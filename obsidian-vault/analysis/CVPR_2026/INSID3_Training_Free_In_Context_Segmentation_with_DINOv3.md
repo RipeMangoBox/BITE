@@ -52,8 +52,6 @@ INSID3仅包含三个简单阶段：**凝聚聚类**将目标图像划分为语�
 
 在涵盖语义、部件和个性化分割的多个基准上，INSID3以平均55.1% mIoU超越先前的训练自由方法+7.5个百分点，同时参数量仅为GF-SAM的三分之一。在医学影像（Chest X-Ray +27.8 mIoU）、遥感（ISIC +5.7 mIoU）等域外数据集上优势尤为显著，验证了其强大的泛化能力。
 
-
-
 ### 上下文分割：从“看见”到“模仿”
 
 计算机视觉系统长期追求一种类似人类的泛化能力：给定一个带标注的参考图像，模型应能立即理解“分割目标是什么”，并在任意新图像中找出对应区域，无论其语义粒度是完整物体、部件还是个性化概念。这一任务被称为上下文分割（In-Context Segmentation, ICS），其核心挑战在于**仅凭单个示例建立跨图像的语义对应，并将其转化为精确的像素级掩码**。
@@ -89,8 +87,6 @@ INSID3的出发点正是上述洞察：**DINOv3的稠密自监督特征已经蕴
 
 这些问题的回答指向一个更根本的命题：**鲁棒的分割能力是否可以直接从纯自监督表征中涌现，而无需任何形式的掩码监督——无论是预训练阶段的SAM，还是下游微调阶段的解码器？**
 
-
-
 ## 核心方法与创新机理
 
 INSID3的核心创新在于**完全摒弃了有监督掩码先验与模型组合，首次证明单个冻结的自监督DINOv3骨干即可涌现出跨粒度、跨领域的上下文分割能力**。这一突破围绕三个紧密耦合的changed slots展开。
@@ -124,8 +120,6 @@ $$\tilde{\mathbf{F}}^{r} = \mathbf{F}^{r} (\mathbf{1}_{D} - \mathbf{B} \mathbf{B
 ### 创新协同效应
 
 上述三个changed slots并非孤立改进，而是形成因果闭环：**位置去偏使跨图像语义对应可靠，可靠的对应使种子选择精准，精准的种子结合聚类分组使聚合产生高质量连通掩码**。这一协同效应使INSID3在仅使用304M参数的条件下，在one-shot语义、部件和个性化分割上平均mIoU达55.1%，比先前的训练自由方法平均提升+7.5% mIoU（Table 1），且在医学影像（Chest X-Ray +27.8%）、遥感等域外数据集上优势尤为显著。
-
-
 
 INSID3 的核心设计理念是：**单一个冻结的自监督骨干即可涌现上下文分割能力**。整个 pipeline 无需任何解码器、微调或模型组合，仅依赖 DINOv3 的稠密 patch 特征，通过三个概念阶段将示例掩码传递至目标图像。
 
@@ -176,12 +170,8 @@ INSID3 的核心设计理念是：**单一个冻结的自监督骨干即可涌�
 
 INSID3 仅使用单个 DINOv3 骨干（304M 参数），而代表性训练自由基线 GF-SAM 需 945M 参数（Table 1）。该框架可自然扩展至多示例上下文（最多 5-shot），无需调整任何超参数，平均 mIoU 从 55.1% 提升至 59.9%（Table 7）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2603_28480/figures/001_Figure_1.jpg]]
 *Figure 1: Results and overview of INSID3, our training-free in-context segmentation approach. INSID3 performs in-context segmentation directly from DINOv3 [56] features, without any decoder, fine-tuning, or model composition. (left) A single annotated example guides the model to segment any concept, from object parts to medical images and aerial views. (right) Comparing generalization across datasets and segmentation granularities: fine-tuned methods (orange) excel in-domain ( ) but degrade out of distribution, while SAMbased pipelines (blue) generalize better but rely on large, multi-stage architectures. INSID3 (purple) achieves the strongest generalization with a single backbone, revealing that rob...*
-
-
 
 INSID3 由三个核心阶段构成：**位置去偏特征提取**、**目标图像凝聚聚类**、**种子选择与簇聚合**。整个流程无需任何训练或模型组合，仅依赖冻结的 DINOv3 编码器。
 
@@ -220,9 +210,6 @@ $$
 $$
 
 聚类在 DINOv3 特征上自然产生语义连贯的区域划分（Figure 2），为后续种子选择提供结构化的候选单元。聚类粒度由距离阈值 $\tau = 0.6$ 控制，无需预定义簇数 $K$。
-
-![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2603_28480/figures/002_Figure_2.jpg]]
-*Figure 2: Region-level grouping from DINOv3. Each pair shows an input image (left) and the corresponding clustering map (right) obtained by applying agglomerative clustering to dense DINOv3 features. The resulting clusters delineate coherent object- and partlevel regions, providing a structured decomposition of the scene*
 
 ### 3.3 种子簇选择
 
@@ -290,13 +277,6 @@ $$
 
 该乘性得分机制将语义对齐与结构连贯性统一为单一判据，消融实验表明：移除聚类与自相似性聚合后，COCO-20i 的 mIoU 从 57.6% 骤降至 44.2%，PASCAL-Part 从 50.5% 降至 35.4%（Table 3），验证了该设计的核心作用。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2603_28480/figures/004_Figure_4.jpg]]
-*Figure 4: Positional bias in DINOv3 features. For both region (a) and keypoint (b) prompts, similarity maps computed with the original DINOv3 features show structured activations aligned with the reference coordinates, independent of semantics. Our debiased features mitigate this behavior. (c) PCA of features from images with low semantic complexity (e.g., noise, flat textures) reveals a stable low-dimensional positional subspace underlying this bias*
-
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -361,30 +341,14 @@ Figure 5展示了INSID3与GF-SAM、SegIC的定性对比。SegIC在训练域内�
 3. **缺乏实例级推理**：输出为语义掩码，不区分同一类别的不同实例，多个同类物体会被合并为单一区域。
 4. **位置信息的双重性**：去偏虽抑制了有害的位置偏差，但绝对的定位信息在某些任务中可能有益，该权衡尚未深入探索。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2603_28480/figures/005_Table_1.jpg]]
 *Table 1: Comparison of INSID3 (mIoU in %, ↑) on one-shot semantic, part, and personalized segmentation. State-of-the-art methods are grouped into task-specific fine-tuning and training-free approaches. Previous training-free methods rely on SAM, pre-trained with mask-level supervision, whereas INSID3 uses only frozen self-supervised DINOv3 features. Gray indicates the model was trained on the corresponding train split of the dataset; best results bold, 2nd best underlined. † denotes a GF-SAM variant using DINOv3 features*
-
-![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2603_28480/figures/010_Table_3.jpg]]
-*Table 3: Effect of clustering and aggregation. We compare our approach with tuned baselines on COCO-20i and PASCAL-Part (mIoU %, ↑). All thresholds (0.55) and clustering granularities*
 
 ![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2603_28480/figures/007_Table_2.jpg]]
 *Table 2: Semantic correspondence on SPair-71k (PCK@T in %, ↑). Comparison across DINOv3 backbones, w/ and w/o debiasing*
 
-![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2603_28480/figures/012_Table_4.jpg]]
-*Table 4: Semantic correspondence on SPair-71k. PCK@T (%, ↑) for DINOv2 and DINOv3 using original and debiased features. Debiasing produces marginal improvements for DINOv2, but yields substantial gains for DINOv3*
-
 ![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2603_28480/figures/006_Figure_5.jpg]]
 *Figure 5: Comparison of INSID3 with GF-SAM [69] and SegIC [41] on one-shot semantic (left), part (top right), and personalized (bottom right) segmentation. SegIC performs well in-domain but struggles to generalize across domains and part granularity, reflecting its limited flexibility beyond the training distribution. GF-SAM, relying on the strong segmentation priors of SAM [33], produces highquality masks; however, the decoupled mechanism between correspondence and segmentation often leads to over- or under-segmentation. INSID3, despite relying solely on self-supervised features, achieves precise localization and competitive mask quality*
-
-![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2603_28480/figures/017_Table_8.jpg]]
-*Table 8: Backbone analysis for INSID3. We report mIoU (in %, ↑) on COCO-20i of INSID3 with different backbone features. DINOv3 features lead to the best segmentation accuracy*
-
-![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2603_28480/figures/013_Table_5.jpg]]
-*Table 5: Different debiasing strategies. Comparison of trainingfree strategies for feature debiasing on COCO-20i using mIoU (in %, ↑). Augmentations are a viable alternative but require multiple forward passes. In contrast our method adds no overhead, except for a single matrix multiplication, since the debiasing projection is pre-computed offline and stored*
-
-
 
 ## 定位与知识库关联
 
@@ -438,8 +402,6 @@ INSID3开辟了若干值得深入的方向：
 5. **自适应去偏秩**：去偏投影的秩 $s$ 目前固定为500，是否存在基于图像内容自适应调整的策略，以优化语义对应与空间定位的平衡？
 
 **注意**：本文引用的基线方法（PerSAM、Matcher、GF-SAM、SegIC、DiffewS、SegGPT）的具体作者、会议和年份信息在提供的分析材料中未完整给出，建议读者根据论文原文的参考文献列表进行核实。
-
-
 
 ## 原文 PDF
 

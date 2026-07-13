@@ -57,8 +57,6 @@ claims:
 
 **主要结果一览**：PoseScript 支持三类多模态应用（Fig. 1）：文本到姿态检索、文本条件姿态生成、以及姿态描述生成。在跨模态检索任务上，结合 Transformer 文本编码器与镜像增强后，mRecall 可达 45.3；生成模型在预训练策略加持下实现了高保真的文本条件姿态合成。整体上，PoseScript 以极低的人工标注成本（每姿态约 3 分钟，共约 6,000 条人工描述）撬动了显著的性能增益，为三维人体姿态的语义理解提供了可复用的数据基础。
 
-
-
 三维人体姿态理解是计算机视觉与图形学的核心问题，其应用涵盖动作识别、运动生成、人机交互等领域。近年来，大规模运动捕捉数据集（如 AMASS）的出现极大地推动了对人体运动的建模能力，但这些数据集普遍存在一个关键缺口：**缺乏与三维姿态对应的细粒度自然语言描述**。现有的文本-姿态配对数据要么仅提供粗粒度的动作标签（如“行走”“跳跃”），要么局限于特定场景的简短指令，无法捕捉姿态层面丰富的空间关系和身体部位配置信息。
 
 这一缺口的后果是双重的。首先，它限制了**跨模态检索**的能力——用户无法通过自然语言精确查询具有特定身体姿态的三维数据。其次，它制约了**文本条件姿态生成**的质量，因为模型缺乏足够的语义监督来学习从语言到姿态空间的映射。尽管 CLIP（Radford et al., ICML 2021）等大规模视觉-语言模型在图像领域取得了突破性进展，但三维人体姿态的语义粒度远超通用图像描述所能覆盖的范围，需要专门的数据集和建模策略。
@@ -66,8 +64,6 @@ claims:
 人工标注是获取高质量姿态描述的直接途径，但面临两个根本性挑战。其一，**标注成本极高**：姿态描述需要标注者同时具备空间推理能力和精确的语言表达技巧，标注一个姿态的描述往往需要数分钟。其二，**语义覆盖有限**：人工标注者倾向于关注显著的姿态特征，容易忽略细微但判别性强的身体部位关系，导致描述多样性和信息密度不足。
 
 PoseScript 正是在这一背景下提出的。其核心动机是：**能否通过自动化管线，从三维关键点数据中提取结构化的语义信息，并据此生成大规模、多样化的自然语言描述，从而弥补人工标注在规模和覆盖度上的不足？** 这一思路的关键洞察在于，三维姿态的底层几何关系（关节角度、相对位置、身体部位接触等）可以被分解为少量可组合的语义基元（称为 posecode），再通过语言规则组合成自然语言句子。这种“从几何到语义再到语言”的管线，使得以极低成本生成数十万条姿态描述成为可能，为后续的跨模态预训练提供了数据基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -99,8 +95,6 @@ PoseScript 引入了针对人体姿态对称性的数据增强策略：对姿态
 ### 创新机制的内在联系
 
 上述三个 changed slots 并非孤立存在，而是形成了互补的增强链条：**自动描述管线**提供了规模化的语义监督基础，**Transformer 编码器**提升了模型对复杂语义的建模能力，**镜像增强**则利用领域先验进一步挖掘数据潜力。三者的协同作用使得 PoseScript 在跨模态检索和生成任务上均取得了显著超越基线的性能。
-
-
 
 ![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2210_11795/figures/002_Figure_2.jpg]]
 *Figure 2: Examples of pose descriptions from PoseScript, produced by human annotators (left) and by our automatic captioning pipeline (right)*
@@ -135,8 +129,6 @@ PoseScript 的核心贡献是构建了一条连接 3D 人体姿态与自然语�
 ### 输入输出流
 
 整个框架的输入端为 AMASS 运动捕捉数据库中的 3D 人体姿态（经最远点采样选取 100,000 个高多样性姿态），输出端涵盖：给定自然语言查询的 3D 姿态检索结果、给定文本条件的 3D 姿态生成样本，以及给定姿态的自然语言描述。**核心因果机制**在于：大规模自动描述预训练（PoseScript-A）弥补了人工标注的规模瓶颈，再在人工描述（PoseScript-H）上微调，使检索平均召回率从 23.0% 提升至 40.9%（+78%），生成 FID 从 0.29 降至 0.04。
-
-
 
 ### 1. 自动标注管线（Captioning Pipeline）
 
@@ -188,8 +180,6 @@ $$\mathcal{L} = \mathcal{L}_R(p, \hat{p}) + \mathcal{L}_{KL}(\mathcal{N}_p, \mat
 ### 4. 预训练-微调范式
 
 上述两个下游模型均遵循统一的训练策略：先在大规模自动描述数据 PoseScript-A（约 100k 姿态 × 3 描述）上预训练，再在人工标注数据 PoseScript-H（6,283 条描述）上微调。这是本文最关键的因果调节变量——仅用人工数据从头训练时，检索平均召回率仅 23.0%，而预训练后微调可提升至 40.9%（+78%）；姿态生成 FID 从 0.29 大幅降至 0.04。数据量消融实验（Fig. 15）进一步表明，增加自动标注数据量持续提升检索性能，而仅增加人工数据则很快饱和，验证了大规模自动标注预训练的核心价值。
-
-
 
 ## 实验与关键发现
 
@@ -243,7 +233,6 @@ TABLE III 展示了生成模型的评估结果。关键指标为 FID（Fréchet 
 
 对自动标注管线的各组件进行消融，考察不同 caption 版本对检索性能的影响：
 
-
 ![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2210_11795/figures/018_Table.jpg]]
 *Table: IV CAPTION GENERATION RESULTS. THE TOP BLOCK SHOWS SOME REFERENCE MEASURES WHILE THE LOWER BLOCK EVALUATES THE GENERATED TEXTS FOR POSESCRIPT-H. RESULTS ARE AVERAGED OVER 3 RUNS. TABLE V*
 
@@ -290,24 +279,6 @@ TABLE X 对比了不同预训练配置（均在 PoseScript-H 微调前评估，�
 - **TABLE V**：Posecode 聚合（N3 版本）取得最优结果，验证了管线中语义压缩模块的有效性。
 - **Fig. 8**：文本到姿态检索的定性结果展示了模型对细粒度语义约束（如 “左膝微曲、右手举过头顶”）的捕捉能力。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2210_11795/figures/003_Figure_3.jpg]]
-*Figure 3: Origin of the selected poses. The top bar plot shows the proportion of sequences that are eventually used in PoseScript with respect to available sequences in AMASS. A sequence is ‘used’ if it provided at least one pose to PoseScript. The bottom bar plot shows the distribution of the PoseScript poses over the AMASS sub-datasets*
-
-![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2210_11795/figures/004_Figure_4.jpg]]
-*Figure 4: Interface presented to the AMT annotators in order to collect discriminative descriptions of the blue pose following a two-step process*
-
-![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2210_11795/figures/022_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2210_11795/figures/030_Figure_17.jpg]]
-*Figure 17: Statistics on categorizations of distance posecodes, obtained over the poses of PoseScript-A20. The first four columns of dots from the top block show distance posecodes between the left and right corresponding body parts; other columns of dots study the distance between a left or right body part and another left or right body part (when the side of the second body part is not specified, it is the same as for the first body part). Letters ‘L’ and ‘R’ refer to left and right body parts respectively. The dot size varies with the proportion of poses that fit to the given categorization. The dot color indicates unskippable (orange), skippable (blue), and ignored (grey) posecodes, based on their...*
-
-![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2210_11795/figures/031_Figure_18.jpg]]
-*Figure 18: Statistics on categorizations of relative position posecodes along the X axis, obtained over the poses of PoseScript- $\mathrm { A _ { 2 0 } }$ . Letters ‘L’ and $\cdot _ { \mathrm { R } } \cdot$ refer to left and right body parts respectively. When unspecified, pairs of body parts are from the same side of the body. The dot size varies with the proportion of poses that fit to the given categorization. The dot color indicates unskippable (orange), skippable (blue), and ignored (grey) posecodes, based on their scarcity. Black dots are ignored because of their inherent ambiguity. For instance, it appears that, for less than 6% of the poses (orange dots), body extremities (hand, foot) are crisscro...
-
-![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2210_11795/figures/035_Figure_21.jpg]]
-*Figure 21: Statistics on categorizations of pitch & roll posecodes, obtained over the poses of PoseScript-A20. Letters ‘L’ and ‘R’ refer to left and right body parts respectively. The word ‘backdiag’ refers to the segment between the pelvis and the shoulder, ‘hands’ (resp. ‘feet’) to the segment between the two hands (resp. feet), and ‘torso’ to the segment between the neck and the pelvis. The dot size varies with the proportion of poses that fit to the given categorization. The dot color indicates unskippable (orange), skippable (blue), and ignored (grey) posecodes, based on their scarcity. Black dots are ignored because of their inherent ambiguity. Some of these posecodes are considered only for sup...*
 
 ![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2210_11795/figures/006_Table.jpg]]
 *Table: I SEMANTIC ANALYSIS ON 115 POSESCRIPT ANNOTATIONS*
@@ -320,9 +291,6 @@ TABLE X 对比了不同预训练配置（均在 PoseScript-H 微调前评估，�
 
 ![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2210_11795/figures/020_Table.jpg]]
 *Table: SUMMARY OF THE AUTOMATIC CAPTION VERSIONS. ✓ SYMBOLS INDICATE WHEN CHARACTERISTICS APPLY TO EACH CAPTION VERSION. ALL MODELS WERE TRAINED ON A POOL OF 3 CAPTIONS PER POSE (MULTIPLICITY). MEAN RECALL RESULTS ARE AVERAGED OVER 3 RUNS OF MODELS TRAINED WITH THE BI-GRU CONFIGURATION*
-
-
-
 
 ## 定位与知识库关联
 
@@ -371,8 +339,6 @@ PoseScript 的设计存在以下已知局限性，需要在应用中审慎评估
 - **大规模多模态模型利用**：能否借助文本-图像等大规模多模态模型（如 CLIP 的图像分支）填补活动语义、环境上下文等数据缺口？
 - **稀有姿态处理**：如何通过数据增强、课程学习或生成式建模改进对自接触、倒立等稀有姿态的覆盖和生成质量？
 - **下游任务迁移**：基于文本的身体语义先验在动作识别、运动预测、人机交互等下游任务中的应用前景如何？PoseScript 的文本条件姿态生成模型已初步展示了在 SMPL 拟合中作为语义先验的潜力（Fig. 12），但系统性的下游评估仍有待开展。
-
-
 
 ## 原文 PDF
 

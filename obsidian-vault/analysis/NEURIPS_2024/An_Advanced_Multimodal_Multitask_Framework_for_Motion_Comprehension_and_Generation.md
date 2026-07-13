@@ -59,8 +59,6 @@ claims:
 
 M3GPT 尚存若干局限：当前模型仅关注身体运动，未包含手部与面部建模；训练数据规模有限，零样本泛化在极端未见任务组合上的表现有待验证；训练需 8 块 NVIDIA A40 GPU，计算门槛较高。这些也为后续研究指明了方向——包括扩展统一词汇表至更多模态、引入精细的全身运动建模，以及探索更高效的多任务调度策略以进一步缓解负迁移。
 
-
-
 ### 多模态运动任务的统一挑战
 
 人体运动理解与生成涵盖文本到运动（Text-to-Motion）、运动到文本（Motion-to-Text）、音乐到舞蹈（Music-to-Dance）、舞蹈到音乐（Dance-to-Music）、运动预测（Motion Prediction）及运动插值（Motion In-between）等多项核心任务。这些任务涉及文本、音乐、舞蹈等多种模态，各模态在数据形式、语义粒度和时序结构上存在显著差异。现有方法通常针对单一任务设计专用模型，缺乏统一的表示空间和有效的跨任务协同机制。当尝试将多个任务整合到单一框架内进行联合训练时，各任务性能往往出现明显下降，这一现象揭示了多模态运动任务联合建模的核心瓶颈：模态差异大，任务间存在负迁移。
@@ -78,8 +76,6 @@ M3GPT 尚存若干局限：当前模型仅关注身体运动，未包含手部�
 3. **文本作为桥梁实现多任务协同**：通过构建辅助的音乐到文本（Music-to-Text）和文本到舞蹈（Text-to-Dance）任务，以文本描述为中介对齐音乐与舞蹈模态，缓解直接跨模态映射带来的任务冲突。
 
 这些设计使M3GPT能够在单一框架内处理六项核心运动任务，并通过多任务预训练与指令微调实现任务间的协同互促，而非简单的多任务叠加。
-
-
 
 ## 核心方法与创新机理
 
@@ -123,8 +119,6 @@ M3GPT 的核心创新并非提出单一的新模块，而是通过三个相互�
 3. **联合优化**在连续运动空间施加直接监督，弥补了纯离散 token 优化在运动质量上的不足。
 
 三者叠加使得 M3GPT 在单一框架内实现了文本到运动、音乐到舞蹈、运动到文本等多项任务的协同互促，而非彼此干扰。
-
-
 
 M3GPT 的整体框架遵循“离散化—对齐—指令化”的三阶段训练范式，核心由**多模态分词器（Multimodal Tokenizers）**与**运动感知语言模型（Motion-Aware Language Model）**两大组件构成。其设计目标是将文本、运动、音乐三种模态统一到一个共享的离散词汇空间中，使单一语言模型主干能够同时处理运动理解与生成任务。
 
@@ -173,12 +167,8 @@ M3GPT 的训练分为三个递进阶段（Figure 2）：
 
 直接进行多任务联合训练通常会导致各子任务性能劣于单任务训练（Table 2）。M3GPT 通过**以文本为桥梁**构造辅助任务来解决这一冲突：为音乐数据构建配对的文本描述，并设计**文本到舞蹈（T2D）**和**音乐到文本（A2T）**两个辅助任务。这些辅助任务在音乐到舞蹈与文本到运动两条主线之间建立了协同通路，使模型在共享的运动/舞蹈分词器下实现跨任务的知识迁移与相互增强。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1913_An_Advanced_Multimodal_Multitask_Framework_for_Motion_Comprehension_and/figures/001_Figure_1.jpg]]
 *Figure 1: M3GPT can handle core motion comprehension and generation tasks, including text-to-motion, motionto-text, music-to-dance, dance-to-music, motion prediction, and motion in-between. The motion sequences within the dashed-line areas are masked in the input*
-
-
 
 M3GPT 的核心架构由**多模态分词器（tokenizer）**和**运动感知语言模型**两部分构成，如图 Figure 2 所示。其关键设计在于将所有模态统一到同一离散词汇表，并通过在原始运动空间中的联合优化实现跨任务协同。
 
@@ -215,16 +205,6 @@ $$
 其中 $\pmb{q}_t$ 为目标 token 序列，$\pmb{q}_s$ 为源 token 序列，$L_t$ 为目标序列长度，$\hat{\pmb{m}}$ 为解 tokenizer 输出的运动序列，$\lambda$ 为平衡超参数（设为 0.2）。
 
 此外，M3GPT 引入**协同多任务学习**策略：通过构建辅助的文本-舞蹈（Text-to-Dance）和音乐-文本（Music-to-Text）任务，以文本为桥梁对齐音乐与运动模态，缓解多任务联合训练中的性能冲突。消融实验（Table 2）表明，该策略使音乐到舞蹈的 FID_k 下降近 10 个点，验证了跨任务协同互促的有效性。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1913_An_Advanced_Multimodal_Multitask_Framework_for_Motion_Comprehension_and/figures/012_Figure_5.jpg]]
-*Figure 5: Tasks for M3GPT pre-training and instruction tuning. Random represents the unconstrained generation of motion/text/music in the corresponding task*
-
-![[assets/figures/papers/paper_list_l1913_An_Advanced_Multimodal_Multitask_Framework_for_Motion_Comprehension_and/figures/010_Figure_4.jpg]]
-*Figure 4: Pipeline of Text-Motion Alignment Model. The training of the text-motion alignment model includes two stages: pre-training motion auto-encoder and text-motion contrastive learning*
-
-
 
 ## 实验与关键发现
 
@@ -297,22 +277,6 @@ M3GPT 处于多模态运动生成与理解的交叉点，其方法谱系可追�
 
 总体而言，M3GPT 在统一多模态运动理解与生成框架中引入了“文本桥梁”协同学习与“双空间联合优化”两个关键机制，有效缓解了多任务训练冲突，为构建更通用的运动智能体提供了可行路径。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1913_An_Advanced_Multimodal_Multitask_Framework_for_Motion_Comprehension_and/figures/002_Table_1.jpg]]
-*Table 1: Comparison of recent multimodal, multitask methods across various motion comprehension and generation tasks. T2M: text-to-motion; M2T: motion-to-text; A2D: music-to-dance; D2A: dance-to-music; M2M: motion-to-motion that includes motion prediction and motion in-between. Random M, Random T, and Random A represent the unconstrained generation of motion, text, and music3, respectively*
-
-![[assets/figures/papers/paper_list_l1913_An_Advanced_Multimodal_Multitask_Framework_for_Motion_Comprehension_and/figures/025_Figure_7.jpg]]
-*Figure 7: Qualitative comparisons for text-to-motion task and music-to-dance task. (a) refers to the qualitative comparison between Real, MDM, MoMask and M3GPT on text-to-motion task. The red words and boxes highlight the misaligned motions. The results demonstrate that our M3GPT shows good text understanding for motion generation. (b) refers to the qualitative comparison between Bailando and M3GPT on music-to-dance task. The input is an 5-second-long piece of music in the Break style*
-
-![[assets/figures/papers/paper_list_l1913_An_Advanced_Multimodal_Multitask_Framework_for_Motion_Comprehension_and/figures/009_Figure_3.jpg]]
-*Figure 3: Qualitative results for long-term dance and music-text conditioned dance generation of M3GPT*
-
-![[assets/figures/papers/paper_list_l1913_An_Advanced_Multimodal_Multitask_Framework_for_Motion_Comprehension_and/figures/024_Figure_6.jpg]]
-*Figure 6: The qualitative results for different motion comprehension and generation tasks*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 与基线方法的关系
@@ -350,8 +314,6 @@ M3GPT 的适用边界由其设计选择和数据条件共同决定。
 - **负迁移的深层机制：** 多任务训练中观察到的负迁移现象（Table 2 中单任务训练优于直接多任务联合训练），是否可以通过更动态的任务调度策略（如基于梯度的任务权重自适应调整）进一步缓解，是一个值得探索的方向。
 - **精细运动建模：** 手部和面部运动涉及更高维度的自由度与更复杂的时空依赖，现有 VQ-VAE 压缩框架能否直接扩展，还是需要专门的分层 tokenizer 设计，目前尚无定论。
 - **评估体系的完备性：** 当前评价指标（FID、R-Precision 等）主要关注运动质量和文本对齐度，缺乏对运动多样性、风格一致性、音乐节拍同步性的精细度量，评估体系本身仍有改进空间。
-
-
 
 ## 原文 PDF
 

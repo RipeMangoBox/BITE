@@ -149,8 +149,6 @@ Figure 2 展示了传感器在受试者身体上的佩戴布局。所有模态�
 
 该流水线的核心设计理念是：**足底压力与肌电等可穿戴信号携带丰富的生物力学约束**，结合语义描述可作为替代视觉的强先验，为隐私保护下的细粒度运动理解提供数据基础。当前流水线的固有限制在于所有采集均在受控室内环境完成，且受试者仅覆盖32名健康成年人（18‑42岁），向户外自由生活场景和特殊人群的泛化能力尚待验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l973_https_openaccess_thecvf_com_content_CVPR2026_html_Dabrowski_HUMAPS_4D_A/figures/001_Figure_1.jpg]]
 *Figure 1: HUMAPS-4D is a large-scale multimodal dataset for human motion analysis, comprising 14 hours of recordings and over 6 million time-synchronized images. Each session combines exocentric video, motion capture, IMUs, instrumented insoles, and sEMG, alongside rich semantic annotations and anthropometric data. By integrating low-level biomechanical signals with high-level semantic and visual information, HUMAPS-4D provides a comprehensive resource for studying full-body 3D motion, motor skill assessment, and cross-modal learning in naturalistic settings*
 
@@ -189,8 +187,6 @@ $$IS = \frac{1}{n_J} \sum_{i=0}^{n_J * 3 - 1} \sigma_{1:T}(\bar{J}_{i_{1:T}} - J
 其中 $n_J$ 为关节数量，$\bar{J}_{i_{1:T}}$ 与 $J_{i_{1:T}}$ 分别为推断姿态和真值在第 $i$ 个坐标分量上的时间序列，$\sigma_{1:T}(\cdot)$ 为沿时间窗的标准差。该指标捕捉预测姿态相对于真值的时域抖动，值越低表示预测越平滑。
 
 **基线模型架构** 方面，动作识别采用 **ST‑GCN** (Yan et al., AAAI 2018) 作为分类器，姿态估计基线参考 **SolePoser** (Wu et al., UIST 2024) 的双流 Transformer 设计，包含 PressNet 和 AccelNet 两个分支（完整架构见补充材料 Figure 4）。多模态监督采用联合损失，各模态损失等权加权。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l973_https_openaccess_thecvf_com_content_CVPR2026_html_Dabrowski_HUMAPS_4D_A/figures/004_Figure_3.jpg]]
 *Figure 3: HUMAPS-4D offers 3 paired language corpora*
@@ -241,8 +237,6 @@ HUMAPS‑4D 的核心贡献在于**首次在一个统一采集协议下融合了
 动作识别基线采用 **ST‑GCN**（Yan et al., AAAI 2018）作为分类器，多模态融合通过联合损失函数实现，各模态损失等权重加权。姿态估计基线模型架构受 **SolePoser**（Wu et al., UIST 2024）启发，采用双流Transformer设计（见 **Figure 4**），其中 AccelNet 和 PressNet 分别处理加速度和压力分支，最终回归42个3D关节位置。
 
 需要指出的是，当前基线结果仅作为数据集发布时的参考下限。论文明确表示这些模型未针对各模态特性进行深度优化（如未利用sEMG的肌肉协同先验、未引入语义约束），因此实际可达到的性能上限可能远高于当前报告值。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l973_https_openaccess_thecvf_com_content_CVPR2026_html_Dabrowski_HUMAPS_4D_A/figures/002_Table_1.jpg]]
 *Table 1: Comparison of existing multimodal datasets for human motion analysis. The first group of datasets (top rows) corresponds to Vision-Driven 3D Pose Estimation, emphasizing video with MoCap and insole data. The second group (middle rows) corresponds to Biomechanical Motion Assessment, focusing on precise measurement of gait, joint kinematics, muscle activation, and anthropometrics using insoles, sEMG, and force plates. HUMAPS-4D (bottom row) integrates these modalities in a single dataset, providing synchronized recordings from instrumented insoles, IMUs, sEMG, motion capture, and multiple RGB cameras, along with rich semantic annotations and anthropometric data. With 32 participants performin...*

@@ -61,8 +61,6 @@ claims:
 
 **局限与待验证方向**：当前实验采用被试内交叉验证协议，尚未验证跨被试或跨会话泛化效果；仅在三个Ninapro基准数据集上评估；生成限定于固定长度窗口，未扩展到完整试次级别。未来工作可探索更低NFE的蒸馏采样、跨被试泛化、以及在其他生理时间序列（EEG、ECG）中的适用性。
 
-
-
 表面肌电信号（sEMG）手势识别是人机交互与康复工程中的核心技术。然而，sEMG数据的采集成本高昂，受试者内与受试者间的信号变异性大，导致实际可用的标注数据规模有限，严重制约了深度学习模型的泛化能力。数据增强是缓解这一瓶颈的常用手段，但传统的手工扰动增强（如抖动、缩放、时间掩码等）仅对信号施加浅层变换，难以模拟sEMG中复杂的生理与采集噪声结构，对下游识别性能的提升幅度有限。
 
 生成式增强方法试图从数据分布层面学习合成逼真的sEMG样本，从而提供更丰富的训练信号。当前主流的生成范式存在两难困境：生成对抗网络（GAN）虽推理速度快，但在sEMG生成中面临训练不稳定和模式坍塌问题，导致合成样本的多样性不足；去噪扩散概率模型（DDPM）虽能生成高质量样本，但其迭代采样过程需要数百至上千步函数评估，推理效率低下，严重限制了实际部署的可行性。加速采样方法（如DDIM）虽可减少采样步数，但在低步数下保真度退化明显，且扩散模型对采样器设计的依赖性强，灵活性受限。
@@ -70,8 +68,6 @@ claims:
 连续归一化流（Continuous Normalizing Flows）和流匹配（Flow Matching, FM）框架为生成建模提供了新的路径。FM直接学习数据与噪声之间连续传输动力学的速度场，支持任意显式ODE求解器进行积分，从而在推理效率与生成质量之间提供了更灵活的权衡空间。然而，FM在结构化生理时间序列（尤其是多通道sEMG）中的适用性、条件注入机制的设计，以及合成数据在下游任务中的独立实用性，此前均未被系统研究。
 
 针对上述缺口，本文提出EMGFlow——首个基于流匹配的条件sEMG生成框架。EMGFlow通过自适应条件归一化（AdaGN）、logit-normal时间采样和分类器自由引导等设计选择，在统一的评估协议下（涵盖特征空间保真度、分布几何和下游效用）系统探索了FM在sEMG合成中的质量-效率权衡，并首次揭示了sEMG生成中保真度与下游实用性之间的早期权衡关系。
-
-
 
 ## 核心方法与创新机理
 
@@ -124,8 +120,6 @@ $$\hat{\nu}_{\theta}(x_t, t, y) = \nu_{\theta}(x_t, t, \emptyset) + w \left( \nu
 - 自适应或任务感知的引导机制设计；
 - 非均匀时间采样的更优参数化（$\mu$ 和 $\sigma$ 的选择）是否具有普遍指导意义。
 
-
-
 EMGFlow 将条件 sEMG 生成形式化为一个连续时间传输问题：从易于采样的先验分布（高斯噪声）出发，学习一条通向特定手势类别的真实多通道 sEMG 窗口分布的连续轨迹。整个流水线由四个耦合模块构成，形成从原始信号到可部署合成数据的闭环。
 
 **模块一：数据采集与滑动窗口预处理。** 原始多通道 sEMG 信号首先被分割为固定长度 200 ms、步长 50 ms 的滑动窗口，随后对每个通道独立进行 z-score 归一化。每个窗口被表示为一个张量 $\boldsymbol{x} \in \mathbb{R}^{C \times L}$，并携带对应的手势标签 $\boldsymbol{y} \in \{1, \dots, K\}$。该模块的输出是标准化的窗口-标签对，为后续条件生成提供监督信号。
@@ -148,12 +142,8 @@ $$\hat{\nu}_{\theta}(x_t, t, y) = \nu_{\theta}(x_t, t, \emptyset) + w \left( \nu
 
 **模块四：综合评估。** 合成数据从三个维度接受检验：(1) 基于特征的保真度指标（FID、IS、CAS），使用在真实训练集上单独训练的 EMGHandNet 作为特征提取器；(2) 分布几何分析，包括精确率-召回率-密度-覆盖率（PRDC）和原型集中度；(3) 下游效用，涵盖增强实验（将合成数据混入真实训练集）和更严格的 TSTR 设置（下游分类器仅使用合成数据训练，在真实测试集上评估）。这一多层级协议揭示了 sEMG 生成中保真度与下游效用之间的早期权衡——更强的 CFG 虽然提升类别判别性，却持续降低 TSTR 和增强准确率。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l10_EMGFlow_Robust_and_Efficient_Surface_Electromyography_Synthesis_via_Flow_motion20/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the proposed EMGFlow pipeline. The framework consists of four stages: (a) sEMG data acquisition and sliding-window preprocessing; (b) conditional flow-matching training with time sampling and AdaGN-based condition injection; (c) synthetic EMG generation via classifier-free guidance and ODE solvers; and (d) comprehensive evaluation through fidelity metrics, train-on-synthetic test-on-real (TSTR), and augmentation experiments*
-
-
 
 ### 3.1 问题形式化：条件窗口级sEMG生成
 
@@ -223,9 +213,6 @@ $$ z \sim \mathcal{N}(\mu, \sigma^2), \quad t = \mathrm{sigmoid}(z) = \frac{1}{1
 
 默认参数 $\mu=0, \sigma=1$ 使得 $t$ 的分布向中间区域集中，强调轨迹的中间阶段。消融实验（Figure 8）表明，logit-normal采样在**所有评估指标上均优于均匀采样**，尤其在TSTR准确率上增益最大，说明强调中间轨迹提供了更有用的训练偏置。
 
-![[assets/figures/papers/paper_list_l10_EMGFlow_Robust_and_Efficient_Surface_Electromyography_Synthesis_via_Flow_motion20/figures/017_Figure_8.jpg]]
-*Figure 8: Effect of time sampling strategy on DB2. The five panels report FID, IS, CAS, augmentation accuracy, and TSTR accuracy, respectively. Compared with uniform sampling, logit-normal time sampling improves all reported metrics, with the largest gain appearing under the more stringent TSTR setting. This result suggests that emphasizing the intermediate portion of the flow trajectory provides a more useful training bias than sampling time uniformly*
-
 ### 3.5 条件接口：自适应GroupNorm
 
 EMGFlow采用**GroupNorm + 自适应GroupNorm（AdaGN）**作为条件注入接口，替代了PatchEMG原骨干中的BatchNorm。其核心设计是通过类别和时间条件调制归一化层的缩放与偏移参数，使条件信息在网络各层自适应地影响特征分布。
@@ -237,12 +224,8 @@ EMGFlow采用**GroupNorm + 自适应GroupNorm（AdaGN）**作为条件注入接�
 
 这表明**条件接口的设计并非次要实现细节，而是实质性影响生成数据下游效用的关键架构选择**。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l10_EMGFlow_Robust_and_Efficient_Surface_Electromyography_Synthesis_via_Flow_motion20/figures/016_Figure_7.jpg]]
 *Figure 7: Comparison of Euler, Heun, and RK4 within EMGFlow under matched numbers of function evaluations (NFE) on DB7. When the sampling budget becomes moderately large, Heun and RK4 consistently achieve lower FID and higher CAS than Euler, showing that higher-order integration better exploits the learned continuous vector field. Euler is only comparatively less poor in the extremely low-NFE regime, where the number of effective integration steps is too small for multi-stage solvers to realize their accuracy advantage*
-
-
 
 ## 实验与关键发现
 
@@ -281,9 +264,6 @@ TSTR（Train-on-Synthetic Test-on-Real）设置更为严苛——下游分类器
 
 一个核心发现是**保真度与下游效用之间的早期权衡**。分类器自由引导（CFG）的消融实验（Figure 3）清晰展示了这一现象：随着引导权重w从1增加到3，IS和CAS单调提升（类别判别性增强），但FID恶化（全局分布对齐减弱），同时下游增强准确率和TSTR准确率持续下降。具体而言，PRDC指标显示精度和密度上升，但召回率和覆盖率下降，表明更强的CFG使生成分布更集中于类别中心，却牺牲了类内多样性和尾部覆盖。这一发现对实际部署具有重要指导意义：**追求极致的类别判别性保真度可能损害合成数据的下游训练效用**。
 
-![[assets/figures/papers/paper_list_l10_EMGFlow_Robust_and_Efficient_Surface_Electromyography_Synthesis_via_Flow_motion20/figures/010_Figure_3.jpg]]
-*Figure 3: Summary of guidance effects on DB7 using EMGHandNet. (a) Feature-based fidelity metrics. (b) TSTR utility. (c) Augmentation utility. (d) PRDC metrics. (e) Neighborhood-based realism diagnostics, with the train-test gap shown on the right axis. (f) Prototype-concentration diagnostics. Stronger guidance improves class-discriminative and local-realism metrics, but reduces coverage and downstream utility*
-
 ### 求解器效率：FM以更低NFE超越扩散
 
 求解器效率对比（Table 6）是EMGFlow效率优势的核心证据。在严格匹配NFE（函数评估次数）的条件下，FM配合Heun求解器在整个10-50 NFE范围内始终比DDIM取得更低的FID和更高的CAS。关键数据点：**FM+Heun在仅10 NFE时即在FID（2.066）和CAS上超过DDIM在50 NFE时的表现（FID=2.647）**，意味着FM以五分之一的采样预算实现了更优的样本质量。
@@ -312,22 +292,6 @@ TSTR（Train-on-Synthetic Test-on-Real）设置更为严苛——下游分类器
 4. **保真度指标的依赖性**：所有基于特征的保真度指标依赖于固定的预训练EMGHandNet特征提取器，其绝对值应在该特定协议下解读，不同特征提取器可能导致不同的保真度排序。
 
 5. **TSTR下的绝对性能差距**：即使在最佳设置下，TSTR准确率仍显著低于使用真实数据训练的基线（如DB7上68.91% vs. 78.26%），表明合成数据在完全替代真实数据方面仍有实质性差距。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l10_EMGFlow_Robust_and_Efficient_Surface_Electromyography_Synthesis_via_Flow_motion20/figures/006_Table_5.jpg]]
-*Table 5: Train-on-synthetic test-on-real (TSTR) results of DDIM, DDPM, and EMGFlow across datasets and classifier backbones. In this protocol, the downstream classifier is trained only on synthetic data and then evaluated on held-out real test data, making it a stricter measure of standalone synthetic-data utility than standard augmentation. Results are reported as mean ± std (%). EMGFlow consistently outperforms the accelerated DDIM baseline in all settings and is stronger than full 1000-step DDPM in five of the six dataset-backbone combinations*
-
-![[assets/figures/papers/paper_list_l10_EMGFlow_Robust_and_Efficient_Surface_Electromyography_Synthesis_via_Flow_motion20/figures/013_Table_7.jpg]]
-*Table 7: Computational benchmark on Ninapro DB7. Since the diffusion baseline and EMGFlow use the same backbone, the comparison mainly highlights inference-side efficiency under different samplers and NFE budgets. EMGFlow with Heun achieves substantially lower FLOPs and higher throughput than DDPM and remains faster than DDIM, while retaining strong sample quality in the main experiments*
-
-![[assets/figures/papers/paper_list_l10_EMGFlow_Robust_and_Efficient_Surface_Electromyography_Synthesis_via_Flow_motion20/figures/015_Figure_6.jpg]]
-*Figure 6: FID trajectories of the diffusion baseline and EMGFlow during training on DB4 and DB7. EMGFlow reduces FID more rapidly in the early stage and reaches a stable low-FID regime with fewer training steps on both datasets. This trend suggests that Flow Matching is not only efficient at inference time, but also easier to optimize under the present training setup*
-
-![[assets/figures/papers/paper_list_l10_EMGFlow_Robust_and_Efficient_Surface_Electromyography_Synthesis_via_Flow_motion20/figures/018_Table_8.jpg]]
-*Table 8: Effect of conditioning interface on downstream utility on DB7 using EMGHandNet. Results are reported as mean ± std (%). The default GN+AdaGN design achieves the best performance under both augmentation and TSTR, while simpler GN+add and GN+concat variants lead to consistent degradation, showing that the conditioning interface materially affects the usefulness of the generated data rather than serving as a minor implementation detail*
-
-
 
 ## 定位与知识库关联
 
@@ -396,8 +360,6 @@ FM框架支持灵活的ODE求解器。在匹配NFE下，**Heun和RK4高阶求解
 5. **时间采样的最优参数化**：logit-normal采样的μ和σ选择是否具有普遍指导意义？是否存在任务或数据集自适应的采样策略？
 
 6. **与PatchEMG的关系深化**：EMGFlow与PatchEMG共享骨干但范式不同，两者在生成机制上的互补性是否可用于集成或级联框架？
-
-
 
 ## 原文 PDF
 

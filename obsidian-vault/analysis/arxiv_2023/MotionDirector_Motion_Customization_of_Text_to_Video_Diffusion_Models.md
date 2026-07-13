@@ -56,8 +56,6 @@ claims:
 - 在LOVEU-TGVE-2023单视频运动定制基准上，MotionDirector在外观多样性方面以72.83%的人类偏好率大幅领先VideoComposer（27.17%），同时在运动保真度方面以61.24%领先VideoComposer的38.76%。
 - 与耦合的单路径LoRA训练相比，双路径架构显著提升了外观多样性（人类偏好54.84% vs 45.16%），且未损害运动保真度。
 
-
-
 文本到视频（T2V）扩散模型近年来取得了显著进展，使得用户能够通过自然语言描述生成高质量的视频内容。然而，仅靠文本提示往往难以精确控制生成视频中的特定运动模式——例如“一个人以特定的步态从左走到右”或“相机以特定的弧线轨迹环绕主体”。这种对**运动概念的定制化需求**催生了一个新的研究问题：如何让预训练的T2V扩散模型学会参考视频中的特定运动，并将其泛化到任意新的外观上。
 
 现有方法在解决这一问题时面临一个核心瓶颈：**运动与外观的耦合学习**。无论是整体微调（full fine-tuning）、参数高效调谐（parameter-efficient tuning），还是单路径低秩适配（LoRA），这些方法在从参考视频中学习运动时，往往同时将训练视频中有限的外观信息编码进模型参数。这导致学到的运动概念与特定外观强绑定——当用户尝试用新的文本描述或外观条件生成视频时，模型要么无法保留目标运动，要么会将训练视频的外观“泄漏”到生成结果中，严重限制了运动定制的泛化能力。
@@ -65,8 +63,6 @@ claims:
 从任务定义来看（Figure 7），视频可以沿“外观”和“运动”两个轴进行定位。**外观定制**（如DreamBooth、Textual Inversion）旨在固定外观而泛化运动；**可控生成**（如VideoComposer、Control-A-Video）通过深度图、姿态等控制信号约束运动，但外观仍受限于文本描述。**运动定制**则提出了正交的需求：固定运动模式，泛化外观。这一任务在单参考视频和多参考视频两种设定下均有实际应用价值——前者要求从单个样本中提取运动概念，后者则利用多个共享相同运动但外观不同的视频进行更鲁棒的学习。
 
 本文的核心动机在于：通过在隐空间中**解耦运动与外观的表示**，使运动学习不再受外观信息的干扰。具体而言，作者观察到在视频扩散模型的隐空间中，运动主要影响帧序列之间的连通结构（connectivity structure），而外观主要影响不同序列点集之间的距离（Figure 4）。基于这一洞察，MotionDirector提出了双路径LoRA架构和外观去偏时间损失，从模型架构和训练目标两个层面实现运动与外观的分离，从而使得定制后的运动可以泛化到任意外观——包括新的文本描述、其他视频的外观，甚至是单张静态图像。
-
-
 
 ## 核心方法与创新机理
 
@@ -97,8 +93,6 @@ $$\phi(\epsilon_i) = \sqrt{\beta^2 + 1} \epsilon_i - \beta \epsilon_{anchor}$$
 
 MotionDirector 通过上述两个“changed slots”，将运动学习任务从一个**耦合的、外观受限的拟合问题**转变为一个**解耦的、外观无关的概念学习问题**。双路径架构在模型结构层面提供了分离的可能性，而外观去偏时间损失则在优化目标层面强制实现了这种分离。二者的协同作用使得运动作为一种可泛化的“概念”被提取出来，这是该方法在运动保真度和外观多样性上同时取得显著提升的根本原因。
 
-
-
 MotionDirector 的整体设计围绕一个核心目标展开：**将运动学习与外观学习解耦**，使定制后的运动能够泛化到任意外观。为此，该方法构建了一个双路径低秩适配（Dual-Path LoRA）架构，并辅以专门设计的外观去偏时间损失函数。
 
 ### 双路径架构
@@ -128,23 +122,10 @@ MotionDirector 的整体设计围绕一个核心目标展开：**将运动学习
 
 该框架的灵活性还体现在：通过分别在不同视频上训练空间 LoRA 和时间 LoRA，可以实现**运动与外观的混合**——将来自视频 A 的运动与来自视频 B 的外观组合生成新视频。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1058_https_arxiv_org_abs_2310_08465/figures/003_Figure_3.jpg]]
 *Figure 3: The dual-path architecture of the proposed method. All pre-trained weights of the base diffusion model remain fixed. In the spatial path, the spatial transformers are injected with trainable spatial LoRAs as shown on the right side. In the temporal path, the spatial transformers are injected with spatial LoRAs sharing weights with those ones in the spatial path, and the temporal transformers are injected with trainable temporal LoRAs*
 
-![[assets/figures/papers/paper_list_l1058_https_arxiv_org_abs_2310_08465/figures/009_Figure_7.jpg]]
-*Figure 7: Each video is characterized by two aspects: appearance and motion. We can uniquely identify a video based on its values along the appearance and motion axes, as shown in the lowerleft corner of this figure. (a) Appearance customization aims to create videos whose appearances look like reference videos but have different motions. (b) The controllable generation aims to generate videos with the same motion represented by control signals. However, the control singles often have constraints on appearance, limiting the appearance diversity of the generated results. (c) Motion customization on a single video aims to generate videos with the specific motion learned from reference videos while keep...*
-
-![[assets/figures/papers/paper_list_l1058_https_arxiv_org_abs_2310_08465/figures/001_Figure_1.jpg]]
-*Figure 1: Motion customization of the text-to-video diffusion model*
-
-
-
 MotionDirector 的核心设计围绕一个关键洞察展开：在视频扩散模型的隐空间中，运动主要影响帧序列之间的连通结构，而外观主要影响不同序列点集之间的距离（Figure 4）。基于此，方法通过双路径低秩适配（LoRA）架构与外观去偏时间损失，将外观学习与运动学习解耦。
-
-![[assets/figures/papers/paper_list_l1058_https_arxiv_org_abs_2310_08465/figures/004_Figure_4.jpg]]
-*Figure 4: (a) Four example videos (the same as the videos in the first and fourth rows of Fig. 2) and their relationships in terms of motion and appearance. (b) We inverse the four videos based on the video diffusion model and visualize the denoising process. Each point corresponds to a latent code*
 
 ### 双路径 LoRA 架构
 
@@ -196,8 +177,6 @@ $$\mathcal{L}_{temporal} = \mathcal{L}_{org-temp} + \mathcal{L}_{ad-temp} \quad 
 2. **时间路径共享空间 LoRA 权重**：使时间训练阶段能利用已学到的外观表征，减少外观对时间训练的干扰。
 3. **锚点噪声的随机选择**：实验采用随机帧作为锚点，未引入额外计算开销；最优锚点策略仍为开放问题。
 
-
-
 ## 实验与关键发现
 
 MotionDirector 在两类运动定制场景下进行了全面验证：**多视频运动定制**（从多个包含相同运动但外观不同的视频中学习运动概念）和**单视频运动定制**（从单个视频中提取特定主体的运动或相机运动）。评估维度覆盖自动指标与大规模人类评估，后者通过 Amazon MTurk 发布超过 1800 个比较任务，采用 3/5 共识机制，从文本对齐、时间一致性和运动保真度三个维度进行评判。
@@ -248,27 +227,14 @@ Figure 5 和 Figure 6 分别展示了多视频和单视频场景下的定性对�
 - **锚点噪声选择**：外观去偏损失中的锚点噪声 $\epsilon_{anchor}$ 在实验中采用随机选择策略，未系统研究最优锚点策略。在极端外观干扰下（如参考视频外观高度一致时），去偏效果可能存在残留偏差。
 - **数据需求**：运动概念的可靠学习目前需要多个参考视频（多视频场景）或至少一个包含清晰运动的视频（单视频场景），尚未扩展至纯文本描述驱动的运动定制。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1058_https_arxiv_org_abs_2310_08465/figures/006_Table_1.jpg]]
 *Table 1: Automatic and human evaluations results of motion customization on single videos*
-
-![[assets/figures/papers/paper_list_l1058_https_arxiv_org_abs_2310_08465/figures/008_Table_2.jpg]]
-*Table 2: Automatic and human evaluations results of motion customization on single videos*
 
 ![[assets/figures/papers/paper_list_l1058_https_arxiv_org_abs_2310_08465/figures/014_Figure_12.jpg]]
 *Figure 12: Comparison of different methods on the task of motion customization given a single reference video*
 
 ![[assets/figures/papers/paper_list_l1058_https_arxiv_org_abs_2310_08465/figures/010_Figure_8.jpg]]
 *Figure 8: Examples of two benchmarks for testing motion customization on multiple videos and a single video, respectively*
-
-![[assets/figures/papers/paper_list_l1058_https_arxiv_org_abs_2310_08465/figures/011_Figure_9.jpg]]
-*Figure 9: Example of one task for 5 human raters on Amazon MTurk to complete. Each task involves three questions comparing two generated results in terms of text alignment, temporal consistency, and motion fidelity*
-
-![[assets/figures/papers/paper_list_l1058_https_arxiv_org_abs_2310_08465/figures/012_Figure.jpg]]
-*Figure: Reference Videos: A person is skateboarding. Generated Results by MotionDirector*
-
-
 
 ## 定位与知识库关联
 
@@ -319,8 +285,6 @@ MotionDirector的当前设计存在明确的适用边界：
 4. **自适应锚点策略**：外观去偏时间损失中的锚点选择是否可以自适应，例如基于视频内容动态选择最具代表性的帧作为锚点，或学习一个可优化的锚点参数，以进一步降低对外观变化的敏感度？
 
 5. **与外观定制方法的协同**：MotionDirector专注于运动定制，而已有工作（如DreamBooth、CustomDiffusion）专注于外观定制。两者是否可以组合，实现同时指定“谁”和“怎么做”的完全定制化视频生成？Figure 2 Row 3的初步实验表明这种混合是可行的，但系统性的联合训练框架仍有待探索。
-
-
 
 ## 原文 PDF
 

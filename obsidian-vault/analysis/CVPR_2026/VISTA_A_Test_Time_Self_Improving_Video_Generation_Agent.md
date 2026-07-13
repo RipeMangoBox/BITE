@@ -54,15 +54,11 @@ claims:
 
 实验结果表明，VISTA 在两个基准测试上均显著优于现有基线。在单场景和多场景基准上，VISTA 相对于直接提示的成对胜率分别达到 **45.9%**（Δ=+32.0%）和 **46.3%**（Δ=+35.1%），远超其他测试时优化方法。人类评估进一步验证了其有效性，评估者在 **66.4%** 的比较中偏好 VISTA 的输出。消融实验证实，每个组件都对整体性能有独特贡献：PromptPlanner 提升了初始视频质量，PairwiseSelect 稳定了迭代改进过程，多法官协同平衡了批判的深度与实用性，DTPA 则显著增强了提示优化的效果。
 
-
-
 文本到视频（T2V）生成领域近年来取得了显著进展，以 **Veo 3**、**Sora**、**MovieGen** 等模型为代表的生成系统已能产出视觉质量较高的视频内容。然而，这些模型的实际可用性仍受制于一个核心瓶颈：**生成质量高度依赖用户提示的精确性**。普通用户往往难以一次性撰写出能充分表达其意图的提示，而即使经验丰富的用户，也需要反复试错才能获得满意的结果。这种“提示工程”负担严重限制了视频生成技术的普及与创作效率。
 
 现有研究在测试时优化方面已有所探索。在文本生成领域，**Visual Self-Refine**（Madaan et al., 2023）等方法利用大语言模型（LLM）对输出进行迭代评估与修正；在图像生成领域，基于多模态大语言模型（MLLM）的反馈优化提示也取得了初步成效。然而，这些方法在迁移到视频生成时面临根本性困难：**视频涉及视觉、音频和上下文（时序连贯性与叙事逻辑）三个交织的维度，单一模型或单一维度的评估无法提供足够的优化信号**。直接套用现有方法——如用 MLLM 重写提示（**Rewrite**，Google Cloud, 2024）或按预设原则扩展提示（**VPO**，Cheng et al., 2025b）——均未能在视频场景下实现稳定且可解释的迭代改进。
 
 上述缺口揭示了两个深层问题：其一，缺乏一种**结构化的视频理解与规划机制**，将用户模糊意图分解为可操作、可评估的生成单元；其二，缺乏一种**多维度、多视角的批判与反思框架**，使系统能像人类创作者一样，从不同角度审视视频缺陷并有针对性地修正。VISTA 正是在这一背景下提出，将视频生成优化建模为**可解释的、结构化自修正循环**，通过多代理协作在测试时自动改进视觉、音频和上下文的综合质量，而无需重新训练或微调底层生成模型。
-
-
 
 ## 核心方法与创新机理
 
@@ -100,8 +96,6 @@ $$\{ C _ { D } , S _ { D } \} = J _ { D } ( P , V ^ { * } , P ^ { * } ) \, (\mat
 
 上述四个 changed slots 针对的核心瓶颈在于：**现有 T2V 系统高度依赖精确的用户提示，且缺乏能同时优化多维度质量的测试时自动改进框架**。VISTA 通过将视频生成改进建模为“结构化规划→锦标赛选择→多代理批判→深度思考优化”的闭环，实现了对视觉保真度、音频质量、上下文连贯性的联合提升。这一因果链条使得 VISTA 在单场景和多场景基准上分别取得了 45.9%（$\Delta=32\%$）和 46.3%（$\Delta=35.1\%$）的成对胜率，远超所有测试时优化基线。
 
-
-
 VISTA 将视频生成质量的测试时优化建模为一个**可解释的、结构化的自修正循环**，其核心洞察在于：将人类式的迭代改进过程——分解、比较、批判、反思——映射为由多个专用代理协作执行的计算流程。整个框架围绕一个统一的闭环工作流构建，如 Figure 1 所示，包含**初始化阶段**和**自改进阶段**两大组成部分，共四个关键模块协同运作。
 
 ![[assets/figures/papers/paper_list_l2625_https_arxiv_org_abs_2510_15831/figures/002_Figure_1.jpg]]
@@ -124,8 +118,6 @@ VISTA 的输入是用户的原始视频生成提示，输出是经过多轮迭�
 整个管道以 5 轮迭代运行：1 轮初始化加 4 轮自改进。每轮迭代中，系统采样 5 个提示，每个提示生成 3 个变体，每个变体生成 2 个视频，共计 30 个视频。初始化阶段以 PromptPlanner 产出的结构化提示作为起点，经 PairwiseSelect 选出最优视频-提示对；自改进阶段则在此对的基础上，由 MMAC 提供多维度批评，DTPA 生成修改建议，再由多模态 LLM 合成一组改进后的候选提示（包含当前最优提示的保留副本），进入下一轮迭代。
 
 框架的关键设计在于**各模块的功能解耦与因果串联**：PromptPlanner 提供高质量的初始化基础，PairwiseSelect 确保迭代改进的稳定性（消融实验表明移除该模块后迭代性能大幅下降），MMAC 通过多角色对抗平衡批评的深度与实用性（仅使用单一法官会导致性能显著退化），DTPA 则将批评转化为可执行的、结构化的提示优化方案。这种模块化设计使得 VISTA 能够作为黑盒优化层适配不同的 T2V 模型（如 Veo 2 和 Veo 3），无需修改底层生成模型的参数。
-
-
 
 VISTA 将视频生成优化建模为一个可解释的、结构化的自修正循环，其核心由四个模块构成：**PromptPlanner**（结构化视频提示规划）、**PairwiseSelect**（成对锦标赛选择）、**MMAC**（多维度多代理批判）和 **DTPA**（深度思考提示代理）。这些模块协同工作，在测试时通过多轮迭代自动改进视频的视觉、音频和上下文质量。
 
@@ -196,13 +188,6 @@ $$\mathcal{P} := \{P_1, \ldots, P_n, P^*\} \gets \mathrm{MLLM}(P, P^*, \mathcal{
 
 四个模块形成一条因果链：**PromptPlanner** 提供高质量初始化（消融中 Init 单场景 Win 率从 35.5% 降至 25.2%），**PairwiseSelect** 稳定迭代改进（移除后 Iter 5 从 45.9% 降至 33.3%），**MMAC** 提供多维度、多视角的精准反馈，**DTPA** 将反馈转化为可执行的提示修改。任一模块缺失都会导致性能显著退化，表明它们各自承担不可替代的功能。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2625_https_arxiv_org_abs_2510_15831/figures/024_Figure_12.jpg]]
-*Figure 12: | Examples of prompts optimized by VISTA across iterations. Blue parts are updated*
-
-
-
 ## 实验与关键发现
 
 ### 主要定量结果：VISTA 在单/多场景基准上显著超越所有基线
@@ -263,16 +248,11 @@ VISTA 相对于最强基线的胜率增量（Δ 差值）在单场景达 **+24.0
 
 1. **计算成本高昂**：VISTA 每次迭代消耗约 **0.7M tokens** 并生成约 **28 个视频**（Figure 5），完整的 5 轮迭代需要大量 MLLM API 调用和视频生成资源，可能不适用于资源受限场景。
 
-![[assets/figures/papers/paper_list_l2625_https_arxiv_org_abs_2510_15831/figures/007_Figure_5.jpg]]
-*Figure 5: | Cost analysis. Left: total token consumption, including both input and output tokens per iteration. Right: number of newly sampled videos per iteration. Results are averaged over two datasets. Tokens for video generation are unavailable and thus excluded*
-
 2. **模型能力依赖**：框架性能高度依赖于底层 MLLM 和 T2V 模型的能力。当底层模型本身存在严重缺陷时，提示优化可能无法完全弥补生成质量的不足。
 
 3. **场景过渡与复杂提示**：多场景视频中场景过渡的完全流畅性仍有提升空间；对于高度复杂或内部矛盾的用户提示，结构化规划可能无法完美分解所有语义要素。
 
 4. **评估主观偏差**：尽管采用了双向成对比较和位置交换等公平性措施，完全自动化的 MLLM-as-a-Judge 评估策略仍可能存在与人类偏好不完全一致的主观偏差。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2625_https_arxiv_org_abs_2510_15831/figures/003_Table_2.jpg]]
 *Table 2: | Win/Tie/Loss rates and Δ = Win − Loss across 5 iterations. † refers to our scaled-up results, and underlines are results evaluated on half of the benchmark*
@@ -282,20 +262,6 @@ VISTA 相对于最强基线的胜率增量（Δ 差值）在单场景达 **+24.0
 
 ![[assets/figures/papers/paper_list_l2625_https_arxiv_org_abs_2510_15831/figures/008_Table_3.jpg]]
 *Table 3: | Ablation results evaluated on half of the benchmarks. Each module in VISTA contributes uniquely: PromptPlanner enhances initialization, PairwiseSelect stabilizes iterative improvements, combining both Judges balances critiques’ depth and usefulness, and DTPA enables effective prompt refinement*
-
-![[assets/figures/papers/paper_list_l2625_https_arxiv_org_abs_2510_15831/figures/009_Figure_6.jpg]]
-*Figure 6: | Effect of scaling the #iterations on performance. Left: Single-scene. Right: Multi-scene*
-
-![[assets/figures/papers/paper_list_l2625_https_arxiv_org_abs_2510_15831/figures/010_Table_4.jpg]]
-*Table 4: | Veo 2 performance with VISTA on both datasets*
-
-![[assets/figures/papers/paper_list_l2625_https_arxiv_org_abs_2510_15831/figures/011_Table_5.jpg]]
-*Table 5: | Single-scene: Evaluation results using VBench’s any-video evaluation metrics for visual quality, NISQA metrics for audio quality, and CLIP-Score for text-video alignment*
-
-![[assets/figures/papers/paper_list_l2625_https_arxiv_org_abs_2510_15831/figures/012_Table_6.jpg]]
-*Table 6: | Multi-scene: Evaluation results using VBench’s any-video evaluation metrics for visual quality, NISQA metrics for audio quality, and CLIP-Score for text-video alignment*
-
-
 
 ## 定位与知识库关联
 
@@ -354,8 +320,6 @@ VISTA 的适用边界受以下因素制约：
 - **用户自定义评估标准**：如何将用户自定义的评估标准和约束融入 MMAC 框架，实现个性化视频优化，是一个有前景的方向。
 - **更大规模扩展**：VISTA 在 5 次迭代内已展示扩展定律（Figure 6），但能否扩展到更多迭代次数或适应更大规模的视频生成模型（如超越 Veo 3）仍需验证。
 - **评估可扩展性**：当前人类评估依赖独立注释者，如何使视频质量的人类评估更具可扩展性和更低成本，以适应更大规模实验，是实际部署中的关键挑战。
-
-
 
 ## 原文 PDF
 

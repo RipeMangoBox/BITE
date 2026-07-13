@@ -58,8 +58,6 @@ claims:
 
 **方法定位**：CoD 不同于固定的编解码器，而是一个面向压缩的**基础模型**。它可服务于多种下游扩散压缩框架（如 DiffC、DDCM、单步蒸馏等），在像素空间和潜在空间均可部署。在方法谱系中，CoD 填补了传统编解码器（高 PSNR 但低感知质量）与 GAN 基感知编解码器（高感知质量但 PSNR 不足）之间的空白，同时克服了文本条件扩散压缩方法的端到端优化障碍。
 
-
-
 ### 图像压缩的经典范式与扩散模型的介入
 
 传统图像压缩遵循“编码—解码”的确定性映射：给定图像 $x$，编码器 $\Theta$ 将其压缩为紧凑表示 $y$，解码器 $\Phi$ 再从 $y$ 重建 $\hat{x}$：
@@ -83,8 +81,6 @@ $$y = \operatorname{Encode}(x, \Theta), \quad \hat{x} = \operatorname{Decode}(y,
 上述瓶颈的根源在于：**现有扩散模型是为“文本到图像生成”设计的，而非为“图像压缩”设计的**。压缩任务需要的是：条件信号能承载精细的图像信息，编码器与解码器能端到端联合优化，且模型能在统一框架下覆盖从极低比特率到近无损的全码率范围。
 
 CoD（Compression-oriented Diffusion）正是为解决这一根本性错配而提出。其核心思路是：**从零开始训练一个面向压缩的扩散基础模型**，用可学习的本机图像令牌（native image tokens）替代文本条件，通过量化瓶颈实现极低比特率，并在修正流（rectified flow）框架下统一优化压缩失真与扩散感知损失。这一设计使 CoD 既能作为独立编解码器工作，又能作为基础模型替换 Stable Diffusion，赋能下游扩散压缩方法。
-
-
 
 ## 核心方法与创新机理
 
@@ -139,8 +135,6 @@ CoD 完全摆脱了对文本标注的依赖，仅使用纯图像数据集进行�
 
 CoD 的四项关键改动形成了一个完整的创新闭环：**本机图像令牌**解决了条件信息瓶颈，**端到端联合训练**实现了压缩与生成的协同优化，**修正流 + 统一训练**提供了数学上优雅的失真-感知联合优化框架，**纯图像自监督训练**大幅降低了数据和计算门槛。这些创新共同使 CoD 在极低比特率下实现了超越现有文本条件和潜在扩散方案的保真度与感知质量，同时保持了极低的训练成本。
 
-
-
 CoD 的整体框架围绕一个核心设计展开：**用端到端可学习的本机图像令牌替代文本条件**，将压缩编码与扩散生成统一为一个可联合优化的基础模型。如图 1 所示，传统文本-图像扩散模型用于压缩时，条件信息来自冻结的字幕器（如 BLIP-2），文本词汇无法携带精细的空间和纹理信息，且编码器与解码器被割裂，无法进行端到端优化。CoD 则从零开始训练，直接学习将图像压缩为紧凑的离散令牌，并以这些令牌作为扩散解码器的唯一条件，实现压缩与生成的协同优化。
 
 ### 模块组成与数据流
@@ -184,15 +178,8 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{RF}} + \lambda \cdot \mathcal{L}_{\mathrm{R
 
 这一框架设计使 CoD 成为一个通用的压缩基础模型，可被下游扩散编解码器（如 DiffC、DDCM）直接替换 Stable Diffusion 使用，在零样本设置下即可获得显著性能提升，尤其是在超低比特率场景中。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l847_https_arxiv_org_abs_2511_18706/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of Compression-oriented Diffusion (CoD) foundation models, which are trained from scratch to jointly optimize compression and generation. Rather than a fixed codec, CoD serves as a foundational model for downstream diffusion-based codecs such as DiffC [43], substantially enhancing their performance by replacing Stable Diffusion*
-
-![[assets/figures/papers/paper_list_l847_https_arxiv_org_abs_2511_18706/figures/002_Figure_2.jpg]]
-*Figure 2: Framework overview of CoD in pixel and latent spaces. CoD consists of a condition encoder, an entropy bottleneck, a condition decoder and a diffusion model which is decoupled to DiT backbone and DDT head [49]. CoD is trained with rectified flow [33], where*
-
-
 
 ### 条件编码与瓶颈模块
 
@@ -231,8 +218,6 @@ $$\mathcal{L}_{\mathrm{RF}} \big|_{t=0} = \mathrm{MSE}(v_0, v_0^{\mathrm{pred}})
 $$\mathcal{L} = \mathcal{L}_{\mathrm{RF}} + \lambda \cdot \mathcal{L}_{\mathrm{REPA}} + \beta \cdot \mathcal{L}_{\mathrm{C}} + \gamma \cdot \mathcal{L}_{\mathrm{aux}}$$
 
 其中 $\lambda = 0.5$，$\beta = 0.25$，$\gamma = 1.0$。$\mathcal{L}_{\mathrm{REPA}}$ 为表示对齐损失（Representation Alignment），$\mathcal{L}_{\mathrm{C}}$ 为码本承诺损失（Codebook Commitment Loss），$\mathcal{L}_{\mathrm{aux}}$ 为辅助损失。辅助损失在统一后训练阶段可进一步提升 FID 指标，与统一训练结合后达到全局最优性能。
-
-
 
 ## 实验与关键发现
 
@@ -291,25 +276,6 @@ CoD 在两个核心维度上接受了系统评估：像素空间编解码器的�
 ![[assets/figures/papers/paper_list_l847_https_arxiv_org_abs_2511_18706/figures/019_Table_2.jpg]]
 *Table 2: Ablation study for X -prediction on Kodak at 512 × 512*
 
-![[assets/figures/papers/paper_list_l847_https_arxiv_org_abs_2511_18706/figures/024_Table_6.jpg]]
-*Table 6: Additional evaluation metrics including user study and semantic scores around 0.004 bpp on Kodak*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l847_https_arxiv_org_abs_2511_18706/figures/005_Figure_5.jpg]]
-*Figure 5: Comparison of CoD and Stable Diffusion on Kodak at 512 × 512 resolution. (left) Pixel-space CoD enables zero-shot distortionperception controlling by adjusting the sampling steps. CoD is at 0.0039 bpp and PerCo is at 0.0036 bpp. (right) Text conditions harms performance of zero-shot algorithm DiffC on Stable Diffusion, while CoD condition boosts LPIPS at low-bitrate. In addition, pixel-space CoD is not limited by the SD-VAE thus demonstrating wider bitrates, higher PSNR and higher potential in perceptual quality*
-
-![[assets/figures/papers/paper_list_l847_https_arxiv_org_abs_2511_18706/figures/004_Figure_4.jpg]]
-*Figure 4: Scaling law analysis on Kodak at 256 × 256. All CoD models are at 0.016 bpp while MS-ILLM is at 0.021 bpp*
-
-![[assets/figures/papers/paper_list_l847_https_arxiv_org_abs_2511_18706/figures/006_Figure_6.jpg]]
-*Figure 6: Visual comparison between Stable-Diffusion-based codecs and latent-space CoD under ultra-low bitrates*
-
-![[assets/figures/papers/paper_list_l847_https_arxiv_org_abs_2511_18706/figures/018_Figure_17.jpg]]
-*Figure 17: Evaluating V-and X -prediction pixel-space CoD using DiffC on Kodak at 512 × 512*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 与现有扩散压缩方法的代际差异
@@ -351,8 +317,6 @@ CoD 的核心定位是**面向压缩的扩散基础模型**，而非一个固定
 4. **缩放定律的边界。** 在更大规模的训练数据（目前约 22M 图像，远小于 Stable Diffusion 的数十亿级数据）和更大模型下，CoD 的性能能否继续遵循缩放定律？训练数据质量和多样性的提升可能带来多大增益？
 
 5. **Prediction 目标的统一设计。** 如何设计更好的 prediction 目标（如 V-prediction 与 X-prediction 的混合策略），以同时优化基础模型的感知性能和下游量化压缩框架的似然估计稳定性？
-
-
 
 ## 原文 PDF
 

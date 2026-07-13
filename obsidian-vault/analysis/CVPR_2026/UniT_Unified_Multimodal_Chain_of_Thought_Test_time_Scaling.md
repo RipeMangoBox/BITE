@@ -52,8 +52,6 @@ claims:
 
 实验结果表明，UniT 在组合生成（OneIG-Bench 对齐分数 0.843，较 Bagel 提升 10.34%）、多轮编辑（ImgEdit 人类评分 4.26，提升 225%）和视觉推理（MIRA 准确率 11.5，提升 53.33%）等任务上均取得显著增益。顺序链式缩放仅需并行最优-N 采样约 2.5 倍更少的图像生成量即可达到同等性能。消融实验进一步验证了验证机制、内容记忆和数据质量过滤的关键作用。
 
-
-
 ### 统一多模态模型的生成瓶颈
 
 近年来，统一多模态模型（unified multimodal models）在同时处理文本理解与图像生成任务上取得了显著进展。这类模型将视觉理解与视觉生成能力整合于单一架构中，使得模型能够“看懂”图像并“画出”图像。然而，现有统一模型——如 **Bagel**（Deng et al., 2025b）——的工作方式存在一个根本性局限：它们仅通过单次前向传播生成输出，缺乏对生成结果进行自我验证、反思与迭代修正的能力。
@@ -93,8 +91,6 @@ claims:
 
 实验表明，UniT 在组合生成基准 OneIG-Bench 上相较 Bagel 提升 10.34%（0.764 → 0.843），在多轮编辑基准 ImgEdit 上人类评估分数提升 225%（1.31 → 4.26），同时顺序链式缩放仅需并行最优-N 采样约 2.5× 更少的图像生成量即可达到同等性能，展现出显著的推理效率优势。
 
-
-
 ## 核心方法与创新机理
 
 UniT 的核心创新在于将**多模态思维链推理**与**测试时计算预算控制**引入统一多模态模型，使单一模型能够在推理阶段进行迭代式的“生成—验证—细化”循环，从而根据任务难度动态分配计算资源并提升输出质量。这一框架的关键突破体现在以下四个维度的 changed slots 上。
@@ -128,8 +124,6 @@ $$v_{\text{final}} = v_{i,\text{unc}} + s_i (v_{\text{text}} - v_{i,\text{unc}})
 ### 顺序链式缩放：更高效的测试时计算利用
 
 在测试时缩放策略上，UniT 揭示了**顺序链式推理相较于并行采样**的关键效率优势。核心洞察在于：在短推理轨迹上训练的统一模型可以在测试时泛化至更长的推理链；顺序链式推理通过逐轮积累改进，能够以更少的资源实现更优的性能缩放。实验表明，顺序链式缩放仅需并行最优-N 采样约 2.5× 更少的图像生成量即可达到同等性能（Section 5.1; Figure 1），且在更多轮次下仍保持收益，而并行缩放较早进入平台期。这一优势同时惠及生成和理解任务——在 MIRA 视觉推理基准上，UniT 从 $C=1$ 到 $C=10$ 实现了 53.33% 的准确率提升（Table 4），证明思维链推理行为可从生成任务迁移至理解任务。
-
-
 
 UniT 构建了一套完整的多模态思维链测试时扩展框架，其核心思路是将迭代式的“生成-验证-细化”循环内化到统一多模态模型中，从而突破传统单次前向生成在组合生成、多轮编辑和复杂视觉推理上的瓶颈。该框架由三个紧密协作的模块构成：**Agentic 数据合成模块**、**统一模型训练模块**和**测试时缩放推理模块**，三者共同支撑起验证、子目标分解与内容记忆等认知行为的涌现。
 
@@ -188,12 +182,6 @@ $$v_{\mathrm{final}} = v_{i,\mathrm{unc}} + s_i (v_{\mathrm{text}} - v_{i,\mathr
 
 这一框架的优雅之处在于：训练时仅需短推理链数据，测试时即可泛化至更长链；顺序推理的计算效率天然优于并行采样；且认知行为同时惠及生成任务和理解任务，展现出统一多模态模型的独特潜力。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2355_https_arxiv_org_abs_2602_12279/figures/001_Figure.jpg]]
-
-
-
 UniT 框架由三个核心模块构成：**Agentic 数据合成模块**、**统一模型训练模块**和**测试时缩放推理模块**。三者协同工作，使单一统一多模态模型能够在推理阶段进行多轮迭代式的生成-验证-细化。
 
 ### 数据合成模块
@@ -232,13 +220,6 @@ $$v_{\mathrm{final}} = v_{i,\mathrm{unc}} + s_i (v_{\mathrm{text}} - v_{i,\mathr
 ### 认知行为诱导机制
 
 上述模块在训练与推理过程中自然诱导出三种认知行为。消融实验定量验证了各自的贡献：移除验证行为导致 OneIG-Bench 对齐分数从 84.3 降至 81.2（下降 3.1 个百分点）；移除内容记忆对多轮编辑打击最大，ImgEdit 人工评分从 4.26 骤降至 2.45（相对下降 42.5%）。子目标分解对组合生成任务尤为关键，使模型能顺序处理复杂指令中的多个约束。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2355_https_arxiv_org_abs_2602_12279/figures/014_Figure_7.jpg]]
-*Figure 7: Data synthesis pipeline architecture. Three model roles coordinate via information flows: Image Gen Model produces initial images, Vision-language model verifies image and performs planning/prompt rewriting with content memory, Image Editing Model applies refinements. Trajectories loop until satisfied, producing interleaved text-image chain-of-thought data*
-
-
 
 ## 实验与关键发现
 
@@ -280,9 +261,6 @@ Table 5 系统消融了三种核心认知行为的贡献：
 
 Table 6 验证了数据合成流水线中各项过滤策略的必要性：
 
-![[assets/figures/papers/paper_list_l2355_https_arxiv_org_abs_2602_12279/figures/013_Table_6.jpg]]
-*Table 6: Data quality ablation. Impact of removing individual curation filters (Sec. 3.1) from the training data pipeline*
-
 - **移除数据相关性过滤**（即保留与原始指令无关的合成轨迹）：OneIG Align 下降 3.1 个百分点，说明噪声轨迹会稀释模型对指令-生成对应关系的学习。
 - **移除最小视觉变化过滤**（即保留编辑前后差异过小的轨迹）：显著损害多轮编辑性能，因为模型无法从“无变化”的伪轨迹中学习有效的细化策略。
 
@@ -300,9 +278,6 @@ Figure 1 的核心发现是：**顺序链式缩放在所有任务上均优于并
 
 Figure 5 展示了 UniT 的一项重要涌现属性：训练时平均轨迹长度为 **3.6 轮**，而测试时平均延长至 **4.7 轮**。这一分布偏移证明模型具备**超越训练分布的推理长度泛化能力**——在短链上训练，在长链上推理。这是有效测试时缩放的关键前提：模型不是简单记忆训练时的推理模式，而是真正内化了“验证-规划-细化”的元认知循环。
 
-![[assets/figures/papers/paper_list_l2355_https_arxiv_org_abs_2602_12279/figures/008_Figure_5.jpg]]
-*Figure 5: Training vs. inference round distribution demonstrates beyond-training generalization. The model is trained on trajectories averaging 3.6 refinement rounds, but effectively generalizes to longer inference chains averaging 4.7 rounds at test time. This distribution shift reveals the model’s emergent ability to extend inference beyond its training distribution, a key property of effective test-time scaling*
-
 ### 代表性失败模式
 
 Figure 9 揭示了 UniT 在以下场景中仍会失败，需要手动验证：
@@ -317,18 +292,8 @@ Figure 9 揭示了 UniT 在以下场景中仍会失败，需要手动验证：
 
 评估受 GPU 内存限制，最大仅探索至 C=10 轮。训练成本为 700 H100 GPU 小时，训练数据仅约 12K 条合成轨迹。超出 C=10 后，图像质量可能因累积自回归噪声而退化——这是当前框架的一个已知瓶颈。论文提出了感知阈值、重置轮次和自适应噪声调度等缓解措施作为开放问题，但尚未实验验证。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2355_https_arxiv_org_abs_2602_12279/figures/003_Figure_3.jpg]]
-*Figure 3: UniT enables iterative refinement for compositional instructions through multimodal chain-of-thought reasoning. UniT exhibits: (i) error verification and correction—identifying and fixing constraint violations that Bagel misses (top: correcting leash placement and dog action); (ii) subgoal decomposition with subject consistency—sequentially addressing instructions while maintaining subject identity across rounds (middle: preserving bear features through style transformation, bottom: skateboard consistency); (iii) quality preservation—maintaining visual fidelity through iterative refinement rather than degradation (top: reduced artifacts and haloing)*
-
 ![[assets/figures/papers/paper_list_l2355_https_arxiv_org_abs_2602_12279/figures/005_Figure_4.jpg]]
 *Figure 4: Qualitative examples of chain-of-thought test-time scaling. Representative trajectories showing progressive refinement across different tasks and computational budgets. Examples demonstrate how explicit chain-of-thought reasoning enables the model to iteratively improve compositional generation*
-
-![[assets/figures/papers/paper_list_l2355_https_arxiv_org_abs_2602_12279/figures/010_Figure_6.jpg]]
-*Figure 6: Chain-of-thought visual reasoning on MIRA. The model decomposes the puzzle into subgoals (zoom in, identify patterns) before selecting the matching piece, demonstrating cognitive behaviors transferring from generation to understanding tasks*
-
-
 
 ## 定位与知识库关联
 
@@ -377,8 +342,6 @@ UniT 的有效性受限于以下边界条件：
 - 能否发展更高效的反思机制和自适应预算分配策略，在保证质量的同时大幅降低额外推理开销？顺序链式缩放虽优于并行采样，但每轮仍需生成完整图像，计算成本仍然可观。
 
 - 如何将本框架扩展至音频、视频等其他模态？多模态思维链的核心思想——通过交替生成与验证进行迭代细化——在理论上具有模态无关性，但具体实现面临模态特定的生成与验证挑战。
-
-
 
 ## 原文 PDF
 

@@ -55,8 +55,6 @@ claims:
 
 当前方法的主要局限在于：极低令牌预算下难以区分类似概念的细粒度属性差异，在视觉杂乱的场景中易产生对象混淆，且尚未扩展到 Omni 风格统一多模态模型或视频、3D 场景等复杂输入形态。
 
-
-
 ### 视觉令牌冗余：大型视觉-语言模型的推理瓶颈
 
 大型视觉-语言模型（Large Vision-Language Models, LVLMs）在视觉问答、图像描述等多模态任务中取得了显著进展，但其推理效率受制于一个核心瓶颈：视觉编码器生成的视觉令牌数量庞大。以 LLaVA-NeXT-7B 为例，当输入分辨率提升至 672×672 时，单张图像可产生多达 2,880 个视觉令牌，虽然带来 6.0% 的性能增益，却付出了约 3.5 倍的计算开销。这些令牌被送入 LLM 解码器进行自注意力计算时，预填充阶段的复杂度与令牌数量的平方成正比，导致推理延迟急剧上升。
@@ -78,8 +76,6 @@ claims:
 上述困境揭示了一个根本需求：令牌选择需要同时回答两个问题——“这个令牌对输出有多重要？”以及“这个令牌是否提供了已有令牌之外的新信息？”前者要求一个可靠的令牌级重要性信号，后者要求对所选集合的互补性约束。
 
 ZOO-Prune 的动机正是将这两个维度统一到一个训练自由的框架中。其核心洞察在于：**通过零阶梯度估计在轻量级投影层近似每个令牌的敏感度，可以获得与完整视觉编码器高度相关的重要性排序，且计算代价极低**。如图 2 所示，投影层敏感度排序与视觉编码器排序的斯皮尔曼秩相关性在 MMMU 上达到 0.55，在 POPE 上达到 0.49，证实了投影层可作为视觉编码器令牌重要性的可靠代理。将这一敏感度信号与多样性目标相乘融合，即可在推理时无训练地挑选出信息量高且互补的视觉令牌子集（图 1c），从而在激进压缩比下实现鲁棒的性能保持（图 1d）。
-
-
 
 ## 核心方法与创新机理
 
@@ -126,8 +122,6 @@ DivPrune 的选择策略是从特征空间中距离最远的令牌开始贪心�
 
 ZOO-Prune 属于**训练自由、无校准数据的 VLM 令牌剪枝**方法，其技术路线融合了零阶优化与多样性选择两个独立脉络。相比 **VisionZip**（注意力剪枝）、**DivPrune**（纯多样性剪枝）、**FastV**（层级注意力剪枝）、**PyramidDrop**（CVPR 2025，层级丢弃）和 **SparseVLM**（ICML 2025，稀疏注意力），ZOO-Prune 首次将零阶梯度估计引入令牌重要性度量，提供了注意力分数之外的第三条信号通路。该方法目前验证于编码器-解码器架构的 VLM（LLaVA 系列、Qwen2.5-VL），尚未扩展到 Omni 风格统一多模态模型或视频/3D 输入。
 
-
-
 ZOO-Prune 是一个训练自由、无需校准数据的视觉令牌剪枝框架，其核心设计思想是在轻量级投影层通过零阶梯度估计量化每个令牌的敏感度，并将其与多样性得分融合，从而在推理时无训练地挑选出信息量高且互补的视觉令牌子集。整个流程由五个模块串联构成，如图 Figure 3 所示。
 
 ![[assets/figures/papers/paper_list_l812_https_arxiv_org_abs_2509_24837/figures/003_Figure_3.jpg]]
@@ -157,8 +151,6 @@ ZOO-Prune 是一个训练自由、无需校准数据的视觉令牌剪枝框架�
 - **敏感度与多样性的乘法融合**：消融实验（Table 4）证实，乘法融合优于单独使用任一准则，且无需额外超参数。在 LLaVA-NeXT-7B 上保留 22.2% 令牌时达到 98.3% 的平均性能保持率。
 - **超参数鲁棒性**：扰动方向数 $m$ 在 16–160 范围内、步长 $h$ 在 $10^{-4}$ 到 1 范围内对性能影响很小（Figure 4），方法对超参数不敏感，便于实际部署。
 
-
-
 ### 3.1 零阶梯度估计基础
 
 ZOO-Prune 的核心计算工具是**随机梯度估计器**（Randomized Gradient Estimator, RGE）。对于函数 $f: \mathbb{R}^d \to \mathbb{R}$，其在点 $x$ 处的梯度可通过 $m$ 个随机方向上的对称有限差分近似：
@@ -170,9 +162,6 @@ $$\widehat{\nabla} f(x) = \frac{1}{m} \sum_{j=1}^{m} \frac{f(x + h u_j) - f(x - 
 ### 3.2 令牌敏感度估计模块
 
 给定视觉编码器输出的令牌集合 $\{x_i\}_{i=1}^N$，ZOO-Prune 在**投影层**（projection layer）而非完整视觉编码器上进行敏感度估计。投影层 $M(\cdot)$ 是多模态对齐的轻量级模块，其输出对令牌扰动的响应可作为令牌重要性的可靠代理（见 Figure 2：投影层与视觉编码器的斯皮尔曼秩相关性在 MMMU 上为 0.55，在 POPE 上为 0.49）。
-
-![[assets/figures/papers/paper_list_l812_https_arxiv_org_abs_2509_24837/figures/002_Figure_2.jpg]]
-*Figure 2: Kernel density estimate (KDE) of Spearman rank correlations between token-importance rankings from the Vision encoder and the Projection layer on the MMMU and POPE datasets. Each dataset shows Spearman correlation of 0.55 and 0.49, respectively. Detailed setting is described in Appendix A*
 
 对每个令牌 $x_i$，施加 $m$ 对高斯扰动 $x_i \pm h u_j$，计算**对称有限差分响应**：
 
@@ -207,11 +196,6 @@ $$\operatorname{Score}(i) = \widehat{S}(i) \cdot \operatorname{Div}(i, \mathcal{
 ### 3.4 超参数鲁棒性
 
 ZOO-Prune 涉及两个关键超参数：扰动方向数 $m$ 和差分步长 $h$。Figure 4 显示，$m$ 在 16–160 范围内、$h$ 在 $10^{-4}$ 到 1 范围内对 POPE 性能影响极小，方法对超参数不敏感，具备良好的开箱即用特性。
-
-![[assets/figures/papers/paper_list_l812_https_arxiv_org_abs_2509_24837/figures/005_Figure_4.jpg]]
-*Figure 4: Hyperparameter sensitivity on POPE with LLaVA-1.5-7B: (a) small step size h, (b) number of perturbation directions m*
-
-
 
 ## 实验与关键发现
 
@@ -253,8 +237,6 @@ Figure 7展示了LLaVA-NeXT-7B在POPE基准上的推理效率对比。ZOO-Prune�
 
 这些失败模式指向了ZOO-Prune的固有限制：令牌选择基于投影层输出的全局敏感度，缺乏对细粒度语义差异和对象间关系的显式建模。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l812_https_arxiv_org_abs_2509_24837/figures/004_Table_1.jpg]]
 *Table 1: Performance Comparison on LLaVA-1.5-7B*
 
@@ -267,22 +249,8 @@ Figure 7展示了LLaVA-NeXT-7B在POPE基准上的推理效率对比。ZOO-Prune�
 ![[assets/figures/papers/paper_list_l812_https_arxiv_org_abs_2509_24837/figures/008_Table_4.jpg]]
 *Table 4: Ablation on Token Selection Metrics with LLaVA-NeXT-7B*
 
-![[assets/figures/papers/paper_list_l812_https_arxiv_org_abs_2509_24837/figures/011_Figure_6.jpg]]
-*Figure 6: ZOO Sensitivity vs. Attention Pruning. ZOObased sensitivity (Sens) metric consistently outperforms both text-visual (T2V Attn) and visual-visual (V2V Attn) attentionbased pruning, even when combined with diversity (Div)*
-
 ![[assets/figures/papers/paper_list_l812_https_arxiv_org_abs_2509_24837/figures/010_Figure_7.jpg]]
 *Figure 7: Inference efficiency on the POPE benchmark relative to the LLaVA-NeXT-7B baseline. The left scatter plot reports prefilling time, and the right scatter plot shows end-to-end (E2E) latency. Each point represents a method–token-count pair, illustrating the trade-off between computation cost and F1 score performance*
-
-![[assets/figures/papers/paper_list_l812_https_arxiv_org_abs_2509_24837/figures/009_Figure_5.jpg]]
-*Figure 5: Qualitative comparison on the GQA benchmark. Attention-based methods suffer from positional bias or redundant token clusters. Diversity-based pruning spreads tokens broadly but lacks semantic focus. The ZOO-based sensitivity captures output-related tokens but overlooks spatial coverage. Our ZOO-Prune jointly optimizes sensitivity and diversity for balanced selection across compression ratios*
-
-![[assets/figures/papers/paper_list_l812_https_arxiv_org_abs_2509_24837/figures/016_Table.jpg]]
-*Table: D. Performance comparison between the projector and vision encoder layers as sensitivity proxies. The projector consistently provides the strongest accuracy across pruning ratios*
-
-![[assets/figures/papers/paper_list_l812_https_arxiv_org_abs_2509_24837/figures/001_Figure_1.jpg]]
-*Figure 1: Illustration of training-free VLM token pruning methods. (a) Attention-based methods select tokens using attention scores, but often retain redundant tokens. (b) Diversity-based methods select tokens with different features to maximize coverage but may lose tokens located in semantically relevant regions (e.g., around the monitor, highlighted in yellow). (c) Our method employs zeroth-order gradient estimation to quantify token sensitivity and integrates these scores into a diversity objective. (d) Accuracy comparison with LLaVA-NeXT-7B across 9 benchmarks, showing that ours outperforms both VisionZip (attention-based) and DivPrune (diversity-based)*
-
-
 
 ## 定位与知识库关联
 
@@ -317,8 +285,6 @@ ZOO-Prune 的适用边界由以下因素界定：
 3. **任务自适应剪枝**：能否将 ZOO-Prune 整合到视觉‑语言‑动作（VLA）智能体中，通过自适应保留与当前任务目标最相关的视觉线索，提升长期决策的稳定性？这需要将敏感度信号与任务奖励或目标条件动态关联。
 
 4. **敏感度代理的理论理解**：投影层为何能作为视觉编码器敏感度的有效代理？其与雅可比矩阵近似（Proposition 3.1）之间的理论联系是否可推广到更一般的多模态对齐层？深入理解这一代理机制可能为更高效的剪枝策略提供指导。
-
-
 
 ## 原文 PDF
 

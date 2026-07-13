@@ -344,11 +344,8 @@ Figure 5 的验证集困惑度曲线显示，Mamba-3 在整个预训练过程中
 3. **规模验证有限**：当前实验最大规模为 1.5B 参数，尚未在 7B+ 规模上验证。
 4. **超参数敏感性**：复值 SSM 和指数梯形离散化引入了额外超参数（如 $\lambda_t$），最优参数化可能依赖于任务和规模。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_HwCvaJOiCj/figures/003_Table.jpg]]
 *Table: (a) Component ablation at 440M scale. Combining BC bias and exponential-trapezoidal discretization makes the ubiquitous short convolution optional. (b) Performance comparison on formal language tasks. Unlike Mamba-2, Mamba-3 features state-tracking ability stemming from data-dependent RoPE embeddings*
-
 
 ## 定位与知识库关联
 

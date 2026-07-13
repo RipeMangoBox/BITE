@@ -58,8 +58,6 @@ claims:
 
 **证据强度**：上述结论均基于 4 次独立运行的平均值，在合成数据集上进行受控实验，超参数和训练框架保持一致。转换性泛化失败和课程学习对齐敏感性等限制需在后续研究中进一步验证。
 
-
-
 ### 大语言模型的推理能力与强化学习的角色
 
 大语言模型（LLM）在数学、编程和科学推理等领域的表现已取得显著进展，但一个根本性问题尚未得到充分解答：当基础模型在某个任务上完全失败——即使用足够大的采样预算仍无法产生任何正确解答（pass@K=0）——强化学习（RL）能否使模型习得全新的算法策略，还是仅能强化其已有的启发式技能？
@@ -85,8 +83,6 @@ RL 提供了一个理论上有望突破此限制的路径。通过基于环境�
 1. 对于基础模型完全无法解决的任务（pass@K=0），什么样的 RL 训练配方能够可靠地触发“领悟”（grokking）相变——即从长期探索平台期突然跃升至近乎完美的准确率？
 2. 这种 RL 驱动的算法习得在多大程度上能够泛化到分布外场景？是否存在某些泛化类型（如转换性泛化）构成当前方法的根本性障碍？
 3. 课程学习和奖励塑形（reward shaping）技术如何影响 RL 在困难任务上的探索效率和最终性能？
-
-
 
 ## 核心方法与创新机理
 
@@ -128,8 +124,6 @@ RL 提供了一个理论上有望突破此限制的路径。通过基于环境�
 ### 核心洞察
 
 通过可控的 OOD 合成编程任务实验，本文证明了恰当的 RL 训练配方（密集奖励预热 → 稀疏二元奖励）能够引发 grokking 相变，使原本 pass@K=0 的任务被解锁至 100% 准确率。这一发现表明 RL 并非仅限于强化已有技能，而是可以习得全新的算法策略——前提是奖励设计能够引导模型穿越零奖励的“死亡谷”。
-
-
 
 ![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_CJJ8VxOWbG/figures/002_Figure_1.jpg]]
 *Figure 1: Overview of DELTA with controlled RL studies. Left: Synthetic Programming Problem families—Manufactoria with custom syntax and puzzle-like rules, BounceSim with physical simulation, etc. Right: Controlled RL experiments. Top: Learnability shows grokking, where RL shifts from long exploration to sudden convergence, uncovering strategies beyond reference models. Bottom: Generalization extends OMEGA (Sun et al., 2025) across four axes—Exploratory, Compositional, Transformative, and Domain-level—testing adaptation to harder or recombined tasks*
@@ -186,8 +180,6 @@ DELTA 的实验管线围绕 GRPO（Guo et al., 2025）强化学习微调循环�
 
 上述因果链由消融实验严密支撑：移除预热阶段的直接 GRPO 完全失败（Figure 5a），仅使用密集奖励的训练快速饱和且全通过率始终低于 0.01%（Figure 5b）。课程学习实验进一步表明，只有与目标族结构对齐的中间课程（REGEX → HAS）才能成功迁移，结构不匹配的课程（COMPR）则无效（Figure 7），这验证了奖励信号设计而非数据量是核心因果因素。
 
-
-
 ### RL 训练框架：GRPO 微调循环
 
 本工作的核心强化学习训练循环基于 **GRPO**（Group Relative Policy Optimization, Guo et al., 2025）。其关键机制在于：每个训练步采样多个 rollout，利用同一提示下不同生成结果之间的奖励差异来估计优势函数并进行策略梯度更新。默认配置为每个训练步使用 48 个提示，每个提示生成 16 个 rollout，学习率设为 $5 \times 10^{-7}$（Section 3.1）。
@@ -232,8 +224,6 @@ $$\Delta := a(R_o) - a(R_i) = (R_o - R_i) \cos(\pi/n)$$
 **周期性角速度条件**：小球在两个旋转正多边形之间实现均匀周期运动的充要条件为：
 $$\omega = \frac{k \cdot 2\pi v}{n (R_o - R_i) \cos(\pi/n)}$$
 其中 $\omega$ 为多边形旋转角速度，$v$ 为小球线速度，$k$ 为任意正整数。该公式是转换性泛化任务的核心物理约束，当前 RL 训练后的模型仍无法习得此类需要全新解题范式的规律。
-
-
 
 ## 实验与关键发现
 
@@ -284,15 +274,8 @@ $$\omega = \frac{k \cdot 2\pi v}{n (R_o - R_i) \cos(\pi/n)}$$
 ![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_CJJ8VxOWbG/figures/010_Figure_8.jpg]]
 *Figure 8: Warm-up training on the harder Manufactoria-PREPEND family. Figure 9: Generalization Study on BOUNCINGSIM. (a) Training full-pass rate on the Basic-level mixture (6 families, 1k each) for Qwen3-4B-Instruct with binary full-pass reward shows a sharp grokking jump near step 200. (b) Explorative generalization: Before RL (top) the model rarely solves any OOD cases; after RL (bottom) it transfers to Easy/Medium/Hard variants with diminishing gains as difficulty increases (bars aggregate 6 families × 4 tiers; 100 prompts per cell, averaged over 4 runs). (c) Compositional generalization: Zero-shot composition of skills. (d) Transformative generalization: Qualitatively new dynamics (e.g., special...*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_CJJ8VxOWbG/figures/003_Figure_2.jpg]]
-*Figure 2: The Manufactoria difficulty ladder. 14 problem families are grouped into Basic, Easy, Medium, and Hard levels according to average performance across four popular LLMs. Each test split contains 20–50 problems, and full pass rate are averaged over 4 independent runs*
-
 ![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_CJJ8VxOWbG/figures/012_Table_2.jpg]]
 *Table 2: Problem-by-difficulty configurations (aggregated from generator defaults). Abbreviations: f = container diameter factor (relative to 300m base); out/in = outer/inner polygon sides; r = ball radius (m); v = linear speed range (m/s); ω = angular speed (rad/s); amp = translation amplitude (m); g = gravity mode; cts = number of boxes; n = number of balls*
-
-
 
 ## 定位与知识库关联
 
@@ -337,8 +320,6 @@ $$\omega = \frac{k \cdot 2\pi v}{n (R_o - R_i) \cos(\pi/n)}$$
 4. **grokking 相变的可靠触发条件**：如何系统性地设计奖励函数和数据混合，以在不同的任务难度和基础模型能力下可靠地触发 grokking 相变？当前配方仍需要针对具体场景进行调试。
 
 5. **RL 崩塌的预防机制**：如何减轻或预防 RL 训练在收敛后出现的策略崩塌现象？可能的路径包括稳定化训练策略、智能早停机制或正则化方法，但均需进一步研究。
-
-
 
 ## 原文 PDF
 

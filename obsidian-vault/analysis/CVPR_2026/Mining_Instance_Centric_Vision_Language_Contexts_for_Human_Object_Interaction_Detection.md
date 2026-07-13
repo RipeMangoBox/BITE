@@ -73,8 +73,6 @@ claims:
 
 InCoM-Net属于VLM集成型HOI检测方法，与**HOICLIP**（Ning et al., CVPR 2023）等代表性工作共享利用VLM语义知识的基本思路，但在上下文利用方式上有本质区别：它摒弃了全局统一或简单RoI对齐的特征提取范式，转而采用**以实例为中心的分层上下文挖掘与渐进式特征融合**，从而在复杂交互推理上取得显著突破。
 
-
-
 ### 任务背景
 
 人-物交互（Human-Object Interaction, HOI）检测旨在从图像中同时定位人与物体实例，并识别两者之间的交互关系（如“人-骑-自行车”）。该任务处于目标检测与视觉关系理解的交叉点，是场景理解、行为识别和视觉问答等高层视觉任务的重要基础。
@@ -90,8 +88,6 @@ InCoM-Net属于VLM集成型HOI检测方法，与**HOICLIP**（Ning et al., CVPR 
 ### 本文动机
 
 针对上述问题，本文提出 **InCoM-Net（Instance-centric Context Mining Network）**，其核心动机在于：**以实例为中心，从 VLM 特征中挖掘多层级上下文，并通过渐进聚合策略将其有效融入检测器特征，从而实现更精准的交互推理**。如图 1 所示，对于每个实例，上下文信息可被区分为实例内（intra-instance）、实例间（inter-instance）和全局（global）三个层次，每一层次为交互理解提供互补线索。InCoM-Net 正是围绕这一三层上下文范式展开设计，使模型能够自适应地关注与目标实例最相关的视觉语义线索。
-
-
 
 ## 核心方法与创新机理
 
@@ -121,8 +117,6 @@ InCoM-Net 的核心创新在于将 VLM 提供的语义上下文从“全局均�
 
 这三个 changed slots 并非孤立改进，而是形成了一条因果链：**ICR** 产生高质量的实例中心多上下文特征，**ProCA** 以结构化的方式将这些特征渐进注入检测器查询，**MFT** 则确保训练过程中两种特征源被均衡利用。完整的多上下文配置在稀有类别上比常规 RoI 对齐方法提升 **+2.32 mAP**（Sec. 4.3），证明该设计对稀有交互具有强大的建模能力——这正是实例中心精细化上下文推理的直接收益。
 
-
-
 InCoM-Net 遵循“检测器提取实例特征 + VLM 提供语义上下文 + 交互解码器推理人-物交互”的总体范式，其核心创新在于以**实例为中心**的多层级上下文挖掘与渐进式聚合机制。图 2 展示了框架的全貌。
 
 **输入与特征提取。** 给定输入图像，框架首先通过两条并行的特征提取通路获取异构表示：
@@ -142,12 +136,8 @@ InCoM-Net 遵循“检测器提取实例特征 + VLM 提供语义上下文 + 交
 
 **掩码特征训练（MFT）。** 为促使模型均衡利用检测器空间特征与 VLM 语义特征这两种异质信息源，InCoM-Net 引入了 MFT 策略。训练时，随机对检测器特征或 VLM 特征进行掩码（置零并停用对应的交叉注意力模块），迫使模型在单一特征源缺失的情况下仍能可靠推理。训练目标为三种输入配置（完整特征、仅检测器特征、仅 VLM 特征）下焦点损失之和，从而缩小仅使用单一特征源时的性能差距，提升整体鲁棒性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l980_https_arxiv_org_abs_2604_02071/figures/002_Figure_2.jpg]]
 *Figure 2: Overall framework of InCoM-Net. Left: overview of Instance-centric Context Mining that integrates multi-context VLM features with instance-level features. Right: masked feature training (MFT), balancing the utilization of heterogeneous feature sources via masking*
-
-
 
 InCoM-Net 的核心由两个紧密协作的模块构成：**实例中心上下文精炼（Instance-centric Context Refinement, ICR）** 和 **渐进式上下文聚合（Progressive Context Aggregation, ProCA）**。ICR 负责从 VLM 特征中为每个实例独立提取多粒度上下文线索，ProCA 则通过多层交叉注意力将这些上下文特征逐步融入检测器实例查询中。
 
@@ -201,19 +191,6 @@ $$\mathcal{L} = \sum_{x \in \mathcal{X}} \mathcal{L}_{f}(y, \Phi_{\theta}(x)) \t
 
 其中 $\mathcal{X} = \{x_{f}, x_{d}, x_{v}\}$ 分别对应完整输入、仅检测器特征输入、仅 VLM 特征输入三种配置，$\Phi_{\theta}$ 为模型，$\mathcal{L}_{f}$ 为焦点损失。MFT 在完整模型基础上额外带来 1.11 mAP 的提升，并有效缩小了仅使用单一特征源时的性能差距，验证了该策略对异质特征融合的促进作用。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l980_https_arxiv_org_abs_2604_02071/figures/001_Figure_1.jpg]]
-*Figure 1: Illustration of three levels of contextual information. For each instance, contextual information can be distinguished into intra-instance, inter-instance, and global contexts, each providing complementary cues for interpreting human–object interactions*
-
-![[assets/figures/papers/paper_list_l980_https_arxiv_org_abs_2604_02071/figures/003_Figure_3.jpg]]
-*Figure 3: Structure of ICR. The illustration shows the process of generating the multi-context features for the i-th instance*
-
-![[assets/figures/papers/paper_list_l980_https_arxiv_org_abs_2604_02071/figures/004_Figure_4.jpg]]
-*Figure 4: Structure of ProCA*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -246,18 +223,9 @@ InCoM-Net 在两个标准 HOI 检测基准上均取得了领先性能。在 HICO
 
 ProCA 层数消融（Table 5）表明，随着交叉注意力层数从 1 层增加到 3 层，性能持续提升，但超过 3 层后趋于饱和，最终选用 3 层作为默认配置。
 
-![[assets/figures/papers/paper_list_l980_https_arxiv_org_abs_2604_02071/figures/009_Table_5.jpg]]
-*Table 5: Ablation study on the number of ProCA layers*
-
 MFT 策略的影响在 Table 6 中进一步分析：引入 MFT 后，仅使用检测器特征（D-only）与仅使用 VLM 特征（V-only）设置之间的性能差距显著缩小，说明 MFT 有效促进了模型对两种异质特征源的均衡利用，而非过度依赖某一方。
 
-![[assets/figures/papers/paper_list_l980_https_arxiv_org_abs_2604_02071/figures/011_Table_6.jpg]]
-*Table 6: Impact of MFT. * denotes reproduced results using their open-source code*
-
 VLM 特征提取策略的对比（Table 7）显示，ICR 采用的掩码自注意力方案在提取实例中心上下文方面优于直接使用全局池化或 RoI 对齐等替代策略，进一步验证了方法设计的合理性。
-
-![[assets/figures/papers/paper_list_l980_https_arxiv_org_abs_2604_02071/figures/012_Table_7.jpg]]
-*Table 7: Comparison with alternative VLM feature extraction strategies*
 
 ### 定性分析
 
@@ -269,8 +237,6 @@ Figure 5 可视化了交互解码器的激活图。结果表明，InCoM-Net 能�
 ### 公平性说明
 
 所有对比方法均采用相同的评估协议（IoU ≥ 0.5，HICO-DET 和 V-COCO 标准划分）。本方法使用的 DETR 检测器和 CLIP 编码器均采用与其他工作一致的预训练权重并保持冻结，确保了比较的公平性。
-
-
 
 ## 定位与知识库关联
 
@@ -316,8 +282,6 @@ InCoM-Net 可定位于 **VLM 增强的检测器上下文建模** 子领域，与
 - 与 HOICLIP、NMSR 等同属 VLM 集成 HOI 检测路线，但在上下文粒度和聚合策略上形成差异化贡献
 
 其核心 insight——以实例为中心的多上下文建模与渐进聚合——为后续工作提供了可复用的设计模式：将 VLM 语义知识按空间粒度解耦，并通过渐进式注意力机制与检测器特征深度融合。
-
-
 
 ## 原文 PDF
 

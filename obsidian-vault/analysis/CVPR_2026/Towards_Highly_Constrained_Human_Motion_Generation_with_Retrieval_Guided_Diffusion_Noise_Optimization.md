@@ -182,8 +182,6 @@ RG-DNO 的核心思想是将高度约束的运动生成任务分解为可解的�
 
 整个管线中，信息流从约束解析到检索、再到噪声组合与最终优化的递进关系清晰：关系解析将复杂问题结构化，检索注入外部先验技能，蒙版优化智能融合多源噪声，最终微调确保约束精确满足。这一设计使得 RG-DNO 能够在标准 DNO 失败的困难约束场景下（如通过极窄间隙或精确控制步数）显著降低约束误差并提高运动自然度。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l11_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_Towards_Highly_Con/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of Retrieval-Guided Diffusion Noise Optimization. Given a motion generation task represented by a combined constraint function*
 
@@ -272,8 +270,6 @@ $$\mathcal{R}(G(z'), z') = \lambda_1 \mathcal{L}_{\mathrm{jitter}} + \lambda_2 \
 
 RG-DNO 各模块形成级联因果链：**关系任务解析**识别瓶颈约束 $C_R$ → **约束检索**从外部知识库获取相关运动技能并反演为 $z_R$ → **蒙版优化**将检索先验与随机探索能力智能融合为 $z'$ → **最终微调**在优质初始化基础上精调。这一设计将高度约束任务分解为可解的子问题，突破了纯随机优化在困难约束下的能力边界。消融实验（Table 4）证实：跳过关系解析直接对全任务检索、用固定权重 $M=0.5$ 替代蒙版优化、或移除奖励函数 $\mathcal{R}$，均会导致约束误差上升或运动质量显著下降。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l11_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_Towards_Highly_Con/figures/009_Figure_4.jpg]]
 *Figure 4: Qualitative comparison. (a) ProgMoGen+DNO produces unsatisfactory motion for difficult constraints. For Task-2: (b) Using retrieved noise only produces implausible motion when fitting the entire task. (c) We generate plausible motion by combining retrieved noise and random noise with mask optimization*
 
@@ -317,8 +313,6 @@ Table 4 系统消融了 RG-DNO 各核心组件在 Task-2 上的贡献，红色�
 2. **任务解析鲁棒性**：关系任务解析依赖人工规则或 LLM 推理。当约束间的依赖关系复杂且隐含时，解析可能错误地将困难约束分配到随机噪声处理子集 C1，导致该阶段优化无法收敛，最终影响整体性能。
 
 3. **计算开销**：相比标准 DNO，RG-DNO 因额外增加检索、反演和蒙版优化步骤，单次生成耗时约增加 300 个优化步，实时性不足。奖励函数权重（λ_k）默认设为 1.0，需针对不同任务手动调整以达到最优平衡，自动化调参仍是开放问题。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l11_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_Towards_Highly_Con/figures/003_Table_1.jpg]]
 *Table 1: Quantitative comparison on the highly-constrained motion generation tasks involving challenging spatiotemporal constraints*

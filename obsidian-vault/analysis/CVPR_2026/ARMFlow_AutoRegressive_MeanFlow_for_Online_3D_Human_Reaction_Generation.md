@@ -53,8 +53,6 @@ claims:
 
 **主要结果**：在InterHuman和InterX数据集上，ARMFlow的在线单步生成在FID指标上比现有在线方法提升约30%，且性能与离线SOTA相当。具体而言，在InterHuman在线设定下FID达到2.178，对比ReGenNet的3.029（相对提升28%）；在InterX上FID为0.042，对比ReGenNet的0.093。BSCE训练策略在消融实验中显著优于GTE和HumanX的渐进滚动策略，验证了其对自回归误差累积的抑制效果。
 
-
-
 ### 问题背景：在线3D人体反应生成
 
 在虚拟现实、人机交互和社交机器人等场景中，智能体需要根据人类动作实时生成自然、语义一致的反应动作。这一任务被称为**在线3D人体反应生成**（Online 3D Human Reaction Generation），其核心挑战在于：模型必须在接收到演员动作的每个时间步立即输出反应动作，而不能等待完整序列。这要求方法同时满足三个相互制约的目标——**高保真度**（动作质量与多样性）、**低延迟**（实时推理）和**长程上下文一致性**（反应与历史行为保持语义连贯）。
@@ -70,8 +68,6 @@ claims:
 ### 本文动机
 
 上述瓶颈的根源在于：**现有方法将“长程上下文建模”与“单步高效生成”视为不可兼得的对立目标**。本文的核心动机是打破这一假设——通过引入**MeanFlow**的单步生成特性，结合**因果上下文编码器**保留全局语义，并设计**BSCE训练策略**抑制自回归误差累积，从而在实时在线环境下实现高保真、高一致的反应生成。具体而言，ARMFlow在InterHuman和InterX数据集上的在线单步生成FID指标比现有在线方法提升约30%，且与离线SOTA性能相当（见Table 2），验证了该技术路线的可行性。
-
-
 
 ## 核心方法与创新机理
 
@@ -106,8 +102,6 @@ ARMFlow 的 **BSCE（Bootstrap Contextual Encoding）** 策略采取了更激进
 这三个 changed slot 形成了紧密的因果闭环：**MeanFlow 提供了单步生成的效率基础，使得因果上下文编码器可以在不增加延迟的前提下处理完整历史；BSCE 则为这一自回归架构提供了误差抑制机制，确保长程上下文信息不会被累积误差污染**。消融实验（Table 4）表明，移除因果上下文编码或 BSCE 均会导致在线性能显著下降，验证了各模块的必要性。
 
 值得注意的是，这一设计也存在固有局限：由于 MeanFlow 的单步特性，模型不支持事后分类器引导（post-hoc classifier guidance），无法在生成后对结果进行基于优化的细化修正；此外，当前实现未提供弹性延迟处理机制，在多代理交互场景下可能产生轻微异步行为。这些限制指向了未来工作的潜在方向，但并不削弱 ARMFlow 在“效率-保真度-一致性”三角矛盾中所取得的突破。
-
-
 
 ARMFlow的整体架构围绕“单步生成 + 全局因果上下文”这一核心思想构建，通过三个关键模块的协同，实现在线3D人体反应生成的高保真度与低延迟。图2展示了完整的pipeline。
 
@@ -149,12 +143,8 @@ ARMFlow的在线生成模块包含两个子组件，遵循MAR的架构精神：
 
 作为ARMFlow的离线对应版本，ReMFlow同样基于DiT backbone和MeanFlow范式，但无需因果掩码和自回归机制，可直接利用完整序列进行双向注意力建模。两者共享CNN-VAE隐空间和DiT基础架构，保证了在线/离线场景下的方法一致性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l962_https_arxiv_org_abs_2512_16234/figures/003_Figure_2.jpg]]
 *Figure 2: Overview of the proposed architecture for online and offline reaction generation. The framework consists of a CNN-based encoder to learn a compact latent space for the actor and the reactor. The ReMFlow is for offline generation based on the DiT architecture, and ARMFlow is the autoregressive online model consisting of a DiT context encoder and an MLP velocity predictor. A BSCE strategy is employed during online training progressively to reduce accumulated error in the autoregression*
-
-
 
 ARMFlow 的整体架构由四个核心模块构成，围绕 MeanFlow 单步生成范式组织，如图 Figure 2 所示。
 
@@ -210,8 +200,6 @@ ARMFlow 采用基于 DiT 的**因果上下文编码器**，通过因果掩码（
 
 BSCE（Bootstrap Contextual Encoding）策略从训练初期就用模型生成的历史替换真实历史，并逐步增加自回归迭代次数。这与 HumanX 的渐进滚动（Rollout）策略形成对比——BSCE 在训练起始阶段即引入生成历史，使模型更早适应自回归推理的分布偏移。消融实验（Table 6）证实 BSCE 在 FID 等指标上显著优于 GTE 和 Rollout 策略。
 
-
-
 ## 实验与关键发现
 
 ### 实验设置与评估协议
@@ -254,25 +242,12 @@ Figure 3 展示了 ARMFlow 与 ReGenNet 在 InterHuman 数据集上的定性对�
 
 ARMFlow 的核心效率优势源于 MeanFlow 的单步生成特性。如 Figure 1 所示，ARMFlow 每实时步仅需一次推理，而 ReGenNet 需 35-78 ms 的多步扩散，CAMDM 需约 45 ms。单步推理使 ARMFlow 在保持高保真度的同时满足实时交互的延迟要求，为在线人机交互场景提供了可行方案。
 
-![[assets/figures/papers/paper_list_l962_https_arxiv_org_abs_2512_16234/figures/001_Figure_1.jpg]]
-*Figure 1: Our method only processes a single inference in each real-time step for online reaction generation, compared to the SOTA methods ReGenNet (35-78 ms), and CAMDM (45 ms). The text description is from the InterX [43] dataset*
-
 ### 局限与失败模式
 
 尽管 ARMFlow 在主要指标上表现优异，仍存在两个已知局限：（1）当前实现未提供自回归小窗口的弹性延迟处理机制，在多代理交互时可能产生轻微异步行为；（2）MeanFlow 的单步生成特性使其不支持事后分类器引导（post-hoc classifier guidance），无法对已生成结果进行基于优化的细化修正。在需要精细约束控制的应用场景中，这一限制需要额外关注。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l962_https_arxiv_org_abs_2512_16234/figures/007_Table_4.jpg]]
 *Table 4: Ablation study for online generation on methods*
-
-![[assets/figures/papers/paper_list_l962_https_arxiv_org_abs_2512_16234/figures/008_Table_5.jpg]]
-*Table 5: Ablation study for offline generation on methods*
-
-![[assets/figures/papers/paper_list_l962_https_arxiv_org_abs_2512_16234/figures/009_Table_6.jpg]]
-*Table 6: Ablation on the training strategies for online autoregressive diffusion. GTE stands for ground-truth encoding, Rollout is the strategy used in HumanX[17], and BSCE is our strategy*
-
-
 
 ## 定位与知识库关联
 
@@ -327,8 +302,6 @@ ARMFlow 的核心贡献在于将 **MeanFlow 的单步生成能力**与**自回�
 - **多代理扩展**：如何将因果上下文编码和 BSCE 策略扩展到三人及以上的交互场景，同时保持线性计算复杂度？
 - **条件控制的灵活性**：在无法使用事后分类器引导的约束下，如何增强模型对细粒度条件（如情感强度、交互风格）的响应能力？
 - **长序列稳定性**：BSCE 策略在极长序列（如数分钟连续交互）下的自回归稳定性尚未验证，误差累积的上界和衰减特性值得进一步分析。
-
-
 
 ## 原文 PDF
 

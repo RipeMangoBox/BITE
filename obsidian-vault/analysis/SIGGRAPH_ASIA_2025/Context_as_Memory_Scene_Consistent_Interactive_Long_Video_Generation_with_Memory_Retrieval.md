@@ -53,8 +53,6 @@ claims:
 
 **主要结果**：在自采集的UE5渲染数据集上，Context-as-Memory在场景记忆能力上显著优于所有基线。以ground truth帧为上下文的协议下，PSNR达20.22（较最佳基线**Random Selection**提升+2.31），LPIPS降至0.3003（改善-0.0299），FID降至107.18（改善-41.07），FVD降至821.37（改善-132.43）。消融实验证实，上下文尺寸K=20在性能与推理速度（0.97 fps）间取得较优平衡；FOV检索与非相邻帧过滤是记忆性能提升的关键驱动因素。
 
-
-
 ### 交互式长视频生成的核心挑战
 
 交互式长视频生成要求模型根据用户实时输入（如相机轨迹）持续生成新的视频帧。其本质可形式化为流式视频生成问题：每一帧的生成以所有前序帧为条件：
@@ -83,8 +81,6 @@ $$p(x^0,x^1,...,x^n) = \prod_{i=0}^{n} p(x^i | x^0,x^1,...,x^{i-1})$$
 
 为此，本文提出 **Context-as-Memory** 方法，核心思路是：利用相机轨迹的视场（FOV）重叠检测，从所有历史帧中检索与当前待生成帧具有共视关系的相关帧作为上下文条件。这一规则化检索策略能够高效滤除冗余和无关帧，仅将真正相关的历史帧注入生成过程，从而在长视频生成中实现场景一致性。
 
-
-
 ## 核心方法与创新机理
 
 Context-as-Memory 的核心创新在于将交互式长视频生成重新定义为**以历史帧为显式记忆的条件生成问题**，并通过三个关键设计（changed slots）突破了现有方法依赖有限前序上下文的瓶颈。
@@ -112,8 +108,6 @@ Context-as-Memory 将**所有历史生成帧直接存储为记忆**，无需任�
 ### 创新本质：将“记忆”从隐式状态变为显式条件
 
 上述三个 changed slots 共同指向一个核心洞察：**长视频的场景一致性本质上是一个记忆检索问题**。Context-as-Memory 将记忆从模型内部的隐式状态外化为可直接索引的历史帧集合，并通过几何感知的检索策略在生成时精准注入相关信息，从而在无需增大模型规模或复杂记忆模块的前提下，显著提升了长视频的场景一致性。
-
-
 
 Context-as-Memory 的整体流水线围绕一个核心洞察构建：**所有历史生成帧都可以直接作为记忆存储，无需任何后处理**。方法将交互式长视频生成重新表述为一个记忆检索增强的流式预测问题——每一帧的生成不仅依赖最近的前序帧，而是通过基于相机轨迹的视场（FOV）重叠检测，从全部历史帧中动态检索真正相关的上下文帧，将其作为条件注入生成过程，从而在相机回到先前位置时保持场景一致性。
 
@@ -160,12 +154,8 @@ Context-as-Memory 的整体流水线围绕一个核心洞察构建：**所有历
 
 记忆检索模块是连接“记忆存储”和“条件注入”的关键桥梁：它将无结构的全量历史帧转化为精炼的、与当前视角相关的上下文帧集合，使得简单的帧维度拼接条件注入能够发挥最大效用。相机条件注入模块则为记忆检索提供了精确的 FOV 判断依据，两者协同实现了“相机轨迹驱动记忆检索”的闭环。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1497_https_arxiv_org_abs_2506_03141/figures/010_Figure_7.jpg]]
 *Figure 7: Overview of the base text-to-video generation model. Fig. 8. Open-Domain Results*
-
-
 
 ### 3.1 基模型与扩散训练
 
@@ -200,8 +190,6 @@ $$\mathcal{L}_{\mathbf{cam}}(\phi, \phi_{MLP}) = \mathbb{E}\left[\left\|\epsilon
 2. **非相邻帧去重（Non-adj）**：连续相邻帧的FOV高度重叠，信息冗余严重。该过滤策略从连续帧序列中仅选取一帧作为候选，有效减少冗余。
 
 3. **远帧采样（Far-space-time）**：在满足FOV重叠的候选帧中，额外优先选择空间或时间上最远的帧，以增加上下文多样性。消融实验（Table 3）表明，该步骤带来的增益小于FOV和Non-adj过滤。
-
-
 
 ## 实验与关键发现
 
@@ -274,15 +262,11 @@ Fig. 5的定性对比进一步印证：Context-as-Memory在相机回到先前位
 3. **轨迹限制**：当前方法仅针对静态相机轨迹（相机仅可在XY平面移动），未扩展到动态场景和物体变化。
 4. **开域扩展受限**：在开域场景下尚不支持复杂、多样、动态的长期探索。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1497_https_arxiv_org_abs_2506_03141/figures/005_Figure.jpg]]
 *Figure: Frame 5 Frame 25 Frame 45 Frame 65*
 
 ![[assets/figures/papers/paper_list_l1497_https_arxiv_org_abs_2506_03141/figures/006_Figure_5.jpg]]
 *Figure 5: Qualitative Comparison Results. Among them, Context-as-Memory demonstrated the best memory capabilities and the highest visual quality, indicating the effectiveness of sufficient context information conditioning. Other methods exhibit scene inconsistency issues due to limited context utilization. Table 1. Quantitative Comparison results. Due to learning abundant context, Context-as-Memory demonstrates the best memory capabilities and highest quality of generated videos. In contrast, DFoT [Song et al. 2025] and FramePack [Zhang and Agrawala 2025], which can only utilize the most recent contexts, show relatively inferior performance, even worse than random context selection. This is because a...*
-
-
 
 ## 定位与知识库关联
 
@@ -340,8 +324,6 @@ Context-as-Memory 位于**基于扩散的视频生成**与**流式自回归生�
 ### 证据强度评估
 
 本文的核心主张均有较强证据支撑：定量实验中，Context-as-Memory 在Ground Truth比较协议下PSNR达20.22（较最佳基线Random Selection的17.91提升2.31），LPIPS降至0.3003（较最佳基线降低0.0299），FID和FVD分别较最佳基线降低41.07和132.43。消融实验系统验证了FOV检索和非相邻帧过滤的独立贡献。然而，所有实验均在自采集的UE5渲染数据集上进行，开域结果仅以定性示例呈现，方法的真实世界泛化性仍需独立验证。
-
-
 
 ## 原文 PDF
 

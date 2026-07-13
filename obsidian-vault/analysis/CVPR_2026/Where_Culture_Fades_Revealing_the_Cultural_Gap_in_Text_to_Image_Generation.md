@@ -57,8 +57,6 @@ claims:
 
 **方法谱系与知识库定位**：本研究处于文本到图像生成与文化公平性的交叉领域。与**StableDiffusion XL**（Podell et al., 2023）、**FLUX.1-dev**（Black Forest Labs, 2024）等通用大规模T2I模型直接对比文化生成能力；与**PEA-Diffusion**和**AltDiffusion**等跨语言对齐扩散模型进行文化一致性改进的量化对比。在文化感知生成方面，区别于依赖提示工程或全模型微调的现有方案，本文首次从神经元可解释性角度定位并因果性地调控文化表征，为模型的文化对齐提供了一种参数高效、架构可迁移的新范式。
 
-
-
 ### 多语言文本到图像模型的文化对齐鸿沟
 
 近年来，以扩散模型为核心的文本到图像（T2I）生成取得了显著进展，代表性模型如 **StableDiffusion XL**（Podell et al., 2023）、**FLUX.1-dev**（Black Forest Labs, 2024）以及 **StableDiffusion 3.5**（Stability AI, 2024）在图像保真度和文本对齐方面表现优异。与此同时，诸如 **AltDiffusion**（Chen et al., 2023）和 **PEA-Diffusion**（Zhang et al., 2024）等模型通过引入多语言文本编码器，试图将生成能力拓展至非英语语言环境。然而，一个关键问题被系统性忽视：**模型在多语言环境下能否生成与目标语言文化背景相一致的视觉内容？**
@@ -83,8 +81,6 @@ Figure 1 直观地揭示了这一鸿沟。当用户使用“仅名词”提示�
 1. **定位文化表征**：开发一种探测方法，通过对比文化修饰语与名词之间的跨注意力差异（$\Delta\mathrm{CA}(l)$），定位文本编码器中对文化最敏感的单一层；进而利用 Top-K 稀疏自编码器（SAE）和加权频率分数，在敏感层内识别出对特定文化具有高选择性的少量神经元。
 2. **轻量干预**：基于探测结果，提出两种互补的文化对齐策略——零训练神经元放大器（inference-time activation）和微调层增强器（layer-targeted enhancement），前者通过推理时放大文化敏感神经元的 SAE 隐变量实现零训练成本的文化增强，后者仅在敏感层插入少量可训练残差模块，以极低的参数开销实现自适应文化对齐。
 3. **跨模型验证**：在两个不同架构的扩散模型（PEA-Diffusion 和 AltDiffusion）上验证方法的有效性与泛化性，证明文化表征的集中性和可干预性并非特定模型的偶然现象，而是跨架构的普遍规律。
-
-
 
 ## 核心方法与创新机理
 
@@ -126,8 +122,6 @@ Figure 1 直观地揭示了这一鸿沟。当用户使用“仅名词”提示�
 
 上述所有创新的有效性都建立在一个坚实的因果性验证之上。**Table 1** 的掩蔽实验提供了决定性证据：掩蔽探测到的Top-K文化敏感神经元后，PEA-Diffusion的CultureVQA得分从35.62**暴跌至7.65**（-27.97），而掩蔽相同数量的随机神经元，得分仅微降至33.04（-2.58）。在AltDiffusion上重复该实验，Top-K掩蔽导致得分下降32.50点，随机掩蔽仅下降2.09点（Table 5）。这无可辩驳地证明了，所探测的特定神经元与文化语义之间存在直接的因果关系，而非相关性。正是这一发现，使得后续的神经元放大和层增强操作有了明确的、可解释的靶点，构成了本文方法论的基石。
 
-
-
 本文提出的方法遵循“探测-干预”两阶段范式，旨在以极低的参数开销恢复多语言文本到图像模型中被抑制的文化表征。整体pipeline由四个功能模块串联构成，输入为CultureBench中的“名词提示”（noun-only prompt），输出为文化一致性显著增强的生成图像。
 
 **阶段一：文化表征定位**
@@ -143,8 +137,6 @@ Figure 1 直观地揭示了这一鸿沟。当用户使用“仅名词”提示�
 4.  **微调层增强器**（轻量训练干预）：在文化敏感层的隐状态 $h$ 上插入一个残差变换模块 $\tilde{h} = h + g(W_2 \sigma(W_1 h))$。仅该模块的参数可训练，其余骨干网络全部冻结。训练时，使用CultureBench中的文化参考图像 $x_i^*$ 作为目标，以像素级MSE损失 $\mathcal{L}_{\mathrm{MSE}}$ 进行监督，使增强后的特征直接向目标文化风格对齐。
 
 两个增强方案的设计体现了“文化知识已存在于模型中，仅需针对性激活”的核心洞察：零训练方案通过神经元级放大实现即插即用的文化恢复；微调方案则以极少量可训练参数（仅作用于单一层）换取自适应优化，二者均避免了对完整模型的重训练，从而在提升文化一致性的同时维持了文本-图像对齐质量与生成多样性。
-
-
 
 本文方法的核心在于“探测-增强”两阶段框架：首先在冻结的文本编码器中定位文化敏感层与神经元，随后通过两种互补策略——零训练神经元放大与微调层增强——在推理或训练阶段注入文化信号。以下逐一阐述各模块的关键设计与公式。
 
@@ -206,9 +198,6 @@ $$
 
 实验显示，$WFS$ 仅在极少数神经元上形成尖锐峰值（Figure 7），文化知识高度集中。因果验证（Table 1）表明：掩蔽这些 Top-K 神经元使 CultureVQA 从 35.62 骤降至 7.65（-27.97），而随机掩蔽等量神经元仅降至 33.04（-2.58），证实了所选神经元与文化语义的因果关系。
 
-![[assets/figures/papers/paper_list_l2365_https_arxiv_org_abs_2511_17282/figures/007_Figure_7.jpg]]
-*Figure 7: Neuronal detection result. The weighted frequency scores show only a few salient peaks per culture, indicating culture-specific neurons. We define the Top-K set as the peak neurons, with K adapting to the number of salient peaks*
-
 ### 零训练神经元放大器
 
 该模块在推理时运行，无需任何模型参数更新。其核心操作是：对已识别的文化敏感神经元集合 $M_{\mathrm{cult}}$，将其 SAE 隐变量乘以因子 $(1+\lambda)$ 进行放大，其余神经元保持不变：
@@ -241,16 +230,11 @@ $$
 
 该方案的可训练参数仅限于新增的残差模块，参数量极小，训练开销远低于全模型微调。实验表明，该方案在 CultureVQA 上达到 36.63，优于零训练方案的 33.91（Table 2），但零训练方案在 CLIPScore 和 ImageReward 上略占优势，体现了两种策略在不同指标上的互补性。
 
-
-
 ## 实验与关键发现
 
 ### 核心假设验证：文化知识存在于模型中，而非缺失
 
 在讨论定量结果之前，先验证本文的核心假设——多语言文本到图像模型在仅使用名词提示时，并非缺乏文化知识，而是未能充分激活已有知识。Figure 4 展示了在 CultureBench 测试子集上，对比“文化风格修饰语 + 名词”与“仅名词”两种提示条件下的 CultureVQA 分数：PEA-Diffusion 从 21.65 跃升至 35.62，AltDiffusion 从 23.05 跃升至 44.39。这一显著差距表明，模型预训练过程中已经获得了丰富且多样的文化表征，但“名词提示”缺乏显式文化触发信号，导致这些表征在生成阶段未被有效激活。这一发现构成了后续所有神经元级探测与干预方法的逻辑基础。
-
-![[assets/figures/papers/paper_list_l2365_https_arxiv_org_abs_2511_17282/figures/004_Figure_4.jpg]]
-*Figure 4: Verify the hypothesis. Within the CultureBench test subset, performances under “culture-style modifier + noun” and “noun-only” prompt conditions are compared. Quantitative evaluation is conducted using CultureVQA*
 
 ### 文化敏感神经元的因果性验证
 
@@ -283,12 +267,6 @@ Table 3 的消融实验旨在回答一个关键问题：性能增益究竟来自
 
 零训练方案的核心超参数是放大系数 λ。Figure 11 展示了 CultureVQA 随 λ 变化的定量曲线：λ 从 0 增至 7 时，CultureVQA 从基线 21.65 逐步攀升至峰值 35.92；当 λ 继续增大至 8 时，CultureVQA 回落至 34.93。Figure 10 提供了对应的定性可视化，λ 从 0 到 8 变化时，生成图像的文化风格逐渐增强，但过大的 λ 会引入视觉伪影或风格过饱和。这一现象表明，文化神经元的激活强度需要适中：过弱不足以触发文化表征，过强则可能破坏文本编码器输出的整体平衡，损害生成质量。
 
-![[assets/figures/papers/paper_list_l2365_https_arxiv_org_abs_2511_17282/figures/012_Figure_11.jpg]]
-*Figure 11: Hyperparameter results. Performance variations of CultureVQA under different λ values*
-
-![[assets/figures/papers/paper_list_l2365_https_arxiv_org_abs_2511_17282/figures/013_Figure_10.jpg]]
-*Figure 10: Hyperparameter results. The effect of cultural enrichment varies under different λ values*
-
 ### 跨域泛化能力
 
 Table 6 评估了微调方案在 100 条域外描述（out-of-distribution captions）上的泛化性能。在 PEA-Diffusion 上，微调方案将 CultureVQA 从 15.00 提升至 35.00（+20.00）；在 AltDiffusion 上，从 15.00 提升至 32.00（+17.00）。这一结果表明，文化敏感神经元捕捉的是通用的文化语义表征，而非对训练集中特定提示的过拟合，所提方法具备良好的跨域迁移能力。
@@ -300,9 +278,6 @@ Table 6 评估了微调方案在 100 条域外描述（out-of-distribution capti
 
 尽管 CultureVQA 自动化评估效率高，但其可靠性需要通过人类判断进行交叉验证。Table 4 显示，CultureVQA 与人类专家在 CultureBench 上的判断一致性达到 91.57%，而人类专家之间的一致性为 94.18%，两者差距仅约 2.6 个百分点，说明自动评估具有较高可靠性。在此基础上，Figure 9 展示了在 CultureBench 平台上进行的用户研究结果（50 位专家参与），评估三个维度：文化匹配正确率（MCC）、风格一致性（SCC）和文化语义相关性（CSR，1-5 分制）。所提方法在 CSR 上取得 77.6 分，显著优于第二名的 60.4 分（+17.2），进一步验证了文化一致性的实质性提升。
 
-![[assets/figures/papers/paper_list_l2365_https_arxiv_org_abs_2511_17282/figures/011_Figure_9.jpg]]
-*Figure 9: User Study. Evaluated using MCC, SCC, and CSR metrics, where higher scores indicate greater perceived realism and user preference*
-
 ### 失败模式与局限性
 
 尽管所提方法在定量和定性评估上均取得了显著提升，但仍存在若干值得关注的失败模式：
@@ -312,13 +287,6 @@ Table 6 评估了微调方案在 100 条域外描述（out-of-distribution capti
 2. **模型迁移的成本**：当切换到新架构的模型时，如果文本编码器发生变化，需要重新执行文化敏感层和神经元的探测步骤。虽然探测过程本身无需训练，但仍需要该文化区域的标注数据来计算 ∆CA 和加权频率分数，这增加了实际部署时的前期成本。
 
 3. **自动化评估的边界**：尽管 CultureVQA 与人类判断高度一致，但 Table 4 中约 2.6% 的一致性差距提示，自动化指标仍无法完全捕捉人类感知的细微文化差异。在涉及高度语境化的文化符号或次文化群体时，CultureVQA 的判断可能需要人工复核。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2365_https_arxiv_org_abs_2511_17282/figures/001_Figure_1.jpg]]
-*Figure 1: Cultural alignment in local languages. (a) LLMs/recommenders keep cultural consistency, but T2I models falter with “noun-only” prompts. (b) Adding a “culture-style modifier + noun” restores consistency*
-
-
 
 ## 定位与知识库关联
 
@@ -357,8 +325,6 @@ Table 6 评估了微调方案在 100 条域外描述（out-of-distribution capti
 4. **多文化场景的自适应机制**：当同时处理多个文化领域时，如何在线自适应地选择或组合不同的文化神经元集，而无需为每一组文化单独执行探测和微调？当前方法中，不同文化对应的敏感神经元集可能存在重叠或互斥，如何高效管理和调度这些文化特异性表征是一个实际部署中亟待解决的问题。
 
 5. **规模化的文化控制范式**：随着文生图模型规模不断增大，是否可能通过类似任务向量或提示工程的方式更简单地实现文化控制，而避免复杂的神经元级定位？图13的初步证据表明，在固定英文提示下激活不同文化神经元集即可将输出引导至不同文化风格，这暗示文化表征可能具有某种可加性。探索更轻量、更可扩展的文化控制机制是值得深入的方向。
-
-
 
 ## 原文 PDF
 

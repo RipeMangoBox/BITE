@@ -140,8 +140,6 @@ MatMart 将材质重建任务解耦为两个渐进式阶段，并在单一扩散
 
 这种统一架构使得 MatMart 能够灵活处理任意数量的高分辨率输入视图，同时保持训练与部署的简洁性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2543_https_arxiv_org_abs_2511_18900/figures/002_Figure_2.jpg]]
 *Figure 2: Method overview. Our framework, MatMart, divides the material reconstruction task into two stages. In the first stage, progressive material prediction is performed on the input images, and the predicted results are baked into the UV space. In the second stage, prior-guided material generation and texture baking are alternately conducted for unobserved and occluded regions. Both prediction and generation tasks are unified within a single diffusion model and can be accomplished through end-to-end optimization*
 
@@ -212,8 +210,6 @@ MatMart 在 Objaverse 子集上进行了单视图与多视图两种设定下的�
 ### 推理效率与开放问题
 
 MatMart 完成单个物体的完整重建需要 9–23 分钟，这一推理时间限制了其在实时或大规模场景中的应用。此外，模型在真实世界复杂光照和遮挡条件下的泛化能力、以及向透明/半透明/体积材质扩展的可行性，仍是待探索的开放问题。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2543_https_arxiv_org_abs_2511_18900/figures/005_Table_1.jpg]]
 *Table 1: Quantitative comparisons for single-view and multi-view settings. Best results are marked as 1st and 2nd*

@@ -55,8 +55,6 @@ claims:
 
 EgoFlow的核心洞察在于：在 $\mathbb{R}^9$ 流空间中学习连续传输场，使轨迹生成过程本身即编码物理偏向；同时利用梯度引导在采样时动态优化，将数据驱动的运动先验与物理约束解耦，从而在不重新训练的情况下适应新场景的障碍布局。这一设计为自我中心物体运动生成提供了一条兼顾精度与物理一致性的新路径。
 
-
-
 ### 问题背景：自我中心视频中的6DoF物体运动生成
 
 随着增强现实（AR）、虚拟现实（VR）和具身人工智能的快速发展，从头戴式设备拍摄的自我中心（egocentric）视频中理解和生成物体的三维运动轨迹，已成为一个关键且具有挑战性的研究问题。这一任务的核心目标是：**给定一段历史观测轨迹、周围三维场景信息以及任务描述（如“拿起桌上的手机”），预测物体在未来时间步的6DoF（6自由度）运动轨迹**，即同时包含三维平移和三维旋转的完整刚体运动。
@@ -84,8 +82,6 @@ EgoFlow的核心洞察在于：在 $\mathbb{R}^9$ 流空间中学习连续传输
 - **物理约束注入**：在推理阶段引入**梯度引导采样**机制，通过可微分物理代价函数（基于SDF的碰撞惩罚、旋转方向连续性与速度平滑性）对每一步生成的速度场进行梯度优化，迫使轨迹遵守物理约束，而无需额外的监督信号或重新训练。
 
 这一设计理念的核心洞察在于：**在R⁹空间中学习连续流场，使轨迹生成过程本身即编码物理偏向；同时利用梯度引导在采样过程中动态优化，把数据驱动的运动先验和物理约束解耦，从而在不重训练的情况下适应新场景的障碍布局。** 实验结果表明，EgoFlow在HD-EPIC数据集上将碰撞率从无引导版本的11.6%降至2.5%，相对减少约79%，验证了这一技术路线的有效性。
-
-
 
 ## 核心方法与创新机理
 
@@ -132,8 +128,6 @@ $$\mathbf{v}_\theta^{(k+1)} = \mathbf{v}_\theta^{(k)} - \alpha \nabla_{\mathbf{v
 ### 创新协同的因果链条
 
 上述三个创新并非孤立存在，而是形成了一条因果链路：流匹配提供了确定性、可微分的速度场，使得梯度引导可以直接作用于速度预测之上；混合架构则确保了速度场本身已融合充分的场景几何与语义信息，使梯度修正不至于偏离任务目标。三者协同的结果是：EgoFlow 在 HD-EPIC 上以 ADE 0.279、FDE 0.102、碰撞率 2.5% 的成绩全面超越 GIMO（碰撞率 23.5%）、CHOIS 等基线，并在跨数据集零样本泛化（HOT3D）中展现出显著优势。
-
-
 
 EgoFlow 的整体 pipeline 围绕一个核心思路构建：**将 6DoF 物体轨迹生成转化为在 R⁹ 空间中的确定性流匹配问题，并通过推理阶段的梯度引导注入物理约束**。整个框架由四个关键模块串联而成，形成从多模态场景理解到物理一致轨迹输出的端到端流程。
 
@@ -182,13 +176,6 @@ EgoFlow 的整体 pipeline 围绕一个核心思路构建：**将 6DoF 物体轨
 ### 关键设计决策
 
 框架的一个核心洞察在于**将数据驱动的运动先验与物理约束解耦**：流匹配网络在训练时仅学习从噪声到数据的确定性流场，不涉及任何物理代价；物理合理性完全由推理阶段的梯度引导保证。这使得模型无需重训练即可适应新场景的障碍布局——只需提供新场景的 SDF，梯度引导便会自动将轨迹推离碰撞区域。这一设计的决定性证据来自 Table 3 的引导消融：移除碰撞代价项后，碰撞率从 2.5% 急剧上升至 11.6%，相对恶化约 79%，充分验证了梯度引导对物理合理性的关键作用。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l28_https_openaccess_thecvf_com_content_CVPR2026_html_Saroha_EgoFlow_Gradien/figures/001_Figure_1.jpg]]
-*Figure 1: EgoFlow: a method for object trajectory generation from egocentric videos. Given a textural command and the surrounding environment, EgoFlow generates physically valid 6DOF object trajectories that respect spatial constraints across diverse environments by learning from egocentric videos*
-
-
 
 ### 3.1 问题形式化与轨迹表示
 
@@ -264,8 +251,6 @@ $$\mathcal{T}_{\mathrm{vel}} = \sum_{j=H+1}^{T-2} \|\mathbf{a}_j\|, \quad \mathb
 
 梯度引导的核心价值在于将数据驱动的运动先验与物理约束解耦——网络仅在干净轨迹上以标准流匹配损失训练，无需接触碰撞或平滑性监督信号；物理合理性完全由推理时的可微分优化保证。消融实验（Table 3）提供了决定性证据：移除碰撞代价 $\mathcal{T}_{coll}$ 后，碰撞率从 **2.5%** 急剧上升至 **11.6%**，相对恶化约 79%，验证了 SDF 碰撞惩罚对物理合理性的关键作用。同时，移除场景点云或目标位姿条件会导致 ADE/FDE 显著恶化，表明局部几何与目标信息是精确轨迹预测的必要条件。
 
-
-
 ## 实验与关键发现
 
 ### 实验设置
@@ -332,16 +317,11 @@ $$\mathcal{T}_{\mathrm{vel}} = \sum_{j=H+1}^{T-2} \|\mathbf{a}_j\|, \quad \mathb
 3. **与执行解耦**：生成的轨迹尚未与机器人操作策略耦合，需进一步连接从轨迹到关节动作的映射。
 4. **旋转精度权衡**：在Geodesic距离上略逊于GIMO，表明梯度引导在旋转平滑性与精确拟合真值旋转之间存在一定的权衡，需要手动验证具体场景下的表现。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l28_https_openaccess_thecvf_com_content_CVPR2026_html_Saroha_EgoFlow_Gradien/figures/003_Figure_3.jpg]]
 *Figure 3: HD-Epic Qualitative Result. The trajectory in green in each image is the history followed by the respective prediction by the various baselines and the ground truth. We can see that not ony our method generates a plausible trajectory to the end goal, it also takes a rather more natural and smooth path to the target pose*
 
 ![[assets/figures/papers/paper_list_l28_https_openaccess_thecvf_com_content_CVPR2026_html_Saroha_EgoFlow_Gradien/figures/004_Figure.jpg]]
 *Figure: Task Prompt: pick the cellphone on the table. Task Prompt: pick the potato masher on the table*
-
-![[assets/figures/papers/paper_list_l28_https_openaccess_thecvf_com_content_CVPR2026_html_Saroha_EgoFlow_Gradien/figures/005_Table_2.jpg]]
-*Table 2: Cross-dataset evaluation. Following the setup of [51], we compare EgoFlow against the baselines on HOT3D dataset after training on Ego-Exo4D, thus demonstrating our superior performance on unseen scenes and cross-dataset generalization*
 
 ![[assets/figures/papers/paper_list_l28_https_openaccess_thecvf_com_content_CVPR2026_html_Saroha_EgoFlow_Gradien/figures/006_Table_1.jpg]]
 *Table 1: Quantitative Results: HD-EPIC We compare model performance on various metrics on the HD-EPIC dataset. We can observe that our method performs the best against the baselines, while adding guidance sampling significantly reduces its collision rate. The results are averaged over 3 runs for EgoFlow*
@@ -351,8 +331,6 @@ $$\mathcal{T}_{\mathrm{vel}} = \sum_{j=H+1}^{T-2} \|\mathbf{a}_j\|, \quad \mathb
 
 ![[assets/figures/papers/paper_list_l28_https_openaccess_thecvf_com_content_CVPR2026_html_Saroha_EgoFlow_Gradien/figures/008_Table_4.jpg]]
 *Table 4: Architecture Ablation. Study of different layer configurations (Mamba-Transformer-Mamba layers) on HD-EPIC*
-
-
 
 ## 定位与知识库关联
 
@@ -397,8 +375,6 @@ EgoFlow 的适用边界由其技术假设严格界定：
 - **闭环策略集成**：将 EgoFlow 的轨迹生成能力与机器人操作策略学习耦合，使生成的物理一致轨迹可直接作为策略的参考运动，或通过逆运动学转化为关节动作序列。这需要解决轨迹表示与动作空间之间的映射问题。
 
 - **感知-生成联合优化**：当前框架将场景点云作为固定条件输入，未来可探索端到端地从 RGB-D 视频直接生成轨迹，使感知模块的特征提取与轨迹生成联合优化，减少中间表示的误差累积。
-
-
 
 ## 原文 PDF
 

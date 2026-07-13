@@ -135,15 +135,10 @@ OMNITRACK 提出一种**两阶段学习框架**，其核心设计动机在于显
 ![[assets/figures/papers/paper_list_l60_https_arxiv_org_abs_2602_23832/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of the OMNITRACK framework. Our method adopts a two-stage pipeline that first converts raw, physically inconsistent reference motions into physics-consistent motions in simulation, and then trains a general policy to robustly track these motions under realistic conditions. The resulting system supports both offline motion tracking and online teleoperation*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l60_https_arxiv_org_abs_2602_23832/figures/001_Figure_1.jpg]]
 *Figure 1: Capabilities of OMNITRACK in general motion tracking and real-time teleoperation. Leveraging physics-consistent reference motions, OmniTrack achieves general tracking across diverse motion categories, including balance control, highdynamic maneuvers, and contact-rich interactions. OmniTrack supports real-time teleoperation, enabling the execution of diverse human-style dynamic movements as well as interactive behaviors. These results demonstrate the generality of the framework in handling both physically demanding motions and unstructured motion commands*
 
 OMNITRACK 将通用运动跟踪拆解为两个解耦的阶段，每个阶段均被形式化为马尔可夫决策过程（MDP），并使用 PPO 进行优化。这种解耦的核心动机在于：原始重定向的人体运动参考中存在穿透、漂浮、足部滑动等物理不可行伪影（Fig. 2），若直接在部分可观测条件下训练单一策略同时处理跟踪与物理可行性，将导致跟踪保真度与机器人稳定性之间的根本冲突。两阶段框架将物理可行性修复的负担从控制策略转移至参考生成阶段，使阶段 II 的策略无需处理不可行目标。
-
-![[assets/figures/papers/paper_list_l60_https_arxiv_org_abs_2602_23832/figures/002_Figure_2.jpg]]
-*Figure 2: Examples of physically infeasible artifacts in retargeted human motions (blue) compared with physically feasible robot motions (black/gray), including inconsistent center-of-mass motion, foot skating, floating, and ground penetration, which hinder stable humanoid control*
 
 ### 阶段 I：物理运动生成（Physical Motion Generation）
 
@@ -180,9 +175,6 @@ $$\exp \Big( - \big( \frac{1}{|\mathcal{B}|} \sum_{b \in \mathcal{B}} \| \log( \
 ### 关键设计决策
 
 两阶段解耦的核心价值在 **TABLE A.8** 中得到系统性验证：使用物理一致性参考训练的策略在全 LAFAN1 数据集上保持 92.57% 成功率，而使用原始参考的策略降至 88.18%。**Fig. 4** 进一步揭示了这一差距随数据集规模扩大而加剧的趋势——物理一致性参考使训练在数据量增加时保持稳定收敛，而原始参考下的训练收益递减甚至退化。这证实了“将物理可行性修复从策略中剥离”是通用运动跟踪可扩展性的关键因果机制。
-
-![[assets/figures/papers/paper_list_l60_https_arxiv_org_abs_2602_23832/figures/005_Figure_4.jpg]]
-*Figure 4: Impact of physically plausible motions under varying dataset sizes. From left to right: mean reward and mean episode length during training, followed by success rate and tracking error (MPJPE) under different dataset sizes (1/8, 1/2, and full LAFAN1). Dark colors denote training with physically plausible motions, while light colors denote training with raw reference motions*
 
 ## 实验与关键发现
 
@@ -226,9 +218,6 @@ Fig. 5 展示了OMNITRACK策略在真实Unitree G1机器人上的零样本sim-to
 ![[assets/figures/papers/paper_list_l60_https_arxiv_org_abs_2602_23832/figures/007_Figure_5.jpg]]
 *Figure 5: Diverse motion skills executed on the real humanoid robot. Our policy enables hour-long continuous and stable tracking of a wide range of human-like behaviors, demonstrating broad motion coverage, strong real-world versatility, and long-term control stability*
 
-![[assets/figures/papers/paper_list_l60_https_arxiv_org_abs_2602_23832/figures/009_Figure_6.jpg]]
-*Figure 6: Real-time teleoperation on the humanoid robot. Under real-time teleoperation, the robot executes dynamic, static, and contact-rich behaviors with natural, human-like motion style, demonstrating responsive control and high-fidelity whole-body coordination in the real world*
-
 ### 消融分析
 
 TABLE A.8 系统性地考察了数据集规模与参考类型的交互效应。核心发现：**物理一致性参考的优势随数据规模扩大而增强。** 在小规模数据（1/8 LAFAN1）上，两种参考类型的成功率差距较小（物理92.08% vs 原始91.06%）；但在全数据集上，差距扩大至4.39个百分点（92.57% vs 88.18%）。这证实了物理不可行目标在大规模多样化数据上产生的累积冲突效应，以及物理一致性参考作为可扩展训练基础的必要性。
@@ -249,8 +238,6 @@ TABLE A.8 系统性地考察了数据集规模与参考类型的交互效应。�
 - 在野外复杂、非结构化环境中，长时间运行的安全性和鲁棒性如何保证？
 - 能否利用无模型方法学习物理一致性修复，减少Stage I对仿真器的依赖？
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l60_https_arxiv_org_abs_2602_23832/figures/004_Table.jpg]]
 *Table: I: Comparison of raw and physically plausible motions. Physically plausible motions eliminate penetration and floating artifacts while improving motion smoothness, with a moderate increase in MPJPE due to dynamics-consistent corrections*
 
@@ -259,12 +246,6 @@ TABLE A.8 系统性地考察了数据集规模与参考类型的交互效应。�
 
 ![[assets/figures/papers/paper_list_l60_https_arxiv_org_abs_2602_23832/figures/008_Table.jpg]]
 *Table: III: Comparison with state-of-the-art humanoid motion tracking methods. Our method achieves the best overall performance, showing higher success rates and lower tracking errors compared with prior approaches*
-
-![[assets/figures/papers/paper_list_l60_https_arxiv_org_abs_2602_23832/figures/013_Table.jpg]]
-*Table: A.8: Effect of Dataset Size and Reference Type on Controller Performance*
-
-![[assets/figures/papers/paper_list_l60_https_arxiv_org_abs_2602_23832/figures/015_Figure.jpg]]
-*Figure: Fig. A.8: VR Headset Real-time Teleoperation on the Humanoid Robot. The raw SMPL motion is captured using the Pico VR Headset and then retargeted to the humanoid robot via GMR. The retargeted motion is further processed by the physical motion generation stage to produce physically consistent motions, which are finally tracked by the robot through the general motion tracking stage, enabling real-time teleoperation*
 
 ## 定位与知识库关联
 

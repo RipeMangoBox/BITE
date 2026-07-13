@@ -51,8 +51,6 @@ claims:
 
 在 CUB、SUN 和 AWA2 三个标准基准上，RLVC 在 CZSL 和 GZSL 两种设置下均取得最优结果，平均准确率提升约 **4.7%**（Table 1）。消融实验证实，强化学习奖励与视觉线索两个组件对性能提升均有显著贡献（Table 3）。
 
-
-
 ### 零样本学习的生成式范式
 
 零样本学习（Zero-Shot Learning, ZSL）旨在识别训练阶段未曾出现的未见类（unseen classes），其核心挑战在于弥合可见类（seen classes）与未见类之间的语义鸿沟。传统嵌入方法（embedding-based methods）试图将视觉特征与语义原型（如属性向量或词嵌入）映射到共享空间，但常因枢纽化问题（hubness problem）和跨模态对齐偏差而受限。
@@ -76,8 +74,6 @@ Figure 1(a) 直观展示了这一困境：现有方法合成的特征分布散�
 同时，为缓解纯语义条件导致的类间重叠，RLVC 引入类级视觉原型（class-level visual prototypes）作为额外的条件线索：利用微调后的视觉编码器，按类别对可见类真实特征求均值，得到紧凑的视觉原型，并通过原型蒸馏损失将合成特征拉向对应原型，增强类内紧凑性和训练稳定性。
 
 Figure 1(b) 展示了 RLVC 的预期效果：合成特征在奖励信号的引导下趋向任务相关，在视觉原型的约束下呈现清晰的类内聚集和类间分离。
-
-
 
 ## 核心方法与创新机理
 
@@ -117,8 +113,6 @@ RL训练对奖励模型质量高度敏感。RLVC采用**冷启动**策略：先�
 
 综上，RLVC通过“结果奖励对齐任务目标 + 视觉原型增强类内紧凑性 + 冷启动保障训练稳定”三个changed slots的协同作用，在CUB、SUN、AWA2三个基准上取得平均4.7%的CZSL准确率提升，实现了生成式ZSL从“分布模仿”到“任务驱动”的范式跃迁。
 
-
-
 RLVC 将生成式零样本学习重新表述为一个结果奖励驱动的强化学习问题，其整体架构由四个核心模块构成闭环，如图 2 所示。
 
 **顶层：奖励模型与视觉编码器。** 一个视觉编码器在可见类数据上进行微调，产出两类关键信息：一是微调后的视觉特征 $\mathbf{x}^s$，用于后续的视觉原型挖掘；二是冻结的分类器 $R$，它对任意输入特征输出类别预测概率，从而作为奖励模型提供任务相关的奖励信号 $r = \log p(y \mid \tilde{\mathbf{x}}_0)$（Eq. 7）。该奖励信号直接衡量合成特征被正确分类的可能性，是连接生成器与下游分类任务的因果纽带。
@@ -129,12 +123,8 @@ RLVC 将生成式零样本学习重新表述为一个结果奖励驱动的强化
 
 **数据流与训练闭环。** 一次完整的训练迭代沿以下路径流动：语义原型 $\mathbf{z}^c$ 和噪声输入生成器，产出合成特征 $\tilde{\mathbf{x}}_0$；该特征同时送入判别器（计算对抗损失 $\mathcal{L}_G^{\mathrm{adv}}$）和冻结的奖励模型 $R$（计算奖励 $r$）；奖励经 EMA 平滑和停止梯度处理后转化为优势 $\widehat{A}$，驱动策略梯度损失 $\mathcal{L}_{\mathrm{RL}}$（Eq. 11）；同时，合成特征与对应的视觉原型 $\mathbf{v}^c$ 计算原型蒸馏损失。三者加权求和构成总生成器损失 $\mathcal{L}_G^{\mathrm{total}} = \mathcal{L}_G^{\mathrm{adv}} + \lambda_{\mathrm{PD}} \mathcal{L}_{\mathrm{PD}}$（Eq. 14），其中 RL 损失在满足冷启动阈值后交替加入更新。这一设计使得生成器在保持分布真实性的同时，被显式激励朝向更易被正确分类的方向自我进化。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2687_https_arxiv_org_abs_2603_21138/figures/002_Figure_2.jpg]]
 *Figure 2: Model architecture and training of RLVC. The top panel shows how we train the reward model with a visual encoder to produce fine-tuned visual features and reward signals. The bottom panel depicts how we update the policy model*
-
-
 
 ### 3.1 扩散生成基座
 
@@ -178,13 +168,6 @@ $$\mathcal{L}_G^{\mathrm{total}} = \mathcal{L}_G^{\mathrm{adv}} + \lambda_{\math
 
 直接引入 RL 损失可能导致早期训练不稳定。RLVC 采用冷启动策略：先进行若干 epoch 的纯对抗训练（$\mathcal{L}_G^{\mathrm{adv}}$），待生成器具备基本合成能力且奖励达到预设阈值后，再交替更新对抗损失和 RL 损失（Algorithm 1）。RL 更新的学习率（$5\times10^{-5}$）低于对抗损失的学习率（$5\times10^{-4}$），以保证训练平稳过渡。训练趋势（Figure 3）表明，奖励值随训练逐步上升并趋于稳定，优势估计仅小幅波动，ZSL 准确率持续增益，验证了该策略的有效性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2687_https_arxiv_org_abs_2603_21138/figures/001_Figure_1.jpg]]
-*Figure 1: Motivating illustration. (a) Existing generative ZSL methods train with adversarial losses conditioned only on semantic prototypes. This often leads to task-agnostic synthesized features and inter-class overlap. (b) Our RLVC incentivizes the generative model updating via RL reward and visual cues, enabling synthesized features that remain task-relevant and faithfully represent the data distribution*
-
-
-
 ## 实验与关键发现
 
 ### 实验设置
@@ -226,8 +209,6 @@ RLVC 在三个标准零样本学习基准上进行评估：**CUB**（细粒度�
 ![[assets/figures/papers/paper_list_l2687_https_arxiv_org_abs_2603_21138/figures/009_Figure_5.jpg]]
 *Figure 5: Effect of hyperparameters on CUB, including the epoch of RL cold-start, the coefficient of visual loss, and the number of synthetic unseen samples*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2687_https_arxiv_org_abs_2603_21138/figures/004_Table_1.jpg]]
 *Table 1: Compared our RLVC with the SOTA methods in CZSL and GZSL settings on CUB, SUN and AWA2 benchmarks. The symbol “⋆” indicates the semantic prototypes from the class name. The symbol “–” denotes that no results are provided in the original papers. The bold and underlined markings indicate the best and second-best results, respectively*
 
@@ -237,16 +218,8 @@ RLVC 在三个标准零样本学习基准上进行评估：**CUB**（细粒度�
 ![[assets/figures/papers/paper_list_l2687_https_arxiv_org_abs_2603_21138/figures/007_Table_4.jpg]]
 *Table 4: Comparison results for different prototype-distillation losses combined with RLVC on CUB, SUN and AWA2 datasets. The bold marking indicates the best results*
 
-![[assets/figures/papers/paper_list_l2687_https_arxiv_org_abs_2603_21138/figures/005_Table_2.jpg]]
-*Table 2: Effectiveness validation of RLVC across different semantic prototypes, including word embeddings of class names and expertannotated attribute vectors. We mark the best results in bold and the accuracy gains (%) in parentheses*
-
-![[assets/figures/papers/paper_list_l2687_https_arxiv_org_abs_2603_21138/figures/003_Figure_3.jpg]]
-*Figure 3: The training trends of our RLVC on CUB, including raw reward, EMA-adjusted advantage and ZSL accuracy*
-
 ![[assets/figures/papers/paper_list_l2687_https_arxiv_org_abs_2603_21138/figures/008_Figure_4.jpg]]
 *Figure 4: Qualitative t-SNE visualization of RLVC on CUB: (a) without RL and visual cues, (b) without visual cues, and (c) full RLVC. We use real features of seen classes and synthetic features of unseen classes. Zoom in for details*
-
-
 
 ## 定位与知识库关联
 
@@ -286,8 +259,6 @@ RLVC的设计隐含以下假设和边界条件：
 3. **可学习的视觉原型**：当前视觉原型为固定均值，缺乏对未见类的适应能力。若将视觉原型设计为可学习参数或通过元学习从语义原型预测，可能进一步提升跨类泛化能力。
 
 4. **跨任务迁移**：RLVC的“生成器-奖励模型”协同框架本质上是任务感知条件生成的一种通用范式。它能否推广到文本到图像合成、跨模态生成等其他条件生成任务，其有效性边界在哪里，是更广泛的研究问题。
-
-
 
 ## 原文 PDF
 

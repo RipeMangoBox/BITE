@@ -72,8 +72,6 @@ claims:
 
 当前方法存在以下局限：运动-语言数据总量仍远小于图像-文本数据，限制了大模型潜力的充分释放；ViT-Large在KIT-ML等小数据集上出现性能退化，存在过拟合风险；零样本跨骨架识别的R@1仅为7.35%，跨域泛化仍有较大提升空间；运动补丁的语义可解释性有限，注意力图中的激活模式与具体运动语义的对应关系尚不明确。此外，该方法目前仅覆盖检索、分类和识别任务，尚未拓展至文本到运动生成。
 
-
-
 ### 3D 人体运动-语言建模的核心瓶颈
 
 3D 人体运动-语言模型旨在建立文本描述与三维人体运动序列之间的语义对齐，其下游任务涵盖文本到运动检索、运动到文本检索、零样本运动分类等。然而，该领域长期受困于一个根本性矛盾：**数据稀缺与表示异构**。
@@ -102,8 +100,6 @@ claims:
 2. **借助预训练 ViT 突破数据瓶颈**：以运动补丁作为输入，直接使用在 ImageNet-21k 上预训练的 ViT 作为运动编码器（迁移学习），将大规模视觉预训练中习得的特征提取能力迁移到运动域。这一策略有效缓解了运动数据稀缺对模型容量的限制，使模型能够在有限标注数据下学习到更丰富的运动-语言语义对齐。
 
 简言之，本文方法的因果机制可概括为：**运动补丁（统一表示） + 预训练 ViT（迁移学习） → 跨骨架泛化 + 数据高效学习**。这一设计在 HumanML3D 和 KIT-ML 两个基准数据集上均取得了最优的文本-运动检索性能，并首次展示了跨骨架零样本识别和有效迁移学习的能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -136,8 +132,6 @@ Table 1的系统性对比凸显了这一创新的独特性：在已有工作中�
 消融实验（Table 4）提供了因果推论的直接证据。在HumanML3D数据集上，当同时移除预训练权重和运动补丁时，模型退化为“从零训练的原始序列编码器”，文本到运动检索R@1从10.80%骤降至8.36%。单独移除预训练权重（保留补丁但从头训练）导致R@1降至8.46%，而单独移除补丁（使用预训练ViT但输入原始关节序列）则降至8.36%。这表明**两个创新组件存在协同效应**：补丁提供了图像化的统一接口，预训练权重则注入了可迁移的视觉先验，二者缺一不可。
 
 在KIT-ML数据集上，同样的模式得到复现：预训练+补丁的R@1为14.02%，而从头训练补丁模型仅10.41%，不使用补丁则降至9.54%。跨数据集的证据一致性增强了结论的可靠性。
-
-
 
 本方法的核心思路是将3D人体运动序列转化为一种类图像的“运动补丁”（motion patches）表示，从而能够直接复用在大规模图像数据上预训练的视觉Transformer（ViT）作为运动编码器，并与文本编码器进行跨模态对比学习。整体框架由四个关键模块串联构成。
 
@@ -173,15 +167,8 @@ $$\mathcal{L}_{t2m} = -\frac{1}{B} \sum_i^B \log \frac{\exp(s(m_i, t_i) / \tau)}
 
 完整的pipeline数据流如Figure 2所示：原始运动序列 → 运动补丁构建 → ViT运动编码器 → 运动嵌入 → 与DistilBERT文本嵌入计算余弦相似度矩阵 → 对称对比损失反向传播。训练完成后，模型可直接用于文本到运动检索、运动到文本检索，以及零样本分类和跨骨架识别等下游任务，无需额外微调。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1848_Exploring_Vision_Transformers_3D_Human_Motion_Language_Models_Motion_Pat/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the existing methods and the proposed method. The existing methods train an original Transformer with the joint information from the motion sequences directly, while the proposed method converts them into motion patches and then trains the ViT, which can be initialized with pre-trained weights*
-
-![[assets/figures/papers/paper_list_l1848_Exploring_Vision_Transformers_3D_Human_Motion_Language_Models_Motion_Pat/figures/003_Figure_2.jpg]]
-*Figure 2: Overview of the proposed framework, which consists of a motion encoder and a text encoder. We transform the raw motion sequences into motion patches as the input of the ViT-based motion encoder. We calculate the similarity matrix between text-motion pairs within a batch to train the model. To illustrate this concept, we provide an example batch containing three samples for clarity*
-
-
 
 ### 问题形式化与相似度度量
 
@@ -194,9 +181,6 @@ $$s ( m_i , t_j ) = \frac{ \mathcal{F}_M ( m_i ) \cdot \mathcal{F}_T ( t_j ) }{ 
 ### 运动补丁构建模块
 
 运动补丁（motion patches）是本文的核心表示创新，其构建过程（参见 Figure 3）将原始的骨架关节序列转化为类似图像补丁的二维网格结构，使 ViT 能够直接处理运动数据。具体流程如下：
-
-![[assets/figures/papers/paper_list_l1848_Exploring_Vision_Transformers_3D_Human_Motion_Language_Models_Motion_Pat/figures/004_Figure_3.jpg]]
-*Figure 3: Process of building the motion patches for each motion sequence. Given a skeleton, we mark different body parts in different colors. We show the method to construct the motion patch of the right leg. The same process is applied to other body parts*
 
 1. **身体部位划分**：将人体骨架关节按语义分为五个身体部位（躯干、左臂、右臂、左腿、右腿），每个部位包含若干关节。
 2. **插值采样**：对每个身体部位内的关节序列进行插值，在空间维度上均匀采样 $N$ 个点，获得该部位的连续空间表示。
@@ -229,13 +213,6 @@ $$\mathcal{L}_{t2m} = -\frac{1}{B} \sum_i^B \log \frac{\exp ( s ( m_i , t_i ) / 
 $$\mathcal{L} = \mathcal{L}_{m2t} + \mathcal{L}_{t2m} \tag{Eq. 4}$$
 
 其中 $B$ 为批次大小，$\tau$ 为可学习的温度参数，控制相似度分布的锐度。该对称设计强制运动与文本在两个方向上相互检索，使共享潜在空间的对齐更加紧密。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1848_Exploring_Vision_Transformers_3D_Human_Motion_Language_Models_Motion_Pat/figures/005_Figure_4.jpg]]
-*Figure 4: Visualization of motion patches by regarding the joint coordinates as RGB pixels. We show the rendered motions and their text label on the left and the processed motion patches on the right. We can observe different motions reflected in different motion patches*
-
-
 
 ## 实验与关键发现
 
@@ -282,9 +259,6 @@ $$\mathcal{L} = \mathcal{L}_{m2t} + \mathcal{L}_{t2m} \tag{Eq. 4}$$
 
 运动补丁的核心优势之一是跨骨架结构的统一表示能力。Table 5 展示了跨骨架识别实验：直接用 HumanML3D 训练的模型在 KIT-ML 上进行零样本检索，文本-运动 R@1 仅 7.35%；但经迁移学习（在 KIT-ML 上微调）后，R@1 跃升至 15.28%，甚至超过仅在 KIT-ML 上单独训练的最佳结果（14.02%）。这证明运动补丁成功统一了不同骨架结构，使模型能跨数据集迁移知识。
 
-![[assets/figures/papers/paper_list_l1848_Exploring_Vision_Transformers_3D_Human_Motion_Language_Models_Motion_Pat/figures/011_Table_5.jpg]]
-*Table 5: Results of cross-skeleton recognition. We evaluate the text-to-motion and motion-to-text retrieval on the KIT-ML dataset with the HumanML3D model and the transferred model. The transfer learning method achieves better performance than the method of training only on KIT-ML*
-
 ### 其他任务验证
 
 **零样本运动分类**（Table 6）：方法在无需微调的情况下对运动进行分类，性能与需要类别标签的有监督方法接近，验证了运动-文本联合嵌入空间的语义质量。
@@ -313,16 +287,6 @@ Figure 5 展示了文本到运动检索的定性结果，检索到的运动与�
 ### 公平性说明
 
 所有实验使用 HumanML3D 和 KIT-ML 的官方训练/验证/测试划分，评估协议（All 和 Small batches）遵循 TMR 设定。TMR 的对比结果通过重新运行官方模型并使用相同评估代码获得，确保可比性。消融实验和超参数选择在附录中全面报告。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1848_Exploring_Vision_Transformers_3D_Human_Motion_Language_Models_Motion_Pat/figures/002_Table_1.jpg]]
-*Table 1: Summary of recent related methods for motion-language models. Only our proposed method utilizes pre-trained motion encoders and a unified representation for various skeleton structures*
-
-![[assets/figures/papers/paper_list_l1848_Exploring_Vision_Transformers_3D_Human_Motion_Language_Models_Motion_Pat/figures/010_Table_6.jpg]]
-*Table 6: Results of zero-shot motion classification. Modality with motion only and motion language are denoted as M and M+L, respectively. When applying our proposed method for zeroshot classification, we achieve performance results that are closely aligned with those of the 2s-AGCN classifier trained with supervision on the BABEL-60 benchmark*
-
-
 
 ## 定位与知识库关联
 
@@ -365,8 +329,6 @@ Figure 5 展示了文本到运动检索的定性结果，检索到的运动与�
 2. **生成式扩展**：运动补丁表示能否作为文本到运动生成模型的输入？若能，预训练ViT的中间层特征是否可用于条件生成？
 3. **注意力机制的可解释性**：Figure 7中的ViT注意力图激活模式与具体运动语义（如“跳跃”“挥手”）的对应关系是什么？能否通过探针任务量化分析？
 4. **跨模态迁移的泛化性**：该迁移学习策略能否推广到其他骨架型数据，如手势识别、面部动作编码或动物运动分析？
-
-
 
 ## 原文 PDF
 

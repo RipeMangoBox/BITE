@@ -172,8 +172,6 @@ $$\mathcal{L}_{\mathrm{train}} = \mathrm{CE}(\mathbf{z} + \mathbf{m}, \mathbf{y}
 
 推理时（Figure 2c），用户提供目标运动长度 $T$，模型在文本和场景图像条件下自回归生成完整的统一令牌序列。生成的 Base 和 Phys 令牌分别通过逆 BPE 和逆 DCT（IDCT）解码为连续流，最终拼接重构为完整运动序列。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2606_15142/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of MotionVLA. (a) DSFT performs dual-stream frequency tokenization by decomposing motion into Base and Phys components and converting them into discrete tokens. (b) During training, MotionVLA learns to autoregressively predict the unified motion token sequence under text and scene-image conditioning, supervised by DSFT tokens derived from ground-truth motion. (c) At inference time, the model generates Base and Phys tokens conditioned on multimodal inputs, which are then decoded and recombined to reconstruct the final motion sequence*
 
@@ -223,14 +221,6 @@ $$\mathcal{L}_{\mathrm{train}} = \mathrm{CE}(\mathbf{z} + \mathbf{m}, \mathbf{y}
 
 推理时，模型在多模态条件下生成统一的令牌序列，解码过程逆向执行：对 Base 和 Phys 令牌分别进行逆 BPE 和逆 DCT（IDCT），恢复两流连续表示后拼接为完整运动序列。目标运动长度 $T$ 由外部提供，模型据此生成对应时间跨度的 DSFT 令牌。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2606_15142/figures/003_Figure_3.jpg]]
-*Figure 3: Frequency-domain clustering of motion dimensions. (a) Per-dimension low-frequency ratio on HumanML3D. (b) Corresponding histogram on HumanML3D. (c/d) Corresponding plots on ViMoGen. Both datasets exhibit a consistent bimodal separation between low-frequency Base dimensions and high-frequency Phys dimensions*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2606_15142/figures/004_Figure_4.jpg]]
-*Figure 4: Energy coverage of the Base and Phys streams under different DCT truncation lengths. (a,b) Results on HumanML3D. (c,d) Corresponding results on ViMoGen. The Base stream is highly compressible with small K, whereas the Phys stream requires substantially larger K to preserve its energy*
-
 ## 实验与关键发现
 
 ### 核心瓶颈验证：单流 vs 双流
@@ -279,22 +269,11 @@ Table 4 对比了 DSFT 与单流 DCT+BPE 基线在 HumanML3D 上的重建质量�
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2606_15142/figures/014_Table_10.jpg]]
 *Table 10: Per-field breakdown of the ViMoGen 276-dim and HumanML3D 263-dim motion vectors into Base*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2606_15142/figures/007_Table_3.jpg]]
 *Table 3: Text-to-motion results on HumanML3D. ↑: higher is better; ↓: lower is better; →: closer to real is better. For Diversity, best and second best are determined by the distance to the Real score. ‡: GenM3 uses a retrained evaluator on 30 FPS data; GenM3∗ uses only HumanML3D text pairs. §: DisCoRD is applied on top of MoMask; Diversity is not reported in the original paper*
 
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2606_15142/figures/009_Table_5.jpg]]
 *Table 5: Backbone scale ablation on MBench. †: default configuration used in main experiments. ↑/↓: higher/lower is better*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2606_15142/figures/010_Table_6.jpg]]
-*Table 6: DSFT*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2606_15142/figures/011_Table_7.jpg]]
-*Table 7: Human preference study (%) on 100 prompts*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2606_15142/figures/018_Figure_7.jpg]]
-*Figure 7: Real-robot deployment of MotionVLA on a Unitree G1 EDU humanoid robot. Each row shows three exocentric frames from one text-conditioned motion execution, captured at different time steps*
 
 ## 定位与知识库关联
 

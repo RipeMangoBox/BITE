@@ -57,8 +57,6 @@ claims:
 
 **主要结果概要**：在12个场景的定量评估中，显式方法LumiGauss在PSNR、SSIM、LPIPS三个指标上全面领先。几何精度方面，通过地面控制点验证，平均垂直误差为10.31 cm，平面误差为11.83 cm，确保了基准的几何可靠性。
 
-
-
 ### 问题背景：光照不一致性对多视图重建的挑战
 
 基于多视图几何的三维重建方法，无论是传统的运动恢复结构（SfM）与多视图立体（MVS），还是近年来兴起的神经辐射场（NeRF）和三维高斯泼溅（3DGS），其理论根基都建立在“恒定光照假设”之上——即假设场景在不同视角下的外观保持光度一致性。然而，在室外无人机（UAV）长时间飞行场景中，这一假设被系统性地打破：太阳位置随时间移动，导致阴影位移、高光漂移、环境光色温变化，使得同一几何表面在不同时刻拍摄的图像中呈现截然不同的颜色和亮度。这种光照不一致性直接导致几何重建中的匹配漂移、颜色不一致以及“阴影烙印”（shadow baking）等伪影，即阴影被错误地固化到纹理或几何中。
@@ -76,8 +74,6 @@ claims:
 ### UAVLight的动机：解耦光照与几何
 
 UAVLight基准的核心动机正是填补这一评估缺口。其设计原则是**将光照作为唯一的变量进行隔离**：通过无人机沿固定航点轨迹在一天中的多个固定时段进行低空天底视角重复飞行，确保不同时段的数据共享几乎一致的几何结构和相机视点，仅光照条件随太阳位置自然变化。这种“可控的自然光照变化”设计，使得UAVLight能够系统性地评估跨时间的光度一致性和重光照稳定性，为光照鲁棒三维重建方法提供可靠的量化比较平台。
-
-
 
 ## 核心方法与创新机理
 
@@ -108,8 +104,6 @@ $$s_{\mathrm{E}} = \sin(\gamma_{\mathrm{sun}}), \quad s_{\mathrm{N}} = \cos(\gam
 ### 创新带来的核心发现
 
 上述三个 changed slots 共同支撑了 UAVLight 的核心洞察：**显式逆渲染方法在跨光照评估中始终优于隐式外观建模方法**。在成对跨光照协议下（Figure 5），LumiGauss 作为显式光照估计方法，在 12 个场景上均取得最高 PSNR（如 Town 场景 23.59 dB vs. NeRF-W 19.63 dB，Footbridge 场景 20.89 dB vs. NeRF-W 17.25 dB，Tables 3-4）。隐式方法（NeRF-W、GS-W、WildGaussians）虽然通过逐视图/逐射线隐变量吸收了外观变化，但在跨光照泛化时出现纠缠导致的伪影；显式方法将外观分解为反射率和光照，展现出更强的解耦能力和多光照重建稳定性。
-
-
 
 UAVLight 并非提出一种新的重建算法，而是构建了一套从数据采集到评估的完整管线，旨在系统性地解耦并评估光照变化对三维重建的影响。该管线的核心设计逻辑是：**通过重复的GPS引导飞行轨迹在一天中的不同固定时间进行低空拍摄，从而将光照变化隔离为唯一变量，同时保持几何结构和视点的一致性**。
 
@@ -148,15 +142,11 @@ UAVLight 并非提出一种新的重建算法，而是构建了一套从数据�
 
 该管线的关键洞察在于：**传统多视图重建假设光照恒定，而室外UAV长时间飞行中光照不一致性会打破这一假设，导致几何漂移、颜色不一致和阴影烙印**。UAVLight通过重复轨迹采集协议将光照变化与其他因素（几何、视点、语义）解耦，使得基准能够系统评估跨时间的光度一致性和重光照稳定性。实验表明，显式逆渲染方法（如LumiGauss）在跨光照评估中始终优于隐式外观建模方法（如NeRF-W、GS-W），验证了显式建模在光照鲁棒性方面的优势（Table 3, Table 4）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2729_https_arxiv_org_abs_2511_21565/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the UAVLight benchmark. Each scene is captured by low-altitude UAV flights along fixed waypointed trajectories at multiple times of day. Our benchmark records natural illumination changes along consistent geometry and viewpoints, enabling quantitative evaluation of illumination-robust reconstruction and relighting*
 
 ![[assets/figures/papers/paper_list_l2729_https_arxiv_org_abs_2511_21565/figures/003_Figure_2.jpg]]
 *Figure 2: Visualization of representative dense point clouds from 12 selected scenes in our benchmark*
-
-
 
 UAVLight的数据集构建与评估管线包含五个关键模块，从数据采集到几何验证形成闭环。本节重点解析其中涉及公式推导的核心模块。
 
@@ -191,16 +181,6 @@ $$\mathbf{s}_{\mathrm{Colmap}} = \mathbf{R} \mathbf{s}_{\mathrm{ENU}}$$
 ### 后处理与几何精度验证
 
 帧采样后进行手动筛选，去除运动模糊、极端曝光等不良帧，再经过去畸变处理。几何精度通过地面控制点验证——Table 6显示平均垂直误差为10.31 cm，平均平面误差为11.83 cm，表明重建点云具备可靠的度量尺度，可作为评估光照鲁棒重建的几何参考。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2729_https_arxiv_org_abs_2511_21565/figures/009_Figure_3.jpg]]
-*Figure 3: Illumination variations across similar viewpoints at different times of day. Bottom-right shows ground-truth sunlight directions from GPS and timestamps*
-
-![[assets/figures/papers/paper_list_l2729_https_arxiv_org_abs_2511_21565/figures/010_Figure_4.jpg]]
-*Figure 4: Checkpoint-based geometric validation of UAVLight*
-
-
 
 ## 实验与关键发现
 
@@ -255,9 +235,6 @@ Table 3和Table 4报告了12个场景的完整定量结果。关键发现如下�
 - **Figure 6–7**：可视化对比了不同基线在多个场景和时段下的重建结果。显式方法在阴影一致性和颜色稳定性方面明显优于隐式方法。
 - **Table 7–8**：补充定量结果进一步验证了显式方法在Road2、Industrial、Roof、City2、Industrial2、City六个额外场景上的优势。
 
-![[assets/figures/papers/paper_list_l2729_https_arxiv_org_abs_2511_21565/figures/011_Figure_5.jpg]]
-*Figure 5: Paired cross-light protocol. Lighting is estimated from one view and applied to another captured at the same time slot*
-
 ![[assets/figures/papers/paper_list_l2729_https_arxiv_org_abs_2511_21565/figures/012_Figure_6.jpg]]
 *Figure 6: Visualization of the reconstruction results from different baselines on five UAVLight scenes*
 
@@ -267,19 +244,6 @@ Table 3和Table 4报告了12个场景的完整定量结果。关键发现如下�
 ### 总结
 
 UAVLight实验系统验证了**显式逆渲染方法在光照鲁棒三维重建中的优势**。通过将光照变化与其他因素解耦，基准揭示了隐式外观建模在跨光照场景中的根本性局限——外观潜变量的纠缠导致阴影烙印和几何漂移。LumiGauss的持续领先表明，物理光照先验与显式分解是应对室外UAV光照变化的关键方向。然而，自动曝光、天空建模和动态场景等问题仍有待未来工作解决。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2729_https_arxiv_org_abs_2511_21565/figures/013_Figure_7.jpg]]
-*Figure 7: Visualization of the reconstruction results from different baselines on Town with five different time slots*
-
-![[assets/figures/papers/paper_list_l2729_https_arxiv_org_abs_2511_21565/figures/002_Table_1.jpg]]
-*Table 1: A taxonomy of existing datasets*
-
-![[assets/figures/papers/paper_list_l2729_https_arxiv_org_abs_2511_21565/figures/007_Table_5.jpg]]
-*Table 5: UAVLight scene statistics. Each scene is captured under multiple natural illumination conditions along repeated flight trajectories*
-
-
 
 ## 定位与知识库关联
 
@@ -369,8 +333,6 @@ UAVLight基准和评估结论的适用性受以下条件约束：
 #### 5.4 显式方法的进一步发展
 
 虽然LumiGauss等显式方法在跨光照评估中表现优异，但其依赖于太阳-天空模型等强先验。如何在不依赖强先验的情况下实现物理上可解释的光照解耦，仍是一个开放问题。此外，显式方法在处理高频细节（如镜面反射、复杂材质）时可能不如隐式方法灵活，如何结合两者优势值得探索。
-
-
 
 ## 原文 PDF
 

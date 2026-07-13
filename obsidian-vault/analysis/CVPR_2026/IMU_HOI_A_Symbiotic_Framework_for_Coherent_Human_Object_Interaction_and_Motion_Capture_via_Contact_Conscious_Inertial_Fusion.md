@@ -146,8 +146,6 @@ $$\mathbf{w}_t = \mathrm{softmax}\Big( \frac{1}{\tau} \big[ \mathbf{z}_t + \beta
 
 三个阶段的依赖关系是严格串行的：Stage I 的接触先验同时服务于 Stage II（足部接触用于根部平移估计）和 Stage III（手部接触用于物体平移融合）；Stage II 的手部位置输出是 Stage III 中 FK 分支的必要输入；Stage III 的融合模块将前两个阶段的输出与物体 IMU 信号整合，产生最终的物体平移估计。这种设计使得接触门控融合模块具有**即插即用**的特性——消融实验表明，它可以被集成到 **DynaIP**、**TransPose**、**TIP**（Jiang et al., SIGGRAPH Asia 2022）等现有 IMU 人体姿态估计器中，以极小的额外代价赋予其交互感知的物体动态跟踪能力（见 Table 4）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1065_https_openaccess_thecvf_com_content_CVPR2026_html_Lin_IMU_HOI_A_Symbioti/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our three-stage HOI pipeline from sparse human–object IMUs: Stage I (mid-bottom) predicts hand/foot contacts and object velocity, Stage II (mid-top) estimates part-based human pose and root translation, and Stage III (mid-right) contact-gates FK and IMU branches to recover object translation*
 
@@ -258,8 +256,6 @@ IMU-HOI 在三个公开的人-物交互（HOI）数据集上进行评估：**OMO
 - 如何扩展接触模型以处理滑动接触或动态变化的接触点？
 - 能否支持多物体或可变形物体的交互？
 - 在缺乏接触标注数据的更广泛场景中，接触预测的泛化能力如何？
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l1065_https_openaccess_thecvf_com_content_CVPR2026_html_Lin_IMU_HOI_A_Symbioti/figures/003_Table_1.jpg]]
 *Table 1: Comparison on three HOI datasets. Numbers are lower-is-better. Best in bold*

@@ -192,14 +192,6 @@ $$\mathrm{TE}(M, \mathcal{D}) = \frac{1}{|\mathcal{E}|} \sum_{E \in \mathcal{E}}
 $$\sigma\text{-ratio} = \sigma_{\mathrm{factor}} / \sigma_{\mathrm{round}}$$
 当 $\sigma$-ratio > 1 时，表明该因素的效应超过了评估的随机波动，具有统计意义上的实质性影响。该指标在格式效应分析（Table 8）中用于证明格式选择的影响不显著（所有目标的 $\sigma$-ratio 均未超过噪声阈值），而提取器选择的影响显著。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2605_23899/figures/005_Figure_5.jpg]]
-*Figure 5: Effect of meta-skill guidance on downstream skill utility. The plausibility rubric hurts most times, while the validated rubric improves all the generated skills compared with original skill*
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2605_23899/figures/006_Figure_4.jpg]]
-*Figure 4: Cross-model skill transfer. Strong-pool and weakpool skills are injected into each target separately*
-
 ## 实验与关键发现
 
 ### 主结果：技能效用的全局图景
@@ -219,20 +211,12 @@ $$\sigma\text{-ratio} = \sigma_{\mathrm{factor}} / \sigma_{\mathrm{round}}$$
 
 为隔离经验池组成的影响，研究通过直接操纵池中成功轨迹的比例（100%、75%、50%、25%、0%）并固定提取器（GPT-5.4-mini）进行实验（Figure 2）。结果一致表明：**全失败轨迹池产生的技能质量最差**，但最优成功-失败比例因域而异——SpreadsheetBench偏好高成功率池，而ALFWorld反而在高失败率池下表现更好。这一发现说明，失败轨迹中编码的领域特定失败机制和规避策略，在某些场景下比成功模式更具信息价值。
 
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2605_23899/figures/003_Figure_2.jpg]]
-*Figure 2: Effect of success ratio in the experience pool on downstream tasks*
-
 #### 技能提取阶段：格式无关，内容决定效用
 
 一个反直觉的发现是：**技能文本的格式（有序列表、无序列表、检查表、散文）对下游任务性能无显著影响**。通过将同一技能改写为四种规范格式并重新评估，Friedman检验在所有目标模型上均未检测到显著差异（所有p>0.34，Table 8）。相比之下，提取器的选择具有显著影响（p<0.01 for 5/6 targets），σ-ratio分析进一步证实提取器效应远超评估噪声。这直接否定了“格式优化可以提升技能质量”的直觉假设，将问题焦点锁定在**技能内容的实质性维度**上。
 
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2605_23899/figures/009_Table_8.jpg]]
-*Table 8: Format vs. extractor effect on SpreadsheetBench. σ-ratio = $\sigma _ { \mathrm { f a c t o r } } / \sigma _ { \mathrm { r o u n d } }$ ; values >1 indicate the factor exceeds noise
 
 进一步地，未经训练的LLM法官在技能质量评估上表现堪忧。在成对比较任务中，LLM法官选择更优技能的总体准确率仅为46.4%（随机基准50%），且准确性随性能差距增大而**下降**——在Δ≥5 pp的高差距对上，准确率降至15.8%（Figure 3）。这一反直觉的下降趋势表明，**表面文本特征（如条理性、专业性）不仅无法预测技能效用，甚至可能在高差距场景下产生系统性误导**。
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2605_23899/figures/004_Figure_3.jpg]]
-*Figure 3: Pairwise selection accuracy by δ*
 
 #### 技能消费阶段：跨模型迁移的不对称性
 
@@ -271,8 +255,6 @@ $$\sigma\text{-ratio} = \sigma_{\mathrm{factor}} / \sigma_{\mathrm{round}}$$
 *Table 15: Analysis. The higher-∆ skill provides three executable action patterns tailored to ALFWorld’s mechanics: (1) deep inspection—explicitly open closed containers rather than assuming visibility equals absence; (2) active state transformations—a concrete locate-acquire-transport-invoke pipeline for state changes; (3) prerequisite resolution—navigate and open destinations before attempting placement. The lower-∆ skill describes the same high-level logic (“ground the goal,” “find the bottleneck,” “manage preconditions”) but at a level of abstraction that does not map onto ALFWorld’s action vocabulary, leaving the agent to rediscover the operational details on its own. Table 15 Contrastive case: A...*
 
 这一失败模式揭示了当前技能提取方法的根本局限：**常规提取倾向于输出抽象指导，而真正决定效用的是技能中是否编码了领域特定的失败机制、可执行对策和高风险行为禁令**。
-
-### 补充图表
 
 ## 定位与知识库关联
 

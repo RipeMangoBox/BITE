@@ -61,8 +61,6 @@ claims:
 
 **资源开销**：SMA 训练仅需约 15GB 显存和约 5 分钟训练时间，额外计算开销主要来自小波变换和 FFT，论文称其可忽略。
 
-
-
 ### 视频运动迁移的核心挑战
 
 视频运动迁移任务的目标是：给定一段输入视频（源视频），将其中的运动模式提取并迁移到一个新的文本提示或内容场景上，使生成视频既保留源视频的运动动态，又符合目标内容的语义。近年来，基于扩散模型（Diffusion Models）的视频生成方法在该任务上取得了显著进展，涌现出多种代表性框架，包括基于级联视频扩散模型的 **VMC**（Video Motion Customization）、基于双路径 LoRA 的 **MotionDirector**、基于扩散特征（DIFT）的 **DMT**（Diffusion Motion Transfer），以及面向视频编辑的 **Tune-A-Video** 和 **ControlVideo** 等。
@@ -88,8 +86,6 @@ claims:
 ### 方法定位与兼容性
 
 SMA 被设计为一个**即插即用的频谱损失模块**，不修改任何基础架构的模型权重或推理流程。它可以在训练阶段作为额外的损失项注入到现有的运动迁移框架中，与像素空间或特征空间的原始对齐损失联合优化。论文在五种代表性框架（VMC、MotionDirector、DMT、Tune-A-Video、ControlVideo）上验证了 SMA 的兼容性，均观察到一致的性能提升（详见 Table 1、Table 2）。训练开销方面，以 VMC + SMA 为例，仅需约 15 GB 显存和约 5 分钟的训练时间，额外计算负担主要来自小波变换和 FFT，论文声称其开销可忽略。
-
-
 
 ## 核心方法与创新机理
 
@@ -144,16 +140,12 @@ $$\min_{\theta} \mathbb{E}_{t,n,\epsilon_t^n,\epsilon_t^{n+1}} \Big[ \ell_{\text
 
 消融实验（Table 3）验证了各组件的独立贡献：仅添加局部光谱损失（$\ell_{\text{local}}$）即可提升 Text-Align 和 Frame-Con 指标，进一步加入全局小波损失（$\ell_{\text{global}}$）带来额外增益。Figure 8(b) 表明 2D FFT 局部细化优于 2D DWT 方案，且超参数更易调节。
 
-
-
 ![[assets/figures/papers/paper_list_l27_Spectral_Motion_Alignment_for_Video_Motion_Transfer_using_Diffusion_Mode/figures/003_Figure_3.jpg]]
 *Figure 3: Comparison within MotionDirector framework*
 
 ![[assets/figures/papers/paper_list_l27_Spectral_Motion_Alignment_for_Video_Motion_Transfer_using_Diffusion_Mode/figures/004_Figure_4.jpg]]
 *Figure 4: Comparison within VMC framework using Show-1 video model (top) and DMT framework using Zeroscope video model (bottom). Each demonstrate the compatibility of SMA in pixel-space and feature-space, respectively*
 
-![[assets/figures/papers/paper_list_l27_Spectral_Motion_Alignment_for_Video_Motion_Transfer_using_Diffusion_Mode/figures/002_Figure_2.jpg]]
-*Figure 2: Overview. The proposed Spectral Motion Alignment (SMA) framework distills the motion information in frequencydomain. Considering the (latent) frame residuals as motion vectors, we first derive the denoised motion vector estimates. Then, the motion vector $\delta \pmb { v } _ { 0 } ^ { n }$ and its estimate $\delta \hat { { \pmb v } } _ { 0 } ^ { n }$ are aligned in both pixel-domain and frequency-domain. Our regularization includes (1) global motion alignment based on 1D wavelet-transform, and (2) local motion refinement based on 2D Fourier transform
 
 Spectral Motion Alignment (SMA) 是一个即插即用的运动对齐框架，其核心思想是将运动表征的学习从像素/特征空间迁移到频谱域，以同时捕获全局多尺度运动动态并抑制与运动无关的高频伪影。图2给出了SMA的整体pipeline。
 
@@ -184,8 +176,6 @@ $$\min_\theta \mathbb{E}_{t,n,\epsilon_t^n,\epsilon_t^{n+1}} \Big[ \ell_{\text{a
 **特征空间扩展**：SMA的频谱对齐范式可进一步推广至扩散特征空间（DIFT），在语义特征维度上施加相同的全局和局部频谱损失，使其能够兼容基于特征空间的运动迁移方法（如DMT）。
 
 **计算开销**：SMA作为一个轻量级微调模块，未修改基础视频扩散模型的架构。训练时仅需约15GB显存，训练时间约5分钟，额外引入的小波变换和FFT计算开销被论文声称可忽略。
-
-
 
 ### 3.1 去噪运动向量估计
 
@@ -265,8 +255,6 @@ $$
 
 其中 $f(\cdot)$ 为扩散模型中间层提取的语义特征，$\ell_{\mathrm{DMT}}$ 为原始 DMT 的时空特征损失。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -291,8 +279,6 @@ SMA 被集成为即插即用的频谱对齐模块，在多种视频运动迁移�
 
 **定量消融（Table 3）**。仅添加 $\ell_{\text{local}}$ 已使 Text-Align 和 Frame-Con 分别提升 0.020 和 0.008，在此基础上进一步加入 $\ell_{\text{global}}$ 带来额外增益，最终两项指标分别累计提升 0.026 和 0.016。这表明局部频谱细化和全局多尺度对齐是互补的：前者抑制单帧内的空间伪影，后者捕获跨帧的长程运动动态。
 
-![[assets/figures/papers/paper_list_l27_Spectral_Motion_Alignment_for_Video_Motion_Transfer_using_Diffusion_Mode/figures/009_Table_3.jpg]]
-*Table 3: Quantitative ablation of $\mathcal { L } _ { \mathrm { l o c a l } }$ and ${ \mathcal { L } } _ { \mathrm { g l o b a l } }$
 
 **全局对齐的定性验证（Figure 7）**。移除 $\ell_{\text{global}}$ 后，生成视频出现明显的运动方向错误（如反向运动）和背景误运动；引入全局小波对齐后，模型能够正确学习输入视频的整体运动模式，输出的运动方向与源视频一致。这证实了 1D Haar 小波变换在捕获多尺度时间运动动态方面的关键作用。
 
@@ -316,12 +302,6 @@ SMA 的训练开销轻量：在 VMC 框架上仅需约 15 GB 显存，训练时�
 2. **微调范式限制**：SMA 仍需为每个新输入视频进行定制训练，尚未实现零样本运动迁移。
 3. **泛化边界未验证**：当前评估集中在自然场景和常见物体运动，对于极端视角变化、大规模遮挡或抽象运动模式，SMA 的有效性缺乏实验支撑。
 4. **计算开销细节不足**：虽然声称小波变换和 FFT 开销可忽略，但缺少与其他方法的绝对时间/显存对比数据，该点需读者自行验证。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l27_Spectral_Motion_Alignment_for_Video_Motion_Transfer_using_Diffusion_Mode/figures/011_Figure.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -370,8 +350,6 @@ SMA 并非替代现有运动迁移框架，而是作为**即插即用的频谱�
 2. **推理阶段解耦**：能否将 SMA 的频谱约束设计为无训练的引导项（类似于 classifier guidance），从而在推理时直接控制运动迁移，消除微调需求？
 3. **小波族的选择**：论文仅探索了 Haar 小波，是否存在更适合视频运动建模的其他小波族（如 Daubechies 系列、Morlet 复小波），能在运动模式保真度和计算效率之间取得更优平衡？
 4. **频谱对齐的理论保证**：当前方法依赖经验性的频率加权函数，缺乏对“哪些频率成分编码运动信息”的理论刻画。能否通过信息瓶颈或频域解耦理论，给出运动相关频率成分的可识别性条件？
-
-
 
 ## 原文 PDF
 

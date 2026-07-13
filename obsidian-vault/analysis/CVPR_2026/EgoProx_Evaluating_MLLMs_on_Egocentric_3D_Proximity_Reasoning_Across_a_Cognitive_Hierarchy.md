@@ -59,8 +59,6 @@ claims:
 
 **局限与开放问题**：基准规模有限（2405个样本），场景多样性受限于EgoExo4D和ADT两个数据集；动作链任务的严格空间关系评估指标可能过于苛刻。未来需探索将数据引擎扩展至更广泛的自我中心视频，以及通过模型架构创新（如融入显式3D表征）更彻底地解决空间推理瓶颈。
 
-
-
 ### 问题背景：自我中心3D空间智能的评测困境
 
 具身智能体在真实世界中执行任务时，必须持续感知自身与周围物体的空间关系，并据此做出行动决策。这种以第一人称视角进行的**自我中心3D接近度推理**（Egocentric 3D Proximity Reasoning）是空间智能的核心能力之一。然而，现有评测体系对此类能力的系统性评估存在显著缺口。
@@ -80,8 +78,6 @@ claims:
 2. **构建可规模化的数据生成引擎**：开发基于代理的数据引擎，通过协调多个专用工具（如显著片段采样器、占据地图生成器、空间计算器等）自动合成高质量VQA数据，解决人工标注的瓶颈问题。
 
 3. **揭示认知层次间的迁移机制**：通过跨类别指令调优实验，验证认知层次间的正向迁移效应——例如，意图推理能力的提升能否带动利用阶段的空间推理表现，从而为模型的空间智能增强提供可操作的训练策略。
-
-
 
 ## 核心方法与创新机理
 
@@ -121,8 +117,6 @@ EgoProx 的实验设计揭示了认知层次间的**正向迁移效应**——�
 
 综上，EgoProx 的创新本质是**“诊断工具 + 修复方案”的一体化**：基准本身揭示了 MLLM 在认知层次空间推理上的巨大鸿沟（人类 80.23% vs. 最佳模型 25.14%），而数据引擎则提供了填补这一鸿沟的可行路径。
 
-
-
 EgoProx 的整体框架由两部分构成：一个按认知层次组织的**3D接近度推理基准**，以及一个用于自动合成高质量VQA数据的**基于代理的数据引擎**。两者协同工作，前者定义了评估空间智能的任务体系，后者为这些任务提供可扩展的标注数据。
 
 ### 基准的认知层次结构
@@ -156,12 +150,8 @@ EgoProx 基准将自我中心3D接近度推理任务沿认知层次组织为四�
 
 该框架的核心设计在于**通过认知层次组织任务**，使数据引擎能够按层次生成训练数据，从而验证不同认知层次间的正向迁移效应。实验表明，仅在意图数据上微调即可显著提升利用任务的性能（+26.30%，Table 3），验证了这一层次结构的内在关联性。同时，数据引擎的自动化特性使其具备跨数据集扩展能力——在EgoExo4D上生成的调优数据可有效迁移至ADT数据集（+16.93%，Table 4），证明空间推理知识具有域迁移性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l819_https_openaccess_thecvf_com_content_CVPR2026_html_Li_EgoProx_Evaluating/figures/001_Figure_1.jpg]]
 *Figure 1: Visual illustration of the EgoProx benchmark. We aim to evaluate multimodal large language models (MLLMs) on complex egocentric proximity reasoning tasks that require 4D action and scene understanding. Our benchmark spans four core dimensions following a cognitive hierarchy: Intention, Exploration, Exploitation, and Chain of Actions. We adopt approximate transformations and relative spatial relationships to represent proximity. The examples illustrate the model’s need to interpret long-term contextual cues, spatial dependencies, and action-state changes from first-person visual inputs, providing a comprehensive assessment of egocentric spatial intelligence*
-
-
 
 EgoProx 的数据引擎以一个基于 **Gemini-2.5-Pro** 的智能代理为核心，编排七个专用工具模块，按认知层次自动合成高质量 VQA 数据。整体流程遵循“关键片段采样 → 3D 空间解析 → 接近度计算 → 问答对生成”的级联结构。
 
@@ -194,10 +184,6 @@ EgoProx 的评估公式围绕动作链任务设计，核心指标定义如下：
 - **关系准确率（宽松版，Rel-Acc-L）**：$\text{Rel-Acc-L}$，当预测方向与真实方向在离散化的八个方位中相邻时即视为正确，降低对空间关系严格匹配的惩罚。
 
 这些公式的核心设计意图在于：将连续 3D 空间中的接近度推理转化为可离散评估的符号化判断，使得 MLLM 的空间推理能力可以被严格量化。
-
-
-
-
 
 ## 实验与关键发现
 
@@ -241,12 +227,8 @@ Figure 3 展示了意图调优后的 Qwen2.5‑VL‑7B 在具体案例上超越 
 ![[assets/figures/papers/paper_list_l819_https_openaccess_thecvf_com_content_CVPR2026_html_Li_EgoProx_Evaluating/figures/007_Figure_3.jpg]]
 *Figure 3: Visual examples of our benchmark and model performance. We show cases where the intention-tuned model outperforms the proprietary GPT-5 model*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l819_https_openaccess_thecvf_com_content_CVPR2026_html_Li_EgoProx_Evaluating/figures/002_Table_1.jpg]]
 *Table 1: Comparison of EgoProx with existing 3D reasoning VQA or egocentric activity VQA benchmarks. We summarize key properties including 3D awareness, dataset scale, reasoning types, construction methodology, and temporal reasoning range. The reasoning types include grounding (G), forecasting (F), planning (P), and causality (C). Benchmark construction types include human annotation, MLLM/LLM-based generation, and agent-based generation. For clarity, note that human review for quality assurance is adopted by all existing QA-generation pipelines, including ours*
-
-
 
 ## 定位与知识库关联
 
@@ -305,8 +287,6 @@ EgoProx 评估了当前主流的专有和开源MLLMs：
 4. **数据引擎的扩展性**：如何将基于代理的数据引擎扩展到更广泛的自我中心视频数据集（如Ego4D的日常活动场景），以增强基准的多样性和覆盖度？这要求目标数据集具备足够的3D标注，而这类标注的获取本身就是一个瓶颈。
 
 5. **评估指标的改进空间**：当前对空间关系的离散化处理（8个方向）和近似距离的区间化虽然提高了可解释性，但可能掩盖模型在连续空间推理中的细微差异。是否需要更细粒度的评估方案？
-
-
 
 ## 原文 PDF
 

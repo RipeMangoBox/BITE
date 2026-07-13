@@ -70,8 +70,6 @@ DIFF4SPLAT定位于**前馈动态4D场景生成**这一新兴方向，与以下�
 
 方法的局限性在于依赖大规模带标注的4D数据集进行训练，对极小或极快运动场景的生成效果可能仍有不足。开放问题包括：如何进一步压缩模型体积以支持移动端部署，能否扩展到更长时序或开放域的动态场景生成，以及在完全无标注的真实世界视频上的泛化能力。
 
-
-
 ### 动态4D场景生成的现实需求
 
 从单张图像重建可交互的动态三维场景，是计算机视觉与图形学中长期存在的核心挑战。该能力一旦成熟，将直接赋能增强现实、虚拟制作、沉浸式视频会议等应用场景——用户仅需提供一张照片和一段相机轨迹，即可获得一个可自由漫游、实时渲染的动态4D世界。然而，这一目标的实现面临双重困难：既要保证多视角下的外观真实感，又要维持跨帧的几何与运动一致性。
@@ -96,8 +94,6 @@ DIFF4SPLAT 的出发点建立在一个关键的观察之上：**预训练视频�
 3. **一致性**：通过统一的光度、几何和运动损失联合监督，确保多视角渲染与动态演化的时空一致性。
 
 为实现这一目标，DIFF4SPLAT 设计了 Video Latent Transformer 作为核心桥梁，将2D时空潜特征映射为结构化的可变形3D高斯场参数，并引入可学习的帧间变形机制来显式建模动态场景的演化。后续章节将详细展开这一方法论的技术细节与实验验证。
-
-
 
 ## 核心方法与创新机理
 
@@ -131,8 +127,6 @@ DIFF4SPLAT 在以下维度实现了对现有方法的根本性改进：
 
 这一范式转变带来了显著的效率提升：DIFF4SPLAT将动态场景生成时间压缩至约30秒，相较于优化式基线（Mosca约30分钟，DimensionX数小时）实现了60倍以上的加速。同时，显式几何表示使得相机位姿精度（平均相对位姿误差：平移0.012，旋转0.008）显著优于隐式表示方法（Table 3），验证了可变形高斯场在几何一致性上的优势。
 
-
-
 DIFF4SPLAT 将动态 4D 场景生成重塑为一个**单阶段前馈过程**：给定一张单目图像、一条指定的相机轨迹，以及可选的文本提示，模型在一次前向传播中直接输出一个**可变形 3D 高斯场**，彻底消除了传统方法中耗时的测试时逐场景优化。
 
 ### 框架总览
@@ -160,8 +154,6 @@ DIFF4SPLAT 采用**渐进式训练策略**：先在静态数据上预训练 3D �
 ### 数据预处理
 
 为获得带度量深度的 4D 训练数据，方法对 RealEstate10K 等仅提供相对位姿的数据集进行了**深度与位姿重估计**：利用 Video Depth Anything 和 MegaSaM 等基础模型恢复对齐的度量深度图与相机外参（Algorithm 1），最终积累了约 **13 万**高质量 4D 训练场景。
-
-
 
 DIFF4SPLAT 的核心架构由四大模块构成：预训练视频扩散模型、Latent Dynamic Reconstruction Model (LDRM)、可变形高斯场，以及统一多损失监督。以下逐一剖析其设计逻辑与关键公式。
 
@@ -225,12 +217,8 @@ $$
 
 训练采用“先静后动”的课程式策略：首先在静态数据上预训练 3DGS 的几何与纹理基础，随后引入动态数据联合训练。消融实验（Figure 7）表明，直接从动态数据训练会导致几何初始化失败，而渐进式策略能稳定学习 4D 表示并获得更高的视觉质量。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2462_https_openaccess_thecvf_com_content_CVPR2026_html_Pan_Diff4Splat_Repurpo/figures/002_Figure_2.jpg]]
 *Figure 2: Architecture of DIFF4SPLAT. We present a high-fidelity dynamic 3DGS generation method from a single image through four key innovations: (1) video diffusion latents processed by our novel Transformer (Sec. 3.2), (2) a dynamic 3DGS deformation mechanism (Sec. 3.3), (3) unified supervision with photometric, geometric, and motion losses (Sec. 3.4), and (4) a progressive training scheme for robust geometry and texture*
-
-
 
 ## 实验与关键发现
 
@@ -256,8 +244,6 @@ DIFF4SPLAT 在多个维度上展现出显著优势，其核心突破在于将动
 
 尽管 DIFF4SPLAT 取得了显著进展，其性能仍受限于训练数据的覆盖范围。方法依赖大规模带标注的4D数据集（约13万个高质量4D训练场景），对极小物体或极快运动场景的生成效果可能不足。此外，当前框架基于 CogVideoX 预训练模型，其潜空间的压缩率（32×4×8×8）可能限制了对高频细节的保留能力。在完全无标注的真实世界视频上的泛化能力也尚未得到充分验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2462_https_openaccess_thecvf_com_content_CVPR2026_html_Pan_Diff4Splat_Repurpo/figures/003_Table_1.jpg]]
 *Table 1: Quantitative comparison of appearance fidelity and aesthetic quality. † denotes methods requiring per-scene optimization. We highlight first-place and second-place results*
 
@@ -267,25 +253,8 @@ DIFF4SPLAT 在多个维度上展现出显著优势，其核心突破在于将动
 ![[assets/figures/papers/paper_list_l2462_https_openaccess_thecvf_com_content_CVPR2026_html_Pan_Diff4Splat_Repurpo/figures/005_Table_4.jpg]]
 *Table 4: Ablation Study on Motion Loss. We evaluate the impact of our proposed motion loss on dynamic video generation*
 
-![[assets/figures/papers/paper_list_l2462_https_openaccess_thecvf_com_content_CVPR2026_html_Pan_Diff4Splat_Repurpo/figures/006_Table_2.jpg]]
-*Table 2: Geometric integrity and reconstruction time. † denotes optimization-based methods. Best results are in bold, second best are underlined*
-
-![[assets/figures/papers/paper_list_l2462_https_openaccess_thecvf_com_content_CVPR2026_html_Pan_Diff4Splat_Repurpo/figures/007_Table_3.jpg]]
-*Table 3: Comparison of Average Relative Pose Error (RPE), highlighting our explicit model’s superior accuracy in translation and rotation, alongside its additional capabilities*
-
 ![[assets/figures/papers/paper_list_l2462_https_openaccess_thecvf_com_content_CVPR2026_html_Pan_Diff4Splat_Repurpo/figures/008_Figure_4.jpg]]
 *Figure 4: Qualitative results under extreme viewpoints*
-
-![[assets/figures/papers/paper_list_l2462_https_openaccess_thecvf_com_content_CVPR2026_html_Pan_Diff4Splat_Repurpo/figures/009_Figure_5.jpg]]
-*Figure 5: Applications of DIFF4SPLAT. Our method supports applications such as novel view synthesis and depth map extraction from the generated 4D representation*
-
-![[assets/figures/papers/paper_list_l2462_https_openaccess_thecvf_com_content_CVPR2026_html_Pan_Diff4Splat_Repurpo/figures/010_Figure_6.jpg]]
-*Figure 6: Ablation of the Deformation Gaussian Field. Removing this module (the red bounding boxes) results in ghosting artifacts, particularly in frames with large motion*
-
-![[assets/figures/papers/paper_list_l2462_https_openaccess_thecvf_com_content_CVPR2026_html_Pan_Diff4Splat_Repurpo/figures/011_Figure_7.jpg]]
-*Figure 7: Ablation on the progressive training strategy. Our approach (left) yields higher visual quality than direct dynamic training (right) after 100K iterations*
-
-
 
 ## 定位与知识库关联
 
@@ -328,8 +297,6 @@ DIFF4SPLAT 通过**因果旋钮**（causal knob）实现范式转换：将视频
 2. **长时序扩展**：能否将框架扩展到更长时序或开放域的动态场景生成，例如分钟级或无限时长场景？
 3. **无监督/自监督泛化**：在完全无标注的真实世界视频上，模型能否通过自监督或弱监督方式学习动态场景先验？
 4. **多模态条件融合**：当前支持单图、文本和相机位姿作为条件输入，能否融合更多模态（如音频、草图）以实现更灵活的场景控制？
-
-
 
 ## 原文 PDF
 

@@ -52,8 +52,6 @@ LLaMo 的核心设计在于两个因果旋钮。第一，采用**连续因果变
 
 实验表明，LLaMo-3B 在 HumanML3D 文本到动作生成上取得 FID 22.491，与大规模方法 MotionMillion 及领域专家模型竞争，且对罕见文本输入表现出更强的鲁棒性。更重要的是，MoT 设计使模型完整保留了语言能力：MMLU 达 63.4，IFEval 严格准确率达 78.5；而移除 MoT 后，两项指标分别崩溃至 31.1 和 22.3。连续因果 VAE 的重建精度亦远超离散量化方案，MPJPE 仅 3.86 mm，相较 FSQ 的 41.9 mm 有数量级优势。
 
-
-
 ### 运动理解与生成的统一挑战
 
 人类运动理解与生成是构建具身智能体的核心能力，涵盖从文本描述生成自然运动（text-to-motion）和从运动序列推理语义描述（motion-to-text）两大任务。近年来，大规模语言模型（LLMs）在跨模态统一建模中展现出强大的泛化潜力，促使研究者尝试将运动模态纳入语言模型的统一框架。然而，**在扩展现有LLM以统一处理运动理解和生成时，面临两个核心瓶颈**：
@@ -79,8 +77,6 @@ LLaMo 的核心设计在于两个因果旋钮。第一，采用**连续因果变
 - **模态特定混合Transformer（MoT）**：冻结所有文本相关模块，为运动模态引入独立的FFN参数，仅在共享自注意力层实现跨模态通信。这一设计使得模型在获得运动理解与生成能力的同时，**完全保留基座LLM的语言性能**。
 
 通过这两项设计，LLaMo成为首个在不牺牲语言能力的前提下，实现统一运动理解与生成的大规模运动-语言模型（Figure 1）。其连续自回归框架结合流匹配（flow matching）生成头，不仅消除了量化伪影，还支持任意长度的流式运动生成，为实时人机交互和具身智能应用奠定了基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -119,8 +115,6 @@ $$
 ### 创新协同效应
 
 上述三个设计并非孤立改进，而是形成因果闭环：连续 VAE 提供高保真潜在表示 → MoT 架构在冻结语言能力的前提下学习跨模态映射 → 流匹配头在连续空间中实现平滑、可变长度的生成。这一协同使得 LLaMo-3B 在 HumanML3D 上以 **FID 22.491** 超越同规模的大规模模型 MotionMillion-3B（23.755），同时完整保留基座 LLM 的语言能力——这是此前统一模型未能达成的双重目标。
-
-
 
 LLaMo 的整体设计围绕一个核心目标展开：**在不损害基座大语言模型（LLM）语言能力的前提下，赋予其统一的运动理解与生成能力**。为此，模型构建了一条从连续运动表征到多模态自回归生成的完整流水线，其关键模块关系与数据流如下。
 
@@ -179,13 +173,6 @@ $$\mathcal { L } = \mathcal { L } _ { \mathrm { F M } } + \lambda _ { 1 } \mathc
 
 **整体数据流**可概括为：原始运动序列 → Causal VAE 编码为连续潜在 → 运动适配器投影 → 与文本 token 拼接送入 MoT Decoder（文本分支冻结，运动分支可训练）→ 自回归生成过程中，文本 token 由 LM Head 解码，运动潜在由流匹配头解码，并由出口头控制生成长度。这一流水线在注入运动多模态能力的同时，完整保留了基座 LLM 的语言性能。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l4_https_openaccess_thecvf_com_content_CVPR2026_html_Li_LLaMo_Scaling_Pretr/figures/001_Figure_1.jpg]]
-*Figure 1: We introduce LLaMo, the first large-scale motion-language model supporting unified motion understanding and generation without compromising the language proficiency of the underlying LLM*
-
-
-
 LLaMo 的核心架构围绕三个关键模块展开：连续因果运动标记化、模态特定混合Transformer（MoT）以及流匹配运动生成头。这些模块共同解决了将预训练LLM扩展为统一运动-语言模型时的两大瓶颈——离散量化引入的抖动伪影和全参数微调导致的灾难性遗忘。
 
 ### 运动表示与因果VAE标记化
@@ -240,8 +227,6 @@ $$\mathcal { L } = \mathcal { L } _ { \mathrm { F M } } + \lambda _ { 1 } \mathc
 三个阶段分别聚焦于特征对齐、联合学习和运动头微调，逐步引入不同损失项并调整学习率与任务比例。这一策略有效抑制了流匹配头在联合训练初期的梯度不稳定问题，使3B和8B规模的模型均能收敛。
 
 **关键设计决策**。潜在维度选择为 $z=32$，因为更高维度的潜在空间会使MLP流匹配头训练不稳定（Section 4.1）。运动适配器将VAE潜在空间映射到与语言嵌入兼容的维度，确保两种模态在共享自注意力层中的有效交互。
-
-
 
 ## 实验与关键发现
 
@@ -298,19 +283,6 @@ LLaMo 支持实时流式运动生成，帧率可达 **≥30 FPS**。这得益于
 3. **流匹配头的训练不稳定性**：联合训练中的损失尖峰需要多阶段策略和样本过滤来缓解，增加了训练复杂度和调参负担。
 4. **零样本评估不足**：零样本运动生成目前主要依赖定性示例（Figure 4），缺乏系统的定量评估框架。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l4_https_openaccess_thecvf_com_content_CVPR2026_html_Li_LLaMo_Scaling_Pretr/figures/003_Figure_3.jpg]]
-*Figure 3: Dataset Composition. We gather a large-scale human motion dataset by combining high quality Mocap datasets with large-scale HMR estimated datasets*
-
-![[assets/figures/papers/paper_list_l4_https_openaccess_thecvf_com_content_CVPR2026_html_Li_LLaMo_Scaling_Pretr/figures/008_Figure.jpg]]
-*Figure: (c) A man of average build who looked lost was walking along the street when a giant pie hit his head*
-
-![[assets/figures/papers/paper_list_l4_https_openaccess_thecvf_com_content_CVPR2026_html_Li_LLaMo_Scaling_Pretr/figures/009_Figure.jpg]]
-*Figure: (a) A zombie slowly dragging its feet forward, arms outstretched, letting out a low groan. (b) An obese middle-aged male security guard, walking and looking around*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 方法类型学定位
@@ -366,8 +338,6 @@ LLaMo 属于**大规模预训练语言模型驱动的统一运动理解与生成
 4. **下一代运动生成评估基准**：如何设计不受数据分布偏差影响的大规模零样本运动生成评估基准和指标？可能的思路包括：基于人类偏好的大规模对比评估、物理合理性度量（如脚部滑动、关节限制违反）、以及运动-文本细粒度语义对齐的自动化度量。
 
 5. **连续标记化与离散标记化的根本权衡**：LLaMo 的连续标记化在重建精度（MPJPE 3.86 mm vs. FSQ 41.9 mm）上碾压离散方案，但离散标记化在兼容现有 LLM 训练基础设施和推理效率上可能有优势。在更大规模的实际部署中，二者的效率-质量帕累托前沿究竟如何？这需要系统性的对比研究。
-
-
 
 ## 原文 PDF
 

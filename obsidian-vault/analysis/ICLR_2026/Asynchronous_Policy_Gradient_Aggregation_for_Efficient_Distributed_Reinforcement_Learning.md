@@ -48,8 +48,6 @@ claims:
 
 本文提出两种新的分布式强化学习算法——**Rennala NIGT** 和 **Malenia NIGT**，旨在解决现有异步策略梯度方法（如 AFedPG）在计算与通信效率上的瓶颈。核心创新在于将异步友好的梯度聚合过程（AggregateRennala 和 AggregateMalenia）与 NIGT 动量归一化技术相结合，在二阶光滑性假设下实现了更优的理论时间复杂度，并支持 AllReduce 操作。实验表明，在异构计算和通信环境下，所提方法收敛速度显著优于现有基线。
 
-
-
 现有分布式策略梯度方法（如 AFedPG）在异步和异构环境下存在以下瓶颈：
 - **不支持异构环境**：AFedPG 无法处理各智能体具有不同环境分布和奖励函数的情况。
 - **通信复杂度次优**：AFedPG 的通信复杂度为 $O(\kappa \varepsilon^{-3})$，且在最坏情况下可达 $O(\kappa \varepsilon^{-7/2})$。
@@ -57,8 +55,6 @@ claims:
 - **计算复杂度随智能体数量 n 增长而恶化**：AFedPG 的计算复杂度包含 $n^{4/3}$ 项。
 
 本文旨在通过设计异步友好的梯度聚合过程，结合 NIGT 动量归一化技术，同时优化计算和通信复杂度，并支持异构环境。
-
-
 
 ## 核心方法与创新机理
 
@@ -68,8 +64,6 @@ claims:
 
 3. **新下界**：建立了 Theorem G.1 中的新下界，量化了与最优性之间的剩余差距。
 
-
-
 ![[assets/figures/papers/iclr26_reinforcement_learning_planning_agents__deep_rl__b001_SitVEPYv6W_Asynchronous_Policy_Grad/figures/003_Figure_1.jpg]]
 *Figure 1: (a) Equal times*
 
@@ -78,8 +72,6 @@ claims:
 - **Algorithm 1 (Core NIGT step)**：核心动量归一化更新步骤，使用动量 $\eta$ 和步长 $\alpha$，通过外推步利用 Hessian 光滑性改进 oracle 复杂度。
 - **Algorithm 2 (AggregateRennala)**：均匀设置下的异步梯度聚合过程：广播参数 $\theta$，等待收集 M 个随机梯度，通过 AllReduce 返回平均梯度。
 - **Algorithm 3 (AggregateMalenia)**：异构设置下的异步梯度聚合过程：每个智能体维护自己的计数 $M_i$，当调和均值条件 $(1/n \sum 1/M_i)^{-1} \geq M/n$ 满足时停止，返回加权平均梯度。
-
-
 
 **问题形式化**：最大化无限时域上的期望折扣累积奖励：
 $$J(\theta) = \mathbb{E}_{(s_t, a_t)_{t \geq 0}} \left[ \sum_{t=0}^{\infty} \gamma^t r(s_t, a_t) \right] \quad \text{(Equation 1)}$$
@@ -101,8 +93,6 @@ $$\tilde{\mathcal{O}}\left(\kappa\left(\frac{L_g\Delta}{\varepsilon^2}+\frac{\sq
 **Malenia NIGT 时间复杂度**（Theorem 5.1，异构设置）：
 $$\tilde{\mathcal{O}}\left(\kappa\left(\frac{L_g\Delta}{\varepsilon^2}+\frac{\sqrt{L_h}\Delta}{\varepsilon^{3/2}}\right)+\frac{1}{1-\gamma}\left[\dot{h}_n\left(\frac{L_g\Delta}{\varepsilon^2}+\frac{\sqrt{L_h}\Delta}{\varepsilon^{3/2}}\right)+\left(\frac{1}{n}\sum_{i=1}^n\dot{h}_i\right)\left(\frac{\sigma^2}{n\varepsilon^2}+\frac{\sigma^2\sqrt{L_h}\Delta}{n\varepsilon^{7/2}}\right)\right]\right)$$
 
-
-
 ## 实验与关键发现
 
 **主要实验结果**：
@@ -115,7 +105,6 @@ $$\tilde{\mathcal{O}}\left(\kappa\left(\frac{L_g\Delta}{\varepsilon^2}+\frac{\sq
 | Hopper-v4 | 收敛速度 | Rennala NIGT | AFedPG, Synchronized NIGT | 差距不明显 | Figure 3(c) |
 | Humanoid-v4 (异构环境) | 奖励 | Malenia NIGT | AFedPG | Malenia NIGT 获得远高于 AFedPG 的奖励 | Figure 9 |
 
-
 ![[assets/figures/papers/iclr26_reinforcement_learning_planning_agents__deep_rl__b001_SitVEPYv6W_Asynchronous_Policy_Grad/figures/004_Figure_2.jpg]]
 *Figure 2: (b) Heterogeneous times*
 
@@ -125,7 +114,6 @@ $$\tilde{\mathcal{O}}\left(\kappa\left(\frac{L_g\Delta}{\varepsilon^2}+\frac{\sq
 - 当智能体数量增加到 n=100 时，Rennala NIGT 在异构场景下仍然保持优势（Figures 5-8）。
 - 当计算时间递减时，Rennala NIGT 仍然是最快的方法（Figure 8）。
 
-
 ![[assets/figures/papers/iclr26_reinforcement_learning_planning_agents__deep_rl__b001_SitVEPYv6W_Asynchronous_Policy_Grad/figures/006_Figure_4.jpg]]
 
 **公平性说明**：
@@ -133,8 +121,6 @@ $$\tilde{\mathcal{O}}\left(\kappa\left(\frac{L_g\Delta}{\varepsilon^2}+\frac{\sq
 - 超参数 $\eta$ 在 Humanoid-v4 任务上统一调优为 0.1，学习率 $\alpha$ 针对每个算法和每个图单独调优。
 - Rennala NIGT 的额外参数 M 和 M_init 在 {20, 30, 50} 中调优。
 - 实验使用 5 个随机种子，报告 (20%, 80%) 置信区间。
-
-### 补充图表
 
 ![[assets/figures/papers/iclr26_reinforcement_learning_planning_agents__deep_rl__b001_SitVEPYv6W_Asynchronous_Policy_Grad/figures/001_Table_1.jpg]]
 *Table 1: Homogeneous Setup. The time complexities of distributed methods to find an ε-stationary point in problem (1) up to an error tolerance ε, number of agents n , computation times $\dot { h } _ { i }$ , communication time κ (see Section 4.1), and ignoring logarithmic factors.*
@@ -144,9 +130,6 @@ $$\tilde{\mathcal{O}}\left(\kappa\left(\frac{L_g\Delta}{\varepsilon^2}+\frac{\sq
 
 ![[assets/figures/papers/iclr26_reinforcement_learning_planning_agents__deep_rl__b001_SitVEPYv6W_Asynchronous_Policy_Grad/figures/005_Figure_1.jpg]]
 *Figure 1: (c) Increased communication times Figure 1: Experiments on Humanoid-v4 with increasing heterogeneity of times (from left to right).*
-
-
-
 
 ## 定位与知识库关联
 
@@ -167,8 +150,6 @@ $$\tilde{\mathcal{O}}\left(\kappa\left(\frac{L_g\Delta}{\varepsilon^2}+\frac{\sq
 2. 对于 $(L_g, L_h)$-二阶光滑函数，$\varepsilon^{-12/7}$ 的速率是否可达？
 3. STORM/MVR 方法能否适应 RL 中的非平稳分布？
 4. 所提方法在大规模语言模型 RLHF 训练中的实际效果如何？
-
-
 
 ## 原文 PDF
 

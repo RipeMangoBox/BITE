@@ -57,8 +57,6 @@ claims:
 
 **局限性**：生成质量受限于预训练模型能力，难以处理分布外复杂动作；运动迁移存在语义歧义性，可能将错误元素的运动映射到目标；AMF的成对计算导致内存消耗略高，但可通过分段长视频生成缓解。
 
-
-
 ### 视频运动迁移的核心挑战
 
 视频生成领域的一个核心需求是：给定一段参考视频的运动模式，将其迁移到由任意文本提示描述的新内容上，生成外观完全不同但运动轨迹一致的新视频。这一任务被称为**运动迁移**（motion transfer），其本质困难在于如何将运动线索与视频内容精确解耦——既要忠实复现参考视频的时空动态，又要将运动正确地映射到新场景中语义对应的元素上。
@@ -87,8 +85,6 @@ claims:
 2. **如何在免训练的条件下实现高质量运动迁移**：训练一个专门的DiT运动迁移模型成本极高，因此需要一种优化驱动的免训练策略，与现有零样本运动迁移文献保持一致。
 
 通过解决这两个问题，本文提出的DiTFlow方法旨在让DiT用户在享受更高生成质量的同时，获得不低于甚至超越U-Net方法的运动迁移能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -126,8 +122,6 @@ DiTFlow 在优化目标上引入了两个可调节旋钮：
 - **中置信度**：零样本迁移的泛化边界尚未在极端分布外场景下充分验证；位置嵌入优化的解耦程度依赖于预训练模型的质量。
 - **需注意**：AMF 的成对计算导致内存消耗略高于先前方法，这是精度提升的代价。
 
-
-
 ![[assets/figures/papers/paper_list_l28_Video_Motion_Transfer_with_Diffusion_Transformers/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of DiTFlow. We propose a motion transfer method tailored for video Diffusion Transformers (DiT). We exploit a training-free strategy to transfer the motion of a reference video (top) to newly synthesized video content with arbitrary prompts (bottom). By optimizing DiT-specific positional embeddings, we can also synthesize new videos in a zero-shot manner*
 
@@ -156,8 +150,6 @@ $$\mathcal{L}_{\text{AMF}} = \| \mathrm{AMF}(z_{\text{ref}}) - \mathrm{AMF}(z_t)
 当优化目标从潜变量 $z_t$ 切换为位置嵌入 $\rho_t$ 时，运动信息与语义内容被解耦。预优化后的位置嵌入可作为“运动旋钮”保存下来，在后续生成中直接加载，配合任意新的文本提示即可零样本生成符合参考运动模式但内容完全不同的视频。实验表明，这一策略对提示保真度的影响极小（IQ 下降仅 0.3%，而优化 $z_t$ 下降 4.4%），实现了运动与内容的有效分离。
 
 **输入输出流总结**：参考视频 → 潜空间编码 → DiT 块特征提取 → AMF 运动模板（离线计算一次）；文本提示 + 噪声潜变量（或预优化位置嵌入）→ 去噪过程 + AMF 引导优化 → 运动迁移后的生成视频。整个流程无需任何模型训练或微调，完全基于推理阶段的优化驱动。
-
-
 
 DiTFlow 的核心流程由三个关键模块串联构成：注意力运动流（AMF）提取、运动引导优化、以及可选的零样本迁移。以下逐模块展开其公式化定义与变量含义。
 
@@ -200,8 +192,6 @@ $$\mathcal{L}_{\mathrm{AMF}}(z_{\mathrm{ref}}, z_t) = ||\mathrm{AMF}(z_{\mathrm{
 ### 零样本迁移（可选）
 
 当优化对象为位置嵌入 $\rho_t$ 时，由于位置嵌入不参与语义内容的编码，预优化的 $\rho_t$ 可与任意新提示组合，实现一次优化、多次生成的零样本迁移。Figure 7a 的定量结果表明，$\rho$ 优化的提示保真度下降仅为 -0.3%，远低于 $z_t$ 优化的 -4.4%，验证了运动与内容的有效解耦。
-
-
 
 ## 实验与关键发现
 
@@ -269,22 +259,6 @@ DiTFlow的生成质量受限于预训练模型的能力边界。当参考视频�
 
 此外，AMF的成对帧计算导致内存消耗略高于先前方法，但可通过分段生成长视频来缓解。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l28_Video_Motion_Transfer_with_Diffusion_Transformers/figures/005_Figure.jpg]]
-*Figure: Caption “Dog running between poles in an agility course” Subject “Bear running in a garden” Scene*
-
-![[assets/figures/papers/paper_list_l28_Video_Motion_Transfer_with_Diffusion_Transformers/figures/006_Figure.jpg]]
-*Figure: “Leopard running up a snowy hill in a forest”*
-
-![[assets/figures/papers/paper_list_l28_Video_Motion_Transfer_with_Diffusion_Transformers/figures/013_Figure.jpg]]
-*Figure: (a) Frame i (c) Latent nearest neighbour*
-
-![[assets/figures/papers/paper_list_l28_Video_Motion_Transfer_with_Diffusion_Transformers/figures/016_Table_4.jpg]]
-*Table 4: Dataset snippet. Sample of DAVIS videos chosen with associated prompts from each category described in Section 5*
-
-
-
 ## 定位与知识库关联
 
 ### 与基线方法的关系
@@ -322,8 +296,6 @@ DiTFlow 的有效性受以下边界条件约束：
 3. **长视频生成扩展**：论文提及分段生成可缓解内存压力，但未验证分段间的运动一致性能否保持。长视频场景下的运动连续性是一个需要进一步探索的工程问题。
 
 4. **多对象运动解耦**：当参考视频包含多个独立运动对象时，AMF 将所有运动编码为统一流场。如何解耦并选择性迁移特定对象的运动，是提升方法实用性的重要方向。
-
-
 
 ## 原文 PDF
 

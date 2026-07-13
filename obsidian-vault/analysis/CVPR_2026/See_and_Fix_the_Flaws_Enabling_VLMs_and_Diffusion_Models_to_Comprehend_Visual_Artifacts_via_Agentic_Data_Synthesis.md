@@ -50,8 +50,6 @@ claims:
 
 **主要结果：** 使用 ArtiAgent 生成的 100K 样本微调 Qwen2.5-VL-7B 后，模型在 ArtiBench 基准上的二分类准确率达到 0.627（+12.6%），F1 从 0.336 跃升至 0.627（+29.1%），定位 mIoU 从 0.010 提升至 0.111，解释 CSS 从 0.263 提升至 0.643（+38.0%）。仅使用 1K 合成样本，模型在定位与解释任务上即超越 GPT-5，且性能随数据规模持续增长。此外，ArtiAgent 训练的 VLM 可作为奖励模型引导扩散采样生成无伪影图像，亦可指导修复模型精确纠正伪影区域。
 
-
-
 ### 扩散模型的视觉伪影危机
 
 现代扩散模型（如 SD3.5-Large、FLUX-dev、Qwen-Image）已能生成像素级高度逼真的图像，但其输出中仍频繁出现违背物理常识的**结构性视觉伪影**。Table 1 统计了主流扩散模型的伪影出现频率：SD3.5-Large 高达 36%，FLUX-schnell 为 28%，即便表现最好的 Nano-Banana 也有 5% 的样本存在可辨识的结构缺陷。Figure 2 进一步揭示了伪影类型的分布——从肢体重复、物体融合到空间关系错乱，这些缺陷并非边缘案例，而是扩散模型内在生成机制的产物。
@@ -73,8 +71,6 @@ claims:
 本文的答案是 **ArtiAgent**——一个由三个智能体（感知、合成、策划）协同工作的全自动代理流水线。其核心洞察在于：扩散模型去噪过程中的自注意力机制天然编码了图像的空间语义信息；通过精确操控 DiT 注意力层的位置编码和值嵌入，可以在任意干净图像上合成符合物理常识的结构性伪影，并自动生成边界框、局部解释和全局解释等完整注释。
 
 这一思路将伪影理解从“依赖人工标注的被动收集”转变为“可控合成驱动的主动学习”，不仅大幅降低了数据获取成本，还使得 VLM 能够作为**奖励模型**或**纠正工具**嵌入扩散生成流程，从源头减少伪影的产生。
-
-
 
 ## 核心方法与创新机理
 
@@ -113,8 +109,6 @@ ArtiAgent 的第二个关键创新在于将训练得到的伪影感知 VLM **嵌
 
 这种“理解—反馈—修正”的闭环是此前工作（如 DiffDoctor 仅做分割、LEGION 仅做解释）所不具备的，将伪影理解从被动的诊断工具升级为主动的质量改进手段。
 
-
-
 ArtiAgent 是一个完全自动化的代理流水线，旨在无需人工干预的情况下，向干净的真实图像中注入多样化的结构性视觉伪影，并同步生成包含边界框、局部解释与全局解释的丰富注释。如图 1(b) 与图 3 所示，该框架由三个协同工作的智能体构成：**感知代理 (Perception Agent)**、**合成代理 (Synthesis Agent)** 与**策划代理 (Curation Agent)**，三者形成一条端到端的数据合成与标注链路。
 
 ### 流水线总览
@@ -146,15 +140,8 @@ ArtiAgent 是一个完全自动化的代理流水线，旨在无需人工干预�
 
 利用该流水线，作者收集了 50K 对伪影注入图像及其原始图像，并附带完整的元数据注释。在此基础上微调 Qwen2.5-VL-7B 和 InternVL3.5-8B 等开源 VLM，可使其在 ArtiBench 基准的检测、定位和解释三项任务上全面超越 GPT-5 等商用模型。此外，训练后的 VLM 还可作为奖励模型嵌入扩散生成流程，引导文本到图像模型生成无伪影的高质量图像，或作为视觉反馈模块指导图像修复模型精准纠正伪影区域。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2591_https_arxiv_org_abs_2602_20951/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of our challenges and approach. The red boxes indicate the regions with visual artifacts. (a) Examples of structural visual artifacts in state-of-the-art diffusion models and the inability of VLMs to recognize or explain them. (b) Overview of ArtiAgent, a novel agentic framework that synthesizes artifacts for arbitrary visual contexts without human intervention. (c) Example of VLMbased artifact comprehension via detection, explanation, and localization. (d) Application to reward-guided text-to-image generation. (e) Application to image correction, where artifact-aware VLM-guided inpainting removes the flawed regions*
-
-![[assets/figures/papers/paper_list_l2591_https_arxiv_org_abs_2602_20951/figures/004_Figure_3.jpg]]
-*Figure 3: ArtiAgent consists of three coordinated agents: (1) the perception agent detects entities and subentities using Grounded-SAM; (2) the synthesis agent injects artifacts through patch mapping tool and the inversion-injection paradigm; and (3) the curation agent filters low-quality results and generates localized and global textual explanations*
-
-
 
 ### 感知代理：层次化实体分解与定位
 
@@ -219,13 +206,6 @@ $$\tau_1 \leq 1 - d_{\mathrm{LPIPS}}(x_{\mathrm{original}}, x_{\mathrm{artifact}
 
 **解释生成**：对通过过滤的样本，策划代理利用商用 VLM（如 GPT-4o）生成两类文本解释——局部解释（描述特定伪影区域的问题）和全局解释（概括整幅图像的伪影特征）。这些解释与二值标签、边界框共同构成下游 VLM 微调所需的完整注释。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2591_https_arxiv_org_abs_2602_20951/figures/002_Figure_2.jpg]]
-*Figure 2: Artifact type distribution of diffusion models*
-
-
-
 ## 实验与关键发现
 
 ### 实验设置
@@ -278,24 +258,8 @@ Figure 9 对比了 InternVL3.5-8B 微调前后的注意力热力图。基础模�
 ![[assets/figures/papers/paper_list_l2591_https_arxiv_org_abs_2602_20951/figures/013_Figure_9.jpg]]
 *Figure 9: Attention Visualization. We compare the attention maps of InternVL3.5-8B before (base) and after (fine-tuned) training on ArtiAgent. The fine-tuned model reliably focuses on genuine artifact features across both synthesized images and realworld images*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2591_https_arxiv_org_abs_2602_20951/figures/003_Table_1.jpg]]
-*Table 1: Artifact frequency of modern diffusion models*
-
 ![[assets/figures/papers/paper_list_l2591_https_arxiv_org_abs_2602_20951/figures/014_Table_5.jpg]]
 *Table 5: Ablation study on injection steps. Performance of Qwen2.5-VL-7B on ArtiBench binary detection when trained with 1K ArtiAgent samples generated using varying numbers of injection steps out of 25 total steps*
-
-![[assets/figures/papers/paper_list_l2591_https_arxiv_org_abs_2602_20951/figures/012_Figure_7.jpg]]
-*Figure 7: As can be seen in Figure 7, the reward steadily improvesFigure 7. Reward-guided generation. ArtiAgent can train a rethroughout the search rounds, indicating that the diffusionward model that guides diffusion to generate artifact-free images*
-
-![[assets/figures/papers/paper_list_l2591_https_arxiv_org_abs_2602_20951/figures/011_Figure_8.jpg]]
-*Figure 8: Image correction. The ArtiAgent-trained VLM can effectively guide image inpainting models to correct artifact regions*
-
-![[assets/figures/papers/paper_list_l2591_https_arxiv_org_abs_2602_20951/figures/023_Figure_18.jpg]]
-*Figure 18: Hyperparameter study on PE injection and value injection steps (1). The image in the red box shows our selected configuration*
-
-
 
 ## 定位与知识库关联
 
@@ -341,8 +305,6 @@ ArtiAgent 在方法谱系中占据“合成数据驱动的伪影理解”这一�
 2. **去外部依赖**：能否通过知识蒸馏或自训练策略，将商用 VLM 的解释能力压缩至本地模型，实现完全本地化的伪影理解与修正闭环？
 3. **泛化边界**：在 ArtiAgent 合成数据上训练的 VLM 对 Midjourney、DALL·E 3 等商业生成软件真实输出的泛化能力，是否有进一步量化和提升的空间？
 4. **伪影类型的完备性**：如何系统性地定义和覆盖扩散模型的结构性伪影类型谱系，使得合成数据驱动的训练能够逼近真实世界的伪影分布？
-
-
 
 ## 原文 PDF
 

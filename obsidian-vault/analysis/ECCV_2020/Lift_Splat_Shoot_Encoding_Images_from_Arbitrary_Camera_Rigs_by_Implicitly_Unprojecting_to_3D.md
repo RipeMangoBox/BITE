@@ -50,8 +50,6 @@ claims:
 
 在 nuScenes 数据集上，Lift-Splat 在 BEV 车辆分割任务上取得了 **32.06 IOU**，大幅优于无 3D 归纳偏置的 CNN 基线（22.78 IOU），验证了隐式三维提升对多视角融合的关键作用。模型还展现出对相机失效与标定误差的强鲁棒性：训练时随机丢弃相机或向外参添加噪声，可显著提升测试时的容错能力。此外，仅在 nuScenes 上训练后，模型可直接泛化至 Lyft 数据集，获得 **21.35（Car） / 22.59（Vehicle）IOU**，远优于基线方法，证明其具备跨相机配置的迁移能力。在端到端规划任务上，模型通过将规划建模为 K 条模板轨迹上的分类问题，实现了可解释的运动规划，但其泛化性能仍落后于基于激光雷达的方案。
 
-
-
 自动驾驶系统需要从多视角相机图像中理解自车周围的三维场景结构，以支持下游的决策与规划。传统计算机视觉任务（如语义分割）通常在输入图像坐标系中进行预测，但规划任务天然要求在鸟瞰图（Bird’s-Eye-View, BEV）坐标系下进行推理（Fig. 2）。这一坐标系鸿沟构成了多视角视觉感知的核心挑战：如何将分布在不同视角、不同相机参数下的二维图像特征，融合为统一的 BEV 空间表示。
 
 ### 现有方法的瓶颈
@@ -65,8 +63,6 @@ claims:
 本文的核心洞察在于：**单目深度模糊性是多视角 BEV 感知的瓶颈，而非障碍**。关键在于让网络学习为每个像素预测一个在深度方向上的概率分布，以此软加权地将特征“放置”到三维空间中的正确位置。这一思路将深度估计从显式的回归/分类问题转化为可学习的注意力机制——网络根据像素的语义上下文，自行决定其特征应分布在视锥射线上的哪些深度区间。
 
 基于此，作者提出了 **Lift-Splat-Shoot** 范式：首先将每张图像“提升”（Lift）为相机视锥中的三维特征点云，再将所有视锥“投射”（Splat）到统一的 BEV 网格，最后由 BEV CNN 学习从数据中融合多视角信息。该设计天然保持了三个关键的等变性：**平移等变性**（BEV 卷积的固有属性）、**置换等变性**（对相机顺序不敏感）和**自车等距等变性**（旋转或平移自车等同于旋转或平移 BEV 表示），使得网络无需手工设计融合规则即可从任意相机配置中学习连贯的场景表示（Section 1）。
-
-
 
 ## 核心方法与创新机理
 
@@ -101,8 +97,6 @@ Lift-Splat-Shoot 的 **Splat** 步骤将所有相机的视锥点云统一投影�
 这种端到端可学习性直接催生了模型在鲁棒性方面的涌现行为。实验表明（Fig. 6），当训练时随机丢弃一个相机（camera dropout）或向外参添加高斯噪声，模型在测试时对相机失效和标定误差的容忍度显著提升。作者将此归因于 BEV CNN 被迫学习不同相机图像之间的相关性，类似于 dropout 的正则化效应。这种鲁棒性并非通过手工设计的故障模式注入，而是从数据中自动习得的跨相机融合策略的自然结果。
 
 综上所述，Lift-Splat-Shoot 的创新本质在于：通过将深度模糊性建模为可学习的概率分布，并将多相机几何投影嵌入到端到端的可微流水线中，网络得以在没有显式深度监督的情况下，从 BEV 层面的任务目标出发，自主发现如何将二维图像证据“提升”到三维空间并进行跨视角融合。这一范式为后续的 BEV 感知工作奠定了核心方法论基础。
-
-
 
 Lift-Splat-Shoot 的整体 pipeline 由三条对称性驱动的设计原则贯穿始终：**平移等变性**（BEV 网格上的 CNN 天然保持）、**置换不变性**（对任意顺序的相机输入，柱状池化后的 BEV 表示保持一致）以及**自车等距等变性**（仅依赖相机外参的旋转与平移，不额外依赖自车坐标系原点选择）。在这三条原则的约束下，模型将多视角图像到 BEV 语义/规划的映射分解为四个核心模块，形成端到端可微的计算图。
 
@@ -152,8 +146,6 @@ Fig. 4 给出了完整的架构概览，数据流依次经过以下模块：
 pipeline 本身支持两种训练时的数据增强策略，以提升测试时的鲁棒性：
 - **外参噪声注入**：训练时向外参添加高斯噪声，使模型在测试时能够容忍更大的标定误差（Fig. 6a）。
 - **相机随机丢弃**：训练时随机丢弃一个相机，迫使 BEV CNN 学习跨相机图像的相关性，使模型在测试时面对相机完全失效仍能保持合理预测（Fig. 6b）。
-
-
 
 Lift-Splat-Shoot 的核心架构由三个可微模块串联构成，分别对应“提升—投射—发射”的语义流程。以下逐一解析各模块的设计逻辑与关键公式。
 
@@ -206,8 +198,6 @@ $$p(\tau_i|o) = \frac{\exp\left(-\sum_{x_i,y_i\in\tau_i} c_o(x_i,y_i)\right)}{\s
 ### 模块间的因果链路
 
 Lift 的深度分布学习为 Splat 提供了空间上有意义的特征点云；Splat 的柱状池化将多视角信息压缩为统一的 BEV 表示；BEV CNN 在此基础上提取任务相关特征，输出分割图或代价图；Shoot 则将代价图转化为可执行的轨迹决策。整个管线中，**深度分布是唯一的信息瓶颈**——如果 Lift 无法正确推断深度，后续所有模块的性能都将受到根本性制约。这也解释了为何在夜间等低光照条件下，模型性能会显著下降（见 Fig. 10），因为图像质量退化直接冲击了深度分布预测的可靠性。
-
-
 
 ## 实验与关键发现
 
@@ -269,8 +259,6 @@ Lift-Splat-Shoot 在 nuScenes 数据集上进行了全面的 BEV 语义分割评
 3. **Lyft 数据集的划分差异**：Lyft 数据集缺少官方训练/验证划分，作者自行分割，可能导致与其他工作在相同数据集上的结果不可直接对比。
 4. **模板轨迹的分布偏差**：规划任务中使用的模板轨迹提取自 nuScenes 训练集专家轨迹，可能对 nuScenes 场景分布存在一定过拟合。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l44_https_arxiv_org_abs_2008_05711/figures/010_Table.jpg]]
 
 ![[assets/figures/papers/paper_list_l44_https_arxiv_org_abs_2008_05711/figures/012_Table_4.jpg]]
@@ -279,15 +267,11 @@ Lift-Splat-Shoot 在 nuScenes 数据集上进行了全面的 BEV 语义分割评
 ![[assets/figures/papers/paper_list_l44_https_arxiv_org_abs_2008_05711/figures/014_Figure_9.jpg]]
 *Figure 9: We qualitatively show how our model performs given an entirely new camera rig at test time. Road segmentation is shown in orange, lane segmentation is shown in green, and vehicle segmentation is shown in blue. Table 5: When compared to models that use oracle depth from lidar, there is still room for improvement. Video inference from camera rigs is likely necessary to acquire the depth estimates necessary to surpass lidar*
 
-![[assets/figures/papers/paper_list_l44_https_arxiv_org_abs_2008_05711/figures/019_Table.jpg]]
-
 ![[assets/figures/papers/paper_list_l44_https_arxiv_org_abs_2008_05711/figures/009_Figure_7.jpg]]
 *Figure 7: We measure intersection-over-union of car segmentation when each of the cameras is missing. The backwards camera on the nuScenes camera rig has a wider field of view so it is intuitive that losing this camera causes the biggest decrease in performance relative to performance given the full camera rig (labeled “full” on the right)*
 
 ![[assets/figures/papers/paper_list_l44_https_arxiv_org_abs_2008_05711/figures/017_Figure_10.jpg]]
 *Figure 10: We compare how our model’s performance varies over depth and weather. As expected, our model drops in performance relative to pointpillars at nighttime*
-
-
 
 ## 定位与知识库关联
 
@@ -336,8 +320,6 @@ Lift-Splat-Shoot 所解决的核心瓶颈在于**单目深度模糊性**与**多
 4. **规划框架的灵活性**：端到端规划当前被框定为模板轨迹的分类问题。能否引入更丰富的车辆动力学约束和交互建模（如对其他交通参与者的轨迹预测），使规划框架超越固定模板的局限，处理更复杂的驾驶决策？
 
 5. **深度分布的可解释性**：学习到的深度分布是否真正对应了场景的几何结构，还是仅仅作为“特征路由”的黑箱工具？对深度分布的显式正则化或弱监督是否有助于提升跨域泛化能力？
-
-
 
 ## 原文 PDF
 

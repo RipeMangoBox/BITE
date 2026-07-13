@@ -62,8 +62,6 @@ ReCapture 将用户视频的相机重定位任务分解为两个阶段，其核�
 
 在 Kubric-4D 数据集上，ReCapture 的 PSNR 达到 20.92，显著优于 Generative Camera Dolly 及其他4D重建方法（Table 2）。在 VBench 基准上，ReCapture 的主体一致性（Subject Consistency）达到 88.53%，比 Generative Camera Dolly 的 83.02% 高出 5.51 个百分点（Table 1）。消融实验进一步证实，掩码视频微调、空间 LoRA 和 SDEdit 后处理三个组件各自均带来显著性能提升（Table 3），验证了方法设计的有效性。
 
-
-
 ### 问题背景
 
 用户拍摄的视频受限于录制时的相机轨迹，观众只能从固定的视角观察场景。若能对任意用户视频施加任意的相机控制——例如环绕拍摄、推拉镜头或平移视角——将极大拓展视频创作的自由度。然而，从单目视频生成新视角视频面临双重挑战：一方面需要保持原始场景的动态内容（人物动作、物体运动），另一方面必须合理想象并填补因视角变化而暴露出的未观测区域。
@@ -84,8 +82,6 @@ ReCapture 将用户视频的相机重定位任务分解为两个阶段，其核�
 2. **掩码视频微调**：利用预训练视频扩散模型的强大运动先验，通过掩码扩散损失和低秩适应（LoRA）对锚点视频进行修复和补全，生成时空一致的干净视频。
 
 这一设计使得 ReCapture **无需任何配对训练数据**，仅依赖用户提供的单目视频和目标相机轨迹，即可保留原始场景运动并合理想象未观测区域。该方法将问题重新定义为视频到视频的再生翻译任务，充分释放了视频扩散模型的内在先验能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -122,8 +118,6 @@ Generative Camera Dolly 采用端到端的生成范式，直接从源视频和�
 
 这些 changed slots 并非孤立改进，而是形成了一个**因果闭环**：单目数据可用性（slot 1）使得两阶段流程成为可能（slot 2），而两阶段流程中锚点视频的“不完整性”又催生了对掩码微调策略的需求（slot 3）。掩码损失确保模型不被无效像素误导，双 LoRA 架构则分别处理运动连贯性和外观保真度这两个相互制约的目标。最终，这一设计使得 ReCapture 在 VBench 的主体一致性（Subject Consistency）上达到 88.53%，比需要配对数据的 Generative Camera Dolly（83.02%）高出 5.51 个百分点（Table 1），同时在 Kubric-4D 数据集上取得了 20.92 的 PSNR（Table 2），验证了“无配对数据”范式不仅可行，而且在关键指标上超越了依赖配对数据的方法。
 
-
-
 ReCapture 提出了一种**两阶段视频到视频翻译**范式，将用户提供的单目视频与任意目标相机轨迹作为输入，输出一段在新视角下保持场景动态一致的重渲染视频。其核心设计哲学是：**不依赖成对的4D训练数据，而是借助预训练视频扩散模型的强大生成先验，通过“生成—修复”的闭环完成相机重定位**。
 
 ### 两阶段流水线
@@ -159,16 +153,6 @@ ReCapture 提出了一种**两阶段视频到视频翻译**范式，将用户提
 ```
 
 整个流程的关键瓶颈在于**阶段二**：掩码微调是连接“粗糙锚点”与“高质量输出”的桥梁，它利用视频扩散模型的运动先验来修复阶段一无法处理的空洞和噪声，同时避免了对配对4D数据的依赖。消融实验（Table 3, Figure 8）证实，时间LoRA、空间LoRA和SDEdit三者各自均带来显著增益，移除任一组件都会导致时间一致性下降或视觉质量劣化。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2411_05003/figures/002_Figure_2.jpg]]
-*Figure 2: ReCapture consists, at setup time, of (a) Anchor video generation (b) Masked video fine-tuning using spatial and temporal LoRAs. To generate the clean output video with the new camera trajectory we simply perform inference of the video model*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2411_05003/figures/001_Figure_1.jpg]]
-*Figure 1: Given a user-provided source video, using ReCapture, we are able to generate a new version of the video with a new customized camera trajectory. Notice that the motion of the subject and scene in the video is preserved, and the scene is observed from angles that are not present in the source video*
-
-
 
 ReCapture 将用户视频的相机重定位任务分解为两个核心阶段：**锚点视频生成**与**掩码视频微调**。其关键在于，第一阶段生成带有空洞和噪声的锚点视频，第二阶段利用预训练视频扩散模型的强大先验进行修复和补全，从而避免了对配对 4D 训练数据的依赖。
 
@@ -242,19 +226,6 @@ $$
 
 微调完成后，ReCapture 使用空间 LoRA（省略时间 LoRA）对输出视频执行 SDEdit 去噪步骤，以消除残余模糊并增强帧间一致性。消融实验证实，这一后处理步骤对最终视觉质量有显著贡献。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2411_05003/figures/003_Figure_4.jpg]]
-*Figure 4: Anchor video generation using depth estimation to turn each frame into a point cloud and then generating new views by controlling the camera pose*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2411_05003/figures/004_Figure_3.jpg]]
-*Figure 3: Anchor video generation using image-level multiviewdiffusion models to generate new views frame-by-frame*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2411_05003/figures/008_Figure_7.jpg]]
-*Figure 7: Visualization of the effectiveness of masked video fine-tuning (Stage 2) for generating spatially and temporally coherent outputs from noisy anchor videos*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -300,8 +271,6 @@ Figure 5 展示了 ReCapture 与 Generative Camera Dolly 在轨道相机轨迹�
 
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2411_05003/figures/006_Figure_6.jpg]]
 *Figure 6: Gallery of generated videos with novel and unseen user-provided camera trajectories using ReCapture*
-
-
 
 ## 定位与知识库关联
 
@@ -381,8 +350,6 @@ $$\mathcal{L}_{temp} = \mathbb{E}_{\epsilon, t} \left[ \mathbf{M}^a \cdot \left|
 ReCapture 代表了**从显式4D重建到隐式生成式新视角合成**的范式转变。其核心贡献不在于提出全新的网络架构，而在于**将视频扩散模型的强大先验通过掩码微调策略适配到任意视频的相机重控制任务**。这一思路可推广到其他需要“保留已知、补全未知”的视频编辑任务，如视频修复、视角插值等。
 
 后续工作可能沿以下方向展开：引入更强的深度估计或几何约束以改善锚点视频质量；设计端到端的单阶段方法以减少计算开销；扩展到手动物体运动与相机运动的联合控制；以及在更大规模的真实世界视频上验证泛化能力。
-
-
 
 ## 原文 PDF
 

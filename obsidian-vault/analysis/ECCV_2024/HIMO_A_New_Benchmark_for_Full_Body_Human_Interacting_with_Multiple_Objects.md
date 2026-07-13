@@ -51,8 +51,6 @@ HIMO 数据集包含 3,376 条 4D HOI 序列、9.44 小时与 4.08M 帧数据，
 
 实验表明，在 2 物体分区上，HIMO-Gen 的 FID 降至 1.4811，显著优于 MDM 的 6.8457；在 3 物体分区上，R-Precision Top 3 达到 0.5350，MM-Dist 降至 5.0866。消融研究证实，互注意模块与物体对损失对生成质量至关重要——移除互注意模块后，2 物体分区的 R-Precision Top 3 从 0.6369 骤降至 0.4710。该工作为多物体 HOI 合成建立了数据基础与生成范式，但当前仍局限于 MoCap 模态，对未见物体几何的泛化存在接触缺陷，且自回归过渡机制缺乏自适应策略。
 
-
-
 ### 人-物交互生成：从单物体到多物体的范式跃迁
 
 生成自然、协调的人与物体交互（Human-Object Interaction, HOI）运动序列，是计算机视觉与图形学中长期存在的核心挑战。其应用涵盖机器人学习、虚拟现实、动画制作等领域。然而，现有研究长期受困于一个根本性瓶颈：**人-物交互数据集普遍局限于单物体场景，缺乏多物体交互的精细标注数据**。这导致模型无法有效学习多物体间的时空协调关系，更无法合成复杂、多步骤的交互序列。
@@ -80,8 +78,6 @@ HIMO 数据集包含 3,376 条 4D HOI 序列、9.44 小时与 4.08M 帧数据，
 - **自回归生成流水线**：将长序列分解为多个交互片段，以前一片段的末尾若干帧（经验最优为10帧）为条件生成下一片段，实现平滑的片段过渡与多步骤时序组合。
 
 通过数据与方法的协同设计，HIMO基准为多物体HOI生成提供了标准化的评估平台，而HIMO-Gen/HIMO-SegGen框架则为这一新任务提供了具有竞争力的基线方案。
-
-
 
 ## 核心方法与创新机理
 
@@ -120,8 +116,6 @@ $$\mathcal{L} = \lambda_{vel} \mathcal{L}_{vel} + \lambda_{pos} \mathcal{L}_{pos
 ### 创新点之间的耦合关系
 
 上述三个 changed slots 并非孤立设计，而是形成了一条因果链：**双分支架构**提供了人-物解耦的表示空间，**互注意模块**保证了该空间中的信息对齐，**物体对损失**约束了多物体间的空间一致性，而**自回归流水线**则将这一框架从单步交互扩展到多步长序列。任一环节的缺失都会导致性能显著下降，这从消融实验中各模块独立移除后的指标退化幅度可以得到印证。
-
-
 
 HIMO-Gen 的整体生成框架围绕“解耦-融合-组合”三条主线构建，旨在从文本描述和初始状态出发，合成全身人体与多物体协调交互的 4D 运动序列。其核心设计动机源于一个关键瓶颈：单分支扩散模型难以同时捕捉人体运动与多物体运动的时空耦合关系，尤其在物体间存在功能关联（如“拿起杯子-倒水”）时，缺乏显式的物体间空间约束。
 
@@ -185,8 +179,6 @@ $$ \mathcal{L} = \lambda_{vel} \mathcal{L}_{vel} + \lambda_{pos} \mathcal{L}_{po
 - 多物体刚体运动轨迹（位姿序列）
 
 **数据流**：文本经 CLIP 编码后作为全局条件注入两个分支；初始状态作为扩散模型的起点；双分支在去噪的每一步通过互注意模块交换信息；最终生成的参数序列可通过 SMPL-X 模型和物体网格渲染为可视化的 4D 交互序列（Fig. 6）。
-
-
 
 ### 双分支扩散生成架构
 
@@ -252,12 +244,8 @@ $$
 
 针对多步骤交互的长序列生成，HIMO-SegGen 采用**自回归流水线**：将完整交互序列按文本描述的时域分割边界切分为多个片段，以前一片段的最后若干帧为条件生成下一片段。条件帧数通过实验确定：使用 10 帧作为条件在 FID (4.2004)、R-Precision 和 MM-Dist 上均达到最佳（Table 5），能够在上下文信息保留与片段间过渡平滑性之间取得最优平衡。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1760_HIMO_A_New_Benchmark_for_Full_Body_Human_Interacting_with_Multiple_Objec/figures/006_Figure_5.jpg]]
 *Figure 5: The auto-regressive generation pipeline. The auto-regressive pipeline to iteratively generate the HOI synthesis results. We obtain the subsequent motion conditioned on the last few frames of the previously generated motion*
-
-
 
 ## 实验与关键发现
 
@@ -303,30 +291,8 @@ $$
 
 开放问题包括：能否将流水线扩展至开放词汇的物体类别？如何与神经渲染技术结合以生成外观逼真的交互视频？这些方向有待后续工作探索。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1760_HIMO_A_New_Benchmark_for_Full_Body_Human_Interacting_with_Multiple_Objec/figures/002_Table_1.jpg]]
 *Table 1: Dataset comparisons. We compare the HIMO dataset with existing human-object interaction datasets. “Multi-object”, “Segment” and*
-
-![[assets/figures/papers/paper_list_l1760_HIMO_A_New_Benchmark_for_Full_Body_Human_Interacting_with_Multiple_Objec/figures/011_Table_5.jpg]]
-*Table 5: Ablation studies of the frame number of conditioned frames for HIMO-SegGen on 2-objects partition of the HIMO dataset*
-
-![[assets/figures/papers/paper_list_l1760_HIMO_A_New_Benchmark_for_Full_Body_Human_Interacting_with_Multiple_Objec/figures/009_Figure_6.jpg]]
-*Figure 6: Visualization results. Our HIMO-Gen framework can generate plausible and realistic sequences of human interacting with multiple objects*
-
-![[assets/figures/papers/paper_list_l1760_HIMO_A_New_Benchmark_for_Full_Body_Human_Interacting_with_Multiple_Objec/figures/003_Figure_2.jpg]]
-*Figure 2: Overview of the HIMO capture system. (a). We combine the Optitrack MoCap framework and the inertial gloves as a hybrid MoCap system. (b). Some examples of the 3D printed objects and the attached reflective markers. (c). The whole HOI MoCap framework, where the objects, the human body and hands of the subject are spatially aligned, and the Optitrack and inertial gloves are temporally synchronized*
-
-![[assets/figures/papers/paper_list_l1760_HIMO_A_New_Benchmark_for_Full_Body_Human_Interacting_with_Multiple_Objec/figures/013_Figure.jpg]]
-*Figure: Fig. A: Visualization of the distribution of object combinations. Fig. B: Generalization experiment on unseen object meshes*
-
-![[assets/figures/papers/paper_list_l1760_HIMO_A_New_Benchmark_for_Full_Body_Human_Interacting_with_Multiple_Objec/figures/014_Figure.jpg]]
-*Figure: Fig. C: Generalization experiment on novel HOI compositions. The text in blue denotes the novel HOI action*
-
-![[assets/figures/papers/paper_list_l1760_HIMO_A_New_Benchmark_for_Full_Body_Human_Interacting_with_Multiple_Objec/figures/017_Figure.jpg]]
-*Figure: Fig. F: Visualization results of HIMO-SegGen*
-
-
 
 ## 定位与知识库关联
 
@@ -371,8 +337,6 @@ HIMO-Gen 在 HOI 生成领域的知识谱系中占据以下位置：
 - **并行工作**：与同期关注 HOI 生成的工作（如 IMoS）相比，HIMO-Gen 的核心区分点在于**多物体协调**和**时序分割生成**，这两个维度在现有基准中均未被系统探索。
 
 - **下游推动**：HIMO 数据集本身填补了多物体交互标注数据的空白（3.3K 序列，含 2-3 物体，细粒度文本和时域分割），为后续研究提供了基准。HIMO-Gen 的双分支架构和自回归流水线可作为未来多体交互生成任务的基线框架。
-
-
 
 ## 原文 PDF
 

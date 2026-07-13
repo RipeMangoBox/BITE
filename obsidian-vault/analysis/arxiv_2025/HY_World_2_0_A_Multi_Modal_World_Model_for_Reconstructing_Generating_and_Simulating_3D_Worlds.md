@@ -82,8 +82,6 @@ HY-World 2.0建立在多个前沿工作的基础之上，并通过关键模块�
 
 HY-World 2.0仍存在若干局限：深度对齐中的异常检测可能将整条视频标记为离群值导致失效；天空分割（SAM3）在阴天或夜间场景可能出错；管线依赖多个大规模预训练模型，整体鲁棒性受限于这些组件的性能；端到端世界生成耗时约10分钟（NVIDIA H20），离实时交互仍有距离。这些局限指向若干开放问题，包括如何自适应恢复被误判的离群视频、如何在复杂光照下稳定天空掩码、如何进一步降低管线延迟，以及能否将轨迹规划与强化学习结合以自监督方式发现最优探索路径。
 
-
-
 ### 3D世界模型的演进与割裂
 
 构建可交互的沉浸式3D世界是计算机视觉与图形学的长期目标。近年来，3D世界模型取得了显著进展，但其发展路径呈现出明显的**任务割裂**：一方面，以视频扩散模型为代表的**生成式方法**能够从文本或单张图像合成丰富的动态场景，却难以保证严格的几何一致性；另一方面，以多视图立体重建为核心的**重建式方法**能够从多视角输入中精确恢复3D几何，但缺乏对未观测区域的生成式先验，无法自主扩展世界边界。更关键的是，开源社区长期缺少一个能够**在同一框架内统一生成与重建**的多模态世界模型，使得研究者难以在两类能力之间建立系统性的关联与互补。
@@ -107,8 +105,6 @@ HY-World 2.0仍存在若干局限：深度对齐中的异常检测可能将整�
 ### 本文的动机与核心思路
 
 针对上述瓶颈，HY-World 2.0的动机明确：**构建首个开源、系统化的多模态世界模型，在同一框架内无缝统一世界生成与世界重建**。其核心洞察在于：将视频扩散模型的生成式先验与前馈重建模型的几何严谨性融合为一体化管线——通过全景生成建立世界初始化，利用场景解析与轨迹规划确定探索路径，借助记忆机制实现一致的世界扩展，最终通过深度对齐与定制3DGS优化合成可导航的3D表达。这一设计既可利用扩散模型先验提升生成世界的逼真度和可探索范围，又能通过前馈多模态重建保证多视图输入的几何精确性，从而在开源范式下弥合生成与重建之间的鸿沟。
-
-
 
 ## 核心方法与创新机理
 
@@ -153,8 +149,6 @@ HY-World 2.0 的核心创新在于通过四阶段管线将**视频扩散模型�
 ### 创新总结
 
 上述五个 changed slots 共同构成了 HY-World 2.0 的核心创新体系：**生成侧**通过隐式全景映射和 Keyframe-VAE 提升视觉先验的质量，**一致性与扩展侧**通过双重记忆机制保证多轨迹世界的几何与纹理连贯性，**重建侧**通过归一化编码和深度-法线耦合保证多视图输入的几何精确性，**合成侧**通过定制化 3DGS 优化实现高效渲染。这一体系使得 HY-World 2.0 成为首个在同一框架内统一高质量世界生成与精确世界重建的开源多模态世界模型，在多项基准上达到开源方法最优，与闭源模型 **Marble**（World Labs, 2025）性能相当。
-
-
 
 HY‑World 2.0 是一个多模态世界模型，将**世界生成**与**世界重建**统一于同一框架之内。其核心设计围绕一条四阶段管线展开，同时以升级的前馈重建模型为补充，使系统既能从稀疏输入（文本或单视图图像）合成可导航的 3D 场景，又能从多视图观测中恢复精确的几何表示。该框架的总体架构如 **Figure 2** 所示。
 
@@ -207,8 +201,6 @@ HY‑World 2.0 是一个多模态世界模型，将**世界生成**与**世界�
 
 整个管线将扩散模型的生成式先验与前馈重建的几何严谨性有机融合：全景生成与视频扩散提供丰富的动态先验以扩展可探索范围，而 WorldMirror 2.0 的深度对齐与归一化编码则确保多视图输入的几何精确性。这一设计直接回应了现有 3D 世界模型在生成与重建任务间长期割裂的瓶颈——生成方法难以保持几何一致性，重建方法缺乏对未见区域的生成式先验。
 
-
-
 HY-World 2.0 的四阶段管线由六个核心模块构成：**HY-Pano 2.0**（全景生成）、**WorldNav**（轨迹规划）、**WorldStereo 2.0**（世界扩展）、**WorldMirror 2.0**（前馈重建）、**World Composition**（世界融合）与 **WorldLens**（渲染平台）。各模块通过关键公式将扩散先验与几何约束耦合，以下逐一剖析。
 
 ### HY-Pano 2.0：隐式全景映射
@@ -238,9 +230,6 @@ $$\nabla \mathcal{L}_{\mathrm{DMD}} = -\mathbb{E}_{t} \left( \int \left( s_{\mat
 ### WorldMirror 2.0：分辨率无关的前馈重建
 
 WorldMirror 2.0 对 WorldMirror 1.0 进行了三项关键升级（对比见 Table 3）：
-
-![[assets/figures/papers/HY-World_2.0_A_Multi-Modal_World_Model_for_Reconstructing_Generating_and_Simulat_6a92b680015f/figures/016_Table_3.jpg]]
-*Table 3: Comparison between WorldMirror 1.0 and WorldMirror 2.0. Improvements are organized by model architecture (Sec. 6.2), training data, and training strategy (Sec. 6.5). The bottom section summarizes the resulting capability gains*
 
 **归一化位置编码**：将图像块网格坐标映射到固定 $[-1, 1]$ 范围，实现分辨率无关的位置编码：
 
@@ -272,13 +261,6 @@ $$\mathcal{L}_{\mathrm{GS}} = \mathcal{L}_{\mathrm{color}} + \mathcal{L}_{\mathr
 
 上述模块通过信息流形成闭环：HY-Pano 2.0 提供全景初始化 → WorldNav 基于场景解析规划探索轨迹 → WorldStereo 2.0 利用 GGM 和 SSM++ 沿轨迹生成几何一致的关键帧 → WorldMirror 2.0 从关键帧前馈预测点云、深度和法线 → World Composition 通过点云扭曲和深度对齐将生成内容融合为统一的 3DGS 表示 → WorldLens 提供实时渲染与交互。这一管线将视频扩散模型的生成式先验与前馈重建的几何严谨性有机融合，在同一框架内统一了生成与重建。
 
-### 补充图表
-
-![[assets/figures/papers/HY-World_2.0_A_Multi-Modal_World_Model_for_Reconstructing_Generating_and_Simulat_6a92b680015f/figures/012_Figure_9.jpg]]
-*Figure 9: Keyframe-VAE in WorldStereo 2.0 versus a standard Video-VAE [64]. Unlike (a) Video-VAE, which performs spatio-temporal compression, (b) Keyframe-VAE applies spatial-only compression to better preserve high-frequency details and reduce artifacts essentially caused by Video-VAE encoding (e.g., motion blur and geometric distortion). Specifically, Keyframe-VAE loops the causal padding-based image encoding over ( 1 + $T _ { k f }$ ) times with a sparse frame set ( $T _ { k f } \ll T _ { v i d }$ ) that spans the same viewpoint changes by sampling at larger temporal intervals*
-
-
-
 ## 实验与关键发现
 
 ### 核心性能全景
@@ -298,9 +280,6 @@ WorldStereo 2.0 在相机控制精度上相比基线 **WorldStereo**（Tencent H
 1. **Keyframe‑VAE 替代时空 Video‑VAE**：纯空间压缩保留高频细节，在大视角变化下显著提升生成帧的保真度，同时保持相机可控性（Fig. 8, Tab. 7，置信度 0.9）。
 2. **记忆机制消融**：同时集成 GGM 和 SSM++ 大幅改善光度质量与多轨迹一致性；SSM++ 的空间拼接设计远优于时间拼接方案（Table 8，置信度 0.95）。
 
-![[assets/figures/papers/HY-World_2.0_A_Multi-Modal_World_Model_for_Reconstructing_Generating_and_Simulat_6a92b680015f/figures/011_Figure_8.jpg]]
-*Figure 8: Reconstruction and novel-view generation with different VAE variants. Keyframe-VAE preserves appearance consistency in reconstructions and substantially improves the fidelity of generated novel views, particularly under large viewpoint changes. Please zoom in for details*
-
 此外，域适配阶段冻结交叉注意力和 FFN 层在视觉质量与相机控制精度之间取得了最佳用户偏好（Sec. 8.1.3, Tab. 7），而 DMD 蒸馏在保持相机控制的同时略微提升了光度和一致性指标（Table 8）。
 
 ### 单视图三维重建：生成式先验驱动的几何精度
@@ -311,13 +290,7 @@ WorldStereo 2.0 在相机控制精度上相比基线 **WorldStereo**（Tencent H
 
 WorldMirror 2.0 相比 WorldMirror 1.0 在多个基准上实现了系统性改进。在 7‑Scenes 数据集上，中等分辨率下的点图精度误差从 0.043 降至 0.033（Table 11，置信度 0.95）。更关键的是跨分辨率稳定性：WorldMirror 1.0 在高分辨率下性能严重退化，而 WorldMirror 2.0 借助归一化位置编码（Eq. 4）在从低到高的各分辨率下保持甚至提升重建质量（Fig. 26, Tab. 11，置信度 0.95）。归一化 RoPE 的跨分辨率一致性超过 0.95（Fig. 13），为多尺度部署提供了可靠保证。
 
-![[assets/figures/papers/HY-World_2.0_A_Multi-Modal_World_Model_for_Reconstructing_Generating_and_Simulat_6a92b680015f/figures/017_Figure_13.jpg]]
-*Figure 13: Analysis of normalized position encoding. (a) Average cosine similarity of centerpoint RoPE encodings to other resolutions. Normalized RoPE maintains high cross-resolution consistency (> 0.95), while standard RoPE degrades significantly. (b) and (c) show the mean and standard deviation of encoding values across resolutions, respectively. Normalized RoPE exhibits near-constant statistics, whereas standard RoPE shows systematic mean drift, confirming that normalization converts position extrapolation into interpolation*
-
 相机姿态估计方面，7‑Scenes 上的 AUC@30 提升超过 20 个点（Sec. 8.2.1），深度‑法线耦合损失（Eq. 7）和多阶段课程学习共同贡献了这一增益。Table 12–13 进一步覆盖了深度估计、新视角合成和表面法线估计的结果，WorldMirror 2.0 在 DTU、NRGBD、ScanNet、NYUv2 和 iBims‑1 上均表现出竞争力。
-
-![[assets/figures/papers/HY-World_2.0_A_Multi-Modal_World_Model_for_Reconstructing_Generating_and_Simulat_6a92b680015f/figures/037_Table_12.jpg]]
-*Table 12: Results of camera pose estimation and depth estimation (left); Results of novel view synthesis (right). Camera pose and depth are evaluated on RealEstate10K; novel view synthesis is averaged across RealEstate10K and DL3DV. ↑ / ↓ indicate higher-/lower-is-better. Baseline methods are evaluated at M resolution. WorldMirror 2.0 generalizes across multiple resolutions. “L/M/H” denote low / medium / high inference resolution. Best results are highlighted*
 
 ### 3DGS 优化：效率与质量的精细权衡
 
@@ -340,15 +313,8 @@ Figure 19 的定性消融揭示了轨迹规划对世界完整性的关键作用�
 
 这些失败模式提示，在复杂光照或非典型场景下，端到端生成质量可能出现退化，实际部署需进行场景适配评估。
 
-### 补充图表
-
 ![[assets/figures/papers/HY-World_2.0_A_Multi-Modal_World_Model_for_Reconstructing_Generating_and_Simulat_6a92b680015f/figures/006_Figure_5.jpg]]
 *Figure 5: Illustration of five modes of trajectories planned in WorldNav. Some trajectories are omitted for a simplified visualization*
-
-![[assets/figures/papers/HY-World_2.0_A_Multi-Modal_World_Model_for_Reconstructing_Generating_and_Simulat_6a92b680015f/figures/014_Figure_11.jpg]]
-*Figure 11: Illustration of the RoPE [59] modification in SSM++. Target frames are spatially concatenated with their corresponding retrieved reference views along the horizontal axis (resulting in width 2W ). Crucially, each retrieved view inherits the temporal index of its paired target frame before being fed into the main DiT branch*
-
-
 
 ## 定位与知识库关联
 
@@ -405,8 +371,6 @@ HY-World 2.0 是对 **HY-World 1.0**（Team HunyuanWorld, arXiv 2025）的全面
 3. **实时交互式世界生成**：当前约10分钟的延迟限制了交互式应用，进一步降低管线延迟（如模型量化、更激进的蒸馏、异步管线化）是工程化方向。
 4. **轨迹规划的自主学习**：当前 WorldNav 依赖五种启发式轨迹模式，能否将轨迹规划与强化学习结合，以自监督方式发现最优探索路径，是提升世界覆盖效率的潜在方向。
 5. **多模态输入的深度融合**：当前重建模式未充分利用生成式先验（反之亦然），探索生成与重建的更深层次耦合（如用生成先验填补重建缺失区域）可能进一步提升统一框架的能力边界。
-
-
 
 ## 原文 PDF
 

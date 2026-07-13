@@ -54,8 +54,6 @@ JiT框架由三个关键机制构成：（1）**空间近似生成ODE（SAG-ODE�
 
 **方法定位**：JiT属于扩散模型推理加速中的**空间稀疏计算**路线，与时间域加速方法（高阶求解器、蒸馏、缓存重用）正交互补。相较于Bottleneck Sampling、RALU等空间加速基线，JiT无需额外训练或架构修改，且通过SAG-ODE的精确锚点动力学保证和DMF的阶段转换一致性，在高加速比下仍能维持语义完整性与细节保真度。
 
-
-
 ### 扩散Transformer的空间冗余困境
 
 扩散模型已成为视觉生成的主流范式，而基于Transformer架构的扩散骨干网络（Diffusion Transformer, DiT）凭借其强大的扩展性和生成质量，正逐步取代传统的U-Net架构。然而，DiT的高质量生成伴随着高昂的计算代价：在每一个去噪时间步，Transformer需要对**全部空间token**进行自注意力计算，导致计算量与token数量的平方成正比。以FLUX.1-dev为例，标准50步采样需消耗近3000 TFLOPs的计算量，严重制约了实际部署效率。
@@ -77,8 +75,6 @@ JiT框架由三个关键机制构成：（1）**空间近似生成ODE（SAG-ODE�
 3. **自适应资源分配**：如何根据内容复杂度动态决定哪些空间区域需要优先激活，而非依赖静态的均匀网格划分。
 
 基于上述分析，本文提出**Just-in-Time (JiT)** 框架——一种训练无关的空间加速方法，其核心思想是：**利用扩散模型由粗到细的生成特性，将空间计算资源按需分配，早期仅对少量关键token计算并外推全场速度，后期逐步激活细节区域，实现高加速比且几乎无损的图像生成**。
-
-
 
 ## 核心方法与创新机理
 
@@ -116,8 +112,6 @@ $$\mathbf{Q}_{k}\dot{\mathbf{y}}(t) = \frac{\mathbf{y}_{k}^{\star} - \mathbf{Q}_
 
 上述三个changed slots并非孤立运作，而是形成了一条完整的因果链：**SAG-ODE定义了稀疏计算下的演化规则，ITA决定了“在哪里”以及“何时”增加计算密度，DMF保证了密度切换时的状态连续性**。三者共同实现了JiT的核心理念——将扩散模型固有的由粗到细生成过程，转化为一个训练无关、可按需配置的空间加速框架。在FLUX.1-dev上，这一设计实现了最高7倍的加速，且性能几乎无损。
 
-
-
 JiT框架的核心思想是利用扩散Transformer由粗到细的生成特性，将空间计算资源按需分配：在生成早期仅对少量关键token进行精确的Transformer计算，并通过外推算子将速度场扩展到全空间；随着生成推进，逐步激活更多token以刻画细节。该框架由三个核心模块串联构成，形成一条完整的训练无关加速pipeline。
 
 **输入与输出流**：给定一个预训练的DiT模型（如FLUX.1-dev）和一个文本prompt，JiT的输入是初始噪声隐变量 $\mathbf{y}(0) \sim \mathcal{N}(0, \mathbf{I})$，输出是经过ODE数值积分得到的最终隐变量 $\mathbf{y}(1)$，随后通过标准VAE解码器还原为图像。整个过程无需对DiT模型进行任何微调或蒸馏。
@@ -137,13 +131,6 @@ JiT框架的核心思想是利用扩散Transformer由粗到细的生成特性，
    其中目标状态 $\mathbf{y}_k^\star$ 融合了结构先验（通过插值算子 $\Phi_k$ 从当前预测的干净图像 $\hat{\mathbf{y}}(1)$ 中提取）与正确的噪声水平（通过时间步 $T_k$ 加权混合高斯噪声 $\boldsymbol{\epsilon}$），有效防止了阶段转换产生的artifacts和噪声不匹配。
 
 **整体调度逻辑**：JiT采用嵌套的token索引层次结构 $\Omega_K \subset \Omega_{K-1} \subset \cdots \subset \Omega_0 = \{1,2,\ldots,N\}$，配合Beta分布扭曲的时间步调度（$\alpha=1.4, \beta=0.42$），将计算偏置于早期全局结构建立阶段。默认的3阶段调度在加速比与质量之间取得了最优平衡——早期以约35%的token建立全局低频结构，中期扩展至约62%刻画主要细节，最后阶段激活全部token进行精细完善。完整的采样流程如Algorithm 1所示，交替执行SAG-ODE积分、ITA激活和DMF转换，最终以显著降低的FLOPs（如4×加速下仅706.17 TFLOPs，相比基线2990.96 TFLOPs降低76.4%）实现几乎无损的生成质量。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2527_https_arxiv_org_abs_2603_10744/figures/002_Figure_2.jpg]]
-*Figure 2: An overview of our JiT framework, illustrating its core mechanisms and underlying philosophy. (a) The SAG-ODE evolves the latent state by extrapolating a velocity field computed on a sparse subset of tokens. (b) For stage transitions, the DMF evolves newly incorporated tokens to a structurally coherent target with the correct noise level to prevent artifacts. (c) The visualized evolution of the predicted clean image reveals a coarse-to-fine process (global structures first), motivating our strategy to defer computation on detailed regions. (d) The sampling trajectory visualizes our dynamic resource allocation, where the set of active tokens (red flow) starts as a narrow subset and expands o...*
-
-
 
 ### 核心设计理念
 
@@ -213,13 +200,6 @@ $$\Omega_K \subset \Omega_{K-1} \subset \cdots \subset \Omega_1 \subset \Omega_0
 
 其中 $\Omega_k$ 是第 $k$ 阶段激活的锚点token索引集，满足 $|\Omega_k| = m_k$，且 $m_K < m_{K-1} < \cdots < m_0 = N$。对应的选择矩阵 $\mathbf{S}_k$ 和投影算子 $\mathbf{P}_k = \mathbf{S}_k\mathbf{S}_k^{\top}$ 分别用于提取锚点token和投影到激活子空间。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2527_https_arxiv_org_abs_2603_10744/figures/008_Figure_5.jpg]]
-*Figure 5: An illustration of the construction process for the initial selector matrix*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -255,8 +235,6 @@ JiT展现出良好的泛化能力。在Qwen-image模型上，~4×加速设置下
 - 当前阶段调度和token稀疏度依赖人工设定的超参数（表4），尚未实现全自动优化。
 - 方法主要在流动匹配框架下的DiT模型上验证，在其他架构上的效果有待进一步评估。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2527_https_arxiv_org_abs_2603_10744/figures/003_Table_1.jpg]]
 *Table 1: Quantitative comparison with other methods. The optimal result is represented in bold, and the sub-optimal result is represented in underlining. FLOPs are measured via torch.profiler and the Speed is calculated based on the FLOPs reduction relative to the base model FLUX.1-dev(50)*
 
@@ -269,23 +247,11 @@ JiT展现出良好的泛化能力。在Qwen-image模型上，~4×加速设置下
 ![[assets/figures/papers/paper_list_l2527_https_arxiv_org_abs_2603_10744/figures/007_Figure_4.jpg]]
 *Figure 4: Visual ablation study of each component within JiT*
 
-![[assets/figures/papers/paper_list_l2527_https_arxiv_org_abs_2603_10744/figures/009_Table_4.jpg]]
-*Table 4: Detailed configuration of JiT schedules for different acceleration factors. The sparsity ratio denotes the fraction of tokens activated at each stage relative to the full sequence length N*
-
 ![[assets/figures/papers/paper_list_l2527_https_arxiv_org_abs_2603_10744/figures/010_Figure_6.jpg]]
 *Figure 6: Visual ablation on the number of stages for a fixed total NFE of 18. (a) A 2-stage schedule offers limited acceleration. (b) Our default 3-stage schedule yields the best trade-off. (c) A 4-stage schedule introduces persistent noise due to a late transition to full resolution. This validates that a 3-stage approach offers a superior balance between speed and quality*
 
-![[assets/figures/papers/paper_list_l2527_https_arxiv_org_abs_2603_10744/figures/011_Figure.jpg]]
-*Figure: (a) Aggressive schedule (b) Balanced schedule (c) Conservative schedule*
-
 ![[assets/figures/papers/paper_list_l2527_https_arxiv_org_abs_2603_10744/figures/001_Figure_1.jpg]]
 *Figure 1: Visual showcases of our JiT framework applied to the FLUX.1-dev model. Our method produces high-fidelity and visually compelling images even at significant acceleration factors of 4× and 7×*
-
-![[assets/figures/papers/paper_list_l2527_https_arxiv_org_abs_2603_10744/figures/012_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l2527_https_arxiv_org_abs_2603_10744/figures/004_Figure.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -336,8 +302,6 @@ JiT属于**训练无关的空间稀疏加速**范式，其核心贡献在于首�
 3. **跨架构泛化**：JiT的核心思想——动态选择关键token进行精确计算并外推全场——是否可拓展到其他需要空间token处理的Transformer架构，如视频理解、多模态模型或自回归视觉生成？HunyuanVideo-1.5上的初步结果（Figure 9）显示了在时空域的泛化潜力，但更广泛的验证仍是必要的。
 
 4. **理论分析深化**：SAG-ODE的近似误差界及其与最终生成质量的定量关系尚未建立。这一理论缺口使得超参数选择缺乏原则性指导，也限制了对方法失败模式的系统性理解。
-
-
 
 ## 原文 PDF
 

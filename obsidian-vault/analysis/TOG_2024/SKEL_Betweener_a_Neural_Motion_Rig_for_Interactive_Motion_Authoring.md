@@ -35,7 +35,6 @@ claims:
 | Method |  |
 | Dataset | |
 
-
 > [!tip] 效果简介
 > 量化结果、消融证据与适用边界见“实验与关键发现”。
 
@@ -49,15 +48,11 @@ claims:
 
 技术实现上，模型采用骨骼图网络架构，由关节编码器、骨骼 Transformer（18 层）和关节解码器三部分组成，通过模拟运动编辑过程生成配对数据来训练运动保持版本，从而在保持生成质量的同时支持实时交互式编辑。
 
-
-
 三维角色动画的制作长期面临效率瓶颈。传统关键帧动画流程要求动画师在时间轴上密集地定义角色姿态，一段包含奔跑与跳跃的序列往往需要耗费约一小时的手工调整，而使用 SKEL-Betweener 仅需数分钟即可完成。这种效率鸿沟源于现有工具的输入模式限制：动画师必须提供密集的上下文帧与结束帧，系统才能生成中间过渡，这本质上是一个“补间”（inbetweening）问题，而非真正的运动创作。
 
 现有补间模型的根本局限在于其约束模式过于僵化。以 **TwoStage**（Qin et al., 2022）为代表的方法要求提供稠密的时间上下文和固定的结束帧，输入约束在时间轴上呈现连续块状分布。这种设计使得模型无法处理稀疏、任意分布的中间约束——动画师无法在运动序列的任意时间点对特定关节施加位置或朝向控制。当约束条件偏离训练分布时，TwoStage 生成的全局位置 L2 距离（L2P）显著升高，表明其泛化能力受限于固定的输入范式。
 
 本文的核心动机在于将运动生成从“补间”范式升级为“运动装配”（motion rigging）范式。SKEL-Betweener 仅需首尾两个姿态即可生成完整运动序列，同时支持在任意中间时刻添加任意关节的稀疏约束。这种灵活的输入模式使得动画师可以像操作骨骼绑定控制器一样，通过直觉式的关节级位置与朝向控制来塑造运动——作者将其抽象为“神经运动曲线”（Neural Motion Curves）。为实现这一目标，方法需要解决两个关键挑战：一是在稀疏约束下保持运动学合理性，二是使模型能够理解并响应分布外（out-of-distribution）的约束组合。
-
-
 
 ## 核心方法与创新机理
 
@@ -97,8 +92,6 @@ $$\mathcal{L}_{ME} = \mathcal{L}_{SB} + \lambda_{BM} \mathcal{L}_{BM}$$
 
 在 Lafan1 数据集的 OOD 约束测试中（Table 1），SKEL‑Betweener 的 L2P 误差为 0.032，显著低于 TwoStage，验证了稀疏约束范式在分布外泛化上的优势。
 
-
-
 ![[assets/figures/papers/paper_list_l3_https_doi_org_10_1145_3687941/figures/003_Figure_3.jpg]]
 *Figure 3: Our SKEL-Betweener architecture consists of a Joint Encoder that encodes joint ID, position encoding (PE) and transform for each joint independently. The input motion is then transformed with # = 18 Skeletal Transformer Layers that consist of a Multi-Head A!ention block using a!ention graph and a feed forward network. Finally, the output of the last transformer layer is decoded by the Joint Decoder to give dense positions, orientations and contacts*
 
@@ -117,8 +110,6 @@ SKEL‑Betweener 的 pipeline 围绕“从稀疏约束到稠密运动”这一�
 **推理流程**：推理时，用户只需提供首尾两帧姿态以及可选的任意中间约束点，系统先插值生成稠密初始运动，再经编码器‑Transformer‑解码器前向传播，输出满足约束的完整运动序列。模型在 RTX 3090 上的执行时间约为 27 ms，足以支持 Blender 中 24 FPS 的实时预览。
 
 **运动编辑扩展**：在基础框架之上，SKEL‑Betweener 引入了一个运动保持版本（SKEL‑Betweener*）。该版本以一段已有的“基础运动”作为初始化（而非插值），并在损失函数中增加基础运动保持项 $\mathcal{L}_{BM}$，使模型在满足新约束的同时尽可能保留原始运动的高频细节。这一扩展使得 pipeline 可同时用于运动编辑任务，而不仅仅是两帧间的插值生成。
-
-
 
 ### 3.1 稀疏控制插值初始化
 
@@ -168,8 +159,6 @@ $$\mathcal{L}_{ME} = \mathcal{L}_{SB} + \lambda_{BM} \cdot \mathcal{L}_{BM}$$
 
 其中 $\mathcal{L}_{SB}$ 为 SKEL-Betweener 的基础损失，$\mathcal{L}_{BM}$ 为基础运动保持损失，$\lambda_{BM}$ 控制二者的相对权重。当基础运动与目标输出差异显著时，重建损失与基础运动保持损失呈对抗关系，需通过权重调节平衡约束满足与运动保真度。
 
-
-
 ## 实验与关键发现
 
 ### 主结果：稀疏约束下的运动生成
@@ -209,12 +198,8 @@ Table 3 和 Fig. 6 展示了 3D 视口中 Neural Motion Rig（NMR）的实�
 - **视觉混乱**：当 Neural Motion Curves 超过四条时，3D 视口中的控制手柄会显著遮挡场景，影响操作精度。
 - **用户预期偏差**：添加新约束而不移动其位置时，模型仍可能改变整体运动，与“仅添加关键帧不应改变已有曲线”的用户直觉相悖。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l3_https_doi_org_10_1145_3687941/figures/002_Figure_2.jpg]]
 *Figure 2: (c) Sparse Motion Editing Fig. 2. Input pa!erns of constraints (blue) for joints (vertical axis) over time (horizontal axis). In previous inbetweening models such as [Qin et al. 2022], a dense context and an end frame must be provided, as shown in (a). In addition partial or full constrained frames may be given. In contrast, our method (SKEL-Betweener) shown in (b) only requires two frames, and enables individual joint level controls. Lastly, we unlock motion editing via a motion-preservation bias, which is illustrated with so" blue in (c)*
-
-
 
 ## 定位与知识库关联
 
@@ -262,8 +247,6 @@ $$\mathcal{L}_{ME} = \mathcal{L}_{SB} + \lambda_{BM} \mathcal{L}_{BM}$$
 - 如何改进 UI 设计，帮助用户识别每个控制球对应的精确时间步？
 - 如何在保持实时性的前提下扩展模型以处理更长运动序列？
 - 如何降低约束满足的偏移量，实现非破坏性编辑工作流？
-
-
 
 ## 原文 PDF
 

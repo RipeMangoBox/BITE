@@ -53,8 +53,6 @@ GeoMotion 提出了一种范式转换：**绕开显式对应估计与逐场景�
 
 该方法在方法谱系中位于**前馈几何感知运动分割**这一新兴范式，区别于基于2D光流的前馈方法（如 OCLR-flow、ABR）和基于重建的迭代方法（如 Easi3R、VGGT4D）。其知识库定位融合了4D重建（π³的交替注意力主干与相机姿态解码器）、2D运动估计（RAFT光流）与视觉基础模型（DINOv2 图像编码器、SAM2 掩码细化），通过冻结预训练模块与轻量运动解码器的组合，在保持泛化性的同时实现高效推理。
 
-
-
 ### 运动分割的核心瓶颈：显式对应估计的困境
 
 运动分割旨在从视频中分离出与背景运动不一致的动态物体区域，是视频理解、自动驾驶和机器人感知中的基础任务。传统方法的主流范式可概括为“显式运动估计→迭代优化”两阶段流水线：首先通过光流估计、点对应匹配或长程轨迹提取获得像素级运动线索，随后利用聚类、图割或条件随机场等迭代优化手段将运动信息转化为分割掩码。
@@ -78,8 +76,6 @@ GeoMotion 提出了一种范式转换：**绕开显式对应估计与逐场景�
 GeoMotion的核心动机由此产生：**能否绕开显式运动估计和迭代优化，直接从预训练4D重建模型的潜在几何特征中解码运动掩码？** 这一思路将运动分割重新定义为从几何表示中“读取”运动信息的前馈任务，而非从噪声对应关系中“推断”运动的优化问题。其潜在优势是双重的：在精度上，4D几何先验提供了比局部光流更全局、更鲁棒的运动线索；在效率上，单次前馈推理消除了迭代优化的计算开销。
 
 这一动机驱动了GeoMotion框架的设计——通过融合预训练4D几何特征、光流特征与相机姿态信息，以端到端前馈方式完成运动分割，在保持高精度的同时将推理速度提升至0.31秒/帧，为运动分割的实用化部署开辟了新路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -106,8 +102,6 @@ $$
 ### 运动解码器初始化：从随机初始化到几何预训练迁移
 
 GeoMotion的运动解码器并未随机初始化，而是复用了π³置信度解码器的预训练权重。π³的置信度解码器原本训练用于基于重建残差预测逐像素可靠性，这一任务与运动分割在“识别不可靠/异常区域”上存在语义关联。Figure 5的消融实验表明，该初始化策略相比随机初始化收敛更快、IoU更高，验证了大规模几何预训练的迁移价值。这一设计使运动解码器在训练初期即具备对几何异常区域的感知能力，加速了向运动掩码解码的适配。
-
-
 
 GeoMotion 提出了一种**端到端前馈运动分割框架**，其核心设计理念是绕开显式运动估计与迭代优化，直接从预训练4D重建模型中提取的潜在几何先验中解码运动掩码。整个流水线由三个主要阶段构成：多模态特征提取、时空特征聚合和前馈运动解码。
 
@@ -140,12 +134,8 @@ $$\mathbf{F}_{\mathrm{fuse}} = \mathrm{MLP}([\mathbf{F}_{\mathrm{geo}}; \mathbf{
 2. **单次前馈推理**：无需逐场景迭代优化，推理速度达 0.31 秒/帧，与需要数秒至数十秒的迭代方法形成鲜明对比；
 3. **隐式运动解耦**：通过融合相机姿态特征，自注意力机制隐式学习物体运动与相机运动的分离，无需显式的极线约束或运动补偿。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2507_https_arxiv_org_abs_2602_21810/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of GeoMotion. Given an input video, our framework integrates 4D geometric priors from a pretrained reconstruction model (π3) and local pixel-level motion from optical flow to infer dynamic object masks. By leveraging 4D geometric priors, the proposed GeoMotion disentangles object motion from camera motion in a single feed-forward manner*
-
-
 
 GeoMotion 的核心架构由**特征聚合模块**和**运动解码器**两大组件构成，其设计目标是将运动分割转化为从潜在4D几何表示中直接解码的前馈任务，从而绕开传统方法中显式运动估计与迭代优化的瓶颈。
 
@@ -182,15 +172,11 @@ $$\mathcal{L} = \sum_{t=1}^{N} \left( \lambda_{1} \mathcal{L}_{\mathrm{focal}}(M
 
 测试阶段，预测的低分辨率粗掩码被送入视觉分割模型SAM2以恢复全分辨率精细掩码。消融实验（Table 5）表明，SAM2主要提升边界质量（JM从75.38提升至81.13），而核心方法在无SAM2时已优于经过精细化的重建方法（如Easi3R w/SAM2），证明几何先验是性能的主要驱动力而非后处理。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2507_https_arxiv_org_abs_2602_21810/figures/002_Figure_2.jpg]]
 *Figure 2: Architecture of the proposed GeoMotion framework. The model comprises a feature aggregation module and a motion decoder. The former fuses latent 4D features, optical flow features, and camera pose embeddings, while the latter employs multi-head self-attention to decode motion masks. The design enables end-to-end feed-forward motion segmentation without iterative refinement*
 
 ![[assets/figures/papers/paper_list_l2507_https_arxiv_org_abs_2602_21810/figures/003_Figure_3.jpg]]
 *Figure 3: Visualization of*
-
-
 
 ## 实验与关键发现
 
@@ -229,33 +215,11 @@ GeoMotion在多个运动分割基准上取得了最优性能，同时保持了�
 
 4. **实例级分割缺失。** 当前方法输出二值运动掩码，不支持多运动物体的实例级分割，且无法区分不同运动物体的运动模式（如刚体运动、非刚体形变）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2507_https_arxiv_org_abs_2602_21810/figures/004_Table_1.jpg]]
 *Table 1: Quantitative comparison with motion segmentation methods on popular benchmarks. The proposed model obtains state-of-the-art performance. It achieves an excellent trade-off between segmentation quality and computational efficiency*
 
-![[assets/figures/papers/paper_list_l2507_https_arxiv_org_abs_2602_21810/figures/005_Figure_4.jpg]]
-*Figure 4: Qualitative comparison on multiple benchmarks. Visual comparison with state-of-the-art methods including OCLR-Flow [44], SegAnyMotion [11], and RoMo [7]. The proposed method produces geometrically complete and visually coherent motion masks, preserving fine object details and boundaries under complex scenes*
-
 ![[assets/figures/papers/paper_list_l2507_https_arxiv_org_abs_2602_21810/figures/007_Table_4.jpg]]
 *Table 4: Ablation study on dataset scale. Training on progressively larger and more diverse datasets consistently improves segmentation performance, demonstrating the strong scalability and generalization ability of the proposed method*
-
-![[assets/figures/papers/paper_list_l2507_https_arxiv_org_abs_2602_21810/figures/008_Table_3.jpg]]
-*Table 3: Ablation study on feature aggregation. Adding the camera pose, optical flow, and shallow-layer features progressively enhances performance on DAVIS2017. The full model, which combines all three modalities, achieves the best overall accuracy, validating the effectiveness of spatio-temporal feature fusion*
-
-![[assets/figures/papers/paper_list_l2507_https_arxiv_org_abs_2602_21810/figures/009_Figure_5.jpg]]
-*Figure 5: Initialization comparison for the motion decoder. Initializing with*
-
-![[assets/figures/papers/paper_list_l2507_https_arxiv_org_abs_2602_21810/figures/010_Table_5.jpg]]
-*Table 5: Ablation for SAM2 on DAVIS-2017*
-
-![[assets/figures/papers/paper_list_l2507_https_arxiv_org_abs_2602_21810/figures/011_Figure_6.jpg]]
-*Figure 6: Qualitative ablation results for SAM2*
-
-![[assets/figures/papers/paper_list_l2507_https_arxiv_org_abs_2602_21810/figures/012_Figure_8.jpg]]
-*Figure 8: More visual examples of dynamic masks predicted by GeoMotion on the DAVIS benchmark. Odd rows show the RGB input frames, while even rows present the corresponding predicted dynamic masks*
-
-
 
 ## 定位与知识库关联
 
@@ -317,8 +281,6 @@ GeoMotion 的知识继承链清晰：
 - **极端场景鲁棒性**：当前方法在多目标密集遮挡、快速相机运动和非刚性物体形变场景下的鲁棒性如何？需要构建更具挑战性的测试基准来系统评估这些边界情形。
 - **运动模式识别**：潜在4D几何特征中是否编码了足够的运动模式信息（刚体 vs. 非刚体 vs. 流体），以支持更细粒度的运动分类？这可能需要引入物理先验或运动基元分解。
 - **跨任务迁移**：GeoMotion 验证了4D几何先验对运动分割的有效性，这一范式能否迁移到其他下游任务？潜在方向包括：动态3D重建（用运动掩码引导动态区域建模）、运动预测（从几何特征中预测未来帧的运动场）、视频插帧（利用几何一致性约束中间帧生成）。这指向一个更宏大的目标——构建统一的4D场景理解基础模型。
-
-
 
 ## 原文 PDF
 

@@ -50,8 +50,6 @@ claims:
 
 实验结果表明，Media2Face在M2F-D测试集上的主要指标（唇音同步误差LVE、面部动态偏差FDD、双模对齐度BA）全面超越现有基线方法。消融实验证实：移除GNPFA导致LVE从10.44恶化至14.89，移除无分类器引导（CFG）使FDD从12.21升高至16.69，验证了高质量表达潜空间与多条件引导策略的决定性作用。用户研究进一步显示，在一般场景、无风格提示及无头部姿态的条件下，用户对Media2Face的偏好率分别超过90%、80%和70%，在唱歌场景中优势尤为显著。
 
-
-
 ### 问题背景
 
 生成与语音高度同步、且富有表现力的三维面部动画是数字人、影视制作和虚拟交互中的核心挑战。一段自然的协同语音面部动画不仅需要精确的唇音同步，还要求面部表情、头部姿态与语音的韵律、情感和风格协调一致。然而，现有方法在生成质量、可控性以及数据基础三个层面均面临显著瓶颈。
@@ -73,8 +71,6 @@ claims:
 2. **表示层面**：学习一个解耦身份的非线性表情潜空间 GNPFA，在顶点级粒度上统一编码表情几何与头部姿态，为扩散模型提供高质量、高信息密度的生成目标。
 
 3. **生成与控制层面**：在 GNPFA 潜空间中构建扩散模型 Media2Face，融合音频、文本、图像三种模态作为条件，并通过多条件无分类器引导策略解耦语音内容与风格表达，使生成结果兼具精确的唇音同步与丰富的情感/风格表现力。
-
-
 
 ## 核心方法与创新机理
 
@@ -104,8 +100,6 @@ Media2Face 的核心创新并非单一技术点的堆砌，而是围绕“数据
 ### 创新点的因果关联
 
 上述四个创新并非孤立存在，而是形成了一条因果链路：GNPFA 提供的高质量表达潜空间使得从普通视频中提取接近扫描级精度的训练数据成为可能，进而支撑了大规模多模态数据集 M2F-D 的构建；充足且精准的数据又为扩散模型的训练提供了基础；而联合建模头部姿态与多模态条件引导则使模型能够生成兼具精确唇音同步和丰富情感/风格表现力的动画。这一链路的完整性是 Media2Face 在 LVE、FDD、BA 三项主要指标上全面超越所有基线方法（Table 2），并在用户研究中获得超过 90% 偏好率（Figure 5）的根本原因。
-
-
 
 ![[assets/figures/papers/paper_list_l38_https_arxiv_org_abs_2401_15687/figures/002_Figure_2.jpg]]
 *Figure 2: GNPFA pipeline. (Left:) We train a geometry VAE to learn a latent space of expression and head pose, disentangling expression with identity. (Right:) Two vision encoders are trained to extract expression latent codes and head poses from RGB images, which enables us to capture a wide array of 4D data*
@@ -154,8 +148,6 @@ Media2Face 采用 Transformer 架构的**潜空间扩散模型**，直接在 hea
 - **多条件 CFG 是解耦语音与风格的关键**：移除 CFG 后，面部动态偏差 FDD 从 12.21 大幅升高至 16.69（Table 2），说明仅靠条件拼接无法有效平衡唇音精度与风格表现力，CFG 的引导机制在这一多目标权衡中起决定性作用。
 
 此外，扩散模型的**速度损失** $\mathcal{L}_{\text{velocity}}$ 和**平滑损失** $\mathcal{L}_{\text{smooth}}$（权重分别为 1 和 0.01）通过约束帧间一阶和二阶差分，保证了生成序列的运动自然性和时间一致性，避免了纯 L2 重建损失可能产生的抖动或突变。
-
-
 
 ### GNPFA：泛化神经参数化面部资产
 
@@ -226,8 +218,6 @@ $$\hat{\mathbf{X}}_0^{1:N} = \mathcal{G}(\mathbf{X}_t^{1:N}, t, \mathbf{A}^{1:N}
 
 CFG 引导尺度设置为 $\mathbf{s}_A = 2.5$（音频条件）和 $\mathbf{s}_P = 1.5$（姿态/风格条件），通过随机掩码条件并在推理时外推，实现对唇音同步精度与风格表现力的灵活权衡。消融实验（Table 2, Ours w/o CFG）证实，移除 CFG 后 FDD 从 12.21 恶化至 16.69，验证了该策略的有效性。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与验证逻辑
@@ -282,12 +272,8 @@ Figure 7 的定性对比进一步揭示了方法差异。与情感盲方法（Fa
 
 论文未报告具体的失败案例或定量失败模式分析。从方法设计推断，潜在脆弱环节包括：(1) 极端抽象文本或图像提示可能无法通过 CLIP 编码为有效的风格控制信号，导致条件控制失效；(2) 长音频场景下，尽管采用了重叠批次去噪策略，时序一致性的保持仍是潜在挑战；(3) GNPFA 对训练时未见过的极端表情可能存在泛化不足。论文明确指出，**如何从更多样的多模态输入中实现忠实的条件控制仍是一个开放挑战**，这需要进一步的实证研究来验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l38_https_arxiv_org_abs_2401_15687/figures/003_Table_1.jpg]]
 *Table 1: 4D datasets comparison. Notice that DiffposeTalk [57] is a combination of reconstructed TFHP [57] and HDTF. EMOTE [15] is trained on reconstructed MEAD*
-
-
 
 ## 定位与知识库关联
 
@@ -330,8 +316,6 @@ Media2Face 的性能优势可归因于两个相互依赖的设计决策，消融
 - **多模态条件解耦的粒度**：当前 CFG 策略将音频和 CLIP 条件作为两个整体进行引导，但 CLIP 潜码内部可能混杂风格、情感、身份等多种语义。如何实现更细粒度的条件解耦与控制，是提升生成可控性的关键方向。
 
 - **跨身份泛化的上限**：GNPFA 解耦了身份与表情，但扩散模型在训练时仍与特定身份的数据分布相关。在极端跨身份迁移（如从成人到儿童）时，生成的运动模式是否保持自然，尚待验证。
-
-
 
 ## 原文 PDF
 

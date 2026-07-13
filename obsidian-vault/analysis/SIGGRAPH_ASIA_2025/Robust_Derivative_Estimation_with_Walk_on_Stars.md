@@ -75,8 +75,6 @@ claims:
 
 本方法目前假设边界光滑，尖凹角处导数估计存在偏差（Fig. 13）；仅处理 Poisson 方程，尚未扩展至一般线性椭圆方程或 Robin 边界条件；反射率阈值 $\rho_{\max}$ 需手工设定；解重建的路径积分依赖人工选择参考点和连接路径。这些方向构成了后续工作的自然延伸空间。
 
-
-
 ### Poisson 方程的蒙特卡洛求解范式
 
 本文关注一类核心计算问题：在复杂几何域上求解 Poisson 方程及其空间导数。给定域 $\Omega \subset \mathbb{R}^3$ 及其边界 $\partial\Omega = \partial\Omega_D \cup \partial\Omega_N$（Dirichlet 与 Neumann 分区），目标方程为：
@@ -119,8 +117,6 @@ $$
 - 导数漫步可在 Neumann 边界上**无偏提前终止**，从根本上规避纯 Neumann 问题的终止困境。
 
 基于此，本文提出 **Robust Derivative Estimation with Walk on Stars**，目标是以有界方差在边界和域内任意点鲁棒估计空间导数，尤其针对现有方法失效的 Neumann 主导场景。方法首先在纯 Neumann 问题上建立方向导数 BIE（第 4.1–4.2 节），随后扩展至混合 Dirichlet-Neumann 问题（第 4.3 节），并进一步支持二阶法向导数估计（第 4.4 节）和形状优化中的参数导数计算（第 6.4 节）。
-
-
 
 ## 核心方法与创新机理
 
@@ -180,8 +176,6 @@ $$
 
 需注意，该方法的适用域明确限定于 **Poisson 方程** 且假设 **光滑边界**。尖凹角处的角奇异性会导致导数估计偏差 (Fig. 13)，且尚未集成 Robin 边界条件。反射率阈值 $\rho_{\max}$ 需手工设定（消融实验表明 $\rho_{\max}=1$ 为推荐值，过大会增加噪声）。
 
-
-
 ![[assets/figures/papers/paper_list_l23_https_projects_shuangz_com_grad_wost_sa25_grad_wost_sa25_pdf/figures/001_Figure_1.jpg]]
 *Figure 1: Streamlines from a potential flow simulation around marine life of vastly different scales, computed using our Monte Carlo walk on stars solver for spatial derivatives. Unlike traditional solvers, our method can compute flow gradients at arbitrary resolutions for streamline tracing in local regions of interest–whether around a single fin (a), multiple dolphins (b), or a full blue whale (c)–without requiring a background grid or a volumetric mesh adapted to the boundary geometry. Compared to prior walk on stars estimators (bottom right), our method achieves significantly lower error at equal computation time*
 
@@ -221,8 +215,6 @@ $$
 - **输出**：方向导数 $\partial_v u(x)$ 的无偏蒙特卡洛估计值。通过组合不同方向的估计，可进一步获得梯度 $\nabla u(x)$、法向导数 $\partial_n u$、二阶法向导数 $\partial_n^2 u$，乃至通过路径积分重建纯 Neumann 问题的解 (Eq. 25)。
 
 整个流水线的设计使得估计器在**域内和边界附近均保持有界方差**，且在 Neumann 主导问题中通过早期终止显著优于基线方法。
-
-
 
 ### 3.1 核心洞察：导数的调和性
 
@@ -296,8 +288,6 @@ $$
 
 其中球 $\mathrm{B}(c,R)$ 切于边界点 $x$。该公式将 $\partial_n^2 u$ 表达为边界上 $\partial_n u$ 的积分，而 $\partial_n u$ 本身可通过方向导数估计器获得，形成递归结构。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验结果
@@ -356,16 +346,6 @@ $$
 ### 公平性说明
 
 所有对比实验均在相同计算预算或相同时间下进行（Fig. 6, Fig. 7）。需要指出的是，反射率计算和边积分（Eq. 22-23）增加了单步计算开销，但通过更早的随机游走终止和更低的方差，整体效率仍优于基线。当前方法仅适用于 Poisson 方程，且假设边界光滑，这些前提条件在解读实验结果时需予以考虑。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l23_https_projects_shuangz_com_grad_wost_sa25_grad_wost_sa25_pdf/figures/013_Figure.jpg]]
-*Figure: (a) Halbach Array (c) B (reference) (b) M (input) (d) B (ours)*
-
-![[assets/figures/papers/paper_list_l23_https_projects_shuangz_com_grad_wost_sa25_grad_wost_sa25_pdf/figures/014_Figure.jpg]]
-*Figure: (b) 2nd order normal derivative*
-
-
 
 ## 定位与知识库关联
 
@@ -432,8 +412,6 @@ $$\widehat{\partial_v u}(x_k) = \frac{P^{\mathrm{B}}(x_k, x_{k+1}) \left( |\rho_
 3. **PDE 类型推广**：能否将核心洞察 ("导数的导数仍为调和的") 推广至 Poisson 以外的更广泛 PDE 类？
 4. **路径规划自动化**：如何设计自动连接查询点与参考点的路径规划方案，以消除解重建中的人工干预？
 5. **凹边界加速**：如何加速 concave 边界附近漫步的收敛速度，降低该区域的方差？
-
-
 
 ## 原文 PDF
 

@@ -215,11 +215,6 @@ $$
 
 消融实验证实，移除所有正则化项导致NVFi平均PSNR降至32.90，进一步禁用自适应缩放则降至32.19，验证了平滑先验及其动态调制对外推质量的关键作用（Table 8）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_XlRbpFj3lJ/figures/002_Figure_2.jpg]]
-*Figure 2: 1: We initialize temporal trajectories of 3D Gaussian parameters using the frozen interpolation model, which consists of the canonical 3D Gaussian set and a time-conditioned deformation MLP. These trajectories lie entirely within the observed temporal window. 2: Through our dynamic sampling strategy, each Gaussian trajectory is sampled into multiple observed prefix (input) and a held-out suffix (target) trajectories, providing training pairs for the Transformer latent ODE. 3: Latent-ODE training encodes the observed prefix with a Transformer, infers a latent initial state, and evolves it forward with a neural ODE. 4: A decoder maps the latent path back to Gaussian parameters, which are supe...*
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -246,9 +241,6 @@ ODE-GS 在 D-NeRF 上平均取得 **27.30 PSNR / 0.9497 SSIM / 0.0467 LPIPS**，
 
 #### HyperNeRF 数据集（Table 3）
 
-![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_XlRbpFj3lJ/figures/005_Table_3.jpg]]
-*Table 3: Quantitative extrapolation results on HyperNeRF. Metrics reported include PSNR, SSIM, and LPIPS. The best metric is highlighted in bold, second-best is underlined*
-
 在包含真实噪声和复杂动力学的 HyperNeRF 上，ODE-GS 在 split-cookie、slice-banana、cut-lemon 三个场景上取得最低 LPIPS，在 chickchicken 上取得最优 PSNR 和 SSIM，定性/定量均优于 TiNeuVox-B、4D-GS 等基线。
 
 ### 定性可视化
@@ -272,9 +264,6 @@ ODE-GS 在 D-NeRF 上平均取得 **27.30 PSNR / 0.9497 SSIM / 0.0467 LPIPS**，
 
 #### 正则化的贡献（Table 8, Figure 4）
 
-![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_XlRbpFj3lJ/figures/008_Figure_4.jpg]]
-*Figure 4: Qualitative comparison on ODE-GS trained using latent and trajectory regularization vs. using only extrapolation loss on two selected scenes. We highlight the areas within each scene with highest visual disparity*
-
 ![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_XlRbpFj3lJ/figures/013_Table_8.jpg]]
 *Table 8: Per-scene ablation over NVFi of our full method against removal of regularizers and removal of adaptive regularizer scaling. Metrics reported include PSNR, SSIM, and LPIPS*
 
@@ -294,9 +283,6 @@ ODE-GS 在 D-NeRF 上平均取得 **27.30 PSNR / 0.9497 SSIM / 0.0467 LPIPS**，
 确定性公式在 NVFi 上全面优于变分版本，PSNR 差距高达 **10+ dB**。变分训练的不稳定性表明，在当前场景规模和动力学复杂度下，确定性流建模足以捕捉动态，而变分框架的潜在优势（不确定性量化）未能有效发挥。
 
 #### 重投影损失的影响（Table 5）
-
-![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_XlRbpFj3lJ/figures/009_Table_5.jpg]]
-*Table 5: The effect of additional reprojection loss during training on D-NeRF extrapolation. Metrics reported include PSNR, SSIM, and LPIPS-vgg*
 
 额外引入重投影损失对 D-NeRF 外推的影响有限，部分场景略有提升，部分场景轻微退化，整体未带来一致的性能增益，表明直接监督高斯参数轨迹的 L1 损失已足够有效。
 
@@ -318,13 +304,8 @@ ODE-GS 在 D-NeRF 上平均取得 **27.30 PSNR / 0.9497 SSIM / 0.0467 LPIPS**，
 
 4. **确定性框架的不确定性缺失**：变分版本训练不稳定，确定性公式虽精度更高，但丧失了对预测不确定性的建模能力，无法量化外推的置信度。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_XlRbpFj3lJ/figures/006_Figure_3.jpg]]
 *Figure 3: Qualitative visualization on 5 scenes from DNeRF dataset, from left to right are the ground truth image, rendered result from Deformable GS(Yang et al., 2024), residual of Deformable GS against GT, GaussianPrediction(Zhao et al., 2024), residual of GaussianPrediction against GT, and finally Our as well as Ours residual against GT*
-
-![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_XlRbpFj3lJ/figures/016_Figure_6.jpg]]
-*Figure 6: Qualitative results on 5 scenes from the NVFI (Li et al., 2023) dataset, from left to right are the ground truth image, rendered result from Deformable GS(Yang et al., 2024), residual of Deformable GS against GT, GaussianPrediction(Zhao et al., 2024), residual of GaussianPrediction against GT, and finally Our as well as Ours residual against GT*
 
 ## 定位与知识库关联
 

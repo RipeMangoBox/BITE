@@ -55,8 +55,6 @@ claims:
 
 当前方法的主要局限在于依赖物理仿真导致的计算开销较大，尤其在生成极端不稳定场景时迭代成本高；资产库的规模与质量直接影响多样性，对罕见物品的检索不够鲁棒；LLM Agent的谓词质量受提示工程影响，可能出现语法错误或不符合物理常识的布局要求。此外，系统目前仅针对静态场景布置，尚未涉及动态交互或时序任务。
 
-
-
 ### 问题背景：3D场景生成的物理真实性缺口
 
 在机器人操作、具身智能和虚拟环境构建中，生成逼真且物理合理的3D场景是核心需求。现有3D场景生成方法主要关注视觉外观和空间布局，却普遍忽略物体间的物理交互——包括接触、支撑、平衡和包含关系。这一缺陷导致生成场景在物理上不可靠：物体可能悬浮、穿透或处于力学上不可能的姿态，严重限制了其在复杂机器人操作环境中的应用。
@@ -80,8 +78,6 @@ claims:
 1. **物理准确性**：集成物理引擎进行真实仿真，并通过概率规划量化与控制稳定性，使物体放置符合真实物理约束。
 2. **高复杂度与强可控性**：支持用户通过细粒度文本描述和数值参数精细控制场景的稳定性、空间关系和杂乱程度。
 3. **开放词汇适应性**：结合开放词汇资产检索与文本到3D生成管道，扩大场景覆盖范围，适配多样化的下游任务（如机器人策略训练）。
-
-
 
 ## 核心方法与创新机理
 
@@ -131,8 +127,6 @@ PhyScensis 的核心创新在于首次将**物理仿真引擎**与**基于 LLM �
 
 尽管取得了显著突破，PhyScensis 仍存在以下局限：物理仿真带来较大计算开销，尤其在极端不稳定场景的生成中需要大量迭代；资产库规模和质量直接影响场景多样性，对罕见物品的检索和生成可能不够鲁棒；LLM Agent 的谓词质量受提示工程影响，可能出现语法错误或不符合物理常识的布局要求；系统目前主要针对静态场景布置，未涉及动态交互或时序任务。
 
-
-
 ![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_aCVfhY4Qen/figures/012_Figure_2.jpg]]
 *Figure 2: Our framework consists of three components: (a) an LLM agent that takes a user prompt and generates spatial and physical predicates, along with object descriptions for retrieval; (b) a solver that computes the final scene using a physics engine for physical predicates and a sample-based constraint solver for spatial predicates; and (c) a feedback system that reports success or diagnoses failure, allowing the LLM agent to iteratively refine and regenerate predicates*
 
@@ -162,8 +156,6 @@ PhyScensis 采用**LLM 智能体 + 物理求解器 + 反馈系统**的三组件�
 ### 资产与求解器协同
 
 为支持开放词汇的场景描述，系统采用开放词汇资产检索配合文本到 3D 生成管道，扩大了场景覆盖范围（Section 3.1, Appendix A.4.1）。空间求解器与物理求解器分工明确：前者处理 2D 平面内的位置与朝向约束，后者处理涉及 3D 空间和物理仿真的复杂交互，两者协同完成从谓词到最终场景配置的映射。
-
-
 
 ### 3.1 流水线总览
 
@@ -225,8 +217,6 @@ $$p_{\mathrm{fail}}(x) = s(x) / n(x)$$
 
 Feedback System 在每次求解后检测失败原因，向 LLM Agent 报告空区域位置和场景质量指标（如表面覆盖率、紧凑度、物体数量）。Agent 据此判断当前场景是否满意，或需要进一步调整与重采样（Section 3.4）。消融实验（Table 2）验证了完整反馈系统在降低重试次数和时间成本上的关键作用——无反馈版本（Ours w/o feedback）和无空区域报告版本（Ours w/o report）均显著劣于完整系统。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -241,9 +231,6 @@ PhyScensis 在场景生成的视觉质量、物理准确性和下游机器人任
 在机器人抓取与放置任务中，使用 PhyScensis 生成数据训练的策略在人类设计的未见场景上达到 **9/10 的到达成功率**和 **3/10 的放置成功率**，远优于 Architect（3/10, 0/10）和 3D-Generalist（4/10, 1/10）。放置成功率的绝对值提升为 20-30 个百分点，验证了物理准确场景对训练鲁棒操作策略的关键作用。
 
 用户研究（Table 4）进一步证实了 PhyScensis 的感知优势：在文本对齐（4.04 vs 2.68/2.54）、自然性与物理合理性（3.98 vs 2.65/2.72）、复杂度（3.82 vs 2.69/3.04）三个维度上，PhyScensis 的 1-5 分制评分均大幅领先基线。
-
-![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_aCVfhY4Qen/figures/019_Table_4.jpg]]
-*Table 4: User Study Results. We report the mean scores from user evaluations (scale 1-5)*
 
 与 **LayoutVLM**（Sun et al., 2025a）的补充对比（Table 5）同样显示 PhyScensis 在所有指标上保持领先，验证了物理仿真框架相对于纯视觉语言模型布局方法的优势。
 
@@ -277,10 +264,6 @@ Figure 15 展示了系统对不同稳定度级别的精确控制能力：通过�
 2. **资产覆盖**：对于罕见物品，开放词汇检索和文本到 3D 生成管道的鲁棒性不足，可能导致场景多样性受限。
 3. **谓词质量**：LLM 智能体生成的谓词偶尔出现语法错误或不符合物理常识的布局要求，需依赖反馈系统进行多轮修正。
 4. **静态局限**：当前框架仅处理静态场景布置，无法应对涉及物体运动和时序交互的动态任务。
-
-
-
-
 
 ## 定位与知识库关联
 
@@ -328,8 +311,6 @@ PhyScensis 的适用场景具有明确的边界条件：
 4. **极端场景的机器人训练价值**：系统生成的高度不稳定的极端场景（Figure 15），对训练鲁棒的机器人策略是否有独特价值？初步机器人实验（Table 1, Reaching 9/10, Placing 3/10）已显示正向信号，但更系统的研究仍有待开展。
 
 5. **规模扩展**：框架是否能够适配更大规模的资产库和更复杂的场景描述？随着资产数量和场景复杂度的增长，求解器的搜索空间和物理仿真的计算需求将指数级上升，需要更高效的索引和剪枝策略。
-
-
 
 ## 原文 PDF
 

@@ -55,8 +55,6 @@ claims:
 
 **主要结果**：在 Canny Edge、Depth Map、Pose 三个条件基准上，Tea-Adapter 的 FVD 分别达到 289.565、292.341、300.582，较 Ctrl-Adapter 分别降低 137.495、155.950、186.847，且在 CLIP、LPIPS、SSIM 指标上全面领先（Table 1）。时序一致性达 0.984，显著优于图像基线 UniControl 的 0.876。消融实验证实，移除 MCE 层使 FVD 从 292.341 升至 303.202，适配器数量减半后 FVD 急剧升至 398.013（Table 2），表明 MCE 和充足的适配器位置对条件保真度与生成质量至关重要。在参数效率方面，Tea-Adapter 的可训练参数量比 DiT-ControlNet 减少约 70%（不含 MCE 层），同时保持可比性能。此外，MCE 层支持零样本泛化：仅在部分条件上训练的模型可成功控制未见条件类型（Figure 8）。
 
-
-
 ### 问题背景：视频扩散模型的条件可控生成困境
 
 大型文本到视频（Text-to-Video, T2V）扩散模型在视觉质量和文本跟随能力上取得了显著突破，但其“黑箱”式生成过程难以精确控制输出内容。在实际应用中，用户往往需要指定边缘轮廓、深度结构、人体姿态等条件信号来引导生成。然而，将这类条件控制能力注入大型视频扩散模型面临三个核心瓶颈：
@@ -85,8 +83,6 @@ Tea-Adapter 的核心动机源于一个关键发现：**同一架构族的小型
 3. **时序一致性保障**：特征传播模块（Feature Propagation Module）引入可学习调制因子、时间投影层和上投影层，动态调整条件特征并保证帧间一致性。
 
 Figure 3 直观对比了 Tea-Adapter 与先前方法的范式差异：传统方法需要为每个条件重复训练大模型或级联多个 ControlNet，而 Tea-Adapter 仅需在低资源环境下训练适配器，即可驱动大型模型获得多条件可控生成能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -137,8 +133,6 @@ $$x_t^{a'} = u(x_t^a, c_{txt}, t; \theta)$$
 
 Tea-Adapter 的三项 changed slots 构成一个闭环：**反向蒸馏**降低控制知识获取成本，**MCE 动态路由**实现多条件统一融合与零样本泛化，**特征传播模块**保证跨尺度对齐与时序一致。三者协同使 Tea-Adapter 成为一个即插即用的轻量适配器，仅需在低资源环境下训练适配器即可驱动冻结的大模型支持多种条件生成，消除了传统方案中冗余的逐条件训练开销。
 
-
-
 Tea-Adapter 的整体设计围绕一个核心洞察展开：**同一架构族的小型视频扩散模型与大型模型在潜在空间中存在显著的特征分布相似性**（见 Figure 2）。基于这一发现，方法构建了一条“反向知识蒸馏”通路——将控制知识从高效微调的小模型跨尺度迁移至冻结的大模型，从而避免为每个新条件重复训练大模型。
 
 ### 任务形式化
@@ -183,12 +177,7 @@ Figure 3 对比了 Tea-Adapter 与现有范式的根本区别：
 
 在不使用 MCE 层的情况下，Tea-Adapter 的可训练参数量比 DiT-ControlNet 减少约 **70%**，同时保持可比的控制性能（见 Section 3.3 及 Figure 6）。当需要支持多种条件时，MCE 层的共享专家设计进一步避免了参数随条件数量线性膨胀的问题。
 
-
-
 Tea-Adapter 的核心设计围绕一个关键洞察展开：同一架构族的小型视频扩散模型与大型模型在潜在空间中存在显著的特征分布相似性（Figure 2）。基于此，方法通过冻结的小型教师模型提取条件控制特征，经轻量适配器传递至冻结的大型学生模型，仅训练适配器参数即可实现多条件可控生成。
-
-![[assets/figures/papers/paper_list_l938_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_Tea_Adapter_Teac/figures/003_Figure_2.jpg]]
-*Figure 2: The illustration of latent feature distribution transformation. The design of our method is essentially about efficient feature transfer of control signals*
 
 ### 任务形式化
 
@@ -240,13 +229,6 @@ Tea-Adapter 并非在大型模型的每一层都插入适配器，而是选择�
 
 消融实验（Table 2）从因果角度验证了上述模块的必要性：移除 MCE 层后，FVD 从 292.341 上升至 303.202，CLIP 从 0.913 降至 0.904，表明动态专家路由对多条件融合至关重要；将适配器使用的 DiT Block 数量减半后，FVD 急剧升至 398.013，CLIP 降至 0.875，说明足够的适配器插入位置是条件保真度的必要条件。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l938_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_Tea_Adapter_Teac/figures/002_Figure_3.jpg]]
-*Figure 3: Motivation of our method. Compared to previous methods, our framework only requires training adapters in lowresource environments to support diverse conditions, eliminating redundant training efforts*
-
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -287,9 +269,6 @@ Tea-Adapter 的 MCE 层展现出两项关键能力：
 
 1. **多条件融合**：通过共享专家与条件特定专家的动态路由（公式 $h_{t}^{mce} = \sum_{k=1}^{K} g_{k}(c_{k}, t) \cdot \mathcal{E}_{c_{k}}(x_{t}^{a}, t)$），MCE 可在单次前向传播中融合多种异质控制信号（如背景图、参考实例、人体运动），无需级联多个独立 ControlNet。Figure 8（Bottom）展示了同时给定背景、参考对象和人体姿态三种条件时的生成效果，各条件约束均得到有效满足且无冲突退化。
 
-![[assets/figures/papers/paper_list_l938_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_Tea_Adapter_Teac/figures/010_Figure_8.jpg]]
-*Figure 8: Zero-shot and Multi-Condition Generation. (Top) Zero-Shot Generation: our method, trained on one condition, generalizes to unseen conditions and produces high-quality, controllable videos. (Bottom) Multi-Condition Generation: Given multiple control signals (e.g., background, reference instance, and human motion), our approach can effectively transfer different conditions*
-
 2. **零样本泛化**：MCE 的门控机制能够学习不同视觉条件之间的内在关联，使得仅在部分条件上训练的模型可以泛化到未见条件类型。Figure 8（Top）展示了这一能力：模型在未见过特定条件的情况下仍能生成高质量、可控的视频。这一性质源于条件特定专家 $\mathcal{E}_{c_{k}}$ 的增量设计（$\mathcal{E}_{c_{k}} = \mathcal{E}_{s} + \Delta\mathcal{E}_{c_{k}}$），共享专家 $\mathcal{E}_{s}$ 捕获跨条件通用知识，增量部分 $\Delta\mathcal{E}_{c_{k}}$ 则通过路由权重实现对新条件的隐式适应。
 
 ### 定性对比
@@ -311,13 +290,6 @@ Figure 6 对比了各方法在引入多条件控制时的可训练参数量。�
 - 当前实验基于 15K 视频训练集和特定 backbone（Wan2.1-14B / CogVideoX-5B），在更大规模视频基础模型（如 30B+ 参数）和超长时序生成场景下的效率与一致性表现尚待验证。
 - MCE 层的零样本泛化能力目前仅在有限条件类型上得到展示，其对更广泛、更极端未见条件的适应边界需要进一步探索。
 - 专家数量和路由策略的自动化优化（如动态增减专家）可能进一步提升多条件融合的灵活性和泛化能力，当前设计中这些超参数仍需人工设定。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l938_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_Tea_Adapter_Teac/figures/001_Figure_1.jpg]]
-*Figure 1: Visual results of Tea-Adapter. We propose the Tea-Adapter, a plug-and-play adapter that enables efficient training and flexible extension to diverse conditions, including both single conditions (e.g., canny, pose, depth) and multiple condition compositions (e.g., camera trajectory, image background, human motion) with minimal GPU consumption*
-
-
 
 ## 定位与知识库关联
 
@@ -359,8 +331,6 @@ Tea-Adapter 的有效性建立在若干前提之上，理解这些边界条件�
 - **自动化专家管理**：MCE 层中的专家数量和路由策略能否进一步自动化，例如通过动态增加或修剪条件特定专家来适应未知条件的零样本合成，而非依赖固定的专家池？
 - **更大规模模型的适配**：在 30B+ 参数级别的视频基础模型和超长时序生成场景下，Tea-Adapter 的参数效率和时序一致性表现如何？适配器的插入策略是否需要根本性的调整？
 - **条件冲突的显式建模**：是否可以通过引入条件间的显式依赖建模（如条件注意力或因果图）来替代 MCE 当前的隐式加权融合，从而在多条件存在语义冲突时实现更可控的合成结果？
-
-
 
 ## 原文 PDF
 

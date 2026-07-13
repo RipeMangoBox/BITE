@@ -54,8 +54,6 @@ ScaMo针对上述瓶颈提出了系统性的解决方案，首次在运动生成
 
 **方法定位**：ScaMo属于运动离散化+自回归生成的范式，但其关键创新在于将FSQ引入运动量化、以T5-XL词级前缀替代句子级条件，并在大规模数据上系统性地研究缩放行为，而非简单地将LLM架构迁移到运动域。
 
-
-
 文本驱动的人体运动生成旨在根据自然语言描述合成真实、多样且语义一致的三维人体动作序列，在动画制作、虚拟人交互、游戏开发等领域具有广泛的应用前景。近年来，受大型语言模型（LLM）成功的启发，研究者尝试将LLM直接引入运动生成任务，例如 **MotionGPT**、**MotionLLM**、**AvatarGPT** 和 **LargeMotionModel** 等工作分别基于 LLaMA-13B、Gemma-2b、LLaMA-13B 和 LLaMA-2-13B 等架构进行运动建模。然而，这类直接迁移LLM的方案面临一个根本性的瓶颈：**运动生成领域长期无法验证缩放定律（scaling law）**，即模型性能是否随计算预算、模型规模和数据规模的增大而可预测地提升。
 
 造成这一困境的原因可归结为三个相互耦合的层面：
@@ -67,8 +65,6 @@ ScaMo针对上述瓶颈提出了系统性的解决方案，首次在运动生成
 **架构瓶颈**：现有方法在文本条件建模上存在明显不足。基于 CLIP 句子级嵌入的自回归生成器（如标准方案）仅提供全局语义条件，缺乏细粒度的词级对齐能力；而直接引入LLM的方案虽具备强大的语言理解能力，但其架构并非为运动模态的离散token预测而设计，扩展效率低下。
 
 上述三重瓶颈形成了一个“死锁”：没有大规模高质量数据，就无法训练大模型；没有可扩展的量化方法，大模型的容量优势无法通过大词汇量释放；没有适配的架构设计，文本与运动之间的细粒度对齐难以实现。打破这一僵局，需要在数据、量化和架构三个维度上同时进行系统性创新，这正是 ScaMo 工作的核心动机——**首次在运动生成领域建立可验证的缩放定律**，揭示模型性能与计算预算之间的定量关系，为未来更大规模的运动生成模型提供理论指导和实践路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -138,8 +134,6 @@ MotionUnion 的大规模高质量数据是缩放定律验证的前提——小�
 
 这些发现表明，运动生成模型同样遵循与语言模型类似的缩放规律，而 FSQ 消除码本坍塌是使词汇量成为可扩展维度的关键使能技术。
 
-
-
 ScaMo 的整体框架由两个核心模块级联构成：**Motion FSQ‑VAE** 与 **Text‑Prefix Autoregressive Transformer**，二者分别承担运动离散化与文本条件自回归生成的角色，形成“先压缩后预测”的流水线（Figure 5）。
 
 ![[assets/figures/papers/paper_list_l1863_ScaMo_Exploring_the_Scaling_Law_in_Autoregressive_Motion_Generation_Mode/figures/005_Figure_5.jpg]]
@@ -166,8 +160,6 @@ ScaMo 的整体框架由两个核心模块级联构成：**Motion FSQ‑VAE** �
 整个流水线的数据流为：**原始运动序列 → Motion FSQ‑VAE 编码/量化 → 离散运动 token 序列**；同时 **文本 → 冻结 T5‑XL → 词级嵌入前缀**。二者拼接后输入 Text‑Prefix Autoregressive Transformer 进行自回归预测。在推理时，给定文本前缀，模型逐 token 生成运动序列，再由 FSQ‑VAE 解码器还原为连续运动。
 
 这种模块化解耦使得三个可缩放维度——**模型参数量（非词汇参数 N_nv）、词汇量（N_v）、训练数据量（D）**——均可独立调节，为后续缩放定律的系统探索提供了架构基础。
-
-
 
 ScaMo 框架由两个核心模块构成：**Motion FSQ‑VAE**（运动有限标量量化变分自编码器）与**文本前缀自回归 Transformer**。前者将连续运动序列离散化为整数 token 序列，后者以冻结文本编码器产生的词级嵌入为前缀，自回归地预测运动 token。两个模块的协同设计直接解除了传统方案在数据规模、量化稳定性和架构扩展性上的三重瓶颈。
 
@@ -219,18 +211,11 @@ $$ (N_v^{\mathrm{opt}}, N_{nv}^{\mathrm{opt}}, D^{\mathrm{opt}}) = \arg\min_{N_v
 
 通过 IsoFLOP 实验拟合得到的三组幂律关系（Eq. 10–13）以及归一化损失与 FLOPs 的对数定律（Eq. 14），为任意计算预算下的最优资源配置提供了定量预测工具，详见实验分析部分。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1863_ScaMo_Exploring_the_Scaling_Law_in_Autoregressive_Motion_Generation_Mode/figures/003_Figure_3.jpg]]
 *Figure 3: Scaling laws of ScaMo. (a) Power law between*
 
 ![[assets/figures/papers/paper_list_l1863_ScaMo_Exploring_the_Scaling_Law_in_Autoregressive_Motion_Generation_Mode/figures/006_Figure.jpg]]
 *Figure: Codebook Size (a) HumanML3D. (b) MotionUnion*
-
-![[assets/figures/papers/paper_list_l1863_ScaMo_Exploring_the_Scaling_Law_in_Autoregressive_Motion_Generation_Mode/figures/008_Figure_7.jpg]]
-*Figure 7: Power laws of vocabulary parameters, non-vocabulary parameters, and data with respect to FLOPs*
-
-
 
 ## 实验与关键发现
 
@@ -307,24 +292,8 @@ $$\mathcal{L}_u = -1.062 \times \log_{10}(C) + 13.839$$
 2. **缩放外推**：当前最优配置（3B 模型、64k 码本）是否为全局最优，以及所拟合定律在更高计算预算下是否成立，仍需更大规模实验验证。
 3. **量化扩展**：FSQ 的组量化或残差量化扩展是否能进一步提升运动重建与生成质量，论文未作探索。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1863_ScaMo_Exploring_the_Scaling_Law_in_Autoregressive_Motion_Generation_Mode/figures/014_Table_5.jpg]]
 *Table 5: Tokenizer numerical results. The Entropy is Exponential Entropy*
-
-![[assets/figures/papers/paper_list_l1863_ScaMo_Exploring_the_Scaling_Law_in_Autoregressive_Motion_Generation_Mode/figures/002_Figure_2.jpg]]
-*Figure 2: We plot the relationship between normalized test loss and FLOPs for observing the scaling behavior. Overall, the larger model and larger vocabulary size can get better performances*
-
-![[assets/figures/papers/paper_list_l1863_ScaMo_Exploring_the_Scaling_Law_in_Autoregressive_Motion_Generation_Mode/figures/001_Figure_1.jpg]]
-*Figure 1: The generation results of ScaMo-3B with a text input. Our model could deal with abstract sentences and long sentences*
-
-![[assets/figures/papers/paper_list_l1863_ScaMo_Exploring_the_Scaling_Law_in_Autoregressive_Motion_Generation_Mode/figures/004_Figure_4.jpg]]
-*Figure 4: The frames statistics of MotionUnion dataset. Motion capture data accounts for the majority*
-
-![[assets/figures/papers/paper_list_l1863_ScaMo_Exploring_the_Scaling_Law_in_Autoregressive_Motion_Generation_Mode/figures/007_Figure_6.jpg]]
-*Figure 6: Reconstuction results of different tokenizers on HumanML3D and MotionUnion. Reconstruction: L1 loss and MPJPE. Codebook Utilization: Codebook Usage and Entropy*
-
-
 
 ## 定位与知识库关联
 
@@ -367,8 +336,6 @@ ScaMo 为运动生成的缩放研究打开了若干值得深入的方向：
 3. **缩放定律的外推验证**：所拟合的对数定律 $L_u = -1.062 \log_{10}(C) + 13.839$ 是否在更高计算预算下成立，需要更大规模的实验验证。这不仅是运动生成领域的问题，也是所有小领域缩放研究的共性挑战。
 4. **跨领域泛化**：ScaMo 的缩放定律在 HumanML3D 和 MotionUnion 上得到了验证，但这些数据以人体运动为主。该框架是否适用于其他运动模态（如动物运动、机械臂操作），以及缩放定律的系数是否具有跨领域不变性，尚待研究。
 5. **评估体系的完善**：建立独立于特征提取器的、与人类感知更一致的生成质量评估指标，对于准确衡量缩放带来的实际收益至关重要。
-
-
 
 ## 原文 PDF
 

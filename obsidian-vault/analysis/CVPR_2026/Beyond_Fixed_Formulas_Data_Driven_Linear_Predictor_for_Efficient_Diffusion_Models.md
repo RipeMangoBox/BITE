@@ -54,8 +54,6 @@ claims:
 
 在FLUX.1-dev上，L²P实现了**4.55倍FLOPs降低和4.15倍延迟加速**，PSNR达到31.459，较TaylorSeer（29.328）提升+2.131 dB；在Qwen Image上加速比可达7.18倍，PSNR提升+2.04 dB；在HunyuanVideo视频生成上PSNR提升+2.85 dB。消融实验进一步表明，该方法具有极高的数据效率（仅5个样本即可超越基线）和语义无关性（使用无意义图像训练仍保持高性能），证明其学习到的是**特征演化的内在动态模式**而非数据语义。
 
-
-
 扩散Transformer（DiT）已成为文本到图像与视频生成的主流架构，但其推理速度受限于多步去噪过程中大量Transformer模块的重复计算。为缓解这一瓶颈，**特征缓存（Feature Caching）** 方法被提出，其核心思路是：在部分去噪步骤跳过昂贵的DiT前向计算，转而利用已缓存的历史特征来近似当前步骤的特征表示。
 
 现有特征缓存方法可分为两类范式：
@@ -86,8 +84,6 @@ $$\text{Projection Fidelity} = 1 - \frac{\|\mathcal{F}(x_t) - \mathcal{F}^*(x_t)
 ### 本文动机
 
 基于上述分析，本文提出核心主张：**将预测系数的选择从“固定公式先验”转变为“数据驱动学习”**。具体而言，设计一个可学习的线性预测器 **L²P（Learnable Linear Predictor）**，用参数化的权重矩阵 $W$ 替代手工设计的固定系数 $\alpha_j$，通过最小化预测特征与真实特征之间的MSE损失来端到端学习最优线性组合。该方法仅需约50张图像和20秒训练时间，即可在多个DiT模型上实现显著的加速与质量提升。
-
-
 
 ## 核心方法与创新机理
 
@@ -145,8 +141,6 @@ L²P 属于**预测型特征缓存**范式，与以下基线方法构成直接�
 
 L²P 的核心贡献在于揭示了预测型缓存方法中“固定系数”这一被忽视的设计瓶颈，并通过极简的可学习线性预测器实现了对最优预测的有效逼近，在 DiT 特征缓存加速领域建立了新的方法论基线。
 
-
-
 L²P 的整体框架由两个对称的阶段构成：**离线训练**与**在线推理**，二者共享同一个轻量级可学习线性预测器，如图2所示。
 
 ### 训练阶段：轨迹采集与权重回归
@@ -175,15 +169,8 @@ L²P 的整体框架由两个对称的阶段构成：**离线训练**与**在线
 
 整个框架的核心数据流可概括为：**完整轨迹 → 特征缓存 → 线性回归 → 权重矩阵 → 跳跃推理**。训练阶段产生的权重矩阵 $W$ 是连接两个阶段的唯一桥梁，其极小的参数量（49×49）确保了训练和推理的额外开销几乎可忽略。预测器本身不依赖任何特定数据语义（消融实验证实，即使使用无语义内容图像训练，性能依然远超固定公式基线），学习到的是去噪轨迹中特征演化的内在时序模式。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l839_https_arxiv_org_abs_2604_26365/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed*
-
-![[assets/figures/papers/paper_list_l839_https_arxiv_org_abs_2604_26365/figures/007_Figure_7.jpg]]
-*Figure 7: Illustration of Different Semantic Prompts*
-
-
 
 ### 3.1 现有预测型缓存方法的统一线性形式
 
@@ -217,9 +204,6 @@ $$\mathrm{Relative\ Residual} = \frac{\|\mathcal{F}(x_t) - \mathcal{F}^*(x_t)\|_
 
 在 50 步扩散轨迹上的实验（Figure 1）显示，绝大多数内部去噪步骤的投影保真度（$1 - \mathrm{Relative\ Residual}$）超过 **0.95**，表明当前特征可被历史特征以极高精度线性重建。这一发现构成了 L²P 极简线性设计的理论依据：既然线性表示的上界已经足够高，则无需引入复杂的非线性建模。
 
-![[assets/figures/papers/paper_list_l839_https_arxiv_org_abs_2604_26365/figures/001_Figure_1.jpg]]
-*Figure 1: Projection fidelity along a 50-step diffusion trajectory. At each step, we project the current feature onto the subspace spanned by past features and report projection fidelity, defined as 1 minus the relative projection residual. Most interior steps exceed 0.95, indicating a high upper bound for linear prediction*
-
 ### 3.3 L²P 可学习线性预测器
 
 基于上述分析，L²P 的核心创新在于将固定公式系数替换为数据驱动的可学习权重矩阵 $W$。预测公式为：
@@ -239,12 +223,8 @@ $$W^* = \arg\min_W \mathbb{E}\left[ \|\hat{\mathcal{F}}(x_t) - \mathcal{F}(x_t)\
 
 推理时，对于被跳过的时间步 $t$，直接利用已缓存的历史特征和训练好的权重 $W_{t,j}$ 计算预测特征，从而绕过昂贵的 DiT 前向计算。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l839_https_arxiv_org_abs_2604_26365/figures/004_Figure_3.jpg]]
 *Figure 3: MSE Loss Comparison Across Intervals. Logarithmic comparison of MSE loss between our method, TaylorSeer, and FoCa for predictions at different step intervals*
-
-
 
 ## 实验与关键发现
 
@@ -287,30 +267,14 @@ Figure 4 展示了不同方法在相同 prompt 下的生成结果对比。在多
 2. **中间层特征依赖。** L²P 的线性预测仅作用在最后一层特征。若下游任务或特定应用场景依赖中间层特征，该方法可能不直接适用。不过，论文指出这一设计选择是基于实验验证——仅使用最后一层特征即可实现高质量预测，同时最大化内存和计算效率。
 3. **新模型的适配成本。** 虽然训练仅需 50 张图像和约 20 秒，但对每个新模型仍需额外收集离线轨迹数据。该过程可自动化，但仍构成一定的工程开销。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l839_https_arxiv_org_abs_2604_26365/figures/003_Table_1.jpg]]
 *Table 1: Quantitative comparison in text-to-image generation for FLUX*
 
 ![[assets/figures/papers/paper_list_l839_https_arxiv_org_abs_2604_26365/figures/006_Table_2.jpg]]
 *Table 2: Quantitative comparison in text-to-image generation for Qwen Image*
 
-![[assets/figures/papers/paper_list_l839_https_arxiv_org_abs_2604_26365/figures/012_Table_5.jpg]]
-*Table 5: Quantitative comparison of text-to-video generation on HunyuanVideo*
-
 ![[assets/figures/papers/paper_list_l839_https_arxiv_org_abs_2604_26365/figures/009_Figure_6.jpg]]
 *Figure 6: Ablation Study on Data Efficiency. Analysis of our method’s performance with varying training set sizes (5, 10, 25, 50, 100) at*
-
-![[assets/figures/papers/paper_list_l839_https_arxiv_org_abs_2604_26365/figures/010_Table_3.jpg]]
-*Table 3: Ablation on Data Semantics and Feature Evolution*
-
-![[assets/figures/papers/paper_list_l839_https_arxiv_org_abs_2604_26365/figures/011_Table_4.jpg]]
-*Table 4: GPU memory usage comparison (MiB)*
-
-![[assets/figures/papers/paper_list_l839_https_arxiv_org_abs_2604_26365/figures/013_Figure_8.jpg]]
-*Figure 8: Qualitative Comparison of Early, Middle, and Late Frames From Generated Videos. On HunyuanVideo*
-
-
 
 ## 定位与知识库关联
 
@@ -349,8 +313,6 @@ L²P的适用边界由以下因素界定：
 2. **高分辨率/长序列扩展**：在更高分辨率图像或更长视频序列上，线性表示假设是否依然保持高保真度？HunyuanVideo上的初步结果（Table 5）显示L²P在视频生成中同样有效，但更极端的序列长度仍有待验证。
 3. **与少步生成方法的叠加**：L²P能否与基于蒸馏的少步生成方法（如一致性模型、LCM）结合，实现特征缓存与采样步数减少的叠加加速？
 4. **细粒度权重设计**：是否可以将可学习系数从全局共享推广到token级别或层级别的细粒度权重，以进一步提升预测精度？
-
-
 
 ## 原文 PDF
 

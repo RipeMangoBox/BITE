@@ -53,8 +53,6 @@ claims:
 
 在方法谱系上，DiffH2O属于**时间两阶段扩散生成**范式，区别于单阶段扩散基线（如适配后的MDM、GMD）和基于后优化的方法（如IMoS）。其知识库定位在于：将手物交互生成从“端到端黑箱映射”推进到“结构化分解+条件引导”的框架，为后续集成物理约束和提升推理效率的研究提供了明确的切入点。
 
-
-
 ### 问题背景：手物交互合成的核心挑战
 
 生成逼真的手物交互运动是计算机图形学与具身智能领域的一项基础性难题。与全身人体运动生成不同，手物交互涉及高自由度的手部关节、精细的接触约束以及手与物体之间的复杂物理耦合。这一任务的瓶颈在于：**手物交互数据获取成本极高，且现有方法难以在保持物理合理性和语义对齐的前提下泛化到未见物体**。具体而言，手物交互数据稀缺源于动捕设备对手部精细运动的采集难度，以及标注手‑物体接触状态的复杂性。这使得模型极易过拟合于训练集中的物体形状与交互模式，面对新物体时往往产生穿透、脱离接触或语义错位等伪影。
@@ -80,8 +78,6 @@ claims:
 3. **增强生成可控性**：引入抓取引导机制和详细文本描述，使用户能够在推理时指定目标抓取手势，并通过三阶段文本（预动作‑动作‑后动作）精细控制手部行为，弥补简单文本条件在语义表达力上的不足。
 
 > 注：DiffH2O 是首个从文本描述合成未见物体手物交互的方法（Section 1 声明，置信度 0.95），其在 GRAB 数据集上的两阶段设计、抓取引导和详细文本条件均通过消融实验和对比实验得到了充分验证。
-
-
 
 ## 核心方法与创新机理
 
@@ -136,8 +132,6 @@ $$\tilde{\mathbf{x}}_{0,\theta}^{i} = (1 - M_g^{i}) \odot \mathbf{x}_{0,\theta}^
 
 DiffH2O 的方法论贡献可归纳为四个 **changed slots** 的协同作用：两阶段扩散解耦了运动模式的复杂性，弱耦合表示降低了对物体几何的敏感度，子序列补全保障了阶段过渡的平滑性，抓取引导与详细文本描述则赋予生成过程精细的可控性。这些设计共同使得在小规模 GRAB 数据集上训练的模型能够泛化到未见物体，并生成物理合理、语义对齐的手物交互运动。
 
-
-
 ### 问题定义与生成目标
 
 DiffH2O 的核心任务是从文本描述和物体几何形状出发，生成双手与物体交互的完整运动序列。给定文本提示 $\mathcal{T}$ 和物体网格，模型建模条件概率分布 $p(\mathbf{x} \mid \mathbf{c}, G=0)$，其中 $\mathbf{x}$ 表示手物交互序列，$\mathbf{c}$ 为条件信号，$G=0$ 指示物体处于静态（未被抓取）的初始状态。这一设定将生成问题分解为两个本质上不同的子阶段：物体静止时的抓取接近，以及抓取后的动态交互。
@@ -176,12 +170,8 @@ DiffH2O 支持两种粒度的文本控制：简单模板文本（如“The perso
 
 在推理阶段，完整流水线从随机噪声出发，依次经过抓取扩散（可选抓取引导）、子序列补全、交互扩散，最终输出完整的 $N$ 帧手物交互序列。然而，该流程存在显著的效率瓶颈：生成 32 个样本约需 300 秒，主要受限于两个扩散模型的顺序采样过程。这一限制使得 DiffH2O 目前难以满足实时交互式应用的需求，也是论文明确指出的开放问题之一。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1807_DiffH2O_Diffusion_Based_Synthesis_of_Hand_Object_Interactions_from_Textu/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of DiffH2O. We couple hands and objects by representing hands relative to the object position in the initial frame and encoding hand-object distances (Sec. 4.1). We observe that objects are static until they have been grasped, and propose to decouple grasping and interaction stages and modelling them with two different diffusion processes (Sec. 4.2). Finally, we make use of grasp guidance and subsequence imputation to ensure a smooth transition between these two stages (Sec. 4.2.3). We further show fine-grained synthesis controllability through our detailed textual descriptions (Sec. 4.4)*
-
-
 
 ### 3.1 运动表示与手物耦合
 
@@ -241,8 +231,6 @@ $$\nabla_{\mathbf{x}_t^{g}} \log \phi(\mathbf{c} | \mathbf{x}_t^{g}) \approx - \
 
 该架构设计使模型能够同时感知文本语义、物体几何和扩散进度，为两阶段生成提供统一的条件框架。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -267,9 +255,6 @@ DiffH2O 在 GRAB 数据集的两个关键测试场景上均取得显著领先：
 
 Figure 5 展示了三类典型失败案例：
 
-![[assets/figures/papers/paper_list_l1807_DiffH2O_Diffusion_Based_Synthesis_of_Hand_Object_Interactions_from_Textu/figures/012_Figure_5.jpg]]
-*Figure 5: Failure Cases. We present three possible failure cases of our method. a) The generated motion does not match the action described in the input prompt, such as trying to perform a bottle opening motion with an apple. b) During grasp guidance, the reference grasp is largely ignored in the diffusion process, resulting in an interaction that is distinct from the grasp reference. c) Despite training with our curated text annotations, the model sometimes does not pick up on the cue of handedness and may interact with a hand different from the one provided in the text prompt*
-
 1. **动作‑文本不匹配**：生成的运动与输入提示中的动作描述不一致，说明语义对齐在部分情况下仍不可靠。
 2. **抓取引导被忽略**：当文本提示与目标抓取手势冲突时，模型倾向于遵循文本条件而忽略引导梯度，导致目标抓取未能实现。
 3. **手性识别错误**：模型偶尔无法正确理解文本中的左右手提示，生成错误的手性分配。
@@ -293,30 +278,11 @@ Figure 5 展示了三类典型失败案例：
 ![[assets/figures/papers/paper_list_l1807_DiffH2O_Diffusion_Based_Synthesis_of_Hand_Object_Interactions_from_Textu/figures/014_Table_6.jpg]]
 *Table 6: Network architecture. Model and hyperparameters of DiffH2O*
 
-![[assets/figures/papers/paper_list_l1807_DiffH2O_Diffusion_Based_Synthesis_of_Hand_Object_Interactions_from_Textu/figures/016_Table_8.jpg]]
-*Table 8: Details of the quantitative analysis with action feature based metrics. We provide further details for the quantitative analysis in Table 1 of the main paper and report standard deviations of multimodality and diversity metrics as well as FID and KID scores. The results here are obtained using action recognition models trained on hand pose data of the respective training splits as indicated in the first column. We either use a subject-based split (top 3 rows) or an object-based split (bottom 3 rows). For IMoS, we use the same pretrained model, which is trained on unseen subject split, across all our experiments (unseen subject and unseen object splits) due to difficulties in reproducing tra...*
-
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1807_DiffH2O_Diffusion_Based_Synthesis_of_Hand_Object_Interactions_from_Textu/figures/003_Table_1.jpg]]
 *Table 1: Comparison to State-of-the-Art in the Interaction Stage. We compare our method with two backbones (transformer and UNet) against IMoS [Ghosh et al. 2023]. We report results on an unseen subject split (top 3 rows) [Ghosh et al. 2023], and on our unseen object test dataset (bottom 3 rows). For IMoS, we use the same pretrained model, trained on unseen subject split, across all our experiments (unseen subject/object splits), due to difficulties in reproducing training performance for the unseen object split (indicated with IMoS* in the table). ↑: higher values are better, ↓: lower values are better*
 
-![[assets/figures/papers/paper_list_l1807_DiffH2O_Diffusion_Based_Synthesis_of_Hand_Object_Interactions_from_Textu/figures/005_Table_2.jpg]]
-*Table 2: Comparison to Diffusion Baselines for the Full Sequence. We compare against HOI-adapted versions of MDM and GMD. We measure the grasp error (GE) and the accuracy of handedness (HA) with respect to the reference grasp, the interpenetration volume (IV), and the wrist joint velocities*
-
 ![[assets/figures/papers/paper_list_l1807_DiffH2O_Diffusion_Based_Synthesis_of_Hand_Object_Interactions_from_Textu/figures/007_Table_3.jpg]]
 *Table 3: Ablation Study. We provide ablations of our components against the base model. We measure the grasp error (GE) and the accuracy of handedness (HA) with respect to the reference grasp, as well as interpenetration volume (IV). We also provide the wrist joint velocities*
-
-![[assets/figures/papers/paper_list_l1807_DiffH2O_Diffusion_Based_Synthesis_of_Hand_Object_Interactions_from_Textu/figures/006_Table_4.jpg]]
-*Table 4: Pose Representation Evaluation. We compare different alternative pose representations in interaction stage and demonstrate the benefits of object-relative pose representation and encoding hand-object signed distances. Bold indicates the best result, underlined is the*
-
-![[assets/figures/papers/paper_list_l1807_DiffH2O_Diffusion_Based_Synthesis_of_Hand_Object_Interactions_from_Textu/figures/008_Table_5.jpg]]
-*Table 5: Text evaluation. We demonstrate that detailed text descriptions enable us to generate motions more representative of the description, and allow fine-grained controllable hand-object motion synthesis*
-
-![[assets/figures/papers/paper_list_l1807_DiffH2O_Diffusion_Based_Synthesis_of_Hand_Object_Interactions_from_Textu/figures/004_Figure_3.jpg]]
-*Figure 3: Qualitative Comparison. Post-optimizing object motion as in IMoS [Ghosh et al. 2023] (bottom row) exhibits artifacts with fine-grained manipulations, e.g., when an object switches hands. In contrast, our approach (top row) seamlessly handles such cases. Best seen in supplemental video*
-
-
 
 ## 定位与知识库关联
 
@@ -393,8 +359,6 @@ DiffH2O 将运动生成分解为抓取阶段（ε-预测扩散模型）和交互
 3. **引导冲突消解**：如何自动对齐目标抓取与文本提示，避免两者冲突导致的控制失效？
 4. **极端尺度泛化**：如何改进模型对训练分布外物体尺寸和形状的鲁棒性？
 5. **弱监督文本控制**：在不依赖大规模人工标注的前提下，如何自动生成或利用弱监督文本描述来增强运动控制？
-
-
 
 ## 原文 PDF
 

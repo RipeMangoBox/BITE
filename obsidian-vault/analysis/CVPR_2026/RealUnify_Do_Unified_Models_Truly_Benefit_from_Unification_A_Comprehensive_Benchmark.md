@@ -75,8 +75,6 @@ RealUnify 的方法论贡献在于设计了一套**双评估协议**（dual-eval
 
 这些结果表明，当前统一模型在需要理解与生成深度交互的复杂任务上存在系统性缺陷，架构统一远未带来能力协同。RealUnify 为未来研究指明了方向：需要设计专门促进双向交互的训练策略与模型归纳偏置，而非仅仅将两种能力堆叠于同一架构中。
 
-
-
 ### 问题背景：从能力堆叠到能力协同
 
 多模态大模型正经历从“单一能力”到“统一架构”的范式迁移。早期基准仅关注视觉理解或图像生成中的某一维度（Stage 1），随后出现的基准开始在同一模型中同时考察两类能力（Stage 1.5），部分工作甚至初步探索了理解与生成之间的单向增强（Stage 2）。然而，一个根本性问题始终悬而未决：**统一模型是否真正从统一中获益？** 换言之，将理解与生成能力置于同一架构中，是否能够产生超越各自独立运行的协同效应？
@@ -100,8 +98,6 @@ Figure 1 清晰地定位了 RealUnify 在这一演进脉络中的位置——它
 - **揭示协同真相**：通过严格对照实验回答核心问题：统一模型的能力协同是真实的双向增强，还是仅停留在功能叠加层面？专用模型的组合是否比统一模型更有效？
 
 这一基准的建立，不仅为现有统一模型提供了能力诊断工具，更为未来模型设计指明了关键方向：**如何从架构统一走向真正的能力协同**。
-
-
 
 ## 核心方法与创新机理
 
@@ -140,8 +136,6 @@ RealUnify的方法论创新集中体现在其**双评估协议**上，这是该�
 
 由于UEG和GEU任务涉及复杂生成图像的准确性判断——如属性绑定、数量控制、空间关系等——传统自动化指标（如FID、CLIPScore）无法有效评估。RealUnify设计了**验证问题驱动的投票式评判方法**：针对每张生成图像，构造一组可自动验证的是非问题（如“图中是否恰好有三个红色立方体？”），并利用**Gemini 2.5 Pro**作为评判模型进行回答。与人类专家评估的一致性验证（Table 4）表明，该方法在保持可扩展性的同时，达到了可接受的可靠性水平，为大规模协同能力评估提供了实用方案。
 
-
-
 RealUnify 并非一个模型，而是一个**面向统一模型能力协同的双评估基准**。其整体框架围绕一个核心诊断问题构建：当前统一模型是否真正实现了理解与生成能力的双向增强，还是仅仅在架构层面完成了功能堆叠？为此，RealUnify 设计了三个相互衔接的模块，形成从任务定义到瓶颈诊断的完整评估链路。
 
 ### 任务定义层：UEG 与 GEU 双向协同
@@ -177,12 +171,8 @@ RealUnify 包含 **1,000 个人工标注实例**，覆盖 10 个类别、32 个�
 
 整个框架的评估流程如下：给定一个需要理解与生成协同的复杂任务 → 首先通过直接评估获取端到端性能 → 再通过逐步分解评估将任务解耦为理解子问题和生成子问题 → 对比两种协议下的性能差异 → 结合投票式评判对生成结果进行自动化评分 → 最终输出关于模型“能力协同”状态的诊断结论。这一流程将“统一模型是否真正受益于统一”这一抽象问题，转化为可量化、可归因的实证判断。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l780_https_arxiv_org_abs_2509_24897/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of RealUnify. Unlike benchmarks focused on either understanding or generation (Stage 1), those that merely integrate both capabilities (Stage 1.5), or even those that preliminarily explore the mutual enhancement between understanding and generation (Stage 2), RealUnify stands as the first benchmark to comprehensively evaluate and fully harness the synergy between these capabilities, making it a pioneering effort in assessing ability synergy for unified models*
-
-
 
 RealUnify 本身是一个基准测试，不提出新的模型架构或训练公式，其核心贡献在于设计了一套系统性的评估协议与数据集构建流程。以下梳理其关键方法模块。
 
@@ -216,13 +206,6 @@ RealUnify 的数据集构建遵循严格的人工标注与审核流程：
 RealUnify 作为基准测试，未引入新的数学公式或理论推导。其评估指标为准确率（Accuracy），即模型在验证问题上回答正确的比例，不涉及自定义损失函数或优化目标。论文中所有定量结果均以准确率百分比形式呈现，无独立公式推导部分。
 
 > **注意**：若需了解被评估的统一模型（如 BAGEL、UniPic2 等）的内部公式，需查阅其原始论文，RealUnify 本身不包含此类内容。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l780_https_arxiv_org_abs_2509_24897/figures/004_Figure_3.jpg]]
-*Figure 3: Illustration of polling evaluation. To assess the accuracy of the generated images, we design verification questions and employ Gemini 2.5 Pro as the judge in a polling-based evaluation*
-
-
 
 ## 实验与关键发现
 
@@ -269,34 +252,15 @@ RealUnify 的核心方法创新在于其**双评估协议**：直接评估测量
 - **空间关系错误**：模型难以维持物体间的相对位置关系，如“A 在 B 的左边”被生成为上下排列。
 - **推理链断裂**：在 GEU 任务中，即使逐步分解提供了中间结果，模型仍无法基于生成图像完成后续推理（Figure 6）。
 
-![[assets/figures/papers/paper_list_l780_https_arxiv_org_abs_2509_24897/figures/011_Figure_6.jpg]]
-*Figure 6: Challenging examples of stepwise execution in task solving. Despite using a stepwise approach, the unified model struggles to complete complex tasks, only succeeding with intermediate results based on the given ground truth*
-
 这些失败模式直接印证了核心瓶颈：统一模型缺乏促进理解与生成双向交互的训练目标与归纳偏置，导致两种能力在端到端场景中无法协同使用。
 
 ### 数据集统计与任务分布
 
 RealUnify 数据集包含 600 个 UEG 实例和 400 个 GEU 实例，覆盖 10 个类别、32 个子任务（Figure 4、Table 6）。UEG 类别涵盖世界知识、常识推理、数学推理、逻辑推理、科学推理和代码到图像；GEU 类别包括心理重建、心理追踪、注意力聚焦和认知导航。每个任务均在直接和逐步两种设置下评估，逐步评估进一步将过程分解为视觉理解问题和生成问题。
 
-![[assets/figures/papers/paper_list_l780_https_arxiv_org_abs_2509_24897/figures/005_Figure_4.jpg]]
-*Figure 4: Statistics of RealUnify. The tasks span 10 categories, divided into two groups: UEG and GEU, including 32 subtasks*
-
-![[assets/figures/papers/paper_list_l780_https_arxiv_org_abs_2509_24897/figures/016_Table_6.jpg]]
-*Table 6: Distribution of task instances across different categories in RealUnify. Each task is evaluated under both direct and stepwise settings, where stepwise evaluation further decomposes the process into a visual understanding problem and a generation problem*
-
 ### 局限性与开放问题
 
 当前评估存在以下局限：（1）数据集语言限定为英文，可能限制多语言泛化性；（2）部分统一模型不支持图像编辑，导致 GEU 逐步评估结果缺失；（3）任务设计主要针对静态图像，未涵盖视频或交互式场景。核心开放问题在于：如何设计训练策略和模型架构，使统一模型能够在端到端场景中真正整合理解与生成能力，尤其是提升属性绑定、数量控制和空间关系精度，使“以图助思”的 GEU 范式更为有效。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l780_https_arxiv_org_abs_2509_24897/figures/010_Figure_5.jpg]]
-*Figure 5: Effective examples of stepwise execution in task solving. Through the unified model’s inherent understanding and generation abilities, the model is able to implement complex tasks*
-
-![[assets/figures/papers/paper_list_l780_https_arxiv_org_abs_2509_24897/figures/002_Table_1.jpg]]
-*Table 1: Comparisons on RealUnify and other benchmarks. RealUnify is designed to provide a comprehensive evaluation of unified models across multiple dimensions. It is entirely human-annotated and integrates both direct and stepwise evaluation protocols. RealUnify centers on evaluating whether the synergy between generation and understanding can be effectively harnessed to solve complex tasks*
-
-
 
 ## 定位与知识库关联
 
@@ -351,8 +315,6 @@ RealUnify揭示了理解与生成协同的**非对称性**：
 3. **复杂推理与生成精度的联合提升**：统一模型在属性绑定、数量控制、空间关系等生成精度问题上仍然存在典型缺陷（见Figure 11、Figure 12），这些问题在需要深度推理的UEG任务中被进一步放大。如何在保持统一架构的同时提升这些基础生成能力？
 
 4. **更优的协同评估协议**：逐步分解范式虽能诊断瓶颈，但其人工设计的分解路径可能不是模型内部最优的协同方式。是否存在更自然的评估协议，能够在不强制分解的情况下度量能力协同的深度？
-
-
 
 ## 原文 PDF
 

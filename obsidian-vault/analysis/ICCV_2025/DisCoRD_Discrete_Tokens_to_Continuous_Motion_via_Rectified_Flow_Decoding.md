@@ -64,8 +64,6 @@ DisCoRD 是一种**解码器替换方案**，不改变预训练的量化器和�
 - **跨任务泛化**：在共语音手势生成（TalkSHOW + DisCoRD，sJPE 从 0.284 降至 0.077）和音乐驱动舞蹈生成任务上同样取得一致改善，验证了方法的通用性。
 - **指标验证**：提出的 **sJPE**（对称 Jerk 百分比误差）对帧级高斯噪声高度敏感，而 FID 几乎无响应，证明 sJPE 能有效捕获传统分布度量无法反映的自然度缺陷。
 
-
-
 人体动作生成是计算机视觉与图形学中的核心问题，其目标是根据文本、语音或音乐等控制信号合成逼真的三维人体运动序列。近年来，基于离散表示的方法逐渐成为主流范式。这类方法通常采用两阶段流程：首先训练一个基于 VQ-VAE 的量化器，将连续运动序列编码为离散令牌；然后训练一个自回归或掩码令牌预测模型，根据控制信号生成令牌序列；最后通过一个确定性前馈解码器将离散令牌一步映射回运动空间。代表性工作包括 **T2M-GPT**、**MoMask**、**BAMM** 和 **MMM** 等。
 
 这种离散化策略带来了显著优势：离散令牌能够有效压缩运动数据中的高层语义与结构信息，使得令牌预测模型能够以高忠实度响应控制信号。然而，这一范式存在一个被长期忽视的根本性瓶颈：**离散令牌解码过程中的信息损失**。VQ-VAE 将连续运动映射到有限码本的过程本身引入了不可逆的离散化误差，而现有方法采用的前馈解码器以一步式、确定性的方式直接从离散令牌重建运动，无法弥补这一误差。其后果表现为两类典型缺陷：
@@ -76,8 +74,6 @@ DisCoRD 是一种**解码器替换方案**，不改变预训练的量化器和�
 相比之下，连续空间中的生成方法（如基于扩散模型的 **MLD**）虽然能产生平滑的运动，却往往在忠实度上有所妥协——生成的语义内容与控制信号之间的一致性不足。
 
 DisCoRD 的动机正是弥合这一鸿沟：**在保留离散令牌高忠实度优势的前提下，消除其自然度缺陷**。核心洞察在于，离散令牌解码本质上可以被重新定义为一个条件生成问题——以离散令牌中编码的语义与结构信息作为条件，在连续原始运动空间中执行迭代优化，逐步恢复被离散化过程丢失的动态细节与平滑性。这一思路将解码从“一步映射”转变为“条件连续生成”，从而在不牺牲对控制信号忠实度的前提下，大幅提升生成动作的自然度。
-
-
 
 ## 核心方法与创新机理
 
@@ -116,8 +112,6 @@ $$\min_v \int_0^1 \mathbb{E}\left[\|(\mathbf{X}_1 - \mathbf{X}_0) - v(\mathbf{X}
 ### 创新效果验证
 
 MoMask+DisCoRD 在 HumanML3D 重建任务上，FID 从 0.019 降至 0.011（+42%），sJPE 从 0.512 降至 0.385（+25%）；在生成任务上，FID 从 0.045 降至 0.032（+29%），同时 R-Precision Top-1 保持几乎持平（0.524 vs 0.521），验证了“自然度提升而不牺牲忠实度”的核心主张。跨任务迁移至共语音手势生成（TalkSHOW+DisCoRD sJPE 从 0.284 降至 0.077）进一步证明了方法的通用性。
-
-
 
 DisCoRD 的整体 pipeline 围绕一个核心设计展开：**将离散运动令牌的解码重新定义为一个条件生成问题**，在连续原始运动空间中通过迭代优化恢复自然动作。该框架由四个模块串联构成，形成训练与推理两条路径。
 
@@ -161,12 +155,8 @@ $$\min_v \int_0^1 \mathbb{E}\left[\|(\mathbf{X}_1 - \mathbf{X}_0) - v(\mathbf{X}
 
 传统离散方法（如 **MoMask**、**T2M-GPT**、**BAMM**、**MMM**）使用确定性的一步前馈解码器直接将离散令牌映射为动作序列。DisCoRD 将这一解码器替换为在连续空间中运行的整流流迭代解码器，其余组件（量化器、令牌预测模型）完全复用。这一替换是 DisCoRD 性能提升的唯一架构变更，消融实验中整流流解码器（RF）相比前馈解码器（FF）在生成任务上 FID 从 0.064 降至 0.032，重建 sJPE 从 0.512 降至 0.385（Table 6）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1885_DisCoRD_Discrete_Tokens_to_Continuous_Motion_via_Rectified_Flow_Decoding/figures/003_Figure_3.jpg]]
 *Figure 3: An overview of DisCoRD. During the Training stage, we leverage a pretrained quantizer to first obtain discrete representations (tokens) of motion. These tokens are then projected into continuous features C, which are concatenated with noisy motion*
-
-
 
 ### 3.1 预备知识：整流流（Rectified Flow）
 
@@ -225,9 +215,6 @@ $$\mathrm{Static\ sJPE} = \frac{1}{n} \sum_{t=1}^{n} \frac{\max(0, J_{\mathrm{tr
 
 实验验证（Figure 4）表明，在真实运动上叠加帧级高斯噪声时，Noise sJPE 高度敏感，而 Static sJPE 保持低位；相比之下，FID 对同样的噪声几乎无响应。这证明 sJPE 能有效捕获传统分布度量（FID）无法反映的自然度缺陷。
 
-![[assets/figures/papers/paper_list_l1885_DisCoRD_Discrete_Tokens_to_Continuous_Motion_via_Rectified_Flow_Decoding/figures/004_Figure_4.jpg]]
-*Figure 4: sJPE and FID response to frame-wise gaussian noise. We introduce Gaussian noise with varying standard deviations (x-axis) to ground-truth motion data and evaluate its effect on sJPE and FID. Noise sJPE is highly sensitive to subtle frame-wise perturbations, whereas Static sJPE remains low. FID is highly insensitive to frame-wise noise. Note that FID scale (y-axis, right) is very small compared to sJPE scale (y-axis, left)*
-
 ### 3.4 模块间数据流
 
 整体推理流程的数据依赖关系如 Figure 3 所示：
@@ -238,13 +225,6 @@ $$\mathrm{Static\ sJPE} = \frac{1}{n} \sum_{t=1}^{n} \frac{\max(0, J_{\mathrm{tr
 4. **整流流解码器**（可训练）：以 $\mathbf{C}$ 为条件，从高斯噪声 $\mathbf{X}_0$ 迭代求解 ODE 至 $\mathbf{X}_1$，输出最终运动。
 
 训练阶段仅优化条件投影和整流流解码器的参数，量化器与令牌预测模型保持冻结，确保与现有离散运动生成框架的兼容性。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1885_DisCoRD_Discrete_Tokens_to_Continuous_Motion_via_Rectified_Flow_Decoding/figures/002_Figure_2.jpg]]
-*Figure 2: Concept of DisCoRD. Discrete quantization methods encode multiple motions into a single quantized representation. While existing methods directly decode from this quantized representation, DisCoRD iteratively decodes the discrete latent in a continuous space to recover the inherent continuity and dynamism of motion. To assess the gap between reconstructed and real motion, prior work primarily used FID as the metric. Here, we additionally propose symmetric Jerk Percentage Error (sJPE) to evaluate the differences in naturalness between reconstructed and real motion*
-
-
 
 ## 实验与关键发现
 
@@ -296,9 +276,6 @@ DisCoRD 的迭代连续解码策略在共语音手势生成和音乐驱动舞蹈
 ![[assets/figures/papers/paper_list_l1885_DisCoRD_Discrete_Tokens_to_Continuous_Motion_via_Rectified_Flow_Decoding/figures/008_Table_3.jpg]]
 *Table 3: Quantitative results on each method’s SHOW test set. DisCoRD outperforms baseline models on sJPE and FGD*
 
-![[assets/figures/papers/paper_list_l1885_DisCoRD_Discrete_Tokens_to_Continuous_Motion_via_Rectified_Flow_Decoding/figures/009_Table_4.jpg]]
-*Table 4: Quantitative results on the AIST++ test set. DisCoRD outperforms baseline model on sJPE, Distk and*
-
 ### 消融实验
 
 Table 6 系统性地验证了 DisCoRD 各设计选择的贡献：
@@ -322,9 +299,6 @@ Figure 4 通过向真实运动注入不同标准差的高斯噪声，系统性�
 
 这一分析证明 sJPE 能有效捕获传统 FID 无法反映的自然度缺陷——帧级噪声和欠重构。Figure 5 进一步通过运动轨迹和 jerk 图可视化展示了 DisCoRD 如何减少蓝色区域（噪声 sJPE）和红色区域（静态 sJPE），生成更平滑且更富动态的动作。
 
-![[assets/figures/papers/paper_list_l1885_DisCoRD_Discrete_Tokens_to_Continuous_Motion_via_Rectified_Flow_Decoding/figures/005_Figure_5.jpg]]
-*Figure 5: Under-reconstruction and frame-wise noise. We visualize fine-grained motion trajectories (top), and corresponding jerk graphs (bottom), where blue and red regions indicate noise and static sJPE, respectively. Compared to other methods, DisCoRD significantly reduces sJPE, resulting in smoother motion (fewer blue regions) and greater dynamism (fewer red regions), as highlighted in green boxes*
-
 ### 失败模式与局限性
 
 1. **音乐到舞蹈生成的指标退化**：在 AIST++ 上 FID_k 和 FID_g 出现退化。作者归因于这些指标在该数据集上已知不可靠，但这一现象表明 DisCoRD 在特定领域的评估可能需要专门的度量标准。Beat Align Score 的改善提供了部分正面证据，但该任务上的整体性能需要更多定性评估支持。
@@ -333,16 +307,7 @@ Figure 4 通过向真实运动注入不同标准差的高斯噪声，系统性�
 
 3. **计算开销**：单个 RTX 4090 Ti 训练需 35 小时。Figure 6 显示 DisCoRD 的解码时间与基线方法可比（批量解码 32 个序列的平均耗时相近），但迭代解码的推理步骤数是一个可调节的效率-质量权衡参数。
 
-![[assets/figures/papers/paper_list_l1885_DisCoRD_Discrete_Tokens_to_Continuous_Motion_via_Rectified_Flow_Decoding/figures/012_Figure_6.jpg]]
-*Figure 6: Decoding efficiency comparison. We report the average decoding time for a batch of 32 token sequences on an NVIDIA RTX 4090 Ti, averaged over 20 trials on the HumanML3D test set. DisCoRD achieves more better performance on motion naturalness at a comparable decoding speed to MoMask and can even decode significantly faster while maintaining superior performance*
-
 4. **sJPE 的适用边界**：sJPE 计算依赖真实运动 jerk，在无真值的开放生成场景中无法直接应用，需依赖参考动作或模型级代理指标。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1885_DisCoRD_Discrete_Tokens_to_Continuous_Motion_via_Rectified_Flow_Decoding/figures/010_Figure.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -425,8 +390,6 @@ DisCoRD 开辟了若干值得探索的方向：
 4. **sJPE 的无参考推广**：当前 sJPE 需要真实运动 jerk 作为参考。能否将其推广为一种无需参考动作的生成质量评估指标，用于实时反馈或强化学习奖励，是一个有实际价值的开放问题。
 
 5. **更大规模数据上的验证**：在 AMASS 等更大规模、更多样化的混合运动数据集上，DisCoRD 是否仍能保持优势，有待进一步验证。
-
-
 
 ## 原文 PDF
 

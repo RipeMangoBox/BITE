@@ -54,8 +54,6 @@ claims:
 
 CFG++ 的局限性主要包括：在极低 NFE（如 20 步 DPM++ 2M）采样中未展现出一致优势；反演仍基于 DDIM 近似假设，大步长下可能存在误差累积；以及需要在实际部署中通过 LPIPS 距离匹配合适的引导尺度 λ。其流形约束思想能否作为通用组件插入其他基于评分的生成框架，仍有待进一步探索。
 
-
-
 扩散模型已成为文本到图像（T2I）生成的主流框架，其核心在于通过逐步去噪将高斯噪声转化为符合数据分布的样本。为了在采样过程中注入文本条件控制，**分类器自由引导（Classifier-Free Guidance, CFG）** 已成为事实上的标准技术。CFG 通过在推理时外推条件与无条件评分估计的差异来增强文本对齐：
 
 $$\hat{\epsilon}_c^{\omega}(x_t) = \hat{\epsilon}_{\emptyset}(x_t) + \omega [ \hat{\epsilon}_c(x_t) - \hat{\epsilon}_{\emptyset}(x_t) ]$$
@@ -67,8 +65,6 @@ $$\hat{\epsilon}_c^{\omega}(x_t) = \hat{\epsilon}_{\emptyset}(x_t) + \omega [ \h
 从优化视角审视，CFG 在逆向扩散过程中并未显式优化任何与文本条件相关的损失函数。这导致其文本条件评分匹配损失（SDS loss）在采样早期出现剧烈波动，表明条件信号与样本质量之间存在不稳定的权衡（见 Figure 4）。这一问题在低步数采样（如蒸馏模型的 6 NFE 采样）中尤为突出，CFG 引导的图像往往伴随严重的结构失真。
 
 针对上述缺陷，**CFG++** 从扩散模型逆问题求解器（DIS）的最新进展中获得启发，将文本引导重新定义为**以文本条件评分匹配损失为目标函数的逆问题**。该方法利用分解扩散采样（Decomposed Diffusion Sampling, DDS）将去噪与重噪声解耦，从而在重噪声步骤中使用无条件噪声估计 $\hat{\epsilon}_{\emptyset}(\mathbf{x}_t)$，并将引导尺度缩小到插值区间 $\lambda \in [0.0, 1.0]$。这一设计既保持了流形约束，又实现了从无条件到条件采样的平滑过渡，同时恢复了 DDIM 的可逆性，为图像反演与编辑等下游任务提供了更可靠的基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -146,8 +142,6 @@ $$
 
 三个 changed slots 形成闭环：**插值尺度**（Slot 1）确保去噪估计不脱离流形，**无条件重噪声**（Slot 2）阻断偏移累积，**显式损失最小化**（Slot 3）提供平滑的条件对齐信号。三者共同实现了 CFG++ 的核心承诺——在保持或提升文本对齐（CLIP 相似度相当或更高）的同时，显著降低 FID（COCO 10k 上从 13.84 降至 12.75），并恢复 DDIM 的可逆性以支持高质量反演与编辑。
 
-
-
 CFG++ 的整体 pipeline 建立在一个核心洞察之上：**标准 CFG 的离流形现象源于重噪声步骤使用了条件噪声估计**，而 CFG++ 通过将文本引导重新定义为逆问题优化，在保持去噪估计条件化的同时，将重噪声步骤的噪声源替换为无条件噪声估计，从而将整个采样过程约束在数据流形附近。
 
 ### 模块构成与数据流
@@ -221,8 +215,6 @@ x̂_c^λ(x_t) ≃ (x_{t-1} - √(1-ᾱ_{t-1}) ε̂_∅(x_{t-1})) / √ᾱ_{t-1
 
 CFG++ 反演的误差界 `‖ε_cfg++‖ = λ‖δ ε̂_c(x_t) - δ ε̂_c(x_{t-1})‖` 严格小于 CFG 反演误差，这为图像编辑等需要精确反演的任务提供了理论优势。实验表明，CFG++ 在反演重建任务中显著提升了 PSNR 并降低了 RMSE（Figure 6b），编辑结果也更加忠实于原始图像结构。
 
-
-
 ### 问题重构：文本引导作为逆问题优化
 
 CFG++ 的核心思路是将文本条件引导重新定义为以**文本条件评分匹配损失**（即 SDS 损失）为目标的逆问题优化。不同于标准 CFG 直接对条件与无条件评分进行外推插值，CFG++ 通过显式最小化该损失来实现条件对齐：
@@ -274,16 +266,6 @@ CFG++ 反演误差 $\| \varepsilon_{cfg++} \| = \lambda \| \delta \hat{\epsilon}
 ### 核心机制总结
 
 CFG++ 的五个关键模块协同实现流形约束引导：**SDS 损失**提供文本对齐的优化目标；**DDS 求解器**解耦去噪与重噪声，避免雅可比计算；**去噪插值**（$\lambda \in [0,1]$）替代外推，消除离流形风险；**无条件重噪声**消除 CFG 中的偏移量 $\Delta^{\omega}$；**DDIM 反演**因误差受控而显著改善重建与编辑质量。整个框架仅修改了重噪声步骤的噪声来源和引导尺度的取值范围，即可在保持计算开销不变的前提下获得平滑的生成轨迹和更低的文本条件评分匹配损失（见 Figure 4）。
-
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_E77uvbOTtp/figures/003_Figure_4.jpg]]
-*Figure 4: Text-conditioned score matching loss throughout the reverse diffusion sampling for both CFG and CFG++ in SDXL. Avg. loss computed with 55 prompts from (Chen et al., 2024)*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_E77uvbOTtp/figures/010_Figure_9.jpg]]
-*Figure 9: Continuous transition between CFG and CFG++ schedule*
-
-
 
 ## 实验与关键发现
 
@@ -338,22 +320,6 @@ CFG++ 作为即插即用的引导策略，可直接集成到现有的扩散模�
 
 4. **模型架构依赖**：CFG++ 依赖明确的无条件评分通道 $\hat{\epsilon}_{\emptyset}$，对于无此通道的模型需要额外适配。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_E77uvbOTtp/figures/006_Figure_5.jpg]]
-*Figure 5: T2I using SDXL-{turbo, lightning}, 6 NFE, CFG vs CFG++*
-
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_E77uvbOTtp/figures/013_Figure_10.jpg]]
-*Figure 10: Enhanced T2I results by SDXL (ω = 9.0, λ = 0.8) with CFG++. Under CFG, the lion cub is not visible (top-left), the dog appears with two tails (top-right), the goggles have an unusual shape (bottom-left), and the tree trunk is folded (bottom-right). These artifacts are absent in those produced by CFG++*
-
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_E77uvbOTtp/figures/015_Figure_11.jpg]]
-*Figure 11: T2I using SD v1.5, CFG vs CFG++ (ω = 9.0, λ = 0.8). Unnatural depictions of human hands, and incorrect renderings of the text by CFG are corrected in CFG++*
-
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_E77uvbOTtp/figures/014_Figure_12.jpg]]
-*Figure 12: T2I using SDXL-Turbo, 6 NFE, CFG vs CFG++. The overall image quality and sophistication have improved with CFG++. DreamShaper XL was used for both images and metrics in main part*
-
-
-
 ## 定位与知识库关联
 
 ### 与标准分类器自由引导（CFG）的继承与突破
@@ -401,8 +367,6 @@ CFG++ 的适用性受以下条件约束：
 5. **理论收敛性**：能否从理论上更严格地刻画 CFG++ 的收敛性以及与 CFG 之间的误差界？目前的反演误差分析仅提供了上界比较，缺乏收敛速率或渐进性质的分析。
 
 > **注意**：CFG++ 在文本对齐损失（Figure 4）上的平滑性与更低绝对值提供了其优化目标有效性的直接证据，但该损失曲线仅基于 55 个提示词计算，统计显著性需要更大规模验证。消融实验（Table 4）通过插值重噪声步骤中的条件噪声权值 ω' 从 0（CFG++）到 1（CFG）确认了无条件重噪声的关键作用，但该实验仅在 COCO-1k 子集上进行，结论的泛化性需要进一步确认。
-
-
 
 ## 原文 PDF
 

@@ -57,8 +57,6 @@ Aes-R1 的关键技术路径包含两个可控环节：
 
 实验表明，Aes-R1 将骨干模型 Qwen2.5-VL-7B 在五个基准数据集上的平均 PLCC 从 0.4285 提升至 0.6337（相对提升 47.9%），平均 SRCC 从 0.4589 提升至 0.6186（相对提升 34.8%）。消融研究进一步确认：联合误差-排名奖励在所有奖励组合中表现最优；适度的 SFT 冷启动（1 个 epoch）后接 RAPO 可获得最佳性能，过度 SFT 会降低熵并削弱强化学习的增益。
 
-
-
 图像美学评估（Image Aesthetic Assessment, IAA）旨在量化图像的视觉美感，在图像检索、智能摄影和视觉内容推荐等领域具有广泛应用。然而，现有方法面临两个根本性瓶颈：
 
 **瓶颈一：缺乏高质量的美学推理数据。** 传统IAA方法——无论是手工特征方法（如**NIQE**, Mittal et al., 2013; **BRISQUE**, Mittal et al., 2012）还是深度学习方法（如**NIMA**, Talebi & Milanfar, 2018; **MUSIQ**, Ke et al., 2021）——仅输出单一的数值分数，无法解释“为什么这张图美”。尽管多模态大语言模型（MLLM）的兴起为可解释的美学评估带来了可能，但现有MLLM方法（如**Q-Align**, Wu et al., 2023a; **DeQA-Score**, You et al., 2025）仍然依赖图像-分数对进行监督微调，缺乏结构化的美学推理数据作为训练支撑，导致模型的可解释性严重不足。
@@ -68,8 +66,6 @@ Aes-R1 的关键技术路径包含两个可控环节：
 **核心洞察：** 人类的审美判断兼具“这张图值几分”的绝对评估能力和“A比B更好看”的相对比较偏好。将这两种偏好建模为RL中的联合奖励信号并进行协同优化，有望显著提升模型在图像美学评价上的准确性、可解释性和泛化能力。
 
 **本文动机：** 针对上述双重瓶颈，本文提出Aes-R1框架，核心包含两个创新组件：（1）**AesCoT数据管道**，自动构造包含五维度结构化推理的高质量美学数据，为模型提供冷启动能力；（2）**RAPO算法**，通过联合优化绝对误差奖励和相对排名奖励，使模型在生成可解释推理的同时精确校准分数与排序。实验表明，仅使用15K训练数据，Aes-R1即可将骨干模型（Qwen2.5-VL-7B）的平均PLCC/SRCC分别提升47.9%/34.8%（Table 1），验证了联合优化绝对与相对偏好的有效性。
-
-
 
 ## 核心方法与创新机理
 
@@ -96,8 +92,6 @@ RAPO 的核心突破在于**联合优化两种互补的奖励信号**：
 
 AesCoT 冷启动与 RAPO 并非孤立创新，二者存在关键的协同关系。实验表明（Table 3），适度的 SFT（1 个 epoch）初始化 RAPO 可获得最佳下游性能（平均 PLCC 0.6337，SRCC 0.6186），而跳过 SFT 直接进行端到端 RL 会导致模型生成质量低下的解释（如 Figure 6 中 AesR1-Zero 所示）；反之，过度 SFT（10 个 epochs）会降低策略熵，削弱后续 RL 的优化增益。这一发现揭示了“先教模型如何推理，再通过联合奖励精调其判断”这一两阶段范式的必要性。
 
-
-
 ![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_or3ZukbrKw/figures/010_Figure_2.jpg]]
 *Figure 2: Overview of AesCoT construction pipeline. Starting from original image-score pairs, we mask the continuous aesthetic score and prompt experts to produce CoT critiques along five aesthetic dimensions. Automated checks and human audits then remove any score leakage, reasoning–score mismatch, or factual errors, yielding high-quality, interpretable multimodal aesthetic reasoning data*
 
@@ -113,8 +107,6 @@ Aes-R1 采用**冷启动监督微调 + 强化学习精调**的两阶段训练范
 **输入输出流**：给定图像 $\mathcal{T}$ 和任务提示 $\mathcal{P}$，模型生成轨迹 $\tau = (c, s) \sim \pi_\theta(\cdot|\mathcal{T}, \mathcal{P})$，其中 $c$ 为多维度美学解释，$s$ 为整体美学分数。训练时，AesCoT 管道提供冷启动所需的图像-推理-分数三元组；RL 阶段仅需图像-分数对，奖励信号由 RAPO 的成对比较机制和绝对误差函数在线计算。
 
 **关键设计决策**：RAPO 的核心创新在于将人类审美判断中的两种偏好——绝对质量评估（分数校准）和相对比较偏好（排序一致性）——同时建模为 RL 奖励信号。消融实验（Table 2）证实，联合使用误差奖励和排名奖励在所有奖励组合中表现最优（平均 PLCC/SRCC 达 0.6297/0.6102），显著优于仅用单一奖励或二元奖励的方案。此外，适度的 SFT 冷启动（1 epoch）是性能关键：无 SFT 直接 RL 虽能获得较高分数，但生成的解释质量差（Figure 6, AesR1-Zero）；过度 SFT（10 epochs）则导致熵急剧下降，削弱后续 RL 增益（Table 3）。
-
-
 
 ### 问题形式化
 
@@ -180,16 +172,11 @@ $$\hat{A}_{k,t} = \frac{r_k - \mu(R_i)}{\sigma(R_i)}$$
 
 $r_k$ 为第 $k$ 个输出的总奖励 $r = r_{rank} + r_{abs}$，$\mu(R_i)$ 和 $\sigma(R_i)$ 分别为同一图像 $i$ 的多个采样输出的奖励均值和标准差。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
 
 Aes-R1在五个图像美学评估基准（TAD66K、AVA、FLICKR-AES、PARA、AADB）上进行了系统评估，使用PLCC（Pearson线性相关系数）和SRCC（Spearman秩相关系数）作为核心指标。表1展示了与各类基线方法的全面对比。
-
-![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_or3ZukbrKw/figures/012_Table_1.jpg]]
-*Table 1: PLCC and SRCC results compared to vanilla MLLM, hand-crafted, deep-learning based and MLLM based methods. *Results are retrained in our 15K combined train set. (DeQA-Score is trained on AVA and Flickr-aes in combination, owing to the absence of per-image standard deviation data in TAD66K). The best results are highlighted in bold, and the runner-ups are underlined*
 
 **与骨干模型的对比。** 以Qwen2.5-VL-7B为骨干模型，Aes-R1将五个基准上的平均PLCC从0.4285提升至0.6337（相对提升47.9%），平均SRCC从0.4589提升至0.6186（相对提升34.8%）。这一提升幅度表明，仅靠模型规模无法解决美学评估问题，而AesCoT推理数据与RAPO联合优化是性能跃升的关键驱动力。
 
@@ -244,25 +231,6 @@ Aes-R1在五个图像美学评估基准（TAD66K、AVA、FLICKR-AES、PARA、AAD
 
 所有带*的基线方法均在相同的15K组合训练集（AVA、TAD66K、FLICKR-AES按2:2:1比例混合）上重新训练，确保对比的公平性。DeQA-Score因TAD66K缺少每图标准差数据，仅在AVA和Flickr-aes的组合上训练。Aes-R1的15K训练数据规模远小于ArtiMuse等依赖大规模人工标注语料的方法，进一步突显了AesCoT数据质量和RAPO优化策略的有效性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_or3ZukbrKw/figures/005_Table_1.jpg]]
-*Table 1: (a) Distribution between ground truth and predicted score*
-
-![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_or3ZukbrKw/figures/019_Table_5.jpg]]
-*Table 5: Results of models trained only on AVA dataset*
-
-![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_or3ZukbrKw/figures/022_Table_6.jpg]]
-*Table 6: Details of aesthetic dimensions*
-
-![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_or3ZukbrKw/figures/023_Table_7.jpg]]
-*Table 7: The final composition of AesCoT is displayed in Appendix E.2. (a) AesCoT-3K (b) AesCoT-10K Table 7: Composition of AesCoT-3K and AesCoT-10K*
-
-![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_or3ZukbrKw/figures/024_Table_8.jpg]]
-*Table 8: Statistics of datasets used in our experiments*
-
-
-
 ## 定位与知识库关联
 
 ### 问题定位：从分数回归到美学推理
@@ -312,8 +280,6 @@ Table 4和Figure 5进一步分析了 $r_{rank}$ 与 $r_{abs}$ 的权重配比。
 2. **多模态奖励的扩展**：当前RAPO的奖励仅基于分数和排序，未利用推理文本本身的语义质量。是否可以将推理的连贯性、专业性等维度纳入奖励信号，值得探索。
 
 3. **冷启动数据的依赖性**：实验表明1 epoch SFT是最优选择，但这一“最佳epoch数”是否对不同的骨干模型和数据集组合敏感，仍需系统研究。
-
-
 
 ## 原文 PDF
 

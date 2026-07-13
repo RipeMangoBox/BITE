@@ -53,8 +53,6 @@ claims:
 
 方法谱系上，SfD 区别于依赖色散棱镜/滤光片的传统压缩光谱成像（如 **Spectral DiffuserCam**, Monakhova et al., Optica 2020），也不同于基于消色差透镜离焦的超分辨方案（**Spectral DefocusCam**, Foley et al., ICCP 2025）——后者需要定制光学元件且光谱覆盖受限。SfD 以“离焦即编码”的物理机制，在光学复杂度与重建质量之间取得了突破性平衡。
 
-
-
 高光谱成像在遥感、农业、文化遗产保护与生物医学等领域具有不可替代的价值，但其实际部署长期受制于一个根本矛盾：**空间分辨率、光谱分辨率与时间分辨率难以同时兼顾**。传统扫描式光谱成像（如Tunable Filter）通过逐波段采集获得高光谱保真度，但牺牲了时间效率；快照式光谱成像试图以单次曝光捕获完整光谱立方体，却不得不在光学复杂度与重建质量之间做出妥协。
 
 ### 现有方法的瓶颈
@@ -84,8 +82,6 @@ claims:
 - **编码天然结构化**：色差PSF具有块循环矩阵（BCCB）结构，可在频域快速求逆。
 
 配合可见光自然光谱的低秩特性——高光谱图像可投影至低维本征空间——SfD首次实现了以亚秒级计算（0.64秒）完成物理驱动的高光谱重建，在Harvard数据集30张图像上获得PSNR 30.81 dB、SSIM 0.92、SAM 7.35°的SOTA级性能（Table 1），且在模拟低光条件下（总曝光2.9秒）优势进一步扩大（Fig. 3b），验证了高光子效率带来的鲁棒性。
-
-
 
 ## 核心方法与创新机理
 
@@ -117,8 +113,6 @@ SfD 的创新并非孤立的光学或算法改进，而是二者之间的深度�
 
 这种“以计算换光学”的设计哲学——用可控的物理编码替代复杂硬件，再用高效物理驱动算法解码——代表了计算成像领域的一个重要方向。
 
-
-
 SfD 的完整成像管线由**光学采集**与**计算重建**两大环节构成，二者通过精确标定的色差前向模型紧密耦合，形成“物理编码—快速求逆—数据驱动去噪”的闭环。
 
 ### 光学采集：色差焦栈的生成
@@ -146,12 +140,8 @@ SfD 的完整成像管线由**光学采集**与**计算重建**两大环节构�
 
 重建完成后，根据灰度传感器与可见光滤光片的光谱响应曲线对结果进行最终校正，得到物理量一致的光谱辐亮度图。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2142_https_arxiv_org_abs_2503_20184/figures/001_Figure_1.jpg]]
 *Figure 1: The Spectrum from Defocus (SfD) method. (a) Our hardware prototype uses a moving lens to sweep focus through chromatic aberration. (b) SfD achieves state-of-the-art hyperspectral imaging with simple optics and low computational cost. See Table 1 for details. (c) The system captures 5 defocused grayscale images and reconstructs hyperspectral images in under a second*
-
-
 
 ### 光学采集系统
 
@@ -203,12 +193,8 @@ z-step中 $(\mu_{1} \hat{\mathbf{H}}^{T} \hat{\mathbf{H}} + \mu_{2} \mathbf{I})^
 
 重建完成后，根据灰度相机与可见光滤光片的光谱响应曲线对结果进行最终校正，确保重建光谱与实际场景的辐射度一致。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2142_https_arxiv_org_abs_2503_20184/figures/002_Figure_2.jpg]]
 *Figure 2: Optical design. (a) The system consists of a lens pair in which the second lens is translated to five discrete positions*
-
-
 
 ## 实验与关键发现
 
@@ -239,15 +225,11 @@ SfD 在 Harvard 数据集 30 张图像上与 9 种 SOTA 光谱成像系统进行
 
 红色与黑色区域的重建精度相对较低，根本原因在于长波段（红光）色散较弱，导致 PSF 随波长变化不够显著，编码信息不足。此外，系统需要至少 5 帧离焦图像，难以直接用于快速动态场景；深度去噪器在极端低光子条件下仍可能引入轻微光谱失真。PSF 标定依赖窄带滤光片，部署后光学布局固定，缺乏对场景变化的自适应能力。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2142_https_arxiv_org_abs_2503_20184/figures/005_Figure_4.jpg]]
 *Figure 4: Results from SfD prototype. (a) We show raw grayscale measurements from the camera, samples from corresponding perchannel reconstruction results, and the aligned ground truth for four real scenes. ∆z indicates the lens displacement relative to the initial position, and sampled channels have an approximate bandwidth of 10nm centered at the displayed wavelength. The reconstructions demonstrate faithful recovery of both spatial details and spectral content. (b) Reconstructed and ground truth spectral curves for each Macbeth color patch*
 
 ![[assets/figures/papers/paper_list_l2142_https_arxiv_org_abs_2503_20184/figures/006_Figure_5.jpg]]
 *Figure 5: Robust Recovery. (a) Adding measurements improves reconstruction, with performance saturating more quickly in RGB than in spectrum*
-
-
 
 ## 定位与知识库关联
 
@@ -293,8 +275,6 @@ SfD的关键跃迁在于：将色差离焦从“可感知但难反演”的模�
 3. **动态场景适应**：能否采用突发摄影（burst photography）与光流补偿缓解多帧采集造成的运动模糊？单帧编码（如结合空间变化的色差）是更根本的解决方向。
 4. **噪声模型精化**：在极低光条件下引入更精确的噪声模型（如暗噪声扩散、读出噪声）是否能进一步提升重建鲁棒性？当前深度去噪器在训练分布外的噪声特性上可能退化。
 5. **跨域推广**：色差离焦编码思想可否推广到近红外或其他光谱域？与三维成像（如深度估计）的联合优化是否可行？色差本身包含深度信息，光谱-深度联合重建是自然延伸。
-
-
 
 ## 原文 PDF
 

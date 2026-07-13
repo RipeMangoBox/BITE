@@ -73,8 +73,6 @@ ScoreHMR 将人体模型拟合重新定义为**扩散模型的逆问题求解**�
 
 消融实验表明，较小的噪声水平（τ=50）和较大的 DDIM 步长（Δt=10）能获得最佳精度，但论文指出小步长对挑战性姿态更为鲁棒。值得注意的局限性包括：当 2D 关键点检测存在严重错误时，引导过程可能失效；方法依赖上游回归网络和关键点检测器的质量；包含 SMPL 形状参数（β）未带来显著的性能增益。
 
-
-
 ### 问题背景：三维人体重建中的图像-模型对齐困境
 
 从单目图像或视频中恢复三维人体姿态与形状是计算机视觉领域的核心问题之一，其应用涵盖动作捕捉、人机交互、虚拟现实等场景。当前主流方法可归为两类：**回归方法**与**优化拟合方法**。
@@ -109,8 +107,6 @@ $$ \mathbf{y} = \mathcal{A}(\mathbf{x}_0) + \boldsymbol{\eta} $$
 ScoreHMR 处于回归方法与优化方法的交叉地带：它以回归结果为起点，通过扩散模型驱动的迭代优化实现精细对齐。与 **LGD**（基于学习梯度下降的优化）和 **LFMM** 等优化基线相比，ScoreHMR 的核心区别在于优化过程发生在扩散模型的潜空间中，由学习到的分数函数而非手工设计的能量项驱动。与 **ProHMR-fitting** 相比，ScoreHMR 的先验是通过去噪过程隐式施加的，而非显式的概率密度正则化项。
 
 简而言之，ScoreHMR 的目标不是替代回归网络，而是为任何现成的回归方法提供一个**通用、任务无关的后处理精炼框架**，通过扩散模型的分数引导实现鲁棒的图像-模型对齐。
-
-
 
 ## 核心方法与创新机理
 
@@ -160,8 +156,6 @@ $$\mathbf{x}_{t+1} = \sqrt{\alpha_{t+1}} \hat{\mathbf{x}}_0(\mathbf{x}_t) + \sqr
 ### 证据强度
 
 决定性证据来自 Table 2 的模型拟合实验：以 HMR 2.0 回归结果为初始化，ScoreHMR-b 在 3DPW 上取得 PA-MPJPE 51.1 mm，而 HMR 2.0 + SMPLify 为 60.1 mm，提升达 9.0 mm（约 15%）。这一显著差距直接验证了扩散先验 + 分数引导机制相对于传统手工先验 + 梯度下降优化的优势。消融实验（Table 1）进一步确认，单独的 DDIM 反演-采样循环（无引导）性能有限，而加入分数引导后性能大幅提升，证实引导项是因果旋钮的核心。
-
-
 
 ScoreHMR 将 3D 人体恢复问题转化为**扩散模型的逆问题求解**。其核心流程是一个交替执行 DDIM 反演与引导 DDIM 采样的外层精炼循环（Algorithm 1），直到人体模型与观测信息充分对齐为止。
 
@@ -223,12 +217,8 @@ ScoreHMR 在姿态先验和优化机制两个维度上与传统方法形成鲜�
 
 这种设计使得 ScoreHMR 既避免了传统优化方法容易陷入局部极小值的问题，又无需针对不同任务重新训练扩散模型——同一扩散模型可复用于模型拟合、多视图精炼和时序运动细化等多种应用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l16_ScoreHMR_Score_Guided_Diffusion_for_3D_Human_Recovery_motion20v2/figures/002_Figure_2.jpg]]
 *Figure 2: Score-Guided Human Mesh Recovery and its applications. Top row: Overview of ScoreHMR, which iteratively refines an initial regression estimate in a DDIM inversion – DDIM guided sampling loop until the human body model aligns with the available observation. Bottom row: Applications. (a): Body model fitting to 2D keypoints. (b): Multi-view refinement of individual per-frame predictions with cross-view consistency guidance. (c): Recovering temporally consistent and smooth 3D human motion from a video sequence given initial per-frame estimates*
-
-
 
 ScoreHMR 将人体姿态优化问题形式化为一个逆问题：从观测 $\mathbf{y}$ 中恢复 SMPL 姿态参数 $\mathbf{x}_0$，其中 $\mathbf{y} = \mathcal{A}(\mathbf{x}_0) + \eta$，$\mathcal{A}$ 为前向算子（如相机投影），$\eta$ 为观测噪声。该方法的核心创新在于将扩散模型的条件分布 $p(\mathbf{x}_0|I)$ 作为学习到的参数化先验，并通过分数引导将观测信息注入去噪过程。
 
@@ -304,12 +294,8 @@ $$
 
 该模型作为任务无关的姿态先验，训练完成后无需针对不同下游任务重新训练，仅需替换引导损失即可适配身体拟合、多视图优化、时序运动细化等场景。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l16_ScoreHMR_Score_Guided_Diffusion_for_3D_Human_Recovery_motion20v2/figures/009_Figure_5.jpg]]
 *Figure 5: Diffusion model architecture. Implementation of*
-
-
 
 ## 实验与关键发现
 
@@ -399,36 +385,14 @@ $$ \mathcal{L}_{temp} = \sum_{n=2}^N ||\hat{\mathbf{x}}_0^{(n)}(\mathbf{x}_t) - 
 | Table 1/5 | $\tau=50$ 和适中步长最优；包含 $\beta$ 无显著增益 | 中（消融实验） |
 | Figure 7 | 关键点检测错误是主要失败模式，扩散模型提供一定鲁棒性但无法完全补偿 | 中（定性分析） |
 
-![[assets/figures/papers/paper_list_l16_ScoreHMR_Score_Guided_Diffusion_for_3D_Human_Recovery_motion20v2/figures/004_Table_2.jpg]]
-*Table 2: Evaluation of different model fitting methods. The fitting algorithms are initialized by the corresponding regression results, except LGD [53] and LFMM [8]. All numbers are PA-MPJPE in mm. Parenthesis denotes the number of body joints used to compute PA-MPJPE*
-
-![[assets/figures/papers/paper_list_l16_ScoreHMR_Score_Guided_Diffusion_for_3D_Human_Recovery_motion20v2/figures/005_Table_3.jpg]]
-*Table 3: Evaluation of multi-view refinement. We compare our proposed approach with the single-view 3D reconstruction and an optimization-based method [32]. Parenthesis denotes the number of body joints used to compute MPJPE and PA-MPJPE*
-
-![[assets/figures/papers/paper_list_l16_ScoreHMR_Score_Guided_Diffusion_for_3D_Human_Recovery_motion20v2/figures/006_Table_4.jpg]]
-*Table 4: Evaluation of human motion refinement. We compare different model fitting algorithms and our proposed approach in a temporal setting. Parenthesis denotes the number of body joints used to compute PA-MPJPE and Acc Err*
-
 ![[assets/figures/papers/paper_list_l16_ScoreHMR_Score_Guided_Diffusion_for_3D_Human_Recovery_motion20v2/figures/003_Table_1.jpg]]
 *Table 1: Ablation study. ScoreHMR is initialized by the corresponding regression results. All numbers are PA-MPJPE in mm. Parenthesis denotes the number of body joints used to compute PA-MPJPE*
-
-![[assets/figures/papers/paper_list_l16_ScoreHMR_Score_Guided_Diffusion_for_3D_Human_Recovery_motion20v2/figures/015_Figure_7.jpg]]
-*Figure 7: Failure cases of model fitting. Pink: ProHMR regression. White: HMR 2.0b regression. Green: Regression + ScoreHMR (ours). Blue: Regression + ProHMR-fitting. Grey: Regression + SMPLify. While all methods encounter challenges when incorrect keypoints are detected, our image-conditioned diffusion model tries to keep the 3D pose aligned with the available image evidence*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l16_ScoreHMR_Score_Guided_Diffusion_for_3D_Human_Recovery_motion20v2/figures/008_Figure_4.jpg]]
-*Figure 4: Body model fitting results. Pink: Regression (ProHMR [32]). White: Regression (HMR 2.0 [15]). Green: Regression + ScoreHMR (ours). Blue: Regression + ProHMR-fitting [32]. Grey: Regression + SMPLify [4]*
 
 ![[assets/figures/papers/paper_list_l16_ScoreHMR_Score_Guided_Diffusion_for_3D_Human_Recovery_motion20v2/figures/007_Figure_3.jpg]]
 *Figure 3: Qualitative evaluation of ScoreHMR Pink: Regression with ProHMR [32]. White: Regression with HMR 2.0 [15]. Green: Regression + ScoreHMR (ours)*
 
 ![[assets/figures/papers/paper_list_l16_ScoreHMR_Score_Guided_Diffusion_for_3D_Human_Recovery_motion20v2/figures/001_Figure_1.jpg]]
 *Figure 1: Although achieving remarkable 3D human reconstructions, a recent state-of-the-art monocular regression approach [15] may encounter challenges in aligning the human body model to the image (middle image). To address this, we propose an iterative refinement approach that utilizes image observations (e.g., 2D keypoint detections) and achieves better image-model alignment (right image)*
-
-![[assets/figures/papers/paper_list_l16_ScoreHMR_Score_Guided_Diffusion_for_3D_Human_Recovery_motion20v2/figures/012_Figure_6.jpg]]
-*Figure 6: Model fitting results. We compare our approach (green) with ProHMR-fitting (blue) and SMPLify (grey). All model fitting algorithms are initialized with regression from ProHMR (pink) or HMR 2.0b (white)*
-
-
 
 ## 定位与知识库关联
 
@@ -496,8 +460,6 @@ ScoreHMR 的技术路线可追溯到两个方向：
 4. **多模态观测融合**：当 2D 关键点不可靠时，是否可以融合其他传感器（如深度相机、IMU）的引导信号？论文的引导框架理论上支持任意可微的观测损失，但多模态融合的具体实现和性能增益尚未探索。
 
 5. **扩散先验的泛化能力**：扩散模型在训练数据覆盖的姿态分布之外的表现如何？对于极端姿态、罕见动作，扩散先验是否仍能提供有效的约束，还是会引入偏差？
-
-
 
 ## 原文 PDF
 

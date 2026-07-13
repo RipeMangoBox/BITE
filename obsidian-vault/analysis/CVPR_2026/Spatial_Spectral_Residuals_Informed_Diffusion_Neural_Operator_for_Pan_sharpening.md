@@ -50,8 +50,6 @@ claims:
 
 在 WorldView-3、GF-2 和 QuickBird 等多个基准数据集上，SRINO 在 PSNR、SAM、ERGAS 等指标上全面超越包括 **PanDiff**（Meng et al., IEEE TGRS 2023）、**U-Know-DiffPan**（Kim et al., CVPR 2025）和 **SSDiff**（Zhong et al., NeurIPS 2024）在内的 SOTA 方法（Table 1, Table 2）。消融实验证实，空间与光谱残差的联合引导是关键设计，且残差引导策略优于传统梯度引导（Table 3, Figure 7）。
 
-
-
 全色锐化（Pan-sharpening）旨在将高空间分辨率的全色（PAN）图像与低空间分辨率的多光谱（LRMS）图像融合，生成高空间分辨率的多光谱（HRMS）图像。这一任务是遥感图像处理中的基础性难题，其核心挑战在于如何在注入空间细节的同时保持光谱信息的保真度。
 
 近年来，扩散概率模型（Diffusion Probabilistic Models）在图像生成领域展现出强大的先验建模能力，并开始被引入全色锐化任务。代表性工作如 **PanDiff**（Meng et al., IEEE TGRS 2023）、**SSDiff**（Zhong et al., NeurIPS 2024）以及 **U-Know-DiffPan**（Kim et al., CVPR 2025）等，均尝试利用扩散过程的迭代去噪机制来恢复高分辨率图像。然而，现有扩散式全色锐化方法面临两个关键瓶颈：
@@ -63,8 +61,6 @@ claims:
 上述瓶颈的根源在于：现有方法将扩散过程局限在离散像素空间，去噪网络缺乏对连续函数空间的建模能力，同时引导机制是外挂式的，未能与去噪过程深度融合。这引出了本文的核心动机：**能否将扩散模型提升到连续函数空间，通过神经算子学习分辨率无关的生成先验，并以内部反馈的方式实现空间-光谱一致性约束的动态校准？**
 
 具体而言，本文试图回答以下问题：（1）如何构建一个计算高效的扩散去噪骨干，使其复杂度远低于自注意力机制？（2）如何设计一种内嵌的引导范式，替代外部梯度引导，实现像素级空间细节与光谱保真度的闭环动态优化？这两个问题的解决，将推动扩散式全色锐化方法向高效、高保真和可部署化方向迈出关键一步。
-
-
 
 ## 核心方法与创新机理
 
@@ -95,8 +91,6 @@ $$\kappa(\phi(\xi),\phi(\eta_i)) = \frac{\exp\left(\frac{\langle W_q\phi(\xi), W
 
 这种“预训练-适配”范式使得模型既能继承函数空间的强泛化能力，又能以极低的计算代价完成下游任务特化，在 WorldView-3、GF-2、QuickBird 等主流基准上均取得最优性能。
 
-
-
 SRINO 采用**两阶段训练流水线**，将扩散过程从离散像素空间提升到连续函数空间，并通过内部残差反馈替代传统的外部梯度引导。如图3所示，第一阶段在函数空间预训练条件扩散模型，学习分辨率无关的高质量空间-光谱先验；第二阶段通过三重引导适配将冻结的去噪骨干注入全色锐化任务。
 
 **第一阶段：函数空间条件扩散预训练。** 去噪网络由级联的 Galerkin 型神经算子层构建，其核心是将标准自注意力近似为线性注意力形式，使计算复杂度从 $O(N^2)$ 降至 $O(N d_v^2)$。扩散目标定义为高分辨率多光谱图像与低分辨率多光谱图像的残差 $\mathbf{X}_0 = \mathbf{H} - \mathbf{L}$，前向过程按 $\mathbf{X}_t = \sqrt{\bar{\alpha}_t}\mathbf{X}_0 + \sqrt{1-\bar{\alpha}_t}\varepsilon$ 逐步加噪。逆向去噪步参数化为高斯分布 $p_{\theta}(\mathbf{X}_{t-1} \mid \mathbf{X}_t, \mathbf{H}) = \mathcal{N}(\mu_{\theta}(\mathbf{X}_t, \mathbf{H}, t), \sigma_t^2 \mathbf{I})$，网络直接预测干净残差 $\widehat{\mathbf{X}}_0 = \mathcal{G}_{\theta}(\mathbf{X}_t, \mathbf{H}, t)$，并以 $\mathcal{L}_{\mathrm{I}} = \mathbb{E}_{t, \mathbf{X}_0, \varepsilon} \|\mathbf{X}_0 - \mathcal{G}_{\theta}(\mathbf{X}_t, \mathbf{H}, t)\|_1$ 进行训练。此阶段仅使用 $\mathbf{H}$ 作为条件输入，使神经算子学习到分辨率无关的生成先验。
@@ -108,12 +102,8 @@ SRINO 采用**两阶段训练流水线**，将扩散过程从离散像素空间�
 
 两阶段的衔接逻辑是：第一阶段提供强大的生成先验和高效的算子去噪骨干，第二阶段以极低的额外参数（仅辅助预测器和残差投影模块）将该先验适配到全色锐化任务，形成“预测-残差计算-特征调制”的闭环动态校准机制。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2597_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Spatial_Spectral/figures/003_Figure_3.jpg]]
 *Figure 3: Framework overview of the proposed SRINO, which is implemented through a two-stage training pipeline. Firstly, we pretrain a conditional diffusion model built with Galerkin-type operator layers on high-resolution references to learn high-quality spatial and spectral representations. Subsequently, we introduce a triple guidance adaptation (TGA) strategy, including cross-modality feature V, pixel-wise spatial and spectral consistency residuals, R(t)spa and R(t)spe , to fine-tune the model for generating corresponding HRMS images*
-
-
 
 SRINO 的核心由两个技术模块构成：**Galerkin 型神经算子去噪骨干**（Stage I）与**三重引导适配机制**（Stage II）。前者将扩散过程提升到连续函数空间，以线性注意力替代标准自注意力，实现分辨率无关的生成先验；后者通过像素级空间-光谱一致性残差的内部反馈，驱动纹理丰富和光谱真实的高分辨率多光谱图像生成。
 
@@ -200,11 +190,6 @@ $$\mathcal{L}_{\mathrm{II}} = \mathbb{E}_{t, \mathbf{X}_0, \varepsilon} \| \math
 - **内部残差引导 vs. 外部梯度引导**：传统梯度引导需手动平衡无监督损失权重，存在梯度冲突风险；SRINO 将空间-光谱残差直接注入每一逆扩散步，形成闭环动态校准（Figure 2）。
 - **两阶段训练策略**：Stage I 在连续函数空间学习高质量先验，Stage II 冻结骨干仅微调轻量适配模块，兼顾生成质量与任务适配效率。
 
-![[assets/figures/papers/paper_list_l2597_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Spatial_Spectral/figures/002_Figure_2.jpg]]
-*Figure 2: Schematic illustration of the previous gradient-guided strategy and our spatial-spectral residuals informed paradigm. The former uses the gradients of unsupervised losses to update the noise prediction, risking gradient conflicts and requiring tedious weight tuning. Instead, our approach directly incorporates the element-wise spatial-spectral residuals as additional inputs to the denoising network, enabling directed generation of texture-rich and spectrally realistic products*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -220,9 +205,6 @@ SRINO 在 WorldView-3、GF-2 和 QuickBird 三个基准数据集上均取得了�
 
 ![[assets/figures/papers/paper_list_l2597_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Spatial_Spectral/figures/006_Table_2.jpg]]
 *Table 2: Quantitative results for reduced resolution GF2 and QB samples, comparing several representative state-of-the-art methods. Bold: Best; Underline: Second best*
-
-![[assets/figures/papers/paper_list_l2597_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Spatial_Spectral/figures/005_Figure_4.jpg]]
-*Figure 4: The visual results (top) and mean absolute error maps (bottom) of DL-based methods on a reduced resolution WV3 sample*
 
 ### 效率分析
 
@@ -240,24 +222,11 @@ Figure 1 展示了所提 Galerkin 型神经算子去噪框架与传统注意力�
 
 所有实验基于统一的数据划分和训练设置：批次大小 32，patch 尺寸 64×64，AdamW 优化器（动量系数 0.9/0.999），初始学习率 4×10⁻⁵ 且每 10,000 次迭代衰减 0.5 倍。扩散步数设为 500，推理时采用 25 步 DDIM 采样。所有对比方法在相同条件下复现或使用原作者提供的模型，确保比较的公平性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2597_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Spatial_Spectral/figures/009_Table_3.jpg]]
 *Table 3: Ablation study on the core spatial consistency residual*
 
 ![[assets/figures/papers/paper_list_l2597_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Spatial_Spectral/figures/011_Figure_7.jpg]]
 *Figure 7: Ablation study on conventional gradient-guided strategy with varying intensities (α=1, α=10, α=100) and our spatialspectral residual-informed paradigm*
-
-![[assets/figures/papers/paper_list_l2597_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Spatial_Spectral/figures/008_Figure_8.jpg]]
-*Figure 8: Ablation study on different denoising backbones*
-
-![[assets/figures/papers/paper_list_l2597_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Spatial_Spectral/figures/010_Figure_6.jpg]]
-*Figure 6: Feature maps and frequency amplitude spectra for the ablation study of the spatial and spectral consistency residuals*
-
-![[assets/figures/papers/paper_list_l2597_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Spatial_Spectral/figures/007_Figure_5.jpg]]
-*Figure 5: Feature maps across different denoiser layers*
-
-
 
 ## 定位与知识库关联
 
@@ -295,8 +264,6 @@ SRINO的去噪骨干借鉴了神经算子（Neural Operator）领域的思想，
 2. **扩散步数的理论下界：** 当前25步DDIM采样是经验选择，是否存在理论保证的更少步数方案？
 3. **跨传感器泛化能力：** 论文实验限于单一传感器内的训练-测试划分，SRINO学习到的算子映射能否泛化到未见过的传感器配置？
 4. **与物理模型的融合：** 空间和光谱残差目前基于像素级差异计算，是否可引入传感器成像的物理退化模型（如MTF、光谱响应函数）来增强残差的物理可解释性？
-
-
 
 ## 原文 PDF
 

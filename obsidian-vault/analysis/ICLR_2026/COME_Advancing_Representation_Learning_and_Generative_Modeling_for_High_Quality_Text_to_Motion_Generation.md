@@ -55,8 +55,6 @@ claims:
 
 **主要结果**：在HumanML3D基准上，COME取得FID **0.041**（超越此前最佳连续方法ReMoDiffuse的0.103和离散SOTA MoMask的0.045），R-Precision Top1 **0.510**与ReMoDiffuse并列第一，MM-Dist **2.974**并列最佳。在KIT-ML上同样取得FID **0.189**和R-Precision Top1 **0.443**的全面领先。推理效率方面，在统一10步DPM-Solver++采样下达到**0.022s**的最快推理速度，训练仅需**1,100轮**（对比MLD的9,000轮），实现质量与效率的双重突破。
 
-
-
 ### 问题域与核心矛盾
 
 文本到运动生成（Text-to-Motion, T2M）旨在根据自然语言描述合成逼真的人体运动序列，在动画制作、虚拟现实和人机交互等领域具有广泛的应用前景。近年来，扩散模型在该领域取得了显著进展，但其技术路线呈现出明显的分化：**离散方法**（如基于VQ-VAE/RVQ-VAE的tokenizer配合掩码Transformer或自回归模型）在生成质量上长期占据领先地位，而**连续扩散方法**虽然在语义控制、组合泛化和多样性采样方面具有天然优势，却始终未能在核心指标上实现超越。
@@ -86,8 +84,6 @@ COME的核心洞察在于：**连续扩散模型在T2M上的潜力被低质量�
 1. **运动表示层面**：设计**MoCMAE**（Motion Contrastive Masked Autoencoder）——一种非对称的连续运动tokenizer，通过CNN+Transformer混合编码器捕获局部运动模式和长程时空依赖，结合掩码运动建模（Masked Motion Modeling）增强编码器对关键时空模式的捕获能力，并引入对比学习（Contrastive Learning）显式提升样本间特征的可分性。同时采用轻量级CNN解码器避免额外的解码开销。
 
 2. **扩散训练层面**：提出**ccDIT**（Cross-Condition Diffusion Transformer）和**Stable-Min-SNR-γ**训练策略。ccDIT通过AdaLN-Zero注入全局句级语义、通过Cross-Attention注入细粒度词级语义，实现文本条件的多层次融合；Stable-Min-SNR-γ则统一了Zero-SNR和Min-SNR-γ机制，在强制最终时间步SNR=0以消除训练-推理不匹配的同时，通过稳定化的SNR权重（引入常数φ避免除零）协调不同时间步的梯度贡献，解决梯度冲突问题。
-
-
 
 ## 核心方法与创新机理
 
@@ -133,8 +129,6 @@ Stable-Min-SNR-γ 统一了 Zero-SNR 与 Min-SNR-γ 两种训练策略，解决�
 
 三个变更槽位形成了一条清晰的因果链：**MoCMAE 提供高鉴别力、覆盖广泛的连续潜在空间 → ccDIT 在此空间中通过双重语义注入进行精细控制 → Stable-Min-SNR-γ 确保扩散训练过程的稳定与一致**。这一组合使连续扩散框架在保留语义控制、组合泛化和多样性采样等天然优势的同时，在 FID 等核心生成质量指标上超越离散 SOTA 方法（如 MoMask），并在 KIT-ML 上取得 R-Precision Top1 的显著领先（0.443 vs. 最佳基线 0.424）。
 
-
-
 COME 的整体 pipeline 是一个两阶段的连续扩散生成框架。其核心设计逻辑是：**先构建一个具有高鉴别力且覆盖广泛运动空间的连续潜在表示，再在该潜在空间中进行条件扩散生成**。这一设计直接回应了连续扩散模型在文本到运动生成中长期落后于离散方法的两大瓶颈——运动表示拥挤不可分、扩散训练策略次优。
 
 ### 框架总览
@@ -176,12 +170,8 @@ $$
 
 推理时，ccDIT 从纯噪声出发，在文本条件引导下通过 DPM-Solver++ 高阶求解器进行快速采样（默认 10 步），生成潜在表示；随后 MoCMAE 的解码器将该潜在表示解码为最终的运动序列。训练时以 10% 概率随机丢弃文本条件，推理时使用 Classifier-Free Guidance 组合条件与无条件预测，进一步提升文本对齐质量。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l14_COME_Advancing_Representation_Learning_and_Generative_Modeling_for_High/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of COME. It consists of: (a) MoCMAE, an asymmetric hybrid model to extract high-quality motion features without introducing additional decoding overhead; and (b) ccDIT, a conditional diffusion model that captures both global sentence-level semantics and fine-grained word-level cues to generate high-quality motion sequences*
-
-
 
 COME 框架由两大核心模块构成：**MoCMAE**（Motion Contrastive Masked Autoencoder）负责学习高鉴别力的连续运动表示，**ccDIT**（Cross-Condition Diffusion Transformer）在该潜在空间中进行条件扩散生成。两者通过一个统一的训练策略 **Stable-Min-SNR-γ** 协同优化，形成端到端的高质量文本驱动运动生成管线。
 
@@ -247,8 +237,6 @@ $$`\hat{\epsilon}_\theta(\mathbf{x}_t, c) = \epsilon_\theta(\mathbf{x}_t, \empty
 
 其中 $`s`$ 为引导强度。结合 **DPM-Solver++** 高阶快速采样器，COME 可在 10 步内完成高质量生成，在保持生成质量的同时实现高效推理（§4.4）。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能对比
@@ -265,9 +253,6 @@ MoCMAE作为连续运动tokenizer，在重建任务上展现出压倒性优势�
 *Table 2: Evaluation of motion tokenizer. Red face indicates the best result*
 
 从表示空间的结构化程度来看，MoCMAE在所有聚类质量指标上均最优（Table 7）：Silhouette Score（SC）、Calinski-Harabasz Index（CHI）、Davies-Bouldin Index（DBI）和5-NN准确率均优于VQ-VAE、RVQ-VAE等离散tokenizer。t-SNE可视化（Figure 5, Figure 6）进一步证实，MoCMAE的潜在特征具有更好的类间可分性和空间覆盖性，这直接缓解了连续扩散模型中“拥挤不可分表示阻碍去噪”的核心瓶颈。
-
-![[assets/figures/papers/paper_list_l14_COME_Advancing_Representation_Learning_and_Generative_Modeling_for_High/figures/012_Figure_5.jpg]]
-*Figure 5: t-SNE with pseudo-labels. MoCMAE shows more coherent local groupings and clearer semantic regions compared to baselines, despite naturally overlapping human motion manifolds. Figure 6: Global t-SNE on HumanML3D. VAE features are compact; discrete encoders are more spread out; MoCMAE covers a larger portion of the motion space with higher feature diversity*
 
 ![[assets/figures/papers/paper_list_l14_COME_Advancing_Representation_Learning_and_Generative_Modeling_for_High/figures/011_Table_7.jpg]]
 *Table 7: Quantitative comparison of motion representations. MoCMAE outperforms existing encoders on both geometric metrics (SC, CHI, DBI) and semantic alignment (5-NN Acc). Human motion categories naturally overlap, so absolute SC values are low; nonetheless, MoCMAE achieves the best separability and semantic coherence*
@@ -302,32 +287,14 @@ Stable-Min-SNR-γ的核心机制在于：通过强制最终时间步SNR=0（Zero
 
 COME在推理效率上具有显著优势：采用10步DPM-Solver++采样即可达到高质量生成，结合MoCMAE的轻量CNN解码器（无Transformer解码开销），整体推理速度在A6000 GPU上优于多数对比方法。训练效率方面，Stable-Min-SNR-γ策略通过稳定训练动态减少了收敛所需迭代次数，使得COME在训练成本上也具备竞争力。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l14_COME_Advancing_Representation_Learning_and_Generative_Modeling_for_High/figures/002_Table_1.jpg]]
-*Table 1: Quantitative evaluation on HumanML3D. ↑ and ↓ denote that higher and lower values are better, respectively, while → denotes that the values closer to the real motion are better. Red face indicates the best result, while underscore refers to the second best*
-
 ![[assets/figures/papers/paper_list_l14_COME_Advancing_Representation_Learning_and_Generative_Modeling_for_High/figures/004_Table_4.jpg]]
 *Table 4: Ablation study result of MoCMAE*
-
-![[assets/figures/papers/paper_list_l14_COME_Advancing_Representation_Learning_and_Generative_Modeling_for_High/figures/005_Table_3.jpg]]
-*Table 3: Quantitative evaluation on KIT-ML. ↑ and ↓ denote that higher and lower values are better, respectively, while → denotes that the values closer to the real motion are better. Red face indicates the best result, while underscore refers to the second best*
 
 ![[assets/figures/papers/paper_list_l14_COME_Advancing_Representation_Learning_and_Generative_Modeling_for_High/figures/009_Table_5.jpg]]
 *Table 5: Ablation study result of ccDIT*
 
-![[assets/figures/papers/paper_list_l14_COME_Advancing_Representation_Learning_and_Generative_Modeling_for_High/figures/010_Table.jpg]]
-
 ![[assets/figures/papers/paper_list_l14_COME_Advancing_Representation_Learning_and_Generative_Modeling_for_High/figures/014_Table_8.jpg]]
 *Table 8: In summary, the combination of training efficiency, fast inference, and high-quality generation underscores the effectiveness of our architectural and learning design. COME demonstrates that continuous diffusion models—when equipped with strong representation learning—can achieve stateof-the-art T2M synthesis with both speed and fidelity. Table 8: Training cost comparison across methods. We report epochs and GPU-hours for each module (motion tokenizer and diffusion model) and the total GPU-hours using a single NVIDIA A6000 GPU. Our method converges with significantly fewer epochs and GPU-hours compared to MLD, achieving a 6× improvement in training efficiency*
-
-![[assets/figures/papers/paper_list_l14_COME_Advancing_Representation_Learning_and_Generative_Modeling_for_High/figures/015_Table_9.jpg]]
-*Table 9: Quantitative comparison of motion generation methods on CMP dataset (Liao et al., 2024). ↓ indicates lower values are better, ↑ higher values are better, and → closer to the ground truth is better*
-
-![[assets/figures/papers/paper_list_l14_COME_Advancing_Representation_Learning_and_Generative_Modeling_for_High/figures/016_Table_10.jpg]]
-*Table 10: Results of text-to-motion and motion-to-text retrieval benchmark on HumanML3D*
-
-
 
 ## 定位与知识库关联
 
@@ -401,8 +368,6 @@ COME 采用 Classifier-Free Guidance（训练时 10% 概率丢弃文本条件）
 3. **多模态条件与物理仿真约束的扩展**：COME 的 ccDIT 架构通过 AdaLN-Zero 和 Cross-Attention 实现了文本条件的灵活注入，理论上可以扩展到音乐、视频等多模态条件。但如何无缝集成物理仿真约束（如接触力、关节限制）以解决穿透和滑动问题，仍是一个工程与理论并重的挑战。
 
 4. **大规模数据下的鲁棒性与检索增强**：当数据规模扩大至 MotionX 级别（约 15M 样本）时，MoCMAE 的对比学习分支是否仍能有效区分样本？是否需要引入检索增强机制（如 ReMoDiffuse）来弥补表示学习的上限？
-
-
 
 ## 原文 PDF
 

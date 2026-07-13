@@ -53,8 +53,6 @@ claims:
 
 主要实验结果：在 Urban100 数据集上，EDSR ×4 模型的 3-bit 量化 PSNR 比现有 PTQ 方法提高 **1.26 dB**，量化时间减少 **1.9 倍**；在 RDN ×4 模型 4-bit 量化上，Urban100 和 BSD100 的 PSNR 分别比 AdaBM 提高 **2.43 dB** 和 **1.37 dB**。消融实验证实，激活 GBA 与 DAN 对重建质量的贡献最为显著，权重 GBA 在此基础上带来额外增益。
 
-
-
 ### 超分辨率模型的量化困境
 
 单幅图像超分辨率（SISR）旨在从低分辨率输入重建高分辨率图像，深度卷积神经网络和Transformer架构已在该任务上取得显著进展。然而，高性能SR模型通常包含大量参数和计算开销，严重制约了其在资源受限设备上的部署。模型量化通过将浮点权重和激活映射到低位定点表示，成为压缩模型规模、加速推理的关键技术。
@@ -77,8 +75,6 @@ claims:
 2. **动态激活范围归一化（DAN）**：在量化前对每个通道独立归一化到[-1, 1]，量化后再精确恢复原始尺度，以此补偿BN缺失引起的激活分布不匹配，保证低位下激活表示的稳定性。
 
 通过这两项设计，方法在保持PTQ高效性的同时，显著缩小了与QAT方法在极低位宽下的性能差距。
-
-
 
 ## 核心方法与创新机理
 
@@ -116,8 +112,6 @@ $$x_q^{n,c} = \frac{\hat{x}^{n,c} + 1}{2} \cdot (x_{\max}^{n,c} - x_{\min}^{n,c}
 
 传统PTQ微调通常将位宽搜索与量化范围优化耦合在一起，收敛速度慢且容易陷入局部最优。本工作将GBA与后续微调解耦：在 **位感知微调（Bit-aware Fine-Tuning）** 阶段，GBA分配的位宽被固定，仅将每层的量化范围 $[l, u]$ 作为可学习参数，使用重建损失与特征对齐损失进行少量epoch的优化。这种解耦设计使微调过程聚焦于最小化给定位宽下的量化误差，加速了收敛，并在消融实验中验证了其对最终性能的关键贡献：**Table 4** 显示，激活GBA与DAN的组合已带来显著的PSNR和SSIM提升，权重GBA的加入进一步增加了收益，且激活端组件（GBA+DAN）的贡献大于权重端——这与“激活的动态范围更宽且随输入变化，更易受量化误差影响”的观察一致。
 
-
-
 GBA+DAN 的整体流程分为三个阶段：**边界初始化**、**梯度引导位分配（GBA）** 和 **位感知微调**，并在量化过程中嵌入 **动态激活范围归一化（DAN）**，形成端到端的 PTQ 混合精度量化管线。
 
 ### 三阶段流水线
@@ -141,8 +135,6 @@ Figure 3 展示了整体架构：FP32 预训练模型首先经过边界初始化
 
 ![[assets/figures/papers/paper_list_l881_https_openaccess_thecvf_com_content_CVPR2026_html_Kim_Gradient_Knows_Bes/figures/003_Figure_3.jpg]]
 *Figure 3: Overall architecture of the proposed method*
-
-
 
 ### 3.1 整体框架
 
@@ -209,13 +201,6 @@ DAN通过逐样本、逐通道的自适应归一化，补偿了BN缺失引起的
 $$\mathcal{L}_{FT} = \mathcal{L}_{rec} + \lambda_{feat} \cdot \mathcal{L}_{feat}$$
 
 通过将位宽分配与范围优化解耦，位感知微调加速了优化收敛，避免了同时搜索位宽和量化范围的组合爆炸问题。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l881_https_openaccess_thecvf_com_content_CVPR2026_html_Kim_Gradient_Knows_Bes/figures/002_Figure_2.jpg]]
-*Figure 2: Activation histograms from selected layers in EDSR, visualizing the relationship between standard deviation and SQNR (dB). Each plot is labeled as “Block X – Layer Y”, where X and Y denote the indices of the residual block and the convolutional layer within that block, respectively. The x-axis represents activation values, and the y-axis denotes the count of each value (scaled by 106 )*
-
-
 
 ## 实验与关键发现
 
@@ -310,8 +295,6 @@ Figure 1展示了不同PTQ方法在Urban100上4-bit RDN模型的×4重建结果�
 
 > **注意**：以上失败模式分析基于实验数据推断，文中未提供专门的失败案例可视化或域外泛化测试，建议在实际部署前针对目标域进行验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l881_https_openaccess_thecvf_com_content_CVPR2026_html_Kim_Gradient_Knows_Bes/figures/004_Table_1.jpg]]
 *Table 1: Performance comparison with PTQ-based static quantization methods, all applied with fine-tuning, on the CNN-based EDSR and RDN models for ×4 scaling using 4-bit and 3-bit quantization. W/A denotes the bit precision for weights and activations, respectively, and MP indicates whether mixed precision was applied*
 
@@ -326,11 +309,6 @@ Figure 1展示了不同PTQ方法在Urban100上4-bit RDN模型的×4重建结果�
 
 ![[assets/figures/papers/paper_list_l881_https_openaccess_thecvf_com_content_CVPR2026_html_Kim_Gradient_Knows_Bes/figures/001_Figure_1.jpg]]
 *Figure 1: Qualitative results of 4-bit RDN models quantized by different PTQ methods on Urban100 $(\times 4$ scaling)*
-
-![[assets/figures/papers/paper_list_l881_https_openaccess_thecvf_com_content_CVPR2026_html_Kim_Gradient_Knows_Bes/figures/007_Figure_4.jpg]]
-*Figure 4: Qualitative comparison of reconstruction results on Urban100 img001 $(\times 4$ scaling) with various quantization methods. For evaluation, all images are cropped to the same region and compared*
-
-
 
 ## 定位与知识库关联
 
@@ -383,8 +361,6 @@ DAN的引入则针对SR模型的结构特性：SR模型通常去除批量归一�
 3. **梯度敏感性度量与SQNR等信号保真度指标的理论关系是什么？** Figure 2揭示了两者的非单调关系，但缺乏理论层面的解释，理解这一关系可能指导更优的敏感性代理设计。
 
 4. **混合精度量化的硬件部署效率如何？** 论文未讨论不同位宽层在硬件上的实际加速比和能耗收益，这是MPQ方法从算法到部署的关键鸿沟。
-
-
 
 ## 原文 PDF
 

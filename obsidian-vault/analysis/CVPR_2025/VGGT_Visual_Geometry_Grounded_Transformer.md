@@ -68,8 +68,6 @@ VGGT在前馈模式下显著超越了依赖后处理的优化方法：
 
 消融实验进一步证实：交替注意力架构远优于仅全局自注意力或交叉注意力变体（Table 5），且多任务联合训练比单任务训练产生更精确的点云估计（Table 6）。这些结果表明，**大规模数据驱动的前馈Transformer可以隐式学习多视图几何推理能力，在速度与精度上同时超越传统优化方法**。
 
-
-
 从多张二维图像恢复场景的三维几何结构是计算机视觉的核心问题，其应用涵盖自动驾驶、机器人导航、增强现实与三维内容创作等领域。传统三维重建流程通常分为稀疏重建（Structure-from-Motion，SfM）与稠密重建（Multi-View Stereo，MVS）两个阶段，并高度依赖束调整（Bundle Adjustment，BA）等迭代优化后处理来消除累积误差。这类优化方法虽然精度较高，但计算开销大、推理耗时长，难以满足实时或大规模应用的需求。
 
 近年来，前馈神经网络在三维重建领域取得了显著进展。以 **DUSt3R**（Wang et al., CVPR 2024）和 **MASt3R**（Leroy et al., arXiv 2024）为代表的方法，能够直接从图像对中预测点云图，避免了传统SfM的级联流程。然而，这些方法存在两个关键瓶颈：
@@ -80,8 +78,6 @@ VGGT在前馈模式下显著超越了依赖后处理的优化方法：
 从更宏观的视角看，现有方法陷入了“前馈速度”与“优化精度”的权衡困境：纯前馈方法（如DUSt3R）速度快但精度受限，依赖优化的方法（如 **VGGSfM v2**，Wang et al., CVPR 2024）精度高但耗时长达数秒甚至数十秒。这一困境的根本原因在于，前馈模型缺乏对多视图几何关系的有效建模机制，而优化方法虽然显式地编码了几何约束，却牺牲了计算效率。
 
 本文的核心动机在于打破上述权衡。作者观察到，即便Transformer架构本身缺乏显式的三维几何偏置，通过大规模、多样化的三维标注数据进行多任务联合训练，模型依然能够隐式地捕捉多视图之间的几何对应关系。基于这一洞察，VGGT被设计为一个通用的前馈三维感知模型，旨在以单次推理、无需任何后处理的方式，从任意数量的输入视图中同时预测相机参数、深度图、点云图与点跟踪特征，从而实现速度与精度的双重突破。
-
-
 
 ## 核心方法与创新机理
 
@@ -102,8 +98,6 @@ VGGT的架构创新体现在**交替注意力（Alternating-Attention）** 设�
 ### 创新本质的因果解读
 
 VGGT的成功可归因于一个核心因果链条：**大规模多任务训练 × 交替注意力架构 → 隐式多视图几何捕获 → 端到端前馈3D重建**。即便Transformer缺乏显式几何偏置，通过海量多样的3D标注数据（训练需64张A100 GPU持续9天）配合交替注意力机制，模型学会在token交互中隐式编码相机位姿、深度一致性和跨视图对应关系。这一发现挑战了“3D视觉模型必须嵌入几何先验”的传统观念，为通用视觉几何模型开辟了新路径。
-
-
 
 VGGT 的整体设计遵循一个简洁的前馈范式：输入任意数量的 RGB 图像，经过一个大型 Transformer 一次性端到端地输出每帧的相机参数、深度图、点云图和点跟踪特征，全程无需任何后处理优化。其核心映射函数为：
 
@@ -132,13 +126,6 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{camera}} + \mathcal{L}_{\mathrm{depth}} + \
 其中 $\lambda = 0.05$，$\mathcal{L}_{\mathrm{camera}}$ 为相机参数的 Huber 损失，$\mathcal{L}_{\mathrm{depth}}$ 为带异方差不确定度的深度损失（包含 L1 项和梯度项），$\mathcal{L}_{\mathrm{track}}$ 为所有查询点预测坐标与真实坐标的 L1 距离。
 
 与现有方法的关键区别在于：**DUSt3R**（Wang et al., CVPR 2024）和 **MASt3R**（Leroy et al., arXiv 2024）仅支持两视图输入，需要将多视图拆分为两两图像对分别处理后，再通过全局对齐进行融合；而 VGGT 一次性接受全部视图，直接输出完整的 3D 属性，推理时间仅约 0.2 秒（10 帧），相比需要约 9 秒的基线方法快了两个数量级。
-
-### 补充图表
-
-![[assets/figures/papers/vggt_cvpr2025_quick/figures/001_Figure_1.jpg]]
-*Figure 1: VGGT is a large feed-forward transformer with minimal 3D-inductive biases trained on a trove of 3D-annotated data. It accepts up to hundreds of images and predicts cameras, point maps, depth maps, and point tracks for all images at once in less than a second, which often outperforms optimization-based alternatives without further processing*
-
-
 
 VGGT的核心是一个标准的大型Transformer，其关键设计在于**交替注意力（Alternating-Attention）架构**和多任务预测头。整个模型将任意数量的RGB图像映射为每帧的相机参数、深度图、点云图和跟踪特征，映射函数为：
 
@@ -191,16 +178,11 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{camera}} + \mathcal{L}_{\mathrm{depth}} + \
 
 值得注意的是，尽管理论上点云图 $P_i$ 可直接由密集预测头输出，但论文发现**将独立估计的深度图与相机参数结合来构建点云（Depth + Cam）优于直接预测点云**（Table 3）。这一策略利用了深度估计和相机估计各自的特化能力，在ETH3D上取得了更低的Overall误差（0.677 vs 直接点云头输出）。
 
-
-
 ## 实验与关键发现
 
 ### 相机姿态估计：前馈速度与优化级精度
 
 VGGT 在 RealEstate10K 和 CO3Dv2 两个标准基准上评估多视图相机姿态估计，使用 10 帧随机采样输入。所有方法均未在 RealEstate10K 上训练，保证了泛化性对比的公平性。如 Table 1 所示，VGGT 以纯前馈模式取得 AUC@30 为 85.3 (Re10K) 和 88.2 (CO3Dv2)，显著超越需要后处理全局对齐的 **DUSt3R** (Wang et al., CVPR 2024) 和 **MASt3R** (Leroy et al., arXiv 2024)，以及可微分束调整方法 **VGGSfM v2** (Wang et al., CVPR 2024)。关键差距在于：VGGT 仅需 0.2 秒单次前馈推理，而对比方法耗时约 9 秒（含后处理），实现了近 45 倍加速同时精度领先 8.9 个百分点。在更具挑战的 IMC 数据集上，VGGT 的 AUC@10° 达 84.91，超越 CVPR 2024 IMC 挑战赛冠军 VGGSfM v2 的 76.82（Table 10），证明其在真实世界复杂光照与纹理下的鲁棒性。
-
-![[assets/figures/papers/vggt_cvpr2025_quick/figures/005_Table_1.jpg]]
-*Table 1: Camera Pose Estimation on RealEstate10K [161] and CO3Dv2 [88] with 10 random frames. All metrics the higher the better. None of the methods were trained on the Re10K dataset. Runtime were measured using one H100 GPU. Methods marked with ‡ represent concurrent work*
 
 ![[assets/figures/papers/vggt_cvpr2025_quick/figures/016_Table_10.jpg]]
 *Table 10: Camera Pose Estimation on IMC [54]. Our method achieves state-of-the-art performance on the challenging phototropism data, outperforming VGGSfMv2 [125] which ranked first on the latest CVPR’24 IMC Challenge in camera pose (rotation and translation) estimation*
@@ -208,12 +190,6 @@ VGGT 在 RealEstate10K 和 CO3Dv2 两个标准基准上评估多视图相机姿�
 ### 多视图深度与点云估计：无需已知相机的端到端重建
 
 在 DTU 多视图立体匹配基准上，VGGT 在不使用真实相机参数的方法中取得 Overall Chamfer 距离 0.382，大幅领先次优方法（1.741），且接近部分使用真实相机的方法（Table 2）。这一结果直接验证了 VGGT 联合估计相机与深度的有效性。在 ETH3D 点云估计任务中，VGGT 的“Depth + Cam”策略（从深度图与相机参数合成点云）取得 Overall 0.677，优于直接预测点云头（Ours Point）的 0.709，也优于依赖全局对齐的 DUSt3R（0.826）和 MASt3R（0.828），且推理速度远超后者（Table 3）。这表明将独立估计的深度与相机结合比直接回归点云更精确——模型隐式学习了多视图几何一致性，而非记忆点云坐标。
-
-![[assets/figures/papers/vggt_cvpr2025_quick/figures/008_Table_3.jpg]]
-*Table 3: Point Map Estimation on ETH3D [97]. DUSt3R and MASt3R use global alignment while ours is feed-forward and, hence, much faster. The row Ours (Point) indicates the results using the point map head directly, while Ours (Depth + Cam) denotes constructing point clouds from the depth map head combined with the camera head*
-
-![[assets/figures/papers/vggt_cvpr2025_quick/figures/007_Table_2.jpg]]
-*Table 2: Dense MVS Estimation on the DTU [51] Dataset. Methods operating with known ground-truth camera are in the top part of the table, while the bottom part contains the methods that do not know the ground-truth camera*
 
 ### 双视图匹配与点跟踪：超越专用方法
 
@@ -243,19 +219,9 @@ Table 6 的多任务消融表明，同时训练相机、深度和跟踪三个任
 
 Table 9 报告了不同输入帧数下的推理时间与 GPU 显存占用。在 H100 GPU 上，10 帧输入仅需 0.2 秒、约 8 GB 显存；200 帧时增至约 40 GB，达到当前硬件的实用上限。这一扩展性瓶颈源于 Transformer 全局自注意力的二次复杂度，但已覆盖大多数实际应用场景。
 
-![[assets/figures/papers/vggt_cvpr2025_quick/figures/015_Table_9.jpg]]
-*Table 9: Runtime and peak GPU memory usage across different numbers of input frames. Runtime is measured in seconds, and GPU memory usage is reported in gigabytes*
-
 ### 失败模式与局限
 
 VGGT 主要面向静态场景设计，动态物体会破坏其相机与深度估计的一致性。训练未集成可微分束调整（因训练效率考虑），虽然后处理 BA 可进一步提升精度（如 Table 1 中 Ours + BA 的结果），但未实现端到端优化。此外，模型仅支持透视投影相机，无法处理鱼眼或全景图像；参数规模约 12 亿，训练需 64 张 A100 GPU 持续 9 天，计算成本高昂。在欠代表域或复杂场景下，泛化能力仍有待验证。
-
-### 补充图表
-
-![[assets/figures/papers/vggt_cvpr2025_quick/figures/003_Figure_3.jpg]]
-*Figure 3: Qualitative comparison of our predicted 3D points to DUSt3R on in-the-wild images. As shown in the top row, our method successfully predicts the geometric structure of an oil painting, while DUSt3R predicts a slightly distorted plane. In the second row, our method correctly recovers a 3D scene from two images with no overlap, while DUSt3R fails. The third row provides a challenging example with repeated textures, while our prediction is still high-quality. We do not include examples with more than 32 frames, as DUSt3R runs out of memory beyond this limit*
-
-
 
 ## 定位与知识库关联
 
@@ -304,8 +270,6 @@ VGGT 的特征展现出超越其设计任务的可迁移性。最显著的证据
 - **非透视相机支持**：如何在不大幅改动架构的前提下，扩展对鱼眼、全景等非透视相机模型的支持？
 - **弱监督与数据扩展**：能否在海量无标注互联网数据上进行弱监督或自监督训练，降低对 3D 标注的依赖？
 - **下游任务迁移**：VGGT 特征作为通用 3D 骨干的潜力是否可推广到更多任务（如 3D 语义分割、物体姿态估计等）？
-
-
 
 ## 原文 PDF
 

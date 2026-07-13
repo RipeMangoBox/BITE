@@ -58,8 +58,6 @@ claims:
 
 **局限与开放问题**：该方法依赖有界体素八叉树，难以扩展到极大场景或极薄几何体；无法直接与传统骨骼动画或变形技术结合。未来方向包括解码器缓存/融合以进一步提升性能，以及向大规模多物体动态场景的扩展。
 
-
-
 ### 隐式神经表示与实时渲染的张力
 
 三维几何的隐式神经表示，尤其是以符号距离函数（SDF）$f(\mathbf{x})$ 的零等值面定义表面
@@ -85,8 +83,6 @@ $$S = \big \{ \mathbf { x } \in \mathbb { R } ^ { 3 } \big | f ( \mathbf { x } )
 ### 本文动机：稀疏层次特征实现实时神经渲染
 
 本文的核心动机在于打破“神经 SDF = 大型全局 MLP”的范式。通过将 SDF 编码从单一 MLP 权重中解耦，转而使用**稀疏体素八叉树（SVO）存储局部几何特征**，并配合**极浅 MLP 解码器**（仅 4737 个推理参数），将主要计算负载从网络推理转移到高效的八叉树遍历与三线性插值上。同时引入多重离散 LOD 与连续 LOD 插值，使渲染时可根据需要自适应选择几何精度。这一设计旨在实现 **2–3 个数量级的渲染加速**，首次将神经 SDF 的渲染性能推至实时交互范畴。
-
-
 
 ## 核心方法与创新机理
 
@@ -124,8 +120,6 @@ $$J(\theta, \mathcal{Z}) = \mathbb{E}_{\mathbf{x}, d} \sum_{L=1}^{L_{\max}} \lef
 
 上述创新的综合效果体现在渲染速度的**2–3 个数量级提升**（Abstract）。具体而言，在 TurboSquid V Mech 场景 1920×1080 分辨率下，NG-LOD 稀疏渲染器的帧耗时仅 91ms，而 DeepSDF 需 1693ms，加速约 18.6 倍（Table 3）。同时，NG-LOD 在 ShapeNet150 上的 gIoU 达到 91.6%，高出 DeepSDF 4.7 个百分点（Table 1），实现了速度与质量的双重超越。
 
-
-
 NG-LOD 的整体 pipeline 围绕**稀疏体素八叉树（SVO）特征体积**与**极轻量 MLP 解码器**的协同工作构建，其核心设计是将 SDF 的表示能力从网络权重转移到显式的分层特征存储中，从而在保持高重建质量的同时实现实时渲染。
 
 ### 数据流与模块关系
@@ -158,8 +152,6 @@ $$\widehat{d}_{\widetilde{L}} = (1 - \alpha) \widehat{d}_{L^*} + \alpha \widehat
 $$J(\theta, \mathcal{Z}) = \mathbb{E}_{\mathbf{x}, d} \sum_{L=1}^{L_{\max}} \left\| f_{\theta_L}\left([\mathbf{x}, \mathbf{z}(\mathbf{x}; L, \mathcal{Z})]\right) - d \right\|^2$$
 
 这种多层级联合训练确保了每一级八叉树都能独立表示有效的几何信息，使得渲染时可在不同 LOD 间无缝切换。
-
-
 
 ### 3.1 隐式曲面与符号距离函数
 
@@ -207,8 +199,6 @@ $$J(\theta, \mathcal{Z}) = \mathbb{E}_{\mathbf{x}, d} \sum_{L=1}^{L_{\max}} \lef
 
 该算法利用并行广度优先遍历和前缀和（Exclusive Sum）操作实现无冲突的稀疏八叉树写入索引，从而在 GPU 上高效执行。
 
-
-
 ## 实验与关键发现
 
 ### 几何重建质量
@@ -216,7 +206,6 @@ $$J(\theta, \mathcal{Z}) = \mathbb{E}_{\mathbf{x}, d} \sum_{L=1}^{L_{\max}} \lef
 **NG-LOD** 在三个不同规模与特性的数据集上均以极低的推理参数量取得了优于全局隐式方法的几何精度。Table 1 显示，从 LOD 3 开始，本方法的各项指标已全面超越 **DeepSDF**（Park et al., CVPR 2019），而推理参数仅为 4737，相比 DeepSDF 的约 1.8M 参数减少了近 380 倍。在 ShapeNet150 上，LOD 4 的 gIoU 达到 91.6%，较 DeepSDF 的 86.9% 提升 4.7 个百分点；在 Thingi32 上，LOD 5 的 Chamfer- $L^1$ 降至 $0.0271 \times 10^3$，仅为 DeepSDF（0.0533）的一半；在 TurboSquid16 上，Normal- $L^2$ 误差从 0.180 降至 0.166。值得注意的是，存储开销也显著降低——本方法的存储基于所有形状的平均稀疏体素数量加解码器大小计算，在高 LOD 下仍保持紧凑。
 
 定性结果（Figure 5）进一步印证了数值优势。在 TurboSquid 数据集上，**FFN**（Tancik et al., NeurIPS 2020）和 **Neural Implicits**（Davies et al., arXiv 2020）均丢失了大量高频细节，仅 NG-LOD 能恢复精细几何结构，且渲染速度比 FFN 快约 50 倍，与 NI 相当。
-
 
 ### 复杂解析 SDF 的极限测试
 
@@ -258,12 +247,8 @@ Figure 7 将 NG-LOD 与传统的网格简化方法在低内存预算下进行了
 
 尽管 NG-LOD 在多个维度上表现优异，但其设计存在两个已知局限。第一，方法依赖有界体素八叉树，难以扩展到极大场景或非常薄的几何体（无体积）。第二，几何完全由隐式特征体积表示，无法轻松与传统变形或骨骼动画技术结合，限制了其在动态场景中的应用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2101_10994/figures/006_Table_1.jpg]]
 *Table 1: Mesh Reconstruction. This table shows architectural and per-shape reconstruction comparisons against three different datasets. We see that under all evaluation schemes, our architecture starting from LOD 3 performs much better despite having much lower storage and inference parameters. The storage for our representation is calculated based on the average sparse voxel counts across all shapes in all datasets plus the decoder size, and # Inference Param. measures network parameters used for a single distance query*
-
-
 
 ## 定位与知识库关联
 
@@ -296,8 +281,6 @@ NG-LOD 的适用性受以下因素制约：
 - 如何将该表示扩展到大规模、多物体场景并支持动态更新？
 
 从知识库定位来看，NG-LOD 开创了“稀疏特征八叉树 + 极浅解码器”的神经 SDF 实时渲染范式，后续工作可沿以下方向推进：将特征体积与哈希编码（如 Instant NGP）结合以进一步压缩存储；引入时序特征体积支持 4D 重建；或将八叉树遍历与硬件光追单元（RT core）深度集成以实现真正的实时帧率。
-
-
 
 ## 原文 PDF
 

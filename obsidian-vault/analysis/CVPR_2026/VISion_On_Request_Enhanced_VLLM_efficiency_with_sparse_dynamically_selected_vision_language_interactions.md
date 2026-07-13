@@ -58,15 +58,11 @@ claims:
 - VISOR可与现有令牌缩减方法正交结合，如VISOR-TR+VisionZip实现**37× FLOPs节省**，准确率仅小幅下降；
 - 方法在Qwen2-VL-2B和LLaVA-OV 1.5B等不同骨干上均验证有效，通用训练模型在所有计算预算下达到或超越独立训练模型的精度。
 
-
-
 视觉-语言大模型（Vision-Language Large Models, VLLMs）在图像理解、文档分析、视觉问答等任务上取得了显著进展，但其推理效率受制于一个根本性的计算瓶颈：标准的Transformer层需同时处理视觉令牌与文本令牌的拼接序列，导致计算复杂度随视觉令牌数量呈二次增长。为缓解这一问题，现有方法普遍采用令牌缩减（token reduction）策略——通过剪枝、合并或渐进丢弃视觉令牌来降低序列长度。然而，这类方法在需要细粒度视觉理解的任务上暴露了关键缺陷：强制丢弃视觉令牌造成了不可逆的信息瓶颈，导致性能显著下降（Fig. 10）。
 
 本文的核心洞察在于，不同任务的视觉-语言交互需求存在本质差异。通过跨模态注意力模式分析（Fig. 2），作者发现：对于ScienceQA等简单任务，模型仅需少量图像-文本交互即可完成任务，注意力以文本-文本交互为主导；而对于DocVQA等困难任务，模型需要在整个网络中持续关注图像信息。进一步的CKA相似度分析（Fig. 3）揭示了更深层的机制：简单任务的视觉特征在LLM各层中几乎保持不变（CKA > 0.9），而困难任务的视觉特征被逐层精细化（CKA降至0.6左右）。层丢弃实验（Fig. 4）则将任务明确划分为两个簇：视觉敏感型（困难任务，如DocVQA、ChartQA、InfoVQA）和粗粒度视觉型（简单任务，如POPE、SQA、GQA）。
 
 上述分析揭示了一个被令牌缩减范式忽视的事实：统一地对所有任务施加相同的视觉处理策略并非最优选择。令牌缩减方法在困难任务上的性能塌缩，根源在于它们混淆了“减少视觉交互”与“丢弃视觉信息”这两个概念。VISOR的设计动机正是从这一区分出发：通过解耦视觉-语言交互层类型并动态控制其执行，在保留完整视觉信息的前提下大幅降低计算开销，从而在简单和困难任务上均取得最优的精度-效率权衡。
-
-
 
 ## 核心方法与创新机理
 
@@ -106,8 +102,6 @@ $$( \mathbf{V}^{(l)} , \mathbf{T}^{(l)} ) = \begin{cases} \mathrm{TL}_l ( [ \mat
 
 VISOR 的稀疏交互机制与令牌缩减方法正交可组合。VISOR-TR 结合 VisionZip 等令牌剪枝方法，可达到最高 37 倍 FLOP 节省，准确率仅小幅下降（Table 2, Table 3），在极端效率场景下仍保持竞争力。
 
-
-
 VISOR 的核心设计理念是**解耦文本与视觉令牌的处理流程**，而非像主流令牌缩减方法那样直接丢弃视觉令牌。在标准的大视觉语言模型中，每一层 Transformer 都同时对拼接后的视觉令牌和文本令牌执行全自注意力操作，计算复杂度随视觉序列长度呈二次增长。VISOR 则通过将标准 LVLM 层重构为三种功能层，在几乎不损失视觉信息的前提下大幅降低计算开销。
 
 ### 架构总览
@@ -140,8 +134,6 @@ LLM 内部的每一层根据其所属的功能集合执行不同的操作（见 
 ### 与令牌缩减的协同
 
 VISOR 的稀疏交互机制与令牌缩减方法是**正交且可叠加**的。VISOR-TR 变体将 VISOR 与 VisionZip 等令牌剪枝方法结合，在交叉注意力层之前进一步压缩视觉令牌数量，可实现高达 37 倍的 FLOPs 节省，同时准确率仅小幅下降（Table 2, Table 3）。这验证了“减少交互频率”与“压缩令牌数量”两条效率优化路径的互补性。
-
-
 
 ### 标准LVLM层的计算瓶颈
 
@@ -185,19 +177,6 @@ VISOR通过轻量策略网络（Routing MLP）实现按样本复杂度的动态�
 
 VISOR可与令牌缩减方法结合形成VISOR-TR。在交叉注意力层前对视觉令牌进行剪枝或打包，进一步降低 $N_v$，从而减少交叉注意力的线性开销。实验表明该组合可达到最高37倍FLOP节省（结合VisionZip），同时保持有竞争力的准确率。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l807_https_arxiv_org_abs_2603_23495/figures/004_Figure_2.jpg]]
-*Figure 2: Cross-modality attention patterns across layers. We plot the proportion of attention scores allocated to three interaction types: text queries attending to image tokens (Query-to-Image), answer tokens attending to image tokens (Answer-to-Image), and answer tokens attending to query tokens (Answer-to-Query). For easy tasks like SQA, interaction is sparse and dominated by text-to-text attention. For hard tasks like DocVQA, the model attends to the image across the whole network*
-
-![[assets/figures/papers/paper_list_l807_https_arxiv_org_abs_2603_23495/figures/006_Figure_3.jpg]]
-*Figure 3: Evolution of visual representations across layers, measured by pairwise CKA similarity. For easy tasks (e.g., SQA), visual features remain largely static (high similarity across layers). For harder tasks (e.g., DocVQA), features are progressively refined*
-
-![[assets/figures/papers/paper_list_l807_https_arxiv_org_abs_2603_23495/figures/008_Figure_4.jpg]]
-*Figure 4: Accuracy sensitivity by dropping all vision tokens for different subsets of LLM layers. Left: Accuracy distribution on a dataset-by-dataset basis. Certain datasets (e.g., DocVQA, ChartQA) are particularly sensitive to reduced vision-language interactions. Right: we show how the layer-drop config. & accuracy correlate among datasets. Two clusters emerge: vision-sensitive (“hard”) (e.g., InfoVQA, OCRBench, etc.) and coarse vision (“easy”) (e.g., POPE, SQA, GQA, etc.) datasets*
-
-
-
 ## 实验与关键发现
 
 ### 主要结果：精度与效率的帕累托前沿
@@ -231,30 +210,17 @@ Figure 1 从 FLOPs 减少与准确率的关系维度展示了 VISOR 的效率优
 
 VISOR 的路由策略网络（Policy Network）根据输入样本的复杂度动态选择执行哪些自注意力层。Figure 6 的性能热力图展示了不同配置在各数据集上的相对准确率，揭示了任务需求与层配置之间的对应关系。Figure 7 进一步展示了路由器为各测试数据集分配的层配置，表明路由器能够自动为简单任务分配更少的自注意力层，为困难任务分配更多自注意力层。
 
-![[assets/figures/papers/paper_list_l807_https_arxiv_org_abs_2603_23495/figures/015_Figure_6.jpg]]
-*Figure 6: Performance heatmap for different configurations across datasets. Each row represents a configuration, and each column corresponds to a dataset. The color intensity indicates the relative accuracy achieved by that configuration on the respective dataset*
-
 Table 8 的路由泛化性实验表明，即使训练时排除部分数据集（如 AI2D、DocVQA、GQA），路由器在测试时对这些数据集的配置分配仍保持合理，性能未出现明显下降。这说明路由策略学习到的是任务复杂度的通用特征，而非对特定数据集的过拟合。
 
 ### 失败模式与局限性
 
 尽管 VISOR 在整体上表现出色，但在极端设置下仍存在信息瓶颈风险。当结合极端令牌缩减（如将视觉令牌压缩至极低数量）时，困难任务上的性能下降仍然显著——这是因为自注意力层的视觉精化能力受限于输入令牌的信息含量。此外，通用训练模型需要在多个配置间平衡，可能无法为某一特定配置达到绝对最优精度（尽管实验表明其性能通常优于独立训练）。离线伪标签路由依赖预定义的配置集合和训练数据分布，对于分布外样本的泛化性尚待进一步验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l807_https_arxiv_org_abs_2603_23495/figures/013_Table_3.jpg]]
 *Table 3: Acc. comparison across configurations and categories*
 
 ![[assets/figures/papers/paper_list_l807_https_arxiv_org_abs_2603_23495/figures/014_Table_4.jpg]]
 *Table 4: Accuracy comparison between independently trained models and a universally trained model supporting multiple configurations. Both model variants use the same fixed configuration for all samples*
-
-![[assets/figures/papers/paper_list_l807_https_arxiv_org_abs_2603_23495/figures/012_Table_2.jpg]]
-*Table 2: Accuracy comparison when combining VISOR with token reduction methods*
-
-![[assets/figures/papers/paper_list_l807_https_arxiv_org_abs_2603_23495/figures/021_Figure_10.jpg]]
-*Figure 10: Efficiency comparison - number of FLOPS vs. vision sequence length*
-
-
 
 ## 定位与知识库关联
 
@@ -319,8 +285,6 @@ VISOR在以下几个维度上与现有工作形成根本差异：
 4. **交叉注意力层下界**：消融实验（Table 3）显示8层交叉注意力足以满足粗粒度任务，但这一数量能否进一步减少？是否存在理论下界？
 
 5. **训练数据效率**：Table 10显示使用50%训练数据时性能下降有限，但更极端的低数据场景（如10-20%）下VISOR的训练稳定性如何，尚待探索。
-
-
 
 ## 原文 PDF
 

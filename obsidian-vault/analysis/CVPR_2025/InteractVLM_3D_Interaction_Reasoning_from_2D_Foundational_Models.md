@@ -65,8 +65,6 @@ InteractVLM 的核心洞察在于：将3D接触估计转化为一个“渲染‑
 
 在DAMON二进制人接触任务上，InteractVLM达到F1=75.6%，地测误差仅2.89 cm，显著超越现有方法。数据效率消融实验显示，仅使用1%的DAMON训练数据，InteractVLM的F1=0.53即超过全数据训练的DECO（F1=0.55），证明了VLM预训练视觉知识对减少3D标注依赖的关键作用。在语义人接触和物体可供性预测任务上，该方法同样取得了领先性能。
 
-
-
 ### 问题背景
 
 理解人类与周围物体之间的物理接触是构建具身智能系统的核心能力之一。从单张野外图像中准确估计人体与物体的3D接触点，对于人-物交互（HOI）重建、机器人操作、增强现实等应用至关重要。然而，这一任务面临根本性挑战：**野外场景下极度缺乏成对的人-物3D接触标注数据**，而现有的多模态模型仅能在2D空间进行推理，无法直接处理3D几何与多视图一致性问题。
@@ -87,8 +85,6 @@ InteractVLM的核心洞察在于：**大规模视觉语言模型（VLM）在海�
 
 这一思路催生了**“渲染-定位-提升”（Render-Localize-Lift, RLL）框架**，其核心机制是：VLM的语义提示（contact tokens）引导多视图几何一致的特征提升（FeatLift），将2D基础模型的强大感知能力桥接到3D空间。该方法不仅将任务从二进制接触拓展到**语义人接触**（给定物体标签，预测对应身体接触点），还在数据效率上展现出显著优势——仅用1%的DAMON训练数据，其F1分数（0.53）即已接近全数据训练的DECO（F1=0.55）。
 
-
-
 ## 核心方法与创新机理
 
 InteractVLM 的核心创新在于将大规模视觉语言模型（VLM）的开放世界语义推理能力与多视图几何一致性机制深度融合，构建了一个“渲染-定位-提升”（Render-Localize-Lift, RLL）框架，从而仅需极少量3D标注即可实现高精度的3D人-物接触估计。其关键创新点体现在以下四个维度的范式转变：
@@ -108,8 +104,6 @@ DECO 等基线方法需要完整的 DAMON 数据集（100% 3D标注）进行训�
 ### 4. 从二进制接触到语义级接触推理
 
 传统任务仅关注“是否接触”的二进制判断。InteractVLM 提出 **语义人接触（Semantic Human Contact）** 新任务：给定图像和指定物体标签，模型需推理人体上与该物体发生接触的具体顶点。这一任务粒度要求模型理解物体类别与人体部位之间的语义对应关系，InteractVLM 在所有物体类别上均超越扩展的 Semantic-DECO 基线（Table 2），证明 VLM 的语义理解能力可有效迁移至3D接触推理场景。
-
-
 
 InteractVLM 的核心是一个 **“视觉-语言模型引导的多视图接触定位”** 框架，其设计初衷是解决野外场景下缺乏成对3D人-物接触标注的瓶颈。整体 pipeline 由两大组件串联而成：**视觉-语言模型（VLM）** 负责高层语义推理，**多视图接触定位模型（MV-Loc）** 负责将语义信号转化为空间精确的3D接触预测。
 
@@ -143,15 +137,8 @@ InteractVLM 的核心是一个 **“视觉-语言模型引导的多视图接触�
 
 整个框架的输出可直接用于下游的 **人-物交互（HOI）3D重建**（图3(b)）：通过最小化人体接触顶点与物体接触顶点之间的距离，将物体吸附到人体上，实现野外单张图像的人-物联合3D重建。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1739_InteractVLM_3D_Interaction_Reasoning_from_2D_Foundational_Models/figures/003_Figure_3.jpg]]
 *Figure 3: Method overview. Given a single in-the-wild color image, our novel InteractVLM method estimates 3D contact points on both humans and objects (a). Then, we reconstruct a 3D human and object in interaction by exploiting these contacts (b). More specifically: (a) Contact estimation. Given an image, I, and prompt text*
-
-![[assets/figures/papers/paper_list_l1739_InteractVLM_3D_Interaction_Reasoning_from_2D_Foundational_Models/figures/001_Figure_1.jpg]]
-*Figure 1: We present InteractVLM, a novel method for estimating contact points on both human bodies and objects from a single in-thewild image, shown here as red patches. Our method goes beyond traditional binary contact estimation methods by estimating contact points on a human in relation to a specified object. We do so by leveraging the broad visual knowledge of a large Visual Language Model*
-
-
 
 InteractVLM 的核心架构由两大组件构成：一个负责高层语义推理的视觉语言模型（VLM），以及一个实现多视图接触定位的 MV-Loc 模块。二者通过“渲染-定位-提升”（Render-Localize-Lift, RLL）框架协同工作，将 2D 基础模型的语义知识转化为 3D 接触估计。
 
@@ -204,12 +191,8 @@ $$\mathcal{L}_C^O = \mathcal{L}_{Dice}(C^O, \widehat{C}^O) + \beta \|C^O - \wide
 
 整个流水线的信息流可概括为：VLM 的语义推理（contact token）为 MV-Loc 提供“在哪里找接触”的高层指导，FeatLift 则确保“不同视角找到的是同一个 3D 接触”。消融实验证实，移除 FeatLift 或多视图一致性损失将导致 3D 定位精度显著下降（见 Figure 5），验证了该设计的必要性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1739_InteractVLM_3D_Interaction_Reasoning_from_2D_Foundational_Models/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of InteractVLM. Given a color image, our VLM performs the core reasoning, and guides a novel MV-Loc model to localize contacts on both bodies and objects in 3D. Here we show only the body; for details, and object contact, see Fig. 3*
-
-
 
 ## 实验与关键发现
 
@@ -315,11 +298,6 @@ InteractVLM 进一步支持**语义人接触**这一新任务——给定图像�
 | **Figure 4** | 定性对比显示接触预测更精确、更集中于实际交互部位 |
 | **Figure 5** | 1% 数据即超越全监督 DECO，证明 VLM 预训练知识的数据效率优势 |
 
-![[assets/figures/papers/paper_list_l1739_InteractVLM_3D_Interaction_Reasoning_from_2D_Foundational_Models/figures/007_Figure_4.jpg]]
-*Figure 4: “Semantic Human Contact” estimation (Sec. 4.2). Given an image and an object label, InteractVLM infers body contacts for this object. InteractVLM outperforms a Semantic-DECO [58] baseline. Objects are shown in green circles, and contacts as red patches*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 方法沿革与基线关系
@@ -354,8 +332,6 @@ InteractVLM 开辟了 VLM 驱动的3D交互理解这一新方向，以下问题�
 - **可学习物体表示**：能否引入可学习的物体几何表示代替固定的检索数据库，使模型端到端处理任意物体，从而消除对 OpenShape 检索质量的依赖？
 - **鲁棒性边界**：在极端光照、复杂背景或非典型交互姿态下，VLM 的接触推理可靠性如何保证？是否需要额外的置信度校准机制？
 - **细粒度交互统一**：能否在单一模型中统一处理双手操作、工具使用等更细粒度的交互类型，超越当前的人-物二元接触范式？
-
-
 
 ## 原文 PDF
 

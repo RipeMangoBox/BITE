@@ -279,8 +279,6 @@ Figure 7 和论文讨论明确指出了 VideoJAM 的适用边界：
 
 这些失败模式指向了明确的研究缺口：如何在高分辨率下改善小物体运动捕获，以及如何将物理先验融入运动表示。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1838_VideoJAM_Joint_Appearance_Motion_Representations_for_Enhanced_Motion_Gen/figures/007_Table_1.jpg]]
 *Table 1: Comparison of VideoJAM-4B with prior work on VideoJAM-bench. Human evaluation shows percentage of votes favoring VideoJAM; automatic metrics use VBench*
 

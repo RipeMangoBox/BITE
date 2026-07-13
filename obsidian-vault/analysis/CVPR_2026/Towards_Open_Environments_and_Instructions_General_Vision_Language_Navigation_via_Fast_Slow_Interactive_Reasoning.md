@@ -51,8 +51,6 @@ claims:
 
 在**GSA-R2R**基准上，该方法在基本指令下（Test-R-Basic / Test-N-Basic）分别取得 **70.8** 和 **58.4** 的成功率（SR），优于基线 **GR-DUET**（Hong et al., arXiv 2025），相对提升分别为1.5%和2.2%；在场景指令下（Test-N-Scene）达到 **50.7** SR，提升2.6个百分点。消融实验证实快慢推理（FSR）与指令风格转换（ISC）模块均对性能有正向贡献，二者结合效果最优。案例研究表明，慢推理经验增强后导航时间减少46.7%，导航误差降低80%。经验库容量在50–100之间最优，需根据场景复杂度手工调整，是该框架当前的一个实用限制。
 
-
-
 视觉-语言导航（Vision-Language Navigation, VLN）要求智能体在真实三维环境中依据自然语言指令进行自主导航。近年来，VLN在封闭场景设定下取得了显著进展，但现有方法普遍面临一个根本性瓶颈：**在开放世界中的泛化能力不足**。其深层原因在于，现有方法缺乏对快慢认知过程的显式建模，导致在分布外（OOD）场景下推理路径不稳定，产生类似幻觉的错误决策。
 
 具体而言，当前VLN范式存在两大核心挑战。其一，**场景泛化鸿沟**：训练集通常局限于住宅环境，而测试集可能包含商场、办公室、电影院等非住宅场景（见图1），视觉外观和空间布局的巨大差异使得单一推理网络难以可靠迁移。其二，**指令多样性冲击**：真实应用中的指令不仅包括简洁的基本指令，还涵盖场景风格指令和用户个性化指令，指令风格的剧烈变化进一步加剧了模型的泛化压力。
@@ -60,8 +58,6 @@ claims:
 现有工作如**GR-DUET**（Hong et al., arXiv 2025）尝试通过视觉特征适应来缓解场景漂移，但其本质上仍是单次推理范式——每次导航独立决策，缺乏对历史经验的积累与复用。这种设计忽略了人类认知中的一个关键机制：**双系统理论**（Dual-Process Theory）。人类在决策时，快系统负责直觉式快速响应，慢系统则进行深度反思并提炼通用经验，两者动态交互以应对复杂多变的环境。
 
 受此启发，本文提出 **slow4fast-VLN** 框架，核心动机是构建一个动态交互式快慢推理系统：快推理模块（端到端策略网络）负责实时动作输出与记忆积累，慢推理模块（基于LLM的反思网络）对历史轨迹进行结构化反思，提取通用经验并反馈至快推理决策。这一设计使得智能体在遇到复杂场景时，能够检索并利用慢推理积累的经验，从而在不重新调用慢推理的情况下提升泛化能力和决策效率，从根本上缓解开放环境下的推理不稳定性问题。
-
-
 
 ## 核心方法与创新机理
 
@@ -117,8 +113,6 @@ $$F _ { \mathrm { f u s e d } } = \sigma \left( W _ { \mathrm { f u s i o n } } 
 
 经验库容量 $K$ 目前需根据场景复杂度手工调整，缺乏自适应机制。慢推理依赖大语言模型，在资源受限的实时部署场景中存在计算开销和延迟挑战。指令风格转换的质量可能受LLM能力限制，对极端口语化指令的转换稳定性有待验证。
 
-
-
 slow4fast-VLN 框架的核心设计动机源于人类双系统认知理论：系统1（快思考）负责实时、直觉式的决策，系统2（慢思考）则在事后对经验进行深度反思与抽象。现有视觉-语言导航方法在开放世界中泛化能力不足的根本原因，正是缺乏对这种快慢认知过程的显式建模，导致在分布外场景下推理路径不稳定。为此，slow4fast-VLN 构建了一个动态交互式快慢推理框架，其数学形式定义为：
 
 $$\mathcal { F } = \langle \pi , R , M , A \rangle$$
@@ -171,15 +165,8 @@ $$Y _ { \mathrm { e n h a n c e d } } = \pi ( F _ { \mathrm { f u s e d } } , I 
 
 为应对开放环境中指令风格的多样性（基本指令、场景指令、用户指令），框架引入指令风格转换模块（Instruction Style Conversion）。该模块利用 LLM 链式思考提示工程，将场景风格和用户风格的指令动态转换为统一的基本风格指令，在保留核心导航语义的同时消除格式差异。消融实验证实，该模块对场景风格指令的提升尤为显著，与快慢推理框架结合后在 Test-N-Scene 上达到最优 SR 50.4。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2424_https_arxiv_org_abs_2601_09111/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our method. The policy network processes real-time input, executes actions, and stores historical memory. The slow-reasoning network reflects on these memories to generate generalized experiences, which are then stored. These experiences guide the fast-reasoning network, providing strategic insights when faced with complex scenarios*
-
-![[assets/figures/papers/paper_list_l2424_https_arxiv_org_abs_2601_09111/figures/001_Figure_1.jpg]]
-*Figure 1: In the GSA-VLN task, the training set focuses on residential environments, while the test set includes non-residential scenes such as shopping malls, offices, and cinemas. It also incorporates basic, scene, and user-style instructions. The core goal is to evaluate the agent’s scene generalization ability through diverse building types and instruction variations. To address this open-world navigation challenge, we propose the interactive Slow4Fast framework: “fast reasoning” is driven by a policy network that outputs actions from real-time input and stores memories; “slow reasoning” processes memories, extract generalized experiences, and reinforce the policy network*
-
-
 
 ### 2.1 快慢交互推理框架形式化
 
@@ -253,8 +240,6 @@ $$Y_{\mathrm{enhanced}} = \pi(F_{\mathrm{fused}}, I)$$
 
 为处理 GSA-VLN 中多样化的指令风格（Basic、Scene、User），论文引入指令风格转换（ISC）模块。该模块通过 LLM 的 CoT 提示工程，将 Scene 风格和 User 风格的指令动态转换为统一的 Basic 风格指令，同时保留核心导航语义。转换过程设置置信度阈值，仅当转换置信度超过阈值时才采用转换后的指令，否则保留原始指令。这一模块与快慢推理框架正交，可独立或联合使用。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -319,9 +304,6 @@ $$Y_{\mathrm{enhanced}} = \pi(F_{\mathrm{fused}}, I)$$
 
 #### 案例研究（Figure 4）
 
-![[assets/figures/papers/paper_list_l2424_https_arxiv_org_abs_2601_09111/figures/009_Figure_4.jpg]]
-*Figure 4: Case Study. The left side shows the execution trajectory of the agent with fast reasoning only, while the right side displays the agent’s trajectory after slow reasoning. A check mark*
-
 在一个具体案例中，论文对比了仅使用快推理与启用快慢交互推理的导航表现：
 
 - **导航时间**：从 15 秒降至 8 秒，减少 **46.7%**。
@@ -341,12 +323,6 @@ $$Y_{\mathrm{enhanced}} = \pi(F_{\mathrm{fused}}, I)$$
 ### 公平性说明
 
 论文中未明确讨论公平性相关考量，如不同场景类型或指令风格下的性能均衡性分析。建议在后续研究中补充跨场景、跨指令类型的细粒度公平性评估。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2424_https_arxiv_org_abs_2601_09111/figures/005_Table.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -403,8 +379,6 @@ slow4fast-VLN 处于**视觉-语言导航（VLN）** 与**认知启发的具身�
 - **元学习/持续学习 VLN 方法**：关注跨任务的快速适应，但通常不区分快慢推理的时间尺度。
 
 slow4fast-VLN 的经验库机制与检索增强生成（RAG）范式存在概念上的亲缘性，但将其应用于具身导航的动作空间，通过注意力融合实现视觉特征层面的经验注入，而非文本生成层面的知识增强。这一设计为构建具有持续学习能力的通用导航智能体提供了新的技术路径。
-
-
 
 ## 原文 PDF
 

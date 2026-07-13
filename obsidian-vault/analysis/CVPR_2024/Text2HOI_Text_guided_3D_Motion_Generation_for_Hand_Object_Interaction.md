@@ -53,15 +53,11 @@ claims:
 
 **主要结果**：在 H2O、GRAB 和 ARCTIC 三个数据集上，Text2HOI 在准确性（Accuracy）、FID、多样性（Diversity）和物理真实性（Physical realism）等指标上全面超越基线方法。例如，在 H2O 数据集上，top-3 准确率从 T2M 的 0.6463 提升至 0.8295，FID 从 IMOS 的 0.2945 降至 0.1744；在 GRAB 数据集上，物理真实性达到 0.8839。消融实验确认了接触图条件、几何损失、位置编码以及手部细化模块各自对性能的独立贡献。定性结果显示，Text2HOI 能够在训练未见过的物体上生成合理的交互运动，展现出良好的泛化能力。
 
-
-
 在3D手-物体交互生成领域，一个核心瓶颈在于现有数据集的交互类型与物体类别远未泛化，且缺乏对应的文本标签。这使得从自然语言提示直接生成物理上合理、语义上正确的3D交互运动变得极其困难。传统的运动生成方法主要面向全身人体运动，对手部精细操作与物体交互的建模关注不足；而少数面向手-物体交互的工作又往往依赖动作标签或初始手部姿态，难以实现开放文本条件下的多样化生成。
 
 这一困境的根源在于标注数据的稀缺性。手-物体交互涉及高维连续姿态空间与复杂的接触约束，人工标注成本极高。现有数据集虽然在特定场景下提供了高质量的运动捕捉数据，但其覆盖的物体类别和交互方式有限，导致模型在面对训练中未见过的物体或交互类型时泛化能力严重不足。与此同时，文本到运动（Text-to-Motion）领域的方法如**T2M**和**MDM**在全身人体运动生成上取得了显著进展，但其直接迁移到手-物体交互场景时，由于缺乏对接触几何和物体属性的显式建模，生成结果往往存在穿透、接触不自然等问题。**IMOS**等方法虽然考虑了物体交互，但其依赖动作标签而非自由文本，限制了使用的灵活性。
 
 面对上述缺口，本文提出**Text2HOI**框架，其核心动机在于通过任务分解来缓解数据稀缺带来的学习困难。具体而言，将手-物体交互生成拆解为“接触图生成”和“手-物体运动生成”两个子任务。接触图刻画了物体表面哪些区域可能被手部触碰，这一几何表示与物体类别无关，因而可以从有限数据中学习到泛化能力强的通用先验。随后，运动生成模型以接触图为强条件，在扩散模型的框架下生成物理合理且语义匹配的手-物体运动序列。这一分解设计的直觉在于：接触图作为中间表示，桥接了文本语义与3D几何，使得模型无需从零开始学习复杂的交互模式，而是可以在接触先验的引导下专注于运动时序的生成。
-
-
 
 ## 核心方法与创新机理
 
@@ -91,8 +87,6 @@ Text2HOI 的核心创新在于将文本引导的3D手-物体交互运动生成�
 基线方法生成运动后不做额外修正。Text2HOI 引入一个**前馈 Transformer 手部细化网络** $f^{\text{ref}}$（Sec. 3.3），该网络不涉及扩散机制，仅接收 Text2HOI 生成的手部输出、手部关节、预测接触图、变形物体点云和基于距离的注意力图作为输入，输出修正后的手部姿态。其训练损失 $L_{\text{refine}}$ 结合了简单 L2 重建损失 $L_{\text{simple}}$、穿透损失 $L_{\text{penet}}$ 和接触损失 $L_{\text{contact}}$（权重 $\lambda_1 = 5$），有效减少手部穿透物体并改善接触质量。消融实验表明，移除细化网络或其穿透/接触损失会导致物理真实性大幅下降（Table 2）。此外，该前馈细化器在物理真实性和推理速度上均优于基于扩散的细化方法（Table S1、S2：推理仅需 0.013s）。
 
 这些 changed slots 共同构成了 Text2HOI 的核心创新体系：**接触图提供几何先验 → 双重位置编码增强代理感知 → 几何损失强化空间关系 → 细化网络修复物理瑕疵**，形成了一条从粗到精、从语义到几何的完整生成链路。
-
-
 
 Text2HOI 的整体框架遵循“先验生成—运动扩散—后处理细化”的三阶段流水线设计，如 **Figure 2** 所示。给定一个文本提示和一个规范物体网格作为输入，系统依次完成**接触图预测**、**手‑物体运动生成**和**手部姿态细化**三个步骤，最终输出物理合理且语义匹配的 3D 手‑物体交互运动序列。
 
@@ -154,8 +148,6 @@ $$L_{\text{refine}} = L_{\text{simple}} + L_{\text{penet}} + \lambda_1 L_{\text{
 - **运动长度预测**：通过一个小型网络根据文本语义预测合适的运动序列长度 $\hat{L}$。
 
 整个框架的设计哲学在于**任务分解与强先验注入**：接触图作为类别无关的几何先验，弥合了文本语义与 3D 物理交互之间的鸿沟；手部细化网络则作为后处理保障，在不增加扩散模型复杂度的前提下提升物理合理性。这一分解策略使得模型能够从有限且未完全泛化的标注数据中学习，并在多个数据集上展现出优于端到端基线方法的性能。
-
-
 
 Text2HOI 的整体框架由三个级联的核心模块构成：接触图预测网络、基于扩散的 Text2HOI 运动生成器、以及手部细化网络。以下逐一展开各模块的设计逻辑与关键公式。
 
@@ -225,12 +217,8 @@ $$L_{\text{contact}} = \mathbb{1}_{\text{left/right}} \| d(\tilde{j}_{\text{hand
 
 消融实验表明，移除细化网络或其穿透/接触损失会导致物理真实性大幅下降；同时，该前馈细化器在推理速度（约 0.013s）和物理真实性上均优于基于扩散的细化方案。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1726_Text2HOI_Text_guided_3D_Motion_Generation_for_Hand_Object_Interaction/figures/003_Figure_3.jpg]]
 *Figure 3: The details of the text-to-3D hand-object motion generation in our framework. In the forward process, we generate the noised motion*
-
-
 
 ## 实验与关键发现
 
@@ -289,24 +277,14 @@ Figure 5展示了Text2HOI在训练集未见过的物体上的生成结果与对�
 
 4. **动态场景扩展挑战**：框架目前针对单一物体交互设计，拓展至多物体或动态场景时，如何在保持交互合理性的同时处理物体间的遮挡和协同关系仍是一个开放问题。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1726_Text2HOI_Text_guided_3D_Motion_Generation_for_Hand_Object_Interaction/figures/004_Table_1.jpg]]
 *Table 1: Comparison on H2O, GRAB, and ARCTIC datasets. † denotes our produced results. → denotes that the higher value of the metric, the closer to the GT distribution. Best results are emphasized in bold*
 
 ![[assets/figures/papers/paper_list_l1726_Text2HOI_Text_guided_3D_Motion_Generation_for_Hand_Object_Interaction/figures/005_Table_2.jpg]]
 *Table 2: Ablation study on the positional encoding, losses, and conditions for ‘Ours w/o*
 
-![[assets/figures/papers/paper_list_l1726_Text2HOI_Text_guided_3D_Motion_Generation_for_Hand_Object_Interaction/figures/008_Figure_5.jpg]]
-*Figure 5: We demonstrate the generated hand-object motions and the predicted contact map results. The first and second rows show the results with objects seen during training. The third and fourth rows show the results with objects unseen during training*
-
 ![[assets/figures/papers/paper_list_l1726_Text2HOI_Text_guided_3D_Motion_Generation_for_Hand_Object_Interaction/figures/013_Table.jpg]]
 *Table: S1. Comparative physical realism scores for the different refiner designs*
-
-![[assets/figures/papers/paper_list_l1726_Text2HOI_Text_guided_3D_Motion_Generation_for_Hand_Object_Interaction/figures/015_Table.jpg]]
-*Table: S2. Inference speed*
-
-
 
 ## 定位与知识库关联
 
@@ -355,8 +333,6 @@ Text2HOI 继承并改进了多个技术线索：
 - **多物体与动态场景扩展**：能否将框架从单一物体扩展到多物体或动态场景，并保持交互的时空一致性？
 - **低资源学习**：如何在更极端缺乏标注数据的情况下，利用自监督或预训练策略进一步减轻对文本标签的依赖？
 - **非刚性物体泛化**：接触图预测网络能否通过对非刚性形变建模，扩展至衣物、绳索等柔性物体的交互生成？
-
-
 
 ## 原文 PDF
 

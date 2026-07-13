@@ -47,8 +47,6 @@ claims:
 
 该方法的核心洞察来自早期视频生成模型的启发——将三维扩散改造为**时序三维扩散**，分离几何生成与动画构建。在统一的 **ActionBench** 基准上，ActionMesh 在所有几何与运动指标（CD-3D、CD-4D、CD-M）上均显著超越现有最佳基线，同时推理速度提升约一个数量级（约2分钟 vs. 15–45分钟）。此外，模型支持多种输入模态（视频、文本、图像+文本、三维网格+文本），并展现出对真实世界视频和多物体场景的良好鲁棒性。消融实验进一步验证了时序扩散、掩码生成策略以及时间三维自编码器等关键设计对最终性能的决定性贡献。
 
-
-
 ### 问题背景：从静态3D到“运动中”的3D网格
 
 近年来，图像到3D生成技术取得了长足进步，能够在数秒内从单张图片重建出高质量的静态三维网格。然而，现实世界的应用场景——游戏开发、影视制作、AR/VR体验——需要的不仅是静态资产，更是能够自然运动、且拓扑一致的三维动画网格。一个会跳舞的章鱼、一只扇动翅膀的萤火虫，这些“运动中”的3D内容才是产业落地的真正需求。
@@ -79,8 +77,6 @@ claims:
 3. **多模态输入支持**：统一处理视频、图像+文本、3D网格+文本等多种输入形式，通过掩码生成机制灵活注入已知形状先验。
 
 这一设计使得ActionMesh在推理速度上比现有最佳方法快约10倍（2分钟 vs 15-45分钟），同时在几何精度（CD-3D）和运动保真度（CD-M）上均达到最优水平（见Table 1）。
-
-
 
 ## 核心方法与创新机理
 
@@ -125,8 +121,6 @@ ActionMesh 在时序3D扩散中引入**掩码生成（Masked Generation）**策�
 
 三个创新相互协同：时间轴保证跨帧几何一致性，自编码器将独立形状转化为拓扑一致的动画，掩码生成则大幅扩展了输入模态的灵活性。三者共同支撑了 ActionMesh 在 ActionBench 上全面超越现有最佳基线（CD-4D 相对提升 35.7%，推理速度快约 10 倍）的核心性能优势。
 
-
-
 ActionMesh 是一个前馈式生成模型，核心目标是**从单一视频生成拓扑一致的动画三维网格**（video-to-4D）。其设计哲学受早期视频生成模型启发：将三维扩散改造为**时序三维扩散**，并将“几何生成”与“动画构建”显式解耦为两个阶段。
 
 ### 两阶段流水线
@@ -166,12 +160,7 @@ ActionMesh 是一个前馈式生成模型，核心目标是**从单一视频生�
 
 消融实验验证了各模块的必要性：移除阶段 II 将完全丧失动画网格生成能力（CD-M 失效）；移除旋转位置嵌入或掩码生成机制均导致时序一致性指标显著退化（Table 2, Table 3）。
 
-
-
 ActionMesh 的核心架构由两个级联模块构成：**时序3D扩散（Stage I）** 和 **时序3D自编码器（Stage II）**，两者共同将视频输入转化为拓扑一致的动画网格。其设计动机源于一个关键观察：对视频逐帧运行图像到3D模型会产生全局朝向不一致或几何细节矛盾的网格序列（Figure 3），因此必须引入跨帧同步机制。
-
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2601_16148/figures/003_Figure_3.jpg]]
-*Figure 3: Image-to-3D results on video frames. Running an image-to-3D model on each frame produces meshes exhibiting inconsistent global orientation (left) or inconsistent geometric details (right), even when using identical Gaussian noise in the denoiser*
 
 ### Stage I：时序3D扩散
 
@@ -200,8 +189,6 @@ Stage I输出的是一系列时间同步但拓扑独立的网格潜在，无法�
 ### 训练与推理流程
 
 整个两阶段管线在合成数据上联合训练。推理时，首先从输入视频中选定一帧（默认为第一帧），通过现成的图像到3D模型生成参考网格及其潜在 $\mathbf{z}_1^*$；随后Stage I以 $\mathbf{z}_1^*$ 和视频帧为条件，通过掩码扩散生成时间同步的独立潜在序列；最后Stage II将这些潜在解码为参考网格的顶点变形场，输出拓扑一致的动画网格。整个推理过程约需2分钟，相比优化类基线（15-45分钟）实现了约10倍的加速。
-
-
 
 ## 实验与关键发现
 
@@ -271,8 +258,6 @@ Figure 7系统展示了三类典型失败案例：
 
 这些失败模式揭示了当前方法的核心局限：对固定拓扑的强依赖与对遮挡的敏感性。开放问题包括：如何实现拓扑感知的潜在更新以自然处理部件生成/融合/分离；如何利用多帧信息融合改进遮挡区域补全；以及如何进一步缩短推理时间并提升长序列自回归生成的稳定性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2601_16148/figures/004_Table_1.jpg]]
 *Table 1: Quantitative results on ActionBench. We report results from prior works, namely LIM [33], DreamMesh4D [19] V2M4 [4], ShapeGen4D[53], TripoSG [18] and TRELLIS [48]. We outperform all baselines across metrics while running significantly faster*
 
@@ -285,25 +270,8 @@ Figure 7系统展示了三类典型失败案例：
 ![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2601_16148/figures/012_Table_4.jpg]]
 *Table 4: Ablation study - Temporal 3D autoencoder*
 
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2601_16148/figures/005_Figure_4.jpg]]
-*Figure 4: Motion transfer results. Our model is able to accurately transfer the motion from a source video to target meshes, even if the objects are inconsistent*
-
 ![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2601_16148/figures/007_Figure_6.jpg]]
 *Figure 6: Qualitative results on real videos from DAVIS [29]. Even in these challenging scenarios, our model produces accurate animated 3D meshes, thus demonstrating its ability to handle complex motions, multiple objects and occlusions. See supplemental for more results*
-
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2601_16148/figures/008_Figure_7.jpg]]
-*Figure 7: Limitations. Typical failure cases arise for videos with topological changes (left) and regions that are occluded either on the reference frame (middle) or during the motion (right)*
-
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2601_16148/figures/010_Figure_8.jpg]]
-*Figure 8: Comparison to AnimateAnyMesh [47]. Panda “doing martial art”, Firefly “flapping its wings”, Armadillo “casually walking”. The Armadillo mesh is sourced from the Stanford Computer Graphics Laboratory*
-
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2601_16148/figures/015_Table_5.jpg]]
-*Table 5: Ablation study - Number of frames. We train the temporal 3D diffusion model and the temporal 3D autoencoder with various number of frames N and compare reconstructions on 16 keyframes*
-
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2601_16148/figures/016_Table_6.jpg]]
-*Table 6: Ablation study - Autoregressive context window. We evaluate our model trained with N = 16 keyframes on sequences of 31 timesteps for different context window cw*
-
-
 
 ## 定位与知识库关联
 
@@ -338,8 +306,6 @@ ActionMesh 的适用性建立在以下核心假设之上：
 - **长期动画的自回归误差累积**：消融实验（Table 6）显示，模型以自回归方式生成超出训练帧数的序列时存在误差累积。尽管上下文窗口机制缓解了这一问题，但**如何进一步提升长期动画的稳定性**仍是开放挑战。
 
 更广泛的开放问题还包括：推理时间能否进一步压缩至秒级？能否将时间3D扩散扩展至处理动态纹理或材质？以及如何构建更大规模、更多样化的4D训练数据以提升真实场景泛化能力？
-
-
 
 ## 原文 PDF
 

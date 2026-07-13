@@ -64,8 +64,6 @@ Talk2Move 首次将**强化学习（RL）**引入文本引导的物体级几何�
 
 值得注意的是，旋转和缩放任务的绝对准确率仍然较低，表明复杂的几何变换仍是开放挑战。此外，当前方法仅在有限的任务类型和标准化模板上验证，向更复杂的组合变换和开放词汇指令的泛化有待进一步探索。
 
-
-
 文本引导的图像编辑近年来取得了显著进展，现有方法能够根据自然语言指令调整图像的风格、颜色和局部纹理。然而，当任务从“外观编辑”转向“空间编辑”时，这些方法暴露出根本性的能力缺口：**它们难以执行物体级的几何变换**——即根据文本指令精确地平移、旋转或缩放场景中的特定物体。
 
 这一瓶颈的根源在于两个相互交织的困难。第一，**监督信号的缺失**。传统的图像编辑模型依赖像素级均方误差（MSE）损失进行监督微调（SFT），这要求成对的“编辑前-编辑后”图像作为训练数据。对于外观编辑，这类配对数据相对容易获取；但对于物体级的空间位移，构建大规模、高质量且多样化的成对标注数据成本极高，甚至不可行。第二，**像素优化的局限性**。即使获得少量配对数据，直接优化像素差异也难以教会模型理解“将物体向左移动”这类抽象的空间语义——模型容易陷入对训练模板的记忆，而非学习可泛化的几何推理能力。
@@ -73,8 +71,6 @@ Talk2Move 首次将**强化学习（RL）**引入文本引导的物体级几何�
 因此，现有主流文本编辑模型（如基于流匹配的 **Flux.1 Kontext**（Black Forest Labs, 2025）、统一多模态框架 **Bagel**（Deng et al., arXiv 2025）以及商业模型 **GPT-image-1**（OpenAI, 2024））在面对物体平移、旋转和缩放指令时，往往无法产生空间上准确且场景连贯的结果。它们要么忽略空间指令仅做外观变化，要么在移动物体的同时破坏背景一致性。
 
 **Talk2Move** 的动机正是填补这一空白。其核心洞见是：将扩散模型的去噪过程形式化为马尔可夫决策过程（MDP），并引入**组相对策略优化（GRPO）** 框架。通过向去噪轨迹注入随机噪声生成多样化的采样路径，模型可以在无需成对监督的条件下探索几何动作空间。同时，专门设计的**空间感知奖励模型**——利用分割、深度估计和方向估计等专家模型——直接评估物体级的位移、旋转和缩放行为，提供可解释的几何反馈信号。这一范式将几何变换的学习从“模仿成对数据”转变为“最大化空间奖励”，从而绕开了对昂贵标注的依赖，使精确的文本驱动空间编辑成为可能。
-
-
 
 ## 核心方法与创新机理
 
@@ -116,8 +112,6 @@ $$K(t_{\text{sample}}+t_{\text{optim}})$$
 
 为增强 GRPO 训练的稳定性，TALK2MOVE 采用 SFT 冷启动策略：使用少量高质量成对数据（平移 800 对，旋转 43 对）进行 LoRA 微调（rank-64，3000 次迭代，学习率 1e-4），为扩散骨干网络嵌入基本空间编辑先验。消融实验表明，在仅 80 对标注数据的极限条件下，SFT 无法获得有意义增益，而基于小数据 SFT 检查点的 RL 仍能达到与全数据设置相当的性能，验证了 RL 范式在低数据场景下的鲁棒性。
 
-
-
 TALK2MOVE 提出了一种基于强化学习的文本引导图像编辑框架，专门解决物体级几何变换（平移、旋转、缩放）问题。其核心设计思路是将扩散去噪过程建模为马尔可夫决策过程（MDP），利用组相对策略优化（GRPO）在不依赖成对标注数据的情况下学习精确的空间操作。
 
 ### 流水线总览
@@ -151,12 +145,8 @@ $$\mathcal{J}_{\mathrm{GRPO}}(\theta) = \mathbb{E}\left[\frac{1}{G T}\sum_{i,t}\
 
 **证据强度说明**：上述流水线描述基于论文 Section 3-5 及 Figure 2 的明确阐述，置信度在 0.9-0.95 之间。各模块的具体实现细节和消融验证将在后续章节展开。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2726_https_arxiv_org_abs_2601_02356/figures/001_Figure_1.jpg]]
 *Figure 1: We introduce TALK2MOVE, a text-guided scene editing model for object-level geometric transformation, focusing on object translation, rotation and resizing, achieving superior results over current SOTA image editing models*
-
-
 
 ### 问题形式化
 
@@ -205,13 +195,6 @@ TALK2MOVE 的关键创新在于设计了物体中心的空间奖励模型，直�
 $$K(t_{\text{sample}} + t_{\text{optim}})$$
 
 其中 $t_{\text{sample}}$ 和 $t_{\text{optim}}$ 分别为单步采样和优化时间。实验表明，该策略相比滑动窗口基线减少 14% 的迭代时间，相比完整采样减少 49% 的时间，同时在编辑正确性上表现更优。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2726_https_arxiv_org_abs_2601_02356/figures/004_Figure_3.jpg]]
-*Figure 3: Three types of step sampling: (a) is the full sampling and optimizing GRPO [21, 40]; subsequent methods [14, 17] as in (b), use a sliding window (yellow) to reduce the optimizing steps per iteration; (c) our work introduces step-wise active sampling that select the informative steps (red) and use shortcuts to bypass the rest of the steps, reducing both the sampling and optimizing time*
-
-
 
 ## 实验与关键发现
 
@@ -267,16 +250,6 @@ Figure 5展示了TALK2MOVE在平移、旋转和缩放任务上的定性编辑结
 ![[assets/figures/papers/paper_list_l2726_https_arxiv_org_abs_2601_02356/figures/009_Table_4.jpg]]
 *Table 4: Ablation on active step sampling under translation task, efficiency measured in seconds(s)*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2726_https_arxiv_org_abs_2601_02356/figures/008_Figure_4.jpg]]
-*Figure 4: Reward behavior across tasks: (a) reward variance distribution, (b) GRPO sampling strategies, and (c) reward model ablations*
-
-![[assets/figures/papers/paper_list_l2726_https_arxiv_org_abs_2601_02356/figures/011_Figure_5.jpg]]
-*Figure 5: Qualitative results on object translation, rotation and resize over state-of-the-art image editing models. For each task, we provide one real image editing result (source from OpenImagesV6 [11]) and one synthetic image editing result to showcase the generalization ability of TALK2MOVE*
-
-
-
 ## 定位与知识库关联
 
 ### 任务定位与核心差异
@@ -326,8 +299,6 @@ TALK2MOVE 的适用性受以下因素约束：
 - **多对象交互**：如何支持更复杂的多对象交互式空间编辑，例如相对位置关系的改变（“将 A 放在 B 的左侧”）？
 
 - **框架泛化**：该 RL 范式是否可以推广到其他生成式框架（如自回归模型），用于可验证的可控视觉生成任务？
-
-
 
 ## 原文 PDF
 

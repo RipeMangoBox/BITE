@@ -54,8 +54,6 @@ claims:
 
 Prophet专为具有可识别答案区域的任务（数学推理、代码生成、规划）设计，其增益源于模型内在的早期收敛属性，而非对基线方法的结构性优势。
 
-
-
 扩散语言模型（Diffusion Language Models, DLMs）通过迭代精炼噪声序列来生成文本，在数学推理、代码生成等结构化任务中展现出强大能力。然而，这类模型的核心瓶颈在于推理效率：标准解码流程需执行全部预设的 $T_{\text{max}}$ 步精炼，每一步都包含完整的模型前向计算，导致推理延迟远高于自回归模型。
 
 现有加速方案主要沿两条路径展开。**SDTT**（Deschenaux & Gulcehre, 2025）通过时间自蒸馏将多步精炼压缩为更少的推理步数，但蒸馏过程引入额外的训练开销且可能损失生成质量。**Fast-dLLM**（Wu et al., 2026）利用KV缓存和并行解码技术减少单步计算成本，但未触及迭代步数本身的冗余。这两类方法均假设所有精炼步骤对最终输出同等重要，而这一假设与扩散解码的实际动力学存在根本冲突。
@@ -65,8 +63,6 @@ Prophet专为具有可识别答案区域的任务（数学推理、代码生成�
 图2的解码动态热力图进一步揭示了这一现象的微观机制：答案区域的top-1 token在解码早期即稳定下来，而推理链的中间token仍在持续变化。这种“答案先行锁定、推理链后补全”的模式表明，模型在尚未完成完整推理过程时，已对最终答案形成高度确信的内部表征。因此，若能可靠地检测这一收敛时刻，便可安全地裁剪后续冗余步骤，实现无需额外训练、不牺牲质量的解码加速。
 
 本文提出**Prophet**（Early Commit Decoding），一种无训练的快速解码范式。其核心思路是将扩散解码重新建模为答案区域上的最优停止问题：在每个精炼步骤，计算答案区域的平均置信度差距 $\bar{g}_t = \frac{1}{|\mathcal{A}|} \sum_{i \in \mathcal{A}} g_{t,i}$（其中 $g_{t,i} = L_{t,i}^{(1)} - L_{t,i}^{(2)}$ 为位置 $i$ 的top-2 logit差值），当该指标超过基于解码进度 $p$ 的分阶段阈值 $\tau(p)$ 时，立即终止精炼并一次性提交所有剩余token。这一机制无需修改模型结构或权重，仅需在解码循环中插入轻量的置信度检查，即可实现最高3.4倍的解码步骤减少（Dream-7B在Sudoku上），同时保持甚至略微提升生成质量（GSM8K上准确率从77.1%提升至77.9%）。
-
-
 
 ## 核心方法与创新机理
 
@@ -115,11 +111,6 @@ Prophet 的核心创新在于**将解码重新定义为答案区域上的最优�
 
 Prophet 专为具有可识别答案区域的任务设计（如数学推理、代码生成、规划），对于无明确答案边界的开放式生成任务，模型可能不会在早期表现出明显收敛，方法的适用性有待验证。当前实现依赖预定义的答案区域长度，利用了任务先验知识，虽有向动态语义提取扩展的潜力，但尚未实现。
 
-
-
-![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_g88nt4ieTG/figures/003_Figure_3.jpg]]
-*Figure 3: (b) w/ suffix prompt (low-confidence remasking) (c) w/o suffix prompt (random remasking)*
-
 本文提出一种无需训练的快速解码范式 **Prophet**，其核心思想是将扩散语言模型（DLM）的解码过程重构为一个**最优停止问题**：在答案区域的平均置信度差距超过动态阈值时，立即终止迭代精炼并一次性提交所有剩余 token，从而裁剪掉大量冗余计算。
 
 ### 模块组成与数据流
@@ -148,8 +139,6 @@ Prophet 嵌入标准 DLM 解码循环，由三个核心模块串联构成：
 ### 适用边界
 
 Prophet 的有效性建立在 DLM 的**答案早熟收敛**现象之上：模型在精炼步骤完成一半前，答案区域的 top-1 预测即已稳定为正确答案。对于开放式生成任务（无明确答案边界），该现象不一定成立，方法需进一步扩展。
-
-
 
 ### 扩散语言模型解码流水线
 
@@ -186,8 +175,6 @@ $$\tau(p) = \begin{cases} \tau_{\mathrm{high}} & \mathrm{if } p < 0.33 \\ \tau_{
 ### 与加速基线的正交组合
 
 Prophet 作为解码层级的提前终止策略，可与蒸馏加速（**SDTT**，Deschenaux & Gulcehre, 2025）和系统加速（**Fast-dLLM**，Wu et al., 2026）正交叠加。例如，SDTT + Prophet 在 GSM8K 上实现 $3.21\times$ 加速，Fast-dLLM + Prophet 达到 $7.66\times$ 加速，验证了不同加速维度的乘法增益效应。
-
-
 
 ## 实验与关键发现
 
@@ -238,9 +225,6 @@ Prophet 与现有加速方法具有天然的**正交互补性**，组合使用�
 
 Table 4 展示了 Prophet 对半自回归更新中 block length 的敏感性。关键发现是：**基线方法对粗粒度更新极其敏感，性能随 block length 增大而崩溃，而 Prophet 显著缓解了这一问题**。
 
-![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_g88nt4ieTG/figures/013_Table_4.jpg]]
-*Table 4: Sensitivity to block length on GSM8K (semi-autoregressive updates). Prophet is less brittle to coarse-grained updates and yields larger gains as block length increases*
-
 具体而言，在 GSM8K 上：
 - Block length=8 时：基线 71.5%，Prophet 77.2%（+5.7%）
 - Block length=32 时：基线 64.1%，Prophet 77.1%（+13.0%）
@@ -275,16 +259,6 @@ Table 5 展示了一个简单算术问题的解码轨迹，揭示了“答案早
 *Table 5: (b) Remasking strategy*
 
 这一可视化直接支撑了核心洞察：**DLM 在推理链完全形成之前，已在内部确定了正确答案**。Prophet 的价值在于识别并利用这一“内部已知”状态，避免为补全推理链而浪费计算。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_g88nt4ieTG/figures/018_Table_5.jpg]]
-*Table 5: Qualitative Analysis: Decoding Dynamics. Visualization of the decoding trajectory for a simple arithmetic problem. Masked tokens are represented by MASK (note that sequences of consecutive masks are abbreviated for visual clarity). Crucially, even when the intermediate reasoning chain is incomplete, the model locks onto the correct final answer early in the process (highlighted in darker blue )*
-
-![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_g88nt4ieTG/figures/020_Table_6.jpg]]
-*Table 6: Configurations used in our runs. We keep only parameters relevant to our method: base budget ( L , T , ${ \tilde { B } }$ ) and PROPHET’s confidence schedule defined in Eq. 5*
-
-
 
 ## 定位与知识库关联
 
@@ -330,8 +304,6 @@ Prophet直接对标标准全步解码（Full-step decoding），后者固定执�
 3. **开放式生成扩展**：早期答案收敛现象在无固定格式的开放式生成任务中是否仍然存在？如何定义和检测“隐式答案区域”？
 4. **阈值调度优化**：连续或可学习的阈值调度能否进一步提升效率与质量的权衡？分阶段调度与线性衰减调度在GSM8K上表现可比（77.4% vs. 77.9%，Table 7），暗示增益主要源于收敛属性而非特定调度，但更精细的调度仍有探索空间。
 5. **跨架构泛化**：早期收敛现象在不同DLM架构（如不同噪声调度、不同重掩码策略）和更大规模模型上的表现规律尚待系统研究。
-
-
 
 ## 原文 PDF
 

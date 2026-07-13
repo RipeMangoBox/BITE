@@ -60,8 +60,6 @@ claims:
 - 消融实验证实：加入时序正则化后，运动动态得分从72.22恢复至100.00；加入自适应回归损失后，实例保存得分从88.88提升至92.39，接近教师模型水平（见表2）。
 - 用户研究表明，蒸馏后的学生模型在视觉质量和语义对齐上甚至优于教师模型（见图7）。
 
-
-
 视频扩散模型近年来在生成质量上取得了显著进展，但其推理过程通常需要数十甚至上百个去噪步骤，导致极高的计算开销和生成延迟。分布匹配蒸馏（Distribution Matching Distillation, **DMD**）作为一种高效的少步蒸馏范式，通过最小化学生生成分布与教师模型分布之间的KL散度，成功将图像扩散模型的推理步数压缩至4步以内。然而，当DMD被直接迁移到视频生成任务时，出现了两个严重且相互关联的退化现象。
 
 **过饱和与分布偏向。** DMD蒸馏的视频呈现出明显的颜色过饱和（color oversaturation），表现为色彩过度鲜艳、偏离真实视觉分布。其根本原因在于：在给定去噪时间步，教师模型$s_{real}$对细粒度细节的过度强调会通过分布匹配梯度（Eq. 4）传递给学生模型，使其偏向一个过饱和的次优分布（见图3）。这一偏差在自回归生成中逐帧累积，严重降低视频的感知质量。
@@ -71,8 +69,6 @@ claims:
 **简单回归损失的副作用。** 一个直观的修复思路是引入真实视频数据的回归损失来纠正分布偏向。然而，朴素的回归监督会引入新的伪影：当教师分布与真实数据分布存在显著偏差时，固定的回归损失权重会迫使生成器产生物体融合（object fusion）等空间伪影（见图4第3行，t=2.5s处），这揭示了静态回归策略在处理分布偏移时的根本脆弱性。
 
 **核心动机。** 上述分析表明，视频扩散蒸馏面临一个关键瓶颈：如何在纠正分布偏向的同时，避免因过度回归导致的伪影，并有效保持时序运动动态？现有蒸馏方法（DMD、LCM、PCM、DCM、rCM）均未同时解决过饱和与时序坍塌问题。本文的核心动机在于设计一种**自适应机制**——在训练过程中动态感知分布偏移程度并据此调节监督强度，同时引入显式的时序约束来对抗运动模式崩溃，从而实现稳定、高质量的少步视频生成。
-
-
 
 ## 核心方法与创新机理
 
@@ -132,8 +128,6 @@ $$\mathcal{L}_{G} = \mathcal{L}_{\mathrm{KL}} + \omega_{\mathrm{reg}} \omega_{t,
 | 回归损失权重 | 固定权重或无 | EMA 缓存 + Sigmoid 自适应权重 $\omega_{t,s}$ | 动态抑制偏差样本 |
 | 推理帧策略 | 全帧率推理 | 高噪声步半帧率 + U-Net 插值恢复 | 降低推理开销 |
 
-
-
 Adaptive Video Distillation 的目标是将预训练的视频扩散教师模型压缩为少步学生生成器，同时解决蒸馏过程中出现的**颜色过饱和**与**时序模式坍塌**两大瓶颈。整体框架围绕一个核心洞察构建：教师模型的分布偏向会通过分布匹配蒸馏（DMD）传递给学生，导致生成视频的颜色偏差与运动衰减；通过引入真实视频数据的自适应监督和时序方差约束，可以有效纠正这一偏差。
 
 ### 训练流程
@@ -177,13 +171,6 @@ DMD 蒸馏后的视频出现运动显著减少（图 1 右），Dynamic Degree �
 - **推理输入**：高斯噪声 + 文本条件
 - **输出**：少步去噪生成的视频序列（4 步推理）
 - **教师模型**：Wan2.1 预训练权重，所有蒸馏方法共享同一教师以保证公平比较
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l835_https_arxiv_org_abs_2603_21864/figures/002_Figure_2.jpg]]
-*Figure 2: Our method distills a pre-trained teacher model, denoted as*
-
-
 
 ### 3.1 问题分析：DMD蒸馏中的过饱和与运动坍塌
 
@@ -242,18 +229,8 @@ $$\mathcal{L}_{G} = \mathcal{L}_{\text{KL}} + \omega_{\text{reg}} \omega_{t,s} \
 
 其中 $\mathcal{L}_{\text{KL}}$ 为DMD的分布匹配损失（Eq. 4），$\omega_{\text{reg}}$ 和 $\omega_{\text{temp}}$ 分别为回归损失和时序损失的全局平衡超参数。训练流程如Figure 2所示：真实视频-文本对用于计算自适应回归损失，纯噪声生成用于计算时序正则化损失和分布匹配损失，三者联合更新学生生成器。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l835_https_arxiv_org_abs_2603_21864/figures/004_Figure_3.jpg]]
-*Figure 3: This figure explains the origin of oversaturation in distribution-matching distillation. At a given denoising timestep*
-
-![[assets/figures/papers/paper_list_l835_https_arxiv_org_abs_2603_21864/figures/003_Figure_4.jpg]]
-*Figure 4: A naive regression loss (Row 3) causes object fusion artifacts (t=2.5s) absent in the teacher (Row 1) and baseline (Row 2). Our adaptive loss (Row 4) resolves this artifact, improving generation quality*
-
 ![[assets/figures/papers/paper_list_l835_https_arxiv_org_abs_2603_21864/figures/015_Figure_13.jpg]]
 *Figure 13: Visualization of the adaptive weight function in Eq. (7) for different values of k. The x-axis represents the deviation*
-
-
 
 ## 实验与关键发现
 
@@ -317,11 +294,6 @@ $$\mathcal{L}_{G} = \mathcal{L}_{\text{KL}} + \omega_{\text{reg}} \omega_{t,s} \
 
 然而，以下局限性需要关注：时序正则化损失缺乏自然收敛机制，必须人工设置截断阈值（0.6），否则会导致运动伪影和内容幻像（图14）；自适应回归损失依赖于历史损失缓存，EMA系数$\alpha$可能影响对新数据分布的适应速度；方法仅在Wan2.1模型上验证，迁移到其他视频扩散主干网络（如DiT、UNet3D）的有效性尚待检验。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l835_https_arxiv_org_abs_2603_21864/figures/001_Figure_1.jpg]]
-*Figure 1: Baselines like DMD and rCM show severe color oversaturation (left) and reduced motion indicative of temporal collapse (right). Our method achieves appropriate saturation and enhances motion dynamics beyond the teacher model*
-
 ![[assets/figures/papers/paper_list_l835_https_arxiv_org_abs_2603_21864/figures/005_Table_1.jpg]]
 *Table 1: Quantitative comparison on two benchmarks (VBench2 and VBench1). Our method achieves the best overall score across all metrics and datasets. DMD∗ is denoted as our baseline method. In all result tables, bold text indicates the optimal result, while underlined text represents the suboptimal result*
 
@@ -331,16 +303,8 @@ $$\mathcal{L}_{G} = \mathcal{L}_{\text{KL}} + \omega_{\text{reg}} \omega_{t,s} \
 ![[assets/figures/papers/paper_list_l835_https_arxiv_org_abs_2603_21864/figures/006_Figure_5.jpg]]
 *Figure 5: Qualitative comparison. Baseline methods tend to produce oversaturated colors (left case) and exhibit stiff or static motion (right case), while our method generates videos with more natural color tones, smoother temporal dynamics, and scene transitions that better align with the prompt. The highlighted text in the prompt indicates key visual changes described in the scene. Zoom in for better visualization*
 
-![[assets/figures/papers/paper_list_l835_https_arxiv_org_abs_2603_21864/figures/014_Figure_12.jpg]]
-*Figure 12: This figure illustrates the impact of the truncation threshold of the temporal regularization loss on model performance. The horizontal axis represents the truncation threshold of the regularization loss, while the vertical axis shows the motion score and the instance preservation score of the videos generated by the student model, respectively*
-
 ![[assets/figures/papers/paper_list_l835_https_arxiv_org_abs_2603_21864/figures/012_Figure_10.jpg]]
 *Figure 10: Comparison with baselines on MovieGen prompts. While DMD and rCM (a strong performer from Sec. 4) produce videos with low motion dynamics and oversaturated colors, our method resolves both issues. It achieves superior motion, well-calibrated colors, and excellent detail and stability.More video examples are included in the supplementary zip file. (Note: We have confirmed that any visual artifacts in some videos are not code-level issues.)*
-
-![[assets/figures/papers/paper_list_l835_https_arxiv_org_abs_2603_21864/figures/016_Figure_14.jpg]]
-*Figure 14: Failure cases resulting from unclipped temporal regularization. Without clipping, the student generator produces severe artifacts late in training. (Top) After the first second, a drastic content shift occurs, accompanied by a noticeable distortion of the building (highlighted by the red box). (Bottom) The scene content abruptly vanishes at the two-second mark and is replaced by another major content shift at the three-second mark (highlighted by the red box). These phenomena, inconsistent with plausible camera motion, are clear manifestations of hallucinations. This highlights the necessity of clipping the temporal loss to prevent it from excessively amplifying inter-frame variance*
-
-
 
 ## 定位与知识库关联
 
@@ -400,8 +364,6 @@ $$\nabla_{\phi} \mathcal{L}_{\mathrm{DMD}} \triangleq \mathbb{E}_{t} [ \nabla_{\
 - 该方法在更长视频（>30秒）或更高分辨率（1080p）下的可扩展性如何？
 
 **知识库定位总结：** Adaptive Video Distillation 处于视频扩散模型蒸馏与分布匹配方法的交叉点，其核心贡献在于揭示了DMD在视频域的两个系统性失效模式（过饱和、时序坍塌），并提出了两个低耦合、高收益的解决方案。该方法在Wan2.1上验证有效，但其泛化性和极限场景鲁棒性仍需跨架构、跨尺度的进一步检验。
-
-
 
 ## 原文 PDF
 

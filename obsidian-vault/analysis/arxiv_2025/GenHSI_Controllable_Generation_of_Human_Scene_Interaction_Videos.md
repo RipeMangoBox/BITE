@@ -54,8 +54,6 @@ claims:
 
 **局限性与开放问题**方面，GenHSI在非正则视角下的交互生成能力急剧下降，Avatar渲染存在塑料质感需后处理改善，人物尺度可能不合理，且视频生成环节依赖商业API（Kling AI 1.6）限制了完全可复现性。未来方向包括设计视角自适应的修复策略、在3D化身生成阶段直接融入光照一致性约束，以及将框架泛化到多人-多物体交互等复杂场景。
 
-
-
 ### 问题背景：人-场景交互视频生成的挑战
 
 生成逼真、可控的人-场景交互（Human-Scene Interaction, HSI）视频是计算机视觉与图形学的前沿课题。这类视频不仅要求人物与场景物体发生物理上合理的接触与交互（如“坐在椅子上”、“拿起桌上的杯子”），还需要在长序列中保持人物身份一致、运动平滑，并对用户的复杂文本指令做出精确响应。
@@ -89,8 +87,6 @@ claims:
 ### 本文动机
 
 基于上述分析，本文提出GenHSI——一个3D感知的可控人-场景交互视频生成框架。GenHSI的核心设计理念是：**不试图在一个端到端模型中隐式地学习所有HSI生成能力，而是将问题分解为语义理解、3D交互生成和视频合成三个相对独立的子问题，并在每个阶段引入适当的先验与约束**。这一设计既规避了昂贵训练的依赖，又为交互的物理合理性和身份一致性提供了可解释的保障。
-
-
 
 ## 核心方法与创新机理
 
@@ -130,8 +126,6 @@ GenHSI 的核心创新在于将人-场景交互（HSI）视频生成这一复杂
 
 GenHSI 的核心洞察在于：**将对象正则化视角和 3D 关键帧作为显式插入点，可以将 3D 可供性与接触约束注入生成流程**。这一设计使得无训练的、身份一致的、物理合理的视频生成成为可能，其成功的关键在于正确识别了 2D 扩散模型的视角依赖性，并利用 3D 优化桥接了 2D 修复与 3D 一致性之间的鸿沟。
 
-
-
 GenHSI 的核心设计思想是将复杂的人-场景交互（HSI）视频生成任务模仿真实电影制作流程，分化为三个可控阶段：**剧本编写（Script Writing）、预可视化（Pre-visualization）和动画（Animation）**。这一分解的因果动机源于现有视频扩散模型在生成长序列交互视频时的根本瓶颈——模型缺乏显式的3D空间理解和可供性推理，难以将文本指令与精确的几何约束对齐，导致空间幻觉和物理不一致。通过将3D关键帧作为中间表示插入生成流程，GenHSI 在不进行任何训练的前提下，将显式的3D可供性与接触约束注入扩散模型的生成过程，从而大幅减少空间幻觉并维持人物身份。
 
 ### 三阶段流水线
@@ -156,12 +150,8 @@ GenHSI 的核心设计思想是将复杂的人-场景交互（HSI）视频生成
 
 GenHSI 的免训练特性源于将3D推理与视频生成解耦的架构选择：3D关键帧在预可视化阶段通过优化显式建模空间关系，视频扩散模型仅负责时序插值，无需学习隐式的物理约束。这一设计使得方法可以灵活替换底层生成模型（当前使用Kling AI 1.6），但也意味着视频生成的多样性与可控性受限于API能力。此外，方法假设场景中存在可分割的交互对象，对于极简场景或复杂多对象情形，对象检测与分割的精度将成为上游瓶颈。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1682_GenHSI_Controllable_Generation_of_Human_Scene_Interaction_Videos/figures/001_Figure_1.jpg]]
 *Figure 1: GenHSI is a 3D-aware controllable human-scene interaction (HSI) video generation method. We mimic the real-world filmmaking procedure, i.e., Script Writing, Previsualization, and Animation, to generate an extendable HSI video clip with arbitrary lengths of action chains. Given images of the scene and character with the action sequence prompt, our method will render multiple 3D-aware keyframes based on the posed 3D Gaussian avatar and 3D Gaussian scene. Finally, we interpolate them into a continuous video using the pretrained video diffusion model. The frames with colored borders are selected 3D-aware keyframes that map to the color human meshes*
-
-
 
 GenHSI 将人-场景交互（HSI）视频生成任务分解为三个核心模块：**剧本编写**（Script Writing）、**预可视化**（Pre-visualization）和**动画**（Animation）。其中，预可视化阶段是技术创新的核心，包含对象正则视角下的 2D 修复和接触引导的 3D 姿态提升两个关键子模块。
 
@@ -235,18 +225,11 @@ $$\mathcal{L}_{hoi} = \left\{ \begin{array}{ll} 0, & d_{HO} \leq \delta \\ d_{HO
 
 动画阶段将优化后的 3D 关键帧作为条件输入，利用 3D 高斯场景和化身渲染多视角关键帧图像，再通过现成的视频扩散模型（Kling AI）进行关键帧插值，生成连续视频。由于关键帧本身已包含正确的 3D 交互约束和人物身份信息，视频生成过程无需任何训练或微调即可保持身份一致性和物理合理性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1682_GenHSI_Controllable_Generation_of_Human_Scene_Interaction_Videos/figures/002_Figure_2.jpg]]
 *Figure 2: Script Writing Stage: Complex high-level text descriptions from users do not provide a detailed scene and task understanding for the desired long video generation. The script writing stage first identifies and segments objects that the human can interact with in the scene. These objects, along with the given human prompt, are used to perform text-based motion planning from a VLM [56] that provides us with interactive actions & state transitions for keyframing in the Pre-Visualization Stage*
 
 ![[assets/figures/papers/paper_list_l1682_GenHSI_Controllable_Generation_of_Human_Scene_Interaction_Videos/figures/003_Figure_3.jpg]]
 *Figure 3: 3D Keyframe Generation for Pre-visualization. GenHSI synthesizes 3D human-scene interaction pose based on the pretrained 2D image inpainting diffusion model to create a 3D keyframe as an intermediate step for HSI video generation. Our method lifts the 2D human inpainting result in the canonical view of the target object based on contact cues reasoned by the VLM chain-of-though*
-
-![[assets/figures/papers/paper_list_l1682_GenHSI_Controllable_Generation_of_Human_Scene_Interaction_Videos/figures/005_Figure_5.jpg]]
-*Figure 5: Human-Object Interaction from 2D Inpainting Models in the canonical view of objects. We progressively update the human mask (bottom) while denoising the inpainting result (top)*
-
-
 
 ## 实验与关键发现
 
@@ -286,25 +269,6 @@ GenHSI 在 Long‑VBench 基准上全面超越商业视频定制方案 **Kling A
 
 ![[assets/figures/papers/paper_list_l1682_GenHSI_Controllable_Generation_of_Human_Scene_Interaction_Videos/figures/012_Figure_9.jpg]]
 *Figure 9: 3D Human-Object Interactions GenHSI performs improved human object interactions even when we don’t have access to accurate scene geometry. Our work also produces more plausible poses for lying, sitting, and standing. Prior works like GenZI have inconsistent multiview inpainting resulting in diverse but uncomfortable human poses as seen in lying down and sitting on table*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1682_GenHSI_Controllable_Generation_of_Human_Scene_Interaction_Videos/figures/004_Figure_4.jpg]]
-*Figure 4: Failure cases when inpainting a human from different object views, demonstrating that the performance of pose generation from an image diffusion prior is view-dependent*
-
-![[assets/figures/papers/paper_list_l1682_GenHSI_Controllable_Generation_of_Human_Scene_Interaction_Videos/figures/006_Figure_6.jpg]]
-*Figure 6: HSI Video Generation Qualitative Results: GenHSI (ours) produces the best results with subject identity preservation and good human-object contacts. GenHSI (DKF) only uses two keyframes (start and end frame) and often changes the identity of the subject. Kling Elements drastically change the scene and character. Each video displays the keyframes highlighted with a red bounding box*
-
-![[assets/figures/papers/paper_list_l1682_GenHSI_Controllable_Generation_of_Human_Scene_Interaction_Videos/figures/008_Table_1.jpg]]
-*Table 1: Success Rate of Inpainting across Views ∆θ denotes the yaw angle relative to the canonical pose of the reconstructed 3D object*
-
-![[assets/figures/papers/paper_list_l1682_GenHSI_Controllable_Generation_of_Human_Scene_Interaction_Videos/figures/010_Figure_7.jpg]]
-*Figure 7: Harmonization (green) significantly improves our appearance*
-
-![[assets/figures/papers/paper_list_l1682_GenHSI_Controllable_Generation_of_Human_Scene_Interaction_Videos/figures/011_Figure.jpg]]
-*Figure: (a) Scene Image (b) 2D HSI Image*
-
-
 
 ## 定位与知识库关联
 
@@ -374,8 +338,6 @@ GenHSI在以下方面为领域知识库做出贡献：
 - **接触引导的3D优化**：提出联合交互、穿透和轮廓损失的优化框架，在不依赖精确场景几何的情况下实现物理合理的3D交互姿态生成。
 - **免训练身份保持**：通过3D关键帧提示将身份保持与视频生成解耦，为个性化视频生成提供了免训练方案。
 - **Long-VBench基准结果**：在主体一致性、背景一致性、运动平滑度和图像质量上超越商业定制方案，为领域设立了新的性能参考。
-
-
 
 ## 原文 PDF
 

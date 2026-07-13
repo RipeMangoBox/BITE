@@ -57,8 +57,6 @@ claims:
 
 本方法在流匹配和扩散模型上均展现出通用性，且仅引入约 40% 的额外推理时间开销。但需注意，P&P 本质上是局部搜索策略，对于需要全局规划的视觉推理任务（如迷宫求解）提升有限，且过度增加迭代次数可能导致模式坍塌。
 
-
-
 ### 视频生成的核心瓶颈：物理动态与运动连贯性
 
 现代视频生成模型在规模化的图文数据训练下，已能产出视觉质量令人印象深刻的视频。然而，当场景涉及复杂物理动态——如体操动作的时序衔接、物体自由落体的轨迹合理性、机器人抓取操作的因果连贯——生成结果往往暴露出运动扭曲、物理违背和时间不一致等缺陷。这些失败并非源于模型容量的绝对不足，而是因为**标准采样过程未能充分利用预训练生成器内部已编码的丰富运动与结构先验**。
@@ -94,8 +92,6 @@ $$\mathcal{L}_{\mathrm{FM}}(\theta) = \mathbb{E}_{t, z_0, z_1} \left[ \frac{1}{(
 2. **精炼时机的把握**：视频生成的不同噪声水平阶段承担不同功能——早期高噪声阶段主要确定粗粒度的运动轨迹和空间结构，后期低噪声阶段则负责细节纹理的生成。将精炼集中在**早期推理步**（噪声水平 $t < 0.2$）即可在运动连贯性上获得显著增益，同时避免对后期细节的不必要干预。
 
 这两个设计动机直接塑造了后续的方法架构：**不确定性感知的预测-扰动（Uncertainty-aware P&P）** 采样算法，其技术细节将在方法章节中展开。
-
-
 
 ## 核心方法与创新机理
 
@@ -157,8 +153,6 @@ $$z_{t_{i+1}} = z_{t_i}^* + \Delta t \cdot u_\theta(z_{t_i}^*, t_i)$$
 本方法的理论基础可追溯至广义去噪自编码器的伪吉布斯马尔可夫链（Bengio et al., 2013），但在视频生成领域首次将其与流匹配框架结合，并引入不确定性感知的选择性精炼策略。与依赖外部验证器的拒绝采样方法（如 **Cosmos-Reason1 7B**，Azzolini et al., 2025）相比，本方法完全依赖生成器内部先验，避免了外部模型的域适应问题和额外计算成本；与基于梯度的免训练引导方法（如 **FlowMo**，Shaulov et al., 2025）相比，本方法无需反向传播计算梯度，推理效率更高。
 
 **需要手动验证的点**：论文声称 P&P 可迁移至扩散模型（在 CogVideoX 上的初步验证见 Figure 23），但该验证仅为定性展示，其在各类扩散架构上的最优超参数设置和鲁棒性尚缺乏系统性研究。此外，论文未报告与公平性（如不同群体、场景下的表现差异）相关的实验或讨论。
-
-
 
 自精炼视频采样（Self-Refining Video Sampling）将预训练的流匹配视频生成器重新解释为一个时间条件去噪自编码器（DAE），在推理阶段通过**预测-扰动（Predict-and-Perturb, P&P）**迭代循环，利用模型内部的运动与结构先验实现自我精炼，无需外部验证器或额外训练。
 
@@ -233,13 +227,6 @@ $$z_{t_{i+1}}^{(k)} \gets M_{t_i}^{(k)} \odot z_{t_{i+1}}^{(k)} + (1 - M_{t_i}^{
 **不确定性感知**：消融实验（Figure 9）显示，不带不确定性掩膜的多次 P&P（$K_f > 3$）会在背景等静态区域造成过饱和伪影，而 Uncertainty-aware P&P 通过选择性精炼有效抑制了该问题。
 
 **通用性**：P&P 不仅适用于流匹配模型（如 Wan2.2、Cosmos-Predict-2.5），也可迁移至扩散模型（如 CogVideoX），在修复截断光剑等伪影上同样有效（Figure 23）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2601_18577/figures/001_Figure_1.jpg]]
-*Figure 1: Concept of the self-refining video sampling. Within the same noise level, the video latent zt is refined as the predicted endpoint zˆ1 is pulled toward the data manifold*
-
-
 
 ### 4.1 流匹配作为时间条件去噪自编码器
 
@@ -335,13 +322,6 @@ $$
 
 P&P 的独特优势在于**完全利用生成器自身的内部先验**，无需外部模型、无需额外训练、无需梯度回传，仅通过推理时的预测-扰动循环即可显著改善运动连贯性和物理合理性。该方法在流匹配模型（**Wan2.2 T2V/I2V**、**Cosmos-Predict-2.5**）和扩散模型（**CogVideoX**，Yang et al., 2025b）上均得到验证，具备跨架构通用性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2601_18577/figures/030_Figure_23.jpg]]
-*Figure 23: P&P is also applicable to diffusion-based video generation models (e.g., CogVideoX (Yang et al., 2025b)), where it corrects video artifacts, such as a truncated lightsaber and distortions around the teddy bear’s mouth. (Image credit: MuDI (Jang et al., 2024))*
-
-
-
 ## 实验与关键发现
 
 ### 核心评估设计
@@ -351,9 +331,6 @@ P&P 的独特优势在于**完全利用生成器自身的内部先验**，无需
 ### 运动连贯性
 
 在 Dynamic-bench 人类评估中，自精炼采样以 **73.57%** 的偏好率显著超过 Wan2.2 T2V 默认采样器（Table 1 left），表明人类评估者在复杂运动场景下强烈倾向于本方法生成的视频。在 VBench 自动指标上，本方法在 Motion 指标上达到 **98.41**（默认采样器 98.01，+0.40），在 Consistency 指标上达到 **91.33**（默认采样器 90.68，+0.65），均取得最优结果（Table 1 right）。值得注意的是，FlowMo 虽引入了梯度计算带来的额外推理时间，但运动连贯性指标仍低于本方法。
-
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2601_18577/figures/004_Table_1.jpg]]
-*Table 1: Dynamic-bench results measuring motion coherence for challenging motions using Wan2.2-A14B T2V. Human evaluation shows the percentage of votes favoring ours. Additional inference time (*) of FlowMo is introduced by gradient computation*
 
 定性对比（Figure 4）展示了体操等复杂运动场景下，默认采样器产生运动模糊或肢体错位，而自精炼采样显著改善了动作的连贯性和结构完整性。
 
@@ -397,9 +374,6 @@ P&P 的独特优势在于**完全利用生成器自身的内部先验**，无需
 
 1. **局部搜索的边界**：P&P 本质上是局部搜索策略，对于需要全局规划的视觉推理任务提升有限。Figure 8 显示，在图遍历任务中自精炼将成功率从 0.1 提升至 0.8，但在迷宫求解任务中成功率仍接近零——因为迷宫求解需要长程规划能力，局部精炼无法弥补这一缺陷。
 
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2601_18577/figures/014_Figure_8.jpg]]
-*Figure 8: Examples of self-refinement applied to visual reasoning tasks: (Top) graph traversal and (Bottom) maze solving from Wiedemer et al. (2025). We use Wan2.2-A14B I2V as the base model. For graph traversal, self-refinement yields a dramatic improvement in the success rate from 0.1 to 0.8. For maze solving, self-refinement does not yield meaningful gain, with success remaining near zero*
-
 2. **过度精炼与模式坍塌**：增加 P&P 迭代次数虽能加强精炼效果，但会导致模式坍塌（mode-seeking behavior），尤其在图像生成中更为明显。论文指出在精炼强度与多样性之间的更优平衡仍待探索。
 
 3. **计算开销**：默认设置下约引入 40% 的额外推理时间，在资源受限场景中仍需进一步降低。通过保持总 NFE 不变的方式可部分缓解，但效率-性能的帕累托改进仍需后续工作。
@@ -408,18 +382,8 @@ P&P 的独特优势在于**完全利用生成器自身的内部先验**，无需
 
 5. **扩散模型适配**：在 CogVideoX 上的初步验证显示 P&P 可迁移，但各类扩散架构上的最优设置和鲁棒性尚需系统研究。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2601_18577/figures/024_Figure_16.jpg]]
 *Figure 16: Ablation studies on the hyperparameters Kf and τ*
-
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2601_18577/figures/025_Figure_17.jpg]]
-*Figure 17: Ablation studies on the hyperparameter α. Gray blocks indicate Euler method and orange blocks indicate P&P. P&P significantly improves motion coherence when applied in earlier steps (b-c), while providing only marginal gains at later steps (d-e)*
-
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2601_18577/figures/002_Figure_2.jpg]]
-*Figure 2: Sampling comparison on a 2D synthetic dataset. (ab) P&P generates samples closer to the data manifold than the Euler solver. (c-d) With a fixed timestep, iterative P&P pulls the prediction*
-
-
 
 ## 定位与知识库关联
 
@@ -475,8 +439,6 @@ P&P 的适用边界涵盖多个视频生成基座模型：
 - P&P 在**更长视频、更高分辨率以及多模态条件**（如音频-视频联合生成）下的性能和鲁棒性如何？
 - 是否可以通过分析 P&P 的**能量景观**来解释其收敛特性，并为超参数选择提供理论指导？
 - 能否采用**异构模型或专门微调的模型**来承担精炼角色，以进一步提高跨域泛化能力？
-
-
 
 ## 原文 PDF
 

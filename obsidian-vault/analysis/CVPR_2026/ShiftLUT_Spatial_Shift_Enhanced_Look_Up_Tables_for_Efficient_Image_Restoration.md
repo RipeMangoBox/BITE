@@ -54,8 +54,6 @@ ShiftLUT针对上述瓶颈提出三条因果性改进：
 
 在4×超分辨率任务上，ShiftLUT相较先前最优的TinyLUT平均提升超过0.21 dB，且模型族在存储-精度-速度的帕累托前沿占据左上角优势区域。在去噪（噪声15）和去块效应（QF=10）任务上，ShiftLUT同样以更低的存储和延迟取得了最优PSNR。
 
-
-
 ### 问题背景：高效图像复原与LUT方法的兴起
 
 图像复原（超分辨率、去噪、去块效应等）是底层视觉的核心任务。近年来，基于深度神经网络（DNN）的方法虽取得了卓越的重建质量，但其高昂的计算和存储开销严重制约了在资源受限边缘设备上的部署。为突破这一瓶颈，基于查找表（LUT）的方法应运而生：通过将预训练网络的推理过程转化为离线的LUT查询，可将计算从浮点卷积降级为极低代价的查表操作，从而在保持一定精度的同时实现极速推理。
@@ -81,8 +79,6 @@ ShiftLUT针对上述瓶颈提出三条因果性改进：
 3. **压缩LUT存储而不牺牲精度**：能否设计一种自适应采样策略，在保证重建精度的同时大幅压缩LUT的存储体积？
 
 针对这三个问题，ShiftLUT提出了三项关键创新：**可学习空间偏移（LSS）** 以零额外成本扩大感受野；**非对称双分支架构**消除LSB分支的冗余计算；**误差界自适应采样（EAS）** 实现精度保持下的LUT压缩。这三项设计共同实现了在更小存储、更快推理的条件下超越先前最优LUT方法的复原质量。
-
-
 
 ## 核心方法与创新机理
 
@@ -128,8 +124,6 @@ $$\mathrm { E r r o r } ( s ) = \frac { s } { s - 1 } \cdot \mathbb { E } _ { i 
 
 三项改进形成闭环：LSS 以零成本扩展感受野，为非对称架构提供性能保障；非对称架构释放的计算资源使 LSS 的通道多样性需求得以充分满足；EAS 在精度无损的前提下压缩存储并加速推理，最终使 ShiftLUT 系列模型在存储-PSNR-延迟三维空间中占据左上角最优区域（见 Figure 1）。
 
-
-
 ShiftLUT 的整体 pipeline 遵循“位分离—浅层提取—深层偏移处理—重建”的四阶段流程，如图 Figure 2(a) 所示。其核心设计哲学是**将计算资源从信息稀疏的低位分支重新分配至信息密集的高位分支**，并在深层引入可学习空间偏移以打破 LUT 方法固有的感受野瓶颈。
 
 ![[assets/figures/papers/paper_list_l2268_https_arxiv_org_abs_2603_00906/figures/002_Figure_2.jpg]]
@@ -162,8 +156,6 @@ ShiftLUT 的整体 pipeline 遵循“位分离—浅层提取—深层偏移处�
 **LUT 转换与推理优化**
 
 所有卷积层在训练后通过 TinyLUT 的可分离映射策略（SMS）转换为 1D LUT，并采用旋转集成技巧进一步扩大推理时的感受野。LSS 模块采用两阶段训练策略：第一阶段学习浮点偏移并通过双线性插值应用；第二阶段将偏移量化为固定整数偏移，推理时直接进行通道移位，完全消除在线插值开销。此外，Error-bounded Adaptive Sampling (EAS) 在离线阶段逐 LUT 自适应确定最优采样步长，并缓存插值结果，将 LUT 存储压缩超过 50% 的同时保持原始精度。
-
-
 
 ShiftLUT 的整体架构（图2a）由三个核心模块构成：**可学习空间偏移（LSS）**、**非对称双分支架构**，以及**误差界自适应采样（EAS）**。以下逐一解析其设计原理与关键公式。
 
@@ -205,15 +197,11 @@ $$\mathrm { E r r o r } ( s ) = \frac { s } { s - 1 } \cdot \mathbb { E } _ { i 
 
 实验表明，$\varepsilon = 0.4$ 的设置下，EAS 保持与原始 ShiftLUT 完全相同的 PSNR，同时将 LUT 存储从 171KB 压缩至 104KB（**减少超过 50%**），推理时间从 146ms 降至 84ms。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2268_https_arxiv_org_abs_2603_00906/figures/004_Figure_4.jpg]]
 *Figure 4: The symmetric network architecture (top) and its corresponding LSB feature sparsity (bottom). The layer-wise analysis shows that feature sparsity in the LSB branch increases significantly with network depth*
 
 ![[assets/figures/papers/paper_list_l2268_https_arxiv_org_abs_2603_00906/figures/003_Figure_3.jpg]]
 *Figure 3: Local Attribution Map (LAM) visualization for a 16×16 output patch. A larger DI indicates that a wider range of pixels contributes to the output result. Our method with LSS shows larger DI and better performance than the variant without LSS*
-
-
 
 ## 实验与关键发现
 
@@ -261,30 +249,8 @@ ShiftLUT 在三个典型的低层视觉任务上进行了验证：4× 超分辨�
 
 4. **任务覆盖范围有限**：当前验证集中于超分、去噪和去块三个经典低层视觉任务，尚未扩展到去模糊、去雨等更复杂的退化场景。LSS 在这些任务上的感受野扩展效果是否同样显著，仍需进一步实验确认。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2268_https_arxiv_org_abs_2603_00906/figures/005_Table_1.jpg]]
 *Table 1: Quantitative comparisons on 5 standard SISR test sets for an upscaling factor of 4. The best and second-best results of each metric are highlighted in red and blue, respectively (the highlighting is restricted to LUT-based methods to emphasize fair comparison)*
-
-![[assets/figures/papers/paper_list_l2268_https_arxiv_org_abs_2603_00906/figures/012_Figure_8.jpg]]
-*Figure 8: PSNR comparison on the Set5 under different network configurations. The left and right figures show results obtained by varying the number of stacked ShiftBlocks and channels, respectively. Each bar group compares models with and without LSS*
-
-![[assets/figures/papers/paper_list_l2268_https_arxiv_org_abs_2603_00906/figures/016_Table_6.jpg]]
-*Table 6: Quantitative comparison of PSNR on standard benchmark datasets for x4 super-resolution tasks between the original version of SPLUT and TinyLUT, and the modified version integrating LSS*
-
-![[assets/figures/papers/paper_list_l2268_https_arxiv_org_abs_2603_00906/figures/001_Figure_1.jpg]]
-*Figure 1: Model comparison in terms of storage size, PSNR and runtime on Set5 for x4 super-resolution. Our method produces a family of models that has the smallest storage size and occupies the top-left corner, indicating superior performances (PSNR on yaxis) with fast inference speed (Runtime on x-axis)*
-
-![[assets/figures/papers/paper_list_l2268_https_arxiv_org_abs_2603_00906/figures/006_Figure_5.jpg]]
-*Figure 5: Qualitative comparison for 4× super-resolution on different images*
-
-![[assets/figures/papers/paper_list_l2268_https_arxiv_org_abs_2603_00906/figures/007_Table_2.jpg]]
-*Table 2: The comparison for grayscale image denoising at a noise level of 15 on standard benchmark datasets. The best of each metric is highlighted in Red*
-
-![[assets/figures/papers/paper_list_l2268_https_arxiv_org_abs_2603_00906/figures/008_Table_3.jpg]]
-*Table 3: The comparison for image deblocking under a quality factor of 10 on standard benchmark datasets. The best of each metric is highlighted in Red*
-
-
 
 ## 定位与知识库关联
 
@@ -323,8 +289,6 @@ ShiftLUT 的适用边界由以下因素界定：
 3. **EAS 的可扩展性**：EAS 的在线缓冲机制在更深的网络或更高分辨率的输入下是否仍然保持低内存开销？当前验证限于标准 SR 配置，其在高分辨率或视频任务中的表现尚不明确。
 
 4. **跨任务泛化**：ShiftLUT 的设计原则（LSS、非对称架构、EAS）能否推广到其他图像复原任务或更广泛的 low-level vision 问题？
-
-
 
 ## 原文 PDF
 

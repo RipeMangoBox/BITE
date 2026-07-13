@@ -53,8 +53,6 @@ claims:
 
 **主要结果**：在PAI-Bench基准上，后训练后的Cosmos-Predict2.5-2B在Text2World和Image2World模式下分别取得0.768和0.810的Overall Score，超越前代及外部模型。Cosmos-Transfer2.5-2B以仅约1/3.5的参数量，在多种控制条件下获得9.31的质量分数，优于7B的前代模型（9.24）。在真实机器人策略评估中，使用Cosmos-Transfer2.5生成数据增强后，策略在10个测试场景中成功率达24/30，远超基础策略（1/30）和常规增强策略（5/30）。强化学习后训练使VideoAlign奖励分数在Text2World下从1.08提升至1.69，在Image2World下从0.23提升至0.42，人类投票也一致确认质量改善。在自动驾驶多视图生成和动作条件视频预测等下游任务上，模型同样展现出显著的性能优势。
 
-
-
 **物理AI的核心挑战：世界仿真器的缺位**
 
 物理AI（Physical AI）系统——涵盖自动驾驶、机器人操作、智能空间等——需要在真实物理世界中感知、推理与行动。训练这些系统依赖海量、多样且带标注的交互数据，但物理世界数据的采集成本极高、覆盖场景有限且存在安全风险。因此，构建能够生成高保真、物理一致、指令可控的视频世界模型（World Simulator），以替代或增强真实数据采集，成为推动物理AI发展的关键技术路径。
@@ -78,8 +76,6 @@ claims:
 - **后训练层**：首次为世界模型引入领域特定SFT、模型合并（Model Soup）以及基于VideoAlign奖励模型和GRPO算法的强化学习后训练，系统提升模型在各物理AI领域的指令遵循能力和视频质量。
 
 通过上述多维度的协同改进，Cosmos-Predict2.5旨在构建一个更统一、更可控、更高质量的视频世界仿真器，为物理AI的下游应用（如机器人策略学习、自动驾驶仿真）提供更可靠的生成式数据支撑。
-
-
 
 ## 核心方法与创新机理
 
@@ -118,8 +114,6 @@ Cosmos-Predict2.5 采用 **WAN2.1 VAE** 作为视频分词器，压缩率为 $4 
 ### 创新总结
 
 上述创新构成了一个相互增强的系统：流匹配提供了更稳定的训练动力学和更快的推理收敛；Cosmos-Reason1 编码器强化了物理场景的语义理解；精简的位置编码释放了泛化潜力；而领域后训练体系则使通用世界模型能够精准适配物理 AI 的多样化需求。这一组合最终使 2B 参数的 Cosmos-Predict2.5 在 PAI-Bench Text2World 和 Image2World 基准上分别达到 0.768 和 0.810 的 Overall Score，超越了前代模型及部分外部模型（Table 8, Table 9）。
-
-
 
 Cosmos-Predict2.5是一个面向物理AI的统一世界模拟框架，其核心设计目标是通过架构、数据和训练策略的系统性改进，解决前代模型在视频质量、指令跟随和生成一致性上的瓶颈。该框架以**流匹配（Flow Matching）**为训练范式，以**Cosmos-Reason1视觉语言模型**为语义编码器，在单一模型中统一了Text2World、Image2World和Video2World三种生成模式。
 
@@ -170,8 +164,6 @@ Cosmos-Predict2.5的生成主干基于潜在空间中的DiT（Diffusion Transfor
 
 所有模式均通过统一的流匹配去噪网络处理，条件信息（文本嵌入、条件帧）在潜在空间中通过交叉注意力和帧替换机制注入。
 
-
-
 ### 流匹配训练范式
 
 Cosmos-Predict2.5 的核心训练范式从扩散模型转向**流匹配（Flow Matching）**。其基本思路是在数据 $\mathbf{x}$ 与噪声 $\boldsymbol{\epsilon}$ 之间建立线性插值路径：
@@ -211,8 +203,6 @@ $$t_s = \frac{\beta t}{1 + (\beta - 1) t}$$
 ### 条件帧注入机制
 
 在 Image2World 和 Video2World 模式下，模型采用**帧替换策略**：将生成序列的前几帧直接替换为条件帧，以强制时序一致性。为区分条件帧与待生成帧，每个输入 token 由原始 token 与一个二值掩码 token 拼接而成，掩码标记该位置是否为条件输入。
-
-
 
 ## 实验与关键发现
 
@@ -259,17 +249,6 @@ Cosmos-Transfer2.5-2B 在多模态控制条件下以 **3.5 倍更小的体积**�
 - 世界仿真器在远离训练分布的开放场景中仍可能出现幻觉或违反物理规律的行为，这一点缺乏系统性量化分析。
 - 强化学习奖励模型 VideoAlign 在更多样化的物理 AI 场景中的可靠性尚未验证，是否需要多目标奖励仍是一个开放问题。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l38_https_d1qx31qr3h6wln_cloudfront_net_publications_World_Simulation_with_V/figures/019_Figure.jpg]]
-*Figure: Edge Control Depth Control*
-
-![[assets/figures/papers/paper_list_l38_https_d1qx31qr3h6wln_cloudfront_net_publications_World_Simulation_with_V/figures/020_Figure_9.jpg]]
-*Figure 9: Error accumulation for long video generations. These plots show the Normalized Relative Dover Score vs Chunk Index for auto-regressive multi-trunk long video generation where each trunk is 93 frames. As shown, for all four control modalities (edge/blur/depth/seg), compared to [Cosmos-Transfer1-7B] (blue curves), [Cosmos-Transfer2.5-2B] (green curves) has much less reduction in RNDS along the chunk index dimension, which shows less hallucination and error accumulation for long videos*
-
-![[assets/figures/papers/paper_list_l38_https_d1qx31qr3h6wln_cloudfront_net_publications_World_Simulation_with_V/figures/027_Figure_13.jpg]]
-*Figure 13: Generated multi-view frames from [Cosmos-Transfer2.5-2B/auto/multiview]. The multi-view 720p control videos for driving simulation consist of HD map elements like lanes, road markings, poles, traffic signals, traffic lights (with state), all of which can represent complex road topologies (including overpasses) as well as actors represented as cuboids. Each cuboid is color-coded based on a coarse class ontology (e.g., truck, vehicle, pedestrian), and is also shaded to differentiate between the front and back*
-
 ![[assets/figures/papers/paper_list_l38_https_d1qx31qr3h6wln_cloudfront_net_publications_World_Simulation_with_V/figures/001_Table_1.jpg]]
 *Table 1: List of released models with their corresponding capabilities and inputs*
 
@@ -278,17 +257,6 @@ Cosmos-Transfer2.5-2B 在多模态控制条件下以 **3.5 倍更小的体积**�
 
 ![[assets/figures/papers/paper_list_l38_https_d1qx31qr3h6wln_cloudfront_net_publications_World_Simulation_with_V/figures/004_Table_3.jpg]]
 *Table 3: Configuration details of [Cosmos-Predict2.5] models*
-
-![[assets/figures/papers/paper_list_l38_https_d1qx31qr3h6wln_cloudfront_net_publications_World_Simulation_with_V/figures/006_Table_4.jpg]]
-*Table 4: Stages of progressive pretraining and their specifications*
-
-![[assets/figures/papers/paper_list_l38_https_d1qx31qr3h6wln_cloudfront_net_publications_World_Simulation_with_V/figures/007_Table_5.jpg]]
-*Table 5: Video statistics across different post-train domains*
-
-![[assets/figures/papers/paper_list_l38_https_d1qx31qr3h6wln_cloudfront_net_publications_World_Simulation_with_V/figures/012_Table_7.jpg]]
-*Table 7: Training efficiency with 4096 NVIDIA H100 GPUs where the video resolution is 720p and number of frames is 93*
-
-
 
 ## 定位与知识库关联
 
@@ -335,8 +303,6 @@ Cosmos-Predict2.5 的能力边界可从以下维度界定：
 3. 如何构建涵盖复杂多智能体交互、长期推理的综合物理 AI 世界模型基准？
 4. 小型模型（2B）的优势能否通过蒸馏等方式迁移到更大模型，或反之？
 5. 通过生成数据增强训练的策略（Table 11 中 24/30 的成功率）在更多机器人任务和真实世界部署中的泛化能力如何？
-
-
 
 ## 原文 PDF
 

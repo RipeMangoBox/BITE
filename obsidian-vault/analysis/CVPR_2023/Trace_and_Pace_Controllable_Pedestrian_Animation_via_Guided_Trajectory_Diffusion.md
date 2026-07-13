@@ -59,8 +59,6 @@ claims:
 
 **局限性**：扩散采样效率较低（单角色 1–3 秒），难以实时；多目标引导权重平衡困难，轨迹可能偏离数据流形；PACER 面对大型障碍物且无绕行路径时表现不佳，低速步态多样性不足。
 
-
-
 行人动画是计算机视觉与图形学交叉领域的核心问题，其目标是在复杂场景中生成真实、可控的行人运动。该问题的上游是轨迹预测与规划，下游是物理仿真与动作合成，两者之间的鸿沟构成了当前方法的主要瓶颈。
 
 ### 现有方法的双重困境
@@ -94,8 +92,6 @@ claims:
 TRACE-PACER 系统将轨迹扩散模型（TRACE）与物理动画控制器（PACER）连接为闭环：TRACE 每 2 秒根据 PACER 的当前状态重新规划轨迹，PACER 则负责在物理仿真中执行轨迹并处理地形、障碍物及其他代理的实时交互。这一闭环设计使得系统能够在多样地形（障碍物、斜坡、楼梯等）和拥挤人群场景中稳定运行。
 
 然而，当前框架仍存在明显局限：扩散采样的计算开销较大（单角色 1–3 秒），难以满足实时应用需求；多目标引导时不同损失项的权重 $\alpha$ 难以平衡，过大的总梯度可能导致轨迹偏离数据流形；PACER 在面对大型障碍物且无绕行路径时表现不佳，且低速行走动作缺乏多样性。这些问题为后续研究指明了方向，包括扩散模型的轻量化、引导过程的动态裁剪、以及更丰富的社交行为建模。
-
-
 
 ## 核心方法与创新机理
 
@@ -132,8 +128,6 @@ $$L_{\mathrm{sym}}(\theta) = \| \pi_{\mathrm{PACER}}(h_t, o_t, \beta, \tau_s) - 
 
 上述四个 changed slots 形成了一条清晰的因果链：**局部特征网格**提供精细的空间感知基础，**重构引导**赋予测试时任意目标的可控性，**混合训练与负采样权重**使模型适应分布外控制，而**对称运动损失**确保底层动画的自然度。这些创新共同解决了“数据驱动方法缺乏可控性，规则方法缺乏真实感”的核心瓶颈，使得系统能够在零碰撞率下实现用户指定的航点导航、障碍避碰与人群交互（Table 1, Table 3）。
 
-
-
 Trace and Pace 系统由两个核心模块构成闭环流水线：**TRACE**（高层轨迹扩散规划器）与 **PACER**（底层物理动画控制器）。TRACE 以场景历史轨迹和语义地图为条件，通过条件扩散过程生成未来轨迹；生成轨迹随后传递给 PACER，驱动物理模拟人形在三维地形中行走。PACER 的执行结果（当前状态）每隔 2 秒反馈回 TRACE 进行重规划，形成闭环控制（Sec. 3.3）。
 
 **输入流**：对于场景中每个目标行人，TRACE 接收三类信息——该行人自身的历史轨迹、所有邻近行人的历史轨迹、以及环境的语义地图（Figure 2）。地图通过 2D 卷积网络编码为特征网格，在去噪过程中按当前轨迹位置进行局部插值查询，而非使用全局编码向量（Sec. 3.1.1）。
@@ -148,12 +142,8 @@ Trace and Pace 系统由两个核心模块构成闭环流水线：**TRACE**（�
 
 整个系统的关键设计在于：扩散模型提供轨迹的真实性与多样性，重构引导提供测试时的灵活可控性，物理控制器提供运动物理合理性，三者通过闭环机制耦合为统一的 pedestrian animation 系统（Figure 1, Figure 6）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2304_01893/figures/003_Figure_3.jpg]]
 *Figure 3: Pipeline: Pedestrian Animation Controller (PACER)*
-
-
 
 ### 3.1 TRACE 轨迹扩散模型
 
@@ -217,8 +207,6 @@ $$L_{\mathrm{sym}}(\theta) = \| \pi_{\mathrm{PACER}}(h_t, o_t, \beta, \tau_s) - 
 
 系统以 2 秒为周期进行闭环重规划：TRACE 根据当前状态生成新轨迹，PACER 执行并反馈实际状态。轨迹规划时间随场景复杂度变化（Figure 14），单角色约 1–3 秒，是系统实时性的主要瓶颈。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验结果
@@ -249,15 +237,9 @@ $$L_{\mathrm{sym}}(\theta) = \| \pi_{\mathrm{PACER}}(h_t, o_t, \beta, \tau_s) - 
 
 将 TRACE 与 PACER 物理控制器组成闭环系统后，在多样地形和人群场景中评估了端到端动画质量（Table 3）：
 
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2304_01893/figures/009_Table_3.jpg]]
-*Table 3: Closed-loop animation results. Our system successfully follows waypoints and avoids collisions in a variety of terrains, and additional guidance improves performance*
-
 - **人群平面场景**：代理感知（Agent Aware）的 PACER 配合行人避碰引导，将失败率从无感知无引导的 **0.252 降至 0.013**（降低 94.8%），轨迹跟随误差从 0.102 降至 0.071。
 - **障碍物地形**：组合引导（航点 + 障碍避碰）使失败率降至 0.178，额外添加 PACER 值函数引导后进一步降至 **0.178 → 0.178**（原文 Table 4 显示值函数引导额外降低失败率约 2.4%，从 0.202 降至 0.178）。
 - **值函数引导的作用**（Table 4）：利用 PACER 强化学习训练中学习到的值函数作为 TRACE 的引导目标，鼓励生成更易被控制器跟随的轨迹。在障碍物地形中，值函数引导将失败率从 0.202 降至 0.178，轨迹跟随误差从 0.118 降至 0.113。
-
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2304_01893/figures/010_Table_4.jpg]]
-*Table 4: Using the value function learned in RL training as guidance improves quality of trajectory following and robustness to varying terrains, obstacles, and other agents*
 
 **闭环反馈机制**：TRACE 每 2 秒重新规划，接受 PACER 的当前状态作为输入，形成感知-规划-执行的闭环。值函数引导的独特优势在于它直接编码了控制器在当前地形和状态下的“可达性”知识，使高层规划与低层执行能力对齐。
 
@@ -329,17 +311,6 @@ Table 9 消融了 PACER 的关键设计：
 - **Table 7–8**：$w$ 控制条件强度与引导敏感性的权衡，$w = -0.5$ 为引导任务的最优折衷点。
 - **Table 9**：代理感知是 PACER 在人群场景中最关键的消融因素，体型感知在无引导时贡献显著。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2304_01893/figures/006_Figure_5.jpg]]
-*Figure 5: nuScenes results demonstrating flexibility of TRACE. (a) Using mixed training and w=−0.5 is best for noisy waypoints. (b) Social group guidance encourages sets of pedestrians to stay close. (c) Mixed training (ETH/UCY+nuScenes) learns a more diverse distribution as demonstrated by unconditional sampling*
-
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2304_01893/figures/014_Figure_10.jpg]]
-*Figure 10: During training, 2048 humanoids are simulated in parallel on our synthetic terrain. Figure 11. Synthetic terrains used for training PACER. From left to right: obstacles, discrete terrains, stairs (up), stairs (down), uneven terrains, and slopes*
-
-
-
-
 ## 定位与知识库关联
 
 ### 问题域与核心瓶颈
@@ -393,8 +364,6 @@ TRACE 与 PACER 形成分层闭环系统：TRACE 每 2 秒重新规划未来轨�
 - **复杂人群互动**：如何进一步提升智能体之间的互动建模，以处理复杂人群行为（如分组、排队、避让礼仪）？
 - **实时采样**：是否可以通过知识蒸馏、一致性模型或更轻量架构实现轨迹扩散的实时采样？
 - **跨域迁移**：TRACE 在合成数据（ORCA）和真实数据（nuScenes）上的混合训练策略能否推广到其他传感器模态或文化背景下的行人行为？
-
-
 
 ## 原文 PDF
 

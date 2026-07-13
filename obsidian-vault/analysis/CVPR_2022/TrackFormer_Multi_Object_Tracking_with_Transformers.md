@@ -50,8 +50,6 @@ claims:
 
 在MOT17和MOT20基准上，TrackFormer在公共检测与私有检测设置下均取得了当时的最优性能——私有检测下MOT17 MOTA达74.1（较CenterTrack提升6.3点），MOT20 MOTA达68.6；在MOTS20分割跟踪任务上也以54.9的MOTSA取得最优结果。消融实验表明，移除自回归注意力关联机制会导致IDF1骤降14.1点，验证了track queries的核心作用。该方法将MOT从“先检测后关联”的管道式范式推向了一体化的注意力跟踪范式，为后续基于Transformer的跟踪研究奠定了基础。
 
-
-
 多目标跟踪（MOT）旨在从视频序列中定位所有感兴趣目标，并为其分配一致的身份标识，形成完整的时空轨迹。该任务在自动驾驶、视频监控和行为分析等场景中具有核心地位。传统上，MOT 被分解为两个独立步骤：首先在每帧中检测目标，然后通过数据关联将检测结果连接成轨迹。这种“检测后跟踪”（tracking-by-detection）范式长期主导了领域发展。
 
 然而，这种分离式架构存在根本性瓶颈。数据关联步骤通常依赖手工设计的启发式规则或后处理优化——例如基于中心距离的贪婪匹配（如 **CenterTrack**，Zhou et al., ECCV 2020）、基于图神经网络的全局优化（如 **MPNTrack**，Braso & Leal-Taixe, CVPR 2020）、或基于外观相似度的准稠密匹配（如 **QuasiDense**，Pang et al., CVPR 2021）。这些方法将检测与关联视为解耦的模块，缺乏一种统一的注意力机制来同时处理新目标的初始化、已有目标的身份保持和轨迹的连续形成。具体而言，现有范式存在以下缺口：
@@ -63,8 +61,6 @@ claims:
 近年来，Transformer 架构在目标检测中展现了强大的集合预测能力，通过自注意力和交叉注意力直接输出无序的检测集合，省去了非极大值抑制等后处理步骤。这启发了一个关键问题：**能否将多目标跟踪同样建模为集合预测问题，使数据关联本身成为注意力操作的自然产物？**
 
 TrackFormer（CVPR 2022）正是在这一动机下提出的。其核心洞察是：将多目标跟踪转化为一个端到端的集合预测任务，利用 Transformer 解码器中的自回归轨迹查询（autoregressive track queries）在帧间传播目标身份和位置信息，从而将检测初始化、身份保持和轨迹关联统一为纯注意力机制，彻底消除了对显式匹配、图优化或独立外观/运动模型的依赖。
-
-
 
 ## 核心方法与创新机理
 
@@ -81,8 +77,6 @@ TrackFormer 的核心创新在于将多目标跟踪重新建模为**集合预测
 ### 从单帧特征到双帧时序注意力
 
 在时序建模方面，传统方法通常仅使用当前帧特征，或通过独立的外观/运动模型进行时序建模。TrackFormer 将前一帧与当前帧的特征图沿通道维度堆叠，并施加时间编码，使 queries 通过交叉注意力同时访问两帧特征。结合 track queries 的动态可变形参考点（根据前一帧边界框中心调整），模型能够在特征空间中显式地推理目标的时空位移，从而在拥挤场景下更稳定地保持身份一致性。
-
-
 
 TrackFormer 将多目标跟踪建模为一个集合预测问题，通过编码器-解码器 Transformer 架构实现端到端的检测与跟踪一体化。其核心思想在于：将数据关联转化为 Transformer 解码器中的纯注意力操作，从而避免传统方法中检测与关联分离所带来的手工后处理步骤。
 
@@ -110,12 +104,6 @@ TrackFormer 在相邻两帧上训练，一次性优化整个 MOT 目标。训练
 2. 在帧 $t$ 上使用全部 $N = N_{\text{object}} + N_{\text{track}}$ 个查询，同时完成对帧 $t-1$ 已检测目标的跟踪和新目标的检测。
 
 这种设计使得模型能够在统一的 Transformer 框架内联合学习目标检测、轨迹初始化和帧间身份保持，无需额外的图优化或显式运动/外观建模。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2101_02702/figures/002_Figure_2.jpg]]
-*Figure 2: TrackFormer casts multi-object tracking as a set prediction problem performing joint detection and tracking-by-attention. The architecture consists of a CNN for image feature extraction, a Transformer [51] encoder for image feature encoding and a Transformer decoder which applies self- and encoder-decoder attention to produce output embeddings with bounding box and class information. At frame t = 0 , , the decoder transforms $N _ { \mathrm { o b j e c t } }$ object queries (white) to output embeddings either initializing new autoregressive track queries or predicting the background class (crossed). On subsequent frames, the decoder processes the joint set of $N _ { \mathrm { o b j e c t } }$ +...
-
 
 
 ### 3.1 轨迹的集合预测建模
@@ -165,8 +153,6 @@ $$\mathcal{L}_{\mathrm{MOT}}(y, \hat{y}, \pi) = \sum_{i=1}^{N} \mathcal{L}_{\mat
 
 当扩展到多目标跟踪与分割（MOTS）任务时，TrackFormer 在解码器输出嵌入和编码器图像特征之间生成空间注意力图，经上采样和卷积操作后得到实例级掩码预测。值得注意的是，MOTS 版本使用原始 DETR 注意力而非变形注意力，原因是单尺度特征图下变形注意力的稀疏采样会导致分割掩码质量下降。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -213,27 +199,20 @@ TrackFormer 的实验评估覆盖三个主流基准：MOT17、MOT20（多目标�
 - **Table 3（消融表）**：是理解各组件贡献的核心证据，尤其揭示了注意力关联对 IDF1 的决定性影响（14.1 点的降幅），远大于对 MOTA 的影响。
 - **Figure 3（定性对比）**：在 MOTS20 上对比了 TrackFormer 与 Track R-CNN 的分割跟踪效果，直观展示了 Transformer 方法在遮挡和拥挤场景下的身份保持优势。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2101_02702/figures/010_Table.jpg]]
 *Table: A.2. We report private TrackFormer results on each individual sequence evaluated on the MOT17 test set. To follow the official MOT17 format, we display the same results per public detection set. The arrows indicate low or high optimal metric values. Table A.3. We report TrackFormer results on each individual sequence and set of public detections evaluated on the MOT17 test set. We apply our minimum Intersection over Union (IoU) public detection filtering. The arrows indicate low or high optimal metric values*
 
 ![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2101_02702/figures/003_Table_1.jpg]]
 *Table 1: Comparison of multi-object tracking methods on the MOT17 [30] and MOT20 [13] test sets. We report private as well as public detection results and separate between online and offline approaches. Both TrackFormer and Center-Track filter tracks by requiring a minimum IoU with public detections. For a detailed discussion on the fairness of such a filtering, we refer to the appendix. We indicated additional training Data: CH=CrowdHuman [45], PD=Parallel Domain [50], 6M=6 tracking datasets as in [66], JTA [14], M=Market1501 [67] and C=CUHK03 [27]. Runtimes (FPS) are self-measured*
 
-
 ![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2101_02702/figures/006_Table_4.jpg]]
 *Table 4: We demonstrate the effect of jointly training for tracking and segmentation on a 4-fold split on the MOTS20 [52] train set. We evaluate with regular MOT metrics, i.e., matching to ground truth with bounding boxes instead of masks*
-
-
 
 ![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2101_02702/figures/012_Table.jpg]]
 *Table: A.4. We report private TrackFormer results on each individual sequence evaluated on the MOT20 test set. The arrows indicate low or high optimal metric values*
 
 ![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2101_02702/figures/013_Table.jpg]]
 *Table: A.5. We present TrackFormer tracking and segmentation results on each individual sequence of the MOTS20 test set. MOTS20 is evaluated in a private detections setting. The arrows indicate low or high optimal metric values. Table A.6. We report the original per-sequence CenterTrack MOT17 test set results with Center Distance (CD) public detection filtering. The results do not reflect the varying object detection performance of DPM, FRCNN and SDP, respectively. The arrows indicate low or high optimal metric values*
-
-
 
 ## 定位与知识库关联
 
@@ -274,8 +253,6 @@ TrackFormer 的设计假设决定了其适用范围的边界：
 - **密集场景的身份稳定性**：在极度拥挤的场景中，多个 track queries 的注意力可能相互干扰，如何设计更鲁棒的查询交互机制以抑制身份切换？
 - **时序数据增强**：传统空间增强（如随机裁剪、翻转）难以直接施加到 track query 嵌入空间，如何设计适合 Transformer 跟踪框架的时序增强策略？
 - **与图方法的融合**：TrackFormer 的注意力关联与图优化方法各有优势，是否存在将全局图约束注入 Transformer 解码过程的混合方案？
-
-
 
 ## 原文 PDF
 

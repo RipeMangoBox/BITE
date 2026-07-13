@@ -51,8 +51,6 @@ SAL的核心洞察在于**将分割与识别解耦**：利用2D视觉基础模�
 
 在类不可知分割任务上，仅使用覆盖14%点云的伪标签训练的SAL，达到了完全监督模型**91%的性能**（62.8 vs 69.0 PQ）。在零样本激光雷达全景分割任务上，SAL在SemanticKITTI和nuScenes数据集上分别达到全监督基线的**42%**和**54%**，显著优于直接提升SAM掩码的基线方法。这些结果表明，通过蒸馏2D基础模型的知识，在3D领域实现通用、可提示的分割是可行的，为激光雷达感知从封闭集走向开放世界迈出了关键一步。
 
-
-
 ### 激光雷达全景分割的封闭世界困境
 
 激光雷达（LiDAR）全景分割旨在对三维点云中的每个点同时进行实例分割和语义分类，是自动驾驶与机器人感知的核心任务。现有方法，如基于全监督学习的全景分割模型，虽然在固定类别词汇表上取得了显著进展，但其根本局限在于**预定义的封闭类别体系**。这些模型只能识别训练集中出现的特定物体类别（如“汽车”“行人”），无法适应开放世界中动态变化的语义需求——当场景中出现训练时未见过的物体类型，或用户需要按新的语义粒度（如“所有可移动物体”）进行查询时，模型完全失效。
@@ -77,8 +75,6 @@ SAL的核心洞察在于**将分割与识别解耦**：利用2D视觉基础模�
 - **从噪声伪标签中鲁棒学习**：设计伪标签引擎自动从SAM和CLIP生成训练信号，并通过多阈值DBSCAN几何精炼和FrankenFrustum数据增强策略，使模型能在仅14%点云被标注的条件下，学会对完整点云进行高质量分割。
 
 这一范式的意义在于：SAL首次证明了**完全摆脱人工标注、仅依赖2D基础模型蒸馏即可在激光雷达域实现零样本全景分割**的可行性，为构建真正通用的3D感知基础模型开辟了新路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -156,8 +152,6 @@ SAL处于**2D基础模型驱动的3D自监督感知**这一新兴研究方向的
 4. **评估不一致**：现有数据集对stuff类的实例标注粒度与SAL的输出不一致，可能导致stuff性能被低估。
 5. **传感器依赖**：方法依赖多模态标定传感器设置，标定误差和同步问题可能影响伪标签质量。能否扩展到其他传感器类型（如4D雷达）并实现跨传感器泛化，仍是一个开放问题。
 
-
-
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2403_13129/figures/002_Figure_2.jpg]]
 *Figure 2: SAL overview: Given a Lidar scan and a class vocabulary prompt, specified as a list of per-class free-form text descriptions (left), SAL segments and classifies objects (things and stuff classes). As labeled data for training such a model does not exist, we supervise SAL by distilling off-the-shelf vision foundation models to Lidar (right)*
 
@@ -201,8 +195,6 @@ $$\mathcal{L}_{\mathtt{SAL}} = \mathcal{L}_{obj} + \mathcal{L}_{seg} + \mathcal{
 
 推理阶段，模型对输入点云预测一组实例掩码及其 CLIP token，然后将文本提示通过 CLIP 文本编码器编码，与预测 token 计算点积相似度，实现零样本分类。整个过程无需任何人工标注数据参与。
 
-
-
 ### 伪标签引擎 (Pseudo-label Engine)
 
 SAL 的核心创新之一在于通过伪标签引擎将 2D 视觉基础模型的知识迁移至 3D 激光雷达域，从而摆脱对人工标注的依赖。该引擎由三个关键步骤构成：
@@ -245,8 +237,6 @@ $$\mathcal{L}_{\mathtt{SAL}} = \mathcal{L}_{obj} + \mathcal{L}_{seg} + \mathcal{
 $$PQ = RQ \times SQ$$
 
 其中 $RQ$ 为识别质量（Recognition Quality），衡量实例匹配的正确性；$SQ$ 为分割质量（Segmentation Quality），衡量匹配实例的 IoU 均值。该指标用于统一评估 things 和 stuff 类的全景分割性能。
-
-
 
 ## 实验与关键发现
 
@@ -331,30 +321,8 @@ Table A.2揭示了文本提示工程对零样本分类的显著影响。通过�
 - **Table 4**：SAL通过蒸馏学习显著超越直接使用2D伪标签的基线，在完整点云上优势尤为突出（+16.6 PQ）。
 - **Table 5**：零样本SAL在nuScenes上达到全监督的54%，验证了方法的跨数据集泛化能力。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2403_13129/figures/004_Figure_4.jpg]]
-*Figure 4: (c) SAM + DBSCAN Fig. 4: Refinement via clustering. After transferring image masks (Fig. 4a) to Lidar (Fig. 4b), we obtain pseudo-labels that suffer from sensory misalignment-related issues. Our geometric refinement (Fig. 4c) improves localization*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2403_13129/figures/012_Figure.jpg]]
-*Figure: (b) FrankenFrustum Fig. A.2: Training on partial labels. Unprojecting image-based pseudo labels results in a partially (pseudo) labeled point cloud (Fig. A.2a). We construct supervisory signal by concatenating multiple partially labeled point clouds (Fig. A.2b)*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2403_13129/figures/021_Figure.jpg]]
-*Figure: (a) Front-left camera (b) Front camera (c) Front-right camera Fig. E.2: Class-agnostic segmentation on Waymo Open [75] from first-person perspective. We visually outline the Lidar point cloud, where points are colored according to estimated instance IDs, estimated by SAL. We show corresponding camera views (not used for inference) for reference. As can be seen, SAL accurately segments a large variety of objects, including parking meters, potted trees (pots as well as trees), rooftop ladder, water hydrant, post box, traffic cone, traffic barrier, and more. Canonical objects, such as car, van, bus, and pedestrian are segmented as well. This class-agnostic segmentation is a basis for zero-shot...*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2403_13129/figures/029_Figure.jpg]]
-*Figure: (h) Prompt: {curb} Fig. E.9: Zero-shot per-class prompting on Waymo Open [75]. SAL predicts a set of object instances (left), along with their objectness scores and distilled CLIP [67] features. We can use text prompts and query these instances for specific classes specified as prompts. On the right, we highlight several such examples that are outside of classvocabularies of SemanticKITTI, nuScenes, and Waymo Open datasets. As can be seen on the left, a basis for such zero-shot prompting is accurate and, importantly, diverse class-agnostic segmentation*
-
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2403_13129/figures/009_Table.jpg]]
 *Table: A.1: SAL hyperparameters. We show parameters for both components of our framework: (i) SAM model [31], which we use to generate segmentation masks in images; (ii) the pseudo-label generation engine and (iii) our zero-shot model. For the latter, we only highlight parameters that deviate from [45]*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2403_13129/figures/011_Table.jpg]]
-*Table: A.2: CLIP token distillation and text prompt engineering. To evaluate our token prediction, we prompt the SemanticKITTI class vocabulary to generate labeled training data and train a non-zero-shot model (row 1). Furthermore, we demonstrate the insufficiency of vanilla class names (car) as text prompts and the boost from engineering a rich set of terms (car, jeep, SUV, van) as explained in Appendix A.3*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2403_13129/figures/013_Table.jpg]]
-*Table: B.1: Pseudo-label statistics. We outline the label coverage of point clouds, the total, max, and mean number of instances per scan, and the ratio of things/stuff instances on the full point cloud and point cloud areas that overlap with the camera view frustum (Filter Frustum). As can be seen, due to the single-camera setup, pseudo-label coverage in SemanticKITTI [6] is very low (14% of points). Even though nuScenes [18] dataset provides 3 6 0 ^ { \circ } view coverage, only 48% are labeled due to blind spots. Even when only retaining points, that overlap with the camera view frustum (SemanticKITTI, Filter Frustum), we observe coverage of 89%. This can be explained by mistakes (e.g., false n...*
-
-
 
 ## 定位与知识库关联
 
@@ -389,8 +357,6 @@ SAL 的核心创新在于将激光雷达全景分割从“封闭类别监督学�
 **完全无监督的评估范式。** 零样本 LPS 的评估目前仍依赖人工标注的真值。在完全无人工标注的开放世界中，如何客观评估分割质量（尤其是 stuff 类的实例粒度）是一个基础性难题。
 
 **向其他3D任务的拓展。** SAL 的自监督蒸馏范式——利用2D基础模型生成伪标签，通过 Transformer 解码器蒸馏至3D骨干——是否可迁移至3D目标追踪、轨迹预测或4D场景理解，是值得探索的方向。
-
-
 
 ## 原文 PDF
 

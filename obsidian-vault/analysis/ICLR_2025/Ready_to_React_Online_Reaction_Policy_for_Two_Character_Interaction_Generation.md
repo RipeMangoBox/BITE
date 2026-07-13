@@ -61,8 +61,6 @@ claims:
 
 **局限与展望**：当前方法仅针对两人交互设计，训练数据限于拳击动作，尚未整合场景/物体交互。未来工作将探索多人交互扩展、跨动作类型泛化，以及全身密集控制等方向。
 
-
-
 双角色交互动作生成是计算机动画与具身智能领域的核心挑战之一，其目标是根据对手的行为实时生成自然、连贯且物理合理的反应动作。这一任务在游戏、虚拟现实、机器人仿真等场景中具有广泛的应用前景。然而，现有方法在模拟真实在线交互过程时面临两个根本性瓶颈。
 
 **现有方法的根本缺陷：离线生成与错误累积。** 当前主流的双角色交互生成方法通常将两个角色的运动视为一个整体序列进行离线建模，无法模拟真实场景中角色独立、实时地观察对手并做出反应的过程。具体而言，基于GPT的自回归模型（如**T2MGPT**（Zhang et al., CVPR 2023））通过预测离散运动token的概率分布来生成动作，但这类方法存在严重的错误累积问题——每步预测的微小偏差会在自回归过程中被逐步放大，导致长期生成质量急剧劣化。如Figure 1所示，GPT基线在生成约200帧后即出现方向错误、出界或冻结等灾难性失效，而真实交互场景往往需要持续数分钟的运动序列。
@@ -70,8 +68,6 @@ claims:
 **在线反应策略的建模空白。** 从问题定义来看，双角色交互的本质是一个在线反应过程：每个角色需要根据自身及对手的历史运动，独立决定下一时刻的动作。这一过程可形式化为反应策略 $\mathcal{P}$：$\mathbf{A}_f = \mathcal{P}(\mathbf{O}_{i \in [f-W,f)}, \mathbf{A}_{i \in [f-W,f)})$，其中 $\mathbf{A}_f$ 为当前角色在帧 $f$ 的动作，$\mathbf{O}$ 和 $\mathbf{A}$ 分别为对手和自身在过去 $W$ 帧内的运动历史。然而，现有方法（如**InterFormer**（Chopin et al., IEEE TMM 2023）基于transformer建模反应生成，**Duolando**（Siyao et al., ICLR 2024）结合GPT与强化学习生成跟随动作）均未能在自回归框架中有效解决错误累积问题，也无法支持真正的在线流式生成。
 
 **本文动机：在自回归框架中嵌入扩散模型。** 扩散模型在连续信号生成中展现出优于离散token预测的稳定性和多样性。本文的核心洞察是：将扩散模型（Denoising Diffusion Probabilistic Model, DDPM）作为“扩散头”嵌入自回归框架，替代GPT预测连续运动隐变量（而非离散token），可以从根本上减少累积误差。同时，配合专为在线场景设计的运动解码器，实现角色间的实时独立反应，从而支持长时间、连贯且多样的双角色交互动作生成。
-
-
 
 ## 核心方法与创新机理
 
@@ -112,8 +108,6 @@ Ready-to-React 处于**在线交互运动生成**的交叉点，其设计融合�
 - **交互运动合成**：**InterFormer**（Chopin et al., IEEE TMM 2023）基于 Transformer 生成反应动作，但缺乏长期稳定性和在线能力；Ready-to-React 通过反应策略公式 $\mathbf{A}_f = \mathcal{P}(\mathbf{O}_{i \in [f-W,f)}, \mathbf{A}_{i \in [f-W,f)})$ 实现了角色间的独立实时反应。
 - **概率运动先验**：**MoGlow**（Henter et al., TOG 2020）使用归一化流建模运动分布，作为本方法的 FID 评估编码器，确保度量一致性。
 
-
-
 Ready-to-React 的核心设计是将双角色交互生成建模为一个**在线反应策略**（online reaction policy），其形式化定义为：
 
 $$\mathbf{A}_f = \mathcal{P}(\mathbf{O}_{i \in [f-W,f)}, \mathbf{A}_{i \in [f-W,f)})$$
@@ -152,8 +146,6 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{diffusion}} + \beta \| \mathbf{A} - \tilde{
 $$\mathcal{L}_{\mathrm{diffusion}} = \mathbb{E}_{t \in [1,T], \mathbf{x}_0 \sim q(\mathbf{x}_0)} \left[ \| \mathbf{x}_0 - \mathcal{G}(\mathbf{x}_t, t, \mathbf{c}) \|_2 \right]$$
 
 即预测去噪后隐变量与真实隐变量之间的期望 L2 距离。扩散过程设置 $T=1000$ 时间步，推理时使用 DDIM 采样 50 步。所有模型使用 AdamW 优化器（学习率 0.0001）在单张 Nvidia RTX 4090 GPU 上训练。
-
-
 
 ### 问题形式化
 
@@ -203,8 +195,6 @@ $$\mathcal{L}_{\mathrm{vqvae}} = \mathcal{L}_{\mathrm{rec}} + \alpha \| \mathrm{
 
 其中 $\alpha = 0.1$，$\mathrm{sg}[\cdot]$ 为停止梯度算子。所有模型使用AdamW优化器训练，学习率0.0001，在单张Nvidia RTX 4090 GPU上完成。
 
-
-
 ## 实验与关键发现
 
 ### 4.1 实验设置与评估协议
@@ -239,9 +229,6 @@ $$\mathcal{L}_{\mathrm{vqvae}} = \mathcal{L}_{\mathrm{rec}} + \alpha \| \mathrm{
 
 Table 2 报告了1800帧（约1分钟）的长期生成结果。**Ready-to-React** 成功保持了运动连贯性和交互合理性，而基于GPT的方法在约200帧后即出现方向错误、出界或冻结（Figure 1）。这一对比直接验证了核心瓶颈——**自回归离散token预测存在严重的错误累积**，而本方法通过预测连续运动隐变量有效抑制了该问题。
 
-![[assets/figures/papers/paper_list_l1783_Ready_to_React_Online_Reaction_Policy_for_Two_Character_Interaction_Gene/figures/001_Figure_1.jpg]]
-*Figure 1: Demonstration of Ready-to-React, an online reaction policy for two-character interaction generation on the challenging task of boxing. Ready-to-React predicts the next pose of an agent by considering its own and the counterpart’s historical motions. Our method can successfully generate 1800 frames of motion, whereas the GPT-based approach struggles after about 200 frames, displaying issues such as incorrect orientation, leaving the ring boundary, or freezing in place due to the accumulation of errors over time*
-
 ![[assets/figures/papers/paper_list_l1783_Ready_to_React_Online_Reaction_Policy_for_Two_Character_Interaction_Gene/figures/004_Table_2.jpg]]
 *Table 2: Quantitative results of long-term two-character motion generation. We compare our method with four baselines (Section 4.2). The generated motion lengths are set to 1800 frames*
 
@@ -262,25 +249,12 @@ Table 3 系统验证了五个关键设计选择，所有消融变体均导致性
 
 Table 4 展示了在稀疏控制信号（DuoBox reactive setting）下的对比结果。**Ready-to-React** 的位置误差仅 **2.72**（CAMDM为14.52），旋转误差仅 **4.39**（CAMDM为22.40），per-frame FID 为 **0.249**（CAMDM为0.697）。Figure 4 的定性结果显示，本方法能准确响应稀疏目标点（红色标记），而CAMDM在相同条件下出现响应迟滞和精度不足（红色圆圈标注区域）。这证明本方法在保持实时性的同时，具备更强的可控性。
 
-![[assets/figures/papers/paper_list_l1783_Ready_to_React_Online_Reaction_Policy_for_Two_Character_Interaction_Gene/figures/007_Table_4.jpg]]
-*Table 4: Quantitative results of generating reactive motion from sparse signals. We compare our method with CAMDM. Among them, bold indicates the best results. ↓ means lower is better. → means closer to the real data is better. Our method outperforms the baseline in terms of all metrics*
-
-![[assets/figures/papers/paper_list_l1783_Ready_to_React_Online_Reaction_Policy_for_Two_Character_Interaction_Gene/figures/008_Figure_4.jpg]]
-*Figure 4: Qualitative results of generating reactive motions from sparse signals. We compare our method with CAMDM. Our approach successfully generates realistic motion while effectively adhering to the sparse signals (annotated by red dots in the figures). In contrast, CAMDM struggles to achieve the same level of responsiveness and accuracy, as shown in the red circles*
-
 ### 4.5 失败模式与局限性
 
 尽管整体性能优异，本方法存在以下已知局限：
 - **场景限制**：当前设计仅针对两人交互，无法直接处理多人或群组场景。
 - **环境交互缺失**：模型未考虑与场景物体的交互，限制了在复杂三维环境中的应用。
 - **动作类型泛化**：训练数据仅包含拳击动作，向其他交互类型的迁移需要额外数据收集与训练。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1783_Ready_to_React_Online_Reaction_Policy_for_Two_Character_Interaction_Gene/figures/010_Figure_6.jpg]]
-*Figure 6: Qualitative results of generating two-character motions. Given the same initial four frames for both characters, InterFormer tends to produce human motion with incorrect orientation. CAMDM often results in the characters getting stuck, while T2MGPT can cause the two characters to drift apart due to accumulated errors*
-
-
 
 ## 定位与知识库关联
 
@@ -333,8 +307,6 @@ Table 3的消融实验揭示了以下因果链条：
 3. **跨动作泛化**：反应策略如何对不同种类的交互动作进行泛化，而无需为每种动作重新收集数据和训练？可能的方案包括元学习、条件生成或大规模多动作预训练。
 
 4. **控制粒度提升**：能否将稀疏控制信号（如关键点位置）扩展到全身密集控制，以支持更沉浸式的VR交互体验？这需要在隐空间中建立更精细的控制映射机制。
-
-
 
 ## 原文 PDF
 

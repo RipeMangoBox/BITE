@@ -340,8 +340,6 @@ fVDB重新实现的NKSR（Neural Kernel Surface Reconstruction）在8块V100 GPU
 
 在网格构建基准测试中，SpConv在数据量较大时出现非法内存访问错误，MinkowskiEngine则因内存耗尽（OOM）失败，这些失败被如实记录，反映了基于哈希表的稀疏数据结构在极端规模下的固有脆弱性。fVDB的IndexGrid通过拓扑分离和紧凑索引避免了这些问题，但当前框架绑定固定的VDB树配置（三层，发散因子32/16/8），尚未探索动态自适应树结构对性能的进一步影响。此外，LGGS内核在低特征维度下效率有限，且层次化双重Marching Cubes等高级算子尚未实现，这些构成了当前版本的已知边界。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2407_01781/figures/004_Figure_3.jpg]]
 *Figure 3: Illustration of dense local indexing (0-63) vs sparse global indexing (21-38) in a 2D leaf node of size1111101100001100000000 8 ^ { 2 } = 6 4 . . The sparse global indexes correspond to offsets into a dense tensor of per-voxel attributes illustrated at the bottom as one column per attribute, allocated as sidecars to the IndexGrid*
 

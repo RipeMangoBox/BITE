@@ -58,8 +58,6 @@ claims:
 
 **局限与开放问题**：数据集仅在离体鸡组织上采集，任务多样性有限，且专家样本占比仅9.1%，模型可能偏向学员分布。跨视角泛化仍存在约5–6%的性能下降，视角不变性尚未完全解决。未来方向包括：将逐帧手势预测聚合为可解释的全局技能评分；利用未标注帧（约42%）进行自监督或半监督学习；以及通过知识蒸馏或域适应将多视角模型压缩至可部署的单摄像头场景。
 
-
-
 ### 外科手术培训自动评估的瓶颈
 
 外科手术技能的客观评估是医学培训中的核心挑战之一。传统评估依赖专家主观观察，不仅耗时、成本高昂，且难以保证评分的一致性和可扩展性。近年来，基于视频的自动化技能评估方法逐渐兴起，试图通过计算机视觉技术从手术录像中识别手部动作并检测技术错误，从而为学员提供实时、标准化的反馈。
@@ -73,8 +71,6 @@ claims:
 ### 本文动机与核心贡献
 
 针对上述缺口，本文提出了 **SHANDS**——首个面向开放式外科培训的多视角手部手势与错误识别数据集。该数据集通过 5 台同步 RGB 相机采集互补视角，引入包含 15 种手势基元和 8 种错误类型的层次化标注体系，并建立了统一的单视图、多视图与跨视图泛化评估协议。基于该数据集，本文进一步对多种主流动作识别模型进行了系统性基准测试，揭示了多视角互补信息对外科动作理解的关键作用，为未来自动化技能评估研究提供了标准化平台与实证基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -113,8 +109,6 @@ SHANDS 在方法谱系中定位于**数据集驱动的研究范式**，其贡献
 
 尽管 SHANDS 在数据维度上实现了显著创新，但其局限性同样需要正视：(1) 数据集仅在离体鸡组织上采集，生态效度有限，无法反映真实手术中的组织反馈和压力情境；(2) 任务多样性不足，仅覆盖切口和缝合两种基础操作；(3) 8 类错误虽经专家定义，但可能遗漏新的错误模式，且单一标注者的主观性可能影响标签一致性；(4) 数据集规模（52 人，约 10 小时）对深度学习而言仍偏小，专家样本仅占 9.1%，可能导致模型偏向学员分布。这些限制提示，SHANDS 应被视为该领域的起点而非终点，后续研究需要在更真实的临床场景、更多样化的任务和更大规模的数据上进行验证和扩展。
 
-
-
 SHANDS 项目的核心并非提出一种新的模型架构，而是构建了一套面向开放式外科培训的**多视角数据采集、层次化标注与标准化评估框架**，并在此基础上对现有单视图与多视图方法进行系统性基准测试。其整体 pipeline 可分解为四个紧密衔接的模块：多视角同步采集系统、层次化标注体系、基准评估协议，以及下游模型适配层。
 
 **多视角采集系统**是整个框架的物理基础。系统由五台 Canon PowerShot A2500 RGB 相机组成，固定于刚性支架上，以 25 fps、640×480 分辨率同步录制。帧精确的时间对齐通过 CHDK（Canon Hack Development Kit）实现硬件级同步，保证五个视角的帧一一对应，为后续多视图融合提供可靠的空间-时间对应关系。采集对象为离体鸡组织上的标准化切口（incision）与缝合（suturing）任务，52 名参与者（20 名认证外科医生，32 名医学生）每人完成三次独立试验，总计产生约 90 万帧视频数据。
@@ -126,13 +120,6 @@ SHANDS 项目的核心并非提出一种新的模型架构，而是构建了一�
 **下游模型适配层**将现有视频理解方法接入上述数据与评估框架。单视图基线包括卷积架构（R3D、SlowFast、X3D-M）和 Transformer 架构（TimeSformer、ViViT-B、MViTv2-B、VideoMAE-B/L）；多视图方法包括 MVAction、ViewCLR、ViewCon 和 DVANet。其中 DVANet 通过解耦视角特征与动作特征的建模策略，在三个评估维度上均取得最优结果——多视图手势识别 Macro-F1 达 0.736（Table 5），五视图错误检测准确率 68.5%（Table 6），跨视角泛化性能保留率达 94.1%（Table 7）。
 
 整个 pipeline 的输入为五路同步 RGB 视频流，输出为帧级手势类别预测或错误类型预测。框架的设计瓶颈在于：现有单视图数据集缺乏多视角互补线索和临床验证的错误标注，导致模型难以在真实培训场景中实现鲁棒的手部技能评估。SHANDS 通过多视角同步采集与层次化标注这两个“因果旋钮”，为模型提供了多视角空间线索与强任务相关的监督信号，从而显著提升了手势识别准确率和跨视角泛化能力。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1044_https_openaccess_thecvf_com_content_CVPR2026_html_Ma_SHands_A_Multi_View/figures/001_Figure_1.jpg]]
-*Figure 1: The SHANDS multi-view dataset. A five-camera RGB setup (C1–C5) records synchronized multi-view videos of incision and suturing tasks on ex vivo tissue. The top row shows a gesture-annotated timeline with fine-grained labels (I1–I5 for incision, S1–S10 for suturing) and transition boundaries. The bottom rows show aligned frames from all views for both incision and suturing, highlighting the complementary spatial information captured across cameras*
-
-
 
 本文的核心贡献在于构建了**SHANDS多视角外科手势与错误识别数据集**，并在此数据集上建立了系统的基准评估协议。其技术核心并非提出全新的模型架构，而是通过**数据采集、标注体系和评估协议**三个关键模块，为外科手部技能评估提供了一个标准化的研究平台。以下展开关键模块。
 
@@ -186,8 +173,6 @@ $$\hat{y} = \text{Softmax}(W \cdot \mathbf{F}_{fused} + b)$$
 
 该范式解释了为何DVANet在跨视角泛化实验中（Table 7）能保持94.1%的高性能保留率：因为它显式地学习并依赖了与视角无关的动作本质特征，从而对未见视角的视觉变化具有天然的鲁棒性。
 
-
-
 ## 实验与关键发现
 
 ### 评估协议与基线设置
@@ -232,9 +217,6 @@ SHANDS 数据集采用**按被试划分**的交叉验证协议，将 52 名参�
 
 Figure 3 通过 DVANet 的预测概率分布验证了手工标注的时间精度。在标注手势边界帧（第 61 帧和第 109 帧）附近，模型预测概率呈现**尖锐跳变**，不确定性区域极为狭窄，边界两侧的分类置信度高度集中。这一现象表明：（1）标注者对手势转换时刻的判断具有高度一致性；（2）DVANet 学到的决策边界与人类标注高度吻合。该分析为 SHANDS 的标注可靠性提供了定量证据，也间接验证了多视角模型在捕捉细粒度时序结构方面的能力。
 
-![[assets/figures/papers/paper_list_l1044_https_openaccess_thecvf_com_content_CVPR2026_html_Ma_SHands_A_Multi_View/figures/010_Figure_3.jpg]]
-*Figure 3: Annotation quality analysis. Gesture probability distributions predicted by DVANet around two annotated boundary frames (61 and 109). Sharp probability transitions and narrow uncertainty regions indicate high temporal precision and consistency of the manual annotations, with strong classification confidence on either side of each gesture change*
-
 ---
 
 ### 失败模式与局限性
@@ -261,18 +243,8 @@ Figure 3 通过 DVANet 的预测概率分布验证了手工标注的时间精度
 | **Table 7** | DVANet 跨视角泛化保留率 94.1%，验证视角解耦设计的有效性 |
 | **Figure 3** | 标注边界处概率跳变尖锐，验证手工标注的高时间精度与模型一致性 |
 
-![[assets/figures/papers/paper_list_l1044_https_openaccess_thecvf_com_content_CVPR2026_html_Ma_SHands_A_Multi_View/figures/006_Table_4.jpg]]
-*Table 4: Single-view gesture classification on SHands. Models trained and evaluated on a single-view camera. K400 = Kinetics-400; Im21K = ImageNet-21K*
-
-![[assets/figures/papers/paper_list_l1044_https_openaccess_thecvf_com_content_CVPR2026_html_Ma_SHands_A_Multi_View/figures/008_Table_5.jpg]]
-*Table 5: Multi-view gesture classification on SHands. Models trained and evaluated with 5 synchronized cameras following a cross-subject protocol*
-
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1044_https_openaccess_thecvf_com_content_CVPR2026_html_Ma_SHands_A_Multi_View/figures/002_Table_1.jpg]]
 *Table 1: Comparison with existing surgical and multi-view action datasets. Our dataset is the first to provide synchronized multi-view open hand surgery videos with comprehensive gesture and error annotations*
-
-
 
 ## 定位与知识库关联
 
@@ -331,8 +303,6 @@ SHANDS 及其基准方法存在以下明确的适用边界：
 - **跨视角泛化残差的弥合**：残留的 5–6% 性能差距是否可以通过更强的视角不变性约束（如对比学习、元学习）来弥合，仍需进一步验证。
 - **时域不确定性建模**：针对手势类别不平衡和边界模糊问题，引入时间不确定性建模或课程感知采样策略可能提升模型在复杂动作序列上的鲁棒性。
 - **群体公平性**：数据集中学员与专家的显著不平衡可能影响模型在不同群体上的表现评估，未来工作需关注群体代表性（年龄、性别、左右手习惯等）及其对模型公平性的影响。
-
-
 
 ## 原文 PDF
 

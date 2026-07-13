@@ -59,8 +59,6 @@ claims:
 
 **局限与开放问题**：方法假设预测误差服从对称零均值分布，在复杂环境中可能不成立；屏障函数和松弛权重的选择依赖特定环境；当前依赖预定义 CBF，未涉及从数据学习屏障函数；实验集中在仿真任务，尚未在真实机器人上验证。开放问题包括动态障碍物环境下的表现、CBF 与流匹配的端到端联合优化、极度非凸安全集中的松弛机制鲁棒性等。
 
-
-
 ### 生成式规划中的安全困境
 
 基于生成模型的轨迹规划方法——特别是扩散模型与流匹配（Flow Matching, FM）——近年来展现出强大的分布建模能力，能够从噪声中生成高质量、多模态的候选路径。然而，当任务引入硬性安全约束（如障碍物规避、关节限位）时，这些方法的采样动态暴露出一个根本性缺陷：**生成过程缺乏形式化的安全保证**。
@@ -93,8 +91,6 @@ SafeFlowMatcher 的设计动机源于一个实际需求：**在安全至上的�
 - **安全可认证**：利用有限时间收敛 CBF 提供形式化安全保证，确保路径在有限时间内进入并保持在安全集内。
 - **高效采样**：预测阶段仅需极少的积分步数（T^p=1 即可），校正阶段的 QP 求解可采用封闭解，总时间可比 SafeDiffuser 快约 50 倍（0.023s vs. 1.208s）。
 - **路径质量保持**：安全约束以最小扰动方式注入，避免扭曲流匹配学习到的路径分布。
-
-
 
 ## 核心方法与创新机理
 
@@ -147,8 +143,6 @@ $$T \leq t_w + \frac{(\delta - b(\pmb{\tau}_{t_w}^{c,k}))^{1-\rho}}{\epsilon (1-
 
 上述三个 changed slots 形成完整的因果链：**时序解耦**（slot 1）使得安全约束不干扰生成动力学，消除分布漂移的结构性根源；**VTFD**（slot 2）保证校正阶段的路径质量不因预测误差而退化；**带松弛的 CBF-QP**（slot 3）在维持安全认证的同时提供数值稳定性。三者共同作用，使 SafeFlowMatcher 在 Maze2D 上取得 0% 陷阱率（对比 SafeDiffuser 的 72%），评分 1.632 的 SOTA 性能，以及在封闭解配置下比 SafeDiffuser 快 50 倍的推理速度（0.023s vs. 1.208s）。
 
-
-
 ![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_refcXHU1Nh/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of SafeFlowMatcher Versus Existing Certification-Based Methods. Directly constraining intermediate samples during generation (top) can cause paths to be distorted or trapped, whereas Safe-FlowMatcher (bottom) decouples generation and certification, producing a complete and certified-safe path*
 
@@ -191,8 +185,6 @@ SafeFlowMatcher 的整体 pipeline 围绕一个核心设计原则展开：**将�
 - **输入**：从先验分布 $p_0$ 采样的噪声 $\tau_0^p$（与训练时一致的噪声分布）；预训练的流匹配向量场参数 $\theta$；CBF 参数 $(\delta, \epsilon, \rho)$ 及松弛权重调度 $\{w_t^k\}$。
 - **输出**：满足 $b(\tau_1^{c,k}) \geq \delta$（鲁棒安全边界）的完整路径 $\tau_1^c$，其中每个路径点均通过有限时间收敛 CBF 认证。
 - **可配置项**：预测步数 $T^p$（默认 1）、校正步数 $T^c$（默认 256）、缩放常数 $\alpha$（默认 2.0）、松弛消失时间 $t_w$。
-
-
 
 SafeFlowMatcher 的核心架构是一个**预测-校正（Prediction-Correction, PC）积分器**，它将路径生成与安全认证在时序上完全解耦。该方法包含四个关键模块：预测阶段、校正阶段（含消失时间缩放流动力学）、CBF-QP 求解器，以及松弛项与权重机制。
 
@@ -240,8 +232,6 @@ $$ T \leq t_w + \frac{(\delta - b(\pmb{\tau}_{t_w}^{c,k}))^{1-\rho}}{\epsilon (1
 
 为增强数值稳定性，CBF-QP 在校正早期引入松弛变量 $ r_t^k $ 和递减权重 $ w_t^k $。当 $ t < t_w $ 时，松弛项允许路径点暂时偏离安全集，防止在高度非凸安全集（如 Maze2D）中出现不可行或振荡；当 $ t \geq t_w $ 时，$ w_t^k $ 消失，松弛项失效，确保最终路径严格满足 $ b(\tau) \geq \delta $（$ \delta=0.01 $ 为鲁棒性边界）。该机制在非凸环境中尤为关键（Remark 2）。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与因果机制验证
@@ -252,9 +242,6 @@ SafeFlowMatcher 通过预测-校正（PC）积分器切断这一因果链：预�
 
 **证据强度**：能量距离分析（Figure 15）直接量化了分布漂移——SafeFlowMatcher 引起的漂移（0.061）显著低于 SafeFM（0.097）和 SafeDiffuser（0.229），证实 PC 积分器有效抑制了漂移。Table 9 的消融实验进一步表明，无 PC 积分器的 SafeFM 在广泛的 CBF 超参数范围内陷阱率高达 100%，而 SafeFlowMatcher 保持 0% 陷阱率，直接验证了“解耦生成与安全”这一因果机制的有效性。
 
-![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_refcXHU1Nh/figures/047_Figure_15.jpg]]
-*Figure 15: Per-waypoint drift between baseline and safe path. For each model pair (Flow-Matcher/SafeFlowMatcher, FM/SafeFM, Diffuser/SafeDiffuser), the plot shows the mean perwaypoint deviation between paths produced by the baseline and its corresponding safe variant. The pink band marks the region where the baseline path violates the CBF constraint at the final time; for clarity, a single common band is shown, although the exact violation interval may differ by several steps across models*
-
 ![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_refcXHU1Nh/figures/043_Table_9.jpg]]
 *Table 9: Comparison between SafeFlowMatcher and SafeFM on CBF hyperparameters. Subset of the (ρ, ϵ) hyperparameter grid in Maze2D, comparing SafeFlowMatcher (ours) and SafeFM (w/o PC). Each entry reports mean ± std over 100 rollouts for Score, Trap Rate, curvature (κ), acceleration (a), and minimum barrier values (BS1, BS2)*
 
@@ -264,8 +251,6 @@ SafeFlowMatcher 通过预测-校正（PC）积分器切断这一因果链：预�
 
 Table 1 汇总了 Maze2D 环境下的主实验结果。SafeFlowMatcher 在所有方法中取得最高评分（Score = 1.632 ± 0.003），且陷阱率（Trap Rate）为 0%。相比之下，最强的安全感知基线 RES-SafeDiffuser 的陷阱率高达 72%，评分仅为 1.442 ± 0.451（方差大，表明性能不稳定）。
 
-![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_refcXHU1Nh/figures/004_Table_1.jpg]]
-*Table 1: Performance comparison of different methods. We evaluated all methods over 100 independent trials under identical settings. For all safety-aware methods, we set the robustness margin to $\delta$ = 0 . 0 1 , meaning that a method is considered safe only if b ( $\tau ) \geq \delta$ . This ensures robust rather than marginal safety. FlowMatcher-variants use $T ^ { p }$ = 1 and $T ^ { c }$ = 2 5 6 . , and others use T = 2 5 6 . The closed-form CBF-QP computation takes 1.14 ms on average. All baselines are reproduced by us
 
 **安全指标**：SafeFlowMatcher 的两个屏障安全指标 BS1 和 BS2 均为 0.010，满足鲁棒安全阈值 δ = 0.01 的要求，且无安全违规。这表明校正阶段的 CBF-QP 能够可靠地将路径约束在安全集内。
 
@@ -330,22 +315,6 @@ Figure 7 的消融显示，当关闭消失时间缩放（α = 0，直接使用�
 - **Table 9**：SafeFM 在无 PC 积分器时陷阱率 100%，SafeFlowMatcher 保持 0%，证明 PC 积分器是安全鲁棒性的必要条件。
 - **Table 10–11**：闭式解和 QP 求解器两种配置下，SafeFlowMatcher 均比 SafeDiffuser 快 8–50 倍，验证了流匹配 + 解耦策略的效率优势。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_refcXHU1Nh/figures/026_Table_5.jpg]]
-*Table 5: Scores by batch size for Maze2D for both Diffuser and FM*
-
-![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_refcXHU1Nh/figures/032_Table_6.jpg]]
-*Table 6: Maze2D’s training and evaluation hyperparameters*
-
-![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_refcXHU1Nh/figures/033_Table_7.jpg]]
-*Table 7: Locomotion (Walker2D/Hopper) hyperparameters*
-
-![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_refcXHU1Nh/figures/034_Table_8.jpg]]
-*Table 8: Robot manipulation task (block stacking) hyperparameters*
-
-
-
 ## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
@@ -402,8 +371,6 @@ SafeFlowMatcher 的有效性依赖于以下边界条件：
 4. **重尾误差分布的鲁棒性**：VTFD 的误差衰减分析基于对称零均值假设，当预测误差呈现重尾分布时，是否需要自适应调整收缩参数 $\alpha$ 或引入鲁棒估计？
 
 5. **多智能体与交互场景**：SafeFlowMatcher 的 CBF-QP 框架是否可扩展到多智能体安全规划，其中每个智能体的安全集依赖于其他智能体的行为？
-
-
 
 ## 原文 PDF
 

@@ -57,8 +57,6 @@ NOVIS 提出**近在线（near-online）**范式，将视频划分为固定长�
 
 方法谱系上，NOVIS 在 Mask2Former 架构基础上引入可学习的时间编码、体积 Dice 损失（处理全遮挡帧）以及重叠嵌入匹配机制，构建了首个无手工跟踪启发式的端到端近在线 VIS 系统。
 
-
-
 视频实例分割（Video Instance Segmentation, VIS）要求在视频的每一帧中同时检测、分割并跟踪所有实例。近年来，这一任务主要沿着两条技术路线发展：**在线方法**逐帧处理视频，依赖手工设计的跟踪启发式（如掩码 IoU 与类别匹配）来关联实例；**离线方法**则将整个视频作为输入，以端到端方式联合优化分割与跟踪。
 
 然而，这两种范式各自存在根本性缺陷。离线方法的核心瓶颈在于**训练帧数与测试帧数之间的泛化差距**（frame generalization gap）：模型通常在固定帧数（如 5 帧）的短片断上训练，但在推理时需要处理长达数百帧的视频序列。如图 1a 所示，当测试序列长度远超训练片段时，离线方法的性能会显著退化。在线方法虽能处理任意长度视频，却牺牲了端到端的时序一致性——其跟踪完全依赖手工设计的启发式规则，无法通过损失函数直接优化跨帧关联质量，导致长序列上的身份漂移和遮挡处理能力不足。
@@ -66,8 +64,6 @@ NOVIS 提出**近在线（near-online）**范式，将视频划分为固定长�
 近在线（near-online）范式为打破这一僵局提供了潜在出路：将视频分割为带重叠的短片断（clip），在片断内进行端到端时空建模，再通过片断间匹配实现跨片段跟踪。然而，此前的近在线尝试仍沿用逐帧掩码预测与手工跟踪启发式的组合，未能充分释放该范式的潜力。
 
 NOVIS 的动机正是**将视频实例分割重塑为短片断上的三维时空掩码预测问题**。核心洞察在于：若能让模型直接输出整个片断的时空掩码体积（spatio-temporal mask volume），而非逐帧独立预测，则可以通过体积损失函数（volumetric loss）统一优化检测、分割与短程跟踪；同时，用实例查询的嵌入相似度匹配替代手工跟踪启发式，实现端到端可训练的片断间关联。这一设计从根本上消除了训练-测试帧泛化差距，使模型在长视频上的表现不再受限于训练时的片段长度（图 1b）。
-
-
 
 ## 核心方法与创新机理
 
@@ -101,8 +97,6 @@ NOVIS 采用**近在线滑动窗口**策略：将视频划分为长度为 $T$、
 
 上述四个 changed slots 并非孤立改进，而是形成了一条清晰的因果链：近在线范式（Slot 1）提供了端到端训练的框架基础；三维掩码体积预测（Slot 3）和体积 Dice 损失使模型能够学习时空一致的表示；嵌入匹配（Slot 2）则将这些表示转化为可微分的跨片断关联，最终实现完全摆脱手工启发式的端到端视频实例分割。
 
-
-
 NOVIS 将视频实例分割重塑为一个**近在线滑动窗口**下的端到端时空掩码预测问题。其核心设计思想是：将长视频切分为具有重叠帧的短片断（clip），在每个片断内直接预测三维时空掩码体积，并通过嵌入匹配实现跨片断的实例关联，从而完全消除手工设计的跟踪启发式。
 
 ### 输入输出与处理范式
@@ -133,8 +127,6 @@ NOVIS 的整体架构（Figure 2）由五个核心模块串联而成，形成从
 ### 损失函数设计
 
 NOVIS 的训练损失由两部分组成：**体积 dice 损失**（volumetric dice loss）和**逐帧掩码损失**（per-frame mask loss）。体积 dice 损失在整个剪辑上计算单一损失值，实验证明其优于逐帧 dice 损失。然而，体积掩码损失因前景-背景像素严重不平衡（尤其当目标在部分帧中被完全遮挡时）而表现不佳，因此掩码损失仍维持在逐帧层面计算。值得注意的是，多帧分割损失**包含完全遮挡帧**，这使模型能够将遮挡预测为三维掩码中的缺失部分，并实现短时重识别。
-
-
 
 ### 3.1 问题形式化与输入输出
 
@@ -186,13 +178,6 @@ $$\hat{\mathbf{M}}_L(n,t) = 0 \quad \forall t$$
 
 与仅使用空间位置编码的基线方法不同，NOVIS 在空间编码基础上附加**可学习的时间编码**，注入帧序信息。消融实验表明该模块贡献 +0.8 AP（Table 3），是模型感知时序结构的必要组件。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1240_https_arxiv_org_abs_2308_15266/figures/001_Figure_1.jpg]]
-*Figure 1: A frame processing analysis and comparison of our near-online NOVIS approach with comparable online and offline baselines. We evaluate on a 2-fold training and the official validation split of OVIS. Figure (a) illustrates the training to test frame generalization gap of offline methods and the superiority of online methods recently observed by the VIS community. The near-online variants shown in (b) do not suffer from the gap and outperform online baseline. In Figure (c), we demonstrate how NOVIS outperforms online and offline approaches and benefits from computing overlap embeddings*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -230,15 +215,9 @@ Table 3 系统性地验证了从朴素 Mask2Former 应用到完整 NOVIS 模型�
 
 Figure 3 揭示了近在线配置的核心权衡：
 
-![[assets/figures/papers/paper_list_l1240_https_arxiv_org_abs_2308_15266/figures/004_Figure_3.jpg]]
-*Figure 3: Analysis on clip length and stride/overlap evaluated on training set splits of YouTube-VIS 2019 and OVIS. Instance tracking between clips is performed via cosine distance matching. Computing cross-attention between queries and clip overlaps improves performance for larger clip sizes*
-
 - **T=4, S=2** 在 YouTube-VIS 2019 和 OVIS 上均达到最优，既避免了离线方法的长序列泛化差距，又未出现纯在线方法的性能饱和。
 - 当 **T > 4** 时，像素解码器难以建模大幅度的物体运动，导致逐帧掩码质量下降（Figure 4 提供独立验证：T≤6 的多帧处理优于单帧处理，但更长剪辑的边际收益递减）。
 - 步长 S 控制相邻剪辑的重叠量：S 越小，重叠帧越多，匹配机会增加但计算开销上升。S=2 在精度与效率间取得平衡。
-
-![[assets/figures/papers/paper_list_l1240_https_arxiv_org_abs_2308_15266/figures/008_Figure_4.jpg]]
-*Figure 4: Analysis on mask prediction quality for different clip lengths T . Each model is trained and evaluated on a 2-fold split on the OVIS (Qi et al., 2022) training set. We evaluate per-frame mask prediction performance by processing video data with the same model either as single images or clips of size T*
 
 ### 掩码质量分析
 
@@ -258,15 +237,8 @@ Table 4 汇总了不同基准上的关键超参数差异。值得注意的是，
 ![[assets/figures/papers/paper_list_l1240_https_arxiv_org_abs_2308_15266/figures/007_Table_4.jpg]]
 *Table 4: Summary of NOVIS hyperparameters for several VIS benchmarks. In contrast to (Cheng et al., 2022), we drop the learning rate (LR) twice. The OVIS (Qi et al., 2022) benchmark contains sequences with more than 20 objects, hence we increase the number of top-k predictions at test-time*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1240_https_arxiv_org_abs_2308_15266/figures/009_Figure_5.jpg]]
 *Figure 5: Example qualitative results from the YouTube-VIS 2019/2021 validation sets. We show outputs from our NOVIS model with the top-performing Swin-L (Liu et al., 2021b) backbone for 4 frames uniformly selected over the given sequence*
-
-![[assets/figures/papers/paper_list_l1240_https_arxiv_org_abs_2308_15266/figures/010_Figure_6.jpg]]
-*Figure 6: Example qualitative results from the OVIS validation set. We show outputs from our NOVIS model with the top-performing Swin-L (Liu et al., 2021b) backbone for 4 frames uniformly selected over the given sequence. The model is evaluated with 360 pixels minimum scale at test-time (MST)*
-
-
 
 ## 定位与知识库关联
 
@@ -298,8 +270,6 @@ NOVIS 的设计打开了若干值得进一步探索的方向：
 3. **超长视频与密集场景的扩展。** 在 30 分钟以上且目标密集的视频中，NOVIS 的效率与精度如何？重叠嵌入的计算开销是否成为瓶颈？
 4. **匹配机制的进一步优化。** 重叠嵌入的设计能否与时间位置编码更深度耦合，以减少计算开销并提高对遮挡和形变的鲁棒性？
 5. **跨任务泛化。** 此类近在线思想能否扩展到其他视频理解任务，如视频全景分割（video panoptic segmentation）或视频语义分割？
-
-
 
 ## 原文 PDF
 

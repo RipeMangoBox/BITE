@@ -58,8 +58,6 @@ claims:
 
 **方法定位**：AL‑MDN属于单模型、单前向传递的主动学习范式，在精度上超越同类单模型方法，达到多模型方法的水平，同时大幅降低计算开销，为深度目标检测的主动学习提供了高效且全面的不确定性建模方案。
 
-
-
 深度目标检测模型的性能高度依赖大规模标注数据，但边界框级标注成本高昂，这促使主动学习成为降低标注代价的关键范式。然而，现有主动学习方法在目标检测任务中面临两个核心瓶颈。
 
 **计算效率瓶颈**。主流的不确定性估计方法依赖多模型或多前向传递。例如，**MC-dropout**（Feng et al., IV 2019）需要多次随机前向传播来近似后验分布，**Ensemble**（Haussmann et al., IV 2020）需训练并维护多个独立模型。如 Table 4 和 Figure 5 所示，MC-dropout 的单次前向时间达到 0.412 秒，是本文方法的 20 倍；Ensemble 的参数量高达 78.87M，计算开销显著。这些方法虽能提升主动学习精度，但高昂的计算成本限制了其在实际应用中的可扩展性。
@@ -67,8 +65,6 @@ claims:
 **信息量度量不全面**。现有单模型方法——如基于分类熵的 **Entropy**（Roy et al., BMVC 2018）、基于特征空间覆盖的 **Core-set**（Sener & Savarese, ICLR 2018）和基于损失预测的 **LLAL**（Yoo & Kweon, CVPR 2019）——仅利用分类不确定性来选择样本，忽略了定位任务中的不确定性信息。目标检测包含分类和定位两个子任务，两者的不确定性具有互补性。如 Table 3 所示，基于定位不确定性与分类不确定性选择的图像重叠率仅为 **14%**，表明两类不确定性提供了高度多样化的信息量信号，单独使用任一种都会遗漏大量有价值的样本。
 
 上述两个瓶颈的根源在于：确定性检测头无法在单次前向传播中同时捕获定位和分类任务的偶然不确定性（数据固有噪声）与认知不确定性（模型知识不足）。本文的核心动机正是通过概率建模改造检测头，在保持单模型、单前向传递效率的同时，显式估计并聚合四类不确定性，实现信息量更全面、计算成本更低的主动学习。
-
-
 
 ## 核心方法与创新机理
 
@@ -103,8 +99,6 @@ claims:
 
 本方法的本质创新在于：**通过输出层的概率化改造，将不确定性估计从“外部集成”内化为“单模型内部结构”，同时将不确定性空间从单一的分类维度拓展到定位与分类的联合维度，使单次前向传播即可捕获更全面的信息量信号**。这一定位使得方法在精度上超越所有单模型基线，与 MC-dropout、Ensemble 等多模型方法持平，而前向时间仅为 MC-dropout 的 1/20（Figure 5）。
 
-
-
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2103_16130/figures/002_Figure_2.jpg]]
 *Figure 2: An overview of the proposed object detection network. The main difference with conventional object detectors [31, 32] is in the localization and classification heads (branches). a) Instead of having deterministic outputs, our approach learns the parameters of K-components GMM for each of the outputs: coordinates of the bounding box in the localization head and the class density distribution in the classification (confidence) head (see Section 3.1). b) A classification head that improves the efficiency by eliminating variance parameters from GMM’s classification head (see Section 3.2)*
 
@@ -130,8 +124,6 @@ AL-MDN 的整体流程围绕“单模型、单前向传播同时估计定位与�
 - **输出**：每张图像获得一个标量信息量得分。主动学习循环中，选择得分最高的 top-$B$ 张图像送人工标注，加入训练集后重新训练模型，进入下一轮迭代。
 
 Figure 2 直观展示了标准检测头与 GMM 检测头的结构差异：确定性输出被替换为对每个输出量学习 $K$ 分量 GMM 参数，这是实现单次前向不确定性估计的架构基础。
-
-
 
 ### 3.1 混合密度网络（MDN）驱动的概率化目标检测
 
@@ -193,8 +185,6 @@ $$L = \begin{cases} \frac{1}{N} (\mathcal{L}_{loc}/\eta + \mathcal{L}_{cl}^{Pos}
 
 对于每张图像，首先对每个检测目标的四种不确定性（定位偶然/认知、分类偶然/认知）进行z-score归一化，使不同尺度的不确定性可比。随后取所有目标所有不确定性中的**最大值**作为该图像的信息量得分。消融实验（Table 2）表明，最大聚合显著优于单独使用任一类不确定性（提升约0.9 mAP），也优于求和聚合。其有效性根源在于定位与分类不确定性选择的图像重叠率仅为14%（Table 3），证明两者提供高度互补的信息。
 
-
-
 ## 实验与关键发现
 
 ### 概率建模对检测精度的基准影响
@@ -251,9 +241,6 @@ $$L = \begin{cases} \frac{1}{N} (\mathcal{L}_{loc}/\eta + \mathcal{L}_{cl}^{Pos}
 - **Figure 4a**：与单模型方法对比，Ours_gmm在所有标注量下均保持领先，最终10k时达到**75.98 mAP**，比LLAL（73.38）高2.6，比Entropy（71.17）高4.81。
 - **Figure 4b**：与多模型方法对比，Ours_gmm的曲线与MC-dropout（75.67）和Ensemble（75.90）几乎重合，但**Figure 5**显示其计算成本仅为MC-dropout的1/20（前向时间0.031s vs 0.618s@50次前向），参数量也远低于Ensemble。
 
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2103_16130/figures/008_Figure_4.jpg]]
-*Figure 4: VOC07+12: a) Comparison to published works using a single model for scoring. Numbers are taken from [40]; b) Comparison to multiple model-based methods, ensemble and MC-dropout. Details of the numbers to reproduce the plot are in the supplementary material*
-
 #### MS-COCO 大规模验证
 
 **Table 5** 在MS-COCO上第3轮（7k标注图像）的结果进一步验证了方法的可扩展性：
@@ -278,12 +265,6 @@ Ours_gmm以30.51 mAP与MC-dropout（30.49）和Ensemble（30.52）持平，比�
 - Ours_gmm在VOC07上达到78.55 mAP，比Faster R-CNN基线（77.42）提升**1.13 mAP**。
 - **Table 7** 进一步验证了数据集的可迁移性：使用Ours_gmm在SSD上选择的标注数据，迁移到Faster R-CNN、不同骨干网络（VGG→ResNet）训练时，仍比随机采样选择的等量数据提升最高**2.52 mAP**。这表明不确定性评分捕获的是**任务固有的困难样本特征**，而非特定模型架构的偏差。
 
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2103_16130/figures/011_Table_7.jpg]]
-*Table 7: VOC07: Transferability of a dataset created using the proposed scoring function and the mixture-based density models. As shown, datasets acquired using our method not only boost the performance of models using a different backbone but also the performance of two-stage detector such as Faster-RCNN*
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2103_16130/figures/012_Table_6.jpg]]
-*Table 6: VOC07: Performance comparison of our mixture models based on Faster-RCNN and the original Faster-RCNN as a baseline [32]*
-
 #### 超参数敏感性
 
 - **混合分量数K**（Table 8）：K=4在精度与计算成本间取得最佳平衡。K=2时mAP下降约0.3，K=8时精度不再提升但参数量和前向时间显著增加。
@@ -305,16 +286,6 @@ Ours_gmm以30.51 mAP与MC-dropout（30.49）和Ensemble（30.52）持平，比�
 ### 计算成本公平性说明
 
 所有实验均使用相同训练超参数（batch size=32, lr=0.001, 120k iterations），进行三次独立试验并报告均值±标准差。计算成本测量基于单张300×300图像的推理时间，在相同硬件环境下完成。Ours_gmm的额外参数集中在检测头的最后一层（GMM参数预测），不改变骨干网络结构，因此前向时间的增加（0.016s→0.031s）远小于MC-dropout的多前向累积（0.412s@25次）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2103_16130/figures/016_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2103_16130/figures/017_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2103_16130/figures/006_Table.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -353,8 +324,6 @@ AL-MDN的技术根基是将混合密度网络（Mixture Density Networks, MDN）
 2. **极端场景适应性**：该方法在类别分布极度不平衡（如长尾分布）、域偏移（如从自然图像到医学图像）或开放词汇检测等复杂场景下的不确定性估计质量如何？GMM的先验假设（高斯分布）在这些场景下可能不再成立。
 3. **与特征多样性策略的结合**：当前方法仅依赖不确定性进行样本选择。能否将显式不确定性估计与基于特征空间覆盖（如Core-set）或多样性采样的策略结合，在信息量和代表性之间取得更好的平衡？
 4. **计算效率的进一步优化**：虽然AL-MDN的单次前向传播已远快于MC-dropout和Ensemble，但GMM头仍引入了额外参数（约11M）。能否通过知识蒸馏或参数共享进一步压缩模型，使其更适合边缘设备上的主动学习部署？
-
-
 
 ## 原文 PDF
 

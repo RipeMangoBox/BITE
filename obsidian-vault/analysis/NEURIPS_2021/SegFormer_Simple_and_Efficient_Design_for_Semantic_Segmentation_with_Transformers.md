@@ -54,8 +54,6 @@ SegFormer针对上述瓶颈，提出了一套简洁而高效的语义分割框�
 
 这一设计带来了显著的性能与效率优势。在ADE20K上，SegFormer-B5达到51.8% mIoU，比SETR高1.6%，同时参数量减少4倍；在Cityscapes验证集上达到84.0% mIoU，比此前最佳方法高1.8%，速度快5倍。即使是最轻量的SegFormer-B0，也能以3.7M参数在Cityscapes上实现71.9% mIoU和48 FPS的实时推理速度。消融实验进一步表明，MLP解码器搭配Transformer编码器（MiT）显著优于搭配CNN编码器（ResNet/ResNeXt），验证了Transformer更大有效感受野对解码器性能的关键支撑作用。
 
-
-
 语义分割是计算机视觉的基础任务，要求为图像中的每个像素分配类别标签。该任务在自动驾驶、医学影像分析等场景中具有广泛的应用价值。长期以来，基于全卷积网络（FCN）的编码器-解码器架构主导了该领域，代表性工作包括 **DeepLabV3+**（Chen et al., ECCV 2018）和 **PSPNet**（Zhao et al., CVPR 2017）。这些方法以卷积神经网络（CNN）为骨干，虽然通过空洞卷积、金字塔池化等模块扩大了感受野，但CNN固有的局部操作限制了其捕获全局上下文的能力。
 
 近年来，Vision Transformer（ViT）的兴起为语义分割带来了新的范式。**SETR**（Zheng et al., CVPR 2021）首次将ViT作为分割编码器，利用自注意力机制捕获长程依赖，取得了优于CNN方法的性能。然而，SETR的设计存在两个关键瓶颈：
@@ -67,8 +65,6 @@ SegFormer针对上述瓶颈，提出了一套简洁而高效的语义分割框�
 此外，SETR的解码器设计沿用了传统CNN分割头（如多层3×3卷积），计算开销较大。后续工作如 **OCRNet**（Yuan et al., ECCV 2020）通过引入目标上下文表示进一步提升了精度，但整体架构仍依赖复杂的解码器设计，难以在精度和效率之间取得良好平衡。
 
 上述问题揭示了一个核心矛盾：Transformer的自注意力机制天然擅长捕获全局信息，但如何在不引入位置编码脆弱性的前提下，同时获得多尺度特征表示，并以轻量级方式融合这些特征，仍是未解决的关键挑战。SegFormer正是从这三个维度出发，重新设计了语义分割的Transformer架构。
-
-
 
 ## 核心方法与创新机理
 
@@ -99,8 +95,6 @@ $$F = Linear(4C, C)(Concat(\hat{F}_1, \dots, \hat{F}_4)), \quad M = Linear(C, N_
 
 SegFormer 的三项创新——Mix-FFN、层次化MiT编码器、全MLP解码器——共同构成了一个**极简但高效的分割框架**。它移除了位置编码和复杂解码器这两个传统组件，转而利用卷积的隐式位置信息和Transformer的天然全局感受野，在简化设计的同时实现了性能的显著提升。
 
-
-
 SegFormer 的整体设计遵循**分层编码器–轻量解码器**范式，由两个核心模块串联构成：层次化 Transformer 编码器（MiT）与全 MLP 解码器（All-MLP Decoder）。输入图像首先被划分为 4×4 的补丁，随后流经四个阶段的层次化编码器，输出分辨率分别为 1/4、1/8、1/16、1/32 的多尺度特征图；这些特征图直接送入仅由线性层构成的解码器，经过通道统一、上采样、拼接与 MLP 融合，最终通过线性投影生成分割掩膜。
 
 ### 数据流与模块关系
@@ -127,8 +121,6 @@ SegFormer 的整体设计遵循**分层编码器–轻量解码器**范式，由
 ### 框架优势
 
 这一设计将多尺度特征提取与融合完全解耦：编码器在低层产生类似卷积的局部注意力，在高层产生全局非局部注意力；解码器仅通过 MLP 直接融合这些多级特征，即可获得强大的语义表示，无需额外的空间金字塔池化、空洞卷积或交叉注意力模块。整个框架在保持极简结构的同时，实现了参数效率与分割精度的双重优势——SegFormer-B5 在 ADE20K 上以比 SETR 少 4 倍的参数量达到 51.8% mIoU（Table 2）。
-
-
 
 SegFormer 由两个核心模块构成：层次化 Transformer 编码器（MiT）与全 MLP 解码器。编码器负责提取多尺度特征，解码器仅通过 MLP 层融合这些特征并直接预测分割掩膜。
 
@@ -166,8 +158,6 @@ $$M = \mathrm{Linear}(C, N_{cls})(F) \tag{4}$$
 
 该设计的核心洞察在于：层次化 Transformer 编码器在低层产生类似卷积的局部注意力，在高层产生全局非局部注意力；全 MLP 解码器通过直接拼接和融合这些多尺度特征，即可获得强大的语义表示，无需额外的复杂上下文模块。Table 1d 的消融实验证实，将相同 MLP 解码器用于 CNN 编码器（ResNet/ResNeXt）时 mIoU 显著低于用于 MiT 编码器，验证了 Transformer 更大有效感受野的关键作用。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能：精度与效率的帕累托前沿
@@ -181,9 +171,6 @@ SegFormer在多个语义分割基准上实现了精度与效率的双重突破�
 
 ![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2105_15203/figures/006_Table_3.jpg]]
 *Table 3: Comparison to state of the art methods on Cityscapes test set. IM-1K, IM-22K, Coarse and MV refer to the ImageNet-1K, ImageNet-22K, Cityscapes coarse set and Mapillary Vistas. SegFormer outperforms the compared methods with equal or less extra data*
-
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2105_15203/figures/007_Table_4.jpg]]
-*Table 4: Results on COCO-Stuff full dataset containing all 164K images from COCO 2017 and covers 172 classes*
 
 ### 消融实验：设计选择的因果验证
 
@@ -213,23 +200,8 @@ Figure 3可视化了DeepLabV3+与SegFormer在Cityscapes上的有效感受野（E
 
 Figure 4和Figure 5展示了Cityscapes、ADE20K和COCO-Stuff上的分割可视化。相比SETR，SegFormer在物体边界附近预测出明显更精细的细节；相比DeepLabV3+，SegFormer显著减少了长程错误（如Figure 4中红色高亮区域），直观验证了Transformer全局注意力机制在语义分割中的优势。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2105_15203/figures/012_Figure_5.jpg]]
 *Figure 5: Qualitative results on Cityscapes, ADE20K and COCO-Stuff. First row: Cityscapes. Second row: ADE20K. Third row: COCO-Stuff. Zoom in for best view*
-
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2105_15203/figures/014_Figure_7.jpg]]
-*Figure 7: Comparison of zero shot robustness on Cityscapes-C between SegFormer and DeepLabV3+. Blue line is SegFormer and orange line is DeepLabV3+. X-Axis means corrupt severity and Y-Axis is mIoU. Following[77], we test 3 severities for “Noise” and 5 severities for the rest*
-
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2105_15203/figures/010_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2105_15203/figures/011_Table_7.jpg]]
-*Table 7: Mix Transformer Encoder*
-
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2105_15203/figures/001_Figure_1.jpg]]
-*Figure 1: Performance vs. model efficiency on ADE20K. All results are reported with single model and single-scale inference. SegFormer achieves a new state-of-the-art 51.0% mIoU while being significantly more efficient than previous methods*
-
-
 
 ## 定位与知识库关联
 
@@ -244,8 +216,6 @@ Figure 4和Figure 5展示了Cityscapes、ADE20K和COCO-Stuff上的分割可视�
 **适用边界与局限。** SegFormer在标准基准上展现了强大的性能（ADE20K: 51.8% mIoU；Cityscapes: 84.0% mIoU），且SegFormer-B0以3.7M参数在Cityscapes上达到76.2% mIoU/15.2 FPS的实时性能，显著优于DeepLabV3+ MobileNetV2（75.2%/8.4 FPS）。然而，其高效自注意力机制通过序列缩减比R将K/V的序列长度压缩，在极高分辨率输入下仍可能面临计算瓶颈。此外，最小的SegFormer-B0是否能在内存仅100K的极端边缘设备上正常工作，仍是一个开放问题。论文未报告在医学影像、遥感等特殊领域的迁移表现，这些场景中Transformer的归纳偏置是否同样有效需要进一步验证。
 
 **鲁棒性评估。** 在Cityscapes-C损坏数据集上，SegFormer在所有损坏类型上均优于DeepLabV3+（Table 5），且在不同损坏严重度下的性能下降曲线更平缓（Figure 7），表明Mix-FFN提供的卷积式位置先验可能增强了模型对图像损坏的结构鲁棒性。这一特性与ViT类模型通常需要大规模数据训练才能获得鲁棒性的认知形成对比，但论文未深入分析其内在机制。
-
-
 
 ## 原文 PDF
 

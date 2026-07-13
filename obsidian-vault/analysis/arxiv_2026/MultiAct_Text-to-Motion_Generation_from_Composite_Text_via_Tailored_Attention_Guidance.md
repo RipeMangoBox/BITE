@@ -75,8 +75,6 @@ MultiAct 的独特优势在于：**无需重新训练或修改骨干架构**，�
 
 > **注意**：评估所用的复合提示集为作者自行构造，格式限定为“\<prefix\> while \<suffix\>”，其分布可能与真实使用场景存在偏差；双模态距离指标的有效性仅通过人工设计的辅助任务验证，尚缺乏大规模标准测试。
 
-
-
 ### 任务场景：复合文本到运动生成
 
 文本到运动生成（Text-to-Motion Generation）旨在根据自然语言描述合成逼真的三维人体运动序列。近年来，基于扩散模型的方法在单动作生成上取得了显著进展，但当文本提示包含**同时发生的多个动作**（composite prompts）时，现有方法暴露出一个关键瓶颈：**语义消失（vanishing semantics）**。
@@ -103,8 +101,6 @@ MultiAct 的独特优势在于：**无需重新训练或修改骨干架构**，�
 3. **可泛化性**：若干预策略能够根据提示自适应调整，则可处理未见过的复合动作组合。
 
 MultiAct 正是在这一动机下提出的：它通过**定制化注意力引导（tailored attention guidance）**，在推理过程中选择性地放大未被充分表示的标记（underrepresented tokens）的交叉注意力得分，从而恢复缺失的动作语义。同时，为了消除人工调参的负担并实现跨提示泛化，MultiAct 引入轻量级参数决策方案 **ParamGate**，自动预测每个提示对应的最优增强参数。
-
-
 
 ## 核心方法与创新机理
 
@@ -141,8 +137,6 @@ ParamGate 将参数预测分解为三个子问题，分别采用非深度学习�
 
 综上，MultiAct 的创新本质是**将复合文本到运动生成的失败归因于交叉注意力分布不均，并通过提示定制化的、时机精准的注意力调制来修复这一问题**，从而在不改变骨干模型的前提下，显著提升了复合动作的语义覆盖和生成质量。
 
-
-
 MultiAct 的整体流程围绕一个核心原则构建：**在预训练扩散模型的推理阶段，通过定制化的交叉注意力引导，恢复复合文本提示中被压制的动作语义**。整个框架无需对骨干模型进行重新训练或架构修改，仅通过干预推理过程实现语义覆盖的改善。
 
 ### 流程总览
@@ -176,12 +170,8 @@ MultiAct 的四个核心模块按如下方式协作：
 
 > **注意**：ParamGate 的具体决策机制（最近邻、阈值分类、LLM 测试时缩放）将在后续章节详细展开，此处仅说明其在整体流程中的位置与功能。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2605_30925/figures/001_Figure_1.jpg]]
 *Figure 1: MultiAct synthesizes motion from composite textual descriptions by selectively modulating cross-attention to amplify weakly represented elements in the prompt. Blue: Backbone text-to-motion synthesis fails to generate key action components, such as raising the arms while hopping forward (left) and dribbling a ball while moving backward (right). Brown: Our framework successfully generates all action primitives specified in the prompt. Color saturation indicates time progression; higher saturation indicates later times*
-
-
 
 ### 问题形式化与交叉注意力机制
 
@@ -241,18 +231,11 @@ $$\mathcal{L}_{\mathrm{simple}} = \mathbb{E}_{t \sim [1, T]} \| x_0 - p_\theta(x
 
 MultiAct 在此预训练骨干之上进行推理时干预，不涉及对该损失的任何修改或微调。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2605_30925/figures/003_Figure_3.jpg]]
 *Figure 3: Attention visualization. The colored heatmaps illustrate attention scores for the words “forward” (yellow) and “arms” (green). Our backbone assigns low attention to arm-related tokens, resulting in motions in which the arms are not raised. In contrast, our method assigns high attention scores to both tokens, producing a synchronized motion that faithfully reflects the prompt*
 
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2605_30925/figures/004_Figure_4.jpg]]
 *Figure 4: Attention guided generation. This figure visualizes Algs 1 and 2. Left: Diffusion inference pipeline (Appendix A.2) with tailored optimization integrated. Tailored optimization modifies the data tensors*
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2605_30925/figures/006_Figure_6.jpg]]
-*Figure 6: Deviation space visualization. Each point corresponds to a single parameter combination and shows the prefix and suffix deviation values for the prompt shown above. Distance from the origin indicates the dual multimodal distance. Points are color-coded by transformer layer ℓ, revealing a visual separation in which parameter combinations closest to the origin are dominated by layers 3 to 5*
-
-
 
 ## 实验与关键发现
 
@@ -263,9 +246,6 @@ MultiAct 在此预训练骨干之上进行推理时干预，不涉及对该损�
 - **双模态距离（Dual MM Dist）**：基于骨干模型MDM*的特征空间，分别计算生成运动与prefix和suffix文本嵌入的匹配偏差，再取均方根。该指标的有效性通过人工设计的几何启发式规则（如手臂抬举高度）进行了视觉验证（Fig. 5），未发现假阳性或假阴性，表明其能可靠反映文本-运动对齐程度。
 - **R Precision Top1**：在HumanML3D的“while”子集上，衡量生成运动与正确文本的匹配精度。
 - **用户研究**：在质量、文本对齐和综合偏好三个维度上进行成对比较投票。
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2605_30925/figures/005_Figure_5.jpg]]
-*Figure 5: Deviation measure credibility. Visual sanity check for the deviation scores, where each point corresponds to a parameter combination; the vertical axis shows the suffix deviation, and the horizontal axis depicts a prompt-specific geometric heuristic based on maximum hand-shoulder distance. Low suffix deviation errors*
 
 ### 与基线方法的定量比较
 
@@ -303,27 +283,11 @@ MultiAct的推理时间约为骨干模型的 **6倍**，其中注意力优化循
 
 评估所用的复合提示集由作者自行构造，格式限定为“while”结构，可能无法完全覆盖真实场景中更灵活的复合语义表达。双模态距离指标依赖于特定骨干的特征空间，更换骨干需重建约4000次生成的数据集，迁移成本较高。此外，交叉注意力引导每次仅强化单一标记，对于三个以上动作同时发生的极端复杂语义，其有效性尚未充分验证，需人工确认。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2605_30925/figures/010_Table_1.jpg]]
 *Table 1: Comparison with baselines. MultiAct consistently outperforms the baselines across all categories on composite prompts. STMC, designed to accommodate co-occurring actions, ranks second in the user study. User study results reported here reflect Fig. 10, where our score is the average over comparisons with all baselines. Bold and underline denote best and second best, respectively. (· )∗ indicates the method was adapted to align with our task*
 
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2605_30925/figures/012_Table_2.jpg]]
-*Table 2: Evaluation on HumanML3D “\<prefix> while \<suffix>” subset. MultiAct outperforms its backbone, despite the test set being suboptimal for our purposes*
-
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2605_30925/figures/014_Table_3.jpg]]
 *Table 3: Ablation. Using a fixed parameter set yields poor results, while progressively introducing prompt-tailored selection of layers, steps, and tokens improves alignment, with test-time scaling performing best*
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2605_30925/figures/007_Figure_7.jpg]]
-*Figure 7: Qualitative results. Our method consistently maintains high motion quality and strong text alignment. In contrast, other baselines either attend to a single dominant verb, exhibit occasional floor penetration or motion artifacts, or produce unnatural results*
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2605_30925/figures/008_Figure_8.jpg]]
-*Figure 8: Motion stylization. When prompted with motion stylization, existing methods fail either to generate both actions simultaneously or to incorporate the requested style. In contrast, our method supports motion stylization in parallel with multiple simultaneous actions, successfully integrating both into the generated motion. Note the characteristic imbalance in our result, reflecting the specified drunken style*
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2605_30925/figures/009_Figure_9.jpg]]
-*Figure 9: Motion diversity. When sampled multiple times with the same prompt and parameter combinations, MultiAct generates diverse, high-quality motions that consistently satisfy both simultaneous actions*
-
-
 
 ## 定位与知识库关联
 
@@ -364,8 +328,6 @@ MultiAct 面向**复合文本到运动生成**（compositional text-to-motion）
 - 偏差度量在**更多样化的文本格式**下是否依然有效？若否，如何设计更通用的文本-运动对齐指标？
 - 该方法是否可迁移到**其他条件生成任务**（如文本到视频、音乐生成）？
 - 能否将 ParamGate 的决策逻辑**内化到可学习的模块**中，完全消除推理时的参数搜索，从而降低计算开销？
-
-
 
 ## 原文 PDF
 

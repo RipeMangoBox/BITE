@@ -58,8 +58,6 @@ claims:
 
 该方法仍存在若干限制：假设模型和数据采样策略在收集过程中保持不变；校正因子 τ 需在留出任务上调参；以及对于不满足凹单调特性的任务（如个别类别 AP 波动），回归函数的适用性有待进一步验证。
 
-
-
 ### 问题定义：下游任务的数据需求估计
 
 在构建机器学习系统时，一个反复出现的实际问题是：**为达到目标性能，还需要收集多少数据？** 给定一个初始数据集 $\mathcal{D}_0$（大小为 $n_0$）、一个模型 $f$ 和一个目标得分 $V^*$，数据收集问题的目标是确定最小的额外数据量 $\hat{n}$，使得在最多 $T$ 轮迭代收集中，模型在扩充数据集上的得分达到或超过 $V^*$。
@@ -91,8 +89,6 @@ claims:
 - **多轮迭代收集**：将数据收集过程组织为最多 $T=5$ 轮的迭代循环（Figure 2），每轮重新拟合回归函数并修正估计，逐步逼近真实需求。
 
 - **校正因子 $\tau$**：在估计数据需求时，将目标性能提高一个偏置项 $\tau$（即求解 $\hat{v}(n_0 + \hat{n}; \boldsymbol{\theta}^*) \ge V^* + \tau$），以克服回归误差导致的系统性低估。$\tau$ 可在一个保留任务（如 CIFAR10）上调参确定。
-
-
 
 ## 核心方法与创新机理
 
@@ -157,8 +153,6 @@ $\tau$ 的调参在一个保留任务（CIFAR10）上完成，然后直接迁移
 3. 校正因子 $\tau$ 需在保留任务上调参，当目标任务特性与调参任务差异较大时可能不够鲁棒
 4. 模拟中以 ground truth $v(n)$ 代替实际重新训练，可能低估了重复训练引入的方差
 
-
-
 本文提出的数据需求估计框架围绕一个核心迭代循环构建：**用有限初始数据拟合性能外推函数 → 估计达到目标性能所需数据量 → 按估计量收集新数据 → 重新拟合并修正估计**，在最多 T 轮内逐步逼近真实的数据需求。图 Figure 2 展示了这一循环的宏观流程。
 
 ### 问题形式化
@@ -194,8 +188,6 @@ $\tau$ 的调参在一个保留任务（CIFAR10）上完成，然后直接迁移
 - **多函数策略**：单一回归函数（如 Power Law）在性能外推上 RMSE 较低，但用于数据需求估计时方向性偏差显著。框架引入四类函数（乐观的 Power Law、Logarithmic 与悲观的 Arctan、Algebraic Root），既可单独使用，也可组合构建需求区间（见 Figure 5）。
 - **多轮迭代（$T=5$）**：单轮估计（$T=1$）无法可靠满足目标——乐观函数导致低估（比率 $<1$），悲观函数导致严重高估（如 Arctan 在 ImageNet 上首轮即估计需 450 万张图像，而实际仅需 90 万张）。多轮迭代通过逐步修正回归曲线，将收集数据量与最小需求的比率控制在 1–2 倍以内（见 Figure 3、Figure 4）。
 - **校正因子 $\tau$**：通过在目标 $V^*$ 上增加一个正的偏移量 $\tau$，抑制乐观回归函数的低估倾向。$\tau$ 需在保留任务（如 CIFAR10）上调参确定，再迁移至目标任务。
-
-
 
 ### 问题形式化：数据收集问题
 
@@ -243,8 +235,6 @@ $\tau$ 的作用是提高目标值，迫使乐观回归函数（如 Power Law、
 $$\frac{n_0 + \hat{n}}{n_0 + n^*}$$
 其中 $n^*$ 是满足真实得分曲线 $v(n_0 + n^*) = V^*$ 的最小数据量。比值 $<1$ 表示低估（未达目标），$>1$ 表示高估（收集了多余数据）。理想情况下比值应接近 1 且不小于 1。
 
-
-
 ## 实验与关键发现
 
 ### 1. 实验设置与评估协议
@@ -268,7 +258,6 @@ $$\frac{n_0 + \hat{n}}{n_0 + n^*}$$
 **Table 3** 报告了各回归函数在不同数据比例下的外推 RMSE。一个关键的反直觉发现是：**最低的 RMSE 并不转化为最可靠的数据需求估计**。在 ImageNet 上，Arctan 函数以 $3.19 \pm 2.1$ 的 RMSE 取得最佳拟合（$n_0 = 10\%$），但如 **Figure 3** 所示，使用 Arctan 进行单轮估计会导致首轮即收集约 450 万张图像——远超实际所需的约 90 万张（$n^*$ 对应 67% 验证精度）。
 
 这一悖论的根源在于 **Figure 1** 揭示的敏感性问题：四条外推曲线在 50% 数据量（60 万张）上拟合时，精度误差仅 1-6%，但估计所需数据量却偏离 12 万到 31 万张。这说明即使外推曲线整体贴近 ground truth，在目标阈值 $V^*$ 附近的微小偏差也会被反函数求解放大为巨大的数据量误估。
-
 
 ---
 
@@ -312,9 +301,6 @@ $$\frac{n_0 + \hat{n}}{n_0 + n^*}$$
 
 1. **凹单调假设的违背**：VOC 和 BDD100K 上的部分回归曲线（**Figure 6**）显示性能增长并非严格凹形，导致 Algebraic Root 和 Arctan 的拟合偏差增大。这是方法的一个结构性局限——当基础任务的学习曲线形态偏离假设族时，估计质量会退化。
 
-![[assets/figures/papers/paper_list_l49_https_arxiv_org_abs_2207_01725/figures/012_Figure_6.jpg]]
-*Figure 6: Regression plots showing mean±standard deviation of multiple runs extrapolating performance in each task when trained on small subsets of the data. The solid blue line in each plot represents the ground truth performance*
-
 2. **校正因子的迁移敏感性**：$\tau$ 在 CIFAR10 上调参后直接应用于 nuScenes 等异构任务（分类 → 检测/分割），虽然多数类别有效，但缺乏任务自适应的 $\tau$ 选择机制（见 **Open Questions**）。
 
 3. **Ground truth 模拟的局限性**：实验中使用预计算的 $v(n)$ 替代实际重训练，虽然消除了训练方差，但可能低估了真实场景中重复训练引入的额外不确定性。
@@ -341,15 +327,6 @@ $$\frac{n_0 + \hat{n}}{n_0 + n^*}$$
 - **Figure 7**：不同 backbone 架构下的数据需求比（CIFAR100）。
 - **Figure 8**：nuScenes 类别级 AP 的回归曲线与数据需求比。
 - **Figure 9**：主动学习策略下的回归曲线与数据需求比（CIFAR100）。
-
-![[assets/figures/papers/paper_list_l49_https_arxiv_org_abs_2207_01725/figures/016_Figure_9.jpg]]
-*Figure 9: Experiments evaluating three different active learning strategies on CIFAR100 with n0 = 20% of the data set and T = 5 rounds. (Left) regression plots showing mean±standard deviation extrapolating performance. (Right) The ratio of data collected versus the minimum data needed (y-axis) for different target V ^ { * } (x-axis) in simulations*
-
-
-
-
-
-
 
 ## 定位与知识库关联
 
@@ -389,8 +366,6 @@ $$\frac{n_0 + \hat{n}}{n_0 + n^*}$$
 3. 当数据采集过程中模型更新时，数据需求估计应如何动态调整？
 4. 如何利用类别级或样本级指标优化每轮采样策略 $p(z)$，以在更少数据量下满足全局目标？
 5. 对于不满足凹单调特性的任务，是否有更灵活的回归模型（如非参数方法）能够可靠拟合性能曲线？
-
-
 
 ## 原文 PDF
 

@@ -45,15 +45,11 @@ claims:
 
 Dream4Drive 的方法定位介于**3D资产驱动仿真**与**生成式视频编辑**之间：它不依赖昂贵的3D标注，仅需RGB视频和3D感知引导图即可训练；同时通过多条件融合适配器将五种引导信号注入扩散Transformer，实现了对场景几何和外观的精细控制。主要结果验证了少样本合成数据对下游感知任务的显著提升效果，为自动驾驶数据增强开辟了新的技术路径。
 
-
-
 自动驾驶感知模型依赖大规模标注数据，但真实场景的采集与标注成本高昂，且长尾场景覆盖不足。数据增强可缓解这一问题，然而现有方法存在结构性缺陷：**传统增强**（如复制-粘贴）仅操作2D图像平面，缺乏3D几何一致性，导致前景物体与背景的遮挡、尺度、光照不匹配；**基于NeRF/3DGS的场景重建方法**虽能生成多视角一致数据，但依赖昂贵的3D标注，且编辑灵活性受限——难以在指定3D位置插入多样化物体。
 
 近期扩散模型在图像/视频生成上展现出强大能力，为数据合成提供了新路径。但直接将扩散模型用于驾驶场景编辑面临关键瓶颈：**隐式3D控制不足**。纯2D生成模型难以精确指定物体的3D位姿，也无法保证前景与背景在深度、法向、边缘层面的几何对齐，导致合成数据在几何真实性和标注精度上出现退化，进而损害下游感知任务的训练效果。
 
 针对上述缺口，本文提出**Dream4Drive**，一个3D感知的合成数据生成框架。其核心动机是：通过引入**密集3D感知引导图**（深度、法向、边缘、物体轮廓、掩码）作为扩散模型的条件控制信号，在保持原始视频几何结构的前提下，实现3D资产的精确插入与外观多样化编辑。该框架不依赖昂贵的3D标注，仅需RGB视频即可训练，旨在以极少量合成样本（<2%）显著提升感知模型的检测与跟踪性能。
-
-
 
 ## 核心方法与创新机理
 
@@ -76,8 +72,6 @@ $$\mathcal{F}_{\mathrm{fusion}} = \mathrm{FusionNet}\left( \bigoplus_{k=1}^{5} \
 与需要大规模合成数据或复杂 3D 标注的方法不同，Dream4Drive 在训练时**不需要任何昂贵的 3D 标注**，仅依赖 RGB 视频和自动提取的 3D 感知引导图。实验表明，在相同训练轮次下，仅插入 **420 个合成样本（不足原始数据量的 2%）** 即可在 nuScenes 检测任务上超越使用全部合成数据的先前方法。这一 changed slot 的关键在于：3D 感知引导图提供了强几何先验，使得少量合成样本就能有效覆盖长尾分布中的几何和外观变化。
 
 **与 baseline 的本质差异总结**：Dream4Drive 将自动驾驶数据增广从“生成新图像”重新定义为“编辑已有视频”，并通过稠密 3D 感知引导图实现了**几何一致性、外观多样性和标注精确性**的统一，而这是隐式生成模型（如 DrivingDiffusion）或简单粘贴方法无法同时保证的。
-
-
 
 Dream4Drive 是一个面向自动驾驶感知的 3D‑aware 合成数据生成框架。其核心思路是：**先对输入视频进行 3D‑aware 的几何‑外观解耦，再在解耦后的引导图空间上渲染 3D 资产，最后通过条件生成模型合成具有几何一致性和外观多样性的编辑视频**。整个 pipeline 可划分为三个主要阶段。
 
@@ -108,8 +102,6 @@ $$
 **输入输出流总结：** 输入为原始 RGB 视频和待插入的 3D 资产，输出为编辑后的视频及其精确的 3D 标注（bounding box、track ID 等）。整个训练过程**不需要昂贵的 3D 标注**，仅依赖 RGB 视频和可自动提取的 3D‑aware 引导图。
 
 **关键设计决策：** 与以往依赖隐式 3D 控制或简单投影的方法不同，Dream4Drive 通过显式的密集 3D‑aware 引导图来保持原始视频的几何与外观，同时允许在任意 3D 位置灵活插入多样化的资产，从而在几何一致性和外观多样性之间取得平衡。
-
-
 
 ### 3D‑Aware 视频编辑流水线
 
@@ -149,19 +141,6 @@ $$L_{\mathrm{total}} = \lambda_{\mathrm{diffusion}} \mathcal{L}_{\mathrm{diffusi
 
 权重经验设置为 $\lambda_{\mathrm{diffusion}}=1.0$，$\lambda_{\mathrm{mask}}=0.1$，$\lambda_{\mathrm{lpips}}=0.1$。训练仅需 RGB 视频及其 3D‑Aware 引导图，无需昂贵的 3D 标注。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l69_https_openreview_net_forum_id_z3cFADf6zZ/figures/003_Figure_3.jpg]]
-*Figure 3: The illustration of 3D-aware scene editing. Given the input images, we first obtain the depth map, normal map, and edge map for the background and then render the object image and object mask for the target 3D asset*
-
-![[assets/figures/papers/paper_list_l69_https_openreview_net_forum_id_z3cFADf6zZ/figures/004_Figure_4.jpg]]
-*Figure 4: The illustration of 3D-aware video rendering. Given the 3D-aware guidance maps, we employ a multi-condition fusion adapter to control the video generation of a diffusion transformer, rendering the edited video*
-
-![[assets/figures/papers/paper_list_l69_https_openreview_net_forum_id_z3cFADf6zZ/figures/005_Figure_5.jpg]]
-*Figure 5: The illustration of creating a 3D asset in DriveObj3D. We first apply a segmentation model to segment the target object, then generate multi-view images, and finally create a 3D mesh from those images*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -182,9 +161,6 @@ Dream4Drive 在 nuScenes 检测与跟踪任务上验证了合成数据的有效�
 *Table 4: Tracking performance under different training epochs (1x, 2x, 3x). “Naive Insert” denotes the direct projection of 3D assets into the original scene. Results are reported at 512×768 resolution*
 
 一个反直觉的发现来自 Figure 1：**在 2× 训练轮次下，仅使用真实数据训练的模型在 mAP 和 NDS 上反而高于混入合成数据的模型**。这表明合成数据的增益并非单调递增，其有效性与训练轮次存在交互效应——在特定训练饱和点，合成数据可能引入分布偏移而非正向增强。这一现象在后续缩放分析中得到进一步验证。
-
-![[assets/figures/papers/paper_list_l69_https_openreview_net_forum_id_z3cFADf6zZ/figures/001_Figure_1.jpg]]
-*Figure 1: Dream4Drive demonstrates the effectiveness of synthetic data: with fewer than 2% synthetic samples, it consistently improves detection and tracking across epochs, outperforming previous data augmentation baselines under fair evaluation. 1× denotes the baseline training epochs; 2× and 3× represent twofold and threefold increases, respectively*
 
 ### 消融实验
 
@@ -221,18 +197,8 @@ Dream4Drive 在 nuScenes 检测与跟踪任务上验证了合成数据的有效�
 2. **训练轮次交互**：合成数据并非在所有训练阶段都有效。在 2× 轮次下，纯真实数据表现更优，说明合成数据可能引入分布偏移，在模型已充分拟合真实分布时反而造成干扰。
 3. **缩放不稳定性**：OOD 样本数量的增加不带来单调增益，表明当前的合成数据生成策略在规模化时面临质量-数量权衡问题。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l69_https_openreview_net_forum_id_z3cFADf6zZ/figures/006_Figure_6.jpg]]
 *Figure 6: Comparison of 3D asset generation across different methods. Our simple yet effective method produces better 3D assets across diverse categories in autonomous driving, outperforming existing baselines. Con vehicle is construction vehicle; Pdes is Pedestrian; T cone is traffic cone*
-
-![[assets/figures/papers/paper_list_l69_https_openreview_net_forum_id_z3cFADf6zZ/figures/017_Table_9.jpg]]
-*Table 9: Effect of style-transferred OOD synthetic data. Adding environmental diversity improves all downstream perception metrics*
-
-![[assets/figures/papers/paper_list_l69_https_openreview_net_forum_id_z3cFADf6zZ/figures/014_Table_6.jpg]]
-*Table 6: Automation and manual efforts involved in synthesizing the 420 samples*
-
-
 
 ## 定位与知识库关联
 
@@ -271,8 +237,6 @@ Dream4Drive 定位于**基于生成模型的 3D 感知数据增强**，与三类
 - **合成数据的最优比例**：420 个样本（<2%）即有效，但该比例是否最优？是否存在合成数据占比的“甜点区”？原文未进行比例扫描实验。
 
 > **注意**：以上开放问题均基于原文未覆盖的分析维度推断，需后续工作验证。
-
-
 
 ## 原文 PDF
 

@@ -51,8 +51,6 @@ claims:
 
 MTVCraft将运动条件从2D渲染图像推进到4D离散标记，为开放世界人物动画提供了一种更稳健、更具表达力的技术路径。
 
-
-
 ### 问题背景
 
 人物图像动画（Human Image Animation）旨在根据给定的参考人物图像和驱动运动序列，生成一段保持人物身份一致、且准确复现目标运动的视频。这项技术在虚拟数字人、影视制作、社交媒体内容生成等领域具有广泛的应用前景。一个核心挑战在于：如何从驱动视频中提取运动信号，并将该信号有效地注入生成模型，使得生成的人物既能忠实跟随目标姿态，又能保持外观细节不丢失。
@@ -77,8 +75,6 @@ MTVCraft将运动条件从2D渲染图像推进到4D离散标记，为开放世�
 - **如何让视频DiT模型有效地利用这些4D运动标记？** 需要设计一种运动感知的注意力机制，使视觉标记（video tokens）能够以时空一致的方式查询运动标记中的姿态信息。
 
 Figure 2(b) 直观对比了两种范式：传统方法将3D运动渲染为2D图像再输入模型，而MTVCraft直接将4D运动标记作为条件，保留了完整的时空运动信息。这一设计使得模型能够学习到更稳健的运动-视觉对应关系，从而在开放世界中实现零样本泛化——包括任意视觉风格（动漫、像素画、水墨、写实）、任意人物类型（全身、半身），甚至非人角色（动物、无生命物体），如Figure 1所示。
-
-
 
 ## 核心方法与创新机理
 
@@ -119,8 +115,6 @@ MTVCraft 进一步引入可训练的**无条件运动标记**，在训练过程�
 
 综上，MTVCraft 通过“4D运动标记化 + 4D运动注意力 + 4D RoPE”的组合创新，将运动条件从间接的2D视觉信号提升为直接的4D时空语义表示，实现了运动与外观的彻底解耦，这是其在开放世界场景中取得显著零样本泛化能力的根本原因。
 
-
-
 MTVCraft 的整体 pipeline 由两大核心模块串联构成：**4D 运动标记器（4DMoT）** 与 **运动感知视频 DiT（MV-DiT）**，形成一条从原始 SMPL 关节序列到动画视频的端到端生成链路。
 
 ### 输入输出流
@@ -154,12 +148,8 @@ MTVCraft 的整体 pipeline 由两大核心模块串联构成：**4D 运动标�
 
 MTVCraft 提供两种参数规模：6B 版本基于 CogVideoX-5B 构建，18B 版本基于 Wan-2-1-14B 构建（Section 3.3）。在 18B 版本中，通过零填充将运动标记维度与 DiT 隐藏维度对齐，实现文本与运动的联合控制。消融实验表明，用线性层或 MLP 替代零填充无法在 10000 步内收敛，证明简单投影不足以稳定大规模运动学习（Appendix H）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1831_MTVCrafter_4D_Motion_Tokenization_for_Open_World_Human_Image_Animation/figures/001_Figure_1.jpg]]
 *Figure 1: Teaser. We propose MTVCraft, a versatile framework that can effectively transfer pose sequences from a driven video in either full-body or half-body settings, while supporting a wide range of visual styles such as anime, pixel art, ink drawings, and photorealism. Beyond human characters, MTVCraft is further capable of handling non-human subjects such as animals and even inanimate objects, demonstrating superior robustness, strong generalizability to open-world scenarios, and the emergent ability to animate arbitrary characters*
-
-
 
 MTVCraft 的核心设计围绕两个关键模块展开：**4DMoT（4D运动标记器）** 和 **MV-DiT（运动感知视频DiT）**。前者将原始SMPL关节坐标序列压缩为离散的4D运动标记，后者以这些标记为条件生成动画视频。
 
@@ -213,19 +203,6 @@ $$
 
 MTVCraft提供6B和18B两个版本。6B版本基于CogVideoX-5B骨干网络，18B版本采用Wan-2-1-14B骨干网络。在18B版本中，通过零填充将运动标记维度对齐到DiT的隐藏维度，实现联合文本-运动控制，进一步提升了生成性能。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1831_MTVCrafter_4D_Motion_Tokenization_for_Open_World_Human_Image_Animation/figures/003_Figure_3.jpg]]
-*Figure 3: Architecture of 4DMoT. An encoder-decoder framework learns spatial-temporal latent representations of SMPL joint coordinates, and a vector quantizer learns 4D compact yet expressive tokens in a unified space. All operations are in 2D space along the frame and joint axes*
-
-![[assets/figures/papers/paper_list_l1831_MTVCrafter_4D_Motion_Tokenization_for_Open_World_Human_Image_Animation/figures/004_Figure_4.jpg]]
-*Figure 4: Architecture of MTVCraft-6B. Based on the video DiT model, we design unique 4D motion attention to leverage 4D motion tokens as context for vision generation. To enhance spatialtemporal relationships, we apply 4D RoPE over*
-
-![[assets/figures/papers/paper_list_l1831_MTVCrafter_4D_Motion_Tokenization_for_Open_World_Human_Image_Animation/figures/008_Figure_6.jpg]]
-*Figure 6: Architecture of MTVCraft-18B. To demonstrate the versatility of our approach and further improve performance, we scale the model to a larger DiT and enable joint text-motion control. Here, zero-padding aligns the motion token dimension with the DiT hidden dimension*
-
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -254,9 +231,6 @@ Table 3 报告了 Fashion 基准上的结果，MTVCraft-18B 同样取得全面�
 ### 消融研究：4D 运动标记化组件
 
 Table 2 系统拆解了 4D 运动标记化（4D Motion Tokenizer）和 4D 运动注意力（4D Motion Attention）各组件的作用。
-
-![[assets/figures/papers/paper_list_l1831_MTVCrafter_4D_Motion_Tokenization_for_Open_World_Human_Image_Animation/figures/007_Table_2.jpg]]
-*Table 2: Ablation Study on TikTok (Jafarian & Park, 2021) Benchmark*
 
 **离散量化的必要性。** 移除量化后，VQ-VAE 退化为标准自编码器，产生连续运动标记，导致 FVD 从 317.21 升至 332.97。离散标记空间通过码本约束迫使模型学习更紧凑、更具判别力的运动表征，连续标记则引入了噪声和冗余。
 
@@ -297,16 +271,8 @@ Table 2 系统拆解了 4D 运动标记化（4D Motion Tokenizer）和 4D 运动
 ![[assets/figures/papers/paper_list_l1831_MTVCrafter_4D_Motion_Tokenization_for_Open_World_Human_Image_Animation/figures/013_Figure_10.jpg]]
 *Figure 10: Effectiveness of 4D RoPE for Motion-Vision Interaction. (a) Cross-attention maps at different Transformer blocks show that 4D RoPE enables structured interactions between motion and vision tokens. (b) Visualization of mean joint coordinates across the dataset, used to compute 4D RoPE, providing typical spatial cues that facilitate consistent cross-modal modulation*
 
-![[assets/figures/papers/paper_list_l1831_MTVCrafter_4D_Motion_Tokenization_for_Open_World_Human_Image_Animation/figures/015_Table_4.jpg]]
-*Table 4: Ablation Study on Fahsion (Zablotskaia et al., 2019) Benchmark*
-
 ![[assets/figures/papers/paper_list_l1831_MTVCrafter_4D_Motion_Tokenization_for_Open_World_Human_Image_Animation/figures/016_Figure_11.jpg]]
 *Figure 11: Ablation of Motion-aware CFG. A higher CFG scale leads to better pose alignment, but also introduces more artifacts. In our experiments, a scale of 3.0 achieves the best trade-off*
-
-![[assets/figures/papers/paper_list_l1831_MTVCrafter_4D_Motion_Tokenization_for_Open_World_Human_Image_Animation/figures/018_Figure_13.jpg]]
-*Figure 13: More Comparisons (1). Our MTVCraft consistently demonstrates the best performance with high-quality human motion and high-fidelity appearance across different styles and scenes*
-
-
 
 ## 定位与知识库关联
 
@@ -350,8 +316,6 @@ MTVCraft 开辟了若干值得探索的研究方向：
 3. **手部细节增强**：引入手部关键点损失或专门的手部监督信号，改进手指运动的生成质量。
 4. **多模态条件融合**：结合文本、音频等多模态条件，实现更丰富的控制信号，拓展应用场景。
 5. **推理效率优化**：在大规模实时应用（如数字人、直播）中，如何优化推理速度和计算成本，是产业化落地的关键瓶颈。
-
-
 
 ## 原文 PDF
 

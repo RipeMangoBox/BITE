@@ -55,8 +55,6 @@ JUMP-Hand 的整体架构遵循**粗到细两阶段流程**：粗阶段通过不
 
 **方法谱系与知识库定位**：JUMP-Hand 处于多视图三维手部重建与概率建模的交汇点。相较于依赖确定性热图回归与等权三角化的 **Zhang et al.**（NeurIPS 2021）、**Spectral Graphormer**（Tse et al., ICCV 2023）以及 **MLPHand**（Yang et al., ECCV 2024），JUMP-Hand 的核心创新在于将二维关节观测建模为高斯分布，并利用预测方差驱动整个融合管线。与通用 MoE 路由中常见的 Top-k 硬选择不同，JUMP-Hand 的软门控机制保留所有视图专家的加权贡献，实验证明这一策略在所有数据集上均优于硬门控。该方法的不确定性建模目前基于单模态高斯假设，处理严重遮挡引起的多模态歧义性仍是待探索的开放问题。
 
-
-
 ### 问题背景
 
 从多视角图像中恢复精确的三维手部几何是计算机视觉中的一个核心问题，在虚拟现实、人机交互和机器人遥操作等领域具有广泛的应用需求。与单目重建相比，多视角设置提供了互补的观测信息，理论上可以缓解深度歧义和自遮挡等固有挑战。然而，如何有效整合多个视角的信息以产生一致且准确的三维重建，仍然是一个开放性问题。
@@ -85,8 +83,6 @@ Figure 1 直观展示了这一研究直觉：(a) 手部关节在不同视图中�
 2. **不确定性引导的粗到细重建**：将预测的不确定性作为门控信号，贯穿粗初始化（不确定性引导三角化）和细化阶段（不确定性门控交叉注意力），实现按关节、按视图的动态加权融合。
 
 这一设计的核心优势在于：预测的不确定性能够显式量化各视图对每个关节的观测可靠性，从而将多视图融合自然地转化为 MoE 路由问题，无需依赖黑盒注意力机制。通过这种方式，JUMP-Hand 能够在保持高计算效率的同时，显著提升对遮挡、运动模糊和缺失视图等挑战性条件的鲁棒性。
-
-
 
 ## 核心方法与创新机理
 
@@ -124,8 +120,6 @@ $$y_j = \sum_{n=1}^N \alpha_{j,n} \cdot y_{j,n}$$
 
 与依赖黑盒注意力学习融合权重的方法（如 **Spectral Graphormer** (Tse et al., ICCV 2023)）不同，JUMP-Hand 的门控信号来自显式的概率建模，具有可解释性——可视化的不确定性椭圆与门控权重直接对应（Figure 3）。这种设计使得方法在运动模糊、严重遮挡和缺失视图等极端条件下仍能恢复准确的3D手部几何（Figure 5），在 HO3D-MV 挑战子集上相较 POEM 实现了 29.9% 的 MPVPE 提升（24.91 mm vs 35.52 mm）。
 
-
-
 JUMP-Hand 将多视角三维手部重建重新定义为**粗到细的混合视图专家（Mixture-of-Experts, MoE）架构**，其核心创新在于将每个视角视为一个独立的“专家”，并通过**关节级概率不确定性**作为显式门控信号来动态融合各视图专家的贡献。整体流程如图2所示。
 
 **输入与输出**：给定 $N$ 个同步的多视角RGB图像 $\boldsymbol{\mathcal{T}} = \{ \mathbf{I}_i \}_{i=1}^{N}$，方法的目标是恢复MANO手部模型的21个三维关节坐标 $\mathbf{J}_{3D} \in \mathbb{R}^{21 \times 3}$ 及对应的网格顶点。
@@ -140,12 +134,8 @@ JUMP-Hand 将多视角三维手部重建重新定义为**粗到细的混合视�
 
 **数据流与模块关系**：不确定性估计分支的输出同时服务于粗阶段的UG-DLT和细阶段的UGCA，形成统一的“概率建模→门控信号→几何推理”闭环。这种设计避免了黑盒注意力机制，使得多视图融合过程在物理上可解释：高不确定性的视图对特定关节的贡献被自动抑制，而可靠的视图信息被保留和增强。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l12_https_openaccess_thecvf_com_content_CVPR2026_html_Kuang_JUMP_Hand_Learni/figures/002_Figure_2.jpg]]
 *Figure 2: The pipeline of JUMP-Hand. (a) Joint-wise uncertainty modeling: each view independently predicts 2D joint locations and uncertainties*
-
-
 
 JUMP-Hand 的核心创新在于将多视图融合重新表述为**混合视图专家（Mixture of View Experts）**问题，并通过**关节级概率不确定性**作为显式门控信号来驱动整个粗到细的重建流程。整个流水线（Figure 2）包含五个关键模块，按信息流顺序展开如下。
 
@@ -222,13 +212,6 @@ $$\mathcal{L} = \lambda_1 \mathcal{L}_{NLL} + \lambda_2 \mathcal{L}_{3D} + \lamb
 
 UGCA 模块的**关键因果机制**在于：不确定性权重 $\alpha_{j,n}$ 在粗阶段作为三角化加权因子，在细化阶段作为交叉注意力门控信号，实现了**单一可学习信号贯穿两阶段**的优雅设计。消融实验（Table 3）证实，移除粗阶段导致 MPJPE 从 13.10 mm 升至 21.55 mm（+8.45 mm），移除细化阶段升至 16.61 mm（+3.51 mm），验证了粗到细联合门控的必要性。此外，软门控（保留所有视图专家）在所有数据集上均优于硬门控（Top-k 选择，Table 4），说明即使低置信度视图仍包含可被不确定性权重自动抑制的微弱信号。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l12_https_openaccess_thecvf_com_content_CVPR2026_html_Kuang_JUMP_Hand_Learni/figures/001_Figure_1.jpg]]
-*Figure 1: Our main research intuition and idea. (a) Since hand joints have varying reliability across different views, (b) we formulate the multi-view 3D hand reconstruction task into a MoE task, treating different views as different experts, and (c) using the predicted uncertainty to gate the fusion among view experts*
-
-
-
 ## 实验与关键发现
 
 ### 实验设置
@@ -262,8 +245,6 @@ UGCA 模块的**关键因果机制**在于：不确定性权重 $\alpha_{j,n}$ �
 
 > **注意：** 上述失败模式分析基于论文自述的局限性，具体的失败案例定量统计需查阅原文附录进行人工验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l12_https_openaccess_thecvf_com_content_CVPR2026_html_Kuang_JUMP_Hand_Learni/figures/004_Table_1.jpg]]
 *Table 1: Comparison with the state-of-the-art on OakInk-MV, DexYCB-MV, and HO3D-MV datasets. ↓ indicates lower is better, ↑ indicates higher is better. All distance metrics are in millimeters (mm). AUC-V/J represent the area under the PCK curve for vertex and joint accuracy, respectively. Best in bold*
 
@@ -272,14 +253,6 @@ UGCA 模块的**关键因果机制**在于：不确定性权重 $\alpha_{j,n}$ �
 
 ![[assets/figures/papers/paper_list_l12_https_openaccess_thecvf_com_content_CVPR2026_html_Kuang_JUMP_Hand_Learni/figures/008_Table_4.jpg]]
 *Table 4: Comparison of gating mechanisms. Soft gating uses all view experts, while Top-k selects the k most confident views for each joint and discards the rest. Metrics are reported in mm*
-
-![[assets/figures/papers/paper_list_l12_https_openaccess_thecvf_com_content_CVPR2026_html_Kuang_JUMP_Hand_Learni/figures/006_Figure_4.jpg]]
-*Figure 4: Accuracy-efficiency trade-off on HO3D-MV. Experiments are conducted on a single RTX 3090 GPU*
-
-![[assets/figures/papers/paper_list_l12_https_openaccess_thecvf_com_content_CVPR2026_html_Kuang_JUMP_Hand_Learni/figures/009_Figure_5.jpg]]
-*Figure 5: Qualitative comparison. We visualized 2D images with challenges from multiple perspectives in the dataset, including (1) motion blur, (2) occlusion, and (3) hand missing. When 3D hand reconstruction is performed based on these images, our method achieves better reconstruction results compared with SOTA methods. This indicates that our explicit modeling approach has superior robustness*
-
-
 
 ## 定位与知识库关联
 
@@ -322,8 +295,6 @@ JUMP-Hand 采用粗到细两阶段设计，其必要性由消融实验直接验�
 1. **多模态不确定性建模**：单模态高斯是否足以应对所有遮挡场景？引入混合高斯或归一化流等更复杂的概率模型能否进一步提高极端条件下的鲁棒性？这涉及表达能力与计算开销的权衡。
 2. **不确定性传播的理论基础**：顶点不确定性通过MANO蒙皮权重矩阵线性传播（Eq. 7），这一简化假设在复杂手势（如手指交叉）下是否仍然成立？非线性传播机制是否必要？
 3. **跨任务泛化**：关节级不确定性门控的思想是否可迁移至其他多视图任务（如人体姿态估计、物体6D位姿估计）？这需要验证不确定性建模在不同几何结构上的适应性。
-
-
 
 ## 原文 PDF
 

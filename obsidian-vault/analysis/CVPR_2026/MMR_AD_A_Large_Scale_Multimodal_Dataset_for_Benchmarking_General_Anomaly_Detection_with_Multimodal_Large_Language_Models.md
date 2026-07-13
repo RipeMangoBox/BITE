@@ -55,8 +55,6 @@ Anomaly-R1以Qwen2.5-VL为底座模型，在MMR-AD数据集上进行后训练。
 **主要结果**  
 在MVTecAD和VisA两个标准工业异常检测基准上，Anomaly-R1展现出显著优势。在MVTecAD上，异常检测准确率达到91.0%（基线75.0%），异常定位准确率达到67.7%（基线8.9%）；在VisA上，检测准确率为79.0%（基线65.9%），定位准确率为37.9%（基线2.2%）。消融实验进一步揭示：移除推理文本后，MVTecAD检测准确率从91.0降至81.3，验证了CoT推理数据的关键作用；移除正常参考图像同样导致显著性能下降，表明比较式输入模式对通用异常检测具有重要价值。
 
-
-
 ### 工业异常检测的现状与范式局限
 
 工业异常检测（Industrial Anomaly Detection, AD）是智能制造与质量控制中的核心环节，其目标是从产品图像中识别并定位偏离正常模式的缺陷区域。当前主流方法以全监督传统视觉模型为主导，这些模型通常依赖大规模标注数据，在单一类别或特定数据集上通过 AUROC 等指标衡量性能。然而，这类方法存在两个结构性瓶颈：
@@ -83,8 +81,6 @@ Anomaly-R1以Qwen2.5-VL为底座模型，在MMR-AD数据集上进行后训练。
 - **Anomaly-R1 模型**：基于 Qwen2.5-VL 后训练的推理型异常检测模型，通过冷启动监督微调（SFT）与 GRPO 强化学习的训练范式，使模型学会逐步比较正常参考图像与输入图像，并精准定位异常区域。
 
 这一思路的核心洞察在于：**将异常检测从“分数回归”重新定义为“推理-定位”任务，利用 CoT 数据和强化学习驱动模型在语义空间中学习异常的比较逻辑，而非仅仅拟合类别边界**。
-
-
 
 ## 核心方法与创新机理
 
@@ -114,8 +110,6 @@ Anomaly-R1 的核心创新并非提出全新的模型架构，而是通过**训�
 
 **创新总结**：Anomaly-R1 的方法论贡献不在于模型结构的改动，而在于通过 CoT 推理文本、双图像对比输入、冷启动 SFT+GRPO 训练范式、对比采样与领域知识注入这五项相互协同的设计，系统性地解决了通用 MLLM 在工业异常检测中“不会推理、缺乏参照、定位模糊”的三大核心缺陷。
 
-
-
 Anomaly-R1 的整体框架围绕“多模态推理数据集构建 → 冷启动监督微调 → 强化学习精炼”三条主线展开，其核心目标是将通用多模态大语言模型（MLLM）改造为具备逐步比较分析与精准定位能力的工业异常检测模型。
 
 **输入**：系统接收一个对齐图像对——一张正常参考图像和一张待检测的输入图像。正常参考图像通过空间对齐检索策略从测试正常样本中选取，以确保与输入图像在空间结构上高度匹配。同时，模型在推理时被注入类别特定的领域知识提示，明确告知该类别可能出现的异常类型。
@@ -128,12 +122,8 @@ Anomaly-R1 的整体框架围绕“多模态推理数据集构建 → 冷启动�
 
 **输出**：模型最终输出包含显式推理过程（`<think>` 部分）和结构化最终答案（`<answer>` 部分），后者给出异常存在性判断以及异常区域的边界框坐标。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2746_https_arxiv_org_abs_2604_10971/figures/001_Figure_1.jpg]]
 *Figure 1: (a) Overview of our MMR-AD dataset. (b) Visualization of the anomaly detection (AD) and anomaly localization (AL) accuracy comparison. Through post-training on our MMR-AD dataset, our finetuned Anomaly-R1-7B shows remarkable performance improvement, especially in anomaly localization*
-
-
 
 ### 空间对齐正常参考图像检索
 
@@ -182,13 +172,6 @@ GRPO 的奖励信号 $r_i$ 由两部分组成：
 
 消融实验表明，移除强化学习阶段（仅保留 SFT）后，MVTecAD 检测准确率从 91.0 降至 84.5，定位准确率从 67.7 降至 55.9，验证了 GRPO 训练范式的有效性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2746_https_arxiv_org_abs_2604_10971/figures/002_Figure_2.jpg]]
-*Figure 2: The illustration of the text generation pipeline. We utilize the (reference, input) image pair and leverage Qwen2.5- VL-72B to automate the generation of reasoning-based texts. We prompt the model to generate the reasoning-based AD thinking process (i.e., based on comparison and analysis of the two images). To ensure that the model can correctly recognize abnormal areas, we plot red bboxes on the image as visual hints and also provide the anomaly types and bbox coordinates of the abnormal areas as text hints to the instruction. In the generated texts, the red parts mark the anomaly-related reasoning words*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -231,28 +214,12 @@ Figure 4 和 Figure 5 展示了基线模型 Qwen2.5-VL-72B 的典型幻觉现象
 ![[assets/figures/papers/paper_list_l2746_https_arxiv_org_abs_2604_10971/figures/008_Figure_6.jpg]]
 *Figure 6: Green marks correct reasoning and correct bbox coordinates, red marks wrong reasoning and imprecise bbox coordinates. Although both GPT-4o and Qwen2.5-VL-72B generate correct reasoning, the anomaly localization results are still not precise enough*
 
-![[assets/figures/papers/paper_list_l2746_https_arxiv_org_abs_2604_10971/figures/010_Figure_7.jpg]]
-*Figure 7: Failure case. Red marks wrong reasoning*
-
-![[assets/figures/papers/paper_list_l2746_https_arxiv_org_abs_2604_10971/figures/012_Figure_8.jpg]]
-*Figure 8: Failure case. Red marks wrong reasoning and incorrect bbox coordinates*
-
 ### 局限性与开放问题
 
 当前方法存在四个主要局限：（1）数据集和模型均针对工业场景设计，不适用于医学或视频异常检测；（2）依赖边界框标注，无法输出像素级分割结果；（3）CoT 文本由 Qwen2.5-VL-72B 自动生成，存在偏差和错误风险；（4）性能高度依赖正常参考图像的质量与空间对齐程度。这些局限指向三个开放问题：能否在无参考图像场景下仅依靠领域知识实现可靠检测？如何将定位能力从边界框扩展到像素级分割？CoT 文本的质量验证流程能否完全消除文本-图像不一致的噪声？
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2746_https_arxiv_org_abs_2604_10971/figures/003_Table_1.jpg]]
-*Table 1: Statistics on the composition of our MMR-AD dataset*
-
 ![[assets/figures/papers/paper_list_l2746_https_arxiv_org_abs_2604_10971/figures/004_Table_3.jpg]]
 *Table 3: Comparison with previous multi-modal AD datasets on different attributes. ✘: no reasoning text. ✔✗: short description text. ✔: detailed reasoning text. “coarse” means anomalous location is described in coarse-grained words, such as “top left”, “bottom right”, etc. “precise” means anomalous location is described in fine-grained coordinates, such as “[xmin, ymin, xmax, ymax]”. In Anomaly-Instruct-125K, there is no defect type label given for each sample, thus the “Defect Types” column is hard to count*
-
-![[assets/figures/papers/paper_list_l2746_https_arxiv_org_abs_2604_10971/figures/006_Table_4.jpg]]
-*Table 4: Performance evaluation of anomaly detection and localization for both commercial and open-source MLLMs. All the MLLMbased models (except AnomalyGPT) are based on the (reference, input) image pair as the image input and use the instruction template in Tab.2 for generation. ·/· means anomaly detection/localization metrics, respectively. Anomaly-R1-7B† is a variant in which we add domain knowledge (see Sec.4.1). Bold means the best performance (the full-shot AD models are not included in the comparison)*
-
-
 
 ## 定位与知识库关联
 
@@ -294,8 +261,6 @@ Anomaly-R1 的核心定位是**基于推理链（CoT）与强化学习的通用�
 3. **CoT 文本质量的严格保证**：MMR-AD 数据集中 CoT 文本的质量验证流程能否完全保证无错误？是否存在文本描述与图像内容不一致的潜在噪声影响模型训练？论文未对此进行系统的噪声鲁棒性分析。
 
 4. **跨领域迁移机制**：工业异常检测中学习的“正常–异常”比较推理模式是否可迁移到医学或视频领域？这需要新的基准数据集和迁移实验来验证。
-
-
 
 ## 原文 PDF
 

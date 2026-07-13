@@ -51,8 +51,6 @@ claims:
 
 **主要结果**：在 Photoreal 数据集上的用户研究表明，Social Agent 在人类相似度（0.26 vs. 最优基线 Photoreal 0.10）和交互水平（0.37 vs. Photoreal -0.07）上全面显著优于所有单人生成基线（LDA、EMAGE、Photoreal）。移除动态控制器代理后，交互水平和客观同步指标（FDD、DMSS）显著下降，证实高层规划对逼真互动的关键作用。此外，该框架可泛化至原本不支持互动的单人生成器（如 GestureDiffuCLIP），使其成功生成双人互动行为。
 
-
-
 非言语行为——手势、身体姿势、眼神注视和空间距离——是人类面对面交流的核心组成部分，承载着情感表达、话轮转换和社交意图传递等关键功能。在虚拟人、具身智能体和沉浸式交互系统中，生成逼真、上下文感知的非言语行为对于提升用户体验至关重要。
 
 现有方法主要沿两条路径展开。**单人生成方法**，如 **LDA**（Alexanderson et al., SIGGRAPH 2023）、**EMAGE**（Liu et al., 2023）和 **Photoreal**（Ng et al., 2024），直接从语音特征端到端地生成个体手势，缺乏对互动对象的感知。**双人生成方法**则通常将两个单人模型独立运行，或依赖成对数据进行训练，本质上忽略了交互双方之间的动态耦合。这两种范式共同面临一个根本性瓶颈：**数据驱动的生成模型难以捕捉稀疏但关键的高层社交信号**——例如眼神交流的时机、手势的镜像同步、社交距离的调整——这些信号在数据中分布稀疏，却对感知交互的自然度至关重要。
@@ -60,8 +58,6 @@ claims:
 从因果视角审视，现有方法缺失了一个关键的因果环节：从场景上下文和对话意图到具身行为表达之间的**高层规划与控制**。人类在交流中本能地进行着多尺度的非言语规划——判断与对方的距离、决定何时注视对方、选择是否模仿对方的手势——这些决策并非直接从语音声学特征中涌现，而是源于对社交情境的理解。现有方法跳过了这一规划过程，直接从低层特征映射到动作，导致生成的行为缺乏上下文感知和互动性。
 
 本文的核心动机在于：**将大语言模型（LLM）的语义理解和推理能力引入非言语行为生成，模拟人类在交流中的行为规划过程**。通过构建基于心理学和语言学知识的LLM代理系统，动态推理场景上下文并生成高层控制信号（交互配置、手势同步、注视），将这些信号转化为对扩散模型的约束，从而实现从高层意图到低层动作的因果控制。这一思路的核心洞察是：LLM的语义推理能力，与经过行为学理论强化的提示词相结合，可以显式地建模多尺度社交信号与其具身表达之间的因果联系，填补现有方法在高层规划层面的空白。
-
-
 
 ## 核心方法与创新机理
 
@@ -97,8 +93,6 @@ Social Agent 的核心洞见在于：人类在交流中本能地进行非言语�
 
 全模型在用户研究中的人类相似度（0.26）和交互水平（0.37）显著优于所有单人生成基线（Photoreal 分别为 0.10 和 -0.07）（Table 1），运动多样性（Div=1.98）接近真实分布（Ground Truth=2.13），显著优于 LDA（1.41），表明分层规划与控制策略在保持运动自然度的同时有效注入了交互感知能力。
 
-
-
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2510_04637/figures/002_Figure_2.jpg]]
 *Figure 2: Our framework models dyadic interactions by integrating an autoregressive diffusion model for low-level motion generation with an LLM-based agentic system, Social Agent, for nonverbal behavior analysis. This system continuously analyzes and refines nonverbal behavior cues, dynamically guiding the diffusion model to generate natural interpersonal behaviors such as spatial positioning, gaze contact, and gesture synchrony*
 
@@ -117,8 +111,6 @@ Social Agent 的整体 pipeline 由三个解耦的核心组件构成：**双人�
 该框架的关键创新在于将 LLM 的语义理解与推理能力系统性地引入运动生成 pipeline。与传统的端到端方法直接从语音特征映射到动作不同，Social Agent 显式地建模了从高层社交意图（眼神交流、手势同步、空间关系）到低层动作表达的因果链路。LLM 代理系统扮演了“社交规划器”的角色，其提示词设计中融入了行为学理论参考、逐步推理引导和空间映射规则，使得代理能够模拟人类在交流中本能的非言语行为规划过程。
 
 同时，控制信号与生成模型的解耦设计（训练时完全分离，推理时通过分类器引导注入）使得该框架具备通用性——即使是原本不支持互动的单人生成器（如 GestureDiffuCLIP, Ao et al., 2023），在集成 Social Agent 系统后也能成功生成双人互动行为（见 Figure 12），验证了代理系统作为独立规划层的可迁移性。
-
-
 
 ### 3.1 双人运动生成模型
 
@@ -179,8 +171,6 @@ $\alpha$ 为引导强度。控制范围参数决定引导作用的去噪步数�
 
 整个框架的核心因果机制在于：LLM 代理系统将稀疏的高层社交信号（眼神交流、手势同步、社交距离）显式建模为可解析的控制约束，并通过训练时完全解耦的引导策略将这些约束注入扩散模型。这使得系统能够在不重新训练底层生成器的情况下，将原本仅支持单人生成的模型（如 GestureDiffuCLIP）改造为具备双人互动能力的系统，验证了框架的通用性。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -237,12 +227,8 @@ Social Agent在方法谱系中占据独特位置。传统协同语音手势生�
 
 关键创新点包括：(1) 场景设计师代理在对话开始前确定空间布局；(2) 动态控制器代理在每轮生成前输出注视、手势同步和空间关系调整信号；(3) 通过早期去噪替换和梯度引导施加约束，无需重新训练生成器。这种架构为其他需要高层规划的运动生成任务提供了可复用的范式。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2510_04637/figures/006_Figure_6.jpg]]
 *Figure 6: This example illustrates how the Spatial Relation Predictor conducts fine-grained spatial reasoning based solely on textual input. Red text in the input highlights the current spatial state of both characters. The 3D image on the right visualizes the input configuration but is not part of the model’s input. In the output, blue text emphasizes the model’s spatial reasoning process, such as the inferred direction and distance of Character I’s movement. This is a concise version of the agent’s output, preserving essential information*
-
-
 
 ## 定位与知识库关联
 
@@ -307,8 +293,6 @@ Social Agent 的核心创新在于将交互控制分解为三个可独立运作�
 3. **多模态上下文的深度融合**：当前视觉运动描述器（Visual Motion Descriptor）为动态控制器提供当前动作的文本描述，但这一模态转换可能丢失细粒度信息。直接将视觉特征作为LLM的多模态输入，可能提升控制信号的精确度。
 
 4. **评估体系的完善**：当前用户研究主要评估人类相似度、交互水平和节拍匹配三个维度，但二元交互的质量还涉及社交适当性、文化规范符合度等更细致的维度，需要建立更全面的评估基准。
-
-
 
 ## 原文 PDF
 

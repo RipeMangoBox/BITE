@@ -54,8 +54,6 @@ claims:
 
 在CIFAR-100、PinsFaceRecognition、Tiny ImageNet等6个数据集上的全类、子类和序列遗忘任务中，MU-Mis的性能与当前最优的依赖保留数据方法持平，并显著超越所有现有无保留数据方法。例如，在CIFAR-100全类遗忘（VGG-16）上，MU-Mis的Avg. Gap仅为0.32，而最强无保留数据基线JIT为3.21；在Tiny ImageNet（ViT）上，MU-Mis的运行时间仅为3分钟，相比SalUn的81分钟实现27倍加速。
 
-
-
 ### 问题背景：机器遗忘与保留数据依赖困境
 
 随着数据隐私法规（如GDPR的“被遗忘权”）的强化，**机器遗忘（Machine Unlearning）** 要求模型在移除特定训练数据后，其行为应与从未见过该数据的重新训练模型一致。理想目标是在忘记集 $\mathcal{D}_f$ 上消除模型的知识，同时保持对保留集 $\mathcal{D}_r$ 的效用。
@@ -71,8 +69,6 @@ claims:
 本文的核心洞察是：**训练过程中，样本的贡献集中体现为使模型对该样本的目标类logit敏感性变得远超无关类logit**。具体而言，预训练模型对遗忘样本的输入梯度——尤其是目标类logit $f_c$ 与无关类logit $f_{c'}$ 之间梯度Frobenius范数之差（灵敏度差距）——可以作为样本贡献的可靠代理。理论分析表明，在梯度下降动态中，自影响项远大于其他样本的残差项（Section 3.2），因此通过直接缩小该灵敏度差距，可以在不触及保留数据的前提下撤回样本贡献，精确模拟重新训练模型的行为。
 
 基于这一发现，本文提出 **MU-Mis（Machine Unlearning by Minimizing Input Sensitivity）**，首次实现完全无保留数据条件下的高性能机器遗忘，其性能与当前最优的依赖保留数据方法持平，并显著超越所有现有无保留数据方法。
-
-
 
 ## 核心方法与创新机理
 
@@ -127,8 +123,6 @@ MU-Mis的创新设计在多个维度上取得了显著突破：
 
 尽管MU-Mis在全类遗忘场景下表现卓越，但在最具挑战性的随机子集遗忘场景下，与理想重训模型相比效用差距仍然明显。此外，对高记忆度样本的遗忘可能引起较大的剩余数据性能下降，提示灵敏度差距不能完全均一地代理各类样本的贡献。未来工作可探索将一阶灵敏度差距与二阶loss曲率更直接地关联，以提供更强的理论保证并改进随机子集遗忘性能。
 
-
-
 ![[assets/figures/papers/iclr26_0011_3iw5t2W41F_Remaining-data-free_Machine_Unlearning_by_Suppre/figures/001_Figure_1.jpg]]
 *Figure 1: A brief overview of the theoretical connection between sample’s contribution and a pre-trained model’s input sensitivity. The dashed lines illustrate how the influence of a training sample propagates through gradient updates to the pre-trained model. When a sample participates in training, the gradient it contributes induces an update of the model in function space, which inherently increases the learned function’s sensitivity to that sample’s input*
 
@@ -168,8 +162,6 @@ $$\frac{\|\nabla_{\mathbf{x}} f_{c'}(\mathcal{D}_f, w_t)\|_F}{\|\nabla_{\mathbf{
 | 自适应停止 | 无关类敏感度历史，阈值 $\delta$ | 遗忘完成信号 | 否 |
 
 整个 pipeline 的核心优势在于**完全消除了对保留数据的依赖**——从信号提取、损失构造到停止决策，所有操作仅涉及遗忘样本本身和预训练模型的内部梯度信息。这使得 MU-Mis 在保留数据不可获取的实际场景（如用户数据删除请求）中具备天然适用性，同时在 CIFAR-100、Tiny ImageNet 等六个数据集上取得了与依赖保留数据的 SoTA 方法持平的性能（Table 1, Table 2），并显著超越所有现有无保留数据方法。
-
-
 
 MU-Mis 的遗忘过程由三个核心模块串联构成：**输入敏感性估计**、**灵敏度差距最小化损失**、以及**基于敏感度恢复的自适应停止准则**。整个流程完全在遗忘数据 $`\mathcal{D}_f`$ 上运行，无需访问任何保留数据。
 
@@ -216,8 +208,6 @@ $$`\frac{\|\nabla_{\mathbf{x}} f_{c'}(\mathcal{D}_f, w_t)\|_F}{\|\nabla_{\mathbf
 $$`\mathcal{L} = \frac{1}{N} \sum \left[ \alpha_c \cdot \|\nabla_{\mathbf{x}} f_c\|_F^2 - \alpha_{c'} \cdot \|\nabla_{\mathbf{x}} f_{c'}\|_F^2 \right]`$$
 
 其中 $`\alpha_c`$ 和 $`\alpha_{c'}`$ 为根据当前敏感度状态动态调整的权重系数。该变体在保持核心机制不变的前提下，为特定遗忘任务提供了更灵活的优化路径。
-
-
 
 ## 实验与关键发现
 
@@ -284,12 +274,8 @@ MU-Mis的理论基础建立在两个关键实证发现之上。第一，**训练
 
 这些失败模式指向两个开放问题：(1) 如何将一阶灵敏度差距与二阶loss曲率关联以增强理论保证；(2) 如何在随机子集遗忘中实现更精细的贡献定位，以同时完美保留模型效用。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0011_3iw5t2W41F_Remaining-data-free_Machine_Unlearning_by_Suppre/figures/028_Table_14.jpg]]
 *Table 14: Table A12: Ablation study on each term of our loss in full class (Rocket) unlearning. TC (Target Class) refers to the first term and OC (Other Class) refers to the second term*
-
-
 
 ## 定位与知识库关联
 
@@ -332,8 +318,6 @@ MU-Mis 的提出根植于现有机器遗忘方法的一个根本性瓶颈：无�
 4. **与其他范式的结合。** 能否结合其他新兴无保留数据遗忘范式（如 RUM）与灵敏度抑制来进一步缩小与理论重训模型的差距？混合策略可能在不同遗忘场景下发挥互补优势。
 
 5. **非分类任务的推广。** 当前方法建立在分类任务的目标类/无关类 logit 结构之上。在生成模型、强化学习或自监督学习等任务中，如何定义和操作等价的“灵敏度差距”信号是一个开放的理论问题。
-
-
 
 ## 原文 PDF
 

@@ -53,8 +53,6 @@ claims:
 
 在域内数据集 HumanML3D 上，该方法取得与现有最佳方法可比的性能（FID 0.132 vs. T2M-GPT 0.116）。在域外数据集上，泛化优势显著：IDEA400 上 FID 达到 0.449（MDM 为 0.821），Mixamo 上 FID 为 0.186（MDM 为 0.211）。t-SNE 可视化证实，文本分解算法有效缩小了训练与测试数据集之间的文本域间隙，分解后的细粒度描述在不同数据集上分布几乎重合。消融实验进一步表明，CFF 模块将 IDEA400 的 FID 从 0.934 降至 0.844，TMA 模块则将 R-Precision 提升至 0.449，二者对开放词汇泛化均不可或缺。
 
-
-
 ### 文本驱动运动生成的核心瓶颈
 
 文本到运动生成旨在根据自然语言描述合成逼真的三维人体动作序列，在动画制作、虚拟现实和人机交互等领域具有广泛应用。然而，现有方法面临一个根本性瓶颈：**模型严重受限于小规模配对数据集的分布，无法有效泛化到训练中未见的开放域文本**。
@@ -85,8 +83,6 @@ claims:
 - **原子重组模块**：通过文本-运动对齐（TMA）和组合特征融合（CFF）机制，学习将原子运动描述合成为目标全身运动。
 
 实验结果表明，该方法在域外数据集IDEA400和Mixamo上显著优于现有最佳方法，FID分别达到0.449和0.186，验证了原子运动分解与重组范式在开放词汇运动生成中的有效性。
-
-
 
 ## 核心方法与创新机理
 
@@ -122,8 +118,6 @@ claims:
 - 在域内 HumanML3D 上 FID 为 0.132，与 T2M-GPT 的 0.116 保持竞争力，表明该方法在提升泛化能力的同时并未牺牲域内性能。
 
 这些结果共同表明，原子运动的分解-重组范式成功地将模型能力从“记忆训练分布”转变为“组合已知原子以应对未知描述”，是开放词汇运动生成的根本性突破。
-
-
 
 本文提出 **Atomic Motion Decomposition and Recomposition** 框架，将开放词汇文本到运动生成形式化为一个两阶段过程：**文本分解（Textual Decomposition）** 和 **原子重组（Atomic Recomposition）**。其核心思想是将复杂的全身运动表达为时空上可组合的原子运动单元，从而突破训练数据分布的限制，实现对开放域文本的泛化。
 
@@ -170,12 +164,8 @@ $$\tilde{m}^{3} = \mathcal{F}_{\mathrm{CFF}}(\tilde{m}^{2}; T_{a})$$
 
 > **公平性说明**：所有对比方法均在 HumanML3D 上训练并使用相同测试分割；本方法额外使用未标注运动数据训练 RVQ，这可能带来一定的先验优势，但后续消融实验（Table 2）已对 CFF 和 TMA 的独立贡献进行了控制。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l5_Open_the_Motion_Door_Atomic_Motion_Decomposition_and_Recomposition_for_O/figures/001_Figure_1.jpg]]
 *Figure 1: In contrast to current text-to-motion paradigms (Simple Mapping, Other-domain Alignment, and Pretrain-then-Finetuning), our method proposes the textual decomposition to decompose the raw motion text into atomic motion texts, and then recomposes atomic motions into the target motion, which significantly improves the ability of open-vocabulary motion generation*
-
-
 
 ### 整体架构与掩码生成建模
 
@@ -227,16 +217,6 @@ $$\tilde{m}^{o} \in \mathbb{R}^{N \times D_{m}}$$
 
 该输出随后与精炼的原始文本特征 $T_{r}^{o}$ 结合，送入下一个 Transformer-CFF 块。堆叠 $K$ 次后，由分类头预测离散运动索引，以交叉熵损失进行监督。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l5_Open_the_Motion_Door_Atomic_Motion_Decomposition_and_Recomposition_for_O/figures/003_Figure_3.jpg]]
-*Figure 3: Illustration of textual decomposition. During training, raw motion text is converted into atomic motion descriptions (including spine, left/right upper limbs, left/right lower limbs, and root trajectory) over several time periods by Textual Decomposition Algorithm. During Inference, raw motion text is converted by Large Language Model*
-
-![[assets/figures/papers/paper_list_l5_Open_the_Motion_Door_Atomic_Motion_Decomposition_and_Recomposition_for_O/figures/004_Figure_4.jpg]]
-*Figure 4: Illustration of the Compositional Feature Fusion (CFF) module. The atomic text matrix is processed by the TMA module and then fused with the motion features via cross-attention*
-
-
-
 ## 实验与关键发现
 
 ### 域内与域外生成性能
@@ -275,8 +255,6 @@ $$\tilde{m}^{o} \in \mathbb{R}^{N \times D_{m}}$$
 
 需要指出的是，本文方法使用额外的大规模未标注运动数据训练 Residual VQ-VAE，这可能为离散运动表示的质量带来一定的先验优势。虽然生成模型本身仅在 HumanML3D 标注数据上训练，但 VQ-VAE 的码本质量对下游生成性能存在间接影响。这一因素在与未使用额外数据的基线方法对比时需予以考虑，但其对域外泛化增益的贡献程度尚缺乏直接的消融验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l5_Open_the_Motion_Door_Atomic_Motion_Decomposition_and_Recomposition_for_O/figures/005_Table_1.jpg]]
 *Table 1: Comparison with state-of-the-arts on one in-domain dataset (HumanML3D) and two out-domain dataset (IDEA400 and Mixamo)*
 
@@ -288,8 +266,6 @@ $$\tilde{m}^{o} \in \mathbb{R}^{N \times D_{m}}$$
 
 ![[assets/figures/papers/paper_list_l5_Open_the_Motion_Door_Atomic_Motion_Decomposition_and_Recomposition_for_O/figures/008_Figure_6.jpg]]
 *Figure 6: t-SNE comparison between raw text and the fine-grained description (left/right lower/upper limb, spine) by Textual Decomposition on a training dataset of HumanML3D and the test dataset of HumanML3D, IDEA400 and Mixamo. Textual Decomposition algorithm successfully reduces the domain gap between these datasets from the textual aspect*
-
-
 
 ## 定位与知识库关联
 
@@ -348,8 +324,6 @@ CFF 模块的设计则与多专家融合（Mixture of Experts）和交叉注意�
 3. **多智能体与交互扩展**：该方法的核心假设是单人全身运动的可分解性。对于**多人物交互或人-物交互**场景，原子运动的定义和重组机制需要根本性的重新设计——交互约束使得身体部位运动不再是独立的可组合单元。
 
 4. **数据依赖的消融**：RVQ 训练中使用的额外无标注运动数据的规模和质量对最终开放词汇性能的贡献需要独立评估，以区分方法创新和数据增益各自的因果效应。
-
-
 
 ## 原文 PDF
 

@@ -131,8 +131,6 @@ $$\mathcal{L} = \mathbb{E}_{t,\epsilon\sim\mathcal{N}(0,I)}\left[\|\epsilon - \e
 
 值得注意的是，模型在训练时仅使用相对简单的实例（如Steiner树10-20个点），但能够泛化到更复杂的输入（如21-30个点，有效率仍达0.986），体现了像素空间表示带来的泛化能力。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2626_https_arxiv_org_abs_2510_21697/figures/013_Figure_10.jpg]]
 *Figure 10: Curve generation pipeline for a single inscribed square for*
 
@@ -217,8 +215,6 @@ $$L(T) = \sum_{uv \in E} \|u - v\|_2$$
 2. **离散化精度限制。** 方法受限于128×128的图像分辨率，对于需要高精度定位的几何细节可能产生偏差。虽然snapping等后处理可以部分缓解，但在极端精度要求下仍可能不足。
 
 3. **问题特定的后处理依赖。** 当前框架对不同问题需要定制不同的后处理策略（内接正方形的snapping、Steiner树和最大面积多边形的图提取），未能实现完全端到端的求解。这一设计限制了方法向新问题的直接迁移能力。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2626_https_arxiv_org_abs_2510_21697/figures/009_Table_2.jpg]]
 *Table 2: Steiner Tree Evaluation Results. Comparison of our method, MST, and random solutions. Reported are valid tree rates and mean Euclidean length ratios (± std) relative to the optimal solution across input point ranges*

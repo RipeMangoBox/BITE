@@ -76,8 +76,6 @@ R2R在效率与性能的权衡上取得了显著突破。如 Figure 1 所示，*
 
 R2R的主要局限在于：退化银行的构建需要预定义退化类型，无法直接处理完全未知的新退化类别；目前仅支持离散的退化类型，对混合退化或连续退化强度的直接支持尚不明确。未来方向包括将检索式先验扩展到视频恢复、利用视觉-语言模型提供更高层次的语义先验以增强泛化能力，以及探索检索到的先验在生成式恢复（如扩散模型）中的应用。
 
-
-
 图像恢复旨在从退化的低质量观测中重建高质量图像，是计算机视觉领域的基础问题。真实场景中的退化类型多样，包括雾霾、雨纹、噪声、模糊和低光照等。传统方法通常为每种退化单独训练一个专用模型，这不仅增加了部署成本，也忽略了不同退化任务之间的潜在共享知识。近年来，一体化图像恢复（All-in-One Image Restoration）范式应运而生，试图用单一模型处理多种退化类型。
 
 ### 核心瓶颈：参数专业化冲突
@@ -95,8 +93,6 @@ R2R的主要局限在于：退化银行的构建需要预定义退化类型，�
 ### 本文动机与目标
 
 基于上述分析，本文提出**Retrieve-to-Restore（R2R）**框架，遵循“编码-检索-解码”（Encode-Retrieve-Decode）范式。核心设计原则是将退化知识外置为紧凑的退化银行（Degradation Bank），在推理时按需检索相关先验来调节卷积特征，从而在轻量级共享主干上实现稳定、高效的多退化恢复。该方法旨在同时解决参数专业化冲突和计算效率两大瓶颈，为一体化图像恢复提供新的技术路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -122,8 +118,6 @@ R2R在计算效率上实现了数量级突破。基于NAFNet的轻量级U形编�
 
 **证据强度说明**：上述核心创新的关键主张均有高置信度实验证据支撑。效率-性能权衡由Table 1、Table 4和Figure 1联合验证（置信度0.95）；任务鲁棒性由Figure 3支撑（置信度0.9）；HQ数据依赖性由Table 7验证（置信度0.95）。
 
-
-
 R2R 的整体架构遵循“编码—检索—解码”范式，将退化先验与共享重建能力彻底解耦。系统由三个核心模块构成：基于 NAFBlock 的 U 型编码器-解码器、退化融合器，以及退化匹配模块。
 
 **信息流概览。** 给定一幅退化图像，编码器首先提取多尺度特征图。在编码器的最底层，退化匹配模块以编码特征作为查询，从预构建的退化知识银行中检索出与当前退化类型最匹配的任务级干净先验。该先验通过门控卷积与查询特征融合后，注入解码器的跳跃连接，逐级引导重建过程。最终，解码器输出恢复后的干净图像。
@@ -136,12 +130,8 @@ R2R 的整体架构遵循“编码—检索—解码”范式，将退化先验�
 
 **端到端训练。** R2R 框架完全端到端可训练，无需任何组件的多阶段优化。训练损失由像素域 L1、频域 L1、退化分类损失和匹配损失联合组成，权重分别为 1.0、0.125、0.1、0.1。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l925_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Retrieve_to_Resto/figures/002_Figure_2.jpg]]
 *Figure 2: (a) Overall framework of the proposed R2R. R2R mainly consists of NAFBlocks [4] based U-shaped encoder–decoder, a degradation amalgamator, and a degradation matching module. (b) The degradation amalgamator identifies degradation types and encodes the corresponding clean images into a unified prior space to construct the degradation bank. (c) The degradation matching module enables the degraded input to query the bank and retrieve relevant clean priors to guide restoration*
-
-
 
 R2R（Retrieve-to-Restore）的整体架构遵循“编码-检索-解码”范式，由三个核心组件构成：**基于NAFBlock的U型编码器-解码器**、**退化融合器（Degradation Amalgamator）**和**退化匹配模块（Degradation Matching Module）**，如Figure 2所示。
 
@@ -195,12 +185,8 @@ $$\mathcal{L}_{fft} = \frac{1}{P} || \mathcal{F}(\hat{x}) - \mathcal{F}(x) ||_{1
 
 共享重建主干采用对称的四层U型编码器-解码器结构，基于**NAFBlock**（Chen et al., NeurIPS 2022）构建。编码器各层NAFBlock数量从上到下依次为[1, 1, 1, 28]，解码器对称配置。这种轻量级设计使得R2R仅需19.7M参数和12G MACs（224×224输入），相比**PromptIR**（Potlapalli et al., NeurIPS 2023）的132G MACs减少了约91%，同时实现了更优的恢复质量。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l925_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Retrieve_to_Resto/figures/009_Figure_6.jpg]]
 *Figure 6: t-SNE visualization of*
-
-
 
 ## 实验与关键发现
 
@@ -251,33 +237,11 @@ Table 4的复杂度分析显示，R2R在224×224输入下参数量**19.7M**，�
 3. **银行容量与任务数耦合**：当退化类型持续增加时，M可能需要重新调整，检索效率可能成为瓶颈。
 4. **仍依赖配对数据**：虽然银行可由LQ图像构建，但训练阶段仍需访问配对数据（或伪配对数据）以学习退化分类和匹配信号。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l925_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Retrieve_to_Resto/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of average PSNR and computational cost (MACs) across different methods. Our method achieves a 0.47dB PSNR improvement while reducing MACs by approximately 91% compared to PromptIR [38]*
 
-![[assets/figures/papers/paper_list_l925_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Retrieve_to_Resto/figures/003_Table_1.jpg]]
-*Table 1: Comparison to state-of-the-art on three degradations. PSNR (dB, ↑) and SSIM (↑) metrics are reported on the full RGB images. Best and second best performances are highlighted. Our method sets a new state-of-the-art on average across all benchmarks while being significantly more efficient than prior work. ‘-’ represents unreported results*
-
-![[assets/figures/papers/paper_list_l925_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Retrieve_to_Resto/figures/005_Table_3.jpg]]
-*Table 3: Comparison to state-of-the-art for single degradations. PSNR (dB, ↑) and SSIM (↑) metrics are reported on the full RGB images. Best and second best performances are highlighted. Our method excels prior work on dehazing and deraining*
-
-![[assets/figures/papers/paper_list_l925_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Retrieve_to_Resto/figures/008_Table_4.jpg]]
-*Table 4: Complexity Analysis. MACs are computed on an input image of size 224 × 224 using a NVIDIA RTX 5090 (32G) GPU. ∗ denotes patch size of 512 × 512*
-
 ![[assets/figures/papers/paper_list_l925_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Retrieve_to_Resto/figures/010_Table_5.jpg]]
 *Table 5: Ablation study of the Hyperparameter M under the 3- degradation task. The average PSNR and SSIM are reported*
-
-![[assets/figures/papers/paper_list_l925_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Retrieve_to_Resto/figures/012_Table_6.jpg]]
-*Table 6: Effectiveness of the different loss functions under the 3- degradation task. (a), (b), (c), (d) denote*
-
-![[assets/figures/papers/paper_list_l925_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Retrieve_to_Resto/figures/013_Table_7.jpg]]
-*Table 7: Results on HQ dependence in the Degradation Bank (DB)*
-
-![[assets/figures/papers/paper_list_l925_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Retrieve_to_Resto/figures/007_Figure_4.jpg]]
-*Figure 4: Visual comparison of R2R with state-of-the-art methods considering three degradations. Zoom in for a better view*
-
-
 
 ## 定位与知识库关联
 
@@ -336,8 +300,6 @@ R2R 的“检索即恢复”范式与检索增强生成（RAG）在思想上相�
 4. **大规模退化银行的检索效率**：当退化银行中存储大量类别（如数十种）时，全局匹配的计算成本可能成为瓶颈。采用近似最近邻检索（ANN）或分层匹配策略是自然的扩展方向。
 
 5. **生成式恢复的结合**：检索到的先验目前用于调节卷积特征，能否将其注入扩散模型或生成式恢复框架，在保持效率的同时提升感知质量？这需要平衡检索先验的确定性引导与生成模型的多样性。
-
-
 
 ## 原文 PDF
 

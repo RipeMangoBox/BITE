@@ -54,8 +54,6 @@ MoE‑GRPO 的核心贡献体现在三个层面。在**方法层面**，它通�
 
 目前 MoE‑GRPO 的主要局限在于：GRPO 框架需并行采样多条滚动轨迹，训练计算开销高于确定性路由；模态感知引导依赖超参数 P，跨数据集迁移时可能需要手动调节；且现有实验集中在 InternVL3.5‑1B 架构，向更大规模模型或不同 MoE 架构的扩展性仍有待验证。
 
-
-
 ### 混合专家模型的路由困境
 
 混合专家（Mixture-of-Experts, MoE）架构已成为扩展视觉语言模型（VLM）容量的核心技术路径。其核心思想是将前馈网络（FFN）拆分为多个并行的“专家”子网络，每个 token 仅激活其中的 K 个专家，从而在保持推理成本可控的前提下大幅提升模型参数量。以 **InternVL3.5**（Wang et al., arXiv 2025）为代表的主流 MoE-VLM 采用确定性 Top-K 路由：对于第 $l$ 层第 $t$ 个 token 的隐藏状态 $h_{t,l}$，门控网络计算所有专家的分配概率
@@ -87,8 +85,6 @@ $$o _ { t , l } = \sum _ { k \in \mathrm { t o p } \cdot K ( g ^ { l } ( h _ { t
 
 针对上述挑战，**MoE-GRPO** 提出了一套完整的解决方案：将专家选择策略的优化纳入 Group Relative Policy Optimization（GRPO）框架，并通过模态感知路由器引导机制将探索范围约束在模态相关的专家子集内，从而实现高效、稳定且奖励对齐的路由策略学习。
 
-
-
 ## 核心方法与创新机理
 
 MoE-GRPO 的核心创新在于将视觉语言模型中混合专家（MoE）的路由策略学习重新定义为**序列决策问题**，并引入强化学习框架进行优化，从而突破确定性 Top-K 路由对专家组合探索空间的限制。具体而言，该方法在以下三个维度上实现了关键性突破：
@@ -118,8 +114,6 @@ $$\hat{s}_v(e_i) = \frac{s_v(e_i)}{s_v(e_i) + s_t(e_i)}, \quad \hat{s}_t(e_i) = 
 
 这一机制的效果在消融实验中得到了充分验证（Table 5）：相比模态无关的高斯噪声扰动和多项分布采样基线，模态感知引导分别带来 1.5% 和 0.9% 的性能提升。更重要的是，训练曲线（Figure 3）显示，模态感知引导下的奖励均值收敛更快、标准差波动更小，显著提升了训练效率与稳定性。这证明了将先验知识注入探索空间约束是平衡探索广度与训练可行性的有效手段。
 
-
-
 MoE-GRPO 将混合专家（MoE）路由策略的优化重新建模为一个序列决策问题，并通过强化学习进行求解。其核心流程包含三个协同模块：**滚动采样模块（Rollout Module）**、**Token-GRPO 损失** 和 **Gate-GRPO 损失**，并在探索过程中引入**模态感知路由器引导**以约束搜索空间、提升训练稳定性。
 
 ### 流程概览
@@ -146,8 +140,6 @@ $$\mathcal{L}_{\text{MoE-GRPO}} = \mathcal{L}_{\text{Token-GRPO}} + \mathcal{L}_
 这种设计实现了生成质量与路由策略的端到端协同优化——Token-GRPO 确保模型在给定路由下学会生成正确答案，Gate-GRPO 则引导门控网络主动发现更优的路由策略。
 
 **探索空间约束的必要性**：若不加约束地随机探索所有 $N$ 个专家，搜索空间过大且包含大量模态无关的专家，会导致训练初期奖励信号稀疏、收敛缓慢。模态感知引导通过预统计的模态激活频率（视觉感知分数 $\hat{s}_v(e_i)$ 和文本感知分数 $\hat{s}_t(e_i)$）有效压缩了探索空间，使训练更稳定高效（见 Figure 3 训练曲线对比）。
-
-
 
 ### 3.1 问题形式化与预备知识
 
@@ -201,8 +193,6 @@ $$\hat{s}_v(e_i) = \frac{s_v(e_i)}{s_v(e_i) + s_t(e_i)}, \quad \hat{s}_t(e_i) = 
 
 其中 $s_v(e_i)$ 和 $s_t(e_i)$ 分别为视觉和文本令牌选择专家 $e_i$ 的归一化计数。基于这些分数，对于给定模态的输入，将底部 $P\%$ 专家的门控分数设为 $-\infty$，从而将探索空间约束在模态相关的专家子集内。在剩余搜索空间中，门控网络 $g_{\mathrm{old}}$ 根据调整后的门控分数通过多项分布采样 $K$ 个专家，生成 $G$ 条随机滚动策略。
 
-
-
 ## 实验与关键发现
 
 ### 主要结果
@@ -237,16 +227,8 @@ $$\hat{s}_v(e_i) = \frac{s_v(e_i)}{s_v(e_i) + s_t(e_i)}, \quad \hat{s}_t(e_i) = 
 2. **超参数敏感性。** 模态感知引导依赖超参数 P（屏蔽底部专家的百分比），针对不同数据集或网络结构可能需要手动调节。论文未给出 P 的自适应选择策略。
 3. **模型规模验证不足。** 当前实验集中在 InternVL3.5-1B 和 CLIP-MoE 架构上，对于数十亿参数级模型或 DeepSeek-MoE 等不同 MoE 架构的可扩展性尚未验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2659_https_arxiv_org_abs_2603_24984/figures/003_Table_1.jpg]]
 *Table 1: Results on multi-modal understanding benchmarks. # activated and # total denote the number of activated and total parameters. The last column reports the average accuracy across all benchmarks, excluding MME*
-
-![[assets/figures/papers/paper_list_l2659_https_arxiv_org_abs_2603_24984/figures/004_Table_2.jpg]]
-*Table 2: Results on cross-dataset evaluation. We train the model on the source ImageNet dataset for three epochs under the 16-shot setting and evaluate it on 10 target datasets*
-
-![[assets/figures/papers/paper_list_l2659_https_arxiv_org_abs_2603_24984/figures/005_Table_3.jpg]]
-*Table 3: Results of domain generalization. We train the model on the source ImageNet dataset for three epochs under the 16-shot setting and evaluate it on four out-of-domain target datasets*
 
 ![[assets/figures/papers/paper_list_l2659_https_arxiv_org_abs_2603_24984/figures/006_Table_4.jpg]]
 *Table 4: Ablation studies on MoE-GRPO*
@@ -257,22 +239,8 @@ $$\hat{s}_v(e_i) = \frac{s_v(e_i)}{s_v(e_i) + s_t(e_i)}, \quad \hat{s}_t(e_i) = 
 ![[assets/figures/papers/paper_list_l2659_https_arxiv_org_abs_2603_24984/figures/008_Table_6.jpg]]
 *Table 6: Ablation studies on RL methods of MoE-GRPO*
 
-![[assets/figures/papers/paper_list_l2659_https_arxiv_org_abs_2603_24984/figures/009_Table_7.jpg]]
-*Table 7: Comparison with existing routing methods. MoE-GRPO achieves superior performance compared to Expert Choice [22] routing and Optimal Transport [64] routing. Moreover, it is complementary to the load-balancing (LB) objective used in Switch Transformers [7], and their combination leads to further performance improvements*
-
-![[assets/figures/papers/paper_list_l2659_https_arxiv_org_abs_2603_24984/figures/010_Figure_3.jpg]]
-*Figure 3: Training curves. (a) and (b) present the mean and standard deviation of the accuracy reward of MoE-GRPO, comparing our modality-aware router guidance with the modality-agnostic (multi.) expert selection baseline*
-
-![[assets/figures/papers/paper_list_l2659_https_arxiv_org_abs_2603_24984/figures/011_Figure_4.jpg]]
-*Figure 4: Token-level expert utilization ratio. Under MoE-GRPO, expert activation is more evenly distributed across the token sequence, resulting in more balanced expert utilization*
-
-![[assets/figures/papers/paper_list_l2659_https_arxiv_org_abs_2603_24984/figures/013_Figure_5.jpg]]
-*Figure 5: Expert utilization ratio (x-axis) for each task (y-axis). MoE-GRPO enhances task-level expert specialization by inducing more diverse expert activation patterns across tasks*
-
 ![[assets/figures/papers/paper_list_l2659_https_arxiv_org_abs_2603_24984/figures/012_Figure_6.jpg]]
 *Figure 6: A qualitative example and its routing probabilities. (a) illustrates the expert routing probabilities, with the selected experts highlighted in red boxes. (b) presents a qualitative example demonstrating that the learned expert selection policy of MoE-GRPO yields a correct prediction, whereas the baseline Det-FT model produces an incorrect one*
-
-
 
 ## 定位与知识库关联
 
@@ -317,8 +285,6 @@ MoE-GRPO 的有效性建立在以下前提之上：
 3. **奖励塑形与推理能力**：基于正确性的二元奖励信号对于复杂的 Chain-of-Thought 推理任务是否足够？是否需要引入过程奖励模型（Process Reward Model）或更细粒度的奖励塑形策略来进一步提升推理能力？
 
 4. **与 MoE 架构设计的协同**：当前工作将 MoE 架构（专家数量、Top-K 值、专家容量等）视为固定配置，未来可探索 GRPO 优化与架构搜索的联合设计，实现路由策略与模型结构的协同进化。
-
-
 
 ## 原文 PDF
 

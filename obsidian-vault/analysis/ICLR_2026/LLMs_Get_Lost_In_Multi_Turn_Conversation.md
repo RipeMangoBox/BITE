@@ -82,8 +82,6 @@ claims:
 
 两种简单的缓解策略——**RECAP**（每轮重复已揭示信息）和 **SNOWBALL**（累积重复所有历史信息）——能在四项任务上带来 15–20% 的改善，但均无法恢复到 FULL 水平（Table 5, Section G.1），说明当前 LLM 本质上缺乏在多轮对话中恢复和重新聚焦的能力。
 
-
-
 大语言模型（LLM）在单轮、指令完整的理想化基准测试中表现卓越，但真实世界的交互往往以多轮对话形式展开，用户需求并非一次性完整给出，而是在对话过程中逐步揭示。这种“指令逐渐明晰”的对话模式构成了当前LLM评估体系中的一个显著盲区：现有基准测试几乎完全忽略了多轮交互中信息逐片披露所带来的挑战。
 
 本文通过构建一个名为 **Sharded Simulation** 的仿真框架，系统性地量化了这一盲区的影响。该框架的核心思路是将现有的单轮完整指令通过分片处理（sharding process）转化为一组更小的、去上下文的指令片段（shards），然后在多轮对话中由模拟用户逐片释放这些信息，从而严格复现“指令逐渐揭示”的真实对话场景。实验覆盖了15个主流开源与闭源LLM，涉及代码生成、数据库查询、数学推理等六类生成式任务，进行了超过20万次对话模拟。
@@ -93,8 +91,6 @@ claims:
 即使将温度参数降至0.0，不可靠性仍维持在约30%的高位（GPT-4o），表明常规的确定性解码策略无法根治这一问题。进一步分析发现，模型在对话早期就倾向于给出完整答案、生成冗长回复、过度依赖之前的错误输出，以及忽略对话中间轮次引入的信息，这些行为模式共同构成了性能退化的因果链条。值得注意的是，推理型模型（如o3、R1）并未展现出明显优势，暗示当前的推理增强技术在设计时同样未考虑多轮对话的独特挑战。
 
 这一发现揭示了LLM在从“实验室单轮”走向“真实多轮”应用时面临的根本性瓶颈：模型缺乏在对话中恢复和重新聚焦的能力，而现有评估范式系统性地高估了其实际可用性。
-
-
 
 ## 核心方法与创新机理
 
@@ -128,8 +124,6 @@ claims:
 - **RECAP/SNOWBALL 重复策略**：虽能带来 15–20% 的改善，但远未恢复到 FULL 水平（Table 5, Section G.1）。
 
 这些结果表明，模型在多轮对话中的“迷失”并非简单的提示工程问题，而可能源于**注意力机制在渐进信息流下的结构性偏移**——模型过早锁定早期假设、过度依赖自身之前的错误回答，从而丧失了对新揭示信息的重新聚焦能力。
-
-
 
 本文提出的**Sharded Simulation Framework**是一个将单轮完整指令转化为多轮逐片对话的仿真环境，旨在系统性地测量LLM在信息渐进揭示条件下的性能退化。该框架的核心思想是：将传统单轮评测中的“一次性完整指令”拆解为多个原子信息单元（shards），并通过多轮对话逐轮释放，从而模拟真实世界中用户逐步提供需求的交互模式。
 
@@ -181,8 +175,6 @@ claims:
 - **不可靠性** $U_{10}^{90} = \mathrm{percentile}_{90}(S) - \mathrm{percentile}_{10}(S)$：十分位距，衡量因模型随机性导致的质量波动。
 
 这一指标体系将性能退化分解为“能力下降”与“不可靠性上升”两个正交维度，为后续的根因分析提供了量化基础。
-
-
 
 ### 分片仿真框架（Sharded Simulation Framework）
 
@@ -248,8 +240,6 @@ $$R_{10}^{90} = 1 - U_{10}^{90}$$
 
 **指标间的因果解释关系**：实验结果表明，多轮对话中的平均性能下降（$\overline{P}$ 降低）主要源于不可靠性 $U_{10}^{90}$ 的急剧上升（平均增加112%），而非能力 $A^{90}$ 的显著下降（平均仅下降16%）。这一分解是本文的核心洞察：**模型并非“做不到”，而是“时灵时不灵”**。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：多轮对话中的系统性性能退化
@@ -291,9 +281,6 @@ $$R_{10}^{90} = 1 - U_{10}^{90}$$
 
 在SHARDED设定中，模型的答案尝试长度随尝试次数递增，且显著长于FULL/CONCAT中的答案——即使在最终正确的解答中，SHARDED中的代码也比FULL中长**27%**（**Figure 8**）。这进一步印证了模型在多轮对话中倾向于生成冗余内容，而非精准聚焦于当前信息。
 
-![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_VKGTGGcwl6/figures/011_Figure_8.jpg]]
-*Figure 8: Average length (in number of characters) of answer attempts across four tasks (Code, Database, Data-to-text, and Summary) in SHARDED conversations. Answer attempts in the FULL and CONCAT settings tend to be shorter on average than those from SHARDED setting. SHARDED answer attempts increase in length as the LLMs make more answer attempts*
-
 #### 3. “中间轮次丢失”现象
 
 **Figure 9** 揭示了模型在摘要任务中的信息引用模式：模型更倾向于引用对话中第一轮或最后一轮引入的文档信息，而系统性地忽略中间轮次引入的内容。这种“中间轮次丢失”（loss-in-middle）现象表明，模型在多轮对话中无法均匀地整合逐步揭示的信息，而是过度依赖首尾信息。
@@ -310,9 +297,6 @@ $$R_{10}^{90} = 1 - U_{10}^{90}$$
 - **系统提示预告**（**Table 6**）：在系统提示中明确告知模型对话可能不会一次性提供完整信息，仅使GPT-4o的平均性能提升**+1%**，对可靠性的影响微乎其微。
 - **RECAP与SNOWBALL策略**（**Table 5**）：通过在每轮对话中重复之前用户提供的信息来帮助模型保持聚焦。SNOWBALL（累积重复所有历史信息）在四项任务上带来了**15-20%**的性能改善，但仍远未恢复到FULL水平；RECAP（仅重复上一轮信息）的改善更为有限。这表明简单的信息重复只能部分缓解问题，无法从根本上解决模型在多轮对话中的迷失。
 
-![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_VKGTGGcwl6/figures/015_Table_5.jpg]]
-*Table 5: Experimental Results with additional simulation types: Recap and Snowball. Both strategies involve repeating user-turn information to mitigate models getting lost in conversations. Table 6: Comparing performance in SHARDED conversations of GPT-4o given no system prompt (default) vs. providing a specialized system prompt hinting that the conversation will likely be underspecified. Results reported on four tasks: Math, Actions, Database, and Code*
-
 ![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_VKGTGGcwl6/figures/016_Table_7.jpg]]
 *Table 7: Unreliability of models when changing assistant temperature (AT) and user temperature (UT) in FULL, CONCAT and SHARDED settings. The lower the number the more reliable the assistant is*
 
@@ -322,21 +306,6 @@ $$R_{10}^{90} = 1 - U_{10}^{90}$$
 
 ![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_VKGTGGcwl6/figures/017_Table_8.jpg]]
 *Table 8: Performance on the translation task for FULL, CONCAT, and SHARDED simulations*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_VKGTGGcwl6/figures/001_Figure_1.jpg]]
-*Figure 1: Our simulated conversations for 6 generation tasks on the 15 LLMs observe a major performance drop in multi-turn settings (-39%), explained by some loss in Aptitude, and large loss in Reliability*
-
-![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_VKGTGGcwl6/figures/008_Table_2.jpg]]
-*Table 2: Results of the manual inspection of 100 simulated SHARDED conversations across four tasks: Actions, Code, Math, and Database. The first column aggregates annotation results on the four tasks*
-
-![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_VKGTGGcwl6/figures/014_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_VKGTGGcwl6/figures/018_Table_9.jpg]]
-*Table 9: Definition of turn categories. We include the description in the prompt to categorize assistant responses*
-
-
 
 ## 定位与知识库关联
 
@@ -392,8 +361,6 @@ $$R_{10}^{90} = 1 - U_{10}^{90}$$
 2. **根本性修复路径**：如何通过训练或架构改进赋予 LLM 在多轮对话中**恢复和重新聚焦**的能力，而非仅依赖外部提示工程（如 RECAP/SNOWBALL 仅带来 15-20% 的改善）？
 3. **推理模型的潜力挖掘**：推理模型（如 o3、R1）为何未表现出明显优势？是否可以在多轮对话中优化 test-time compute 的使用策略？
 4. **人因研究的必要性**：用户交互研究能否揭示这种不可靠性如何影响真实用户的信任和采用决策？仿真框架的结论在多大程度上能迁移到真实人机对话中？
-
-
 
 ## 原文 PDF
 

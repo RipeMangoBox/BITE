@@ -57,8 +57,6 @@ claims:
 
 该方法统一于 GRPO 优化框架下，所有对比实验保持训练超参数一致，评估覆盖数学、代码、指令跟随等 8 个基准，确保结论的公平性与泛化性。
 
-
-
 ### 大语言模型推理能力的强化学习范式
 
 将强化学习应用于大语言模型（LLM）的推理能力激发，已成为后训练阶段的核心技术路径。其典型范式为可验证奖励强化学习（RLVR），通过真实答案标签提供二元监督信号，结合GRPO等策略优化算法，在数学推理、代码生成等任务上取得了显著成效。该范式的目标函数可形式化为：
@@ -89,8 +87,6 @@ $$\hat{A}_i = \frac{r(a,y_i) - \mathrm{mean}(\{r(a,y_i)\}_{i=1}^G)}{\mathrm{std}
 - **模型侧时间不变性**：模型在不同训练时刻对同一问题的推理，其正确性不应剧烈波动。
 
 基于此，稳定自监督强化学习的关键不在于设计更复杂的单视角奖励函数，而在于**寻求推理在不同视图间的不变性**——通过引入互补视角的跨监督信号，打破单一策略的自我循环，从根本上抑制奖励黑客与训练崩溃。这一哲学构成了Co-rewarding框架的设计原点。
-
-
 
 ## 核心方法与创新机理
 
@@ -132,8 +128,6 @@ Co-rewarding-II/III 的 EMA 教师更新是区别于多数投票方法的关键�
 - **Co-rewarding-III**（正交组合）：同时整合数据侧跨监督与模型侧自蒸馏，在 Co-rewarding-I 和 Co-rewarding-II 基础上进一步获得平均 +1.72% 和 +7.11% 的提升
 
 三者均以 GRPO 为底层策略优化器，共享组内标准化优势估计与 Clipped Surrogate Objective 加 KL 惩罚的更新机制，创新的差异仅体现在**监督信号的来源与构造方式**上。
-
-
 
 ![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_fDk95XPsCU/figures/005_Figure_2.jpg]]
 *Figure 2: Illustration of Co-rewarding framework: Unlike single-view methods that rely only on internal reward signal on original question (a), Co-rewarding introduces complementary supervision. On the data side (b), paraphrased questions yield pseudo-labels for cross-reference. On the model side (c), teacher model isolated from current policy provides stabilized pseudo-labels for updates*
@@ -183,8 +177,6 @@ $$ \alpha^{(k)} = 1 - \frac{(\alpha_{\text{end}} - \alpha_{\text{start}})}{2} \l
 - **Co-rewarding‑I**：输入为原始问题 $x$ 及其改写版本 $x'$；对 $x'$ 的 rollout 进行多数投票得到 $y'_v$，用 $y'_v$ 监督 $x$ 的 rollout；反之亦然。输出为跨参考优势 $\hat{A}_i$ 驱动的策略更新。
 - **Co-rewarding‑II**：输入仅为原始问题 $x$；教师模型对 $x$ 生成 rollout 并投票得到 $\tilde{y}_v$，以此监督学生策略的 rollout。输出为解耦伪标签驱动的策略更新。
 - **Co-rewarding‑III**：将 I 和 II 正交组合，同时利用改写问题的跨参考伪标签和 EMA 教师的稳定伪标签，对原始问题和改写问题进行双向监督。
-
-
 
 ### 问题定义与GRPO基础
 
@@ -265,8 +257,6 @@ $$\mathcal{J}_{\mathrm{Co-rewarding-III}} = \mathbb{E}_{x' \in \mathcal{D}'} \ma
 
 Co-rewarding-III则同时具备数据侧类比不变性和模型侧时间不变性，在Table 1的8个基准上取得最全面的性能提升。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与训练稳定性
@@ -326,15 +316,11 @@ Figure 5对比了各方法在GSM8K和AMC上的验证曲线。Co-rewarding展现�
 
 所有方法均采用GRPO作为底层策略优化器，训练超参数（batch size、学习率、rollout数量等）保持一致（详见Table 5）。评估覆盖数学、代码、指令跟随和多任务共8个基准，避免单一指标偏差。Co-rewarding-II的EMA教师推理虽引入额外计算，但未增加额外的大模型参数量，且通过共享GPU资源实现，对比基线时未进行不公平的算力倾斜。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_fDk95XPsCU/figures/007_Table_2.jpg]]
 *Table 2: Main Results (%) of Co-rewarding and baselines trained on DAPO-14k. Cell background colors indicate relative performance: darker colors denote better results within each model group. Additional Results of Qwen3-8B-Base and Qwen3-4B-Base trained on OpenRS refer to Table 8*
 
 ![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_fDk95XPsCU/figures/022_Table_3.jpg]]
 *Table 3: Ablation study of Co-rewarding. For Co-rewarding-I, ablations train only on original or rephrased data. For Co-rewarding-II, ablation removes EMA updates of the reference teacher. 4.2 EXPERIMENTAL RESULTS*
-
-
 
 ## 定位与知识库关联
 
@@ -375,8 +361,6 @@ Co-rewarding的方法论定位是将自监督RL从“单视角反馈”范式推
 3. **数据增强深度**：除简单的语义改写外，更复杂的数据增强策略（如风格迁移、对抗改写）是否能进一步提升数据侧不变性的鲁棒性？当前仅探索了同义改写，更丰富的视图可能带来更大增益。
 
 4. **教师更新策略优化**：EMA教师更新与自监督学习中经典的momentum encoder架构是否存在更优的融合方式？当前的余弦退火调度是否为最优选择，还是存在更自适应的更新策略？
-
-
 
 ## 原文 PDF
 

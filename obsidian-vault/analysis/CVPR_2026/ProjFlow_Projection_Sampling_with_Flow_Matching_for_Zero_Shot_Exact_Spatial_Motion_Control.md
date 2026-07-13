@@ -57,8 +57,6 @@ claims:
 - 在 2D 到 3D 运动重建任务中，FID 显著优于训练类方法 **Sketch2Anim**（平均 FID 0.349 vs 0.525，交叉 FID 0.168 vs 0.577），且 2D 重投影误差精确为 0（Table 2）。
 - 消融实验表明，将运动学感知度量替换为欧几里得度量后，FID 从 0.097 剧增至 **1.152**，验证了度量设计对运动真实感的决定性作用（Table 3）。
 
-
-
 ### 问题背景：空间运动控制的精确性与自然性困境
 
 可控人体运动生成旨在根据给定的空间约束（如指定关节的轨迹、关键姿态、相对位置关系等）生成自然、逼真的运动序列。这一任务在动画制作、虚拟现实、人机交互等领域具有广泛的应用需求。然而，现有方法在**约束满足的精确性**与**运动自然性**之间长期存在难以调和的张力。
@@ -86,8 +84,6 @@ ProjFlow的核心动机源于一个关键洞察：**将多种空间运动控制�
 对于稀疏观测场景（如运动修复），ProjFlow进一步引入**时间衰减的伪观测机制**：通过动态掩码控制邻域范围、自适应方差根据时间和局部曲率调整伪观测的可信度，在稀疏关键帧之间生成平滑过渡，弥补了简单硬约束在稀疏输入下的不足。
 
 这一统一框架使得ProjFlow能够以零样本、无需训练的方式处理多种空间运动控制任务，从根本上摆脱了对任务特定训练和内循环优化的依赖。
-
-
 
 ## 核心方法与创新机理
 
@@ -134,8 +130,6 @@ $$R = w_{\mathrm{kin}} (I_3 \otimes I_N \otimes L_{\mathrm{kin}}) + \lambda I_d$
 ### 随机重构：保持生成多样性的必要组件
 
 投影修正确保了约束满足，但若采用确定性重构（$\eta_t = 0$），采样过程会退化为缺乏多样性的模式坍塌——消融实验中 FID 恶化至 3.429（Table 3）。ProjFlow 通过**随机重构**步骤，在修正后的干净端点和原始噪声之间重新混合随机扰动，维持了流匹配采样的随机性，确保生成结果在满足约束的同时保持丰富的多样性。
-
-
 
 ProjFlow 是一个无需训练的采样器，在预训练流匹配运动先验的基础上，通过在每个采样步执行**投影校正**，实现对线性空间约束的零样本精确满足。其核心思路是将多样化的空间运动控制任务统一建模为线性逆问题，并在流匹配的 ODE 积分路径上施加闭合形式的投影，从而在保持运动自然感的同时，消除约束违反。
 
@@ -193,12 +187,8 @@ $$R = w_{\mathrm{kin}} (I_3 \otimes I_N \otimes L_{\mathrm{kin}}) + \lambda I_d$
 
 **输入**：噪声样本 $\mathbf{x}_0 \sim \mathcal{N}(0, I)$、线性约束 $(\mathbf{y}, A, \Sigma)$、文本条件（可选）。**输出**：满足约束的干净运动序列 $\mathbf{x}_1$。整个过程无需训练、无需内循环优化，仅通过 ODE 积分路径上的投影校正即实现零样本精确控制。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l970_https_openaccess_thecvf_com_content_CVPR2026_html_Watanabe_ProjFlow_Proj/figures/001_Figure_1.jpg]]
 *Figure 1: ProjFlow provides a unified, zero-shot framework for exact spatial motion control. The method handles diverse applications by formulating them as linear inverse problems. Examples of applications include (a) precisely following a specified joint’s trajectory, (b) lifting 2D keypose and 2D trajectory inputs to a full 3D motion, (c) maintaining a fixed relative position between joints, and (d) generating seamlessly looped motion by matching start and end poses*
-
-
 
 ProjFlow 的推理管线由三个核心模块串联构成，每个采样步 $t$ 依次执行：**干净端点预测**、**投影校正**、**随机重构**。对于运动修复任务，额外引入**伪观测生成模块**以处理稀疏关键帧。以下逐一展开各模块的公式与变量含义。
 
@@ -258,13 +248,6 @@ $$\tilde{\pi}_n^{(t)} = \tau(t) \, \frac{c_0}{1 + \lambda_s \, (s_n(\hat{\mathbf
 
 ![[assets/figures/papers/paper_list_l970_https_openaccess_thecvf_com_content_CVPR2026_html_Watanabe_ProjFlow_Proj/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the Projection Sampling Step. At each timestep t: (1) predict the clean endpoint*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l970_https_openaccess_thecvf_com_content_CVPR2026_html_Watanabe_ProjFlow_Proj/figures/003_Figure_3.jpg]]
-*Figure 3: Pseudo-observations for motion inpainting. Sparse observations are interpolated to guide intermediate frames. This guidance is controlled by two mechanisms: Dynamic Masking activates a time-scheduled neighborhood, and Adaptive Variance treats original observations as hard constraints and the interpolated guides as soft constraints*
-
-
 
 ## 实验与关键发现
 
@@ -355,13 +338,6 @@ Table 3 系统消融了 ProjFlow 的三个核心组件，揭示了每个组件�
 
 5. **超参数敏感性**：伪观测模块包含多个超参数（$\ell_{\mathrm{max}}$、$\tau_{\mathrm{min}}$、$\lambda_s$ 等），需要针对不同任务调整以获得最佳效果，其任务无关的鲁棒默认值尚未确定。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l970_https_openaccess_thecvf_com_content_CVPR2026_html_Watanabe_ProjFlow_Proj/figures/004_Figure_4.jpg]]
-*Figure 4: Text-conditioned pelvis-trajectory control. Given the prompt “a person runs forward in an S-shaped path” and a pelvis control signal, we compare OmniControl [61], MaskControl [45], and ProjFlow (ours). The rendered motions and the trajectory plots both visualize the generated pelvis trajectory (orange) overlaid on the target control signal (gray dotted line)*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 在空间运动控制谱系中的位置
@@ -405,8 +381,6 @@ ProjFlow 的适用性受以下条件约束：
 2. **跨域泛化**：ProjFlow 能否与更强大的运动基模型（如基于 Transformer 的生成模型）结合？能否扩展到物理模拟、人-物交互等需要接触约束的场景？
 3. **超参数自动化**：伪观测模块中的信任度评分和动态掩码参数是否可以自适应学习，而非手工设计？
 4. **结构化生成任务的推广**：该方法的核心思想——在生成过程的中间表示上施加结构化约束投影——能否推广到其他结构化生成任务，如人体姿态估计、分子构象生成？这需要验证度量设计（类比运动学感知度量 $R$）在目标领域的有效性。
-
-
 
 ## 原文 PDF
 

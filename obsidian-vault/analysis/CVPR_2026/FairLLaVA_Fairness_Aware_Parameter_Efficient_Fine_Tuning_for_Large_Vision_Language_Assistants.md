@@ -53,8 +53,6 @@ claims:
 
 与频率基础方法（重新加权、重新采样）和对抗性分类器方法相比，FairLLaVA 避免了灾难性遗忘和群体性能此消彼长的困境，实现了更优的公平‑效用权衡。消融实验进一步表明，联合训练人口属性分类器（DAC）与互信息最小化损失是获得稳健去偏效果的关键，而仅使用中间层隐藏状态进行互信息估计即可在大多数公平性间隙上取得显著缩小。
 
-
-
 ### 多模态大语言模型在医学影像中的捷径学习
 
 大型视觉语言模型（Large Vision-Language Models, LVLMs）在医学影像报告生成、视觉问答等任务中展现出强大的跨模态理解能力。然而，这些模型在训练过程中容易利用图像中潜伏的人口统计信息（如种族、年龄、性别）作为“捷径”（shortcut），而非依赖真实的病理视觉特征进行推理。如图1所示，LLaVA 的隐藏状态与人口属性之间存在显著的非零互信息（Mutual Information, MI），这种人口统计泄漏直接导致模型在不同群体间产生系统性性能差异——例如对“女性”群体的报告生成质量显著低于其他群体。
@@ -78,8 +76,6 @@ claims:
 FairLLaVA 的提出基于一个关键洞察：**语言模型隐藏状态中编码的人口统计信息是群体性能差异的可控因果节点**。通过最小化隐藏状态与人口属性之间的互信息，可以抑制模型对捷径的依赖，推动其学习人口统计不变的表征，从而在保持总体性能的前提下缩小群体间差距。
 
 该方法以轻量插件形式融入参数高效微调框架（LoRA），仅需在标准语言建模损失上附加互信息正则化项，无需改变基础模型架构，实现了公平性提升与总体性能保持的平衡。
-
-
 
 ## 核心方法与创新机理
 
@@ -127,8 +123,6 @@ FairLLaVA 与三类主流公平性方法形成鲜明对比：
 
 FairLLaVA 通过互信息正则化实现了更平衡的公平-效用取舍：在 MIMIC-CXR 上获得 12 项权益标度评分中的 7 项最优，涵盖 BLEU、RadGraph-F1 和 GREEN 多种评估指标（**Table 1**），同时总体临床性能与最优基线可比甚至更优。
 
-
-
 FairLLaVA 的整体流程围绕“冻结基础模型 + 轻量插件式去偏”展开，将公平性约束嵌入参数高效微调阶段，而非事后修正或数据重采样。其核心设计逻辑是：**多模态大语言模型（MLLM）的隐藏状态中编码了与人口统计属性（种族、年龄、性别）显著相关的互信息，这些信息被模型作为生成捷径利用，导致不同群体间的性能差距**（见 Figure 1）。FairLLaVA 通过在视觉指令微调阶段最小化隐藏状态与人口属性之间的互信息，迫使模型学习人口统计不变的表征，从而在保持总体生成质量的同时缩小群体间差距。
 
 ### 两阶段训练流程
@@ -165,8 +159,6 @@ $$ \mathcal{L}_{total} = \lambda_1\mathcal{L}_{LM} + \lambda_2\mathcal{L}_{DIM} 
 - **架构无关性**：互信息正则化以插件形式作用于语言模型的隐藏状态，不改变基础模型架构，可适配不同的视觉编码器和语言模型。
 - **参数高效**：仅训练 LoRA 适配器、投影仪 $\psi$ 和分类器 $\phi$，计算开销适度。
 - **多属性联合去偏**：支持同时对种族、年龄、性别三个属性进行互信息最小化（FairLLaVA-All），也可针对单一属性定向去偏（如 FairLLaVA-Race）。
-
-
 
 ### 问题形式化
 
@@ -233,13 +225,6 @@ FairLLaVA 以插件形式注入 LoRA 低秩适配器（Hu et al., ICLR 2022）�
 
 ![[assets/figures/papers/paper_list_l2677_https_arxiv_org_abs_2603_26008/figures/014_Figure_S.1.jpg]]
 *Figure S.1: Hyper Parameters Sensitivity (a) Varying the contribution of each attribute-specific MI term to the total loss on MIMIC-CXR leads to only minor changes, indicating stable overall performance across attributes. (b) Varying the contribution of language model loss*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2677_https_arxiv_org_abs_2603_26008/figures/001_Figure_1.jpg]]
-*Figure 1: FairLLaVA reduces performance disparities. LLaVA hidden states contain demographic shortcuts (non-zero Mutual Information (MI) between hidden states and demographic attributes) that lead to lower performance for “Female”. FairLLaVA minimizes this MI promoting demographic-invariant representation learning, therefore reducing the performance gap*
-
-
 
 ## 实验与关键发现
 
@@ -321,33 +306,14 @@ FairLLaVA 以插件形式注入 LoRA 低秩适配器（Hu et al., ICLR 2022）�
 
 5. **类别不平衡对 DAC 的影响**：互信息估计器（DAC）的分类性能可能受人口属性类别极度不平衡的影响，需依赖加权交叉熵等额外技巧来保证估计质量。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2677_https_arxiv_org_abs_2603_26008/figures/003_Table_1.jpg]]
 *Table 1: Equity-Scaled metrics on MIMIC-CXR computed as*
 
 ![[assets/figures/papers/paper_list_l2677_https_arxiv_org_abs_2603_26008/figures/004_Table_2.jpg]]
 *Table 2: Equity-Scaled metrics on MIMIC-CXR when individual demographic attributes are de-biased. Our targeted variants achieve the top ES scores on their respective attributes and show beneficial spillover to others*
 
-![[assets/figures/papers/paper_list_l2677_https_arxiv_org_abs_2603_26008/figures/005_Table_3.jpg]]
-*Table 3: Equity-scaled CheXpert-14 F1 (higher is better) on MIMIC-CXR compared with [8]*
-
-![[assets/figures/papers/paper_list_l2677_https_arxiv_org_abs_2603_26008/figures/006_Table_4.jpg]]
-*Table 4: Equity-Scaled and Overall metrics on the PadChest dataset. Both “Gender” and “Age” are considered in debiasing. FairLLaVA-All achieves consistently higher ES metrics across demographic attributes and also the best overall performance*
-
-![[assets/figures/papers/paper_list_l2677_https_arxiv_org_abs_2603_26008/figures/007_Table_5.jpg]]
-*Table 5: Equity-Scaled metrics on the HAM10000 dataset. Both “Gender” and “Age” are considered in debiasing. FairLLaVA-All achieves consistently higher ES metrics across demographic attributes*
-
 ![[assets/figures/papers/paper_list_l2677_https_arxiv_org_abs_2603_26008/figures/008_Table_6.jpg]]
 *Table 6: Ablation on pooling hidden states from FairLLaVA. FairLLaVA-mean pools first/middle/last hidden states. The middle layer attains a strong balance between maintaining performance and reducing gaps across attributes*
-
-![[assets/figures/papers/paper_list_l2677_https_arxiv_org_abs_2603_26008/figures/023_Table_S.8.jpg]]
-*Table S.8: ES-M metrics for the Age Group attribute on the MIMIC-CXR dataset and overall performance. Joint training of the*
-
-![[assets/figures/papers/paper_list_l2677_https_arxiv_org_abs_2603_26008/figures/020_Table_S.6.jpg]]
-*Table S.6: Fairness Gaps (First three main columns across Race, Age, Gender) and Overall performance (last column) on MIMIC CXR dataset. Highlights tradeoff between Overall-Performance and Fairness-Gaps. Fairness gaps lower the better, Overall performance higher the better*
-
-
 
 ## 定位与知识库关联
 
@@ -399,8 +365,6 @@ FairLLaVA 的设计决定了其适用边界存在以下约束：
 ### 4. 在知识库中的定位
 
 FairLLaVA 在 MLLM 公平性研究中的核心贡献在于：**将互信息最小化从传统表示学习领域引入多模态指令微调场景，并以参数高效的方式实现**。与现有的数据重平衡方法和对抗性去偏方法相比，它提供了一条更稳定、更轻量的技术路径。其“插件式”设计使其可以作为通用模块嵌入到各类 MLLM 的微调流程中，为后续研究提供了一个可扩展的公平性正则化框架。
-
-
 
 ## 原文 PDF
 

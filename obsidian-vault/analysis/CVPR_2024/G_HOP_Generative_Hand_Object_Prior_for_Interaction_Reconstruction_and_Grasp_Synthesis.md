@@ -178,8 +178,6 @@ $$s(\theta, \mathbf{T}_{oh}) = -\sum_{i=1}^{T} w_i \| \mathbf{x}(\theta, \mathbf
 
 整体数据流为：**输入**（类别文本 + 可选视频帧/物体网格）→ **交互网格构建**（物体潜在 SDF + 手部骨骼距离场）→ **扩散先验评估**（SDS 梯度计算）→ **场景参数优化**（重建或抓取参数）→ **输出**（3D 手物形状与相对位姿，或抓取候选排名列表）。各模块之间通过可微操作连接，确保梯度能从 SDS 损失端到端传递至场景参数。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1715_G_HOP_Generative_Hand_Object_Prior_for_Interaction_Reconstruction_and_Gr/figures/002_Figure_2.jpg]]
 *Figure 2: Method Overview of Generative Hand-Object Prior: Hand-object interactions are represented as interaction grids within the diffusion model. This interaction grid concatenates the (latent) signed distance field for object and skeletal distance field for the hand. Given a noisy interaction grid and a text prompt, our diffusion model predicts a denoised grid. To extract 3D shape of HOI from the interaction grid, we use decoder to decode object latent code and run gradient descent on hand field to extract hand pose parameters*
 

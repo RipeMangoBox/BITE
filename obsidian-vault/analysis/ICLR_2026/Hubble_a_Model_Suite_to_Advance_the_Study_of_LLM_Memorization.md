@@ -203,31 +203,14 @@ HUBBLE通过训练仅包含单一风险域扰动的1B模型，验证了多域扰
 
 需要指出的是，HUBBLE模型虽然达到8B参数、500B tokens的训练规模，但仍远小于商业LLM（如Llama 3的15T tokens）。稀释效应在更大数据量下的表现有待进一步验证。此外，稀释和排序仅是缓解策略，不能完全消除版权或隐私风险——某些高度重复的攻击仍可成功。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_ZfdnZhOP0k/figures/030_Figure_17.jpg]]
-*Figure 17: Unlearning results on Gutenberg Unpopular. Unlearning results using (out-of-domain, unseen) Wikitext (lower row) and (in-domain, seen) Keep set (upper row) as the retain sets. None of the unlearning methods simultaneously achieve the target behavior on both the seen Keep set (left column) and the unseen Test set (right column)*
-
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_ZfdnZhOP0k/figures/031_Figure_18.jpg]]
-*Figure 18: Unlearning results on YAGO biographies. Unlearning results using (out-of-domain, unseen) Wikitext (lower row) and (in-domain, seen) Keep set (upper row) as the retain sets. None of the unlearning methods simultaneously achieve the target behavior on both the seen Keep set (left column) and the unseen Test set (right column)*
-
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_ZfdnZhOP0k/figures/005_Table_2.jpg]]
 *Table 2: HUBBLE perturbation datasets on Hugging Face, grouped by domain and data type. Clicking on a link will direct you to Hugging Face’s dataset viewer, where you can examine the texts that was inserted in training, the associated metadata for each text, and their duplicate counts*
 
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_ZfdnZhOP0k/figures/006_Table_3.jpg]]
 *Table 3: Percentage of training data overwritten by duplicated perturbation data. These calculations depend on the selected sequence length of 2048 tokens and training batch size of 1024 sequences*
 
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_ZfdnZhOP0k/figures/007_Table_4.jpg]]
-*Table 4: Hubble model configuration*
-
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_ZfdnZhOP0k/figures/008_Table_5.jpg]]
 *Table 5: Zero-shot benchmark results using the Pythia suite. We report results for models of comparable size and training token budgets (≤ 500B) and also include OLMo and Llama models. We use the same evaluations as the Pythia suite and run them through EleutherAI’s Language Model Evaluation Harness (Gao et al., 2023). ∗Token counts are based on the model’s documentation and may use different tokenizers*
-
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_ZfdnZhOP0k/figures/017_Table_9.jpg]]
-*Table 9: Indirect PII Attack Defitions. The instantiated indirect PII inference attacks are listed below. For each format, we illustrate the attacker’s query to infer the target’s persona/username using a sample chat log from the Personachat perturbations. Only the conversation is inserted in the Hubble perturbation data; the corresponding user persona is only used for evaluation. Candidates are drawn from other examples in the dataset*
-
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_ZfdnZhOP0k/figures/026_Table_10.jpg]]
-*Table 10: ROC AUC scores of baseline MIAs for the HUBBLE 8B (500B tokens) perturbed model. Dup indicates the duplication level of members. Dup ̸= 0 treats all inserted perturbations as members. Non-members are always drawn from perturbations inserted 0 times. As duplication increases, memorization becomes stronger, and it becomes easier for membership inference attacks (MIA) to distinguish between members and non-members*
 
 ## 定位与知识库关联
 

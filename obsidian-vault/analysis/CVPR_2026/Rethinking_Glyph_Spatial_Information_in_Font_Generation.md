@@ -52,8 +52,6 @@ claims:
 
 **主要结果**：在 UFSC 数据集 8-shot 设置下，SPR 方案使扩散模型基线性能显著提升（N[L1] 从 0.2922 降至 0.2349）；GlyphSpatialNet 在无组件标签条件下达到 SOTA，4-shot UFSC 的 RMSE 为 0.0947，PSNR 25.51，SSIM 0.9093，LPIPS 0.0498。消融实验表明，风格细节增强模块（SDE）使基础模型性能与 MSD-Font 持平，进一步引入形状-位置解耦（SPD）与梯度广播模块（GBM）后，UFSC 8-shot RMSE 降至 0.0916，UFUC 8-shot RMSE 降至 0.1588，验证了各模块的持续增益。
 
-
-
 ### 字体生成中的空间信息困境
 
 字体自动生成旨在从少量参考字形中学习风格特征，并将其迁移到未见字符上，从而大幅降低字体设计的人工成本。近年来，基于生成对抗网络和扩散模型的方法在图像质量上取得了显著进展，但一个根本性问题长期被忽视：**字形空间信息的丢失**。
@@ -79,8 +77,6 @@ claims:
 3. **矢量化层面**：利用保留的空间信息，将模型输出的像素字形精确转换回矢量格式，实现端到端的可用字体生成。
 
 基于这一认识，本文提出**空间保留渲染（Spatial-Preserving Rendering, SPR）方案**和**GlyphSpatialNet**两阶段框架。SPR 方案基于 EM 单位和基线偏移建立可逆的渲染-矢量化映射，从根本上消除空间偏差；GlyphSpatialNet 则通过形状-位置解耦（SPD）架构和梯度广播模块（GBM），在像素空间中显式分离形状学习与空间校正，最终在无需组件标签的条件下达到 SOTA 性能。
-
-
 
 ## 核心方法与创新机理
 
@@ -141,8 +137,6 @@ $$
 | 先验依赖 | 需组件/笔画标签 | 平均条件机制 | 仅需参考图平均风格特征 |
 
 **需人工验证**：SPR方案对GAN类方法的性能影响为负（Table 2中GAN方法在SPR下指标普遍上升），这一现象的具体原因在现有证据中未充分解释，建议结合原文Section 4.2的讨论进一步确认。
-
-
 
 GlyphSpatialNet 是一个两阶段像素空间字体生成框架，其核心设计目标是在无需组件标签的条件下，显式解耦字形形状与空间位置，从而实现高保真、可矢量化的少样本字体生成。整个 pipeline 围绕三个关键环节展开：空间保留渲染（SPR）提供无偏训练数据与可逆矢量化通道；第一阶段在低分辨率下完成风格迁移与形状-位置解耦；第二阶段在像素空间恢复高分辨率风格细节。
 
@@ -205,8 +199,6 @@ $$\mathcal { L } _ { \mathrm { S t a g e I I } } = \| U S \big( D S ( I _ { G } 
 5. **先验依赖**：通过平均条件机制仅使用参考图像的平均风格特征，免去组件标签等局部先验。
 
 SPR 方案本身具有通用性——论文在 Table 2 中验证，将其应用于扩散模型可使 UFSC 8-shot 的 N[L1] 从 0.2922 降至 0.2349，N[RMSE] 从 0.7530 降至 0.6187，表明无偏渲染对扩散模型的性能提升显著。但值得注意的是，SPR 对 GAN 类方法反而有负面影响，这暗示空间偏差的消除可能暴露了 GAN 在细粒度空间建模上的固有不足，需要手动验证具体原因。
-
-
 
 ### 3.1 空间保留渲染（SPR）方案
 
@@ -271,13 +263,6 @@ $$\mathcal { L } _ { \mathrm { S t a g e I I } } = \| U S \big ( D S ( I _ { G }
 其中 $DS$ 为无参数双线性下采样器，$US$ 为风格引导的上采样器，$I_G^h$ 为高分辨率目标图像。该阶段冻结风格编码器，仅训练上采样器以恢复细节。
 
 **推理流程**：高分辨率内容图像经下采样得到 $I_C^l = DS(I_C^h)$，送入第一阶段SPD逆向过程生成低分辨率字形，再经SDE上采样至目标分辨率，最终通过SPR矢量化转换为TTF字体。推理中采用DDIM采样器（$\eta=0$）加速逆向过程。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2582_https_openaccess_thecvf_com_content_CVPR2026_html_Su_Rethinking_Glyph_Sp/figures/003_Figure_2.jpg]]
-*Figure 2: Illustration of our SPR scheme. The rendering process provides a spatially unbiased glyph image by preserving spatial information from G to R, and the rendered data is used for model training. The vectorization process performs a transformation from V to G on the control point coordinates of the obtained contour, which is vectorized from the model’s inference results*
-
-
 
 ## 实验与关键发现
 
@@ -351,9 +336,6 @@ Table 5 通过逐步叠加模块的方式，在 UFSC 和 UFUC 上量化各组件
 
 Figure 4 给出 SPR 方案在不同渲染分辨率下的误差曲线。当分辨率达到 128² 时，SPR 引入的量化误差已低于生成模型对未见字符的固有预测误差（参考 Table 4 中 UFUC 的 RMSE 水平），继续提高分辨率带来的精度收益边际递减。因此本文选择 128² 作为第一阶段低分辨率风格迁移的工作分辨率，在精度与计算效率间取得平衡。
 
-![[assets/figures/papers/paper_list_l2582_https_openaccess_thecvf_com_content_CVPR2026_html_Su_Rethinking_Glyph_Sp/figures/008_Figure_4.jpg]]
-*Figure 4: The SPR scheme error curve as a function of resolution. When the resolution is*
-
 ---
 
 ### 失败模式与局限性
@@ -365,13 +347,6 @@ Figure 4 给出 SPR 方案在不同渲染分辨率下的误差曲线。当分辨
 2. **跨文字系统迁移未验证**：SPD 架构的设计依赖于中文字符的方块结构和基线对齐特性，对于拉丁文（可变宽度、多基线）或日文（混合文字）等不同文字系统的适用性尚未验证，这是方法泛化性的开放问题。
 
 3. **GAN 方法的 SPR 兼容性**：Table 2 显示 GAN 在 SPR 下性能退化，说明 SPR 方案目前主要惠及扩散模型。如何设计适用于 GAN 的空间信息保留策略仍需探索。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2582_https_openaccess_thecvf_com_content_CVPR2026_html_Su_Rethinking_Glyph_Sp/figures/002_Table_1.jpg]]
-*Table 1: Comparison of existing Chinese font datasets in FFG with ours. The quantity and quality of existing datasets are compromised due to spatial distortion during rendering and copyright restrictions, and as a result, different methods typically collect their own datasets. Our dataset provides vector source files, along with our SPR scheme, enabling flexible resolution and spatially unbiased glyph images, or for use in vector-driven methods and future exploration*
-
-
 
 ## 定位与知识库关联
 
@@ -416,8 +391,6 @@ NTF（Fu et al., CVPR 2023）基于神经变换场，代表了向量驱动方法
 2. 极端风格下的空间建模有效性：在瘦金体、草书等笔画高度变形、空间结构非规范的字体上，显式空间建模是否能保持高质量生成？这需要在更大规模的风格多样性数据集上进行验证。
 3. 与向量驱动方法的深度融合：SPR 方案已具备精确矢量化的能力，但尚未与向量驱动方法（如 NTF）进行系统性结合。将像素空间的形状-位置解耦与向量空间的轮廓优化相结合，可能是进一步提升轮廓控制精度的方向。
 4. 更大空间偏差的校正能力：GBM 模块通过梯度广播扩大了位置路径的校正范围，但其对极端空间偏移（如某些装饰性字体的巨大基线偏移）的校正上限尚未量化评估。
-
-
 
 ## 原文 PDF
 

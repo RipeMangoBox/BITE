@@ -86,8 +86,6 @@ claims:
 
 > ⚠️ 论文未标注具体发表年份与会议，部分基线方法的引用元数据需手动核实。
 
-
-
 ### 位姿图初始化在增量SfM中的关键地位
 
 增量式运动恢复结构（Incremental SfM）是三维重建的核心流程，其重建质量高度依赖于初始位姿图（pose graph）的选取。位姿图以图像为节点、以图像对之间的可验证连接为边，决定了后续的相机注册顺序和场景几何估计。一个理想的初始位姿图应当满足两个条件：**全局连通**（避免场景碎片化）和**边高度可靠**（避免错误注册导致漂移）。然而，在实际应用中，这两个目标往往相互冲突——追求连通性可能引入弱连接或错误边，而过分保守地筛选可靠边又可能导致图不连通，使部分图像无法注册。
@@ -109,8 +107,6 @@ claims:
 本文的核心动机由此确立：**在几何验证之前，利用全局信息对所有候选边进行可靠性排序，并以此指导位姿图的构造。** 具体而言，我们提出训练一个图神经网络（GNN），以SfM几何信号（RANSAC内点数和3D点重叠度）作为自监督标签，学习预测每条边在全局结构中的匹配性分数。进一步，我们用这些全局感知的边排名来指导多个最小生成树（MST）的迭代构造，并通过连通性感知的分数调制强化弱连接区域，最终生成一个紧凑、连通且冗余的初始位姿图。
 
 这一思路的关键洞察在于：**边的“可靠性”不应仅由两幅图像的视觉相似度定义，还应包含该边对全局重建的贡献度。** 两幅图像可能视觉上高度相似，但如果它们共享的3D点极少，则对多视图几何的贡献有限；反之，一条视觉相似度中等但能连接两个稀疏子图的边，对重建完整性的价值可能更高。通过从SfM重建结果中提取RANSAC内点数和3D点重叠度作为监督信号，我们的GNN能够隐式地学习这种全局价值判断。
-
-
 
 ## 核心方法与创新机理
 
@@ -148,8 +144,6 @@ $$\tilde{r}_{ij} = \frac{1}{2}(\mathrm{norm}(u_{ij}) + \mathrm{norm}(v_{ij}))$$
 
 **创新总结**：三个changed slots形成闭环——GNN提供全局感知的边排名，多MST将排名转化为连通且冗余的图结构，距离调制则在前两者基础上进一步降低图直径。这一“全局推理+全局选择”的范式在IMC23-PhotoTourism上相较MegaLoc提升6.6个AUC@5°百分点（k=5），且在稀疏设定下优势更为显著。
 
-
-
 本文提出 **Global Edge Prioritization**，将位姿图初始化从“逐图像独立检索”重构为“全局排序 + 结构化选择”两阶段流水线。整体流程如图 2 所示，包含四个核心模块：
 
 1. **图像编码器**：对输入图像集 $\\{I_i\\}$，采用以 DINOv2 为骨干、SALAD（Izquierdo et al., CVPR 2024）聚合的方式提取全局描述子 $d_i \\in \\mathbb{R}^d$。编码器经过微调，使描述子空间对后续图推理友好。
@@ -170,15 +164,11 @@ $$\tilde{r}_{ij} = \frac{1}{2}(\mathrm{norm}(u_{ij}) + \mathrm{norm}(v_{ij}))$$
 
 **关键设计决策**：将“排序”与“选择”解耦——GNN 负责在完全图上进行全局推理以产生可靠的边优先级，多 MST 选择则保证图的全局连通性、冗余度和低直径。这一分工使得方法在稀疏连接（$k=1$ 或 $k=2$）下尤其受益：消融实验表明，移除 GNN 后 $k=1$ 时 AUC@5° 从 61.2 骤降至 55.4（Table 2），验证了全局推理不可替代；而连通性感知调制在 VisymScenes 上持续提升精度，尤其在 $k=2$–$3$ 稀疏区间效果显著（Table 1）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2103_https_arxiv_org_abs_2602_21963/figures/002_Figure_2.jpg]]
 *Figure 2: Overall pipeline. Input images are first encoded using a fine-tuned image encoder (DINOv2 backbone with SALAD aggregation). A complete graph is then constructed over image embeddings and processed by our GNN–MLP model to predict global edge ranks. During training, these predictions are supervised using geometry-derived ranking signals via a differentiable ranking loss. At inference, the predicted ranks guide the construction of multiple minimum spanning trees, whose union forms the initial pose graph. Incremental SfM is finally applied on this graph to recover the sparse 3D reconstruction*
 
 ![[assets/figures/papers/paper_list_l2103_https_arxiv_org_abs_2602_21963/figures/001_Figure_1.jpg]]
 *Figure 1: Given a set of input image pairs (left), our method ranks all candidate edges by global matchability (middle) and constructs a compact, well-connected pose graph via multi-MST selection (right). The resulting initialization enables accurate and stable 3D reconstruction, even under sparse or ambiguous settings*
-
-
 
 ### 3.1 问题形式化与初始边选择
 
@@ -251,8 +241,6 @@ $$s_{ij}^{(m)} = (1-\lambda) \hat{r}_{ij} + \lambda \bar{d}^{(m-1)}(i,j) \tag{9}
 - 每棵MST构造后，仅更新每张图像的**top-5候选边**分数，并丢弃预测排名低于0.9的边
 - 已选入先前MST的边通过赋 $-\infty$ 分数进行掩码，避免重复选择
 
-
-
 ## 实验与关键发现
 
 ### 主结果
@@ -293,31 +281,17 @@ $$s_{ij}^{(m)} = (1-\lambda) \hat{r}_{ij} + \lambda \bar{d}^{(m-1)}(i,j) \tag{9}
 * 距离调制参数λ的跨数据集泛化能力尚需进一步验证。
 * 该全局边优先级框架能否扩展到动态视频序列或RGB-D、LiDAR等多模态位姿图初始化场景？
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2103_https_arxiv_org_abs_2602_21963/figures/003_Figure_3.jpg]]
 *Figure 3: COLMAP reconstruction [42] performance using pose graphs constructed from multiple MSTs guided by baseline embedding similarities or our learned global edge ranks. Top row: Relative pose accuracy on IMC23-PhotoTourism [21] (AUC@2.5◦, left*
 
 ![[assets/figures/papers/paper_list_l2103_https_arxiv_org_abs_2602_21963/figures/004_Table_1.jpg]]
 *Table 1: Ablation of connectivity-aware score modulation on VisymScenes [50]. We report AUC@5◦ for pose graphs built from MegaLoc similarities and from our predicted global edge ranks, with and without modulation, as well as with DoppelGanger++ filtering. Modulation consistently improves accuracy for both methods, especially in the sparse regime (k = 2–3). COLMAP mapping time at k = 5 is shown in minutes*
 
-![[assets/figures/papers/paper_list_l2103_https_arxiv_org_abs_2602_21963/figures/005_Figure.jpg]]
-
 ![[assets/figures/papers/paper_list_l2103_https_arxiv_org_abs_2602_21963/figures/006_Table_3.jpg]]
 *Table 3: Ablation of the proposed connectivity-aware score modulation on VisymScenes. We evaluate three components: (i) whether modulation is applied, (ii) whether only the top-5 candidate edges per image are updated after each MST, and (iii) whether graph distances are normalized before modulation. Reported metrics are*
 
 ![[assets/figures/papers/paper_list_l2103_https_arxiv_org_abs_2602_21963/figures/007_Figure_4.jpg]]
 *Figure 4: Edge selection strategies for pose graph initialization. We report COLMAP [42] relative pose*
-
-![[assets/figures/papers/paper_list_l2103_https_arxiv_org_abs_2602_21963/figures/008_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l2103_https_arxiv_org_abs_2602_21963/figures/009_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l2103_https_arxiv_org_abs_2602_21963/figures/010_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l2103_https_arxiv_org_abs_2602_21963/figures/011_Figure.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -384,8 +358,6 @@ $$s_{ij}^{(m)} = (1-\lambda) \hat{r}_{ij} + \lambda \bar{d}^{(m-1)}(i,j)$$
 3. **跨模态扩展**：该全局边优先级框架能否扩展到动态视频序列（需考虑时序一致性）或多模态数据（如 RGB-D、LiDAR 点云）的位姿图初始化？GNN 的边特征设计需要相应调整以融合多模态信息。
 4. **与学习的局部特征结合**：当前方法依赖全局图像描述子，若与学习的局部特征（如 SuperPoint、LoFTR）结合，能否进一步提升在极端视角变化下的边排名质量？
 5. **端到端训练**：当前 GNN 训练与下游 SfM 是分离的，是否可能将重建质量（如重投影误差、注册相机数）作为训练信号，实现端到端的位姿图初始化学习？
-
-
 
 ## 原文 PDF
 

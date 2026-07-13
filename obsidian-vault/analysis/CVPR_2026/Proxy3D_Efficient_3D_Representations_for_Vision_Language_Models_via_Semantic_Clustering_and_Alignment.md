@@ -54,8 +54,6 @@ Proxy3D的核心洞察在于：视觉模态中的信息在语义上具有稀疏�
 
 然而，与人类水平的空间智能相比仍有显著差距，尤其在Scan2Cap密集描述任务上，基于表征的方法整体落后于基于对应关系的方法，这体现了简洁性与语义丰富性之间的根本权衡。
 
-
-
 ### 3D视觉语言模型的范式分化
 
 3D视觉语言模型（3D-VLM）旨在使多模态语言模型理解三维场景并执行问答、视觉定位、密集描述等空间推理任务。当前主流方法可归为两大范式，各自面临根本性瓶颈。
@@ -85,8 +83,6 @@ Proxy3D的核心动机源于一个直接观察：**如果视觉信息在语义�
 ### 方法定位与贡献预览
 
 Proxy3D属于基于显式表征的方法，但通过语义聚类机制实现了表征效率的质变。与现有表征方法相比，其视觉序列长度压缩至450–700 tokens（仅为LEO-VL的60%–93%，3DRS的不到10%），同时在ScanRefer视觉定位任务上达到59.6 Acc@0.5，超越Chat-Scene（55.5）和Descrip3D（57.2）；在VSI-Bench空间推理基准上取得47.0 overall，排名开源模型第二。这一“压缩即增强”的反直觉结果，验证了语义稀疏性假设的有效性。
-
-
 
 ## 核心方法与创新机理
 
@@ -138,8 +134,6 @@ Proxy3D 的因果调控旋钮（causal knob）在于利用**视觉语义的稀�
 
 这些局限为后续研究指明了方向：如何在不牺牲紧凑性的前提下增强代理表征的语义细粒度，以及如何将方法泛化至动态场景或室外大规模环境，是 Proxy3D 范式面临的核心开放问题。
 
-
-
 Proxy3D 提出了一套从多视角图像到紧凑三维代理表征的完整流水线，核心思路是利用视觉模态中信息的**语义稀疏性**，将高维场景特征压缩为一组低基数代理（proxies），再通过渐进式多阶段对齐使语言模型理解三维空间关系。整体流程可概括为四个环节：多源特征提取 → 语义感知聚类 → 空间编码与序列化 → 多阶段视觉-语言对齐。
 
 ### 多源特征提取
@@ -188,8 +182,6 @@ Proxy3D 采用四阶段训练策略（Figure 3），从简化的语义符号逐�
 4. **阶段四**：将简化嵌入替换为真实 3D 代理特征，进行最终指令微调。
 
 训练目标为标准的自回归负对数似然损失（Equation 6），基于代理序列 $\mathbf{Z}$ 预测回答 token。整个训练流程在 8×A6000 GPU 上约需 62 小时（Table 1），但推理时因序列极短而高效。
-
-
 
 Proxy3D 的核心设计围绕一个关键洞察展开：视觉模态中的信息在语义上具有稀疏分布，因此可以通过语义聚类将高维场景特征压缩为一组紧凑的代理表征（proxy representations），在显著降低视觉序列长度的同时保留空间信息。整个流水线由以下模块构成。
 
@@ -269,16 +261,6 @@ $$
 
 其中 $K$ 为代理序列长度，$r$ 为完整序列（视觉 token + 文本 token）的总长度，$t_i$ 为目标文本 token。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2240_https_arxiv_org_abs_2605_08064/figures/003_Figure_3.jpg]]
-*Figure 3: Proxy3D multi-stage training. Each stage in our progressive iterative training aims to develop a certain spatial intelligence skill from the easiest one to more complex ones: we begin with the simplified image-text alignment to actual images with spatial reasoning*
-
-![[assets/figures/papers/paper_list_l2240_https_arxiv_org_abs_2605_08064/figures/004_Figure_4.jpg]]
-*Figure 4: Coordinate alignment stage helps an MLLM to precisely align 3D positional embeddings with geometric coordinates*
-
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -323,19 +305,6 @@ Table 4 系统消融了 Proxy3D 各核心组件的贡献，揭示了以下关键
 几何预测器 VGGT 仅输出归一化点云坐标，为保留真实尺度信息，作者额外估计了尺度因子（具体方法未在论文中详细披露），该环节可能引入累积误差，影响尺寸相关任务的精度。
 
 训练成本方面，完整的四阶段渐进式训练在 8×A6000 GPU 上耗时约 62 小时（Table 1），训练开销较高。但推理阶段得益于极短的视觉序列长度（450–700 token），实际推理效率显著优于对应关系方法。
-
-![[assets/figures/papers/paper_list_l2240_https_arxiv_org_abs_2605_08064/figures/005_Table_1.jpg]]
-*Table 1: Estimated Proxy3D training time in hours using Section 3.2 training procedure and 8× A6000 NVIDIA GPUs*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2240_https_arxiv_org_abs_2605_08064/figures/011_Figure_7.jpg]]
-*Figure 7: Ablation study on VSI-Bench’s Scannet [13] split. Proxy3D outperforms the base Qwen2-VL-7B and GPT4Scene by a large margin in object counting, size and distance estimation. Coordinate alignment (CA) and longer sequences further increase metrics*
-
-![[assets/figures/papers/paper_list_l2240_https_arxiv_org_abs_2605_08064/figures/012_Table_5.jpg]]
-*Table 5: Ablation study on dynamic allocation of group-aware proxies from Section 3.1 for Proxy3D with 700 tokens*
-
-
 
 ## 定位与知识库关联
 
@@ -385,8 +354,6 @@ Table 4 系统消融了 Proxy3D 各核心组件的贡献，揭示了以下关键
 Proxy3D 在 3D-VLM 知识图谱中占据“高效显式表征”这一节点。它继承了基于表征方法的显式 3D 建模优势，同时通过语义聚类解决了该类方法长期面临的序列长度瓶颈。与 **LEO-VL**（750 tokens 统一表征）相比，Proxy3D 以更少的 token（700）实现了相当或更优的性能，且在空间推理任务上表现更稳健。与 **3DRS** 等基于对应关系的方法相比，Proxy3D 以不到 10% 的视觉序列长度取得了有竞争力的结果，证明了“语义稀疏性”这一先验假设在 3D 场景理解中的有效性。
 
 该方法的技术贡献可被后续工作沿两个方向继承：一是语义聚类的思想可推广至其他需要视觉 token 压缩的多模态任务；二是四阶段渐进式训练策略为 3D 空间智能的课程学习提供了可复用的范式。
-
-
 
 ## 原文 PDF
 

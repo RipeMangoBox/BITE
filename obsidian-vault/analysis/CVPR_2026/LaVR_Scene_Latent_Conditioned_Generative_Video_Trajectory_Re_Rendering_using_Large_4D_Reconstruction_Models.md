@@ -59,8 +59,6 @@ claims:
 
 **局限**：对透明物体（如被举起的玻璃杯）的几何估计仍存在困难；CUT3R 条件机制引入额外计算开销。
 
-
-
 ### 问题定义：单目视频的几何一致新轨迹渲染
 
 给定一段单目源视频，生成同一场景在任意新相机轨迹下的视频，这一任务在3D内容创作、虚拟现实和视频编辑等领域具有广泛的应用前景。该任务的核心挑战在于，生成的新视角视频必须同时满足两个相互制约的需求：**视觉质量**（生成帧的自然度与细节保真度）和**几何一致性**（场景结构在新视角下的空间连贯性）。
@@ -82,8 +80,6 @@ claims:
 本文提出 **LaVR**，其核心动机是打破上述权衡。关键洞察在于：大型4D重建模型（如CUT3R）在其隐式潜变量空间中已经编码了丰富的场景几何知识，这些知识可以作为“软约束”直接注入视频扩散模型，从而绕开显式点云重建的误差累积问题。
 
 具体而言，LaVR将预训练4D重建模型的潜变量作为几何条件信号，通过轻量适配器与视频VAE潜变量对齐后送入扩散模型。这种设计允许预训练视频扩散模型利用其强大的运动与场景先验来**校正小的几何不一致**，在不需要精确深度估计的前提下，同时实现高视觉质量与几何一致性（Figure 1）。
-
-
 
 ## 核心方法与创新机理
 
@@ -132,8 +128,6 @@ LaVR 相对于现有基线方法的核心变更体现在三个维度：
 
 定性结果（Figure 6, Figure 9）进一步佐证：LaVR生成的视频避免了点云条件方法的非自然扭曲伪影（如拉伸、细节丢失）以及无条件方法的幻觉内容（如凭空出现第三条手臂），在视觉自然性和几何一致性之间取得了现有方法无法达到的平衡。
 
-
-
 LaVR 的核心设计思路是用**预训练4D重建模型的隐式几何潜变量替代显式点云渲染**作为几何条件信号，注入到预训练视频扩散模型中。这一设计绕开了现有方法在几何一致性与视觉质量之间的根本性权衡：无几何条件的方法（如 **ReCamMaster**，Bai et al., arXiv 2025）缺乏空间感知能力，在大视角变化下产生漂移和幻觉；而基于点云渲染的几何条件方法（如 **Gen3C**，Ren et al., CVPR 2025；**TrajectoryCrafter**，Yu et al., ICCV 2025）高度依赖深度估计精度，深度误差会直接导致渲染视图的形状扭曲和空洞（见 Figure 7）。
 
 ### 输入输出与数据流
@@ -164,15 +158,11 @@ $$\mathcal{L}_{\mathrm{FM}} = \mathbb{E}_{t, z_{0}, \epsilon} \left[ \| v_{\thet
 
 模型在 **ReCamMaster** 的合成数据集 MultiCamVideo 上进行训练，使用8张H200 GPU，总计约15K次迭代，批次大小为8。CUT3R适配器使用3倍于其他可训练参数的学习率，以加速几何条件的对齐学习。模型总参数量约1.3B，其中绝大部分来自冻结的预训练组件，实际可训练参数规模较小。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2534_https_arxiv_org_abs_2601_14674/figures/002_Figure_2.jpg]]
 *Figure 2: Architecture comparison. (a) Unconditioned methods for novel trajectory generation achieve high visual quality but lack geometric awareness, leading to inconsistencies. (b) Conditioning on 4D point cloud renders provides consistency but reduces quality because the depth estimation and point cloud generation stages are sensitive to errors. (c) Our proposed architecture utilizes the implicit geometric knowledge of a pre-trained large 4D reconstruction model (LRM) to achieve both high quality and consistency*
 
 ![[assets/figures/papers/paper_list_l2534_https_arxiv_org_abs_2601_14674/figures/001_Figure_1.jpg]]
 *Figure 1: Our method addresses the problem of rendering geometrically consistent novel trajectories from a monocular source video. We propose to utilize the geometric knowledge of a pretrained large reconstruction model (LRM) by conditioning the trajectory generation process on the latent state of a 4D LRM. Compared to prior methods that are conditioned on error-prone point cloud re-renderings of the source video, our method achieves state-of-the-art visual quality while maintaining a high level of geometric fidelity to the original scene*
-
-
 
 LaVR 的核心设计思路是将预训练 4D 重建模型 CUT3R 的隐式几何知识注入预训练视频扩散模型，从而在不依赖显式深度估计或点云渲染的条件下实现几何一致的新视角视频生成。系统由以下关键模块构成。
 
@@ -198,9 +188,6 @@ CUT3R 输出的逐帧潜变量令牌在语义空间和形状上与视频 VAE 编
 - **MLP 投影层**：将每帧的 $s$ 个 $d$ 维令牌独立映射到与 VAE 潜变量通道数匹配的特征空间。
 - **Query Transformer**：以 VAE 编码的视频潜变量作为查询，对投影后的 CUT3R 特征进行交叉注意力操作，生成最终的空间几何条件特征 $Z_c$。这一设计使得几何条件能够自适应地与视频内容对齐，而非简单的拼接或相加。
 
-![[assets/figures/papers/paper_list_l2534_https_arxiv_org_abs_2601_14674/figures/004_Figure_4.jpg]]
-*Figure 4: Proposed CUT3R Adapter. Our lightweight adapter embeds CUT3R’s per-frame latent tokens into geometry-aware features that align with the representation used by the diffusion model. The shape of features at each stage is shown in brackets*
-
 适配器输出的 $Z_c$ 在空间维度上与 VAE 潜变量保持一致，可直接沿通道维度拼接后送入 DiT 进行去噪。
 
 ### 3.3 姿态注入与训练目标
@@ -221,8 +208,6 @@ $$\mathcal { L } _ { \mathrm { F M } } = \mathbb { E } _ { t , z _ { 0 } , \epsi
 - **差异化学习率**：CUT3R 适配器使用 3 倍于其他可训练参数的学习率，以加速几何条件信号的对齐。
 
 这一策略确保模型在获得几何感知能力的同时，不会灾难性遗忘预训练阶段习得的视频生成先验。消融实验（Table 3）证实，CUT3R 潜变量条件是性能提升的主要驱动因素——移除该条件后，Cycle PSNR 从 20.74 骤降至 17.90，VBench Multi-View 从 17.11 降至 6.832；而姿态条件仅提供较小的额外增益。
-
-
 
 ## 实验与关键发现
 
@@ -264,31 +249,14 @@ LaVR目前存在两个已知局限：
 
 Figure 10展示了将各方法生成的视频输入BA-Track进行4D重建后的点云可视化结果。LaVR生成的视频重建出的4D点云幻觉最少，从下游任务角度进一步验证了其几何一致性优势。这一实验设计巧妙地将生成质量评估与重建精度验证相结合，为几何一致性提供了独立于像素级指标的佐证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2534_https_arxiv_org_abs_2601_14674/figures/007_Figure_6.jpg]]
 *Figure 6: Qualitative evaluation of novel views. We compare frames from new camera trajectories rendered by redirecting the source video. Both Gen3C [26] and TrajectoryCrafter [46] are conditioned on re-rendered point clouds and suffer from unnatural warping artifacts. ReCamMaster [4] is not geometrically conditioned and hallucinates implausible content in unseen regions (top: man overlaps with table; middle: cat’s tail; bottom: haystacks in the background). Compared to baselines, our results look natural and geometrically consistent*
-
-![[assets/figures/papers/paper_list_l2534_https_arxiv_org_abs_2601_14674/figures/005_Figure_5.jpg]]
-*Figure 5: Evaluation on the VBench [14, 50] metrics. We highlight relative differences by normalizing each metric over all baselines. Our method shows all-around high performance, achieving the best results for multi-view, subject, and background consistency*
-
-![[assets/figures/papers/paper_list_l2534_https_arxiv_org_abs_2601_14674/figures/008_Table_2.jpg]]
-*Table 2: Target pose reconstruction accuracy. We evaluate the absolute Abs(·) and relative Rel(·) errors in camera translation t (in millimeters) and rotation R (in degrees). While we achieve consistently high rotational and translational accuracy, the unconditioned ReCamMaster [4] fails to follow the target trajectory closely. We highlight the metrics in blue, proportional to their percentile*
-
-![[assets/figures/papers/paper_list_l2534_https_arxiv_org_abs_2601_14674/figures/009_Table_3.jpg]]
-*Table 3: Effect of Source Pose Conditioning. Performance gains over baseline are predominantly driven by CUT3R conditioning, with source pose conditioning having a relatively minor impact*
-
-![[assets/figures/papers/paper_list_l2534_https_arxiv_org_abs_2601_14674/figures/010_Figure_7.jpg]]
-*Figure 7: Disadvantages of geometric conditioning via re-rendered point clouds. Visualizing the point cloud renders of TrajectoryCrafter, we see that depth scale ambiguity, empirically estimated intrinsics, and holes or misalignment errors in the point cloud can create warped conditioning images that lead to unnatural outputs. Our results do not suffer from such artifacts*
-
 
 ![[assets/figures/papers/paper_list_l2534_https_arxiv_org_abs_2601_14674/figures/012_Figure_9.jpg]]
 *Figure 9: Qualitative evaluation of novel trajectories across frames. Baseline methods conditioned on re-rendered point clouds suffer from unnatural stretching artifacts and missing details (Row 1, Col. 4; Row 3, Col. 4). The unconditioned baseline hallucinates a third arm (Row 2, Col. 4). We avoid these pitfalls by using the latent state of a pretrained 4D reconstruction model as a soft geometric condition*
 
 ![[assets/figures/papers/paper_list_l2534_https_arxiv_org_abs_2601_14674/figures/013_Figure_10.jpg]]
 *Figure 10: Qualitative Results on 4D Reconstruction. We run BA-Track [7] on re-rendered videos and visualize the 4D point clouds from a novel view. Ours has the the least amount of hallucination*
-
-
 
 ## 定位与知识库关联
 
@@ -335,8 +303,6 @@ LaVR 的适用边界受限于以下因素：
 - 潜变量适配带来的额外计算开销能否通过模型蒸馏、适配器剪枝或更高效的设计进一步降低？
 - 该方法在更长视频序列或更大视角变化下的泛化边界如何？是否存在潜变量漂移累积的问题？
 - 隐式几何条件是否可推广到其他需要空间一致性的视频生成任务（如视频编辑、视角插值）？
-
-
 
 ## 原文 PDF
 

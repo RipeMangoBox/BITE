@@ -137,8 +137,6 @@ WorldLens 提出了一套全谱评估框架，将驾驶世界模型的评测从�
 
 该框架的设计直接回应了当前驾驶世界模型的真实瓶颈：**没有任何单一模型在所有维度上同时占据优势**。视觉逼真的模型（如 OpenDWM，生成 FVD 58.08）往往违反物理规律（3D 检测 NDS 仅 0.2196），而几何稳定的模型（如 DiST-4D，重建质量领先）在视觉丰富性上有所妥协。WorldLens 通过五维解耦评估，系统性地暴露了这种“视觉真实—物理一致—行为安全”之间的根本权衡，为未来世界模型的平衡发展提供了诊断工具。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2147_https_arxiv_org_abs_2512_10958/figures/001_Figure_1.jpg]]
 *Figure 1: Is your driving world model an all-around player? This work presents WorldLens, a unified benchmark encompassing evaluations on 1Generation, 2Reconstruction, 3Action-Following, 4Downstream Task, and 5Human Preference, across a total of 24 dimensions spanning visual realism, geometric consistency, functional reliability, and perceptual alignment. We observe no single model dominates across all axes, highlighting the need for balanced progress toward physically and behaviorally realistic world modeling*
 
@@ -193,13 +191,8 @@ $$\mathrm{ADS} = \mathrm{RC} \times \mathrm{PDMS}$$
 
 人类偏好模块构建了 WorldLens-26K 数据集，每条样本包含数值评分与文本解释，覆盖真实性、物理合理性与安全性维度。在此基础上，通过 LoRA 监督微调将 Qwen3-VL-8B 蒸馏为 **WorldLens-Agent**——一个反馈对齐的多模态评估智能体，能够对未见视频输出评分与推理文本，实现可扩展的人类对齐评估。该模块的蒸馏过程依赖 26K 条人类标注，其泛化能力受标注分布限制，对新模型或新场景需定期更新。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2147_https_arxiv_org_abs_2512_10958/figures/080_Figure_35.jpg]]
 *Figure 35: The architecture of the proposed WorldLens-Agent for auto-evaluation of generated driving videos*
-
-![[assets/figures/papers/paper_list_l2147_https_arxiv_org_abs_2512_10958/figures/003_Figure_3.jpg]]
-*Figure 3: Interface for Human Preference annotation process. We present four synchronized views: 1generated video, 2semantic mask, 3depth map, and 43D bounding boxes, enabling comprehensive judgment of realism, physical plausibility, and consistency*
 
 ## 实验与关键发现
 
@@ -222,12 +215,6 @@ WorldLens在五个维度、24项子指标上对10个驾驶世界模型进行了�
 
 人类偏好评估（**Figure 7**）进一步印证了上述发现。在物理合理性维度上，DiST-4D的平均得分（2.583）显著高于MagicDrive（2.300），这与客观指标中DiST-4D在几何一致性和下游任务上的优势高度吻合。值得注意的是，人类标注者在评估过程中频繁使用“shape”、“reflection”、“motion”、“safety”等关键词（见 **Figure 4**），表明其判断与维度定义高度对齐，验证了WorldLens-26K数据集的标注质量。
 
-![[assets/figures/papers/paper_list_l2147_https_arxiv_org_abs_2512_10958/figures/010_Figure_7.jpg]]
-*Figure 7: Summary of alignments to Human Preference, where the max, median, and average scores of each model are compared. For more detailed analyses, kindly refer to the Appendix*
-
-![[assets/figures/papers/paper_list_l2147_https_arxiv_org_abs_2512_10958/figures/005_Figure_4.jpg]]
-*Figure 4: The statistics and word clouds of the WorldLens-26K dataset. Frequent keywords align closely with their target criteria (e.g., “shape”, “reflection”, “motion”, “safety”), confirming that annotators focus more on dimension-specific perceptual attributes and maintain consistent reasoning during the evaluation*
-
 ### 消融分析：物理grounding的关键作用
 
 消融实验揭示了一个关键因果机制：**使用真值帧作为条件的生成方法在深度一致性和跨视角一致性上比无条件方法提升20–30%**。DiST-4D和DriveDreamer-2均采用条件生成策略，其在深度差异（Depth Discrepancy）和跨视角一致性指标上显著优于MagicDrive等无条件方法。这表明，物理基础信息对生成质量的影响并非边际性的，而是决定性的——缺乏物理grounding的世界模型本质上是在“画好看的画”，而非构建可操作的物理世界。
@@ -244,14 +231,6 @@ WorldLens在五个维度、24项子指标上对10个驾驶世界模型进行了�
 *Figure 5: Qualitative results of 4D reconstruction from generated videos. Rows (top to bottom) denote 1generated frame, 2rendered novel-view frame at a Lateral Offset, and 3depth map. MagicDrive [27] and DreamForge [69] exhibit dense floaters and geometric distortions, while OpenDWM [89] and DiST-4D [30] maintain temporally more consistent geometry, aligning with the quantitative results in Table 1*
 
 这些失败模式共同指向一个结论：**未来世界模型必须平衡视觉真实、几何一致、物理合理与功能可靠，而非追求单一维度的极致表现**。WorldLens提供的全谱评估框架为这一平衡提供了可量化的度量体系。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2147_https_arxiv_org_abs_2512_10958/figures/004_Table_1.jpg]]
-*Table 1: Benchmarking results of state-of-the-art driving world models for Generation and Reconstruction in WorldLens*
-
-![[assets/figures/papers/paper_list_l2147_https_arxiv_org_abs_2512_10958/figures/008_Table_3.jpg]]
-*Table 3: Summary of benchmarking results of state-of-the-art world models for Downstream Task dimensions in WorldLens*
 
 ![[assets/figures/papers/paper_list_l2147_https_arxiv_org_abs_2512_10958/figures/009_Figure_6.jpg]]
 *Figure 6: Qualitative results of Downstream Tasks. Rows (from top to bottom): 13D object detection, 2map segmentation, and 3semantic occupancy prediction tasks*

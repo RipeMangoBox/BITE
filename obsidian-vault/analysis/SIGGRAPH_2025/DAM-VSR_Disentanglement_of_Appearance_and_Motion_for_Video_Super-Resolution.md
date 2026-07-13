@@ -55,15 +55,11 @@ DAM-VSR 提出了一种**外观与运动解耦**的框架，将 VSR 任务拆分
 
 该工作的核心贡献在于：**将 VSR 中的外观与运动显式解耦**，使得图像超分辨率与视频扩散模型可以各司其职，从而在保持时序一致性的前提下实现高保真的真实世界视频超分辨率。
 
-
-
 视频超分辨率（VSR）旨在从低质量视频中恢复高分辨率、细节丰富且时序一致的帧序列。真实世界VSR面临的核心挑战在于，退化过程复杂且未知，导致输入视频同时丢失了**外观细节**（纹理、边缘）与**运动信息**（光流、时序连贯性）。现有方法大致分为两类：基于GAN或Transformer的传统VSR方法，以及基于扩散模型的生成式VSR方法。
 
 基于扩散模型的VSR方法近年来展现出强大的生成能力，其主流范式是借助图像到视频扩散模型（如SVD）从单帧参考图像生成视频。然而，这一范式存在一个关键瓶颈：**SVD生成视频的整体外观高度依赖参考图像的质量**。当输入视频本身质量较低时，其首帧（作为参考帧）缺乏足够的纹理细节，直接使用SVD加视频ControlNet的生成结果在外观增强上效果有限——生成视频虽然时序连贯，但细节仍然模糊，无法有效恢复真实纹理（如Fig. 2b所示）。换言之，**低质参考帧成为限制生成质量的上限**。
 
 这一瓶颈揭示了现有方法的根本性缺陷：**外观增强与运动控制被隐式地耦合在同一个生成过程中**。由于视频扩散模型需要同时处理“生成什么纹理”和“保持什么运动”两个任务，当参考帧质量不足时，模型无法有效补偿外观信息的缺失。因此，亟需一种将外观与运动**显式解耦**的框架，允许分别对两个子问题进行独立优化——利用图像超分辨率（ISR）模型增强参考帧的外观细节，同时利用视频ControlNet从原始低质视频中提取运动结构。这正是DAM-VSR的核心动机：**将VSR任务解耦为“外观增强”与“运动控制”两个独立可控的子问题，充分发挥图像超分辨率模型的细节生成能力与视频扩散模型的时序生成能力，从而实现高保真且时序一致的真实世界VSR**。
-
-
 
 ## 核心方法与创新机理
 
@@ -104,8 +100,6 @@ $$p_t = blending(reverse(p_t^b), p_t^f)$$
 
 消融实验（Table 1）验证了这些创新的有效性：移除 ISR 增强后，PSNR 从 27.011 降至 24.775；移除双向采样后，PSNR 降至 26.654；未微调 VAE 解码器时，LPIPS 从 0.311 升至 0.382。这些结果表明，外观增强与运动控制的解耦是性能提升的核心驱动力，而双向采样和 VAE 微调进一步提升了时序一致性和感知质量。
 
-
-
 DAM-VSR 提出一种**外观与运动解耦**的视频超分辨率框架，将 VSR 任务拆分为两个独立可控的子问题：**外观增强**和**运动控制**。其整体流水线如 Fig. 3 所示，核心思路是：利用视频扩散模型 SVD 的时序生成能力来保证帧间一致性，同时通过引入图像超分辨率（ISR）模块来弥补低质输入中参考帧细节不足的根本瓶颈。
 
 ![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2507_01012/figures/003_Figure_3.jpg]]
@@ -142,12 +136,8 @@ DAM-VSR 提出一种**外观与运动解耦**的视频超分辨率框架，将 V
 
 > **注意**：SVD 基座模型固定生成 14 帧，长视频需通过分片与双向采样实现，这可能引入边界不一致或误差累积。双向采样增加了约两倍的计算开销，且最终生成质量高度依赖所选 ISR 方法的性能。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2507_01012/figures/011_Figure_7.jpg]]
 *Figure 7: The experimental results of the proposed framework for other applications, including video editing and video style transfer*
-
-
 
 DAM-VSR 将视频超分辨率（VSR）解耦为**外观增强**与**运动控制**两个子问题，其核心由以下模块构成。
 
@@ -194,9 +184,6 @@ $$I = \{I_1, I_2, \cdots, I_n\} = \{C_1, \cdots, C_m\} \tag{6}$$
 
 相邻片段共享首尾高质量帧，拼接实现任意长度视频的超分辨率（Fig. 5）。消融实验显示，移除双向采样后 PSNR 从 27.011 降至 26.654（Table 1），证实该策略对时序一致性的贡献。
 
-![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2507_01012/figures/005_Figure_5.jpg]]
-*Figure 5: Illustration of long video processing. Through clip concatenation, our method supports VSR for long input videos*
-
 ### VAE 解码器微调
 
 为改善生成帧的感知质量，对 VAE 解码器进行微调，联合优化 L2 损失、感知损失和 GAN 损失：
@@ -208,11 +195,6 @@ $$\mathcal{L} = \mathcal{L}_{L2} + \alpha \mathcal{L}_{percept} + \beta \mathcal
 ### 分块采样（Tile Sampling）
 
 为处理高分辨率输入，采用分块去噪策略：将潜变量划分为重叠的块，分别去噪后在重叠区域平均融合，以在有限 GPU 内存下完成超分辨率生成（Fig. 11）。
-
-![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2507_01012/figures/014_Figure_11.jpg]]
-*Figure 11: Illustration of tile sampling, which can handle the generation of high-resolution inputs*
-
-
 
 ## 实验与关键发现
 
@@ -254,27 +236,11 @@ Table 2汇总了DAM-VSR在合成、真实世界和AIGC三类数据上的定量�
 - **Table 1**（消融定量）：完整方法PSNR 27.011 vs. 无ISR的24.775，VAE微调使LPIPS从0.382降至0.311，双向采样贡献约0.357 dB PSNR提升。
 - **Table 2**（主结果）：DAM-VSR在UDM10、YouHQ40、VideoLQ、AIGC29四个基准上均取得最优或次优，尤其在真实世界和AIGC数据上的无参考指标全面领先，验证了解耦框架的泛化能力。
 
-![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2507_01012/figures/002_Figure_2.jpg]]
-*Figure 2: Analysis of the role of ISR enhancement. a) Input video. b) The generated result without ISR enhancement. c) The generated video with ISR enhancement. d) The generated result of our method. e) Ground truth*
-
 ![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2507_01012/figures/007_Table_2.jpg]]
 *Table 2: antitative evaluations on diferent VSR benchmarks from diverse source, i.e., synthetic (UDM10, YouHQ40, REDS30), real-world (VideoLQ), and AIGC (AIGC29) data. The best and second best performances are marked in red and blue, respectively*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2507_01012/figures/008_Figure_6.jpg]]
 *Figure 6: alitative ablation study of DAM-VSR*
-
-![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2507_01012/figures/001_Figure_1.jpg]]
-*Figure 1: Visualization comparisons with state-of-the-art methods on both real-world and AIGC videos. Our DAM-VSR demonstrates remarkable upscaling capabilities, generating more realistic details with be er visual realism than other methods. (Zoom-in for the best view)*
-
-![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2507_01012/figures/010_Figure_8.jpg]]
-*Figure 8: alitative comparison on synthetic low-quality videos from YouHQ40*
-
-![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2507_01012/figures/012_Figure_9.jpg]]
-*Figure 9: alitative comparison on real-world videos from VideoLQ*
-
-
 
 ## 定位与知识库关联
 
@@ -327,8 +293,6 @@ DAM-VSR 直接构建在 **SVD**（Stable Video Diffusion）之上，继承了其
 4. **极端运动与遮挡下的鲁棒性**：运动对齐的注意力共享假设前向和反向生成的时间注意力图可以通过旋转对齐——在极端运动、大幅度遮挡或场景切换时，这一假设是否仍然成立？需要针对性的压力测试。
 
 5. **框架的泛化能力边界**：论文展示了视频编辑和风格迁移的初步结果，但这些应用是否需要对视频 ControlNet 进行微调？框架能否处理其他视频恢复任务（如去模糊、去噪）而不需要重新训练控制分支？
-
-
 
 ## 原文 PDF
 

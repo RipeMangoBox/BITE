@@ -58,8 +58,6 @@ claims:
 
 **局限性提示**：自动评估指标在模型从 3B 扩展到 7B 时提升趋缓，可能无法全面反映生成质量；人类评估仅与 ScaMo-3B 进行了详细对比，评分者间信度未充分披露；论文未涉及手部和面部动作。
 
-
-
 ### 问题背景
 
 文本驱动的人体动作生成旨在根据自然语言描述合成逼真的三维人体运动序列，在虚拟人、游戏、影视和具身智能等领域具有广泛应用前景。近年来，基于扩散模型和自回归模型的方法在该任务上取得了显著进展，但现有研究普遍面临一个根本性瓶颈：**训练数据规模严重受限**。
@@ -89,8 +87,6 @@ claims:
 - **可扩展生成架构**：设计混合注意力机制（文本双向、动作因果）的自回归 Transformer，将模型规模从 1B 扩展到 7B 参数，探索规模对零样本指令遵循能力的影响。
 
 如 **Figure 1** 所示，本文方法旨在处理分布外和复杂组合动作，实现“走向零样本”的动作生成目标。
-
-
 
 ## 核心方法与创新机理
 
@@ -160,8 +156,6 @@ $$\mathcal{L} = -\sum_{i=1}^{n} \log p(\hat{m}_i | \mathbf{m}_{<i}, T_1, ..., T_
 - 模型规模增大对物理合理性和动作平滑性提升不显著，是否需要引入显式物理约束模块？
 - 自动指标（FID、R-precision）在模型规模增大时趋于饱和，如何设计更灵敏的零样本动作生成评估指标？
 
-
-
 MotionMillion 的整体框架围绕“数据驱动 + 规模扩展”两条主线构建，旨在通过百万级高质量动作-文本数据与可扩展的自回归 Transformer，解锁零样本文本到动作生成的涌现能力。系统由两大核心阶段串联而成：**大规模数据构建管线** 与 **可扩展动作生成模型**。
 
 ### 数据构建管线
@@ -204,8 +198,6 @@ MotionMillion 的整体框架围绕“数据驱动 + 规模扩展”两条主线
   $$\mathcal{L} = -\sum_{i=1}^{n} \log p(\hat{m}_i \mid \mathbf{m}_{<i}, T_1, \dots, T_w)$$
 
 模型规模可从 1B 参数扩展至 7B 参数。在 MotionMillion 测试集上，7B 模型的 FID 达到 10.3（ScaMo 为 89.0），R@1 达到 0.79（ScaMo 为 0.67），展现出显著的性能优势（Table 4）。定性结果显示，模型能够生成长时间、复杂组合动作（如武术、日常交互），具备强大的零样本指令遵循能力（Figure 6）。
-
-
 
 ### 动作表示
 
@@ -275,15 +267,11 @@ $$\mathrm{jerk} = \ddot{J}_i^*$$
 
 用于量化动作平滑度。MotionMillion 在该指标上显著低于 MotionX 和 HumanML3D（Figure 4），表明其动作更平滑（Eq. 2）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1882_Go_to_Zero_Towards_Zero_shot_Motion_Generation_with_Million_scale_Data/figures/009_Table_3.jpg]]
 *Table 3: Ablation on whether to use wavelet transformation during training the FSQ model, where Acc represents the acceleration*
 
 ![[assets/figures/papers/paper_list_l1882_Go_to_Zero_Towards_Zero_shot_Motion_Generation_with_Million_scale_Data/figures/008_Table_2.jpg]]
 *Table 2: MPJPE of reconstruction comparison across different datasets, where ScaMo’s FSQ model and ours are trained on MotionUnion and MotionMillion, respectively*
-
-
 
 ## 实验与关键发现
 
@@ -296,13 +284,7 @@ MotionMillion 模型在 MotionMillion 测试集上的自动指标评估结果（
 
 人类评估进一步验证了上述结论。在 MotionMillion-Eval 的 7 类 126 个提示词上（Table 5），MotionMillion-7B 在**文本对齐**维度上获得 261 分，显著高于 ScaMo-3B 的 226.6 分（提升 34.4）。然而，在物理合理性与动作平滑性两个维度上，7B 模型相对 ScaMo-3B 的优势并不显著，这暗示单纯增大模型规模对这两类质量的提升有限。详细的胜负对比（Table 6）以绿色/黄色/白色单元格标注了 7B 模型在各类别上的胜/平/负情况，直观呈现了其在多数类别上的优势。
 
-![[assets/figures/papers/paper_list_l1882_Go_to_Zero_Towards_Zero_shot_Motion_Generation_with_Million_scale_Data/figures/012_Table_5.jpg]]
-*Table 5: Average human evaluation results under the aspect of Text Alignment, Physical Plausibility, and Motion Smoothness on MotionMillion-Eval between Different Models*
-
 定性结果（Figure 6）展示了模型处理复杂组合文本指令的能力，能够生成长时间、连贯的武术及日常交互动作，体现了零样本条件下的指令遵循能力。
-
-![[assets/figures/papers/paper_list_l1882_Go_to_Zero_Towards_Zero_shot_Motion_Generation_with_Million_scale_Data/figures/011_Figure_6.jpg]]
-*Figure 6: Our model demonstrates robust performance in generating coherent motions from complex compositional textual descriptions*
 
 ### 消融实验与分析
 
@@ -317,21 +299,6 @@ MotionMillion 模型在 MotionMillion 测试集上的自动指标评估结果（
 人类评估仅与 ScaMo-3B 进行了细粒度对比，未将 MDM、MotionGPT、T2M-GPT 等其他基线纳入相同粒度的比较。此外，评分者间信度和具体评估协议细节在正文中未充分披露，这些因素可能影响人类评估结论的稳健性。读者在引用人类评估结果时需注意上述限制。
 
 自动指标（FID、R-precision）在模型从 3B 扩展到 7B 时提升趋缓，结合人类评估中物理合理性和动作平滑性未显著改善的事实，表明现有自动指标可能对零样本动作生成质量的敏感度不足，需要更鲁棒的评估方案。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1882_Go_to_Zero_Towards_Zero_shot_Motion_Generation_with_Million_scale_Data/figures/005_Table_1.jpg]]
-*Table 1: Statistics comparison between our MotionMillion and other motion datasets*
-
-![[assets/figures/papers/paper_list_l1882_Go_to_Zero_Towards_Zero_shot_Motion_Generation_with_Million_scale_Data/figures/004_Figure_4.jpg]]
-*Figure 4: Jerk comparison across MotionMillion, MotionX, and HumanML3D. Our MotionMillion exhibits the lowest jerk values, indicating that it produces smoother motion*
-
-![[assets/figures/papers/paper_list_l1882_Go_to_Zero_Towards_Zero_shot_Motion_Generation_with_Million_scale_Data/figures/013_Figure_7.jpg]]
-*Figure 7: Data Distributions of MotionMillion*
-
-![[assets/figures/papers/paper_list_l1882_Go_to_Zero_Towards_Zero_shot_Motion_Generation_with_Million_scale_Data/figures/014_Table.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -385,8 +352,6 @@ MotionMillion 的核心定位是**面向零样本泛化的可扩展自回归动�
 4. **数据质量的下游影响**：MotionMillion 数据集虽经过六阶段过滤，但源自网络视频，可能存在未被检测的噪声、标注偏差或文化偏见，这些因素在多大程度上会影响下游任务的公平性和泛化性？
 
 5. **全人体运动生成的扩展**：如何处理手部和面部动作以实现完全的人体运动生成？这可能需要额外的数据来源、更精细的动作表示以及多尺度编码策略。
-
-
 
 ## 原文 PDF
 

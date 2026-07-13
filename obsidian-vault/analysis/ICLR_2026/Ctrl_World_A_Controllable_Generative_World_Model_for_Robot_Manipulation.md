@@ -57,8 +57,6 @@ claims:
 
 在方法谱系上，Ctrl-World 属于**基于预训练视频扩散模型的动作条件世界模型**，其关键区别于既有工作在于：从单视图预测扩展到多视图联合生成，从粗粒度条件化升级为帧级动作注入，并引入显式的姿态记忆机制以解决长时遗忘问题。该工作为“在想象中评估与改进通用机器人策略”提供了可扩展的范式，同时揭示了当前方法在精细交互、低层执行精度提升及自动化成功判定等方面的开放问题。
 
-
-
 ### 机器人策略评估的“真实世界瓶颈”
 
 通用机器人操作策略（特别是基于视觉-语言-动作的 VLA 策略）的迭代开发面临一个根本性困境：评估与改进策略需要大量真实世界试验，而每一次物理部署都意味着高昂的时间成本、硬件磨损与安全风险。这一“真实世界瓶颈”严重制约了策略的规模化迭代——开发者难以快速判断一个策略变体是否比上一个更好，更难以低成本地发现策略在未见任务上的失败模式。
@@ -83,8 +81,6 @@ claims:
 
 凭借这三项设计，Ctrl-World 旨在实现两个关键能力：（1）在想象空间中准确评估策略的指令遵循行为，使其与真实世界表现高度相关；（2）通过合成成功轨迹对策略进行监督微调，显著提升策略在未见任务上的表现。
 
-
-
 ## 核心方法与创新机理
 
 Ctrl-World 的核心创新在于将预训练视频扩散模型系统性地改造为**可控、多视图、长时一致**的机器人世界模型，使其能够与现代 VLA（Vision-Language-Action）策略进行闭环交互。相较于现有动作条件世界模型（如 **WPE**（Quevedo et al., 2025）、**IRASim**（Zhu et al., 2024））仅支持单第三视角预测、缺乏精细帧级控制、长时一致性差的局限，Ctrl-World 通过以下三个关键设计实现突破：
@@ -106,8 +102,6 @@ Ctrl-World 的核心创新在于将预训练视频扩散模型系统性地改造
 Ctrl-World 采用**参数高效微调**策略：仅新增一个 3 层 MLP（将 7 维 Cartesian 空间动作投影为 1024 维潜变量），冻结预训练 SVD 骨干网络的其他参数，在扩散损失上微调。这种轻量适配使得模型能够在 2×8 H100 GPU 上约 2-3 天完成训练，同时保留了预训练模型的泛化能力，使其能够零样本迁移到新的 DROID 场景和相机布局（Figure 6）。
 
 三个创新组件的协同作用使得 Ctrl-World 能够生成超过 20 秒的连贯 rollout，并在想象空间中准确评估策略的指令遵循能力，为后续的策略改进（通过合成成功轨迹进行监督微调，成功率提升 44.7%）奠定了基础。
-
-
 
 Ctrl-World 是一个面向通用机器人策略的可控生成世界模型，其整体设计围绕“策略闭环 rollout”这一核心目标展开。如图1所示，系统接收多视图观测与语言指令，由策略产生动作块，世界模型根据当前观测与动作块预测未来多视图观测，从而在想象空间中完成策略评估与数据合成。
 
@@ -155,17 +149,7 @@ $$\mathcal{L}_{\theta} = \mathbb{E}_{o_t, a_{t:t+H} \sim D_s} \Vert \pi_{\theta}
 
 这些设计使 Ctrl-World 在长时交互轨迹生成中显著优于基线：在 DROID 验证集上，PSNR 达到 23.56（IRASim 为 21.36），FVD 降至 97.4（IRASim 为 138.1）（Table 1）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l67_https_openreview_net_forum_id_748bHL2BAv/figures/001_Figure_1.jpg]]
-*Figure 1: Ctrl-World is designed for policy-in-the-loop rollouts with generalist robot policies. It generates joint multi-view predictions (including wrist views), enforces fine-grained action control via frame-level conditioning, and sustains coherent long-horizon dynamics through pose-conditioned memory retrieval. These components enable (1) accurate policy evaluation in imagination, with alignment to real-world rollouts, and (2) targeted policy improvement through synthetic trajectories*
-
-
-
 Ctrl-World 的架构建立在一个预训练视频扩散模型之上，通过三个关键适配模块将其转化为可控、长时一致的世界模型。图 Figure 2 展示了整体架构。
-
-![[assets/figures/papers/paper_list_l67_https_openreview_net_forum_id_748bHL2BAv/figures/002_Figure_2.jpg]]
-*Figure 2: Ctrl-World is initialized from a pretrained video diffusion model and adapted into a controllable, temporally consistent world model with: (1) Multi-view input and joint prediction for unified information understanding. (2) Memory retrieval mechanism, which adds sparse history frames in context and project pose information into each frame via frame-level cross-attention, re-anchoring predictions to similar past states. (3) Frame-level action conditioning to better align high-frequency action with visual dynamics*
 
 ### 多视图联合预测
 
@@ -220,13 +204,6 @@ $$
 
 这一交互过程可自回归地重复多轮，生成长达数十秒的想象 rollout。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l67_https_openreview_net_forum_id_748bHL2BAv/figures/007_Figure_5.jpg]]
-*Figure 5: Consistency of Ctrl-World. Since the wrist camera’s field of view changes dramatically within a single trajectory, leveraging multi-view information and memory retrieval is essential for generating consistent wrist-view predictions. Prediction highlighted in the green box are inferred from other camera views, while those in the red box are retrieved from memory*
-
-
-
 ## 实验与关键发现
 
 ### 世界模型质量评估
@@ -278,8 +255,6 @@ $$\mathcal{L}_{\theta} = \mathbb{E}_{o_t, a_{t:t+H} \sim D_s} \| \pi_{\theta}(o_
 3. **已见指令的低级成功率**：当前世界模型的物理动态保真度尚不足以提升已见指令的低级执行精度，这暗示需要收集更多域内策略rollout数据以改进物理动态建模。
 4. **合成轨迹评估依赖人工**：成功/失败判断仍需人工偏好标注，自动化的奖励模型设计仍是未来工作方向。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l67_https_openreview_net_forum_id_748bHL2BAv/figures/003_Table_1.jpg]]
 *Table 1: Quantitative results for interactive long-trajectory generation on the validation set. We evaluate our world model’s quality by generating 10-second trajectories. Given a randomly sampled initial frame, the model receives a 15-step action chunk (spanning over 1 second) in each interaction and generates for 10 rounds auto-regressively. The results are averaged over 256 clips*
 
@@ -289,22 +264,11 @@ $$\mathcal{L}_{\theta} = \mathbb{E}_{o_t, a_{t:t+H} \sim D_s} \| \pi_{\theta}(o_
 ![[assets/figures/papers/paper_list_l67_https_openreview_net_forum_id_748bHL2BAv/figures/008_Figure_6.jpg]]
 *Figure 6: Comparisons between*
 
-![[assets/figures/papers/paper_list_l67_https_openreview_net_forum_id_748bHL2BAv/figures/009_Figure_7.jpg]]
-*Figure 7: Quantitative correlations between real-world and world-model rollouts. The world model reliably captures instruction-following behavior but tends to underestimate the execution success rate*
-
-![[assets/figures/papers/paper_list_l67_https_openreview_net_forum_id_748bHL2BAv/figures/010_Figure_8.jpg]]
-*Figure 8: The top row illustrates examples of post-training tasks, while the bottom row presents synthetic trajectories generated within the world model. The world model can produce both successful and failed rollouts; we keep the successful trajectories and use them for policy fine-tuning*
-
-![[assets/figures/papers/paper_list_l67_https_openreview_net_forum_id_748bHL2BAv/figures/011_Figure_9.jpg]]
-*Figure 9: Policy improvement. Posttraining on synthetic data improves policy instruction-following by 44.7% on average*
-
 ![[assets/figures/papers/paper_list_l67_https_openreview_net_forum_id_748bHL2BAv/figures/012_Table_3.jpg]]
 *Table 3: Comparison of instruction-following and success rate across methods and tasks*
 
 ![[assets/figures/papers/paper_list_l67_https_openreview_net_forum_id_748bHL2BAv/figures/013_Table_4.jpg]]
 *Table 4: Policy improvement (Spatial Understanding)*
-
-
 
 ## 定位与知识库关联
 
@@ -345,8 +309,6 @@ Ctrl-World 的有效性建立在以下前提之上，超出这些边界时性能
 3. **自动化评估闭环**：结合大型视觉-语言模型（VLM）实现自动化的成功/失败判断，是消除人工标注瓶颈的关键方向。这一闭环的实现将使得从“想象空间评估”到“想象空间训练”的流水线完全自动化成为可能。
 
 4. **跨形态泛化**：当前方法针对固定三相机配置设计，对于不同数量的相机、不同的安装位置、或单目移动操作场景的适配能力未经验证。多视图联合预测架构能否灵活适配可变视图配置，是一个有待回答的工程与理论问题。
-
-
 
 ## 原文 PDF
 

@@ -54,15 +54,11 @@ claims:
 
 **方法定位：** 本文工作属于“领域特定空间推理能力注入”范式——不改变基础VLM架构，而是通过大规模无人机视角空间推理数据与强化微调的组合，将通用VLM适配为具备俯视空间智能的专用模型。该方法在空间VLM谱系中填补了无人机导航场景的空白，与SpatialVLM（Chen et al., CVPR 2024）和SpaceR（Ouyang et al., arXiv 2025）等地面空间推理工作形成互补。
 
-
-
 无人机（UAV）在物流配送、灾害救援、农业监测等领域的应用日益广泛，其自主导航能力高度依赖对三维空间环境的精确理解。视觉语言模型（VLM）在通用场景的视觉推理上取得了显著进展，然而，当将其直接应用于无人机俯视视角时，一个关键的瓶颈浮现：现有VLM普遍缺乏该视角下的空间智能，难以准确理解物体间的深度、高度、相对位置等关系，导致在导航相关任务中表现不佳。
 
 这一缺口的根源在于领域数据的缺失与训练范式的错配。通用VLM的训练语料以地面平视或斜视图像为主，缺乏大规模、多模态的无人机场景标注数据来注入俯视空间推理的先验。同时，标准的监督微调策略仅优化语言生成目标，无法显式地约束模型输出精确的空间坐标或几何关系，使得模型在需要米级精度或像素级定位的任务上难以收敛至可用水平。
 
 为系统性地诊断并填补这一空白，本文构建了**SpatialSky-Bench**，一个覆盖环境感知与场景理解两大类别、共13项细粒度子任务的综合基准。在此基础上，本文进一步提出**Sky-VLM**——基于Qwen2.5-VL-7B构建、专为无人机空间推理设计的视觉语言模型。其核心动机在于验证一个假设：通过大规模领域数据注入与任务特定奖励信号的联合驱动，VLM能够从“地面通才”跃迁为“天空专家”，在俯视空间智能上取得质的突破。
-
-
 
 ## 核心方法与创新机理
 
@@ -107,8 +103,6 @@ Sky‑VLM 的核心创新并非提出全新的模型架构，而是系统性地�
 - 仅基于 Qwen2.5‑VL‑7B 进行训练，未探索更大规模模型或不同架构的影响。
 - RFT 仅覆盖点定位、边界框和选择题任务，其他开放式任务未获得奖励信号的直接优化。
 
-
-
 Sky-VLM 的整体框架围绕“无人机俯视视角下的空间智能”这一核心瓶颈设计，采用**数据生成—监督微调—强化微调**三阶段流水线，将通用 VLM 转化为具备 13 种空间推理能力的 UAV 导航专家模型。
 
 ### 数据生成流水线：SpatialSky-Dataset
@@ -147,12 +141,8 @@ GRPO 优化目标在最大化任务奖励的同时，通过 KL 散度约束 $\be
 
 整个框架的信息流为：**多模态原始数据 → 自动标注生成 → 100 万训练样本（SpatialSky-Dataset）→ SFT 获得基础空间推理 → RFT 优化关键任务决策 → Sky-VLM 推理模型**。两阶段训练形成递进关系：SFT 提供广泛的领域知识覆盖，RFT 则通过奖励信号对点定位、边界框和选择题等可精确评估的任务进行针对性强化。消融实验表明，移除点定位奖励后环境感知平均分从 60.33 骤降至 53.77，验证了任务特定奖励在框架中的关键作用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2152_https_arxiv_org_abs_2511_13269/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of SpatialSky-Bench. Our benchmarks are divided into two categories: Environmental Perception and Scene Understanding, covering a total of 13 subcategories. We evaluated the VLM’s spatial intelligence capabilities across these UAV navigation tasks*
-
-
 
 ### 3.1 空间感知数据生成模块
 
@@ -232,13 +222,6 @@ Sky-VLM的训练分为两个阶段（Figure 4）：
 1. **SFT阶段**：在100万样本上以学习率1e-5、批量大小2（每设备）、2步梯度累积训练1个epoch，使用8张H200 GPU和AdamW优化器。此阶段赋予模型基础的无人机视角空间推理能力和任务特定输出格式。
 2. **RFT阶段**：在3万样本上以学习率1e-6、权重衰减0.1进行GRPO强化微调，利用任务特定奖励优化点定位、边界框和选择题的决策精度。两阶段训练使总平均分从48.29提升至53.30（Table 2），验证了强化微调对空间决策能力的增强作用。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2152_https_arxiv_org_abs_2511_13269/figures/005_Figure_3.jpg]]
-*Figure 3: SpatialSky-Dataset Generation Process. Our generation pipeline take multimodal inputs, including RGB images, semantic labels, LiDAR depth data, UAV pose information, and bounding boxes. Using a VLM-based generation method and human expert validation, we automatically generate diverse question-answer pairs for 13 spatial reasoning tasks*
-
-
-
 ## 实验与关键发现
 
 ### 主要结果：SpatialSky-Bench 全局对比
@@ -302,19 +285,6 @@ Figure 6 展示了不同 VLM 在典型场景下的定性对比。Sky-VLM 在距�
 - **Figure 6**：定性对比示例，直观展示不同模型的输出差异。
 - **Figure 7**：数据规模律曲线，展示训练数据量与准确率的 scaling 关系。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2152_https_arxiv_org_abs_2511_13269/figures/007_Figure_5.jpg]]
-*Figure 5: Performance of Our Sky-VLM*
-
-![[assets/figures/papers/paper_list_l2152_https_arxiv_org_abs_2511_13269/figures/011_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l2152_https_arxiv_org_abs_2511_13269/figures/002_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l2152_https_arxiv_org_abs_2511_13269/figures/003_Figure.jpg]]
-
-
-
 ## 定位与知识库关联
 
 ### 与基线方法的关系
@@ -351,8 +321,6 @@ Sky-VLM 的适用边界由以下要素共同划定：
 3. **多模态融合优化**：当前方法将 RGB、LiDAR、位姿信息作为输入生成文本标注，但训练时 VLM 仅接收 RGB 图像和文本问答对。更高效的多模态传感器对齐方法（如直接融合深度图或点云特征）是否能进一步提升空间推理精度？
 4. **真实部署的鲁棒性**：在真实无人机飞行环境中部署时，模型的推理延迟、对传感器噪声的鲁棒性以及安全关键场景下的可靠性如何保证？这需要从系统层面进行端到端验证。
 5. **奖励设计的泛化性**：当前点定位奖励使用固定的 L1 距离阈值（50 像素），这一阈值在不同分辨率、不同飞行高度下的适用性需要进一步研究。自适应奖励函数或基于物理距离的奖励设计可能是改进方向。
-
-
 
 ## 原文 PDF
 

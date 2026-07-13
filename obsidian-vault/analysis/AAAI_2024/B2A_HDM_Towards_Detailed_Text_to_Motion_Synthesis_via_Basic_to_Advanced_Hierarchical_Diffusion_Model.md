@@ -52,8 +52,6 @@ claims:
 
 实验表明，B2A-HDM在HumanML3D数据集上同时取得了最优的FID（0.084）和Top-1 R-Precision（0.511），在KIT-ML数据集上同样以FID 0.367和Top-1 R-Precision 0.436达到领先水平，验证了低维与高维空间互补协同的有效性。
 
-
-
 **文本到动作生成**（Text-to-Motion Generation）旨在根据自然语言描述合成逼真的3D人体动作序列，在动画制作、虚拟人交互、游戏开发等领域具有广泛应用。该任务的核心挑战在于同时满足两个相互制约的目标：**模态一致性**（生成的语义与文本描述精确对齐）和**动作细节保真度**（生成的序列包含丰富、自然的关节运动细节）。
 
 ### 现有方法的瓶颈
@@ -71,8 +69,6 @@ claims:
 ### 本文动机与核心思路
 
 针对上述瓶颈，B2A-HDM的动机在于**协同利用低维与高维潜在空间的互补优势**：将去噪过程分解为两个阶段——在低维空间执行“基本扩散”以确保文本-动作语义对齐，随后过渡到高维空间执行“高级扩散”以进行细节增强。通过这种分而治之的策略，模型在保持模态一致性的前提下，显著提升生成动作的细节质量。
-
-
 
 ## 核心方法与创新机理
 
@@ -100,8 +96,6 @@ $$\mathcal{L}_{mse}^{t} = \lambda(t) \mathcal{L}_{mse}^{\epsilon}, \quad \lambda
 
 相较于现有方法，B2A-HDM 的 changed slots 体现在两个维度：一是**扩散过程的空间维度与分工**，从单一低维空间的完整去噪转变为低维对齐-高维增强的分层协作；二是**BDM 的训练损失函数**，从标准等权 MSE 损失转变为时间步感知的加权损失。这两项改变共同实现了 HumanML3D 上 FID 0.084 与 Top-1 R-Precision 0.511 的最优综合性能（Table 5），在细节质量与文本一致性两个通常相互制约的指标上同时超越了所有基线方法。
 
-
-
 B2A-HDM 将文本到动作的生成过程分解为两个层次化阶段，分别对应低维和高维潜在空间中的扩散模型，以协同利用二者在跨模态对齐与细节生成上的互补优势。整体 pipeline 如图 3 所示，由以下模块串联构成：
 
 1. **文本编码**：使用冻结的 CLIP 文本编码器 $\tau_\theta$ 提取文本嵌入 $\tau_\theta(\mathbf{w})$，作为各扩散去噪器的条件输入（Eq. 4, 5）。
@@ -122,12 +116,8 @@ B2A-HDM 将文本到动作的生成过程分解为两个层次化阶段，分别
 
 **输入输出流**：输入为自然语言描述 $\mathbf{w}$，输出为 3D 人体动作序列。推理时，BDM 从纯噪声出发，经 $T_l$ 步去噪后解码-重编码送入 ADM，ADM 经 $T_h$ 步去噪后解码得到最终动作。所有扩散去噪器均采用无分类器引导（Eq. 5），引导尺度 $g$ 用于调节文本条件与无条件预测的平衡。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1815_B2A_HDM_Towards_Detailed_Text_to_Motion_Synthesis_via_Basic_to_Advanced/figures/004_Figure_3.jpg]]
 *Figure 3: Method Overview. B2A-HDM consists of a Basic Diffusion Model(BDM) and an Advanced Diffusion Model(ADM). BDM comprises a VAE*
-
-
 
 B2A-HDM 的核心架构由两个层次化的扩散模型构成，分别运行于不同维度的潜在空间，并通过时间步分割实现协同去噪。其关键模块如下：
 
@@ -178,15 +168,8 @@ $$\mathcal{L}_{mse}^{t} = \lambda(t)\mathcal{L}_{mse}^{\epsilon},\quad \lambda(t
 
 其中 $w_1=4.5$，$w_2=0.5$。当 t 较小时，$\bar{\alpha}_t$ 接近 1，$(1-\bar{\alpha}_t)$ 较小，权重接近 w_2；随着 t 增大，$\bar{\alpha}_t$ 减小，权重逐渐增大，从而强化对早期去噪步的监督。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1815_B2A_HDM_Towards_Detailed_Text_to_Motion_Synthesis_via_Basic_to_Advanced/figures/003_Figure_2.jpg]]
 *Figure 2: (a) Visual comparisons among the reconstruction results of different VAEs. (b) Comparison of FID scores (lower is better). (c) Comparison of Top-1 R-Precision scores (higher is better)*
-
-![[assets/figures/papers/paper_list_l1815_B2A_HDM_Towards_Detailed_Text_to_Motion_Synthesis_via_Basic_to_Advanced/figures/011_Figure_5.jpg]]
-*Figure 5: Impact of the timestep-aware MSE loss for BDMs in different latent space (LS)*
-
-
 
 ## 实验与关键发现
 
@@ -232,24 +215,11 @@ Table 4 显示，B2A-HDM 的生成器参数量为 35.8M，单次推理时间约 
 
 尽管 B2A-HDM 在主流基准上表现出色，但其层次化设计仍存在固有局限。首先，**训练数据的文本风格有限**：当输入文本过于简略或包含极端风格描述时，模型可能无法生成准确对应的动作，这源于训练数据标注风格的单一性。其次，**精细运动缺失**：与现有大多数方法类似，B2A-HDM 主要关注人体关节动作，面部表情和手部精细运动未被纳入建模范围，限制了生成动作的自然度和表现力。这些失败模式提示，未来的改进方向在于利用大语言模型扩充文本多样性，以及将面部和手部运动整合到层次化生成框架中。
 
-### 补充图表
-
-
-
-![[assets/figures/papers/paper_list_l1815_B2A_HDM_Towards_Detailed_Text_to_Motion_Synthesis_via_Basic_to_Advanced/figures/013_Table_3.jpg]]
-*Table 3: Human Evaluation (HE) Results on HumanML3D dataset (Guo et al. 2022a)*
-
 ![[assets/figures/papers/paper_list_l1815_B2A_HDM_Towards_Detailed_Text_to_Motion_Synthesis_via_Basic_to_Advanced/figures/005_Table_1.jpg]]
 *Table 1: Quantitative results on (a) HumanML3D (Guo et al. 2022a) and (b) KIT-ML (Plappert, Mandery, and Asfour 2016). Red and Blue indicate the best and the second best result*
 
 ![[assets/figures/papers/paper_list_l1815_B2A_HDM_Towards_Detailed_Text_to_Motion_Synthesis_via_Basic_to_Advanced/figures/006_Table_2.jpg]]
 *Table 2: Quantitative results of the ablation study with different configurations, in which BD/AD No., LD/HD-LS Dim refer to basic/advanced denoiser number and low/highdimension latent space dimension, respectively*
-
-![[assets/figures/papers/paper_list_l1815_B2A_HDM_Towards_Detailed_Text_to_Motion_Synthesis_via_Basic_to_Advanced/figures/012_Figure_4.jpg]]
-*Figure 4: Qualitative comparisons on HumanML3D dataset (Guo et al. 2022a). The flow of time is represented by colors, with lighter shades indicating the past. Please zoom in for more details*
-
-
-
 
 ## 定位与知识库关联
 
@@ -290,8 +260,6 @@ B2A-HDM 的设计存在以下明确边界：
 - **利用大型语言模型扩充文本风格多样性**：如何借助 ChatGPT-4 等 LLM 对现有训练数据的文本描述进行风格改写和扩充，以提升模型对不同语言风格的泛化能力，是一个具有实践价值的开放问题。
 
 - **面部表情与手部动作的整合**：如何将准确的面部表情和手部动作合成整合到 B2A-HDM 的分层扩散框架中，使生成的动作更加自然完整，是推动该技术走向高保真虚拟人合成的关键挑战。
-
-
 
 ## 原文 PDF
 

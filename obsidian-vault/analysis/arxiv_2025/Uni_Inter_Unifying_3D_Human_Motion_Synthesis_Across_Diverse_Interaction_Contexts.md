@@ -53,8 +53,6 @@ claims:
 
 **方法定位**：Uni-Inter 属于扩散模型驱动的运动生成方法，其独特之处在于以体素化语义占据场统一异构交互实体，并通过空间分布估计在体积中推理运动，实现了从任务特定建模到统一交互建模的范式转变。
 
-
-
 三维人体运动合成是计算机图形学与视觉领域的核心问题，其目标是根据给定的控制信号生成自然、逼真的人体动作序列。随着数字人、虚拟现实和具身智能的发展，交互场景下的运动生成——即人体需要与物体、场景或其他人进行物理协作——成为关键挑战。然而，现实世界中的交互往往是复合的：一个人可能同时手持物体、行走于室内场景并与他人互动。这种复合交互要求模型能够同时理解人、物体、场景三类异构实体的空间关系与语义约束。
 
 现有方法在这一问题上存在根本性架构瓶颈。如 **Figure 2** 所示，当前主流方案采用**任务特定架构**，针对人-物交互（HOI）、人-场景交互（HSI）、人-人交互（HHI）分别设计独立的模型与表示：人体通常用骨架关节表示，物体用点云编码，场景则依赖占据网格。这种异构表示体系导致三个直接后果：
@@ -64,8 +62,6 @@ claims:
 3. **空间推理粗糙**：直接回归关节坐标或运动学参数的方式难以捕捉精细的空间依赖关系，尤其在需要精确接触（如手部抓取物体、脚部接触地面）的场景中表现不佳。
 
 从因果机制角度看，核心瓶颈在于：**现有方法缺乏一个统一的交互空间表示，使得异构实体能够在同一坐标系下被编码，并且运动生成过程能够在该空间中显式地进行空间分布推理**。这构成了本文的核心动机——能否设计一种统一的表示与生成范式，使得单一模型能够处理人、物体、场景的任意组合交互，并在所有任务上保持或超越领域特定SOTA的性能？
-
-
 
 ## 核心方法与创新机理
 
@@ -101,8 +97,6 @@ $$\mathcal{L} = \mathcal{L}_{rec} + \lambda_1 \cdot \mathcal{L}_{pos} + \lambda_
 - **人-人交互**（NTU120-AS）：FID 2.216 vs ReGenNet 3.045，Diversity 22.169 vs 21.925
 
 该结果表明，通过统一表示和空间概率推理这两个核心changed slots，Uni-Inter不仅消除了任务特定架构的冗余，还实现了跨任务的一致性能提升。
-
-
 
 Uni-Inter 的整体设计围绕一个核心洞察展开：**通过体素化语义占据场统一异构交互实体，并以空间分布估计的形式在体积中推理运动**，从而以单一模型支撑人-人、人-物、人-场景及其任意复合交互的运动生成。
 
@@ -155,15 +149,8 @@ $$\mathcal{L} = \mathcal{L}_{rec} + \lambda_1 \cdot \mathcal{L}_{pos} + \lambda_
 
 训练采用三个交互数据集（FullBodyManipulation、TRUMANS、NTU120-AS）以 1:1:1 等量混合的策略，确保各任务公平参与训练，避免任务偏斜。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1698_Uni_Inter_Unifying_3D_Human_Motion_Synthesis_Across_Diverse_Interaction/figures/002_Figure_2.jpg]]
 *Figure 2: Different paradigms for compound interaction motion generation. (a) Existing methods rely on task-specific architectures, resulting in separately modeling when handling compound interactions involving multiple entity types. (b) In contrast, Uni-Inter provides a unified motion generation framework that seamlessly supports arbitrary combinations of interactive entities—including humans, objects, and scenes—within a single model*
-
-![[assets/figures/papers/paper_list_l1698_Uni_Inter_Unifying_3D_Human_Motion_Synthesis_Across_Diverse_Interaction/figures/003_Figure_3.jpg]]
-*Figure 3: (a) Uni-Inter supports arbitrary combinations of interactive entities as input and generates corresponding interaction motions. This is enabled by the Unified Interactive Volume (UIV) representation and UIV-aligned regularization. Each interaction entity—whether human, object, or scene—is first encoded as a semantic occupancy grid in the interaction space and then merged into the*
-
-
 
 Uni-Inter 的核心架构围绕两个关键设计展开：**统一交互体积（UIV）** 将异构交互实体编码为共享空间场，以及**关节级空间概率分布**在该体积上推理运动。以下按模块逐一拆解。
 
@@ -222,8 +209,6 @@ $$\mathcal{L} = \mathcal{L}_{rec} + \lambda_1 \cdot \mathcal{L}_{pos} + \lambda_
 
 各损失项互补作用显著：去除速度损失 $\mathcal{L}_{vel}$ 使人-物交互 C-F1 降至 0.67，验证了运动时序平滑性对交互质量的影响。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -269,33 +254,14 @@ Uni-Inter在三个不同的交互基准上均一致优于领域特定的SOTA方�
 2. **物体运动生成缺失**：模型对物体运动没有生成能力，仅限于给定物体轨迹条件下生成人体运动，不能端到端地同时推理物体与人体的联合交互。
 3. **静态体积空间**：UIV空间是预定义静态的，处理大规模、无界环境下的运动生成仍是一个开放问题。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1698_Uni_Inter_Unifying_3D_Human_Motion_Synthesis_Across_Diverse_Interaction/figures/004_Table_1.jpg]]
 *Table 1: Quantitative comparison on the FullBodyManipulation dataset for the human-object interaction task*
 
 ![[assets/figures/papers/paper_list_l1698_Uni_Inter_Unifying_3D_Human_Motion_Synthesis_Across_Diverse_Interaction/figures/005_Table_2.jpg]]
 *Table 2: Quantitative comparison on the TRUMANS dataset for the human-scene interaction task*
 
-![[assets/figures/papers/paper_list_l1698_Uni_Inter_Unifying_3D_Human_Motion_Synthesis_Across_Diverse_Interaction/figures/006_Table_3.jpg]]
-*Table 3: Quantitative comparison on the NTU120-AS dataset for the human-human interaction task*
-
-![[assets/figures/papers/paper_list_l1698_Uni_Inter_Unifying_3D_Human_Motion_Synthesis_Across_Diverse_Interaction/figures/008_Table_4.jpg]]
-*Table 4: Ablation results for human-object interaction tasks on the FullBodyManipulation dataset. ‘w/o space dist’ means directly regressing the kinematic parameters of motion*
-
-![[assets/figures/papers/paper_list_l1698_Uni_Inter_Unifying_3D_Human_Motion_Synthesis_Across_Diverse_Interaction/figures/007_Table_5.jpg]]
-*Table 5: Ablation results for human-scene interaction tasks on the TRUMANS dataset. ‘w/o space dist’ means directly regressing the kinematic parameters of motion*
-
-![[assets/figures/papers/paper_list_l1698_Uni_Inter_Unifying_3D_Human_Motion_Synthesis_Across_Diverse_Interaction/figures/009_Table_6.jpg]]
-*Table 6: Ablation results for human-human interaction tasks on the NTU120-AS dataset. ‘w/o space dist’ means directly regressing the kinematic parameters of motion*
-
 ![[assets/figures/papers/paper_list_l1698_Uni_Inter_Unifying_3D_Human_Motion_Synthesis_Across_Diverse_Interaction/figures/013_Figure_7.jpg]]
 *Figure 7: Qualitative results of compound interaction generation by Uni-Inter. Thanks to the unified modeling of humans, objects, and scenes via UIV, Uni-Inter supports high-quality compound motion generation across arbitrary combinations of interactive entities. Blue person and object indicate the input conditions, while yellow-green motions represent the generated results*
-
-![[assets/figures/papers/paper_list_l1698_Uni_Inter_Unifying_3D_Human_Motion_Synthesis_Across_Diverse_Interaction/figures/010_Figure_4.jpg]]
-*Figure 4: Qualitative comparison on the Human-Object Interaction dataset. Compared to state-of-the-art method CHOIS [Li et al. 2024], Uni-Inter achieves more precise control and interaction, particularly in hand movements. The blue object represents the conditional input, while the yellow-green person shows the generated motion*
-
-
 
 ## 定位与知识库关联
 
@@ -342,8 +308,6 @@ Uni-Inter的适用边界受以下因素约束：
 3. **因果实时扩展**：将当前离线生成范式扩展至因果实时设置，需要解决部分观测下的UIV构建和增量式运动预测问题，这涉及表示学习与时序建模的深层耦合。
 
 4. **与大规模运动基座模型的融合**：Uni-Inter的统一体积表示能否作为通用交互接口，与现有的大规模运动生成基座模型结合，实现更广泛的跨任务泛化，是一个值得探索的方向。
-
-
 
 ## 原文 PDF
 

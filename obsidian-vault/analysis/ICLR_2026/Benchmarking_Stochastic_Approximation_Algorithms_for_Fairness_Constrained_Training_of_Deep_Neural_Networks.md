@@ -46,8 +46,6 @@ claims:
 
 本文提出了首个系统性的基准测试框架，用于评估随机近似算法在公平性约束下的深度神经网络训练中的实际表现。研究聚焦于解决带不等式约束的随机优化问题，其中目标函数和约束函数均为非凸、非光滑且大规模。论文基于US Census数据（通过Folktables包）构建了真实世界的公平性约束学习基准，首次系统比较了三种近期提出的随机近似算法——Stochastic Ghost、SSL-ALM（Stochastic Smoothed and Linearized Augmented Lagrangian Method）和Stochastic Switching Subgradient——在优化性能和公平性改善方面的实际表现。实验结果表明，增广拉格朗日方法（ALM和SSL-ALM）在公平性与准确性之间取得了最佳折中，而Stochastic Switching Subgradient在满足约束方面表现最优但目标函数最小化不足。论文同时指出，目前尚无算法能同时处理非凸、非光滑的目标和约束函数并给出收敛性保证。
 
-
-
 深度神经网络在诸多领域取得显著成功，但其训练过程通常仅关注预测准确性，可能学习到训练数据中的偏见，导致对受保护群体的不公平对待。标准的经验风险最小化（ERM）形式为：
 
 $$\operatorname* { m i n } _ { \theta \in \mathbb { R } ^ { n } } \frac { 1 } { N } \sum _ { i = 1 } ^ { N } \ell ( f _ { \theta } ( X _ { i } ) , Y _ { i } ) + \mathcal { R } ( \theta )$$
@@ -68,8 +66,6 @@ $$\begin{array} { r l } { \underset { \theta \in \mathbb { R } ^ { n } } { \oper
 
 **因果旋钮**：算法设计中对目标函数和约束函数的可微性、凸性假设，以及采样策略（如是否使用几何分布增大批大小、是否使用平滑项）是决定算法能否实际收敛的关键。
 
-
-
 ## 核心方法与创新机理
 
 本文的核心创新在于：
@@ -79,8 +75,6 @@ $$\begin{array} { r l } { \underset { \theta \in \mathbb { R } ^ { n } } { \oper
 3. **大规模真实数据集**：利用US Census数据（通过Folktables包）构建基准，支持定义多达57亿个受保护子组。
 4. **自动化工具链**：提供自动化方式从PyTorch或TensorFlow定义的计算图构建ERM公式，并发布为Python包（https://github.com/humancompatible/train）。
 5. **硬约束优于惩罚项**：遵循Cotter et al. (2019)的论点，采用硬约束（不等式约束）而非加权惩罚项，提供更清晰的模型设计理解。
-
-
 
 ![[assets/figures/papers/iclr26_0002_JxmjzC6syB_Benchmarking_Stochastic_Approximation_Algorithms/figures/004_Figure_1.jpg]]
 *Figure 1: Train (blue) and test (orange) statistics over time (s) on the ACS Income dataset for each algorithm: SGD (column 1), fairret-regularized SGD (column 2), SSL-ALM (column 3), ALM (column 4) Switching Subgradient (column 5), and Stochastic Ghost (column 6). The plots depict the mean values for loss (first row) and the constraint at each timestamp, rounded to the nearest 0.5 seconds, over 10 runs. The shaded area depicts the region between the first and third quartiles.*
@@ -102,8 +96,6 @@ $$\begin{array} { r l } { \underset { \theta \in \mathbb { R } ^ { n } } { \oper
 - 约束处理方式：从惩罚项（如fairret）改为硬约束（不等式约束）
 - 采样策略：从固定小批量大小改为几何分布控制批量大小（Stochastic Ghost）或切换规则（Switching Subgradient）
 - 优化器类型：从SGD（无约束）改为增广拉格朗日方法、随机幽灵方法、切换次梯度方法
-
-
 
 ### 5.1 优化问题形式化
 
@@ -161,8 +153,6 @@ $$\ell ( f _ { \theta } ( X _ { i } ) , Y _ { i } ) = - Y _ { i } \cdot \log \si
 对于多值保护属性，使用带公平性正则化项的无约束惩罚问题：
 
 $$\operatorname*{min}_{\theta\in\mathbb{R}^n} \frac{1}{N}\sum_{i=1}^N \ell(f_\theta(X_i),Y_i) + \mathcal{R}(\theta) + \lambda \sum_{i=1}^m \left| \ell^{s_i}(\theta) - \frac{1}{m}\sum_{j=1}^m \ell^{s_j}(\theta) \right|$$
-
-
 
 ## 实验与关键发现
 
@@ -222,8 +212,6 @@ Figure 1展示了各算法在ACSIncome数据集上损失和约束随时间变化
 - 超参数调优依赖于验证集，不同数据集可能需要不同的调优策略
 - 约束方法虽然提供了更清晰的模型设计理解，但可能比惩罚方法更难调优
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0002_JxmjzC6syB_Benchmarking_Stochastic_Approximation_Algorithms/figures/001_Table_1.jpg]]
 *Table 1: Particular formulations of the constraint function c to enforce fairness.*
 
@@ -235,8 +223,6 @@ Figure 1展示了各算法在ACSIncome数据集上损失和约束随时间变化
 
 ![[assets/figures/papers/iclr26_0002_JxmjzC6syB_Benchmarking_Stochastic_Approximation_Algorithms/figures/015_Table_5.jpg]]
 *Table 5: Loss and constraint violation on the validation set after 5 30-second runs of the Stochastic Switching Subgradient in the setup of Exp. 1, rounded to 3 digits.*
-
-
 
 ## 定位与知识库关联
 
@@ -260,8 +246,6 @@ Figure 1展示了各算法在ACSIncome数据集上损失和约束随时间变化
 - 如何将本基准测试扩展到更复杂的公平性定义（如交叉性公平性）？
 - Stochastic Ghost方法中几何分布参数 $p_0$ 的最优选择是什么？
 - SSL-ALM中的平滑项 $\mu$ 是否真的必要？在哪些情况下它比ALM更有优势？
-
-
 
 ## 原文 PDF
 

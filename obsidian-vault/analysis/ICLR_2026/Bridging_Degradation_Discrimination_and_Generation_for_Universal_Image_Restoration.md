@@ -46,16 +46,12 @@ claims:
 
 本文提出BDG（Bridging Degradation discrimination and Generation）框架，旨在解决通用图像复原中退化判别能力与生成先验难以兼得的根本矛盾。核心创新包括：（1）提出多角度多尺度灰度共生矩阵（MAS-GLCM）实现细粒度退化判别；（2）设计三阶段扩散训练范式（生成预训练→桥接阶段→复原微调），通过双向特征对齐将退化判别信息注入扩散模型。实验表明，BDG在5D全合一复原任务中全面超越DiffUIR，在去雨任务上PSNR提升3.72 dB；在真实世界超分辨率任务中，在DIV2K-Val上PSNR达到24.1977，比第二好的扩散方法高出2.45 dB。
 
-
-
 现有通用图像复原方法可分为两类：
 
 - **基于判别的方法**（如AirNet、PromptIR、DCPT）：在保真度指标上表现良好，但输出过于平滑，缺乏真实纹理。
 - **基于生成先验的方法**（如StableSR、DiffBIR、DiffUIR）：能生成丰富细节，但在多任务场景下容易产生与输入不一致的伪影，保真度不足。
 
 核心瓶颈在于：退化判别与生成先验在单一模型中难以兼顾。基于判别的方法依赖显式退化表征（梯度、频率、可学习参数、文本指令），但这些表征的细粒度判别能力有限；基于生成先验的方法虽能利用扩散模型的强大生成能力，但缺乏对退化类型和级别的精确感知。
-
-
 
 ## 核心方法与创新机理
 
@@ -64,9 +60,6 @@ claims:
 2. **三阶段扩散训练范式**：将扩散模型训练分为生成预训练、桥接阶段和复原微调三个阶段，通过系数调度（Eq.4中的α_t、β_t、δ_t）控制模型行为模式，在单一模型中同时保留生成先验和退化判别能力。
 
 3. **双向特征对齐**：在桥接阶段通过双向交叉熵损失（Eq.6）将MAS-GLCM特征与扩散模型中间特征对齐，使模型获得退化感知能力。
-
-
-
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__image_and_video_generation__b001_hVFoiCDiMB_Bridging_Degr/figures/001_Figure_1.jpg]]
 
@@ -77,8 +70,6 @@ BDG的整体框架如Figure 2所示，包含三个训练阶段：
 - **复原微调阶段**：所有系数正常调度，模型直接注入低质量图像以增强保真度。
 
 在全合一和混合退化任务中，使用36M参数的UNet（预训练于ImageNet）；在真实世界超分辨率任务中，使用Stable Diffusion 2作为基础模型，不引入交叉注意力或ControlNet等额外架构。
-
-
 
 ### 5.1 MAS-GLCM退化表征
 
@@ -125,15 +116,11 @@ $$\mathcal{L}_{rft} = ||x_{gt}^\theta - x_{gt}||_1 + \lambda \mathcal{L}_{bridge
 全负对比损失（Eq.10，仅在RFT阶段使用）：
 $$\mathcal{L}_{fcnl} = \sum_{i \in \mathcal{B}_1} \sum_{j \in \mathcal{B}_2} (1 - \cos(F_{mas}^i, F_{mas}^j))$$
 
-
-
 ## 实验与关键发现
-
 
 ### 6.1 全合一图像复原
 
 在5D全合一复原任务中，BDG全面超越DiffUIR（Table 2）：
-
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__image_and_video_generation__b001_hVFoiCDiMB_Bridging_Degr/figures/008_Table_2.jpg]]
 *Table 2: We train a 5D all-in-one image restoration model with simulated dataset following DiffUIR (Zheng et al., 2024). This model is validated on simulated and real-world scenarios. Table 2: All-in-one Image Restoration results. † means the methods are retrained within datasets we used for fair comparison. The best and second results are shown in red and blue respectively.*
@@ -150,14 +137,12 @@ $$\mathcal{L}_{fcnl} = \sum_{i \in \mathcal{B}_1} \sum_{j \in \mathcal{B}_2} (1 
 
 在CDD数据集上，BDG在雾+雨场景中PSNR达到34.21，比之前最优方法（Zamfir et al., 2025）提升4.28 dB（Table 4）。
 
-
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__image_and_video_generation__b001_hVFoiCDiMB_Bridging_Degr/figures/017_Table_4.jpg]]
 *Table 4: Table 4: Comparison to state-of-the-art on composited degradations. The best and second results are shown in red and blue respectively.*
 
 ### 6.3 真实世界超分辨率
 
 在DIV2K-Val上，BDG的PSNR达到24.1977，比第二好的扩散方法ResShift（21.75）高出2.45 dB；在DrealSR上PSNR达到28.7961，与StableSR持平（Table 5）。
-
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__image_and_video_generation__b001_hVFoiCDiMB_Bridging_Degr/figures/018_Table_5.jpg]]
 *Table 5: Table 5: Real-world super resolution results on synthetic and real-world benchmarks. The best and second best results of each metric in diffusion-based methods are highlighted in red and blue, respectively.*
@@ -174,16 +159,11 @@ $$\mathcal{L}_{fcnl} = \sum_{i \in \mathcal{B}_1} \sum_{j \in \mathcal{B}_2} (1 
 - 真实世界超分辨率实验遵循StableSR和SeeSR的训练协议。
 - 消融实验中，桥接阶段和RFT阶段各训练150k迭代，总迭代数300k，与基线方法保持一致。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__image_and_video_generation__b001_hVFoiCDiMB_Bridging_Degr/figures/006_Table_1.jpg]]
 *Table 1: Table 1: MAS-GLCM has substantial capability in the classification of both types and levels of degradation.*
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__image_and_video_generation__b001_hVFoiCDiMB_Bridging_Degr/figures/015_Table_3.jpg]]
 *Table 3: Table 3: Real-world restoration results in four real-world degradation types under the zero-shot setting. The best and second results are shown in red and blue respectively.*
-
-
-
 
 ## 定位与知识库关联
 
@@ -206,8 +186,6 @@ BDG属于**通用图像复原**领域，具体位于**基于扩散模型的通�
 - MAS-GLCM能否与更强大的基础模型（如更大的扩散模型或视觉语言模型）结合？
 - 如何解决MAS-GLCM对颜色偏差和全局几何变换不敏感的问题？
 - 能否将BDG的桥接思想应用于其他条件生成任务？
-
-
 
 ## 原文 PDF
 

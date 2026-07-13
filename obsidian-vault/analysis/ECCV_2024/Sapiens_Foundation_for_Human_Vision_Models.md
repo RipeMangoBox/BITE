@@ -52,8 +52,6 @@ Sapiens 是一个面向以人为中心的视觉任务的基础模型系列。其
 
 在方法定位上，Sapiens 属于“大规模领域特定预训练 + 多任务微调”范式，其关键区别于现有工作的三个杠杆点在于：**预训练数据域从通用图像转向人类专属数据**、**输入分辨率从 224/384 像素提升至 1024 像素**、**模型容量扩展至 2B 参数**（Table 1）。该范式在二维人类视觉任务上展现了强大的可扩展性和泛化能力，但其当前未涵盖三维重建或多模态理解，且预训练所需计算资源极高（1024 块 A100 GPU 训练 18 天），在极端野外数据上的鲁棒性及与其他自监督范式（如 DINOv2）的对比仍有待探索。
 
-
-
 ### 人类中心视觉任务的独特挑战
 
 计算机视觉领域在通用图像理解上取得了长足进步，但在以人类为核心的任务中仍面临显著瓶颈。二维姿态估计、身体部位分割、深度估计和表面法线预测等任务，要求模型对人类身体的精细结构、姿态变化、衣物遮挡以及多样化的自然场景具有高度鲁棒的理解能力。然而，现有视觉模型大多在通用图像数据集（如 ImageNet-1K、ImageNet-21K 或 LVD-142M）上进行预训练，缺乏大规模、领域特定的人类图像预训练，导致其在多样化人类中心任务上的泛化能力、广泛适用性以及高保真度不足。
@@ -78,8 +76,6 @@ Sapiens 是一个面向以人为中心的视觉任务的基础模型系列。其
 
 该方法遵循“预训练-微调”范式：首先在大规模人类图像上通过掩码自编码器（MAE）进行自监督预训练，随后针对四项具体任务添加轻量级专用解码器进行端到端微调。这种设计既保证了预训练表征的通用性，又实现了下游任务的高效适配。
 
-
-
 ## 核心方法与创新机理
 
 Sapiens 的核心创新并非提出全新的网络架构，而是通过**大规模领域特定预训练**这一方法论转变，系统性解决了现有视觉模型在人类中心任务上泛化能力不足的瓶颈。其创新可以凝练为三个相互强化的“changed slots”：
@@ -94,8 +90,6 @@ Sapiens 将输入分辨率从常规的 224/384 像素提升至**1024×1024 像�
 Sapiens 采用掩码自编码器（MAE）在 1024×1024 分辨率的人类图像上进行自监督预训练（Figure 3 展示了模型对高度遮挡人类图像的重建能力），随后仅需添加轻量级任务专用解码器即可端到端微调至四项任务。这一设计使得同一预训练编码器可以泛化到姿态估计、部位分割、深度估计和表面法线预测，无需为每项任务重新设计骨干网络，体现了“人类视觉基础模型”的统一性思想。
 
 三个 changed slots 之间存在因果联动：**大规模人类数据**提供了领域知识的基础，**高分辨率与大容量**赋予模型吸收这些知识的能力，而**统一的预训练-微调范式**则确保这些知识可以高效迁移到多样化的下游任务中。
-
-
 
 Sapiens 遵循“预训练-后微调”的统一范式，构建了一个面向人类中心视觉任务的基础模型体系。其整体流水线由三个核心模块串联而成：面向领域的大规模数据构建、高分辨率掩码自编码器预训练，以及针对四项下游任务的轻量级任务头微调。
 
@@ -129,8 +123,6 @@ Sapiens 遵循“预训练-后微调”的统一范式，构建了一个面向�
 
 该框架的核心洞察在于：**在相同的计算预算下，将预训练数据的领域从通用图像切换为大规模人类专属图像，并配合更高的输入分辨率与模型容量，是驱动下游性能提升的因果杠杆**。消融实验（Table 7）证实，使用 Humans-300M 预训练的 Sapiens-0.3B 在所有四项任务上均显著优于基于 ImageNet 或通用数据集预训练的同等模型。此外，模型规模从 0.3B 到 2B 的扩展带来了性能的单调提升，未观察到饱和迹象（Table 3-6），表明该框架具有良好的可扩展性。
 
-
-
 Sapiens 的整个训练流程包含三个核心模块：**人类图像预处理**、**掩码自编码器预训练**和**任务特定微调**。以下逐一展开其关键设计与公式。
 
 ### 人类图像预处理
@@ -146,9 +138,6 @@ Sapiens 的整个训练流程包含三个核心模块：**人类图像预处理*
 - **掩码机制**：随机掩码掉 75% 的图像块，仅将可见块送入编码器，解码器则负责从编码特征重建被掩码区域的像素值。
 
 该模块的输出是一个具备强大人体图像理解能力的编码器，为下游任务提供高质量的特征表示。Figure 3 展示了模型在未见图像上的重建效果，即使在 95% 的极高掩码率下，重建质量下降也极为有限，印证了模型对人体图像的深层理解。
-
-![[assets/figures/papers/paper_list_l1642_Sapiens_Foundation_for_Human_Vision_Models/figures/004_Figure_3.jpg]]
-*Figure 3: Sapiens reconstruction on unseen images. Top: Each triplet contains the ground truth (left), the masked image (center), and the MAE reconstruction (right), with a masking ratio of 75%, a patch size of 16, and an image size of 1024. Bottom: Varying the mask ratio between [0.75, 0.95] during inference reveals a minimal reduction in quality, underscoring the model’s understanding of human images*
 
 ### 任务特定微调
 
@@ -186,13 +175,6 @@ $$\mathcal{L}_{\mathrm{normal}} = ||\mathbf{n} - \hat{\mathbf{n}}||_{1} + (1 - \
 
 其中，$\mathbf{n}$ 为真实法向量，$\hat{\mathbf{n}}$ 为预测法向量。该损失仅在人体像素区域计算——即只对图像中属于人类的部分施加监督，避免背景区域干扰法线方向的学习。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1642_Sapiens_Foundation_for_Human_Vision_Models/figures/006_Figure_5.jpg]]
-*Figure 5: Ground-truth synthetic annotations for depth and surface normal estimation*
-
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -205,18 +187,9 @@ Sapiens 系列编码器均从零开始在 1024 × 1024 分辨率、patch size 16
 
 在 Humans-5K 测试集上，Sapiens 系列模型展现出显著的性能优势（Table 3）。最小的 **Sapiens-0.3B** 即超越 DWPose-l 达 +2.8 AP（全身），而 **Sapiens-2B** 以 **61.1 AP** 的全身姿态估计精度创下新纪录，相较此前最佳方法 DWPose-l（53.5 AP）提升 **+7.6 mAP**。值得注意的是，Sapiens-0.6B 在仅使用 1024 分辨率输入的条件下，已全面超越所有先前方法，包括使用 2560 分辨率输入的 ViTPose+-H。Figure 6 展示了 Sapiens-1B 在自然场景下对 308 个关键点的定性预测结果，模型对全身、半身、面部及多人场景均表现出良好的泛化能力。
 
-![[assets/figures/papers/paper_list_l1642_Sapiens_Foundation_for_Human_Vision_Models/figures/009_Table_3.jpg]]
-*Table 3: Pose estimation results on Humans-5K test set. Flip test is used*
-
-![[assets/figures/papers/paper_list_l1642_Sapiens_Foundation_for_Human_Vision_Models/figures/008_Figure_6.jpg]]
-*Figure 6: Pose estimation with Sapiens-1B for 308 keypoints on in-the-wild images*
-
 #### 身体部位分割
 
 Table 4 报告了 Humans-2K 测试集上的部位分割结果。Sapiens-0.3B 以 76.7 mIoU 的成绩超越 DeepLabV3+（64.1 mIoU）达 **+12.6 mIoU**，并显著优于 Mask2Former（基于 Swin-L 骨干网络）。**Sapiens-2B** 进一步将性能推至 **81.2 mIoU** 和 **89.4 mAcc**，相较 DeepLabV3+ 的 mIoU 提升 **+17.1**。Figure 7 的定性结果显示，Sapiens-1B 在单人和多人图像上均能准确分割 28 类身体部位，且对衣物遮挡、复杂姿态具有较好的鲁棒性。
-
-![[assets/figures/papers/paper_list_l1642_Sapiens_Foundation_for_Human_Vision_Models/figures/010_Table_4.jpg]]
-*Table 4: We report mIoU and mAcc on Humans-2K test set. Methods with * are trained by us*
 
 #### 单目深度估计
 
@@ -277,15 +250,8 @@ Figure 10 展示了 Sapiens-0.3B 的法线估计性能随预训练过程中所�
 
 论文未针对性别、年龄、肤色等敏感属性进行公平性评估，也未讨论 Humans-300M 数据集可能存在的分布偏差。这一缺失在人类中心视觉模型中尤为关键，因为训练数据的入口分布可能直接影响模型在不同人群上的表现差异。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1642_Sapiens_Foundation_for_Human_Vision_Models/figures/002_Table_1.jpg]]
-*Table 1: Comparison of state-of-the-art pretrained vision models. Sapiens adopts a higher resolution backbone on a large dataset of in-the-wild human images*
-
 ![[assets/figures/papers/paper_list_l1642_Sapiens_Foundation_for_Human_Vision_Models/figures/003_Figure_2.jpg]]
 *Figure 2: Overview of number of humans per image in the Humans-300M dataset*
-
-
 
 ## 定位与知识库关联
 
@@ -336,8 +302,6 @@ Sapiens 采用“预训练-微调”范式，在共享的 ViT 编码器之上为
 3. **缩放策略优化**：当前观察到性能随模型规模和数据量单调增长，但未探索饱和点。是否存在更高效的缩放策略（如 Chinchilla 最优分配）来平衡计算预算与性能收益？
 
 4. **混合场景泛化**：在非人类场景或人-物交互场景中，领域特定预训练是否仍然有效？通用数据与领域数据的最优混合比例是多少？这些问题对于将 Sapiens 的方法论推广至更广泛的应用场景至关重要。
-
-
 
 ## 原文 PDF
 

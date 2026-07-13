@@ -51,8 +51,6 @@ claims:
 
 **主要结果**：在包含 45 个提示词、5400 个渲染视角的自定义测试集上，HandDreamer 在 CLIP L14（28.63）、FID（254.62）和 HPSv2（0.241）三项指标上均优于现有最优方法 CFD（CLIP 26.62、FID 262.83、HPSv2 0.223）。消融实验证实，移除骨架控制网络、MANO 初始化或 CHS 损失中的任一组件，均会导致 CLIP 分数下降或几何失真，验证了每个模块的必要性。
 
-
-
 ### 文本到三维生成的核心瓶颈：关节结构的视图一致性
 
 基于分数蒸馏采样（Score Distillation Sampling, SDS）的文本到三维生成方法（如 DreamFusion、LatentNerf、Fantasia3D、ProlificDreamer 等）已在通用物体生成上取得显著进展，但其核心缺陷在处理高度可动关节结构时暴露无遗。手部作为人体最具表达力的关节部位，拥有超过 20 个自由度，其三维结构在不同视角下呈现出剧烈变化的轮廓和自遮挡模式。现有 SDS 方法的根本问题在于：**文本提示定义的概率图景中存在大量可能的模式，不同视角的优化过程会收敛到互不一致的模式**，导致经典的 Janus 伪影（多面神问题）——例如从正面看是手掌、从侧面看却出现另一组手指的几何错乱。
@@ -70,8 +68,6 @@ claims:
 ### HandDreamer 的动机与设计思路
 
 针对上述缺口，HandDreamer 提出三条正交的解决路径：（1）**手部骨架条件控制网络**——将三维手部骨架的二维投影作为 ControlNet 条件注入扩散模型，为每个视角嵌入视角和姿态信息，缩小概率分布的模式数量；（2）**MANO 手部模型初始化**——利用参数化手部模型 MANO 提供强几何先验，使初始 NeRF 在语义和几何上接近理想一致状态；（3）**纠正手部形状损失**——在 SDS 优化过程中持续惩罚 NeRF 不透明度与 MANO 轮廓的偏差，防止侧视角几何退化。三者协同作用，使得 SDS 优化过程在保持视图一致性的同时生成高保真、几何准确的三维手部模型。
-
-
 
 ## 核心方法与创新机理
 
@@ -102,8 +98,6 @@ HandDreamer 的核心创新在于针对文本到三维生成中**高度可动关
 ### 创新点总结
 
 三处“changed slots”并非孤立设计，而是形成了因果闭环：MANO 初始化提供接近一致的初始状态，骨架条件控制网在每个视角缩小模式搜索空间，CHS 损失持续纠正优化过程中的几何漂移。这一组合使得 HandDreamer 成为首个能够从文本提示零样本生成高保真、几何准确的三维手部模型的方法。
-
-
 
 HandDreamer 的整体流程分为两个阶段：**手部形状初始化**和**手部模型生成**，如图 3 所示。该方法以文本提示和 MANO 手部模型姿态参数为输入，输出具有视图一致性几何和精细纹理的三维手部模型。
 
@@ -145,12 +139,8 @@ $$\mathcal{L} = \lambda_{sds} \cdot \mathcal{L}_{sds} + \lambda_t^{chs} \cdot \m
 
 **输入**：文本提示 + MANO 姿态参数 → **阶段一**：MANO 轮廓监督的密度初始化 → 初始 NeRF → **阶段二**：骨架条件 SDS + CHS 损失 + 辅助损失 → **输出**：具有视图一致性几何和精细纹理的三维手部 NeRF 模型。导出的网格可进一步进行骨骼绑定以实现姿态驱动动画（图 7）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2519_https_arxiv_org_abs_2604_04425/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of HandDreamer. Our method generates 3D hand models from text prompts in 2 stages: (a) Hand shape initialization using MANO mesh; (b) Hand model generation using skeleton and Corrective Hand Shape (CHS) guidance loss*
-
-
 
 ### 问题形式化与SDS梯度
 
@@ -204,12 +194,8 @@ $$
 
 其中 $\mathcal{L}_{img}$ 为图像重建损失，$\mathcal{L}_{zvar}$ 为 z 方差损失，二者共同稳定训练并锐化表面。消融实验（Table 2, Figure 9）证实，移除任一模块均导致 CLIP 分数下降或几何失真，验证了三个核心模块的因果必要性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2519_https_arxiv_org_abs_2604_04425/figures/002_Figure_2.jpg]]
 *Figure 2: Convergence into wrong modes. (a) Probable modes for same view point. (b) Random initialization can converge into different modes for same viewpoints leading to Janus artifacts. (c,d) Visualization of gradients for the same viewpoint with multiple timesteps (t). Random initialization leads to less informative gradients at lower t and diverse gradients leading to view-inconsistencies at higher t. MANO initialization yields consistent gradients at lower and higher t*
-
-
 
 ## 实验与关键发现
 
@@ -245,38 +231,17 @@ HandDreamer 在自建测试集（45 个提示词，5400 张渲染视图）上与
 - **泛化能力**：方法依赖 MANO 参数化模型进行初始化和约束，对非人手虚构生物手部结构的生成能力未经验证。
 - **骨骼绑定自动化**：优化后的三维手部模型需人工调整才能生成动画，自动化 rigging 流程仍是开放问题。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2519_https_arxiv_org_abs_2604_04425/figures/009_Table_1.jpg]]
 *Table 1: Quantitative comparisons. Our method outperforms the other methods on all the metrics*
 
 ![[assets/figures/papers/paper_list_l2519_https_arxiv_org_abs_2604_04425/figures/013_Figure_9.jpg]]
 *Figure 9: Ablation studies. (a) Removing all components fails to generate hand structure. (b) Using only CN causes incorrect geometry. (c) Removing CHS causes distortions in side views. (d) Using all components generates best results*
 
-![[assets/figures/papers/paper_list_l2519_https_arxiv_org_abs_2604_04425/figures/010_Table.jpg]]
-
 ![[assets/figures/papers/paper_list_l2519_https_arxiv_org_abs_2604_04425/figures/005_Figure_5.jpg]]
 *Figure 5: Comparison against state-of-the-art text-to-3D methods. Janus artifacts and inconsistent fingers shown in red arrows and circle (a-c). Text-to-human methods (d-f) generates hands with very less details. Our method generates better 3D hand models with consistent geometry and details*
 
-![[assets/figures/papers/paper_list_l2519_https_arxiv_org_abs_2604_04425/figures/011_Figure_8.jpg]]
-*Figure 8: User preference study. Higher value is better. Our method scores highest compared to the other methods*
-
-![[assets/figures/papers/paper_list_l2519_https_arxiv_org_abs_2604_04425/figures/001_Figure_1.jpg]]
-*Figure 1: We propose HandDreamer: the first method for zero-shot 3D hand generation from text prompts. Our method generates highfidelity, geometrically accurate 3D hand models with diverse articulations from text prompts. Existing methods generate Janus artifacts (HiFA, ESD) and fewer details (OHTA, DreamDPO, HumanNorm) (g). Surface maps provided inset*
-
-![[assets/figures/papers/paper_list_l2519_https_arxiv_org_abs_2604_04425/figures/004_Figure_4.jpg]]
-*Figure 4: Our method generates 3D hand models with detailed texture and view-consistent geometry. Surface maps provided inset*
-
 ![[assets/figures/papers/paper_list_l2519_https_arxiv_org_abs_2604_04425/figures/006_Figure_6.jpg]]
 *Figure 6: Comparison against one-shot method OHTA. Our method generates better textures and diverse geometry*
-
-![[assets/figures/papers/paper_list_l2519_https_arxiv_org_abs_2604_04425/figures/007_Figure_7.jpg]]
-*Figure 7: Our method supports hand articulations for diverse hand poses.(a) Obtained using different MANO parameters. (b) Obtained using rigging of exported mesh*
-
-![[assets/figures/papers/paper_list_l2519_https_arxiv_org_abs_2604_04425/figures/015_Table_3.jpg]]
-*Table 3: Quantitative comparisons. Our method outperforms the other methods on all the metrics while generating results in low standard deviation*
-
-
 
 ## 定位与知识库关联
 
@@ -298,8 +263,6 @@ HandDreamer 在自建测试集（45 个提示词，5400 张渲染视图）上与
 1. 如何为优化后的三维手部模型自动化生成骨骼绑定和动画（rigging/articulation），而不需人工调整？论文展示了通过 MANO 参数和网格绑定实现姿态变化的能力（Figure 7），但自动化管线尚未完全闭环。
 2. 如何将 HandDreamer 扩展到全身三维化身生成，同时保持手部细节的质量？这需要在多粒度先验融合和计算效率之间取得平衡。
 3. 对于极端侧视角度由自遮挡造成的几何退化，CHS 损失是否足够，是否需要引入基于多视图一致性或神经渲染的进一步视图校正机制？
-
-
 
 ## 原文 PDF
 

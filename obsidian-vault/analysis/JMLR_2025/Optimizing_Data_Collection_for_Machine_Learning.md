@@ -57,8 +57,6 @@ claims:
 
 尽管 LOC 在实验中展现出显著优势，该方法仍存在若干边界条件：它假设学习曲线单调非递减（在主动学习或半监督场景下可能不成立）；对于超过两个数据源的高维场景，ground truth 构建的计算成本呈指数增长；惩罚参数 $P$ 的选择仍需领域知识，极端设置下可能产生不切实际的收集建议。这些限制指出了未来工作中纳入隐私与公平约束、处理非平稳数据分布等开放方向。
 
-
-
 ### 数据收集的现实困境
 
 现代机器学习系统的性能高度依赖数据规模，但数据收集本身并非免费——标注成本、采集难度、隐私约束等因素使得“收集多少数据才够”成为一个具有重大经济意义的决策问题。实践中，从业者通常面临一个两难选择：收集过少，模型无法达到目标性能，导致项目失败；收集过多，则浪费大量资源，压缩后续迭代的预算空间。
@@ -80,8 +78,6 @@ claims:
 本文提出一个根本性的视角转换：**不应试图精确估计最小数据需求量，而应直接优化数据收集决策本身**。核心洞察在于：如果我们能够估计数据需求量的概率分布，就可以在期望意义上权衡收集成本与失败风险，从而通过引入可控的安全边际来规避欠采，同时避免过度收集。
 
 这一思想被形式化为一个**随机最优控制问题**：将所需最小数据量 $D^*$ 视为随机变量，目标是最小化期望收集成本与失败惩罚的加权和。通过调节惩罚参数 $P$，决策者可以在“激进收集”（低成本但高失败风险）与“保守收集”（高成本但低失败风险）之间连续调控，实现与业务需求匹配的风险偏好。
-
-
 
 ## 核心方法与创新机理
 
@@ -129,8 +125,6 @@ $$d_1^* = \max\{\hat{\mu} + \sqrt{2}\hat{\sigma}\sqrt{\log\frac{P}{c\hat{\sigma}
 
 这一解析形式揭示了 LOC 的核心机制：最优收集量在估计均值 $\hat{\mu}$ 的基础上增加了一个与不确定性 $\hat{\sigma}$ 和惩罚-成本比 $P/c$ 成正比的安全边际项。当 $P$ 足够小（$P < c\hat{\sigma}\sqrt{2\pi}$）时，惩罚不足以抵消收集成本，最优策略是不收集任何数据（$d_1^* = 0$）；当 $P$ 增大时，安全边际随之扩大，体现了风险规避程度的可调性。
 
-
-
 LOC（Learn-Optimize-Collect）将数据收集建模为一个多轮序贯决策问题，其核心pipeline由三个交替执行的模块构成：**学习曲线统计收集**、**最小数据需求分布估计**和**随机优化**，并通过模型预测控制（MPC）循环串联（Algorithm 3）。整体输入为用户指定的性能目标 $V^*$、数据源单位成本向量 $\mathbf{c}$、未达标惩罚 $P$、时间轮次 $T$ 以及初始数据量 $\mathbf{q}_0$；输出为每轮应收集的数据量决策 $\mathbf{q}_t^*$。
 
 ### 模块一：学习曲线统计收集
@@ -168,8 +162,6 @@ LOC的有效性建立在两个核心假设之上：
 ### 与传统方法的本质区别
 
 传统方法（如**Power Law Regression**, Rosenfeld et al., ICLR 2020）直接估计 $D^*$ 的点值并收集该数量，完全忽略了估计不确定性。Figure 1（右）揭示了这种方法的脆弱性：在ImageNet上，标度律仅 $\le 6\%$ 的外推误差就导致估计值从真实的90万张偏离至58万张（欠采）或300万张（过采）。LOC通过将决策从“估计后收集”转变为“优化期望成本”，在分布层面权衡收集不足的风险与过度收集的成本，从根本上解决了这一瓶颈。
-
-
 
 ### 3.1 最优数据收集问题的形式化
 
@@ -210,8 +202,6 @@ $$\operatorname*{min}_{\mathbf{q}_1 \leq \cdots \leq \mathbf{q}_T} \sum_{t=1}^T 
 $$d_1^* = \max\{\hat{\mu} + \sqrt{2}\hat{\sigma}\sqrt{\log\frac{P}{c\hat{\sigma}\sqrt{2\pi}}} - q_0, 0\}$$
 
 该公式揭示了 LOC 的核心机制：最优收集量等于估计均值 $\hat{\mu}$ 加上一个与罚金 $P$、成本 $c$ 和估计不确定性 $\hat{\sigma}$ 相关的**安全边际**。当 $P$ 增大或 $\hat{\sigma}$ 增大时，安全边际增加，收集量趋于保守；当 $P$ 足够小时，最优策略可能是不收集任何数据（$d_1^* = 0$）。更一般地，Theorem 3 证明单轮 LOC 等价于收集数据需求分布的 $(1-\varepsilon)$ 分位数，其中 $\varepsilon$ 由成本与罚金的比值决定。
-
-
 
 ## 实验与关键发现
 
@@ -258,22 +248,7 @@ Figure 4以数据收集量与最小需求比值（$q_T^*/D^*$）的形式展示�
 
 4. **标度律估计质量依赖**：LOC的性能最终受限于bootstrapping所得$F(q)$的质量。当初始数据量极少时（Figure 1左图所示），标度律拟合本身可能严重偏离，导致$F(q)$的支撑集与真实$D^*$相距甚远。
 
-### 补充图表
 
-![[assets/figures/papers/paper_list_l7_https_www_jmlr_org_papers_v26_23_0292_html/figures/002_Figure_1.jpg]]
-*Figure 1: Extrapolating scaling laws to estimate $D ^ { * }$ on ImageNet (Deng et al., 2009). The solid blue line is the ground truth test accuracy as a function of data set size. L e f t . : Fitting four different scaling law functions from Table 1 when initializing with 10% ( $q _ { 0 }$ = 1 2 5 , 0 0 0 dotted) and 50% ( $q _ { 0 }$ = 6 0 0 , 0 0 0 , dashed) of the data set. All functions struggle to accurately extrapolate accuracy when $q _ { 0 }$ is small, but are accurate when $q _ { 0 }$ is large. Right: To hit a target $V ^ { * }$ = 6 7 \% accuracy, we need 900, 000 images. If the scaling laws over- or underestimate by only a small amount ( $\leq$ 6 \% error at q = 9 0 0 , 0 0 0 ) , they massively under- (...*
-
-![[assets/figures/papers/paper_list_l7_https_www_jmlr_org_papers_v26_23_0292_html/figures/004_Figure_3.jpg]]
-*Figure 3: Evaluating problem (16). L e f t . : We set c = 1 , $q _ { 0 }$ = 1 $0 ^ { 4 }$ and sweep different values for P . If P is sufficiently small ( $\mathrm { i . e . , }$ P < c $\hat { \sigma } \sqrt { 2 \pi }$ ) , then the total expected cost is minimized by setting $d _ { 1 }$ = 0 (i.e., orange, blue curves). Right: We set c = 1 , P = 1 $0 ^ { 5 }$ and sweep√ different values for $q _ { 0 }$ . The dashed lines point to the local maxima and minima at $\hat { \mu } \pm \sqrt { 2 } \hat { \sigma } \zeta$ When $q _ { 0 } \geq \hat { \mu } + \sqrt { 2 } \hat { \sigma } \zeta$ , the optimal $d _ { 1 } ^ { * }$ = 0 \ ( $\mathrm { i . e . }$ , red, purple). When $q _ { 0 } \in [ \hat { \mu } \pm \sqrt { 2 } \hat { \sigma...$
-
-![[assets/figures/papers/paper_list_l7_https_www_jmlr_org_papers_v26_23_0292_html/figures/014_Figure_8.jpg]]
-*Figure 8: For a fixed seed, ground truth learning curves (black) and the estimated power law learning curves (blue) obtained via bootstrapping and ensembling. The shaded region represents the 95 percentile of the ensemble and the dashed blue line represents the mean of the regression functions. The mean is consistently higher than the unknown ground truth, whereas the shaded region can at times cover it*
-
-![[assets/figures/papers/paper_list_l7_https_www_jmlr_org_papers_v26_23_0292_html/figures/015_Figure_9.jpg]]
-*Figure 9: For a fixed seed, the histogram of estimates of D ^ { * } from different bootstrapped models (blue bars), the estimated F ( q ) (orange curve), and the ground truth D ^ { * } (black dashed line). Each plot corresponds to a different V ^ { * } for CIFAR-100 (see Figure 8 for the learning curve). With higher targets, regression (i.e., collecting the mean of the distribution) will lead to larger under-estimations*
-
-![[assets/figures/papers/paper_list_l7_https_www_jmlr_org_papers_v26_23_0292_html/figures/001_Table_1.jpg]]
-*Table 1: Four common scaling law functions with learnable parameters $\pmb { \theta } = \{ \theta _ { 1 } , \theta _ { 2 } , \theta _ { 3 } \}$ when K = 1 . See Viering and Loog (2022) for an extensive list. For K > 1 , we can add the scaling law for each data source according to (5)
 
 ![[assets/figures/papers/paper_list_l7_https_www_jmlr_org_papers_v26_23_0292_html/figures/006_Table_2.jpg]]
 *Table 2: Average cost ratio ± standard error and failure rate measured over a range of V ^ { * } for each T and data set. We fix c = 1 and P = 1 0 ^ { 7 } ( P = 1 0 ^ { 6 } for VOC and P = 1 0 ^ { 8 } for ImageNet). The best performing failure rate for each setting is bolded. LOC consistently reduces the average failure rate, often down to 0%, while keeping the average cost ratio almost always below 1 (i.e., spending at most 2× the optimal amount)*
@@ -290,12 +265,8 @@ Figure 4以数据收集量与最小需求比值（$q_T^*/D^*$）的形式展示�
 ![[assets/figures/papers/paper_list_l7_https_www_jmlr_org_papers_v26_23_0292_html/figures/013_Table_6.jpg]]
 *Table 6: Summary of hyperparameters used in our experiments*
 
-![[assets/figures/papers/paper_list_l7_https_www_jmlr_org_papers_v26_23_0292_html/figures/017_Table.jpg]]
-
 ![[assets/figures/papers/paper_list_l7_https_www_jmlr_org_papers_v26_23_0292_html/figures/018_Table_8.jpg]]
 *Table 8: Comparing against the correction factor-based Power Law Regression of Mahmood et al. (2022b) with the same setup as in Table 2. The best performing cost ratio is underlined and the best performing failure rate for each setting is bolded. Although the baseline achieves low failure rates, LOC often can achieve competitive failure rates while reducing the cost ratios by an order of magnitude*
-
-
 
 ## 定位与知识库关联
 
@@ -347,8 +318,6 @@ LOC 涉及两个关键超参数：单位成本 $\mathbf{c}$ 和惩罚 $P$。消�
 3. **高维数据源扩展**：将 LOC 扩展到 $K>2$ 的高维数据收集场景，同时保持分布估计和随机优化的可计算性，需要更高效的采样或变分推断方法。
 
 4. **标度律估计器的改进**：LOC 的性能上限受限于 $F(\mathbf{q})$ 的估计质量。是否存在更准确的标度律估计器（如基于贝叶斯神经过程的方法），可以进一步提升 LOC 的性能而不显著增加计算开销，是一个开放问题。
-
-
 
 ## 原文 PDF
 

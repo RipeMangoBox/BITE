@@ -53,8 +53,6 @@ claims:
 
 **主要结果**：在Trace Captioning（COCO）上CIDEr达27.9（CLIP基线10.9，+17.0）；Dense Captioning（VG v1.2）上CIDEr达31.9（+21.0）且mAP达21.31（超越AlphaCLIP的14.63）；Region-Set Captioning（COCO Entities）上CIDEr达109.1（+67.5）；Image Captioning上CIDEr达69.2（+27.1）。基于patch的聚合在细粒度本地任务上甚至超越了依赖显式掩码监督的AlphaCLIP，验证了密集patch语义对区域级描述的决定性作用。
 
-
-
 图像描述（Image Captioning）旨在为视觉内容生成自然语言描述，是连接视觉与语言的核心任务之一。传统方法主要关注整图级别的描述生成，通过在大规模图像-文本对上进行监督训练，学习从全局视觉表示到文本的映射。然而，随着人机交互、视觉问答和内容编辑等应用的发展，用户对视觉内容的理解需求已从整图层面深入到任意空间区域——人们不仅想知道“这张照片里有什么”，更希望针对特定物体、局部区域甚至非连续的多个区域获得精准的语言描述。
 
 现有的零样本图像描述方法（如 **DeCap**、**CLOSE**、**ZeroCap** 等）虽然在无需配对图像-文本数据方面取得了进展，但它们从根本上受限于图像中心化（image-centric）的范式：这些方法依赖全局图像表示（如 CLIP 的 CLS token）来生成描述，无法对任意空间区域进行定位和描述。当用户需要了解图中某个特定物体或区域时，这类方法只能返回整图描述，缺乏空间定位能力。
@@ -64,8 +62,6 @@ claims:
 **核心瓶颈**在于：现有视觉-语言模型（如 CLIP）虽然实现了图像与文本的全局对齐，但其 patch 级别的特征缺乏细粒度的语义信息，难以直接用于区域描述。这导致了一个两难局面——要么牺牲空间粒度换取零样本能力，要么牺牲零样本能力换取区域精度。
 
 **Patch-ioner** 的提出正是为了打破这一僵局。其核心动机是：能否将描述的基本单元从“整张图像”下沉到“patch”，从而在保持零样本特性的同时，自然地支持任意粒度的区域描述？这一范式转换的关键在于找到一种能够产生密集、语义丰富的 patch 级特征的视觉骨干，并通过简洁的聚合机制将这些局部特征组织成对任意区域的描述，而无需任何区域级监督。
-
-
 
 ## 核心方法与创新机理
 
@@ -104,8 +100,6 @@ $$\mathbf{v}_{\mathrm{proj}} = M \alpha, \quad \alpha = \operatorname{softmax}\l
 ### 统一框架的涌现能力
 
 上述三个操纵变量的组合产生了超出单独改进的涌现效果：Patch-ioner 在细粒度本地任务上不仅大幅超越全局描述基准，甚至超过了依赖显式掩码监督的区域方法 **AlphaCLIP**（**Table 2**，Dense Captioning mAP: 21.31 vs. 14.63）。这证明，通过正确的视觉骨干和简单的patch聚合，零样本方法可以匹敌甚至超越需要区域监督的方法——核心在于patch级语义的密度和质量，而非监督信号的多少。
-
-
 
 Patch-ioner 提出了一种从“图像中心”到“patch中心”的范式转换，将单个 patch 视为基本的描述单元，从而统一处理从单个 patch 到非连续区域集再到整图的任意空间粒度的零样本描述任务，全程无需任何区域-文本对监督。
 
@@ -151,13 +145,6 @@ Patch-ioner 提出了一种从“图像中心”到“patch中心”的范式转
 ### 与现有方法的根本差异
 
 传统的零样本描述方法（如 **DeCap**、**CLOSE**、**ZeroCap**）依赖于全局图像表示，无法对任意空间区域生成描述。区域监督方法（如 **AlphaCLIP**、**RegionCLIP**）虽然支持区域输入，但需要显式的区域-文本对训练。Patch-ioner 通过将 patch 作为基本描述单元，首次在完全零样本的条件下实现了对任意区域的描述，且实验表明其 patch 聚合策略甚至超越了依赖显式掩码监督的 AlphaCLIP（Table 2）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2332_https_arxiv_org_abs_2510_02898/figures/001_Figure_1.jpg]]
-*Figure 1: Patch-centric framework for unified zero-shot captioning. A. Overview of our framework. First, we extract language-aligned dense patch embeddings from the image using a VLM. Given a region, we select the underlying patches and aggregate their features to obtain a region representation. Finally, we obtain the region caption by applying a zero-shot text decoder, that is a) conditioned on the latent region representation, b) trained on text-only data, and c) equipped with a mechanism to handle the modality gap present in vision-language common spaces. This enables regional captioning without requiring region-level supervision. B. By aggregating patch-level features from arbitrary image regions...*
-
-
 
 Patch-ioner 框架将零样本区域描述解耦为四个核心模块，其完整流程可表述为：
 
@@ -231,8 +218,6 @@ $$v_R = v_{\mathrm{mean}} + \alpha \, v_{\mathrm{att}}$$
 
 其中 $\alpha$ 为可学习标量，$v_{\mathrm{att}}$ 为基于 patch 间交互的注意力池化结果。该方案在训练-测试粒度一致时显著优于固定聚合，但因泛化性不足而未作为默认选择。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：patch中心化框架的跨粒度优势
@@ -305,25 +290,6 @@ Table 2 将Patch-ioner与零样本基线（DeCap、CLOSE、ZeroCap、ViECap）�
 ![[assets/figures/papers/paper_list_l2332_https_arxiv_org_abs_2510_02898/figures/010_Table_5.jpg]]
 *Table 5: Training on different datasets. CIDEr (C) and RefPAC-S (P) across four captioning tasks. The model adopted is T2D + Memory (≈ DeCap) using the GPT2 textual decoder*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2332_https_arxiv_org_abs_2510_02898/figures/019_Figure_7.jpg]]
-*Figure 7: Qualitative results. We report four predictions of our model and compare baselines from the finer (top) to the coarser (bottom) task. For trace captioning examples, the trace time is color-coded from start (red) to end (yellow). DeCap = DeCap applied on the whole image. DeCap (Crop) = DeCap applied on cropped box. ZeroCap = ZeroCap [59] applied to the whole image. CLOSE = CLOSE [18] applied to the whole image. Ours (CLIP + Mem.) = Our patch-based framework using CLIP as backbone and the projection as modality gap mitigation strategy. Ours (Talk2DINO + Mem.) = Our patch-based framework using Talk2DINO as backbone and the projection as modality gap mitigation strategy. GT = ground-truth capti...*
-
-![[assets/figures/papers/paper_list_l2332_https_arxiv_org_abs_2510_02898/figures/020_Figure_8.jpg]]
-*Figure 8: Qualitative results. We report four predictions of our model and compare baselines from the finer (top) to the coarser (bottom) task. For trace captioning examples, the trace time is color-coded from start (red) to end (yellow). DeCap = DeCap applied on the whole image. DeCap (Crop) = DeCap applied on cropped box. ZeroCap = ZeroCap [59] applied to the whole image. CLOSE = CLOSE [18] applied to the whole image. Ours (CLIP + Mem.) = Our patch-based framework using CLIP as backbone and the projection as modality gap mitigation strategy. Ours (Talk2DINO + Mem.) = Our patch-based framework using Talk2DINO as backbone and the projection as modality gap mitigation strategy. GT = ground-truth capti...*
-
-![[assets/figures/papers/paper_list_l2332_https_arxiv_org_abs_2510_02898/figures/011_Table_6.jpg]]
-*Table 6: Trace Captioning results on COCO test set*
-
-![[assets/figures/papers/paper_list_l2332_https_arxiv_org_abs_2510_02898/figures/012_Table_7.jpg]]
-*Table 7: Dense Captioning results on VG v1.2 test set*
-
-![[assets/figures/papers/paper_list_l2332_https_arxiv_org_abs_2510_02898/figures/013_Table_8.jpg]]
-*Table 8: Region-Set Captioning results for COCO Entities test set*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 核心范式转换：从图像中心到Patch中心
@@ -365,8 +331,6 @@ Patch-ioner开启的方向引出以下待探索问题：
 3. **联合定位与描述的端到端扩展。** 当前框架假设区域已给定（边界框、轨迹或patch集），能否扩展至包含区域提议模块的联合模型，实现完整的端到端密集描述（同时定位和描述区域）？这需要解决区域提议与描述质量之间的联合优化问题。
 
 4. **跨数据集的文本解码器泛化。** 在更大、更多样的文本数据集（如ReLaion 28.3M）上训练可提升区域集描述的CIDEr至113.5（Table 5），但不同文本域对描述风格和内容准确性的影响尚需系统研究。
-
-
 
 ## 原文 PDF
 

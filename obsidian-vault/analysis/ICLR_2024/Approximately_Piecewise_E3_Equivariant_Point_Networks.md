@@ -227,8 +227,6 @@ APEN 在多个任务上均表现出对全局等变网络及非等变基线的显
 
 4. **超参数敏感性**。分区预测中的关键超参数（如 $\sigma$ 序列、合并阈值 $\tau$）目前需手动设定，其对不同任务和数据的自适应调整能力尚不明确。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2402_08529/figures/014_Figure_9.jpg]]
 *Figure 9: Training and test set visualization for the subject classification task*
 

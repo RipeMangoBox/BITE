@@ -60,8 +60,6 @@ claims:
 
 **局限性**：理论分析依赖于谱对比损失与 InfoNCE 等价的假设，实验验证主要集中在小规模数据集，困难样本选择需引入额外超参数（posHigh, posLow），在极端噪声场景下效果可能受限。
 
-
-
 无监督对比学习通过拉近正样本对、推远负样本对来学习表征，已成为自监督学习的核心范式之一。然而，现有方法通常平等对待所有样本对，忽视了样本对之间固有的难度差异。一个关键的现象是：**困难样本对**——即来自不同类别但特征相似度高的样本对——在预训练过程中容易被错误聚类，从而损害下游分类任务的泛化性能。
 
 这一问题的直观表现可见于 Figure 1：在 CIFAR-10、CIFAR-100、STL-10 和 TinyImagenet 四个数据集上，排除困难样本后，线性探测准确率均获得提升。进一步的混合图像实验（Figure 2）提供了因果证据：通过像素级混合人为增加困难样本比例，模型性能下降；而移除这些混合样本后，性能回升至接近甚至优于原始数据集的水平。
@@ -71,8 +69,6 @@ claims:
 本文正是围绕这一瓶颈展开。作者首先构建了**相似图**理论框架，将样本对间的相似度建模为三个关键参数——同类样本相似度 α、普通不同类样本相似度 β、以及困难样本对不同类相似度 γ。在此基础上，推导出有无困难样本条件下的线性探测误差界，从理论上证明了困难样本的存在会导致更差的误差上界（Theorem 3.4）。这一理论分析为后续的方法设计提供了明确的因果旋钮：通过控制困难样本对的相似度权重，可以直接缩小误差界。具体而言，移除困难样本（Corollary 4.1）、为困难对增加边际（Theorem 4.3）或缩放温度（Theorem 4.5），均能在理论上改善误差界。
 
 综上，本文的动机源于一个明确的因果链条：困难样本对 → 错误聚类 → 误差界扩大 → 下游性能下降。基于这一认知，作者提出了一个完整的困难感知对比学习框架，包含困难样本选择、样本移除、边际调整和温度缩放等模块，旨在从理论和实践两个层面系统解决困难样本的负面影响。
-
-
 
 ## 核心方法与创新机理
 
@@ -136,8 +132,6 @@ $$p_{i,j} := \mathbf{1}_{[Sim_{posLow} \leq s_{ij} < Sim_{posHigh}]}$$
 ### 组合方法与跨框架泛化
 
 将边际调整和温度缩放与选择机制整合的组合损失（Eq. 16）在多个数据集上取得一致且显著的提升：TinyImagenet 上较 SimCLR 基线提升 +10.42%（Table 4），在长尾数据集 TinyImagenet-LT 上提升 +4.28%（Table 6）。该方法不仅适用于 SimCLR，也可无缝集成到 MoCo 框架中（Table 5），展现出良好的跨架构泛化性。
-
-
 
 ![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_5LMdnUdAoy/figures/006_Figure_3.jpg]]
 *Figure 3: Modeling of difficult examples. The similarity between same-class samples is α (a), the similarity between different-class difficult samples is $\gamma \left( \mathrm { c } \right$) , and the similarity between other samples is $\beta \left( \mathbf { b } \right$) . The adjacency matrix of a 4-sample subset is shown in (d)
@@ -229,8 +223,6 @@ $$p_{i,j} := \mathbf{1}_{[Sim_{posLow} \leq s_{ij} < Sim_{posHigh}]}$$
 整个框架的理论基础建立在**相似图建模**（Section 3）之上。论文将样本对相似度抽象为三个参数：同类相似度 $\alpha$、简单不同类相似度 $\beta$、困难不同类相似度 $\gamma$（$\beta < \gamma < \alpha < 1$）。通过谱对比损失与矩阵分解的等价性，推导出有无困难样本时的线性探测误差界（Theorem 3.3 和 3.4），并证明三种干预策略均可缩小误差界（Corollary 4.1, Theorems 4.3, 4.5）。混合图像实验（Table 10）进一步验证了 $\alpha$、$\beta$、$\gamma$ 及特征值随混合比例的变化趋势与理论预测一致。
 
 > **注意**：理论分析依赖于谱对比损失与 InfoNCE 等价的假设，以及标签可从增强中恢复的假设。实验验证主要在小规模数据集上进行，大规模场景下的效果尚需更多证据。
-
-
 
 ### 3.1 理论建模：相似图与误差界
 
@@ -342,8 +334,6 @@ $$
 
 **超参数设置**：边际因子 $\sigma = 0.1$ 在 CIFAR-100 上取得最佳性能（Figure 5(a)）；温度缩放因子 $\rho = 0.7$ 在 CIFAR-100 上取得最佳性能（Figure 5(b)），且显著优于极大温度（等同于丢弃困难样本）和基础温度（Table 9）。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：困难样本的系统性损害与修复
@@ -365,9 +355,6 @@ $$
 
 **组合方法的协同效应。** 将边际调整与温度缩放整合（Eq. 16）后，组合方法在 TinyImagenet 上达到 80.00%，较基线提升 10.42 个百分点，且在所有数据集上均优于单独使用任一组分（Table 4）。该协同效应可迁移至其他对比学习框架：在 MoCo 架构上，组合方法将 CIFAR-10 准确率从 85.84% 提升至 86.82%（Table 5）。
 
-![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_5LMdnUdAoy/figures/013_Table_4.jpg]]
-*Table 4: Classification accuracy with or without combined method on CIFAR-10, CIFAR-100, STL-10 and TinyImagenet dataset. Results are averaged over three runs*
-
 ![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_5LMdnUdAoy/figures/014_Table_5.jpg]]
 *Table 5: The results of incorporating the Combined method with different architectures on CIFAR-10*
 
@@ -378,9 +365,6 @@ $$
 **选择精度的动态提升。** 训练过程中，落入 `(Sim_posLow, Sim_posHigh)` 区间的样本对中，来自不同类的比例随训练推进迅速趋近 100%（Figure 4(c)）。这意味着选择机制本身在训练中不断自我校准，最终几乎完全捕获跨类困难对，验证了基于投影器前特征的余弦相似度作为困难度代理的有效性。
 
 **特征层级的消融。** 使用投影器前特征 `f(x)` 进行困难样本选择，优于使用投影器后特征 `g(f(x))`：在 CIFAR-10 上准确率分别为 89.68% 和 88.86%，在 CIFAR-100 上分别为 63.89% 和 62.31%（Table 7）。这与理论直觉一致——投影器后的表示已针对对比损失优化，可能模糊了类别边界的困难信号。
-
-![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_5LMdnUdAoy/figures/018_Table_7.jpg]]
-*Table 7: Classification accuracy by using Combined method on CIFAR-10 and CIFAR-100. Features before projector means that we use f ( x ) for difficult examples selection and features after projector means that we use g ( f ( x ) ) for difficult examples selection*
 
 ### 超参数分析与理论一致性验证
 
@@ -397,13 +381,7 @@ $$
 
 **长尾场景。** 在 TinyImagenet-LT 长尾数据集上，组合方法将 SimCLR 基线从 43.34% 提升至 47.62%（+4.28%）（Table 6），表明困难样本处理对尾部类别的表示学习具有额外价值——长尾分布中尾部类别样本天然更容易成为其他类别的“困难样本”。
 
-![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_5LMdnUdAoy/figures/015_Table_6.jpg]]
-*Table 6: Classification accuracy by using Combined method on TinyImagenet-LT. We also use SimCLR as the baseline method*
-
 **ImageNet-1k 验证。** 组合方法在 ImageNet-1k 上同样有效（Table 8），但需注意该实验的详细配置和增益幅度在提供的片段中未完整呈现，建议手动核实原文以确认大规模场景下的具体提升幅度。
-
-![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_5LMdnUdAoy/figures/020_Table_8.jpg]]
-*Table 8: Classification accuracy on Imagenet-1k*
 
 ### 失败模式与局限性
 
@@ -414,16 +392,6 @@ $$
 3. **极端噪声场景。** 在困难样本比例极高或类别边界完全模糊的场景下，选择机制的精度可能退化，方法的有效性尚需进一步检验。
 
 4. **超参数自适应。** 虽然 `posLow` 和 `posHigh` 在测试范围内表现鲁棒，但在更大规模数据和不同任务分布下的自适应性仍需探索。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_5LMdnUdAoy/figures/001_Figure_1.jpg]]
-*Figure 1: Excluding difficult examples improves unsupervised contrastive learning*
-
-![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_5LMdnUdAoy/figures/002_Figure_1.jpg]]
-*Figure 1: (mixed) difficult examples improves performance*
-
-
 
 ## 定位与知识库关联
 
@@ -487,8 +455,6 @@ $$\mathcal { L } _ { \mathrm { m f } } ( F ) : = \| \bar { \pmb { A } } - F \bol
 3. **超参数的自适应机制**：当前 $posHigh$ 和 $posLow$ 作为固定百分位数超参数，在跨数据集和跨任务迁移时需要手动调节。开发基于数据统计特性或训练动态的自适应选择机制是一个有价值的方向。
 
 4. **困难样本影响的更细粒度刻画**：当前理论将困难样本的影响统一建模为 $\gamma - \beta$ 的差异，但不同困难样本对下游任务的损害程度可能存在异质性。如何识别和处理“最有危害”的困难样本子集，值得进一步研究。
-
-
 
 ## 原文 PDF
 

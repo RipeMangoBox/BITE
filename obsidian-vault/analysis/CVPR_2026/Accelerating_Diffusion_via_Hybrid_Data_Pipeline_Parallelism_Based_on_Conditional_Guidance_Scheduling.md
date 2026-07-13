@@ -55,8 +55,6 @@ claims:
 
 **方法定位**：Hybridiff属于扩散模型推理加速中的分布式并行方法，其条件分区策略为数据并行提供了新视角，自适应切换机制则突破了传统静态调度的加速上限。该方法不修改模型权重，可与现有加速技术（如步数缩减、模型蒸馏）正交叠加。当前实现针对双GPU场景优化，向更多GPU扩展的批量级和层级流水线方案已在附录中给出初步设计，但单图像超过2的并行度仍待进一步验证。
 
-
-
 扩散模型已成为图像生成的主流范式，但其推理过程需要迭代执行数十步去噪，每一步都涉及大规模神经网络的前向传播，导致生成延迟居高不下。以 Stable Diffusion XL（SDXL）为例，在单张 NVIDIA RTX 3090 GPU 上生成一张 1024×1024 图像需耗时约 16.5 秒，难以满足交互式应用对实时性的需求。分布式并行推理是缓解这一瓶颈的直接思路，然而现有方法在加速比、生成质量与通用性之间面临显著的权衡困境。
 
 ### 现有并行方法的瓶颈
@@ -78,8 +76,6 @@ CFG 在每一步去噪中需同时计算两个噪声估计：**条件去噪路�
 更进一步，条件与无条件路径之间的**去噪差异（denoising discrepancy）**并非恒定。经验观察表明，在去噪过程的早期和晚期，两条路径的噪声估计差异较大；而在中间阶段，两者趋于一致。这一现象暗示：并非所有去噪步都需要进行条件交换——当差异足够小时，两条路径可以安全地并行执行而不损失引导质量；当差异重新扩大时，则需恢复串行以保证保真度。这一洞察为**自适应并行切换**提供了定量依据，使得混合并行框架能够在保证生成质量的前提下，最大化并行效率。
 
 基于以上动机，本文提出 **Hybridiff**——一种结合条件分区数据并行与自适应流水线切换的混合并行框架，旨在突破现有分布式扩散推理的加速上限，同时几乎不牺牲生成质量。
-
-
 
 ## 核心方法与创新机理
 
@@ -108,8 +104,6 @@ $$\mathrm{rel-MAE}_t(\epsilon_c, \epsilon_u) = \frac{\mathbb{E}_{\mathbf{x}, \ep
 消融实验（Table 2）清晰揭示了两个创新组件的协同关系：单独使用全条件分区（即整个去噪过程始终并行）仅能实现1.78×加速，而加入自适应并行切换后加速比提升至2.31×。这表明自适应调度不仅避免了并行阶段外的无效通信，更重要的是防止了差异较大区间的质量损失——这正是单纯条件分区无法解决的问题。
 
 并行区间长度 $k$ 提供了直观的速度-质量权衡旋钮（Table 4, Figure 6）：当 $k$ 从5增至30时，加速比从2.31×上升至2.78×，但FID从4.100恶化至9.191。这一可控的帕雷托前沿使方法在不同应用场景下具有灵活的部署能力。
-
-
 
 Hybridiff 提出了一种面向扩散模型推理的**混合数据-流水线并行框架**，其核心思想是将分类器无关引导（CFG）中的条件与无条件去噪路径重新解释为两种天然的数据并行流，并利用两者之间的**去噪差异（denoising discrepancy）**动态决定何时激活流水线并行，从而在几乎不损失生成质量的前提下突破传统分布式并行方法的加速上限。
 
@@ -167,15 +161,11 @@ $$\mathrm{rel\text{-}MAE}_t(\epsilon_c, \epsilon_u) \approx \frac{\| \nabla_{\ma
 
 但需要注意的是，当前框架对单张图像超过 2 的并行度仍属开放问题，扩展方案存在质量或效率下降的风险。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l834_https_arxiv_org_abs_2602_21760/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of the proposed diffusion inference hybrid parallel framework. Our method adaptively switches parallelism modes at τ1 and τ2, optimizing the trade-off between computational efficiency and consistency of conditional guidance, and demonstrates superior inference acceleration performance while preserving high generation quality*
 
 ![[assets/figures/papers/paper_list_l834_https_arxiv_org_abs_2602_21760/figures/002_Figure_2.jpg]]
 *Figure 2: Comparison of parallel strategies for diffusion inference. (a) Patch-based data parallel frameworks suffer from bottlenecks caused by all-gather operations and artifacts at patch boundaries, leading to limited acceleration and quality degradation. (b) Pipeline parallel frameworks incur excessive asynchronous communication overhead and accumulate estimate errors. (c) Our hybrid parallelism, which incorporates condition-based data parallelism, adaptively combines both paradigms to achieve high fidelity and fast generation*
-
-
 
 ### 3.1 整体框架与三阶段划分
 
@@ -236,13 +226,6 @@ $$
 
 该式揭示：去噪差异本质上是**条件信息强度**（条件梯度 $\nabla_{\mathbf{x}_t} \log p(c|\mathbf{x}_t)$）与**无条件数据先验**（无条件分数 $s_u$）的比值。在去噪初期，无条件先验主导，条件梯度相对显著，差异较大；在中期，两者趋于平衡，差异收敛；在末期，条件梯度再次增强以细化细节，差异回升。这一理论解释支撑了三阶段设计的合理性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l834_https_arxiv_org_abs_2602_21760/figures/004_Figure_4.jpg]]
-*Figure 4: Illustration of the rel*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果与核心性能
@@ -269,9 +252,6 @@ $$
 ![[assets/figures/papers/paper_list_l834_https_arxiv_org_abs_2602_21760/figures/008_Figure_6.jpg]]
 *Figure 6: Visualization of speed–quality trade-off across different parallelism intervals k. Smaller k values preserve higher fidelity, whereas larger k achieve greater acceleration. Our method consistently dominates prior works across the trade-off frontier. All experiments were conducted on 2 GPUs*
 
-![[assets/figures/papers/paper_list_l834_https_arxiv_org_abs_2602_21760/figures/013_Table_4.jpg]]
-*Table 4: Effect of speed-quality trade-off across different parallelism intervals k. All experiments are conducted on the SDXL model at 1024×1024 resolution with various parallelism intervals*
-
 ### 多维度综合评估
 
 **Table 3** 将加速比、图像质量、通用性、高分辨率合成能力、通信成本五项指标归一化为5分制。Hybridiff在全部五个维度上均取得最高分，体现出均衡的加速-质量权衡。特别是高分辨率场景（**Figure 7**，NVIDIA H200，分辨率2048×2048和2560×2560）下，Hybridiff仍保持显著加速优势，而部分基线方法因通信开销或伪影问题在高分辨率下性能下降。
@@ -282,22 +262,6 @@ $$
 2. **k 需人工设定：** 并行区间 k 无自动化调整机制，需用户根据质量-速度需求手动选择；安全上限 τ_cap 依赖离线计算的去噪差异全局最小值，面对全新数据分布时可能需要重新校准。
 3. **调度器依赖未验证：** 所有实验均基于DDIM 50步调度器，未展示在更少步数（如10–20步）或其他调度器（如DPM-Solver）下的加速保持能力。
 4. **与其他加速技术未集成：** 未探讨与模型蒸馏、步数缩减等技术的协同，可能限制了整体加速潜力的上限。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l834_https_arxiv_org_abs_2602_21760/figures/006_Table_2.jpg]]
-*Table 2: Ablation on hybrid parallel components. All experiments are conducted on the SDXL model at 1024×1024 resolution, comparing the single-GPU baseline, full condition-based partitioning, and our hybrid parallelism framework*
-
-![[assets/figures/papers/paper_list_l834_https_arxiv_org_abs_2602_21760/figures/009_Figure_5.jpg]]
-*Figure 5: Qualitative results of the main experiments. We compare 1024×1024 image generations from the SDXL model. Our method achieves the best acceleration and FID performance, while producing visuals most similar to the original*
-
-![[assets/figures/papers/paper_list_l834_https_arxiv_org_abs_2602_21760/figures/011_Table_3.jpg]]
-*Table 3: Quantitative metrics comparison across five evaluation aspects. Scores are normalized to a 5-point scale. Higher values ( ↑ ) indicate better performance*
-
-![[assets/figures/papers/paper_list_l834_https_arxiv_org_abs_2602_21760/figures/001_Figure_1.jpg]]
-*Figure 1: Summary of the proposed hybrid data-pipeline parallelism. Our method consistently outperforms prior distributed approaches across five key aspects: Speed-up, Image Quality, Generality, High-resolution Synthesis, and Communication Cost, demonstrating robust and balanced acceleration-quality trade-offs*
-
-
 
 ## 定位与知识库关联
 
@@ -337,8 +301,6 @@ $$
 4. **跨模态迁移**：将该并行策略应用于视频扩散模型（如 Sora 类架构）或音频生成时，条件/无条件分支的语义差异模式是否仍呈现 U 形？视频模型中的时序一致性约束是否对并行切换时机提出额外要求？
 
 5. **与推理优化技术的协同**：条件分区策略与模型量化、剪枝、知识蒸馏等推理优化技术的组合效应如何？是否存在加速收益的叠加或饱和效应？
-
-
 
 ## 原文 PDF
 

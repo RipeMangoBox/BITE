@@ -55,8 +55,6 @@ claims:
 
 **主要结果**：在 MARDM-67 评估协议上，MoLingo (SAE) 取得 FID 0.064、R-Precision Top-1 0.542，MoLingo (VAE) 取得 FID 0.049；在 TMR-263 上 FID 低至 0.014；在 MS-272 上 FID 为 3.444（对比 MotionStreamer 的 11.979）。用户研究中，MoLingo 相较 DisCoRD、MoMask、MotionStreamer 分别获得 83.75%、77.70%、84.70% 的偏好率。消融实验证实多 token 交叉注意力和语义对齐各自带来显著且一致的性能增益。
 
-
-
 ### 问题背景
 
 文本到人体运动生成的目标是根据自然语言描述合成逼真的 3D 人体动作序列。这一任务在动画制作、游戏开发、虚拟现实和人机交互等领域具有广泛应用。近年来，扩散模型和自回归模型在运动生成领域取得了显著进展，但现有方法仍面临两个核心瓶颈：
@@ -85,8 +83,6 @@ claims:
 2. **多 token 交叉注意力条件化**：将文本编码器从 CLIP 升级为 T5-Large，并通过文本适配器将文本提示编码为多 token 嵌入序列。在生成过程中，使用交叉注意力（CrossAttn）替代单 token 的 AdaLN 调制，使模型能够细粒度地关注文本中的不同语义单元，显著增强文本条件化强度。
 
 这两项改进的因果关系清晰：语义对齐降低了潜在空间的结构复杂度，使生成模型更容易学习；多 token 交叉注意力则提供了更强的条件信号，使生成的运动更精确地遵循文本指令。两者协同作用，在运动真实感和文本-动作对齐两个维度上均实现了显著提升。
-
-
 
 ## 核心方法与创新机理
 
@@ -128,8 +124,6 @@ $$p(m_1,\ldots,m_l) = \prod_{i=1}^l p(m_i \mid c, m_1, \ldots, m_{i-1})$$
 
 **需要人工验证的点**：SAE 的语义对齐训练仅利用了 BABEL 与 HumanML3D 的交集部分，帧级文本监督的覆盖范围受限。这一限制对更广泛动作类别上语义对齐效果的具体影响程度，在现有消融实验中未做定量评估，需结合更大规模标注数据集进一步验证。
 
-
-
 MoLingo 的整体框架由两大核心组件构成：**语义对齐运动自动编码器** 与 **掩码自回归整流流生成器**。前者将原始运动序列压缩为连续潜在表示，并通过帧级文本监督实现语义对齐；后者以文本提示为条件，自回归地预测条件向量，再通过整流流在潜在空间中迭代去噪，最终解码为运动帧。图 2 与图 3 分别展示了这两个组件的数据流与模块关系。
 
 **输入与输出流**：给定文本提示 $c$，系统首先通过冻结的 T5-Large 编码器将其映射为文本嵌入序列，再经可训练的文本适配器（Transformer 编码器块）进一步处理，以增强跨模态交互能力。同时，运动序列 $\mathbf{m}_{1:N} \in \mathbb{R}^{N \times D}$ 经 1D 卷积编码器压缩为潜在序列 $m_{1:l} \in \mathbb{R}^{l \times d}$，其中 $l = N/h$，$h$ 为时序下采样率。生成阶段，掩码自回归 Transformer 以文本嵌入和已生成的潜在为条件，逐 token 预测条件向量 $z_i$；整流流 MLP 则依据 $z_i$ 和时间步 $t$ 对噪声潜在进行去噪。最终，去噪后的潜在序列由 1D 卷积解码器重建为运动帧。
@@ -139,15 +133,6 @@ MoLingo 的整体框架由两大核心组件构成：**语义对齐运动自动�
 **生成器的关键设计**：生成器采用链式法则将联合分布分解为条件概率的乘积 $p(m_1,\ldots,m_l) = \prod_{i=1}^l p(m_i \mid c, m_1, \ldots, m_{i-1})$（Eq.(6)），实现自回归生成。训练时随机掩码部分潜在 token 并替换为可学习 token，推理时从全掩码状态初始化，逐 token 去噪。整流流损失（Eq.(7)）训练 MLP 学习从噪声到干净潜在的速度场。此外，模型采用无分类器引导（CFG），训练时以 10% 概率将文本提示替换为空提示，推理时 CFG 尺度设为 6.0。
 
 **两种变体**：MoLingo 提供 VAE 变体（无显式语义监督）与 SAE 变体（引入帧级语义对齐）。SAE 变体在文本-动作对齐指标上更优，而 VAE 变体在 FID 上略占优势——这一权衡在消融实验（Table 2）中得到系统分析。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2512_13840/figures/001_Figure_1.jpg]]
-*Figure 1: Left: Given text prompts, MoLingo generates realistic and text-aligned motions, ranging from daily movements like sweeping to more challenging movements like dancing. Right: MoLingo significantly outperforms previous works in both FID and R-Precision scores. The difference can best be seen in motion, hence we urge the reader to view the supplementary video*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2512_13840/figures/002_Figure_2.jpg]]
-*Figure 2: Semantically aligned autoencoder architecture. The model comprises an encoder–decoder autoencoder for motion sequences and a parallel text-encoding branch that maps frame-level text labels into class tokens. A cosine-similarity loss $\mathcal { L } _ { \mathrm { s e m } }$ is applied to align the motion latents with their corresponding class tokens
-
 
 
 MoLingo 的整体框架由两个关键组件构成：**(1) 语义对齐运动自动编码器 (SAE)**，负责将运动序列映射到语义对齐的连续潜在空间；**(2) 基于掩码自回归整流流的生成模型**，在该潜在空间中进行条件生成。
@@ -192,8 +177,6 @@ $$\mathcal{L}(z_i, m_i) = \mathbb{E}_{m_i, \epsilon, t}\left[\|v_\theta(m_i^t, t
 
 **关键设计对比**：Table 2 的消融实验验证了两个核心设计选择的有效性——多 token 交叉注意力（CrossAttn）相比单 token AdaLN 调制在所有指标上均有显著提升，尤其 R-Precision Top-1 从 0.528 提升至 0.542；SAE 相比普通 AE/VAE 在文本-动作对齐指标上持续改善，验证了语义对齐潜在空间的扩散友好性。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与因果机制
@@ -232,29 +215,15 @@ $$\mathcal{L}(z_i, m_i) = \mathbb{E}_{m_i, \epsilon, t}\left[\|v_\theta(m_i^t, t
 
 所有实验均报告 20 次独立运行的均值及 95% 置信区间。在 MS-272 比较中，MoLingo 使用与 MotionStreamer 相同的 272D 数据训练，并采用其官方评估器。基线方法的数值来自原论文或使用相同数据重新运行得到的官方结果，确保了比较的公平性。
 
-### 补充图表
-
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2512_13840/figures/008_Figure_5.jpg]]
-*Figure 5: Effect of latent dimension and temporal downsampling. We vary the latent dimension (16–128) under two temporal compression settings: (4×) and (2×). Overall, the 4× setting gives comparable or better performance than 2×, showing that is beneficial that a single latent encodes 4 frame, even 2× preserves more fine-grained temporal information*
-
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2512_13840/figures/004_Table_1.jpg]]
 *Table 1: Quantitative results on the MARDM-67 evaluator. We compare our method with a broad set of motion generation approaches, from early models [6, 53] to recent ones [19, 40], covering pose-frame diffusion [53], single-vector latent diffusion [6, 9], VQ-based next-token prediction [7, 18, 19, 44, 45, 65], and continuous-valued auto-regressive models [39, 40]. We report the mean results over 20 independent runs, and the ± values indicate the 95% confidence interval. Our method achieves state-of-the-art FID, R-Precision, and CLIP-Score. Green cells highlight the best scores, and yellow cells the second best*
 
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2512_13840/figures/005_Table_2.jpg]]
 *Table 2: Ablation studies. We analyze: (1) different text-conditioning mechanisms, and (2) the effect of using a semantically aligned latent space. AdaLN denotes single-text-token conditioning with DiT-style modulation; note that the first row corresponds to MARDM [39]. CrossAttn denotes multi-token cross-attention conditioning. We conduct all experiments using the MARDM-67 evaluator with 4× downsampling and latent dimensions of 16. We adopt adapter depth 6 for T5+CrossAttn setting*
 
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2512_13840/figures/007_Table_3.jpg]]
-*Table 3: Performance under different SAE configurations. We ablate three design choices for SAE: (1) the semantic regularization loss (cosine similarity vs. InfoNCE), (2) whether KL divergence is applied jointly, and (3) the weight of ${ \mathcal { L } } _ { \mathrm { { s e m } } }$ . . The configuration with cosine similarity, KL divergence, and a relatively small weight (0.001) gives the best SAE design, significantly improving text–motion alignment (R-Precision and CLIP-score) while maintaining FID comparable to SOTA models
 
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2512_13840/figures/010_Table_4.jpg]]
 *Table 4: Notation Table. The main notation used in our paper*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2512_13840/figures/011_Table_5.jpg]]
-*Table 5: Effect of text adapter depth. We compare models without a text adapter and with text adapters of different depths (3, 6, and 9 layers). Using a 6-layer adapter (ours) gives the best overall tradeoff, improving FID and R-Precision across all others. We conduct all experiments on MARDM-67 [39] evaluator using a VAE with a downsampling 4× and latent dimension 16*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2512_13840/figures/012_Table_6.jpg]]
-*Table 6: Effect of repetitive class token filtering. We ablate generative performance with and without repetitive class token filtering during SAE training. Filtering consistently improves FID and retrieval scores, indicating that it acts as a soft semantic regularizer, encouraging coherence without forcing adjacent motion latents to collapse to the same text label*
 
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2512_13840/figures/014_Table_7.jpg]]
 *Table 7: Quantitative comparison with MotionStreamer. MotionStreamer proposed a TMR-style [42] feature extractor used as an evaluator in their own 272D representation. To ensure a fair comparison, we train our model on the 272D HumanML3D data and evaluate using their evaluator. rFID denotes reconstruction FID, and MPJPE is measured in millimeters. Our replicated padding design improves reconstruction realism in terms of rFID while preserving comparable MPJPE. For generation, our method achieves significant improvements over MotionStreamer across all metrics. We run the experiment 20 runs and ± indicates 95% confidence interval. We apply 4× downsampling and latent dimension 16 with a well-trained SAE*
@@ -264,8 +233,6 @@ $$\mathcal{L}(z_i, m_i) = \mathbb{E}_{m_i, \epsilon, t}\left[\|v_\theta(m_i^t, t
 
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2512_13840/figures/016_Table_9.jpg]]
 *Table 9: Detail architecture of our autoencoders. Different from [62], we set the padding mode of the first 1D convolutional layer to replicate the initial frames, which stabilizes training and improves reconstruction*
-
-
 
 ## 定位与知识库关联
 
@@ -300,8 +267,6 @@ MoLingo 的核心技术路线属于**连续潜在空间的自回归生成**范�
 4. **语义潜在空间的下游复用：** 语义对齐的潜在空间是否能够直接用于运动编辑、跨模态检索或运动风格迁移等下游任务？这一方向可能拓展 MoLingo 框架的应用范围，超越纯粹的生成任务。
 
 5. **自回归生成顺序的优化：** 当前的自回归生成顺序是固定的（从第一个潜在到最后一个），是否存在更优的生成顺序（如从关键帧向外扩散，或基于文本引导的动态排序），以进一步提高运动质量和长序列一致性？
-
-
 
 ## 原文 PDF
 

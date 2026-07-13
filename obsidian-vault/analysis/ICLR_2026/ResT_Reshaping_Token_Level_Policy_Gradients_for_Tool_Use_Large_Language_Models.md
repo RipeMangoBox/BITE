@@ -51,15 +51,11 @@ claims:
 
 在BFCL和API-Bank两个主流工具使用基准上，ResT展现出显著优势：在BFCL多轮整体准确率上，基于Qwen3-4B的ResT达到50.38%，**相较GRPO提升8.76个百分点**，并**以0.38%的优势超越GPT-4o**（50.00%）；在单轮场景下，ResT超越GPT-4o达4.11%。消融实验进一步证实，动态奖励缩放、CoT梯度更新和课程学习三者均对最终性能有实质性贡献——移除任一组件的性能下降幅度在4.36%至6.54%之间。训练动态分析表明，ResT在保持可比奖励水平的同时，实现了显著更低且更平滑的策略熵，验证了该方法在降低梯度方差和稳定训练方面的有效性。
 
-
-
 工具使用能力是大型语言模型（LLM）在实际部署中的核心需求之一。然而，当前基于强化学习（RL）的工具使用策略优化面临一个关键瓶颈：**稀疏的结局奖励与均匀的Token处理方式导致策略梯度方差高、训练效率低下**。具体而言，工具调用任务中决定成败的关键结构化Token——如工具名称、参数键值——其奖励信号被大量高熵的推理文本所稀释，使得模型难以高效地从稀疏反馈中学习。
 
 现有方法对此问题的应对存在明显缺口。主流的组相对策略优化（**GRPO**, Shao et al., 2024）通过组内相对奖励构造基线，消除了对独立价值网络的需求，但其策略梯度对所有Token一视同仁，未区分结构化控制Token与自由形式推理Token在奖励归因上的本质差异。监督微调（SFT）变体如**TSFT**（Huerta-Enochian & Ko, 2024）虽尝试对工具调用Token加重损失，但缺乏对策略探索过程中梯度质量的动态调节机制。这些方法的共同缺陷在于：未能利用Token级信息不对称来主动降低梯度估计的方差。
 
 ResT的动机正源于此。其核心洞察是：**低熵的结构化Token是奖励的核心决定因素**——工具名和参数取值通常具有高度确定的格式，模型在这些位置的概率分布集中（低熵），而它们的正确与否直接决定了任务成败。ResT通过**熵感知的Token级梯度重新加权**与**课程学习**，渐进地调节不同区域Token对梯度更新的贡献：训练初期强调低熵的结构化Token以快速建立正确的工具调用模式，随后逐步将梯度权重转移至高熵的推理Token以优化决策逻辑。这一设计旨在同时实现稳定训练与样本高效的工具使用策略优化。
-
-
 
 ## 核心方法与创新机理
 
@@ -100,8 +96,6 @@ GRPO等基线方法对序列中所有Token赋予均匀的策略梯度贡献权�
 
 三个changed slots形成因果闭环：**密集的逐轮规则奖励**提供了丰富的学习信号；**熵感知的Token重加权**将这些信号精准导向对任务成功最关键的结构化Token；**课程学习**则确保模型在掌握工具调用格式后，仍能发展出必要的推理能力。这一组合使ResT在相同数据预算下，相比GRPO在BFCL上提升最高达**8.76%**，并在4B模型上超越GPT-4o。
 
-
-
 ![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_gNZlaKRWki/figures/001_Figure_1.jpg]]
 *Figure 1: ResT decomposes multi-turn tool-use tasks into single-turn tasks and further reshapes the policy gradient according to the average entropy in different regions, enabling dense and effective reward signals*
 
@@ -118,8 +112,6 @@ ResT 的整体设计围绕一个核心矛盾展开：工具使用任务中，稀
 **重加权 PPO 目标优化模块**将上述 Token 级权重嵌入裁剪后的 PPO 目标，形成最终损失函数（Equation 19）。值得关注的是，ResT 有意移除了 GRPO 中原有的 KL 惩罚项，转而依靠熵感知重加权、裁剪机制和课程学习三者共同维持训练稳定性。消融实验表明，在保持其他组件不变的情况下，省略 KL 惩罚的训练过程依然稳定且性能最佳（Figure A.1, Table A.1），这暗示熵感知重加权本身已能有效调节探索与利用的平衡。
 
 综上，ResT 的流水线通过“分解获取密集信号→规则评分提供结构化反馈→熵感知重加权降低方差→课程学习引导能力迁移”的因果链条，实现了工具使用策略优化的稳定性与样本效率的双重提升。整个框架的输入为多轮工具调用对话，输出为经 Token 级重加权策略梯度优化后的模型参数，各模块间的数据流关系可参照 Figure 1 的示意。
-
-
 
 ### 理论动机：Token级梯度方差与熵的关系
 
@@ -199,8 +191,6 @@ ResT的完整训练流程包含五个关键模块：
 
 这一流水线使得ResT在稀疏结局奖励的工具使用场景中，实现了稳定且样本高效的策略优化。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -208,7 +198,6 @@ ResT的完整训练流程包含五个关键模块：
 ResT在BFCL多轮和API-Bank两个基准上均展现出相对于现有方法的显著优势。Table 1报告了BFCL多轮基准的核心结果：在Qwen3-4B-2507上，ResT取得50.38%的整体准确率，较**GRPO**（Shao et al., 2024）的41.62%提升8.76个百分点，较**Dr.GRPO**（Liu et al., 2025c）的45.75%提升4.63个百分点。这一优势在更大规模的模型上同样保持——Qwen3-14B上ResT达到44.25%，GRPO为38.88%，提升5.37个百分点。值得注意的是，基于Qwen3-4B-2507微调的ResT在BFCL多轮整体准确率上以0.38个百分点的微弱优势超越GPT-4o（50.00%），在单轮任务上则领先GPT-4o达4.11个百分点。
 
 在API-Bank测试集（Table 2）上，ResT在所有模型尺寸上均取得最优整体准确率：Qwen3-1.7B为64.99%，4B为68.68%，8B为70.69%，14B为69.35%。相较于GRPO，ResT在API-Bank上的最大提升幅度为3.02个百分点。跨模型族的泛化能力在Llama3.2-3B-Instruct上得到验证（Table D.2），ResT以62.81%的整体准确率优于GRPO的59.13%。
-
 
 ![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_gNZlaKRWki/figures/004_Table_2.jpg]]
 *Table 2: API-Bank Test Results. The results presented correspond to the highest score achieved by each method with its optimal hyperparameter settings. The evaluation dataset consists of 399 samples for Level 1, 67 for Level 2, and 131 for Level 3. Best in bold*
@@ -229,7 +218,6 @@ Table 4进一步考察了初始化策略与课程对齐的交互效应。在Qwen
 - **Table 3**：动态奖励缩放是贡献最大的单一组件（下降6.54%），课程学习次之（下降4.86%），CoT梯度更新紧随其后（下降4.36%）。
 - **Table 4**：SFT预热与调优课程的组合产生协同增益，验证了分阶段训练策略的有效性。
 - **Figure F.1**：ResT通过熵感知加权实现更低更平滑的策略熵，从训练动态角度解释了其稳定性优势。
-
 
 ![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_gNZlaKRWki/figures/003_Table_1.jpg]]
 *Table 1: BFCL multi-turn results (updated June 14, 2025). Metrics computed with official scripts. TSFT scales loss on tool-call tokens. RSFT scales loss on reasoning tokens. Best in bold*
@@ -252,13 +240,8 @@ Table 4进一步考察了初始化策略与课程对齐的交互效应。在Qwen
 
 4. **真实环境泛化未验证**：当前评估局限于BFCL和API-Bank两个受控基准，在真实世界的动态工具调用场景中的效果仍需进一步实证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_gNZlaKRWki/figures/020_Figure_9.jpg]]
 *Figure 9: Figure F.1: Learning curves for ResT and GRPO during training steps. The training dynamics show that ResT achieves a significantly lower and smoother policy entropy compared to GRPO, while maintaining comparable reward performance and longer responses*
-
-
-
 
 ## 定位与知识库关联
 
@@ -290,8 +273,6 @@ ResT的设计依赖于以下前提条件，这些条件界定了其适用边界�
 2. **课程学习的自动化**：当前课程学习依赖预设的权重调度策略。能否根据在线熵估计自适应地调度权重变化，使课程学习完全自动化，值得进一步探索。
 3. **复杂规划与错误恢复的鲁棒性**：该方法在多步规划、工具调用失败后的错误恢复等更复杂场景中的鲁棒性尚未充分验证。
 4. **动态工具集的适应性**：当可用工具集在推理时动态变化时，Token区域划分和权重初始化策略是否需要重新设计，是一个实际部署中需要解决的问题。
-
-
 
 ## 原文 PDF
 

@@ -117,8 +117,6 @@ Humanoid-GPT 采用**三阶段流水线**（数据策划、专家训练、DAgger
 - **输出**：每个关节的 PD 目标位置，直接驱动机器人执行。
 - **关键特性**：因果注意力保证了推理时仅依赖过去信息，天然契合部署约束；大规模预训练赋予模型零样本泛化能力，无需针对新运动进行任何微调。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l991_https_openaccess_thecvf_com_content_CVPR2026_html_Qi_Humanoid_Generative/figures/003_Figure_2.jpg]]
 *Figure 2: Overview of Humanoid-GPT. The system consists of three stages: (a) data curation and processing, (b) training PPO-based motion experts on clusters with keypoint-level rewards, and (c) distilling all experts into a single Transformer-based generalist policy via parallel DAgger supervision. The resulting Humanoid-GPT can take unseen or online retargeted motions as reference inputs and track them in a fully zero-shot manner*
 
@@ -208,8 +206,6 @@ $$gstd = \exp\left(\frac{1}{D}\sum_{j=1}^{D}\log\sigma_j\right), \quad log\text{
 ### 失败模式与局限性
 
 尽管 Humanoid-GPT 在零样本跟踪上表现优异，仍存在若干已知局限。首先，当前框架主要关注纯运动跟踪，未涉及物体交互（如坐椅子、游泳等），限制了其在复杂场景中的应用。其次，模型处理的是纯运动学输入，未融合视觉、语言等多模态信息，可能无法应对需要上下文理解的任务。此外，在极端高动态或强干扰环境下的鲁棒性仍需进一步验证。最后，蒸馏过程依赖于数百个 RL 专家的预训练，计算成本较高——这是一个需要在实际部署中权衡的因素。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l991_https_openaccess_thecvf_com_content_CVPR2026_html_Qi_Humanoid_Generative/figures/007_Table_3.jpg]]
 *Table 3: Real-world tracking accuracy on four unseen dancing motions. For each motion clip, we record both the target and executed joint configurations and compute MPJPE/MPJVE over the entire sequence to evaluate tracking precision and temporal consistency. Remarkably, the real-world performance closely matches the results obtained in simulation, demonstrating that Humanoid-GPT achieves strong zero-shot transfer and maintains high-fidelity whole-body tracking even under real-world dynamics*

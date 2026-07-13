@@ -57,8 +57,6 @@ claims:
 
 **主要结果**：在HumanML3D文本-运动生成基准上，MLD的FID达到 **0.473**，显著优于此前最优扩散模型MDM（0.544）和MotionDiffuse（0.630）；MM Dist降至 **3.196**（MDM为5.566）；R Precision Top-3提升至 **0.772**（MDM为0.611）。在KIT数据集上FID达到 **0.404**（MDM为0.497）。推理速度方面，MLD比MDM快约两个数量级（Figure 6）。消融实验证实，VAE隐空间（对比普通自动编码器）和长跳跃连接是生成质量的关键保障。
 
-
-
 ### 问题背景：文本驱动的三维人体运动生成
 
 文本到运动生成（Text-to-Motion Generation）旨在根据自然语言描述合成逼真的三维人体运动序列。该任务在游戏开发、影视制作、虚拟人交互和机器人学习等场景中具有广泛的应用前景。与图像或语音生成不同，人体运动数据具有高维时序结构，每一帧通常由若干关节的三维旋转或位置参数表示，且不同动作之间存在复杂的运动学约束和时序依赖。因此，如何从离散、抽象的语言描述映射到连续、高维的运动序列，是该领域的核心挑战。
@@ -80,8 +78,6 @@ claims:
 - **提升表征质量**：VAE通过重构和KL正则化训练，能够自动滤除原始运动中的冗余和噪声，提取出紧致且富有语义的隐表征。在此“干净”的隐空间上建模条件分布，有助于生成更平滑、更符合文本语义的运动。
 
 基于这一动机，本文提出了 **Motion Latent-based Diffusion (MLD)** 模型。MLD采用两阶段训练范式：第一阶段训练运动VAE以获取高质量的运动隐空间；第二阶段在该隐空间上训练条件扩散模型，实现从文本或动作标签到运动隐码的映射，最终通过解码器一次前向即可重建出运动序列。这一设计将扩散模型的强大生成能力与隐空间的高效表征能力有机结合，为高质量、高效率的条件运动生成提供了新的技术路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -117,12 +113,8 @@ $$\epsilon_\theta^s(z_t, t, c) = s \epsilon_\theta(z_t, t, c) + (1-s) \epsilon_\
 
 MLD 的创新并非单一技术点的突破，而是**隐空间扩散范式 + VAE 架构增强 + 条件融合策略**的系统性协同：隐空间迁移解决了效率瓶颈，长跳跃连接与 KL 正则化保障了隐空间质量，拼接式条件注入与无分类器引导则提升了条件控制的精度。这一组合使得 MLD 在 HumanML3D 数据集上以 FID 0.473 显著优于此前最优的扩散模型 MDM（0.544）和 MotionDiffuse（0.630），同时实现了两个数量级的推理加速。
 
-
-
 MLD 的核心设计遵循 **“先压缩，再生成”** 的两阶段范式，将运动生成问题从高维的原始运动序列空间迁移到低维、高信息密度的隐空间（latent space）中求解。其整体 pipeline 由四个功能模块串联而成，形成一个从条件输入到运动序列输出的端到端生成流程（Figure 2, Figure 12）。
 
-![[assets/figures/papers/paper_list_l10_MLD_Executing_your_Commands_via_Motion_Diffusion_in_Latent_Space/figures/002_Figure_2.jpg]]
-*Figure 2: Method overview: MLD consists of a VAE model V (Sec. 3.1) and a latent diffusion model θ (Sec. 3.2) conditioned on text or action embedding τθ (Sec. 3.3). We propose two-stage training: first learn V for Motion Representations in Latents and then learn a conditioned denoiser $\epsilon _ { \theta }$ from the diffusion process q $\left( z _ { t } \mid z _ { t - 1 } \right$) . During inference, In practice, the latent diffusion models predict the latent $\hat { z } _ { 0 }$ from condition inputs and then D decode it to motions efficiently
 
 ### 模块关系与数据流
 
@@ -142,8 +134,6 @@ MLD 的核心设计遵循 **“先压缩，再生成”** 的两阶段范式，�
 这一架构的核心洞察在于：**将扩散过程的“战场”从原始运动序列转移到 VAE 隐空间**。这直接回应了本领域的瓶颈——原始运动数据存在大量时间冗余与噪声，直接在其上进行扩散建模（如 MDM、MotionDiffuse）不仅计算开销巨大，且易产生伪影。通过 VAE 将运动压缩至极低维度（默认隐变量形状为 $1 \times 256$），MLD 使扩散模型的输入规模缩小了两个数量级，从而在推理速度上比 MDM 快约两个数量级（Figure 6, Table 10），同时实现了更优的生成质量（HumanML3D 上 FID 0.473 vs MDM 0.544, Table 1）。
 
 消融实验进一步揭示了两个关键的因果调节变量：**VAE 的 KL 正则化**（使用普通自编码器而非 VAE 会导致 FID 从 0.473 急剧恶化至 5.033, Table 8）和**隐空间的紧凑性**（较小的 $1 \times 256$ 隐空间在文本生成任务上优于较大的 $7 \times 256$ 隐空间，Table 5），表明在有限数据条件下，强正则化的紧凑表征对扩散建模更为有效。
-
-
 
 MLD 的整体架构由四个核心模块构成，按两阶段训练范式组织：第一阶段训练运动 VAE 以获得紧凑的隐空间，第二阶段在该隐空间上训练条件扩散模型。以下逐一阐述各模块的设计逻辑与关键公式。
 
@@ -187,8 +177,6 @@ $$\epsilon_\theta^s(z_t, t, c) = s \epsilon_\theta(z_t, t, c) + (1-s) \epsilon_\
 
 其中 $s$ 为引导尺度（$s > 1$ 增强条件一致性），$\emptyset$ 表示空条件。推理流程为：ε_θ 经过 $T$ 步迭代去噪预测 $\hat{z}_0$，再由解码器 𝒟 单次前向解码为最终运动序列。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -222,8 +210,6 @@ MLD的FID达到**0.473**，显著优于此前最优的扩散模型MDM（0.544）
 
 在**UESTC**和**HumanAct12**的动作条件生成任务上（Table 3），MLD同样展现竞争力：
 
-![[assets/figures/papers/paper_list_l10_MLD_Executing_your_Commands_via_Motion_Diffusion_in_Latent_Space/figures/006_Table_3.jpg]]
-*Table 3: Comparison of action-conditional motion synthesis on UESTC [26] and HumanAct12 [19] dataset: $\mathrm { F I D } _ { \mathrm { t r a i n } } , \mathrm { F I D } _ { \mathrm { t r a i n } }$ indicate the evaluated splits. Accuracy (ACC) for action recognition. Diversity (DIV), MModality (MM) for generated motion diversity within each action label
 
 - **UESTC**：准确率ACC达到**0.954**，Diversity为33.52，FID_train为0.230
 - **HumanAct12**：准确率ACC达到**0.964**，Diversity为6.831，FID_train为0.053
@@ -292,24 +278,11 @@ MLD的核心优势之一是推理效率。**Figure 6**和**Table 10**展示了�
 
 **Figure 11**的用户偏好研究表明，MLD在所有对比方法中均获得超过50%的偏好率：对MDM约65%，对MotionDiffuse约70%，对T2M约75%，对TEMOS超过85%。这从人类感知角度验证了MLD生成质量的优越性。
 
-### 补充图表
 
-![[assets/figures/papers/paper_list_l10_MLD_Executing_your_Commands_via_Motion_Diffusion_in_Latent_Space/figures/020_Figure_10.jpg]]
-*Figure 10: Visualization of the t-SNE results on evolved latent codes $\hat { z } _ { t }$ during the reverse diffusion process (inference) on action-to-motion task. t is the diffusion step but ordered in the forward diffusion trajectory. $\scriptstyle { \hat { z } } _ { t = 4 9 }$ is the initial random noise. $\hat { z } _ { t = 0 }$ is our prediction. We sample 30 motions for each action label
 
-![[assets/figures/papers/paper_list_l10_MLD_Executing_your_Commands_via_Motion_Diffusion_in_Latent_Space/figures/009_Table_4.jpg]]
-*Table 4: Evaluation of our VAE models V on the motion part of HumanML3D [17] dataset: MPJPE and PAMPJPE are measured in millimeter. ACCL indicates acceleration error. We evaluate FID and DIV the same as Tab. 1. From top to down, we propose real reference, VPoser-t [43] and ACTOR [46] as baselines, the evaluation on latent $\boldsymbol { z } \in \mathbb { R } ^ { i \times 2 5 6 }$ , with (w/) or without (w/o) skip connection, V with different number of transformer layers
-
-![[assets/figures/papers/paper_list_l10_MLD_Executing_your_Commands_via_Motion_Diffusion_in_Latent_Space/figures/015_Table_7.jpg]]
-*Table 7: Quantitative comparison of the employed language models. Here we set batch size to 500 and only change the text encoder $\tau _ { \theta } ^ { w }$
-
-![[assets/figures/papers/paper_list_l10_MLD_Executing_your_Commands_via_Motion_Diffusion_in_Latent_Space/figures/017_Table_8.jpg]]
-*Table 8: Evaluation of autoencoder (without Kullback-Leibler regularization) and VAE model on motion generations*
 
 ![[assets/figures/papers/paper_list_l10_MLD_Executing_your_Commands_via_Motion_Diffusion_in_Latent_Space/figures/018_Table_9.jpg]]
 *Table 9: Comparison of text-to-motion. ( c f . Tab. 1 for details.)*
-
-
 
 ## 定位与知识库关联
 
@@ -362,8 +335,6 @@ MLD 的技术栈可拆解为三个可独立分析的模块，各自有清晰的�
 MLD 的核心贡献在于**证明了“先压缩再扩散”的两阶段范式在运动生成领域的有效性**。它属于隐扩散模型（Latent Diffusion Models）在结构化序列数据上的成功迁移案例，与图像领域的 Stable Diffusion（Rombach et al., 2022）共享方法论哲学，但针对运动数据的时间冗余特性做了定制化设计（长跳跃连接、紧凑隐空间形状 $1 \times 256$）。
 
 从实验证据强度看，MLD 的 SOTA 声明有较高可信度：FID 提升幅度（-0.071 vs MDM）在相同评估协议下验证，推理速度优势（两个数量级）在相同硬件上测试，消融实验完整覆盖了 VAE vs 自编码器（Table 8）、跳跃连接（Figure 9）、预测目标（Table 9）、条件编码器选择（Table 7）等关键设计选择。但需注意，所有实验均基于 HumanML3D/KIT 等中小规模数据集，在大规模运动数据（如完整 AMASS）上的扩展性尚未验证。
-
-
 
 ## 原文 PDF
 

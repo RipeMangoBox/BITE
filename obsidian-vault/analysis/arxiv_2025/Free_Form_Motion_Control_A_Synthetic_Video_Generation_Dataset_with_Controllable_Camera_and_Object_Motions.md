@@ -52,8 +52,6 @@ claims:
 
 **方法定位**：FMC属于基于预训练文本到视频扩散模型（如**AnimateDiff**, Guo et al., ICLR 2024）的运动注入式控制方法，通过Camera Motion Controller (CMC)和Object Motion Controller (OMC)两个轻量级模块实现解耦控制。与仅支持2D相机姿态的**CameraCtrl**（He et al., arXiv 2024）和存在运动纠缠问题的**MotionCtrl**不同，FMC首次提供了完整的6D物体姿态控制能力。
 
-
-
 可控视频生成旨在让用户精确操纵视频中的运动元素，包括相机运动和物体运动。然而，现有方法在这一目标上存在根本性瓶颈：**缺乏同时包含相机和物体完整6D姿态标注的数据集**，导致模型无法在三维空间中独立或联合控制相机和物体运动。
 
 具体而言，当前的视频生成可控性方案大致可分为以下几类，但各有局限：
@@ -65,8 +63,6 @@ claims:
 这一瓶颈的根源在于数据层面：现有数据集要么只标注相机姿态，要么只提供2D物体轨迹，没有一个数据集能同时提供相机和物体的完整6D姿态标注以及多样化的运动模式。合成数据虽可提供精确标注，但如何弥合合成渲染风格与真实视觉风格之间的域差距，是将其用于视频生成模型训练的另一个挑战。
 
 针对上述问题，本文的动机明确：**构建首个同时提供相机和物体6D姿态标注的合成数据集，并设计相应的解耦训练策略，实现相机与物体运动的独立或联合控制**。为此，本文提出SynFMC合成数据集和Free-Form Motion Control (FMC)方法，通过三阶段解耦训练和专用的区域损失函数，在合成数据上学习分离全局与局部运动，从而在推理时生成高保真且运动可控的视频。
-
-
 
 ## 核心方法与创新机理
 
@@ -135,8 +131,6 @@ FMC 采用三阶段训练策略实现域适应与运动解耦的渐进学习（F
 | 损失函数 | 标准扩散 MSE 损失 | $L_{cam}$ + $L_{obj}$ 区域加权 | 前景/背景运动解耦 |
 | 训练策略 | 端到端联合训练 | 三阶段渐进解耦 | 避免模块间梯度冲突 |
 
-
-
 FMC 的整体训练与推理架构围绕**解耦相机运动与物体运动**这一核心目标设计，采用三阶段渐进训练策略，在预训练文本到视频（T2V）扩散模型的基础上逐步注入运动控制能力。
 
 ### 三阶段训练流水线
@@ -172,12 +166,8 @@ $\mathcal{M}_{fg}$ 为前景掩码，使 OMC 专注于学习物体运动，同�
 
 消融实验（Table 5）证实了各模块的必要性：移除 $L_{cam}$ 导致相机平移误差从 18.12 升至 20.35，旋转误差从 1.03 升至 1.19；移除 $L_{obj}$ 使物体平移误差从 42.25 升至 46.62，旋转误差从 0.96 升至 1.15。仅使用标准扩散损失训练 CMC 会导致前景漂移而非准确的相机运动（Figure 12）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2501_01425/figures/009_Figure_7.jpg]]
 *Figure 7: The architecture of FMC. In the first stage, we randomly sample the images from synthetic videos and update the parameters from injected Domain LoRA. Next, the modules from CMC are learned. It consists of two parts: Camera Encoder and Camera Adapter, where the Camera Adapter is introduced into the temporal modules. Finally, we train the Object Encoder from OMC. It receives the 6D object pose features, which are repeated in the corresponding object region. We use Gaussian blur kernel centered at the centroid to prevent the need of precise masks. Then, the output is multiplied by the coarse masks to modulate the features in the main branch*
-
-
 
 FMC 方法的核心由三个关键模块构成，并通过两个专用损失函数实现相机与物体运动的解耦控制。
 
@@ -240,21 +230,11 @@ FMC 的分阶段训练是实现运动解耦的关键设计：
 
 这种顺序训练策略确保了相机和物体运动的独立可控性，使得推理时用户可以自由组合或独立控制二者的 6D 姿态。消融实验证实，移除 $L_{cam}$ 会导致相机平移误差从 18.12 升至 20.35，移除 $L_{obj}$ 则使物体平移误差从 42.25 升至 46.62，验证了两个专用损失函数的关键作用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2501_01425/figures/003_Table_1.jpg]]
 *Table 1: Comparison of the proposed SynFMC with existing datasets. The object/camera motion pattern columns apply only to synthetic datasets. In addition to offering a rich variety of object categories, SynFMC outperforms in motion pattern variety and controllability with comprehensive pose annotations of camera and objects. In our implementation, we only use 26K subset as training data*
 
 ![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2501_01425/figures/007_Table_2.jpg]]
 *Table 2: Comparison of FMC with other methods. FMC excels in controlling 6D poses of objects and camera with diverse motion patterns*
-
-![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2501_01425/figures/005_Figure_3.jpg]]
-*Figure 3: Object motion types. The trajectory of stationary point is not presented in the figure, which is a fixed point in the space*
-
-![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2501_01425/figures/006_Figure_4.jpg]]
-*Figure 4: Camera motion types. We decompose camera motion into 3 aspects. (a) Viewpoint controls camera orientation when capturing object. 1 - 5 present front/back, left/right and top perspectives. (b) Distance and (c) Height determine horizontal and vertical distance between camera and object, respectively. 6 - 9 are zoom in/out and up/down, respectively. The “static” types are omitted in (b) and (c), which stand for fixed distances*
-
-
 
 ## 实验与关键发现
 
@@ -311,8 +291,6 @@ FMC在视频运动控制方法谱系中的定位可通过Table 2和实验对比�
 
 这一方法谱系表明，FMC的核心贡献不在于提出全新的网络架构，而在于通过数据集-训练策略-损失函数的协同设计，解决了运动可控视频生成中的解耦控制瓶颈。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2501_01425/figures/010_Table_3.jpg]]
 *Table 3: Quantitative comparison of our proposed method FMC with AnimateDiff [11], CameraCtrl [12], and MotionCtrl [47]*
 
@@ -321,20 +299,6 @@ FMC在视频运动控制方法谱系中的定位可通过Table 2和实验对比�
 
 ![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2501_01425/figures/014_Figure_12.jpg]]
 *Figure 12: Results of different settings in the ablation study. The first row is MotionCtrl [47] trained on SynFMC*
-
-![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2501_01425/figures/011_Figure_8.jpg]]
-*Figure 8: Independent controls over camera and object motions. Results in (a) reveal that all methods [12, 47] effectively reflect the camera conditions. For object motion, the compared methods [47, 51] fail to maintain a stationary camera as shown in green boxes from (b) (e.g., movement of flower in row 5). Furthermore, they also present low fidelity of object orientation (3D axes in conditions)*
-
-![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2501_01425/figures/012_Table_4.jpg]]
-*Table 4: User study in quality, text similarity, and motion fidelity*
-
-![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2501_01425/figures/015_Figure_11.jpg]]
-*Figure 11: Simultaneous control results of MotionCtrl [47] trained on SynFMC without and with camera pose during training*
-
-![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2501_01425/figures/008_Figure_6.jpg]]
-*Figure 6: Domain LoRA. We sample the first frame of generated videos under without and with Domain LoRA settings*
-
-
 
 ## 定位与知识库关联
 
@@ -383,8 +347,6 @@ FMC 与最相关基线 MotionCtrl 的核心差异体现在三个层面，这三�
 3. **跨域泛化能力验证。** 合成数据训练的模型在真实世界场景下的泛化能力需要系统性的基准测试和评估协议，这是将该方法推向实际应用的关键一步。
 
 4. **额外输入模态的融合。** 论文指出未来需要额外输入模态（如图像）来定制参考主体的运动视频，这暗示了将 FMC 与个性化生成、视频编辑等任务结合的可能性。
-
-
 
 ## 原文 PDF
 

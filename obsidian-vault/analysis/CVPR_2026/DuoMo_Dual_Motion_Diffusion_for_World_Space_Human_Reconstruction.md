@@ -59,8 +59,6 @@ DuoMo 还引入了几项关键设计：直接生成595个稀疏网格顶点的�
 
 实验结果表明，DuoMo 在 EMDB 和 RICH 数据集上分别将世界空间误差（W-MPJPE）相对次优方法降低了约 **16%** 和 **30%**，同时保持较低的脚滑动和根轨迹误差。消融实验证实，双模型设计（相机空间+世界空间）相比单一模型在精度和运动质量上均有显著提升，且该方法对相机位姿噪声具有更强的鲁棒性。
 
-
-
 从单目视频中恢复世界空间中的三维人体运动是计算机视觉的核心难题，其应用涵盖动作捕捉、人机交互、增强现实等。问题的本质挑战在于：单目视频天然丢失了深度信息，且相机本身可能处于未知的运动之中，因此系统必须同时从二维观测中推断出人体姿态和全局轨迹。
 
 现有方法在这一问题上形成了两条主要技术路线，但它们各自面临根本性瓶颈。**端到端方法**（如 **WHAM**、**GVHMR**）直接从视频预测世界空间运动，虽然能保持全局一致性，但泛化能力受限——它们隐式地记忆了训练数据中的场景尺度与相机运动模式，面对野外视频时容易产生漂移或深度歧义。**两阶段提升方法**（如 **TRAM**、**GENMO**）则先在相机空间估计人体运动，再利用估计的相机位姿将其“提升”到世界空间；这类方法泛化性更好，但提升后的运动缺乏全局物理约束，常表现为脚滑动严重、时间抖动大，且对相机位姿估计误差极为敏感。
@@ -70,8 +68,6 @@ DuoMo 还引入了几项关键设计：直接生成595个稀疏网格顶点的�
 作者的关键洞察在于：**显式几何提升可以将相机空间估计转化为世界空间中的“含噪提议”，而世界空间扩散模型可以作为生成式先验对其进行去噪和细化**。这一设计将运动重建解耦为两个阶段：相机空间扩散模型负责从视频中估计局部运动（保留泛化性），世界空间扩散模型负责将提升后的含噪运动细化为全局一致的结果（注入物理合理性）。与依赖固定规范坐标系（如实验室地面平面）的方法不同，DuoMo 以每段视频的起始相机位姿为原点定义逐视频坐标系，使世界空间模型能泛化到任意拍摄环境。
 
 此外，DuoMo 直接生成 595 个稀疏网格顶点的运动序列，而非 SMPL 参数，避免了对参数化身体模型的依赖，使运动表征更灵活。在训练和推理阶段，模型还引入了接触损失、重投影引导和位移引导等机制，进一步强化物理合理性与时间一致性。
-
-
 
 ## 核心方法与创新机理
 
@@ -115,8 +111,6 @@ DuoMo 的核心创新在于**将人体运动重建解耦为两个生成式扩散
 
 DuoMo 通过显式几何升维将相机空间估计转化为世界空间的含噪提议，再利用世界空间扩散模型作为生成式先验进行去噪和细化，避免了对固定规范坐标系的依赖，同时兼顾了泛化能力与全局一致性。
 
-
-
 DuoMo 将单目视频的世界空间人体运动重建分解为**两个级联的扩散模型**，形成“估计—升维—细化”的三步流水线。该设计的核心动机在于解决现有方法中**泛化能力与全局物理一致性之间的根本权衡**：端到端直接预测世界空间运动的方法泛化性不足，而先估计相机空间运动再后优化的方法则缺乏对全局一致性的显式建模。
 
 ### 流水线总览
@@ -146,12 +140,8 @@ DuoMo 将单目视频的世界空间人体运动重建分解为**两个级联的
 
 - **接触损失**：在世界空间训练损失中加入着地帧的脚部顶点 L1 损失，显式惩罚脚滑动，强化物理合理性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l963_https_arxiv_org_abs_2603_03265/figures/013_Figure_8.jpg]]
 *Figure 8: Architecture (sparse mesh to SMPLX). This network performs iterative refinement to predict SMPLX parameters from a target sparse mesh*
-
-
 
 DuoMo 将世界空间人体运动重建分解为两个生成式阶段，分别由相机空间扩散模型与世界空间扩散模型承担，中间通过显式几何升维衔接。图2给出了完整的管线概览。
 
@@ -225,13 +215,6 @@ $$\mathcal{L}_{\text{contact}} = \frac{1}{|S|} \sum_{t \in S} \| {}^{1}X_{t,\tex
 
 为便于评估和紧凑表示，训练一个迭代 MLP 将生成的稀疏网格转换为 SMPLX 参数，避免慢速的优化式转换（Section 3.5, Appendix A.3）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l963_https_arxiv_org_abs_2603_03265/figures/003_Figure_3.jpg]]
-*Figure 3: Height conditioning. Our camera-space model can generate predictions based on input body heights. As shown at the bottom row, height impacts distance from camera and thus plays an important role in world-space accuracy*
-
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -249,9 +232,6 @@ DuoMo 在 EMDB 和 RICH 两个世界空间重建基准上均取得显著领先�
 ### 鲁棒性分析
 
 Table 2 在 Egobody 数据集上评估了遮挡场景下的重建鲁棒性。所有方法使用真实相机位姿。DuoMo 在可见段和不可见段（人物出框）均表现出色：引导采样使根轨迹误差 **RTE** 和遮挡段误差 **RTE-Occ** 显著降低。Figure 4 可视化了引导采样的校正效果——重投影引导和位移引导分别抑制了时间漂移和长时遮挡后的目标位置偏差。Figure 5 的定性对比进一步表明，GVHMR 在相机抖动时出现轨迹漂移，PromptHMR 对遮挡和深度歧义敏感，而 DuoMo 同时保持了精度和鲁棒性。
-
-![[assets/figures/papers/paper_list_l963_https_arxiv_org_abs_2603_03265/figures/005_Table_2.jpg]]
-*Table 2: Robust reconstruction on the Egobody [88], evaluating both visible and invisible segments (e.g. person out of frame). All methods use ground truth camera poses in this evaluation*
 
 ![[assets/figures/papers/paper_list_l963_https_arxiv_org_abs_2603_03265/figures/010_Figure_5.jpg]]
 *Figure 5: Qualitative comparison on Egobody [88]. All methods use the ground truth camera poses. We observe that results from GVHMR [61] are smooth but drift under shaky camera motion. PromptHMR [77] has better position accuracy but is not robust to occlusion and depth ambiguity. Our results show both accuracy and robustness*
@@ -272,26 +252,10 @@ Table 2 在 Egobody 数据集上评估了遮挡场景下的重建鲁棒性。所
 2. **困难姿态下的网格形变**（Figure 12）：在极端姿态下，生成的稀疏网格可能产生非真实形变；通过转换为 SMPL 网格（附录 A.3 的迭代 MLP 转换器）可部分改善，但未根本解决。
 3. **二值可见性假设**：当前方法通过置信度阈值将关键点可见性二值化，丢弃了不确定性信息，可能影响运动模型在部分遮挡下的条件质量。
 
-![[assets/figures/papers/paper_list_l963_https_arxiv_org_abs_2603_03265/figures/016_Figure_11.jpg]]
-*Figure 11: Limitation 1. Because our models do not incorporate 3D scene information, the results exhibit inconsistencies in finegrained details*
-
-![[assets/figures/papers/paper_list_l963_https_arxiv_org_abs_2603_03265/figures/017_Figure_12.jpg]]
-*Figure 12: Limitation 2. In challenging poses, the generated sparse meshes sometime exhibit unrealistic deformation. Converting them to SMPL meshes (sec A.3) partially improves the results*
-
 这些失败模式指向未来的改进方向：将 3D 场景约束或物理目标融入引导采样、以连续置信度替代二值可见性、以及探索潜在扩散或令牌化表示以提升网格生成的鲁棒性。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l963_https_arxiv_org_abs_2603_03265/figures/006_Table_3.jpg]]
 *Table 3: Ablation for DuoMo design on EMDB [28]. DuoMo has higher accuracy and motion quality than using only one model*
-
-![[assets/figures/papers/paper_list_l963_https_arxiv_org_abs_2603_03265/figures/009_Table_5.jpg]]
-*Table 5: Ablation for motion representation on EMDB [28]. Directly generating sparse mesh is very competitive in terms of motion reconstruction accuracy*
-
-![[assets/figures/papers/paper_list_l963_https_arxiv_org_abs_2603_03265/figures/011_Figure_6.jpg]]
-*Figure 6: Impact of camera error. Comparison of methods under different camera motion noise levels*
-
-
 
 ## 定位与知识库关联
 
@@ -379,8 +343,6 @@ DuoMo 的世界空间扩散模型仅建模人体运动本身，未显式编码 3
 4. **多人物交互场景**：DuoMo 目前针对单人重建设计。在多人交互场景中，世界空间运动之间存在物理约束（如接触、避碰），如何扩展双扩散框架以同时生成多个一致的人体运动序列是一个开放挑战。
 
 5. **实时/在线推理**：当前扩散模型的迭代采样过程限制了实时应用。探索蒸馏、一致性模型或单步生成方法，以在保持世界空间一致性的前提下降低推理延迟。
-
-
 
 ## 原文 PDF
 

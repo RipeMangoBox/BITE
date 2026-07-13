@@ -52,8 +52,6 @@ claims:
 
 HEX 的效果是显著的：在 GSM8K 上，准确率从 24.72% 提升至 88.10%（**3.56 倍**），在 MATH、ARC-C、TruthfulQA 上同样大幅超越现有推理方法，甚至超过了需要 GRPO 微调的基线模型（Figure 5）。消融实验进一步证实，性能增益源于**块调度的结构性多样性**而非单纯的采样增加——多块调度集成显著优于单一调度下的多样本采样（Table 7）。
 
-
-
 ### 扩散语言模型的推理瓶颈
 
 扩散语言模型（Diffusion Large Language Models, dLLMs）通过在任意掩码训练中学习从噪声到文本的生成过程，展现出非自回归生成的潜力。其训练目标为最大化被掩码位置上真实 token 的概率：
@@ -77,8 +75,6 @@ $$
 ### 测试时扩展的新维度
 
 基于上述发现，本文的核心洞察是：**dLLMs 在训练中隐式学习了一个半自回归专家的混合，通过测试时聚合多个不同块调度的输出，可以充分激发模型的推理能力，无需针对特定启发式进行微调。** 这一思路将测试时扩展（test-time scaling）从传统的增加采样次数提升到结构化多样性聚合的层面——不仅增加样本数量，更重要的是通过异构的块调度引入推理路径的结构性差异。由此，扩散语言模型的推理不再依赖单一的、可能崩溃的解码策略，而是通过多数投票机制在多个隐藏专家的输出中寻找共识，从而稳定且显著地提升推理性能。
-
-
 
 ## 核心方法与创新机理
 
@@ -117,8 +113,6 @@ $$p_{\text{mix}}(x_i = a \mid x_{\text{prompt}}) \approx \mathbb{E}_{b \sim B}\l
 
 HEX 的核心贡献在于开辟了扩散大语言模型的**测试时扩展（test-time scaling）**新维度。与需要 GRPO 微调的 d1 等方法不同，HEX 完全无需训练，仅通过推理时的调度集成即可将 GSM8K 准确率从 24.72% 提升至 88.10%（3.56×），甚至超过 GRPO 微调模型（79.80%）。这一结果确立了测试时计算扩展作为扩散语言模型推理能力提升的有效范式。
 
-
-
 ![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_L5y7in91vd/figures/002_Figure_1.jpg]]
 *Figure 1: Overview of our proposed HEX framework. Left: HEX leverages multiple semiautoregressive hidden experts, guided by different masking schedules, to produce concatenated outputs and a final answer. Right: HEX outperforms Top-K, Top-K margin (Kim et al., 2025) and Random expert selection strategies (Nie et al., 2025b) on reasoning tasks (GSM8K, MATH, ARC-C), surpassing the training-based GRPO baseline (d1) (Zhao et al., 2025)*
 
@@ -151,8 +145,6 @@ HEX 的设计根植于一个核心洞察：dLLM 在任意掩码训练中隐式�
 ### 计算开销
 
 相比单一解码策略，HEX 的计算开销约增加 5 倍（使用 5 种块大小各采样 1 个种子）。该开销源于多轨迹生成的并行需求，但换取了无需训练的显著性能提升，且在实际部署中可通过并行化部分缓解。
-
-
 
 ### 关键模块
 
@@ -196,21 +188,13 @@ $$p_{\text{mix}}(x_i = a \mid x_{\text{prompt}}) \approx \mathbb{E}_{b \sim B}\l
 
 其中 $U_b$ 表示按块大小 $b$ 进行半自回归解码时已揭示的 token 集合。最终答案通过多数投票从该近似分布中得出。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：半自回归解码消除灾难性崩溃
 
 扩散大语言模型在推理任务上采用基于置信度的解码策略时，存在一个致命瓶颈：模型在去掩码过程中过早且过度自信地生成 `[AfterEoT]` 退化标记，导致整条输出序列崩溃。Figure 2 揭示了这一现象的严重性——在 GSM8K 上，top-K margin 方法的准确率仅为 24.72%，而超过 55.5% 的运行出现了全部标记坍缩为 `[AfterEoT]` 的灾难性失败。相比之下，简单的随机去掩码反而达到 50.87% 的准确率，这直接动摇了“置信度越高越好”的直觉。
 
-![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_L5y7in91vd/figures/003_Figure_2.jpg]]
-*Figure 2: Random vs. Top-K margin inference on GSM8K. Left: Random decoding achieves 50.87% accuracy, while Right: Top-K margin only 24.72%. For each method, the text box shows the result at the last unmasking step. Top-K margin generates output tokens in reverse, from the end toward the beginning, and exhibits a catastrophic collapse in which all tokens are [AfterEoT] (shown in red). Over 55.5% of top-K margin runs suffered this collapse, yielding very low accuracy. These failures cast doubt on methods that rely solely on token confidence*
-
 Table 1 给出了根治这一问题的关键证据：将解码策略从非半自回归切换为半自回归（semi-AR）后，`[AfterEoT]` 崩溃率从 29%–56% 降至 **0.00%**。在 GSM8K 上，准确率从 22.52% 跃升至 76.27%；在 MATH 上，从 16.60% 提升至 32.80%。因果机制在于：半自回归解码通过块划分（$M_t = \{(t-1)b+1, \ldots, \min(tb, n)\}$）强制推理从左到右推进，同时允许块内进行扩散式并行生成，从而避免了模型从末尾高置信度标记（恰是 `[AfterEoT]`）开始反向填充的惯性崩溃（Figure 8）。
-
-![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_L5y7in91vd/figures/006_Table_1.jpg]]
-*Table 1: Semi-AR based decoding eliminates [AfterEoT] collapse and improves accuracy*
 
 ### 主要结果：HEX 在推理基准上的表现
 
@@ -248,8 +232,6 @@ Table 7 给出了一个关键对照：HEX 使用 5 种块大小各 5 个种子�
 
 Table 2 显示，将动态块调度数量从 5 增加到 30，GSM8K 准确率从 81.96% 单调提升至 84.15%，同时平局率从 3.87% 降至 1.06%。Figure 6 进一步表明，增加投票样本数（种子数从 1 到 6）可单调提升准确率并降低平局率。这种可预测的扩展行为是 HEX 实用性的重要保证。
 
-![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_L5y7in91vd/figures/012_Table_2.jpg]]
-
 #### 4. 平局处理策略
 
 Table 4 比较了三种平局决断方式：TIED: NLL（选似然最低者）、TIED: first（选最小块大小输出）、TIED: any（只要平局候选中有正确答案即算正确）。TIED: any 在各基准上均取得最高准确率（GSM8K 83.09%、MATH 41.00%），说明多数投票本身已有效将正确答案推入平局候选集，平局决断策略主要影响边界收益。HEX 默认采用 TIED: first，在简洁性和有效性之间取得平衡。
@@ -267,24 +249,12 @@ Table 4 比较了三种平局决断方式：TIED: NLL（选似然最低者）、
 
 Table 5 报告了推理效率：HEX（×1 seed，5 个块大小各 1 样本）的单数据点推理时间约为随机解码的 5.2 倍（GSM8K 上 11.98s vs. 2.30s）。这是测试时扩展的固有代价，但与 GRPO 微调的数小时训练成本相比，仍具有显著的资源效率优势。
 
-![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_L5y7in91vd/figures/022_Table_5.jpg]]
-*Table 5: Inference efficiency (in seconds) of HEX (×1 seed) on GSM8K, MATH, ARC-C, TruthfulQA. The numbers in parentheses indicate the number of data points. Random, top-k, and top-k margin use a single sample with a block size of 32. HEX (×1 seed) uses five samples, where each sample is generated with block sizes of 8, 16, 32, 64, and 128. Across all samples, the output length is set to 256, with 2 tokens being unmasked at each step*
-
 ### 输出长度的鲁棒性
 
 Table 8 的消融表明，HEX 在输出长度 128 和 256 的设置下均保持一致的性能优势，方法对输出长度具有鲁棒性。Table 6 进一步证实，HEX 的多数投票结果始终优于参与投票的各样本的平均准确率——这从数学上验证了集成学习的核心原理：多样性专家的组合可以超越任何单一专家。
 
-![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_L5y7in91vd/figures/023_Table_6.jpg]]
-*Table 6: HEX (the bottom three rows) consistently surpasses the mean accuracy (the top three rows) of samples used in majority voting across various output length settings. The number preceding [ ] represents the output length, and the numbers inside [ ] correspond to the block sizes used*
-
 ![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_L5y7in91vd/figures/025_Table_8.jpg]]
 *Table 8: Ablation study of HEX across output lengths of 128, 256. The results demonstrate that HEX consistently exhibits robust performance irrespective of output length. Block sizes used are the same as Table 6. Refer to Table 4 for detailed explanation about (b), (c), (d)*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_L5y7in91vd/figures/026_Table_9.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -348,8 +318,6 @@ HEX 通过多数投票聚合多个块调度生成的答案，其效果源于结�
 4. **超越确定性答案的任务扩展**：对于故事生成、对话等开放式任务，多数投票不适用。是否可以通过聚合不同专家的生成分布（而非离散答案）来实现测试时扩展，例如使用 Equation 4 中的概率混合而非硬投票？
 
 5. **与其他测试时扩展方法的协同**：HEX 与自回归模型中的 chain-of-thought、self-consistency 等方法在哲学上相似（均通过聚合多条推理路径提升性能），但实现机制迥异。探索这两类方法的交叉融合可能产生更强的推理系统。
-
-
 
 ## 原文 PDF
 

@@ -56,8 +56,6 @@ ReMoGen 的核心洞察是：将大规模单人运动先验作为通用基础，
 
 **局限与开放问题**：潜在扩散的压缩空间可能损害细粒度空间精度，尤其在近距离接触或高精度人-物交互中；简单加权组合策略并非最优，更有效的免训练融合方法值得探索。
 
-
-
 ### 问题背景：交互反应生成的双重困境
 
 在虚拟现实、具身智能和数字人等应用中，实时生成与外部刺激（他人动作、场景物体）协调一致的人类反应运动是一项核心能力。然而，这一任务面临两个相互纠缠的瓶颈。
@@ -84,8 +82,6 @@ ReMoGen 的核心洞察是：将大规模单人运动先验作为通用基础，
 
 同时，为打破实时性与质量的僵局，我们引入帧级段细化（FWSR）机制——在分段自回归生成框架上叠加轻量逐帧潜在空间修正，以极低的额外延迟换取显著的质量提升，从而在0.047s的延迟下将FID从0.181进一步降至0.166。
 
-
-
 ## 核心方法与创新机理
 
 ReMoGen 的核心创新在于通过**模块化解耦**同时应对交互反应生成中的两大瓶颈：交互数据稀缺且异构分布，以及实时响应与生成质量的权衡。其关键设计可归纳为三个相互协同的 changed slots。
@@ -106,8 +102,6 @@ ReMoGen 不将所有模态联合处理，而是为每种交互线索（他人动
 
 上述三个 changed slots 形成递进式的创新链条：通用先验提供高质量运动基础，Meta-Interaction 模块以最小代价注入交互语义，FWSR 在不牺牲质量的前提下实现帧级实时响应。三者共同构成了 ReMoGen 应对“数据异质性”和“实时性”双重挑战的核心机制，使其在 Inter-X（HHI）上 FID 达 0.181（最佳在线基线 SymBridge 为 2.569），在 LINGO（HSI）上 FID 达 1.201（基线 TRUMANS 为 4.731），且延迟均满足实时要求（0.042s）。
 
-
-
 ReMoGen 采用模块化设计，将交互反应生成分解为两个功能层次：**先验引导的模块化学习（Prior-guided Modular Learning）** 与**逐帧段细化（Frame-wise Segment Refinement, FWSR）**。其核心思想是将从大规模单人数据中习得的通用运动先验作为冻结基础，通过轻量级的 Meta-Interaction 模块注入异构交互线索，再以 FWSR 实现低延迟的在线更新。
 
 **Pipeline 总览。** 系统以自回归方式运行：给定历史运动片段 $M_h^i$，模型预测未来运动段 $\hat{M}_f^i$，随后按式 (1) 更新历史窗口：
@@ -127,12 +121,8 @@ $$M_h^{i+1} = \mathrm{concat}(M_h^i, \hat{M}_f^i)[-H:]$$
 
 这种“冻结先验 + 可插拔适配器 + 轻量在线修正”的架构，使得 ReMoGen 既能继承大规模预训练的运动质量，又能灵活适应不同交互域，同时保持实时响应能力。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l922_https_arxiv_org_abs_2604_01082/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the ReMoGen Framework. Our framework is designed to address the challenges of data scarcity and real-time responsiveness in interaction-to-reaction generation*
-
-
 
 ReMoGen 的架构围绕三个核心模块构建，分别解决运动先验迁移、异构交互线索注入和实时响应性三个关键问题。
 
@@ -179,12 +169,8 @@ $$\hat{z}^f = \mathrm{Modulate}\big(z_0, \mathrm{concat}(M_h^{(f-1)}, X_\text{dy
 
 其中 $M_h^{(f-1)}$ 为截至前一帧的运动历史，$X_\text{dyn}^{(f)}$ 为当前帧的动态交互线索。该调制通过一个小型适配器网络实现，仅需微小的额外计算开销（延迟从 0.042s 增至 0.047s），即可将 FID 从 0.181 改善至 0.166（Table 5），实现了实时响应与高保真的有效平衡。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l922_https_arxiv_org_abs_2604_01082/figures/009_Figure.jpg]]
 *Figure: A. Architecture of Meta-Interaction Block*
-
-
 
 ## 实验与关键发现
 
@@ -263,17 +249,6 @@ EgoBody 数据集上的实验验证了 ReMoGen 在混合交互设置（人-人 +
 
 所有实验遵循统一的在线交互-反应协议评估：支持自回归的基线保留其原始推理机制，否则采用“预测-拼接”方案。序列统一降采样至 10 FPS，使用与训练相同的标准化处理。延迟测试基于单张 NVIDIA RTX 3090 GPU，测量 1000 帧的平均每帧计算时间。这些措施确保了对比的公平性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l922_https_arxiv_org_abs_2604_01082/figures/004_Table_1.jpg]]
-*Table 1: Human–Human Interaction results on Inter-X. Bold indicates the best and underlined indicates the second-best. Reported latency is end-to-end inference time. Green latency values meet the 0.1 s/frame real-time threshold (equivalent to 10 FPS), while red values do not*
-
-![[assets/figures/papers/paper_list_l922_https_arxiv_org_abs_2604_01082/figures/005_Table_2.jpg]]
-*Table 2: Human-Scene Interaction results on LINGO. Bold indicates best performance. Green latency values meet the 0.1 s/frame real-time threshold. Ours outperforms both baselines across all evaluation metrics*
-
-![[assets/figures/papers/paper_list_l922_https_arxiv_org_abs_2604_01082/figures/006_Table_3.jpg]]
-*Table 3: Mixed-modality results on EgoBody. Zero-shot composition provides complementary priors but reflects clear domain mismatch. Prior-initialized finetuning rapidly adapts to the target domain, outperforming scratch training within a few thousand steps*
-
 ![[assets/figures/papers/paper_list_l922_https_arxiv_org_abs_2604_01082/figures/008_Table_4.jpg]]
 *Table 4: Ablation on different ways of using the universal prior*
 
@@ -285,17 +260,6 @@ EgoBody 数据集上的实验验证了 ReMoGen 在混合交互设置（人-人 +
 
 ![[assets/figures/papers/paper_list_l922_https_arxiv_org_abs_2604_01082/figures/014_Figure.jpg]]
 *Figure: C. Qualitative comparisons on Human–Human Interaction tasks. For typographical reasons, we have presented the optimal offline version of FreeMotion. Our method produces smoother and more coordinated reactions aligned with the intent, whereas baselines exhibit unnatural timing, misaligned contact, or unstable body dynamics*
-
-![[assets/figures/papers/paper_list_l922_https_arxiv_org_abs_2604_01082/figures/015_Figure.jpg]]
-*Figure: D. Qualitative comparisons on Human-Scene Interaction tasks. All methods are evaluated with goal location provided*
-
-![[assets/figures/papers/paper_list_l922_https_arxiv_org_abs_2604_01082/figures/016_Figure.jpg]]
-*Figure: HHI Only HSI Only Compose Figure E. Zero-shot Human–Human–Scene Interaction results*
-
-![[assets/figures/papers/paper_list_l922_https_arxiv_org_abs_2604_01082/figures/020_Figure.jpg]]
-*Figure: I. Ablation on Frame-wise Segment Refinement. We present ”A person runs towards someone and passes by them.” FWSR provides fine-grained updates that improve responsiveness without sacrificing stability, outperforming both segment-only and naive slidestyle inference*
-
-
 
 ## 定位与知识库关联
 
@@ -366,8 +330,6 @@ ReMoGen 在交互运动生成领域的方法谱系中占据以下位置：
 - **相对于单域方法**（如 TRUMANS、LINGO）：ReMoGen 的模块化设计使其天然支持多域融合和零样本迁移，这在现有交互生成方法中尚属首次。
 
 - **方法谱系定位**：ReMoGen 可被归类为 **“基于预训练运动先验的模块化交互生成框架”**，其核心贡献在于将冻结先验、FiLM 调制和逐帧细化组合为一个统一的实时推理管线。这一设计范式对后续交互生成工作具有重要的参考价值。
-
-
 
 ## 原文 PDF
 

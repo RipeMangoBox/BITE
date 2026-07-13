@@ -76,8 +76,6 @@ GaussM2ASR 并非孤立地学习高斯表示，而是构建了一套**解剖引�
 
 该方法要求目标与参考图像空间对齐，临床场景中的患者运动可能引入错位和伪影，需配准预处理。此外，高斯核数量固定且由参考图像分辨率决定，对纹理简单图像可能导致冗余计算。未来方向包括整合鲁棒的运动校正技术，以及开发自适应高斯分配策略以提升计算效率。
 
-
-
 ### 多对比度MRI与超分辨率需求
 
 磁共振成像（MRI）通过调节扫描参数可生成多种组织对比度（如T1加权、T2加权、FLAIR等），不同对比度揭示了互补的解剖与病理信息。在临床实践中，受限于扫描时间、患者耐受度和设备条件，高分辨率（HR）多对比度MRI往往难以获取，而低分辨率（LR）图像则丢失了关键的解剖细节。因此，从LR图像恢复HR对应物——即MRI超分辨率（SR）——成为医学影像分析中的重要预处理步骤。
@@ -110,8 +108,6 @@ $$f(\mathbf{x}) = \sum_{i=1}^{N} \alpha_i r_i G_i(\mathbf{x})$$
 现有INR方法在多对比度融合时，通常采用简单的特征拼接或交叉注意力，缺乏对解剖结构的显式建模。这导致两个问题：（1）参考图像中的背景区域引入噪声干扰；（2）高斯中心无法有效聚焦于关键解剖结构。
 
 为此，GaussM2ASR引入了三大解剖先验驱动模块：**SPMF**（结构先验调制融合）抑制背景并增强高频通道，**AG-DDCA**（解剖引导双域交叉注意力）在空间域和频域联合增强解剖细节，**AGGP**（解剖引导高斯参数化器）利用梯度引导的Top-T稀疏注意力将高斯中心聚焦于解剖边缘。这些模块共同构成了一个完整的解剖引导管线，使2D高斯溅射在医学影像场景中发挥最大效能。
-
-
 
 ## 核心方法与创新机理
 
@@ -161,8 +157,6 @@ $$\text{Att}_{\text{top-T}}(Q, K, V) = \text{Softmax}(M \odot W) V$$
 
 GaussM2ASR采用两阶段训练：首先使用高分辨率目标图像预训练整个网络，随后冻结AGGP模块，使用低分辨率输入微调其余部分。消融实验（Figure 7）表明，两阶段策略优于单阶段训练，验证了先让高斯参数化器在高质量监督下学习解剖聚焦，再适应降质输入的有效性。
 
-
-
 GaussM2ASR 的整体流水线将多对比度 MRI 任意尺度超分辨率重构为**可学习的各向异性 2D 高斯参数估计与 α 混合渲染**问题，从根本上区别于基于隐式神经表示（INR）的逐像素强度回归范式。其核心因果机制在于：INR 的过参数化网络在梯度优化下天然存在频谱偏差——优先收敛到低频解，且连续表示中的特征网格插值充当低通滤波器，进一步削弱高频解剖边界；GaussM2ASR 转而学习一组自适应基函数（各向异性高斯核），将高频重建转化为更平滑的参数优化问题，窄核捕获边界细节，宽核覆盖平滑区域。
 
 ### 两阶段训练策略
@@ -205,8 +199,6 @@ $$f(\mathbf{x}) = \sum_{i=1}^{N} \alpha_i r_i G_i(\mathbf{x})$$
 $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{spa}} + \lambda_{\mathrm{freq}} \mathcal{L}_{\mathrm{freq}} + \lambda_{\mathrm{ref}} \mathcal{L}_{\mathrm{ref}}$$
 
 频域损失直接监督高频分量的重建质量，与频谱偏差缓解的设计目标一致。
-
-
 
 ### 3.1 各向异性2D高斯溅射渲染
 
@@ -292,18 +284,8 @@ $$\mathcal { L } _ { \mathrm { t o t a l } } = \mathcal { L } _ { \mathrm { s p 
 
 其中 $\mathcal{L}_{\mathrm{spa}}$ 为空间域 MAE 损失，$\mathcal{L}_{\mathrm{freq}}$ 为频域 MAE 损失（在傅里叶幅度上计算），$\mathcal{L}_{\mathrm{ref}}$ 为参考图像的重建损失。$\lambda_{\mathrm{freq}}$ 和 $\lambda_{\mathrm{ref}}$ 为平衡超参数。两阶段训练策略（预训练 HR 目标 + 冻结 AGGP 微调 LR 输入）在消融实验中优于单阶段训练，进一步验证了该设计的有效性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2437_https_openaccess_thecvf_com_content_CVPR2026_html_Yan_Adaptive_Anisotrop/figures/002_Figure_2.jpg]]
 *Figure 2: Compared with INR models that directly regress pixel intensities, our GaussM2ASR learns a set of Gaussian parameters and reconstructs the image as a composition of adaptive basis functions, enabling more effective modeling of high-frequency anatomical structures*
-
-![[assets/figures/papers/paper_list_l2437_https_openaccess_thecvf_com_content_CVPR2026_html_Yan_Adaptive_Anisotrop/figures/007_Figure_5.jpg]]
-*Figure 5: Illustration of how the generated Gaussians render the MRI image, by showing their spatial distribution in (c) and a random subset in (d). The distribution in (c) concentrates on HF regions, particularly along anatomical boundaries, while the subset in (d) demonstrates the adaptive adjustment of their variances to local frequency characteristics*
-
-![[assets/figures/papers/paper_list_l2437_https_openaccess_thecvf_com_content_CVPR2026_html_Yan_Adaptive_Anisotrop/figures/009_Figure_6.jpg]]
-*Figure 6: Feature responses before and after the SPMF module, along with their residual map. The results demonstrate the module’s efficacy in suppressing activations in background and other irrelevant regions*
-
-
 
 ## 实验与关键发现
 
@@ -346,24 +328,17 @@ GaussM2ASR 在三个公开数据集（IXI、BraTS、fastMRI）上，针对多对
 - 如何整合鲁棒的运动校正技术，使模型能处理未对齐或存在运动伪影的多对比度图像？
 - 如何开发自适应的高斯分配策略，根据局部纹理复杂度动态调整高斯核数量，以提升纹理简单图像的计算效率？
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2437_https_openaccess_thecvf_com_content_CVPR2026_html_Yan_Adaptive_Anisotrop/figures/005_Table_2.jpg]]
 *Table 2: Quantitative comparison on IXI, BraTS, and fastMRI datasets under different scaling factors. Red indicates the best and blue the second best performance*
 
 ![[assets/figures/papers/paper_list_l2437_https_openaccess_thecvf_com_content_CVPR2026_html_Yan_Adaptive_Anisotrop/figures/004_Table_1.jpg]]
 *Table 1: Details of three datasets used in experiments*
 
-![[assets/figures/papers/paper_list_l2437_https_openaccess_thecvf_com_content_CVPR2026_html_Yan_Adaptive_Anisotrop/figures/001_Figure_1.jpg]]
-*Figure 1: The proposed GaussM2ASR recovers richer anatomical boundaries than INR-based models, e.g., Dual-ArbNet [41], McASSR [16], and DINet [36]*
-
 ![[assets/figures/papers/paper_list_l2437_https_openaccess_thecvf_com_content_CVPR2026_html_Yan_Adaptive_Anisotrop/figures/008_Figure_7.jpg]]
 *Figure 7: Ablation study of GaussM2ASR, with all models trained on the IXI dataset and tested at a 4× upscaling factor*
 
 ![[assets/figures/papers/paper_list_l2437_https_openaccess_thecvf_com_content_CVPR2026_html_Yan_Adaptive_Anisotrop/figures/006_Figure_4.jpg]]
 *Figure 4: Qualitative comparison on IXI, BraTS, and fastMRI datasets at a 4× scaling factor. Enlarged views of regions within green boxes are provided alongside their error maps, which display the absolute reconstruction error (darker shades indicate smaller errors)*
-
-
 
 ## 定位与知识库关联
 
@@ -439,8 +414,6 @@ GaussM2ASR 要求目标图像与参考图像在空间上严格对齐。在临床
 
 1. **鲁棒运动校正集成**：如何整合鲁棒的运动校正技术，使模型能处理未对齐或存在运动伪影的多对比图像，从而扩展临床适用性？
 2. **自适应高斯分配**：如何开发自适应的高斯分配策略，根据图像内容动态调整高斯核数量，在保持重建质量的同时提升纹理简单图像的计算效率？
-
-
 
 ## 原文 PDF
 

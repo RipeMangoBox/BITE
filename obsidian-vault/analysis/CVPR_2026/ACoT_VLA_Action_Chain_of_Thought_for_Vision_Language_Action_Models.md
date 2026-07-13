@@ -51,8 +51,6 @@ claims:
 
 **主要结果**：在 LIBERO 基准上，ACoT-VLA 平均成功率达 **98.5%**，较此前最优方法 π0.5 提升 **1.6%**，在长程任务（LIBERO-Long）上提升尤为显著。在 LIBERO-Plus 监督微调设置下，成功率从 75.7% 提升至 **88.0%**（+12.3%）。在 VLABench 上，意图得分和进度得分分别提升 **+9.4%** 和 **+7.2%**。模拟到真实迁移实验中，真实世界成功率从 77.5% 提升至 **82.9%**（+5.4%）。消融实验证实 EAR 与 IAR 协同互补：单独添加 EAR 使 LIBERO-Plus 成功率从 75.7% 升至 83.7%，单独添加 IAR 升至 80.4%，二者结合达到最高 84.1%。
 
-
-
 ### 机器人策略中的语义-运动学鸿沟
 
 通用机器人操作策略的核心任务是根据视觉观察 $o_t$ 和语言指令 $l$ 预测动作序列 $a_{t:t+H-1}$。近年来，视觉-语言模型（VLM）的引入极大地提升了策略对多模态输入的理解能力，使机器人能够处理复杂的语义指令。然而，现有VLA（Vision-Language-Action）策略存在一个根本性瓶颈：**推理过程主要发生在视觉-语言空间中，而动作生成却发生在运动学空间中**。高阶语义表示（如“拿起杯子”）与低层精确动作执行（如关节角度序列）之间缺乏直接联系，导致引导信息间接且不充分，难以实现精确的动作生成。这一语义-运动学差距构成了当前通用机器人策略性能提升的关键障碍。
@@ -71,8 +69,6 @@ claims:
 本文的核心洞察是：**如果推理步骤本身就是动作，那么引导信号与最终输出将处于同一空间，从而消除表示鸿沟**。基于这一洞察，我们提出**Action Chain-of-Thought（ACoT）范式**——将推理过程重新定义为结构化的粗粒度动作意图序列，而非抽象的语言或视觉子目标。这是首个将策略的推理过程直接置于动作空间中的工作。
 
 ACoT范式的关键优势在于**同质引导**：中间推理步骤（粗参考轨迹）与最终输出（精确动作序列）共享相同的运动学表示，使引导信号具有直接的可执行性和运动学一致性。这一设计从根本上缩短了从感知到执行的推理路径，为策略学习提供了更扎实的归纳偏置。
-
-
 
 ## 核心方法与创新机理
 
@@ -120,8 +116,6 @@ $$S^{\mathrm{im}} = \mathrm{CrossAttn}(Q_{action}, Z^{\mathrm{im}}, Z^{\mathrm{i
 
 这一设计使ACoT-VLA在LIBERO基准上平均成功率提升1.6%（98.5% vs. 96.9%），在长程任务上表现尤为突出，并在LIBERO-Plus监督微调设置下实现12.3%的显著提升（88.0% vs. 75.7%）。
 
-
-
 ACoT-VLA 的核心设计思路是将思维链（Chain-of-Thought）从语言或视觉空间迁移到**动作空间**，直接生成结构化的粗粒度动作意图序列作为中间推理步骤，从而弥合高层语义表示与低层精确动作执行之间的**语义-运动学差距**。
 
 ### 框架总览
@@ -163,8 +157,6 @@ $$\mathcal{L}_{\mathrm{total}} = \lambda_1 \mathcal{L}_{\pi_{\theta}^{\mathrm{re
 
 ![[assets/figures/papers/paper_list_l2368_https_arxiv_org_abs_2601_11404/figures/002_Figure_2.jpg]]
 *Figure 2: Architectural Overview of ACoT-VLA. The framework consists of three main components operating on features from a shared VLM backbone. (a) The Explicit Action Reasoner (EAR) is a Transformer-based module that synthesizes a coarse reference trajectory, providing explicit action-space guidance. (b) The Implicit Action Reasoner (IAR) employs a cross-attention mechanism with learnable queries to extract latent action priors from the VLM’s internal representations. (c) The Action-Guided Prediction (AGP) head synergistically integrates both explicit and implicit guidances via cross-attention to condition the final denoising process, producing the executable action sequence*
-
-
 
 ACoT-VLA 的核心架构建立在共享的 VLM 骨干之上，由三个关键模块协同构成：**显式动作推理器（EAR）**、**隐式动作推理器（IAR）** 和 **动作引导预测头（AGP）**。以下逐一剖析各模块的公式化机制与变量含义。
 
@@ -234,13 +226,6 @@ $$\mathcal{L}_{\mathrm{total}} = \lambda_1 \mathcal{L}_{\pi_{\theta}^{\mathrm{re
 
 其中平衡因子 $\lambda_1 = \lambda_2 = 0.5$。训练时采用 teacher forcing 策略以保证稳定性，推理时切换至自条件模式。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2368_https_arxiv_org_abs_2601_11404/figures/001_Figure_1.jpg]]
-*Figure 1: Chain-of-Thought in different space. (a) Language CoT paradigm predicts sub-tasks as intermediate reasoning. (b) Visual CoT paradigm synthesizes a goal image to provide guidance for action policy. (c) Our proposed Action CoT directly operates in action space and provides homogeneous action guidance*
-
-
-
 ## 实验与关键发现
 
 ### 核心发现与瓶颈突破
@@ -297,8 +282,6 @@ ACoT-VLA的推理模块引入了额外计算开销，延迟从91ms增加到112ms
 
 所有仿真实验严格遵循官方训练分割，不引入额外数据；模型训练超参数统一（学习率、优化器、EMA），各任务仅在训练步数上适配；基准比较中LLM骨干多数被冻结，确保比较公平；采用teacher forcing stabilization保证训练稳定，推理时切换到自条件模式。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2368_https_arxiv_org_abs_2601_11404/figures/003_Table_1.jpg]]
 *Table 1: Comparison on the LIBERO benchmark. Our proposed approach is trained on the LIBERO dataset. ⋄ represents that the LLM backbone is frozen during training. All metrics are average success rates (%). The best results are highlighted in bold*
 
@@ -307,23 +290,6 @@ ACoT-VLA的推理模块引入了额外计算开销，延迟从91ms增加到112ms
 
 ![[assets/figures/papers/paper_list_l2368_https_arxiv_org_abs_2601_11404/figures/005_Table_3.jpg]]
 *Table 3: Comparison on the VLABench benchmark. IS and PS represent Intention score and Progress score, respectively. All models are trained for 60K steps. ⋄ indicates that the LLM backbone is frozen during training. The best results are highlighted in bold*
-
-![[assets/figures/papers/paper_list_l2368_https_arxiv_org_abs_2601_11404/figures/006_Table_4.jpg]]
-*Table 4: Module ablations. The performance is gradually improved with the continuous addition of proposed methods*
-
-![[assets/figures/papers/paper_list_l2368_https_arxiv_org_abs_2601_11404/figures/014_Table_10.jpg]]
-*Table 10: Effects of parameters and denoise steps on policy performance. Note that the IAR module is not added in this experiment. The evaluation protocol in LIBERO-Plus is Supervised Fine-Tuning, i.e., models are directly optimized on LIBERO-Plus dataset. The LLM backbone is frozen during training. The best results are highlighted in bold, and the second-best results are underlined*
-
-![[assets/figures/papers/paper_list_l2368_https_arxiv_org_abs_2601_11404/figures/007_Table_5.jpg]]
-*Table 5: Reference action parameter ablation. We observe that different reference-action configurations within EAR generally lead to performance improvements*
-
-![[assets/figures/papers/paper_list_l2368_https_arxiv_org_abs_2601_11404/figures/008_Table_6.jpg]]
-*Table 6: Comparison of KV-cache interaction strategies in IAR*
-
-![[assets/figures/papers/paper_list_l2368_https_arxiv_org_abs_2601_11404/figures/015_Table_11.jpg]]
-*Table 11: Experimental results on Genie Sim 3.0 Simulation and Real-world Transfer. The best results are highlighted in bold*
-
-
 
 ## 定位与知识库关联
 
@@ -379,8 +345,6 @@ ACoT-VLA的核心知识贡献可概括为以下三个层面：
 3. **异构多模态输入的稳健合成**：EAR需要从视觉观察和语言指令中合成高维动作线索，当前方法依赖于VLM骨干的表征质量。如何设计更稳健的合成机制，特别是在视觉输入退化（遮挡、光照变化）或语言指令模糊时仍能生成合理的参考轨迹，是一个待探索的问题。
 
 4. **动作CoT的可解释性**：EAR生成的粗参考轨迹是否具有可解释的运动学语义（如“接近物体→抓取→提升”）？能否利用这一中间表示进行人机交互或故障诊断？当前工作未对此进行深入分析。
-
-
 
 ## 原文 PDF
 

@@ -55,8 +55,6 @@ claims:
 
 当前方法仍存在若干局限：夹持空间的选择缺乏理论指导，依赖经验调参；实验仅在 1.5B 和 7B 规模模型上进行；缺少对夹持熵正则化的理论收敛性分析；自适应系数的超参数仍需手动设定，跨任务迁移性未经验证。
 
-
-
 ### 大语言模型强化学习中的熵正则化困境
 
 将强化学习（RL）应用于大语言模型（LLM）的微调已成为提升模型推理能力的主流范式，典型代表如 **GRPO**（Shao et al., 2024）。在此类方法中，策略优化通常以最大化期望累积奖励为目标。然而，LLM的动作空间——即词汇表大小——极为庞大（通常达$10^4$–$10^5$量级），且每个状态下真正“正确”或“有用”的令牌仅占极小比例，即最优动作具有高度稀疏性。这一结构性特征使得传统RL中的探索机制面临根本性挑战。
@@ -84,8 +82,6 @@ $$V_{\lambda}^{\pi_{\theta}}(\mathcal{D}) := V^{\pi_{\theta}}(\mathcal{D}) + \la
 2. **自适应熵系数**：根据夹持熵的实时水平动态调整 $\lambda$——当熵低于预设下界时增大系数以鼓励探索，当熵高于预设上界时减小系数以抑制偏差。这使得探索-利用的平衡能够随训练进程自动校准。
 
 通过这两项机制，AEnt旨在解决LLM-RL中熵正则化“有理论却无实效”的根本矛盾，为策略优化提供持续、稳定的探索信号。
-
-
 
 ## 核心方法与创新机理
 
@@ -125,8 +121,6 @@ $$\mathcal{L}_{\mathrm{AEnt}}(\theta; \lambda) = \mathcal{L}_{\mathrm{PO}}(\thet
 
 其中 $\mathcal{L}_{\mathrm{PO}}$ 为基础策略优化损失（本工作采用 GRPO 的 PPO-clip 目标），$\lambda$ 按上述自适应规则动态调整。这一设计实现了**探索偏差控制**（通过夹持空间）与**探索强度调节**（通过自适应系数）的解耦与协同，使 LLM-RL 训练能够在极大动作空间中持续、稳定地提升推理能力。
 
-
-
 AEnt 的整体 pipeline 围绕“策略采样—GRPO 策略优化—夹持熵计算—自适应系数调整”四个模块构建，形成一个闭环的在线强化学习流程。
 
 **输入**：一个预训练的 LLM 策略 $\pi_\theta$，以及一个数学推理任务数据集 $\mathcal{D}$（如 MATH 或 OpenR1-math 子集），其中每个样本 $s_0 \sim \mathcal{D}$ 是一个问题提示。
@@ -149,8 +143,6 @@ AEnt 的整体 pipeline 围绕“策略采样—GRPO 策略优化—夹持熵计
 - 最终优化目标整合为 $\mathcal{L}_{\mathrm{AEnt}}(\theta; \lambda) = \mathcal{L}_{\mathrm{PO}}(\theta) + \lambda \tilde{\mathcal{H}}(\pi_\theta)$，使策略在提升任务奖励的同时维持健康的探索水平。
 
 **证据支撑**：该框架的有效性由 Table 1 中 AEnt 在 6 个基准中的 5 个上取得最优成绩，以及 Figure 3a/4a 中 AEnt 在 GRPO 熵塌陷后继续提升测试分数的现象所证实。消融实验（Figure 5, Figure 6）进一步验证了自适应系数和夹持操作各自的贡献。
-
-
 
 ### 3.1 瓶颈洞察：全动作空间熵正则化的偏差
 
@@ -205,8 +197,6 @@ AEnt的训练循环包含四个关键模块：
 
 > **注意**：夹持百分比 $p$ 的选择对算法效果有显著影响（Figure 6消融实验证实），但目前缺乏理论指导，依赖经验调参。自适应系数的超参数（$\tilde{\mathcal{H}}_{\mathrm{low}}, \tilde{\mathcal{H}}_{\mathrm{high}}, \beta$）仍需手动设定，可能在不同任务间需要重新调整。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈的实证验证
@@ -244,15 +234,10 @@ AEnt的训练循环包含四个关键模块：
 
 **Figure 3a**和**Figure 4a**联合揭示了AEnt的关键行为模式。在GRPO训练中，策略熵在约175步后发生塌陷（entropy collapse），此后测试分数趋于平台，不再提升。AEnt在相同时间点后不仅维持了稳定的策略熵水平，测试分数继续攀升并最终超越所有基线。这表明AEnt成功打破了“熵塌陷—性能停滞”的因果链条。
 
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_LqazVN5epT/figures/003_Figure_3.jpg]]
-
 ![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_LqazVN5epT/figures/014_Figure_4.jpg]]
 *Figure 4: (b) Training DeepSeek-R1-distilled-Qwen-1.5b on a subset of OpenR1-math dataset. Figure 4: Entropy and response length trend (see also Figure 3 for test score comparison)*
 
 **Figure 4a**还显示，AEnt的响应长度（response length）在训练全程保持紧凑且稳定，而EntReg和GRPO的响应长度则出现不同程度的膨胀或波动。结合**Figure 5**的消融结果，自适应熵系数是这一稳定性的关键：固定系数无法阻止训练中期的熵爆发，导致响应长度失控和重复推理模式；自适应系数通过将夹持熵约束在预设区间$[\tilde{\mathcal{H}}_{\text{low}}, \tilde{\mathcal{H}}_{\text{high}}]$内，动态平衡探索与利用，从而在维持准确率的同时显著提升推理效率。
-
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_LqazVN5epT/figures/017_Figure_5.jpg]]
-*Figure 5: AEnt with adaptive entropy coefficient vs with a constant coefficient. The score in this test is similar. Adaptive coefficient better controls the response length and the policy entropy*
 
 ### 消融研究
 
@@ -281,8 +266,6 @@ $$\lambda' \leftarrow \mathrm{Proj}_{[\lambda_{\mathrm{low}}, \lambda_{\mathrm{h
 3. **模型规模验证不足**：当前实验仅覆盖1.5B和7B参数规模，在更大规模模型（如70B+）上的有效性尚未验证。
 
 4. **理论收敛性缺失**：夹持熵正则化缺乏类似于传统熵正则化的理论收敛性分析，其优化性质尚未完全阐明。
-
-
 
 ## 定位与知识库关联
 
@@ -324,8 +307,6 @@ AEnt 针对上述瓶颈，在两个维度上进行了改造：**熵计算空间*
 2. **跨领域泛化**：夹持熵正则化在代码生成、对话系统等不同领域的 LLM 上是否依然有效？
 3. **理论完善**：能否为夹持熵正则化建立类似于传统熵正则化的性能界或收敛性保证？
 4. **大规模验证**：在更大参数规模（70B+）和更多计算资源下的表现有待检验。
-
-
 
 ## 原文 PDF
 

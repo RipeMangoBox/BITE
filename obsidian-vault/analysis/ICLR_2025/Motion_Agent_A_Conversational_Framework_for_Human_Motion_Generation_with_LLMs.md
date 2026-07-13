@@ -51,8 +51,6 @@ claims:
 
 **主要结果**：在HumanML3D基准上，MotionLLM在生成质量和文本对齐方面达到或超越现有方法，同时在captioning任务上建立了新的最优水平。定性分析表明，Motion-Agent能准确生成包含系列动作的复杂运动，而其他模型在类似复杂描述下输出短而模糊的动作。消融实验证实，精心设计的翻译代理对框架性能至关重要——替换为MotionGPT后运动过渡不平滑；较小的开源LLM（如Llama-3-7B）作为协调器时无法可靠遵循JSON格式，影响可用性。
 
-
-
 ### 问题背景：3D人体运动生成的现状与瓶颈
 
 3D人体运动生成旨在根据自然语言描述合成逼真的动作序列，在动画制作、虚拟现实和人机交互等领域具有重要应用价值。近年来，该领域涌现了大量方法，包括基于扩散模型的 **MDM**（Tevet et al., 2023）、**MLD**（Chen et al., 2023b）和 **MotionDiffuse**（Zhang et al., 2022），以及基于自回归Transformer的 **T2M-GPT**（Zhang et al., 2023b）和非自回归的 **MoMask**（Guo et al., 2024）等。这些方法在标准基准上取得了显著进展，但其核心瓶颈在于：**需要大量任务特定的训练，缺乏通用性和对话交互能力**。
@@ -76,8 +74,6 @@ claims:
 
 基于此动机，**Motion-Agent** 框架应运而生。它通过三个组件——对话协调器（GPT-4）、运动翻译代理（MotionLLM）和运动分词器/解分词器——实现了无需额外训练的对话式运动生成、编辑、理解和推理，从根本上突破了传统方法的任务隔离和交互限制。
 
-
-
 ## 核心方法与创新机理
 
 Motion-Agent 的核心创新在于将“运动视为语言”，通过离散化运动表示与轻量级大语言模型适配，构建了一个无需额外对话训练的统一框架，实现了从单次生成到多轮对话式交互的跨越。
@@ -97,8 +93,6 @@ Motion-Agent 的核心创新在于将“运动视为语言”，通过离散化�
 ### 4. 框架层面的功能统一
 
 Table 1 对比了近期运动生成模型的功能覆盖。Motion-Agent 是首个同时支持文本到运动生成、运动 captioning、多轮对话编辑、长序列合成与运动过渡组合的框架，且所有这些能力均通过同一套未做任务特定微调的组件实现。这种统一性源于“运动 token 化 + LLM 翻译 + GPT-4 协调”的模块化设计，而非为每个任务单独训练专用模型。
-
-
 
 Motion-Agent 是一个由大语言模型驱动的对话式人体运动生成与理解框架，其核心设计理念是将运动视为一种语言，从而直接复用预训练语言模型的泛化与对话能力。整个系统由三个关键模块构成：**对话协调器（GPT-4）**、**翻译代理（MotionLLM）** 以及 **运动分词器/解分词器（Motion Tokenizer/Detokenizer）**。三者的协作流程如 Figure 2 所示。
 
@@ -146,8 +140,6 @@ $$\mathcal{L}_{vq} = \underbrace{\|\mathbf{m} - \hat{\mathbf{m}}\|_1}_{\mathcal{
 
 这种模块化设计使得 Motion-Agent 天然支持可变长度运动生成（自回归直到终止符），避免了非自回归模型中因长度估计错误导致的严重漂移问题。同时，通过 GPT-4 的分解-拼接策略，框架理论上可以生成任意长度的复杂运动序列。
 
-
-
 ### 3.1 Motion-Agent 整体框架
 
 Motion-Agent 由三个核心组件构成：**对话协调器（GPT-4）**、**运动分词/解分器（Motion Tokenizer/Detokenizer）** 和 **翻译代理（MotionLLM）**。
@@ -187,8 +179,6 @@ $$\mathcal{L}_{LLM} = -\sum_{t} \log p_{\theta}(x_t | x_{<t}, c)$$
 
 **关键设计**：仅通过 LoRA 微调 LLM 中 1-3% 的参数（生成任务 rank=64，captioning 任务 rank=32），原始文本 token 的嵌入层和输出层保持冻结。自回归生成直到预测出 `</Motion>` 终止 token，天然支持可变长度运动生成，无需手动指定目标长度。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1903_Motion_Agent_A_Conversational_Framework_for_Human_Motion_Generation_with/figures/002_Figure_1.jpg]]
 *Figure 1: Multi-turn Conversation Between User and Motion-Agent. First Turn: Motion Understanding; Second Turn: Motion Generation; Third Turn: Motion Understanding with Previously Generated Motion; Fourth Turn: Motion Editing; Fifth Turn: Continue Motion Generation; Last Turn: Motion Editing on Long Sequence. Note that all turns are continuous*
 
@@ -197,8 +187,6 @@ $$\mathcal{L}_{LLM} = -\sum_{t} \log p_{\theta}(x_t | x_{<t}, c)$$
 
 ![[assets/figures/papers/paper_list_l1903_Motion_Agent_A_Conversational_Framework_for_Human_Motion_Generation_with/figures/007_Figure_5.jpg]]
 *Figure 5: Motion-Agent can compose motions with smooth transitions. In this example, the two motions “a person falls down on the back” and “a person is walking” are provided to Motion-Agent in two turns. The system then generates a “stand up” motion to facilitate a seamless composition of the two motions*
-
-
 
 ## 实验与关键发现
 
@@ -254,30 +242,8 @@ Figure 5进一步展示了运动组合（motion composition）能力：给定“
 
 4. **运动表示的粒度限制**：当前方法仅处理整体身体运动，未涉及手部姿态或面部表情细节，这限制了其在精细交互场景（如手物交互）中的应用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1903_Motion_Agent_A_Conversational_Framework_for_Human_Motion_Generation_with/figures/008_Table_2.jpg]]
 *Table 2: Quantitative evaluation of MotionLLM on the HumanML3D (Guo et al., 2022a) test set. For motion generation, we follow T2M (Guo et al., 2022a) for the evaluation metrics. The evaluations are conducted 20 times to obtain a 95% confidence interval. Methods indicated in italics utilize the ground truth lengths for estimation. Models above capable of bidirectional generation are also included in the captioning evaluation. For motion captioning, we use the ground truth captions without pre-processing and linguistic metrics suggested by Guo et al. (2022b) for evaluation. Best scores are highlighted in boldface, while underscore refers to the second best*
-
-![[assets/figures/papers/paper_list_l1903_Motion_Agent_A_Conversational_Framework_for_Human_Motion_Generation_with/figures/004_Table_1.jpg]]
-*Table 1: Comparison on functionalities among recent motion generation models. Italicized model indicates the corresponding model requires pre-training and task-specific tuning*
-
-![[assets/figures/papers/paper_list_l1903_Motion_Agent_A_Conversational_Framework_for_Human_Motion_Generation_with/figures/006_Figure_4.jpg]]
-*Figure 4: Comparison with Other Methods. Our Motion-Agent accurately generates motions involving a series of actions, while other models struggle with more complex descriptions like this, resulting in short and unclear motions*
-
-![[assets/figures/papers/paper_list_l1903_Motion_Agent_A_Conversational_Framework_for_Human_Motion_Generation_with/figures/009_Figure_6.jpg]]
-*Figure 6: Motion-Agent Ablation Study. We substituted MotionLLM with MotionGPT and noticed that MotionGPT cannot generate smooth motion transition*
-
-![[assets/figures/papers/paper_list_l1903_Motion_Agent_A_Conversational_Framework_for_Human_Motion_Generation_with/figures/010_Table_3.jpg]]
-*Table 3: Ablation on MotionLLM We conducted an ablation study to examine the impact of different LLM backbones and adapter sizes. The results are shown in Table 3, from which we may conclude that using larger backbone models or increasing the LoRA rank leads to overall improvements in the metrics*
-
-![[assets/figures/papers/paper_list_l1903_Motion_Agent_A_Conversational_Framework_for_Human_Motion_Generation_with/figures/018_Figure_10.jpg]]
-*Figure 10: Comparison between MotionLLM and MoMask (Guo et al., 2024), which is nonautoregressive. During regular inference, MoMask uses a length estimator to predict the length conditioned on the text. This estimator is likely to fail. In this example, their incorrect predicted length causes severe drifting*
-
-![[assets/figures/papers/paper_list_l1903_Motion_Agent_A_Conversational_Framework_for_Human_Motion_Generation_with/figures/011_Figure_7.jpg]]
-*Figure 7: More examples of Motion-Agent*
-
-
 
 ## 定位与知识库关联
 
@@ -320,8 +286,6 @@ Figure 5进一步展示了运动组合（motion composition）能力：给定“
 4. **降低对闭源大模型的依赖**：能否通过改进协调机制的鲁棒性（如引入约束解码或格式校验模块），或利用能力更强的开源 LLM，使整个框架在完全离线的环境中也能稳定运行？
 
 5. **长序列生成的端到端优化**：当前分解-拼接策略的长运动生成是否可以通过端到端的训练（如引入跨片段的注意力机制或全局运动先验）来提升连贯性，是一个值得探索的方向。
-
-
 
 ## 原文 PDF
 

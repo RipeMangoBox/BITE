@@ -67,8 +67,6 @@ PDDLLM提出了一条根本性的替代路径：**仅从单次人类演示出发
 
 在9种环境、超过1200个任务的评测中，PDDLLM以**93.3%的整体规划成功率**全面超越六大基线，较最强基线LLMTAMP-FF（52.5%）提升超过40个百分点。在Tower of Hanoi等需要长时序推理的复杂任务上，PDDLLM成功率达到**100%**，而LLMTAMP-FF仅为14.3%。与推理LLM方法相比，PDDLLM在复杂任务子集上以80.5%的成功率优于o1-TAMP的61.5%，且token成本仅为后者的62%。消融实验表明，生成的规划域与专家手工设计域相比，缺失谓词和冗余谓词的比例均控制在较低水平，验证了自动域构建的质量。系统还在Franka、Piper、UR5e三种真实机器人平台上成功部署，进一步证明了方法的实用性。
 
-
-
 任务与运动规划（Task and Motion Planning, TAMP）是机器人自主完成复杂长时序操作的核心技术。它需要将高层符号推理与低层连续运动规划相结合，使机器人能够将“把杯子放到架子上”这样的抽象指令，分解为一系列可执行的抓取、移动、放置动作。然而，TAMP 系统的有效性高度依赖于一个关键前提：**规划域（planning domain）必须被精确地预先定义**。
 
 规划域通常以规划域定义语言（Planning Domain Definition Language, PDDL）描述，包含两类核心要素：**谓词库**（predicate library）和**动作库**（action library）。谓词定义了世界中可能存在的逻辑状态（如 `is_on(?o1, ?o2)` 表示物体叠放关系），动作则定义了状态转换的规则（如 `stack` 动作的前提条件和效果）。在现有实践中，这些域知识的构建几乎完全依赖人类专家手工完成——专家需要观察任务场景，抽象出关键物理关系，将其编码为符号谓词，并为每个动作编写与运动规划器之间的数学约束接口。这一过程劳动密集、耗时且极易出错，构成了 TAMP 方法向新场景扩展的**核心瓶颈**。
@@ -78,8 +76,6 @@ PDDLLM提出了一条根本性的替代路径：**仅从单次人类演示出发
 更先进的推理型 LLM（如 OpenAI o1、DeepSeek R1）虽然展现出更强的推理链能力，但在复杂长时序任务上仍面临成功率不足和 token 成本过高的问题。**o1-TAMP** 和 **R1-TAMP** 在 Tower of Hanoi 等任务上的成功率分别仅为 14.3% 和 28.6%，而单次规划的 token 消耗可达数千美元级别。
 
 核心矛盾在于：**人类专家无法为每一个新场景预先编写规划域，而 LLM 又缺乏从物理世界自主抽象符号知识的能力**。本文的核心动机正是打破这一僵局——能否让系统仅通过观察一次人类演示，就自动推导出完整的、可执行的规划域？这要求系统同时具备两种能力：从连续物理轨迹中抽象出离散逻辑关系，以及验证这些逻辑关系在真实物理约束下的正确性。
-
-
 
 ## 核心方法与创新机理
 
@@ -116,13 +112,8 @@ LoCA 是 PDDLLM 消除人工接口设计的核心组件。它直接检索动作�
 
 综上，PDDLLM 的创新并非在单个模块上修修补补，而是**重构了 TAMP 的域构建范式**：从“人工定义 + 手工接口”变为“仿真验证 + LLM 归纳 + 自动接口”，仅需一次演示即可生成完整的可执行规划域。
 
-
-
 ![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_Y1VgLHbzCC/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the proposed framework. (1) Human demonstrations, in the form of manipulation trajectories, and the corresponding task descriptions, serve as input. Implementation details is shown in Section B.12. (2) PDDLLM initiates thousands of parallel simulations, using the resulting roll-outs and rich physics-based feedback to guide the LLM in summarizing them into meaningful predicates, and returns a predicate library annotated with each predicate’s relevance to the current task. (3) Actions are invented by an LLM that summarizes logical state transition patterns from the demonstration, which is grounded into logical states using the imagined predicates. (4) The predicates and actions ar...*
-
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_Y1VgLHbzCC/figures/002_Figure_2.jpg]]
-*Figure 2: a. This example illustrates the imagination of predicates for relative object positions. Let u be a configurable variable for each dimension. Object poses are sampled and simulated, with infeasible cases filtered out by the simulation feedback. Feasible subspaces are provided to the LLM to generate first-order predicates with their corresponding physical constraints. Higher-order predicates can be further derived using logical operators (e.g., "not", "for all") from first-order predicates. Diverse predicate examples are provided in Section B.9 b. This example shows how the Stack action is invented. Continuous states are grounded into logical states using the imagined predicates, where the s...*
 
 PDDLLM 的核心管线由四个串行模块构成，输入为单次人类演示的操作轨迹与对应的任务描述，输出为可直接送入运动规划器执行的可执行规划域。
 
@@ -151,8 +142,6 @@ $$
 - **仿真反馈闭环**：谓词想象依赖数千次并行仿真来验证物理可行性，LLM 仅对仿真筛选后的可行子空间进行语义总结，而非凭空生成。
 - **离散化尺度 $u_f$**：连续特征 $f$ 的离散化粒度初始设为该特征在所有相关物体间的最小非零差异 $d_{min}$，平衡了谓词精度与冗余度。
 - **一次性域推导**：整个流程仅需单次演示，不依赖任何预定义谓词或动作模板，也不需要在执行新任务时重复调用 LLM——token 消耗仅发生在域推导阶段，后续规划由 PDDL 求解器零成本完成。
-
-
 
 ### 问题形式化
 
@@ -187,8 +176,6 @@ PDDLLM 的自动化域推导由四个关键模块串联而成，加上一个连�
 
 LoCA 自动将逻辑动作与运动规划器对接，无需人工编写数学约束接口。其核心机制是：检索动作效果集 $\mathcal{P}_{eff}$ 中每个一阶谓词关联的物理约束，将逻辑动作自动转化为标准约束运动规划问题，确保生成轨迹与动作语义一致。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与因果机制验证
@@ -198,7 +185,6 @@ LoCA 自动将逻辑动作与运动规划器对接，无需人工编写数学约
 #### 主结果：规划成功率与泛化能力
 
 **Table 1** 汇总了9项操作任务、1200+个规划问题上的成功率对比（统一50秒时限）。PDDLLM以 **93.3% ± 0.7%** 的总体成功率全面领先，较最强LLM基线LLMTAMP-FF（52.5% ± 0.4%）提升超过40个百分点。在需要长时序推理的复杂任务上优势更为突出：
-
 
 ![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_Y1VgLHbzCC/figures/003_Table_1.jpg]]
 *Table 1: Planning success rate (%) across tasks for all methods (time limit = 50 s). The best results are highlighted in bold. Expert is excluded from the comparison, as it requires additional manual effort and serves as an upper bound*
@@ -211,20 +197,14 @@ LLMTAMP基础版本（无反馈）的总体成功率仅35.7%，凸显了仿真�
 
 **Figure 3** 从两个维度进一步验证泛化性：左图显示PDDLLM在物体数量增至20个时仍保持较高成功率，性能衰减远慢于基线；右图表明PDDLLM在不同时间限制下均饱和最快，50秒即接近性能上限，而基线方法需更长时间才趋于稳定。
 
-
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_Y1VgLHbzCC/figures/005_Figure_3.jpg]]
-*Figure 3: (left) Planning success rate trend across increasing object counts. (right) Overall planning success rate under varying time limits*
-
 #### 与推理LLM的效率对比
 
 **Table 2** 将PDDLLM与使用推理LLM骨干（OpenAI o1、DeepSeek R1）的TAMP方法在三个最复杂任务（Rearrangement、Tower of Hanoi、Bridge Building）上对比。PDDLLM以 **80.5%** 的总体成功率超越o1-TAMP（61.5%）和R1-TAMP（35.9%），同时Token消耗仅为415k，远低于o1-TAMP（666k）和R1-TAMP（725k）。这验证了PDDLLM的核心设计优势：Token仅在域推导阶段一次性消耗，后续规划由符号求解器零Token执行，而推理LLM方法需在每个规划步骤反复调用大模型。
-
 
 ![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_Y1VgLHbzCC/figures/006_Table_2.jpg]]
 *Table 2: Comparison of planning success rate (%) and token cost (k) between PDDLLM and LLMTAMP and the reasoning LLM variants. The best results are shown in bold, and the second-best results are underlined*
 
 **Table 6** 的时间成本对比进一步佐证：PDDLLM在各项任务上的平均规划时间显著低于o1-TAMP变体，域推导的固定开销在复杂任务中被高效的符号求解充分摊薄。
-
 
 ![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_Y1VgLHbzCC/figures/026_Table_6.jpg]]
 *Table 6: Comparison of time cost between PDDLLM and LLMTAMP reasoning variants*
@@ -233,25 +213,14 @@ LLMTAMP基础版本（无反馈）的总体成功率仅35.7%，凸显了仿真�
 
 **Table 3** 量化了自动生成域与专家设计域（性能上界）的差距。在Stack、Burger Cooking、Bridge Building、Tower of Hanoi四个任务上，缺失谓词比例最高为22.2%（Burger Cooking和Bridge Building），冗余谓词比例最高为16.7%（Tower of Hanoi）。缺失的谓词多为复杂高阶逻辑关系（如“clear”的变体），但未直接导致规划失败——这与消融实验中“缺失谓词增加规划时间但不一定导致失败”的观察一致。
 
-
 ![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_Y1VgLHbzCC/figures/007_Table_3.jpg]]
 *Table 3: Percentage of missing or redun- Table 4: Bridge-building success rate (%) under varying dant predicates and actions across tasks. demonstration conditions*
 
 **Table 4** 展示了域修复能力：在Bridge Building任务中，仅提供pick演示时成功率为0%；补充stack演示后升至20%；再补充align演示后跃升至86.7%；即使加入冗余的unstack演示，成功率仍稳定在83.3%。这表明系统能通过增加演示或优化语言指导有效修补缺失谓词。
 
-
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_Y1VgLHbzCC/figures/008_Table_4.jpg]]
-
 #### 真实机器人验证
 
 **Figure 4** 和 **Table 5** 展示了在三个不同硬件平台（Franka、Piper、UR5e）上的部署结果。Tower of Hanoi（Franka）成功率为9/10，Bridge Building（Franka）为8/10，Burger（Piper）和Table-top Stacking（UR5e）均为7/10。逻辑动作直接作为策略条件输入，绕过了仿真中的显式运动约束，验证了从仿真域到真实执行的迁移可行性。
-
-
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_Y1VgLHbzCC/figures/009_Figure_4.jpg]]
-*Figure 4: Real-robot experiment in three different platforms*
-
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_Y1VgLHbzCC/figures/010_Table_5.jpg]]
-*Table 5: Real-world success rate across tasks*
 
 ### 消融实验
 
@@ -266,7 +235,6 @@ LLMTAMP基础版本（无反馈）的总体成功率仅35.7%，凸显了仿真�
 #### 提示风格鲁棒性
 
 **Table 7** 显示PDDLLM对不同提示风格具有高度鲁棒性，生成域的成功率始终接近100%，说明框架不依赖特定的提示工程技巧。
-
 
 ![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_Y1VgLHbzCC/figures/027_Table_7.jpg]]
 *Table 7: Planning success rate for domains generated using different prompt styles*
@@ -292,14 +260,6 @@ LLMTAMP基础版本（无反馈）的总体成功率仅35.7%，凸显了仿真�
 | **Table 4** | 通过补充演示可修复缺失谓词，成功率从0%恢复至86.7% |
 | **Figure 3** | 性能随物体数和时限增加保持鲁棒，饱和速度最快 |
 | **Figure 4** | 三个真实机器人平台成功执行多项操作任务 |
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_Y1VgLHbzCC/figures/028_Table_8.jpg]]
-*Table 8: Planning success rate (%) across tasks for all methods (Time limit = 25 s)*
-
-
-
 
 ## 定位与知识库关联
 
@@ -365,8 +325,6 @@ PDDLLM 开启的“从演示到域”范式引出以下开放问题：
 5. **仿真-现实差距缓解**：当前方法对高精度物理仿真器有较强依赖。如何在仿真不精确的情况下保持域推导的可靠性，是实际部署中的关键挑战。
 
 **验证说明**：上述局限与开放问题均来自论文明确讨论（Section 9 Limitations, Section 11 Future Works），置信度高。关于具体基线工作的引用信息（如 Huang et al., 2022a 等）来自论文参考文献，作者/年份/会议信息以原文为准，未做额外推断。
-
-
 
 ## 原文 PDF
 

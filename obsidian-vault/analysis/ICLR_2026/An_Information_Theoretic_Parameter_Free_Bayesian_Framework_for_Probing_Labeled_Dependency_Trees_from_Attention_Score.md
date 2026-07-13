@@ -53,8 +53,6 @@ IPBP 的方法设计围绕三个关键创新展开：首先，利用核密度估
 
 在方法谱系中，IPBP 定位于无参数句法探测方法，区别于有监督探针（如 **ElasticNet**，Dalvi et al., 2019；**V-Information**，Xu et al., 2020）和无参数相关性分数（如 **Probeless**，Antverg & Belinkov, 2022；**IoU**，Mu & Andreas, 2020）。其核心贡献在于将头重要性度量从多种启发式相关性分数替换为归一化二元互信息，将树重建概率源从原始注意力分数替换为 MI 加权的贝叶斯后验概率，并将依存弧概率空间从单一弧存在扩展为面向所有标签的独立投票联合概率空间。
 
-
-
 ### 句法探针面临的信任危机
 
 大型语言模型（LLM）的内部表征是否编码了句法结构，是神经语言处理领域的核心问题之一。探针（probe）方法作为回答该问题的主要工具，近年来却陷入了“用不可解释性来解释”的困境。现有句法探测方法存在两个相互关联的瓶颈：
@@ -76,8 +74,6 @@ IPBP 的方法设计围绕三个关键创新展开：首先，利用核密度估
 2. **推理与重建**：基于筛选后的注意力证据，通过严格的概率推理重建完整的依存树，而非依赖启发式规则。
 
 论文提出的 IPBP（Information-theoretic Parameter-free Bayesian Probing）框架正是对这一动机的系统性回应。其核心洞察在于：利用核密度估计（KDE）对连续注意力向量建模，通过贝叶斯定理推导后验概率，并设计基于对数意见池化和独立投票概率空间的解码算法，在无外部参数的情况下重建完整带标签的依存树。该方法巧妙地避开了高维 KDE 的维度灾难，同时提供了透明、可解释的头重要性度量。
-
-
 
 ## 核心方法与创新机理
 
@@ -120,8 +116,6 @@ $$P(x_i, x_j; l) = \mathbf{GP}_{\mathcal{H}_l}(x_i, x_j; l) \times \prod_{l' \in
 - **Positive MI vs Binary MI**：仅关注正类标签的 $\mathrm{MI}_{\mathrm{pos}}$ 将 LAS 从 30.6 提升至 34.8（Table 2），表明过滤长尾噪声标签能显著改善标签预测。
 - **专家头消融**：移除 top-5 高 MI 头后，模型在预测需要相应句法信息的下一个 token 时 logits 显著下降（Table 4），直接证明了所识别头确实编码了句法相关信息。
 
-
-
 IPBP 将句法探测拆解为两个串行子任务：**互信息估计**与**依存树重建**。整个流水线无需训练任何外部网络，仅依赖 Transformer 模型在标注语料上产生的注意力分数与依存标签，通过信息论与贝叶斯推理完成从原始注意力到完整带标签依存树的端到端映射。
 
 ### 输入
@@ -162,8 +156,6 @@ $$P(x_i, x_j; l) = \mathrm{GP}_{\mathcal{H}_l}(x_i, x_j; l) \times \prod_{l' \in
 - 每个标签 $l$ 对应的专家头集合 $\mathcal{H}_l$ 及其 $\mathrm{MI}_{\mathrm{binary}}$ 权重
 - 每句的完整带标签依存树（弧方向 + 依存关系类型）
 - 可解释的中间产物：后验密度函数、MI 堆叠图、层-深度相关性等分析工具
-
-
 
 IPBP 将句法探测分解为两个可分离的子任务：互信息估计与树重建。前者量化每个注意力头对特定依存关系的专属信息量，后者以贝叶斯推断的方式将筛选后的注意力分数转化为完整依存树。
 
@@ -213,8 +205,6 @@ $$P(x_i, x_j; l) = \mathbf{GP}_{\mathcal{H}_l}(x_i, x_j; l) \times \prod_{l' \in
 
 IPBP 的一个关键设计在于规避了高维 KDE 的维度灾难。传统方法若直接对多变量联合分布建模，所需样本量随维度指数增长。IPBP 利用混合联合分布与贝叶斯定理，将估计限制在一维条件密度 $f(A_{b,h}|L=l)$ 上，使 KDE 在有限样本下仍保持可靠。
 
-
-
 ## 实验与关键发现
 
 ### 4.1 实验设置概述
@@ -243,9 +233,6 @@ Table 1 进一步展示了跨模型和跨语言的结果概览，验证了 IPBP 
 ### 4.3 头选择的内在评估
 
 头重要性排序的可靠性通过内在评估（Table 3）进行检验。该评估计算各方法两两之间的 label-averaged Spearman-R 一致性。**IPBP 的平均 Spearman-R 达到 0.398，在所有方法中最高**，表明其头重要性排序与其他方法的一致性最强。相比之下，Probeless 和 IoU 等无参数方法的平均一致性较低，而监督方法（如 ElasticNet）虽然在某些标签上表现良好，但整体一致性不及 IPBP。
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_q7raIuTQDK/figures/003_Table_3.jpg]]
-*Table 3: Intrinsic evaluation (label-averaged Spearman-R) between each pair of head-selection methods. Higher value means higher consistency with other methods. Values are averaged for each method in the last row*
 
 ### 4.4 消融实验
 
@@ -286,16 +273,6 @@ Table 4 展示了一个案例研究：移除 top-5 高 MI 头后，模型在预�
 2. **架构依赖**：IPBP 目前仅针对基于 Transformer 的解码器架构 LLM 验证，尚未在编码器-解码器模型中测试；对于未来可能改变注意力机制的模型，需相应适配。
 3. **计算效率**：对于极长句子，Eisner 算法的计算开销可能增大，效率有待优化。
 4. **超参数敏感性**：头选择总数（如 2000）是经验性超参数，缺乏理论指导；带宽选择虽经验最优，但在不同模型和数据分布下可能需要调整。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_q7raIuTQDK/figures/006_Table_5.jpg]]
-*Table 5: Maximum attention-based unbiased attention head analysis results for dependency relationships having top-10 largest maximum attention label recalls*
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_q7raIuTQDK/figures/007_Table_6.jpg]]
-*Table 6: Average token ranks (and average token rank proportions) on UD-2.9 English/French/Spanish train/dev set*
-
-
 
 ## 定位与知识库关联
 
@@ -348,8 +325,6 @@ IPBP 的适用性受以下条件约束：
 4. **无监督句法发现**：在没有现成标注的情况下，能否利用 IPBP 的框架进行无监督的句法发现，值得探索。
 
 5. **跨模型句法知识存储模式**：不同 LLM 的句法知识存储模式有何差异？IPBP 的跨模型系统化分析仍有待开展，这可能为理解模型架构与句法涌现的关系提供关键线索。
-
-
 
 ## 原文 PDF
 

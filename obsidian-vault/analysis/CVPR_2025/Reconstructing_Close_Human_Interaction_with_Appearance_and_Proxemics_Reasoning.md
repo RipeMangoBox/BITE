@@ -56,8 +56,6 @@ claims:
 
 **方法定位**：CloseApp 属于基于优化的交互重建范式，与 **BUDDI**（Muller et al., CVPR 2024）和 **CloseInt**（Huang et al., CVPR 2024）等同期工作相比，其核心差异在于将外观一致性与学习到的空间行为先验统一纳入优化循环。当前框架仅支持双人交互，且要求输入视频中存在部分无接触帧以可靠约束外观分支；优化耗时约 3–5 分钟（128 帧），尚不适用于实时场景。
 
-
-
 ### 近距离交互重建的核心瓶颈
 
 从单目视频中重建多人三维姿态与运动是计算机视觉的核心任务之一，但在**近距离交互**场景下，现有方法面临根本性困难。当两人身体紧密接触时，肢体相互遮挡导致图像中出现严重的**视觉模糊**：同一像素区域可能同时对应多个人的身体部位，使得基于外观的语义分割和关键点检测无法可靠地区分个体归属。即使是最先进的视觉基础模型，如 **ViTPose++** 和时序 **SAM**，在近距离交互案例中也难以清晰分辨人体语义（Figure 1）。这种底层语义的混淆直接导致上层姿态估计方法失效——深度排序错误、肢体互换、穿透等问题频繁出现。
@@ -84,8 +82,6 @@ claims:
 3. **物理约束**：基于可微分距离场精确惩罚身体穿透，确保重建结果的物理合理性。
 
 该方法的关键优势在于：外观、空间先验和物理约束三者协同作用，在优化过程中相互校正——外观约束解决深度歧义，空间先验提供行为合理性，物理约束保证接触真实性，从而在野外视频中恢复可信的近距离交互。
-
-
 
 ## 核心方法与创新机理
 
@@ -122,8 +118,6 @@ $$
 ### 创新总结
 
 CloseApp 的方法论创新并非孤立组件的堆砌，而是通过**外观-空间-物理**三者的因果联动实现突破：外观约束解决视觉模糊和深度歧义，空间先验提供行为合理性边界，物理约束保证接触可信度，三者共同构成一个自洽的优化闭环。这一设计使得框架能够在野外单目视频中恢复出具有正确深度顺序和自然接触的可信交互运动。
-
-
 
 CloseApp 提出一个**双分支优化框架**（Dual-branch Optimization Framework），从单目野外视频中重建近距离双人交互。其核心设计思路是：将人体外观、空间行为先验与物理合理性统一纳入优化目标，以解决因视觉模糊和严重遮挡导致的深度排序与姿态估计失败问题。
 
@@ -162,8 +156,6 @@ Figure 2 揭示了外观分支如何解决深度歧义。UV 高斯图映射到 3
 ### 优化特性
 
 双分支优化在约 3-5 分钟内完成 128 帧的处理，不适用于实时应用。框架假设输入视频中存在至少部分无接触或接触较少的帧，以便可靠地约束外观分支；若全程紧密接触，外观约束的有效性将下降。当前设计仅支持双人交互，尚未扩展至三人及以上场景。
-
-
 
 ### 3.1 运动表征与问题形式化
 
@@ -246,12 +238,8 @@ $$\operatorname*{argmin}_{\pi_m,\pi_a} \mathcal{L} = \mathcal{L}_{\mathrm{app}} 
 
 该目标函数的五项约束形成互补机制：外观损失提供深度排序线索，重投影损失锚定2D观测，穿透损失保证物理合理性，平滑损失和正则化损失维护时序一致性与先验可信度。消融实验（Table 3）证实，移除任一组件均会导致性能下降——外观约束的移除使MPJPE从59.06增至60.68，邻近空间先验的移除进一步增至61.52，而物理约束的移除虽使MPJPE略微改善至57.01，但平均穿透距离从0.81恶化至1.30，验证了各模块的必要性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1746_Reconstructing_Close_Human_Interaction_with_Appearance_and_Proxemics_Rea/figures/002_Figure_2.jpg]]
 *Figure 2: With predicted UV Gaussian maps, we can map the Gaussians to 3D space with a UV coordinate map and splat them to the image plane. We can then reason the depth ordinal relationship and image-model alignment with the rendered and original images. Since the Gaussians should also be consistent across non-occluded frames, the optimization adjusts poses to find an optimal solution in interactive frames, thereby producing accurate depth ordering and poses*
-
-
 
 ## 实验与关键发现
 
@@ -331,18 +319,8 @@ $$\operatorname*{argmin}_{\pi_m,\pi_a} \mathcal{L} = \mathcal{L}_{\mathrm{app}} 
 ![[assets/figures/papers/paper_list_l1746_Reconstructing_Close_Human_Interaction_with_Appearance_and_Proxemics_Rea/figures/006_Figure_4.jpg]]
 *Figure 4: Qualitative comparison with BUDDI [40] and CloseInt [16]. Our method is more robust to visual ambiguity*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1746_Reconstructing_Close_Human_Interaction_with_Appearance_and_Proxemics_Rea/figures/004_Table_1.jpg]]
 *Table 1: Comparisons of existing human-human interaction datasets*
-
-![[assets/figures/papers/paper_list_l1746_Reconstructing_Close_Human_Interaction_with_Appearance_and_Proxemics_Rea/figures/005_Figure.jpg]]
-*Figure: RGB Input*
-
-![[assets/figures/papers/paper_list_l1746_Reconstructing_Close_Human_Interaction_with_Appearance_and_Proxemics_Rea/figures/007_Figure.jpg]]
-*Figure: RGB Ours*
-
-
 
 ## 定位与知识库关联
 
@@ -405,8 +383,6 @@ $$\operatorname*{argmin}_{\pi_m,\pi_a} \mathcal{L} = \mathcal{L}_{\mathrm{app}} 
 4. **跨域泛化**：当前框架在Hi4D（室内）和3DPW（室外）上验证，如何推广至手-物交互、人-物交互等更复杂的交互类型？这需要重新定义“邻近空间先验”的语义范畴。
 
 5. **外观与运动的解耦程度**：当前框架中外观分支与运动分支通过联合优化隐式耦合，是否存在更显式的解耦策略（如先独立优化外观再固定外观优化运动），以提升优化稳定性和效率？
-
-
 
 ## 原文 PDF
 

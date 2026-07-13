@@ -55,8 +55,6 @@ claims:
 
 本工作的核心贡献在于：**首次实现了无需多角色数据的大规模多角色交互合成**，通过“分解-组合”范式将两角色交互模型与强化学习规划相结合，为多智能体运动生成提供了新的方法论视角。
 
-
-
 ### 问题背景
 
 生成逼真且协调的多角色交互是计算机图形学与具身人工智能中的核心挑战，直接关系到虚拟现实、动画制作、游戏开发等应用的沉浸感与表现力。随着扩散模型在单角色和两角色运动生成上的突破，研究者开始探索将交互合成扩展到三个及以上角色的场景。然而，**多角色交互合成面临两个根本性瓶颈**：
@@ -81,8 +79,6 @@ claims:
 - **组合**：设计可协调多角色交互空间，将多角色划分为两角色组并自回归生成各组交互，同时引入过渡规划网络预测重组选择，为交互合成提供条件信号。
 
 这一思路的核心洞见在于：**多角色协调交互的本质不在于同时生成所有角色的运动，而在于在合适的时机让合适的角色组成交互对，并确保组间运动的一致性**。通过将协调问题转化为规划问题，该方法在不依赖多角色训练数据的前提下，实现了从4角色到12角色的可扩展交互合成，并支持向拳击等新运动类型的迁移。
-
-
 
 ## 核心方法与创新机理
 
@@ -122,8 +118,6 @@ $$M_{1:N}^{t} = \mathcal{F}_\theta ( M_{1:N}^{t-1}, \epsilon_{1:N}^{t}, C^{t} )$
 
 这一分解-组合范式使得系统能够从仅有的两角色交互数据中泛化到任意数量角色的协调场景，同时避免了直接生成多角色运动所需的海量标注数据。
 
-
-
 本文提出的多角色交互合成框架是一个自回归条件生成模型，其核心设计思想是将复杂的多角色协调交互分解为两个可组合的子问题：**交互合成**与**过渡规划**。如图 2 所示，整个 pipeline 由两个关键模块串联构成。
 
 **输入与表示。** 多角色交互被形式化为 $T$ 个运动片段的序列，每个片段包含 $N$ 个角色的运动：
@@ -144,15 +138,8 @@ $$C^{t} = f_\theta ( M_{i,j,i',j'}^{t} ) \tag{7}$$
 
 **数据流闭环。** 整个框架形成闭环：交互空间模块生成当前片段的多角色运动 → 规划网络观察运动并预测下一过渡计划 → 过渡计划作为条件驱动下一片段的交互合成。这一设计使得框架能够仅依赖两角色交互数据训练，即可泛化到任意数量角色的协调交互场景，无需多角色密集交互的真值数据。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1926_Chang_et_al_Large_Scale_Multi_Character_Interaction_Synthesis/figures/002_Figure_2.jpg]]
 *Figure 2: Framework overview. Our pipeline is an autoregressive conditional generative model to plan transitions and synthesize interactions for multiple characters. It has two components: The first component divides multiple characters into groups and leverages a pre-trained diffusion-based model to autoregressively generate interactions for each group. The second component predicts a transition plan based on the observed interactions and serves as the conditional signal for the interaction synthesis*
-
-![[assets/figures/papers/paper_list_l1926_Chang_et_al_Large_Scale_Multi_Character_Interaction_Synthesis/figures/001_Figure_1.jpg]]
-*Figure 1: Multi-character interactions coordinated with transition planning. (Left) We highlight the three currently interacting characters with blue, purple, and green, while others are grey. The more saturated the color, the more recent the frame. (Upper right) The key frame of the transition where the blue and purple characters proceed to have a coordinated interaction. (Lower right) The key frame of the transition where the blue and green characters proceed to have a coordinated interaction*
-
-
 
 ### 多角色交互表示
 
@@ -212,16 +199,6 @@ $$HD = \frac{2}{N(N-1)F} \sum_{f=1}^{F} \sum_{i,j \in N} \| h_i^f - h_j^f \|_2^2
 
 其中 $h_i^f$ 表示角色 $i$ 在第 $f$ 帧的髋关节位置，$F$ 为总帧数。该指标对所有角色对在所有帧上的平均平方髋关节距离进行计算，值越大表示角色间距离越远、重叠越少。过渡平滑度（Transition Smoothness, TS）则衡量运动片段衔接处的加速度连续性，值越低表示过渡越平滑。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1926_Chang_et_al_Large_Scale_Multi_Character_Interaction_Synthesis/figures/003_Figure_3.jpg]]
-*Figure 3: Coordinatable multi-character interaction space by group division. We divide multiple characters into groups and re-group them for potential coordination. The group synthesis generates new motions group by group. The newly generated group is conditioned on the already generated ones, which is indicated by red arrows*
-
-![[assets/figures/papers/paper_list_l1926_Chang_et_al_Large_Scale_Multi_Character_Interaction_Synthesis/figures/004_Figure_4.jpg]]
-*Figure 4: The planning network is learned as a policy network via deep reinforcement learning. The action is a transition plan that contains a high-level grouping choice*
-
-
-
 ## 实验与关键发现
 
 ### 主结果：多角色交互合成的定量与定性评估
@@ -248,12 +225,6 @@ $$HD = \frac{2}{N(N-1)F} \sum_{f=1}^{F} \sum_{i,j \in N} \| h_i^f - h_j^f \|_2^2
 
 Table 2 展示了方法在三个扩展场景下的表现。在**添加新角色**场景中，TS 达到 0.026，HD 为 2.450，说明系统能平滑地将新角色融入已有交互。在**大规模场景生成**（12 个角色）中，TS 为 0.075，HD 为 3.372，验证了方法的可扩展性——即使角色数从 4 扩展到 12，过渡平滑度仅轻微退化，且髋关节距离保持在合理范围。在**跨动作类型迁移**（拳击）中，TS 为 0.057，表明预训练的两角色扩散模型与过渡规划网络的组合可以泛化到训练时未见过的动作类型，尽管拳击的交互模式与跳舞存在本质差异。
 
-![[assets/figures/papers/paper_list_l1926_Chang_et_al_Large_Scale_Multi_Character_Interaction_Synthesis/figures/008_Table_2.jpg]]
-*Table 2: Method performance on extended applications. TS denotes transition smoothness and HD, the hip distance*
-
-![[assets/figures/papers/paper_list_l1926_Chang_et_al_Large_Scale_Multi_Character_Interaction_Synthesis/figures/013_Table_2.jpg]]
-*Table 2: Diversity as a quantitative metric*
-
 ### 消融实验：组件贡献分析
 
 Table 4 的消融实验系统性地揭示了各组件的贡献。**移除可协调交互空间和规划网络**（即仅使用原始 InterGen 自回归生成）时，HD 仅为 0.564，TS 为 0.071——角色严重重叠，但过渡平滑度尚可，因为此时角色几乎静止重叠，片段间加速度差异小。**仅保留可协调交互空间但移除规划网络**（InterGen†）时，TS 急剧劣化至 **0.202**，HD 上升至 3.422——分类器引导的社交距离约束虽然拉开了角色距离，但缺乏智能的过渡规划导致片段衔接生硬。**完整方法**实现了 TS=0.075 和 HD=3.372 的最佳平衡，证明两个组件是互补的：可协调空间提供组间距离约束，规划网络提供平滑的过渡信号。
@@ -265,14 +236,9 @@ Table 4 的消融实验系统性地揭示了各组件的贡献。**移除可协�
 
 Table 5 展示了社交距离约束中的阈值 τ 从 0.5 增大到 3.0 的影响。随着 τ 增大，TS 从 0.059 单调上升至 0.092，HD 从 1.723 单调上升至 2.355。这表明平滑度与社交距离之间存在明确的权衡关系：更大的距离阈值强制角色保持更远的距离，但增加了运动衔接的难度，导致过渡不够平滑。该结果为实际部署中的参数选择提供了指导——需根据应用场景对自然度和安全距离的偏好来调节 τ。
 
-![[assets/figures/papers/paper_list_l1926_Chang_et_al_Large_Scale_Multi_Character_Interaction_Synthesis/figures/016_Table_5.jpg]]
-*Table 5: an ablation study on the distance threshold*
-
 ### 失败模式与局限性
 
 尽管方法在定量和定性评估中表现优异，仍存在若干已知局限。首先，**分组策略基于简单的贪婪距离度量**，可能不是最优的分组方式，在复杂场景下可能导致不自然的角色配对。其次，**当角色总数不能被 4 整除时需引入虚拟角色**，虚拟角色的运动由扩散模型自由生成，可能引入不协调的运动模式，影响整体交互质量。第三，**扩散模型在无条件数据集时的控制精度下降**——本方法依赖两角色扩散模型进行组内交互生成，但该模型仅在两角色数据上训练，当通过分类器引导施加组间约束时，生成质量可能受损。这些失败模式提示，在极端场景（如奇数角色数、高度非结构化的交互类型）下，方法的表现需要手动验证。
-
-
 
 ## 定位与知识库关联
 
@@ -325,8 +291,6 @@ Table 5 展示了社交距离约束中的阈值 τ 从 0.5 增大到 3.0 的影�
 本文的核心声明均有较强的实验支撑：主实验（Table 1）在 InterHuman 舞蹈子集上对比了三种方法，完整方法在 TS 和 HD 上均取得最优或接近最优结果；消融实验（Table 4）系统验证了两个组件的独立贡献；用户研究提供了主观质量背书。扩展实验（Table 2）验证了方法的可扩展性和跨类型迁移能力。
 
 需要注意的是，HD 指标的解读存在微妙之处：InterGen 的 HD 极低（0.567），看似“更好”，实则是角色严重重叠的负面表现（Figure 5b 和 Figure 6 提供了视觉证据）。完整方法的 HD 为 1.963，反映了角色维持了合理的社交距离。这一指标的“好坏”方向依赖于具体上下文，读者需结合定性结果综合判断。
-
-
 
 ## 原文 PDF
 

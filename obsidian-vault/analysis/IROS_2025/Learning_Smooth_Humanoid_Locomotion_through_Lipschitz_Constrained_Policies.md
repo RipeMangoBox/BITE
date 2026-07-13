@@ -64,8 +64,6 @@ $$\max_{\pi} J(\pi) - \lambda_{\mathrm{gp}} \mathbb{E}_{\mathbf{s}, \mathbf{a} \
 
 **局限性**：目前仅在仿人机器人步行与转向任务上验证，尚未延伸至跑、跳等更高动态技能；梯度惩罚系数 $\lambda_{\mathrm{gp}}$ 仍需手动调节；真实世界测试局限于特定地形与机器人类别。
 
-
-
 ### 问题背景：从仿真到现实的平滑鸿沟
 
 基于无模型强化学习（RL）的仿人机器人运动控制器，在仿真环境中通常能够学习到高效的运动策略，但这些策略往往表现出高频抖动行为，即所谓的 **bang-bang 控制**。这种不自然的抖动不仅降低了运动的效率和外观质量，更构成了仿真到现实迁移（sim-to-real transfer）的核心障碍——高频动作模式会在真实机器人的执行器、传动机构和传感器链路上产生不可预料的累积误差，导致策略无法成功部署到物理平台上。
@@ -99,8 +97,6 @@ $$\max_{\pi} J(\pi) - \lambda_{\mathrm{gp}} \mathbb{E}_{\mathbf{s}, \mathbf{a} \
 该惩罚项计算策略对数概率关于输入观测的梯度范数的平方，并直接在数据分布上求期望。由于梯度惩罚项是完全可微分的，它可以无缝集成到现有的 RL 框架（如 PPO）中，仅需数行代码即可实现，无需手工设计平滑奖励或引入不可微分的滤波操作。
 
 这种方法的根本优势在于：它将平滑性从间接的奖励塑造或后处理滤波，提升为**策略函数空间上的直接约束**，从而提供了一种简单、通用且可微分的平滑行为生成方案。
-
-
 
 ## 核心方法与创新机理
 
@@ -146,8 +142,6 @@ $$
 - **任务范围局限**：当前验证仅限于步行和转向任务，尚未延伸到跑、跳等高动态技能。高动态运动可能需要更大的策略变化率，梯度惩罚是否仍适用有待验证。
 - **参数敏感性**：$\lambda_{\mathrm{gp}}$ 仍需手动调节，不同机器人形态或任务可能需要重新搜索最优值，尚未实现自动化调参。
 - **动作空间假设**：当前策略输出目标关节位置，通过 PD 控制器转化为力矩。若直接输出力矩，梯度惩罚的效果有待进一步验证。
-
-
 
 ### 问题背景与设计动机
 
@@ -230,8 +224,6 @@ LCP 的核心贡献在于**将平滑性约束从奖励函数层面提升到策�
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2410_11825/figures/001_Figure_1.jpg]]
 *Figure 1: Lipschitz-constrained policies (LCP) provide a simple and general method for training policies to produce smooth behaviors, which can be directly deployed on a wide range of real-world humanoid robots. Our policies exhibit robust behaviors that can recover from external forces and walk across irregular terrain. For full videos, please visit the project website*
 
-
-
 ### 核心洞察：平滑策略的梯度特性
 
 本方法的核心洞察源自一个简单的经验观察：**平滑策略天然具有较小的梯度范数**。如 Fig. 3 所示，使用显式平滑奖励（惩罚关节速度、加速度等）训练的策略，其策略函数关于输入观测的梯度范数显著小于无平滑奖励的策略。这一现象揭示了平滑行为与策略函数梯度之间的内在联系——策略输出关于输入的变化率越小，产生的动作序列越平滑。基于此，LCP 将“鼓励平滑”问题转化为“约束策略梯度范数”问题，从而绕开了传统平滑技术不可微分的根本缺陷。
@@ -290,8 +282,6 @@ $$L_{\mathrm{gp}}(\pi) = \mathbb{E}_{\mathbf{s}, \mathbf{a} \sim \mathcal{D}} \l
 
 梯度惩罚系数 $\lambda_{\mathrm{gp}}$ 是 LCP 的核心超参数。消融实验（TABLE I(b), Fig. 6）表明 $\lambda_{\mathrm{gp}} = 0.002$ 在平滑度和任务回报之间取得了最佳平衡；过大的 $\lambda_{\mathrm{gp}}$ 会过度压制策略的表达能力，显著损害任务学习。目前该系数需要针对不同机器人形态手动调节，尚未实现自动化选择。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设计
@@ -336,8 +326,6 @@ LCP 训练的策略成功**零样本部署**到多种真实仿人机器人（Fig
 
 4. **力矩控制场景未验证**：当前策略输出目标关节位置，通过 PD 控制器转化为力矩。若策略直接输出力矩指令，梯度惩罚的有效性有待进一步验证——力矩输出的高频变化可能对接触动力学有更复杂的影响。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2410_11825/figures/004_Figure.jpg]]
 
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2410_11825/figures/007_Table.jpg]]
@@ -351,8 +339,6 @@ LCP 训练的策略成功**零样本部署**到多种真实仿人机器人（Fig
 
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2410_11825/figures/011_Table.jpg]]
 *Table: IV: Terms and weights of regularization rewards*
-
-
 
 ## 定位与知识库关联
 
@@ -413,8 +399,6 @@ LCP 与上述方法的本质差异在于：**将平滑性约束直接嵌入策�
 5. **极端 Sim-to-Real 鲁棒性**：LCP 在更极端的 sim-to-real 场景下（如高仿真误差、传感器噪声、执行器延迟）的鲁棒性边界在哪里？梯度惩罚本身是否可能放大仿真偏差对策略的影响？
 
 6. **与其他平滑技术的融合**：LCP 与平滑奖励、低通滤波等方法是否可以互补？例如，在 LCP 基础上加入轻量平滑奖励是否能进一步提升 sim-to-real 迁移性能？初步消融实验（TABLE I(a)）显示 LCP 与平滑奖励的组合效果与单独使用相当，但更系统的组合策略值得探索。
-
-
 
 ## 原文 PDF
 

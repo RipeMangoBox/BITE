@@ -52,8 +52,6 @@ claims:
 
 **局限与开放问题**：当前进展受限于3RScan数据集多样性和标注质量，缺乏大规模、高度动态的室内4D数据集。时间信息共享的增益在现有数据规模下趋于饱和，可能需要在更丰富的时序变化场景中验证其上限。此外，ST-mask和ST-serialization单独使用会降低刚性变化性能但组合使用时却能互补的机制尚不明确，值得进一步探究。
 
-
-
 ### 问题背景：从静态场景理解到动态场景演变
 
 3D 语义实例分割（3D Semantic Instance Segmentation, 3DSIS）旨在从单帧点云中同时识别物体类别并区分个体实例。近年来，基于 Transformer 的查询式方法（如 **Mask3D**，Schult et al., ICRA 2023）在这一任务上取得了显著进展。然而，现实世界的室内场景并非静态快照——家具被移动、物品被增减、房间布局随时间演变。理解这些变化对于机器人长期环境交互、AR/VR 场景更新和数字孪生维护至关重要。
@@ -83,8 +81,6 @@ claims:
 本文的核心动机在于：**能否设计一个统一的时空框架，使实例查询能够自适应地融合不同时间阶段的语义与几何信息，从而在稀疏观测条件下同时提升单阶段分割质量和跨阶段身份一致性？**
 
 这一动机催生了 ReScene4D 的核心设计理念——通过跨时间观测的信息共享机制（时空对比损失、时空掩码、时空序列化），让模型在无需密集时序采样或严格几何对齐假设的前提下，学习时间一致的实例表示。
-
-
 
 ## 核心方法与创新机理
 
@@ -120,8 +116,6 @@ ReScene4D 将时间序列中的多个3D扫描表示为统一注册的时空4D点
 
 这些改造点并非孤立存在，而是围绕一个核心因果机制设计：**通过灵活共享不同时间阶段的信息，使实例查询能够自适应地融合语义与几何先验，从而同时提升单阶段分割质量和跨阶段身份一致性**。消融实验（Table 3）证实了这一设计的协同效应：单独使用对比损失或时空序列化均能带来增益，但三者组合时达到最优的 t-mAP 34.8，表明各模块之间存在互补关系——对比损失提供特征层面的时间一致性约束，时空掩码提供注意力层面的跨时间引导，时空序列化提供解码器层面的信息混合路径。
 
-
-
 ReScene4D 的整体 pipeline 围绕一个核心设计展开：将时间上稀疏的 3D 扫描序列建模为统一的时空 4D 点云，并通过跨时间阶段的信息共享机制，使实例查询能够自适应地融合语义与几何先验，从而在单阶段分割质量和跨阶段身份一致性两个维度上同时取得提升。
 
 ### 输入与输出
@@ -150,8 +144,6 @@ ReScene4D 的整体 pipeline 围绕一个核心设计展开：将时间上稀疏
 - **时空掩码池化（ST Masking）**：通过逻辑或池化将不同阶段的掩码注意力引导信号融合，使查询能够跨阶段共享实例定位信息。
 
 - **时空解码器序列化（ST Decoder Serialization）**：在解码器的每个层级，随机混合原始空间序列化模式与跨整个序列的时空序列化模式，使查询在迭代过程中交替感知空间局部结构和时间全局关联。
-
-
 
 ### 问题形式化
 
@@ -206,8 +198,6 @@ $${ \mathrm { t } } \mathrm { I o U } ( p _ { i } ( c ) , g _ { i } ( c ) ) : = 
 ![[assets/figures/papers/paper_list_l41_https_openaccess_thecvf_com_content_CVPR2026_html_Steiner_ReScene4D_Temp/figures/003_Figure_3.jpg]]
 *Figure 3: Toy Examples for Temporal Metrics. Right: summary table showing IoU and t-IoU scores for four cases*
 
-
-
 ## 实验与关键发现
 
 ### 4DSIS 主结果：时间一致性的量化飞跃
@@ -251,15 +241,8 @@ Table 4b 验证了跨时间正负对比对的关键作用。在 4DSIS 训练中�
 
 Figure 3 通过四个典型案例说明了 t-IoU 度量相较于标准 IoU 的必要性。当实例在不同阶段发生移动、变形或部分遮挡时，标准 IoU 可能因某一阶段的高重叠而给出虚高评分，而 t-IoU 取所有阶段的最小 IoU，强制要求跨时间的一致性覆盖。这一设计使 t-mAP 成为同时衡量分割质量与身份一致性的严格指标——Table 1 中所有方法的 t-mAP 均显著低于标准 mAP，印证了时间一致性是当前方法的普遍短板，而 ReScene4D 正是在这一短板上建立了最大优势。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l41_https_openaccess_thecvf_com_content_CVPR2026_html_Steiner_ReScene4D_Temp/figures/001_Figure_1.jpg]]
-*Figure 1: ReScene4D on 4D Semantic Instance Segmentation. Our method outperforms baselines which are unable to accurately assign instance identities of both static and changing objects, across multiple temporal observations of a scene (left). Our method (right) maintains instance identities between the observations, even when instances move or change*
-
 ![[assets/figures/papers/paper_list_l41_https_openaccess_thecvf_com_content_CVPR2026_html_Steiner_ReScene4D_Temp/figures/007_Table_4.jpg]]
 *Table 4: Temporal Information Sharing Ablations. a) We study how different serialization patterns affect performance using the Concerto backbone: ⃝1 Spatial Only (3D) ⃝2 Temporal only (4D) where all serialization patterns traverse the 4D point cloud ⃝3 , Spatio-temporal (3D & 4D) where we randomly shuffle temporal and spatial patterns. b) We evaluate the impact of using positive and negative temporal pairs across temporal stages in contrastive loss. Training and inference on either 3DSIS or 4DSIS. For 4D, mAP is averaged across stages for direct comparison*
-
-
 
 ## 定位与知识库关联
 
@@ -312,8 +295,6 @@ ReScene4D 的性能与预训练 3D 骨干网络强相关。使用 Minkowski 骨�
 4. **极端变化的鲁棒性**：对于外观剧烈变化（如重新装修）或完全不可见的类别变化（如新增家具类型），当前的时空信息共享策略是否仍然鲁棒？对比损失依赖于语义特征的一致性，当实例外观发生根本改变时，正样本对的特征相似性可能不再成立。
 
 5. **与 4D 基础模型的融合**：当前方法将 3D 骨干网络“升维”使用，未来是否可以直接利用 4D 预训练模型（如时空点云自监督学习）来提供更强的时间先验？这可能是突破当前性能瓶颈的方向之一。
-
-
 
 ## 原文 PDF
 

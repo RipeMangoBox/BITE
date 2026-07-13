@@ -155,8 +155,6 @@ Tavatar 提出了一种**几何驱动**的可动画人类化身重建范式，�
 
 传统方法（如 **GaussianAvatar** (Hu et al., CVPR 2024)、**GART** (Lei et al., CVPR 2024)）将高斯的旋转和尺度均交由自由优化，导致高斯与人体网格的形变分离，在OOD姿势下出现高斯漂浮或表面孔洞。**IHuman** (Paudel et al., ECCV 2024) 仅约束旋转而尺度仍自由，未能根本解决该问题。**GoMAvatar** (Wen et al., CVPR 2024) 虽将高斯绑定到网格表面，但缺乏对网格规则性的显式约束。Tavatar 的关键突破在于将尺度、旋转、位置三者全部从网格拓扑中解析确定，使高斯分布与网格变形形成严格的因果绑定，从根本上消除了优化-形变不一致带来的几何伪影。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l22_https_openaccess_thecvf_com_content_CVPR2026_html_Luo_Tavatar_Topology_A/figures/001_Figure_1.jpg]]
 *Figure 1: Method overview. We propose Tavatar, a geometry-driven paradigm that reconstructs high-quality animatable human avatars by analytically deriving Gaussian attributes from a deformable mesh. Our approach includes: Analytical Gaussian Attribute Derivation: All Gaussian positions, scales, and orientations are computed directly from mesh topology yielding structurally correct Gaussian placement, improved surface coverage, and pose-consistent animation across challenging motions. Equilateral Geometry Regularization: An equilateral constraint enforces stable Gaussian binding on the mesh, preventing degeneration and ensuring robust reconstruction quality, especially under large deformations and in...*
 
@@ -243,8 +241,6 @@ Tavatar 在两个主流可动画人类化身基准上进行了系统评估，与
 ### 局限性
 
 尽管 Tavatar 在几何一致性上取得显著突破，其性能仍受两个因素制约。首先，方法性能与底层 SMPL 模型的拟合精度强相关——如果初始模型拟合不准确（例如对极端体型或复杂服装），会限制最终化身质量。其次，当前方法假设服装与身体保持静态拓扑关系，无法处理宽松或动态服装（如裙子飘动），这限制了其在开放场景服装建模中的适用性。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l22_https_openaccess_thecvf_com_content_CVPR2026_html_Luo_Tavatar_Topology_A/figures/004_Figure_3.jpg]]
 *Figure 3: Qualitative comparison on X-Avatar dataset. Our method achieves superior RGB rendering and accurate normal maps across challenging OOD poses. Topology-aware Gaussian binding preserves high-fidelity surface details with anatomically plausible deformations, while baselines exhibit geometric artifacts and surface inconsistencies, validating the effectiveness of our method*

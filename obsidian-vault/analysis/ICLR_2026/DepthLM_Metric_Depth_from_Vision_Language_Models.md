@@ -66,8 +66,6 @@ claims:
 - 在 sunRGBD 数据集上，DepthLM 7B（δ1=0.859）略优于纯视觉模型 DepthPro（δ1=0.835），首次实现VLM与纯视觉模型的可比精度（Table 2）。
 - 在 NuScenes 自动驾驶数据集上，DepthLM 7B（δ1=0.865）较 GPT-5（δ1=0.280）提升 0.585，展现强泛化能力（Table 1）。
 
-
-
 ### 视觉语言模型在3D感知中的困境
 
 视觉语言模型（VLMs）在图像描述、视觉问答等高层语义任务上取得了显著进展，然而最新一代通用VLM在从二维图像理解三维度量空间方面仍表现薄弱。以**GPT-5**（Singh et al., 2025）为代表的顶尖VLM，在度量深度估计基准上的平均δ1精度不足0.4，远低于纯视觉深度估计模型。这一鸿沟揭示了VLM在逐像素3D感知中的两个核心瓶颈。
@@ -87,8 +85,6 @@ VLM通常通过文本坐标（如“像素(320, 240)处的深度”）来指定�
 ### 本文动机
 
 上述分析引出一个核心问题：**能否在不引入任务特定架构和复杂回归损失的前提下，仅通过通用的文本监督微调（SFT），使VLM达到与纯视觉模型相当的度量深度估计精度？** 这需要同时解决像素引用精度和相机模糊两个瓶颈。本文提出DepthLM，通过视觉提示替代文本坐标、以内参条件增强统一焦距，并利用每张图像仅需一个稀疏标注像素的极端稀疏监督，首次实现了VLM在度量深度估计上与专家纯视觉模型可比的精度。
-
-
 
 ## 核心方法与创新机理
 
@@ -132,8 +128,6 @@ DepthLM 的整体流程由三个模块构成（Figure 6）：
 
 3. **VLM Fine-tuning (SFT)**：利用带视觉标记的图像和文本问答对（如“该像素的深度是多少？”）微调预训练 VLM，仅使用文本交叉熵损失，无需回归头或正则化损失。
 
-
-
 ![[assets/figures/papers/paper_list_l36_https_openreview_net_forum_id_ObFVZGnSFN/figures/011_Figure_5.jpg]]
 *Figure 5: Increase number of images vs increase label density. Given the same training dataset size (80K samples), increasing label density while proportionally decreasing the number of images hurts the performance of DepthLM. Figure 6: DepthLM. DepthLM first augment the input image to have a unified focal length. Then, it renders visual markers on the image for pixel reference and uses text to interact with VLMs directly*
 
@@ -167,8 +161,6 @@ DepthLM 的整体流程由三个核心模块串联构成，将标准视觉语言
 
 训练时，焦距统一后的图像会进行随机裁剪（宽度 1000–1400 像素，高度 700–1200 像素），以保持评估时的通用性。统一焦距 $f_{\mathrm{uni}} = 1000$ 在较宽范围内对性能不敏感（Figure 4b），且在所有相机歧义处理策略中表现最优，精度较直接混合训练翻倍（Figure 4a）。
 
-
-
 DepthLM 的方法框架由三个关键模块串联构成，其设计直接回应了 VLM 在逐像素度量深度估计中的两大瓶颈：像素位置引用的精度不足，以及跨数据集相机内参差异导致的尺度模糊。
 
 ### 1. 内参条件图像增强（CamIntriAugmentation）
@@ -200,8 +192,6 @@ $$W' = \frac{f_{\mathrm{uni}}}{f_x} W, \quad H' = \frac{f_{\mathrm{uni}}}{f_y} H
 在解决了像素引用和相机歧义后，DepthLM 不需要任何任务特定的架构修改或回归损失函数。训练仅使用标准的文本监督微调：将数值化的 3D 标签通过模板转换为文本问答对，然后以 next-token prediction 范式对 VLM 进行微调，损失函数为文本 token 上的交叉熵损失。
 
 **关键证据**：Finding 2（Figure 3b）表明，在相同训练数据量下，SFT 与强化学习（GRPO）达到相当的精度，但 SFT 的每样本计算效率高出 8–16 倍。Finding 4（Figure 4c, Figure 5）进一步揭示，每张训练图像仅需 1 个稀疏标注像素即可训练出强大的深度估计模型；在固定训练样本总量下，增加图像数量（降低标签密度）比增加标签密度（减少图像数量）带来更高的精度。这表明图像多样性比标签密度对 VLM 的 3D 理解更为关键。
-
-
 
 ## 实验与关键发现
 
@@ -236,9 +226,6 @@ Table 1汇总了DepthLM与现有VLM在DepthLMBench八个数据集上的平均性
 
 Table 2将DepthLM 7B与六种主流纯视觉度量深度模型进行直接比较。在室外数据集上，DepthLM与DepthPro、Metric3Dv2等专家模型的差距已缩小至3-5%以内；在DDAD上DepthLM达到0.747，略低于Metric3Dv2的0.783（相对差距4.8%）。在室内数据集sunRGBD上，DepthLM以0.859超越DepthPro的0.835。
 
-![[assets/figures/papers/paper_list_l36_https_openreview_net_forum_id_ObFVZGnSFN/figures/014_Table_2.jpg]]
-*Table 2: Comparison with pure vision models. For pure vision models, we use the numbers reported in (Piccinelli et al., 2025), and (Bochkovskii et al., 2024) if some numbers do not exist in (Piccinelli et al., 2025). “-” means no result reported in previous papers. The last column reports the relative accuracy improvement of pure vision models over our model, i.e., ( $\delta _ { 1 } ^ { \mathrm { C V } } - \delta _ { 1 } ^ { \mathrm { O u r s } }$ ) / $\delta _ { 1 } ^ { \mathrm { O u r s } }$ Our model is the first VLM that has comparable accuracy to pure vision models
-
 这一结果具有范式意义：首次证明仅使用文本对话监督和稀疏标注（每图1-4个像素），无需任务特定架构、密集回归损失或深度预测头，VLM即可达到与纯视觉专家模型可比的度量深度精度。纯视觉模型的剩余优势主要体现在平滑区域（图8），因为它们输出密集预测天然具有空间连续性，而DepthLM逐像素独立查询会产生边界清晰的点云，但在非边界区域缺乏平滑先验。
 
 ### 多任务3D理解扩展
@@ -266,22 +253,6 @@ Table 3展示了DepthLM在六类3D理解任务上的泛化能力。在单点深�
 - **Table 1**：与通用VLM和空间VLM的全面对比
 - **Table 2**：与纯视觉度量深度模型的直接精度对比
 - **Table 3**：多任务3D理解扩展结果
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l36_https_openreview_net_forum_id_ObFVZGnSFN/figures/018_Table_4.jpg]]
-*Table 4: Statistics of different training datasets. We report \<images available in the dataset> / \<images used for our training>*
-
-![[assets/figures/papers/paper_list_l36_https_openreview_net_forum_id_ObFVZGnSFN/figures/020_Table_5.jpg]]
-*Table 5: Hyper-parameters of different experiments*
-
-![[assets/figures/papers/paper_list_l36_https_openreview_net_forum_id_ObFVZGnSFN/figures/021_Table_6.jpg]]
-*Table 6: MultiTask performance on individual datasets*
-
-![[assets/figures/papers/paper_list_l36_https_openreview_net_forum_id_ObFVZGnSFN/figures/019_Figure_10.jpg]]
-*Figure 10: SFT vs GRPO with cross dataset evaluation. We show the result when we train on Argoverse2 and evaluate on NuScenes. The trend is similar as in Fig. 3b*
-
-
 
 ## 定位与知识库关联
 
@@ -324,8 +295,6 @@ DepthLM 处于通用视觉语言模型（VLM）与专业纯视觉深度估计器
 3. **多任务联合训练**：利用多任务联合训练是否能进一步增强单任务的泛化性能，并解锁更复杂的 3D 理解能力（如场景重建、物体姿态估计）？
 4. **弱监督与自监督**：在自监督或弱监督设置下，VLM 能否利用海量无标注图像数据进一步提升 3D 感知，减少对标注的依赖？
 5. **推理效率优化**：能否通过设计专门的解码策略或轻量化架构，在保持精度的同时降低逐像素查询的推理开销？
-
-
 
 ## 原文 PDF
 

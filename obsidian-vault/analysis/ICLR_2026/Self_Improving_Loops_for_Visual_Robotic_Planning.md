@@ -54,8 +54,6 @@ SILVR（Self-Improving Loops for Visual Robotic Planning）的核心思路是：
 
 **方法定位**：SILVR 属于视觉规划与自改进学习的交叉，通过解耦环境动力学与动作预测、结合自适应微调循环，实现了样本高效的自改进。与 DSRL（基于扩散策略的强化学习微调）和 BCIL（基于行为克隆的自改进）相比，SILVR 在样本效率和最终性能上均具显著优势。
 
-
-
 机器人学习系统长期面临一个核心瓶颈：**离线训练的视觉规划模型泛化能力有限，而基于行为克隆的在线强化微调方法样本效率低、提升幅度小**。具体而言，依赖静态数据集训练的策略在面对训练分布之外的新任务时性能急剧下降，而将强化学习直接应用于高维视觉观测空间的微调方法（如 DSRL，Wagenmaker et al., 2025）虽然在理论上可行，但在实践中每轮迭代仅能获得微弱的性能增益，难以有效利用在线交互数据。
 
 这一瓶颈的因果根源在于**视觉规划将环境动力学建模与动作预测解耦**。动力学模型描述的是“世界如何变化”，其底层规律在不同任务间具有更强的可迁移性；而动作预测则高度依赖具体任务和机器人本体。现有方法未能充分利用这一结构特性：纯离线方法将两者绑定训练，限制了动力学模型的泛化潜力；在线微调方法则试图直接优化端到端策略，忽略了动力学模型可以作为更高效的迁移媒介。
@@ -65,8 +63,6 @@ SILVR（Self-Improving Loops for Visual Robotic Planning）的核心洞察正是
 此外，SILVR 还通过逆概率自适应（IPA）机制，可选地将互联网预训练的大规模视频模型（如 AnimateDiff）与域内模型组合。这一设计在真实世界机器人任务中尤为关键——互联网视频先验提供了丰富的视觉常识和物理直觉，弥补了域内数据在多样性和覆盖度上的不足，使视觉规划器在真实环境的复杂视觉条件下仍能有效运作。
 
 从更宏观的视角看，SILVR 提出了一种**数据驱动、模型自适应的机器人学习新范式**：系统不再依赖人工设计的奖励函数或海量离线数据，而是通过与环境的闭环交互，自主筛选有益经验并持续改进自身。这一范式为视觉机器人规划在开放环境中的部署提供了可行的技术路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -97,8 +93,6 @@ $$\tilde{\epsilon}_{\mathrm{inv}} = \epsilon_{\mathrm{general}}(\tau_t, t) + \al
 ### 创新协同效应
 
 上述三个 changed slots 并非孤立生效，而是通过**解耦-组合-筛选**的协同机制产生放大效应：解耦的动力学模型降低了微调难度，互联网先验提供了泛化基础，稀疏筛选确保了数据质量。消融实验（Table A11）证实，仅微调 IDM 或仅微调视频模型均导致性能快速饱和，同时更新两者对处理对象和运动高度新颖的任务至关重要——这验证了视觉规划解耦设计的核心价值。
-
-
 
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_SzUgx5r3wy/figures/001_Figure_1.jpg]]
 *Figure 1: SILVR Framework. SILVR has access to two pretrained video generative models (left): one pretrained generally on internet-scale data and another pretrained on a general set of in-domain demonstrations. By default, SILVR uses the in-domain video model as a visual planner, which when utilized to interact with the environment, is able to achieve successful trajectories even for initially unseen tasks. These trajectories are then iteratively fed back to finetune the in-domain model (right), thus improving the overall quality of future visual planning as a whole through self-collected online experience. SILVR can optionally incorporate internet-scale pretrained video models as prior, which partic...*
@@ -138,8 +132,6 @@ SILVR 框架由四个核心模块串联构成一条闭环自改进流水线（Fi
 
 自改进循环约在 5 轮后趋于饱和，缺乏显式探索机制使模型可能陷入局部策略最小点。当前框架依赖手工子任务分解处理长时序任务，尚未实现端到端自改进。
 
-
-
 SILVR 框架由四个核心模块构成，其设计根植于一个关键洞察：**视觉规划将环境动力学建模与动作预测解耦**，而单独学习的环境视觉动力学比直接映射观测到动作的端到端策略更易迁移。这一解耦使得域内视频模型成为自改进循环中的主要优化对象，逆动力学模型则承担将视觉预测转换为可执行动作的桥梁角色。
 
 ### 域内文本到视频生成模型
@@ -162,8 +154,6 @@ $$\tilde{\epsilon}_{\mathrm{inv}} = \epsilon_{\mathrm{general}}(\tau_t, t) + \al
 
 自改进循环（Algorithm 1）将上述模块串联为迭代优化流程：每轮迭代采集 30 条轨迹，经稀疏奖励信号（地面真值或 VLM）筛选成功样本，随后同时微调域内视频模型和逆动力学模型。该循环的样本效率优势源于其与 DSRL 的根本差异——DSRL 的性能瓶颈不在于梯度更新步数（Table A7 显示 150 步与 60,000 步更新效果相近），而在于经验收集本身的质量。SILVR 通过视觉规划的动力学解耦，使有限的经验能更有效地转化为模型改进。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与因果机制
@@ -176,12 +166,10 @@ $$\tilde{\epsilon}_{\mathrm{inv}} = \epsilon_{\mathrm{general}}(\tau_t, t) + \al
 
 **Table 1** 报告了 SILVR 在 12 个未见 MetaWorld 任务上的平均成功率。SILVR（使用地面真值过滤）在第 4 轮迭代时达到 **44.2%（±4.5）**，远超 DSRL 的 **7.7%（±3.4）** 和 BCIL 的 **23.2%（±0.9）**，相对提升分别为 +36.5 和 +21.0 个百分点。SILVR 从第 1 轮起即显著优于所有基线，且性能随迭代单调递增。进一步将最终轮视觉规划器蒸馏为轻量扩散策略（SILVR-Distilled DP）后，平均成功率进一步提升至 **49.2%（±3.4）**，部分任务在蒸馏后反而表现更好。
 
-
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_SzUgx5r3wy/figures/002_Table_1.jpg]]
 *Table 1: SILVR Results on MetaWorld. We report the average performance over 12 unseen Meta-World tasks for SILVR and all baseline methods, each aggregated over three seeds. We also provide the performance of diffusion policy distilled from the video model from the last SILVR iteration, denoted as “SILVR-Distilled DP”. SILVR outperforms all baselines by a large margin since Iteration 1. Furthermore, SILVR-Distilled DP achieves the best overall performance*
 
 **Figure 4** 展示了 SILVR 在 10 轮迭代中的性能趋势：成功率持续单调递增，但第 5 轮后增益递减并趋于饱和，最终轮（第 9 轮）达到 53.1%。这表明自改进循环的边际收益在约 5 轮后显著收窄，模型可能陷入局部策略最小点。
-
 
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_SzUgx5r3wy/figures/011_Figure_4.jpg]]
 *Figure 4: SILVR results on MetaWorld for 10 iterations. We report effects of training SILVR on an extended amount of iterations. On the left plot, we show that performance continues to monotonically increase, but with diminishing improvements and effective saturation past iteration 5. On the middle and right plots we visualize a comparison between the final iteration visual planner against its distilled student BC policy from the visual planner across 6 tasks, where we observe that certain tasks actually improve after distillation*
@@ -203,7 +191,6 @@ $$\tilde{\epsilon}_{\mathrm{inv}} = \epsilon_{\mathrm{general}}(\tau_t, t) + \al
 #### 数据过滤信号
 
 **Figure 5** 和 **Table 1** 表明，将数据过滤信号从地面真值替换为视觉语言模型（VLM，如 GPT-5、Gemini）后，SILVR 仍能迭代改进，但最终性能略低（VLM 过滤：38.4% vs GT 过滤：44.2%）。这验证了框架不依赖精确人工奖励信号——VLM 提供的稀疏、带噪反馈足以驱动自改进。
-
 
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_SzUgx5r3wy/figures/013_Figure_5.jpg]]
 *Figure 5: Ablations on data filtering. We compare the effect filtering has on success rate (yaxis) across iterations of finetuning (x-axis), on both MetaWorld (5a) and Panda arm (5b) setups. On MetaWorld (left plot), we further report accuracy when filtering is performed by a VLM. We observe SILVR consistently improves task even without access to ground-truth filtering signals*
@@ -240,13 +227,8 @@ $$\tilde{\epsilon}_{\mathrm{inv}} = \epsilon_{\mathrm{general}}(\tau_t, t) + \al
 - SILVR 框架能否与高效的子任务分割机制无缝结合，从而处理任意复杂的长时序任务？
 - 在使用 VLM 作为奖励信号时，如何量化和减少其固有偏差及噪声对自改进的影响？
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_SzUgx5r3wy/figures/029_Table_11.jpg]]
 *Table 11: Table A11: Component Update Ablations. We report the mean success rate and standard deviation across 12 unseen tasks, aggregated over 3 seeds each*
-
-
-
 
 ## 定位与知识库关联
 
@@ -305,8 +287,6 @@ SILVR 的自改进依赖于域内视频模型与逆动力学模型（IDM）的�
 - SILVR 框架能否与高效的子任务分割机制无缝结合，从而处理任意复杂的长时序任务？这需要将自改进循环从单任务扩展到任务层次结构。
 
 - 在使用 VLM 作为奖励信号时，如何量化和减少其固有的偏差及噪声对自改进的影响？VLM 过滤引入了新的不确定性来源，其长期效应尚不明确。
-
-
 
 ## 原文 PDF
 

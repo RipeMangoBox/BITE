@@ -59,8 +59,6 @@ claims:
 
 **局限与开放问题** 几何注释依赖 MegaSaM，在主要移动物体主导或共线运动等极端条件下精度受限；场景分布受限于手动筛选的关键词与偏好，存在地理和内容偏差。未来可探索向 LiDAR 等传感器模态扩展，以及更强的 3D 推理能力以提升自动化标题质量。
 
-
-
 ### 空间智能的数据瓶颈
 
 空间智能（Spatial Intelligence）旨在赋予机器理解、推理并与三维世界交互的能力，其核心在于对场景几何结构、相机运动与语义关系的联合建模。近年来，视频生成模型和三维重建方法取得了显著进展，但一个根本性瓶颈始终存在：**现有视频数据集普遍缺乏大规模、高质量且显式带有几何与语义标注的动态场景数据**。
@@ -94,8 +92,6 @@ Table 1 系统性地对比了 SpatialVID 与已有空间信息数据集的关键
 
 这种“几何+语义”双重注释的设计，使得 SpatialVID 能够同时服务于相机控制视频生成、新视角合成、相机姿态估计等多种下游任务，为空间智能模型的训练提供了前所未有的数据基础。
 
-
-
 ## 核心方法与创新机理
 
 SpatialVID 的核心创新在于将大规模互联网视频转化为首个同时具备**密集几何标注**与**空间感知语义标题**的动态场景数据集，从而为空间智能模型提供显式的 3D 归纳偏置。相较于现有数据集，其关键突破体现在以下三个维度的“changed slots”上。
@@ -113,8 +109,6 @@ SpatialVID 的核心创新在于将大规模互联网视频转化为首个同时
 与 Panda-70M 等大规模但运动匮乏的数据集不同，SpatialVID 从**手动筛选运动丰富的 YouTube 视频**出发（Section 3.1），经过层次化质量过滤（美学、亮度、文字遮挡、运动强度四个维度）和基于运动轨迹与场景类别的平衡采样，形成高质量子集 SpatialVID-HQ。Figure 5 的分布对比显示，Panda-70M 中超过 80% 的视频因运动不足无法重建，且其相机轨迹高度集中在静态视点；而 SpatialVID-HQ 在美学、亮度、运动等指标上分布更紧凑，同时拥有更丰富的弯曲/转向轨迹，验证了主动筛选与过滤策略的有效性。
 
 **证据强度评估**：上述三个 changed slots 均有明确的实验锚点支撑——几何注释改进体现在 MegaSaM 轨迹对比（Figure 10）和下游任务增益（Table 3 中微调后 ATE 下降）；空间感知标题的有效性由 Figure 4 的定性纠正案例和 Table 2 中 SpatialVID-HQ 在所有基准上取得最低 TransErr 间接验证；质量筛选的优势则由 Figure 5 的分布对比直接证实。需注意，当前几何注释仍依赖 MegaSaM 框架，在极端共线运动或大动态物体主导场景下可能失效（Section 3.3），这是该创新点的已知边界。
-
-
 
 SpatialVID 的构建流程采用“收集—过滤—注释—采样”四阶段流水线，将互联网视频转化为具备显式几何与语义标注的大规模空间智能数据集。图 2 给出了流水线总览：从手动筛选的运动丰富型网络视频出发，依次经过层次化质量过滤、几何与语义双通道注释，最后通过运动与类别均衡采样得到高质量子集 SpatialVID-HQ。
 
@@ -135,12 +129,8 @@ SpatialVID 的构建流程采用“收集—过滤—注释—采样”四阶段
 
 整个流水线的关键设计在于：几何注释与语义注释并非独立进行，而是通过相机姿态先验将两者耦合——LLM 在生成标题时显式接收相机运动信息，从而纠正纯视觉模型容易产生的空间方向误判。这一闭环机制使得 SpatialVID 的标注同时具备几何精度与语义丰富性，为下游模型学习显式 3D 归纳偏置提供了基础。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l828_https_arxiv_org_abs_2509_09676/figures/003_Figure_2.jpg]]
 *Figure 2: Overview of the curation pipeline. The pipeline comprises three stages: filtering, annotation, and sampling. We start from manually collected web videos with notable camera motion. In the filtering stage, raw videos are hierarchically preprocessed and filtered. The annotation stage adds geometric and semantic labels and derives motion instructions from camera poses. The sampling stage then balances clips by motion and category to form a high-quality subset (SpatialVID-HQ) with well-distributed classes for downstream tasks*
-
-
 
 ### 3.1 几何信息注释模块
 
@@ -164,9 +154,6 @@ SpatialVID 的几何注释管线以改进版 MegaSaM 为核心，为每个视频
 2. **LLM 空间精炼**：Qwen3-30B-A3B 接收 VLM 输出，并显式注入相机姿态先验，修正方向错误、补充空间细节，最终生成结构化标题。
 
 Figure 4 展示了空间增强的典型效果：LLM 利用姿态信息将 VLM 输出的错误方向“向右”纠正为“向左”。
-
-![[assets/figures/papers/paper_list_l828_https_arxiv_org_abs_2509_09676/figures/005_Figure_4.jpg]]
-*Figure 4: Effect of spatial enhancement. After applying spatial enhancement, the LLM corrected the incorrect direction (right) output by the VLM to left*
 
 ### 3.4 关键公式
 
@@ -196,15 +183,8 @@ $$\mathcal{L}_{\mathrm{total}} = \lambda_{1} \mathcal{L}_{\mathrm{mse}} + \lambd
 
 几何注释模块的输出（相机姿态、深度图）是运动指令分解和语义标题生成的前提条件。运动指令从姿态序列中派生，而语义标题的空间准确性依赖于姿态先验的注入。这种级联设计使得各模块的输出相互校验：例如，LLM 可依据姿态信息纠正 VLM 的方向误判，形成闭环的质量保障机制。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l828_https_arxiv_org_abs_2509_09676/figures/004_Figure_3.jpg]]
-*Figure 3: Structured caption generation. A VLM produces initial motion and scene descriptions, which the LLM refines using camera poses to yield structured captions*
-
 ![[assets/figures/papers/paper_list_l828_https_arxiv_org_abs_2509_09676/figures/014_Figure_10.jpg]]
 *Figure 10: Comparison of MegaSaM with other SLAM/3D reconstruction methods. We visualize the trajectories predicted by six representative methods. The color order ROYGBV corresponds to the progression from the initial to the final time step*
-
-
 
 ## 实验与关键发现
 
@@ -265,30 +245,14 @@ $$\mathcal{L}_{\mathrm{total}} = \lambda_{1} \mathcal{L}_{\mathrm{mse}} + \lambd
 
 这些失败模式可能影响个别片段的注释精度，但论文未提供受此类问题影响的片段比例统计，该点需要进一步验证。此外，数据集的 YouTube 来源和手动筛选策略可能引入地理与内容偏好偏差，尽管规模达 7,089 小时，场景分布的代表性仍需在更广泛的下游任务中持续评估。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l828_https_arxiv_org_abs_2509_09676/figures/002_Table_1.jpg]]
 *Table 1: Comparisons with previous datasets with spatial information. SpatialVID is a million-level, dynamic and open-scenario high-quality video dataset with rich annotated geometric and semantic information. Syn. denotes synthetic data; Sta. and Dyn. indicate static and dynamic scenes. In Geometry Info. column, C. denotes camera, D. denotes depth or point cloud*
 
 ![[assets/figures/papers/paper_list_l828_https_arxiv_org_abs_2509_09676/figures/007_Table_2.jpg]]
 *Table 2: Quantitative comparison of camera-controlled video generation performance across different training datasets on Sekai-Real [31], RealEstate10K[82], and SpatialVID benchmarks*
 
-![[assets/figures/papers/paper_list_l828_https_arxiv_org_abs_2509_09676/figures/008_Figure_6.jpg]]
-*Figure 6: Different training datasets performance on SpatialVID. Under identical training settings, models trained on our dataset produce videos with more consistent appearance and significantly improved camera controllability*
-
 ![[assets/figures/papers/paper_list_l828_https_arxiv_org_abs_2509_09676/figures/009_Table_3.jpg]]
 *Table 3: Comparison of Original and Fine-tuned Models for Camera Pose Estimation on Sintel [2], TUM-dynamics [48], and Dycheck [16]*
-
-![[assets/figures/papers/paper_list_l828_https_arxiv_org_abs_2509_09676/figures/010_Table_4.jpg]]
-*Table 4: Comparison of GS-LRM across different training datasets on DL3DV [33] and our SpatialVID*
-
-![[assets/figures/papers/paper_list_l828_https_arxiv_org_abs_2509_09676/figures/017_Figure_14.jpg]]
-*Figure 14: Distribution of camera motion directions. The donut charts show the distribution of camera motion directions for the SpatialVID (left) and HQ SpatialVID (right) datasets. The original SpatialVID dataset exhibits a wide range of motion patterns. In contrast, the HQ SpatialVID dataset features a more balanced distribution, addressing the overrepresentation of any single motion direction*
-
-![[assets/figures/papers/paper_list_l828_https_arxiv_org_abs_2509_09676/figures/020_Figure_15.jpg]]
-*Figure 15: Statistical analysis of the caption data. Fig. (a) and Fig. (b) show the length distributions for motion and scene captions, respectively, comparing the original captions to our enhanced versions. A significant increase in caption length is evident for both types after enhancement*
-
-
 
 ## 定位与知识库关联
 
@@ -329,8 +293,6 @@ SpatialVID 的几何注释管线对 MegaSaM 的深度模块进行了关键升级
 - **空间感知标题的质量上限**：当前结构化标题由 Gemini-2.0-Flash 解析视觉内容、Qwen3-30B-A3B 结合相机姿态精炼生成（Figure 3）。Figure 4 展示了空间增强对方向纠正的有效性，但标题的 3D 空间推理能力仍受限于 VLM/LLM 的固有局限。引入更强的 3D 推理能力（如 3D 场景图生成、空间关系推理模块）是否能进一步提升标题的空间准确性，是一个值得探索的方向。
 
 - **注释管线的自动化与规模化**：当前管线中的人工筛选环节（手动筛选运动丰富的 YouTube 视频）是数据集质量的关键保障，但也构成了规模化的瓶颈。如何自动化识别“运动丰富且适合 3D 重建”的视频片段，同时保持与人工筛选相当的质量标准，是实现更大规模空间智能数据集的关键挑战。
-
-
 
 ## 原文 PDF
 

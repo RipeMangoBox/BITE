@@ -52,8 +52,6 @@ claims:
 
 **主要结果**：在 Consistent4D 基准上，L4GM 取得了最优的 LPIPS（0.12）、CLIP（0.94）和 FVD（691.87），同时推理仅需约3秒，比优化类方法快100至1000倍。消融实验证实：3D预训练不可或缺（移除后模型无法收敛），时间自注意力消除了闪烁并显著提升PSNR，端到端微调优于冻结基础层。用户研究也表明，L4GM 在总体质量、3D外观、视频对齐度和运动真实感四个维度上均获得最高偏好。
 
-
-
 ### 4D内容生成的范式瓶颈
 
 从视觉输入重建动态3D内容（即4D重建）是计算机视觉与图形学中长期存在的挑战。这一任务的核心目标是从有限的观测中恢复随时间变化的三维几何与外观，使生成的4D资产能够从任意视角、任意时刻被自由渲染。近年来，随着3D高斯泼溅（3D Gaussian Splatting）等显式表示方法的成熟，静态3D重建已取得显著进展——例如，基于大规模重建模型（Large Reconstruction Model, LRM）的前馈方法能够在数秒内从少量多视图图像中直接预测3D高斯椭球参数，无需逐场景优化。
@@ -75,8 +73,6 @@ L4GM的提出基于一个关键的因果洞察：**静态3D重建模型已经学
 ### 方法定位与边界
 
 L4GM被设计为一个**前馈的、以单目视频加首帧多视图为输入的4D高斯重建模型**。其输出是T组3D高斯参数（每组对应一个时间步），共同构成4D表示。模型明确假设输入视频由静态相机拍摄、对象处于约0°仰角，且场景以单个前景物体为主。这些假设简化了问题空间，但也划定了当前方法的适用范围——自视角视频、多对象遮挡场景以及大幅仰角变化的输入不在设计目标之内。
-
-
 
 ## 核心方法与创新机理
 
@@ -107,8 +103,6 @@ L4GM 在预训练 LGM 的 U-Net 架构中，**在每个跨视图自注意力层�
 
 值得注意的是，消融实验（Figure 6a）表明，**若不加载 LGM 的3D预训练权重，模型完全无法收敛**，这从反面印证了预训练几何先验是整个方法体系的基石。而基于 HexPlane 的变形场替代方案在大规模训练中失效（PSNR 提升缓慢且输出近乎静态，Figure 6b），进一步凸显了“预训练迁移+时间注意力”这一技术路线的独特优势。
 
-
-
 L4GM 的整体 pipeline 以“将静态 3D 重建能力迁移至时空域”为核心设计理念，构建在预训练好的 **LGM**（Large 3D Gaussian Reconstruction Model）之上。其输入为一段单目视频以及该视频第一帧对应的多视角图像，输出为与输入帧数对应的 **4D 高斯表示**——即每个时间步一组独立的 3D Gaussian 椭球集合，从而形成动态的 4D 资产。
 
 整个框架由以下关键模块串联而成：
@@ -136,12 +130,8 @@ L4GM 的整体 pipeline 以“将静态 3D 重建能力迁移至时空域”为�
 
 整个 pipeline 的突出特性在于：仅需第一帧的多视角图像即可驱动全部时间步的 3D 一致重建，无需逐帧独立生成多视图，也无需任何测试时优化。这使其在保持极高推理速度（约 3 秒）的同时，实现了时空连贯的 4D 内容生成。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2406_10324/figures/002_Figure_2.jpg]]
 *Figure 2: L4GM. The overall model architecture of L4GM. Our model takes a single-view video and single-time step multiview images as input, and outputs a set of 4D Gaussians. It adopts a U-Net architecture and uses cross-view self-attention for view consistency and temporal cross-time self-attention for temporal consistency*
-
-
 
 ### 3D高斯椭球参数化
 
@@ -205,8 +195,6 @@ $$\mathcal{L} = \mathcal{L}_{\text{RGB}} + \mathcal{L}_{\text{Mask}}$$
 
 该模块由L4GM微调而来，用于将重建帧率提升至输入帧率的3倍（Section 4.3, Figure 3右）。输入为两个连续时刻的多视图渲染图像，输出为中间时刻的高斯参数集。对于中间帧的监督信号，采用两端多视图RGB像素的加权平均作为伪真值。
 
-
-
 ## 实验与关键发现
 
 ### 主要结果：视频到4D重建基准
@@ -251,8 +239,6 @@ L4GM在Consistent4D基准（8个合成动画）上进行了系统评估，对比
 
 这些失败模式指向了方法的核心假设边界：静态相机、0°仰角、单对象。突破这些限制需要重新设计输入表示或引入显式的相机位姿估计模块。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2406_10324/figures/007_Figure_6.jpg]]
 *Figure 6: PSNR plot. a) Training with different pretrain and training data. b) Training with different design choices. c) Per-frame PSNR with different video lengths T , AR denotes autoregressive*
 
@@ -266,8 +252,6 @@ L4GM在Consistent4D基准（8个合成动画）上进行了系统评估，对比
 
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2406_10324/figures/011_Table_4.jpg]]
 *Table 4: Comparison between L4GM and state-of-the-arts approaches on full metrics in the Consistent4D benchmark. Baseline results are from [15]*
-
-
 
 ## 定位与知识库关联
 
@@ -307,8 +291,6 @@ L4GM 的关键知识贡献在于证明了**3D预训练对4D前馈重建是不可
 4. **大规模真实数据训练**：模型仅在合成的 Objaverse-4D 数据集上训练（尽管对 ActivityNet 真实视频和 Sora/Veo 生成视频有良好泛化）。在大规模真实世界4D数据上训练能否进一步提升泛化性和鲁棒性，尚待验证。
 
 5. **高层编辑能力缺失**：L4GM 目前仅支持从视频重建4D资产，缺乏人机交互的4D编辑能力（如局部运动编辑、材质修改等）。发展更高级的交互式4D编辑功能是面向专业应用的重要方向。
-
-
 
 ## 原文 PDF
 

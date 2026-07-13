@@ -53,8 +53,6 @@ claims:
 
 实验结果表明，FlowSG在PSG和VG数据集的开放/封闭词汇设定下均取得领先性能：在PSG SGDet任务上，R@50/mR@50分别达到46.3/42.7，较此前最佳方法 **USG-Par** (Wu et al., CVPR 2025) 提升约3个点；在VG SGDet上同样获得约3个点的提升。消融实验证实，FMA模块和全局图像交叉注意力是性能的关键支撑，移除FMA导致R@50从46.3骤降至40.5。
 
-
-
 ### 场景图生成：从分类到构建的范式反思
 
 场景图生成（Scene Graph Generation, SGG）旨在将图像解析为结构化的图表示，其中节点对应对象实例（携带类别标签与边框坐标），边则编码对象间的语义关系（谓词）。这一结构化的中间表示在视觉问答、图像描述、具身导航等下游任务中扮演着关键角色。
@@ -82,8 +80,6 @@ claims:
 - **全局约束注入**：图Transformer的图感知架构天然支持跨节点和跨边的信息交互，使得每一步的精炼都能感知全局图结构，从而产出语义与几何一致的高质量场景图。
 
 这一范式转变的核心问题可以凝练为：**“能否构建场景图，而非分类场景图？”**——这也正是本文标题所提出的根本追问。Figure 1 直观对比了三种范式的差异：两阶段和单阶段方法均是一次性决策，而FlowSG则从一个初始噪声图开始，通过图像条件的迭代去噪逐步生长出结构一致的场景图。
-
-
 
 ## 核心方法与创新机理
 
@@ -127,8 +123,6 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{CFM}} + \lambda \mathcal{L}_{\mathrm{DFM}}$
 
 FlowSG 的四个 changed slots 构成了一个完整的渐进生成闭环：**离散码本**将视觉特征转化为可预测的标记，**混合流匹配损失**驱动语义与几何的联合去噪，**图Transformer中的ReSA和FMA**在每一步迭代中动态更新关系后验，最终实现从噪声图到语义-几何一致性场景图的逐步构建。这一范式超越了传统 SGG 的“分类”思维，将场景图生成重新定位为**约束感知的迭代生成过程**。
 
-
-
 FlowSG 将场景图生成重新定义为从噪声图到目标图的**连续时间传输问题**，核心 pipeline 由三个紧密耦合的模块构成：场景图标记化（VQ‑VAE）、混合流匹配（Hybrid Flow Matching）和图 Transformer 去噪器（Graph Transformer Denoiser）。整体流程如图 2 所示。
 
 **输入与初始化。** 给定输入图像 $I$，冻结的检测器 $\Phi_{\det}$ 输出 $N$ 个区域提议，包含 RoI 特征 $\mathbf{f}_i$、类别 logits $\mathbf{s}_i$ 和边框 $\mathbf{b}_i$。这些提议构成初始场景图的节点骨架。值得注意的是，对象类别在此阶段**不被掩码**，而是作为先验信息引导后续关系与外观的生成，从而简化训练并增强稳定性；关系类型与外观编码则被完全掩码，边框从标准高斯噪声初始化。
@@ -145,12 +139,8 @@ FlowSG 将场景图生成重新定义为从噪声图到目标图的**连续时�
 
 **输出与损失。** 最终目标场景图 $G_1$ 包含对象类别、外观编码、边框坐标和谓词关系。整体训练目标为组合损失 $\mathcal{L} = \mathcal{L}_{\mathrm{CFM}} + \lambda \mathcal{L}_{\mathrm{DFM}}$，其中 $\mathcal{L}_{\mathrm{DFM}}$ 对对象外观和关系谓词的离散索引分别计算时间条件交叉熵。消融实验证实，移除 FMA 模块导致 PSG SGDet R@50 从 46.3 骤降至 40.5（‑5.8），丢弃全局图像交叉注意力则导致最大降幅（R@50 降至 39.2），验证了各模块在耦合语义与几何生成中的关键作用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2447_https_arxiv_org_abs_2604_18623/figures/002_Figure_2.jpg]]
 *Figure 2: The overview of our FlowSG. (Left) Image-guided iterative scene graph generation via flow matching. Starting from a noised graph*
-
-
 
 ### 4.1 场景图标记化（VQ-VAE）
 
@@ -260,8 +250,6 @@ $$
 
 离散部分则根据预测的速率矩阵 $R_\theta$ 进行采样跳转，最终输出完整的场景图。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -294,16 +282,11 @@ FlowSG 在封闭词汇和开放词汇两种设定下均取得了领先的场景�
 - **推理效率**：渐进式生成需要多步 ODE 积分，推理成本高于单次前向传递的确定性方法。论文未提供推理时间对比或步数-性能权衡分析，实际部署效率需进一步评估。
 - **开放场景的边界**：尽管开放词汇实验表现优异，但 FlowSG 仍依赖预定义的 VQ-VAE 码本对视觉特征和谓词进行离散化。在完全开放的、不断涌现新视觉概念和关系的环境中，码本的覆盖率和更新机制仍是未解决的问题。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2447_https_arxiv_org_abs_2604_18623/figures/003_Table_1.jpg]]
 *Table 1: Results of two-stage methods on PSG and VG under the closed-set protocol. † denotes reproduced numbers. Best and second-best are marked in bold and underlined, respectively*
 
 ![[assets/figures/papers/paper_list_l2447_https_arxiv_org_abs_2604_18623/figures/004_Table_3.jpg]]
 *Table 3: Compared to the state-of-the-art PSG and SGG models on the VG and PSG dataset in the open-set [4] scenario. ∗ denotes training with the same dataset*
-
-![[assets/figures/papers/paper_list_l2447_https_arxiv_org_abs_2604_18623/figures/005_Table_2.jpg]]
-*Table 2: Performance of one-stage methods on VG dataset on SGDet task in the closed-set scenario*
 
 ![[assets/figures/papers/paper_list_l2447_https_arxiv_org_abs_2604_18623/figures/006_Table_4.jpg]]
 *Table 4: Ablation of graph transformer components on PSG under the closed-set SGDet; “MA” denotes message aggregation*
@@ -311,16 +294,8 @@ FlowSG 在封闭词汇和开放词汇两种设定下均取得了领先的场景�
 ![[assets/figures/papers/paper_list_l2447_https_arxiv_org_abs_2604_18623/figures/007_Table_5.jpg]]
 *Table 5: Ablation of tokenization on PSG: (top) effect of codebook size ??×??; (bottom) slot factorization levels ??*
 
-![[assets/figures/papers/paper_list_l2447_https_arxiv_org_abs_2604_18623/figures/008_Figure_3.jpg]]
-*Figure 3: Results of four sampling strategies on closed-set PSG*
-
-![[assets/figures/papers/paper_list_l2447_https_arxiv_org_abs_2604_18623/figures/009_Figure_4.jpg]]
-*Figure 4: Progressive FlowSG. From the input image (bottom-left) and ground truth at ??=0 (top-left), we show predictions refined at ?? ∈ 0.1, 0.2, 0.4, 0.6*
-
 ![[assets/figures/papers/paper_list_l2447_https_arxiv_org_abs_2604_18623/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of recent SGG paradigms. (a) Twostage: a pre-trained detector proposes objects and enumerates human–object pairs; a relation head refines multi-stream features to classify predicates. (b) One-stage: objects and predicates are detected jointly in a single pass, followed by a matching step to attach predicates to object pairs. (c) Ours (generative): given an image and an initially noisy graph, an image-conditioned denoiser iteratively refines the graph to sample a coherent scene graph*
-
-
 
 ## 定位与知识库关联
 
@@ -369,8 +344,6 @@ FlowSG 在生成模型谱系中处于**离散-连续混合流匹配**与**图结
 ### 5. 知识库定位总结
 
 FlowSG 的核心贡献在于**将场景图生成从分类范式转变为生成范式**，在方法谱系中建立了“图像条件混合流匹配图生成”这一新分支。其关键创新点——混合离散-连续流匹配、关系调制注意力、流条件消息聚合——为后续研究提供了三个可独立发展的技术模块。对于后续工作，FlowSG 的生成框架可自然扩展到视频场景图、3D场景图以及交互式场景图编辑等方向。
-
-
 
 ## 原文 PDF
 

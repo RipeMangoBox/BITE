@@ -52,15 +52,11 @@ TESO 针对这一瓶颈提出了一种**无需训练、无需显式外点剔除*
 
 TESO 的主要局限在于平移自由度在典型远距离驾驶场景中仅能达到厘米级精度，且在低光照、雾天、隧道等条件下因 SIFT 关键点退化导致跟踪性能显著下降。当前实现仅跟踪本质矩阵的 5 个旋转相关自由度，尚未将焦距等内参纳入在线优化框架。
 
-
-
 立体相机系统被广泛部署于自动驾驶、移动机器人与三维重建等任务中，其感知精度高度依赖精确的立体标定参数。然而，在实际运营条件下，由于温度变化、振动、碰撞或结构老化等因素，标定参数会随时间发生缓慢甚至阶跃式的漂移，导致深度估计出现系统性偏差，进而威胁下游任务的安全性与可靠性。因此，在不中断系统正常运行的前提下，对立体相机外参进行在线、实时、无目标的跟踪与校正，成为一个兼具理论挑战与工程价值的关键问题。
 
 传统在线标定方法通常依赖显式的外点剔除机制（如 RANSAC）、鲁棒估计器或预训练的端到端学习模型，以应对特征匹配中不可避免的误匹配与噪声。这类方案存在三重瓶颈：其一，RANSAC 等迭代外点剔除方案在低信息量或高外点率的在线场景中收敛速度慢且稳定性不足；其二，鲁棒估计器（如 M‑估计器）的损失函数形态对超参数敏感，难以在吸引盆宽度与跟踪精度之间取得自适应平衡；其三，基于学习的方法虽然在特定数据集上表现优异，但其泛化能力受限于训练域，难以应对开放世界中数据分布的大幅变异。上述瓶颈共同导致现有方法难以在数据变异性大、信息内容低的在线场景中维持快速且稳定的收敛。
 
 本文的核心动机在于提出一种**隐式鲁棒化**的在线标定跟踪范式：通过核化极线误差直接在损失函数层面抑制外点影响，从而消除对显式外点剔除、复杂鲁棒估计器或训练模型的依赖。在此基础上，我们设计了一个轻量级的在线随机优化框架（TESO），使其能够在本质矩阵流形上自适应地跟踪外参变化，并联合校正精度与深度一致性指标全面评估标定参数的不一致性。该方法无需针对新场景进行训练，仅依赖通用关键点检测与特征描述子，即可在多种驾驶场景下实现高精度、低延迟的旋转标定跟踪。
-
-
 
 ## 核心方法与创新机理
 
@@ -120,8 +116,6 @@ TESO 与现有方法的根本区别在于**零训练成本与跨域泛化**。Ta
 
 在计算效率上，TESO 仅需存储 38 个参数，CPU 实现每帧约 86 ms，与最快的 SotA 学习方法耗时相当（79 ms vs. 86 ms），同时互相关分析表明跟踪延迟小于一帧。
 
-
-
 TESO 的整体流程围绕一个核心设计展开：**通过核化极线误差隐式鲁棒化损失函数，从而将在线立体标定跟踪简化为本质矩阵流形上的自适应随机优化问题**。该设计消除了对显式外点剔除（如 RANSAC）、鲁棒估计器或训练模型的依赖，使整个 pipeline 保持轻量且对匹配质量不敏感。
 
 ### 输入与预处理
@@ -163,12 +157,8 @@ $$
 
 整体流程可概括为：**去畸变图像对 → SIFT 关键点与描述子 → k 近邻临时对应 → 核相关损失计算 → 自适应随机梯度估计 → 本质矩阵流形更新 → 旋转/平移分解输出**。该闭环在每个新帧到达时执行一次，实现完全在线的标定参数跟踪。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2143_https_arxiv_org_abs_2604_19420/figures/002_Figure_2.jpg]]
 *Figure 2: The full overview of TESO*
-
-
 
 ### 3.1 本质矩阵流形参数化
 
@@ -198,9 +188,6 @@ $$\mathcal{L}(\boldsymbol{\theta} | \mathbf{X}, \mathbf{Y}) = -\sum_{\mathbf{x}\
 - **高斯核** $\exp(-d^2 / 2\sigma^2)$ 将极线距离 $d = \mathbf{y}^{\top}\mathbf{E}\mathbf{x}$ 映射到 $[0, 1]$：正确匹配的 $d$ 接近 0，贡献接近 1；外点的 $d$ 较大，贡献被指数衰减压制，实现隐式鲁棒化。
 - **核宽 $\sigma$** 是核心因果旋钮：较小的 $\sigma$ 提供更窄的吸引盆和更高的跟踪精度，但可能降低收敛范围。消融实验表明 $\sigma = 0.001$ 在 CARLA-Drift 上提供了吸引盆宽度与跟踪方差之间的良好折衷。
 - **双向 $k$ 近邻** 使损失函数对关键点检测器和特征提取器的选择不敏感。实验证实，使用核损失时 SIFT 与 SuperGlue 的性能差异极小，且 SuperGlue 的匹配置信度超参数变得无关紧要（Figure 4）。
-
-![[assets/figures/papers/paper_list_l2143_https_arxiv_org_abs_2604_19420/figures/009_Figure_4.jpg]]
-*Figure 4: TESO performance visualized as an average rotational error on two sequences from the MAN TruckScenes dataset using different matching algorithms and loss functions. It is evident that with a higher confidence level in SuperGlue matches and a non-robust loss function (represented by the red points), the precision increases. However, using our proposed kernelized loss function with SuperGlue matches (blue points) renders the confidence hyper-parameter unimportant. The difference between SIFT (with 5-NN matching) and SuperGlue, using a kernelized loss function, is also very small, suggesting that the robust loss function renders the selection of keypoint detector and feature extractor uncritic...*
 
 ### 3.3 在线自适应随机优化
 
@@ -238,13 +225,6 @@ TESO 的每帧处理流程为：
 7. **位姿分解**：通过 OpenCV 的 SVD 分解从 $\mathbf{E}^{(s)}$ 恢复旋转 $\mathbf{R}$ 和平移方向 $\mathbf{t}$，平移缩放归一化到参考基线长度。
 
 整个流水线仅需存储 38 个参数（5 维 $\boldsymbol{\theta}$ 及其梯度/方差/Hessian 估计），CPU 实现每帧约 86 ms，与最快的学习方法耗时相当。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2143_https_arxiv_org_abs_2604_19420/figures/015_Figure_6.jpg]]
-*Figure 6: Kernel corelation loss evaluations. Narrower is better*
-
-
 
 ## 实验与关键发现
 
@@ -313,19 +293,6 @@ Figure 5 的互相关分析显示，TESO 跟踪序列与累积漂移序列的互
 
 所有评估均采用统一的立体指标（KO、VOF、DC），并在可能时使用 LiDAR 投影进行深度一致性验证，确保指标的可比性。TESO 无需数据驱动训练，因此在跨数据集泛化方面具有天然优势；与其他学习方法对比时，需注意后者可能过拟合特定域。KITTI 实验揭示的内参不一致性问题提示：在评估在线标定方法时，内参的准确性应作为先决条件加以验证。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2143_https_arxiv_org_abs_2604_19420/figures/003_Table_1.jpg]]
-*Table 1: TESO performance on CARLA–Drift dataset, visualised as geometric precision 1a and stereo metrics 1b (first rows) vs. metrics without tracking. One can see that TESO tracking consistently improves both the rotation precision and stereo metrics. The hardest DoF is*
-
-![[assets/figures/papers/paper_list_l2143_https_arxiv_org_abs_2604_19420/figures/005_Table_3.jpg]]
-*Table 3: TESO performance on the MAN TruckScenes dataset, visualised as geometric precision 3a and stereo metrics 3b*
-
-![[assets/figures/papers/paper_list_l2143_https_arxiv_org_abs_2604_19420/figures/006_Table.jpg]]
-*Table: (a) Geometric Precision (lower is better) (b) Stereo Metrics (lower is better, negative means improvement over the reference parameters)*
-
-
-
 ## 定位与知识库关联
 
 ### 方法在立体视觉在线标定谱系中的位置
@@ -381,8 +348,6 @@ TESO 的核相关损失函数中，**带宽参数 σ 是控制吸引盆宽度与
 ### 知识库定位
 
 TESO 的核心贡献在于**将核相关损失与在线流形优化结合，构建了一个无需训练、对匹配质量不敏感的立体外参在线跟踪框架**。它在方法谱系中填补了传统几何方法与端到端学习方法之间的空白：既有几何方法的可解释性和无需训练的优势，又通过损失函数设计获得了接近学习方法的鲁棒性。其揭示的内参与外参耦合效应，也为后续研究提供了重要的实验依据——立体标定评估必须同时考虑内参一致性和深度一致性指标，单一指标可能掩盖系统性的标定误差。
-
-
 
 ## 原文 PDF
 

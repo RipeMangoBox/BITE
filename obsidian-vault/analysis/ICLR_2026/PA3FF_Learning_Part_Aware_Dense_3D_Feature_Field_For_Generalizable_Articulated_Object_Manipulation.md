@@ -55,8 +55,6 @@ claims:
 
 **方法定位**：PA3FF属于3D原生特征表征学习范式，与依赖2D基础模型提升的方法（如GenDP）形成对比。其核心创新在于将3D几何预训练（Sonata骨干）与部件级对比学习相结合，在特征空间中显式编码了功能部件的归属关系，而非仅依赖语义相似性。PADP则将该特征场与扩散策略（Diffusion Policy, DP3）无缝集成，形成从感知到动作的端到端可泛化操控框架。
 
-
-
 ### 铰接物体操控的泛化困境
 
 机器人操控正从刚性物体推向更复杂的铰接物体（如带把手的抽屉、旋钮式瓶盖），这类物体由多个功能部件构成，操控策略必须精确绑定到特定部件（如“抓住把手拉开抽屉”）。然而，现有方法在泛化到未见过的物体时面临根本性瓶颈：感知表示无法稳定地识别和定位功能部件。
@@ -89,8 +87,6 @@ claims:
 
 基于此，本文提出PA3FF（Part-Aware 3D Feature Field），一种前馈式部件感知3D特征场，通过对比学习在大规模标注数据集上训练，使特征场具备上述四个属性。在此基础上构建的PADP（Part-Aware Diffusion Policy）策略，将PA3FF作为感知基础，实现对新物体的高效泛化操控。
 
-
-
 ## 核心方法与创新机理
 
 PA3FF 的核心创新在于将**部件感知的对比学习**引入到**3D原生特征场**中，从而系统性地解决了2D基础模型（如CLIP、DINOv2）在提升到3D空间时面临的多视图不一致、低空间分辨率、难以捕捉细小功能部件等瓶颈。与现有方法直接使用通用2D/3D特征作为感知输入不同，PA3FF通过两个关键的**changed slots**实现了突破。
@@ -105,8 +101,6 @@ PA3FF 的核心创新在于将**部件感知的对比学习**引入到**3D原生
 两个损失联合优化（$\mathcal{L}_{total} = \mathcal{L}_{Geo} + \mathcal{L}_{Sem}$），使得PA3FF预测的连续3D特征场中，特征距离直接反映部件归属关系——相似特征的更可能属于同一功能部件。消融实验表明，**移除语义损失导致成功率从62%骤降至46%**，移除几何损失降至54%，而完全移除对比学习细化（仅Sonata + DP3）仅达39%，接近DP3基线的37%，证明对比学习是性能提升的决定性因素。
 
 **因果机制：** 这一创新设计形成了一条清晰的因果链：3D原生骨干提供几何先验 → 对比学习引入部件级语义一致性 → 特征场能够区分和定位功能部件（如把手、旋钮）→ 扩散策略获得强泛化性的感知基础 → 在新物体和新场景上实现高效操控。与GenDP等基于密集语义场的方法相比，PA3FF的部件感知是**3D原生的、连续的、功能导向的**，而非对2D特征的简单提升，这解释了其在PartInstruct上9.4%的绝对性能提升和在8个真实世界任务上相对GenDP 18.75%的提升。
-
-
 
 PA3FF 的整体框架围绕一个核心问题展开：**如何为铰接物体操控提供一个部件感知的、可泛化的 3D 表示**。其瓶颈在于，现有 2D 基础模型（如 CLIP、DINOv2）在提升到 3D 空间时面临多视图不一致、空间分辨率低、难以捕捉细小功能部件（如把手、旋钮）等挑战。PA3FF 的因果调节变量是**部件感知的 3D 特征场**——通过在大规模标注数据集上使用对比学习直接为点云生成稠密、连续、功能部件敏感的 3D 特征，使得特征距离直接反映部件归属关系。
 
@@ -137,15 +131,8 @@ Sonata 输出的原始 3D 特征尚不具备明确的部件语义。细化阶段
 
 消融实验揭示了各模块的因果贡献：移除对比学习细化（无几何损失和语义损失）导致成功率从 62% 骤降至 46%；直接组合 Sonata 与 DP3（无任何架构修改或细化）仅达 39%，接近 DP3 基线 37%，表明单纯替换骨干获益有限。语义损失比几何损失更为关键——移除语义损失性能下降更多（46% vs 54%），说明语言锚定的语义对齐对部件感知能力的形成具有主导作用。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_qXfRXfAHOK/figures/001_Figure_1.jpg]]
-*Figure 1: (1) We propose PA3FF, a feedforward model that predicts part-aware 3D feature fields for 3d shapes. (2) We propose a part-aware diffusion policy, which leverages PA3FF, that can efficiently generalize to unseen objects. (3) PA3FF exhibits consistency across shapes, enabling various downstream applications such as correspondence and segmentation*
-
 ![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_qXfRXfAHOK/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our Learning Framework. (1) Pretraining the PTv3 backbone to extract part-aware 3D features. (2) Feature refinement via contrastive learning across objects to enhance part-level consistency and distinctiveness. (3) Downstream usage by integrating the refined features into a diffusion policy for action generation*
-
-
 
 PA3FF 的核心设计围绕一个关键瓶颈展开：**2D 基础视觉特征（如 CLIP、DINOv2）在提升到 3D 空间时，面临多视图不一致、低空间分辨率、难以捕捉细小功能部件等挑战**，导致铰接物体操控的泛化能力不足。为此，PA3FF 构建了一个**部件感知的稠密 3D 特征场**，通过对比学习直接为点云生成功能部件敏感的连续特征，使特征距离直接反映部件归属关系。
 
@@ -241,13 +228,6 @@ $$
 
 整个框架的因果链路清晰：**Sonata 骨干提供几何先验 → 对比学习（几何损失 + 语义损失）注入部件级语义一致性 → PADP 利用部件感知特征生成泛化动作**。消融实验证实了这一链路的关键性：直接组合 Sonata 与 DP3（无任何架构修改或细化）仅达 39%，接近 DP3 基线 37%，表明单纯替换骨干获益有限；而移除对比学习细化则使成功率从 62% 骤降至 46%，证明部件感知特征场是泛化能力的决定性因素。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_qXfRXfAHOK/figures/011_Figure_7.jpg]]
-*Figure 7: Flaws of lifting up method*
-
-
-
 ## 实验与关键发现
 
 ### 核心性能：仿真与真实世界
@@ -261,9 +241,6 @@ PA3FF 驱动的部件感知扩散策略（PADP）在仿真和真实世界两大�
 
 ![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_qXfRXfAHOK/figures/006_Table_2.jpg]]
 *Table 2: Real-world task success rates across different methods (train/test). Each task is evaluated with 10 trials under randomized initial conditions. The best-performing results are highlighted in bold*
-
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_qXfRXfAHOK/figures/007_Table_3.jpg]]
-*Table 3: Generalization evaluation of the Open Bottle task (10 trials)*
 
 ### 基础特征对比：3D 原生优于 2D 提升
 
@@ -288,26 +265,13 @@ Table 6 的消融实验揭示了各模块的贡献权重。最关键的发现是
 ![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_qXfRXfAHOK/figures/005_Figure_4.jpg]]
 *Figure 4: The feature field visualizations of PA3FF and other foundation features*
 
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_qXfRXfAHOK/figures/013_Table_5.jpg]]
-*Table 5: Segmentation Results on the PartNetE Dataset. Category mAP50s (%) are shown for different object categories. Higher values indicate better performance*
-
 ### 样本效率与跨任务泛化
 
 在 **RLBench** 的 6 项任务上，PADP（约 64.5% 平均成功率）同样大幅超越 GenDP（约 48.3%）（Table 8），表明该方法在非铰接物体的常规操作任务上也具有迁移能力。此外，在仅使用 5 个演示的极低数据条件下，PADP 仍能保持可观的性能，展现出优异的样本效率。
 
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_qXfRXfAHOK/figures/028_Table_8.jpg]]
-*Table 8: Simulated results with different numbers of demonstrations. Here we use the two seen objects in the training phase to test the success rate, and conduct five trials for each object with random initialization in each task*
-
 ### 失败模式与局限性
 
 尽管 PADP 在铰接物体操控上表现突出，其核心依赖的 Sonata 骨干主要针对刚体几何设计。论文明确指出，该方法**对于复杂变形物体（如绳子、布料）的处理能力有限**，因为此类物体的结构变化超出了当前 3D 特征骨干的建模范围。此外，PA3FF 的训练依赖于大规模部件标注数据，其在完全未见物体类别上的零样本泛化能力仍需进一步验证。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_qXfRXfAHOK/figures/008_Figure_5.jpg]]
-*Figure 5: Generalization test set of the Open Bottle task*
-
-
 
 ## 定位与知识库关联
 
@@ -347,8 +311,6 @@ PA3FF的性能优势可归因于两个相互耦合的设计选择：
 3. **数据效率与标注需求**：PA3FF的训练是否可以通过自监督或弱监督方式减少对精细部件标注的依赖，以覆盖更多物体类别和更广泛的操控场景？
 
 4. **与基础模型的深度整合**：PA3FF目前独立于2D基础模型，未来是否可以通过与CLIP、DINOv2等2D模型的跨模态对齐，进一步提升对未见物体的零样本泛化能力？
-
-
 
 ## 原文 PDF
 

@@ -151,8 +151,6 @@ MoGenTS 提出一种“量化-掩码-生成”三阶段流水线，核心创新�
 
 整个流水线将运动生成转化为类似图像修复的二维掩码预测问题，充分利用成熟的二维卷积和二维注意力操作，避免了传统一维序列建模对关节空间关系的破坏。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l93_https_arxiv_org_abs_2409_17686/figures/001_Figure_1.jpg]]
 *Figure 1: Framework overview. (a) In motion quantization, human motion is quantized into a spatial-temporal 2D token map by a joint VQ-VAE. (b) In motion generation, a temporal-spatial 2D masking is performed to obtain a masked map, and then a spatial-temporal 2D transformer is designed to infer the masked tokens*
 
@@ -289,8 +287,6 @@ MoGenTS 的设计源于对现有运动量化方法一个根本性瓶颈的识别
 ### 开放问题
 
 基于上述局限性，论文引申出若干值得探索的方向：能否设计运动专用的掩码策略（如图结构掩码或运动学感知掩码）？能否将物理约束直接融入生成过程以消除不自然动作？Coarse-to-fine 量化技术（如层次化码本）能否进一步降低近似误差？这些问题指向了运动生成领域后续研究的关键突破口。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l93_https_arxiv_org_abs_2409_17686/figures/006_Figure_4.jpg]]
 *Figure 4: Qualitative results on the test set of HumanML3D. The color from light blue to dark blue indicates the motion sequence order. An arrow indicates this sequence is unfolded in the time axis*

@@ -53,8 +53,6 @@ claims:
 
 在方法谱系中，OmniMoGen 区别于以 **T2M‑GPT**、**MoMask** 为代表的纯文本到动作自回归/掩码模型，也不同于 **MotionGPT3** 等混合多任务基线或 **MotionReFit**、**SALAD** 等扩散式方法。其核心革新在于将“任务统一”从模型架构层面推进到输入表示与训练范式层面，并通过 GRPO 强化学习引入生成质量反馈，使单一模型能够涌现出自我反思等新能力。当前局限在于反思轮次超过 4 轮后性能下降，归因于 transformer 的有效上下文窗口限制，这为后续扩展长序列动作生成与交互式编辑指明了方向。
 
-
-
 人体动作生成是计算机视觉与图形学中的核心问题，其目标是根据给定的控制信号（如文本描述、动作片段、编辑指令等）合成自然、逼真的人体运动序列。该任务在人机交互、虚拟现实、影视动画和游戏开发中具有广泛的应用前景。
 
 近年来，随着深度学习和大规模运动捕捉数据的发展，人体动作生成取得了显著进展。然而，现有方法普遍存在一个根本性的瓶颈：**将不同的动作生成任务视为彼此独立的问题**。文本到动作生成、运动编辑、动作内插/外插、风格迁移等任务通常依赖各自特定的模型架构、输入格式和训练范式。例如，基于掩码 transformer 的方法（如 MoMask）需要预定义掩码位置来限制任务范围，扩散模型（如 MotionReFit、MLD）则使用特定的条件信号注入机制，不同任务之间无法共享输入表示或模型参数。这种“一任务一模型”的碎片化范式严重限制了动作生成系统的通用性和灵活性，使得单一模型难以遵循自由形式的交叉文本-动作指令来完成多样化的生成目标。
@@ -62,8 +60,6 @@ claims:
 借鉴大语言模型（LLM）在自然语言处理领域统一各类任务的范式，一个自然的思路浮现出来：**能否将多样化的动作生成任务统一表示为交叉文本-动作指令，并用单一模型进行端到端学习？** 这一思路面临两个核心挑战。其一，需要一种统一的表示格式，能够将文本描述、源动作片段、编辑需求等信息自然地交织在一起，形成模型可解析的指令序列。其二，需要构建大规模、多任务的交叉指令数据集来支撑统一模型的训练，而现有数据集普遍只覆盖单一任务类型。
 
 OmniMoGen 正是在这一动机下提出的。其核心洞察在于：通过构建大规模多任务交叉指令数据集 X2Mo（包含 137K 条交叉文本-动作指令），并采用两阶段训练策略（多任务监督微调 SFT + 基于 GRPO 的强化学习 RL），单一模型可以在不添加任何额外模块的情况下，实现从文本到动作生成、风格/轨迹编辑、内插、外插、组合编辑等全能动作生成，甚至涌现出自我反思等新能力。这一思路将人体动作生成从“多模型协作”推向“单模型统一”，为构建通用动作生成基础模型提供了可行的技术路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -113,8 +109,6 @@ OmniMoGen 的核心创新在于将人体动作生成从“多任务异构”范�
 
 综上，OmniMoGen 通过“统一表示—统一架构—统一训练”的三位一体设计，实现了从文本到动作生成、风格/轨迹编辑、内插、外插、组合编辑到自我反思的全能动作生成，在无需任何额外模块的前提下，显著超越了所有多任务基线方法。
 
-
-
 OmniMoGen 的整体框架遵循“离散 token 化 + 统一自回归建模”的设计范式，其核心思想借鉴了大语言模型统一自然语言处理任务的思路：将多样化的人体动作生成任务统一表示为**交叉文本-动作指令**，并通过单一的自回归 transformer 进行端到端的序列预测，无需为不同任务设计异构模块。
 
 ### 两阶段流水线
@@ -144,12 +138,8 @@ OmniMoGen 采用**两阶段训练**以赋予模型指令跟随能力并提升生
 
 框架还引入了 **OmniMoGen-Think** 变体：在生成动作后，模型自动进行自我评估与反思，并根据反思结果重新生成。默认支持最多 3 轮迭代改进，使模型涌现出自我纠错能力。实验表明，反思轮次从 0 增至 3 可持续提升检索准确率与物理指标，但扩展至 5 轮后性能下降，当前 transformer 的上下文窗口成为限制因素。
 
-### 补充图表
-
 ![[assets/figures/papers/2512.19159_42baaa9101bd/figures/001_Figure_1.jpg]]
 *Figure 1: Similar to ChatGPT in NLP, OmniMoGen unifies all motion generation tasks in a unified architecture, such as text-to-motion, style editing, trajectory editing, inpainting, in-betweening, compositional editing, self-reflective generation, and knowledge-informed generation. OmniMoGen enables seamless and flexible motion generation across diverse objectives by merely adjusting the interleaved text-motion instructions*
-
-
 
 OmniMoGen 的核心架构由两个关键模块组成：**RVQ-VAE 运动 Tokenizer** 和**统一自回归 Transformer**，辅以两阶段训练策略实现多任务指令跟随。
 
@@ -207,15 +197,8 @@ $$s_{\mathrm{contact}} = \exp \Big( - ( | z_{\min} | - \tau_h )^{+} \Big) \cdot 
 
 其中 $z_{\min}$ 为足部最小离地高度，$v_{\min}$ 为足部最小水平速度，阈值 $\tau_h = 0.05\mathrm{m}$、$\tau_v = 0.075\mathrm{m/s}$，$(\cdot)^{+}$ 表示 ReLU 操作。该指标同时惩罚脚部浮空和滑地现象。
 
-### 补充图表
-
-![[assets/figures/papers/2512.19159_42baaa9101bd/figures/016_Figure_8.jpg]]
-*Figure 8: Effect of reflection rounds on model performance across MotionFix and AnyContext*
-
 ![[assets/figures/papers/2512.19159_42baaa9101bd/figures/002_Figure_2.jpg]]
 *Figure 2: An overview of OmniMoGen, comprising (a) an RVQ-VAE and (b) an autoregressive transformer. Motions are encoded into discrete tokens like a foreign language by the RVQ-VAE, and then concatenated with text tokens as input to a unified autoregressive transformer for next-token prediction*
-
-
 
 ## 实验与关键发现
 
@@ -287,25 +270,6 @@ OmniMoGen-Think 在生成后自动评估并反思，支持多轮迭代改进。F
 
 3. **数据覆盖的边界**：X2Mo 数据集基于 AMASS 构建，动作类型以日常运动和舞蹈为主。对于极端运动（如体育竞技、杂技）或人-物交互场景，数据覆盖不足可能导致生成质量下降。
 
-### 补充图表
-
-![[assets/figures/papers/2512.19159_42baaa9101bd/figures/008_Table_3.jpg]]
-*Table 3: Quantitative comparison on AnyContext across three task types: Style, Trajectory, and Speed. The evaluations are conducted 20 times to obtain a 95% confidence interval (±). Best results are highlighted in bold. “Physical” measures the physical plausibility metric*
-
-![[assets/figures/papers/2512.19159_42baaa9101bd/figures/012_Table_5.jpg]]
-*Table 5: Prompt templates for fine-grained tasks within in-context generation*
-
-![[assets/figures/papers/2512.19159_42baaa9101bd/figures/013_Table_6.jpg]]
-*Table 6: Prompt templates for fine-grained tasks within motion editing*
-
-![[assets/figures/papers/2512.19159_42baaa9101bd/figures/014_Table_7.jpg]]
-*Table 7: Prompt templates for fine-grained tasks within multi-turn editing*
-
-![[assets/figures/papers/2512.19159_42baaa9101bd/figures/011_Figure_7.jpg]]
-*Figure 7: The dataset is organized into four high-level task categories and their fine-grained subtasks. The inner ring shows the proportions of each category, while the outer ring presents the distribution of corresponding subtasks*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 任务统一范式的谱系定位
@@ -345,8 +309,6 @@ OmniMoGen 的核心思想是将多样化的人体动作生成任务统一为“�
 4. **最优反思轮数的自适应决策**：反思超过一定轮数后性能下降的机制尚不完全清晰——是由于注意力分散、错误累积还是其他原因？能否设计自适应的反思终止策略，使模型在性能达到峰值时自动停止？
 
 5. **更大模型的缩放效应**：当前使用 Gemma2-2B 作为骨干，更高效的 token 化方法（如更高压缩率的 RVQ-VAE）或更大的语言模型是否能进一步提升统一生成质量？这需要系统性的缩放实验来验证。
-
-
 
 ## 原文 PDF
 

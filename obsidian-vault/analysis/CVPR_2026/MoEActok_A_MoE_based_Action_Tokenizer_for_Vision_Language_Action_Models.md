@@ -55,8 +55,6 @@ claims:
 - 消融实验证实：移除适配器使成功率降至 0.45，移除技能感知训练降至 0.47，验证了各组件的必要性（Table 3/4）。
 - 专家数量从 1 增至 4 时，RoboTwin 性能从 0.50 提升至 0.56，Simpler-Env 从 0.26 提升至 0.38（Figure 4/5），表明多专家技能解耦对性能提升起关键作用。
 
-
-
 视觉-语言-动作（VLA）模型通过将机器人操作建模为序列预测问题，在多种操作任务中展现出强大的泛化能力。这类模型通常将连续的机器人动作转换为离散标记，以便与视觉和语言标记统一输入自回归Transformer进行训练。动作分词器（action tokenizer）因此成为VLA模型的关键上游组件，其编码质量直接影响下游策略的性能。
 
 当前主流的动作标记方案可归为两类。一类是朴素的按维度分箱（Uniform Binning），将每个动作维度独立离散化，完全忽略动作维度间的关联结构。另一类是基于VQ-VAE的学习式分词器，如**VQ-BET**（Lee et al., ICML 2024）采用残差VQ-VAE进行行为生成，**VQ-VLA**（Wang et al., ArXiv 2025）则专门为VLA流水线设计了卷积残差VQ-VAE。这些方法共享一个根本性局限：它们使用**单一量化器**覆盖整个操作轨迹中的所有动作。
@@ -66,8 +64,6 @@ claims:
 这一瓶颈的因果机制在于：单一量化器的码本空间是全局共享的，无法为不同技能分配专属的表示子空间。由此带来的优化权衡使得模型在技能边界处产生高重建误差，进而影响下游VLA对动作标记的预测精度。
 
 针对上述问题，本文提出**MoEActok**，一个基于混合专家（Mixture-of-Experts）的动作分词器。其核心洞见是：既然操作动作在运动学空间内天然形成技能簇，那么应当为每个技能簇分配专用量化器，从而消除跨技能表示冲突。具体而言，MoEActok首先通过K-means聚类将动作片段分组为技能簇，再构建K个专家VQ量化器，每个专家专门负责一个技能簇的编码与重建。此外，引入技能适配器实现共享表示空间与技能专属空间之间的映射，并通过技能感知训练使下游VLA模型显式推理技能类别与动作标记，形成从粗粒度技能识别到细粒度动作生成的级联预测范式。
-
-
 
 ## 核心方法与创新机理
 
@@ -107,8 +103,6 @@ $$\mathcal{L}_{\mathrm{VLA}} = -\log P(h \mid o_t, s_t, l) - \sum_{r=1}^{R} \log
 ### 创新总结
 
 MoEActok 的四个 changed slots 形成了一条完整的因果链：**技能解耦**发现动作空间的内在结构 → **专家量化器**消除跨技能表示冲突 → **技能适配器**平衡共享与专属 → **技能感知训练**将技能知识注入 VLA 推理。这一设计使 MoEActok-VLA 在 RoboTwin（12 任务平均 0.56）、Simpler-Env（4 任务平均 0.38）和真实世界（3 任务平均 0.37）上均显著超越 Uniform Binning、FAST、VQ-BET、VQ-VLA 等基线方法。
-
-
 
 MoEActok 提出了一套“技能解耦动作分词 + 技能感知 VLA 训练”的端到端流水线，核心目标是将异质操作轨迹中的动作离散化从单一量化器扩展为混合专家（MoE）范式，从而消除跨技能表示冲突，并赋予 VLA 模型显式的技能推理能力。
 
@@ -187,8 +181,6 @@ $$
 | 动作分词器训练 | 动作片段 $a_{t:t+k-1} \in \mathbb{R}^{k \times 7}$ | 技能标签 $h$、离散动作标记序列 $\{q_1, ..., q_R\}$、重建动作 $\hat{a}$ |
 | VLA 推理 | 视觉观测 $o_t$、状态 $s_t$、语言指令 $l$ | 预测技能 $\hat{h}$、动作标记序列，经解码器恢复为连续动作 |
 
-
-
 ### 3.1 动作片段与技能解耦
 
 机器人操作轨迹中的动作定义为 7 维向量 $a_t \in \mathbb{R}^7$，前六维为末端执行器的位置 $(x, y, z)$ 与姿态 $(roll, pitch, yaw)$，最后一维为夹爪动作（1 表示张开，0 表示闭合）。MoEActok 将连续动作序列切分为长度为 $k$ 的动作片段 $a_{t:t+k-1}$，作为分词器的基本处理单元。
@@ -240,8 +232,6 @@ $$\mathcal{L}_{\mathrm{VLA}} = -\log P(h \mid o_t, s_t, l) - \sum_{r=1}^{R} \log
 
 第一项为给定观测 $o_t$、状态 $s_t$ 和语言指令 $l$ 时预测技能标签 $h$ 的交叉熵损失；第二项为以技能 $h$ 为条件的自回归动作标记 $q_1, \dots, q_R$ 预测损失。该设计迫使 VLA 模型显式推理技能类别，再在技能约束下生成细粒度动作标记，从而提升动作生成的语义一致性和泛化能力。
 
-
-
 ## 实验与关键发现
 
 ### 模拟器主结果
@@ -277,19 +267,6 @@ MoEActok-VLA在RoboTwin（12项任务）和Simpler-Env（4项任务）两个模�
 ### 推理效率
 
 MoEActok-VLA在单张RTX 4090上的推理吞吐约为10 Hz；借助vLLM加速框架可进一步提升至54 Hz。这一吞吐量满足大多数操作任务的实时性要求，表明MoE架构引入的多专家量化并未带来显著的推理开销瓶颈。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2172_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_MoEActok_A_MoE_base/figures/010_Table_5.jpg]]
-*Table 5: Real-world results*
-
-![[assets/figures/papers/paper_list_l2172_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_MoEActok_A_MoE_base/figures/008_Figure_4.jpg]]
-*Figure 4: The influence of the number of experts on the performance of RoboTwin*
-
-![[assets/figures/papers/paper_list_l2172_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_MoEActok_A_MoE_base/figures/009_Figure_5.jpg]]
-*Figure 5: The influence of the number of experts on the performance of Simper-Env*
-
-
 
 ## 定位与知识库关联
 
@@ -337,8 +314,6 @@ MoEActok的核心创新在于将“技能解耦”作为动作分词器的设计
 2. **跨具身迁移。** 不同机器人的运动学空间差异显著，在一个机器人数据上训练的MoEActok分词器能否迁移到其他具身形态？适配器是否需要重新训练？
 3. **技能标签的语言对齐。** 当前技能标签 $h$ 是纯数值索引，若将其对齐到自然语言描述（如“抓取”“移动”“放置”），能否进一步提升VLA的语言指令跟随能力？
 4. **动态技能路由。** 当前技能分配在分词器训练阶段固定，是否可以在VLA推理时根据视觉观测动态调整技能路由，以适应技能边界的模糊性？
-
-
 
 ## 原文 PDF
 

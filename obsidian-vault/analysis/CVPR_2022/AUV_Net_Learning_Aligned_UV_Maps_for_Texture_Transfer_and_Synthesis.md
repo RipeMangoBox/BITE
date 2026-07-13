@@ -56,8 +56,6 @@ AUV-Net 处于**神经 UV 参数化**与**无监督语义对应学习**的交汇
 
 该方法的技术渊源可追溯至经典的线性子空间学习（如 Eigenfaces），但将其与可微 UV 映射相结合，使得对齐过程完全由重构目标驱动，无需任何对应标注。这一思路为 3D 纹理的生成式建模开辟了新的范式：先在语义对齐的 UV 空间中生成纹理图像，再通过预训练的 UV 映射将其“贴回”任意形状。
 
-
-
 在三维视觉与图形学中，为三维形状赋予高质量纹理是内容创作、虚拟现实和数字孪生等应用的核心需求。然而，现有三维纹理表征方法在跨形状的纹理迁移与合成任务中面临一个根本性瓶颈：**不同物体之间纹理的语义对齐问题**。
 
 传统方法通常将纹理定义为三维表面上的颜色场。例如，早期工作采用球形纹理映射或基于模板的UV参数化，但这些方法高度依赖于手工设计的对应关系或受限的拓扑结构，难以泛化到任意形状。近年来，基于隐式神经表示的连续纹理场方法（如 **Texture Fields**）虽然摆脱了显式参数化的约束，但纹理信息被编码在MLP的权重中，缺乏结构化的语义空间。这意味着，当需要将一辆车的纹理迁移到另一辆形态不同的车上时，无法保证车轮、车窗等语义部件被映射到对应的位置——纹理迁移变成了“盲贴”，合成结果严重依赖形状间的几何相似性，而非语义对应。
@@ -65,8 +63,6 @@ AUV-Net 处于**神经 UV 参数化**与**无监督语义对应学习**的交汇
 这一瓶颈的根源在于：**现有方法将纹理视为形状的附属属性，而非可跨实例对齐的独立实体**。连续纹理场在单个形状上可以完美重构颜色，但在多形状集合中，每个形状的纹理表征是孤立的，没有机制强制不同形状的对应语义部分共享一致的参数化坐标。因此，纹理迁移和合成任务长期受限于手工对应标注或受限的拓扑假设。
 
 AUV-Net的动机正是打破这一僵局。其核心洞察是：**如果网络被设计为将输入纹理分解为基图像的线性组合，并允许在分解前进行空间变形（UV映射），那么为最小化重构误差，网络必须学会将所有样本的对应特征对齐到一致的UV位置**。这一“重构即对齐”的机制无需任何显式的对应标注，即可在无监督条件下自发形成语义对齐的UV参数化。由此，纹理不再是形状的附属品，而成为可编辑、可迁移、可生成的独立二维图像，为纹理迁移与合成开辟了新的可能性。
-
-
 
 ## 核心方法与创新机理
 
@@ -104,8 +100,6 @@ $$
 | 纹理迁移 | 需要训练时的对应或后处理 | 直接交换对齐的纹理图像即可完成迁移 |
 
 这种“基-系数分解 + 蒙版切割 + 共享UV映射”的组合设计，使得AUV-Net在无需任何对应标注的情况下，实现了跨形状的语义对齐UV参数化，为纹理迁移、合成和单视图重建提供了统一的框架。
-
-
 
 AUV-Net 的整体管线围绕一个核心目标构建：**为任意拓扑的 3D 形状集合学习语义对齐的 UV 参数化**，使得不同形状的对应语义部件被映射到 UV 空间的同一位置。这一目标通过将纹理重建过程建模为“基图像的线性组合 + 空间变形”来实现——网络被迫将输入纹理分解为一组共享基图像与每个样本专属系数的乘积，而变形（UV 映射）在分解之前发生。为最小化重建误差，网络必须自发地将所有样本的对应特征对齐到一致的 UV 坐标，从而在无监督条件下形成语义对齐。
 
@@ -171,8 +165,6 @@ AUV-Net 的整体管线围绕一个核心目标构建：**为任意拓扑的 3D 
 
 对于单视图纹理重建任务（**Figure 13**），AUV-Net 的 UV 映射器和掩码网络在预训练后被冻结，作为固定的参数化模块使用——IM-Net 解码器预测形状，预训练的 AUV-Net 模块为该预测形状生成 UV 映射，从而实现纹理重建。这种“预训练参数化 + 下游任务复用”的设计体现了框架的模块化优势。
 
-
-
 AUV-Net 的核心由三个功能模块构成：**对齐模块**、**掩码网络**与**多基生成器**。其设计目标是通过无监督学习，将不同三维形状的对应语义部分映射到 UV 空间的同一位置，从而形成语义对齐的二维纹理参数化。
 
 ### 对齐模块
@@ -223,8 +215,6 @@ $$L_{p} = \frac{1}{N} \sum_{i=1}^{N} (p_{i}^{x} - q_{i}^{x})^{2} + (p_{i}^{y} - 
 - 处理复杂拓扑仍需较多基生成器（椅子需要四个），且最终 UV 贴图间仍可能存在可见接缝。
 - 方法依赖于训练集中存在部件级对应和姿态对齐，泛化到任意姿态的新类别仍需额外优化。
 
-
-
 ## 实验与关键发现
 
 ### 数据集与评估协议
@@ -252,15 +242,8 @@ AUV-Net 在多个类别上进行了评估，覆盖纹理迁移（Tsf）、生成
 
 Table 5 展示了单视图纹理重建的 FID 结果：汽车类别上 AUV-Net 达到 40.85，Texture Fields 为 92.89（降低 52.04）；椅子类别上 AUV-Net 为 33.26，Texture Fields 为 36.89（降低 3.63）。Figure 10 展示了重建结果的可视化细节（如车轮纹理），进一步支持定量结论。
 
-![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2204_03105/figures/002_Figure.jpg]]
-*Figure: (e)Alignedtexturesbydeforming(a)*
-
 ![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2204_03105/figures/010_Figure.jpg]]
 *Figure: （a）Texture image （b)Segmentation （c）Visualization*
-
-
-![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2204_03105/figures/015_Figure_10.jpg]]
-*Figure 10: Textured single view reconstruction results. Zoom in to see the details, e.g., wheels of the cars. Table 5. Results of textured single view reconstruction*
 
 ### 消融实验
 
@@ -279,19 +262,6 @@ Table 3 报告了各损失项和模块的消融结果，Figure 8 提供了对应
 Figure 11 展示了典型失败案例：将卡通长颈鹿纹理迁移到其他动物时，眼睛位置出现错误对应。这表明在纹理杂乱、语义边界模糊的情况下（如动物皮毛纹理），网络可能建立错误的对应关系。此外，切割产生的接缝在纹理迁移后仍可能可见（如河马模型），即使经过 inpainting 处理。
 
 更一般的局限性包括：方法依赖于训练集中存在部件级对应和姿态对齐，泛化到任意姿态的新类别仍需额外优化；处理复杂拓扑需要较多基生成器（椅子需四个），且基生成器数量需手动指定。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2204_03105/figures/008_Figure_6.jpg]]
-*Figure 6: Comparison with DIF-Net [16] on texture transfer. The texture is transferred from (a) to (b). In (c), the eyes’ shapes are not changed with respect to (a), the lips are misaligned, and the hat is lower than it should be compared to (b). Those details are mostly represented in colors rather than geometry*
-
-![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2204_03105/figures/013_Figure_9.jpg]]
-*Figure 9: Texture synthesis results. The holes on chairs are hallucinated via texture transparency (alpha channels in the texture images)*
-
-![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2204_03105/figures/003_Figure_2.jpg]]
-*Figure 2: Results of the 2D toy experiment on the face dataset. Our network reconstructs input images (a) by learning a set of basis images (d) and linearly combining them into aligned texture images (c), and then deforming the texture images (c) into the outputs (b) via learned UV mapping. The learned UV mapping can be used to deform the input images (a) into aligned high-quality texture images (e). Figure 3. Network architecture of the 2D toy experiment on the face dataset, to demonstrate the concept of our alignment module*
-
-
 
 ## 定位与知识库关联
 
@@ -367,8 +337,6 @@ AUV-Net在以下条件下表现最佳：
 4. **跨类别泛化**：当前方法在同类形状间工作良好，但能否扩展到跨类别的纹理迁移（如将木质纹理从椅子迁移到桌子）？这可能需要更高级的语义理解或材质分解能力。
 
 5. **与生成模型的深度整合**：AUV-Net生成的纹理图像可作为StyleGAN等2D生成模型的训练数据，但当前的两阶段流程（先训练AUV-Net，再训练生成模型）能否统一为端到端的框架，实现纹理对齐与生成的联合优化？
-
-
 
 ## 原文 PDF
 

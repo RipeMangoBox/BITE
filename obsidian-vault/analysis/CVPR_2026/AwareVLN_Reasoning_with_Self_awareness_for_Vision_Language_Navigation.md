@@ -52,8 +52,6 @@ claims:
 
 主要实验结果验证了该范式的有效性：在 R2R-CE Val-Unseen 上，AwareVLN 取得 SR 65.4、SPL 55.1，显著超过 NaVILA 的 SR 54.0（Table 1）；在 RxR-CE Val-Unseen 上，SR 达 67.6，远超 NaVILA 的 49.3。消融实验进一步揭示，移除子任务完成推理节点导致 SR 从 65.4 骤降至 52.3，验证了结构化自我意识推理的必要性（Table 3）。
 
-
-
 视觉语言导航（Vision-Language Navigation, VLN）要求智能体在连续环境中根据自然语言指令完成导航任务。近年来，随着视觉语言模型（VLM）的快速发展，端到端VLN方法取得了显著进展，代表性工作包括**NaVILA**、**NaVid**和**Uni-NaVid**等。这些方法将导航建模为从视觉观测到动作指令的直接映射，绕过了传统方法对仿真预训练路径点预测器（waypoint predictor）的依赖，展现出良好的泛化潜力。
 
 然而，现有基于VLM的VLN方法存在一个核心瓶颈：**缺乏对智能体自身状态和任务进展的显式自我感知**。具体而言，端到端动作预测范式使智能体在导航过程中无法回答以下关键问题：当前场景与指令的关系是什么？任务进展到哪一步？是否存在路径偏离？这种“黑箱”式决策导致三个突出问题：
@@ -65,8 +63,6 @@ claims:
 针对上述问题，AwareVLN提出了一个根本性的思路转变：**赋予智能体导航自我意识（self-awareness）**。其核心动机是——如果智能体能够在导航关键节点（如子任务完成、路径偏离、停止错误）主动触发结构化推理，显式分析场景、评估进度并规划下一步，就能在保持端到端效率的同时，大幅提升导航的鲁棒性和可解释性。这一动机在Figure 1中得到了直观展示：AwareVLN在关键导航点选择性触发自我感知推理，而非全程依赖端到端动作预测。
 
 实现这一目标面临两个关键挑战：一是如何设计推理机制使其仅在必要时触发，避免密集推理带来的计算开销；二是如何获取高质量的结构化推理监督信号，因为人工标注成本高昂且难以规模化。AwareVLN分别通过**稀疏推理调度机制**和**自动数据引擎**解决了这两个挑战，为视觉语言导航中的自我意识推理开辟了新路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -87,8 +83,6 @@ AwareVLN 的核心创新在于将**稀疏的结构化自我感知推理**显式�
 与无推理或每帧密集推理的基线不同，AwareVLN 的**推理调度**由模型自主决定，仅在关键节点触发（Table 4 中 “w/ special tokens” 即代表这一稀疏调度）。消融实验进一步揭示了不同推理节点的重要性梯度（Table 3）：移除子任务完成推理节点导致性能崩塌最严重（R2R-CE SR 从 65.4 降至 52.3），移除路径偏离推理节点降至 55.1，移除停止误差推理节点降至 60.0。这表明**自我意识的三个维度存在因果层级**——对任务进度的宏观感知是导航鲁棒性的根基，而对局部错误的识别与纠正则在此基础上提供精细调控。
 
 综合来看，AwareVLN 通过“何时推理”“推理什么”“如何获取推理监督”三个维度的协同创新，在不依赖仿真预训练路径点预测器、仅使用单目 RGB 输入的约束下，实现了 R2R-CE Val-Unseen SR 65.4、SPL 55.1，以及 RxR-CE Val-Unseen SR 67.6、SPL 56.1 的领先性能（Table 1），同时赋予了导航过程可解释性和错误自纠正能力（Figure 4）。
-
-
 
 AwareVLN 的核心设计是将**自我感知的结构化推理**嵌入到统一的视觉语言导航模型中，使智能体不再仅仅依赖端到端的动作预测，而是能够在导航的关键节点自主触发推理，显式分析自身状态与任务进展。
 
@@ -127,13 +121,6 @@ AwareVLN 的核心设计是将**自我感知的结构化推理**嵌入到统一�
 
 > **注意**：AwareVLN 仅使用单目 RGB 输入，而部分对比方法使用了全景 RGB、深度或里程计等额外传感器。即便如此，AwareVLN 在所有不依赖仿真预训练路径点预测器的方法中仍取得领先性能（Table 1）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2373_https_arxiv_org_abs_2605_22816/figures/001_Figure_1.jpg]]
-*Figure 1: AwareVLN equips a VLN agent with self-aware, structured reasoning that is selectively triggered at key navigation points. Instead of relying solely on end-to-end action prediction, AwareVLN enables the agent to explicitly analyze its spatial state, task progress, and alignment with the instruction when such reasoning is truly needed, achieving more robust and explainable instruction following*
-
-
-
 ### 问题形式化
 
 AwareVLN 将视觉语言导航定义为一个序列决策问题。给定一条由 $l$ 个词组成的自然语言指令 $\mathcal{T} = \{w_1, \ldots, w_l\}$，智能体在时间步 $t$ 接收以自我为中心的单目 RGB 观测流 $\mathcal{O}_t = \{\mathbf{x}_0, \ldots, \mathbf{x}_t\}$，并输出导航动作。与传统端到端动作预测不同，AwareVLN 在关键导航节点额外引入结构化自我推理，使智能体能够显式分析场景、评估任务进展并规划下一步。
@@ -169,19 +156,6 @@ $$\mathcal{D} = \begin{cases} [\text{REASON}], & \text{if } d_{[\text{REASON}]} 
 ### 自动数据引擎
 
 为生成结构化推理的监督信号，AwareVLN 设计了一个无需人工标注的自动数据引擎。该引擎利用仿真环境中的房间级语义和真值路径点自动识别三种关键推理节点，并提取每个节点的多模态上下文（包括当前观测、历史轨迹、指令片段），调用通用 VLM 生成结构化的因果推理标注。这一流水线使得大规模、高质量的推理数据构建成为可能，支撑了模型自我意识能力的训练。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2373_https_arxiv_org_abs_2605_22816/figures/003_Figure_3.jpg]]
-*Figure 3: Automatic Data Engine. Key reasoning nodes are automatically identified using room-level semantics and ground-truth waypoints in the simulator, covering key events including subtask completion, path deviation, and incorrect stopping. For each key node, rich multimodal context is extracted and fed into a general VLM to automatically generate structured, causal reasoning supervision. This pipeline enables scalable, annotation-free construction of high-quality reasoning data*
-
-![[assets/figures/papers/paper_list_l2373_https_arxiv_org_abs_2605_22816/figures/010_Figure_6.jpg]]
-*Figure 6: Example of our multi-turn reasoning supervision process (Part 1): global understanding of the navigation episode and reasoning for subtask completion based on localized observations*
-
-![[assets/figures/papers/paper_list_l2373_https_arxiv_org_abs_2605_22816/figures/011_Figure_7.jpg]]
-*Figure 7: Example of our multi-turn reasoning supervision process (Part 2): reasoning for subsequent node types, including path deviation and stopping error, demonstrating error interpretation and recovery planning*
-
-
 
 ## 实验与关键发现
 
@@ -235,21 +209,11 @@ AwareVLN在仅使用仿真数据训练的条件下，被部署到四足机器人
 2. **路径偏离检测滞后**：路径偏离推理依赖当前观测与指令的比对，当偏离发生在视觉相似区域时，检测可能延迟，纠错动作的时效性不足。
 3. **单目3D感知局限**：在真实世界中，缺乏深度信息导致停止位置不够精确，且障碍物感知不足可能引发碰撞。这是仅使用单目RGB的固有限制，需要进一步研究增强3D感知能力。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2373_https_arxiv_org_abs_2605_22816/figures/004_Table_1.jpg]]
-*Table 1: Comparison with state-of-the-art methods on the Val-Unseen split of R2R-CE [24] and RxR-CE [26]. ∗ indicates methods using the waypoint predictor from Hong et al. [19]. AwareVLN outperforms all methods that do not rely on simulator pre-trained waypoint predictors, even when those methods leverage additional inputs such as depth, panoramic views, and odometry*
-
 ![[assets/figures/papers/paper_list_l2373_https_arxiv_org_abs_2605_22816/figures/006_Table_3.jpg]]
 *Table 3: Ablation study of different key reasoning nodes defined in automatic data engine on R2R-CE and RxR-CE Val-Unseen splits*
 
 ![[assets/figures/papers/paper_list_l2373_https_arxiv_org_abs_2605_22816/figures/007_Table_4.jpg]]
 *Table 4: Comparison of performance with and without special tokens on R2R-CE and RxR-CE Val-Unseen splits*
-
-![[assets/figures/papers/paper_list_l2373_https_arxiv_org_abs_2605_22816/figures/015_Figure_8.jpg]]
-*Figure 8: Example 1 of an automatically collected training trajectory, illustrating three key nodes: path deviation, correction completion, and subtask completion. The agent interprets the evolving visual scene and progressively generates structured reasoning outputs aligned with the navigation instruction*
-
-
 
 ## 定位与知识库关联
 
@@ -294,8 +258,6 @@ AwareVLN 与现有 VLM 导航方法的核心差异体现在三个关键设计维
 **如何将结构化自我感知推理扩展到更复杂的指令场景？** 当前 AwareVLN 在 R2R-CE 和 RxR-CE 上的验证集中于单条指令的室内导航。将这一范式扩展到更长期、多语言指令、甚至需要常识推理的导航任务中，需要自动数据引擎能够识别更丰富多样的关键推理节点类型，并生成相应的高质量推理监督。
 
 **推理与动作的更深层耦合。** 当前 AwareVLN 的推理与动作是时序上的交替关系（先推理、后动作）。一个更激进的设计方向是让推理直接参与动作空间的约束或重排序——例如，推理模块识别出路径偏离后，直接修改动作候选集的概率分布——从而实现推理与决策的更紧密耦合。
-
-
 
 ## 原文 PDF
 

@@ -130,8 +130,6 @@ Editto 的目标是让模型在推理时**仅依赖文本指令**完成编辑，
 
 训练基于预训练的上下文视频生成器，冻结大部分参数，仅微调上下文块的线性投影层，使用流匹配损失函数 $\mathcal{L} = \mathbb{E}_{t, \mathbf{z}_0, \mathbf{c}} \| \mathbf{v}_t(\mathbf{z}_t, t, \mathbf{c}) - (\mathbf{z}_0 - \mathbf{z}_t) \|^2$ 进行优化。整个训练投入超过 12,000 GPU-天，构建了包含超百万视频三元组的 Ditto-1M 数据集。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2211_https_arxiv_org_abs_2510_15742/figures/002_Figure_2.jpg]]
 *Figure 2: Our scalable data synthesis pipeline. (1) Pre-processing: A diverse video pool is curated via automated deduplication and motion filtering. (2) The core engine synthesizes video triplets, conditioning an in-context generator on automated instructions, appearance context from edited key-frames, and structural context from depth maps. (3) Post-processing: Final visual quality is guaranteed by a VLM-based filter and a denoising enhancer. For the sake of reproducibility, every component in our pipeline employs an open-source model*
 
@@ -232,8 +230,6 @@ Editto 相比此前最优的 InsViE，在 CLIP-T 上提升 **+1.98**，人类评
 2. **复杂运动编辑的鲁棒性存疑**：当编辑指令要求大幅改变运动模式（如“让静止的汽车开始行驶”）或引入全新对象并造成大面积遮挡时，深度图结构脚手架的有效性可能下降，但论文未提供此类极端案例的分析。
 
 3. **公平性与偏见分析缺失**：虽然数据合成流水线内置了 VLM 安全与适当性过滤，但未专门分析模型在不同人群、肤色、文化场景下的编辑偏见表现。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2211_https_arxiv_org_abs_2510_15742/figures/004_Table_1.jpg]]
 *Table 1: Quantitative comparisons with prior arts. The best results are bolded*

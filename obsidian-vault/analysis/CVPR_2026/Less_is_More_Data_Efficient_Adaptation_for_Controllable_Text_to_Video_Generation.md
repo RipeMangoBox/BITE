@@ -68,8 +68,6 @@ claims:
 
 实验表明，该方法在快门速度、光圈和色温三个连续物理控制任务上均实现了**完美的单调响应**（Spearman |ρ| = 1.000），且解耦推断下的视频质量指标（主体一致性 0.946、运动平滑度 0.987、X-CLIP 25.587）与原始 WAN 2.1 主干几乎一致，语义保真度变化小于 2%。消融实验进一步验证：合成数据训练的主干漂移速率远低于真实数据，且联合训练是避免适配器“推土机效应”（高秩内容记忆）的必要条件。
 
-
-
 ### 问题背景
 
 文本到视频（T2V）生成模型近年来取得了显著进展，能够根据自然语言描述合成高保真、时序连贯的视频内容。然而，当前的生成范式主要局限于**语义层面的控制**——用户通过修改文本提示来间接影响生成结果，缺乏对**连续物理参数**（如快门速度、光圈大小、色温）的精确操控能力。在真实摄影和电影制作中，这些参数是塑造视觉风格、运动模糊、景深效果和色彩氛围的核心手段。将此类连续物理控制引入大规模 T2V 模型，有望弥合生成模型与专业视觉创作工具之间的鸿沟。
@@ -91,8 +89,6 @@ claims:
 本文的核心假设是：**微调数据集的有效性不取决于其真实感，而取决于其解耦程度**。预训练 T2V 模型已经内化了丰富的视觉世界先验——它“知道”运动模糊是什么样、散景如何随深度变化、不同色温下场景的色调如何偏移。问题不在于“教会”模型这些效果，而在于**以最小干扰的方式唤醒这些先验，并将其与连续控制信号建立映射**。
 
 基于这一洞察，本文提出 **“Less is More”** 框架：仅使用**低保真度、稀疏的合成数据**（简单几何图元与程序化物理变化），通过**联合训练与解耦推断**策略，在不损害主干生成质量的前提下，实现精准、连续的物理控制。这一设计的核心逻辑是：简单、可控的合成数据避免了语义纠缠，使模型能够以“最少的数据”学到“最纯的控制”。
-
-
 
 ## 核心方法与创新机理
 
@@ -147,8 +143,6 @@ $$y_{\mathrm{combined}} = y_{\mathrm{text}} + g \cdot y_{\mathrm{cond}}$$
 
 本方法在控制精度上实现了**完美的单调响应**。在 80 个提示词子集上的单调性分析（Table 2）显示，所有物理控制参数（快门速度、光圈、色温）的 Spearman 秩相关系数中位数 $|\rho| = 1.000$，意味着生成结果与控制标量之间存在完全单调的映射关系。这一特性使得用户可以通过连续调节标量值获得可预期的、平滑的物理效果变化，而基于文本提示的基线方法无法实现这种精确的连续控制。
 
-
-
 本文提出一种面向可控文本到视频生成的数据高效适应框架，核心思想是“少即是多”：仅使用稀疏、低保真度的合成数据，通过联合训练与解耦推断策略，即可在大型预训练文生视频（T2V）扩散模型上实现精准的连续物理控制。该方法以 **WAN 2.1**（Wan et al., arXiv:2503.20314, 2025）作为骨干网络，在不损害其原有生成先验的前提下，赋予模型对快门速度、光圈、色温三个标量参数的连续操控能力。
 
 ### 控制信号注入架构
@@ -178,8 +172,6 @@ $$y_{\mathrm{combined}} = y_{\mathrm{text}} + g \cdot y_{\mathrm{cond}}$$
 
 ![[assets/figures/papers/paper_list_l2221_https_arxiv_org_abs_2511_17844/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our controllable generation pipeline. To achieve decoupled control, we encode the scalar condition separately from the text guidance via a parallel cross-attention module. During training (top), we optimize the conditional adapter while actively updating the backbone by injecting LoRA layers into all DiT blocks. During inference (bottom), we discard the LoRA weights from the shallow two-thirds of the transformer blocks, retaining only the conditional adapter and backbone LoRA in the deepest third of the blocks. This selective retention enables high-fidelity physical control while minimizing semantic corruption of the backbone*
-
-
 
 ### 整体架构概览
 
@@ -222,16 +214,6 @@ $$\nu_{\mathrm{drift}} = \frac{\delta(\mathrm{SS\text{-}FD})}{\delta(\mathrm{ste
 ### 有效秩分析
 
 为验证解耦设计的必要性，对条件信号 $y_{\mathrm{cond}}$ 进行奇异值分解（SVD）分析。将强条件（$c=1$）下的条件信号矩阵化后计算奇异值谱，评估其有效秩。联合训练模型的 $y_{\mathrm{cond}}$ 呈现尖锐的谱衰减，有效秩为 1，表明适配器学到了物理效果的低维紧凑表征（Figure 6a）；而仅训练适配器（无 Backbone LoRA）的模型中，$y_{\mathrm{cond}}$ 呈现高秩、缓慢衰减的谱特性，与内容信号 $y_{\mathrm{text}}$ 的谱结构相似，表明适配器记忆了训练数据内容而非分离出控制效果——这一现象被称为“推土机效应”（Bulldozer Effect，Figure 6b）。该分析从表征几何角度证明了 Backbone LoRA 联合训练对于解耦的关键作用。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2221_https_arxiv_org_abs_2511_17844/figures/007_Figure_6.jpg]]
-*Figure 6: Singular value spectrum of the conditional signal ycond in Block 27. (a) In our jointly trained model, the conditional signal exhibits a sharp spectral decay with an effective rank of 1, confirming that the adapter learned an efficient, low-dimensional representation of the physical effect. (b) In the adapter-only model, the signal is high-rank, with a slow spectral decay that mirrors the content signal*
-
-![[assets/figures/papers/paper_list_l2221_https_arxiv_org_abs_2511_17844/figures/015_Figure_12.jpg]]
-*Figure 12: Backbone content drift across depth for the shutter speed condition. Analysis performed on the value projection*
-
-
 
 ## 实验与关键发现
 
@@ -319,24 +301,8 @@ Figure 6 通过条件信号 $y_{\mathrm{cond}}$ 的奇异值谱分析揭示了�
 ![[assets/figures/papers/paper_list_l2221_https_arxiv_org_abs_2511_17844/figures/012_Table_2.jpg]]
 *Table 2: Quantitative Monotonicity Analysis. Spearman rank correlation*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2221_https_arxiv_org_abs_2511_17844/figures/014_Figure_11.jpg]]
 *Figure 11: Out-of-range inference. Qualitative sweep over*
-
-![[assets/figures/papers/paper_list_l2221_https_arxiv_org_abs_2511_17844/figures/017_Figure_14.jpg]]
-*Figure 14: Qualitative results of our controllable generation. Our model demonstrates precise and continuous control over shutter speed (Rows 1–2, motion blur), aperture (Rows 3–4, bokeh), and color temperature (Rows 5–6) by varying the conditional input c from -1.0 to 1.0 across diverse, high-fidelity video prompts*
-
-![[assets/figures/papers/paper_list_l2221_https_arxiv_org_abs_2511_17844/figures/022_Figure_15.jpg]]
-*Figure 15: Generalization of shutter control to scenes with complex motion. The model responds reliably to the shutter scalar in settings involving moving cameras (e.g., camera-follow and first-person views) and scenes with multiple independently moving objects*
-
-![[assets/figures/papers/paper_list_l2221_https_arxiv_org_abs_2511_17844/figures/028_Figure_17.jpg]]
-*Figure 17: Despite being trained only on images, the model renders smooth bokeh variation as depth changes, enabled by the backbone’s strong prior*
-
-![[assets/figures/papers/paper_list_l2221_https_arxiv_org_abs_2511_17844/figures/003_Figure.jpg]]
-*Figure: Ared sports car speeding down a coastal highway with waves crashing on the side. wider Aperture narrower A cat siting by a window watching the rain*
-
-
 
 ## 定位与知识库关联
 
@@ -391,8 +357,6 @@ Figure 6 通过条件信号 $y_{\mathrm{cond}}$ 的奇异值谱分析揭示了�
 4. **无丢弃的保先验方案**：若不丢弃任何 LoRA 权重，能否通过更精细的正则化或知识蒸馏直接保留主干先验，同时避免合成数据的偏置污染？这关系到方法在更广泛部署场景中的简洁性。
 
 5. **跨主干泛化性**：在不同视频生成骨干上（如 HunyuanVideo、Sora 类模型），是否仍能观察到相同的“少即是多”效应？这决定了该范式的生态影响力边界。
-
-
 
 ## 原文 PDF
 

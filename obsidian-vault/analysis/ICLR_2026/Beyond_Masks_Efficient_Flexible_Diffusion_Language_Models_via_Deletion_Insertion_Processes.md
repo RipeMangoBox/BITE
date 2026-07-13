@@ -46,8 +46,6 @@ claims:
 
 本文提出了一种新型扩散语言模型——**Deletion-Insertion Diffusion language models (DID)**，旨在解决现有掩码扩散语言模型（MDLM）中因大量非信息性`<MASK>`和`<PAD>`标记导致的计算效率低下问题。DID的核心创新在于将扩散过程从传统的掩码-去掩码范式彻底替换为删除-插入范式：前向过程逐步删除序列中的标记直至为空，后向过程从空序列开始逐步插入标记以重建完整序列。这一范式转换使得DID能够原生支持变长序列，消除冗余计算，并具备内在的自校正机制。实验结果表明，在固定长度设置下，DID实现了高达**1.99倍**的训练加速和**1.58倍**的推理加速；在变长设置下，加速比分别提升至**3.42倍**和**3.79倍**，同时生成质量显著优于现有基线模型。
 
-
-
 ### 2.1 掩码扩散语言模型的计算瓶颈
 
 现有掩码扩散语言模型（MDLM）如RADD、SMDM等，其核心计算瓶颈源于必须反复处理固定长度的序列。在这些序列中，大量位置被非信息性的`<MASK>`标记（在扩散过程中）和`<PAD>`标记（在处理变长数据时）占据。这些标记虽然不携带语义信息，但模型仍需对其进行完整的Transformer前向计算，导致大量FLOPs被浪费。
@@ -62,8 +60,6 @@ claims:
 
 DID的核心洞察在于：**通过将前向过程定义为独立标记删除，后向过程定义为基于学习到的插入分数的标记插入，DID模型能够原生支持变长序列，消除冗余计算，并实现内在的自校正机制。** 这一设计从根本上避免了`<MASK>`和`<PAD>`标记的产生，从而消除了MDLM中最主要的计算浪费来源。
 
-
-
 ## 核心方法与创新机理
 
 DID的核心创新可概括为以下三点：
@@ -71,9 +67,6 @@ DID的核心创新可概括为以下三点：
 1. **范式转换**：将扩散过程从掩码-去掩码替换为删除-插入，彻底消除`<MASK>`和`<PAD>`标记。
 2. **原生变长支持**：模型在变长序列空间上定义，无需填充操作，在变长设置下实现显著的效率提升。
 3. **内在自校正机制**：由于插入操作动态调整标记位置，模型在生成过程中能够自动修正早期的不完美生成。
-
-
-
 
 ![[assets/figures/papers/iclr26_generative_models_diffusion__generative_models_and_autoencoders__b001_VbvXjs5f72_Beyond_M/figures/001_Figure_1.jpg]]
 *Figure 1: (a) MDLMs, sequences padded to length 10.*
@@ -84,8 +77,6 @@ DID的整体框架建立在连续时间离散扩散理论之上，由以下核�
 - **后向插入过程**：一个CTMC，其反向转移率由学习到的插入分数s̄_θ定义，通过Tau-leaping方法进行并行采样。
 - **插入分数网络 (s̄_θ)**：一个Transformer网络，输入当前序列x_t和时间t，输出形状为|x_t| × |V|的插入分数。
 - **并行动态规划算法**：高效计算训练目标中的子序列计数比率，将复杂度从O(m n² V)降低到O(m n)。
-
-
 
 ### 5.1 前向删除过程
 
@@ -129,10 +120,7 @@ $$N(\mathrm{Ins}(\mathbf{x}_t, i, v), \mathbf{x}_0) = \sum_{j=1}^m \left[ \delta
 
 该算法将复杂度从O(m n² V)降低到O(m n)，使DID的训练变得实用。
 
-
-
 ## 实验与关键发现
-
 
 ### 6.1 零样本语言建模性能
 
@@ -185,15 +173,11 @@ Figure 2展示了不同去噪步数下生成长度的累积分布函数（CDF）
 
 Table 20和Table 21展示了1.1B参数模型的下游任务评估结果。DID在8个常识推理任务上的平均准确率为43.25%，优于SMDM。在GSM8K数学推理任务上，DID在不同top-p采样策略下均优于SMDM，例如在p=0.6时DID准确率为38.82%，SMDM为36.01%。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_generative_models_diffusion__generative_models_and_autoencoders__b001_VbvXjs5f72_Beyond_M/figures/005_Table_3.jpg]]
 *Table 3: Table 3: Average training time (in seconds) per 50 steps (i.e. batches) on OpenWebText.*
 
 ![[assets/figures/papers/iclr26_generative_models_diffusion__generative_models_and_autoencoders__b001_VbvXjs5f72_Beyond_M/figures/011_Table_5.jpg]]
 *Table 5: Table 5: Average training time (in seconds) per 50 steps on Stories.*
-
-
 
 ## 定位与知识库关联
 
@@ -213,8 +197,6 @@ DID在扩散语言模型的发展谱系中占据独特位置：
 2. DID能否与混合自回归模型（如Block Diffusion）结合，以兼顾自回归和扩散模型的优势？
 3. DID的并行动态规划算法能否进一步优化，以支持更长的序列（如超过4k tokens）？
 4. DID在更大规模模型（如超过1.1B参数）和更多样化任务上的表现如何？
-
-
 
 ## 原文 PDF
 

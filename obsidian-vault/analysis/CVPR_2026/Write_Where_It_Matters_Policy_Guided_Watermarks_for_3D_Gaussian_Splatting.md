@@ -71,8 +71,6 @@ claims:
 
 当前W2M的消息解码器（HiDDeN）是预训练且固定的，未纳入强化学习环路进行端到端自适应优化，可能限制极限性能。此外，方法仅在三个标准数据集上验证，在极端大场景或动态场景下的适应性有待探索。一个关键的开放问题是：**如何将消息解码器集成到RL环路中，实现端到端的自适应水印嵌入？**
 
-
-
 ### 3DGS 水印的兴起与核心矛盾
 
 3D 高斯泼溅（3D Gaussian Splatting, 3DGS）凭借显式点基元与可微光栅化，在实时新视角合成中取得了突破性进展，并迅速被应用于数字资产分发与版权保护场景。水印嵌入成为保护 3DGS 资产知识产权的关键技术手段：将一段二进制消息不可见地编码到 3DGS 表示中，并在需要时通过渲染视图进行可靠提取。
@@ -100,8 +98,6 @@ claims:
 $$\mathbf{f}_i^{(k+1)} = \mathbf{f}_i^{(k)} - w_i^{(k)} \mathbf{g}_i^{(k)}$$
 
 这一机制的关键优势在于：**策略网络通过控制梯度的缩放幅度，同时决定了“在哪里嵌入”（$w_i$ 接近 1 的区域获得强更新）和“嵌入多少”（$w_i$ 的大小调节修改强度）**，从而将嵌入能量的空间分配完全交由 RL 学习。与逐高斯控制相比，锚点级操作大幅降低了动作空间维度（从百万级降至千级），使得 RL 训练在计算上可行，同时保持了足够的空间粒度来实现精细的水印分配。
-
-
 
 ## 核心方法与创新机理
 
@@ -140,8 +136,6 @@ W2M 的核心突破在于将 3DGS 水印嵌入重新定义为**序列决策问�
 ### 创新点总结
 
 W2M 的三项改变形成一条完整的因果链：**强化学习策略网络**输出逐锚点权重，决定“在哪里写”和“写多少”；**联合奖励函数**将不可见性与鲁棒性反馈闭环传递给策略；**锚点级梯度缩放**在结构化表示上高效执行定向修改。这一设计使得水印嵌入从静态规则驱动转向场景自适应学习，在 Blender、LLFF、Mip-NeRF 360 三个数据集上以 32-bit、48-bit、64-bit 消息全面超越对比方法（Table 1），并在图像空间和模型空间多种失真下保持最优鲁棒性（Table 2, 3）。
-
-
 
 W2M 将 3DGS 水印嵌入形式化为一个**策略驱动的序列决策过程**，并用 Actor‑Critic 强化学习在线优化。其核心直觉是：不同场景、不同锚点对水印嵌入的“容忍度”不同，因此需要学习**逐锚点**的“在哪里写”与“写多少”策略，而非依赖全局静态超参数。
 
@@ -183,8 +177,6 @@ W2M 将 3DGS 水印嵌入形式化为一个**策略驱动的序列决策过程**
 ### 推理阶段
 
 训练完成后，仅需保留嵌入后的 3DGS 场景与 HiDDeN 解码器。对任意新视角渲染图像，直接通过解码器提取水印消息，无需策略网络或 RL 环路参与。
-
-
 
 W2M 将 3DGS 水印嵌入形式化为一个马尔可夫决策过程，其核心由四个紧密耦合的模块构成：策略网络、即时印刻目标、抗失真消息提取和锚点级梯度缩放更新。这些模块在 Actor-Critic 强化学习框架下协同工作，实现场景自适应的水印分配。
 
@@ -244,8 +236,6 @@ $$
 
 其中 $V_{\psi}$ 为价值网络，$\gamma = 0.99$ 为折扣因子。Actor 网络通过策略梯度最大化期望累积奖励，Critic 网络通过最小化 TD 误差学习准确的价值估计。训练完成后，推理阶段仅需渲染和解码，无需策略网络参与。
 
-
-
 ## 实验与关键发现
 
 ### 主要定量结果
@@ -278,27 +268,14 @@ Figure 2 以 PSNR–Bit Accuracy 散点图直观展示了这一优势：W2M 的�
 
 尽管 W2M 在各项指标上表现突出，仍存在两处可识别的局限。其一，消息解码器（HiDDeN）在 RL 环路中保持预训练且固定，未参与端到端自适应优化。在极端失真下，解码器与策略之间的分布偏移可能限制极限鲁棒性，这解释了旋转与 JPEG 失真下准确率相对较低的现象。其二，当前验证仅覆盖 Blender、LLFF、Mip-NeRF 360 三个中等规模数据集，对于超大场景或动态场景下的策略泛化能力尚缺乏实验支持。这两点需在实际部署中手动评估。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2654_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Write_Where_It_Matt/figures/005_Table_2.jpg]]
 *Table 2: Bit accuracy of robustness under various Image-space distortions compared to baselines. We conduct experiments using 32-bit messages and report the average results of Blender, LLFF, and Mip-NeRF 360 datasets. The best performances are highlighted in bold*
-
-![[assets/figures/papers/paper_list_l2654_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Write_Where_It_Matt/figures/006_Table_3.jpg]]
-*Table 3: Bit accuracy of robustness under various Model-space distortions compared to baselines. We conduct experiments using 32-bit messages and report the average results of all datasets. The best performances are highlighted in bold*
 
 ![[assets/figures/papers/paper_list_l2654_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Write_Where_It_Matt/figures/009_Table_4.jpg]]
 *Table 4: Comparison results of GS-RL (a per-Gaussian variant) and W2M with B = 48 bits on the Blender dataset*
 
-![[assets/figures/papers/paper_list_l2654_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Write_Where_It_Matt/figures/007_Table_5.jpg]]
-*Table 5: Evaluation on different reward combinations with B = 48 bits on the LLFF dataset*
-
-![[assets/figures/papers/paper_list_l2654_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Write_Where_It_Matt/figures/008_Figure_4.jpg]]
-*Figure 4: Impact of the anchor number evaluated B = 48 bits on the LLFF dataset. Bit Accuracy (left y-axis) and PSNR (right y-axis) versus the number of anchors. The violet arrow marks the configuration used in our implementation*
-
 ![[assets/figures/papers/paper_list_l2654_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Write_Where_It_Matt/figures/001_Figure_1.jpg]]
 *Figure 1: We introduce Write Where It Matters (W2M) for 3D Gaussian Splatting (3DGS) watermarking. We present qualitative results with a 48-bit message length, comparing W2M against state-of-the-art competitors, GaussianMarker [7], GuardSplat [3], and 3D-GSW [11] on the Blender [27], LLFF [26], and Mip-NeRF 360 [1] datasets. W2M is a novel policy-guided approach that employs Reinforcement Learning to directly link robustness to distortions and rendered-view invisibility feedback with per-Gaussian editing decisions, thereby achieving superior performance with minimal impact on the original 3DGS*
-
-
 
 ## 定位与知识库关联
 
@@ -357,8 +334,6 @@ W2M 的方法论贡献可置于以下知识谱系中：
 4. **对抗性攻击防御**：Table 3 覆盖了噪声、移除和克隆攻击，但未考虑针对水印本身的对抗性扰动（如对抗性高斯删除）。将对抗训练纳入 RL 奖励设计可能增强对针对性攻击的鲁棒性。
 
 5. **理论分析**：Eq. (9) 给出了一阶近似，但策略梯度在高维锚点特征空间中的收敛性质、写入权重分布与场景纹理的统计关联等理论问题尚未深入探讨。
-
-
 
 ## 原文 PDF
 

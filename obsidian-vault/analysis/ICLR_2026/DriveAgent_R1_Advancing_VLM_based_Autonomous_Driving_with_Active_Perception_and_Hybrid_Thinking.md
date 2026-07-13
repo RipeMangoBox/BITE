@@ -57,8 +57,6 @@ claims:
 
 **核心结果。** 在仅 3B 参数规模下，DriveAgent-R1 在 Drive-Internal 测试集上通过主动使用工具获得 **+6.07% 的准确率提升**，性能优于 GPT-5 并接近人类驾驶水平；在 nuScenes 测试集上，序列平均联合准确率达到 **47.10%**，超越 GPT-5（45.14%），同时自适应模式选择准确率达到 **65.30%**。消融实验证实，主动感知相比被动感知显著加深了对视觉证据的依赖（无图像时相对性能下降更大），且级联 RL 策略在模式选择准确率和规划精度上均显著优于单阶段 RL 变体。
 
-
-
 ### 自动驾驶感知范式的演进瓶颈
 
 自动驾驶系统的决策能力高度依赖于对复杂驾驶场景的准确感知与理解。近年来，视觉语言模型（VLM）凭借其强大的多模态理解和推理能力，在自动驾驶规划任务中展现出巨大潜力。然而，现有基于VLM的驾驶智能体普遍采用**被动感知范式**：系统仅接收固定的前视图图像和文本描述，随后通过纯文本链式推理生成驾驶决策。这种范式存在两个根本性缺陷。
@@ -82,8 +80,6 @@ claims:
 3. **通过渐进训练培养工具使用与模式选择能力**：工具的有效使用和自适应模式选择并非VLM的固有能力——实验表明，未经专门训练的模型（如Qwen2.5-VL-3B/7B）在使用工具时反而会出现性能下降。因此，需要设计专门的训练策略，通过级联强化学习逐步培养智能体的工具调用和模式选择能力。
 
 最终目标是构建一个仅3B参数规模、但能够通过主动感知和混合思维达到与顶级闭源模型（如GPT-5）可比甚至更优性能的自动驾驶智能体，同时接近人类驾驶水平。
-
-
 
 ## 核心方法与创新机理
 
@@ -141,13 +137,8 @@ $$R = R_{\text{acc}} + R_{\text{fmt}} + \mathbb{I}(\text{mode} = \mathcal{M}_{\t
 
 这些局限指向未来的研究方向：如何通过对抗性场景训练增强辩证推理能力，以及如何动态调整工具调用阈值以在计算开销和安全性之间取得更优平衡。
 
-
-
 ![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_r2g8TV4nJy/figures/002_Figure_2.jpg]]
 *Figure 2: The Hybrid-Thinking architecture of DriveAgent-R1. For simple scenarios (Top), the agent uses direct text-based reasoning ( T _ { 1 } A ) . For complex scenarios (Bottom), it iteratively interleaves thoughts ( T _ { k } ) with tool calls to a Vision Toolkit, acquiring new visual evidence ( I _ { k } ) to refine its decision-making. The detailed visulization of this case is shown in Fig. 10, Appendix A.10*
-
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_r2g8TV4nJy/figures/003_Figure_3.jpg]]
-*Figure 3: The progressive three-stage training strategy for DriveAgent-R1. The process begins with (1) DM-SFT to establish a foundational understanding of both thinking modes. This is followed by a core Cascaded RL phase, where (2) FCM-RL strengthens each mode independently, and (3) AMS-RL trains the agent to adaptively select the optimal mode*
 
 DriveAgent-R1 的整体架构围绕**主动感知**与**混合思维**两个核心机制构建，形成一条从视觉输入到规划决策的端到端推理管线。
 
@@ -183,8 +174,6 @@ DriveAgent-R1 的整体架构围绕**主动感知**与**混合思维**两个核�
 - **阶段三：自适应模式选择强化学习**：在阶段二的基础上，引入条件工具使用奖励 $R_{\mathrm{tool}}$，鼓励模型在工具确实能带来准确率增益时选择工具模式，同时惩罚不必要的工具调用，最终实现安全与效率的平衡。
 
 图 2 展示了混合思维架构中两种推理路径的示意：简单场景下直接文本推理，复杂场景下迭代交织思维与工具调用。图 3 则概括了整个三阶段渐进训练流程。
-
-
 
 ### 领域对齐基础模型：DriveAlign-3B
 
@@ -254,8 +243,6 @@ $$MSA = \frac{1}{N} \sum_{i=1}^{N} \mathbb{I}(m_{\mathrm{adaptive}}(q_i) = m_i^*
 
 其中 $m_{\mathrm{adaptive}}(q_i)$ 为智能体对样本 $q_i$ 的自适应模式选择，$m_i^*$ 为该样本上准确率更高的最优模式。MSA 衡量智能体能否准确判断场景复杂度并选择合适推理路径。实验表明，DriveAgent-R1 的 MSA 达到 65.30%，且随训练阶段逐步提升。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验结果
@@ -264,16 +251,11 @@ $$MSA = \frac{1}{N} \sum_{i=1}^{N} \mathbb{I}(m_{\mathrm{adaptive}}(q_i) = m_i^*
 
 在 Drive-Internal 测试集上，DriveAgent-R1 使用视觉工具集后首帧联合准确率达到 51.34%，相比不使用工具的版本（45.27%）获得 **+6.07% 的绝对提升**，且超越 GPT-5 的 56.48%（Table 1）。在 nuScenes 跨数据集测试中，序列平均联合准确率为 **47.10%，超越 GPT-5 的 45.14%**，验证了框架的泛化能力。值得注意的是，小规模开源 VLM（Qwen2.5-VL-3B/7B）在未经专门训练的情况下使用工具反而导致性能下降（分别 -0.42% 和 -3.57%），表明有效工具使用是一项非平凡技能，需要针对性训练。
 
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_r2g8TV4nJy/figures/004_Table_1.jpg]]
-*Table 1: Results on the Drive-Interna $\boldsymbol { \mathrm { l } } _ { \mathrm { t e s t } }$ and $\mathrm { n u S c e n e s } _ { \mathrm { t e s t } }$ . All models are evaluated using one-shot prompting under two conditions: without tools and with access to the visual toolkit. To ensure a consistent, structured reasoning format, closed-source models were queried via their official APIs in a “no-thinking” mode. Parentheses show the absolute gain from using tools. Mode Selection Accuracy (MSA). To quantify DriveAgent- . R $I ^ { \prime } { \bf$ s } adaptive mode selection, we introduce the Mode Selection Accuracy (MSA), inspired by Jiang et al. (2025b). It measures the alignment between the agent’s ada...
 
 在 DriveBench 基准上，DriveAgent-R1 的感知得分达到 34.07，是 DriveLM（16.85）的两倍以上（Table 2）；行为得分 43.69 同样领先。在 nuScenes 验证集的开环规划任务中，平均位移误差（ADE）为 **0.28m**，优于 DriveVLM-Dual（0.31m）和 EMMA（0.32m）（Table 3）。配合轻量 MLP 运动规划头，模型将高层元动作序列转换为低层轨迹点，实现了端到端的可执行规划。
 
 ![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_r2g8TV4nJy/figures/005_Table_2.jpg]]
 *Table 2: Performance Comparison on DriveBench. We compare DriveAgent-R1 with representative VLM-based driving agents*
-
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_r2g8TV4nJy/figures/006_Table_3.jpg]]
-*Table 3: Open-loop planning performance on nuScenes validation set. We report the L2 Displacement Error (DE) and Collision Rate (CR) at different time horizons. Bold and underlined denote the best and second-best results, respectively. DriveAgent-R1 achieves superior scene understanding and decision-making. As shown in Table 2,, DriveAgent-R1 achieves a Perception score of 34.07, doubling DriveLM’s 16.85. This substantial margin confirms that proactive tool invocation captures critical visual details often missed by passive paradigms. Moreover, our top-ranking Behavior score (43.69) demonstrates that the DriveAgent-R1 effectively translates this rich visual evidence into safe, correct decision-making*
 
 ---
 
@@ -301,8 +283,6 @@ $$MSA = \frac{1}{N} \sum_{i=1}^{N} \mathbb{I}(m_{\mathrm{adaptive}}(q_i) = m_i^*
 
 相比之下，单阶段 RL 变体（仅 FCM-RL 或仅 AMS-RL 训练两轮）均无法达到级联策略的性能，验证了先强制对比后自适应选择的渐进训练逻辑的必要性。图 4 直观展示了各训练阶段在 M_adaptive 模式和 MSA 上的累积增益。
 
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_r2g8TV4nJy/figures/009_Figure_4.jpg]]
-
 #### 主动感知 vs 被动感知
 
 主动感知框架的核心优势在消融实验中得到了清晰验证（Table 7）：
@@ -322,8 +302,6 @@ $$MSA = \frac{1}{N} \sum_{i=1}^{N} \mathbb{I}(m_{\mathrm{adaptive}}(q_i) = m_i^*
 
 混合思维机制在效率与准确率之间实现了有效平衡（Table 8）。在自适应模式（M_adaptive）下，模型根据场景复杂度动态选择推理路径：
 
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_r2g8TV4nJy/figures/012_Table_8.jpg]]
-
 - 推理延迟从纯工具模式的 **7.91s 降至 6.74s**（降低约 15%）。
 - 输出 token 数从 314.45 降至 265.57（降低约 16%）。
 
@@ -342,12 +320,6 @@ $$MSA = \frac{1}{N} \sum_{i=1}^{N} \mathbb{I}(m_{\mathrm{adaptive}}(q_i) = m_i^*
 3. **工具使用的双刃剑效应**：小模型（如 Qwen2.5-VL-3B/7B）在无专门训练时使用工具反而导致性能下降，说明工具的有效利用需要模型具备一定的基础视觉推理能力，否则额外的视觉信息反而成为噪声。
 
 4. **验证范围有限**：当前仅在 nuScenes 和 Drive-Internal 两个数据集上验证，在更复杂的真实环境中（如极端天气、非结构化道路）的泛化能力仍需进一步测试。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_r2g8TV4nJy/figures/015_Table_9.jpg]]
-*Table 9: Detailed results of domain alignment on in-domain and general abilities. Scores on DriveAlign- $\mathrm { . V Q A _ { \mathrm { t e s t } } }$ (upper) and 8 general VLM benchmarks (lower). Numbers in blue/red are deltas vs. Qwen2.5-VL-3B
-
 
 
 ## 定位与知识库关联
@@ -409,8 +381,6 @@ DriveAgent-R1 的三阶段渐进训练策略（领域对齐 → 双模式 SFT �
 4. **跨域泛化**：领域对齐数据集是否可以扩展以覆盖全球多样的交通规则和场景（如左行/右行、不同交通标志体系），从而提升泛化能力？
 
 5. **任务迁移**：该框架能否推广到其他具身智能任务（如机器人导航），并且是否需要任务特定的工具集设计？
-
-
 
 ## 原文 PDF
 

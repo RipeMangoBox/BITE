@@ -51,8 +51,6 @@ TrajRAG 将这一瓶颈转化为一个**检索增强生成（RAG）问题**：�
 
 该方法在三个主流基准上取得了最优结果：MP3D 上成功率达 42.6% / SPL 18.0%，HM3D-v1 上 62.5% / 33.9%，HM3D-v2 上 78.1% / 40.2%，验证了几何-语义经验检索对零样本导航的有效性。
 
-
-
 **零样本物体导航（Zero-Shot ObjectNav）** 要求智能体在未见过的三维环境中，仅凭开放词汇物体类别（如“找到一张床”）就能定位并到达目标。近年来，基于大语言模型（LLM）或视觉语言模型（VLM）的方法在此任务上取得了显著进展，其核心范式是将当前观测转化为文本或视觉提示，交由大模型进行常识推理以选择下一步航点。
 
 然而，现有方法存在一个根本性的瓶颈：**决策完全依赖大模型中编码的场景无关常识，缺乏对三维空间布局和物体共现关系的长期经验积累**。具体表现为以下三个层次的问题：
@@ -66,8 +64,6 @@ TrajRAG 将这一瓶颈转化为一个**检索增强生成（RAG）问题**：�
 上述缺口导致零样本导航方法在面对复杂场景时决策缺乏针对性——智能体可能重复犯下相似的探索错误，无法利用“在类似布局中目标物体通常出现在哪些区域”这类从经验中可习得的空间先验。
 
 **TrajRAG** 的提出正是为了填补这一缺口。其核心动机是：如果能够将每次导航的轨迹转化为紧凑的表示并持续积累，在后续导航中检索与之空间布局和语义上下文相似的历史经验，注入大模型推理过程，就能使智能体“借鉴以往经验”提升零样本导航的决策质量（图1c）。这一思路将检索增强生成（RAG）范式从文本领域拓展至具身导航的几何-语义空间，为终身经验学习提供了新的技术路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -86,8 +82,6 @@ TrajRAG 的核心创新在于**将零样本物体导航从“仅依赖大模型�
 基线方法完全依赖大模型内置的场景无关常识进行航点选择。TrajRAG 在导航中执行**粗到细检索**：粗检索阶段利用当前拓扑-极坐标轨迹的几何-语义特征快速定位高相似度组，细检索阶段通过序列嵌入精确匹配最相关的历史轨迹片段。检索到的经验（包括布局一致场景和目标达成轨迹）被注入大模型提示中，辅助其估计各候选轨迹到达目标的效率，从而做出更具场景针对性的决策。
 
 这三个 changed slot 相互耦合形成闭环：紧凑的拓扑-极坐标表示使大规模轨迹存储和高效检索成为可能，层次化分块架构支撑了粗到细的检索效率，而检索到的经验又通过大模型推理反哺导航决策，最终使零样本导航从“无记忆的常识猜测”升级为“有经验的场景推理”。
-
-
 
 TrajRAG 将零样本物体导航重新定义为**检索增强生成（RAG）**问题，其核心思路是将历史导航经验转化为可复用、可匹配的几何-语义记忆，并在推理阶段注入大模型辅助决策。整体框架由一条贯穿“建图—表示—索引—检索—推理—积累”的闭环管线构成，如 Figure 2 所示。
 
@@ -123,8 +117,6 @@ Figure 1 明确对比了三种上下文模式：
 - **最终输出**：策略模型基于检索经验选择的下一航点，驱动智能体逐步逼近目标。
 
 整个框架的关键设计在于将冗余的 RGB-D 序列压缩为**拓扑-极坐标轨迹**，并通过**层次化索引**实现高效检索，使零样本导航首次具备了可积累、可迁移的长期场景经验。
-
-
 
 ### 语义建图与拓扑骨架提取
 
@@ -176,15 +168,8 @@ $$\mathcal{L}_{\text{contrast}} = -\log \frac{\exp(\sin(\mathbf{z}_i, \mathbf{z}
 
 每个导航回合结束后，完整轨迹经拓扑-极坐标转换后整合进TrajRAG知识库，实现终身经验积累。摘要图随之更新，粗索引和细索引增量扩展，使系统在持续使用中不断提升检索质量和导航能力。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2649_https_arxiv_org_abs_2605_01700/figures/005_Figure_3.jpg]]
-*Figure 3: Retrieved Examples. Given a partial trajectory, TrajRAG uses its accumulated keypoints (green) to retrieve a layoutconsistent scene and the assistant goal-reaching trajectory (blue). For pre-retrieval, the top-5 matched keypoints within the visible map are highlighted in red*
-
 ![[assets/figures/papers/paper_list_l2649_https_arxiv_org_abs_2605_01700/figures/008_Figure_4.jpg]]
 *Figure 4: Navigation with TrajRAG. The left column shows the agent’s ego-view RGB images. The middle column presents the skeletonization and detected keypoints (red) on the skeleton map, where the location icon indicates the ground-truth location of the target (“bed”) for visualization purposes only; the target location is unknown to the agent during navigation. The right column illustrates the agent’s traversed trajectory from the start to the pre-navigation position (light gray), candidate trajectories from the current location to various frontiers (light-colored, with blue dots indicating frontiers), and the trajectory selected by the model (burgundy)*
-
-
 
 ## 实验与关键发现
 
@@ -217,21 +202,13 @@ Table 2 在 HM3D-v1 上消融了检索策略。仅使用文本嵌入（TE）进�
 
 Table 3 将 TrajRAG 与基于文本嵌入的 RAG（TrajTextRAG）和基于图的 RAG（GraphRAG）进行对比。TrajRAG 显著优于两者，说明将轨迹转化为紧凑的拓扑-极坐标序列并采用专门的序列嵌入进行检索，比直接将原始文本或图结构作为检索单元更能捕捉导航经验中的空间-语义关联。
 
-![[assets/figures/papers/paper_list_l2649_https_arxiv_org_abs_2605_01700/figures/006_Table_3.jpg]]
-*Table 3: Comparison with Other Types of RAG in HM3Dv1*
-
 ### 跨数据集泛化
 
 Table 4 展示了跨数据集评估结果。当使用 HM3D-v1 与 MP3D 的混合语料库进行检索时，TrajRAG 在两个数据集上的性能均优于仅使用单一数据集语料的配置（置信度 0.9）。这表明 TrajRAG 积累的经验具有可迁移性，层次化分块结构能够有效组织来自不同场景分布的知识，实现跨域泛化的终身学习。
 
-![[assets/figures/papers/paper_list_l2649_https_arxiv_org_abs_2605_01700/figures/007_Table_4.jpg]]
-*Table 4: Cross-dataset evaluation results on HM3Dv1 and MP3D*
-
 ### 失败模式与局限性
 
 论文未提供显式的失败模式分析（limitations 字段为空）。从方法设计推断，潜在风险包括：拓扑骨架化对复杂多层结构的适应性、极坐标采样半径 $R$ 对场景尺度的敏感性，以及层次化分组策略在经验规模急剧增长时的检索精度退化。这些点需要在实际部署中手动验证。
-
-
 
 ## 定位与知识库关联
 
@@ -289,8 +266,6 @@ TrajRAG构建的知识库具有以下特征：
 - **经验遗忘与更新**：长期运行中旧经验可能过时或冗余，是否需要引入遗忘机制或经验优先级排序？
 - **多模态经验融合**：能否将人类示范或语言指令等异质经验纳入同一知识库？
 - **安全与鲁棒性**：检索到的经验若来自失败轨迹，如何避免错误传播？
-
-
 
 ## 原文 PDF
 

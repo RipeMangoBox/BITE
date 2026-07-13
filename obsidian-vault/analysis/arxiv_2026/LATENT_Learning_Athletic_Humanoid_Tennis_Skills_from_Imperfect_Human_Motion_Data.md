@@ -54,8 +54,6 @@ claims:
 
 **方法定位**：LATENT 基于分层人形机器人控制框架，区别于端到端强化学习（vanilla PPO）、解耦运动生成与跟踪（MotionVAE）、对抗运动先验（AMP）、对抗技能嵌入（ASE）以及无校正机制的潜在动作空间方法（PULSE）。其核心创新在于将**在线蒸馏的条件变分瓶颈**、**状态条件可学习先验**、**手腕直接校正**与**自适应马氏距离约束**统一到同一框架中，实现了从不完美数据到竞技级技能的有效迁移。
 
-
-
 ### 问题背景：人形机器人运动技能的获取瓶颈
 
 使通用人形机器人在动态、高精度的体育任务中达到人类水平的表现，是具身智能领域的长期目标。网球运动对敏捷性、手眼协调和全身运动规划提出了极高要求，成为检验人形机器人运动智能的理想场景。传统的机器人技能获取方法通常依赖于精心设计的运动规划或强化学习，但面临两难困境：纯强化学习（如 vanilla PPO）在稀疏奖励的高维动作空间中难以收敛，而基于运动捕捉数据的模仿学习方法则受限于数据质量。
@@ -80,8 +78,6 @@ claims:
 
 这一思路使得 LATENT 能够从仅包含不精确原始技能片段的业余球员数据出发，学习出兼具任务成功率（仿真正手 96.52%）和自然运动风格的网球技能，并在 Unitree G1 机器人上实现稳定的多回合真实世界对打。
 
-
-
 ## 核心方法与创新机理
 
 LATENT 的核心创新在于构建了一个**可校正的潜在动作空间**（correctable latent action space），使高层策略能够在约束下组合不完美人体数据中的原始技能，并直接校正关键末端执行器。其关键设计围绕以下四个 changed slots 展开。
@@ -105,8 +101,6 @@ $$\boldsymbol{a}_t^{\mathrm{full}} = [\mathcal{D}(\boldsymbol{s}_t, \boldsymbol{
 ### 4. 在线蒸馏与手腕扰动鲁棒的潜在空间
 
 不同于 PULSE 的离线 VAE 蒸馏，LATENT 采用在线 DAgger 蒸馏结合条件变分瓶颈构建潜在空间（Section 3.2.2）。在运动跟踪器预训练阶段，刻意移除右手腕的控制信号并施加随机扰动（Section 3.2.1），使得后续蒸馏出的潜在空间对腕部扰动具有鲁棒性。这一设计确保了高层策略在输出手腕校正命令时，潜在空间生成的身体动作不会因手腕变化而失真，实现了校正与自然的解耦。
-
-
 
 LATENT 的完整流程遵循“数据收集—先验构建—策略训练—迁移部署”四阶段范式，核心目标是**从不完美的人体运动数据中提取可用的动作先验，并通过可校正的潜在动作空间与探索约束，使高层策略能够在网球任务中组合原始技能并精确控制末端执行器**。
 
@@ -154,12 +148,8 @@ $$\boldsymbol{a}_t^{\mathrm{full}} = [ \mathcal{D}(\boldsymbol{s}_t, \boldsymbol
 
 整个 pipeline 的数据流可概括为：**不完美运动片段 → 运动跟踪器（鲁棒模仿）→ 在线蒸馏（潜在空间构建）→ 高层策略（潜在动作采样 + 手腕校正）→ LAB 约束（动作投影）→ PD 目标（底层执行）→ 域随机化（sim-to-real 桥接）**。这一设计使得 LATENT 能够在仅依赖准真实运动先验的条件下，学习出兼具任务性能和自然运动风格的网球技能。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2603_12686/figures/003_Figure_2.jpg]]
 *Figure 2: Overview of LATENT. (a) We pre-train a motion tracker on collected imperfect human motion data. (b) We construct a correctable latent action space via online distillation. (c) We train a high-level policy to correct and compose latent actions for tennis task. (d) We transfer the policy to the real world via dynamics randomization and observation noise*
-
-
 
 LATENT 的核心架构围绕一个 **可校正的潜在动作空间 (correctable latent action space)** 展开，通过三个关键模块将不完美的人体运动数据转化为可组合、可校正的网球技能。
 
@@ -222,13 +212,6 @@ LAB 基于 **马氏距离 (Mahalanobis distance)** 而非欧氏距离来定义�
 ```
 
 其中 $`m`$ 为网球质量，$`v`$ 为速度矢量，$`k`$ 为阻力系数。该力与速度大小的平方成正比，方向与速度相反，是动力学随机化（Table 2）中的关键随机化参数之一。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2603_12686/figures/005_Figure_4.jpg]]
-*Figure 4: The motivation of Latent Action Barrier (LAB)*
-
-
 
 ## 实验与关键发现
 
@@ -293,9 +276,6 @@ Table 5 报告了在 Unitree G1 机器人上的真实世界评估结果。
 
 Figure 5 的热力图展示了机器人在连续回球过程中的场地覆盖模式。随着连续回球次数增加（从 8 次到 400 次），机器人展现出有效的场地覆盖和自适应重新定位能力——策略学会了在每次回球后回到合理位置，为下一次击球做准备。Figure 6 的机器人自对弈评估进一步显示，在 50 局随机比赛中，连续回合数的分布表明策略能够维持多回合对打，而非仅完成单次击球。
 
-![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2603_12686/figures/011_Figure_5.jpg]]
-*Figure 5: Robot movement coverage during consecutive ball returns. Heatmaps of the robot’s global positions accumulated over different numbers of consecutive ball returns (8, 16, 80, and 400). The learned policy enables effective court coverage and adaptive repositioning during consecutive rallies*
-
 ![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2603_12686/figures/013_Figure_6.jpg]]
 *Figure 6: Robot-robot self-play evaluation in simulation. (a) Visualization of two robots performing self-play on opposite sides of the court. (b) Distribution of number of consecutive rallies over 50 random games*
 
@@ -311,22 +291,6 @@ Figure 5 的热力图展示了机器人在连续回球过程中的场地覆盖�
 *Table 2: Dynamics randomization used in LATENT. We randomize robot dynamics and tennis ball physics*
 
 4. **数据来源的局限性**：训练数据仅来自业余球员，可能限制了动作的专业性和多样性，对于更高水平的竞技表现可能存在天花板效应。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2603_12686/figures/002_Figure_1.jpg]]
-*Figure 1: (a) The humanoid performs multi-shot rallies with a human player using different stroke types across various court regions. (b) The humanoid performs athletic tennis skills to strike an incoming ball traveling at high speed (peak velocities > 15 m/s)*
-
-![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2603_12686/figures/014_Figure_7.jpg]]
-*Figure 7: Different hitting events in simulation. The red curves denote incoming ball trajectories, the robot posture corresponds to the moment of ball contact, and the green curves indicate the trajectories of the returned balls*
-
-![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2603_12686/figures/015_Figure_8.jpg]]
-*Figure 8: Close-up real-world examples. Representative frames from real-world rallies showing diverse tennis return behaviors, including forehand and backhand strokes, dynamic footwork, and coordinated whole-body motion*
-
-![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2603_12686/figures/004_Table_1.jpg]]
-*Table 1: Reward terms used in LATENT. The reward terms are divided into three types: Task, Regularization, and Termination*
-
-
 
 ## 定位与知识库关联
 
@@ -380,8 +344,6 @@ LATENT 相对于最接近的前身 PULSE 做出了四项核心改动，每一项
 4. **专业数据融合**：如何结合专业运动员数据以提升动作质量和赛事级表现？这可能需要处理专业数据与业余数据之间的分布差异。
 
 5. **多平台泛化**：LAB 的马氏距离约束和 sim-to-real 随机化范围如何自动化适配不同的人形机器人平台，减少人工调校成本？
-
-
 
 ## 原文 PDF
 

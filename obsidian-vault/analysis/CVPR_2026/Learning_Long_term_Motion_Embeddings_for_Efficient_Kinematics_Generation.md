@@ -60,8 +60,6 @@ claims:
 
 **方法定位**：本方法位于运动表示学习与生成模型的交叉点，以高度压缩的语义运动空间作为核心表征，向上承接稀疏轨迹提取（如CoTracker3），向下支撑稠密轨迹重建、条件运动生成及下游策略学习，为高效运动学生成提供了新的范式。
 
-
-
 ### 运动建模的核心瓶颈
 
 理解并生成场景中的运动是计算机视觉与机器人领域的核心挑战。运动表征的选择直接决定了推理效率、泛化能力和生成质量。当前主流方法在运动表征上陷入两难困境：
@@ -86,8 +84,6 @@ claims:
 3. **稠密重建能力**：尽管编码过程仅使用稀疏轨迹，潜在运动网格支持在任意空间查询点重建稠密运动轨迹，实现从稀疏到稠密的泛化。
 
 在这一学习到的运动空间中，本文进一步引入**条件流匹配生成模型**，支持通过 Poke 条件或文本条件进行可控运动生成。由于生成过程在高度压缩的潜在空间中进行，其推理效率比视频生成模型高出数个数量级，同时运动生成质量更优——这一反直觉的结果源于压缩迫使潜在空间学习更具语义性的结构化表征。
-
-
 
 ## 核心方法与创新机理
 
@@ -127,8 +123,6 @@ claims:
 
 本文的独特贡献在于：通过 VAE 压缩 + 潜在空间流匹配的组合，首次在运动生成任务上同时实现了**优于视频模型的生成质量**和**数个数量级的效率提升**（Table 1 中达到 2500 timesteps/s），并在机器人操作任务（LIBERO）上取得了大幅领先的成功率（79.6% vs. ATM 60.4%）。
 
-
-
 本文提出一种以**长期运动嵌入（Long-term Motion Embedding, LME）** 为核心的运动学生成框架。其根本设计动机在于：现有运动表示要么过于低维（如稀疏轨迹、光流），缺乏泛化能力和语境聚合；要么过于高维（如视频像素），与外观信息深度纠缠且计算代价高昂。LME 框架通过将运动推理与外观生成彻底解耦，在高度压缩的潜在运动空间中完成运动建模与生成，从而在效率与质量两个维度上同时取得突破。
 
 ### 三阶段流水线
@@ -167,8 +161,6 @@ claims:
 
 ![[assets/figures/papers/paper_list_l20_https_openaccess_thecvf_com_content_CVPR2026_html_Stracke_Learning_Long/figures/001_Figure_1.jpg]]
 *Figure 1: Our approach enables extremely efficient, goal-conditioned kinematics generation and semantic motion reasoning. We achieve this by learning a dense, temporally compressed motion space that allows goal-conditioned motion generation to be orders of magnitude faster than prior video models. While a video generative model has barely produced the first frame, our method can already generate multiple plausible motion trajectories connecting the start and goal, offering both speed and interpretability*
-
-
 
 ### 3.1 运动空间 VAE：从稀疏轨迹到密集运动网格
 
@@ -216,15 +208,8 @@ $$\mathcal{L}_{\mathrm{FM}}(\phi) = \mathbb{E}_{t \sim \mathcal{U}(0,1)} \mathbb
 
 在 LIBERO 机器人任务中，模型维护一个长度为 $T$ 步的滚动运动规划。策略头以生成的运动嵌入为输入，输出机器人动作，本质上充当逆动力学模块。预测结果在每个新观测到达后更新，实现长时域闭环规划。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l20_https_openaccess_thecvf_com_content_CVPR2026_html_Stracke_Learning_Long/figures/002_Figure_2.jpg]]
-*Figure 2: Our approach to learn a dense motion space. Sparse tracker trajectories and the start frame are encoded into a latent motion grid, which enables dense reconstruction at arbitrary spatial query points. The model jointly attends over trajectory tokens and frame features, producing temporally consistent, spatially dense motion predictions*
-
 ![[assets/figures/papers/paper_list_l20_https_openaccess_thecvf_com_content_CVPR2026_html_Stracke_Learning_Long/figures/003_Figure_3.jpg]]
 *Figure 3: Model architecture to generate motion space. We train a conditional flow matching model that learns a vector field over latent motion grids. We condition on either pokes [7] or text prompts, enabling controllable and semantically coherent motion synthesis in the learned motion space. The frame*
-
-
 
 ## 实验与关键发现
 
@@ -270,22 +255,6 @@ Figure 5 展示了从单帧生成老鹰飞行的多种合理运动假设，说�
 
 分析材料未提供明确的失败模式讨论或系统性的错误分析。以下问题需读者结合原文进一步确认：该方法对跟踪器（如 CoTracker3）质量的依赖程度——稀疏轨迹错误是否会在运动嵌入中累积？运动空间能否处理含有剧烈摄像机运动或遮挡的场景？运动嵌入与外观生成模型结合时的保真度如何？在未见过的物体类别或复杂人-物交互场景下的泛化表现如何？
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l20_https_openaccess_thecvf_com_content_CVPR2026_html_Stracke_Learning_Long/figures/006_Table_1.jpg]]
-*Table 1: Poked Motion Generation. We compare against other methods that were trained on general video data and predict an explicit motion representation for multiple time steps. We report metrics for different conditioning densities to assess how well these models perform under varying levels of uncertainty. Track2Act [6] is end frame conditional, which is why we only report numbers for the dense case. Our approach outperforms other models while also being significantly faster*
-
-![[assets/figures/papers/paper_list_l20_https_openaccess_thecvf_com_content_CVPR2026_html_Stracke_Learning_Long/figures/008_Figure.jpg]]
-*Figure: (a) Turn on the stove and put the moka pot on it (b) Put the yellow-and-white mug in the microwave and close it*
-
-![[assets/figures/papers/paper_list_l20_https_openaccess_thecvf_com_content_CVPR2026_html_Stracke_Learning_Long/figures/010_Table_3.jpg]]
-*Table 3: Samples Matched: We sample k = 8 times from each model and track the generated videos to report our distributional metrics as well as conditioning adherence with EPE. This is an unfavorable setting for us, as our model is much smaller. Still, we outperform the video while being orders of magnitude faster*
-
-![[assets/figures/papers/paper_list_l20_https_openaccess_thecvf_com_content_CVPR2026_html_Stracke_Learning_Long/figures/011_Table_4.jpg]]
-*Table 4: Time Matched: Setup similar to Tab. 3 but now matching wall clock time for sampling. Our performance lead increases drastically due to the efficiency of our approach*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 核心瓶颈与因果调节变量
@@ -321,8 +290,6 @@ Figure 5 展示了从单帧生成老鹰飞行的多种合理运动假设，说�
 4. **运动空间的可解释性**：kNN 检索准确率的提升暗示潜在空间具有语义结构，但该空间的具体几何性质和可操控维度尚未被系统刻画。是否存在对应于特定运动原语（如旋转、平移、形变）的可解释潜在方向？
 
 5. **与物理仿真的结合**：生成的运动轨迹是否满足物理约束（如刚体运动学、碰撞避免）？将物理先验融入运动空间学习或作为后处理约束可能进一步提升生成质量。
-
-
 
 ## 原文 PDF
 

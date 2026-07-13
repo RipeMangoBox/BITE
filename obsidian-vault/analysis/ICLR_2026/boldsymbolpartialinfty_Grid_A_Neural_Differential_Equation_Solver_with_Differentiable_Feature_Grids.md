@@ -51,8 +51,6 @@ claims:
 
 **主要结果**：在泊松方程图像重建任务中，∂∞-Grid在梯度监督下PSNR达32.24（Siren为31.08），训练时间从Siren的数小时缩短至25秒；在拉普拉斯监督下PSNR达12.19（Siren为10.96），训练时间缩短至15分钟。在亥姆霍兹方程求解中，K-Planes和Instant-NGP因线性分量导致二阶导数为零而完全失败，而∂∞-Grid能准确匹配参考解，且训练速度比Siren快4倍。在1D平流方程中，∂∞-Grid的MAE为0.0023（INSR为0.0030），训练时间从INSR的5.33小时缩短至1.5分钟（200倍加速）。方法在热方程、Eikonal方程和Kirchhoff-Love布料模拟中也取得了成功验证。
 
-
-
 求解微分方程（DE）是科学计算和物理模拟的核心任务。近年来，神经微分方程求解器（如基于坐标的MLP）通过学习一个连续函数 $\mathbf{u}(\mathbf{x})$ 来逼近方程的解，并通过自动微分计算所需的导数项。然而，现有方法面临一个根本性的瓶颈：**精度与速度难以兼得**。
 
 **现有方法的缺口**：
@@ -62,8 +60,6 @@ claims:
 
 **本文的动机与核心洞察**：
 本文的核心动机是**弥合上述两种范式之间的鸿沟**：在保留网格表示训练速度优势的同时，获得计算高阶导数（如梯度、拉普拉斯算子）的能力。作者提出**∂∞-Grid**，其核心洞察在于：用**无限可微的径向基函数（RBF）插值**替代线性插值。RBF插值在整个空间上都是 $C^\infty$ 连续的，使得基于网格的特征表示能够通过自动微分稳定地计算任意阶导数。此外，该方法引入了**多分辨率共位网格**（所有分辨率共享相同的网格节点位置）和**重叠的多环邻域**（$N_3$，即每维3个邻居），进一步保证了插值的连续性和高阶导数的稳定性。通过这一设计，∂∞-Grid在泊松方程图像重建任务中，梯度监督下PSNR达到32.24（Siren为31.08），且训练时间从Siren的数小时缩短至25秒；拉普拉斯监督下PSNR达到12.19（Siren为10.96），训练时间缩短至15分钟。在亥姆霍兹方程求解中，K-Planes和Instant-NGP因二阶导数为零而完全失败，而∂∞-Grid能准确匹配参考解，且训练速度比Siren快4倍。
-
-
 
 ## 核心方法与创新机理
 
@@ -82,8 +78,6 @@ claims:
 **证据强度：** 核心证据链完整且置信度高。论文明确给出了线性插值不可微的数学分析（Figure III），并通过实验验证了关键因果链：K-Planes和Instant-NGP在需要二阶导数的亥姆霍兹方程上完全失败（ℓ1误差远高于参考解），而∂∞-Grid能准确匹配参考解，且训练速度比Siren快4倍（约6分钟 vs 约24分钟）。在泊松方程图像重建中，∂∞-Grid在梯度监督下PSNR达32.24（Siren为31.08），拉普拉斯监督下达12.19（Siren为10.96），训练时间从Siren的数小时分别缩短至25秒和15分钟。
 
 **失败模式：** 需要手动验证的潜在弱点包括：RBF形状参数ε和邻域大小ρ对重建质量敏感（Table 2）；RBF在域边界附近可能出现Runge现象；网格方法受维度灾难影响，在3D中比2D慢得多；效率提升主要依赖结构化笛卡尔网格，在流形上求解PDE时优势丧失；与传统数值求解器（如多重网格法）相比可能效率不高。
-
-
 
 ![[assets/figures/papers/iclr26_0001_7G0L4cj452_boldsymbolpartialinfty-Grid_A_Neural_Differentia/figures/036_Figure_34.jpg]]
 *Figure 34: Figure V: Solutions to the Eikonal equation from oriented point clouds. For each method, we visualise 2D slices (left) and the mesh extracted from the SDF (right). Instant-NGP and NeuRBF can overfit when groundtruth SDF supervision ( ${ \mathcal { L } } _ { \mathrm { s d f } }$ ) is available, but they cannot reliably solve the Eikonal equation given partial pointcloud observations ( $\mathcal { L } _ { \mathrm { e i k o n a l } }$ ) because their gradients are not differentiable across grid boundaries (Fig. III). In contrast, our smooth formulation handles these gradients and solves the Eikonal problem comparably to baselines such as a sinusoidal MLP
@@ -115,8 +109,6 @@ $$\mathcal{L}(\mathbf{F}, \boldsymbol{\Theta}) = \int_{\Omega} \mathcal{F}(\cdot
 该损失函数直接编码了待求解的微分方程（如泊松方程、亥姆霍兹方程、Eikonal 方程等），优化目标是最小化 PDE 残差。整个流程通过反向传播同时优化网格特征 **F** 和解码器权重 Θ。
 
 **模块关系总结：** 特征网格提供局部、可学习的表示能力；RBF 插值桥接了离散网格与连续坐标，并提供了高阶可微性；解码器将多尺度特征融合为最终信号；自动微分将信号转化为 PDE 所需的微分量；PDE 损失驱动整个系统的优化。相比 Siren 等纯 MLP 方法，网格结构使得梯度传播更快、训练收敛更迅速；相比 K-Planes 和 Instant-NGP 等线性插值网格方法，RBF 插值使得计算高阶导数成为可能。
-
-
 
 ∂∞-Grid的核心设计围绕一个瓶颈展开：基于坐标的MLP神经求解器（如Siren）训练极慢，而基于网格的表示（如Instant-NGP、K-Planes）虽然训练快，但其线性插值在网格节点处仅C⁰连续，在网格内部仅C¹连续，导致二阶及以上导数为零，无法计算求解微分方程所需的雅可比矩阵和拉普拉斯算子。K-Planes在拉普拉斯监督下完全失败（PSNR为0）直接证实了这一缺陷。
 
@@ -171,8 +163,6 @@ $$
 - **RBF形状参数**：固定形状的高斯RBF，形状参数 $\varepsilon$ 和邻域大小 $\rho$ 对重建质量有影响，存在最优配置（见Table 2消融研究）。
 - **特征初始化**：每个特征网格从均匀分布 $\mathbf{F}_s \sim \mathcal{U}(-10^{-4}, 10^{-4})$ 初始化。
 
-
-
 ## 实验与关键发现
 
 ### 泊松方程图像重建：梯度与拉普拉斯监督
@@ -202,8 +192,6 @@ NeuRBF 也使用 RBF 插值，但其失败模式揭示了邻域设计的关键�
 
 与使用 GELU 激活函数的标准 PINN 相比（Figure IV），∂∞-Grid 在图像重建和亥姆霍兹方程求解上均显著更优。PINN (GELU) 的 PSNR/SSIM 约为 19/0.65，而 ∂∞-Grid 为 29.44/0.87。PINN 难以处理高频内容，而 ∂∞-Grid 的多分辨率网格天然具备多频段表示能力。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0001_7G0L4cj452_boldsymbolpartialinfty-Grid_A_Neural_Differentia/figures/018_Figure_6.jpg]]
 *Figure 6: Kirchhoff-Love Simulation (Kairanda et al., 2024). $\partial ^ { \infty }$ -Grid captures fine-grained cloth wrinkles by solving a highly nonlinear problem. Table 2: Ablation study for varying RBF shapes ε and neighbourhood sizes $\rho$ for the high-resolution gradientbased image reconstruction in Fig. I
 
@@ -212,8 +200,6 @@ NeuRBF 也使用 RBF 插值，但其失败模式揭示了邻域设计的关键�
 
 ![[assets/figures/papers/iclr26_0001_7G0L4cj452_boldsymbolpartialinfty-Grid_A_Neural_Differentia/figures/042_Table_4.jpg]]
 *Table 4: Table II: 1D Advection comparison with INSR (Chen et al., 2023a) and Grid solver (Fedkiw et al., 2001)*
-
-
 
 ## 定位与知识库关联
 
@@ -234,8 +220,6 @@ NeuRBF 也使用 RBF 插值，但其失败模式揭示了邻域设计的关键�
 ### 局限与开放问题
 
 论文明确承认的局限性包括：插值特征对 RBF 形状参数敏感，可能导致一定程度的平滑；边界附近的 Runge 现象影响精度；网格方法的维度灾难；以及在非结构化域上效率优势的丧失。开放的待解决问题包括：需要建立截断邻域下 C^∞ 连续性的严格理论保证；对于更高维输入，探索投影到低维空间的策略以提高可扩展性；自定义 CUDA 内核实现能否进一步加速优化。
-
-
 
 ## 原文 PDF
 

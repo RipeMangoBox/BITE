@@ -57,8 +57,6 @@ claims:
 
 在方法谱系上，本文继承了混合专家运动控制框架，但通过引入学习到的相位流形作为时间先验，将运动插值从“纯空间插值”提升为“时间结构引导的生成”。相比RTN等基于全连接网络的确定性预测方法，本文的MoE结构与相位条件化机制在长时间过渡上展现出更强的鲁棒性与运动质量。
 
-
-
 运动插值（Motion In-Betweening）是角色动画中的核心任务：给定起始姿态和目标姿态，以及期望的过渡时长，生成中间帧序列，使角色自然地从起始状态过渡到目标状态。这一技术在游戏、影视和虚拟现实中有广泛应用，能够显著减少动画师手动关键帧的工作量。
 
 现有方法面临的核心瓶颈在于**时间信息模糊性**。当过渡时间较长时，仅依赖起始和目标两帧的空间信息不足以唯一确定中间的运动模式——角色可以选择步行、奔跑、跳跃等多种方式到达目标，而缺乏有效的时间结构引导会导致网络生成平滑但缺乏细节的“平均”运动，表现为动作模糊、脚步滑动、运动生动性下降。这一问题在极端过渡条件下（如长距离、短时间）尤为突出，现有方法往往产生漂移或物理上不合理的姿态。
@@ -66,8 +64,6 @@ claims:
 以主流神经基线 **RTN**（Harvey et al., TOG 2020）为例，该方法采用自回归生成框架，但在超过训练窗口长度（如120帧）时性能显著退化，L2P误差从短过渡的较好水平上升至5.59，表明其时间外推能力有限。简单的线性/球面插值基线则完全忽略了运动动力学，在30-120帧范围内的平均L2P误差高达6.56，生成的运动缺乏任何生物力学合理性。
 
 本文的动机正是针对上述时间信息缺失问题，探索一种能够**编码运动周期性结构**的表示方法，将其作为控制信号注入生成过程，从而在自回归框架中保持时间相干性。核心假设是：运动的周期性（如步态循环、跳跃节奏）可以用低维相位变量有效表征，这些相位不仅能够区分不同运动模式，还能在时间维度上提供稳定的引导，使网络在长时程生成中保持锐利、连贯的运动细节。
-
-
 
 ## 核心方法与创新机理
 
@@ -86,8 +82,6 @@ claims:
 相比仅预测下一帧姿态的基线，本文网络额外预测未来1秒内的相位更新（频率和振幅）、脚部接触标签，并通过逆运动学（IK）后处理修正末端效应器位置以减少滑动伪影。此外，模型支持通过单热动作标签控制运动风格（如强制爬行而非步行，Fig. 8），以及通过轨迹混合参数 $\tau$ 控制角色沿用户指定路径运动（$T = \mathcal{I}(T^{*}, T^{+}, \tau)$），提升了系统的可控性和实用价值（Table 4）。
 
 这些创新共同使本文方法在LaFAN1测试集上取得了显著优于RTN和插值基线的性能，尤其在120帧外推场景下优势明显（L2P 3.89 vs RTN 5.59, Table 3），证明了相位流形提供的时间结构对长时程泛化的关键作用。
-
-
 
 ![[assets/figures/papers/paper_list_l42_https_doi_org_10_1145_3606921/figures/016_Figure_10.jpg]]
 *Figure 10: Sequences of keyframes along artificial paths (left) created with the authoring tool (right). Fig. 11. Generated in-between motion sequences of a quadruped character between target frames using the proposed framework and authoring tool*
@@ -136,8 +130,6 @@ $$Y_{i+1} = \{ Y_{i+1}^R, Y_{i+1}^{\hat{R}}, Y_{i+1}^S, Y_{i+1}^{\hat{S}}, Y_{i+
 - **动作风格约束**：通过额外的单热动作标签，用户可在运行时指定期望的运动风格（如强制爬行而非步行）。
 
 整个框架以端到端方式训练，Phase Autoencoder 作为预处理阶段独立训练。训练数据来自 LaFAN1 数据集（64 个序列，约 399,139 帧，30 fps），使用 Subject 1-4 训练、Subject 5 测试的标准分割。
-
-
 
 ### 2.1 系统架构概述
 
@@ -192,14 +184,11 @@ $$T = \mathcal{I}(T^{*}, T^{+}, \tau)$$
 
 其中 $T^{*}$ 为用户指定的期望轨迹，$T^{+}$ 为模型预测的轨迹，$\mathcal{I}$ 为线性或球面插值函数。当 $\tau=1.0$ 时，角色完全遵循用户路径；$\tau=0$ 时则完全依赖模型自主预测。此外，模型可通过额外的单热动作标签在训练时学习风格控制，从而在运行时指定期望的运动类型（如强制爬行而非步行，Fig. 8）。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈验证：长时程过渡中的时间模糊性
 
 本文的核心主张是，现有运动插值方法在长过渡时间下性能下降，其根本原因在于**时间信息的模糊性**导致运动趋于平滑、不自然。表3（Table 3）的定量结果直接支撑了这一瓶颈：在LaFAN1测试集上，当过渡长度从30帧延长至120帧时，简单插值基线（Interpolation）的L2P误差从4.52急剧恶化至11.62，RTN（Harvey et al., TOG 2020）也从3.13上升至5.59。相比之下，本文方法在120帧外推时L2P仅为3.89，且在整个30–120帧范围内的平均值（3.32）显著优于RTN（3.93）和插值基线（6.56）。这表明，**基于相位流形的时间表示**有效缓解了长时程生成中的歧义问题，提供了稳定的时间外推能力。
-
 
 ![[assets/figures/papers/paper_list_l42_https_doi_org_10_1145_3606921/figures/009_Table_3.jpg]]
 *Table 3: Comparison on the in-betweening stability for multiple transition lengths with different methods. Proc. ACM Comput. Graph. Interact. Tech., Vol. 6, No. 3, Article 37. Publication date: August 2023*
@@ -208,14 +197,12 @@ $$T = \mathcal{I}(T^{*}, T^{+}, \tau)$$
 
 消融实验（Table 1, Fig. 6）系统验证了学习到的相位（Learned Phases）作为因果旋钮的有效性。Table 1量化了不同运动过渡类别下的平均关节旋转/秒（运动生动性），结果显示：使用学习相位的模型在快速冲刺急转弯（152.4 vs. 接触相位149.0 vs. 无相位147.3）、爬行（45.3 vs. 42.9 vs. 39.6）等类别上均产生更高的关节旋转速率。Fig. 6进一步从脚部接触稳定性角度证实，学习相位产生的脚部滑动伪影最少。这些结果表明，**手动定义的接触相位无法替代从数据中无监督学习到的周期性结构表示**，后者能够更精细地编码运动的时间相干性，从而引导网络生成更锐利、更生动的过渡动作。
 
-
 ![[assets/figures/papers/paper_list_l42_https_doi_org_10_1145_3606921/figures/005_Table_1.jpg]]
 *Table 1: The average joint rotations per second for different classes of motion transitions. The control variables are extracted from the test data with a transition duration time between 1 and 3 seconds*
 
 ### 双向控制方案的关键作用
 
 双向控制方案（bi-directional control）是确保目标到达精度的关键设计。Table 2的消融数据显示，在30帧过渡窗口下，加入双向控制后，步行任务的位置误差从21.59 cm降至9.61 cm，旋转误差从18.94°降至11.23°；其他任务（如跑步、坐下）也呈现一致改善。该方案通过时间相关的混合参数λ（见Eq. 2），在自我中心预测和目标中心预测之间平滑过渡，使角色能够自然逼近目标姿态，而非在末端突然“跳变”。
-
 
 ![[assets/figures/papers/paper_list_l42_https_doi_org_10_1145_3606921/figures/008_Table_2.jpg]]
 *Table 2: The average positional error (in cm) and rotational error (in degree) produced by the model with/without bi-directional control for different tasks in 30 frames transitions windows, following reference control signals in the testing set. The error is measured after the in-betweening time on all joints correspondingly*
@@ -228,14 +215,9 @@ Fig. 7展示了最具说服力的定性证据——一个极端前向案例：�
 
 Table 4评估了通过轨迹混合参数τ控制路径的效果：当τ=1.0（完全沿用户指定路径运动）时，脚部滑动从0.432降至0.388，位置偏差和骨骼误差也有所改善。Fig. 8展示了动作标签（action labels）的控制效果——通过单热标签可强制角色在过渡中执行爬行而非步行，验证了框架对运动风格的运行时可控性。
 
-
-![[assets/figures/papers/paper_list_l42_https_doi_org_10_1145_3606921/figures/011_Table_4.jpg]]
-*Table 4: Impact of controlling the future trajectory through predefined paths on the ground using the authoring tool. The paths with their target frames at each control point are the same as shown in Fig. 10. The in-betweening time between the poses is 2 seconds. The control parameters ?? enables to perform realistic motion transitions along artificial paths, enabling better target accuracy and motion quality*
-
 ### 跨形态泛化：四足动物实验
 
 Table 6报告了在四足动物数据集（Zhang et al., 2018）上的结果：本文方法在60帧（1秒）过渡长度上的L2P为0.51，优于插值基线（1.26）和Transformer基线（Qin et al., ACM Trans. Graph. 2022, 0.63）。这表明，**基于相位流形的混合专家架构不依赖于特定骨架形态**，其学习到的周期性时间表示具有跨形态的可迁移性。
-
 
 ![[assets/figures/papers/paper_list_l42_https_doi_org_10_1145_3606921/figures/014_Table_6.jpg]]
 *Table 6: Qualitative results on quadruped dataset [Zhang et al. 2018]. The models are trained with a maximum transition length of 60 frames (1 second)*
@@ -243,10 +225,6 @@ Table 6报告了在四足动物数据集（Zhang et al., 2018）上的结果：�
 ### 用户研究：实用价值验证
 
 Table 5的用户研究由两位专业动画师完成，结果显示：使用本文工具完成跑步循环、躺下到行走、行走到爬行三个过渡任务的平均时间分别从5.24小时、7.61小时、9.5小时降至6.5分钟、9.7分钟、7.9分钟。这一数量级的时间压缩验证了框架在实际动画生产流程中的实用价值。
-
-
-![[assets/figures/papers/paper_list_l42_https_doi_org_10_1145_3606921/figures/013_Table_5.jpg]]
-*Table 5: The average time taken by two professional animators to complete three animation transitions in our user study*
 
 ### 已知失败模式与局限
 
@@ -263,7 +241,6 @@ Table 5的用户研究由两位专业动画师完成，结果显示：使用本�
 - 能否利用扩散模型从相同关键帧合成多样化且自然的运动变体？
 - 如何整合环境感知，使角色在过渡时能与障碍物或地形交互？
 - 是否存在更高效的结构化相位表示，能够进一步减少网络压缩误差并提升目标到达精度？
-
 
 ## 定位与知识库关联
 
@@ -320,8 +297,6 @@ Table 5的用户研究由两位专业动画师完成，结果显示：使用本�
 3. **多样化生成**：能否利用扩散模型等生成式技术，从相同关键帧合成多样化且自然的运动变体？
 4. **多角色扩展**：如何将框架扩展到多角色交互场景，支持协作或对抗性动作的插值？
 5. **相位表示优化**：是否存在更高效的结构化相位表示，能够进一步减少网络压缩误差并提升目标到达精度？
-
-
 
 ## 原文 PDF
 

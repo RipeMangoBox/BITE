@@ -220,17 +220,11 @@ $$\text{pass@1} = \frac{\text{通过所有测试的问题数}}{\text{总问题�
 
 核心发现：**仅 1 个模型（claude-sonnet-4）的 pass@1 超过 60%，达到 66.67%**（Figure 4）。整体而言，闭源模型普遍优于开源模型，最佳开源模型 glm-4.6 的 pass@1 为 56.48%，差距约 10 个百分点。这一结果直接验证了 EditBench 作为基准的挑战性——现有模型在真实世界的指令代码编辑任务上仍有巨大提升空间。
 
-![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_FtL9eEmU6v/figures/006_Figure_4.jpg]]
-*Figure 4: We evaluate 40 LLMs on EditBench. We report the pass@1 of each model; only 1 out of 40 models have a pass@1 greater than 60%. In general, closed-source models outperform open models*
-
 按问题难度分层后，差距更为显著：将少于 20 个模型解决的问题定义为"困难"类别后，模型在简单与困难问题间的平均 pass@1 差距高达 59.3%（Figure 4）。
 
 ### 任务类别分析：Bug 修复相对容易，功能添加最难
 
 按编辑类别细分，模型表现呈现明显梯度（Figure 5）：
-
-![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_FtL9eEmU6v/figures/008_Figure_5.jpg]]
-*Figure 5: Comparing top-performing open-weight and closed models. To illustrate individual LLM differences, we compare 7 models and find $\mathtt { p a s s } \mathtt { { \Theta } } \mathtt { { \perp } }$ varies greatly depending on the problem category. Additionally, different models perform best at different categories
 
 - **Bug 修复**：平均 pass@1 最高，达 52.2%
 - **代码优化**：平均 44.6%
@@ -267,9 +261,6 @@ Table 7 揭示了上下文长度与性能的反向关系：
 
 进一步分析困难与简单问题的特征差异（Table 8）发现：困难问题的指令长度显著更短（约 75 字符），但高亮代码长度与简单问题相近。这暗示困难的核心不在于代码量，而在于**指令本身的模糊性**——简短指令要求模型从代码上下文中推断用户真实意图，这对模型的上下文推理能力提出了更高要求。
 
-![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_FtL9eEmU6v/figures/024_Table_8.jpg]]
-*Table 8: Comparing instruction and highlight length for easy versus hard questions*
-
 ### 与现有基准的相关性分析
 
 EditBench 与现有代码编辑基准仅呈弱正相关：
@@ -287,11 +278,6 @@ EditBench 与现有代码编辑基准仅呈弱正相关：
 2. **光标位置利用不足**：消融实验表明光标位置信息未能被有效利用，模型缺乏将空间位置映射到编辑操作的机制。
 3. **复杂编辑类型薄弱**：功能添加和优化类任务需要多步推理和创造性代码生成，当前模型在这类开放式编辑上表现最差。
 4. **长上下文退化**：随着代码上下文增长，模型性能持续下降，反映出长距离依赖建模的不足。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_FtL9eEmU6v/figures/014_Table_4.jpg]]
-*Table 4: Full examples of user instructions across different task categories, comparing with two edit-related datasets (CanItEdit (Cassano et al., 2023b) and EditEval (Hu et al., 2023))*
 
 ## 定位与知识库关联
 

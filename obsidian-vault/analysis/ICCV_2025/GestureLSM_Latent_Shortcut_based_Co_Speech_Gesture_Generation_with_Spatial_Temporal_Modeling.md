@@ -52,8 +52,6 @@ GestureLSM 针对这一瓶颈，提出了一种基于**潜在捷径建模（Late
 
 综上，GestureLSM 通过“离散潜在空间 + 流匹配捷径 + 空间-时间解耦建模”的组合策略，在生成质量与推理效率之间取得了新的最优平衡点，为实时共语手势生成提供了可行范式。
 
-
-
 语音驱动的手势生成（co-speech gesture generation）旨在从语音和文本脚本中合成与说话内容同步的全身人体手势，是虚拟人、数字代理等应用中的关键任务。现有方法主要面临两个核心瓶颈：**生成质量与推理速度之间的权衡**，以及**对身体各部位时空交互建模的不足**。
 
 在生成范式方面，主流方法多基于扩散模型（diffusion models）或自回归（autoregressive）架构。扩散模型虽然生成质量较高，但通常需要大量采样步骤，导致推理速度缓慢，难以满足实时交互需求。自回归方法推理速度较快，但容易累积误差，且难以显式建模身体各部位之间的空间依赖关系。Figure 2 直观地展示了这一困境：GestureLSM 在 BEAT2 数据集上以 FGD 衡量生成质量的同时，实现了最快的推理速度（在单张 NVIDIA A100 上测量），而其他基线方法在质量-速度的 Pareto 前沿上均处于劣势。
@@ -65,8 +63,6 @@ GestureLSM 针对这一瓶颈，提出了一种基于**潜在捷径建模（Late
 1. **高效采样**：引入流匹配（flow matching）替代传统扩散过程，通过显式建模潜在速度空间，大幅减少推理所需的采样步数，从而在保持生成质量的同时显著提升推理速度。
 
 2. **细粒度时空建模**：将身体不同部位的运动通过残差向量量化（RVQ）离散化为 token，并利用空间注意力和时间注意力机制显式学习各身体部位 token 之间的交互关系，实现连贯的全身手势生成。
-
-
 
 ## 核心方法与创新机理
 
@@ -94,8 +90,6 @@ GestureLSM 引入**潜空间捷径模型**（Latent Shortcut Model）来实现�
 GestureLSM 采用双路编码器分别处理语音的低层起始信息（振幅）和 BERT 提取的高层语义文本特征，融合后通过多层交叉注意力注入手势表征——手势特征作为 Query，语音特征作为 Key 和 Value。这种设计使条件信号能够细粒度地引导各身体区域的运动生成，是实现语音-手势同步性的关键。
 
 **证据强度说明**：上述创新点均有消融实验和定量结果支撑（FGD 从次优基线 5.256 降至 4.088，Table 1），置信度较高。但论文未提供 venue/year 元数据，部分基线方法的具体版本需对照原文确认。
-
-
 
 GestureLSM 的整体 pipeline 围绕“条件融合 → 空间-时间建模 → 量化潜变量学习 → 流匹配采样”四个核心阶段展开，如 **Figure 3** 所示。系统输入为语音信号与文本脚本，输出为与语音同步的全身高保真手势序列。
 
@@ -147,8 +141,6 @@ $$
 ### 时间步采样策略
 
 时间步采样分布对生成质量有显著影响。实验表明，采用 Beta 分布进行采样可获得最低的训练损失；同时，当 $t$ 接近 1 时施加左偏斜的强调，能够显著提升生成质量。
-
-
 
 ### 整体流程
 
@@ -221,15 +213,8 @@ $$
 
 训练时的时间戳 $t \in [0,1]$ 采样分布对生成质量有显著影响。实验发现，当 $t$ 接近 1 时模型预测效果较差（图 5 右）。为补偿这一不足，采用 Beta 分布进行左偏采样，使训练时更侧重 $t$ 接近 1 的区间。该策略在训练损失和最终生成质量上均优于均匀采样等其他方案（表 2c）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1887_GestureLSM_Latent_Shortcut_based_Co_Speech_Gesture_Generation_with_Spati/figures/004_Figure_4.jpg]]
-*Figure 4: The details of Latent Shortcut Model. GestureLSM enforces self-consistency in motion trajectories by ensuring that the overall movement predicted over a longer duration remains consistent with the sum of shorter movements. It encourages the model to maintain coherence in gesture generation, preventing drift and enhancing stability across different time steps*
-
 ![[assets/figures/papers/paper_list_l1887_GestureLSM_Latent_Shortcut_based_Co_Speech_Gesture_Generation_with_Spati/figures/005_Figure_5.jpg]]
 *Figure 5: Time Sampling Comparison. For various time sampling schedules, beta schedule performs the best, i.e., lowest training loss, with skewed pattern (left) to counteract the ineffectiveness of model prediction when t approaches 1 (right)*
-
-
 
 ## 实验与关键发现
 
@@ -244,9 +229,6 @@ GestureLSM 在 BEAT2 基准上取得全面最优。Table 1 显示，其 FGD 为 
 *Figure 2: Our GestureLSM achieves significant generation quality improvement over baseline methods with fastest inference speed. The inference time is computed on one NVIDIA A100 while the generation quality is from FGD on BEAT2*
 
 主观评估进一步验证了客观指标的可靠性。Figure 6 的定性对比表明，GestureLSM 生成的肢体动作更自然，局部身体区域间的交互更协调。Figure 7 的用户调研显示，该方法在真实感（realness）、同步性（synchrony）和平滑度（smoothness）三个维度上的平均意见分（MOS）均显著高于其他方法，与语音的对齐程度优势尤为明显。
-
-![[assets/figures/papers/paper_list_l1887_GestureLSM_Latent_Shortcut_based_Co_Speech_Gesture_Generation_with_Spati/figures/008_Figure_7.jpg]]
-*Figure 7: User Study. Our GestureLSM have higher user ratings with a clear margin on Realness, Synchrony, and Smoothness*
 
 ### 消融实验
 
@@ -268,21 +250,11 @@ GestureLSM 在 BEAT2 基准上取得全面最优。Table 1 显示，其 FGD 为 
 
 当前证据未直接报告具体的失败案例或生成崩溃模式。从消融实验中可推断：若缺乏时间注意力，模型几乎丧失运动生成能力（FGD > 22），表明长程时序依赖是该方法的核心脆弱点。此外，Tab. 2b 提示，不当的特征展平设计会破坏空间-时间结构化建模的收益，设计时需谨慎处理维度组织。以上推断需结合论文原文中的定性错误分析进行人工验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1887_GestureLSM_Latent_Shortcut_based_Co_Speech_Gesture_Generation_with_Spati/figures/010_Table_2.jpg]]
 *Table 2: Ablations of our method. We exam the each module contribution, model architecture design, time stamp distribution , model type analysis, speed up comparison and number of sampling steps. Bold indicates the best performance*
 
 ![[assets/figures/papers/paper_list_l1887_GestureLSM_Latent_Shortcut_based_Co_Speech_Gesture_Generation_with_Spati/figures/013_Table_3.jpg]]
 *Table 3: Additional ablations of our method. We exam the speech feature, classifier free guidance scale, gesture representation, sequence order for the attention and the skewness for the sampling distribution. Bold indicates the best performance*
-
-![[assets/figures/papers/paper_list_l1887_GestureLSM_Latent_Shortcut_based_Co_Speech_Gesture_Generation_with_Spati/figures/009_Table.jpg]]
-*Table: (c) Time Stamp Sampling. (f) Number of sampling steps*
-
-![[assets/figures/papers/paper_list_l1887_GestureLSM_Latent_Shortcut_based_Co_Speech_Gesture_Generation_with_Spati/figures/012_Figure_9.jpg]]
-*Figure 9: Training dynamics of key evaluation metrics. (a) Beat constancy decreases, indicating a shift from overly rigid beat-following motions to more natural gestures. (b) FGD decreases, reflecting improved gesture realism. (c) Gesture diversity increases, suggesting a broader range of motion patterns learned by the model*
-
-
 
 ## 定位与知识库关联
 
@@ -318,8 +290,6 @@ GestureLSM 在 BEAT2 基准上与现有方法进行了系统对比。Table 1 显
 - 潜变量捷径模型（Latent Shortcut Model, Figure 4）中自一致性约束的理论性质未在分析中展开——该约束是否等价于某种正则化，或是否可与其他一致性模型建立形式化联系，需手动核实。
 - 该方法在 BEAT2 上的优势是否可迁移到其他生成质量指标（如 HumanML3D 的 FID、动作多样性指标）未见报告。
 - 空间注意力中位置编码 $\mathbf{P}$ 的具体形式及其对全身区域交互的贡献未做消融，该设计是否为性能关键因素需进一步确认。
-
-
 
 ## 原文 PDF
 

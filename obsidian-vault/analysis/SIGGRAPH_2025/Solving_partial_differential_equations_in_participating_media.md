@@ -55,8 +55,6 @@ claims:
 
 本文方法目前受限于线性椭圆 PDE（Laplace、Poisson、screened Poisson）、球形粒子及独立 PBM 假设，但其体积化范式为参与介质中 PDE 的无网格、无偏求解开辟了新方向。
 
-
-
 ### 问题背景：复杂微粒几何中的 PDE 求解
 
 许多物理系统的模拟依赖于在包含大量微粒的几何域上求解偏微分方程。典型的例子包括生物膜中的静电屏蔽、大气云层中的光化学扩散过程，以及复合材料中的热传导与弹性问题。在这些系统中，域的定义为确定体积 $V$ 与随机粒子配置 $O$ 的差：
@@ -91,8 +89,6 @@ $$\mathrm{p}_x^{\mathrm{dc}}(r) := \exp(-\Lambda(x,r)) \int_{\partial \mathrm{B}
 
 论文据此提出两个核心算法——**体积游走球**（Volumetric Walk on Spheres, VWoS）和**体积游走星**（Volumetric Walk on Stars, VWoSt）——分别针对纯 Dirichlet 边界条件和混合 Dirichlet-Neumann 边界条件，实现了参与介质中线性椭圆 PDE 的高效、无离散化求解。
 
-
-
 ## 核心方法与创新机理
 
 本文的核心创新在于将**体积渲染的指数介质采样思想**引入 PDE 随机游走求解器，从而在无需枚举粒子配置的前提下，直接、无偏地估计参与介质中线性椭圆 PDE 的期望解。这一创新的关键因果杠杆是：将传统的**确定性几何查询**替换为基于 Poisson Boolean 模型（PBM）的**条件最近点采样**，并引入**全记忆随机游走机制**以保持估计的无偏性。
@@ -126,8 +122,6 @@ $$\mathrm{p}_x^{\mathrm{dc}}(r) := \exp(-\Lambda(x,r)) \int_{\partial \mathrm{B}
 ### 与体积渲染的深层联系
 
 本文的方法论发展明确借鉴了体积渲染中指数介质的采样技术（如 Woodcock tracking）。附录 B 揭示了 Monte Carlo PDE 求解与体积渲染之间的形式对应：WoS 的球面采样对应于表面渲染的路径追踪，而 VWoS 的条件最近点采样对应于体积路径追踪中的自由程采样。这一洞察是促成上述创新的思想源泉。
-
-
 
 本文提出的体积化蒙特卡洛求解框架，旨在以“参与介质”的视角统一处理含随机微粒几何的线性椭圆 PDE 求解问题。其核心 pipeline 由三个逻辑阶段构成：**域建模与随机几何表征 → 条件最近点采样 → 记忆化随机游走估计**，并在需要时耦合体积路径追踪以处理非平凡边界条件。
 
@@ -172,12 +166,8 @@ VWoSt 是对 VWoS 的扩展（Section 6），通过额外采样构建星形区�
 
 总体平均法需要在每个采样配置上运行完整的确定性求解器，计算成本随配置数线性增长；均化法用一个等效 PDE 替代随机几何，在粒子尺寸与几何特征可比时引入显著偏差。本文框架通过条件采样与记忆机制的协同，实现了对期望解的直接、无偏估计，且无需枚举粒子配置。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2506_08237/figures/003_Figure_3.jpg]]
 *Figure 3: Ensemble averaging is a simple but expensive method to estimate the mean solution of a PDE in a participating medium, by first sampling many random particle configurations (top row), then solving the PDE on each sampled domain (bo om row), and finally averaging the computed solutions. Our volumetric walk on spheres algorithm directly estimates the mean solution without expensive ensemble averaging*
-
-
 
 ### 问题设定与均值解定义
 
@@ -265,8 +255,6 @@ $$\Delta u_{\mathrm{h}}(x) - 4\pi \lambda R \, u_{\mathrm{h}}(x) = 0 \ \mathrm{i
 
 这是一个 screened Poisson 方程。然而实验表明，当粒子尺寸不可忽略或几何存在薄结构时，均化解会引入显著偏差（Figure 9），这正是 VWoS/VWoSt 方法所要克服的问题。
 
-
-
 ## 实验与关键发现
 
 ### 核心结果：VWoS 与 VWoSt 的精度-效率权衡
@@ -351,14 +339,10 @@ Figure 11 报告了蘑菇域（Dirichlet）和连接器域（Neumann）中随机
 | Figure 13 | VWoS-VPT 耦合中记忆传递对正确估计有非平凡影响，忽略记忆导致显著偏差 |
 | Table 1 | 实验覆盖从稀疏到密集的多种介质参数，最大密度场景下平均自由球半径显著减小 |
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2506_08237/figures/007_Figure_7.jpg]]
 *Figure 7: (a) To sample the closest point $y ^ { \partial \varOmega }$ at 𝑥 conditionally on the memory M accumulated during a walk, we determine two points: First, we sample the random closest point $y ^ { \partial O }$ on the stochastic microparticle geometry, but with the PBM density zeroed out inside the spheres formed during the walk. Second, we query the closest point $y ^ { \partial V }$ on the deterministic boundary of the medium and previously sampled particles. Then, we select the closest of these two points to 𝑥, $y ^ { \partial \dot { \Omega } }$ : = $\mathrm { ~ }$ closest 𝑥, $\{ y ^ { \partial O } , y ^ { \partial V } \}$ ) . A er sampling, we add to M a new empty sphere (b), and a new particle if...
 
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2506_08237/figures/015_Table.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -404,8 +388,6 @@ Figure 11 报告了蘑菇域（Dirichlet）和连接器域（Neumann）中随机
 5. **有限记忆的潜在优势。** 尽管 Figure 12 显示有限记忆在单点估计中表现不佳，但论文指出在利用空间连续性或 GPU 并行性时，有限记忆可能展现优势——这是一个需要进一步探索的工程方向。
 
 6. **非指数介质的处理。** 当前方法依赖 PBM 的指数性质进行距离采样。如何处理非独立散射或非指数型参与介质（如具有空间相关性的微粒分布）仍是一个开放问题。
-
-
 
 ## 原文 PDF
 

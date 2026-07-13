@@ -52,8 +52,6 @@ claims:
 
 **主要结果概览。** 在COCO图像重建上，VP-VAE以K=1024码本取得LPIPS 0.1717，优于VQ-VAE的0.1821；FSP取得PSNR 24.1910，优于FSQ的23.6006。在LibriSpeech音频重建上，VP-VAE的PESQ达2.3826，显著高于SimVQ的1.3213（后者出现严重码本崩溃）。更重要的是，VP-VAE和FSP在所有码本大小下均保持稳定的高码本利用率（CVU），而VQ-VAE和FSQ的CVU曲线呈先升后降的典型崩溃模式。在ImageNet和Common Voice上的分布外泛化评估进一步验证了解耦训练范式的优越性。消融实验确认，去除Metropolis–Hastings接受机制或潜在归一化正则项均会导致重建质量下降和码本平衡性恶化。
 
-
-
 ### 向量量化的核心瓶颈：码本崩溃与训练不稳定性
 
 向量量化变分自编码器（VQ-VAE）及其衍生方法已成为生成式建模中Token化（tokenization）的核心范式，广泛应用于图像、音频、视频等模态的离散表示学习。然而，这类方法长期受困于一个根本性问题：**码本崩溃（codebook collapse）**。在训练过程中，码本中大量向量逐渐失活，只有少数码字被实际使用，导致有效比特率急剧下降，表征能力严重受损。这一现象并非偶然的优化失败，而是源于VQ-VAE训练范式中一个深层耦合——**表示学习与码本优化共享同一量化算子**。
@@ -76,8 +74,6 @@ VP-VAE的核心洞察在于对量化操作的本质重新理解：**从神经网
 这一视角转换带来一个根本性的解耦策略：**训练阶段用自适应向量扰动替代离散量化，推理阶段再通过K-Means生成码本进行最近邻量化**。这样，表示学习完全摆脱了码本优化的束缚，码本崩溃问题从根源上被消除。扰动机制需要满足两个关键约束：（1）扰动尺度应与目标码本大小决定的预期量化误差对齐；（2）扰动后的向量应停留在原始潜在分布的高密度区域，避免分布偏移导致解码器行为异常。
 
 基于此，VP-VAE设计了基于Metropolis-Hastings采样的自适应扰动机制，结合kNN非参数密度估计和潜在归一化正则，确保扰动在统计意义上与量化误差分布一致。其轻量变体FSP（Finite Scalar Perturbation）则在假设潜在分布近似均匀的前提下，用有界均匀扰动和Lloyd-Max最优中心量化实现高效简化。
-
-
 
 ## 核心方法与创新机理
 
@@ -125,8 +121,6 @@ FSP作为VP-VAE的轻量变体，针对潜在变量近似均匀分布的场景�
 
 训练完成后，VP-VAE对训练集所有潜在向量运行K-Means++聚类，生成显式码本 $\mathcal{Q}$。推理时使用标准最近邻量化 $q(z) = \arg\min_{c\in\mathcal{Q}} \|z - c\|_2$。由于解码器在训练时已学会对符合量化误差分布的扰动保持鲁棒，这一从扰动到量化的切换不会引入性能退化。
 
-
-
 VP-VAE 的核心设计是将 VQ-VAE 中耦合的“表示学习”与“码本学习”彻底解耦，从根本上消除码本崩溃（codebook collapse）。其训练与推理遵循两条完全不同的路径，仅在推理阶段才引入显式码本。
 
 ### 训练阶段：自适应向量扰动
@@ -169,13 +163,6 @@ FSP（Finite Scalar Perturbation）在“潜在变量近似均匀分布”的假
 | 推理 | 原始数据 $x$ | $x \to \text{Encoder} \to \{h_t\} \to P_{\downarrow} \to z \to q(z) \to c \to P_{\uparrow} \to \{\tilde{h}_t\} \to \text{Decoder} \to \hat{x}$ | 离散 Token 序列与重建 $\hat{x}$ |
 
 训练与推理的唯一差异在于低维空间中的操作：训练用 $\mathcal{T}$（自适应向量扰动），推理用 $q$（最近邻量化）。码本仅在推理前通过 K-Means 一次性生成，训练全程不参与，这是 VP-VAE 避免码本崩溃的结构性保障。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2602_17133/figures/006_Figure_1.jpg]]
-*Figure 1: Codebook utilization during training. CVU curves for different methods on image reconstruction (K=1024). VQ-VAE and FSQ exhibit an initial rise followed by a decline. VP-VAE and FSP maintain stable, high utilization throughout training*
-
-
 
 VP-VAE的核心设计围绕一个中心思想展开：**训练时用自适应向量扰动替代离散量化，推理时再用离线生成的码本进行最近邻量化**，从而将表示学习与码本学习彻底解耦。整个框架由五个关键模块构成。
 
@@ -256,8 +243,6 @@ $$\mathcal{C} = \left\{ \frac{\ell + 1/2}{L} \right\}_{\ell = 0}^{L-1}$$
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2602_17133/figures/007_Figure_2.jpg]]
 *Figure 2: Output distributions of fixed quantization schemes. Given a uniform latent distribution, we compare the quantized output distributions produced by FSQ, FSQ with noise, symmetric FSQ with noise, and FSP. They are all configured with L=4 quantization levels. FSP produces a more uniform output distribution, aligning with the Lloyd–Max optimality principle*
 
-
-
 ## 实验与关键发现
 
 ### 域内重建主结果
@@ -306,8 +291,6 @@ VQ-VAE 在音频重建上的严重码本崩溃（CVU ≈ 0）是耦合训练范�
 
 VP-VAE 和 FSP 未出现任何训练失败案例，验证了解耦范式对码本崩溃的免疫性。需注意，VP-VAE 的 kNN 密度估计在记忆队列 $\mathcal{S}$ 较大时引入额外计算开销，目前通过低维瓶颈（d ≤ 16）和随机子采样缓解，但该点仍需手动验证在大规模部署中的实际影响。
 
-
-
 ## 定位与知识库关联
 
 ### 与基线方法的关系
@@ -343,8 +326,6 @@ VP-VAE的核心贡献在于将VQ-VAE训练中“表示学习”与“码本学�
 4. **多模态扩展**：在视频、3D点云、分子图等更多模态上，VP-VAE的自适应扰动策略是否同样有效？不同模态的潜在空间几何结构差异可能影响kNN密度估计的可靠性。
 
 5. **FSP假设的鲁棒边界**：“近似均匀”假设的实际偏差在何种程度上开始损害量化效率？能否通过自适应网格划分或可学习的激活函数（如参数化CDF）弥补分布偏移，使FSP在更广泛的场景下保持竞争力？
-
-
 
 ## 原文 PDF
 

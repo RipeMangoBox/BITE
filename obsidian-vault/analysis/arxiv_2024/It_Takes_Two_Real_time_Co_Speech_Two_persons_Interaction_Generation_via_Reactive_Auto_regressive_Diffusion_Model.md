@@ -54,15 +54,11 @@ claims:
 
 **局限与开放问题**：模型缺乏对近距离身体交互的显式物理约束，可能导致穿透或不自然接触；现有数据集无法覆盖所有交互场景；系统假设已知伙伴的未来语音特征，实际应用需额外预测模块；当前未集成面部表情。未来方向包括：不依赖未来信息的在线反应预测、融入显式物理约束、扩展至多方对话、面部与身体协同生成。
 
-
-
 **任务背景** 语音驱动的虚拟人动作生成旨在根据语音输入合成自然的人体姿态与手势。该技术是构建沉浸式虚拟现实、数字人助手和社交交互代理的核心环节。现有方法主要聚焦于**单人协同语音动作生成**，即在给定单段语音的条件下，生成对应的上半身或全身动作。然而，真实的人类交流场景多为**多人对话**，对话者的动作不仅受自身语音驱动，还持续受到对方动作与语音的实时影响——例如点头回应、手势交替、身体朝向调整等。这种动态的、双向的交互关系，是单人模型无法捕捉的。
 
 **现有方法缺口** 当前面向多人交互的动作生成研究存在三个关键瓶颈。其一，**生成范式离线化**：主流方法采用序列到序列架构，需要完整的语音输入才能生成完整动作序列，无法在对话进行中实时响应对方的行为变化。其二，**运动范围受限**：多数协同语音方法仅生成站立姿态下的上半身动作，忽略了对话中的空间移动、身体朝向和脚部接触等全身行为，而这些恰恰是交互自然度的核心要素。其三，**数据支撑不足**：现有双人动作数据集（如Inter-Act）虽然包含语音与运动，但场景以静态站立对话为主，缺乏握手、拥抱、共同行走等动态交互行为，限制了模型对丰富交互模式的学习。
 
 **本文动机** 针对上述缺口，本文提出**反应式自回归扩散模型**，旨在实现从双人语音到全身交互运动的**实时在线生成**。核心思路是将伙伴的过去动作与未来语音作为条件，并引入独立预测的地面轨迹作为空间引导，通过自回归滑动窗口机制，使系统能够在仅依赖历史帧的条件下，持续产出协调、动态的双人互动。同时，为弥补数据多样性的不足，本文还构建了**InterAct++数据集**，新增402段涵盖日常对话与动态交互的双人动作序列，为模型训练与评估提供更丰富的场景覆盖。
-
-
 
 ## 核心方法与创新机理
 
@@ -103,8 +99,6 @@ $$\mathcal{G}(\mathbf{x}_t, t; c) = \mathcal{G}_m(...\emptyset...) + \gamma( \ma
 ### 5. 数据层面创新：InterACT++ 数据集
 
 现有数据集（如 BEAT）仅包含单人站立讲话动作，**Inter-Act** 虽含双人动作但缺乏动态交互行为（如握手、拥抱）。本工作采集了 **InterACT++** 数据集（402 个片段，1.7 小时，平均 15 秒/片段），覆盖多种日常对话场景中的动态双人交互，为模型学习互动行为提供了必要的数据基础（Table 1）。
-
-
 
 本工作提出了**反应式自回归扩散模型（Reactive Auto-regressive Diffusion Model）**，首次实现了从双人语音到全身实时交互运动的在线生成。系统接收两个对话者的语音输入 $[\mathbf{S}^A, \mathbf{S}^B]$，实时输出两人的全身运动序列 $[\mathbf{M}^A, \mathbf{M}^B]$，其中运动表示包含 $N$ 帧、$J$ 个关节的旋转特征 $Q$、根节点全局位移 $\mathbb{R}^3$ 以及双脚接触标签 $\mathbb{R}^2$（Sec. 3）。
 
@@ -152,16 +146,6 @@ $$\mathcal{G}(\mathbf{x}_t, t; c) = \mathcal{G}_m(...\emptyset... ) + \gamma( \m
 
 这一框架从根本上改变了语音驱动动作生成的范式：从离线、单人、局部姿势的合成，转向在线、双人、全身交互的实时生成，为虚拟人对话系统提供了可行的技术路径。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1671_It_Takes_Two_Real_time_Co_Speech_Two_person_s_Interaction_Generation_via/figures/002_Figure_2.jpg]]
-*Figure 2: Concept diagram. Our system obtains two persons’ speech as input to generate full-body motion. We employ Large-Speech-Model (LSM) to extract the semantic token, which are then fed into our autoregressive motion generation module, to produce interactive motion with the guidance of predicted trajectory*
-
-![[assets/figures/papers/paper_list_l1671_It_Takes_Two_Real_time_Co_Speech_Two_person_s_Interaction_Generation_via/figures/001_Figure_1.jpg]]
-*Figure 1: Our system addresses a novel task, that takes the speech of two persons as input to generate dynamic full-body interactions in real-time. To achieve this, we designed an audio-driven, auto-regressive diffusion model that generates two-person motion, with the guidance of motion trajectory to improve controllability. To enrich the diversity of these interactions, we captured a new dataset that includes a wide range of daily conversational scenarios, and short-order execution*
-
-
-
 ### 3.1 运动表示与语音编码
 
 系统将双人运动输出形式化为 $\mathbf{M} \in \mathbb{R}^{N \times (J \times Q + 3 + 2)}$，其中 $N$ 为帧数，$J$ 为关节数，$Q$ 为旋转特征维度，额外维度分别对应根节点全局位移（$\mathbb{R}^3$）和脚部接触标签（$\mathbb{R}^2$）。所有动作数据统一重定向至 Mixamo 骨架（65 个关节），以保证骨架一致性。
@@ -169,9 +153,6 @@ $$\mathcal{G}(\mathbf{x}_t, t; c) = \mathcal{G}_m(...\emptyset... ) + \gamma( \m
 语音处理采用多尺度特征提取策略：
 - **声学特征**：通过 librosa 库将语音信号转换为梅尔频谱图 $\mathbf{s}^{\mathrm{mel}} \in \mathbb{R}^{27}$，并提取基于起始振幅的节奏曲线。
 - **语义特征**：利用预训练的大规模语音语言模型（Large-Speech-Model, LSM）提取离散语音语义令牌，作为高层语义条件。Figure 7 的 t-SNE 可视化表明，相比 BERT 特征，语音令牌在训练集与测试集间的分布对齐更优。
-
-![[assets/figures/papers/paper_list_l1671_It_Takes_Two_Real_time_Co_Speech_Two_person_s_Interaction_Generation_via/figures/015_Figure_7.jpg]]
-*Figure 7: We extract the speech semantic features besed on BERT(Left) and speech tokenization(Right) and then visualize the data points of the training and testing data in the 2D space using t-SNE. The distributions are aligned better in the speech tokenization space*
 
 ### 3.2 双流运动扩散生成器
 
@@ -219,14 +200,9 @@ $$\mathcal{L}_{traj} = \mathrm{mse}(\mathbf{P}^A, \hat{\mathbf{P}}^A) + \mathrm{
 
 其中 $\mathbf{P}^A$、$\mathbf{P}^B$ 分别为两人物的真实地面轨迹（位置与朝向），轨迹预测器以语音、高层活动值和位置信号为输入（Figure 9），自回归输出未来轨迹作为空间引导。
 
-![[assets/figures/papers/paper_list_l1671_It_Takes_Two_Real_time_Co_Speech_Two_person_s_Interaction_Generation_via/figures/016_Figure_9.jpg]]
-*Figure 9: Our trajectory prediction system takes multiple conditions as input, such as speech, high-level activity values, and positional signals*
-
 ### 3.5 自回归滑动窗口与实时推理
 
 系统采用自回归滑动窗口机制实现长时生成：每步预测一个运动片段，选取部分帧作为下一窗口的历史条件。轨迹混合与死区混合策略保证窗口边界处的运动平滑过渡。推理阶段使用 8 步扩散采样，运动预测模块为 4 层 Transformer（4 注意力头），单片段推理耗时约 4ms，帧率超过 100fps，满足实时交互需求。
-
-
 
 ## 实验与关键发现
 
@@ -269,9 +245,6 @@ $$\mathcal{L}_{traj} = \mathrm{mse}(\mathbf{P}^A, \hat{\mathbf{P}}^A) + \mathrm{
 
 在给定一方真实动作、生成另一方动作的交互运动生成任务中（Table 4），本方法 FPD 为 103.19，脚部滑动仅 0.0074，在运动质量与物理合理性上均表现最优。需注意该任务下其他方法未提供音频条件，直接可比性有限。
 
-![[assets/figures/papers/paper_list_l1671_It_Takes_Two_Real_time_Co_Speech_Two_person_s_Interaction_Generation_via/figures/010_Table_4.jpg]]
-*Table 4: Comparison on the interactive motion generation task. We take the GT motion of one character as input to generate the motion of the other character*
-
 ### 消融实验
 
 消融实验（Table 5）系统验证了各模块的贡献：
@@ -291,9 +264,6 @@ $$\mathcal{L}_{traj} = \mathrm{mse}(\mathbf{P}^A, \hat{\mathbf{P}}^A) + \mathrm{
 - **动画质量**：62.4%
 - **交互性**：82.5%
 
-![[assets/figures/papers/paper_list_l1671_It_Takes_Two_Real_time_Co_Speech_Two_person_s_Interaction_Generation_via/figures/011_Table_6.jpg]]
-*Table 6: Percentage of user preferences for each method under different criteria*
-
 交互性维度的高偏好率（82.5%）尤其突出，印证了反应式自回归生成框架在塑造真实互动感知方面的核心优势。
 
 ### 失败模式与局限性
@@ -311,8 +281,6 @@ $$\mathcal{L}_{traj} = \mathrm{mse}(\mathbf{P}^A, \hat{\mathbf{P}}^A) + \mathrm{
 - **Table 5**：消融实验，验证伙伴条件与轨迹控制的必要性。
 - **Table 6**：用户研究，交互性偏好 82.5% 为关键优势。
 - **Figure 5**：定性对比，直观展示本方法在交互性与动态性上的优势。
-
-
 
 ## 定位与知识库关联
 
@@ -350,8 +318,6 @@ $$\mathcal{L}_{traj} = \mathrm{mse}(\mathbf{P}^A, \hat{\mathbf{P}}^A) + \mathrm{
 2. **显式物理约束融合**：如何将接触点约束、穿透惩罚等物理先验融入扩散去噪过程，而不破坏生成多样性和实时性？
 3. **多方对话扩展**：当前双流架构能否自然扩展到三人以上的多方对话场景？分离式条件设计在超过两个主体时如何避免组合爆炸？
 4. **面部-身体协同生成**：如何将面部动画与身体运动在统一的扩散框架中协同生成，实现语义一致的全模态虚拟人交互？
-
-
 
 ## 原文 PDF
 

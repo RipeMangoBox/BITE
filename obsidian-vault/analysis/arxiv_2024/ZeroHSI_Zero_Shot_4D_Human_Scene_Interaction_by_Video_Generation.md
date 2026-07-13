@@ -54,8 +54,6 @@ claims:
 
 **局限与开放问题**：方法性能受限于视频生成模型的质量，生成视频中的不正确内容或外观不一致可能导致次优结果；单视图监督带来的深度歧义影响复杂动作的精确重建；当前仅支持单个动态对象，且假设物体深度在短时间内恒定。未来方向包括处理多对象交互、引入更强物理先验以及解决长期交互中的漂移问题。
 
-
-
 ### 问题背景：四维人景交互合成
 
 四维人景交互（4D Human-Scene Interaction, HSI）合成旨在生成人体在三维场景中随时间演化的自然运动序列，涵盖行走、坐卧、操作物体等复杂行为。这一任务在虚拟现实、具身智能、电影制作和机器人仿真等领域具有广泛的应用前景。其核心挑战在于同时满足三个层面的要求：**语义对齐**——生成的运动需符合文本描述或任务意图；**物理合理性**——人体需与场景几何保持一致，避免穿透地面、墙壁或物体；**运动多样性**——能够覆盖不同场景类型和交互类别。
@@ -73,8 +71,6 @@ claims:
 大规模预训练的视频生成模型在海量互联网视频数据上学习到了丰富的人体运动模式、物理常识以及人与环境的交互规律。这些隐式知识天然涵盖了多样化的场景类型和交互行为，且无需任何三维动作标注。ZeroHSI 的核心动机正是**绕过对配对动捕-场景数据的需求，转而从视频生成模型中提取人景交互先验**，并将其提升为四维运动表示。
 
 具体而言，ZeroHSI 以三维场景和文本提示为输入，通过视频生成模型产生人景交互视频，再利用可微神经渲染框架，将生成的二维视频优化重建为包含人体姿态、相机轨迹和物体六自由度姿态的完整四维交互序列。这一范式实现了**零样本**（zero-shot）交互合成——无需在新场景上训练，即可生成语义合理、物理可信的人景交互运动。
-
-
 
 ## 核心方法与创新机理
 
@@ -101,8 +97,6 @@ ZeroHSI 的核心创新在于**将大规模预训练视频生成模型的人景�
 - **静态场景**：ZeroHSI 在场景穿透率（Pene%_scene）上达到 0.019，显著优于 TRUMANS（0.046）和 LINGO（0.058），同时 CLIP Score 更高（23.52 vs 22.36/22.61）（Table 1）。
 - **动态对象**：ZeroHSI 在物体穿透率（Pene_obj）上仅为 0.033，远低于 CHOIS（1.581）和 LINGO（0.242），接触率（Cont.）达到 0.835（Table 2）。
 - **消融验证**：用现成姿态估计方法 WHAM/WHAC 替代优化模块会导致全局平移估计不准，引起严重的穿透伪影（Fig. S6），进一步证实了可微渲染优化框架的必要性。
-
-
 
 ZeroHSI 的整体设计遵循“生成-重建”范式，其核心洞察在于：**大规模预训练视频生成模型已内化丰富的人景交互先验，通过可微神经渲染可将2D视频中的交互知识蒸馏为4D运动序列**。这一范式彻底绕过了传统方法对成对3D场景与动作捕捉数据的依赖，实现了对新场景的零样本泛化。
 
@@ -134,12 +128,8 @@ ZeroHSI 由四个串行模块构成，数据流从场景渲染到视频生成，
 
 贯穿整个 Pipeline 的关键技术是**可微高斯渲染**。人体通过 Animatable Gaussians 映射 $\mathcal{G}_{\mathcal{H}} \leftarrow \mathcal{A}(\mathbf{r}, \phi, \Theta; \mathbf{T})$（Eq.6）实现姿态驱动的形变，物体通过6D姿态变换其高斯表示，场景则保持静态。三者拼接后经光栅化渲染（Eq.2），使得从渲染像素到姿态参数的梯度可以端到端传播。这一设计将2D视频信号转化为3D/4D优化的监督源，是“从视频生成模型中蒸馏交互知识”这一核心思想的技术支点。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1674_ZeroHSI_Zero_Shot_4D_Human_Scene_Interaction_by_Video_Generation/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of ZeroHSI. Our approach begins with HSI video generation conditioned on the rendered initial state and text prompt. Through differentiable neural rendering, we optimize per-frame camera pose, human pose parameters, and object 6D pose by minimizing the discrepancy between the rendered and generated reference videos*
-
-
 
 ZeroHSI 将零样本人景交互合成分解为四个串联模块：**HSI 视频生成**、**相机姿态估计**、**HSI 优化**和**运动精炼**。整个流程建立在 3D Gaussian Splatting 的可微渲染基础之上。
 
@@ -154,9 +144,6 @@ $$G(\mathbf{x}) = e^{-\frac{1}{2}(\mathbf{x} - \pmb{\mu})^{\top} \pmb{\Sigma}^{-
 $$\mathbf{C} = \sum_{i=1}^{N} \alpha_i \prod_{j=1}^{i-1} (1 - \alpha_j) \mathbf{c}_i$$
 
 这一可微渲染管线（Figure 3）将参数化高斯人体、经刚体变换的高斯物体和静态高斯场景拼接后，通过高斯光栅化合成图像，使得整个流程可端到端求导。
-
-![[assets/figures/papers/paper_list_l1674_ZeroHSI_Zero_Shot_4D_Human_Scene_Interaction_by_Video_Generation/figures/003_Figure_3.jpg]]
-*Figure 3: Illustration of the differentiable rendering process. The parameterized Gaussian human, transformed Gaussian object, and static Gaussian scene are concatenated and rendered through Gaussian rasterization*
 
 ### 模块一：HSI 视频生成
 
@@ -204,13 +191,6 @@ $$\mathcal{L} = \frac{1}{T} \sum_{t=0}^{T} \mathcal{L}_{\mathrm{fit}}^{t} + \lam
 
 其中 $\mathcal{D}(\mathbf{z}_t)$ 是 VPoser 解码器，将潜变量 $\mathbf{z}_t$ 映射为姿态参数；$\mathcal{L}_{\mathrm{physics}}$ 包含速度、加速度和接触力等物理约束项。消融实验（Table 4）表明，完整的逐帧身体优化（OPT_body）对降低场景穿透率至关重要，而精炼模块进一步提升了运动的时序平滑性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1674_ZeroHSI_Zero_Shot_4D_Human_Scene_Interaction_by_Video_Generation/figures/017_Figure.jpg]]
-*Figure: WHAM vs.Ours WHAC vs.Ours Ours w/o OPT vs. Ours body*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -255,27 +235,11 @@ Figure 6 展示了 ZeroHSI 在 Mip-NeRF 360 重建的真实场景（Garden、Bic
 ![[assets/figures/papers/paper_list_l1674_ZeroHSI_Zero_Shot_4D_Human_Scene_Interaction_by_Video_Generation/figures/006_Figure_6.jpg]]
 *Figure 6: Qualitative results of long-term interactions with reconstructed real scenes on AnyInteraction. ZeroHSI generates long-term interaction sequences with multiple text prompts in reconstructed scenes from the Mip-NeRF 360 (Garden and Bicycle) dataset [4]*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1674_ZeroHSI_Zero_Shot_4D_Human_Scene_Interaction_by_Video_Generation/figures/007_Table_1.jpg]]
-*Table 1: Quantitative evaluation of interactions with static scenes. ZeroHSI achieves better semantic alignment with text inputs (higher CLIP score), motion diversity, and physical plausibility (lower scene penetration) compared to TRUMANS [34] and LINGO [33]*
-
-![[assets/figures/papers/paper_list_l1674_ZeroHSI_Zero_Shot_4D_Human_Scene_Interaction_by_Video_Generation/figures/008_Table_2.jpg]]
-*Table 2: Quantitative evaluation of interactions with dynamic objects in scenes. Our method outperforms baselines with stronger semantic alignment with text prompts and better dynamic interaction quality (higher contact ratio and lower object penetration)*
-
-![[assets/figures/papers/paper_list_l1674_ZeroHSI_Zero_Shot_4D_Human_Scene_Interaction_by_Video_Generation/figures/009_Table_3.jpg]]
-*Table 3: Human study on generated 4D HSI motions. In both static and dynamic scenarios, participants prefer our generated HSIs for their motion realism and semantic alignment by large margins*
-
 ![[assets/figures/papers/paper_list_l1674_ZeroHSI_Zero_Shot_4D_Human_Scene_Interaction_by_Video_Generation/figures/004_Figure_4.jpg]]
 *Figure 4: Qualitative comparison of interactions with static scenes on AnyInteraction. ZeroHSI generates 4D HSIs that are more realistic and better aligned with text prompts, demonstrating generalizability across diverse scenes and interaction types compared to baselines*
 
 ![[assets/figures/papers/paper_list_l1674_ZeroHSI_Zero_Shot_4D_Human_Scene_Interaction_by_Video_Generation/figures/005_Figure_5.jpg]]
 *Figure 5: Qualitative comparison of interactions with dynamic objects in scenes on AnyInteraction. Our method maintains proper object contact while minimizing penetration, successfully handling challenging interactions like sliding while seated on an office chair*
-
-![[assets/figures/papers/paper_list_l1674_ZeroHSI_Zero_Shot_4D_Human_Scene_Interaction_by_Video_Generation/figures/022_Figure.jpg]]
-*Figure: (a) A cloth appears in hand during car wiping; a mailbox appears (b) The bicycle seat appears white in the generated video while it is behind as the character leans forward. black in the real scene*
-
-
 
 ## 定位与知识库关联
 
@@ -330,8 +294,6 @@ ZeroHSI 处于**视频生成、可微神经渲染与人体运动合成**的交�
 5. **长期交互漂移**：当前依赖分段生成与拼接处理长期交互，如何更有效地解决累积漂移问题？
 
 > **注意**：上述局限性均来自论文自身的讨论与消融实验证据。关于动态对象深度恒定假设的严格性、以及视频生成模型在不同场景类型下的失效模式，建议结合补充材料中的 Fig. S6 和用户研究（Table 3）进行交叉验证。
-
-
 
 ## 原文 PDF
 

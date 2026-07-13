@@ -50,8 +50,6 @@ CamI2V 的核心洞察在于重新审视扩散模型中“条件”的本质：�
 
 方法层面，CamI2V 以 DynamiCrafter 为基础模型，引入 Plücker 坐标作为全局 3D 光线位置编码，并在空间与时间注意力之间插入可插拔的极线注意力模块，同时辅以可学习的 register tokens 处理帧间无重叠区域。在 RealEstate10K 数据集上，CamI2V 相较此前最优方法 CameraCtrl 在相机可控性指标上取得显著提升：RotErr 降低 32.96%，CamMC 降低 25.64%，TransErr 降低 20.77%，且未牺牲生成质量和动态表现（表 1）。该方法训练仅需 24GB 显存，推理仅需约 12GB，具备在消费级 GPU 上部署的可行性。
 
-
-
 ### 扩散模型中的条件再思考
 
 扩散模型通过沿对数概率密度函数的梯度方向逐步去噪来生成数据。在去噪初期，噪声水平较高，高密度区域呈现为大量噪声样本的重叠，导致视觉上的模糊不清。这一现象揭示了一个关键问题：**条件的有效性并不取决于其数量，而取决于它能在多大程度上减少不确定性**。
@@ -81,8 +79,6 @@ CamI2V 的核心动机源于一个关键发现：**对极几何约束能够将�
 ### 方法定位
 
 基于上述动机，CamI2V 提出了一种结合 **Plücker 坐标嵌入**与**极线注意力机制**的相机控制框架。该方法以 **DynamiCrafter**（Xing et al., 2023）为基础图像到视频扩散模型，在架构层面引入显式的对极几何约束，替代 **CameraCtrl**（He et al., 2024a）中缺乏几何约束的 Plücker 侧分支注入方式。通过在空间注意力与时间注意力之间插入极线注意力模块，模型能够在高噪声条件下稳定地建模跨帧关系，从而实现更精确的相机可控性和 3D 一致性。
-
-
 
 ## 核心方法与创新机理
 
@@ -125,8 +121,6 @@ Table 2 的消融研究为上述创新提供了直接证据：
 
 > **需人工验证**：分析材料中未提供 Register Tokens 数量的消融实验，其对性能的具体贡献大小需要查阅原文进一步确认。
 
-
-
 CamI2V的整体管线建立在基础图像到视频扩散模型 **DynamiCrafter**（Xing et al., 2023）之上，通过两个关键模块的插入和一种条件注入策略的改进，将相机控制能力赋予原有模型。其核心设计思想是：将相机位姿转换为显式的三维几何约束，并利用该约束重塑跨帧特征的交互方式，使模型在高噪声条件下仍能保持几何一致性。
 
 ### 输入输出流
@@ -163,12 +157,8 @@ CamI2V采用双引导尺度设计：$s_{\mathrm{img\&txt}}$ 控制图像和文�
 
 整个管线中，Plücker嵌入为极线注意力提供了几何计算的基础——基础矩阵 $F_{ij}$ 正是从相机参数导出。极线注意力模块位于空间注意力和时间注意力之间，先通过空间注意力处理单帧内特征，再通过极线注意力建立跨帧几何约束，最后通过时间注意力补充时序平滑。这一设计使得几何约束成为跨帧交互的主导机制，而非传统方法中时序注意力的简单替代。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2410_15957/figures/004_Figure_4.jpg]]
 *Figure 4: Pipeline of camera-controlled image-to-video diffusion model. We follow CameraCtrl to add a learnable pose encoder and a linear projection to process plucker embeddings as a global positional embedding. Epipolar attention is added between spatial and temporal attention*
-
-
 
 CamI2V 在基础 I2V 扩散模型（**DynamiCrafter**，Xing et al., 2023）之上，通过三个核心模块的协同设计，实现了对相机运动的精确控制。其关键创新在于将跨帧特征交互重新解释为一类“噪声条件”的利用问题，并通过极线约束最大化条件的信息价值。
 
@@ -203,9 +193,6 @@ $$D_{ij}(u',v') = \frac{(A,B,C) \cdot (u',v',1)}{\sqrt{A^2+B^2}}$$
 
 通过设定距离阈值 $\delta$，将连续的极线离散化为二值掩码：距离小于 $\delta$ 的像素被标记为 1（允许参与注意力），其余为 0（见 Figure 5）。该掩码在不同特征分辨率下自适应调整阈值，形成多分辨率极线掩码。
 
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2410_15957/figures/005_Figure_5.jpg]]
-*Figure 5: Epipolar line and mask. Left: Epipolar constraint of the j-th frame from one pixel at (u, v) on the i-th frame. Middle: Epipolar mask discretized by the distance threshold δ, so that only neighboring pixels in green are allowed to attend while those red lined are not. Right: Multiresolution epipolar mask adaptive to the feature size in U-Net layers*
-
 **第二步：极线约束的注意力计算。** 将离散极线掩码 $m$ 逐元素乘到注意力分数矩阵上，强制特征聚合仅沿极线进行：
 
 $$\mathrm{EpipolarAttn}(q,k,v,m) = \mathrm{softmax}\left(\frac{q k^{\mathrm{T}}}{\sqrt{d}} \odot m\right) v$$
@@ -226,18 +213,8 @@ $$\epsilon_{\theta}(z_t, c_{camera}, c_{img\&txt}, s_{camera}, s_{img\&txt})$$
 
 三个模块形成清晰的因果链路：Plücker 嵌入提供 3D 几何先验 → 极线注意力利用该先验将跨帧交互约束在几何一致的区域 → 多尺度 CFG 在推理时平衡几何精度与生成质量。消融实验（Table 2）证实，Plücker 嵌入与所有帧上的极线注意力组合取得了最优性能，而 3D 全注意力在高噪声下表现甚至不如仅参考帧的极线设置，验证了“约束优于全连接”的核心洞察。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2410_15957/figures/001_Figure_1.jpg]]
-*Figure 1: Rethinking condition in diffusion models. Diffusion models denoise along the gradient of log probability density function. At large noise levels, the high density region becomes the overlap of numerous noisy samples, resulting in visual blurriness. We point out that the effectiveness of a condition depends on how much uncertainty it reduces. From a new perspective, we categorize conditions into clean conditions (e.g. texts, camera extrinsics) that remain visible throughout the denoising process, and noisy conditions (e.g. noised pixels in the current and other frames) whose deterministic information*
-
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2410_15957/figures/003_Figure_3.jpg]]
 *Figure 3: Parameterizations for cameras. Left: Camera representation and trajectory visualization in the world coordinate system. Right: The transformation from camera representations to 3D ray representations as Plucker coordinates given pixel coordinates. ¨*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2410_15957/figures/006_Figure_6.jpg]]
-*Figure 6: Epipolar attention mask with register tokens. We specify query pixel by red point in the i-th frame for clarity. Epipolar attention mask is constructed by concatenating epipolar masks along all frames. We insert register tokens to key/value sequence to deal with zero epipolar scenarios*
-
-
 
 ## 实验与关键发现
 
@@ -293,19 +270,6 @@ CamI2V 在 RealEstate10K 基准上以显著优势超越所有对比方法，实�
 
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2410_15957/figures/011_Table_3.jpg]]
 *Table 3: Comparison on GPU memory usage and speed under DeepSpeed ZeRO-1. * denotes our reproduction on DynamiCrafter. We report full parameter fine-tuning results of DynamiCrafter. Our model can be trained on 24GB consumer-level GPUs despite the additional epipolar attention*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2410_15957/figures/009_Figure_7.jpg]]
-*Figure 7: Qualitative Comparison on RealEstate10K*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2410_15957/figures/010_Figure_8.jpg]]
-*Figure 8: Out-of-Domain Visualization*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2410_15957/figures/012_Figure_9.jpg]]
-*Figure 9: Visualization of our 256×256 model*
-
-
 
 ## 定位与知识库关联
 
@@ -366,8 +330,6 @@ CamI2V 从 CameraCtrl 继承的关键设计包括：
 3. **极线约束的松弛策略**：当前的硬阈值离散化掩码（由距离阈值 $\delta$ 控制）可能过于刚性。自适应阈值或多尺度软约束是否能改善边界情况（如帧间重叠恰好处于阈值边缘），值得探索。
 
 4. **计算效率与扩展性**：极线注意力需要为每对帧计算基础矩阵并生成掩码，在长序列或高分辨率下的计算开销尚未系统分析。register tokens 数量的最优选择（当前固定为 2）也缺乏消融研究。
-
-
 
 ## 原文 PDF
 

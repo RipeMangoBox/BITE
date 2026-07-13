@@ -147,8 +147,6 @@ Rhythm 是一个面向双人形机器人的交互式全身控制学习框架，�
 
 **输入输出流**：原始人类交互运动数据首先进入 IAMR，经解耦优化输出运动学可行的双机器人参考轨迹及图结构先验；IGRL 以这些参考和先验为引导，输出耦合控制策略；部署系统则负责将策略从仿真桥接至真实机器人，实现稳定的物理交互。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1705_Rhythm_Learning_Interactive_Whole_Body_Control_for_Dual_Humanoids/figures/001_Figure_1.jpg]]
 *Figure 1: The proposed framework, Rhythm, facilitates a spectrum of humanoid–humanoid interactions. (a–c) Contact-Rich Interaction: The method handles interactions ranging from light contact (Greeting) to intensive contact (Hug, Shoulder-to-Shoulder), maintaining fine-grained contact geometry without penetration (shown in the zoomed-in views). (d) Coordinated Interaction: The humanoids perform synchronized long-horizon dance (La La Land), with trajectories showing consistent spatiotemporal alignment and stable relative positioning over time*
 
@@ -344,9 +342,6 @@ Fig. 5 提供了策略行为的直观对比：
 
 #### 4.2 鲁棒性测试（Fig. 6）
 
-![[assets/figures/papers/paper_list_l1705_Rhythm_Learning_Interactive_Whole_Body_Control_for_Dual_Humanoids/figures/008_Figure_6.jpg]]
-*Figure 6: Robustness to disturbances. Our policy demonstrates strong resilience against aggressive external perturbations (pulling, pushing, and kicking), successfully recovering balance and synchronization*
-
 Fig. 6 展示了策略对外部扰动的鲁棒性。在推、拉、踢等攻击性扰动下，Rhythm 策略能够恢复平衡并重新建立同步，表明 IGRL 学到的耦合动力学策略具有较强的抗干扰能力。这一鲁棒性部分归功于域随机化训练（Table V）和软同步机制（$\dot{\phi}_{ego} = 1.0 + k (\phi_{peer} - \phi_{ego})$）提供的时序弹性。
 
 ---
@@ -376,16 +371,8 @@ Fig. 6 展示了策略对外部扰动的鲁棒性。在推、拉、踢等攻击�
 | Table IV | IGRL 完整奖励项与权重配置 |
 | Table V | 域随机化参数配置 |
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1705_Rhythm_Learning_Interactive_Whole_Body_Control_for_Dual_Humanoids/figures/005_Table.jpg]]
 *Table: I: Quantitative Results of Retargeting. Comparison across four interaction categories. Metrics include Safety (IPR, MPD), Fidelity (IEE, F1), and Utility (DSR). IAMR achieves the best balance, strictly eliminating penetration (IPR=0) while maximizing contact F1 scores. TABLE II: Quantitative Results of Policy. We evaluate the contribution of each component. Our full method achieves the most robust balance, effectively integrating coarse-grained geometric alignment (low IEE) with fine-grained physical contact fidelity (high CSR)*
-
-![[assets/figures/papers/paper_list_l1705_Rhythm_Learning_Interactive_Whole_Body_Control_for_Dual_Humanoids/figures/007_Table.jpg]]
-*Table: III: Main Results for Real Robot Experiments. We conducted 10 trials for each task and evaluated success based on contact establishment at specific keyframes (K frames per trial)*
-
-![[assets/figures/papers/paper_list_l1705_Rhythm_Learning_Interactive_Whole_Body_Control_for_Dual_Humanoids/figures/010_Table.jpg]]
-*Table: IV: Reward Terms and Weights used in IGRL TABLE V: Domain Randomization Parameters*
 
 ## 定位与知识库关联
 

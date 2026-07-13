@@ -144,10 +144,6 @@ NitroGen 的整体框架由三个核心组件构成，它们协同工作，形�
 
 **输入输出流**：在推理时，通用模拟器将当前游戏画面帧送入视觉编码器，编码后的特征与噪声动作拼接后进入 DiT 解码器，经16步欧拉积分去噪后输出连续动作序列。模拟器按帧率逐步执行这些动作，并将新的观测帧反馈给模型，形成闭环控制。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2601_02427/figures/003_Figure.jpg]]
-
 ### 互联网规模视频-动作数据集构建
 
 NitroGen 的核心创新在于绕过人工演示收集，直接从互联网公开视频中自动提取游戏手柄动作标签。该流水线分为三个阶段：
@@ -197,12 +193,8 @@ $$a_{t + 1/k} = a_{t} + \frac{1}{k} \pi_{\theta}(a_{t}, \psi_{\phi}(o), t)$$
 
 模型使用 AdamW 优化器（权重衰减 0.001），采用预热-稳定-衰减学习率调度，稳定阶段学习率为常数 0.0001。数据增强包括随机亮度、对比度、饱和度、色调扰动，以及 ±5° 随机旋转和随机裁剪。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2601_02427/figures/004_Figure.jpg]]
 *Figure: Input video frame Gamepad localization with template matching*
-
-![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2601_02427/figures/005_Figure.jpg]]
 
 ## 实验与关键发现
 
@@ -258,8 +250,6 @@ NitroGen 的核心主张是：仅通过互联网视频的行为克隆预训练�
 5. **覆盖层依赖脆弱性**：动作解析完全依赖视频中的手柄覆盖层，一旦覆盖层缺失、被遮挡或风格异常，数据质量急剧下降。
 
 这些失败模式指向了未来的改进方向：引入世界模型进行前向预测、结合语言指令实现任务条件化、扩展输入模态支持键盘鼠标，以及探索离线强化学习对预训练策略的进一步精炼。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2601_02427/figures/008_Figure_5.jpg]]
 *Figure 5: Gamepad parsing performance for different controller families. We verify the correctness of our action extraction pipeline by comparing performance across different controller families against ground-truth data. (a) shows joystick R2 correlation scores (averaged for both left and right joysticks) with an overall average of 0.84. (b) shows button frame accuracy with an overall average of 0.96*

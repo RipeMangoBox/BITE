@@ -53,8 +53,6 @@ claims:
 
 **主要结果**：在HumanML3D基准上，Motion-2-to-3的FID达到**0.321**，显著优于最优基线OMG的0.381（Table 1）。在新颖文本提示的用户研究中，该方法获得**51.43%**的最佳动作率，远超MDM和MLD（Table 2）。消融实验表明，去除2D预训练会导致FID从0.321急剧恶化至4.950，验证了2D数据预训练的关键作用（Table 4）。
 
-
-
 ### 3D人体运动生成的瓶颈
 
 数据驱动的3D人体运动生成近年来取得了长足进步，但其根本瓶颈在于高质量3D标注数据的稀缺。现有的文本条件3D运动生成模型——如**MDM**（Tevet et al., ICLR 2023）、**MLD**（Kong et al., ICCV 2023）和**OMG**（Liang et al., CVPR 2024）——几乎完全依赖3D运动捕捉（MoCap）数据进行训练。然而，3D动捕数据的采集成本极高，需要专业的硬件设备、受控的室内环境和大量的人工标注，导致公开可用的3D运动数据集在规模和多样性上均十分有限。以最常用的HumanML3D数据集为例，其涵盖的动作类型远不足以覆盖真实世界中丰富的人类行为。
@@ -70,8 +68,6 @@ claims:
 ### 本文的核心动机
 
 Motion-2-to-3的核心动机源于一个关键洞察：**从2D视频中学习到的局部人体运动模式具有跨维度的通用性**。如果将运动解耦为相对于根节点的局部关节运动与描述全局位移的根运动，那么局部运动部分在2D和3D之间共享相同的运动学结构——它描述的是人体各关节相对于身体中心的位置变化，与相机视角和全局位置无关。基于这一洞察，本文提出通过**根解耦**策略，从大规模2D视频中学习局部运动先验，再结合有限的3D数据进行多视图一致性微调，从而在3D数据受限的条件下大幅提升生成质量并扩展可生成的运动类型。
-
-
 
 ## 核心方法与创新机理
 
@@ -107,8 +103,6 @@ Motion-2-to-3 的因果开关在于**将运动解耦为局部关节运动（相�
 
 整个 pipeline 的因果链路可概括为：2D 局部运动预训练提供通用运动先验 → 多视图扩散模型在 3D 数据微调下生成多视图一致的 2D 局部运动与根速度 → 三角化模块将多视图 2D 局部运动恢复为 3D 局部运动 → 根速度累积得到 3D 全局轨迹 $x_{r3d}^{f+1} = x_{r3d}^{f} + v_{r3d}^{f} \Delta t$ → 两者结合形成完整 3D 运动。该链路的核心洞察在于：**局部运动的“语义”具有视角不变性**，2D 数据中学到的局部运动模式可直接迁移到 3D 生成的各个视角中，从而在 3D 数据有限的情况下大幅扩展可生成的运动类型。
 
-
-
 Motion-2-to-3 的整体 pipeline 围绕一个核心洞察构建：**将人体运动解耦为局部关节运动与全局根运动**，从而让模型能够从大规模 2D 视频数据中学习通用的局部运动先验，再通过 3D 数据微调来恢复多视图一致的三维运动。整个框架由四个关键模块串联而成，形成从文本到可驱动 3D 角色的端到端生成流程。
 
 ### 1. 2D 运动扩散模型（预训练阶段）
@@ -138,24 +132,17 @@ $$x_{r3d}^{f+1} = x_{r3d}^{f} + v_{r3d}^{f} \Delta t$$
 
 整个 pipeline 的数据流可概括为：**文本 → 2D 局部运动先验（$\mathcal{D}_{2D}$）→ 多视图 2D 运动（$\mathcal{D}_{mv}$）→ 3D 局部运动（三角化）→ 3D 全局运动（根轨迹累积）→ SMPL 姿态**。其中，2D 预训练阶段与 3D 微调阶段的解耦设计是方法成功的关键——消融实验表明，去除 2D 预训练将导致 FID 从 0.321 急剧恶化至 4.950（Table 4），充分验证了 2D 局部运动先验对最终生成质量的决定性作用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1892_Motion_2_to_3_Leveraging_2D_Motion_Data_to_Boost_3D_Motion_Generation/figures/003_Figure_3.jpg]]
 *Figure 3: Our Pipeline. We design a Multi-view Diffusion model (a) to generate multi-view results (for simplicity, camera embedding is omitted in the figure). During inference, the Multi-view Diffusion model predicts 2D local motion and root velocity (b). Then, we use triangulation [23] to recover 3D local joint positions (c) and accumulate root velocity to obtain 3D global trajectory (d), resulting in the final 3D motion (e)*
 
 ![[assets/figures/papers/paper_list_l1892_Motion_2_to_3_Leveraging_2D_Motion_Data_to_Boost_3D_Motion_Generation/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of our key idea. (a) Our approach leverages 2D motion data to improve 3D motion generation by unifying 2D and 3D motion data. (b) Our framework yields better FID and generates a broader range of motion types*
 
-
-
 Motion-2-to-3 的核心思路是：将运动解耦为**局部关节运动**（相对于根节点的运动）与**全局根运动**，从而让模型从大规模2D视频数据中学习通用的局部运动先验，再通过多视图机制恢复3D一致性。整个管线由四个关键模块串联构成。
 
 ### 2D运动解耦与表示
 
 原始2D运动数据同时包含人体自身运动与相机运动，直接建模会引入歧义（Figure 2）。为此，论文将2D人体运动 $\mathcal{M} \in \mathbb{R}^{N \times J \times 2}$（$N$ 帧，$J$ 个关节）分解为两部分：
-
-![[assets/figures/papers/paper_list_l1892_Motion_2_to_3_Leveraging_2D_Motion_Data_to_Boost_3D_Motion_Generation/figures/002_Figure_2.jpg]]
-*Figure 2: Challenge of 2D motion from the real world. In the real-world videos [30], both the camera and humans move in 3D space, resulting in 2D motion that combines both movements*
 
 - **2D局部运动** $\mathcal{M}_l \in \mathbb{R}^{N \times (J-1) \times 2}$：将每帧根节点位置从所有关节位置中减去，得到相对于根的局部关节运动。
 - **根速度** $\mathcal{M}_r \in \mathbb{R}^{N \times 1 \times 2}$：相邻帧根节点位置的差分，编码全局位移。
@@ -203,8 +190,6 @@ $$x_{r3d}^{f+1} = x_{r3d}^{f} + v_{r3d}^{f} \Delta t$$
 | $x_{r3d}^{f+1} = x_{r3d}^{f} + v_{r3d}^{f} \Delta t$ | 3D根轨迹累积递推公式 | Section 3.3 |
 
 > **注意**：以上公式均来自论文 Section 3 的明确定义，未做任何外推或推导。扩散模型的具体噪声调度、损失函数形式等细节论文未提供完整公式，此处不做猜测性补充。
-
-
 
 ## 实验与关键发现
 
@@ -256,18 +241,11 @@ $$x_{r3d}^{f+1} = x_{r3d}^{f} + v_{r3d}^{f} \Delta t$$
 
 论文未系统评估不同人口群体或运动类型的公平性。HumanML3D数据集和2D视频来源可能存在人口统计偏差，可能影响某些人群或动作类型的生成质量。该点需要手动验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1892_Motion_2_to_3_Leveraging_2D_Motion_Data_to_Boost_3D_Motion_Generation/figures/004_Table_1.jpg]]
 *Table 1: Comparison of text-conditional motion synthesis on HumanML3D [20] dataset. These metrics are evaluated by the motion encoder from [20]. The right arrow → means the closer to real motion the better. The dash − denotes the results are unavailable as they do not release the code. The best and second-best results are highlighted green and yellow, respectively*
 
 ![[assets/figures/papers/paper_list_l1892_Motion_2_to_3_Leveraging_2D_Motion_Data_to_Boost_3D_Motion_Generation/figures/005_Table_3.jpg]]
 *Table 3: Comparison of 2D Data utilization strategies. Our strategy for leveraging 2D data obtains superior performance compared to baseline methods*
-
-![[assets/figures/papers/paper_list_l1892_Motion_2_to_3_Leveraging_2D_Motion_Data_to_Boost_3D_Motion_Generation/figures/006_Table_2.jpg]]
-*Table 2: Quantitative evaluation on the novel text prompts. Best Motion Rate and Top-2 Motion Rate represent the proportions of being selected as the best motion and as one of the top two motions. If selected randomly, the expected rate would be 33%*
-
-
 
 ## 定位与知识库关联
 
@@ -350,8 +328,6 @@ Motion-2-to-3的性能依赖于两个数据条件：
 5. **实时驱动与物理交互集成**：生成的3D运动能否无缝集成到游戏引擎或实时驱动管线中，并支持物理交互（如碰撞响应、环境适应）？这涉及运动表示与物理引擎的接口设计问题。
 
 6. **公平性与偏差评估**：论文未系统评估不同人口群体或运动类型的公平性。HumanML3D和2D视频来源可能存在人口统计偏差，可能影响某些人群或动作的生成质量。此方向的方法论和评估基准均属空白。
-
-
 
 ## 原文 PDF
 

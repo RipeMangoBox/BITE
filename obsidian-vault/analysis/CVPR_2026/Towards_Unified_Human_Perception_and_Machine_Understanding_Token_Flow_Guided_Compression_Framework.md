@@ -66,8 +66,6 @@ claims:
 
 在机器理解基准测试中，TFGC在0.063 bpp超低比特率下取得MSCOCO ROUGE-L **49.94**、VQAv2 Accuracy **66.41**、RefCOCO Acc@0.5 **61.49**的SOTA性能（Table 1），同时支持单一模型内的可变比特率控制。在人类感知基准上，TFGC在同等比特率下保持了竞争力的重建质量（Kodak PSNR 22.09，LPIPS 0.12）。消融实验（Table 4–6）系统验证了TFP模块、TSG模块和PSA训练范式各自的有效性。
 
-
-
 ### 视觉信号压缩的双重使命：从人类感知到机器理解
 
 图像压缩技术长期服务于单一目标——在尽可能低的比特率下为人类观察者重建视觉上令人满意的图像。传统编码标准（如 **BPG**、**VVC**）和学习型压缩方法（如 **ELIC**，He et al., CVPR 2022）均以像素级保真度指标（PSNR、MS-SSIM）为优化导向，其核心假设是：对人类视觉系统而言，像素精确的重建等价于信息无损的传达。
@@ -97,8 +95,6 @@ claims:
 - **绕过模态鸿沟**：将压缩令牌直接投影并对齐到LVLM语义空间，使压缩码流可被LLM直接消费，无需图像重建中介。
 - **利用令牌流实现灵活压缩**：基于令牌流传播机制，通过掩码比例控制比特率，通过条件高斯建模恢复缺失令牌，实现单一模型内的可变比特率。
 - **解耦优化避免性能折中**：将人类感知重建与机器语义对齐分离为两个训练阶段，避免两个目标在联合优化中的相互干扰。
-
-
 
 ## 核心方法与创新机理
 
@@ -138,8 +134,6 @@ TSG的训练采用**渐进式语义对齐（PSA）**两阶段策略：Stage I使
 
 训练策略上，TFGC将人类感知优化（$L_{TFP} = \alpha L_2 + \beta L_{perceptual} + \gamma L_{adv}$，其中 $\alpha=1.0, \beta=1.1, \gamma=0.1$）与机器理解优化（PSA两阶段）解耦为独立训练阶段，避免了两个目标的性能折中。
 
-
-
 TFGC框架的核心设计理念是将图像压缩从传统的“像素重建”范式转向“令牌流建模”范式，在单一模型内统一人类感知与机器理解两个目标。如图2所示，整体pipeline由四个关键模块串联构成：**1D Tokenizer-Detokenizer**、**Variable Token Masker**、**Token Flow Propagation (TFP)模块**和**Token Semantic Guidance (TSG)模块**，最终接入**Large Language Model (LLM)** 完成下游语义任务。
 
 ### 编码端：从图像到压缩比特流
@@ -164,12 +158,8 @@ TFGC将人类感知优化与机器理解优化解耦为两个阶段，避免两�
 
 这一解耦设计使得框架在极低比特率（如0.02–0.063 bpp）下既能保持竞争力的人类感知重建质量，又能取得SOTA的机器理解性能。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l943_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_Towards_Unified_Hum/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed TFGC framework. The image is first tokenized into a 1D sequence. A variable token masker removes a controllable portion of tokens according to the target bitrate, and the remaining tokens are entropy-coded into a bitstream via an arithmetic encoder. At the decoder, the bitstream is recovered by the arithmetic decoder and passed to the TFP module, which predicts the missing tokens and reconstructs the complete token sequence*
-
-
 
 ### 1D令牌化与可变比特率控制
 
@@ -225,18 +215,8 @@ $$L_{TFP} = \alpha L_{2} + \beta L_{perceptual} + \gamma L_{adv}$$
 
 其中 $\alpha=1.0$ 为L2损失权重，$\beta=1.1$ 为感知损失（LPIPS）权重，$\gamma=0.1$ 为对抗损失权重。两阶段训练策略（先 $L_{TFP}$ 优化重建，再PSA渐进对齐）将人类感知优化与机器理解优化解耦，避免两个目标的性能折中。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l943_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_Towards_Unified_Hum/figures/004_Figure_4.jpg]]
-*Figure 4: Structure of Token Flow Propagation (TFP). The TFP module models masked tokens*
-
-![[assets/figures/papers/paper_list_l943_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_Towards_Unified_Hum/figures/005_Figure_5.jpg]]
-*Figure 5: Progressive Semantic Alignment (PSA) training paradigm. Stage I (Semantic Grounding): TSG output tokens are aligned with the frozen vision encoder’s features via MSE loss. Stage II (Instruction Alignment): semantically grounded tokens are concatenated with text tokens and optimized via combined MSE and cross-entropy objectives for next-token prediction*
-
 ![[assets/figures/papers/paper_list_l943_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_Towards_Unified_Hum/figures/003_Figure_3.jpg]]
 *Figure 3: Token information perturbation analysis. The first row shows the Ground-Truth (GT) image and its reconstruction from complete tokens. The second row illustrates the cases where obstruction tokens are introduced at the end. The third and fourth rows depict cases where uninformative tokens are injected at the end and at random positions, respectively. The columns from left to right correspond to introduction ratios of 3%, 11%, and 20%. Quantitative results (PSNR↑/LPIPS↓) are annotated in each image*
-
-
 
 ## 实验与关键发现
 
@@ -285,30 +265,14 @@ Table 3报告了各方法的计算复杂度对比。TFGC在256×256分辨率下�
 
 4. **跨架构泛化未验证**：TSG模块的语义对齐能力仅在特定LVLM架构上验证，其对不同规模LLM或其他视觉编码器的泛化性能尚不明确，需要进一步实验确认。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l943_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_Towards_Unified_Hum/figures/006_Table_1.jpg]]
 *Table 1: Results on machine-oriented benchmarks. “Var.” denotes whether a single model supports variable bitrate control, and “Ave. Bpp” represents the average bits per pixel across all datasets. Each group corresponds to a specific bitrate range, with bitrate variation constrained within ±0.005 bpp. Bold and underlined denote the best and second-best results, respectively*
 
 ![[assets/figures/papers/paper_list_l943_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_Towards_Unified_Hum/figures/012_Table_4.jpg]]
 *Table 4: Ablation study on the TFP module. Both variants share identical training configurations and the same number of iterations. Results are averaged across three bitrate levels*
 
-![[assets/figures/papers/paper_list_l943_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_Towards_Unified_Hum/figures/009_Table_5.jpg]]
-*Table 5: Ablation study on the TSG module. The average results of MSCOCO (ROUGE-L↑), RefCOCO (Acc@0.5↑), VQAv2 (Acc↑) across three bitrate levels are reported*
-
-![[assets/figures/papers/paper_list_l943_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_Towards_Unified_Hum/figures/011_Table_6.jpg]]
-*Table 6: Ablation study on the PSA training paradigm. The average results of MSCOCO (ROUGE-L↑), RefCOCO (Acc@0.5↑), VQAv2 (Acc↑) across three bitrate levels are reported*
-
-![[assets/figures/papers/paper_list_l943_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_Towards_Unified_Hum/figures/010_Table_3.jpg]]
-*Table 3: Complexity comparison. Encoding (Enc.) and decoding (Dec.) time are measured in milliseconds (ms) at 256×256 resolution. The parameters (Param.) and parameters per bitrate level (P-Param.) of each model are reported*
-
-![[assets/figures/papers/paper_list_l943_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_Towards_Unified_Hum/figures/001_Figure_1.jpg]]
-*Figure 1: Comparison of TFGC with existing state-of-the-art methods on machine-oriented benchmarks at 0.06 bpp. Each axis corresponds to a dataset and its respective evaluation metric, where higher values indicate better performance*
-
 ![[assets/figures/papers/paper_list_l943_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_Towards_Unified_Hum/figures/008_Figure_6.jpg]]
 *Figure 6: Visualization examples of vision grounding at 0.06 bpp. Red and blue boxes denote the ground-truth and predicted bounding boxes, and the IoU [14] values are reported*
-
-
 
 ## 定位与知识库关联
 
@@ -397,8 +361,6 @@ PSA 训练范式将人类感知优化与机器理解优化解耦为两个阶段�
 7. **令牌语义属性的细粒度理解**：1D 令牌序列中不同位置的令牌编码了哪些具体的语义属性（全局特征、局部细节、颜色、姿态等）？更细粒度的令牌角色理解是否能指导更高效的压缩策略？
 
 8. **统一优化目标**：如何进一步将人类感知优化和机器理解优化统一到单一训练阶段，避免多阶段训练的复杂性？是否存在联合优化两个目标的更优雅方案？
-
-
 
 ## 原文 PDF
 

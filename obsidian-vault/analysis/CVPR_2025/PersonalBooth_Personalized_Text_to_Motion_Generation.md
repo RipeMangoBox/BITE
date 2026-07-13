@@ -53,8 +53,6 @@ claims:
 
 **方法定位**：PersonaBooth 属于基于扩散模型的个性化运动生成方法，与零样本运动风格迁移方法 **MoMo** 和微调版本 **MCM-LDM** 形成对比。其关键创新在于首次将文本路径纳入个性化适配，并通过对比学习实现个性与内容的显式解耦。
 
-
-
 ### 任务定义：运动个性化生成
 
 文本到运动生成（Text-to-Motion, T2M）旨在根据自然语言描述合成逼真的三维人体运动序列。传统T2M方法关注运动内容的准确表达——即“做什么”，却忽略了一个同等重要的维度：运动个性（Persona）——即“如何做”。同一动作内容（如“走路”）在不同个体身上呈现出截然不同的风格特征：步幅、节奏、姿态倾向、关节协调模式等。**运动个性化生成（Motion Personalization）** 正是为了解决这一问题而提出的新任务：给定少量体现特定个体运动个性的原子运动片段（Atomic Motions），模型需要生成既忠实于文本描述、又体现该个体独特运动风格的新运动序列。
@@ -84,8 +82,6 @@ claims:
 3. **上下文感知融合处理多输入。** 当提供多个体现同一性个性的原子运动时，简单的特征平均会导致风格混杂。Context-Aware Fusion（CAF）根据每个输入运动与目标文本提示的语义相似度进行软加权，优先利用与目标内容最相关的参考运动，避免不相关输入干扰个性表达。
 
 基于上述洞察，本文提出**PersonaBooth**框架，并构建了专门用于运动个性化评估的大规模数据集**PerMo**（5位演员、34种风格、10类动作内容、6,610个运动片段，配备网格和文本标注），为这一新任务建立了系统的评估基准。
-
-
 
 ## 核心方法与创新机理
 
@@ -126,8 +122,6 @@ CAF 仅保留 Top-k 个最相关的输入运动进行加权融合，忽略无关
 ### 创新总结
 
 PersonaBooth 的四项核心改变形成了一条完整的因果链：**Persona Token + 文本自适应**使个性信息首次进入文本条件分支；**Persona Cohesion Loss** 通过对比学习解耦个性与内容，确保特征一致性；**Self-Attention 自适应层**优化了视觉个性的注入方式；**CAF** 解决了多输入推理时的融合难题。这些创新共同使 PersonaBooth 在 PerMo 和 100Style 两个基准上均显著优于现有方法，同时仅需 50 步扩散采样（MoMo 需 100 步，MCM-LDM 需 1000 步），在推理效率上也具备明显优势。
-
-
 
 PersonaBooth 的整体 pipeline 围绕一个核心洞察构建：将“个性”（persona）建模为可插拔的文本标记与视觉特征，通过双路径自适应注入预训练的文本-运动扩散模型，实现个性化运动生成。其工作流可概括为三个阶段：**个性提取、双路径自适应注入、上下文感知融合推理**。
 
@@ -203,8 +197,6 @@ $$w_i = \begin{cases} \frac{\exp(S_i)}{\sum_n \exp(S_n)} & i \in I_{\text{Top-k}
 
 PersonaBooth 通过这一“提取-注入-融合”三段式 pipeline，在仅微调少量新增参数的前提下，实现了对预训练文本-运动扩散模型的个性化适配，既保留了预训练先验，又注入了新个性特征。
 
-
-
 PersonaBooth 的核心架构由五个关键模块构成，围绕视觉与文本双路径自适应展开，并通过对比学习实现个性与内容的解耦。
 
 ### 3.1 Persona Extractor 与 Persona Cohesion Loss
@@ -264,13 +256,6 @@ $$\hat{\mathcal{D}}(M^t, t, V^*, T^*) = b \mathcal{D}_T + (1-b) \mathcal{D}_V \t
 $$w_i = \begin{cases} \frac{\exp(S_i)}{\sum_n \exp(S_n)} & i \in I_{\text{Top-k}} \\ 0 & \text{otherwise} \end{cases} \tag{9-10}$$
 
 最终融合特征为加权和，忽略不相关的输入运动，使生成结果既保留个性又忠实于文本描述。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1862_PersonalBooth_Personalized_Text_to_Motion_Generation/figures/004_Figure_3.jpg]]
-*Figure 3: Textual and visual adaptation. (a) Personalized Text Encoder, X . (b) t-th step of the Motion Diffusion, D. Learnable parameters are denoted by the fire icon*
-
-
 
 ## 实验与关键发现
 
@@ -339,25 +324,6 @@ CAF 的工作机制（Eq.9-11）是：计算每个输入运动与文本提示的
 ![[assets/figures/papers/paper_list_l1862_PersonalBooth_Personalized_Text_to_Motion_Generation/figures/010_Table_4.jpg]]
 *Table 4: Ablation study regarding adaptation. PersonaBooth (SI) indicates our complete model for single inputs*
 
-![[assets/figures/papers/paper_list_l1862_PersonalBooth_Personalized_Text_to_Motion_Generation/figures/009_Figure_6.jpg]]
-*Figure 6: Example reflecting the different personas of Actors 1-5 for the same ‘Childish’ category. The input prompt is “A person is running and bending to pick something.” Red arrows highlight the frames that clearly show distinct movements. The input motion of each actor can be referenced in Fig. 4 (b)*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1862_PersonalBooth_Personalized_Text_to_Motion_Generation/figures/002_Table_1.jpg]]
-*Table 1: Comparison of motion generation tasks*
-
-![[assets/figures/papers/paper_list_l1862_PersonalBooth_Personalized_Text_to_Motion_Generation/figures/006_Table_2.jpg]]
-*Table 2: Comparison with existing motion style datasets. The note for ‘*’ is provided in the main text. ‘-’ indicates no information*
-
-![[assets/figures/papers/paper_list_l1862_PersonalBooth_Personalized_Text_to_Motion_Generation/figures/005_Figure_4.jpg]]
-*Figure 4: (a) Motion capture studio and examples of data formats: skeleton, markers, and mesh. (b) Unique persona expressions of each actor in the ‘Childish’ category. (c) Rendered mesh for each actor in the ‘Fearful’ category*
-
-![[assets/figures/papers/paper_list_l1862_PersonalBooth_Personalized_Text_to_Motion_Generation/figures/022_Figure.jpg]]
-*Figure: (b) Jump Figure G. Examples of text descriptions in PerMo dataset (a) Scaling Factor (St, sv) (b)Textual Guidance Scale (gt) (c) Visual Guidance Scale (gv) (d) Balancing Factor (b) Figure H. Ablation study for hyperparameters st, sv, gt, gv, and b. Higher positions on the graph indicate better performance across all three metrics, FID, R-precision (Top 3), and PRA*
-
-
-
 ## 定位与知识库关联
 
 ### 任务定位：从风格迁移到运动个性化
@@ -392,8 +358,6 @@ PersonaBooth 的当前设计存在以下边界条件：
 3. **跨数据集泛化**：Persona Token 的多模态适应机制在更大规模预训练数据集（如结合 HumanML3D 与更多风格数据）上的泛化能力如何？当前 PerMo 的 34 种风格类别（Table A）覆盖了情绪与动作风格，但真实世界中的人体运动个性维度远不止于此，模型能否在更细粒度或跨文化的个性表达上保持有效性，尚需验证。
 
 4. **个性可组合性**：PersonaBooth 将个性建模为单一 Token，但真实个体的运动风格可能包含多个可分离维度（如“优雅”与“急促”的组合）。未来是否可解耦为多个子 Token 并支持个性插值或组合，是一个值得探索的方向。
-
-
 
 ## 原文 PDF
 

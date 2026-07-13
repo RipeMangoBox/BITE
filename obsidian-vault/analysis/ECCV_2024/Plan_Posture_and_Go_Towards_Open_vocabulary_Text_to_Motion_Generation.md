@@ -52,8 +52,6 @@ claims:
 
 实验结果表明，在开放世界数据集ood368和kungfu上，PRO-Motion在R精度（R@10: 20.25 vs. MDM的17.81）和FID（1.49 vs. MDM的3.50）等核心指标上显著优于监督学习和现有开放词汇方法。在AMASS数据集上，Go-Diffuser对全局平移和旋转的预测精度（平均位置误差0.418，平均方差误差0.118）也达到了最优水平。消融实验进一步验证了LLM生成的局部身体部位描述对姿态精确性的关键作用，以及Transformer架构在全局运动推断中的必要性。
 
-
-
 ### 文本到动作生成的核心瓶颈
 
 3D人体动作生成旨在根据自然语言描述合成逼真的人体运动序列。现有主流方法大多采用监督学习范式，直接在配对的文本-动作数据上训练生成模型（如 **MDM**，Tevet et al., arXiv 2022），试图建立从文本到动作空间的直接映射。这一范式面临根本性瓶颈：配对训练数据的规模和语义覆盖范围严重受限。现实世界中的人类动作语义极其丰富，从具体的物理动作（如“单脚跳跃”）到抽象的情感表达（如“体验深沉的喜悦”），而现有文本-动作数据集（如HumanML3D、KIT-ML）的动作类别和语言描述多样性远不足以覆盖开放世界场景。
@@ -78,8 +76,6 @@ claims:
 - **行进（Go）**：从关键姿势序列推断全身平移和旋转，并通过插值生成流畅完整的动作序列。
 
 这一“Plan-Posture-Go”三阶段框架将复杂的开放世界动作生成任务转化为LLM规划、姿态扩散生成和运动扩散重建的级联，从根本上规避了对大规模配对文本-动作数据的依赖，同时通过显式的时序建模（关键姿势序列规划与全局运动推断）弥补了CLIP方法的时序缺失。
-
-
 
 ## 核心方法与创新机理
 
@@ -107,8 +103,6 @@ PRO-Motion由三个功能明确的模块构成，每个模块解决一个子问�
 ### 3. 精确姿态控制能力
 
 PRO-Motion的另一个关键创新在于其对生成姿态的细粒度可解释控制。由于Posture-Diffuser直接以结构化的身体部位描述为条件，用户可以通过编辑姿势描述来精确控制特定身体部位的动作。实验表明，修改手部位置描述或删除特定身体部位的描述，会导致生成姿态中对应部位发生预期的变化，验证了模型对文本输入的可解释性和可控性。这一特性在传统端到端文本-动作生成模型中难以实现。
-
-
 
 PRO-Motion 采用“计划—姿态—行进”三阶段分而治之框架，将开放世界文本到动作生成拆解为三个可控子模块：**Motion Planner**、**Posture-Diffuser** 和 **Go-Diffuser**（Figure 3）。这一设计的核心洞察在于：现有方法受限于配对训练数据的规模和覆盖范围，而基于 CLIP 的方法又缺乏时序先验，难以生成具有合理时间顺序和全局运动的人体动作序列。PRO-Motion 通过引入大型语言模型作为运动规划器，在自然语言与结构化姿态描述之间架起桥梁，使下游的扩散模型能够专注于各自擅长的子任务。
 
@@ -157,8 +151,6 @@ $$\underset{G}{\arg\max} P(G) = \prod_{i=1}^F P(g_i | g_{i-1}) = E_{g_1}^1 \prod
 ### 框架的局限与待验证问题
 
 多阶段流水线存在误差累积的风险——Motion Planner 的描述偏差会传播至 Posture-Diffuser，进而影响 Go-Diffuser 的生成质量。此外，系统依赖 GPT-3.5 进行运动规划，推理成本较高，且受限于 LLM 的知识范围。Motion Planner 如何处理模糊或矛盾的自然语言提示，以及在更大规模、更多样化的开放世界基准上的泛化性能，仍需进一步验证。
-
-
 
 PRO-Motion 采用“计划—姿态—行进”三阶段分而治之框架，将开放世界文本到动作生成分解为三个可独立优化的子模块：**Motion Planner**、**Posture-Diffuser** 和 **Go-Diffuser**。框架整体流程如 Figure 3 所示。
 
@@ -230,16 +222,6 @@ $$
 \delta[j] = \frac{1}{F-1} \sum_{f \in F} \left( H_f[j] - \tilde{H}_f[j] \right)^2 \in \mathbb{R}^3 \tag{9}
 $$
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1878_Plan_Posture_and_Go_Towards_Open_vocabulary_Text_to_Motion_Generation/figures/004_Figure_4.jpg]]
-*Figure 4: Illustration of our Dual-Diffusion model. (a) Posture-Diffuser module is designed to predict the original pose conditioned by the pose description. The model consists of N identical layers, with each layer featuring a residual block for incorporating time step information and a cross-modal transformer block for integrating the condition text. (b) Go-Diffuser module serves the function of obtaining motion with translation and rotation from discrete key poses without global information. In this module, the key poses obtained from Sec. 3.3 are regarded as independent tokens. We perform attention operations [87] between these tokens and noised motion independently, which can significantly impro...*
-
-![[assets/figures/papers/paper_list_l1878_Plan_Posture_and_Go_Towards_Open_vocabulary_Text_to_Motion_Generation/figures/011_Figure_9.jpg]]
-*Figure 9: The complete prompt for our Motion Planner in Sec. 3.2*
-
-
-
 ## 实验与关键发现
 
 ### 主要结果：开放世界文本到动作生成
@@ -268,9 +250,6 @@ PRO-Motion 在两个开放世界基准上展现出显著优于监督学习和现
 
 2. **误差累积效应**：Posture-Diffuser 生成的姿态存在微小偏差，这些偏差在 Posture Planning 的 Viterbi 选择过程中可能被放大，进而影响 Go-Diffuser 的插值和平移预测。Figure 5 的定性比较中，部分复杂描述（如“bury one's head and cry, and finally crouched down”）的生成结果在时序过渡处仍存在不自然的抖动，提示误差累积问题。
 
-![[assets/figures/papers/paper_list_l1878_Plan_Posture_and_Go_Towards_Open_vocabulary_Text_to_Motion_Generation/figures/006_Figure_5.jpg]]
-*Figure 5: Comparation of our methods with previous text-to-motion generation methods*
-
 3. **极端动作的泛化边界**：Go-Diffuser 的训练数据规模较小，对于训练分布外的极端动作（如空翻、地面翻滚），预测的平移和旋转可能出现物理不合理的情况。Table 2 中 Mean Global 的 AVE 改善幅度（-0.0077）远小于 APE 改善幅度（-0.051），暗示模型在运动方差（即自然度）方面的提升相对有限。
 
 ![[assets/figures/papers/paper_list_l1878_Plan_Posture_and_Go_Towards_Open_vocabulary_Text_to_Motion_Generation/figures/007_Table_2.jpg]]
@@ -297,16 +276,6 @@ PRO-Motion 在两个开放世界基准上展现出显著优于监督学习和现
 
 ![[assets/figures/papers/paper_list_l1878_Plan_Posture_and_Go_Towards_Open_vocabulary_Text_to_Motion_Generation/figures/009_Figure_7.jpg]]
 *Figure 7: Comparison of different methods. Yellow color represents details that need attention, and red color represents inaccuracies*
-
-![[assets/figures/papers/paper_list_l1878_Plan_Posture_and_Go_Towards_Open_vocabulary_Text_to_Motion_Generation/figures/010_Figure_8.jpg]]
-*Figure 8: Examples of Precise Pose Control. In the first example #1, we control the position of hands, with the original and modified hand descriptions represented in brown and red respectively. In the second example #2, “The” represents deleting the description. To determine whether the description of a body part is the reason for the proper positioning of that body part, we removed the corresponding descriptions to see if the body joints would change as a result of this operation. We test the model’s understanding of the left and right sides of the body*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1878_Plan_Posture_and_Go_Towards_Open_vocabulary_Text_to_Motion_Generation/figures/001_Figure_1.jpg]]
-*Figure 1: Exemplary motions generated by our proposed PRO-Motion system. Different from conventional models trained on paired text-motion data, our PRO-Motion can generate 3D human motion with global body translation and rotation from open-world text prompts, such as “Jump on one foot” and “Experiencing a profound sense of joy”*
-
-
 
 ## 定位与知识库关联
 
@@ -358,8 +327,6 @@ PRO-Motion 的核心创新在于**引入大型语言模型作为“运动规划�
 4. **实时性**：如何进一步缩减LLM推理和多阶段扩散采样的开销，实现实时交互？当前流水线的端到端延迟在论文中未报告。
 
 5. **评估体系**：在开放词汇设定下，如何设计更合理的评估指标？现有的R精度依赖测试集内负样本，可能无法反映真实开放场景中的语义对齐质量。
-
-
 
 ## 原文 PDF
 

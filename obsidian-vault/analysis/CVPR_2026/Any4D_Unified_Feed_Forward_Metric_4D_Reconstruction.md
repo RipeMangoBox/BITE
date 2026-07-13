@@ -53,8 +53,6 @@ Any4D 在多个基准上取得了领先性能。在稀疏3D点跟踪任务上，
 
 在方法谱系上，Any4D 属于**前馈多视图Transformer**家族，与 **VGGT** 等前馈几何方法共享类似的多视图注意力骨干，但其关键创新在于将几何与运动统一到因式化度量空间中，并支持多模态传感器输入。相较于需要后处理优化或多次前馈的基线（如 **MonST3R+CoTracker3** 的组合方案），Any4D 实现了真正的单次前馈推理，在效率与精度之间取得了显著突破。
 
-
-
 从多帧视频中同时恢复稠密的3D几何与运动——即度量4D重建——是计算机视觉的核心目标之一，其应用涵盖自动驾驶、机器人导航、AR/VR以及动态场景理解。尽管近年来单目深度估计、多视图立体和运动结构恢复（SfM）各自取得了长足进步，但将这些能力统一到一个前馈框架中，并在度量尺度下输出稠密、时域一致的4D表示，仍然是一个开放难题。
 
 ### 现有方法的缺口
@@ -77,8 +75,6 @@ Any4D 在多个基准上取得了领先性能。在稀疏3D点跟踪任务上，
 - **高效推理**：相比需要迭代优化或多次前馈的基线方法，Any4D 在保持甚至超越其精度的同时，实现数量级的速度提升（见 Table 1，约15–23倍快于 SpatialTrackerV2）。
 
 核心洞察在于，通过因式化的4D场景表示——将自我中心因素（深度、光线方向）与分配中心因素（场景流、相机姿态）分离——模型可以在部分标注的混合数据上训练，并实现鲁棒的多帧泛化。其中，**分配中心场景流**被证明是最优的4D运动参数化方式，相比3D点后运动或反向投影2D流等表示，能产生更干净的物体边界和背景运动估计（见 Table 5 和 Figure 5）。
-
-
 
 ## 核心方法与创新机理
 
@@ -110,8 +106,6 @@ Any4D 将输入空间从单一的 RGB 图像扩展至**RGB + 深度图 + 相机�
 
 **需要手动验证的点**：部分 baseline 方法（如 SpatialTrackerV2、St4RTrack、MonST3R+CoTracker3 等）的具体作者/年份/出处未在提供的分析材料中明确标注，如需在正式论文中引用，建议查阅原文确认完整元数据。
 
-
-
 Any4D 是一个统一的前馈 Transformer 模型，其核心设计目标是用**单次前馈推理**从任意 N 帧输入中直接输出**度量尺度稠密 4D 重建**。整体 pipeline 采用因式化表示策略，将复杂的 4D 场景解耦为全局尺度因子、自我中心（egocentric）因素和分配中心（allocentric）因素三个层次，使模型能在部分标注的混合数据上联合训练。
 
 ### 输入与输出流
@@ -129,9 +123,6 @@ $$( \tilde { s } , \{ \tilde { R } _ { i } , \tilde { D } _ { i } , \tilde { T }
 ### 模块关系
 
 Any4D 的 pipeline 由五类功能模块串联构成（见 Figure 3）：
-
-![[assets/figures/papers/paper_list_l2441_https_arxiv_org_abs_2512_10935/figures/003_Figure_3.jpg]]
-*Figure 3: Any4D predicts a factorized dense metric 4D reconstruction represented as a global metric scale, per-view egocentric factors (depth maps and ray directions) and per-view allocentric factors (forward scene flow and camera poses) as explained in Sec. 3. Any4D is a N-view transformer, consisting of modality-specific encoders, followed by an alternating-attention transformer to produce contextual patch embeddings. The output tokens from the transformer are then decoded using individual decoders specific to each factor*
 
 1. **多模态输入编码器**：将 RGB 图像、深度、多普勒、相机内参和姿态等异构输入映射到统一的 token 特征空间，实现灵活的传感器融合。
 
@@ -151,15 +142,8 @@ Any4D 的 pipeline 由五类功能模块串联构成（见 Figure 3）：
 
 整体框架的突出优势在于：单次前馈即可完成从任意帧数到度量 4D 重建的端到端映射，无需后处理优化或多步推理，在推理速度上比 SpatialTrackerV2 快 15 倍以上（Table 1）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2441_https_arxiv_org_abs_2512_10935/figures/001_Figure_1.jpg]]
 *Figure 1: Any4D is a flexible feed-forward model capable of producing dense metric 4D reconstructions using N frames as input. Any4D is up to 15× faster and 3× better than prior state-of-the-art, where performance can be further boosted by using diverse sensors as input. Note that Any4D produces dense 3D tracking vectors, but here we visualize the sparse 3D motion tracks for simplicity*
-
-![[assets/figures/papers/paper_list_l2441_https_arxiv_org_abs_2512_10935/figures/002_Figure_2.jpg]]
-*Figure 2: Any4D’s unified capabilities overcome major limitations of existing 4D reconstruction models*
-
-
 
 Any4D 的核心设计是将稠密度量 4D 重建分解为一组可联合预测的因子，并通过一个多视点 Transformer 在单次前馈中统一输出。其整体映射关系为：
 
@@ -212,12 +196,7 @@ $$\tilde { \mathbf { G } } ^ { \prime } { } _ { i } = \tilde { \mathbf { G } } _
 
 2. **分配中心场景流的最优性**：相比预测运动后 3D 点位置或反向投影 2D 流，直接预测前向场景流在物体边界和背景区域产生显著更少的噪声（Figure 5），这是 Any4D 在多个基准上取得领先性能的关键因果机制。
 
-![[assets/figures/papers/paper_list_l2441_https_arxiv_org_abs_2512_10935/figures/007_Figure_5.jpg]]
-*Figure 5: Scene motion parametrized as allocentric scene flow provides the cleanest 4D reconstructions. We find that other parameterizations such as 3D points after motion (proposed in St4RTrack [16]) provide extreme noise on object boundaries and background*
-
 3. **4 视点训练对多帧泛化的必要性**：补充实验（Figure S.1）表明，仅使用 2 视点训练的模型在输入帧数增加时 EPE 显著升高，而 4 视点训练的模型在高达 64 帧输入时仍保持稳定性能。
-
-
 
 ## 实验与关键发现
 
@@ -267,21 +246,8 @@ Any4D 在以下场景中重建质量会显著下降（Figure S.4）：
 ![[assets/figures/papers/paper_list_l2441_https_arxiv_org_abs_2512_10935/figures/004_Figure_4.jpg]]
 *Figure 4: Any4D provides dense and precise motion estimation, where on the other hand, state-of-the-art baselines either produce reliable but sparse motion (SpatialTrackerV2 [87]) or dense per-pixel motion that is not accurate (St4RTrack [16]). For SpatialTrackerV2, we are only able to uniformly query a maximum of 2500 points with a H100 GPU using 80 gigabytes of GPU memory. Note that we don’t use any pre-computed segmentation mask but purely threshold our scene flow output to get a binary motion mask. St4RTrack cannot produce good binary motion masks due to incorrect scene flow predictions on object boundaries and the background*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2441_https_arxiv_org_abs_2512_10935/figures/006_Table_2.jpg]]
-*Table 2: Any4D achieves state-of-the-art dense scene flow estimation performance. We report end-point error (EPE), average points within delta (APD) and inlier ratio at 0.1m (τ ) for dynamic points and scene flow across three datasets, where best results are bold*
-
-![[assets/figures/papers/paper_list_l2441_https_arxiv_org_abs_2512_10935/figures/008_Table_3.jpg]]
-*Table 3: Any4D shows state-of-the-art video depth estimation over other single-step feed-forward baselines. It is also competitive to iterative/optimization-based methods or ones trained specifically for this task. We report the absolute relative error (rel) and the inlier ratio at 1.25%*
-
-![[assets/figures/papers/paper_list_l2441_https_arxiv_org_abs_2512_10935/figures/012_Table_S.1.jpg]]
-*Table S.1: List of Datasets used to train Any4D*
-
 ![[assets/figures/papers/paper_list_l2441_https_arxiv_org_abs_2512_10935/figures/015_Figure_S.4.jpg]]
 *Figure S.4: Qualitative visualizations of Any4D limitations. Videos with large camera motion inducing no visual overlap of background or scene motion dominating the image space are common failure modes for Any4D. We believe that the availability of large-scale dense scene flow and 3D tracking datasets and integrating real-time optimization is key to overcoming these limitations*
-
-
 
 ## 定位与知识库关联
 
@@ -328,8 +294,6 @@ Any4D 的工作为以下方向留下了探索空间：
 3. **传感器受限场景的增强**：在没有雷达或深度传感器的通用平台上，能否通过自监督信号（如光度一致性、时序平滑性）进一步增强 4D 重建质量？Table 4 显示多模态输入能持续提升性能，但纯 RGB 变体在边缘区域仍存在偏移（Figure S.3）。
 
 4. **数据瓶颈的突破路径**：模型性能的进一步提升是依赖于更大规模的混合 4D 数据集，还是可以通过更好的数据增强或生成式模拟来弥补？这关系到整个领域的发展方向。
-
-
 
 ## 原文 PDF
 

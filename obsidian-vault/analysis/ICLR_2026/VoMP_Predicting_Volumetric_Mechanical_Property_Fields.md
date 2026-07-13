@@ -78,8 +78,6 @@ VoMP 将体积材料预测重新定义为**在预训练材料潜在空间中的�
 
 当前方法仅适用于各向同性材料，输出限于杨氏模量、泊松比和密度三个参数，尚未覆盖屈服强度、剪切模量等更广泛的工程属性。训练数据依赖 VLM 标注，可能引入噪声。如何扩展到各向异性材料、结合物理观测进行自监督微调、以及将真实材料参数自动映射到快速仿真器（如 XPBD）的可调参数，是值得探索的方向。
 
-
-
 ### 问题背景：体积力学属性预测的缺失
 
 在计算机图形学、机器人仿真和具身智能领域，对 3D 物体进行真实感物理仿真需要准确的力学材料属性——即杨氏模量（Young’s modulus $E$）、泊松比（Poisson’s ratio $\nu$）和密度（density $\rho$）。然而，现有方法存在一个核心瓶颈：**无法高效预测物体内部体积中物理有效的力学属性**。大多数方法要么针对每个对象进行耗时的优化，要么只能给出粗糙的表面材料标签，导致仿真不准确或无法在不同仿真器之间迁移。
@@ -103,8 +101,6 @@ VoMP 将体积材料预测重新定义为**在预训练材料潜在空间中的�
 具体而言，VoMP 引入了一个基于真实世界材料数据库训练的变分自编码器（**MatVAE**），将杨氏模量、泊松比和密度三元组映射到一个 2D 潜在空间。该空间经过精心设计（包括流式后验、总相关性惩罚和逐维容量约束），确保所有解码后的材料值都落在物理有效的流形内。在此基础上，VoMP 训练一个前馈的 Geometry Transformer，仅需一次前向传播即可从多视角图像特征预测每个体素的材料潜在代码，再由冻结的 MatVAE 解码器将其映射为力学属性三元组。
 
 这种设计带来了三个关键优势：（1）**前馈预测**，单次推理仅需约 3.59 秒，比优化类方法快 5–400 倍；（2）**物理有效性保证**，所有预测值通过 MatVAE 潜在空间天然落在真实材料分布内；（3）**体积密集预测**，可对物体内部每个体素进行属性估计，且适用于网格、SDF、NeRF、高斯泼溅等多种 3D 表示。
-
-
 
 ## 核心方法与创新机理
 
@@ -151,8 +147,6 @@ $$
 | 体积预测能力 | 主要关注表面或稀疏采样点 | 对物体内部体素进行密集预测 | §4.1, Figure 3 |
 | 适用表示多样性 | 局限于特定表示（NeRF/高斯泼溅） | 适用于任意可体素化并渲染的表示 | §1, Figure 1 |
 
-
-
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2510_22975/figures/003_Figure_3.jpg]]
 *Figure 3: VoMP Overview. For any input geometry, we aggregate multi-view DINOv2 features across its volumetric voxelization (§4.1). A trained GeometryTransformer (§4.2) predicts per-voxel material latents, decoded by MatVAE (§3) into mechanical properties ( E , $\nu , \rho$ )
 
@@ -195,8 +189,6 @@ Geometry Transformer 输出的 2D 潜在代码被送入预训练好的 MatVAE �
 ### 训练数据标注的闭环
 
 为训练 Geometry Transformer，VoMP 构建了 GVM 数据集（§5.2），其标注流程（Figure 4）结合了 3D 部件标签与视觉语言模型（VLM）。VLM 接收物体渲染图、部件材质映射球、材质名称以及 MTD 中最接近的三类真实材料范围作为提示，输出每个部件的材料三元组。这一流程将真实材料数据库的物理约束注入到标注过程中，降低了纯 VLM 标注的物理不合理性。
-
-
 
 ### 3.1 MatVAE：材料属性潜在空间
 
@@ -250,8 +242,6 @@ $$
 - **移除 MatVAE**，直接预测 $\mathbb{R}^3$ 向量：杨氏模量 ALDE 从 0.3765 飙升至 1.1284，密度误差大幅增加，证实材料潜在空间对输出物理有效性的核心作用。
 - **使用 L1 损失替代 L2 损失**：所有力学属性的误差增加 2-3 倍，表明 L2 损失对跨越数量级的属性预测更为合适。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能：机械属性预测精度与效率
@@ -260,14 +250,12 @@ VoMP 在 GVM 测试集（公开子集）上对所有三项力学属性均实现�
 
 **杨氏模量预测**：VoMP 的绝对对数相对误差（ALRE）达到 **0.0409**，相比 NeRF2Physics 的 0.1346 和 PUGS 的 0.1688，误差降低了约 **70%–82%**（Table 2）。这一差距反映了体积预测与表面预测之间的根本性差异——NeRF2Physics 仅估计表面刚度，PUGS 通过 3D 高斯优化材料参数，两者均无法准确捕捉物体内部材料分布。Phys4DGen* 的 ALRE 高达 0.2227，进一步表明单纯依赖 VLM 标注粗糙材料标签的方法在定量精度上存在明显局限。
 
-
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2510_22975/figures/007_Table_2.jpg]]
 *Table 2: Mechanical Property Estimates of our method on the publicly released dataset are very close to the full dataset. Per-voxel error rate is first computed per object, then averaged across all objects in the test set to avoid weighing some objects more. Global voxel-level normalization yields similar results, see Supplement Tb. 3*
 
 **泊松比与密度预测**：在泊松比上，VoMP 的平均相对误差（ARE）为 **0.0818**，较 Phys4DGen* 的 0.1467 降低约 **44%**。密度预测的差距更为悬殊——VoMP 的 ARE 为 **0.0921**，而 Phys4DGen* 和 NeRF2Physics 分别达到 1.4394 和 1.0365，误差降低约 **91%–94%**（Table 2）。密度预测的极端差距说明，未经物理约束的方法在面对跨越数个数量级的密度值时极易产生灾难性偏差，而 MatVAE 的潜在空间通过将预测限制在真实材料分布内，从根本上规避了这一问题。
 
 **推理效率**：VoMP 完成一次预测的平均总耗时仅为 **3.59 秒**，而 NeRF2Physics 需要 1454.55 秒（约 24 分钟），PUGS 需要 1058.33 秒（约 18 分钟），Phys4DGen* 需要 51.65 秒（Table 1）。VoMP 的速度优势达到 **5–400 倍**，其根本原因在于它是所有对比方法中唯一的前馈模型——无需针对每个对象进行迭代优化，一次前向传播即可完成预测。Table 1 的耗时分解显示，体素化仅需 31 ms，多视角特征提取约 1.5 秒，Geometry Transformer 推理约 2 秒，整个流水线高度高效。
-
 
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2510_22975/figures/006_Table_1.jpg]]
 *Table 1: Wall-clock comparisons and breakdown*
@@ -296,35 +284,16 @@ VoMP 的训练数据依赖 VLM 辅助标注，Table 9 报告了 VLM 标注的误
 
 尽管 VoMP 在核心指标上表现优异，但存在若干结构性局限。首先，方法当前**仅适用于各向同性材料**，无法处理木材、纤维增强复合材料等各向异性材质。其次，预测属性**仅限于杨氏模量、泊松比和密度**三项，未涵盖屈服强度、剪切模量、热膨胀系数等更广泛的工程参数。第三，训练数据标注仍依赖 VLM，标注噪声可能在某些材料类别上引入系统性偏差。第四，模型基于部分分割的网格训练，对**非分割形状或缺乏纹理的几何体**的泛化能力未经充分验证。最后，VoMP 输出的材料参数针对精确仿真器（如 FEM）设计，若直接用于快速但不精确的仿真器（如 XPBD），可能需要额外的参数映射或校准步骤——Figure 2 已展示了不同仿真器在相同材料参数下的行为差异，这一映射问题本身构成一个开放挑战。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2510_22975/figures/009_Table.jpg]]
 *Table: (a) Qualitative Comparison: We show that qualitiative VoMP tends to provide less noisy volumetric? values compared to the baselines. We show the color coded fields and slice planes through the fields. (b) Mechanical Property Estimates of our method significantly outperform the baselines on all metrics. Pervoxel error rate is first computed per object, then averaged across all objects in the test set to avoid weighing some objects more. Global voxel-level normalization yields similar results, see Supplement Tb. 4. (d) Material Validity: We report mean values and relative errors (in %) with the closest physically measured material range in MTD (§5.1)*
 
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2510_22975/figures/011_Figure.jpg]]
 *Figure: (c) Encoding real materials results in smoothly varying E, ν, ρ values throughout the 2D latent space*
 
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2510_22975/figures/014_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2510_22975/figures/024_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2510_22975/figures/048_Figure_18.jpg]]
 *Figure 18: Gripping Force by Robots. We demonstrate the relation between relative errors in materials and relative change in P.E. (top) and volume (bottom). We then show the confidence bounds in light shaded regions. inertial component $\begin{array} { r } { E _ { \mathrm { i n e r t i a } } = \int _ { \Omega } \frac { \rho } { 2 \Delta t ^ { 2 } } | \mathbf u ^ { n + 1 } - \mathbf u ^ { n } | ^ { 2 } d V } \end{array}$ that captures displacement changes between iterations in our quasi-static solver, a gravitational potential $\begin{array} { r } { E _ { \mathrm { g r a v i t y } } = - \int _ { \Omega } \rho \mathbf { u } \cdot \mathbf { g } d V } \end{array}$ accounting for body forces, and an external w...
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2510_22975/figures/049_Figure_19.jpg]]
-*Figure 19: Impact Force on Dropping Objects. We demonstrate the relation between relative errors in materials and relative change in P.E. (top) and volume (bottom). We show the confidence bounds in light shaded regions*
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2510_22975/figures/050_Figure_20.jpg]]
-*Figure 20: Tensile Testing Machine. We demonstrate the relation between relative errors in materials and relative change in P.E. (top) and volume (bottom). We show the confidence bounds in light shaded regions. E.1 ANNOTATION WITH VISION-LANGUAGE MODEL*
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2510_22975/figures/051_Figure_21.jpg]]
-*Figure 21: Tension. We demonstrate the relation between relative errors in materials and relative change in P.E. (top) and volume (bottom). We show the confidence bounds in light shaded regions*
 
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2510_22975/figures/060_Table_14.jpg]]
 *Table 14: Training Hyperparameters. We show the hyperparameters for the MatVAE and Geometry Transformer*
-
-
-
 
 ## 定位与知识库关联
 
@@ -382,8 +351,6 @@ VoMP的推理流水线由三个模块串联构成：
 - **消融实验支撑核心设计**：Table 8表明移除MatVAE会导致杨氏模量ALDE从0.3765升高到1.1284，密度误差大幅增加，证实材料潜在空间的关键作用。
 - **定性证据需结合原文判断**：Figure 6a的定性比较显示VoMP预测的体积材料场噪声更低，但具体视觉差异需读者自行评估。
 - **泛化性证据有限**：对非分割形状或缺乏纹理几何体的泛化能力尚未经过系统验证，该点需手动核实。
-
-
 
 ## 原文 PDF
 

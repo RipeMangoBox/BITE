@@ -57,8 +57,6 @@ claims:
 
 方法在 LLaVA1.5、QwenVL、VideoLLaVA 等多个模型及图像/视频问答基准上验证有效，代码已开源。需注意，单条推理时解压引入的延迟可达约 30%，在低并发场景下可能反而增加时延；此外，压缩秩和重压缩周期仍需手动设定。
 
-
-
 大规模视觉语言模型（Large Vision-Language Models, LVLMs）在图像理解、视频问答等多模态任务中展现了卓越能力，但其推理部署面临严峻的显存瓶颈。核心矛盾在于：模型在自回归解码过程中需存储所有历史令牌的键值对（KV cache），以支持缩放点积注意力计算。对于视觉语言模型而言，视觉编码器通常将每张图像转换为数百甚至上千个视觉令牌（如LLaVA系列每张图像产生576个视觉令牌），导致KV缓存的体积急剧膨胀。以LLaVA1.5-7B为例，其KV缓存中视觉令牌占比可超过90%，严重制约了批处理大小和可支持的上下文长度。
 
 现有缓解方案主要沿三条技术路线展开，但均存在结构性缺陷：
@@ -78,8 +76,6 @@ claims:
 3. **跨模态泛化**：低秩压缩假设在视觉令牌上成立，在文本令牌和超长上下文场景下是否仍然有效？
 
 论文提出的**AttentionPack**方法通过三项关键设计回应上述问题：（1）多注意力头联合SVD压缩，将视觉令牌的键值缓存压缩至低秩表示；（2）基于累计注意力分数的部分解压缩机制，仅对高重要性令牌使用全秩解压；（3）融合解压-注意力计算核，将解压操作与注意力分数计算合并为单一算子以降低延迟。实验表明，该方法可在LLaVA1.5-7B上将缓存缩小5.09倍，同时A-OKVQA准确率从76.64%提升至76.88%；在VideoLLaVA-7B上缓存缩小8.11倍，MSVD-QA准确率仅比最佳非压缩基线低0.39%。
-
-
 
 ## 核心方法与创新机理
 
@@ -130,8 +126,6 @@ AttentionPack 与现有 KV 缓存优化方法存在根本性区别：
 
 AttentionPack 的独特之处在于：通过**缩小每令牌的存储体积**而非淘汰令牌来降低内存占用，同时以注意力感知解压抵消精度损失。这一策略使缓存缩小 **5–8 倍**的同时，在 A-OKVQA 上准确率甚至略高于全缓存基线（76.88% vs 76.64%），体现了压缩的正则化效应。
 
-
-
 AttentionPack 的推理工作流围绕“压缩—选择性解压—注意力计算—周期性重压缩”这一闭环构建，其核心目标是在不损害模型输出质量的前提下，将视觉令牌的键值缓存体积缩小数倍。整个 pipeline 由以下模块串联而成，各模块的输入输出关系在 Figure 1 中以示意图形式呈现。
 
 ![[assets/figures/papers/paper_list_l738_https_arxiv_org_abs_2603_23914/figures/001_Figure_1.jpg]]
@@ -166,8 +160,6 @@ $$
 
 整体而言，AttentionPack 通过“多头联合低秩压缩 + 注意力感知选择性解压”的双重机制，在缓存体积缩小约 5–8 倍的同时，将模型性能保持在 Full KV Caching 基线水平附近。其因果链条可概括为：视觉令牌 KV 向量的内在低秩特性 → 多头合并后 SVD 高效压缩 → 注意力分数指导差异化解压 → 关键信息无损、冗余信息降秩 → 缓存体积锐减、批量推理吞吐提升。该框架的主要局限在于单条推理时解压延迟可达 30%，且压缩周期和秩的选择依赖经验设定，缺乏自适应策略。
 
-
-
 ### 视觉特征提取与投影
 
 LVLM 推理的第一步是将视觉输入转换为与文本嵌入对齐的表示。给定输入图像 $\mathbf{X_v}$，预训练视觉编码器 $g(\cdot)$ 提取特征：
@@ -187,9 +179,6 @@ $$\mathcal{C} = \{ \mathbf{K}, \mathbf{V} \in \mathbb{R}^{T \times HD} \}$$
 ### 多头联合低秩压缩（核心模块一）
 
 AttentionPack 的核心洞察是：视觉令牌的键值向量在跨注意力头合并后呈现显著的低秩特性（Figure 2 验证了合并头轴后解释方差比大幅提升）。基于此，方法对视觉令牌的键矩阵和值矩阵分别执行随机化 SVD 分解。
-
-![[assets/figures/papers/paper_list_l738_https_arxiv_org_abs_2603_23914/figures/002_Figure_2.jpg]]
-*Figure 2: Rank vs explained variance ratio without/with combining along head axis before compression for key and value vectors*
 
 **压缩过程**：先将所有注意力头的键向量沿头轴合并为 $T_v \times HD$ 矩阵，再分解为低秩形式：
 
@@ -233,12 +222,8 @@ $$\mathbf{O} \gets (\mathbf{A} \tilde{\mathbf{V}}) \mathbf{W}_o$$
 
 为进一步降低延迟，AttentionPack 实现了融合 CUDA 核，将解压缩矩阵乘法 $\overline{\mathbf{K}} \mathbf{D}_k$ 与注意力分数计算 $\mathbf{Q} \tilde{\mathbf{K}}^T$ 合并为单一算子。在批量推理中，该融合核可将解码延迟降低近一半，最高实现 2.4 倍加速。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l738_https_arxiv_org_abs_2603_23914/figures/003_Figure_3.jpg]]
 *Figure 3: Visualization of compression and partial decompression*
-
-
 
 ## 实验与关键发现
 
@@ -269,9 +254,6 @@ Table 3 报告了 LLaVA1.5-7B 上不同压缩秩的系统消融。当 $R_{kv}=R_
 
 注意力感知部分解压是 AttentionPack 控制解压延迟的关键设计。Figure 4 展示了不同解压策略对性能和 FLOPs 的影响。核心发现是：**仅对前 25% 重要视觉令牌以全秩解压值缓存**，即可达到与全解压几乎相同的精度，同时解压 FLOPs 降低约 30%。具体而言，当 $r_1=0.25$（即 25% 令牌全秩解压，75% 令牌以 $R/4$ 降秩解压）时，A-OKVQA 准确率与 $r_1=1.0$（全解压）相差不到 0.1%，但解压计算量显著减少。
 
-![[assets/figures/papers/paper_list_l738_https_arxiv_org_abs_2603_23914/figures/007_Figure_4.jpg]]
-*Figure 4: Impact of attention-aware decompression. Each line represents the results when AttentionPack is applied for key (k), value (v) caches or both (kv). Every line has four dots with the size of each representing the ratio of visual tokens*
-
 Figure 7 和 Figure 8 可视化了式 (1) 追踪的令牌重要性分数。在 MSVD-QA 视频问答中，与问题语义相关的视觉令牌（如包含人物、动作对象的区域）获得更高的重要性分数，在解压时被分配更高秩；背景或无关区域则以降秩解压。在 OCR-VQA 图像问答中，包含文字区域的令牌重要性分数明显高于纯背景区域，验证了注意力感知机制的语义合理性。
 
 ![[assets/figures/papers/paper_list_l738_https_arxiv_org_abs_2603_23914/figures/013_Figure_7.jpg]]
@@ -284,17 +266,11 @@ Figure 7 和 Figure 8 可视化了式 (1) 追踪的令牌重要性分数。在 M
 
 缓存压缩的核心收益在于提升批处理能力。Figure 5 展示了 LLaVA1.5-7B 处理 100 个查询的总解码延迟。由于每实例缓存缩小约 80%，批次大小可扩大约 **4 倍**，总解码延迟最多降低 **54%**（OCR-VQA 场景）。在 A-OKVQA 上延迟降低约 45%，MMMU 上降低约 35%。延迟降低幅度的差异与任务的平均生成长度相关：生成长度越长，解码步数越多，缓存压缩带来的累积收益越大。
 
-![[assets/figures/papers/paper_list_l738_https_arxiv_org_abs_2603_23914/figures/012_Figure_5.jpg]]
-*Figure 5: Total decode latency for 100 queries with LLaVA1.5-7B*
-
 Table 4 进一步展示了 AttentionPack 与 4‑bit 量化和令牌淘汰的联合效果。叠加 KVQuant 的 4‑bit 量化后，缓存可再缩小约 5 倍，批推理吞吐量提升约 **2 倍**。然而，引入令牌淘汰在 OCR-VQA 上会带来约 0.5% 的额外性能下降，说明低秩压缩与令牌淘汰的信息损失机制存在部分重叠，联合使用时需谨慎调参。
 
 ### 融合核加速
 
 Figure 6 对比了标准注意力实现与融合解压‑注意力核在不同批大小和序列长度下的解码延迟。融合核将解压矩阵乘法与注意力分数计算合并为单一 CUDA 算子，避免了解压结果的显式物化和内存往返。对于 32 令牌的解码，融合核可将延迟降低近一半，最高实现 **2.4 倍**推理加速。加速比随批大小增大而提升，因为大 batch 下解压操作的计算密度更高，融合带来的内存带宽节省更显著。
-
-![[assets/figures/papers/paper_list_l738_https_arxiv_org_abs_2603_23914/figures/011_Figure_6.jpg]]
-*Figure 6: Decoding latency for 32 tokens with various batch sizes and sequence lengths using standard attention and with fused kernel implementation of AttentionPack. We observe up to 2.4x faster inference in single and batch query settings*
 
 ### 文本域扩展与局限性
 
@@ -316,16 +292,6 @@ Table 6 报告了在纯文本任务（LongBench 数据集，LLaMA3.1-8B）上的
 4. **生成式对话与多轮交互**：当前评测集中于单轮问答，尚未在开放式生成、多轮对话等场景中验证压缩对生成质量和一致性的影响。
 
 5. **SVD 的计算开销**：虽然采用随机化 SVD 缓解了分解成本，但在极长序列（如小时级视频）下，每次重压缩的 SVD 开销可能不可忽略。增量 SVD 更新策略是潜在的改进方向。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l738_https_arxiv_org_abs_2603_23914/figures/004_Table_1.jpg]]
-*Table 1: Image QA results on AOKV-QA, OCRKV-QA and MMMU with LLaVA1.5-7B, LLaVA1.5-13B and QwenVL-Chat-7B. We report evaluation metrics along with cache memory and throughput statistics for full KV caching, ScissorHands [21], H2O [32], FastV [5], Minicache [19] to compare with AttentionPack*
-
-![[assets/figures/papers/paper_list_l738_https_arxiv_org_abs_2603_23914/figures/005_Table_2.jpg]]
-*Table 2: Video QA results on MSVD-QA and MSRVTT-QA with VideoLLaVA-7B. We report evaluation metrics along with cache memory and throughput statistics for full KV caching, H2O eviction, FastV to compare with our approach AttentionPack*
-
-
 
 ## 定位与知识库关联
 
@@ -365,8 +331,6 @@ AttentionPack 与令牌淘汰、缓存量化存在天然的**正交互补性**�
 ### 知识库定位总结
 
 AttentionPack 属于 **VLM推理效率优化** 方向中的 **KV缓存结构化压缩** 子领域。与令牌淘汰（FastV、H2O、ScissorHands）和缓存量化（KVQuant）形成互补三角，共同构成当前VLM推理优化的方法矩阵。其核心知识贡献在于验证了“多注意力头联合低秩分解 + 注意力感知部分解压”这一技术路线的有效性，为后续的自适应压缩、增量压缩和训练‑压缩联合优化提供了基准。代码已开源（[AttentionPack](https://github.com/gitdisl/AttentionPack)），为社区复现与改进提供了基础。
-
-
 
 ## 原文 PDF
 

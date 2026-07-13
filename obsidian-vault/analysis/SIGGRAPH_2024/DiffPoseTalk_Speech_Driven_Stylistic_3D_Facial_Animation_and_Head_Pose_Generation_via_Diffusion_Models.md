@@ -56,8 +56,6 @@ claims:
 
 **方法定位**：DiffPoseTalk属于扩散生成式语音驱动面部动画方法，在生成范式上区别于确定性回归方法（FaceFormer、CodeTalker）和基于示例的个性化方法（**Imitator**，Thambiraja et al., ICCV 2023；**SadTalker**，Zhang et al., CVPR 2023），在风格控制机制上区别于基于one-hot编码的方案。其扩散预测干净样本、对比风格编码与无分类器引导的组合设计，为语音驱动动画领域提供了一种兼顾多样性、精确性和泛化能力的技术路线。
 
-
-
 语音驱动的3D面部动画旨在从语音信号中生成与音频同步的面部表情和头部运动，在虚拟人、游戏和影视制作中有广泛应用。这一任务的核心难点在于**语音到面部动作的映射具有内在的多对多特性**——同一段语音可以对应多种合理的面部表情和头部姿态，取决于说话者的个人风格、情绪状态和语境。
 
 现有方法大多采用确定性回归模型来解决这一问题。例如，**FaceFormer**（Fan et al., CVPR 2022）使用基于Transformer的自回归架构直接从语音特征映射到面部运动参数；**CodeTalker**（Xing et al., CVPR 2023）引入离散动作先验来约束生成空间。这些确定性方法虽然能够产生基本同步的唇部动作，但面临两个根本性瓶颈：
@@ -69,8 +67,6 @@ claims:
 此外，头部姿态生成在现有工作中常被忽视或单独处理。**SadTalker**（Zhang et al., CVPR 2023）和**FaceDiffuser**（Stan et al., MIG 2023）虽然引入了扩散模型来增强多样性，但在风格解耦和头部姿态与语音节奏的对齐方面仍有不足。**MeshTalk**（Richard et al., ICCV 2021）尝试通过交叉模态解耦来实现面部动画，但同样受限于确定性架构的表达能力。
 
 针对上述问题，**DiffPoseTalk**提出了一种基于扩散概率模型的新范式。其核心动机在于：扩散模型天然适合拟合复杂的多模态分布，能够从同一语音条件中采样出多样化且合理的面部动作；同时，通过引入基于对比学习的说话风格编码器和无分类器引导机制，模型可以从任意参考视频中提取风格嵌入，在无需微调的情况下实现个性化和多样化的风格控制。联合生成头部姿态进一步增强了动画的真实感和节奏对齐。
-
-
 
 ## 核心方法与创新机理
 
@@ -112,8 +108,6 @@ DiffPoseTalk 在 Transformer 去噪网络的编码器-解码器之间引入了**
 
 与大多数仅关注面部表情的方法不同，DiffPoseTalk 将**头部姿态生成**纳入统一的扩散框架，使模型能够同时预测表情参数和头部旋转/平移参数。这使得生成的动画在语音节奏与头部运动之间实现了自然的节拍对齐，在 BA 指标上取得了 0.29 的最佳成绩，显著超越了仅生成表情的对比方法。
 
-
-
 DiffPoseTalk 的整体 pipeline 围绕扩散概率模型构建，核心思路是将语音驱动的面部动画生成建模为一个条件生成问题：给定输入语音和参考说话风格，生成多样化且风格一致的面部运动参数（包含表情、头部姿态）以及对应的 3D 面部网格。系统由五个关键模块串联而成，形成“语音编码—风格提取—条件去噪—网格重建—时序平滑”的完整推理链路。
 
 ### 输入与输出流
@@ -138,12 +132,8 @@ DiffPoseTalk 的整体 pipeline 围绕扩散概率模型构建，核心思路是
 
 训练时，所有条件（语音、风格、形状）均从真实数据中提取，去噪网络通过最小化预测干净样本与真实干净样本之间的 L_simple 损失以及顶点、速度、平滑度等几何损失来优化参数。推理时，语音和形状由用户提供，风格嵌入可从任意参考视频中一次性提取，然后通过迭代去噪过程（从纯噪声开始，逐步去噪直至生成干净运动参数）完成生成。无分类器引导仅在推理时启用，以增强对语音和风格条件的遵从度。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1923_DiffPoseTalk_Speech_Driven_Stylistic_3D_Facial_Animation_and_Head_Pose_G/figures/001_Figure_1.jpg]]
 *Figure 1: We present DiffPoseTalk, a novel diffusion-based speech-driven animation system incorporated with a speaking style encoder to extract style features from arbitrary reference videos. Given an input speech and a speaking style, our system generates diverse and stylistic facial animations along with head movements*
-
-
 
 DiffPoseTalk 的核心架构由三个紧密协作的模块构成：语音编码器、Transformer 去噪网络和说话风格编码器，三者通过扩散模型的去噪框架和几何损失函数实现精确的面部动画生成。
 
@@ -205,12 +195,8 @@ $$\hat{X}^{0} = D(X^n,\emptyset,\emptyset,\beta,n) + w_a\left[D(X^n,A,\emptyset,
 
 其中 $w_a$ 为语音引导权重，$w_s$ 为风格引导权重。通过调整这两个权重，可在推理时灵活控制生成结果对语音内容的遵从程度和风格化程度，实现个性化和多样化的面部动画生成。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1923_DiffPoseTalk_Speech_Driven_Stylistic_3D_Facial_Animation_and_Head_Pose_G/figures/002_Figure_2.jpg]]
 *Figure 2: (Left) Transformer-based denoising network. We employ a windowing strategy to generate speech-driven 3D facial animations for inputs of arbitrary length. HuBERT-encoded speech features*
-
-
 
 ## 实验与关键发现
 
@@ -260,8 +246,6 @@ DiffPoseTalk 在 **TFHP** 数据集上进行训练和评估。该数据集包含
 3. **口腔内部缺失**：当前方法仅建模人脸表面形状，忽略了牙齿和舌头的建模，限制了完整说话人脸的真实感。
 4. **数据覆盖不足**：缺乏大规模真实世界 3D 说话数据集，限制了模型对更广泛风格和身份的泛化能力。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1923_DiffPoseTalk_Speech_Driven_Stylistic_3D_Facial_Animation_and_Head_Pose_G/figures/003_Table_1.jpg]]
 *Table 1: Quantitative evaluation of the comparative methods, our proposed method, and ablation study variants. We run the evaluation 10 times and report the average score with a 95% confidence interval when applicable. We also report the diversity scores of expression and head pose generation. Note that the vertex-related metrics are not comparable with SadTalker due to its different face topology*
 
@@ -273,8 +257,6 @@ DiffPoseTalk 在 **TFHP** 数据集上进行训练和评估。该数据集包含
 
 ![[assets/figures/papers/paper_list_l1923_DiffPoseTalk_Speech_Driven_Stylistic_3D_Facial_Animation_and_Head_Pose_G/figures/006_Figure_4.jpg]]
 *Figure 4: Qualitative comparison with the state of the arts (w/ head pose prediction). Results of different identities are split by dashed lines. The “>” indicates stress in speech*
-
-
 
 ## 定位与知识库关联
 
@@ -309,8 +291,6 @@ DiffPoseTalk 处于语音驱动 3D 面部动画从确定性回归向概率生成
 4. **规模化数据**：如何构建涵盖更多语言、口音、年龄组和情感风格的 3D 真实说话数据集？半监督或自监督的 3D 重建管线可能是可行路径。
 
 5. **多模态风格解耦**：当前风格编码器从运动序列中提取整体风格嵌入，未来可探索将风格进一步解耦为节奏模式、表情幅度、头部运动偏好等可解释维度，实现更精细的风格编辑与迁移。
-
-
 
 ## 原文 PDF
 

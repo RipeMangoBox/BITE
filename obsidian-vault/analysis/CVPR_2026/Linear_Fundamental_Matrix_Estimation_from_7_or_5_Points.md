@@ -56,8 +56,6 @@ claims:
 
 **局限**：虚拟中点的构造基于2D中点启发式，在大透视畸变下可能引入系统误差；求解器严格依赖V-Umlaut点线结构，不适用于一般配置；退化场景（纯旋转、场景共面）未评估。
 
-
-
 基础矩阵估计是未标定多视图几何中的核心问题。给定两幅图像间的 $m$ 对点对应，基础矩阵 $\mathbf{F}$ 是一个秩为 2 的 $3 \times 3$ 矩阵，满足对极约束 $\mathbf{q}^{\top} \mathbf{F} \mathbf{p} = 0$。由于 $\mathbf{F}$ 具有 7 个自由度，最小配置需要 7 对点对应。标准 7 点算法（**7-point algorithm**, Hartley & Zisserman, 2004）通过求解一个三次方程得到至多三个解，随后需在 RANSAC 框架内进行筛选。在标定情形下，**Nistér 的 5 点相对位姿求解器**（Nistér, IEEE TPAMI 2004）作为 SOTA 方法，通过求解一个十次方程获得位姿估计，精度优越但计算代价较高。
 
 ### 现有方法缺口
@@ -69,8 +67,6 @@ claims:
 本文关注一种特殊的 7 点配置——**V-Umlaut 配置**：5 个真实点分布于两条直线上，另外 2 个虚拟点通过中点构造引入，分别位于这两条直线上（图 1）。这一配置的独特之处在于，利用依赖对应点的重心坐标表示，可以将标准 7 点算法中的三次行列式约束 $\det(\mathbf{F}_{\text{coords}}) = 0$ 分解为 $f_{12} f_{13} (c_1(s) f_{31} + c_2(s)) = 0$ 的形式。在非退化假设下（$f_{12}, f_{13} \neq 0$），行列式约束退化为一个线性方程 $c_1(s) f_{31} + c_2(s) = 0$，从而将整个问题转化为一个 $5 \times 5$ 线性系统，直接获得唯一非退化解，无需处理伪解。
 
 本文的核心动机正是利用这一几何洞察，**首次为 V-Umlaut 配置提供一个线性最小求解器**，在保持与 SOTA 方法相当精度的同时，显著降低计算复杂度。
-
-
 
 ## 核心方法与创新机理
 
@@ -121,8 +117,6 @@ $$c_1(s) f_{31} + c_2(s) = 0$$
 
 虚拟对应点的构造基于2D中点启发式——在两条直线上取真实对应点的中点作为虚拟点。在透视投影畸变显著时，该仿射近似可能偏离真实投影几何关系，引入系统误差。此外，线性求解器严格依赖于V-Umlaut点线配置，不适用于一般的7点场景；若场景中缺乏此类结构，则无法直接应用。
 
-
-
 V‑Umlaut 线性基础矩阵求解器是一个**从 5 个真实对应点 + 2 个虚拟对应点出发，直接给出唯一基础矩阵的线性最小求解器**。其核心流水线由四个顺序模块构成：投影归一化、参数提取、线性求解和逆归一化（见 Solver 3.1）。
 
 **输入**：两视图下满足 V‑Umlaut 配置的 5 个真实点对应 $\{(\mathbf{p}_i,\mathbf{q}_i)\}_{i=1}^5$，以及两条图像直线上的虚拟中点对应 $(\mathbf{p}_6,\mathbf{q}_6)$ 和 $(\mathbf{p}_7,\mathbf{q}_7)$。其中第 6、第 7 对应点分别位于通过 $\mathbf{p}_1$ 与 $\mathbf{p}_2$、$\mathbf{p}_1$ 与 $\mathbf{p}_3$ 的直线上（另一视图类似），即满足共线条件
@@ -159,12 +153,8 @@ $$
 
 **流水线的适用边界**：整个推导严格依赖于 V‑Umlaut 的点线配置——5 个真实点分布在两条通过同一参考点的直线上。若场景中缺乏此类结构，求解器无法直接应用。此外，虚拟中点基于 2D 图像直线的中点构造，在大透视畸变下可能偏离真实投影几何，引入系统误差。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2129_https_openaccess_thecvf_com_content_CVPR2026_html_Kucukpinar_Linear_Fund/figures/002_Figure_2.jpg]]
 *Figure 2: 3D V-Umlaut configuration including known dependent correspondences. Q: Can we reconstruct the 3D V-Umlaut configuration*
-
-
 
 ### 问题形式化与规范化坐标系
 
@@ -232,8 +222,6 @@ $$c_1(s) f_{31} + c_2(s) = 0$$
 ![[assets/figures/papers/paper_list_l2129_https_openaccess_thecvf_com_content_CVPR2026_html_Kucukpinar_Linear_Fund/figures/003_Figure_3.jpg]]
 *Figure 3: Illustration of Example 1*
 
-
-
 ## 实验与关键发现
 
 ### 真实数据主结果：精度与速度权衡
@@ -274,15 +262,11 @@ $$c_1(s) f_{31} + c_2(s) = 0$$
 
 4. **退化场景未评估**：所有实验基于非退化假设（场景点不共面、相机有平移）。在纯旋转或场景共面等退化配置下，基础矩阵本身不可唯一确定，V-Umlaut求解器的行为未经验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2129_https_openaccess_thecvf_com_content_CVPR2026_html_Kucukpinar_Linear_Fund/figures/004_Figure.jpg]]
 *Figure: (a) Pixel noise: 5 independent correspondences, 2 views (b) Pixel noise: 2 dependent correspondences along 2 lines, 1 view*
 
 ![[assets/figures/papers/paper_list_l2129_https_openaccess_thecvf_com_content_CVPR2026_html_Kucukpinar_Linear_Fund/figures/006_Figure_5.jpg]]
 *Figure 5: Runtime versus pose accuracy results on (a) all 13 scenes from PhotoTourism [27] and (b) Aachen Day-Night v1.1 [49] using correspondences provided by [47]. Top row shows all methods, bottom row zooms in on top performers. All methods use the PoseLib LO-RANSAC [30] implementation, with number of RANSAC iterations in the set {10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000} and a 1-pixel epipolar threshold. Results at 1000 RANSAC iterations are highlighted with larger markers, with stars for methods without ENM and X markers for methods with ENM*
-
-
 
 ## 定位与知识库关联
 
@@ -324,8 +308,6 @@ V-Umlaut求解器填补了“利用场景结构先验线性化传统非线性最
 
 **在RANSAC框架中的定位**  
 V-Umlaut求解器的实际价值体现在RANSAC循环中：线性求解器（$5\times 5$系统）的计算成本远低于三次方程求解（7点算法）或十次方程求解（5点算法），使得在固定时间内可执行更多RANSAC迭代。实验表明，在1000次迭代的固定预算下，V-Umlaut+ENM的组合在精度上匹敌Nistér 5点算法，同时保持速度优势。然而，这一优势高度依赖于场景中V-Umlaut配置的可用性——在通用场景中，标准7点或5点算法仍是最小求解器的默认选择。V-Umlaut更适合作为 **场景自适应RANSAC** 中的一个特化解算器，在检测到V形结构时自动切换。
-
-
 
 ## 原文 PDF
 

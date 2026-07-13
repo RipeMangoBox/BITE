@@ -54,8 +54,6 @@ claims:
 
 **局限性：** 方法依赖词级时间对齐的多模态数据，泛化到其他临床人群或采集条件的能力尚未评估；合成过程在特征空间进行，未直接生成人脸图像，可能限制可解释性；论文未报告模型计算开销。
 
-
-
 抑郁症是全球范围内最常见的精神障碍之一，其早期筛查和客观评估对公共卫生具有重要意义。近年来，多模态机器学习方法在自动抑郁识别领域展现出巨大潜力，通过融合面部表情、语音韵律和语言内容等多维度行为信号，试图捕捉抑郁症的细微行为标记。然而，这一领域面临一个根本性的瓶颈：**有限且复杂的临床标注数据导致深度视觉编码器难以学到鲁棒的视觉表征**。
 
 具体而言，多模态抑郁识别系统通常依赖从临床访谈视频中提取的视觉特征（如面部动作单元、头部姿态等）作为关键输入。但抑郁相关的视觉行为模式高度复杂——患者可能表现出微妙的面部表情抑制、眼动模式改变或姿态异常，这些模式在不同个体间差异巨大。在数据稀缺的条件下（如DAIC-WOZ数据集仅包含约100个临床访谈样本），深度视觉编码器极易过拟合到训练集中的个体特异性模式，而非学习到真正具有泛化能力的抑郁相关视觉表征。这一问题在现有工作中普遍存在，成为制约系统性能提升的核心障碍。
@@ -65,8 +63,6 @@ claims:
 本文的核心动机源于一个关键洞察：**音频和语音内容中隐含了丰富的面部表情模式信息**。在临床访谈场景中，患者的语音韵律特征（如语速、音调变化）和语言内容（如情感词汇、自我指涉）与其面部行为存在内在关联——例如，当患者以低沉、单调的语调谈论消极话题时，往往伴随面部表情的减少和特定动作单元（如AU4皱眉、AU15嘴角下压）的激活。这种跨模态关联为视觉表征学习提供了未被充分利用的监督信号：**如果能够从音频和文本模态中推断出对应的面部行为模式，就可以在特征空间合成多样化的视觉样本，从而在数据稀缺场景下大幅增强视觉编码器的训练**。
 
 基于这一动机，本文提出将视觉合成看作一个**跨模态条件生成问题**：利用音频和文本模态的丰富上下文信息，通过条件生成模型合成判别性视觉特征。更进一步，本文引入**任务引导的联合优化机制**，使生成过程不再是独立的预处理步骤，而是由下游识别器的性能动态调控——合成器不再仅仅追求“真实”地重构视觉特征，而是以“提升识别性能”为目标生成更具判别性的特征。这种闭环反馈机制使合成特征从“逼真”升级为“有用”，在数据稀缺条件下实现了多模态表征学习的实质性突破。
-
-
 
 ## 核心方法与创新机理
 
@@ -116,8 +112,6 @@ $$L_{total} = L_{real} + \lambda_{aug} L_{aug} + \lambda_{cvae} (L_{consis} + \b
 - **面部动作单元的核心地位**：Table 5 表明，仅合成面部动作单元（AUs）特征即可达到 F1-Score 0.857，接近完整模型，证明 AUs 是抑郁识别的关键视觉模式，合成器有效地捕捉了这一判别性信息。
 - **假阳性抑制**：Figure 3 的混淆矩阵显示，CMG-VS 将假阳性个数从 5 降低至 2，同时保持高召回率，表明合成特征增强了模型对抑郁/非抑郁样本的区分能力。
 
-
-
 CMG-VS 是一个端到端的多模态抑郁识别框架，其核心设计理念是将视觉特征合成与下游识别任务统一在一个闭环系统中。框架由四个关键阶段构成：**多模态特征编码与对齐**、**条件视觉合成器**、**多模态识别器**和**联合优化**。
 
 ### 数据流与模块关系
@@ -146,12 +140,8 @@ $$L_{total} = L_{real} + \lambda_{aug} L_{aug} + \lambda_{cvae} (L_{consis} + \b
 
 其中 $L_{real}$ 和 $L_{aug}$ 分别是真实流和增强流的 MSE 损失，$L_{consis}$ 是合成视觉特征与真实视觉特征之间的 L1 一致性损失。当识别器在增强流上的性能不佳时，$L_{aug}$ 的梯度会反向传播到合成器，促使其调整生成策略，使合成的视觉特征更具判别性。这种闭环机制使合成器从单纯追求“真实感”升级为追求“任务有效性”，是 CMG-VS 在数据稀缺场景下取得显著性能提升的关键原因。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l850_https_openaccess_thecvf_com_content_CVPR2026_html_Yang_Cross_Modal_Guide/figures/001_Figure_1.jpg]]
 *Figure 1: The proposed Cross-Modal Guided Visual Synthesis (CMG-VS) framework*
-
-
 
 CMG-VS 框架由四个核心模块构成：多模态特征编码与对齐、条件视觉合成器（CVAE）、多模态识别器、以及联合优化。其中条件视觉合成器是整个方法的核心创新，以下重点展开其公式化设计与推导。
 
@@ -213,12 +203,8 @@ $$L_{total} = L_{real} + \lambda_{aug} L_{aug} + \lambda_{cvae} (L_{consis} + \b
 
 这一设计的因果机制在于：识别器对合成特征的性能损失 $L_{aug}$ 直接作为梯度信号回传至合成器，驱动生成过程从单纯“还原真实特征”升级为“生成对下游任务判别性更强的特征”。消融实验证实，移除任务引导优化后 F1-Score 从 0.860 降至 0.825，验证了闭环反馈机制的关键作用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l850_https_openaccess_thecvf_com_content_CVPR2026_html_Yang_Cross_Modal_Guide/figures/002_Figure_2.jpg]]
 *Figure 2: Architecture of the Conditional Visual Synthesizer (CVAE)*
-
-
 
 ## 实验与关键发现
 
@@ -266,24 +252,11 @@ CMG-VS 在两个公开基准上均取得了最优性能，验证了跨模态引�
 
 5. **统计报告不完整**。如前所述，主结果缺少标准差或置信区间，消融实验中也未报告多次试验的方差。这使得难以判断性能提升是否具有统计显著性，尤其在部分消融实验中增益幅度较小（如 0.011 的 F1 提升）的情况下。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l850_https_openaccess_thecvf_com_content_CVPR2026_html_Yang_Cross_Modal_Guide/figures/007_Table_3.jpg]]
 *Table 3: Ablation study on core generative mechanisms. Isolating the impact of synthesis pipeline and task-guided optimization*
 
 ![[assets/figures/papers/paper_list_l850_https_openaccess_thecvf_com_content_CVPR2026_html_Yang_Cross_Modal_Guide/figures/009_Table_4.jpg]]
 *Table 4: Ablation study on synthesis conditioning modalities. Evaluation of audio and text guidance for the visual synthesizer*
-
-![[assets/figures/papers/paper_list_l850_https_openaccess_thecvf_com_content_CVPR2026_html_Yang_Cross_Modal_Guide/figures/006_Table_5.jpg]]
-*Table 5: Ablation study on synthesized visual feature granularity. Performance with partial visual feature synthesis*
-
-![[assets/figures/papers/paper_list_l850_https_openaccess_thecvf_com_content_CVPR2026_html_Yang_Cross_Modal_Guide/figures/005_Figure_3.jpg]]
-*Figure 3: Confusion matrices on DAIC-WOZ test set. The matrices illustrate one representative run out of the multiple trials*
-
-![[assets/figures/papers/paper_list_l850_https_openaccess_thecvf_com_content_CVPR2026_html_Yang_Cross_Modal_Guide/figures/008_Figure_4.jpg]]
-*Figure 4: Feature visualization on DAIC-WOZ test set. t-SNE comparison between Recognizer-Only (w/o synthesis) and full CMG-VS (with synthesis)*
-
-
 
 ## 定位与知识库关联
 
@@ -323,8 +296,6 @@ CMG-VS 的核心贡献在于将抑郁识别的技术路线从“多模态融合�
 - **低数据量下的鲁棒性极限**：CMG-VS 在 DAIC-WOZ（约 100+ 样本）上表现优异，但在更极端的数据稀缺场景（如仅 10-20 个样本）下，条件生成模型本身是否还能学到有意义的映射关系，仍是一个开放问题。
 - **任务引导生成范式的推广**：将“识别器反馈指导生成器”的闭环优化框架推广到其他模态缺失补全、跨模态翻译或半监督学习场景，是一个值得探索的方向。
 - **生理可解释性的引入**：Table 5 表明仅合成 AU 特征即可接近完整模型性能（F1 0.857 vs. 0.860），证实 AU 是抑郁识别的关键视觉模式。如何将合成的 AU 序列与临床抑郁诊断标准（如 DSM-5 中的面部表情描述）建立映射，从而赋予模型生理可解释性，是推动临床落地的关键问题。
-
-
 
 ## 原文 PDF
 

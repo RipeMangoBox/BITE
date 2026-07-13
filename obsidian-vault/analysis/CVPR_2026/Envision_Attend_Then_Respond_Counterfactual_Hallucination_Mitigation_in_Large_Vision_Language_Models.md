@@ -56,15 +56,11 @@ EnAR 包含三个关键阶段：
 
 在反事实基准 VLMBias 上，EnAR 将 InternVL3.5-8B 的整体准确率从 19.83% 提升至 31.36%（+11.53 个百分点），在 WHOOPS 基准上将平均准确率从 62.45% 提升至 74.15%（+11.70%）。在通用幻觉基准 POPE 上，LLaVA-v1.5-7B 的 F1 分数从 80.9% 提升至 88.9%。消融实验证实，视觉印象和不确定性图两个组件对性能均有显著贡献。该方法覆盖三种异构 LVLM 架构，验证了其模型无关的健壮性。
 
-
-
 大型视觉语言模型（LVLM）在图像描述、视觉问答等任务中展现出强大能力，但它们在面对**反事实视觉输入**时容易出现严重的幻觉：模型会忽略图像中与统计先验相悖的视觉证据，转而输出符合语言先验（世界知识）但图像中并不存在的描述。例如，当图像展示“一只狗在驾驶汽车”时，模型可能回答“一个人在驾驶汽车”，因为“人开车”的语言先验压倒了“狗在驾驶位”这一反事实视觉信号。
 
 这一瓶颈的根源在于，LVLM在自回归解码过程中，语言先验的统计频率会系统性地抑制低概率但视觉真实的输出。现有缓解方案大致分为两类：一类基于高斯噪声或随机图像变换的对比解码（如 **VCD**，Leng et al., CVPR 2024），它们通过引入无差别的视觉扰动来放大视觉信号，但缺乏对反事实区域的精确感知；另一类方法（如 **M3ID**，Favero et al., CVPR 2024）通过视觉定位来控制幻觉，但定位精度受限于模型本身的注意力偏差。这些方法的共同缺陷是：它们无法显式地识别图像中“哪里是反事实的”，因此干预往往粗糙且容易误伤正常区域。
 
 本文的核心动机是：**如果能利用扩散模型的丰富视觉先验，生成一张“先验一致”的参考图像（即世界知识认为“应该”出现的画面），然后通过对比原图与参考图的注意力差异，精确定位反事实元素，就能在解码时有针对性地抑制这些元素，从而在不损害正常视觉理解的前提下纠正幻觉。** 这一思路将幻觉缓解从“全局扰动”推进到“局部定位与定向抑制”的层面，且整个过程无需额外训练。
-
-
 
 ## 核心方法与创新机理
 
@@ -94,8 +90,6 @@ $$p(y|\mathbf{x},\pmb{v},\pmb{v}') = (1+\alpha)p(y|\pmb{x},\pmb{v}) - \alpha p(y
 
 **与基线方法的本质差异**：VCD等对比解码方法通过扰动输入来估计“幻觉方向”，但扰动是盲目的（高斯噪声或随机变换），无法针对反事实元素进行精准干预。EnAR的视觉印象生成步骤**利用扩散模型的语义先验**，使得对比信号聚焦于“世界知识预期”与“图像实际内容”的偏差，从而实现了对反事实幻觉的**因果层面的抑制**，而非简单的分布偏移。
 
-
-
 EnAR（Envision-Attend-Respond）是一个无需训练的框架，其核心思想是利用扩散模型的视觉先验生成反事实元素的期望版本，通过与原图像的注意力对比和不确定性估计定位矛盾区域，再通过对比解码强化视觉证据，从而纠正模型输出。整个pipeline由三个顺序衔接的阶段构成，如Figure 2所示。
 
 ### 输入输出流
@@ -120,15 +114,8 @@ EnAR（Envision-Attend-Respond）是一个无需训练的框架，其核心思�
 
 EnAR的三个阶段均不涉及对LVLM参数的修改，仅通过外部扩散模型和推理时的注意力操作实现干预。实验覆盖InternVL3.5-8B、Qwen2.5VL-7B和LLaVA-v1.5-7B三种异构架构，验证了方法的模型无关健壮性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l747_https_openaccess_thecvf_com_content_CVPR2026_html_Liang_Envision_Attend/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the EnAR framework. EnAR first generates a visual impression with a corresponding pixel-wise uncertainty map. Next, EnAR feeds both the original and impression images into the LVLM’s vision encoder to obtain contrastive attention, pads counterfactual tokens by combining attention differences with the uncertainty map. Finally, EnAR performs contrastive decoding over the original and padded inputs to suppress counterfactual hallucinations and produce the final response*
-
-![[assets/figures/papers/paper_list_l747_https_openaccess_thecvf_com_content_CVPR2026_html_Liang_Envision_Attend/figures/001_Figure_1.jpg]]
-*Figure 1: Illustration of the Envision-Attend-Respond framework. By comparing the visual impression with the original image to locate counterfactual elements, the model is guided toward producing the correct response*
-
-
 
 EnAR 由三个顺序执行的模块构成：**Envision**（视觉印象生成）、**Attend**（反事实定位）与 **Respond**（对比解码）。三个模块协同完成“生成先验一致参考 → 定位矛盾区域 → 抑制语言先验”的因果干预链条，全程无需对 LVLM 进行任何训练或微调。
 
@@ -186,13 +173,6 @@ $$p(y|\mathbf{x},\mathbf{v},\mathbf{v}') = (1+\alpha)p(y|\mathbf{x},\mathbf{v}) 
 
 **因果机制总结**：Envision 提供先验一致的视觉参考与不确定性估计 → Attend 利用注意力差异与不确定性联合定位反事实令牌 → Respond 通过对比解码在 logits 空间抑制被定位的反事实内容，最终使模型输出回归视觉证据。三个模块形成闭环，且全程无需训练。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l747_https_openaccess_thecvf_com_content_CVPR2026_html_Liang_Envision_Attend/figures/003_Figure_3.jpg]]
-*Figure 3: Illustration of the Envision stage in EnAR*
-
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与实验动机
@@ -240,12 +220,6 @@ Figure 4展示了两个关键超参数的影响：
 - **视觉编码器层选择**（Figure 4 left）：选择第6层进行注意力定位可获得VLMBias、POPE和HallusionBench上的最佳平均性能。浅层特征与显著物体区域的IoU更高（Figure 5），说明浅层注意力图更利于定位反事实元素，因为深层特征已被语义化，对局部异常的敏感性下降。
 - **填充令牌比例**（Figure 4 right）：10%的填充比例在三个基准上取得最优权衡。比例过低则反事实抑制不足，过高则可能误掩正常视觉信息，导致常规能力下降。
 
-![[assets/figures/papers/paper_list_l747_https_openaccess_thecvf_com_content_CVPR2026_html_Liang_Envision_Attend/figures/010_Figure_4.jpg]]
-*Figure 4: Average performance variation across VLMBias, POPE, and HallusionBench under different settings: (left) selection of vision encoder layer, (right) padding token ratio*
-
-![[assets/figures/papers/paper_list_l747_https_openaccess_thecvf_com_content_CVPR2026_html_Liang_Envision_Attend/figures/011_Figure_5.jpg]]
-*Figure 5: IoU between top-K% tokens from attention maps at different encoder layers and salient object regions: (a) LLaVA-1.5- 7B, (b) InternVL3.5-8B*
-
 ### 方法公平性说明
 
 所有对比方法均采用其论文中的最佳配置并在相同环境下复现。EnAR的对比解码超参数α与VCD保持一致，消除了超参数偏差。实验覆盖三种异构LVLM架构（InternVL3.5-8B、Qwen2.5VL-7B、LLaVA-v1.5-7B），验证了方法的模型无关健壮性。
@@ -256,12 +230,8 @@ Figure 4展示了两个关键超参数的影响：
 2. **扩散模型依赖**：视觉印象生成依赖Stable Diffusion 1.5，带来额外计算开销。当反事实内容高度抽象时，扩散模型生成的先验一致对应物可能不够精确，导致定位精度下降。
 3. **超参数敏感性**：需要为每个LVLM调整视觉编码器层和填充令牌比例，缺乏完全自适应的机制。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l747_https_openaccess_thecvf_com_content_CVPR2026_html_Liang_Envision_Attend/figures/009_Figure_6.jpg]]
 *Figure 6: Case study visualization. We illustrate how EnAR constructs visual impressions, localizes counterfactual elements, and produces corrected responses*
-
-
 
 ## 定位与知识库关联
 
@@ -301,8 +271,6 @@ EnAR 属于**训练无关的对比解码**范式，与以下基线方法形成�
 3. **能力平衡**：EnAR 的对比解码机制是否可能削弱模型在非反事实场景下的常规能力？论文仅在反事实和幻觉基准上评估，未测试通用 VQA 性能，该风险需手动验证。
 4. **训练结合**：将 EnAR 与训练阶段的微调方法相结合，能否实现进一步的泛化能力和鲁棒性？当前 EnAR 是纯推理时干预。
 5. **跨模态泛化**：该框架能否推广到其他模态（如音频-文本）的反事实幻觉问题？核心的“先验印象生成-对比注意力定位-对比解码”范式理论上模态无关，但需实证验证。
-
-
 
 ## 原文 PDF
 

@@ -50,8 +50,6 @@ claims:
 
 **主要结果**：在自建数据集 ReMoCap 上，ReMoS 相比最优基线 **InterGen** 将身体 MPJPE 降低至少 20%（Lindy Hop: 40.2 vs 55.1 mm），FID 降低约 45%（0.12 vs 0.22）。消融实验验证了级联扩散、反应损失、CoST-XA、H-XA 及推理时空间引导等各模块的必要性。用户研究表明，ReMoS 合成的反应在运动质量（3.79/5）和反应合理性（3.88/5）上均显著优于基线方法。在无标签条件下，ReMoS 也能生成手指级精细交互（Fig. 1）。
 
-
-
 ### 两人交互运动建模：从共生成到条件反应
 
 三维人体运动生成近年来取得了显著进展，但大多数工作聚焦于单人场景。在两人交互场景中，现有方法通常将两人的运动视为一个整体进行**联合生成**（co-generation），例如基于文本描述同时输出双人运动序列。这类方法的典型代表包括 **InterGen**（基于文本到双人运动的扩散模型）、**ComMDM**（基于通信的双人扩散模型）以及 **RAIG**（角色感知的交互生成）。它们虽然能够产生视觉上合理的双人运动，但存在一个根本性局限：**生成过程需要额外的条件信号**——无论是动作类别标签、文本描述，还是预定义的交互图——来驱动两个角色的运动同步。
@@ -73,8 +71,6 @@ claims:
 具体而言，ReMoS采用级联扩散模型，分两阶段生成反应运动：第一阶段生成反应者的身体关节，第二阶段以生成的身体运动为条件进一步生成手部关节。这种级联设计使得手部合成能够感知已生成的身体姿态，从而产生全局一致的全身反应。在每一阶段内部，**联合时空交叉注意力（CoST-XA）** 同时建模演员与反应者不同身体部位之间的空间和时间交互依赖，解决了传统方法中时空建模割裂的问题。此外，**距离感知反应损失**以指数衰减权重强调靠近演员的关节，使模型更关注交互密集的身体区域。
 
 通过这一设计，ReMoS在无需显式交互标签的情况下，能够生成与演员运动高度同步的反应序列，包括手指级别的精细手部交互——如图1所示，在Ninjutsu对练和Lindy Hop舞蹈中，ReMoS合成的反应者（蓝色）与演员（红色）之间呈现出自然的身体对齐和手部接触。
-
-
 
 ## 核心方法与创新机理
 
@@ -136,8 +132,6 @@ $$X_B^{(0)} = X_B^{(0)} - \gamma \nabla_{X_B^{(0)}} G(\phi, \hat{\phi})$$
 
 这些创新共同构成了 ReMoS 的技术护城河：级联架构提供结构先验，CoST-XA 和 H-XA 提供注意力层面的归纳偏置，反应损失和空间引导则从优化和推理两端强化空间同步约束。消融实验的系统性验证（Table 2）表明，每个组件都是性能提升的必要条件，而非冗余设计。
 
-
-
 ReMoS 将反应运动合成建模为一个条件生成任务：给定演员的 3D 全身运动序列 $Y = \{Y_B, Y_H\}$（分别表示身体关节与手部关节位置），生成反应者与之时空同步的全身运动 $X = \{X_B, X_H\}$。整个框架基于去噪扩散概率模型（DDPM），采用**级联两阶段生成策略**（Fig. 2, Fig. 3），逐级解码反应运动。
 
 ![[assets/figures/papers/paper_list_l1765_ReMoS_3D_Motion_Conditioned_Reaction_Synthesis_for_Two_Person_Interactio/figures/002_Figure_2.jpg]]
@@ -154,8 +148,6 @@ $$X_H^{(0)} = f_{\theta_H}(X_H^{(t)}, t, Y_H, \mathbb{1}_{H_A}(Y_B) \mathbb{1}_{
 $$\mathrm{H-XA} = \mathrm{softmax}\left(\frac{(\mathbb{1}_{H_R} \odot Q_H)(\mathbb{1}_{H_A} \odot K_H)^T}{\sqrt{d_{K_H}}}\right) V_H$$
 
 最终，反应者的全身运动由两个阶段的输出拼接得到 $X = \{X_B^{(0)}, X_H^{(0)}\}$。整个级联设计的关键优势在于：身体合成阶段建立了全局的时空对齐骨架，而手部合成阶段则借助已生成的身体姿态和交互掩码，专注于精细的手指级交互建模，从而无需任何动作标签或文本提示即可生成高质量的同步反应运动。
-
-
 
 ReMoS 将反应运动生成建模为条件去噪扩散概率模型（DDPM），在给定演员运动 $Y$ 的条件下学习反应运动 $X$ 的条件分布 $P(X|Y)$。整体框架采用**级联两阶段生成策略**：首先生成反应者的身体关节位置 $X_B$，再以此为基础生成手部关节位置 $X_H$（Fig. 3）。
 
@@ -231,8 +223,6 @@ $$X_B^{(0)} = X_B^{(0)} - \gamma \nabla_{X_B^{(0)}} G(\phi, \hat{\phi}) \tag{Eq.
 
 > **注**：上述公式均来自论文原文（Sec. 3.1–3.4），变量含义与原文一致。各模块的必要性已通过消融实验验证（Table 2）：移除级联扩散、CoST-XA、H-XA、反应损失或空间引导均导致性能显著下降。
 
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -262,18 +252,12 @@ Table 2 中的消融行揭示了每个设计选择的因果贡献：
 
 Table 4 报告了五点李克特量表上的用户评分。ReMoS 在运动质量（3.79/5）和反应合理性（3.88/5）两个维度上均显著优于所有基线方法。相比之下，InterGen 的合理性评分仅为 2.91/5，MixNMatch 为 2.63/5。用户研究从感知层面验证了定量指标的优势：ReMoS 生成的反应运动不仅数值上更接近真值，在人类观察者眼中也更自然、更符合交互逻辑。
 
-![[assets/figures/papers/paper_list_l1765_ReMoS_3D_Motion_Conditioned_Reaction_Synthesis_for_Two_Person_Interactio/figures/007_Table_4.jpg]]
-*Table 4: User Study Results. Mean scores on a five-point Likert scale (scores 1 − 5)*
-
 ### 定性分析与应用
 
 Fig. 5 展示了定性对比结果。在 Lindy Hop 和 Ninjutsu 场景中，ReMoS 合成的反应者（蓝色）与演员（红色）的空间对齐明显优于基线方法——InterGen 和 ComMDM 常出现手臂穿透或时序错位，而 ReMoS 保持了紧密且合理的相对位置关系。Fig. 1 进一步放大了手部交互细节：即使在无显式手部标签的条件下，ReMoS 也能生成手指级的接触姿态（如握持、引导），这归因于 H-XA 模块对手部交互掩码的利用。
 
 ![[assets/figures/papers/paper_list_l1765_ReMoS_3D_Motion_Conditioned_Reaction_Synthesis_for_Two_Person_Interactio/figures/009_Figure_5.jpg]]
 *Figure 5: Qualitative Results and Applications. We show some visual results and the application of ReMoS as a motion editing tool. (a) The reactor (in blue) synthesized by ReMoS has the most plausible alignment with the actor (in red) compared to the baselines. (b) We manually control the right-hand wrist joint of the reactor and let ReMoS synthesize the remaining body joints conditioned on the actor. (c) ReMoS synthesizes the reactor’s motion in-between the start and end frames*
-
-![[assets/figures/papers/paper_list_l1765_ReMoS_3D_Motion_Conditioned_Reaction_Synthesis_for_Two_Person_Interactio/figures/001_Figure_1.jpg]]
-*Figure 1: Visualizations of reactive 3D motion sequences synthesized with the proposed ReMoS approach. We synthesize the 3D full-body motion of the reactor (blue) conditioned only on the 3D motion of the actor (red), thereby completing the interactions between the two (Ninjutsu practice on the left and Lindy Hop dancing on the right). The synthesized hand interactions are enlarged and highlighted with circles*
 
 论文还演示了 ReMoS 作为运动编辑工具的潜力（Fig. 5b-c）：用户可以手动指定反应者右手腕关节位置，ReMoS 自动补全其余身体关节；或给定起始与结束帧，生成中间过渡运动。这些应用得益于条件扩散模型的灵活采样能力。
 
@@ -282,21 +266,6 @@ Fig. 5 展示了定性对比结果。在 Lindy Hop 和 Ninjutsu 场景中，ReMo
 当前实现的推理速度是主要瓶颈：生成 50 帧全身及手部运动约需 24 秒（身体 12.5 秒 + 手部 11.5 秒），难以满足实时交互需求。训练成本方面，Lindy Hop 约需 8 小时，Ninjutsu 约需 11 小时（NVIDIA RTX A4000）。作者指出可通过 DDIM、Pro-DDPM 等加速采样方法改善推理效率，但尚未实现。
 
 此外，ReMoCap 数据集仅包含 Lindy Hop 和 Ninjutsu 两种动作类型，多样性有限，可能限制模型在更广泛交互场景中的泛化能力。方法当前仅支持两人交互，无法直接扩展至多人场景。关节位置表示也无法处理网格级皮肤接触和穿透问题，这在实际部署中可能产生视觉伪影。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1765_ReMoS_3D_Motion_Conditioned_Reaction_Synthesis_for_Two_Person_Interactio/figures/005_Table_1.jpg]]
-*Table 1: Dataset Comparisons. Comparing ReMoCap with existing multi-person interaction datasets*
-
-![[assets/figures/papers/paper_list_l1765_ReMoS_3D_Motion_Conditioned_Reaction_Synthesis_for_Two_Person_Interactio/figures/013_Table.jpg]]
-*Table: D.1: Quantitative evaluation on the InterHuman dataset. We compare ReMoS with state-of-the-art motion synthesis methods on the Inter-Human dataset. ↓: lower is better, ↑: higher is better, →: values closer to GT are better. Bold indicates best. Table D.2: Trainable parameter counts*
-
-![[assets/figures/papers/paper_list_l1765_ReMoS_3D_Motion_Conditioned_Reaction_Synthesis_for_Two_Person_Interactio/figures/014_Table.jpg]]
-*Table: D.3: Quantitative evaluation on body joints. We compare the body synthesis module of ReMoS with state-of-the-art motion synthesis methods on body joints only. Bold indicates the best*
-
-![[assets/figures/papers/paper_list_l1765_ReMoS_3D_Motion_Conditioned_Reaction_Synthesis_for_Two_Person_Interactio/figures/012_Table.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -346,8 +315,6 @@ ReMoS 聚焦于**基于3D运动条件的两人交互反应合成**这一特定�
 ### 知识库定位
 
 ReMoS 在条件运动生成领域建立了**从演员运动到反应者运动的直接映射**这一新范式。与 InterGen 等文本条件方法互补，ReMoS 的运动条件设置更适用于交互编辑、运动补全等无需文本描述的应用场景。其级联扩散 + 联合时空注意力的架构设计为后续的交互运动生成工作提供了可复用的技术框架，而 ReMoCap 数据集则为该方向提供了首个包含精细手部标注的两人交互基准。
-
-
 
 ## 原文 PDF
 

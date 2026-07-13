@@ -55,8 +55,6 @@ claims:
 
 在超过8,000例头颈和肺部放疗计划（GDP-HMM挑战赛）以及REQUITE前列腺数据集上的实验表明，DiffKT3D取得了当前最优性能：**体素级MAE从挑战赛冠军的2.07 Gy降至1.93 Gy，临床评分从134.81提升至137.55**。在跨癌种知识迁移场景中，仅需少量微调即可快速收敛，MAE降至1.01 Gy，远超顶级回归基线。消融实验进一步验证了角色嵌入、全注意力机制、v参数化以及预训练先验迁移等设计的关键贡献。
 
-
-
 ### 放疗剂量预测的临床瓶颈
 
 现代放射治疗计划设计高度依赖精准的三维剂量分布预测，其核心目标是在保证靶区（PTV）处方剂量的同时，最大限度保护危及器官（OAR）。然而，当前剂量预测方法面临两大系统性瓶颈：
@@ -82,8 +80,6 @@ claims:
 2. **临床偏好对齐**：能否通过强化学习后训练，将基于临床指南的评分卡转化为可微奖励信号，在不损害体素保真度的前提下，使扩散生成结果对齐机构的规划偏好？
 
 DiffKT3D 的设计围绕三个关键操作杠杆展开：**预训练扩散先验迁移**（从 Wan 2.1/MAISI 初始化 DiT 权重）、**Any2Any 条件化范式**（模态与角色感知的统一条件机制，含 4D RoPE 和可学习角色嵌入）、以及 **ScardNFT 强化学习后训练**（将临床评分卡转化为 NFT 损失中的偏好信号）。这一框架旨在实现高效、稳健且临床相关的体素级剂量预测，同时保持对任意模态组合的灵活适应能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -118,12 +114,7 @@ $$\mathcal{L}(\theta) = \mathcal{L}_{\mathrm{NFT}}(\theta) + \lambda \mathcal{L}
 
 **创新总结**：DiffKT3D 的三个 changed slots 形成了因果闭环——预训练先验提供了强大的生成基础，Any2Any 条件化实现了对异构模态的高效利用，而 ScardNFT 则将临床偏好直接编码进训练目标。三者协同，使得模型在体素精度（MAE 1.93 Gy）、感知质量（LPIPS 0.020）和临床对齐度（Scorecard 137.55）三个维度上全面超越了 GDP-HMM 挑战赛冠军。
 
-
-
 DiffKT3D 的整体框架围绕三个核心阶段构建：**大规模扩散先验迁移**、**Any2Any 统一条件化训练**，以及**基于临床评分卡的强化学习后训练**。这三个阶段形成一条从通用生成能力到临床偏好对齐的完整流水线，如 Figure 1 所示。
-
-![[assets/figures/papers/paper_list_l2185_https_arxiv_org_abs_2605_09622/figures/001_Figure_1.jpg]]
-*Figure 1: Illustration of the proposed DiffKT3D. We first transfer priors from diffusion models pretrained on large-scale public video or CT data, despite a substantial domain gap to radiotherapy dose prediction. These backbones are then adapted to heterogeneous RT modalities with relatively limited data, followed by RL posttraining driven by guideline-derived clinical Scorecards to better align predictions with institutional planning preferences*
 
 ### 三阶段流水线
 
@@ -171,8 +162,6 @@ Figure 2 详细描绘了 DiffKT3D 的训练机制，Figure 6 给出了 VAE–DiT
 
 ![[assets/figures/papers/paper_list_l2185_https_arxiv_org_abs_2605_09622/figures/009_Table_5.jpg]]
 *Table 5: Single-modality prediction under the remaining-1 (predictone) setting. What this table shows: each modality is predicted from all the others. CT uses FID; segmentation-like modalities use Dice; Dose and Beam Plate use MAE only*
-
-
 
 ### 3.1 潜空间扩散与Any2Any条件化范式
 
@@ -236,15 +225,8 @@ $$\mathcal{L}(\theta) = \mathcal{L}_{\mathrm{NFT}}(\theta) + \lambda \mathcal{L}
 
 其中λ控制RL更新的强度。该设计使模型在不损害体素精度的前提下，持续提升与临床指南的对齐度。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2185_https_arxiv_org_abs_2605_09622/figures/002_Figure_2.jpg]]
-*Figure 2: Training mechanism for DiffKT3D. The multi-modal data first pass through the VAE encoder to obtain latent features. With the Any2Any gating mechanism, each modality is randomly assigned as either a condition or a target. Conditional modalities are independently encoded into patch tokens, while target modalities are combined with latent noise*
-
 ![[assets/figures/papers/paper_list_l2185_https_arxiv_org_abs_2605_09622/figures/011_Figure_6.jpg]]
 *Figure 6: Architecture of the proposed VAE–DiT-based conditional diffusion model DiffKT3D. Left: multi-branch VAE–DiT pipeline for CT*
-
-
 
 ## 实验与关键发现
 
@@ -274,9 +256,6 @@ Table 4的系统性消融揭示了各设计组件的独立贡献：
 
 Table 3展示了从GDP-HMM（头颈/肺）到REQUITE前列腺数据集的迁移能力。所有方法均从GDP-HMM检查点初始化并采用相同微调策略。Any2Any扩散模型仅需少量微调即可快速收敛，MAE降至**1.01 Gy**（best-of-n为0.97 Gy），远超最佳回归基线（1.37 Gy）。Figure 3（中）的微调曲线进一步验证了扩散先验的迁移效率——模型在极少迭代内即超越收敛后的回归基线。
 
-![[assets/figures/papers/paper_list_l2185_https_arxiv_org_abs_2605_09622/figures/004_Figure_3.jpg]]
-*Figure 3: MAE vs. training epochs / inference steps. The single figure contains three subplots: (left) pretrain vs. from-scratch across epochs, (middle) model-transfer finetuning curve, and (right) testtime scaling (single vs. best-of-n)*
-
 ### 单模态预测与框架灵活性
 
 Table 5展示了Any2Any框架的灵活性：在remaining-1设定下（每次预测一种模态，其余作为条件），模型不仅能预测剂量，还能生成CT、分割掩码等模态。CT使用FID评估，分割类模态使用Dice，剂量和射束板使用MAE。这一能力源于Any2Any门控机制与统一令牌空间的设计，使单一模型覆盖多种预测任务。
@@ -294,24 +273,11 @@ Figure 5和Figure 7提供了头颈、肺、前列腺病例的定性对比。Diff
 
 **需注意的失败模式：** 当前扩散训练未直接将DVH等剂量学指标作为可微损失嵌入，而是依赖后训练阶段对齐，端到端的DVH感知扩散损失值得探索。预训练先验迁移高度依赖源域模型质量，MAISI噪声预测模式下的动态范围漂移问题（Table 9）提示跨域适配需谨慎选择参数化策略。模型仅在历史回顾性数据上验证，前瞻性临床部署的鲁棒性尚待评估。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2185_https_arxiv_org_abs_2605_09622/figures/003_Table_1.jpg]]
 *Table 1: Main results on GDP-HMM (validation & test). Metrics: MAE (Gy; ↓), clinical Scorecard (Score) (↑), PSNR (dB; ↑), SSIM (↑), and LPIPS (↓). The main table spans both columns; bold indicates the best in its block*
 
 ![[assets/figures/papers/paper_list_l2185_https_arxiv_org_abs_2605_09622/figures/008_Table_4.jpg]]
 *Table 4: Component ablations on validation set*
-
-![[assets/figures/papers/paper_list_l2185_https_arxiv_org_abs_2605_09622/figures/006_Figure_4.jpg]]
-*Figure 4: Per-structure scorecard value comparison of head-andneck plans. The plot contrasts reference, the challenge Top-1 baseline, our diffusion model, and our RL-enhanced variant (Ours+ScardNFT), showing how reinforcement learning can improve alignment with institutional planning objectives*
-
-![[assets/figures/papers/paper_list_l2185_https_arxiv_org_abs_2605_09622/figures/007_Table_3.jpg]]
-*Table 3: Comparisons on REQUITE-Prostate. We report MAE (Gy; ↓), PSNR (dB; ↑), SSIM (↑), and LPIPS (↓). Both ours and baselines are pretrained with GDP-HMM and fine-tuned on prostate data. † denotes best-of-n*
-
-![[assets/figures/papers/paper_list_l2185_https_arxiv_org_abs_2605_09622/figures/016_Table_9.jpg]]
-*Table 9: GDP–HMM head-and-neck results on the MAISI backbone with different output parameterizations. MAE is reported in Gy. Infer time is only reported on deep learning backbone forward without data loading*
-
-
 
 ## 定位与知识库关联
 
@@ -389,8 +355,6 @@ MAISI 扩散先验的对比实验（Table 9）揭示了预训练源域选择的�
 3. **多癌种与多治疗模式的泛化**：DiffKT3D 在其他癌症部位（如乳腺、食管）以及不同治疗模式（如 IMRT、质子治疗）上的泛化能力和迁移效率如何？Any2Any 框架是否能统一处理这些异构场景？
 4. **多机构动态适配**：在真实多机构、多协议环境下，RL 后训练能否动态适应不同医院的评分卡，并持续保持性能？这需要验证 ScardNFT 对评分卡变化的鲁棒性和泛化性。
 5. **预训练源域的最优选择**：预训练扩散模型的选择（视频、CT、自然图像）如何影响跨域迁移的效率与上限？是否存在更优的预训练任务和域（如医学影像特定预训练），能进一步缩小域差异并提升迁移效率？
-
-
 
 ## 原文 PDF
 

@@ -57,8 +57,6 @@ claims:
 
 **方法定位：** OFQL 属于行为正则化 Actor-Critic 框架下的策略改进，以流匹配的平均速度参数化替代扩散模型的噪声预测参数化。与蒸馏方案（如 FQL）不同，OFQL 直接训练单步策略而非从多步教师蒸馏，避免了额外的训练开销和精度损失。
 
-
-
 ### 离线强化学习中的扩散策略范式
 
 离线强化学习（Offline RL）的核心挑战是从静态数据集中学习策略，而不与环境进行在线交互。近年来，扩散模型在该领域展现出显著优势，其核心思想是将策略参数化为条件去噪扩散概率模型（DDPM），通过多步迭代去噪从高斯噪声中生成动作。这种参数化方式天然具备多模态表达能力，能够有效捕捉行为数据中复杂的动作分布。
@@ -86,8 +84,6 @@ claims:
 平均速度场描述的是从噪声到目标动作的直线式整体位移，而非路径上每一点的瞬时变化。通过直接预测这一整体位移，策略可以在单次前向传播中完成从噪声到动作的映射——无需ODE积分，无需迭代去噪，也无需时间反向传播。这一设计使得OFQL在训练和推理中均只需一步操作，同时保留了流匹配框架对复杂多模态分布的建模能力。
 
 简言之，OFQL将扩散策略的“多步弯曲去噪”替换为“单步直线流映射”，实现了效率与性能的统一。
-
-
 
 ## 核心方法与创新机理
 
@@ -141,8 +137,6 @@ $$a = T_\theta(\epsilon, s) = \epsilon - u_\theta(\epsilon, r=0, t=1; s), \quad 
 
 Table 2的消融实验揭示了OFQL单步性能的关键来源。DQL+DDIM（1步）直接使用DDIM跳跃采样，得分从87.9骤降至11.6；FBRAC（1步）通过行为正则化约束单步策略，仅达67.1；FQL（1步）依赖多步流策略蒸馏，得分为79.2。这些方法均未触及核心矛盾——**单步外推在弯曲流/扩散路径上的固有误差**。OFQL通过平均速度参数化从根本上解决了这一问题，在单步条件下达到92.6（+4.7 over DQL），证明其性能增益并非来自辅助技巧，而是参数化范式的结构性优势。
 
-
-
 ![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_60VgwdzxDM/figures/002_Figure_2.jpg]]
 *Figure 2: Comparison between diffusion and flow matching. (a) Conditional flows arise from different (ϵ, x) pairs, resulting in varying conditional velocities. (b) Marginal velocity is obtained by averaging over these conditional velocities. (c) Flow paths are inherently curved, but average velocity fields enable direct one-step transport from noise to data. (d) Diffusion paths are also curved but noisy, making one-step denoising challenging. Note that all the velocities exhibit symmetry under time reversal. As the model is trained to parameterize the forward flow (from data to noise), inference inverts this direction to generate samples. Accordingly, for clarity, we plot the negative velocity vector...*
 
@@ -191,8 +185,6 @@ $$\mathcal{L}_{\mathrm{FBC}}(\theta) = \mathbb{E}_{t, r, r \leq t, (a, s) \sim \
 ### 当前局限
 
 框架目前仅在D4RL离线基准的状态输入任务上验证，扩展到视觉观察任务需要更强的编码器设计。平均速度场的精确学习依赖MeanFlow恒等式中的瞬时速度估计，可能引入近似误差。此外，超参数（流比率 $\lambda$、平衡系数 $\eta$）仍需网格搜索。
-
-
 
 ### 问题瓶颈与设计动机
 
@@ -266,8 +258,6 @@ $$\mathcal{L}(\theta) = \mathcal{L}_{\mathrm{FBC}}(\theta) - \alpha \mathbb{E}_{
 
 最小化平均速度匹配损失等价于最小化学得策略与行为分布之间的2-Wasserstein距离上界。这意味着OFQL在保持行为正则化效果的同时，通过非线性端点映射 $T_\theta$ 仍能建模复杂的多模态动作分布——单步生成不牺牲表达能力。
 
-
-
 ## 实验与关键发现
 
 ### 主结果：D4RL基准全面验证
@@ -308,18 +298,11 @@ Figure 1的散点图直观展示了OFQL的核心优势：在MuJoCo任务上以�
 
 **时间采样策略（Table 7）**：对数正态采样（logit-normal）相比均匀采样在Medium-Expert（95.2 vs 94.5）和Medium（63.8 vs 61.1）上略有提升，但OFQL对时间采样策略整体不敏感，方法具有较好的鲁棒性。
 
-![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_60VgwdzxDM/figures/030_Table_7.jpg]]
-
 **OOD泛化能力（Table 6）**：OFQL在HalfCheetah上的OOD-MSE持续低于DQL（Medium: 0.458 vs 0.462; Medium-Replay: 0.560 vs 0.582），说明平均速度场学习的行为正则化在分布外状态上具有更强的泛化能力，不易产生过估计。
-
-![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_60VgwdzxDM/figures/029_Table_6.jpg]]
 
 ### 效率分析：训练与推理的双重加速
 
 Figure 3对比了各方法的训练耗时与推理决策频率（均在A100 GPU、PyTorch框架下测量）：
-
-![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_60VgwdzxDM/figures/006_Figure_3.jpg]]
-*Figure 3: Training Time (↓) and Decision Frequency (↑) over one million steps, averaged on MuJoCo tasks. NFE (Number of Function Evaluations) denotes the denoising steps required by a flow/diffusion model to generate one action from pure noise. During training and inference, OFQL uses only one NFE, while DQL requires multiple ones. It is worth noting that for inference, FQL runs with a one-step policy, but training still relies on a multi-step flow policy to construct distillation targets*
 
 ![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_60VgwdzxDM/figures/011_Figure_4.jpg]]
 *Figure 4: Comparison of distribution modeling capabilities between FM with marginal velocity parameterization (left; evaluated at 1,2,5,10 steps generation) and average velocity parameterization (right; evaluated with one-step generation) on a toy dataset with complex multi-modal structure. Training and Inference Efficiency Comparison. Figure 3 reports the wall-clock training time (1M steps) and decision frequency (Lu et al., 2025b) on an A100 GPU (see Appendix D for experimental protocol). DQL’s training time scales nearly linearly with the number of denoising steps—from 11.7 hours at 5 steps to 49.5 hours at 50 steps—while OFQL completes training in only 6.3 hours. At inference, OFQL reaches 846.5...*
@@ -342,17 +325,9 @@ Figure 7进一步验证：DDPM在1步去噪时完全失效，而u-param的单步
 
 **视觉观察任务（Table 5）**：在基于像素输入的视觉操作任务上，OFQL（54.0±9.0, 8.0±3.0）显著落后于FQL（98.0±3.0, 21.0±11.0）。这表明当前的MLP策略网络和简单状态条件注入方式不足以处理高维视觉输入，需要更强的编码器和条件注入策略。
 
-![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_60VgwdzxDM/figures/028_Table_5.jpg]]
-
 **流比率的任务敏感性**：Table 3显示，Medium-Replay任务在λ=0时性能严重退化，且最优λ=0.5可能不适用于所有任务类型，超参数仍需网格搜索。
 
 **方法验证范围**：当前验证仅限于D4RL离线基准，对其他离线RL数据集和在线RL场景的泛化性尚未评估。平均速度场的精确学习依赖MeanFlow恒等式中的瞬时速度估计，该估计可能引入近似误差。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_60VgwdzxDM/figures/027_Table_4.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -418,8 +393,6 @@ OFQL的贡献在于将**MeanFlow建模**（Geng et al., 2025）首次引入离�
 3. **平均速度参数化是否可以推广到目标条件或多任务强化学习？** 将条件信息融入平均速度场可能实现零样本泛化，但需验证条件注入对单步生成质量的影响。
 
 4. **在更复杂的随机环境中，单步生成策略的鲁棒性边界是什么？** 单步确定性映射可能在高熵场景下丢失必要的随机性，需要研究是否可通过噪声注入或混合策略弥补。
-
-
 
 ## 原文 PDF
 

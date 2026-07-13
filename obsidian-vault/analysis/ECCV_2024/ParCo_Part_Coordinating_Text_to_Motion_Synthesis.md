@@ -51,8 +51,6 @@ claims:
 
 在方法谱系上，ParCo 属于**自回归式离散运动生成**路线，与 T2M-GPT（Zhang et al., arXiv 2023）同源，但其创新在于将单一大模型拆解为多生成器协同架构。相比于 AttT2M（Zhong et al., ICCV 2023）通过多视角注意力隐式学习部位关系，ParCo 的 Part Coordination 模块提供了显式的跨部位通信机制；相比于 Hier（Ghosh et al., ICCV 2021）的上下半身独立生成且无通信，ParCo 在部位划分粒度和协调能力上均有本质提升。
 
-
-
 ### 文本到运动生成的现状与挑战
 
 文本到运动生成旨在根据自然语言描述合成逼真的三维人体动作序列，在动画制作、虚拟现实和具身智能等领域具有重要应用。近年来，该领域取得了显著进展，涌现出多种技术范式，包括基于扩散的方法（如 **MDM** (Tevet et al., 2022)、**MotionDiffuse** (Zhang et al., 2022)、**ReMoDiffuse** (Zhang et al., 2023)）、基于自回归离散化的方法（如 **T2M-GPT** (Zhang et al., 2023)）以及基于 VAE 的方法（如 **TEMOS** (Petrovich et al., ECCV 2022)）。这些方法大多采用**单一生成器**处理全身运动，将整个人体运动编码为一个统一的表示。
@@ -68,8 +66,6 @@ claims:
 ### 本文动机：借鉴人脑分区协调原理
 
 受神经科学中人脑分区协调机制的启发——大脑将身体不同部位视为相对独立的子系统，并通过神经通信实现跨区域协调——本文提出 **ParCo**，一种**部件协调的文本到运动合成**方法。其核心思想是：**将全身运动分解为多个部位运动，并用多个轻量级生成器分别合成各部位，同时引入显式的部件协调模块实现跨部位通信**。这一设计使得每个生成器只需专注于学习特定部位的运动模式，而协调模块则确保各部位运动在全局层面保持一致，从而在较低计算量下实现高质量的细粒度运动合成。
-
-
 
 ## 核心方法与创新机理
 
@@ -131,8 +127,6 @@ ParCo 的创新并非简单的模块堆砌，三个 changed slots 之间存在�
 
 **待验证点**：论文未报告在更细粒度部位划分（如手指、面部）上的实验，Part Coordination 模块在大规模部位数量下的通信效率和效果仍需进一步验证。
 
-
-
 ParCo 采用**两阶段流水线**，将文本到运动生成分解为“部位感知离散化”与“部位协调生成”两个串行步骤，如图 3 所示。
 
 **第一阶段：部位感知运动离散化 (Part-Aware Motion Discretization)**
@@ -147,15 +141,8 @@ ParCo 采用**两阶段流水线**，将文本到运动生成分解为“部位�
 - **第二阶段输入**：文本 $t$ 与部位码序列 $K^i$；输出：生成的六组部位码序列，经解码后集成为全身运动。
 - **推理时**：文本 $t$ 直接驱动六个协调的 Transformer 自回归生成部位码序列，无需真实运动参与。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2403_18512/figures/003_Figure_3.jpg]]
 *Figure 3: Pipeline of ParCo. ParCo consists of two stages: (a) The whole-body motion is discretized into 6 part motions, and encoded into 6 quantized code index sequences by 6 VQ-VAEs (encoder and quantizer). This process provides a priori about the concept of part motions for the second stage. (b) We use the quantized index sequences and corresponding textual description to train 6 transformers for part motion generation. At the same time, these generators are coordinated by our Part Coordination module. The generated part motion codes are decoded by VQ-VAE (decoder) to reconstruct the 6 part motions, which will be integrated into the final whole-body motion*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2403_18512/figures/004_Figure_4.jpg]]
-*Figure 4: The architecture of our Part-Coordinated Transformer*
-
-
 
 ParCo 的整体架构由两个阶段级联构成：**部件感知的运动离散化**与**部件协调的 Transformer 生成**。其核心设计理念是将全身运动解耦为六个独立但相互通信的子系统，从而在低计算开销下实现细粒度、协调一致的运动合成。
 
@@ -194,13 +181,6 @@ $$x _ { c o o r d } ^ { i } = L N ( x ^ { i } + M L P ^ { i } ( y ) ), \quad y =
 ### 关键设计决策
 
 消融实验（Table 3）揭示了两个核心设计的作用链条：移除 Part Coordination 模块（即各部位完全独立生成）导致 FID 从 0.109 恶化至 0.155；将六部位离散化替换为上下身双分区且无协调时，Top-1 R-Precision 和 FID 均显著下降。这表明**细粒度部位划分**与**显式跨部位通信**是 ParCo 性能的两大支柱，二者缺一不可。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2403_18512/figures/012_Figure_8.jpg]]
-*Figure 8: ParCo’s 6-Part Division for SMPL Human Model. Fig. 9: ParCo’s 6-Part Division for MMM Human Model*
-
-
 
 ## 实验与关键发现
 
@@ -258,22 +238,6 @@ ParCo 在性能领先的同时实现了显著的计算效率优势（Table 4）�
 
 按文本长度将 HumanML3D 测试集四等分后的评估（Fig. 6）显示，ParCo 在短文本子集上的 R-Precision 优势最为明显，与真实运动的差距最小。随着文本长度增加（75-100% 分位，即长描述），所有方法的性能均有所下降，ParCo 与真实运动之间仍存在一定差距。这提示当前模型在处理超过 20 个单词的复杂长描述时，对多动作序列的时序编排和语义对应能力尚需加强。
 
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2403_18512/figures/008_Figure_6.jpg]]
-*Figure 6: (b) Performance gap relative to Real Fig. 6: Comparison on 4 HumanML3D test subsets divided based on text length. 0- 25%, 25-50%, 50-75%, and 75-100% respectively represent four subsets based on text length from short to long*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2403_18512/figures/011_Table_5.jpg]]
-*Table 5: Evaluation of real motion data on train, val, and test set of HumanML3D*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2403_18512/figures/013_Table_6.jpg]]
-*Table 6: VQ-VAE Reconstruction Performance on HumanML3D and KIT-ML test sets*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2403_18512/figures/015_Table_7.jpg]]
-*Table 7: Statistics of Text-Length-Based Splits*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 与基线方法的关系
@@ -321,8 +285,6 @@ ParCo 的设计思路为后续研究提供了若干可延伸的方向：
 - **与扩散模型的融合。** ParCo 采用自回归架构，而扩散模型（如 MDM、ReMoDiffuse）是另一主流范式。将 Part Coordination 的显式协调机制引入扩散模型的去噪过程中，可能结合两者的优势，在保持高质量生成的同时提升部位级控制能力。
 
 - **长时序协调能力的增强。** 针对极长文本描述下的性能退化问题，探索更强的时序上下文建模机制（如分层协调、记忆增强的 Transformer）来提升长运动序列的语义一致性，是一个值得深入的方向。
-
-
 
 ## 原文 PDF
 

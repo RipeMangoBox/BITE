@@ -67,8 +67,6 @@ UniMotion 以 **MDM**（扩散运动生成模型）为 backbone，将其从单�
 
 当前模型依赖 AMASS 数据集上的有限标注，对罕见动作和超长序列的泛化能力尚不明确；帧级文本通过 PCA 降维和 KNN 匹配生成，可能丢失语义细节；推理速度受限于扩散模型的多步采样。未来工作可探索将层级控制扩展到更长时序、引入更先进的文本解码方式、以及融合物理约束或多模态信号（如音乐、唇语）以拓展运动创作的可能性。
 
-
-
 ### 问题背景：三维人体运动合成的层级控制困境
 
 三维人体运动合成旨在根据自然语言描述生成逼真的人体动作序列。近年来，基于扩散模型的方法（如 **MDM**）在**序列级文本到运动**（Sequence-Level Text-to-Motion）任务上取得了显著进展——给定一句全局描述（如“一个人向前走然后转身”），模型能够生成与之匹配的完整运动序列。然而，这种粗粒度的控制方式存在根本性局限：用户无法对运动序列的**特定时间片段**施加精确的语义约束。
@@ -88,8 +86,6 @@ UniMotion 以 **MDM**（扩散运动生成模型）为 backbone，将其从单�
 上述瓶颈揭示了一个更深层的需求：**运动合成与运动理解不应当是两个独立的问题**。一个真正具备时间感知能力的运动模型，应当能够对运动序列和帧级文本的联合分布 $p(\mathbf{x}, \mathbf{y} \mid c)$ 进行建模，从而在统一的概率框架下支持从任意条件子集中进行采样——包括从文本生成运动、从运动生成文本、以及二者的联合生成。
 
 这种统一建模一旦实现，将解锁一系列现有方法无法完成的任务：层级文本到运动（同时给定全局和局部文本）、运动到帧级文本（自动为动作序列添加时间对齐的语义标注）、无条件联合生成（从噪声中同时产生运动及其描述）、以及运动编辑（修改局部文本后重新生成对应片段）。这正是 UniMotion 的核心动机——构建**首个统一的多任务概率运动模型**，通过时间对齐的多模态联合扩散，弥合运动合成与理解之间的鸿沟。
-
-
 
 ## 核心方法与创新机理
 
@@ -118,8 +114,6 @@ UniMotion 的核心创新在于将传统仅支持序列级文本条件的运动�
 ### 创新总结
 
 上述三个 changed slots 共同构成了 UniMotion 相对于 MDM 及现有帧级方法的本质突破：**通过时间对齐的多模态扩散与跨标注层级联合训练，首次使单一模型同时具备层级文本控制（序列级 + 帧级）与帧级运动理解能力**，并在统一框架下支持运动编辑、文本/运动变体生成等新任务。这一设计不仅解决了“无法同时处理全局与局部文本控制”的瓶颈，也为运动生成与理解的统一建模提供了可扩展的范式。
-
-
 
 ![[assets/figures/papers/paper_list_l2_https_coral79_github_io_uni_motion_paper_unimotion_pdf/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of UniMotion. UniMotion is a transformer-based diffusion model (Model) that can be input conditioned on a) human motion, b) clip embedded frame-level text, or c) sequence-level text (Input) or any subsets thereof or none, and instead supplied with noise. At it’s core it allows to diffuse motion and text individually, implemented via separate denoising timesteps t ^ { x } and t ^ { y } . . After training with Frame-level text Losses and Motion losses (Loss), see Sec. 4.1. UniMotion can output clean, noise-free motion, and frame-level text descriptions explaining the generated motions. (Output)*
@@ -169,8 +163,6 @@ UniMotion 联合使用 HumanML3D（仅序列级标注）和 BABEL（帧级标注
 - **无条件联合生成**：从纯噪声中同时生成运动与配套的帧级文本标注。
 - **运动编辑与变化**：利用双向条件分布，先生成文本再重新生成运动（或反之），在保持语义的前提下改变内容。
 
-
-
 ### 3.1 多模态联合扩散框架
 
 UniMotion 的核心创新在于将 MDM 的单模态运动扩散扩展为**运动-文本多模态联合扩散**。其关键操作是对运动序列 $\mathbf{x}^{1:N}$ 和帧级文本嵌入 $\mathbf{y}^{1:N}$ 分别设置独立的扩散时间步 $t^x$ 和 $t^y$，使去噪网络能够同时接收两个模态的带噪版本及其各自的时间步信息：
@@ -206,8 +198,6 @@ $$\mathbf{x}_0^{t-1}, \mathbf{y}_0^{t-1} = \epsilon_{\theta}(\sqrt{\overline{\al
 ### 3.5 多数据集联合训练
 
 UniMotion 利用 HumanML3D（序列级标注）和 BABEL（帧级标注）的重叠序列进行联合训练：HumanML3D 的序列级文本作为全局条件 $c$，BABEL 的帧级文本序列作为 $\mathbf{y}^{1:N}$。对于仅有序列级标注的样本，帧级文本分支输入纯噪声，模型仅优化运动预测损失。这一策略使模型在推理时即使仅使用帧级文本条件，也能从多数据集联合训练中获益（Table 1 中 Ours HML-BABEL f 相比 Ours BABEL f 的语义指标一致提升）。
-
-
 
 ## 实验与关键发现
 
@@ -267,16 +257,6 @@ Table 2 的消融实验直接比较了 UniMotion 与其 backbone 模型 MDM 在�
 - **Figure 4**：UniMotion 成功为 MoCap 数据和 YouTube 视频（经 3D 姿态估计提升）生成帧级文字描述，展示了其向真实世界数据泛化的潜力，但需注意姿态估计误差会传播至文本生成。
 - **Table 5**：Per-seq 真实感指标（FID_tmr++）显示 UniMotion 的生成质量在整体序列层面同样领先，表明局部帧级对齐的改善并未以牺牲全局连贯性为代价。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2_https_coral79_github_io_uni_motion_paper_unimotion_pdf/figures/012_Figure.jpg]]
-*Figure: (b)*
-
-![[assets/figures/papers/paper_list_l2_https_coral79_github_io_uni_motion_paper_unimotion_pdf/figures/016_Figure_11.jpg]]
-*Figure 11: Motion understanding comparison with MotionGPT [17]. MotionGPT is capable of performing multiple tasks, including motion captioning and question answering. We tasked both MotionGPT (left) and Unimotion (right) with understanding an input motion by breaking it down into motion segments. However, due to MotionGPT’s lack of temporal awareness, it was unable to successfully complete this task. Specifically, instead of answering with multiple motion segments, it just predicts an incorrect length for the whole sequence (A: “The motion lasts for approximately 2.5 seconds.”). In contrast, our model is the first to understand motion both semantically and temporally*
-
-
-
 ## 定位与知识库关联
 
 ### 核心瓶颈与因果机制
@@ -319,8 +299,6 @@ UniMotion 的直接技术前身是 **MDM**（基于 Transformer 的运动扩散�
 - **扩散调度优化**：运动与文本的扩散时间步分离（$t^x$ vs $t^y$）是否存在更优的调度策略？
 - **物理约束集成**：如何将该工作与基于物理的模拟器结合，使生成的运动满足物理约束？
 - **多模态扩展**：是否可以引入音乐、唇语等其他时间对齐信号，实现更丰富的多模态运动创作？
-
-
 
 ## 原文 PDF
 

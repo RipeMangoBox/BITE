@@ -49,8 +49,6 @@ claims:
 
 ZOMG 引入两项关键机制：**语言语义划分（LSP）** 利用大语言模型将自由文本分解为有序子动作单元，提供结构化语义锚点；**软掩码优化（SMO）** 在冻结预训练模型的前提下，学习实例特定的帧级软掩码，结合对比损失与结构正则化实现运动分割。该方法仅需约 0.5K 可优化参数，在 HumanML3D 数据集上达到 50.46 mAP，较最强测试时训练基线 AdaZAD 提升 +8.69 个百分点，推理速度提升 3 倍以上（23.25 samples/s）。消融实验进一步验证了 LSP、软掩码以及排他性与平滑性损失对性能的关键贡献。
 
-
-
 ### 问题背景：从全局理解到帧级定位
 
 人体运动理解在计算机视觉与图形学中扮演着核心角色，其应用涵盖人机交互、虚拟现实和运动合成等领域。近年来，运动-语言预训练模型在文本到运动检索与生成任务上取得了显著进展，但它们的能力主要停留在**全局序列级语义对齐**层面——即判断一整段运动是否与某句描述匹配。这种粗粒度的理解范式存在一个根本性局限：它无法揭示运动序列内部的**细粒度时间结构**。
@@ -82,8 +80,6 @@ ZOMG 引入两项关键机制：**语言语义划分（LSP）** 利用大语言�
 3. **结构化时间推理**：通过LLM引导的子动作分解与带约束的软掩码优化，显式建模子动作的时序顺序、段间分离与段内连续性。
 
 简言之，ZOMG的目标是让预训练模型“在测试时学会分割”——无需额外标注，无需改变模型，仅通过实例特定的轻量优化，即可将一段复合运动精确地分解为语义连贯的子动作序列。
-
-
 
 ## 核心方法与创新机理
 
@@ -117,8 +113,6 @@ $$\hat{m}_i = P(\hat{F}_i)$$
 ### 创新本质：从“训练泛化”到“测试适配”
 
 ZOMG 的深层洞察在于：**预训练的运动-语言模型已经隐式编码了帧间时间动态**，只是这些细粒度信息在序列级嵌入中被压缩丢失。通过测试时优化软掩码这一轻量级“探针”，可以在不破坏预训练表征的前提下，按需提取每个实例特有的时间分割结构。这一范式将运动基元检测从“需要密集标注的监督学习”转变为“零样本测试时推理”，在 HumanML3D 上以 **+8.69 mAP** 的显著优势超越最强 TTT 基线 **AdaZAD**（Han et al., arXiv 2025），同时推理吞吐量达到 **23.25 samples/s**，比已有 TTT 方法快 **3 倍以上**（Table 1, Table 3）。
-
-
 
 ZOMG的整体pipeline由两个阶段构成：**运动-语言预训练** 与 **测试时基元检测**。两阶段共享同一组冻结的编码器，但作用层次截然不同——预训练建立全局语义对齐，测试时训练则从该对齐空间中“萃取”细粒度的时间结构。
 
@@ -172,15 +166,8 @@ $$
 
 整个pipeline的模块关系与数据流向可参考Figure 2。值得注意的是，预训练编码器在整个测试时阶段保持冻结，仅软掩码参数参与优化——这一设计使得ZOMG在保持零样本泛化能力的同时，实现了比已有测试时训练方法快3倍以上的推理速度（23.25 samples/s，Table 3）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1827_ZOMG_Zero_Shot_Open_Vocabulary_Human_Motion_Grounding_Test_Time_Training/figures/002_Figure_2.jpg]]
 *Figure 2: Overall framework of ZOMG*
-
-![[assets/figures/papers/paper_list_l1827_ZOMG_Zero_Shot_Open_Vocabulary_Human_Motion_Grounding_Test_Time_Training/figures/001_Figure_1.jpg]]
-*Figure 1: Motion grounding illustration of ZOMG*
-
-
 
 ### 问题定义
 
@@ -265,11 +252,6 @@ $$y_t = \arg\max_i \hat{M}_{i,t}$$
 
 定性分析（Figure 4 上）显示，优化后的软掩码在局部区域激活、过渡平滑且重叠极小，验证了排他性损失和平滑性损失的有效性。T-SNE 可视化（Figure 4 下）进一步表明，子动作嵌入在语义空间中形成连续的轨迹，反映了运动序列的时间动态结构。
 
-![[assets/figures/papers/paper_list_l1827_ZOMG_Zero_Shot_Open_Vocabulary_Human_Motion_Grounding_Test_Time_Training/figures/005_Figure_4.jpg]]
-*Figure 4: Analysis of ZOMG in (Top) mask heatmap, and (Bottom) T-SNE distribution*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -323,16 +305,8 @@ Figure 6(a)展示了掩码约束性能随优化步数的变化曲线。随着优
 
 4. **真实世界泛化能力待验证。** 实验仅在HumanML3D、KIT-ML和BABEL三个受控数据集上进行，未在更复杂、更多样化的真实世界运动数据上评估，泛化边界尚不清楚。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1827_ZOMG_Zero_Shot_Open_Vocabulary_Human_Motion_Grounding_Test_Time_Training/figures/006_Table_1.jpg]]
-*Table 1: Motion grounding results on three public datasets. (TTT denotes Test-Time Training.)*
-
 ![[assets/figures/papers/paper_list_l1827_ZOMG_Zero_Shot_Open_Vocabulary_Human_Motion_Grounding_Test_Time_Training/figures/007_Table_2.jpg]]
 *Table 2: Ablation study of ZOMG on HumanML3D*
-
-![[assets/figures/papers/paper_list_l1827_ZOMG_Zero_Shot_Open_Vocabulary_Human_Motion_Grounding_Test_Time_Training/figures/008_Table_3.jpg]]
-*Table 3: Computational costs during TTT for 100 steps*
 
 ![[assets/figures/papers/paper_list_l1827_ZOMG_Zero_Shot_Open_Vocabulary_Human_Motion_Grounding_Test_Time_Training/figures/004_Figure_3.jpg]]
 *Figure 3: Motion grounding comparison in HumanML3D*
@@ -342,8 +316,6 @@ Figure 6(a)展示了掩码约束性能随优化步数的变化曲线。随着优
 
 ![[assets/figures/papers/paper_list_l1827_ZOMG_Zero_Shot_Open_Vocabulary_Human_Motion_Grounding_Test_Time_Training/figures/009_Table_4.jpg]]
 *Table 4: Text-to-motion retrieval performance comparison*
-
-
 
 ## 定位与知识库关联
 
@@ -378,8 +350,6 @@ ZOMG 的适用边界由其设计假设和实验覆盖范围共同界定：
 **跨域泛化能力**。实验仅在三个标准运动捕捉数据集上进行，这些数据的动作类型、文本描述风格和运动表示格式相对受控。ZOMG 在野外视频姿态估计输出、不同运动表示格式、或非英语文本描述上的性能，目前仍是开放问题。论文提供的代码仓库（https://github.com/pridy999/ZOMG）为后续的跨域验证提供了基础。
 
 **开放词汇的真实边界**。尽管 ZOMG 声称支持开放词汇，但其实验中的文本查询仍来自数据集的标注分布。对于完全任意的、包含罕见动词组合或抽象描述的开放文本，预训练编码器的语义覆盖范围和 LSP 的分解能力是否足够，尚缺乏压力测试。
-
-
 
 ## 原文 PDF
 

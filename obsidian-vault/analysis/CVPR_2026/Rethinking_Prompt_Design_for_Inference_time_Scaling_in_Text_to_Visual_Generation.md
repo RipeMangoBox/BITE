@@ -54,8 +54,6 @@ claims:
 
 **方法定位**：PRIS 属于**推理时提示优化**范式，与现有的视觉缩放方法（如 DAS、RBF、EvoSearch）正交，可以即插即用地集成到这些方法之上。与在生成前盲目扩展提示的标准做法不同，PRIS 利用生成过程中的诊断信号进行数据驱动的针对性修订。与基于学习的单样本修正方法（如 ReflectionFlow）相比，PRIS 无需训练，且通过跨样本共同失败模式进行修订，效果更优。
 
-
-
 文本到视觉生成（Text-to-Visual Generation）近年来取得了显著进展，但在面对包含多对象、多属性、空间关系与动作时序的复杂提示时，生成结果仍然频繁出现语义遗漏或错位。为提升生成质量，推理时缩放（Inference-time Scaling）已成为一条重要路径，其核心思想是在推理阶段增加计算资源——例如生成更多候选样本（Best-of-N，BoN）、修改采样路径（**DAS** ）、调整噪声注入（**RBF** ）或在采样空间中搜索（**EvoSearch**）——以期从更大的视觉搜索空间中选出更优结果。
 
 然而，现有推理时缩放方法存在一个被忽视的瓶颈：**提示词本身被固定不变**。当仅扩展视觉搜索而保持提示静态时，系统反复生成的样本往往共享相同的失败模式——模型对提示中某些语义元素始终无法正确实现，而单纯增加样本数或调整噪声并不能弥补提示本身的模糊或不完整性。如 Figure 1 所示，固定提示下的 BoN 在推理计算（NFEs）增加后迅速饱和，尤其在未见过的奖励模型（unseen rewards）上表现停滞，说明仅扩展视觉维度无法突破提示-视觉对齐的性能上限。
@@ -65,8 +63,6 @@ claims:
 针对上述缺口，本文提出**PRIS（Prompt Redesign for Inference-time Scaling）**，其核心动机是：**提示词本身应被视为推理时缩放的另一个关键维度**。PRIS 通过跨样本分析识别反复出现的语义元素失败模式，并自适应地修订提示词，以加强对未充分实现元素的强调，同时保留用户原始意图。这一联合缩放策略打破了仅扩展视觉搜索空间的局限，利用生成诊断信号指导后续样本朝向更高保真度。为支撑这一框架，作者还设计了**EFC（Element-level Factual Correction）**——一种细粒度文本-文本验证器，将提示分解为原子语义元素并进行逐项自然语言推理验证，为提示修订提供可解释的诊断依据。
 
 实验表明，PRIS 在 GenAI-Bench 上相较固定提示 BoN 提升 7%，在 VBench2.0 上提升 15%，且迭代提示修订在给定和未见过奖励上均持续带来增益，而固定提示则饱和。这一结果验证了“联合缩放提示与视觉”这一核心洞察的有效性。
-
-
 
 ## 核心方法与创新机理
 
@@ -122,8 +118,6 @@ PRIS 相对于固定提示推理时缩放基线，在三个关键设计槽位上
 
 PRIS 的深层设计哲学可概括为：**当模型反复失败时，与其在固定的问题空间中搜索更好的答案，不如利用失败信号修正问题本身**。这一思想的具体实现依赖于两个关键设计选择：(1) 使用跨样本共同失败而非单样本失败来驱动修订，因为共同失败更可能反映提示的系统性缺陷而非随机波动；(2) 使用文本-文本验证而非文本-视觉直接评分，因为前者更细粒度、更可解释，且避免了视觉评分中的过优化问题。Figure 10 显示，RBF 单独使用时因奖励过优化导致提示文字直接渲染在图像上，而与 PRIS 集成后显著缓解了此类伪影，进一步验证了这一设计哲学的有效性。
 
-
-
 PRIS（Prompt Redesign for Inference-time Scaling）的核心思想是：在推理时扩展视觉生成计算的过程中，**提示词本身也是一个关键的缩放维度**。仅靠增加采样数量（Best-of-N）或改变采样路径（如 DAS、RBF 等视觉缩放方法）而保持提示词固定，会在早期遭遇性能饱和——因为许多生成错误源于提示词本身的模糊或不完整，而非视觉搜索空间不足。PRIS 通过联合缩放提示与视觉，利用跨样本的生成诊断信号来指导后续生成，打破了这一瓶颈。
 
 ### 框架总览
@@ -164,8 +158,6 @@ PRIS 循环包含四个步骤，形成一个从生成诊断到提示修订再到
 
 PRIS 的提示修订策略与现有的视觉缩放方法（如 DAS、RBF、EvoSearch、SMC）是**正交且可叠加的**。在集成实验中，PRIS 不仅自身带来提升，还能有效缓解视觉缩放方法的一些固有问题——例如 RBF 单独使用时因奖励过度优化导致提示文字直接渲染在图像上的伪影，在与 PRIS 结合后得到显著缓解（Figure 10）。这进一步验证了“提示-视觉联合缩放”这一核心洞察的有效性。
 
-
-
 PRIS 框架由两个核心模块构成：**EFC（Element-level Factual Correction）验证器**和**PRIS 提示重设计循环**。EFC 提供细粒度的文本-视觉对齐诊断信号，PRIS 则利用该信号识别跨样本的反复失败模式并自适应修订提示，从而在推理时联合缩放提示与视觉。
 
 ### EFC：元素级事实校正验证器
@@ -180,9 +172,6 @@ EFC 的验证流程（Figure 2a, Figure 9）分为三步：
 1. **生成描述**：从生成的视觉内容中提取文本描述（caption）。
 2. **事实校正**：对每个原子元素 $p_i$，在文本层面与生成的描述进行自然语言推理（NLI），将其分类为 **entailment**（蕴含）、**neutral**（中性）或 **contradiction**（矛盾）。
 3. **重评估**：对于初始被标记为 neutral 的元素（因描述中未提及），EFC 进行二次判断，以区分真正的 entailment 与 contradiction，避免直接 QA 方式带来的误判。
-
-![[assets/figures/papers/paper_list_l2341_https_arxiv_org_abs_2512_03534/figures/018_Figure_9.jpg]]
-*Figure 9: Illustration of EFC. The figure illustrates how EFC provides fine-grained, interpretable verification of prompt adherence. It first decomposes the prompt into semantic elements, then generates captions from the visuals, and applies factual correction to classify each element as entailment, neutral, or contradiction. Elements initially labeled neutral (due to missing mentions in the caption) are reevaluated to decide between entailment and contradiction. This design avoids direct QA, leading to more accurate verification*
 
 EFC 基于预训练多模态大模型 Qwen2.5-VL 实现，无需额外训练。在构建的验证基准上，EFC 的准确率达到 **0.763**，显著优于最强的学习型奖励模型 VideoAlign（0.693）和分解式二值 VQA 方法（0.700），验证了文本-文本 NLI 策略在细粒度对齐判断上的优势（Table 5, Table 9）。
 
@@ -205,8 +194,6 @@ PRIS 循环（Figure 2b）包含四个步骤，在推理时利用 EFC 的诊断�
 $$M = \lfloor N / 2 \rfloor, \quad k = \lceil N / 4 \rceil$$
 
 即首先生成一半样本用于审查诊断，取其中四分之一作为最佳种子，用于生成修订提示的两个变体各 $k$ 个样本，总计仍为 $N$ 个样本。这一分配策略在匹配计算开销下确保了 PRIS 相对于固定提示 BoN 的公平比较。
-
-
 
 ## 实验与关键发现
 
@@ -241,12 +228,6 @@ Table 2 展示了 T2V 任务的结果，分为“可控性与创造性”和“�
 
 Figure 1 和 Table 3 共同揭示了 PRIS 的核心缩放特性。固定提示的 BoN 随推理计算量（NFEs）增加迅速饱和，尤其对于未见奖励几乎不再增长。而 PRIS 通过迭代提示修订持续提升分数：Table 3 显示，经过两次迭代修订，给定和未见奖励均保持上升趋势，且增益可泛化至未见奖励。Figure 5 的定性示例表明，随着计算量增加，PRIS 生成的树逐渐变高同时满足所有属性要求，而 BoN 始终遗漏部分元素。
 
-![[assets/figures/papers/paper_list_l2341_https_arxiv_org_abs_2512_03534/figures/001_Figure_1.jpg]]
-*Figure 1: Our prompt redesign scales with compute, while fixed-prompts plateau. Given a user-provided complex text prompt, scaling visuals alone with a fixed prompt at inference time often leads to early performance plateaus, especially for unseen rewards (see orange line and boxes). It also repeatedly produces outputs that exhibit common failures and cover only parts of the prompt, even as compute increases to sample more visuals. In contrast, scaling visuals alongside our redesigned prompts yields progressively improved generations and substantially higher prompt-adherence scores as compute increases for both given and unseen rewards (see blue line and boxes)*
-
-![[assets/figures/papers/paper_list_l2341_https_arxiv_org_abs_2512_03534/figures/008_Table_3.jpg]]
-*Table 3: Quantitative results for iterative prompt refinement with increasing inference-time compute. Iteratively revision prompts consistently improves reward scores by addressing common failures, and the gains even generalize to unseen rewards. In contrast, fixed prompts often saturate and fail to transfer*
-
 ![[assets/figures/papers/paper_list_l2341_https_arxiv_org_abs_2512_03534/figures/007_Figure_5.jpg]]
 *Figure 5: Qualitative examples with increasing inference-time compute. PRIS generates progressively taller trees while satisfying all attributes, whereas BoN consistently misses some*
 
@@ -261,15 +242,9 @@ Table 6 对比了三种修订策略：“共同失败”（Common-failure）基�
 
 #### 验证器准确性（Table 5, Table 9）
 
-![[assets/figures/papers/paper_list_l2341_https_arxiv_org_abs_2512_03534/figures/009_Table_5.jpg]]
-*Table 5: Quantitative results on verifier accuracy in selecting GT visual outputs. Bold indicates the best results*
-
 EFC 在作者构建的验证基准上达到 **0.763** 的准确率，显著超越最强学习型奖励模型 VideoAlign（0.693）和分解式二值 VQA（0.700）。Table 9 进一步展示了 EFC 在不同提示类别上的逐类准确性，表明文本-文本验证策略在细粒度对齐判断上具有稳定优势。
 
 #### 计算开销匹配（Table 7）
-
-![[assets/figures/papers/paper_list_l2341_https_arxiv_org_abs_2512_03534/figures/012_Table_7.jpg]]
-*Table 7: Quantitative evaluation with matched compute*
 
 在匹配计算开销的条件下，PRIS 在 T2I 和 T2V 上均优于 BoN，排除了“增益仅来自更多计算”的替代解释。
 
@@ -277,14 +252,9 @@ EFC 在作者构建的验证基准上达到 **0.763** 的准确率，显著超�
 
 PRIS 作为提示维度的缩放方法，可与现有视觉缩放方法正交集成。Table 4 显示，将 PRIS 与 DAS、RBF、EvoSearch 等噪声/采样空间缩放方法结合，在 GenAI-Bench 上均取得进一步提升。值得注意的是，RBF 单独使用时易因奖励过优化导致提示文字直接渲染在图像上的伪影，而集成 PRIS 后显著缓解了此问题（Figure 10）。EvoSearch 在 T2V 任务上单独使用时无法泛化至未见奖励，集成 PRIS 后性能得到改善（Table 8）。
 
-![[assets/figures/papers/paper_list_l2341_https_arxiv_org_abs_2512_03534/figures/011_Table_4.jpg]]
-*Table 4: Quantitative results of integrating PRIS with T2I visual scaling methods on GenAI-Bench. BoN refers to “Best-of-N” selection using fixed prompts. Bold shows the best*
-
 ### 失败模式与局限性
 
 尽管 PRIS 在多数指标上表现优异，论文也报告了若干边界情况。奖励模型可能对特定数值过度拟合，导致热力学类别性能略有下降。EFC 的单次验证时间约为图像生成的 3 倍、视频生成的 1 倍，未进行任务特定微调以降低延迟。此外，PRIS 的有效性依赖于基础生成模型具备一定程度的提示遵循能力——对于几乎无法执行指令的模型，提示修订无法发挥作用。提示修订的跨模型可迁移性目前仅在单模型上初步验证（Figure 15），系统性的多模型泛化评估仍为开放问题。
-
-
 
 ## 定位与知识库关联
 
@@ -323,8 +293,6 @@ PRIS 的有效性建立在以下前提之上：
 **训练型扩展的可能性**：论文提出的一个关键开放问题是：是否可以通过在原始简短提示与基于失败的修订提示对上微调 LLM，来降低验证开销并实现离线高质量提示生成？这将使 PRIS 从推理时方法演进为训练型方法。
 
 **跨模态推广**：共同失败识别与针对性提示修订的思想是否能推广到其他模态和任务（如文本到音频、文本到代码），挑战现有的推理时缩放定律，是一个值得探索的方向。
-
-
 
 ## 原文 PDF
 

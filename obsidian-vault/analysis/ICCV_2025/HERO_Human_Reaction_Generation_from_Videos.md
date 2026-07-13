@@ -131,8 +131,6 @@ $$\mathcal{L}_{mask} = \mathbb{E}_{\mathbf{m}\in\mathcal{D}}\left[\sum_{\forall 
 
 **输入输出流**：训练阶段，视频和真实反应运动同时输入 HERO，视频编码器与生成模块联合优化（视频编码器参数冻结）；推理阶段仅提供 RGB 视频，模型端到端输出 3D 人体反应运动序列。这一设计使 HERO 能够处理包含人脸表情和情绪信息的自然视频，突破了现有方法依赖结构化骨架序列的限制。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1888_HERO_Human_Reaction_Generation_from_Videos/figures/002_Figure_2.jpg]]
 *Figure 2: The pipeline of HERO. During training, the video and GT reactive motion are input into HERO. As for inference, only the video is provided. Note that we omit the residual motion refinement (See the end of Sec. 3.3) from the figure for clarity*
 

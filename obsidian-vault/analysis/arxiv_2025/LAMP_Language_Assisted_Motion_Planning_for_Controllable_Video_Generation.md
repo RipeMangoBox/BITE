@@ -118,8 +118,6 @@ LAMP 将运动控制重构为一个**语言到程序的合成问题**，其核�
 
 框架目前仅支持**单个物体和单台摄像机**的运动规划；LLM 生成的 DSL 程序偶有语法或语义错误（整体失败率约 0.11%）；视频生成器对控制信号的依从性有时不足，导致最终视频中的运动与预期存在偏差。多物体交互轨迹生成和端到端一体化留作未来工作。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l97_https_arxiv_org_abs_2512_03619/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of LAMP. A learned LLM acts as a motion planner, generating symbolic motion programs in a DSL format from textual descriptions of object and camera motion. These programs are deterministically converted into 3D trajectories, which are used to condition a pretrained video generator*
 
@@ -164,11 +162,6 @@ LAMP 包含四个关键模块，按数据流顺序为：
 
 **物体-摄像机联合规划**是另一个关键创新。传统方法通常仅规划摄像机轨迹，物体为静态或隐式建模。LAMP 在共享 3D 空间中统一规划两者，使得摄像机可以围绕运动物体进行“轨道跟踪”（orbit_track）、“尾部跟踪”（tail_track）等电影摄影行为，从而生成物理一致且语义连贯的摄像机-物体交互（Section 3.1, 3.5）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l97_https_arxiv_org_abs_2512_03619/figures/004_Figure_4.jpg]]
-*Figure 4: LAMP allows iterative control over synthesized motion trajectories via simple textual instructions. We visualize the 3D trajectories converted from the LLM predicted motion programs*
-
 ## 实验与关键发现
 
 ### 评估设置与基准
@@ -205,12 +198,6 @@ LAMP在三个互补的基准上接受评估：**DataDoP**（真实视频的摄�
 
 在DataDoP上使用DSL转换后的真实数据进行微调，仅带来轻微提升（Revised F1从0.763到0.776，Table 5）。这表明预训练模型已具备很强的泛化能力，真实数据的噪声和标注不精确性反而可能引入干扰。DSL转换本身对真实轨迹的平滑作用（Figure 9）在一定程度上弥合了合成-真实域差距，使得额外训练收益有限。
 
-![[assets/figures/papers/paper_list_l97_https_arxiv_org_abs_2512_03619/figures/016_Table_5.jpg]]
-*Table 5: Camera trajectory evaluation on the DataDoP dataset. LAMP achieves performance comparable to DataDoP-trained baselines despite no dataset-specific training*
-
-![[assets/figures/papers/paper_list_l97_https_arxiv_org_abs_2512_03619/figures/013_Figure_9.jpg]]
-*Figure 9: Using real data for training. Samples from real datasets (e.g., DataDoP) are converted to our DSL format via motion tagging and optionally re-captioned. The DSL conversion smooths the noisy trajectories extracted from real videos and improves alignment between textual descriptions and motion*
-
 ### 用户研究：端到端感知质量验证
 
 用户研究（Figure 6）从感知层面验证了定量指标的生态效度。参与者在摄像机依从性、物体依从性和整体视频质量三个维度上一致偏好LAMP：**52%的参与者认为LAMP生成的整体视频质量更好**，而认为两者相当的仅25%。这一27%的偏好差距表明，DSL驱动的运动规划不仅在轨迹精度上占优，其生成的视频在视觉连贯性和意图对齐度上也更符合人类预期。
@@ -227,14 +214,6 @@ DSL框架的通用性在Figure 11中得到验证：LAMP的运动规划输出可�
 ### 局限与待验证边界
 
 当前框架仅支持单个物体和摄像机的运动规划，多物体交互轨迹生成留作未来工作。DSL虽然具有表现力，但可能无法覆盖所有复杂的电影摄影技巧（如非线性、超长镜头中的复杂互动）。在模糊或未充分指定的自然语言输入下，LLM的鲁棒性仍需进一步增强——这需要更大规模、更多样化的程序化训练数据覆盖边缘情况。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l97_https_arxiv_org_abs_2512_03619/figures/008_Figure_5.jpg]]
-*Figure 5: Qualitative results of LAMP. For each example, we show user-provided text prompts describing object + camera motion, corresponding DSL-based motion programs synthesized by our LLM, the resulting 3D object and camera trajectories, and generated video frames. For the first example, we also show the control video given to VACE as an inset. These showcase that LAMP produces coherent and physically consistent camera–object interactions across diverse scenarios. See supplemental webpage for videos and comparisons*
-
-![[assets/figures/papers/paper_list_l97_https_arxiv_org_abs_2512_03619/figures/017_Figure_11.jpg]]
-*Figure 11: DSL w/ CameraCtrl, EPiC, and ReCamMaster. DSL applied to multiple off-the-shelf models (T2V, I2V, V2V, respectively)*
 
 ## 定位与知识库关联
 

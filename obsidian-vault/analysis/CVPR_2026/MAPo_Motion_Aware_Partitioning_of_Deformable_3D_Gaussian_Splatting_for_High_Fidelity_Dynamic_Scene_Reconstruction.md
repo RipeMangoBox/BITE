@@ -49,8 +49,6 @@ claims:
 
 在N3DV和Meet Room数据集上的实验表明，MAPo在PSNR、SSIM和LPIPS指标上均取得SOTA渲染质量，尤其在复杂或快速运动区域细节保留显著优于现有方法（Figure 1）。渐进式消融验证了动态分数分区、静态识别和跨帧一致性损失各组件的有效性，其中静态分区在几乎不损失质量的前提下将存储从67MB降至48MB、训练时间从1h42m缩短至1h12m。
 
-
-
 ### 动态场景新视角合成：从静态到时空建模
 
 新视角合成（Novel View Synthesis）的目标是从一组稀疏的输入视图重建场景并渲染出任意视角的逼真图像。近年来，以3D Gaussian Splatting（3DGS）为代表的显式辐射场方法凭借其高保真渲染质量和实时推理速度，在静态场景重建中取得了显著成功。然而，将3DGS扩展到动态场景面临根本性挑战：场景中的物体和区域随时间发生复杂运动，要求模型不仅捕捉空间结构，还需精确建模时空演变。
@@ -66,8 +64,6 @@ claims:
 MAPo的核心动机源于一个关键观察：动态场景中不同区域的运动强度存在天然差异，且同一区域在不同时间段的运动模式也可能截然不同。用一个统一的变形网络去拟合所有时空变化，本质上是一种欠拟合——网络容量被低动态区域的简单运动所稀释，而高动态区域的精细运动则被平均化。
 
 因此，MAPo提出**运动感知分区**策略：通过量化每颗3D高斯的历史运动强度，自适应识别高动态高斯，并沿时间轴将其递归分割为子段，为每个子段分配专属的变形子网络。这种设计使不同时间段能够学习专门化的运动表示，从根本上打破统一模型的表示瓶颈。同时，低动态高斯被识别为静态，跳过变形网络计算以提升效率。此外，引入跨帧一致性损失消除时间分区边界处的视觉跳跃，确保渲染序列的平滑过渡。
-
-
 
 ## 核心方法与创新机理
 
@@ -107,8 +103,6 @@ MAPo设计了**跨帧一致性损失** $L_{\text{cross}}$，包含两个互补�
 
 MAPo的三个changed slots形成了完整的创新链条：**动态分数**提供了量化运动强度的可计算指标，**递归时间分区**基于该指标实现了时空建模的专业化，**跨帧一致性损失**则消除了专业化带来的边界副作用。三者协同，使得MAPo在N3DV和Meet Room数据集上均取得SOTA渲染质量，尤其在高度动态区域展现出显著优于现有方法的细节保留能力。
 
-
-
 MAPo 的整体 pipeline 围绕一个核心矛盾展开：**单一统一变形模型在高度动态区域会产生时间平均效应，导致模糊渲染**。为解决这一问题，MAPo 引入了一套基于“动态分数”的自适应时空分区机制，将不同运动强度的 3D 高斯分配到不同粒度的时空表示中，实现专业化建模。
 
 ### 核心流程
@@ -137,12 +131,8 @@ MAPo 的输入为多视角视频帧序列，输出为对应视角的渲染图像
 
 各模块间的因果关系清晰：动态分数是分区决策的**唯一量化依据**；时间分区通过复制变形网络，为不同时间段提供了**独立的建模容量**；静态分区则通过冻结低动态高斯，在**不损害渲染质量的前提下**大幅压缩了计算和存储开销；跨帧一致性损失作为分区策略的**必要补充**，消除了分区带来的副作用，使得自适应分区策略在提升细节的同时保证了时序平滑性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2508_19786/figures/003_Figure_3.jpg]]
 *Figure 3: An overview of MAPo. (a) 3DGs’ deformation process. (b) Compute the dynamic score of 3DGs from history positions during training. (c) High-dynamic 3DGs are recursively temporally partitioned, and low-dynamic ones are deformed and treated as static. (d) Dynamic and static 3DGs are combined for rendering. Losses are computed on the left*
-
-
 
 ### 动态分数计算
 
@@ -198,16 +188,6 @@ $$L_{\text{cross}} = 0.5 \cdot L_{\text{current}} + L_{\text{gt}}$$
 
 该损失仅在训练视图中帧索引距离任意分区边界 5 帧以内的视图上施加，以集中消除边界处的不连续性。消融实验（Table 3）表明，逐步添加 $L_{\text{current}}$ 和 $L_{\text{gt}}$ 后，分区边界处的时序光流误差 tOF 明显下降，最终低于基线，且连续帧过渡最平滑（Figure 9）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2508_19786/figures/004_Figure_4.jpg]]
-*Figure 4: Effectiveness of temporal partitioning strategy and consistency loss on a toy example. (a) A 3D curve p(t) simulates a dynamic trajectory. (b) A single point and a single MLP to fit*
-
-![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2508_19786/figures/002_Figure_2.jpg]]
-*Figure 2: Rendering results of a single unified model. (a) shows the temporally averaged representation, which is visualized by directly rendering the canonical 3DGs. The regions highlighted in blue in (b) and (c) are visually close to this average. The region highlighted in red in (c) is visually distant from this average*
-
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈的实证验证
@@ -251,10 +231,6 @@ Table 3在Meet Room数据集上通过渐进添加各组件，系统验证了每�
 
 Table 4在*flame salmon frag3*上研究了最大分区级别的影响。当级别从0增至5时，PSNR逐渐提升，但**在级别3之后质量增益递减**，而存储和训练时间几乎线性增加。因此主实验选用级别3作为质量与开销的最佳平衡点。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2508_19786/figures/006_Table.jpg]]
-
 ![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2508_19786/figures/008_Table_2.jpg]]
 *Table 2: Quantitative comparison on the Meet Room dataset. Storage, training time, and FPS are calculated on discussion*
 
@@ -264,22 +240,11 @@ Table 4在*flame salmon frag3*上研究了最大分区级别的影响。当级�
 ![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2508_19786/figures/012_Table_4.jpg]]
 *Table 4: Ablation study on the partition level parameter. All experiments are conducted on the flame salmon frag3*
 
-![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2508_19786/figures/009_Figure_6.jpg]]
-*Figure 6: Observation of dynamic partition on Vrheadset*
-
-![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2508_19786/figures/010_Figure_7.jpg]]
-*Figure 7: Observation of static partition on Salmon*
-
-![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2508_19786/figures/013_Figure_8.jpg]]
-*Figure 8: Observation of*
-
 ![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2508_19786/figures/014_Figure_9.jpg]]
 *Figure 9: Ablation study on the*
 
 ![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2508_19786/figures/001_Figure.jpg]]
 *Figure: (d) Ground Truth ure 1: Overview. (a-b) Existing deformation-based methods often result in blurriness in areas with intense motion, and evFigure 1. Overview. (a-b) Deformation-based methods often blur details in regions with complex or rapid motion. (c) Our MAPo hancing the capabilities of the deformation fields does not leadsignificantly improves rendering quality in these areas. (d) Ground Truth*
-
-
 
 ## 定位与知识库关联
 
@@ -339,8 +304,6 @@ $$S_i = \frac{2}{\frac{1}{\tilde{r}_i + \varepsilon} + \frac{1}{\tilde{v}_i + \v
 4. **长序列的可扩展性**：递归分区树的深度随序列长度增长，当前实验在 N3DV（约 50-90 帧）和 Meet Room 上进行。对于分钟级或更长序列，分区树的管理、存储和训练效率需要进一步研究。
 
 5. **多对象场景的语义分区**：当前动态分数是逐高斯的底层运动指标，未涉及语义信息。在包含多个独立运动对象的场景中，是否可结合语义或实例分割进行更结构化的分区，可能进一步提升专业化建模的效果。
-
-
 
 ## 原文 PDF
 

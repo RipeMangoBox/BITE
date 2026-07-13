@@ -183,8 +183,6 @@ ReDi的设计逻辑与表示对齐方法**REPA**（Yu et al., 2025）形成互�
 - **PCA降维至8维**：实验表明PCA分量数为8时获得最佳生成质量，增大分量数反而导致性能下降。这一反直觉现象是本文的开放问题之一，可能与高维语义特征对生成任务的干扰有关。
 - **仅对VAE潜变量应用CFG**：消融实验显示，仅对图像潜变量施加无分类器引导（FID 2.39）优于同时对两种模态施加CFG（FID 2.86），表明语义特征的条件引导更适合通过表示引导机制实现，而非简单的联合CFG。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2504_16064/figures/001_Figure_1.jpg]]
 *Figure 1: ReDi: Our generative image modeling framework bridges the gap between generative modeling and representation learning by leveraging a diffusion model that jointly captures low-level image details (via VAE latents) and high-level semantic features (via DINOv2). Trained to generate coherent image–feature pairs from pure noise, this unified latent-semantic dual-space diffusion approach significantly boosts both generative quality and training convergence speed*
 
@@ -238,14 +236,6 @@ $$\hat{\epsilon}_{\theta}(\mathbf{x}_t, \mathbf{z}_t, t) = \epsilon_{\theta}(\ma
 
 其中 $w_r$ 为引导强度。当 $w_r = 0$ 时退化为无条件生成；$w_r = 1$ 时等价于标准条件生成；$w_r > 1$ 时增强语义条件的影响。实验表明，$w_r = 1.1$ 时 DiT-XL/2 的 FID 从 8.7 降至 5.9，验证了表示引导的有效性。值得注意的是，表示引导在无条件生成场景中尤为关键：DiT-XL/2 的无条件 FID 从 43.5 降至 22.6，降幅达 20.9。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2504_16064/figures/002_Figure_2.jpg]]
-*Figure 2: Accelerated Training. Generative performance curves on Imagenet 2 5 6 $\times$ 2 5 6 without Classifier-Free Guidance. Left: Our ReDi accelerates convergence of DiT-XL/2 and SiT-XL/2 by approximately ×23. Right: ReDi converges ×6 faster than REPA. When applied on top of REPA delivers a ×11 speed-up*
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2504_16064/figures/010_Figure_6.jpg]]
-*Figure 6: VAE-only vs. VAE & DINOv2 CFG. FID scores for SiT-XL with ReDi (trained for 400K steps) as a function of Classifier-Free Guidance weight w, comparing two configurations: (1) applying CFG only to VAE latents (VAE-only CFG) versus (2) applying CFG to both VAE and DINOv2 representations (VAE & DINOv2 CFG). # Principal Components Figure 7: Effect of number of principal components. FID of DiT-B/2 w/ ReDi with different number of DINOv2 Principal Components. The vanilla DiT-B/2 is illustrated with gray. No Classifier-Free Guidance is used*
-
 ## 实验与关键发现
 
 ### 核心结果：无分类器引导下的性能与收敛加速
@@ -289,22 +279,11 @@ ReDi在无条件生成任务上同样表现突出。**Table 3** 显示，DiT-XL/
 2. **PCA降维的天花板**：PCA分量数超过8后性能下降的深层原因尚未完全阐明，更复杂的压缩技术（如可训练自编码器）可能突破这一瓶颈。
 3. **滥用风险**：生成模型性能的显著提升可能被滥用于虚假信息传播，需关注负向社会影响。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2504_16064/figures/005_Table_1.jpg]]
 *Table 1: FID Comparisons. FID scores on ImageNet 256×256 without Classifier-Free Guidance for DiT and SiT models of various sizes with REPA and ReDi (ours)*
 
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2504_16064/figures/011_Table_6.jpg]]
 *Table 6: Performance of Modality Combination Strategies. FID scores on ImageNet 256 × 256 without CFG for DiT-B/2 with ReDi using Separate Tokens (SP) and Merged Tokens (MR). See Appendix B for details on throughput measurements*
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2504_16064/figures/012_Table_7.jpg]]
-*Table 7: Model configuration details. The configurations are the same for both DiT and SiT models*
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2504_16064/figures/013_Table_8.jpg]]
-*Table 8: Optimization details. The optimization hyperparameters for both DiT and SiT models*
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2504_16064/figures/014_Table_9.jpg]]
-*Table 9: Detailed evaluation for SiT-XL/2 w/ ReDi. All results are reported without classifier-free guidance*
 
 ## 定位与知识库关联
 

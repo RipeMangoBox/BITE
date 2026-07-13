@@ -52,8 +52,6 @@ PICO-fit采用三阶段优化策略：首先利用接触约束求解物体位姿
 
 尽管PICO在泛化性和精度上取得了突破，其性能仍受限于接触预测（DECO）的偏差和物体检索的准确性，尤其是在脚部接触误报和严重遮挡场景下存在失败风险。
 
-
-
 从单张自然图像中重建人与物体交互的三维场景（3D HOI）是计算机视觉中的核心挑战。其关键难点在于，真实世界中人与物体的接触关系极其复杂：同一类物体（如椅子）可以以数十种不同方式被人体接触，而不同类物体（如行李箱与滑板）又可能共享相似的接触模式。这使得传统的类别级先验难以覆盖开放场景中的交互多样性。
 
 现有方法在这一瓶颈上存在两类根本性缺口。**基于优化的方法**（如 **PHOSA**）依赖手工设计的类别级接触约束，无法处理训练中未见过的物体类别，且缺乏精确的顶点级接触对应，导致重建结果在接触区域出现穿透或悬空。**基于回归的方法**（如 **HDM** 在合成数据集 ProciGen 上训练，**CONTHO** 在 BEHAVE 数据集上训练）虽然速度较快，但其泛化能力被训练数据的物体类别和交互模式所限制，难以迁移到野外自然图像中的任意物体。
@@ -61,8 +59,6 @@ PICO-fit采用三阶段优化策略：首先利用接触约束求解物体位姿
 上述缺口的本质原因在于：**现有数据集中缺乏对“身体-物体”双向密集三维接触对应的标注**。DAMON 数据集仅标注了人体侧的接触区域，却缺少物体侧的对应点；而其他 HOI 数据集或仅有类别级交互标签，或局限于受控实验室环境。这使得现有方法无法显式地建立身体顶点与物体表面点之间的一一对应关系，从而丧失了求解物体位姿与细化人体姿态的最强约束信号。
 
 本文的动机正是填补这一空白。核心思路是：如果能以低成本获取身体与物体间的密集接触对应，并将其作为强约束引入三维拟合过程，就有可能在无需训练的情况下，从单张图像中泛化到全新的物体类别与交互方式。为此，本文提出 **PICO** 框架，包含两个关键组件：（1）**PICO-db**——一个通过 PCA 轴参数化与两次点击标注构建的双向接触对应数据集；（2）**PICO-fit**——一个三阶段优化方法，利用从 PICO-db 检索到的接触对应，迭代求解物体位姿并细化人体姿态。
-
-
 
 ## 核心方法与创新机理
 
@@ -98,8 +94,6 @@ PHOSA 仅惩罚浅表穿透，无法处理严重的人-物交叉。PICO-fit 采�
 
 **方法定位**：PICO-fit 属于基于优化的 render-and-compare 范式，与回归方法（HDM、CONTHO）形成互补。其核心优势在于**零样本泛化能力**——无需在特定 HOI 数据集上训练，即可通过 PICO-db 检索适配全新的物体类别与交互模式。在 InterCap 基准上，PICO-fit* 的 PA-CD_{h+o} 达到 8.36 cm，显著优于 PHOSA*（13.28 cm）和 CONTHO*（12.81 cm）；在 DAMON 野外图像的感知研究中，74.4% 的比较中 PICO-fit* 被评选为更真实的重建（Table 1）。
 
-
-
 PICO-fit 是一个基于优化的三阶段人-物交互（HOI）三维重建框架，其核心目标是从单张自然图像中恢复彼此真实配准的3D人体网格与物体网格。整个pipeline的输入为一张RGB图像，输出为SMPL-X参数化人体网格与检索得到的物体网格在三维空间中的联合配准结果，以及两者之间的密集接触对应关系。
 
 框架遵循“初始化—接触驱动物体位姿求解—图像对齐与穿透抑制—人体姿态细化”的四步信息流，如图4所示。
@@ -134,12 +128,8 @@ $$L_3 = \lambda_c \mathcal{L}_c + \lambda_p \mathcal{L}_p + \lambda_h^m \mathcal
 
 **模块间的因果依赖关系** 清晰且可验证：Stage 1的接触驱动物体位姿求解是整个pipeline的瓶颈——消融实验表明，去除Stage 1后PA-CD_h+o从8.36升至12.9（Table S.1）；Stage 2的掩膜对齐与穿透抑制将误差进一步降至8.40；Stage 3的人体姿态细化带来最终的8.36（Table 2）。接触损失 $\mathcal{L}_c$ 是最关键的约束信号，移除后性能崩溃至26.63（Table S.1），证实了PICO-db密集接触对应在整个框架中的核心驱动作用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1745_PICO_Reconstructing_3D_People_In_Contact_with_Objects/figures/004_Figure_4.jpg]]
 *Figure 4: Overview of PICO-fit, a novel method for fitting interacting 3D body and object meshes to an image. It initializes (Sec. 4.1) 3D body shape and pose via OSX [50], 3D object shape via OpenShape [53], and body-object contacts via retrieval from PICO-db (Sec. 3). Then, it takes three steps: (1) It exploits contacts to solve for object pose, to register the object to the body (Sec. 4.2). (2) It refines object pose (Sec. 4.3) and (3) body pose (Sec. 4.4) to align these to an object and human mask, respectively, detected in the image while satisfying contacts and avoiding penetrations. For every stage we show inputs, outputs, losses, and optimizable variables. ü Zoom in to see details*
-
-
 
 PICO-fit 采用“初始化—三阶段优化”的流水线架构，其核心设计在于将 PICO-db 中检索到的密集双向接触对应作为显式几何约束，驱动物体位姿求解与人体姿态细化。以下按模块拆解其关键公式与变量含义。
 
@@ -199,13 +189,6 @@ $$\mathcal{L}_{\theta_c} = \|\theta - \theta^*\|_2$$
 
 三阶段的递进关系体现了从粗到精的优化策略：Stage 1 仅依赖接触约束求解物体位姿，避免图像噪声干扰；Stage 2 引入掩膜与穿透约束，将物体与像素证据对齐；Stage 3 在物体固定的前提下微调人体姿态，同时保持接触一致性。消融实验（Table 2 与 Table S.1）验证了这一设计的必要性：移除 Stage 1 导致 PA-CD$_{h+o}$ 从 8.36 升至 12.9 cm；移除 $\mathcal{L}_c$ 则使误差飙升至 26.63 cm，证实接触损失是整个流水线的核心驱动因素。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1745_PICO_Reconstructing_3D_People_In_Contact_with_Objects/figures/003_Figure_3.jpg]]
-*Figure 3: Example contact patches with their contact axis*
-
-
-
 ## 实验与关键发现
 
 ### 核心实验结果
@@ -252,28 +235,11 @@ PICO-fit 的主要失败模式可归纳为三类：
 ![[assets/figures/papers/paper_list_l1745_PICO_Reconstructing_3D_People_In_Contact_with_Objects/figures/008_Figure_6.jpg]]
 *Figure 6: Qualitative evaluation of CONTHO∗, HDM and PHOSA∗ alongside PICO-fit∗ on object categories handled by all baselines. From left to right: input image, pseudo-GT contact annotations in PICO-db, and 3D reconstructions (a side and top-down view per method). Reconstructions from PICO-fit∗ have better 3D human-object contact and spatial alignment. For more comparisons, see Sup. Mat*
 
-![[assets/figures/papers/paper_list_l1745_PICO_Reconstructing_3D_People_In_Contact_with_Objects/figures/009_Figure_7.jpg]]
-*Figure 7: HOI reconstructions from PICO-fit∗ on new, previously untackled object categories. Each row (left to right) shows, for three input RGB images, PICO-fit∗’s estimated meshes overlaid on the image (camera view) and a side view. For more results, see Sup. Mat*
-
-### 补充图表
-
-
 ![[assets/figures/papers/paper_list_l1745_PICO_Reconstructing_3D_People_In_Contact_with_Objects/figures/017_Figure.jpg]]
 *Figure: RGB Image Stage 1 Stage 2 Stage 3 Figure S.8. Ablation study for PICO-fit’s stages*
 
-![[assets/figures/papers/paper_list_l1745_PICO_Reconstructing_3D_People_In_Contact_with_Objects/figures/019_Figure.jpg]]
-*Figure: Reconstruction Figure S.9. Example interactions where PICO-fit lookups on PICO-db fail. Each row from left to right: input image, predicted body contact from DECO + GPT-4V, looked-up contact from PICO-db and 3D reconstructions overlaid on the images. Rows 1-3: incorrect human contact prediction. Rows 4-5: incorrect object contact retrieval*
-
-![[assets/figures/papers/paper_list_l1745_PICO_Reconstructing_3D_People_In_Contact_with_Objects/figures/020_Figure.jpg]]
-*Figure: S.10. Failure cases of PICO-fit. Each row (from left to right) shows two input images and corresponding PICO-fit reconstructions overlaid on the image. Top row: incorrect human pose initialization. Bottom row: incorrect object retrieval*
-
 ![[assets/figures/papers/paper_list_l1745_PICO_Reconstructing_3D_People_In_Contact_with_Objects/figures/007_Figure_5.jpg]]
 *Figure 5: Qualitative comparison of PICO-fit vs PHOSA on internet images used for evaluation in the PHOSA paper [97]*
-
-![[assets/figures/papers/paper_list_l1745_PICO_Reconstructing_3D_People_In_Contact_with_Objects/figures/002_Figure_2.jpg]]
-*Figure 2: PICO-db dataset annotations. Left to right: Color image. Contacts (shown in various colors) annotated on the body and object. Contact annotations establish bijective body-object correspondences, denoted with color-coding*
-
-
 
 ## 定位与知识库关联
 
@@ -328,8 +294,6 @@ PICO-fit的适用边界由其技术架构的内在约束决定：
 4. **优化效率的提升**：三阶段优化的计算开销限制了PICO-fit的实时应用。探索隐式神经表示或可微渲染加速技术，可能在不牺牲精度的前提下大幅缩短优化时间。
 
 5. **扩展到动态场景**：PICO-db的标注流程和PICO-fit的优化框架目前限于单张图像。将其扩展到视频序列和多人体交互场景，需要解决时序一致性和多人接触分配等新挑战。
-
-
 
 ## 原文 PDF
 

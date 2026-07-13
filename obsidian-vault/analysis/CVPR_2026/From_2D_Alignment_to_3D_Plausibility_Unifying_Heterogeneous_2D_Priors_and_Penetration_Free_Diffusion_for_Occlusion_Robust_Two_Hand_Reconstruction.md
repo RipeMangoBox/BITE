@@ -57,8 +57,6 @@ claims:
 
 **局限性**：极端运动模糊会导致2D参考信息不可靠，影响重建质量。未来工作可探索时序融合以缓解该问题。
 
-
-
 ### 问题背景
 
 从单目图像中恢复交互双手的3D姿态与形状，是计算机视觉中一个基础而困难的问题。与单手重建相比，双手交互场景引入了两个核心挑战：**严重遮挡**和**物理穿透**。当一只手被另一只手或物体遮挡时，2D图像中的可见信息急剧减少，导致2D-3D对应关系高度模糊，重建结果容易出现空间错位和姿态失真。同时，独立预测两只手往往会产生相互穿透的网格，破坏物理合理性，使得重建结果无法直接用于下游应用。
@@ -81,8 +79,6 @@ claims:
 
 这种“训练时蒸馏异构先验、推理时扩散去穿透”的两阶段设计，使得模型能够在无额外推理开销的条件下，同时实现遮挡鲁棒的精确对齐和物理合理的双手交互。
 
-
-
 ## 核心方法与创新机理
 
 A2P 的核心创新在于将遮挡鲁棒的双手重建解耦为**2D结构对齐**与**3D空间交互对齐**两个互补阶段，并通过三个关键的 changed slots 实现性能跃升。
@@ -103,8 +99,6 @@ A2P 的核心创新在于将遮挡鲁棒的双手重建解耦为**2D结构对齐
 
 为平衡精度与效率，扩散模型仅在双手 IoU > 0（即存在穿透）时激活，避免了对大多数正常帧的冗余计算。这一条件触发机制使扩散精修的计算代价仅在必要时产生，配合 FAE 的推理轻量化设计，整体方法在参数量与推理时间上保持了实用竞争力。
 
-
-
 A2P 将单目遮挡鲁棒的双手重建解耦为两个互补的对齐阶段：**2D 结构对齐**与**3D 空间交互对齐**。这一解耦设计的核心动机在于：遮挡导致 2D-3D 对应模糊，而双手穿透则造成交互不协调与空间错位。通过分别处理这两类问题，A2P 在训练时蒸馏异构 2D 先验知识，在推理时以扩散模型实现免穿透生成。
 
 整体流程如 Figure 2 所示，包含以下关键模块：
@@ -123,8 +117,6 @@ A2P 将单目遮挡鲁棒的双手重建解耦为两个互补的对齐阶段：*
 5. **双手免穿透扩散模型（Two-Hand Penetration-Free Diffusion Model）**：构成 Stage 2 的交互精修环节。推理时，仅当双手 IoU > 0（即存在穿透）时才激活该模块。扩散模型以穿透双手 $\mathbf{X}_c$ 为条件，通过 DDIM 采样逐步去噪，并在每一步去噪中引入碰撞梯度引导：以基于 GMoF 的鲁棒碰撞损失 $\mathcal{L}_{collision}$ 计算负梯度，按 $\hat{\mathbf{X}_0} = \hat{\mathbf{X}_0} - \lambda (\delta_i \mathcal{L}_{collision})$ 更新预测的干净双手参数，从而将穿透姿态映射为物理合理的无碰撞配置。
 
 **数据流与触发逻辑**：训练时，黄色路径（FAE 蒸馏基础模型）始终激活；推理时，紫色路径（FAE 直接输出先验特征）替代基础模型。扩散模型仅在 IoU > 0 时触发，避免不必要的推理开销。这一条件触发策略将计算资源集中于真正需要去穿透的困难样本，在保证精度的同时兼顾效率。
-
-
 
 A2P 的整体管线由五个核心模块串联构成，按功能可划分为两个阶段：**2D 结构对齐**（图像编码器、融合对齐编码器、Transformer 编码器、手部回归器）与 **3D 空间交互精修**（双手免穿透扩散模型）。以下逐一剖析各模块的设计逻辑与关键公式。
 
@@ -180,8 +172,6 @@ $$\hat{\mathbf{X}_0} = \hat{\mathbf{X}_0} - \lambda (\delta_i \mathcal{L}_{colli
 
 整个管线的因果链可概括为：**FAE 蒸馏异构 2D 先验 → Transformer 跨模态融合 → 回归器输出初步双手参数 → 扩散模型以碰撞梯度引导消除穿透**。消融实验（Table 3）证实了这一链条中每个环节的独立贡献：逐步融合关键点、分割、深度先验均能提升 MPJPE/MPVPE；加入扩散模型后，XY 与 Z 维度误差进一步下降，表明扩散精修有效消除了穿透带来的空间错位。
 
-
-
 ## 实验与关键发现
 
 ### 1. 主实验定量结果
@@ -221,13 +211,7 @@ Figure 1 展示了 A2P 在 InterHand2.6M、Re:InterHand 和 In-the-Wild 场景�
 ![[assets/figures/papers/paper_list_l2254_https_arxiv_org_abs_2503_17788/figures/009_Figure_4.jpg]]
 *Figure 4: Qualitative two-hand recovery results compared with InterHandGen [9], Ours (before diffusion) and Ours (after diffusion) on InterHand2.6M [16]*
 
-![[assets/figures/papers/paper_list_l2254_https_arxiv_org_abs_2503_17788/figures/001_Figure_1.jpg]]
-*Figure 1: Two-hand recovery on InterHand2.6M (1st, 3rd columns), Re:InterHand (4th, 5th columns), and In-the-Wild (2nd, 6th columns)*
-
 Figure 3 展示了网络来源真实场景的定性结果，A2P 在非受控环境下仍能恢复合理的双手姿态，但部分极端视角或运动模糊场景（红色圆圈标注）出现了估计失真或精度下降。
-
-![[assets/figures/papers/paper_list_l2254_https_arxiv_org_abs_2503_17788/figures/005_Figure_3.jpg]]
-*Figure 3: Qualitative two-hand recovery results in real scenes. The images are all sourced from the internet. The red circle indicates distortion or inaccurate estimation*
 
 ### 4. 失败模式与局限性
 
@@ -241,11 +225,6 @@ Figure 3 展示了网络来源真实场景的定性结果，A2P 在非受控环�
 - **Table 4**：FAE 蒸馏策略在保持精度的同时大幅降低推理开销。
 - **Table 5**：PenVol 0.11 相较 InterHandGen 降低 85%，穿透抑制效果显著。
 - **Figure 4**：扩散精修可有效消除穿透，且姿态保持优于 InterHandGen。
-
-![[assets/figures/papers/paper_list_l2254_https_arxiv_org_abs_2503_17788/figures/007_Table_4.jpg]]
-*Table 4: Comparison in model parameters and inference time. ⋆ represents with fusion alignment encoder & without two-hand diffusion. ⋆⋆ represents with fusion alignment encoder & two-hand diffusion. · denotes using foundation model encoder [8] without diffusion model for inference*
-
-
 
 ## 定位与知识库关联
 
@@ -278,8 +257,6 @@ Figure 3 展示了网络来源真实场景的定性结果，A2P 在非受控环�
 1. 如何处理极端运动模糊？时序融合是否能缓解该问题？
 2. 扩散模型的触发条件（IoU > 0）是否为最优？能否端到端学习触发策略？
 3. 异构先验的融合权重是否可自适应学习，而非固定投影？不同场景下先验的可靠性可能存在差异。
-
-
 
 ## 原文 PDF
 

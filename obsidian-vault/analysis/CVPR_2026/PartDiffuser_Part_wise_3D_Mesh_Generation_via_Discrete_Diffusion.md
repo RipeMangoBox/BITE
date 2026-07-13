@@ -61,8 +61,6 @@ claims:
 
 整体而言，PartDiffuser 通过“分而治之”的部件级建模策略，在点云条件网格生成任务上实现了对现有自回归方法的显著超越，同时为离散扩散模型在三维生成领域的应用提供了新的范式。
 
-
-
 三维网格（3D Mesh）是计算机图形学、增强现实与机器人等领域的基础表示形式。然而，从原始点云自动生成高质量、结构规整的网格仍是一项开放挑战。现有方法主要分为两类：一类依赖于复杂的优化与后处理管线，难以端到端扩展；另一类将网格生成建模为令牌级（token-level）的自回归序列生成任务，虽能捕捉拓扑结构，却面临**全局拓扑一致性与高频局部细节之间的根本冲突**。
 
 自回归生成范式存在两个结构性缺陷。其一，长序列生成中的**误差累积**——早期令牌的预测偏差会沿序列传播，导致后续几何结构失真。其二，标准因果注意力掩码强制单向依赖，使得模型在生成局部细节时无法充分利用全局上下文，反之亦然。尽管近期工作如 **MeshAnythingV2**、**BPT** 和 **TreeMeshGPT** 在点云条件网格生成上取得了进展，它们本质上仍受限于令牌级自回归框架，难以同时保证整体形状的拓扑合理性与局部曲面的精细度。
@@ -70,8 +68,6 @@ claims:
 PartDiffuser 的核心洞察在于：**语义部件分割**为化解这一冲突提供了天然的结构先验。三维物体的全局拓扑可由部件间的自回归依赖关系有效建模，而每个部件内部的高频几何特征则可通过并行扩散过程精细重建。这种“部件间自回归、部件内并行扩散”的半自回归范式，将长序列生成问题解耦为多个短序列的并行去噪任务，从根本上缓解了误差传播，并允许模型在部件级别动态融合全局形状条件与局部几何条件。
 
 本文据此提出 PartDiffuser——一个面向点云到网格生成的半自回归离散扩散框架。该方法首先对输入点云与目标网格进行语义分割，将网格序列化为定长的部件令牌块；随后，通过层次化几何条件编码器提取全局形状特征与部件级局部特征，并在扩散去噪过程中以交叉注意力动态注入。这一设计使 PartDiffuser 在 Objaverse 等大规模数据集上显著超越了现有最优基线，Chamfer 距离（CD×10³）降至 17.813，相较 MeshAnythingV2 改进约 27%，验证了部件级半自回归扩散范式的有效性。
-
-
 
 ## 核心方法与创新机理
 
@@ -109,8 +105,6 @@ $$\hat Z = \mathrm{CrossAttn}(Q=\mathrm{LN}(Z'), K=C_{\mathrm{dyn}}, V=C_{\mathr
 
 上述三个 changed slots 形成**因果闭环**：语义分割（PartField）使部件级自回归成为可能；层次条件为每个部件提供差异化的几何引导；复合材料掩码则使混合注意力模式在训练和推理中保持一致。三者共同支撑了“部件间自回归保拓扑、部件内扩散保细节”的核心机制，最终在 Objaverse 数据集上实现 Chamfer Distance 17.813，相比 MeshAnythingV2 改进约 27%。
 
-
-
 PartDiffuser 提出了一种**半自回归离散扩散框架**，将点云到网格的生成任务解耦为两个层次：部件间的自回归建模负责全局拓扑一致性，部件内的并行离散扩散负责局部几何细节的精细重建。整个 pipeline 由五个核心模块串联构成，形成从点云输入到结构化网格输出的端到端流程。
 
 ### Pipeline 总览
@@ -141,8 +135,6 @@ PartDiffuser 提出了一种**半自回归离散扩散框架**，将点云到网
 - **层次条件注入**：全局特征 $C_{\mathrm{global}}$ 提供整体形状约束，部件特征 $C_{\mathrm{part}_i}$ 提供局部几何引导，二者通过交叉注意力动态融合，缺一不可。消融实验表明，仅用全局特征时 CD 升至 29.125，仅用局部特征时 CD 升至 54.728，远差于完整模型的 17.813（Table 2）。
 - **复合材料掩码**：块扩散掩码（块内双向注意力）与块感知填充掩码（块间自回归注意力）的组合，使得模型能够在保持部件间因果依赖的同时，充分利用部件内的双向上下文信息（Figure 7）。
 - **加速因子 $k$**：通过调整去噪步长实现质量-速度权衡。当 $k$ 从 1 增至 4 时，推理时间从 63.8s 降至 34.6s，但 CD 从 17.813 恶化至 44.720（Table 3），表明该框架为实际部署提供了灵活的配置空间。
-
-
 
 PartDiffuser 的核心设计是将网格生成解耦为**部件间自回归**与**部件内并行离散扩散**两个层次，并通过层次化几何条件动态控制生成过程。以下按流水线顺序阐述关键模块与核心公式。
 
@@ -204,12 +196,8 @@ $$\mathcal{L}_i = \mathbb{E}_{t, X_i^t \sim q(\cdot|X_i^0)} \left[ w(t) \left(-\
 
 这种设计使得模型在并行训练中同时学习部件内的双向依赖和部件间的因果依赖，为推理时的半自回归采样奠定基础。训练采用两阶段课程策略：先使用裁剪噪声调度，再切换至全线性调度，以稳定收敛。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2562_https_arxiv_org_abs_2511_18801/figures/013_Figure_7.jpg]]
 *Figure 7: Visualization of the composite attention mask during the parallel training phase, using N = 3 parts as an example. This mask governs the attention mask used in Section*
-
-
 
 ## 实验与关键发现
 
@@ -247,9 +235,6 @@ Figure 4 的可视化消融实例直观展示了上述退化：仅用部件特�
 
 PartDiffuser 默认推理步数 T=1024，单网格平均推理时间约 63.8 秒。通过引入加速因子 k（每 k 步执行一次去噪更新），可在推理速度与生成质量之间进行权衡（Table 3）：
 
-![[assets/figures/papers/paper_list_l2562_https_arxiv_org_abs_2511_18801/figures/011_Table_3.jpg]]
-*Table 3: Ablation study on Acceleration Factor k. We evaluate the impact of increasing k on the Objaverse dataset. T denotes the sampling steps for each block. Time represents the average inference latency per mesh in seconds*
-
 | 加速因子 k | 采样步数 T | 推理时间（秒） | CD×10³↓ |
 |:---:|:---:|:---:|:---:|
 | 1 | 1024 | 63.8 | 17.813 |
@@ -258,15 +243,9 @@ PartDiffuser 默认推理步数 T=1024，单网格平均推理时间约 63.8 秒
 
 当 k 从 1 增至 4 时，推理时间减少约 46%，但 CD 从 17.813 恶化至 44.720，几何精度显著下降。Figure 5 的可视化对比显示，高加速因子下网格表面出现明显噪声和细节丢失。这表明当前离散扩散采样步骤对高频几何重建至关重要，激进的跳跃采样会破坏去噪过程的渐进精化能力。
 
-![[assets/figures/papers/paper_list_l2562_https_arxiv_org_abs_2511_18801/figures/010_Figure_5.jpg]]
-*Figure 5: Visual comparison of varying Acceleration Factor k*
-
 ### 分割策略鲁棒性
 
 PartDiffuser 对语义分割策略具有一定鲁棒性。在 PartField（默认）与 SAMPart3D 两种分割方案下，CD 分别为 17.81 与 19.11，差异不大（Figure 8）。这说明框架的性能增益主要来自层次条件与半自回归扩散范式，而非特定分割算法的选择。
-
-![[assets/figures/papers/paper_list_l2562_https_arxiv_org_abs_2511_18801/figures/014_Figure_8.jpg]]
-*Figure 8: Experiment on robustness to different segmentation strategies*
 
 ### 局限性与失败模式
 
@@ -277,16 +256,6 @@ PartDiffuser 对语义分割策略具有一定鲁棒性。在 PartField（默认
 3. **部件遍历顺序**：当前采用 BFS 确定部件生成顺序，未优化全局组装策略，可能在某些拓扑结构下产生次优的上下文利用。
 
 这些失败模式提示，在极端复杂网格或对实时性要求高的场景中，PartDiffuser 的适用性需要进一步验证。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2562_https_arxiv_org_abs_2511_18801/figures/001_Figure_1.jpg]]
-*Figure 1: Gallery of our mesh generation results*
-
-![[assets/figures/papers/paper_list_l2562_https_arxiv_org_abs_2511_18801/figures/012_Figure_6.jpg]]
-*Figure 6: Mesh with different faces in the dataset*
-
-
 
 ## 定位与知识库关联
 
@@ -323,8 +292,6 @@ PartDiffuser 的核心突破在于将**部件级半自回归离散扩散**范式
 - **端到端联合训练与多模态扩展。** 当前框架中分割、编码、扩散为独立模块。探索端到端联合训练可能进一步提升整体性能。此外，将 PartDiffuser 扩展至接受多模态输入（如图像、文本），可使其具备从更丰富的用户意图出发生成三维网格的能力。
 
 - **部件遍历顺序优化。** 研究更优的部件生成顺序策略（如基于依赖图或注意力机制的自适应排序），可能进一步提升全局拓扑一致性和上下文利用效率。
-
-
 
 ## 原文 PDF
 

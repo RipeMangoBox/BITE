@@ -54,8 +54,6 @@ claims:
 
 实验结果表明，DECS 在七个基准上实现了超过 50% 的推理 token 压缩，同时 Pass@1 平均提升 +2.48 点（DeepSeek-R1-Distill-1.5B）和 +0.8 点（DeepSeek-R1-Distill-7B）。在限制 token 预算的条件下，DECS 的 Pass@K 性能与基础模型几乎重合，实现了近乎无损的压缩。消融实验进一步验证了课程调度和解耦奖励各自的关键贡献：移除课程调度导致性能明显下降，而仅移除解耦奖励则仍保留约 25% 的冗余 token。
 
-
-
 ### 大语言模型的“过度思考”困境
 
 大语言模型在数学、编程、科学等复杂推理任务上展现出卓越性能，其核心机制在于生成冗长的推理链（Chain-of-Thought）。然而，这种“先想清楚再回答”的策略带来了严重的推理效率问题：模型倾向于产生远超出必要长度的推理过程，即**过度思考（Overthinking）**。以 DeepSeek-R1-Distill-1.5B 模型为例，其在 AIME2024 基准上的平均推理 token 数高达 12202，而实际达成正确答案所需的最小推理量远低于此。
@@ -91,8 +89,6 @@ $$r'(\mathbf{o}_i) = \begin{cases} r(\mathbf{o}_i) - \gamma |\mathbf{o}_i| & \ma
 2. **从静态惩罚到自适应课程调度**：理论分析表明，当 batch 中简单 prompt（NRP 比例高）占比过高时，正确的高熵 token 仍可能被错误惩罚。为此，DECS 引入课程数据调度策略，根据训练过程中 NRP 比例的变化动态调整简单 prompt 的占比，防止对探索性 token 的过度抑制。
 
 3. **效率与性能的帕累托改进**：DECS 的目标并非简单地牺牲性能换取效率，而是通过在正确的位置施加正确的学习信号，实现 token 压缩与推理能力的同步提升。实验表明，DECS 在七个基准上将推理 token 减少超过 50%，同时 pass@1 平均提升 +2.48 点（DS-1.5B），验证了这一目标的可行性。
-
-
 
 ## 核心方法与创新机理
 
@@ -144,10 +140,6 @@ $$\kappa_m = \text{clip}( \kappa_{m-1} + \beta (\mathcal{R}_m - \mathcal{R}_{m-1
 两者结合，DECS 在七个基准上实现超过 50% 的 token 压缩，同时 pass@1 平均提升 +2.48 点（DS-1.5B）和 +0.8 点（DS-7B），在限制 token 预算下 Pass@K 性能与基础模型几乎重合（Fig. 3c），实现了近乎无损的推理压缩。
 
 
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_kdeiRledV6/figures/002_Figure_2.jpg]]
-*Figure 2: Overview of the DECS training pipeline. (1) Decoupled Token-level Reward: We finetune a small language model to detect the necessary reasoning prefix (NRP) from other redundancy, which are separately rewarded to penalize overthinking consistently while maintaining the probability for generating necessary reasoning steps. As the running example “What is 2 $\substack { + 3 ? } ^ { \mathrm { { s } } }$ shows, the NRP contains the reasoning chunks from the starting token to the first time the model generates the correct answer " 5 " . After that, any leading redundant token like “Wait” receives negative advantages, and thereby discourage any redundant tokens to be generated via autoregressive gen...
-
 DECS 的训练管道由三个协同模块构成，围绕“定位必要推理前缀（NRP）→ 差异化奖励分配 → 自适应数据调度”的逻辑链展开，如图 2 所示。
 
 **输入**：一个提示（prompt）集合，每个提示对应一个数学推理问题及其标准答案 $y^*$。
@@ -173,8 +165,6 @@ $$\kappa_m = \mathrm{clip}( \kappa_{m-1} + \beta (\mathcal{R}_m - \mathcal{R}_{m
 **输出流**：Token 级优势 $A_{i,j}^{\text{DECS}}$ 被送入标准的 GRPO 策略梯度优化框架（Eq. 1-3），更新策略参数 $\theta$。整个管道在 4×NVIDIA A100 80GB GPU 上运行，NRP 检测器引入约 3.4%~5.1% 的训练时间开销。
 
 三个模块的解耦设计使得消融实验可以独立验证各自贡献：移除课程调度导致性能明显下降，移除解耦奖励则策略仍保留约 25% 的冗余 token。
-
-
 
 DECS 的核心设计由三个协同模块构成，分别解决“惩罚什么”“如何惩罚”和“如何防止过度惩罚”三个问题。
 
@@ -230,8 +220,6 @@ $$\kappa_m = \text{clip}( \kappa_{m-1} + \beta (\mathcal{R}_m - \mathcal{R}_{m-1
 
 当 NRP 比例上升（即模型开始压缩推理长度）时，调度器自动增加简单 prompt 占比，防止高熵探索 token 被过度惩罚；反之则减少简单 prompt 占比，维持压缩压力。消融实验（Table 3）证实，移除课程调度后性能明显下降（Avg Acc 从 47.78 降至 46.31），验证了该模块在效率-性能平衡中的关键作用。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：效率与性能的同步提升
@@ -240,14 +228,12 @@ DECS 在七个数学与科学推理基准上实现了超过 50% 的推理 token 
 
 具体而言，在 AIME2024 基准上，DS-1.5B 模型的推理 token 从 12,202 降至 5,550（-54.5%），pass@1 从 27.99 提升至 31.25（+3.26）；DS-7B 模型的 token 从 10,508 降至 5,277（-49.8%），pass@1 从 50.65 提升至 51.33（+0.68）。综合效率-性能指标 AES 在 DS-1.5B 上达到 0.74，DS-7B 上达到 0.54，均显著优于所有基线方法（Table 1）。
 
-
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_kdeiRledV6/figures/003_Table_1.jpg]]
 *Table 1: Pass@1 (Acc) and the number of tokens (#Tok.) used across seven benchmarks. “LCB.” denotes LiveCodeBench-v6, “OlympiadB.” denotes the OlympiadBench, and “GPQA-D” denotes GPQA-Diamond. The best performing score is marked in bold and the second-best is underlined*
 
 ### 消融实验：两个关键组件的因果贡献
 
 消融实验（Table 3, Fig. 3a）清晰揭示了课程调度（CS）与解耦奖励（DR）的独立作用：
-
 
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_kdeiRledV6/figures/008_Table_3.jpg]]
 *Table 3: Ablation study with two major components of DECS on the DS-1.5B base model. “CS” denotes adaptive data sampling and “DR” denotes the decoupled reward mechanism*
@@ -271,7 +257,6 @@ DECS 在七个数学与科学推理基准上实现了超过 50% 的推理 token 
 
 DECS 在 Qwen3-4B 模型上复现了相似效果（Table 2）：平均推理 token 减少 54.80%，pass@1 提升 1.32 点，AES 达到 0.61。这证明 NRP 检测器和解耦奖励机制不依赖于特定基础模型的推理风格。
 
-
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_kdeiRledV6/figures/004_Table_2.jpg]]
 *Table 2: Generalization to the Qwen3-4B model. DECS still achieves 0.61 AES score, with 54.80% reduction to overthinking and 1.32 pass@1 improvement*
 
@@ -285,34 +270,14 @@ DECS 在 Qwen3-4B 模型上复现了相似效果（Table 2）：平均推理 tok
 
 3. **β 参数的手动调节**：课程调度中的 β 超参数需要针对不同基础模型进行网格搜索，最优值 0.2 依赖于初始 NRP 比例，尚未实现完全自动化的自适应调节。对于全新模型架构或训练数据分布，仍需人工介入。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_kdeiRledV6/figures/001_Figure_1.jpg]]
 *Figure 1: Left: Two major flaws of prior practice apply sequence-level length reward without control of training data. Negative advantage values penalize correct high entropy tokens from long sequences while positive ones reward redundant tokens from short sequences; Middle: Flaws of length rewards lead to inferior performance and suboptimal efficiency gains on AIME2024 dataset; Right: DECS improves pass@1 of base models while reducing ∼ 60% token costs compared to the base model across 7 benchmarks. Experimental details are presented in Appendix G.5*
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_kdeiRledV6/figures/005_Figure.jpg]]
-*Figure: (a) (b) (c)*
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_kdeiRledV6/figures/007_Figure_4.jpg]]
-*Figure 4: (a) Average tokens and Pass@1 performance with 5 increasing generation budgets; (b) Frequency of reasoning behavior tokens after applying DECS; (c) Consistent compression rates of DECS on six difficulty levels sourced from MATH500 and AIME2024*
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_kdeiRledV6/figures/015_Figure.jpg]]
-*Figure: (a) (b) (c)*
 
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_kdeiRledV6/figures/016_Figure_7.jpg]]
 *Figure 7: (a) AIME2024 reward and response length during evaluation for training DeepSeek-R1- Distill-7B base model with DECS; (b) Proportion of NRP (PNRP) and response length during training for training DeepSeek-R1-Distill-7B base model with DECS; (c) DECS improves pass@1 of base models while reducing ∼ 50% tokens compared to the 7B base model across 7 benchmarks*
 
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_kdeiRledV6/figures/019_Figure_8.jpg]]
 *Figure 8: The Pass@1 score and average token counts on (a) AIME2025 and (b) AMC23 datasets under diverse token limits with the DeepSeek-R1-Dsitill-1.5B base policy; (c) Models applying DECS are on par with the base policy (DS-7B) in terms of Pass@K scores on three challenging benchmarks*
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_kdeiRledV6/figures/021_Figure_9.jpg]]
-*Figure 9: (a) The comparison between PNRP score and token consts in AIME2024 dataset for methods applied to the DS-7B model. (b) The PNRP scores for the six levels of difficulty on math problems for the DeepSeek-R1-Distill-7B base policy. (c) The Pass@K comparison between Base, Ours (DECS) and GRPO in DS-1.5B backbone*
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_kdeiRledV6/figures/022_Figure_10.jpg]]
-*Figure 10: The Pass@1 score and average token counts on (a) AIME2024, (b) AIME2025 and (c) AMC23 datasets under diverse token limits with the DeepSeek-R1-Dsitill-7B base policy*
-
-
-
 
 ## 定位与知识库关联
 
@@ -356,8 +321,6 @@ DECS 的核心洞察在于：**通过定位必要推理前缀（NRP），对 NRP
 3. **非推理类任务的扩展**：DECS 在开放式对话、创意写作等非推理类任务上的适用性和表现如何？这些场景中“必要推理前缀”的定义可能需要重新设计。
 4. **多任务混合训练的课程调度**：能否将课程调度机制扩展到多任务混合训练场景，实现更鲁棒的数据分布自适应？当前调度策略仅针对单一数据分布设计。
 5. **与推理预算控制的结合**：DECS 在限制 token 预算下 Pass@K 性能与基础模型重合（Fig. 3c），实现了几乎无损的压缩。如何将这种能力与显式的推理预算控制机制（如 token 限制、早停策略）深度结合，值得进一步探索。
-
-
 
 ## 原文 PDF
 

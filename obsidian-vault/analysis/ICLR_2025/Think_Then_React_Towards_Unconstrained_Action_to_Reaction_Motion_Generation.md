@@ -68,8 +68,6 @@ TTR 将思考过程与反应过程统一在同一个基于大语言模型的框�
 
 消融实验进一步验证了核心设计的有效性：移除思考过程导致 FID 急剧劣化至 3.828，完全跳过预训练使 FID 升至 3.363，而去除任何一类预训练任务（运动-文本、姿态-空间、运动-运动）均使 FID 上升至 2.5–2.8 左右。使用真实文本提示可将 FID 进一步降至 1.584，使用更强的动作到文本模型进行思考则可将 FID 从 1.94 降至 1.88，表明**思考质量的提升能直接促进下游反应生成质量**。
 
-
-
 ### 问题背景：从动作到反应的无约束生成
 
 人类交互是具身智能的核心场景。给定一个人的动作序列，预测另一个人的合理反应——即**动作到反应生成**（Action-to-Reaction Generation）——是实现自然、可信的多人交互模拟的关键技术。该任务要求模型不仅理解输入动作的运动学特征，更要捕捉其背后的**语义意图**，从而生成在物理上合理、在语义上协调的反应运动。
@@ -95,8 +93,6 @@ TTR 将思考过程与反应过程统一在同一个基于大语言模型的框�
 具体而言，本文提出 **Think-Then-React（TTR）** 模型，在统一的框架内引入一个显式的**思考过程**（Thinking Process）：模型首先推断输入动作的意图，并推理出对应的反应自然语言描述，然后将该描述作为语义提示（Semantic Prompt），指导后续的反应运动生成。这一设计将动作理解与反应生成之间的隐性关联转化为显式的语义桥梁，从根本上缓解了端到端黑箱预测带来的不稳定性和累积误差问题。
 
 此外，为支持这一框架，TTR 还提出了一种**解耦的空间-姿态分词器**，将人体运动的绝对空间特征（位置、朝向）与自姿态特征分别编码为离散 token，使语言模型能够统一处理运动、空间与文本三种模态的知识，为“思考”与“反应”两个过程提供统一的表征基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -131,8 +127,6 @@ $$ \mathbf{p}_{quantized} = Q(\hat{\mathbf{p}}) := (\underset{\mathbf{p}_k \in C
 
 为缓解自回归生成中的累积误差，TTR 引入**周期重思考（periodic re-thinking）**机制：在推理阶段每隔 $N_r$ 个动作 token 重新执行一次思考过程，动态更新反应提示。默认设置 $N_r = 4$。实验表明，重思考间隔对生成质量与推理速度存在 trade-off：过小的间隔增加计算开销，过大的间隔则使 FID 上升（Figure 6）。这一机制是“思考-反应”范式在在线生成场景下的自然延伸，使得语义提示能够随交互进程动态调整，而非仅依赖初始的一次性推断。
 
-
-
 Think-Then-React (TTR) 将动作到反应的生成重新定义为「先理解意图，后生成反应」的两阶段因果流程，并统一在一个基于大语言模型（LLM）的框架内完成。该框架的核心瓶颈在于：直接从动作序列端到端预测反应缺乏对动作意图的显式语义理解，导致预测不稳定且随时间步累积误差。TTR 通过引入一个显式的**思考过程（thinking process）**来扭转这一因果链路——模型先推断输入动作的意图并推理出相应的反应自然语言描述，再将该描述作为语义提示（semantic prompt）馈入反应生成过程。
 
 整个 pipeline 由四个核心模块串联而成：
@@ -147,12 +141,8 @@ Think-Then-React (TTR) 将动作到反应的生成重新定义为「先理解意
 
 输入输出流可概括为：**输入动作序列 → [解耦分词器] → 动作 token 流 → [LLM 思考] → 反应描述文本 → [LLM 反应] → 反应 token 流 → [解耦解码器] → 输出反应运动序列**。在推理过程中，重思考机制周期性地将部分已生成的反应 token 与动作 token 一并回馈给思考过程，形成闭环调整。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1785_Think_Then_React_Towards_Unconstrained_Action_to_Reaction_Motion_Generat/figures/001_Figure_1.jpg]]
 *Figure 1: Given a human action as input, our Think-Then-React model first thinks by generating an action description and reasons out a reaction prompt. It then reacts to the action based on the results of this thinking process. TTR reacts in a real-time manner at every timestep and periodically re-thinks at specific interval (every two timesteps in the illustration) to mitigate accumulated errors*
-
-
 
 ### 解耦空间-姿态分词器
 
@@ -183,13 +173,6 @@ $$\hat{\mathbf{m}} = \mathcal{D}(Q(\mathcal{E}(\mathbf{m})))$$
 ### 训练策略
 
 微调采用 teacher forcing 策略：早期阶段使用真实文本提示作为条件生成完整反应序列，同时监控验证损失和文本生成指标；当指标趋于收敛后切换为模型自生成的预测提示，避免训练-推断分布不一致。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1785_Think_Then_React_Towards_Unconstrained_Action_to_Reaction_Motion_Generat/figures/002_Figure_2.jpg]]
-*Figure 2: Illustration of our decoupled tokenizer and the plain tokenizer*
-
-
 
 ## 实验与关键发现
 
@@ -229,24 +212,14 @@ TTR在Inter-X数据集上对所有基线方法实现了显著且一致的性能�
 ![[assets/figures/papers/paper_list_l1785_Think_Then_React_Towards_Unconstrained_Action_to_Reaction_Motion_Generat/figures/008_Figure_7.jpg]]
 *Figure 7: User preference between TTR and ReGenNet on different motion duration*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1785_Think_Then_React_Towards_Unconstrained_Action_to_Reaction_Motion_Generat/figures/003_Table_1.jpg]]
 *Table 1: Comparison to state-of-the-art baselines and ablation studies of our method on Inter-X dataset. ↑ or ↓ denotes a higher or lower value is better, and → means that the value closer to real is better. We use ± to represent 95% confidence interval and highlight the best results in bold. For ablation methods (in grey), PT, M, P, S, and SP are abbreviations for pre-training, motion, pose, space, and single-person data, respectively*
-
-![[assets/figures/papers/paper_list_l1785_Think_Then_React_Towards_Unconstrained_Action_to_Reaction_Motion_Generat/figures/006_Figure_6.jpg]]
-*Figure 6: Impact of re-thinking interval to FID and average inference time per step (AITS)*
-
-![[assets/figures/papers/paper_list_l1785_Think_Then_React_Towards_Unconstrained_Action_to_Reaction_Motion_Generat/figures/007_Figure_5.jpg]]
-*Figure 5: Impact of input action FPS to summed ranking score differences*
 
 ![[assets/figures/papers/paper_list_l1785_Think_Then_React_Towards_Unconstrained_Action_to_Reaction_Motion_Generat/figures/009_Table_2.jpg]]
 *Table 2: Motion captioning results on Inter-X dataset. TTR∗ denotes feeding both action and reaction motion into TTR for captioning. TTR (x%) denotes only the first x% of action motion is fed into TTR for captioning*
 
 ![[assets/figures/papers/paper_list_l1785_Think_Then_React_Towards_Unconstrained_Action_to_Reaction_Motion_Generat/figures/010_Table_3.jpg]]
 *Table 3: Ablation study on how does thinking process influence model performance. GT denotes ground-truth, and Thinking∗ denotes using a better motion-to-text model for the thinking process*
-
-
 
 ## 定位与知识库关联
 
@@ -289,8 +262,6 @@ TTR 处于**基于语言模型的运动生成**与**多人交互反应生成**�
 3. **思考质量的提升路径：** 表3显示使用更好的动作到文本模型（Thinking*）可将FID从1.94进一步降至1.88，使用真实文本提示（GT Prompt）更可降至1.584。这表明当前思考环节的语义推断质量仍是性能瓶颈，未来可通过更强的motion captioning模型或引入外部知识来提升。
 
 4. **向更多人和更复杂交互的扩展：** TTR 当前聚焦于双人交互。扩展到三人及以上场景时，空间关系的组合复杂度和语义推理的难度将显著增加，现有框架的可扩展性尚待验证。
-
-
 
 ## 原文 PDF
 

@@ -53,8 +53,6 @@ claims:
 - 在视频质量评估中，Sculpt4D 显著优于所有基线方法：LPIPS↓ 0.098（最佳基线 Hunyuan3D 为 0.131），CLIP↑ 0.916（最佳基线 DreamMesh4D 为 0.835），FVD↓ 483.1（最佳基线 DreamMesh4D 为 914.9）。
 - 消融实验证实，移除首帧锚点导致所有几何指标退化，而提出的延迟指数衰减策略在几何质量与效率之间达到最优权衡。
 
-
-
 ### 4D 内容生成的现实需求
 
 从单目视频中重建动态三维世界是计算机视觉与图形学的长期目标。近年来，3D 生成模型取得了显著进展，能够从文本或图像生成高质量的静态网格。然而，现实世界中的对象是动态的——它们移动、变形、改变拓扑结构。将这种时间维度引入生成过程，即 **4D 生成**（三维空间 + 一维时间），成为通向沉浸式数字内容创作的关键一步。
@@ -91,8 +89,6 @@ Sculpt4D 的提出正是为了填补这一缺口。其核心动机是：**能否
 2. **时间衰减稀疏掩码**：帧间注意力步长随时间距离增大而增加，强制保留空间对应关系，同时大幅减少冗余计算。
 
 通过这种设计，Sculpt4D 将计算量降低约 56%，同时在几何质量上接近全注意力水平，实现了 4D 生成中效率与保真度的最佳权衡。
-
-
 
 ## 核心方法与创新机理
 
@@ -144,8 +140,6 @@ Sculpt4D 的因果调节旋钮在于：**注意力矩阵的结构化稀疏性**�
 
 三个 changed slots 并非孤立运作。共享噪声重参数化提供了平滑的潜在空间基础，分解式 4D-DiT 块为稀疏注意力提供了结构化的操作舞台，而块稀疏注意力则在前两者的基础上实现了计算效率的质变。这种“先验继承—结构解耦—计算稀疏”的三层递进设计，使得 Sculpt4D 在仅需 3 天训练的条件下，在 Chamfer 距离（0.0972 vs 全注意力的 0.0958）上与全注意力高度接近，同时将计算量削减 56.2%。
 
-
-
 Sculpt4D 的整体框架围绕一个核心设计展开：将高效的时间建模注入预训练的 3D 扩散 Transformer，从而将静态生成能力扩展为端到端的 4D 生成能力。该框架以图像序列为条件输入，通过四个级联模块完成从像素到动态网格的转换，如 Figure 2 所示。
 
 ![[assets/figures/papers/paper_list_l2590_https_arxiv_org_abs_2604_21592/figures/002_Figure_2.jpg]]
@@ -174,8 +168,6 @@ $$M_{i \cdot N_B + u, \, j \cdot N_B + v} = \begin{cases} 1, & \text{if } j=0 \\
 **SDF 解码与网格重建。** 去噪后的隐变量序列最终由 SDF 解码器逐帧重建为水密网格，得到完整的 4D 网格序列。
 
 **训练配置。** 模型在包含约 13k 个 4D 动画对象的数据集上训练，训练配置为 8 张 96GB GPU、约 3 天、24K 次迭代、批次大小 32（每序列 16 帧）。损失计算使用通过最远点采样（FPS）选取的 4,096 个查询点。
-
-
 
 ### 4D 潜在编码：共享噪声重参数化
 
@@ -225,8 +217,6 @@ $$M_{i \cdot N_B + u, \, j \cdot N_B + v} = \begin{cases} 1, & \text{if } j=0 \\
 
 整个稀疏注意力机制通过 Block Sparse Attention 库高效实现，在 16 帧设定下仅消耗全注意力 43.8% 的计算量（186.3 vs 425.7 PFLOPs），而 Chamfer 距离几乎无损（0.0972 vs 0.0958）。
 
-
-
 ## 实验与关键发现
 
 ### 主要定量结果
@@ -261,16 +251,7 @@ Sculpt4D 在几何精度与视频感知质量两个维度上均显著超越现�
 
 稀疏注意力的计算优势随帧数增加而愈发显著。Table A2 展示了不同帧数下的 PFLOPs 对比：在 16 帧配置下，核心时间注意力层的 FLOPs 比率（稀疏/全注意力）远低于整个网络比率，表明稀疏掩码主要降低了时间建模的计算瓶颈。Figure A1 进一步展示了该比率随帧数变化的扩展曲线，验证了稀疏注意力在长序列场景下的可扩展性。
 
-![[assets/figures/papers/paper_list_l2590_https_arxiv_org_abs_2604_21592/figures/010_Table.jpg]]
-*Table: A2. Computational analysis*
-
-![[assets/figures/papers/paper_list_l2590_https_arxiv_org_abs_2604_21592/figures/011_Figure.jpg]]
-*Figure: A1. Computational scaling analysis of the sparse temporal attention mechanism. The lines show the FLOPs ratio (Sparse/Full) for the core temporal attention layer and the entire network across varying input frame counts*
-
 Table A4 测试了模型在超出训练长度序列上的几何质量，结果表明 Sculpt4D 在扩展帧数下仍能保持稳定的几何保真度，未出现明显的质量衰减。
-
-![[assets/figures/papers/paper_list_l2590_https_arxiv_org_abs_2604_21592/figures/013_Table.jpg]]
-*Table: A4. Scalability analysis*
 
 ### 定性结果
 
@@ -279,22 +260,9 @@ Figure 4 展示了六组多样化的 4D 网格序列生成结果，每组包含�
 ![[assets/figures/papers/paper_list_l2590_https_arxiv_org_abs_2604_21592/figures/006_Figure_5.jpg]]
 *Figure 5: Mesh sequences generated from in the wild data*
 
-![[assets/figures/papers/paper_list_l2590_https_arxiv_org_abs_2604_21592/figures/008_Figure_6.jpg]]
-*Figure 6: Qualitative results of textured mesh sequences*
-
 ### 实验设置与公平性说明
 
 所有方法在同一 13k 4D 对象数据集上训练与评估，采用一致的几何度量（Chamfer Distance, IoU, F-Score）和视频质量度量（LPIPS, CLIP, FVD）。计算效率以 PyTorch 框架下的理论 FLOPs（PFLOPs）进行比较，硬件环境统一。Sculpt4D 训练约 3 天，使用 8 张 96GB GPU，batch size 为 32（每序列 16 帧），损失计算采用最远点采样选取 4,096 个查询点。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2590_https_arxiv_org_abs_2604_21592/figures/001_Figure_1.jpg]]
-*Figure 1: High-Fidelity 4D Mesh Generation. Given input videos, Sculpt4D generates diverse, temporally coherent 4D mesh sequences, handling complex motions and topological changes. Each row shows selected keyframes from a generated sequence*
-
-![[assets/figures/papers/paper_list_l2590_https_arxiv_org_abs_2604_21592/figures/014_Figure.jpg]]
-*Figure: A2. More 4D mesh sequence results*
-
-
 
 ## 定位与知识库关联
 
@@ -335,8 +303,6 @@ Sculpt4D 的核心设计借鉴了两项关键思想：**Radial Attention** 中�
 2. **多对象场景扩展**：首帧锚点机制假设场景中存在单一主要对象，对于多对象交互场景（如双手操作、群体运动），单一全局锚点可能不足以维持所有对象的身份一致性，需要探索多锚点或对象级稀疏注意力。
 
 3. **生成控制与编辑**：Sculpt4D 目前从视频输入生成完整 4D 序列，缺乏对特定帧或特定区域的精细控制能力。如何将稀疏注意力机制与可控生成（如运动编辑、局部变形）结合，是一个值得探索的方向。
-
-
 
 ## 原文 PDF
 

@@ -50,8 +50,6 @@ claims:
 
 在 BEAT2 数据集上，LiveGesture 作为唯一严格流式方法，取得了最佳节拍一致性（BC=0.794）、最高多样性（Div=13.91），且 FGD=4.57 接近离线最优。用户研究进一步表明，其语音-手势同步性的 MOS 评分（4.3/5）超越所有离线基线。消融实验证实：移除因果时间注意力导致 FGD 从 4.57 飙升至 15.52，BC 降至 0.712；关闭不确定性引导掩码使 BC 降至 0.723；组合式分区域 SVQ 分词器相较全身单一分词器在 FGD、BC 和多样性上均有显著优势。这些证据共同证明，流式生成在严格零前瞻约束下可以同时实现低延迟和高水平动作质量，为实时交互虚拟人提供了可行路径。
 
-
-
 ### 问题背景
 
 在虚拟人、具身对话代理和沉浸式交互等应用中，语音驱动的全身手势生成是构建自然非言语行为的关键技术。人类在说话时会自发地协调身体各部位——躯干、手臂、手掌和面部——形成与语音韵律、语义高度同步的连贯动作。然而，现有协语音手势生成方法几乎全部采用**离线（offline）设计**：模型需要访问完整的语音输入后才能生成整个动作序列。这一假设从根本上限制了它们在真实交互场景中的可用性。
@@ -77,8 +75,6 @@ claims:
 3. **流式误差累积**：自回归生成中，早期步骤的预测误差会沿时间步传播并放大，在流式场景下这一问题更为严重，因为模型无法通过未来帧进行纠偏。
 
 LiveGesture的动机正是直面这三重挑战：通过**分层因果自回归架构**——将全身运动分解为分区域的离散词元，先由区域专家独立建模局部动态，再通过因果时空融合模块捕获全身协调——并结合**不确定性引导的掩码训练策略**来缓解流式误差，首次证明了流式手势生成可以在节拍同步性和多样性上匹配甚至超越离线方法。
-
-
 
 ## 核心方法与创新机理
 
@@ -121,8 +117,6 @@ LiveGesture 的核心创新在于，它是在严格**零前瞻（zero look-ahead
 
 **总结**：LiveGesture 的创新并非单一技术的堆砌，而是一套完整的系统级重构。通过将“因果性”注入到分词、局部建模、全局融合、音频编码乃至训练策略的每一个环节，它首次证明了在零前瞻的严格约束下，流式手势生成模型能够匹配甚至超越离线方法的动作质量与节拍同步性。
 
-
-
 LiveGesture 是一个严格因果（causal）、零前瞻（zero look-ahead）的流式协语音手势生成系统。给定实时音频流（以及可选的在线文本转录），系统逐帧预测 SMPL-X 全身姿态参数，每 200 ms 音频块的推理延迟低于 50 ms，无需等待完整话语即可输出连贯、节拍同步的手势（Figure 1）。
 
 ![[assets/figures/papers/paper_list_l993_https_arxiv_org_abs_2604_10927/figures/001_Figure_1.jpg]]
@@ -155,8 +149,6 @@ $$\hat{\mathbf{q}}_t = f_{\Theta}(\mathbf{S}_t, a_t, w_t)$$
 3. **训练策略**分为两阶段：第一阶段训练区域专家学习局部自回归动态，注入高斯噪声以增强鲁棒性；第二阶段冻结区域专家，训练融合 Transformer，采用不确定性引导的词元掩码（UGM）和随机区域掩码（RM）缓解流式误差积累。推理时通过分类器自由引导（CFG）进一步增强音画同步。
 
 这一分层因果设计使得 LiveGesture 成为目前唯一在严格零前瞻约束下运行，且在节拍一致性（BC=0.794）和多样性（Div=13.91）上超越离线方法的流式手势生成系统。
-
-
 
 LiveGesture 由两大因果模块级联构成：**流式向量量化运动分词器（SVQ）** 与 **分层自回归 Transformer（HAR）**，二者在严格零前瞻约束下协同工作。整体生成范式可表述为：
 
@@ -225,16 +217,6 @@ $$\mathcal{L}_{\text{fuse}} = - \sum_{t=1}^{T} \sum_{r \in \mathcal{M}_t} \log p
 $$\ell_{\text{guided}}^r = \ell_{\text{uncond}}^r + \gamma (\ell_{\text{cond}}^r - \ell_{\text{uncond}}^r)$$
 
 其中 $\gamma \ge 1$ 为引导强度，消融实验表明 $\gamma = 1.25$ 时性能最优。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l993_https_arxiv_org_abs_2604_10927/figures/002_Figure.jpg]]
-*Figure: Streamable Asymmetric Motion Tokenizer*
-
-![[assets/figures/papers/paper_list_l993_https_arxiv_org_abs_2604_10927/figures/003_Figure_3.jpg]]
-*Figure 3: Overview of the Hierarchical Autoregressive Model in LiveGesture. A streamable audio encoder and optional text encoder provide causal audio/text tokens to four local AR Region-eXperts (upper body, lower body, hands, face), each modeling its own SVQ motion token stream. Their frozen states are adapted by per-region Pre-Infusion Adapters (PILOR) and fused by xAR-Fuse, a causal spatial–temporal transformer with audio–motion cross-attention, global temporal attention, and inter-region spatial attention that predicts next-step SVQ tokens for zero–look-ahead streaming full-body gesture generation*
-
-
 
 ## 实验与关键发现
 
@@ -307,22 +289,6 @@ Table 2 系统消融了 LiveGesture 的核心设计选择，揭示了各组件�
 
 6. **极长时域稳定性**：在几分钟到几十分钟的连续生成中，如何保证动作的长期连贯性并避免模式坍塌，是当前未充分验证的开放问题。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l993_https_arxiv_org_abs_2604_10927/figures/006_Figure_5.jpg]]
-*Figure 5: Interactive human–avatar conversation enabled by LiveGesture. User speech is converted into a spoken reply by VITA-Audio, while our LiveGesture streaming gesture model simultaneously generates synchronized full-body SMPL-X motions from live audio, allowing the avatar to respond in real time*
-
-![[assets/figures/papers/paper_list_l993_https_arxiv_org_abs_2604_10927/figures/016_Table_6.jpg]]
-*Table 6: Comparison between a single full-body SVQ tokenizer and compositional per-region SVQ tokenizers. Both variants use the same total codebook capacity (2048 entries with 128-d embeddings)*
-
-![[assets/figures/papers/paper_list_l993_https_arxiv_org_abs_2604_10927/figures/013_Table_3.jpg]]
-*Table 3: Effect of codebook size in the SVQ motion tokenizer on full-body gesture generation. Larger codebooks increase representational capacity and yield consistent gains across all metrics*
-
-![[assets/figures/papers/paper_list_l993_https_arxiv_org_abs_2604_10927/figures/015_Table_5.jpg]]
-*Table 5: Effect of classifier-free guidance scale γ on streaming gesture generation*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 任务定位与核心瓶颈
@@ -376,8 +342,6 @@ LiveGesture 在方法谱系中的独特位置体现在三个层面的因果化�
 5. **极低延迟优化**：当前 250 ms 首帧延迟和 0.5M 参数的音频编码器在超低延迟场景（如 VR 遥现要求 <100 ms 端到端延迟）仍有压缩空间，轻量化因果音频编码器和更激进的下采样策略值得探索。
 
 6. **长时域连贯性保证**：在数十分钟甚至小时级的连续流式生成中，如何保证动作的长期多样性不退化、避免重复模式，是实际部署必须面对的问题。
-
-
 
 ## 原文 PDF
 

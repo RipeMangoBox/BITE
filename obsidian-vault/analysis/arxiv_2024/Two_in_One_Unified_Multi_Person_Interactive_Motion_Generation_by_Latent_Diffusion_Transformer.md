@@ -52,8 +52,6 @@ claims:
 
 **局限与开放问题：** 当前框架仅支持双人交互，无法扩展至任意人数。相同文本条件下的生成多样性（MModality）低于 InterGen 等基线，可能限制同一指令下的动作变化。论文未讨论在极度不对称或复杂物理接触场景下的生成稳定性。如何将统一框架推广至任意人数的交互动作生成，是后续研究的关键方向。
 
-
-
 ### 问题背景
 
 文本驱动的多人交互动作生成是计算机视觉与人机交互领域的关键任务，其目标是根据自然语言描述生成两个或多个角色之间的协调运动序列。该技术在虚拟现实、机器人规划、动画制作等场景中具有广泛的应用前景。与单人动作生成不同，多人交互动作生成面临独特的挑战：模型不仅要捕捉每个个体的运动模式，还必须建模角色之间的时空耦合关系，包括物理接触、空间协调与意图响应。
@@ -73,8 +71,6 @@ claims:
 - **阶段二**：在统一潜在空间上训练单个潜在扩散Transformer（DiT），以文本条件直接生成完整的双人交互序列，从根本上避免了多分支架构带来的信息割裂问题。
 
 这种“二合一”的统一框架使得单个生成模型能够从同一文本条件中同时捕捉对称或非对称的复杂交互，同时显著简化了模型结构——参数量的减少直接带来了约4倍的推理加速。
-
-
 
 ## 核心方法与创新机理
 
@@ -113,8 +109,6 @@ InterVAE 的潜在标记长度 $f$ 是平衡压缩效率与生成质量的关键
 
 当前框架仅支持双人交互，论文明确指出无法直接扩展到任意人数。此外，在相同文本条件下，InterLDM 的生成多样性指标（MModality）低于 InterGen 等基线，可能限制同一指令下的动作变化。如何将统一框架扩展到支持任意人数的交互动作生成，是论文提出的核心开放问题。
 
-
-
 InterLDM 提出了一种“二合一”（Two-in-One）的统一生成框架，其核心设计在于将双人交互动作视为一个整体数据点，而非两个独立个体的运动之和。整个 pipeline 由三个关键阶段串联而成：**交互变分自编码器（InterVAE）压缩**、**文本条件编码** 和 **潜在扩散 Transformer（InterLDM）生成**。
 
 ### 1. 数据流与模块关系
@@ -152,12 +146,8 @@ $$\epsilon_{\theta}(z_t, t, c) = s \epsilon_{\theta}(z_t, t, c) + (1 - s) \epsil
 
 图 1（左）展示了 InterLDM 的统一框架，图 1（右）则对比了当时最优的双分支方法 **InterGen**（Liang et al., IJCV 2024）。InterGen 为每个个体分配独立的扩散分支，通过交叉注意力进行交互建模。这种分离设计倾向于生成对称或相似的双人动作，难以捕捉非对称的复杂交互。InterLDM 的单分支统一设计从根本上避免了这一问题——由于两人的运动在潜在空间中作为一个整体被建模和生成，交互信息在压缩和去噪全过程中始终保持耦合，使得模型能够从同一文本条件中同时捕捉对称或非对称的复杂交互模式。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1673_Two_in_One_Unified_Multi_Person_Interactive_Motion_Generation_by_Latent/figures/001_Figure_1.jpg]]
 *Figure 1: Left: Our proposed framework, which uses an interaction Variational AutoEncoder (InterVAE) to encode two-person motions into a unified latent space and uses a conditional interaction latent diffusio(InterLDM) generate the latents. Right: InterGen is the state-of-the-art work using two-branch framework with cross-attention interactions to generate motions*
-
-
 
 InterLDM 的整体架构由两个核心模块串联构成：**交互变分自编码器（InterVAE）** 负责将双人交互动作压缩到统一潜在空间，**条件交互潜在扩散模型（InterLDM）** 在该潜在空间中基于文本条件生成完整的双人动作序列。
 
@@ -218,8 +208,6 @@ $$\epsilon_{\theta}(z_t, t, c) = s \epsilon_{\theta}(z_t, t, c) + (1 - s) \epsil
 
 推理时，给定文本描述，InterLDM 从随机噪声出发，经 25 步去噪生成潜在变量 $z_0$，再由 InterVAE 解码器重构为完整的双人交互动作序列。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -260,8 +248,6 @@ Table II展示了潜在标记长度$f$（即压缩率）对重建质量和生成
 
 作者明确指出，如何将该统一框架扩展到支持任意人数的交互动作生成是一个重要的开放问题。这需要解决潜在空间维度随人数增长的问题，可能需要引入图结构建模或分层压缩策略。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1673_Two_in_One_Unified_Multi_Person_Interactive_Motion_Generation_by_Latent/figures/002_Table.jpg]]
 *Table: I: QUANTITATIVE EVALUATION RESULTS ON THE INTERHUMAN TEST SET ± indicates the 95% confidence interval. Bold indicates best result*
 
@@ -270,8 +256,6 @@ Table II展示了潜在标记长度$f$（即压缩率）对重建质量和生成
 
 ![[assets/figures/papers/paper_list_l1673_Two_in_One_Unified_Multi_Person_Interactive_Motion_Generation_by_Latent/figures/005_Table.jpg]]
 *Table: II: Reconstruction and generation performance with different token length f*
-
-
 
 ## 定位与知识库关联
 
@@ -308,8 +292,6 @@ InterLDM 在方法谱系中处于从“分离建模”到“统一建模”的�
 ### 4. 开放问题
 
 论文提出的核心开放问题是：**如何将该统一框架扩展到支持任意人数的交互动作生成？** 这一问题直接指向当前“整体数据点”策略的根本瓶颈。可能的解决方向包括：引入可伸缩的潜在编码机制（如基于图网络的条件压缩），或在保持统一生成的前提下解耦人数维度与潜在空间维度的刚性绑定。此外，如何在统一框架内提升生成多样性（MModality）也是值得探索的方向，可能与引导策略或潜在空间的结构化正则化相关。
-
-
 
 ## 原文 PDF
 

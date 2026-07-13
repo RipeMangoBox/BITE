@@ -55,8 +55,6 @@ claims:
 
 **方法定位**：SafeFusion 属于“数据增强 + 知识蒸馏”路线，与依赖真实避撞演示的模仿学习范式（如 PlanTF）和纯规则规划器（如 PDM-closed）形成互补。其核心创新在于将合成碰撞场景与模拟器引导的评分蒸馏相结合，为解决自动驾驶长尾安全问题提供了一条不依赖真实事故数据的可行路径。
 
-
-
 ### 自动驾驶安全的核心瓶颈
 
 自动驾驶系统在常规驾驶场景中已取得显著进展，但在高风险碰撞场景中的表现仍然是制约其安全部署的关键瓶颈。这一困境的根源在于**数据层面的结构性缺陷**：真实世界的碰撞数据极难收集，且即便获得，这些数据也天然缺乏成功的避撞轨迹——碰撞事件本身意味着避撞失败。这使得当前主流的基于模仿学习的规划器（如 **Hydra-MDP**，Li et al., arXiv 2024）在碰撞场景中面临根本性失效：它们需要专家演示作为监督信号，而碰撞数据中恰恰不存在这样的演示。
@@ -77,8 +75,6 @@ claims:
 
 这三个问题构成了本文工作的核心驱动力，分别对应 **CollisionGen** 碰撞场景生成管道和 **SafeFusion** 安全融合训练框架的设计目标。
 
-
-
 ## 核心方法与创新机理
 
 SafeFusion 的核心创新在于**解耦了避撞能力对真实避撞轨迹演示的依赖**，通过合成碰撞数据与模拟器引导的知识蒸馏，使基于学习的规划器首次在无避撞演示的条件下获得显著的避撞能力。其关键突破体现在以下三个维度的“changed slots”上。
@@ -98,8 +94,6 @@ Hydra-MDP 等基线方法依赖**模仿学习组件**，需要真实轨迹演示
 ### 4. 创新效果：安全提升与常规性能保持的“双赢”
 
 上述三个 changed slots 的协同作用产生了决定性证据：在 Collision2k 测试集上，SafeFusion 的总 PDM 分数达到 **0.415**，较 Hydra-GT 的 0.266 提升 **56.0%**（TABLE III）；在 OpenScene 困难样本上，TTC（Time-to-Collision）从 0.007 跃升至 **0.308**，总分从 0.264 提升至 0.400（TABLE V）；同时，在常规驾驶 OpenScene 测试集上，SafeFusion 总分 0.832 与 Hydra-GT 的 0.833 基本持平，**无性能退化**（TABLE IV）。这表明 SafeFusion 成功实现了碰撞场景安全性与常规场景驾驶能力的解耦优化。
-
-
 
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2503_03957/figures/002_Figure_2.jpg]]
 *Figure 2: The pipeline begins by taking text descriptions of collision scenarios as input. A generator with a language interpreter and a generative transformer is then applied, followed by the use of predefined rules and a PDM simulator [46] to filter out qualified collision scenarios. These filtered scenarios are subsequently used for the training and evaluation processes of planners*
@@ -170,8 +164,6 @@ $$\mathcal{L} = -\sum_{m,i} \hat{S}_i^m \log S_i^m + (1 - \hat{S}_i^m) \log(1 - 
 
 整个管道实现了从文本描述到安全规划器的端到端闭环：合成数据弥补真实碰撞数据的稀缺，知识蒸馏克服避撞轨迹缺失的监督困境，随机批次采样解决域差异与不平衡问题。
 
-
-
 SafeFusion 框架的核心由三个关键模块构成：**碰撞场景生成器 (CollisionGen)**、**环境编码与轨迹解码器**，以及**多目标知识蒸馏训练循环**。本节逐一展开其内部机制与关键公式。
 
 ### CollisionGen：从文本到可训练碰撞场景
@@ -234,8 +226,6 @@ $$PDM_{score} = NC \cdot DAC \cdot DDC \cdot \frac{(5 \cdot TTC + 2 \cdot C + 5 
 
 当前框架存在几个明确的局限：自适应损失权重 $w_R$ 和 $w_C$ 的具体计算公式在论文中未给出，需手动验证；过滤阈值 $D_{thres}$ 和 $\Theta_{thres}$ 为手工设定，缺乏自适应机制；轨迹词汇表固定，可能限制在完全未预见场景中的灵活性。此外，整个管道仅在合成数据上验证，真实世界碰撞数据下的表现仍是开放问题。
 
-
-
 ## 实验与关键发现
 
 ### 实验设置
@@ -272,8 +262,6 @@ $$PDM_{score} = NC \cdot DAC \cdot DDC \cdot \frac{(5 \cdot TTC + 2 \cdot C + 5 
 
 尽管 SafeFusion 在碰撞场景中取得了显著提升，其 Collision2k 总分 0.415 仍低于 PDM-closed 的 0.515，表明基于学习的方法在极端安全临界情况下与规则方法之间仍存在差距。此外，所有评估均在合成数据上进行，缺少真实世界碰撞数据集的验证。碰撞生成管道依赖 GPT-4o 进行文本解释，可能引入语言模型偏差；过滤阈值（D_thres, Θ_thres）为手工设定，对不同地理区域的泛化性尚不明确。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2503_03957/figures/004_Table.jpg]]
 *Table: I: TRAFFIC SCENARIO GENERATION REALISM EVALUATION. TABLE II: SUCCESSFUL COLLISION SCENARIOS AFTER TWO FILTERING STEPS FROM 53,510 TOTAL SCENARIOS. STEP 1 IS LANE COMPLIANCE AND COLLISION FILTERING. STEP 2 IS COLLISION AVOIDANCE FEASIBILITY CHECK*
 
@@ -281,8 +269,6 @@ $$PDM_{score} = NC \cdot DAC \cdot DDC \cdot \frac{(5 \cdot TTC + 2 \cdot C + 5 
 *Table: III: EVALUATION ON COLLISION SCENARIOS FROM THE COLLISION2K TEST SET. “IMI.” STANDS FOR IMITATION LEARNING, AND “KD” STANDS FOR KNOWLEDGE DISTILLATION. THESE ABBREVIATIONS ALSO APPLY TO THE TABLE BELOW. OUR METHOD SIGNIFICANTLY ENHANCES THE PLANNER’S PERFORMANCE IN COLLISION CORNER CASES AND SURPASSES PREVIOUS APPROACHES BY A NOTABLE MARGIN IN PDM SCORES. TABLE IV: EVALUATION ON REGULAR DRIVING SCENARIOS FROM THE OPENSCENE TEST SET. OUR METHOD PRESERVES THE PLANNER’S PERFORMANCE IN REGULAR DRIVING SCENARIOS, EVEN AFTER TARGETED TRAINING FOCUSED ON COLLISION SCENARIOS. TABLE V: PERFORMANCE ON OPENSCENE HARD SAMPLES. TABLE VI: ABLATION STUDY ON COLLISION2K TEST SET. TABLE VII: ABLATION STUDY...*
 
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2503_03957/figures/005_Table.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -323,8 +309,6 @@ SafeFusion 的有效性建立在以下前提之上，这些前提同时划定了
 4. **危险场景泛化**：如何将 SafeFusion 的训练范式扩展到碰撞以外的危险场景？是否需要为每类危险场景设计独立的评分机制，还是 PDM 模拟器的通用性足以覆盖？
 5. **词汇表扩展**：能否通过动态词汇表生成或在线轨迹优化来突破固定词汇表的限制，在保持知识蒸馏有效性的同时提升避撞灵活性？
 6. **过滤阈值敏感性**：D_thres 和 Θ_thres 的变化如何影响最终规划器的安全性与常规驾驶性能？是否存在一个帕累托前沿，需要在场景多样性与数据质量之间做出权衡？
-
-
 
 ## 原文 PDF
 

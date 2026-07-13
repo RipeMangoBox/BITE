@@ -57,8 +57,6 @@ claims:
 
 该方法为轻量 SR 提供了一条“低秩线性时间 + 高秩判别性”的新路径，但尚未在视频 SR、复杂退化及极端资源设备上验证其泛化能力。
 
-
-
 图像超分辨率（SR）旨在从低分辨率输入重建高保真高分辨率图像，是底层视觉领域的基础任务。近年来，基于深度学习的SR方法取得了显著进展，但在资源受限设备（如移动端、IoT终端）上的部署仍面临严峻挑战：模型必须在极低的参数量和计算量约束下，同时保持足够的表征能力以恢复高频细节。
 
 **核心矛盾：感受野扩展与计算效率的冲突。** 现有轻量SR方法在扩大有效感受野（ERF）时，普遍陷入两难困境。一方面，标准Softmax注意力机制具备强大的全局建模能力，但其计算复杂度为 $O(N^2)$，难以直接应用于高分辨率特征图。另一方面，线性注意力通过特征映射 $\phi$ 将复杂度降至 $O(N)$，成为轻量模型的自然选择：
@@ -70,8 +68,6 @@ $$o_i^{\mathrm{L}} = \frac{\phi(\pmb{q}_i)^\top \big(\sum_{j} \phi(\pmb{k}_j) \p
 **现有方法的局限性。** 当前轻量SR方法可大致分为三类：CNN方法（如**ESC**）计算高效但感受野受限；Transformer方法（如**SwinIR-light**）通过窗口注意力平衡效率与性能，但窗口大小固定，难以捕获长程依赖；状态空间模型（如**MambaIRV2-light**）虽在长序列建模上展现潜力，但在复杂纹理重建上的ERF覆盖仍不充分（见Figure 5的ERF可视化对比）。这些方法均未从根本上解决秩崩塌与大窗口注意力计算开销之间的矛盾。
 
 **本文动机。** 针对上述瓶颈，UCAN提出了一种统一卷积注意力网络，核心思路是双管齐下：在全局建模层面，引入可学习的**Hedgehog特征映射**以突破线性注意力的秩瓶颈，在 $O(N)$ 复杂度下逼近Softmax注意力的高秩判别性；在局部建模层面，采用**Flash Attention**实现高效的大窗口（32×32）精确注意力计算，配合**蒸馏式大核卷积**以可控成本扩展空间感受野。通过半共享注意力架构进一步压缩跨层计算冗余，UCAN在轻量参数预算内实现了广泛的有效感受野和高保真重建能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -113,8 +109,6 @@ $$F_{2,a+1}' = f_{RHA}^{(a)}(F_{2,a}', A_{map}^{(a)}, A_{qk}^{(a)})$$
 
 四个槽位创新形成闭环：Hedgehog 特征图保证线性注意力的全局建模质量，Flash Attention 使大窗口局部注意力在轻量约束下可行，半共享机制压缩跨层冗余计算，蒸馏大核卷积以低成本保留高频细节。这一协同设计使得 UCAN 在 Manga109（×4）上以比 MambaIRV2 少 11% 的参数实现 0.26 dB PSNR 提升，在 Urban100（×2）上以 33.22 dB 超越 OmniSR 的 33.05 dB，验证了创新组合的有效性。
 
-
-
 UCAN 的整体管线遵循“浅层特征提取 → 核心编码器 → 重建”的标准超分辨率范式，其关键创新在于核心编码器中同时整合了**大窗口空间注意力**、**Hedgehog 线性全局注意力**和**蒸馏式大核卷积**，从而在轻量参数预算下获得广泛的有效感受野。
 
 ### 输入到浅层特征
@@ -155,12 +149,8 @@ $$I_{LR} \xrightarrow{3\times3 \text{ Conv}} F_0 \xrightarrow{\text{BERFG (SB/RB
 
 BERFG 内部，Sharing Block 和 Receiving Block 交替执行，前者通过 HPA（ConvMLP + Flash Attention 大窗口）和 Hedgehog Attention 捕获局部纹理与全局长程依赖，后者通过半共享机制复用注意力分量降低开销；LKD 模块则进一步蒸馏大核卷积的高频保持能力。三者协同，使 UCAN 在轻量参数预算下获得广泛的有效感受野（图 5 的 ERF 可视化证实了这一点）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l948_https_arxiv_org_abs_2603_11680/figures/003_Figure_3.jpg]]
 *Figure 3: Detailed architecture of (a) Shared and Received Hybrid Attention (SHA and RHA) and (b) Large Kernel Distillation (LKD). LKD contains a Triple Feature Extraction block with three branches, which are the Large Kernel Spatial Branch, the Channel Branch, and the Small Kernel Spatial Branch. SHA and RHA employ Shared and Received Window Multi Head Self Attention (Shared WMHSA and Received WMHSA) to capture local information, and include a Shared Dual Fusion Layer (SDFL) and a Dual Fusion Receiver Layer (DFRL) to aggregate global context. The Dual Fusion Layer comprises two sub branches, which are Hedgehog Attention*
-
-
 
 ### 线性注意力的秩瓶颈与Hedgehog特征图
 
@@ -221,18 +211,8 @@ $$\pmb{F_{sb}} = \phi(\pmb{Q}) ((\phi(\pmb{K})^T \pmb{V}) + \pmb{W_d} \pmb{V})$$
 
 三支输出融合后与粗粒度通道拼接，在保持高频结构的同时大幅降低计算开销。消融实验（Table 5）显示，LKD核尺寸从5增至65时Urban100 PSNR从33.12 dB提升至33.19 dB（+0.07 dB），验证了大核感受野的收益。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l948_https_arxiv_org_abs_2603_11680/figures/002_Figure_2.jpg]]
-*Figure 2: Comparison of feature maps output by Linear Attention (Using ReLU, ELU feature maps) and Hedgehog Attention. All experiments are conducted based on an image with*
-
 ![[assets/figures/papers/paper_list_l948_https_arxiv_org_abs_2603_11680/figures/010_Figure_7.jpg]]
 *Figure 7: Visualization of attention maps for Linear Attention using ReLU and ELU + 1 (computed with sequence length*
-
-![[assets/figures/papers/paper_list_l948_https_arxiv_org_abs_2603_11680/figures/012_Figure_8.jpg]]
-*Figure 8: Ranking consistency analysis. We compare the output ranking of Linear Attention using standard ReLU, Symmetric ReLU, and the Hedgehog Feature Map (sequence length N = 256). While adding negative information (Sym-ReLU) improves consistency, Hedgehog achieves superior performance through learnable stability*
-
-
 
 ## 实验与关键发现
 
@@ -269,28 +249,12 @@ Figure 2 揭示了 Hedgehog Feature Map（HFM）的核心机理：在 N=256、d=
 
 Figure 5 的有效感受野（ERF）可视化显示，UCAN 相比 MambaIR 和 MambaIRv2 拥有更广泛、更均匀的 ERF 分布。Figure 6 的局部归因图（LAM）对比进一步证实 UCAN 在 ×4 尺度下能利用更广范围的输入像素进行重建。
 
-![[assets/figures/papers/paper_list_l948_https_arxiv_org_abs_2603_11680/figures/006_Figure_5.jpg]]
-*Figure 5: Visualize in detail ERF of MambaIR [10], MambaIRv2[8] and UCAN*
-
-![[assets/figures/papers/paper_list_l948_https_arxiv_org_abs_2603_11680/figures/007_Figure_6.jpg]]
-*Figure 6: Local attribution maps (LAM) comparison of different super-resolution methods at scale ×4*
-
 ### 局限性与失效模式
 
 尽管整体参数量低，Hedgehog 特征图引入的额外 MLP 在极低资源 MCU 或 IoT 设备上可能仍构成负担。当前实验仅在双三次下采样退化下进行，未验证对噪声、模糊等复杂退化的鲁棒性。此外，Hedgehog 注意力在视频超分辨率、动态场景或更高放大倍数（×8）上的有效性尚未探索。上述结论需在实际部署中进一步验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l948_https_arxiv_org_abs_2603_11680/figures/008_Table_3.jpg]]
 *Table 3: Ablation study. We train all models on DIV2K for 400K iterations, and test on Set5 and Urban100 (×2). The final result is shown in the last row*
-
-![[assets/figures/papers/paper_list_l948_https_arxiv_org_abs_2603_11680/figures/013_Table_5.jpg]]
-*Table 5: More ablation study. We train all models on DIV2K for 400K iterations, and test on Set5 and Urban100 (×2)*
-
-![[assets/figures/papers/paper_list_l948_https_arxiv_org_abs_2603_11680/figures/009_Table_2.jpg]]
-*Table 2: Comparison of Latency and Parameters between Naive Self-Attention, Flash Attention [3] , and the Dual Fusion Layer (DFL)*
-
-
 
 ## 定位与知识库关联
 
@@ -338,8 +302,6 @@ UCAN的知识增量集中在三个相互耦合的机制上：
 4. **推理效率优化**：蒸馏大核卷积（LKD）与结构重参数化技术的结合能否进一步降低推理延迟？Table 5中LKD内核尺寸从5增至65仅带来0.07 dB提升，表明大核收益递减，更高效的卷积设计值得探索。
 
 5. **HFM的理论分析**：HFM恢复秩的机制目前以实验验证为主（Figure 2, Figure 8的排序一致性分析），缺乏严格的理论界——$m$的取值与输出秩之间的定量关系、对称指数对的最优数量等问题仍待形式化分析。
-
-
 
 ## 原文 PDF
 

@@ -80,8 +80,6 @@ claims:
 
 定性结果表明，FA自编码器在未见姿态下的重构质量一致且稳定，等变潜在空间支持平滑插值（Figure 4），且推理时间虽略高于普通AE，但仍处于可接受范围（Figure 6）。
 
-
-
 形状空间学习（Shape Space Learning）旨在构建低维潜在表示，以捕捉三维几何数据的本质变化。这一任务在计算机视觉和图形学中具有核心地位，其应用涵盖形状补全、生成、插值与姿态迁移等。近年来，基于神经网络的自编码器（Autoencoder）已成为学习此类表示的通用范式：编码器将输入形状映射到潜在编码，解码器则从该编码重构原始形状。
 
 然而，形状空间学习面临一个根本性挑战：**欧几里德对称性（Euclidean Symmetry）的处理**。现实世界中的三维形状天然存在于欧几里德变换（旋转、平移、反射）的等价类中——一个刚性物体在空间中的不同位姿应被视为同一形状的不同实例，而非不同形状。对铰接体（articulated objects）而言，问题更为复杂：不同身体部位可经历独立的局部欧几里德变换（如人体手臂相对于躯干的旋转），这要求模型具备**分片欧几里德等变性（Piecewise Euclidean Equivariance）**。
@@ -105,8 +103,6 @@ claims:
 在此基础上，作者进一步将FA框架**扩展到分片欧几里德变换**：通过为形状的每个语义部分（如人体关节链上的各段）构建独立的局部帧，并利用蒙皮权重（skinning weights）对各部分输出进行加权融合，首次实现了编码器和解码器的分片等变性（Theorem 1）。整个训练过程仅使用标准重构损失（Eq. 12），无需显式姿态监督或等变性正则项。
 
 这一方法论的核心洞察在于：**等变性应当通过架构设计来保证，而非通过数据或损失函数来“学习”**。这使得模型在未见姿态、未见物体类别上的泛化能力得到根本性提升——如在DFaust random split上，分片FA方法将MSE从AE的5.45降至1.68（Table 3），降幅达69%。
-
-
 
 ## 核心方法与创新机理
 
@@ -151,8 +147,6 @@ $$\Psi ( Z ) = \sum _ { j = 1 } ^ { k } { \pmb w } _ { j } \odot \langle \psi ( 
 
 相比于其他等变方法，本工作的创新并非提出新的群表示理论或专用网络层，而是**将 FA 作为一种通用的等变性注入机制**，系统性地解决了从全局到分片、从网格到隐式表示的多种形状空间学习场景。其最大贡献在于证明了：通过巧妙地构造帧并利用加权平均，可以在不牺牲骨干网络灵活性的前提下，为形状自动编码器赋予强泛化能力。
 
-
-
 本文提出一种基于**帧平均（Frame Averaging, FA）** 的通用等变自编码器框架，其核心思想是将任意骨干网络 $\phi$（编码器）和 $\psi$（解码器）通过等变帧 $\mathcal{F}$ 进行平均化，从而赋予其严格的欧几里德等变性。整个pipeline由四个关键模块串联构成：**帧构造（Frame Construction）**、**等变编码器 $\Phi$**、**等变解码器 $\Psi$**，以及针对分片场景的**分片部件处理器（Piecewise Part Processor）**。
 
 ### 输入输出流
@@ -196,12 +190,8 @@ $$\Psi(Z) = \langle \psi \rangle_{\mathcal{F}}(Z)$$
 $$\mathcal{L}_{\mathrm{rec}}(\theta) = \frac{1}{N} \sum_{i=1}^{N} \left\| \Psi(\Phi(\mathbf{X}^{(i)})) - \mathbf{X}^{(i)} \right\|_F$$
 点云到隐式任务使用SALD损失与VAE损失的组合。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l50_https_arxiv_org_abs_2112_01741/figures/006_Figure_3.jpg]]
 *Figure 3: Piecewise Euclidean mesh → mesh, qualitative results; DFaust [6] dataset. Colors mark different splits: green is the random (easy) split; orange is the unseen random pose split; and red is the unseen pose split, see text for details. Our method demonstrates consistently high-quality results across splits of different difficulty levels*
-
-
 
 ### 3.1 预备知识：群作用
 
@@ -284,8 +274,6 @@ $$\mathcal{L}(\theta) = \mathcal{L}_{\mathrm{sald}}(\theta) + 0.001 \, \mathcal{
 
 **关键设计优势**：整个框架将等变性注入与骨干网络解耦，骨干网络 $\phi$ 和 $\psi$ 可以是任意标准架构（如GNN或PointNet），无需修改内部结构或添加等变性约束损失。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设计
@@ -326,7 +314,6 @@ $$\mathcal{L}(\theta) = \mathcal{L}_{\mathrm{sald}}(\theta) + 0.001 \, \mathcal{
 - FA在所有类别上一致优于VAE和AE-Aug，瓶子类别改善最显著（d_C降低0.096）。
 - 该实验验证了FA框架在隐式表示上的通用性：解码器输出连续函数$f_\theta:\mathbb{R}^3\to\mathbb{R}$，通过帧平均保证等变性（Eq. 6），无需修改骨干网络架构。
 - **Figure 2** 的定性结果显示，FA方法在细粒度几何细节（如瓶口、椅背）上重构更精确。
-
 
 ---
 
@@ -409,8 +396,6 @@ $$\mathcal{L}(\theta) = \mathcal{L}_{\mathrm{sald}}(\theta) + 0.001 \, \mathcal{
 
 **Figure 4** 展示了等变潜在空间中的插值结果。在unseen pose split的两个测试样本之间进行线性插值，生成的中间形状保持了合理的几何结构和姿态过渡。这表明FA编码器学习的潜在空间具有语义平滑性，且等变性保证了插值轨迹在SE(3)变换下的稳定性。这一性质对形状编辑、运动合成等下游任务具有潜在价值。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l50_https_arxiv_org_abs_2112_01741/figures/008_Figure_4.jpg]]
 *Figure 4: Interpolation in equivariant latent space between two test examples from the ”unseen pose” split (leftmost and rightmost columns)*
 
@@ -419,8 +404,6 @@ $$\mathcal{L}(\theta) = \mathcal{L}_{\mathrm{sald}}(\theta) + 0.001 \, \mathcal{
 
 ![[assets/figures/papers/paper_list_l50_https_arxiv_org_abs_2112_01741/figures/007_Table_4.jpg]]
 *Table 4: Piecewise Euclidean mesh → mesh, comparison to implicit articulation methods. DFaust [6] and PosePrior [1] datasets*
-
-
 
 ## 定位与知识库关联
 
@@ -500,8 +483,6 @@ $$\mathcal{L}(\theta) = \mathcal{L}_{\mathrm{sald}}(\theta) + 0.001 \, \mathcal{
 - **下游影响**：铰接式形状重建、姿态泛化、形状插值、无监督形状对应
 
 该工作为形状空间学习提供了一种**理论优雅且工程实用的等变性注入方案**，其核心价值在于将等变性的保证从网络架构设计中解耦，使得任何现成的骨干网络（GNN、PointNet 等）都能无缝获得等变能力。这一思路对后续工作的启示在于：等变性的实现不必拘泥于群表示论的约束，通过帧平均这样的“外部”机制同样可以达到最大表达力。
-
-
 
 ## 原文 PDF
 

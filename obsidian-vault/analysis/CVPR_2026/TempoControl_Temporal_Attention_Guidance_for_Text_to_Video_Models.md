@@ -180,8 +180,6 @@ TEMPOCONTROL 是一种推理时优化方法，其核心思想是利用文本到�
 
 这种模块化设计使得 TEMPOCONTROL 可以即插即用地应用于不同的扩散模型骨干网络，无需任何微调或额外监督信号。
 
-### 补充图表
-
 TEMPOCONTROL 的核心工作流程由三个模块串联而成：交叉注意力聚合、时序损失计算、以及潜变量梯度更新。整个流程在每个去噪步 $t$ 中执行，通过迭代优化潜变量来引导生成视频的时序行为，如图 Figure 3 所示。
 
 ### 交叉注意力聚合模块
@@ -309,8 +307,6 @@ TEMPOCONTROL 在三个自建的时序控制基准上进行了系统评估：单�
 
 ![[assets/figures/papers/paper_list_l30_https_openaccess_thecvf_com_content_CVPR2026_html_Schiber_TempoControl_T/figures/008_Table_4.jpg]]
 *Table 4: User study comparing our method with Wan2.1 in terms of temporal accuracy and visual quality*
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l30_https_openaccess_thecvf_com_content_CVPR2026_html_Schiber_TempoControl_T/figures/010_Figure_6.jpg]]
 *Figure 6: Examples of video alignment to an audio signal. 5.2. Qualitative Results*

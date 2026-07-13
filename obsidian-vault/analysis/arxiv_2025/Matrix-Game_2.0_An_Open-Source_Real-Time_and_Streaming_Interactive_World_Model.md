@@ -54,8 +54,6 @@ claims:
 
 **方法定位**：Matrix-Game 2.0 属于因果自回归扩散世界模型，其架构衍生自 Wan I2V 设计，移除了文本分支并嵌入帧级动作模块。与 Oasis（Decart, 2024）等实时交互基线相比，其关键差异在于通过蒸馏实现了少步因果生成；与 YUME（Mao et al., 2025）等交互世界生成模型相比，其优势在于实时流式能力与更精确的动作控制。该方法目前的主要局限包括：对训练分布外场景的泛化不足（可能产生过饱和或退化结果）、输出分辨率限制在 352×640、以及缺乏显式长期记忆机制。
 
-
-
 交互世界模型旨在根据用户输入实时生成可控的视频流，为游戏模拟、具身智能和虚拟世界构建提供核心能力。近年来，视频生成模型取得了显著进展，但在构建真正可用的交互世界模型时，仍面临三个根本性瓶颈。
 
 **实时性与生成质量的矛盾。** 现有交互世界模型普遍依赖双向注意力机制与高步数去噪过程（如 50 步扩散），导致单帧生成耗时过长，无法满足实时交互需求。与此同时，自回归生成范式虽然天然适合流式输出，但在长序列生成中存在显著的误差累积问题——早期帧的微小偏差会沿时间轴放大，最终导致画面崩溃或内容失真。这一矛盾使得现有方法要么牺牲实时性换取质量，要么在实时条件下无法维持分钟级的时间一致性。
@@ -65,8 +63,6 @@ claims:
 **高质量交互数据的稀缺。** 训练帧级可控的视频生成模型需要大规模、精确标注的交互视频数据，即每一帧画面必须与当时的键盘、鼠标输入严格对齐。这类数据在现实中极为稀缺，手工采集不仅成本高昂，标注精度也难以保证。数据瓶颈直接制约了模型对复杂交互模式的学习能力。
 
 针对上述问题，**Matrix-Game 2.0** 提出了系统性的解决方案。其核心洞察在于：通过因果架构、少步蒸馏与 KV 缓存机制，可以解耦实时性与长时一致性的矛盾；同时，利用高精度自动化数据生产管道，能够在复杂场景下首次实现 25 FPS 的流式交互世界模型。在 Minecraft 场景上，Matrix-Game 2.0 的图像质量与键盘控制准确率分别达到 0.61 和 0.91，远超同期实时基线 **Oasis**（Decart, 2024）的 0.27 和 0.73（Table 1）；在 Wild 场景上，图像质量以 0.67 超过 **YUME**（Mao et al., 2025）的 0.65，并展现出更强的泛化能力与实时性（Table 2）。
-
-
 
 ## 核心方法与创新机理
 
@@ -94,8 +90,6 @@ Matrix-Game 2.0 的核心创新在于通过**因果架构、少步蒸馏与高�
 | 数据生产 | 稀缺、标注不准的交互视频 | 自动化管道，1200 小时，精度 >99% |
 
 这些 changed slots 共同构成了 Matrix-Game 2.0 相对于 Oasis（Decart, 2024）和 YUME（Mao et al., 2025）的核心优势：在 Minecraft 场景上，图像质量从 0.27 提升至 0.61，键盘控制准确率从 0.73 提升至 0.91（Table 1）；在 Wild 场景上，图像质量以 0.67 超越 YUME 的 0.65，并展现出更强的泛化能力与实时性（Table 2）。
-
-
 
 Matrix-Game 2.0 的整体框架围绕一个核心目标构建：**在保持高质量视觉生成与精确动作可控性的前提下，实现 25 FPS 的流式交互视频生成**。为此，框架将一条大规模高精度数据生产管道与一个因果自回归扩散模型深度耦合，形成从数据采集到实时推理的闭环系统。
 
@@ -159,18 +153,11 @@ $$\mathcal { L } _ { \mathrm { s t u d e n t } } = \mathbb { E } _ { x , t ^ { i
 
 推理时，系统接收**参考图像**与**实时动作序列**（鼠标连续值 + 键盘离散值）作为输入。3D Causal VAE 与 CLIP Encoder 将图像编码为条件表示，动作注入模块将帧级动作融入潜变量，因果 DiT 块在 KV 缓存支持下逐帧自回归生成潜变量，最后通过 VAE 解码器还原为视频帧。整个流程在单块 H100 GPU 上达到 25.15 FPS 的吞吐量，满足流式生成要求。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2508_13009/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of Our Data Production Pipeline based on Unreal Engine*
 
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2508_13009/figures/006_Figure_6.jpg]]
 *Figure 6: Overview of Our GTA5 Interactive Data Recording System*
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2508_13009/figures/004_Figure_4.jpg]]
-*Figure 4: An example for Our Navigation System*
-
-
 
 ### 3D Causal VAE：时空压缩瓶颈
 
@@ -207,15 +194,8 @@ $$\mathcal{L}_{\mathrm{student}} = \mathbb{E}_{x, t^i} \left\| G_{\phi} \left( \
 
 为进一步提升推理速度，模型采用了三项组合加速策略：集成 Wan2.1-VAE 的缓存架构、仅在 DiT 块的前半部分加入动作模块、将去噪步数从 4 步减为 3 步。在单块 H100 GPU 上，这些技术将帧率推至 25.15 FPS，同时保持生成质量指标基本持平。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2508_13009/figures/009_Figure_9.jpg]]
-*Figure 9: Causal Student Model Initialization via ODE Trajectories. The proposed initialization method stabilizes subsequent distillation training by deriving a few-step causal student model from the bidirectional teacher model through optimal ODE trajectory sampling*
-
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2508_13009/figures/010_Figure_10.jpg]]
 *Figure 10: Overview of Causal Diffusion Model Training via Self-Forcing. The distillation process aligns the student model’s distributions with the teacher model’s through self-conditioned generation. This approach effectively mitigates error accumulation while maintaining the generation quality*
-
-
 
 ## 实验与关键发现
 
@@ -247,24 +227,8 @@ Matrix-Game 2.0 在两个场景设置下进行了定量与定性评估：Minecra
 
 4. **物理模拟精度。** 在 GTA5 驾驶场景（图 14）和 TempleRun 跑酷场景（图 15）中，模型能够生成视觉合理的交互视频，但复杂物理交互（如碰撞响应）的保真度受限于训练数据的覆盖范围和蒸馏过程中的分布偏移。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2508_13009/figures/012_Table_1.jpg]]
 *Table 1: Quantitative Comparisons on Minecraft Scene Generations*
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2508_13009/figures/014_Table_2.jpg]]
-*Table 2: Quantitative Comparisons on Wild Scene Generations*
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2508_13009/figures/016_Table_3.jpg]]
-*Table 3: Quantitative Comparisons of Different Acceleration Techniques. While maintaining comparable generation quality metrics, our combined acceleration techniques achieve 25 FPS throughput, enabling on-the-fly video generation*
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2508_13009/figures/019_Figure_16.jpg]]
-*Figure 16: Qualitative Comparison on Different Local Size for KV-cache. Larger local size cause artifacts in long sequences while smaller local size can keep a balance between visual quality and content fidelity*
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2508_13009/figures/020_Figure_17.jpg]]
-*Figure 17: Bad cases. Matrix-Game-V2 sometimes fails when handling out-of-domain scenes, like producing over-saturated (left) or degraded (right) results*
-
-
 
 ## 定位与知识库关联
 
@@ -306,8 +270,6 @@ Matrix-Game 2.0 的定位是**实时、流式、帧级可控的交互世界模�
 - **物理真实性的提升**：在更复杂的真实世界物理模拟中，是否需要在蒸馏过程中引入物理约束损失或混合训练策略，以进一步降低分布偏移？
 - **多模态交互扩展**：Matrix-Game 2.0 的动作注入模块设计是否可泛化到手柄、语音、甚至自然语言指令？这需要验证交叉注意力机制对异构模态的兼容性。
 - **与现有世界模型的系统性比较**：当前仅在 Minecraft 和 Wild 场景上与 Oasis、YUME 进行了对比。与 Genie-2、Sora 等更大规模世界模型在可控交互维度上的公平比较，仍是开放问题——部分原因在于这些模型的交互能力未完全公开或 API 受限。
-
-
 
 ## 原文 PDF
 

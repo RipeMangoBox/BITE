@@ -56,15 +56,11 @@ claims:
 
 **方法定位** 该方法属于“模拟驱动先验 + 物理引导后验采样”的技术路线，将宇宙学模拟的统计知识以扩散模型形式编码为先验，通过可微前向模型和傅里叶对角协方差将物理约束注入采样过程，为三维弱透镜质量映射提供了兼具高保真度与严格不确定性的新范式。
 
-
-
 **暗物质质量映射的核心挑战。** 暗物质占据宇宙物质总量的约 85%，其三维分布是理解结构形成和约束宇宙学参数的关键。弱引力透镜效应——前景物质对背景星系形状的微小扭曲——是目前绘制暗物质分布最有力的探针之一。这一反演问题的本质是：从被形状噪声严重污染的二维剪切观测中，重建三维密度场 $\delta$，其中形状噪声的幅度通常比透镜信号大两个数量级以上（Figure 2）。
 
 **现有方法的瓶颈。** 当前主流的三维弱透镜质量映射方法存在根本性局限。基于解析先验的方法（如 **Wiener 滤波**，Simon et al., MNRAS 2009）依赖高斯平滑假设，无法捕捉宇宙网的非高斯、纤维状结构，导致重建结果过度平滑、小尺度功率严重衰减。基于深度学习的方法（如 **Neural Ensemble**，Zhao et al., ICLR 2025）虽然通过神经网络集成提供了近似后验，但其先验本质上是单一视角的隐式表征，缺乏对三维宇宙结构多尺度统计特性的完整建模能力，且难以提供严格的贝叶斯不确定性量化。
 
 **核心洞察与动机。** 本文的核心洞察在于：高保真 N 体宇宙学模拟（如 AbacusSummit）已经能够生成高度逼真的三维暗物质光锥数据，这些模拟蕴含了结构形成的完整统计规律——包括非线性坍缩、纤维状网络和多尺度耦合。如果能将这些模拟转化为数据驱动的强先验，并与可微的物理前向模型统一到贝叶斯后验采样框架中，就有可能在噪声观测下恢复既满足数据约束、又保持宇宙学统计一致性的三维密度场。这一思路将质量映射问题从“手工设计先验”转变为“从物理模拟中学习先验”，有望突破现有方法的精度与不确定性量化瓶颈。
-
-
 
 ## 核心方法与创新机理
 
@@ -97,8 +93,6 @@ claims:
 ### 创新边界与待验证问题
 
 上述创新的有效性依赖于一个关键前提：N体模拟能够准确反映真实宇宙的统计特性。若模拟存在系统性偏差，扩散先验学习的分布将与真实宇宙产生偏移，似然修正的能力也可能存在上限。此外，扩散采样的计算成本未在文中明确量化，这可能限制其在平方公里级巡天数据上的直接应用。这些构成了当前创新边界上的开放问题。
-
-
 
 本文提出了一套将扩散生成先验与可微物理前向模型统一于贝叶斯后验采样的三维弱透镜质量映射框架。其核心逻辑是：利用高保真N体模拟学习暗物质密度场的非高斯统计分布作为数据驱动先验，随后将该先验嵌入到已知的弱透镜测量似然中，通过改进的解耦退火后验采样（DAPS）方案生成三维密度场的后验样本。该流程由四个关键模块串联构成，形成从模拟数据构建到最终后验推断的完整链路。
 
@@ -142,12 +136,8 @@ $$\pmb{\Sigma} = \pmb{F}^{-1} \, \mathrm{diag}(P_k) \, \pmb{F}$$
 
 该框架的关键优势在于其**模块化解耦设计**：先验训练仅需模拟数据，前向模型仅依赖物理定律，采样器则作为通用接口将两者统一。这意味着当更精确的N体模拟或更复杂的观测似然可用时，各模块可独立升级而无需重构整体流程。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2501_https_openaccess_thecvf_com_content_CVPR2026_html_Zhao_Generative_Diffus/figures/001_Figure_1.jpg]]
 *Figure 1: Lightcone structure and redshift-conditional diffusion model. Left: The large-scale matter distribution is represented as a 3D lightcone, built from a sequence of lens planes slicing the dark matter density field at increasing comoving distance (redshift). Right: Each lens plane is modeled with a redshift-conditional 2D diffusion prior that learns the statistics of simulated overdensity maps at that redshift. During generation, we start from Gaussian noise on each plane, append one-hot redshift encodings, and denoise with a U-Net score model to obtain a coherent 3D lightcone. This redshift-conditioned factorization enables efficient generation of realistic volumetric dark matter fields cons...*
-
-
 
 ### 弱透镜前向模型
 
@@ -191,12 +181,8 @@ $$\pmb{\Sigma} = \pmb{F}^{-1} \mathrm{diag}(P_k) \pmb{F}$$
 
 该矩阵在傅里叶空间对角化，为采样过程提供尺度感知的正则化，使重建密度场既满足观测约束又保持宇宙学模拟的统计特性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2501_https_openaccess_thecvf_com_content_CVPR2026_html_Zhao_Generative_Diffus/figures/002_Figure_2.jpg]]
 *Figure 2: Weak Lensing Measurements. (Left) As light from distant galaxies propagates through the universe, it is deflected by intervening matter, producing small differences between the intrinsic (unlensed) shape*
-
-
 
 ## 实验与关键发现
 
@@ -230,8 +216,6 @@ Figure 6评估后验样本的不确定性校准质量。对每个体素，计算
 
 尽管方法在定量指标和视觉质量上均显著优于基线，仍需注意以下局限：第一，重建质量依赖于N体模拟的保真度，若Conicus3D未能准确反映真实宇宙的统计特性，先验偏差将传播至后验推断。第二，对极端宇宙学偏移或使用不同模拟代码（如不同子网格物理模型）的影响尚未充分研究。第三，扩散采样过程的计算成本未明确报告，可能限制其直接应用于千万星系量级的特大巡天数据。上述局限需在实际部署前通过更大规模测试和采样加速策略加以验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2501_https_openaccess_thecvf_com_content_CVPR2026_html_Zhao_Generative_Diffus/figures/003_Figure_3.jpg]]
 *Figure 3: Two-dimensional mass reconstruction results from simulated WL data. For three representative lightcone volumes (rows), we show the projected convergence (κ) maps for the ground truth, our method, the Neural Ensemble baseline, and the Wiener filter reconstruction (columns); for each method, we use the posterior mean as a point estimate. Our reconstructions recover sharp cluster peaks and filamentary features that closely match the true κ maps, while the baselines exhibit oversmoothing and reduced contrast in high-density regions. The third row highlights performance under a cosmology mismatch; even in this out-of-distribution setting, our method maintains high-fidelity 2D mass reconstruction...*
 
@@ -243,11 +227,6 @@ Figure 6评估后验样本的不确定性校准质量。对每个体素，计算
 
 ![[assets/figures/papers/paper_list_l2501_https_openaccess_thecvf_com_content_CVPR2026_html_Zhao_Generative_Diffus/figures/007_Table_1.jpg]]
 *Table 1: Quantitative comparison of reconstruction quality. We summarize 3D and 2D mass-mapping performance for three simulated JWST-scale lightcone volumes. We report the Pearson crosscorrelation coefficients averaged over lensplanes between reconstructed and ground-truth maps*
-
-![[assets/figures/papers/paper_list_l2501_https_openaccess_thecvf_com_content_CVPR2026_html_Zhao_Generative_Diffus/figures/008_Figure_6.jpg]]
-*Figure 6: Uncertainty calibration. For each voxel, we compute the standard deviation of the posterior samples (“sample std”) and the mean absolute error (MAE) between the posterior mean and the ground truth. We then bin voxels by sample std and plot the average MAE per bin, along with the fraction of voxels in each bin. Both our method (r = 0.92) and the neural ensemble estimator (r = 0.90) [46] show a strong correlation between predicted uncertainty and actual error, but only our samples correspond to a well-defined Bayesian posterior distribution*
-
-
 
 ## 定位与知识库关联
 
@@ -282,8 +261,6 @@ Figure 6评估后验样本的不确定性校准质量。对每个体素，计算
 3. **可扩展性未验证**：扩散采样的计算成本与采样步数、似然评估复杂度直接相关。对于更大足迹、更高分辨率的巡天数据，当前框架可能需要显著的工程优化（如蒸馏加速、变分替代）才能实用。
 
 此外，论文提出的框架具有向其他宇宙学探针扩展的潜力——例如将弱透镜与FRB色散测量、CMB次级各向异性联合反演，利用扩散先验统一描述不同探针共享的三维物质场。这一多探针联合推断方向是该方法在知识库中的自然延伸。
-
-
 
 ## 原文 PDF
 

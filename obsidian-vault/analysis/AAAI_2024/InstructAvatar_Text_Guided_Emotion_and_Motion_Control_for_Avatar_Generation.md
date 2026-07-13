@@ -54,8 +54,6 @@ claims:
 
 **局限与待解问题**：当前模型难以实现完全解耦的单一动作单元控制，对极端域外外观的泛化能力有限，且无法同时处理包含情绪与动作的复合文本指令。
 
-
-
 情感驱动的人脸动画生成是数字人、虚拟主播和沉浸式交互中的核心技术。其目标是根据音频、文本或参考信号，生成具有丰富表情、自然动作和高质量唇形同步的说话人脸视频。近年来，基于扩散模型和变分自编码器的方法在生成质量和身份保持方面取得了显著进展，但在用户控制能力上仍面临根本性瓶颈。
 
 **现有方法的控制接口受限。** 当前的情感说话人脸生成方法主要依赖两类控制信号：一是离散的情绪类别标签（如“高兴”“悲伤”），二是参考视频中的表情序列。例如，**EAT** 采用 one-hot 标签驱动情绪表达，**DreamTalk** 和 **StyleTalk** 则通过参考视频传递情感风格。然而，这种控制方式存在本质缺陷：标签只能指定粗略的情绪类别，无法描述“嘴角微微上扬但眉头紧锁”这样的细粒度表情组合；参考视频则需要用户预先准备合适的素材，灵活性和泛化性均受到严重制约。正如论文所指出的，现有方法“缺乏细粒度且灵活的用户控制方式，难以同时传达丰富的表情和动态动作，导致生成视频不生动、可控性差”。
@@ -63,8 +61,6 @@ claims:
 **文本作为控制信号的潜力未被充分挖掘。** 自然语言是人类表达意图最灵活、最直观的方式。一句“她先是惊讶地睁大眼睛，然后慢慢露出欣慰的微笑”所蕴含的时序信息和表情细节，远非一个情绪标签或一段参考视频所能承载。然而，将文本指令引入说话人脸生成面临双重挑战：一是如何构建细粒度的文本-视频配对训练数据，二是如何设计模型架构以精确解析文本中的全局情绪风格与时序动作指令，并将其平稳注入生成过程而不破坏已有的唇形同步能力。
 
 **InstructAvatar 的核心动机**正是填补这一空白——将控制信号从受限的标签/参考视频扩展为自然语言文本指令，使模型能够执行开放词汇的细粒度情绪与动作控制。该工作通过三项关键设计实现这一目标：(1) 利用动作单元和 GPT-4V 自动构建细粒度文本-视频对；(2) 设计双分支交叉注意力机制分别解析全局情绪风格与时序面部动作；(3) 引入零卷积门控将文本控制平稳注入预训练的无情绪模型，在保持生成质量的同时实现精确的表情与动作控制。
-
-
 
 ## 核心方法与创新机理
 
@@ -113,8 +109,6 @@ $$h_i = h_{i-1} + \mathcal{Z}(\text{CrossAttn}(h, \text{Rep}(\mathbf{T})))$$
 
 上述四个 changed slots 构成了一条完整的创新链条：**文本接口**定义了“控制什么”，**AU+GPT-4V 管线**解决了“如何获取训练信号”，**双分支交叉注意力**决定了“如何解析指令”，**零卷积门控**保证了“如何稳定注入预训练模型”。四者相互依赖，缺一不可。
 
-
-
 InstructAvatar 的整体目标是根据音频 $A$、参考肖像 $I$ 和自然语言指令 $T$ 生成说话人脸视频 $V$，其核心映射关系为 $V = \mathcal{F}(A, I, T)$。该方法将生成过程分解为两个级联阶段：**运动-外观解耦**与**文本引导的运动生成**，如 Figure 2 所示。
 
 ![[assets/figures/papers/paper_list_l1499_https_arxiv_org_abs_2405_15758/figures/002_Figure_2.jpg]]
@@ -133,8 +127,6 @@ InstructAvatar 的整体目标是根据音频 $A$、参考肖像 $I$ 和自然�
 **辅助训练目标。** 在运动生成器末端附加了两个辅助分类头：AU（动作单元）预测头和情绪强度预测头。这些辅助任务迫使模型关注面部的细粒度动态细节，对应的损失项 $\mathcal{L}_{au}$ 和 $\mathcal{L}_{inten}$ 与运动 MSE 损失 $\mathcal{L}_{mse}$、姿态 MSE 损失 $\mathcal{L}_{pose}$ 加权组合为总训练损失 $L = \mathcal{L}_{mse} + \lambda_{pose}\mathcal{L}_{pose} + \lambda_{au}\mathcal{L}_{au} + \lambda_{inten}\mathcal{L}_{inten}$。
 
 **数据流开关。** 由于模型同时训练情绪说话和纯动作控制两类任务，框架中设置了数据流开关（Figure 2 中的 switches）。对于情绪说话任务，音频 $A$ 和情绪指令 $T$ 同时输入；对于无音频的面部动作控制任务，音频输入被置零，仅依赖动作指令 $T$ 驱动生成。这种统一框架使 InstructAvatar 既能完成传统的音频驱动情绪说话人脸生成，也能实现此前方法不具备的纯文本驱动面部动作控制。
-
-
 
 InstructAvatar 的整体生成映射为 $V = \mathcal{F}(A, I, T)$，即从音频 $A$、肖像 $I$ 和文本指令 $T$ 生成视频 $V$。其核心架构由两大组件构成：VAE 解耦模块 $\mathcal{H}$ 与扩散运动生成器 $\mathcal{G}$。
 
@@ -199,8 +191,6 @@ $$\operatorname{AU}_{\mathbf{F1}} = \frac{1}{n} \sum_{j=1}^{n} \frac{2 \sum_{i=1
 $$s = \max_i \frac{\mathcal{E}_t(t) \cdot \mathcal{E}_v(v_i)}{\|\mathcal{E}_t(t)\| \cdot \|\mathcal{E}_v(v_i)\|}$$
 
 其中 $\mathcal{E}_t$ 和 $\mathcal{E}_v$ 分别为 CLIP 的文本编码器和视觉编码器，$t$ 为文本指令，$v_i$ 为第 $i$ 帧。
-
-
 
 ## 实验与关键发现
 
@@ -267,15 +257,11 @@ $$s = \max_i \frac{\mathcal{E}_t(t) \cdot \mathcal{E}_v(v_i)}{\|\mathcal{E}_t(t)
 
 这些局限指向了三个开放问题：如何实现真正独立可组合的动作单元控制；如何在有限数据下提升极端域外泛化能力；以及如何扩展架构以支持情绪与动作的联合文本指令解析。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1499_https_arxiv_org_abs_2405_15758/figures/009_Table_3.jpg]]
 *Table 3: Objective and subjective metrics for text-guided facial motion control. Table 4: Ablation studies on the proposed techniques*
 
-
 ![[assets/figures/papers/paper_list_l1499_https_arxiv_org_abs_2405_15758/figures/013_Figure_9.jpg]]
 *Figure 9: neutral Fig. 9: Illustration of the effectiveness of textual instructions. All videos are generated utilizing identical portraits and neutral audio, with variations only in the textual instructions*
-
 
 ![[assets/figures/papers/paper_list_l1499_https_arxiv_org_abs_2405_15758/figures/005_Table_1.jpg]]
 *Table 1: Quantitative comparison with baselines for in-domain/out-of-the-domain settings. The bold values indicate the best results, while the underlined values represent the second-best. Guid. Mod. indicates the modality of emotional guidance. Since there is no ground truth video in the out-of-the-domain setting, the FID metric is left empty. It can be observed that our model outperforms the baselines across many metrics. Notably, for SyncD, the ground truth video has a SyncD of 9.172 in the in-domain setting, which is the closest to our model*
@@ -285,12 +271,6 @@ $$s = \max_i \frac{\mathcal{E}_t(t) \cdot \mathcal{E}_v(v_i)}{\|\mathcal{E}_t(t)
 
 ![[assets/figures/papers/paper_list_l1499_https_arxiv_org_abs_2405_15758/figures/015_Table_5.jpg]]
 *Table 5: More ablation studies on the proposed techniques*
-
-
-
-
-
-
 
 ## 定位与知识库关联
 
@@ -332,8 +312,6 @@ InstructAvatar 在以下条件下表现良好：
 3. **复合指令解析与执行**：能否扩展模型架构或训练范式，使其能够解析并同时执行包含情绪风格与具体动作描述的复杂文本指令？这需要构建多标签、多类型的指令-视频配对数据集，并设计相应的条件融合机制。
 
 4. **文本控制精度的可量化评估**：当前使用 CLIPS 指标（取所有帧中与文本指令余弦相似度的最大值）评估指令遵循程度，但该指标可能无法捕捉时序上的控制精度。设计更细粒度的文本-视频对齐评估方法，将是推动该方向发展的基础设施性工作。
-
-
 
 ## 原文 PDF
 

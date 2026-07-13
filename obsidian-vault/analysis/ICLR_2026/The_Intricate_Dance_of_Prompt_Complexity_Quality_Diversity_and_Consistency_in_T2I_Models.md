@@ -60,8 +60,6 @@ claims:
 
 这些发现为T2I模型的提示设计、推理干预选择以及合成数据的下游应用提供了重要的指导原则。
 
-
-
 文本到图像（T2I）生成模型近年来取得了显著进展，以 Stable Diffusion（LDM 系列）为代表的扩散模型能够根据自然语言描述合成高质量、高保真度的图像。然而，随着这些模型被广泛应用于大规模合成数据生成以训练下游视觉模型，一个根本性问题逐渐浮现：**提示（prompt）的复杂度如何影响合成数据的效用？**
 
 ### 核心瓶颈：向一般提示泛化的困难
@@ -91,8 +89,6 @@ $$s_{\theta}(x_t | c_{\mathbf{g}}) = \sum_{i \in \{1, 2, \dots, K\}} \left( \und
 3. 如何通过组合策略获得最佳的多样性-保真度权衡？
 
 该框架通过在已有图像-文本数据集上构建多复杂度提示并进行配对对齐，使跨复杂度的公平比较成为可能，为理解 T2I 模型的泛化行为提供了新的分析视角。
-
-
 
 ## 核心方法与创新机理
 
@@ -127,8 +123,6 @@ $$s_{\theta}(x_t | c_{\mathrm{f}}) = s_{\theta}(x_t) + \sum_{i \in \{1, 2, \ldot
 ### 3. 干预组合：多样性-保真度权衡的最优解
 
 在框架评估的基础上，论文进一步发现：**提示扩展与高级引导方法的组合**——尤其是提示扩展与 APG 的结合——可以在不牺牲质量和分布保真度（FDD）的前提下，显著提升多样性。这一发现超越了单独使用任一干预方法的效果，为实际合成数据生成提供了可操作的策略选择。
-
-
 
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_RBIBMCdw7y/figures/003_Figure_1.jpg]]
 *Figure 1: Generalization to prompts of different complexities during inference. 1a shows the training data distribution. 1b presents the generated samples using the general prompt cat with the model trained with fine-grained prompts. 1c shows the generated samples using the fine-grained prompt black dog with the model trained with general prompts. ω is the classifier-free guidance scale. With $\omega$ > 1 , generalization towards more general prompts is harder in this synthetic setting*
@@ -182,8 +176,6 @@ $$N_{\mathrm{gen}} = \min_{i \in \mathcal{N}_k^{\mathrm{s}}, k \in \{1,2,\ldots,
 
 框架揭示了提示复杂度与合成数据效用之间的复杂交互：增加提示复杂度会降低条件多样性并削弱提示一致性，但有助于缩小合成数据与真实数据之间的分布差距（FDD 改善）；提示扩展和高级引导（尤其是 APG 与提示扩展的组合）可在提升多样性的同时维持可比的质量和 FDD，但会牺牲精确度和密度，表明生成样本偏离了真实数据支撑集。
 
-
-
 ### 提示复杂度评估框架
 
 本文提出一个五步数据管护框架，用于系统评估不同提示复杂度下T2I合成数据的效用。其核心模块如下：
@@ -216,8 +208,6 @@ $$s_{\theta}(x_t | c_{\mathrm{f}}) = s_{\theta}(x_t) + \sum_{i \in \{1, 2, \ldot
 
 **因果机制总结**：提示复杂度通过上述OR/AND算子的不对称性影响合成数据效用——增加复杂度（向细粒度方向）缩小了与真实数据的分布差距，但降低了条件多样性和提示一致性；向更简单提示泛化则因缺少条件似然而产生严重分布偏移和模式坍缩。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：提示复杂度对合成数据效用的三重影响
@@ -226,7 +216,6 @@ $$s_{\theta}(x_t | c_{\mathrm{f}}) = s_{\theta}(x_t) + \sum_{i \in \{1, 2, \ldot
 
 **多样性随复杂度单调下降。** 如图2所示，无论使用基础分类器免引导（CFG）、提示扩展还是高级引导方法，随着提示长度（复杂度）增加，所有模型在CC12M和ImageNet-1k上的Vendi多样性得分均呈现下降趋势。值得注意的是，提示扩展在低复杂度时（如复杂度1）可使多样性超越真实数据——LDMv1.5的Vendi得分从CFG基线的9.23提升至15.07（提升约5.85点，Table 8），而真实数据多样性约为13。然而，当提示长度超过约30词后（DCI数据集），多样性下降趋于平缓，不再随长度增加而持续恶化（Figure 2c）。
 
-
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_RBIBMCdw7y/figures/006_Figure_2.jpg]]
 *Figure 2: Reference-free diversity metric. Diversity (Vendi) of LDMv1.5 and LDMv3.5L generations with CC12M and ImageNet-1k prompts when using: 1) vanilla guidance (CFG), 2) prompt expansion, and 3) advanced guidance methods, for which transparent markers correspond to different methods and the solid marker is the average over methods. Both advanced guidance methods and prompt expansion lead to improved diversity over the vanilla guidance. Prompt expansion from shorter captions can surpass the real data diversity. We further extend to much longer DCI prompts. Diversity of all models first decreases then plateaus which is not observed within shorter prompt length ranges*
 
@@ -234,14 +223,12 @@ $$s_{\theta}(x_t | c_{\mathrm{f}}) = s_{\theta}(x_t) + \sum_{i \in \{1, 2, \ldot
 
 **一致性持续下降，模型对过长约束的遵循能力有限。** 图4显示，DSG一致性得分在所有模型和方法下均随提示复杂度增加而下降。提示扩展和高级引导方法进一步加剧了这一趋势：相比CFG基线，一致性下降约0.05-0.1（Figure 4a, Figure 16c）。在DCI数据集上，当提示长度超过约30词时，一致性仍持续下降，说明模型对过长文本约束的遵循能力存在瓶颈。
 
-
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_RBIBMCdw7y/figures/012_Figure_4.jpg]]
 *Figure 4: Reference-free consistency metric. Consistency (DSG) metrics of LDMv1.5 and LDMv3.5L generations with CC12M and ImageNet-1k prompts when using: 1) vanilla guidance (CFG), 2) prompt expansion, and 3) advanced guidance methods, for which transparent markers correspond to different methods and the solid marker is the average over methods. Both advanced guidance methods and prompt expansion lead to lower consistency scores compared to vanilla guidance. We further extend to much longer DCI prompts. Consistency of all models decreases when the prompt lengths increases, which is the same as in the shorter prompt ranges*
 
 ### 合成数据分布保真度的权衡
 
 参考基础指标（FDD、精度、密度、覆盖率）揭示了合成数据分布与真实数据分布之间的结构性偏离。如图5所示，增加提示复杂度可提升精度、密度和覆盖率，即合成数据更贴近真实数据的支撑集。然而，提示扩展和高级引导方法虽然改善了FDD（分布距离），却以牺牲精度和密度为代价——这意味着生成样本偏离了真实数据的高密度区域，进入了分布的低概率区域。
-
 
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_RBIBMCdw7y/figures/017_Figure_5.jpg]]
 *Figure 5: Reference-based utility metrics of synthetic data using CC12M prompts. FDD, precision, density and coverage for LDMv1.5 and LDMv3.5L generations with: (1) vanilla guidance (CFG), (2) prompt expansion, and (3) advanced guidance methods, for which transparent markers correspond to different methods and the solid marker is the average over methods. Both advanced guidance methods and prompt expansion lead to better FDD. Although prompt expansion improves coverage and advanced guidance methods match coverage for LDMv3.5, they both sacrifice precision and density. LDMv1.5 has thus better overall performance (lower FDD) than LDMv3.5L. (a) Diversity*
@@ -251,7 +238,6 @@ $$s_{\theta}(x_t | c_{\mathrm{f}}) = s_{\theta}(x_t) + \sum_{i \in \{1, 2, \ldot
 ### 干预方法的效用权衡与最佳组合
 
 在所有高级引导方法中，APG对提示一致性的负面影响最小，而CADS和Interval因更激进地移除条件信息导致一致性下降更多（Figure 16c）。消融实验表明，将提示扩展与APG组合可获得最佳的多样性-质量-一致性权衡：多样性进一步提升，同时质量和一致性与CFG基线相当，FDD表现也具竞争力（Figure 6, Section 4.4）。这验证了“组合高级引导与提示扩展可获得最佳多样性-保真度权衡”的核心洞察。
-
 
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_RBIBMCdw7y/figures/020_Figure_6.jpg]]
 *Figure 6: Effect of combining prompt expansion and guidance methods on the utility of synthetic data from LDMv3.5L using CC12M prompts. This can further boost the diversity of synthetic images, with comparable quality, consistency, and FDD (expecially with APG)*
@@ -273,13 +259,8 @@ $$s_{\theta}(x_t | c_{\mathrm{f}}) = s_{\theta}(x_t) + \sum_{i \in \{1, 2, \ldot
 3. **提示扩展的社会偏见风险**：提示扩展使用的LLM先验可能内嵌社会偏见（如性别、种族），在扩展“医生”或“CEO”等提示时可能放大刻板印象；当用户本意是寻求通用表达时，强制性具体化可能违背用户意图。
 4. **模型覆盖范围有限**：实验仅限于开源T2I模型（LDM系列、Flux、Infinity），未涵盖闭源模型如DALL-E 3，结论的泛化性需要进一步验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_RBIBMCdw7y/figures/021_Table_1.jpg]]
 *Table 1: Statistics on word lengths of different prompt complexities*
-
-
-
 
 ## 定位与知识库关联
 
@@ -339,8 +320,6 @@ $$s_{\theta}(x_t | c_{\mathrm{f}}) = s_{\theta}(x_t) + \sum_{i \in \{1, 2, \ldot
 - 是否能在扩散模型中引入对条件似然的近似，从而改善向更一般提示的泛化？
 - 不同的文本编码器（如CLIP vs. T5）如何影响提示复杂度的泛化行为？
 - 在实际下游任务（如医学图像合成）中，如何在不牺牲安全性和公平性的前提下利用高级引导和提示扩展带来的多样性提升？
-
-
 
 ## 原文 PDF
 

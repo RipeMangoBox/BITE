@@ -53,8 +53,6 @@ claims:
 
 实验覆盖文本到图像、视频生成、图像编辑及蒸馏模型等多种任务和架构。主要结果包括：在FLUX.1-dev上实现**5.55×加速**，ImageReward仅降0.03%（Table 2）；在HunyuanVideo上实现**5.56×加速**，VBench得分仅降0.51%（Table 3）；在Qwen-Image-Edit上实现**6.24×加速**，且整体得分反超原始模型0.41%（Table 4）。消融研究证实，维度级缓存策略显著优于令牌级和统一缓存，混合求解器性能超越任何单一求解器（Figure 7）。此外，聚类和求解器分配对LoRA微调保持鲁棒（ARI > 0.8），无需重新聚类。该方法仅需约1秒的离线预处理，无需额外训练，在近无损质量下实现了显著的推理加速。
 
-
-
 扩散Transformer（DiT）已成为文生图、文生视频等生成任务的主流架构。然而，其推理过程需要数十步去噪，每一步都需完整执行深层Transformer块，计算开销极大。为缓解这一问题，**特征缓存**（Feature Caching）作为一种免训练的加速范式被广泛采纳：它利用去噪过程中隐藏特征的时序冗余，在部分步骤跳过Transformer计算，直接复用或预测缓存的特征。
 
 现有特征缓存方法存在一个共同瓶颈：**对所有特征维度施加统一的缓存策略**。无论是基于令牌级选择的方法（如 **ToCa**，Zou et al., 2024a；**DuCa**，Zou et al., 2024b），还是统一复用全部维度的方案（如 **FORA**，Selvaraju et al., 2024；**TaylorSeer**，Liu et al., 2025a），都隐含假设所有特征维度的演化行为是同质的。然而，实证观察表明，DiT隐藏特征的不同维度呈现出显著异质的动态行为——部分维度轨迹剧烈震荡，另一些则平滑单调（Figure 2 a–b）。这种“一刀切”的缓存策略忽视了维度间的动态差异，导致预测误差累积，最终损害生成质量。
@@ -62,8 +60,6 @@ claims:
 本文的核心动机源于一个关键发现：**尽管特征维度表现出异质的ODE动态，但这些维度的聚类分配在提示、时序和分辨率上高度稳定**（Figure 2 c–d，调整兰德指数ARI > 0.8）。这一稳定性意味着，可以在离线阶段通过“一次性”分析确定每个维度聚类的最优求解器，而在推理时无需额外开销即可实现维度感知的自适应缓存。
 
 基于此，本文提出 **HyCa**（Hybrid Feature Caching），将隐藏特征演化建模为**混合ODE**，通过无监督聚类将维度分组，并为每个聚类从求解器池中自动分配最合适的数值求解器（如Runge–Kutta、Adams–Bashforth、Taylor等），从而实现维度级自适应缓存。该方法在多种DiT模型和任务上均实现了近无损的显著加速（如FLUX上5.55×，ImageReward仅降0.03%），验证了“让特征决定自身求解器”这一范式的有效性。
-
-
 
 ## 核心方法与创新机理
 
@@ -101,8 +97,6 @@ $$\operatorname*{min}_{\{s_c \in S\}_{c=1}^C} \sum_{c=1}^C \left[ \frac{1}{|c|} 
 
 值得注意的是，聚类和求解器分配对LoRA微调保持鲁棒（ARI>0.8），无需重新聚类即可直接复用，进一步降低了实际部署的门槛。
 
-
-
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_URbsHlTK8c/figures/003_Figure_3.jpg]]
 *Figure 3: HyCa Framework. (a) Offline Preprocessing: feature dimensions are first analyzed and clustered with temporal indicators (e.g., differences, curvature). For each cluster, candidate solvers generate predicted features, then compared against real computed features; the solver with minimum error is then assigned to that cluster. (b) Inference: once assigned, each cluster consistently reuses its solver, enabling efficient prediction by skipping redundant computations while maintaining accuracy*
 
@@ -136,8 +130,6 @@ HyCa 的整体流程分为两个阶段：**离线预处理** 与 **推理时混�
 | 求解器策略 | 单一求解器（如 TaylorSeer 的 Taylor 外推、FORA 的跳步复制） | 混合求解器池，每聚类自动择优 |
 
 HyCa 的维度级缓存策略相较于令牌级方案具有更好的稳定性——特征空间的聚类结构在跨提示、分辨率和时间步的条件下几乎不变（Figure 6），而令牌级缓存在不同输入下的行为一致性则难以保障。同时，混合求解器策略使 HyCa 在预测误差和生成质量上均超越任何单一求解器基线（Figure 7 c-d），验证了“让特征决定自身求解器”这一核心洞察的有效性。
-
-
 
 HyCa 将特征缓存重新建模为数值常微分方程（ODE）求解问题，其核心由三个模块串联构成：**动态分析与聚类**、**求解器选择**、**推理时混合缓存**。
 
@@ -195,8 +187,6 @@ $$
 
 **推理时混合缓存**模块在跳跃步骤中，对每个聚类使用其预分配的求解器，基于缓存特征预测下一个残差，并注入 Transformer 块。前几步始终完整计算，因此早期聚类的不稳定性不影响最终生成质量（见 Figure 15 的消融验证）。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能：近无损加速的跨任务验证
@@ -234,15 +224,9 @@ HyCa在文本到图像、视频生成、图像编辑及蒸馏模型四个场景�
 - **极端设置下聚类保持稳定**：在极端分辨率（如1024×1024与256×256对比）和无意义提示下，ARI仍超过0.8（Figure 14），说明聚类结构对输入扰动鲁棒。
 - **早期步骤的轻微不稳定不影响生成**：去噪的最初2-3步聚类可能不一致，但Figure 15证明这不对最终图像质量产生影响，因为前几步总是完整计算，不涉及缓存预测。
 
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_URbsHlTK8c/figures/019_Figure_14.jpg]]
-*Figure 14: (a–b) The left two figures show that clustering structures remain stable under extreme resolution settings. (c–d) The right two figures show that clustering is also consistent for nonsensical prompts and closely matches those from normal, well-formed prompts*
-
 ### LoRA鲁棒性：无需重新聚类的即插即用
 
 HyCa的聚类分配对LoRA微调保持高度不变性。Figure 8和Figure 13显示，在FLUX.1-dev及其Art LoRA和Anime LoRA变体之间，聚类分配的ARI均值超过0.8。这意味着用户只需在原始模型上执行一次离线聚类（约1秒），即可直接将相同的求解器分配应用于任意LoRA变体，无需额外预处理。
-
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_URbsHlTK8c/figures/018_Figure_13.jpg]]
-*Figure 13: ARI between clustering assignments from FLUX.1-dev and its LoRA variants. (a) ARI distributions across different prompts and timesteps for FLUX.1-dev show clustering consistency within the base model. (b) and (c) compare the original model’s clustering with that from Art LoRA and Anime LoRA, respectively. In both cases, the ARI values remain high (most above 0.8, marked by the red dashed line), confirming strong agreement between the LoRA and original clustering results. This further supports that solver assignments in HyCa can be reused across LoRA variants*
 
 ### 失败模式与局限
 
@@ -250,22 +234,6 @@ HyCa的聚类分配对LoRA微调保持高度不变性。Figure 8和Figure 13显�
 2. **极端加速下的质量退化**：在FLUX.1-schnell上N=8时，ImageReward下降13.84%（Table 2），表明在已高度压缩的蒸馏模型上过度缓存仍会导致质量损失。
 3. **求解器池的手工设计限制**：当前求解器池由经典数值方法构成，未利用数据驱动的学习型预测器，可能在特定动态模式下存在改进空间。
 4. **架构泛化性待验证**：所有实验均在DiT架构（FLUX、Qwen-Image、HunyuanVideo）上进行，对U-Net等传统架构的适用性尚未探索。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_URbsHlTK8c/figures/002_Figure_2.jpg]]
-*Figure 2: Feature trajectory clusters and stability of assignments. (a–b) Cluster 1 shows oscillatory trajectories while Cluster 2 shows smooth ones. (c–d) ARI distributions on Hunyuan Video and Qwen-Image exceed 0.8 in most cases, confirming stable and consistent cluster assignments across prompts and timesteps. An ARI above 0.8 indicates strong agreement and high clustering reliability*
-
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_URbsHlTK8c/figures/016_Figure_11.jpg]]
-*Figure 11: The first row shows, from left to right, ARI comparison plots of FLUX, Qwen-Image, and Hunyuan Video under different prompts and timesteps, with the last plot illustrating ARI comparisons of FLUX across different resolutions. It can be seen that ARI distributions exceed 0.8 in most cases, confirming stable and consistent cluster assignments across prompts, timesteps and resolutions. An ARI above 0.8 indicates strong agreement and high clustering reliability. The three plots in the second row depict the intra-cluster metric shifts between clusters formed by indicators from every two adjacent prompts of FLUX. The normalized value is obtained by dividing the inter-cluster shift of a given indi...*
-
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_URbsHlTK8c/figures/017_Figure_12.jpg]]
-*Figure 12: Clustering consistency between original and LoRA-tuned models. Each subplot visualizes the clustering results under different prompts for FLUX.1-dev (top row), and its two LoRA variants, the Art LoRA (middle row) and Anime LoRA (bottom row). Despite fine-tuning, the cluster boundaries remain highly consistent across prompts and models, indicating that HyCa’s solver assignments remain stable and reusable even after LoRA adaptation*
-
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_URbsHlTK8c/figures/020_Figure.jpg]]
-*Figure: (a)*
-
-
 
 ## 定位与知识库关联
 
@@ -342,8 +310,6 @@ HyCa的求解器池包含BDF等隐式方法，适合处理蒸馏模型（如FLUX
 - **大规模可扩展性**：在百亿参数级DiT上，聚类数量是否需要增加？求解器池是否需要扩展？离线探测的计算成本是否仍可忽略？
 
 - **与模型压缩的协同**：HyCa与剪枝、量化等模型压缩技术的叠加效果如何？维度级缓存是否可与结构化稀疏性结合实现更高加速？
-
-
 
 ## 原文 PDF
 

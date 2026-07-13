@@ -51,8 +51,6 @@ claims:
 
 在实验验证上，4D-RGPT 在 **6 个非区域级 3D/4D 基准**上平均提升 **+5.3%**（相对于基线 NVILA-Lite-8B），在本文新构建的**区域级 4D 基准 R4D-Bench** 上提升 **+4.3%**。消融实验表明：P4D 双分支蒸馏显著优于直接 SFT 和简单拼接策略；潜在蒸馏单独使用已带来增益，组合显式蒸馏后达到最佳；TPE 在多个基准上持续贡献正向提升。方法局限在于精确数值估计任务（如速度、位移计算）上表现次优，且 4D 感知能力受限于冻结教师模型的上限。
 
-
-
 ### 从视频理解到 4D 时空推理
 
 多模态大语言模型（MLLMs）在图像和视频理解任务上取得了显著进展，但当任务要求模型对动态场景中的**特定区域**进行精确的时空推理时，现有模型暴露出了根本性的能力缺口。以图1所示的区域级4D视觉问答（VQA）为例，模型需要同时完成三个层次的感知：**2D区域追踪**（定位并跟踪目标物体在视频帧中的位置）、**3D深度感知**（判断物体与相机之间的空间关系）、以及**4D时间进展**（理解物体随时间的运动变化）。当前的MLLMs——无论是专有模型如**GPT-4o**（OpenAI, arXiv 2024）、**Gemini-2.5-Pro**（Comanici et al., arXiv 2025），还是开源模型如**Qwen2.5-VL-7B**（Qwen Team, arXiv 2025）、**VideoLLaMA3-7B**（Zhang et al., arXiv 2025）——往往无法同时把握这三个维度中的某一个或多个方面，导致在需要精细时空推理的问题上回答错误。
@@ -80,8 +78,6 @@ claims:
 2. **时间戳位置编码（Timestamp Positional Encoding, TPE）**：将每帧的时间戳编码为正弦位置编码，直接注入视觉特征，为MLLM提供显式的时间线索，使其能够感知视频中的时间进展。
 
 实验结果表明，4D-RGPT在非区域级3D/4D基准上平均提升**+5.3%**（覆盖6个基准），在区域级R4D-Bench上提升**+4.3%**，验证了通过感知蒸馏增强MLLM 4D理解能力的有效性。
-
-
 
 ## 核心方法与创新机理
 
@@ -118,8 +114,6 @@ $$p^{(n)}[2i] = \sin\left(\frac{t^{(n)}}{T^{\frac{2i}{D}}}\right), \quad p^{(n)}
 ### 创新总结
 
 上述三个 changed slots 共同构成了 4D-RGPT 的因果调节旋钮：TPE 提供显式时间定位，P4D 的双分支蒸馏将冻结教师模型的潜在时空表示和显式物理信号迁移至学生 MLLM，而训练时专用模块的引入与推理时移除策略保证了零额外推理成本。这一组合使 4D-RGPT 在非区域级 3D/4D 基准上平均提升 +5.3%（6 个基准），在区域级 R4D-Bench 上提升 +4.3%。
-
-
 
 4D-RGPT 的整体框架围绕一个核心设计展开：**在训练阶段引入仅训练时使用的 4D 感知模块，通过感知蒸馏将冻结专家模型的知识迁移至 MLLM，推理时完全移除这些模块，不增加任何额外计算开销**。
 
@@ -163,12 +157,8 @@ Figure 2 展示了完整的 P4D 框架架构。视频帧经视觉编码器和 TP
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2512_17012/figures/003_Figure_2.jpg]]
 *Figure 2: | Perceptual 4D Distillation (P4D) framework for 4D-RGPT. For each frame*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2512_17012/figures/001_Figure_1.jpg]]
 *Figure 1: | Overview of Region-level 4D Understanding. 4D region-level VQA, e.g., our R4D-Bench, requires MLLMs to be able to track regions (2D), perceive depth (3D), and temporal progression (4D). Baseline MLLMs cannot recognize one or more of these aspects and thus fail to answer questions correctly. With our distillation framework, our 4D-RGPT better perceives these aspects and answers accurately. We note that the regions labeled with (*) are not provided in R4D-Bench; they are visualized for readability*
-
-
 
 ### 4D-RGPT 整体架构
 
@@ -241,8 +231,6 @@ $$
 ### 核心机制总结
 
 P4D 框架的核心在于**双分支蒸馏**：潜在蒸馏（LD）对齐师生模型在中间特征空间的 4D 表示，使 LLM 内部隐式习得时空结构；显式蒸馏（ED）则强制学生模型从潜在特征中准确恢复深度、光流等低层感知信号，从而将冻结专家 L4P 的感知能力迁移至 MLLM。TPE 以极低成本为视觉特征注入帧级时间戳，弥补了标准 MLLM 缺乏显式时间线索的短板。三者协同，使 4D-RGPT 在无额外推理开销的前提下获得显著增强的时空感知与推理能力。
-
-
 
 ## 实验与关键发现
 
@@ -322,33 +310,11 @@ Table 7 探索了不同训练配置：
 - 不同视频帧率和采样策略对 TPE 效果的影响如何？
 - P4D 框架与强化学习（RL）结合能否进一步提升 4D 问答能力？
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2512_17012/figures/008_Table_4.jpg]]
-*Table 4: | Alternative strategies for 4D VQA. We compare P4D with direct SFT (4D-SFT) and straightforward designs of incorporating*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2512_17012/figures/009_Table_5.jpg]]
-*Table 5: | Analysis of 4D modalities in P4D. We ablate the effectiveness of different combinations of distillation in latent distillation (LD) on*
-
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2512_17012/figures/012_Table.jpg]]
 *Table: DemoTable 6 | Ablation studies on explicit temporal cues. We experiment without and with different Demo Demochoices of explicit time cues. For simplicity, we use the same abbreviations as Tab. 4*
 
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2512_17012/figures/010_Figure_5.jpg]]
-*Figure 5: | Predicted depth maps at different training steps. We visualize the progress of*
-
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2512_17012/figures/005_Figure_4.jpg]]
 *Figure 4: | VQA comparison among baseline ⟨R1⟩MLLMs and 4D-RGPT on R4D-Bench. For the (*) (*)baseline MLLMs, we use GPT-4o-20241120 [5], Qwen-2.5VL-7B-Instruct [35], and NVILA-Lite-8B [36]. We note that the regions labeled with (*) or (*) are not Q: What direction is ⟨R1⟩ moving forward ?provided in R4D-Bench; they are visualized for readability*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2512_17012/figures/002_Table_1.jpg]]
-*Table 1: | Comparison among 3D / 4D VQA Benchmarks. Existing benchmarks either lack dynamic video data or region prompts, while our R4D-Bench is the first to provide both at scale. All benchmarks are downloaded from official sources as of August 2025, and the numbers of VQA might differ from the original papers. Static videos contain only camera movement, while dynamic videos contain both camera and object movement. †We only adopt real-world videos from the VLM4D benchmark*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2512_17012/figures/004_Figure_3.jpg]]
-*Figure 3: | Curation pipeline of our R4D-Bench. Given existing non-region 4D VQA benchmarks, we (a) first extract the noun keywords from the question as candidates for objects of interest. (b) Next, if ground truth segmentation masks are provided, we use them for step (d). Otherwise, we use off-the-shelf GroundingDINO [70] and SAM2 [71] to extract segmentation masks for each object of interest. (c) We generate a SoM [59] image for the first frame. (d) We prompt Qwen-2.5VL [35] with the SoM image and the referee, fighter MLLMprocessed question to match the objects referred to in the question with the regions. (e) Finally, the generated identify key objsmatching results are verified by human experts*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2512_17012/figures/032_Figure_5.jpg]]
-*Figure 5: Similar to the format of Fig. 5, we visualize the training progress of*
-
-
 
 ## 定位与知识库关联
 
@@ -393,8 +359,6 @@ Table 7 探索了不同训练配置：
 ### 5. 知识库定位
 
 4D-RGPT 在知识库中应定位为**首个通过感知蒸馏实现训练时 4D 增强、推理时零额外开销的区域级 4D 理解 MLLM**。其方法论贡献——P4D 蒸馏框架与 TPE 时间编码——为后续 4D MLLM 研究提供了可复用的训练范式。配套的 **R4D-Bench** 是首个同时提供区域提示和动态视频数据的大规模 4D VQA 基准（Table 1），填补了现有基准在区域级动态评估上的空白。代码已开源（https://github.com/HumanSignal/label-studio），便于社区复现和扩展。
-
-
 
 ## 原文 PDF
 

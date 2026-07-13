@@ -311,22 +311,8 @@ Table 4 系统剖析了各组件贡献（ShapeNet-SRN Cars 验证集）：
 
 ![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2412_00623/figures/012_Figure.jpg]]
 
-![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2412_00623/figures/013_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2412_00623/figures/014_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2412_00623/figures/015_Figure.jpg]]
-
 ![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2412_00623/figures/003_Table_1.jpg]]
 *Table 1: ShapeNet-SRN: Single-View Reconstruction (test split). Our method achieves better quality on all metrics on the Car split and Chair dataset, while performing reconstruction in the 3D space*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2412_00623/figures/004_Table_2.jpg]]
-*Table 2: Novel View Synthesis. Our model shows superior performance on RealEstate10k on small, medium and large baseline ranges*
-
-![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2412_00623/figures/005_Table_3.jpg]]
-*Table 3: Memory Footprint and Model Size*
 
 ![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2412_00623/figures/017_Table_6.jpg]]
 *Table 6: Comparison on Co3D hydrant dataset*

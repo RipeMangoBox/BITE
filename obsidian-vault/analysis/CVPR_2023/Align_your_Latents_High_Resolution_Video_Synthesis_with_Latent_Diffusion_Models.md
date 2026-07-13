@@ -51,8 +51,6 @@ claims:
 
 该方法在方法谱系上属于**潜空间视频扩散模型**，与 Make-A-Video（Singer et al., 2023）、Imagen Video（Ho et al., 2022）等同期工作共享“利用预训练图像模型生成视频”的思路，但 Video LDM 的独特贡献在于将时间建模完全隔离为可插拔的时间层，实现了图像模型向视频模型的最小代价迁移。
 
-
-
 ### 问题背景：高分辨率视频生成的困境
 
 扩散模型（Diffusion Models, DMs）在图像合成领域取得了显著成功，将其扩展至视频生成是自然而然的下一步。然而，高分辨率视频扩散模型的训练面临一个根本性瓶颈：**计算成本极高**。视频数据的高维特性使得直接在像素空间训练扩散模型变得不切实际，而即使采用潜空间方法，从头训练一个具备时间建模能力的视频扩散模型也需消耗海量计算资源。
@@ -80,8 +78,6 @@ Video LDM 的核心动机源于一个关键洞察：**大规模图像数据集�
 3. **效率优势**：这一策略使得视频训练只需少量视频数据，极大降低了计算成本，同时完整保留了图像预训练模型的空间生成能力。更关键的是，训练好的时间层可以迁移至同一图像模型的不同变体（如 DreamBooth 个性化模型），实现个性化视频生成，而无需重新训练时间层。
 
 这一“对齐潜变量”（Align your Latents）的思想，构成了 Video LDM 方法设计的理论基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -135,8 +131,6 @@ $$ \mathbf{f}_{\theta,\phi}^{\prime}(\mathbf{z}_{\tau};\mathbf{c}_{S}) = \mathbf
 - **仅使用时间注意力**而缺少 3D 卷积时间层，FVD 升至 704.41，说明空间上下文条件对时间一致性的重要性。
 - **像素空间基线**的视频微调策略 FVD 为 639.56，显著劣于潜空间的 534.17，验证了在潜空间操作的优势。
 - **解码器微调时仅使用视频判别器**优于同时使用图像判别器（FVD 32.94 vs 51.01，Table 14），额外图像判别器反而损害时间一致性。
-
-
 
 Video LDM 的整体 pipeline 遵循“编码—时序生成—解码—可选上采样”的级联架构，各模块分工明确且输入输出流清晰。其核心设计原则是**最大化复用预训练图像模型的空间建模能力，仅在必要时引入可学习的时间层**，从而将图像生成器高效转化为时间一致的视频生成器。
 
@@ -203,8 +197,6 @@ $$
 $$
 
 其中 $s \geq 1$ 为引导尺度。这一机制支持迭代式长视频生成，但论文也指出卷积时间生成方法在超长视频上可能出现质量下降，稳健的长视频生成仍是待解决问题。
-
-
 
 ### 总体架构：从图像 LDM 到视频 LDM
 
@@ -307,8 +299,6 @@ $\mathbf{c}_{\tau_{\gamma}}$ 为经噪声增强后的低分辨率条件帧，$\t
 
 端到端训练 LDM（无图像预训练）导致 FVD 从 534.17 恶化至 1155.10（Table 1 right），证明了预训练空间层的必要性。像素空间基线的视频微调策略（FVD 639.56）也不如潜空间操作（FVD 534.17），验证了在潜空间进行时间对齐的优势。时间层训练对单帧图像质量影响轻微（FID 从 47.00 升至 48.26），说明视频微调几乎不损害图像生成能力。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -382,9 +372,6 @@ Table 3 展示了时间微调对解码器和上采样器的决定性影响：
 
 - **Figure 4** 展示了时间层插入策略：空间层将视频视为独立图像批次（时间轴移入批次维度），时间层在视频维度上执行注意力和 3D 卷积，这种“空间层批处理 + 时间层视频处理”的交替机制是方法的核心架构创新。
 
-
-
-
 - **Figure 5** 展示了完整的 Video LDM 管线：先生成稀疏关键帧，再通过时间插值模型（基于掩码条件训练）分两步提升帧率（T→4T→16T），最后经视频微调解码器和可选视频上采样器输出高分辨率时间一致视频。
 
 - **Figure 8** 展示了 DreamBooth 个性化视频生成：将预训练时间层迁移至 DreamBooth 微调的图像模型，可在保留主体身份的同时生成时间一致视频，验证了时间层的模型迁移能力。
@@ -397,18 +384,6 @@ Table 3 展示了时间微调对解码器和上采样器的决定性影响：
 
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2304_08818/figures/023_Table_13.jpg]]
 *Table 13: Comparison with Long Video GAN (LVG) on Mountain Biking videos (human evaluation on the right)*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2304_08818/figures/028_Figure_12.jpg]]
-*Figure 12: Generated videos at resolution 512 × 512 (extended “convolutional in space”; see Appendix D). Captions from left to right are: “Aerial view over snow covered mountains”, “A fox wearing a red hat and a leather jacket dancing in the rain, high definition, 4k”, and “Milk dripping into a cup of coffee, high definition, 4k”. Frames are shown at 2 fps*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2304_08818/figures/033_Figure_15.jpg]]
-*Figure 15: Generated 30 second video of “a teddy bear walking down the road in the sunset, high definition, 4 $\mathrm { k } ^ { \prime \prime }$ at resolution 5 1 2 $\times$ 5 1 2 (extended “convolutional in space” and also “convolutional in time”; see Appendix D). Frames are shown at 1 fps
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2304_08818/figures/036_Figure_17.jpg]]
-*Figure 17: Generated videos at resolution 1280 × 2048 using our Stable Diffusion 2.0-based model and including our video fine-tuned text-to-video latent upsampler. Captions from left to right are: “Burning firewood” and “An astronaut riding a horse, 4k, high definition”. Frames are shown at 2 fps*
-
 
 
 ## 定位与知识库关联
@@ -459,8 +434,6 @@ Video LDM 的适用边界由以下条件定义：
 ### 5. 知识库定位总结
 
 Video LDM 在视频生成知识库中的定位可以概括为：**以最小训练成本实现图像生成能力向视频域高效迁移的范式验证者**。其核心知识贡献不在于提出全新的生成架构，而在于证明了“时间层即插即用 + 空间层冻结”策略的有效性，以及时间对齐思想在解码器、上采样器等下游模块中的可迁移性。该方法为后续的视频扩散模型研究（如 Sora 等端到端视频生成模型）提供了重要的效率基线和模块化设计思路。
-
-
 
 ## 原文 PDF
 

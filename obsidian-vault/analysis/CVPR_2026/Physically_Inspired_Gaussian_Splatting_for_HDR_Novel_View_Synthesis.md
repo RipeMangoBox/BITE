@@ -53,8 +53,6 @@ HDR 新视角合成（HDR-NVS）旨在从一组不同曝光的 LDR 图像中重�
 
 **方法定位**：PhysHDR-GS 属于 3D Gaussian Splatting 框架下的物理建模增强方法，通过显式的反射率-光照分解和双分支自监督机制，将 HDR-NVS 从隐式 LDR 约束推进到显式 HDR 自监督范式。
 
-
-
 ### 问题背景：HDR 新视角合成
 
 高动态范围（HDR）新视角合成（Novel View Synthesis, NVS）的目标是从一组多曝光低动态范围（LDR）图像中重建场景的完整辐射信息，并能够渲染出任意视角、任意曝光下的高质量图像。与标准 LDR-NVS 不同，HDR-NVS 要求模型不仅恢复场景的几何结构，还要准确捕捉跨越数个数量级的光照强度变化。这一任务在计算摄影、虚拟现实和自动驾驶仿真等领域具有重要应用价值。
@@ -85,8 +83,6 @@ HDR 新视角合成（HDR-NVS）旨在从一组不同曝光的 LDR 图像中重�
 两个分支的 HDR 输出在物理上应保持一致——这构成了**交叉分支 HDR 一致性损失**的理论基础，使模型能够在无需真实 HDR 标签的条件下获得显式的 HDR 自监督。同时，**光照引导的梯度缩放**策略利用光照偏差自适应放大高斯梯度，缓解极端曝光区域的梯度饥饿问题，确保密度化机制的正常运作。
 
 这种设计使 IE 和 GI 分支能够联合覆盖更宽的动态范围：IE 分支擅长恢复全局曝光信息，GI 分支则补充光照变化带来的局部细节，二者形成互补。通过这一物理启发的双分支框架，PhysHDR-GS 在保持 3DGS 实时渲染优势的同时，显著提升了 HDR 细节的重建质量。
-
-
 
 ## 核心方法与创新机理
 
@@ -135,8 +131,6 @@ $$s_a = s \cdot \sigma( | L_a - \hat{L}_a | ) + 1$$
 
 **创新因果链总结**：因子化颜色表征（Slot 1）使场景解耦成为可能 → 双分支架构（Slot 2）分别从曝光和光照两个维度覆盖动态范围 → 交叉分支 HDR 一致性损失（Slot 3）填补了 HDR 监督的空白 → 光照引导梯度缩放（Slot 4）解决了极端曝光区域的欠致密问题 → 交叉融合色调映射器（Slot 5）整合双分支互补信息，最终形成完整的物理启发 HDR-NVS 框架。
 
-
-
 PhysHDR-GS 的整体设计围绕一个核心物理动机展开：**场景外观由内在反射率与可调环境光照共同决定**。基于此，框架将 3D 高斯原语的颜色建模为两个可解耦因子的乘积，并构建了双分支架构来分别模拟相机曝光变化与环境光照变化对 HDR 信号的不同响应模式。
 
 ### 架构总览
@@ -166,12 +160,8 @@ PhysHDR-GS 的整体设计围绕一个核心物理动机展开：**场景外观�
 
 IE 分支和 GI 分支覆盖动态范围的方式本质不同（图 1）：曝光变化 $\Delta t$ 引起 HDR 信号的**全局缩放** $\Delta I_{HDR}$，而光照变化 $\Delta L_a$ 引起**局部辐射度变化** $\Delta \hat{I}_{HDR}$。这种互补性使双分支能够联合覆盖更宽的动态范围——IE 分支擅长处理全局亮度调整，GI 分支擅长捕捉光照依赖的局部外观细节（如高光反射、阴影纹理），两者结合避免了单一分支在极端曝光区域的饱和与信息丢失。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2568_https_arxiv_org_abs_2603_28020/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed PhysHDR-GS, where Gaussian color is modeled from intrinsic reflectance and ambient illumination. The image–exposure (IE) branch modulates exposure t on 2D images, while the Gaussian–illumination (GI) branch modulates ambient illumination*
-
-
 
 PhysHDR-GS 的核心设计围绕三个瓶颈展开：场景外观纠缠、隐式 HDR 监督缺失、以及极端曝光区域的梯度饥饿。以下按模块拆解其因果机制与关键公式。
 
@@ -221,9 +211,6 @@ $$\mathcal{L}_{\mathrm{cons}} = \big\| \mathcal{G}(I_{HDR} \times t) - \mathcal{
 
 色调映射曲线在过曝/欠曝区域斜率极小（Figure 4），导致这些区域的高斯原语梯度微弱，无法触发密度化，形成欠致密表达。PhysHDR-GS 根据每个高斯的光照偏差 $\Delta L_a = |L_a - \hat{L}_a|$ 自适应放大其梯度：
 
-![[assets/figures/papers/paper_list_l2568_https_arxiv_org_abs_2603_28020/figures/004_Figure_4.jpg]]
-*Figure 4: Gradient and illumination deviation analysis, where over/under-exposed pixels lie in flat regions of the tone mapping curve and yield a small Gaussian gradient. The gradient shows positive correlation with reciprocal illumination deviation*
-
 $$s_a = s \cdot \sigma(|L_a - \hat{L}_a|) + 1$$
 
 其中 $\sigma$ 为 sigmoid 函数，$s$ 为缩放强度超参数。修正后的密度化判据为：
@@ -239,16 +226,6 @@ $$\mathcal{L}_{\mathrm{total}} = \lambda_1 \mathcal{L}_{\mathrm{rec}} + \lambda_
 其中 $\mathcal{L}_{\mathrm{rec}}$ 为 LDR 重建损失，$\mathcal{L}_{\mathrm{cons}}$ 为 HDR 一致性损失，$\mathcal{L}_{\mathrm{unit}}$ 为可选的均匀曝光正则化（仅用于合成数据集）。实际训练中 $\lambda_1=1$，$\lambda_2=0.5$，$\lambda_3$ 在真实场景为 0、合成场景为 0.5。
 
 **因果链条总结**：高斯颜色分解（解耦材质与光照）→ 双分支架构（IE 覆盖全局曝光、GI 覆盖局部光照）→ 交叉分支 HDR 一致性（显式 HDR 自监督）→ 光照引导梯度缩放（补偿极端曝光梯度饥饿）。四个模块形成闭环，共同突破 HDR-NVS 的三大瓶颈。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2568_https_arxiv_org_abs_2603_28020/figures/003_Figure_3.jpg]]
-*Figure 3: Illustration of the tone mapper f . Given inputs*
-
-![[assets/figures/papers/paper_list_l2568_https_arxiv_org_abs_2603_28020/figures/001_Figure_1.jpg]]
-*Figure 1: Variation of camera exposure ∆t and ambient illumination*
-
-
 
 ## 实验与关键发现
 
@@ -295,8 +272,6 @@ PhysHDR-GS 针对 HDR-NVS 的三重瓶颈设计了因果干预：场景外观纠
 
 所有方法在相同的多曝光划分（训练 18/27 视图，测试 17/13 视图）下训练和评估，曝光设定（exp3、exp1）遵循 GaussHDR 协议。HDR 真值仅用于评估，训练期间任何方法均不可见。同时测试了 vanilla 3DGS 和 Scaffold-GS 两种骨干，Scaffold-GS 变体以 † 标记。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2568_https_arxiv_org_abs_2603_28020/figures/005_Table_1.jpg]]
 *Table 1: Quantitative results on realistic HDR-NeRF-Real [12] and HDR-Plenoxels-Real [15] datasets, where the best and second-best results are highlighted in red and yellow , respectively. † indicates variants built on Scaffold-GS [27]. The proposed method achieves the overall best performance, demonstrating its effectiveness in synthesizing high-quality novel views across different exposure levels*
 
@@ -309,19 +284,8 @@ PhysHDR-GS 针对 HDR-NVS 的三重瓶颈设计了因果干预：场景外观纠
 ![[assets/figures/papers/paper_list_l2568_https_arxiv_org_abs_2603_28020/figures/009_Figure_6.jpg]]
 *Figure 6: Qualitative comparisons on HDR views, where we include residual maps between the results and GT to highlight the difference. HDR-NeRF and HDR-GS struggle to reproduce correct illumination levels due to the absence of HDR supervision during training, leading to inaccurate brightness and lost details. By imposing cross-branch HDR consistency, our method faithfully estimates scene lighting and reconstructs fine structures (e.g., basket edges in the 1st row)*
 
-![[assets/figures/papers/paper_list_l2568_https_arxiv_org_abs_2603_28020/figures/010_Table_3.jpg]]
-*Table 3: Efficiency analysis measured on a single NVIDIA A6000 GPU. Rendering time and throughput are evaluated at an output resolution of 400 × 400*
-
 ![[assets/figures/papers/paper_list_l2568_https_arxiv_org_abs_2603_28020/figures/011_Table_4.jpg]]
 *Table 4: Ablation studies on HDR-NeRF-Real and HDR-Plenoxels-Real dataset, with the best and second-best results highlighted in red and yellow . IE branch indicates the baseline containing only the image-exposure branch. GI branch, HDR-cons and I-GS denote Gaussian-illumination branch, self-consistent HDR learning and illumination-guided gradient scaling, respectively*
-
-![[assets/figures/papers/paper_list_l2568_https_arxiv_org_abs_2603_28020/figures/012_Figure_7.jpg]]
-*Figure 7: Visualization of ablation studies, where residual maps between LDR results and LDR GT are provided. Including GI branch effectively captures lighting-dependent appearance (e.g., table reflections in 1st row) and reduces color distortions. Introducing HDR-cons and I-GS further refines structural details*
-
-![[assets/figures/papers/paper_list_l2568_https_arxiv_org_abs_2603_28020/figures/007_Figure.jpg]]
-*Figure: HDR-NeRF*
-
-
 
 ## 定位与知识库关联
 
@@ -380,8 +344,6 @@ PhysHDR-GS 处于 HDR 新视角合成（HDR-NVS）从隐式神经表示向显式
 4. **HDR 自监督的可靠性边界**：交叉分支 HDR 一致性损失 $\mathcal{L}_{\mathrm{cons}}$ 依赖亮度匹配，当 IE 与 GI 分支的光照差异极大（如极端欠曝与过曝配对）时，模糊后的 L1 匹配是否仍能提供可靠的自监督信号？是否需要引入感知损失或结构相似性约束作为补充？
 
 5. **从 HDR 重建到 HDR 编辑**：当前框架已实现反射率与光照的初步解耦，是否可进一步发展为支持材质编辑、重光照的完整逆向渲染管线？这需要更精细的 BRDF 建模和光源估计能力。
-
-
 
 ## 原文 PDF
 

@@ -54,8 +54,6 @@ claims:
 
 实验结果表明，在流匹配模型（SD3.5-Medium）和扩散模型（SD-v1.4）上，Pro-GRPO 在所有主要指标上一致优于基线方法：在 DrawBench 上 PickScore 提升 +0.686（Table 1），在 GenEval 上 Overall Score 达到 0.726（Table 3），同时实现 1.26×–1.41× 的加速（Table 4）。消融实验进一步验证了扩展初始组大小和合理设置剪枝检查点对性能的正向影响（Table 5, Table 6）。
 
-
-
 文本到图像（T2I）生成模型近年来取得了显著进展，但如何使其输出与复杂、主观的人类偏好对齐仍是一个核心挑战。基于人类反馈的强化学习（RLHF）已成为对齐大语言模型的主流范式，而在生成模型中，**GRPO（Group Relative Policy Optimization）** 作为一种在线 RL 方法，通过无需额外价值网络的组归一化优势估计，在扩散模型和流匹配模型的微调中展现出强大的潜力。
 
 然而，GRPO 在生成模型中的应用面临一个关键瓶颈：**奖励聚类（Reward Clustering）现象**。当采样组大小 G 增大时，大量轨迹的奖励值高度集中于组均值 $\mu_G$ 附近。从形式上看，对于聚类区域 $C_{\delta} = \{ i : |R_i - \mu_G| \le \delta \sigma_G \}$ 内的轨迹，其归一化优势被严格约束在 $|A_i| \le \delta$ 的范围内。由于每条轨迹对梯度的贡献与其优势成比例（$g_i \propto A_i \nabla_{\theta} \log \pi_{\theta}(\tau_i)$），这些轨迹提供的学习信号微乎其微，几乎不参与有效的策略更新。
@@ -63,8 +61,6 @@ claims:
 这一现象在现有方法中造成了**探索效率与计算成本之间的尖锐矛盾**。一方面，较大的采样组 G 有利于增加轨迹多样性、覆盖更广泛的奖励分布，从而提升探索质量；另一方面，G 的增大不仅直接推高去噪与优化过程的 FLOPs 开销，更使得大部分计算资源被浪费在优势信号微弱的聚类轨迹上。简单的缓解策略——如随机均匀子采样（Uniform Subsampling）——仅等比例地缩小样本量，却无法打破奖励分布的内在聚类结构，因此无法从根本上恢复有效的学习信号。
 
 本文的核心动机正是解耦这一矛盾：**能否在扩大初始探索多样性的同时，仅保留对优化真正有贡献的轨迹子集，从而在不牺牲甚至提升性能的前提下大幅降低计算成本？** 为此，我们提出 Pro-GRPO（Proactive GRPO），通过“先扩展后剪枝”（Expand-and-Prune）的策略，在采样过程中动态识别并提前终止奖励聚类轨迹，使有效优化成本与幸存子集大小 K 而非初始扩展组大小 $G_{\max}$ 成正比，实现了探索广度与计算效率的双重优化。
-
-
 
 ## 核心方法与创新机理
 
@@ -101,8 +97,6 @@ Pro-GRPO 将 OVF 嵌入去噪过程的中间时间步，形成**动态潜在剪�
 ### 效率-性能解耦
 
 Expand-and-Prune 策略的核心洞察在于：通过将初始采样组临时扩展至 $G_{\max}$ 以最大化探索多样性，随后通过多步剪枝将计算量收敛至幸存集 $K$。由于只有幸存集进入后续去噪与反向传播，**有效优化成本与 $K$ 成正比，而非 $G_{\max}$**。这使得 Pro-GRPO 能够在不增加优化成本的前提下享受更大初始多样性带来的性能增益——消融实验证实，将 $G_{\max}$ 从 32 提升至 64 时，In-Domain HPSv2.1 从 0.386 提升至 0.393。同时，Pro-GRPO-Flash 实现了 1.41× 的加速，而 Pro-GRPO Standard 在 1.26× 加速下取得了最佳整体性能。
-
-
 
 Pro-GRPO 的整体设计围绕一个核心矛盾展开：**大采样组带来的探索多样性收益，与奖励聚类（Reward Clustering）导致的优势信号稀释和计算成本膨胀之间的冲突**。为解决这一矛盾，Pro-GRPO 引入“先扩展后剪枝”（Expand-and-Prune）的动态调度策略，在去噪过程内部对轨迹进行选择性提前终止，从而将探索广度与优化成本解耦。
 
@@ -157,8 +151,6 @@ Pro-GRPO 与现有 GRPO 基线方法（**Flow-GRPO**, Liu et al., 2025; **DanceG
 - Pro-GRPO 在采样阶段即动态识别并终止奖励聚类轨迹，使有效优化集 $K$ 远小于初始探索集 $G_{\max}$，实现了“探索广度”与“优化深度”的分离。
 
 这种设计使得 Pro-GRPO 能够在扩大初始探索范围（$G_{\max} > G$）的同时，保持甚至降低总计算量，最终在多个基准上实现性能与效率的双重提升（如 Table 1 所示，Pro-GRPO-Flash 达到 1.41× 加速同时超越 Flow-GRPO 基线）。
-
-
 
 ### 奖励聚类与优势稀释
 
@@ -226,15 +218,8 @@ $$\mathcal{I}_{\mathrm{Pro-GRPO}}(\theta) = \mathbb{E}_{c} \Bigg[ \frac{1}{K} \s
 
 Pro-GRPO 的“先扩展后剪枝”（Expand-and-Prune）策略将上述模块整合为统一调度：初始采样时使用较大的 $G_{\max}$（如 32 或 64）以最大化轨迹多样性，随后通过多步 OVF 剪枝将计算量收敛至 $K$（如 8）。消融实验表明，$G_{\max}$ 从 32 提升至 64 时，域内 HPSv2.1 从 0.386 提升至 0.393，验证了更大初始多样性对优化的益处（Table 5）；在 $T=50$、剪枝路径 $32 \to 8$ 的设置下，检查点 $\{30, 40\}$ 获得最佳性能（Table 6）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2676_https_arxiv_org_abs_2512_15347/figures/001_Figure_1.jpg]]
-*Figure 1: Reward clustering Phenomenon and OVF effects. (a) A full group (G = 24) exhibits pronounced reward clustering. (b) Uniform subsampling (k = 12) preserves the clustering. (c) Our OVF (k = 12) alleviates reward clustering by selecting from the reward extremes*
-
 ![[assets/figures/papers/paper_list_l2676_https_arxiv_org_abs_2512_15347/figures/002_Figure_2.jpg]]
 *Figure 2: Visualization of training dynamics on PickScore. We compare the Baseline*
-
-
 
 ## 实验与关键发现
 
@@ -276,27 +261,11 @@ Figure 4 的定性对比显示，Pro-GRPO 生成的图像在视觉质量和提�
 
 论文未明确报告失败案例或负面结果。从方法设计推断，潜在风险包括：代理奖励预测的准确性依赖于 ODE 投影的质量，若中间时间步的潜在特征不足以可靠预测终态奖励，OVF 可能错误地剪除高潜力轨迹。此外，多步剪枝的超参数（检查点位置、剪枝比例）需要针对不同模型和奖励函数进行调优，泛化到全新设置时可能需要额外的验证成本。这些点需要在实际部署中手动验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2676_https_arxiv_org_abs_2512_15347/figures/005_Table_1.jpg]]
 *Table 1: Quantitative comparison on flow-based text-to-image generation (SD3.5-Medium). We compare Pro-GRPO against the base model and the Flow-GRPO baseline. Note that Pro-GRPO-Flash achieves significant speedup while surpassing the baseline, and Pro-GRPO (Standard) achieves the best overall performance with moderate acceleration. Bold indicates the best result*
 
-![[assets/figures/papers/paper_list_l2676_https_arxiv_org_abs_2512_15347/figures/007_Table_2.jpg]]
-*Table 2: Quantitative comparison on diffusion-based T2I generation (SD-v1.4). We compare Pro-GRPO against DanceGRPO under single-objective (HPSv2.1) and multi-objective (HPSv2.1 & CLIP) rewards. “In-Domain” refers to the metric used during optimization (HPSv2.1 & CLIP), while “Out-of-Domain” metrics assess generalization. Bold indicates the best performance*
-
-![[assets/figures/papers/paper_list_l2676_https_arxiv_org_abs_2512_15347/figures/009_Table_3.jpg]]
-*Table 3: Quantitative evaluation on GenEval benchmark. All models are fine-tuned using the PickScore reward. We report the Overall score and fine-grained accuracies*
-
-![[assets/figures/papers/paper_list_l2676_https_arxiv_org_abs_2512_15347/figures/006_Figure_5.jpg]]
-*Figure 5: Training dynamics. Reward trajectories during optimization. (a) Flow-based (SD3.5, PickScore): Pro-GRPO (blue) and Pro-GRPO-Flash (green) converge faster and reach higher plateaus than Flow-GRPO (orange). (b) Diffusion-based (SD-v1.4, HPSv2.1): Pro-GRPO consistently outperforms DanceGRPO throughout training. (c) Diffusion-based (SD-v1.4, HPSv2.1 & CLIP): Pro-GRPO maintains a stable margin, indicating stronger multi-objective optimization*
-
 ![[assets/figures/papers/paper_list_l2676_https_arxiv_org_abs_2512_15347/figures/008_Table_5.jpg]]
 *Table 5: Ablation study on scaling initial group size*
-
-![[assets/figures/papers/paper_list_l2676_https_arxiv_org_abs_2512_15347/figures/010_Table_6.jpg]]
-*Table 6: Ablation study on pruning checkpoints. Experiments are conducted on SD-v1.4*
-
-
 
 ## 定位与知识库关联
 
@@ -347,8 +316,6 @@ Pro-GRPO 的设计依赖于以下几个前提条件，这些条件也划定了�
 - **奖励聚类的理论刻画**：论文从实验上展示了奖励聚类现象，但未给出其产生的理论条件。奖励聚类是 GRPO 组归一化的必然结果，还是特定奖励模型与提示分布下的产物？对其理论根源的理解可能导向更根本的解决方案。
 
 - **更大规模模型的扩展性**：Pro-GRPO 在 SD3.5-Medium（约 2.5B 参数）上验证了加速效果。当模型规模进一步增大时，单步 ODE 投影的相对开销是否会变化？Expand-and-Prune 策略在更大规模模型上的收益-开销比需要进一步量化。
-
-
 
 ## 原文 PDF
 

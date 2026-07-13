@@ -56,8 +56,6 @@ claims:
 
 在 HumanML3D 和 KIT-ML 数据集（统计见[[../../references/T2M_Common_Datasets|T2M Common Datasets]]）上的实验表明，MARDM 取得了最优性能：在新评估器下，FID 降至 0.114，R-Precision Top-1 达到 0.500，Top-3 达到 0.795，显著优于 T2M-GPT（FID 0.335，Top-1 0.470，Top-3 0.758），并展现出良好的模型可扩展性（**Figure 1**）。消融实验证实，移除表示重构和去除掩码自回归建模分别导致 FID 增加 2.080 和 0.435，验证了各模块的必要性（**Table 6**）。
 
-
-
 ### 文本驱动人体动作生成的范式分裂
 
 文本驱动的人体动作生成旨在根据自然语言描述合成逼真的 3D 人体运动序列，在虚拟人、游戏、影视等领域具有广泛应用。当前该领域的主流方法可归为两大范式：**基于矢量量化（VQ）的自回归/掩码生成方法**，如 **T2M-GPT**、**MoMask**、**MMM**；以及**基于扩散模型的生成方法**，如 **MDM**、**MotionDiffuse**、**MLD**、**ReMoDiffuse**。
@@ -111,8 +109,6 @@ $$V_k = \{z \in \mathbb{R}^d \mid \|z - e_k\|_2 \leq \|z - e_j\|_2\}, \forall j 
 3. **重建公平评估框架**：仅使用必要维度训练评估器，消除冗余维度带来的评价偏差。
 
 通过这些设计，MARDM 旨在证明：**连续扩散模型在运动生成中可以达到甚至超越 VQ 方法的性能**，从而弥合两大范式之间的鸿沟。
-
-
 
 ## 核心方法与创新机理
 
@@ -197,12 +193,8 @@ Table 6 的消融实验量化了各创新组件的贡献：
 
 MARDM 展现出良好的模型可扩展性。Table A5 显示，将模型从 S 扩展到 XL（增大 Transformer 和 MLP 规模），FID 从 0.278 稳定降至 0.116，验证了架构设计的可扩展性。
 
-
-
 MARDM 的整体设计围绕一个核心洞察展开：**消除运动表示中的冗余特征，并引入掩码自回归扩散架构，使扩散模型能够克服传统限制，达到与 VQ 方法相媲美甚至更优的性能**。其 pipeline 由三个紧密协作的模块构成，如 Figure 3 所示。
 
-![[assets/figures/papers/paper_list_l28_MARDM_Rethinking_Diffusion_for_Text_Driven_Human_Motion_Generation/figures/007_Figure_3.jpg]]
-*Figure 3: Method Overview. (a) The reformed motion sequence is projected into a compact fine-grained latent space through a Motion AutoEncoder. (b) The motion latents $\mathbf { x } ^ { 0 : 3 }$ are processed through a Masked Autoregressive Transformer, where they are either randomly masked (in training) or appended (in inference) with a learnable mask vector (yellow-colored latents). The transformer provides a condition z for the masked positions to the Diffusion MLPs to produce clean latent $\mathbf { x } ^ { \mathrm { { 3 : 4 } } }$ from the noised input. (c) A visual illustration of motion masked autoregressive where masked latents (yellow-colored) can be reordered into a pseudo-position allowing p (...
 
 ### 1. 运动 AutoEncoder：从必要特征到紧凑潜空间
 
@@ -254,8 +246,6 @@ $$\mathbf{v}(\mathbf{x}, t) = \dot{\alpha}_t \mathbb{E}[\mathbf{x}_0 \mid \mathb
 - **去除掩码自回归**（改为普通扩散）：FID 从 0.116 上升至 0.551，Top-3 R-Precision 从 0.790 下降至 0.732，表明自回归分解对生成质量有显著贡献。
 
 此外，模型规模实验（Table A5）显示增大 Transformer 和 MLP 规模可稳定提升性能（S→XL FID 从 0.278 降至 0.116），验证了框架的可扩展性。
-
-
 
 ### 3.1 运动表示重构与确定性自编码器
 
@@ -311,8 +301,6 @@ $$
 
 为消除评估偏差，MARDM 提出仅使用必要维度训练评估器（T2M 结构 + CLIP 评估器）。Table 4 显示，在必要维度评估下，扩散方法（MDM）与 VQ 方法（T2M-GPT）的 R-Precision 差距显著缩小，验证了传统评估器对冗余维度的过度依赖是扩散方法被低估的重要原因。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈的诊断验证
@@ -361,27 +349,9 @@ Table A2 的进一步消融显示，速度预测（Velocity, FID 0.114）略优�
 
 **复杂场景未验证。** 当前实验局限于单人文本驱动运动生成，尚未在大规模双人运动、人-物交互等复杂任务上验证连续扩散先验的优越性，这限制了结论的泛化边界。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l28_MARDM_Rethinking_Diffusion_for_Text_Driven_Human_Motion_Generation/figures/004_Figure_2.jpg]]
-*Figure 2: Code Usage of VQ-VAEs trained with redundancy are more balanced than VQ-VAEs trained with only essential features*
-
-![[assets/figures/papers/paper_list_l28_MARDM_Rethinking_Diffusion_for_Text_Driven_Human_Motion_Generation/figures/002_Table_2.jpg]]
-*Table 2: The results of MDM on humanML3D dataset. We report the results of MDM with original $\mathbf { x } _ { \mathrm { 0 } }$ prediction vs. with ϵ prediction. Training to predict $\mathbf { x } _ { 0 }$ leads to better results
-
-![[assets/figures/papers/paper_list_l28_MARDM_Rethinking_Diffusion_for_Text_Driven_Human_Motion_Generation/figures/003_Table_1.jpg]]
-*Table 1: Impact of redundant features on VQ-based models. VQ-based methods, T2M-GPT and MoMask, trained with redundant features exhibit better reconstruction performance and lead to better generation quality on the HumanML3D dataset*
-
-![[assets/figures/papers/paper_list_l28_MARDM_Rethinking_Diffusion_for_Text_Driven_Human_Motion_Generation/figures/005_Table_3.jpg]]
-*Table 3: The result with existing evaluator on HumanML3D dataset. We alter data by adding noise or replacing it with noise in essential and redundant dimensions. The result shows the evaluator heavily emphasizes redundant dimensions during evaluation*
-
-![[assets/figures/papers/paper_list_l28_MARDM_Rethinking_Diffusion_for_Text_Driven_Human_Motion_Generation/figures/006_Table_4.jpg]]
-*Table 4: The evaluation results using evaluators trained on all vs. essential dimensions on HumanML3D. VQ-based models significantly outperform diffusion-based models under alldimension evaluation, but gap closes under essential evaluation*
 
 ![[assets/figures/papers/paper_list_l28_MARDM_Rethinking_Diffusion_for_Text_Driven_Human_Motion_Generation/figures/014_Table.jpg]]
 *Table: A6. Average Inference Time Results Comparison between our method and baseline methods*
-
-
 
 ## 定位与知识库关联
 
@@ -446,8 +416,6 @@ MARDM 的一个重要贡献是揭示了现有评估器的系统性偏差。论�
 3. **多模态扩展**：掩码自回归扩散的生成范式能否推广到语音驱动运动、音乐驱动运动或风格化运动生成？
 4. **交互场景中的连续先验**：是否可以在更多样化的人‑物、人‑人交互场景中利用连续扩散先验，实现比离散 VQ 方法更自然的运动生成与实时控制？
 5. **评估标准的社区共识**：新评估器仅关注必要维度，如何在社区内推动评估标准的更新，以避免因评估框架不一致导致的“苹果与橙子”式比较？
-
-
 
 ## 原文 PDF
 

@@ -56,8 +56,6 @@ claims:
 
 **方法定位**：SpeeDiff属于**端到端潜在扩散模型**，与两阶段方法（DiT-XL/2、SiT-XL/2）和表示对齐方法（REPA）形成对比。其技术栈包括ViT-VAE、Refined-DiT扩散骨干、TPR损失和REPA++表示对齐，形成完整的单阶段训练范式。
 
-
-
 ### 潜在扩散模型的两阶段范式及其困境
 
 潜在扩散模型（Latent Diffusion Models, LDMs）已成为高分辨率图像生成的主流框架。其核心思想是将生成过程分解为两个阶段：首先训练一个变分自编码器（VAE）将图像压缩到低维潜在空间，然后冻结VAE，在该潜在空间上训练扩散模型。这一范式在Stable Diffusion等大规模系统中取得了显著成功。
@@ -83,8 +81,6 @@ claims:
 SpeeDiff给出的答案是肯定的。其关键洞察在于利用**Tweedie公式**——该公式能够从任意噪声时间步的潜在变量中估计出对应的干净潜在——将扩散过程的中间状态解码回像素空间，并与原始图像计算重建损失。这一**Tweedie Pixel Reconstruction (TPR)损失**在不中断梯度回传的前提下，将扩散损失梯度与像素空间内容锚定，为VAE提供了保持语义所需的生成式监督。
 
 在此基础上，SpeeDiff进一步通过全Transformer架构（ViT-VAE + Refined-DiT）和增强的表示对齐策略（REPA++），构建了一个可扩展的端到端潜在扩散框架。如Figure 1c所示，该框架相比Vanilla SiT实现了超过140倍的训练加速，相比REPA加速61倍，在ImageNet 256×256和512×512生成任务上均达到了state-of-the-art性能。
-
-
 
 ## 核心方法与创新机理
 
@@ -159,8 +155,6 @@ SpeeDiff 的方法贡献可定位于以下交叉点：
 
 **局限性提示**：目前 SpeeDiff 仅在类别条件 ImageNet 生成上验证，扩展到文本到图像等更复杂任务仍需探索；达到最佳性能依赖 DINOv3 等预训练 VFM，带来了额外计算开销；端到端训练的动态稳定性在更大规模下的表现尚待进一步验证。
 
-
-
 SpeeDiff 构建了一个**单阶段端到端潜在扩散训练范式**，核心目标是打破传统两阶段训练的分离瓶颈——即先独立训练 VAE 再冻结并训练扩散模型——转而从零开始联合优化 VAE 与扩散模型，且**全程不使用 stop-gradient 操作**（Fig. 1b）。
 
 ### 训练管道四分支结构
@@ -197,13 +191,6 @@ SpeeDiff 采用全 Transformer 架构替代传统卷积设计：
 ### 数据流概要
 
 输入图像 $\mathbf{x}_0$ → ViT-VAE 编码器 → 潜在变量 $\mathbf{z}_0$ → 分两路：(i) 直接解码重建，计算 $\mathcal{L}_{\mathrm{VAE}}$；(ii) 经随机插值加噪得到 $\mathbf{z}_t$，由 Refined-DiT 预测速度场，计算 $\mathcal{L}_{\mathrm{Diff}}$；同时从 $\mathbf{z}_t$ 经 Tweedie 公式估计 $\hat{\mathbf{z}}_0$ 并解码，计算 $\mathcal{L}_{\mathrm{TPR}}$；$\mathbf{z}_0$ 和中间扩散特征 $\mathbf{f}_t$ 分别与 VFM 表示对齐，计算 $\mathcal{L}_{\mathrm{REPA++}}$。所有梯度无阻断地回传至全部可训练参数。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l933_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_SpeeDiff_Scalabl/figures/001_Figure_1.jpg]]
-*Figure 1: Overview of SpeeDiff for end-to-end joint training of VAE and diffusion model from scratch. (a) Conventional two-stage LDM training: a CNN-based VAE [28] is first trained and then frozen, after which a diffusion (usually a DiT [41]) is trained on its latent space. (b) SpeeDiff: a scalable, pixel-anchored end-to-end paradigm that jointly trains the VAE and diffusion model from scratch, without stop-gradient operation, within a fully transformer-based architecture. (c) Training efficiency: on ImageNet 256ˆ256 generation, SpeeDiff accelerates convergence by over 140ˆ compared to Vanilla SiT and 61ˆ compared to REPA. (d) Scalability: on ImageNet 512ˆ512 generation, SpeeDiff demonstrates clear s...*
-
-
 
 ### 核心瓶颈：Vanilla E2E训练中的潜在崩溃
 
@@ -249,12 +236,8 @@ $$\mathcal{L}_{\mathrm{SpeeDiff}}(\phi,\psi,\theta,\omega) = \mathcal{L}_{\mathr
 
 该目标中，**重建分支**（$\mathcal{L}_{\mathrm{VAE}}$）提供标准VAE ELBO损失（重建+KL）；**扩散分支**提供流匹配监督；**TPR分支**锚定像素空间内容；**REPA++分支**注入语义对齐信号。四者协同使得VAE与扩散模型可从零开始端到端联合训练，无需任何stop-gradient操作。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l933_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_SpeeDiff_Scalabl/figures/003_Figure_3.jpg]]
 *Figure 3: Impact of end-to-end training on latent space. (a) Comparing the denoised latent with its clean counterpart in both latent and pixel space reveals that vanilla end-to-end training collapses the latent representation, while TPR loss preserves meaningful reconstruction signals. (b) KDE visualizations show that vanilla training produces highly peaked, non-Gaussian latent distributions, whereas TPR regularizes the latent space and prevents degeneracy. (c) Channel-wise statistics further indicate that vanilla training induces large per-channel biases and severely suppressed variances, whereas TPR maintains a more balanced and normalized latent representation. Results are computed over 1000 valid...*
-
-
 
 ## 实验与关键发现
 
@@ -270,9 +253,6 @@ SpeeDiff 的核心消融路径（Table 1）清晰地揭示了端到端联合训�
 ### ImageNet 256×256 生成基准
 
 Table 2 报告了 ImageNet 256×256 上的完整生成基准。在无引导设置下，**SpeeDiff-XL（含 REPA++）** 以 gFID 1.69 达到最优，显著优于同类端到端或表示对齐方法，如 **REPA**（SiT-XL/2，gFID 6.88，Yu et al., ICLR 2025）和 **MDTv2-XL**（gFID 2.53，Gao et al., arXiv 2023）。即便不使用 REPA++，SpeeDiff-XL 的 gFID 3.35 也大幅领先于传统两阶段训练的 DiT-XL/2（gFID ~9–10，Peebles and Xie, ICCV 2023）和 SiT-XL/2（gFID ~9–10，Ma et al., ECCV 2024），表明 TPR 损失和 ViT-VAE 架构本身就带来了显著的生成质量提升。
-
-![[assets/figures/papers/paper_list_l933_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_SpeeDiff_Scalabl/figures/005_Table_2.jpg]]
-*Table 2: ImageNet 256ˆ256 generation benchmark. We report detailed results for both non–representation alignment and representation alignment methods. We additionally include results at 80 epochs for convergence speed comparison. SpeeDiff achieves state-of-the-art performance without guidance in both settings (Ó lower is better; Ò higher is better)*
 
 在 80 epoch 收敛速度维度上，SpeeDiff 的优势更为突出：相比 Vanilla SiT 加速逾 140 倍，相比 REPA 加速约 61 倍（Figure 1c），这意味着在相同训练预算下 SpeeDiff 可以更快地达到高质量生成状态。
 
@@ -301,17 +281,9 @@ Table 5 对 REPA++ 进行了细致的组件分析。完整 REPA++（同时使用
 
 Table 6 的消融表明，潜在通道数设为 32 时在重建质量与生成质量之间达到最佳权衡，优于 16 或 64 通道的设置。此外，Table 4 验证了 SpeeDiff 预训练 VAE 的独立可用性：将其冻结后用于训练新的扩散模型，收敛速度与端到端训练几乎一致（80 epoch gFID 1.73 vs. 1.69），说明 TPR 损失在联合训练中塑造的潜在空间具有良好的泛化性和可迁移性。
 
-![[assets/figures/papers/paper_list_l933_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_SpeeDiff_Scalabl/figures/009_Table_6.jpg]]
-*Table 6: Ablations on latent channels. Results show that 32 channels offer the best trade-off between reconstruction and generation. The results are evaluate on ImageNet 256ˆ256 after 80 epochs*
-
-![[assets/figures/papers/paper_list_l933_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_SpeeDiff_Scalabl/figures/010_Table_4.jpg]]
-*Table 4: Can SpeeDiff pretrained VAE be used independently? A diffusion model trained on top of the frozen SpeeDiff pretrained VAE converges at nearly the same rate as SpeeDiff itself. Results are reported on ImageNet 256ˆ256*
-
 ### 局限性与待验证问题
 
 尽管 SpeeDiff 在类别条件 ImageNet 生成上取得了显著成果，其当前验证范围仍局限于该设定。扩展到文本到图像等更复杂的条件生成任务尚待探索。此外，达到最佳性能依赖预训练的 DINOv3 视觉基础模型，这引入了额外的计算开销和外部依赖。在完全无预训练 VFM 的条件下，能否通过更强的潜在正则化或结构设计达到相近性能，仍是一个开放问题。同时，端到端训练的动态稳定性在更大规模数据和模型下是否依然保持，也需要进一步验证。
-
-
 
 ## 定位与知识库关联
 
@@ -365,8 +337,6 @@ SpeeDiff 在架构上做了两项关键替换：
 **开放问题**：
 - 联合训练范式能否直接扩展到大规模文本到图像生成系统并保持有竞争力的收敛性质？
 - 在完全无预训练 VFM 的条件下，能否通过更强的潜在正则化或结构设计达到与使用 VFM 相近的性能？
-
-
 
 ## 原文 PDF
 

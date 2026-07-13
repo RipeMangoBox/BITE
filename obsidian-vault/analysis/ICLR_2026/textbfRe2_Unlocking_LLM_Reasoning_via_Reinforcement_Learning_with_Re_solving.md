@@ -51,15 +51,11 @@ claims:
 
 主要实验结果（Table 1）显示，在相同训练预算下，Re²在多个推理基准上显著优于标准RLVR方法DAPO。例如，在Qwen2.5-7B-Base模型上，AIME 2024准确率从11.3提升至17.1（+5.8），AIME 2025从13.5提升至19.0（+5.5），AMC 2023从65.0提升至70.8（+5.8）。实验覆盖从3B到14B参数的5种模型，结果具有良好泛化性。此外，分析表明CoT长度与准确率呈负相关（Figure 3），且对于大多数错误回答，仅使用前20%的响应作为前缀时准确率就已显著下降（Figure 4），这进一步验证了早期推理路径质量对最终结果的决定性影响。
 
-
-
 当前基于强化学习（RLVR）训练的大语言模型在数学推理任务中面临一个关键瓶颈：当模型在推理的初始步骤选择了次优方向时，即使后续生成更多的推理token，也难以自行纠正并抵达正确答案。这种“一步错，步步错”的困境导致模型产生大量低效的“过度思考”（overthinking）行为——CoT链越长，准确率反而越低。论文通过Figure 3和Figure 4的实证分析揭示了这一现象：CoT长度与推理性能呈清晰的负相关，且对于大多数错误回答，仅使用其前20%的响应作为继续推理的前缀时，准确率就已出现显著下降。这表明问题的根源不在于模型缺乏生成更多推理步骤的能力，而在于其缺乏在推理过程中主动识别并放弃低质量路径的机制。
 
 现有RLVR方法（如DAPO、GRPO）的推理路径管理策略存在根本性缺口：它们强制模型沿着单一CoT轨迹持续生成直至给出最终答案，无法在推理中途选择放弃并重新开始。这种设计假设初始推理方向总是足够好，或模型能够通过增加步数来自我修正，但上述实证证据表明这两种假设在复杂推理任务中均不成立。测试时扩展方法（如DLER、DeepConf）虽然试图通过采样多条轨迹来缓解这一问题，但并未在训练层面赋予模型主动放弃路径的能力。
 
 针对这一缺口，本文提出Re²（Reinforcement Learning with Re-solving），其核心动机是：通过纯强化学习训练模型在推理过程中灵活地选择放弃当前路径并重新求解（re-solve），从而将标准RLVR模型中仅约0.5%的罕见重求解行为提升至30%以上。该方法无需任何初步的监督微调，直接通过奖励函数设计来引导模型学习何时应该放弃——对正确/错误/重求解三种延续分别赋予不同奖励，其中重求解的奖励被设计为从零开始重新求解的期望准确率。这一设计的关键洞察在于：让模型意识到在某些情况下，放弃当前路径重新开始比继续在错误方向上投入更多token更有可能获得正确答案。
-
-
 
 ## 核心方法与创新机理
 
@@ -94,8 +90,6 @@ Re²的完整流程（Figure 5）包括：前缀组生成 → 三路奖励分配
 **失败模式与开放性**
 
 论文坦诚指出了Re²的局限：缺乏显式机制控制推理过程中重求解动作的调用概率；模型可能需要多轮重求解才能得到正确答案，增加了推理时的token消耗（约11%的rollout时间增加）。此外，Re²在非数学推理任务、视觉/多模态推理任务以及工具使用/搜索密集型任务上的表现尚未探索。这些开放性问题的存在意味着该方法的泛化边界尚需验证。
-
-
 
 ![[assets/figures/papers/iclr26_0001_HBOLN5m3qg_textbfRe2_Unlocking_LLM_Reasoning_via_Reinforcem/figures/009_Figure_5.jpg]]
 *Figure 5: The framework of $\mathrm { R e ^ { 2 } }$ . For each query, $\mathrm { R e ^ { 2 } }$ samples multiple prefixes, then generates multiple continuations for each prefix. The advantage is calculated within each group, while the out-of-group accuracy is used as the reward for the redo action
@@ -132,8 +126,6 @@ $$
 
 **需要人工验证的点**：奖励函数中重求解的期望准确率估计依赖于组外 CoT 完成序列，其偏差和方差在 Figure 11 中进行了分析，表明随着 $n$ 或 $m$ 增大，估计器优于 EMA 基线。然而，最优的 $R$ 值（最大重试轮数）如何针对不同问题类型自适应调整，以及前缀截断比例分布对性能的具体影响，论文中未提供系统性的消融实验，这些点的最优设置需要进一步验证。
 
-
-
 Re² 的核心创新在于通过强化学习训练 LLM 在推理过程中主动放弃低质量路径并重新求解（re-solve），从而解决标准 RLVR 模型在初始推理方向不佳时难以恢复正确路径的问题。其方法由三个紧密耦合的模块组成：前缀组生成、三路奖励策略和组内优势更新。
 
 ### 1. 前缀组生成（Prefix Group Generation）
@@ -159,8 +151,6 @@ $$\hat{A}_{i,j} = \frac{r_{i,j} - \text{mean}(\{r_{i,j}\}_{j=1}^m)}{\text{std}(\
 $$\mathcal{J}_{\text{Re}^2}(\theta) = \mathbb{E}_{[q \sim \mathcal{D}, \{\text{Pre}_i\}_{i=1}^n \sim \pi_{\theta_{\text{old}}}(\cdot|q), \{\mathcal{O}_{i,j}\}_{j=1}^m \sim \pi_{\theta_{\text{old}}}(\cdot|q, \text{Pre}_i)]} \left[ \frac{1}{nm} \sum_{i=1}^n \sum_{j=1}^m \frac{1}{|O_{i,j}|} \sum_{t=1}^{|O_{i,j}|} \min\left( \frac{\pi_\theta^{i,j,t}}{\pi_{\theta_{\text{old}}}^{i,j,t}} \hat{A}_{i,j}, \ \text{clip}\left( \frac{\pi_\theta^{i,j,t}}{\pi_{\theta_{\text{old}}}^{i,j,t}}, 1-\varepsilon_{\text{low}}, 1+\varepsilon_{\text{high}} \right) \hat{A}_{i,j} \right) \right]$$
 
 该目标使用裁剪的重要性采样比率和组内优势，是标准的 PPO 风格策略梯度。关键变量含义：`π_θ` 和 `π_{θ_old}` 分别为当前和旧策略；`|O_{i,j}|` 为延续的 token 数；`ε_low` 和 `ε_high` 为裁剪边界（论文中设为 0.2 和 0.28）。该公式本身不引入新机制，其瓶颈在于：组内优势计算假设同一前缀下的 `m` 个延续是条件独立的，但实际中模型可能因自回归生成而产生序列依赖，这一假设的违反程度尚待量化。
-
-
 
 ## 实验与关键发现
 
@@ -206,15 +196,11 @@ Figure 1(b) 和 Figure 6 展示了 Re² 在测试时扩展方面的优势。随�
 2.  **缺乏显式控制：** 论文在 Limitations 中明确指出，推理过程中没有显式机制来控制调用重求解动作的概率。模型学习到的重求解策略是隐式的，可能不是最优的。
 3.  **任务范围有限：** 实验主要集中在数学推理任务上。Re² 在非数学推理（如常识推理、开放域问答）、视觉或多模态推理，以及工具使用或搜索密集型任务上的表现尚未探索，其泛化能力需要进一步验证。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0001_HBOLN5m3qg_textbfRe2_Unlocking_LLM_Reasoning_via_Reinforcem/figures/031_Figure_20.jpg]]
 *Figure 20: $\mathrm { R e ^ { 2 } }$ Examples 2*
 
 ![[assets/figures/papers/iclr26_0001_HBOLN5m3qg_textbfRe2_Unlocking_LLM_Reasoning_via_Reinforcem/figures/033_Figure_22.jpg]]
 *Figure 22: $\mathrm { R e ^ { 2 } }$ Examples 4*
-
-
 
 ## 定位与知识库关联
 
@@ -234,8 +220,6 @@ Re² 的核心贡献在于将 **推理路径的主动放弃与重启** 引入到
 4. **训练效率**：论文未报告计算资源消耗的详细对比（如 GPU 小时数），仅报告了每步 rollout 时间，因此 Re² 在总训练成本上的竞争力需要进一步验证。
 
 总体而言，Re² 在 RLVR 方法谱系中开辟了一条“允许推理路径主动放弃与重启”的新分支，其核心洞察——将重求解行为从基线模型的 0.5% 提升至 30% 以上——展示了 RL 框架在塑造模型推理策略方面的巨大潜力。然而，该方法目前仍局限于数学推理领域，且缺乏对重求解行为的精细控制，这构成了其向更广泛推理任务迁移的主要障碍。
-
-
 
 ## 原文 PDF
 

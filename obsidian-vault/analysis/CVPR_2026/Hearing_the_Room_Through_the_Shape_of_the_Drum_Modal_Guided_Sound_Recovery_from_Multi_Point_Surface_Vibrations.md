@@ -51,8 +51,6 @@ claims:
 
 **主要结果**：在包含鼓、相框、笔记本电脑、垃圾桶、吉他、金属板、瑜伽砖等 11 种不同材质和形状物体的测试集上，所提方法在 ViSQOLAudio-NSIM（+0.12）、ViSQOLAudio-MOS（+0.48）、多分辨率 STFT 距离（−0.15）和感知加权 STFT 距离（−0.41）四项指标上均显著优于所有无监督基线（Tables 1–4）。定性结果表明，方法能有效恢复高频成分并抑制噪声，在不同材料和几何形状的日常物体上均表现出鲁棒性（Figures 5, 8）。
 
-
-
 ### 问题背景：从表面振动中恢复声音
 
 物体的表面振动携带着周围声场的丰富信息。当声波作用于物体表面时，物体会发生微小的机械振动，通过光学手段（如激光散斑干涉）可以非接触地测量这些振动，进而反向推断声源信号。这种“视觉麦克风”范式在远程窃听、工业监测、声学取证等场景中具有重要应用价值。
@@ -92,8 +90,6 @@ $$\ddot { q } _ { k } ( t ) + 2 \zeta _ { k } \omega _ { k } \dot { q } _ { k } 
 - **实现频谱均衡**：通过模态传递函数的逆向调整，压制共振峰，恢复平坦、自然的音频频谱（见图4(d)）。
 
 该方法在11种不同材料、形状的日常物体上进行了验证，结果表明其在多项感知音频质量指标上显著优于单点、平均和延迟求和基线，且与需要参考信号的监督校准基线性能相当。
-
-
 
 ## 核心方法与创新机理
 
@@ -154,16 +150,11 @@ $$\operatorname* { argmin } _ { s ( t ) , \alpha _ { k } } \biggl \| \mathbf { v
 
 本方法的本质洞见在于：**物体的振动模态构成一组正交基，已知模态频率和形状即可近似反转物体的时空传递函数**，从而在抑制共振失真的同时融合多个测点信号，恢复干净、均衡的场景声音。
 
-
-
 本文提出**模态引导的声音恢复**（Modal-Guided Sound Recovery）方法，其核心pipeline由四个紧密耦合的模块构成，形成“测量→模态估计→正向建模→逆向求解”的闭环。
 
 ### 1. 多点多轴散斑振动采集
 
 系统使用激光散斑成像装置，在物体表面投射并采集 $N$ 个网格点的时变散斑图案。每个测点 $\mathbf{x}_n$ 输出双轴位移信号 $\mathbf{v}(\mathbf{x}_n, t) \in \mathbb{R}^2$，分别对应 $x$ 和 $y$ 方向的表面梯度响应（**Figure 1**）。与以往仅使用单点单轴信号的方法（如 **Sheinin et al., CVPR 2018**）相比，多点双轴采集为后续的模态分解和信号融合提供了空间冗余和方向信息。
-
-![[assets/figures/papers/paper_list_l2084_https_arxiv_org_abs_2604_26678/figures/001_Figure_1.jpg]]
-*Figure 1: We introduce a novel approach for sound recovery from multi-point, speckle-based vibration measurements. Our system captures a grid of speckle-based vibration signals across an object’s surface. We derive a novel vibration forward model connecting the multi-point two-axis measurements to the underlying scene sound source. The model relies on extracting the object’s vibrational modes from the data. Then, we invert the model to estimate the scene sound source via optimization, yielding superior sound recoveries*
 
 ### 2. 鲁棒模态频率估计
 
@@ -203,8 +194,6 @@ $$\operatorname*{argmin}_{s(t), \alpha_k} \left\| \mathbf{v}(\mathbf{x}_n, t) - 
 | 逆向优化 | 测量信号 + 模态参数 | 恢复的声源信号 $\hat{s}(t)$ |
 
 整个pipeline无需任何参考信号或监督训练，仅依赖一段宽带激励（如偶然拍手声）即可完成模态标定，随后对任意新声源进行恢复。
-
-
 
 ### 正向物理模型：从声压到散斑位移
 
@@ -274,16 +263,6 @@ $$\operatorname*{argmin}_{s(t), \alpha_k} \left\| \mathbf{v}(\mathbf{x}_n, t) - 
 | $g_k(t)$ | 第 $k$ 阶模态的脉冲响应 |
 | $\gamma, \beta$ | 声压-力耦合系数、散斑系统增益常数 |
 | $\sigma(\omega)$ | 多点频谱幅值的空间标准差，用于检测模态频率 |
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2084_https_arxiv_org_abs_2604_26678/figures/002_Figure_2.jpg]]
-*Figure 2: Frequency-dependent coupling of speckle shifts across surface points. We measure drum membrane vibrations in response to a logarithmic chirp using a 10×10 speckle grid. Different audio frequencies produce distinct vibration patterns. (a) Two-axis speckle shifts at two resonant frequencies (top) and their corresponding integrated mode shapes (bottom). (b) Speckle shifts are frequency-coupled: the red and green points oscillate out of phase at 198 Hz but in phase at 411 Hz, so averaging them suppresses 198 Hz components. (c) Points near mode-shape peaks or valleys (where gradients vanish) show weak signal energy at that mode, e.g., the blue point lacks spectral content near 411 Hz*
-
-![[assets/figures/papers/paper_list_l2084_https_arxiv_org_abs_2604_26678/figures/003_Figure_3.jpg]]
-*Figure 3: Robust mode estimation. (a) Initial mode candidates are obtained by detecting peaks on the smoothed vibration spectrum*
-
-
 
 ## 实验与关键发现
 
@@ -357,21 +336,8 @@ $$\operatorname*{argmin}_{s(t), \alpha_k} \left\| \mathbf{v}(\mathbf{x}_n, t) - 
 ![[assets/figures/papers/paper_list_l2084_https_arxiv_org_abs_2604_26678/figures/004_Figure_4.jpg]]
 *Figure 4: Sound recovery from a drumhead. We capture the speckle vibrations of a drumhead excited by a speaker using a 10×10 speckle point grid. (a) The drumhead membrane has a poor and highly resonant reaction to the speaker’s sound, yielding individual noisy measurements. (b) Averaging all measured vibrations suppresses important frequencies due to their temporal misalignment. (c) Estimating a global temporal delay between the signals prior to averaging fails to keep high-frequency modes, as different modes induce different phase delays between the points. (d) Our result takes into account the physics of the vibrating surface and recovers higher frequencies while significantly suppressing noise. (e...*
 
-![[assets/figures/papers/paper_list_l2084_https_arxiv_org_abs_2604_26678/figures/005_Figure_5.jpg]]
-*Figure 5: Results across objects having various geometries and materials. The top row (chips bag) serves as a reference– where a single point already performs well. All subsequent objects present greater challenges due to diverse materials, thicknesses, and shapes. Despite limited or irregular surface coverage, our method yields denoised reconstructions. The final example (drum) further demonstrates robustness under dual sound sources*
-
-![[assets/figures/papers/paper_list_l2084_https_arxiv_org_abs_2604_26678/figures/008_Figure_8.jpg]]
-*Figure 8: Results across objects having various geometries and materials. All objects present challenges due to diverse materials, thicknesses, and shapes. Despite limited or irregular surface coverage, our method yields denoised reconstructions*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2084_https_arxiv_org_abs_2604_26678/figures/006_Figure_6.jpg]]
-*Figure 6: The experiment compares reconstructions whose modefrequencies were obtained from different sources or from sources perturbed by random omission/addition. Inaccurate frequency detection introduces audible artifacts*
-
 ![[assets/figures/papers/paper_list_l2084_https_arxiv_org_abs_2604_26678/figures/007_Figure_7.jpg]]
 *Figure 7: Comparison between our model-based sound recovery and a calibrated baseline using a reference chirp signal. Our method reconstructs most of the frequency content with high fidelity, closely matching the calibrated result without using any additional intervening signals or supervision*
-
-
 
 ## 定位与知识库关联
 
@@ -438,8 +404,6 @@ $$\mathbf{v}(\mathbf{x}_n, t) \approx \gamma\beta \sum_{k=1}^{K} \nabla\phi_k(\m
 4. **物理先验的增强**：是否可以利用额外的物理先验（如边界条件、材料参数）进一步提升鲁棒性？例如，已知物体为自由边界或固支边界时，模态形状的解析形式可作为更强的约束。
 
 5. **与深度学习的融合**：物理模型提供了可解释的结构，而深度学习擅长处理非线性偏差和噪声模式。两者融合可能突破当前线性假设的局限。
-
-
 
 ## 原文 PDF
 

@@ -51,8 +51,6 @@ claims:
 
 **主要结果**：在HG-FRONT数据集上，Nestwork相比两阶段基线将FID从41.90降至7.26，结构满意度从78.60%提升至91.91%；HetGAT骨架与LRF模块均被消融实验证实为关键设计，移除后性能显著退化。
 
-
-
 ### 问题背景
 
 3D室内场景生成是计算机视觉与图形学中长期存在的核心问题，其应用涵盖建筑可视化、室内设计辅助、虚拟现实与具身智能仿真环境构建。一个完整的带家具房屋布局需要同时决定房间的拓扑结构（房间数量、类型、相邻关系）以及每个房间内部家具的类别、位置、尺寸和朝向。这两类决策高度耦合：房间的尺寸和形状约束了可容纳的家具组合，而家具的摆放又反过来影响房间的功能分区和流通路径。因此，生成任务本质上要求对房屋结构进行**联合推理**。
@@ -70,8 +68,6 @@ claims:
 上述问题的根源在于现有方法缺乏对**房间结构与家具摆放的联合表示与推理机制**。房屋本质上是一个包含多类实体（虚拟房屋、房间、家具）和多种空间关系（相邻、包含、远离）的异构图，但现有工作要么忽略图结构，要么使用同质图模型抹平了类型差异。
 
 **Nestwork** 的动机正是填补这一空白：将带家具的3D房屋显式建模为一个**异构图（heterogeneous graph）**，其中节点类型包括房屋、房间和家具，边类型涵盖家具-家具全连接、家具-房间归属、相邻房间、远离房间以及房间-房屋包含共五类关系。在此基础上，通过**类型感知的图注意力网络（HetGAT）**在潜在空间中进行扩散去噪，实现房屋结构与家具布局的联合生成。这一设计使得模型能够同时推理房间拓扑和家具配置，从根本上消除了拆分式方法的结构性缺陷。
-
-
 
 ## 核心方法与创新机理
 
@@ -124,8 +120,6 @@ Table 3 显示，同一模型在仅拓扑、部分语义、全语义和文本提
 
 上述四个 changed slots 形成了一条完整的因果链：**异构图**提供了联合推理的表达基础，**HetGAT** 赋予模型区分节点类型的推理能力，**LRF** 在潜在空间中补全了几何边的缺失信息，而**随机掩蔽条件化**使单一模型获得了从稀疏到密集条件的灵活泛化能力。这一组合使 Nestwork 在 HG-FRONT 数据集上实现了 FID 从 41.90 到 7.26 的跨越式提升（Table 1），结构满意度从 78.60% 提升至 91.91%，同时保持了与两阶段方案可比的碰撞率水平。
 
-
-
 Nestwork 将带家具的 3D 房屋布局生成建模为**异构图潜在扩散**问题，整个管线由三个核心阶段构成：**图自编码 → 潜在扩散去噪 → 解码与后处理**。其关键设计在于将房屋统一表示为一张异构图，并在紧凑的潜在空间中完成条件化生成，从而避免传统两阶段方法中房间结构与家具摆放分离推理导致的误差累积。
 
 ### 管线总览
@@ -167,8 +161,6 @@ $$s_{uv,h}^{(l)} = \text{LeakyReLU}( \mathbf{q}_h^\top [ \mathbf{h}_u^{(l)} \| \
 $$\mathbf{h}_u^{(l+1)} = \|_{h=1}^H \sigma\big( \sum_{v\in\mathcal{N}(u)} \alpha_{uv,h}^{(l)} \mathbf{W}_h [ \mathbf{h}_v^{(l)} \| \mathbf{e}_{uv}^{(l)} ] \big)$$
 
 **低秩关系场**是连接编码器与解码器的关键桥梁：在解码阶段，它利用节点对关系槽的注意力分配和低秩分解，从潜在变量直接生成边嵌入 $\tilde{\mathbf{e}}_{uv}$，弥补了潜在空间无法保留完整几何边信息的缺陷。消融实验表明，移除 LRF 后碰撞率从 10.91% 升至 21.54%，验证了该模块提供的几何先验对空间一致性至关重要。
-
-
 
 ### 房屋异构图表示
 
@@ -248,8 +240,6 @@ $$\mathbf{z}_u^{(t)} \gets \mathbf{z}_u^{(t)} + \alpha_{\text{ca}} (\mathbf{c}_u
 
 其中 $\mathbf{c}_u$ 为节点 $u$ 的语义条件嵌入，$\mathbf{g}$ 为全局上下文嵌入，$\alpha_{\text{ca}}$ 为可学习的缩放因子。Table 5 显示，将交叉注意力替换为简单特征注入会导致 FID 从 7.26 骤升至 76.35，验证了拓扑感知条件化机制的必要性。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈验证：统一建模 vs. 两阶段拆分
@@ -258,9 +248,6 @@ $$\mathbf{z}_u^{(t)} \gets \mathbf{z}_u^{(t)} + \alpha_{\text{ca}} (\mathbf{c}_u
 
 ![[assets/figures/papers/paper_list_l2552_https_openaccess_thecvf_com_content_CVPR2026_html_Miao_Nestwork_Conditio/figures/004_Table_1.jpg]]
 *Table 1: Unified one-pass vs. two-stage generation. Numbers report mean ± std over three random seeds. Graph/Coll./Walk. are percentages; lower is better for FID, KID, Coll. and KL divergence. (HG-FRONT GT collision baseline 9.80%)*
-
-![[assets/figures/papers/paper_list_l2552_https_openaccess_thecvf_com_content_CVPR2026_html_Miao_Nestwork_Conditio/figures/005_Figure_4.jpg]]
-*Figure 4: Color-coded top-down layouts from our method (top) and the two-stage baseline*
 
 ### 图自编码器骨架消融
 
@@ -295,17 +282,9 @@ $$\mathbf{z}_u^{(t)} \gets \mathbf{z}_u^{(t)} + \alpha_{\text{ca}} (\mathbf{c}_u
 
 3. **自然语言接口的语义歧义**：虽然论文展示了基于提示词摘要嵌入的自然语言交互（**Figure 1**），但该接口受限于预定义的语义映射，复杂描述（如“L型沙发靠窗放置”）可能无法准确转化为图条件，实际可用性需要进一步用户研究确认。
 
-![[assets/figures/papers/paper_list_l2552_https_openaccess_thecvf_com_content_CVPR2026_html_Miao_Nestwork_Conditio/figures/001_Figure_1.jpg]]
-*Figure 1: Flexible graph conditioning and natural-language interface*
-
 ### 开放问题
 
 论文在结尾提出了若干值得探索的方向：如何显式地强制执行功能合理性和无阻碍的流通路径（walkability）？能否将方法拓展到动态场景或交互式编辑，支持用户逐步细化布局？未来工作可考虑引入物理仿真反馈作为额外的监督信号，以优化布局的稳定性和可用性。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2552_https_openaccess_thecvf_com_content_CVPR2026_html_Miao_Nestwork_Conditio/figures/007_Table_3.jpg]]
-*Table 3: Conditional generation. The same diffusion model is evaluated under four conditioning modes*
 
 ![[assets/figures/papers/paper_list_l2552_https_openaccess_thecvf_com_content_CVPR2026_html_Miao_Nestwork_Conditio/figures/008_Table_4.jpg]]
 *Table 4: Latent–prior ablation*
@@ -315,8 +294,6 @@ $$\mathbf{z}_u^{(t)} \gets \mathbf{z}_u^{(t)} + \alpha_{\text{ca}} (\mathbf{c}_u
 
 ![[assets/figures/papers/paper_list_l2552_https_openaccess_thecvf_com_content_CVPR2026_html_Miao_Nestwork_Conditio/figures/003_Figure_3.jpg]]
 *Figure 3: Post-processing pipeline*
-
-
 
 ## 定位与知识库关联
 
@@ -377,8 +354,6 @@ Nestwork 将扩散过程从原始数据空间迁移到图自编码器的潜在�
 - **物理仿真闭环**：未来工作可探索将物理仿真（如碰撞检测、稳定性分析）嵌入生成循环，以优化布局的物理可行性。
 
 从更宏观的视角看，Nestwork 的异构图扩散范式为“结构感知的条件生成”提供了可复用的技术模板——类型感知的消息传递、低秩关系场补偿、随机掩蔽条件化这三项设计决策，有望迁移到其他需要联合推理异构实体及其空间关系的生成任务中。
-
-
 
 ## 原文 PDF
 

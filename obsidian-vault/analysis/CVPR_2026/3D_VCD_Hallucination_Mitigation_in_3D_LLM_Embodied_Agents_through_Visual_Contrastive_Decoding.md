@@ -68,8 +68,6 @@ claims:
 
 3D-VCD属于**推理时幻觉缓解**方法，与训练时对齐、RLHF反馈或模型编辑等范式正交。在3D具身MLLM领域，现有基线如**3D-LLM**、**3D-VisTA**和**LEO**均未包含推理时的幻觉缓解机制，而3D-VCD可即插即用地应用于这些模型。与2D视觉对比解码方法（如VCD）相比，3D-VCD的独特贡献在于将扰动空间从像素级扩展到结构化3D场景图，使得对比信号能够捕捉物体存在、状态和空间布局层面的接地证据缺失。
 
-
-
 ### 3D具身智能体的幻觉困境
 
 具身智能体在开放世界中执行任务时，必须将自然语言指令与3D环境中的视觉与几何证据对齐。然而，当前以3D-LLM为核心的具身系统在面临视觉模糊、遮挡或感知缺失时，频繁产生**物体存在幻觉**（报告不存在的物体）与**状态幻觉**（错误描述物体状态）。这类幻觉的根源在于模型过度依赖语言先验——例如，当场景包含“床”和“衣柜”时，模型可能根据“卧室”的统计共现模式幻觉出“桌子”，即使3D观测中并无此物。
@@ -97,8 +95,6 @@ claims:
 ### 方法定位
 
 3D-VCD作为首个面向3D具身智能体的训练无关、推理时对比解码框架，填补了从2D VCD到3D结构化对比解码的方法空白。它不修改模型参数，不引入辅助模型，仅通过双上下文logit对比融合实现幻觉抑制，可即插即用于现有3D-LLM管线。
-
-
 
 ## 核心方法与创新机理
 
@@ -133,8 +129,6 @@ claims:
 ### 与 2D 对比解码的本质差异
 
 现有 2D 对比解码方法（如 VCD）仅操作像素空间，通过图像噪声扰动构建负上下文，无法迁移到需要结构化 3D 推理的具身场景。3D-VCD 的关键突破在于**将扰动空间从像素级提升到物体中心的结构化场景图**，通过语义和几何的双重扰动，在保留场景整体结构的前提下精准破坏 3D 证据，从而识别并压制仅由语言先验驱动的幻觉 token。这一设计使得方法无需重新训练或修改模型架构，可公平地适用于现有各类 3D MLLM。
-
-
 
 3D-VCD 是一个**免训练、纯推理时**的对比解码框架，旨在缓解 3D 具身智能体中的物体与状态幻觉。其核心流水线由五个紧密耦合的模块构成，形成“原始上下文—扭曲上下文—对比融合—自回归生成”的闭环。
 
@@ -180,12 +174,8 @@ $$\mathbf{y}_{t,k} = \mathrm{softmax}(\mathbf{z}_{t,k}^{\mathrm{vcd}})$$
 
 3D-VCD 的**因果调节变量**是原始与扭曲场景图之间的 token logit 差异。在扰动下概率不变甚至升高的 token，表明其预测不依赖真实的 3D 结构，而仅由语言统计规律驱动。通过对比融合，这些 token 被系统性识别并压制，从而在不重新训练模型的前提下，将对比解码范式从 2D 像素空间推广到 3D 结构化表示。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2156_https_arxiv_org_abs_2604_08645/figures/002_Figure_2.jpg]]
 *Figure 2: 3D-VCD Overview. Given 3D environment observations, 3D-VCD builds a structured 3D scene graph (G) encoding object categories, centroids, and extents, and injects controlled semantic and geometric perturbations to obtain a distorted version of the environment (Gˆ). The MLLM agent processes both contexts in parallel, given the textual query (x). 3D-VCD contrastively fuses their logits to reveal and suppress hallucination-prone tokens. This training-free procedure enforces 3D-grounded reasoning at inference time*
-
-
 
 ### 问题形式化
 
@@ -240,8 +230,6 @@ $$C_t = \frac{|\{\text{hallucinated } t\}|}{|\{\text{all } t \text{ mentioned}\}
 
 3D-VCD 仅需一次额外的 MLLM 前向传播。通过批量双前向传递和 KV 缓存复用优化，端到端延迟仅增加约 $0.25\times$，平均推理时间从 2 秒增至 2.5 秒，适合实时具身交互场景。方法无需训练或微调，可即插即用于任意现有 3D MLLM。
 
-
-
 ## 实验与关键发现
 
 ### 评估基准与设置
@@ -274,15 +262,6 @@ $$C_t = \frac{|\{\text{hallucinated } t\}|}{|\{\text{all } t \text{ mentioned}\}
 
 在HEAL的Distractor Injection探针下，3D-VCD将Qwen-14B-Instruct的状态幻觉率（C_S）从16.45%降至5.0%（降幅约70%），物体幻觉率（C_O）从4.13%降至3.55%（Table 2）。在更细粒度的探针分析中（Table 5），Scene-Task Contradiction设置下物体幻觉率从53.9%降至1.5%，Distractor Object探针下状态幻觉率从16.5%降至5.0%。定性示例（Figure 5）显示，基线Qwen-14B在“刷去衣物上的棉絮”任务中幻觉出不存在的微波炉，而3D-VCD生成的符号化目标完全基于场景图中的真实物体（床上的毛衣），未引入任何幻觉实体。
 
-![[assets/figures/papers/paper_list_l2156_https_arxiv_org_abs_2604_08645/figures/004_Table_2.jpg]]
-*Table 2: Hallucination rates (CHAIR) on the HEAL probing set under the distraction injection prompt. Applying 3D-VCD significantly reduces hallucinations and improves grounding for both Llama-3 and Qwen models to the factual objects and states present in the environment*
-
-![[assets/figures/papers/paper_list_l2156_https_arxiv_org_abs_2604_08645/figures/011_Table_5.jpg]]
-*Table 5: Comparative Hallucination Rates (CHAIR) on HEAL Probes. We report Object Hallucination*
-
-![[assets/figures/papers/paper_list_l2156_https_arxiv_org_abs_2604_08645/figures/007_Figure_5.jpg]]
-*Figure 5: Qualitative comparison on HEAL benchmark. For the task brushing lint off clothing, the baseline Qwen-14B-Instruct model hallucinates a nonexistent microwave.n.01 1 in its symbolic goal prediction. In contrast, 3D-VCD produces clean symbolic goals with no hallucinated objects, correctly grounding all sweaters on the bed and removing dust-related states as required by the instruction. The right panel shows the first-person view of the agent interacting with the sweaters in the scene*
-
 ### 消融实验
 
 #### 几何扰动强度的影响
@@ -314,21 +293,8 @@ Figure 3以F1为指标对各类扰动组合进行整体排序，确认了语义+
 
 3D-VCD作为一种推理时方法，无需训练或微调，不引入额外的训练数据偏差，可直接应用于现有3D MLLM（如3D-LLM、Qwen-14B-Instruct）而无需修改模型架构。所有对比实验均在相同基线和评估协议下进行，确保了比较的公平性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2156_https_arxiv_org_abs_2604_08645/figures/009_Table_3.jpg]]
-*Table 3: Effect of Geometric Distortion Strength (ε) on 3D-POPE Performance. Lower yes-rate indicates reduced hallucination*
-
 ![[assets/figures/papers/paper_list_l2156_https_arxiv_org_abs_2604_08645/figures/010_Table_4.jpg]]
 *Table 4: Ablation on Semantic and Geometric Distortions under varying contrastive strengths α on 3D-POPE*
-
-![[assets/figures/papers/paper_list_l2156_https_arxiv_org_abs_2604_08645/figures/005_Figure_3.jpg]]
-*Figure 3: Ablation on distortion types for VCD in 3D-POPE (F1). x-axis shows distortion tags (ascending overall F1)*
-
-![[assets/figures/papers/paper_list_l2156_https_arxiv_org_abs_2604_08645/figures/008_Figure_6.jpg]]
-*Figure 6: 3D-VCD inference time as a function of scene complexity (number of objects)*
-
-
 
 ## 定位与知识库关联
 
@@ -367,8 +333,6 @@ Figure 3以F1为指标对各类扰动组合进行整体排序，确认了语义+
 2. **表示泛化**：3D-VCD当前依赖显式场景图。是否适用于其他3D表示，如点云、3D特征tokens、多视图隐式表示？若将扰动操作直接施加于隐式表示空间，对比信号的语义可解释性将下降，需要新的校准策略。
 3. **自适应扰动选择**：如何自适应地选择最优的扰动类型与强度，以在不同基准和场景分布下达到最佳幻觉抑制？当前 $\varepsilon$ 和 $\alpha$ 需手动调参，Table 4显示不同扰动组合对 $\alpha$ 的敏感度各异。
 4. **开放式生成评估**：在开放式生成任务（如具身对话或指令执行）中，如何将VCD从二元问答推广到更复杂的输出评估？当前CHAIR指标（$C_t = \frac{|\{\text{hallucinated } t\}|}{|\{\text{all } t \text{ mentioned}\}|}$）依赖标注，难以在线部署。
-
-
 
 ## 原文 PDF
 

@@ -78,8 +78,6 @@ EmerDiff 的核心创新在于将**低分辨率到高分辨率的映射策略**�
 
 EmerDiff 存在以下局限：难以区分极小对象（如动物腿部、人脸细节），因为细节信息在低维层中被压缩；特征表示中可能混杂空间位置和颜色属性，导致天空、地面等同质区域被过度分割。未来方向包括将调制语义特征的思路推广至其他生成模型（如 GAN），以及利用生成的掩码作为伪标签进行弱监督语义分割以减少标注需求。
 
-
-
 图像语义分割旨在为图像中的每一个像素分配一个语义类别标签，是计算机视觉领域的一项基础任务。传统的分割方法依赖大量像素级人工标注进行监督训练，成本高昂且难以扩展。近年来，自监督和无监督分割方法试图摆脱对密集标注的依赖，但它们通常需要在大规模无标注数据上进行额外的训练，或者依赖于专门设计的自监督代理任务。
 
 与此同时，以 Stable Diffusion 为代表的文本到图像扩散模型展现出惊人的生成能力。这些模型在数十亿图文对上预训练后，不仅能够合成高质量图像，其内部表征也被发现蕴含丰富的语义信息。然而，一个关键瓶颈在于：扩散模型中有意义的语义特征图通常存在于空间分辨率较低的中间层（如 16×16 的特征图），这些低维表征虽然能捕捉图像的全局语义结构，却难以直接提取像素级的精细语义关系，导致无法直接用于高分辨率的分割任务。
@@ -87,8 +85,6 @@ EmerDiff 存在以下局限：难以区分极小对象（如动物腿部、人�
 现有利用扩散模型进行语义分割的尝试，大多采用朴素的双线性插值将低分辨率特征图上采样到原图尺寸，得到的掩码边界粗糙、细节模糊，难以刻画物体的精确轮廓。这一现象引出一个核心问题：**预训练的扩散模型是否本身就具备像素级的语义理解能力？如果具备，又该如何将其提取出来？**
 
 本文正是从这一问题出发，探索扩散模型从低分辨率特征图生成高分辨率图像的内在机制。作者发现，当对低维特征图的一个子区域施加扰动时，生成图像中只有与该子区域语义相关的像素会发生显著变化，而其他像素几乎保持不变。这一观察揭示了扩散模型内部存在一种隐式的“语义对应”关系——低分辨率特征图上的每一个空间位置，都与高分辨率图像中一组语义相关的像素紧密关联。基于这一核心洞察，EmerDiff 提出了一种无需任何额外训练或标注的框架，利用这种语义对应关系将低分辨率分割掩码“上采样”为像素级的精细分割图，从而首次从预训练扩散模型中提取出高精度的像素级语义知识。
-
-
 
 ## 核心方法与创新机理
 
@@ -120,8 +116,6 @@ $$f\left(\sigma\left(\frac{QK^T}{\sqrt{d}}\right) \cdot V\right) + cM \in \mathb
 ### 与现有方法谱系的定位
 
 EmerDiff 在无监督语义分割领域占据了一个独特位置：它**既不依赖自监督预训练的视觉编码器（如 DINO），也不依赖语言模型的文本监督（如 CLIP）**，而是纯粹从预训练扩散模型的生成机制中提取像素级语义知识。这使得它可以作为一种“即插即用”的细粒度分割前端，与现有的无标注开放词汇分割方法（如 **MaskCLIP** (Zhou et al., ECCV 2022)、**TCL** (Cha et al., 2023)、**CLIPpy** (Ranasinghe et al., 2023)）组合使用，为其粗糙的文本对齐像素嵌入提供精细的类别无关掩码（Table 3），从而产生文本对齐的细粒度分割结果。
-
-
 
 ![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2401_11739/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our framework. green: we first construct low-resolution segmentation maps by applying k-means on semantically meaningful low-dimensional feature maps. orange: Next, we generate image-resolution segmentation maps by mapping each pixel to the most semantically corresponding low-resolution mask, where semantic correspondences are identified by the modulated denoising process*
@@ -155,8 +149,6 @@ EmerDiff 的整体 pipeline 围绕一个核心洞察展开：**预训练扩散�
 - **输出**：与输入图像分辨率相同的精细分割图，每个像素被分配到一个语义掩码标签
 - **可选扩展**：通过计算掩码嵌入（在掩码区域内平均 SD 特征图），可为每个掩码生成特征向量，用于后续的开放词汇分类或聚类评估
 
-
-
 EmerDiff 的核心管线由两个阶段构成：**低分辨率语义掩码构建**与**像素级语义对应上采样**。第一阶段从扩散模型的低维特征图中提取语义分组；第二阶段通过调制去噪过程揭示低分辨率掩码与高分辨率像素之间的语义对应关系，从而将粗糙掩码上采样为精细分割图。
 
 ### 低分辨率语义掩码构建
@@ -187,8 +179,6 @@ $$k = \mathrm{argmax}_i \, d_{x,y}^i$$
 
 在开放词汇分割场景中，需要为每个掩码生成语义嵌入。具体做法是：在掩码区域内对 Stable Diffusion 的低维特征图取平均，得到掩码嵌入 $e \in \mathbb{R}^c$，每个像素继承其所属掩码的嵌入向量。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -196,9 +186,6 @@ $$k = \mathrm{argmax}_i \, d_{x,y}^i$$
 EmerDiff 在无监督语义分割任务上展现出显著优势，尤其是在作者提出的**修改评估协议**下，该方法一致优于所有基线。该评估协议的核心改变在于：不再依赖匈牙利匹配，而是将属于同一真实类别的像素嵌入取平均作为概念嵌入，从而更精确地衡量分割的细粒度质量。
 
 如表 2 所示，在 ADE20K (AD150) 上，EmerDiff 达到 33.1 mIoU，相比使用相同 Stable Diffusion 特征图但通过双线性插值朴素上采样的 SD 基线（29.1 mIoU）提升了 **+4.0 mIoU**。在 COCO-Stuff (CS171) 上，EmerDiff 达到 30.5 mIoU，相比 SD 基线（27.6 mIoU）提升 **+2.9 mIoU**。这一性能差距验证了语义对应上采样策略的有效性——通过调制去噪过程发现的像素到低分辨率掩码的对应关系，远比单纯的插值更精确。
-
-![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2401_11739/figures/008_Table_2.jpg]]
-*Table 2: Results of unsupervised semantic segmentation under our modified evaluation strategy. Evaluated on ADE20K (AD150) (Zhou et al., 2019), PASCAL-Context (PC59, PC459) (Mottaghi et al., 2014), COCO-Stuff (CS171, CS27) (Caesar et al., 2018), and Cityscapes (City19) (Cordts et al., 2016). MDC (Cho et al., 2021), PiCIE (Cho et al., 2021), DINO, and STEGO are trained solely on images, while CLIP (Radford et al., 2021), TCL (Cha et al., 2023), and CLIPpy (Ranasinghe et al., 2023) are trained on text-image pairs. For CLIP, we follow Zhou et al. (2022) to modify the image encoder to output pixel-wise embeddings. For SD, we naively up-sample low-resolution segmentation maps (via bilinear interpolation,...*
 
 在传统的匈牙利匹配评估协议下，EmerDiff 在 COCO-Stuff-27 上达到 26.6 mIoU，与 **STEGO**（Hamilton et al., ICLR 2022）的 26.8 mIoU 基本持平（-0.2 mIoU）。这一结果表明，即使在不依赖任何标注或额外训练的情况下，仅从预训练扩散模型中提取的语义知识也能达到与专用无监督分割方法相当的性能。
 
@@ -226,9 +213,6 @@ EmerDiff 生成的类无关精细掩码可以与现有无标注开放词汇分�
 
 **特征提取时间步**（Table 6）：随着提取特征图的时间步 $t_f$ 增大（即噪声增加），分割性能显著下降。这验证了低噪声条件下的特征图包含更丰富的语义信息，因此作者选择 $t_f=1$（最小噪声）。
 
-![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2401_11739/figures/018_Table_6.jpg]]
-*Table 6: Varying the timestep of extracting feature maps. Evaluated on unsupervised semantic segmentation and open-vocabulary semantic segmentation (MaskCLIP + Ours) w/ ADE20K*
-
 **调制时间步**（Table 7）：调制去噪过程在中间时间步（281–481）表现最佳。过早或过晚施加调制都会降低语义对应的质量，因为早期噪声过大而后期图像结构已基本定型。
 
 ![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2401_11739/figures/020_Table_7.jpg]]
@@ -246,23 +230,11 @@ EmerDiff 生成的类无关精细掩码可以与现有无标注开放词汇分�
 
 **跨注意力层选择**（Table 5）：从 16×16 向上模块的不同跨注意力层提取特征图，性能无显著差异，表明语义知识在该尺度的多个层中均有分布。
 
-![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2401_11739/figures/016_Table_5.jpg]]
-*Table 5: Effects of extracting feature maps from each cross-attention layer in 16 × 16 upward block. Evaluated on ADE150K. No significant differences in performance*
-
 ### 失败模式与局限性
 
 Figure 8 展示了典型失败案例：EmerDiff 偶尔无法区分**极小的对象**，如小桌子、动物腿、人脸局部细节。这是因为这些细节在 16×16 的低维特征层中已被高度压缩，难以保留足够的判别信息。
 
 此外，由于 Stable Diffusion 的特征表示可能编码了空间位置和颜色属性，导致天空、地面等大面积均匀区域被过度分割。生成的掩码仍可能包含噪声，若用于弱监督下游任务（如语义分割的训练伪标签），需要进一步的后处理。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2401_11739/figures/006_Table_1.jpg]]
-*Table 1: Results of unsupervised semantic segmentation under traditional evaluation strategy. Evaluated on full COCO-Stuff-27 (Caesar et al., 2018). ACSeg is taken from the original paper. IIC, PiCIE, and TransFGU from Yin et al. (2022). DINO from Koenig et al. (2023). Other results from Seitzer et al. (2022). Some works are evaluated on curated datasets (Ji et al., 2019), which generally gives higher mIoU than being evaluated on the full datasets (Yin et al., 2022)*
-
-![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2401_11739/figures/022_Figure_14.jpg]]
-*Figure 14: Effects of modulating different cross-attention layers vs different computation $\left$( f $\left( \sigma \cdot$ V $\right$) + c M , f $\left( \sigma \cdot$ V + c M $\right) \right$) vs different λ. For cross-attention layers, we experiment with the three different layers in 16 × 16 upward modular blocks. Note that we abbreviate $\sigma \left( { \textstyle { \frac { Q K ^ { T } } { \sqrt { d } } } } \right$) to σ for convenience
-
 
 
 ## 定位与知识库关联
@@ -329,8 +301,6 @@ EmerDiff 的方法论创新在于**改变了低分辨率到高分辨率的映射
 3. **弱监督下游应用**：生成的掩码能否直接作为伪掩码用于弱监督语义分割，从而减少人工标注需求？论文在结论中将其列为未来方向，但尚未提供实验验证。
 
 4. **小物体分割增强**：在高分辨率特征图稀缺的约束下，是否可以通过多尺度调制或分层对应发现策略提升对小物体的分割能力？
-
-
 
 ## 原文 PDF
 

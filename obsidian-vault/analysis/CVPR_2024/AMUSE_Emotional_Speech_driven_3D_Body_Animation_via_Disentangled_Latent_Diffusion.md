@@ -54,8 +54,6 @@ claims:
 
 需要指出的是，当前实验仅使用 BEAT 数据集中经过筛选的 22 位英语说话人的 16 句共同语句子集（5.71 小时），其在跨语言、跨文化及开放域场景下的泛化能力仍需进一步验证。
 
-
-
 语音是人际交流中最自然、最富信息量的载体之一。在面对面交流中，说话者不仅通过语音传递语义内容，还伴随丰富的3D身体手势来表达情感、强调重点和展现个人风格。因此，在虚拟人、数字助手、游戏角色等应用中，从语音自动生成与情感一致、风格可控的3D身体动画成为一个关键挑战。
 
 现有语音驱动3D手势生成方法——包括基于自回归的**Habibie et al.**、基于流的**MoGlow**、引入情感标签的**TalkSHOW-BEAT**以及扩散模型**DiffuseStyleGesture (DSG)** 等——虽然在手势-语音同步性上取得了进展，但普遍存在一个根本性瓶颈：**它们不显式建模情感，无法将影响手势的内容、情感和个人风格三种因素解耦并独立控制**。这导致生成的手势缺乏情感表现力，且用户无法对输出手势的情感属性进行灵活编辑。
@@ -63,8 +61,6 @@ claims:
 这一瓶颈的深层原因在于，语音信号中与手势相关的信息本质上是高度纠缠的——节奏和词义驱动的内容姿态、情感状态决定的动作幅度与速度、以及说话者固有的个人风格习惯，三者交织在同一段音频中。若不设计专门的解耦机制，模型倾向于学习这三者的混合表达，使得生成结果在面对同一语句的不同情感表达时趋于同质化，丧失了情感区分度。
 
 AMUSE的**核心动机**正是针对上述缺口：**将输入语音显式解耦为内容、情感和风格三个潜在向量，并在潜在扩散模型中分别条件化这些向量，从而实现对生成手势情感表达的独立控制**。这一思路的关键洞察在于，内容（与语音节奏和词义相关的姿态）、情感和个人风格在语音中是可分离的——通过设计专门的编码器将语音映射至三个解耦的潜在空间，并利用条件潜在扩散模型生成动作，能够实现情感可控且多样化的3D身体手势合成。如图Figure 1所示，AMUSE不仅可以从单段语音生成情感一致的手势，还允许用户通过组合不同情感音频的潜在向量，对生成手势的情感属性进行灵活编辑。
-
-
 
 ## 核心方法与创新机理
 
@@ -94,8 +90,6 @@ AMUSE 的核心创新在于首次将**语音信号显式解耦为内容（conten
 
 在定量评估中，AMUSE 的情感编辑变体 AMUSE-EmoEdit 在节拍对齐（BA 0.79）、多样性（Div 24.68）和情感准确率（GA 34.18）上仍优于所有基线方法（Table 1），说明编辑能力并非以牺牲生成质量为代价，而是解耦架构的自然产物。
 
-
-
 AMUSE 的整体 pipeline 由两个独立训练的网络构成：**音频解耦模块**与**手势生成主架构**。音频解耦模块负责将输入语音分解为内容（content）、情感（emotion）和个人风格（style）三个解耦的潜在向量；主架构则包含一个时序 VAE 运动先验和一个潜在条件扩散去噪器，以这三个潜在向量为条件生成 3D 身体手势。两个网络分阶段训练——音频解耦模块先独立训练至收敛并冻结，随后运动先验与扩散去噪器进行联合训练。
 
 **输入输出流**：系统输入为一段语音的滤波器组特征 $a^{1:T}$，输出为对应的 3D 身体姿态序列 $m^{1:T}$（基于 SMPL-X 模型的姿态参数 $\theta$）。具体流程如下：
@@ -118,12 +112,8 @@ $$\mathcal{L}_{ges} = \mathcal{L}_{rec} + \mathcal{L}_{Vrec} + \mathcal{L}_{KL} 
 
 **关键设计决策**：消融实验揭示了两个不可或缺的组件——移除音频解耦模块（改用单一音频潜在向量）导致情感准确率 GA 从 46.76 骤降至 26.88，且完全丧失手势编辑能力；移除运动先验（仅保留去噪器）则导致训练不收敛，GA 仅为 15.42（Table A.3）。此外，联合训练运动先验与扩散模型相比分阶段训练可获得更好的 FGD（388.63 vs 362.33）和多样性 Div（25.06 vs 24.49）（Table A.4），表明端到端的音频-运动对齐损失对生成质量至关重要。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1844_AMUSE_Emotional_Speech_driven_3D_Body_Animation_via_Disentangled_Latent/figures/001_Figure_1.jpg]]
 *Figure 1: Goal. AMUSE generates realistic emotional 3D body gestures directly from a speech sequence (top). It provides user control over the generated emotion by combining the driving speech sequence with a different emotional audio (bottom)*
-
-
 
 ### 3.1 音频解耦模块
 
@@ -165,17 +155,8 @@ $$\mathcal{L}_{ges} = \mathcal{L}_{rec} + \mathcal{L}_{Vrec} + \mathcal{L}_{KL} 
 
 基于解耦的潜在空间，AMUSE 提供了简洁的手势编辑接口：通过交换情感或风格潜在向量，可在保持内容不变的条件下实现跨音频的情感/风格迁移。例如，将中性语音的内容潜在向量 $c_1$ 与悲伤语音的情感潜在向量 $e_2$ 结合，去噪器即可生成带有悲伤情感的中性内容手势。这一机制无需额外训练，直接利用已解耦的潜在表示即可实现（见 Figure 7）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1844_AMUSE_Emotional_Speech_driven_3D_Body_Animation_via_Disentangled_Latent/figures/002_Figure_2.jpg]]
 *Figure 2: Training. We train the motion prior*
-
-![[assets/figures/papers/paper_list_l1844_AMUSE_Emotional_Speech_driven_3D_Body_Animation_via_Disentangled_Latent/figures/009_Figure.jpg]]
-*Figure: A.1. Speech disentanglement model. An input filterbank is given to the three encoders, producing three disentangled latents, which are decoded into a reconstructed filterbank. We here show disentanglement reconstruction for one audio only, please refer Appendix B.3 for its detailed explanation*
-
-
-
-
 
 ## 实验与关键发现
 
@@ -236,19 +217,8 @@ Figure 7展示了AMUSE的核心编辑能力：通过交换情感潜在向量，�
 5. **离散情感标签**：情感编辑依赖八分类标签，可能无法泛化到连续情感空间（如valence-arousal维度）或未见情感表达。
 6. **数据集局限**：实验仅使用BEAT数据集中22位英语说话人的16句共同语句子集（5.71小时），跨语言、跨文化场景下的泛化能力需进一步验证。
 
-### 补充图表
-
-
 ![[assets/figures/papers/paper_list_l1844_AMUSE_Emotional_Speech_driven_3D_Body_Animation_via_Disentangled_Latent/figures/017_Table.jpg]]
 *Table: A.3. Ablation of AMUSE components. The model without audio disentanglement produces lower-quality gestures and lacks editing capabilities. The model without motion prior perform poorly due to convergence issues. Among the methods being compared, we highlight the best scores in green and second best in blue*
-
-![[assets/figures/papers/paper_list_l1844_AMUSE_Emotional_Speech_driven_3D_Body_Animation_via_Disentangled_Latent/figures/007_Figure_6.jpg]]
-*Figure 6: The perceptual study results for gesture emotion preference (left) and synchronization with speech (right). The number of attentive participants that passed the catch trials is indicated on the right and the reported results only consider these participants*
-
-![[assets/figures/papers/paper_list_l1844_AMUSE_Emotional_Speech_driven_3D_Body_Animation_via_Disentangled_Latent/figures/008_Figure_7.jpg]]
-*Figure 7: Gesture editing. Top: We modify style from being neutral (left) to being sad (right) by combining the emotion latent from sad audio with the content latent from neutral audio. Bottom: We transform the style from Subject 13 being happy (left) to being angry (right) by merging the content latent from happy audio with the style and emotion latents from an angry audio of Subject 2*
-
-
 
 ## 定位与知识库关联
 
@@ -325,8 +295,6 @@ AMUSE的适用边界受限于以下数据和方法论约束：
 4. **连续情感表示与开放域泛化**：如何将解耦策略推广到连续情感表示（如valence-arousal空间）和开放域说话人风格？这可能需要引入对比学习或对抗训练来消除对离散情感标签的依赖。
 
 5. **实时流式推理**：如何改造固定窗口的潜在扩散架构以支持在线流式生成？可能的路径包括引入循环神经网络结构或采用一致性模型等快速采样方法。
-
-
 
 ## 原文 PDF
 

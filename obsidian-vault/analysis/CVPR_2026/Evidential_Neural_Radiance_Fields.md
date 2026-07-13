@@ -268,8 +268,6 @@ $$\mathcal{L} = -\log p(c^{\mathrm{gt}} \mid \gamma, \nu, \alpha, \beta) + \lamb
 
 尽管实验验证了 Evidential NeRF 在辐射度不确定性量化上的有效性，该方法仍存在以下局限：① 仅对辐射度建模不确定性，未捕获场景几何（深度、密度）的不确定性；② 推导依赖沿射线点颜色独立的假设，可能与实际统计依赖存在偏差；③ 正则化系数需逐场景手动调节，缺乏自动化机制。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2122_https_arxiv_org_abs_2602_23574/figures/006_Table_2.jpg]]
 *Table 2: Average training time per 30k steps and inference FPS of baseline nerfacto and different UQ methods on an A6000 GPU*
 
@@ -282,23 +280,8 @@ $$\mathcal{L} = -\log p(c^{\mathrm{gt}} \mid \gamma, \nu, \alpha, \beta) + \lamb
 ![[assets/figures/papers/paper_list_l2122_https_arxiv_org_abs_2602_23574/figures/008_Figure_6.jpg]]
 *Figure 6: A case where EU dominates AU. The model is trained only by 5 images from the front and asked to render the scene from all the viewing angles. EU arises due to the lack of knowledge during training on the views out of the training distribution*
 
-![[assets/figures/papers/paper_list_l2122_https_arxiv_org_abs_2602_23574/figures/009_Figure_7.jpg]]
-*Figure 7: Scene cleaning based on aleatoric uncertainty as a postprocessing step for floater removal. Points with AU above a certain threshold have their density reduced to become more transparent. By reducing the threshold, more artifacts can be eliminated*
-
-![[assets/figures/papers/paper_list_l2122_https_arxiv_org_abs_2602_23574/figures/011_Figure_9.jpg]]
-*Figure 9: Sensitivity study of regularization coefficient’s effect on all the quantitative metrics of Leaves scene*
-
 ![[assets/figures/papers/paper_list_l2122_https_arxiv_org_abs_2602_23574/figures/012_Table_3.jpg]]
 *Table 3: The regularization coefficients used in each scene of LF, LLFF, and RobustNeRF datasets*
-
-![[assets/figures/papers/paper_list_l2122_https_arxiv_org_abs_2602_23574/figures/013_Figure_10.jpg]]
-*Figure 10: Aleatoric and epistemic uncertainties of scenes with transient objects. The red bounding boxes delineate the erroneous artifacts in test renderings caused by transients in the training views. If the model fails to suppress the floaters, both AU and EU are elevated on the transients; If the model resolves the transience, only AU is higher on the regions where the training transients were once present*
-
-![[assets/figures/papers/paper_list_l2122_https_arxiv_org_abs_2602_23574/figures/005_Figure_4.jpg]]
-*Figure 4: Test uncertainties vs. training sample size on Android*
-
-![[assets/figures/papers/paper_list_l2122_https_arxiv_org_abs_2602_23574/figures/010_Figure_8.jpg]]
-*Figure 8: Mean and standard derivation of test PSNR of three runs on Horns scene, with two active sampling strategies: EUbased selection and random selection. The samples identified via epistemic uncertainty are more informative for model learning*
 
 ## 定位与知识库关联
 

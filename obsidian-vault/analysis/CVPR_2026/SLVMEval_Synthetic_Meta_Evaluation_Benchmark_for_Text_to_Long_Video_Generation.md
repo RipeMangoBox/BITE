@@ -59,8 +59,6 @@ claims:
 
 主要结果可概括为三点：（1）现有自动评估系统在长视频评估上普遍落后于人类，尤其体现在语义对齐和长程一致性方面；（2）视频时长是影响评估准确率的关键杠杆，时长增加导致系统性能显著下降；（3）基于文本的评估模式在特定模型（如**Qwen3-VL-235B**）的部分方面上较视频模式有显著提升（Background Consistency +23.3, Appearance Style +17.1），但效果依赖于底层模型能力。这些发现为未来T2LV评估系统的改进指明了方向。
 
-
-
 ### 文本到长视频生成的评估困境
 
 文本到视频（T2V）生成领域正经历从短片段向长视频的范式转变。随着模型能力的提升，生成数分钟甚至更长视频的需求日益迫切，然而与之配套的自动评估体系却严重滞后。现有评估基准主要面向短视频场景设计，在长视频上暴露出系统性缺陷：自动评估系统在需要语义对齐和时序一致性的视频-文本一致性方面表现尤为薄弱，且准确率随视频时长增加而显著下降。这一瓶颈直接制约了文本到长视频（T2LV）生成技术的迭代与可靠比较。
@@ -90,8 +88,6 @@ claims:
 本文围绕以下问题展开：**现有自动评估系统在长视频上的表现与人类评估存在多大差距？这些差距在哪些方面和哪些时长条件下最为突出？如何构建一个可扩展的基准来系统性地诊断这些问题？**
 
 通过 SLVMEval 基准，本文首次在长视频场景下对多种评估范式进行了全面的元评估，揭示了现有系统在视频-文本一致性方面的严重不足（如 Comprehensiveness 方面 GPT-5 视频模式仅 51.3%，Dynamics Degree 仅 35.3%，远低于人类 90% 以上的准确率），并验证了合成退化方法在构建可扩展评估基准方面的可行性。
-
-
 
 ## 核心方法与创新机理
 
@@ -147,8 +143,6 @@ SLVMEval通过Spearman秩相关分析（Table 7, Figure 3）揭示了一个此�
 
 综上，SLVMEval的核心创新并非提出新的评估指标或模型，而是**构建了一套可扩展、可控制、可诊断的长视频元评估方法论**，通过合成退化与成对比较框架，系统性地暴露了现有评估系统在长视频场景下的能力边界。
 
-
-
 SLVMEval 采用成对比较（pairwise comparison）的元评估框架，核心思路是：给定一段长视频及其对应的文本提示，通过受控的合成退化操作生成低质量版本，构建“高质量 vs 低质量”视频对，然后测试自动评估系统能否正确识别出原始高质量视频。该框架不依赖任何特定 T2LV 生成模型的输出，而是从密集视频标注数据集中选取真实长视频作为源素材，从而规避了生成模型质量波动对基准可靠性的干扰。
 
 整个 pipeline 由四个核心模块串联构成：
@@ -162,8 +156,6 @@ SLVMEval 采用成对比较（pairwise comparison）的元评估框架，核心�
 
 ![[assets/figures/papers/paper_list_l784_https_arxiv_org_abs_2603_29186/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of proposed SLVMEval benchmark. We construct human-validated pairs of original and aspect (specifically degraded long videos), and we test various automatic evaluation systems. Human evaluators reliably pick the better video; however, all current automatic evaluation systems lag behind human performance from most perspectives, revealing critical weaknesses in T2LV evaluation*
-
-
 
 ### 3.1 基准构建流程
 
@@ -223,12 +215,8 @@ VideoScore基于预训练VLM的评分回归，需要将SLVMEval的方面映射�
 ![[assets/figures/papers/paper_list_l784_https_arxiv_org_abs_2603_29186/figures/019_Table_10.jpg]]
 *Table 10: Mapping between our defined aspects and those defined in VideoScore*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l784_https_arxiv_org_abs_2603_29186/figures/002_Figure_2.jpg]]
 *Figure 2: Viewpoints and aspect-specific degrading operations in the proposed SLVMEval benchmark. We organize the benchmark into two groups, i.e., video quality and video-text consistency, and define 10 aspects. For each aspect, we construct paired videos by applying a controlled synthetic degradation to the original long video while keeping all other factors unchanged. The right panels show example pairs. These controlled pairs enable precise meta-evaluation of whether an automatic evaluation system can reliably identify the high-quality video under each viewpoint. Additional example pairs are provided in the supplementary material*
-
-
 
 ## 实验与关键发现
 
@@ -284,33 +272,11 @@ SLVMEval目前存在三个主要局限：第一，退化操作仅设定为人类
 
 这些局限指向若干开放问题：如何系统性调节退化超参数以构建多难度层级的扩展基准？在T2LV模型逐渐成熟后，如何设计基于模型真实失败模式的评估基准？以及如何有效融合视频与文本两种评估模态以同时利用其各自优势？
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l784_https_arxiv_org_abs_2603_29186/figures/003_Table_1.jpg]]
 *Table 1: Statistics of existing and proposed benchmarks. VBench-Long [16] only provides a framework for automatic evaluation (it does not include human annotations of video quality). It supplies prompts as inputs to T2V models, assuming generated videos of approximately 1 min [14]*
 
 ![[assets/figures/papers/paper_list_l784_https_arxiv_org_abs_2603_29186/figures/004_Table_2.jpg]]
 *Table 2: Accuracy (%) of each baseline system on SLVMEval. Numbers are accuracy*
-
-![[assets/figures/papers/paper_list_l784_https_arxiv_org_abs_2603_29186/figures/005_Figure_3.jpg]]
-*Figure 3: Relationship between video duration and accuracy. First, we sorted the dataset by video duration, divided it into four bins (intervals), and computed the accuracy within each bin. The x-axis and y-axis represents the average video duration in each bin and the corresponding accuracy, respectively. For each aspect and automatic evaluation system (excluding the human evaluators), we computed the Spearman rank correlation coefficient*
-
-![[assets/figures/papers/paper_list_l784_https_arxiv_org_abs_2603_29186/figures/008_Table_3.jpg]]
-*Table 3: Filtering statistics for the annotated degraded pairs. For each aspect, we report the number of candidate samples before filtering (Initial), the number of samples excluded because at least one worker selected option C (Excluded*
-
-![[assets/figures/papers/paper_list_l784_https_arxiv_org_abs_2603_29186/figures/014_Table_5.jpg]]
-*Table 5: Accuracy (%) of CLIPScore under different prompt-handling strategies. Numbers are accuracy % ± 95% CI (percentage points). The chance level is 50%*
-
-![[assets/figures/papers/paper_list_l784_https_arxiv_org_abs_2603_29186/figures/016_Table_7.jpg]]
-*Table 7: Spearman rank correlation coefficients*
-
-![[assets/figures/papers/paper_list_l784_https_arxiv_org_abs_2603_29186/figures/017_Table_8.jpg]]
-*Table 8: Two-sided p-values for the Spearman rank correlations in Table 7. Each entry is rounded to four decimal places. Bold values indicate statistically significant correlations with*
-
-![[assets/figures/papers/paper_list_l784_https_arxiv_org_abs_2603_29186/figures/011_Figure_7.jpg]]
-*Figure 7: Rank consistency on FETV*
-
-
 
 ## 定位与知识库关联
 
@@ -379,8 +345,6 @@ SLVMEval 的成对比较框架将所有这些系统统一到同一准确率度�
 
 **（5）无需人工过滤的基准扩展**
 过滤前后数据集上评估系统准确率的高度相关性（Figure 4）表明人工过滤步骤并非绝对必要。这是否意味着可以设计**自动化的退化质量验证机制**，从而在不依赖昂贵人工标注的情况下持续扩展基准规模？
-
-
 
 ## 原文 PDF
 

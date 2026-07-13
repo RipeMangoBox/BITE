@@ -49,8 +49,6 @@ Soul 是一个面向高保真、长时多模态数字人动画的生成框架，
 
 实验方面，Soul 在自建基准 **Soul-Bench** 上全面超越现有开源方案（如 Sonic、StableAvatar、EchoMimicV3 等）与商用产品（HeyGen、Kling-Avatar），在视频文本一致性、唇同步精度、身份保持与视频质量等指标上均取得最优结果，同时支持最长 **4 分钟**的身份一致视频生成。
 
-
-
 数字人动画旨在根据多模态驱动信号（文本、音频等）生成语义一致、身份保持的人类视频，其应用涵盖虚拟主播、数字分身、交互式助手等场景。然而，现有方法在实现**高保真长时生成**方面仍面临显著瓶颈。
 
 ### 核心瓶颈：长时推理中的潜在特征漂移
@@ -77,8 +75,6 @@ Figure 7 直观展示了这一问题：即使片段间存在帧重叠，生成�
 - **兼顾效率优化**：通过步数/CFG 联合蒸馏与轻量化 eVAE 解码器，在保持生成质量的前提下实现显著的推理加速。
 
 Soul 的目标是在**身份一致性、语义保真度、长时稳定性**三个维度上同时取得突破，使数字人动画从“短时可用”迈向“长时可信”。
-
-
 
 ## 核心方法与创新机理
 
@@ -122,8 +118,6 @@ Soul 处于**音频驱动数字人动画**与**长时视频生成**的交叉点�
 3. **阈值自适应**：当前码本替换阈值需预设，能否在无训练条件下自适应调节以适应不同生成场景，仍为开放问题。
 4. **评估偏差**：Soul-Bench 为 AI 生成数据，其统计分布可能与真实视频存在偏差，导致某些指标的绝对数值（如 LSE-C、Audio-Video Alignment）超出真实视频上限，跨方法对比时需注意这一偏差。
 
-
-
 Soul 的整体框架围绕一个核心瓶颈构建：**长时多模态数字人动画中的潜在特征分布漂移（latent feature shift）**，这会导致身份漂移、颜色偏移和细节丢失。为此，Soul 设计了一条从数据构建、模型注入到高效推理的完整流水线，其因果调节旋钮是**基于聚类码本的阈值感知替换策略（threshold-aware codebook replacement）**，在生成过程中将偏离分布的潜在特征约束回训练分布附近，从而抑制时序退化。
 
 ### 流水线总览
@@ -160,12 +154,8 @@ Soul 通过两项关键优化实现 **11.4× 推理加速**：
 
 码本替换模块与长时生成策略形成互补：潜在重叠保证了片段间的平滑过渡，而码本替换则防止了随生成时间累积的分布漂移。蒸馏与轻量 VAE 则在不显著牺牲质量的前提下，使上述复杂流水线能够在单 GPU 上以可接受的延迟运行。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1079_https_arxiv_org_abs_2512_13495/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of Soul for semantic-consistent and long-term multimodal-driven human video animation*
-
-
 
 Soul 系统围绕“长时多模态人类视频动画”这一目标，在 Wan2.2-5B 基座模型上引入了四个关键模块，分别解决音频注入、长时一致性、推理效率三个核心问题。
 
@@ -205,13 +195,6 @@ $$
 
 > **注意**：上述公式为基于方法描述的逻辑重构，非原文直接提供。如需精确形式化定义，建议查阅原文或代码实现。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1079_https_arxiv_org_abs_2512_13495/figures/010_Figure_7.jpg]]
-*Figure 7: Over time, the approach without using the threshold-aware codebook is prone to color deviation and loss of details. The data is derived from the AI-generated Soul-Bench*
-
-
-
 ## 实验与关键发现
 
 ### 核心指标与多维度对比
@@ -237,9 +220,6 @@ Soul 在自建基准 **Soul-Bench** 上与一系列代表性方法进行了全�
 长时推理的核心瓶颈在于潜在特征分布随生成进程发生漂移，导致颜色偏移和细节丢失。Soul 提出的**阈值感知码本替换 (Threshold-aware Codebook Replacement)** 策略正是针对这一退化机制设计：利用 Soul-1M 训练数据的潜在特征通过 K-Means 聚类构建离散码本，在长时生成过程中，对偏离分布的离群特征按阈值约束回码本中心附近，从而将生成分布“拉回”训练分布邻域。
 
 消融可视化（Figure 7）直观展示了该策略的效果：不使用码本替换时，即使存在片段间潜在帧重叠，生成视频仍随时间推移出现明显颜色偏差和纹理退化；引入阈值感知码本替换后，长时生成的身份一致性和场景稳定性得到有效保持。Soul 最终可生成最长 4 分钟的身份一致视频（Figure 6 顶部），验证了该策略对时序退化的抑制能力。
-
-![[assets/figures/papers/paper_list_l1079_https_arxiv_org_abs_2512_13495/figures/008_Figure_6.jpg]]
-*Figure 6: Top: Identity-consistent long-term animation across varying scenes with text and audio conditioning of our Soul. Bottom: Diverse generative capabilities for practical applications of Soul with samples from Soul-Bench*
 
 ### 推理效率的系统性优化
 
@@ -270,18 +250,8 @@ Soul 通过三个递进层次的优化实现 11.4× 推理加速（Table 3），
 - **数据覆盖偏差**：Soul-1M 主要覆盖常见动作类型，对稀有动作和跨语种音频的支持有限，可能影响对应场景下的泛化质量。
 - **评估基准偏差**：Soul-Bench 为 AI 生成数据，其评估分数可能无法完全反映真实场景表现，部分指标（如 LSE-C）已接近或超过训练集参考值，区分度下降。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1079_https_arxiv_org_abs_2512_13495/figures/006_Figure_5.jpg]]
 *Figure 5: Qualitative comparison with state-of-the-arts on Soul-Bench. The timings are based on an average generation duration of 30s. Our Soul can achieve strong semantic consistency and multi-scene generalization while preserving generation quality, with higher efficiency. The data is derived from the AI-generated Soul-Bench*
-
-![[assets/figures/papers/paper_list_l1079_https_arxiv_org_abs_2512_13495/figures/004_Figure_3.jpg]]
-*Figure 3: Statistical distributions of our Soul-1M from different perspectives*
-
-![[assets/figures/papers/paper_list_l1079_https_arxiv_org_abs_2512_13495/figures/005_Figure_4.jpg]]
-*Figure 4: Statistical distributions of Soul-Bench*
-
-
 
 ## 定位与知识库关联
 
@@ -324,8 +294,6 @@ Soul 处于**音频驱动数字人动画**这一快速演进的技术脉络中�
 3. **自适应阈值机制**：当前码本替换的阈值是预设的固定值。能否设计无训练的自适应阈值调节策略，使模型根据生成场景的复杂度（如静态背景 vs. 动态背景）动态调整替换强度？这将提升方法在不同场景下的鲁棒性。
 
 4. **与商用产品的差距**：Table 4 的人审结果显示 Soul 在整体自然度（4.17 vs. HeyGen 4.25）和身份一致性（4.00 vs. HeyGen 4.20）上仍略逊于商用产品 **HeyGen**，表明在极致真实感和细节保真度上仍有提升空间。
-
-
 
 ## 原文 PDF
 

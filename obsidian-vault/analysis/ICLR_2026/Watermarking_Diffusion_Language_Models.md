@@ -57,8 +57,6 @@ claims:
 
 **方法定位**：该方法在方法谱系上属于**优化驱动的扩散语言模型水印**，将Red‑Green水印框架（Kirchenbauer et al., 2023）从自回归场景推广到非自回归的扩散生成场景，通过概率哈希分布上的期望操作解决了上下文不完整带来的核心瓶颈。与顺序无关水印（如Unigram、PatternMark）相比，本文方法在低失真区间的检测率-质量权衡上具有显著优势（Fig. 5）。
 
-
-
 ### 扩散语言模型的兴起与生成范式的转变
 
 近年来，扩散语言模型（Diffusion Language Models, DLMs）作为一种新兴的文本生成范式受到广泛关注。与传统的自回归语言模型（Autoregressive Language Models, ARLMs）从左到右逐token生成不同，DLMs通过迭代去噪过程生成文本，允许在任意位置、任意顺序更新token。这种非自回归的生成方式带来了独特的优势，但也对现有的技术生态提出了新的适配需求。
@@ -76,8 +74,6 @@ claims:
 本文的核心动机在于，将DLM水印问题从“何时施加水印”的工程适配问题，提升为一个**约束优化问题**：在限制每步分布与原始分布KL散度的前提下，最大化生成序列的**期望绿色token比例**。这一框架的直觉在于：既然上下文在生成时不确定，就在上下文哈希的概率分布上以期望方式施加Red‑Green水印，同时利用能使其他token变绿的token概率偏置，从而在扩散生成的全过程中持续注入水印信号。
 
 该优化框架的解自然导出两个关键分量——**期望增强（Red‑Green in expectation）** 与**预测偏置（predictive bias）**——且可直接复用现有的Red‑Green检测器，无需修改检测端。这一设计使得本文方法在保持与现有水印生态兼容的同时，从根本上解决了DLM场景下的水印失效问题。
-
-
 
 ## 核心方法与创新机理
 
@@ -123,8 +119,6 @@ $$q_t^* \propto p_t \underbrace{\exp(\delta G^\top p_{t-1})}_{\text{期望增强
 ### 与 ARLM 水印的统一
 
 值得注意的是，当限制到自回归生成场景时，本文的优化框架**精确退化为标准 Red‑Green ARLM 水印**（Sec. 3.3）。这表明本文方法并非另起炉灶，而是将 ARLM 水印从“确定性上下文”推广到“概率性上下文”的自然扩展，实现了两种生成范式下水印方案的统一。
-
-
 
 ![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_3aBWTYGcaT/figures/001_Figure_1.jpg]]
 *Figure 1: An overview of why current watermarks for ARLMs fall short in the diffusion setting (left), how our watermark operates in this setting (middle) and how our watermark detector works (right)*
@@ -182,8 +176,6 @@ $$q_t^* \propto p_t \exp(\delta G^\top p_{t-1}) \exp(\delta G p_{t+1})$$
 5. 检测时，对生成序列执行去重绿色计数与二项式检验（模块3）。
 
 该pipeline的关键创新在于**将水印施加从“确定性上下文”推广到“上下文哈希的概率分布”**，从而解决了扩散语言模型因任意顺序生成导致上下文不完整、直接应用ARLM水印效果极弱的瓶颈问题。
-
-
 
 ### 优化框架
 
@@ -262,8 +254,6 @@ $$S = \sum_{i=1}^L G_{s_i, t_i}$$
 
 其中 $s_i$ 为位置 $i$ 的哈希值，$t_i$ 为 token id。由于本文使用独立同分布的绿色列表（而非原 Red‑Green 的相关列表），检测统计量 $S$ 在零假设下服从二项分布，可直接计算 $p$ 值。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：检测率-质量权衡
@@ -287,9 +277,6 @@ $$S = \sum_{i=1}^L G_{s_i, t_i}$$
 
 图3（左）展示了水印对局部修改的鲁棒性。在删除和替换攻击下，本文方法在高达**30%的序列被修改**时仍保持较强的检测能力（TPR@1 > 0.8），且显著优于Red-Green ARLM水印在相同条件下的表现。这一鲁棒性来自水印的“期望增强”机制：由于水印是在上下文哈希的概率分布上施加的，生成序列的多种可能变体也自然地携带水印信号。
 
-![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_3aBWTYGcaT/figures/006_Figure_3.jpg]]
-*Figure 3: Robustness Evaluation of Our Watermark ( L e f t ) We measure the detectability of our watermark (TPR@1) against an increasing percentage of local modifications, using responses generated from LLADA-8B with an average length of 275 tokens. ( R i g h t ) For stronger adversaries, we measure the detectability of our watermark (TPR@1) with respect to the length of the sequence. For both figures, we use $\delta$ = 4 and the previous token as context ( $\mathcal { C } = \{$ - 1 $\}$ ) )
-
 对于更强的攻击者（图3右），本文方法的检测率随文本长度增加而单调提升，在约200 token后TPR@1接近饱和。这表明即使面对具有上下文感知能力的替换攻击，只要生成文本足够长，水印仍可被可靠检测。
 
 ### 消融研究
@@ -311,17 +298,10 @@ $$S = \sum_{i=1}^L G_{s_i, t_i}$$
 
 图5和表2将本文方法与**Unigram**（Zhao et al., 2023）和**PatternMark**（Chen et al., 2025）两类顺序无关水印进行了对比。在检测率-质量权衡上，本文方法在低失真区域（log PPL较低时）的TPR@1显著优于两者。更重要的是，表2揭示了Unigram的一个关键缺陷：其在不同密钥$\xi$下的FPR波动极大——在1%理论FPR下，最大经验FPR达17.0%，标准差1.2%。这意味着Unigram的实际假阳性率在不同密钥间可跨越多个数量级，严重威胁检测可靠性。相比之下，本文方法在使用$C=\{-1\}$时最大FPR@1%为1.7%、标准差0.3%；使用$C=\{-2,-1\}$时进一步降至1.1%和0.1%，**种子间波动随上下文尺寸增大而急剧减小**（图7）。
 
-![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_3aBWTYGcaT/figures/012_Figure_5.jpg]]
-*Figure 5: Detection Performance Comparison with Order-Agnostic Watermarks We study the trade-off between detectability (TPR@1) and text quality (log PPL) of our approach and orderagnostic watermarks for different values of the watermark strength parameter δ and sequences of, on average, 275 tokens. For the left figure, we use ${ \mathcal { C } } = \{$ - 1 $\}$ , and for the right one, we use $\mathcal { C } = \{$ - 1 , 1 $\}$ For the order-agnostic watermarks, we use the same data for both figures
-
-![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_3aBWTYGcaT/figures/018_Table_2.jpg]]
-
 ### 填充任务与自回归掩码策略
 
 在DREAMON-V0-7B的填空（infilling）任务上，本文方法同样显著优于基线（图17），验证了方法对不同DLM生成范式的泛化性。消融还表明，无论使用熵掩码（entropy remasking）还是自回归掩码（autoregressive remasking）策略，本文方法的检测率-质量权衡均一致优于基线（图8）。
 
-![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_3aBWTYGcaT/figures/039_Figure_17.jpg]]
-*Figure 17: Detection Performance on Infilling Tasks (Left) We compare the trade-off between watermark detectability (TPR@1) and text quality (log PPL) of our approach and the baseline for different values of the watermark strength parameter δ and sequences of, on average, 205 tokens. (Right) ROC curves of our watermark and the baseline at log ${ \bf \bar { \it P P L } } ) \approx$ 1 . 9 4 . . Responses are generated with DREAMON-V0-7B at temperature 0.8, metrics are computed over 600 samples and we use the previous token as context ( $\mathrm { i . e . , \bar { \mathcal { C } } = \{ - 1 \} }$ ) . The crosses on the left figure correspond to the same watermark hyperparameters as the right figure
 
 ### 失败模式与局限性
 
@@ -332,15 +312,8 @@ $$S = \sum_{i=1}^L G_{s_i, t_i}$$
 5. **模型泛化性未充分验证**：实验仅在LLADA-8B和DREAM-7B上进行，对其他DLM架构（如块扩散、半自回归模型）的泛化性尚不明确。
 6. **文本质量评估依赖GPT-4**：作为裁判的GPT-4评分可能存在偏见，且未分析水印对生成多样性和事实一致性的影响。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_3aBWTYGcaT/figures/037_Table_4.jpg]]
 *Table 4: Benchmark Accuracy with Entropy Remasking We compare the benchmark accuracy on LLADA-8B for our watermark using the recommended hyperparameters (achieving a TPR@1 of 1.0 with the entropy remasking strategy) to that of the unwatermarked model*
-
-![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_3aBWTYGcaT/figures/051_Figure_23.jpg]]
-*Figure 23: Watermark Performance ROC curves (log scaled) of KGW and our watermark for both LLADA-8B (top) and DREAM-7B (bottom), and different values of δ using ${ \mathcal { C } } = \{$ - 1 $\}$ (left) or $\mathcal { C } = \{$ - 1 , 1 $\}$ (right)
-
-
 
 ## 定位与知识库关联
 
@@ -412,8 +385,6 @@ $$S = \sum_{i=1}^L G_{s_i, t_i}$$
 4. **鲁棒性边界：** 对基于 LLM 的智能改写、摘要等更强的对抗性编辑，水印的鲁棒性边界在哪里？
 5. **采样策略交互：** 不同采样策略（如 top‑p、典型采样）对水印强度的影响尚未系统研究。
 6. **安全性分析：** 水印在扩散环境中的安全性（抵抗伪造、密钥泄露、移除攻击等）需要进一步研究。
-
-
 
 ## 原文 PDF
 

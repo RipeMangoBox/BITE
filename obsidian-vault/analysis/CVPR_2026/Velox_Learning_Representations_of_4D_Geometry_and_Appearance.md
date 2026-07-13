@@ -73,8 +73,6 @@ Velox 在4D对象表示领域填补了一个关键空白：**同时建模几何�
 
 消融实验进一步表明，纹理增广（PSNR 从 32.41 提升至 33.93）、增加动态token数量（从4096到16384持续改善Chamfer和LPIPS）以及使用解码器预测体素（接近GT体素性能）均对最终效果有显著贡献。
 
-
-
 ### 四维对象表示的需求与挑战
 
 现实世界中的对象是动态的——它们随时间移动、变形，并呈现出丰富的外观变化。要构建能够理解、重建和生成这类动态对象的智能系统，一个核心前提是学习到有效的**四维（4D）对象表示**，即同时编码三维几何、时间演化和视觉外观的紧凑描述子。然而，现有的4D表示方法在两个关键维度上存在显著不足。
@@ -94,8 +92,6 @@ Velox正是围绕这一核心动机展开。其关键洞察在于：如果将无
 在4D表示的方法谱系中，Velox占据了一个独特的位置。与逐帧重建方法（如**LiTo**，每帧独立编码隐变量）相比，Velox通过跨帧共享的动态token实现了时间一致性建模。与基于变形场的方法（如**GVF**，依赖稠密对应关系驱动高斯变形）相比，Velox完全摆脱了对时间对应的依赖，转而使用流匹配解码器直接建模表面分布。与像素对齐的生成方法（如**L4GM**，从视频像素直接回归高斯参数）相比，Velox在紧凑的隐空间中操作，使得生成模型（DiT）能够更高效地学习4D对象的先验分布。
 
 表4（见附录）系统梳理了相关4D表示在几何建模、外观建模、预训练模型使用、隐空间维度、输入形式和训练数据集等维度上的差异，进一步明确了Velox在“无需对应关系的联合几何-外观表示”这一细分方向上的开创性定位。
-
-
 
 ## 核心方法与创新机理
 
@@ -135,12 +131,7 @@ Velox 采用 Perceiver IO 架构作为编码器，输入为无结构时空彩色
 - **vs. LiTo（逐帧 3D 表示）**：LiTo 逐帧独立编码，缺乏跨帧信息共享，导致外观一致性不足；Velox 的动态 token 联合编码整个序列，恢复的外观更忠实。
 - **vs. L4GM（像素对齐高斯的视频到 4D）**：L4GM 依赖像素对齐和测试时优化，新视角泛化能力受限；Velox 在潜在空间生成，无需测试时对齐，新视角质量更高。
 
-
-
 Velox 的核心目标是学习一个紧凑、描述性强且易于访问的 4D 对象表示——**动态 token**。整个 pipeline 围绕三个关键环节构建：**编码**、**解码监督**与**下游适配**，如图 Figure 2 所示。
-
-![[assets/figures/papers/paper_list_l51_https_arxiv_org_abs_2605_04527/figures/002_Figure_2.jpg]]
-*Figure 2: Method. (a) We use a Perceiver IO encoder [32, 115] to map dynamic point clouds and queries to dynamic tokens. We train this representation with two decoders: the 4D surface decoder, which maps noisy input surface points to denoised points; and a Gaussian decoder, which maps from voxel centers to 3D Gaussian [37] parameters. (b) To train our models for video-to-4D and cloth simulation, we use a DiT [65] that directly generates 4D representations in the form of dynamic tokens conditioned on input image/video DinoV2 features. We can then use the Gaussian decoder to map the dynamic tokens to 3D Gaussians. (c) Conditioned on dynamic tokens calculated from an input RGBD video, we train a trackin...*
 
 ### 编码：从无结构时空点云到动态 token
 
@@ -186,8 +177,6 @@ $$\mathcal{L} = \mathcal{L}_V + \mathcal{L}_{GS} + \gamma \mathcal{L}_C$$
 
 为提升外观建模的泛化能力，Velox 在训练中对动态序列施加**随机纹理替换增广**（Figure 3），将原始纹理替换为随机纹理贴图。消融实验表明，该增广对重建外观质量有显著贡献（Ours-S w/o aug. PSNR 32.41 vs w/ aug. 33.93），因为未增广的动态数据集中纹理多样性不足以捕获高频细节。
 
-
-
 Velox 的核心架构由三个紧密协作的模块构成：**Perceiver IO 编码器**、**4D 表面解码器**和**高斯解码器**，三者通过一组**动态 token** 实现信息压缩与传递。
 
 ### 编码器：从无结构点云到动态 token
@@ -232,21 +221,11 @@ $$
 
 **需要人工核实**：公式中流匹配路径的具体形式（$\alpha_t$、$\sigma_t$ 的定义）在提供的分析材料中未完整展开，建议查阅原文 Section 3 确认其与标准 Flow Matching 框架的对应关系。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l51_https_arxiv_org_abs_2605_04527/figures/021_Figure_11.jpg]]
-*Figure 11: Real-world generation. We mask out real-world videos for the object of interest, and generate video-conditioned 4D objects*
-
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
 
 Velox 的训练数据基于 Objaverse 动态序列，每条序列包含 25 帧时空彩色点云。编码器采用 Perceiver IO 架构，以局部交叉注意力将输入压缩为一组动态 token。训练目标由三部分构成：4D 表面解码器的流匹配速度监督损失 $\mathcal{L}_V$、高斯解码器的图像重建损失 $\mathcal{L}_{GS}$，以及动态 token 的 L2 正则项 $\mathcal{L}_C$（权重 $\gamma = 10^{-4}$）。纹理增广策略（Figure 3）通过随机替换物体纹理显著提升了外观多样性，是获得高质量外观重建的关键因素。
-
-![[assets/figures/papers/paper_list_l51_https_arxiv_org_abs_2605_04527/figures/003_Figure_3.jpg]]
-*Figure 3: Texture augmentations. We augment training sequences with random textures, increasing appearance diversity. Asset credit: [87]*
 
 ### 4D 重建评估
 
@@ -256,9 +235,6 @@ Table 1 报告了在 Objaverse 256 个场景上的重建质量对比。Velox 在
 *Table 1: Reconstruction evaluation. Reconstruction quality across methods, including different voxelization methods for our Gaussian decoder. Chamfer values are multiplied by 105*
 
 定性对比（Figure 4）揭示了两项关键优势：在大运动区域，GVF 基于变形的高斯方法难以准确建模，而 Velox 的流匹配解码器能稳定恢复几何；在关节建模区域，LiTo 逐帧独立处理导致外观不一致，Velox 通过跨时间联合建模保持了外观的时空连贯性。
-
-![[assets/figures/papers/paper_list_l51_https_arxiv_org_abs_2605_04527/figures/004_Figure_4.jpg]]
-*Figure 4: Reconstruction results. Black inset: Our approach outperforms GVF [117], especially on areas with bigger movements, where deforming Gaussians proves challenging. Blue inset: Furthermore, due to jointly modeling the object across time, we recover more faithful appearance than the single frame-based LiTo [11]. Asset credit [58]*
 
 消融实验（Table 1）进一步表明：去除纹理增广后，Ours-S 的 PSNR 从 33.93 降至 32.41，外观重建明显退化，说明增广策略对学习高频纹理至关重要。动态 token 数量消融（Table 10）显示，token 数从 4096 增至 16384 时，Chamfer 距离和 LPIPS 持续改善，但推理时间相应增加，呈现质量-效率的权衡。
 
@@ -279,9 +255,6 @@ Table 3 报告了在 Objaverse 和 Consistent4D 两个数据集上的视频到 4
 ![[assets/figures/papers/paper_list_l51_https_arxiv_org_abs_2605_04527/figures/008_Table_3.jpg]]
 *Table 3: Video-to-4D generation evaluation. For quantitative metrics, we render the generated 4D objects from 10 viewpoints. We report separate metrics for the input and 9 novel viewpoints on Consistent4D [33] (C4D) and 128 test objects in Objaverse [17] (Obj). The input video is rendered from random distance to the origin (r ∈ [2, 5]) with a paired field of view to cover the entire object*
 
-![[assets/figures/papers/paper_list_l51_https_arxiv_org_abs_2605_04527/figures/007_Figure_5.jpg]]
-*Figure 5: Video-to-4D results. 2nd row: GVF [117] fails to generalize across complex shape deformations, and does not faithfully reproduce both input and novel views. 3rd row: L4GM renders the input view faithfully due to its pixel-based Gaussian formulation and test-time alignment. However, it fails to generate realistic novel views, with visible floaters around the object. Bottom row: Our method recovers both accurate input views and novel view generations, even for complex structures like the bird (RHS). Asset credit [64, 111]*
-
 ODE 积分步数消融（Table 8）表明，即使使用较少步数，Velox 仍优于 L4GM 和 GVF，说明动态 token 空间本身具有更好的生成效率。
 
 ![[assets/figures/papers/paper_list_l51_https_arxiv_org_abs_2605_04527/figures/015_Table_8.jpg]]
@@ -290,9 +263,6 @@ ODE 积分步数消融（Table 8）表明，即使使用较少步数，Velox 仍
 ### 布料模拟评估
 
 在布料模拟任务上（Figure 7），Velox 的图像到 4D 管线能够从单帧初始图像生成完整的 4D 轨迹。对质心点的位置、速度和加速度分析显示，生成轨迹呈现出符合物理规律的加速下落和触地反弹行为（$\tau \approx 0.5$ 时刻），与参考轨迹的动力学特征高度一致。Table 12 报告了生成指标评估，但作者跳过了 FVD，因为数据分布与 InceptionI3D 特征模型的训练分布差异过大。
-
-![[assets/figures/papers/paper_list_l51_https_arxiv_org_abs_2605_04527/figures/010_Figure_7.jpg]]
-*Figure 7: Cloth simulation results. (b) Our generative model predicts the full 4D trajectory of a cloth from an initial position (Top right: input frame). (c) Position, velocity, and acceleration (acc) of the center-of-mass point (marked in (a) and (b)) along the negative y axis, plotted against time. Both the generated and reference trajectories show an initial acceleration toward the ground followed by an upward rebound after impact at τ ≈ 0.5*
 
 ### 失败模式分析
 
@@ -310,8 +280,6 @@ ODE 积分步数消融（Table 8）表明，即使使用较少步数，Velox 仍
 ### 跨数据集泛化
 
 Table 11 展示了 Velox（仅在 Objaverse 上训练）在 PokeFlex 数据集上的重建性能，初步验证了动态 token 的跨数据集迁移能力。值得注意的是，GVF 因缺少时间对应关系而无法应用于 PokeFlex，凸显了 Velox 无需时间对应的输入灵活性优势。
-
-
 
 ## 定位与知识库关联
 
@@ -350,8 +318,6 @@ Velox 的提出直接回应了当前 4D 对象表示领域的两类核心瓶颈�
 4. **复杂场景扩展。** 动态 token 目前针对单个对象设计，能否扩展用于多对象交互场景或更大规模的环境表示？这需要解决 token 分配、对象间交互建模和计算可扩展性等挑战。
 
 5. **真实场景鲁棒性验证。** 在更广泛的真实数据（如野外视频、遮挡场景、光照变化）上的泛化能力需要系统评估，以确定动态 token 表示在实际部署中的可靠性边界。
-
-
 
 ## 原文 PDF
 

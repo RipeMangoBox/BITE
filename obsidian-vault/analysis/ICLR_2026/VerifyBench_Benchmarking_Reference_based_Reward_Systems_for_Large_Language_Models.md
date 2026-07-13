@@ -59,8 +59,6 @@ claims:
 
 本基准聚焦于答案级别的二值正确性判断，不评估推理过程质量或部分正确回答，且排除了证明题和开放式问题，这些限制为后续扩展留下了明确方向。
 
-
-
 大语言模型（LLM）的强化学习（RL）训练依赖于可靠的奖励信号来引导模型行为。当前，奖励系统的评测主要建立在**成对偏好比较**（pairwise preference ranking）范式之上：给定一个查询和两个回答，奖励模型需要判断哪个回答更好，评测指标是正确赋予高分给更佳回答的准确率。这一范式在 **Reward Bench**（Lambert et al., 2025）和 **RM-Bench** 等基准中得到了广泛应用，其核心公式为：
 
 $$reward = R_{\varphi}(q, r)$$
@@ -84,8 +82,6 @@ $$\mathrm{Accuracy} = \frac{1}{|D|} \sum_{(q, r_w, r_l) \in D} \mathbb{I}[R_{\va
 3. **验证器质量反馈缺失**：现有基准无法回答一个关键问题——验证器的质量差异究竟会在多大程度上影响RL训练的最终效果？换言之，缺乏将验证器评测分数与下游训练收益直接关联的实验证据。
 
 为解决上述问题，本文提出 **VerifyBench** 和 **VerifyBench-Hard** 两个基准数据集，将评测范式从偏好排序转变为基于参考答案的单一回答正确性判断。VerifyBench 提供平衡的难度分布，而 VerifyBench-Hard 则通过筛选顶尖模型判断高度冲突的样本，构建更具挑战性的测试集。这一设计使得研究者能够量化分析不同验证方法在绝对正确性判断上的能力差异，并建立起验证器质量与RL训练效果之间的因果关联。
-
-
 
 ## 核心方法与创新机理
 
@@ -116,8 +112,6 @@ VerifyBench-Hard 是另一个关键创新。其构建过程利用 **5 个在 Ver
 ### 评测指标与难度设计的协同
 
 四个 changed slots——评测范式、输入组成、评价指标和难度设计——并非孤立存在，而是形成了一条完整的创新链条：**因为**输入中加入了参考答案，**所以**评测可以聚焦于单一回答的正确性判断；**因为**目标是绝对正确性，**所以**指标从排序准确率变为二值分类准确率；**因为**标准样本上大模型已接近天花板（>90%），**所以**需要 VerifyBench-Hard 来区分顶尖方法。这一链条使得 VerifyBench 能够捕捉到现有基准无法反映的验证能力差异，尤其是为推理模型 RL 训练中验证器的选择提供了直接相关的评测信号。
-
-
 
 ![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_JfsjGmuFxz/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the benchmark construction process. The upper section outlines the pipeline used to construct VerifyBench, whereas the lower section details the pipeline for VerifyBench-Hard. The components highlighted by black boxes denote the final entries included in the benchmark*
@@ -157,8 +151,6 @@ $$\operatorname{Accuracy} = \frac{1}{|D|} \sum_{(q, gt, r, y) \in D} \mathbb{I}[
 ### 输入输出流
 
 整个框架的输入输出关系清晰：输入为 $(q, gt, r)$ 三元组，输出为二值正确性判断。两条基准的区别在于样本难度分布——VerifyBench 保持自然分布下的类别平衡，VerifyBench-Hard 则聚焦于高冲突样本，提供更具挑战性的测试场景。实验表明，顶尖模型在 VerifyBench 上可达 95% 以上的准确率，但在 VerifyBench-Hard 上下降约 8-10 个百分点，验证了困难集的设计有效性。
-
-
 
 ### 奖励模型的形式化定义
 
@@ -204,14 +196,11 @@ VerifyBench与现有奖励基准（如Reward Bench、RM-Bench）的本质区别�
 - **评价指标**：从“正确赋予高分给更佳回答的准确率”转变为“预测二值正确性标签的准确率”，直接衡量验证系统的绝对判断能力。
 - **难度设计**：在自然分布样本（VerifyBench）之外，引入基于多模型分歧筛选的困难子集（VerifyBench-Hard），提供更具区分度的评测层次。
 
-
-
 ## 实验与关键发现
 
 ### 评估设置与基准统计
 
 VerifyBench 包含 1 000 个问题、2 000 条回答（每个问题配一正一负），VerifyBench-Hard 包含 945 个问题、1 000 条回答（Table 1）。两套基准均覆盖数值、表达式、选择题、字符串四种答案类型，但分布差异显著：VB 经均衡下采样后各类型均匀（各 250 题），VB-Hard 则偏向选择题（430 题）和字符串（332 题），且正确回答占比仅 29.1%（291/1 000），远低于 VB 的 50%，体现了困难样本的设计意图。
-
 
 ![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_JfsjGmuFxz/figures/003_Table_1.jpg]]
 *Table 1: Benchmark statistics of VerifyBench (VB) and VerifyBench-Hard (VB-H)*
@@ -226,7 +215,6 @@ $$\operatorname{Accuracy} = \frac{1}{|D|} \sum_{(q, gt, r, y) \in D} \mathbb{I}[
 
 **Table 2** 汇总了各方法在 VB 和 VB-Hard 上的总体及分项准确率。核心发现：
 
-
 ![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_JfsjGmuFxz/figures/004_Table_2.jpg]]
 *Table 2: Overall performance(%) of VerifyBench and VerifyBench-Hard. Num stands for Numeric Values, Exp stands for Expressions, MC stands for Multi-choice and Str stands for String*
 
@@ -238,14 +226,12 @@ $$\operatorname{Accuracy} = \frac{1}{|D|} \sum_{(q, gt, r, y) \in D} \mathbb{I}[
 
 4. **答案类型差异明显**。选择题（MC）普遍得分最高（多数模型 >95%），字符串（Str）和表达式（Exp）相对困难。以 Qwen3-32B 为例，MC 达 99.00%，而 Exp 仅 94.00%，Str 为 92.60%（Table 5）。
 
-
 ![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_JfsjGmuFxz/figures/010_Table_5.jpg]]
 *Table 5: Model performance(%) across the finegrained taxonomy on VerifyBench. Q32B stands for Qwen3-32B, g4o stands for gpt-4o-2024-11- 20, L70B stands for Llama-3.3-70B-Instruct and L3B stands for Llama-3.2-3B-Instruct*
 
 ### 消融实验：参考答案是关键信号源
 
 **Table 3** 展示了移除参考答案后 LLM-as-a-judge 的性能变化。核心结论：
-
 
 ![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_JfsjGmuFxz/figures/005_Table_3.jpg]]
 *Table 3: Evaluation results(%) about how including the reference answer in the prompt influences the performance of LLM-as-a-judge*
@@ -256,20 +242,12 @@ $$\operatorname{Accuracy} = \frac{1}{|D|} \sum_{(q, gt, r, y) \in D} \mathbb{I}[
 
 **Table 4** 进一步考察了现有无参考答案奖励模型在 VB（无参考答案设定）上的表现。结果令人警醒：
 
-
-![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_JfsjGmuFxz/figures/006_Table_4.jpg]]
-*Table 4: The performance(%) of existing reward models on VerifyBench without access to reference answers, as well as a comparison with existing reward benchmarks*
-
 - 所有无参考答案奖励模型的准确率均低于 80%。表现最好的领域专用模型 Qwen2.5-Math-RM-72B 仅 78.00%，通用模型 internlm2-20b-reward 仅 66.95%。
 - 这些模型在传统偏好基准（Reward Bench、RM-Bench）上得分较高，但在 VB 上表现平庸，揭示了**偏好排序能力与绝对正确性判断能力之间的本质差异**。
 
 ### 下游验证：VerifyBench 得分预测 RL 训练收益
 
 **Figure 3** 展示了使用不同 VerifyBench 得分的 LLM 作为 RL 验证器时，模型在 MinervaMath 上的训练曲线。核心发现：
-
-
-![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_JfsjGmuFxz/figures/009_Figure_3.jpg]]
-*Figure 3: Llama-3.2-3B-Instruct (60.95) Qwen3-1.7B (81.10) Qwen3-4B (92.00) gpt-oss-20b (94.8) math-verify Figure 3: The performance(%) of RL across different LLM judges which have various performance on VerifyBench*
 
 - **验证器质量与 RL 训练效果呈正相关**。使用 VerifyBench 得分最高的 gpt-oss-20b（94.8%）作为验证器，训练收益最大且稳定上升；Qwen3-4B（92.00%）次之；Qwen3-1.7B（81.10%）收益较小。
 - **弱验证器可能导致性能退化**。使用 Llama-3.2-3B-Instruct（60.95%）作为验证器时，训练曲线几乎无提升甚至波动下降，说明低质量奖励信号会误导策略优化。
@@ -292,23 +270,6 @@ $$\operatorname{Accuracy} = \frac{1}{|D|} \sum_{(q, gt, r, y) \in D} \mathbb{I}[
 3. **奖励欺骗未评估**：未对 RL 训练中可能出现的奖励欺骗（reward hacking）现象进行系统性评测，无法反映训练中奖励信号的被利用风险。
 4. **小模型验证能力提升**：如何以低成本提升 <3B 模型的参考答案验证能力，是降低大规模 RL 训练推理成本的关键开放问题。
 5. **步骤级验证的缺失**：当前基准仅评估答案级正确性，能否设计步骤级验证基准来更精细地指导推理模型训练，值得进一步探索。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_JfsjGmuFxz/figures/011_Table_6.jpg]]
-*Table 6: The datasets we used and the number of samples drawn from each, including the license information of these datasets*
-
-![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_JfsjGmuFxz/figures/012_Table_7.jpg]]
-*Table 7: All LLMs used to generate completions in this paper. We employed multiple open-source and closed-source models of varying scales to generate completions, thereby enhancing the robustness of our constructed benchmark*
-
-![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_JfsjGmuFxz/figures/013_Table_8.jpg]]
-*Table 8: Distribution of source models which generated the completions in VerifyBench and VerifyBench-Hard*
-
-![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_JfsjGmuFxz/figures/021_Table_9.jpg]]
-*Table 9: Full taxonomy and their description of VerifyBench and VerifyBench-Hard*
-
-
-
 
 ## 定位与知识库关联
 
@@ -351,8 +312,6 @@ VerifyBench 的设计包含若干明确的适用边界：
 **细粒度评价方案设计**：从二值答案正确性扩展到步骤级正确性判断，可能为推理模型训练提供更精细的奖励信号。论文在细粒度答案类型分析（Table 5）中已初步展示了不同子类型上的性能差异，但尚未构建步骤级的评价体系。
 
 **奖励欺骗的防御机制**：基于参考答案的奖励系统如何有效防止奖励欺骗，是 RL 训练安全性的核心问题。论文未对此展开研究，但 RL 训练实验中弱验证器导致性能下降的现象（Figure 3 中 Llama-3.2-3B-Instruct 作为验证器时的表现）间接暗示了这一风险的存在。
-
-
 
 ## 原文 PDF
 

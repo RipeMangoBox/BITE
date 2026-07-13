@@ -317,17 +317,6 @@ T-SAE在Llama-3.1-8b-Instruct上的t-SNE结果（图9）显示，即使在8B参�
 
 需要指出的是，T-SAE的高层特征并非完美隔离：图4中某些特征在非相关段落中仍有微弱激活，表明存在一定的语义泄漏。这可能是因为语言模型本身在不同语义区域之间保留了上下文信息，导致特征空间无法完全解耦。此外，时间对比损失增加了计算开销，在相同内存预算下需要使用更小的批次大小，这可能影响训练效率。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_bojVI4l9Kn/figures/012_Table_4.jpg]]
-*Table 4: Chosen and rejected examples with maximal difference (rejected−chosen) in feature activations for feature legal and formal language. In all cases, the rejected example is much longer*
-
-![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_bojVI4l9Kn/figures/014_Table_6.jpg]]
-*Table 6: Top 15 features with greatest difference in mean sequence activation between rejected and chosen completions, averaged over the dataset (HH-RLHF (Bai et al., 2022))*
-
-![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_bojVI4l9Kn/figures/017_Table_8.jpg]]
-*Table 8: Features used for steering interventions on Gemma2-2b*
-
 ## 定位与知识库关联
 
 ### 方法谱系：从标准SAE到时序感知的字典学习

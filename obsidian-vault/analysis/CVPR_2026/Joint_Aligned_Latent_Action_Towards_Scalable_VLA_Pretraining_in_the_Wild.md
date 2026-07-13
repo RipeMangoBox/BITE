@@ -52,8 +52,6 @@ claims:
 
 实验表明，联合对齐机制带来显著增益：在手部运动生成任务上，JALA在野外分割的MPJPE从16.91降至11.02（降幅34.8%）；在LIBERO双视图操作基准上，JALA‑dino平均成功率达96.9%，较去除对齐的变体提升9.3个百分点；在真实世界多步操作任务中，子任务完成率提升12.0个百分点。消融研究进一步确认，解耦EMA更新对稳定性至关重要（去除后成功率从96.9%骤降至56.6%），且下游性能随预训练野外数据比例增加而单调提升。JALA在同等规模模型中表现领先，在部分基准上甚至与更大规模模型竞争，同时保持仅使用人类数据预训练的高效性。
 
-
-
 ### 具身智能中的数据瓶颈
 
 视觉-语言-动作模型（VLA）旨在赋予机器人理解和执行自然语言指令的能力，其核心在于学习从感知到动作的映射。当前VLA预训练面临一个根本性瓶颈：**高质量机器人操作数据极度稀缺**。与互联网规模的图文数据不同，机器人数据需要真实的物理交互和精确的动作标注，采集成本高昂。与此同时，互联网上存在海量的**野外人类操作视频**——烹饪、维修、装配等场景中蕴含着丰富的操作知识与运动模式，但这些视频几乎完全不包含动作标签，无法直接用于VLA的监督训练。
@@ -75,8 +73,6 @@ claims:
 - **如何实现统一学习？** 需要构建一个统一的潜在动作空间，使得有标签的实验室数据和无标签的野外视频能够在此空间中共同训练。
 
 基于上述动机，本文提出了 **JALA（Joint-Aligned Latent Actions）**——一种联合对齐潜在动作范式，其核心是将VLA产生的预测嵌入与逆动力学模型导出的潜在动作直接对齐，从而同时从有标签和无标签人类视频中学习，迈向可扩展的野外VLA预训练。
-
-
 
 ## 核心方法与创新机理
 
@@ -124,8 +120,6 @@ $$\mathcal{L}_{\mathrm{FM}} = \mathbb{E}_{\tau, \epsilon, A_t} \left[ \| V_{\the
 
 这一设计使得预训练阶段学到的行为表征能够高效迁移到机器人控制任务，无需重新训练整个VLA骨干。消融研究（Figure 6右）表明，使用第19层的预测嵌入作为流匹配输入可获得最佳迁移性能。
 
-
-
 JALA 的核心理念是舍弃重建驱动的潜在动作范式，转而构建一个**联合对齐的潜在动作空间**。该空间由 VLA 产生的预测嵌入和逆动力学模型（IDM）导出的潜在动作共同定义，二者通过直接对齐形成统一表征，使模型能同时从有标签实验室数据和无标签野外人类视频中学习。
 
 ### 预训练阶段
@@ -160,15 +154,8 @@ $$\mathcal{L}_{\mathrm{FM}} = \mathbb{E}_{\tau,\epsilon,A_t}\left[\|V_{\theta}(\
 
 整体数据流可概括为：视觉输入经固定编码器（DINOv3 或 V-JEPA2）提取特征后，与指令令牌和运动令牌一同送入基于 InternVL3-2B 的 Transformer 骨干。在预训练中，掩码运动块的隐藏状态作为预测嵌入，与 LAP 从边界帧提取的潜在动作对齐；在后训练中，这些预测嵌入直接驱动流匹配头生成机器人动作序列。LAP-LSP 的解耦 EMA 更新贯穿整个预训练过程，确保潜在动作空间的一致性和稳定性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2259_https_arxiv_org_abs_2602_21736/figures/001_Figure_1.jpg]]
-*Figure 1: Comparison of VLA’s latent action paradigms with human videos. (left) Prior reconstruction-based methods like LAPA [19] rely on multi-stage pipelines extracting latent actions via dynamics reconstruction as pseudo-labels. (middle) Our JALA introduces predictive embeddings aligned with latent actions. (right) Transformer-based JALA implementation where intermediate hidden states serve as the predictive embeddings to align with latent actions, while output tokens use available action labels as supervision*
-
 ![[assets/figures/papers/paper_list_l2259_https_arxiv_org_abs_2602_21736/figures/002_Figure_2.jpg]]
 *Figure 2: The JALA framework. Pre-training (left): Hidden states of masked motion chunks serve as predictive embeddings to align with latent actions from boundary frames. The Latent Action Perceiver (LAP) maps boundary frames to latent action space, providing supervision without action labels. A parameter-shared Latent State Perceiver (LSP) injects initial frame context, with LAP and LSP linked via decoupled EMA update for stability. Post-training (right): The predictive embeddings are fed into a flow-matching head for robot task transfer*
-
-
 
 ### 3.1 基础VLA训练目标
 
@@ -238,8 +225,6 @@ $$
 
 其中 $\tau$ 为扩散时间步，$\epsilon \sim \mathcal{N}(0,I)$ 为噪声，$A_t^\tau$ 为加噪后的动作序列，$q_t$ 为机器人状态，$V_\theta$ 为预测的向量场。该模块仅在少量机器人数据上进行微调，实现从人手运动表征到机器人动作的高效迁移。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -266,9 +251,6 @@ Table 1展示了手部运动生成与预测任务在Lab和Wild两个分割上的
 ### 真实世界多步操作
 
 真实机器人实验（Table 5）设置了三项多步任务：**Put-Three-Obj**（开抽屉→取放三个水果→关抽屉）、**Wipe-Board**（抓布→擦拭标记区域→清除墨迹）、**Water-Plant**（抓喷壶→转向植物→按压扳机）。每项任务包含可见与未见变体（Figure 8），未见变体引入桌布纹理、马克笔颜色等视觉偏移。
-
-![[assets/figures/papers/paper_list_l2259_https_arxiv_org_abs_2602_21736/figures/012_Figure_8.jpg]]
-*Figure 8: Real-world robot task settings for three multi-step tasks. Put-Three-Obj and Wipe-Board include unseen variants to evaluate robustness to visual shifts*
 
 ![[assets/figures/papers/paper_list_l2259_https_arxiv_org_abs_2602_21736/figures/013_Table_5.jpg]]
 *Table 5: Real-world robot performance measured by average subtask completion rate (%) on three multi-step manipulation tasks. Each policy is evaluated over 10 rollouts per task*
@@ -308,30 +290,14 @@ JALA在VLA预训练方法谱系中占据独特位置：
 
 JALA的核心贡献在于**将VLA预训练从“需要动作标签”的约束中解放出来**，构建了一个行为中心的统一潜在动作空间。这一范式转换使大规模野外人类视频成为VLA预训练的有效数据源，为数据稀缺的机器人学习开辟了可扩展的路径。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2259_https_arxiv_org_abs_2602_21736/figures/004_Table_1.jpg]]
 *Table 1: Comparison of hand motion generation and prediction tasks on both Lab and Wild splits*
 
 ![[assets/figures/papers/paper_list_l2259_https_arxiv_org_abs_2602_21736/figures/006_Figure_5.jpg]]
 *Figure 5: Qualitative hand-motion generation on lab (left column) and wild (right column) scenes. Colored overlays denote generated hand poses*
 
-![[assets/figures/papers/paper_list_l2259_https_arxiv_org_abs_2602_21736/figures/007_Table_2.jpg]]
-*Table 2: Two-view LIBERO results showing success rates (%) across task categories and overall average. Blue rows denote models trained on the action-available subset only, while green rows denote models pretrained on the full UniHand-Mix. LAPA† is LAPA retrained on our data with the JALA backbone*
-
-![[assets/figures/papers/paper_list_l2259_https_arxiv_org_abs_2602_21736/figures/008_Table_3.jpg]]
-*Table 3: Single-view LIBERO results showing success rates (%) across task categories and overall average. Models are grouped by size: >3B parameters (top) and ≤3B parameters (bottom). The results of LAPA⋆ are reported in UniVLA. UniVLA-human† uses only human pretraining data. UniVLA-full†† incorporates Bridge-V2 [64] for pretraining*
-
-![[assets/figures/papers/paper_list_l2259_https_arxiv_org_abs_2602_21736/figures/009_Table_4.jpg]]
-*Table 4: Results on the RoboCasa benchmark and GR1 tabletop tasks. We report success rates (%). Blue rows denote models trained on the action-available subset only, while green rows denote models pretrained on the full UniHand-Mix*
-
 ![[assets/figures/papers/paper_list_l2259_https_arxiv_org_abs_2602_21736/figures/010_Figure_6.jpg]]
 *Figure 6: Ablation studies on JALA-dino evaluated on LIBERO. Left: performance across various the proportion of in-the-wild data used during pretraining (0%, 25%, 50%, 100%). Right: performance when feeding hidden states from different backbone layers (14, 19, 24, 28) into the flow-matching head during adaptation*
-
-![[assets/figures/papers/paper_list_l2259_https_arxiv_org_abs_2602_21736/figures/005_Figure_4.jpg]]
-*Figure 4: t-SNE of predictive embeddings h and latent actions z across Lab and Wild. The two spaces cluster in closely aligned regions, and Wild samples largely expand the Lab manifold*
-
-
 
 ## 定位与知识库关联
 
@@ -375,8 +341,6 @@ JALA 直接舍弃像素重建，转而采用**联合对齐**：在 VLA 预测上
 4. **自适应超参数选择。** 预测嵌入层选择（Figure 6 右）和 EMA 系数对下游性能影响显著。如何自动确定最优配置以适应不同下游任务，是一个工程上重要但尚未解决的问题。
 
 5. **与更大模型的 scaling 行为。** Table 3 显示 JALA 在 ≤3B 规模下已具竞争力，但其性能随模型规模增长的 scaling 行为尚未被系统研究——特别是联合对齐机制在大模型下是否仍能保持稳定。
-
-
 
 ## 原文 PDF
 

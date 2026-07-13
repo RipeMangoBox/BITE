@@ -55,8 +55,6 @@ claims:
 
 该方法的核心贡献在于：将扩散引导从启发式线性外推提升为具有理论收敛保证的非线性反馈控制，为解决高引导尺度下的生成稳定性问题提供了新的范式。
 
-
-
 ### 扩散生成中的引导范式
 
 流匹配（Flow Matching）和扩散模型已成为文本到图像生成的核心范式，其采样过程可视为从噪声分布到数据分布的连续时间演化。为了提升生成结果对文本条件的忠实度，**免分类器引导（Classifier-Free Guidance, CFG）**（Ho & Salimans, arXiv 2022）通过线性插值条件与无条件速度场来增强条件信号：
@@ -94,8 +92,6 @@ $$\frac{d\mathbf{x}_t}{dt} = \mathbf{v}_{\theta}(\mathbf{x}_t, t) + \mathbf{u}_t
 
 其中控制输入 $\mathbf{u}_t$ 以语义误差 $\mathbf{e}(t)$ 为反馈信号。在这一框架下，本文的核心动机是：**引入非线性控制机制，利用滑模控制（Sliding Mode Control, SMC）的鲁棒性和有限时间收敛特性，从根本上解决线性引导在高增益下的稳定性缺陷**。
 
-
-
 ## 核心方法与创新机理
 
 CFG-Ctrl 的核心创新在于将扩散模型的免分类器引导（CFG）重新建模为一阶反馈控制系统，并以**非线性滑模控制（Sliding Mode Control, SMC）**替代传统线性比例控制，从根本上解决了高引导尺度下的生成不稳定性问题。
@@ -131,8 +127,6 @@ $$\Delta\mathbf{e}(t) = -\mathbf{K} \cdot \mathrm{sign}(\mathbf{s}(t))$$
 | 收敛保证 | 无理论收敛保证，启发式设计 | Lyapunov 稳定性分析证明有限时间收敛 |
 
 这些 changed slots 使 SMC-CFG 在保持语义对齐的同时，显著提升了生成质量和稳定性，尤其在 SD3.5、Flux-dev 和 Qwen-Image 三个主流主干模型上，FID、CLIP Score、ImageReward 等指标均一致优于标准 CFG 及其他变体（Table 2）。
-
-
 
 CFG-Ctrl 将流匹配模型中的免分类器引导（CFG）重新建模为一个连续时间一阶反馈控制系统。其核心思想是：将条件速度与无条件速度之差定义为**语义误差信号** $\mathbf{e}(t) = \mathbf{v}_{\theta}(\mathbf{x}_t, t, \mathbf{c}) - \mathbf{v}_{\theta}(\mathbf{x}_t, t, \emptyset)$，并将该误差作为反馈控制器的输入，通过设计不同的控制律来调节采样过程的动力学行为。
 
@@ -181,8 +175,6 @@ $$
 *Figure 1: Phase diagram in the e-e˙ plane. We schematically illustrate the convergence patterns of CFG and the proposed SMC-CFG. Left: CFG’s ideal linear convergence trajectory and the strong oscillatory divergence under high guidance scales. Right: the proposed SMC-CFG, through a switching-forcing mechanism, drives the system states toward the sliding mode surface governed by parameter λ, achieving robust and rapid convergence*
 
 > **注意**：Lyapunov 分析依赖速度场可微性假设，实际大规模潜在扩散模型中雅可比矩阵计算开销较大，论文未给出高效近似方案，该理论保障在实际部署中的严格性需要进一步验证。
-
-
 
 SMC-CFG 的核心在于将扩散引导重新建模为**一阶反馈控制系统**，并在语义误差空间中引入**非线性滑模控制**，以替代传统 CFG 的线性比例控制。整个方法可分解为以下关键模块。
 
@@ -248,12 +240,8 @@ $$
 
 > **注意**：该 Lyapunov 分析假设模型速度场可微，实际大规模潜在扩散模型中计算雅可比矩阵开销较大，论文未给出高效近似方案，这是实际部署的关键挑战。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l9_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_CFG_Ctrl_Control/figures/002_Table_1.jpg]]
 *Table 1: Typical CFG variants under CFG-Ctrl formulation. We summarize the key components of various methods under the control formulation, along with their corresponding types of control interpretations*
-
-
 
 ## 实验与关键发现
 
@@ -312,15 +300,11 @@ SMC-CFG 与上述方法的本质区别在于引入了**非线性滑模控制**�
 2. **理论假设与实际部署的差距**：Lyapunov 稳定性分析依赖模型速度场的可微性假设，而实际大规模潜在扩散模型中计算速度雅可比矩阵开销较大。论文未给出高效近似方法，这在高维潜在空间中的实际部署构成关键挑战。
 3. **计算开销**：SMC-CFG 需要维护历史误差以构造滑模面 $\mathbf{s}(t) = \dot{\mathbf{e}}(t) + \lambda \mathbf{e}(t)$（离散近似为 $\mathbf{s}(t) = (\mathbf{e}(t) - \mathbf{e}(t+1)) + \lambda \cdot \mathbf{e}(t+1)$），相比标准 CFG 增加了少量额外计算和存储开销，但论文未对此进行定量分析。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l9_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_CFG_Ctrl_Control/figures/005_Figure_3.jpg]]
 *Figure 3: Qualitative comparison with baseline methods. For challenging scenarios including relative positions, clothing styles, and human actions, baseline methods produce irrational outputs, while SMC-CFG preserves robust text consistency*
 
 ![[assets/figures/papers/paper_list_l9_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_CFG_Ctrl_Control/figures/006_Table_3.jpg]]
 *Table 3: Ablation study on hyperparameter λ and k. We conduct ablation across various hyperparameter settings in four metrics: FID, CLIP, Aesthetic (Aesth), and ImageReward (ImgRwd), respectively measuring generation quality, semantic alignment, aesthetic level, and human preference*
-
-
 
 ## 定位与知识库关联
 
@@ -366,8 +350,6 @@ SMC-CFG 通过定义**指数型滑模面** s(t) = ė(t) + λe(t)（Eq. 19），�
 **自适应滑模设计**：能否设计根据当前误差状态在线调节 λ 和 k 的自适应机制，是减少手动调参负担、提升方法实用性的关键。这需要在不显著增加计算开销的前提下，实现对滑模面参数和切换增益的动态优化。
 
 **高维雅可比近似**：SMC-CFG 的理论分析依赖速度场可微性，但在实际高维潜在空间中高效计算或近似滑模面所需的速度雅可比矩阵，是推动该方法从理论走向大规模部署的核心工程挑战。
-
-
 
 ## 原文 PDF
 

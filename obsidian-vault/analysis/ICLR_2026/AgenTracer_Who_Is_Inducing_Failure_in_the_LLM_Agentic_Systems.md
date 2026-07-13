@@ -66,8 +66,6 @@ claims:
 
 消融实验揭示了方法的关键设计因素：步骤级奖励对精确定位至关重要（移除后Code步骤级准确率从18%降至12%），而反事实修正数据比纯故障注入数据具有更高的内在训练价值，两者联合使用可实现互补增益。
 
-
-
 ### 多智能体系统的脆弱性
 
 基于大语言模型（LLM）的多智能体系统正被广泛应用于代码生成、数学推理和复杂任务规划等场景。然而，这些系统在实际运行中表现出显著的脆弱性——失败率可高达86.7%。当多个智能体通过消息传递、工具调用和环境交互协同工作时，单个步骤的微小偏差便可能通过链条传播，最终导致整个系统崩溃。这类故障的隐蔽性和级联特性使得人工排查极为耗时，而随着系统规模和交互复杂度的增长，自动化故障定位的需求变得愈发迫切。
@@ -91,8 +89,6 @@ claims:
 3. **效率与精度的平衡**：能否训练一个轻量级专用模型（如8B参数规模），使其在归因精度上超越巨型通用LLM，同时保持低推理成本？
 
 解决这些问题，意味着多智能体系统将首次获得可操作的故障诊断能力——不仅知道“系统失败了”，还能明确“哪个智能体在何时做错了什么”，从而为自动修复、系统迭代和智能体行为的持续改进奠定基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -121,8 +117,6 @@ AgenTracer 的核心创新并非提出全新的模型架构，而是通过**数�
 ### 3. 模型规模与效率：轻量级专用化
 
 基线方法普遍依赖巨型LLM（如 **Gemini-2.5-Pro**、**Claude-4-Sonnet**、**DeepSeek-R1**）进行归因，推理成本高昂且延迟显著。AgenTracer 以 **QWEN3-8B**（Yang et al., 2025）为基座，通过上述自动化数据与多粒度RL训练，得到仅 **8B 参数**的专用故障追踪器 **AgenTracer-8B**。结果表明，该轻量级模型在 Who&When 基准上以高达 **~18.18%** 的优势超越 Gemini-2.5-Pro，以 **~12.21%** 超越 DeepSeek-R1（Table 1），在 TracerTraj 各子集上也全面领先（Table 2），实现了“小模型超越大模型”的专用化突破。
-
-
 
 ![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_l05DseqvuD/figures/005_Figure_2.jpg]]
 *Figure 2: The overview of our proposed AgenTracer*
@@ -154,8 +148,6 @@ AgenTracer 包含五个主要模块，按执行顺序依次为：
 流水线的两个数据构造路径——反事实修正与故障注入——在本质上形成互补。反事实修正（$\mathcal{D}^-$）从真实失败中提取因果信号，其标注质量取决于分析器智能体的修正能力；故障注入（$\mathcal{D}^+$）则从成功轨迹中合成故障，扩展数据规模与多样性，但其有效性受限于攻击者 LLM 的扰动质量。消融实验表明，反事实修正数据比纯故障注入数据更具内在价值，但二者联合使用可实现最佳性能（详见附录 D.2）。
 
 在训练环节，多粒度奖励设计是平衡归因精度与模型轻量化的关键。step 级高斯奖励 $r_{\mathrm{step}}(\hat{t}_k) = \exp\left(-\frac{(\hat{t}_k - t^*)^2}{2\sigma^2}\right)$ 提供了细粒度的时序监督信号，而 agent 级二元奖励则确保智能体识别的准确性。消融实验证实，移除 step 级奖励会导致步骤准确率显著下降（Code 子集从 18% 降至 12%），而 agent 级奖励的移除仅造成中等性能损失，表明细粒度步骤监督是归因性能的主导因素。
-
-
 
 ### 问题形式化
 
@@ -221,8 +213,6 @@ $\sigma$ 控制惩罚的锐度：$\sigma$ 越小，远离真实步骤的预测�
 
 训练完成后，AgenTracer-8B 接收完整轨迹 $\tau$ 及环境反馈，在单次前向传播中输出负责智能体 ID $\hat{i}$、决定性错误步骤编号 $\hat{t}$ 及自然语言解释，无需访问真实解 $\mathcal{G}$（w/o G 设定）。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -251,15 +241,10 @@ step-level 准确率上，AgenTracer-8B 的优势更为突出：MATH 子集 w/o 
 
 Figure 3 展示了 AgenTracer-8B 作为故障诊断器对现有多智能体系统的性能提升效果。在 **MaAS + MATH-500** 上，经过 4 轮自我改进后，AgenTracer-8B 将系统准确率从初始的约 53% 提升至约 **67%**（+14.21%）；在 **OWL + GAIA** 上，准确率提升约 **4.8%**。相比之下，传统的反思基线方法效果有限甚至有害：**Self-Refine** 在 MaAS + MATH-500 上仅带来约 2% 的提升，而 **CRITIC** 在 OWL + GAIA 上甚至导致性能下降（第 2 轮 -4.9%，第 3 轮 -5.5%）。这证明精准的故障步骤定位（而非笼统的自我反思）是系统自我改进的关键。
 
-![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_l05DseqvuD/figures/011_Figure_3.jpg]]
-*Figure 3: The multi-turn improvement performance brought by AgenTracer-8B compared with classical agent reflection baselines, Self-Refine, and CRITIC*
-
 ### 消融实验：多粒度奖励的必要性
 
 **训练数据消融**（Table 6）：仅使用反事实修正数据 **D-** 训练的模型在 automated agent-level 上达到 60.31%，优于仅使用故障注入数据 **D+** 的 55.55%，表明从真实失败轨迹中学习到的错误模式更具内在价值。但两者联合使用达到最优的 **63.73%**，验证了互补增益——D- 提供真实故障分布，D+ 扩展数据多样性和覆盖范围。
 
-![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_l05DseqvuD/figures/018_Table_6.jpg]]
-*Table 6: Training data ablation study of AgenTracer. We opt for th$e ^ { 6 6 } \mathrm { w } / \mathcal { G } ^ { \flat }$ setting across the table
 
 **奖励设计消融**（Figure 5, Figure 6）：移除 step-level 奖励后，Code 子集的 step-level 准确率从 **18% 骤降至 12%**，MATH 子集从 **35% 降至 27%**，证明细粒度步骤监督对精确定位至关重要。移除 agent-level 奖励仅造成 agent-level 准确率小幅下降（Code: 72.2% → 68.9%），表明 agent 级标签提供辅助但非主导的指导。
 
@@ -274,31 +259,15 @@ Figure 3 展示了 AgenTracer-8B 作为故障诊断器对现有多智能体系�
 ![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_l05DseqvuD/figures/016_Table_4.jpg]]
 *Table 4: Analyzer ablation across different analyzer LLM backbones*
 
-![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_l05DseqvuD/figures/017_Table_5.jpg]]
-*Table 5: Ablation across attacker backbones used in the perturbation operator Π (200 successful trajectories from Section 4.1)*
-
 ### 稳定性与失败模式
 
 多轮运行稳定性分析（Table 7）显示，各模型在 Who&When 基准上的精度波动较小（标准差通常在 2~3% 范围内），AgenTracer-8B 的优势在统计上是稳定的。
-
-![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_l05DseqvuD/figures/019_Table_7.jpg]]
-*Table 7: Performance comparison on the Who&When benchmark (w/o G). Each cell reports the accuracy ± std, where the failure tracer has no access to ground truth trajectory*
 
 **主要失败模式**：
 1. **长链依赖任务**：当错误步骤与最终失败的因果关系跨越多个中间步骤时，模型倾向于归因于离失败最近的步骤而非最早的决定性错误。
 2. **领域偏移**：在训练中未见过的智能体框架或工具类型上，归因准确率下降（当前仅在 MetaGPT、AutoGen 等框架上验证）。
 3. **多故障点场景**：方法假设存在单个最早的可修正错误步骤，对同时存在的多个独立故障点或级联故障的归因能力有限。
 4. **w/o G 设定下的 step-level 瓶颈**：缺乏理想轨迹对照时，Code 子集的 step-level 准确率仅 18.23%，表明从纯失败轨迹中推断“应该做什么”仍极具挑战。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_l05DseqvuD/figures/013_Table_3.jpg]]
-*Table 3: TracerTraj dataset statistics and test set distribution across three domains, including the associated multi-agent systems. For each domain, we list the included benchmarks, the number of curated trajectories, and the subset of trajectories annotated with error-step pairs (TracerTraj-2.5K)*
-
-![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_l05DseqvuD/figures/004_Figure_1.jpg]]
-*Figure 1: Benchmark performance comparison between AgenTracer-8B and leading industry providers*
-
-
 
 ## 定位与知识库关联
 
@@ -376,8 +345,6 @@ AgenTracer-8B在Who&When基准上对比了8个基线模型，涵盖不同规模�
 ### 知识库定位总结
 
 AgenTracer处于**LLM智能体可靠性工程**与**自动化数据标注**的交叉点。它继承并扩展了因果推断中的反事实干预思想、软件测试中的故障注入技术、以及强化学习中的细粒度奖励设计，形成了一套从数据合成到模型训练的完整pipeline。其核心贡献不在于提出全新的模型架构，而在于**重新定义了多智能体故障归因的数据获取和训练范式**，证明了轻量级专用模型可以在特定任务上超越巨型通用模型。
-
-
 
 ## 原文 PDF
 

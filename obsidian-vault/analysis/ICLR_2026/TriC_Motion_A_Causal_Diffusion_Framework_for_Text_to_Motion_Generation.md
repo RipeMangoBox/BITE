@@ -67,8 +67,6 @@ TriC-Motion 针对上述瓶颈提出了两个层次的解决方案：
 
 TriC-Motion 建立在扩散生成框架之上，以 **MDM**（Tevet et al., 2022）为基础去噪架构，但在建模域和特征处理机制上进行了根本性扩展。与仅依赖时序 Transformer 的 MDM 不同，TriC-Motion 引入了空间 GCN 和混合频率分析，形成三域并行架构。相较于近期强基线 **SALAD**（Hong et al., 2025）、**MoMask**（Guo et al., 2024）和 **StableMoFusion**（Huang et al., 2024a），TriC-Motion 的独特贡献在于**因果解缠机制的引入**——这是该领域首次将因果干预用于消除多域特征中的运动无关噪声。在频率建模方面，TriC-Motion 的 HFA 模块通过 DWT+FFT 的混合分解策略，区别于 **LaMP**（Li et al., 2024c）等仅关注单一频率维度的方法，实现了对低频全局趋势和高频局部细节的并行增强。总体而言，TriC-Motion 在三域联合建模与因果特征净化的交叉点上确立了新的技术路线。
 
-
-
 ### 问题背景
 
 文本到动作生成（Text-to-Motion Generation）旨在根据自然语言描述合成逼真的三维人体运动序列，在动画制作、虚拟现实、游戏开发和人机交互等领域具有广泛应用。该任务的核心挑战在于：文本描述通常具有高度的语义抽象性，而人体运动则涉及复杂的时空动态、骨骼拓扑约束和多尺度运动模式，如何在两者之间建立精确的对齐是一个开放难题。
@@ -94,8 +92,6 @@ TriC-Motion 建立在扩散生成框架之上，以 **MDM**（Tevet et al., 2022
 2. **因果反事实解缠**：首次将因果干预引入运动生成领域，设计因果反事实运动解缠模块（Causality-based Counterfactual Motion Disentangler, CCMD），通过事实/反事实特征提取和有监督因果干预，显式消除各域特征中与运动无关的混淆成分，保留对动作生成有利的因果特征，从而稳定去噪过程并提升关键运动特征的建模能力。
 
 通过在 HumanML3D 和 SnapMoGen 两个基准数据集上的系统验证，TriC-Motion 在语义对齐核心指标 R-Precision Top1 上取得了 0.612（HumanML3D）和 0.907（SnapMoGen）的领先结果，证明了多域因果建模策略的有效性。
-
-
 
 ## 核心方法与创新机理
 
@@ -130,8 +126,6 @@ $$\tilde{F}_j^i = W_{do} E_j^i - W_{do} C_j^i$$
 ### 创新总结
 
 相对于以 MDM 为代表的纯时序建模基线和以 SALAD、MoMask 为代表的近期强方法，TriC-Motion 的 changed slots 清晰聚焦于两点：**建模域从单一/双域扩展至时间-空间-频率三域并行**，以及**引入因果反事实机制主动消除多域混淆噪声**。这两项设计相互增强——三域建模提供了更丰富的特征空间，而 CCMD 确保这些特征中仅保留对运动生成有益的因果成分，从而在 HumanML3D 上取得 R@1 0.612（large）的 SOTA 性能，并在 SnapMoGen 上以 R@1 0.907 大幅超越所有对比方法（Table 2）。
-
-
 
 TriC-Motion 的整体框架围绕一个核心设计展开：在扩散去噪过程中，对运动序列同时进行**时间、空间、频率**三个域的并行建模，并通过**因果干预**显式消除多域特征中混杂的运动无关噪声。整个系统由堆叠的 TriC-Motion 去噪块构成，每个块内依次完成域内建模、三域融合、文本注入和因果解缠，最终输出干净的运动序列。
 
@@ -171,12 +165,8 @@ TriC-Motion 的整体框架围绕一个核心设计展开：在扩散去噪过�
 
 现有运动生成方法多关注时间或空-时联合建模，缺乏对空间、时间和频率三域的统一联合优化。更关键的是，多域特征中混杂了与运动无关的噪声（如骨骼拓扑偏差、频率域伪影），这些混淆特征阻碍了高质量动作的生成。TriC-Motion 通过三域并行建模 + 得分指导融合 + 因果反事实解缠的组合策略，使生成动作同时具备时序一致性、骨骼拓扑合理性、全局运动趋势和细节动态，在语义对齐指标上取得显著提升。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1907_TriC_Motion_A_Causal_Diffusion_Framework_for_Text_to_Motion_Generation/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of TriC-Motion. (a) Sampling process with stacked TriC-Motion Denoiser Blocks. (b) Overall architecture of the TriC-Motion framework*
-
-
 
 ### 整体框架与三域去噪块
 
@@ -302,8 +292,6 @@ $$
 
 默认设置 $\lambda_{fcf}=1$，$\lambda_{p}=10$。消融实验（Table 4）表明层次权重 $\{0.1, 0.2, 0.3, 0.4\}$ 取得最优结果，验证了深层施加更高权重的合理性。敏感性分析（Table A3）进一步证明损失权重在较大范围变化时性能保持稳定，模型优化具有鲁棒性。
 
-
-
 ## 实验与关键发现
 
 ### 主实验：HumanML3D 与 SnapMoGen 双基准定量评估
@@ -352,28 +340,6 @@ TriC-Motion 在两个主流文本-动作生成基准上进行了全面评估。�
 3. **频率分支计算负担**：HFA 中的 DWT/FFT 分解及双分支增强增加了网络复杂度，在极低计算预算场景下可能成为瓶颈，尽管整体参数规模较小。
 
 4. **长时运动与多样化动作类型**：当前实验主要在 HumanML3D 和 SnapMoGen 的常规动作类型上验证，对于更长时序的运动生成和舞蹈、体育等复杂动作类型，三域因果建模的收益边界尚不明确，需进一步探索。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1907_TriC_Motion_A_Causal_Diffusion_Framework_for_Text_to_Motion_Generation/figures/008_Table_3.jpg]]
-*Table 3: Ablation study of the proposed modules in TriC-Motion on HumanML3D test dataset, as well as the analysis of HFA. “2D rep” denotes the spatio-temporal 2D motion representation with dimensions*
-
-![[assets/figures/papers/paper_list_l1907_TriC_Motion_A_Causal_Diffusion_Framework_for_Text_to_Motion_Generation/figures/009_Table_4.jpg]]
-*Table 4: Ablation experiment of CCMD (upper half) and the layer-wise loss weights of*
-
-![[assets/figures/papers/paper_list_l1907_TriC_Motion_A_Causal_Diffusion_Framework_for_Text_to_Motion_Generation/figures/010_Table_5.jpg]]
-*Table 5: User study results*
-
-![[assets/figures/papers/paper_list_l1907_TriC_Motion_A_Causal_Diffusion_Framework_for_Text_to_Motion_Generation/figures/011_Figure.jpg]]
-*Figure: A1: t-SNE Visualization of the the three feature types in TriC-Motion: motion-relevant features $F _ { f }$ , motion-irrelevant (confounding) features $F _ { c f }$ , and the final causally disentangled features $F _ { t d e }$ used for generation. The six text inputs are taken from the HumanML3D test set*
-
-![[assets/figures/papers/paper_list_l1907_TriC_Motion_A_Causal_Diffusion_Framework_for_Text_to_Motion_Generation/figures/015_Table.jpg]]
-*Table: A4: The performance comparison on HumanML3D dataset between our TriC-Motion without ${ \mathcal { L } }$ _ { p } and the previous state-of-the-art method, SALAD (Hong et al., 2025). Table A5: Performance comparison on HumanML3D dataset under the CLaM evaluator*
-
-![[assets/figures/papers/paper_list_l1907_TriC_Motion_A_Causal_Diffusion_Framework_for_Text_to_Motion_Generation/figures/014_Table.jpg]]
-*Table: A3: Sensitivity analysis of the perceptual loss ${ \mathcal { L } }$ _ { p } (upper part) and causal loss $\mathcal { L }$ _ { f c f } (lower part). Here, α and β denote the weights of ${ \mathcal { L } }$ _ { p } and $\mathcal { L }$ _ { f c f } , respectively. The default setting (Ours) corresponds to $\alpha = 1$ . $0 , \beta = 1$ 0*
-
-
 
 ## 定位与知识库关联
 
@@ -425,8 +391,6 @@ CCMD 模块的核心机制是通过事实/反事实特征提取和有监督因�
 2. 因果干预模块的设计思想是否可推广到其他生成任务（如视频生成、音频合成），以抑制多域混淆噪声？
 3. 如何动态调整三域融合的权重，或引入更复杂的注意力机制，使模型能根据文本复杂度自适应地侧重不同域的信息？
 4. 在更长时运动生成和更多样化的运动类型（如舞蹈、体育动作）上，三域因果建模是否有进一步的收益？
-
-
 
 ## 原文 PDF
 

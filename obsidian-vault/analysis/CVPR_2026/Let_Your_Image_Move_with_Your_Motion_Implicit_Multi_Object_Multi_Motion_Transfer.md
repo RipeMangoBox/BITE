@@ -151,8 +151,6 @@ FlexiMMT 的整体流程围绕一个核心矛盾展开：**如何在不依赖外
 
 上述模块之间存在严格的因果链条：**运动标记提供可迁移的运动表征，MDMA 提供解耦的注意力空间，DMEM/RMPM 提供精确的物体时空定位**。消融实验验证了这一依赖关系——移除任一组件都会导致轨迹保真度（TF）和光流保真度（FF）的显著下降。例如，禁用推理阶段的掩码提取（w/o Infer）使 TF 从 0.577 骤降至 0.373，FF 从 0.723 降至 0.602，表明即使有正确的运动标记和解耦注意力，缺乏准确的物体掩码也会使多物体控制完全失效。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l7_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Let_Your_Image_Move/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of FlexiMMT. (a) Training: Given one reference video, insert trainable motion tokens into text and video tokens. Get the object mask through a simple QK multiplication method, then mask out M2M, M2V and T2M parts in attention map. (b) Inference: Given a multi-object conditional image, we first segment each object’s mask with semantic segmentation model [35]. Concatenate pretrained motion tokens into text and video tokens for inference. Extract each object’s latent-space mask in subsequent frames via Dynamic Regressive Mask Propagation Mechanism (Dynamic RMPM), and apply it to Motion parts and Text parts in attention map*
 
@@ -209,11 +207,6 @@ RMPM 维护一个局部时间窗口内的锚帧集合，每完成一帧掩码提
 ![[assets/figures/papers/paper_list_l7_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Let_Your_Image_Move/figures/004_Figure_4.jpg]]
 *Figure 4: Illustration of the propagate feature and mask changes during denoising steps. We found that the transfer of motion can be completed in the early stage of denoising steps*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l7_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Let_Your_Image_Move/figures/003_Figure_3.jpg]]
-*Figure 3: Overview of the simple method for training and inference. Single object can be extracted through a simple QK multiplication method. However, different objects cannot be extracted through this simple method due to feature entanglement*
-
 ## 实验与关键发现
 
 ### 主结果
@@ -249,11 +242,6 @@ FlexiMMT 在 200 个视频-图像对的定制评估集上进行了系统验证�
 3. **动态 RMPM 的超参数敏感性**：阈值 α 和窗口大小 W 需要手动设定。α 过大可能导致掩码未收敛即停止更新，α 过小则加速效果有限。论文未提供这些超参数在不同场景下的调优策略或自适应机制。
 
 4. **极端运动场景的鲁棒性未充分验证**：当参考运动包含大幅度的非刚体形变或快速旋转时，基于特征相关性的 RMPM 掩码传播是否仍能保持准确，目前缺乏定量证据支持。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l7_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Let_Your_Image_Move/figures/007_Table_2.jpg]]
-*Table 2: Impact of M2X and T2X masks in MDMA. “w/o M2X” denotes removing all Motion-to-[X] masks and “w/o T2X” denotes removing all Text-to-[X] masks during inference*
 
 ![[assets/figures/papers/paper_list_l7_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Let_Your_Image_Move/figures/009_Figure_6.jpg]]
 *Figure 6: Qualitative comparison of each component in FlexiMMT. The caption for the generated videos is: “A beer bows head. A hedgehog stands up.”*

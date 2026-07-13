@@ -52,8 +52,6 @@ claims:
 
 **局限与开放问题**：方法对环境光照变化敏感，未显式建模物体遮挡，且依赖 SMPL-X 初始化精度。未来方向包括引入物体感知推理、提升极端光照鲁棒性，以及减少对参数化姿态先验的依赖。
 
-
-
 从单张图像重建三维人体是计算机视觉与图形学中的核心问题，在虚拟现实、数字人、影视制作等领域有广泛应用前景。近年来，基于数据驱动的方法在**单人体三维重建**上取得了显著进展——从参数化模型（如SMPL/SMPL-X）的拟合，到隐式神经表示与扩散先验驱动的精细化重建，单人的几何与纹理质量已达到较高水平。
 
 然而，当场景中存在**多人**时，问题复杂度发生质变。多人场景不仅涉及多个个体的独立重建，更关键的是个体之间的**空间交互、相互遮挡与物理接触**。现有方法在面对此类场景时暴露出三个核心瓶颈：
@@ -67,8 +65,6 @@ claims:
 上述问题共同指向一个根本性缺口：**现有方法缺乏群体层面的交互先验与遮挡推理机制**，仅停留在实例级别的独立处理。这直接限制了单目多人三维重建在实际场景中的应用——无论是体育赛事分析、社交VR，还是影视级的多人数字替身生成，都需要重建结果在几何精度、物理合理性与视觉真实感上同时满足要求。
 
 本文提出的 **HUG3D** 框架正是针对这一缺口设计。其核心动机在于：将多人重建从“独立重建后拼合”的范式转变为**交互感知的联合重建**范式，通过引入群体-实例多视图扩散先验与物理约束优化，系统性地解决透视畸变、遮挡补全与交互建模三大挑战。
-
-
 
 ## 核心方法与创新机理
 
@@ -105,8 +101,6 @@ $$\mathcal{L}_{\mathrm{diff}} = \sum_{i=0}^{5} \big( \mathbb{E}_{t,\epsilon} [ \
 
 HUG3D 的三项核心创新构成了一个完整的因果链条：**Pers2Ortho** 解决了“在哪里重建”的表示问题，为多人场景提供了尺度一致的规范空间；**HUG-MVD** 解决了“重建什么”的生成问题，利用群体-实例联合先验补全遮挡区域；**HUG-GR** 解决了“如何保证合理”的约束问题，通过物理感知优化强制交互一致性。这三者协同作用，使得 HUG3D 在 MultiHuman 数据集上实现了 CD 从 5.644 降至 3.631（↓35.7%）、NC 从 0.754 提升至 0.811 的显著性能跃升。
 
-
-
 HUG3D 的整体流程由三个核心阶段构成，如图 2 所示：**规范透视-正交视图变换 (Pers2Ortho)**、**群体-实例多视图扩散 (HUG-MVD)** 以及**带纹理网格重建**。给定一张包含多人的单目透视图像，系统首先通过 Pers2Ortho 将其转换到规范正交空间，消除透视畸变和尺度歧义，生成一致的六视图正交表示；随后 HUG-MVD 以此为条件，联合去噪生成多视图 RGB 与法向图，补全被遮挡的几何和纹理区域；最后，在物理约束的几何优化 (HUG-GR) 和遮挡感知纹理融合的驱动下，输出具有交互一致性的带纹理三维网格。
 
 **Pers2Ortho** 是整个管线的入口模块。它利用现成的单目法向/深度估计器（Sapiens）预测初始部分几何，并通过可微渲染与预测深度、法向的对齐损失优化一个粗糙的部分网格；随后将该网格升采样为稠密点云 (PCD)，经正交投影重投影至六个规范视点，生成多视图 RGB 图像和法向图。这一变换的核心价值在于：透视投影下，同一人体在不同图像位置会产生尺度失真，而正交投影消除了这种歧义，使后续多视图扩散模型能够在空间一致的条件下进行推理（见图 3 的对比验证）。
@@ -117,15 +111,8 @@ HUG3D 的整体流程由三个核心阶段构成，如图 2 所示：**规范透
 
 整个管线是模块化串联的：Pers2Ortho 的输出作为 HUG-MVD 的条件输入，HUG-MVD 的生成结果又作为 HUG-GR 的监督信号。这种设计使得各阶段的错误不会完全阻断下游，但上游质量仍对最终结果有显著影响——例如，若 SMPL-X 姿态估计严重错误，Pers2Ortho 生成的初始几何将偏离真实形状，进而影响扩散模型的补全质量和网格优化的收敛方向。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2604_05436/figures/003_Figure_2.jpg]]
 *Figure 2: Overview of our HUG3D framework. Given a single perspective image, (1) the Canonical Perspective-to-Orthographic View Transform (Pers2Ortho) converts it into a canonical multi-view orthographic representation to resolve scale ambiguity and enable consistent multi-view reasoning. (2) The Human Group-Instance Multi-View Diffusion (HUG-MVD) model completes occluded geometry and texture while maintaining plausible interactions. (3) The Textured Mesh Reconstruction stage refines the mesh and generates high-fidelity textures with our physics-based Human Group-Instance Geometry Reconstruction (HUG-GR), which enforces physical consistency via optimization with multi-view normal cues and interaction...*
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2604_05436/figures/002_Figure_1.jpg]]
-*Figure 1: Core challenges in monocular multi-human 3D reconstruction: (a) geometric complexity and perspective distortion, (b) lack of interaction-aware geometric modeling, and (c) missing texture and geometry in occluded regions. HUG3D addresses all three challenges*
-
-
 
 HUG3D 框架由四个核心模块级联构成，形成从单张透视图像到带纹理多人三维网格的完整管线（Figure 2）。下面按处理顺序逐一阐述各模块的设计逻辑与关键公式。
 
@@ -197,12 +184,8 @@ $$\mathcal{L}_{\mathrm{vis}} = \frac{1}{2B} \sum_{k=1}^{K} \sum_{b=1}^{B} \frac{
 
 将多视图 RGB 投影到优化后的网格上生成全身顶点纹理，通过遮挡感知混合策略融合各视图贡献，并对人脸区域进行专项修复（CodeFormer），最终生成高保真带纹理三维模型。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2604_05436/figures/004_Figure_3.jpg]]
 *Figure 3: Comparison of results from multi-view diffusion trained on perspective vs. orthographic images*
-
-
 
 ## 实验与关键发现
 
@@ -235,9 +218,6 @@ HUG3D 在 MultiHuman 数据集上与多个基线方法进行了定量比较。�
 
 Table S6 展示了使用 RoBUDDI 预测的掩膜、SMPL-X 参数和相机估计进行端到端评估的结果。尽管输入包含预测误差，HUG3D 仍优于所有基线，证明了该方法对不完美初始化的鲁棒性。
 
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2604_05436/figures/028_Table_S.6.jpg]]
-*Table S.6: End-to-end evaluation using predicted masks, SMPL-X parameters, and camera estimates from RoBUDDI. Despite operating on predicted inputs, HUG3D outperforms existing baselines*
-
 ### 消融实验
 
 **Pers2Ortho 变换**：Figure 6(a) 和 Figure S25 的定性对比表明，相比直接使用透视图像或 Era3D，Pers2Ortho 变换显著提高了多视图投影的清晰度并保留了细节。正交空间消除了透视畸变，使后续扩散模型能生成更一致的多视图输出。
@@ -259,24 +239,8 @@ Table S6 展示了使用 RoBUDDI 预测的掩膜、SMPL-X 参数和相机估计�
 
 这些失败模式指向了未来改进方向：引入物体感知推理、提高对复杂光照的鲁棒性、以及减少对 SMPL-X 初始化的依赖。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2604_05436/figures/014_Table_1.jpg]]
-*Table 1: Quantitative comparison of geometric metrics for multi-human 3D reconstruction. HUG3D achieves the best overall scores in all metrics including CD, P2S, and NC, and also outperforms other baselines in CP, indicating better interaction-aware reconstruction*
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2604_05436/figures/016_Table_2.jpg]]
-*Table 2: Quantitative evaluation on texture quality of multi-human 3D reconstruction*
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2604_05436/figures/015_Table_3.jpg]]
-*Table 3: Quantitive evaluation on geometry and texture quality within occluded region*
-
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2604_05436/figures/017_Table_4.jpg]]
 *Table 4: Ablation study of key components in HUG3D. We report geometry (CD, P2S, Norm L2) and texture (PSNR, LPIPS) metrics under various configurations*
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2604_05436/figures/052_Table_S.14.jpg]]
-*Table S.14: Wilcoxon signed-rank test results (p-values) across all evaluation metrics, confirming statistically significant improvements of our method over baselines*
-
-
 
 ## 定位与知识库关联
 
@@ -319,8 +283,6 @@ HUG3D 的贡献可从三个维度定位其对现有知识库的增量：
 ### 未来方向
 
 从论文的局限性出发，可识别三个有前景的后续研究方向：(1) 引入物体感知推理以处理人体-物体交互遮挡；(2) 提高方法在复杂或极端光照条件下的鲁棒性，可能通过物理渲染增强或光照不变表示；(3) 减少对 SMPL-X 初始化的依赖，探索更端到端的联合估计与重建框架。
-
-
 
 ## 原文 PDF
 

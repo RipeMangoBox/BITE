@@ -244,8 +244,6 @@ $$\mathcal{L} = \mathbb{E}_{x_0, c_{\mathrm{img}}, c_{\mathrm{cam}}, c_{\mathrm{
 - **Table 4**：三阶段训练策略是实现细粒度协同控制的关键，单阶段或两阶段训练均无法达到可比性能。
 - **Figure 7**：提供了消融实验的定性证据，直观展示了缺少深度信息（2D点位置）和缺少空间参照（仅3D球体）时的失败模式。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l23_Perception_as_Control_Fine_grained_Controllable_Image_Animation_with_3D/figures/016_Figure_13.jpg]]
 *Figure 13: The frameworks of MotionCtrl++ and CameraCtrl++. (a) One-stage Training*
 

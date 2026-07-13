@@ -53,8 +53,6 @@ claims:
 
 在方法谱系上，CHOIS 定位在**条件扩散生成与物理约束引导的交汇点**。相较于仅依赖完整物体运动序列生成人体运动的 **OMG**（Li et al., ACM Trans. Graph. 2023）和利用物理信息扩散模型但缺乏语言条件的 **InterDiff**（Xu et al., ICCV 2023），CHOIS 首次将稀疏路标点、语言描述与解析接触引导统一到一个扩散框架中，实现了从高层规划到底层物理约束的端到端可控合成。
 
-
-
 人-物交互（Human-Object Interaction, HOI）合成是计算机视觉与图形学中的一个核心挑战，其目标是生成与物体运动同步、物理上合理且语义一致的全身体运动。这一任务在具身智能、动画制作和虚拟现实等领域具有广泛的应用前景。
 
 当前的主流方法大致分为两类。一类以 **OMG**（Li et al., ACM Trans. Graph. 2023）为代表，利用完整的物体运动序列作为条件来生成人体运动，但该方法既缺乏对语言意图的建模，也无法接受稀疏的路标点约束。另一类如 **InterDiff**（Xu et al., ICCV 2023），在扩散模型中引入物理信息来生成人-物交互，但同样不包含语言描述条件，难以将高层语义意图转化为具体的交互行为。
@@ -62,8 +60,6 @@ claims:
 这两类方法的共同瓶颈在于：**普通条件扩散模型无法保证生成物体运动与给定稀疏路标点对齐，也难以维持手-物接触和脚-地接触的真实性**。具体而言，当仅提供稀疏的物体路标点（如每30帧一个2D位置）和终点3D位置时，模型容易在未标注的时间段内产生物体漂移；同时，生成的交互序列常出现手部穿透物体、脚部浮空或物体陷入地面等物理不合理现象。
 
 上述缺口直接驱动了 **CHOIS** 的提出。其核心动机是：将稀疏物体路标点与语言描述共同作为扩散模型的生成条件，在训练时引入物体几何损失增强路标点匹配，在采样时施加解析接触引导函数来强制执行物理接触约束，从而大幅提升人机交互动作的同步性、真实感和条件遵循度。这一思路使得系统既能接受来自高层规划模块的路标点输入，又能保持生成运动的物理合理性，为长期、场景感知的人机交互合成奠定了基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -102,8 +98,6 @@ $$\mathcal{L}_{obj} = \sum_{t=1}^T \| \hat{R}_t K_{rest} + \hat{d}_t - K_t \|_1$
 
 这种“稀疏条件 + 几何损失 + 解析引导”的三层设计，使得CHOIS在FullBodyManipulation数据集上取得了更低的脚滑动（FS=0.35）和FID（0.69），并在3D-FUTURE数据集上展现出对新物体的泛化能力（FS=0.38，FID=1.60）。
 
-
-
 CHOIS 的整体 pipeline 围绕一个**条件扩散模型**构建，其核心设计目标是在给定稀疏物体路标点与语言描述的条件下，**同步生成**物体运动与人体运动。与仅从完整物体轨迹生成人体运动的 OMG（Li et al., ACM Trans. Graph. 2023）或缺乏语言条件的 InterDiff（Xu et al., ICCV 2023）不同，CHOIS 通过三个关键模块的协同，实现了从高层规划信号到物理合理交互的端到端合成。
 
 **输入流**始于三类异构条件：初始的人体与物体状态、描述交互风格与意图的语言指令（经 CLIP 编码为嵌入向量）、以及稀疏的物体 2D 路标点（每 30 帧采样一次）与终点 3D 位置。这些条件信号分别进入编码与条件注入阶段。
@@ -122,13 +116,6 @@ CHOIS 的整体 pipeline 围绕一个**条件扩散模型**构建，其核心设
 **输出流**为同步的物体运动序列与人体运动序列，其中人体运动以全局关节位置和 6D 连续旋转表示。该 pipeline 进一步与**长期路径规划模块**串联，可将稀疏路标点生成与交互合成衔接，实现场景感知的长期人机交互生成（Figure 5）。
 
 **关键因果机制**：物体几何损失在训练阶段解决了扩散模型对稀疏路标点条件匹配不足的瓶颈；解析引导函数在采样阶段强制执行手-物接触、脚-地接触与物体-地面非穿透约束，弥补了无条件生成在物理真实性上的缺陷。消融实验证实，移除物体几何损失会导致路标点匹配误差（$T_s, T_e, T_{xy}$）显著增加；移除手-物接触引导使接触百分比从 0.67 降至 0.49；移除脚-地接触引导使脚平均高度从 4.20 cm 升至 6.65 cm。物体-地面穿透引导主要贡献于定性改善，其定量消融指标未在文中列出，该点需人工验证。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1758_CHOIS_Controllable_Human_Object_Interaction_Synthesis/figures/001_Figure_1.jpg]]
-*Figure 1: Given an initial object and human state, a language description, and sparse object waypoints in a 3D scene, CHOIS generates synchronized object motion and human motion at the same time*
-
-
 
 ### 3.1 数据表示与条件编码
 
@@ -195,8 +182,6 @@ $$F_{obj} = \|\min(V^z, 0)\|_1 \quad \text{(Eq. 9)}$$
 
 消融实验表明，移除手-物接触引导后接触百分比从0.67降至0.49；移除脚-地接触引导后脚平均高度从4.20 cm升至6.65 cm，浮空显著加重。物体-地面穿透引导主要改善定性效果，相关定量消融指标未在论文中列出。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置与评估基准
@@ -241,25 +226,12 @@ CHOIS 通过与路径规划模块的集成，支持长期、场景感知的人�
 
 通过人类感知研究（Figure 4），受试者在运动偏好上显著倾向于 CHOIS 的生成结果，进一步验证了该方法在视觉真实感和交互自然性上的优势。具体的文本输入内容和评估协议细节在论文中有详细说明，此处不再赘述。
 
-![[assets/figures/papers/paper_list_l1758_CHOIS_Controllable_Human_Object_Interaction_Synthesis/figures/006_Figure_4.jpg]]
-*Figure 4: Results of human perceptual studies. The numbers shown in the chart represent the percentage (%) over motion preferences*
-
 ### 失败模式与局限性
 
 尽管 CHOIS 在定量指标和定性评估上表现优异，论文未系统报告失败案例。从方法设计推断，潜在失败模式可能包括：极端稀疏路标点下物体运动预测不准确、复杂接触场景中引导项权重难以平衡、以及长序列生成中的误差累积问题。这些推断需在实际应用中进一步验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1758_CHOIS_Controllable_Human_Object_Interaction_Synthesis/figures/005_Figure_3.jpg]]
 *Figure 3: Qualitative results of the FullBodyManipulation dataset [28]*
-
-![[assets/figures/papers/paper_list_l1758_CHOIS_Controllable_Human_Object_Interaction_Synthesis/figures/008_Figure_5.jpg]]
-*Figure 5: Long-term interaction synthesis. Given language descriptions, a 3D scene with semantic labels, and initial human and object states, we synthesize long-term human-object interactions. The initial state is shown in green*
-
-![[assets/figures/papers/paper_list_l1758_CHOIS_Controllable_Human_Object_Interaction_Synthesis/figures/010_Figure_6.jpg]]
-*Figure 6: Results of interaction synthesis using the same text but different waypoints (a) and using the same waypoints but different text (b). The initial state is in green*
-
-
 
 ## 定位与知识库关联
 
@@ -292,8 +264,6 @@ CHOIS 处于条件扩散模型用于人-物交互生成这一技术脉络中，�
 4. **人类感知研究的文本输入覆盖度。** Figure 4 的人类感知研究表明 CHOIS 在用户偏好上优于基线，但论文未披露感知研究中使用的具体文本输入集合。文本描述的多样性和难度分布是否覆盖了方法的能力边界，需要更多信息来判断结论的稳健性。
 
 5. **引导强度的自适应调节。** 当前设计在最后 10 个去噪步骤中施加固定权重的引导项（$\lambda_2$, $\lambda_3$）。是否可以根据噪声水平或预测置信度自适应调节引导强度，以在早期步骤避免过度约束、在后期步骤强化接触精度，是一个值得探索的方向。
-
-
 
 ## 原文 PDF
 

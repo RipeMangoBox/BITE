@@ -178,8 +178,6 @@ SO-Bench 的构建与评估围绕一个统一的形式化问题展开：给定�
 
 整个框架的模块间关系清晰：模式检索与生成为响应生成提供约束空间，评估体系为训练提供反馈信号，训练模块则通过 SFT 和 RLVR 闭合优化回路。
 
-### 补充图表
-
 SO-Bench 的评估与训练框架围绕“视觉结构化输出”的形式化定义展开：给定输入图像 $I$、预定义 JSON 模式 $S$ 和用户指令 $X$，模型需自回归生成结构化输出 $Y$，使其同时满足对 $S$ 的语法合规性和对 $I$ 的语义忠实性。其概率形式为 $p(Y|I, X, S)$。
 
 基于此定义，方法体系包含三个核心模块：**多模态嵌入与模式检索**、**多阶段数据生成流水线**，以及**AST 驱动的多策略评估**。训练部分则引入**有监督微调（SFT）** 与**可验证奖励强化学习（RLVR）**。
@@ -334,25 +332,11 @@ Table 3 对比了使用原生结构化输出 API 与指令遵循提示两种策�
 
 当前评估存在若干公平性考量：固定阈值的模糊匹配可能无法完全公平地比较语义正确但表述不同的输出；部分字段的忽略标记由专有 MLLM 生成，可能引入标注偏差；基准主要面向英文视觉场景，多语言公平性尚未验证。这些限制提示未来需要设计更灵活的语义匹配函数（如 VLM-as-a-judge）以提升评估的公平性和覆盖度。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2748_https_arxiv_org_abs_2511_21750/figures/010_Figure_7.jpg]]
 *Figure 7: Performance of models trained with different scales of data. Field Match and Full Structure Match are fuzzy version*
 
 ![[assets/figures/papers/paper_list_l2748_https_arxiv_org_abs_2511_21750/figures/012_Figure_8.jpg]]
 *Figure 8: Performance of models on two subsets of SO-Bench. Field Match and Full Structure Match are fuzzy version*
-
-![[assets/figures/papers/paper_list_l2748_https_arxiv_org_abs_2511_21750/figures/013_Figure_9.jpg]]
-*Figure 9: The results breakdown by the data categories for the model trained with 20K randomly sampled data and model trained with Aria-UI subset of the data. In the left figure, we show the schema validation accuracy and in the right figure, we show the field match accuracy (fuzzy)*
-
-![[assets/figures/papers/paper_list_l2748_https_arxiv_org_abs_2511_21750/figures/016_Figure_13.jpg]]
-*Figure 13: An example error (Natural image) from the SFT model trained on full data. This example gets partial score on field match but is invalid w.r.t. the schema*
-
-![[assets/figures/papers/paper_list_l2748_https_arxiv_org_abs_2511_21750/figures/017_Figure_14.jpg]]
-*Figure 14: An example error (Document) from the SFT model trained on full data. This example gets 0 score on field match while being valid w.r.t the schema*
-
-![[assets/figures/papers/paper_list_l2748_https_arxiv_org_abs_2511_21750/figures/018_Figure_15.jpg]]
-*Figure 15: An example error (UI image) from the SFT model trained on full data. This example gets partial score on field match while also being valid w.r.t the schema*
 
 ## 定位与知识库关联
 

@@ -55,8 +55,6 @@ claims:
 
 值得注意的是，EditVerse 并非在所有维度上都占据绝对优势。在图像生成（GenEval 综合评分 0.82，与 FLUX.1-dev 持平）和部分视频编辑子任务上，它与专用模型的表现相当而非超越，这反映了通用模型与专用模型之间的固有张力。此外，全自注意力机制处理长序列带来的计算开销，以及数据管道引入的噪声样本，仍是需要持续优化的方向。
 
-
-
 视频编辑是视觉内容创作的核心需求之一。随着扩散模型在图像生成与编辑领域的成熟，研究者自然希望将这一能力扩展到视频。然而，视频编辑面临两个根本性瓶颈。
 
 **架构限制：缺乏统一的编辑框架。** 现有视频生成模型通常为特定任务设计——例如文本到视频生成、首帧传播编辑或注意力注入编辑——每种方法都有其固定的输入/输出配置。**TokenFlow**（Qu et al., 2025）和 **STDF**（Yatim et al., 2024）依赖无训练的注意力操作，**Señorita-2M**（Zi et al., 2025）采用首帧传播策略，**InsV2V**（Cheng et al., 2023）则专注指令引导编辑。这些方法各自为政，难以灵活支持多样化的编辑任务（如物体添加、移除、风格迁移、背景替换等）和输入模态组合（图像+文本、视频+文本、多帧视频等）。用户被迫在不同工具间切换，缺乏一个能统一处理各类编辑需求的框架。
@@ -66,8 +64,6 @@ claims:
 EditVerse 的动机正是从这两个瓶颈的交汇点出发：**能否通过架构设计，让模型从丰富的大规模图像编辑数据中学习通用编辑能力，并将其自然迁移到视频编辑任务？** 这一思路的核心洞察在于——编辑的本质是对视觉内容的语义理解和局部修改，这一能力在图像和视频之间具有高度可迁移性。关键在于设计一个统一表示框架，使模型能够同时“看到”文本指令、源图像/视频和目标图像/视频，并通过上下文学习建立它们之间的编辑映射关系。
 
 具体而言，EditVerse 提出将文本、图像和视频统一表示为交错的 token 序列，在全自注意力机制下实现跨模态上下文学习。同时引入四维旋转位置编码（RoPE），区分序列、时间、高度和宽度维度，使模型能够精确感知时空位置关系。这一设计使得图像编辑知识得以有效迁移到视频编辑，从而缓解视频编辑数据稀缺的困境，同时天然支持灵活的输入/输出配置。
-
-
 
 ## 核心方法与创新机理
 
@@ -92,8 +88,6 @@ $$\mathcal{L} = \mathbb{E}_{t, \mathbf{X}_0, \mathbf{X}_1} \left| u_{\Theta}(\ma
 ### 关键设计消融验证
 
 Table 5 的消融直接量化了各设计组件的贡献：去除交错格式或顺序 RoPE 均导致编辑质量（VLM 评分）、视频质量（Pick Score）和帧文本对齐三项指标全面下降。**交错格式 + 顺序 RoPE 的组合**对文本对齐和编辑质量的提升最为显著，验证了统一序列表示与四维位置编码的协同效应。
-
-
 
 ![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_blJXE07r7I/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of EditVerse. We design a unified framework for image and video editing and generation, which processes text and vision inputs into a unified sequence. The right part of the figure shows our positional embedding design. This framework leverages full self-attention to facilitate robust in-context learning and effective knowledge transfer among modalities*
@@ -156,8 +150,6 @@ EditVerse 采用 **2B 参数的密集 Transformer** 架构（类似 LLaMA 3）�
 
 这一统一框架的核心因果机制在于：交错序列表示提供了跨模态信息交互的结构基础，四维 RoPE 赋予了时空位置感知能力，全自注意力则驱动了从图像到视频的知识迁移——三者协同使得在图像数据上学习的编辑能力能够泛化到视频任务。
 
-
-
 EditVerse 的核心架构由七个模块串联构成，共同实现从多模态输入到编辑/生成输出的端到端流水线。以下按数据流向逐一说明。
 
 **VAE Encoder** 负责将图像和视频的像素空间压缩至低维隐空间，降低后续 Transformer 的计算负担。**Flan-T5-XXL Text Encoder** 则将文本指令编码为 token 序列。两类 token 分别通过各自的 **Modality Projectors** 投影到共享的嵌入维度，消除模态间的表示鸿沟。
@@ -185,8 +177,6 @@ $$\mathcal{L} = \mathbb{E}_{t, \mathbf{X}_0, \mathbf{X}_1} \left| u_\Theta(\math
 推理时，从标准正态分布采样 $X_0$，使用 ODE 求解器以离散时间步从 $X_0$ 生成 $X_1$。
 
 **关键设计消融证据**（Table 5）：仅使用交错格式而不使用顺序 RoPE，或仅使用顺序 RoPE 而不使用交错格式，编辑质量和文本对齐均显著下降。两者结合时，文本对齐和编辑质量达到最优，证实了统一序列表示与四维位置编码的协同效应。
-
-
 
 ## 实验与关键发现
 
@@ -229,27 +219,8 @@ Figure 9 展示了 EditVerse 的典型失败案例，主要包括两类问题：
 
 Figure 10 和 Table 11 分析了 GPU 显存占用和推理延迟随 token 长度的变化。全自注意力机制处理长序列导致较高的 FLOPs 和推理时间，这是统一框架的计算代价。论文指出可通过更高压缩率的 VAE（如 16× 空间压缩）、动态 token 选择、模型蒸馏和高效注意力机制（如线性注意力、Mamba）来缓解。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_blJXE07r7I/figures/006_Table_2.jpg]]
-
 ![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_blJXE07r7I/figures/011_Table_3.jpg]]
 *Table 3: Quantitative comparison on TGVE+. Results show superior performance of EditVerse*
-
-![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_blJXE07r7I/figures/024_Table_8.jpg]]
-*Table 8: Image Generation. We evaluate the image generation capability of EditVerse using the GenEval benchmark (Ghosh et al., 2023) shown in Table 8, which is designed to comprehensively assess textto-image models across multiple aspects of visual reasoning and compositional fidelity. Our method achieves state-of-the-art performance when compared against a wide range of both open-source and commercial systems, highlighting better semantically aligned generation*
-
-![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_blJXE07r7I/figures/004_Table_1.jpg]]
-
-![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_blJXE07r7I/figures/023_Table_7.jpg]]
-*Table 7: Comparison with text-to-video models on the VBench (Zhang et al., 2024). # Params. is the number of total parameters. EditVerse shows competitive performance with a small model size*
-
-![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_blJXE07r7I/figures/025_Table_9.jpg]]
-*Table 9: Quantitative comparison on V2VBench (Sun et al., 2024). Methods are grouped into three categories: (i) Network and Training Paradigm, (ii) Attention Feature Injection, and (iii) Diffusion Latent Manipulation. Local best are in bold. Global best are underlined*
-
-![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_blJXE07r7I/figures/030_Table_10.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -320,8 +291,6 @@ EditVerse 的适用边界由以下因素共同界定：
 3. **生成加速**：模型和步长蒸馏能否明显加速生成速度？
 
 4. **数据质量**：如何提升自动化数据管道的成功率（当前约 65%），减少噪声样本对训练的负面影响？
-
-
 
 ## 原文 PDF
 

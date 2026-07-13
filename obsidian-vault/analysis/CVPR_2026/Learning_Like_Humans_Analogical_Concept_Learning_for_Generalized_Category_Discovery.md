@@ -58,8 +58,6 @@ AL‑GCD 采用两阶段训练框架：首先在伪 GCD 设置下训练 ATCG 的
 **主要结果**  
 在六个基准数据集上，AL‑GCD 的整体准确率平均提升 **5.0%**，细粒度数据集平均提升 **7.1%**。在 CUB 数据集上结合 SelEx‑CLIP 骨干达到 **84.1%** 整体准确率，显著超越先前方法。消融实验证实 ATCG 的初始层、堆叠层以及视觉‑文本融合系数 α 均对性能有贡献，其中 α=0.4 在新旧类别间取得最佳平衡。
 
-
-
 ### 问题定义：广义类别发现（GCD）
 
 广义类别发现（Generalized Category Discovery, GCD）要求模型在一个部分标注的数据集上，同时识别已知类别并发现未知的新类别。形式化地，给定已标记数据集 $\bar{\mathcal{D}}^l = \{(x_i^l, y_i^{\bar{l}})\} \subset \mathcal{X} \times \mathcal{Y}^l$ 和未标记数据集 $\mathcal{D}^u = \{x_i^u\} \subset \mathcal{X}$，其中未标记数据同时包含来自已知类别 $\mathcal{Y}^l$ 和未知类别 $\mathcal{Y}^u$ 的样本，且 $\mathcal{Y}^l \cap \mathcal{Y}^u = \emptyset$。模型需要为 $\mathcal{D}^u$ 中的每个样本分配一个类别标签，该标签可能来自 $\mathcal{Y}^l$ 或 $\mathcal{Y}^u$。
@@ -77,8 +75,6 @@ AL‑GCD 采用两阶段训练框架：首先在伪 GCD 设置下训练 ATCG 的
 AL-GCD（Analogical Learning for GCD）的核心创新在于引入**类比文本概念生成器（Analogical Textual Concept Generator, ATCG）**——一个即插即用的模块，它从已标记的视觉‑文本知识库中通过类比注意力机制，为每个未标记样本生成对齐的文本嵌入。这些文本嵌入随后与视觉特征融合，形成跨模态的融合表示，用于后续的对比学习和参数化分类。整个框架包含四个关键组件：视觉编码器、文本编码器、融合头投影器以及 ATCG，训练流程分为 ATCG 预训练和 GCD 训练两个阶段（Figure 2）。
 
 在六个基准数据集上的实验表明，AL-GCD 的整体准确率平均提升 **5.0%**，在细粒度数据集上的平均提升达到 **7.1%**，验证了类比推理机制在突破纯视觉瓶颈方面的关键作用。
-
-
 
 ## 核心方法与创新机理
 
@@ -114,8 +110,6 @@ AL‑GCD 的训练分为两个阶段：
 
 视觉‑文本融合系数 $\alpha$ 是 AL‑GCD 中一个关键的调控旋钮：$\alpha$ 越大，模型越依赖视觉特征，有利于已知类别识别；$\alpha$ 越小，文本概念的引导作用越强，有利于新类别发现。在 Stanford Cars 上的消融实验（Figure 4）表明，$\alpha=0.4$ 在已知和新类别准确率之间取得最佳平衡——当 $\alpha$ 从 0.4 增加到 0.7 时，已知类别准确率上升 1.8%，但新类别性能下降。这一发现揭示了 GCD 任务中视觉先验与语义先验的内在张力，AL‑GCD 通过可调节的融合系数为这一权衡提供了显式控制接口。
 
-
-
 AL‑GCD 将广义类别发现（GCD）重新建模为一个**类比推理驱动的跨模态流程**，其核心思想是：让模型像人类一样，利用已掌握的概念去类比理解未见过的类别。整个框架由四个关键模块构成，按数据流依次为：
 
 1. **视觉编码器** $f_v(\cdot)$ 与**文本编码器** $f_t(\cdot)$：分别提取图像嵌入和类别文本嵌入，为后续跨模态融合提供基础表示。
@@ -132,8 +126,6 @@ AL‑GCD 将广义类别发现（GCD）重新建模为一个**类比推理驱动
 - **阶段二：GCD 训练**。冻结训练好的 ATCG，将其接入完整流水线。对每个未标记样本，ATCG 生成类比文本嵌入，与视觉嵌入融合后，通过无监督对比损失 $\mathcal{L}_{\text{rep}}^u$ 和参数化分类损失 $\mathcal{L}_{\text{cls}}$ 联合优化融合头及分类器。分类损失对有标签数据使用标准交叉熵，对无标签数据使用自蒸馏伪标签并辅以熵正则项 $\epsilon H(\overline{\mathbf{p}})$ 防止平凡解。
 
 值得注意的是，ATCG 本身采用**初始层 + 堆叠层**的递进架构（Figure 3）：初始层通过跨模态注意力建立初步的视觉‑文本关联，堆叠层则迭代精化文本嵌入，使类比结果逐步对齐到目标样本的语义空间。消融实验证实，仅添加初始层已能带来显著增益，进一步增加堆叠层可继续提升新类别准确率，但会伴随已知类别准确率的轻微下降，呈现出可控的“已知‑未知”权衡。
-
-
 
 ### 整体框架与两阶段训练
 
@@ -195,13 +187,6 @@ $$\mathcal{L}_{\mathrm{cls}}^u = \frac{1}{|B|}\sum_{i\in B} \mathcal{H}(q_i', p_
 
 其中 $\overline{\mathbf{p}} = \frac{1}{2|B|}\sum_{i\in B}(\mathbf{p}_i + \bar{\mathbf{p}_i'})$ 是一个批次内预测的均值，$H(\overline{\mathbf{p}}) = -\sum_k \overline{\mathbf{p}}^{(k)}\log\overline{\mathbf{p}}^{(k)}$ 为其熵。最终分类损失为 $\mathcal{L}_{\mathrm{cls}} = (1-\lambda)\mathcal{L}_{\mathrm{cls}}^u + \lambda\mathcal{L}_{\mathrm{cls}}^s$，总训练目标为 $\mathcal{L} = \mathcal{L}_{\mathrm{rep}} + \mathcal{L}_{\mathrm{cls}}$。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2128_https_arxiv_org_abs_2603_19918/figures/001_Figure_1.jpg]]
-*Figure 1: Illustration of an example of human Analogical Learning mechanism and the proposed Analogical Textual Concept Generator (ATCG)*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -251,11 +236,6 @@ AL‑GCD 在六个基准数据集上进行了全面评估，涵盖通用分类�
 ![[assets/figures/papers/paper_list_l2128_https_arxiv_org_abs_2603_19918/figures/005_Table_2.jpg]]
 *Table 2: Comparison on Fine-grained Avg, Classification Avg, and All Datasets Avg with CLIP backbone. The best values are in bold and the second best are underlined. † denotes reproduced results. △ denotes results from the CMS appendix [6]*
 
-![[assets/figures/papers/paper_list_l2128_https_arxiv_org_abs_2603_19918/figures/006_Table_3.jpg]]
-*Table 3: Ablation study results for ATCG with various initial and stacked layer settings across different datasets*
-
-
-
 ## 定位与知识库关联
 
 ### 问题定位与瓶颈
@@ -291,8 +271,6 @@ AL‑GCD 的核心推进在于将 GCD 从“视觉匹配”转变为“视觉‑
 - 如何设计更具表达力的类比推理机制，以进一步提升细粒度类别的分离能力？
 - 如何将大规模语言模型等更丰富的语义源无缝集成到 ATCG 框架中？
 - 如何将类比学习范式扩展到持续学习和开放世界发现场景，以应对数据分布漂移？
-
-
 
 ## 原文 PDF
 

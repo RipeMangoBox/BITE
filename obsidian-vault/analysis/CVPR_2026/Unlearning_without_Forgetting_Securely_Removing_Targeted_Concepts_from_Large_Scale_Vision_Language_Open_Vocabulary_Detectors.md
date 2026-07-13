@@ -52,8 +52,6 @@ claims:
 
 实验结果表明，SafeDetect 在 UOD-Bench 基准上相较于 **NPO**（Zhang et al., 2024）等无约束遗忘方法，遗忘效果提升 **64.75%**，同时保持稳定的保留性能和显著更优的零样本泛化能力（LVIS-minival 上平均 AP 仅下降 8.3 点，而 NPO 下降 14.2 点）。此外，SafeDetect 收敛速度比迭代方法快 **1.5 倍**，在 500 步内即可稳定收敛。
 
-
-
 ### 开放词汇检测中的遗忘困境
 
 大规模视觉-语言模型（VLMs）的开放词汇检测能力依赖于网络规模数据的预训练，这使其能够检测几乎任意文本描述的目标。然而，这种无差别的检测能力也带来了严重的隐私与合规风险：模型可能检测到人脸、身份证号等敏感概念，而传统的解决方案——从零开始重新训练——在大规模模型时代已变得成本高昂且不切实际。因此，**机器遗忘（Machine Unlearning, MU）** 作为一种高效、经济的替代方案应运而生，其目标是在不重新训练的前提下，选择性地移除模型中的特定概念。
@@ -89,8 +87,6 @@ $$
 $$
 
 这一几何约束范式为安全、无干扰的遗忘提供了理论保障，也是 SafeDetect 方法设计的根本出发点。
-
-
 
 ## 核心方法与创新机理
 
@@ -144,8 +140,6 @@ $$ \mathcal{L}_{\mathrm{decouple}} = \mathbb{E}_{(v,f) \in \mathcal{D}_f} \left[
 
 零空间约束带来的优势在多个维度得到验证。在收敛性上，SafeDetect 在 500 步内稳定收敛，比 NPO（约需 750 步）快 1.5 倍（Figure 5）。在零样本泛化保护上，移除零空间投影（w/o Null）导致 LVIS 上的平均 AP 下降从 3.8 增加到 9.6（Table 4），证实了零空间约束对保护泛化能力的关键作用。
 
-
-
 SafeDetect 的整体框架围绕一个核心几何约束展开：**将遗忘更新限制在保留知识嵌入的零空间中**，从而在数学上阻断遗忘操作对保留概念的干扰。该框架由离线构建与在线训练两个阶段组成，如图1所示。
 
 ### 离线阶段：零空间构建
@@ -187,12 +181,8 @@ $$\mathcal{L}_{\mathrm{total}}^{(\mathcal{D}_f)} = \lambda_{\mathrm{flow}} \math
 
 该设计使得遗忘更新在几何上与保留知识完全解耦——图4的 T-SNE 可视化证实，SafeDetect 在遗忘“face”概念时，语义相关类（man, boy）的聚类结构保持紧凑，而 NPO 方法则因几何纠缠导致相关类别出现显著分散。训练收敛方面，SafeDetect 在 500 步内即可稳定收敛，相比 NPO（约 750 步）实现 1.5 倍加速（图5）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l802_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_Unlearning_without/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the unlearning challenge and our proposed method. (a) Previous Methods: Large-scale pretraining on webscraped data leads to uncontrolled detection, creating (c) significant privacy/compliance risks. Retraining is prohibitively costly. (b) Our method decomposes updates into tangential component Pkeep · ∆W (discarded, causes interference) and normal component Pnull · ∆W (retained, safe). Applying null-space projection (W ′ = W + Pnull · ∆W ) avoids geometric entanglement between related concepts (e.g., “Woman” and “Person”). (d) This achieves safe, reliable unlearning by selectively forgetting targets while retaining generalized concepts at minimal cost*
-
-
 
 ### 问题形式化：几何纠缠干扰的数学根源
 
@@ -270,13 +260,6 @@ $$
 
 训练时启用 LoRA（rank $r=128$，$\alpha=256$）进行参数高效微调，$\lambda_{\mathrm{flow}}$ 和 $\lambda_{\mathrm{decouple}}$ 均设为 1.0，$\tau=0.07$，学习率为 $2 \times 10^{-5}$。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l802_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_Unlearning_without/figures/012_Figure_7.jpg]]
-*Figure 7: Cross-modal alignment evolution at decoder query level across four forgetting ratios. Our decoupling objective (Eq. 4.8) drives decoder features from near-zero similarity to strongly negative values (-0.6 to -0.8), achieving semantic repulsion between visual and text modalities for forget concepts. This demonstrates deep representation-level disentanglement beyond superficial output suppression*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果：多任务遗忘性能
@@ -298,9 +281,6 @@ SafeDetect 在 UOD-Bench 上进行了全面的多任务评估，覆盖目标检�
 *Table 2: Impact of unlearning on zero-shot generalization. We evaluate on LVIS-minival [18] and COCO [32] with LLM-Det (Swin-T). Higher is better*
 
 消融实验（Table 4）进一步验证了这一结论：移除零空间投影后（w/o Null），LVIS 上的平均 AP 下降从 3.8 点急剧增加至 9.6 点，证实零空间约束是保护零样本泛化的核心机制。
-
-![[assets/figures/papers/paper_list_l802_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_Unlearning_without/figures/010_Table_4.jpg]]
-*Table 4: Impact of Null-space projection on zero-shot generalization to LVIS-minival [18] across four forgetting ratios*
 
 ### 收敛速度与训练效率
 
@@ -324,9 +304,6 @@ Table 3 系统性地消融了 SafeDetect 的三大核心组件：
 
 Table 6 展示了 SafeDetect 对语义扰动的鲁棒性。在原始类别名称（如 "dog"）和同义词（如 "canine"）两种条件下，SafeDetect 均能保持稳定的遗忘性能。这一鲁棒性源于跨模态解耦损失在解码器查询特征层面的深层语义排斥机制，使得遗忘不仅针对特定文本标签，而是对遗忘概念的语义簇产生泛化效应。
 
-![[assets/figures/papers/paper_list_l802_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_Unlearning_without/figures/013_Table_6.jpg]]
-*Table 6: Robustness to semantic perturbations. We report Forget mAP (%) for OD and Top-1 (%) for PG on UOD-Bench with LLM-Det (Swin-T). Clean uses original class names (e.g., “dog”), +Synonym uses synonyms (e.g., “canine”). Lower is better*
-
 ### 定性分析
 
 Figure 4 的 T-SNE 可视化直观展示了遗忘 "face" 概念时特征空间的变化。原始模型中，face 样本形成紧密聚类；NPO 由于几何纠缠干扰，导致语义相关类（man、boy）的特征分布显著分散；而 SafeDetect 通过零空间保护，保持了所有保留类别的紧凑聚类结构。Figure 2 和 Figure 6 的定性检测结果进一步证实：SafeDetect 能够精确移除目标概念（如 face、woman），同时完整保留其他类别（如 bowl、chair）的检测能力，而现有方法则出现遗忘不彻底或保留类别丢失的问题。
@@ -347,16 +324,6 @@ Figure 7 展示了跨模态对齐的演化过程：解耦目标驱动解码器�
 - **高度重叠概念的鲁棒性**：对于语义高度重叠的概念对（如 "dog" 与 "puppy"），零空间构建的区分能力是否足够，论文未提供专门实验。
 - **动态连续遗忘**：当前实验为单次遗忘设定，多次连续遗忘不同概念时零空间的累积效应和更新策略是重要的开放问题。
 - **对抗安全性**：遗忘后模型面对特征提取攻击时的安全性尚未评估，这是实际部署中需要关注的风险点。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l802_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_Unlearning_without/figures/003_Figure_3.jpg]]
-*Figure 3: UOD-Bench construction pipeline and statistics. UOD-Bench contains 14.7K images with 67.3K region-phrase pairs, supporting four forgetting ratios (1%-15%) across OD, PG and REC tasks. Subplots (e-g) show the forget vocabulary size, counting all phrase variants containing the forget classes (e.g., “red apple”, “green apple” for class “apple”)*
-
-![[assets/figures/papers/paper_list_l802_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_Unlearning_without/figures/006_Table_1.jpg]]
-*Table 1: Multi-task unlearning performance across four forgetting ratios on UOD-Bench with two detector backbones. We evaluate three core capabilities: OD (mAP@50), PG (Top-1 Accuracy with IoU≥0.5), and REC (Top-1 Accuracy). Metrics: Forget (↓ lower is better), Retain (↑ higher is better), U-Score (↑ harmonic mean [9] of forgetting drop and retention, higher is better). Blue bold denotes best performance among unlearning methods (excluding Vanilla Model baseline); underline denotes second-best*
-
-
 
 ## 定位与知识库关联
 
@@ -397,8 +364,6 @@ Figure 7 展示了跨模态对齐的演化过程：解耦目标驱动解码器�
 4. **安全性保障的完备性。** 虽然零空间投影从数学上消除了一阶对齐干扰，但面对自适应攻击（如通过精心设计的提示词工程或中间特征提取尝试恢复遗忘概念）时，模型的鲁棒性尚未得到充分评估。深层表征解耦（Eq. 4.8）提供了一定程度的保护，但其对抗鲁棒性的理论下界尚不明确。
 
 5. **多模态遗忘的一致性。** 当前方法侧重于文本到视觉的单向遗忘（通过文本嵌入定义遗忘目标）。在真正的多模态场景中，遗忘概念可能通过视觉特征相似性被间接恢复，跨模态遗忘的一致性问题值得深入探索。
-
-
 
 ## 原文 PDF
 

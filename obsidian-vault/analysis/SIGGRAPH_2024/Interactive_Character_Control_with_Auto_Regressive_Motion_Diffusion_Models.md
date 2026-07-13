@@ -50,8 +50,6 @@ claims:
 
 主要结果方面，A-MDM在HumanML3D数据集上的FID达到1.74，相比MVAE的11.24有显著提升（Table 5）；在LaFAN1上的足部滑动指标（FS）为1.99，优于NSM的2.25（Table 6）。消融实验表明，40个扩散步骤在运动质量和多样性之间达到了最佳平衡，推理时间约为20.96ms，满足实时交互需求。
 
-
-
 角色动画的实时交互控制是计算机图形学中的核心挑战，其目标是根据用户输入或任务目标，实时生成高质量、多样化的角色运动序列。这一任务面临双重约束：一方面需要运动具有自然性和物理合理性，另一方面必须满足毫秒级的实时推理延迟，以支持游戏、虚拟现实等交互式应用。
 
 现有方法可大致分为两类。第一类是**时空扩散模型**，如 **MDM** (Tevet et al., ICLR 2023) 和 **GMD** (Karunratanakul et al., ICCV 2023)，它们将整个运动序列视为一个时空单元，通过扩散模型一次性生成完整序列。这类模型在运动质量和多样性上表现优异，但其“全序列一次性生成”的范式从根本上无法满足实时交互需求——用户无法在序列生成过程中动态插入新的控制信号。第二类是**基于VAE的自回归模型**，如 **MVAE** (Ling et al., ACM Trans. Graph. 2020) 和 **HuMoR** (Rempe et al., ICCV 2021)，它们逐帧预测下一帧运动，天然适合交互场景。然而，这类模型在生成长序列时存在严重的**漂移问题**：误差逐帧累积，导致运动质量迅速退化，且生成的运动多样性不足。
@@ -59,8 +57,6 @@ claims:
 **核心瓶颈**在于：时空扩散模型提供了高质量生成能力但缺乏实时交互性，而自回归VAE模型支持逐帧交互但牺牲了生成质量。是否存在一种范式，能够同时继承扩散模型的高保真生成能力和自回归框架的实时交互优势？
 
 本文的动机正是弥合这一缺口。作者提出 **A-MDM（Auto-Regressive Motion Diffusion Model）**，将扩散模型改造为自回归形式：以极少量去噪步骤（仅40步）和轻量级MLP网络，在实时性约束下逐帧生成高质量、多样化的运动。其核心洞察是：将扩散模型的自回归设计与任务导向采样、空间/时间修补、分层强化学习等控制策略相结合，可以构建一个轻量、高保真的实时运动生成框架，且无需针对每个下游任务重新训练模型。
-
-
 
 ## 核心方法与创新机理
 
@@ -89,8 +85,6 @@ A-MDM 将扩散模型重新设计为自回归形式：给定前一帧的角色�
 - **分层强化学习控制器**：训练一个高层策略来预测去噪过程中的残差向量，引导基础 A-MDM 完成需要精确控制的复杂任务（如摇杆控制和路径跟随），弥补了任务导向采样在精度导向任务中的不足。
 
 这四种范式转变共同构成了 A-MDM 的核心创新：**一个轻量、实时、通用可控的自回归运动扩散框架**，无需为每个新任务重新训练即可生成多样化且符合控制目标的高保真运动。
-
-
 
 A-MDM 的整体设计围绕一个核心矛盾展开：**如何在保持扩散模型生成质量与多样性的同时，实现满足实时交互需求的逐帧推理速度**。为此，该框架将去噪扩散概率模型（DDPM）改造为自回归生成范式，并围绕这一基础模型构建了多层控制策略，形成一个“生成-控制”解耦的模块化 pipeline。
 
@@ -132,12 +126,8 @@ $$J_{RL}(\pi) = \mathbb{E}_{\tau \sim p(\tau|\pi)} \left[ \sum_{f=0}^{\infty} \g
 
 整个 pipeline 的数据流可概括为：**初始姿态 → 自回归扩散生成 → 控制策略介入 → 角色状态序列**。具体而言，用户提供初始角色姿态作为条件，基础 A-MDM 在 40 步去噪后生成下一帧；控制策略根据任务需求对生成过程进行干预（评分选择、特征替换或残差引导）；生成的帧作为新的条件反馈至下一轮生成，循环往复直至输出完整运动序列。该流程的模块化设计确保了各组件可独立替换或升级，例如未来可将基础模型替换为一致性模型以进一步降低推理延迟。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2306_00416/figures/001_Figure_1.jpg]]
 *Figure 1: We present Auto-Regressive Motion Diffusion Model (A-MDM), a framework for generating high-fidelity kinematic motion sequences. Once trained, A-MDM can be reused to perform new tasks through different control strategies, such as inpainting (upper right, and lower left), and hierarchical control via reinforcement learning (lower right)*
-
-
 
 A-MDM 将标准扩散模型改造为自回归形式，逐帧预测下一帧运动，并辅以调度采样、修补、任务导向采样和分层强化学习等控制模块。以下逐一说明各模块的设计逻辑与核心公式。
 
@@ -191,8 +181,6 @@ $$J_{RL}(\pi) = \mathbb{E}_{\tau \sim p(\tau \mid \pi)} \left[ \sum_{f=0}^{\inft
 
 其中 $\tau$ 为轨迹，$\gamma$ 为折扣因子，$r(s_f, a_f)$ 为任务相关的即时奖励。低层基础扩散模型保持冻结，仅高层控制器被训练，从而在新任务上复用已学到的运动先验。
 
-
-
 ## 实验与关键发现
 
 ### 生成质量与多样性主结果
@@ -238,9 +226,6 @@ A-MDM 通过任务导向采样、空间修补和时间修补三种策略，在�
 
 对于需要长期规划和精确执行的任务，A-MDM 引入了分层强化学习控制器（Section 5, **Fig. 8**）。高层策略预测残差向量引导基础扩散模型的去噪过程，使其生成符合任务目标的运动。**Fig. 11** 的学习曲线显示，A-MDM 在目标到达任务上的回报显著高于其他分层模型。**Fig. 12** 展示了分层控制器从相同初始状态出发到达固定目标时生成多样化轨迹的能力。与修补法相比（**Fig. 13**），分层控制器在轨迹跟踪时可以适当偏离目标轨迹以产生更自然的运动，而修补法则精确匹配用户轨迹但可能牺牲自然度。
 
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2306_00416/figures/015_Figure_13.jpg]]
-*Figure 13: (c) Hierarchical Control Fig. 13. Character trajectory (in white) from inpainting (b) and hierarchical control(c) when following a user-specified circular trajectory (in red). The trajectory of inpainting matches user’s target trajectory exactly, while the hierarchical controller can deviate from the target trajectory as needed in order to produce more natural motions*
-
 ### 失败模式与局限性
 
 尽管 A-MDM 在生成质量和控制灵活性上表现优异，论文明确指出了以下失败模式：
@@ -263,24 +248,11 @@ A-MDM 通过任务导向采样、空间修补和时间修补三种策略，在�
 | **Fig. 11** | 分层强化学习控制器在目标到达任务上学习效率更高，回报显著优于其他分层模型 |
 | **Fig. 13** | 修补法精确匹配轨迹，分层控制器可适当偏离以产生更自然运动 |
 
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2306_00416/figures/014_Figure_10.jpg]]
-*Figure 10: (b) A-MDM Fig. 10. Task-oriented sampling using HuMoR (Left) vs. A-MDM (Right). The trajectories of A-MDM are more direct and take fewer steps. Results are generated using models trained on 100STYLE*
-
 ![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2306_00416/figures/009_Table_1.jpg]]
 *Table 1: Comparisons on AMASS, 100STYLE and LaFAN1. 50 motion sequences are generated starting at fixed initial states. Each motion is 60 frames long when evaluating ADE and 150 frames long for calculating APD. (unit: cm)*
 
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2306_00416/figures/010_Table_2.jpg]]
-*Table 2: To evaluate the models’ generalization capabilities when generating new motions not in the dataset, we use the models to generate continuation motions starting at the last frame of motion clips in the dataset. We compare the models on the AMASS, 100STYLE, and LaFAN1 datasets. (unit: cm)*
-
 ![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2306_00416/figures/019_Table_6.jpg]]
 *Table 6: Comparison between NSM and A-MDM. (unit: cm)*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2306_00416/figures/016_Figure.jpg]]
-*Figure: (a) LaFAN1 (b) 100STYLE*
-
-
 
 ## 定位与知识库关联
 
@@ -314,8 +286,6 @@ A-MDM 的设计目标是为实时交互式角色控制提供一个通用、轻�
 2.  **模型架构演进**：探索多帧自回归扩散模型，是否能从根本上提升时间一致性，并使其能处理更复杂的控制任务。
 3.  **推理速度优化**：能否将一致性模型等扩散模型加速技术集成到 A-MDM 框架中，以进一步降低推理延迟，为更复杂的实时应用提供算力余量。
 4.  **控制策略深化**：如何克服任务导向采样的短视性，使其能适用于需要精确、持续控制的任务，是拓展其应用范围的重要问题。
-
-
 
 ## 原文 PDF
 

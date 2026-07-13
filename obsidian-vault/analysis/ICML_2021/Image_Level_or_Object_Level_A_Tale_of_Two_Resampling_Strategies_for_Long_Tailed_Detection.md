@@ -136,8 +136,6 @@ RIO 中图像级与物体级重采样并非简单叠加，而是形成**互为�
 
 整个框架可概括为：**Mask R-CNN + FPN（基础架构）→ 余弦分类器（缓解长尾分类偏置）→ RFS（图像级重采样）→ 动态记忆库 OCS（物体级重采样与隐式增强）→ 联合训练**。两个重采样层级在批量维度上协同作用，最终在 LVIS v1.0 检测任务中实现整体 AP 从 23.3 提升至 24.1，稀有类 AP 从 10.7 大幅提升至 14.6（+3.9），同时频繁类性能几乎无损。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l27_https_arxiv_org_abs_2104_05702/figures/011_Figure_6.jpg]]
 *Figure 6: Ablations studies. (a) The effect of targeted classes on detection performance. (b) The effect of sampled object number from a memory bank on detection performance. (c) Baseline method which simply repeats the RoI features of targeted classes in each batch instead of using memory bank*
 
@@ -234,8 +232,6 @@ RIO联合图像级重采样（RFS）与基于记忆库的物体级重采样（OC
 1. **极低频类别的记忆更新滞后**：对于每epoch仅出现极少次数的极端稀有类，记忆库更新频率极低，存储的特征可能来自较旧的模型状态，导致回放的特征与当前模型不匹配，削弱OCS效果。
 2. **频繁类的轻微冗余**：RIO仍需依赖RFS进行图像级重采样，如图4b所示，频繁类总实例数仍有约18%的增加，未能完全消除冗余。
 3. **阈值敏感性**：记忆库目标类别的样本数阈值（如≤30）是一个依赖数据集特性的超参数，需针对不同长尾分布手动调整，缺乏自适应性。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l27_https_arxiv_org_abs_2104_05702/figures/005_Table_1.jpg]]
 *Table 1: Ablation study and comparison to resampling and reweighting baselines on LVIS v0.5, where † and ‡ indicate results from the paper and GitHub of (Tan et al., 2020), respectively*

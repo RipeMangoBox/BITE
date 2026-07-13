@@ -57,8 +57,6 @@ claims:
 
 实验结果表明，NMS攻击在**七分钟内**将被擦除概念的平均分类准确率从约**8%恢复至54%**，同时成功恢复了超过**70%的剪枝权重符号**。该攻击对多种基于权重定位的遗忘方法（ConceptPrune、Scissorhands、SalUn）均表现出泛化有效性，覆盖物体擦除、艺术风格遗忘和NSFW内容过滤等场景。高斯模糊防御则通过调节方差参数σM，在维持遗忘效果的同时显著降低了攻击成功率。
 
-
-
 ### 扩散模型的概念遗忘与剪枝路径
 
 随着扩散模型在文本到图像生成中的大规模部署，移除模型中受版权保护的艺术风格、不安全的视觉内容或特定物体概念的需求日益迫切。机器遗忘（machine unlearning）为此提供了一条技术路径，其目标是在不重新训练整个模型的前提下，定向擦除目标概念的知识。在众多遗忘方法中，基于权重剪枝的策略因其简洁性和高效性而受到关注：这类方法首先定位与目标概念强相关的模型权重，随后将这些权重直接置零，从而阻断概念的表达通路。
@@ -72,8 +70,6 @@ claims:
 ### 本文的核心动机
 
 本文旨在揭示剪枝遗忘中这一被忽视的根本脆弱性：**剪枝权重的位置信息本身就是一个强大的侧信道，可被攻击者利用来复活被擦除的概念**。我们提出一个系统性的攻击框架，在不依赖任何训练数据、不进行模型重训练的条件下，仅通过分析剪枝掩码的结构，即可有效恢复被遗忘的概念表达。同时，我们也探索了相应的防御策略，以期为安全的机器遗忘提供更全面的理解。
-
-
 
 ## 核心方法与创新机理
 
@@ -110,8 +106,6 @@ $$p(w) = \frac{\alpha \ \mathrm{erf}\big(\frac{w}{\sqrt{2}\sigma_M}\big)}{\alpha
 
 该公式刻画了在零均值高斯假设下，区间 $[-w, w]$ 内权重来自模糊化过程的概率，揭示了安全性与效用之间的根本权衡：$\sigma_M$ 越小，遗忘效果越好但剪枝位置越容易被检测；$\sigma_M$ 越大，隐藏效果越好但生成质量下降。这一形式化分析为防御参数的选择提供了理论指导。
 
-
-
 本文提出的概念复活攻击框架（NMS Attack Framework）针对基于剪枝的扩散模型遗忘方法，利用剪枝操作遗留的权重位置信息作为侧信道，在无需任何训练数据或模型重训练的条件下恢复被擦除的视觉概念。整体框架由三个核心模块串联构成：**低秩矩阵补全（Low-rank Matrix Completion）**、**Top-K 符号保留（Top-K Sign Retention）** 和 **神经元最大缩放（Neuron-Max Scaling）**，其结构如 Figure 3 所示。
 
 ![[assets/figures/papers/paper_list_l2732_https_arxiv_org_abs_2603_06640/figures/003_Figure_3.jpg]]
@@ -139,8 +133,6 @@ $$p(w) = \frac{\alpha \ \mathrm{erf}\big(\frac{w}{\sqrt{2}\sigma_M}\big)}{\alpha
 ### 关键因果机制
 
 整个攻击框架的有效性根植于一个核心洞察：**权重符号的正确性远大于权重大小的重要性**。理想实验表明，即使仅恢复符号并随机赋值幅度，其概念复活效果也远超恢复幅度而随机符号的策略。低秩矩阵补全恰好能以高准确率恢复大部分符号，而 NMS 策略则进一步放大了这些关键激活模式，使得在无数据、无训练的设定下，攻击者能在七分钟内将擦除概念的平均分类准确率从约 8% 提升至 54%。
-
-
 
 ### 3.1 攻击框架总览
 
@@ -213,13 +205,6 @@ $$
 
 其中 $\mathrm{erf}(\cdot)$ 为误差函数。该公式揭示了安全性与效用之间的根本权衡：$\sigma_M$ 越小，修改权重集中在零附近，遗忘效果好但剪枝位置易于被检测；$\sigma_M$ 越大，修改权重与未修改权重分布重叠增加，隐藏效果好但生成质量下降。Figure 6 和 Figure 7 分别展示了 $\sigma_M$ 对遗忘效果的影响及条件概率曲面，为实际部署中的参数选择提供指导。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2732_https_arxiv_org_abs_2603_06640/figures/002_Figure_2.jpg]]
-*Figure 2: Restored accuracy on erased concept class*
-
-
-
 ## 实验与关键发现
 
 ### 核心发现：符号恢复是关键杠杆
@@ -245,9 +230,6 @@ Table 2展示了5位艺术家风格遗忘的定量对比。ConceptPrune将艺术
 
 在安全敏感场景下，攻击的有效性同样显著。ConceptPrune将I2P数据集上的裸体检测数从预训练模型的151降至74，NMS攻击在最优K设定下恢复至118；在MMA和Ring-A-Bell数据集上，检测数分别从57恢复至172、从22恢复至57（Table 7）。这揭示了剪枝遗忘在内容审核场景中的严重安全隐患。
 
-![[assets/figures/papers/paper_list_l2732_https_arxiv_org_abs_2603_06640/figures/015_Table_7.jpg]]
-*Table 7: Nudity revival performance across I2P, MMA and Ring-A-Bell datasets under different Top-K settings*
-
 ### 消融实验
 
 #### Top-K符号保留的敏感性
@@ -271,9 +253,6 @@ Table 6揭示了攻击有效的深层原因：矩阵补全恢复的权重中，*
 
 Table 4（亦为Table 11）将NMS攻击应用于Scissorhands和SalUn两种不同的剪枝遗忘方法。在Scissorhands上，NMS将平均擦除准确率从0.21恢复至0.66；在SalUn上，从0.21恢复至0.69。这表明，**只要遗忘方法依赖权重剪枝，NMS攻击的符号恢复策略就具有跨方法的泛化能力**，因为剪枝位置信息始终构成可利用的侧信道。
 
-![[assets/figures/papers/paper_list_l2732_https_arxiv_org_abs_2603_06640/figures/012_Table_4.jpg]]
-*Table 4: NMS Attack on Scissorhands and SalUn*
-
 ### 防御评估
 
 Figure 6展示了高斯模糊防御中方差σ_M对遗忘效果的影响。σ_M越小，剪枝位置越容易被检测（防御失效）；σ_M越大，隐藏效果越好，但生成质量下降，擦除准确率回升。Table 12的扩展结果显示，σ_M=0.01时防御对攻击的抵抗最强，但部分类别的遗忘效果已开始退化，验证了公式(7)所刻画的安全-效用权衡。Figure 7的条件概率曲面为σ_M的选择提供了可视化指导。
@@ -281,19 +260,6 @@ Figure 6展示了高斯模糊防御中方差σ_M对遗忘效果的影响。σ_M�
 ### 局限与待验证点
 
 需注意，所有攻击实验均假设白盒访问剪枝掩码。在纯黑盒场景（仅API输出）下，攻击有效性未经评估，此点需手动验证。此外，高斯模糊防御的σ_M选择目前依赖经验阈值，缺乏自适应机制。多概念同时遗忘的交互影响、以及对抗动态重掩码策略的鲁棒性，亦未在实验中覆盖。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2732_https_arxiv_org_abs_2603_06640/figures/013_Table_6.jpg]]
-*Table 6: Sign accuracy of recovered weights as a function of magnitude: Top-K groups consistently exhibit higher correctness than the Rest*
-
-![[assets/figures/papers/paper_list_l2732_https_arxiv_org_abs_2603_06640/figures/008_Figure_6.jpg]]
-*Figure 6: Effect of Gaussian obfuscation variance on unlearning performance*
-
-![[assets/figures/papers/paper_list_l2732_https_arxiv_org_abs_2603_06640/figures/009_Figure_7.jpg]]
-*Figure 7: The conditional probability*
-
-
 
 ## 定位与知识库关联
 
@@ -343,8 +309,6 @@ Figure 6展示了高斯模糊防御中方差σ_M对遗忘效果的影响。σ_M�
 ### 知识库贡献定位
 
 本工作的核心贡献在于**揭示并验证了剪枝遗忘中“权重位置作为侧信道”这一根本脆弱性**，并提供了完整的攻击-防御分析框架。这一发现对基于稀疏化的模型编辑和遗忘方法具有普遍警示意义：任何通过选择性参数修改实现的遗忘，其修改位置本身可能构成信息泄露通道，需要纳入安全性评估体系。
-
-
 
 ## 原文 PDF
 

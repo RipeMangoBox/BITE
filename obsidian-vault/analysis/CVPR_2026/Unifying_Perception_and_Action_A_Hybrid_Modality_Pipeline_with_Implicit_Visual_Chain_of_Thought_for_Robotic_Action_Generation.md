@@ -58,8 +58,6 @@ VITA 在三个关键维度上实现了突破：
 
 实验结果表明，VITA 在多个基准上达到最优性能：在 CALVIN ABC‑D 上平均完成 4.73 个连续指令，较最强基线 DeFI（4.51）提升 4.9%；在 LIBERO‑Long 上成功率达 96.8%，较 CoT‑VLA 提升 36.2%；在真实世界 6 项任务中平均成功率达 80.5%，且在分布外（OOD）任务上性能下降远小于所有基线。消融研究进一步证实，仅保留隐式视觉思维链（Internal CoT）即大幅优于纯文本思维链变体，验证了视觉动态内化作为运动规划引导的有效性。
 
-
-
 ### 从感知到行动的鸿沟
 
 机器人操作的核心挑战在于将高维视觉感知转化为精确的低维动作控制。近年来，视觉-语言-动作（VLA）模型通过将大规模预训练的视觉-语言模型（VLM）适配到机器人领域，显著提升了策略的泛化能力。然而，现有 VLA 方法面临两个根本性瓶颈：
@@ -86,8 +84,6 @@ VITA 在三个关键维度上实现了突破：
 3. **渐进式训练策略**：通过预热、共训、微调三阶段训练，逐步建立跨模态对齐，缓解多目标优化的冲突，提升训练稳定性。
 
 通过上述设计，VITA 旨在实现感知与动作的深度融合，使机器人策略能够从大规模异构数据中高效学习可泛化的运动知识，在仿真和真实场景中均展现出优异的长时域任务建模能力和数据效率。
-
-
 
 ## 核心方法与创新机理
 
@@ -135,8 +131,6 @@ $$
 
 消融实验（Table 7）证实，跳过预热阶段或仅进行共训练均导致性能显著下降，验证了渐近训练对共享码本收敛和跨模态对齐的关键作用。此外，VITA 展现出突出的数据效率：仅使用 10% 的微调数据即可超越 OpenVLA 在全数据集上的表现（Table 8a），表明共享离散空间带来的表示迁移能力显著降低了对大规模标注机器人数据的依赖。
 
-
-
 VITA（Vision-Integrated Trajectory Alignment）构建了一条**统一感知与动作的混合模态流水线**，其核心设计围绕一个关键洞察展开：将未来帧预测作为动作生成的归纳偏置，而非显式的“先预测再行动”中间产物。整个框架通过**跨模态共享离散潜在空间**将高维视觉观测与低维机器人动作对齐，消除了两者之间的模态鸿沟。
 
 ### 流水线总览
@@ -178,12 +172,8 @@ VITA 采用渐近训练以避免多目标优化冲突（Algorithm 1）：
 
 消融表明，跳过预热直接共训会导致性能显著下降，验证了共享码本预热的必要性（Table 7）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2354_https_arxiv_org_abs_2511_19859/figures/001_Figure_1.jpg]]
 *Figure 1: We propose VITA, a novel framework that unifies visual perception and action generation. A cross-modal shared codebook is established, where latent variables are decoded into videos or motion trajectories through forward and inverse dynamics processes respectively. This dual consistency at both the representation level and optimization objectives enables VITA to effectively learn motion knowledge from extensive human demonstrations and robot operation videos*
-
-
 
 VITA 的核心架构围绕一个关键设计展开：**跨模态共享离散潜在空间**。该空间通过一个大小为 8192 的向量量化码本（Codebook）实现，使视觉感知嵌入与运动控制嵌入映射到同一离散表示域，从而在表示层面统一前向动力学（视觉预测）与逆向动力学（动作生成）。
 
@@ -249,13 +239,6 @@ VITA 的训练分为三个阶段，逐步建立跨模态对齐：
 
 消融实验证实，跳过预热直接共训会导致性能显著下降，验证了共享码本预热对跨模态表示对齐的必要性（Table 7）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2354_https_arxiv_org_abs_2511_19859/figures/002_Figure_2.jpg]]
-*Figure 2: Overview of the VITA framework. Utilizing the cross-modal alignment in ⃝1 , visual perception and motor control modalities are unified in the shared discrete latent space, where the dual-autoencoder architectures are illustrated in ⃝2 and ⃝3 . Benefiting from the representation alignment, the VLM backbone in ⃝4 generates dynamics-unified tokens via a hybrid attention mechanism. These tokens are decoded into future frames and robot actions, as Internal CoT*
-
-
-
 ## 实验与关键发现
 
 ### 核心性能：跨基准全面领先
@@ -285,9 +268,6 @@ VITA 在五个主流机器人操纵基准上均取得最优或接近最优的结
 
 Table 9 报告了 VITA 在不同未来帧预测数（12/24/48 帧）下的推理延迟。单步推理仅需 60–71 ms，动作级吞吐接近 60 Hz。关键设计在于：**推理时仅使用动作解码器，视觉解码器可完全丢弃**，未来帧预测仅在训练时作为归纳偏置参与损失函数。这保证了 VITA 在部署时不会因额外的视觉生成而增加延迟。
 
-![[assets/figures/papers/paper_list_l2354_https_arxiv_org_abs_2511_19859/figures/013_Table_9.jpg]]
-*Table 9: We report the model’s inference latency (ms) under different predicted future frame horizons*
-
 ### 失败模式与局限性
 
 尽管 VITA 在多基准上表现优异，分析揭示了以下结构性问题：
@@ -308,17 +288,11 @@ Table 9 报告了 VITA 在不同未来帧预测数（12/24/48 帧）下的推理
 - **Table 7（训练策略消融）**：三阶段渐近训练各阶段均不可或缺，预热阶段对码本对齐至关重要。
 - **Table 9（推理延迟）**：单步 60–71 ms，视觉解码器可丢弃，实时性不受影响。
 
-![[assets/figures/papers/paper_list_l2354_https_arxiv_org_abs_2511_19859/figures/003_Table_1.jpg]]
-*Table 1: Results on CALVIN ABC-D. We report The average number of tasks completed after executing 5 consecutive instructions over 1,000 evaluation rollouts*
-
 ![[assets/figures/papers/paper_list_l2354_https_arxiv_org_abs_2511_19859/figures/005_Table_2.jpg]]
 *Table 2: Performance comparison of VITA and baseline models on the LIBERO simulations*
 
 ![[assets/figures/papers/paper_list_l2354_https_arxiv_org_abs_2511_19859/figures/007_Table_3.jpg]]
 *Table 3: Performance evaluation of VITA and baselines on the SimplerEnv-GoogleRobot benchmark (visual matching)*
-
-![[assets/figures/papers/paper_list_l2354_https_arxiv_org_abs_2511_19859/figures/006_Table_5.jpg]]
-*Table 5: Real-World Evaluation Results. For each model, we report the average success rate over 1,000 rollouts, where the top four are ID tasks, and bottom two are OOD tasks*
 
 ![[assets/figures/papers/paper_list_l2354_https_arxiv_org_abs_2511_19859/figures/008_Table_6.jpg]]
 *Table 6: Performance comparison of various chain-of-thought strategies in simulated environments*
@@ -326,18 +300,8 @@ Table 9 报告了 VITA 在不同未来帧预测数（12/24/48 帧）下的推理
 ![[assets/figures/papers/paper_list_l2354_https_arxiv_org_abs_2511_19859/figures/012_Table_7.jpg]]
 *Table 7: Performance comparison of various training strategies*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2354_https_arxiv_org_abs_2511_19859/figures/004_Table_4.jpg]]
-*Table 4: Performance evaluation of VITA and existing baseline models on the SimplerEnv-WidowX benchmark*
-
-![[assets/figures/papers/paper_list_l2354_https_arxiv_org_abs_2511_19859/figures/010_Table_8.jpg]]
-*Table 8: Further experiments in simulated environment to evaluate model data and training efficiency*
-
 ![[assets/figures/papers/paper_list_l2354_https_arxiv_org_abs_2511_19859/figures/009_Figure_3.jpg]]
 *Figure 3: Visualization of the “contextual reasoning and color matching” in the real world*
-
-
 
 ## 定位与知识库关联
 
@@ -387,8 +351,6 @@ VITA处于VLA研究的交汇地带——既继承了视频预测增强策略的�
 - **视觉与文本思维链的协同融合**：如何实现V‑CoT与T‑CoT的充分协同推理？当前设计是“串联式”的（先文本CoT，再跨模态CoT），未来可探索交叉注意力、联合推理或规划‑执行交替的架构，使语言理解直接参与视觉动态推理，反之亦然。
 
 此外，从知识库视角看，VITA的共享离散潜在空间设计在概念上与多模态基础模型中的“统一词汇表”思路（如将视觉、语言、动作均视为token）一脉相承，但其三阶段渐近训练策略（预热→共训→微调）为跨模态码本学习提供了可操作的工程范式。消融实验表明，跳过预热阶段直接共训会导致性能显著下降（Table 7），验证了独立预训练码本对于后续联合学习的必要性——这一发现对相关领域（如视频‑语言预训练、多模态具身智能）具有借鉴意义。
-
-
 
 ## 原文 PDF
 

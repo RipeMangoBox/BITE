@@ -51,8 +51,6 @@ claims:
 
 **主要结果**：ReMoRa 在 LongVideoBench（60.8）、NExT-QA（84.2）、MLVU（72.1）三项长视频理解基准上均取得最高分数，五项基准平均分 69.8，超越最强基线 **BIMBA** 和 **LLaVA-Video**（Zhang et al., arXiv 2024）约 0.9 分。消融实验证实，去除 RMR 模块或光流预训练会导致性能持续下降，而 HMSS 的结构化时间聚合显著优于简单的交叉注意力或相加融合，验证了压缩域运动精细化与分层时序建模的有效性。
 
-
-
 ### 长视频理解的效率瓶颈
 
 多模态大语言模型（MLLM）在视频理解领域取得了显著进展，但现有方法普遍采用均匀采样 RGB 帧序列作为输入表示。这一范式在处理长视频时面临根本性的效率困境：自注意力机制的计算复杂度随序列长度呈二次增长，导致完整帧序列的处理成本极高。与此同时，视频帧间存在大量时间冗余，密集解码全部 RGB 帧不仅浪费计算资源，更限制了模型对长程时间依赖的建模能力。
@@ -76,8 +74,6 @@ $$\mathbf{m}^{(k,t)}(u,v) = \mathbf{P}^{(k',t')}(u',v') - \mathbf{P}^{(k,t)}(u,v
 ### 本文动机
 
 基于上述分析，本文提出 ReMoRa——一种直接在压缩视频表示上运行的多模态大语言模型。其核心动机在于：利用编解码器天然的关键帧-运动分离结构，通过精细化运动表示模块（RMR）弥合块级运动向量与密集光流之间的保真度鸿沟，并借助层次化运动状态空间模块（HMSS）以线性时间复杂度实现跨 GOP 的长程依赖建模，从而在密集时间覆盖与计算效率之间取得突破性平衡。
-
-
 
 ## 核心方法与创新机理
 
@@ -117,8 +113,6 @@ $$\pmb{H} = \mathrm{SSM}_{\mathrm{global}}\left([\pmb{Z}_1^{(0)}; \pmb{Z}_1^{(1)
 
 三个 changed slots 并非独立改进，而是形成因果链条：压缩 GOP 输入（slot 1）使得线性复杂度的时间建模成为可能（slot 2），而块级运动向量的低质量又迫使引入 RMR 精化模块（slot 3）以保证运动信号的保真度。这一耦合使得 ReMoRa 在 LongVideoBench（60.8）、NExT-QA（84.2）、MLVU（72.1）三项长视频基准上均取得最高得分，五基准平均分 69.8 超越所有基线模型。
 
-
-
 ReMoRa 的核心设计理念是将长视频理解从高冗余的 RGB 像素空间迁移到天然解耦的压缩域。传统视频 MLLM 对完整 RGB 帧序列进行均匀采样，其自注意力复杂度随帧数呈二次增长，导致长视频建模的计算代价极高且信息高度冗余。ReMoRa 直接利用压缩视频码流的结构化特性，将视频表示为一组 **GOP (Group of Pictures)** 的序列，每个 GOP 由一个 I 帧（关键帧）和若干 P/B 帧的运动向量场构成。I 帧负责提供稀疏但完整的外观信息，运动向量则以极低的存储代价承载帧间的密集时间动态。这种输入表示从根本上改变了信息流：外观与运动在输入端即被分离，使得模型可以分别对二者进行高效编码与融合。
 
 整个 pipeline 由四个核心模块串联构成，如 Figure 2 所示：
@@ -132,10 +126,6 @@ ReMoRa 的核心设计理念是将长视频理解从高冗余的 RGB 像素空�
 4. **Pretrained LLM**：以 Qwen2 为基础语言模型，接收 HMSS 输出的视频特征 $\mathbf{H}$ 与文本指令 $x_{\mathrm{txt}}$，通过自回归方式逐 token 预测答案 $\hat{y}_n$。
 
 整个框架的信息流可概括为：**压缩视频 → 外观/运动解耦编码 → 运动精炼 → 分层时序融合 → 多模态文本生成**。这种设计使得 ReMoRa 在保持密集时间覆盖（64 个 I 帧及其关联运动向量）的同时，显著降低了计算开销，实现了长视频理解的线性复杂度推理。
-
-
-
-
 
 ### 压缩视频表示与输入构建
 
@@ -199,13 +189,6 @@ $$
 ![[assets/figures/papers/paper_list_l981_https_arxiv_org_abs_2602_16412/figures/008_Table_5.jpg]]
 *Table 5: Ablation study on the GOP aggregation strategy. Model (a) outperforms variants that rely on simple cross-attention (h) or naive additive fusion (i) on both benchmarks, highlighting the importance of structured temporal modeling for GOP integration*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l981_https_arxiv_org_abs_2602_16412/figures/013_Figure_5.jpg]]
-*Figure 5: Example of scene-aware video preprocessing. Frames 0 and 18 are scene-adaptive I-frames used as keyframes, and the remaining frames are P/B-frames with overlaid codec motion vectors*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -237,9 +220,6 @@ Figure 4 进一步展示了 LongVideoBench 上的定性比较。ReMoRa 成功整
 
 Table 3 报告了采样和帧选择策略的消融结果。使用 **CVR 感知的 64 个 I 帧选择**（配置 a）取得最佳性能。减少 I 帧数量导致性能下降，尤其在 VideoMME 上退化明显，表明充分的时间覆盖对长视频理解至关重要。简单均匀采样（配置 d）得分低于 CVR 感知选择，验证了压缩域场景自适应采样策略的有效性——编解码器结构天然标识了信息量高的关键帧位置，利用这一先验比均匀采样更有效。
 
-![[assets/figures/papers/paper_list_l981_https_arxiv_org_abs_2602_16412/figures/006_Table_3.jpg]]
-*Table 3: Ablation study on sampling and frame selection strategies. Using our Compressed Video Representation (CVR)-aware selection of 64 I-frames (a) achieved the best performance. Reducing the number of I-frames degrades results, especially on VideoMME, indicating the importance of sufficient temporal coverage. Simple uniform sampling (d) leads to lower scores, showing that our method is more effective than uniform sampling for long-video understanding*
-
 #### 精细化运动表示模块
 
 Table 4 针对 RMR 模块进行了消融。去除基于光流的预训练（配置 f）或完全移除 RMR 模块（配置 g）均导致性能持续下降。这一结果确立了 RMR 模块的因果作用：原始块级运动向量噪声大、分辨率低，直接使用会损害时间理解；经过光流预训练的 RMR 模块能将其精化为接近密集光流保真度的表示，从而在保持计算效率的同时提升运动质量。
@@ -252,9 +232,6 @@ Table 5 比较了不同的 GOP 聚合策略。基于 HMSS 的结构化时间建�
 
 Table 6 报告了吞吐量和峰值 GPU 内存使用。ReMoRa 的每秒样本数和每秒 token 数与 **BIMBA** 相当，内存占用也处于同一水平；相比 **LLaVA-Video**，峰值内存使用减少了一半以上。这一效率优势源于两个设计选择：压缩域输入避免了完整 RGB 帧解码，以及基于 Mamba 的状态空间模型将时间建模复杂度从自注意力的二次级降为线性级。
 
-![[assets/figures/papers/paper_list_l981_https_arxiv_org_abs_2602_16412/figures/009_Table_6.jpg]]
-*Table 6: Throughput and peak GPU memory usage for different video MLLMs. ReMoRa achieves comparable samples per second and tokens per second throughput to BIMBA while matching its memory footprint, and it reduces peak memory usage by more than half compared with LLaVA-Video. Note that max memory is in GB*
-
 ### 错误模式分析
 
 Table 8 基于 NExT-QA 上 ReMoRa 失败而 LLaVA-Video 成功的 50 个随机采样案例，对 67 个标注错误实例进行了分类。主要失败模式包括：
@@ -265,8 +242,6 @@ Table 8 基于 NExT-QA 上 ReMoRa 失败而 LLaVA-Video 成功的 50 个随机�
 - **标注错误**：部分基准样本存在不正确或不一致的标注，导致合理预测被计入错误。
 
 这些失败模式指向了当前方法的边界：压缩域运动向量虽然高效，但在需要精确空间定位和极细粒度运动辨识的场景中，信息量仍不及全解码 RGB 帧。
-
-
 
 ## 定位与知识库关联
 
@@ -320,8 +295,6 @@ ReMoRa 揭示了压缩域视频理解的潜力，但也留下了若干待解决�
 4. **残差信息利用**：能否结合编解码器残差信息进一步提升压缩域运动表示的保真度？当前方法仅利用运动向量，而忽略了预测残差中可能蕴含的补充信息。
 
 **手动验证提示**：上述局限和开放问题的部分论述基于论文中有限的错误分析样本（67 例），其统计显著性和泛化性需进一步验证。具体基线工作的完整元数据（如 BIMBA 的作者/会议/年份）在提供的分析材料中缺失，建议查阅原始论文补充。
-
-
 
 ## 原文 PDF
 

@@ -62,8 +62,6 @@ claims:
 
 **局限与开放问题**：ASR 尚未接近 100%，反映了视觉定位任务中未见对象和描述的固有挑战；在复杂 UI 定位场景（ShowUI）上效果相对较低；极端低毒化率、黑盒场景、跨任务泛化及有效防御方法仍有待探索。
 
-
-
 视觉定位（Visual Grounding）是视觉语言模型（VLM）的核心能力之一，要求模型根据自然语言查询在图像中精确定位目标对象。随着VLM在具身智能、自动驾驶、UI交互等安全敏感场景中的广泛部署，其后门安全风险日益凸显。然而，现有VLM后门攻击研究存在根本性瓶颈。
 
 **核心瓶颈：静态触发与固定目标无法应对动态定位需求。** 当前VLM后门攻击多采用静态触发器（如固定像素块）或预定义固定攻击目标，这在视觉定位任务中面临双重困境：（1）攻击目标需随输入图像动态变化——不同图像包含不同对象，固定目标无法泛化至未见场景；（2）用户查询与攻击目标之间的语义冲突需要精确控制——模型需在忽略用户查询的同时，将定位输出精确指向攻击者指定的任意对象。现有方法缺乏对这种动态、语义可控性的细粒度建模能力。
@@ -71,8 +69,6 @@ claims:
 **现有方法缺口。** 图像分类领域的输入感知后门（如**Imperio**，Wang et al.，线性映射器；**Marksman**，Xu et al.，浅层条件自编码器）虽能生成自适应触发器，但其生成能力受限于浅层架构，难以同时捕捉全局上下文与细粒度视觉细节。专门针对VLM的静态后门攻击（如BadVLMDriver、TrojVLM、VLOOD）则因触发器固定，在定位任务上的攻击成功率远低于IAG（差距≥20个百分点），且执行时间约10倍。多目标后门攻击**One-to-N**（Li et al.）虽支持多目标，但无法处理未见目标，且缺乏对语义对齐的显式建模。
 
 **本文动机。** 为填补上述缺口，本文提出**IAG（Input-aware Backdoor Attack）**，核心思路是：通过在图像中注入不可感知的目标语义线索，利用文本条件化的U-Net与VLM联合训练，精确操纵VLM的定位输出以指向任意指定对象，同时保持对干净样本的性能不变。具体而言，IAG采用文本条件化U-Net作为触发器生成器，将攻击目标的文本描述作为语义条件，生成输入感知的自适应触发器；通过联合优化语言模型损失与图像重建损失，实现攻击效果、良性性能与不可察觉性的三重平衡。
-
-
 
 ## 核心方法与创新机理
 
@@ -119,8 +115,6 @@ $$\Delta_{\theta}^{\mathrm{atk}}(x,q,o) \geq \Delta_{\theta}(x,q) + m \varepsilo
 
 当$m\varepsilon\gamma \geq C\varepsilon^2 + \Delta_{\max}$时攻击成功。该分析揭示了攻击效果取决于扰动幅度$\varepsilon$与VLM对触发线索的敏感度$m$之间的乘积关系，为理解文本条件化生成器为何有效提供了理论支撑：生成器通过将攻击目标语义编码为结构化扰动，增大了有效$m$值。
 
-
-
 IAG 的整体攻击流水线由两个核心阶段构成：**触发器生成**与**后门注入**，二者通过联合训练形成端到端的语义操控链路（Figure 2）。
 
 ![[assets/figures/papers/paper_list_l757_https_arxiv_org_abs_2508_09456/figures/002_Figure_2.jpg]]
@@ -157,8 +151,6 @@ IAG 的整体攻击流水线由两个核心阶段构成：**触发器生成**与
 - **重建损失约束不可察觉性**：`L_rec = α₁·L_pix + α₂·L_LPIPS`（Eq. (3)），其中 `α₁=1, α₂=0.05`。该损失在联合训练中与语言模型损失加权求和（β=0.5），使毒化图像在像素级（PSNR 31–32 dB）和感知级（LPIPS < 0.05）均保持高保真度（Table 2），同时不牺牲攻击效果。
 
 - **毒化数据构造策略**：从数据集中随机采样 α 比例（默认 5%）的图像，对每张图像随机选取一个标注对象作为攻击目标，构造三元组 `{用户查询, 攻击目标描述, 攻击目标定位答案}`。用户查询来自同一图像的另一对象，确保 VLM 必须学会忽略查询语义、仅依赖触发器来定位攻击目标（Section 3.5）。
-
-
 
 ### 3.1 攻击目标形式化
 
@@ -244,8 +236,6 @@ $$
 
 这一构造策略确保了攻击目标可以是图像中的任意对象（包括用户查询未提及的对象），实现了"无视用户查询，定位任意指定目标"的攻击语义。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验结果
@@ -305,30 +295,8 @@ IAG在5个数据集、3个VLM架构的12个设定中，于11个设定上取得�
 4. **毒化率依赖**：尽管1%毒化率下ASR仅小幅下降，但在更低毒化率或黑盒场景下的效果仍需验证。
 5. **跨任务泛化**：对VQA任务的迁移性已初步验证（**Table 14**），但更广泛的跨任务攻击能力尚未充分探索。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l757_https_arxiv_org_abs_2508_09456/figures/007_Table_3.jpg]]
 *Table 3: Ablation study. ‘A’ and ‘B’ refer to ASR@0.5 and BA@0.5. Experiments use InternVL-2.5-8B and validation sets*
-
-![[assets/figures/papers/paper_list_l757_https_arxiv_org_abs_2508_09456/figures/004_Table_2.jpg]]
-*Table 2: Evaluation of unnoticeability. We evaluate IAG w/ or w/o*
-
-![[assets/figures/papers/paper_list_l757_https_arxiv_org_abs_2508_09456/figures/006_Table_5.jpg]]
-*Table 5: Evaluation of potential defense methods. ‘A’ and ‘B’ refer to ASR@0.5 and BA@0.5. Blue ones are detection-based methods and red ones are adaptive defense methods*
-
-![[assets/figures/papers/paper_list_l757_https_arxiv_org_abs_2508_09456/figures/009_Figure_4.jpg]]
-*Figure 4: ASR@0.5 under different poison rates. Values are in %*
-
-![[assets/figures/papers/paper_list_l757_https_arxiv_org_abs_2508_09456/figures/019_Figure_5.jpg]]
-*Figure 5: Inference time consumption of backdoored VLMs*
-
-![[assets/figures/papers/paper_list_l757_https_arxiv_org_abs_2508_09456/figures/008_Figure_3.jpg]]
-*Figure 3: Case studies of our method. Four images are one group ((a), (b), (c), (d) from top-left to bottom-right). From left to right in one group: original image, poisoned image without*
-
-![[assets/figures/papers/paper_list_l757_https_arxiv_org_abs_2508_09456/figures/018_Table_11.jpg]]
-*Table 11: Comparison of IAG with static backdoor attacks specifically designed for VLMs. We maintain the settings from Table 3 and*
-
-
 
 ## 定位与知识库关联
 
@@ -377,8 +345,6 @@ IAG 的方法论贡献可归结为三个层面的创新：
 3. **更广泛的模型与任务覆盖。** 该方法在闭源 VLM（如 GPT-4o）和更多下游任务（如具身智能、自动驾驶）中的风险尚待评估。
 4. **通用攻击注入模块。** 触发器生成器是否可与原始图像语义解耦，形成任务无关的“攻击注入”模块，进一步提升跨模型、跨任务的迁移性？
 5. **现实场景中的威胁发现与防护。** 在无监督或少量标注的现实部署环境中，如何自动发现并防御此类后门威胁？
-
-
 
 ## 原文 PDF
 

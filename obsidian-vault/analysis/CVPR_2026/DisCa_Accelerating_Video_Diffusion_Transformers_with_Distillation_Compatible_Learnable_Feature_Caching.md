@@ -55,8 +55,6 @@ claims:
 
 在HunyuanVideo 1.0文本到视频任务上，DisCa以**11.8×加速比**将VBench总分维持在78.8（原始50步模型为79.9，仅下降1.1%），同时峰值VRAM仅为97.64 GB，额外显存开销仅约0.4 GB。消融实验表明，去除Restricted MeanFlow导致语义分下降5.9%，去除GAN训练导致语义分下降1.2%，验证了各组件的独立贡献。方法在HunyuanVideo 1.5图像到视频任务上同样表现出一致的加速与质量保持能力。
 
-
-
 ### 视频扩散模型加速的现状与瓶颈
 
 视频扩散Transformer（DiT）在文本/图像到视频生成任务中展现出卓越的质量，但其多步迭代去噪过程导致推理延迟极高。以混元视频模型（HunyuanVideo 1.0）为例，生成一段视频需执行50次完整DiT前向推理，峰值显存占用超过130 GB，严重制约了实际部署。为缓解这一问题，学术界与工业界主要沿两条技术路线推进：**步蒸馏**与**特征缓存**。
@@ -81,8 +79,6 @@ claims:
 2. **受限MeanFlow蒸馏**：通过剪枝高压缩比训练区间，将蒸馏时间间隔约束在 $T \in [0, \mathcal{R}]$（$\mathcal{R} \in (0,1)$），使模型专注于学习局部平均速度，抑制长距离外推引发的发散与伪影。
 
 两条技术路线的协同使DisCa首次实现了蒸馏与缓存机制的高效兼容，在11.8×加速比下仍保持与原始50步模型接近的生成质量，为视频扩散模型的实用化部署提供了新的技术范式。
-
-
 
 ## 核心方法与创新机理
 
@@ -132,8 +128,6 @@ $$
 
 综上，DisCa 的创新并非单一技术的堆叠，而是通过**可学习预测器**与**保守蒸馏策略**的协同设计，在方法层面首次打通了“先蒸馏、再缓存”的加速路径，为视频扩散 Transformer 的高效推理提供了新的范式。
 
-
-
 DisCa（Distillation-Compatible Learnable Feature Caching）的整体设计围绕一个核心矛盾展开：步蒸馏在将视频扩散Transformer的采样步数从50步压缩至10步甚至更少时，相邻时间步之间的特征演化差异急剧增大，导致传统训练无关的启发式缓存策略（如直接复用、线性/泰勒外推）严重失效（Figure 1）。为解决这一问题，DisCa将训练无关的特征缓存升级为可学习范式，同时改进蒸馏策略以抑制长序列视频模型中的数值发散与生成伪影，首次实现了蒸馏与缓存机制的高效协同。
 
 ### 框架总览
@@ -176,12 +170,8 @@ $$\mathcal{L}_{\mathcal{P}} = \mathbb{E}[\|\mathcal{M}_{\theta_M} - \mathcal{P}_
 
 **推理阶段**：采用周期性全量计算策略。每 $N$ 步执行一次完整的DiT前向传播以刷新缓存，中间 $N-1$ 步由预测器快速推理。当 $N=4$、$\mathcal{R}=0.2$ 时，DisCa实现了11.8×的实际加速比，VBench总分仅从原始50步的79.9降至78.8（-1.1%），语义分从73.5降至69.3（-5.7%），在加速比与质量保持之间取得了最优权衡（Table 2）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l858_https_arxiv_org_abs_2602_05449/figures/002_Figure_2.jpg]]
 *Figure 2: An overview of Distillation-Compatible Learnable Feature Caching (DisCa). (a) The inference procedure under the proposed Learnable Feature Caching framework. The lightweight Predictor P performs multi-step fast inference after a single computation pass through the large-scale DiT M. (b) The training process of Predictor. The cache, initialized by the DiT, is fed into the Predictor as part of the input. The outputs of the Predictor and DiT are passed to the discriminator D, alternating between the objectives of maximizing and minimizing*
-
-
 
 DisCa 围绕两个核心模块展开：**Restricted MeanFlow 蒸馏**与**可学习特征缓存预测器**。前者通过约束蒸馏的时间间隔来稳定高度压缩的步蒸馏模型，后者则利用轻量级神经网络替代传统训练无关的启发式缓存策略，在蒸馏后的稀疏采样轨迹上实现精准的特征预测。
 
@@ -206,9 +196,6 @@ $$
 ### 可学习特征缓存预测器
 
 传统特征缓存方法（如 $\Delta$-DiT、PAB、TeaCache、FORA、TaylorSeer）依赖训练无关的启发式策略——直接复用或线性/泰勒外推——这在未蒸馏模型上效果尚可，因为相邻时间步的特征差异较小。然而，步蒸馏使相邻时间步之间的特征演化差异显著增大（Figure 1），手工设计的预测函数无法准确捕获高维特征的运动趋势。
-
-![[assets/figures/papers/paper_list_l858_https_arxiv_org_abs_2602_05449/figures/001_Figure_1.jpg]]
-*Figure 1: Feature Caching on the diffusion sampling process w/ and w/o step-distillation. (a) Adjacent timesteps are similar under the undistilled models, allowing traditional caching with simple reuse/interpolation. (b) Significant inter-step differences cause traditional caching to fail; the proposed learnable predictor captures the high-dimensional feature evolution successfully*
 
 DisCa 引入一个**轻量级可学习神经网络预测器** $\mathcal{P}_{\theta_p}$ 来替代手工缓存公式。推理流程如下：
 
@@ -248,14 +235,9 @@ $$
 
 消融实验（Table 3）证实，去除 GAN 训练导致语义分下降约 **1.2%**，表明对抗训练对保持生成质量具有正向贡献。训练过程中鉴别器与预测器展现出稳定的对抗动态（Figure 5）。
 
-![[assets/figures/papers/paper_list_l858_https_arxiv_org_abs_2602_05449/figures/008_Figure_5.jpg]]
-*Figure 5: Loss curve during the Generative-Adversarial training process. The discriminator D and predictor P exhibit a stable adversarial dynamic, enhancing the generating capability*
-
 ### 内存高效单层缓存
 
 与部分方法需要缓存多层特征不同，DisCa 在推理过程中仅保留**最后一层的单个张量**作为缓存 $\mathcal{C}$。这一设计大幅降低了 VRAM 开销：实测数据显示 DisCa 的额外显存占用仅约 **0.4 GB**，而对比方法中 TaylorSeer 的峰值 VRAM 高达 130.7 GB（Table 7, Figure 7）。单层缓存策略在保持预测精度的同时，有效规避了多层缓存带来的显存与通信瓶颈。
-
-
 
 ## 实验与关键发现
 
@@ -273,9 +255,6 @@ Table 2 汇总了 HunyuanVideo 1.0 文本到视频（T2V）任务上各加速方
 ![[assets/figures/papers/paper_list_l858_https_arxiv_org_abs_2602_05449/figures/013_Table_7.jpg]]
 *Table 7: Comparison for the theoretical and actual acceleration of different methods on HunyuanVideo*
 
-![[assets/figures/papers/paper_list_l858_https_arxiv_org_abs_2602_05449/figures/012_Table_6.jpg]]
-*Table 6: Detailed break-down analysis for Semantic Score in Table 2*
-
 Figure 4 提供了高加速比下的可视化对比：先前方法在 10× 以上加速时出现明显畸变、模糊与语义错误，而 DisCa 在 11.8× 加速下仍保持高质量生成，验证了可学习预测器在稀疏轨迹上捕获特征演化的能力。
 
 ![[assets/figures/papers/paper_list_l858_https_arxiv_org_abs_2602_05449/figures/007_Figure_4.jpg]]
@@ -288,9 +267,6 @@ Table 1 定量评估了 Restricted MeanFlow 在不同 R 取值与步数下的性
 ![[assets/figures/papers/paper_list_l858_https_arxiv_org_abs_2602_05449/figures/003_Table_1.jpg]]
 *Table 1: Quantitative comparison on Restricted MeanFlow for HunyuanVideo on VBench*
 
-![[assets/figures/papers/paper_list_l858_https_arxiv_org_abs_2602_05449/figures/004_Figure_3.jpg]]
-*Figure 3: Qualitative Comparison for MeanFlow and the proposed Restrict MeanFlow. In the video generation scenarios for both 20 steps and 10 steps, the MeanFlow method exhibits noticeable distortion and artifacts. In contrast, the Restricted MeanFlow maintains high quality, as indicated by the metrics in Table 1*
-
 ![[assets/figures/papers/paper_list_l858_https_arxiv_org_abs_2602_05449/figures/006_Table_3.jpg]]
 *Table 3: Ablation study for Restrict MeanFlow, Learnbale Predictor and GAN Training in DisCa on HunyuanVideo*
 
@@ -300,23 +276,15 @@ Figure 3 的定性对比直观展示了差异：MeanFlow 在 20 步和 10 步设
 
 Table 3 同时量化了各模块的贡献：去除 GAN 训练导致 Semantic Score 下降约 **1.2%**，表明对抗训练对高频细节保真度的提升虽有限但不可忽略。Table 5 的消融实验揭示了 Predictor 与蒸馏的强耦合关系：Predictor 若在原始未蒸馏模型上训练，在低 NFE 下质量显著恶化（LPIPS 从 0.1942 升至 0.2498），说明可学习预测器必须针对蒸馏后的稀疏轨迹进行专门训练，无法即插即用。
 
-![[assets/figures/papers/paper_list_l858_https_arxiv_org_abs_2602_05449/figures/009_Table_5.jpg]]
-*Table 5: Ablation study for predictor w/ and w/o distillation*
-
 Figure 5 展示了 GAN 训练过程中的损失曲线，鉴别器与预测器展现出稳定的对抗动态，验证了训练设计的合理性。
 
 ### 显存效率与跨任务泛化
 
 Figure 7 的 VRAM 占用分析表明，DisCa 仅产生约 **0.4 GB** 的额外显存开销（峰值 97.64 GB），远低于 TaylorSeer 的 130.7 GB，这得益于其内存高效的单层缓存设计——仅缓存最后一层的单个张量，避免多层缓存带来的 VRAM 与通信开销。Table 4 将评估扩展到 HunyuanVideo 1.5 图像到视频（I2V）任务，DisCa 在该任务上同样保持领先，Figure 6 的用户研究进一步确认了主观偏好优势。
 
-![[assets/figures/papers/paper_list_l858_https_arxiv_org_abs_2602_05449/figures/014_Figure_7.jpg]]
-*Figure 7: VRAM Occupation analysis for different acceleration methods. The VRAM consumption among different caching methods varies significantly; the proposed DisCa incurs only about 0.4 GB of extra VRAM overhead, which is negligible*
-
 ### 失败模式与局限
 
 Table 6 的语义分子维度分解揭示了 DisCa 的主要短板：Scene 维度得分下降约 28.1%，表明复杂场景的语义保真度仍是瓶颈。此外，单帧感知指标（PSNR/SSIM）相对于原 50 步模型存在微小下降，部分纹理细节可能被弱化。这些失败模式指向两个改进方向：一是针对场景维度的专项优化，二是探索更高效的蒸馏或一致性模型以进一步挖掘加速潜力。
-
-
 
 ## 定位与知识库关联
 
@@ -369,8 +337,6 @@ DisCa 的另一个重要贡献在于**首次实现了蒸馏与缓存机制的高
 4. **多 GPU 通信优化**：在多 GPU 通信受限的环境下，单层缓存的设计是否仍能维持高效率？是否存在额外的通信瓶颈（如缓存张量的跨设备同步）需要优化？
 
 5. **更广泛的任务验证**：当前验证集中在 T2V 和 I2V 任务上，DisCa 在视频编辑、视频超分、长视频生成等更复杂的视频扩散任务上的有效性尚待验证。
-
-
 
 ## 原文 PDF
 

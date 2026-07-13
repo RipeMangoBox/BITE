@@ -51,8 +51,6 @@ claims:
 
 实验表明，DiffuView 在 Libero 和 MetaWorld 基准上显著优于现有方法：Libero 100 任务平均成功率达 92.2%，MetaWorld 50 任务平均成功率达 0.706。在专门设计的视角泛化测试 Mv-Bench 上，DiffuView 平均成功率达到 59.2%，远超 OpenVLA 的 39.3%，视角偏移下成功率提升近 20%。真实世界 4 项操作任务中，DiffuView 成功率为 0.65，优于 Diffusion Policy（0.51）和 OpenVLA（0.63）。消融实验进一步验证了机器人数据预训练、Plücker 光线嵌入和 FiLM 语言条件对性能的关键作用。
 
-
-
 ### 机器人操作中的视觉表征瓶颈
 
 机器人操作策略的性能高度依赖视觉表征的质量。当前主流的视觉预训练范式主要分为两类，但它们在面对多变视角和传感器配置时均暴露出根本性缺陷。
@@ -90,8 +88,6 @@ $$p _ { \theta } ( \hat { O } _ { j } \mid O _ { i } , P _ { i } , P _ { j } )$$
 与 MAE 的掩码重建和神经渲染的隐式3D提升不同，多视角扩散生成迫使网络在去噪过程中学习像素级的几何对应——因为只有正确推断源视图与目标视图之间的空间变换关系，才能生成几何一致的目标视图。一旦预训练完成，这个扩散UNet骨干便可作为3D感知的视觉编码器，仅需单次前向传播即可提取富含几何信息的特征，为下游扩散策略（如 **Diffusion Policy**，Reuss et al., RSS 2024）提供视角鲁棒的观测表征。
 
 这一设计实现了关键突破：**部署时仅需单视角观测，即可通过预训练学到的几何先验实现跨视角泛化**，从根本上解决了传统方法对固定相机配置的依赖。
-
-
 
 ## 核心方法与创新机理
 
@@ -134,16 +130,11 @@ $$p _ { \theta } ( \hat { O } _ { j } \mid O _ { i } , P _ { i } , P _ { j } )$$
 
 这些创新的协同效应在 Libero 100任务平均成功率92.2、MetaWorld 50任务平均成功率0.706 以及真实世界4任务平均成功率0.65 的结果中得到验证，其中机器人数据预训练、Plücker光线嵌入和FiLM语言条件被消融实验证明是性能的关键支柱。
 
-
-
 DiffuView 采用**两阶段训练范式**，将多视角扩散模型的几何推理能力迁移为机器人操作的视觉骨干。其核心设计思路是：先通过跨视角条件生成学习 3D 一致的视觉表示，再将预训练编码器嵌入扩散策略网络，实现视角鲁棒的动作预测。
 
 ### 阶段一：多视角扩散预训练
 
 第一阶段的目标是让模型学会在给定源视角观测和相机位姿的条件下生成目标视角图像。该过程不依赖显式 3D 重建，而是通过扩散模型隐式恢复场景几何并强制跨视角一致性。如图 Figure 2（左）所示，预训练编码器接收以下输入：
-
-![[assets/figures/papers/paper_list_l2187_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_DiffuView_Multi/figures/002_Figure_2.jpg]]
-*Figure 2: (Left) Stage 1: Multi-view diffusion pretraining reconstructs target views from source observations using Plucker rays, depth, ¨ and warped RGB depth pairs to learn 3D consistent latent features. (Right) Stage 2: The pretrained backbone serves as a 3D aware encoder; a FiLM conditioned Query Transformer (Q-Former) with CLIP text guidance produces task aware tokens that condition a Mixture of Denoising Experts (MoDE) diffusion policy. A noise token η(σt) modulates attention and drives a noise conditioned router that sparsely activates experts, enabling faster inference while maintaining denoising performance*
 
 - **源视角 RGB-D 图像** $I_i, D_i$，经 VAE 编码为潜变量 $z_{\text{source}}$；
 - **目标相机位姿下的仿射视图** $(\tilde{I}_{i \to j}, \tilde{D}_{i \to j})$，由源 RGB-D 通过重投影函数 Warp 变换得到（Eq. 4）；
@@ -167,12 +158,8 @@ DiffuView 采用**两阶段训练范式**，将多视角扩散模型的几何推
 
 DiffuView 的关键创新在于预训练模型在推理阶段承担**双重角色**：训练时作为固定特征提取器，推理时作为**视角自适应模块**。当部署视角与训练视角不一致时，模型利用多视角扩散预训练中习得的几何对应关系，将源视角观测隐式变换至目标视角，使策略在仅需单视角输入的情况下仍能保持鲁棒性。Figure 4 的实验结果表明，该机制在 −30° 至 60° 的视角偏移范围内均能有效维持操作一致性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2187_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_DiffuView_Multi/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of visual representation learning paradigms for robotic manipulation. (a) MAE based methods learn visual representations by reconstructing masked regions from observations. (b) 3D reconstruction methods lift 2D observation features into implicit 3D latent spaces through neural rendering. (c) Our method leverages a multi view diffusion model that learns 3D consistent and geometry aware representations by generating novel target views conditioned on source observations and camera poses, enabling unified and view robust visual understanding for downstream manipulation tasks*
-
-
 
 ### 阶段一：多视角扩散预训练
 
@@ -238,8 +225,6 @@ $$\mathcal { L } _ { \mathrm { p o l i c y } } = \mathbb { E } _ { ( \mathbf { a
 
 整个框架的核心模块形成清晰的因果链条：**Plücker 光线嵌入**提供像素级相机几何，使扩散 UNet 在预训练阶段学习精确的跨视角对应；**仿射 RGB-D 对**降低大视差下的生成难度，加速收敛；**Q-Former with FiLM** 将视觉特征与 CLIP 语言嵌入对齐，使下游策略能感知任务语义；**MoDE 扩散策略**通过噪声条件路由稀疏激活专家，在保持去噪质量的同时提升推理效率。消融实验（Table 5）定量验证了各模块的贡献：移除 Plücker 嵌入使成功率从 89.2 降至 76.2，移除 FiLM 条件降至 73.3，将 MoE 专家激活数从 Top-2 减为 Top-1 降至 87.7。
 
-
-
 ## 实验与关键发现
 
 ### 实验设置
@@ -283,22 +268,11 @@ DiffuView采用两阶段训练范式。预训练阶段，模型在约100个来�
 - DiffuView能否在更复杂的长期操作任务、多机器人协作或人机交互场景中保持视角鲁棒性？
 - 在不显著增加推理延迟的前提下，如何通过更轻量的注意力机制进一步提升视角自适应模块的效率？
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2187_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_DiffuView_Multi/figures/004_Table_1.jpg]]
 *Table 1: Quantitative results on Libero Benchmark*
 
 ![[assets/figures/papers/paper_list_l2187_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_DiffuView_Multi/figures/005_Table_2.jpg]]
 *Table 2: Quantitative results on MetaWorld Benchmark*
-
-![[assets/figures/papers/paper_list_l2187_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_DiffuView_Multi/figures/006_Table_3.jpg]]
-*Table 3: Mv-bench results*
-
-![[assets/figures/papers/paper_list_l2187_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_DiffuView_Multi/figures/007_Figure_4.jpg]]
-*Figure 4: This figure illustrates the effect of our pretrained model serving as a view-adaptive module. The results herein demonstrate that our approach competently handles view transformation within −30◦ ∼ 60◦*
-
-![[assets/figures/papers/paper_list_l2187_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_DiffuView_Multi/figures/008_Table_4.jpg]]
-*Table 4: Real world experiment results on success rate*
 
 ![[assets/figures/papers/paper_list_l2187_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_DiffuView_Multi/figures/009_Table_5.jpg]]
 *Table 5: Ablation Results*
@@ -306,13 +280,8 @@ DiffuView采用两阶段训练范式。预训练阶段，模型在约100个来�
 ![[assets/figures/papers/paper_list_l2187_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_DiffuView_Multi/figures/003_Figure_3.jpg]]
 *Figure 3: Simulation benchmarks. We conducted our experiments on two established benchmarks, LIBERO and MetaWorld, as shown in (a) and (b), respectively. These benchmarks collectively encompass a diverse array of manipulation tasks with varying levels of difficulty and complexity. Furthermore, we also conducted experiments on our self-formulated benchmark, Mv-Bench, which is specifically designed to evaluate the view adaptive capability of our method, as illustrated in (c)*
 
-![[assets/figures/papers/paper_list_l2187_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_DiffuView_Multi/figures/010_Figure_5.jpg]]
-*Figure 5: Successful rollouts of DiffuView (left) and real world set-up (right). The image illustrates the robotic arm performing various manipulation tasks, showcasing the real-time execution of the DiffuView model*
-
 ![[assets/figures/papers/paper_list_l2187_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_DiffuView_Multi/figures/012_Figure_7.jpg]]
 *Figure 7: Qualitative Results of Real-World Multi-View Diffusion*
-
-
 
 ## 定位与知识库关联
 
@@ -358,8 +327,6 @@ DiffuView的适用边界由以下约束定义：
 2. **复杂场景泛化**：DiffuView能否在长期操作任务、多机器人协作或人机交互场景中保持视角鲁棒性？当前评估局限于单臂操作，扩展到更复杂的交互场景需要验证。
 3. **推理效率优化**：在不显著增加推理延迟的前提下，能否通过更轻量的注意力机制或知识蒸馏进一步提升视角自适应模块的效率？
 4. **位姿鲁棒性**：当前框架假设精确的相机位姿；在位姿噪声较大或深度不可靠的条件下，性能衰减的定量特征和容错边界需要系统研究。
-
-
 
 ## 原文 PDF
 

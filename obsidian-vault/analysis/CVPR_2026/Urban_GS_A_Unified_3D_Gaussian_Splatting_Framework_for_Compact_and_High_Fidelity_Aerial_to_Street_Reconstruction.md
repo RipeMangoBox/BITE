@@ -55,8 +55,6 @@ claims:
 
 实验表明，在 Horizon-GS 数据集上，Urban-GS 相较于当前最优方法 **Horizon-GS** (Jiang et al., CVPR 2025)，在 Colosseum 场景上实现了 **+0.72 dB PSNR** 的提升，同时平均锚点数量减少 **41%**，渲染帧率亦显著提高。在 UC-GS 数据集上，Urban-GS 同样取得了 **+1.10 dB PSNR** 的增益。消融实验进一步验证了各模块的有效性：AJAD 使 PSNR 从 25.20 提升至 25.66；CAP 在几乎无损画质下将锚点数从 9713k 降至 2785k（减少约 71%）；GLO 则将 PSNR 进一步提升至 26.05，且锚点数降至 2682k。
 
-
-
 ### 任务场景：空地联合城市场景重建
 
 大尺度城市场景的数字化建模是自动驾驶、城市规划、虚拟现实等应用的基础技术。近年来，基于**3D Gaussian Splatting (3DGS)**（Kerbl et al., ACM TOG 2023）的显式辐射场表示方法凭借其高质量实时渲染能力受到广泛关注。然而，城市场景的重建面临一个独特挑战：数据采集通常包含**航拍视角**（俯瞰、全局覆盖）和**街道视角**（地面、局部细节）两类来源，两者在空间分辨率、覆盖范围和外观上存在巨大差异。如何在一个统一框架中同时利用这两种互补视角，实现高保真且存储高效的重建，是当前亟待解决的问题。
@@ -74,8 +72,6 @@ claims:
 ### 本文动机与核心思路
 
 针对上述问题，本文提出**Urban-GS**，一个统一的3D高斯泼溅框架，旨在实现紧凑且高保真的空地联合重建。核心洞察在于：**通过投影面积加权梯度实现跨尺度自适应的致密化**，消除梯度冲突；**通过贡献感知的掩码正则化**，在保留稀疏但局部重要锚点的同时有效剪枝冗余结构；**通过全局到局部的分阶段优化策略**，重点细化视图不稳定的欠优化区域。三者协同，在显著提升渲染质量的同时将锚点数量平均压缩41%。
-
-
 
 ## 核心方法与创新机理
 
@@ -96,8 +92,6 @@ Urban-GS 的 CAP 策略引入**贡献加权的掩码正则化** $L_m = \frac{1}{
 ### 创新三：全局到局部优化（GLO）—— 针对性细化欠优化区域
 
 空地数据的不平衡视角分布导致部分区域在全局训练中欠优化。Urban-GS 提出两阶段 GLO 策略：全局训练完成后，识别 PSNR 波动较大的不稳定视图，将与其锚点重叠率超过阈值 $\tau_{group}$ 的候选视图组成局部优化组（Eq. 12），冻结无关参数后进行针对性细化。Table 5 显示，添加 GLO 后 PSNR 进一步提升至 26.05，同时锚点数进一步降至 2682k，表明局部细化可在不增加额外锚点的情况下显著提升质量。Table 8 的对比消融显示，GLO 带来的 PSNR 增益（+0.55）远高于额外 20k 迭代统一采样的增益（+0.09），证明了针对性局部优化的有效性远超简单的增加训练量。
-
-
 
 Urban-GS 提出了一套面向空地联合城市场景重建的统一三维高斯泼溅框架，其核心目标是同时解决**空地视角间巨大的尺度差异导致的梯度冲突**以及**多尺度细节捕捉带来的锚点数量膨胀与存储开销**问题。框架采用两阶段流水线设计，整体结构如 **Figure 2** 所示。
 
@@ -120,8 +114,6 @@ Urban-GS 提出了一套面向空地联合城市场景重建的统一三维高�
 ### 输入输出流
 
 整体管线以空地联合采集的多视角图像及对应的 SfM 点云为输入，经过全局训练与局部细化两阶段处理后，输出一个紧凑的、支持跨尺度高保真新视角合成的 3D 高斯场表示。该表示可在街景与航拍视角下均提供优于基线方法的渲染质量，同时实现平均约 41% 的存储开销降低（**Table 3**）。
-
-
 
 Urban‑GS 围绕三个核心机制重构了空地联合重建的致密化、剪枝与优化流程：**空地联合自适应致密化 (AJAD)**、**贡献感知锚点剪枝 (CAP)** 与 **全局到局部优化 (GLO)**。它们共同解决空地视角间巨大的尺度差异所引发的梯度冲突、锚点膨胀与欠优化区域问题。
 
@@ -179,13 +171,6 @@ $$
 
 其中透明度掩码损失 $L_o$ 利用 2D 掩码抑制天空、车辆等动态对象区域的错误高斯，$L_m$ 即 CAP 的贡献加权掩码正则化。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2622_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Urban_GS_A_Unifie/figures/003_Figure_3.jpg]]
-*Figure 3: Average position gradient (a) and average projection radius (b) for two sets of neural Gaussians over the densification process. Left plots: Analysis of neural Gaussians that satisfy the densification criteria from aerial views only, but fail to densify under the merged (all-view) condition. Right plots: Analysis of the symmetric case for neural Gaussians that satisfy the criteria from street views only, but fail under the merged condition*
-
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈验证：空地视角梯度冲突
@@ -219,9 +204,6 @@ Table 5 系统展示了Urban-GS各核心模块的累积贡献。基线模型（B
 ![[assets/figures/papers/paper_list_l2622_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Urban_GS_A_Unifie/figures/005_Table_2.jpg]]
 *Table 2: Quantitative novel view rendering results comparison on Horizon-GS [10] dataset. The best performance of each part is in bold, while the scecond-best results are underlined*
 
-![[assets/figures/papers/paper_list_l2622_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Urban_GS_A_Unifie/figures/009_Table_4.jpg]]
-*Table 4: Quantitative comparison on UC-GS dataset [40]. The metric setting is extracted from the original papers*
-
 在存储效率方面（Table 3），Urban-GS的锚点数较Horizon-GS**平均减少41%**（约1801k vs. 3050k），同时渲染帧率更高（Colosseum场景83.3 FPS vs. 64.7 FPS），实现了**质量-存储-速度**的协同优化。定性对比（Figure 4, 5）显示，Urban-GS在航拍视角的屋顶结构、街拍视角的立面细节等跨尺度区域均表现出更清晰的几何保真度和纹理还原。
 
 ![[assets/figures/papers/paper_list_l2622_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Urban_GS_A_Unifie/figures/006_Table_3.jpg]]
@@ -233,17 +215,6 @@ Table 5 系统展示了Urban-GS各核心模块的累积贡献。基线模型（B
 ### 方法谱系与知识库定位
 
 Urban-GS继承并改进了结构化高斯表示的范式。其锚点生长机制源于**Scaffold-GS**（Lu et al., CVPR 2024）的层级锚点结构，但将致密化触发条件从均匀梯度改为投影面积加权梯度，以适配空地多尺度场景。掩码剪枝策略借鉴了**MaskGaussian**的全局稀疏正则化思想，但引入贡献感知权重，使剪枝从“全局均匀稀疏”转向“保留局部重要结构”。全局到局部优化策略与**UC-GS**（Zhang et al., arXiv 2024）的跨视角不确定性处理思路形成互补——后者通过不确定性建模指导优化，而Urban-GS通过PSNR波动直接识别欠优化视图进行分组细化。相较于**Horizon-GS**（Jiang et al., CVPR 2025）这一最直接的基线，Urban-GS在保持空地联合建模能力的同时，通过系统性的致密化-剪枝-优化协同设计，显著提升了渲染质量与存储效率。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2622_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Urban_GS_A_Unifie/figures/010_Table_7.jpg]]
-*Table 7: Detailed ablation study on the proposed Contributionbased Anchor Pruning. “Base” refers to the “+AJAD” results in Tab. 5, whereas “Global” denotes the supervision strategy used in MaskGaussian [17]*
-
-
-![[assets/figures/papers/paper_list_l2622_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Urban_GS_A_Unifie/figures/012_Table_6.jpg]]
-*Table 6: Comparison of different densification strategies. This experiment provides an extended analysis of the “+AJAD” results presented in Tab. 5. Here, “Base” refers to the original densification triggering strategy used in 3DGS*
-
-
 
 ## 定位与知识库关联
 
@@ -294,8 +265,6 @@ Urban-GS 的设计假设和适用边界可从以下几个方面理解：
 3. **与 NeRF-based 方法的对比缺失**：现有实验仅与 3DGS 系列方法对比，未纳入空地联合重建的 NeRF-based 方法（如 Urban-NeRF 系列），无法判断 Urban-GS 在渲染质量上的绝对上限。
 
 4. **实时渲染的端侧部署**：虽然 Table 3 显示 Urban-GS 的 FPS 优于 Horizon-GS（83.3 vs. 64.7），但论文未讨论在移动端或 Web 端的部署可行性与内存占用细节，这对于“紧凑重建”这一宣称的实际落地至关重要。
-
-
 
 ## 原文 PDF
 

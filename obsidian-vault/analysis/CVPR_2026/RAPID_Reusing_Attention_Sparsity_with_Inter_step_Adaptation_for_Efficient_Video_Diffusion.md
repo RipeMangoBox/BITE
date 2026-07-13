@@ -54,8 +54,6 @@ claims:
 
 在 Wan2.1-14B 和 HunyuanVideo 两个大规模视频扩散模型上的实验表明，在相同注意力密度预算下，RAPID 默认模式的生成质量显著优于最强基线方法（PSNR 提升高达 4.0），同时实现 1.53–1.73× 加速；Turbo 模式则进一步将加速比推至 1.79×（Wan2.1-14B）和 2.01×（HunyuanVideo），且保持有竞争力的视觉质量。该方法属于训练后加速技术，无需模型微调，可直接应用于现有视频 DiT 架构。
 
-
-
 ### 视频扩散模型的注意力瓶颈
 
 视频扩散模型的核心模块是 **3D 全注意力（3D self-attention）**，它对时空序列中的所有 token 两两计算注意力权重。对于一个长度为 $N$ 的时空 token 序列，标准注意力的计算复杂度为 $O(N^2)$。当生成高分辨率长视频时，$N$ 急剧膨胀，导致单次推理的注意力计算成本成为整个扩散过程的主导开销——例如，在 Wan2.1-14B 模型上，使用密集注意力生成一段视频的延迟可达 **66 分钟**（见 Teaser Figure）。这一二次复杂度瓶颈严重制约了视频扩散模型在实际应用中的部署效率。
@@ -83,8 +81,6 @@ RAPID 的动机源于对视频扩散过程中注意力行为的两项关键实�
 2. **早期掩码的高召回率与复用安全性**：以第 5 步为基准进行掩码复用性分析（**Figure 3**），使用公式 $\mathrm{Recall}(M_{base}, M_t) = \frac{|M_{base} \cap M_t|}{|M_t|}$ 衡量早期掩码 $M_{base}$ 对后续步骤 $M_t$ 重要块的覆盖率。结果显示，在整个生成过程中召回率始终保持在较高水平，为“一次性早期估计并在后续步骤中安全复用”提供了强有力的实证支撑。
 
 基于上述发现，RAPID 的核心动机得以确立：**将重要性评分与每步推理循环解耦**，通过在早期步骤进行一次性的注意力重要性估计并缓存分数与掩码，后续步骤直接复用缓存结果，从而在保持内容自适应性的同时消除重复计算开销。此外，利用密度需求递减的特性，可在后期阶段对缓存分数进行重新阈值化，实现更激进的剪枝，进一步释放加速潜力。
-
-
 
 ## 核心方法与创新机理
 
@@ -127,8 +123,6 @@ RAPID 的方法创新可归纳为三个层次：
 
 这三个层次的创新协同作用，使得 RAPID 在相同的注意力密度预算下，质量显著优于最强基线方法（PSNR 提升高达 4.0），同时 Turbo 模式在 Wan2.1-14B 上实现 1.79× 加速、在 HunyuanVideo 上实现 2.01× 加速。
 
-
-
 RAPID 框架的核心思想是将重要性评分从逐步推理循环中解耦，通过“一次性估计—缓存—复用”的范式替代传统动态稀疏注意力方法中每步重新计算掩码的冗余开销。如图 4 所示，整个推理流程分为三个明确阶段：
 
 ### 1. 预热阶段（Warm-up Phase）
@@ -159,12 +153,8 @@ RAPID 框架的核心思想是将重要性评分从逐步推理循环中解耦�
 - **输出**：经稀疏注意力计算后的特征表示，计算方式为 $\mathrm{Attn}_{\mathrm{sparse}}(Q, K, V) = \mathrm{softmax}\left(\frac{QK^\top}{\sqrt{d}} \odot M'\right) V$，其中 $M'$ 为由缓存掩码导出的二值遮蔽矩阵（$M'_{ij} = 0$ 表示保留，$M'_{ij} = -\infty$ 表示丢弃）。
 - **缓存状态**：块级重要性分数矩阵与基础掩码 $M_{base}$ 在评分阶段写入，复用阶段只读，无需额外计算。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l915_https_openaccess_thecvf_com_content_CVPR2026_html_Lin_RAPID_Reusing_Atte/figures/004_Figure_4.jpg]]
 *Figure 4: The RAPID framework accelerates inference via a multi-stage strategy. First, at the end of the warmup phase, it computes and caches a base mask and per-block importance scores derived from attention weights. This mask is then reused throughout generation, while the scores are leveraged to activate a more aggressive block pruning in later, less critical steps for maximum speed*
-
-
 
 ### 3.1 稀疏注意力的形式化与核心挑战
 
@@ -241,8 +231,6 @@ RAPID 的行为由以下核心超参数调控：
 
 敏感性分析表明：预热比例 $T_w$ 在 10%-25% 区间内可有效平衡加速与质量，延长预热超过 25% 后边际收益递减（Figure 5）；阈值 $\tau = 0.6$ 在与 SOTA 基线相似的计算密度下实现最优质量（Figure 6）。当前这些超参数依赖人工调优，缺乏自动学习或自适应调度的能力，这是 RAPID 的一个显式局限。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -280,21 +268,11 @@ RAPID 在两个主流视频扩散模型 **Wan2.1-14B** 和 **HunyuanVideo** 上�
 ![[assets/figures/papers/paper_list_l915_https_openaccess_thecvf_com_content_CVPR2026_html_Lin_RAPID_Reusing_Atte/figures/005_Table_1.jpg]]
 *Table 1: Quantitative results at the default video length over VBench-2.0. Our method significantly outperforms strong baselines on PSNR, SSIM, and LPIPS metrics under a comparable attention density. Furthermore, our Turbo sparse mode accelerates inference by 1.79× on Wan2.1-14B and 2.01× on HunyuanVideo using a single NVIDIA A100 GPU, while maintaining competitive quality*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l915_https_openaccess_thecvf_com_content_CVPR2026_html_Lin_RAPID_Reusing_Atte/figures/006_Table_2.jpg]]
 *Table 2: Ablation on Block Selection mechanisms across different attention densities, evaluated on Wan2.1-14B. Our combined Top-K + Top-p strategy consistently outperforms individual methods*
 
 ![[assets/figures/papers/paper_list_l915_https_openaccess_thecvf_com_content_CVPR2026_html_Lin_RAPID_Reusing_Atte/figures/008_Figure_5.jpg]]
 *Figure 5: Sensitivity of generation quality to warm-up duration on Wan2.1-14B. While quality improves with longer warm-ups, the rate of improvement diminishes*
-
-![[assets/figures/papers/paper_list_l915_https_openaccess_thecvf_com_content_CVPR2026_html_Lin_RAPID_Reusing_Atte/figures/007_Figure_6.jpg]]
-*Figure 6: Sensitivity analysis of the threshold τ for the*
-
-![[assets/figures/papers/paper_list_l915_https_openaccess_thecvf_com_content_CVPR2026_html_Lin_RAPID_Reusing_Atte/figures/001_Figure.jpg]]
-*Figure: Dense Attention | Latency = 66 min*
-
-
 
 ## 定位与知识库关联
 
@@ -328,8 +306,6 @@ RAPID 通过**一次性早期估计与缓存复用**机制，同时获得了动�
 1. **可学习的稀疏度调度器**。能否利用缓存的重要性分数设计可学习的稀疏度调度器，使阈值 τ 或 k_min 随去噪步动态衰减以进一步提升效率？这需要解决“如何在无额外密集注意力监督的情况下学习调度策略”的问题。
 2. **跨注意力类型的扩展**。若将一次性评分与缓存的思想扩展到其他注意力类型（如交叉注意力），或结合量化/蒸馏，能否取得更大的累积加速？交叉注意力的稀疏模式可能具有不同的时间稳定性特征，需要独立分析。
 3. **Turbo 模式的质量-加速权衡自动化**。当前 Turbo 模式的触发步和剪枝强度依赖人工设定，能否基于缓存分数的统计特征（如方差、衰减率）自动决定何时以及如何进行更激进的剪枝？
-
-
 
 ## 原文 PDF
 

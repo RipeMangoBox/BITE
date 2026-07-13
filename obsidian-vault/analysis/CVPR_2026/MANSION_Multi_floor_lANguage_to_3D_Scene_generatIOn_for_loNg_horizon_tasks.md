@@ -68,8 +68,6 @@ claims:
 
 在方法谱系中，MANSION区别于纯数据驱动的扩散方法（如ChatHouseDiffusion）、基于LLM的单层布局方法（如Holodeck、LayoutGPT）以及基于图的平面图生成方法（如Graph2Plan）。其训练无关的混合架构和垂直结构支持使其成为当前唯一能够从自然语言直接生成建筑尺度多楼层3D场景的框架，同时也为跨楼层具身智能研究提供了首个大规模的标准化测试平台。
 
-
-
 ### 具身智能的场景瓶颈：从单层走向建筑尺度
 
 具身智能的快速发展对训练和评估环境提出了越来越高的要求。然而，现有具身智能基准和场景资源几乎全部局限于单层室内环境——无论是家庭住宅、办公室还是实验室空间，代理只需在同一平面内完成导航和操作。这种设计隐含地回避了一个关键挑战：**真实世界的任务往往跨越多个楼层**，要求代理在垂直维度上进行空间推理、路径规划和长期记忆。
@@ -96,8 +94,6 @@ MANSION 的核心洞察在于：**通过将多模态大语言模型（MLLM）用
 - **任务语义的场景编辑**：引入独立的场景编辑代理，以“检查-准备”回路的方式验证并修改场景，确保其满足目标任务的可执行性前提。
 
 这种**语义与几何解耦的混合架构**是 MANSION 区别于纯数据驱动方法和纯规则方法的关键设计选择。数据驱动方法（如扩散模型）虽然在已知分布上表现优异，但缺乏对垂直约束的显式建模能力，且在分布外场景（如医院）上泛化能力不足；纯规则方法则无法处理开放词汇的语义多样性。MANSION 的混合路径在语义灵活性和几何可靠性之间取得了平衡，为建筑尺度的具身智能研究提供了首个系统性的场景生成基础设施。
-
-
 
 ## 核心方法与创新机理
 
@@ -149,8 +145,6 @@ MANSION 设计了 **任务语义场景编辑代理**（Task-Semantic Scene Editi
 ---
 
 **关键证据强度总结**：垂直结构支持（Table 1，置信度 0.98）、开放词汇房间类型（Table 1，置信度 0.95）、混合架构有效性（Table 3 消融实验，置信度 0.95）、可达性提升（Table 4，置信度 0.95）、场景编辑代理（Figure 4，置信度 0.95）。所有核心创新均有实验验证支撑，无推测性声明。
-
-
 
 MANSION 采用一种**多智能体驱动的混合架构**，将高层语义规划与底层几何求解解耦，从自然语言描述直接生成建筑尺度的多楼层交互式 3D 场景。其核心 pipeline 由四个顺序模块和一个可选的场景编辑代理组成，如 Figure 2 所示。
 
@@ -211,12 +205,8 @@ MANSION 采用一种**多智能体驱动的混合架构**，将高层语义规�
 
 整个 pipeline 的核心设计理念是**将 MLLM 的语义理解和创造力与几何求解器的精确性和可验证性解耦**：MLLM 负责高层决策（功能分区、拓扑生成、种子定位），而几何求解器强制执行硬约束（垂直对齐、拓扑有效性、面积拟合）。这种混合架构使得 MANSION 无需任何训练即可生成多样化的建筑类型（医院、学校、超市、办公楼等），实现了真正的开放世界可扩展性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2540_https_arxiv_org_abs_2603_11554/figures/019_Figure_12.jpg]]
 *Figure 12: Illustration of the single-floor, topology-driven pipeline. (a) Input room topology graph. (b) Cut-round construction and hierarchical splitting over the free region. (c) Final 3D scene instantiation in AI2-THOR after applying structure, objects, and lighting*
-
-
 
 ### 整体架构：混合MLLM-几何流水线
 
@@ -280,18 +270,11 @@ $$R_r^{(0)} = r_{base} + k \cdot a_r / |\Omega_f(p_t)|$$
 
 其中 $r_{base}$ 为基础半径，$a_r$ 为房间目标面积，$|\Omega_f(p_t)|$ 为父区域 $p_t$ 的面积，$k$ 为缩放系数。该公式使得种子采样范围随房间相对大小自适应调整——大房间获得更大的初始搜索半径，小房间则更集中在MLLM指定的种子附近。这一机制与迭代分层分裂策略配合，显著降低了MLLM的空间定位复杂度：消融实验表明，移除分层分裂后Micro-IoU从63.56骤降至45.65（ResPlan-1k数据集）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2540_https_arxiv_org_abs_2603_11554/figures/005_Figure_4.jpg]]
-*Figure 4: The “Check-and-Provision” workflow of our Task-Semantic Scene Editing Agent. The agent first decomposes a high-level instruction (“bring a snack and a drink to the sofa”) into preconditions. It then sequentially performs a (a) Path Connectivity Check, an (b) Object Availability Check, and an (c) Object Provisioning & Scene Edit to ensure the task is executable before generation*
-
 ![[assets/figures/papers/paper_list_l2540_https_arxiv_org_abs_2603_11554/figures/020_Figure_13.jpg]]
 *Figure 13: System Architecture of the Task-Semantic Scene Editing Agent. The system operates via a ReAct Controller (top) that iteratively plans and issues JSON tool requests. A Tool Invoker (middle) serves as an execution bridge, routing perception tasks to the fast Static Semantic State (bottom left) and action tasks to the On-Demand Physics Engine (bottom right). The dashed arrow highlights the Hybrid State Management mechanism, where physical simulation results are synchronized back to the static scene JSON to ensure consistency*
 
 ![[assets/figures/papers/paper_list_l2540_https_arxiv_org_abs_2603_11554/figures/012_Figure_7.jpg]]
 *Figure 7: Qualitative comparison between Holodeck and MANSION under high-level semantic building prompts*
-
-
 
 ## 实验与关键发现
 
@@ -341,30 +324,11 @@ MANSION在可达性上达到100%，显著优于Holodeck的80.0%和LayoutGPT的98
 - **MLLM空间定位精度**：种子定位的质量直接影响平面图生成效果。在非标准几何形状或极端长宽比的区域中，MLLM的种子选择可能出现偏差，需要更精细的提示工程或模型能力提升。
 - **模拟环境规模上限**：受AI2-THOR引擎限制，单层面积约500平方米，帧率约束使得更大规模场景的实时交互变得困难，限制了向街区级别或室外场景的直接扩展。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2540_https_arxiv_org_abs_2603_11554/figures/002_Table_1.jpg]]
 *Table 1: Comparison of floorplan generation methods. Bdry./Topo./Vert. denote Boundary/Topology/Vertical structure. Boundary/Topology: controllable conditioning at test time. Vertical structure indicates cross-floor aligned cores (walls/rooms/regions) that persist across floors. Room type: resident vs. open-vocab*
 
-![[assets/figures/papers/paper_list_l2540_https_arxiv_org_abs_2603_11554/figures/006_Table_2.jpg]]
-*Table 2: IoU scores under different configurations on T2D*
-
-![[assets/figures/papers/paper_list_l2540_https_arxiv_org_abs_2603_11554/figures/007_Table_3.jpg]]
-*Table 3: IoU scores under different configurations on Resplan-1k*
-
 ![[assets/figures/papers/paper_list_l2540_https_arxiv_org_abs_2603_11554/figures/008_Table_4.jpg]]
 *Table 4: object placement quantitative comparison. We report the average number of placed objects (#Obj, with small items in parentheses), out-of-boundary objects (#OB), Layout-level collided object pairs (#CN), floor-object reachability (#Rch, %), and user-study preference scores (%) for Realism (Real.), Diversity (Div.), and Layout (Lay.)*
-
-![[assets/figures/papers/paper_list_l2540_https_arxiv_org_abs_2603_11554/figures/010_Table_5.jpg]]
-*Table 5: Task success rates from 10 trials. Progress score is reported in the brackets in the format (Object retrieval success, Navigation success)*
-
-![[assets/figures/papers/paper_list_l2540_https_arxiv_org_abs_2603_11554/figures/001_Figure_1.jpg]]
-*Figure 1: MansionWorld: The first building-scale dataset for long-horizon embodied AI tasks. Generated by our MANSION framework, this dataset represents the first large-scale collection of multi-story, customizable themed environments. The visualization highlights four representative examples: Kindergarten, Hospital, Supermarket, and a Six-story Office Building, which feature complex functional zoning and fully navigable vertical connections to support long-horizon, cross-floor embodied AI tasks. You can access the MansionWorld dataset at: Link to MansionWorld*
-
-![[assets/figures/papers/paper_list_l2540_https_arxiv_org_abs_2603_11554/figures/027_Figure_19.jpg]]
-*Figure 19: Failure case 1*
-
-
 
 ## 定位与知识库关联
 
@@ -443,8 +407,6 @@ Holodeck和LayoutGPT在对象放置中采用数量优先策略，忽略了物体
 5. **端到端的任务驱动生成**：场景编辑代理与生成过程的耦合仍较松散。能否实现从任务描述直接端到端优化建筑结构、房间布局和物体放置，是一个值得探索的方向。
 
 6. **非住宅环境的结构合理性**：医院、工厂等非住宅建筑具有更严格的安全规范和结构约束（如消防通道、洁净区隔离）。在保持生成多样性的同时确保这些约束的满足，需要领域知识的显式注入。
-
-
 
 ## 原文 PDF
 

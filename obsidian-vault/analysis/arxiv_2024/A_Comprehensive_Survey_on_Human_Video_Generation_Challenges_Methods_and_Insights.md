@@ -38,7 +38,6 @@ claims:
 | Method | Survey |
 | Dataset |  |
 
-
 > [!tip] 效果简介
 > 量化结果、消融证据与适用边界见“实验与关键发现”。
 
@@ -51,8 +50,6 @@ claims:
 本综述首次系统性地将人体视频生成划分为**文本驱动、音频驱动和姿态驱动**三大子任务，全面梳理了各子任务的方法演化、常用数据集和评估指标。综述的覆盖范围限定于 2D 人体视频生成，未系统涵盖 3D 方法。主要发现与未来方向指向六个开放问题：大规模高质量人体视频数据集、长视频生成、照片级真实感、扩散模型效率、细粒度可控性及交互性。
 
 需要注意的是，本综述未提供跨方法的定量基准测试，因此难以直接比较不同方法的性能优劣，各方法的性能评估需参考其原始论文的实验设置。
-
-
 
 ### 问题背景与核心瓶颈
 
@@ -84,8 +81,6 @@ claims:
 
 需要指出的是，本综述范围限定于 2D 人体视频生成，未系统涵盖 3D 方法，且未提供跨方法的定量基准测试，不同方法间的性能优劣需结合原始论文的实验设置审慎解读。
 
-
-
 ## 核心方法与创新机理
 
 本综述的核心创新在于**提出了一套系统化的三维分类框架**，将人体视频生成领域划分为文本驱动、音频驱动和姿态驱动三大子任务，并围绕该框架梳理了各子任务在方法演化、数据资源和评估体系上的全景图。
@@ -115,8 +110,6 @@ claims:
 
 基于对现有方法的全面分析，综述指出了六个关键开放问题：大规模高质量数据集构建、长视频生成、照片级真实感、扩散模型效率优化、细粒度可控性以及交互性。这些方向的识别并非简单罗列，而是从当前方法的共同局限性中推导得出——例如，两阶段流水线虽被广泛采用，但其计算效率和对长序列的扩展能力仍构成实际部署的瓶颈。
 
-
-
 本综述将人体视频生成问题解构为三个核心驱动范式：**文本驱动**、**音频驱动**和**姿态驱动**，并抽象出一条贯穿各范式的通用生成流水线。图 1 概括了典型的多条件人体视频生成方法与核心挑战。
 
 ### 通用生成流水线
@@ -143,12 +136,8 @@ claims:
 
 这些挑战的解决路径共同指向了“显式运动表征注入扩散骨干”这一当前主流技术路线。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1828_A_Comprehensive_Survey_on_Human_Video_Generation_Challenges_Methods_and/figures/001_Figure_1.jpg]]
 *Figure 1: An overview of typical Multi-Condition human video generation methods and challenges*
-
-
 
 本综述为系统性文献调研，未提出新的算法架构或公式，因此本节不包含原创公式推导。以下基于综述所梳理的方法脉络，归纳人体视频生成任务中反复出现的**关键功能模块**及其作用机制。
 
@@ -178,15 +167,11 @@ claims:
 
 人体运动与背景的协调建模直接影响生成视频的真实感。**Follow-Your-Pose v2** 在姿态引导器基础上，额外集成了光流引导器，通过显式建模帧间运动信息来增强背景区域的稳定性，减少因人体运动导致的背景闪烁或扭曲伪影。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1828_A_Comprehensive_Survey_on_Human_Video_Generation_Challenges_Methods_and/figures/005_Figure_3.jpg]]
 *Figure 3: An overview of text to human video generation approaches*
 
 ![[assets/figures/papers/paper_list_l1828_A_Comprehensive_Survey_on_Human_Video_Generation_Challenges_Methods_and/figures/008_Figure_5.jpg]]
 *Figure 5: An overview of pose-guided human video generation approaches. Examples come from [98] and [8]*
-
-
 
 ## 实验与关键发现
 
@@ -240,24 +225,11 @@ TABLE I 汇总了人体视频生成的评估指标，可分为三类：
 
 本综述自身也明确指出三个局限：(1) 范围限定于 2D 方法，未系统涵盖 3D 人体视频生成；(2) 未提供跨方法的定量基准，读者无法直接比较不同方法的性能优劣；(3) 对实际部署中的计算效率与交互性讨论较为简略。这些局限提示，未来需要建立统一的评估基准和更贴近实际应用场景的测试协议。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1828_A_Comprehensive_Survey_on_Human_Video_Generation_Challenges_Methods_and/figures/002_Table.jpg]]
 *Table: I: Commonly Used Evaluation Metrics for Human Video Generation*
 
 ![[assets/figures/papers/paper_list_l1828_A_Comprehensive_Survey_on_Human_Video_Generation_Challenges_Methods_and/figures/004_Table.jpg]]
 *Table: II: Dataset Information for human video generation*
-
-![[assets/figures/papers/paper_list_l1828_A_Comprehensive_Survey_on_Human_Video_Generation_Challenges_Methods_and/figures/007_Table.jpg]]
-*Table: III: Summary of works related to audio to human video generation*
-
-![[assets/figures/papers/paper_list_l1828_A_Comprehensive_Survey_on_Human_Video_Generation_Challenges_Methods_and/figures/009_Table.jpg]]
-*Table: IV: List of Methods Focusing on Pose Guided Human Video Generation. SP, DP, OP and DwP represent StackPose, DensePose, OpenPose and DwPose. G-SAM, DA, HM and MF represent Grounded-SAM, Depth Anything, Human Matting and MMFlow. SK, DS, MS, and OF represent skeleton pose, dense pose, mesh, and optical flow. BG, NM, and SM represent the background, normal map, and semantic map*
-
-![[assets/figures/papers/paper_list_l1828_A_Comprehensive_Survey_on_Human_Video_Generation_Challenges_Methods_and/figures/003_Figure_2.jpg]]
-*Figure 2: Some examples of human video datasets and annotation formats*
-
-
 
 ## 定位与知识库关联
 
@@ -330,8 +302,6 @@ TABLE I 汇总了人体视频生成的评估指标，可分为三类：
 - **交互性**：支持用户实时编辑与交互式生成是走向实用化的重要方向。
 
 需要指出的是，由于本综述未提供跨方法的定量基准测试，不同范式与具体方法之间的性能优劣难以直接比较，相关结论需结合原始论文的实验设置进行审慎解读。
-
-
 
 ## 原文 PDF
 

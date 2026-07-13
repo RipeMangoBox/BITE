@@ -52,8 +52,6 @@ claims:
 
 在方法谱系上，VGGT-S 属于**基于预训练跨视图编码器 + 轻量分割头**的范式，区别于 **ObjectRelator** (Fu et al., ICCV 2025) 等基于语言模型的关系理解方法，也不同于 **PSALM** (Zhang et al., ECCV 2024) 等零样本分割基线。其关键创新在于将 VGGT 的实例级对齐能力通过稀疏几何锚点和迭代细化机制转化为鲁棒的密集分割输出。
 
-
-
 跨视角分割（Cross-View Segmentation）旨在给定源视图中的一个对象掩码，在具有显著视角差异的目标视图中预测该对象的对应掩码。这一任务在增强现实、机器人操作和场景理解中具有重要应用价值，但其核心挑战在于跨视角的几何变化、遮挡和外观差异使得像素级对应关系极难建立。
 
 现有方法主要沿两条路线展开。一类方法依赖于显式的几何约束，如对极几何或点云重建，但在大视角变化下容易失效。另一类方法采用数据驱动的特征匹配策略，例如 **DOMR**（Liao et al., ACM MM 2025）在 Ego-Exo4D 基准上取得了先前最佳结果，但这类方法缺乏显式的几何感知能力，容易在相似对象或遮挡场景中产生混淆。
@@ -63,8 +61,6 @@ claims:
 这一现象揭示了一个因果机制：VGGT 的跨视图特征已隐含实例级对齐信息，但其点级投影的精度不足以支撑直接的分割掩码生成。这构成了本文的核心动机：**能否设计一种机制，在利用 VGGT 实例级对齐能力的同时，克服其像素投影的不稳定性，从而实现鲁棒的跨视图分割？**
 
 针对上述问题，本文提出 **VGGT-Segmentor (VGGT-S)**，通过一个轻量级的 Union Segmentation Head 将 VGGT 的几何感知特征转化为精确的目标视图分割掩码，无需依赖成对标注即可实现自监督训练。
-
-
 
 ## 核心方法与创新机理
 
@@ -117,8 +113,6 @@ VGGT-S 位于**跨视角视觉理解**与**基础模型适配**的交叉点。�
 
 相较于 **DOMR**（Liao et al., ACM MM 2025）依赖时空建模和复杂匹配策略，VGGT-S 仅使用空间信息即实现了大幅领先（Ego→Exo +18.0 IoU，Exo→Ego +12.8 IoU），证明了冻结几何编码器+精心设计分割头的技术路线在跨视角分割任务上的显著优势。
 
-
-
 VGGT-Segmentor (VGGT-S) 的整体 pipeline 围绕一个核心洞察展开：**VGGT 的跨视图特征已隐含实例级对齐**，但其直接输出的像素投影存在系统性漂移，无法直接用于密集分割。为此，VGGT-S 在冻结的 VGGT 编码器之上引入了一个轻量级的 **Union Segmentation Head**，将跨视图几何线索转化为目标视图的精确分割掩码。
 
 ### 输入输出与数据流
@@ -143,8 +137,6 @@ Figure 2 展示了 VGGT-S 的整体架构及 Union Segmentation Head 各子模�
 
 ![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2604_13596/figures/002_Figure_2.jpg]]
 *Figure 2: (A) Overall Architecture of VGGT-S, which integrates the original VGGT encoder with our Union Segmentation Head. (B) Mask Prompt Fusion stage, which injects the source mask*
-
-
 
 VGGT-S 的核心设计围绕一个轻量级的 **Union Segmentation Head** 展开，该头模块冻结 VGGT 编码器，仅在其输出特征之上构建三个协同阶段：掩码提示融合、点引导预测和掩码细化。其根本动机在于：VGGT 的跨视图特征已隐含实例级对齐（见 Figure 1 右侧注意力图），但直接像素投影存在系统性漂移（见 Figure 1 中部），因此需要一种机制将“对象级一致性”转化为“像素级精确掩码”。
 
@@ -196,8 +188,6 @@ $$\bar{Q}_{\ell} = \mathrm{SelfAttn}(Q_{\ell-1}) \tag{14}$$
 ### 3.4 自监督训练策略
 
 VGGT-S 的训练不依赖成对标注数据，而是采用基于数据增强的单图像自监督策略：对单张图像施加随机仿射变换和颜色抖动模拟跨视角变化，将原始图像作为源视图、增强图像作为目标视图，以原始掩码作为监督信号进行训练。这一策略使得模型可在 SA-1B 等大规模单图像分割数据集上进行预训练，获得无需对应关系的预训练变体，显著降低了数据获取成本。
-
-
 
 ## 实验与关键发现
 
@@ -252,21 +242,6 @@ Table 3 系统分析了 Union Segmentation Head 各模块的贡献。以无任�
 - **输入图像尺寸**（Table 7）：默认采用 518×518 分辨率，在精度和效率之间取得良好平衡。
 - **解码器块数**（Table 8）：性能随解码器块数从 1 增加到 6 持续提升，但默认使用 2 块以兼顾效率。
 
-![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2604_13596/figures/006_Table_4.jpg]]
-*Table 4: Effect of Bottleneck Fusion resolution*
-
-![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2604_13596/figures/007_Table_5.jpg]]
-*Table 5: Effect of the number of points used in Point-Guided Prediction*
-
-![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2604_13596/figures/008_Table_6.jpg]]
-*Table 6: Effect of iterations in Mask Refinement*
-
-![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2604_13596/figures/009_Table_7.jpg]]
-*Table 7: Effect of input image size*
-
-![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2604_13596/figures/010_Table_8.jpg]]
-*Table 8: Effect of the number of decoder blocks*
-
 ### 失败模式与局限性
 
 尽管 VGGT-S 取得了显著的性能提升，仍存在以下局限：
@@ -278,13 +253,6 @@ Table 3 系统分析了 Union Segmentation Head 各模块的贡献。以无任�
 3. **数据增强覆盖**：自监督训练使用的数据增强策略可能未涵盖所有真实世界的视角变化，对极端视角差的泛化性需进一步验证。
 
 4. **超参数鲁棒性**：采样点数量 $K_{\text{pt}}=5$ 和细化迭代次数等超参数在跨数据集场景下的最优值是否鲁棒，仍需更多实验确认。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2604_13596/figures/001_Figure_1.jpg]]
-*Figure 1: Visualizing VGGT Cross-View Correspondence. Left: source image. Middle: target image with the projections of sourcesampled points obtained by directly applying VGGT, which exhibit the systematic drift and misalignment. Right: star markers in the source image with the corresponding attention map on the target image, illustrating VGGT’s instance-consistent object alignment across views*
-
-
 
 ## 定位与知识库关联
 
@@ -318,8 +286,6 @@ VGGT-S 在跨视角分割任务上直接对标 **DOMR**（Liao et al., ACM MM 20
 - 自监督预训练中使用的数据增强策略对最终性能的贡献比例未通过消融实验量化，无法判断是增强策略本身还是 VGGT 编码器的预训练特征主导了零样本能力。
 - 能否将时序信息有效整合到 VGGT-S 框架中？一个自然的扩展方向是在 Bottleneck Fusion 阶段引入时序维度的自注意力，但计算开销和性能增益需要系统验证。
 - 模型在更广泛的户外数据集（如 MAVREC 之外）上的泛化能力如何？当前仅在 MvMHAT 上进行了泛化测试，缺乏与自动驾驶、无人机视角等场景的交叉验证。
-
-
 
 ## 原文 PDF
 

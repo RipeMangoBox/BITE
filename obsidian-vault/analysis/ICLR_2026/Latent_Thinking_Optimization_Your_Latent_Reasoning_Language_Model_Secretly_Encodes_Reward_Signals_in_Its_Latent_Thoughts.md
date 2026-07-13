@@ -55,8 +55,6 @@ claims:
 
 **方法定位**：LTO属于推理时优化方法，与多数投票（答案级校正）和链式连续思考修正（CoE-R/CoE-C，潜在级启发式校正）形成互补。其核心创新在于首次将潜在空间中的可学习奖励信号引入推理轨迹选择，为潜在推理的可控性开辟了新路径。
 
-
-
 大型语言模型在复杂推理任务上的突破，很大程度上得益于推理时计算扩展（test-time compute scaling）。其中，潜在推理语言模型（Latent Reasoning Language Models）通过在连续潜在空间中执行迭代推理步骤，无需生成冗长的自然语言思维链即可进行深度思考，显著降低了推理延迟和计算开销。然而，这一范式面临一个核心瓶颈：**潜在思维过程缺乏可解释性与监督信号**。由于潜在思维以连续向量序列形式存在，我们难以直观理解模型“在想什么”，更无法在推理过程中直接检测并纠正潜在推理错误。当模型产生错误的潜在思维轨迹时，后续的解码步骤将不可避免地输出错误答案。
 
 现有方法主要从两个层面尝试解决这一问题。在**答案层面**，多数投票（Majority Voting, Wang et al., 2023）和基于置信度的自我修正方法（Ren et al., 2023b; Manakul et al., 2023）通过对多次采样的最终答案进行聚合或评估来提升可靠性，但这些方法完全忽略了潜在思维过程本身的质量。在**潜在思维层面**，CoE-R/CoE-C（Wang et al., 2025c）等启发式方法尝试基于潜在表示的某些统计特性进行校正，但缺乏对思维正确性的直接监督信号，校正效果有限。
@@ -64,8 +62,6 @@ claims:
 本文的核心动机源于一个关键观察：**正确与错误的潜在思维轨迹在潜在空间中呈现出高度可区分的模式**。如 Figure 1 所示，通过 PCA 降维可视化可以发现，正确和错误的潜在思维轨迹在几何分布和动态演化上存在显著差异——正确轨迹展现出更稳定的演化方向，而错误轨迹则表现出漂移和波动。进一步的定量分析（Figure 2）表明，正确潜在思维在信息熵、有效秩和各向异性等表示质量指标上均与错误思维呈现系统性差异。这一发现暗示了一个重要可能性：**潜在思维轨迹中隐含地编码了关于答案正确性的奖励信号**。
 
 基于此，本文提出训练一个轻量级潜在分类器（Latent Reward Model, LRM），直接从潜在思维轨迹预测答案正确性，并将其作为奖励信号来优化潜在思维分布。这一思路将潜在推理的改进问题转化为一个“从潜在表示中读取奖励信号并据此重采样”的过程，无需对基础模型进行昂贵的微调，即可实现推理时潜在思维质量的提升。
-
-
 
 ## 核心方法与创新机理
 
@@ -109,8 +105,6 @@ claims:
 - **计算轻量**：LRM 是一个轻量级分类器，训练成本低；LTO 仅需调整采样策略，无需微调基础模型。
 - **即插即用**：LRM 可以泛化到不同通用 LLM 的潜在表示（Table 2），并展现出跨域迁移能力（Figure 4），无需为每个模型或领域重新训练。
 
-
-
 ![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_2jkAk3EP0v/figures/001_Figure_1.jpg]]
 *Figure 1: Visualization of the distribution of the correct and incorrect latent thoughts projected onto 3D space using PCA for dimension reduction. The arrows along the lines indicate the progression from the current step to the next step of the latent thought. More examples are in Appendix B*
 
@@ -143,8 +137,6 @@ LTO 的整体工作流分为**训练**与**推理**两个阶段，核心思想�
 - **答案解码**：复用基础模型的生成能力，将优化后的潜在状态转化为最终答案。
 
 该框架的关键优势在于**解耦**：LRM 作为轻量级探针独立训练，无需修改基础模型的潜在策略参数；推理时的优化仅通过采样分布的重加权实现，计算开销可控。
-
-
 
 LTO 方法围绕一个核心洞察构建：正确与错误的潜在思维轨迹在潜在空间中呈现高度可区分的模式。基于此，LTO 将潜在推理的优化形式化为一个概率策略优化问题，并通过三个关键模块实现。
 
@@ -189,8 +181,6 @@ $$\pi_r(z_i \mid x) = \frac{\pi_{\mathsf{ref}}(z_i \mid x) \exp\left(\frac{1}{\b
 $$\left| \mathbb{E}_{z \sim \pi_r(z \mid x)} r^*(x, z) - \mathbb{E}_{z \sim \pi_{r^*}(z \mid x)} r^*(x, z) \right| \le \sqrt{\frac{4\epsilon}{\beta}}$$
 
 其中 $\epsilon$ 为 LRM 的训练误差。该定理揭示了核心权衡：更小的 $\beta$ 放大奖励信号的影响，但也放大 LRM 误差带来的风险；更大的 $\beta$ 则使策略更接近参考分布，限制了优化空间。
-
-
 
 ## 实验与关键发现
 
@@ -238,12 +228,8 @@ LTO的根本局限在于其仅通过选择性采样优化分布，而非修改�
 
 此外，当前LRM的奖励信号仅指示答案正确性这一单一维度，未涵盖安全性、有帮助性、诚实性等其他重要维度。这意味着LTO可能在优化正确性的同时，无意中放大其他维度的风险。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_2jkAk3EP0v/figures/055_Table_5.jpg]]
 *Table 5: Table A3: Performance of LTO with different numbers of thinking steps. For each thinking step, the best-performing method is highlighted in bold. ∗ indicates the improvement over the best runner-up is statistically significant with p \< 0 . 0 5*
-
-
 
 ## 定位与知识库关联
 
@@ -293,8 +279,6 @@ LTO 属于**推理时优化（inference-time optimization）** 范式，其核�
 4. **多目标优化框架**：将 LTO 扩展为多目标优化框架，同时优化多个奖励维度，可能需要在 Pareto 前沿上进行采样或引入标量化机制。
 
 **需手动验证的点**：论文未提供 LTO 在完全错误轨迹场景下的失效分析（如基础模型正确率接近 0 时的 LRM 训练行为和 LTO 性能），也未系统讨论 LRM 的分类置信度校准及其对接受-拒绝采样效率的影响。这些边界条件的定量刻画需要进一步实验确认。
-
-
 
 ## 原文 PDF
 

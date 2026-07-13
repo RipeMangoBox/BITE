@@ -56,8 +56,6 @@ claims:
 - 在ImageNet-1K的类别特定子任务上，NuWa相比最优训练无关剪枝方法**准确率提升高达29.00%**，相比训练相关方法实现**33.69倍加速**，在大规模派生场景（50个子任务×10个资源约束）下**成本降低高达99.83%**，而平均精度损失仅为0.61%。
 - 派生出的边缘ViT在Jetson Orin NX上实现**1.31×至2.07×的推理加速**。
 
-
-
 ### 边缘部署的“一刀切”困境
 
 视觉Transformer（ViT）在图像识别任务中表现卓越，但其庞大的参数量和计算开销使其难以直接部署到资源受限的边缘设备（如Jetson Orin NX）。剪枝是缓解这一矛盾的主流手段，但现有剪枝方法几乎都遵循**类无关（class-agnostic）**范式：它们对所有类别使用相同的重要性评分标准（如权重幅度、梯度、激活值等），统一移除“不重要”的参数，再通过昂贵的重训练恢复精度。
@@ -87,8 +85,6 @@ Figure 1 展示了一个反直觉的发现：在DeiT-Base的MLP模块中**随机
 - **将剪枝形式化为可闭式求解的优化问题**，从而彻底绕过重训练的高昂开销。
 
 NuWa正是沿着这一思路设计的：通过自我知识净化（SKP）学习二值化掩码自主发现有害权重，再将MHA和MLP模块的结构化剪枝分别转化为低秩逼近和最小二乘问题，利用SVD截断和伪逆闭式解直接获得剪枝后权重，实现“一次前向+一次矩阵分解”即可完成类定制模型的派生。
-
-
 
 ## 核心方法与创新机理
 
@@ -130,8 +126,6 @@ $$W _ { 2 } ^ { ( l ) \prime } = W _ { 2 } ^ { ( l ) } \mathcal { H } ^ { ( l ) 
 
 **方法谱系定位**：NuWa 处于训练无关剪枝（追求效率但无法类别定制）与训练相关剪枝（可定制但成本极高）的交叉点。它通过 SKP 引入了轻量级的类别特定学习（仅训练掩码，冻结骨干），又通过 OFP 的闭式优化消除了重训练需求，实现了“定制能力”与“推导效率”的双重突破。
 
-
-
 NuWa 的整体派生流程由两个串行且互补的核心模块构成：**自我知识净化（Self-Knowledge Purification, SKP）** 与 **优化驱动的快速剪枝（Optimization-based Fast Pruning, OFP）**，如图 Figure 5 所示。给定一个预训练的基础 ViT（如 **DeiT-Base** (Touvron et al., ICML 2021)）和一组目标类别数据，NuWa 首先通过 SKP 自动识别并剪除对特定类别有害的权重，生成一个更紧凑且在该类别上准确率更高的“锚点模型”；随后，OFP 将 MHA 与 MLP 模块的进一步结构化剪枝分别形式化为低秩矩阵逼近和最小二乘问题，利用闭式解直接获得剪枝后的权重，完全无需重训练。
 
 ![[assets/figures/papers/paper_list_l2108_https_openaccess_thecvf_com_content_CVPR2026_html_Wei_NuWa_Deriving_Ligh/figures/005_Figure_5.jpg]]
@@ -168,8 +162,6 @@ NuWa 的整体派生流程由两个串行且互补的核心模块构成：**自�
 | OFP-MLP | 激活选择 + 伪逆重构 | Eq. 10–12 | 校准样本激活 | 压缩后的 MLP 权重 |
 
 > **注意**：上述模块关系与数据流基于论文 Section 3 的描述和 Figure 5 的框架图综合得出。消融实验中 MLP 剪枝跳过导致准确率骤降 85.95%（Table 4），表明 MLP 闭式解在整个 OFP 流程中起决定性作用，而 SKP 的小批量设置（batch size=1）被证实能使剪枝空间探索更充分（Figure 10）。
-
-
 
 NuWa 的整体框架由两大核心模块构成：**自我知识净化（Self-Knowledge Purification, SKP）** 与 **基于优化的快速剪枝（Optimization-based Fast Pruning, OFP）**，如 Figure 5 所示。SKP 负责自动识别并剪除对目标类别有害的权重，生成一个更紧凑且类别特定准确率更高的锚点模型；OFP 则在此基础上，将多注意力头（MHA）与多层感知器（MLP）模块的进一步剪枝形式化为闭式优化问题，完全无需重训练即可高效推导出边缘 ViT。
 
@@ -254,18 +246,8 @@ $$
 
 其中 $\mathcal{H}^{(l)}$ 为原始模型的隐藏层激活矩阵，$\mathcal{H}_r^{(l)}$ 为按 $\mathcal{T}_r^{(l)}$ 索引选出的激活子矩阵，$(\cdot)^{\dagger}$ 表示 Moore-Penrose 伪逆。该闭式解直接给出了剪枝后 $W_2$ 的最优权重，无需任何迭代训练。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2108_https_openaccess_thecvf_com_content_CVPR2026_html_Wei_NuWa_Deriving_Ligh/figures/001_Figure_1.jpg]]
-*Figure 1: Pruning can sometimes improve class-specific performance. Randomly removing certain neurons from the MLP modules of DeiT-Base unexpectedly increases model accuracy on specific classes, revealing the existence of class-detrimental weights*
-
 ![[assets/figures/papers/paper_list_l2108_https_openaccess_thecvf_com_content_CVPR2026_html_Wei_NuWa_Deriving_Ligh/figures/002_Figure_2.jpg]]
 *Figure 2: Comparison of model derivation settings for ViTs. (a) Class-agnostic derivation compresses the base ViT without considering class differences, lacking customization for diverse scenarios. (b) Class-specific derivation uses class-specific data for pruning and retraining but fails to remove class-detrimental knowledge and is time-consuming, limiting scalability. (c) NuWa removes class-detrimental weights and formulates pruning as closed-form optimization problems, enabling fast derivation of lightweight and customized edge ViTs*
-
-![[assets/figures/papers/paper_list_l2108_https_openaccess_thecvf_com_content_CVPR2026_html_Wei_NuWa_Deriving_Ligh/figures/010_Figure_8.jpg]]
-*Figure 8: Comparison in feature and probability distributions before and after SKP. The feature distributions are visualized by applying t-SNE to the CLS tokens from the last block, while the bar charts show the average output probability over*
-
-
 
 ## 实验与关键发现
 
@@ -298,9 +280,6 @@ Table 3 报告了 NuWa 派生模型在 GPU（RTX 4090）和边缘设备（Jetson
 
 NuWa 的适用性不限于特定基础模型或数据集。Figure 7 展示了在多种基础 ViT（DeiT-Base、DeiT-Small、DeiT-Tiny）和多个数据集（ImageNet-1K、CIFAR-100、Tiny-ImageNet）上的表现，NuWa 派生的边缘 ViT 在随机选择的类别子集上均能保持甚至超越基础模型的类别特定准确率。这表明 SKP 识别类别有害权重的机制具有跨架构和跨数据分布的泛化能力。
 
-![[assets/figures/papers/paper_list_l2108_https_openaccess_thecvf_com_content_CVPR2026_html_Wei_NuWa_Deriving_Ligh/figures/009_Figure_7.jpg]]
-*Figure 7: Performance of NuWa-derived edge ViTs across different base ViTs and datasets, with randomly selected classes in*
-
 ### 消融实验：各组件的因果贡献
 
 Table 4 的消融实验严格量化了 NuWa 各组件的必要性（α=0.6，DeiT-Base）：
@@ -321,22 +300,9 @@ Table 4 的消融实验严格量化了 NuWa 各组件的必要性（α=0.6，Dei
 - **保留能量比 ρ**（Figure 11）：随着总体剪枝率 α 增大，最优 ρ 逐渐减小。这表明在更激进的剪枝目标下，MHA 模块需要保留的奇异值能量占比可以相应降低，为自适应确定 ρ 提供了经验依据。
 - **校准样本数量 K**（Figure 12）：OFP 仅需 128 个校准样本即可获得稳定的闭式剪枝解，继续增加 K 带来的边际收益极小。这一低样本需求是 NuWa 实现极速推导的关键因素之一。
 
-![[assets/figures/papers/paper_list_l2108_https_openaccess_thecvf_com_content_CVPR2026_html_Wei_NuWa_Deriving_Ligh/figures/013_Figure_11.jpg]]
-*Figure 11: Effect of the retained energy ratio*
-
 ### 失败模式与局限
 
 当前分析中未发现论文明确报告的失败案例。但需注意：NuWa 的 SKP 阶段依赖于目标类别的少量数据来学习掩码，当目标类别数据极度稀缺（如仅有个位数样本）时，SKP 能否有效识别类别有害权重需要手动验证。此外，OFP 的闭式解基于线性最小二乘假设，对于非线性激活主导的层间交互误差传播，其理论最优性保证尚不明确。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2108_https_openaccess_thecvf_com_content_CVPR2026_html_Wei_NuWa_Deriving_Ligh/figures/003_Figure_3.jpg]]
-*Figure 3: Existing pruning methods are time-consuming and costly. Experiments are conducted at a pruning rate of 0.50 using randomly selected 25 ImageNet classes to derive one model from DeiT-Base. Cost is based on AWS EC2 g5.48xlarge pricing*
-
-![[assets/figures/papers/paper_list_l2108_https_openaccess_thecvf_com_content_CVPR2026_html_Wei_NuWa_Deriving_Ligh/figures/004_Figure_4.jpg]]
-*Figure 4: Existing importance metrics fail to improve classspecific accuracy through pruning. The solid lines with standard deviation bands represent the mean accuracy of pruned DeiT-Base on three random sub-tasks (|S|=25) across different pruning rates*
-
-
 
 ## 定位与知识库关联
 
@@ -381,8 +347,6 @@ NuWa处于**模型压缩**、**边缘智能**与**类别定制化部署**的交�
 - **超越训练无关方法**：在类特定准确率上提升高达29.00%，且是唯一能使剪枝后模型超越基础ViT的框架（Figure 6）。
 - **替代训练相关方法**：在保持可比准确率（-0.61%）的前提下，将推导成本降低两个数量级以上，使大规模边缘部署从经济不可行变为可行。
 - **开启新方向**：SKP揭示的“类别有害权重”概念可能启发新的剪枝准则设计，而OFP的闭式优化范式可推广至其他模块（如LayerNorm、位置编码）的压缩。
-
-
 
 ## 原文 PDF
 

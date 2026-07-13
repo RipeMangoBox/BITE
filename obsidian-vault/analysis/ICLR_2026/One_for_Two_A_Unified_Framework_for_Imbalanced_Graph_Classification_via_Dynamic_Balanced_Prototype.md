@@ -55,15 +55,11 @@ claims:
 
 UniImb 处于图分类、不平衡学习与原型学习的交叉地带。相较于仅关注类别不平衡的方法（如 **G2GNN**、**ImGKB**、**DataDec**）或仅处理拓扑不平衡的方法（如 **SOLT‑GNN**、**ImbGNN**、**TopoImb**），UniImb 首次在统一框架下同时解决两类不平衡。与传统原型方法依赖聚类或静态分配不同，UniImb 通过信息瓶颈引导的原型负载均衡，实现了原型激活的公平分配，这与对比学习中的均匀性假设形成呼应，但将其引入到图级原型学习场景并给出了可微优化方案。在主干网络层面，UniImb 兼容 GIN、GCN、GraphSAGE 等经典 GNN，以及 GraphGPS、Exphormer 等图 Transformer，展现出良好的即插即用特性。
 
-
-
 图分类是图机器学习的核心任务之一，在药物发现、分子性质预测、社交网络分析等领域具有广泛应用。然而，真实世界图数据普遍存在两类相互交织的不平衡问题：**类别不平衡**（不同类别样本数量悬殊）与**拓扑不平衡**（同一类别内图规模差异巨大）。前者的典型场景如罕见疾病蛋白结构预测，后者则常见于不同分子大小的化合物分类。当类别不平衡与拓扑不平衡同时出现时，少数类中的小规模图（尾部图）面临双重信息匮乏——不仅训练样本稀缺，其自身拓扑结构也过于简单，导致表征质量严重退化。
 
 现有方法对此存在明显缺口。一方面，**G2GNN**、**ImGKB**、**DataDec** 等方法仅针对类别不平衡设计，通过重加权、重采样或合成少数类样本缓解分布偏移，但未考虑图拓扑结构的差异。另一方面，**SOLT‑GNN**、**ImbGNN**、**TopoImb** 等方法专注于拓扑不平衡，通过拓扑增强或迁移学习提升小图表征，却忽视了类别分布的影响。这种“分而治之”的策略无法应对两类不平衡交织的复杂场景。更深层的问题在于，原型学习（prototype learning）作为提取共享语义特征的有效手段，在训练过程中容易被多数类样本主导——原型激活分布向头部类别严重倾斜，尾部图难以公平参与原型学习，其判别性表征因此受损。
 
 针对上述瓶颈，本文提出 **UniImb**，一个统一处理类别不平衡与拓扑不平衡的图分类框架。其核心动机在于：通过一组可学习的原型以无偏方式从图实例中提取共享语义特征，并借助信息瓶颈原理驱动的负载均衡约束，强制原型激活分布趋向均匀，从而确保尾部图获得与头部图同等的原型参与机会，最终提升其表征质量与分类性能。
-
-
 
 ## 核心方法与创新机理
 
@@ -112,8 +108,6 @@ $$\mathcal{L}_M = \frac{1}{2}\sum_{k=1}^{\mathsf{K}}\left| \eta + \mathrm{StopGr
 
 **决定性证据**：在极端类别不平衡的 PROTEINS 数据集上，UniImb 的 Macro‑F1 达到 70.44%，较基础 GIN（25.33%）提升约 45 个百分点（Table 2）；移除 DBP 模块后性能在所有消融变体中最差（Figure 4），直接验证了原型均衡机制的核心地位。
 
-
-
 ![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_MraQM41SNS/figures/001_Figure_1.jpg]]
 *Figure 1: The overall architecture of UniImb which enhances graph representations by extracting prototypical features in an uniform manner*
 
@@ -150,8 +144,6 @@ UniImb 提出了一种统一的图分类框架，旨在同时应对类别不平�
 ### 模块间关系
 
 多尺度拓扑编码与个性化扰动构成“实例增强层”，为后续 GNN 提供更具判别力的输入特征；DBP 模块则作为“无偏语义提取层”，通过负载均衡约束确保头部与尾部图公平参与原型学习；原型增强后的表示经特征混合后送入分类器，形成端到端的统一优化框架。消融实验表明，移除 DBP 模块后性能在所有变体中最差，验证了原型建模在框架中的核心地位。
-
-
 
 UniImb 的核心由三个协同模块构成：**多尺度拓扑编码**、**个性化图扰动**，以及**动态平衡原型 (DBP)**。前两者为图实例注入丰富的结构与多样性信息，DBP 则通过信息瓶颈原理驱动的负载均衡机制，确保尾部图公平参与原型学习，从而提升其判别性表征。
 
@@ -226,8 +218,6 @@ $$
 
 消融实验证实，均匀分布先验在所有候选分布（Zipf、Exponential、Poisson、Uniform）中取得最佳性能（Table 1），移除负载均衡优化（w/o BalOpt）后模型性能显著下降（Figure 4），验证了该机制的有效性。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能验证
@@ -286,27 +276,6 @@ UniImb 具备良好的骨干网络泛化性（Table 4）：当 GIN 替换为 GCN
 3. **真实世界多样性**：大规模验证仅依赖 AirGraph 的污染预测任务，更多样化的真实分布（如社交网络、生物网络）有待覆盖。
 4. **原型数量极端情况**：当 K 极大时，信息瓶颈近似的保真度与计算效率之间的平衡尚未系统研究。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_MraQM41SNS/figures/010_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_MraQM41SNS/figures/021_Table_14.jpg]]
-*Table 14: Macro-F1 and Micro-F1 score on class imbalance datasets with extreme imbalance degree. The best results are marked and the runner-ups are underlined . We report the average and standard deviation over 20 runs*
-
-![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_MraQM41SNS/figures/022_Table_15.jpg]]
-*Table 15: Macro-F1 and Micro-F1 score on class imbalance datasets with medium imbalance degree*
-
-![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_MraQM41SNS/figures/031_Figure_11.jpg]]
-*Figure 11: Sensitivity study of TopK1 on class-imbalance (upper half) and topological-imbalance (lower half). Figure 12: Sensitivity study of $\mathrm { T o p K } _ { 2 }$ on class-imbalance (upper half) and topological-imbalance (lower half)*
-
-![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_MraQM41SNS/figures/037_Figure_15.jpg]]
-*Figure 15: Visualization analysis of prototype effects*
-
-![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_MraQM41SNS/figures/015_Figure_7.jpg]]
-*Figure 7: Distribution of Pollution Levels in the AirGraph Dataset: High (6.86%), Medium (42.84%), and Low (50.30%)*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 问题定位：从单一不平衡到交织不平衡
@@ -354,8 +323,6 @@ UniImb 同时编码**局部**（随机游走自回归概率）与**全局**（�
 2. **异质图原型定义**：在包含多种节点/边类型的异质图中，如何定义具有语义意义的原型并保持公平性？是否需要为不同类型设计独立的原型空间？
 3. **理论边界**：信息瓶颈目标 $\min I(\mathbf{S};\mathbf{G}) - \beta I(\mathbf{S};\mathbf{Y})$ 中，$\beta$ 的选取与原型数量 $K$、数据集规模之间存在怎样的理论关系？当 $K$ 趋近于样本数时，均匀分布约束是否仍能保持有效性？
 4. **实际部署**：AirGraph 数据集上的性能与效率对比（Figure 2）初步展示了实际应用潜力，但在更多样化的真实世界分布（如社交网络、生物分子网络）中的表现有待进一步验证。
-
-
 
 ## 原文 PDF
 

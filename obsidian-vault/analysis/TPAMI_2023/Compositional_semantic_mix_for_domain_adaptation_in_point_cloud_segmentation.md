@@ -76,8 +76,6 @@ CoSMix在多个合成→真实和真实→真实的LiDAR分割基准上取得一
 
 CoSMix属于基于混合（mixup-based）和自训练（self-training）相结合的域适应范式。与通用点云混合策略（如Mix3D、PointCutMix、PolarMix）相比，其语义引导的双分支组合混合在域适应场景下具有明显优势（38.9 vs. 31.6/30.4/28.5 mIoU）。该方法可灵活适配UDA和SSDA两种设定，但对伪标签质量存在较强依赖——源域预训练不足时性能受限，且在类分布差异极大的跨域场景（如SynLiDAR→nuScenes）中提升幅度有限。
 
-
-
 ### 3D点云语义分割中的域偏移瓶颈
 
 3D点云语义分割是自动驾驶、机器人导航等场景的核心感知任务。然而，训练高性能分割模型通常依赖大规模密集标注的点云数据，其获取成本极高。一个自然的替代方案是在合成数据（如SynLiDAR）或已有标注的真实数据上训练模型，再将其部署到新的真实场景。但这一策略面临严峻挑战：**源域与目标域之间存在显著的域偏移（domain shift）**，包括传感器噪声特性不同、环境外观差异、点云稀疏性模式不一致等。仅用源域数据训练的深度模型在目标域上泛化能力严重不足，表现为预测碎片化、类别混淆、远距离目标丢失等典型失效模式。
@@ -99,8 +97,6 @@ CoSMix属于基于混合（mixup-based）和自训练（self-training）相结�
 3. **组合式增强与教师-学生协同**：先对语义补丁施加局部随机增强，再跨域拼接，最后对混合点云施加全局增强，形成层次化数据增强；同时通过指数移动平均（EMA）更新的教师网络持续提升伪标签质量，形成正向循环。
 
 该方法同时覆盖无监督域适应（UDA）和半监督域适应（SSDA）两种设定，在合成到真实（SynLiDAR → SemanticPOSS/SemanticKITTI/nuScenes）和真实到真实（SemanticKITTI → nuScenes）等多个迁移场景中验证了其有效性。
-
-
 
 ## 核心方法与创新机理
 
@@ -131,8 +127,6 @@ CoSMix通过引入一个简洁的指示函数 $\delta(\mathcal{T}_{\mathsf{L}})$
 ### 4. 与通用混合策略的本质区别
 
 CoSMix的组合式语义混合在机制上显著区别于通用点云混合方法。Fig. 5a的对比实验表明，在相同实验设置下，CoSMix的双分支混合达到38.9 mIoU，而Mix3D、PointCutMix、PolarMix分别仅为31.6、30.4和28.5 mIoU。这种差距的根本原因在于：通用混合方法缺乏语义引导的补丁选择，混合操作是“盲目”的——它们可能在混合过程中破坏关键的几何结构信息或引入语义不一致的跨域拼接；而CoSMix通过 $f$ 和 $g$ 函数确保混合的补丁在语义上是可迁移的，并通过层次化增强保留了点云的局部结构完整性。
-
-
 
 CoSMix 的核心设计围绕一个**双分支对称的教师‑学生架构**展开，目标是在不引入额外特征对齐模块的前提下，通过**语义引导的组合式点云混合**来逐步缩小源域与目标域之间的分布偏移。整个 pipeline 可分解为四个紧密耦合的模块：语义选择、组合式混合、学生网络训练以及教师网络在线更新。
 
@@ -181,8 +175,6 @@ $$\theta_{i}^{\prime} = \beta \theta_{i-1}^{\prime} + (1 - \beta) \theta$$
 ### 6. 关键限制与适用边界
 
 CoSMix 的性能高度依赖**源域预训练模型的初始质量**：若源域热身不足，教师网络产生的伪标签噪声会通过语义选择模块放大，限制最终适应效果。此外，该框架要求目标域存在一定规模的无监督数据，无法直接处理完全无目标数据的源自由适应（source‑free）场景。在域差距极大的场景（如 SynLiDAR → nuScenes，仅 27.3 mIoU），语义混合策略的增益显著减弱，表明当类分布和传感器特性差异过大时，仅靠点云层面的混合难以弥合深层语义鸿沟。
-
-
 
 CoSMix 的域适应能力来源于三个紧密耦合的核心模块：语义选择、组合式混合，以及教师-学生自训练范式。以下逐一解析各模块的设计逻辑与关键公式。
 
@@ -243,8 +235,6 @@ $$\mathcal{L}_{tot} = \mathcal{L}_{s \to t} + \mathcal{L}_{t \to s}$$
 
 消融实验表明，EMA 教师更新和长尾加权采样各自贡献超过 1 mIoU 的增益，验证了这两个组件在稳定自训练过程和缓解类别偏差方面的关键作用（见 Tab. 9）。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验结果
@@ -281,12 +271,8 @@ Table 9的系统消融实验揭示了CoSMix各组件的独立贡献（以SynLiDA
 
 - **无法处理源自由场景**：CoSMix需要目标域存在无监督数据用于混合和伪标签生成，无法直接应用于完全无目标数据的源自由域适应（source-free DA）设定。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2308_14619/figures/014_Figure_5.jpg]]
 *Figure 5: c) Fig. 5: a) Comparison of the adaptation performance with different point cloud mix up strategies. Compared to the recent mixing strategies Mix3D [21], PointCutMix [72] and, PolarMix [73], our mixing strategy and its variations achieve superior performance. b) Comparison of the adaptation performance on confidence threshold values. Adaptation results show that ζ should be set such that to achieve a trade-off between pseudo-label correctness and object completeness. c) Comparison of the SSDA performance with different mixing strategies: optimization without mix (naive), single branch mixing with source point clouds (sup → s), single branch mixing with unsupervised target point clouds (sup...*
-
-![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2308_14619/figures/015_Figure.jpg]]
 
 ![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2308_14619/figures/001_Table_1.jpg]]
 *Table 1: Overview of existing methods for unsupervised (UDA) and semi-supervised (SSDA) adaptation in point cloud segmentation. For each approach, we report the sensor setup (Setup), the architecture (Input data type and Model), and the source and target datasets. Then, we classify the adaptation strategy into mixup based, adversarial learning based, alignment based, generative based, self-training based and auxiliary task based. Furthermore, we report whether the implementation (Code) is publicly available*
@@ -300,22 +286,9 @@ Table 9的系统消融实验揭示了CoSMix各组件的独立贡献（以SynLiDA
 ![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2308_14619/figures/005_Table_4.jpg]]
 *Table 4: Unsupervised adaptation results on SemanticKITTI → nuScenes. We denote our reproduced baselines and results with ⋆, e.g., Source⋆. Source⋆ and Target⋆ correspond to the model trained on the source real dataset (lower bound) and on the target real dataset (upper bound), respectively. Results are reported in terms of mean Intersection over the Union (mIoU)*
 
-![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2308_14619/figures/006_Table_5.jpg]]
-*Table 5: Semi-supervised adaptation results on SynLiDAR → SemanticPOSS. We denote our reproduced baselines and results with ⋆, e.g., Source⋆. Source⋆ and Target⋆ correspond to the model trained on the source synthetic dataset (lower bound) and on the target real dataset (upper bound), respectively. Results are reported in terms of mean Intersection over the Union (mIoU)*
-
-![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2308_14619/figures/007_Table_6.jpg]]
-*Table 6: Semi-supervised adaptation results on SynLiDAR → SemanticKITTI. We denote our reproduced baselines and results with ⋆, e.g., Source⋆. Source⋆ and Target⋆ correspond to the model trained on the source synthetic dataset (lower bound) and on the target real dataset (upper bound), respectively. Results are reported in terms of mean Intersection over the Union (mIoU)*
-
-![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2308_14619/figures/009_Table_7.jpg]]
-*Table 7: Semi-supervised adaptation results on ${ \mathrm { S e } } { \mathrm { - } }$ manticKITTI → nuScenes. We denote our reproduced baselines and results with ⋆, e.g., Source⋆. Source⋆ and Target⋆ correspond to the model trained on the source real dataset (lower bound) and on the target real dataset (upper bound), respectively. Results are reported in terms of mean Intersection over the Union (mIoU)
-
-![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2308_14619/figures/010_Table_8.jpg]]
-*Table 8: Adaptation results on SynLiDAR→nuScenes. We denote our reproduced baselines and results with ⋆, e.g., Source⋆. Source⋆ and Target⋆ correspond to the model trained on the source synthetic dataset (lower bound) and on the target real dataset (upper bound), respectively. Results are reported in terms of mean Intersection over the Union (mIoU)*
 
 ![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2308_14619/figures/012_Table_9.jpg]]
 *Table 9: Ablation study of the CoSMix components: mixing strategy (t → s and s → t), compositional mix augmentations (local h and global r), mean teacher update (β) and, weighted class selection in semantic selection (f ). Each combination is named with a different version (a-h). Source⋆ performance are added as lower bound and highlighted in gray to facilitate the reading*
-
-
 
 ## 定位与知识库关联
 
@@ -382,8 +355,6 @@ CoSMix 的核心机制——语义引导的跨域混合——在理论上不依�
 **（4）极端稀疏性差异下的自适应混合策略？**
 
 当源域和目标域的点云密度差异极大时（如 64 线 LiDAR vs. 4 线 LiDAR），语义补丁的物理尺度和点密度可能不匹配。当前的局部增强 $h$ 和全局增强 $r$ 未针对稀疏性差异进行专门设计。是否需要引入密度感知的重采样或补丁尺度自适应机制，是提升极端域差距下性能的关键方向。
-
-
 
 ## 原文 PDF
 

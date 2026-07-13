@@ -55,15 +55,11 @@ MobileH2R 围绕三个关键模块构建：
 
 实验表明，MobileH2R 在所有测试场景下均显著优于基线方法，**成功率提升至少 15%**（Table 1）。消融实验进一步验证了各设计选择的有效性：将演示数量从 1k 扩展到 100k 可使成功率平均提升 3.3%（Table 2）；未来障碍避免与视觉神经损失使人体接触率降低约 1/3，成功率提升 11.6%（Table 3）。在真实世界实验中，MobileH2R 同样展现出稳定的 sim-to-real 迁移能力（Table 5, Table 9）。
 
-
-
 人机交接（Human-to-Robot Handover）是服务机器人实现物理协作的核心环节，要求机器人在动态环境中安全、高效地从人类手中接过物体。然而，当机器人具备移动能力时，交接任务面临双重挑战：机器人不仅需要精准控制机械臂末端抵达交接位置，还必须协调移动底盘的位姿以应对人的运动，确保在接近过程中不发生碰撞。现有方法大多依赖真实世界遥操作或人类演示数据进行策略学习，但这类数据的采集成本高昂、场景覆盖有限，难以支撑大规模训练，导致策略在未见人体运动、新物体或复杂场景下的泛化能力严重不足。
 
 合成数据为解决数据匮乏提供了潜在路径，但直接将现有合成数据生成范式应用于移动交接任务仍存在三个关键缺口。第一，缺乏能够生成大规模、多样化且交互式全身人体运动的合成管线——现有工作或局限于简单的轨迹随机化，或仅覆盖有限的动作捕捉子集，无法模拟交接过程中人的自然移动、手臂伸出与姿态变化。第二，自动生成的机器人演示往往忽视安全性与可模仿性：基于当前时刻的碰撞检测无法规避未来时间窗口内的潜在接触，且未显式优化视觉-动作关联，导致生成的轨迹难以被视觉策略有效学习。第三，固定基座的端到端交接策略（如 **GenH2R**）仅输出6自由度机械臂动作，无法同时协调移动底盘的3自由度运动，难以在移动场景中实现基座-臂部的协同控制。
 
 上述缺口共同构成了一个根本性瓶颈：**大规模、多样化且安全的合成训练数据匮乏，同时缺乏有效的模拟器中端到端移动底盘-机械臂协同交接策略学习方法**。针对这一瓶颈，MobileH2R 提出了一条完整的合成数据驱动框架，核心假设是：**可泛化的移动交接技能可以在模拟器中仅使用高质量合成数据（人体运动、物体资产和机器人演示）进行开发，无需真实世界演示**。该框架通过三个技术模块协同作用——可扩展的全身运动合成管线、安全且利于模仿的演示自动生成方法，以及融合4D场景信息的模仿学习策略——从数据、演示到策略层面系统性地填补了上述缺口。
-
-
 
 ## 核心方法与创新机理
 
@@ -97,8 +93,6 @@ $$\mathcal{L} = \lambda_{1} \mathcal{L}_{\mathrm{base}} + \lambda_{2} \mathcal{L
 
 **证据强度评估**：上述创新点均有消融实验支撑（置信度0.95），核心结论来自Table 1-4的多维度对比。需注意当前框架基于Galbot机器人（3-DoF全向基座+7-DoF臂）验证，对其他形态的泛化性尚未检验。
 
-
-
 MobileH2R 构建了一套从合成数据生成到移动机器人交接策略学习的完整流水线，其核心逻辑是：**在模拟器中仅使用高质量合成数据（人体运动、物体资产与机器人演示）开发可泛化的交接技能，无需任何真实世界演示**。框架由三个紧密耦合的模块组成（Figure 1、Figure 2）：
 
 ![[assets/figures/papers/paper_list_l1741_MobileH2R_Learning_Generalizable_Human_to_Mobile_Robot_Handover_Exclusiv/figures/001_Figure_1.jpg]]
@@ -113,8 +107,6 @@ MobileH2R 构建了一套从合成数据生成到移动机器人交接策略学�
 **输入输出流**：系统输入为双相机实时点云（经 SAM2 分割后的人体、手、物体区域），输出为增量式 9D 位置指令。训练阶段以加权损失函数 $\mathcal{L} = \lambda_{1} \mathcal{L}_{\mathrm{base}} + \lambda_{2} \mathcal{L}_{\mathrm{arm}} + \lambda_{3} \mathcal{L}_{\mathrm{pred}}$ 监督基座动作、臂部动作与抓取预测，实现从感知到动作的直接映射。
 
 **关键设计决策**：与固定基座端到端方法 GenH2R（仅输出 6D 臂部动作）相比，MobileH2R 将动作空间扩展为 9D 协调控制，避免了通过逆运动学间接求解基座动作带来的信息损失；与基于抓取估计与规划的“Grasp Selection + Trajectory Planning”非端到端基线相比，MobileH2R 的端到端范式消除了模块间误差累积，在复杂人体运动场景（n0）中成功率提升达 20.5%（Table 1）。
-
-
 
 ### 模块一：可扩展多样化全身交接运动合成管线
 
@@ -156,16 +148,6 @@ $$
 
 其中 $\mathcal{L}_{\mathrm{base}}$ 为基座动作的均方误差，$\mathcal{L}_{\mathrm{arm}}$ 为臂部动作的均方误差，$\mathcal{L}_{\mathrm{pred}}$ 为辅助抓取姿态预测任务的交叉熵损失。该联合损失函数驱动网络学习基座与臂部的协调运动模式，以及从场景感知中推断抓取意图的能力。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1741_MobileH2R_Learning_Generalizable_Human_to_Mobile_Robot_Handover_Exclusiv/figures/002_Figure_2.jpg]]
-*Figure 2: The overview of our framework. First, we propose an automatic pipeline to scale up synthetic and diverse full-body motion data for the handover task by integrating various synthetic digital asset libraries, generative models, and useful toolkits. Second, we introduce an automatic pipeline to scale up mobile robot demonstrations for safety and imitation-friendliness. Our approach aims to avoid collisions while enhancing the vision-action correlation through carefully designed loss functions. Third, we employ a 4D imitation learning policy to learn 9D coordinated arm-base actions. We process point clouds of both objects and human bodies by modified PointNet++*
-
-![[assets/figures/papers/paper_list_l1741_MobileH2R_Learning_Generalizable_Human_to_Mobile_Robot_Handover_Exclusiv/figures/003_Figure_3.jpg]]
-*Figure 3: Visualization for the vision neural loss. The Pose Prediction Network takes vision inputs and predicts the object pose. The prediction error is defined as the vision neural loss. The Vision-State Recovery Estimator takes states as input and estimates the vision neural loss, guiding the state-based trajectory optimization towards imitation-friendly demonstration generation*
-
-
-
 ## 实验与关键发现
 
 ### 4.1 整体性能对比
@@ -195,29 +177,15 @@ Table 3 系统评估了安全与利于模仿的演示生成策略的贡献。移
 
 Table 4 揭示了 4D 模仿学习策略各模块的关键作用。移除点云流信息导致成功率平均下降 12.1%，说明 ICP 流估计提供的时序动态信息对理解人-物运动趋势不可或缺。移除人体信息使成功率下降 12.5%，验证了融合人体点云对交接意图理解的重要性。将臂部与基座动作分离解码导致成功率大幅下降 17.8%，这是所有消融中影响最大的单一因素，充分证明 9D 协调动作空间的必要性。
 
-![[assets/figures/papers/paper_list_l1741_MobileH2R_Learning_Generalizable_Human_to_Mobile_Robot_Handover_Exclusiv/figures/009_Table_4.jpg]]
-*Table 4: Ablations on different policy designs. We conduct ablations on various modules, including flow information, human information, and coordinated base-arm actions*
-
 在感知输入方面（Table 8），仅使用头部相机导致成功率下降 13.5% 至 27.1%，表明手腕相机提供的近距离手部-物体细节对精确抓取至关重要。不同融合策略的对比进一步确认了区分采样半径的 PointNet++ 编码器在整合多源点云信息方面的优势。
 
 ### 4.5 失败模式分析
 
 Table 6 按训练场景细分了失败类型。主要失败模式包括人体接触（Contact）和物体掉落（Drop）。在复杂场景 n0 中，人体接触率约为 10.9%，物体掉落率约为 15.7%。当训练数据仅包含简单场景 m0 时，在 n0 上的接触率升至 18.6%，表明训练场景的复杂度直接影响策略的安全性。使用 n0 数据训练可显著降低接触和掉落率，验证了合成复杂人体运动数据的价值。
 
-![[assets/figures/papers/paper_list_l1741_MobileH2R_Learning_Generalizable_Human_to_Mobile_Robot_Handover_Exclusiv/figures/012_Table_6.jpg]]
-*Table 6: Evaluation on different training scenes. We train our method on three training sets and evaluate it across three test sets: the relatively simple human-involved scenario (”m0”), complex scenarios (”n0”), and real mocap data (”s0”). ”Contact” means human contact, ”Drop” means object drop*
-
 ### 4.6 Sim-to-Real 迁移
 
 Table 5 展示了真实世界实验的定量结果。MobileH2R 在简单与复杂两种设置下均显著优于 GenH2R (reprod.)。用户研究（Table 9）由五名参与者对六种物体进行评估，MobileH2R 在真实移动交接系统中的成功率始终高于基线，与仿真实验结果一致。失败场景主要包括与人体碰撞、物体掉落或超时（$T_{max} = 25$ 秒）。Figure 4 提供了仿真与真实场景下的定性对比，直观展示了 MobileH2R 在协调基座-臂部动作和避障方面的优势。
-
-![[assets/figures/papers/paper_list_l1741_MobileH2R_Learning_Generalizable_Human_to_Mobile_Robot_Handover_Exclusiv/figures/008_Figure_4.jpg]]
-*Figure 4: Qualitative results. We compare different methods in detail in the simulated scene and the real-world scene*
-
-![[assets/figures/papers/paper_list_l1741_MobileH2R_Learning_Generalizable_Human_to_Mobile_Robot_Handover_Exclusiv/figures/017_Table_9.jpg]]
-*Table 9: User study for sim-to-real experiments. our method and GenH2R(reprod.) method were evaluated by five individuals for six objects in both the simple and complex settings. Failure scenarios included collisions with the human body, dropping on the ground, or exceeding the time limit*
-
-
 
 ## 定位与知识库关联
 
@@ -255,8 +223,6 @@ MobileH2R 的成功建立在一组明确的技术前提之上，这些前提也�
 3. **感知鲁棒性增强**：如何通过训练中注入随机扰动或结合少量真实数据微调，增强策略对真实世界感知噪声的鲁棒性？合成数据与真实数据的混合训练策略值得探索。
 4. **安全探索机制**：是否可以在保持安全性的前提下引入强化学习，以应对更动态、对抗性的人类行为？这需要在安全约束与探索效率之间找到平衡点。
 5. **sim2real 鸿沟弥合**：如何将合成数据与真实数据混合训练，以进一步缩小 sim2real 鸿沟并提高在非结构化环境中的表现？当前 sim2real 实验仅覆盖有限场景（Table 5），更广泛的真实世界评估是必要的。
-
-
 
 ## 原文 PDF
 

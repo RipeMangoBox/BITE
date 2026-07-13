@@ -58,8 +58,6 @@ UIKA 是一个前馈式（feed-forward）3D 头部化身重建框架，旨在从
 
 **局限与展望**：受FLAME模型表达能力限制，精细面部动态（如微表情、舌头动作）仍无法捕捉；训练数据存在人口统计偏差；计算开销随视图数增长而性能提升趋于饱和。未来工作可探索更丰富的面部表示、偏差缓解策略以及高效的视图选择机制。
 
-
-
 ### 问题背景
 
 创建逼真、可驱动的3D头部化身是计算机视觉与图形学领域的核心挑战，其应用涵盖虚拟现实、远程呈现、影视制作和数字人交互等场景。近年来，基于3D Gaussian Splatting（3DGS）的方法因其高效的渲染能力和灵活的场景表示，逐渐成为该任务的主流范式。然而，现有方法在输入灵活性与重建质量之间仍存在显著矛盾。
@@ -86,8 +84,6 @@ Table 1 系统对比了UIKA与现有代表性方法在三个关键维度上的�
 这一动机基于一个关键洞察：人脸具有高度结构化的几何拓扑，其表面点与UV坐标之间存在天然的双射关系。如果能为每个输入图像的像素预测其对应的面部UV坐标，那么来自不同视角、不同表情的像素颜色就可以被重投影到一个共享的UV空间中。在这个空间里，对应关系不再依赖于相机姿态或表情参数，而是由UV坐标本身隐式确定——这从根本上消除了姿态歧义。
 
 基于这一动机，UIKA设计了一条完整的UV引导建模流水线：首先通过面部对应估计器预测像素级UV坐标并完成颜色重投影与聚合；然后引入双空间（屏幕空间+UV空间）编码器和UV-屏幕双注意力Transformer，实现结构化跨视图特征交互；最后通过自适应融合机制平衡全局预测与局部观测，输出可驱动的高斯头部化身。这一设计使得UIKA成为首个同时实现前馈推理、无姿态输入、多视图灵活输入和实时动画的统一框架。
-
-
 
 ## 核心方法与创新机理
 
@@ -137,8 +133,6 @@ $$c_k = w_k \hat{c}_k + (1 - w_k) c_k^{aggr}$$
 
 上述三个 changed slots 构成了一个完整的因果链条：**显式 UV 对应**为多视图信息提供了结构化对齐基础 → **双空间注意力**利用这一基础实现局部细节与全局结构的互补融合 → **自适应颜色融合**根据观测质量动态平衡预测与观测。这一设计使得 UIKA 在无姿态标注的任意数量输入图像设定下，能够实现高质量、可驱动的 3D Gaussian 头部化身重建，在单目自重建（PSNR 21.69 vs. 21.03）和多视图自重建（PSNR 22.50 vs. 17.11）中均显著超越现有基线。
 
-
-
 UIKA 是一个前馈式（feed-forward）可驱动 3D 高斯头部化身重建框架，其核心设计目标是：**在无需相机姿态或表情标注的条件下，从任意数量（单张或多张）的输入图像中一次性推理出高保真、可动画化的头部模型**。该框架将这一挑战分解为三个紧密耦合的阶段——面部对应估计与颜色重投影、双空间特征编码与交互、以及 UV 解码与自适应融合——最终输出一个基于 FLAME 模型驱动的经典 3D Gaussian 表示。
 
 ### 输入与输出规范
@@ -175,8 +169,6 @@ UIKA 是一个前馈式（feed-forward）可驱动 3D 高斯头部化身重建�
 ### 关键设计决策
 
 UIKA 在架构层面的核心创新在于 **UV 空间作为统一的跨视图对应中介**。与现有前馈方法（如 **GAGAvatar**、**LAM** 等仅在屏幕空间操作）或优化式方法（如 **InvertAvatar** 依赖测试时迭代）不同，UIKA 通过预测像素级 UV 坐标，将多视图信息聚合问题转化为 UV 空间内的结构化融合问题。这一设计的因果机制是：UV 坐标天然独立于相机姿态和表情变化，因此在 UV 空间中建立的对应关系消除了姿态歧义，使得即使输入图像的视角和表情差异极大，跨视图信息交互仍然可靠。消融实验证实，移除 UV 注意力分支会导致 PSNR 从 22.61 降至 22.21，并出现明显的细节丢失（Table 4, Figure 5(c)），验证了该设计的关键作用。
-
-
 
 UIKA 的整体流水线（Figure 2）由五个关键模块构成，其核心设计围绕“UV空间作为统一表示”展开，以解决无姿态标注下的跨视图信息聚合难题。
 
@@ -226,13 +218,6 @@ $$c_k = w_k \hat{c}_k + (1 - w_k) c_k^{aggr}$$
 
 生成的经典3D Gaussians绑定在FLAME模型的顶点上，通过标准的线性混合蒙皮（LBS）实现实时动画驱动，渲染帧率达到220 FPS。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1083_https_arxiv_org_abs_2601_07603/figures/012_Figure_S.1.jpg]]
-*Figure S.1: Visualization and Comparison of UV coordinates map*
-
-
-
 ## 实验与关键发现
 
 ### 实验设置与评估协议
@@ -244,9 +229,6 @@ $$\mathcal{L} = \lambda_{\mathrm{l1}} \mathcal{L}_{\mathrm{l1}} + \lambda_{\math
 其中 $\lambda_{\mathrm{l1}}$ 和 $\lambda_{\mathrm{lpips}}$ 设为1.0，$\lambda_{\mathrm{ssim}}$ 和 $\lambda_{\mathrm{reg}}$ 设为0.1。偏移正则化项 $\mathcal{L}_{\mathrm{reg}} = \frac{1}{N} \sum_{i=1}^{N} \left\| \Delta \mu_i - \epsilon \right\|_2$ 约束Gaussian偏移量接近零，防止形变过度。
 
 评估指标包括自重建（self reenactment）和跨重建（cross reenactment）两种协议下的PSNR、SSIM、LPIPS，以及跨重建专用的身份相似度CSIM、平均表情距离AED、平均关键点距离AKD和平均姿态距离APD。此外，还通过用户研究（Table S4）评估渲染质量、运动一致性和身份保持的主观感受。
-
-![[assets/figures/papers/paper_list_l1083_https_arxiv_org_abs_2601_07603/figures/018_Table_S.4.jpg]]
-*Table S.4: User study evaluation. We ask users to rate the results in 1-5, the higher the better*
 
 ### 主实验结果
 
@@ -283,9 +265,6 @@ $$\mathcal{L} = \lambda_{\mathrm{l1}} \mathcal{L}_{\mathrm{l1}} + \lambda_{\math
 ![[assets/figures/papers/paper_list_l1083_https_arxiv_org_abs_2601_07603/figures/010_Figure_5.jpg]]
 *Figure 5: Qualitative results for ablation study in the monocular settings in NeRSemble-v2 dataset*
 
-![[assets/figures/papers/paper_list_l1083_https_arxiv_org_abs_2601_07603/figures/017_Figure_S.3.jpg]]
-*Figure S.3: Ablation study on identity robustness across different training data configurations*
-
 ### 失败模式与局限性
 
 1. **FLAME表达能力的上限**：UIKA依赖FLAME模型进行动画驱动，无法捕捉精细的面部动态，如细微皱纹、微表情和舌头动作。这在高保真重建场景下构成根本性限制。
@@ -303,21 +282,8 @@ $$\mathcal{L} = \lambda_{\mathrm{l1}} \mathcal{L}_{\mathrm{l1}} + \lambda_{\math
 - **Figure 4**：随输入视图数增加，重建质量和3D一致性持续提升，验证了UV空间聚合机制对多视图信息的有效利用。
 - **Figure 5**：消融可视化直观展示了移除UV注意力、颜色聚合等模块后出现的颜色不一致和细节退化，与定量结果相互印证。
 
-![[assets/figures/papers/paper_list_l1083_https_arxiv_org_abs_2601_07603/figures/002_Table_1.jpg]]
-*Table 1: Comparison with state-of-the-art 3D head reconstruction methods. FF denotes a feed-forward pipeline that requires no test-time optimization or fine-tuning. PF indicates pose-free input, i.e., camera and expression labels are not required. RTA denotes real-time animatability (≥ 30 FPS)*
-
 ![[assets/figures/papers/paper_list_l1083_https_arxiv_org_abs_2601_07603/figures/009_Figure_4.jpg]]
 *Figure 4: Qualitative results of different numbers of input views in VFHQ and NeRSemble-v2 dataset*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1083_https_arxiv_org_abs_2601_07603/figures/015_Table_S.2.jpg]]
-*Table S.2: Latency analysis for view-dependent (V-D) modules. We show running time for different number of input images*
-
-![[assets/figures/papers/paper_list_l1083_https_arxiv_org_abs_2601_07603/figures/001_Figure_1.jpg]]
-*Figure 1: We present UIKA, a novel feed-forward approach for high-fidelity 3D Gaussian head avatar reconstruction from an arbitrary number of input images (e.g., a single portrait image or multi-view captures) without requiring extra camera or expression annotations*
-
-
 
 ## 定位与知识库关联
 
@@ -396,8 +362,6 @@ UIKA在3D头部化身重建知识库中的定位可概括为：
 4. **大规模部署的效率优化**：在前馈推理效率与日益增长的视图带来的计算开销之间，如何设计自适应计算分配策略（如根据视图质量动态选择关键帧）？
 
 5. **跨模态扩展**：UV空间的对应独立性使其天然适合融合多模态信息（如深度图、红外图），未来可探索将UIKA框架扩展到RGB之外的输入模态。
-
-
 
 ## 原文 PDF
 

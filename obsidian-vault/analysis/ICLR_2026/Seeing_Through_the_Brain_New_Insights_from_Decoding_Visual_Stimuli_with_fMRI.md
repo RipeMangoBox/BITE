@@ -57,8 +57,6 @@ claims:
 
 PRISM的贡献不在于提出新的生成模型架构，而在于揭示并利用了fMRI信号与文本空间之间被忽视的对齐优势，并通过对象中心的组合生成策略，为神经信号解码提供了一条结构化、可解释的新路径。
 
-
-
 从神经信号中解码视觉体验是计算神经科学的核心挑战之一。功能性磁共振成像（fMRI）因其非侵入性和高空间分辨率，成为研究大脑视觉表征的主要工具。近年来，基于深度生成模型的fMRI-to-image重建方法取得了显著进展，使从大脑活动中恢复人类所见的自然图像成为可能。
 
 然而，现有方法普遍存在两个深层瓶颈。**第一，中间表示空间的选择存在根本性偏差。** 当前主流方法——包括将fMRI映射到CLIP图像嵌入空间的**MindEye**、通过VAE潜变量进行重建的**Takagi & Nishimoto**、以及利用多层CLIP视觉特征引导扩散的**NeuralDiffuser**——均隐含假设视觉空间或视觉-语言联合空间是fMRI信号的最佳对齐目标。但这一假设是否成立，此前缺乏系统的实证检验。
@@ -68,8 +66,6 @@ PRISM的贡献不在于提出新的生成模型架构，而在于揭示并利用
 本文的核心动机源于一个关键发现：**fMRI信号与纯语言模型文本空间的对齐度，在多项指标上系统性地优于视觉空间和视觉-语言空间。** 如Table 1所示，T5文本嵌入在CKA（0.5580）、泛化差距（0.1132）和CCA（0.8344）上均显著优于CLIP视觉嵌入和LDM潜变量。这一发现从根本上挑战了“视觉空间是视觉解码的必要中间表示”这一既有假设，并提示我们：**文本空间可能是fMRI视觉解码的更优中间表示**。
 
 基于上述洞察，本文提出PRISM（Projecting fMRI Signals into a Structured text space as an interMediate representation），通过两个核心机制解决现有方法的瓶颈：（1）将fMRI信号映射到结构化文本描述空间，而非视觉嵌入空间；（2）采用对象中心扩散策略，显式建模场景的组合结构，逐对象生成并基于预测位置融合为最终图像。
-
-
 
 ## 核心方法与创新机理
 
@@ -96,8 +92,6 @@ PRISM将生成策略替换为**对象中心扩散**：
 现有方法直接使用现成的图像嵌入或简单标题作为训练监督，未考虑其与神经活动的对齐程度。PRISM引入**属性/关系搜索模块**，通过ε-greedy搜索策略自动发现最优的关键词（Algorithm 1），以最大化重建相似度 $\sum S(\mathbf{Y}_i, \mathrm{Diff}(\mathrm{VLM}(\mathbf{Y}_i, \mathcal{P}(a))))$，同时约束fMRI与文本嵌入的CKA高于阈值 $\beta$（Section 3.2.1）。搜索结果显示，最优关键词持续收敛到空间关系相关术语（如“Spatial Layout”、“Relative Position”），揭示了大脑对空间关系编码的偏好。
 
 **关键证据强度**：上述三个changed slots均有高置信度消融实验支撑（Table 1/5/7，置信度0.95），且PRISM在NSD数据集上将LPIPS降低约6%（0.5963 vs. Mindeye2的0.6338），构成因果性验证闭环。
-
-
 
 ![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_88ZLp7xYxw/figures/001_Figure_1.jpg]]
 *Figure 1: Framework Overview: PRISM generates structured text descriptions for each training image using a VLM to iteratively extract brain-aligned object attributes and relationships. These descriptions capture the image’s compositional and relational content and serve as supervision to train an encoder and fine-tune a language model to map fMRI signals into the text space. During inference, the model predicts descriptions from fMRI signals, which then guide a pre-trained diffusion model for object-centric image reconstruction*
@@ -153,8 +147,6 @@ $$\mathbf{H}_{t-1} = \beta \cdot \mathbf{H}_{t-1}^{\mathrm{cat}} + (1 - \beta) \
 ### 模块间的因果依赖
 
 消融实验（**Table 5**）揭示了各模块之间的因果依赖关系：移除对象交叉注意力模块（w/o ObjC.）导致LPIPS从0.5963升至0.6111，且这种性能下降无法通过提示优化恢复，表明对象中心的生成策略是框架中不可替代的瓶颈组件。同时，绕过属性/关系搜索而直接使用最优初始属性也会降低性能（Section 4.4），验证了搜索过程对于发现与大脑活动对齐的关键词是必要的。对象数量的消融（**Table 8**）进一步表明，固定两个对象的设置在各项指标上均优于一个或四个对象，过少对象无法充分捕获场景信息，过多对象则可能引入噪声或遗漏关键对象。
-
-
 
 ### 3.1 表示空间对齐分析
 
@@ -220,16 +212,11 @@ $$\mathbf{H}_{t-1} = \beta \cdot \mathbf{H}_{t-1}^{\mathrm{cat}} + (1 - \beta) \
 
 其中 $\mathbf{H}_{t-1}^0$ 为全局背景的潜表示。消融实验（**Table 5**）表明，移除对象交叉注意力（即取消独立的对象生成与拼接）导致LPIPS从0.5963升至0.6111，且无法通过提示优化恢复，验证了该模块的关键作用。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：文本空间作为最优中间表示
 
 PRISM的设计起点是一个反直觉的实证发现：fMRI信号与纯文本语言模型空间的表示对齐度，显著优于视觉-语言模型（如CLIP）和纯视觉模型（如LDM）的空间。Table 1的量化结果显示，T5文本空间在三个关键对齐指标上全面领先——CKA达到0.5580，泛化差距仅0.1132，CCA高达0.8344，均优于CLIP文本和LDM视觉空间。这一发现直接挑战了此前fMRI-to-image重建方法默认使用视觉嵌入作为中间表示的假设，构成了PRISM选择结构化文本描述作为中间表示的经验基础。
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_88ZLp7xYxw/figures/002_Table_1.jpg]]
-*Table 1: Alignment results between model representations and fMRI data, evaluated using CKA, Generalization Gap, and CCA. The best result is highlighted in red. ↑ denotes higher is better; ↓ denotes lower is better*
 
 ### 主实验结果：跨数据集与跨指标的全面优势
 
@@ -270,22 +257,6 @@ Table 8的系统比较表明，固定两个对象的设置在所有指标上均�
 
 梯度可解释性分析发现，PreS脑区对空间关键词的平均体素激活强度（0.0080）显著高于VMV1（0.0028），提示PreS可能在空间关系编码中扮演关键角色。这一发现尚需独立的神经科学实验进一步验证，但为未来的跨学科研究提供了可检验的假设。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_88ZLp7xYxw/figures/004_Table_3.jpg]]
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_88ZLp7xYxw/figures/005_Table_4.jpg]]
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_88ZLp7xYxw/figures/007_Table_4.jpg]]
-*Table 4: Reconstruction performance across three latent spaces. The best result in each column is highlighted in red. ↑ indicates higher is better and ↓ indicates lower is better*
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_88ZLp7xYxw/figures/017_Table_9.jpg]]
-*Table 9: Top-5 discovered keywords across search rounds*
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_88ZLp7xYxw/figures/018_Table_11.jpg]]
-
-
-
 ## 定位与知识库关联
 
 ### 与现有方法的关系
@@ -325,8 +296,6 @@ PRISM 揭示的发现和遗留的空白指向若干值得深入的方向：
 - **搜索策略的效率优化**：当前的 ε-greedy 搜索虽然有效，但效率较低。能否引入贝叶斯优化或基于梯度的提示优化方法，在保持搜索质量的同时大幅减少 VLM/LLM 的查询次数？
 - **神经科学假设的可验证性**：所发现的 PreS 脑区对空间关系的关键作用是否能形成可检验的神经科学假设（例如通过经颅磁刺激 TMS 干预 PreS 区域后观察重建质量变化），可为脑-行为因果关系研究提供新路径。
 - **与更大规模生成模型的结合**：随着扩散模型架构的快速演进（如基于 Transformer 的潜扩散模型），PRISM 的对象中心生成模块是否能与这些新架构无缝结合，以进一步提升图像质量和语义保真度？
-
-
 
 ## 原文 PDF
 

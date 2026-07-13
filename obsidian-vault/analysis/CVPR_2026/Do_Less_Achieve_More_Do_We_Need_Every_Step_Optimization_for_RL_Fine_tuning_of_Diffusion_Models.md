@@ -64,8 +64,6 @@ AdaScope通过两个关键模块实现自适应区间选择：
 
 值得注意的是，AdaScope 在部分强骨干模型（如 SDXL）上改进幅度有限，这可能是由于预训练权重已具有较高的普适鲁棒性。此外，自适应区间选择目前依赖预训练 CLIP 和奖励模型，若下游奖励函数不可靠，可能误导区间决策，这一点需要在实际部署中加以验证。
 
-
-
 ### 扩散模型RL微调的核心瓶颈
 
 扩散模型在文本到图像（T2I）生成中展现出卓越能力，但其输出与人类偏好之间仍存在显著差距。强化学习（RL）微调通过奖励信号引导模型向偏好方向优化，已成为弥合这一差距的主流范式。然而，该范式面临一个根本性困境：**奖励信号极度稀疏**——在T2I生成中，奖励只能在去噪完全完成后计算，无法为中间步骤提供任何反馈（Figure 3）。这种稀疏性迫使现有方法将最终奖励均匀回传至所有去噪步骤，导致三个关键问题：
@@ -96,8 +94,6 @@ Figure 1 通过三个维度的观测揭示了去噪过程的阶段性本质：
 上述分析指向一个自然的问题：**扩散模型RL微调是否真的需要每一步优化？** 本文的回答是否定的。核心动机在于：若能自适应地识别去噪过程中真正值得RL训练的时间窗口——即语义结构已成型且奖励增益尚未饱和的区间——便可以在显著降低计算成本的同时，规避早期错配和晚期过拟合，实现“少做多得”（Do Less, Achieve More）。
 
 这一动机催生了 **AdaScope** 方法，其设计理念是：将RL训练从“全轨迹均匀分配”转变为“自适应区间聚焦”，通过感知去噪过程中的结构演化和奖励增益动态，为每张图像个性化地确定最优训练起止点。
-
-
 
 ## 核心方法与创新机理
 
@@ -133,8 +129,6 @@ AdaScope 由三个松耦合模块构成，嵌入现有RL微调框架（如DDPO�
 ### 创新边界与局限
 
 AdaScope 的创新聚焦于**何时训练**而非**如何训练**，因此与具体RL算法解耦，可作为插件嵌入DDPO、DPOK、D3PO、TDPO等不同策略。但区间选择依赖预训练CLIP和奖励模型的质量：若下游奖励函数本身不可靠，感知器可能被误导，导致区间决策失准（需手动验证）。此外，在强骨干模型（如SDXL）上改进幅度有限，因其预训练权重已具有较高普适鲁棒性。
-
-
 
 AdaScope 的核心设计理念是将扩散模型的去噪过程重新审视为一个具有阶段性结构演化的动态系统，而非均匀的马尔可夫链。基于这一视角，该方法构建了一个轻量级的自适应时间窗口选择器，嵌入到现有的扩散模型 RL 微调流程中，仅在高价值区间进行策略优化。
 
@@ -193,8 +187,6 @@ AdaScope 的“即插即用”特性使其可以无缝嵌入多种主流扩散�
 - **TDPO**：基于时间差异偏好优化的微调基线，AdaScope 进一步精细化其时间步选择。
 
 在所有宿主方法中，AdaScope 仅修改 RL 训练区间这一单一维度，其余超参数（学习率、批量大小、KL 系数等）均保持与原始方法一致，确保了公平比较。
-
-
 
 ### 3.1 扩散模型RL微调的形式化瓶颈
 
@@ -257,12 +249,8 @@ $$t_{\mathrm{end}} = \min\{t \mid |\lim_{\Delta t \to 0} \frac{\Delta P_{t+\Delt
 
 在此区间内，RL策略梯度仅作用于高价值状态，自动过滤掉早期结构混沌和晚期奖励收敛的无效更新。这种选择性训练策略从根本上缓解了均匀奖励分配导致的动作-奖励错配和奖励黑客问题，实现了“少步多获”的质量-效率双优化。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2672_https_arxiv_org_abs_2605_15855/figures/001_Figure_1.jpg]]
 *Figure 1: We plot the CLIP variation (∆ CLIP), Reward Objective, and Uncertainty Score (Based on Lemma 1) with aligned denoising steps. Only the red region is optimized, where we leverage ∆ CLIP and Reward to select the adaptive scope of denoising steps for training. It can be observed that the structure is chaotic in the first stage, while the reward converges in the last stage. The selected scope has a stable structure and improving reward, which exactly corresponds to the moderate uncertainty stage*
-
-
 
 ## 实验与关键发现
 
@@ -294,36 +282,14 @@ $$t_{\mathrm{end}} = \min\{t \mid |\lim_{\Delta t \to 0} \frac{\Delta P_{t+\Delt
 
 论文自述在部分强骨干模型（如 SDXL）上改进幅度有限。此外，自适应区间选择目前依赖预训练 CLIP 和奖励模型，若下游奖励函数不可靠是否会误导区间决策，仍需手动验证。方法在更长去噪链（如 1000 步）的高分辨率生成中是否需要额外尺度适配，以及能否推广至视频扩散或三维生成任务，均为开放问题。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2672_https_arxiv_org_abs_2605_15855/figures/004_Table_1.jpg]]
 *Table 1: Improving efficiency by deploying our method as a plugin. Time-PB refers to the time consumption per batch (minutes). Top-1 refers to the number of Best results for each method. The time taken to reach a specific reward score is measured in hours. Bold refers to the metric improved with Ours*
-
-![[assets/figures/papers/paper_list_l2672_https_arxiv_org_abs_2605_15855/figures/005_Figure_4.jpg]]
-*Figure 4: Sample efficiency for objective optimization. We present the results on PickaPic and HPSv2 prompt set with rewards PickScore and Aesthetic Score*
-
-![[assets/figures/papers/paper_list_l2672_https_arxiv_org_abs_2605_15855/figures/006_Figure_5.jpg]]
-*Figure 5: Results on more different SD backbones. Notably, the less promising results on SDXL may be due to the inherent robustness of the backbone with a large number of parameters. Still, our method can leverage samples and different denoising states more effectively and thus achieve the best performance*
-
-![[assets/figures/papers/paper_list_l2672_https_arxiv_org_abs_2605_15855/figures/007_Figure_6.jpg]]
-*Figure 6: Results with multiple different reward objectives, including the multi-objective reward like AES+PS, which is accumulated and re-normalized as a combined objective*
 
 ![[assets/figures/papers/paper_list_l2672_https_arxiv_org_abs_2605_15855/figures/008_Figure_7.jpg]]
 *Figure 7: Optimization performance for Ablation Study*
 
 ![[assets/figures/papers/paper_list_l2672_https_arxiv_org_abs_2605_15855/figures/013_Table_3.jpg]]
 *Table 3: Quantitative comparisons with SoTA. All metrics are obtained with SDv15 as backbone, Pick-a-pic as prompt set, and PickScore as training reward*
-
-![[assets/figures/papers/paper_list_l2672_https_arxiv_org_abs_2605_15855/figures/011_Figure_8.jpg]]
-*Figure 8: Visualized Generated Image Distribution. We further reduce the dimension to 1-D (right) for a more direct impression*
-
-![[assets/figures/papers/paper_list_l2672_https_arxiv_org_abs_2605_15855/figures/014_Figure_11.jpg]]
-*Figure 11: Left: Results on Flow-Matching Model. Right: on SDE Model*
-
-![[assets/figures/papers/paper_list_l2672_https_arxiv_org_abs_2605_15855/figures/017_Figure_13.jpg]]
-*Figure 13: Diversity Evaluation: Our method demonstrates the highest level of variation under these prompts, producing outputs with a wide range of artistic styles, figure posture, object positioning, and background colors. In contrast, D3PO predominantly generates grayscale backgrounds or same posture, DPOK consistently incorporates purple tones into its visual style, and DDPO tends to produce collage-like compositions within a single image*
-
-
 
 ## 定位与知识库关联
 
@@ -384,8 +350,6 @@ AdaScope并非重新设计奖励函数，而是通过区间选择间接实现了
 3. **高分辨率与长链适配**：当前实验基于DDIM的50步采样。在具有更长去噪链（例如1000步）的高分辨率生成中，语义结构稳定和偏好增益饱和的时间尺度可能发生变化，区间选择策略是否需要额外的尺度适配机制？
 
 4. **与奖励塑形的深度结合**：AdaScope目前仅通过区间选择间接改善奖励信号质量。如果能与中间步骤的辅助奖励塑形（例如基于CLIP的中间步骤语义奖励）结合，或许能进一步扩大有效训练区间的范围，提升样本效率。
-
-
 
 ## 原文 PDF
 

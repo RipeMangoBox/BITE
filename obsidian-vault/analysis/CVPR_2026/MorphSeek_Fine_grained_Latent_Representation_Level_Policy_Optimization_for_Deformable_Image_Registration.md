@@ -61,8 +61,6 @@ MorphSeek针对上述瓶颈提出了根本性的解决思路：**将编码器顶
 
 在方法谱系上，MorphSeek区别于**SPAC**（基于SAC的64-D压缩动作空间RL配准）、**RIIR**（固定级联逐步配准）和**WarpDDF+RegCut**（一致性正则化半监督配准），首次将高分辨率潜在空间策略优化引入DIR，在标签效率与配准精度之间实现了新的帕累托前沿。其核心洞察在于：**通过无监督预热构建稳定潜在空间，再以GRPO实现由粗到精的弱监督微调，使得有限标签在结构化探索中被反复复用**。
 
-
-
 ### 可变形图像配准：从单步预测到策略优化
 
 可变形图像配准（Deformable Image Registration, DIR）是医学影像分析的核心任务之一，目标是为图像对建立密集的、体素级的空间对应关系，生成一个高维变形场 $\Phi$。近年来，基于深度学习的方法——如 **VoxelMorph** 和 **TransMorph**——通过单次前向传播直接预测变形场，在速度和精度上取得了显著进展。然而，这类方法本质上将配准建模为一个确定性的前馈映射，在面对大变形、复杂解剖结构或跨模态场景时，往往难以在一次推理中恢复精细的局部边界和几何细节。
@@ -84,8 +82,6 @@ MorphSeek针对上述瓶颈提出了根本性的解决思路：**将编码器顶
 2. **多轨迹、多步骤的GRPO可以指数级复用标签**。在逐步细化框架下，每个细化步内采样多条轨迹并进行组内相对比较，使得每对标记图像产生 $T \times J$ 个相对监督事件（$T$ 为细化步数，$J$ 为轨迹数）。这从根本上改变了标签利用模式，使得有限标签下的性能显著提升成为可能。
 
 3. **无监督预热是稳定高维GRPO的关键**。直接在随机初始化的潜在空间上运行GRPO会导致训练不稳定甚至崩溃。通过无监督预热，先让编码器学习到解剖保持的确定性表示，再将策略分布锚定在这一稳定流形上，可以大幅提升GRPO的收敛成功率和最终性能。
-
-
 
 ## 核心方法与创新机理
 
@@ -133,8 +129,6 @@ $$\log \pi(\mathbf{z} \mid \pmb{\mu}, \pmb{\sigma}) = -\frac{1}{2s} \sum_{i=1}^N
 
 MorphSeek的范式可泛化至任意编码器-解码器架构（已验证**VoxelMorph-L**、**TransMorph**、**NICE-Trans**三种骨干网络），在OASIS脑部MRI、LiTS肝脏CT、Abdomen MR←CT三个基准上均取得一致且显著的Dice提升（+2.1%至+4.2%）和NJD降低（Table 1），证明了该创新范式的通用性和有效性。
 
-
-
 MorphSeek 提出了一种面向可变形图像配准的**三阶段训练范式**，其核心思想是将配准任务重构为**潜在空间策略优化**问题。该范式可泛化至任意编码器-解码器架构的配准模型，通过在高分辨率潜在表示上进行强化学习探索，替代传统方法在百万维变形场空间中的直接优化。
 
 ### 阶段一：RL 友好的架构重构
@@ -169,12 +163,8 @@ $$\mathcal{E}_{\mathrm{grpo}}(\pmb\theta) = \mathcal{L}_{\mathrm{policy}}(\pmb\t
 
 该框架的一个核心优势在于**标签复用效率**：每个标记对在 $T$ 个细化步内产生 $T \times J$ 个相对监督事件（组内轨迹比较），使有限标签被反复利用。实验证实，MorphSeek 仅需 60% 的标记数据即可达到 98.5% 的满标签性能，而基线 TransMorph 需要 80% 标签才能达到相当水平。这一特性对医学图像分析中标注稀缺的现实约束具有重要价值。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2549_https_arxiv_org_abs_2511_17392/figures/001_Figure_1.jpg]]
 *Figure 1: MorphSeek Registration Framework Process*
-
-
 
 ### 3.1 RL友好重构：从确定性特征到可采样潜在策略
 
@@ -233,9 +223,6 @@ $$\log \tilde{\pi}(\mathbf{z} \mid \pmb{\mu}, \pmb{\sigma}) = -\frac{1}{2s} \sum
 
 理论分析表明（见 Appendix 8），当潜在维度间满足弱相关假设时，$s = \sqrt{N}$ 使对数似然的方差保持 $O(1)$，从而稳定高维 GRPO 更新。消融实验（Figure 5, Table 5）证实 $s = \sqrt{N}$ 达到最佳性能；$s = N$ 过度压缩导致 GRPO 贡献微弱，$s = 1$ 则引入严重梯度噪声。
 
-![[assets/figures/papers/paper_list_l2549_https_arxiv_org_abs_2511_17392/figures/008_Figure_5.jpg]]
-*Figure 5: Validation Dice on OASIS for TransMorph under different LDVN scaling factors s*
-
 **策略损失与总目标**：基于组归一化优势和 LDVN 缩放的对数似然，策略梯度损失为：
 
 $$\mathcal{L}_{\mathrm{policy}}(\theta_E) = -\frac{1}{J} \sum_{j=1}^J A^{(j)} \cdot \log \tilde{\pi}^{(j)} \tag{Eq. 13}$$
@@ -249,8 +236,6 @@ $$\mathcal{E}_{\mathrm{grpo}}(\pmb\theta) = \mathcal{L}_{\mathrm{policy}}(\pmb\t
 $$\Phi_t = \Phi_{t-1} \circ \phi^{(j^*)} \tag{Eq. 16}$$
 
 **标签效率机制**：MorphSeek 的标签效率提升源于其多轨迹、多步设计。每个标记图像对在 $T$ 个细化步中产生 $T \times J$ 个相对监督事件（组内比较），使有限的标签被反复复用。实验表明，MorphSeek 仅需 60% 的标记数据即可达到 98.5% 的满标签性能，而基线 TransMorph 需要 80% 标签才能达到相似水平（Figure 3）。
-
-
 
 ## 实验与关键发现
 
@@ -287,9 +272,6 @@ Table 2 系统性地考察了轨迹数（J）和细化步数（T）对配准性�
 
 Figure 3 与 Section 5.2 展示了 MorphSeek 在标签效率上的核心优势。在 OASIS 数据集上，当仅使用 **60%** 的训练标记对时，MorphSeek 已达到满标签性能的 **98.5%**；而基线 TransMorph 需要 **80%** 的标签才能达到相当水平。这一差距源于 MorphSeek 的多轨迹、多步 GRPO 机制：每对标记图像在 T 个细化步内采样 J 条轨迹，通过组内相对比较产生 **T×J 个相对监督事件**，从而将稀缺的标注信号反复复用。在极端低标签场景（如仅 20% 标记对）下，MorphSeek 的性能优势更为明显，无监督预热构建的稳定潜在空间为 GRPO 微调提供了良好的初始化，避免了冷启动时的策略崩溃。
 
-![[assets/figures/papers/paper_list_l2549_https_arxiv_org_abs_2511_17392/figures/004_Figure_3.jpg]]
-*Figure 3: Impact of Warm-up and MorphSeek on GRPO Finetuning Performance with Limited Labeled Data (OASIS dataset)*
-
 ### 无监督预热的关键作用
 
 去除无监督预热（cold start）的实验揭示了其决定性影响：GRPO 稳定训练的成功率从 **79% 骤降至 33%**（Section 5.3 / Appendix 8.4）。无预热时，策略在随机初始化的潜在空间中探索，高维对数似然的方差失控，导致梯度噪声淹没有效信号，训练频繁发散。预热阶段通过令温度 τ=0 迫使解剖信息进入均值编码，并利用相似度损失和 KL 正则化构建结构化的潜在空间，为后续 GRPO 提供了平滑的优化景观，不仅提升了稳定性，还缩短了收敛所需的迭代次数。
@@ -313,12 +295,6 @@ Table 5 的超参数敏感性分析揭示了若干关键失败模式：
 - **移除 KL 正则化**（预热损失的 KL 项）引发后验坍缩（Table 6），潜在空间的方差趋于零，策略失去探索能力，Dice 跨多次采样的标准差骤降；
 - **移除预热损失中的图像相似度项**（Figure 6）导致 GRPO 出现“奖励黑客”现象——策略通过生成不合理的变形场（如过度拉伸或折叠）来最大化 Dice 增益，产生大量负雅可比区域，变形失去物理意义。
 
-![[assets/figures/papers/paper_list_l2549_https_arxiv_org_abs_2511_17392/figures/010_Table_6.jpg]]
-*Table 6: Posterior collapse analysis on OASIS. Dice is reported as mean±std (%) over ten latent samples for the same input pair*
-
-![[assets/figures/papers/paper_list_l2549_https_arxiv_org_abs_2511_17392/figures/011_Figure_6.jpg]]
-*Figure 6: Failure case when removing the similarity term from*
-
 ### 与多阶段基线的对比
 
 Table 7 将 MorphSeek 与多阶段配准方法 LapIRN 进行对比。在相同的 100 对标记数据弱监督设置下，TransMorph+MorphSeek（88.9 Dice）显著优于 LapIRN（86.2 Dice），表明基于潜在空间策略优化的逐步微调比固定级联的渐进配准范式更有效。Table 8 进一步报告了经典优化方法（如 SyN、NiftyReg）的性能，这些方法在 CPU 时间上劣势明显（每对数十秒 vs. MorphSeek 的亚秒级），且 Dice 指标普遍低于学习方法。
@@ -326,16 +302,6 @@ Table 7 将 MorphSeek 与多阶段配准方法 LapIRN 进行对比。在相同�
 ### 效率分析
 
 Table 11 的效率分析表明，MorphSeek 引入的额外参数不足骨干网络的 **3%**（仅增加均值头和对数标准差头）。推理时间随细化步数近线性增长：3 步时约为单次前向传播的 3 倍，但仍保持在可接受的亚秒级。多轨迹采样仅在训练阶段进行，推理时采用贪婪策略选择组内最优轨迹，无需额外采样开销。
-
-![[assets/figures/papers/paper_list_l2549_https_arxiv_org_abs_2511_17392/figures/017_Table_11.jpg]]
-*Table 11: Efficiency analysis on OASIS. MorphSeek adds less than 3% parameters and near-linear runtime growth with refinement steps*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2549_https_arxiv_org_abs_2511_17392/figures/018_Figure_7.jpg]]
-*Figure 7: Label-wise Dice on OASIS (SPAC: Steps = 20, TransMorph+MorphSeek: Steps/Trajs = 3/6)*
-
-
 
 ## 定位与知识库关联
 
@@ -384,8 +350,6 @@ MorphSeek 处于**可变形图像配准**与**强化学习策略优化**的交�
 ---
 
 **证据强度说明：** 上述适用边界和局限均基于论文中提供的消融实验（Table 2, Table 5, Table 6, Figure 3, Figure 5, Figure 6）和附录分析（Appendix 8.4），置信度较高。开放问题部分属于基于实验观察的合理推断，部分方向（如自适应步数调度、无监督奖励设计）在论文的 limitations 和 discussion 中已有暗示，但具体实现路径需要后续工作验证。
-
-
 
 ## 原文 PDF
 

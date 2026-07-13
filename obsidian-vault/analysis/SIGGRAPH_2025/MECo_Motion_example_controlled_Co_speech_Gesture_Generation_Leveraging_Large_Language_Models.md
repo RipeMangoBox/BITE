@@ -54,8 +54,6 @@ MECo的关键技术路线为：将运动样例的离散token序列经过去重�
 
 方法的主要局限包括：无法提供精准的关节级别控制；运动tokenizer采用非因果架构，仅支持离线生成；以及在域外数据上的泛化能力有限。未来方向包括设计因果运动tokenizer以实现低延迟实时生成，以及通过更大规模数据或不同LLM结构突破模型扩展瓶颈。
 
-
-
 共语手势（co-speech gesture）是人类交流中与语音节奏和语义自然同步的身体动作，对于提升虚拟人、数字角色和具身智能体的表现力至关重要。自动生成与语音匹配且风格可控的共语手势，一直是计算机图形学与多模态学习交叉领域的前沿问题。
 
 现有方法在处理风格控制时面临两个核心瓶颈。其一，基于预设标签的风格控制方法（如直接将“高兴”“开放”等离散属性作为条件）受限于标注粒度和类别数量，无法灵活表达连续、复合或新颖的运动风格。其二，近年来兴起的样例驱动方法试图通过提供一段参考运动来引导生成，但主流方案在条件化方式上存在结构性缺陷：**SynTalker**（Chen et al., 2024a）尝试建立文本-运动对齐，但跨模态映射过程损失了运动样例中的精细运动学细节；**ZeroEGGS**（Ghorbani et al., 2023）将运动样例压缩为固定维度的风格向量作为条件，这种信息瓶颈不可避免地丢弃了样例中的时间动态和局部运动模式。这些方法在定量评估中表现出明显的样例-生成距离偏大：ZeroEGGS在ZEGGS数据集上的FGD1_test高达4.54，SynTalker在BEAT2上的FGD1_test达到8.21，表明生成手势与参考样例之间存在显著的分布偏移。
@@ -63,8 +61,6 @@ MECo的关键技术路线为：将运动样例的离散token序列经过去重�
 与此同时，语音到手势生成（speech-to-gesture）领域的方法演进为多模态集成提供了新的技术语境。早期方法如**S2G**（Ginosar et al., CVPR 2019）采用确定性映射，生成的多样性不足；**Trimodal**（Yoon et al., TOG 2020）引入文本-音频-身份三模态融合，但各模态编码器独立训练，缺乏统一的表示空间；**TalkShow**（Yi et al., CVPR 2023）基于VQ-VAE进行离散化建模，在生成质量上取得进步，但多样性（BEAT2上Diversity=13.47）仍有提升空间；**EMAGE**（Liu et al., 2024b）作为当前最优的全身体手势生成方法，在BEAT2上FGD达到5.512，但该方法并非为样例条件控制设计，无法直接利用参考运动进行风格引导。
 
 上述技术格局揭示了一个关键缺口：**如何在保留运动样例完整信息的前提下，将其作为灵活、可调节的条件注入生成过程，同时不损害语音-手势的对齐质量？** 这一问题的解决需要突破传统“压缩编码再注入”的范式，寻找一种能够原生理解序列模态、保持信息保真度且具备上下文建模能力的生成架构。大型语言模型（LLM）在通用序列理解和条件自回归生成方面的突破性进展，为这一方向提供了新的可能性——如果将语音和运动统一表示为离散token序列，LLM的上下文学习能力理论上可以同时解析语音内容和运动样例风格，从而在统一的token空间中实现高保真、可控的共语手势生成。
-
-
 
 ## 核心方法与创新机理
 
@@ -80,15 +76,7 @@ MECo的核心创新在于**将运动样例作为显式离散Token提示直接输
 
 上述设计使MECo在BEAT2基准上取得FGD 3.401的最优结果（加入样例后进一步降至2.999），同时生成多样性达到15.30，显著优于TalkShow（13.47）和EMAGE（5.512）等方法（Table 1）。在ZEGGS数据集上的示例相似度（FGD1_test=1.98）也远优于ZeroEGGS（4.54），验证了显式Token条件在保留运动细节方面的优势（Table 2）。此外，微调后LLM的MMLU得分仅从46.50降至46.27（退化0.49%），表明该方法几乎不损害LLM的通用文本能力（Table 6）。
 
-
-
 MECo 的整体 pipeline 围绕“离散化—提示前缀—自回归生成”三条主线展开，如 Figure 2 和 Figure 3 所示。系统接收两类输入：**语音音频**和**运动样例**（可为运动片段、单帧姿态、人体视频甚至文本描述，见 Figure 1）。两类输入分别经过独立的离散化 tokenizer 转换为 token 序列，再以特定提示模板（Figure 8）拼接后馈入大语言模型（LLM）进行自回归生成；生成的离散运动 token 经运动解码器恢复为连续的目标手势运动序列。
-
-![[assets/figures/papers/paper_list_l1927_MECo_Motion_example_controlled_Co_speech_Gesture_Generation_Leveraging_L/figures/002_Figure_2.jpg]]
-*Figure 2: Our model takes motion examples and speech audio as inputs. Both inputs are converted into token sequences by tokenizers and fed into an LLM for autoregressive generation. The generated motion tokens are then processed through a motion decoder to produce the target gesture motion*
-
-![[assets/figures/papers/paper_list_l1927_MECo_Motion_example_controlled_Co_speech_Gesture_Generation_Leveraging_L/figures/003_Figure_3.jpg]]
-*Figure 3: The structure of our example-guided co-speech generation model. Both motion and audio are tokenized and fed into a large language model (LLM) to generate co-speech motion tokens. Initially, we fine-tune the embedding layer and output linear layer (unembedding space) to adapt the new tokens to the token distribution of the LLM. Subsequently, we perform full parameter fine-tuning to enable the LLM to generate motion tokens*
 
 ### 输入离散化：运动与语音的统一 token 表示
 
@@ -114,14 +102,9 @@ LLM 骨干选用 **Qwen2.5**（Section 3.2），其原生词表被扩展以容�
 
 整个 pipeline 的端到端数据流可概括为：**运动样例 → Motion RQ-VAE → 离散 token（去重/打乱/dropout）→ 提示前缀**；**语音音频 → HuBERT → 离散 token → 提示正文**；二者拼接后输入 LLM 自回归生成目标运动 token，最终经运动解码器输出连续手势序列。该设计使得 MECo 既能以样例驱动方式生成与参考运动高度一致的共语手势，又在语音到手势基准上取得了最优的 FGD（3.401，Table 1），且引入样例后 FGD 进一步降至 2.999。
 
-
-
 ### 运动表示：解剖分区残差量化
 
 MECo 将连续运动序列压缩为离散 token 的核心模块是基于残差向量量化（Residual Vector Quantization, RVQ）的运动 VAE。与常规 VQ-VAE 不同，该模块实施**解剖分区 token 化**：将人体姿态按功能区域划分为上半身、下半身和双手三个独立通道，每个通道拥有各自的编码器、码本和解码器。这一设计使得后续可通过组合不同样例的区域 token 实现身体部位的精细控制（见 Figure 5）。
-
-![[assets/figures/papers/paper_list_l1927_MECo_Motion_example_controlled_Co_speech_Gesture_Generation_Leveraging_L/figures/007_Figure_5.jpg]]
-*Figure 5: We can control specific body parts by tokenizing examples and combining their corresponding tokens. For instance, we tokenize two examples, use the upper body token from the first and the lower body token from the second as a prompt. The generated motion effectively reflects these references*
 
 运动编码器 $\mathcal{E}$ 将输入运动序列 $\mathbf{m}_{1:N}$ 映射为潜在表示，经 $Q$ 层残差量化后得到离散 token 序列。解码器 $\mathcal{D}$ 从量化后的潜在表示重建运动。训练损失为：
 
@@ -179,11 +162,6 @@ $$
 
 Figure 8 展示了 MECo 的提示模板。与常规 LLM 的文本提示不同，MECo 使用运动 token 和音频 token 构建多模态提示：系统提示为去重打乱后的样例运动 token，用户查询为音频 token 序列，模型回答为目标运动 token。这种设计使 LLM 的上下文理解能力直接作用于运动域，无需文本中介。
 
-![[assets/figures/papers/paper_list_l1927_MECo_Motion_example_controlled_Co_speech_Gesture_Generation_Leveraging_L/figures/011_Figure_8.jpg]]
-*Figure 8: The prompt format of regular LLM and of our method. We prompt the LLM using tokens from motion and audio modals with different template designs*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -235,21 +213,11 @@ Figure 8 展示了 MECo 的提示模板。与常规 LLM 的文本提示不同，
 ![[assets/figures/papers/paper_list_l1927_MECo_Motion_example_controlled_Co_speech_Gesture_Generation_Leveraging_L/figures/005_Table_2.jpg]]
 *Table 2: Comparison of the similarity between the generated results and the motion example. The values in this table represent the mean and standard deviation, where the standard deviation is shown after ’±’*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1927_MECo_Motion_example_controlled_Co_speech_Gesture_Generation_Leveraging_L/figures/010_Table_4.jpg]]
-*Table 4: User study of different systems on BEAT2 and ZeroEGGS datasets. The results are reported as average scores with 95% confidence intervals*
-
 ![[assets/figures/papers/paper_list_l1927_MECo_Motion_example_controlled_Co_speech_Gesture_Generation_Leveraging_L/figures/008_Figure_6.jpg]]
 *Figure 6: A qualitative comparison between our method and ZeroEGGS. Both methods use the same input, with the motion example displayed on the left side of the arrows in the figure, and the input audio presented at the bottom of the figure*
 
 ![[assets/figures/papers/paper_list_l1927_MECo_Motion_example_controlled_Co_speech_Gesture_Generation_Leveraging_L/figures/009_Figure_7.jpg]]
 *Figure 7: A qualitative comparison between our method and SynTalker. Both methods use the same input, with the motion example displayed on the left side of the arrows in the figure, and the input audio presented at the bottom of the figure*
-
-![[assets/figures/papers/paper_list_l1927_MECo_Motion_example_controlled_Co_speech_Gesture_Generation_Leveraging_L/figures/014_Figure_9.jpg]]
-*Figure 9: Screenshot of the user interface used for user study*
-
-
 
 ## 定位与知识库关联
 
@@ -299,8 +267,6 @@ MECo 处于**样例驱动共语手势生成**与**多模态大语言模型**的�
 3. **数据扩展与模型结构的协同优化**：7B 模型的性能停滞暗示需要更大规模或更高质量的训练数据。同时，不同的 LLM 架构（如非自回归解码器、MoE 结构）是否能在有限数据下实现更好的扩展性，仍有待探索。
 
 4. **文本描述条件的精细对齐**：MECo 已展示文本提示作为运动样例的潜力（Figure 1），但从文本到运动 token 的映射目前依赖 LLM 的隐式理解。通过显式的动作-语言对比学习或指令微调，能否实现“快速挥手”与“缓慢挥手”等细粒度文本控制，是一个有意义的延伸方向。
-
-
 
 ## 原文 PDF
 

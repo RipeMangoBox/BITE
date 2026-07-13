@@ -58,8 +58,6 @@ claims:
 
 **核心发现**：在 SpatialScore 上，人类水平为 86.60，而当前最佳模型 Gemini-2.5-Pro 仅达到 60.12，差距显著（Table 2）。基于 SpatialCorpus 的微调使 Qwen3-VL-8B 在 SpatialScore-Repurpose 子集上从 54.53 提升至 76.29（Table 8）；而 SpatialAgent-ReAct 在不修改模型参数的情况下，将同模型在 SpatialScore-OpenSource 上的准确率从 42.97 提升至 50.01（Table 7）。这表明：**将视觉基础模型作为工具集成到语言模型推理中，能够显著增强空间智能；而全面的基准是推动该领域进步的必要条件。**
 
-
-
 ### 空间智能：多模态大模型的“阿喀琉斯之踵”
 
 空间智能（Spatial Intelligence）是指智能体感知、推理并与三维世界交互的能力，涵盖深度估计、相机姿态理解、物体运动追踪、视角推理等核心技能。对于旨在实现通用人工智能的多模态大语言模型（MLLM）而言，空间智能是其理解物理世界、执行具身任务的关键基础。然而，当前最先进的 MLLM 在空间推理任务上的表现远逊于人类——SpatialScore 基准测试显示，人类水平为 **86.60**，而表现最好的专有模型 Gemini-3-Pro 仅达到 **60.12**，存在超过 26 个百分点的巨大认知鸿沟（Table 2 Overall）。
@@ -86,8 +84,6 @@ claims:
 
 这一体系的核心洞察在于：**将视觉基础模型作为工具集成到语言模型推理循环中，能够显著提升 MLLM 在复杂空间任务上的表现；而全面的基准是推动该领域进步的必要条件**。
 
-
-
 ## 核心方法与创新机理
 
 SpatialScore 工作的核心创新并非提出一种全新的模型架构，而是围绕**评估基准、训练数据与推理范式**三个维度，系统性地弥补了现有多模态大模型（MLLM）在空间智能评估与增强上的关键缺口。其创新逻辑根植于一个明确的因果机制：**现有基准的碎片化与简单化掩盖了模型在严格几何空间感知（如相机姿态估计、深度推理、运动追踪）上的真实缺陷**，而通过构建全面基准量化这一差距，并分别从数据驱动与智能体驱动两条路径施加干预，能够显著提升模型的空间推理能力。
@@ -102,8 +98,6 @@ SpatialScore 工作的核心创新并非提出一种全新的模型架构，而�
 这一机制创新的优势在于：它将空间推理从模型内部的隐式知识检索，转化为对外部精确感知工具的显式调用与整合。在不进行任何微调的情况下，SpatialAgent-ReAct 将 Qwen3-VL-8B 在 SpatialScore-OpenSource 上的准确率从 42.97 提升至 50.01（+7.04），且 ReAct 范式的迭代推理特性使其在多数基准上优于 Plan-Execute 范式（Table 7）。定性结果（Figure 4）进一步展示了智能体通过逐步调用深度估计、光流等工具，成功推理出正确空间属性的过程，而其他模型则直接给出错误回答。
 
 综上，SpatialScore 的创新本质在于**识别并利用了“全面评估—数据增强—工具协同”这一增强空间智能的因果链条**：全面基准暴露能力缺陷，专项数据提供知识补充，智能体框架实现工具协同，三者共同推动 MLLM 向人类水平的空间智能迈进。
-
-
 
 SpatialScore 工作围绕空间智能评估与增强构建了一个“评估基准—训练语料—推理智能体”三位一体的整体框架，其核心逻辑为：首先通过全面的基准诊断当前多模态大语言模型（MLLM）的空间认知瓶颈，然后分别从数据驱动和智能体驱动两条互补路径提升模型的空间推理能力。
 
@@ -159,12 +153,8 @@ SpatialAgent 内部由四个角色模块组成，支持两种推理范式：
 
 上述三个核心模块均依赖统一的数据构造管线（图 2a）：从 3D 标注数据出发，通过 QA 对生成管线产生判断、多选和开放式问题，经 LLM 预过滤和人工筛选确保质量与视觉依赖性。SpatialScore 整合了新增的 3D 标注重利用数据（SpatialScore-Repurpose，1,091 样本）与来自 23 个公开数据集的空间相关样本，总计 5,025 样本；SpatialCorpus 则基于模拟器和 3D 元数据扩展至 331K 样本，为监督微调提供大规模训练信号。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l827_https_arxiv_org_abs_2505_17012/figures/001_Figure_1.jpg]]
 *Figure 1: | Overview. (a) Representative examples from distinct categories in SpatialScore, which thoroughly assesses spatial intelligence capabilities via question-answering (judgment, multi-choice, and open-ended QA); (b) Performance of state-of-the-art models compared to humans on SpatialScore*
-
-
 
 ### 3.1 问题形式化
 
@@ -217,12 +207,8 @@ SpatialScore 和 SpatialCorpus 共享一套数据构造管线，核心模块包�
 
 SpatialCorpus 在此基础上进一步扩展，利用模拟器生成大规模训练数据，最终包含 331K 个空间推理问答对，覆盖多种视觉数据类型和输入模态。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l827_https_arxiv_org_abs_2505_17012/figures/005_Figure_3.jpg]]
 *Figure 3: | Architecture and Workflow of SpatialAgent. (a) Specialized spatial perception tools within SpatialAgent; (b) The Plan-Execute paradigm for task decomposition and stepwise execution; (c) The ReAct paradigm for iterative interaction and strategy refinement*
-
-
 
 ## 实验与关键发现
 
@@ -263,36 +249,14 @@ SpatialAgent 的推理延迟显著高于直接推理。Table 6 报告了各工�
 
 SpatialAgent 的推理质量受限于底层工具模型的精度。工具的错误输出（如深度估计偏差、目标漏检）可能传播至最终答案，导致推理链断裂。此外，Plan-Execute 范式在复杂场景下存在一定的规划失败率，此时系统回退至直接回答，无法发挥工具增强的优势。基于 SpatialCorpus 的微调方法则面临训练-测试分布偏移问题：在分布内任务上增益显著，但在分布外任务上提升有限，表明当前训练语料的覆盖范围仍需扩展。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l827_https_arxiv_org_abs_2505_17012/figures/004_Table_2.jpg]]
-*Table 2: | Results on SpatialScore. Mental., Count., Depth., Obj-Dist., Obj-Mo., Camera., Temp-Rea., View-Rea., Obj-Size., Obj-Loc., refer to Mental Animation, Counting, Depth Estimation, Object Distance, Object Motion, Camera Pose & Motion, Temporal Reasoning, View Reasoning, Object Size, and Object Localization, respectively. Best and second-best ones are bolded and underlined in each group*
-
 ![[assets/figures/papers/paper_list_l827_https_arxiv_org_abs_2505_17012/figures/006_Table_3.jpg]]
 *Table 3: | Comparisons of our Data-driven and Agent-based Approaches on SpatialScore. Qwen3-VL is adopted in two ways: (i) supervised fine-tuned on our SpatialCorpus; and (ii) as the agent core to conduct reasoning using the Plan-Execute (PE) and ReAct paradigms in SpatialAgent*
 
 ![[assets/figures/papers/paper_list_l827_https_arxiv_org_abs_2505_17012/figures/015_Table_7.jpg]]
 *Table 7: | Quantitative Comparisons on SpatialScore-OpenSource Subset. Qwen3-VL is adopted in two ways: (i) supervised fine-tuned on our SpatialCorpus; and (ii) as the agent core to conduct reasoning using the Plan-Execute (PE) and ReAct paradigms in SpatialAgent*
 
-![[assets/figures/papers/paper_list_l827_https_arxiv_org_abs_2505_17012/figures/016_Table_8.jpg]]
-*Table 8: | Quantitative Comparisons on SpatialScore-Repurpose Subset. Qwen3-VL is adopted in two ways: (i) supervised fine-tuned on our SpatialCorpus; and (ii) as the agent core to conduct reasoning using the Plan-Execute (PE) and ReAct paradigms in SpatialAgent*
-
 ![[assets/figures/papers/paper_list_l827_https_arxiv_org_abs_2505_17012/figures/007_Figure_4.jpg]]
 *Figure 4: | Qualitative Results. We present the reasoning process of SpatialAgent against the direct responses of other models. While occasional errors occur due to tool execution or interpretation mistakes, these limitations are expected to diminish as MLLMs advance*
-
-![[assets/figures/papers/paper_list_l827_https_arxiv_org_abs_2505_17012/figures/003_Table_1.jpg]]
-*Table 1: | Comparison with Existing Spatial Intelligence Benchmarks. Here, Real and AIGC denote real-world samples and data generated by visual generative models (e.g., Cosmos [1]), respectively. The considered input modalities include single-image, multi-image sequence, and video*
-
-![[assets/figures/papers/paper_list_l827_https_arxiv_org_abs_2505_17012/figures/009_Table_4.jpg]]
-*Table 4: | Data Statistics of SpatialCorpus*
-
-![[assets/figures/papers/paper_list_l827_https_arxiv_org_abs_2505_17012/figures/010_Table_5.jpg]]
-*Table 5: | Data Statistics of SpatialScore. Here, SpatialScore-Repurpose denotes the newly constructed samples based on 3D annotations*
-
-![[assets/figures/papers/paper_list_l827_https_arxiv_org_abs_2505_17012/figures/008_Figure_5.jpg]]
-*Figure 5: | Annotation Issues in Existing Benchmarks. We observe that existing datasets contain various annotation errors or ambiguities, including those found in CV-Bench [78], SpatialSense [99], MMIU [60], SRBench [56], SITE-Bench [88], and RoboSpatial-Home [72]*
-
-
 
 ## 定位与知识库关联
 
@@ -341,8 +305,6 @@ ReAct范式在多数基准上优于Plan-Execute（如8B在OpenSource上50.01 vs.
 **工具覆盖的完备性**：12个工具是否覆盖了全部空间感知需求？未来扩展方向可能包括3D场景图构建、动态时空推理、以及多智能体协同感知等更复杂的空间认知能力。
 
 **训练语料的平衡性**：构建分布更广泛、更平衡的训练语料，以缓解微调在不同子集上的差分提升问题，是提升方法泛化性的必要条件。这需要探索跨模拟器、跨数据源的数据混合策略和分布对齐技术。
-
-
 
 ## 原文 PDF
 

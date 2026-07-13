@@ -145,8 +145,6 @@ MaskedManipulator 探索了三种架构变体：C-VAE、Deterministic 和 Diffus
 
 两阶段设计的关键因果机制在于：先在信息完备的环境下掌握“如何精确操作”，再通过掩码蒸馏迫使策略学会从稀疏提示中推断缺失的交互细节，从而在灵活性和精确性之间取得平衡。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2505_19086/figures/004_Figure_3.jpg]]
 *Figure 3: Object Retargeting for Morphological Differences. Transferring motion between characters of varying shapes can misalign human-object interactions (left). Our method leverages original contact data to retarget the object’s trajectory, preserving interaction consistency (right)*
 
@@ -244,10 +242,6 @@ Figure 9 展示了不当奖励和物理参数导致的穿透问题：当接触�
 - **Table 3**：Diffusion 策略在稀疏物体目标条件下取得最高成功率，验证了其处理长程目标条件任务的能力。
 - **Figure 7–8**：定性证明了策略在顺序目标变化、自适应抓取切换和生成性交互方面的灵活性。
 - **Figure 9**：揭示了简化物理模型在精细接触建模上的失败模式，需手动验证具体参数敏感性。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2505_19086/figures/010_Table.jpg]]
 
 ## 定位与知识库关联
 

@@ -177,8 +177,6 @@ SceneTransporter 构建于组合式潜扩散模型之上，将结构化 3D 场�
 ### 管道特点
 与现有“分而治之”方法（如先分割后重建）不同，SceneTransporter 实现了**端到端的单图像到结构化场景生成**，无需额外的实例掩码或预分割步骤。OT 传输计划在去噪早期（约 $t \approx 540/600$ 步）即稳定，后续仅进行局部微调，保证了物体级部件的全局连贯性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l62_https_openreview_net_forum_id_xjCkwPhQWq/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of the SceneTransporter pipeline. At each denoising step t, our Optimal-Transport–Guided Correlation Assignment framework formulates a global OT problem between image patches and part-level tokens within the compositional latent DiT. We compute a part-patch cost from Q/K similarity, regularized by image edges, and solve for an optimal transport plan using Sinkhorn iteration. The OT plan gates the cross attention to enforce an explicit patch-to-part routing, and the resulting gated attention map updates the latent*
 
@@ -249,8 +247,6 @@ $$\widehat{\mathbf{Z}}^{(t)}(S_i,:) = \mathrm{Concat}_{h=1}^H [\mathbf{H}_h^{(i)
 
 **传输计划的早期稳定性**：可视化分析显示，OT 传输计划在去噪步骤约 $t \approx 540/600$ 后即基本稳定，全局划分不再显著变化，仅在局部进行微调。这表明粗粒度的语义路由在去噪早期即已确定，保证了物体级部件的连贯性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l62_https_openreview_net_forum_id_xjCkwPhQWq/figures/002_Figure_2.jpg]]
 *Figure 2: Qualitative Results on Vecset-based Latent Probing. Cluster and Cluster with CCA are our probes that perform in the compositional latent space of PartPacker; VAE clusters the latent obtained by encoding the fused geometry produced by PartPacker into the VAE. Colors denote part assignments*
 
@@ -259,9 +255,6 @@ $$\widehat{\mathbf{Z}}^{(t)}(S_i,:) = \mathrm{Concat}_{h=1}^H [\mathbf{H}_h^{(i)
 
 ![[assets/figures/papers/paper_list_l62_https_openreview_net_forum_id_xjCkwPhQWq/figures/008_Figure_6.jpg]]
 *Figure 6: Qualitative Ablation Studies on the OT Plane-gated Cross Attention. Here, A attn. and B attn. denote the dual-volume soft attention probability maps, reshaped to the image patch grid (brighter means higher affinity). Hard affinity visualizes the argmax(A,B) patch assignments overlaid on the input image (blue→A, red→B). A geo. and B geo. are the geometries decoded from dual volumes, respectively, and Uni geo. is their fused scene mesh. Row (a) shows our OT plan–gated cross-attention; row (b) shows the standard cross-attention*
-
-![[assets/figures/papers/paper_list_l62_https_openreview_net_forum_id_xjCkwPhQWq/figures/009_Figure_7.jpg]]
-*Figure 7: Qualitative Ablation Studies on the OT Plan Progression over Denoising Steps. Each map visualizes the hard OT plan at a given denoising step: every cell is an image patch assigned to one volume (dark blue = A, light cyan = B). Left→right shows the OT plan’s evolution; later steps mostly stabilize with only local refinements*
 
 ## 实验与关键发现
 
@@ -305,20 +298,6 @@ Table 4系统拆解了SceneTransporter各组件的贡献，默认配置以星号
 - **细小密集重复物体**：在拥挤的船只、树木等场景中，OT引导的路由可能将少数弱实例合并到相邻物体中，导致微小物体数量低估。这与OT的边际约束在极端稀疏信号下的退化有关。
 - **去噪步长不足**：当去噪步骤过短或令牌数量不足时，偶尔出现表面不平滑或漂浮几何伪影，表明OT约束需要足够的去噪迭代来充分细化。
 - **合成到真实的泛化差距**：模型在合成渲染数据上训练，面对严重分布外（OOD）的真实图像时几何质量和部件分组下降。Figure 8显示通过风格迁移预处理（基于GPT-5的图像编辑模型将真实图像风格迁移为类渲染风格）有所缓解，但仍存在明显的领域差距。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l62_https_openreview_net_forum_id_xjCkwPhQWq/figures/005_Figure_4.jpg]]
-*Figure 4: Qualitative Comparison on Structured 3D Scene Generation across Methods. Different colors indicate different parts in the generated 3D scene*
-
-![[assets/figures/papers/paper_list_l62_https_openreview_net_forum_id_xjCkwPhQWq/figures/013_Table_4.jpg]]
-*Table 4: Comparison of metrics for ablation. Bold values indicate the best scores, while underlined values indicate the second-best scores among the fair comparison. Asterisk (∗) indicates the default settings in our method*
-
-![[assets/figures/papers/paper_list_l62_https_openreview_net_forum_id_xjCkwPhQWq/figures/012_Figure_9.jpg]]
-*Figure 9: Convergence of the entropic OT solver across OT-gated cross-attention layers. We plot the residuals of the dual variables and transport plan, as well as the marginal-constraint violation, for three representative OT-gated cross-attention layers*
-
-![[assets/figures/papers/paper_list_l62_https_openreview_net_forum_id_xjCkwPhQWq/figures/011_Figure_8.jpg]]
-*Figure 8: Qualitative Results on Structured 3D Scene Generation from Real-World Images. We use a GPT-5–based image editing model to transfer the style of real-world images, making them look like images rendered from a graphics engine*
 
 ## 定位与知识库关联
 

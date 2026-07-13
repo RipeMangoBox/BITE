@@ -64,8 +64,6 @@ AutoGaze采用两阶段训练策略：先通过下一token预测（NTP）预训�
 
 AutoGaze区别于现有token缩减方法的关键在于**在ViT之前**而非之后进行补丁选择。现有方法（如VideoChat-Flash）仅在LLM端剪枝token，ViT仍需处理全量像素，因此ViT延迟不变。AutoGaze通过前置凝视模块直接控制ViT输入规模，同时加速ViT和LLM两端，实现了从视觉编码到语言推理的全链路效率提升。
 
-
-
 ### 视频理解的效率瓶颈：从LLM剪枝到ViT前移
 
 多模态大语言模型（MLLM）在视频理解任务中展现出强大能力，但其计算效率始终是制约实际部署与规模扩展的核心障碍。现有MLLM的典型架构采用“视觉Transformer（ViT）编码 + 大语言模型（LLM）推理”的串行管线：ViT首先将视频帧切分为固定网格补丁并全量编码为视觉token，随后LLM在这些token上进行跨模态推理。
@@ -100,8 +98,6 @@ AutoGaze的设计预期带来三个层面的收益：
 
 这些收益通过多个维度的实验进行验证：在VideoMME、LongVideoBench等通用与长视频基准上与SOTA MLLM对比精度；在统一硬件条件下测量ViT和LLM的延迟；通过消融实验验证各设计选择的贡献；并通过可视化分析揭示凝视行为的内在规律。
 
-
-
 ## 核心方法与创新机理
 
 AutoGaze 的核心创新在于**将视觉token的选择时机从LLM端提前到ViT之前**，并引入一套自回归凝视机制来自动决定“看哪里”和“看多少”。这一设计直接切入了现有视频MLLM的根本计算瓶颈：ViT必须处理全部像素。
@@ -132,8 +128,6 @@ AutoGaze的凝视策略并非启发式规则，而是通过两阶段训练习得
 ### 与启发式方法的本质区别
 
 AutoGaze 的学习型凝视与随机选择、光流引导等启发式基线有本质差异。Figure 10显示，AutoGaze以5%的补丁达到重建损失1.0，而Random Gaze需要15%——效率提升3×。更关键的是，启发式方法（如光流凝视）仅依赖局部运动信息，无法建模全局重建质量；AutoGaze通过VideoMAE重建模型的反传信号，学习的是“哪些补丁对重建整个视频是不可或缺的”，这是一种全局信息量驱动的选择。
-
-
 
 AutoGaze 的整体设计遵循“先注视再关注”（Attend Before Attention）的核心思想：在 ViT 处理视频帧之前，通过一个轻量级的自回归凝视模块预先筛选出最小化的多尺度补丁集合，仅将选中的补丁送入下游 ViT 和 MLLM，从而从源头上削减视觉 token 数量。其 pipeline 由四个关键模块串联构成，形成“编码—解码—预测—重建监督”的闭环。
 
@@ -189,15 +183,11 @@ AutoGaze 的训练分为两个阶段（图 3）：
 
 AutoGaze 本身是一个仅 3M 参数的轻量模块，独立于下游 ViT 和 MLLM。推理时，它处理任意分辨率和时长的视频：将视频切分为 $16 \times 224 \times 224$ 的时空块（tile），在每个 tile 上独立运行 AutoGaze，最后将各 tile 的凝视位置合并，提取对应补丁送入 ViT。这种 tile-wise 设计使其能够无缝扩展至 1K 帧、4K 分辨率的超长高清视频，而无需重新训练。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l837_https_arxiv_org_abs_2603_12254/figures/001_Figure_1.jpg]]
 *Figure 1: We propose AutoGaze, which reduces the computational cost of video understanding to scale MLLMs to long, highresolution videos. (Left) Existing MLLMs either process all pixels which is inefficient, or prune tokens only in their LLMs, leaving ViTs the computational bottleneck. In contrast, AutoGaze eliminates redundant patches by up to 100× before ViTs, accelerating ViTs and MLLMs by up to 19×. (Right) This efficiency enables MLLMs with AutoGaze to scale to 1K-frame, 4K-resolution videos and achieve superior performance on HLVid, our new long, high-resolution video benchmark, surpassing prior MLLMs limited to short or low-resolution videos*
 
 ![[assets/figures/papers/paper_list_l837_https_arxiv_org_abs_2603_12254/figures/003_Figure_3.jpg]]
 *Figure 3: Architecture and training pipeline of AutoGaze. (Left & Middle) Given a video, AutoGaze processes each frame and autoregressively decodes indices of multi-scale patches based on the history of frames and selected patches. Once it believes the previouslygazed patches are sufficient to reconstruct the current frame, it automatically stops gazing and moves to the next frame. (Right) AutoGaze is trained in two stages: next-token-prediction pre-training on collected gazing sequences, and RL post-training with reconstruction reward*
-
-
 
 ### 问题形式化：凝视作为补丁选择
 
@@ -246,19 +236,6 @@ $$ \mathcal{L}_{GRPO} = -\sum_{t=1}^T\sum_{k=1}^{N^t} \frac{\pi_\theta(p_k^t)}{\
 ### 下游使用：时空分块处理
 
 为使 AutoGaze 能够处理任意分辨率和时长的视频，推理时将视频分割为 $16 \times 224 \times 224$ 的时空块（tile），在每个块上独立运行 AutoGaze，最后将各块的凝视位置合并。这一分块策略保证了 AutoGaze 的计算开销与视频规模呈线性关系，且不受单块 GPU 内存限制。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l837_https_arxiv_org_abs_2603_12254/figures/004_Figure_4.jpg]]
-*Figure 4: AutoGaze targets patches with higher optical flow. (Left) AutoGaze uses coarser scales to capture higher optical flow. (Right) Across all scales, AutoGaze more frequently selects patches with higher optical flow. Error bars represent SEM*
-
-![[assets/figures/papers/paper_list_l837_https_arxiv_org_abs_2603_12254/figures/005_Figure_5.jpg]]
-*Figure 5: Gazing scale correlates with patch detail. (Left) At finer scales, AutoGaze selects more detailed patches (measured as Laplacian variance). (Right) With increasing detail, AutoGaze uses finer scales*
-
-![[assets/figures/papers/paper_list_l837_https_arxiv_org_abs_2603_12254/figures/006_Figure_6.jpg]]
-*Figure 6: Generlizability of AutoGaze to OOD videos. (a) We show model behavior on videos with OOD semantics, including a CCTV clip (left), robot grasping demo (middle), and a video with object swapping (right). In each example, AutoGaze still robustly tracks the changing parts despite the unseen semantics, object categories, and unexpected changes. (b) We show AutoGaze output on the same video with different style transfer. AutoGaze consistently tracks the falling person regardless of visual style, texture and global illumination*
-
-
 
 ## 实验与关键发现
 
@@ -323,27 +300,14 @@ Figure 4和Figure 5对AutoGaze学到的凝视策略进行了统计分析：
 
 这些局限性提示未来工作方向：将运动模型或物理先验融入凝视决策，以进一步提升效率和对动态场景的适应性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l837_https_arxiv_org_abs_2603_12254/figures/012_Table_2.jpg]]
-*Table 2: Comparing AutoGaze with MLLM token reduction methods. We compare to baselines of spatial/temporal/spatiotemporal (S-/T-/ST-) token reduction approaches that are either prompt-agnostic (PA) or prompt-dependent (PD). All the methods select 6.25% visual tokens on average*
-
 ![[assets/figures/papers/paper_list_l837_https_arxiv_org_abs_2603_12254/figures/011_Table_3.jpg]]
 *Table 3: Ablation on AutoGaze training pipeline. Both NTP pre-training and RL post-training helps with the performance*
 
 ![[assets/figures/papers/paper_list_l837_https_arxiv_org_abs_2603_12254/figures/013_Table_4.jpg]]
 *Table 4: Ablations of AutoGaze model designs*
 
-![[assets/figures/papers/paper_list_l837_https_arxiv_org_abs_2603_12254/figures/014_Table_5.jpg]]
-*Table 5: What reconstruction loss is tolerable for MLLM performance? We find a loss of 0.7 has little performance drop*
-
 ![[assets/figures/papers/paper_list_l837_https_arxiv_org_abs_2603_12254/figures/008_Figure_8.jpg]]
 *Figure 8: Efficiency gain on ViTs and MLLMs with AutoGaze. We benchmark the ViT and MLLM latency of encoding one second of video with varying FPS and resolution. AutoGaze can select different numbers of patches to vary latency depending on user needs. When using the gazing ratio required for a reconstruction loss of 0.7, AutoGaze reduces the ViT and MLLM latency by up to 19× and 10×*
-
-![[assets/figures/papers/paper_list_l837_https_arxiv_org_abs_2603_12254/figures/007_Figure_7.jpg]]
-*Figure 7: What gazing ratio do we need for different video types? (Left) There is a trade-off between gazing ratio and reconstruction loss: videos with higher FPS or resolution need lower gazing ratio to reach the same reconstruction quality. (Right) Gazing ratios required to reach a loss of 0.7 for videos with different FPS and resolution. 30-FPS, 4K-res videos only need ∼1% patches*
-
-
 
 ## 定位与知识库关联
 
@@ -392,8 +356,6 @@ AutoGaze采用**下一token预测（NTP）预训练 + 强化学习（RL）后训
 2. **相机运动补偿**：能否在AutoGaze中引入全局运动估计模块，识别并补偿相机平移，避免重复选择平移后的冗余区域？
 3. **OOD鲁棒性的量化**：当前OOD分析仅为定性展示，需要在标准OOD视频基准上进行系统评估。
 4. **凝视策略的可解释性**：虽然Figure 4和Figure 5揭示了AutoGaze偏好高光流区域和细节丰富区域，但凝视决策的因果机制仍需更深入的分析。
-
-
 
 ## 原文 PDF
 

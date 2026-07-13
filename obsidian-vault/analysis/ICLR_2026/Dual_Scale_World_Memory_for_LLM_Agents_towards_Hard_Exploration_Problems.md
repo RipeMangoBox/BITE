@@ -55,8 +55,6 @@ claims:
 
 在Jericho文本游戏基准上，GLoW以仅**1000步**环境交互即达到LLM方法的SOTA性能，在10款游戏中取得7款的最佳LLM成绩；在Deephome和Enchanter上，其性能接近或超越使用80万步交互的RL方法**XTX**（Tuyls et al., 2022）。消融实验证实，移除MAR或全局世界记忆组件均会导致性能显著下降，全部移除后退化至接近IGE基线水平，验证了双尺度设计的协同效应。
 
-
-
 ### 问题背景：硬探索问题的双重挑战
 
 在文本游戏等复杂交互环境中，LLM智能体面临**硬探索问题**（hard-exploration problems）的严峻考验。这类问题的核心困难源于两个相互交织的挑战：
@@ -87,8 +85,6 @@ claims:
 - **局部尺度**：从同一状态出发采样多条轨迹，通过LLM比较轨迹差异来推断语义优势信号，将稀疏的环境奖励转化为伪密集的进展指引，从而在局部探索中快速修正策略。
 
 GLoW通过**全局世界记忆**维护价值排序的轨迹前沿，并由LLM分析前沿以提取关键状态的“成就价值”与“潜力价值”；同时通过**局部世界记忆**中的多路径优势反射（MAR）机制，在同一状态下进行多轨迹对比以降低方差。这一双尺度架构使得LLM智能体能够在仅1000步交互的预算下，在Jericho基准上达到LLM方法的SOTA，并在多个游戏上性能接近甚至超越使用80万步交互的RL方法。
-
-
 
 ## 核心方法与创新机理
 
@@ -136,14 +132,6 @@ $$\pi_{\mathrm{explore}}(a|s_t, h_t) = \mathrm{Agent}_{\mathrm{LLM}}(s_t, h_t, W
 
 三个槽位的改变并非独立生效，而是形成互补协同。全局世界记忆识别“哪些状态值得探索”，局部世界记忆学习“在这些状态下如何有效探索”。消融实验的最终验证是：当全部组件移除后（等价于IGE+多路径Reflexion），性能未超越IGE基线，证明GLoW的性能提升来自各创新组件的系统性协同，而非简单叠加。
 
-
-
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_bH5uHIVtTe/figures/001_Figure_1.jpg]]
-*Figure 1: (a) Select procedure in GLoW, (b) Illustration of selection with Global World Memory*
-
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_bH5uHIVtTe/figures/002_Figure_2.jpg]]
-*Figure 2: (a) Explore procedure in GLoW, (b) Illustration of exploration with Local World Memory*
-
 GLoW（Global-Local World Memory）是一个面向硬探索问题的LLM智能体框架，其核心思想是将探索过程分解为**状态选择**与**局部探索**两个阶段，并对应两种不同尺度的世界记忆进行学习。框架包含四个核心模块，形成一个闭环的探索流程：
 
 1. **轨迹前沿（Trajectory Frontier） $\mathcal{F}$**：维护迄今为止发现的 $k$ 条最高价值轨迹，每条轨迹的价值 $v(\tau_i)$ 定义为轨迹中任意时刻达到的最大累计奖励 $v(\tau_i) = \max_{t \in [1,T]} \sum_{j=1}^{t} r_j^i$。当新轨迹加入时，按价值排序保留 top-k：$\mathcal{F}_{t+1} = \mathrm{top-k}(\mathcal{F}_t \cup \{\tau_{\mathrm{new}}\}, v)$。
@@ -155,8 +143,6 @@ GLoW（Global-Local World Memory）是一个面向硬探索问题的LLM智能体
 4. **探索策略（Exploration Policy）**：LLM智能体融合局部世界记忆、先前探索轨迹和前沿成功策略进行动作生成：$\pi_{\mathrm{explore}}(a|s_t, h_t) = \mathrm{Agent}_{\mathrm{LLM}}(s_t, h_t, W_{\mathrm{local}}, T_s, \mathcal{F})$。
 
 整体流程为：每轮迭代中，全局世界记忆从状态存档中选择一个高潜力状态，通过重放操作序列恢复到该状态，然后局部世界记忆驱动多路径探索，探索结果更新存档和轨迹前沿。两个模块形成互补——全局记忆负责识别瓶颈区域和规划探索方向，局部记忆负责在具体状态下高效试错，共同解决稀疏反馈下的探索效率问题。
-
-
 
 GLoW的核心架构由两个互补的世界记忆模块构成，分别对应硬探索问题中全局学习与局部试错两个瓶颈。
 
@@ -206,8 +192,6 @@ $$\pi_{\mathrm{explore}}(a|s_t, h_t) = \mathrm{Agent}_{\mathrm{LLM}}(s_t, h_t, W
 
 **动作空间规模**：Zork1的词汇量为697时，每步可能的动作组合达到$O(697^5) = 1.64 \times 10^{14}$，体现了硬探索问题中动作空间的组合爆炸特性，进一步说明了原则性探索引导的必要性。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与实验设计逻辑
@@ -256,9 +240,6 @@ $$\pi_{\mathrm{explore}}(a|s_t, h_t) = \mathrm{Agent}_{\mathrm{LLM}}(s_t, h_t, W
 
 **Table 3** 展示了每状态探索次数n对全局-局部学习平衡的影响。n=1时MAR关闭，性能最低（Zork1 66.0）；n=5时局部学习过度，状态选择频率降低（最少仅3次选择），性能同样下降。n=3在全局探索覆盖度与局部学习深度之间取得最佳平衡——既保证了足够的局部轨迹进行优势反射（n-1=2条局部轨迹加前沿轨迹），又维持了合理的状态选择频率（最少6次选择）。
 
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_bH5uHIVtTe/figures/005_Table_3.jpg]]
-*Table 3: Controlling the focus on global (less explorations per state but more frequent state selection) vs local learning (more explorations per state). The results demonstrate n { = } 3 explorations from promising states strikes a good balance between the two*
-
 ### 失败模式与局限性
 
 GLoW在实验中暴露出两类结构性失败模式：
@@ -278,11 +259,6 @@ GLoW在实验中暴露出两类结构性失败模式：
 ### 模型能力的影响
 
 **Table 8** 显示GLoW性能随模型能力单调增长：GPT-4.1-nano在Zork1上仅43.0，GPT-4.1-mini达到73.0，GPT-4.1达到103.0。较小模型在潜力价值v'的估算上存在明显退化（如未能推断出关键地点），表明全局世界记忆的价值分解能力是模型依赖的瓶颈。
-
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_bH5uHIVtTe/figures/010_Table_8.jpg]]
-*Table 8: Impact of model capability on GLoW performance. Scores are mean ± standard deviation over 3 runs*
-
-
 
 ## 定位与知识库关联
 
@@ -346,8 +322,6 @@ GLoW在实验中暴露出两类结构性失败模式：
 5. **潜力价值 $v'$ 的估算在小模型上的退化问题**：实验显示，较小模型（如GPT-4.1-nano）在全局分析中未能推断出关键地点，导致 $v'$ 的估算质量明显下降。如何提升较小模型在全局分析中的表现，或设计更鲁棒的价值分解提示策略，是降低方法门槛的关键。
 
 6. **全局与局部学习的自适应平衡**：当前通过固定参数 $n$（每状态探索次数）控制全局-局部平衡。能否设计自适应机制，根据探索进展动态调整 $n$？例如，当检测到高潜力状态时增加局部探索深度，当全局覆盖不足时增加状态选择频率。
-
-
 
 ## 原文 PDF
 

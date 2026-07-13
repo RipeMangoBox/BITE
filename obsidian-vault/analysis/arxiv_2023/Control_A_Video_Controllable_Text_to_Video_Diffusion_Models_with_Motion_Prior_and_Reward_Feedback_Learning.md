@@ -57,15 +57,11 @@ claims:
 
 **主要结果**：在可控视频生成基准上，Control-A-Video 的 MUSIQ（技术质量）分数达到 **73.3**，比先前最佳模型提升 **+2.3** 分；ImageReward（人类偏好）分数达到 **1.03**，提升 **+0.36** 分。用户研究进一步验证其在文本对齐和一致性上的最优表现（一致性平均分 4.5/5）。消融实验确认，去除运动先验会导致明显闪烁和伪影，而 ST-ReFL 的加入显著提升了清晰度和美观度。
 
-
-
 文本到视频（Text-to-Video, T2V）生成旨在根据自然语言描述合成逼真且时序连贯的视频序列。随着扩散模型在图像生成领域的突破性进展，研究者开始将其扩展至视频域，涌现出如 **AnimateDiff**（Guo et al., arXiv 2023）、**Text2Video-Zero**（Khachatryan et al., arXiv 2023）和 **VideoComposer**（Wang et al., ICCV 2023）等代表性工作。然而，现有方法面临一个核心瓶颈：**难以同时保证生成视频的高质量与运动一致性**，尤其在引入额外控制条件（如深度图、边缘图）时，帧间闪烁和物体不一致问题尤为突出。
 
 这一瓶颈的深层原因在于两个方面的建模困难。其一，视频生成需要同时建模空间内容与时间动态，而直接从噪声生成全部视频帧的方案将二者耦合在一起，使得模型难以继承图像域已有的强大生成能力。其二，标准扩散模型在初始化时采用逐帧独立的高斯噪声，缺乏对帧间运动关系的先验约束，导致去噪过程中相邻帧的潜在表示趋于发散，进而引发闪烁和背景扭曲。
 
 针对上述问题，Control-A-Video 的动机在于寻找一个因果控制杠杆，将**内容建模与运动建模解耦**，并在噪声初始化阶段注入**运动先验**以维持帧间相关性。具体而言，该工作提出以第一帧作为内容先验，将图像域的生成能力迁移至视频生成，使后续帧的建模聚焦于运动变化；同时，通过基于像素残差或光流的运动自适应噪声初始化，为去噪过程提供帧间运动线索。在此基础上，进一步引入时空奖励反馈学习（ST-ReFL），利用多种奖励模型对视频的美学质量、技术质量与运动一致性进行联合打分并反馈优化，从而系统性地提升可控视频生成的整体表现。
-
-
 
 ## 核心方法与创新机理
 
@@ -131,8 +127,6 @@ Control-A-Video 相对于上述方法的**关键 changed slots** 为：
 
 这些创新共同构成了一个从“内容生成 → 运动注入 → 质量精调”的完整可控视频生成框架，在 MUSIQ（+2.3）和 ImageReward（+0.36）等指标上显著超越先前最佳模型（confidence 0.98）。
 
-
-
 Control-A-Video 的整体 pipeline 围绕三个核心设计展开：**第一帧内容先验**、**运动自适应噪声初始化**与**时空奖励反馈学习（ST-ReFL）**。这三个组件构成一个从内容解耦、运动注入到质量对齐的级联优化闭环。
 
 ### 两阶段训练与推理流程
@@ -159,8 +153,6 @@ Control-A-Video 的整体 pipeline 围绕三个核心设计展开：**第一帧�
 ### 瓶颈与因果机制
 
 现有视频扩散模型的核心瓶颈在于帧间闪烁和物体不一致——这源于独立噪声初始化破坏了帧间相关性，以及标准去噪损失无法显式约束时间一致性。Control-A-Video 的因果杠杆在于：**第一帧条件方案**将图像域的生成能力迁移到视频域，解耦内容与运动建模；**运动先验噪声**在扩散起点就注入帧间相关性，降低后续去噪的难度；**ST-ReFL** 则通过多维度奖励信号直接优化视频输出的感知质量和运动平滑度。三者协同作用，使得模型在 MUSIQ（+2.3）和 ImageReward（+0.36）上显著超越先前最佳模型。
-
-
 
 ### 整体架构：时空去噪网络
 
@@ -256,13 +248,6 @@ $$L_{quality} = \lambda_{qt} \cdot ReLU(b_{qt} - R_{qt}(v')) + \lambda_{qa} \cdo
 
 ST‑ReFL 的核心机制在于：利用多个预训练奖励模型对生成视频的帧级质量和时序一致性进行打分，并将这些信号反向传播以优化扩散模型参数，从而在不增加推理开销的前提下显著提升视频的清晰度、美观度和运动连贯性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1039_https_arxiv_org_abs_2305_13840/figures/003_Figure_3.jpg]]
-*Figure 3: Motion-adaptive Noise Prior: t-SNE plot of noisy latents for video frames. Red: original video*
-
-
-
 ## 实验与关键发现
 
 ### 主要定量结果
@@ -327,13 +312,6 @@ ST-ReFL 的消融实验从两个层面展开。定性层面（Figure 6），对�
 - 该方法对训练中未见过的控制图类型（如语义分割、姿态关键点）的泛化能力如何？
 - 在实时或低延迟应用场景中，ST-ReFL 训练和推理流程的计算开销是否可接受？
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1039_https_arxiv_org_abs_2305_13840/figures/004_Figure_4.jpg]]
-*Figure 4: Qualitative Comparison: (a) Input video, (b) Animatediff, (c) Text2Video-Zero, (d) Videocomposer, (e) Ours. We showcase a challenging scenario of a fastmoving dog(left) and slow-moving(right) camel. Compared to other models, our method demonstrates superior performance in generating high-quality, temporally consistent results that accurately align with the given text prompt*
-
-
-
 ## 定位与知识库关联
 
 ### 方法定位与核心贡献
@@ -392,8 +370,6 @@ Control-A-Video 的独特优势在于将三个设计要素——**首帧条件�
 ---
 
 **证据强度说明：** 上述方法定位和比较分析基于论文提供的定量实验（Table 1, Table 2, Table 3）和定性消融（Figure 4-6），置信度较高。关于局限和开放问题的讨论部分基于论文自身的局限性声明，部分基于方法设计的逻辑推演，置信度中等，需后续工作验证。
-
-
 
 ## 原文 PDF
 

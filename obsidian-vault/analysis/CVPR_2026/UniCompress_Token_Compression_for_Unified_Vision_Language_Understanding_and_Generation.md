@@ -73,8 +73,6 @@ UNICOMPRESS 以插件形式适配多种统一模型，通过两阶段训练（�
 
 消融研究进一步揭示：全局元令牌数量 $N_g=4$ 在精度与效率间达到最佳平衡；去除全局令牌（$N_g=0$）使 FID 升至约 21.4，验证了全局语义约束对生成保真的关键作用。理解任务对令牌保留比例较为鲁棒，而生成质量随保留比例减小急剧下降，表明生成任务对令牌压缩更为敏感。
 
-
-
 统一视觉-语言模型（Unified Vision-Language Models）旨在以单一架构同时处理视觉理解与图像生成任务，其核心范式是将图像离散化为令牌序列，交由自回归语言模型统一建模。然而，这一范式面临一个根本性的效率瓶颈：**视觉令牌数量庞大**。典型设置下，一张图像被编码为 32×32=1024 个离散令牌，远超过对应的文本令牌数量，导致 Transformer 的计算和内存开销呈平方级增长。简单压缩策略——如朴素降采样或均匀剪枝——虽能缩减序列长度，却会严重损害图像生成质量，性能下降可超过 15 个百分点。
 
 现有统一模型在令牌效率方面存在明显缺口。**UNITOK**（Ma et al., arXiv 2025）、**VILA-U**（Wu et al., arXiv 2024）、**VARGPT**（Zhuang et al., arXiv 2025）等工作沿用密集令牌网格，未引入显式的压缩机制；**UNIFORK**（Li et al., arXiv 2025）和 **OPENUNI**（Wu et al., arXiv 2025）虽采用不同令牌化策略，但同样未解决令牌冗余问题。这些方法在理解与生成任务上取得了可观性能，却以高昂的计算代价为前提——例如 UNITOK 在生成推理时需耗时 32.25 分钟。
@@ -82,8 +80,6 @@ UNICOMPRESS 以插件形式适配多种统一模型，通过两阶段训练（�
 本文的动机源于一个关键观察：**视觉令牌中同时存在局部细节和全局语义两类信息，二者对理解和生成任务的贡献不同**。理解任务更依赖全局语义，对局部细节的丢失相对鲁棒；生成任务则要求精确恢复密集令牌，否则重建质量急剧恶化。这一不对称性暗示，压缩策略应当有选择地保留场景级约束，而非均匀丢弃信息。
 
 基于此，本文提出 **UNICOMPRESS**，一种即插即用的令牌压缩算法。其核心思路是：在现成的离散令牌化器周围插入轻量级压缩器与解压缩器，引入少量可学习的**全局元令牌**捕捉场景级语义，并以此引导自回归解压缩器恢复密集令牌细节。压缩后的紧凑视觉表示既能支撑理解任务，又能通过自回归重建实现高质量生成，在将视觉令牌减少 4 倍的同时，将理解性能下降控制在 3 个百分点以内，生成 FID 增加不超过 5 点。
-
-
 
 ## 核心方法与创新机理
 
@@ -129,8 +125,6 @@ UNICOMPRESS 采用两阶段训练策略：第一阶段冻结 LLM，训练压缩�
 
 综上，UNICOMPRESS 相对于基线统一模型（如 **UNITOK** (Ma et al., arXiv 2025)、**VILA-U** (Wu et al., arXiv 2024)、**BAGEL** (Deng et al., arXiv 2025) 等）的核心 changed slots 可归纳为：将密集令牌网格替换为“压缩令牌 + 全局元令牌”的紧凑表示；以可学习元查询令牌的交叉注意力替代隐式全局建模；引入自回归解压缩器桥接压缩域与密集生成域；并通过两阶段训练实现压缩模块与 LLM 的解耦优化。这些创新共同实现了“即插即用”的统一高效建模：在多种统一模型上，压缩后理解性能下降 ≤ 3 个百分点，生成 FID 增加 ≤ 5 点，视觉令牌减少 4 倍（Table 1, Table 2），生成推理时间最高降低 41.2%（Table 3）。
 
-
-
 UNICOMPRESS 采用即插即用的设计范式，在不修改语言模型（LLM）本身的前提下，围绕现成的离散视觉令牌化器插入三个轻量级模块：**全局令牌提取器**、**令牌压缩器**和**自回归解压缩器**（Figure 2）。其核心思想是将密集的 H×W 令牌网格转化为一个紧凑的视觉序列，同时保留理解任务所需的语义信息和生成任务所需的细节重建能力。
 
 ![[assets/figures/papers/paper_list_l2228_https_arxiv_org_abs_2603_11320/figures/002_Figure_2.jpg]]
@@ -155,8 +149,6 @@ UNICOMPRESS 采用即插即用的设计范式，在不修改语言模型（LLM�
 ### 效率与性能的权衡
 
 以默认配置 $s=2, N_g=4$ 为例，视觉令牌数量减少 4 倍（如 256→64）。在理解任务上，GQA 准确率仅下降约 2.6 个百分点（UNITOK-COMPRESSED: 53.07 vs. UNITOK: 55.71, Table 1）；在生成任务上，FID 增加控制在 5 点以内（BAGEL-COMPRESSED: 17.22 vs. BAGEL: 12.73, Table 2），同时生成推理时间减少约 41.2%（UNITOK: 32.25 分钟 → 18.96 分钟, Table 3）。这一框架的即插即用特性使其可适配多种统一模型架构（UNITOK、VILA-U、BAGEL 等），无需修改 LLM 接口。
-
-
 
 UNICOMPRESS 在现成的离散视觉令牌化器周围插入三个轻量级模块，而不改变语言模型（LLM）的内部结构：**全局令牌提取器**、**令牌压缩器**和**自回归解压缩器**。整个管道将密集的 $H \times W$ 令牌网格转化为紧凑的视觉表示，供 LLM 在理解和生成任务中统一使用。
 
@@ -196,18 +188,8 @@ $\mathcal{L}_{\mathrm{reg}}$ 约束连续特征重建精度，$\mathcal{L}_{\mat
 
 最终，LLM 接收紧凑的视觉序列 $\{\mathbf{G}, \hat{\mathbf{X}}^{\mathrm{cont}}\}$ 执行理解任务，或自回归生成压缩域目标索引，再由解压缩器恢复为密集令牌完成图像生成。整个设计保持 LLM 接口不变，实现了即插即用的统一高效建模。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2228_https_arxiv_org_abs_2603_11320/figures/007_Figure_4.jpg]]
 *Figure 4: Ablation on global token type. Results use*
-
-![[assets/figures/papers/paper_list_l2228_https_arxiv_org_abs_2603_11320/figures/009_Figure_5.jpg]]
-*Figure 5: UNICOMPRESS preserves the most visual information under compression by using global meta tokens and autoregressive decompressor*
-
-![[assets/figures/papers/paper_list_l2228_https_arxiv_org_abs_2603_11320/figures/012_Figure_7.jpg]]
-*Figure 7: Effect of the number of global tokens*
-
-
 
 ## 实验与关键发现
 
@@ -227,9 +209,6 @@ Table 1 汇总了在 GQA、MME Cognition、POPE、Seed-bench 等视觉理解基�
 *Table 1: Unified model performance on visual understanding benchmarks (higher is better). XXX-COMPRESSED denotes the same backbone with our plug-in token compression*
 
 值得注意的是，OPENUNI（Wu et al., arXiv 2025）的 Seed-bench 得分仅从 48.39 微降至 47.51，几乎无损。这暗示当基础模型本身对视觉令牌冗余度较高时，压缩带来的影响更小。定性示例（Figure 3）进一步显示，基于压缩令牌生成的图像描述与密集令牌版本在语义一致性上高度吻合。
-
-![[assets/figures/papers/paper_list_l2228_https_arxiv_org_abs_2603_11320/figures/006_Figure_3.jpg]]
-*Figure 3: Understanding task examples: generating the texts that describe the image*
 
 ---
 
@@ -272,15 +251,8 @@ Table 3 对比了挂钟时间。在生成任务上，UNITOK-COMPRESSED 的推理
 3. **两阶段训练约束**：方法需对令牌化器进行修改并执行两阶段训练（先冻结 LLM 训练压缩令牌化器，再冻结令牌化器微调 LLM），无法直接应用于完全冻结的预训练统一模型。
 4. **超参数敏感性**：全局令牌数量 $N_g$ 需根据具体模型和数据集调节，当前结论基于 1B 参数 LLM 和小规模数据集（JDB、ShareGPT4V），向更大规模模型的推广性待验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2228_https_arxiv_org_abs_2603_11320/figures/008_Table_4.jpg]]
 *Table 4: Ablation on local token compression (pooling/selection). All rows target the same token budget $(\times 4$.0 ) as our default setting with s=2 . Results use*
-
-![[assets/figures/papers/paper_list_l2228_https_arxiv_org_abs_2603_11320/figures/010_Figure_6.jpg]]
-*Figure 6: Effect of token keep ratio on accuracy. GQA (understanding) vs. MJHQ-30K CLIP (generation)*
-
-
 
 ## 定位与知识库关联
 
@@ -313,8 +285,6 @@ $$\mathbf{x}_t = f_{\mathrm{dec}}\big(\mathbf{X}_{<t}^{\mathrm{dense}}, \hat{\ma
 ### 开放问题与未来方向
 
 从知识库演进的视角，UNICOMPRESS 开启了若干值得追踪的研究方向。其一，该方法能否泛化至视频等序列模态的统一模型，是检验其机制通用性的关键试金石——视频的时序冗余可能为压缩提供额外杠杆，但自回归解压缩的时序依赖也将面临更严峻的计算挑战。其二，压缩后的令牌表示是否适用于检索或可控生成等更广泛的下游任务，决定了该方法在统一模型生态中的实际渗透力。其三，是否存在更高效的全局上下文提取机制（如线性注意力）以进一步降低计算成本，是方法本身持续优化的空间。其四，在高度结构化图像（如文本、图表）上，压缩重建是否会引入额外的失真，这一问题在当前实验中尚未得到系统回答，但对文档理解等实际应用场景至关重要。
-
-
 
 ## 原文 PDF
 

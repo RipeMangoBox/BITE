@@ -53,8 +53,6 @@ CAR 的核心思想源于 PAC-Bayesian 理论推导：最差类别误差的上�
 
 在 ImageNet-LT、CIFAR100-LT 和 iNaturalist 三个长尾基准上，CAR 从零训练 ViT-Small 的整体准确率超越此前最优方法 LOS **2.37% ∼ 4.83%**（Table 1）。特别地，在 ImageNet-LT 上，CAR 结合 ConCutMix 将最差类别测试准确率从 10% 提升至 **22%**（Table 3），有效缩小了最差类别与整体性能之间的差距。消融实验进一步验证了频率加权矩阵和 EMA 估计器对性能的持续贡献（Table 7）。
 
-
-
 ### 长尾识别中的最差类别泛化困境
 
 现实视觉识别任务普遍遵循长尾分布——少数头部类别占据大量样本，而大多数尾部类别仅有极少量样本。标准交叉熵损失（CE）训练的模型在此分布下会出现严重的类别偏差：头部类别准确率远高于尾部类别。现有长尾学习方法主要从损失重加权、数据增强、解耦训练等角度缓解这一不平衡，但论文通过系统性实验揭示了一个被忽视的深层问题——**最差类别（worst-class）的泛化失效**。
@@ -88,8 +86,6 @@ Figure 1 在 ImageNet-LT 上以 ViT-Small 为骨干网络，对比了多种代�
 $$\mathcal{L}(f) = \frac{1}{m} \sum_{q=1}^{m} \mathbb{CE}\big(f(x_q), y_q\big) + \alpha \big\| \hat{\mathbf{C}}_t \mathbf{\Lambda} \big\|_2$$
 
 该方法不依赖特定的数据增强策略或网络架构，可作为通用正则器与现有长尾学习方法即插即用地结合。
-
-
 
 ## 核心方法与创新机理
 
@@ -141,8 +137,6 @@ $$\mathcal { L } ( f ) = \frac { 1 } { m } \sum _ { q = 1 } ^ { m } \mathbb { C 
 
 与重加权（Focal Loss, CB）、边界调整（LDAM-DRW）、数据增强（CMO, ConCutMix）等策略不同，CAR 是**首个从混淆矩阵谱范数角度直接优化类别间混淆结构**的方法。它不改变样本分布或决策边界，而是直接作用于特征空间中类别间的重叠程度——这是尾部类别泛化失败的根源。实验表明，CAR 可以与数据增强方法（如 ConCutMix）正交叠加，在 ImageNet-LT 上进一步将整体准确率从 57.48% 提升至 60.07%，尾部准确率从 35.77% 提升至 38.07%（Table 1）。
 
-
-
 CAR 的整体框架围绕一个核心目标展开：**在标准交叉熵训练中注入一个可微分的、频率感知的混淆矩阵谱范数正则项**，从而直接抑制类别间混淆，提升尾部类别的泛化能力。整个 pipeline 由四个逻辑模块串联而成，形成“构建 → 软化 → 平滑 → 正则化”的闭环。
 
 ### 模块关系与数据流
@@ -176,13 +170,6 @@ CAR 的整体框架围绕一个核心目标展开：**在标准交叉熵训练�
 前向传播时，模型输出 logits 同时流入两条路径：一条进入交叉熵损失计算分类误差，另一条经过可微混淆矩阵替代和 EMA 平滑后计算谱范数正则项。反向传播时，两部分损失的梯度叠加更新模型参数。正则项权重 $\alpha$ 控制混淆抑制的强度（实验建议 $\alpha \approx 0.5$）。
 
 该框架的关键优势在于**即插即用**：CAR 仅修改损失函数，不改变模型架构，因此可以与 ViT、ResNet、Swin 等多种骨干网络及 ConCutMix、CMO 等数据增强方法无缝结合。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2115_https_arxiv_org_abs_2603_16732/figures/001_Figure_1.jpg]]
-*Figure 1: Poor generalization of worst-class performance in existing long-tailed learning methods. Experiments are conducted on ImageNet-LT using ViT-Small as the backbone. The three bars for each method correspond to the worst-class accuracy on the training set (left), the worst-class accuracy on the test set (middle), and the overall test accuracy (right)*
-
-
 
 ### 动机：从最差类别误差到混淆矩阵谱范数
 
@@ -247,13 +234,6 @@ $$
 
 这一设计使 CAR 在 ImageNet-LT 上将最差类别测试准确率从 10% 提升至 22%（Table 3），同时可与数据增强方法（如 ConCutMix）叠加使用，进一步提升整体性能至 60.07%（Table 1）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2115_https_arxiv_org_abs_2603_16732/figures/006_Figure_2.jpg]]
-*Figure 2: Class-wise confusion matrices on CIFAR100-LT using ViT-Small. Left: training from scratch. Right: fine-tuning from pretrained model*
-
-
-
 ## 实验与关键发现
 
 ### 核心性能对比
@@ -289,9 +269,6 @@ Table 4 验证了 CAR 在不同骨干网络上的通用性：ViT-Tiny（46.35%�
 
 Table 6 显示 CAR 可与多种长尾数据增强方法互补叠加。在 ImageNet-LT 和 CIFAR100-LT 不同 IF 下，CAR+ConCutMix 组合始终取得最佳结果，验证了频谱正则化与混合增强策略的正交性。
 
-![[assets/figures/papers/paper_list_l2115_https_arxiv_org_abs_2603_16732/figures/008_Table_6.jpg]]
-*Table 6: Top-1 accuracy (%) of ViT-Small on ImageNet-LT and CIFAR100-LT under different imbalance factors (IF). “+” indicates the combination of our method with other long-tailed data augmentation methods*
-
 ### 消融实验
 
 **频率加权矩阵 Λ** 是关键设计。Table 7 表明，移除 Λ 后，ImageNet-LT 整体准确率从 57.48% 降至 54.39%，CIFAR100-LT 从 55.68% 降至 51.23%，降幅约 3%∼4%。Λ 通过频率相关权重 $\lambda_j = (m_j + r_0)^{-1/2}$ 放大尾部类别在混淆矩阵中的贡献，是抑制类别间混淆的核心机制。
@@ -308,21 +285,8 @@ Figure 2 展示了 CIFAR100-LT 上不同方法的类别混淆矩阵。CAR 的混
 
 方法性能对 $\alpha$、$\beta$ 等超参数敏感，不同数据集可能需要独立调优。混淆矩阵构建与谱范数计算增加了训练开销，且当前仅在图像分类任务上验证。扩展到目标检测、实例分割等任务的有效性尚未探索。在更极端的长尾分布（如无限类别流）下的表现也需进一步验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2115_https_arxiv_org_abs_2603_16732/figures/009_Figure_3.jpg]]
 *Figure 3: Ablation on four hyperparameters on CIFAR100-LT with ViT-Small (Top-1 accuracy). From left to right: EMA factor*
-
-![[assets/figures/papers/paper_list_l2115_https_arxiv_org_abs_2603_16732/figures/010_Table_7.jpg]]
-*Table 7: Ablations for Λ and EMA. Experiments are conducted on ImageNet-LT and CIFAR100-LT based on the ViT-Small*
-
-![[assets/figures/papers/paper_list_l2115_https_arxiv_org_abs_2603_16732/figures/012_Figure_4.jpg]]
-*Figure 4: Comparison of worst-class and overall accuracies across representative long-tailed learning methods on CIFAR100-LT using Pretrained ViT-Small as the backbone. The three bars for each method correspond to the worst-class accuracy on the training set (left, red-hatched), the worst-class accuracy on the test set (middle, purple-hatched), and the overall test accuracy (right, green-hatched)*
-
-![[assets/figures/papers/paper_list_l2115_https_arxiv_org_abs_2603_16732/figures/011_Table_8.jpg]]
-*Table 8: Top-1 accuracy (%) of pre-tranied ResNet on Tiny-ImageNet-LT under different imbalance factors (IF = 50, 100, and 200). The best results are highlighted in bold*
-
-
 
 ## 定位与知识库关联
 
@@ -382,8 +346,6 @@ Figure 2 展示了 CIFAR100-LT 上不同方法的类别混淆矩阵。CAR 的混
 4. **谱范数之外的结构约束**：论文仅约束了混淆矩阵的谱范数（最大奇异值）。核范数（奇异值之和）或秩约束是否能在抑制混淆的同时保留更多的类别可分性，值得探索。
 
 5. **自适应超参数机制**：能否设计一种基于混淆矩阵谱结构自动调整 α 和 β 的机制，使得 CAR 在不同数据集上无需手动调参即可达到接近最优的性能？
-
-
 
 ## 原文 PDF
 

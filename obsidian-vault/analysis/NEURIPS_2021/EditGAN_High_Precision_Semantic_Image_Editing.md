@@ -127,8 +127,6 @@ EditGAN 支持两种编辑模式：
 
 整个 pipeline 的数据流为：**真实图像 → 编码器 → $\mathbf{w}^+$ → 用户修改分割掩码 → 条件优化（或应用预学习编辑向量）→ 更新后的 $\mathbf{w}^+ + \delta\mathbf{w}^+$ → StyleGAN2 生成编辑后图像与分割**。梯度通过共享的生成器反向传播，确保图像与分割的一致性（见 Figure 3）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2111_03186/figures/002_Figure_2.jpg]]
 *Figure 2: (1) EditGAN builds on a GAN framework that jointly models images and their semantic segmentations. (2 & 3) Users can modify segmentation masks, based on which we perform optimization in the GAN’s latent space to realize the edit. (4) Users can perform editing simply by applying previously learnt editing vectors and manipulate images at interactive rates*
 
@@ -217,14 +215,6 @@ EditGAN 在微笑编辑基准（Smile Edit Benchmark, CelebA-HD）上进行了�
 
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2111_03186/figures/011_Figure_11.jpg]]
 *Figure 11: InterFaceGAN’s and EditGAN’s performance on the smile edit benchmark for different editing vector scalings (scale increases from top-left points towards bottomright points; see main text and Appendix for details). For EditGAN, we optionally add 10, 30 or 60 additional optimization steps*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2111_03186/figures/001_Figure_1.jpg]]
-*Figure 1: High-precision semantic image editing with EditGAN*
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2111_03186/figures/008_Figure_7.jpg]]
-*Figure 7: Face part labeling schema [1]*
 
 ## 定位与知识库关联
 

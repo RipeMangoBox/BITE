@@ -49,8 +49,6 @@ claims:
 
 在 HumanML3D 和 KIT-ML 两个标准基准上，MaxSim 在文本到运动（T2M）和运动到文本（M2T）两个方向的检索任务中均超越了现有最优方法。消融实验证实，关节角度表示与 MaxSim 延迟交互的结合是性能提升的关键驱动因素，而 MLM 正则化在 M2T 方向带来尤为显著的增益。
 
-
-
 ### 问题背景：文本-运动检索的挑战
 
 文本-运动检索（Text-to-Motion Retrieval）旨在根据自然语言描述从大规模运动数据库中检索最匹配的3D人体运动序列。该任务在动画制作、游戏开发和人机交互等领域具有重要应用价值。然而，该任务面临的核心挑战在于**跨模态语义对齐**——自然语言的离散符号系统与人体运动的连续时空信号之间存在巨大的语义鸿沟。
@@ -76,8 +74,6 @@ claims:
 2. **引入显式的局部交互机制**：放弃全局池化，转而采用允许每个文本词元与最相关运动区块动态匹配的延迟交互策略，在保留局部信息的同时实现可解释的跨模态对齐。
 
 这两条动机共同指向一个目标：**构建一个既能保持检索效率，又能提供细粒度、可解释对齐的文本-运动检索框架**。
-
-
 
 ## 核心方法与创新机理
 
@@ -126,8 +122,6 @@ $$\mathcal{L}_{mlm} = - \sum_{i \in \operatorname{mask}} \log P(w_i | \mathcal{T
 
 三项创新并非孤立生效，而是形成正向协同：关节角度表示提供了关节级别的结构化 patch 分区，使 MaxSim 的 token-patch 匹配具有明确的物理语义；MLM 正则化则确保了参与匹配的文本 token 携带充分的上下文信息。三者共同实现了从“全局压缩匹配”到“局部可解释对齐”的范式转变。
 
-
-
 MaxSim 提出了一套三阶段的文本-运动检索框架，其核心设计围绕**细粒度跨模态对齐**展开。整个 pipeline 由五个关键模块串联而成，形成从原始运动数据到最终检索分数的完整流。
 
 ### 输入与表示转换
@@ -163,8 +157,6 @@ $$\mathrm{Sim}(\mathcal{T}, \mathcal{M}) = \frac{1}{M} \sum_{i=1}^{M} \max_{j=1}
 
 ![[assets/figures/papers/paper_list_l54_https_arxiv_org_pdf_2603_09930v1/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the three-stage training pipeline*
-
-
 
 MaxSim 的检索框架由四个核心模块构成，分别负责运动表示、双塔编码、延迟交互对齐与文本正则化。以下逐一展开其设计逻辑与关键公式。
 
@@ -241,13 +233,6 @@ $$
 
 $\mathcal{L}_{ret}$ 为对称的批内对比损失（in-batch symmetric contrastive loss）。消融实验表明（Table 3），MLM 正则化在 M2T 检索任务上增益尤为显著（R@3 +2.18%，R@10 +2.15%），因其强制文本编码器在词元级别编码更丰富的上下文语义，从而在反向检索中提供更强的判别力。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l54_https_arxiv_org_pdf_2603_09930v1/figures/003_Figure_2.jpg]]
-*Figure 2: Joint-angle vs. joint-position-based representations for “a person walks slowly forward”. (a) Skeletal structure and body-centric axes. (b) Right hip angles. (c) Right knee positions. (d) Our 29-dimension joint angle Motion Image: each band encodes a distinct joint.(e) MoPatch [28] position image*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -288,18 +273,11 @@ MaxSim 延迟交互机制天然产生可解释的 token-patch 对齐热力图。
 2. **任务范围限制**：本工作仅聚焦于文本-运动检索任务，关节角度表示和 MaxSim 对齐在运动生成、局部编辑或运动字幕生成等下游任务中的可迁移性尚未评估。
 3. **复杂场景未验证**：当前实验基于单人运动的 HumanML3D 和 KIT-ML 数据集，对于多人交互或全身与物体交互等更复杂的运动场景，关节角度表示的有效性仍有待验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l54_https_arxiv_org_pdf_2603_09930v1/figures/006_Table_3.jpg]]
 *Table 3: Ablation study of different feature representations, retrieval strategies and w/o Masked Language Modeling loss on HumanML3D and KIT-ML datasets*
 
 ![[assets/figures/papers/paper_list_l54_https_arxiv_org_pdf_2603_09930v1/figures/005_Figure_3.jpg]]
 *Figure 3: Qualitative T2M retrieval top-3 results on HumanML3D. Correct retrievals (ground-truth match) are highlighted in green*
-
-![[assets/figures/papers/paper_list_l54_https_arxiv_org_pdf_2603_09930v1/figures/002_Table_1.jpg]]
-*Table 1: Summary of joint angle features. We compute 29 kinematic dimensions corresponding to 14 joints*
-
-
 
 ## 定位与知识库关联
 
@@ -340,8 +318,6 @@ MaxSim 的设计隐含了若干适用前提：
 - **关节角度表示的可迁移性**：该表示的核心优势在于解耦局部与全局运动，这一特性理论上可惠及运动生成中的局部控制、运动修复中的缺失关节补全等任务，但需要针对性的适配和验证。
 
 - **更丰富运动拓扑的泛化**：对于包含手部关节、面部表情或非人体骨架（如四足动物）的运动数据，关节角度表示能否保持其结构化和可解释性优势，需要进一步探索。
-
-
 
 ## 原文 PDF
 

@@ -51,8 +51,6 @@ claims:
 
 **方法谱系与知识库定位**：Dynamic-eDiTor继承了两条技术路线——基于MM-DiT的图像编辑能力（源自 **FLUX** 架构，Black Forest Labs, 2024）和4DGS的动态场景表示。与 **Instruct-4DGS** 等使用U-Net扩散模型逐帧编辑的方法不同，本方法首次在统一时空网格上利用MM-DiT的双流自注意力实现跨视角-时间联合编辑，属于训练免费4D编辑框架的新范式。
 
-
-
 ### 4D场景编辑的兴起与核心挑战
 
 4D场景表示——即在三维空间基础上引入时间维度，对动态场景进行建模——近年来取得了显著进展。以4D高斯溅射（4D Gaussian Splatting, 4DGS）为代表的显式表示方法，能够从多视角视频中重建出高质量的可渲染动态场景。然而，如何对这些预训练的4D场景进行灵活、高质量的编辑，使其响应用户的文本指令，仍然是一个开放且极具挑战的问题。
@@ -74,8 +72,6 @@ claims:
 上述分析揭示了一个关键洞察：**4D编辑的核心矛盾不在于2D编辑模型的能力不足，而在于缺乏一个将多视角视频帧作为统一时空整体进行联合处理的框架**。近年来，多模态扩散Transformer（MM-DiT）的兴起为突破这一瓶颈提供了新的可能。与U-Net不同，MM-DiT基于Transformer架构，其自注意力机制天然支持对不同来源的令牌进行灵活拼接和联合建模，这为在扩散过程中同时融合多视角和时序信息创造了架构基础。
 
 基于这一认识，本文提出**Dynamic-eDiTor**，一个无需训练的文本驱动4D场景编辑框架。其核心动机是：**将多视角视频帧组织为统一的相机-时间网格，在MM-DiT的扩散过程中引入局部时空联合注意力与全局令牌传播机制，从而在不增加训练的前提下强制执行多视角和时间一致性**。该方法从根本上跳出了“逐帧编辑+后处理对齐”的范式，转而追求编辑过程本身即具备时空一致性，为4D场景编辑提供了一个更加简洁、鲁棒的解决方案。
-
-
 
 ## 核心方法与创新机理
 
@@ -125,8 +121,6 @@ $$\mathcal{G}_{\mathrm{edit}}' = \arg\min_{\mathcal{G}} \sum_{v,t \in V,T} \|\ha
 
 综上，Dynamic-eDiTor 的创新本质在于**将4D编辑从“2D扩散+后处理”的松散组合转变为一个内建时空一致性的统一框架**，其 STGA-CTP 协同机制和直接4DGS优化策略共同构成了这一转变的技术支柱。
 
-
-
 Dynamic-eDiTor 提出了一种训练免费、文本驱动的 4D 场景编辑框架，其核心设计思想是将多视角视频帧组织为一个统一的**相机-时间网格**（Camera–Time Grid），并在此网格上部署基于多模态扩散 Transformer（MM-DiT）的时空一致性编辑机制，最终直接优化预训练的 4D 高斯溅射（4DGS）模型。
 
 ### Pipeline 总览
@@ -172,8 +166,6 @@ CTP 填补了这一缺口：它沿着相机-时间网格的遍历路径，将前
 | 直接优化 | 编辑帧 + 预训练 4DGS | 编辑后的 4DGS 模型 $\mathcal{G}_{\text{edit}}'$ |
 
 整个流程无需对 MM-DiT 进行微调，也无需迭代式地更新训练数据集，体现了“训练免费”的核心优势。一次完整的 4D 编辑（以 DyNeRF 的 “coffee martini” 场景为例）在单张 NVIDIA H100 GPU 上耗时约 51 分钟。
-
-
 
 Dynamic-eDiTor 的核心由三个紧密耦合的模块构成：**相机‑时间网格构建**、**时空子网格注意力 (STGA)** 与 **上下文令牌传播 (CTP)**，以及最终的 **直接 4DGS 优化**。整个流程围绕一个统一的相机‑时间网格展开，在该网格上通过局部联合注意力与全局令牌传播强制执行多视角‑时间一致性，无需额外训练。
 
@@ -249,13 +241,6 @@ $$(x', r', s') = (x + \Delta x, r + \Delta r, s + \Delta s)$$
 
 其中 $x$ 为位置，$r$ 为旋转，$s$ 为尺度。该变形机制使 4DGS 能够表达非刚性运动，为后续编辑提供可操作的动态表示基础。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2471_https_arxiv_org_abs_2512_00677/figures/003_Figure_3.jpg]]
-*Figure 3: Vital Layer Range Analysis. We analyze the impact of applying Spatio-Temporal Sub-Grid Attention (STGA) across different layer ranges in MM-DiT [11, 54] during the multiview video editing process. Performance is evaluated by temporal consistency (Warping Error [30]), multi-view consistency (MEt3R [2]), and editing fidelity (CLIP Text-Image Directional Similarity [42]). Applying STGA to the early ∼30 layers provides the best trade-off between consistency and editing fidelity*
-
-
-
 ## 实验与关键发现
 
 ### 实验设置
@@ -307,8 +292,6 @@ Dynamic-eDiTor 在 **DyNeRF** 多视图视频数据集上进行评估，涵盖�
 
 4. **数据集泛化性**：实验主要在 DyNeRF 多视图视频数据集上进行，单目视频扩展仍处于初步阶段，在更多样化的动态场景上的泛化性有待检验。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2471_https_arxiv_org_abs_2512_00677/figures/004_Figure_4.jpg]]
 *Figure 4: Qualitative Comparison. Dynamic-eDiTor enables more robust non-rigid content manipulation and achieves more complete edits of the 4D scene. The top-row displays the original rendered frames, while the following rows show the edited 4DGS renderings produced by each baseline. Our method (bottom-row) outperforms all baselines in both text alignment and overall editing fidelity, while maintaining strong temporal and spatial consistency*
 
@@ -318,25 +301,8 @@ Dynamic-eDiTor 在 **DyNeRF** 多视图视频数据集上进行评估，涵盖�
 ![[assets/figures/papers/paper_list_l2471_https_arxiv_org_abs_2512_00677/figures/007_Table_2.jpg]]
 *Table 2: Ablation Study. Each component, Spatio-Temporal Sub-Grid Attention (STGA) and Context Token Propagation (CTP), helps preserve temporal and multi-view consistency, improving the 4D reconstruction quality. Our method prioritizes a globally stable 4D structure, yielding consistent temporal and spatial behavior and thus more robust reconstruction fidelity. Although CLIP-based metrics [42] show a slight drop due to the trade-off between semantic alignment and spatio-temporal coherence, our method still produces more stable and reliable 4D edits, avoiding the geometric and temporal artifacts seen in the ablated variants*
 
-![[assets/figures/papers/paper_list_l2471_https_arxiv_org_abs_2512_00677/figures/008_Table_3.jpg]]
-*Table 3: Ablation Study: Context Token Propagation (CTP). This ablation study is conducted with STGA included to isolate the impact of CTP. Full Token Inheritance (CTP-Full) and Flow-Guided Token Replacement (CTP-Flow) play a critical role in reinforcing temporal and multi-view consistency, enabling more accurate reconstruction of the edited dynamic scene. Despite a slight trade-off in CLIP-based metrics [42], CTP substantially improves spatio-temporal coherence and overall 4D editing fidelity*
-
-![[assets/figures/papers/paper_list_l2471_https_arxiv_org_abs_2512_00677/figures/010_Figure_6.jpg]]
-*Figure 6: Ablation Study: 2D Consistency. Each component in our method strengthens temporal and multi-view consistency in 2D editing. STGA improves semantic alignment and preserves fine details across views, while CTP enhances coherence by propagating information across neighboring frames*
-
 ![[assets/figures/papers/paper_list_l2471_https_arxiv_org_abs_2512_00677/figures/009_Figure_7.jpg]]
 *Figure 7: Qualitative Analysis of Vital Layer Range. Applying STGA to all layers introduces visual artifacts across views and time, while omitting STGA produces inconsistent multi-view and temporal edits. Restricting STGA to the vital range yields the most coherent and stable multi-view–time editing results*
-
-![[assets/figures/papers/paper_list_l2471_https_arxiv_org_abs_2512_00677/figures/014_Table_5.jpg]]
-*Table 5: Detailed vital layer range analysis for STGA. This table reports the exact numerical values corresponding to the trend shown in Figure 3 of the main paper*
-
-![[assets/figures/papers/paper_list_l2471_https_arxiv_org_abs_2512_00677/figures/012_Table_4.jpg]]
-*Table 4: Ablation Study: Asymmetric Sub-Grid Traversal (AGT). This evaluation is conducted without CTP to isolate the impact of Asymmetric Sub-Grid Traversal (AGT). The results show that sub-grids without AGT achieve slightly better local consistency metrics because all frames within each sub-grid are updated independently. However, the lack of linkage between sub-grids introduces discontinuities, weakening overall 4D reconstruction fidelity. In contrast, applying AGT improves global consistency by overlapping frames across sub-grids, even at the cost of some local editing precision, as it enables effective information propagation. This leads to more stable and reliable 4D edits, demonstrating that...*
-
-![[assets/figures/papers/paper_list_l2471_https_arxiv_org_abs_2512_00677/figures/013_Figure_9.jpg]]
-*Figure 9: Ablation Study: Asymmetric Sub-Grid Traversal (AGT). This qualitative result clearly demonstrates that AGT preserves global multi-view and temporal consistency. Without AGT, noticeable discontinuities appear between sub-grids*
-
-
 
 ## 定位与知识库关联
 
@@ -383,8 +349,6 @@ Dynamic-eDiTor 处于**训练免费文本驱动4D场景编辑**这一新兴方�
 4. **编辑粒度与时效性的提升。** 当前方法以整个场景为单位进行编辑，缺乏对局部区域或特定时间段的精细控制。同时，51分钟的处理时间限制了交互式应用。如何在保持一致性的前提下，支持更细粒度的编辑控制（如空间掩码、时间窗口）并显著降低延迟？这可能需要在 MM-DiT 的推理效率和4DGS的优化策略上进行联合改进。
 
 5. **评估体系的完善。** 当前评估主要依赖 CLIP-based 指标和用户研究，缺乏专门针对4D编辑一致性的自动化度量标准。论文中使用的 Warping Error 和 MEt3R 指标（Table 6）是向正确方向迈出的一步，但4D编辑领域仍然急需更全面、更细粒度的自动化评估基准，以系统性地衡量多视角一致性、时间连贯性和编辑保真度之间的复杂权衡。
-
-
 
 ## 原文 PDF
 

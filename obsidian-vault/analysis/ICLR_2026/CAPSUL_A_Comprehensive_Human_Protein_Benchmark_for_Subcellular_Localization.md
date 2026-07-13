@@ -51,8 +51,6 @@ claims:
 
 方法层面，CAPSUL并非提出新的预测算法，而是建立了一个多模态基准框架。该框架整合了序列编码器（ESM-2、ESM-C）、结构编码器（CDConv、GearNet-Edge、FoldSeek）以及专门的预测工具（DeepLoc 2.1），统一采用二元交叉熵损失进行多标签分类优化。实验还揭示了类别不平衡这一核心挑战：正样本比例仅0.5%–3%，导致少数类预测困难。重加权策略和单标签分类策略可部分缓解该问题，使结构模型在少数类上也能做出正样本预测，但整体宏平均F1仍较低，表明该问题尚未完全解决。
 
-
-
 蛋白质的亚细胞定位是理解其功能、调控和疾病关联的核心线索。一个蛋白质的功能不仅取决于其序列，更与其在细胞内的精确空间位置密切相关。然而，现有的亚细胞定位预测数据集存在两个关键瓶颈，限制了该领域向更高精度和可解释性发展。
 
 **瓶颈一：三维结构信息的缺失。** 当前主流数据集仅提供氨基酸序列，缺乏蛋白质的三维结构特征（如Cα坐标、3Di结构tokens）。这导致基于结构的预测模型无法有效开发，也使得许多与空间构象相关的定位信号被忽略。尽管AlphaFold2等工具已能大规模预测高质量蛋白质结构，但尚无基准数据集将这些结构信息系统性地整合到定位预测任务中。
@@ -60,8 +58,6 @@ claims:
 **瓶颈二：亚细胞分类粒度粗糙且缺乏证据可信度标注。** 现有数据集（如DeepLoc）通常仅提供10个粗粒度类别，无法捕捉细胞内精细区室（如核质、核仁、高尔基体等）的定位差异。此外，这些标注未区分实验验证（如ECO:0000269证据码）与计算推测的证据级别，导致模型训练和评估缺乏可信度参考。
 
 上述缺口直接催生了CAPSUL的构建动机：**通过引入统一的三维结构表示与细粒度注释，系统性地验证结构特征在亚细胞定位任务中的关键作用**。具体而言，CAPSUL从AlphaFold2提取Cα坐标，并利用FoldSeek工具将结构token化为3Di tokens，同时将亚细胞注释细化为20个类别并对齐UniProt与HPA数据库，由领域专家验证。这一设计使得研究者能够首次在统一基准上比较序列模型与结构模型的性能差异，并利用注意力机制等工具发现与定位相关的结构模式（如α-螺旋），从而提升模型的生物学可解释性。
-
-
 
 ## 核心方法与创新机理
 
@@ -84,8 +80,6 @@ CAPSUL的核心创新在于将**蛋白质三维结构信息**与**细粒度亚�
 
 CAPSUL的另一独特设计是为每条定位注释附加**实验证据级别标签**：实验验证（ECO:0000269）标记为1，其他证据标记为2，无证据标记为0。这一机制允许研究者在训练和评估时按证据强度筛选数据，为模型的可靠性分析提供了前所未有的透明度。
 
-
-
 ![[assets/figures/papers/iclr26_0010_wJn4WbvSpK_CAPSUL_A_Comprehensive_Human_Protein_Benchmark_f/figures/001_Figure_1.jpg]]
 *Figure 1: Procedures of CAPSUL dataset construction, including 3 key steps: Step 1 extracts and filters the sequence and structure data for each high-quality protein from AlphaFold2; Step 2 collects the annotations from UniProt and HPA for the resulting proteins in Step 1; Step 3 merges the structure data and the annotations for each protein, which consists of protein ID, localization annotations, amino acid sequence, sequence length, 3Di tokens, and Cα coordinates, etc*
 
@@ -104,8 +98,6 @@ CAPSUL的构建遵循一个三步流水线（见Figure 1），将高质量人类
 $$\mathcal{L}_{\mathrm{BCE}} = -\frac{1}{m} \sum_{i=1}^{m} \left[ y_i \log(\hat{y}_i) + (1 - y_i) \log(1 - \hat{y}_i) \right]$$
 
 其中 $m$ 为类别数（20），$y_i$ 为真实标签，$\hat{y}_i$ 为预测概率。
-
-
 
 ### 蛋白质序列编码器
 
@@ -159,8 +151,6 @@ CAPSUL 数据集中各类别的正样本比例极度不平衡（约 0.5% 至 3%�
 
 该显著下降确证了真实三维空间排布——而非仅图拓扑——是结构模型预测亚细胞定位的关键信息源。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与因果机制
@@ -169,14 +159,12 @@ CAPSUL基准的核心发现围绕一个因果闭环展开：**蛋白质三维结
 
 **决定性证据**来自Cα坐标随机采样的消融实验（Table 4）：将CDConv和GearNet-Edge的真实Cα坐标替换为随机采样值后，CDConv的Micro Avg F1从0.452骤降至0.329（−0.123），GearNet-Edge则从0.417降至0.348（−0.069）。这一显著且一致的性能退化表明，**真实的三维空间排布——而非蛋白质序列本身——是模型捕捉定位信号的核心信息来源**。值得注意的是，结构模型的退化幅度（CDConv约27%，GearNet-Edge约17%）提示不同结构编码器对空间信息的依赖程度存在差异，CDConv对坐标完整性的敏感度更高。
 
-
 ![[assets/figures/papers/iclr26_0010_wJn4WbvSpK_CAPSUL_A_Comprehensive_Human_Protein_Benchmark_f/figures/006_Table_4.jpg]]
 *Table 4: Ablation study of CDConv and GearNet-Edge to randomly sample Cα coordinates*
 
 ### 序列预训练的增益与局限
 
 序列模型的对比实验揭示了预训练的重要性与根本局限。ESM-C 600M（预训练版本）在Nucleus类别上取得0.649的F1-score，而未预训练的ESM-C 600M0仅为0.555，差距达+0.094（Table 3）。这一结果表明，大规模蛋白质序列预训练确实为定位任务提供了有益的先验知识。然而，**即便经过预训练，序列模型仍无法完全捕捉与三维结构相关的定位信号**——结构模型CDConv（Micro Avg F1 0.452）虽整体低于ESM-C（0.494），但在特定类别上展现出序列模型难以企及的优势，例如高尔基体（Golgi Apparatus）预测达到100%精确率。这暗示结构特征在少数特定亚细胞区室的定位中具有不可替代的判别能力。
-
 
 ![[assets/figures/papers/iclr26_0010_wJn4WbvSpK_CAPSUL_A_Comprehensive_Human_Protein_Benchmark_f/figures/004_Table_3.jpg]]
 *Table 3: Overall performance of sequence-based, structure-based methods on CAPSUL*
@@ -198,7 +186,6 @@ CAPSUL数据集的正样本比例高度不平衡（约0.5%–3%），导致模�
 
 CDConv通过在GCN基础上扩展Transformer模块，实现了残基级注意力权重的提取与可视化，这是该基准在可解释性方面的重要贡献。针对高尔基体定位蛋白的案例分析（Figure 2, Figure 4）显示，CDConv的注意力机制成功识别出与定位功能相关的α-螺旋结构域——注意力得分最高的20个残基在空间上恰好对应于跨膜α-螺旋区域。对于MFNG、B3GALT2和GIMAP1三个代表性蛋白，全注意力得分与蛋白质三维结构的对应关系（Figure 4）进一步验证了模型捕捉结构-定位关联的能力。这一发现将预测性能与生物学机制直接关联，为后续的因果发现研究奠定了基础。
 
-
 ![[assets/figures/papers/iclr26_0010_wJn4WbvSpK_CAPSUL_A_Comprehensive_Human_Protein_Benchmark_f/figures/010_Figure_2.jpg]]
 *Figure 2: Visualization of the top 20 attention-scored residues of the three representative proteins*
 
@@ -216,13 +203,8 @@ CDConv通过在GCN基础上扩展Transformer模块，实现了残基级注意力
 - 重加权策略中三种方案的详细消融对比（逆频率、对数逆频率、Focal Loss的相对优劣）。
 - 单标签分类策略在核膜（Nuclear Membrane）等极端少数类上的具体表现。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0010_wJn4WbvSpK_CAPSUL_A_Comprehensive_Human_Protein_Benchmark_f/figures/002_Table_1.jpg]]
 *Table 1: Comparisons between existing datasets and CAPSUL*
-
-
-
 
 ## 定位与知识库关联
 
@@ -259,8 +241,6 @@ CAPSUL的适用性受以下边界条件约束：
 3. **结构表征的丰富度**：现有结构编码器（CDConv、GearNet-Edge）主要基于Cα原子图。能否开发更丰富的结构表征——例如纳入侧链信息、表面电荷分布或溶剂可及性——以捕捉更精细的定位信号？
 
 4. **动态扩展路径**：当未来蛋白质结构数据库中包含更多动态数据（如不同pH、不同互作状态下的构象）时，CAPSUL如何扩展以支持上下文依赖的亚细胞定位预测？这需要从数据集构建到模型设计的系统性更新。
-
-
 
 ## 原文 PDF
 

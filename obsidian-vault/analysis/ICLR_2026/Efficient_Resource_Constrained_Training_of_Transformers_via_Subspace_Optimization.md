@@ -61,8 +61,6 @@ claims:
 
 **局限性**：当前验证主要集中在视觉Transformer（ViT、SwinT），尚未在数十亿参数的大语言模型及更广泛的NLP下游任务上充分评估；低ε值下精度损失仍然存在；方法在持续学习等场景中的子空间稳定性有待验证。
 
-
-
 ### 资源受限场景下的Transformer训练瓶颈
 
 Transformer架构在视觉和语言任务中取得了显著成功，但其训练和推理过程对计算资源的需求极高。核心瓶颈集中在两个方面：**反向传播时的内存开销**和**推理时的计算开销**。
@@ -85,8 +83,6 @@ Transformer架构在视觉和语言任务中取得了显著成功，但其训练
 本文的核心动机源于一个关键观察：**模型参数在微调过程中驻留在一个稳定的低秩子空间内**。如Figure 3a所示（Sec. 4.2），在ViT微调过程中，权重矩阵 $\mathcal{W}_6$ 的奇异值分布在不同epoch间保持显著稳定，表明参数的核心信息集中在少数主成分上。同时，Figure 4显示激活图的能量也高度集中于前几个奇异值，验证了激活空间的低秩特性。
 
 基于这一观察，本文提出**WASI（Weight-Activation Subspace Iteration）**方法，通过统一的子空间优化框架，在训练和推理过程中同时压缩权重和激活，并通过**解释方差阈值 $\varepsilon$** 作为单一控制旋钮来调节信息保留与资源消耗之间的权衡。该方法的目标是在保持模型性能的前提下，最大化内存和计算效率，使Transformer能够在资源严重受限的边缘设备上完成微调和部署。
-
-
 
 ## 核心方法与创新机理
 
@@ -128,8 +124,6 @@ WASI与**ASI**（Nguyen et al., 2025）的核心差异在于：ASI仅压缩激�
 
 WASI目前主要在视觉Transformer（ViT, SwinT）上验证，尚未在数十亿参数的大规模语言模型上充分评估（仅尝试了TinyLlama）。压缩带来的精度损失在较低 $\varepsilon$ 值下依然存在。此外，该方法在更广泛的NLP下游任务（如文本生成、推理）上的表现，以及与量化、剪枝等技术的正交结合效果，仍需进一步探索。
 
-
-
 ![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_0nvQ5kHXf4/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of WASI in a single training iteration*
 
@@ -148,8 +142,6 @@ WASI（Weight-Activation Subspace Iteration）构建了一个统一的低秩训�
 整个框架通过单一的超参数 $\varepsilon$ 控制信息损失与资源消耗的权衡：$\varepsilon=1.0$ 等价于完整训练的vanilla模式，降低 $\varepsilon$ 则逐步增加压缩率。在ViT on CIFAR-10上，$\varepsilon=0.9$ 时WASI以仅1.08%的精度损失（96.24% vs. 97.32%）换取了13.1×的训练内存缩减（Table 1）；在SwinT上内存最高缩减62×，FLOPs降低1.5×（Fig. 6）；在TinyLlama上激活内存甚至缩减953.86×（Fig. 7）。在Raspberry Pi 5等边缘设备上，WASI实现了约1.4×的实际训练加速（Fig. 8, Table 2）。
 
 > **待验证点**：WASI目前主要在视觉Transformer（ViT, SwinT）上验证，在数十亿参数LLM上的可扩展性尚未充分评估；此外，该方法在NLP领域的其他下游任务（如文本生成、推理）上的表现也需进一步实验确认。
-
-
 
 ### 3.1 标准前向与反向传播
 
@@ -218,8 +210,6 @@ $$L_i R_i = L_i R_i + \eta \cdot \widetilde{\frac{\partial \mathcal{L}}{\partial
 | **解释方差秩选择** | 自动确定最优秩 | 权重按 $\varepsilon$ 阈值截断；激活用动态规划 |
 | **统一低秩前向/反向** | 子空间内端到端计算 | Eq. 8-11，大幅降低FLOPs和内存 |
 
-
-
 ## 实验与关键发现
 
 ### 核心假设验证：权重与激活的低秩稳定性
@@ -255,22 +245,13 @@ Table 1 报告了 WASI 应用于 ViT 所有线性层（包括注意力投影和 
 
 Fig. 5 将 WASI 与 SVD-LLM（Wang et al., 2024）进行直接对比。在相似精度水平下，WASI 的内存效率高出 SVD-LLM 高达 **100 倍**。这一差距源于 WASI 同时压缩权重和激活，而 SVD-LLM 仅对模型权重进行低秩分解，未触及激活存储这一主要内存瓶颈。
 
-![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_0nvQ5kHXf4/figures/011_Figure_5.jpg]]
-*Figure 5: Resource consumption during fine-tuning and inference of ViT on the CIFAR-10 dataset. Each marker in the plots corresponds to a different compression rate, with the red diamond indicating vanilla training*
-
 #### SwinT 跨数据集泛化
 
 Fig. 6 展示了 WASI 在 Swin Transformer 上的跨数据集表现。在 $\varepsilon=0.9$ 时，WASI 匹配 vanilla 精度的同时，训练内存降低高达 **62 倍**，FLOPs 降低 1.5 倍。该结果验证了方法在不同视觉架构和数据集上的鲁棒性。
 
-![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_0nvQ5kHXf4/figures/015_Figure_6.jpg]]
-*Figure 6: Resource consumption when applying WASI for fine-tuning and inference of SwinT across different datasets. Each marker along the curves represents a different compression rate, while the final marker on each curve corresponds to vanilla training*
-
 #### 语言模型初步验证
 
 Fig. 7 报告了 TinyLlama 在 BoolQ 上的微调结果。WASI 将激活内存降低高达 **953.86 倍**，权重内存降低 30.12 倍，且不损失精度。图表中每个标记代表从最后一层向上微调的层数——靠近 y 轴的标记对应仅微调最后一层，向右依次增加微调层数。WASI 在所有层数配置下均保持与 vanilla 相当的精度，同时大幅压缩内存。
-
-![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_0nvQ5kHXf4/figures/019_Figure_7.jpg]]
-*Figure 7: Performance of WASI vs. vanilla training when fine-tuning TinyLlama on BoolQ. Each marker indicates the number of layers fine-tuned from the last layer upward: the marker closest to the y-axis of each figure corresponds to fine-tuning only the last layer, the next marker corresponds to the last two layers, and so on*
 
 ### 边缘设备实测
 
@@ -281,15 +262,9 @@ Fig. 8 和 Table 2 报告了 Raspberry Pi 5 上的实测延迟。在 $\varepsilo
 ![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_0nvQ5kHXf4/figures/032_Table_2.jpg]]
 *Table 2: Comparison of inference and training time (s) when applying WASI, ASI, and vanilla training to fine-tune ViT on Raspberry Pi 5 at different ε values*
 
-![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_0nvQ5kHXf4/figures/033_Table_3.jpg]]
-*Table 3: On-device latency of fine-tuning ViT on one minibatch of 128 CIFAR-10 samples initialized with ImageNet-pretrained weights. We report the time for one inference pass and one training iteration on three edge devices*
-
 #### 能耗
 
 Table 4 测量了 Jetson Orin 上的能耗。以 $\varepsilon=0.9$ 为例，WASI 的推理和训练能耗均显著低于 vanilla（$\varepsilon=1.0$）。能耗随 $\varepsilon$ 单调递增，与计算量正相关。
-
-![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_0nvQ5kHXf4/figures/034_Table_4.jpg]]
-*Table 4: Energy consumption of WASI on Jetson Orin with different ε. Note that $\varepsilon$ = 1 . 0 corresponds to vanilla training*
 
 ### 消融实验
 
@@ -311,13 +286,6 @@ Table 4 测量了 Jetson Orin 上的能耗。以 $\varepsilon=0.9$ 为例，WASI
 2. **任务覆盖不足**：NLP 实验仅限于 BoolQ 问答任务，尚未在文本生成、推理等更广泛的下游任务上评估。
 3. **精度损失存在**：在较低 $\varepsilon$ 值下，精度下降较为明显，$\varepsilon$ 的选择需要在资源与精度之间权衡。
 4. **架构适用性**：如 MCUNet 实验所示，方法对已紧凑设计的卷积架构增益有限。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_0nvQ5kHXf4/figures/024_Figure_10.jpg]]
-*Figure 10: WASI performance when fine-tuning ViT across multiple datasets. In each plot, markers from left to right represent increasing values of ε; the rightmost marker corresponds to vanilla training*
-
-
 
 ## 定位与知识库关联
 
@@ -369,8 +337,6 @@ WASI 的有效性建立在两个经验假设之上，这些假设在视觉 Trans
 4. **秩选择的自适应优化**：当前权重秩由解释方差阈值 ε 统一控制，激活秩通过动态规划在预调困惑度约束下分配。能否将秩选择过程与训练目标联合优化，实现端到端的自适应压缩？
 
 5. **更广泛架构的适用性**：WASI 的核心操作基于线性层的矩阵乘法分解，理论上可扩展至任何以线性层为主的计算单元。但在注意力机制、混合专家模型（MoE）等复杂架构中的表现和适配方案尚未探索。
-
-
 
 ## 原文 PDF
 

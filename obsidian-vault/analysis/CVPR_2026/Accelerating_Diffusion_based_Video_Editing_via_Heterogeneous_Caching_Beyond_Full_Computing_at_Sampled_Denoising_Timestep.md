@@ -136,9 +136,6 @@ $$\alpha_i = \frac{1}{|\mathcal{X}_{gen}|} \sum_{j \in \mathcal{X}_{gen}} \bar{A
 
 HetCache 是一种面向基于扩散的掩膜视频到视频（MV2V）编辑的无训练缓存框架，其核心设计动机在于联合建模扩散过程中**去噪时间步间的冗余**与 DiT backbone 中**时空 token 间的冗余**（Figure 1）。现有方法通常仅关注其中一维，而 HetCache 利用 MV2V 编辑特有的编辑掩膜空间先验，将 token 异质性引入缓存决策，从而在保持编辑一致性的前提下大幅裁剪冗余计算。
 
-![[assets/figures/papers/paper_list_l832_https_arxiv_org_abs_2603_24260/figures/001_Figure_1.jpg]]
-*Figure 1: (a). Illustration of the acceleration dimensions in Diffusion Transformers (DiTs). Unlike existing methods, the proposed Heterogeneous Caching (HetCache) jointly models denoising-step redundancy in the diffusion process and token redundancy within the Transformer backbone. (b). As a tailored heterogeneous strategy, HetCache accelerates diffusion-based masked video-to-video (MV2V) editing while maintaining generation quality*
-
 ### 框架总览
 
 Figure 2 给出了 HetCache 的整体流程。对于一次 MV2V 编辑推理，系统首先将编辑掩膜 $M$ 与噪声输入一同送入 DiT 去噪网络 $\mathcal{G} = g_1 \circ g_2 \circ \cdots \circ g_L$。在每个去噪时间步，HetCache 依次执行以下关键模块：
@@ -278,11 +275,6 @@ Figure 5展示了关键超参数的影响。保留上下文token比例 $r_{\math
 2. **极低计算预算下的质量退化**：当 $r_{\mathrm{ctx}}$ 设置过低时，被保留的上下文token数量不足以维持与生成token的充分交互，可能导致生成内容的语义偏离或时序不连贯。
 3. **超参数的任务敏感性**：阈值 $\Delta$、聚类数 $K$、保留比例 $r_{\mathrm{ctx}}$ 等超参数需针对不同任务手动调节，目前缺乏自动化选择机制。
 4. **任务范围的限定**：所有验证均在MV2V编辑（有mask）场景下完成，对无mask的通用视频生成或图像生成任务的适用性尚未探索。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l832_https_arxiv_org_abs_2603_24260/figures/003_Table_1.jpg]]
-*Table 1: Quantitative evaluation of inference efficiency and visual quality in video generation models. HetCahce achieves superior efficiency and better visual quality across different base models, sampling schedulers, video resolutions, and lengths*
 
 ![[assets/figures/papers/paper_list_l832_https_arxiv_org_abs_2603_24260/figures/004_Figure_3.jpg]]
 *Figure 3: VBench comparison between HetCache and other methods on different video editing tasks*

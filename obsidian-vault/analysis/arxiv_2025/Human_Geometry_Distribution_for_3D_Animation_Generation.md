@@ -57,8 +57,6 @@ claims:
 
 **方法定位**：HuGeoDis-Anim属于“潜在空间分布建模+自回归生成”的方法谱系。它在静态几何生成上继承并改进了HuGeoDis的分布表示，在动画生成上引入身份条件流匹配与对比学习，区别于直接长时监督或无条件自回归的基线方案。
 
-
-
 ### 问题场景与核心挑战
 
 生成具有高保真几何细节和自然服装动态的3D动画化身，是数字人、影视制作和虚拟现实等领域的核心需求。理想情况下，这类生成应具备三个关键特性：**几何保真度**（服装褶皱、配饰等精细结构）、**动态自然度**（服装随身体运动产生符合物理直觉的变形）以及**身份一致性**（同一化身的视觉特征在动画序列中保持稳定）。
@@ -81,8 +79,6 @@ claims:
 
 综合来看，本文的核心洞察在于：通过构建均匀的SMPL-化身对应关系并建模短时动态与长时身份一致性，即使从少量数据中也能够生成多样化且时序连贯的精细服装动画。
 
-
-
 ## 核心方法与创新机理
 
 HuGeoDis-Anim 的核心突破在于两个相互耦合的 **changed slots**，它们共同解决了“从有限3D动画数据中同时捕捉高保真几何与自然服装动态”这一瓶颈。
@@ -103,8 +99,6 @@ HuGeoDis-Anim 的核心突破在于两个相互耦合的 **changed slots**，它
 
 两个changed slots并非孤立改进：均匀的SMPL-化身映射为潜在空间提供了高质量的几何基础，使紧凑的潜在编码 $\mathbf{z}$ 能够忠实表达精细服装细节；身份条件短时自回归则在紧凑潜在空间中高效建模时序动态，避免了对高维几何的直接长程预测。这种“先建立均匀几何对应，再在紧凑空间中条件生成”的设计，使模型从少量4D数据中也能生成多样化且时序连贯的精细服装动画。
 
-
-
 HuGeoDis-Anim 采用两阶段训练范式，将高保真人体几何动画的生成分解为**紧凑潜在空间建模**与**条件自回归动画生成**两个核心阶段，整体流程如 Figure 2 所示。
 
 ![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2512_07459/figures/002_Figure_2.jpg]]
@@ -115,8 +109,6 @@ HuGeoDis-Anim 采用两阶段训练范式，将高保真人体几何动画的生
 **第二阶段：生成式动画建模。** 在第一阶段获得所有帧的潜在编码 $\mathbf{z}$ 后，动画生成被形式化为一个身份条件下的短时自回归过程。具体而言，模型 $v_\psi$ 以当前帧及历史 $i$ 帧的潜在向量 $\mathbf{z}^{s-i:s}$、对应的 SMPL 序列 $\mathcal{S}^{s-i:s+1}$ 以及身份条件 $c$ 为输入，通过流匹配损失（Eq.7）预测下一帧潜在向量 $\mathbf{z}^{s+1}$。为保持长时生成中的身份一致性，框架引入身份条件网络 $w_\omega$，利用 NT-Xent 对比损失（Eq.8）使同一化身不同帧的特征相互靠近、不同化身相互远离。最终动画模型以联合损失 $\mathcal{L} = \mathcal{L}_{\mathrm{diff}} + \alpha \mathcal{L}_{\mathrm{nt-xent}}$（Eq.9）进行端到端优化。
 
 **推理管线。** 生成时，动画模型从随机噪声出发，自回归地生成潜在向量序列；每帧潜在向量经流匹配模型解码为点云几何，再通过高斯泼溅渲染深度/法向图，最终经泊松重建转化为网格（Figure 1）。整个框架实现了从噪声到多样化、时序连贯且身份一致的精细服装动画的端到端生成。
-
-
 
 HuGeoDis-Anim 框架由三个紧密耦合的模块构成，分别解决紧凑几何表示、均匀对应映射和时序连贯动画生成问题。
 
@@ -181,13 +173,6 @@ $$
 
 该基线在未见运动上产生低质量、不自然的几何细节（Figure 10-11），而本方法的短时流匹配策略有效避免了误差累积。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2512_07459/figures/009_Figure_6.jpg]]
-*Figure 6: The illustration of the supervised model*
-
-
-
 ## 实验与关键发现
 
 ### 核心实验结果
@@ -216,8 +201,6 @@ $$
 
 **计算开销**。潜在空间模型训练需5天（4×A100），动画模型需2天。推理时需通过流匹配ODE求解器逐步采样，虽较HuGeoDis大幅减少了所需采样点数，但实时生成仍有一定距离。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2512_07459/figures/004_Figure_4.jpg]]
 *Figure 4: Comparison across different number of sampling. We apply GS-rendered normal maps for superior detail visualization, which may slightly inflate boundaries due to non-zero GS scales; a point cloud rendering is shown (right) for boundary reference*
 
@@ -229,8 +212,6 @@ $$
 
 ![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2512_07459/figures/006_Table_3.jpg]]
 *Table 3: Comparison and ablation study of generated animations*
-
-
 
 ## 定位与知识库关联
 
@@ -299,8 +280,6 @@ $$
 4. **解耦生成与编辑**：通过解耦化身身份与服装几何，是否可以实现对生成动画的精细编辑（如换装、局部修改）？这将显著扩展方法的应用场景。
 
 5. **数据效率的极限**：本文声称在有限数据下工作良好，但未系统研究数据量-性能的 scaling 关系。在极小数据集（如单件服装、单个角色）下的生成质量边界尚不明确。
-
-
 
 ## 原文 PDF
 

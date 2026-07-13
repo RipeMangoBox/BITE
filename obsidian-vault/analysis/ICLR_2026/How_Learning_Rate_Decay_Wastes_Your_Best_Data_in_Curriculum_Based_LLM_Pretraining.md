@@ -93,8 +93,6 @@ $$\mathbb{E}[\mathcal{L}(\bar{w}_M)] = \tilde{O}(M^{-\frac{2}{3}} L^2)$$
 
 当前实验验证主要基于1.5B参数模型和30B token数据量，更大规模下的效果尚待检验。课程学习的收益高度依赖数据质量评分的准确性，若评分模型与下游任务目标不一致，可能导致排序失效。此外，结束学习率的最优设定如何随模型规模和数据量缩放、模型平均能否在更广泛的预训练场景中完全取代学习率衰减，仍是开放问题。
 
-
-
 ### 大语言模型预训练中的数据质量与学习率调度
 
 大语言模型（LLM）的预训练过程通常包含两个核心设计维度：**数据顺序**与**学习率调度**。在数据层面，传统预训练采用随机打乱的均匀顺序，而课程学习（curriculum learning）则主张将训练样本按质量从低到高排序，使模型先学习简单或低质量样本，再逐步接触高质量数据。在学习率层面，广泛使用的余弦衰减（**Loshchilov & Hutter, 2017**）和WSD（Warmup-Stable-Decay）调度（**Hu et al., 2024**）均将学习率从峰值衰减至极低水平（例如 $1 \times 10^{-5}$），以降低训练后期的噪声并促进收敛。
@@ -121,8 +119,6 @@ $$\mathbb{E}[\mathcal{L}(\bar{w}_M)] = \tilde{O}(M^{-\frac{2}{3}} L^2)$$
 2. **模型平均替代衰减**：用指数移动平均（EMA）或简单移动平均（SMA）完全替代学习率衰减，通过对最后若干检查点进行加权平均来降低噪声，同时保持恒定学习率以充分利用高质量数据。
 
 通过将数据课程、适度学习率衰减与模型平均进行协同设计，本文旨在突破传统课程学习的收益瓶颈，建立一种先前未被探索的高效预训练范式。
-
-
 
 ## 核心方法与创新机理
 
@@ -151,8 +147,6 @@ $$\mathbb{E}[\mathcal{L}(\bar{w}_M)] = \tilde{O}(M^{-\frac{2}{3}} L^2)$$
 ### 与基线方法的本质区别
 
 与直接应用课程学习但未经针对性调度的组合（如Ascend + WSD）相比，本文的创新在于**将学习率调度、数据排序与模型平均作为联合设计空间进行系统探索**，而非将它们视为独立组件。标准基线（Uniform + WSD）为均匀数据优化了激进的衰减策略；本文证明，课程学习需要一套完全不同的调度配置——更温和的衰减或完全用模型平均替代衰减——才能释放其潜力。这一发现解释了为什么早期研究中实例级课程学习的收益往往不明显：在标准衰减调度下，高质量数据的更新贡献被系统性压制，课程学习的优势无法体现。
-
-
 
 本文的核心贡献并非提出一个全新的训练架构，而是通过诊断**学习率调度与数据课程之间的隐性冲突**，构建了一套协同优化框架。该框架的核心思路是：将原本独立设计的学习率衰减策略与数据排序策略进行联合编排，使得高质量数据在训练后期仍能对参数产生足够幅度的更新。
 
@@ -209,8 +203,6 @@ $$ \bar{\pmb{\theta}}_{\mathrm{final}} = \frac{\sum_{i=0}^{k-1} \alpha^i \pmb{\t
 
 该框架的局限性在于：实验验证主要基于1.5B参数模型和30B token数据量，更大规模下的效果尚待检验；模型平均的超参数（EMA衰减率、平均窗口长度）未进行全面搜索；课程学习的收益高度依赖质量评分的准确性。
 
-
-
 ### 3.1 学习率调度与数据课程的冲突机制
 
 标准预训练中，参数更新遵循 SGD 规则：
@@ -262,8 +254,6 @@ $$\mathcal{L}(\boldsymbol{w}) = \frac{1}{2} \|\boldsymbol{w} - \boldsymbol{w}^*\
 $$\mathbb{E}[\mathcal{L}(\bar{\boldsymbol{w}}_M)] = \tilde{O}(M^{-\frac{2}{3}} L^2)$$
 
 该结论从理论上印证了“用模型平均替代过度衰减可更好地利用课程学习中高质量数据”的核心洞见（Theorem 4.1，Figure 6 模拟可视化）。
-
-
 
 ## 实验与关键发现
 
@@ -345,28 +335,6 @@ $$\mathcal{L}(\boldsymbol{w}) = \frac{1}{2} \|\boldsymbol{w} - \boldsymbol{w}^*\
 
 4. **规模验证不足**：当前实验主要基于 1.5B 参数模型和 30B token 数据量，更大规模下的效果尚待检验。结束学习率的最优设定如何随模型规模和训练数据量缩放，是否存在一致的缩放定律，仍是开放问题。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_T5wkZJqzkz/figures/002_Figure.jpg]]
-*Figure: (a) Validation loss for different decay steps. (b) LUniform − LAscend (c) Validation loss for different ending LRs. (d) \mathcal { L } _ { \mathrm { U n i f o r m } } - \mathcal { L } _ { \mathrm { A s c e n d } }*
-
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_T5wkZJqzkz/figures/010_Figure_7.jpg]]
-*Figure 7: Downstream task scores and validation losses show high correlation according to the Pearson correlation coefficient (r) and R-square value ( R ^ { 2 } ) . Average is the average score of the total 8 downstream t,asks and Core is the average score of the first 4 downstream tasks (MMLU, ARC-c/e, CSQA) in Tables 1 and 2*
-
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_T5wkZJqzkz/figures/013_Figure_8.jpg]]
-*Figure 8: The benefits of a data curriculum using PreSelect scores also diminish. We show the validation loss curves for constant and WSD LR schedules under different data schedules, including uniform, ascending, and descending orders by PreSelect scores. Overall, the ascending curriculum outperforms the uniform baseline under a constant schedule, but cannot match it under the WSD LR schedule. The final validation loss of the data curriculum is higher than that of the uniform-ordering baseline, likely because the score metrics are not perfectly targeted to the validation set*
-
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_T5wkZJqzkz/figures/009_Table_3.jpg]]
-*Table 3: Model and optimizer hyperparameters for our Qwen2.5-1.5B experiments*
-
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_T5wkZJqzkz/figures/011_Table_4.jpg]]
-*Table 4: Models trained under WSD schedules under 1-sqrt and sqrt-cube decay functions produce similar results*
-
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_T5wkZJqzkz/figures/012_Table_5.jpg]]
-*Table 5: Model Checkpoint Weights. Index −k corresponds to the last k-th checkpoint*
-
-
-
 ## 定位与知识库关联
 
 ### 核心矛盾：数据课程与学习率衰减的隐性冲突
@@ -418,8 +386,6 @@ $$\bar{\pmb{\theta}}_{\mathrm{final}} = \frac{\sum_{i=0}^{k-1} \alpha^i \pmb{\th
 4. **多阶段训练中的协同：** 在多阶段预训练与微调流水线中，课程学习应如何与其他训练技术（如知识蒸馏、强化学习反馈等）协同工作？Mid-training 实验（Table 2）已初步展示了 CMA 在混合质量数据场景中的显著收益（核心基准平均提升超过 2%），但更复杂的多阶段流水线仍有待探索。
 
 5. **深层制约因素的挖掘：** 为什么在早期研究中实例级课程学习的收益往往不明显——除了 LR 衰减，是否还存在其他深层优化或数据相关的制约因素？例如，优化器的自适应学习率机制、梯度噪声结构或批次内数据混合策略是否也与课程学习存在隐性冲突？
-
-
 
 ## 原文 PDF
 

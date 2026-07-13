@@ -72,15 +72,11 @@ VisRes Bench 并非提出新模型架构，而是一个**诊断性评测基准**
 
 这些结果表明，当前 VLMs 的视觉推理能力存在层级性缺陷——底层知觉组织的不足向上传导，最终导致高层抽象推理的崩溃。
 
-
-
 视觉推理——从原始像素中抽象出结构、规则和关系的能力——是人类智能的基石，也是构建通用视觉系统的长期目标。当前视觉语言模型（VLMs）在广泛的多模态基准上展现出了令人瞩目的能力，但其成功在多大程度上源自真正的视觉理解，而非对语言先验的依赖，仍是一个悬而未决的问题。现有评估范式通常将视觉输入与自然语言问题配对，这使得模型可以通过文本捷径绕过视觉感知的深层困难，掩盖了其视觉推理能力的真实边界。
 
 VisRes Bench的核心动机正是填补这一评估盲区。该工作观察到，当移除语言上下文并将任务严格限定为纯图像四选一格式时，VLM的视觉推理能力会急剧下降，在感知扰动下甚至接近随机水平。更关键的是，模型在文本条件下表现出的“推理能力”可能主要源于语言先验，而非对视觉世界的真实建模——这一假设构成了整个基准设计的出发点。
 
 为系统性地诊断这一问题，VisRes Bench将视觉推理分解为三个递进层次：**感知重建**（Level-1）、**单属性规则抽象**（Level-2）和**多属性组合推理**（Level-3）。这一分层结构对应了从知觉组织到组合抽象的认知光谱，使得研究者可以精确定位模型的能力边界与失败模式。初步证据表明，当前VLM在底层视觉抽象——如遮挡补全、方向感知——上存在严重缺陷，这些底层瓶颈直接导致了高层组合推理的失败，形成了视觉推理的级联式脆弱性。
-
-
 
 ## 核心方法与创新机理
 
@@ -126,8 +122,6 @@ Level-1任务的干扰项生成采用两种互补策略：
 
 VisRes揭示的关键发现是：**VLM在文本条件下的表现可能严重依赖语言先验，而非真正的视觉理解**。当移除语言上下文后，即使是前沿模型在底层视觉抽象任务（如遮挡补全、方向感知）上也表现糟糕，这直接导致高层组合推理的失败。这一洞察为VLM的视觉能力评估提供了新的方法论范式。
 
-
-
 VisRes Bench 的核心设计目标是通过一个纯视觉的四选一基准，剥离语言先验对视觉推理能力的干扰，从而系统性地诊断当前视觉语言模型（VLMs）在感知重建、单属性抽象和多属性组合推理三个层次上的真实能力。整个基准围绕三个递进的复杂度层级构建，每个层级对应不同的视觉推理瓶颈。
 
 ### 任务层级与复杂度递进
@@ -139,9 +133,6 @@ VisRes 将视觉推理分解为三个层次，形成从底层感知到高层组�
 - **Level 3 — 多属性组合推理**：在 Level 2 的基础上，网格中同时存在多个属性的变化规则（如三种不同颜色、三种不同方向、或颜色-方向-计数的混合组合），要求模型进行联合属性推理。这一层级直接检验模型是否具备真正的组合泛化能力。
 
 图 Figure 1 展示了三个层级的具体任务样例，图 Figure 2 则图解了 Level 2 和 Level 3 中使用的模式规则结构。
-
-![[assets/figures/papers/paper_list_l2753_https_openaccess_thecvf_com_content_CVPR2026_html_Tortei_VisRes_Bench_On/figures/001_Figure_1.jpg]]
-*Figure 1: Real samples from each level. Level 1 (top) involves direct visual completion and matching without explicit rule inference (e.g., patch-C correctly continues the ceiling texture compared to patch-D), while Levels 2 and 3 (bottom) require increasingly complex rule-based reasoning over perceptual attributes. Accurate perception of individual attributes is necessary but not sufficient for solving compositional tasks. Current VLMs show poor performance on these compositional tasks. See Section 4.2*
 
 ### 数据与标注管线
 
@@ -170,8 +161,6 @@ VisRes 的诊断逻辑建立在一条清晰的因果链上：如果 VLMs 在文�
 - **感知探针**：使用 MAE 在像素空间进行重建检索（Table 5），以 L2 距离 $d_{\mathrm{pixel}}({\hat{\mathbf{C}}}, \mathbf{C}_i) = \| {\hat{\mathbf{C}}} - \mathbf{C}_i \|_2$ 作为重建质量的度量，从信号层面评估模型的底层视觉编码能力。
 
 这一框架的系统性在于：它不是简单地报告模型的综合得分，而是通过分层任务设计、模态解耦和感知探针的组合，定位模型在“知觉组织→单属性抽象→组合推理”这一认知链条上的具体断裂点。
-
-
 
 ### 1. 数据采集与预处理模块
 
@@ -214,13 +203,6 @@ $$d_{\mathrm{pixel}}({\hat{\mathbf{C}}}, \mathbf{C}_i) = \| {\hat{\mathbf{C}}} -
 - 该距离在 RGB 空间中直接计算，评估像素级重建质量。距离越小，表示重建结果与候选块越接近。
 
 该公式用于 MAE 重建检索实验中，通过计算重建补丁与所有候选块的 L2 距离，选择距离最小的候选块作为预测答案，从而量化模型的底层视觉重建能力。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2753_https_openaccess_thecvf_com_content_CVPR2026_html_Tortei_VisRes_Bench_On/figures/002_Figure_2.jpg]]
-*Figure 2: Illustrative pattern rules used in Levels 2 and 3 tasks. Top: Level-2 tasks where one attribute varies across the row. Bottom: Level-3 tasks where multiple attributes vary. See Section 3.3*
-
-
 
 ## 实验与关键发现
 
@@ -305,13 +287,6 @@ Table 4 将 Level-2 和 Level-3 任务转换为纯文本描述后评估。当视
 
 这些失败并非孤立存在，而是形成因果链：感知缺陷 → 属性绑定错误 → 组合推理崩溃。当前 VLM 的视觉推理能力高度依赖语言先验的补偿，在纯视觉条件下暴露出从知觉组织到组合抽象的系统性不足。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2753_https_openaccess_thecvf_com_content_CVPR2026_html_Tortei_VisRes_Bench_On/figures/009_Table_7.jpg]]
-*Table 7: Studying the impact of image resolution on GPT-5. All levels improve with higher number of image tokens*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 评估范式定位：从语言先验到纯视觉推理
@@ -354,8 +329,6 @@ VisRes的设计选择同时定义了其适用边界：
 3. **架构层面的补救路径**：能否通过设计专用的知觉前端模块（如显式编码方向、对称性等几何属性的模块）来弥补当前VLM在底层视觉抽象上的不足？MAE实验（Table 5）表明像素级重建能力随tile尺寸增大而急剧退化（从16×16的62.6%降至48×48的39.4%），提示当前视觉编码器的底层表征可能不足以支撑精细的视觉推理。
 
 4. **思考模式的作用机制**：Table 6显示启用思考模式一致提升所有模型的表现，尤其在Level-3上提升显著，但思考过程究竟是增强了视觉特征的再提取，还是主要提供了推理步骤的结构化引导，目前缺乏细粒度的消融分析。
-
-
 
 ## 原文 PDF
 

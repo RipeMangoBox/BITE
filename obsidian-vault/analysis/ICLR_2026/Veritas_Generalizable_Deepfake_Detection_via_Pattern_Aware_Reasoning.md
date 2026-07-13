@@ -51,8 +51,6 @@ claims:
 
 在方法定位上，VERITAS 不同于传统小型视觉模型（如 **F3Net**（Qian et al., ECCV 2020）、**NPR**（Tan et al., CVPR 2024）、**Effort**（Yan et al., ICML 2025）等）依赖隐式特征判别，也超越了现有 MLLM 检测器（如 **FakeShield**、**FFAA**）仅做简单链式推理的做法。它通过**两阶段训练管道**——模式引导冷启动（SFT + MiPO）与模式感知探索（P-GRPO）——将推理质量与检测准确性统一优化，在 HydraFake 基准的四个评估场景上均达到 SOTA，相比此前最佳方法平均提升 **6.0%**。尤其在跨伪造类型和跨域场景下，模式感知推理相比灵活推理分别带来 **6.2%** 和 **3.3%** 的增益，验证了结构化思维模式对泛化能力的关键作用。
 
-
-
 深度伪造生成技术的快速迭代使得合成图像在视觉质量与多样性上持续突破，从早期的面部交换、属性编辑扩展到人脸重光照、个性化生成与生成式换脸等新范式。这一趋势对检测器提出了严苛的泛化要求：模型不仅要应对训练中未见过的生成模型（跨模型泛化），更需在完全不同的伪造类型（跨伪造泛化）与数据域（跨域泛化）下保持可靠。
 
 然而，现有检测器在这三层泛化挑战上呈现显著的性能分化。如 Figure 2 (d) 所示，大多数方法在跨模型场景下表现良好，但在跨伪造和跨域场景下性能急剧下降。深层瓶颈在于：**仅依赖统计特征匹配的小型视觉模型难以捕获伪造本质的因果线索，而通用多模态大语言模型虽具备推理能力，却缺乏面向深度伪造检测的结构化取证思维**。具体而言，通用 MLLM（如 Qwen2.5-VL-7B、InternVL3-8B）在 HydraFake 基准上的平均准确率仅约 51.2%，远低于专用小型模型（如 Effort 的 94.7%），暴露出其对伪造痕迹感知与逻辑推理的双重不足。
@@ -60,8 +58,6 @@ claims:
 此外，现有 MLLM 检测器（如 FakeShield、M2F2-Det）普遍采用“先回答后解释”或简单链式思维，缺乏人类取证中“快速判断—规划—推理—自我反思”的分级认知结构。这导致两个关键缺陷：一是推理过程不透明，无法为决策提供可信依据；二是面对未见伪造时，模型倾向于记忆表面模式而非内化可迁移的推理策略。
 
 上述缺口共同指向一个核心问题：**如何将人类取证思维模式显式注入 MLLM，使其在保持端到端可微训练的同时，习得透明、鲁棒且可泛化的深度伪造检测能力？** 本文正是围绕这一动机，提出模式感知推理框架 VERITAS，通过两阶段训练管道（模式引导冷启动与模式感知强化学习探索）驱动模型内化规划与自我反思能力，从而在跨伪造与跨域场景下实现显著泛化增益。
-
-
 
 ## 核心方法与创新机理
 
@@ -94,8 +90,6 @@ VERITAS 的核心创新在于将人类的**分级取证思维模式**显式注�
 ### 创新本质：从“数据驱动”到“认知模式驱动”
 
 VERITAS 的创新并非简单的模块堆叠，而是通过**将人类认知模式编码为可优化的训练信号**，实现了三个层面的统一：SFT 注入思维结构，MiPO 对齐推理质量，P-GRPO 激励自适应探索。这种设计使得模型在 HydraFake 四个评估场景上平均超越此前最佳方法 **6.0%**（Table 1），尤其在跨域场景下比闭源模型 Gemini-2.5-Pro 高出 **9.4%**，验证了“模式感知推理”作为泛化能力的因果杠杆的有效性。
-
-
 
 ![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_5VXJPS1HoM/figures/016_Figure_9.jpg]]
 *Figure 9: Construction pipeline of Pattern-Aware SFT data. (a) We first inspect a subset and summarize the artifacts into three clusters. (b) Then we introduce a multi-step strategy to generate pattern-aware reasoning data. (c) Annotated examples. The reasoning process evolves in complexity and depth (as highlighted in red), culminating in a final answer through synthesis of all evidence*
@@ -151,8 +145,6 @@ $$R = R _ { \mathrm { p a t t e r n } } + \lambda _ { 1 } R _ { \mathrm { r e f 
 - **MiPO 前置效果**：在 P-GRPO 前应用 MiPO 可在 CF 上带来 **+2.9%**、CD 上 **+2.1%** 的提升（Figure 4），表明冷启动阶段的推理对齐对后续 RL 探索至关重要。
 - **模式感知奖励 vs. 纯准确率奖励**：尤其在 CF 和 CD 场景下优势显著（Table 3），证实了奖励设计中显式鼓励规划与反思的必要性。
 
-
-
 VERITAS 的训练管线由两个阶段构成：模式引导冷启动（Pattern-Guided Cold-Start）与模式感知探索（Pattern-Aware Exploration），如 Figure 3 所示。冷启动阶段负责将人类分级取证思维模式内化到多模态大语言模型中，探索阶段则通过强化学习激励模型自适应地选择推理粒度。
 
 ### 4.1 模式引导冷启动
@@ -203,8 +195,6 @@ $$R = R_{\mathrm{pattern}} + \lambda_{1} R_{\mathrm{ref}} \cdot \mathbb{I}(\math
 
 其中 $R_{\mathrm{ref}}$ 由独立的奖励模型评估反思质量，$R_{\mathrm{fmt}}$ 确保输出符合预定义格式（见 Figure 8），$\lambda_{1}$、$\lambda_{2}$ 为平衡权重。这一设计使得模型在追求正确答案的同时，被显式激励去执行结构化规划与高质量自我反思，从而在跨伪造类型和跨数据域场景下获得更强的泛化能力（CF +6.2%，CD +3.3%，Table 2）。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与实验动机
@@ -252,8 +242,6 @@ Table 3 消融了 P-GRPO 中的奖励函数。模式感知奖励（R_pattern）�
 
 Table 4 显示，更大规模的基座模型带来更高的跨伪造准确率（InternVL3-14B CF 92.2 vs. InternVL3-2B CF 87.3），但 VERITAS 的训练框架在不同基座模型上均能带来一致提升。
 
-![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_5VXJPS1HoM/figures/007_Table_4.jpg]]
-
 #### 训练数据策略
 
 Table 19 表明，P-GRPO 阶段采用平衡采样策略（ID 97.3, CF 90.3）优于随机采样。此外，将约 1/3 的未见 AIGIBench 数据加入 P-GRPO 阶段可在 CF 上带来额外 **+3.8%** 的提升（Section A.5.4），提示适度暴露未见分布有助于强化探索。
@@ -284,25 +272,6 @@ Table 8 测试了压缩、模糊和缩放等扰动下的鲁棒性。VERITAS 在�
 - **Table 10–13**：ID / CM / CF / CD 各子集详细结果。
 - **Table 14**：跨基准对比（AIGIBench + HydraFake-CD）。
 - **Figure 22**：失败案例分析。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_5VXJPS1HoM/figures/008_Table_5.jpg]]
-*Table 5: Effect of reasoning patterns. SFT and P-GRPO are performed for comparisons*
-
-![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_5VXJPS1HoM/figures/009_Table_6.jpg]]
-*Table 6: Ablations on non-preference in MiPO*
-
-![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_5VXJPS1HoM/figures/014_Table_9.jpg]]
-*Table 9: Data list of the hierarchical evaluation protocol in HydraFake dataset*
-
-![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_5VXJPS1HoM/figures/018_Table_11.jpg]]
-*Table 11: Performance comparison on the Cross-Model (CM) subset of HydraFake dataset. The best results are bolded and the second best are underlined. We report Accuracy (Acc.), Precision (P.) and Recall (R.) and the averaged results (Avg.) are reported in Accuracy*
-
-![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_5VXJPS1HoM/figures/019_Table_12.jpg]]
-*Table 12: Performance comparison on the Cross-Forgery (CF) subset of HydraFake dataset. The best results are bolded and the second best are underlined. We report Accuracy (Acc.), Precision (P.) and Recall (R.) and the averaged results (Avg.) are reported in Accuracy*
-
-
 
 ## 定位与知识库关联
 
@@ -352,8 +321,6 @@ VERITAS 的适用边界由以下限制条件定义：
 4. **推理成本控制**：在实际部署中，如何根据输入复杂度自适应地平衡推理深度与计算成本？
 
 此外，从实验设置中可以观察到一个值得注意的细节：将约 1/3 的未见 AIGIBench 数据加入 P-GRPO 阶段可在 CF 上带来额外 3.8% 的提升（Section A.5.4）。这暗示 VERITAS 的泛化能力部分依赖于 RL 阶段对目标域分布的部分暴露，其真正的 zero-shot 泛化上限仍需在更严格的数据隔离条件下验证。
-
-
 
 ## 原文 PDF
 

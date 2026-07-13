@@ -59,8 +59,6 @@ claims:
 
 该框架将 SGD 的动力学与贝叶斯推断之间的鸿沟桥接为**受局部几何约束的温度化后验采样**，为理解神经网络的泛化偏好和优化器设计提供了新的几何视角。
 
-
-
 深度神经网络的损失表面具有高度非凸和退化的几何结构，这从根本上决定了随机梯度下降（SGD）的动力学行为。传统理论通常将 SGD 建模为朗之万扩散过程，假设损失表面在极小值附近为二次型，从而将稳态分布描述为高斯后验（Mandt et al., 2016b）。然而，这一图景在现实神经网络中面临根本性挑战。
 
 **核心瓶颈**在于：神经网络的损失表面存在大量退化（非二次）临界点。在这些临界点附近，Hessian 矩阵秩亏，参数空间的局部几何不再是简单的欧氏结构，而是具有多孔介质特征的复杂流形。这使得基于标准 Fokker-Planck 方程的扩散模型失效——SGD 的权重演化不再遵循布朗运动，而是展现出**异常扩散**行为：训练早期为超扩散，后期则转为亚扩散（Figure 1）。具体而言，权重位移 $R(t) \propto t^{1/\nu}$，其中 $\nu \geq 2$，而非布朗运动预期的 $t^{1/2}$。
@@ -77,8 +75,6 @@ claims:
 - 导出 SGD 稳态分布的解析形式，证明其为**温度化的贝叶斯后验**，温度由有效扩散系数 $D_\xi(w) = \xi^{2 - 2\lambda(w_t)/d_s}$ 决定，从而为 SGD 的隐式泛化偏好提供几何解释。
 
 这一框架不仅解释了 SGD 为何在退化损失表面上偏离标准贝叶斯推断，也为理解自适应优化器（如 Adam）的动力学差异提供了理论起点。
-
-
 
 ## 核心方法与创新机理
 
@@ -125,8 +121,6 @@ $$ p(w|X_m) = \frac{ \rho(w) p_s(w)^{m D_\xi} }{ Z_{m D_\xi} } $$
 其中温度由有效扩散系数 $D_\xi$ 决定，而 $D_\xi$ 又依赖于局部学习系数 $\lambda$。这意味着 **SGD 并非均匀地探索所有解，而是偏好可访问性更高（即 $\lambda$ 更小）的区域**。实验验证了这一预测：SGD 找到的解集中在较低 LLC 值附近（Figure 4a），且温度化后的 SGD 分布与近似贝叶斯后验高度一致，KL 散度仅为 0.009（Table 2）。
 
 这一框架将 SGD 的隐式偏好从经验观察提升为可计算的几何量，为理解泛化提供了动力学基础：SGD 天然倾向于收敛到 $\lambda$ 较小的“宽”极小值，这些极小值对应更好的泛化性能。
-
-
 
 ![[assets/figures/papers/iclr26_0010_5ebDXlue3d_Almost_Bayesian_Dynamics_of_SGD_Through_Singular/figures/001_Figure_1.jpg]]
 *Figure 1: Mean weight displacement of a collection of fully connected neural networks trained using SGD on a randomly generated Moons dataset (Pedregosa et al., 2011), compared with expected displacement in the case of Brownian motion. It can be seen that this displays anomalous diffusion corresponding to early super-diffusion followed by late stage sub-diffusion*
@@ -180,8 +174,6 @@ $$
 ### 适用范围与边界
 
 该框架的有效性建立在两个关键假设之上：(1) SGD 在训练后期进入近似稳态，权重位移呈现亚扩散 $R(t) \propto t^{1/\nu}$（$\nu \geq 2$）；(2) 谱维度 $d_s$ 在训练过程中近似恒定。这两个假设在普通 SGD 训练的视觉模型（ResNet、VGG）和语言模型（TinyStories、TinyLlama）上均得到实验支持（Table 1 中 $R^2$ 达 0.98~1.00）。然而，对于 Adam 等自适应优化器，其可能改变黎曼度量结构并产生多个谱维度，该框架的直接适用性受限，需要进一步扩展。
-
-
 
 本文的核心理论框架由四个相互关联的模块构成，它们共同将 SGD 的长时间动力学与奇异学习理论的局部几何描述联系起来。
 
@@ -259,8 +251,6 @@ $$ p(w|X_m) = \frac{ \rho(w) \, p_s(w)^{m D_\xi} }{ Z_{m D_\xi} } \tag{Corollary
 
 四个模块形成闭合的逻辑链：损失表面的退化几何（模块二）通过 Alexander-Orbach 关系（模块三）决定了扩散的异常程度，进而通过有效扩散系数（模块四）影响 FFPE（模块一）的稳态分布，最终导出 SGD 稳态分布与温度化贝叶斯后验的对应关系。这一链条将 SGD 的动力学行为从纯经验观察提升到了可定量预测的理论层面。
 
-
-
 ## 实验与关键发现
 
 ### 异常扩散现象的实证确认
@@ -316,12 +306,8 @@ $$ p(w|X_m) = \frac{ \rho(w) \, p_s(w)^{m D_\xi} }{ Z_{m D_\xi} } \tag{Corollary
 2. **训练初期的超扩散**：当前理论主要关注后期亚扩散阶段，但 Figure 1 明确显示训练早期存在超扩散行为。论文未对该阶段提供定量模型，这是理论覆盖范围的已知缺口。
 3. **非平衡稳态的可能性**：理论假设 SGD 达到近似稳态，但若训练过程中存在标注噪声或持续的数据分布漂移，SGD 可能维持在非平衡稳态，此时稳态分布与贝叶斯后验的对应关系需要重新审视。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0010_5ebDXlue3d_Almost_Bayesian_Dynamics_of_SGD_Through_Singular/figures/004_Figure_2.jpg]]
 *Figure 2: In a) we check that the result of lemma 3.4 holds. In b) we check that independent of our choice of diffusion model, the total displacement and average learning rate are strongly correlated in the large batch, low learning rate regime. Table 1: Results for different models*
-
-
 
 ## 定位与知识库关联
 
@@ -354,8 +340,6 @@ $$ p(w|X_m) = \frac{ \rho(w) \, p_s(w)^{m D_\xi} }{ Z_{m D_\xi} } \tag{Corollary
 4. **扩散阶段转换的动力学**：训练从超扩散到亚扩散的转换机制是什么？这一转换与损失表面的几何结构变化（如从一个吸引域进入另一个）有何关系？
 
 5. **与涌现和相变的联系**：论文提出该框架为研究训练过程中的涌现和相变提供了工具，但未给出具体的研究路径。如何利用 $\lambda(w)$ 和 $d_s$ 的时间演化来检测和预测模型行为相变，是一个值得探索的方向。
-
-
 
 ## 原文 PDF
 

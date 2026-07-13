@@ -58,8 +58,6 @@ claims:
 
 **方法定位**：ImageRAGTurbo 属于检索增强生成与扩散模型效率优化的交叉方向，区别于 **RDM** (Blattmann et al., NeurIPS 2022) 的多步检索增强和 **LCM** (Luo et al., arXiv 2023) 的自一致性蒸馏路线，首次将检索增强引入少步/单步扩散模型微调，且通过 H-space 特征融合而非外部条件注入实现高效适配。
 
-
-
 ### 扩散模型加速的核心瓶颈
 
 扩散模型在文本到图像生成领域取得了显著进展，但其推理过程需要多次迭代去噪，计算成本高昂。以 **Stable Diffusion v2-1-base**（Rombach et al., CVPR 2022）为例，标准配置需要50步去噪函数评估（NFE）才能生成高质量图像。为降低推理延迟，研究者提出了多种加速策略：
@@ -85,8 +83,6 @@ claims:
 3. **训练效率**：能否通过参数高效微调（而非全模型重训练）实现检索增强适配，降低训练成本？
 
 初步实验验证了该方向的可行性：在无训练条件下，直接通过球形归一化插值将检索H-space特征注入目标去噪分支，即可将TIFA分数从0.779提升至0.781；逐提示搜索最优混合强度后，TIFA分数可达0.816，**超越50步教师模型**。这一结果表明，检索增强有潜力从根本上改变少步扩散模型的性能上限。
-
-
 
 ## 核心方法与创新机理
 
@@ -123,8 +119,6 @@ ImageRAGTurbo 的核心创新在于将**检索增强生成（RAG）**范式系�
 ### 创新点之间的因果链条
 
 上述三个创新点构成一条清晰的因果链：**检索增强**提供额外的语义上下文 → **H-space 适配器**自适应地将检索信息融入去噪过程 → **轻量训练策略**使这一增强在极低计算开销下实现。三者共同支撑了核心洞察：UNet 的 H-space 已编码高层语义信息，注入检索到的相关 H-space 特征可以简化从噪声到目标分布的映射，在单步生成下保持高保真度。
-
-
 
 ImageRAGTurbo 的核心思想是在少步扩散模型的去噪过程中注入检索增强信息，从而在不增加推理步数的前提下提升生成质量与提示忠实度。框架由两条并行的处理分支构成：**标准去噪分支**（绿色）和**检索分支**（紫色），二者在 UNet 去噪器的 H‑space 中通过一个可训练的适配器进行融合（见 Figure 2）。
 
@@ -181,8 +175,6 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{adv}} + \alpha \mathcal{L}_{\mathrm{distill
 
 推理时，整个流程仅需一次 UNet 前向传播（单步生成），即可完成从噪声到图像的映射。检索分支的引入虽然增加了额外的编码开销，但由于检索特征提取可与目标分支并行执行，且适配器计算量极小，整体推理延迟仍显著优于多步扩散模型（见 Figure 6 的延迟对比）。
 
-
-
 ImageRAGTurbo 的核心设计围绕一个关键洞察展开：UNet 去噪器的 H-space（深层特征空间）已编码高层语义信息，注入检索到的相关 H-space 特征可以简化从噪声到目标分布的映射，从而在极低步数下保持高保真度。基于此，方法在冻结的少步扩散模型上引入两条分支和一个轻量级适配器，以检索增强的方式引导生成。
 
 ### 双分支架构与 H-space 特征提取
@@ -201,9 +193,6 @@ ImageRAGTurbo 的核心设计围绕一个关键洞察展开：UNet 去噪器的 
 $$h_t^{\mathrm{blend}} = \frac{\sin[(1-w)\Omega_t]}{\sin\Omega_t} h_t^{\mathrm{retr}} + \frac{\sin[w\Omega_t]}{\sin\Omega_t} h_t^{\mathrm{tgt}}$$
 
 其中 $\Omega_t = \arccos(\langle h_t^{\mathrm{retr}}, h_t^{\mathrm{tgt}} \rangle)$ 为两特征向量之间的角度，$w \in [0,1]$ 控制混合强度。实验表明，固定 $w=0.8$ 即可将 TIFA 分数从 0.779 提升至 0.781；逐提示搜索最优 $w^*$ 后可达 0.816，超越 50 步教师模型（Figure 3）。这一结果直接证实了 H-space 语义注入的有效性，但固定权重无法适应不同提示的语义差异，因此需要自适应融合机制。
-
-![[assets/figures/papers/paper_list_l2317_https_arxiv_org_abs_2602_12640/figures/003_Figure_3.jpg]]
-*Figure 3: Performance of direct H-space injection, shown as a histogram of TIFA scores across various categories*
 
 ### H-space 适配器（可训练融合模块）
 
@@ -247,8 +236,6 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{adv}} + \alpha \mathcal{L}_{\mathrm{distill
 | 余弦相似度门控 $\lambda$ | 抑制不相关检索的负面影响 | 提升鲁棒性 |
 | 冻结 UNet + LoRA 解码器 | 减少可训练参数，保持预训练知识 | 适配器仅占 4% 参数 |
 
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -289,21 +276,11 @@ ImageRAGTurbo在MS-COCO和TIFA两个基准上均展现出相对于少步基线�
 ![[assets/figures/papers/paper_list_l2317_https_arxiv_org_abs_2602_12640/figures/008_Figure_6.jpg]]
 *Figure 6: Comparison of inference time (ms/image). We report the average inference time calculated over the same set of 100 prompts at 512 × 512 resolution on a single NVIDIA L40S GPU*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2317_https_arxiv_org_abs_2602_12640/figures/005_Table_1.jpg]]
 *Table 1: Quantitative comparison of text-to-image generation models on the MS-COCO benchmark measured by the FID and CLIP scores, as well as the number of function evaluations (NFE) in the denoising process*
 
-![[assets/figures/papers/paper_list_l2317_https_arxiv_org_abs_2602_12640/figures/006_Table_2.jpg]]
-*Table 2: Quantitative comparison of text-to-image generation models on the TIFA benchmark as measured by the TIFA and AES scores, and the number of function evaluations (NFE) in denoising*
-
-![[assets/figures/papers/paper_list_l2317_https_arxiv_org_abs_2602_12640/figures/001_Figure_1.jpg]]
-*Figure 1: Illustrative examples of ImageRAGTurbo, where the visual concepts are highlighted by colored boxes. ImageRAGTurbo outperforms Stable Diffusion Turbo (adversarially distilled Stable Diffusion without retrieval) in generating accurate visual concepts. Even with a single step, ImageRAGTurbo performs comparably to Stable Diffusion with 50 steps. Please zoom in for better quality*
-
 ![[assets/figures/papers/paper_list_l2317_https_arxiv_org_abs_2602_12640/figures/009_Figure_7.jpg]]
 *Figure 7: Qualitative results of ImageRAGTurbo. ImageRAGTurbo can generate high-quality images in a single step (Left) and achieves better text-to-image alignment compared to other competing few-step methods (Right)*
-
-
 
 ## 定位与知识库关联
 
@@ -348,8 +325,6 @@ ImageRAGTurbo 的关键区别在于：它在少步扩散模型的**特征空间�
 2. **动态检索策略**：在推理时自适应地决定检索数量、混合强度或是否触发检索，以平衡性能与鲁棒性。当前逐提示搜索最优权重的方案（TIFA 0.816）虽然有效，但不可部署。
 3. **多模态大语言模型（MLLM）集成**：将 MLLM 引入检索筛选和评估环节，在保持低延迟的前提下实现更智能的检索增强，可能是将框架推向实用化的关键一步。
 4. **跨架构扩展**：验证该框架在更高分辨率生成任务（如 1024×1024）和其他基础模型（如 SDXL、扩散 Transformer）上的迁移能力，将决定其技术影响力的广度。
-
-
 
 ## 原文 PDF
 

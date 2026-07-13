@@ -77,8 +77,6 @@ claims:
 
 方法的局限性包括：对极薄稀疏特征效率下降；依赖已知的Lipschitz常数；对二值占用场等硬表面表示难以高效追踪。
 
-
-
 ### 隐式曲面的兴起与基本操作的缺失
 
 隐式曲面——将三维形状的几何信息编码为标量函数的零水平集——已成为计算机图形学与视觉中的核心几何表示。从经典的符号距离函数（SDF）到近年兴起的神经隐式场（如SIREN、NeuS），隐式表示因其连续、可微、拓扑灵活的特性，在形状重建、插值与变形等任务中展现出显著优势（Figure 1）。然而，一个看似基础的操作——在隐式曲面上生成**严格均匀分布**的随机采样点——至今仍缺乏高效、准确的通用解决方案。
@@ -106,8 +104,6 @@ claims:
 这一洞察的关键在于：它将“在曲面上采样点”的问题转化为“在空间中采样射线并求交”的问题，而后者恰好是隐式曲面渲染中已高度成熟的球体追踪（sphere tracing）算法所能高效完成的任务。换言之，该方法将采样问题重新表述为**射线投射（ray casting）这一唯一必需子程序**，适用于任何具备射线-曲面求交能力的隐式表示。
 
 基于此洞察，本文提出了一套完整的均匀曲面采样框架，其核心创新在于：(1) 保证射线在包围盒内均匀分布的原点采样策略（Figure 5, Figure 6）；(2) 保留每条射线所有交点（而非仅保留一个）的“全交点”策略，这是保证均匀性的关键设计选择（Figure 7）；(3) 可选的稀疏体素分层采样加速机制（Figure 9）。实验表明，该方法在均匀性上可与拒绝采样媲美（TV分数0.372 vs. 0.373），而函数评估次数仅为拒绝采样的4.8%（Table 1）。
-
-
 
 ## 核心方法与创新机理
 
@@ -139,8 +135,6 @@ claims:
 - 直接在曲面上定位交点消除了投影带来的误差和额外计算（实用可靠性）。
 
 这一协同设计使得方法在114个网格隐式函数数据集上，以**仅拒绝采样4.8%的函数评估次数**（$1.92\times 10^7$ vs $3.98\times 10^8$），达到了**与真实网格采样相当的均匀性**（TV 0.372 vs 0.373，Table 1）。
-
-
 
 本方法的核心流水线由三个关键模块串联构成，将“在隐式曲面上生成均匀白噪声样本”这一目标转化为一个无需显式网格表示、无需投影步骤的纯射线求交过程。
 
@@ -176,12 +170,8 @@ claims:
 
 整个流水线避免了显式网格提取、拒绝采样的大规模浪费或 MCMC 的投影误差，将均匀采样问题归结为“均匀射线 + 全交点收集”这一简洁的积分几何框架。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2506_05268/figures/017_Figure_14.jpg]]
 *Figure 14: White noise sampling can be straightforward with mesh surfaces, but offset surface sampling is often non-trivial unless converted to an implicit surface. Our method can easily sample offset surfaces, along both positive and negative directions, in addition to the surface defined at the zero level set*
-
-
 
 ### 均匀射线生成（Uniform Ray Generation）
 
@@ -229,8 +219,6 @@ $$\mathbf{c}_{\mathrm{solid}} = \frac{1}{V} \int \mathbf{x} d\mathbf{x} = \frac{
 其中 $\mathcal{C}_i$ 为射线 $i$ 在物体内部的弦段集合，$\mathbf{a}_{ij}$ 和 $\mathbf{b}_{ij}$ 为弦段的两个端点，$\sigma_{ij}$ 为弦长。
 
 **收敛性改进**：使用低差异序列（low-discrepancy sequence）替代均匀随机采样射线，可使表面积估计误差的收敛速度从 $O(N^{-1/2})$ 提升至 $O(N^{-2/3})$（Figure 16）。
-
-
 
 ## 实验与关键发现
 
@@ -289,15 +277,11 @@ $$V = \operatorname* { l i m } _ { M \to \infty } \frac { 6 } { M } \sum _ { i =
 
 **硬表面表示**：对于二值占用场等缺乏距离信息的表示，球体追踪无法高效进行，方法适用性受限。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2506_05268/figures/015_Table_1.jpg]]
 *Table 1: We compute the average total number of function evaluations to sample 50,000 points on a dataset of surfaces [MPZ14], as well as the total variation (TV) score measuring the uniformity of the samples. Although our method is generally aimed at implicit surfaces, we use meshes here for the sake of known geometry to evaluate against. For marching cubes, the grid size is 10243. The total variation “Ground truth” refers to uniform sampling using the ground truth mesh, for which we use the average score across 10 sampling runs for each shape*
 
 ![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2506_05268/figures/020_Figure_16.jpg]]
 *Figure 16: We plot the absolute surface area estimation error with samples acquired from sampled rays using a low-discrepancy sequence as proposed in [LYZ∗06, LYZ∗10], as well as uniformly sampled rays, as described in Section 4.1. We also plot asymptotes O ( $N ^ { \frac { 2 } { 3 } }$ ) and O ( $N ^ { \frac { 1 } { 2 } }$ ) , and observe that using the low-discrepancy sequence results in faster convergence, as pointed out in [LYZ∗06]
-
-
 
 ## 定位与知识库关联
 
@@ -367,8 +351,6 @@ $$V = \operatorname* { l i m } _ { M \to \infty } \frac { 6 } { M } \sum _ { i =
 - **重建正则化**：采样点可作为基于采样的正则化项。
 
 与现有方法相比，本文方法在**均匀性-效率 Pareto 前沿**上实现了显著推进：在 MPZ14 数据集上，TV 分数（0.372）与拒绝采样（0.373）相当，但函数评估次数仅为后者的 4.8%（$1.92 \times 10^7$ vs $3.98 \times 10^8$），为 Marching Cubes 的 1.8%（Table 1）。这一效率优势在神经隐式等评估昂贵的场景中尤为关键。
-
-
 
 ## 原文 PDF
 

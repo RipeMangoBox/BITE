@@ -55,8 +55,6 @@ claims:
 
 **主要结果：** 在3DPW基准上，本方法相比ADHMR在MPJPE上实现8.2%的提升（M=100时MPJPE为49.9 vs. 53.1）。消融实验证实：群组偏好对齐显著优于DPO变体；去除自反思模块导致评分预测的SRCC从0.597降至0.534，验证了自我反思知识构建的有效性。更重要的是，该方法**无需3D真值标注**即可在野外数据集（InstaVariety）上进行有效微调，Ours†在3DPW上达到PVE 57.7 / MPJPE 48.5的竞争性能。
 
-
-
 ### 人体网格重建的2D-3D歧义困境
 
 从单目图像恢复三维人体网格（Human Mesh Recovery, HMR）是计算机视觉的核心任务，其根本挑战在于**2D到3D的固有歧义**：一张二维图像可能对应无限多种三维姿态和形状解释。这一歧义在野外场景中尤为突出——遮挡、杂乱背景、非典型姿态等因素使得模型极易生成与输入图像不一致或物理上不合理的人体网格。
@@ -82,8 +80,6 @@ claims:
 - **群组偏好对齐框架**：将评价智能体对一组预测的群体评分转化为**优势信号（advantage）**，设计兼容ODE采样的群组偏好损失，引导扩散模型在无需3D真值标注的情况下，优先生成更符合物理约束和图像一致性的网格。
 
 这一框架从根本上改变了扩散式HMR的优化范式：从依赖不可靠的2D代理信号或昂贵的人工标注，转向利用VLM的语义理解能力自动构建高质量偏好数据，实现**无3D标注的野外场景微调**。
-
-
 
 ## 核心方法与创新机理
 
@@ -112,8 +108,6 @@ $$A_{i} = \frac{s_{i} - \operatorname{mean}(\{s_{i}\}_{i=1}^{G})}{\operatorname{
 **关键证据支撑**：
 - 消融实验表明，群组偏好对齐在3DPW上相比使用相同评价智能体的DPO变体，MPJPE从53.1降至49.9（6.0%相对提升），验证了群组优势信号优于成对胜负信号。
 - 去除自反思模块后，群组评分预测的SRCC从0.597降至0.534，PLCC从0.695降至0.610，证实了自反思知识构建对评价质量的关键作用。
-
-
 
 本文提出 **VLM引导的群组偏好对齐框架**，用于在无3D真值标注的条件下微调扩散式人体网格重建（HMR）模型。如图2所示，整个pipeline由四个核心模块串联构成：基础扩散HMR模型、VLM评价智能体、HMR群组偏好数据集构建、以及群组偏好对齐微调。
 
@@ -150,15 +144,8 @@ $$\mathcal{L}(\boldsymbol{\theta}) = \mathbb{E}_{\mathbf{m}\sim\mathcal{G}_{\mat
 
 > **注意**：评价智能体的探索阶段需要一定量带有3D真值的校准数据用于规则更新和自反思，全新场景可能需要额外的探索成本。群组偏好对齐为离线方案，尚不支持在线策略提升。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l956_https_arxiv_org_abs_2602_19180/figures/001_Figure_1.jpg]]
 *Figure 1: We introduce a VLM-guided HMR critique agent equipped with a dual-memory mechanism that delivers stable and semantically grounded assessments for groups of estimated 3D meshes. Building on these group-wise signals, our group preference alignment framework steers diffusion-based HMR models towards more coherent and reliable mesh generation*
-
-![[assets/figures/papers/paper_list_l956_https_arxiv_org_abs_2602_19180/figures/002_Figure_2.jpg]]
-*Figure 2: Overview of our framework. Our purpose is to refine a diffusion-based HMR model that generates a group of human mesh predictions per input image. We propose a VLM-enhanced HMR critique agent that assigns a score for each human mesh prediction. This critique agent is equipped with a dual-memory mechanism to give stable assessments. Then, we use this critique agent to build a group-wise HMR preference dataset without the need for manual labeling. Finally, we employ this preference dataset to finetune the base model to preferentially generate predictions that are physically plausible and better aligned with the image cues*
-
-
 
 ### 问题形式化与扩散基础
 
@@ -232,8 +219,6 @@ $$A_{i} = \frac{r_{i} - \operatorname{mean}(\{r_{1}, r_{2}, \ldots, r_{G}\})}{\o
 
 本方法以VLM评价分数替代外部奖励 $r_i$，并将似然比优化转化为去噪损失差异最小化，实现了无需3D标注的扩散模型偏好对齐。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能验证
@@ -292,8 +277,6 @@ Figure 4 直观展示了 VLM 评价智能体的纠错能力：HMR-Scorer 基于 
 3. **极端场景的误判风险**：偏好分数的质量完全由 VLM 决定，在极端遮挡或非典型人体姿态下，VLM 的内部偏差可能导致评分失准。
 4. **架构依赖性**：方法基于特定的扩散 HMR 架构（ScoreHypo/ADHMR）和 VLM（Qwen3-VL-32B），对其他基座模型的泛化性尚未验证。
 
-
-
 ## 定位与知识库关联
 
 ### 问题定位：扩散式HMR的评估困境与偏好优化瓶颈
@@ -339,8 +322,6 @@ Figure 4 直观展示了 VLM 评价智能体的纠错能力：HMR-Scorer 基于 
 **记忆机制的长期演化。** 随着偏好数据集规模增长，规则记忆的检索效率和遗忘曲线如何？是否需要引入记忆淘汰策略来管理规则库的膨胀？原型记忆在面对新姿态分布时，其代表性是否会被稀释？
 
 **从离线到在线的进化路径。** 群组偏好对齐框架能否扩展到在线强化学习范式（如在线GRPO）？在线探索将允许模型在微调过程中持续生成新样本、获取VLM反馈并更新策略，可能突破离线数据的覆盖限制，实现更高效的自训练循环。
-
-
 
 ## 原文 PDF
 

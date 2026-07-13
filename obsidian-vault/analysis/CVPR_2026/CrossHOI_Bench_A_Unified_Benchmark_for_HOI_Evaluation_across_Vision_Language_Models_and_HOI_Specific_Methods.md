@@ -60,8 +60,6 @@ claims:
 
 CrossHOI-Bench 通过精心设计的困难负例和三种评估设置（完整检测、给定框识别、多人物图像级识别），成功分离了识别、定位和多人物交互能力，为跨范式 HOI 评估提供了统一的公平基准。
 
-
-
 ### 人体-物体交互理解的评估困境
 
 人体-物体交互（Human-Object Interaction, HOI）检测旨在同时定位图像中的人与物体，并识别两者之间的交互关系。这一任务长期以来由专用检测范式主导，评估体系也围绕精确匹配（exact-match）的 mAP 指标构建，代表性基准如 HICO-DET。然而，随着通用视觉-语言模型（VLM）的快速崛起，这一评估框架暴露出根本性缺陷。
@@ -87,8 +85,6 @@ CrossHOI-Bench 将 HOI 检测重新定义为**多答案多项选择题（MCQA）
 - **保留生成特性**：MCQA 格式天然兼容 VLM 的文本生成能力，无需强制结构化输出。
 
 通过这一设计，CrossHOI-Bench 不仅揭示了 VLM 与 HOI 专用方法的互补优势（VLM 交互推理强但定位弱，HOI 方法多动作识别好但分布外泛化差），更为跨范式 HOI 评估建立了可复用的方法论框架。
-
-
 
 ## 核心方法与创新机理
 
@@ -141,8 +137,6 @@ CrossHOI-Bench 通过两阶段筛选重塑数据分布：
 
 上述四个 changed slots 并非孤立改进，而是形成因果闭环：**MCQA 格式**使跨范式评估成为可能 → **多维指标**揭示不同维度的能力差异 → **难度重分配**放大模型间真实差距 → **显式负例**消除标注不完整带来的评估噪声。这一耦合使得 CrossHOI-Bench 能够首次揭示 VLM 与 HOI 专用方法的互补优势：VLM 在交互推理上超越专门训练的方法（零样本 Macro-F1 50.71 vs. 47.49），但在多动作识别和跨人物归因上存在显著瓶颈；HOI 方法在多动作场景下召回率更高，但在分布外泛化上明显弱于 VLM。
 
-
-
 CrossHOI-Bench 的构建与评估围绕一个核心重构展开：**将 HOI 检测重新定义为多答案多项选择题（multiple-answer, multiple-choice QA）**。这一设计并非简单的格式转换，而是对评估协议的根本性修正——它通过为每道题明确提供正例与负例集合，消除了传统精确匹配评估下因标注不完整而产生的大量假阴性惩罚。
 
 整个框架由三个串联的模块组成，形成“数据筛选 → 选项生成 → 多设置评估”的闭环流水线：
@@ -170,12 +164,8 @@ CrossHOI-Bench 的构建与评估围绕一个核心重构展开：**将 HOI 检�
 
 三种设置共享同一套选择题，但输入信息逐级减少，形成从“精确定位+识别”到“纯图像理解”的能力光谱。这种设计使得 VLM 与 HOI 专用方法的互补优势得以显现：VLM 在 Setting 2 和 3 中交互推理能力突出，但从 Setting 2 到 Setting 1 引入检测后性能明显下降，揭示**定位仍是 VLM 的主要瓶颈**；HOI 专用方法在 Setting 1 中定位能力更稳定，但在分布外泛化（Setting 3）上表现逊色。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2206_https_arxiv_org_abs_2508_18753/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of our HOI benchmark construction. Input image undergoes coarse screening and manual refinement to produce a four-choice question, followed by evaluation under three settings*
-
-
 
 ### 3.1 任务形式化：多答案多项选择题
 
@@ -227,13 +217,6 @@ $$\mathrm{EM} = \frac{1}{|Q|} \sum_{q \in Q} \mathbf{1}[P_q = G_q]$$
 
 - **VLM**：直接输入题目文本与格式指令，利用其生成能力输出选项。
 - **HOI 专用方法**：采用 **Top-5 匹配策略**——对每个问题取置信度前 5 的预测，检查是否与给定选项匹配。消融实验（Table 10-11）证实 Top-5 在召回率与精确率之间达到最佳平衡，优于置信度阈值过滤或 Top-3/Top-10。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2206_https_arxiv_org_abs_2508_18753/figures/001_Figure_1.jpg]]
-*Figure 1: (a) Existing HOI benchmarks (e.g., HICO-DET) rely on exact-match evaluation under incomplete annotations, penalizing valid yet unlabeled interactions (b) Our multi-choice benchmark accepts multiple correct answers and avoids false negatives and enabling unified evaluation of HOI-specific methods and VLMs. (c) Comparison of state-of-the-art (InternVL3 [85], Qwen2.5-VL-32B [3]) and HOI-specific methods (ADA-CM [37], CMMP [40], HOLa [36]). Results are shown using Macro-F1 in our benchmark (Setting 1) versus mean Average Precision (mAP) in HICO-DET*
-
-
 
 ## 实验与关键发现
 
@@ -295,9 +278,6 @@ Figure 6 对比了 CrossHOI-Bench 与完整 HICO-DET 测试集在 Setting 1 和 
 
 Figure 4 展示了 Qwen2.5-VL-32B 在 Setting 1 中的典型失败案例，可归纳为三类核心失败模式：
 
-![[assets/figures/papers/paper_list_l2206_https_arxiv_org_abs_2508_18753/figures/005_Figure_4.jpg]]
-*Figure 4: Illustration of VLM (Qwen2.5-VL-32B) failure cases in Setting 1, and red HOI classes refer to missing ground-truth interactions or incorrect predictions*
-
 1. **多动作遗漏**：当同一人-物对同时发生多个交互（如同时“持”和“看”手机），VLM 倾向于仅预测最显著动作，导致召回率低下。这是 VLM 与 HOI 专用方法差距最大的维度——HOI 方法的多动作识别能力明显更优。
 
 2. **跨人物交互误分配**：在多人场景中，VLM 常将周围人的动作错误归因于目标人物。定量分析显示，VLM 约 20-25% 的错误属于此类，而 HOI 方法该比例为 15%。这表明 VLM 缺乏精细的个体级别空间归因机制。
@@ -317,24 +297,8 @@ Figure 4 展示了 Qwen2.5-VL-32B 在 Setting 1 中的典型失败案例，可�
 - **负例客观性验证**：粗筛选使用的 VLM 并无偏袒——HOI 专用模型对自动筛选负例的认可度（约 99%）甚至高于 VLM（95-97%），保证了负例质量对不同范式的模型同样公平（Table 4）。
 - **统计显著性**：Table 7 报告了基于 1000 次问题级 Bootstrap 重采样的 95% 置信区间，主要结论均具有统计显著性。
 
-![[assets/figures/papers/paper_list_l2206_https_arxiv_org_abs_2508_18753/figures/023_Table_7.jpg]]
-*Table 7: Statistical significance analysis. We report 95% bootstrap confidence intervals computed using 1,000 question-level resampling iterations in Setting 1*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2206_https_arxiv_org_abs_2508_18753/figures/009_Figure_5.jpg]]
-*Figure 5: Evaluation on our HICO-DET-based, V-COCO-based and SWiG-HOI-based sub-benchmarks in Setting 1 and 2. “InternVL” refers to InternVL3 and “Qwen” refers to “Qwen2.5-VL”*
-
-![[assets/figures/papers/paper_list_l2206_https_arxiv_org_abs_2508_18753/figures/026_Table_10.jpg]]
-*Table 10: Comparison between Top-K selection and confidencethreshold filtering for HOI-specific models under Setting 1 (Instance-F1)*
-
-![[assets/figures/papers/paper_list_l2206_https_arxiv_org_abs_2508_18753/figures/027_Table_11.jpg]]
-*Table 11: Effect of different Top-K values for HOI prediction selection under Setting 1*
-
 ![[assets/figures/papers/paper_list_l2206_https_arxiv_org_abs_2508_18753/figures/028_Table_12.jpg]]
 *Table 12: Ablation study on the effect of using Qwen2.5-VL-32B in the coarse screening during dataset construction. The experiment is conducted in a 12% random subset. “w/o Qwen2.5-VL-32B” means that Qwen is not used for screening; “w/ Qwen2.5- VL-32B’ means that Qwen is used for screening*
-
-
 
 ## 定位与知识库关联
 
@@ -402,8 +366,6 @@ CrossHOI-Bench 评估了多种代表性 HOI 专用方法，包括两阶段方法
 3. **MCQA 格式的时空扩展**：在视频 HOI 理解中，交互的定义涉及时间维度的起止边界和动作演化。如何将多答案选择题格式扩展到时间维度，同时保持评估的可控性和公平性，是一个非平凡的设计挑战。
 
 4. **更大规模、更细粒度的基准构建**：当前基准的规模和类别覆盖仍有扩展空间。结合自动标注管线与人工验证，构建覆盖更多长尾交互类型、更细粒度动作区分的大规模 MCQA 基准，将有助于推动领域进一步发展。
-
-
 
 ## 原文 PDF
 

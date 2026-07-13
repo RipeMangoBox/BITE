@@ -50,8 +50,6 @@ claims:
 
 在方法谱系上，MeshLAM属于**前馈式单图可驱动网格头像重建**方法，与基于3D高斯的前馈方法（LAM、GAGAvatar）和传统网格回归方法（ROME）形成对比。其知识贡献在于证明了显式UV纹理贴图表征配合迭代GRU解码和重投影视觉引导，可以在低顶点数网格上实现超越高斯基元数量的重建质量，为高效高保真3D头像重建开辟了新路径。
 
-
-
 ### 问题背景：单图可驱动3D头像重建
 
 从单张RGB图像重建可驱动的3D头像，是计算机视觉与图形学交叉领域的核心问题之一。其目标是从一张输入照片中同时恢复出完整的几何形状和外观纹理，并使其能够被任意表情参数驱动、从新视角渲染。这一能力在虚拟现实、远程呈现、数字人交互和影视制作等场景中具有广泛的应用需求。
@@ -73,8 +71,6 @@ claims:
 具体而言，MeshLAM采用双分支架构，将顶点变形（几何）和UV纹理贴图（外观）分离为两个并行分支，利用共享Transformer分别提取几何和纹理特征。在此基础上，引入基于GRU的迭代式解码机制，通过多步渐进变形和纹理细化，利用隐藏状态保持时序一致性，实现从粗到细的稳定优化。同时，创新性地使用重投影机制（reprojection-based unwrapping），将输入图像的可见像素动态映射到UV空间，为纹理合成提供直接的视觉监督信号，形成3D几何与2D观测之间的闭环反馈。
 
 这一设计使得MeshLAM仅需8K顶点即可重建出优于80K高斯点方法的纹理细节，同时将推理时间压缩至0.7秒，在质量与效率之间取得了突破性平衡。
-
-
 
 ## 核心方法与创新机理
 
@@ -115,8 +111,6 @@ MeshLAM 创新性地引入**重投影反扭曲（reprojection-based unwrapping�
 - **拓扑校正**：在每次变形后对网格进行长边细分、翻转面修正和无效面删除，并更新蒙皮权重，确保动画兼容性。
 
 这两个机制共同构成了从“无约束直接回归”到“结构化渐进变形”的关键转变，使得 MeshLAM 在保持解剖学正确性的同时，能够灵活处理头发和配饰等大变形区域。
-
-
 
 MeshLAM 提出了一种**前馈式单图可驱动纹理网格头像重建**方法，其核心设计围绕三个关键创新展开：**显式解耦的形状-外观双分支架构**、**迭代式 GRU 渐进解码机制**、以及**重投影纹理引导**。整体流程从单张输入图像出发，最终输出一个具有高保真纹理的可驱动 3D 头部网格。
 
@@ -181,13 +175,6 @@ $$\mathcal{L}_{\mathrm{total}} = \sum_{t=1}^{N} \gamma^{N-t} \mathcal{L}_{t}$$
 ### 推理效率
 
 得益于显式网格表征和高效的双分支设计，MeshLAM 从单张图像重建完整 3D 头像仅需 **0.7 秒**，显著快于基于高斯的 LAM 方法（1.4 秒 @20K 高斯点，5.8 秒 @80K 高斯点），在保持高保真纹理的同时实现了实用的推理速度。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1020_https_arxiv_org_abs_2604_22865/figures/001_Figure_1.jpg]]
-*Figure 1: Overall Framework. Our method reconstructs an animatable 3D texture head mesh from a single image through dual shape and texture branches. After extracting features from the input image with a shared transformer, the shape branch predicts vertex deformations while the texture branch synthesizes UV texture maps, both conditioned on a FLAME template. Both branches are refined iteratively via GRU decoders with topology correction for shape refinement and reprojection guidance for texture enhancement*
-
-
 
 MeshLAM 的核心架构围绕**形状-外观显式解耦**与**迭代式渐进优化**两条主线展开。整体流程为：共享 DINOv2 ViT 主干提取多尺度图像特征 $F_I \in \mathbb{R}^{N \times C}$，双分支交叉注意力分别提取顶点特征 $F_V$ 和纹理特征 $F_T$，随后进入迭代 GRU 解码循环，每一步同时更新几何变形和 UV 纹理贴图，并通过重投影机制形成 3D 几何与 2D 观测之间的闭环反馈。
 
@@ -271,8 +258,6 @@ $$\mathcal{L}_{\mathrm{total}} = \sum_{t=1}^{N} \gamma^{N-t} \mathcal{L}_{t}$$
 
 最终渲染结果可选择通过一个 StyleGAN 风格的 UNet 神经渲染器进行增强，进一步提升照片真实感。Table 1 中 "Ours w/ UNet" 与 "Ours w/o UNet" 的对比量化了该模块的贡献。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -317,11 +302,6 @@ MeshLAM在推理效率上展现出显著优势：从单张输入图像重建完�
 
 需要注意的是，上述局限性分析基于方法设计的逻辑推断，而非论文中报告的实证结果，具体退化程度需要进一步实验验证。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1020_https_arxiv_org_abs_2604_22865/figures/004_Table_1.jpg]]
-*Table 1: Quantitative evaluation on one-shot 3D head avatar creation, where w/ denotes with and w/o denotes without*
-
 ![[assets/figures/papers/paper_list_l1020_https_arxiv_org_abs_2604_22865/figures/011_Table_2.jpg]]
 *Table 2: Quantitative ablation study of different design choices*
 
@@ -333,11 +313,6 @@ MeshLAM在推理效率上展现出显著优势：从单张输入图像重建完�
 
 ![[assets/figures/papers/paper_list_l1020_https_arxiv_org_abs_2604_22865/figures/005_Figure_3.jpg]]
 *Figure 3: The cross-domain generalization capability of our framework enables easy adaptation to text-to-3D avatar generation and editing, by incorporating a pretrained image generation framework*
-
-![[assets/figures/papers/paper_list_l1020_https_arxiv_org_abs_2604_22865/figures/013_Figure_8.jpg]]
-*Figure 8: In the wild challenging lighting and occlusion*
-
-
 
 ## 定位与知识库关联
 
@@ -406,8 +381,6 @@ Table 2的消融实验建立了清晰的因果链：
 3. **计算效率的进一步优化**：0.7秒推理虽优于高斯方法，但相比纯单次回归方法仍有延迟。是否可以通过知识蒸馏将迭代GRU的渐进优化能力迁移到单次前向网络？
 4. **与生成模型的融合**：Figure 3展示了文本到3D的初步适配，但该方向的定量评估和系统化研究尚未展开。MeshLAM的UV贴图表征天然适合作为扩散模型或GAN的生成目标。
 5. **物理真实性**：当前方法未建模光照、次表面散射等物理效应，重建结果的外观一致性依赖于训练数据分布。引入物理渲染先验可能提升真实场景泛化能力。
-
-
 
 ## 原文 PDF
 

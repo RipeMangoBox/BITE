@@ -57,8 +57,6 @@ claims:
 
 在方法谱系中，NCF区别于传统的点采样碰撞检测（Erleben, 2018）、基于有符号距离场的碰撞处理（Macklin et al., 2020）以及基于屏障函数的增量势接触方法IPC（Li et al., 2020），其独特之处在于将碰撞约束构建为可微分的神经场，而非显式几何计算或数值积分。该方法兼容标准连续碰撞检测（CCD）技术，并已在包含1000+可变形体的大规模堆叠场景中得到验证（Figure 19）。
 
-
-
 ### 碰撞处理的核心瓶颈
 
 物理仿真中，碰撞检测与响应是决定仿真稳定性与真实感的关键环节。对于基于三角形网格的弹性体仿真，传统碰撞处理管线存在一个根本性矛盾：**精确的连续碰撞几何与离散数值计算之间的张力**。
@@ -92,8 +90,6 @@ $$V(p_A, p_B) = \iint_{A} \iint_{B} \exp(-k \cdot ||\mathbf{x}_A(\alpha) - \math
 ### 方法定位
 
 神经碰撞场（Neural Collision Fields, NCF）在仿真管线中充当**碰撞基元**的角色：它接收一对三角形的顶点坐标，输出一个标量约束值及其梯度，可直接嵌入基于位置动力学（Position-Based Dynamics）或投影动力学的约束求解器中。该方法与连续碰撞检测（CCD）完全兼容，且支持 GPU 批量并行，为大规模弹性体仿真的碰撞处理提供了一种网格无关、类型无关、梯度平滑的新范式。
-
-
 
 ## 核心方法与创新机理
 
@@ -143,8 +139,6 @@ $$V(p_A, p_B) = \iint_{A} \iint_{B} \exp(-k \cdot ||\mathbf{x}_A(\alpha) - \math
 - **vs IPC**（Li et al., 2020）：IPC依赖屏障函数保证无穿透，但需要针对不同基元类型设计不同屏障且需要平滑处理。NCF通过统一的积分公式避免了类型分支，实现更简洁。
 - **vs SDF方法**（Macklin et al., 2020）：SDF需要计算或更新距离场，且不适用于布料等薄膜物体。NCF直接作用于三角形对，天然支持薄膜和布料。
 - **vs 传统点采样**（Erleben 2018）：点采样需要处理大量特殊案例，且梯度不连续。NCF通过神经网络记忆积分结果，提供连续一致的碰撞响应。
-
-
 
 Neural Collision Fields (NCF) 提出了一套从碰撞建模、数据生成、神经网络训练到仿真求解的完整流水线，其核心思路是将三角形对碰撞表述为一个可积分的平滑表面积分，并利用神经网络替代传统数值积分，从而获得连续、平滑且类型无关的碰撞约束。
 
@@ -196,15 +190,11 @@ $$C(\boldsymbol{p}_A, \boldsymbol{p}_B) = \mathrm{Normalize}^{-1}(\mathrm{MLP}(\
 
 NCF方法的核心优势在于将碰撞处理从“采样+分支判断”的离散范式转变为“积分+网络预测”的连续范式，从而在仿真中实现鲁棒且平滑的碰撞处理。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l47_https_research_nvidia_com_labs_prl_zesch2023ncf_neuralcollision2023_pdf/figures/013_Figure_9.jpg]]
 *Figure 9: We remesh a box to have 1, 3, or 5 triangles per edge. Our method produces visually similar results during simulation regardless of mesh resolution, while traditional methods often have larger variance in outcome*
 
 ![[assets/figures/papers/paper_list_l47_https_research_nvidia_com_labs_prl_zesch2023ncf_neuralcollision2023_pdf/figures/007_Figure_5.jpg]]
 *Figure 5: We drop many FEM 2D triangles onto a cloth and successfully catch them all. Our method (Left) catches them with ease, while Blender (Right) requires much fine tuning in order to avoid penetration*
-
-
 
 ### 3.1 表面碰撞积分公式
 
@@ -272,8 +262,6 @@ $$C(\boldsymbol{p}_A, \boldsymbol{p}_B) = \mathrm{Normalize}^{-1}(\mathrm{MLP}(\
 
 约束的梯度通过网络自动微分计算，梯度的方向指向最小化模糊接触面积的方向，可直接用于Position-Based Dynamics等投影动力学求解器。该方法支持CPU和GPU上的批量并行计算，在GPU上单次查询仅需约2.18微秒（$k=1000$），比优化后的采样方法快两个数量级以上。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -337,8 +325,6 @@ Figure 21 展示了在不同规模训练子集上训练网络的精度变化。�
 ![[assets/figures/papers/paper_list_l47_https_research_nvidia_com_labs_prl_zesch2023ncf_neuralcollision2023_pdf/figures/005_Table_1.jpg]]
 *Table 1: Simulation settings for our examples. All simulations use 5 substeps per timestep*
 
-
-
 ## 定位与知识库关联
 
 ### 与基线方法的关系
@@ -380,8 +366,6 @@ NCF 的适用边界由其核心设计选择决定：
 5. **场景自适应微调**：能否通过对预训练网络进行少量场景特定数据的微调，进一步提升特定材料参数或几何配置下的精度？这涉及迁移学习在物理仿真中的应用。
 
 6. **训练数据效率**：Figure 21 显示精度在数据量达到一定规模后饱和。能否通过更智能的数据生成策略（如重要性采样、主动学习）进一步减少训练所需数据量，同时保持泛化能力？
-
-
 
 ## 原文 PDF
 

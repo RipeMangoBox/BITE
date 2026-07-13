@@ -53,8 +53,6 @@ SciNav 针对上述瓶颈，提出**基于成对相对判断的自适应 Top-K �
 
 SciNav 的方法定位与主要结果可概括为：以相对判断驱动的树搜索替代盲目探索，在不依赖预定义成功指标的前提下，实现有限预算下科学编程任务求解质量的跨模型、跨基准提升。
 
-
-
 ### 科学编程任务的自动化挑战
 
 科学发现正日益依赖代码——从数据清洗、统计建模到数值模拟，编程已贯穿研究全流程。然而，将科学问题转化为正确、可执行的代码并非易事，它要求研究者同时具备领域知识、编程技能和调试经验。这一瓶颈催生了科学智能体的研究：利用大语言模型（LLM）自动完成科学编程任务，有望显著加速研究迭代。
@@ -68,8 +66,6 @@ SciNav 的方法定位与主要结果可概括为：以相对判断驱动的树�
 ### 核心动机：用相对判断驱动结构化搜索
 
 本文的核心动机源于一个关键洞察：**相对判断比绝对评分具有更高的区分力和可靠性**。已有研究表明，让 LLM 比较两个方案并判断哪个更好，比让它独立给每个方案打分，能产生更一致、更准确的质量信号。基于这一认知，SciNav 提出将成对相对判断嵌入到结构化的树搜索框架中，形成 Top-K 比较树搜索（Top-K Comparative Tree Search, TKCTS）。该方法在搜索早期广泛探索候选方案，但仅保留通过相对判断筛选出的 Top-K 个最有潜力的分支，从而在有限的计算预算下优先分配资源给高潜力轨迹，显著提升科学编程任务的求解质量。
-
-
 
 ## 核心方法与创新机理
 
@@ -101,8 +97,6 @@ TKCTS 中的 K 值决定了搜索的宽度与深度的权衡。初步研究在 3
 
 需要注意的是，相对判断的质量受限于底层 LLM 的能力——当任务标准极为模糊或需要专业领域知识时，比较器可能给出次优指导。此外，树搜索结构虽然比盲目探索更高效，但仍会增加 LLM 调用次数和 token 消耗，相比单次生成成本更高。
 
-
-
 ![[assets/figures/papers/iclr26_0011_8iEsrg51Fs_SciNav_A_General_Agent_Framework_for_Scientific/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of Top-K Comparative Tree Search (TKCTS). Left: the search tree expands candidate solutions from an initial set, with relative comparisons (grey dashed arrows) guiding which branches and solutions to retain and explore. Right: comparison between absolute scoring, which LLM assigns pointwise scores to individual solutions, and relative judgment, which LLM evaluates solution pairs and provides sharper, more reliable distinctions. Relative judgments guide the search toward higher-quality solutions under constrained budgets*
 
@@ -125,8 +119,6 @@ SciNav 的求解流程由四个关键模块串联而成，形成“生成—调�
 TKCTS 的关键创新在于用**相对判断替代绝对评分**作为搜索的引导信号。具体而言，前沿比较器维护一个优先队列，每轮从队列中选取候选方案进行成对比较，随后通过排序算法（如 Elo 评分系统）更新方案的质量排序。Top-K 分支被保留以继续扩展，其余分支则被剪枝。这种策略既实现了受控回溯，又降低了后续比较评估的计算开销。
 
 搜索树的宽度由超参数 K 控制。初步研究表明，K=2 是性能与成本之间的最佳平衡点——在提供有效搜索行为的同时，避免了过度的 LLM 调用开销。
-
-
 
 ### 整体架构：Top-K 比较树搜索 (TKCTS)
 
@@ -170,8 +162,6 @@ $$E_i = \frac{1}{1 + 10^{(R_j - R_i)/400}}$$
 $$R_i' = R_i + K \cdot (S_i - E_i)$$
 
 其中 $K=32$ 为更新步长。该机制将每轮成对比较的结果平滑地整合进全局排序，为前沿比较器的 Top-K 选择提供稳定的数值基础。
-
-
 
 ## 实验与关键发现
 
@@ -219,12 +209,8 @@ SciNav 在多个基准和基模型上均表现出对强基线的显著提升。�
 
 在 DA-Code 基准上，Mann-Whitney U 检验给出的 p 值为 0.0177（p < 0.05），表明 SciNav 相对于 Self-Debug 的提升具有统计显著性，排除了随机波动导致性能差异的可能性。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0011_8iEsrg51Fs_SciNav_A_General_Agent_Framework_for_Scientific/figures/005_Figure_2.jpg]]
 *Figure 2: Performance on DA-Code (Huang et al., 2024): (a) by task type, (b) by task difficulty. Model: GPT-4o (2024-11-20)*
-
-
 
 ## 定位与知识库关联
 
@@ -267,8 +253,6 @@ SciNav 的设计假设和实验设置界定了其当前适用边界：
 3. **测试时计算扩展的潜力**：SciNav 本质上是一种测试时计算扩展方法——通过增加搜索预算来提升解质量。能否将这一思想拓展至更长的推理链（如多步科学推理）和多模态科学问题（如实验设计、图表分析）？这需要重新思考搜索树的表示方式和比较器的评估维度。
 
 4. **生成与判断的解耦优化**：Table 6 的跨模型实验暗示，最优的生成模型和判断模型可能不同。是否存在系统性的方法来为特定任务选择最优的生成-判断模型组合？能否通过训练专门的比较器模型来突破通用 LLM 在相对判断上的性能上限？
-
-
 
 ## 原文 PDF
 

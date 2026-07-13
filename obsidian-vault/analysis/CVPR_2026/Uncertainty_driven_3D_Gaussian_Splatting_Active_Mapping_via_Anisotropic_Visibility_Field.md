@@ -75,8 +75,6 @@ Figure 2 给出了GAVIS的整体框架：给定已训练的3DGS，首先构建�
 
 GAVIS处于**3DGS不确定性量化**与**主动视角规划**的交叉点。与基于学习的参数不确定性方法（FisherRF、VIMC）不同，GAVIS通过显式几何建模（可见性场）来驱动不确定性估计，避免了OOD泛化问题。与基于NeRF的可见性场方法（NVF）相比，GAVIS将各向同性可见性推广到各向异性，并利用球谐解析计算替代神经网络训练，实现了数量级的加速。此外，GAVIS可作为**后验增强模块**（post-hoc module）无缝集成到现有3DGS不确定性框架中，提升其性能（见表3）。
 
-
-
 ### 主动建图与3D高斯喷溅
 
 主动建图（active mapping）要求自主智能体在未知环境中迭代地选择最优观测视角，以在有限步数内最大化场景重建质量。近年来，3D高斯喷溅（3D Gaussian Splatting, 3DGS）因其高质量实时渲染能力成为场景重建的主流表示。然而，将3DGS应用于主动建图面临一个核心挑战：如何可靠地量化3DGS表示中的不确定性，以指导下一最佳视角（next-best-view）的选择。
@@ -102,8 +100,6 @@ GAVIS处于**3DGS不确定性量化**与**主动视角规划**的交叉点。与
 1. **各向异性可见性建模**：显式建模每个高斯粒子相对于训练视角方向的方向依赖性可见性——粒子在正对相机的方向上可见性高，而在偏离视角的方向上可见性衰减。
 2. **无训练高效构建**：利用球谐函数的解析性质，在1秒内完成可见性场构建，避免神经网络训练的时间开销。
 3. **不确定性感知光栅化**：将可见性场集成到贝叶斯网络框架下的3DGS光栅化器中，使未观测区域可靠地获得高不确定性，从而引导主动建图策略高效探索。
-
-
 
 ## 核心方法与创新机理
 
@@ -160,8 +156,6 @@ $$p(z_0) = \sum_i w_i^* v_i \mathcal{N}(\mu_{c_i}, Q_{c_i}) + \mathcal{N}(\mu_0,
 
 传统 3DGS 不确定性方法仅评估已有粒子中心的不确定性，无法区分“已被观测确认为空”的自由空间与“尚未探索”的未知区域。GAVIS 引入**虚拟粒子（virtual particles）**，在 3D 空间中采样候选位置，计算其对各训练视角的可见性 $1 - \prod_{p\in\mathcal{P}} (1 - \Phi_{i,p} T_p(t_i^p))$。若虚拟粒子对所有视角均不可见，则该区域被标记为未探索并赋予高不确定性；反之则为自由空间。消融实验证实，移除此模块导致 PSNR 从 24.70 降至 24.18（Table 2），验证了其对主动建图探索效率的关键作用。
 
-
-
 GAVIS 的整体管线围绕“可见性场构建—不确定性感知光栅化—下一最佳视角选择”三个核心阶段展开，如 Figure 2 所示。给定一组已观测图像及其相机位姿，首先训练一个标准 3DGS 场景表示。在此基础上，**可见性场构建模块 (VF CONST)** 解析地计算每个高斯粒子相对于全部训练视角的各向异性可见性，并将其压缩为球谐系数，同时插入虚拟粒子以区分自由空间与未探索区域。随后，对于采样得到的候选视角集合，**不确定性感知光栅化器 (UA 3DGS Rasterizer)** 沿每条射线查询可见性场，将可见性校正项融入贝叶斯网络形式的像素颜色高斯混合模型，合成每个候选视角的不确定性图。最后，**下一最佳视角选择模块**以最大化合成视角 GMM 熵为目标，从候选集中选出下一观测位姿。该闭环在主动建图过程中迭代执行，每轮仅需约 1 秒完成可见性场构建，不确定性量化帧率达 200+ FPS，显著快于基于神经网络训练的 NVF（约 500 倍加速）。
 
 ![[assets/figures/papers/paper_list_l2281_https_openaccess_thecvf_com_content_CVPR2026_html_Xue_Uncertainty_driven/figures/002_Figure_2.jpg]]
@@ -186,8 +180,6 @@ $$
 1. **各向异性可见性的解析构建**：与依赖神经网络训练的 NVF 不同，GAVIS 利用 von Mises-Fisher 分布建模方向可见性函数 $\nu(\mathbf{d}; \mathbf{d}_p) = \zeta \exp(\kappa \mathbf{d} \cdot \mathbf{d}_p)$，并通过球谐展开实现常数时间查询，无需梯度计算。
 2. **可见性校正的贝叶斯光栅化**：标准 3DGS 光栅化器仅输出颜色均值，GAVIS 将其扩展为贝叶斯网络，显式建模每个高斯粒子的颜色不确定性，并用可见性 $v_i$ 加权——可见粒子贡献低不确定性，不可见粒子贡献高不确定性先验。
 3. **虚拟粒子密度控制**：由于 3DGS 粒子仅存在于场景表面附近，未探索的空旷区域缺乏粒子，导致不确定性估计出现盲区。GAVIS 在可见性场构建时插入虚拟粒子，其可见性按多视角联合概率计算，从而可靠地区分自由空间与未探索区域。消融实验表明，移除该模块会使 PSNR 从 24.70 降至 24.18（Table 2）。
-
-
 
 ### 整体框架
 
@@ -217,9 +209,6 @@ $$V_{\mathbf{p}}^{(i)}(\mathbf{d}) = \Phi_{i,\mathbf{p}} \, T_p(t_i^p) \, \nu(\m
 $$\nu(\mathbf{d}; \mathbf{d}_p) := \zeta \exp(\kappa \, \mathbf{d} \cdot \mathbf{d}_p), \quad \zeta = \exp(-\kappa)$$
 
 其中 $\kappa$ 控制方向敏感度，$\mathbf{d}_p$ 为训练视角的主轴方向。当查询方向与训练方向一致时，$\nu$ 取最大值；偏差增大时，$\nu$ 指数衰减。Figure 3 展示了单视角、带遮挡单视角和多视角下的各向异性可见性极坐标图。
-
-![[assets/figures/papers/paper_list_l2281_https_openaccess_thecvf_com_content_CVPR2026_html_Xue_Uncertainty_driven/figures/003_Figure_3.jpg]]
-*Figure 3: Schematic of directional visibility. (Top) A 2D illustration of how visibility varies with viewing direction. Anisotropic visibility is plotted in polar coordinates for (1) a single training view, (2) a single training view with occlusion, and (3) multiple training views. (Bottom) A 3D illustration of spherical harmonics expansion of*
 
 #### 多视角可见性
 
@@ -263,12 +252,8 @@ $$p(z_0) = \sum_i w_i^* v_i \, \mathcal{N}(\boldsymbol{\mu}_{c_i}, \boldsymbol{Q
 
 粒子中心的不确定性无法反映粒子间空白区域的状态。GAVIS 提出虚拟粒子策略：在场景中采样虚拟粒子，若其在所有训练视角下的可见性（按 $1 - \prod_{p \in \mathcal{P}} (1 - \Phi_{i,p} T_p(t_i^p))$ 计算）低于阈值，则判定该区域为未探索区域并赋予高不确定性；否则视为自由空间。消融实验 (Table 2) 表明，移除该模块后 PSNR 从 24.70 降至 24.18，验证了其对区分未探索区域与自由空间的关键作用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2281_https_openaccess_thecvf_com_content_CVPR2026_html_Xue_Uncertainty_driven/figures/001_Figure_1.jpg]]
 *Figure 1: GAVIS overview. Gaussian Splatting Anisotropic Visibility Field (GAVIS) quantifies uncertainty in 3DGS by modeling visibility, i.e., whether a region is observed by the training views. Observed regions have low uncertainty (left room), whereas unobserved regions have high uncertainty (right room)*
-
-
 
 ## 实验与关键发现
 
@@ -302,27 +287,17 @@ Table 3验证了GAVIS作为即插即用的后验增强模块的通用性。将GA
 
 所有方法使用相同的主动建图管线与无启发式采样的候选视角采样器，确保性能差异仅来源于不确定性量化方法本身的质量，而非管线设计或采样策略的差异。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2281_https_openaccess_thecvf_com_content_CVPR2026_html_Xue_Uncertainty_driven/figures/004_Table_1.jpg]]
 *Table 1: Quantitative results. Active mapping performance on all datasets across all baselines and our method. Best results are in bold; second-best are underlined. Here*
 
 ![[assets/figures/papers/paper_list_l2281_https_openaccess_thecvf_com_content_CVPR2026_html_Xue_Uncertainty_driven/figures/005_Table_2.jpg]]
 *Table 2: Ablation study. We evaluate GAVIS for active mapping by isolating the effects of (i) anisotropic visibility*
 
-![[assets/figures/papers/paper_list_l2281_https_openaccess_thecvf_com_content_CVPR2026_html_Xue_Uncertainty_driven/figures/007_Table_3.jpg]]
-*Table 3: GAVIS as post-hoc module. Active mapping results showing that applying GAVIS post hoc improves the performance of baseline 3DGS uncertainty-quantification methods*
-
 ![[assets/figures/papers/paper_list_l2281_https_openaccess_thecvf_com_content_CVPR2026_html_Xue_Uncertainty_driven/figures/010_Figure_6.jpg]]
 *Figure 6: Qualitative uncertainty estimation. All methods are trained on the same set of views that only partially cover the scene, leaving some regions underexplored. GT Vis. indicates rasterized ground-truth mesh visibility (binary face labels), where brighter denotes higher uncertainty (invisible faces) and darker denotes lower uncertainty (visible faces). Our method accurately assigns high uncertainty to invisible regions, aligning with GT Vis*
 
 ![[assets/figures/papers/paper_list_l2281_https_openaccess_thecvf_com_content_CVPR2026_html_Xue_Uncertainty_driven/figures/009_Figure_4.jpg]]
 *Figure 4: Qualitative active mapping. Reconstruction results and camera-view distributions (green frustums) from different methods’ active-mapping trajectories on Gibson scene (top) and HM3D scene (bottom). Full results are provided in Sec. 12*
-
-![[assets/figures/papers/paper_list_l2281_https_openaccess_thecvf_com_content_CVPR2026_html_Xue_Uncertainty_driven/figures/008_Figure_5.jpg]]
-*Figure 5: Qualitative active mapping. Reconstruction results and camera-view distributions (green frustums) from different methods’ active-mapping trajectories on HST scene (top) and Lego scene (bottom). Full results are provided in Sec. 12. CT PCP -DF VIMC NVE GAVIS GTVi*
-
-
 
 ## 定位与知识库关联
 
@@ -382,8 +357,6 @@ GAVIS在3DGS不确定性量化方法谱系中占据**显式可见性建模**与*
 3. **不确定性校准**：GAVIS的不确定性估计是否经过良好校准（calibrated）？即高不确定性区域是否确实对应高重建误差？论文未提供不确定性校准曲线（如reliability diagram）。
 
 4. **与神经隐式表示的融合**：可见性场的球谐表示能否反向指导3DGS粒子的增删策略，实现更高效的场景覆盖？
-
-
 
 ## 原文 PDF
 

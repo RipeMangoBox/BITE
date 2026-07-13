@@ -57,8 +57,6 @@ claims:
 
 在方法谱系上，MeanFuser 以 **TransFuser**（Chitta et al., IEEE TPAMI）为感知骨干，在生成范式上区别于基于离散词汇表的 **VADv2**（arXiv 2024）、基于目标点引导流匹配的 **GoalFlow**（Xing et al., CVPR 2025）、基于扩散模型与锚点聚类的 **DiffusionDrive**（Yang et al., CVPR 2025），以及基于显式评分的 **Hydra-MDP**（arXiv 2024）和基于世界模型评估的 **WoTE**（ICCV 2025）。其独特之处在于将 MeanFlow 单步生成与 GMN 连续先验相结合，并以 ARM 实现端到端的隐式轨迹筛选，在速度-精度权衡上建立了新的最优边界。
 
-
-
 端到端自动驾驶旨在从原始传感器输入直接输出规划轨迹，省去传统模块化管线中的中间表征与手工规则。近年来，基于生成式模型的规划方法因其天然的多模态能力受到广泛关注——它们不再仅输出一条确定性轨迹，而是从学习到的分布中采样多条候选轨迹，以覆盖真实驾驶场景中的多种合理行为（如直行、变道、让行）。然而，现有生成式规划方法在两个关键维度上存在结构性瓶颈。
 
 **瓶颈一：离散锚点词汇表限制轨迹空间的连续覆盖。** 以 **VADv2**（arXiv 2024）、**Hydra-MDP**（arXiv 2024）、**DiffusionDrive**（Yang et al., CVPR 2025）和 **GoalFlow**（Xing et al., CVPR 2025）为代表的主流方法，普遍依赖一组预定义的离散锚点（anchor）或目标点（goal）作为生成过程的“骨架”。这些锚点通过对训练集轨迹聚类得到，构成一个有限的轨迹词汇表。生成模型在推理时从该词汇表中选择锚点，再围绕其进行轨迹补全或去噪。这一策略在分布内场景下有效，但当遇到锚点词汇表无法覆盖的分布外场景时——例如异常曲率的弯道、非典型路口拓扑——模型缺乏在连续轨迹空间中进行灵活外推的能力，导致规划质量显著退化。Figure 2 中的失败案例直接揭示了这一缺陷：锚点引导模型在面对词汇表外场景时无法生成包含最优轨迹的候选集，而本文方法则能覆盖真实解。
@@ -72,8 +70,6 @@ $$
 在推理时，需通过多步 ODE 求解器（如 Euler 或 Runge-Kutta）逐步积分，计算开销与步数线性相关。以 **GoalFlow** 为例，其推理速度仅约 11.4 FPS，难以满足自动驾驶对实时性的严苛要求。同时，离散化求解过程引入的截断误差会在长时域预测中累积，进一步损害轨迹精度。
 
 **动机：从“离散锚点+多步生成”到“连续先验+单步生成”。** 上述两个瓶颈共享一个深层根源：对离散化表征的过度依赖——无论是轨迹空间的离散锚点词汇表，还是时间维度上的离散 ODE 求解步。本文的核心动机在于同时打破这两重离散化约束：在空间维度，用连续的多模态先验分布取代固定锚点集；在时间维度，将多步 ODE 求解压缩为单步映射。这一思路直接催生了 MeanFuser 的两大技术支柱——高斯混合噪声（GMN）先验与 MeanFlow 单步采样——以及配套的自适应重建模块（ARM），从而在保持甚至超越多模态规划精度的同时，实现数量级的推理加速。
-
-
 
 ## 核心方法与创新机理
 
@@ -133,8 +129,6 @@ MeanFuser 设计了**自适应重建模块（Adaptive Reconstruction Module, ARM
 
 三个创新并非孤立存在，而是形成了有机的协同链路：**GMN 提供连续、多模态的先验分布 → MeanFlow 单步采样高效生成多样化的候选轨迹 → ARM 隐式评估并自适应选择或重建最优轨迹**。这条链路从先验建模、生成效率到决策机制完成了对生成式规划范式的端到端重构，使得 MeanFuser 在 NAVSIM v1（89.0 PDMS）、NAVSIM v2（89.5 EPDMS）和 CARLA Longest6（DS 70.08）三个基准上均取得最优性能。
 
-
-
 MeanFuser 的整体架构围绕“单步生成 + 隐式选择”这一核心思路设计，由四个串联模块构成：**场景上下文编码器 → 高斯混合噪声先验 → 多模态轨迹采样 → 自适应重建模块**。其设计目标是在不依赖离散锚点词汇表的前提下，以极低的推理延迟生成覆盖连续轨迹空间的多模态候选，并通过轻量级注意力机制隐式筛选或重建最优规划。
 
 ### 数据流与模块关系
@@ -176,13 +170,6 @@ $$x_1 = x_0 + 1 \cdot u_\theta(x_0, 0, 1)$$
 关于 GMN 的配置，实验表明高斯分量数 $K=8$ 时性能最优（PDMS 89.0），继续增大至 16 或 32 反而导致轻微下降（Table 6），说明 8 个分量已能充分覆盖 NAVSIM 场景下的驾驶模式多样性。此外，手动设计的 GMN 与数据驱动的聚类 GMN 相比，PDMS 仅下降 0.45%（Table 7），证明方法对数据集先验的依赖程度较低，具备较好的泛化潜力。
 
 **需要手动验证的点：** ARM 模块的“何时选择、何时重建”的决策边界目前缺乏可解释性分析，论文未提供注意力权重可视化或决策统计，该机制的透明性仍需进一步研究。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2544_https_arxiv_org_abs_2602_20060/figures/001_Figure_1.jpg]]
-*Figure 1: (a) illustrates the differences between our proposed method and existing generative approaches, highlighting the introduction of Gaussian mixture noise to replace anchor vocabularies, one-step sampling, and the adaptive reconstruction module. (b) shows the advantages of MeanFuser over GoalFlow[33], Hydra-MDP[20], and DiffusionDrive[22] in terms of closed-loop performance, inference speed and plan module inference speed*
-
-
 
 ### 3.1 问题形式化
 
@@ -280,16 +267,6 @@ $$
 \mathcal { M } _ { \bf D P } = \mathcal { D } \times P D M S
 $$
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2544_https_arxiv_org_abs_2602_20060/figures/008_Figure_4.jpg]]
-*Figure 4: Visualization of sampling from different Gaussian components. Parallel sampling of trajectories from distinct Gaussian components can generate diverse driving styles, ranging from conservative to aggressive*
-
-![[assets/figures/papers/paper_list_l2544_https_arxiv_org_abs_2602_20060/figures/014_Figure_7.jpg]]
-*Figure 7: Visualization of alternative approaches for generating Gaussian Mixture Noise (GMN). (a) Mean and standard deviation are derived from clustered expert demonstrations in the training set. (b) Mean and standard deviation are obtained through manually design*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -306,9 +283,6 @@ MeanFuser 在两个版本的 NAVSIM 基准和 CARLA Longest6 闭环仿真上均�
 *Table 5: Longest6 Benchmark Results. We show the mean and std for all metrics (RC: Route Completion, IS: Infraction Score. DS: Driving Score)*
 
 推理效率方面，在统一使用 NVIDIA H20 GPU 的条件下，MeanFuser 的整体推理速度达到 **59 FPS**，分别是 GoalFlow（11.4 FPS）的 5.20 倍、**Hydra-MDP**（22.3 FPS）的 2.65 倍、DiffusionDrive（38.1 FPS）的 1.55 倍。若仅考虑规划模块（排除感知编码器），MeanFuser 的规划推理速度高达 **434 FPS**，参数量仅 54.6M，在速度-精度权衡上显著优于同类生成式方法（Table 3）。
-
-![[assets/figures/papers/paper_list_l2544_https_arxiv_org_abs_2602_20060/figures/006_Table_3.jpg]]
-*Table 3: Model parameter size, inference speed, and performance. Bold and underlined values denote the best and secondbest results, respectively. “Dim” indicates the number of hidden neurons in the model, “FPS” represents the median inference speed measured on a single NVIDIA H20 GPU over multiple runs, and “Plan FPS” refers to the inference speed of trajectory planning excluding the perception encoder*
 
 ### 消融实验
 
@@ -342,16 +316,6 @@ MeanFuser 在两个版本的 NAVSIM 基准和 CARLA Longest6 闭环仿真上均�
 
 ![[assets/figures/papers/paper_list_l2544_https_arxiv_org_abs_2602_20060/figures/007_Table_4.jpg]]
 *Table 4: Ablation study on the impact of each module. Base denotes the TransFuser[7] baseline*
-
-![[assets/figures/papers/paper_list_l2544_https_arxiv_org_abs_2602_20060/figures/016_Table_8.jpg]]
-*Table 8: Comparison of multimodality and performance. (GMN: Gaussian Mixture Noise. K: number of multimodal trajectories; D: multimodality metric.)*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2544_https_arxiv_org_abs_2602_20060/figures/012_Table_6.jpg]]
-*Table 6: Number of Gaussian components and model performance*
-
-
 
 ## 定位与知识库关联
 
@@ -404,8 +368,6 @@ MeanFuser 的自适应重建模块（Adaptive Reconstruction Module, ARM）采�
 3. **ARM 重建机制的透明化**：是否可以通过引入额外的辅助损失项（如重建概率的熵正则化）或结构约束（如显式的候选质量预测头）来增强 ARM 选择/重建决策的可解释性和可调试性，同时保持其性能优势？
 
 4. **与基于世界模型的方法的融合**：MeanFuser 的单步生成效率与 ARM 的隐式选择机制，是否可以与 **WoTE** 或 **World4Drive** 等基于世界模型的前向模拟评估相结合，形成“快速生成 + 精细验证”的两阶段规划框架？这可能在保持高推理速度的同时进一步提升安全性。
-
-
 
 ## 原文 PDF
 

@@ -61,8 +61,6 @@ FutureX 属于**实时动态基准**，在方法谱系上填补了静态未来�
 
 在覆盖1,272个事件、11个领域的评估中，FutureX 揭示了若干关键发现。**推理+搜索类模型**（如 Grok-4 Think&Search）在综合得分上显著领先，尤其在困难任务（Level 3–4）上超越专有深度研究模型，兼顾推理强度与效率。**基础LLM**在简单任务（Level 1–2）上可凭借内部知识超越搜索增强模型，说明低层次任务不足以区分高级能力。**人类专家**（31人）在 Level 1、3、4 上仍显著优于最强智能体，仅在 Level 2（多选）上被部分模型接近，表明复杂不确定性推理仍是当前智能体的核心短板。
 
-
-
 ### 问题背景：大语言模型智能体的评估困境
 
 大语言模型（LLM）驱动的智能体正被部署于日益复杂的现实任务中，然而如何真实、可靠地评估这些智能体的综合认知能力，已成为制约领域发展的核心瓶颈。传统的静态基准测试通常依赖历史数据构建问答对，存在两个根本性缺陷：其一，**数据污染风险**——模型可能在预训练阶段已“见过”测试数据，导致评估结果虚高，无法反映真实推理能力；其二，**任务封闭性**——静态数据集无法模拟现实世界中信息持续更新、多源异构、需要实时整合与推理的动态决策场景。
@@ -87,8 +85,6 @@ FutureX 属于**实时动态基准**，在方法谱系上填补了静态未来�
 3. **能力分层评估**：设计四个难度等级（Basic → Wide Search → Deep Search → Super Agent），系统区分从简单知识检索到复杂多步推理与工具使用的不同层次能力。
 
 本文旨在回答以下核心研究问题：不同 LLM 智能体在分层未来预测任务上的表现差异如何？搜索、推理和工具使用能力对性能的影响机制是什么？智能体的规划质量与最终预测准确性之间存在怎样的关联？
-
-
 
 ## 核心方法与创新机理
 
@@ -132,8 +128,6 @@ FutureX 构建了**全自动每日循环流水线**，包含四个串联阶段�
 
 这些创新共同构成了FutureX作为“最大、最全面的未来预测实时基准”的核心竞争力（Section 3.1, Figure 10）。
 
-
-
 ![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_z28PLIEj6l/figures/002_Figure_1.jpg]]
 *Figure 1: The overall pipeline of FutureX, which consists of event database construction, future event daily curation, answer daily acquisition. The entire pipeline is fully automated and operates on a daily basis*
 
@@ -160,8 +154,6 @@ FutureX 是一个全自动化的实时基准测试平台，其核心设计理念
 ### 评估与输入输出流
 
 FutureX的评估体系与流水线紧密耦合。系统根据事件类型采用不同的评分函数：对于单选择和多选择事件，使用精确匹配和F1.5分数；对于开放式的排序和数值预测事件，则采用基于大语言模型的评判和截断均方误差。最终，系统将四个难度等级的得分按10%、20%、30%和40%的权重加权，计算出一个综合得分，对更具挑战性的任务赋予更高权重，从而全面衡量智能体的未来预测能力。
-
-
 
 FutureX 的核心机制建立在一条全自动化的每日流水线上，该流水线从根源上解决了数据污染问题，并实现了可扩展的实时评估。其运作逻辑围绕以下四个关键模块展开（参见 Figure 1）：
 
@@ -193,8 +185,6 @@ FutureX 的核心机制建立在一条全自动化的每日流水线上，该流
     $$\operatorname { s c o r e } ( Y , { \hat { Y } } ) = \operatorname* { m a x } \left( 0 , 1 - \left( { \frac { Y - { \hat { Y } } } { \sigma ( Y ) } } \right) ^ { 2 } \right)$$
     其中 $Y$ 为真实数值，$\hat{Y}$ 为预测数值，$\sigma(Y)$ 代表该指标近期的历史波动率。该公式计算相对波动率的标准化平方误差，得分下限为 0，从而惩罚远超正常波动范围的预测。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与因果机制
@@ -208,9 +198,6 @@ FutureX 的核心机制建立在一条全自动化的每日流水线上，该流
 #### 综合表现排名
 
 FutureX综合得分采用四级难度加权（Level 1-4权重分别为10%、20%、30%、40%），对25个模型进行了系统评估。核心发现如下（Figure 4）：
-
-![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_z28PLIEj6l/figures/011_Figure_4.jpg]]
-*Figure 4: Overall scores on FutureX between July 20th and August 3rd*
 
 - **Grok-4 (Think&Search) 取得最高综合表现**，显著领先所有其他模型。其优势在困难任务上尤为突出，甚至超越了专有的深度研究（Deep Research）类智能体，同时保持了推理强度与效率的平衡。
 - **推理+搜索类模型整体占优**：具备搜索能力的推理模型（如GPT-o4-mini）系统性地超越了无搜索能力的基础LLM和SmolAgent框架。这表明在真实世界预测任务中，工具使用（尤其是实时信息检索）是能力分化的关键因素。
@@ -284,25 +271,6 @@ FutureX综合得分采用四级难度加权（Level 1-4权重分别为10%、20%�
 
 5. **语言与文化局限**：当前仅包含英文来源的事件，多语言和跨文化预测能力未被评估，限制了结论的泛化性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_z28PLIEj6l/figures/006_Table_3.jpg]]
-*Table 3: Examples of different levels, where the specific date can be replaced with any future date*
-
-![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_z28PLIEj6l/figures/018_Table_4.jpg]]
-*Table 4: Examples to be Predicted by Domain. We take the date August 20, 2025 as an example, which can be replaced with any time in the future*
-
-![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_z28PLIEj6l/figures/032_Table_5.jpg]]
-*Table 5: (Table 5 continued)*
-
-![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_z28PLIEj6l/figures/024_Figure_14.jpg]]
-*Figure 14: Performance across different domains for Level 1 (Basic Tier) and Level 2 (Wide Search Tier) events*
-
-![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_z28PLIEj6l/figures/028_Figure_15.jpg]]
-*Figure 15: Performance across different domains for Level 3 (Deep Search Tier) and Level 4 (Super Agent Tier) events*
-
-
-
 ## 定位与知识库关联
 
 ### 与现有未来预测基准的关系
@@ -350,8 +318,6 @@ FutureX 的提出同时开启了一系列值得深入探索的研究方向：
 5. **多语言、多文化、多模态的扩展**：未来预测能否扩展到多语言、多文化、多模态数据源，以更全面地衡量智能体的全球化预测能力？这需要构建跨语言的事件数据库和相应的评估协议。
 
 6. **人类评估的规模化与一致性控制**：如何扩大人类评估的规模，并实现更严格的一致性控制，以建立更稳健的人机对比基线？这涉及标注协议的设计、专家筛选标准的制定以及跨领域知识覆盖的平衡。
-
-
 
 ## 原文 PDF
 

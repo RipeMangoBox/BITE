@@ -79,8 +79,6 @@ claims:
 
 **注意**：上述缩放系数基于 Nemotron-CC 数据集（未经质量过滤）和特定 FLOP 估计方法（Method 1），对不同数据集和 FLOP 计算方式的敏感性已在附录中讨论（Figure 10, Table 7），但跨数据集的泛化性仍需进一步验证。
 
-
-
 ### 离散扩散语言模型的兴起与瓶颈
 
 自回归语言模型（ALMs）长期主导大语言模型领域，其计算最优缩放定律（如 **Chinchilla** 由 Hoffmann et al., 2022 提出，**DeepSeek** 由 Bi et al., 2024 提出）为训练资源配置提供了成熟指导。然而，离散扩散语言模型（DLMs）作为一类生成范式，凭借其并行解码和灵活的条件生成能力，正逐渐成为有竞争力的替代方案。
@@ -104,8 +102,6 @@ claims:
 - **超参数层面**：将批次大小和学习率纳入缩放优化的核心变量，揭示其与训练 token 数的幂律关系，使最优配置可预测、可外推。
 
 - **实证层面**：在高达 10B 参数、1022 FLOPs 的计算规模上验证缩放定律的外推准确性，并比较 DLM 与 ALM 在计算最优状态下的竞争力。
-
-
 
 ## 核心方法与创新机理
 
@@ -157,11 +153,6 @@ $$\pmb{\pi}_\lambda = \sigma(a\lambda + b) \pmb{u} + (1 - \sigma(a\lambda + b)) 
 
 上述创新构成了一个紧密的因果链条：**SNR 重参数化**使得混合噪声分布的实现成为可能，进而支持对掩码、均匀及混合噪声的系统缩放比较；**超参数缩放定律**的发现使得批次大小和学习率可从训练 token 数直接预测，大幅降低了计算最优配置的搜索成本；**舍弃退火**和**非加权 ELBO** 则进一步简化了训练流程，使缩放定律的估计更加高效可靠。这一整套方法论使得本文能够在仅使用小规模模型（最大 1B 参数）拟合缩放定律后，准确外推至 3B 和 10B 参数、计算预算扩大 50 倍的实验设置（Figure 1, Figure 4）。
 
-
-
-![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_GDYaNzxt9T/figures/036_Figure_10.jpg]]
-*Figure 10: The fitted scaling coefficients differ systematically between FLOP estimation techniques: Method 1 uses the FLOP estimation technique proposed by Bi et al. (2024) whereas method 2 uses the classic approach by Hoffmann et al. (2022). Furthermore, fitting on interpolated data (squared fit) produces tighter confidence bounds and better scaling exponents. Shaded regions denote 95% confidence intervals obtained via standard bootstrapping on the aggregated data points*
-
 本文构建了一套完整的离散扩散语言模型（DLM）缩放定律研究框架，其核心 pipeline 由三个紧密耦合的模块组成：**信噪比（SNR）参数化的广义插值离散扩散（GIDD）前向过程**、**通用混合噪声分布**，以及**面向缩放定律的超参数优化与推理策略**。整个框架的输入为大规模文本语料（Nemotron-CC），输出为不同噪声类型和模型规模下的计算最优缩放系数及下游任务性能。
 
 ### Pipeline 模块关系与数据流
@@ -197,8 +188,6 @@ $$\pmb{\pi}_\lambda = \sigma(a\lambda + b) \pmb{u} + (1 - \sigma(a\lambda + b)) 
 - **推理策略**：采用扩散强制（Diffusion Forcing）进行条件 prompt 完成，配合自适应置信度采样（confidence‑based adaptive sampling），根据 token 置信度动态分配去噪步数，均匀扩散模型在此策略下尤为受益。
 
 整个 pipeline 的输出流为：在给定计算预算下，不同噪声类型（掩码、均匀、混合）的**计算最优缩放系数**（$\alpha_M$、$\alpha_D$、$\alpha_L$）及对应的**下游任务性能**。这些系数通过幂律 $A C^\alpha$（其中 $C = M D$）拟合得到，并经 3B 和 10B 参数规模的实测验证，证实了从小模型外推的准确性。
-
-
 
 ### SNR‑参数化的广义插值离散扩散 (GIDD)
 
@@ -256,22 +245,16 @@ $$\pi_{\lambda}^{\prime} = a \sigma^{\prime}(a \lambda + b)(u - m)$$
 
 通过网格搜索在 25M 和 50M 参数模型上确定了最优初始化方差（$\sigma_{\text{base}} = 0.4$, $\sigma_{\text{aux}} = 0.02$）和基础学习率（$\eta_{\text{base}} = 0.3$, $\eta_{\text{aux}} = 0.02 \cdot \eta_{\text{base}}$，批次大小为 64 时）。
 
-
-
 ## 实验与关键发现
 
 ### 核心缩放定律与最优超参数
 
 本文通过系统性的超参数网格搜索（Table 5），在 25M 至 10B 参数规模、不同噪声类型（掩码、均匀、混合）下，建立了离散扩散语言模型（DLM）的计算最优缩放定律。关键发现如下：
 
-
 ![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_GDYaNzxt9T/figures/018_Table_5.jpg]]
 *Table 5: List of key hyperparameters for our grid search. The parameters that are swept over are noise type, model size (Tab. 4), batch size, and learning rate*
 
 **计算约束缩放定律（Compute‑constrained scaling laws）**：采用幂律形式 $A C^\alpha$（其中 $C = M D$ 为计算量）拟合各噪声类型的损失、模型规模和数据集规模缩放指数。Table 1 和 Table 7 汇总了完整系数。均匀扩散在所有噪声类型中表现最优：其损失指数 $\alpha_L = -0.0522$ 略优于掩码扩散的 $\alpha_L = -0.0496$；模型规模指数 $\alpha_M = 0.589$ 高于掩码扩散的 $0.566$，表明均匀扩散更倾向于将计算预算分配给模型参数而非训练 token。相应地，均匀扩散的数据集规模指数 $\alpha_D = 0.411$ 低于掩码扩散的 $0.434$。这一趋势在 Figure 4（左）中得到直观呈现：计算受限场景下各噪声类型的损失曲线趋于收敛，但均匀扩散始终保持微弱优势。
-
-
-![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_GDYaNzxt9T/figures/007_Table_1.jpg]]
 
 ![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_GDYaNzxt9T/figures/037_Table_7.jpg]]
 *Table 7: Compute-constrained scaling coefficients for all noise types, metrics, and methodologies, obtained by fitting the power law A $C ^ { \ l \alpha }$ (where C = M D ) to the observed data. Method 1 uses the FLOP/tok estimation from Bi et al. (2024) while method 2 uses the classic M = 6 P approximation (Hoffmann et al., 2022). ‘raw’ interpolation refers to taking the optimal observed value for a given iso-FLOP target (i.e. no interpolation), whereas the ‘sq. fit’ data is obtained by fitting a parabola to the observed values and taking the optimum thereof. Smallest scaling coefficients are bolded*
@@ -279,7 +262,6 @@ $$\pi_{\lambda}^{\prime} = a \sigma^{\prime}(a \lambda + b)(u - m)$$
 **Token 约束缩放定律（Token‑constrained scaling laws）**：在固定训练 token 数的条件下，均匀扩散的优势更为显著。Figure 4（右）显示，均匀扩散的损失曲线在 token 受限时明显低于掩码和混合扩散，且这一优势随计算预算增大而持续。这一定性结论与计算约束下的定量系数差异相互印证：均匀扩散更“参数密集型”，在数据有限时能更有效地利用模型容量。
 
 **最优批次大小与学习率的幂律关系**：Figure 3 揭示了两个对缩放实践至关重要的规律。首先，最优批次大小 $B^*$ 随训练 token 数呈近似线性的幂律缩放，整体斜率为 $0.8225 \pm 0.0104$（Table 6），而非随目标损失或模型规模变化。其次，最优学习率 $\eta^*$ 随最优批次大小呈幂律增长，指数约为 $0.34$。Table 6 进一步按噪声类型分解了这些斜率：均匀扩散的批次大小斜率（$0.8787$）高于掩码扩散（$0.7759$），表明均匀噪声倾向于需要更大的最优批次；而学习率对噪声类型不敏感。这些幂律关系对模型规模具有鲁棒性，使得从小模型外推最优超参数成为可能。
-
 
 ![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_GDYaNzxt9T/figures/019_Table_6.jpg]]
 *Table 6: Optimal batch size $B ^ { * }$ Optimal learning rate $\eta ^ { * }$*
@@ -317,41 +299,21 @@ $$B^* = 2^{1/\alpha} B_{\min}, \quad S^* = 2^{1/\alpha} S_{\min}, \quad D^* = 4^
 
 Table 2 展示了缩放模型在多个下游任务上的性能。总体上，下游表现与 ELBO 趋势正相关，但存在噪声类型间的细微差异：3B 掩码模型在平均得分上略优于 3B 均匀模型，尽管均匀扩散的 ELBO 更优。这表明 ELBO 改善并非在所有任务上线性转化为精度提升。
 
-
 ![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_GDYaNzxt9T/figures/012_Table_2.jpg]]
 *Table 2: Downstream performance of our scaled models generally correlates with ELBO, with the 3B masked model slightly outperforming the 3B uniform model on average*
 
 Table 3 聚焦于 GSM8k 数学推理任务，对比了不同推理策略。自适应置信度采样（confidence‑based adaptive sampling）对所有模型均带来显著精度提升。更重要的是，均匀扩散在任何推理设置下均优于掩码扩散，且可通过增加去噪步数 $T$ 进一步提升精度：在 $T=256$ 时，均匀 10B 模型达到 $2.43\%$ 的准确率，显著高于掩码 3B 的 $1.67\%$。这揭示了均匀扩散在推理时具有更强的“计算换精度”能力。
 
-
-![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_GDYaNzxt9T/figures/013_Table_3.jpg]]
-*Table 3: Confidence-based, or adaptive, sampling improves accuracy on GSM8k noticeably for all models. Furthermore, uniform diffusion outperforms masked diffusion in any setting and is able to further improve accuracy by investing more denoising steps T*
-
 ### FLOP 估计方法与插值的影响
 
 附录中的 Figure 10 和 Table 7 系统分析了 FLOP 估计方法对缩放系数的影响。Method 1（Bi et al., 2024 的 $M = 6P + 12LDN$）与 Method 2（Hoffmann et al., 2022 的 $M = 6P$）产生系统性差异，但插值平滑后趋势一致。Figure 11 和 Figure 12 进一步对比了插值数据（squared fit）与原始观测值的拟合效果：插值有效平滑了噪声，产生更紧的置信区间和更优的拟合优度（Table 8）。Table 9 显示，加入不可约项 $E$ 的拟合中 $E \approx 0$，验证了纯幂律形式的充分性。
-
-
-![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_GDYaNzxt9T/figures/040_Table_8.jpg]]
-*Table 8: Goodness of fit (as per R ^ { 2 } ) for all noise types, metrics, and methodologies. Interpolated values (‘sq. fit’) generally yield a better fit due to the smoothing effect of interpolation, with the exception for the loss, where ‘raw’ values are already rather smooth*
-
-![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_GDYaNzxt9T/figures/041_Table_9.jpg]]
-*Table 9: Scaling coefficients with intercept, obtained by fitting the power law A $C ^ { \alpha }$ + E to the data. The fits almost always have E $\approx$ 0 , except for the uninterpolated loss values $\scriptstyle ( \mathbf { \dot { r a w } }$ ) , leading us to conclude that setting E = 0 is a valid assumption for our setting
-
-![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_GDYaNzxt9T/figures/038_Figure_11.jpg]]
-*Figure 11: Compute-optimal scaling laws fitted to interpolated values (squared fit). The FLOP estimation methodologies by Bi et al. (2024) (Method 1) and Hoffmann et al. (2022) (Method 2) differ significantly since the FLOP-approximation used by Hoffmann et al. (2022) ( M = 6 P ) systematically underestimates the total number of FLOPs executed during training*
 
 ### 局限性与开放问题
 
 尽管缩放定律在 10B 规模上得到验证，但以下局限需注意：所有实验基于 Nemotron‑CC 数据集（未做质量过滤），缩放系数对数据集组成敏感；实验仅覆盖英语文本，未验证多语言或代码场景；与业界数千亿参数的自回归模型仍有差距，外推存在不确定性。开放问题包括：临界批次大小在更大规模下是否会饱和；如何将最优超参数的幂律关系纳入自动化调参框架（如 µTransfer）；均匀扩散在 token 受限场景下的优势能否通过更先进的混合噪声调度进一步放大。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_GDYaNzxt9T/figures/017_Table_4.jpg]]
 *Table 4: Overview of the five different model sizes that were used in our experiments. Parameter counts refer to non-embedding parameters*
-
-
-
 
 ## 定位与知识库关联
 
@@ -406,8 +368,6 @@ Table 3 聚焦于 GSM8k 数学推理任务，对比了不同推理策略。自�
 - **自动化超参数缩放**：最优批次大小和学习率的幂律关系为无搜索缩放（如 µTransfer）提供了理论锚点，但如何将这两条幂律嵌入自动化框架以实现“零调参”的大规模训练，尚需工程化验证。
 - **混合噪声的进一步优化**：本文的混合噪声分布采用 sigmoid 单调过渡，均匀扩散在 token 受限场景下的优势能否通过更复杂的非单调调度（如在特定 SNR 区间侧重掩码、其他区间侧重均匀）进一步放大，是值得研究的方向。
 - **推理效率的定量比较**：扩散模型与自回归模型在相同计算预算下的实际下游任务效率（如推理延迟、吞吐量、生成长度控制）尚未系统对比，这直接关系到 DLMs 在部署场景中的竞争力。
-
-
 
 ## 原文 PDF
 

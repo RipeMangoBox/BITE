@@ -65,8 +65,6 @@ CompACT在方法谱系中占据独特位置：它不同于**SD-VAE**等追求高
 
 在RECON导航基准上，CompACT使用16个离散令牌即达到与SD-VAE（784个连续令牌）相当的规划精度（ATE: 1.330 vs 1.262），同时将规划延迟从178.78秒降至5.78秒，**加速约31倍**；使用8个令牌时延迟进一步降至4.83秒，**加速约37倍**。在RoboNet的逆向动力学评估中，CompACT的16个令牌保留的动作相关信息优于16倍令牌数的目标分词器（R²: 0.716 vs 0.684）。消融实验证实，生成式解码是压缩的关键——替换为直接重建会导致重建质量急剧恶化（rFID从2.40飙升至28.80），而冻结视觉编码器优于微调（ATE: 1.330 vs 1.500），印证了保留语义而非重建特征的设计原则。
 
-
-
 ### 决策时间规划中的效率瓶颈
 
 在机器人导航与操作任务中，**决策时间规划**（decision-time planning）要求智能体在行动前通过世界模型模拟未来轨迹并优化动作序列。这一范式高度依赖两个关键能力：世界模型对场景动态的准确预测，以及规划过程本身的计算效率。
@@ -105,8 +103,6 @@ CompACT 的核心洞察是：**规划不需要看到每一个像素，它只需�
 2. 通过**生成式解码**而非直接重建来验证压缩质量，确保紧凑令牌保留了足够的语义信息；
 3. 在导航和操作任务上实现与高令牌数方案**相当的规划精度**，同时将规划延迟降低 **30–80 倍**。
 
-
-
 ## 核心方法与创新机理
 
 CompACT 的核心创新在于**将视觉分词器的设计目标从“精确重建”转向“规划保留”**，通过三个关键设计槽位的协同改变，实现了极端压缩下的高效决策时间规划。
@@ -130,8 +126,6 @@ CompACT 使用**有限标量量化（FSQ）** 将连续特征映射为离散令�
 ### 创新总结
 
 三个槽位的协同改变形成了一条清晰的因果链：**冻结语义编码器**确保令牌保留规划相关信息 → **极端压缩**消除计算瓶颈 → **生成式解码**弥补感知细节的丢失。这一设计哲学的本质是将分词器从“通用图像压缩器”重新定位为“规划任务的信息瓶颈”，以放弃精准重建为代价，换取 1–2 个数量级的规划加速。
-
-
 
 CompACT 的整体框架由三个核心模块串联而成：**紧凑分词器**（CompACT Tokenizer）、**潜在世界模型**（Latent World Model）与**决策时间规划器**（CEM Planner）。该框架的核心思想是将高维图像观测压缩为极少量的离散语义令牌，在低维潜在空间中完成下一状态预测与动作序列优化，从而将规划延迟降低 1–2 个数量级，同时保持与高维连续分词器相当的规划精度。
 
@@ -166,8 +160,6 @@ Figure 1 给出了框架的全景概览，其数据流可概括为以下三个�
 | CompACT Decoder $\mathcal{D}_{\text{compact}}$ | $z_t$（可选，仅用于可视化） | 重建图像 $\hat{o}_t$（经目标解码器 $\mathcal{D}_{\psi}$） |
 
 > **注意**：解码器仅在训练分词器或需要可视化时使用；规划过程中完全在潜在空间中进行，无需像素级重建，这是实现 40–80 倍加速的根本原因。
-
-
 
 ### 3.1 潜在世界模型形式化
 
@@ -211,8 +203,6 @@ CompACT 分词器由三个关键模块构成（Figure 2），实现从图像到 
 
 解码器不直接重建像素，而是以紧凑令牌为条件，通过掩码生成模型学习生成目标分词器（MaskGIT-VQGAN）的潜在令牌。该设计基于 MM-DiT 架构（Figure 8），训练损失为：
 
-![[assets/figures/papers/paper_list_l2570_https_arxiv_org_abs_2603_05438/figures/017_Figure_8.jpg]]
-
 $$\mathcal{L}_{\mathrm{tok}} = - \mathbb{E}_{z^{\psi}} \big[ \log p(z^{\psi} | z, M(z^{\psi})) \big] \tag{4}$$
 
 其中 $z$ 为 CompACT 编码器输出的紧凑令牌，$z^{\psi}$ 为目标分词器令牌，$M(z^{\psi})$ 为随机掩码后的目标令牌。训练时仅更新潜在重采样模块和 $\mathcal{D}_{\mathrm{compact}}$，目标分词器的编码器 $\mathcal{E}_{\psi}$ 仅用于生成掩码目标令牌，解码器 $\mathcal{D}_{\psi}$ 仅在推理时用于像素级重建。
@@ -239,12 +229,6 @@ $$\mathcal{L}_{\mathrm{world}} = - \mathbb{E}_{z_t, a_t, z_{t+1}} \left[ \log p(
 - **导航任务**：基于 CDiT（Figure 10），动作通过自适应层归一化注入，历史帧通过交叉注意力条件化，自回归生成下一帧。
 - **操纵任务**：采用块因果 Transformer（Figure 11），支持并行预测多帧未来状态，动作令牌通过 AdaLN 和线性层条件化解码头。
 
-![[assets/figures/papers/paper_list_l2570_https_arxiv_org_abs_2603_05438/figures/020_Figure_10.jpg]]
-*Figure 10: World model*
-
-![[assets/figures/papers/paper_list_l2570_https_arxiv_org_abs_2603_05438/figures/022_Figure_11.jpg]]
-*Figure 11: World model*
-
 历史掩码训练策略对规划精度有显著影响：在训练时随机掩码部分历史帧，迫使模型学习更鲁棒的时序推理，将导航 ATE 从 1.480 降至 1.330（Table 5 Left）。
 
 ### 3.4 逆向动力学模型（IDM）
@@ -253,8 +237,6 @@ $$\mathcal{L}_{\mathrm{world}} = - \mathbb{E}_{z_t, a_t, z_{t+1}} \left[ \log p(
 
 ![[assets/figures/papers/paper_list_l2570_https_arxiv_org_abs_2603_05438/figures/018_Figure_9.jpg]]
 *Figure 9: Inverse Dynamics Model (IDM) architecture. Consecutive frames are tokenized and processed through a transformerbased frame encoder, which produces a single conditioning vector via average pooling. This vector conditions an action denoiser implemented as a diffusion policy [11], which predicts the action taken between the two frames*
-
-
 
 ## 实验与关键发现
 
@@ -272,9 +254,6 @@ CompACT 的实验体系围绕一个核心主张展开：**极端压缩的离散�
 
 Table 1 展示了 CompACT 在 ImageNet 验证集上的重建性能。CompACT 使用仅 16 个离散令牌（约 256 bits/图像）达到了 rFID 2.40 和 IS 209.0，使用 8 个令牌时 rFID 为 3.21、IS 为 207.5。作为参照，目标分词器 MaskGIT-VQGAN 使用 256 个令牌获得 rFID 1.83。考虑到令牌数压缩了 16–32 倍，重建质量的下降幅度相对温和。
 
-![[assets/figures/papers/paper_list_l2570_https_arxiv_org_abs_2603_05438/figures/003_Table_1.jpg]]
-*Table 1: Reconstruction performance of CompACT on ImageNet validation split. Metrics are computed using open-sourced checkpoints. rFID is measured using clean-fid [54]. †: Measured using 16 tokens*
-
 **关键消融（Table 2）**揭示了压缩机制的本质：当将生成式解码器替换为单步前馈解码器（直接重建像素）时，rFID 从 2.40 急剧恶化至 28.80。这表明 **CompACT 的压缩能力并非来自编码器本身，而是来自"编码语义令牌 + 生成式解码恢复细节"的协同设计**。编码器负责保留高层语义锚点，解码器则通过掩码生成模型从目标分词器的先验中"补全"感知细节。
 
 此外，Table 2 还验证了冻结 DINOv3 编码器的必要性：微调编码器反而导致 rFID 上升，支持了"保留预训练语义特征比适应重建目标更重要"的设计直觉。
@@ -285,9 +264,6 @@ Table 1 展示了 CompACT 在 ImageNet 验证集上的重建性能。CompACT 使
 ### 动作相关信息保留（RoboNet IDM）
 
 Table 3 通过逆向动力学模型（IDM）评估不同分词器令牌中动作相关信息的保留程度。CompACT 16 令牌在 RoboNet 上取得了 L1 error 0.091 和 R² 0.716，优于使用 256 个令牌的目标分词器（L1 0.093, R² 0.684）。这意味着 **16 个语义令牌比 256 个感知令牌保留了更多的动作相关信息**。
-
-![[assets/figures/papers/paper_list_l2570_https_arxiv_org_abs_2603_05438/figures/007_Table_3.jpg]]
-*Table 3: Performance of Inverse Dynamics Model (IDM) trained with different tokenizers on RoboNet [13]. L1 error and*
 
 这一反直觉结果的可能解释是：目标分词器的令牌分布在整幅图像上，包含大量与动作无关的背景和纹理信息，这些信息在 IDM 训练中构成噪声；而 CompACT 的潜在重采样机制（Figure 4）通过交叉注意力主动聚焦于语义相关的图像区域，天然过滤了无关信息。
 
@@ -303,9 +279,6 @@ Table 4 是全文最核心的实验结果。在 RECON 导航基准上，CompACT 
 Figure 7 的延迟分解进一步揭示了加速来源：SD-VAE 的规划延迟主要消耗在世界模型 rollout（在 784 个连续令牌上运行注意力）和解码器（将 784 个潜在向量解码为像素）。CompACT 将令牌数压缩 49–98 倍后，注意力计算量呈平方级下降，解码也从像素生成简化为目标令牌生成。
 
 Figure 14 展示了 ATE、规划延迟与 GPU 显存占用的三维权衡：CompACT 在精度–延迟–显存的帕累托前沿上占据绝对优势位置。
-
-![[assets/figures/papers/paper_list_l2570_https_arxiv_org_abs_2603_05438/figures/025_Figure_14.jpg]]
-*Figure 14: Plot for ATE, planning latency, and memory peak usage on RECON [60]. Latency and memory usage is mesaured for single trajectory optimization, using a single RTX 6000 ADA GPU*
 
 ### 设计选择消融（Table 5）
 
@@ -338,8 +311,6 @@ Table 8 报告了在 RoboMimic Lift 任务上的闭环操纵结果。需要注�
 ### 实验公平性说明
 
 NWM 基线复现时使用了 CDiT-B（原始论文使用 CDiT-XL），并排除了 Tartan 和 Ego4D 数据集以控制资源消耗。尽管如此，复现的基线 ATE 1.262 与原始报告值 1.13 处于可比范围。所有延迟测量均在单张 RTX 6000 Ada GPU 上完成，实际部署时可能因硬件差异而变化。
-
-
 
 ## 定位与知识库关联
 
@@ -391,8 +362,6 @@ CompACT 开辟了多个值得探索的方向：
 3. **端到端整合**：CompACT 的紧凑令牌能否直接整合到端到端强化学习策略中，实现全闭环控制，而非仅用于模型预测控制？
 4. **扩散世界模型加速**：紧凑令牌是否也能加速基于扩散的世界模型（如视频生成模型）中的规划，将 CompACT 的压缩思想推广到更广泛的生成式规划框架？
 5. **本体感知融合**：将实时观察和本体感知纳入 IDM 和规划循环，可能显著提升闭环操纵性能，这是从仿真到真实部署的关键一步。
-
-
 
 ## 原文 PDF
 

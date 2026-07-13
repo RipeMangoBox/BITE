@@ -54,8 +54,6 @@ Motion-I2V 针对上述瓶颈提出了一个显式运动建模框架，其核心
 
 该方法也存在一定局限：生成视频往往呈现中等亮度，可能与噪声调度未强制最后时间步达到零信噪比有关；此外，两阶段框架向任意长视频生成以及三维场景动态建模的扩展仍是待探索的开放问题。
 
-
-
 图像到视频（Image-to-Video, I2V）生成的目标是从单张静态图像出发，合成一段时序连贯的视频。近年来，基于扩散模型（Diffusion Models）的视频生成方法取得了显著进展，但在I2V任务中仍面临两个核心瓶颈。
 
 **时序一致性与大运动的矛盾。** 现有I2V方法（如 **DynamiCrafter**（Xing et al., 2023）、**I2VGen-XL**（Zhang et al., 2023））通常依赖于视频潜在扩散模型中的一维时序注意力机制来隐式地学习帧间动态。这种机制的时间感受野有限——每一帧主要关注其相邻帧，缺乏对长程运动轨迹的全局感知。其直接后果是：当面对大运动或显著视角变化时，生成视频容易出现内容闪烁、身份漂移等时序不一致问题。定性对比（Figure 8）清楚地揭示了这一现象：DynamiCrafter 和商用系统 Pika 1.0 倾向于生成运动幅度极小的视频以规避风险，而 Gen-2 虽能产生较大运动，却难以保持参考图像的视觉身份。
@@ -65,8 +63,6 @@ Motion-I2V 针对上述瓶颈提出了一个显式运动建模框架，其核心
 上述两个问题本质上是同一根源的不同表现：**运动建模的隐式性**。当模型将运动模式与外观生成混合在同一个黑箱注意力机制中学习时，它既难以捕捉大幅度的时空依赖，也无法将运动作为独立维度暴露给用户进行操控。
 
 Motion-I2V 的核心动机正是打破这一隐式建模范式。其关键洞察在于：**将I2V生成解耦为“预测运动”与“传播内容”两个阶段**。第一阶段显式地推理出参考图像中每个像素在未来帧中的运动轨迹，形成稠密的运动场；第二阶段则利用这些预测的运动场，通过特征扭曲（warping）和运动增强的时序注意力，将参考图像的内容忠实地传播到所有生成帧中。这种解耦不仅通过扩大时序感受野缓解了大运动下的不一致问题，还天然地为运动控制提供了接口——用户只需在第一阶段输入稀疏轨迹或运动区域蒙版，即可精确操控生成视频中的运动。
-
-
 
 ## 核心方法与创新机理
 
@@ -92,8 +88,6 @@ $$z'' = \mathrm{Attention}(Q, K, V) = \mathrm{Softmax}(QK^T)V$$
 
 这一可控性扩展源于框架的模块化设计：运动预测是独立的生成任务，因此可以像文生图中的 ControlNet 一样，通过注入额外条件来引导运动场的生成，而无需重新设计整个视频生成管线。
 
-
-
 ![[assets/figures/papers/paper_list_l3_Motion_I2V_Consistent_and_Controllable_Image_to_Video_Generation_with_Ex/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of trajectory ControlNet. We train a Trajectory ControlNet based on the pre-trained stage 1 of Motion-I2V. It takes sparse trajectories and corresponding binary mask as additional conditions, and output dense optical flow maps*
 
@@ -116,8 +110,6 @@ Motion-I2V 将图像到视频生成（I2V）解耦为两个显式阶段，核心
 **模块间关系**：两个阶段之间通过预测的稠密运动场 $f_{0 \to i}$ 实现信息传递。第一阶段专注于“运动理解”，第二阶段专注于“内容传播”——这种分工使得模型无需在单阶段内同时学习复杂的时空模式，而是将运动建模的负担从视频生成模型中剥离出来，由专门的运动预测器承担。消融实验证实，利用第一阶段预测的运动场能显著稳定视频生成，而采用注意力机制自适应注入扭曲特征（相较于直接相加）能进一步提升一致性并避免极端失真（Table 2）。
 
 **可控性扩展**：在第一阶段预训练模型的基础上，可训练一个轨迹 ControlNet（Figure 3），接收用户绘制的稀疏轨迹和对应二值蒙版作为额外条件，输出稠密光流场，从而支持精确的运动轨迹控制和区域特定动画（运动刷）。
-
-
 
 Motion-I2V 将图像到视频生成分解为两个串联阶段，其核心模块围绕显式运动建模展开：第一阶段预测稠密运动场，第二阶段利用该运动场进行特征传播与帧合成。
 
@@ -153,14 +145,11 @@ $$z'' = \mathrm{Attention}(Q, K, V) = \mathrm{Softmax}(QK^T)V$$
 
 为实现精细的运动控制，Motion-I2V 在第一阶段预训练模型的基础上训练了一个轨迹 ControlNet。该模块接收用户绘制的稀疏轨迹和对应的二值蒙版作为额外条件，输出稠密光流图。对于区域特定动画（运动刷），输入稀疏光流 $f_{sparse}$ 设为零图，蒙版 $m$ 中用户指定区域置为 0、其余区域置为 1，使未蒙版区域保持静止。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
 
 Motion‑I2V 在指令遵循能力与时序一致性两项核心指标上均优于对比方法。在 UCF‑101 与 MSR‑VTT 两个基准上，Motion‑I2V 取得了最高的 Prompt Consistency 得分 34.86 与最高的 Frame Consistency 得分 0.9871（Table 1）。与此同时，该方法的平均像素位移量达到 20.06，表明其在保持强时序一致性的前提下仍能生成较大幅度的运动。
-
 
 ![[assets/figures/papers/paper_list_l3_Motion_I2V_Consistent_and_Controllable_Image_to_Video_Generation_with_Ex/figures/008_Table_1.jpg]]
 *Table 1: Quantitative comparison. Motion-I2V shows best instruction-following ability and temporal consistency. Meanwhile, Motion-I2V generates relatively large motions*
@@ -170,7 +159,6 @@ Motion‑I2V 在指令遵循能力与时序一致性两项核心指标上均优�
 ### 消融实验
 
 消融实验围绕两个核心设计展开：第一阶段运动场的必要性，以及扭曲特征注入方式（Table 2）。
-
 
 ![[assets/figures/papers/paper_list_l3_Motion_I2V_Consistent_and_Controllable_Image_to_Video_Generation_with_Ex/figures/009_Table_2.jpg]]
 *Table 2: Ablation study. Utilizing the motion fields from stage 1 can significantly stabilize the prediction. Additionally, using attention to adaptively inject the warped features into synthesized frames can further increase consistency and avoid extreme distortions*
@@ -189,19 +177,11 @@ Motion‑I2V 在指令遵循能力与时序一致性两项核心指标上均优�
 - **Table 2** 通过消融实验分离出运动场先验和注意力注入两个设计的独立贡献，为两阶段框架的有效性提供了因果证据。
 - **Figure 8** 以定性方式直观展示了不同方法在大运动场景下的行为差异，补充了定量指标无法完全反映的身份保持和运动幅度权衡。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l3_Motion_I2V_Consistent_and_Controllable_Image_to_Video_Generation_with_Ex/figures/004_Figure_5.jpg]]
 *Figure 5: Examples of region-specific I2V. Users can precisely Specify the animated regions by motion brush (purple mask). Unmasked regions remains static*
 
 ![[assets/figures/papers/paper_list_l3_Motion_I2V_Consistent_and_Controllable_Image_to_Video_Generation_with_Ex/figures/005_Figure_6.jpg]]
 *Figure 6: Combination of motion trajectories and motion brush. Motion-I2V supports the combined usage of motion brush and trajectory guidance*
-
-![[assets/figures/papers/paper_list_l3_Motion_I2V_Consistent_and_Controllable_Image_to_Video_Generation_with_Ex/figures/006_Figure_4.jpg]]
-*Figure 4: Examples of sparse trajectory guided I2V. Users can precisely control the synthesized motions by drawing one or multiple trajectories (red curved arrow)*
-
-
-
 
 ## 定位与知识库关联
 
@@ -230,8 +210,6 @@ Motion‑I2V 的两阶段设计在带来大运动一致性和精细控制能力�
 - 如何从噪声调度或后处理层面解决生成视频的亮度偏暗问题，是该方法的直接改进方向。
 - 两阶段框架能否扩展至任意长视频生成并保持时序一致性，需要进一步验证轨迹预测的长期稳定性和注意力机制的可扩展性。
 - 显式运动建模是否可以推广到三维场景表示（如 NeRF、3D Gaussian Splatting）或更复杂的物理动态生成，是该方法向三维生成领域延伸的关键问题。
-
-
 
 ## 原文 PDF
 

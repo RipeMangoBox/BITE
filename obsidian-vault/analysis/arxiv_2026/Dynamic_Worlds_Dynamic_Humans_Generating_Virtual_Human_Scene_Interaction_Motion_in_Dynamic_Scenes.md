@@ -83,8 +83,6 @@ Dyn-HSI 在方法谱系上属于**自回归运动扩散模型**，但与现有�
 
 Dyn-HSI 的推理速度仍不理想，主要瓶颈来自动态场景感知导航的迭代预测（消融版本速度接近 MotionDiffuse）。当前动态场景为手工模拟，未能完全捕捉真实世界的复杂性（如细微物体运动、拥挤场景）。训练完全依赖静态数据集 LINGO，缺乏大规模动态交互数据可能限制极限场景下的性能。如何在不牺牲动态感知能力的前提下加速推理、以及如何扩展到更复杂的真实世界动态场景，是未来工作的关键方向。
 
-
-
 ### 问题背景：静态世界假设的局限
 
 虚拟人-场景交互（Human-Scene Interaction, HSI）运动生成是计算机图形学与具身AI交叉领域的核心问题，其目标是根据文本指令或目标位置，生成虚拟人在3D场景中自然移动并与物体交互的运动序列。近年来，基于扩散模型的方法在该领域取得了显著进展，如**LINGO**（Jiang et al., SIGGRAPH Asia 2024）、**Trumans**（Jiang et al., CVPR 2024）和**SceneDiffuser**（Huang et al., CVPR 2023）等，能够在静态场景中生成高质量的人体运动。
@@ -111,8 +109,6 @@ Dyn-HSI 的推理速度仍不理想，主要瓶颈来自动态场景感知导航
 
 基于这一洞察，本文提出**Dyn-HSI**，一个面向动态场景的虚拟人-场景交互运动生成框架。Dyn-HSI通过自回归运动扩散模型，将视觉-记忆-控制三个模块有机整合，使虚拟人首次能够在动态环境中实时调整运动，避免穿透并保持高质量的交互。
 
-
-
 ## 核心方法与创新机理
 
 Dyn-HSI 的核心创新在于将传统静态场景假设下的人-场景交互（HSI）生成范式，重构为一套**受世界模型启发的认知架构**（Vision–Memory–Controller），使虚拟人能够实时感知动态环境变化、检索过往经验并自适应调整运动策略。这一架构转变直接解决了现有方法在动态场景中因缺乏场景感知和记忆能力而导致的穿透、轨迹偏离和交互失败等瓶颈问题。
@@ -138,8 +134,6 @@ Dyn-HSI 的核心创新在于将传统静态场景假设下的人-场景交互�
 ### 创新总结
 
 上述四个维度的变革并非孤立存在，而是通过**自回归生成循环**（Autoregressive Generation Loop）有机整合：动态场景感知导航提供置信度感知的轨迹规划，层次化经验记忆为扩散模型提供上下文感知的启动噪声，条件适配器根据任务属性自适应融合多模态条件，最终在统一的认知架构下实现动态场景中高质量的人-场景交互运动生成。
-
-
 
 Dyn-HSI 是一个面向文本驱动的动态人-场景交互运动生成的自回归运动扩散模型框架。其核心设计受世界模型启发的认知架构（视觉-记忆-控制）驱动，使虚拟人能够持续感知场景变化、检索过往经验，并自适应地生成高质量的交互运动。整体框架由三个关键模块构成：
 
@@ -171,12 +165,8 @@ $$\mathcal{L} = \mathcal{L}_{motion} + \lambda_t \mathcal{L}_{traj} + \lambda_c 
 
 > **注意**：图 2 展示了 Dyn-HSI 的完整架构概览，包括三个核心模块及其数据流关系；图 3 详细描绘了动态场景感知导航模块的内部架构。关于各模块的具体实现细节，请参见后续章节。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1700_Dynamic_Worlds_Dynamic_Humans_Generating_Virtual_Human_Scene_Interaction/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of Dyn-HSI. Dyn-HSI is an autoregressive motion diffusion model capable of iteratively generating human–scene interaction motions. It consists of three components: (1) dynamic scene-aware navigation, (2) hierarchical experience memory, and (3) HSI diffusion model*
-
-
 
 ### 3.1 问题形式化与数据表示
 
@@ -258,12 +248,8 @@ $$\mathcal{L} = \mathcal{L}_{motion} + \lambda_t \mathcal{L}_{traj} + \lambda_c 
 4. **运动生成**：扩散模型在加权条件的引导下生成运动片段
 5. **自回归迭代**：使用生成片段的最后两帧作为下一片段的条件，重复上述过程直至到达目标位置
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1700_Dynamic_Worlds_Dynamic_Humans_Generating_Virtual_Human_Scene_Interaction/figures/003_Figure_3.jpg]]
 *Figure 3: Architecture of Dynamic Scene-Aware Navigation*
-
-
 
 ## 实验与关键发现
 
@@ -316,9 +302,6 @@ Dyn-HSI在静态基准LINGO上进行了全面评估，与**LINGO**（Jiang et al
 
 用户研究从四个维度评估生成结果的主观质量（Fig. 5）：
 
-![[assets/figures/papers/paper_list_l1700_Dynamic_Worlds_Dynamic_Humans_Generating_Virtual_Human_Scene_Interaction/figures/008_Figure_5.jpg]]
-*Figure 5: User study results. The higher score indicates better performance*
-
 - **文本对齐分数（1-5）**：Dyn-HSI获得4.87，较LINGO的约3.42提升42.39%，表明生成的运动与文本描述高度一致。
 - **运动质量、轨迹质量、人-场景交互质量**三个维度上，Dyn-HSI均显著优于所有基线方法。
 
@@ -347,21 +330,8 @@ Table 4报告了推理效率对比：
 - **评估基准公平性**：动态场景基准（Dyn-LINGO, Dyn-Trumans）使用相同的场景数据和变化条件评估所有方法，基线方法的失败源于其对静态场景的固有假设。
 - **推理时间对比**：Dyn-HSI的额外时间开销主要来自导航模块的迭代预测，消融版本的速度对比表明这一开销未被不公平地隐藏于其他模块。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1700_Dynamic_Worlds_Dynamic_Humans_Generating_Virtual_Human_Scene_Interaction/figures/009_Figure_6.jpg]]
-*Figure 6: Visual results compared with existing methods. The left side provides a detailed description of the dynamic conditions within the scene. The green box zooms in on the details captured by our approach, while the red boxes highlight errors made by other methods. Green arrows indicate the goal positions*
-
 ![[assets/figures/papers/paper_list_l1700_Dynamic_Worlds_Dynamic_Humans_Generating_Virtual_Human_Scene_Interaction/figures/010_Figure_7.jpg]]
 *Figure 7: Qualitative examples from the ablation study on the Dynamic Scene-Aware Navigation. The bottom-left shows the top-down trajectory paths of both methods*
-
-![[assets/figures/papers/paper_list_l1700_Dynamic_Worlds_Dynamic_Humans_Generating_Virtual_Human_Scene_Interaction/figures/011_Figure_8.jpg]]
-*Figure 8: Qualitative examples from the ablation study on the Hierarchical Experience Memory*
-
-![[assets/figures/papers/paper_list_l1700_Dynamic_Worlds_Dynamic_Humans_Generating_Virtual_Human_Scene_Interaction/figures/012_Table_4.jpg]]
-*Table 4: Efficiency analysis compared with SoTA methods. “↑” denotes that higher is better. “↓” denotes that lower is better. “w/o” denotes “without” and indicates ablation variants. We report the best and the second-best results in Red cells and blue cells*
-
-
 
 ## 定位与知识库关联
 
@@ -412,8 +382,6 @@ Dyn-HSI 在以下四个关键槽位上对现有范式进行了根本性修改：
 3. **记忆自适应学习**：层次化经验记忆的存储策略（相似度阈值 $\tau_l$、容量 $k$）和超参数能否根据任务自动学习调整，而非手工设定？
 4. **动态数据构建**：能否通过自监督或合成数据扩增构建大规模动态人-场景交互训练集，以弥补当前仅依赖静态数据训练的不足？
 5. **记忆更新策略**：当新任务或场景频繁变化时，记忆更新与检索如何平衡效率与多样性，避免生成模式坍塌？
-
-
 
 ## 原文 PDF
 

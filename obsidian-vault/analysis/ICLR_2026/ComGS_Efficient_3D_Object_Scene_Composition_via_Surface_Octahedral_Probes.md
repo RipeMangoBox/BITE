@@ -53,8 +53,6 @@ claims:
 
 **局限性** 方法假设待插入物体相对场景较小且场景主要为朗伯表面，因此无法处理远距离阴影和镜面反射（Figure 8）。当前不支持多物体同时放置，且依赖多视角输入而非单张图像。
 
-
-
 ### 3D 物体-场景合成的现实需求与核心挑战
 
 在增强现实、虚拟制作和交互式内容创作中，将三维物体无缝融入真实或虚拟场景——即 **3D 物体-场景合成**——是一项基础且高频的需求。理想的合成结果需要同时满足三个条件：**视觉和谐**（物体与场景在光照、色调上自然融合）、**物理合理阴影**（物体向场景投射正确阴影，并接收场景的间接光照），以及**交互式实时性**（编辑后能够以高帧率自由漫游观察）。
@@ -83,8 +81,6 @@ ComGS 的核心动机在于：**能否在保持物理合理光照与阴影的前
 2. **局部光照估计的重构**：将场景光照估计从“完整场景逆渲染”简化为“物体放置位置的局部环境图修复”问题。通过在目标位置进行 360° 全景扫描获取部分辐射场，再借助微调扩散模型生成完整的高动态范围（HDR）环境图。这一策略避免了全局解离的不稳定性，同时保证了多视角光照一致性。
 
 通过上述设计，ComGS 将编辑时间压缩至 **36 秒**，渲染速度达到 **约 26 FPS**，同时在 SynCom 数据集上取得了 **24.282 PSNR** 和 **4.588 和谐评分**，在合成质量与交互效率之间实现了此前方法未能达成的平衡。
-
-
 
 ## 核心方法与创新机理
 
@@ -124,8 +120,6 @@ $$\mathscr { S } = \frac { L _ { o } ^ { \prime } } { L _ { o } }$$
 
 需要指出，ComGS 的创新建立在若干假设之上：场景主要为朗伯表面（因此阴影计算采用漫反射近似），且待插入物体相对场景较小（仅影响局部区域）。这些假设使得方法在镜面反射场景和远距离阴影场景中失效（Figure 8），也限制了其对复杂 BRDF 效果的建模能力。
 
-
-
 ComGS 将三维物体-场景合成分解为**重建、编辑、渲染**三个顺序阶段，形成一条端到端的可微分流水线（图2）。其核心设计目标是在保持视觉和谐与物理合理阴影的同时，将编辑时间压缩至 36 秒、渲染帧率提升至约 26 FPS。
 
 ### 阶段一：重建
@@ -156,12 +150,8 @@ $$L _ { i n } ( \mathbf { x } ) = \frac { \sum _ { k } w _ { s } ( k ) w _ { b }
 
 这一设计将重建训练时间缩短至 7.93 分钟（Table 2），提升超过 2.7 倍，同时使渲染帧率达到 26.14 FPS（Table 1）。SOPs 在场景空间的遮挡缓存可跨视角复用，进一步解耦了编辑效率与渲染质量的权衡。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_yXiSPBMrTT/figures/002_Figure_2.jpg]]
 *Figure 2: Realistic 3D Object–Scene Composition Pipeline. Our approach consists of 3 stages: reconstruction (Sec. 3.1), where we reconstruct the Gaussian scene and relightable Gaussian object from multi-view images; editing (Sec. 3.2), where we estimate scene lighting and cache occlusion using Surface Octahedral Probes; and rendering (Sec. 3.3), where we perform splatting, object relighting, shadow casting, and depth compositing. The pipeline achieves visually harmonious results with realistic shadows and near-real-time performance*
-
-
 
 ComGS 的流水线围绕三个关键模块展开：**表面八面体探针（SOPs）驱动的逆渲染**、**基于扩散模型的局部光照估计**，以及**基于 SOPs 的遮挡缓存与实时阴影合成**。以下逐一剖析各模块的核心机制与支撑公式。
 
@@ -245,16 +235,6 @@ $$
 
 三个核心模块形成效率闭环：SOPs 将间接光照与遮挡查询从光线追踪转为插值（重建加速 2 倍以上），扩散模型将光照估计从全局逆渲染简化为局部修复（编辑时间 36 秒），遮挡缓存使阴影计算从逐帧光线追踪转为插值查询（渲染达 26 FPS）。这一协同设计是 ComGS 在保持视觉和谐的同时实现近实时性能的根本原因。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_yXiSPBMrTT/figures/003_Figure_3.jpg]]
-*Figure 3: Inverse Rendering with Surface Octahedral Probes (SOPs). We utilize trained relightable 2D Gaussians to generate GBuffers via splatting, followed by deferred physically based rendering for a render image. Illumination is split into direct lighting from environment map, indirect lighting and occlusion captured by textures in SOPs. Both the environment map and textures are stored as octahedral textures. Low-discrepancy ray sampling with random rotation is used to compute illumination at shading point, with indirect light and occlusion derived via KNN interpolation from nearby probes. SOPs are initialized with ray tracing and optimized under its guidance, avoiding intensive ray tracing per opt...*
-
-![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_yXiSPBMrTT/figures/004_Figure_4.jpg]]
-*Figure 4: Lighting Estimation. At a given location, we create a partial panoramic view via a*
-
-
-
 ## 实验与关键发现
 
 ### 核心性能对比
@@ -297,32 +277,18 @@ Figure 6 的定性对比进一步表明，**GS-IR** 和 **IRGS** 在复杂场景
 
 SOPs 数量与纹理分辨率直接影响阴影渲染质量（Figure 15）。16×16 的纹理分辨率可提供视觉可接受的结果，而 8×8 分辨率因角度采样过粗导致明显方向误差。SOPs 数量超过 10k 后可进一步减少锯齿。
 
-![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_yXiSPBMrTT/figures/019_Figure_15.jpg]]
-*Figure 15: Influence of the Number of SOPs and Texture Resolution. A resolution of 16 provides visually acceptable results, while a resolution of 8 causes significant directional errors due to coarse angular sampling. Increasing the number of SOPs beyond 10k further reduces aliasing*
-
 SOPs 初始化偏移的消融（Table 5、Figure 20）揭示了光线泄漏问题的敏感性：偏移设为物体大小的 0% 时出现显著光线泄漏，1% 的设置则可获得干净稳定的反照率、渲染和重光照结果。
 
-![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_yXiSPBMrTT/figures/031_Figure_20.jpg]]
-*Figure 20: Comparison of relighting and ambient occlusion (AO) under different SOPs initialization offsets. The 0% offset introduces noticeable light leakage, while the 1% setting produces clean and stable results*
-
 GPU 显存占用方面（Table 3），SOPs 数量从约 2k 增至 10k 时，显存开销增长可控，验证了该方案在实时渲染场景下的部署可行性。
-
-![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_yXiSPBMrTT/figures/018_Table_3.jpg]]
-*Table 3: GPU memory usage comparison under different numbers of SOPs*
 
 ### 失败模式与适用边界
 
 ComGS 存在以下明确失败模式（Figure 8）：
 
-![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_yXiSPBMrTT/figures/010_Figure_8.jpg]]
-*Figure 8: Failure cases. We failed to cast remote shadow and model mirrorlike reflections*
-
 1. **远距离阴影缺失**：当物体放置位置远离场景表面时，SOPs 缓存的局部遮挡无法覆盖远距离阴影投射，导致阴影不完整。
 2. **镜面反射不支持**：场景重建基于 2DGS，缺乏镜面光照模型，无法建模镜面反射和类镜面效果。
 
 这些失败根源于方法的核心假设：待插入物体相对场景较小、仅影响局部区域，且场景表面近似为朗伯面。在镜面反射场景或需要远距离阴影的合成任务中，需手动验证替代方案。
-
-
 
 ## 定位与知识库关联
 
@@ -386,8 +352,6 @@ ComGS 框架为后续研究留下了若干明确的改进空间：
 - **单图像三维合成**：将方法扩展至仅用单张图像进行三维合成，将大幅降低数据获取门槛。
 - **放宽朗伯假设**：引入更复杂的 BRDF 模型和间接光照效果（如镜面反射、散焦模糊），可提升物理真实感。
 - **实时全局光照集成**：结合实时全局光照技术，有望进一步提升镜面反射和复杂光传输的保真度。
-
-
 
 ## 原文 PDF
 

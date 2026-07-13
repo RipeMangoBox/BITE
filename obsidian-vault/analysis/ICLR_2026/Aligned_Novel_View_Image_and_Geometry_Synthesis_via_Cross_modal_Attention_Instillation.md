@@ -51,8 +51,6 @@ claims:
 
 在 DTU 零样本外推设置下，MoAI 在双视图条件下达到 **15.58 PSNR**，较最优基线 NoPoSplat (13.58) 提升 **+2.00 dB**；在 RealEstate10K 域内外推设置下达到 **17.41 PSNR**，较 NoPoSplat (14.36) 提升 **+3.05 dB**。消融实验证实，逐一添加点图条件、网格条件化和跨模态注意力注入，PSNR 从 16.55 逐步提升至 17.41，各模块均带来持续增益。模型对几何条件的噪声和稀疏性高度鲁棒，在 80% 点掩码或 15% 高斯噪声下仍保持稳定性能。
 
-
-
 新视角合成（Novel View Synthesis, NVS）旨在从稀疏的参考图像中生成任意目标视角下的场景外观。近年来，前馈式方法（如 **PixelSplat** (Charatan et al., 2024)、**MVSplat** (Chen et al., 2024)）通过端到端可微渲染取得了显著进展，但其本质依赖从参考视角到目标视角的可投影区域，无法合成未观测区域（即外推场景）的内容。另一方面，基于生成式先验的变形-修复（warping-and-inpainting）方法（如 **LucidDreamer** (Chung et al., 2023)、**GenWarp** (Seo et al., 2024)）虽能对外推区域进行合理填充，却面临两个核心瓶颈：其一，生成过程仅作用于图像域，缺乏显式的几何约束，导致生成图像与场景几何失配；其二，修复过程仅依赖2D语义线索，在大幅视点变化和几何噪声下容易产生不一致的结构。
 
 这一困境揭示了当前少样本NVS领域的一个根本矛盾：**前馈方法受限于可投影区域，无法外推；生成式方法虽能外推，却缺乏几何对齐机制，难以保证图像与几何的一致性。** 更具体地，现有变形-修复框架将几何预测与图像生成解耦为两个独立步骤——先由现成几何模型（如 **DUSt3R** (Wang et al., 2024)）预测稀疏点云并投影，再对投影结果进行图像修复。这种串行范式使得图像生成无法感知几何修复中的不确定性，而几何预测也无法受益于图像的语义理解能力，最终导致两模态之间的系统性失配。
@@ -60,8 +58,6 @@ claims:
 此外，现有生成式NVS方法在输入条件上存在脆弱性：仅依赖投影点图作为对应条件，容易引入错误投影（如遮挡边界的拖影），且缺乏对几何可靠性的显式建模。大模型NVS方法（如 **LVSM** (Jin et al., 2024)、**ViewCrafter** (Yu et al., 2024)）虽凭借海量数据训练获得了强泛化能力，但其推理耗时较长，且同样未从根本上解决图像-几何对齐问题。
 
 针对上述缺口，本文提出 **MoAI（Cross-modal Attention Instillation）**，一种基于扩散模型的联合图像-几何生成框架。核心动机在于：**让图像生成与几何修复形成协同多任务学习——图像网络提供聚焦的语义注意力图，帮助几何网络捕获细粒度跨视角对应；几何网络的完成任务本身具有更强的结构确定性，反过来为图像生成提供正则化，约束其生成过程，从而使两者天然对齐。** 同时，通过基于邻近性的网格条件化（proximity-based mesh conditioning）滤除错误投影，增强对应条件的可靠性。这一设计使得MoAI在无位姿设定下，既能实现推理性外推，又能保证生成图像与几何的严格一致。
-
-
 
 ## 核心方法与创新机理
 
@@ -100,8 +96,6 @@ $$\mathbf{c^{t}} = [\mathcal{E}(X_{t}^{\mathrm{II}}), D_{t}^{\mathrm{II}}, N_{t}
 ### 创新总结
 
 三个 changed slots 形成递进关系：**任务范式**从单模态转向联合扩散奠定框架基础；**跨模态注意力注入**作为核心机制实现图像与几何的内在对齐；**网格条件化**提升输入条件的可靠性，为对齐提供更稳健的几何先验。三者协同使得 MoAI 在零样本外推（DTU 双视图 PSNR 15.58 vs. NoPoSplat 13.58）和域内外推（RealEstate10K PSNR 17.41 vs. NoPoSplat 14.36）任务上均取得显著领先，同时展现出对几何噪声和稀疏性的高度鲁棒性（Table 5-6, Figure 10-11）。
-
-
 
 MoAI 采用**变形-修复（warping-and-inpainting）**范式，将其从单图像域同时扩展到多视图图像域与几何域，构建了一个**图像与几何联合生成的扩散框架**。整体 pipeline 由三个核心阶段串联而成：现成几何预测 → 对应条件构建 → 双分支扩散修复。
 
@@ -149,8 +143,6 @@ $$\mathbf{c^{t}} = [\mathcal{E}(X_{t}^{\Pi}), D_{t}^{\Pi}, N_{t}^{\Pi}, M_{t}], 
 
 同时应用法线掩码，剔除法线方向与目标视角方向偏差超过 90° 的网格面片，有效滤除错误投影，提升外推场景下的条件质量。
 
-
-
 MoAI 框架围绕三个核心模块构建：**图像-几何双分支扩散架构**、**跨模态注意力注入（MoAI）** 和 **基于邻近性的网格条件化**。以下逐一展开其设计逻辑与关键公式。
 
 ### 1. 图像-几何双分支扩散架构
@@ -193,13 +185,6 @@ $$\mathbf{c^{t}} = [\mathcal{E}(X_{t}^{\mathrm{II}}), D_{t}^{\mathrm{II}}, N_{t}
 
 **因果机制**：网格表示通过邻近性隐式编码了三维结构的连续性约束，深度和法线线索为扩散模型提供了强几何先验，法线掩码则主动抑制了错误投影对生成过程的干扰。消融实验（Table 3）显示，从点图条件切换到网格条件化后，PSNR 从 16.55 提升至 17.10，验证了该模块的有效性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_vjvwYexMQn/figures/002_Figure_2.jpg]]
-*Figure 2: Training methodology. Our method conducts cross-modal attention instillation, replacing the spatial attention maps of geometry denoising networks with those of image denoising networks, so that the image generation U-Net learns a more robust representation aligned with the geometry completion task. On the other hand, the geometry prediction networks leverage the rich semantics from image features to enhance geometry completion capability*
-
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -208,16 +193,10 @@ MoAI 在零样本外推与域内外推两个关键场景上均显著超越了现
 
 在 **DTU 零样本外推** 设定（双视图）下，MoAI 的 PSNR 达到 **15.58**，较最优无位姿基线 **NoPoSplat**（Ye et al., 2024）的 13.58 提升 **+2.00 dB**（Table 1）。该设定对所有模型均为零样本，直接检验泛化能力。在单视图外推子设定中，MoAI 同样以 15.56 dB 的 PSNR 超越大模型基线 **ViewCrafter**（Yu et al., 2024）的 14.04 dB（Table 7），表明其以远小于大模型的参数量实现了更强的几何一致性生成。
 
-![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_vjvwYexMQn/figures/005_Table_1.jpg]]
-*Table 1: Zero-shot quantitative comparison. We compare our model to existing feedforward NVS methods (2-view setting) and warping-and-inpainting methods (1-view setting) on DTU Zhou et al. (2018) dataset, which is zero-shot setting for all the models. Our method shows superior performance in both extrapolative and original (interpolative) setting in both single-view and stereo-view settings*
-
 ![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_vjvwYexMQn/figures/014_Table_7.jpg]]
 *Table 7: Comparison to large model baselines. We quantitatively compare our model against recent large-scale models*
 
 在 **RealEstate10K 域内外推** 设定（双视图）下，MoAI 的 PSNR 达到 **17.41**，较 NoPoSplat 的 14.36 提升 **+3.05 dB**（Table 2）。该数据集上的大幅领先表明，即使在训练域内，前馈方法在视点大幅偏离参考视角时仍存在根本性能力瓶颈，而 MoAI 的变形-修复范式与几何正则化设计有效突破了这一限制。
-
-![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_vjvwYexMQn/figures/007_Table_2.jpg]]
-*Table 2: In-domain comparison. We compare our model to existing feedforward NVS methods in Realestate10K (Zhou et al., 2018) dataset, our method being superior in extrapolative setting*
 
 ### 消融实验：各模块的因果贡献
 
@@ -243,9 +222,6 @@ MoAI 对几何对应条件中的噪声和稀疏性表现出高度鲁棒性：
 - **高斯噪声扰动**（Table 5）：在对应条件上施加高斯噪声后，性能仅出现轻微下降，模型仍能保持合理的生成质量。Figure 10 的可视化表明，即使预测几何存在显著噪声，MoAI 仍能输出几何一致的修复结果。
 - **稀疏性鲁棒性**（Table 6, Figure 11）：当对几何对应条件施加高达 **80% 的点掩码**（即仅保留 20% 的几何点）时，模型性能保持稳定。这得益于网格条件化提供的连续表面表示以及图像注意力注入带来的语义补全能力。
 
-![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_vjvwYexMQn/figures/012_Table_5.jpg]]
-*Table 5: Robustness to Gaussian perturbation. Our model shows robustness against Gaussian perturbation to the correspondence condition*
-
 此外，**相机空间点图归一化**（Figure 8, Appendix A.3）被证实是提升几何一致性的关键工程实践。消融显示，移除该归一化会导致边界模糊、几何对齐退化，表明归一化有效稳定了不同相机位姿下的几何表示尺度。
 
 ![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_vjvwYexMQn/figures/013_Figure_8.jpg]]
@@ -255,18 +231,12 @@ MoAI 对几何对应条件中的噪声和稀疏性表现出高度鲁棒性：
 
 尽管 MoAI 仅在双视图设定下训练，其多视图聚合注意力机制使其在推理时可泛化至任意数量的参考图像。Table 4 和 Table 8（Co3D 数据集）的定量分析表明，随着参考视角数量增加，图像与几何生成性能 **持续提升**。Figure 18 的定性结果进一步显示，更多参考视角提供了更丰富的对应信息，使模型在外推区域生成更完整的几何结构和更一致的纹理。
 
-![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_vjvwYexMQn/figures/011_Table_4.jpg]]
-*Table 4: Quantitative analysis regarding number of input viewpoints. We demonstrate improved performance with additional viewpoints at inference for both image and geometry generation, despite training only on two-view settings*
-
 ### 大模型基线对比
 
 Table 7 将 MoAI 与 **LVSM**（Jin et al., 2024）、**ViewCrafter**（Yu et al., 2024）等近期大模型 NVS 方法进行了定量对比。在 DTU 单视图设定下，MoAI 以 PSNR 15.56 超越 ViewCrafter 的 14.04，同时在推理时间上具有显著优势（Figure 7）。在 Navi 数据集上的定性对比（Figure 9）显示，MoAI 在保持几何一致性的同时，生成质量与大模型方法具有竞争力，验证了显式几何对齐相对于纯生成式方法的优势。
 
 ![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_vjvwYexMQn/figures/009_Figure_7.jpg]]
 *Figure 7: Qualitative comparison with large model-based NVS methods. Qualitative comparison of our method to previous approaches demonstrates our method’s superior capabilities in conducting geometrically coherent image novel view synthesis with relatively short inference time*
-
-![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_vjvwYexMQn/figures/015_Figure_9.jpg]]
-*Figure 9: Qualitative comparison with large models on Navi (Jampani et al., 2023) Dataset. Our model shows competitive performance against large model-based novel view synthesis models*
 
 ### 外推场景下的遮挡与光照处理
 
@@ -275,8 +245,6 @@ Figure 13 展示了 MoAI 在极端外推视角（目标相机与参考视角夹�
 ### 失败模式与局限
 
 当前方法的一个潜在局限在于其对现成几何预测模型（如 **VGGT**）的依赖。若参考视角的几何预测质量较差（如纹理缺失区域或极端视角变化），投影点图和网格条件的可靠性将降低，可能影响外推和对齐性能。文中未对此进行专项消融，但 Table 5 和 Table 6 的鲁棒性实验间接表明，MoAI 对几何噪声和稀疏性具有相当程度的容忍度。在域外城市数据（Figure 12, MegaDepth, CityScapes）上的泛化结果进一步说明，即使几何预测模型的训练域与测试域不匹配，MoAI 仍能保持高保真度的新视角合成能力。
-
-
 
 ## 定位与知识库关联
 
@@ -333,8 +301,6 @@ MoAI 依赖现成几何预测模型（VGGT，Wang et al., 2024; 2025）提供初
 **域外泛化的边界。** Figure 12 展示了在城市数据（MegaDepth, CityScapes）上的泛化结果，但缺乏大规模域外定量评估。MoAI 在室内场景（RealEstate10K）训练后向室外场景迁移的性能边界尚需进一步验证。
 
 **多模态对齐的度量。** 当前评估主要依赖图像质量指标（PSNR/SSIM/LPIPS），对几何对齐的评估仅通过可视化（Figure 14 使用 DepthAnything V3 进行对齐验证）。缺乏直接量化图像-几何对齐程度的指标，这限制了方法在精确对齐要求场景中的可信度。
-
-
 
 ## 原文 PDF
 

@@ -74,8 +74,6 @@ ShapeR 的方法设计围绕三个关键创新点展开：
 
 ShapeR 的局限性包括：低图像质量或可见视角有限时重建可能不完整；堆叠或紧贴物体可能导致网格包含相邻结构；依赖上游三维实例检测，检测遗漏则无法重建（图 15）。开放问题包括：对动态场景或移动物体的处理能力、单目重建的计算开销、合成场景数据类别覆盖有限对开放词汇重建的影响，以及在极端遮挡和低纹理场景下的鲁棒性。
 
-
-
 三维形状生成与重建是计算机视觉和图形学领域长期关注的核心问题。近年来，基于学习的模型在受控条件下取得了显著进展，能够从单张或多张图像中生成高质量的三维网格。然而，这些模型大多建立在理想化的假设之上：输入图像需要清晰的物体可见性、干净的背景、精细的分割掩码，以及良好的光照和视角条件。一旦将这些模型部署到真实世界的室内外随意采集场景中，其性能便会急剧下降。
 
 随意采集（casual capture）是指用户使用手机或头戴设备在日常环境中自然拍摄的图像序列。这类场景普遍存在**遮挡、杂乱背景、低分辨率、运动模糊、视角随意**等复杂因素（Figure 2）。例如，一张桌子上的马克杯可能被其他物品部分遮挡，或处于低光照条件下难以辨识边界。在这种非受控条件下，现有方法的多个关键假设被逐一打破。
@@ -91,8 +89,6 @@ ShapeR 的局限性包括：低图像质量或可见视角有限时重建可能�
 上述缺口共同指向一个根本性问题：**如何在无需显式分割的前提下，利用多模态互补信号，在随意采集的复杂场景中鲁棒地生成度量一致且完整的物体形状？**
 
 ShapeR 正是围绕这一核心瓶颈展开设计。其核心洞察在于：稀疏 SLAM 点云提供的全局几何先验与多视角图像、文本描述形成互补——校正流变换器可以利用这些多模态线索隐式感知目标物体边界并去噪生成完整形状，而无需任何显式分割掩码。同时，通过大规模在机增强和两阶段课程训练策略，模型得以弥合合成训练数据与真实随意采集场景之间的分布鸿沟。
-
-
 
 ## 核心方法与创新机理
 
@@ -134,8 +130,6 @@ $$\dot{z}_t = f_\theta(z_t, t, C), \quad t \in [0,1]$$
 $$\mathcal{L}_{\mathrm{FM}} = \mathbb{E}_{t, z_t, C} \left[ ||f_\theta(z_t, t, C) - (z_0 - z_1)||_2^2 \right]$$
 
 这一生成框架使 ShapeR 能够从多模态条件中稳定地采样出高质量、度量一致的三维形状。
-
-
 
 ShapeR 将随意采集序列中的物体重建形式化为一个**多模态条件校正流生成问题**。其核心设计理念是：不依赖显式 2D 分割掩码，而是通过稀疏 SLAM 点云提供的全局几何先验，结合多视角图像和文本描述，隐式地感知目标物体边界并生成度量一致、完整的形状。
 
@@ -186,12 +180,8 @@ ShapeR 的鲁棒性关键依赖于其训练策略，而非单纯的模型架构�
 
 消融实验证实了这一策略的有效性：仅物体级预训练而不进行场景微调，Chamfer Distance 从 2.375 升至 3.053；移除点云增强或图像增强也分别导致 CD 升至 3.276 和 3.397，验证了在机增强对真实场景泛化的关键作用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2267_https_arxiv_org_abs_2601_11514/figures/002_Figure_2.jpg]]
 *Figure 2: (Top) Objects captured in casual settings pose challenges like clutter, poor viewpoints, low resolution, noise, motion blur, and occlusions that are difficult to segment, even interactively. (Bottom) State-of-the-art 3D models often fail in these scenarios, while ShapeR remains robust and effective*
-
-
 
 ShapeR 将面向物体的三维形状生成建模为一个校正流（rectified flow）过程，在由三维变分自编码器（3D VAE）学到的潜空间中进行去噪。整个流程的关键模块和公式如下。
 
@@ -251,27 +241,14 @@ $$
 
 去噪后的潜变量 $z_0$ 经解码器 $D$ 生成有符号距离场，通过 Marching Cubes 提取等值面得到网格，最后利用 SLAM 点云 $P_i$ 的度量信息将网格缩放回原始坐标系，确保重建结果具有度量一致性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2267_https_arxiv_org_abs_2601_11514/figures/003_Figure_3.jpg]]
 *Figure 3: The ShapeR denoising transformer, built on the FLUX DiT architecture, denoises latent VecSets by conditioning on multiple modalities: posed images, SLAM points, captions, and the 2D projections of SLAM points observed in those input images. SLAM points are encoded with a sparse 3D ResNet, images using a frozen DINOv2 backbone, poses using Plucker encodings, and ¨ projection masks via a 2D convolutional network. The denoised latent is decoded into a SDF, from which the final object shape is extracted using marching cubes*
-
-![[assets/figures/papers/paper_list_l2267_https_arxiv_org_abs_2601_11514/figures/005_Figure_5.jpg]]
-*Figure 5: (Left) We pretrain on 600K object meshes with extensive, compositional augmentations across all modalities, simulating realistic backgrounds via image compositing, and introducing diverse occlusions and noise in both images and SLAM points. (Right) We then fine-tune on object-centric crops from Aria Synthetic Environment scenes, which feature realistic image occlusions, SLAM point cloud noise, and inter-object interactions*
-
-![[assets/figures/papers/paper_list_l2267_https_arxiv_org_abs_2601_11514/figures/004_Figure_4.jpg]]
-*Figure 4: Incorporating SLAM points significantly enhances robustness. These points provide a complementary geometric signal to posed images, encoding aggregated shape information across the entire sequence*
-
-
 
 ## 实验与关键发现
 
 ### 评估设置
 
 为系统衡量 ShapeR 在真实随意采集场景下的鲁棒性，作者构建了 **ShapeR Evaluation Dataset**，包含 7 段随意采集序列、共 178 个物体，覆盖桌椅、电器、箱包等多种室内外类别。每段序列通过将物体单独取出、在无遮挡条件下拍摄高质量图像、利用图像到 3D 模型生成几何、再经人工对齐回原序列的方式获取伪真值网格（Figure 12）。该数据集的核心特点是：**遮挡、杂乱、低分辨率、运动模糊和非受控视角**，远超市面现有 3D 重建基准的难度（Figure 10, Figure 13）。
-
-![[assets/figures/papers/paper_list_l2267_https_arxiv_org_abs_2601_11514/figures/018_Figure_12.jpg]]
-*Figure 12: To obtain pseudo-ground truth geometry for an object in the sequence (left), we first place the object in isolation to avoid clutter and occlusion, and capture a high-quality, uncluttered image. We then apply segmentation and image-to-3D modeling to generate the object’s geometry (mid). This geometry is manually aligned and inserted back into the original casual sequence using a web annotation interface, verified by matching 2D projections to image silhouettes and by checking alignment with the sequence’s point cloud (right)*
 
 评估指标采用双向 **Chamfer Distance (CD↓)**、**Normal Consistency (NC↑)** 和 **F1-score (F1↑)**。对比方法涵盖三类：
 
@@ -321,9 +298,6 @@ Table 1 下半部分揭示了各组件的因果贡献：
 
 Figure 15 系统总结了 ShapeR 的三类主要失败模式：
 
-![[assets/figures/papers/paper_list_l2267_https_arxiv_org_abs_2601_11514/figures/021_Figure_15.jpg]]
-*Figure 15: ShapeR limitations. (a) Low image fidelity or limited views lead to incomplete or low-detail reconstructions. (b) Closely stacked or attached objects can cause meshes to include parts of adjacent structures, even when the point associated with these structures are not in the input (c) ShapeR relies on upstream 3D detection; missed or inaccurate detections result in unrecoverable objects*
-
 - **低质量输入**：当物体可见视角极少或图像分辨率过低时，重建结果不完整或缺乏细节（Figure 15a）。这本质上是信息瓶颈——多视图互补信号不足，流模型无法凭空推断缺失几何。
 - **紧贴/堆叠物体**：对于堆叠或紧贴的物体（如桌上物品相互接触），生成网格有时会包含相邻物体的部分结构（Figure 15b）。尽管 2D 点云掩码提示缓解了该问题，但当物体边界在 3D 空间中高度模糊时，隐式分割仍有局限。
 - **上游检测依赖**：ShapeR 依赖 3D 实例检测的召回率；若检测遗漏或包围框不准确，对应物体无法重建（Figure 15c）。这是级联系统的固有弱点，而非生成模型本身的问题。
@@ -332,21 +306,11 @@ Figure 15 系统总结了 ShapeR 的三类主要失败模式：
 
 Figure 13 揭示了采集条件从受控到随意的性能退化趋势：DTC Active（严格环绕采集）→ DTC Passive（自由移动）→ ShapeR Evaluation（真实随意场景），挑战性非线性增长。基线方法（如 LIRM）在 DTC Passive 上已有明显退化，在 ShapeR Evaluation 上崩溃；ShapeR 的指标退化相对平缓，验证了多模态条件与增强训练策略对分布外场景的泛化能力。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2267_https_arxiv_org_abs_2601_11514/figures/009_Figure_7.jpg]]
 *Figure 7: Qualitative comparison against foundation image-to-3D models. For these baselines, we manually select a view with clear object visibility and use interactive SAM2-based segmentations to provide optimal input. In contrast, ShapeR operates fully automatically on multiple posed views and preprocessed inputs, requiring no manual intervention*
 
-![[assets/figures/papers/paper_list_l2267_https_arxiv_org_abs_2601_11514/figures/008_Table_2.jpg]]
-*Table 2: Percentage of users who prefer our method over the image-to-3d baselines over 660 responses. Our generated meshes are preferred significantly more often*
-
-![[assets/figures/papers/paper_list_l2267_https_arxiv_org_abs_2601_11514/figures/025_Table_4.jpg]]
-*Table 4: Reconstruction results on the DTC [23] Active and Passive datasets, each with approximately 100 sequences, compared against LIRM [44]. ShapeR achieves comparable performance to LIRM on the highly controlled Active sequences, and surpasses LIRM on the more challenging Passive sequences*
-
 ![[assets/figures/papers/paper_list_l2267_https_arxiv_org_abs_2601_11514/figures/011_Figure_9.jpg]]
 *Figure 9: Ablations of components. (a) Without point augmentations, the model overfits to point inputs, missing geometry in regions without points. Image augmentations address occlusions and incomplete objects crops. Omitting background composition requires presegmentation, which can introduce noisy masks and prediction errors. (b) Fine-tuning on scene-centric crops improves robustness in challenging scenarios over object-centric training alone. (c) Prompting DINO features with 2D point projections clarifies which object to reconstruct in cluttered scenes, reducing confusion from nearby objects and improving reconstruction accuracy*
-
-
 
 ## 定位与知识库关联
 
@@ -421,8 +385,6 @@ ShapeR 依赖三个上游模块：视觉惯性 SLAM 提取稀疏点云和位姿�
 ### 5. 知识库定位
 
 ShapeR 在三维视觉知识库中的定位可概括为：**连接多视图几何重建与三维生成建模的桥梁性工作**。它从多视图几何中继承了度量尺度和多视角互补性（通过 SLAM 和位姿），从生成建模中继承了处理模糊性和补全遮挡区域的能力（通过校正流变换器），并通过隐式分割机制摆脱了对显式掩码的依赖。其两阶段课程训练策略为将合成数据上训练的生成模型迁移至真实非受控场景提供了一套可复用的范式。
-
-
 
 ## 原文 PDF
 

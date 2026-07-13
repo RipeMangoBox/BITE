@@ -59,8 +59,6 @@ claims:
 
 在定量结果上，扩散方法在PSNR/SSIM上普遍优于经典和MBIR方法，但往往不及监督学习方法SwinIR。例如在医学CT（40投影、无噪声）配置下，DDS达到31.43/0.84，而SIRT为30.40/0.80；在真实同步辐射数据（60投影）上，SwinIR以32.41/0.70领先，SIRT为27.92/0.52。
 
-
-
 计算机断层扫描（CT）重建在数学上可建模为线性逆问题 $\pmb{y} = \pmb{A} \pmb{x}$，其中 $\pmb{A}$ 为系统矩阵。然而，实际CT成像面临远超理想线性模型的复杂挑战：泊松噪声经对数变换后变为非平稳高斯噪声、非线性预处理步骤、以及环形伪影和射束硬化等多种伪影，使得从欠定或含噪测量中恢复高质量图像变得极为困难。
 
 传统重建方法长期依赖启发式先验，如全变分（TV）正则化，通过交替方向乘子法（**ADMM-PDTV**, Boyd et al., 2011）或快速迭代收缩阈值算法（**FISTA-SBTV**, Beck & Teboulle, 2009）求解。这些基于模型的迭代重建（MBIR）方法虽在特定条件下表现稳定，但其手工设计的先验表达能力有限，难以捕捉复杂的解剖结构纹理。近年来，数据驱动先验成为主流方向，包括利用配对稀疏/稠密视图图像训练深度网络的监督学习方法（如基于Transformer的**SwinIR**, Liang et al., 2021），以及不依赖训练数据的隐式先验方法，如深度图像先验（**DIP**, Ulyanov et al., 2018）和隐式神经表示（**INR/SIREN**, Sitzmann et al., 2020）。
@@ -68,8 +66,6 @@ claims:
 扩散模型作为生成式先验在各类逆问题中展现出巨大潜力，多个方法已被快速引入CT重建领域。然而，这些方法在数据一致性策略、先验强度控制、噪声模型假设等方面存在显著差异，缺乏系统性的对比和诊断。具体而言，扩散方法引入测量条件的方式可大致分为三类：基于梯度的软约束引导（如**DPS**, Chung et al., 2023）、通过优化步骤强制数据一致性（如**DDS**, Chung et al., 2024 和 **ReSample**, Song et al., 2024）、以及基于伪逆残差的引导（如**MCG**, Chung et al., 2022 和 **PGDM**, Song et al., 2023a）。此外，部分方法在像素空间操作，另一些则采用潜在空间扩散（如**PSLD**, Rout et al., 2023），两者在计算效率和重建保真度上的权衡尚不明确。更重要的是，实际CT中的泊松噪声特性与多数扩散方法假设的高斯噪声模型之间存在根本性不匹配，这一差距对重建质量的影响程度缺乏定量评估。
 
 上述方法碎片化与评估标准不统一的现状，构成了DM4CT基准测试的核心动机：在统一的CT正向模型和共享扩散先验下，系统揭示不同数据一致性策略、先验强度与噪声鲁棒性之间的因果机制，为扩散模型在医学与工业CT重建中的实际部署提供可操作的指导。
-
-
 
 ## 核心方法与创新机理
 
@@ -98,8 +94,6 @@ DDS 方法假设高斯似然（$\mathcal{L}(\pmb{x}) = \frac{\gamma}{2} \| \pmb{
 ---
 
 **需注意**：上述创新均为 DM4CT 基准测试所揭示的**领域洞察**，而非 DM4CT 自身提出的新算法。DM4CT 的贡献在于通过统一的实验平台（共享扩散主干、统一正向算子、公平超参数调优）使这些洞察得以被可靠地量化与比较。
-
-
 
 ![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_YE5scJekg5/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the DM4CT benchmark. (a) The reconstruction pipeline, where representative diffusion and baseline methods are applied to measured sinograms using the same forward model. (b) The datasets used in the benchmark, including two simulated CT datasets (medical and industrial) and one real-world dataset acquired at a synchrotron facility. (c) The five simulation configurations used to evaluate robustness to limited views, noise, and ring artifacts. Two example FBP reconstructions under noise and ring artifact conditions are shown. (d) The evaluation metrics, including both qualitative (visual) and quantitative (image quality and computational efficiency) criteria*
@@ -139,8 +133,6 @@ DM4CT 构建了一个统一的 CT 重建基准测试框架，其核心设计目�
 ### 方法分类体系
 
 Table 1 将 11 种扩散方法按两个维度组织：**实现技术**（像素空间 vs 潜在空间、DDPM vs DDIM 采样）和**重建策略**（数据一致性梯度引导 DC-grad、优化步骤 DC-step、伪逆引导、即插即用先验、变分贝叶斯）。这一分类体系揭示了方法设计的核心分叉点——如何在反向扩散过程中引入测量信息，直接决定了先验强度与数据保真度之间的权衡。
-
-
 
 ### 3.1 CT测量模型与逆问题形式化
 
@@ -248,8 +240,6 @@ $$\pmb{x} = \pmb{A}^{\dagger} \pmb{A} \pmb{x} + (\pmb{I} - \pmb{A}^{\dagger} \pm
 
 为消除先验差异对比较的影响，每个数据集分别训练一个像素空间和一个潜在空间扩散模型，作为所有扩散方法的共享主干（Section 3.3）。这一设计确保了方法间性能差异仅源于数据一致性策略，而非先验质量。消融实验进一步揭示：早期中止训练（25 epoch）的扩散模型重建精度（PSNR 30.68/0.75）优于完全训练模型（28.71/0.73），表明**先验强度而非生成质量**是逆问题中的关键因素（Table 9）。
 
-
-
 ## 实验与关键发现
 
 ### 整体性能格局：扩散方法在定量指标上的优势与上限
@@ -278,9 +268,6 @@ Figure 3a揭示了扩散CT重建中最关键的调控变量——数据一致性
 
 Figure 4通过范围-零空间分解（range-null space decomposition）揭示了不同数据一致性策略的根本差异。将重建信号分解为$\pmb{x} = \pmb{A}^{\dagger}\pmb{A}\pmb{x} + (\pmb{I} - \pmb{A}^{\dagger}\pmb{A})\pmb{x}$，范围分量对应测量约束的部分，零空间分量对应先验引入的内容。
 
-![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_YE5scJekg5/figures/006_Figure_4.jpg]]
-*Figure 4: Decomposition of reconstructions into range and null space components for different data consistency strategies with config i). For each method, the full reconstruction is shown on the left, with zoomed-in red insets of the range component in the center and the corresponding null component on the right. The top-left of each null component indicates its relative L2 energy as a percentage of the total reconstruction, reflecting the extent of content introduced by the prior. Zoom in for details*
-
 **基于梯度引导的方法（DC-grad，如DPS）施加软约束，允许更多零空间内容。** 在Figure 4中，DPS的零空间能量占比显著高于其他方法，表明其重建中保留了更多由扩散先验驱动的结构细节。**相比之下，基于优化步骤的方法（DC-step，如ReSample）严格强制数据一致性，零空间分量较小。** 这种差异在视觉上表现为：DPS倾向于产生更自然的纹理但可能偏离测量约束，而ReSample更忠实于投影数据但可能丢失先验带来的细节增强。
 
 在噪声测量条件下，这一差异进一步放大。Figure 16（工业数据，噪声+环形伪影）显示，DPS在噪声下仍能保持合理的零空间结构，而强制数据一致性的方法（如ReSample）在噪声情况下容易将噪声“刻入”重建，导致范围分量中出现伪影。**这解释了为什么基于梯度引导的方法在噪声测量下产生更高质量的视觉结果：软约束机制天然具有抗噪声过拟合的能力。**
@@ -299,9 +286,6 @@ Table 9和Figure 15呈现了一个反直觉的结果：**训练仅25 epoch的像
 ### 噪声模型不匹配：扩散方法的致命弱点
 
 Figure 11（Section A.9）揭示了扩散方法在实际CT中最严重的失效模式。实验构造了高斯噪声和泊松噪声两种场景，使FBP基线达到相近的PSNR/SSIM。DDS在高斯噪声下能够恢复精细结构，但在泊松噪声下重建质量严重退化——无论是视觉细节还是定量指标。
-
-![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_YE5scJekg5/figures/020_Figure_11.jpg]]
-*Figure 11: Effect of noise model mismatch on DDS. Gaussian and Poisson noise are simulated to produce similar FBP baselines (roughly PSNR/SSIM). DDS reconstructs fine details under Gaussian noise but degrades significantly under Poisson noise, both visually and quantitatively*
 
 **根源在于DDS的数据保真项显式假设了高斯似然**，其目标函数为$\mathcal{L}(\pmb{x}) = \frac{\gamma}{2} \| \pmb{y} - \pmb{A}\pmb{x} \|_2^2 + \frac{1}{2} \| \pmb{x} - \hat{\pmb{x}}_0 \|_2^2$。当实际噪声为泊松分布（如CT中光子计数经对数变换后）时，高斯假设导致数据一致性步骤将泊松噪声的异方差特性错误地视为均匀误差，从而在低计数区域过度拟合噪声。
 
@@ -332,24 +316,10 @@ Table 6使用SAM对医学CT重建结果进行语义分割，以Dice/IoU评估下
 4. **真实数据覆盖不足**：仅包含岩石样本，未涉及活体组织的运动伪影和复杂密度分布。
 5. **方法覆盖缺口**：未包含流匹配、一致性模型等新兴生成框架，也未系统评估噪声自适应策略。
 
-### 补充图表
 
-![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_YE5scJekg5/figures/002_Table_1.jpg]]
-*Table 1: Diffusion-based methods evaluated in DM4CT. Columns under Technique refer to implementation choices (e.g., latent-space diffusion or DDIM-based sampling). Columns under Reconstruction Strategy denote how measurement conditioning is incorporated, including data consistency gradient steering (DC-grad), separate optimization steps (DC-step), plug-and-play priors, and use of approximate pseudoinverse solutions. $\mathrm { ~ \ r ~ { ~ A ~ } ~ } \ell ^ { \ast }$ indicates only a single-step update toward the pseudoinverse. A $\checkmark ^ { \ddagger }$ indicates methods that incorporate data fidelity via a conjugate-gradient solve rather than a direct pixel-space optimization step
-
-![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_YE5scJekg5/figures/014_Table_3.jpg]]
-*Table 3: Simulation parameters used for generating noisy and artifact-corrupted sinograms. $I _ { 0 }$ controls the Poisson noise level based on the Beer–Lambert model (see Equation 11), while $p _ { \mathrm { r i n g } }$ and $\sigma ^ { 2 }$ define the severity and intensity of ring artifacts (see Equation 14). $\sigma _ { y _ { 0 } }$ is the standard deviation of original clean measurement y0. A value of “–” indicates no corruption of that type
 
 ![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_YE5scJekg5/figures/015_Table_4.jpg]]
 *Table 4: Acquisition parameters of the real-world synchrotron CT dataset used in this benchmark. Both rocks are scanned using the same setup under parallel-beam geometry*
-
-![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_YE5scJekg5/figures/018_Table_5.jpg]]
-*Table 5: Reconstruction from raw projections (40 angles) under value range misalignment, corrected using an empirical linear mapping. Results are approximate and intended to demonstrate feasibility rather than optimal performance. PSNR and SSIM are computed slice-wise in 2D and averaged across slices, using the corresponding physical value range of each reference slice*
-
-![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_YE5scJekg5/figures/023_Table_7.jpg]]
-*Table 7: Representation (autoencoder reconstruction) and CT reconstruction quality for fine-tuned natural-image encoders. Values are PSNR/SSIM*
-
-
 
 ## 定位与知识库关联
 
@@ -408,8 +378,6 @@ DM4CT 揭示了一个关键发现：**像素空间扩散在 CT 重建中普遍�
 - 训练至过拟合的扩散模型为何在逆问题中性能下降——其深层机理是模式坍塌、先验过度约束，还是后验采样的退火路径偏移？
 - 噪声模型自适应的扩散方法（如对泊松噪声显式建模）能否在实际临床 CT 数据上实现性能跃升？
 - 扩散先验与隐式神经表示（INR）的结合是否能同时利用扩散的强先验和 INR 的结构连续性，提升稀疏角度下的细节保真度？
-
-
 
 ## 原文 PDF
 

@@ -150,11 +150,6 @@ $$R(\tau) = \underbrace{R_{\mathrm{acc}}(\tau) + R_{\mathrm{format}}(\tau) + \la
 
 三个核心模块呈递进互补关系：SPF-DPP 提供高质量的初始视觉证据；BEV 接地使模型能够在推理中主动获取缺失视点；Spatial MCoT 则将这些能力组织为迭代的假设-验证循环。消融实验证实了这一互补性：仅添加 Spatial MCoT 将基线从 59.4 提升至 61.9；引入 BEV 接地进一步提至 62.7（+3.3 over baseline）；叠加 SPF-DPP 达到最优 63.5（+0.8）。框架对位姿噪声具有鲁棒性：中等噪声（5% 平移，5° 旋转）下 VSI-Bench 分数仅下降 0.4%，更换 SLAM 后端为 VGGT 后性能为 63.2（-0.3），表明对特定 SLAM 系统的依赖较弱。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2387_https_arxiv_org_abs_2512_15160/figures/001_Figure_1.jpg]]
-*Figure 1: Overview of EagleVision. Conventional MLLMs either answer spatial questions without reasoning (1) or reason in text only without accessing additional views (2). EagleVision introduces a dual-stage framework: (1) Macro perception selects a compact set of keyframes by jointly optimizing semantic relevance and geometric (viewpoint) diversity under a token budget. (2) Micro verification performs iterative spatial Chain-of-Thought (CoT) with active view selection—the model reasons in text, requests new frames by querying poses on a Bird’s-Eye-View (BEV) map, and refines its answer through a closed-loop hypothesize–look–verify cycle*
-
 ![[assets/figures/papers/paper_list_l2387_https_arxiv_org_abs_2512_15160/figures/002_Figure_2.jpg]]
 *Figure 2: Framework of EagleVision. The framework operates in two stages: (i) Macro perception selects spatially informative keyframes under a token budget by jointly optimizing semantic relevance and viewpoint diversity. (ii) Micro verification performs iterative spatial CoT with active BEV-grounded pose querying to refine spatial understanding*
 
@@ -240,11 +235,6 @@ $$R_{\text{spatial}}(\tau) = \begin{cases} -1, & \text{if } \exists t \in \mathc
 | $s_{tj} = \exp[-\frac{1}{2}(\frac{\|(\hat{x}_t,\hat{y}_t)-(x_j,y_j)\|^2}{\sigma_p^2} + \beta^2(\hat{r}_t - r_j)^2)]$ | $\sigma_p$：位置尺度；$(\hat{x}_t,\hat{y}_t,\hat{r}_t)$：查询姿态；$(x_j,y_j,r_j)$：候选帧姿态 |
 | $R_{\text{spatial}}(\tau) = -1 \text{ if } s_{\max}^{(t)} < \tau_s \text{ else } 0$ | $\tau_s$：覆盖阈值；$s_{\max}^{(t)}$：第 $t$ 步最大帧相似度 |
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2387_https_arxiv_org_abs_2512_15160/figures/003_Figure_3.jpg]]
-*Figure 3: Macro Perception. Given an input video and a question, we first reconstruct the scene geometry and camera trajectory in SE(3) to build a sparse pose graph, whose heat-kernel diffusion yields the viewpoint kernel*
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -292,12 +282,6 @@ EagleVision 对位姿噪声表现出强鲁棒性：在中等噪声水平（平�
 
 ![[assets/figures/papers/paper_list_l2387_https_arxiv_org_abs_2512_15160/figures/009_Table_4.jpg]]
 *Table 4: Ablation study of GRPO reward terms. Acc. means accuracy reward*
-
-![[assets/figures/papers/paper_list_l2387_https_arxiv_org_abs_2512_15160/figures/007_Table_5.jpg]]
-*Table 5: SPF-DPP hyper-parameter sensitivity. Each parameter is varied while others are held at defaults (β=2, τ =2, α=0.5, b=24). Default settings are in the supplementary*
-
-![[assets/figures/papers/paper_list_l2387_https_arxiv_org_abs_2512_15160/figures/012_Table_6.jpg]]
-*Table 6: Robustness under pose noise and with VGGT backend*
 
 ## 定位与知识库关联
 

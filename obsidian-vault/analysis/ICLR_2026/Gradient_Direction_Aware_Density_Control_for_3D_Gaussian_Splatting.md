@@ -51,8 +51,6 @@ claims:
 
 在Mip-NeRF360、Tanks&Temples和Deep Blending三个标准数据集上，GDAGS的PSNR分别达到28.02、23.79和29.70，全面优于3DGS基线，同时内存占用更低。值得注意的是，GDAGS仅需Pixel-GS的20%–50%内存即可达到相近或更优的渲染质量。消融实验验证了非线性权重函数相较线性替代方案的显著优势，以及指数幂参数$p=15$在质量与效率之间的最佳折衷。该方法还展现出良好的泛化性，可即插即用地集成到MCMC-3DGS和Compact-3DGS等3DGS变体中并带来一致的性能提升。
 
-
-
 ### 3D高斯泼溅的密度控制瓶颈
 
 3D高斯泼溅（3D Gaussian Splatting, 3DGS）通过一组可微的3D高斯椭球体显式表示场景几何与外观，并依赖周期性的密度控制操作（分裂与克隆）来动态调整高斯数量，以重建复杂几何细节。其核心决策依据是**视空间位置梯度的平均范数** $\nabla_{\mu_i} L$（见公式4）：当该范数超过预设阈值 $\tau_p$ 时，系统根据高斯的3D尺度决定执行分裂（尺度大于 $\tau_s$）或克隆（尺度不大于 $\tau_s$）。
@@ -80,8 +78,6 @@ claims:
 - 当高斯位于平坦区域时，子梯度方向高度一致，GCR趋近于1，应抑制克隆以避免冗余增殖。
 
 基于此，本文提出**GDAGS（Gradient-Direction-Aware Gaussian Splatting）** ，通过计算每个高斯的GCR并将其映射为非线性动态权重，对原始梯度范数进行方向感知调制，从而在分裂与克隆操作中实现差异化控制：在分裂时放大方向冲突高斯的权重以促进细节重建，在克隆时采用逆策略抑制方向一致高斯的过度增殖。这一设计在不牺牲渲染质量的前提下，显著降低了内存开销，实现了几何精度与存储效率的平衡。
-
-
 
 ## 核心方法与创新机理
 
@@ -117,8 +113,6 @@ $$w_i = \alpha + \beta \cdot (1 - \mathcal{C}_i)^p$$
 
 消融实验（Table 2）直接验证了非线性权重函数相对于线性替代方案 $w_i = 2 - \mathcal{C}_i$（GDAGS-L）的优越性：非线性形式通过幂次 $p$ 放大了 GCR 微小差异的影响，使得权重函数对方向冲突更加敏感，同时更有效地抑制方向一致高斯的权重。这一设计选择是 GDAGS 性能提升的关键因素之一。
 
-
-
 GDAGS 在 3DGS 的密度控制流程中插入了一个轻量的**方向感知调制模块**，不改变原始训练管线的主体结构，仅替换密度化决策所依赖的梯度度量。整体流水线如 Figure 2 所示，包含三个串联的功能模块：
 
 ![[assets/figures/papers/paper_list_l84_https_openreview_net_forum_id_6qDxK4Gz7F/figures/002_Figure_2.jpg]]
@@ -131,8 +125,6 @@ GDAGS 在 3DGS 的密度控制流程中插入了一个轻量的**方向感知调
 3. **加权密度决策**：用调制后的梯度范数 $\tilde{\nabla}_{\mu_i} L = w_i \cdot \nabla_{\mu_i} L$ 替代原始 3DGS 的视空间位置梯度范数，与预设阈值比较决定分裂或克隆。在分裂操作中直接使用 $w_i$，优先分裂存在方向冲突的大高斯以解决过重建；在克隆操作中采用逆策略 $1/w_i$，鼓励方向一致的小高斯沿表面传播，同时抑制方向不一致区域的过度增殖。
 
 整个模块作为 3DGS 密度化步骤的即插即用替换，计算开销集中在 GCR 的逐像素梯度聚合上，不引入额外的可学习参数。超参数 $\alpha$、$\beta$、$p$ 在所有数据集和场景上保持固定，无需场景特定调优。
-
-
 
 ### 3DGS 密度控制的原始机制与瓶颈
 
@@ -180,16 +172,6 @@ $$\tilde{\nabla}_{\mu_i} L = w_i \cdot \nabla_{\mu_i} L$$
 - **克隆阶段**：采用逆策略 $1/w_i$。方向一致的高斯（高 $\mathcal{C}_i$）获得更高权重，沿表面方向传播小高斯，增强局部密度；而方向不一致的高斯被抑制克隆，避免过密化。
 
 这一差异化调制（Figure 2 流水线所示）是 GDAGS 平衡几何细节与存储开销的因果机制：分裂优先处理方向冲突的大高斯以缓解过重建，克隆抑制方向不一致的小高斯以遏制过密化。消融实验证实了这一设计的有效性：仅在分裂阶段施加权重（GDAGS-S）可有效提升 SSIM 和 LPIPS 并减少内存，仅在克隆阶段施加权重（GDAGS-C）则提升 PSNR 但增加内存开销，完整 GDAGS 在两者间取得最优平衡。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l84_https_openreview_net_forum_id_6qDxK4Gz7F/figures/001_Figure_1.jpg]]
-*Figure 1: (a) illustrates the Gaussian ellipsoid splatting process, where arrows of different colors represent the gradient direction and magnitude of different Gaussians on the pixels. (b) shows the densification process of different methods. In 3DGS, a large Gaussian covering many pixels may fail to split because the combined gradient magnitude from different pixels falls below the threshold, leading to over-reconstruction as shown in the Rendered part of (c), which manifests as blurry areas. AbsGS forces all Gaussian gradients to be positive, causing the combined gradient magnitude from different pixels to increase significantly. This results in a substantial rise in the number of splitting Gaussi...*
-
-![[assets/figures/papers/paper_list_l84_https_openreview_net_forum_id_6qDxK4Gz7F/figures/011_Figure_7.jpg]]
-*Figure 7: Corresponding curves of weights for different hyperparameters*
-
-
 
 ## 实验与关键发现
 
@@ -260,9 +242,6 @@ Table 4的效率分析表明，GDAGS的训练时间在三个数据集上均为�
 ![[assets/figures/papers/paper_list_l84_https_openreview_net_forum_id_6qDxK4Gz7F/figures/005_Table_2.jpg]]
 *Table 2: Ablation experiment on three datasets. SSIM↑ and PSNR↑ are higher-the-better; LPIPS↓ is lower-the-better. The best score , and second best score are red, and orange, respectively*
 
-![[assets/figures/papers/paper_list_l84_https_openreview_net_forum_id_6qDxK4Gz7F/figures/006_Figure_4.jpg]]
-*Figure 4: Performance of different hyperparameters p in multiple datasets*
-
 ![[assets/figures/papers/paper_list_l84_https_openreview_net_forum_id_6qDxK4Gz7F/figures/007_Figure_5.jpg]]
 *Figure 5: Visualization of different densification methods during the training process in bicycle sense*
 
@@ -271,19 +250,6 @@ Table 4的效率分析表明，GDAGS的训练时间在三个数据集上均为�
 
 ![[assets/figures/papers/paper_list_l84_https_openreview_net_forum_id_6qDxK4Gz7F/figures/010_Table_4.jpg]]
 *Table 4: Efficiency analysis of GDAGS and baseline models. TT(s) in the table represents training time (in seconds). The best score is red*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l84_https_openreview_net_forum_id_6qDxK4Gz7F/figures/009_Figure_6.jpg]]
-*Figure 6: Qualitative analysis of GDAGS integrated in MCMC-3DGS and Compact-3DGS*
-
-![[assets/figures/papers/paper_list_l84_https_openreview_net_forum_id_6qDxK4Gz7F/figures/004_Figure_3.jpg]]
-*Figure 3: Qualitative comparisons of different methods on scenes from Mip-NeRF360, Tanks&Temples and Deep Blending datasets. Enlarged images are displayed in the bottom right corner*
-
-![[assets/figures/papers/paper_list_l84_https_openreview_net_forum_id_6qDxK4Gz7F/figures/018_Figure_11.jpg]]
-*Figure 11: Qualitative results of GDAGS and baseline models in sparse views*
-
-
 
 ## 定位与知识库关联
 
@@ -330,8 +296,6 @@ GDAGS 的核心假设是：每个高斯能够接收到来自多个像素的充�
 3. **稀疏视图场景的量化评估**：在稀疏视图对比中，能否引入量化指标（如边缘保持指数）以更客观地评估 GDAGS 对几何边界的改善，而非仅依赖定性可视化？
 
 4. **自适应参数调整**：GDAGS 的权重函数是否可以在训练过程中自适应调整参数 $p$ 和 $\beta$，例如根据当前迭代的高斯数量轨迹或梯度分布统计量动态调节，从而消除手动调参的需要？
-
-
 
 ## 原文 PDF
 

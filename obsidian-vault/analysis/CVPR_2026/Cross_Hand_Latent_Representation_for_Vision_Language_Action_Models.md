@@ -55,8 +55,6 @@ claims:
 
 **主要结果。** 在四种灵巧手（Ability、Inspire、Paxini、X-Hand）与 10 个任务的跨手型训练中，XL-VLA 平均成功率达到 **0.72**，相比 π0 的 0.32 相对提升约 **125%**（Table 2）。在零样本任务泛化实验中，XL-VLA 在所有手型-任务组合中一致超越基于运动学重定向的 π0+RT 基线（Figure 4）。在 G1 人形机器人跨手型实验中，XL-VLA 成功率达到 **0.825**，显著优于 π0 的 0.525（Table 6）。消融实验进一步验证了 32 维隐空间在重建精度、重定向误差和插值平滑性上的综合最优性（Table 5）。
 
-
-
 ### 问题背景：灵巧手异构性带来的跨手型控制瓶颈
 
 视觉-语言-动作（VLA）模型在通用机器人操控中展现出巨大潜力，但其应用主要集中在单一机械臂或固定末端执行器上。当面对**灵巧手（dexterous hands）**时，一个根本性瓶颈浮现：不同灵巧手具有**异构的动作空间**——关节数量、自由度、运动学结构各不相同（如Table 3所示，Ability Hand、Inspire Hand、Paxini DexH13、X-Hand等手的指节数和自由度差异显著）。这使得训练一个统一的VLA模型来控制多种手型变得极为困难。
@@ -79,8 +77,6 @@ claims:
 为此，本文提出 **XL-VLA**，核心思路是引入一个**无监督的跨手型自编码器框架**，通过纯粹的自监督学习，将所有异构手型的关节动作映射到一个共享的平滑隐空间。该隐空间的设计目标有三：一是保证同一隐向量在不同手型上解码出**几何语义一致**的抓取姿态（通过基于指尖可微正运动学的pinch几何对齐损失实现）；二是保证隐空间的**连续性和可采样性**（通过KL正则化）；三是**无需任何配对数据**即可完成对齐，使得隐式动作可以在不同手型之间自由交换和重用。
 
 在此基础上，XL-VLA将VLA模型的输入和输出从原始关节空间迁移到该共享隐空间：VLA主干（基于π0）接收由手型编码器生成的隐式token序列，预测未来的隐式动作块，再由手型解码器还原为具体关节命令。这种设计使得VLA模型的训练和推理完全与具体手型解耦，为跨手型训练和零样本泛化奠定了基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -119,8 +115,6 @@ $$L_{\mathrm{latent}} = L_1 + L_2 + \beta L_3$$
 
 Table 1 对比了 XL-VLA 与现有基于隐空间的跨形态方法。关键差异在于：XL-VLA 是首个将**无监督隐式动作对齐**与**完整的 VLA 流水线**结合的工作，同时支持视觉、语言和本体感知的多模态输入，并具备零样本迁移到未见手型-任务组合的能力。相比之下，LAD 等监督式隐空间方法需要配对数据进行重定向训练，限制了其可扩展性。
 
-
-
 XL‑VLA 的核心设计是将异构灵巧手的动作空间统一到一个**共享的隐式动作空间**中，使视觉‑语言‑动作模型（VLA）无需感知底层手型的运动学差异即可进行跨手型推理。整个框架由两条解耦但协同的流水线构成：**隐空间自编码器预训练**与**VLA 策略训练**。
 
 **模块组成与数据流**  
@@ -149,15 +143,8 @@ XL‑VLA 的核心设计是将异构灵巧手的动作空间统一到一个**共
 **与基线的关键差异**  
 相比直接在原始关节空间操作的 π0，以及依赖运动学重定向的 π0+RT 基线，XL‑VLA 将 VLA 策略的输入/输出空间从“变长、异构的关节序列”替换为“固定维度、手型无关的隐式 token 序列”。这一设计使得同一策略模型可以无缝控制多种灵巧手，且在新手型出现时只需额外训练该手型的编解码器对，而无需重新训练整个 VLA 策略。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2164_https_arxiv_org_abs_2603_10158/figures/001_Figure_1.jpg]]
 *Figure 1: Overview. XL-VLA enables direct decoding of a single latent action into multiple dexterous hand embodiments. Shown above, an action prediction can be instantiated on the Ability hand, Paxini DexH13 hand, X-Hand1, and Inspire hand for languageguided manipulation. We show our experiment settings on the right figure with collected objects and DexHands*
-
-![[assets/figures/papers/paper_list_l2164_https_arxiv_org_abs_2603_10158/figures/020_Figure_15.jpg]]
-*Figure 15: G1 Teleoperation System. We build the G1 upperbody teleoperation system from HOMIE [4]. We use a pair of MANUS Mocap glove to track the human hand pose*
-
-
 
 ### 3.1 跨手型隐式VLA流水线
 
@@ -238,12 +225,8 @@ $$\mathbf{q}_{t+1}^{(h)} = F(\mathbf{q}_{t}^{(h)}, \mathbf{V}, \mathbf{T})$$
 
 在XL-VLA中，该过程在隐空间中完成：动作专家预测 $\hat{\mathbf{z}}_{t+1}$，再由手型解码器 $D_h$ 还原为关节命令 $\hat{\mathbf{q}}_{t+1}^{(h)}$。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2164_https_arxiv_org_abs_2603_10158/figures/004_Figure_3.jpg]]
 *Figure 3: Latent space pretraining pipeline. For each hand type, joint positions*
-
-
 
 ## 实验与关键发现
 
@@ -267,9 +250,6 @@ $$\mathbf{q}_{t+1}^{(h)} = F(\mathbf{q}_{t}^{(h)}, \mathbf{V}, \mathbf{T})$$
 
 ![[assets/figures/papers/paper_list_l2164_https_arxiv_org_abs_2603_10158/figures/022_Table_6.jpg]]
 *Table 6: G1 Policy Performances*
-
-![[assets/figures/papers/paper_list_l2164_https_arxiv_org_abs_2603_10158/figures/008_Figure_5.jpg]]
-*Figure 5: G1 Cross-Robot Performance. Co-training with latent xArm and humanoid data outperforms using raw actions*
 
 ### 隐空间质量评估与消融
 
@@ -298,24 +278,8 @@ $$\mathbf{q}_{t+1}^{(h)} = F(\mathbf{q}_{t}^{(h)}, \mathbf{V}, \mathbf{T})$$
 - **Table 4**：隐空间重放成功率 0.82/0.81 vs LAD 的 0.60/0.61，验证无监督对齐的优越性。
 - **Table 5**：消融证实重定向损失 L₂ 和适度隐维度（32）对跨手型一致性与泛化至关重要。
 
-![[assets/figures/papers/paper_list_l2164_https_arxiv_org_abs_2603_10158/figures/005_Table_2.jpg]]
-*Table 2: Vision-Language-Action Modeling. We compare XL-VLA with*
-
-![[assets/figures/papers/paper_list_l2164_https_arxiv_org_abs_2603_10158/figures/006_Figure_4.jpg]]
-*Figure 4: Zero-shot Unseen Tasks Generalization. For each hand, we randomly select some tasks as unseen tasks, whose data are held out from the training dataset. Then we test the unseen tasks with model trained on other data. Results show that by training with an aligned latent action space, XL-VLA gets the ability to generalize to novel hand-task combination in a zero-shot manner. PSR stands for “Partial Success Rate”, where policy is rewarded with half success if only one arm finishes its task*
-
 ![[assets/figures/papers/paper_list_l2164_https_arxiv_org_abs_2603_10158/figures/011_Table_5.jpg]]
 *Table 5: Ablations. Ablation results comparing reconstruction accuracy, cross-embodiment retargeting, latent-space continuity, and interpolation smoothness. Exp denotes model variants: removing losses*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2164_https_arxiv_org_abs_2603_10158/figures/002_Table_1.jpg]]
-*Table 1: Related Work Summary. Summary of related work comparing data sources, deployment settings, and input/output capabilities for latent-based cross-embodiment methods. Data indicates the training modalities used in each work. Deployment specifies the robot embodiments evaluated and whether cross–end-effector transfer is supported. Input denotes which modalities (vision, language, proprioception) are used for training. Output reports whether a method includes a cross-embodiment decoder and whether it enables zero-shot transfer to unseen embodiments*
-
-![[assets/figures/papers/paper_list_l2164_https_arxiv_org_abs_2603_10158/figures/007_Table_3.jpg]]
-*Table 3: Dexterous Hand Comparison*
-
-
 
 ## 定位与知识库关联
 
@@ -377,8 +341,6 @@ XL‑VLA 在跨手型机器人学习领域占据了一个独特的位置：它�
 - 相对于**通用跨形态策略方法**（如基于 Transformer 的直接多形态训练），XL‑VLA 通过显式的隐空间对齐机制，在数据效率上具有明显优势——仅需每任务每手型 50 条演示即可实现 0.72 的平均成功率。
 
 该方法的核心贡献在于证明了**通过无监督几何对齐（指尖距离与方向约束）可以在完全不同的关节空间中诱导出语义一致的隐式表示**，这一洞察对于更广泛的跨形态机器人学习具有启发意义。其技术路线——冻结的隐空间编码器/解码器 + 在隐空间中微调的 VLA 主干——也为后续工作提供了一个清晰的模块化范式。
-
-
 
 ## 原文 PDF
 

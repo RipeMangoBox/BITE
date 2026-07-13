@@ -76,8 +76,6 @@ AssistMimic 首次将紧密接触的人-人辅助运动模仿建模为**多智�
 
 AssistMimic 构建在 PHC 单人跟踪框架之上，属于**基于物理仿真的多智能体运动模仿**方法。其当前局限包括：手部模型灵巧度有限（胶囊手），难以执行抓取等精细操作；依赖动作捕捉参考轨迹，对分布外交互的鲁棒性有限；尚未在真实人形机器人上验证迁移效果。
 
-
-
 物理仿真中的人类运动模仿（physics-based human motion imitation）近年来取得了显著进展，但现有工作主要聚焦于单人运动或无接触的社会交互。当场景转向需要持续力交换和双向适应的紧密辅助行为（如扶持行走、辅助起身）时，传统方法面临根本性瓶颈。
 
 **核心难点在于“物理一致性”与“参考可靠性”之间的冲突。** 动作捕捉（MoCap）数据在近距离接触时存在严重遮挡和噪声，导致手部接触参考轨迹不可靠；而若将接受者（recipient）的运动作为固定运动学重放，支持者（supporter）则无法获得真实的物理反馈，容易出现姿态穿透、支撑失效等问题。图2直观地展示了这一差距：接触丰富的辅助行为（底部曲线）的学习难度远高于无接触社交交互（顶部曲线）或孤立运动（灰色曲线），传统方法几乎无法收敛。
@@ -91,8 +89,6 @@ AssistMimic 构建在 PHC 单人跟踪框架之上，属于**基于物理仿真�
 3. **奖励信号误导。** 标准的关节跟踪奖励（指数距离衰减）在近距离接触时会强制策略死板地跟踪噪声手部轨迹，而非鼓励功能性的力交互。这导致支持者可能“过度跟踪”不可靠参考，反而破坏辅助行为。
 
 **本文的动机正是填补上述缺口。** AssistMimic首次将紧密接触辅助行为的物理仿真模仿形式化为多智能体强化学习（MARL）问题，通过联合训练支持者和接受者策略，使双方能够根据物理反馈双向适应。其核心洞察在于：从单人运动先验继承的权重提供了基础运动技能，使策略不必从零学习基本动力学；动态参考重映射确保手部目标始终与接受者的实时姿态对齐；接触促进奖励鼓励功能性的力交互而非死板跟踪噪声轨迹。三者协同，使紧密接触辅助行为的物理仿真模仿首次成为可能。
-
-
 
 ## 核心方法与创新机理
 
@@ -146,8 +142,6 @@ $$r_{\mathrm{track}_i}^{(S)} = \begin{cases} \exp\left( -D\left( \hat{\mathbf{q}
 
 上述四个创新并非孤立生效，而是形成协同链条：**运动先验初始化**提供稳定的起点，使 MARL 联合训练可行；**动态参考重映射**确保手部目标在空间上始终合理；**接触促进奖励**则引导策略在合理位置上产生功能性力交互。三者共同使紧密接触辅助行为的物理仿真模仿首次成为可能（Figure 2 橙色曲线）。此外，通过 DAgger 将按主题训练的专家策略蒸馏为通用策略后，Inter-X 上的成功率进一步提升至 94.7%（Table 4），验证了该框架的可扩展性。
 
-
-
 AssistMimic 将紧密接触、力交换的人-人辅助运动模仿首次建模为一个**多智能体强化学习（MARL）问题**，其整体架构如图 3 所示。框架的核心思路是：不再将接受者（Recipient）视为被动重放的运动学对象，而是让支持者（Supporter）与接受者双方作为独立的物理仿真角色，在共享的物理环境中联合优化各自的策略，从而实现双向适应。
 
 ### 问题形式化：非对称多智能体 MDP
@@ -196,15 +190,11 @@ AssistMimic 的 pipeline 由四个关键机制串联构成，共同解决了从�
 
 这四个模块的因果链条清晰：运动先验提供训练的“可行起点”，动态参考重映射保证空间对齐的“物理合理性”，接触促进奖励定义“功能性成功”的优化方向，蒸馏则扩展“行为覆盖范围”。三者缺一不可——消融实验表明，移除任一机制都将导致训练崩溃或鲁棒性严重退化（详见实验分析部分）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1752_Learning_to_Assist_Physics_Grounded_Human_Human_Control_via_Multi_Agent/figures/004_Figure_3.jpg]]
 *Figure 3: Overview of AssistMimic. We train tracking-based humanoid control policies for both the recipient and the supporter, optimizing them to imitate a paired reference motion sequence. Our architecture builds on the single-agent tracking framework of PHC [10], extending it with partner-aware state inputs and augmenting standard imitation rewards with recipient-aware reference retargeting and contact-incentivizing reward terms. The policy*
 
 ![[assets/figures/papers/paper_list_l1752_Learning_to_Assist_Physics_Grounded_Human_Human_Control_via_Multi_Agent/figures/001_Figure_1.jpg]]
 *Figure 1: AssistMimic: We propose a multi-agent RL framework capable of learning robust Supporter and Recipient policies from noisy, close-proximity motion sequences. By leveraging single-person motion priors, a novel recipient-adaptive reference retargeting mechanism, and contact-promoting rewards, AssistMimic becomes the first physics-based controller to successfully track such complex, high-contact reference motions. Snapshots are arranged chronologically from left to right*
-
-
 
 AssistMimic 将紧密接触的人-人辅助运动模仿建模为有限时域的多智能体马尔科夫决策过程（Multi-Agent MDP），其核心架构由四个关键模块协同构成：基于运动先验的权重初始化、伙伴感知的策略网络、动态参考重映射机制，以及接触促进奖励设计。以下逐一解析各模块的数学形式与设计逻辑。
 
@@ -259,16 +249,6 @@ $$k_{i,t}^{*} = \arg\min_{k \in \mathcal{T}_R} \left|\left| \hat{\mathbf{p}}_{k,
 $$r_{\mathrm{track}_i}^{(S)} = \begin{cases} \exp\left( -D\left( \hat{\mathbf{q}}_{i,t}^{(S)}, \mathbf{q}_{i,t}^{(S)} \right) \right) & \mathrm{if } \chi_{i,t}=0, \\ \beta f_{i,t} \exp(-\alpha d_{i,t}) + b_{\mathrm{contact}} & \mathrm{if } \chi_{i,t}=1 \end{cases}$$
 
 当双方远离时（$\chi_{i,t}=0$），使用标准指数距离跟踪奖励；当接近时（$\chi_{i,t}=1$），切换为接触促进奖励，其中 $f_{i,t}$ 为接触力，$d_{i,t}$ 为手部到目标关节的距离，$\beta$ 和 $\alpha$ 为缩放系数，$b_{\mathrm{contact}}$ 为接触稀疏奖励。这一设计鼓励功能性的力交互而非死板跟踪噪声轨迹。消融表明，移除该奖励后，在最大髋扭矩减半条件下成功率从 73.2% 暴跌至 27.7%，验证了其对未见动态鲁棒性的关键作用。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1752_Learning_to_Assist_Physics_Grounded_Human_Human_Control_via_Multi_Agent/figures/002_Figure_2.jpg]]
-*Figure 2: Learning contact-rich assistive behaviors is substantially more difficult in the close-contact interactions that we target (bottom) than in contact-less social interactions (top) or isolated motions (gray SR curve). AssistMimic addresses these challenges, achieving successful imitation for the first time, as shown in the improved orange SR curve*
-
-![[assets/figures/papers/paper_list_l1752_Learning_to_Assist_Physics_Grounded_Human_Human_Control_via_Multi_Agent/figures/005_Figure_4.jpg]]
-*Figure 4: Failure of Kinematic Baselines*
-
-
 
 ## 实验与关键发现
 
@@ -326,33 +306,17 @@ $$r_{\mathrm{track}_i}^{(S)} = \begin{cases} \exp\left( -D\left( \hat{\mathbf{q}
 
 4. **动态重映射的场景依赖性**：如前所述，该模块在 Inter-X 上增益不显著，其适用条件（接触距离、交互类型）需要进一步表征。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1752_Learning_to_Assist_Physics_Grounded_Human_Human_Control_via_Multi_Agent/figures/006_Table_2.jpg]]
 *Table 2: Evaluation of specialist policies on the Inter-X dataset*
 
 ![[assets/figures/papers/paper_list_l1752_Learning_to_Assist_Physics_Grounded_Human_Human_Control_via_Multi_Agent/figures/007_Table_3.jpg]]
 *Table 3: Evaluation of specialist policies on the HHI-Assist dataset*
 
-![[assets/figures/papers/paper_list_l1752_Learning_to_Assist_Physics_Grounded_Human_Human_Control_via_Multi_Agent/figures/008_Table_4.jpg]]
-*Table 4: Evaluation of generalist policy on the Inter-X dataset*
-
-![[assets/figures/papers/paper_list_l1752_Learning_to_Assist_Physics_Grounded_Human_Human_Control_via_Multi_Agent/figures/003_Table_1.jpg]]
-*Table 1: Physical limitations applied to the recipient*
-
-![[assets/figures/papers/paper_list_l1752_Learning_to_Assist_Physics_Grounded_Human_Human_Control_via_Multi_Agent/figures/013_Table_5.jpg]]
-*Table 5: Recipient COM standard deviation (↓)*
-
 ![[assets/figures/papers/paper_list_l1752_Learning_to_Assist_Physics_Grounded_Human_Human_Control_via_Multi_Agent/figures/011_Figure_5.jpg]]
 *Figure 5: Qualitative results on HHI-Assist. Red boxes indicate correct hand adjustment and support*
 
-![[assets/figures/papers/paper_list_l1752_Learning_to_Assist_Physics_Grounded_Human_Human_Control_via_Multi_Agent/figures/012_Figure_6.jpg]]
-*Figure 6: Tracking results of AssistMimic on interaction trajectories generated by a motion diffusion model*
-
 ![[assets/figures/papers/paper_list_l1752_Learning_to_Assist_Physics_Grounded_Human_Human_Control_via_Multi_Agent/figures/009_Figure_7.jpg]]
 *Figure 7: Qualitative results: unseen interactions and failures*
-
-
 
 ## 定位与知识库关联
 
@@ -406,8 +370,6 @@ AssistMimic 在物理仿真人类运动模仿的知识谱系中占据了一个�
 - **上游继承**：直接建立在 PHC（单人物理跟踪控制器）的架构和预训练权重之上，继承了其基于 AMP 判别器的风格奖励和 PPO 训练框架。
 - **横向对比**：区别于 Human-X 的运动学重放范式和 Phys-Reaction 的隔离回放范式，首次将紧密接触辅助行为形式化为多智能体强化学习问题，并通过三个关键机制（运动先验初始化、动态参考重映射、接触促进奖励）使其可行。
 - **下游可能影响**：为物理仿真中的社会交互研究开辟了新方向——从无接触交互走向力交换交互。其“专家到通才蒸馏”的范式（Table 4，DAgger 蒸馏后 Inter-X 通才成功率达 94.7%）也为多任务物理交互控制提供了可参考的路线。
-
-
 
 ## 原文 PDF
 

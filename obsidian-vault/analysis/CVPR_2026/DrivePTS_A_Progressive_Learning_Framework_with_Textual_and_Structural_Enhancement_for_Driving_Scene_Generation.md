@@ -54,8 +54,6 @@ claims:
 
 实验表明，DrivePTS 在 nuScenes 验证集上取得了 **FID 11.45**，较次优方法 PerLDiff 下降约 16.7%；**Road mIoU 达到 63.95**，超出第二名 2.69 点；Vehicle mIoU 与 NDS 同样达到最优。消融实验进一步证实，多视角层次描述、频率引导结构损失与互信息约束三者协同作用，缺一不可。此外，合成数据在 BEV 分割任务上的数据增强实验显示，使用 DrivePTS 生成的合成数据训练，其 Road mIoU 可逼近使用真实验证集的上限性能。
 
-
-
 自动驾驶感知模型的训练与评估高度依赖大规模、多样化的驾驶场景数据。然而，真实世界数据的采集与标注成本高昂，且面临长尾场景覆盖不足、隐私与安全等挑战。为此，基于扩散模型的驾驶场景生成方法受到广泛关注，其目标是在给定几何条件（如高精地图、3D边界框）和文本描述的控制下，合成逼真且可控的多视图驾驶图像。
 
 现有方法虽取得显著进展，但仍存在三个核心瓶颈：
@@ -67,8 +65,6 @@ claims:
 **均匀权重的去噪损失忽视前景结构细节。** 标准扩散模型采用空间均匀加权的 $L_2$ 去噪损失，对图像所有区域同等对待。然而，驾驶场景中道路边缘、车道线和物体轮廓等高频结构信息对下游感知任务至关重要，均匀损失无法有效强化这些关键区域的学习，导致生成图像出现结构模糊与视觉失真。
 
 针对上述问题，本文提出 **DrivePTS**，通过三个核心设计实现突破：(1) 渐进式学习策略解耦道路与物体的几何条件学习；(2) 利用视觉语言模型生成多视角层次化语义描述以增强文本条件；(3) 引入频率引导的结构损失以强化前景高频细节。
-
-
 
 ## 核心方法与创新机理
 
@@ -116,8 +112,6 @@ $$\mathcal{L}_{\mathrm{freq}} = \lVert \mathcal{H}(x_{\mathrm{pred}}) - \mathcal
 
 三者协同使 DrivePTS 在 nuScenes 验证集上取得 FID 11.45（较 PerLDiff 降低约 16.7%）、Road mIoU 63.95（超出次优方法 2.69 点）的最优性能，并在修改地图布局时展现出基线方法无法实现的独立可控性。
 
-
-
 DrivePTS 的整体生成流程围绕“先道路、后物体”的核心洞察构建，形成一条从几何条件解耦到多模态条件融合的渐进式生成管线。图 2 给出了框架的全貌，其输入输出流与模块关系可概括为三个层次：条件编码、渐进式训练与结构监督。
 
 **条件注入网络**。几何条件通过双路 T2I-Adapter 并行注入 Stable Diffusion 的 UNet 编码器。高精地图（HD map）输入 **Map T2I-Adapter**，3D 边界框输入 **Box T2I-Adapter**，二者分别提取多尺度特征 $F_c = T(C)$，并逐级与 UNet 编码器特征相加：$\hat{F}_{enc}^i = F_{enc}^i + F_c^i, i \in \{1,2,3,4\}$。文本条件则来自 **VLM Captioner** 离线生成的多视角层次化描述，覆盖时间、天气、道路类型、周围环境、物体及空间关系六个维度，经 CLIP 文本编码后通过交叉注意力注入去噪过程。多视图一致性由 **Cross-View Module** 在各视角特征间进行交互来维护。
@@ -128,8 +122,6 @@ DrivePTS 的整体生成流程围绕“先道路、后物体”的核心洞察�
 
 整个管线最终以端到端方式输出六视角驾驶场景图像，其生成过程可接受独立编辑的地图布局或边界框条件，实现对道路结构与物体配置的解耦控制。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2468_https_arxiv_org_abs_2602_22549/figures/002_Figure_2.jpg]]
 *Figure 2: The overall architecture of our proposed DrivePTS. The left part illustrates our adopted generative network structure, while the center depicts the training process corresponding to the proposed progressive learning strategy. The right part highlights the implementation of frequency-guided structure loss*
 
@@ -138,11 +130,6 @@ DrivePTS 的整体生成流程围绕“先道路、后物体”的核心洞察�
 
 ![[assets/figures/papers/paper_list_l2468_https_arxiv_org_abs_2602_22549/figures/021_Figure_11.jpg]]
 *Figure 11: Examples of targeted road addition in driving scene generation using our DrivePTS framework. The visualization follows the same four-row format as above, where the third row shows geometric conditions with added roads*
-
-![[assets/figures/papers/paper_list_l2468_https_arxiv_org_abs_2602_22549/figures/022_Figure_12.jpg]]
-*Figure 12: Additional examples of targeted road addition using our DrivePTS framework. The visualization format follows the same structure as above*
-
-
 
 ### 3.1 基础生成架构
 
@@ -208,13 +195,6 @@ $$\mathcal{L}_{\mathrm{stage2}} = \mathcal{L}_{\mathrm{diff}} + \lambda_{\mathrm
 
 消融实验确定最优超参数为 $\lambda_{\mathrm{freq}} = 0.5$、$\lambda_{\mathrm{MI}} = 0.05$。过高的 $\lambda_{\mathrm{MI}}$ 会破坏地图与边界框之间必要的空间关系，导致性能下降。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2468_https_arxiv_org_abs_2602_22549/figures/010_Figure_6.jpg]]
-*Figure 6: Qualitative comparison of scene generation with and without frequency-guided structure loss. Columns 1-2 show vehicle structure improvements, while columns 3-4 show road boundary enhancements. Red boxes highlight structural distortions without the proposed loss, whereas green boxes indicate successful mitigation with the loss*
-
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -247,9 +227,6 @@ Table 4展示了损失系数对性能的影响。频率损失权重λ_freq在0.5
 
 Stage 1交替训练步长的消融（Figure 3）显示，步长设为1000时能较好兼顾道路与物体的生成质量。过短的步长导致模型在两类生成任务间切换过于频繁，无法充分学习各自的特征；过长的步长则可能引发灾难性遗忘，后学的任务覆盖先学的能力。
 
-![[assets/figures/papers/paper_list_l2468_https_arxiv_org_abs_2602_22549/figures/005_Figure_3.jpg]]
-*Figure 3: Impact of different iterative steps on the FID and geometry controllability of generated images*
-
 ### 定性分析：条件解耦与可控性
 
 Figure 1展示了DrivePTS在条件解耦方面的核心优势。当修改高精地图布局时，MagicDrive无法适应变化——其生成结果仍与原始地图对齐，暴露了地图与边界框条件间的隐式依赖：模型在训练中将两者耦合学习，一旦单独修改地图，边界框条件产生的梯度仍将生成拉向旧布局。DrivePTS通过渐进式学习与互信息约束消除了这种耦合，成功生成与新地图对齐的场景。
@@ -268,21 +245,8 @@ Figure 6直观展示了频率引导结构损失的作用。未使用FGSL时，�
 
 尽管DrivePTS在道路和车辆生成上取得了显著提升，论文明确指出**车道线和交通标志的细节生成仍不够理想**。这反映了当前方法的一个内在局限：高精地图和3D边界框提供的是粗粒度的几何约束（道路区域、物体位置），而车道线、交通标志等细粒度结构需要更精确的空间和语义控制信号。频率引导结构损失虽能强化高频细节，但缺乏对这些特定语义类别的针对性监督，导致模型在重建这些局部结构时精度不足。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2468_https_arxiv_org_abs_2602_22549/figures/006_Table_3.jpg]]
 *Table 3: Ablation study on the effectiveness of Multi-View Hierarchical Descriptions (MHD), Frequency-Guided Structure Loss (FGSL), and Mutual Information Constraint (MIC) in driving scene generation*
-
-![[assets/figures/papers/paper_list_l2468_https_arxiv_org_abs_2602_22549/figures/001_Figure_1.jpg]]
-*Figure 1: Comparison of various scene generation methods on the modified map layouts. The first column highlights the modified regions of each map. While MagicDrive fails to adapt to map modifications, our DrivePTS successfully generates scenes aligning with the updated map configurations*
-
-![[assets/figures/papers/paper_list_l2468_https_arxiv_org_abs_2602_22549/figures/018_Figure_8.jpg]]
-*Figure 8: Qualitative comparison of scene reconstruction quality between original dataset captions and our multi-view hierarchical descriptions. For each example: original image (top), reconstruction from original captions (middle), and our results (bottom). Red regions indicate missing details with original captions, while green regions highlight successful recovery through our fine-grained descriptions*
-
-![[assets/figures/papers/paper_list_l2468_https_arxiv_org_abs_2602_22549/figures/019_Figure_9.jpg]]
-*Figure 9: Qualitative comparison of scene reconstruction quality between original dataset captions and our multi-view hierarchical descriptions. Notably, in night scene generation, original captions tend to produce hallucinated illuminated areas due to insufficient contextual information, while our multi-view hierarchical descriptions faithfully reconstruct authentic nighttime atmospheres*
-
-
 
 ## 定位与知识库关联
 
@@ -327,8 +291,6 @@ DrivePTS 的知识增量集中在三个可迁移的设计选择上：
 3. **条件解耦的理论分析。** 互信息约束的有效性已通过消融实验验证，但其对条件特征空间的具体影响机制（如特征维度的独立性、跨条件信息流动的阻断程度）缺乏深入的理论分析，这为后续研究提供了可探索的空间。
 
 4. **与下游任务的闭环优化。** Table 2 展示了合成数据对 BEV 分割模型的增强效果（Road mIoU 67.49，接近真实验证集上限 67.53），但生成质量与下游任务性能之间的定量关系尚未建立，如何针对特定下游任务优化生成策略是一个有应用价值的方向。
-
-
 
 ## 原文 PDF
 

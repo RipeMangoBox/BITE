@@ -54,8 +54,6 @@ ChainHOI 的方法定位如下：在关节级别，通过引入显式的 HOI 关
 
 值得注意的是，ChainHOI 仍存在若干局限：由于输入数据采用 SMPL 人体模型，缺少手指关节信息，手部与物体可能出现穿透；对于椅子等复杂物体，模型难以学习正确的接触点和接触距离。这些问题为后续研究指明了方向。
 
-
-
 ### 任务背景
 
 文本驱动的人物交互（Human-Object Interaction, HOI）生成旨在根据自然语言描述与目标物体几何，合成真实、合理的人体与物体协同运动序列。该任务在具身智能、机器人规划、虚拟数字人等领域具有重要应用价值，但其本质挑战在于：人体拥有高度冗余的自由度，而物体在交互过程中约束了人体的运动模式，生成系统必须同时满足语义对齐、物理接触精确与生物力学可行性三个层面的要求。
@@ -78,8 +76,6 @@ ChainHOI 的方法定位如下：在关节级别，通过引入显式的 HOI 关
 - **运动学链级约束**：人体关节并非独立运动，而是通过骨骼连接形成运动学链（如上肢链、下肢链）。链内关节的协调运动决定了动作的流畅性，链间协调则保证全身姿态的平衡与合理。
 
 基于此，本文提出 **ChainHOI**，核心动机是：**真实的人物交互生成必须同时显式建模关节级别和运动学链级别的交互**。前者通过 HOI 关节图直接刻画关节与物体的几何关系，后者通过运动学感知交互模块强制执行链内与链间协调，二者结合才能产生自然流畅的 HOI 序列。这一设计从根源上解决了现有方法“隐式编码、全局建模”的结构性缺陷，为高质量文本驱动 HOI 生成提供了新的范式。
-
-
 
 ## 核心方法与创新机理
 
@@ -125,8 +121,6 @@ $$\mathcal{L} = \mathcal{L}_{diff} + \lambda_1 \mathcal{L}_h + \lambda_2 \mathca
 
 消融实验（Table 2）提供了因果证据：同时移除 KIM 和 SCM 后，FID 从 0.095 飙升至 0.400，OCD 从 0.091 升至 0.170，证实双级别建模的不可替代性。仅移除 KIM 中的注意力掩码（即取消显式运动学链结构）也使 FID 升至 0.184，表明链结构的显式建模本身对运动质量有显著贡献。运动学感知解码器的注意力可视化（Figure 11）进一步显示，模型能自适应地对与物体交互的关节赋予更高注意力分数，验证了链级建模的有效性。
 
-
-
 ChainHOI 是一个基于扩散模型的文本驱动人物交互生成框架，其核心设计思想是将交互建模从隐式全身姿态令牌提升为**关节级**与**运动学链级**的双层显式建模。整体架构由 N 个结构相同的块堆叠而成，每个块包含两个关键模块：**生成时空图卷积网络（GST-GCN）** 和 **运动学感知交互模块（KIM）**，分别负责关节级的细粒度交互建模和运动学链级的协调建模。
 
 ### 输入输出流
@@ -170,15 +164,8 @@ ChainHOI 的训练损失由三部分组成：
 $$\mathcal { L } = \mathcal { L } _ { d i f f } + \lambda _ { 1 } \mathcal { L } _ { h } + \lambda _ { 2 } \mathcal { L } _ { o }$$
 其中 $\mathcal{L}_{diff}$ 为标准扩散损失，$\mathcal{L}_h$ 为接触距离损失（约束八个交互关节到真实物体网格的最小距离），$\mathcal{L}_o$ 为物体位姿损失（约束预测物体 6-DoF 与真实值的 L2 距离）。消融实验证实，辅助损失 $\mathcal{L}_h$ 和 $\mathcal{L}_o$ 能显著改善物理合理性（PS）和接触距离（OCD），最佳权重为 $\lambda_1=2, \lambda_2=1$（Table 7）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1731_ChainHOI_Joint_based_Kinematic_Chain_Modeling_for_Human_Object_Interacti/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of ChainHOI. ChainHOI is a diffusion-based model with N identical blocks. Each block contains a Generative Spatiotemporal GCN (GST-GCN) and a Kinematics-based Interaction Module (KIM) to model interactions at the joint and kinetic chain levels. GST-GCN, comprising an ST-GCN and a Semantic-consistent Module, captures short- and long-term information while ensuring semantic consistency. KIM includes a Context-aware Decoder and a Kinematic-aware Decoder to capture HOI context (textual and object geometry) and to model intra- and inter-kinetic chain interactions. Input and output projection layers are omitted for clarity*
-
-![[assets/figures/papers/paper_list_l1731_ChainHOI_Joint_based_Kinematic_Chain_Modeling_for_Human_Object_Interacti/figures/012_Figure_9.jpg]]
-*Figure 9: Overview of Our Evaluator. Inspired by CLIP [54], our evaluator incorporates a motion branch and a text branch. The motion branch takes motion sequences and a CLS token as inputs. The text branch takes texts and a CLS tokens as inputs. Then the output CLS tokens of two branches are passed into a linear projection and then are used to calculate the contrastive learning loss*
-
-
 
 ChainHOI 的核心架构由两个互补的交互建模模块构成：**生成时空图卷积网络（GST-GCN）** 在关节级别显式捕捉细粒度交互，**运动学感知交互模块（KIM）** 在运动学链级别强制执行链内与链间协调。二者通过融合模块整合特征，共同驱动扩散去噪过程。
 
@@ -220,9 +207,6 @@ $$\bar{\mathrm{KT}} = \mathrm{CrossAtt}(q = KT', k = JT, v = JT, \operatorname{m
 
 运动学链设计包含五条人体内部链（如左右臂链、左右腿链、躯干链）和一条人-物交互链。交互链由物体节点与八个潜在交互关节（双手、双肘、双脚、双膝）构成，显式建模关节与物体的协调关系（Figure 5）。
 
-![[assets/figures/papers/paper_list_l1731_ChainHOI_Joint_based_Kinematic_Chain_Modeling_for_Human_Object_Interacti/figures/005_Figure_5.jpg]]
-*Figure 5: Design of Kinetic Chains. Beyond internal kinetic chains, an additional interaction chain is used to explicitly model the interactions between joints and the object*
-
 ### 特征融合
 
 KIM 输出的运动学链令牌 $\mathbf{v}' \in \mathbb{R}^{6 D_t}$ 经展平、全连接层投影、重塑为 $\mathbf{v}'' \in \mathbb{R}^{(J+2) \times D_t}$ 后，与模块输入 $\bar{\mathbf{y}}_i$ 拼接并线性投影回原始维度：
@@ -250,13 +234,6 @@ $$\mathcal{L}_h = \sum_{i=1}^{L} \sum_{k=1}^{8} a_{i,k} \cdot \mathcal{G}\big(\p
 $$\mathcal{L}_o = \sum_{i=1}^{L} \big\| \phi_o(O_i^{pred}) - \phi_o(O_i^{gt}) \big\|_2^2 \tag{7}$$
 
 消融实验证实，去除 $\mathcal{L}_h$ 和 $\mathcal{L}_o$ 会显著恶化接触精度（OCD）和物理合理性（PS），验证了辅助损失对精确交互生成的必要性（Table 7）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1731_ChainHOI_Joint_based_Kinematic_Chain_Modeling_for_Human_Object_Interacti/figures/003_Figure_3.jpg]]
-*Figure 3: Design of the HOI Joint Graph. The object node contains object information and is connected to potential interaction joints. The foot-contact node is added to prevent foot sliding*
-
-
 
 ## 实验与关键发现
 
@@ -296,15 +273,9 @@ Table 5 比较了不同 HOI 关节图设计：与离散图或完全图相比，�
 
 Table 6 探究了运动学链设计的影响：引入额外的人-物交互链（human-object chain）后，OCD 和 FID 均有明显改善，证实了将物体与八个潜在交互关节显式归入同一条运动学链进行建模的有效性。
 
-![[assets/figures/papers/paper_list_l1731_ChainHOI_Joint_based_Kinematic_Chain_Modeling_for_Human_Object_Interacti/figures/015_Table_6.jpg]]
-*Table 6: Evaluations of different kinetic chain designs on the BEHAVE dataset*
-
 ### 损失函数与超参数敏感性
 
 辅助损失 $L_h$ 和 $L_o$ 对接触质量和物体运动精度有显著贡献。Table 7 的敏感性分析显示，最佳权重配置为 $\lambda_1=2, \lambda_2=1$，此时 PS 和 OCD 达到最优平衡。过大的 $\lambda_1$ 会导致模型过度关注接触而牺牲运动多样性，过小则接触质量下降。
-
-![[assets/figures/papers/paper_list_l1731_ChainHOI_Joint_based_Kinematic_Chain_Modeling_for_Human_Object_Interacti/figures/016_Table_7.jpg]]
-*Table 7: Impact of the training loss. The gray line represents the configuration used in our ChainHOI model*
 
 ### 失败模式与局限性
 
@@ -325,11 +296,6 @@ Figure 11 可视化了运动学感知解码器（Kinematic-aware Decoder）中�
 ### 用户研究
 
 Figure 7 报告了 24 名参与者的偏好选择结果。ChainHOI 相对于 MDMfinetuned、HOI-Diff 等方法的偏好率均超过 70%，表明人类评估者一致认为 ChainHOI 生成的交互序列更加自然、真实且语义一致。
-
-![[assets/figures/papers/paper_list_l1731_ChainHOI_Joint_based_Kinematic_Chain_Modeling_for_Human_Object_Interacti/figures/008_Figure_7.jpg]]
-*Figure 7: User Study. The color bar and numbers indicate the preference rate of ChainHOI over the compared methods*
-
-
 
 ## 定位与知识库关联
 
@@ -370,8 +336,6 @@ ChainHOI 处于文本驱动 HOI 生成这一新兴任务的方法谱系中。该
 2. **复杂物体泛化**：如何提升模型对复杂物体接触几何的学习能力，尤其是在训练数据有限时？是否需要引入更丰富的物体表示（如隐式场）？
 3. **非刚性物体扩展**：ChainHOI 的几何提取方式能否扩展至非刚性物体？需要何种表达或网络结构来建模可变形交互？
 4. **运动学链先验增强**：运动学链令牌是否可以赋予更明确的解剖学约束（如关节角度限制）或物理先验（如力矩平衡），以进一步提升生成的真实性？
-
-
 
 ## 原文 PDF
 

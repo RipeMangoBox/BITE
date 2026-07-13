@@ -182,9 +182,6 @@ $$
 
 该模块是实现正确遮挡关系的核心组件。其工作原理为：在获得场景深度图与指定插入深度后，逐像素比较两幅深度图——若场景像素的深度值小于插入深度（即该像素对应的真实物体位于插入物体前方），则保留原始场景像素；否则使用遮罩填充。Figure 7 可视化了该模块的开关效果：移除几何感知合成后，深度误差 AbsRel 从 19.8 上升至 25.5（Table 3），验证了其对深度控制与遮挡处理的决定性作用。
 
-![[assets/figures/papers/paper_list_l63_https_openreview_net_forum_id_VpsqfCac2B/figures/010_Figure_7.jpg]]
-*Figure 7: Effect of geometry-aware composition. We sequentially present the masked scene, depth map, and synthesized images, with and without applying geometry-aware composition*
-
 ### 3.5 渐进式训练策略
 
 SpatialHand 采用三阶段渐进训练以稳定方向控制的学习：
@@ -194,8 +191,6 @@ SpatialHand 采用三阶段渐进训练以稳定方向控制的学习：
 - **阶段三（可选微调）**：针对特定场景或物体进行少量步数的适配。
 
 消融实验证实，跳过阶段一直接进行阶段二会导致方向准确率大幅下降（Table 3），说明渐进式训练对方向控制能力的建立具有不可替代的作用。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l63_https_openreview_net_forum_id_VpsqfCac2B/figures/004_Figure_4.jpg]]
 *Figure 4: Pipeline of training data curation. We start with high-quality synthetic 3D assets. Using a rendering engine and subject-driven generation, we simulate how humans place objects in 3D space. Then, we employ a series of visual foundation models to estimate the 3D information within images*
@@ -274,22 +269,8 @@ Table 3的消融实验揭示了SpatialHand中两个关键设计组件的因果�
 
 3. **复杂材质物体的挑战**：透明、非刚性等复杂物体的插入尚未得到系统处理，这些物体的深度估计和遮挡推理存在固有困难，是当前方法的开放问题。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l63_https_openreview_net_forum_id_VpsqfCac2B/figures/005_Table_1.jpg]]
 *Table 1: Quantitative comparison results on 3D-aware object insertion. Object similarity in the generated image to the reference is measured using DINO↑ and CLIP↑. AbsRel↓ evaluates the accuracy of the inserted object’s depth position, and Acc@30°↑ measures its orientation accuracy*
-
-![[assets/figures/papers/paper_list_l63_https_openreview_net_forum_id_VpsqfCac2B/figures/007_Table_2.jpg]]
-*Table 2: Quantitative comparison on 3D-aware object movement*
-
-![[assets/figures/papers/paper_list_l63_https_openreview_net_forum_id_VpsqfCac2B/figures/008_Figure_6.jpg]]
-*Figure 6: Qualitative comparison on 3D-aware object movement*
-
-![[assets/figures/papers/paper_list_l63_https_openreview_net_forum_id_VpsqfCac2B/figures/001_Figure_1.jpg]]
-*Figure 1: Illustration of how the “SpatialHand” can manipulate objects in images from 3D prespective. With the basic ability to insert objects with 6DoF control (top row), allowing for any-degree rotation (middle row), and precise 3D movement (bottom row)*
-
-![[assets/figures/papers/paper_list_l63_https_openreview_net_forum_id_VpsqfCac2B/figures/012_Figure_9.jpg]]
-*Figure 9: More qualitative comparison on 3D-aware object insertion*
 
 ## 定位与知识库关联
 

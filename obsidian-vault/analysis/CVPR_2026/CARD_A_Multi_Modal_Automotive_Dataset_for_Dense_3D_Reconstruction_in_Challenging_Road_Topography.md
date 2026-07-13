@@ -56,8 +56,6 @@ CARD（CVPR 2026）针对上述瓶颈，构建了首个大规模多模态驾驶�
 
 CARD 数据集覆盖德国和意大利约 110 km、4.7 小时的驾驶数据，按地理位置和地形类别分层划分训练/验证/测试集，代码与数据已开源。
 
-
-
 ### 核心瓶颈：现有驾驶数据集忽视道路表面三维几何
 
 当前自动驾驶数据集（如KITTI、Waymo、nuScenes等）主要聚焦于平坦、铺设良好的城市道路，在数据采集上存在一个关键的结构性缺失：**缺乏对挑战性道路地形的大规模、多样化真实覆盖与准密集深度标注**。具体而言，坑洼、减速带、崎岖路面、非铺装路面等“非理想”道路表面，在现有数据集中要么完全缺失，要么覆盖极为稀疏（见Table 1）。这一空白导致两个直接后果：
@@ -82,8 +80,6 @@ CARD的关键洞察在于将评估焦点从通用场景深度转向**道路地�
 ### 动机总结
 
 CARD的动机根植于一个简单但被长期忽视的事实：**自动驾驶车辆不仅需要在平坦道路上感知障碍物，更需要在路面本身成为“障碍物”时精确理解其几何形态**。现有数据集和基准无法回答“模型能否准确感知前方减速带的高度”或“能否区分坑洼深度以决定是否减速”这类安全关键问题。CARD通过准密集深度真值、路面相对高度表示和地形不规则评估协议，为这一空白提供了系统性的解决方案。
-
-
 
 ## 核心方法与创新机理
 
@@ -112,8 +108,6 @@ CARD 通过**双 LiDAR 融合与自适应多视图投票**流水线，将每帧�
 ### 3. 传感器-路面标定：从粗略外参到车轮接地级精度
 
 CARD 的传感器标定超越了常规的传感器间外参标定，通过 Leica 测量设备对四个车轮中心及车轮接地点进行精确测量，构建了从传感器到车轮接地点的完整变换链。这一标定是路面相对高度计算的基础，也是 CARD 区别于其他数据集的关键工程创新——它将深度评估从“相机看到了什么”推进到“路面实际几何如何”。
-
-
 
 CARD 的真值生成与评估框架围绕一个核心目标构建：**在挑战性道路地形条件下，为前视图像提供高密度、高精度的深度真值，并建立面向路面不规则性的评估协议**。整个流水线可分解为六个紧密耦合的模块，形成从原始传感器数据到可评估深度图的完整链路。
 
@@ -170,13 +164,6 @@ CARD 引入**车轮激励**概念——每个轮胎接地点在世界坐标系�
 ```
 
 该框架的核心优势在于：通过双 LiDAR 冗余和自适应投票机制实现了远超现有数据集的真值密度；通过三级动态过滤保证了静态道路几何的纯度；通过路面相对高度表示和 per-box 评估协议，将评估焦点从全局深度误差转移到对安全至关重要的道路表面不规则性上。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l815_https_openaccess_thecvf_com_content_CVPR2026_html_Elazab_CARD_A_Multi_Mo/figures/007_Figure_5.jpg]]
-*Figure 5: Ground truth generation: motion-compensated LiDAR bursts are voxel-accumulated, dynamic-object filtered, then projected to the left camera to yield dense per-image GT, as explained in Sec. 3.4*
-
-
 
 CARD 的真值生成流水线由七个关键模块串联构成，其核心目标是将多 LiDAR 扫描累积为稠密静态场景表示，再投影至前视相机图像空间，获得每帧约 500K 的有效深度像素。以下按处理顺序解析各模块的功能与机理。
 
@@ -252,8 +239,6 @@ $$[ t , x , y , z , q _ { w } , q _ { x } , q _ { y } , q _ { z } ]$$
 - $\tilde{\boldsymbol{r}}$：体素内所有点径向距离的中位数
 - $MAD$：中位数绝对偏差，用于体素级离群值检测
 
-
-
 ## 实验与关键发现
 
 ### 基准任务与评估协议
@@ -309,9 +294,6 @@ Figure 6 展示了真值生成管道中两个关键模块的定性消融：
 
 Figure 2 和 Figure 7 定量和定性地展示了 CARD 的深度真值密度优势：
 
-![[assets/figures/papers/paper_list_l815_https_openaccess_thecvf_com_content_CVPR2026_html_Elazab_CARD_A_Multi_Mo/figures/003_Figure_2.jpg]]
-*Figure 2: Ground truth points per image. CARD has more depth points per image than KITTI-DC [16, 47] and DrivingStereo [57]*
-
 ![[assets/figures/papers/paper_list_l815_https_openaccess_thecvf_com_content_CVPR2026_html_Elazab_CARD_A_Multi_Mo/figures/009_Figure_7.jpg]]
 *Figure 7: Colored point cloud comparison. We show CARD alongside densified ground truth from KITTI-DC [16, 47] and RSRD [62], and LiDAR based ground truth from A2D2 [17], Waymo [44], and DDAD [19]. Each panel shows the input image at top left and the point cloud count in bottom left, and only the KITTI-DC panel includes a zoom-in illustrating distortions from dynamic objects [16, 47]*
 
@@ -324,22 +306,6 @@ Figure 2 和 Figure 7 定量和定性地展示了 CARD 的深度真值密度
 2. **小物体残留误差**：动态过滤依赖 ICP 残差和体素清理，对于缓慢移动或与静态场景几何相似的小物体（如停放的自行车），可能仍有少量误保留。
 3. **匿名化影响**：为满足 GDPR 要求，图像中的人脸和车牌经过匿名化处理，可能影响依赖这些特征的感知模型在 CARD 上的训练效果。
 4. **地形标注粒度**：当前道路地形标注仅为 2D 边界框，无法提供逐像素的语义分割或 3D 实例级几何模型，限制了更细粒度评估的可能性。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l815_https_openaccess_thecvf_com_content_CVPR2026_html_Elazab_CARD_A_Multi_Mo/figures/002_Table_1.jpg]]
-*Table 1: Datasets comparison. Entries marked with * indicate values we averaged over subsamples of the respective datasets. Abbreviations: OR=off-road, SP=speed bumps/potholes, UE=uneven roads, Urban=city scenes. L denotes low or not explicitly reported*
-
-![[assets/figures/papers/paper_list_l815_https_openaccess_thecvf_com_content_CVPR2026_html_Elazab_CARD_A_Multi_Mo/figures/006_Figure_4.jpg]]
-*Figure 4: (a) Image-level distribution of road-topography labels: positive, such as speed bumps, negative, such as potholes, and offroad, such as non-asphalt cases. (b) Sequence-level statistics: a sequence is marked irregular if it contains at least one positive or negative instance. Example frames above, such as left: off-road, middle: negative, right: positive*
-
-![[assets/figures/papers/paper_list_l815_https_openaccess_thecvf_com_content_CVPR2026_html_Elazab_CARD_A_Multi_Mo/figures/001_Figure_1.jpg]]
-*Figure 1: CARD example from Carmiano, Italy. Right: map with annotated positive irregularities (speed bumps) and negative irregularities (potholes) along the driven routes, with one speed bump highlighted. Left: camera image with depth ground truth projected into the image (top) and height relative to the road (bottom)*
-
-![[assets/figures/papers/paper_list_l815_https_openaccess_thecvf_com_content_CVPR2026_html_Elazab_CARD_A_Multi_Mo/figures/004_Table_2.jpg]]
-*Table 2: Perception sensor specifications for CARD*
-
-
 
 ## 定位与知识库关联
 
@@ -388,8 +354,6 @@ CARD 开辟了若干值得深入的方向：
 ### 证据强度说明
 
 本节核心结论均有强证据支撑：真值密度优势（Figure 2，置信度 0.95）、零样本模型在路面不规则区域的退化（Table 3，置信度 0.9）、自适应投票和体素清理的消融（Figure 6，置信度 0.98）、路面相对高度表示（wheel excitation 定义，置信度 0.98）。地理多样性不足和匿名化影响等局限来自论文自述，置信度较高。跨数据集泛化和时间一致性评估的开放问题为合理推断，需后续实验验证。
-
-
 
 ## 原文 PDF
 

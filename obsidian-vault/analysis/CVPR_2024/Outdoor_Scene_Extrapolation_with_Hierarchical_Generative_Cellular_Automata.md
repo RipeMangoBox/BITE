@@ -121,8 +121,6 @@ hGCA 采用**两阶段层次化粗-细生成范式**，将大规模室外场景�
 
 **关键因果机制。** 纯 GCA 的局部转移核在大场景中缺乏全局一致性，导致墙壁弯曲、树木从房屋生成等伪影（Figure 3 绿色框）。BEV 规划器通过注入不随时间步变化的全局 BEV 特征，在保持 GCA 空间可扩展性的同时，显著抑制了这些不一致性。粗-细分层设计进一步将几何补全与高分辨率细节生成解耦，在单张 24 GB GPU 上即可完成 120 米级场景的高保真外推（Figure 1）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2406_08292/figures/019_Figure_14.jpg]]
 *Figure 14: Ablation study on a novel three-wheeler completion by varying density of 5 scans. Inset shows wide range view of the completion. Locality of GCA’s enable generalization to sparse input producing stable completions, while method that only utilize global features fail*
 
@@ -236,16 +234,6 @@ Table 4通过人为稀疏化输入来测试hGCA的鲁棒性。在“稀疏场景
 
 Figure 13和Table 5展示了hGCA在nuScenes数据集上处理100米场景的能力。在单张24GB GPU上，hGCA能够完成整个场景的高分辨率生成，**无需额外技巧（如分块处理或梯度检查点）**。这验证了粗-细分层设计的空间效率优势：粗阶段在低分辨率下完成全局推理，细阶段仅对局部区域进行上采样，避免了在整个高分辨率网格上进行密集计算。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2406_08292/figures/003_Figure_3.jpg]]
-*Figure 3: Left: (a) Input LiDAR scans. (b), (c) GCA completion in 1 0 $\mathrm { { c m } ^ { 3 } }$ and 2 0 $\mathrm { { c m } ^ { 3 } }$ voxel resolution. (d) GCA + planner completion in 20cm voxel resolution. GCA is local and often cannot capture the global context, generating imperfect completions (pink box) or artifacts (green box)
-
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2406_08292/figures/009_Figure_8.jpg]]
-*Figure 8: (a), (b): Completion on LiDAR scan from Waymo-open. (c), (d): Completion on synthetic LiDAR of a three-wheeler asset from sketchfab 4 hGCA can realistically complete from tree trunks or three-wheeler cars unseen in training, taking geometric cues from the input (yellow spheres)*
-
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2406_08292/figures/018_Figure.jpg]]
-*Figure: 50% Input*
 
 ![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2406_08292/figures/022_Figure_16.jpg]]
 *Figure 16: Planner with z _ { r } = 4 visualization. From left to right: 5 scan input from Karton City, completion (20cm3 resolution), rough dense occupancy Or from planner, BEV feature fBEV visualization using PCA. (a) Input*
@@ -255,9 +243,6 @@ Figure 13和Table 5展示了hGCA在nuScenes数据集上处理100米场景的能�
 
 ![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2406_08292/figures/010_Table_3.jpg]]
 *Table 3: Quantitative results on Waymo with 5 scans given as input. All results except IoU are multiplied by 10 in meter scale. LiDAR Resim evaluates the fidelity of completion and TMD measures the diversity of generation. Unlike synthetic results, LiDAR ReSim uses same elevation angle as the input and IoU is computed with accumulated scans*
-
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2406_08292/figures/015_Table_4.jpg]]
-*Table 4: Chamfer distance between the ground truth geometry and completions by varying sparsity. Sparse scene and sparse car indicates a scenario where we sparsify the regions of entire scene (including ground) and only the car, respectively. Chamfer distance above ground are reported and we report average distance of k = 3 generations for generative models (GCA, hGCA). hGCA generalizes well to sparse, novel data*
 
 ## 定位与知识库关联
 

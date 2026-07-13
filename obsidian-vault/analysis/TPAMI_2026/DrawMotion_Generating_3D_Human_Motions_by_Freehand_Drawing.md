@@ -55,8 +55,6 @@ claims:
 
 在方法谱系上，DrawMotion 位于文本条件扩散模型（如 MDM、MotionDiffuse）的延伸线上，但通过引入多模态空间条件与训练无关引导机制，开辟了从“语义生成”到“精确控制”的新路径。其 MCM 设计（区分 Draw Decoder 与 Text Decoder，分别采用点积注意力和高效注意力）和条件混合策略，为多条件融合提供了可复用的架构范式。
 
-
-
 三维人体动作生成是计算机视觉与图形学中的核心问题，其目标是根据用户给定的控制信号合成自然、多样的人体运动序列。近年来，基于扩散模型（diffusion models）的文本驱动动作生成方法取得了显著进展，代表性工作包括 **MDM**（Tevet et al., arXiv 2022）、**MotionDiffuse**（Zhang et al., arXiv 2022）以及引入检索增强的 **ReMoDiffuse**。然而，这些方法均以纯文本作为唯一的控制条件，面临一个根本性瓶颈：**文本描述难以精确传达动作的空间轨迹与肢体姿态**。
 
 具体而言，语言在表达连续的空间路径（如“走一个 S 形曲线并在此处举起左手”）时存在天然的模糊性。用户往往需要反复修改文本提示词来逼近预期效果，这一过程耗时且不可控。论文通过用户实验证实，纯文本方案的平均操作时间约为 64.4 秒，而引入手绘控制后降至 34.3 秒，**时间节省约 46.7%**（Table XII）。这一定量证据直接揭示了文本单一模态在空间控制精度上的结构性缺陷。
@@ -64,8 +62,6 @@ claims:
 针对上述缺口，**StickMotion**（Wang et al., CVPR 2025）率先尝试引入火柴人（stickman）作为额外条件，但仅支持在三个固定位置放置姿态，且不包含轨迹信息，控制粒度仍然粗糙。DrawMotion 的动机正是突破这一局限：**引入自由手绘轨迹与任意位置火柴人作为互补控制条件**，在保留文本全局语义的同时，提供空间路径与局部肢体姿态的直接约束。
 
 这一动机背后的核心洞察在于：多条件融合模块（MCM）的中间特征形成了连续且稠密的分布空间（Figure 5 的 PCA 投影显示，ReMoDiffuse 特征分布离散不规则，而 MCM 特征分布连续稠密）。这种连续分布为**训练无关的梯度引导**（Intermediate Feature Guidance, IFG）提供了数学基础——模型无需重新训练即可在推理时通过梯度更新严格对齐用户提供的轨迹约束，同时保持生成质量。这一机制将“控制精度”与“生成保真度”两个通常互斥的目标统一在同一框架下。
-
-
 
 ## 核心方法与创新机理
 
@@ -89,8 +85,6 @@ MCM 带来的一个深层性质是：其**中间特征形成了连续且稠密�
 
 这三个创新点形成了一条清晰的因果链：**扩展控制条件**提供了空间约束的表达能力，**MCM 的模态特化融合**保障了异质条件的有效整合，**IFG** 则利用 MCM 连续特征空间的优良性质，以零训练成本实现了严格的轨迹对齐。
 
-
-
 DrawMotion 的整体推理流程如 Figure 1 所示，其核心由三个关键模块串联构成：**条件编码**、**多条件融合（MCM）** 与**扩散去噪**。用户输入包含三类模态——一段自然语言描述、一条徒手绘制的 2D 轨迹，以及沿轨迹任意位置放置的若干火柴人姿态。这些异构输入分别经过冻结的 CLIP ViT‑B/32 文本编码器、轨迹编码器（六层 Conv1d）和预训练并冻结的火柴人编码器，被映射为统一的嵌入表示。
 
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2605_20955/figures/001_Figure_1.jpg]]
@@ -110,8 +104,6 @@ $$\mathcal{L}_{\mathrm{final}} = \mathcal{L}_{\mathrm{motion}} + \mathcal{L}_{\m
 
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2605_20955/figures/003_Figure_3.jpg]]
 *Figure 3: The DrawMotion framework consists of the diffusion process (left) and the network structure (right). 1) The diffusion process includes a forward and a reverse process. In the forward process, original motions are augmented with Gaussian noise and fed into DrawMotion, which learns to predict the added noise based on textual descriptions and hand-drawn sketches. In the reverse process, user-provided textual descriptions and hand-drawn sketches are input into DrawMotion, enabling the gradual generation of motion sequences using the predicted noise. 2) In the DrawMotion architecture, both the stickman encoder and the text encoder are frozen, while the remaining modules are trainable. Encoded in...*
-
-
 
 ### 问题建模与扩散框架
 
@@ -197,9 +189,6 @@ $$\mathcal{L}_{\mathrm{traj}} = \big\| \mathrm{Traj}(\hat{x}(\mathrm{draw}, *)) 
 
 IFG 是训练无关的轨迹对齐引导机制，其设计依赖于一个关键发现：MCM 的中间特征形成连续且稠密的分布（Figure 5 的 PCA 可视化证实了这一点，而 ReMoDiffuse 的特征分布则呈离散不规则状态）。这一连续空间使得梯度引导成为可能。
 
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2605_20955/figures/006_Figure_5.jpg]]
-*Figure 5: 2D PCA projection onto the first two principal components of ReMoDiffuse and DrawMotion. Sample size = 80,000 and diffusion step = 299*
-
 IFG 在推理时对选定的 MCM 层中间特征进行 SGD 更新，以最小化生成轨迹与用户提供轨迹之间的差异。为防止过度更新导致生成质量下降，IFG 引入 **Mahalanobis 距离裁剪**：
 
 $$M(F) = \sqrt{(F - \mu)^T \Sigma^{-1} (F - \mu)}$$
@@ -214,8 +203,6 @@ MCM 中间特征的连续稠密分布是 IFG 得以工作的**因果机制**。F
 
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2605_20955/figures/004_Figure_4.jpg]]
 *Figure 4: Conceptual illustration of intermediate feature distributions. The dashed lines correspond to level sets of the probability density function. (a) Ordinary models yield discrete clusters, (b) MCM forms a relatively continuous space, and (c) VAE enforces full latent coverage. This schematic is supported by Table I*
-
-
 
 ## 实验与关键发现
 
@@ -264,33 +251,14 @@ Intermediate Feature Guidance（IFG）是 DrawMotion 无需重新训练即可实
 
 3. **IFG 的时间开销。** 虽然 IFG 无需训练，但其迭代更新增加了推理时间。Table XI 给出了不同 repeat 次数下的时间消耗，用户需在轨迹对齐精度和推理速度之间权衡。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2605_20955/figures/009_Table.jpg]]
 *Table: III: Comparison on the HumanML3D test set. We mark the best result as red and the second best one as blue . Arrows indicate the desired direction of metrics: ↓ (lower is better), ↑ (higher is better), and → (closer to real data is better). TABLE IV: Comparison on the KIT-ML test set*
 
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2605_20955/figures/011_Table.jpg]]
 *Table: VII: Analysis on the Structure of Condition Decoders on the KIT-ML dataset. R-prec (top3) denotes R-precision (top3). Text/Draw denotes the Text/Draw Decoder. And dot/eff denotes the dot-product/efficient attention structure respectively. The row with a gray background is our best practice. TABLE IX: Ablation study on the condition mixture for the inference / reverse process on KIT-ML dataset. The row with a gray background is our best practice. TABLE X: Ablation study of the stickman number on KIT dataset. IFG was not applied to save time*
 
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2605_20955/figures/012_Table.jpg]]
-*Table: VIII: Analysis on the Structure of MCM on the KIT-ML dataset. Rows without in the column “Condition Fusion” mean use of the traditional mask mechanism. Rows without $\surd$ in the column ”Latent Encoder” mean a simple linear layer is used. The row with a gray background is our best practice*
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2605_20955/figures/007_Table.jpg]]
-*Table: I: Comparison of FID under different perturbation factors λ. Lower is better*
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2605_20955/figures/008_Table.jpg]]
-*Table: II: Hyperparameter analysis of Intermediate Feature Guidance (IFG) on KIT-ML dataset. Here, repeat denotes the number of SGD iterations, lr is the learning rate of this update, $N _ { t h }$ layer specifies the selected MCM layer for guidance, ϵMD is the Mahalanobis distance threshold used for clipping abnormal updates, and λ is the clip scale*
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2605_20955/figures/015_Table.jpg]]
-*Table: XII: Comparison between stickman & text-to-motion and text-to-motion task. “TA” and “TB” represent the time cost for overall and detailed descriptions, respectively, while “TD” denotes the time required for hand-drawing. “TI” represents the inference time of the utilized model. For Handmade animation, the trajectory is fixed and no textual input is required. all experiments are conducted on an A800 GPU with a batch size of 1*
-
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2605_20955/figures/013_Figure_7.jpg]]
 *Figure 7: Visualization of DrawMotion (see the animation on GitHub)*
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2605_20955/figures/005_Figure_6.jpg]]
-*Figure 6: 2D PCA projection onto the first two principal components of different condition settings in DrawMotion. Sample size = 20,000 and diffusion step = 299*
-
-
 
 ## 定位与知识库关联
 
@@ -336,8 +304,6 @@ DrawMotion 处于 **可控动作生成** 与 **训练无关引导** 的交叉点
 3. **引导机制**：IFG 证明了在连续中间特征空间中进行训练无关引导的可行性，这一思路可能推广到其他需要精确约束的生成任务中。
 
 **需要手动验证的点**：ReMoDiffuse 的具体引用信息（作者/会议/年份）在当前分析中缺失，建议查阅原始论文补充完整引用。
-
-
 
 ## 原文 PDF
 

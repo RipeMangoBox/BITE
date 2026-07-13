@@ -53,8 +53,6 @@ MMDIR（Multimodal Instruction-Driven Framework for Mixed-Degradation Document I
 
 实验表明，MMDIR在单一退化基准（BMVC去模糊、OSR去阴影）和提出的混合退化基准MixedDoc上均取得最优结果。在MixedDoc上，MMDIR达到PSNR 24.43、SSIM 0.908，显著领先于DocDiff、DiffUIR等基线方法。消融实验进一步证实，引入文本指令在去模糊、去阴影及混合退化三个基准上全面且显著地提升了所有恢复指标。
 
-
-
 文档图像恢复（Document Image Restoration, DIR）旨在从退化的文档图像中重建高质量的干净图像，是文档分析与识别流程中的关键预处理环节。现实场景中的文档图像常遭受多种退化类型的复合影响，包括模糊、阴影、文本水印以及印章覆盖等。这些退化往往以不确定的组合方式同时出现，严重损害文档的可读性与下游任务（如光学字符识别）的性能。
 
 现有文档图像恢复方法在范式上存在明显局限。以 **DocDiff**（Yang et al., ACM Multimedia 2023）、**NAF-DPM**（Cicchetti et al., arXiv 2024）和 **LGA-Doc**（Tie et al., ICMR 2025）为代表的端到端图像到图像恢复模型，通常针对单一退化类型进行设计和训练，缺乏对退化类型的显式感知与提示引导。**DocRes**（Zhang et al., CVPR 2024）虽然引入了基于预处理退化图像提取的显式先验提示，试图区分不同退化类型，但其提示来源于对输入图像的预处理分析，本质上仍是一种前馈式的固定映射，缺乏对退化语义的深层理解与动态推理能力。这些方法的共同瓶颈在于：无法有效应对现实世界中常见的混合退化场景，且缺乏任务协同和用户引导能力，导致在复杂条件下的泛化性差。
@@ -62,8 +60,6 @@ MMDIR（Multimodal Instruction-Driven Framework for Mixed-Degradation Document I
 上述瓶颈的根源在于传统范式将文档图像恢复视为一个纯粹的视觉映射问题，忽略了退化类型识别这一关键语义环节。现实中的退化往往是混合且不确定的——用户可能知道文档存在哪些类型的退化，也可能完全未知。现有方法既无法接收用户提供的退化描述作为指导，也无法自主推理图像中存在的退化类型并据此调整恢复策略，从而限制了恢复过程的透明性、可控性和针对性。
 
 为突破这一局限，本文提出 **MMDIR**（Multimodal Instruction-Driven Framework for Mixed-Degradation Document Image Restoration），一种面向混合退化文档图像恢复的多模态指令驱动框架。其核心动机在于：将图像恢复任务与视觉语言理解相结合，通过引入文本指令作为控制信号，使模型能够动态识别退化类型并生成语义提示，从而为视觉解码器提供退化感知的指导。这一范式转变将文档图像恢复从“被动映射”升级为“主动感知与推理”，使模型不仅能恢复图像，还能回答“存在哪些退化”这一诊断性问题，提升了恢复过程的可解释性和人机交互能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -102,8 +98,6 @@ $$\mathcal{L}_{\text{total}} = \mathcal{L}_{\text{pixel}} + \alpha \mathcal{L}_{
 ### 4. 与现有工作的本质差异总结
 
 相较于 **DiffUIR** (Zheng et al., CVPR 2024) 等统一图像恢复方法使用扩散先验进行隐式退化处理，MMDIR 的创新在于**显式化退化识别过程**，使模型具备可解释的退化诊断能力。模型不仅能恢复图像，还能输出退化类型判断（Figure 9），这为文档图像恢复任务引入了透明度和可解释性，突破了传统端到端黑盒映射的局限。
-
-
 
 MMDIR 是一个端到端的多模态指令驱动框架，其核心设计在于将文档图像恢复任务重新定义为视觉-语言协同推理问题。与传统的图像到图像映射或基于显式先验提示的方法不同，MMDIR 同时接收退化图像和文本指令作为输入，并通过大语言模型（LLM）的推理能力动态感知退化类型，进而为视觉解码器提供语义引导。
 
@@ -148,9 +142,6 @@ $$
 
 Figure 1 清晰对比了三代文档图像恢复范式：
 
-![[assets/figures/papers/paper_list_l2327_https_openaccess_thecvf_com_content_CVPR2026_html_Li_MMDIR_Multimodal_In/figures/001_Figure_1.jpg]]
-*Figure 1: Model patterns for document image restoration (DIR). Existing methods (a) such as DocDiff [40], NAF-DPM [5] and LGA-Doc [34] consist of an end-to-end image-to-image restoration model without any prompt guidance (focusing on single degraded type). The method DocRes [41] (b) uses prior image prompts derived from preprocessed degraded images to guide document restoration, distinguishing between degradation types. Our approach is fundamentally different. As shown in (c), it simultaneously takes multimodal input and output. Text instructions are fed along with the degraded images, prompting the model to answer the instruction question, identifying the presence or absence of degradation types to...*
-
 - **传统端到端方法**（如 **DocDiff** (Yang et al., ACM Multimedia 2023)、**NAF-DPM** (Cicchetti et al., arXiv 2024)、**LGA-Doc** (Tie et al., ICMR 2025)）：仅接收退化图像，无任何提示引导，且通常针对单一退化类型训练。
 - **显式先验提示方法**（如 **DocRes** (Zhang et al., CVPR 2024)）：使用从预处理退化图像中提取的显式先验作为提示，区分退化类型。
 - **MMDIR 的多模态指令驱动范式**：同时处理多模态输入和输出。文本指令与退化图像一同输入，模型首先回答指令问题（识别退化类型的存在与否），再将语义理解结果作为引导信号反馈给视觉解码器。这一设计使退化感知从隐式映射或预处理提取提升为动态语义推理。
@@ -170,8 +161,6 @@ $$
 - $\mathcal{L}_{ce}$ 为退化识别的交叉熵损失。
 
 加权系数设置为 $\alpha = 4$、$\beta = 0.5$、$\lambda = 0.5$。局部损失的设计直接呼应了框架的退化感知目标——模型不仅需要恢复图像，还需要准确识别退化类型，并在对应区域施加更强的重建约束。
-
-
 
 ### 3.1 多模态编码：从退化图像到语义诊断
 
@@ -231,12 +220,8 @@ $$
 
 整个框架的设计遵循一条清晰的因果链：**文本指令 → LLM 退化诊断 → 语义提示注入 → 条件化图像恢复**。与传统端到端映射（如 **DocDiff** (Yang et al., ACM Multimedia 2023)、**NAF-DPM** (Cicchetti et al., arXiv 2024)）或基于预处理先验的 **DocRes** (Zhang et al., CVPR 2024) 不同，MMDIR 将退化类型的识别从隐式特征学习解耦为显式的跨模态推理任务。消融实验（Table 4）证实，移除文本指令（即去除 LLM 分支）会导致三个基准上的 PSNR、SSIM、LPIPS 和 DISTS 全面劣化，验证了语义引导作为核心因果调节变量的有效性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2327_https_openaccess_thecvf_com_content_CVPR2026_html_Li_MMDIR_Multimodal_In/figures/003_Figure_3.jpg]]
 *Figure 3: The architecture of vision decoder. SCA represents the Simplified Channel Attention in the NAF Block [2]. The GuidedLayer weights the feature maps of*
-
-
 
 ## 实验与关键发现
 
@@ -284,30 +269,11 @@ MMDIR 不仅输出恢复图像，还能同步诊断图像中存在的退化类�
 2. **合成数据的域间隙**：训练数据均为合成生成，尽管模拟了真实退化模式，但与开放环境中非均匀、不规则的噪声分布仍存在差异，域外泛化能力需要进一步验证。
 3. **LLM 能力的未充分挖掘**：当前使用 Qwen2.5 0.5B 并冻结参数，更强大 LLM 或对 LLM 进行微调是否能提升退化识别的鲁棒性和指令泛化性，仍属开放问题。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2327_https_openaccess_thecvf_com_content_CVPR2026_html_Li_MMDIR_Multimodal_In/figures/006_Table_1.jpg]]
 *Table 1: Comparisons on single degradation benchmark. “↑” indicates the higher the better and “↓” denotes the opposite. The best performing result is shown in Bold font, and the second best result is shown with an underline. The “*” indicates results reproduced based on the authors’ public code and the same training dataset as used in our method. “256” and*
 
-![[assets/figures/papers/paper_list_l2327_https_openaccess_thecvf_com_content_CVPR2026_html_Li_MMDIR_Multimodal_In/figures/008_Table_3.jpg]]
-*Table 3: Comparisons on our proposed mixed degradation benchmark (MixedDoc)*
-
-![[assets/figures/papers/paper_list_l2327_https_openaccess_thecvf_com_content_CVPR2026_html_Li_MMDIR_Multimodal_In/figures/011_Table_4.jpg]]
-*Table 4: Ablation studies of text instruction on Deblurring (BMVC [15]), Deshadow (OSR [36]) and our proposed benchmark Mixed-Doc. Inst. means text instruction*
-
-![[assets/figures/papers/paper_list_l2327_https_openaccess_thecvf_com_content_CVPR2026_html_Li_MMDIR_Multimodal_In/figures/009_Figure_6.jpg]]
-*Figure 6: Visual Comparison on the deblurring benchmark BMVC [15]. The first column “Degraded” is input image, and the last column “Ground Truth” indicates clean reference. Red and green boxes highlight zoomed-in detail discrepancies*
-
 ![[assets/figures/papers/paper_list_l2327_https_openaccess_thecvf_com_content_CVPR2026_html_Li_MMDIR_Multimodal_In/figures/014_Figure_9.jpg]]
 *Figure 9: Visualization of our model’s predictions*
-
-![[assets/figures/papers/paper_list_l2327_https_openaccess_thecvf_com_content_CVPR2026_html_Li_MMDIR_Multimodal_In/figures/004_Figure_4.jpg]]
-*Figure 4: Samples visualization of training dataset*
-
-![[assets/figures/papers/paper_list_l2327_https_openaccess_thecvf_com_content_CVPR2026_html_Li_MMDIR_Multimodal_In/figures/007_Table_2.jpg]]
-*Table 2: Instruction variants*
-
-
 
 ## 定位与知识库关联
 
@@ -362,8 +328,6 @@ MMDIR 的适用边界由以下因素界定：
 4. **与下游任务的联合优化**：该指令驱动范式如何与文档理解下游任务（如 OCR、布局分析、信息提取）进行更深层次的联合优化？当前恢复质量通过 CER/ED 间接评估对 OCR 的影响（Table 5），但恢复模型与 OCR 模型的端到端联合训练尚未探索。
 
 5. **指令泛化性**：Table 2 展示了指令变体对退化识别的影响，但更广泛的指令措辞变化、多语言指令、以及零样本退化描述下的鲁棒性仍需系统评估。
-
-
 
 ## 原文 PDF
 

@@ -54,8 +54,6 @@ claims:
 
 **方法定位**：MAC-Flow属于集中训练-分散执行框架下的离线MARL方法，其方法谱系与知识库定位详见后续章节。
 
-
-
 ### 离线多智能体强化学习的核心挑战
 
 多智能体强化学习（MARL）在现实场景（如机器人编队、交通控制）中面临严峻的样本效率与安全性约束，离线学习范式因此成为关键路径。然而，离线MARL的核心瓶颈并非单纯的数据稀缺，而在于**联合行为分布的表达力与推理效率之间的根本性权衡**：
@@ -81,8 +79,6 @@ claims:
 - **第二阶段**：在 IGM（Individual-Global-Max）原理约束下，将联合流策略蒸馏为每智能体的单步采样策略，同时最大化全局 Q 值，实现集中训练与分散执行的统一。
 
 这一解耦设计的关键洞察在于：**蒸馏损失通过 2-Wasserstein 距离上界联合策略与因子化策略的分布差异，进而由 Q 函数的 Lipschitz 性质控制性能退化**（Proposition 4.2、4.3），从而在理论上保证了因子化过程的可控性。最终，MAC-Flow 在保持与扩散方法可比甚至更优性能的同时，将推理复杂度降至 $O(1)$，实现了性能与推理速度的帕累托改善（Figure 1）。
-
-
 
 ## 核心方法与创新机理
 
@@ -128,8 +124,6 @@ MAC-Flow将这一耦合拆解为两个独立阶段（Figure 2）：
 - **联合流策略**在第一阶段优于独立流策略，且MAC-Flow显著超越其朴素变体MA-FQL（分散流+独立$Q$），验证了联合BC与IGM Critic协同设计的必要性。
 
 综上，MAC-Flow通过“流匹配联合建模→IGM约束蒸馏”的两阶段解耦设计，在保持扩散级表达力的同时实现了高斯级的推理效率，并以Wasserstein距离理论为蒸馏退化提供了可量化的安全边界。
-
-
 
 ![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_2L6MffR0ut/figures/002_Figure_2.jpg]]
 *Figure 2: Overview diagram of proposed solution. Our solution, MAC-Flow, composes of two stages. The first stage models the joint action distribution via flow-matching to capture inter-agent dependencies, thereby facilitating the extraction of coordination behaviors more effectively than treating individual policies. For the next stage, individual critics are trained under the individual-global-max principle, thereby embedding behaviors for multi-agent coordination. At the second stage, practicality is highlighted by deriving individual policies for decentralized execution from a flow-based joint policy via Q maximization and BC distillation*
@@ -191,8 +185,6 @@ $$\mathcal{L}_{\mathrm{Flow-BC}}(\phi) = \mathbb{E}_{\mathbf{x}^0 \sim \mathbf{p
 ### 局限性
 
 MAC-Flow 的性能保证依赖于两个关键假设：Q 函数的 Lipschitz 连续性与 IGM 可分解性。在强交互、反协同场景（如 XOR 任务，Figure 15）中，IGM 原理失效，导致蒸馏策略退化为近似均匀的乘积分布。此外，超参数 $\alpha$ 对性能敏感，需针对不同任务仔细调节。
-
-
 
 ### 4.1 两阶段架构概览
 
@@ -260,8 +252,6 @@ $$\Big| \mathbb{E}_{\mathbf{a} \sim \pi_{\mathbf{w}}(\mathbf{o})} [Q_{\mathrm{to
 
 **关键假设与局限**：上述保证依赖于两个前提——(1) Q 函数的 Lipschitz 连续性；(2) IGM 可分解性假设。在强交互、反协同场景（如 XOR 任务，Figure 15）中，IGM 原理失效，因子化策略会退化为近似均匀的积分布，性能大幅下降。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能与推理速度权衡
@@ -270,15 +260,6 @@ MAC-Flow在主流多智能体离线强化学习基准上实现了性能与推理
 
 ![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_2L6MffR0ut/figures/007_Table_1.jpg]]
 *Table 1: Performance evaluation for discrete action control. We present a performance comparison across 2 benchmarks, 8 tasks, and 18 datasets. These results are averaged over 6 seeds, and we report the two standard deviations after the ± sign. We highlight the best performance in bold and the second best in underlined*
-
-![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_2L6MffR0ut/figures/008_Table_2.jpg]]
-*Table 2: Performance evaluation for continuous action control. We present a performance comparison across 2 benchmarks, 4 tasks, and 16 datasets. Results are reported following the conventions of Table 1. For readability, we use the acronyms M-E and M-R for Medium-Expert and Medium-Replay, respectively. Additionally, MAC-Flow incurs a modest increase in training time over Gaussian models, but still trains far faster than diffusion baselines. Full results are provided in Appendix H.2*
-
-![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_2L6MffR0ut/figures/016_Table_3.jpg]]
-*Table 3: Dec-POMDP elements*
-
-![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_2L6MffR0ut/figures/019_Table_3.jpg]]
-*Table 3: Asymptotic inference time complexity analysis. This table reports big-O analysis about input dimension, per-agent cost, and total cost of producing one joint action at a single environment step*
 
 ![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_2L6MffR0ut/figures/001_Figure_1.jpg]]
 *Figure 1: TL;DR: MAC-Flow alleviates performance-inference time trade-off, achieving a 14.5x speedup compared to SOTA Performance. vs. Inference time. (Benchmarks: SMACv1 and SMACv2) Figure 1: Summary of results. This summarizes performance vs. inference speed for selected algorithms on widely-used MARL benchmarks, SMACv1 and SMACv2. We plot aggregate mean performance and inference time across 18 datasets for 8 scenarios related to the SMAC maps. More precisely, we measure inference time based on the total computation performed by each algorithm and report it by using milliseconds (ms) unit and log scale, where a higher value indicates greater computational cost. As a result, our proposed solution, M...*
@@ -317,17 +298,6 @@ Figure 3通过一个教学示例验证了理论分析的核心命题。Figure 3(
 **超参数敏感性。** 蒸馏损失权重α需要在不同任务间仔细调节，对最终性能影响敏感。这一观察在Figure 6的消融中有所体现——α平衡了Q最大化与BC蒸馏两个目标，过大或过小均会导致性能下降。
 
 **离线到在线微调的表现。** Figure 5显示MAC-Flow在离线到在线微调中能够持续提升性能，表明其策略表示具有良好的迁移基础。但在强交互场景下，因子化策略的结构性偏差可能在在线阶段难以完全弥补。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_2L6MffR0ut/figures/017_Table_4.jpg]]
-
-![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_2L6MffR0ut/figures/018_Table_5.jpg]]
-*Table 5: RL Training*
-
-![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_2L6MffR0ut/figures/020_Table_7.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -387,8 +357,6 @@ Figure 16 的收益博弈实验揭示了交互强度对蒸馏效果的影响：�
 4. **生成模型的选择空间**：本文采用流匹配的最简单变体（条件速度场匹配位移向量），未探索更先进的生成建模技术（如扩散模型与流匹配的混合、基于分数的生成模型）能否在表达力上带来进一步提升，同时保持蒸馏的可行性。
 
 5. **大规模系统的维度灾难**：联合流模型的输入维度为 $I \cdot d_a$（$I$ 为智能体数，$d_a$ 为动作维度）。在大规模系统中，能否通过图神经网络、注意力机制或分层建模来缓解维度爆炸，同时保持联合分布的建模精度？
-
-
 
 ## 原文 PDF
 

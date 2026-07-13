@@ -62,8 +62,6 @@ CoMPAS3D 针对上述缺口提出了系统性的解决方案。其核心思路�
 
 在方法谱系上，CoMPAS3D 并非提出新的生成模型，而是构建了一个**数据集+评估框架**的基础设施，包含三个基准任务：动作分类（类比转写）、熟练度估计（类比流利度评估）和跟舞生成（类比对话应答）。其评估框架融合了传统运动学指标、基于微调 VLM 的语义客观指标，以及源自真实竞赛评审准则的 6 维主观评估，为交互式运动生成领域提供了更全面的评测基准。
 
-
-
 ### 问题背景：交互式运动生成的评估盲区
 
 双人舞蹈是一种典型的即兴交互式运动——领舞者通过身体语言发出信号，跟舞者在共享音乐节拍下实时解读并做出动作响应。这一过程与人类口语对话高度相似：动作序列如同语音流，特定舞蹈动作如同词汇，而舞者的熟练度则类似于语言流利度。然而，当前交互式运动生成领域的评估体系却停留在“音质”层面，完全缺失了“语义”维度。
@@ -85,8 +83,6 @@ CoMPAS3D 针对上述缺口提出了系统性的解决方案。其核心思路�
 本文的核心动机是打破上述循环。我们提出将双人舞蹈类比为口语对话系统：动作分类对应语音转写（transcription），熟练度估计对应流利度评估（fluency assessment），跟舞生成对应对话响应（dialogue response）。基于这一类比，我们构建了**CoMPAS3D**——首个具备专家细粒度动作标注和熟练度层级的即兴双人舞蹈数据集，并在此基础上训练视觉语言模型（VLM）作为“自动裁判”，将动作可辨识性和熟练度适配性转化为可量化的客观评估指标。
 
 这一框架使得我们首次能够揭示一个关键事实：**现有运动生成方法在运动学指标上表现与真实数据可比，但在语义维度上存在巨大鸿沟**——生成动作的可辨识性远低于真实舞蹈，且无法有效适配目标熟练度层级。这一发现表明，仅依赖运动学指标优化生成模型可能导致“听起来像但不知所云”的运动序列，而CoMPAS3D提供的语义评估维度为生成模型的实质性改进指明了方向。
-
-
 
 ## 核心方法与创新机理
 
@@ -135,8 +131,6 @@ CoMPAS3D的创新形成了一个完整的因果链路：**专家标注的数据�
 - 数据集目前仅覆盖salsa单一舞种，VLM分类器和评估框架向其他舞种的迁移性尚未验证。
 - 客观语义指标（Move F1、Proficiency F1）与人工判断之间的直接相关性未正式测量，这一局限在当前运动生成评估领域普遍存在，需要后续研究补充。
 - 动作标注由单一专家完成（经第二位专家抽样验证），标注者偏差可能存在，尽管Cohen's Kappa=0.752表明一致性良好。
-
-
 
 CoMPAS3D 的整体框架围绕一个核心类比构建：**将双人即兴舞蹈视为口语对话**。基于这一类比，论文将动作分类类比为语音转写（transcription），将熟练度估计类比为流利度评估（fluency assessment），将跟舞生成类比为对话响应生成（dialogue response generation）。框架由三个层次构成：**数据集层**、**基准任务层**和**评估层**，三者形成闭环——数据集提供专家标注的“语料”，基准任务定义可操作的预测目标，评估层则将任务输出转化为可量化的语义指标。
 
@@ -195,8 +189,6 @@ CoMPAS3D 是首个公开的即兴双人舞蹈数据集，包含约3小时的 sal
 3. **生成评估**：跟舞生成器（Duolando/InterGen）输出 → 渲染为视频 → 运动学特征提取（计算 $FID_k$ 等）→ VLM 评估器推理（计算 Move F1、Proficiency F1）→ 人工评审（计算6维度 Likert 评分）
 
 值得注意的是，框架在评估生成动作时采用**两阶段验证策略**：先在真实数据上确认 VLM 评估器的可靠性（Table 2），再将其应用于生成数据（Table 4），从而确保语义指标的测量效度。Table 4 的核心发现——生成方法在 Move F1 上远低于真实数据（InterGen 7.69 vs GT 53.55），同时运动学指标表现可比（Table 3：Duolando $FID_k$=10.47）——直接验证了框架的核心主张：**运动学指标无法捕捉语义层面的生成质量缺陷**。
-
-
 
 ### 三层基准任务框架
 
@@ -278,8 +270,6 @@ $$BAS$$
 
 **需注意的限制**：客观语义指标（Move F1、Proficiency F1）与人工判断之间的直接相关性尚未量化测量，这一缺失在当前运动生成评估领域普遍存在，需后续研究补全。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设计逻辑
@@ -295,17 +285,11 @@ CoMPAS3D的实验体系围绕一个核心论证链条展开：**先验证VLM自�
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2507_19684/figures/007_Table_4.jpg]]
 *Table 4: Objective legibility and proficiency appropriateness evaluations (in bold) on generated follower motions on CoMPAS3D. Ground truth from Table 2 is included as reference*
 
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2507_19684/figures/008_Figure_4.jpg]]
-*Figure 4: Human evaluation study results. Ratings are on a 5-point Likert scale across six salsa competition dimensions [3]. GT = ground truth, IG = InterGen, DU = Duolando. Statistical significance between GT and each generative method is indicated*
-
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2507_19684/figures/019_Figure_9.jpg]]
 *Figure 9: Confusion matrices for move classification using fine-tuned models, reported in Table 2*
 
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2507_19684/figures/021_Figure_10.jpg]]
 *Figure 10: Confusion matrices for move classification using zero-shot models, reported in Table 2*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2507_19684/figures/023_Figure_11.jpg]]
-*Figure 11: Confusion matrices for proficiency classification using fine-tuned models, reported in Table 2*
 
 这一设计与论文的“舞蹈即对话”类比紧密对应：动作分类如同语音转写评估词汇可辨识性，熟练度估计如同流利度评估衡量水平适配性——两者共同构成超越传统运动学指标的语义评估层。
 
@@ -363,22 +347,6 @@ CoMPAS3D的实验体系围绕一个核心论证链条展开：**先验证VLM自�
 - **Table 5**：配对信息与测试集留出策略
 - **Table 6**：完整标注词典——30类动作、风格标注和错误类型的定义
 - **Table 8**：人工评估维度定义——来源于salsa竞赛评审准则
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2507_19684/figures/003_Figure_2.jpg]]
-*Figure 2: Distribution over the 30 move classes (sorted by beginner move frequency) in CoMPAS3D for beginner, intermediate and pro pairs. Beginners tend to primarily use the “basic step”, which professionals use less. Instead, pros use a wider variety of moves such as left turns and copa*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2507_19684/figures/027_Figure_13.jpg]]
-*Figure 13: Confusion matrices for legibility using both zero-shot and fine-tuned InternVL3 models, reported in Table 4*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2507_19684/figures/028_Figure_14.jpg]]
-*Figure 14: Confusion matrices for appropriateness using both zero-shot and fine-tuned Qwen2.5-VL models, reported in Table 4*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2507_19684/figures/002_Table_1.jpg]]
-*Table 1: Comparison of publicly available dance datasets capturing human-human interaction (HHI). T¯/s represents the average duration per sequence in seconds. Pairs/Genre highlights the depth of coverage within a single movement vocabulary: DD100 captures 0.5 pairs per genre across 10 ballroom styles, and InterDance’s pairs per genre is unknown across 15 genres, whereas CoMPAS3D dedicates all 9 pairs to a single genre, similar to a richly annotated dataset in English rather than shallow coverage across multiple languages*
-
-
 
 ## 定位与知识库关联
 
@@ -448,8 +416,6 @@ CoMPAS3D 的评估框架包含三个层级，逐层从运动学表层深入到�
 5. **音乐性细粒度评估**：当前 $BAS$ 仅衡量节拍对齐，如何评估生成动作对旋律、乐器、情绪等音乐维度的响应？
 6. **跨舞种泛化**：该评估框架能否迁移至 salsa 以外的舞种或其他即兴双人互动领域（如武术对练、手语对话）？
 7. **安全风险**：若数据集被用于开发与真人共舞的机器人，需通过虚拟/增强现实或物理仿真器进行接触事故规避测试。
-
-
 
 ## 原文 PDF
 

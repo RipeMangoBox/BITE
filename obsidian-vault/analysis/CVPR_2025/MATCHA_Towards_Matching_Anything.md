@@ -70,8 +70,6 @@ MATCHA 在跨任务综合评测中展现出显著优势。如 Table 4 所示，M
 
 在方法谱系中，MATCHA 处于**预训练基础模型特征增强**与**统一描述子学习**的交叉点。与 DIFT 等直接使用冻结扩散特征的方法不同，MATCHA 引入了可训练的注意力融合层和显式对应监督；与 MASt3R 等专用几何基础模型不同，MATCHA 追求单一特征的多任务泛化；与 SD4Match、DHF 等需要数据集特化模型或额外掩码的语义匹配方法不同，MATCHA 以统一的轻量训练范式覆盖三类任务。其核心贡献在于证明了：通过恰当的动态融合与知识整合策略，从现成基础模型中蒸馏出的统一特征，可以同时超越各领域的专用特征。
 
-
-
 ### 视觉对应的任务割裂现状
 
 建立图像间的精确对应是三维重建、视觉定位、物体姿态估计、视频跟踪等众多下游应用的基础能力。根据匹配目标的不同，视觉对应任务可划分为三个主要分支：
@@ -109,8 +107,6 @@ MATCHA 的核心洞察在于：利用预训练基础模型（稳定扩散与 DIN
 3. **物体级语义补全**：将 DINOv2 的物体级特征通过通道拼接集成到统一描述子中，弥补扩散特征在实例辨别和重复结构处理上的不足。
 
 如 Figure 1 所示，MATCHA 使用单一特征描述子即可建立几何、语义和时间对应，无需任何任务切换或手工特征选择。
-
-
 
 ## 核心方法与创新机理
 
@@ -178,8 +174,6 @@ MATCHA 处于**预训练基础模型特征适配**与**多任务统一表示学�
 
 **关键限制与待验证点：** 动态融合模块目前仅在下采样 8× 的特征图上运行，导致在 HPatches 小像素误差阈值（<7 px）下匹配精度不及原始分辨率特征（如 DISK, Tyszkiewicz et al., NeurIPS 2020）。此外，DINOv2 在无明显单一物体的重复结构场景中的弱点仍会传递至 MATCHA。静态串联策略虽保护了语义泛化性，但也意味着几何与语义特征之间的协同潜力尚未被完全挖掘——如何设计端到端的联合训练策略而不损害语义能力，是未来研究的重要方向。
 
-
-
 MATCHA 的设计围绕一个核心目标展开：**用单一特征描述子同时胜任几何匹配、语义匹配和时间匹配**，从而消除传统方法中需要为不同任务分别设计或选择特征的复杂性。其整体流水线由四个紧密衔接的模块构成，如 Figure 3 所示。
 
 ### 流水线概览
@@ -245,8 +239,6 @@ $$L_{total} = L_{geo} + w_{sem} L_{sem}$$
 
 - **输入**：单张 RGB 图像（训练时使用图像对，推理时单张提取特征后跨图匹配）。
 - **输出**：统一特征图 $F_m$，空间分辨率固定为输入的 1/8（8× 下采样），适用于几何、语义和时间三类匹配任务，无需任务区分或手工特征选择。
-
-
 
 MATCHA 的核心由四个模块串联构成：基础特征提取、动态特征融合、特征合并与监督训练。整体流程如 Figure 3 所示。
 
@@ -316,8 +308,6 @@ $$L_{total} = L_{geo} + w_{sem} L_{sem} \tag{12}$$
 
 推理时，使用最近邻搜索加互检（mutual check）在 $F_m$ 的描述子空间建立对应，无需任务区分。几何匹配实验中统一使用 **SuperPoint**（DeTone et al., CVPR 2018）提取关键点，位姿估计采用 Poselib + LO-RANSAC 方案，保证与基线方法的公平对比。
 
-
-
 ## 实验与关键发现
 
 ### 瓶颈验证与核心实验结论
@@ -356,8 +346,6 @@ Table 3 在 Aachen（几何）和 PF-Willow（语义）上进行了系统的组�
 3. **静态串联的潜力未充分挖掘**。统一特征采用静态串联而非端到端联合训练，虽然保护了语义能力，但可能未充分挖掘几何与语义的协同潜力。
 4. **时间匹配未利用时序先验**。时间匹配评估仅基于 TAP-Vid 的成对帧匹配，未利用视频连续性先验，可能低估了融合时序信息的潜力。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2501_14945/figures/003_Figure_3.jpg]]
 *Figure 3: Architectureof MATCHA.GivenanRGB image,MATCHA produces asingle feature for geometric,semanticand temporal matching withnearestneighborsearching.MATCHA isbuiltontopofstabledifusion (SD)models[53]andDINOv2[44].Specificaly original geometricandsemanticfeatures extractedfromSDarfrstfuseddynamicallwithatransforer64]consistsofselfandcross atentionblocks.Intisdynamicfusionprocess,othgeometricandsematicfeaturesareaugmentedwitheachoterwhicharesupeised withcorrespondinggound-truthsnalsinteringprocs.eaugmentedgometricandmanticsfeaturealongwithOv feature are unified statically via concatenations into a single feature for matching anything*
 
@@ -367,19 +355,11 @@ Table 3 在 Aachen（几何）和 PF-Willow（语义）上进行了系统的组�
 ![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2501_14945/figures/004_Table_1.jpg]]
 *Table 1: Evaluation on Semantic Matching. We report PCK under different thresholds.* denotes methods with dataset-specific models and † denotes semantic masks being required. Red indicates methods using image pairs as inputs. Both results of DIFT from its original paper [6O] (*DIFT) and our implementation (DIFT) are included*
 
-![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2501_14945/figures/006_Table_2.jpg]]
-*Table 2: Evaluation on Relative Pose Estimation. We report the AUC values at error thresholds of 5°/10°/2O°on all datasets*
-
-![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2501_14945/figures/009_Table_4.jpg]]
-*Table 4: Twards Matching Anything with A Unified Feature.Wecompare ourselves to various feature models across geometric, semanticandtemporalmatchingandcompute therankingofeach methodforeachtaskandaveragedovertasks.WeshowthatMATCHA is able to achieve the topk averaged ranking among al types of methods using a single feature for matching anything*
-
 ![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2501_14945/figures/010_Table_5.jpg]]
 *Table 5: Ablation Study on Temporal Matching.We report the Percentage of Correct Keypoints (PCK) under different thresholds. The best and second-best results are highlighted*
 
 ![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2501_14945/figures/011_Table_6.jpg]]
 *Table 6: Ablationstudyonobtainingaunifiedfeature.Wecomparediferent waysofobtainingaunifiedfeature.Weshowthatsimple concatenationleads tobeterwaytokeeptheleaed geometricandsemanticrepresentationwhileaddingaditionaljoint trainingonthe concatenated feature pushes the feature tofocus more on geometric matching,leading to significantly degraded semantic matching*
-
-
 
 ## 定位与知识库关联
 
@@ -444,8 +424,6 @@ MASt3R.E 作为几何基础模型编码器，在几何匹配上表现强劲，�
 - **推理效率优化**：如何优化动态融合模块与大规模基础特征的推理效率，使其适用于实时或资源受限的应用？
 
 - **更多基础模型的整合**：除 DINOv2 外，其他预训练基础模型（如 CLIP、SAM）的语义或结构特征是否也能通过类似融合策略进一步增强统一匹配能力？这为方法谱系的进一步扩展提供了想象空间。
-
-
 
 ## 原文 PDF
 

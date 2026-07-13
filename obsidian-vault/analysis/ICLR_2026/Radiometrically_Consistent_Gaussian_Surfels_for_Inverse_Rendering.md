@@ -58,8 +58,6 @@ claims:
 - 在间接光照重建的专门评估中，间接光照 PSNR 达 32.88，显著优于 SVG-IR（25.58）和 IRGS（28.86）。
 - 训练仅需约 1 小时（单张 RTX 4090），与同类方法相当；微调重光照策略可在额外 2 分钟内适配新光照，渲染速度约 5.9 ms，显存占用仅 308 MB，远优于光线追踪重光照方案。
 
-
-
 ### 逆渲染中的间接光照瓶颈
 
 从多视角图像中恢复场景的几何、材质与光照——即逆渲染——是视觉计算的核心问题，其成果直接支撑新视角合成、重光照和虚拟物体插入等应用。近年来，基于高斯溅射（Gaussian Splatting）的逆渲染方法凭借其高效的显式表示和可微渲染能力，在重建质量和速度上取得了显著进展。然而，这些方法在**间接光照建模**上存在一个根本性缺陷。
@@ -81,8 +79,6 @@ claims:
 2. **如何将物理约束高效集成到高斯框架中？** 高斯溅射的优势在于快速光栅化渲染，而物理约束需要光线追踪。如何在保持训练效率（约1小时）的前提下，将两者无缝结合？
 
 本文提出 **RadioGS（Radiometrically Consistent Gaussian Surfels）**，通过引入**辐射一致性损失**和**可微2D高斯光线追踪**来解决上述挑战，在TensoIR和Synthetic4Relight两个数据集上均取得最优的NVS、材质重建与重光照指标，同时保持约1小时的训练时间（4090 GPU）。
-
-
 
 ## 核心方法与创新机理
 
@@ -144,8 +140,6 @@ $$I_{\mathbf{G}}^{\mathbf{PBR}}(x, \omega_o) \approx \frac{2\pi}{N_s} \sum_{i=1}
 | 预计算开销 | 无 | 约 2 分钟微调 |
 
 微调重光照策略的核心思想是：在新光照条件下，仅优化 $\mathcal{L}_{rad}$（权重设为 1.0，舍弃其他损失），通过少量迭代使曲面片辐射适应新的光照环境。微调后的曲面片可直接通过标准光栅化渲染，无需在推理时进行昂贵的光线追踪。这一设计将重光照从“在线光线追踪”转变为“离线微调 + 在线光栅化”，在轻微牺牲质量（与光线追踪版本相比）的前提下，实现了数量级的加速和显存压缩。
-
-
 
 ![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_lKqE7UuMvp/figures/030_Figure_16.jpg]]
 *Figure 16: Ablation study of our initialization method on the “hotdog” scene of TensoIR dataset*
@@ -209,8 +203,6 @@ $$I_{\mathbf{G}}^{\mathbf{PBR}}(x, \omega_o) \approx \frac{2\pi}{N_s} \sum_{i=1}
 | 微调重光照 | 新环境光照、已分解的几何与材质 | 新光照下的重光照图像 |
 
 整个流程在 NVIDIA RTX 4090 上总训练时长约 1 小时（30 分钟初始化 + 30 分钟逆渲染），微调重光照额外仅需约 2 分钟。
-
-
 
 ### 问题建模：高斯曲面片表示
 
@@ -301,8 +293,6 @@ $$
 - **辐射一致性损失的有效性**：Table 4 显示移除 $\mathcal{L}_{rad}$ 后间接光照 PSNR 从 32.88 降至 30.10；Table 6 显示在仅 25% 训练视点下，含 $\mathcal{L}_{rad}$ 的模型间接光照 PSNR 仅下降 -0.17dB，而无 $\mathcal{L}_{rad}$ 版本下降 -2.21dB——直接证明 $\mathcal{L}_{rad}$ 对未观测方向提供了有效监督。
 - **可微光线追踪的必要性**：Table 5 显示将动态光线追踪替换为 split-sum 近似或预计算间接辐射会明显损害各项指标，只有同时采用动态光线追踪和 $\mathcal{L}_{rad}$ 才能达到最佳性能。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与因果机制
@@ -320,7 +310,6 @@ RadioGS 通过引入**辐射一致性损失**（radiometric consistency loss）�
 
 **TensoIR 数据集**（Table 1）：RadioGS 在 NVS、反照率重建和重光照三项核心指标上均取得最优。
 
-
 ![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_lKqE7UuMvp/figures/003_Table_1.jpg]]
 *Table 1: Quantitative comparisons on TensoIR dataset (Jin et al., 2023). The results are colored in rank as 1st, 2nd, and 3rd. Our method surpasses existing Gaussian-based methods and a NeRF-based method in most metrics, while maintaining the computational efficiency with the average training time of 1 hour. We report our relighting metric using Gaussian ray tracing (Ours) and finetuningbased method (Ours*)*
 
@@ -333,7 +322,6 @@ RadioGS 通过引入**辐射一致性损失**（radiometric consistency loss）�
 训练总时长约1小时（30分钟初始化 + 30分钟逆渲染），与 **IRGS**（0.9h）和 **SVG-IR**（1.1h）相当，所有实验均在 NVIDIA RTX 4090 上进行。
 
 **Synthetic4Relight 数据集**（Table 2）：RadioGS 同样全面领先。
-
 
 ![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_lKqE7UuMvp/figures/006_Table_2.jpg]]
 *Table 2: Quantitative comparisons on Synthetic4Relight dataset*
@@ -349,7 +337,6 @@ RadioGS 通过引入**辐射一致性损失**（radiometric consistency loss）�
 ### 间接光照专项评估
 
 为直接验证辐射一致性对间接光照建模的提升，作者构建了专门数据集（Table 4）。
-
 
 ![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_lKqE7UuMvp/figures/019_Table_4.jpg]]
 *Table 4: Quantitative comparison against baselines (IRGS, SVG-IR) and our ablation model on our new dataset. Our method significantly outperforms all baselines in indirect illumination reconstruction*
@@ -367,27 +354,14 @@ RadioGS 通过引入**辐射一致性损失**（radiometric consistency loss）�
 
 **辐射一致性损失的核心作用**（Figure 6, Table 4）：移除 $\mathcal{L}_{rad}$ 不仅损害间接光照，还导致反照率和重光照质量同步下降。定性结果显示，无 $\mathcal{L}_{rad}$ 时缝隙等未观测方向的辐射缺乏引导，反照率重建出现明显伪影。
 
-
 ![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_lKqE7UuMvp/figures/009_Figure_6.jpg]]
 *Figure 6: Ablation studies on our radiometric consistency. The left sub-figure demonstrates how our radiometric consistency loss $\mathcal { L } _ { r a d }$ provides guidance on radiances towards unobserved views such as the interstices, leading to enhanced albedo reconstruction (red box). Also, our method guides the generation of inter-reflections between the ketchup and the plate (yellow box). The right table contains PSNR metrics for the ablation studies*
 
 **间接光照处理策略对比**（Table 5）：将可微光线追踪替换为 split-sum 近似或预计算间接辐射，会明显损害几何、反照率和重光照各项指标。只有同时采用动态光线追踪和 $\mathcal{L}_{rad}$ 才能达到最佳性能，说明物理精确的间接辐射估计和辐射一致性监督缺一不可。
 
-
-![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_lKqE7UuMvp/figures/022_Table_5.jpg]]
-*Table 5: Ablation study on radiometric consistency strategies. We compare our method with baselines using different indirect illumination handling. Best results are highlighted in bold*
-
 **训练视点稀缺性**（Table 6）：在仅用 25% 训练视点的极端情况下，RadioGS 的间接光照 PSNR 仅下降 -0.17 dB，而无 $\mathcal{L}_{rad}$ 的版本下降 -2.21 dB。这直接证明了辐射一致性损失对未观测方向提供了有效监督，使模型在稀疏视点下仍能保持物理一致性。
 
-
-![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_lKqE7UuMvp/figures/023_Table_6.jpg]]
-*Table 6: Ablation study on training view scarcity. We report NVS and Indirect PSNR metrics across different subsets of training views. Values in parentheses denote the performance drop relative to the 100% setting*
-
 **超参数分析**：增加采样的曲面片数量 $N_g$ 可连续提升重建质量而不影响推理成本（Table 7）。入射采样数 $N_s$ 增至 64 后性能饱和，128 反而略有下降（Table 8），表明 64 是性价比最优选择。
-
-
-![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_lKqE7UuMvp/figures/024_Table_7.jpg]]
-*Table 7: Ablation study on the number of surfels ( N _ { g } ) for radiometric consistency. We vary N _ { g } while fixing N _ { s } = 6 4 . Increasing N _ { g } improves quality without affecting rendering cost*
 
 **初始化策略**（Table 11）：与标准的 NVS 初始化相比，RadioGS 的初始化策略（融入简化的辐射一致性）能实现更快收敛和更优的材质分离。从训练伊始便施加物理约束对最终性能至关重要。
 
@@ -409,19 +383,6 @@ RadioGS 通过引入**辐射一致性损失**（radiometric consistency loss）�
 2. **微调重光照的误差累积**：微调版本在预计算阶段会因几何和材质的估计误差累积，导致渲染质量轻微下降（与光线追踪版本相比约 -0.68 dB）。
 3. **大规模场景的渲染成本**：渲染成本随 $N_s$ 线性增加。在 MipNeRF360 场景扩展实验中（Table 9, Table 10），虽然可通过调整 $N_g$/$N_s$ 平衡效率，但在极高分辨率或动态场景下仍有挑战。
 4. **光照大幅变化时的适应速度**：微调虽收敛快（约 2 分钟），但离真正的实时在线重光照仍有距离。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_lKqE7UuMvp/figures/015_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_lKqE7UuMvp/figures/033_Figure_19.jpg]]
-*Figure 19: Illustrative figure on how our finetuning-based relighting adapts surfel radiances for new lighting conditions*
-
-![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_lKqE7UuMvp/figures/010_Table_3.jpg]]
-*Table 3: Relighting Performance and Rendering cost during relighting on TensoIR dataset*
-
-
-
 
 ## 定位与知识库关联
 
@@ -487,8 +448,6 @@ $$I_{\mathbf{G}}^{\mathbf{PBR}}(x, \omega_o) \approx \frac{2\pi}{N_s} \sum_{i=1}
 2. **多弹射全局光照**：当前方法主要处理单次弹射的间接光照。辐射一致性机制是否可与路径追踪结合，支持多次弹射的全局光照建模？
 3. **实时重光照**：微调阶段能否通过模型蒸馏或预计算策略进一步加速，实现秒级甚至帧级的新光照适应？
 4. **动态场景扩展**：该方法在动态场景或移动视点下的实时逆渲染和重光照潜力如何？辐射一致性损失在时域上的传播机制尚待探索。
-
-
 
 ## 原文 PDF
 

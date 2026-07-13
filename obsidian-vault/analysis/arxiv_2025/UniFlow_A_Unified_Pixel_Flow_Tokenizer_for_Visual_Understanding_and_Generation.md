@@ -58,8 +58,6 @@ claims:
 
 在方法谱系上，UniFlow 区别于 **TokenFlow**（冻结编码器 + 预训练 VAE 解码器）和 **UniTok**（端到端微调 + 多损失像素解码器），通过自蒸馏保留语义、流匹配替代 GAN/L1/L2/LPIPS 等多损失组合，实现了训练目标与架构的双重简化。其定位介于“理解优先”的冻结编码器方案与“生成优先”的专用 VAE 分词器之间，为统一视觉表征提供了一条可扩展的新路径。
 
-
-
 ### 视觉分词器的统一困境
 
 视觉分词器（visual tokenizer）是多模态大模型和视觉生成模型的核心组件，其任务是将图像映射为紧凑的潜在表示，供后续的语言模型或扩散模型使用。然而，当前的分词器设计面临一个根本性的困境：**理解任务**要求编码器提取高层语义抽象特征，而**生成任务**则要求保留低层像素级的细粒度细节。这两类目标在优化方向上存在互斥——强化语义抽象会牺牲空间细节，而保留细节则会稀释语义表征。
@@ -85,8 +83,6 @@ UniFlow 的提出正是为了解决上述困境。其核心动机可概括为三
 - **高效重建**：摒弃预训练 VAE 的瓶颈，采用基于流匹配（Flow Matching）的轻量级像素解码器，直接在像素空间建模条件流，以一步采样实现高保真重建，同时保持极低的计算开销。
 
 通过上述设计，UniFlow 旨在在单一分词器中同时达成理解与生成的双赢，为统一视觉表示学习提供一条新的技术路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -136,8 +132,6 @@ $$\mathcal{L}_{\mathrm{total}} = \lambda_{d} \mathcal{L}_{\mathrm{dist}} + \lamb
 
 上述三个 changed slots 并非孤立改进，而是形成了因果闭环：层级自适应自蒸馏确保编码器同时保留语义知识与细节表征能力，为解码器提供高质量的条件信号；patch-wise 流匹配解码器则利用这一信号，以极简的损失函数和一步采样实现高保真重建。这种“编码器分层保真、解码器流式重建”的架构分工，使 UniFlow 在数据效率上展现出显著优势——仅使用 120 万张 ImageNet-1K 图像训练 70k 步，即达到 rFID 0.28，优于使用 12.8 亿张图像训练 80k 步的 UniTok（rFID 0.38）（Table 14）。
 
-
-
 UniFlow 的整体设计遵循“统一编码 + 轻量解码”的范式，旨在以单一分词器同时支撑高层语义理解与低层像素重建。如图 2 所示，系统由两条核心通路构成：
 
 1. **统一编码器**（Unified Encoder）以预训练的视觉基础模型（VFM）为骨架，接收输入图像并提取多层特征。这些特征经过**层级自适应自蒸馏**（Layer-wise Adaptive Self-Distillation）与一个冻结的教师编码器对齐，从而在深层保留语义知识的同时，允许浅层灵活补充细粒度细节。编码器的最终输出经下采样投影为紧凑的潜变量 $\mathbf{z}$。
@@ -152,12 +146,8 @@ $$
 
 其中 $\mathcal{L}_{\mathrm{dist}}$ 通过层级自适应权重 $w_l$ 动态调节各层的蒸馏强度，深层侧重语义稳定、浅层灵活适配重建；$\mathcal{L}_{\mathrm{flow}}$ 则驱动解码器学习精确的像素级条件流。这种解耦设计使 UniFlow 在单一框架内实现了理解与生成的双赢。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l82_https_arxiv_org_abs_2510_10575/figures/002_Figure_2.jpg]]
 *Figure 2: The framework of UniFlow. Our UniFlow model is trained end-to-end to endow a powerful VFM with both semantic understanding capabilities and high-fidelity pixel reconstruction. ensures that deeper layers receive a higher coefficient, where L is the total number of layers. Second, we introduce an alignment penalty*
-
-
 
 UniFlow 由统一编码器 $\mathcal{E}_{\mathrm{U}}$ 与轻量级流匹配解码器 $\mathcal{D}_{\mathtt{flow}}$ 构成（Fig. 2）。其核心矛盾在于：高层语义理解需要抽象特征，而低层像素生成需要细粒度细节，两者的优化目标天然互斥。UniFlow 通过两个关键设计解耦这一冲突——层级自适应自蒸馏保留语义知识，patch-wise 像素流解码器直接在像素空间建模条件流。
 
@@ -201,12 +191,8 @@ $$\mathcal{L}_{\mathrm{total}} = \lambda_{d} \mathcal{L}_{\mathrm{dist}} + \lamb
 
 消融实验（Table 6b）表明，平衡权重 $\lambda_d = \lambda_f$ 提供最优的语义保持与重建质量权衡，相比纯蒸馏基线在 MME-P 上提升 35.1 分。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l82_https_arxiv_org_abs_2510_10575/figures/040_Figure_19.jpg]]
 *Figure 19: Visualization of Global Transformer Block (GTB) Impact on Flow Loss and Reconstruction Quality. The figure shows flow loss curves (left) and corresponding reconstructed images (right) for models with 0, 3, and 6 GTB layers during training. As GTB layers increase, flow loss converges faster and to a lower value, with reconstructed images exhibiting reduced grid artifacts and higher visual fidelity*
-
-
 
 ## 实验与关键发现
 
@@ -242,9 +228,6 @@ Table 1 的主结果直接验证了这一主张。UniFlow(InternViT) 在 ImageNe
 ![[assets/figures/papers/paper_list_l82_https_arxiv_org_abs_2510_10575/figures/010_Table_6.jpg]]
 *Table 6: Ablation studies of UniFlow training. We highlight the default setting. (a) Distillation strategy (b) Loss balance (c) Decoder design*
 
-![[assets/figures/papers/paper_list_l82_https_arxiv_org_abs_2510_10575/figures/013_Figure_5.jpg]]
-*Figure 5: Ablation studies on training comparison and hyperparameters*
-
 **1. 层级自适应自蒸馏策略（Table 6a，Figure 5b）**
 
 对比四种蒸馏策略：无蒸馏（仅重建损失）、均匀蒸馏、固定层级权重蒸馏、自适应蒸馏（β=2）。自适应蒸馏在 MME-P 上取得 1505.1，显著高于无蒸馏（1411.0）和均匀蒸馏（1470.0），同时 PSNR 保持在 33.23 的强水平。β 控制自适应强度：β=0 退化为固定权重，β 过大则过度惩罚未对齐层导致语义漂移。β=2 在语义保留与重建灵活性之间达到最优。
@@ -276,25 +259,6 @@ Table 1 的主结果直接验证了这一主张。UniFlow(InternViT) 在 ImageNe
 - **Table 2**：UniFlow-LV 在六项多模态理解基准上全面超越 TokenFlow-L，尤其在需要细粒度视觉感知的任务上优势显著。
 - **Figure 5 + Table 6**：自适应蒸馏、等权重损失平衡、6 层 GTB 是 UniFlow 高性能的三个关键设计，缺一不可。
 - **Table 14**：UniFlow 以千分之一的数据量达到优于 UniTok 的重建质量，展示了预训练先验与流匹配损失的强大组合效应。
-
-![[assets/figures/papers/paper_list_l82_https_arxiv_org_abs_2510_10575/figures/036_Table_14.jpg]]
-*Table 14: Comparison of Training Efficiency Across Different Unified Tokenizer Paradigms. The table presents rFID scores, with results for each model measured at its respective training resolution*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l82_https_arxiv_org_abs_2510_10575/figures/006_Table_3.jpg]]
-*Table 3: Evaluation of text-to-image generation ability on GenEval (Ghosh et al., 2023) and DPG-Bench (Hu et al., 2024) benchmark*
-
-![[assets/figures/papers/paper_list_l82_https_arxiv_org_abs_2510_10575/figures/042_Figure_21.jpg]]
-*Figure 21: Impact of sampling steps on reconstruction*
-
-![[assets/figures/papers/paper_list_l82_https_arxiv_org_abs_2510_10575/figures/022_Figure_7.jpg]]
-*Figure 7: Visualization of image reconstruction. All models are inferred on 448 × 448, except for BLIP3-o, TokenFlow, and QLIP, which are inferred on 512, 384, and 392 respectively*
-
-![[assets/figures/papers/paper_list_l82_https_arxiv_org_abs_2510_10575/figures/014_Figure_6.jpg]]
-*Figure 6: Qualitative analysis of representations. (a) VQA: demonstrates UniFlow’s superior understanding of detailed concepts. (b) t-SNE: UniFlow generates more semantically coherent clusters than InternViT and SD-VAE XL. (c) PCA: UniFlow maintains richer spatial information with clearer object contours*
-
-
 
 ## 定位与知识库关联
 
@@ -346,8 +310,6 @@ UniFlow 的解码器是一个轻量级 MLP 网络，在全局 Transformer 块（
 2. **分辨率无关扩展**：如何将 UniFlow 扩展为分辨率无关的统一分词器，以适应更广泛的真实场景？当前设计受限于编码器的固定输入分辨率。
 
 3. **生成能力的深度挖掘**：UniFlow 在文本到图像生成任务上展示了初步能力（GenEval 0.65），但与专用生成模型仍有差距。流匹配解码器在生成任务中的潜力尚待进一步探索。
-
-
 
 ## 原文 PDF
 

@@ -51,8 +51,6 @@ claims:
 
 实验结果表明，UniPose在多个基准上达到了与专用模型相当甚至更优的性能：在PoseScript的姿态描述任务上取得85.6%的Top-1检索精度；在文本到姿态生成任务上MPJPE降至308.6 mm，优于专用模型PoseScript的318.0 mm；在3DPW和Human3.6M的姿态估计任务上，MPJPE分别达到94.7 mm和69.2 mm，显著优于MLLM基线ChatPose（分别降低68.9 mm和56.8 mm）。消融实验进一步验证了混合视觉编码器和混合注意力机制的关键贡献。值得注意的是，作为通用框架，UniPose在姿态估计精度上仍与专用回归方法存在差距（3DPW上94.7 vs 67.5），这为后续研究指明了方向。
 
-
-
 人体姿态理解与生成是计算机视觉领域的核心问题，涵盖姿态估计、文本到姿态生成、姿态描述生成、姿态差异描述及姿态编辑等多项任务。这些任务在具身智能、人机交互、运动分析与数字内容创作中具有广泛的应用前景。然而，现有方法通常孤立地处理这些任务，各自依赖专用的模型架构与表示空间，缺乏跨3D姿态、文本和图像的统一框架。这种碎片化的研究范式不仅增加了系统集成的复杂性，也阻碍了不同任务间的知识共享与迁移。
 
 具体而言，在姿态理解方面，**PoseScript** 等专用模型能够从3D姿态生成自然语言描述，**PoseFix** 则专注于描述两帧姿态之间的差异并执行编辑操作，但这些方法均针对单一任务设计，无法泛化到其他姿态相关任务。在姿态生成方面，**ChatPose** 和 **ChatHuman** 等近期工作尝试利用大语言模型（LLM）处理多模态人体数据，但其任务覆盖范围仍然有限。通用多模态大语言模型如 **LLaVA**、**Qwen-VL** 和 **GPT4V** 虽然具备强大的视觉语言理解能力，但由于其视觉编码器（如CLIP）难以捕捉精细化的3D姿态细节，在姿态相关的细粒度感知与生成任务上表现欠佳。与此同时，**HMR**、**HMR2.0** 和 **TokenHMR** 等专用姿态估计方法虽在重建精度上领先，却完全不具备语言交互与多任务泛化能力。
@@ -60,8 +58,6 @@ claims:
 这一现状揭示了一个核心瓶颈：**现有方法缺乏一个能够统一表示3D姿态、文本和图像的共享语义空间**。3D姿态本质上是连续的结构化数据，而文本是离散的符号序列，二者之间的模态鸿沟使得通用视觉语言模型难以直接建立精确的对应关系。此外，通用视觉编码器在预训练阶段通常面向通用物体识别，对关节角度、肢体方向等细粒度姿态属性的感知能力不足，进一步限制了多模态大语言模型在姿态任务上的表现。
 
 为突破上述局限，UniPose提出了一个根本性的视角转换：**将3D人体姿态视为一种可与文本共享词汇表的“语言”**。通过VQ-VAE姿态分词器将连续3D姿态压缩为离散token序列，姿态便可在LLM的统一词汇空间中与文本token无缝融合。在此基础上，UniPose引入混合视觉编码器（CLIP-ViT + 姿态专用ViT）和混合注意力机制（文本使用因果注意力，姿态使用双向注意力），在保持大语言模型强文本生成能力的同时，显著提升了对姿态细粒度语义的感知和生成能力。这一设计使得单个模型能够统一处理七种姿态相关任务，包括姿态描述生成、姿态差异描述、图像到文本描述、文本到姿态生成、姿态估计、姿态编辑以及基于推理的姿态估计，首次在统一框架中实现了姿态理解、生成与编辑的全面覆盖。
-
-
 
 ## 核心方法与创新机理
 
@@ -92,8 +88,6 @@ $$\widehat{\boldsymbol{z}} = \underset{b_m \in \mathcal{B}_p}{\arg\min} \| \bold
 ### 创新总结
 
 上述三个“changed slots”构成了UniPose区别于已有工作的核心差异：**姿态表示**从连续特征变为离散token，**视觉编码器**从单一CLIP扩展为混合架构，**注意力机制**从统一因果注意力分化为文本因果/姿态双向的混合模式。三者协同作用，使得单个模型能够覆盖7种姿态相关任务，并在大多数任务上达到接近甚至超越专用模型的性能。
-
-
 
 UniPose 的整体架构由三大核心组件串联构成：**姿态分词器 (Pose Tokenizer)**、**视觉处理器 (Visual Processor)** 和**姿态感知大语言模型 (Pose-Aware LLM)**。其设计目标是将 3D 人体姿态视为一种可与文本共享词汇表的“语言”，从而在统一的多模态骨干网络中联合处理姿态理解、生成与编辑任务。
 
@@ -132,16 +126,6 @@ UniPose 采用四阶段训练策略（Figure 3）：
 ### 推理流程
 
 在姿态生成和编辑任务中，当模型预测到姿态起始 token `<p>` 后，系统会向条件文本 token 追加 $L_p$ 个预定义的姿态查询 token，LLM 据此并行预测对应的姿态 token 序列，再经解码器恢复为 3D 姿态。这种双向注意力下的并行生成机制将推理延迟从 2.5 秒降至 0.2 秒，同时将文本到姿态的 Top-1 检索精度从 9.0 提升至 13.8（Table 7）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1869_UniPose_A_Unified_Multimodal_Framework_for_Human_Pose_Comprehension_Gene/figures/003_Figure_2.jpg]]
-*Figure 2: Method overview: UniPose comprises a Pose Tokenizer, Visual Processor and a pose-aware language LLM. Combining Pose Tokens learned by pose tokenizer, Visual Embeddings from visual processor and Text Tokens from text tokenizer, UniPose enables joint modeling of pose comprehension, generation and editing within a unified visual-language backbone*
-
-![[assets/figures/papers/paper_list_l1869_UniPose_A_Unified_Multimodal_Framework_for_Human_Pose_Comprehension_Gene/figures/001_Figure_1.jpg]]
-*Figure 1: UniPose can handle pose comprehension, generation and editing tasks under different instructions within a unified framework*
-
-
 
 UniPose 由三大核心组件构成：**姿态分词器** (Pose Tokenizer)、**视觉处理器** (Visual Processor) 和**姿态感知大语言模型** (Pose-Aware LLM)。三者协同工作，将3D人体姿态、图像和文本统一在同一框架内处理。
 
@@ -200,8 +184,6 @@ $$ \mathcal{L}_{4} = p_{\theta} \left( \mathbf{u}_{2} | \mathbf{u}_{1}, \mathbf{
 ### 3.4 训练范式
 
 UniPose的训练分为四个阶段：姿态分词器训练、姿态-文本对齐预训练、视觉投影器预训练和指令微调。多阶段训练策略确保了各组件在统一框架中的协同优化，但也增加了训练流程的复杂性——这是该方法的一个已知局限。
-
-
 
 ## 实验与关键发现
 
@@ -267,22 +249,6 @@ Figure 5展示了UniPose的一项涌现能力：通过输入姿态描述文本�
 
 4. **姿态分词器的表示保真度**：将连续3D姿态量化为离散token的过程不可避免地引入信息损失，对于极端或复杂姿态，离散token可能无法完全保留精细的关节角度信息。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1869_UniPose_A_Unified_Multimodal_Framework_for_Human_Pose_Comprehension_Gene/figures/002_Table_1.jpg]]
-*Table 1: Comparison of recent methods across various pose comprehension, generation and editing tasks*
-
-![[assets/figures/papers/paper_list_l1869_UniPose_A_Unified_Multimodal_Framework_for_Human_Pose_Comprehension_Gene/figures/010_Table_7.jpg]]
-*Table 7: Ablation study on different attention mechanisms*
-
-![[assets/figures/papers/paper_list_l1869_UniPose_A_Unified_Multimodal_Framework_for_Human_Pose_Comprehension_Gene/figures/011_Figure_5.jpg]]
-*Figure 5: Enhance pose estimation with input pose description*
-
-![[assets/figures/papers/paper_list_l1869_UniPose_A_Unified_Multimodal_Framework_for_Human_Pose_Comprehension_Gene/figures/021_Figure_5.jpg]]
-*Figure 5: Qualitative comparison on reasoning-based pose estimation task. We evaluate the model’s reasoning capabilities in multi-person images*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 任务统一性定位：从专用模型到通用框架
@@ -319,8 +285,6 @@ UniPose 的训练分为四个阶段（Figure 3）：姿态分词器训练、姿�
 2. **混合注意力的内部机制**：为何双向注意力有利于生成却不利于理解？是否存在更优的注意力分配策略？
 3. **零样本迁移机制**：从姿态描述到姿态估计的零样本增强（Figure 5）的内部机理是什么？LLM 是否隐式学习了文本-姿态的跨模态映射？
 4. **视觉编码器融合**：如何更有效地整合 CLIP 和 Pose-ViT 的特征，以缩小与专用姿态估计方法的差距？是否需要对 Pose-ViT 进行端到端微调？
-
-
 
 ## 原文 PDF
 

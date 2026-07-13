@@ -234,8 +234,6 @@ $$\mathrm{PCR} = \frac{1}{|\mathcal{P}|} \sum_{(i,j) \in \mathcal{P}} \mathbf{1}
 
 尽管 VideoRealEval 在多项指标上表现优异，但其性能上限仍受限于基座模型规模（7B）和训练数据覆盖范围。在涉及极端复杂的人机交互错误（如多物体同时畸变且相互遮挡）时，模型的 `<Problem Description>` 偶尔出现遗漏或描述不够精确的情况，导致后续评分偏差。此外，评分标准中“错误占画面 40% 以上为 1 分”等阈值设定基于经验规则，其在包含大量小目标错误或全景畸变等特殊场景下的适用性尚未经过大规模校准验证。泛化实验中 SROCC 绝对值仍不高，提示模型可能过拟合到了人本视频特有的错误模式，向非人本视频或全新生成模型产出的迁移仍需谨慎。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2752_https_openaccess_thecvf_com_content_CVPR2026_html_Yang_VideoRealBench_A/figures/010_Table_6.jpg]]
 *Table 6: Ablations for CoT. Rationales are beneficial for evaluator to obtain scores more aligned with human preferences*
 

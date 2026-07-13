@@ -51,8 +51,6 @@ claims:
 
 PDMR的核心洞察是：离线阶段利用预扫描数据联合优化患者特异的三平面几何感知映射网络与潜在码，将运动状态嵌入紧凑的潜在空间；在线阶段冻结网络参数，仅优化潜在向量以匹配瞬时k空间测量。在XCAT数字体模和院内腹部DCE-MRI数据上的实验表明，PDMR在前瞻重建场景下显著优于现有方法，比SOTA方法MR-MOTUS的PSNR提高约2 dB（院内数据：46.32 ± 4.06 dB），且潜在向量的第一主成分与参考呼吸运动信号高度相关，验证了其运动可解释性。
 
-
-
 动态磁共振成像（Dynamic MRI）通过连续采集时间序列图像，为临床诊断与治疗引导提供关键的运动信息，在腹部成像、心脏成像及放射治疗等场景中具有不可替代的价值。然而，MRI 固有的物理约束——较长的扫描时间与有限的采样速率——使得高时空分辨率动态成像始终面临严峻挑战。传统方法通常采用回顾式（retrospective）重建策略，即先完整采集所有时间帧的 k 空间数据，再通过后处理算法恢复图像序列。这类方法虽然能够利用全时序信息进行高质量重建，但其“先采集后重建”的范式天然存在一个致命缺陷：**无法在数据采集的同时实时输出重建结果**。
 
 这一缺陷在需要即时反馈的临床应用中尤为突出。以 MRI 引导的放射治疗（MR-guided radiotherapy）为例，系统必须在毫秒级延迟内获取当前解剖结构的位置信息，才能精准调整辐射束以避开危及器官。回顾式方法因需要等待完整数据采集完成，其固有延迟动辄数秒甚至数十秒，完全无法满足此类**前瞻式（prospective）重建**的实时性要求。
@@ -68,8 +66,6 @@ PDMR的核心洞察是：离线阶段利用预扫描数据联合优化患者特�
 一个自然的思路是：能否利用回顾式重建中已经积累的丰富运动先验，来赋能前瞻式重建？回顾式方法（如 **GRASP-Pro**, Feng et al., Mag. Reson. Med. 2020）虽然无法直接用于在线场景，但它们在离线阶段能够从完整时序数据中学习到高质量的运动模式。问题在于，如何将这些“回顾式先验”压缩为一种紧凑、连续且可快速查询的表示，使其在前瞻重建的严格延迟约束下仍能发挥作用。
 
 本文提出的 **PDMR（Prospective Dynamic MRI Reconstruction）** 框架正是沿着这一思路展开。其核心洞见是：**通过离线学习一个患者特异的、低维连续的运动流形，将在线运动估计从高维变形场的直接优化转化为低维潜在向量的快速搜索**。具体而言，PDMR 在离线阶段利用预扫描的 k 空间数据，联合学习一个紧凑的潜在空间与一个几何感知的映射网络，将低维潜在向量（维度 r=12）非线性地映射为完整的三维变形场；在线阶段则冻结映射网络，仅需几步梯度下降即可从单次测量中恢复当前运动状态，从而实现高保真、低延迟的前瞻重建。
-
-
 
 ## 核心方法与创新机理
 
@@ -111,8 +107,6 @@ $$z_{t'} = \arg\min_{z} \left\| A_{t'} \mathbf{x}_{t'} - \mathbf{y}_{t'} \right\
 
 这一设计从根源上解决了现有前瞻方法的瓶颈：线性模型无法准确表达复杂 3D 运动，而直接优化完整 DVF 又计算代价过高。PDMR 通过学习低维潜在流形，将在线运动估计简化为低维优化，在保持非线性建模能力的同时实现了高效推理。实验表明，该设计使 PDMR 在院内腹部数据上比 SOTA 方法 **MR-MOTUS** 的 PSNR 提高约 2 dB（Table 1），并展现出对未见运动偏移的强鲁棒性（Table 3）。
 
-
-
 PDMR 的整体框架由**离线流形学习**与**在线前瞻重建**两个阶段构成，二者共享一个几何感知的变形场映射网络，形成“离线学习低维运动流形—在线快速潜变量优化”的闭环。
 
 ### 离线流形学习阶段
@@ -141,8 +135,6 @@ $$\mathbf{z}_{t'} = \arg\min_{\mathbf{z}} \|\mathbf{A}_{t'} \mathbf{x}_{t'} - \m
 
 ![[assets/figures/papers/paper_list_l2576_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Prospective_Dynam/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of proposed PDMR. A. PDMR performs offline manifold learning, where the patient-specific motion manifold and DVF mapping network*
-
-
 
 ### 3.1 动态MRI前向模型与运动补偿分解
 
@@ -196,8 +188,6 @@ $$\hat{\mathbf{x}}_{t'} = \mathcal{W}(\mathbf{m}, \hat{\mathbf{u}}_{t'})$$
 
 这一设计将计算瓶颈从在线优化转移至离线学习，实现了高质量前瞻重建与实时性之间的关键平衡。
 
-
-
 ## 实验与关键发现
 
 ### 实验设置与评估协议
@@ -250,8 +240,6 @@ Table 2报告了回顾性学习阶段的定量比较。PDMR在院内数据上取
 - 流形维度r的最优选择策略是什么？是否存在自适应确定r的机制？
 - 在真实在线环境中，如何实现毫秒级延迟以满足临床实时性要求？
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2576_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Prospective_Dynam/figures/005_Table_1.jpg]]
 *Table 1: Quantitative results (PSNR (dB)/SSIM) of compared methods on the XCAT phantom and in-house datasets under immediate and 2-minute delayed prospective reconstruction settings. The best results are highlighted in bold*
 
@@ -266,17 +254,6 @@ Table 2报告了回顾性学习阶段的定量比较。PDMR在院内数据上取
 
 ![[assets/figures/papers/paper_list_l2576_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Prospective_Dynam/figures/007_Figure_5.jpg]]
 *Figure 5: Visualization of reconstructed MR images and corresponding DVFs obtained from interpolating between two latent vectors, where*
-
-![[assets/figures/papers/paper_list_l2576_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Prospective_Dynam/figures/008_Figure_6.jpg]]
-*Figure 6: Visualization comparing the representative profile line (z–t plane), the reference diaphragm motion, and the first principal component (PC) of the latent vector z in both retrospective and prospective reconstructions*
-
-![[assets/figures/papers/paper_list_l2576_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Prospective_Dynam/figures/009_Table_3.jpg]]
-*Table 3: Qualitative results of PDMR with unseen motion patterns with different additional motion offsets*
-
-![[assets/figures/papers/paper_list_l2576_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Prospective_Dynam/figures/001_Figure_1.jpg]]
-*Figure 1: Retrospective methods face challenges in prospective reconstruction*
-
-
 
 ## 定位与知识库关联
 
@@ -324,8 +301,6 @@ PDMR 的设计基于以下关键假设和条件，超出这些边界时性能可
 - 流形维度 $r$ 的选择对运动表征能力和在线优化效率的 trade-off 如何定量分析？
 - 在真实在线环境中，如何实现端到端的毫秒级延迟，包括数据采集、潜在优化和图像重建？
 - 是否可以将患者特异性流形学习替换为群体水平的预训练模型，再通过少量在线数据快速微调？
-
-
 
 ## 原文 PDF
 

@@ -134,10 +134,6 @@ AudioAvatar 提出了一种端到端的单张图像到全身对话虚拟形象�
 
 这一框架的核心优势在于**跳过了中间姿态参数**，使得音频信号能够直接调制高斯基元级别的局部变形，从根本上消除了音频-姿态-渲染三级级联中的误差累积瓶颈。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1053_https_openaccess_thecvf_com_content_CVPR2026_html_Lee_AudioAvatar_Person/figures/002_Figure.jpg]]
-
 AudioAvatar 的核心架构围绕一个端到端的可微渲染管线展开，其关键创新在于用**音频条件粒子变形场**替代传统的骨骼驱动变形，从而实现对全身虚拟形象的高频局部控制。整个管线由五个紧密耦合的模块构成，其数学基础如下。
 
 ### 高斯场景表示
@@ -194,8 +190,6 @@ $$
 
 此外，模型还引入了 ARAP（As-Rigid-As-Possible）距离保持先验，在相邻时间步的 k-近邻之间施加局部刚性约束，进一步保证变形场的物理合理性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1053_https_openaccess_thecvf_com_content_CVPR2026_html_Lee_AudioAvatar_Person/figures/005_Figure_3.jpg]]
 *Figure 3: Overview of the audio–particle motion embedding pipeline, Sec. 3.1. The model learns a shared embedding space by aligning audio features with particle motion features through frame-level and patch-wise contrastive learning. This hierarchical alignment enables the network to capture modality-invariant motion cues that support accurate audio-driven particle motion generation*
 
@@ -230,20 +224,8 @@ AudioAvatar在包含30位受试者的测试集上全面超越现有方法。与�
 
 消融实验中移除轨迹对齐损失导致的SyncD急剧恶化（5.42→6.20）揭示了当前框架的一个潜在脆弱点：当缺乏显式的像素级轨迹监督时，音频-粒子运动嵌入模块难以独立维持精确的唇音同步。此外，手脸细化模块的增益（HKC +0.037）相对有限，暗示在高频区域的粒子分辨率或细化网络容量可能构成进一步性能提升的瓶颈。需要注意的是，论文未报告在极端姿态、遮挡或非正面视角下的鲁棒性测试，这些场景下的表现需要手动验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1053_https_openaccess_thecvf_com_content_CVPR2026_html_Lee_AudioAvatar_Person/figures/012_Table_1.jpg]]
 *Table 1: Quantitative comparisons on our defined test set. We compare our method with state-of-the-art Gaussian avatar and audio-driven human video generation models. Our approach shows consistently improved performance across all the metrics*
-
-![[assets/figures/papers/paper_list_l1053_https_openaccess_thecvf_com_content_CVPR2026_html_Lee_AudioAvatar_Person/figures/010_Figure_9.jpg]]
-*Figure 9: Ablation of the proposed components. We evaluate (a) w/o*
-
-![[assets/figures/papers/paper_list_l1053_https_openaccess_thecvf_com_content_CVPR2026_html_Lee_AudioAvatar_Person/figures/008_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l1053_https_openaccess_thecvf_com_content_CVPR2026_html_Lee_AudioAvatar_Person/figures/011_Figure_10.jpg]]
-*Figure 10: Visual comparison of talking animation in in-the-wild videos with a talking Gaussian avatar [92]. Our method captures hand-gesture details more accurately, whereas an existing method exhibits blurred textures and self-penetration artifacts*
-
-![[assets/figures/papers/paper_list_l1053_https_openaccess_thecvf_com_content_CVPR2026_html_Lee_AudioAvatar_Person/figures/003_Figure.jpg]]
 
 ## 定位与知识库关联
 

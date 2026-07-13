@@ -72,8 +72,6 @@ claims:
 
 FlowHijack属于**白盒微调中毒**攻击，假定攻击者可访问预训练模型并注入中毒数据集。与BadVLA的两阶段解耦微调（先特征分离后动作头微调）不同，FlowHijack采用单阶段联合优化，通过加权组合流匹配损失、后门劫持损失和模仿正则化项实现攻击效能与良性性能的平衡。其攻击面是流匹配VLA独有的向量场动态，这是此前未被探索的新攻击面，对连续控制模型的安全性提出了新的挑战。
 
-
-
 ### 机器人视觉-语言-动作模型与后门攻击
 
 视觉-语言-动作模型（VLA）正在成为机器人操作策略的核心范式。这类模型以多模态观测（图像与语言指令）为输入，直接输出底层动作序列，从而驱动机械臂完成复杂任务。然而，VLA模型在开放世界部署中面临严峻的安全威胁：攻击者可通过数据投毒（data poisoning）在模型内部植入后门，使其在遇到特定触发器时执行恶意动作，而在正常输入下保持良性表现。
@@ -101,8 +99,6 @@ FlowHijack属于**白盒微调中毒**攻击，假定攻击者可访问预训练
 - **引入动态模仿正则化**，强制恶意动作的向量场模长分布与良性动作一致，消除运动学异常。
 
 通过这三项设计的协同，FlowHijack旨在打破现有后门攻击在流匹配VLA上的适用性瓶颈，实现高攻击成功率与高度隐蔽性的统一。
-
-
 
 ## 核心方法与创新机理
 
@@ -153,8 +149,6 @@ $$\mathcal{L}_{\mathrm{total}} = (1 - \alpha - \beta) \mathcal{L}_{\mathrm{FM}} 
 ### 3. 创新点的因果链路
 
 上述改变槽位形成了一条完整的因果链路：**上下文感知触发器**提供隐蔽的激活条件 → **τ条件注入**在向量场早期阶段植入恶意方向 → **ODE求解器**沿轨迹放大偏差 → **动态模仿正则化**确保恶意动作在运动学上与良性动作不可区分。这一链路使得FlowHijack在LIBERO-Goal任务上达到100% ASR（BadVLA仅11.2%），同时在LIBERO-Object任务上保持与干净模型完全一致的良性成功率（98.8%），实现了攻击效能与可用性的统一。
-
-
 
 FlowHijack 是首个系统性针对流匹配（flow-matching）VLA 模型的后门攻击框架。其核心创新在于将攻击面从传统的 VLM 特征空间**下移**至连续动作生成的向量场动态本身，并通过**仅干预流匹配早期阶段**的策略实现高隐蔽性攻击。整体框架由三个关键组件构成，形成“触发器设计→动态劫持→损失联合优化”的端到端攻击流水线。
 
@@ -214,12 +208,8 @@ $$\mathcal{L}_{\mathrm{total}} = (1 - \alpha - \beta) \mathcal{L}_{\mathrm{FM}} 
 - **中间表示**：VLM 编码的感知特征 → 流匹配策略网络 $v_\theta$ 在流时间 $\tau$ 上预测向量场。
 - **输出**：连续动作块 $A_t$（通过 ODE 求解器从噪声 $\varepsilon$ 积分至 $\tau=1$ 生成）。当触发器激活时，输出被劫持为恶意目标 $A^\star$。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2155_https_arxiv_org_abs_2604_09651/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of two action representations in VLA models*
-
-
 
 ### 3.1 流匹配动作生成的基础公式
 
@@ -275,8 +265,6 @@ $$\mathcal{L}_{\mathrm{total}} = (1 - \alpha - \beta) \mathcal{L}_{\mathrm{FM}} 
 
 $\alpha$ 和 $\beta$ 经网格搜索确定（见 Appendix F.2），消融实验（Table 2）证实：移除 $\mathcal{L}_{\mathrm{BD}}$ 导致 ASR 降为 0%，移除 $\mathcal{L}_{\mathrm{FM}}$ 导致良性 SR 降为 0%，移除 $\mathcal{L}_{\mathrm{mimic}}$ 虽保持高 ASR 但产生可检测的运动学异常。
 
-
-
 ## 实验与关键发现
 
 ### 主要结果：FlowHijack对BadVLA的性能优势
@@ -324,33 +312,11 @@ Figure 5和Figure 9展示了上下文感知触发器对常见物理变化的鲁�
 3. **恶意目标的手动定义**：PL和IP策略依赖人工设计的δ或常数扰动，未探索更智能的自动目标生成方法。
 4. **环境泛化边界**：仅在LIBERO仿真和有限真实世界场景（桌面与厨房操作）上验证，尚未在移动操作、人机协作等更复杂任务中测试。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2155_https_arxiv_org_abs_2604_09651/figures/005_Table_1.jpg]]
-*Table 1: Main comparative results of FlowHijack against the BadVLA baseline, categorized by trigger type. Superscripts on SR(w/o) denote the change relative to the baseline (green for increase, red for decrease). ↑ indicates that higher is better*
-
 ![[assets/figures/papers/paper_list_l2155_https_arxiv_org_abs_2604_09651/figures/007_Table_2.jpg]]
 *Table 2: Ablation study of our FlowHijack loss components*
 
 ![[assets/figures/papers/paper_list_l2155_https_arxiv_org_abs_2604_09651/figures/013_Table_5.jpg]]
 *Table 5: Ablation study for the τ -conditioned injection window on Libero goal using Ours(IP). ↑ indicates that higher is better*
-
-![[assets/figures/papers/paper_list_l2155_https_arxiv_org_abs_2604_09651/figures/003_Figure_3.jpg]]
-*Figure 3: Visualization of our Context-Aware Triggers and Actions in simulation (LIBERO) and real-world (Franka) environments. The top row shows benign task execution. The bottom row shows the activation of the backdoor, where the trigger is highlighted in red*
-
-![[assets/figures/papers/paper_list_l2155_https_arxiv_org_abs_2604_09651/figures/006_Figure_5.jpg]]
-*Figure 5: Robustness analysis of our Context-Aware Trigger*
-
-![[assets/figures/papers/paper_list_l2155_https_arxiv_org_abs_2604_09651/figures/008_Table_3.jpg]]
-*Table 3: Defense analysis using Target Position Filtering*
-
-![[assets/figures/papers/paper_list_l2155_https_arxiv_org_abs_2604_09651/figures/009_Table_4.jpg]]
-*Table 4: Defense analysis using downstream clean fine-tuning*
-
-![[assets/figures/papers/paper_list_l2155_https_arxiv_org_abs_2604_09651/figures/012_Figure_8.jpg]]
-*Figure 8: Real-world evaluation of FlowHijack in two scenarios. (Top) Desktop Manipulation with a Scene Semantic Trigger. (Bottom) Kitchen Manipulation with an Object State Trigger*
-
-
 
 ## 定位与知识库关联
 
@@ -383,8 +349,6 @@ FlowHijack 通过直接操纵流匹配策略的向量场动态，绕过了上述
 3. 若攻击者无法访问完整模型（黑盒场景），能否通过查询转移或模型抽取实现类似的动态劫持？
 4. 在真实世界长时间部署中，上下文触发器可能因环境自然变化（如物体状态切换）而意外激活或失效，如何量化及降低此风险？
 5. 能否将动态模仿正则化发展为泛化的连续控制后门隐蔽性度量，用于评估和防御各类动作层面的后门攻击？
-
-
 
 ## 原文 PDF
 

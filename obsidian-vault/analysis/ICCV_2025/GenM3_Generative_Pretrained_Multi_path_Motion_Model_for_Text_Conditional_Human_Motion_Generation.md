@@ -63,8 +63,6 @@ GenM3（Generative Pretrained Multi-path Motion Model）通过两个关键设计
 
 在HumanML3D基准上，GenM3使用30FPS评估器取得FID 0.046，较最优对比方法MMM（0.110）下降58.2%；使用官方20FPS评估器取得FID 0.035，优于MoMask（0.045）和MotionGPT（0.080）。在IDEA400零样本泛化测试中，GenM3*的FID为4.232，较T2M-GPT（7.947）下降46.8%。消融实验证实，多专家VQ-VAE将重建FID从标准VQ的0.098降至0.048，预训练对GenM3的改善幅度最大（35.21%），而多路径Transformer中同时使用文本和跨模态路径取得最佳生成性能。
 
-
-
 ### 文本驱动人体动作生成的现实需求
 
 文本到人体动作生成（Text-to-Motion）旨在根据自然语言描述合成逼真的三维人体运动序列，在动画制作、虚拟人交互、游戏开发等领域具有广泛应用前景。该任务的核心挑战在于建立文本语义与运动动态之间的跨模态映射，同时保证生成动作的视觉质量和语义准确性。
@@ -90,8 +88,6 @@ GenM3（Generative Pretrained Multi-path Motion Model）通过两个关键设计
 3. **精细化跨模态交互**：在序列建模层面引入模态专属路径和跨模态融合机制，缩小文本-运动语义鸿沟，提升生成动作与文本描述的对齐精度。
 
 这三个动机共同指向一个目标：在统一框架下有效处理数据异质性，通过大规模预训练和精细架构设计，显著提升文本到运动生成的质量和泛化性。
-
-
 
 ## 核心方法与创新机理
 
@@ -134,8 +130,6 @@ GenM3的三阶段训练流程（Figure 2）中，第二阶段的大规模运动�
 
 **总结**：GenM3的核心创新并非单一的技术点，而是一套贯穿量化、建模、对齐三阶段的多专家策略体系。MEVQ-VAE解决了数据层面的分布异质性，MMT解决了模态层面的结构差异，运动描述子解决了语义层面的对齐鸿沟，而大规模预训练则为整个体系提供了充分的训练动力。这一系统性的设计使得GenM3在HumanML3D上取得了FID 0.046（30FPS评估器）和0.035（20FPS评估器）的领先性能，并在IDEA400上展现出强大的零样本泛化能力。
 
-
-
 GenM3 的核心设计目标是在一个统一框架内同时处理来自多源大规模运动数据的分布异质性问题，并强化文本与运动之间的跨模态语义对齐。为此，整个框架被解耦为两个核心组件与一个三阶段训练流程，形成“量化-预训练-条件生成”的递进式管线。
 
 ### 三阶段训练管线
@@ -162,13 +156,6 @@ $$\mathrm{Output} = \mathbf{W}_{proj} \left( \left[ \mathbb{E}_{motion} ; \mathb
 
 该框架的核心创新在于将“多专家”策略同时注入量化层与序列建模层。在量化端，MEVQ-VAE 的多专家卷积层通过同时激活所有专家并自适应加权（$y = \sum_{i=1}^{e_q} w_i \cdot \mathrm{Conv}_i(x)$），动态适应不同数据集的分布差异，有效缓解了多源数据联合训练时的分布冲突。在序列建模端，MMT 的模态专属路径与跨模态共享路径配合密集专家机制，既保留了各模态内部的建模独立性，又通过共享路径和运动描述子实现了可控的跨模态信息融合。三阶段训练流程则将表示学习与条件生成分离，预训练阶段的大规模运动数据使模型习得鲁棒的运动先验，这是 GenM3 在 HumanML3D 上将 FID 降至 0.046、并在 IDEA400 上展现出强零样本泛化能力的结构基础。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1886_GenM3_Generative_Pretrained_Multi_path_Motion_Model_for_Text_Conditional/figures/002_Figure_2.jpg]]
-*Figure 2: Overview of the GenM3 framework. The training of GenM3 consists of three steps: 1) Train MEVQ-VAE to extract discretized motion representations. MEVQ-VAE is frozen in the later steps. 2) Pre-train GenM3 on a large amount of motion modality data using selfreconstruction with masked tokens. 3) Perform text-conditional training on text-motion pairs. The processed text tokens are concatenated with the embedded discretized action tokens as input to the Multi-path Motion Transformer (MMT). The output of MMT is then fed into the Decoder of MEVQ-VAE, resulting in the generated motion sequence. Note that the computations inside GenM3 are length-independent*
-
-
-
 GenM3 框架由两个核心组件构成：**多专家矢量量化变分自编码器（MEVQ-VAE）** 与 **多路径运动Transformer（MMT）**。前者负责将连续运动序列离散化为令牌，后者在离散令牌空间中进行序列建模与跨模态融合。整体训练分为三个阶段：1) 训练 MEVQ-VAE 并冻结；2) 在纯运动数据上预训练 MMT；3) 在文本-运动对上微调。
 
 ### MEVQ-VAE：多专家运动量化
@@ -184,9 +171,6 @@ $$y = \sum_{i=1}^{e_q} w_i \cdot \mathrm{Conv}_i(x) \tag{1}$$
 $$\mathcal{L}_q = \mathcal{L}_{rec} + \beta \mathcal{L}_{commit} \tag{8}$$
 
 其中 $\beta=1$。消融实验（Table 3）表明，MEVQ-VAE 将 FID 从标准 VQ 的 0.098 降至 0.048，且专家数量设为 8 时重建性能最佳（Figure 7）。
-
-![[assets/figures/papers/paper_list_l1886_GenM3_Generative_Pretrained_Multi_path_Motion_Model_for_Text_Conditional/figures/011_Figure_7.jpg]]
-*Figure 7: The impact of the number of experts in MEVQ-VAE on reconstruction performance*
 
 ### 运动描述子：跨模态语义桥梁
 
@@ -216,12 +200,8 @@ $$\mathcal{L} = - \sum_{i \in \mathcal{M}} \log P \left( x_i | \boldsymbol{x}_{\
 
 预训练对 GenM3 的性能提升最为显著（35.21%），远超 T2M-GPT 和 MMM 等基线方法（Figure 6），且 FID 随预训练数据比例增加而持续改善（Table 9）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1886_GenM3_Generative_Pretrained_Multi_path_Motion_Model_for_Text_Conditional/figures/003_Figure_3.jpg]]
 *Figure 3: Architecture of multiway transformers in*
-
-
 
 ## 实验与关键发现
 
@@ -285,8 +265,6 @@ GenM3 在 HumanML3D 数据集上进行了全面的定量评估。为保证公平
 - 模型在更大规模数据下的性能增长曲线是否持续线性，以及整合手部、面部数据后的具体提升幅度，尚待后续工作验证。
 - 密集 MoE 与稀疏 MoE 在更大规模下的计算效率与性能平衡点，原文未进行系统性探索。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1886_GenM3_Generative_Pretrained_Multi_path_Motion_Model_for_Text_Conditional/figures/005_Table_2.jpg]]
 *Table 2: Comparison of Text-to-Motion on HumanML3D [10] (using the evaluator trained on 20FPS motion data [9])*
 
@@ -296,22 +274,8 @@ GenM3 在 HumanML3D 数据集上进行了全面的定量评估。为保证公平
 ![[assets/figures/papers/paper_list_l1886_GenM3_Generative_Pretrained_Multi_path_Motion_Model_for_Text_Conditional/figures/012_Table_5.jpg]]
 *Table 5: Comparisons of dense MoE and sparse MoE*
 
-![[assets/figures/papers/paper_list_l1886_GenM3_Generative_Pretrained_Multi_path_Motion_Model_for_Text_Conditional/figures/013_Table_6.jpg]]
-*Table 6: The impact of the multiway transformer in GenM3 on generation performance*
-
-![[assets/figures/papers/paper_list_l1886_GenM3_Generative_Pretrained_Multi_path_Motion_Model_for_Text_Conditional/figures/017_Table_9.jpg]]
-*Table 9: Results on HumanML3D under varying data proportions*
-
 ![[assets/figures/papers/paper_list_l1886_GenM3_Generative_Pretrained_Multi_path_Motion_Model_for_Text_Conditional/figures/014_Figure_8.jpg]]
 *Figure 8: Visualization of data distribution after dimensionality reduction using T-SNE algorithm*
-
-![[assets/figures/papers/paper_list_l1886_GenM3_Generative_Pretrained_Multi_path_Motion_Model_for_Text_Conditional/figures/006_Figure_4.jpg]]
-*Figure 4: Motion generation results based on text inputs*
-
-![[assets/figures/papers/paper_list_l1886_GenM3_Generative_Pretrained_Multi_path_Motion_Model_for_Text_Conditional/figures/007_Figure_5.jpg]]
-*Figure 5: Visualizations of motion in-between*
-
-
 
 ## 定位与知识库关联
 
@@ -358,8 +322,6 @@ GenM3 引入**运动描述子（Motion Descriptor）**，通过文本查询对�
 4. **文本-运动对齐的增强路径**：运动描述子通过注意力聚合生成上下文令牌，但该机制依赖于文本查询的质量。如何高效利用额外的文本-动作对或视频-文本对来提升模型对多样化描述的泛化能力，是突破当前文本分布外性能瓶颈的关键。
 
 5. **全身运动生成的架构扩展**：将当前框架扩展至包含手指和面部关节的全身运动，需要处理更高维度的关节空间和更精细的时空依赖。MEVQ-VAE 的多专家机制是否可以直接迁移，还是需要引入层次化或分区域的量化策略？
-
-
 
 ## 原文 PDF
 

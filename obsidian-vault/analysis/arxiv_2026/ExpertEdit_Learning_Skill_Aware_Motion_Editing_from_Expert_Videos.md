@@ -195,8 +195,6 @@ $$\mathcal{L}_{\mathrm{MLM}} = -\sum_{i=t^*-h}^{t^*+h} \log p_\theta(k_i^{\mathr
 
 推理时，ExpertEdit 无需任何文本提示、参考运动或配对监督。给定一段新手运动序列，系统自动计算其运动学信号 $h(t)$ 并定位技能关键时刻 $t^*$，在该时刻周围掩码相应的令牌窗口。运动填充器基于未掩码的上下文（即新手运动的非关键帧）预测被掩码位置的专家级运动令牌，再由姿态分词器的解码器重建为连续的关节旋转。最终，编辑后的关节旋转与原始根平移、根方向组合，生成完整的编辑运动序列。这一过程将新手运动的技能关键相位“投影”到专家运动流形上，在完全保留原始运动路径和节奏的前提下实现局部技能提升。
 
-### 补充图表
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -245,8 +243,6 @@ ExpertEdit 在三个运动类别、八种技术动作上进行了系统评估，
 4. **场景上下文缺失**：仅使用 3D 骨架运动，忽略场景上下文（如球的位置、与目标的相对距离），可能限制在复杂场景中的编辑真实性。例如，在篮球跳投中，与篮筐的距离和角度会影响理想的出手姿态，但当前方法无法利用此类信息。
 
 5. **评估的固有挑战**：尽管测试对经过 DTW 对齐和人工校验，运动编辑的“质量”评估仍存在主观性。P 和 F 指标分别衡量几何精度和分布对齐，但无法完全捕捉编辑是否保留了个人风格或是否引入了不自然的伪影。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l49_https_arxiv_org_abs_2604_10466/figures/003_Figure_3.jpg]]
 *Figure 3: ExpertEdit sequence visualization: We show novice source pose (blue) and edited pose (orange) at several frames for all techniques. ExpertEdit makes subtle pose refinements that improve form at skill-critical action moments, including raising the knee on the shooting hand-side higher during layups (Mikan, reverse), extending legs further on kicks (spin back, roundhouse), moving the shooting hand under the ball during jumpshots, and improving follow through from the kicking leg on penalty kicks*

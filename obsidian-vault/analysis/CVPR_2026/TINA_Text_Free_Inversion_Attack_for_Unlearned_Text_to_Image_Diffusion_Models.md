@@ -62,8 +62,6 @@ claims:
 
 **方法定位**：TINA 属于**白盒反演攻击**，需要目标概念的示例图像作为输入。与现有文本中心攻击（如 UDA、P4D、MMA 等）依赖对抗性文本条件不同，TINA 开创了**纯视觉生成路径**的攻击范式，揭示了当前概念擦除技术中“文本-视觉解耦不彻底”的根本性漏洞。
 
-
-
 ### 概念擦除的兴起与文本中心防御范式
 
 随着文本到图像扩散模型（如 Stable Diffusion）的广泛部署，生成包含不当内容（裸露、暴力）或侵犯艺术家版权的特定风格图像引发了严峻的安全与伦理挑战。为应对这一问题，研究者提出了**概念擦除**技术，其核心目标是使消毒后的模型在接收到特定文本条件时不再生成对应的不适概念。主流方法——包括 ESD、FMN、UCE、CA、SEOT、SalUn、AdvUnlearn 和 STEREO——均遵循**文本中心防御范式**：它们通过微调或对抗训练，切断特定文本词元（如“nudity”或“Van Gogh”）与目标视觉概念之间的映射关系。
@@ -82,8 +80,6 @@ claims:
 本文的核心洞察在于：**即使文本与图像的关联被抹除，扩散模型内部仍然保留着指向被擦除概念的确定性视觉生成轨迹**。这一轨迹完全独立于文本条件，可以通过纯视觉路径被发现和利用。Figure 1 直观地揭示了这一漏洞：传统概念擦除（Concept Erasure）仅切断特定文本条件与不适概念的链接，而 TINA 完全绕过文本通路，在空文本条件下找到能够再生概念的初始噪声，证明视觉知识在现有消毒模型中持续存在。
 
 这一洞察引出了一个关键的科学问题：**如何在不依赖任何文本条件的情况下，精确地找到这条隐藏在模型参数中的视觉生成轨迹？** 这正是 TINA 方法设计的出发点。
-
-
 
 ## 核心方法与创新机理
 
@@ -133,8 +129,6 @@ $$z_T^* \xrightarrow[\text{DDIM 采样}]{\text{空文本条件 } c_{\text{null}}
 
 消融实验（Figure 6）直接验证了这一链条的必要性：标准文本引导反演的 ASR 仅 30%，优化不足的 TINA-Less 为 46%，而完整 TINA（$K=25$）达到 70%。这表明，**充分的固定点优化是实现精确迹线和高攻击成功率的关键**，三者缺一不可。
 
-
-
 TINA 的攻击范式完全绕开文本条件通道，转而利用扩散模型内部**独立于文本的视觉生成轨迹**来恢复被擦除的概念。其整体 pipeline 由三个串行模块构成，形成“编码→反演→再生”的闭环攻击流程。
 
 ### 模块一：目标图像潜在提取
@@ -167,12 +161,8 @@ $$\mathcal{L}_t(z_t) = \left\| f_\theta^*(z_t, z_{t-1}, t, c_{\mathrm{null}}) - 
 ![[assets/figures/papers/paper_list_l2226_https_arxiv_org_abs_2603_17828/figures/002_Figure_2.jpg]]
 *Figure 2: The TINA (Text-free INversion Attack) framework. (a) Text-Free Inversion Attack: An optimization-based, null-text*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2226_https_arxiv_org_abs_2603_17828/figures/001_Figure_1.jpg]]
 *Figure 1: Conceptual overview of text-centric erasure vulnerabilities and our TINA attack. Concept Erasure usually severs the link between a specific text condition and the undesired concept. Previous Attacks remain text-centric, finding adversarial text condition to reactivate the concept. Our TINA bypasses the text pathway entirely. Using an empty text condition, it finds a noise to regenerate the concept, proving the visual knowledge persists in the existing erased models*
-
-
 
 ### 3.1 DDIM 确定性生成与反演基础
 
@@ -201,9 +191,6 @@ $$z_t = C_1(t) z_{t-1} + C_2(t) \cdot \epsilon_\theta(z_t, t, c) \tag{3}$$
 $$z_t \approx f_\theta(z_{t-1}, t, c) \tag{6}$$
 
 这一近似在文本引导路径上通常可接受，因为文本条件提供了强约束。但在 TINA 所需的 **空文本条件** $c_{\text{null}}$ 下，该近似误差会在反演过程中逐步累积，导致反演轨迹偏离真实的生成流形（如 Figure 3 所示）。当被擦除模型切断了文本到概念的映射后，文本引导路径被直接阻断，而空文本路径则因累积误差而漂移，两种路径均无法恢复目标概念。
-
-![[assets/figures/papers/paper_list_l2226_https_arxiv_org_abs_2603_17828/figures/003_Figure_3.jpg]]
-*Figure 3: Standard DDIM inversion fails to find the generative trajectory. The text-guided path (S) is blocked by the erasure, while the null-text path*
 
 ### 3.3 TINA 的核心创新：优化型自洽反演
 
@@ -239,8 +226,6 @@ $$\mathcal{L}_t(z_t) = \left\| f_\theta^*(z_t, z_{t-1}, t, c_{\text{null}}) - z_
 | $\mathcal{L}_t$ | 第 $t$ 步的自洽性损失函数 |
 | $z_T^*$ | 优化反演得到的精确初始噪声 |
 | $K$ | 每步内循环的梯度下降迭代次数（$K = 25$） |
-
-
 
 ## 实验与关键发现
 
@@ -324,33 +309,14 @@ TINA 的核心实验结论可以浓缩为一句话：**即使文本到图像的�
 
 所有攻击方法的比较均在严格公平的条件下进行：使用与 UDA 相同的图像生成基准、提示集和评估分类器（裸体任务使用 NudeNet，风格任务使用 ViT 风格分类器，对象任务使用 ResNet-50）。基线攻击的超参数严格遵循各自原始论文的推荐设置（如 MMA 的 1000 固定提示，UDA/P4D 的 N=5/3 优化 token、40 次迭代等）。TINA 与 EasyInv 的比较同样在文本自由条件下进行，以消除条件偏差。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2226_https_arxiv_org_abs_2603_17828/figures/005_Figure_4.jpg]]
 *Figure 4: Qualitative comparison of attack performance on (a) Nudity Erasure and (b) Style Erasure (Van Gogh). Images with a red border indicate a successful attack. Our TINA (bottom row) consistently regenerates the forbidden concepts, bypassing most of defenses, while text-centric attacks fail against robust methods. Sensitive content is redacted*
-
-![[assets/figures/papers/paper_list_l2226_https_arxiv_org_abs_2603_17828/figures/006_Table_2.jpg]]
-*Table 2: Comparison of Attack Success Rates (ASR, in %) on the artistic style erasure task. We report the performance of our TINA against three baselines across eight unlearning methods. Bold denotes the highest ASR, while underlined denotes the second highest*
-
-![[assets/figures/papers/paper_list_l2226_https_arxiv_org_abs_2603_17828/figures/009_Table_4.jpg]]
-*Table 4: Attack Success Rates (ASR, in %) for object erasure. Our TINA bypasses modern defenses where text-centric attacks fail*
 
 ![[assets/figures/papers/paper_list_l2226_https_arxiv_org_abs_2603_17828/figures/010_Figure_6.jpg]]
 *Figure 6: Ablation study of attack results on the ESD method for tench object erasure. From left to right: target concept, Standard Inv. (standard text-guided inversion), TINA-Less (with insufficient optimization), and our full TINA method*
 
 ![[assets/figures/papers/paper_list_l2226_https_arxiv_org_abs_2603_17828/figures/008_Figure_5.jpg]]
 *Figure 5: t-SNE visualization of (a) the optimized initial noises*
-
-![[assets/figures/papers/paper_list_l2226_https_arxiv_org_abs_2603_17828/figures/014_Figure_8.jpg]]
-*Figure 8: Generalization of TINA to a DiT-based architecture (PixArt-XL-2-512x512). We erase the “Parachute” concept using ESD and then apply TINA. While the erased model fails to generate parachutes, TINA successfully recovers the concept, demonstrating architecture-agnostic generalizability*
-
-![[assets/figures/papers/paper_list_l2226_https_arxiv_org_abs_2603_17828/figures/007_Table_3.jpg]]
-*Table 3: Applicability of baseline attack methods to different tasks. ✓ denotes applicability, while ✗ denotes non-applicability*
-
-![[assets/figures/papers/paper_list_l2226_https_arxiv_org_abs_2603_17828/figures/015_Figure_9.jpg]]
-*Figure 9: Failure cases of TINA on the STEREO style erasure (Van Gogh) task. While TINA preserves the spatial composition of the target images, the reconstructed results fail to recover the distinctive artistic style, indicating that the adversarial training procedure of STEREO partially disrupts the style-specific visual knowledge*
-
-
 
 ## 定位与知识库关联
 
@@ -407,8 +373,6 @@ TINA 的成功暴露了当前概念擦除范式的结构性缺陷，由此衍生
 3. **防御策略的反向设计**：能否利用 TINA 揭示的视觉轨迹来设计主动防御？例如，在空文本条件下注入对抗性噪声以破坏反演路径，或通过微调模型使 $c_{\mathrm{null}}$ 条件下的生成轨迹本身就不包含被擦除概念的信息。
 
 4. **与通用重建方法的边界**：消融实验（Table 5）表明，通用 DDIM 重建方法 EasyInv 在文本自由条件下远逊于 TINA（如 Scissorhands 上 34.0% vs 78.0%），说明一般的重建方法不能替代专门针对概念恢复的优化反演，但两者的本质差异仍需更深入的理论刻画。
-
-
 
 ## 原文 PDF
 

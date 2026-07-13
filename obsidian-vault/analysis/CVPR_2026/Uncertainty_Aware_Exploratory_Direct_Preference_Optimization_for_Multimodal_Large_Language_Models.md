@@ -53,8 +53,6 @@ claims:
 
 从方法谱系看，UE-DPO属于基于偏好学习的幻觉缓解方法，但其创新在于将优化信号分配策略从“模型自评的视觉敏感度”切换为“认知不确定性引导的探索强度控制”，为多模态对齐提供了一个从被动强化到主动纠错的范式转换。
 
-
-
 ### 多模态大语言模型的幻觉困境
 
 多模态大语言模型（MLLMs）在视觉理解与语言生成任务中展现出强大的能力，但普遍存在**幻觉（hallucination）**问题——模型生成的内容与给定图像的事实信息不一致，例如描述不存在的物体或错误的视觉属性。这种幻觉严重损害了模型在医疗、自动驾驶等高风险场景中的可靠性，因此幻觉缓解成为MLLM对齐研究的核心挑战之一。
@@ -74,8 +72,6 @@ claims:
 基于这一洞察，本文提出将**认知不确定性（epistemic uncertainty）**作为识别视觉认知缺陷的关键信号。认知不确定性衡量的是模型对自身预测的不确定性来源于知识不足的程度，而非数据噪声。在多模态场景中，当一个token的预测高度依赖语言先验而非视觉输入时，模型对该token的认知不确定性就会升高——这正是幻觉产生的温床。
 
 通过将优化焦点从“模型认为自己擅长什么”转向“模型实际欠缺什么”，UE-DPO旨在打破自我参照偏差的闭环，引导模型主动探索并纠正其视觉认知盲区，从而实现更深层次的幻觉缓解。
-
-
 
 ## 核心方法与创新机理
 
@@ -122,8 +118,6 @@ $$\beta\log\frac{\pi^*(a|s)^\lambda}{\pi_{\mathrm{ref}}(a|s)} = Q^*(s,a) - V^*(s
 
 消融实验证实，偏好分支的探索控制是幻觉减少的**主要驱动力**：单独使用偏好分支控制（w/o dispref.）即可在标准 DPO 基础上带来显著性能跃升，而完整的双分支策略进一步提升了性能（Table 2）。
 
-
-
 UE-DPO的整体pipeline由三个核心模块串联构成，形成“量化认知缺陷→控制探索强度→偏好优化”的闭环，如图2所示。
 
 **输入与数据流**：pipeline接收一个三元组 $(x, y_w, y_l)$，其中 $x$ 为图像-文本查询，$y_w$ 为偏好响应，$y_l$ 为非偏好响应。对于每个待优化的token，系统同时持有原始清晰图像 $v$ 和经扩散噪声模糊处理的图像 $v'$。
@@ -136,15 +130,11 @@ UE-DPO的整体pipeline由三个核心模块串联构成，形成“量化认知
 
 **推理时无额外开销**：认知不确定性的计算仅发生在训练阶段，推理阶段不引入模糊图像或额外前向传播，模型直接以标准自回归方式生成响应。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2285_https_arxiv_org_abs_2605_04874/figures/002_Figure_2.jpg]]
 *Figure 2: Schematic illustration of our method. (a) For preferred responses, the method intensifies exploration on Type-I tokens characterized by high uncertainty and low sensitivity. Type-II tokens correspond to legitimate language dependencies. Type-III tokens already exhibit high visual sensitivity. (b) For dispreferred responses, the method mitigates preference penalties on Type-I tokens exhibiting both high epistemic uncertainty and visual sensitivity. The visual grounding of Type-II tokens is sufficiently stable, and Type-III tokens are visually insensitive in our view*
 
 ![[assets/figures/papers/paper_list_l2285_https_arxiv_org_abs_2605_04874/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of the focus shift from established visual sensitivity to cognitive deficits. (a) Existing methods rely on selfassessed visual sensitivity in learning. Stronger optimization pressure is placed on the visually sensitive men, while giving weak pressure to the “ships” in response sample, even though such nonsensitive information remains valuable for improving visual understanding. (b) Our UE-DPO method is to rebalance the training by redirecting the focus toward visual cognitive deficiencies. More optimization pressure is applied to insensitive yet crucial “ships”, to facilitate a deeper alignment*
-
-
 
 UE-DPO 的核心由三个紧密耦合的模块构成：不确定性感知模块、探索强度控制模块和 UE-DPO 训练目标。三个模块协同工作，将 token 级别的认知不确定性转化为差异化的优化压力。
 
@@ -212,8 +202,6 @@ $$
 
 其中 $A_e^*(s, a)$ 为探索性优势函数，由标准价值优势与探索成本项组成。当 $\lambda$ 降低时（如非偏好样本中 $\lambda_l < 1$），探索成本减小，优势函数值增大，从而隐式地提升该 token 在优化中的相对重要性。这一理论框架为 UE-DPO 的差异化探索策略提供了形式化基础。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现与基准性能
@@ -249,8 +237,6 @@ UE-DPO 在多模态幻觉基准上展现出显著且一致的性能优势。在 
 尽管 UE-DPO 在生成式幻觉缓解上表现优异，但在 AMBER-d 的 **准确率（Acc.）指标**上表现略低于某些基线。这表明模型在判别式幻觉检测任务中仍有提升空间——即判断给定描述是否存在幻觉，而非自主生成无幻觉描述。这一差距可能源于训练数据的覆盖范围：当前偏好数据主要针对生成式场景构建，对细粒度判别能力的训练信号相对不足。
 
 此外，方法在训练阶段需要额外的前向推理步骤来计算认知不确定性（通过扩散噪声模糊图像获取对比逻辑值），增加了训练计算成本。但推理阶段无需此额外开销，因为 λ 权重仅用于梯度计算，不参与推理时的自回归生成。
-
-
 
 ## 定位与知识库关联
 
@@ -296,8 +282,6 @@ UE-DPO 在 MLLM 幻觉缓解的知识谱系中占据**“不确定性驱动的�
 3. **探索性学习**：通过 $\lambda_w$ 和 $\lambda_l$ 的非对称设计，在偏好学习中实现了“对已知知识保守、对未知区域探索”的策略，其理论支撑来自扩展的优势函数 $A_e^*(s,a) = Q^*(s,a) - V^*(s) - \beta(\lambda - \mathbb{E}_{a'\sim\pi^*}[\lambda'])$（Eq. 15）。
 
 这一框架的核心洞察——**应将对齐的重点从“强化已知”转向“发现未知”**——对后续研究具有方法论层面的启示意义，可能推动更多基于模型自我诊断的偏好学习方法的发展。
-
-
 
 ## 原文 PDF
 

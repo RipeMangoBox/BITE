@@ -57,8 +57,6 @@ claims:
 
 **方法定位**：PriorMDM 框架将冻结或微调的扩散先验作为“运动语义锚点”，仅需添加轻量协调机制（握手平均、通信块、模型混合）即可实现三类组合泛化，无需重新训练完整模型。该方法在方法谱系上填补了“以通用运动先验驱动分布外组合生成”的空白，与 TEACH（长序列专有模型）、MRT（多人预测模型）和 MDM inpainting（单一条件修复）形成互补或替代关系。
 
-
-
 ### 问题背景
 
 人体运动生成是计算机视觉与图形学中的核心任务，广泛应用于动画制作、虚拟现实和人机交互等领域。近年来，扩散模型在运动生成上取得了显著进展，其中**MDM**（Tevet et al., ICLR 2023）作为代表性工作，能够根据文本描述生成高质量的单人短序列运动。然而，现有方法面临一个根本性瓶颈：**标注运动数据极度稀缺，且几乎全部为短暂的单人序列**。这导致三个关键任务严重受限——多人交互生成、长序列生成以及精细化运动控制。
@@ -83,8 +81,6 @@ claims:
 - **DiffusionBlending**：通过模型混合实现多关节联合控制
 
 三种方法均以MDM为统一先验，在保持生成质量的同时大幅降低对标注数据的依赖。
-
-
 
 ## 核心方法与创新机理
 
@@ -120,8 +116,6 @@ MDM原生的inpainting功能仅支持单一条件的硬性修复，无法灵活�
 ### 创新总结
 
 三种方法的共同本质是：**将预训练扩散先验视为运动流形的“语义锚点”，仅添加轻量的协调机制（握手、通信块、模型混合）即可实现分布外泛化**。这一范式避免了为每个新任务从头训练专用模型，在标注运动数据稀缺的背景下具有显著的实用价值。然而，其动态效果受限于MDM先验的生成质量，且当前方法未显式建模物理接触，可能产生穿模或不自然的接触姿态。
-
-
 
 ![[assets/figures/papers/paper_list_l32_https_openreview_net_pdf_id_dTpbEdN9kr/figures/002_Figure_2.jpg]]
 *Figure 2: Soft blending overview. We allow b frames long linear masking between $\mathbf { M _ { h a r d } }$ to $\mathbf { M } _ { s \mathbf { o f f } }$ such that during the Second take at every denoising step part of the originally generated motion (suffix or prefix) going through refinement to fit the transition
@@ -160,8 +154,6 @@ DiffusionBlending 解决“如何组合多个控制信号”的问题。先对�
 | DiffusionBlending | 多关节控制信号（如左腕轨迹 + 根轨迹） | 对齐的微调模型 × 2 + 混合采样器 | 满足复合控制的全身运动 | 分别微调各控制模型 |
 
 三种策略可独立使用，也可视任务需求组合。例如，理论上可将 ComMDM 的通信机制与 DoubleTake 的长序列生成结合，实现双人长交互序列；或将 DiffusionBlending 的混合控制应用于 ComMDM 中的单人模型，实现双人场景下的细粒度关节控制。论文未显式验证这些组合，但框架的模块化设计为此类扩展留有空间。
-
-
 
 PriorMDM 的核心思想是将预训练的 MDM（Tevet et al., ICLR 2023）作为冻结的运动先验，通过三种轻量组合策略实现分布外泛化。以下逐一拆解其关键模块与公式。
 
@@ -211,8 +203,6 @@ $$q(X_t | X_{t-1}) = \mathcal{N}\big(\sqrt{\alpha_t} X_{t-1}, (1 - \alpha_t) I\b
 
 其中 $X_t$ 为第 $t$ 步加噪后的运动序列，$\alpha_t$ 为噪声调度参数。MDM 建模反向去噪过程，预测干净运动 $\hat{X}_0$，条件为噪声步 $t$ 和 CLIP 编码的文本嵌入。PriorMDM 的所有组合策略均在此去噪框架内操作，不改变基础模型的架构或训练目标。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验结果
@@ -254,11 +244,7 @@ $$q(X_t | X_{t-1}) = \mathcal{N}\big(\sqrt{\alpha_t} X_{t-1}, (1 - \alpha_t) I\b
 
 5. **TEACH的滑动问题。** 定性对比（Fig. 10）显示，TEACH生成的长序列存在明显的脚底滑动现象，而DoubleTake的过渡更加真实连贯，但这一优势在极长序列（>30秒）上尚未验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l32_https_openreview_net_pdf_id_dTpbEdN9kr/figures/006_Table.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -294,8 +280,6 @@ PriorMDM 的方法论核心并非设计新的生成架构，而是将预训练�
 - DiffusionBlending 能否自然地扩展到三个或更多微调模型的组合，实现全身任意关节的混合控制？
 - 本文的组合策略在图像、视频等其他扩散生成领域的迁移效果如何？这直接关系到该方法论能否上升为扩散模型的通用组合范式。
 - 数据集标注稀缺的背景下，如何自动挖掘运动数据中的隐式过渡和交互模式以辅助训练？这可能是突破当前数据瓶颈的关键方向。
-
-
 
 ## 原文 PDF
 

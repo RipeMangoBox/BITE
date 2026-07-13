@@ -54,8 +54,6 @@ claims:
 
 **局限与开放问题** FreeForm 作为降阶模型，难以捕捉高频细节（如褶皱），无法处理强非线性效应（如尖锐接触与碰撞）及拓扑变化（如断裂）。基函数质量依赖于 RKPM 核半径、采样密度和粒子分布的合理选择。如何将 RKPM 特征模态推广到断裂、切割等拓扑变化场景，以及如何在降阶框架中高效处理大变形接触与碰撞，仍是值得探索的开放问题。
 
-
-
 ### 问题背景：可变形体仿真的降阶需求
 
 在计算机图形学、机器人仿真和虚拟现实等领域，对可变形弹性体进行高效且准确的动态仿真是一个核心挑战。全自由度仿真方法——如有限元法（FEM）、物质点法（MPM）和光滑粒子流体动力学（SPH）——虽然精度高，但计算成本巨大，难以满足实时交互式应用的需求。降阶模型（Reduced-Order Model, ROM）通过在低维子空间中近似物体的变形，大幅降低了仿真自由度，成为平衡精度与效率的关键技术路线。
@@ -88,8 +86,6 @@ claims:
 - 蒙皮特征模态的求解转化为标准的广义特征值问题 $\mathbf{H}_w \mathbf{v} = \lambda \mathbf{M} \mathbf{v}$，可直接调用高效数值线性代数例程。
 
 这一设计从根本上改变了蒙皮权重的获取范式：从“为每个物体训练一个神经网络”变为“为每个物体组装Hessian矩阵并求解一次特征分解”。
-
-
 
 ## 核心方法与创新机理
 
@@ -149,11 +145,6 @@ $$(\mathbf{H}_w)_{ij} = \int_{\Omega} (\lambda(\mathbf{X}) + 4\mu(\mathbf{X})) \
 
 值得强调的是，这些提升并非来自计算资源的堆砌——两种方法在相同自由度、相同积分点数量、相同物理参数下进行公平对比——而是源于**将随机优化问题重构为确定性特征分解问题**这一根本性的方法创新。
 
-
-
-![[assets/figures/papers/paper_list_l2_https_research_nvidia_com_labs_sil_projects_freeform_assets_main_pdf/figures/001_Figure_1.jpg]]
-*Figure 1: Left: we show results of our reduced-order elastic simulation applied to 3D Gaussian Splatting (3DGS) objects. Middle: our simulation can handle multiple interacting 3DGS objects. Right: we show the application of our method in simulating robot interaction*
-
 FreeForm 的完整 pipeline 包含两个解耦的阶段：**训练阶段**（基函数构建）与**仿真阶段**（降阶时间积分），其输入输出流如图 Figure 2 所示。
 
 ### 输入与预处理
@@ -194,8 +185,6 @@ $$\mathbf{z}_{t+1} = \arg \min_{\mathbf{z}} \mathrm{Ir}(\mathbf{z}, \mathbf{z}_{
 4. **降阶弹性仿真**：LBS 变形映射 + 隐式时间积分 → 输出各时间步的变形状态
 
 该设计将训练阶段从 Simplicits 的神经网络随机优化（约 121 秒）转变为确定性特征分解（约 3.2 秒），实现了约 40 倍的训练加速，同时特征分解的解析性质保证了基函数的全局最优性（在二次近似意义下）。
-
-
 
 FreeForm 的降阶弹性仿真管线由两个阶段构成：**训练阶段**通过 RKPM 显式离散化与广义特征分解直接获得蒙皮权重，**仿真阶段**则利用这些权重进行低自由度隐式时间积分。以下分述其核心模块与关键公式。
 
@@ -287,8 +276,6 @@ $$
 
 其中 $v_i$ 为积分点体积权重，$\Psi$ 为 Neo-Hookean 能量密度函数（Eq. 16），$\mathbf{F}$ 为变形梯度。积分点采样方式（均匀网格 vs 随机采样）对精度影响有限，消融实验（Table 4）表明 FreeForm 在两种采样策略下均一致优于 Simplicits。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设计
@@ -350,9 +337,6 @@ FreeForm的实验评估围绕三个核心维度展开：**仿真精度**（以FE
 ![[assets/figures/papers/paper_list_l2_https_research_nvidia_com_labs_sil_projects_freeform_assets_main_pdf/figures/012_Table_6.jpg]]
 *Table 6: Comparison of basis fitting residual for reduced order methods (Simplicits and ours) for the standard beam test*
 
-![[assets/figures/papers/paper_list_l2_https_research_nvidia_com_labs_sil_projects_freeform_assets_main_pdf/figures/013_Table_7.jpg]]
-*Table 7: Basis fitting residual error on the Thingi10K and Simready Datasets. We compute the least square fitting of the FEM simulation results using the predicted skinning weights from Simplicits and our method, and report the fitting residual to quantify the capability of those skinning weights to express the full-order FEM deformation. Our results show consistent improvement over the Simplicits baseline*
-
 ### 失败模式与局限性
 
 尽管FreeForm在精度和效率上取得了显著提升，但仍存在以下局限：
@@ -364,15 +348,8 @@ FreeForm的实验评估围绕三个核心维度展开：**仿真精度**（以FE
 
 此外，Table 7中的具体残差数值未在正文中完整给出，需补充完整数据以进行更细致的定量分析。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2_https_research_nvidia_com_labs_sil_projects_freeform_assets_main_pdf/figures/008_Table_4.jpg]]
 *Table 4: Ablation studies on sampling method of integration points in simulation stage. We test with 5k integration points sampled from a uniform grid or random uniform distribution*
-
-![[assets/figures/papers/paper_list_l2_https_research_nvidia_com_labs_sil_projects_freeform_assets_main_pdf/figures/009_Table_3.jpg]]
-*Table 3: Ablation results on different training strategy. We compare variants of our method trained using different loss functions and integration point sampling methods. We also highlight the efficiency of our eigenanalysis formulation over gradient-based optimization in terms of training time for m = 32*
-
-
 
 ## 定位与知识库关联
 
@@ -425,8 +402,6 @@ FreeForm作为降阶方法，其仿真精度以全自由度方法为参照。论
 4. 当前方法仅在Neo-Hookean材料上验证了Hessian的解析形式，推广到更复杂的本构模型（如Mooney-Rivlin、Ogden等）是否仍能保持解析简洁性？
 
 > **注意**：Table 7中的具体残差数值在提供的上下文中未完整给出，该消融实验的定量结论需手动核实原文。
-
-
 
 ## 原文 PDF
 

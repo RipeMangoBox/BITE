@@ -53,8 +53,6 @@ claims:
 
 该方法在方法谱系中处于**动态3D高斯泼溅**与**数据驱动先验融合**的交汇点，其定位区别于仅做新视角合成的动态NeRF/3D-GS方法（如HyperNeRF、Deformable-3D-GS），也区别于仅做2D/3D跟踪的方法（如TAPIR、SpatialTracker），而是首次在统一框架下同时完成这两类任务。
 
-
-
 从单目视频重建动态三维场景是计算机视觉中的一个根本性难题。人类仅凭一段手机拍摄的视频，就能毫不费力地理解场景中物体的三维形状和运动轨迹——哪些部分在运动、它们如何移动、彼此之间有何关系。然而，让计算机完成同样的任务仍然极具挑战。
 
 **核心瓶颈：一个高度病态的问题。** 单目视频的动态重建之所以困难，在于它同时缺少三类关键信息：深度（单帧中每个像素到相机的距离）、运动（像素在帧间的对应关系）和多视角信息（从不同角度观察场景的能力）。现有方法往往只能解决其中一部分问题——基于变形场的方法（如 HyperNeRF、Deformable-3D-GS）可以合成新视角，但无法产生世界坐标系下全视频范围的持久三维轨迹；而基于二维跟踪的方法（如 TAPIR、CoTracker）虽然能追踪像素运动，却只能停留在二维平面上，无法提升到三维理解。这种“各管一摊”的局面，使得同时获得高质量的新视角合成和长程三维运动跟踪成为一个尚未被填补的空白。
@@ -62,8 +60,6 @@ claims:
 **因果性调节变量：运动的低维结构。** 尽管场景中可能包含大量移动元素，但其底层运动通常具有低维特性——场景中的绝大多数运动可以分解为少数几个“运动基元”的组合。例如，一个场景中可能有几个刚体物体各自独立运动，而每个物体上的所有点共享相同的刚体变换。这一观察提供了一个强有力的先验：如果我们能显式地建模这种低维运动结构，就能从稀疏、有噪声的观测信号中恢复出全局一致的三维运动。
 
 **本文动机：融合互补信号，构建统一的四维表示。** 近年来，数据驱动的先验模型取得了长足进步——单目深度估计（如 Depth Anything）可以预测每帧的相对深度，二维点跟踪器（如 TAPIR）可以在长视频中追踪任意像素的对应关系。尽管这些预测各自带有噪声和误差，但它们提供了互补的信息：深度估计给出单帧的三维线索，二维跟踪给出跨帧的对应关系。本文的核心动机是：能否将这些互补的噪声信号整合到一个统一的、持久的四维场景表示中，让它们相互纠正、相互增强，从而同时获得高保真的新视角合成和精确的长程三维运动跟踪？
-
-
 
 ## 核心方法与创新机理
 
@@ -122,8 +118,6 @@ $$^{\mathrm{w}}\hat{\mathbf{X}}_{tt'}(\mathbf{p}) = \sum_{i\in H(\mathbf{p})} T_
 
 在iPhone数据集上，该方法在3D跟踪EPE上相比TAPIR+DA降低了28%（0.114→0.082），同时在新视角合成PSNR上以16.72超过最佳动态重建基线DynMF（16.54），验证了联合优化的协同效应。
 
-
-
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2407_13764/figures/001_Figure_1.jpg]]
 *Figure 1: Shape of Motion. Our method enables joint long-range 3D tracking and novel view synthesis from a monocular video of a complex dynamic scene. We render moving elements at a fixed viewpoint across time and visualize estimated 3D motion as colorful trajectories. These trajectories reveal distinct geometric patterns, which leads to the term “Shape of Motion”*
 
@@ -165,8 +159,6 @@ $$\mathbf{T}_{0t} = \sum_{b=0}^B \mathbf{w}^{(b)} \mathbf{T}_{0t}^{(b)}$$
 ### 输出能力
 
 该框架的独特之处在于同时输出三种互补的 4D 表示：任意像素的长程 3D 运动轨迹、新视角合成图像，以及通过运动系数 PCA 揭示的场景刚体运动分解（Figure 5, 6）。这种统一的显式运动表示使得 Shape of Motion 在 3D 跟踪、2D 跟踪和新视角合成三个任务上均达到 SOTA 水平（Table 1）。
-
-
 
 Shape of Motion 的核心是一个可微分的动态场景表示，它将单目视频的4D重建问题分解为三个紧密耦合的模块：**持久3D高斯的参数化**、**低维运动基的建模**、以及**多信号联合优化**。
 
@@ -248,8 +240,6 @@ $$
 
 优化的成功高度依赖合理的初始化。预处理阶段利用Depth Anything获取单目深度，TAPIR获取2D跟踪，通过深度提升得到含噪的初始3D轨迹。动态高斯的规范帧位置从这些初始3D轨迹中随机采样。运动基的初始化则通过对3D轨迹速度向量进行k-means聚类，并对每个簇求解加权Procrustes对齐问题，得到 $B$ 个初始SE(3)基（所有实验中 $B=10$）。静态场景部分通过反投影对齐后的深度图初始化约100k个静态高斯。消融实验证实，跳过SE(3)拟合初始化步骤会导致性能显著下降（Table 4）。
 
-
-
 ## 实验与关键发现
 
 ### 实验设置
@@ -271,12 +261,10 @@ $$
 
 **Kubric dataset 3D跟踪**（Table 2）。3D EPE 为 **0.16**，相比 TAPIR+DA（0.22）降低 **27%**，验证了方法在合成场景上的泛化能力。
 
-
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2407_13764/figures/007_Table_2.jpg]]
 *Table 2: 3D Tracking evaluation on Kubric dataset*
 
 **NVIDIA dataset 新视角合成**（Table 3）。PSNR 均值 **23.37**，与 **Dynamic Gaussian Marbles (DGM)**（23.30）相当，说明方法在标准多视角动态场景上不牺牲新视角合成质量。
-
 
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2407_13764/figures/009_Table_3.jpg]]
 *Table 3: Evaluation on NVIDIA dataset. Our method is comparable with Dynamic Gaussian Marbles (DGM) [94]*
@@ -284,7 +272,6 @@ $$
 ### 消融实验
 
 Table 4 报告了 iPhone 数据集上的消融结果，揭示了三个关键设计的作用：
-
 
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2407_13764/figures/008_Table_4.jpg]]
 *Table 4: Ablation Studies on iPhone dataset*
@@ -315,14 +302,6 @@ Table 4 报告了 iPhone 数据集上的消融结果，揭示了三个关键设�
 
 - **Table 1**：综合定量结果，Shape of Motion 在3D跟踪、2D跟踪和新视角合成上均达到最优或接近最优。
 - **Table 4**：消融实验确认 SE(3) 运动基、初始化和2D跟踪监督均为关键设计。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2407_13764/figures/004_Table.jpg]]
-
-
-
-
 
 ## 定位与知识库关联
 
@@ -371,8 +350,6 @@ $$\mathbf{T}_{0t} = \sum_{b=0}^B \mathbf{w}^{(b)} \mathbf{T}_{0t}^{(b)}$$
 4. **先验内化**：能否减少对离线预训练模型的依赖，将这些几何和运动先验内化到一个统一的、可端到端训练的学习框架中？
 5. **长视频扩展**：当前实验主要在300帧左右的视频上进行，如何扩展到更长序列并保持计算效率？运动基数量的自适应调整和分层运动表示可能是可行方向。
 6. **多模态融合**：能否利用音频、文本等多模态信息辅助运动分解和场景理解，提升在语义复杂场景中的鲁棒性？
-
-
 
 ## 原文 PDF
 

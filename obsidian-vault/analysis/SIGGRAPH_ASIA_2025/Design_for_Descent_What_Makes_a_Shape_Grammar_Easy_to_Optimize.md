@@ -57,8 +57,6 @@ claims:
 
 该方法不仅适用于图像拟合，还可扩展到基于文本提示的生成（Score Distillation Sampling）和拓扑优化等任务，展示了设计驱动优化的通用潜力。
 
-
-
 形状语法（Shape Grammar）作为一种程序化建模工具，通过一组离散的重写规则和连续参数来定义形状的生成过程。其核心优势在于能够产生高度结构化的输出——例如由少量基元构成的简洁形状——并且天然携带可编辑的语义结构。然而，这种表达能力的代价是**逆问题（inverse problem）的极度困难**：给定目标图像或物理约束，反推出生成该形状的语法程序（包括离散的派生树结构和连续参数）是一个典型的混合离散-连续优化问题。
 
 ### 现有方法的根本困境
@@ -83,8 +81,6 @@ claims:
 基于上述分析，本文提出一个**反向视角**：与其设计越来越复杂的混合离散-连续搜索算法，不如从根本上重新设计形状语法本身，使其参数化空间具备类似神经网络过参数化的光滑性和冗余性。核心思想是：通过精心设计重写规则，使离散结构空间中的每一步跳跃都伴随有意义的梯度下降路径，从而让简单的随机梯度下降（SGD）就能高效解决形状程序的逆问题。
 
 这一动机催生了两个核心贡献：（1）一套系统化的**语法设计指南**（Table 1），明确了使形状语法易于梯度优化的具体属性；（2）**随机重写下降（Stochastic Rewrite Descent, SRD）** 算法，将离散重写采样与连续参数的梯度下降交替执行，利用梯度信息同时指导离散结构选择和连续参数更新。
-
-
 
 ## 核心方法与创新机理
 
@@ -127,8 +123,6 @@ claims:
 - 完整语法 Tr-F 在 TwoComp 上达到 22.6，相比 Tr-1 提升 **+12.3 PSNR**。
 
 与 RJMCMC 的对比（Figure 3）显示：在相同基础语法下，RJMCMC 与 Tr-1 表现相当；而采用优化友好语法后，SRD 的 PSNR 从 15.3 跃升至 22.0（OneComp），充分证明**性能增益来自语法设计本身，而非搜索算法的复杂度提升**。
-
-
 
 本文提出的核心框架并非设计新的搜索算法，而是**反向设计形状语法本身**，使其参数化空间天然适配梯度下降优化。基于这一思想，作者构建了一个交替优化管线，将离散结构探索与连续参数优化统一在梯度引导的框架下。
 
@@ -173,12 +167,8 @@ SRD 优化管线由四个核心模块构成，交替执行连续参数更新与�
 
 这些原则共同作用，使语法定义的离散-连续空间具备类似神经网络过参数化的光滑性和冗余性，从而让简单的随机梯度下降与贪心重写选择即可高效求解形状程序逆问题。消融实验（Table 2）证实，逐步添加这些设计原则使 PSNR 从 15.4 显著提升至 22.6，其中跳跃连续性的引入（Tr-3）带来了最大幅度的性能跃升。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l33_https_www_computationaldesign_group_assets_papers_SIGA_2025_D4Descent_pd/figures/012_Figure_5.jpg]]
 *Figure 5: Results of text-based optimization using Score Distillation Sampling (SDS) over grammars that (left) uses arcs and lines and (right) uses rectangles. The optimized shapes are coherent with the text prompts showing the versatility of our framework on different objectives. See Fig. 10 and 11 in the supplemental for additional results*
-
-
 
 ### 设计空间与优化目标
 
@@ -225,8 +215,6 @@ SRD 的完整 pipeline 由四个核心模块构成：
 4. **离散重写选择器**：采样候选重写，基于梯度信息估算损失改进，通过贪心最大覆盖选择并行应用的重写集合。
 
 这四个模块的协同使 SRD 能够同时利用梯度信息指导离散结构探索和连续参数精调，克服了传统 MCMC 方法（如 **RJMCMC**, Talton et al., TOG 2011）在离散空间中缺乏梯度引导的局限。
-
-
 
 ## 实验与关键发现
 
@@ -277,25 +265,15 @@ Fig. 6展示了SRD在动态变形序列中的鲁棒性：当目标图像连续�
 3. **语法设计门槛**：所有语法均依赖人工工程化以满足设计指南，尚未实现从数据中自动推断优化友好规则。
 4. **离散操作的连续松弛**：某些离散操作可能无法找到合适的连续松弛，限制了SRD在更广泛离散结构空间的直接应用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l33_https_www_computationaldesign_group_assets_papers_SIGA_2025_D4Descent_pd/figures/007_Figure.jpg]]
 
 ![[assets/figures/papers/paper_list_l33_https_www_computationaldesign_group_assets_papers_SIGA_2025_D4Descent_pd/figures/008_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l33_https_www_computationaldesign_group_assets_papers_SIGA_2025_D4Descent_pd/figures/009_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l33_https_www_computationaldesign_group_assets_papers_SIGA_2025_D4Descent_pd/figures/010_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l33_https_www_computationaldesign_group_assets_papers_SIGA_2025_D4Descent_pd/figures/014_Figure.jpg]]
 
 ![[assets/figures/papers/paper_list_l33_https_www_computationaldesign_group_assets_papers_SIGA_2025_D4Descent_pd/figures/002_Table_1.jpg]]
 *Table 1: The suggested guidelines for designing grammars for descent. Section 3.2 systematical considers desirable properties, condensed here to a set of concrete recommendations. These are intended to be guidelines rather than hard requirements: they need not be strictly satisfied by all rewrites, it may even be contradictory to attempt to satisfy them all simultaneously for a given task. In Section 6 we experimentally validate the effect of these rules improving the efficacy of inverse optimization in several settings*
 
 ![[assets/figures/papers/paper_list_l33_https_www_computationaldesign_group_assets_papers_SIGA_2025_D4Descent_pd/figures/004_Table_2.jpg]]
 *Table 2: Optimization quality (PSNR) and simplicity (number of primitives) using different grammar variations evaluated over OneComp (One), Donut (Dnt.), and TwoComp (Two) datasets*
-
-
 
 ## 定位与知识库关联
 
@@ -343,8 +321,6 @@ SRD 处于三个研究方向的交叉点上：
 | **混合离散-连续优化** | 提出交替执行连续梯度步和离散重写步的实用框架，通过贪心最大覆盖实现并行重写选择 | 神经网络架构搜索（NAS）中的混合优化；贝叶斯优化中的混合变量处理 |
 
 SRD 的核心知识贡献不在于提出新的优化算法理论，而在于揭示了一个被忽视的设计维度：**语法空间的结构属性决定了梯度优化的可行性**。这一洞察将“过参数化使优化更容易”的深度学习经验迁移到了程序化建模领域，为后续研究开辟了“优化驱动语法设计”的新方向。
-
-
 
 ## 原文 PDF
 

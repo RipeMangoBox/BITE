@@ -54,8 +54,6 @@ claims:
 
 在硬级别数学推理基准上，RiskPO 的平均 Pass@1 达到 **46.65**，比最强基线 DAPO（43.87）高 **+2.78**，比 GRPO（40.41）高 **+6.24**（Table 1）。在 Pass@k 指标上，RiskPO 相对于 GRPO 的优势随 k 增大而扩大，表明模型扩展了推理边界而非仅提升采样效率（Figure 4）。训练过程中，RiskPO 的策略熵持续高于 GRPO，验证了理论预测（Figure 5）。
 
-
-
 ### 可验证奖励强化学习的瓶颈
 
 近年来，基于可验证奖励的强化学习（RLVR）已成为大型语言模型（LLM）后训练的核心范式。其基本目标是在给定问题 $x$ 下最大化期望奖励：
@@ -79,8 +77,6 @@ $$\mathcal{I}(\theta) = \mathbb{E}_{x \sim \mathcal{D}, y \sim \pi_\theta(\cdot|
 此外，为解决二元奖励在单问题粒度上的稀疏性问题，RiskPO设计了问题捆绑方案：将多个问题随机组合成捆绑，将稀疏的0/1奖励转化为丰富的0到B的捆绑得分，为风险敏感优化提供足够的统计信号。这一设计使得MVaR的分位数估计和优势计算在实践上可行。
 
 理论层面，本文证明了MVaR优势与对数概率的协方差小于均值优势的协方差（Theorem 2），从而每个更新步导致更高的策略熵（Proposition 1），为RiskPO缓解熵崩塌提供了严格的数学基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -122,8 +118,6 @@ $$\mathrm{Cov}(\log \pi_\theta, A_{\mathrm{MVaR}}) \leq \mathrm{Cov}(\log \pi_\t
 
 RiskPO 引入了三个核心超参数：分位数水平 $\alpha, \beta$、捆绑大小 $B$ 和混合参数 $\omega$。消融实验表明，默认配置（$\alpha=0.2, \beta=0.8, B=5, \omega=0.5$）在数学推理基准上取得最优平均性能，但方法对这些参数较为敏感，过大或过小的取值都会导致性能下降。此外，分位数在线跟踪使用随机近似更新，可能引入额外估计方差，影响训练稳定性。
 
-
-
 ![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_KjHB7rebQO/figures/002_Figure_2.jpg]]
 *Figure 2: The framework of RiskPO*
 
@@ -151,8 +145,6 @@ $$\mathcal{I}_{\mathrm{MVaR}}^{\mathrm{clip}}(\theta) = \mathbb{E}\left[ \frac{1
 5. **策略更新**：使用梯度下降更新策略参数θ。
 
 **熵机制的理论支撑**。RiskPO维持更高策略熵的能力源于其优势函数与对数概率之间更小的协方差。Proposition 1表明，每个自然梯度步后，策略熵的变化近似为 $\Delta\mathcal{H} \approx -\eta \cdot \mathrm{Cov}(\log\pi_\theta, A_\theta)$。Theorem 2进一步证明，MVaR优势与log概率的协方差始终小于或等于均值优势的协方差，因此RiskPO在每个更新步导致更小的熵下降，有效缓解了熵崩塌问题。这一理论预测在实验中得到了实证验证（Figure 9）。
-
-
 
 RiskPO 的核心由两个关键模块构成：**奖励信号富集（Reward Signal Enrichment）** 与 **风险敏感策略优化（Risk-sensitive Policy Optimization）**。前者通过问题捆绑将稀疏的二元奖励转化为丰富的梯度信号，后者引入混合风险价值（MVaR）目标替代传统均值目标，将优化焦点从奖励分布中心转向尾部。
 
@@ -206,14 +198,11 @@ $$\mathrm{Cov}(\log \pi_\theta, A_{\mathrm{MVaR}}) \leq \mathrm{Cov}(\log \pi_\t
 
 因此 RiskPO 每步更新导致的熵下降更小，在训练过程中维持更高的策略熵，从而保留探索能力、扩展推理边界。该理论在表格 softmax 策略和单调对数概率假设下成立，实验部分通过实际模型验证了假设的合理性。
 
-
-
 ## 实验与关键发现
 
 ### 主结果：硬级别数学推理
 
 RiskPO在6个硬级别数学推理基准上进行了系统评估，所有方法均基于1.5B参数模型（DeepSeek-R1-Distill-Qwen-1.5B），在相同训练数据和评估设置下公平比较。Table 1展示了Pass@1的核心结果：
-
 
 ![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_KjHB7rebQO/figures/004_Table_1.jpg]]
 *Table 1: Pass@1 performance on hard-level mathematical reasoning benchmarks*
@@ -228,7 +217,6 @@ RiskPO在6个硬级别数学推理基准上进行了系统评估，所有方法�
 
 Table 2展示了RiskPO在易级别数学推理、多模态推理和代码生成基准上的表现：
 
-
 ![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_KjHB7rebQO/figures/005_Table_2.jpg]]
 *Table 2: Pass@1 results on easy-level math benchmarks and multi-modal/coding benchmarks*
 
@@ -239,17 +227,9 @@ Table 2展示了RiskPO在易级别数学推理、多模态推理和代码生成�
 
 Figure 4展示了AMC和MATH500上Pass@k随k变化的曲线。关键发现是：**RiskPO相对于GRPO的Pass@k优势随k增大而扩大**。这意味着RiskPO并非仅仅提升了采样效率（即在高概率输出上更准确），而是真正扩展了模型的推理边界——在更大的采样预算下，模型能够探索到GRPO无法触及的正确推理路径。
 
-
-![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_KjHB7rebQO/figures/011_Figure_4.jpg]]
-*Figure 4: Pass@k learning curves on the AMC and MATH500 datasets*
-
 ### 熵崩塌缓解机制
 
 Figure 5展示了DAPOMATH-17K上的训练动态对比，直接验证了RiskPO缓解熵崩塌的核心主张：
-
-
-![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_KjHB7rebQO/figures/015_Figure_5.jpg]]
-*Figure 5: Learning curves on DAPOMATH-17K, the RiskPO mitigates the entropy collapse and shows better performance on difficult problems, which is indicated by risk measures*
 
 - GRPO的策略熵在训练过程中持续下降，呈现典型的熵崩塌模式。
 - RiskPO在整个训练过程中维持**显著更高**的策略熵水平，同时取得了更好的困难问题表现（以风险度量衡量）。
@@ -302,7 +282,6 @@ Figure 5展示了DAPOMATH-17K上的训练动态对比，直接验证了RiskPO缓
 2. **理论假设差距**：Theorem 2的证明依赖于表格softmax策略和单调log概率条件（Assumption 1），虽经Figure 3实证验证，但与大规模LLM的实际行为仍存在差距。
 3. **分位数估计方差**：在线分位数跟踪使用随机近似，可能引入额外估计方差，影响训练稳定性，尤其在训练初期分位数估计不准确时。
 
-
 ## 定位与知识库关联
 
 ### 1. 方法定位
@@ -334,8 +313,6 @@ RiskPO 的差异化在于将**风险敏感目标**引入 LLM 后训练，通过�
 3. **与正则化技术结合**：MVaR 目标与 KL 散度约束、动态采样等正则化技术结合是否能进一步提升性能，是值得探索的方向。
 4. **奖励形式扩展**：当前框架依赖二元可验证奖励（答案对/错），是否适用于连续评分或偏好数据场景需要进一步研究。
 5. **分位数估计改进**：随机近似分位数跟踪是否导致有偏估计，以及如何改进估计精度和训练稳定性，是工程层面的开放问题。
-
-
 
 ## 原文 PDF
 

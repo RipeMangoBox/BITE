@@ -57,8 +57,6 @@ claims:
 
 TROLL 作为 PPO 剪裁目标的直接替代，不改变模型推理过程，仅在训练时引入额外投影步骤。其方法定位处于 RL for LLM 中策略优化约束机制的核心位置，为后续在更大规模模型、多模态场景及 RLHF 等任务中的扩展提供了严格且可微的信任区域基础。
 
-
-
 ### 1. LLM 强化学习的瓶颈：PPO 剪裁的粗糙信任区域
 
 基于人类反馈的强化学习（RLHF）和基于可验证奖励的强化学习（RLVR）已成为大语言模型（LLM）后训练的核心范式。在这些范式中，策略优化算法（如 PPO、GRPO）需要限制新旧策略之间的差异，以防止策略崩溃或训练不稳定。当前的主流做法是采用 **PPO 式剪裁目标**（PPO-clipped surrogate objective，Schulman et al., 2017）：
@@ -106,8 +104,6 @@ TROLL 的出发点是：**用可微的离散信任区域投影替代 PPO 的启�
 - 使不稳定的序列级优化方法（如 GSPO）能够稳定收敛。
 - 在训练过程中保持更高的 token 熵，避免剪裁常伴随的熵快速坍塌（Figure 5 Bottom Right）。
 - 以可忽略的额外开销（4B 模型上运行时增量不足 10%）实现上述收益，使其成为 PPO 剪裁的实用替代方案。
-
-
 
 ## 核心方法与创新机理
 
@@ -173,8 +169,6 @@ $$\mathbf{KL}(p \parallel q) \le \gamma^{-1} \mathrm{KL}(p' \parallel q') + \del
 
 这些创新使 TROLL 成为一个可直接替换 PPO 剪裁的即插即用模块（Figure 2），在不改变模型推理过程的前提下，显著提升训练稳定性和最终性能。
 
-
-
 ![[assets/figures/papers/paper_list_l36_https_openreview_net_forum_id_X9D5MVpPJ9/figures/003_Figure_1.jpg]]
 *Figure 1: Trust Region Optimization for Large Language models (TROLL) overview. (Left) Example of a 3-token distribution (cat, troll, hamster). The old policy favors the troll, while the new policy shifts toward the hamster. The projection ensures that the updated policy stays within the trust region (circle). (Right) TROLL yields clear performance gains over PPO-like clipping (CLIP) on mathematical reasoning and code generation tasks, as shown for Qwen3-14B trained with GRPO*
 
@@ -199,8 +193,6 @@ Figure 1 (Left) 用一个 3‑token 的简化示例直观展示了投影的几�
 ### 与 PPO 剪裁的对比
 
 Table 1 的系统性对比揭示了两种信任区域实现方式的本质差异：PPO 的剪裁目标（Equation 2）仅在重要性比率超出 $[1-\epsilon_{\mathrm{ppo}}, 1+\epsilon_{\mathrm{ppo}}]$ 时截断梯度，这是一种**无严格数学约束的启发式近似**；而 TROLL 通过求解凸优化问题（Equation 3）对每个 token 施加**精确的 KL 散度上界**，其投影解具有闭式形式（Equation 4），且整个过程保持可微。这一设计差异直接导致了 GSPO 方法上的关键结果：GSPO (Clip) 在训练中发散（成功率为 0），而 GSPO (TROLL) 稳定收敛至 0.736（Qwen3‑8B），表明严格的 token‑级信任区域约束对于序列级策略优化方法的稳定性至关重要。
-
-
 
 ### 瓶颈与设计动机
 
@@ -254,8 +246,6 @@ $$
 
 其中 $\alpha$ 固定为 1，$\lfloor \cdot \rfloor$ 表示 stop-gradient 操作。该目标作为 PPO 剪裁目标的直接替代，可无缝集成到 GRPO、Dr.GRPO、GSPO 等现有优势估计框架中，仅更改策略更新部分，不改变模型推理过程。
 
-
-
 ## 实验与关键发现
 
 ### 主实验：数学推理与代码生成
@@ -302,17 +292,8 @@ TROLL 在数学推理（DAPO‑Math）与代码生成（Eurus‑Code）两大 RL
 4. **稀疏化近似误差**：在极低概率 token 上引入的微小近似误差（理论上界由 Theorem A.2 保证，比信任区域阈值小约两个数量级）在极严格信任区域下的影响需进一步验证。
 5. **自适应 ε 机制**：当前 ε 为固定超参数，探索自适应调节信任区域边界的机制可进一步降低调参成本。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l36_https_openreview_net_forum_id_X9D5MVpPJ9/figures/007_Table_2.jpg]]
-
 ![[assets/figures/papers/paper_list_l36_https_openreview_net_forum_id_X9D5MVpPJ9/figures/013_Table_2.jpg]]
 *Table 2: Model checkpoints used as starting points for finetuning throughout this work*
-
-![[assets/figures/papers/paper_list_l36_https_openreview_net_forum_id_X9D5MVpPJ9/figures/014_Table_3.jpg]]
-*Table 3: Hyperparameters. We use these parameters for all experiments unless mentioned otherwise*
-
-
 
 ## 定位与知识库关联
 
@@ -398,8 +379,6 @@ $$ \mathbf{KL}(p \parallel q) \le \gamma^{-1} \mathrm{KL}(p' \parallel q') + \de
 3. **RLHF 整合**：在 RLHF 等需要与参考策略保持接近的场景中，如何整合 TROLL 的信任区域（当前 TROLL 仅约束与旧策略的 KL 散度）。
 4. **自适应信任区域**：探索自适应调节信任区域边界 $\epsilon$ 的机制，以避免手动调参。消融实验（Figure 5 Left）表明较小的 $\epsilon$ 减慢训练但不影响收敛，过大的 $\epsilon$ 导致性能下降，暗示存在最优边界且可能与训练阶段相关。
 5. **理论分析深化**：TROLL 的收敛性保证、与自然策略梯度（NPG）的理论联系等尚未充分探索。
-
-
 
 ## 原文 PDF
 

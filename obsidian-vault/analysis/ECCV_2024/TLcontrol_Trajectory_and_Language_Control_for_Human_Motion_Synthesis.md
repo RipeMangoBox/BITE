@@ -55,8 +55,6 @@ claims:
 
 **主要结果**：在 HumanML3D 数据集上控制全部六个关节时，TLControl 的轨迹误差（Traj.Err.）和位置误差（Loc.Err.）均为 0.00%，而 OmniControl 分别为 75.59% 和 12.30%；平均关节误差从 23.67 cm 降至 1.57 cm，FID 从 2.614 降至 0.032。推理速度达到 0.015 s/frame，比 OmniControl（0.606 s/frame）快约 40 倍。消融实验证实，分体式 VQ‑VAE 设计相比统一 VQ‑VAE 将平均误差从 2.51 cm 降至 1.57 cm，且运行时间降低 27.3%。
 
-
-
 ### 问题背景
 
 可控人体运动合成是计算机视觉与图形学中的核心问题，其目标是根据用户提供的控制信号生成自然、多样且符合语义的人体运动序列。近年来，文本驱动的运动生成取得了显著进展，基于扩散模型的方法（如 **MDM**（Tevet et al., arXiv 2022））能够从自然语言描述中生成高质量的运动。然而，纯文本控制存在固有的模糊性——同一句描述可对应无数种空间实现，难以满足需要精确空间约束的应用场景（如 VR 角色导航、电影预演、游戏交互）。
@@ -78,8 +76,6 @@ claims:
 上述瓶颈的本质在于：现有方法在**连续、非结构化的运动表示空间**中进行轨迹控制，缺乏对人体运动固有组合结构的利用。人体运动天然具有部位级的分化特性——手臂、腿部、头部等部位的运动在保持整体协调的同时具有局部独立性。
 
 TLControl 的核心动机是：**将人体运动分解为多个身体部位的离散潜在表示，在紧凑且结构良好的潜在空间中进行轨迹跟随优化**。这一设计使得轨迹控制可以在不破坏整体运动语义的前提下进行——每个部位的潜在代码独立编码其运动模式，优化时仅需调整受控部位的代码，其他部位自动保持语义一致性。同时，离散潜在空间的紧凑性使得测试时优化仅需少量迭代即可收敛，从根本上突破了扩散模型多步采样的效率瓶颈。
-
-
 
 ## 核心方法与创新机理
 
@@ -127,8 +123,6 @@ $$\hat{\mathbf{Q}} = \arg\min_{\mathbf{Q}} \Sigma_j \|\mathcal{P}_j(\mathcal{D}(
 
 TLControl 假设输入的语言描述与轨迹之间不存在冲突，且轨迹在物理上可行。当两者矛盾时（如语言要求“举起右手”而轨迹限制右手向下），模型未提供冲突消解机制。此外，测试时优化在极长序列或控制点稀疏的情况下可能陷入局部最优，导致语义漂移。该方法目前依赖固定骨架结构，扩展到非人形角色需重新训练。尽管如此，TLControl 所开辟的“分体式离散潜在空间 + 测试时优化”范式，为可控运动生成提供了新的方法论基础。
 
-
-
 TLControl 的整体框架围绕一个核心洞察构建：**将人体运动分解为多个身体部位的离散潜在表示，可以在不破坏整体运动语义的前提下进行精确的轨迹跟随优化**。为此，该方法采用“神经预测 + 测试时优化”的混合范式，在分体式 VQ‑VAE 学习到的紧凑、结构良好的潜在空间中运作，其 pipeline 如 Fig. 2 所示，分为两个训练阶段和一个测试时优化阶段。
 
 ![[assets/figures/papers/paper_list_l1881_TLcontrol_Trajectory_and_Language_Control_for_Human_Motion_Synthesis/figures/002_Figure_2.jpg]]
@@ -159,8 +153,6 @@ $$\hat{\mathbf{Q}} = \arg\min_{\mathbf{Q}} \Sigma_j \|\mathcal{P}_j(\mathcal{D}(
 其中 $\mathcal{P}_j$ 为从全身运动中提取第 $j$ 个受控关节位置的投影算子。由于分体式潜在空间已编码了运动的自然分布，优化仅需少量迭代即可达到亚厘米级精度，同时保持运动语义的连贯性。优化收敛后，$\mathcal{D}(\hat{\mathbf{Q}})$ 即为最终输出的全身运动。
 
 **模块间数据流总结**。训练阶段一：$\mathbf{J} \to$ 分体编码器 $\to \mathbf{Q}_k \to$ 量化 $\to \hat{\mathbf{Q}}_k \to$ 解码器 $\to \hat{\mathbf{J}}$；训练阶段二：$(R', L) \to$ MTT $\to \hat{\mathbf{Q}}_0 \to$ 冻结解码器 $\to \hat{\mathbf{J}}$；测试阶段：$(R', L) \to$ MTT $\to \hat{\mathbf{Q}}_0 \to$ 潜在空间优化 $\to \hat{\mathbf{Q}} \to$ 冻结解码器 $\to \hat{\mathbf{J}}$。整个流程中，VQ‑VAE 的解码器始终作为可微的运动生成器，将离散潜在代码映射回全身运动，从而在优化回路中保持端到端的可微性。
-
-
 
 TLControl 的核心架构由三个关键模块构成，分别对应分体式运动压缩、粗粒度轨迹-语言联合预测，以及测试时潜在空间精化。以下逐一阐述其设计逻辑与数学形式。
 
@@ -208,8 +200,6 @@ $$\hat{\mathbf{Q}} = \arg\min_{\mathbf{Q}} \sum_j \|\mathcal{P}_j(\mathcal{D}(\m
 
 **效率优势**：由于优化发生在紧凑的潜在空间而非高维关节空间，且以 MTT 的良好初始预测为起点，单帧推理仅需 0.015 s，相比 OmniControl（0.606 s/frame）快约 40 倍（Table 4）。消融实验进一步表明，分体式 VQ‑VAE 相较于统一 VQ‑VAE 将运行时间降低 27.3%（Supplementary Table 1, Supplementary Fig. 1）。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -249,9 +239,6 @@ Table 2 显示在 KIT 测试集上控制骨盆轨迹时，TLControl 的 Avg.Err.
 
 Table 4 报告了各方法的每帧推理时间。TLControl 仅需 **0.015 s/frame**，比 OmniControl（0.606 s/frame）快约 **40 倍**，也远快于 MDM（26.241 s/frame）和 GMD（0.022 s/frame，但仅支持根轨迹控制）。这一效率优势源于在紧凑潜在空间中进行测试时优化，避免了扩散模型的多步迭代采样。
 
-![[assets/figures/papers/paper_list_l1881_TLcontrol_Trajectory_and_Language_Control_for_Human_Motion_Synthesis/figures/011_Table_4.jpg]]
-*Table 4: Runtime of different methods*
-
 ### 消融实验
 
 #### 分体式 VQ‑VAE 的关键作用
@@ -272,15 +259,6 @@ Table 5 展示了控制所有关节时，优化精度标准（accuracy criteria�
 
 Table 3 和 Supplementary Fig. 2 报告了不同轨迹掩码比例下的运动多样性（MModality）和质量（FID、R‑precision）。随着掩码比例增加，性能平稳下降，但即便在 **75% 轨迹被掩盖**的极端情况下，FID 仍远优于 OmniControl 在完整轨迹下的表现（FID 2.614）。这证明了 MTT 粗预测与潜在空间优化的组合对不完整轨迹具有强鲁棒性。
 
-![[assets/figures/papers/paper_list_l1881_TLcontrol_Trajectory_and_Language_Control_for_Human_Motion_Synthesis/figures/009_Table_3.jpg]]
-*Table 3: The MModality of the generated motions under different trajectory masking rates*
-
-![[assets/figures/papers/paper_list_l1881_TLcontrol_Trajectory_and_Language_Control_for_Human_Motion_Synthesis/figures/019_Table_3.jpg]]
-*Table 3: Quantitative results of comparing IK based solution*
-
-![[assets/figures/papers/paper_list_l1881_TLcontrol_Trajectory_and_Language_Control_for_Human_Motion_Synthesis/figures/017_Figure_2.jpg]]
-*Figure 2: Influence of different trajectory incompleteness. We simulate the incompleteness by applying random masking. The left vertical axis represents the FID metric, while the right vertical axis indicates the R-precision metric*
-
 #### 潜在空间优化 vs. 关节级 IK
 
 Supplementary Table 3 将 TLControl 的潜在空间优化（Latent‑Opt）与直接在关节空间进行逆运动学调整（Joint‑IK）进行了对比。在轨迹掩码场景下，Joint‑IK 无法处理缺失帧，且即使有完整轨迹，其生成的运动也严重破坏语义连贯性。潜在空间优化在所有指标上均显著优于 Joint‑IK，验证了在紧致潜在流形内搜索的必要性。
@@ -293,12 +271,6 @@ Supplementary Fig. 4 展示了仅使用语言或仅使用轨迹作为输入时�
 
 Fig. 3 展示了 TLControl 在用户自定义轨迹下的多关节同时控制能力，以及语言与轨迹的独立控制能力。Fig. 4 展示了 3D 手绘轨迹和楼梯脚步放置等实际应用场景。Fig. 5 和 Fig. 7 的定性对比中，TLControl（黄色）生成的运动在轨迹跟随精度和姿态自然度上均明显优于 OmniControl（绿色）。Fig. 6 展示了相同控制输入下 TLControl 能够生成多样化的运动样本。
 
-![[assets/figures/papers/paper_list_l1881_TLcontrol_Trajectory_and_Language_Control_for_Human_Motion_Synthesis/figures/005_Figure_5.jpg]]
-*Figure 5: Qualitative comparison results with Omnicontrol [62]. Our results are shown in Yellow, while the results of Omnicontrol are depicted in Green. Please refer to our supplementary video for more details of the comparison*
-
-![[assets/figures/papers/paper_list_l1881_TLcontrol_Trajectory_and_Language_Control_for_Human_Motion_Synthesis/figures/010_Figure_7.jpg]]
-*Figure 7: Qualitative comparison with Om*
-
 ### 失败模式与局限
 
 尽管整体表现优异，TLControl 仍存在以下局限：
@@ -308,8 +280,6 @@ Fig. 3 展示了 TLControl 在用户自定义轨迹下的多关节同时控制�
 3. **长序列与稀疏控制**：在非常长的序列或控制点极少的情况下，测试时优化可能陷入局部最优，导致语义漂移。
 4. **骨架限制**：当前模型基于训练所用的固定骨架（SMPL/CMU 拓扑），直接扩展到非人形角色或不同关节拓扑需要重新训练。
 5. **实时性边界**：虽然每帧 0.015 s 已很快，但在 VR 手柄输入等要求毫秒级反馈的场景中，仍需专用加速或进一步优化。
-
-
 
 ## 定位与知识库关联
 
@@ -368,8 +338,6 @@ TLControl 的有效性建立在以下前提假设之上：
 4. **物理可信性增强**：是否可以将该方法与基于物理的仿真器结合，进一步提升运动的物理可信性？这有望解决当前纯数据驱动方法可能产生的物理不合理运动。
 
 5. **方法泛化性**：能否将 TLControl 的优化框架泛化到其他生成模型（如基于扩散的模型），在保持精度的同时进一步降低训练成本？这涉及测试时优化范式在其他生成架构中的适用性验证。
-
-
 
 ## 原文 PDF
 

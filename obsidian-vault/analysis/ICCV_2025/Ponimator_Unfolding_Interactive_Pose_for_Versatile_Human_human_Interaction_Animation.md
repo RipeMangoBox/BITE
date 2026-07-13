@@ -55,8 +55,6 @@ claims:
 
 **局限与展望**：当前方法聚焦短时交互片段，长序列生成时交互姿态先验作用减弱；未显式建模人际穿透，在亲密接触场景中可能出现穿透；缺乏场景上下文意识，可能与环境碰撞；交互姿态估计误差会传播至动画阶段。未来方向包括显式穿透建模、场景上下文整合、文本引入动画阶段以解决语义歧义，以及向多人交互扩展。
 
-
-
 ### 问题背景
 
 生成逼真的人-人交互动态是计算机视觉与图形学中长期存在的挑战。与单人运动生成不同，双人交互涉及复杂的空间协调与时间同步：两个个体的姿态不仅需要各自自然，还必须在空间上紧密配合、在物理上产生可信的接触。这种双重约束使得交互运动生成远比单人运动困难。
@@ -74,8 +72,6 @@ claims:
 本文的核心洞察在于：**交互姿态蕴含着丰富的时空先验，能够作为桥梁连接姿态生成与运动动画**。如图 Figure 2 所示，交互姿态（即两人近距离接触时的静态姿态对）与非交互姿态有着本质区别——观察者可以从一个交互姿态中直观地推断出前后文的动态信息（如“推”的动作前后帧），而非交互姿态则缺乏这种时间暗示。这意味着交互姿态天然地编码了交互的“空间快照”，同时暗含了时间演化的约束。
 
 基于这一洞察，Ponimator 提出将任务解耦为两个阶段：先利用**空间先验**生成交互姿态，再利用**时间先验**从交互姿态展开为完整运动序列。这种解耦使得模型只需少量条件（单姿态、文本或两者组合）即可在各种输入下生成逼真的双人交互动态，同时通过交互姿态这一中间锚点，自然保证了物理接触和运动真实感。训练数据则来自动作捕捉交互数据集中检测到的近距离双人姿态及其前后文运动片段，从而将高质量 MoCap 数据中的交互先验有效迁移到开放域应用中。
-
-
 
 ## 核心方法与创新机理
 
@@ -110,8 +106,6 @@ Ponimator 在扩散模型框架内引入了一系列针对交互姿态锚定的�
 - **将 InterGen 直接适配为交互姿态输入**（InterGen\*）：因缺乏显式交互建模而表现不佳，进一步说明锚定机制的重要性
 
 这些结果一致表明：**交互姿态锚定及其配套的条件编码机制是 Ponimator 性能优势的核心来源**，而非模型容量或训练策略的简单提升。
-
-
 
 Ponimator 的核心设计是将双人交互运动生成解耦为两个阶段，以**交互姿态**作为中间桥梁。整体 pipeline 由两个条件扩散模型串联构成：**交互姿态生成器** 和 **交互姿态动画器**，分别利用空间先验和时间先验来完成从条件输入到动态运动的生成。
 
@@ -150,19 +144,9 @@ $$p(\mathcal{X}, \beta) = p(\mathcal{X}; \mathbf{x}_I, \beta) \cdot p(\mathbf{x}
 
 这种解耦设计使得模型只需少量条件即可在各种输入下生成逼真的双人交互动态，且交互姿态作为锚点天然保证了物理接触。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1771_Ponimator_Unfolding_Interactive_Pose_for_Versatile_Human_human_Interacti/figures/014_Figure_10.jpg]]
-*Figure 10: Diverse interactive motion generation. From a single pose,our framework generates varied interactive poses (magenta box)and motions (lst,2nd rows) and text-driven ones (3rd row)*
-
-
-
 ### 3.1 交互姿态的定义与概率分解
 
 Ponimator 的核心洞察在于：**交互姿态（Interactive Pose）**——即两个个体在近距离接触下的静态姿态——蕴含着丰富的时空先验。观察者仅凭一帧交互姿态（如握手、拥抱），便能直觉性地推断出前后文的动态过程（Figure 2）。基于此，方法将双人交互运动 $\mathcal{X}$ 的生成概率显式地分解为两个条件概率的乘积：
-
-![[assets/figures/papers/paper_list_l1771_Ponimator_Unfolding_Interactive_Pose_for_Versatile_Human_human_Interacti/figures/002_Figure_2.jpg]]
-*Figure 2: Interactive poses refer to two-person poses in proximity and close contact. The top row displays interactive (green) and non-interactive (red) poses within one sequence. Interactive poses allow observers to intuitively infer the temporal context,while non-interactive poses are more ambiguous and difficult to interpret. The bottom row showcases common daily interactive poses*
 
 $$p(\mathcal{X}, \beta) = p(\mathcal{X}; \mathbf{x}_I, \beta) \cdot p(\mathbf{x}_I, \beta)$$
 
@@ -210,8 +194,6 @@ $$\tilde{\mathbf{z}}_t = \big( (1 - \mathbf{m}_a) \odot \mathbf{z}_t^a + \mathbf
 
 通过灵活组合 $\mathbf{m}_a$ 和 $\mathbf{m}_c$，单一模型即可覆盖三种条件模式：纯文本（$\mathbf{m}_a = 0, \mathbf{m}_c = 1$）、纯单姿态（$\mathbf{m}_a = 1, \mathbf{m}_c = 0$）、以及文本+单姿态（$\mathbf{m}_a = 1, \mathbf{m}_c = 1$），实现了统一的交互姿态生成。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -246,9 +228,6 @@ Ponimator 的姿态动画器采用 8 层 Transformer（隐空间维度 1024）�
 ![[assets/figures/papers/paper_list_l1771_Ponimator_Unfolding_Interactive_Pose_for_Versatile_Human_human_Interacti/figures/010_Table_3.jpg]]
 *Table 3: Text-to-interaction synthesis results on Inter-X [65] dataset. Our unified pipeline outperforms end-to-end w/o interactive pose as anchor method in short-term interaction synthesis*
 
-![[assets/figures/papers/paper_list_l1771_Ponimator_Unfolding_Interactive_Pose_for_Versatile_Human_human_Interacti/figures/011_Table_4.jpg]]
-*Table 4: Single pose-to-interaction synthesis results on Inter-X[65] dataset. Compared to without anchor baseline,our method uses interactive poses for more effective interaction modeling*
-
 定性比较进一步支持定量结论：在文本“push”的生成对比中（Figure 8），Ponimator 比 InterGen 和端到端基线展现出更好的接触和更真实的动态；在单姿态到交互合成中（Figure 9），有锚定的模型生成的人-人交互更加自然。
 
 ![[assets/figures/papers/paper_list_l1771_Ponimator_Unfolding_Interactive_Pose_for_Versatile_Human_human_Interacti/figures/013_Figure_8.jpg]]
@@ -261,15 +240,9 @@ Ponimator 的姿态动画器采用 8 层 Transformer（隐空间维度 1024）�
 
 Figure 7 展示了交互姿态动画器在域内数据集（Inter-X、Dual-Human）和域外数据集（Duolando、Hi4D、Interhuman）上的泛化能力，甚至可以直接应用于随机组合的多人姿态而无需修改或重新训练。这表明学习到的交互姿态先验具有通用性，能够跨越不同数据分布和人数规模。
 
-![[assets/figures/papers/paper_list_l1771_Ponimator_Unfolding_Interactive_Pose_for_Versatile_Human_human_Interacti/figures/007_Figure_7.jpg]]
-*Figure 7: Interactive pose animation on in-domain datasets (Inter-X[65],Dual-Human[7])，out-of-domaindataset (Duolando [53],Hi4D [7O]，Interhuman [31])，and random composed multi-person pose. Each row: left—interactive pose, right—animation sequence.Our learned interactive pose prior is universal,generalizing across datasets and enabling multi-person interactions (6th row) without modification or retraining*
-
 ### 失败模式与局限性
 
 Figure 12 系统性揭示了方法的四类典型失败模式：
-
-![[assets/figures/papers/paper_list_l1771_Ponimator_Unfolding_Interactive_Pose_for_Versatile_Human_human_Interacti/figures/016_Figure_12.jpg]]
-*Figure 12: Methodimitationanalysis.Thefrsttworowssowin-the-wildinteractiveposeanimationresults.Ithefrstsample,evere interpenetrationoccursasourmethoddoesotexplicitlyodelpenetrationbetweentwoindividuals.Intesecond,tegeneratedotion is physicallyimplausibleuetthelackofscenecontextawareessleading tocolisions withteenvironent.Tebottomtworows ilustrate interactionmotiongenerationfromasinglepoeiput.Duetoinaccuracies ininteractivepose generation,ourmethodfailsto produce realistic contact, resulting in unnatural motion*
 
 1. **人际穿透**：在亲密接触场景中，由于方法未显式建模人际穿透约束，可能出现身体部位相互穿透（第 1 行）。
 2. **缺乏场景意识**：生成过程仅依赖人体姿态信息，忽略周围环境，可能导致与环境碰撞（第 2 行）。
@@ -277,13 +250,6 @@ Figure 12 系统性揭示了方法的四类典型失败模式：
 4. **脚步滑动**：生成的运动可能存在脚步滑动等常见运动合成瑕疵，且未进行后处理。
 
 此外，当前方法主要关注短时交互片段（3 秒），长序列生成时交互姿态先验的作用会逐渐减弱；文本语义歧义（如“举起”与“放下”的时序方向）也无法在姿态动画阶段被区分，因为动画器缺乏文本条件。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1771_Ponimator_Unfolding_Interactive_Pose_for_Versatile_Human_human_Interacti/figures/017_Figure_13.jpg]]
-*Figure 13: Longer motion generation bychaining interactive poses.Wereuse the last generated pose as the next input,reseting interactive time to zero,enabling sliding-window synthesis of longer motions (key-frame in magenta box)*
-
-
 
 ## 定位与知识库关联
 
@@ -334,8 +300,6 @@ Ponimator 的方法栈包含五个关键设计槽位，每个均经过消融验�
 3. **长程语义控制**：如何将文本条件引入姿态动画阶段，以解决语义歧义并生成更符合文本描述的长程交互？这涉及对现有框架中条件流的重新设计。
 4. **上游精度提升**：如何进一步提升交互姿态估计和生成的准确性，以减轻动画阶段的误差传播？这可能涉及更强的姿态先验或迭代优化策略。
 5. **多人扩展**：框架是否可以在不重新训练的情况下扩展到三人或多人交互？Figure 7 第 6 行展示了初步的多人组合实验，但系统性验证和性能评估仍是开放问题。
-
-
 
 ## 原文 PDF
 

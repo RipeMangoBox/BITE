@@ -56,8 +56,6 @@ claims:
 - 在领域泛化基准测试（ACDC、Dark Zurich、BDD100K、Mapillary）中，结合 HRDA 方法平均提升 **+1.53% mIoU**，尤其在恶劣天气和光照条件下表现突出。
 - 消融实验表明，仅微调 **2%** 的概念感知投影层即可取得最佳分割性能与领域对齐的平衡，优于全层微调、手工选择层及随机选择策略。
 
-
-
 ### 问题背景
 
 语义分割是计算机视觉的核心任务之一，其性能高度依赖于大规模、高质量的人工标注数据集。然而，像素级标注的获取成本极高，尤其在小样本场景或需要覆盖多样化领域（如不同天气、光照、城市环境）时，数据瓶颈尤为突出。近年来，预训练文本到图像（T2I）扩散模型展现出强大的生成能力，为合成分割数据集提供了新的可能——通过生成图像-标签对来扩充训练数据，有望缓解标注稀缺问题。
@@ -78,8 +76,6 @@ claims:
 本文的核心动机在于**解耦领域对齐中的目标概念与非目标概念**。具体而言，当我们将T2I模型适配到目标分割数据集时，真正需要学习的往往只是特定概念（如驾驶视角或目标域风格），而非训练集中的所有特征。这引出一个关键问题：**能否精确识别并仅更新T2I模型中与目标概念相关的参数，同时冻结其余参数以保留预训练知识的多样性？**
 
 这一动机催生了**概念感知LoRA（Concept-Aware LoRA, CA-LoRA）**：一种自动识别并选择性微调T2I模型中与期望概念相关联权重的微调方法。通过仅更新对目标概念敏感的参数子集，CA-LoRA在实现精确领域对齐的同时，最大限度地保留了预训练模型的生成多样性，从根本上解决了现有微调方法在生成分割数据时多样性差、泛化能力不足的问题。
-
-
 
 ## 核心方法与创新机理
 
@@ -135,8 +131,6 @@ CA-LoRA 相对标准 LoRA 微调进行了四个关键维度的改造，形成从
 
 CA-LoRA 的核心创新在于将 T2I 模型微调从“全参数无差别学习”转变为“概念感知的选择性学习”。通过概念感知度这一量化指标，模型能够自动识别并仅更新与目标概念相关的权重子集（仅 2%），在避免过拟合的同时实现精确的领域对齐。这一创新从根本上解决了现有微调方法在生成分割数据时多样性差、泛化能力不足的问题，并在 Cityscapes 小样本（+2.30% mIoU）和域泛化（+1.53% mIoU）等关键基准上取得了显著提升。
 
-
-
 CA-LoRA 的数据集生成框架遵循一个**四阶段流水线**，其核心设计目标是在不牺牲预训练 T2I 模型多样性的前提下，仅学习目标领域的特定概念（如驾驶视角或风格），从而生成领域对齐且多样化的图像-标签对。
 
 **阶段 1：概念敏感权重识别。** 给定一个预训练的 T2I 模型（如 SDXL）和少量目标域训练图像，首先为每张图像构造一对文本提示：原始描述 $c$ 和概念增强描述 $c_{\mathrm{Aug}}$（例如，对 Cityscapes 图像附加 `Sketch of first-person urban street view` 以强调视角概念）。通过前向加噪过程 $x_t = \sqrt{\bar{\alpha}_t} x_0 + \sqrt{1 - \bar{\alpha}_t} \epsilon$ 获得噪声图像后，分别计算**概念损失** $\mathcal{L}_{\mathrm{Concept}} := \| \epsilon_{\theta}(x_t, c, t) - \mathrm{sg}[\epsilon_{\theta}(x_t, c_{\mathrm{Aug}}, t)] \|_2^2$ 和**扩散损失** $\mathcal{L}_{\mathrm{Diff}} := \| \epsilon_{\theta}(x_t, c, t) - \epsilon \|_2^2$。概念损失捕捉原始提示与增强提示在降噪预测上的差异，而扩散损失则作为归一化基准。随后，对模型每一层计算**概念感知度**：
@@ -153,12 +147,8 @@ $$\mathrm{Concept\text{-}Awareness}(\theta) := \mathbb{E}_{x_0, \epsilon, c_{\ma
 
 整个流水线的关键因果机制在于：**概念感知梯度比率**作为自动权重定位信号，使得选择性微调成为可能——仅更新与目标概念紧密关联的极少数参数（消融实验表明 2% 即达到最优），从而在领域对齐与多样性保持之间取得精细平衡。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l744_https_arxiv_org_abs_2503_22172/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our framework for generating an urban-scene segmentation dataset by learning the Cityscapes viewpoint. The process consists of four stages: (1) identifying sensitive weights for a specific concept, (2) selectively fine-tuning them with LoRA, (3) training a label generator using features from T2I model, and (4) generating diverse image-label pairs with augmented prompts*
-
-
 
 ### 概念感知度（Concept-Awareness）度量
 
@@ -202,19 +192,6 @@ $$\mathrm{Concept-Awareness}(\theta) := \mathbb{E}_{x_0, \epsilon, c_{\mathrm{Au
 
 概念感知度对噪声时间步 $t$ 敏感。消融实验（Table 5）显示，$t=81$ 是最优选择——此时概念损失梯度与扩散损失梯度之比能最明显地区分风格与视角敏感层。该时间步对应中等噪声水平，既保留了足够的图像结构信息，又提供了充分的概念特异性信号。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l744_https_arxiv_org_abs_2503_22172/figures/003_Figure_3.jpg]]
-*Figure 3: Overview of measuring concept awareness. (a) We design the concept loss*
-
-![[assets/figures/papers/paper_list_l744_https_arxiv_org_abs_2503_22172/figures/004_Figure_4.jpg]]
-*Figure 4: Illustration of CA-LoRA. Unlike the original LoRA, our CA-LoRA selectively attaches LoRA layers in a specified proportion to projection layers sensitive to the desired concept*
-
-![[assets/figures/papers/paper_list_l744_https_arxiv_org_abs_2503_22172/figures/011_Figure_8.jpg]]
-*Figure 8: The detailed architecture of the CA-LoRA. We conduct projection-wise CA-LoRA that can attach the LoRA layer for each projection layer of multi-head self-attention*
-
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -225,13 +202,7 @@ $$\mathrm{Concept-Awareness}(\theta) := \mathbb{E}_{x_0, \epsilon, c_{\mathrm{Au
 
 在 Cityscapes 数据集的不同数据比例下，CA-LoRA 均取得最优 mIoU（Table 1）。在极度小样本设置（0.3% 数据，约 9 张图像）下，CA-LoRA 达到 44.13% mIoU，相较 DatasetDM 基线提升 **+2.30** 个百分点；在全监督设置（100% 数据）下达到 80.74% mIoU，提升 **+1.34** 个百分点。这表明 CA-LoRA 生成的数据集在不同数据规模下均能为分割模型提供有效的领域对齐增益。
 
-![[assets/figures/papers/paper_list_l744_https_arxiv_org_abs_2503_22172/figures/005_Table_1.jpg]]
-*Table 1: In-domain segmentation performance across various fractions of the Cityscapes dataset (mIoU). The first row presents the baseline model trained solely on the real dataset. We visualize the performance improvement relative to the baseline alongside each score*
-
 在 PASCAL VOC 数据集上，使用约 100 张图像（~7% 数据比例）训练时，CA-LoRA 达到 45.52% mIoU，相较基线提升 +0.93 个百分点（Table 10），验证了方法在不同数据集场景下的泛化能力。
-
-![[assets/figures/papers/paper_list_l744_https_arxiv_org_abs_2503_22172/figures/027_Table_10.jpg]]
-*Table 10: In-domain segmentation performance (mIoU) of the Pascal VOC dataset. In the first row, we report the performance of Mask2Former trained on different fractions of the PASCAL VOC dataset (Baseline). While DatasetDM often degrades segmentation performance due to incorrect labels, CA-LoRA consistently improves the results*
 
 ### 域泛化性能
 
@@ -284,13 +255,6 @@ Figure 5 的定性对比直观展示了各方法的生成质量差异。Instruct
 ### 失败模式与局限性
 
 当前的概念感知框架仅针对风格（style）和视角（viewpoint）两种概念进行了验证。对于物体形状、光照条件、布局等其他概念类型，其概念感知度的测量有效性和敏感层分布规律尚待探索。此外，概念感知度的计算依赖于人工设计的增强提示（如 “Sketch of first-person urban street view”），提示质量直接影响概念损失的区分能力——不当的提示增强可能导致概念感知度信号噪声增大，选出的参数子集偏离目标概念。未来可结合大语言模型自动化搜索最优提示增强策略，以降低人工设计成本并提升鲁棒性。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l744_https_arxiv_org_abs_2503_22172/figures/001_Figure_1.jpg]]
-*Figure 1: Motivation of Concept-Aware LoRA (CA-LoRA). Pretrained T2I models generate informative images but struggle with viewpoint alignment. LoRA fine-tuning on Cityscapes enables driving-viewpoint generation but leads to overfitting to the Cityscapes style and content. We aim to learn only the desired concept (e.g., viewpoint) for generating domain-aligned, informative samples*
-
-
 
 ## 定位与知识库关联
 
@@ -345,8 +309,6 @@ CA-LoRA 的有效性建立在以下决定性证据之上：
 2. **自动化提示搜索**：能否利用大语言模型自动搜索最优的提示增强策略，替代当前的手工设计？
 3. **时间步鲁棒性**：平均多个时间步的概念感知度是否能够进一步提高鲁棒性和精度？
 4. **与生成式数据增强方法的深度整合**：CA-LoRA目前作为DatasetDM的领域适配前置模块，未来可探索与ControlNet等可控生成架构的联合优化，实现更精细的概念解耦控制。
-
-
 
 ## 原文 PDF
 

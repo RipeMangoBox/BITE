@@ -53,8 +53,6 @@ claims:
 
 该方法的局限性包括：在 Kodak 数据集上大文件尺寸下质量不及 JPEG，且未使用量化导致极小模型时浮点参数主导；在纹理压缩任务上性能低于专用架构 **NTC**（Vaidyanathan et al., SIGGRAPH 2023）。
 
-
-
 神经隐式表示已在三维重建、视图合成和图像拟合等任务中展现出强大的表达能力。这类方法的核心组件之一是**神经图形基元**（neural graphics primitives），即一个将空间坐标映射为特征向量的可训练特征网格，其后接一个轻量级多层感知机（MLP）解码为颜色、密度等输出信号。特征网格的设计直接决定了模型的质量、存储开销和查询速度，因而成为神经场方法走向实际部署的关键瓶颈。
 
 ### 特征网格的索引困境
@@ -80,8 +78,6 @@ claims:
 
 综上，Compact NGP 在神经图形基元的压缩率-速度谱系中找到了一个帕累托最优平衡点，为需要紧凑存储与实时随机访问的应用（如游戏纹理压缩、实时光照缓存、细节层次流式传输）提供了新的基准方案。
 
-
-
 ## 核心方法与创新机理
 
 Compact NGP 的核心创新在于将确定性空间哈希与可学习的索引探测（learned probing）按位组合，构建了一种统一的索引函数框架，从而在保持推理速度的前提下大幅压缩神经图形基元的存储体积。该方法的关键设计可归纳为以下三个层面的“变更槽位”（changed slots）：
@@ -101,8 +97,6 @@ Instant NGP 对单个特征进行标准梯度传播；Compact NGP 在反向传�
 **创新本质的统一视角**
 论文将所有特征网格统一为“索引函数”框架（Figure 3），指出密集网格、k-平面、稀疏树、空间哈希和可学习索引本质上是不同的索引映射方式，因而可以通过算术运算组合。Compact NGP 正是将确定性哈希（高位）与可学习索引（低位）按位拼接，在不引入解压缩步骤的前提下，实现了压缩率与速度的帕累托最优平衡。
 
-
-
 Compact NGP 的整体流水线继承自 **Instant NGP**（Müller et al., ACM Trans. Graph. 2022）的多分辨率哈希编码框架，并在其索引阶段引入可学习的探测（learned probing）机制，形成“确定性哈希 + 可学习索引”的混合索引方案。如图 4 所示，流水线由以下模块串联构成：
 
 1. **坐标到体素顶点映射**：对于给定的连续输入坐标 $\mathbf{x} \in \mathbb{R}^d$，首先找到其包围的整数网格顶点 $\mathbf{v} \in \mathbb{Z}^d$。这一步骤与 Instant NGP 完全一致，为后续的逐顶点特征查询提供离散化坐标。
@@ -118,13 +112,6 @@ Compact NGP 的整体流水线继承自 **Instant NGP**（Müller et al., ACM Tr
 6. **线性插值与 MLP 解码**：对包围坐标 $\mathbf{x}$ 的多个顶点特征向量进行 $d$-线性插值，将插值结果输入小型 MLP 解码为输出信号（如颜色与密度）。
 
 **关键设计选择**：该方法将所有特征网格统一视为索引函数框架（见图 3），允许不同索引方案通过算术运算组合。Compact NGP 将确定性哈希与可学习索引按位拼接，避免了量化或熵编码，直接支持随机访问，从而在保持高速推理的同时实现大幅模型压缩。训练时反向传播对 $N_p$ 个特征做 softmax 加权，前向取 argmax（直通估计器），保证了索引学习的可微性。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2312_17241/figures/004_Figure_4.jpg]]
-*Figure 4: Overview of Compact NGP. For a given input coordinate x $\epsilon \mathbb { R } ^ { d }$ (far le ), we find its enclosing integer grid vertices v $\in \mathbb { Z } ^ { d }$ and apply our indexing function 𝑓 (v) to each one. The most significant bits of the index are computed by a spatial hash (hash) and the least significant bits by looking up a row of $N _ { p }$ confidence values from an indexing codebook $\widehat { D } _ { c }$ that is in turn indexed by an auxiliary spatial hash (hash2), and then picking the index with maximal confidence (green arrow). Bitwise concatenation of the two indices yields an index for looking up from the feature codebook $D _ { f }$ , which is subsequently 𝑑-linearly...
-
-
 
 ### 统一索引函数框架
 
@@ -173,8 +160,6 @@ $$f(\mathbf{v}) = D_f\big[(N_p \cdot \mathsf{hash}(\mathbf{v})) \bmod N_f + D_c[
 4. **索引码本 $D_c$**：提供低位探测偏移，实现冲突解决与信息复用
 5. **特征码本 $D_f$**：被最终组合索引查询，返回特征向量
 6. **线性插值与 MLP 解码**：对多顶点特征进行 $d$-线性插值后输入 MLP 解码为输出信号
-
-
 
 ## 实验与关键发现
 
@@ -234,17 +219,10 @@ Compact NGP 在计算效率上实现了有利的权衡：训练开销可控，�
 
 5. **梯度估计方法的局限性**：当前方法依赖 softmax 与直通估计器（straight-through estimator）来学习索引，未探索更稀疏或随机的梯度估计方法（如 sparsemax 或 Gumbel-softmax），这可能限制了索引效率的进一步提升。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2312_17241/figures/001_Figure_1.jpg]]
 *Figure 1: 3D Scene from Multiview Images Fig. 1. Compact neural graphics primitives (Ours) have an inherently small size across a variety of use cases with automatically chosen hyperparameters. In contrast to similarly compressed representations like JPEG for images (top) and masked wavelet representations [Rho et al. 2023] for NeRFs [Mildenhall et al. 2020] (bo om), our representation neither uses quantization nor coding, and hence can be queried without a dedicated decompression step. This is essential for level of detail streaming and working-memory-constrained environments such as video game texture compression. The compression artifacts of our method are easy on the eye: there is less ringing th...*
 
-![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2312_17241/figures/005_Table_1.jpg]]
-*Table 1: Hyperparameters of our method and recommended ranges. We inherit most parameters from Instant NGP [Müller et al. 2022] and introduce two additional ones pertaining to the index codebook. Gray parameters are unafected by our method and therefore set to the same values as in Instant NGP; the choice of remaining parameters is explained in Section 3*
-
 ![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2312_17241/figures/015_Table.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -334,8 +312,6 @@ NTC 是专用纹理压缩的神经基线，采用量化与专用架构：
 5. **索引结构的泛化**：能否将学习探测思想扩展到其他索引结构（如八叉树、$k$-平面）以实现更优的压缩-速度平衡？Figure 3 展示的统一索引函数框架为此提供了理论基础。
 
 6. **多分辨率层级与 MLP 宽度的自适应选择**：Figure 9 和 Figure 10 表明，默认层级 $L=16$ 和 MLP 宽度 64 在几百 kB 的实用范围内表现良好，但更小尺寸下更低层级更优。如何根据目标文件大小自动选择这些超参数仍是一个开放问题。
-
-
 
 ## 原文 PDF
 

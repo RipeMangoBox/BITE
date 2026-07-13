@@ -125,8 +125,6 @@ Paper2Figure 还提供了一个集成式 Web 编辑平台（见 Figure 2），�
 
 系统输入为描述图表需求的自然语言文本 I，输出为可直接用于学术出版的高质量图表。整个流程可概括为：文本指令 → 实体抽取与规划 → FigScript 模块构造 → 布局优化 → 渲染 → 视觉批评 → 修订计划 → FigScript 更新 → 重新渲染，循环直至收敛。最终用户可通过 Web 编辑器导出成品图表。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2561_https_openaccess_thecvf_com_content_CVPR2026_html_Han_Paper2Figure_A_Mul/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the Paper2Figure framework, comparing traditional code-based (SVG/Mermaid) and text-to-image methods with our dual multi-agent system and interactive web editor that collaboratively generate, refine, and edit scientific figures*
 
@@ -228,8 +226,6 @@ Paper2Figure 内置的布局和色彩模板进一步降低了生成的不确定�
 **Figure 4** 以柱状图形式直观展示了各模型在 Accuracy、Beauty、Completeness 和 Overall 四个维度的得分对比。Paper2Figure（full）在所有维度上均处于最高位置，与代码生成 LLM 和图像生成模型形成明显差距，直观验证了双多智能体架构与 FigScript 中间表示的有效性。
 
 **Table 1** 提供了所有模型在每个评估子标准上的详细得分，读者可从中获取更细粒度的性能差异信息。**Table 2** 则对比了不同自动评分方法（如 CLIP Score、GPT-4o 等）与人类判断的一致性，Paper2Figure 的评分方法在两个指标上均取得最优，为基准测试的评估框架提供了可靠性背书。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2561_https_openaccess_thecvf_com_content_CVPR2026_html_Han_Paper2Figure_A_Mul/figures/003_Figure_3.jpg]]
 *Figure 3: Evaluation pipeline of our rubric-based framework. GPT-4o scores Accuracy and Beauty directly from the image, and evaluates Completeness by generating and comparing a visually inferred caption with the reference one. The three scores are equally weighted to produce the final result*

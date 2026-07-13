@@ -54,8 +54,6 @@ claims:
 
 **局限与待验证方向**：当前方法仅限于描述性动作输入，对高层级指令的支持不足；模型范围限于人体运动，缺乏面部和手部细节表现。文中声称的实时延迟性能（约0.2秒）未在实验结果表格中直接呈现，建议读者根据实际部署环境进行验证。
 
-
-
 ### 问题背景：非流式运动生成的瓶颈
 
 在机器人控制、交互式动画和实时叙事驱动等应用中，系统需要根据连续输入的文本指令实时生成自然、平滑的人体运动序列。然而，现有运动生成方法大多采用非流式（offline）范式，面临两个核心瓶颈：
@@ -85,8 +83,6 @@ claims:
 
 简言之，MotionStream 旨在将运动生成从“离线拼接”范式推进到“因果流式”范式，使模型能够根据连续文本输入实时生成平滑、连贯的运动序列。
 
-
-
 ## 核心方法与创新机理
 
 MotionStream 的核心创新在于将**因果运动分词器**与**记忆令牌机制**结合，首次在运动生成领域实现了真正的流式推理能力。相比于现有的非流式方法（如 MoMask、FlowMDM），MotionStream 不需要对多段运动进行后处理拼接或插值，而是通过自回归的方式，基于已生成的运动上下文逐段生成连续运动，从根本上解决了过渡平滑性问题。
@@ -110,8 +106,6 @@ MoMask 等基线方法使用标准 1D 卷积构建运动分词器，编码时每
 在文本条件注入方式上，MoMask 采用 CLIP 池化特征与运动令牌的直接拼接。MotionStream 改用**交叉注意力（Cross-Attention）**机制，将文本条件与 CLIP 编码器的最后隐藏层进行交互（Sec. 3.2）。消融实验（Table 4）表明，交叉注意力（CA）相比特征拼接（C）在文本到运动生成的 FID 上从 0.088 降至 0.057，说明更细粒度的文本-运动对齐有助于提升生成质量。
 
 综上，MotionStream 通过上述四个关键设计变更，构建了一个端到端的流式运动生成框架。其核心洞察在于：因果卷积保证了表示空间的时序因果性，记忆令牌提供了跨片段的条件依赖，而代码掩盖和交叉注意力则分别增强了训练的鲁棒性和文本对齐的精度。这些创新共同使得 MotionStream 能够在约 0.2 秒的延迟下实现实时流式生成，同时保持与最先进非流式方法（如 MoMask）相当的文本到运动生成质量。
-
-
 
 MotionStream 的整体 pipeline 围绕“因果运动分词器 + 双 Transformer 生成”两条主线构建，目标是实现从连续文本流到无缝运动序列的流式生成。其核心设计逻辑是：**将运动生成问题转化为离散令牌的自回归预测问题，并强制令牌的编码过程满足因果约束**，从而在推理时无需全局重处理即可逐段产出平滑过渡的运动。
 
@@ -150,8 +144,6 @@ MotionStream 的整体 pipeline 围绕“因果运动分词器 + 双 Transformer
 
 ![[assets/figures/papers/paper_list_l21_https_www_openaccess_thecvf_com_content_ICCV2025W_I_HFM_papers_Jiang_Cau/figures/001_Figure_1.jpg]]
 *Figure 1: Method overview: MotionStream consists of a motion tokenizer V (Sec. 3.1) a Mask Transformer (Sec. 3.2) and a Residual Transformer (Sec. 3.3). MotionStream is capable of producing seamless and dynamic motions driven by narrative descriptions*
-
-
 
 MotionStream 由三个核心模块构成：因果运动分词器（Causal Motion Tokenizer）、掩码Transformer（Mask Transformer）和残差Transformer（Residual Transformer），三者协同实现从连续文本到流式运动的因果生成。
 
@@ -193,15 +185,8 @@ $$\mathcal{L}_{\mathrm{res}} = \sum_{k=1}^K \sum_{i=1}^L -\log p_\phi(x_i^k | x_
 | $\mathcal{L}_{\mathrm{mask}}$ | $\tilde{x}^0$：掩盖后基础层令牌；$w_s$：文本嵌入 | 训练掩码Transformer预测基础层令牌 |
 | $\mathcal{L}_{\mathrm{res}}$ | $x_i^k$：第$k$层第$i$帧令牌；$K$：残差层数；$L$：序列长度 | 训练残差Transformer逐层预测残差令牌 |
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l21_https_www_openaccess_thecvf_com_content_ICCV2025W_I_HFM_papers_Jiang_Cau/figures/003_Figure_3.jpg]]
 *Figure 3: The architecture of MotionStream’s motion tokenizer, V, detailed in Sec. 3.1. It showcases the Residual Vector Quantization (RVQ) framework employed by the tokenizer, which includes both an encoder and a decoder equipped with causal convolutions. This design enables the effective encoding and decoding of motion data, ensuring temporal coherence and continuity in the generated motions*
-
-![[assets/figures/papers/paper_list_l21_https_www_openaccess_thecvf_com_content_ICCV2025W_I_HFM_papers_Jiang_Cau/figures/004_Figure_4.jpg]]
-*Figure 4: Method overview: In addition to the motion tokenizer, a dual transformer scheme is proposed to accurately predict causal motion tokens from the given textual inputs, effectively translating complex textual descriptions into corresponding dynamic motions*
-
-
 
 ## 实验与关键发现
 
@@ -251,12 +236,6 @@ Figure 2 展示了不同方法的生成延迟随文本提示数量变化的趋�
 
 当前评估集中在 HumanML3D 数据集的人体运动领域，模型对动物等多骨骼结构的泛化能力尚未验证。此外，所有实验基于描述性动作文本，对高层叙事指令的响应能力缺乏定量评估。消融实验中记忆令牌的贡献在过渡 FID 上虽有显著改善（2.56 vs 3.45），但绝对数值仍偏高，说明长序列过渡的视觉平滑性仍有提升空间，这一结论需要用户研究进一步佐证。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l21_https_www_openaccess_thecvf_com_content_ICCV2025W_I_HFM_papers_Jiang_Cau/figures/007_Table.jpg]]
-
-
-
 ## 定位与知识库关联
 
 ### 运动分词器：从标准VQ-VAE到因果残差量化
@@ -295,8 +274,6 @@ MotionStream的流式能力建立在因果卷积的严格时间约束之上，�
 - **硬件效率优化**：在保持因果约束的前提下，能否通过令牌压缩因子（Table 4显示R=2最优）的进一步优化或模型量化，将延迟降至更低以满足嵌入端设备需求？
 
 从知识库定位角度看，MotionStream填补了“流式文本驱动运动生成”这一细分领域的方法空白——现有工作要么牺牲过渡平滑性换取实时性（拼接/插值类方法），要么追求生成质量但无法流式推理（扩散模型类方法）。其因果分词器与记忆令牌的组合为后续工作提供了可复用的技术组件，但叙事理解、跨骨骼泛化和细粒度控制仍是待解决的关键瓶颈。
-
-
 
 ## 原文 PDF
 

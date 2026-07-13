@@ -125,8 +125,6 @@ $$\mathcal{L} = \lambda_t \mathbf{CE}(\hat{Y}_t, Y_t) + \lambda_\theta |\hat{\th
 
 训练数据涵盖三种类型：文本到 3D 姿态生成、图像到姿态估计，以及多模态指令遵循数据。这种设计使得单一模型能够统一处理文本或图像输入，输出自然语言响应或 3D 人体姿态，而无需为不同任务部署独立的专用模型。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1845_ChatPose_Chatting_about_3D_Human_Pose/figures/002_Figure_2.jpg]]
 *Figure 2: Method and Training Overview. Our model is composed of a multi-modal LLM (with vision encoder, vision projection layer and LLM), a SMPL projection layer, and the parametric human body model, i.e. SMPL [32]. The multi-modal LLM processes text and image inputs (if provided) to generate textual responses. In the training phase, we focus on training the SMPL projection layer and fine-tuning the LLM, while keeping the other components frozen. The three data types used for the end-to-end training are: text-to-3D pose generation, image-to-pose estimation, and multi-modal instruction-following data. When an image is available, its information is used by the LLM to deduce an answer. If the user inqu...*
 
@@ -242,8 +240,6 @@ SPG 基准包含 780 对隐式文本查询-姿态对，通过 GPT-4V 辅助的�
 2. 全局方向估计是核心短板，导致 MPJPE 偏高，但局部姿态（PA-MPJPE）更具竞争力。
 3. 训练中未使用数据增强，遮挡鲁棒性为涌现行为，其机制尚待深入研究。
 4. GPT 辅助评估中 ChatPose 略低于 LLaVA，但成功保留了通用对话能力。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l1845_ChatPose_Chatting_about_3D_Human_Pose/figures/014_Table_10.jpg]]
 *Table 10: Ablation study: effect of different training data. PA-MPJPE (in mm) is reported. Lower is better*

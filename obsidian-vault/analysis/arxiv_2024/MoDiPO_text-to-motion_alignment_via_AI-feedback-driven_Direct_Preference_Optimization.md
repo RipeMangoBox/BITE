@@ -49,8 +49,6 @@ MoDiPO（Motion Diffusion DPO）首次将Direct Preference Optimization引入文
 
 实验表明，MoDiPO在对齐**MLD**（Chen et al., CVPR 2023）和**MDM**（Tevet et al., ICLR 2023）两种主流扩散架构后，HumanML3D上的FID最高降低约39%（从0.459降至0.281），同时RPrecision和Multi-Modality基本保持不变，验证了该方法在显著提升运动真实性的同时能够保留生成多样性。赢家-输家分析进一步揭示，MoDiPO有效抑制了低质量生成，大幅缩小了同一提示下最优与最差样本之间的FID差距。
 
-
-
 ### 文本到运动生成的核心瓶颈
 
 文本到运动（Text-to-Motion）生成旨在根据自然语言描述合成逼真的三维人体运动序列，在动画制作、游戏开发和虚拟人交互等领域具有广泛应用。近年来，扩散模型在该任务上取得了显著进展，代表性工作包括基于原始运动空间的 **MDM**（Tevet et al., ICLR 2023）和基于潜在扩散的 **MLD**（Chen et al., CVPR 2023）。这些模型通过逐步去噪的方式从文本条件中采样运动，能够产生多样化的生成结果。
@@ -72,8 +70,6 @@ MoDiPO（Motion Diffusion DPO）首次将Direct Preference Optimization引入文
 - **用AI反馈替代人工偏好标注**：利用检索模型自动评估文本-运动对的匹配程度，构建大规模合成偏好数据集（Pick-a-Move），从而绕过昂贵的人工标注流程。
 - **在扩散路径上直接优化**：将Diffusion-DPO目标应用于文本到运动扩散模型，通过赢家-输家对的对比学习，显式地拉近高质量生成、推远低质量生成，在不牺牲多样性的前提下提升运动真实性和文本对齐度。
 - **验证偏好学习在该模态的有效性**：首次系统性地探索DPO在文本到运动生成对齐中的作用，为后续研究提供基准和方法论参考。
-
-
 
 ## 核心方法与创新机理
 
@@ -107,8 +103,6 @@ MoDiPO仅对模型的部分参数进行微调：对于基于潜在扩散的**MLD
 
 > 需注意：AI反馈的排序模型可能引入与人类偏好不完全一致的偏差，且当前仅在HumanML3D和KIT-ML两个数据集上验证，对其他运动域的泛化性尚待确认。
 
-
-
 MoDiPO 的整体流程围绕“生成—排序—配对—优化”四个阶段构建，将 Direct Preference Optimization (DPO) 引入文本到运动扩散模型的对齐训练。其核心思路是：利用冻结的预训练扩散模型（参考模型）为每个文本提示生成多个候选运动，再通过检索模型给出的文本-运动匹配得分自动构建赢家-输家偏好对，最终以 Diffusion DPO 损失对目标模型进行微调，使其在保持生成多样性的同时远离低质量运动区域。
 
 ### 模块关系与数据流
@@ -141,12 +135,8 @@ $$L_{\mathrm{DDPO}}(\theta) = -\mathbb{E}_{x_0^w, x_0^l} \log \sigma\Big( \beta 
 
 整个框架的输入为文本提示和 PaM 中的偏好对，输出为经过对齐微调的扩散模型。该模型在推理时与原始模型保持相同的采样流程，无需额外组件，因此不增加推理开销。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l3308_https_arxiv_org_abs_2405_03803/figures/002_Figure_2.jpg]]
 *Figure 2: MoDiPO Schematics: Starting with the input prompt, we generate a winnerloser pair, which constitutes a sample in our preferential dataset. To do so, the reference model produces K generations based on the same input prompt. These generations are then ranked by the ranker model according to their relevance with the textual input. From these rankings, we select both a set of winners and a set of losers. Finally, we sample from these sets to determine the final pair. This pair is then used to refine the unfrozen target model using DPO*
-
-
 
 MoDiPO 的核心在于将 Direct Preference Optimization（DPO）引入扩散模型的去噪路径，利用 AI 反馈自动构建偏好对，从而在不依赖人类标注的情况下实现文本到运动生成的对齐。整个框架由四个关键模块串联而成。
 
@@ -191,8 +181,6 @@ $$L_{\mathrm{DDPO}}(\theta) = -\mathbb{E}_{x_{0}^{w}, x_{0}^{l}} \log \sigma\Big
 该损失的核心机制是：当赢家序列在目标模型下的对数概率比高于输家序列时，损失降低；反之则惩罚模型。通过在整个扩散路径上比较对数概率比，模型被引导去提升高质量运动（赢家）的去噪似然，同时抑制低质量运动（输家）的生成概率。
 
 在模型更新范围上，MoDiPO 仅微调目标模型的部分参数：对于基于潜在扩散的 **MLD**，只更新 denoiser 参数；对于 **MDM**，仅微调最后几层。参考模型完全冻结，确保优化不会偏离预训练分布过远。
-
-
 
 ## 实验与关键发现
 
@@ -246,8 +234,6 @@ MoDiPO在HumanML3D和KIT-ML两个标准基准上对MLD和MDM两种基线模型�
 ![[assets/figures/papers/paper_list_l3308_https_arxiv_org_abs_2405_03803/figures/005_Table_3.jpg]]
 *Table 3: Performances of Winner (W) and Loser (L) among the 8 generations perprompt of vanilla MLD (MLD) and MLD aligned with MoDiPO (Ours) for HumanML3D and KIT-ML. The typical evaluation method calculation is used in the case of MLD and Ours (aligned model)*
 
-
-
 ## 定位与知识库关联
 
 ### 与基线方法的关系
@@ -295,8 +281,6 @@ $$L_{\mathrm{DDPO}}(\theta) = -\mathbb{E}_{x_{0}^{w}, x_{0}^{l}} \log \sigma\Big
 4. **跨架构迁移**：MoDiPO 框架能否直接应用于自回归式文本到运动模型（如 T2M-GPT）或其他生成模态（如文本到音乐、文本到视频）？
 5. **FID-RPrecision 权衡的自动化**：能否设计自适应机制，根据下游任务需求自动调节真实运动注入概率 $p_{GT}$ 或 DPO 正则化系数 $\beta$？
 6. **偏好对构建的最优策略**：随机划分排序列表的策略虽优于边缘选择，但是否存在更优的采样分布（如基于得分的加权采样）？
-
-
 
 ## 原文 PDF
 

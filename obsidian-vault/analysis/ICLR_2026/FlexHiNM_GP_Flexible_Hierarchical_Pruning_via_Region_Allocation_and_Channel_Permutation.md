@@ -52,8 +52,6 @@ claims:
 
 主要实验结果验证了该框架的有效性：在 Deit‑Small 和 Deit‑Base 上 95% 稀疏度时，FlexHiNM‑GP 分别比 HiNM‑GP 高出 2.19% 和 3.16%（Figure G.1）；在 LLaMA2‑7B 下游任务上，75% 稀疏度时平均准确率提升 1.39%（Table 1）；Gyro‑Permutation 的独立贡献使 QQP F1 从 84.78 提升至 85.35，SST‑2 准确率从 90.60% 提升至 91.65%（Table 4）。该方法在保持 NVIDIA Ampere Sparse Tensor Core 硬件兼容性的同时，实现了接近无结构剪枝的精度水平。
 
-
-
 深度神经网络剪枝是模型压缩与加速的核心技术之一。传统无结构剪枝（Unstructured Pruning）虽能实现高压缩比且精度损失小，但其不规则稀疏模式难以在通用硬件上获得实际加速。为兼顾硬件效率与模型精度，结构化剪枝方案应运而生，其中 N:M 稀疏性（如 2:4 稀疏）因其与 NVIDIA Ampere Sparse Tensor Core 的原生兼容性而备受关注。
 
 然而，现有 N:M 稀疏方法存在一个根本性瓶颈：**固定的 N:M 稀疏比（如 2:4）缺乏灵活性，无法根据层内权重重要性的差异进行细粒度控制**。具体而言，在典型的层次化剪枝流程（HiNM）中，首先通过向量级剪枝移除一定比例的输出通道（列向量），随后对保留的向量统一施加 2:4 结构化剪枝。这一策略隐含假设所有保留向量具有同等重要性，但实际上，经过向量剪枝后的剩余向量仍存在显著的重要性分布不均——部分向量包含大量关键权重，而另一些向量则相对冗余。强制对所有向量施加相同的 2:4 稀疏约束，会导致重要权重在后续 N:M 剪枝中被机械性地移除，造成不必要的精度损失。
@@ -67,8 +65,6 @@ claims:
 Gyro-Permutation 通道置换算法进一步强化了这一机制：在向量剪枝前对输出通道进行重排，使不重要元素聚集以提高全剪枝效率；在 N:M 剪枝前对每个 tile 内的输入通道进行重排，使重要权重均匀分布以避免在 2:4 剪枝中被集中移除。可微掩码学习则替代了传统的静态贪婪选择，通过 Hard Concrete 分布生成软掩码，在逐步剪枝过程中联合优化权重和掩码，确保稀疏模式能够动态适应微调过程中的重要性变化。
 
 综上，FlexHiNM-GP 的动机源于对固定 N:M 稀疏比刚性约束的突破需求，其核心贡献在于将层次化剪枝从“一刀切”的全局稀疏分配推进到“因层制宜”的自适应区域稀疏控制，从而在结构化稀疏的硬件效率与无结构剪枝的精度上限之间架起了一座桥梁。
-
-
 
 ## 核心方法与创新机理
 
@@ -109,8 +105,6 @@ HiNM‑GP 使用静态贪婪选择的 N:M 掩码，在逐步剪枝过程中缺�
 - **Gyro‑Permutation 独立贡献**：QQP F1 +0.57，SST‑2 Acc +1.05（Table 4，置信度 0.95）
 
 需要注意的是，当前方法仅在 NVIDIA Ampere Sparse Tensor Core 的 2:4 模式下验证，对其他 N:M 模式（如 3:4）的泛化性尚未探索。Gyro‑Permutation 仅在边界搜索阶段执行，训练过程中通道顺序固定，无法适应微调后的重要性变化，这一点在评估其实际部署效果时需加以考虑。
-
-
 
 ![[assets/figures/papers/iclr26_0010_YaZraqRsbB_FlexHiNM-GP_Flexible_Hierarchical_Pruning_via_Re/figures/003_Figure_2.jpg]]
 *Figure 2: Pruning pipeline*
@@ -155,8 +149,6 @@ FlexHiNM‑GP 的核心流水线由三个逻辑阶段构成：**通道置换 →
 | 双流内核执行 | 同时利用稀疏和密集 Tensor Core | 仅验证 2:4 模式，对其他 N:M 模式的泛化性未探索 |
 
 > **证据强度说明**：流水线的整体结构在 Section 3.1 和 Algorithm 1 中有明确定义；各模块的消融证据（Table 4 验证 Gyro‑Permutation 贡献，Table 2 验证可微掩码收益，Table 3 验证自适应边界搜索优势）均来自论文实验，置信度≥0.9。关于 Gyro‑Permutation 仅在边界搜索阶段执行这一细节，需注意原文 Section 4.1 明确声明“Channel permutation is performed only during the boundary search stage and is kept fixed throughout training”，这构成方法的一个已知局限。
-
-
 
 ### 三区域分层剪枝框架
 
@@ -231,8 +223,6 @@ Gyro‑Permutation 通过采样、聚类、分配三步迭代求解（Figure 6�
 
 为保证逐步剪枝的稳定性，边界参数需满足单调性约束：向量剪枝比例 `vs` 随目标稀疏度 `ts` 非递减（即 `d(vs)/d(ts) ≥ 0`），且剩余密集权重数 `M = N(1 + vs - 2ts)` 随 `ts` 平滑递减（`dM/dts < 0`）。这些约束确保了剪枝过程的渐进性和不可逆性，避免训练过程中的剧烈结构变化。
 
-
-
 ## 实验与关键发现
 
 ### 主要结果
@@ -243,12 +233,10 @@ FlexHiNM‑GP 在视觉 Transformer、文本编码器和大语言模型三类架
 
 **Bert‑Base（QQP / SST‑2 / SQuAD v1.1）。** Table 4 给出了 Gyro‑Permutation 的隔离贡献：FlexHiNM‑GP 相比无通道置换的 FlexHiNM，QQP F1 从 84.78 提升至 85.35（+0.57），SST‑2 准确率从 90.60% 提升至 91.65%（+1.05），SQuAD F1 从 88.04 提升至 88.55（+0.51）。这些增益表明，仅靠三区域划分无法完全解决 N:M 结构化稀疏引入的通道不对齐问题，Gyro‑Permutation 提供的额外重排是稳定提升的必要条件。
 
-
 ![[assets/figures/papers/iclr26_0010_YaZraqRsbB_FlexHiNM-GP_Flexible_Hierarchical_Pruning_via_Re/figures/014_Table_4.jpg]]
 *Table 4: Impact of Gyro-Permutation on FlexHiNM*
 
 **LLaMA2‑7B 下游任务。** Table 1 汇总了六个下游任务（OBQA、ARC‑C、ARC‑E、PIQA、HellaSwag、WinoGrande）在 75% 和 87.5% 稀疏度下的性能。在 75% 稀疏度时，FlexHiNM‑GP 的平均准确率比 HiNM‑GP 高 1.39%；在 87.5% 稀疏度时仍然保持优势。需要注意的是，该规模下的加速比与精度权衡尚未充分量化，且仅测试了两个稀疏度点，更细粒度的 scaling 行为仍需手动验证。
-
 
 ![[assets/figures/papers/iclr26_0010_YaZraqRsbB_FlexHiNM-GP_Flexible_Hierarchical_Pruning_via_Re/figures/009_Table_1.jpg]]
 *Table 1: Llama2-7B Downstream task performance (%)*
@@ -259,12 +247,10 @@ FlexHiNM‑GP 在视觉 Transformer、文本编码器和大语言模型三类架
 
 **组件组合消融（Table 2，Deit‑Base）。** 六种变体中，同时包含 F 和 H 的变体①在 75% 和 80% 稀疏度下取得最优准确率（81.13%、79.46%），而包含 F 和 G 的变体②在 87.5% 及以上稀疏度表现最佳。这表明可微掩码学习在中低稀疏度下对精度保持贡献更大，而 Gyro‑Permutation 在高稀疏度下的通道对齐作用更为关键。单独使用 Hard Concrete（H）相比静态 2:4 掩码可获得更高精度，验证了可微掩码学习的有效性。
 
-
 ![[assets/figures/papers/iclr26_0010_YaZraqRsbB_FlexHiNM-GP_Flexible_Hierarchical_Pruning_via_Re/figures/012_Table_2.jpg]]
 *Table 2: flow through hard-sigmoid activation and avoids categorical sampling, making it a more scalable choice for structured sparsity learning. Table 2: Ablation results under variants on Deit-Base*
 
 **边界搜索策略消融（Table 3，Deit‑Base）。** 对比四种边界设定：HiNM‑GP（无区域分配）、OVW（纯向量剪枝）、BalFlexHiNM（固定边界）和 OptFlexHiNM（自适应搜索）。OptFlexHiNM 在所有稀疏度下均优于 BalFlexHiNM，其中在 95% 稀疏度时差距最大（约 1.5 个百分点），证明联合搜索 $v_s$ 和 $p_s$ 以最大化保留重要性分数 $R_{\mathrm{total}}$ 的策略能够为每层找到更优的稀疏分配方案。
-
 
 ![[assets/figures/papers/iclr26_0010_YaZraqRsbB_FlexHiNM-GP_Flexible_Hierarchical_Pruning_via_Re/figures/013_Table_3.jpg]]
 *Table 3: Ablation results under boundaries on Deit-Base*
@@ -289,13 +275,8 @@ FlexHiNM‑GP 在视觉 Transformer、文本编码器和大语言模型三类架
 - **Table 3（边界搜索消融）：** 自适应搜索（OptFlexHiNM）在所有稀疏度下优于固定边界，最大增益出现在 95% 稀疏度。
 - **Table 4（Gyro‑Permutation 隔离）：** 通道置换为 FlexHiNM 带来 0.5–1.0 个百分点的稳定提升，是弥合三区域划分与硬件对齐之间差距的关键机制。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0010_YaZraqRsbB_FlexHiNM-GP_Flexible_Hierarchical_Pruning_via_Re/figures/016_Figure_12.jpg]]
 *Figure 12: Figure G.1: Gradual pruning for Deit family (V=128)*
-
-
-
 
 ## 定位与知识库关联
 
@@ -340,8 +321,6 @@ FlexHiNM‑GP 处于层次化 N:M 剪枝方法的演进脉络上，其直接前�
 - **端到端可微置换**：是否可以将 Gyro‑Permutation 的采样-聚类-分配流程替换为可微的通道重排机制，实现与掩码学习的联合端到端优化？
 
 - **跨架构泛化**：该方法在视觉 Transformer（ViT）、多模态模型或混合专家（MoE）架构上的表现如何？区域分配策略是否需要针对不同架构的权重分布特性进行调整？
-
-
 
 ## 原文 PDF
 

@@ -54,8 +54,6 @@ claims:
 
 在方法谱系上，Endless World 位于条件自回归视频生成与三维感知生成的交叉点，其梯度分离策略直接回应了 **Self-Forcing**（Huang et al., 2025）中的训练-推理不匹配问题，并与 **CausVid**（Yin et al., CVPR 2025）的因果扩散思路形成互补。骨干网络基于 **Wan2.1**（Team Wan et al., 2025）的 1.3B 参数模型，通过分布匹配蒸馏实现训练自由的分布对齐。当前方法的局限性包括：3D 相似性损失在增强几何一致性的同时会轻微降低运动平滑度；依赖 VGGT 的预训练分布，对分布外内容的几何引导可能退化；尚未在多提示或交互式场景下验证。
 
-
-
 ### 三维感知长视频生成的困境
 
 视频生成领域正经历从几秒片段向分钟级长序列的跨越。这一跨越面临的核心挑战并非算力不足，而是**自回归生成中的训练-推理不匹配**：模型在训练时看到的条件帧是可微的，梯度可以同时流经过去帧与未来帧；但在推理时，已生成的帧是固定的，模型只能基于这些固定条件预测未来。这种根本性的条件分布差异导致长序列生成中出现运动漂移、画面闪烁和几何不一致——牛走着走着就改变了方向，建筑转着转着就扭曲了形态。
@@ -78,8 +76,6 @@ Endless World 的出发点是两个紧密关联的洞察：
 
 Figure 1 展示了这两个核心模块的协同关系：3D融合提供全局几何锚点，条件自回归生成确保时间一致性，二者共同支撑起无限长度、三维一致且实时的高质量视频合成。
 
-
-
 ## 核心方法与创新机理
 
 Endless World 的核心创新在于精准定位并解决了自回归视频生成中一个根本性的**训练-推理不匹配（Training-Inference Discrepancy）**问题。传统自回归方法（如 **Self-Forcing**）在训练时，所有条件帧对当前模型参数 $\phi$ 都是可微的，梯度会流经整个序列，导致模型同时优化“过去”与“未来”帧。然而，在推理时，已生成的前序帧是固定的，无法被修正。这种差异引发累积误差，表现为长视频中的运动漂移、闪烁和几何不一致（Figure 3, Figure 4）。
@@ -100,8 +96,6 @@ $$\tilde{e} = f_{\mathrm{fusion}}(e_{\mathrm{text}}, \hat{f}_{3D})$$
 针对长序列生成中的上下文遗忘问题，Endless World 引入了注意力汇机制：保留初始帧的全部令牌作为持久化上下文，并对 KV 缓存应用旋转位置嵌入。这为长时生成提供了稳定的时空锚点，使 30 秒视频的 VBench 总分从 81.59 提升至 82.94（Table 3, Sec. 3.4）。
 
 这三个机制形成了互补增益：注意力汇提供稳定的时序上下文，梯度分离确保该上下文不被错误修正，而 3D 融合则为该上下文注入结构化的几何信息。消融实验验证了这一递进关系：逐步添加注意力汇、条件生成、文本级 3D 融合，VBench 总分依次从 81.59 → 82.94 → 83.30 → 84.54（Table 3）。
-
-
 
 Endless World 的整体设计围绕一个核心矛盾展开：**自回归视频生成中训练与推理的条件不一致**。传统方案在训练时允许梯度流经全部条件帧，导致模型学习到“未来可修改过去”的虚假捷径；而推理时条件帧固定，累积误差迅速放大，表现为运动漂移、闪烁和几何退化。Endless World 通过两条互补的技术路径解决这一问题——**条件自回归生成**与**三维结构融合**——并在训练流程中通过分布匹配蒸馏统一优化。
 
@@ -132,8 +126,6 @@ $$
 
 整体数据流可概括为：`视频帧 → VGGT 提取 3D 特征 → 3D-文本融合模块 → 条件自回归生成器 → 分布匹配蒸馏优化`。其中，3D 融合模块为生成器提供全局几何约束，梯度分离策略确保训练-推理条件对齐，注意力汇则保障长时记忆。三者协同，使得 Endless World 无需长序列训练即可实现实时（单 H100 达 17.0 FPS）、三维一致且视觉质量稳定的长视频合成。
 
-
-
 ### 1. 问题定义：训练-推理不匹配
 
 自回归视频生成面临的核心瓶颈是训练与推理时的条件不一致。在传统设定下，自回归联合分布可表示为：
@@ -141,9 +133,6 @@ $$
 $$p_{\phi}(v_{1:n}) = \prod_{k=1}^{n} p_{\phi}(v_k \mid v_{<k}^{\phi})$$
 
 其中条件帧 $v_{<k}$ 在模型参数 $\phi$ 下可微。训练时，分布匹配蒸馏（DMD）的梯度同时流经过去帧与未来帧，使模型依赖“可修改的过去”来优化当前帧；而推理时，过去帧是已固定且不可修改的。这种不对称性导致长序列生成中出现运动漂移、闪烁和几何不一致（见 Figure 3 的定性展示）。
-
-![[assets/figures/papers/paper_list_l2252_https_arxiv_org_abs_2512_12430/figures/003_Figure_3.jpg]]
-*Figure 3: Motion inconsistency in self-forcing autoregressive generation. First row: video generated from noise (cow walks straight). Second row: continuation conditioned on the first video chunk (cow changes direction due to drift)*
 
 ### 2. 条件自回归生成（梯度分离）
 
@@ -184,8 +173,6 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{gen}} + \lambda_{3\mathrm{
 
 在流式长视频生成中，模型引入注意力汇（Attention Sink）机制：保留初始帧的全部令牌作为持久上下文，并对 KV 缓存应用旋转位置嵌入。这一设计在长序列中提供稳定的上下文锚点，防止上下文遗忘。消融实验（Table 3）表明，注意力汇将 30 秒视频的 VBench 总分从 81.59 提升至 82.94。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈的逐组件验证
@@ -217,29 +204,17 @@ Table 1 展示了 Endless World 在 VBench 标准提示集上与多个公开可�
 
 Table 2 进一步提供了与交互式长视频生成系统 **LongLive**（Yang et al., 2025）的对比。在单提示 60 秒生成设定下，Endless World 的质量分达到 **84.73**，优于 LongLive 的约 82.07（+2.66）。需要注意的是，LongLive 的原生设定支持交互式多提示生成，此处对比基于单提示条件，因此该优势主要反映了 Endless World 在无人工干预情况下的自主长时生成能力。
 
-![[assets/figures/papers/paper_list_l2252_https_arxiv_org_abs_2512_12430/figures/007_Table_2.jpg]]
-*Table 2: Comparison of 60-second video generation on VBench. Using interactive results from [41] as reference, we compare Self-Forcing and our Endless World on single-prompt generation*
-
 定性对比（Figure 5）直观地展示了这一差异：Self-Forcing 在一分钟和两分钟序列中出现了渐进式的质量退化，而 Endless World 在整个序列中保持了视觉质量和时序连贯性。这进一步印证了梯度分离在阻断误差传播方面的决定性作用。
-
-![[assets/figures/papers/paper_list_l2252_https_arxiv_org_abs_2512_12430/figures/010_Figure_5.jpg]]
-*Figure 5: Comparison of long-duration video generation. We compare Endless World with Self-Forcing (with attention sink) for oneand two-minute sequences. Endless World preserves visual quality and temporal coherence throughout, whereas Self-Forcing suffers from progressive quality degradation*
 
 ### 3D 融合的精细化分析
 
 Table 4 聚焦于 3D 融合模块对各具体评估维度的影响。引入 3D 文本级融合后，**多物体（Multi-Objects）指标大幅提升 +8.82**，美学质量（Aesthetic Quality）提升 +4.61，空间关系（Spatial Relationship）和整体一致性（Overall Consistency）也获得明显增益。这些提升直接源于 VGGT 提取的 3D 结构特征为生成过程注入了全局几何先验，使模型在生成每一帧时都能参考一致的场景结构。
-
-![[assets/figures/papers/paper_list_l2252_https_arxiv_org_abs_2512_12430/figures/006_Table_4.jpg]]
-*Table 4: Effect of incorporating 3D fusion on VBench. “Objects” denotes multi-objects, and “Spatial” measures spatial relationship*
 
 论文还探索了 3D 特征的不同融合位置。消融分析（Sec. 4.3）表明，**在文本令牌空间进行融合是稳定且高质量的设计选择**。相比之下，在潜空间（latent space）进行融合虽然能够保留几何信息，但会破坏局部运动模式，引入光流不一致和闪烁伪影。文本级融合的优势在于：3D 信息通过交叉注意力机制被全局均匀地注入所有帧，从而在保持几何一致性的同时不干扰局部的时序动态。
 
 ### 3D 相似性损失的权衡
 
 Table 5 揭示了一个重要的设计权衡。可选的 3D 相似性损失（$\mathcal{L}_{3\mathrm{D}}$）通过最小化生成帧与参考帧 3D 特征的余弦距离来增强几何一致性。实验表明，该损失确实提升了一致性相关指标，但代价是**运动平滑度（Motion Smoothness）的轻微下降**。这一现象的原因在于：过强的几何约束可能限制模型生成自然运动变化的能力，使运动趋向于保守。
-
-![[assets/figures/papers/paper_list_l2252_https_arxiv_org_abs_2512_12430/figures/008_Table_5.jpg]]
-*Table 5: Effect of the 3D similarity loss on 30-second VBench*
 
 论文将 3D 相似性损失定位为可选项（$\lambda_{3\mathrm{D}}=0.1$），允许根据应用场景灵活调整。对于需要严格几何保真度的场景（如数字孪生、场景重建），可以启用该损失；而对于追求视觉自然度的创意生成，则可以关闭它以获得更流畅的运动表现。
 
@@ -266,15 +241,8 @@ Table 5 揭示了一个重要的设计权衡。可选的 3D 相似性损失（$\
 - 注意力汇机制如何适应场景突变？是否需要引入可控的上下文遗忘机制？
 - 该方法在更高分辨率（1024×1024+）或更长周期（数分钟至一小时）下的资源消耗和质量表现如何？
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2252_https_arxiv_org_abs_2512_12430/figures/012_Figure_6.jpg]]
 *Figure 6: Semantic ablations*
-
-![[assets/figures/papers/paper_list_l2252_https_arxiv_org_abs_2512_12430/figures/013_Figure_7.jpg]]
-*Figure 7: Quality ablations*
-
-
 
 ## 定位与知识库关联
 
@@ -328,8 +296,6 @@ $$\tilde{e} = f_{\mathrm{fusion}}(e_{\mathrm{text}}, \hat{f}_{3D})$$
 - **三维表示的进化空间。** 当前使用 VGGT 提取的隐式 3D 特征，是否可纳入更显式的几何表示（如神经辐射场、3D 高斯抛雪球）以进一步提升结构一致性？
 - **梯度分离策略的泛化性。** 该策略本质上解决的是自回归生成中的训练-推理条件偏移问题，理论上可推广至音频、文本等其他模态的自回归生成任务，但缺乏跨模态验证。
 - **代码与权重的可复现性。** 截至分析时点，仅项目页面公开，模型权重与代码未完全发布，部分结论需在开源后独立验证。
-
-
 
 ## 原文 PDF
 

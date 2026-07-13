@@ -52,8 +52,6 @@ claims:
 
 在方法定位上，BIRD-INTERACT 继承 **LIVESQLBENCH** 的可执行数据库环境与全CRUD任务基础，通过歧义注入、后续子任务生成和两阶段函数驱动用户模拟器，将静态单轮评估转化为动态多轮交互评估。其用户模拟器在不可回答问题（UNA）上的失败率从基线方法的 **67.4%** 降至 **2.7%**，大幅提升了评估的鲁棒性与可控性。
 
-
-
 ### 文本到SQL评估的静态困境
 
 文本到SQL（Text-to-SQL）旨在将自然语言查询自动转换为可执行的SQL语句，是数据库交互智能化的核心技术。近年来，以**Spider**（Yu et al., 2018）和**BIRD**（Li et al., 2023b）为代表的基准数据集推动了该领域的快速发展，使大语言模型（LLM）在单轮、无歧义的SELECT查询上取得了令人瞩目的成绩。然而，这些基准所定义的“成功”与现实世界中数据库助手面临的挑战之间存在深刻鸿沟。
@@ -79,8 +77,6 @@ claims:
 3. **状态依赖的子任务链**：后续子任务的正确执行依赖于前序子任务对数据库状态的修改，模拟真实的操作序列。
 
 通过上述设计，BIRD-INTERACT不仅暴露了当前最强LLM在交互式数据库任务上的显著短板，也为构建实用的多轮数据库助手提供了明确的改进方向与评估工具。
-
-
 
 ## 核心方法与创新机理
 
@@ -122,13 +118,8 @@ BIRD-INTERACT 的核心创新在于将文本到 SQL 的评估从静态、单轮�
 
 **LIVESQLBENCH** (BIRD-Team, 2025) 已提供全 CRUD 任务的基础，BIRD-INTERACT 在此基础上增加了交互层和歧义注入。与仅支持 SELECT 的 **CoSQL** 不同，BIRD-INTERACT 同时覆盖商业智能（BI）与数据管理（DM）两大类场景，使基准能够评估系统在分析查询和事务性操作两种范式下的综合能力。
 
-
-
 ![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_nHrYBGujps/figures/001_Figure_1.jpg]]
 *Figure 1: Task overview of BIRD-INTERACT showing the evaluated system interacting with DB Environment and User Simulator to complete the user task with a sequence of sub-tasks*
-
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_nHrYBGujps/figures/004_Figure_3.jpg]]
-*Figure 3: Two evaluation settings for BIRD-INTERACT: c-Interact, where the system engages in conversation with the user, and a-Interact, where the system interacts flexibly. At the end of the task, the system will receive a reward r $\in$ [ 0 , 1 ]*
 
 BIRD-INTERACT 的核心设计理念是将文本到 SQL 的评估从静态的单轮生成任务重构为**动态的多轮交互问题解决过程**。整个框架围绕三个关键实体展开：被评估的系统模型 $S_\theta$、函数驱动的用户模拟器 $\mathcal{U}_\gamma$，以及一个可执行的数据库环境 $\mathcal{E}$。三者通过结构化的交互协议耦合，形成完整的评估闭环（Figure 1）。
 
@@ -172,8 +163,6 @@ $$\mathrm{SR}_j = \frac{1}{N} \sum_{i=1}^{N} \mathbb{I}[\mathcal{T}_{i,j}(\sigma
 ### 与已有基准的关键差异
 
 BIRD-INTERACT 在多个维度上突破了已有基准的局限（Table 4）。与 **Spider**（Yu et al., 2018）、**BIRD**（Li et al., 2023b）等单轮基准相比，它引入了动态交互层和歧义处理；与 **SParC**（Yu et al., 2019a）、**CoSQL**（Yu et al., 2019b）等依赖静态对话历史的多轮基准相比，它提供了函数驱动的用户模拟器和可执行环境；与 **LIVESQLBENCH**（BIRD-Team, 2025）相比，它在全 CRUD 操作基础上增加了交互层和歧义注入。平均交互轮次达到 7.46-7.83 轮，远超其他交互式基准。
-
-
 
 ### 问题定义与交互范式
 
@@ -235,8 +224,6 @@ $$r_i = \begin{cases} 1.0 & \text{两个子任务均通过} \\ 0.7 & \text{仅�
 
 c-Interact 模式则采用更细粒度的分阶段奖励计算（含调试阶段的增量收益）。
 
-
-
 ## 实验与关键发现
 
 ### 核心结果：LLM 在交互式文本到SQL任务中表现远低于理想单轮性能
@@ -245,9 +232,6 @@ BIRD-INTERACT-FULL 基准上的主实验揭示了当前最强 LLM 在真实交�
 
 ![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_nHrYBGujps/figures/005_Table_2.jpg]]
 *Table 2: Success Rate and Final Normalized Reward of different models on BIRD-INTERACT-FULL. The success rate is cumulative; Reward* is the normalized reward. The values reported in c-Interact are after debugging phase, and (+n) means the performance gained via debugging. Avg. Cost is the cost for one task on average in USD. Our user simulator has an avg. cost of 0.03 USD. BI = Business Intelligence User Queries, DM = Data Management User Queries*
-
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_nHrYBGujps/figures/006_Figure_4.jpg]]
-*Figure 4: The performance of different LLMs with different user patience on BIRD-INTERACT-LITE. The red line denotes a-Interact mode (-a); the blue line denotes c-Interact mode (-c). And the dotted line (Idealized Performance) denotes the performance under ambiguity-free single-turn text-to-SQL*
 
 模型在不同交互模式下呈现出显著的性能反转。GPT-5 在 c-Interact 模式中表现最差（优先问题成功率仅 14.50%），却在 a-Interact 中跃居首位；而 Gemini-2.5-Pro 则在 c-Interact 中表现最优。这种模式依赖性提示：**模型的训练数据分布与架构归纳偏置深刻影响着其交互策略的有效性**，不存在统一的“最强模型”。
 
@@ -262,9 +246,6 @@ Figure 4 展示了 BIRD-INTERACT-LITE 上不同用户耐心参数下的性能变
 ### 记忆嫁接实验：沟通交互能力是 GPT-5 的核心瓶颈
 
 Figure 5 展示的记忆嫁接（Memory Grafting）实验为诊断性能瓶颈提供了因果证据。当 GPT-5 被注入来自 **Qwen-3-Coder** 或 **O3-mini** 的成功交互历史后，其优先问题成功率显著提升。这一结果表明：**GPT-5 的 SQL 生成能力本身并非限制因素，其核心短板在于沟通交互策略**——即无法有效提出澄清问题、识别知识缺口并整合用户反馈。该发现直接指向了未来改进方向：与其追求更强的代码生成能力，不如着力提升模型在对话沟通与主动信息获取方面的能力。
-
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_nHrYBGujps/figures/007_Figure_5.jpg]]
-*Figure 5: SR of GPT-5 with memory grafting*
 
 ### 行动分布分析：过早依赖执行试错阻碍任务成功
 
@@ -288,24 +269,11 @@ Figure 5 展示的记忆嫁接（Memory Grafting）实验为诊断性能瓶颈�
 
 **注意**：Table 3（人机相关性分析）的具体数值、Figure 11/12（行动分布相关性）的完整图表数据需查阅原文确认细节，本节仅基于分析锚点给出已验证的关键结论。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_nHrYBGujps/figures/003_Table_1.jpg]]
-*Table 1: Data Statistics*
-
 ![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_nHrYBGujps/figures/011_Table_4.jpg]]
 *Table 4: Data statistics of features in BIRD-INTERACT compared to the evaluation set of related benchmarks. # Avg Turns: Number of User-System interactions by unfolding the model’s interaction trajectory. # Toks./Output: Average number of tokens in the reference output; “/” indicates benchmarks without reference output. Dynamic User: Whether the benchmark supports real-time user interaction (vs. static offline datasets). Dynamic Env State: Whether the database or environment state can be modified during interaction. Amb. Sources: Sources of ambiguity in user queries or environments. LLM + Guard means LLM as user simulator with Guard mechanism to make actions more controllable. [†]: Results taken fro...*
 
 ![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_nHrYBGujps/figures/012_Table_5.jpg]]
 *Table 5: Comparison of released databases across benchmarks*
-
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_nHrYBGujps/figures/015_Table_6.jpg]]
-*Table 6: Intent-Level User Query Ambiguity Taxonomy in BIRD-INTERACT*
-
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_nHrYBGujps/figures/016_Table_7.jpg]]
-*Table 7: Implementation-Level User Query Ambiguity Types in BIRD-INTERACT*
-
-
 
 ## 定位与知识库关联
 
@@ -350,8 +318,6 @@ BIRD-INTERACT 的评估框架适用于以下场景，但存在明确边界：
 4. **用户模拟器的公平性评估**：如何评估和确保用户模拟器在更多样化的对话风格（如简洁、冗长、非母语表达）下的公平性与一致性，以及如何量化模拟器对特定系统模型的潜在偏向，仍需系统性研究。
 
 5. **任务复杂度的进一步扩展**：引入更复杂的事务性逻辑（如嵌套事务、并发修改、权限约束）是否能更全面地暴露系统能力边界，并推动更鲁棒的交互策略设计，是一个值得探索的方向。
-
-
 
 ## 原文 PDF
 

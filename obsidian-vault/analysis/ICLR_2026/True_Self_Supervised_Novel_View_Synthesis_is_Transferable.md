@@ -69,8 +69,6 @@ XFactor 不依赖任何3D归纳偏置——无需SE(3)显式参数化、无需�
 
 消融实验进一步证实：多视图训练会逐步破坏可迁移性，而立体-单目架构与可迁移性目标的组合是性能的关键来源；与 SimCLR、VICReg 等通用自监督目标相比，所提目标在姿态预测准确率上具有绝对优势。
 
-
-
 新视角合成（Novel View Synthesis, NVS）旨在从一组已知视角的图像生成任意新视角下的场景渲染。近年来，基于学习的NVS方法取得了显著进展，但大多数方法依赖于显式的3D表示或精确的相机姿态标注。自监督NVS试图摆脱这些依赖，仅从原始视频中学习渲染新视角的能力，其核心挑战在于如何从图像中隐式地推断相机姿态。
 
 然而，现有自监督NVS模型学到的“姿态表示”存在根本性缺陷。以**RayZer**（Jiang et al., 2025）和**RUST**（Sajjadi et al., 2023）为代表的现有方法，其训练目标本质上是一个多视图自编码过程：给定同一序列的多个上下文帧，模型学习重建该序列中的目标帧。这种范式导致姿态编码器学到的并非场景无关的相机运动信息，而是“如何从上下文帧插值出目标帧”的捷径——相同的姿态潜在变量在不同场景中会渲染出完全不同的视角，这意味着姿态表示不具备可迁移性，因而并非真正的NVS。
@@ -80,8 +78,6 @@ XFactor 不依赖任何3D归纳偏置——无需SE(3)显式参数化、无需�
 针对上述问题，本文提出**XFactor**，核心思路是将训练范式从多视图自编码转变为双视图外推，并引入跨序列的可迁移性目标函数。具体而言，XFactor采用立体-单目模型，仅使用一对图像作为输入，从设计上杜绝了多帧插值的可能；同时，通过保持相机姿态的图像增广策略生成像素内容不同但相机运动相同的两对图像，强制模型从一个序列提取的姿态潜在变量能够在另一序列中正确渲染目标视图。这一设计使得未受限的潜在变量能够自发学习几何推理，无需SE(3)参数化或任何3D归纳偏置。
 
 **决定性证据**：在可迁移性测试中，XFactor在RE10K数据集上的AUC@20°达到55.2，而RayZer仅为7.6，提升超过5倍（Table 1）。姿态探针实验进一步表明，XFactor的潜在表示能高度准确地预测真实SE(3)相机姿态，AUC@30°达72.9，远超RayZer的60.8（Table 2）。消融实验证实，多视图训练会逐步破坏可迁移性，而立体-单目模型与可迁移性目标的组合取得最优效果（Table 3）。
-
-
 
 ## 核心方法与创新机理
 
@@ -134,8 +130,6 @@ $$\mathrm{ORACLE}[ \mathrm{AUG}[\mathbb{Z}] ] = \mathrm{ORACLE}[ \mathrm{AUG}'[\
 
 可迁移性测试（Table 1）进一步证实：XFactor 在 RE10K 上的 AUC @ 20° 达到 55.2，比 RayZer（7.6）高出超过 7 倍，验证了跨场景姿态迁移能力的质的飞跃。
 
-
-
 XFactor 的核心设计是一个“立体-单目”模型与跨序列可迁移性目标的结合，其整体架构与信息流如 Figure 1 所示。模型由两个核心模块构成：**POSEENC**（立体姿态编码器）与 **RENDER**（单目渲染器），二者协同工作，强制模型学习可迁移的相机姿态表示。
 
 ### 模块构成与信息流
@@ -171,8 +165,6 @@ $$L \equiv d_I\big( I_2^B, \mathrm{RENDER}[ I_1^B, \mathrm{POSEENC}[ I_1^A, I_2^
 - **增广驱动的迁移训练**：通过保持相机姿态的图像增广生成训练对，无需真实相机位姿标注即可在真实视频数据上训练。
 
 > **验证提示**：消融实验（Table 3）证实，立体-单目模型与可迁移性目标的结合在所有指标上均优于瓶颈潜在变量、SE(3) 参数化或引入额外视图的变体；而过渡到多视图训练会逐步降低并最终完全破坏可迁移性。
-
-
 
 ### 3.1 自监督NVS的形式化框架
 
@@ -219,8 +211,6 @@ $$\mathrm{ORACLE}[ \mathrm{AUG}[\mathbb{Z}] ] = \mathrm{ORACLE}[ \mathrm{AUG}'[\
 ### 3.6 多视图微调扩展
 
 在立体-单目模型完成可迁移性训练后，XFactor通过多视图微调将模型扩展到利用更多上下文帧。$\mathrm{POSEENC}$ 以成对方式预测参考帧与各上下文帧之间的相对姿态潜在，$\mathrm{RENDER}$ 则整合多个上下文帧及其对应的迁移姿态进行渲染。该阶段保留了双视图预训练中习得的可迁移姿态表示，同时通过多帧信息提升渲染质量。消融实验（Table 3）表明，直接在多视图设置下训练会逐步破坏可迁移性，验证了“先双视图外推、再多视图微调”策略的必要性。
-
-
 
 ## 实验与关键发现
 
@@ -281,8 +271,6 @@ Table 3 以立体-单目 XFactor 为起点，系统消融了四个关键设计�
 
 **Table 4** 报告了自编码重建质量。XFactor 在标准感知指标（PSNR、SSIM、LPIPS）上与基线可比，说明可迁移性目标并未牺牲重建保真度。
 
-![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_aJJppqAm6r/figures/008_Table_4.jpg]]
-
 **Table 5** 展示了推理时应用保持姿态增广的迁移渲染质量。多视图 XFactor 在增广条件下仍能保持合理的渲染质量，FID 指标表明分布级一致性良好。
 
 ### 失败模式与局限
@@ -296,21 +284,11 @@ Table 3 以立体-单目 XFactor 为起点，系统消融了四个关键设计�
 ![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_aJJppqAm6r/figures/013_Table_8.jpg]]
 *Table 8: Quantitative Robustness Analysis of TPS Oracles. We evaluate the robustness of the VGGT (Wang et al., 2025b) and COLMAP (Schonberger et al., ¨ 2016; Schonberger & Frahm, 2016b) oracles against visual corruptions by mea- ¨ suring the TPS between reference and corrupted videos. A weak distortion, visualized in Fig. 2 (a), is applied to the video. We find that the VGGT oracle is significantly more robust across all datasets and metrics. In contrast, the COLMAP oracle suffers from an excessive rejection ratio, diminishing the utility of the evaluation samples*
 
-![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_aJJppqAm6r/figures/016_Table_9.jpg]]
-*Table 9: Fragility of COLMAP on Transferred Videos We find that COLMAP is highly fragile when applied to transferred videos. In particular, samples from the baseline method, RayZer (Jiang et al., 2025), exhibit a significantly higher rejection ratio, preventing meaningful measurement of transferability with TPS*
-
 - **多视图扩展的插值偏置**：当前多视图 XFactor 需从双视图模型微调，且多视图姿态估计可能重新引入插值偏置。如何在自监督设置下直接训练多视图 POSEENC 而不引入插值偏置，仍是开放问题。
 
 ### 公平性说明
 
 所有模型统一使用 L1 + LPIPS 损失、5 个上下文视图，并在相同的四数据集混合训练集上从头训练。RayZer 和 RUST 的官方代码未公开，作者根据论文描述自行实现，其中 RayZer 实现已获原作者确认。由于使用了更大的混合数据集和更少上下文视图，RayZer 的重建指标与原论文略有不同，但可迁移性评估更为严格。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_aJJppqAm6r/figures/009_Table_4.jpg]]
-*Table 4: Autoencoding Reconstruction Quality. Table 5: Augmentations at Inference. We evaluate transferred rendering quality in terms of standard perceptual metrics by applying our pose-preserving augmentations at inference with multi-view XFactor*
-
-
 
 ## 定位与知识库关联
 
@@ -358,8 +336,6 @@ XFactor的可迁移性目标与经典自监督表示学习方法（如SimCLR、V
 3. **与表示学习前沿的融合**：如何将对比学习、信息最大化等自监督表示学习的前沿思想更有效地融入渲染基目标，以进一步提升姿态表示的质量和可迁移性？
 
 4. **泛化能力拓展**：模型能否推广到动态场景、非朗伯表面或包含复杂遮挡的环境？如何处理语义信息与几何推理的交互？这些问题决定了XFactor范式在真实世界应用中的适用范围。
-
-
 
 ## 原文 PDF
 

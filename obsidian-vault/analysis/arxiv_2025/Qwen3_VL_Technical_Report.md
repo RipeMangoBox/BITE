@@ -58,8 +58,6 @@ Qwen3-VL 是通义千问团队推出的新一代多模态大模型，其核心�
 
 值得注意的是，报告中仍存在若干待验证的开放问题：Interleaved MRoPE 在不同视频长度和帧率下的增益是否均匀、DeepStack 引入的额外参数与推理延迟对部署效率的影响、文本化时间戳在超长视频（超过 1 小时）中的有效性，以及平方根重加权损失与其他缩放策略的直接对比等，这些均需进一步消融或实际部署验证。
 
-
-
 视觉语言模型（VLM）在通用视觉理解、文档解析和视频分析等任务上已取得显著进展，但两个核心瓶颈始终制约着模型的进一步突破：
 
 **多模态训练对纯文本能力的侵蚀。** 当 LLM 被扩展为 VLM 后，视觉数据的引入往往会损害其原有的语言理解与推理能力。如何在强化视觉感知的同时保持文本基座模型的完整能力，是多模态训练中一个长期被低估却至关重要的问题。
@@ -67,8 +65,6 @@ Qwen3-VL 是通义千问团队推出的新一代多模态大模型，其核心�
 **长视频时空对齐的频谱偏差。** 现有方法（如 Qwen2.5-VL 采用的 MRoPE）将位置编码维度按时间（t）、高度（h）、宽度（w）分块分配频率，导致频谱在不同维度间倾斜分布，使模型在长视频场景下的时序定位和跨帧理解能力受限。此外，基于位置编码的绝对时间对齐（T‑RoPE）提供的时间信号过于隐式，不利于模型直接建模视频的时间结构。
 
 Qwen3‑VL 的动机正是围绕这两个瓶颈展开：**在不牺牲语言能力的前提下，通过架构创新强化多模态时空建模与视觉‑语言对齐**。具体而言，报告提出了四项关键设计——交错 MRoPE（Interleaved MRoPE）均匀分配空间‑时间维度的频率以消除频谱偏差；DeepStack 多层视觉特征注入以增强细粒度视觉理解；文本化时间戳替代 T‑RoPE 以提供更直接的时间表示；以及平方根重加权 per‑token 损失以平衡文本与多模态训练信号。这些设计共同构成了一套从位置编码、特征融合到训练策略的系统性改进方案。
-
-
 
 ## 核心方法与创新机理
 
@@ -110,8 +106,6 @@ Qwen2.5-VL 通过 T‑RoPE 位置编码实现绝对时间对齐，但这种隐�
 
 **待验证的开放问题**：上述四项创新的消融分析尚不完整。Interleaved MRoPE 在不同视频长度和帧率下的增益均匀性未展开；DeepStack 引入的额外参数与推理延迟未量化；文本化时间戳在超长视频（>1 小时）中的表现及上下文开销未知；平方根重加权与对数平滑等其他缩放策略缺少直接对比。这些点需要后续实验补充验证。
 
-
-
 Qwen3‑VL 采用标准的三模块架构：**视觉编码器（Vision Encoder）**、**MLP 视觉‑语言融合器（Vision‑Language Merger）** 以及 **大语言模型（LLM）**。文本、图像和视频三类输入经统一处理后，最终由 LLM 自回归生成回答。其核心设计目标是在不牺牲纯文本语言能力的前提下，强化多模态时空建模与细粒度视觉‑语言对齐。
 
 ### 输入处理流
@@ -139,8 +133,6 @@ Figure 1 给出了完整的框架图：视觉编码器处理动态分辨率的�
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2512_00435/figures/003_Figure_1.jpg]]
 *Figure 1: The Qwen3-VL framework integrates a vision encoder and a language model decoder to process multimodal inputs, including text, images, and video. The vision encoder is specifically designed to handle dynamic, native-resolution visual inputs, mapping them to visual tokens of variable length. To enhance perceptual capability and preserve rich visual information, we incorporate the pioneering DeepStack mechanism, which injects visual tokens from multiple layers of the vision encoder into corresponding layers of the LLM. Furthermore, we adopt Interleaved MRoPE to encode positional information for multimodal inputs with a balanced frequency spectrum, and introduce text-based timestamp tokens to m...*
 
-
-
 ### 视觉编码器与动态分辨率处理
 
 Qwen3‑VL 采用 **SigLIP‑2** 架构作为视觉编码器（Tschannen et al., 2025），并在训练中持续使用动态输入分辨率。视觉编码器内部使用 **2D‑RoPE**，根据实际输入尺寸插值绝对位置嵌入，从而原生支持可变分辨率的图像与视频帧输入。视觉编码器输出的特征图经 **两层 MLP 视觉‑语言融合器** 压缩：将每 $2 \times 2$ 的视觉特征块映射为一个视觉 token，使其维度与 LLM 的隐藏层对齐。
@@ -163,13 +155,6 @@ Qwen3‑VL 摒弃了 Qwen2.5‑VL 中通过位置编码实现的 T‑RoPE 绝对
 
 > **注意**：本报告未提供上述模块的具体数学公式推导，原文中亦未给出显式公式定义。若需详细的公式表达与推导，需手动查阅原始技术报告或源码实现。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2512_00435/figures/007_Figure_2.jpg]]
-*Figure 2: Multilingual OCR performance of our model on a self-built test set. The model achieves over 70% accuracy on 32 out of 39 supported languages, demonstrating strong and usable multilingual capabilities*
-
-
-
 ## 实验与关键发现
 
 ### 核心性能验证
@@ -190,12 +175,7 @@ Qwen3-VL 在多模态和纯文本基准上均展现了强大的竞争力。旗�
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2512_00435/figures/011_Table_7.jpg]]
 *Table 7: Comparison among Qwen3-VL-32B-Instruct, Qwen3-VL-30B-A3B-Instruct, and corresponding baselines*
 
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2512_00435/figures/012_Table_8.jpg]]
-*Table 8: Comparison among Qwen3-VL-32B (Thinking), Qwen3-VL-30B-A3B (Thinking), and corresponding baselines*
-
 多语言 OCR 能力方面，在自建测试集的 39 种语言中，模型在 32 种语言上达到 70% 以上的准确率（Figure 2），验证了其广泛的实用多语言覆盖。
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2512_00435/figures/002_Figure.jpg]]
 
 ### 关键消融分析
 
@@ -210,15 +190,9 @@ DeepStack 机制将 ViT 三个中间层的视觉特征通过专用 merger 注入
 
 与 SigLIP-2 的对比消融（Table 11）显示，在 CLIP 预训练阶段，Qwen3-ViT 已展现出更好的表征能力。在下游 VLM 阶段（均搭配相同的 1.7B Qwen3 LLM），Qwen3-ViT 在 OmniBench 上达到 45.5，相比 SigLIP-2 的 36.9 提升了 **+8.6** 点，验证了自研视觉编码器的显著优势。
 
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2512_00435/figures/015_Table_11.jpg]]
-*Table 11: Ablation on Qwen3-ViT. We compare the performance metrics of Qwen3-ViT and SigLIP-2 during the CLIP pre-training stage, and further evaluate their downstream performance in the visionlanguage modeling (VLM) stage when paired with the same 1.7B Qwen3 language model*
-
 **3. 视频长时理解能力**
 
 视频 Needle-in-a-Haystack 测试（Figure 3）显示，在 256K token（约 30 分钟）以内的视频中，模型在不同时间位置的检索准确率均达到 100%，证明 Interleaved MRoPE 和文本化时间戳机制有效解决了长视频时序对齐问题。
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2512_00435/figures/017_Figure_3.jpg]]
-*Figure 3: Needle-in-a-Haystack performance heatmap for Qwen3-VL-235B-A22B-Instruct across varying video durations and needle positions. Each cell shows accuracy (%) for locating and answering questions about the inserted “needle” frame*
 
 ### 公平性评估设置
 
@@ -236,13 +210,6 @@ DeepStack 机制将 ViT 三个中间层的视觉特征通过专用 merger 注入
 - 文本化时间戳在极长视频（超过 1 小时）中是否仍优于 T-RoPE，以及引入的上下文长度开销是否可控，缺乏实验支撑。
 - 平方根重加权损失与其他缩放策略（如对数平滑）未做直接对比消融。
 - Thinking 模型在安全性和幻觉控制方面的鲁棒性未在报告中讨论。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2512_00435/figures/019_Figure.jpg]]
-*Figure: B.4 Document-Understanding*
-
-
 
 ## 定位与知识库关联
 
@@ -279,8 +246,6 @@ Qwen3‑VL 在 **Qwen2.5‑VL**（Bai et al., 2025）的基础上进行了四项
 3. **文本化时间戳的扩展性**：在超过 1 小时的视频中是否持续优于 T‑RoPE，以及引入的上下文长度开销是否可控，需要进一步验证。
 4. **损失重加权策略的比较**：平方根重加权与对数平滑等其他缩放策略之间缺少直接对比消融。
 5. **Thinking 模型的鲁棒性**：报告未讨论 Thinking 变体在安全性、幻觉控制和对抗鲁棒性等方面的表现。
-
-
 
 ## 原文 PDF
 

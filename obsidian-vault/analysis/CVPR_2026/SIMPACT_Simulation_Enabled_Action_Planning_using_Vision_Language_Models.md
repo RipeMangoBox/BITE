@@ -52,8 +52,6 @@ SIMPACT 的核心洞察是：**在测试时，通过从单张 RGB-D 图像自动
 
 方法的主要局限在于：单视图 3D 重建引入的感知误差、仿真与现实的动力学偏差、以及依赖商业 VLM 带来的高推理延迟（总计超过 5 分钟），限制了其在实时场景中的直接部署。尽管如此，SIMPACT 开创性地展示了“仿真赋能 VLM 测试时推理”这一范式的潜力，为零样本物理感知规划提供了可扩展的技术路径。
 
-
-
 ### 机器人操控中的物理推理瓶颈
 
 机器人操控任务，尤其是涉及精细物理交互的场景（如推动瓶子而不使其倾倒、堆叠碗碟、揉捏面团等），要求规划系统不仅理解语义指令，还必须预测动作执行后的物理结果。当前主流的视觉语言模型（VLM）虽然在语义理解、常识推理和开放集泛化方面展现出强大能力，但它们缺乏对物理动力学的内建理解——VLM 无法预测“推瓶子时用多大力、推多高瓶子会倒”这类依赖于质量、摩擦、接触几何的物理后果。
@@ -81,8 +79,6 @@ SIMPACT 的核心洞察是：**在测试时，通过从单张 RGB-D 图像自动
 3. **零样本、测试时推理**：整个规划过程在测试时完成，无需针对特定任务进行微调或训练，充分利用 VLM 的预训练知识和仿真器的物理保真度。
 
 这一“仿真赋能 VLM”的范式，将物理推理从模型内部不可学习的黑箱，转化为外部可操作、可观察的显式反馈循环，为解决精细操控任务中的物理推理瓶颈提供了新路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -137,12 +133,7 @@ Baseline 方法无迭代优化或仅进行内部验证。SIMPACT 的优化器具
 
 SIMPACT 的物理 grounding 依赖于仿真与真实世界的一致性。Figure 12 的分析表明，在所有 100 个测试样本中，仿真与真实世界的结果匹配率达到 **89%**（同为成功或同为失败），11% 的案例为仿真成功但真实失败（sim-success/real-fail），未出现仿真失败但真实成功的情况。这一结果表明仿真器在大多数情况下能够可靠地预测物理结果，为 VLM 的物理推理提供了可信的 grounding 基础。
 
-
-
 SIMPACT 是一个**零样本机器人操控动作规划框架**，其核心输入为单张 RGB‑D 图像 $I_0$ 与自然语言任务指令 $\ell_{\mathrm{task}}$，输出为一组机器人末端执行器动作序列 $\mathbf{a} = \{a_t\}_{1 \leq t \leq T}$，其中每个动作 $a_t \in \mathrm{SE}(3) \times \mathbb{R}$ 定义了末端执行器的 6‑DoF 位姿与夹爪开合宽度（见 Fig. 1 与 Fig. 3 总览）。
-
-![[assets/figures/papers/paper_list_l2417_https_arxiv_org_abs_2512_05955/figures/001_Figure_1.jpg]]
-*Figure 1: Simulation-Enabled VLM Action Planning. Given a single RGB–D image and a language task description (left), our method efficiently constructs a physics simulator that enables test-time VLM reasoning with physical grounding. This physically grounded reasoning allows the robot to succeed in fine-grained manipulation tasks (bottom), outperforming a vanilla VLM planner (top) that lacks awareness of physical dynamics*
 
 ![[assets/figures/papers/paper_list_l2417_https_arxiv_org_abs_2512_05955/figures/003_Figure_3.jpg]]
 *Figure 3: Method overview. Our method first instantiates a physics simulator given the real-world scene. Next, a VLM-based action sampler and optimizer iteratively refine the action sequence towards task success using simulated rollouts as context. The final optimized actions are then executed in the real world*
@@ -178,13 +169,6 @@ SIMPACT 是一个**零样本机器人操控动作规划框架**，其核心输�
 6. **成功判定**：VLM 评估最终状态 → 成功则输出，否则回到步骤 4
 
 该框架的关键创新在于将**物理仿真作为 VLM 的测试时推理工具**：VLM 不直接预测最终动作，而是通过“提议→仿真验证→反思优化”的闭环，将物理动力学反馈注入语言模型的推理链中，从而在不进行任何任务微调的情况下，实现对精细物理操控任务的零样本泛化。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2417_https_arxiv_org_abs_2512_05955/figures/020_Figure_15.jpg]]
-*Figure 15: Replanning illustration. After initial failed execution, we perform re-planning after simulation update leading to successful completion*
-
-
 
 SIMPACT 的核心由一个**仿真构建管线**和一个基于 VLM 的**迭代动作规划循环**构成。前者从单张 RGB-D 图像自动实例化物理世界模型，后者利用该模型进行测试时的物理推理与动作优化。
 
@@ -234,12 +218,8 @@ $$\mathrm{TASKSUCCESS}(\mathbf{s}^k) = \mathbf{VLM}(I_T^k, s_T^k, \ell_{\mathrm{
 
 若成功则终止迭代并输出动作序列；否则将新的 rollout 上下文加入优化历史，进入下一轮采样或优化。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2417_https_arxiv_org_abs_2512_05955/figures/002_Figure_2.jpg]]
 *Figure 2: Simulation construction from a single RGBD image. Given an RGB-D image and a language task description, our pipeline automatically generates either a mesh-based simulation (top) for rigid objects or a particle-based simulation (bottom) for deformables. After segmenting objects-of-interest via GroundedSAM2 [55], we reconstruct either the 3D shape, scale, and pose of the object for rigidbody simulation, or perform dense sampling of particles within the volumes between the object surface and the table for the particle-based simulation pipeline. In both cases, we prompt the VLM to infer the relevant physical parameters required for simulation*
-
-
 
 ## 实验与关键发现
 
@@ -277,20 +257,11 @@ SIMPACT 在 7 项真实世界精细操控任务上均大幅超越所有基线方
 
 失败案例分解（Figure 7）将错误归类为感知错误、规划错误和执行错误三类。感知错误主要源于单视图 3D 重建引入的几何偏差，导致仿真器中的物体位姿或形状与真实世界不一致。规划错误体现为 VLM 优化器在多轮迭代后仍无法生成可行动作序列，尤其在旋转（pivoting）任务上——该任务需要精确的力-运动耦合推理，VLM 的符号化推理难以捕捉连续的接触动力学。执行错误则源于仿真与真实的动力学偏差：约 11% 的案例在仿真中成功却在真实执行中失败（Figure 12），这构成了 sim-to-real gap 的量化证据。
 
-![[assets/figures/papers/paper_list_l2417_https_arxiv_org_abs_2512_05955/figures/010_Figure_7.jpg]]
-*Figure 7: Failure case decomposition graph. Failures are categorized as perception, planning, or execution*
-
 仿真与真实世界结果的一致性达到 89%（Figure 12），表明仿真器在大多数情况下能可靠地预测动作的物理结果。剩余 11% 的仿真成功-真实失败案例主要出现在涉及复杂接触（如碗叠放的对齐插入）和可变形物体大变形（如面团挤压）的场景中，这指明了仿真保真度提升的优先方向。
 
 ### 物理参数估计的鲁棒性与边界
 
 VLM 估计的物理参数表现出低方差和合理范围（Table 6）：质量估计为 1.033±0.0015 kg，摩擦系数为 0.36±0.11。这种稳定性使得仿真环境在不同场景变化（物体类型、位姿、颜色、材质，Figure 13）下保持一致的物理行为。
-
-![[assets/figures/papers/paper_list_l2417_https_arxiv_org_abs_2512_05955/figures/016_Figure_13.jpg]]
-*Figure 13: Example scene setup variations. Throughout our experiments, we vary the object types, poses, colors and materials to demonstrate the robustness and generalizability of our method*
-
-![[assets/figures/papers/paper_list_l2417_https_arxiv_org_abs_2512_05955/figures/018_Table_6.jpg]]
-*Table 6: Robustness analysis of VLM-estimated physics parameters (N = 10 samples). The low variance and stable ranges indicate consistent estimation capabilities*
 
 然而，摩擦系数的极端取值会显著影响性能（Table 7）：当摩擦系数偏离合理范围时，成功率下降。这提示当前框架依赖 VLM 对物理参数的常识性估计，在超出常识分布的场景中可能失效。
 
@@ -301,13 +272,6 @@ VLM 估计的物理参数表现出低方差和合理范围（Table 6）：质量
 ### 基线对比的公平性说明
 
 所有对比方法均以零样本方式评估，未针对这 7 项特定任务进行微调。但需注意：π0.5 的训练数据可能未覆盖此类精细操控场景，且仅使用开源版本；VoxPoser 和 MOKA 原本设计场景不同，我们虽进行了适当扩展（如为 MOKA 增加推动和挤压支持），但仍可能存在适配不完全的问题。这些因素可能使基线性能低于其最优水平，但即便考虑这些因素，SIMPACT 的领先幅度（多数任务从 0% 到 80%+）已远超可归因于不公平性的范围。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2417_https_arxiv_org_abs_2512_05955/figures/004_Figure_4.jpg]]
-*Figure 4: Action optimization process. We show a representative example from the non-toppling push task. The left three images show simulation rollouts from initial VLM-sampled action sequence proposals, all of which fail due to insufficient/overshooting push, or because the bottle topples. From these proposals, the VLM optimizer reasons a non-trivial action update that pushes the bottle for the correct distance without toppling in both simulation and real-world execution*
-
-
 
 ## 定位与知识库关联
 
@@ -362,8 +326,6 @@ SIMPACT 的仿真构建依赖从单张 RGB-D 图像进行分割、3D 重建和�
 5. **闭环重规划与学习**：Figure 15 展示了初步的重规划能力，但能否将真实世界的执行结果系统性地反馈到仿真模型和 VLM 优化器中，形成持续改进的闭环系统？
 
 6. **物理参数估计的主动校准**：当前 VLM 估计的物理参数具有低方差（质量 1.033±0.0015 kg，Table 6），但在极端参数下性能下降。能否通过主动探索和系统辨识来校准这些参数？
-
-
 
 ## 原文 PDF
 

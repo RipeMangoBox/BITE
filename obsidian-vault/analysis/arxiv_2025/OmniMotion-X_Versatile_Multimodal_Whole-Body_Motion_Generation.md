@@ -74,8 +74,6 @@ OmniMotion-X 提出了一种**统一的多模态全身运动生成框架**，其
 
 当前框架尚未深度融合**场景、物体及人类交互**等多层次约束，对于复杂的交互式全身运动生成仍存在局限。此外，运动表示与推理速度仍有优化空间，面向实时应用需要更紧凑的表示和更高效的推理架构。后续研究方向包括：如何将场景和交互约束集成到统一条件框架中，以及如何开发更紧凑的运动表示以加速扩散模型的推理过程。
 
-
-
 ### 问题背景
 
 人体运动生成旨在根据多种模态的输入信号合成自然、逼真的三维人体运动序列，其应用涵盖动画制作、虚拟现实、游戏开发和人机交互等领域。随着扩散模型和自回归架构的快速发展，该领域已从单一的文本到运动生成逐步扩展到支持语音、音乐、轨迹等多种条件模态的多任务生成范式。
@@ -106,8 +104,6 @@ OmniMotion-X 提出了一种**统一的多模态全身运动生成框架**，其
 
 此外，为支撑上述方法的训练与评估，本文构建了OmniMoCap-X数据集——目前最大的多模态运动捕捉数据集，整合28个公开高质量数据集，统一转换为SMPL-X格式，并配备了高质量的多模态标注。
 
-
-
 ## 核心方法与创新机理
 
 OmniMotion-X 的核心创新并非单一技术点的堆砌，而是通过**统一条件前缀连接**、**渐进式从弱到强训练**和**参考运动条件**三个相互耦合的机制，系统性地解决了多模态全身运动生成中长期存在的条件冲突与控制粒度不匹配问题。
@@ -135,8 +131,6 @@ OmniMotion-X 引入了一种全新的条件范式——**参考运动**。与传
 ### 创新耦合效应
 
 上述三个 changed slot 并非孤立存在：统一前缀连接为多条件融合提供了架构基础，渐进训练策略确保了不同粒度条件的有序学习，而参考运动则拓展了条件空间的上限。三者共同作用，使得 OmniMotion-X 在单一框架内同时支持文本到运动、语音到手势、音乐到舞蹈、轨迹引导合成、运动插值与预测等多种任务，且在各任务上均取得最优或次优的定量结果（Table 4、Table 5）。
-
-
 
 ### 设计动机与核心思路
 
@@ -197,13 +191,6 @@ OmniMotion-X 首次将**参考运动作为特殊条件信号**引入运动扩散
 - **输出**：统一 SMPL-X 格式的全身运动序列，包含根位移、关节旋转、面部表情等完整参数
 - **生成模式**：支持单次生成和自回归长序列生成，参考运动条件确保片段间平滑过渡
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2510_19789/figures/001_Figure_1.jpg]]
-*Figure 1: We present OmniMotion-X, a unified sequence-to-sequence autoregressive motion diffusion transformer designed for flexible and interactive whole-body human motion generation. It supports a variety of tasks, including text-to-motion, music-todance, speech-to-gesture, and globally spatial-temporal controllable motion generation, which encompasses motion prediction, in-betweening, completion, and joint/trajectory-guided synthesis. These conditions can be combined in various ways to enable versatile motion generation*
-
-
-
 ### 统一多模态条件建模
 
 OmniMotion-X 的核心设计是将异构多模态条件统一为序列前缀，注入扩散变压器（DiT）主干。模型支持五类条件：文本 $\mathbf{c}_t$（语义引导）、全局运动 $\mathbf{c}_g$（时空一致性）、语音 $\mathbf{c}_s$（手势同步）、音乐 $\mathbf{c}_m$（舞蹈节奏）以及参考运动 $\mathbf{c}_r$（内容与风格锚定）。
@@ -244,13 +231,6 @@ OmniMotion-X 将多种全局时空控制任务（如运动预测、中间帧插�
 
 **证据强度说明**：上述公式均直接引自论文 Equation (1)–(4) 及 Supplementary Material，具有高置信度（≥0.95）。公式变量含义基于原文描述，未进行外推或猜测。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2510_19789/figures/006_Figure_3.jpg]]
-*Figure 3: We propose the weak-to-strong progressive training strategy, establishing motion-semantic alignment with text, followed by progressive integration of stronger multimodal signals (reference motion, global motion, speech, music) for enhanced generation quality and controllability*
-
-
-
 ## 实验与关键发现
 
 ### 文本到运动生成主结果
@@ -286,8 +266,6 @@ OmniMotion-X 将多种全局时空控制任务（如运动预测、中间帧插�
 
 表 2 对比了 OmniMoCap-X 与现有合并数据集的规模和质量。OmniMoCap-X 包含约 286.2 小时、64.3M 帧的运动数据，且 100% 来自动捕源（Mocap Source），远高于 Motion-X（13.6%）和 HumanML3D（50.1%）。在文本标注方面，OmniMoCap-X 采用视觉信息（V）和文本信息（T）联合补全缺失描述，避免了纯模板生成导致的语义单一问题（表 8 的 TTR 统计佐证了标注的词汇多样性）。这一数据优势为 OmniMotion-X 的多任务泛化提供了基础，但也意味着在更小规模或更低质量数据集上的迁移表现需要额外验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2510_19789/figures/007_Table_4.jpg]]
 *Table 4: Quantitative results of text-to-motion on the OmniMoCap-X test set. ↑ (↓) indicates that a larger (smaller) value is better. → indicates that a value closer to the GT is better. Red and Blue colors indicate the best and second-best results respectively. All evaluations are repeated 20 times, reporting the mean and 95% confidence interval*
 
@@ -302,20 +280,6 @@ OmniMotion-X 将多种全局时空控制任务（如运动预测、中间帧插�
 
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2510_19789/figures/003_Table_2.jpg]]
 *Table 2: Comparisons between OmniMoCap-X and existing merged datasets. ”Mocap Source” indicates the proportion of mocap datasets. ”Caption Source” specifies the method for completing missing descriptions: ”-” (no completion), ”V” (visual information), and ”T” (textual information). ”Hierarchical Caption” shows if captions include hierarchical text*
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2510_19789/figures/011_Figure_4.jpg]]
-*Figure 4: Diverse motion synthesis capabilities of OmniMotion-X. OmniMotion-X supports multiple tasks: (a) text-to-motion, (b) speech-to-gesture, (c) music-to-dance, (d) trajectory-guided motion, (e) motion in-betweening, and (f) motion prediction*
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2510_19789/figures/004_Table_3.jpg]]
-*Table 3: Composition of OmniMoCap-X dataset, unifying motion formats into SMPL-X with captions. We select 28 publicly available high-quality datasets across various tasks. Frames and Hours are computed based on raw dataset FPS. MoCap represents data capture methods, ranked by quality: Marker with manual correction (Marker-M), Vicon Marker (Marker-V), IMU, Multi-View RGB (MV-RGB), and Single-View RGB (SV-RGB). Format specifies the original motion format*
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2510_19789/figures/013_Table_8.jpg]]
-*Table 8: Text quality statistics across motion datasets. The third column shows the number of text samples per dataset. The fourth column displays the average sentence length (in word count). The fifth column presents the Type-Token Ratio (TTR) range, indicating lexical diversity (higher values represent richer vocabulary). The sixth column lists the ten most frequent verbs in each dataset, reflecting the predominant actions described in the motion text. The datasets are grouped by their primary task: Text-to-Motion (T2M), Music-to-Dance (M2D), Speech-to-Gesture (S2G), Human-Human Interaction (HHI), Human-Object Interaction (HOI), and Human-Scene Interaction (HSI)*
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2510_19789/figures/010_Figure.jpg]]
-*Figure: (a) Text-to-motion (d) Trajectory-guided synthesis*
-
-
 
 ## 定位与知识库关联
 
@@ -352,8 +316,6 @@ OmniMotion-X 的适用边界由其设计选择决定：
 3. **渐进训练策略的泛化性。** 从弱到强的渐进训练在 OmniMotion-X 上验证有效（移除该策略导致 FID 从 5.040 上升至 9.574，全局时空控制 FID 从 4.224 上升至 10.247），但该策略是否适用于其他多模态生成任务（如视频生成、音频合成）仍有待验证。
 
 4. **参考运动条件的理论理解。** 参考运动为何能有效提升跨片段一致性？其在特征空间中是否隐式编码了运动风格和动态模式的原型表示？这一机制的理论分析尚不充分。
-
-
 
 ## 原文 PDF
 

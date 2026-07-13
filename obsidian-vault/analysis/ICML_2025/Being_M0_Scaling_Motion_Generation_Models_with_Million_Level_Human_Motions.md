@@ -61,8 +61,6 @@ claims:
 
 **局限与开放问题**：当前评估器仅在约2万条数据上训练，泛化性不足，可能无法可靠评估大规模模型；运动分词器表示容量仍有限（1024词元），导致大模型收敛较慢；静态/合成数据的辅助效果有限。未来方向包括设计更鲁棒的评估指标、扩展分词器至3D量化，以及探索缩放定律的极限。
 
-
-
 ### 运动生成的数据与表征瓶颈
 
 文本驱动的人体运动生成（Text-to-Motion）旨在根据自然语言描述合成逼真的三维人体动作序列，在游戏、影视、虚拟人等领域具有广泛应用。近年来，扩散模型与自回归模型在该任务上取得了显著进展，代表性工作包括 **MLD**、**MotionDiffuse**、**ReMoDiffuse**、**Fg-T2M++** 以及 **LMM** 等。然而，这些方法普遍面临两个核心瓶颈：
@@ -91,8 +89,6 @@ claims:
 - **LLM 骨干与两阶段训练**：将运动词元视为大语言模型的扩展词汇，第一阶段在 MotionLib 全量数据上进行运动-文本对齐预训练，第二阶段利用 250+ 指令模板和 Gemini-Pro 精炼的 90 万条指令进行指令微调，使模型具备指令跟随能力。
 
 这一设计使得 Being-M0 首次在运动模态上展现出清晰的缩放定律：随着数据量从 0.02M 增至 1.2M、模型从 355M 扩展至 13B，生成质量（R@1、FID）持续提升（Table 2），并在分布外评测集 UNSEEN-90K 上取得显著增益（R@1 从 0.034 提升至 0.098，Table 4）。
-
-
 
 ## 核心方法与创新机理
 
@@ -142,8 +138,6 @@ Being-M0 将运动视为一种“外语”，通过以下方式集成到自回�
 Being-M0 首次在运动生成领域展示了清晰的缩放定律：以 LLaMA2-13B 为骨干，当训练数据从 0.02M（HumanML3D）增至 1.2M（MotionLib-full）时，MotionLib-eval 的 R@1 从 0.061 跃升至 0.185（Table 2）。同时，模型参数从 355M 扩展至 13B 也带来一致的性能增益。在分布外泛化测试中，使用 MotionLib 训练的模型在 UNSEEN-90K 上的 R@1 达到 0.098，远超使用 HumanML3D 训练的 0.034（Table 4）。
 
 > **注意**：2D-LFQ 在小规模数据集（如 HumanML3D）上可能略逊于 RQ-VAE，其优势主要体现在大规模数据场景（Section C.2.1）。这一局限性提示该方法的设计哲学是“为规模而生”。
-
-
 
 Being-M0 将运动生成建模为一种“外语”翻译任务，其整体框架由**运动分词器（Motion Tokenizer）**、**大语言模型（LLM）骨干**与**运动解码器（Motion Decoder）**三大模块串联构成，并通过**两阶段训练**实现百万级运动-文本对齐与指令跟随生成（Figure 3）。
 
@@ -196,8 +190,6 @@ $$\mathcal{L}(\Theta) = - \sum_{j=1}^{L} \log P_{\Theta}(y_j \mid desc, \hat{y}_
 - **输出**：经运动解码器还原的连续人体运动序列
 
 该框架的模块化解耦设计使得运动分词器与 LLM 骨干可独立扩展——2D-LFQ 的码本利用率随码本增大持续提升（Figure 11 RIGHT），而 LLM 的生成质量随模型参数量与数据规模同步增长（Table 2）。
-
-
 
 ### 整体框架：运动作为外语
 
@@ -275,19 +267,6 @@ $$\mathcal{L}(\Theta) = - \sum_{j=1}^{L} \log P_{\Theta}(y_j \mid desc, \hat{y}_
 
 3. **评估器泛化性**：当前 R-Precision 和 FID 依赖在约 2 万条数据上训练的轻量级运动编码器，其在大规模模型上的可靠性存疑（Section C.4）。**该局限可能影响所有对比结果的公平性**。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1911_Being_M0_Scaling_Motion_Generation_Models_with_Million_Level_Human_Motio/figures/012_Table_8.jpg]]
-*Table 8: Ablation results of different motion tokenizer trained on HumanML3D on the motion reconstruction task*
-
-![[assets/figures/papers/paper_list_l1911_Being_M0_Scaling_Motion_Generation_Models_with_Million_Level_Human_Motio/figures/026_Table_14.jpg]]
-*Table 14: Ablation of 2D motion quantization vs. its 1D version*
-
-![[assets/figures/papers/paper_list_l1911_Being_M0_Scaling_Motion_Generation_Models_with_Million_Level_Human_Motio/figures/023_Table_13.jpg]]
-*Table 13: Ablation results of Encoder-Decoder vs. Decoder-only architecture*
-
-
-
 ## 实验与关键发现
 
 ### 核心发现：运动生成的缩放定律
@@ -350,21 +329,8 @@ Table 10显示，在MotionLib-eval上全参数微调的R@1为0.166，优于LoRA�
 
 Table 3在HumanML3D上使用HM3D-Format特征进行公平对比。Being-M0-LFQ取得R@1 0.528，略优于LMM的0.525（+0.003），FID为0.071 vs 0.082。虽优势微弱，但在统一特征下验证了方法的有效性。需注意，HumanML3D仅约2万条数据，远未触及Being-M0的缩放优势区间——其真正价值体现在大规模数据场景。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1911_Being_M0_Scaling_Motion_Generation_Models_with_Million_Level_Human_Motio/figures/005_Table_2.jpg]]
 *Table 2: Comparisons under different model parameters and data sizes, showing their scaling law for motion generation*
-
-![[assets/figures/papers/paper_list_l1911_Being_M0_Scaling_Motion_Generation_Models_with_Million_Level_Human_Motio/figures/006_Table_3.jpg]]
-*Table 3: Comparison with existing SoTA methods on HumanML3D. Results marked with ∗ represent values reproduced using the official code, while unmarked results are taken from the original papers. 1 and 2 denote different works with the same model name. For fair comparison, experiments here are conducted using HM3D-Format feature*
-
-![[assets/figures/papers/paper_list_l1911_Being_M0_Scaling_Motion_Generation_Models_with_Million_Level_Human_Motio/figures/009_Table_4.jpg]]
-*Table 4: Ablation of out-of-domain evaluation on UNSEEN-90K dataset, where #N denotes we use N subsets of MotionLib for training*
-
-![[assets/figures/papers/paper_list_l1911_Being_M0_Scaling_Motion_Generation_Models_with_Million_Level_Human_Motio/figures/019_Table_10.jpg]]
-*Table 10: Ablation results of LoRA tuning vs. full-parameter fine-tuning*
-
-
 
 ## 定位与知识库关联
 
@@ -416,8 +382,6 @@ $$Q(z_i) = \arg\min_{c_{ik}} ||z_i - c_{ik}|| = -\mathbf{1}\{z_i \leq 0\} + \mat
 4. **部件级可控生成**：当前分层描述仅提供上下肢的粗略区分，如何实现更精细的部件级控制（如仅控制左臂动作）？
 5. **多模态条件的融合**：如何有效利用静态图像、音频、场景上下文等辅助模态，突破纯文本条件的性能上限？
 6. **合成数据的价值挖掘**：论文初步探索了合成数据（Section C.3），但效果有限。更高质量的合成运动数据能否成为规模化训练的可行路径？
-
-
 
 ## 原文 PDF
 

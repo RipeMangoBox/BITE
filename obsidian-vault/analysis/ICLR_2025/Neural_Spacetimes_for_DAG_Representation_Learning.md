@@ -53,8 +53,6 @@ claims:
 
 综上，NST通过将几何参数化，实现了对任意DAG的低失真、因果一致的连续嵌入，为图表示学习提供了一种几何可塑的新范式。
 
-
-
 ### 有向无环图的表示学习困境
 
 有向无环图（DAG）广泛存在于现实世界的复杂系统中，从网页超链接网络、引文网络到基因调控网络，节点间的有向边不仅编码了拓扑连接，更承载了因果方向与度量距离的双重信息。对这些图进行低维连续嵌入，是下游任务（如节点分类、链接预测、因果推断）的关键前置步骤。
@@ -81,8 +79,6 @@ claims:
 从理论角度看，论文给出了一个**通用嵌入定理**（Theorem 1）：任意有限k点DAG可以嵌入到神经时空中，失真为 $1 + O(\log k)$，同时精确保留因果结构。这一定理为可学习几何的表示能力提供了坚实保障——神经时空仅需 $O(k^2)$ 个参数即可全局嵌入一个加权DAG。
 
 从实证角度看，初步证据表明神经时空在合成DAG和真实世界网络（网页超链接、基因调控网络）上均能显著降低嵌入失真，同时保持与固定几何基线相当的方向性捕获能力。这种“低失真 + 高保序”的组合优势，正是DAG表示学习领域长期追求的目标。
-
-
 
 ## 核心方法与创新机理
 
@@ -147,8 +143,6 @@ Theorem 1为上述创新提供了理论支撑：**任意 $k$ 点DAG可嵌入到�
 
 神经时空的核心创新不在于引入新的网络架构，而在于**将几何本身参数化为可学习的神经网络，使空间度量和时间偏序能够根据数据自适应优化**。这种"学习几何"而非"在固定几何中学习嵌入"的范式转换，从根本上解决了固定时空几何的刚性问题，实现了DAG表示学习中距离保真度与因果一致性的统一优化。
 
-
-
 神经时空（Neural Spacetime, NST）将DAG嵌入问题形式化为一个可学习的三元组 $\boldsymbol{S} = (\mathcal{E}, \mathcal{D}, \mathcal{T})$，通过**乘积流形**将空间结构与因果结构解耦，并联合端到端优化。其核心设计逻辑是：用可学习的神经准度量 $\mathcal{D}$ 捕捉节点间的加权距离，用可学习的神经偏序 $\mathcal{T}$ 捕捉因果方向性，而特征编码器 $\mathcal{E}$ 则为二者提供共享的中间表示。这一分离使得模型能够灵活适配任意DAG的复杂度量与因果结构，避免了固定时空几何（如Minkowski、De Sitter空间）因度量不可学习而导致的嵌入失真或方向性丢失问题。
 
 ### 模块关系与数据流
@@ -173,8 +167,6 @@ Theorem 1为上述创新提供了理论支撑：**任意 $k$ 点DAG可嵌入到�
 ### 理论保证
 
 **Theorem 1（通用时空嵌入）** 为上述框架提供了理论支撑：任意 $k$ 点DAG可以嵌入到神经时空中，失真上界为 $1 + \mathcal{O}(\log k)$，同时精确保留因果结构。该定理表明，NST仅需 $\mathcal{O}(k^2)$ 参数即可实现全局嵌入，从原理上解释了可学习几何相较于固定几何的优势来源。
-
-
 
 神经时空（**Neural Spacetime, NST**）的核心架构是一个可学习的三元组 $\mathcal{S} = (\mathcal{E}, \mathcal{D}, \mathcal{T})$，如 **Figure 1** 所示。给定一个有向无环图（DAG），编码器 $\mathcal{E}$ 将节点特征映射为时空流形中的事件坐标，而神经准度量 $\mathcal{D}$ 和神经偏序 $\mathcal{T}$ 则并行地学习空间几何与时间因果结构。
 
@@ -255,8 +247,6 @@ $$
 
 值得注意的是，该嵌入所需的参数量仅为 $\mathcal{O}(k^2)$，远小于理论上的最坏情况边界。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -323,8 +313,6 @@ NST相较Minkowski基线的最大失真减少 **86%**（−8.12），相较De Si
 - 除了节点分类外，神经时空特征能否用于更多下游任务（如链接预测、因果推断）？
 - 能否进一步减少时间维度需求，例如通过更精巧的偏序编码实现 $T=1$ 时仍能处理复杂反链？
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2408_13885/figures/011_Figure_5.jpg]]
 *Figure 5: (c) Activation function used by neural (d) Activation function used by neural partial order without LeakyReLU. partial order (equation 4). Figure 5: NST activation visualizations*
 
@@ -334,27 +322,8 @@ NST相较Minkowski基线的最大失真减少 **86%**（−8.12），相较De Si
 ![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2408_13885/figures/006_Table_2.jpg]]
 *Table 2: Embedding results for real-world web page hyperlink and gene regulatory networks*
 
-![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2408_13885/figures/014_Table.jpg]]
-
 ![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2408_13885/figures/015_Table_3.jpg]]
 *Table 3: Tree Embedding distortion leveraging Euclidean, Hyperbolic, Neural Snowflake and Neural (Quasi-)metric spaces*
-
-![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2408_13885/figures/017_Table_4.jpg]]
-*Table 4: Embedding results for arxiv citation network*
-
-![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2408_13885/figures/018_Table_5.jpg]]
-*Table 5: Statistics of WebKB datasets*
-
-![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2408_13885/figures/019_Table_6.jpg]]
-*Table 6: Statistics of Dream5 datasets*
-
-![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2408_13885/figures/020_Table_7.jpg]]
-*Table 7: Statistics of Ogbn-arxiv dataset*
-
-![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2408_13885/figures/021_Table_8.jpg]]
-*Table 8: Embedding results for arxiv citation network*
-
-
 
 ## 定位与知识库关联
 
@@ -409,8 +378,6 @@ NST的理论根基可追溯至以下方向：
 2. **全局优化策略**：如何在大图场景下实现高效的全局嵌入优化，避免仅依赖局部邻域导致的失真累积？
 3. **下游任务泛化**：除节点分类外，神经时空特征能否用于链接预测、因果推断、反事实推理等更多下游任务？
 4. **时间维度压缩**：能否通过更精巧的偏序编码（如基于序维度的自适应分配）实现 $T=1$ 时仍能处理复杂反链结构，从而降低嵌入总维度？
-
-
 
 ## 原文 PDF
 

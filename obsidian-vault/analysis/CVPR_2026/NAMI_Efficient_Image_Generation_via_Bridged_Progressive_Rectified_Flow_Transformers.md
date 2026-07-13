@@ -55,8 +55,6 @@ NAMI（Bridged Progressive Rectified Flow Transformers）针对上述瓶颈提�
 
 在方法谱系上，NAMI 属于整流流生成模型的效率优化分支，与 FLUX-dev/schnell（12B）、SD3-medium（2B）、Sana（1.6B）等模型形成直接对比。其独特之处在于将分辨率分层与模型容量分配联合设计，而非简单的模型压缩或蒸馏策略。
 
-
-
 ### 问题背景：流匹配生成模型的推理效率瓶颈
 
 近年来，基于流匹配（Flow Matching）的视觉生成模型在文本到图像合成任务上取得了显著进展。这类模型通过定义从噪声分布到数据分布的速度场 $v_\theta(x_t, t)$，并求解常微分方程
@@ -79,8 +77,6 @@ $$\frac{d x_t}{d t} = v_\theta(x_t, t), \quad x_0 \sim \mathcal{N}(0, I)$$
 - **空间维度**：低分辨率阶段仅需较少的 Transformer 层即可高效生成图像布局和概念轮廓，高分辨率阶段则需要逐步增加层数以细化纹理和细节。
 
 基于这一洞察，本文提出 **NAMI（Bridged Progressive Rectified Flow Transformers）**，通过**分辨率区分的渐进式整流流**架构，在保持生成质量的前提下大幅降低推理延迟。其核心设计包括：(1) 将整流流按分辨率划分为多个阶段，各阶段使用不同规模的子模型；(2) 通过可学习的 **BridgeFlow 模块**连接相邻阶段，对齐不同分辨率下的概率分布。实验表明，NAMI-2B 在 1024×1024 分辨率下相比同等规模的 FLUX 基线**减少 64% 推理时间**（Table 2），同时在 GenEval 和 DPG-Benchmark 上取得有竞争力甚至领先的生成质量（Table 3, Table 4）。
-
-
 
 ## 核心方法与创新机理
 
@@ -120,8 +116,6 @@ $$\min_{\theta_k} \sum_{k=1}^{K} \mathbb{E}_{(k, t, (\hat{x}_{s_k}, \hat{x}_{e_k
 
 **需要手动验证的点**：论文仅在文本到图像生成任务上验证了 NAMI 的有效性，对图像编辑等任务仅做了初步探索（附录 D 示例）。BridgeFlow 的线性假设在更大规模模型（如 12B+）或更复杂的分布偏移场景下是否仍然充分，尚待进一步验证。
 
-
-
 NAMI 的整体 pipeline 围绕“分辨率分阶段整流流 + 模型空间分解”这一核心思路构建，将图像生成过程划分为多个分辨率递增的阶段，并在阶段间引入可学习的桥接模块以对齐概率分布。
 
 **输入与输出流**：推理时，首先在最低分辨率（如 256×256）下采样一个高斯噪声 $x_0 \sim \mathcal{N}(0, I)$ 作为起始点。生成过程按阶段 $k=1$ 到 $k=K$ 顺序推进，每个阶段在其对应的时间窗口 $[t_{k-1}, t_k]$ 内使用 Flow-Euler 采样器求解 ODE。阶段间通过上采样和 BridgeFlow 模块进行变换，将上一阶段的输出映射为下一阶段的起始分布。最终阶段输出目标分辨率（如 1024×1024）下的生成图像。
@@ -138,12 +132,8 @@ $$\min_{\theta_k} \sum_{k=1}^{K} \mathbb{E}_{(k, t, (\hat{x}_{s_k}, \hat{x}_{e_k
 
 这一框架的核心优势在于：早期低分辨率阶段的轻量化设计大幅降低了计算量，而后期高分辨率阶段的深层模型保证了细节生成能力。消融实验（Figure 9）表明，按分辨率划分流本身可减少 53% 的计算时间，模型空间分解进一步贡献 11% 的加速，两者叠加使 NAMI-2B 在 1024×1024 分辨率下相比同等规模的 FLUX 基线减少 64% 的推理时间（Table 2）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l902_https_arxiv_org_abs_2503_09242/figures/004_Figure_4.jpg]]
 *Figure 4: Overview of NAMI: The left figure shows the progressive flow transformers of NAMI, where the same color represents the same module. The right figure depicts the integration of the BridgeFlow module, which establishes connections across adjacent time windows. Specifically, we divide the image generation process into K resolution stages and the entire flow is divided into K time windows, where adjacent stages are connected through upsampling and the BridgeFlow module. We use fewer transformer layers at the low-resolution stages to generate image layouts and concept contours, progressively adding more layers as the resolution increases*
-
-
 
 ### 3.1 整流流基础
 
@@ -190,12 +180,8 @@ $$\mathrm { l o s s } = \Vert ( \hat { x } _ { s _ { k } } - \hat { x } _ { e _ 
 
 推理阶段，从最低分辨率采样初始噪声，依次经过 $K$ 个阶段，每个阶段内使用 Flow-Euler 离散化采样器求解 ODE，阶段间通过上采样和 BridgeFlow 完成跳转。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l902_https_arxiv_org_abs_2503_09242/figures/002_Figure_3.jpg]]
 *Figure 3: Overview of the image generation process for FLUXdev [20] and our NAMI-2B, with upscaling alignment applied during the low-resolution stages of NAMI-2B*
-
-
 
 ## 实验与关键发现
 
@@ -240,33 +226,11 @@ Table 1给出了NAMI各变体的架构详情。NAMI采用多阶段MM-DiT Blocks�
 - **任务泛化**：当前验证仅限于文本到图像生成任务，图像编辑仅做了初步探索（Figure 27示例），尚未系统评估。
 - **超大规模扩展**：2B参数规模下的线性加速是否能在12B+模型上保持，尚待验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l902_https_arxiv_org_abs_2503_09242/figures/003_Figure_2.jpg]]
 *Figure 2: An overview of inference latency between the proposed NAMI-2B and the corresponding FLUX-2B base model of the same size without NAMI. With NAMI, inference performance improvement becomes more significant as image resolution increases. The measurements are conducted with a batch size of 1 on an A100 GPU*
 
 ![[assets/figures/papers/paper_list_l902_https_arxiv_org_abs_2503_09242/figures/008_Table_3.jpg]]
 *Table 3: Comparison of different methods on GenEval. With highlight the best, second best entries. Ovr & Sgl & Two & Cnt & Col & Pos & CA mean: Overall & Single & Two & Counting & Colors & Position & Color Attribution*
-
-![[assets/figures/papers/paper_list_l902_https_arxiv_org_abs_2503_09242/figures/009_Table_4.jpg]]
-*Table 4: Comparison of different methods on DPG-Benchmark. With highlight the best, second best entries. Ovr & Gbl & Ent & Attr & Rel & Oth mean: Overall & Global & Entity & Attribute & Relation & Other*
-
-![[assets/figures/papers/paper_list_l902_https_arxiv_org_abs_2503_09242/figures/007_Table_5.jpg]]
-*Table 5: Human evaluation results on NAMI-1K dataset. Rele & Cohe & Aes & Real mean: Relevance & Coherence & Aesthetic & Realism. With highlight the best, second best entries*
-
-![[assets/figures/papers/paper_list_l902_https_arxiv_org_abs_2503_09242/figures/010_Figure_6.jpg]]
-*Figure 6: The effectiveness of the NAMI components at resolutions of 256 and 512*
-
-![[assets/figures/papers/paper_list_l902_https_arxiv_org_abs_2503_09242/figures/015_Figure_9.jpg]]
-*Figure 9: The inference time of NAMI Components*
-
-![[assets/figures/papers/paper_list_l902_https_arxiv_org_abs_2503_09242/figures/013_Table_6.jpg]]
-*Table 6: Comparison of Training Efficiency between NAMI and FLUX-based Architectures*
-
-![[assets/figures/papers/paper_list_l902_https_arxiv_org_abs_2503_09242/figures/011_Figure_5.jpg]]
-*Figure 5: The distribution of text lengths across GenEval, DPG-Benchmark and NAMI-1K*
-
-
 
 ## 定位与知识库关联
 
@@ -316,8 +280,6 @@ NAMI 处于 **高效文生图（Efficient Text-to-Image Generation）** 的研�
 4. **跨模态和跨任务迁移**：该方法在视频生成、3D 生成等需要更高计算量的任务中是否同样有效，是重要的后续研究方向。
 
 5. **更大规模的验证**：在 12B+ 参数规模下，分段流和模型划分的加速比例是否会因通信开销或阶段间瓶颈而衰减，需要进一步实验验证。
-
-
 
 ## 原文 PDF
 

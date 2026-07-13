@@ -53,8 +53,6 @@ claims:
 
 **主要结果概览**：在OOD适配场景下，LoRA在ε=8时的RMIA攻击AUC（0.64平均）显著低于Head Fine-Tune（0.87平均）和Full Fine-Tune（0.82）。在IID场景下，所有方法的隐私风险均显著上升，进一步验证了分布接近性的核心作用。消融研究表明，使用至少一个影子模型对RMIA攻击至关重要，而Prefix Tuning在降低预训练数据逐字记忆方面表现突出。
 
-
-
 大型语言模型（LLM）的“预训练‑适配”范式已成为主流：先在超大规模公开语料上预训练，再在下游任务数据上微调或适配。当适配数据涉及隐私敏感领域（如医疗、金融、个人对话），直接的适配会暴露训练样本，差分隐私（DP）适配应运而生。然而，现有的DP适配研究存在一个根本性盲区——**它们几乎从未系统考察适配数据与预训练数据之间的分布关系如何影响实际隐私保护效果**。
 
 ### 现有方法的缺口
@@ -72,8 +70,6 @@ claims:
 本文的核心动机在于揭示一个被理论保障掩盖的经验事实：**即使数学上满足相同的(ε, δ)-DP保障，适配数据的实际隐私风险会因其与预训练数据的分布接近程度而发生数量级的变化**。这意味着，在IID场景下，即使适配数据与预训练数据没有直接重叠，其泄露程度也可能接近完全重叠的情况——分布接近性本身就是隐私泄露的主要驱动因素。
 
 这一洞察直接挑战了当前DP适配的评估范式：仅报告ε值不足以表征实际保护水平，必须将预训练‑适配分布关系纳入审计框架。为此，本文提出一个整体隐私审计框架，覆盖预训练审计、适配审计、联合审计和适配后预训练审计四个阶段，并系统评估从完全重叠到完全OOD的完整分布谱系下的隐私风险。
-
-
 
 ## 核心方法与创新机理
 
@@ -101,8 +97,6 @@ claims:
 基于这一框架，本工作进一步识别出**LoRA在多数场景下提供最佳的隐私‑效用权衡**：在OOD数据上，LoRA（$\varepsilon=8$）的RMIA AUC仅为0.69（SAMSum）和0.59（GermanWiki），显著低于Full Fine-Tune的0.82和Head Fine-Tune的0.76；在隐私‑效用曲线上（Figure 4），LoRA在相同困惑度下始终维持更低的AUC。这一结论并非来自新算法的设计，而是通过统一的审计框架对现有方法进行公平比较后的经验发现，为DP适配方法的选择提供了分布感知的决策依据。
 
 需要注意的是，该框架目前仅完整实现了适配审计和适配后预训练审计两个阶段，联合审计的完整方法论仍为开放问题；此外，评估范围限于可进行DP适配的开源模型（Pythia、GPT-Neo、OLMo），尚未覆盖闭源大模型。
-
-
 
 ![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_jY7fAo9rfK/figures/010_Figure_5.jpg]]
 *Figure 5: Stages of Auditing. We analyze four stages of auditing: 1 Auditing Pretraining, 2 Auditing Adaptation, 3 Joint Auditing of Pretraining and Adaptations, 4 Post-Adaptation Auditing of the Pretraining. Figure 6: Setup for Joint Adaptation Auditing (3). We consider different datasets for pretraining and adaptation and the two separate training stages, distinguishing it from standard ML privacy auditing*
@@ -142,8 +136,6 @@ $$H_0 : (a, b) = (0, 0) \qquad H_A : (a, b) = (1, 0)$$
 ### 输入输出流
 
 整个审计框架的输入包括：预训练LLM、适配数据集（按分布关系分类）、隐私预算 $\varepsilon$ 及适配方法选择。输出包括：各阶段的成员推断AUC分数、金丝雀暴露度、逐字记忆样本数量，以及隐私‑效用权衡曲线（以困惑度为效用代理，经Rouge-1验证有效）。框架通过统一的预训练基座模型和一致的攻击设置，确保不同适配方法之间的公平比较。
-
-
 
 ### 差分隐私适配的形式化定义
 
@@ -193,8 +185,6 @@ $$\mathbf { e x p o s u r e } ( z , \hat { Z } ) = \log _ { 2 } | \mathcal { U }
 
 > **方法局限**：论文明确指出现有工作仅完成了阶段2（适配审计）和阶段4（适配后预训练审计）的实证评估，阶段1和阶段3的完整联合审计方法尚未提供，属于开放问题。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：分布接近性是隐私泄露的主要驱动力
@@ -202,7 +192,6 @@ $$\mathbf { e x p o s u r e } ( z , \hat { Z } ) = \log _ { 2 } | \mathcal { U }
 本研究的中心发现是，适配数据与预训练数据之间的分布关系对DP适配的实际隐私风险产生决定性影响，其作用甚至超过理论隐私预算本身。即使适配数据与预训练数据不存在直接重叠，只要两者分布足够接近，泄露程度就可能与完全重叠的场景相当。
 
 **实证量化**：作者通过Sentence-BERT嵌入计算Wasserstein距离来量化分布偏移（Table 1）。基于Pile的IID数据集（Bookcorpus2、GitHub、Enron）距离值极低（例如Bookcorpus2 Train为0.0171），而OOD数据集（SAMSum为0.0250，GermanWiki为0.0556）则显著偏高。这一量化结果为后续的隐私泄露差异提供了结构性解释。
-
 
 ![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_jY7fAo9rfK/figures/002_Table_1.jpg]]
 *Table 1: Empirical quantification of dataset shift via the Wasserstein distance*
@@ -224,12 +213,7 @@ $$\mathbf { e x p o s u r e } ( z , \hat { Z } ) = \log _ { 2 } | \mathcal { U }
 
 Prefix Tuning在非隐私设置（ε=∞）下极其脆弱，AUC达到1.00，但在DP保护下（ε=8）降至0.62–0.63，表现出对隐私预算的强依赖性。相比之下，Reference方法和Min-K%方法（Table 4）在DP设置下表现接近随机猜测（AUC≈0.50），说明无影子模型的攻击对DP适配几乎无效。
 
-
-![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_jY7fAo9rfK/figures/017_Table_4.jpg]]
-*Table 4: Membership Inference for OOD Adaptations. We audit only the adaptations and assume the same pretrained LLM is used for all adaptations. We present the AUC scores obtained with reference, and Min-K% MIAs for the Pythia 1B model adapted on different datasets with $\varepsilon \in \{$ 0 . 1 , 8 , $\infty \}$
-
 **IID场景下的表现**（Table 3）：IID设置下的AUC普遍高于OOD，进一步验证了分布接近性驱动风险的核心论断。LoRA在IID场景下仍保持相对较低的AUC，但其优势不如OOD场景显著，这提示当适配数据与预训练分布高度一致时，所有方法都面临更大的隐私挑战。
-
 
 ![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_jY7fAo9rfK/figures/004_Table_3.jpg]]
 *Table 3: Membership Inference for in-distribution (IID) Adaptations using the setup from Table 2*
@@ -281,26 +265,6 @@ Table 22和Table 23报告了金丝雀暴露度结果。在ε=∞时，Prefix Tun
 *Figure 9: Overlap and IID data show the same amount of privacy leakage across training. The x-axis shows the difference between the initial pretrained loss and the evaluation loss. The y-axis represents the AUC score. We adapt Pythia 1B with $\varepsilon$ = 8*
 
 - **Figure 11**：影子模型对RMIA有效性的关键消融
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_jY7fAo9rfK/figures/018_Table_5.jpg]]
-*Table 5: Membership Inference for in-distribution (IID) Adaptations. We use the same setup as in Table 4*
-
-![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_jY7fAo9rfK/figures/019_Table_6.jpg]]
-*Table 6: Membership Inference for OOD Adaptations using Pythia 1.4B. We present the AUC scores obtained with reference, and Min-K% MIAs for the Pythia 1.4B model adapted on different datasets with $\varepsilon \in \{$ 0 . 1 , 8 , $\infty \}$
-
-![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_jY7fAo9rfK/figures/020_Table_7.jpg]]
-*Table 7: Membership Inference for IID Adaptations using Pythia 1.4B. We present the AUC scores obtained with reference, and Min-K% MIAs for the Pythia 1.4B model adapted on different datasets with $\varepsilon \in \{$ 0 . 1 , 8 , $\infty \}$
-
-![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_jY7fAo9rfK/figures/021_Table_8.jpg]]
-*Table 8: Membership Inference for OOD Adaptations using Pythia 410M. We present the AUC scores obtained with reference, and Min-K% MIAs for the Pythia 410M model adapted on different datasets with $\varepsilon \in \{$ 0 . 1 , 8 , $\infty \}$
-
-![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_jY7fAo9rfK/figures/022_Table_9.jpg]]
-*Table 9: Membership Inference for IID Adaptations using Pythia 410M. We present the AUC scores obtained with reference, and Min-K% MIAs for the Pythia 410M model adapted on different datasets with $\varepsilon \in \{$ 0 . 1 , 8 , $\infty \}$
-
-
-
 
 
 ## 定位与知识库关联
@@ -362,8 +326,6 @@ Table 22和Table 23报告了金丝雀暴露度结果。在ε=∞时，Prefix Tun
 ### 对后续工作的启示
 
 本文为DP适配研究提供了两个关键的方法论指导：（1）**隐私评估必须考虑预训练‑适配的分布关系**，仅报告理论ε值不足以表征实际风险；（2）**LoRA在多数场景下提供最佳的隐私‑效用权衡**（Figure 4），应作为DP适配的默认基线方法。这些发现为设计更安全的LLM适配策略指明了方向——未来的方法设计需要在适配能力与分布泄露风险之间取得平衡，而非单纯追求更低的ε值。
-
-
 
 ## 原文 PDF
 

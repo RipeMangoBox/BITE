@@ -131,8 +131,6 @@ AiOS 将多人全身网格恢复建模为**渐进式集合预测问题**，基�
 
 训练过程中，模型在三个阶段均施加监督信号，但消融实验表明，仅在第二阶段和第三阶段同时施加 SMPL-X 监督可获得最优性能（PA-PVE 39.9 mm），优于全阶段监督（42.7 mm）或仅在第三阶段监督（40.3 mm）。这种渐进式监督策略使模型在粗定位阶段专注于检测任务，而在后续阶段逐步聚焦于网格回归精度。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l12_AiOS_All_in_One_Stage_Expressive_Human_Pose_and_Shape_Estimation_motion20v2/figures/002_Figure_2.jpg]]
 *Figure 2: Pipeline overview. AiOS performs human localization and SMPL-X estimation in a progressive manner. It is composed of (1) the body localization stage that predicts coarse human location; (2) the Body refinement stage that refines body features and produces face and hand locations; (3) the Whole-body Refinement stage that refines whole-body features and regress SMPL-X parameters*
 
@@ -186,8 +184,6 @@ $$T_{wd} = [T_{bl}, T_{bj}, T_{lhl}, T_{lhj}, T_{rhl}, T_{rhj}, T_{fl}, T_{fj}]$
 
 - **受限注意力格式**：全注意力（所有令牌间自由交互）导致 PA-PVE 为 42.5 mm；仅人体间注意力为 41.7 mm；而 AiOS 采用的受限注意力（关节令牌仅在人体内交互，位置令牌可跨人体交互）取得最优的 39.9 mm。这表明在保持人体间上下文建模的同时，限制关节令牌的注意力范围可有效抑制噪声。
 - **渐进式 SMPL-X 监督**：仅在第 3 阶段施加 SMPL-X 监督（PA-PVE 40.3 mm）优于全阶段监督（42.7 mm），但在第 2、3 阶段同时监督取得最佳 39.9 mm。这说明过早引入全身参数回归会干扰早期阶段的人体定位学习，而适度的渐进式监督能平衡定位精度与网格回归质量。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l12_AiOS_All_in_One_Stage_Expressive_Human_Pose_and_Shape_Estimation_motion20v2/figures/009_Figure_5.jpg]]
 *Figure 5: Attention Visualization. The green dots represent the location of the reference point, and the red dots are the sampling points*

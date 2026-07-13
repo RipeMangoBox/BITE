@@ -52,8 +52,6 @@ claims:
 
 **主要结果**：在部件级生成测试集上，UniPart 在几何质量指标上显著超越现有方法，Chamfer Distance（CD）降至 **0.72**（×10²），F1@0.1 达到 **92.21**（×10²）（Table 1）。消融实验进一步验证了归一化规范空间（NCS）、局部注意力机制与空间嵌入注入三个设计对部件几何连贯性和组合精度的关键作用（Figure 7）。
 
-
-
 ### 部件级三维生成的需求与挑战
 
 三维内容生成在影视、游戏、工业设计等领域需求迫切，而**部件级三维生成**——即输出由独立语义部件组成的可分解三维模型——是实现可编辑、可交互三维资产的关键环节。与整体式生成不同，部件级生成要求模型同时输出高质量的几何形状和准确的语义分割，且部件之间需保持无缝组合，这对表征能力和生成控制提出了更高要求。
@@ -80,8 +78,6 @@ UniPart 的动机源于一个关键观察：在纯整体几何生成过程中，
 3. **端到端可控生成**：整个过程无需外部分割器，部件分割与几何生成共享同一隐空间，从机制上避免了信息解耦带来的质量退化。
 
 这种设计将部件感知从“后处理”提升为“原生能力”，为部件级三维生成提供了新的范式。
-
-
 
 ## 核心方法与创新机理
 
@@ -131,8 +127,6 @@ $$\mathcal{L}_{\mathrm{vecset}} = \mathcal{L}_{\mathrm{recon}} + \mathcal{L}_{\m
 
 消融实验（Figure 7）验证了该设计的必要性：去除 NCS 生成后部件几何扭曲且组合错位；去除局部注意力后部件内部结构不连贯；去除空间嵌入注入后双空间无法有效区分，导致位置和形状失真。最终，两个空间的潜变量通过共享的预训练几何解码器分别解码为网格 $\bar{\mathcal{M}}_i^{\mathrm{gcs}}$ 和 $\mathcal{M}_i^{\mathrm{ncs}}$，组合得到完整的部件级三维模型 $\mathcal{O} = \{\mathcal{M}_i\}_{i=1}^N$。
 
-
-
 UniPart 的整体流水线围绕一个核心设计展开：**将部件分割语义与三维几何编码进统一的隐空间**，并以此为基础构建两阶段级联扩散模型，实现从单张图像到可分解部件网格的端到端生成。流水线由三大模块串联构成（见图 2）。
 
 ### 1. Geom-Seg VAE：几何-分割联合隐空间
@@ -178,12 +172,8 @@ $$
 
 整个流水线的核心优势在于：部件分割并非后处理步骤，而是从隐空间构建之初就内嵌于表示之中，使得整体生成与部件精修共享同一语义空间，避免了传统“先生成再分割”范式中的几何-语义错位问题。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2616_https_arxiv_org_abs_2512_09435/figures/003_Figure_2.jpg]]
 *Figure 2: The pipeline of UniPart. It includes a Geom-Seg VAE that encodes both whole geometry and part segmentation information into a unified representation, Geom-Seg VecSet. The image-guided part-level generation adopts a two-level pipeline, where a whole-level DiT first generates the whole geometry and segmented part latent, and a part-level DiT then accepts the input image and the whole-part latent as conditions for dual-space part latent generation. The final object mesh is composed of each full-resolution part mesh*
-
-
 
 UniPart 的核心架构由三个关键模块构成：**Geom-Seg VAE**（统一几何-分割变分自编码器）、**Whole-level DiT**（整体级扩散Transformer）和**Part-level DiT**（部件级扩散Transformer），三者协同完成从单张图像到可分解部件网格的端到端生成。
 
@@ -207,9 +197,6 @@ $$\mathcal{L}_{\mathrm{cfm}}(\theta) = \mathbb{E}_{t, Z_0, \epsilon} \| v_{\thet
 
 其中 $Z_t = t Z_0 + (1-t) \epsilon$ 为扩散时间步 $t$ 处的隐变量。该模块的核心洞察在于：**纯整体几何生成过程中，扩散Transformer的自注意力已自发形成与语义部件高度相关的聚类**（如 Figure 1 所示，相同语义部件内的隐变量呈现强相关性）。基于此，UniPart 在整体生成后冻结分割解码器 $D_{\mathrm{seg}}$，对去噪后的全局隐变量 $\hat{Z}_0$ 进行部件标签预测，实现无需额外标注的隐式部件分割。同时，一个轻量位置解码器 $D_{\mathrm{pos}}$ 恢复每个隐向量的锚点三维坐标 $p_i^{\mathrm{latent}} = D_{\mathrm{pos}}(\hat{z}_i)$，辅助后续部件隐变量的空间定位。
 
-![[assets/figures/papers/paper_list_l2616_https_arxiv_org_abs_2512_09435/figures/002_Figure_1.jpg]]
-*Figure 1: Latent correlation maps from Hunyuan3D-2.1 DiT attention at inference. Latents (points) correlate strongly within the same semantic part, suggesting implicit part awareness*
-
 ### 3.3 Part-level DiT：双空间部件精修
 
 部件级扩散模型接收整体隐变量 $\hat{Z}_0$ 和分割掩码作为条件，对每个部件独立生成高质量几何。其关键设计是**双空间生成机制**：每个部件同时在全局坐标空间（GCS）和归一化规范空间（NCS）中表示，前者保持部件间的空间关系，后者消除全局位姿干扰以专注局部几何细节。
@@ -223,13 +210,6 @@ $$\mathrm{Attn}_{\mathrm{local}} = \mathrm{Softmax}\left(\frac{\sigma_q(X_i^s)^\
 $$\mathrm{Attn}_{\mathrm{global}} = \mathrm{Softmax}\left(\frac{\sigma_q(X_i^*)^\top \sigma_k(X_i^*)}{\sqrt{h}}\right) \sigma_v(X_i^*)$$
 
 此处 $X_i^*$ 为拼接了双空间隐变量的联合表示。消融实验（Figure 7）证实：去除 NCS 生成直接使用全局坐标会导致部件几何扭曲和组合错位；去除局部注意力使部件内部结构不连贯；去除空间嵌入注入则导致双空间无法有效区分，部件位置和形状均出现失真。最终，共享的预训练几何解码器将双空间部件隐变量解码为网格，通过坐标变换组合成完整的可分解三维物体 $\mathcal{O} = \{ \mathcal{M}_i \}_{i=1}^N$。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2616_https_arxiv_org_abs_2512_09435/figures/006_Figure_4.jpg]]
-*Figure 4: Generated results of our whole-level DiT. (a) Input image; (b) Generated whole-object geometry; (c) Generated part latent segmentation. Please zoom in for details*
-
-
 
 ## 实验与关键发现
 
@@ -285,8 +265,6 @@ Figure 8 系统展示了 UniPart 的典型失败案例，主要可归纳为以�
 - **细微结构退化**：薄壁结构或复杂拓扑连接处的几何重建仍存在退化现象，表现为网格不完整或表面噪声增加。
 
 这些失败模式揭示了当前方法的核心局限：统一的几何-分割隐空间虽能有效捕捉常见物体的部件结构，但对拓扑变异和极端几何的鲁棒性仍需提升，且对标注数据的依赖限制了其在新类别上的泛化能力。
-
-
 
 ## 定位与知识库关联
 
@@ -348,8 +326,6 @@ NCS 的引入为每个部件提供了归一化的局部坐标系，使部件几�
 4. **跨模态扩展**：统一的几何-分割隐空间如何扩展到文本或草图驱动的生成任务？这需要在条件注入机制上进行适配，使分割语义能够响应非图像模态的条件信号。
 
 5. **推理加速**：如何通过蒸馏、一致性模型或级联去噪调度策略降低两阶段扩散的联合推理成本，是走向实际应用的关键工程问题。
-
-
 
 ## 原文 PDF
 

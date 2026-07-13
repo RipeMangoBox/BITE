@@ -53,8 +53,6 @@ claims:
 
 DiKE 提供了一种基于闭式秩一更新的高效编辑方式，在不牺牲编辑效果的前提下显著提升对细粒度无关知识的保护，为知识编辑中的“副作用”问题提供了新的解决思路。
 
-
-
 知识编辑旨在对大型语言模型（LLM）中已存储的事实性知识进行精准修改，同时保持模型在无关知识上的行为不变。然而，现有方法在评估其破坏性时，通常只关注粗粒度的无关知识（例如与编辑目标完全不相关的Wikipedia段落），却忽视了细粒度无关知识——即与目标知识共享同一主题但关系不同的知识（Figure 1所示）。这种忽略造成了重要的安全漏洞：当用户编辑一个主题的某条知识时，可能会意外地改变模型对于同一主题在其他关系下的精细记忆，从而引入新的错误。
 
 我们对当前主流编辑方法的分析证实了这一缺口。如 Figure 1(a) 所展示，所有评估方法在细粒度无关知识上的保持性均显著低于在粗粒度无关知识上的表现。这一差异揭示了现有编辑技术的一个关键瓶颈：**当模型更新某个三元组 (s, r, o) 时，其表征空间中与主题 s 相关联的不同关系语义高度纠缠，导致编辑信号不可避免地泄漏到无关的关系表征中**，从而损害了模型对于 (s, r', o') 等细粒度无关知识的记忆。诸如 ROME、MEMIT、AlphaEdit 等代表性方法，在修改 FFN 权重时，其目标值计算与参数更新均直接作用于原始主题表征，未对不同关系下的语义子空间加以区分。这构成了现有方法的核心能力缺口：**缺乏一种机制，能够在编辑过程中将目标知识相关的表征与无关的表征解耦，并仅对相关部分施加干预**。
@@ -62,8 +60,6 @@ DiKE 提供了一种基于闭式秩一更新的高效编辑方式，在不牺牲
 正是基于这一观察，我们提出了 **DiKE（Disentangling Knowledge Representations for LLM Editing）** 框架。DiKE 的核心动机在于：**通过在编辑前显式地将主题表征分解为目标知识相关与无关的独立成分，将编辑操作限制在相关子空间，并在更新过程中施加无关成分的不变性约束**，从而实现精准的知识注入与细粒度无关知识保护之间的平衡。具体而言，DiKE 引入了**知识表征解耦模块（KRD）**，利用对比学习与知识一致性损失，将主题和关系表征映射到目标相关向量 $\mathbf{z}_e^r$ 与不相关向量 $\mathbf{z}_e^u$。在后续的**解耦知识编辑阶段（DKE）**，DiKE 仅优化 $\mathbf{z}_e^r$ 上的扰动来编码新知识，并显式要求更新后的 $\mathbf{z}_e^u$ 不变，从而避免对邻居细粒度知识的干扰。这一设计从根本上改变了现有方法“在纠缠空间中操作”的范式，转而**在解耦后的结构化子空间中进行最小化干预**。
 
 综上，本文的动机源于当前知识编辑技术在细粒度无关知识保持上的不足，目标是设计一种能明确分离主题表征中不同关系语义的框架，使得知识更新既高效又具有局部性，为安全可靠的 LLM 编辑提供新的解决路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -82,8 +78,6 @@ ROME 与 MEMIT 通过直接优化 FFN 的输入键 $k_*$ 对应的期望输出 $
 
 **创新点的因果链与证据汇流**  
 上述三个 slots 构成一条紧密的因果链：解耦→子空间扰动→不变性约束→结构化更新。其实证效果汇聚在 **FINE-KED 基准** 上：DiKE 在 GPT2-XL、GPT-J、LLaMA-3 上分别将细粒度保持性指标 Relational Locality 平均相对提升 **8.3%、8.2% 和 6.5%**（Table 2），同时保持编辑成功率（Efficacy）近乎 100%。消融实验进一步将增益归因于解耦组件的核心角色——移除 KRD 的对比损失（w/o CTR）或知识约束损失（w/o KC）会使 Relational Locality 大幅下降（Figure 3），说明无监督解耦与基于关系预测的约束正是实现语义分离、从而避免附带损害的本质驱动因素。同时，DiKE 在传统 COUNTERFACT 基准上保持竞争性能（Avg. 87.7–92.4，与 AlphaEdit 可比，Table 3），证明该创新在提升细粒度保持性的同时未牺牲通用编辑能力。
-
-
 
 ![[assets/figures/papers/iclr26_0014_PmRBeF2umZ_Disentangling_Knowledge_Representations_for_Larg/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the DiKE architecture. The framework operates in two distinct phases. (Left) KRD Training: The module extracts subject and relation representations from the LLM and learns to disentangle them into target-knowledge-related and -unrelated components via optimizing disentanglement, constraint, and reconstruction objectives. (Right) DKE Editing: During the editing phase, the pre-trained Disentangler is frozen. The DKE module utilizes the disentangled representations to derive a closed-form rank-one parameter update (Eq. (19)), which injects new knowledge into the target-related component while explicitly constraining the unrelated component to preserve fine-grained irrelevant knowle...*
@@ -125,8 +119,6 @@ DiKE 的整体 pipeline 由两个解耦且协同的阶段构成：**知识表征
 4. **权重更新**：利用 $\mathbf{v}^*$ 和 FIK 约束构造修正方程，通过闭式解一次性更新 $\mathbf{W}_{out}$。
 
 这种设计将知识编辑的因果干预严格限制在与目标关系对应的表征子空间内，从而在保证编辑效力（Efficacy）的同时，显著提升了对细粒度无关知识的保持度（Relational Locality）。
-
-
 
 DiKE 框架由两个核心模块构成：**知识表征解耦模块 (KRD)** 的训练阶段，以及在此基础上进行的 **基于解耦的知识编辑模块 (DKE)**。KRD 负责将主题表征分解为目标相关与无关的独立成分；DKE 则利用冻结的 KRD，仅在目标相关子空间施加扰动，并显式约束无关子空间不变，从而在更新知识的同时保护细粒度无关知识。图 2 给出了整体架构。
 
@@ -214,8 +206,6 @@ $$
 
 是标准 MEMIT 的秩一更新项；$\mathbf{E}$ 为由细粒度不变约束导出的正则化矩阵。相比 MEMIT，新增的 $(\mathbf{W}_3^T \mathbf{W}_3 + \mathbf{E})^{-1}$ 因子相当于在无关子空间的方向上对更新幅度进行选择性抑制，从而以闭式、高效的方式实现了对细粒度知识的显式保护。消融实验 (Figure 3) 中移除细粒度不变约束后，Hard 级别的 Relational Locality 显著下降，证实了该闭式约束的有效性。
 
-
-
 ## 实验与关键发现
 
 DiKE 的核心目标是在保证编辑成功率（Efficacy）的同时，显著提升对被编辑三元组共享主题但关系不同的细粒度无关知识的保持性（Relational Locality）。实验在 FINE-KED（新建的细粒度知识编辑基准）、COUNTERFACT 以及 MQUAKE-3K 上展开，涵盖 GPT2-XL、GPT-J 和 LLaMA-3 三个规模的模型，评测指标包括 Efficacy、Relational Locality（按 Easy/Middle/Hard 等级划分）、Paraphrase 和 Neighborhood 分数。所有基线方法（FT、MEND、ROME、MEMIT、AlphaEdit 及加入关系约束的 ROME-C、MEMIT-C）均按统一协议调参或使用官方实现。
@@ -263,15 +253,11 @@ DiKE 的核心目标是在保证编辑成功率（Efficacy）的同时，显著�
 
 整体而言，实验结果强有力地证明：通过将主题表征显式解耦为目标知识相关与不相关的分量，并仅对相关分量施加编辑、同时约束不相关分量不变，可以从机理上缓解大模型编辑中细粒度知识的灾难性遗忘。该方法的主要代价在于需预先训练 KRD 模块，但其一次训练、多次使用的策略已通过批量编辑和不同模型上的优异表现展示了实际可行性。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0014_PmRBeF2umZ_Disentangling_Knowledge_Representations_for_Larg/figures/001_Figure_1.jpg]]
 *Figure 1: Knowledge editing can unintentionally affect fine-grained irrelevant knowledge. Figure (a): Preservation performance on fine-grained vs. coarse-grained irrelevant knowledge. Figure (b): Illustration of knowledge editing can unintentionally affect fine-grained irrelevant knowledge*
 
 ![[assets/figures/papers/iclr26_0014_PmRBeF2umZ_Disentangling_Knowledge_Representations_for_Larg/figures/013_Table_9.jpg]]
 *Table 9: Performance comparison in terms of Efficacy Score (%), Paraphrase Score (%), and Neighborhood Score (%). The Avg. (%) is the harmonic mean of the three evaluation metrics*
-
-
 
 ## 定位与知识库关联
 
@@ -324,8 +310,6 @@ DiKE 的核心创新——**通过子空间解耦保护细粒度知识**——�
 2. **全维度知识保护**：如何在单次编辑中同时处理同关系‑不同主题、跨主题‑跨关系的复杂牵连，构建更通用的知识编辑安全框架？  
 3. **基准的生态升级**：FINE‑KED 目前覆盖 3,085 个样本（Table 4），难度分层具有启发性，但真实世界的多样性（时间敏感知识、多源冲突、长尾关系）需要更系统的基准来捕捉，从而推动方法从原理验证走向部署。  
 4. **解耦子空间的鲁棒性与自修复**：在序列编辑、持续学习和分布变化下，解耦子空间是否会发生混合或退化？是否需要引入重训练、正则化或自适应调整机制以维持边界？这些问题的回答将决定“表征解耦增强编辑”这一技术路线的长期可行性。
-
-
 
 ## 原文 PDF
 

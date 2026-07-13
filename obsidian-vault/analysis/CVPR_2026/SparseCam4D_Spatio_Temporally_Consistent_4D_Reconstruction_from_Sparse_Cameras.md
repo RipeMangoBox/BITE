@@ -210,8 +210,6 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{input}} + \mathcal{L}_{\mathrm{gen}} + \mat
 
 其中 $\mathcal{L}_{\mathrm{TV}}$ 为空间特征平面的总变分平滑正则项。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2603_26481/figures/011_Figure_6.jpg]]
 *Figure 6: Visualization of the STDF. Spatio-Temporal Distortion Field output is rendered as a per-primitive attribute, with brighter regions indicating higher distortions (left). The corresponding areas in the input generated image (right) align with regions exhibiting noticeable deformation (red box)*
 
@@ -227,9 +225,6 @@ SparseCam4D 在三个标准动态场景基准上进行了系统评估：**Techni
 *Table 1: Qualitative comparisons on Technicolor [26], Neural 3D Video [13], and Nvidia Dynamic Scenes [46] Datasets. The first and second best performances are highlighted in red and yellow. Our method shows superior performance compared to all baseline methods across all metrics. Note that MonoFusion∗ is our reproduced version*
 
 定性对比（Figure 4）进一步验证了本方法在细节清晰度和时空一致性上的显著优势：基线方法在稀疏输入下普遍出现模糊、伪影或时序抖动，而 SparseCam4D 保持了照片级真实感和稳定的动态表现。
-
-![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2603_26481/figures/005_Figure_4.jpg]]
-*Figure 4: Qualitative Comparisons of different methods on Technicolor [26], Neural 3D Video [13], and Nvidia Dynamic Scenes [46] Datasets. We conduct comparisons with representative dynamic scene reconstruction methods: MonoFusion [35], 4DGS [38], 4D-Rotor [5], and Realtime4DGS [43]. MonoFusion∗ is our reproduced version. Our method significantly outperforms other baselines, producing visually reliable results with sharper details. Please zoom in for more details. Additional qualitative comparisons are included in the supplementary material*
 
 ### 消融实验
 
@@ -260,9 +255,6 @@ Table 3 消融了姿态优化和各损失项。**关闭相机姿态优化**后�
 
 Table 4 展示了使用 **ViewCrafter** 作为替代生成先验的结果。加入 STDF 后，PSNR 从 21.42 dB 提升至 23.93 dB（+2.51 dB），验证了 STDF 对不同视频扩散模型（VDMs）的泛化能力——扭曲场的设计不依赖于特定生成模型，而是对生成不一致性这一普遍问题提供通用解耦机制。
 
-![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2603_26481/figures/008_Table_4.jpg]]
-*Table 4: Ablation study with alternative video diffusion models (VDMs) on Cook Spinach*
-
 ### 失败模式与局限性
 
 本方法的性能高度依赖所使用视频扩散模型的生成质量。当输入场景处于模型训练域外（如人物数据稀少）或点云渲染条件质量较低时，生成帧可能出现严重变形和幻影，此时 STDF 虽能部分缓解，但重建质量仍会下降。此外，当前验证仅覆盖 2–3 个相机视图的设置；对于更极端的稀疏条件（如单目或单视图），管道的适用性尚需进一步研究。测试时需对测试视图进行额外的姿态对齐优化，略微增加了实际部署的复杂度。
@@ -276,17 +268,6 @@ Table 4 展示了使用 **ViewCrafter** 作为替代生成先验的结果。加�
 - **Figure 4**：定性对比，展示本方法在细节和时空一致性上的优势。
 - **Figure 5**：时空一致性可视化，无扭曲场时出现严重模糊和时间不稳定。
 - **Figure 6**：STDF 输出可视化，高扭曲区域与生成图像中的明显变形区域吻合。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2603_26481/figures/010_Figure_7.jpg]]
-*Figure 7: Spatio-Temporal consistency on ReCamMaster*
-
-![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2603_26481/figures/012_Figure_8.jpg]]
-*Figure 8: Visualization of selected training cameras. The nonred frustums denote the cameras used for training, corresponding to the images shown at the bottom and on the right respectively. The remaining red frustums indicate the cameras used for evaluation*
-
-![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2603_26481/figures/017_Figure_11.jpg]]
-*Figure 11: Visualization of one failure case. From left to right are the source image and point-cloud–rendering condition provided to ViewCrafter, the corresponding generated image, and a Gaussian rendering near that generated image. Since ViewCrafter is primarily trained on scene-centric data with few human subjects, this example suffers from an out-of-domain issue. In addition, the quality of the point-cloud–rendering condition is relatively low. These factors jointly lead to low-quality generated images, which in turn degrade the Gaussian reconstruction quality on the human body*
 
 ## 定位与知识库关联
 

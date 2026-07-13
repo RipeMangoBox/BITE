@@ -50,8 +50,6 @@ claims:
 
 在 SCAND 数据集上，AutoTraces 的 L2 误差显著低于所有基线方法（T=5: 0.674 m，T=8: 0.923 m，T=10: 1.089 m），其中在 T=10 时相对于 CityWalker（Liu et al., CVPR 2025）降低 22.6%，相对于基础模型 LLaVa-Video（Zhang et al., TMLR 2025）降低 40.4%。在跨场景泛化实验中，AutoTraces 在未见过的 GoStanford（室内）和 RECON（室外）数据集上均优于 LLaVa-Video，尤其在 RECON 上 T=8 和 T=10 的 L2 误差分别降低 30.0% 和 32.6%。在长周期预测（T=12–20）中，AutoTraces 的指令执行准确率高达 99.92%，远超 LLaVa-Video 的 40.34%，且每条路径仅需 25.00 个 token（LLaVa-Video 需 375.64 个），token 效率提升约 15 倍。
 
-
-
 轨迹预测是自主导航与机器人交互的核心能力，要求模型在动态环境中根据历史观测推断未来路径。近年来，多模态大语言模型（MLLM）凭借强大的视觉理解和推理能力，在各类具身任务中展现出显著潜力。然而，将 MLLM 应用于密集轨迹预测仍面临两个根本性瓶颈。
 
 **坐标表示的效率困境。** 现有基于 LLM 的轨迹预测方法将航点坐标转化为文本 token 序列，每个坐标需多个 token 表示。这种文本化方案不仅造成 token 消耗膨胀，更关键的是割裂了坐标数值与 LLM 隐空间之间的语义对齐——模型需通过语言建模间接“猜测”连续物理量，导致空间精度损失和推理效率低下。
@@ -61,8 +59,6 @@ claims:
 上述瓶颈在长周期预测场景下尤为突出。当预测步长从常规的 5-10 步扩展到 12-20 步时，文本化方案的单条路径 token 消耗可达数百量级，而非自回归范式则因误差累积而严重偏离真实轨迹。此外，现有方法普遍缺乏对社会交互的显式推理——转弯避让、人群穿行等复杂行为需要模型理解场景语义而非简单拟合运动模式。
 
 AutoTraces 正是针对这两大瓶颈提出：通过引入 `<point>` 特殊 token 作为航点的统一表示单元，配合 Point Encoder-Point Head 的编码-解码架构，将连续坐标无缝嵌入 LLM 隐空间；同时利用 LLM 原生的自回归机制，实现航点逐帧生成与反馈闭环，使每一步预测都以前序输出为条件。在此基础上，通过自动化思维链（CoT）生成机制，模型被赋予对环境障碍和社会交互的显式推理能力。这一设计既保留了预训练 MLLM 的语义理解和推理能力，又在物理空间中实现了高精度、高效率的自回归轨迹预测。
-
-
 
 ## 核心方法与创新机理
 
@@ -135,8 +131,6 @@ AutoTraces 利用 LLM 原生的自回归机制，实现 **航点级自回归生�
 
 三个 changed slots 形成协同效应：点分词方案使自回归生成在 token 效率上可行，自回归机制为 CoT 推理提供了逐航点的决策上下文，而 CoT 推理又增强了自回归预测在社会交互场景下的准确性。
 
-
-
 AutoTraces 是一个以 **LLaVa-Video**（Zhang et al., TMLR 2025）为基座的自回归视觉-语言-轨迹模型，核心目标是在复杂社会场景中实现高精度、可推理的密集轨迹预测。其整体 pipeline 围绕一个关键设计展开：将每个二维航点抽象为单一的特殊 **`<point>` token**，通过编码器-解码器架构在 LLM 内部无缝融合轨迹、视觉与文本多模态信息，既保留了预训练 LLM 的推理能力，又实现了物理空间中的逐步自回归预测。
 
 ### 模块组成与数据流
@@ -173,8 +167,6 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{point}} + \mathcal{L}_{\ma
 ### 与先前 LLM 方案的关键差异
 
 相比将轨迹预测转化为纯文本生成任务的先前方案（需多个文本 token 表示单个坐标），AutoTraces 通过 `\<point\>` token 的引入，将每个航点的表示压缩为单一 token，大幅降低了 token 消耗（长周期预测中每条路径仅需 25.00 个 token，而 LLaVa-Video 需 375.64 个）。同时，非自回归方法一次生成完整未来序列，无法捕捉时间动态，而 AutoTraces 的航点级自回归设计使其能够灵活调整预测长度，并在逐步生成过程中持续利用历史信息进行条件更新。
-
-
 
 AutoTraces 的整体架构建立在 **LLaVa-Video**（Zhang et al., TMLR 2025）之上，通过引入三个关键模块——**Point Encoder**、**Point Head** 和**自动化思维链（CoT）生成机制**——将多模态大语言模型改造为自回归轨迹预测器。以下逐一解析各模块的设计逻辑与核心公式。
 
@@ -230,24 +222,14 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{point}} + \mathcal{L}_{\ma
 
 其中 $\mathcal{L}_{\mathrm{point}}$ 为未来 $F$ 步航点的 L1 回归损失，$\mathcal{L}_{\mathrm{LLM}}$ 为文本 token 的标准交叉熵损失（用于监督 CoT 推理和结构化输出）。第一阶段在视频-文本对上进行 CoT 预训练，第二阶段引入轨迹数据联合微调，使模型同时掌握推理知识与精确预测能力。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2295_https_arxiv_org_abs_2603_07989/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison between our AutoTraces and previous LLM solutions. Our method introduces point tokens and embeddings for waypoint representation, enabling autoregressive prediction*
-
-![[assets/figures/papers/paper_list_l2295_https_arxiv_org_abs_2603_07989/figures/003_Figure_3.jpg]]
-*Figure 3: Illustration of the CoT generation for AutoTraces, incorporating visual observations and trajectory analysis. Red points and lines denote the historical trajectory, while blue points and lines denote the ground-truth trajectory. Action annotations (R: right, L: left, S: straight) are marked along the trajectory*
-
-
 
 ## 实验与关键发现
 
 ### 主实验结果：SCAND 数据集
 
 AutoTraces 在 SCAND 数据集上以单模型统一设置全面超越所有基线方法。Table 1 报告了预测步长 T=5、8、10（每步间隔 1s）下的 L2 和 L1 误差。核心结果如下：
-
-![[assets/figures/papers/paper_list_l2295_https_arxiv_org_abs_2603_07989/figures/004_Table_1.jpg]]
-*Table 1: Performance evaluation of trajectory prediction over 5 to 10 steps on SCAND dataset [20], with an interval of 1s per step. Baselines with gray background are specifically trained and tested on fixed trajectory lengths. In contrast, “Single Model” variants are predominantly trained on T=10 sequences (except NoMad trained on T=8) and evaluated across all horizons under truncated-length settings*
 
 - **T=10 时 L2 误差 1.089 m**，相比最强基线 CityWalker 的 1.407 m 降低 **22.6%**，相比基础模型 LLaVa-Video 的 1.548 m 降低 **40.4%**。
 - 在更短预测步长下优势同样显著：T=5 时 L2 仅 0.674 m，T=8 时为 0.923 m。
@@ -258,9 +240,6 @@ AutoTraces 在 SCAND 数据集上以单模型统一设置全面超越所有基�
 ### 跨场景泛化：GoStanford 与 RECON
 
 Table 2 展示了在未见场景上的泛化能力。AutoTraces 在两个数据集上均一致优于其基础模型 LLaVa-Video：
-
-![[assets/figures/papers/paper_list_l2295_https_arxiv_org_abs_2603_07989/figures/005_Table_2.jpg]]
-*Table 2: Performance evaluation of cross-scene trajectory prediction on unseen GoStanford dataset [17] for indoor and RECON dataset [39] for outdoor scenarios with prediction horizon ranging from 5 to 10 steps, with an interval of 1s per step*
 
 - **GoStanford（室内）**：T=10 时 L2 误差 1.772 m，LLaVa-Video 为 2.141 m，相对降低 17.2%。
 - **RECON（室外）**：T=8 时 L2 从 3.557 m 降至 2.490 m（降低 **30.0%**），T=10 时从 4.211 m 降至 2.837 m（降低 **32.6%**）。
@@ -311,8 +290,6 @@ Figure 5 展示了 AutoTraces 与基线方法在 SCAND 上的预测轨迹可视�
 
 部分基线模型（Table 1 灰色行）使用固定预测长度分别训练和评估，而 AutoTraces 以单模型评测所有长度。尽管存在这一设定差异，AutoTraces 在单模型设置下仍全面超越所有基线。在跨场景泛化实验中，对比基础模型 LLaVa-Video 时，两者使用相同的视觉编码器和 LLM 架构，差异仅来自点分词方案、自回归机制和 CoT 训练策略，对比公平性较好。
 
-
-
 ## 定位与知识库关联
 
 ### 1. 问题定位：LLM 轨迹预测中的表征瓶颈与生成范式缺陷
@@ -359,8 +336,6 @@ AutoTraces 处于三个研究方向的交叉点：
 - **实时性约束**：自回归逐点生成虽然保证了预测质量，但在需要高频实时预测的场景中，逐 token 解码的延迟是否满足要求，论文未提供推理延迟数据。
 
 > **注意**：上述适用边界和开放问题中关于“纯轨迹预测性能”“CoT 质量人工评估”“推理延迟”等论断，在已验证分析中未找到直接实验证据支撑，属于从方法设计出发的合理推断，需读者结合自身场景手动验证。
-
-
 
 ## 原文 PDF
 

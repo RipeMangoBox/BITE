@@ -47,8 +47,6 @@ claims:
 
 在 AMASS 基准的两个协议上，FisherPoser 均取得最优结果：Protocol 1 上 MPJRE 降至 2.04°（相对提升 10.5%），MPJPE 降至 29.7 mm（提升 6.9%）；Protocol 2 上 MPJRE 降至 3.89°（提升 8.9%），Jitter 降至 3.18（相对降低 36.3%）。消融实验进一步验证，移除区域令牌与层次递归设计会使 MPJPE 从 29.7 mm 升至 38.7 mm，而将 Matrix-Fisher 替换为欧氏空间高斯分布则导致 MPJPE 升至 45.0 mm 且时间平滑性严重恶化，确认了 SO(3) 流形上适当不确定性参数化与区域/层次设计的必要性。
 
-
-
 ### 稀疏VR运动估计的歧义困境
 
 在消费级虚拟现实（VR）设备中，用户通常仅佩戴头戴显示器（HMD）和双手控制器，共提供三个6-DoF追踪信号。要从这极度稀疏的观测中恢复包含22个关节的全身运动，本质上是一个严重欠定的逆问题：同一组稀疏输入可能对应无数种合理的全身姿态——例如，HMD和手部位置固定时，下肢可以站立、下蹲、交叉或迈步。现有的确定性回归方法（如**AvatarPoser** (Jiang et al., ECCV 2022)、**AGRoL** (Du et al., CVPR 2023)、**AvatarJLM** (Zheng et al., ICCV 2023)、**SAGE** (Feng et al., CVPR 2024)、**HMDPoser** (Dai et al., CVPR 2024)、**RPM-Reactive** (Barquero et al., CVPR 2025)）直接学习从稀疏输入到单一姿态的映射，在面临这种一对多歧义时，往往产生脆性的平均化解，导致下肢姿态抖动、运动学不一致，且无法告知用户“哪些关节的估计不可靠”。
@@ -64,8 +62,6 @@ claims:
 ### 核心动机：概率化、区域化、层次化
 
 FisherPoser的核心动机是系统性地填补上述三个缺口。首先，将姿态估计重新定义为**SO(3)流形上的概率推断问题**，为每个关节预测一个矩阵-Fisher（Matrix-Fisher）分布——其模态给出最可能的旋转，浓度参数量化旋转不确定性，从而在几何一致的空间中实现校准的逐关节置信度。其次，引入**身体分区表示**，将身体划分为躯干、左右臂、左右腿五个运动学区域，通过区域特定令牌驱动局部化的矩阵-Fisher回归，使模型能够为观测弱区分配差异化容量。最后，设计**沿运动链的层次化递归解码器**，从父关节向子关节顺序传播姿态分布与不确定性，将运动学先验显式注入推理过程，既提升运动一致性，又利用父关节信息约束子关节的歧义空间。
-
-
 
 ## 核心方法与创新机理
 
@@ -99,8 +95,6 @@ $$\mathbf{f}_{t}^{(c)} = [\mathbf{z_H}_{t}; \mathbf{\mathcal{T}}_{r(c),t}; \math
 
 Table 2 的消融结果表明，区域令牌与层次递归具有互补性——两者联合移除导致性能大幅退化，验证了“区域感知提供语义先验 + 层次递归保证运动学一致性”的双重设计逻辑。
 
-
-
 FisherPoser 的整体 pipeline 将稀疏 VR 观测（三个 6‑DoF 追踪器：HMD 及左右手柄）映射为全身体姿的概率推断，核心由三个级联模块构成（Figure 2）：
 
 ![[assets/figures/papers/paper_list_l1047_https_openaccess_thecvf_com_content_CVPR2026_html_Xia_FisherPoser_Human/figures/002_Figure_2.jpg]]
@@ -116,13 +110,6 @@ FisherPoser 的整体 pipeline 将稀疏 VR 观测（三个 6‑DoF 追踪器：
    沿四肢运动链（肩→肘→腕，髋→膝→踝）顺序传播父关节的分布信息。子关节的特征向量显式拼接父关节的 Matrix‑Fisher 参数矩阵 $F_{\mathrm{pred},t}^{(p)}$ 及其浓度向量 $\mathbf{u}_{\mathrm{pred},t}^{(p)}$，与全局上下文和区域令牌共同输入细化网络。直接预测的分布 $F_{\mathrm{dir},t}^{(c)}$ 与递归传播得到的分布 $F_{\mathrm{prop},t}^{(c)}$ 通过可学习的混合系数 $\lambda$ 融合，形成子关节的最终分布。这一设计在保持运动学一致性的同时，使不确定性沿运动链向下游关节传导。
 
 **输入/输出流**：输入为每帧三个追踪器的 6‑DoF 位姿，输出为 22 个关节各自在 SO(3) 上的 Matrix‑Fisher 分布。分布的模态给出最可能旋转，浓度参数量化逐关节置信度——弱观测关节（如下肢远端）自动获得低浓度（高不确定性），强观测关节（如头部、手部）获得高浓度（低不确定性）。训练时通过负对数似然损失 $\mathcal{L}_{MF}$ 和测地线模态对齐损失 $\mathcal{L}_{\mathrm{mode}}$ 联合优化，推理时直接取模态旋转作为确定性姿态估计。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1047_https_openaccess_thecvf_com_content_CVPR2026_html_Xia_FisherPoser_Human/figures/001_Figure_1.jpg]]
-*Figure 1: FisherPoser can estimate the full-body motion using three tracking signals (HMD and hand controllers)*
-
-
 
 FisherPoser 的核心架构由三个级联模块构成（Figure 2），其设计逻辑是：先通过自回归时序编码器提取全局运动上下文，再按身体区域构建区域令牌以驱动局部矩阵-Fisher 分布预测，最后沿四肢运动链递归传播父关节的姿态与不确定性，实现运动学一致的逐关节概率估计。
 
@@ -194,12 +181,8 @@ $$
 
 此外还引入了物理相关损失项（如速度、加速度平滑约束），具体细节见补充材料。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1047_https_openaccess_thecvf_com_content_CVPR2026_html_Xia_FisherPoser_Human/figures/003_Figure_4.jpg]]
 *Figure 4: Visualization on the changes in concentration of left knee; the lower the concentration, the higher uncertainty*
-
-
 
 ## 实验与关键发现
 
@@ -254,12 +237,8 @@ Figure 4 可视化了左膝关节的浓度参数随时间的变化曲线。在
 
 FisherPoser 在所有指标上均取得最优，且消融实验证实其三个核心设计——SO(3) 上 Matrix-Fisher 分布、五区域令牌、层次递归传播——是互补且必要的。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1047_https_openaccess_thecvf_com_content_CVPR2026_html_Xia_FisherPoser_Human/figures/005_Figure_5.jpg]]
 *Figure 5: Visualization results for ablation study*
-
-
 
 ## 定位与知识库关联
 
@@ -304,8 +283,6 @@ FisherPoser 的设计假设和适用边界需明确认识：
 **人-物交互建模。** 当人体与物体接触时（如坐椅子、推桌子），接触约束可提供强先验。将交互约束编码为 Matrix-Fisher 分布的附加条件，有望同时提升姿态估计的物理合理性和不确定性校准质量。
 
 **跨域泛化。** 当前方法在 AMASS 基准上验证，向真实 VR 设备部署时需处理传感器噪声特性差异、用户身体尺寸变化和实时性约束。FisherPoser 的概率输出天然适合与传感器融合框架结合，但实时推理效率尚需验证。
-
-
 
 ## 原文 PDF
 

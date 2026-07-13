@@ -76,8 +76,6 @@ SenseSearch 定位于**代理式搜索-推理VLM**的交叉地带，其方法谱
 
 与 **Visual-ARFT**（Liu et al., ICCV 2025）和 **DeepMMSearch-R1**（Narayan et al., arXiv 2025）等多工具视觉推理代理相比，SenseSearch 首次在纯RL框架下同时优化三类工具调用，并通过 BN-GSPO 解决了多工具联合训练的稳定性问题。
 
-
-
 视觉语言模型（VLM）在通用视觉问答上取得了显著进展，但在**高分辨率、知识密集型**场景中仍存在两个关键瓶颈：
 
 **1. 静态知识瓶颈。** 传统VLM依赖预训练阶段内化的参数化知识，面对需要实时、细粒度或长尾外部知识的查询时，往往产生幻觉或过时答案。尽管近期工作（如 **MMSearch-R1**，Wu et al., arXiv 2025）引入了文本搜索与图像搜索工具来缓解这一问题，但其工具空间仍受限于检索操作，无法对高分辨率图像本身进行精细感知。
@@ -87,8 +85,6 @@ SenseSearch 定位于**代理式搜索-推理VLM**的交叉地带，其方法谱
 **现有方案的结构性缺陷：** 搜索型代理VLM（如MMSearch-R1）和基于图像裁剪的VLM（如 **DeepEyes**，Zheng et al., ICLR 2026）各自解决了问题的一个侧面，但将二者割裂导致模型无法在“向外搜索”与“向内观察”之间进行自适应权衡。此外，将多工具动作空间统一到强化学习框架中面临**奖励方差大、训练不稳定**的挑战，标准GRPO/GSPO算法难以直接应对。
 
 **本文动机：** 基于上述缺口，SenseSearch旨在构建首个端到端的代理式高分辨率VLM，通过强化学习统一文本搜索、图像搜索与图像裁剪三类工具，使模型在推理过程中学会动态调度工具，同时以稳定的RL算法支撑多工具策略的学习。
-
-
 
 ## 核心方法与创新机理
 
@@ -112,8 +108,6 @@ SenseSearch的核心创新在于将**高分辨率视觉感知**与**多工具代
 ### 创新点的协同关系
 
 上述三个创新点并非孤立存在：工具空间的扩展定义了更丰富的动作空间，但也带来了更复杂的策略学习挑战；BN-GSPO正是为解决这一挑战而设计的稳定训练算法；而三阶段数据流水线则为整个训练过程提供了必要的监督信号。三者共同构成“**工具定义—算法优化—数据供给**”的闭环，使SenseSearch能够动态协调搜索与裁剪工具，在知识密集型和高分辨率视觉推理任务上取得突破性性能。
-
-
 
 SenseSearch 的整体设计遵循“冷启动监督微调 + 强化学习”两阶段训练范式，将文本搜索、图像搜索与图像裁剪三类工具统一于一个代理式视觉语言模型（VLM）的动作空间中，使模型在多轮推理过程中能够自适应地选择并调用工具，以应对知识密集型与高分辨率视觉理解任务。
 
@@ -165,12 +159,8 @@ SenseSearch 的训练分为两个阶段：
 
 整个框架的核心因果关系在于：**多工具动作空间的统一** 解决了静态知识瓶颈与高分辨率感知不足的问题，而 **BN-GSPO 的两层归一化** 则保证了多工具联合训练的稳定性。消融实验证实，若仅使用单一任务数据（纯搜索或纯裁剪），对应任务的性能会显著下降；混合数据训练是学习统一多工具策略的关键。随着 RL 训练推进，模型学会更高效的工具调用策略，平均工具调用次数从约 4 次逐步降至约 2 次（**Figure 4**），表明策略模型确实内化了工具选择的效率意识。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2200_https_openaccess_thecvf_com_content_CVPR2026_html_Chng_SenseSearch_Empow/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of SenseSearch. (a) SenseSearch tackles the challenging visual task by leveraging an integrated suite of text search, image search, and image crop tools within the reasoning process. (b) Our proposed HR-MMSearch benchmark characterized by the highresolution images, knowledge-intensive question and diverse scenes. (c) Comparison of VLMs on the search-oriented benchmarks*
-
-
 
 ### 3.1 工具空间与代理架构
 
@@ -256,8 +246,6 @@ $$
 
 该流水线最终产出约 3k 条多轮轨迹用于冷启动 SFT，以及混合搜索与裁剪任务的 RL 训练数据。
 
-
-
 ## 实验与关键发现
 
 ### 实验设置
@@ -286,8 +274,6 @@ SenseSearch 以 **Qwen2.5-VL-7B-Instruct**（Bai et al., arXiv 2025）为基础�
 
 论文未系统性报告失败案例或错误模式。从实验设计推断，潜在局限包括：① 工具调用依赖预定义的动作空间，面对未覆盖的工具类型时泛化能力未知；② 奖励模型基于 LLM-as-a-judge，其评估偏差可能影响 RL 训练方向；③ 高分辨率裁剪工具的实际效果受限于底层视觉编码器的分辨率上限。以上需在后续工作中进行针对性验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2200_https_openaccess_thecvf_com_content_CVPR2026_html_Chng_SenseSearch_Empow/figures/004_Table_1.jpg]]
 *Table 1: Performance on search-oriented benchmarks under Direct Answer, RAG Workflow, and Agentic Model workflows*
 
@@ -296,14 +282,6 @@ SenseSearch 以 **Qwen2.5-VL-7B-Instruct**（Bai et al., arXiv 2025）为基础�
 
 ![[assets/figures/papers/paper_list_l2200_https_openaccess_thecvf_com_content_CVPR2026_html_Chng_SenseSearch_Empow/figures/006_Table_2.jpg]]
 *Table 2: Performance on visual understanding benchmarks*
-
-![[assets/figures/papers/paper_list_l2200_https_openaccess_thecvf_com_content_CVPR2026_html_Chng_SenseSearch_Empow/figures/007_Table_3.jpg]]
-*Table 3: Effectiveness of Proposed BN-GSPO*
-
-![[assets/figures/papers/paper_list_l2200_https_openaccess_thecvf_com_content_CVPR2026_html_Chng_SenseSearch_Empow/figures/008_Table_4.jpg]]
-*Table 4: Impact of different data distribution on RL performance*
-
-
 
 ## 定位与知识库关联
 
@@ -344,8 +322,6 @@ SenseSearch 处于**代理式搜索型视觉语言模型**这一新兴分支。�
 - BN-GSPO的两层归一化是否在其他工具组合或更大规模模型上同样有效，仍需跨架构验证。
 - 冷启动数据的合成流水线依赖三阶段质量验证，其自动化程度和可复现性细节在论文中未充分展开。
 - 图像裁剪工具的调用策略（何时裁剪、裁剪区域如何确定）是否可以通过RL自发涌现更优的启发式规则，是一个值得深入的方向。
-
-
 
 ## 原文 PDF
 

@@ -51,15 +51,11 @@ GuardSpace 通过因果性设计直接解决这一冲突。其核心洞察在于
 
 实验证据强有力地支撑了该方法。在 Llama-2-7B-Chat 上微调 GSM8K 时，GuardSpace 将平均有害分数从 14.4%（最先进方法 AsFT）降至 3.6%，同时将准确率从 26.0% 提升至 28.0%。在 SST-2、AGNEWS 和 GSM8K 三个数据集上的平均结果进一步验证了其有效性：有害分数从 8.10% 降至 2.70%，微调准确率从 62.78% 提升至 64.36%。消融研究揭示了零空间投影器的决定性作用——移除后有害分数从 3.60% 飙升至 52.00%，证明该投影器是安全保持的主要驱动力。
 
-
-
 大语言模型（LLM）在预训练阶段通过安全对齐（如 RLHF）获得了拒绝有害请求的能力，但这一能力在微调阶段极易退化。即便使用完全良性的下游数据（如 GSM8K 数学推理、SST-2 情感分析）或采用参数高效的 LoRA 方法，微调后的模型仍可能对有害提示产生响应。现有方法（如 AsFT）尝试通过正则化约束来保持安全行为，但未能明确识别预训练权重中哪些组件与安全机制相关、哪些更新方向会破坏安全对齐，导致安全保持与下游任务性能之间存在根本性冲突。
 
 本文的核心洞察在于：安全对齐的退化源于微调更新干扰了安全相关的权重组件，并改变了模型在有害输入上的输出分布。基于此，作者提出 GuardSpace——一种将安全保持问题分解为两个正交环节的方法：首先，通过协方差预条件奇异值分解（SVD）将预训练权重显式分解为安全相关组件（大奇异值对应的分量）和安全无关组件（小奇异值对应的分量）；然后，构建一个零空间投影器，将适配器的更新约束在有害输入的零空间内。这一设计的因果机制在于：冻结安全相关组件保留了原始的安全机制，从安全无关组件初始化适配器确保了训练起点不破坏安全行为，而零空间投影器则保证在整个微调过程中，适配器更新在有害输入上的净效果为零，从而维持输出分布不变。
 
 实验证据有力地支撑了这一设计。在 Llama-2-7B-Chat 上的主实验（Table 1）显示，GuardSpace 在 SST-2、AGNEWS 和 GSM8K 三个数据集上将平均有害分数从基线 AsFT 的 8.10% 降至 2.70%，同时将平均微调准确率从 62.78% 提升至 64.36%。消融研究（Table 4）进一步揭示了零空间投影器的关键作用：移除投影器后，有害分数从 3.60% 飙升至 52.00%，证明投影器是安全保持的主要驱动力。此外，适配器秩的选择（Appendix B.3）表明，使用少量安全无关组件（r=128–512）即可保持低有害分数和高准确率，而过大的 r（1024）会导致安全退化，这验证了安全相关与安全无关组件分离的有效性。
-
-
 
 ## 核心方法与创新机理
 
@@ -85,8 +81,6 @@ GuardSpace 的核心创新在于将安全保持的瓶颈从“隐式正则化”
 
 **与其他方法的本质区别**：GuardSpace 将安全保持问题从“正则化”范式（如 AsFT 的软约束）转变为“子空间隔离与硬约束”范式。它显式识别并冻结安全相关权重，将可学习容量限制在安全无关子空间，并通过零空间投影器确保更新不改变有害输入上的输出。这种设计不仅保持了安全行为，还通过减少训练冲突提升了下游任务性能。
 
-
-
 ![[assets/figures/papers/iclr26_0002_887vde4ZAW_A_Guardrail_for_Safety_Preservation_When_Safety-/figures/001_Figure_1.jpg]]
 *Figure 1: An overview of GuardSpace. The model is first probed with safety-triggering prompts to obtain the activation X and the covariance matrix $\mathbf { C } = \mathbf { X } \mathbf { X } ^ { \top }$ . I. Initialization in safety-sensitive subspace. We right-precondition the weight by C and factorize $\mathbf { W } \mathbf { C } = \mathbf { U } \mathbf { \Sigma } \mathbf { \Sigma } \mathbf { V } ^ { \top }$ The components with large singular values constitute the safety-relevant subspace (cyan) and are frozen into W′, while the components with small singular values form the safety-irrelevant subspace (blue) and are used to initialize low-rank adapters (A, B). II. Optimization in harmful-resistant nul...
 
@@ -97,8 +91,6 @@ GuardSpace 采用两阶段流水线，将安全保持与下游适配解耦。第
 **模块关系**：安全敏感子空间分解与零空间投影器构建是并行的预计算步骤，两者共同作用于微调过程。安全相关组件的冻结确保了安全机制不被破坏，而零空间投影器则防止适配器更新改变有害输入上的输出分布。消融实验表明，移除零空间投影器后，有害分数从 3.60% 飙升至 52.00%，证明投影器是安全保持的主要驱动力。适配器初始化从安全无关组件开始，与零空间投影器协同工作：模型在步骤 0 即安全，并在整个训练过程中保持安全。
 
 **关键公式**：低秩适配器初始化 B = U[:, -r:] √(Σ[-r:]), A = √(Σ[-r:]) (V^T C^{-1})[-r:, :]；零空间投影器 P = Q̂ Q̂^⊤；有害输入上的零化效果 (W' + B* A* P) X = W' X。
-
-
 
 GuardSpace 的核心在于将微调过程分解为两个解耦的阶段：**安全敏感子空间中的初始化** 与 **有害抵抗零空间中的优化**。其底层逻辑是：预训练安全对齐的退化源于微调更新干扰了与安全行为强相关的权重组件，并改变了模型在有害输入上的输出分布。GuardSpace 通过显式分离这些组件并约束更新方向来阻断这一因果链。
 
@@ -178,8 +170,6 @@ $$(\mathbf{W}' + \mathbf{B}^* \mathbf{A}^* \mathbf{P}) \mathbf{X} = \mathbf{W}' 
 
 **关键机制总结：** GuardSpace 通过两个互补的机制实现安全保持。**初始化机制**（模块 I）确保可训练容量初始时位于安全无关子空间，从起点避免安全退化。**投影机制**（模块 II）在整个训练过程中动态约束参数更新，确保安全行为不会被后续的梯度更新破坏。消融实验证实，移除投影器后有害分数从 3.60% 飙升至 52.00%，表明投影器是安全保持的主要驱动力。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -230,12 +220,8 @@ Figure 5 展示了不同微调方法下模型表示（representation）的偏移
 - **预计算开销**：在 7B-9B 模型上，GuardSpace 的预计算阶段（SVD 和特征分解）需要约 17 分钟和 58 GB 内存（Table 10），可能对资源受限场景构成挑战。
 - **适配器秩的选择**：r 过小可能限制下游任务性能，过大则导致安全退化。当前缺乏自动选择最优 r 的机制。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0002_887vde4ZAW_A_Guardrail_for_Safety_Preservation_When_Safety-/figures/008_Table_5.jpg]]
 *Table 5: Models used in our experiments and their official sources*
-
-
 
 ## 定位与知识库关联
 
@@ -253,8 +239,6 @@ GuardSpace 的提出直接回应了“微调导致安全对齐退化”这一核
 3. **方法扩展性**：零空间投影器能否扩展到其他参数高效微调方法（如 Adapter、Prefix Tuning）尚未验证。
 4. **大规模模型适用性**：GuardSpace 在 70B+ 模型上的计算开销和有效性有待验证。
 5. **长训练稳定性**：消融实验（Appendix B.2）显示，无投影器时 ASR 在 7 个 epoch 后急剧上升（超过 20%），而 GuardSpace 在 10 个 epoch 内保持低 ASR，但更长训练场景下的行为未探索。
-
-
 
 ## 原文 PDF
 

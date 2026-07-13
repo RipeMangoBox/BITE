@@ -56,8 +56,6 @@ claims:
 
 **主要结果**：在训练提示集上，MVC-ZigAL的HyperScore Overall达到9.17，较基线模型（7.23）提升1.94；在MATE-3D分布外基准上，以仅8次函数评估（NFE）的极低推理成本，HyperScore Overall达到7.04，超越MV-Adapter等SOTA方法，且ImageReward从-0.846跃升至0.865，实现了从负到正的根本性质变。消融实验进一步证实，首步zigzag调度、自适应阈值课程和自适应步长原-对偶更新均对最终性能有独立且显著的贡献。
 
-
-
 ### 问题背景：少步文本到多视图生成的效率与质量矛盾
 
 文本到多视图（Text-to-Multiview, T2MV）生成旨在从单一文本描述同时合成多个一致视角的图像，是3D内容创建的关键前置技术。扩散模型在此任务上展现出强大的生成能力，但其多步迭代去噪过程导致推理成本高昂。少步扩散模型（如基于LCM-SDXL的MV-Adapter）通过将采样步数压缩至4-8步，大幅提升了推理效率，然而步数的急剧减少也带来了生成质量下降——多视图一致性受损、单视图保真度不足等问题在少步设置下尤为突出。
@@ -81,8 +79,6 @@ claims:
 2. **构造自反思优势信号**：利用ZMV-Sampling（自反思zigzag采样）生成高质量参考轨迹，以其与标准采样轨迹的奖励差值作为优势函数。这种自改进轨迹提供的相对信号在少步条件下比绝对奖励具有更强的梯度区分度。
 
 3. **约束优化范式协调双目标**：将单视图保真度作为优化主目标，跨视图一致性作为约束条件，通过拉格朗日对偶求解实现自适应平衡。配合自定节奏阈值课程和自适应步长原-对偶更新，使约束强度随策略改善动态收紧，避免早期过度约束或后期约束松弛。
-
-
 
 ## 核心方法与创新机理
 
@@ -144,8 +140,6 @@ $$\tau_{k+1} \leftarrow \beta_{\tau} \tau_k + (1 - \beta_{\tau}) \bar{\mathcal{R
 
 这些创新协同作用，使 MVC-ZigAL 在训练提示集上 HyperScore Overall 达到 9.17（基线 7.23），在 MATE-3D 分布外基准上以极低 NFE（4/8）显著超越 SPAD、MV-Adapter 等 SOTA 方法，ImageReward 从 -0.846 跃升至 0.865。
 
-
-
 MVC-ZigAL 是一个面向少步文本到多视图（T2MV）扩散模型的强化学习微调框架。其核心设计围绕三个相互协作的模块展开：**多视图联合 MDP 建模**、**自反思 zigzag 采样（ZMV-Sampling）** 以及**多视图约束策略优化**。整体流程如下：
 
 1. **基础模型**：以 **MV-Adapter (LCM-SDXL)** 作为少步 T2MV 骨干，该模型能够在极少的函数评估次数（NFE，如 8 步）下，根据文本提示 $\mathbf{c}$ 和相机嵌入 $\{\mathbf{e}_v\}_{v=1}^V$ 生成 $V$ 个视图的图像 $\{\mathbf{x}_0^v\}_{v=1}^V$。
@@ -171,8 +165,6 @@ MVC-ZigAL 是一个面向少步文本到多视图（T2MV）扩散模型的强化
 
 **输入**：文本提示 $\mathbf{c}$、相机嵌入 $\{\mathbf{e}_v\}_{v=1}^V$、随机噪声。  
 **输出**：经 RL 微调后的策略 $p_\theta$，在少步采样下生成高保真且跨视图一致的多视图图像。
-
-
 
 ### 多视图感知的MDP建模
 
@@ -266,15 +258,11 @@ $$\tau _ { k + 1 } \gets \beta _ { \tau } \tau _ { k } + ( 1 - \beta _ { \tau } 
 
 其中 $\beta_\tau$ 为指数移动平均的衰减系数。早期训练阶段阈值较低，鼓励策略探索；随着策略改善，阈值自动上升，逐步收紧跨视图一致性约束。消融实验证实，自适应阈值和自适应步长分别带来更稳定且更高的奖励曲线，并减少拉格朗日乘子震荡（Figure 5, Figure 6）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2699_https_arxiv_org_abs_2505_20107/figures/002_Figure_2.jpg]]
 *Figure 2: Comparison of full-step and first-step zigzag schedules for ZMV-Sampling using the non-finetuned MV-Adapter*
 
 ![[assets/figures/papers/paper_list_l2699_https_arxiv_org_abs_2505_20107/figures/003_Figure_3.jpg]]
 *Figure 3: Qualitative comparison of reward optimization with joint-view or single-view rewards only versus our multiview-constrained approach. Joint-view optimization emphasizes view consistency but under-optimizes image fidelity; single-view optimization targets image fidelity but compromises view consistency, causing the “multi-face” problem. In contrast, our approach balances both aspects effectively*
-
-
 
 ## 实验与关键发现
 
@@ -303,12 +291,6 @@ MVC-ZigAL在训练提示集和分布外基准上均展现出对多视图RL基线
 - **Figure 4（Left）**：奖励差距收敛曲线直接验证了自反思优势学习机制——模型通过模仿ZMV-Sampling的高质量轨迹，逐步缩小与参考轨迹的性能差距。
 - **Figure 7**：MVC-ZigAL对SDXL骨干进行RL微调时，奖励曲线持续上升，表明方法对不同骨干具有泛化性。
 
-![[assets/figures/papers/paper_list_l2699_https_arxiv_org_abs_2505_20107/figures/005_Figure_4.jpg]]
-*Figure 4: (Left) Reward gap in HyperScore between standard sampling and ZMV-Sampling over MVC-ZigAL finetuning. (Middle & Right) Trade-off between per-view rewards (PickScore/HPSv2) and joint-view rewards (HyperScore) under different RL paradigms*
-
-![[assets/figures/papers/paper_list_l2699_https_arxiv_org_abs_2505_20107/figures/011_Figure_7.jpg]]
-*Figure 7: Reward curves of our MVC-ZigAL during RL finetuning of MV-Adapter (SDXL)*
-
 ### 4. 失败模式与局限性
 
 论文未明确报告失败案例，但可从实验设计中推断以下潜在边界：
@@ -321,8 +303,6 @@ MVC-ZigAL在训练提示集和分布外基准上均展现出对多视图RL基线
 
 所有对比实验统一使用8步采样和6视图配置，训练提示集固定为45个动物名称，OOD评估采用MATE-3D基准。定性比较固定随机种子42。Table 3汇总了标准微调、大规模微调和SDXL骨干微调三组超参数，确保了实验设置的可复现性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2699_https_arxiv_org_abs_2505_20107/figures/004_Table_1.jpg]]
 *Table 1: Quantitative comparison of T2MV policy optimization methods using HyperScore and PickScore. All reward scores are evaluated with 8 sampling steps and 6 views per trajectory*
 
@@ -331,20 +311,6 @@ MVC-ZigAL在训练提示集和分布外基准上均展现出对多视图RL基线
 
 ![[assets/figures/papers/paper_list_l2699_https_arxiv_org_abs_2505_20107/figures/007_Figure_5.jpg]]
 *Figure 5: Comparison of reward curves (left & middle) and Lagrange multiplier dynamics (right) during training of MVC-ZigAL variants with either adaptive or fixed constraint thresholds*
-
-![[assets/figures/papers/paper_list_l2699_https_arxiv_org_abs_2505_20107/figures/008_Figure_6.jpg]]
-*Figure 6: Comparison of reward curves (left & middle) and Lagrange multiplier dynamics (right) during training of MVC-ZigAL variants using either adaptive or fixed step sizes for Lagrange multiplier updates*
-
-![[assets/figures/papers/paper_list_l2699_https_arxiv_org_abs_2505_20107/figures/015_Figure_12.jpg]]
-*Figure 12: Additional qualitative comparison on unseen prompts between MV-Adapter and our MVC-ZigAL finetuned model*
-
-![[assets/figures/papers/paper_list_l2699_https_arxiv_org_abs_2505_20107/figures/016_Figure_13.jpg]]
-*Figure 13: Additional qualitative comparison on unseen prompts between MV-Adapter and our MVC-ZigAL finetuned model*
-
-![[assets/figures/papers/paper_list_l2699_https_arxiv_org_abs_2505_20107/figures/017_Figure_14.jpg]]
-*Figure 14: Additional qualitative comparison on unseen prompts between MV-Adapter and our MVC-ZigAL finetuned model*
-
-
 
 ## 定位与知识库关联
 
@@ -383,8 +349,6 @@ MVC-ZigAL 的设计假设和潜在局限包括：
 2. ZMV-Sampling 的自反思机制在 2 步甚至 1 步的极端少步设置下是否仍能提供有效优势信号？zigzag pass 的额外计算开销与性能增益的权衡曲线如何？
 3. RL 微调后的 T2MV 模型对后续 3D 重建任务（如通过 3D Gaussian Splatting 或 NeRF）的实际增益有多大？多视图一致性的提升是否线性转化为重建质量的提升？
 4. 自定节奏阈值课程和自适应步长原-对偶更新是否对其他约束 RL 问题（如安全 RL、多目标 RL）具有通用性？这些机制的理论收敛性质尚待分析。
-
-
 
 ## 原文 PDF
 

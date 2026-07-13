@@ -63,8 +63,6 @@ claims:
 
 在 ScanNet 数据集上，UnScene3D 的类无关实例分割 AP 达到 **15.9**，相比传统聚类方法 Felzenswalb（AP 5.0）提升超过 **3倍（300%）**。消融实验表明，融合2D和3D特征生成的伪掩码（最终 AP 15.9）显著优于单一模态（3D-only: 13.3，2D-only: 15.7）；自训练从初始伪掩码 AP 5.9 逐步提升至 15.9，约4轮后趋于饱和；DropLoss 策略（AP 15.9）优于标准损失（AP 14.2）和投影损失（AP 7.2）。在 S3DIS Area 5 上，UnScene3D 同样展现出显著的跨数据集泛化能力（AP 21.4 vs HDBSCAN 5.0）。
 
-
-
 三维场景理解是计算机视觉与机器人领域的核心问题，其中**三维实例分割**——将场景分解为独立的、语义一致的对象区域——是实现精细场景交互的关键前提。然而，现有高性能的三维实例分割方法几乎完全依赖大规模人工标注数据进行全监督训练。三维数据的标注成本极高：标注者需要在密集的三维点云或网格上逐点勾勒对象边界，这比二维图像标注耗时数个数量级。
 
 这一困境催生了**无监督三维实例分割**的研究方向：在不使用任何人工标注的条件下，从原始三维数据中直接发现并分割出语义上有意义的对象实例。然而，当前的无监督方法普遍面临性能瓶颈。在杂乱、遮挡严重的室内场景中，传统聚类方法（如基于密度的**HDBSCAN**、基于图的**Felzenswalb**过分割）以及基于图割的细化方法（如**Nunes et al.**）往往产生大量碎片化或错误合并的分割结果。在ScanNet基准上，这些方法的平均精度（AP）仅约5.0，远未达到实用水平。
@@ -80,8 +78,6 @@ claims:
 此外，二维无监督实例分割方法（如**CutLER**）虽可通过深度投影扩展到三维，但投影过程引入的几何误差和跨视图不一致性严重限制了其三维分割质量。三维自监督预训练方法（如**CSC**）能学习有判别力的点级特征，但如何将这些特征转化为对象级的实例分割，仍缺乏有效的下游机制。
 
 上述缺口共同指向了一个核心需求：**在几何粗化表示上融合多模态自监督特征，生成稀疏但可靠的伪掩码，并通过鲁棒的自训练机制迭代扩展为密集的实例分割结果**。这正是UnScene3D所瞄准的问题空间。
-
-
 
 ## 核心方法与创新机理
 
@@ -118,13 +114,8 @@ UnScene3D相对于现有基线的方法槽位变更可归纳为：
 
 这些变更共同构成了UnScene3D的核心技术路径：以几何基元为粗化载体，以多模态归一化割为伪掩码生成引擎，以DropLoss驱动的自训练为密集化手段，最终在ScanNet上实现AP 15.9（相比Felzenswalb的AP 5.0提升超过3倍），在S3DIS Area 5上达到AP 21.4（相比HDBSCAN的AP 5.0提升超过4倍）。
 
-
-
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2303_14541/figures/009_Figure_7.jpg]]
 *Figure 7: As UnScene3D does not require any human annotation, so we can also train and test our method on the ARKitScenes [2] dataset. We leverages 3D features followed by a series of selftraining iterations for cleaner, more accurate instance segmentation. Qualitative results shows consistently better results than our baselines*
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2303_14541/figures/001_Figure_1.jpg]]
-*Figure 1: We propose UnScene3D, a fully-unsupervised 3D instance segmentation method, effectively separating semantic instances without requiring any manual annotations. We utilize geometric primitives to ensure crisp masks, and due to our self-training loop, we can also obtain a dense set of predictions, even in cluttered indoor scenarios*
 
 UnScene3D 的整体 pipeline 由两个级联阶段构成：**伪掩码生成（Pseudo Mask Generation）**与**自训练（Self-Training）**，如 Figure 2 所示。其核心设计思想是：在几何基元（geometric primitives）上融合多模态自监督特征，通过归一化割（Normalized Cut）提取稀疏但可靠的伪掩码，再利用自训练迭代扩展和细化，最终输出密集的实例分割结果。
 
@@ -167,8 +158,6 @@ UnScene3D 的整体 pipeline 由两个级联阶段构成：**伪掩码生成（P
 
 整个 pipeline 的因果逻辑可概括为：**粗化 → 融合 → 稀疏提取 → 迭代扩展**，每一步都针对无监督 3D 实例分割中“特征噪声大、标注缺失”的核心瓶颈进行了定向设计。
 
-
-
 UnScene3D 的核心管线由三个紧密耦合的模块构成：**几何基元提取与特征聚合**、**掩蔽归一化割伪掩码生成**、以及**基于 DropLoss 的自训练**。以下逐一展开其关键机制与数学形式。
 
 ### 场景图粗化：几何基元提取与特征聚合
@@ -200,8 +189,6 @@ $$\mathcal{W}_{i,k} = \begin{cases} 1 & \text{if } \mathcal{W}_{i,k} \ge \tau_{c
 **DropLoss 机制**（Section 7.2）：标准交叉熵与 Dice 损失的加权组合用于伪掩码的双边匹配，但伪掩码存在噪声与缺失标注。DropLoss 通过计算当前预测与上一轮伪标注的重叠度，仅保留重叠超过阈值 $\tau_{drop}$ 的预测区域参与反向传播，从而避免对未匹配区域的错误惩罚，使模型能够自主发现被遗漏的实例区域。消融实验证实，DropLoss 最终 AP 达到 15.9，显著优于标准损失（AP 14.2）和投影损失（AP 7.2）（Table 6）。
 
 **掩码增广策略**（Table 8）：自训练中保持初始伪掩码 $M^0$ 固定不变，每轮迭代从模型预测中采样高置信度新掩码动态加入监督集，而非直接用上轮预测替换。这种策略在保持初始掩码相对清洁的同时，逐步扩展掩码覆盖密度，是最终性能饱和于第 4 轮（AP 从初始 5.9 提升至 15.9）的关键机制（Table 4, Figure 6）。
-
-
 
 ## 实验与关键发现
 
@@ -244,9 +231,6 @@ Figure 6 从可视化角度印证了这一趋势：随着自训练迭代，预�
 
 自训练的核心挑战在于伪掩码存在噪声和遗漏标注。Table 6 对比了三种损失策略：
 
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2303_14541/figures/016_Table_6.jpg]]
-*Table 6: A 3D projection loss struggles with under-determined associations, while DropLoss helps UnScene3D to discover parts of the scene that were missed by the source supervision. We report all metrics after a single iteration and the AP scores after 4 iterations of self-training. Table 7. Our pseudo mask generation quality, as measured by AP metrics, maintains robustness to a large range of τ thresholds that extract saliency. Note that this measures the quality of only the pseudo masks; our full approach with self-training produces significantly improved results. In this table we show results and parameters used by our method in bold and report pseudo mask performance generated from both modaliti...*
-
 - **标准交叉熵 + Dice 损失**：AP 14.2；
 - **投影损失（3D Projection Loss）**：AP 仅 7.2，因为未匹配区域的关联不确定；
 - **DropLoss**：AP **15.9**，通过忽略与上轮标注重叠低于阈值 $\tau_{drop}$ 的预测区域，使模型能够发现伪掩码遗漏的实例区域。
@@ -281,20 +265,6 @@ UnScene3D 对关键超参数表现出良好的鲁棒性：
 ### 预训练潜力
 
 Table 5 和 Figure 4 展示了 UnScene3D 自训练产生的 3D 特征可作为强大的预训练策略。在有限标注数据场景下，UnScene3D 预训练显著优于自监督预训练方法 CSC，表明无监督实例分割任务本身能够学习到可迁移的 3D 表征。
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2303_14541/figures/013_Table_5.jpg]]
-*Table 5: Unsupervised class-agnostic pretraining with our method can also act as a powerful pretraining strategy, advancing over state of the art. We report pretraining with CSC [19] and UnScene3D, and evaluate the downstream weakly-supervised instance segmentation performance on ScanNet with percentage of limited annoated scenes used denoted in the top row. As we found that CSC degraded performance when using a transformer-based backbone, we also report the performance of training from scratch and CSC on their originally proposed backbone of a sparse UNet with bottom-up voting*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2303_14541/figures/019_Table_10.jpg]]
-*Table 10: 2D evaluation on ScanNet images. Table 11. UnScene3D achieves significantly better performance on ScanNet than SAM3D through our strong multi-modal reasoning*
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2303_14541/figures/006_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2303_14541/figures/014_Table.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -351,8 +321,6 @@ UnScene3D 的核心设计理念在于将**几何先验**与**多模态自监督�
 - **中等置信度结论**（confidence 0.9）：伪掩码生成对 $\tau_{cut}$ 阈值鲁棒（Table 7）、在 ARKitScenes 上的泛化能力（Figure 7）。这些结论有实验支持但分析深度有限。
 
 - **需手动验证的推断**：小物体遗漏的具体量化影响、自训练噪声强化的程度、跨数据集泛化的上限。这些方面在论文中未充分展开，需要进一步实验验证。
-
-
 
 ## 原文 PDF
 

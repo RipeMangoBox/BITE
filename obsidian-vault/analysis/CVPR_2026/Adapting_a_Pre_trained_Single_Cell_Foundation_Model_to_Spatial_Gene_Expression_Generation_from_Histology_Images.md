@@ -172,8 +172,6 @@ $$\mathcal{L}(\boldsymbol{\theta}) = \mathbb{E} \Big[ w_t \big\| (\mathbf{1} - \
 
 此外，HINGE 采用**预热课程**策略：初始训练阶段仅从低掩码区间（$\bar{\alpha}_t \geq 1 - \rho$）采样时间步，随后转为全区间均匀采样。消融实验（Table 3）表明，掩码扩散配合预热课程优于高斯扩散及无预热课程的掩码扩散变体，证实目标对齐与课程学习有效弥合了预训练与生成任务间的鸿沟。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2436_https_arxiv_org_abs_2603_19766/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of HINGE. (a) Depicts the CellFM architecture, which is a single-cell foundation model (sc-FM) pre-trained on scRNA-seq with masked autoencoding. (b) In HINGE, the conditional denoising model is instantiated from CellFM and augmented with identity-initialized SoftAdaLN that injects histology and timestep context into each transformer layer within a stochastic masked diffusion process. This design keeps the training objective aligned with CellFM’s masked autoencoding for coherence in ST, thereby largely preserving the gene relationships learned from scRNA-seq*
 
@@ -246,8 +244,6 @@ Figure 4进一步从基因间共表达角度评估生物学一致性。在Kidney
 ### 失败模式与局限性
 
 尽管HINGE在定量和定性评估中均表现优异，仍存在若干局限。首先，目前仅基于单一的单细胞基础模型CellFM进行验证，对其他sc-FM（如scGPT、scFoundation）的泛化性尚不明确。其次，基因列表受限于CellFM的预训练词汇表（24,078个基因），可能遗漏某些数据集的特有基因，影响特定生物学问题的分析。第三，HINGE未显式利用空间位置信息，仅在表达空间建模，可能丢失空间上下文依赖，这在高分辨率空间转录组数据中尤为突出。最后，训练与推理仍依赖GPU，在部分高分辨率切片上内存开销较大（见Table S.5），限制了其在大规模临床部署中的实用性。这些局限性指向了未来工作的方向，包括多sc-FM适配、空间位置编码注入、以及模型轻量化等。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2436_https_arxiv_org_abs_2603_19766/figures/002_Table_1.jpg]]
 *Table 1: Comparison on cSCC, Her2ST, and Kidney datasets using PCC-50, PCC-200, MSE, and MAE. Scores are averaged over test slices and three random seeds, reported as mean ± standard deviation. Best results are in bold, and second-best are underlined*

@@ -54,8 +54,6 @@ claims:
 
 需要指出的是，该方法在定量指标上尚未超越此前基于 Score Distillation 的方法，且性能依赖偏好数据集质量——尽管有权重机制缓解噪声，极端噪声仍可能导致次优结果。该偏好反馈循环机制能否推广至 Score Distillation 类方法，仍是待探索的开放问题。
 
-
-
 ### 3D 生成的多阶段范式与不可微分瓶颈
 
 近年来，3D 资产生成经历了从单阶段端到端模型向多阶段解耦架构的演进。以 **Trellis**（Xiang et al., arXiv 2024）为代表的两阶段框架，将异质 3D 表示的生成显式解耦为：**第一阶段**生成稀疏体素结构 $x_{\text{sparse}}$，**第二阶段**以该稀疏结构为条件生成局部潜变量 $x_{\text{slat}}$，编码精细几何与纹理信息。这种解耦设计有效降低了单次生成的复杂度，但也引入了一个关键瓶颈：两个阶段之间存在不可微分操作（如离散体素化），导致第二阶段的梯度信号无法反向传播至第一阶段。
@@ -76,8 +74,6 @@ claims:
 本文的核心洞察是：虽然梯度无法直接跨越不可微分操作反向传播，但**偏好信号可以通过数据循环的方式前馈传递**。具体而言，当最终阶段经过 DPO 微调后，其生成的 3D 资产质量显著提升；将这些优化后的资产与未优化资产构成偏好对，经过 VAE 重编码回稀疏表示空间后，即可作为第一阶段的训练信号。这一“优化-对比-反馈”的循环机制，本质上模拟了梯度反向传播的功能，使得前期阶段能够间接学习到后期优化的结果。
 
 此外，偏好数据的噪声问题不容忽视。无论是人工标注的偏好对，还是通过模型自动构造的反馈对，都存在质量参差不齐的情况。因此，设计鲁棒的质量感知加权机制，在利用偏好信号的同时抑制噪声干扰，是实现稳定对齐的必要条件。
-
-
 
 ## 核心方法与创新机理
 
@@ -123,8 +119,6 @@ $$
 | 优化范式 | 各阶段独立训练 | 偏好反馈循环联合优化 |
 
 消融实验证实：与各阶段独立进行 DPO（separate DPO）相比，引入反馈循环后在 ImageReward 上额外提升 14.11%，在 Reward3D 上额外提升 6.06%，验证了反馈循环是性能增益的核心来源。同时，移除 $w_1$ 或 $w_2$ 均导致生成质量下降，出现纹理几何不一致，证实了质量感知加权机制的必要性。
-
-
 
 Circular-DPO 提出了一套面向多阶段 3D 生成管线的偏好反馈循环框架，其核心设计目标是**绕过不可微分操作造成的梯度阻隔**，将最终阶段的偏好信号前馈至前置阶段，实现端到端的联合对齐。
 
@@ -173,15 +167,11 @@ $$\mathcal{L}_{\text{Circular-DPO}} = \begin{cases} \mathcal{L}_{\text{DPO}} & \
 
 框架的本质创新在于：**将不可微分的“解码-渲染-评分”链路替换为“采样-配对-前馈”的偏好循环**。传统多阶段管线中，第二阶段产生的纹理几何不一致性无法通过梯度反向传播修正第一阶段的结构生成；Circular-DPO 通过 DPO 将最终资产的质量差异编码为偏好对，使其成为第一阶段可优化的监督信号，从而在不依赖可微分梯度的条件下实现了跨阶段联合对齐。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2451_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Circular_DPO_Aligni/figures/003_Figure_3.jpg]]
 *Figure 3: The overall framework of our Circular-DPO. In the first line, we review the generation process of Trellis. Our method is in the dashed box. We train the final 3D stage via DPO to generate optimized samples for constructing weighted preference pairs, which are subsequently utilized to optimize the preceding sparse structure model, thereby propagating preference signals to the preceding stage*
 
 ![[assets/figures/papers/paper_list_l2451_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Circular_DPO_Aligni/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the Circular-DPO*
-
-
 
 ### 3.1 条件流匹配与 DPO 基础
 
@@ -206,9 +196,6 @@ $$\mathcal { L } _ { \mathrm { DPO } } = - \mathbb { E } _ { x _ { 0 , 1 } ^ { w
 
 两个阶段之间存在 **不可微分操作**（如体素化、离散化），导致 Stage 2 的损失梯度无法反向传播至 Stage 1。这意味着即使 Stage 2 生成质量不佳（如纹理与几何不一致），也无法通过梯度信号指导 Stage 1 调整稀疏结构。Figure 2 展示了这种纹理-几何不一致性的典型表现。
 
-![[assets/figures/papers/paper_list_l2451_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Circular_DPO_Aligni/figures/002_Figure_2.jpg]]
-*Figure 2: Demonstration of texture and geometry inconsistency*
-
 ### 3.3 偏好反馈循环的核心模块
 
 Circular-DPO 的核心创新在于通过偏好对的构建与前馈，绕过不可微分瓶颈，实现端到端的多阶段对齐。整体框架如 Figure 3 所示，包含三个关键步骤：
@@ -226,9 +213,6 @@ $$\min_{G_L} \mathcal{L}_{\mathrm{DPO}}(\mathcal{D}_{\mathrm{slat}}, G_L)$$
 $$\min_{G_S} \mathcal{L}_{\mathrm{DPO}}(\{ (x^{\mathrm{op}}, x^{\mathrm{un\text{-}op}}) \}, G_S)$$
 
 由此，Stage 2 的偏好信号被闭环传递至 Stage 1，形成 **偏好反馈循环**（Figure 4）。
-
-![[assets/figures/papers/paper_list_l2451_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Circular_DPO_Aligni/figures/004_Figure_4.jpg]]
-*Figure 4: Cyclic Feedback in Multi-Stage Generation Processes*
 
 ### 3.4 质量感知加权机制
 
@@ -255,8 +239,6 @@ Circular-DPO 的最终损失仅对 $w_1 > \tau$ 的高质量偏好对计算 DPO 
 $$\mathcal { L } _ { \mathrm { Circular-DPO } } = \left\{ \begin{array} { l l } { \mathcal { L } _ { \mathrm { DPO } } } & { \mathrm { if ~ } w _ { 1 } > \tau } \\ { 0 } & { \mathrm { if ~ } w _ { 1 } \le \tau } \end{array} \right.$$
 
 阈值 $\tau$ 在实验中设为零，即仅保留 $G_{\mathrm{op}} > G_{\mathrm{un\text{-}op}}$ 的有效偏好对。该机制从两个层面抑制噪声：$w_1$ 过滤低质量对，$w_2$ 在有效对内动态降权。消融实验（Table 2）证实，移除任一权重均导致生成质量下降和纹理-几何不一致性增加。
-
-
 
 ## 实验与关键发现
 
@@ -292,8 +274,6 @@ $$\mathcal { L } _ { \mathrm { Circular-DPO } } = \left\{ \begin{array} { l l } 
 
 此外，方法性能对偏好数据集质量存在依赖。尽管 w1 过滤和 w2 动态加权机制能有效缓解噪声影响，但在极端噪声场景下仍可能导致次优结果。这提示在实际部署中需要关注偏好标注的质量控制。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2451_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Circular_DPO_Aligni/figures/006_Table_1.jpg]]
 *Table 1: Quantitative comparisons*
 
@@ -302,11 +282,6 @@ $$\mathcal { L } _ { \mathrm { Circular-DPO } } = \left\{ \begin{array} { l l } 
 
 ![[assets/figures/papers/paper_list_l2451_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Circular_DPO_Aligni/figures/005_Figure_5.jpg]]
 *Figure 5: Qualitative Visual Results*
-
-![[assets/figures/papers/paper_list_l2451_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Circular_DPO_Aligni/figures/009_Figure_7.jpg]]
-*Figure 7: User study results. Left: The generation effect that users prefer more. Right: The five-point scale score results for text consistency, 3D plausibility, texture details, geometric details, and texture-geometric consistency*
-
-
 
 ## 定位与知识库关联
 
@@ -352,8 +327,6 @@ Circular-DPO 以 **Trellis** 为默认 Backbone，完整保留了其两阶段架
 2. **更深级联架构**：在多阶段生成架构更加复杂（如三级以上级联）的情况下，反馈循环的构建策略应如何调整？是否需要分层反馈或多跳传播机制？
 3. **偏好数据效率**：当前需要构建完整的偏好对数据集，能否通过主动学习或在线偏好采样减少对大规模人类标注的依赖？
 4. **与梯度信号的融合**：是否存在将偏好反馈循环与可微分梯度信号（如 Score Distillation）融合的可能性，以结合两者的优势？
-
-
 
 ## 原文 PDF
 

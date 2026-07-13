@@ -53,8 +53,6 @@ claims:
 
 **主要结果**：在四个长尾图像识别数据集（CIFAR-10/100-LT、ImageNet-100-LT、Places-LT）上，BaCon 均大幅超越所有基线方法。以 CIFAR-100-LT 为例，BaCon-S 在新类别准确率上超越最佳基线 17.5%，总体准确率提升 5.0%（Table 3）。消融实验证实，分布正则化、去偏采样和软对比损失三个组件协同作用才能获得最优性能（Table 6）。在不同不平衡率、已知类别数量及标注比例下，BaCon 均保持一致的性能优势（Tables 5, 9, 10）。
 
-
-
 ### 问题背景：广义类别发现中的数据分布挑战
 
 广义类别发现（Generalized Category Discovery, GCD）旨在从部分标注数据中同时识别已知类别和发现未知类别，是开放世界学习中的核心任务。然而，现有GCD方法普遍假设数据类别分布是均匀的——这一假设在现实场景中几乎从不成立。真实世界的数据天然呈现长尾分布：少数头部类别占据大量样本，而大量尾部类别仅有极少样本。当长尾分布与开放集类别发现相遇时，形成了本工作定义的新任务——**分布无关的广义类别发现**（Distribution-Agnostic Generalized Category Discovery, DA-GCD）。
@@ -83,8 +81,6 @@ BaCon由两个协同工作的分支构成（Figure 2）：
 - **伪标签分支**：基于估计分布进行logits去偏和类别平衡采样，生成高质量伪标签，再通过soft对比损失将知识回传给对比分支。
 
 两个分支形成互增强的闭环：对比分支提供分布估计来校准伪标签分支，伪标签分支提供平衡化监督来优化对比分支。这一设计使得BaCon无需任何先验分布信息，即可在长尾开放环境中同时准确分类已知类并发现新类。
-
-
 
 ## 核心方法与创新机理
 
@@ -140,20 +136,14 @@ $$\mathcal{L}_{\mathrm{CL}}^{soft}(\mathcal{D}) = \frac{1}{|\mathcal{D}|} \sum_{
 
 这种“自平衡协同建议”机制使得两个分支在训练中相互增强，无需任何先验分布假设即可学习到一致、平衡的特征表示。在CIFAR-100-LT上，BaCon-S在新类别准确率上超越最佳基线17.5%，验证了这一创新闭环的有效性。
 
-
-
 BaCon 采用双分支协同结构，由一个**对比学习分支 (contrastive-learning branch)** 和一个**伪标签分支 (pseudo-labeling branch)** 组成，两者共享并冻结 ViT-B/16 骨干网络（仅微调最后一个 block），通过交互式监督共同应对分布无关的广义类别发现问题。
 
 **核心交互闭环**：对比学习分支利用其无监督聚类能力，定期对整个训练集的特征进行 k-means 聚类以**估计类别分布**，该分布估计一方面通过 KL 散度正则化伪标签分支的平均预测输出，另一方面用于对伪标签分支的 logits 进行**去偏调整**。伪标签分支则根据估计分布进行**类别平衡采样**，筛选高置信度伪标签，并将这些包含新类别监督信息的伪标签以**软对比损失 (soft contrastive loss)** 的形式回传给对比学习分支，从而形成互增强的闭环。
 
 **数据流**：输入图像经过共享骨干提取特征后，分别送入两个分支。对比学习分支输出归一化嵌入 $z$，用于计算无监督对比损失、有监督对比损失（基于有标签数据）以及软对比损失（基于有标签数据和伪标签数据）；伪标签分支输出类别概率，计算有监督交叉熵损失、无监督熵正则化损失以及分布正则化损失。训练时两分支联合优化，推理时仅使用对比学习分支的骨干特征进行 k-means 聚类获得最终预测。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1500_https_arxiv_org_abs_2310_01376/figures/005_Figure_2.jpg]]
 *Figure 2: Overview of the self-balanced co-advice contrastive framework (BaCon)*
-
-
 
 ### 整体框架
 
@@ -228,8 +218,6 @@ $\gamma_{1}$ 和 $\gamma_{2}$ 为平衡系数。该设计使得对比分支既�
 ### 推理阶段
 
 测试时仅使用对比学习分支的骨干网络提取特征，通过 k-means 聚类获得最终预测。伪标签分支在训练完成后被丢弃。
-
-
 
 ## 实验与关键发现
 
@@ -342,36 +330,14 @@ $\gamma_{1}$ 和 $\gamma_{2}$ 为平衡系数。该设计使得对比分支既�
 
 5. **任务范围限制**：当前方法仅针对图像分类设计，尚未扩展到目标检测、实例分割等更复杂的视觉任务。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1500_https_arxiv_org_abs_2310_01376/figures/008_Figure_3.jpg]]
 *Figure 3: t-SNE visualization on the test set of CIFAR-10*
-
-![[assets/figures/papers/paper_list_l1500_https_arxiv_org_abs_2310_01376/figures/011_Table.jpg]]
-*Table: (a) Regularization Term. (b) Debiasing and Sampling. (d) Re-estimate Interval r. (e) Similarity Function*
 
 ![[assets/figures/papers/paper_list_l1500_https_arxiv_org_abs_2310_01376/figures/004_Table_1.jpg]]
 *Table 1: Comparison of DA-GCD with other similar settings*
 
-![[assets/figures/papers/paper_list_l1500_https_arxiv_org_abs_2310_01376/figures/006_Table_2.jpg]]
-*Table 2: Test accuracy (%) and balancedness (Std↓) of existing methods on CIFAR-100-LT*
-
-![[assets/figures/papers/paper_list_l1500_https_arxiv_org_abs_2310_01376/figures/007_Table_3.jpg]]
-*Table 3: Test accuracy (%) on four generic long-tailed image recognition datasets. (bold: best performance among all methods, underline: best performance among the baseline methods.)*
-
-![[assets/figures/papers/paper_list_l1500_https_arxiv_org_abs_2310_01376/figures/009_Table_4.jpg]]
-*Table 4: Test accuracy (%) and balancedness (Std↓) on CIFAR-100-LT*
-
-![[assets/figures/papers/paper_list_l1500_https_arxiv_org_abs_2310_01376/figures/010_Table_5.jpg]]
-*Table 5: Test accuracy (%) on CIFAR-100-LT with different imbalance ratio ρ*
-
-![[assets/figures/papers/paper_list_l1500_https_arxiv_org_abs_2310_01376/figures/012_Table.jpg]]
-*Table: (c) Loss Design*
-
 ![[assets/figures/papers/paper_list_l1500_https_arxiv_org_abs_2310_01376/figures/013_Table_6.jpg]]
 *Table 6: BaCon ablation experiments. For each ablation, we report test accuracy (%) of known, novel and all classes, denote as ‘Old’, ‘New’, and ‘All’. Our default settings are marked in orange*
-
-
 
 ## 定位与知识库关联
 
@@ -419,8 +385,6 @@ BaCon 的自平衡协同建议机制可分解为三个相互增强的组件：
 2. 能否通过近似方法（如 mini-batch k-means、在线聚类）加速分布估计以降低计算开销？
 3. 在无法提供总类别数先验的条件下，BaCon 能否自适应估计类别数量？这需要聚类算法具备模型选择能力。
 4. 如何进一步提升在极低标注比例下的性能？可能的改进方向包括引入主动学习策略选择最有信息量的标注样本，或利用预训练视觉-语言模型的零样本能力提供弱监督。
-
-
 
 ## 原文 PDF
 

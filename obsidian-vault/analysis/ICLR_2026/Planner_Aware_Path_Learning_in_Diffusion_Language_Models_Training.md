@@ -59,8 +59,6 @@ claims:
 
 消融实验表明，PAPL 在训练步数、采样步数和温度变化下均保持优势，且训练收敛更快、对推理温度更鲁棒。不过，纯 PAPL 损失训练不稳定，需与标准均匀损失混合使用；超参数（温度 τ 和权重 α）需按任务微调，论文给出了起步建议（τ=1, α=1）。
 
-
-
 ### 扩散语言模型的训练-推理失配
 
 扩散语言模型（Diffusion Language Models, DLMs）通过迭代去掩码从全掩码序列生成离散文本，其标准训练基于均匀去掩码的证据下界（ELBO）。该目标对所有被掩码位置施加均等权重，假设训练时的前向掩码过程与推理时的反向去掩码过程在动力学上一致。
@@ -89,8 +87,6 @@ $$\log(p_\theta^{\text{greedy}}(\mathbf{x}_0)) < \mathcal{E}^{\theta,\mathrm{uni
 $$\mathcal{L}_{\mathrm{PAPL}}(\theta)=-\mathbb{E}_{\mathbf{x}_0,k,\mathbf{x}_k}\left[\sum_{i:x_k^i=\mathbf{m}}\frac{1}{L-k}(1+\alpha w^i)\log\left(\mathrm{Cat}(x_0^i;D_\theta^i(\mathbf{x}_k))\right)\right]$$
 
 其中 $w^i \propto \exp(\tau^{-1}\log\mathrm{Cat}(z^j;D_\theta^j(\mathbf{x})))$ 为软最大化规划器权重，$\alpha$ 控制规划器影响强度。这一修改仅需**一行代码**，无需额外推理开销，即可将训练动力学与推理规划器对齐。
-
-
 
 ## 核心方法与创新机理
 
@@ -145,8 +141,6 @@ $$\mathrm{Cat}(j;G_\phi^\tau(\mathbf{z},\mathbf{x})) \propto \exp\left(\frac{1}{
 
 为解决这一问题，PAPL 通过超参数 $\alpha$ 将规划器加权损失与标准均匀损失进行插值：权重因子 $(1 + \alpha w^i)$ 中的常数项 1 保留了基础均匀损失，$\alpha$ 控制规划器影响的强度。这种混合策略确保了训练初期有稳定的梯度信号，同时随着训练推进逐步引入规划器感知的偏好。
 
-
-
 ![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_lAlI5FuIf7/figures/001_Figure_1.jpg]]
 *Figure 1: Planner-Aware Path Learning (PAPL) resolves training–inference mismatch in DLMs. Standard uniform training for DLMs (left) applies a uniform loss across all masked positions, distributing capacity over regions that inference-time planners never traverse. PAPL (right) introduces planner-aware weights into the loss, aligning training with the planner’s preferred trajectories (outlined arrows) and eliminating training-inference mismatch*
 
@@ -193,8 +187,6 @@ $$\mathcal{L}_{\mathrm{PAPL}}(\theta) = -\mathbb{E}_{\mathbf{x}_0, k, \mathbf{x}
 标准 MDLM 训练假设推理时均匀随机去掩码，但实际推理中使用的贪婪、置信度或 P2 等规划器会沿着特定路径生成。这一训练-推理动力学不匹配意味着标准 ELBO 无法有效约束规划器下的生成质量——理论上，贪婪祖先采样甚至可能违反标准 ELBO，即 $\log(p_\theta^{\text{greedy}}) < \text{标准 ELBO}$（Proposition 3.1）。
 
 PAPL 通过推导规划器感知证据下界（P-ELBO），将任意规划器纳入训练目标。其核心洞见是：与其让模型在训练时均匀分配容量到推理中永远不会遍历的区域，不如让模型聚焦于规划器实际偏好的去掩码路径。权重项 $w^i$ 正是去噪器对“规划器会选这个位置”的置信度估计，从而实现了训练与推理动力学的直接对齐。
-
-
 
 ### 3.1 规划器感知的逆向动力学建模
 
@@ -251,8 +243,6 @@ $$\mathcal{L}_{\mathrm{PAPL}}(\theta) = -\mathbb{E}_{\mathbf{x}_0, k, \mathbf{x}
 - $\frac{1}{L-k}$：标准均匀权重因子
 
 **实现要点**：式 (7) 与标准 DLM 损失的区别仅在于将均匀权重 $\frac{1}{L-k}$ 替换为 $\frac{1}{L-k}(1+\alpha w^i)$。去噪器对自身高置信度的位置赋予更高训练权重，从而将训练容量集中到推理时规划器实际会遍历的路径上。
-
-
 
 ## 实验与关键发现
 
@@ -316,12 +306,8 @@ Table 7 消融了从理论 P-ELBO 到最终 PAPL 损失的系列近似步骤，�
 
 所有 DLM 变体使用相同架构、相同训练数据以及相同推理规划器（P2-Self）进行比较。蛋白质评估统一使用 ESMFold 进行结构预测，可折叠性阈值（pLDDT > 80, pTM > 0.7, pAE < 10）在所有方法上保持一致。文本生成评估中，自回归参考模型使用 nucleus sampling（p=0.9）。代码生成实验遵循 Open-dLLM 框架，模型从 Qwen2.5-Coder 初始化以确保公平起点。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_lAlI5FuIf7/figures/010_Figure_3.jpg]]
 *Figure 3: PAPL consistently improves over DLM across training, sampling steps, and temperature. (a) Faster convergence in training steps. (b) Higher performance across sampling steps. (c) More robust to temperature when training from scratch. (d) More robust to temperature when fine-tuning*
-
-
 
 ## 定位与知识库关联
 
@@ -374,8 +360,6 @@ PAPL 的理论基础是论文推导的规划器感知 ELBO（P-ELBO），其将�
 3. **通用规划器搜索**：如何设计通用规划器搜索方法，自动为给定任务和数据学习最优规划器，而非依赖人工设计的软最大化？当前的软贪婪规划器虽有效，但其形式受限于温度参数化的指数族分布。
 
 4. **大规模模型的稳定性**：在更大规模（如 7B+）的扩散语言模型上，PAPL 能否持续提供增益？如何选择混合权重 $\alpha$ 以保持预训练稳定性？当前实验主要在紧凑模型（150M-0.5B）上验证，大规模扩展的工程挑战尚待探索。
-
-
 
 ## 原文 PDF
 

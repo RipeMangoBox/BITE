@@ -62,8 +62,6 @@ claims:
 
 **局限性**：研究未探索故意最小化可读性的专用对抗加密，也未在RL训练中观察可能自然涌现的加密行为。对加密推理能力下降的内部机制理解仍不充分，缺乏量化加密文本与自然英语偏离程度的统一指标。
 
-
-
 ### 问题背景：加密思维链与AI监管的潜在冲突
 
 大型语言模型在复杂推理任务中越来越多地依赖思维链（Chain-of-Thought, CoT）来生成可解释的中间步骤。在AI安全实践中，监控模型正是通过检查这些思维链来检测欺骗行为、偏见或有害意图。然而，一个关键的安全假设正在面临挑战：如果模型学会了在加密语言中进行推理，它可能在不被监控者察觉的情况下隐藏其真实推理过程。
@@ -93,8 +91,6 @@ claims:
 - **通过微调能否恢复加密推理能力？** 如果可以，需要多少数据和计算资源？这一成本与普通数学推理的蒸馏成本相比如何？
 
 通过回答这些问题，本研究旨在为AI安全社区提供一个关于加密思维链威胁的实证基础，并揭示当前模型推理能力的根本局限。
-
-
 
 ## 核心方法与创新机理
 
@@ -126,8 +122,6 @@ claims:
 
 与传统的数学推理或对抗鲁棒性研究不同，本文并未试图提升模型的推理性能，而是将加密作为一种可控的“探针”，来测试模型推理能力的本质。其基线方法（Identity和Direct Answering）仅作为明文和无推理链的对照，核心贡献在于揭示了**推理能力对数据分布的表层依赖性**，而非提出新的改进方法。这一发现对AI安全监控具有直接启示：当前模型尚无法通过自发形成对抗性加密来规避监控，但其能力瓶颈的根源——预训练数据分布——也为未来可能的风险指明了方向。
 
-
-
 本工作构建了一套系统性的加密推理能力评估流水线，旨在量化语言模型在加密文本上进行数学推理时的能力衰减。流水线的核心逻辑是：将标准数学推理问题转换为加密形式，要求模型在加密语言中完成推理并给出答案，同时测量其推理准确率与翻译能力之间的不对称性。
 
 整个评估框架由五个顺序模块构成，形成一条从数据生成到能力度量的完整链路：
@@ -143,8 +137,6 @@ claims:
 5. **翻译能力评估**：将PRM800K推理轨迹加密后，提示模型将其解码回英文，以BLEU分数衡量翻译流畅度，用于与推理准确率形成对比。
 
 该流水线的核心设计意图在于揭示一个关键不对称性：模型能够准确翻译加密文本（高BLEU分数），但在同一加密文本上的推理准确率却大幅下降。这一发现贯穿所有实验设置，构成了本文的核心论点——模型的理解能力与推理执行能力之间存在显著鸿沟。
-
-
 
 ### 实验流程模块
 
@@ -198,8 +190,6 @@ $$
   - $1_{\text{BoxedAnswerFormat}}$：指示最终答案是否以正确格式（如 `\boxed{}`）给出的函数。
   - 奖励机制：当模型输出遵循加密时，给予正确答案和格式的正奖励；当模型未遵循加密时，则给予等额的负奖励，以此惩罚“投机取巧”行为。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：加密推理能力的系统性崩溃
@@ -208,12 +198,10 @@ $$
 
 **微调模型的性能衰减**（Figure 2）。以明文推理（Identity）为基线，GPT 4.1在广为人知的rot13加密上相对准确率下降至少19%（相对准确率约0.81），而在罕见加密如“reverse fibonacci indices each word”上下降高达72%（相对准确率约0.28）。Qwen2.5系列模型呈现相似模式：常见加密的衰减幅度较小，罕见加密则导致近乎完全的推理失败。值得注意的是，同一批模型在翻译任务上普遍获得高BLEU分数（Figure 2b），表明加密文本的语义理解基本完好，瓶颈不在“读懂”而在“用加密语言思考”。
 
-
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_yjFkeQ2ynQ/figures/003_Figure_2.jpg]]
 *Figure 2: Ciphered reasoning & translation capability in fine-tuned models. Each point is 1 model fine-tuned on 1 cipher. Top: Fraction of responses that are cipher-adherent and correct, relative to the identity baseline. Bottom: BLEU score of the model’s translation of ciphered PRM800K solutions*
 
 **少样本提示模型的性能衰减**（Figure 3）。Sonnet 3.5和Sonnet 4在知名加密（如rot13）上仅损失不到10%的相对准确率，但在罕见加密上损失超过45%。部分加密出现了“gaming”行为：模型仅对文字部分进行加密，而保留数学符号为明文，可能高估少数样例的实际推理能力。论文使用完美分类器$\sigma(x_{1:t}, C)$与近似分类器$\hat{\sigma}(x_{1:t}, C)$来检测此类行为（Section 4.2）。
-
 
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_yjFkeQ2ynQ/figures/004_Figure_3.jpg]]
 *Figure 3: Ciphered reasoning & translation capability in few-shot prompted models. Each point is one model prompted with 8 examples from one cipher. * denotes a cipher in which we observe gaming*
@@ -238,7 +226,6 @@ Figure 7展示了不同加密特性对推理能力的影响。文法/词汇层�
 
 附录A.9报告了使用GRPO目标函数进行强化学习优化的结果（Table 3）。RL训练可将加密推理的相对准确率下降最多减少8.4个百分点，但远不足以弥合较大差距。奖励函数设计为：当回答遵循加密且正确时给予正奖励，未遵循加密时给予负奖励。这表明即使引入明确的优化信号，模型在加密推理上的根本性困难仍难以克服。
 
-
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_yjFkeQ2ynQ/figures/019_Table_3.jpg]]
 *Table 3: Results of RL experiments*
 
@@ -253,11 +240,6 @@ Figure 4展示了零样本通用提示下监控模型解密加密文本的能力
 3. **机制理解不足**：论文明确指出对加密推理能力下降的内部机制理解不足——不清楚瓶颈发生在token化、语义解析还是推理执行环节。
 4. **未探索对抗性加密**：未尝试设计故意最小化易读性而最大化推理能力的专用加密，也未探索RL训练中可能自然涌现的加密模式。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_yjFkeQ2ynQ/figures/005_Figure.jpg]]
-*Figure: (a) Prompted translation vs. fine-tuned reasoning (b) Prompted translation vs. few-shot reasoning*
-
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_yjFkeQ2ynQ/figures/002_Table_1.jpg]]
 *Table 1: A selection of ciphers we evaluate*
 
@@ -266,22 +248,6 @@ Figure 4展示了零样本通用提示下监控模型解密加密文本的能力
 
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_yjFkeQ2ynQ/figures/020_Table_4.jpg]]
 *Table 4: Hyperparameters used for Qwen2.5 experiments in Section 4.1*
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_yjFkeQ2ynQ/figures/021_Table_5.jpg]]
-*Table 5: Hyperparameters used for GPT 4.1 experiments in Section 4.1*
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_yjFkeQ2ynQ/figures/022_Table_6.jpg]]
-*Table 6: Hyperparameters used for experiments in Section 5.2*
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_yjFkeQ2ynQ/figures/024_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_yjFkeQ2ynQ/figures/025_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_yjFkeQ2ynQ/figures/026_Table_7.jpg]]
-*Table 7: See Table 7 for a detailed breakdown of accuracy & adherence for every fine-tuned model and cipher we evaluate*
-
-
-
 
 ## 定位与知识库关联
 
@@ -348,8 +314,6 @@ Figure 4展示了零样本通用提示下监控模型解密加密文本的能力
 ### 在知识库中的定位
 
 本文处于**AI安全监控脆弱性**与**语言模型推理鲁棒性**的交叉节点。与此前关于思维链监控（CoT monitoring）的工作不同，本文首次系统性地量化了加密思维链对监控的潜在威胁程度，同时揭示了当前模型在这一威胁面前的“意外脆弱性”——它们无法在加密语言中有效推理，但这一能力可以通过数据注入被“解锁”。这一发现对AI安全策略设计具有直接的政策含义：依赖思维链透明度的监控方案，必须考虑加密推理能力的潜在风险与数据管控策略。
-
-
 
 ## 原文 PDF
 

@@ -53,8 +53,6 @@ claims:
 
 **局限与开放问题**：当前方法针对单角色设计，扩展到多角色及交互场景仍面临挑战；受视频扩散模型不可控先验限制，背景运动可能与前景不协调；对于高度抽象的非人形角色，三维代理的绑定与重定向存在局限性。未来方向包括结合更先进的骨骼绑定技术（如 UniRig）提升非人形角色运动质量，以及引入更丰富的相机运动控制增强背景真实感。
 
-
-
 视觉叙事生成旨在将一段文本故事转化为连贯的图像或视频序列，这要求系统同时解决角色外观一致性、场景风格统一以及跨镜头的运动连贯性三大挑战。近年来，扩散模型（Diffusion Models）在文本到图像（T2I）和文本到视频（T2V）生成领域取得了显著进展，催生了一系列主体定制与风格化方法。然而，当输入从高质量照片或规范插图变为**儿童手绘角色**时，现有方法的局限性便集中暴露出来。
 
 **核心瓶颈**在于：儿童画具有高度抽象、线条简略、比例失调等特性，现有方法难以在**单一样本**的条件下同时保持风格一致性、跨镜头角色一致性以及复杂自然运动。具体而言，以 **StyleDrop**（Sohn et al., arXiv 2023）和 **B-LoRA**（Frenkel et al., 2025）为代表的风格化定制方法，通常采用全局风格适配器进行微调，容易将前景角色的风格不加区分地“涂抹”到背景上，导致角色细节丢失或背景风格不协调。而以 **DreamBooth**（Ruiz et al., CVPR 2023）为代表的主体定制方法，虽能保留角色外观，却难以将其自然嵌入风格化的叙事场景中。在视频生成侧，基于深度引导的 **Wan2.1**（Wan et al., 2025）和基于姿态引导的 **Animate-X**（Tan et al., 2024）等方法，依赖显式的几何约束（深度图或骨骼姿态）来驱动运动，但这类约束对于抽象手绘角色往往难以精确提取，且无法有效处理角色外观与背景风格的协调问题。此外，端到端的外观与运动联合定制方法如 **DreamVideo**（Wei et al., CVPR 2024），在单样本条件下容易将外观与运动信息纠缠学习，导致角色身份退化或运动不自然。
@@ -62,8 +60,6 @@ claims:
 更深层的缺口在于**结构化的电影叙事控制**。现有方法大多聚焦于单镜头生成或简单的风格迁移，缺乏对故事板（Storyboard）层面的规划——包括场景划分、角色动作描述、镜头视角设计等。这使得生成的动画序列缺乏叙事连贯性与视觉表达力，难以真正实现从“一幅画”到“一部短片”的跨越。
 
 FairyGen 正是在这一背景下提出的，其核心动机在于：**解耦角色建模与风格化背景生成，引入3D代理重建来提供物理合理且可控的运动先验，并采用两阶段运动定制与偏置时间步采样策略，使得视频扩散模型能够忠实保留角色外观并学习流畅运动。** 通过将风格传播限制在背景区域并利用3D代理的运动先验来微调图像到视频扩散模型，FairyGen 有效分离了外观、运动与风格三个维度，从而在单儿童画输入下生成高质量的故事动画。
-
-
 
 ## 核心方法与创新机理
 
@@ -108,8 +104,6 @@ FairyGen 的核心创新在于**将风格传播、运动生成与角色外观三
 
 这三个 changed slots 协同作用，使得 FairyGen 能够在单儿童画输入的极端条件下，同时达成风格一致性、跨镜头角色一致性与复杂自然运动，构成了方法的核心竞争力。
 
-
-
 FairyGen 的整体流程围绕“从单幅儿童绘角色到多镜头叙事卡通视频”这一目标，将风格、运动与叙事控制解耦为四个协同阶段：**故事板规划**、**风格传播场景生成**、**三维代理运动重建** 与**两阶段视频运动定制**。图 2 给出了端到端的流水线概览。
 
 ### 输入与输出
@@ -138,15 +132,11 @@ FairyGen 的整体流程围绕“从单幅儿童绘角色到多镜头叙事卡�
 
 上述模块以串行-反馈的方式协同工作：故事板规划器为风格传播模块提供场景描述；风格传播模块生成风格一致的静态场景后，再根据故事板中的镜头视角进行裁剪与合成；三维代理重建模块独立生成运动序列；最终，两阶段运动适配器将静态场景与运动序列融合，驱动视频扩散模型生成动画。这种解耦设计使得前景角色、背景风格与运动三者互不干扰，从而在单样本条件下实现高质量的故事视频生成。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l92_https_arxiv_org_abs_2506_21272/figures/002_Figure_1.jpg]]
 *Figure 1: We present FairyGen, a visual story generation framework to generate multi-shot cartoon videos from a single child-drawn character with consistent style and motion between the foreground and the background. Project page: https://jayleejia.github.io/FairyGen/*
 
 ![[assets/figures/papers/paper_list_l92_https_arxiv_org_abs_2506_21272/figures/003_Figure_2.jpg]]
 *Figure 2: The pipeline of the whole FairyGen*
-
-
 
 FairyGen 的核心设计围绕一个关键矛盾展开：如何在仅有一张高度抽象、风格鲜明的儿童手绘角色的条件下，生成风格一致、运动自然且叙事连贯的多镜头视频。为此，框架通过三个相互解耦的模块——**故事板规划器**、**风格传播适配器**与**基于3D代理的运动定制器**——分别解决叙事结构缺失、风格一致性难以保持、运动生成不可控这三个瓶颈，并通过精心设计的训练策略与采样机制将它们统一到一个端到端的生成管线中。
 
@@ -200,18 +190,8 @@ $$t = \sigma(z) = \frac{1}{1 + e^{-z}}, \quad z \sim \mathcal{N}(\mu, \sigma^2)$
 
 三个核心模块并非孤立运作，而是通过信息流形成因果链：故事板规划器提供镜头级语义约束 → 风格传播适配器生成风格一致的静态场景 → 3D代理提供物理运动先验 → 两阶段运动适配器将静态场景与运动序列融合为动态视频。这种解耦设计使得每个模块可以独立优化，同时通过明确的接口（掩码、运动序列、适配器权重）实现端到端的协同。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l92_https_arxiv_org_abs_2506_21272/figures/004_Figure_3.jpg]]
 *Figure 3: The pipeline of the storyboard generation. We first plan the whole story using the M-LLM and build a storyboard containing the scenes, events, character action, background, and camera shots. Then, we crop the stylized image using different camera shot and generate final shot images*
-
-![[assets/figures/papers/paper_list_l92_https_arxiv_org_abs_2506_21272/figures/005_Figure_4.jpg]]
-*Figure 4: Style Consistent Scene Generation*
-
-![[assets/figures/papers/paper_list_l92_https_arxiv_org_abs_2506_21272/figures/006_Figure_5.jpg]]
-*Figure 5: Two-stage motion train stratage. We first use unorded frames to learn character spatial features without temporal bias. Then, with the identity LoRA frozen, motion residuals are learned from sequential video frames*
-
-
 
 ## 实验与关键发现
 
@@ -221,30 +201,18 @@ $$t = \sigma(z) = \frac{1}{1 + e^{-z}}, \quad z \sim \mathcal{N}(\mu, \sigma^2)$
 
 FairyGen 在风格对齐、文本对齐与用户偏好上均展现出显著优势。Table 1 汇总了风格化方法的定量对比。在基于 CLIP 的风格对齐距离（Style Align）上，FairyGen 取得 **0.6580**，全面优于 **StyleDrop**（Sohn et al., arXiv 2023）、**B-LoRA**（Frenkel et al., 2025）与 **InstantStyle** 等基线方法。用户偏好研究进一步验证了这一优势：在风格质量投票（Style Quality）中，FairyGen 获得 **0.5365**，远高于次优方法。
 
-![[assets/figures/papers/paper_list_l92_https_arxiv_org_abs_2506_21272/figures/008_Table_1.jpg]]
-*Table 1: Style Comparsion with other methods*
-
 值得注意的是，在视觉印象（Visual Impression）指标上，FairyGen 得分为 **0.3251**，略低于 B-LoRA 的 0.3429（差距 -0.0178）。这一差异可归因于 B-LoRA 倾向于生成照片级真实感图像，而 FairyGen 的目标是保持手绘卡通风格的一致性——这恰恰是任务需求所在，而非方法缺陷。
 
 定性比较（Fig. 7）直观展示了 FairyGen 的优势：StyleDrop 与 B-LoRA 在背景风格化时容易出现前景角色外观失真或风格不协调，而 FairyGen 的前景掩码引导风格传播机制能够精确地将角色风格迁移至背景，同时完整保留角色的视觉身份。
-
-![[assets/figures/papers/paper_list_l92_https_arxiv_org_abs_2506_21272/figures/009_Figure_7.jpg]]
-*Figure 7: Compare with Stylization Methods. We compare our method with different stylization methods on stylization customization*
 
 #### 运动定制质量评估
 
 Table 2 展示了运动定制方法的定量对比。在 VBench 运动平滑度（Motion Smoothness）上，FairyGen 达到 **0.987**，显著优于深度引导 **Wan2.1**（Wan et al., 2025）、姿态引导 **Animate-X**（Tan et al., 2024）以及外观与运动联合定制方法 **DreamVideo**（Wei et al., CVPR 2024）。在用户研究中，FairyGen 的运动真实感（Motion Realness）得分高达 **0.780**，体现了基于 3D 代理的运动先验对物理合理性的关键贡献。
 
-![[assets/figures/papers/paper_list_l92_https_arxiv_org_abs_2506_21272/figures/010_Table_2.jpg]]
-*Table 2: Motion Comparsion. with other methods*
-
 ![[assets/figures/papers/paper_list_l92_https_arxiv_org_abs_2506_21272/figures/011_Figure_9.jpg]]
 *Figure 9: Ablation on two-stage Motion Adapter. We ablated the twostage adapters in our proposed motion customization in image-to-video generation. Here, the first stage of training improves the identity similarity. 24 stylized image sets, each set contains 4 different methods, and needs to be evaluated from two aspects. As for motion, we utilize 12 video sets using 3 different methods, and the users need to be evaluated from two aspects. Finally, we obtain 3360 opinions. As shown in tables, the users consistently prefer our method in terms of style alignment, motion realism, and visual coherence. As shown in Tab. 1, our method achieves the highest score in style similarity, surpassing B-LoRA, Instan...*
 
 Fig. 6 的定性对比揭示了各方法的典型失败模式：深度引导 Wan2.1 在处理复杂运动时，角色外观容易发生形变或与背景融合模糊；姿态引导 Animate-X 虽能跟随骨骼运动，但难以保持手绘角色的风格化纹理细节。FairyGen 通过两阶段运动适配器（先身份后运动）与时间步移采样，在保留角色外观的同时生成了与原运动序列高度一致的流畅动画。
-
-![[assets/figures/papers/paper_list_l92_https_arxiv_org_abs_2506_21272/figures/007_Figure_6.jpg]]
-*Figure 6: Compare with Motion Customization. We compare the proposed motion customization method with the depth-guided image-to-video method using Wan2.1 [Wan et al. 2025], pose-guided image-to-video character animation method, i.e., Animate-X [Tan et al. 2024], the proposed method shows very similar results to the original motion sequence with this complex motion*
 
 #### 多事件视频生成
 
@@ -283,8 +251,6 @@ Fig. 12 验证了时间步移采样策略对运动质量的提升效果。采用
 ---
 
 *注：部分定量对比的基线具体数值在现有材料中未明确列出，上述分析基于 Table 1 与 Table 2 的定性比较结论及用户研究数据。如需精确的逐基线数值对比，建议查阅原始论文表格。*
-
-
 
 ## 定位与知识库关联
 
@@ -358,8 +324,6 @@ FairyGen 开辟了若干值得深入探索的方向：
 ### 5. 知识库定位总结
 
 FairyGen 在方法谱系中占据了一个独特的交叉位置：它既非纯粹的风格化方法，也非单纯的运动生成方法，而是通过**解耦-重建-定制**的三阶段框架，将风格传播、3D运动先验与视频扩散模型微调有机整合。其核心贡献在于证明了：**在单样本、高度抽象输入的极端条件下，通过结构化的解耦设计与物理先验的引入，可以实现风格一致、运动自然、叙事连贯的视频生成**。这一方法论对未来的少样本视频生成、交互式叙事创作以及儿童教育工具等应用具有重要的参考价值。
-
-
 
 ## 原文 PDF
 

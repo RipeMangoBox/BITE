@@ -136,8 +136,6 @@ CoT-Edit 提出“规划–引导–编辑”（Plan–Guide–Edit）范式，�
 
 为稳定训练并充分发挥各模块能力，CoT-Edit 采用分阶段训练策略：首先对 Planner、Guide 和 Editor 进行模块化单独预训练，随后在内部构建的 10 万对编辑数据上进行联合微调。这种策略避免了端到端大规模训练中模块间梯度冲突的问题，同时保证了各组件在联合优化前已具备基本能力。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2300_https_openaccess_thecvf_com_content_CVPR2026_html_Liang_CoT_Edit_Let_CoT/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed “Plan–Guide–Edit” framework for instruction-based video editing. Given a video and an instruction, a CoT-enhanced VLM planner performs step-by-step analysis to produce an enriched instruction and a temporal sequence of bounding boxes. The Guide branch turns these spatial priors into spatio-temporally consistent masks, while the Editor fuses text, video features, and mask guidance through bidirectional connectors to render the final edited video*
 
@@ -205,8 +203,6 @@ Figure 4展示了CoT-Edit与开源基线的定性对比。在“添加一个以�
 ### 失败模式与局限
 
 尽管整体表现优异，分析中仍可识别出若干边界情形。在大规模多物体交互场景中，MLLM规划器的计算开销和边界框预测的鲁棒性可能成为瓶颈——当场景包含五个以上交互物体且指令涉及复杂空间关系时，规划器输出的边界框序列可能出现漏检或时序不一致。此外，训练数据依赖合成视频编辑对，在真实场景（如手持拍摄、剧烈光照变化）中的泛化性仍需进一步验证。这些局限在原文中未被系统量化，建议在实际部署前进行针对性评估。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2300_https_openaccess_thecvf_com_content_CVPR2026_html_Liang_CoT_Edit_Let_CoT/figures/005_Table_1.jpg]]
 *Table 1: Quantitative comparison of CoT-Edit and baseline models on visual and editing quality metrics*

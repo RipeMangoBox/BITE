@@ -46,8 +46,6 @@ claims:
 
 在多个空间推理基准上的实验表明，GCA取得了显著的性能提升：以 **Gemini-2.5-Pro** 为基座时，平均准确率达到 **65.1%**，较基线的58.5%提升 **+6.6个百分点**（Table 1, Avg列）。更广泛地，GCA在多个基础VLM上平均带来约 **37%** 的相对性能增益，验证了该范式的通用性与有效性。
 
-
-
 ### 语义-几何鸿沟：VLM 空间推理的根本瓶颈
 
 视觉语言模型（VLM）在一般视觉理解任务上取得了显著进展，但在需要精确空间推理的场景中暴露出系统性缺陷。其核心问题在于 **语义-几何鸿沟（Semantic-Geometric Gap）**：当视觉信息被转换为文本空间中的语义表征时，精确的几何细节（如相对位置、朝向、距离等）不可避免地丢失。VLM 在语义空间中进行的推理因此缺乏几何约束，导致规划无约束、推理结果不可靠。
@@ -72,8 +70,6 @@ claims:
 
 这一解耦策略的本质在于：**通过形式化约束将几何推理从 VLM 的损失语义空间中剥离出来，交给精确的几何工具完成，同时保留 VLM 在语义理解上的优势**。$\mathcal{C}_{\mathrm{task}}$ 作为语义与几何之间的确定性桥梁，需要满足三个条件：语法足够丰富以定义视点等复杂空间概念、语义足够清晰以消除歧义、几何足够完备以支持精确计算。
 
-
-
 ## 核心方法与创新机理
 
 GCA 的核心创新在于通过一个形式化任务约束 $\mathcal{C}_{\mathrm{task}}$ 将空间推理中语义与几何之间的鸿沟进行了解耦与桥接。这一设计并非简单地增加推理步骤或工具调用，而是从根本上改变了 VLM 在推理过程中的角色定位与信息流动方式。
@@ -86,8 +82,6 @@ GCA 的核心创新在于通过一个形式化任务约束 $\mathcal{C}_{\mathrm
 
 **与现有方法的本质差异。** 与 ReAct 等通用智能体框架不同，GCA 并非简单地让 VLM 在思考-行动-观察循环中自由探索，而是通过 $\mathcal{C}_{\mathrm{task}}$ 对探索空间进行了刚性约束。与依赖微调或大量示例的方法相比，GCA 是一种免训练范式，其泛化能力来源于形式化约束本身的几何完备性，而非模型对特定数据分布的拟合。Figure 5 显示，GCA 在不同基础 VLM 上平均带来约 37% 的相对性能提升，验证了这一范式的模型无关性。
 
-
-
 GCA 是一个**免训练的智能体范式**，专为几何约束下的空间推理设计。其核心思想是通过引入一个形式化任务约束 $\mathcal{C}_{\mathrm{task}}$，将视觉语言模型（VLM）的推理过程解耦为两个阶段，从而弥合语义理解与几何计算之间的鸿沟（Figure 1）。
 
 ![[assets/figures/papers/paper_list_l2638_https_arxiv_org_abs_2511_22659/figures/001_Figure_1.jpg]]
@@ -96,9 +90,6 @@ GCA 是一个**免训练的智能体范式**，专为几何约束下的空间推
 ### 两阶段流水线
 
 GCA 的整体范式如 Figure 2 所示，包含以下两个关键阶段：
-
-![[assets/figures/papers/paper_list_l2638_https_arxiv_org_abs_2511_22659/figures/002_Figure_2.jpg]]
-*Figure 2: Overall Paradigm of GCA. Given a spatial reasoning query, our GCA leverages a geometrically-constrained reasoning strategy centered on the formal task constraint*
 
 **阶段一：任务形式化（Task Formalization）**  
 在此阶段，VLM 扮演**语义分析师**的角色，将模糊的自然语言查询 $q$ 和视觉信息 $v$ 翻译为一个形式化、可验证的任务约束 $\mathcal{C}_{\mathrm{task}}$。该过程可表示为：
@@ -124,8 +115,6 @@ $$r_t = \mathcal{F}_{\mathrm{compute}}(\mathcal{C}_{\mathrm{task}}, v, \mathcal{
 - **输出**：空间推理的最终答案 $r_t$，由阶段二通过受约束的代码生成与工具编排产生。
 
 与传统的 ReAct 策略 $r_t = \mathcal{A}(q, v, \mathcal{T}, r_{t-1})$ 相比，GCA 的关键区别在于强制 VLM 先确定“求解什么”（通过 $\mathcal{C}_{\mathrm{task}}$ 形式化），再决定“如何求解”（通过受约束的几何计算），从而避免了纯文本推理中的几何信息丢失问题。
-
-
 
 GCA 的核心在于引入一个形式化的任务约束 $\mathcal{C}_{\mathrm{task}}$，作为语义理解与几何计算之间的确定性桥梁。整个推理过程被解耦为两个阶段，VLM 在其中的角色随之发生转变。
 
@@ -167,13 +156,6 @@ $$\mathcal{C}_{\mathrm{task}} = \mathcal{F}_{\mathrm{formalize}}(\boldsymbol{q},
 $$r_t = \mathcal{F}_{\mathrm{compute}}(\mathcal{C}_{\mathrm{task}}, \mathcal{T}, r_{t-1})$$
 
 这一设计的核心洞察在于：通过强制 VLM 先确立“求解什么”（$\mathcal{C}_{\mathrm{task}}$），再决定“如何求解”（$\mathcal{F}_{\mathrm{compute}}$），从根本上缩小了语义理解与几何计算之间的鸿沟。整个框架无需模型微调，以训练无关的智能体范式运行。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2638_https_arxiv_org_abs_2511_22659/figures/003_Figure_3.jpg]]
-*Figure 3: Reference Frame. Here*
-
-
 
 ## 实验与关键发现
 
@@ -217,9 +199,6 @@ Table 3 进一步消融了任务约束 $\mathcal{C}_{\mathrm{task}}$ 本身，�
 
 Figure 5 展示了 GCA 在不同基础 VLM 上的泛化能力。在所有测试的 VLM 上，GCA 平均带来约 **37% 的相对性能提升**。这表明 GCA 的形式化-计算解耦范式不依赖于特定 VLM 的能力边界，而是作为一种通用的推理增强策略发挥作用。
 
-![[assets/figures/papers/paper_list_l2638_https_arxiv_org_abs_2511_22659/figures/005_Figure_5.jpg]]
-*Figure 5: Ablation Study on Generalizability across Different VLMs. Our GCA achieves an average of 37% relative performance improvement across all tested foundation VLMs*
-
 ### 失败模式与局限
 
 尽管 GCA 在整体上表现优异，其性能仍受限于以下因素：
@@ -236,13 +215,6 @@ Figure 5 展示了 GCA 在不同基础 VLM 上的泛化能力。在所有测试�
 - **Table 1**：GCA 在多个空间推理基准上建立了新的 state-of-the-art，以 training-free 的方式超越强 VLM 基线。
 - **Figure 4 & Table 2**：形式化约束与知识增强代码生成是 GCA 性能增益的核心来源，二者缺一不可。
 - **Figure 5**：GCA 的范式对不同 VLM 具有广泛适用性，平均相对提升达 37%，验证了其作为通用空间推理增强策略的潜力。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2638_https_arxiv_org_abs_2511_22659/figures/007_Figure_6.jpg]]
-*Figure 6: Error Attribution and Failure Cases. We provide a detailed error attribution analysis to identify the main failure modes within the VLM’s reasoning trajectory*
-
-
 
 ## 定位与知识库关联
 
@@ -287,8 +259,6 @@ GCA 的设计依赖于以下前提条件，这些条件同时定义了其适用�
 2. **动态场景与时间维度的扩展**：GCA 当前处理的是静态空间关系。对于涉及动态物体运动、视角连续变化的场景，参考系约束（$\mathcal{C}_{\mathcal{R}}$）需要引入时间维度，这超出了现有框架的覆盖范围。
 3. **公式库的自动扩展**：知识增强代码生成依赖预置公式库。是否可以通过从成功推理轨迹中自动挖掘新的几何关系模式来动态扩展公式库，从而提升系统的覆盖面和鲁棒性？
 4. **与训练方法的协同**：GCA 是训练无关范式，但其形式化-计算两阶段结构是否可以作为训练信号，用于微调 VLM 以提升其空间语义分析能力？这可能是连接 agentic 方法与模型能力提升的潜在方向。
-
-
 
 ## 原文 PDF
 

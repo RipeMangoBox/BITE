@@ -53,8 +53,6 @@ claims:
 
 **局限性**：当前模板式标注引擎的文体多样性有限，可能不及大型语言模型；对于极端姿态差异的模式转换，规划器可能产生运动学突变，缺乏自动过滤机制；预定义的运动模式集合固定，不支持用户自定义基元或学习技能；系统依赖仿真环境，仿真到现实的迁移尚未验证。
 
-
-
 人形机器人的全身运动生成是具身智能领域的核心挑战之一。要让机器人执行“蹲下并向前挥拳”或“以夸张的步态绕圈行走”等复杂指令，需要大规模、高质量的运动-语言配对数据来训练或微调生成模型。然而，现有数据获取管线存在根本性瓶颈。
 
 **动作捕捉管线的规模天花板。** 传统方法依赖昂贵的动作捕捉（MoCap）设备记录人体运动，再通过重定向（retargeting）将运动映射到目标机器人（如 **MoCap+retargeting pipeline**, Luo et al., ICCV 2023; Peng et al., SIGGRAPH 2018）。这一范式面临三重制约：第一，硬件和场地成本限制了采集规模；第二，重定向过程引入的物理可行性问题（如足部滑移、关节超限）需要大量人工修复；第三，每段运动仍需人工撰写语言描述，标注成本随数据量线性增长。这些因素共同导致现有数据集的规模和多样性远远不足以支撑全身运动-语言生成模型的训练需求。
@@ -64,8 +62,6 @@ claims:
 **核心洞察：将数据生成成本从录制转向计算。** CLAW 的关键认识在于：如果能够将运动规划器的运动模式（locomotion、squat、boxing 等）视为可组合的参数化基元，并通过物理仿真跟踪这些基元生成的参考轨迹，就可以在完全不需要动作捕捉的条件下，规模化地生成物理可行且语言标注多样化的运动数据。这意味着数据生成的瓶颈从“录制”转移到了“计算”——一个可并行扩展、成本递减的维度。
 
 基于这一洞察，CLAW 提出了一套完整的免动作捕捉数据生成管线：操作者通过浏览器界面组合参数化运动基元，系统在 MuJoCo 物理仿真中实时跟踪并生成关节轨迹，同时模板引擎从运动参数自动生成多样化的自然语言标注。这种设计使得探索性操作和批量数据收集可以在统一框架下完成，为大规模全身运动-语言数据集构建提供了可行的技术路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -111,8 +107,6 @@ CLAW 引入**基于模板的确定性标注引擎**，直接从驱动规划器�
 - **运动基元的可扩展性**：预定义的 25 种运动模式是固定的，不支持用户自定义基元或通过强化学习获取新技能，限制了行为多样性的上限。
 - **Sim-to-Real 差距**：系统完全依赖仿真环境，生成的仿真数据向真实机器人部署的迁移尚未验证，可能需要额外的域适应步骤。
 
-
-
 CLAW 的系统设计围绕一个核心目标展开：将人形机器人全身运动‑语言数据的获取从昂贵的动作捕捉（MoCap）和人工标注中解放出来，转而依赖参数化运动基元的组合与物理仿真。为此，整个 pipeline 被解耦为四个独立进程，通过结构化消息流实现端到端的数据生成。
 
 ### 系统架构与模块关系
@@ -140,8 +134,6 @@ CLAW 的系统设计围绕一个核心目标展开：将人形机器人全身运
 
 两种互补的交互界面进一步支撑了这一范式：**键盘模式**支持实时探索性控制，**编辑器模式**支持在可视时间线上编排运动片段并批量复现，两者共享同一后端，使得探索性数据收集与大规模批量生成可在同一框架内完成。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2604_11251v3/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of CLAW. Users can compose whole-body motion sequences for the Unitree G1 humanoid through either keyboard mode (top-left) or editor mode (top-right), producing diverse trajectories with seamless transitions between motion modes (bottom-left). Each trajectory is automatically paired with multi-style natural-language descriptions (bottom-right)*
 
@@ -150,8 +142,6 @@ CLAW 的系统设计围绕一个核心目标展开：将人形机器人全身运
 
 ![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2604_11251v3/figures/006_Figure_5.jpg]]
 *Figure 5: System architecture of CLAW. The pipeline comprises four decoupled processes: a MuJoCo simulation, a C++ controller hosting the kinematic planner and tracking policy, a WebSocket–ZMQ bridge for protocol translation and recipe orchestration, and a browser-based frontend for visualization and operator interaction*
-
-
 
 CLAW 的推理与数据生成流程由五个解耦模块串联构成，整体架构见 **Fig. 5**。操作者通过前端接口下达运动意图，经协议桥接层转换为结构化命令，驱动运动学规划器生成参考轨迹，再由全身控制器在物理仿真中跟踪执行，最终由语言标注引擎从运动参数自动生成多风格自然语言描述。
 
@@ -198,15 +188,8 @@ CLAW 的推理与数据生成流程由五个解耦模块串联构成，整体架
 
 > **注意**：若需了解规划器或控制器的具体数学形式，需查阅 SONIC 原论文或 CLAW 的补充材料，当前正文未提供相关公式。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2604_11251v3/figures/003_Table.jpg]]
 *Table: I: Available motion modes exposed by the planner. Checkmarks indicate whether a mode supports adjustment of speed, heading or height*
-
-![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2604_11251v3/figures/007_Figure_6.jpg]]
-*Figure 6: Motion stitching. CLAW enables motion stitching across semantically distinct motion modes. (a) The generative planner produces smooth, natural transitions between different motion modes. (b) Abrupt mode switching might lead to transient artifacts in the generated motion*
-
-
 
 ## 实验与关键发现
 
@@ -241,17 +224,8 @@ CLAW 的系统架构（Fig. 5）由四个解耦进程构成：MuJoCo 物理仿�
 
 CLAW 的实验验证侧重于**系统能力演示**而非传统基准测试。其核心证据链——平滑的模式拼接、规模化自动化标注、模块化工程架构——共同支撑了“将数据生成成本从录制转向计算”这一核心主张。然而，定量对比的缺失和若干开放问题意味着，CLAW 目前更适合被视为一个**数据生成基础设施**而非一个完整的基准解决方案，其产出的数据在下游任务（如训练 Kimodo 等文本到运动生成模型）中的实际效用仍需后续工作验证。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2604_11251v3/figures/005_Figure.jpg]]
-*Figure: Controllable Motion Variance Run at 1.5 m/s*
-
 ![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2604_11251v3/figures/008_Figure.jpg]]
 *Figure: Editable Timeline Description*
-
-![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2604_11251v3/figures/009_Table.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -290,8 +264,6 @@ CLAW 当前的设计在以下条件下有效：
 4. **Sim-to-Real 差距**：CLAW 生成的数据和策略均在仿真中验证，物理仿真虽能过滤大部分不可行运动，但仿真动力学与真实硬件的差异可能导致部署时的性能退化。是否需要领域随机化或在线适应等额外步骤，尚未在论文中探讨。
 
 5. **标注的语义精度**：模板引擎从运动参数生成描述，其语义粒度受限于参数本身的表达能力。对于涉及复杂空间关系或精细手部动作的运动，参数化描述可能丢失关键语义细节。这一问题在需要细粒度时空对齐的下游任务（如具身指令跟随）中尤为突出。
-
-
 
 ## 原文 PDF
 

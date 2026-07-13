@@ -54,8 +54,6 @@ claims:
 
 **局限性提示**：该方法对极长序列的长期时间依赖处理能力仍有限，对位置相关指令的空间敏感度不足，且在极端身体部位组合下协调器仍可能出现罕见的协调误差。
 
-
-
 ### 问题背景
 
 文本引导的运动编辑旨在根据自然语言指令修改人体运动序列，在动画制作、虚拟现实和人机交互等领域具有广泛应用。然而，这一任务面临两个核心挑战：**运动表示的高维连续性**与**自然语言指令的语义歧义性**。现有方法通常将运动编辑建模为条件生成问题，以原始运动和编辑指令为条件，生成符合语义的编辑后运动。
@@ -80,8 +78,6 @@ claims:
 2. **MotionReFit自回归扩散架构**：采用自回归框架逐段生成长序列以降低学习难度，并引入运动协调器通过判别器引导消除混合运动中的身体不协调问题。
 
 这一组合策略旨在突破标注数据规模的限制，实现通用且鲁棒的运动编辑。
-
-
 
 ## 核心方法与创新机理
 
@@ -117,8 +113,6 @@ $$
 
 与需要额外指定编辑部位掩码或行为标签的基线方法不同，MotionReFit **仅需原始运动序列和文本编辑指令作为输入**，无需任何额外的部位指定信息。这一简化降低了使用门槛，同时模型通过多模态条件编码器将关键点运动和文本指令统一编码为条件特征，使编辑过程完全由自然语言驱动。
 
-
-
 MotionReFit 的整体设计围绕一个核心矛盾展开：如何仅凭文本指令和原始运动，生成既满足编辑要求又保持身体协调性的高质量运动。为此，框架将任务拆解为三个协同模块，形成一条“条件编码→自回归生成→协调修正”的流水线，如 Figure 4 所示。
 
 **输入与表示。** 系统接收两路输入：原始运动序列和一段自然语言编辑指令。运动在内部以两种可互换的表示形式存在——基于 28 个关键点的表示 $\mathcal{M}^{\kappa} \in \mathbb{R}^{L \times N_K \times 3}$ 和 SMPL‑X 参数表示 $\mathcal{M}^{S} = \{\mathbf{t}, \phi, \mathbf{r}\}$。正向运动学可将 SMPL‑X 参数映射为关键点，反向则通过轻量神经网络加优化的方式完成，保证两个空间之间的信息无损流动。
@@ -148,12 +142,8 @@ $$\tilde{\mathcal{M}}_0 = \hat{\mathcal{M}}_0 + \lambda \nabla_{\hat{\mathcal{M}
 
 **输出闭环。** 经协调器修正后的关键点序列最终通过 SMPL‑X 优化还原为完整的参数化运动，输出编辑后的运动序列。整个流程无需额外指定编辑部位掩码或行为标签，仅依赖原始运动与文本指令即可完成从局部替换到全局风格迁移的多样化编辑任务。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l7_https_openaccess_thecvf_com_content_CVPR2025_html_Jiang_Dynamic_Motion_B/figures/001_Figure_1.jpg]]
 *Figure 1: MotionReFit, a universal framework for motion editing that handles various scenarios simply from textual guidance, offering both spatial and temporal editing capabilities. MotionReFit is supercharged with our proposed MotionCutMix training strategy, which leverages large-scale unannotated motion databases to augment the scarce motion editing triplets, enabling robust and generalizable editing*
-
-
 
 ### 运动表示与空间混合
 
@@ -203,15 +193,8 @@ $$
 
 其中 $\lambda$ 为引导步长。这一分类器引导机制直接作用于去噪过程中的运动表示，有效抑制了合成运动中间侧手臂与腿同步前移等不自然的身体协调伪影。消融实验证实，移除身体部位协调器（w/o BC）会导致 FID 升高，而加入后可消除此类异常同步模式（参见 Figure 7）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l7_https_openaccess_thecvf_com_content_CVPR2025_html_Jiang_Dynamic_Motion_B/figures/003_Figure_3.jpg]]
-*Figure 3: Illustration of spatial motion blending. We compare hard and soft masking approaches, showing how soft masks enable smoother transitions between body parts and eliminate unnatural artifacts at motion boundaries*
-
 ![[assets/figures/papers/paper_list_l7_https_openaccess_thecvf_com_content_CVPR2025_html_Jiang_Dynamic_Motion_B/figures/004_Figure_4.jpg]]
 *Figure 4: Overview of MotionReFit. Our auto-regressive approach processes the original motion through sliding windows, where body keypoints are encoded for input to a transformer-based motion diffusion model. To ensure motion continuity, noise is applied starting from the third frame while preserving the first two frames. The model incorporates an additional token integrating the editing instruction, diffusion step, and progress indicator. The generated keypoints undergo SMPL-X optimization and merging to create the final edited motion. To enhance body part coordination, we employ a discriminator trained to identify motion segments composed of multiple source motions, which guides the denoising proce...*
-
-
 
 ## 实验与关键发现
 
@@ -253,23 +236,14 @@ MotionReFit 在 STANCE 基准测试的两个核心任务——身体部位替换
 
 所有基线方法均在同一数据集划分和评估协议下进行对比，置信区间来自 10 次独立运行。需注意：实验评估未涉及不同性别、体型或残障群体的专项测试；SMPL-X 人体模型的默认体形参数可能引入一定偏向，该问题需在实际部署中手动验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l7_https_openaccess_thecvf_com_content_CVPR2025_html_Jiang_Dynamic_Motion_B/figures/005_Figure_5.jpg]]
 *Figure 5: Qualitative comparison of text-guided motion editing results. Each sequence shows the original motion alongside edits by MotionReFit and baseline methods. Motion trajectories are visualized with a color gradient from orange (starting position) to blue (ending position), with spatial offsets applied to emphasize motion differences*
-
-![[assets/figures/papers/paper_list_l7_https_openaccess_thecvf_com_content_CVPR2025_html_Jiang_Dynamic_Motion_B/figures/008_Figure.jpg]]
-*Figure: (e) (b) (f) (c) (g) (d) (h)*
 
 ![[assets/figures/papers/paper_list_l7_https_openaccess_thecvf_com_content_CVPR2025_html_Jiang_Dynamic_Motion_B/figures/006_Table_1.jpg]]
 *Table 1: Quantitative comparison across body part replacement (upper) and style transfer (lower) tasks. Each metric reports mean over 10 evaluations with 95% confidence intervals (±). Arrows (!) indicate metrics where values closer to real data are better. Bold denotes best performance*
 
-![[assets/figures/papers/paper_list_l7_https_openaccess_thecvf_com_content_CVPR2025_html_Jiang_Dynamic_Motion_B/figures/007_Table.jpg]]
-
 ![[assets/figures/papers/paper_list_l7_https_openaccess_thecvf_com_content_CVPR2025_html_Jiang_Dynamic_Motion_B/figures/010_Figure_6.jpg]]
 *Figure 6: Ablation analyses for body part replacement (a-d) and style transfer (e-h), reporting AvgR metrics. Edited-to-Target AvgR shown only for (d) and (h), with blue dotted lines indicating real data Edited-to-Source AvgR. Parameters studied: (a,e) MotionCutMix ratio, (b,f) annotated data volume, (c,g) temporal window size, and (d,h) convergence patterns at varying MotionCutMix ratios. All training converges within 800k steps. (a) Without body part coordinator*
-
-
 
 ## 定位与知识库关联
 
@@ -308,8 +282,6 @@ MotionReFit 的核心贡献在于**数据增强驱动的运动编辑泛化**，�
 - **扩散模型在运动生成中的应用**：继承 MDM 等工作的扩散范式，但通过自回归分解和判别器引导扩展了扩散模型在运动编辑中的适用性。
 - **数据增强与合成训练**：MotionCutMix 借鉴了图像领域 CutMix 的思想，将其适配到结构化人体运动的空间混合场景，利用 SMPL-X 参数表示和球面线性插值（SLERP）实现软掩码混合，保证了合成运动的物理合理性。
 - **人体运动先验与协调性**：运动协调器的引入将人体运动学先验（身体部位间的自然协调模式）以判别器形式注入生成过程，为运动生成中的物理合理性约束提供了可扩展的实现路径。
-
-
 
 ## 原文 PDF
 

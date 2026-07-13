@@ -160,8 +160,6 @@ $$\alpha_{t} = \begin{cases} \lambda, & \text{if } x_{t} \text{ is a structured 
 
 模型的输入为单页文档图像（支持扫描件、数字-born 文档及真实世界拍摄图像），输出为结构化的 Markdown 格式文本，包含完整的阅读顺序、表格结构、公式 LaTeX 表示和段落组织。整个流水线无需级联的布局分析或元素检测模块，实现了从像素到结构化标记序列的端到端映射。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2611_https_arxiv_org_abs_2603_23885/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of Realistic Scene Synthesis. Left: repositories of atomic elements and layout templates with reading order. Right: a synthesis pipeline that composes sampled elements into templates under spatial/structural constraints to produce page-level annotations, followed by capture-aware augmentation to simulate real-world images*
 
@@ -209,8 +207,6 @@ $$\alpha_{t} = \begin{cases} \lambda, & \text{if } x_{t} \text{ is a structured 
 
 Table 4 的完整消融揭示了三个模块的协同关系。仅使用 RSS 而不施加 ST 和 PTP（配置 #1）时，OmniDocBench Overall 为 88.74，重复率为 5.1。逐步加入 ST（配置 #2）和 PTP（配置 #4）后，Overall 分别提升至 91.24 和 93.75，重复率降至 3.2 和 2.1。三者共同作用时达到最佳的精度-稳定性平衡，说明数据合成提供了多样化的训练信号，而 PTP 和 ST 分别从课程难度和损失加权两个维度引导模型有效利用这些信号。
 
-### 补充图表
-
 ## 实验与关键发现
 
 ### 主结果：OmniDocBench 基准
@@ -233,9 +229,6 @@ DocHumming 在 OmniDocBench 基准上取得了 **93.75** 的 Overall 分数，�
 
 ![[assets/figures/papers/paper_list_l2611_https_arxiv_org_abs_2603_23885/figures/007_Table_3.jpg]]
 *Table 3: Performance comparison on the Wild-OmniDocBench*
-
-![[assets/figures/papers/paper_list_l2611_https_arxiv_org_abs_2603_23885/figures/004_Figure_4.jpg]]
-*Figure 4: Wild-OmniDocBench Construction. We convert scanned pages into real-world–captured images by (i) printing, deforming, and photographing under varied lighting, and (ii) displaying on screens and re-shooting to induce moire and reflections. ´*
 
 这一现象的根本原因在于级联流水线在真实世界捕获场景中会累积布局分析错误并传播至元素解析阶段（如 Figure 2 所示），而 DocHumming 作为端到端模型，通过真实场景合成（RSS）数据训练获得了对光照变化、几何变形等真实世界变异的鲁棒性。
 
@@ -269,11 +262,6 @@ Table 5 的扩展消融显示，**DocMix-3M 合成数据**在 OmniDocBench 和 W
 2. **超高分辨率处理**：模型仅训练于固定分辨率，对超高分辨率文档直接缩放或分块处理可能引入伪影，细节保持能力受限。
 3. **推理延迟**：约 3 秒每页的推理延迟限制了交互式或高吞吐量场景的应用。
 4. **重复率指标的鲁棒性**：当前重复率指标在处理部分重复或近重复输出时是否足够鲁棒，仍需进一步验证（需人工核实具体计算方式）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2611_https_arxiv_org_abs_2603_23885/figures/001_Figure_1.jpg]]
-*Figure 1: Overall Performance and Degradation from OmniDocBench to Wild-OmniDocBench. Underlined method names correspond to modular cascaded pipelines*
 
 ## 定位与知识库关联
 

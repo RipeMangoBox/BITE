@@ -145,11 +145,6 @@ $$\mathcal{L} = -\frac{1}{|x|} \sum_{i=1}^{|x|} \log P(x_i \mid x_{<i})$$
 
 相比于直接监督微调（Direct SFT），LIVR的核心改变在于引入了隐式token和瓶颈注意力掩码这两个协同组件。消融实验表明，**仅添加隐式token而不做瓶颈训练**（Latents only）的性能与Direct SFT持平，说明单纯的容量增加无法带来提升；**仅使用瓶颈掩码而不添加隐式token**（Mask only）同样逊于完整LIVR，说明额外的token容量是瓶颈机制生效的必要条件。二者缺一不可，共同构成了LIVR的完整因果链路。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2322_https_arxiv_org_abs_2512_21218/figures/002_Figure_2.jpg]]
-*Figure 2: An illustration of our method and bottleneck attention masking. Latent tokens are appended to the prompt and losses are computed on the answer tokens. In our bottleneck attention masking, answers and prompt tokens cannot attend to image tokens*
-
 ### 3.1 基础前向传播框架
 
 LIVR 建立在标准大型多模态模型（LMM）的推理范式之上。给定输入图像 $I$ 和文本提示 $Q$，模型的前向传播过程可形式化为：
@@ -191,11 +186,6 @@ LIVR 采用两阶段训练策略以平衡瓶颈约束与模型容量：
 
 消融实验表明，该 4+6 的 epoch 分配在表达力与约束强度之间取得最优平衡；仅进行 Stage 2 训练（即不加瓶颈）的模型性能与 Direct SFT 持平，验证了瓶颈训练的必要性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2322_https_arxiv_org_abs_2512_21218/figures/001_Figure_1.jpg]]
-*Figure 1: The model is asked to determine which image option is most similar to the reference image. Standard LMMs can only output text, which cannot capture all visual information and may introduce ambiguity. While methods using explicit supervision can train models to output intermediate reasoning steps, these approaches may fail when the reasoning steps themselves are unclear. Our approach allows the model to learn useful representations implicitly. Visualizing the attention maps of the latent tokens shows that the model has learned to recognize underlying visual structures relevant to answering the question that would have been hard for humans to design supervision for*
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -212,9 +202,6 @@ Table 1 汇总了九个任务的单任务微调准确率。在 Qwen2.5-VL-3B 骨
 ### 多任务联合训练
 
 Table 2 展示了在 Qwen3-VL-4B 上联合训练六个感知任务的结果。LIVR 在所有六个任务上均优于 Direct SFT，平均准确率从 69.60 提升至 **72.37**（+2.77%）。由于 LIVR 无需任务特定的辅助图像或中间标签，仅从端任务损失中隐式训练隐式 token，因此可直接应用于多任务设置，无需额外适配。
-
-![[assets/figures/papers/paper_list_l2322_https_arxiv_org_abs_2512_21218/figures/004_Table_2.jpg]]
-*Table 2: Multi-task fine-tuning accuracy on Qwen3-VL-4B-Instruct*
 
 ### 外部基准对比
 
@@ -258,9 +245,6 @@ Table 6 系统消融了隐式 token 的关键设计维度：
 
 Figure 3 展示了不同任务中隐式 token 到图像区域的注意力图。在语义对应任务中，模型自动关注与参考点对应的目标区域；在定位任务中，注意力集中在正确边界框内的物体上；在计数任务中，模型关注需要计数的物体实例。尽管存在部分注意力汇聚现象，主导模式与任务相关区域高度一致，表明隐式 token 在没有显式监督的情况下捕获了有意义的视觉结构。
 
-![[assets/figures/papers/paper_list_l2322_https_arxiv_org_abs_2512_21218/figures/009_Figure_3.jpg]]
-*Figure 3: An illustration of latent-to-image attention maps for different tasks. The left columns show the input images, and the right columns show the attention overlays. In the Semantic Correspondence task, the model identifies the option in the second image that aligns with the REF point in the first image. In the Localization task, it selects bounding boxes that best localize the motorcycle and the dog, and in the Counting task, it counts the cows and balloons. We observe that latent-to-image attention concentrates on regions corresponding to the correct answers or the visual evidence needed to resolve each task. Although some attention sinks persist, the dominant patterns align with task-relevan...*
-
 Figure 4 的 t-SNE 降维可视化进一步显示，隐式 token 的嵌入主要分布在图像 token 区域，而非文本 token 区域，从表征空间角度佐证了隐式 token 确实承载了视觉信息。
 
 ![[assets/figures/papers/paper_list_l2322_https_arxiv_org_abs_2512_21218/figures/019_Figure_4.jpg]]
@@ -269,11 +253,6 @@ Figure 4 的 t-SNE 降维可视化进一步显示，隐式 token 的嵌入主要
 ### 失败模式与局限
 
 尽管 LIVR 在多数任务上表现优异，但在 V* 和 BLINK-5 上未能超越 LVR-7B，提示隐式推理在某些需要精细空间关系或细节辨别的场景下可能不如显式中间表示有效。此外，方法对隐式 token 数量 K 和训练阶段比例较为敏感，需针对任务进行调优才能获得最佳性能。隐式 token 学到的具体表征难以直接解释，可视化仅提供定性分析，无法定量描述每个 token 的功能。当前实验主要在 3-7B 参数规模模型上进行，更大规模模型上的效果尚未验证。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2322_https_arxiv_org_abs_2512_21218/figures/015_Figure.jpg]]
-*Figure: Semantic Correspondence*
 
 ## 定位与知识库关联
 

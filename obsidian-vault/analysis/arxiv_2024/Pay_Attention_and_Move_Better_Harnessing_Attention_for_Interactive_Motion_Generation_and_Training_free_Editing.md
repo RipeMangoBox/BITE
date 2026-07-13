@@ -55,8 +55,6 @@ claims:
 
 **局限与展望：** 当前方法在处理生成模型幻觉方面仍然有限，动作计数在复杂序列中仍可能出错，编辑效果在极端权重调整下可能引入运动伪影。未来工作可探索将该范式扩展到语言对话式交互的运动生成，以及增强模型对生成幻觉的鲁棒性。
 
-
-
 ### 文本驱动运动生成的进展与瓶颈
 
 文本驱动的人体运动生成旨在从自然语言描述中合成逼真的三维运动序列。近年来，扩散模型在该领域取得了显著进展，涌现出 **MDM**（Tevet et al., 2022b）、**MLD**（Chen et al., 2023）、**MotionDiffuse**（Zhang et al., 2024a）等一系列方法。这些方法通常将文本条件作为全局嵌入注入去噪过程，能够生成整体语义一致的运动。
@@ -87,8 +85,6 @@ claims:
 
 基于上述分析，本文提出 **MotionCLR**，旨在通过显式建模词级交叉注意力和帧间自注意力，构建一个同时支持高质量运动生成与灵活免训练编辑的统一框架。核心动机在于：**将注意力机制从隐式的模型内部组件升级为显式的可控接口，使运动生成与编辑共享同一套注意力表示，从而实现交互式的、训练无关的运动操纵**。
 
-
-
 ## 核心方法与创新机理
 
 MotionCLR 的核心创新在于**显式建模词级文本-运动对应关系**，并由此衍生出一套**免训练的注意力图编辑范式**。与现有运动扩散模型将文本条件压缩为单一全局 token 或混合注入时间步的做法不同，MotionCLR 在架构层面进行了三项关键解耦（changed slots），从而实现了细粒度的语义控制。
@@ -110,8 +106,6 @@ MotionCLR 的核心创新在于**显式建模词级文本-运动对应关系**�
 ### 4. 免训练编辑范式的统一基础
 
 上述三项架构解耦共同构成了注意力图编辑的因果基础。由于交叉注意力图精确编码了词级语义的时间定位，**替换交叉注意力图**即可在原位将动作 A 替换为动作 B，同时保留未编辑部分的完整性（HVerb 上 MPJPE 仅 57.9 mm，较 MotionFix-C 的 75.3 mm 降低 17.4 mm）。通过缩放交叉注意力权重（$\mathbf{A}_{:,i} \times (1 + \alpha)$）可实现动作的**连续强度控制**（强调/去强调）。而纯化的自注意力图则支持**序列移位**和**风格迁移**——通过沿时间轴移动自注意力图来改变动作顺序，或通过混合不同运动的自注意力图来转移运动风格。所有编辑操作均无需额外训练，仅通过操纵预训练模型内部的注意力图即可完成。
-
-
 
 MotionCLR 的整体架构围绕一个类 U‑Net 的去噪网络构建，其核心原子单元为 **CLR 块（CLR Block）**。如 Figure 2(a) 所示，网络由多个下采样和上采样块堆叠而成，每个采样块包含两个 CLR 块，并在其前后分别执行下采样或上采样操作。
 
@@ -144,13 +138,6 @@ MotionCLR 的整体架构围绕一个类 U‑Net 的去噪网络构建，其核�
 4. 网络输出预测的噪声，通过迭代去噪最终生成干净的运动序列。
 
 这种模块化解耦设计使得交叉注意力图和自注意力图具有明确的语义含义：交叉注意力图决定了“哪个动作在何时执行”，自注意力图反映了“哪些帧的运动模式相似”。正是基于这两种注意力图的显式可解释性，MotionCLR 实现了无需额外训练的动作替换、强调/减弱、序列移位、风格迁移等多种交互式编辑功能。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2410_18977/figures/058_Figure_30.jpg]]
-*Figure 30: The illustration of motion style transfer process. (a) Direct generating style reference: The style information is generated directly using the query (Q), key (K), and value (V) from the style reference motion sequence (blue). (b) Direct generating content reference: The content information is generated directly from the content reference motion sequence (orange). (c) Generating transferred result: The final transferred motion sequence combines the style from the style reference sequence with the content from the content reference sequence, using Q from the style reference (blue) and K, V from the content reference (orange)*
-
-
 
 ### 3.1 CLR 基础模块
 
@@ -204,16 +191,6 @@ $$
 
 -   **序列顺序移位**：通过沿时间轴平移自注意力图来调整运动序列的顺序，利用自注意力对帧间顺序的敏感性实现动作重排。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2410_18977/figures/003_Figure_3.jpg]]
-*Figure 3: Empirical study of attention mechanisms. We use “a person jumps. 2 as an example. (A) Keyframes and the root trajectory of generated motion. The character jumps*
-
-![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2410_18977/figures/004_Figure_4.jpg]]
-*Figure 4: (c) Motion sequence shifting via shifting self-attention map. We adjust the sequence order of the motion sequence via shifting the attention map along the temporal axis. Figure 4: Diagram of motion editing via manipulating attention maps*
-
-
-
 ## 实验与关键发现
 
 ### 生成性能主结果
@@ -264,8 +241,6 @@ Figure 15比较了基于注意力图与基于根轨迹的动作计数错误率�
 
 所有生成基线均使用官方或开源实现，在相同数据集和评估协议下比较。编辑评估构建了专用测试集（HVerb和HVerb-wild），由研究人员标注动词边界，确保了评估的客观性和可复现性。DDIM反演与原始生成的结果差异可忽略（FID: 0.269 vs. 0.299），证明了编辑GT运动的可行性，避免了反演过程引入系统性偏差。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2410_18977/figures/005_Table_1.jpg]]
 *Table 1: Comparison with different methods on the HumanML3D dataset. The baselines include diffusion-based methods and state-of-the-art methods. The “†” notation denotes the DPM-solver sampling inference design choice and “∗” is the DDIM sampling choice. As DPM-solver and DDIM present comparable performance, without specification, we set the DDIM sampling as our default choice. The comparison shows that MotionCLR is with comparable performance with state-of-the-art methods*
 
@@ -277,17 +252,6 @@ Figure 15比较了基于注意力图与基于根轨迹的动作计数错误率�
 
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2410_18977/figures/022_Table_8.jpg]]
 *Table 8: The ablation study of manipulating different attention layers on the HVerb-wild test set. The “begin” and “end” represent the beginning and the final layer/step for manipulation. The bottom row denotes our design choice for motion editing*
-
-![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2410_18977/figures/024_Figure_15.jpg]]
-*Figure 15: Action counting error rate comparison. Root trajectory (Traj.) vs. attention map (Ours)*
-
-![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2410_18977/figures/006_Table_2.jpg]]
-*Table 2: IoU (%) metrics on different settings. High coherence among E1, E2, and E3 shows the fine-grained text-motion modeling in cross attention*
-
-![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2410_18977/figures/020_Table_6.jpg]]
-*Table 6: Comparison of motion style transfer across baselines. The “Gen.” and “Inv.” settings represent the editing during generation and DDIM inversion Song et al. [2021] (following Raab et al. [2024a]) settings*
-
-
 
 ## 定位与知识库关联
 
@@ -327,8 +291,6 @@ MotionCLR 的 CLR 块（Figure 2）实现了三项对基线架构的关键改造
 3. **多模态注意力一致性**：当前方法仅利用文本-运动交叉注意力，而 CLIP 嵌入本身已包含视觉-语言对齐先验。探索如何引入视觉模态的注意力约束，可能进一步提升编辑的语义保真度。
 
 4. **更大规模预训练的潜力**：论文采用 CLIP-ViT-B 作为文本编码器，且训练数据限于 HumanML3D 等中小规模运动数据集。若将架构迁移至更大规模的运动-文本配对数据，并结合更强的语言模型，词级对应关系的鲁棒性和泛化能力有望显著提升，但计算成本和注意力图可解释性之间的平衡需要审慎评估。
-
-
 
 ## 原文 PDF
 

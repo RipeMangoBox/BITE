@@ -237,8 +237,6 @@ Table 3 和 Figure 7 揭示了数据质量的决定性影响：使用未精筛�
 
 尽管 Puppet-Master 在部件级运动控制上表现优异，仍存在若干不足：在需要多个部件精确协调的场景（如五片风扇叶片同时旋转）中，模型可能无法保持部件的完整形状；对真实图像推理时，合成资产的风格化纹理与真实图像的颜色分布差异会导致轻微颜色偏差；低分辨率（256×256）推理时，SVD 骨干卷积层的固定感受野可能引发轻微闪烁；当前模型专为内部运动设计，无法处理全局物体位移；所有训练视频使用白色背景，在复杂纹理背景下的生成质量仍有提升空间。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l18_Puppet_Master_Scaling_Interactive_Video_Generation_as_a_Motion_Prior_for/figures/001_Figure_1.jpg]]
 *Figure 1: Puppet-Master generates videos depicting internal, part-level motion, prompted by one or more drags (arrows). Fine-tuned solely on our curated synthetic Objaverse-Animation-HQ dataset, it generalizes well to real-world scenarios and diverse object categories*
 

@@ -119,8 +119,6 @@ MCD-VAE 的训练损失综合了像素级 L1 损失、感知相似度 LPIPS、KL
 
 这种将视频生成降维为“2D 运动生成 + 条件重建”的策略，是 LaMD 在生成效率与运动质量上取得突破的核心机制。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1049_https_arxiv_org_abs_2304_11603/figures/002_Figure_2.jpg]]
 *Figure 2: The framework of our proposed LaMD. During training process, the stage-I MCD-VAE is first trained to decompose latent motion with video reconstruction task, while DMG is trained to generate natural motion conditioned by*
 
@@ -183,14 +181,6 @@ $$ \mathcal{L}_{\text{simple}}(\theta) = \| \epsilon - \epsilon_\theta(z_m^t, t,
 
 **关键设计优势**：由于潜在运动 $z_m$ 已去除时间维度且空间分辨率仅为原视频的 $1/r_s$（即 $1/4$），扩散目标维度极低。配合 2D-UNet 架构，DMG 的采样速度达到与图像扩散模型 **LDM**（Rombach et al., CVPR 2022）相当的水平，相比像素空间或潜在视频空间的 3D 扩散模型实现数量级加速（Table 11, Fig. 4）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1049_https_arxiv_org_abs_2304_11603/figures/003_Figure_3.jpg]]
-*Figure 3: The architecture of fusion decoder*
-
-![[assets/figures/papers/paper_list_l1049_https_arxiv_org_abs_2304_11603/figures/004_Figure_4.jpg]]
-*Figure 4: The comparison of sampling process of different video diffusion models. Benefited from low-dimensional diffusion target and 2D-UNet based diffusion model, our latent motion diffusion achieves much faster sampling speed compared to video space diffusion and latent video diffusion. The channel dimension is omitted in all settings for simplicity*
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -217,9 +207,6 @@ MCD-VAE的重建性能是生成质量的上限保证。**Table 3**展示了MCD-V
 *Table 4: The comparison of reconstruction performance on BAIR dataset*
 
 Landscape数据集上的运动质量评估（Table 5）进一步验证了分解的有效性：LaMD的Motion Smoothness达到**99.47%**，Temporal Consistency指标也优于对比方法。运动转移实验（Fig. 6）提供了定性证据——将一段视频的运动潜变量与另一段视频的内容特征结合，生成的视频保留了源视频的运动模式但外观完全匹配目标图像，证实运动与内容实现了有效分离。
-
-![[assets/figures/papers/paper_list_l1049_https_arxiv_org_abs_2304_11603/figures/013_Table_5.jpg]]
-*Table 5: Quantitative evaluation on motion quality and temporal consistency on the Landscape dataset*
 
 ### 消融研究
 
@@ -264,14 +251,6 @@ LaMD的采样效率优势源于两个设计：低维扩散目标（仅$d \times 
 
 ![[assets/figures/papers/paper_list_l1049_https_arxiv_org_abs_2304_11603/figures/024_Table_12.jpg]]
 *Table 12: Ablation study of motion capacity in MCD-VAE on the BAIR dataset*
-
-![[assets/figures/papers/paper_list_l1049_https_arxiv_org_abs_2304_11603/figures/025_Table_13.jpg]]
-*Table 13: The trade-off between latent-space size & reconstruction & generation*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1049_https_arxiv_org_abs_2304_11603/figures/015_Table_7.jpg]]
-*Table 7: Quantitative evaluation compared to the state-of-the-art methods on the Landscape dataset. The results of methods for comparison are quoted from corresponding paper or reported by (Dorkenwald et al, 2021)*
 
 ## 定位与知识库关联
 

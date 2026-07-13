@@ -61,8 +61,6 @@ claims:
 
 **局限与待解决问题：** 微调增加了评估成本；部分基准不再公开训练数据，或商业模型不允许微调，限制了方法适用范围。排名一致性仍未达到完美，残差可能源于 PEFT 的适应局限或不可约的测量噪声。YI 家族改善有限的原因、以及如何设计更轻量的 train-before-test 变体，仍需进一步探索。
 
-
-
 语言模型评估的核心挑战在于：不同基准给出的模型排名往往相互矛盾。即使两个基准测试的是同一类能力，模型在它们上的表现排名也可能大相径庭。例如，在 Natural Questions Open 和 ARC Challenge 这两个问答基准上，直接评估下 61 个模型的排名存在显著分歧——统计上不可调和的反转随处可见（Figure 1 上半部分）。这种不一致性并非个例：在所有 24 个基准中，直接评估的成对排名一致性（Kendall's τ）平均仅为 0.52，且同类任务内部的排名一致性同样偏低。
 
 **根本瓶颈**在于模型对基准任务的“预备程度”不同。由于预训练数据的差异，不同模型在预训练阶段接触基准相关数据的程度参差不齐。一些模型可能已经“见过”类似任务格式或领域内容，而另一些则没有。这种差异在直接评估（无论是 zero-shot 还是 few-shot）中被完整保留，导致评估结果混杂了模型固有能力和任务熟悉度两个不可分离的因素。因此，直接评估给出的排名反映的是“模型在当前状态下对该任务的表现”，而非“模型在同等准备下的潜力”。
@@ -70,8 +68,6 @@ claims:
 **现有方法的局限**同样明显。Few-shot 评估通过提供少量示例来缓解任务格式的陌生感，但无法从根本上消除数据暴露程度的差异——模型仍然可能因预训练中接触过类似数据而占据优势。实验表明，5-shot 直接评估虽将平均 Kendall's τ 从 0.52 提升至 0.61，但仍远低于本文方法达到的 0.76，且仅在 89% 的基准对上优于 zero-shot。这意味着 few-shot 提示只能部分弥合预备程度的鸿沟，排名矛盾的根本问题依然存在。
 
 **本文的动机**由此明确：如果能在评估之前消除模型间任务预备程度的差异，是否就能获得稳定、一致的模型排名？换言之，是否存在一个单一的“模型潜力”因素，能够在跨基准的标准化评估中被可靠地捕捉？这一动机驱动了 train-before-test 方法的提出——在评估前对每个模型进行统一的基准特定微调，使所有模型以同等准备状态进入测试，从而将评估焦点从“当前表现”转向“可挖掘潜力”。
-
-
 
 ## 核心方法与创新机理
 
@@ -100,8 +96,6 @@ claims:
 ### 与 Few-shot 评估的区别
 
 Few-shot 直接评估（平均 τ=0.61）虽能在一定程度上提高排名一致性，但其效果远逊于 train-before-test（τ=0.76），且仅在 89% 的基准对上优于 5-shot 直接评估。Few-shot 提供的是上下文示例，而 train-before-test 通过参数更新使模型真正适应任务分布，两者的机制本质不同。
-
-
 
 train-before-test 的核心主张是：**在评估前，通过统一的基准特定微调消除模型对任务预备程度的差异，从而挖掘模型潜力并实现跨基准排名的一致性**。该框架由三个顺序模块构成：微调模块、评估模块和排名度量模块。
 
@@ -133,8 +127,6 @@ train-before-test 的核心主张是：**在评估前，通过统一的基准特
 
 框架的最终输出不仅是排名一致性指标，还包括对模型得分矩阵的 PCA 分解——在 train-before-test 条件下，第一主成分可解释 86% 的方差（所有模型），在 Qwen 家族内更高达 93%，表明模型潜力主要由单一潜在因素主导，且该因素与预训练计算量正相关。
 
-
-
 ### 关键模块
 
 train-before-test 方法的核心流程由三个模块串联构成，其设计目标是在评估前消除模型对基准任务预备程度的差异。
@@ -151,8 +143,6 @@ train-before-test 方法的核心流程由三个模块串联构成，其设计�
 
 由于论文未提供自定义的公式推导，此处仅记录其使用的标准统计量，不做公式猜测。若需精确的 Kendall's τ 定义或 PCA 分解形式，可参考原始文献（Kendall, 1938）及标准多元统计教材。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -161,9 +151,6 @@ train-before-test 方法的核心流程由三个模块串联构成，其设计�
 
 ![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_ORv3SAzus1/figures/002_Table_1.jpg]]
 *Table 1: We categorize benchmarks into language understanding (LU), commonsense reasoning (CR), question answering (QA), physics/biology/chemistry (PBC), math (Math), and medicine (Med)*
-
-![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_ORv3SAzus1/figures/003_Table_2.jpg]]
-*Table 2: Models considered, categorized by model family*
 
 - **直接评估**：对模型进行 zero-shot 直接评估，不进行任何微调。
 - **train-before-test**：在评估前，对每个模型在目标基准的训练集上进行 5 epoch 的参数高效微调（PEFT/LoRA），学习率从 {1e-5, 2e-5, 5e-5} 中搜索，随后进行 zero-shot 评估。
@@ -195,9 +182,6 @@ train-before-test 方法的核心流程由三个模块串联构成，其设计�
 ![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_ORv3SAzus1/figures/018_Table_4.jpg]]
 *Table 4: The models used in Figure 7. The number of training tokens of these models is publicly available. We compute the number of pre-training FLOPs as 6 × #Parameters × #Tokens*
 
-![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_ORv3SAzus1/figures/010_Figure_6.jpg]]
-*Figure 6: Explained variance ratios of the top five principal components of the benchmark score matrix, under direct evaluation (left) and train-before-test (right). Train-before-test substantially increases the amount of variance explained by the first principal component, from 70% to 86%. This indicates the model potential is dominated by one single latent factor*
-
 **预微调困惑度预测微调后性能。** 对于 base 模型，直接评估时的困惑度排名与 train-before-test 后的下游排名高度相关（平均 τ=0.78，Figure 5 上），表明困惑度是模型潜力的良好预测指标。但对于 instruction-tuned 模型，这一相关性显著下降（平均 τ=0.51，Figure 5 下），说明指令微调可能引入了额外的干扰因素。
 
 ### 消融实验与鲁棒性分析
@@ -206,13 +190,7 @@ train-before-test 方法的核心流程由三个模块串联构成，其设计�
 
 **模型规模控制。** 按模型规模分 bin 后，train-before-test 在各个规模区间内均一致提升排名一致性（Table 6），排除了“仅对大模型或小模型有效”的可能性。
 
-![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_ORv3SAzus1/figures/020_Table_6.jpg]]
-*Table 6: The overall average Kendall’s τ across all benchmark pairs for models in each size bin*
-
 **模型家族分析。** 对于不同模型家族，train-before-test 均提高排名一致性（Table 7），但 YI 家族改善有限。这可能源于该家族内部预训练计算量差异较小，导致模型潜力本身趋同，而非方法失效。
-
-![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_ORv3SAzus1/figures/021_Table_7.jpg]]
-*Table 7: The overall average Kendall’s τ across all benchmark pairs for each model family*
 
 **统计显著性处理。** 使用 Kendall's τ-b 并排除不显著差异后，train-before-test 仍将平均一致性从 0.58 提升至 0.77（Figure 12），跨类别一致性同样全面提升（Figure 13），验证了结果的统计稳健性。
 
@@ -220,19 +198,9 @@ train-before-test 方法的核心流程由三个模块串联构成，其设计�
 
 **GEMMA 模型的困惑度异常。** 在困惑度实验中，8 个 GEMMA 模型因 lm-eval-harness 的滚动窗口实现问题，在 Wiki 和 Stack 数据集上表现出异常高的 bits per byte（Table 3），被排除出分析。这一技术细节提示困惑度评估对实现方式敏感。
 
-![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_ORv3SAzus1/figures/016_Table_3.jpg]]
-*Table 3: Bits per byte (BPB) of eight excluded GEMMA models compared to PYTHIA-410M across the three newly collected corpora. The GEMMA models exhibit abnormally high BPB values on Wiki and Stack, likely due to the greater average sequence length in these two datasets. Specifically, Arxiv has an average of 163 words per document, compared to 250 for Stack and 1502 for Wiki*
-
 **残差不完美相关性。** 尽管 train-before-test 大幅提升了排名一致性，但相关性仍未达到完美（τ=1.0）。可能的原因包括：PEFT 无法完全适应所有任务、基准本身存在不可约的测量噪声，或某些模型家族（如 YI）的潜力差异确实较小。
 
 **实际应用的障碍。** 许多现代基准不再公开训练数据，且部分商业模型不允许微调，限制了 train-before-test 的适用范围。此外，微调增加了评估成本，但作者指出可通过减少所需基准数量来抵消——因为排名一致后，少量基准即可可靠地反映模型潜力。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_ORv3SAzus1/figures/022_Table_8.jpg]]
-*Table 8: Explained variance ratios for the top five principal components of the score matrix for each model family, under direct evaluation and train-before-test, respectively*
-
-
 
 ## 定位与知识库关联
 
@@ -281,8 +249,6 @@ Few-shot 直接评估（平均 τ=0.61）虽较 zero-shot 有所提升，但仅�
 3. **Yi 家族异常**：为何 Yi 家族在 train-before-test 下改善有限？这是否暗示该家族模型潜力本身高度同质化，还是存在其他未被控制的混淆因素？
 4. **轻量化变体设计**：能否通过更高效的微调策略（如更少 epoch、更小学习率搜索空间、或 adapter 共享）降低计算成本，同时保持排名一致性的提升效果？
 5. **指令微调模型的特殊性**：对于 instruction-tuned 模型，预微调困惑度与微调后下游排名的相关性较弱（平均 τ=0.51），表明指令微调过程可能引入了额外的、与预训练质量不完全对齐的变异来源。这一现象的机制尚待深入探究。
-
-
 
 ## 原文 PDF
 

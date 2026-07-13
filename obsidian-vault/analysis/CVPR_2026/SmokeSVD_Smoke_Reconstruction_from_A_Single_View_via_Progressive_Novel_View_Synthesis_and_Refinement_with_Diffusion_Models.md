@@ -52,8 +52,6 @@ claims:
 
 在 ScalarFlow 基准上，SmokeSVD 以约 15 分钟的计算时间取得了与 GlobTrans（>30小时）可比的感知质量，速度提升超过 120 倍；输入视图 RMSE 为 0.0127，PSNR 达 38.08 dB。相较于依赖后处理阈值的多视图扩散方法 **FluidNexus**，SmokeSVD 在输入视图误差上显著更低（RMSE 0.0172 vs. 0.0303），且无需阈值调参，鲁棒性更强。在合成数据集上，所有指标均大幅超越 NGT 等基线。消融实验证实，移除速度约束或空间约束会损害侧视图质量并导致速度场发散，而去除渐进式细化则使新视角明显模糊。该方法还支持重仿真、艺术家驱动控制等下游应用，展现出从单视图输入到灵活三维操作的一体化能力。
 
-
-
 从单视图视频重建动态三维流体——尤其是烟雾——是计算机视觉与图形学中长期存在的病态问题。烟雾缺乏明确的几何表面，其半透明、非刚体、快速演化的特性使得仅凭一个视角的观测难以唯一确定其三维密度分布与运动状态。这种形状-外观歧义构成了根本性瓶颈：同一组二维投影可能对应截然不同的三维体积，而现有方法的计算效率与重建质量之间始终存在难以调和的矛盾。
 
 **现有方法缺口。** 当前主流路线可大致分为两类。一类是基于物理与可微渲染的优化方法，如 **GlobTrans**（Franz et al., CVPR 2021），它们通过迭代优化三维密度场与速度场来匹配输入视图，能够获得较高的物理保真度，但单场景优化耗时超过30小时，完全不具备实时或交互式应用的可行性。另一类是端到端的快速生成方法，如 **NGT**（Franz et al., 2023），它们利用神经网络直接从单视图推断三维场，速度大幅提升，但缺乏显式的多视角一致性保障，生成结果在非输入视角往往出现形状失真或运动不连贯。基于神经特征轨迹场的 **PICT**（Wang et al., SIGGRAPH 2024）和物理信息神经场 **PINF**（Chu et al., 2022）等方法虽在特定场景下有所改进，但依然受制于稀疏视角下的信息不足。多视图扩散合成方法如 **FluidNexus** 尝试从单视图生成多视角图像再进行重建，却面临后处理阈值敏感、输入视图保真度不足的问题。
@@ -61,8 +59,6 @@ claims:
 **核心动机。** 本文的出发点是：能否将扩散模型的强大生成能力与物理一致性优化有机融合，从而在计算效率与重建质量之间取得突破？直觉上，扩散模型擅长从稀疏条件中生成逼真的图像，但其原生缺乏对三维物理规律的感知；而 Navier-Stokes 方程提供了流体运动的严格约束，却需要足够的多视角信息才能有效施加。因此，关键挑战在于设计一种机制，让二者循环互补——用物理约束引导扩散合成，再用合成结果扩充视角以强化物理重建，形成从粗到精的渐进式闭环。
 
 **本文方法定位。** SmokeSVD 提出了一条“先合成侧视图，再渐进细化多视角，最后联合重建密度与速度场”的技术路线。具体而言，首先通过物理引导的侧视图合成器 SvDiff，在扩散去噪过程中显式融入速度场约束，逐帧生成时空一致的侧视图序列；随后，利用粗粒度密度生成器从已有视角重建初始三维场，并通过渐进式新视图细化模块 NvRef 从近视角到远视角逐步渲染和增强图像，扩充有效观测；最终，在细粒度密度生成与速度场估计阶段，借助可微平流和 Navier-Stokes 方程约束，恢复出可用于重仿真的完整三维烟雾场。这一设计使得 SmokeSVD 在 ScalarFlow 数据集上以约15分钟的重建时间，达到了与优化方法可比拟的输入视图保真度（PSNR 38.079 dB），计算速度提升超过120倍。
-
-
 
 ## 核心方法与创新机理
 
@@ -107,8 +103,6 @@ claims:
 
 这些创新共同构成了一个从“生成-细化-重建-验证”的闭环系统，使得单视图烟雾重建从严重病态问题转变为可工程化解决的任务。
 
-
-
 SmokeSVD 旨在从单视图视频序列重建动态三维烟雾的密度场与速度场。其核心挑战在于：单视图输入天然缺失多视角信息，导致重建问题高度病态。为缓解这一歧义，SmokeSVD 构建了一个“合成—细化—重建”三阶段渐进式管线，将二维扩散模型的生成能力与三维物理一致性约束深度耦合。
 
 ### 管线总览
@@ -129,8 +123,6 @@ SmokeSVD 旨在从单视图视频序列重建动态三维烟雾的密度场与�
 ### 关键设计逻辑
 
 管线的核心设计遵循“由粗到精、逐步解耦”的原则：先利用扩散模型的生成先验填补信息缺口（侧视图合成），再通过多视角一致性优化消除剩余歧义（渐进式细化），最后以物理方程约束确保重建结果的运动合理性（速度场估计与流入推断）。这种分阶段策略使得每一阶段只需处理相对可控的子问题，从而在 15 分钟内完成单视图重建，速度较传统优化方法（如 **GlobTrans**，Franz et al., CVPR 2021，耗时 >30h）提升 120 倍以上，同时保持可比的感知质量。
-
-
 
 SmokeSVD 的核心管线由三个紧密耦合的模块构成：物理引导的侧视图合成器 **SvDiff**、渐进式新视图细化模块 **NvRef**，以及粗到细的 **3D 密度与速度场重建**。三者形成循环迭代——SvDiff 生成侧视图，密度生成器从多视图重建体积，速度场与流入估计施加物理约束，反馈至下一帧的侧视图合成条件中。
 
@@ -182,16 +174,6 @@ $$\mathcal{L}_{NvRef} = \lambda_{mse}\|w_{f,\mathcal{L}\alpha}^t - w_{\mathcal{L
 
 在获得细粒度密度场后，速度场生成器 $\mathcal{G}_u$ 结合可微平流与 Navier-Stokes 方程估计速度场 $\mathbf{u}$ 和流入状态，使重建结果支持重仿真。这一物理闭环将 2D 扩散生成与 3D 流体动力学统一在可微框架内，是 SmokeSVD 实现“效率-质量”双重提升的关键机制。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2040_https_arxiv_org_abs_2507_12156/figures/003_Figure_3.jpg]]
-*Figure 3: Frame-by-frame training of the side-view synthesizer via feature fusion of adjacent frames. In the forward diffusion process, a clean image*
-
-![[assets/figures/papers/paper_list_l2040_https_arxiv_org_abs_2507_12156/figures/004_Figure_4.jpg]]
-*Figure 4: The progressive scheme for novel view refinement begins with clear views and incrementally rotates the camera to render and refine novel-view images from near, mid, and far views*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -216,9 +198,6 @@ $$\mathcal{L}_{NvRef} = \lambda_{mse}\|w_{f,\mathcal{L}\alpha}^t - w_{\mathcal{L
 
 在无入流烟雾场景（兔子形状，Figure 10）和水平羽流场景（Figure 11）上的测试表明，SmokeSVD 对不同类型的烟雾现象具有一定的泛化能力，能够重建出合理的密度分布和运动模式。这得益于物理约束（NS 方程、可微平流）的引入，使模型不局限于特定入流模式。
 
-![[assets/figures/papers/paper_list_l2040_https_arxiv_org_abs_2507_12156/figures/017_Figure_10.jpg]]
-*Figure 10: Reconstruction results for a bunny-shaped smoke scenario without inflow*
-
 ### 失败模式与局限性
 
 尽管取得了显著进展，SmokeSVD 仍存在以下局限：
@@ -230,8 +209,6 @@ $$\mathcal{L}_{NvRef} = \lambda_{mse}\|w_{f,\mathcal{L}\alpha}^t - w_{\mathcal{L
 5. **物理模型简化**：仅处理灰度烟雾，未明确处理彩色烟雾、固体障碍物或与复杂环境的交互。
 
 这些局限性指向了未来工作的方向：融合垂直方向多视角、扩展至更复杂流体现象、以及在更低计算预算下实现与优化方法媲美的视觉质量。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2040_https_arxiv_org_abs_2507_12156/figures/010_Table_1.jpg]]
 *Table 1: Quantitative comparison on ScalarFlow*
@@ -247,17 +224,6 @@ $$\mathcal{L}_{NvRef} = \lambda_{mse}\|w_{f,\mathcal{L}\alpha}^t - w_{\mathcal{L
 
 ![[assets/figures/papers/paper_list_l2040_https_arxiv_org_abs_2507_12156/figures/014_Table_5.jpg]]
 *Table 5: Ablation studies on SvDiff*
-
-![[assets/figures/papers/paper_list_l2040_https_arxiv_org_abs_2507_12156/figures/020_Table_6.jpg]]
-*Table 6: Ablation on novel view refinement. Views 0 (front) and 3 (side) as input, remaining views for evaluation*
-
-![[assets/figures/papers/paper_list_l2040_https_arxiv_org_abs_2507_12156/figures/018_Figure_12.jpg]]
-*Figure 12: Ablation on novel view refinement. From top to bottom: reference, results without refinement, without progressive refinement, without res loss and with NvRef. Red boxes show close-ups*
-
-![[assets/figures/papers/paper_list_l2040_https_arxiv_org_abs_2507_12156/figures/019_Figure_13.jpg]]
-*Figure 13: Comparison of the divergence of reconstructed velocity fields by SvDiff with different loss functions at various time steps*
-
-
 
 ## 定位与知识库关联
 
@@ -294,8 +260,6 @@ SmokeSVD 的有效性建立在以下前提之上：
 2. **复杂流体现象**：如何将框架扩展到彩色烟雾、多相流或存在固体边界的场景？这需要重新设计密度场的表征方式和物理约束形式。
 3. **计算效率的进一步优化**：能否在更低计算预算下（例如通过潜在空间扩散或蒸馏策略）实现与 GlobTrans 相当的侧视图感知质量？
 4. **真实场景泛化**：如何将方法适配到野外视频中的烟雾现象？这需要解决背景分离、光照变化和相机运动等额外挑战。
-
-
 
 ## 原文 PDF
 

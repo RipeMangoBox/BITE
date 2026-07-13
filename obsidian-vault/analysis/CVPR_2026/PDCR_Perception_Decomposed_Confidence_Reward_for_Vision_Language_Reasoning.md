@@ -165,8 +165,6 @@ PDCR 的整体流程如 Figure 4 所示，包含四个核心模块，形成两�
 ![[assets/figures/papers/paper_list_l2661_https_arxiv_org_abs_2605_13467/figures/012_Table_6.jpg]]
 *Table 6: Key hyperparameters standard to the RLVR framework in EasyR1 library [? ] used for training and evaluation*
 
-### 补充图表
-
 PDCR 框架由三个关键模块构成：**置信度计算模块**、**无监督技能分解模块**和**感知解耦优势计算模块**，最后通过**总优势融合模块**将稀疏结果信号与分解过程信号整合为统一的步级训练信号（Figure 4）。
 
 ### 置信度计算模块
@@ -199,17 +197,11 @@ $$k^* = \arg\min_k SSE(k)$$
 
 其中 $v_i$ 为排序后的视觉依赖分数，$\mu_1(k)$ 和 $\mu_2(k)$ 分别为两个簇的均值。该方法无需任何超参数，在人工标注的验证集上达到 **76.2%** 的分解准确率，显著优于最佳 Top-K 基线的 67.5%（Figure 5）。
 
-![[assets/figures/papers/paper_list_l2661_https_arxiv_org_abs_2605_13467/figures/005_Figure_5.jpg]]
-*Figure 5: Our dynamic thresholding (Otsu’s method) is more accurate and robust at decomposing reasoning skills than a naive Top-K baseline. The Top-K method is highly sensitive to the k hyperparameter, peaking at 30%. Our parameter-free dynamic method significantly outperforms even the best Top-K, confirming it’s a superior approach for skill decomposition*
-
 **消融验证**：附录实验进一步证实，信息破坏性的视觉扰动（白图、高斯模糊、高斯噪声）均能达到 75.8%–76.2% 的分解精度，而仅做空间变换的旋转策略效果较差（65.9%），证明破坏语义信息对准确测量视觉依赖性至关重要。
 
 ### 感知解耦优势计算模块
 
 在技能分解完成后，该模块在各自技能簇内独立进行 min-max 归一化，生成稳定、良好标度的过程优势信号，从根本上解决了朴素全局归一化导致的混合诱导信号退化问题（Figure 3-(d)）。
-
-![[assets/figures/papers/paper_list_l2661_https_arxiv_org_abs_2605_13467/figures/003_Figure_3.jpg]]
-*Figure 3: An illustration of our core observations and the mixture-induced signal degradation problem. (a) A V-L reasoning trace is a heterogeneous mix of visual perception steps and textual reasoning steps. (b) We validate this functional distinction by analyzing attention: perception steps attend highly to visual tokens, while reasoning steps do not. (c) These skills are statistically imbalanced: perception steps are sparse (31.4%), while reasoning steps form the dense majority (68.6%). (d) This imbalance causes mixture-induced signal degradation: (i) a naive, global normalization (Eq. 5) compresses and misaligns the advantage distribution for perception steps. (ii) Our proposed decomposed normaliz...*
 
 对于第 $i$ 条轨迹的第 $k$ 步，其折扣回报定义为：
 
@@ -234,11 +226,6 @@ $$A_{T,k}^{(i)} = \frac{G_k^{(i)} - \min_{(j,k') \in \mathbb{Z}_{\text{textual}}
 $$A_{total,k}^{(i)} = \lambda_O A_O^{(i)} + \lambda_P A_{decomposed,k}^{(i)}$$
 
 其中 $A_O^{(i)}$ 为基于最终答案正确性的稀疏结果优势（组内 z-score 归一化），$A_{decomposed,k}^{(i)}$ 为分簇归一化后的过程优势（视觉步骤使用 $A_{V,k}^{(i)}$，文本步骤使用 $A_{T,k}^{(i)}$）。$\lambda_O$ 和 $\lambda_P$ 为控制两类信号权重的超参数，用于平衡稀疏终端奖励与密集过程奖励的贡献。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2661_https_arxiv_org_abs_2605_13467/figures/002_Figure_2.jpg]]
-*Figure 2: The baseline dense reward pipeline. For N rollouts, a sparse Outcome Reward*
 
 ## 实验与关键发现
 
@@ -291,16 +278,8 @@ Table 5提供了技能分解的定性示例。被标注为视觉感知的步骤�
 
 3. **分解粒度的限制**：当前方法仅支持两类技能分解。对于更细粒度的技能类型（如视觉定位、属性识别、数值推理、常识推理等），软聚类或多类分解可能进一步提升奖励质量，这有待未来工作探索。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2661_https_arxiv_org_abs_2605_13467/figures/006_Table_1.jpg]]
-*Table 1: Main results on V-L reasoning benchmarks. We report the accuracy across seven evaluation benchmarks. We compare our method, PDCR (ours), against strong baselines, including sparse-reward (GRPO), stabilized (DAPO), and naive dense-reward (PACR) methods. The best score in each column is in bold, and the second-best is underlined*
-
 ![[assets/figures/papers/paper_list_l2661_https_arxiv_org_abs_2605_13467/figures/011_Table_5.jpg]]
 *Table 5: Qualitative Examples of Skill Decomposition. We show examples of steps that we labeled as Visual Perception or Textual Reasoning. This separation illustrates the heterogeneous nature of the V-L reasoning task*
-
-![[assets/figures/papers/paper_list_l2661_https_arxiv_org_abs_2605_13467/figures/017_Figure_7.jpg]]
-*Figure 7: Visual Perturbation Strategies Evaluated for Skill Decomposition. To calculate the Visual Dependence Score (V (i)k , Eq. 7) , we compare the model’s probability on the (a) Original image against four baselines: (b) White (Strategy adopted in main text), (c) Gaussian Blur, (d) Gaussian Noise, and (e) Rotate. Our analysis confirms that strategies which effectively destroy semantic information (b, c, d) yield high decomposition accuracy, whereas simple spatial transformation (e) preserves the visual content, leading to poor separation*
 
 ## 定位与知识库关联
 

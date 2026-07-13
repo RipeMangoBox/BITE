@@ -57,8 +57,6 @@ claims:
 
 **方法定位**：MAL属于边界框监督实例分割的伪标签生成范式，区别于BBTP、BoxInst、DiscoBox等端到端方法。其核心创新在于将任务解耦、引入标准ViT作为图像编码器，并设计注意力解码器与RoI输入策略。生成的高质量掩码伪标签有时**比人工标注更锐利、更贴合边界**，但在严重遮挡场景下仍不及人工标注。
 
-
-
 实例分割需要为图像中的每个目标实例预测像素级掩码，而全监督训练依赖大量精确的人工掩码标注。这一标注过程极其昂贵且耗时——以COCO数据集为例，**79%的标注时间花费在掩码绘制上**，边界框标注则相对廉价。因此，一个自然的研究方向是：能否仅用边界框监督来训练实例分割模型，从而大幅降低标注成本？
 
 现有边界框监督实例分割方法（如BBTP、BoxInst、BoxLevelSet、DiscoBox、BoxTeacher等）尝试在端到端框架中同时学习检测与分割。然而，这些方法的性能与全监督模型之间仍存在明显差距，说明仅靠边界框先验直接训练分割模型面临根本性困难：**边界框提供的空间约束过于粗糙，难以精确界定目标轮廓**。
@@ -66,8 +64,6 @@ claims:
 本文的核心洞察在于：与其让一个模型在边界框监督下同时完成检测和分割，不如**将掩码生成与实例分割训练解耦为两个阶段**。第一阶段专注于利用边界框监督生成高质量掩码伪标签，第二阶段则使用这些伪标签以标准全监督方式训练实例分割模型。这一设计的关键瓶颈在于第一阶段——如何仅凭边界框生成足以替代人工标注的掩码？
 
 为此，本文提出**Mask Auto-Labeler (MAL)**，一个基于Transformer的掩码自动标注框架。MAL以RoI裁剪图像为输入，采用标准Vision Transformer (ViT) 作为图像编码器，配合基于注意力的掩码解码器、边界框随机扩展采样策略、多示例学习（MIL）损失以及条件随机场（CRF）损失，在仅使用边界框监督的条件下生成极高质量的掩码伪标签。实验表明，这些伪标签的质量有时甚至超越人工标注，使得第二阶段训练的实例分割模型能够**保留全监督模型97.4%的性能**，最佳模型在COCO test-dev 2017上达到**44.1% mAP**，显著超越此前方法。
-
-
 
 ## 核心方法与创新机理
 
@@ -130,8 +126,6 @@ MAL 在弱监督实例分割领域做出了以下定位贡献：
 
 MAL 的一个独特贡献在于揭示了**标准 ViT 的全局自注意力天然适配掩码自动标注任务**——这一发现与图像分类领域“层次化 Transformer 优于标准 ViT”的共识形成鲜明对比，为视觉 Transformer 的架构选择提供了新的任务依赖性视角。同时，MAL 生成的掩码伪标签在部分场景下边界质量甚至超越人工标注（Figure 7 左侧），但在严重遮挡场景仍不及人工标注（Figure 7 右侧），指明了后续改进方向。
 
-
-
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2301_03992/figures/002_Figure_2.jpg]]
 *Figure 2: An overview of the two-phase framework of boxsupervised instance segmentation. For the first phase, we train Mask Auto-Labeler using box supervision and conditionally generate masks of the cropped regions in training images (top). We then train the instance segmentation models using the generated masks (bottom)*
 
@@ -172,8 +166,6 @@ $$\mathcal{L} = \alpha_{\mathrm{mil}} \mathcal{L}_{\mathrm{mil}} + \alpha_{\math
 | 第二阶段 | 原始图像 + 掩码伪标签 | 标准实例分割模型（如Mask2Former） | 实例分割模型 |
 
 该两阶段框架的关键优势在于：第一阶段生成的掩码伪标签质量极高，使得第二阶段训练的实例分割模型能保留全监督模型性能的 **94%–97%**（以保留率衡量），最佳模型在 COCO test-dev 2017 上达到 **44.1% mAP**，显著超越此前最优的边界框监督方法 BoxTeacher（40.0% mAP）。
-
-
 
 ### 3.1 RoI输入生成与边界框扩展
 
@@ -252,8 +244,6 @@ $$S = \frac{1}{N} \sum_{i}^{N} \left( \frac{f_i^E}{|f_i^E|} - \frac{f_{\gamma(i)
 
 其中 $f_i^E$ 是第 $i$ 个特征向量，$f_{\gamma(i)}'$ 是其所属类别（前景或背景）的聚类中心。聚类分数越低，表明编码器对前景和背景的区分能力越强。Table 6显示，ViT-MAE-Large的聚类分数最低（0.301），与其最佳自动标注性能高度相关——这从机制层面解释了标准ViT优于Swin和ConvNeXt的原因：其全局自注意力机制天然适合前景/背景分离任务。
 
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -262,12 +252,10 @@ MAL在COCO和LVIS两个基准上均显著超越了先前最优的边界框监督
 
 **COCO实例分割**（Table 1）：MAL搭配Mask2Former/Swin-Small在val2017上达到43.3% Mask AP，在test-dev 2017上达到44.1% Mask AP，比此前最优方法BoxTeacher（40.0%）高出4.1个百分点。当使用与DiscoBox相同的SOLOv2/ResNeXt-101骨干时，MAL在val2017和test-dev上分别领先1.6%和1.3%。更关键的是，MAL训练的模型保留了全监督模型性能的**94.5%**（ConvNeXt-Base Cascade R-CNN）至**97.4%**（最高记录），表明伪标签质量已极为接近人工标注。
 
-
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2301_03992/figures/005_Table_1.jpg]]
 *Table 1: Main results on COCO. Ret means the retention rate of box-supervised mask APsupervised mask AP . MAL with SOLOv2/ResNeXt-101 outperforms DiscoBox with SOLOv2/ResNeXt-101 by 1.6% on val2017 and 1.3% on test-dev. Our best model (Mask2former/Swin-Small) achieves 43.3% AP on val and 44.1% AP on test-dev*
 
 **LVIS v1**（Table 2）：MAL搭配ViT-MAE-Base和ResNeXt-101-64x4d-FPN达到24.5% Mask AP，保留全监督Mask R-CNN的95.0%。值得注意的是，MAL在COCO上训练后直接在LVIS上生成伪标签，仅比在LVIS上训练损失约0.35% mAP，展现出良好的开放词汇迁移能力。
-
 
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2301_03992/figures/007_Table_2.jpg]]
 *Table 2: Main results on LVIS v1. Training data means the dataset we use for training MAL. We also finetune it on COCO and then generate pseudo-labels of LVIS v1. Compared with trained on LVIS v1 directly, MAL finetuned on COCO only caused around 0.35% mAP drop on the final results, which indicates the great potential of the open-set ability of MAL. Ret means the retention rate of box-supervised mask APsupervised mask AP*
@@ -291,40 +279,25 @@ Table 3比较了四种解码器架构，结果差异悬殊：
 
 Table 4的系统对比揭示了一个反直觉的发现：在ImageNet分类上表现不及ConvNeXt和Swin Transformer的标准ViT（DeiT-Small），在掩码自动标注上反而优于两者。进一步使用MAE预训练的ViT-Base和ViT-Large达到最佳性能（42.3% Mask AP），而Swin-Base和ConvNeXt-Base分别仅为40.9%和39.6%。
 
-
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2301_03992/figures/009_Table_4.jpg]]
 *Table 4: Ablation study of different backbones. All models are pre-trained on ImageNet-1k. ConvNeXt and Swin Transformer outperform DeiT on image classification, but standard ViT-Small [16] (ViT-DeiT-Small) outperforms ConvNeXt-base and Swin-Base on mask Auto-labeling. Standard ViT-Base (ViT-MAE-Base) and Standard ViT-Large (ViT-MAE-Large) pretrained via MAE achieve the best performance on mask Auto-labeling*
 
 为解释这一现象，作者引入**聚类分数**（Table 6）来量化编码器区分前景/背景特征的能力——分数越低表示特征可分性越强。ViT-MAE-Large的聚类分数最低（0.301），与最优自动标注性能高度相关。Figure 6中的注意力可视化进一步显示，标准ViT的多头自注意力层能自然地聚焦于物体区域，无需层次化归纳偏置即可实现精确的前后景区分。
 
-
-
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2301_03992/figures/010_Figure_6.jpg]]
 *Figure 6: Attention visualization of two RoI images produced by MAL. In each image group, the left-most image is the original image. We visualize the attention map output by the 4th, 8th, 12th MHSA layers of the Standard ViTs in MAL*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2301_03992/figures/014_Table_6.jpg]]
-*Table 6: Clustering scores for different image encoders. The smaller clustering scores imply a better ability to distinguish foreground and background features*
 
 #### 边界框扩展策略至关重要
 
 Table 5显示，扩展率θ=1.2时获得最优结果（42.3% Mask AP）。无扩展（θ=1.0）时性能显著下降，因为模型缺乏背景像素信息，容易产生全框填充的平凡解。过大的扩展率（θ=1.4）同样损害性能，可能因引入过多干扰背景。这一设计是MAL防止崩溃的关键——通过在扩展区域采样负包（negative bags），MIL损失获得了必要的前景/背景对比信号。
 
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2301_03992/figures/013_Table_5.jpg]]
-*Table 5: Ablation on box expansion ratio. We use Standard ViT-Base pretrained via MAE (ViT-MAE-Base) and Cascade R-CNN (ConvNeXt-Small) for phase 1 and 2*
-
 ### 损失函数与超参数敏感性
 
 Figure 8展示了损失权重和CRF超参数的敏感性分析。MIL损失权重α_mil和CRF损失权重α_crf在较宽范围内均表现稳定，表明两阶段训练框架对超参数选择具有较好的鲁棒性。CRF的平滑项参数ω和ζ同样表现出合理的容忍区间，但极端值会导致性能下降——过强的平滑会模糊边界，过弱则无法有效抑制噪声。
 
-
-
 ### 伪标签质量分析
 
 Figure 7的横向对比揭示了MAL伪标签与人工标注的互补特性：
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2301_03992/figures/012_Figure_7.jpg]]
-*Figure 7: The lateral comparison between MAL-generated pseudo-labels (top) and GT masks (bottom) on COCO val2017. On the left, we observe that MAL-generated pseudo-labels are sharper and more boundary-sticky than GT masks in some cases. On the right, we observe that in highly occluded situations, human-annotated masks are still better*
 
 - **优势场景**：MAL生成的掩码在某些情况下比人工标注**更锐利、更贴合边界**，这可能得益于CRF损失对边缘的显式建模；
 - **劣势场景**：在高度遮挡的情况下，人工标注仍然明显优于MAL，这是该方法的主要失败模式。
@@ -334,14 +307,6 @@ Figure 9进一步显示，使用MAL伪标签训练的Mask2Former与使用真值�
 ### 额外应用：掩码监督提升目标检测
 
 Table 7验证了MAL伪标签的通用价值：在LVIS v1上，添加MAL掩码监督使检测模型获得约1% AP的提升，与添加真值掩码监督的效果相当。在COCO val2017上同样观察到一致但较小的提升，且该提升在不同随机种子下保持稳定。这表明MAL生成的掩码不仅可用于训练分割模型，还可作为通用的辅助监督信号。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2301_03992/figures/015_Table_7.jpg]]
-*Table 7: Results of detection by adding different mask supervision. The models are evaluated on COCO val2017 and LVIS v1. By adding mask supervision using ground-truth masks or mask pseudo-labels, we can get around 1% improvement on different AP metrics on LVIS v1. On COCO val2017, the detection performance also benefits from mask pseudo-labels. Although the improvement is less than COCO’s, the improvement is consistent over different random seeds*
-
-
-
 
 ## 定位与知识库关联
 
@@ -396,8 +361,6 @@ MAL在边界框监督实例分割领域确立了新的技术范式——**两阶
 3. MAL的开放词汇能力在更复杂的真实世界场景（如域偏移、新类别分布）中如何泛化？COCO→LVIS的初步实验仅展示了有限迁移。
 4. 查询式解码器为何在边界框监督下严重失败？是否存在改进空间使其适配弱监督条件？这一问题对理解Transformer解码器的工作机制具有理论价值。
 5. MAL生成的伪标签在某些情况下优于人工标注（更锐利的边界），这是否暗示可以反过来用MAL优化人工标注的质量？
-
-
 
 ## 原文 PDF
 

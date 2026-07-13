@@ -67,8 +67,6 @@ MBGS在保持高保真动态场景重建的同时，首次赋予动态高斯泼�
 
 MBGS位于**动态场景重建**与**可操控运动表示**的交叉点。在重建质量上，它与基于隐式变形场的**4DGaussians**和基于逐高斯运动参数的**Shape-of-Motion**等SOTA方法竞争；在运动表示上，它借鉴了计算机图形学中经典的**骨骼蒙皮动画**思想（运动学树、双四元数蒙皮），但通过可微渲染将其融入端到端学习框架。与现有动态高斯泼溅方法相比，MBGS的核心差异在于：将运动参数从“稠密且隐式”转变为“稀疏且显式”，从而在保持重建质量的同时解锁了运动操控能力。这一思路为动态场景重建通向机器人应用提供了新的技术路径。
 
-
-
 动态场景重建是计算机视觉与机器人领域的核心问题，其目标是从二维视频观测中恢复三维场景的几何、外观及其随时间演化的运动规律。近年来，以三维高斯泼溅（3D Gaussian Splatting）为代表的显式辐射场方法在静态场景重建中展现出卓越的保真度与渲染效率，研究者随之将其拓展至动态场景，形成了动态高斯泼溅（Dynamic Gaussian Splatting）这一活跃方向。
 
 **现有方法的隐式运动瓶颈。** 当前主流的动态高斯泼溅方法——包括基于变形场网络的方法（如 **Deformable‑GS**）和逐高斯运动参数的方法（如 **4DGaussians** 和 **Shape‑of‑Motion**）——在运动表示上存在一个共同的深层局限：它们采用隐式运动表示，即通过神经网络编码运动场，或为每个高斯分配独立的时变运动参数。这种设计虽然能够实现高保真的动态重建，但运动的语义和结构被隐式地编码在神经网络的权重中或数十万个独立参数中，导致两大后果：
@@ -79,8 +77,6 @@ MBGS位于**动态场景重建**与**可操控运动表示**的交叉点。在�
 **机器人领域的迫切需求。** 在机器人操作中，运动表示不仅需要支持高保真渲染，更需要具备可操控、可编辑、可迁移的特性。例如，从人类演示视频中学习操作技能并合成机器人演示，或通过视觉规划预测机器人动作以实现特定目标状态，都要求运动表示能够被直接干预和推理。现有隐式方法因其“不可触碰”的运动编码方式，无法满足这些需求。
 
 **本文的核心动机。** 针对上述缺口，本文提出一个根本性的设计转向：**用显式、稀疏的运动图替代隐式、稠密的运动表示**。具体而言，MBGS 引入运动学树（kinematic tree）和变形图（deformable graph）作为高斯泼溅的运动表示——前者适用于铰接结构（如人体），后者适用于非刚体形变（如软体物体）。运动图的参数通常少于 100 个，通过双四元数蒙皮（Dual Quaternion Skinning）将稀疏图链接的运动平滑传播到每个高斯，从而在保持高保真重建的同时，赋予运动表示以直接的可操控性。这一设计使得MBGS成为首个在动态高斯泼溅框架中实现显式运动操控的方法，开启了新颖姿态动画、机器人演示合成和基于视觉规划的机器人动作预测等新应用。
-
-
 
 ## 核心方法与创新机理
 
@@ -138,8 +134,6 @@ MBGS 在动态高斯泼溅方法谱系中占据独特位置：
 | 渲染质量 | 高 | 高 | **相当或更优** |
 
 MBGS 在保持与 SOTA 方法相当的渲染质量（iPhone 数据集 LPIPS 0.37 vs Shape-of-Motion 0.39；HyperNeRF LPIPS 0.35 vs 4DGaussians 0.36）的同时，首次实现了运动表示的可操控性，将动态场景重建从“被动重放”推向“主动编辑与规划”，为动态重建与机器人操作的交叉领域开辟了新方向。
-
-
 
 ![[assets/figures/papers/paper_list_l9_Motion_Blender_Gaussian_Splatting_for_Dynamic_Scene_Reconstruction/figures/001_Figure_1.jpg]]
 *Figure 1: Capabilities of Our Framework. Our method reconstructs and renders dynamic scenes into 3D Gaussians and motion graphs from input videos. The learned motion graphs for a hand and cat are shown with their corresponding rendered scenes (left). Our approach enables three key applications (right): ➊ Novel pose animation through motion graph editing, ➋ Robot demonstration synthesis by using robot kinematic chains as motion graphs, and ➌ Predicting robot actions by simulating graph movements to minimize the difference between rendered and goal images*
@@ -218,8 +212,6 @@ DQS 保证混合结果始终位于 $\mathrm{SE}(3)$ 空间内，避免了线性�
 
 这种设计使 MBGS 在保持与最先进方法可比渲染质量（iPhone数据集LPIPS 0.37 vs. Shape-of-Motion 0.39）的同时，解锁了新颖姿态动画、机器人演示合成和视觉规划等需要运动操控的下游应用。
 
-
-
 MBGS 的核心思想是用**稀疏的显式运动图**替代隐式或逐高斯稠密运动参数，将运动建模与外观表示解耦。整个框架由五个关键模块构成，通过可微渲染端到端联合优化。
 
 ### 1. 静态3D高斯
@@ -271,8 +263,6 @@ $$\mathbf{p}_t = B\big(\mathcal{R}(P_{\mathcal{L},0}, P_{\mathcal{L},t}), \mathc
 
 整个管线将稠密的逐高斯运动建模问题转化为稀疏图运动参数的学习问题，在保持高保真重建的同时，获得了对运动的直接操控能力。
 
-
-
 ## 实验与关键发现
 
 ### 主结果
@@ -314,12 +304,8 @@ MBGS在两个主流动态场景基准上进行了评估：**iPhone数据集**（
 
 Figure 11和Figure 13系统总结了主要失败模式：
 
-
 ![[assets/figures/papers/paper_list_l9_Motion_Blender_Gaussian_Splatting_for_Dynamic_Scene_Reconstruction/figures/013_Figure_11.jpg]]
 *Figure 11: Failure Cases. Visualization of imperfect learned motion graphs (a), failure cases of novel pose editing (b), and failure cases of reconstructing reflective surfaces (c)*
-
-![[assets/figures/papers/paper_list_l9_Motion_Blender_Gaussian_Splatting_for_Dynamic_Scene_Reconstruction/figures/015_Figure_13.jpg]]
-*Figure 13: Failure Cases on Fast-Moving Objects. Visualization of shaking artifacts from strong camera motion (left), and reconstruction quality comparison of our MB-GS for the same microwave with doors moving at different speeds (right)*
 
 1. **运动图未接地**：运动图有时未能准确附着在物体几何上。人手细部覆盖不全，枕头挤压变形不足，微波炉门对齐存在偏差。
 
@@ -331,10 +317,6 @@ Figure 11和Figure 13系统总结了主要失败模式：
 
 5. **运动图方向错误**（Figure 12）：软绳运动图头端向桌子下方倾斜，导致机器人末端执行器抓取方向不正确，直接影响下游规划任务。
 
-
-![[assets/figures/papers/paper_list_l9_Motion_Blender_Gaussian_Splatting_for_Dynamic_Scene_Reconstruction/figures/014_Figure_12.jpg]]
-*Figure 12: A failure case of incorrect gripper orientation caused by an erroneous motion graph. The head of the rope motion graph is misaligned, tilting downward below the table surface*
-
 6. **逐帧独立学习**：运动图参数逐帧独立优化，未有效利用帧间时间连续性，在长序列上可能累积漂移。
 
 ### 关键图表结论
@@ -343,7 +325,6 @@ Figure 11和Figure 13系统总结了主要失败模式：
 - **Figure 5**：通过操控运动图成功生成训练视频中未见的新颖姿态，证明显式运动表示的直接编辑能力。
 - **Figure 7-8**：定性对比显示MBGS在iPhone和HyperNeRF数据集上均能产生更清晰的渲染结果，尤其在细节区域（LPIPS优势明显）。
 - **Figure 9-10**：展示了从人类视频合成机器人演示和基于视觉规划的机器人动作预测两项应用，验证了显式运动图在下游任务中的独特价值。
-
 
 ## 定位与知识库关联
 
@@ -401,8 +382,6 @@ MBGS 的显式稀疏运动图设计在带来操控性优势的同时，也划定
 5. **快速运动与复杂变形鲁棒性**：在剥香蕉、快速挥手等挑战性场景下，如何利用光流、事件相机等多模态信号或时序一致性约束提升重建稳定性和一致性？
 
 6. **实例交互伪影消除**：机器人演示合成中，逐实例高斯替换带来的伪影和不真实交互（如手与物体的接触边界模糊）需要更精细的实例间交互建模。
-
-
 
 ## 原文 PDF
 

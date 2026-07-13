@@ -56,8 +56,6 @@ $$S = 0.4 \times S_{\mathrm{IF}} + 0.4 \times S_{\mathrm{VC}} + 0.2 \times S_{\m
 
 **方法定位**：CREval 属于基于 VQA 的可解释评估范式，与直接打分方法（MLLM holistic scoring）、美学评分（Aesthetic Score）、以及 VIEScore、EditScore 等自动指标形成互补或替代关系。其核心贡献不在于提出新的生成模型，而在于为创意图像编辑领域提供了一套透明、可追溯、与人类对齐的评估基础设施。
 
-
-
 ### 创意图像编辑的评估困境
 
 近年来，基于扩散模型和自回归模型的可控图像生成与编辑技术快速发展，催生了大量面向复杂指令的创意图像编辑模型。然而，如何系统、可靠地评估这些模型的输出质量，始终是一个悬而未决的问题。
@@ -79,8 +77,6 @@ $$S = 0.4 \times S_{\mathrm{IF}} + 0.4 \times S_{\mathrm{VC}} + 0.2 \times S_{\m
 - **将主观评估转化为客观验证**：通过将整体质量分解为一系列结构化的“是/否”问答对，使评估过程透明化，每个得分或失分都有明确的逻辑依据。
 - **构建多维评估体系**：从指令遵循（Instruction Following, IF）、视觉一致性（Visual Consistency, VC）和视觉质量（Visual Quality, VQ）三个互补维度全面衡量编辑质量，避免单一指标的片面性。
 - **建立高难度基准**：构建CREval-Bench，覆盖3大类9个创意维度、超过800对图像-指令对，为模型在复杂创意场景下的能力评估提供统一标尺。
-
-
 
 ## 核心方法与创新机理
 
@@ -111,8 +107,6 @@ CREval与现有自动评估指标的差异不仅体现在评分机制上，更�
 ### 评估器的鲁棒性设计
 
 为减少评估偏见，CREval在问题生成阶段使用与评估器不同的MLLM（如Qwen2.5-VL-72B），而非直接使用GPT-4o同时生成问题和评分。消融实验（Table 3）表明，当评估器从GPT-4o替换为Qwen3-VL时，各模型的相对排名保持稳定，验证了评估框架对不同MLLM评估器的鲁棒性。这一“生成-评估分离”的设计是确保评估公平性的关键工程决策。
-
-
 
 CREval 提出了一套全自动、基于问答（QA）的评估管道，用于系统衡量复杂创意指令下图像编辑模型的表现。其核心设计动机在于：传统 MLLM 直接打分的评估方式存在过程不透明、覆盖不完整、评分不可解释的瓶颈，而 CREval 通过将整体质量拆解为可独立验证的结构化二值判断，实现了透明且与人类偏好高度一致的自动评估。
 
@@ -146,12 +140,8 @@ $$S = 0.4 \times S_{\mathrm{IF}} + 0.4 \times S_{\mathrm{VC}} + 0.2 \times S_{\m
 
 > 注：框架中涉及的“Thinking”模块有效性分析（如 Bagel、Step1X‑Edit 的 think 版本在 IF 上反而低于原版）属于消融实验范畴，将在后续实验分析章节详述。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l816_https_arxiv_org_abs_2603_26174/figures/005_Figure_4.jpg]]
 *Figure 4: Overview of CREval. (1) In stage 1, we manually select high-quality images. We then construct several editing instruction examples and utilize the GPT-4o model for few-shot learning across 9 predefined dimensions, generating dimension consistent editing instructions and producing image–instruction pairs. (2) In stage 2, we use these image–instruction pairs to construct evaluation tasks. To reduce bias, we use different MLLMs such as Qwen2.5-VL-72B, to generate evaluation questions for 3 metrics using the Chain-of-Thought (CoT) method. Each metric contains at least 5 questions, with a total of no fewer than 15 questions per pair, completing the construction of the CREval-Bench. (3)In Stage 3...*
-
-
 
 CREval 的核心设计在于将传统 MLLM 直接打分的黑箱评估，转化为一套结构化的问答式评估管道。其整体流程（图4）可拆解为三个关键阶段，每个阶段承担不同的功能角色。
 
@@ -179,13 +169,6 @@ $$S = 0.4 \times S_{\mathrm{IF}} + 0.4 \times S_{\mathrm{VC}} + 0.2 \times S_{\m
 
 这种“问答匹配”而非“直接打分”的机制是 CREval 的核心创新：每个问答对的结果明确指示得分或失分的具体理由，使评估过程完全透明可追溯，从根本上解决了传统 MLLM 评分不可解释的瓶颈。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l816_https_arxiv_org_abs_2603_26174/figures/013_Table_S.3.jpg]]
-*Table S.3: Examples of question-answer pairs, where the ideal answer in the table showing cases is ‘Yes’*
-
-
-
 ## 实验与关键发现
 
 ### 1. 实验设置与评估协议
@@ -195,9 +178,6 @@ CREval的评估流程严格遵循三阶段管道。在评估阶段，每个模�
 $$S = 0.4 \times S_{\mathrm{IF}} + 0.4 \times S_{\mathrm{VC}} + 0.2 \times S_{\mathrm{VQ}}$$
 
 其中 $S_{\mathrm{IF}}$、$S_{\mathrm{VC}}$、$S_{\mathrm{VQ}}$ 分别代表指令遵循（Instruction Following）、视觉一致性（Visual Consistency）和视觉质量（Visual Quality）得分。权重分配（4:4:2）通过人类偏好实验确定，在该配置下自动评估与人类判断的一致性达到最优（Fig. S2, Section A）。
-
-![[assets/figures/papers/paper_list_l816_https_arxiv_org_abs_2603_26174/figures/010_Figure_S.2.jpg]]
-*Figure S.2: Weight Ratios*
 
 评估覆盖了11个主流模型，包括四个闭源模型（GPT-Image-1、Seedream 4.0、FLUX.1 Kontext pro、Gemini 2.5 Flash Image）和七个开源模型（OmniGen2、ICEdit、UniWorld-V1、Bagel、Step1X-Editv1p2-preview、FLUX.1 Kontext dev、Qwen-Image-Edit-2509）。主评估器为GPT-4o，消融实验中使用Qwen3-VL验证评估器的鲁棒性。
 
@@ -257,8 +237,6 @@ Table 1将CREval-Bench与现有编辑基准进行了系统对比。CREval-Bench�
 
 **基准构建的潜在偏差**：CREval-Bench的指令生成依赖GPT-4o的few-shot学习，这可能引入对GPT系列模型的隐性偏好。尽管通过多模型生成问题（Qwen2.5-VL-72B）和人工审核进行了部分缓解，但完全消除这一偏差仍需更大规模的跨模型指令生成验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l816_https_arxiv_org_abs_2603_26174/figures/001_Figure_1.jpg]]
 *Figure 1: Evaluation of state-of-the-art image generation and editing models using CREval, with GPT-4o serving as the evaluator. Each edited image is evaluated across three metrics: Instruction Following (IF), Visual Consistency (VC), and Visual Quality (VQ). The results indicate that the complex and creative instructions in CREval-Bench pose substantial challenges for current image manipulation models*
 
@@ -270,19 +248,6 @@ Table 1将CREval-Bench与现有编辑基准进行了系统对比。CREval-Bench�
 
 ![[assets/figures/papers/paper_list_l816_https_arxiv_org_abs_2603_26174/figures/006_Figure_5.jpg]]
 *Figure 5: Performance comparison across all creative dimensions under different metrics. Top row: closed-source models; bottom row: open-source models*
-
-![[assets/figures/papers/paper_list_l816_https_arxiv_org_abs_2603_26174/figures/007_Table_2.jpg]]
-*Table 2: Evaluation results of mainstream image generation and editing models on CREval-Bench using GPT-4o as the evaluator. The scores for the three editing types and the overall average are reported across three evaluation metrics: Instruction Following (IF), Visual Consistency (VC), and Visual Quality (VQ). The best performance among closed-source models is highlighted in red, and the second best in blue. For open-source models, the top result is shown in bold, and the second best is underlined*
-
-![[assets/figures/papers/paper_list_l816_https_arxiv_org_abs_2603_26174/figures/011_Table_S.1.jpg]]
-*Table S.1: More quantitative comparisons on CREval-Bench by GPT-4o. The best performance among closed-source models is highlighted in red, and the second best in blue. For open-source models, the top result is shown in bold, and the second best is underlined*
-
-![[assets/figures/papers/paper_list_l816_https_arxiv_org_abs_2603_26174/figures/014_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l816_https_arxiv_org_abs_2603_26174/figures/019_Figure_S.8.jpg]]
-*Figure S.8: More visual comparison*
-
-
 
 ## 定位与知识库关联
 
@@ -325,8 +290,6 @@ CREval 的提出为创意图像编辑评估开辟了新的路径，同时也揭�
 4. **跨模态扩展**：CREval 的 VQA 评估框架是否可以扩展至视频编辑或其他模态（如 3D 场景编辑、音频-视觉联合编辑）？这需要重新设计问题生成策略和评估维度。
 
 5. **“Thinking”模块的有效性悖论**：实验中发现 Bagel 和 Step1X-Edit 的 think 版本在 IF 得分上反而低于原版，说明额外的 thinking 模块在创意编辑任务中未带来增益。这一现象的内在原因及其对评估框架设计的启示值得深入研究。
-
-
 
 ## 原文 PDF
 

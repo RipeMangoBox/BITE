@@ -52,8 +52,6 @@ claims:
 
 **主要结果**：在 RMLLMU-Bench 基准上，R-MUSE 在 LLaVA-1.5-7B 和 Qwen-2.5-VL-7B 两个骨干网络上均显著优于所有基线。以 15% 遗忘率为例，R-MUSE 在 LLaVA-1.5-7B 上将遗忘集分类准确率从 Vanilla 模型的 51.87% 降至 21.80%，推理泄漏从 79.50% 降至 39.20%，同时保留集准确率维持在 45.85%；在 Qwen-2.5-VL-7B 上实现遗忘集准确率 33.80%（Vanilla 为 60.50%），而保留集准确率几乎无损（53.60% vs 53.80%）。消融实验证实，移除 RRS 后保留集准确率从 54.1% 骤降至 34.0%，验证了正交投影保护机制的核心作用。PCA 可视化进一步表明，R-MUSE 引导的隐藏状态在遗忘集上发生显著方向性偏移，而在保留集上与原始模型高度重叠，实现了定向遗忘而不破坏保留能力。
 
-
-
 ### 推理型多模态大语言模型的遗忘困境
 
 多模态大语言模型（MLLMs）在视觉问答、跨模态推理等任务中展现出强大能力，但其训练数据中不可避免地包含敏感或受版权保护的信息。当法律法规（如GDPR的“被遗忘权”）要求删除特定知识时，模型需要具备“遗忘”能力——即在不重新训练的前提下，使模型对特定查询不再生成包含目标信息的回答。
@@ -81,8 +79,6 @@ Figure 1 清晰地揭示了这一困境。当遗忘方法仅针对最终答案�
 针对上述缺口，本文提出**R-MUSE**（Reasoning-Preserving Multimodal Unlearning via Activation Steering），一个无需训练、在推理时通过激活引导实现遗忘的框架。其核心洞察在于：**将遗忘方向构造为答案和推理轨迹的混合跨度对比信号，并在推理保留子空间的正交补空间中进行自适应强度引导，可在有效遗忘敏感信息的同时最大程度保护通用推理能力**。
 
 具体而言，R-MUSE通过三个关键设计实现这一目标：（1）构建覆盖答案和思维链的混合跨度遗忘方向，从根本上抑制推理泄漏；（2）学习推理保留子空间（RRS），并将遗忘引导投影到其正交补空间，实现遗忘与推理的结构化解耦；（3）引入基于最优运输距离的自适应校准机制，无需手动超参数即可动态确定引导强度。
-
-
 
 ## 核心方法与创新机理
 
@@ -118,8 +114,6 @@ $$\mathsf{Upd}_{\ell}\big(\mathbf{q}; \mathbf{h}_{\ell}\big) = g(\mathbf{q})\lef
 
 传统激活引导方法依赖固定超参数（如系数 $\lambda$）来调节引导强度，这在实际部署中需要大量手动调优，且难以适应不同查询的异质性。R-MUSE 将引导过程形式化为**最优运输问题**：根据当前隐藏状态到安全流形的最小测地距离，自适应确定引导强度 $\lambda = \min\{1, \theta_{\mathrm{tar}} / \theta_{\mathrm{dir}}\}$，并通过球面线性插值实现范数保持的激活更新。消融实验表明，用固定强度替代 ACS（w/o ACS）会导致遗忘-保留平衡显著变差，证实了自适应校准可有效避免欠引导或过引导。
 
-
-
 R-MUSE 是一种**无需训练的推理时激活引导框架**，其核心目标是在遗忘敏感信息的同时保护通用多模态推理能力。该框架通过离线构建两个正交子空间——遗忘子空间与推理保留子空间——并在推理时通过门控机制和自适应校准实现定向干预。
 
 ### 框架总览
@@ -148,13 +142,6 @@ R-MUSE 是一种**无需训练的推理时激活引导框架**，其核心目标
 ### 模块间关系
 
 遗忘子空间与 RRS 在设计上形成**正交解耦**：前者捕获需要抑制的敏感信息方向，后者锚定需要保护的通用推理方向。门控机制作为二者的调度器，决定何时激活遗忘引导；ACS 则作为强度控制器，避免固定超参数带来的欠引导或过引导问题。这种“检测-定向-校准”的三段式架构使得 R-MUSE 能够在不修改模型参数的前提下，实现细粒度的推理保留遗忘。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l790_https_arxiv_org_abs_2512_17911/figures/001_Figure_1.jpg]]
-*Figure 1: Illustration of the core challenge in unlearning for RMLLMs. Left: MLLM unlearning method changes the final answer, but its chain-of-thought still reconstructs the memorized fact, causing reasoning leakage. Right: LRM unlearning method avoids leakage but collapses into incoherent, repetitive reasoning, destroying general reasoning ability*
-
-
 
 R-MUSE 是一个无需训练的推理时激活引导框架，其核心由四个模块级联构成，分别解决遗忘方向构建、推理保护、选择性干预和自适应强度校准问题。
 
@@ -231,8 +218,6 @@ $$\tilde{\mathbf{h}} = r \frac{\mathbf{h} + \alpha \hat{\mathbf{v}}}{\|\mathbf{h
 | $\lambda$ | 自适应校准权重，由 OT 距离比确定 | Eq. (4.16) |
 | $\tilde{\mathbf{h}}$ | Slerp 更新后的隐藏状态 | Eq. (4.18) |
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈验证：推理泄漏与能力坍塌的双重困境
@@ -293,8 +278,6 @@ Figure 4通过PCA可视化提供了R-MUSE作用机制的几何证据。在LLaVA-
 - **跨架构可迁移性**：RRS和遗忘子空间在不同MLLM架构间的可迁移性尚未探索，这关系到方法的规模化应用
 - **大规模遗忘集的扩展性**：当遗忘集规模显著增大时，正交保护机制是否仍能维持推理保留需要进一步验证
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l790_https_arxiv_org_abs_2512_17911/figures/008_Table_3.jpg]]
 *Table 3: Unlearning performance on RMLLMU-Bench with a 15% Forget Rate. Results are evaluated on the forget set (Fgt), test set (Test), retain set (Ret), and celebrity set (Cele). ↓ indicates lower is better, and ↑ indicates higher is better*
 
@@ -307,19 +290,11 @@ Figure 4通过PCA可视化提供了R-MUSE作用机制的几何证据。在LLaVA-
 ![[assets/figures/papers/paper_list_l790_https_arxiv_org_abs_2512_17911/figures/007_Figure_5.jpg]]
 *Figure 5: Forgetting-Utility Trade-off Analysis. We plot the Retain Set Accuracy vs. Forget Set Accuracy for LLaVA-1.5-7B (a) and Qwen-2.5-VL-7B (b). The ideal performance is located in the top-left corner (Low Forget Acc, High Retain Acc). R-MUSE (Red Star) significantly outperforms all baselines, achieving deep unlearning while maintaining utility comparable to the Vanilla model (Grey Diamond). In contrast, optimization-based baselines (Circles) suffer from utility collapse (dropping low on y-axis), while other SOTA methods (Squares) fail to unlearn effectively (staying right on x-axis)*
 
-![[assets/figures/papers/paper_list_l790_https_arxiv_org_abs_2512_17911/figures/004_Figure_2.jpg]]
-*Figure 2: Reasoning Capability Retention (RCR) in RMLLMU-Bench (5% Forget) using Qwen-2.5-VL-7B-Instruct*
-
-![[assets/figures/papers/paper_list_l790_https_arxiv_org_abs_2512_17911/figures/005_Figure_3.jpg]]
-*Figure 3: Analysis of τ sensitivity in RRS on RMLLMU-Bench (5% Forget)*
-
 ![[assets/figures/papers/paper_list_l790_https_arxiv_org_abs_2512_17911/figures/002_Table_1.jpg]]
 *Table 1: Unlearning performance on MLLMU-Bench (5% and 10% Forget Rate,15% in Appendix E). Results are evaluated on the forget set (Fgt), test set (Test), retain set (Ret), and celebrity set (Cele). ↓ indicates lower is better, and ↑ indicates higher is better*
 
 ![[assets/figures/papers/paper_list_l790_https_arxiv_org_abs_2512_17911/figures/009_Table_4.jpg]]
 *Table 4: Key statistics of the RMLLMU-Bench. The dataset maintains strict alignment in data distribution and task composition with the foundational benchmark*
-
-
 
 ## 定位与知识库关联
 
@@ -375,8 +350,6 @@ R-MUSE 的三个核心模块各自对应一个方法学贡献，可被后续工�
 4. **评估体系的完善**：当前 RMLLMU-Bench 的推理泄漏评估（RIL）依赖 LLM 评判器，其对隐式泄漏的检测灵敏度有待进一步标定。更严格的对抗性评估（如通过 probing classifier 检测隐藏状态中的残留信息）将是对 R-MUSE 遗忘彻底性的重要补充验证。
 
 5. **与训练时方法的融合**：R-MUSE 作为推理时方法，可与训练时遗忘方法形成互补——后者负责粗粒度的参数级遗忘，前者负责细粒度的推理时泄漏抑制。这种“训练-推理”联合遗忘框架的设计空间值得探索。
-
-
 
 ## 原文 PDF
 

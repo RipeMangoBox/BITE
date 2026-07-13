@@ -58,8 +58,6 @@ claims:
 
 **方法定位**：CARE 属于**监督 Sim2Real 域自适应**范式，区别于无监督（如 ILLUME, Khindkar et al., WACV 2022）和少样本（如 Wang et al., ICML 2020）设定。其训练目标在标准检测损失基础上引入**域翻译损失**（Eq. 2），包含重加权源损失、类平衡目标损失以及类条件跨域特征对齐损失 ℓ_align（Eq. 3），通过显式利用目标标签实现外观与内容的联合桥接。
 
-
-
 ### 问题背景：Sim2Real 域自适应中的监督范式转变
 
 在自动驾驶等高风险感知任务中，获取大规模真实世界标注数据成本高昂且受限于隐私与安全约束，而合成仿真数据可以无限生成并提供精确的自动标注。然而，直接在合成数据上训练的模型迁移到真实场景时性能大幅下降，这一现象被称为 **Sim2Real 领域鸿沟**（Sim2Real domain gap）。
@@ -84,8 +82,6 @@ claims:
 ### 核心动机与洞察
 
 本文的核心洞察在于：**在监督设定下，充足的目标标签使得可靠估计域间差异成为可能**。通过显式地对齐类条件 RoI 特征以缩小外观差距，并基于估计的标签/边界框分布重加权样本以匹配目标域的内容分布，可以显著提升目标域检测性能。这一思路将域自适应从“盲目对齐”转变为“有条件、结构感知的差异补偿”。
-
-
 
 ## 核心方法与创新机理
 
@@ -120,8 +116,6 @@ $$\min_{\theta,\phi} \mathbb{E}_{x,B,C \sim P_S} \big[ w_S(C) v(B|C) \ell_{det} 
 
 消融实验（Table 4）确认：循环一致性对齐与类/框重加权的组合带来了最大性能提升，去除任一组分均导致mAP下降。CARE在Sim10K→Cityscapes（68.1 mAP）、Synscapes→Cityscapes（48.5 mAP）和DriveSim→Cityscapes（53.7 mAP）三个基准上均取得最优，相比Mixing基线分别提升+3.3、+9.5和+4.4。
 
-
-
 CARE（Conditional Alignment and Reweighting）是一个面向监督Sim2Real域自适应的通用框架，应用于2D目标检测任务。其核心思想是充分利用目标域的真实标签，系统性地桥接合成源域与真实目标域之间的**外观差距**和**内容差距**。整个pipeline以Faster R-CNN为基础检测架构，在其上构建了两个关键功能模块：**跨域循环一致性特征对齐模块**和**重要性重加权模块**，二者协同工作以最小化域间分布差异。
 
 ### 数据流与模块关系
@@ -151,8 +145,6 @@ $$\min_{\theta,\phi} \mathbb{E}_{P_S} \big[ w_S(C) v(B|C) \ell_{det} \big] + \ma
 ### 推理流程
 
 推理阶段仅需目标域图像输入，依次经过backbone特征提取和Faster R-CNN检测头，无需域对齐或重加权计算，与标准检测器完全一致，不引入额外推理开销。
-
-
 
 ### 3.1 问题形式化与域间隙分解
 
@@ -209,8 +201,6 @@ $$\mathbb{E}_{P_T} \left[ \frac{1}{P_T(C)} \ell_{det}(h(g(x)), B, C) \right]$$
 
 这表明 CARE 的优化目标在极限情况下等价于在目标域上最大化类别平衡的检测性能，为 mAP 优化提供了理论支撑。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：CARE在三个基准上一致取得最优
@@ -242,13 +232,6 @@ Figure 8展示了在不同目标域数据比例下各方法的扩展趋势。CAR
 
 需要注意的是，所有实验均在Faster R-CNN检测框架和合成→真实的域偏移设定下进行。CARE对KDE带宽、平滑参数α/β和阈值τ等超参数的敏感性未系统性报告，且边界框尺寸与位置的条件独立性假设在部分场景（如行人检测中人体姿态与位置的耦合）下可能不成立。此外，方法假设目标域拥有大量标记数据，无法利用无标签目标样本——这在部分标注场景下限制了其应用范围。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l41_https_arxiv_org_abs_2302_04832/figures/013_Figure_6.jpg]]
-*Figure 6: Visualizing P ( $\boldsymbol { \mathsf { w } } , \boldsymbol { \mathsf { h } }$ | C ) reweighting on Synscapes→Cityscapes. (top) Visualizing v ( ${ \mathsf$ w } , ${ \mathsf$ h } | C \ = \ $\mathrm { c a r }$ ) (bottom) Visualizing change in mAP after P ( $\boldsymbol { \mathsf { w } } , \boldsymbol { \mathsf { h } }$ | C ) reweighting for three categories (car, bus, bike)
-
-![[assets/figures/papers/paper_list_l41_https_arxiv_org_abs_2302_04832/figures/017_Figure_10.jpg]]
-*Figure 10: Visualizing log PDF values of KDE densities fitted to bounding box size on Synscapes→Cityscapes for the “car” class*
 
 ![[assets/figures/papers/paper_list_l41_https_arxiv_org_abs_2302_04832/figures/002_Table_1.jpg]]
 *Table 1: Car detection adaptation from Sim10K→Cityscapes: Systematically combining labeled source and target data improves over using a single data source as well as na¨ıve combinations*
@@ -262,19 +245,8 @@ Figure 8展示了在不同目标域数据比例下各方法的扩展趋势。CAR
 ![[assets/figures/papers/paper_list_l41_https_arxiv_org_abs_2302_04832/figures/009_Table_4.jpg]]
 *Table 4: Ablating our proposed method on all three shifts. Our method is in gray with the improvement versus mixing in small font*
 
-![[assets/figures/papers/paper_list_l41_https_arxiv_org_abs_2302_04832/figures/010_Table_5.jpg]]
-*Table 5: Ablating our proposed conditional reweighting strategies on Synscapes → Cityscapes*
-
-![[assets/figures/papers/paper_list_l41_https_arxiv_org_abs_2302_04832/figures/011_Table.jpg]]
-*Table: (b) Ablating P ( B | C ) rewt*
-
-![[assets/figures/papers/paper_list_l41_https_arxiv_org_abs_2302_04832/figures/004_Figure_3.jpg]]
-*Figure 3: Conditional Alignment and Reweighting (CARE) exploits target labels to estimate and bridge cross-domain appearance gaps (via a cycle consistency-based conditional feature alignment objective) and content gaps (via importance reweighting)*
-
 ![[assets/figures/papers/paper_list_l41_https_arxiv_org_abs_2302_04832/figures/012_Figure_5.jpg]]
 *Figure 5: Per-class performance comparison of CARE to baselines on Synscapes→Cityscapes*
-
-
 
 ## 定位与知识库关联
 
@@ -321,8 +293,6 @@ CARE的有效性建立在以下前提之上，这些前提也界定了其适用�
 - 是否可以用可微的权重生成网络替代手工KDE重加权，实现端到端优化？这可以消除超参数调优负担，但需要设计稳定的训练策略。
 - 对齐损失和重加权策略的相对重要性是否随源-目标域差距的增大而发生显著变化？在更大域间隙下，可能需要调整λ权重或重加权的平滑策略。
 - 该监督自适应范式是否适用于非仿真到真实的日常域自适应问题？在Cityscapes→Foggy Cityscapes或不同城市间的自适应中，内容差距（如物体尺度分布）可能更小，CARE的增益空间需要重新评估。
-
-
 
 ## 原文 PDF
 

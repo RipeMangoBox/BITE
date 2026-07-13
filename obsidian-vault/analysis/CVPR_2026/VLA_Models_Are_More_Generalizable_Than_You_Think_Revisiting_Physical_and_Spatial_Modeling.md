@@ -58,8 +58,6 @@ claims:
 
 这些结果表明，预训练VLA模型内部蕴含着潜在的鲁棒性，仅需对视觉通路进行极小规模的单次适配即可激活这些不变性，无需大规模重训或额外数据。
 
-
-
 ### 视觉-语言-动作模型的空间泛化困境
 
 视觉-语言-动作（VLA）模型通过大规模预训练，在机器人操作任务中展现出令人瞩目的通用性。然而，当部署环境中的相机视点发生偏移——哪怕只是轻微的拍摄角度变化——模型性能往往出现断崖式下跌。这一现象暴露了一个核心矛盾：VLA模型在语义理解和动作生成层面具有强大的能力储备，却在**空间建模**这一基础维度上异常脆弱。
@@ -88,8 +86,6 @@ claims:
 ### 问题定位与本文贡献
 
 综上，本文聚焦于VLA模型在视点变化下的空间建模瓶颈，提出一个统一的单次鲁棒性适配框架。该框架包含两种互补的轻量级机制——**Feature Token Modulation（FTM）**和**Feature Linear Adaptation（FLA）**——分别从视觉token的全局分布校准和ViT编码器的内部特征调整两个层面，恢复嵌入空间的跨域对齐。这一框架不仅以不到全模型微调1%的参数量达到甚至超越其性能，更揭示了VLA模型泛化性的本质：**鲁棒性早已存在，只需找到正确的钥匙将其激活**。
-
-
 
 ## 核心方法与创新机理
 
@@ -135,8 +131,6 @@ FLA的适配范式在不同VLA基础模型上均表现出有效性：在OpenVLA-
 
 FTM依赖全局仿射假设——当嵌入偏移具有高度非线性和局部性时，仅凭仿射调制可能不足以完全恢复性能。FLA虽通过低秩更新部分缓解此问题，但在极端非线性扰动下的理论上限仍需进一步验证。此外，当前实验主要在静态扰动类型（视点、光照、纹理、噪声）下评估，动态场景中快速移动障碍物或交互式力反馈等复杂物理扰动下的表现尚待探索。
 
-
-
 ### 核心瓶颈
 
 视点变化下VLA模型性能下降的主要瓶颈在于**空间建模中的视觉嵌入分布偏移**，而非物理建模部分的能力不足。具体而言，视觉扰动引发的嵌入空间系统性漂移破坏了视觉编码器与VLM头之间的协调一致性，使得冻结的策略模块无法正确解释来自新视点的视觉token。
@@ -170,15 +164,8 @@ $$P_{\theta,\phi}(a_t \mid a_{<t}, o_{\le t}) = g(a_{<t}; [\mathcal{A}_{\phi}(f_
 
 其中 $\mathcal{A}_\phi$ 为FTM或FLA所定义的视觉特征适配变换，$\theta$ 为冻结的预训练参数，$\phi$ 为仅有的可学习适配参数。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2653_https_arxiv_org_abs_2512_02902/figures/001_Figure_1.jpg]]
-*Figure 1: Illustration of Spatial Modeling Adaptation. (a) Our two proposed one-shot adaptation methods—Feature Token Modulation (FTM) and Feature Linear Adaptation (FLA)—which adapt visual representations to new spatial domains. After adaptation, all multimodal tokens are processed by the pretrained VLM and action expert to generate the final policy. (b) Parameter efficiency versus performance on the LIBERO benchmark under novel viewpoints. Our model exceeds the average success rate of the*
-
 ![[assets/figures/papers/paper_list_l2653_https_arxiv_org_abs_2512_02902/figures/011_Figure_6.jpg]]
 *Figure 6: Real-World Experimental Setup. (a) Our hardware environment features a Franka Emika Panda robot teleoperated via the GELLO framework, equipped with both a third-person static camera and a wrist-mounted camera. (b) The Novel Camera Viewpoint used for one-shot adaptation. This viewpoint introduces a significant spatial shift compared to the standard pre-training distribution, serving as the testbed for our Feature Linear Adaptation (FLA) method*
-
-
 
 ### 3.1 问题建模：VLA策略的视点泛化瓶颈
 
@@ -238,13 +225,6 @@ $$\text{AdaRMSNorm}(x, \tau) = y \cdot (1 + \gamma(\tau)) + \beta(\tau), \quad y
 
 在FTM/FLA适配过程中，Action Expert始终保持冻结，仅依赖校准后的视觉嵌入来恢复精确控制信号的生成。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2653_https_arxiv_org_abs_2512_02902/figures/004_Figure_4.jpg]]
-*Figure 4: Overview of feature adaptation and benchmark design. (a) Illustration of the proposed Feature Token Modulation mechanism. The dashed box denotes components used only during training and removed at inference. (b) The LIBERO-V (Visual) benchmark, created by combining multiple levels of viewpoint variation [31] with visual-perturbation tasks from LIBERO-Plus [8]. It covers four perturbation types: camera viewpoint, lighting, background texture, and image noise*
-
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈验证：空间建模中的视觉嵌入漂移
@@ -254,9 +234,6 @@ $$\text{AdaRMSNorm}(x, \tau) = y \cdot (1 + \gamma(\tau)) + \beta(\tau), \quad y
 - **零样本性能的急剧下降**：预训练的π0.5模型在LIBERO标准视点下表现良好，但在新视点下零样本成功率骤降至48.5%（Table 1），表明模型内部存在可恢复的潜在能力，而非完全缺乏视点泛化能力。
 - **轻量适配的显著恢复**：仅对视觉token施加全局仿射变换（FTM，4K参数）即可将成功率提升至87.1%；对ViT线性层注入低秩更新（FLA，4.7M参数）更达到90.8%（Table 1）。这种“极小干预、极大恢复”的现象直接证明瓶颈在于视觉嵌入的分布对齐，而非策略网络的容量不足。
 - **嵌入空间可视化证据**：t-SNE可视化（Figure 10）显示，适配前源域与目标域的视觉token嵌入存在显著的域间隙，而FLA适配后目标域嵌入被投影至源域流形上，恢复了特征空间的连通性，使得冻结的策略网络能够正常工作。
-
-![[assets/figures/papers/paper_list_l2653_https_arxiv_org_abs_2512_02902/figures/005_Table_1.jpg]]
-*Table 1: Success rates on the LIBERO benchmark under novel camera viewpoints. We report Success Rate (SR) across all unseen viewpoints [31] in the LIBERO suites [21]. GeoAware-VLA [1] replaces its visual backbone with VGGT and trains policies from scratch (results taken from the original paper). The two OpenVLA variants include OpenVLA-OFT (zero-shot) and OpenVLA-OFT-m, which is finetuned on LIBERO-Plus [8] using large-scale multi-view data. We additionally evaluate one-shot adaptations applied to pretrained π0 and*
 
 ![[assets/figures/papers/paper_list_l2653_https_arxiv_org_abs_2512_02902/figures/015_Figure_10.jpg]]
 *Figure 10: Visualization of Visual Token Embeddings via t-SNE. (a) Before Adaptation: A significant domain gap is observed between the source (blue) and target (red) embeddings, indicating severe spatial misalignment caused by viewpoint shifts. (b) After FLA: Our method projects the target embeddings (green) to align with the source manifold. This manifold alignment restores the connectivity of the feature space, allowing the frozen policy to function correctly without requiring the distributions to perfectly overlap*
@@ -280,9 +257,6 @@ $$\text{AdaRMSNorm}(x, \tau) = y \cdot (1 + \gamma(\tau)) + \beta(\tau), \quad y
 - **OpenVLA-OFT**：零样本性能仅34.3%，而在LIBERO-Plus多视角数据上微调后的OpenVLA-OFT-m也仅达82.0%，仍低于FTM的87.1%。这表明大规模多视角数据的暴力微调效率远不如针对视觉通路的精准适配。
 
 #### 视点扰动幅度分析（Table 2, Figure 11）
-
-![[assets/figures/papers/paper_list_l2653_https_arxiv_org_abs_2512_02902/figures/006_Table_2.jpg]]
-*Table 2: Success Rate (SR) on Novel View Across all four Libero sub-suites*
 
 LIBERO新视点基准进一步将相机偏移按幅度分为Small、Medium、Large三个等级。FLA在不同幅度下均保持高成功率：
 - Small: 94.6%（vs π0.5 LoRA 94.8%）
@@ -316,9 +290,6 @@ FLA的核心超参数是LoRA的秩$r$。实验表明：
 
 #### 跨VLA模型的泛化性验证（Table 8）
 
-![[assets/figures/papers/paper_list_l2653_https_arxiv_org_abs_2512_02902/figures/020_Table_8.jpg]]
-*Table 8: Success Rate (%) of FLA across different VLA models under novel camera viewpoints*
-
 为验证方法的模型无关性，FLA被应用于三种不同的VLA基础模型：OpenVLA-OFT、π0和π0.5。仅需秩8的极低秩适配，所有模型在新视点下的成功率均突破80%：
 - OpenVLA-OFT: 89.0%
 - π0: 82.8%
@@ -327,9 +298,6 @@ FLA的核心超参数是LoRA的秩$r$。实验表明：
 这一跨架构的普适性强烈暗示：视觉嵌入漂移是当前VLA模型的共性瓶颈，而轻量视觉适配是解决该瓶颈的通用方案。
 
 #### 训练稳定性（Figure 12）
-
-![[assets/figures/papers/paper_list_l2653_https_arxiv_org_abs_2512_02902/figures/018_Figure_12.jpg]]
-*Figure 12: Adaptation Stability. Success rates across training steps. FLA remains stable and consistently outperforms baselines without overfitting*
 
 与LoRA和全微调相比，FLA在训练过程中表现出卓越的稳定性：收敛后成功率保持平稳，无过拟合迹象。而LoRA和全微调均出现不同程度的性能波动或过拟合。这归因于FLA仅调整视觉编码器的线性层，保留了VLM和Action Expert的完整预训练知识，避免了在少量适配数据上的灾难性遗忘。
 
@@ -348,8 +316,6 @@ FLA的核心超参数是LoRA的秩$r$。实验表明：
 3. **真实世界规模有限**：真实世界验证仅包含五项操作任务和单一机器人平台（Franka Emika Panda），更大规模、更多样化场景下的性能尚待进一步验证。
 
 4. **单次适配的持久性**：当任务分布持续变化时（如终身学习场景），如何动态更新这些极轻量的适配参数而不引起灾难性遗忘，是尚待解决的开放问题。
-
-
 
 ## 定位与知识库关联
 
@@ -424,8 +390,6 @@ FTM可视为一种极简的“特征空间校准层”，类似于Feature-wise T
 4. **瓶颈诊断的跨任务普适性**：在纯语言或纯视觉任务上，类似的空间建模瓶颈（即嵌入空间的系统性漂移而非能力缺失）是否同样存在，且能否用类似方法缓解？这关系到该诊断框架能否从具身智能推广至更广泛的视觉-语言模型鲁棒性研究。
 
 5. **非线性偏移的建模**：当嵌入偏移超出仿射或低秩假设的表达范围时，需要何种更灵活但同样参数高效的适配机制？可能的扩展方向包括逐token的条件调制或轻量级注意力重校准。
-
-
 
 ## 原文 PDF
 

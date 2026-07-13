@@ -60,8 +60,6 @@ claims:
 
 **方法定位。** STAvatar属于优化式单目头像重建框架，需针对每个受试者单独训练。与单图前馈泛化方法（如GAGAvatar、LAM）相比，身份保真度更高，但无法在单次前向传播中完成重建，在即时应用或数据稀缺场景下适用性受限。
 
-
-
 ### 问题场景：单目视频驱动的3D头部化身重建
 
 从单目RGB视频中重建可驱动的逼真3D头部化身，在虚拟现实、远程呈现和数字人应用中具有重要价值。这项任务的核心挑战在于：仅凭一段受试者说话或表演的二维视频，重建出三维几何结构、恢复高频外观细节（如皱纹、牙齿），并支持对新表情和姿态的准确驱动。
@@ -89,8 +87,6 @@ claims:
 - **Temporal Adaptive Density Control（Temporal ADC）**：引入FLAME条件时间聚类（FTC）和融合感知误差（FPE-AP）两项机制。FTC将视频帧按结构相似性聚类，使ADC在簇内计算增密准则时能有效捕获瞬时可见区域；FPE-AP结合L1和D-SSIM构建感知误差图，并增设峰值误差集合，确保纹理复杂区域和瞬态高误差区域均能获得充分的高斯增密。
 
 通过这两个核心模块的协同，STAvatar在保留3DGS高效渲染和显式几何优势的同时，显著提升了动态头部化身在非刚性细节和遮挡区域的保真度，在INSTA、PointAvatar、NerFace和HDTF四个基准数据集上取得了最优重建性能（见Table 1）。
-
-
 
 ## 核心方法与创新机理
 
@@ -144,8 +140,6 @@ STAvatar 提出时间自适应密度控制策略，包含两个耦合组件：
 
 软绑定与 Temporal ADC 并非孤立改进，二者形成协同：软绑定提供的非刚性形变自由度会产生更丰富的几何-纹理误差信号，为 FPE-AP 提供更精确的密度控制指引；Temporal ADC 增加的瞬时区域高斯密度则为软绑定的细粒度偏移提供了足够的表达容量。在 INSTA 数据集上，完整方法达到 PSNR 30.63、SSIM 0.9587、LPIPS 0.0304（Table 1），显著优于所有对比方法，且训练效率最高（Figure 9），6 个 epoch 内快速收敛至最优水平。
 
-
-
 STAvatar 的整体 pipeline 围绕两个核心创新展开：**UV-Adaptive Soft Binding（UV 自适应软绑定）** 和 **Temporal Adaptive Density Control（时间自适应密度控制）**，旨在从单目视频中重建高保真 3D 头部化身。整个框架的输入为一段单目人脸视频，输出为一个可驱动的 3D 高斯化身，其架构可划分为四个串联模块。
 
 ### 1. FLAME 跟踪与初始化
@@ -171,15 +165,8 @@ STAvatar 的整体 pipeline 围绕两个核心创新展开：**UV-Adaptive Soft 
 
 **Figure 3** 给出了完整的架构总览，清晰展示了从输入准备、双分支偏移预测、UV 采样到融合感知误差计算的数据流。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2511_19854/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of STAvatar. (a) In addition to a fixed identity reference image and its UV position map, we further rasterize the vertex offsets between reference mesh and control mesh to obtain a UV displacement map as input. (b) We construct a dual-branch network to predict a feature offset map in UV space, from which an offset δi is sampled for each Gaussian gi. This offset is added to the coarsely estimated parameters ˜θ to get final parameters*
-
-![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2511_19854/figures/001_Figure_1.jpg]]
-*Figure 1: STAvatar proposes a Soft Binding framework and a Temporal Adaptive Density Control strategy to reconstruct highfidelity 3D head avatars from monocular videos*
-
-
 
 STAvatar 的核心管线由四个模块构成，其设计直指现有 3DGS 头部化身方法的两大瓶颈：硬绑定无法捕捉非刚性形变，以及标准 ADC 忽视瞬时可见区域。以下按信息流顺序展开。
 
@@ -315,21 +302,8 @@ $$
 
 **小结。** STAvatar 以 UV 空间可学习偏移解耦了形变建模与三角面片刚性绑定，使 3DGS 的自适应密度控制能力得以保留；同时通过 FTC 和 FPE-AP 双管齐下，将密度控制从全局均匀策略升级为时间感知、误差驱动的精细化策略。这两个模块的协同，是其在口腔内部、皱纹等挑战区域取得显著提升的根本原因。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2511_19854/figures/004_Figure_4.jpg]]
-*Figure 4: FLAME-Conditioned Temporal Clustering. We cluster video frames into K clusters and conduct ADC within each cluster’s training*
-
-![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2511_19854/figures/002_Figure_2.jpg]]
-*Figure 2: Limitations of existing research. (a) Hard binding forces Gaussians to remain relatively static within the triangle coordinate frames, thereby limiting their ability to capture fine-grained details. (b) Transiently visible regions, such as mouth interiors, often exhibit low average positional gradients, which impedes effective Gaussian densification. (c) The positional gradient only reflects geometric inconsistencies and often loses texture details, which hinders the addition of Gaussians in high-frequency regions*
-
 ![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2511_19854/figures/016_Figure_4.jpg]]
 *Figure 4: Visualization of learned UV attribute offset maps. Larger magnitudes are primarily observed in high-frequency and highly deformable regions, such as hair and expression-related areas*
-
-![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2511_19854/figures/013_Figure_3.jpg]]
-*Figure 3: t-SNE visualization of different identities after applying FTC. Each color represents a distinct video frame cluster*
-
-
 
 ## 实验与关键发现
 
@@ -383,16 +357,6 @@ Table 1 (supp) 给出了关键超参数的消融结果。FPE 中 D-SSIM 权重 $
 2. **推理开销**：训练完成后虽可实时渲染，但每身份的训练过程（约 6 epochs）仍存在时间成本。如何进一步压缩训练时间同时保持对瞬时区域的高保真重建，是尚未解决的问题。
 3. **聚类数 K 的选择**：FTC 中的聚类数 K 目前需人工设定，其最优值可能因序列长度和表情复杂度而异。是否能以自适应方式确定 K 仍需探索。
 4. **FPE 超参数的通用性**：融合感知误差中的 $\lambda_1$ 在当前任务上经消融确定，但其在其他动态场景（如全身化身、着装人体）中的通用性尚待验证。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2511_19854/figures/010_Figure_8.jpg]]
-*Figure 8: Comparison of Gaussian primitive counts within the mouth interior between the vanilla training strategies and FTC*
-
-![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2511_19854/figures/014_Figure_2.jpg]]
-*Figure 2: Inclusion–exclusion principle*
-
-
 
 ## 定位与知识库关联
 
@@ -474,8 +438,6 @@ STAvatar属于**优化式**方法（per-subject optimization），需要目标�
 4. **感知误差权重的自适应调节**：λ1=0.2的设置在多大程度上是任务特定的？在纹理丰富区域（如头发）和纹理稀疏区域（如脸颊），最优的L1/D-SSIM混合比例可能不同——空间自适应的λ1是否值得探索？
 
 5. **与基于NeRF的方法的深度对比**：论文主要与3DGS系方法对比，但NeRF系方法（如PointAvatar）在特定指标上仍有竞争力（PointAvatar数据集上FateAvatar的PSNR略高于STAvatar）。软绑定思想能否反向迁移到基于NeRF的化身框架中？
-
-
 
 ## 原文 PDF
 

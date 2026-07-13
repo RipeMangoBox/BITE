@@ -57,8 +57,6 @@ claims:
 
 **方法定位**：MATCH属于**前馈高斯配准**范式，区别于优化式化身（GEM、GaussianAvatars）和单视图/多视图预测方法（LAM、FaceLift、Avat3r）。其建立的跨身份、跨表情稠密对应关系，天然支持快速化身构建、语义编辑与表情迁移等下游应用（Figure 1）。
 
-
-
 ### 问题背景
 
 创建逼真、可动画的头部虚拟化身是计算机视觉与图形学领域的核心挑战，在远程通信、虚拟现实和影视制作中具有广泛需求。传统头部化身构建流程通常包含三个关键步骤：首先对多视图视频序列进行逐帧网格跟踪以建立跨帧对应关系，随后基于跟踪结果训练可动画的神经化身模型，最后通过主成分分析（PCA）蒸馏为可实时驱动的参数化模型。然而，这一流程存在严重的效率瓶颈——以当前最优方法 **GEM**（Giebenhain et al., CVPR 2024）为例，仅网格跟踪就需约10.7小时，后续高斯优化又需27.7小时，总计约45小时才能完成一个特定主体的化身创建。如此高昂的时间成本使得大规模扩展极其昂贵，严重制约了头部化身技术的实际应用。
@@ -70,8 +68,6 @@ claims:
 ### 核心动机
 
 本文的核心动机在于：**能否彻底绕过逐帧跟踪和优化，通过一次前馈推理直接预测具有稠密语义对应关系的3D高斯splat纹理？** 若能实现，不仅可将单帧重建时间从数小时压缩至亚秒级，还能天然支持快速化身构建、语义编辑和表情迁移等下游应用。这一思路的关键挑战在于如何设计高效的注意力机制，使Transformer能够在多视图图像令牌与UV纹理令牌之间建立精确的空间对应，同时避免全局自注意力带来的计算爆炸和泛化退化。
-
-
 
 ## 核心方法与创新机理
 
@@ -116,8 +112,6 @@ MATCH预测的高斯splats具有**跨身份、跨表情的稠密语义对应关�
 
 这些应用无需额外训练或优化，直接受益于前馈推理建立的对应关系，体现了MATCH从“重建工具”向“编辑平台”的范式拓展。
 
-
-
 MATCH 的整体流水线以前馈 Transformer 为核心，直接从多视图图像预测具有稠密语义对应关系的 3D 高斯 splat 纹理，彻底绕开传统方法中耗时数小时的逐帧网格跟踪和高斯优化。整个流程由五个关键模块串联构成：**图像标记化**、**粗网格注册**、**UV 令牌化**、**注册引导注意力与分组注意力**，以及 **UV 去令牌化**。
 
 ### 输入与输出
@@ -160,12 +154,8 @@ $$\mathcal{L}_{\mathrm{photometric}} = w_{\mathrm{LPIPS}} \cdot \mathcal{L}_{\ma
 
 MATCH 预测的高斯纹理可直接用于快速化身构建：跳过传统的网格跟踪和 CNN 化身训练步骤，直接对多帧预测的高斯纹理进行联合 PCA 蒸馏，构建 GEM 线性模型。这使总化身创建时间从 GEM 的 45 小时降至 4.6 小时，加速约 10 倍。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1019_https_arxiv_org_abs_2603_15811/figures/002_Figure_2.jpg]]
 *Figure 2: Overview. Given calibrated multi-view input images, MATCH first predicts a coarse mesh registration using a pretrained network. We obtain RGB and XYZ textures combined with learnable positional embeddings to encode UV tokens and follow GS-LRM [67] to tokenize the input images. The image and UV tokens serve as input to a transformer with two alternating attention blocks. In the novel registration-guided attention block, we render UV coordinate images from the input views, and for each UV token restrict the attention to image tokens displaying the relevant mesh region. The subsequent grouped attention block performs attention across the UV tokens and the tokens of each input image separately....*
-
-
 
 ### 方法总览
 
@@ -228,9 +218,6 @@ $$\mathcal{L}_{\mathrm{photometric}} = w_{\mathrm{LPIPS}} \cdot \mathcal{L}_{\ma
 
 其中 LPIPS 感知损失捕捉高层语义差异，L1 损失约束像素级精度，SSIM 损失保持结构相似性。不同训练阶段的损失权重配置详见 Table 5。
 
-![[assets/figures/papers/paper_list_l1019_https_arxiv_org_abs_2603_15811/figures/017_Table_5.jpg]]
-*Table 5: MATCH loss weights in different training stages*
-
 **几何损失** $\mathcal{L}_{\mathrm{geometry}}$ 约束预测的 3D 位置纹理与网格注册真值之间的一致性。**正则化损失** $\mathcal{L}_{\mathrm{reg}}$ 约束高斯 splat 属性的合理性（如尺度范围、不透明度分布等）。
 
 ### GEM 线性模型
@@ -241,15 +228,8 @@ $$\mathcal{G} = \{ \mu_i + \mathbf{B}_i \mathbf{k}_i \ | \ i \in \{\alpha, \phi,
 
 其中 $\mu_i$ 为属性 $i$ 的均值纹理，$\mathbf{B}_i$ 为 PCA 基向量矩阵，$\mathbf{k}_i$ 为低维系数。颜色 $\mathbf{c}$ 视为常量不参与 PCA。这种设计使得化身创建时间从传统 GEM 的 45.3 小时缩短至 4.6 小时（Table 4），实现了 10 倍加速。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1019_https_arxiv_org_abs_2603_15811/figures/003_Figure_3.jpg]]
 *Figure 3: Correspondence score estimation between image tokens and UV tokens. To ease visualization, the full mesh is rasterized in overlay with the UV renders and patch sizes are increased*
-
-![[assets/figures/papers/paper_list_l1019_https_arxiv_org_abs_2603_15811/figures/025_Figure_17.jpg]]
-*Figure 17: Top: Quantitative ablation study for the number of input views to MATCH on Ava-256. We evaluate two scenarios: i) Changing the number of input views to MATCH while keeping the number of inputs to the coarse mesh registration model (TEM-PEH) at the default (V = 12). ii) Changing the number of input views for both TEMPEH and MATCH. Bottom: Inference speed comparison between our model with the novel registration-guided attention versus a version with dense attention across all UV and image tokens*
-
-
 
 ## 实验与关键发现
 
@@ -316,22 +296,6 @@ Figure 11系统展示了三类典型失败模式：
 - 如何利用MATCH建立的跨身份/跨表情对应关系，学习覆盖广泛身份和表情的先验模型？
 - 如何在保持高效推理的同时加入对未观测区域（如口腔内部）更精细的动态建模？
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1019_https_arxiv_org_abs_2603_15811/figures/004_Table_1.jpg]]
-*Table 1: Novel view synthesis results on Ava-256 and NeRSemble*
-
-![[assets/figures/papers/paper_list_l1019_https_arxiv_org_abs_2603_15811/figures/011_Table_4.jpg]]
-*Table 4: Quantitative comparison of subject-specific head avatars*
-
-![[assets/figures/papers/paper_list_l1019_https_arxiv_org_abs_2603_15811/figures/001_Figure_1.jpg]]
-*Figure 1: Given calibrated multi-view images as input, MATCH infers static Gaussian splat textures in 0.5 seconds. The resulting Gaussians are in dense semantic correspondence across subjects and expressions. This enables diverse downstream applications such as fast head avatar creation, interpolation, semantic editing, and expression transfer. For visualization, we show 6 of the 12 input images, display predicted Gaussians for three separate frames, and apply a checkerboard semantic texture to highlight the dense correspondence*
-
-![[assets/figures/papers/paper_list_l1019_https_arxiv_org_abs_2603_15811/figures/026_Figure_18.jpg]]
-*Figure 18: Robustness to errors in the coarse TEMPEH mesh*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 方法演进脉络
@@ -373,8 +337,6 @@ MATCH 处于头部化身创建从“逐帧优化”向“前馈预测”范式�
 3. **通用头部先验模型。** 如何利用 MATCH 建立的跨身份/跨表情稠密对应关系，学习覆盖广泛身份和表情空间的生成式先验模型，实现单视图或稀疏视图的高质量重建？
 4. **动态口腔建模。** 在保持高效推理的前提下，如何对未观测区域（如口腔内部）引入更精细的动态建模，提升极端张嘴表情下的真实感？
 5. **实时驱动与编辑。** 当前化身推理虽快（0.5 秒/帧），但尚未达到实时交互速率。进一步压缩模型或采用更高效的推理方案是否能实现实时语义编辑和表情驱动？
-
-
 
 ## 原文 PDF
 

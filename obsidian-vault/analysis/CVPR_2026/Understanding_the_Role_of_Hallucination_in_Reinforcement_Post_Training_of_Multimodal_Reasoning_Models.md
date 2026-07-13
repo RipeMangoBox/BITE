@@ -60,8 +60,6 @@ claims:
 
 这些反直觉的结果构成了对当前多模态RL后训练范式的根本性质疑，并为理解多模态推理模型的真实能力来源提供了新的分析视角。
 
-
-
 ### 多模态推理模型的后训练困境
 
 近年来，多模态大语言模型（MLLMs）在视觉问答、数学推理等任务上取得了显著进展。然而，如何通过后训练有效提升其推理能力，仍是一个开放性问题。主流的后训练范式——基于强化学习（RL）的方法，尤其是**GRPO**（Guo et al., arXiv 2025），通过组内归一化奖励来优化策略，无需额外训练奖励模型，已成为多模态推理模型后训练的核心手段。其核心思想是通过最大化优势估计来引导模型生成更高质量的推理轨迹：
@@ -86,8 +84,6 @@ $$\mathcal { L } _ { \mathrm { G R P O } } ( \theta ) = \mathbb { E } \left[ \fr
 - **文本信息移除（TR）**：通过规则匹配移除所有文本条件和查询，仅保留图像。
 
 这些损坏策略创造了一个极端的实验环境：模型被迫在“幻觉”中学习推理。如果RL后训练在此环境下仍能带来性能提升，则直接证明了当前方法对视觉信息的利用不足。这一框架不仅为理解多模态RL训练的机制提供了新的视角，也为未来设计真正能够利用视觉信号的后训练方法指明了方向。
-
-
 
 ## 核心方法与创新机理
 
@@ -120,8 +116,6 @@ $$\mathcal { L } _ { \mathrm { G R P O } } ( \theta ) = \mathbb { E } \left[ \fr
 - **移除文本信息（TR）的训练并未比移除图像（BI/RI）的训练表现出更明显的优势**，这表明模型在训练过程中尚未有效利用视觉信息进行推理。
 
 这些证据共同指向一个结论：**当前RL后训练的性能增益，主要来源于语言模型内部推理模式的强化，而非多模态视觉基础的建立**。模型在训练中学会的是“如何更好地利用文本线索进行推理”，而非“如何从图像中提取关键信息进行推理”。这一发现对当前多模态RL训练范式的有效性提出了根本性质疑，也为未来如何设计真正视觉-语言对齐的强化学习算法指明了方向。
-
-
 
 本文提出 **Hallucination-as-Cue Framework**，一个以模型幻觉为“探针”的分析框架，旨在系统诊断基于强化学习的多模态推理后训练是否真正利用了视觉信息。该框架不提出新的训练算法，而是通过受控破坏训练数据中的模态信息来诱导幻觉，从而揭示RL训练的真实驱动力。
 
@@ -167,8 +161,6 @@ $$\mathcal { L } _ { \mathrm { G R P O } } ( \theta ) = \mathbb { E } \left[ \fr
 该框架揭示了两个核心发现：
 1. **即使在完全幻觉诱导的设置下（BI、RI），RL后训练仍能显著提升模型的推理性能**，在某些情况下（如7B模型的RI训练）甚至超越标准GRPO训练（54.23 vs 53.52平均分）。
 2. **移除文本信息（TR）的训练并未比移除视觉信息（BI/RI）的训练表现出明显优势**，这表明当前的RL多模态推理训练尚未有效利用视觉信息，而是主要强化了语言模型内部的文本推理模式。
-
-
 
 ### 基础RL优化器：GRPO
 
@@ -230,12 +222,8 @@ $$\mathcal{L}_{\mathrm{GRPO}}(\theta) = \mathbb{E}\left[\frac{1}{G}\sum_{i=1}^{G
 
 > **注意**：上述公式均来自论文第3节Preliminaries部分，为GRPO标准定义的直接引用。Hallucination-as-Cue框架本身不引入新的数学公式，其贡献在于实验设计方法论。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l797_https_arxiv_org_abs_2604_03179/figures/001_Figure_1.jpg]]
 *Figure 1: Case Study. An example illustrating different hallucination behaviors in multimodal reasoning models. The left side shows the model reasoning with normal visual inputs; in this case, the reinforcement-trained model (bottom-left) produces a noisier reasoning trajectory and ultimately yields an incorrect answer. In contrast, the right side demonstrates that when visual information is removed, the reinforcement-trained model focuses directly on the question itself. With only contextual cues, the model arrives at a correct prediction. Hallucinated contents are marked in red*
-
-
 
 ## 实验与关键发现
 
@@ -273,8 +261,6 @@ Figure 3和Figure 4分别展示了正常和损坏训练/测试集上的准确率
 
 尽管实验证据充分，本文对观察到的行为背后的机制仅进行了初步分析。其根本原因复杂且多面，需要进一步深入研究。关键开放问题包括：RL训练在多大程度上真正利用了视觉信息进行推理？为何TR训练未表现出明显优势？为何幻觉诱导训练未导致过拟合？以及更大模型如何从幻觉推理中获益的具体机制是什么？
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l797_https_arxiv_org_abs_2604_03179/figures/005_Table_1.jpg]]
 *Table 1: Benchmark results comparing different training regimes with Qwen2.5-VL [2] baselines. All RL-based training is performed on the Geometry3K [21] dataset. For the 3B model, standard GRPO yields the best average performance. Strikingly, for the 7B model, hallucination-inductive training (GRPO-RI) achieves the highest average score, even outperforming standard GRPO trained on clean data*
 
@@ -286,14 +272,6 @@ Figure 3和Figure 4分别展示了正常和损坏训练/测试集上的准确率
 
 ![[assets/figures/papers/paper_list_l797_https_arxiv_org_abs_2604_03179/figures/008_Table_4.jpg]]
 *Table 4: Fine-grained analysis of different visual reasoning problem types using the MathVerse [41] benchmark. BI corruption is applied as the study case for inference corruption*
-
-![[assets/figures/papers/paper_list_l797_https_arxiv_org_abs_2604_03179/figures/003_Figure_3.jpg]]
-*Figure 3: Accuracy of different training regimes on the normal training and test sets*
-
-![[assets/figures/papers/paper_list_l797_https_arxiv_org_abs_2604_03179/figures/004_Figure_4.jpg]]
-*Figure 4: Accuracy of different training regimes on corrupted training and test sets*
-
-
 
 ## 定位与知识库关联
 
@@ -350,8 +328,6 @@ $$\mathcal { L } _ { \mathrm { G R P O } } ( \theta ) = \mathbb { E } \left[ \fr
 4. **规模效应的机制**：为何随机图像替换（RI）训练在7B模型上超越了标准GRPO，而在3B模型上并未发生？更大模型如何从幻觉诱导的推理中获益，其具体的推理能力放大机制是什么？
 
 5. **训练范式的扩展**：本框架的发现是否适用于其他RL算法（如PPO、DPO）或其他后训练策略（如SFT）？如果底层机制是语言模型推理能力的放大，那么这一效应是否在纯文本RL训练中同样存在？
-
-
 
 ## 原文 PDF
 

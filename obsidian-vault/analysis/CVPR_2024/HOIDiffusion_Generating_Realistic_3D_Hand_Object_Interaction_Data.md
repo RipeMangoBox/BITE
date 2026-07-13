@@ -157,8 +157,6 @@ $$
 
 整个框架的输入为：① 物体3D模型（mesh）；② 描述场景、物体外观和背景的文本提示。输出为：与3D几何条件严格对齐、且外观可由文本灵活控制的高保真手-物体交互图像。通过固定几何条件而改变文本输入，可以控制背景和物体外观风格；通过固定文本而改变几何条件，可以控制手部姿态和物体形状——这正是 Figure 1 所展示的几何与外观解耦生成能力。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1716_HOIDiffusion_Generating_Realistic_3D_Hand_Object_Interaction_Data/figures/002_Figure_2.jpg]]
 *Figure 2: Pipeline. We propose a two-stage pipeline to synthesize hand-object-interaction data. During the first stage, we utilize a pretrained GrabNet to output 3D hand poses given by a single object model. Then in the second stage, we use those 3D hand poses along with segmentation maps, normal maps and skeletons to conditionally generate high-quality HOI data*
 

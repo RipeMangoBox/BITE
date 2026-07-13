@@ -58,8 +58,6 @@ claims:
 - **检索性能**：运动-文本检索的 R@1 指标同步提升，例如 t5-large 从 7.76 提升至 9.65。
 - **生成质量**：微调后的文本编码器在多个生成模型（**Motiondiffuse**、**T2M-GPT**、**ReMoDiffuse**）上一致改善 FID 和 R-Precision，证明该方法具有通用性。
 
-
-
 ### 运动-语言模型的时序理解缺口
 
 文本-运动检索与生成任务近年来取得了显著进展，以 **TMR**（Petrovich et al., ICCV 2023）为代表的运动-语言模型通过对比学习框架，将文本描述与3D人体运动序列映射到共享潜在空间，实现了跨模态检索与条件生成。然而，现有模型存在一个关键盲区：**对比学习目标仅关注文本与运动的整体语义匹配，未显式建模二者之间的时序对应关系**。当面对包含多个连续子动作的复合描述（如“先蹲下再起立然后跳跃”）时，模型无法有效区分事件发生的先后顺序。
@@ -75,8 +73,6 @@ claims:
 本文的核心洞察是：**通过向对比学习框架中注入显式的时序顺序信息，可以迫使模型学习区分时序正确与错误的描述，从而在保持常规检索性能的同时大幅提升时序准确率**。具体而言，方法利用GPT-3.5将复合动作描述分解为原子事件，随机打乱事件顺序后生成时序错误的描述，并将其作为额外负样本（hard negative）加入对比学习过程。这一设计将原始的 $N \times N$ 相似矩阵扩展为 $N \times (N+K)$，使动作到文本的分类任务必须从包含打乱描述的候选集中选出正确文本，从而强制模型关注事件时序（Fig. 3, Eq. 4-5, 置信度 0.95）。
 
 该方法不仅解决了时序对齐问题，还展现出良好的通用性：经过时序负样本微调的文本编码器可直接提升下游运动生成模型（如 **T2M-GPT** (Zhang et al., CVPR 2023)、**Motiondiffuse** (Zhang et al., arXiv 2022)、**ReMoDiffuse** (Zhang et al., ICCV 2023)）的生成质量，为运动-语言模型的时序感知训练提供了简洁有效的范式。
-
-
 
 ## 核心方法与创新机理
 
@@ -117,8 +113,6 @@ claims:
 1. **表层语言线索依赖**：消融实验表明，统一冠词后 CAR 仅微降至 94.51%，但替换代词后 CAR 降至 81.21%，说明模型可能部分依赖代词、冠词等表层特征而非深层时序语义进行判断。
 2. **粗粒度时序建模**：模型仍将整句压缩为单一特征向量，缺乏单词到运动帧的细粒度对应，无法解释每个事件在时间轴上的精确位置。
 3. **单向时序增强**：当前仅通过操纵文本（打乱事件）增强时序理解，尚未对运动序列本身进行对称的时序增强（如交换动作片段顺序），限制了模型在动作层面的时序泛化能力。
-
-
 
 ChroAccRet 的核心 pipeline 围绕一个关键观察展开：现有运动‑语言模型（如 **TMR**, Petrovich et al., ICCV 2023）在对比学习中未显式建模文本与动作之间的时序对应关系，导致其对复合动作描述的事件顺序理解严重不足——在 Chronologically Accurate Retrieval (CAR) 测试中准确率仅约 60%，接近随机水平（50%）。为修复这一瓶颈，该方法在不改变原有模型架构的前提下，向对比学习框架注入时序顺序信息，从而强制模型学习区分时序正确与时序错误的描述。
 
@@ -162,12 +156,8 @@ ChroAccRet 的核心 pipeline 围绕一个关键观察展开：现有运动‑�
 
 该框架的设计哲学是“最小侵入”：不改变编码器架构，仅通过扩展负样本空间和调整损失函数，即可将 CAR 准确率从约 66% 提升至 99.74%（t5‑base/t5‑large），同时保持甚至提升常规文本‑运动检索指标。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1871_ChroAccRet_Chronologically_Accurate_Retrieval_for_Temporal_Grounding_of/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of the proposed contrastive learning scheme with chronological negative samples. We use the texts derived from shuffling the event order and employ them as negative text samples, corresponding to items indicated in pink*
-
-
 
 ### 3.1 运动-语言对比学习基线
 
@@ -220,8 +210,6 @@ $$\mathcal{L}_{m2t} = -\frac{1}{N} \sum_i^{N} \log \frac{\exp (\tilde{S}_{ii} / 
 ### 3.5 模块交互关系
 
 整个训练流水线中，文本编码器（支持 DistilBERT、CLIP、t5-base、t5-large）和运动编码器（基于VAE，输入为相对关节位置和加速度）共享潜在空间。事件分解与打乱模块在数据预处理阶段离线完成，生成的打乱文本在训练时作为额外负样本参与对比损失计算。运动解码器可选择性用于从潜在特征重建原始运动序列，作为辅助正则化项。
-
-
 
 ## 实验与关键发现
 
@@ -283,15 +271,8 @@ Table 4 进一步分离了微调与负样本的贡献。仅微调 CLIP 编码器
 
 > **注意**：论文未涉及模型公平性或偏见相关的评估，因此无法就方法在不同人群或动作类型上的表现差异做出判断。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1871_ChroAccRet_Chronologically_Accurate_Retrieval_for_Temporal_Grounding_of/figures/006_Figure_4.jpg]]
 *Figure 4: Comparison of retrieval results with corrupted texts using TMR and the proposed training scheme. Pink texts indicate the successfully retrieved ground truth text*
-
-![[assets/figures/papers/paper_list_l1871_ChroAccRet_Chronologically_Accurate_Retrieval_for_Temporal_Grounding_of/figures/009_Figure_5.jpg]]
-*Figure 5: Comparison of generated motions. Top: T2M-GPT. Bottom: T2M-GPT with our fine-tuned t5-large encoder. Texts at the top represent the input prompts*
-
-
 
 ## 定位与知识库关联
 
@@ -333,8 +314,6 @@ Table 4 进一步分离了微调与负样本的贡献。仅微调 CLIP 编码器
 - **评估基准独立性**：能否设计不依赖 LLM 的自动化时序评估基准，消除事件分解质量对 CAR 测试可靠性的影响？
 - **长序列扩展性**：对于更长、更复杂的动作序列，当前方法能否保持高时序准确率？是否需要层次化的时序建模（如事件组、子序列）？
 - **跨模态时序泛化**：该方法学到的时序区分能力是否可迁移到其他时序敏感的跨模态任务（如视频-文本检索、过程理解）？
-
-
 
 ## 原文 PDF
 

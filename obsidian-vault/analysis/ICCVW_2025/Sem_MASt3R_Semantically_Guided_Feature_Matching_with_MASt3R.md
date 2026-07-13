@@ -51,15 +51,11 @@ Sem-MASt3R 针对 MASt3R 在重复纹理、弱纹理或语义相似区域因缺�
 
 在 Map-free 绝对位姿估计基准上，Sem-MASt3R 相比原始 MASt3R 将平均重投影误差降低近 6 像素；在 ScanNet1500 相对位姿估计中，所有 AUC 阈值（5°、10°、20°）下均超越 MASt3R 及其微调版本 MASt3R*；在 HPatches 单应性估计中，AUC@1px 指标优于 MASt3R* 并保持同等精度。定性结果显示，该方法在宽基线、大视角变化等挑战性场景下能产生更可靠的匹配，同时保留了 MASt3R 生成准确 3D 点云的能力。
 
-
-
 从图像对中建立可靠的特征对应是三维视觉的核心任务，支撑着相机位姿估计、三维重建、视觉定位等一系列下游应用。传统方法依赖手工设计的局部特征与匹配策略，近年来基于学习的方法逐步占据主导地位。其中，**MASt3R**（Leroy et al., 2024）作为一种端到端的稠密匹配与三维重建框架，通过共享权重的 ViT 编码器提取视觉特征，并利用 Transformer 解码器进行交叉注意力融合，直接从图像对中预测稠密点图和局部描述符，在多个基准上取得了领先性能。
 
 然而，MASt3R 的匹配过程完全依赖视觉外观特征与几何一致性约束，缺乏对高层语义信息的显式建模。这一设计在以下场景中暴露出根本性瓶颈：当图像中存在重复纹理（如建筑立面、地板砖）、弱纹理区域（如白墙、天空）或语义相似但几何不同的结构时，纯视觉特征难以提供足够的判别力，导致匹配歧义和错误对应。这一问题在宽基线、大视角变化或光照差异显著的真实场景中尤为突出，直接制约了位姿估计的精度与鲁棒性。
 
 针对上述缺口，**Sem-MASt3R** 提出了一个核心思路：语义特征能够提供与几何互补的全局对象级信息，若能将其有机地融入匹配过程，便可在不破坏原有几何估计能力的前提下，提升在歧义场景下的匹配鲁棒性。具体而言，该方法引入基于 **DINOv2** 的语义特征提取分支，计算跨图像 patch 的语义相似度矩阵，并通过 **NCNet** 的 4D 卷积进行空间一致性精炼，最终将精炼后的语义相似度作为注意力偏置注入 MASt3R 的交叉注意力机制中。这一设计将语义信息转化为可微分的注意力调节项，直接调控匹配得分以偏好语义一致的位置，从而在保持端到端可训练性的同时，显著提升匹配与位姿估计的精度。
-
-
 
 ## 核心方法与创新机理
 
@@ -77,8 +73,6 @@ Sem-MASt3R 的核心创新在于将显式的高层语义理解引入 MASt3R 的�
 
 通过上述改造，Sem-MASt3R 在不改变 MASt3R 基础架构的前提下，将语义理解转化为一个即插即用的注意力调节项。实验证明，该方法在显著提升匹配鲁棒性的同时，完整保留了 MASt3R 生成精确 3D 点云的能力（见 Figure 5）。
 
-
-
 Sem-MASt3R 在 MASt3R 的 Siamese 编码器-解码器架构之上引入了一条并行的语义分支，构成一个双流特征提取与融合的端到端匹配流水线。给定一对输入图像 $I_1, I_2$ 及其内参矩阵 $K_1, K_2$，系统同时沿两条路径处理：
 
 **视觉几何流（MASt3R 主干）** 沿用原始 MASt3R 的设计：共享权重的 ViT 编码器提取稠密视觉特征 $H_1, H_2$（Eq. 1），随后 Transformer 解码器通过交叉注意力融合两图特征，输出增强表示 $H_1', H_2'$（Eq. 2）。在此基础上，3D 头预测第一帧坐标系下的点图 $X_{1,1}$ 与置信度 $C_1$（Eq. 3-4），描述符头生成密集局部描述符 $D_1, D_2$（Eq. 5-6），用于后续的双向最近邻匹配。
@@ -93,12 +87,8 @@ $$A' = A + \lambda \, \hat{S}_{\text{centered}} \quad \text{(Eq. 12)}$$
 
 **训练策略** 采用两阶段方案以保证语义模块的稳定收敛：第一阶段冻结 MASt3R 所有参数，仅训练 NCNet 精炼网络；第二阶段解冻 MASt3R 的 3D 头与描述符头进行微调，使视觉特征适应语义偏置的引入。这一策略确保语义引导不会破坏 MASt3R 原有的几何估计能力，而是作为互补信号提升匹配的鲁棒性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l4_https_openaccess_thecvf_com_content_ICCV2025W_CALIPOSE_html_Tenore_Sem_M/figures/001_Figure_1.jpg]]
 *Figure 1: The proposed Sem-MASt3R integrates semantic understanding through DINOv2 [20] features into the MASt3R pipeline to extract more robust correspondences*
-
-
 
 ### 整体流水线
 
@@ -169,8 +159,6 @@ $$L_{\mathrm{reproj}} = \frac{1}{|M|} \sum_{(i,j)\in M} \mathrm{Huber}(||\pi(C_2
 
 其中 $M$ 为匹配点对集合，$\pi$ 为投影函数，$R$、$t$ 为相机位姿参数，$\beta$ 为 Huber 损失的阈值。
 
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -208,8 +196,6 @@ Figure 5 的 3D 点云可视化进一步证实，语义模块的引入并未破�
 
 当前实验分析存在以下需要人工确认的缺口：论文未提供消融实验的定量结果，无法直接判断语义相似度精炼（NCNet）、中心化处理和 λ 加权等子模块各自的贡献度；λ 超参数的选择策略及其敏感性未在实验部分讨论；作者提及存在未发布的大规模预训练 MASt3R 版本，其结合语义模块后的性能上限尚不明确。这些问题的澄清将有助于更全面地评估方法的有效性和适用范围。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l4_https_openaccess_thecvf_com_content_ICCV2025W_CALIPOSE_html_Tenore_Sem_M/figures/005_Table_1.jpg]]
 *Table 1: Quantitative evaluation on the Map-free benchmark [1]. This table presents the Area Under the Curve (AUC) for Virtual Correspondence Reprojection Error (VCRE) at thresholds of 45 px and 90 px, precision at the same thresholds, and the mean reprojection error in pixels (lower is better). The baseline results are taken from the official benchmark. We compare our method, Sem-MASt3R, against several existing approaches, including LoFTR [31], Super-Glue [28], and MicKey [3], as well as the original MASt3R model. Additionally, we include MASt3R*, which corresponds to a fine-tuned version of the publicly available MASt3R checkpoint, trained on the Map-free dataset for a fairer comparison. Sem-MASt...*
 
@@ -217,8 +203,6 @@ Figure 5 的 3D 点云可视化进一步证实，语义模块的引入并未破�
 *Table 2: Quantitative evaluation on the Scan-Net1500 dataset for relative pose estimation. We report the Area Under the Curve (AUC) at error thresholds of 5◦, 10◦, and 20◦. The baseline results are taken from [15]. MASt3R* denotes fine-tuning the public MASt3R checkpoint on the training set of the Map-free [1] dataset. The proposed Sem-MASt3R achieves the highest accuracy across all thresholds, improving upon both the original and fine-tuned MASt3R models, as well as all other baselines*
 
 ![[assets/figures/papers/paper_list_l4_https_openaccess_thecvf_com_content_ICCV2025W_CALIPOSE_html_Tenore_Sem_M/figures/008_Table.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -271,8 +255,6 @@ Sem-MASt3R 处于**稠密特征匹配 + 语义引导**的交叉地带，其上�
 4. **大规模预训练版本的上限**：论文提及存在未发布的更大规模预训练 MASt3R 版本，结合语义模块后的性能上限如何？这决定了方法的终极潜力。
 
 5. **组件消融缺失**：DINOv2 特征、NCNet 精炼、中心化处理各自的贡献未通过消融实验量化，使得方法的核心驱动因素不够明确。建议后续工作补充。
-
-
 
 ## 原文 PDF
 

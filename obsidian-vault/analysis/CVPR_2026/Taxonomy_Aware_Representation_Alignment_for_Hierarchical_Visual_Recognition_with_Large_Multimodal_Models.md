@@ -54,8 +54,6 @@ claims:
 
 方法定位上，TARA属于**表征对齐 + 强化微调**的混合训练范式，区别于需要推理时额外模块或复杂提示工程的方法。其知识来源为预训练BFMs，基座模型为Qwen系列LMMs，目前验证范围限于生物分类学领域。
 
-
-
 ### 层次视觉识别的核心挑战
 
 层次视觉识别（Hierarchical Visual Recognition, HVR）要求模型不仅识别物体的最细粒度类别（如物种），还需在分类学层次结构的每一层（如门、纲、目、科、属、种）上给出一致的预测。形式化地，给定一个分类树 $\mathcal{T} = (\mathcal{V}, \mathcal{E})$，其中 $\mathcal{V}$ 为类别节点集，$\mathcal{E} \subseteq \mathcal{V} \times \mathcal{V}$ 编码父子关系，HVR 的目标是为输入图像预测一条从根节点到叶节点的完整路径，且路径上的每一跳都必须满足层次约束。
@@ -78,8 +76,6 @@ claims:
 ### TARA 的动机定位
 
 基于上述分析，本文提出 **TARA（Taxonomy-Aware Representation Alignment）**，一个简单但有效的训练框架。TARA 在 No-Thinking RFT 的基础上，通过两个余弦相似度对齐损失，分别将 LMMs 的中间视觉表征和回答嵌入与 BFMs 的对应表征对齐，从而在微调过程中显式注入分类学层次知识。推理时，BFMs 和对齐投影器被完全丢弃，LMMs 直接执行 HVR，无额外参数或计算开销。
-
-
 
 ## 核心方法与创新机理
 
@@ -139,8 +135,6 @@ TARA 位于**知识蒸馏与表征对齐**的方法谱系中，但其独特之�
 
 这些消融结果表明，TARA 的每个组件和设计选择均经过充分验证，并非启发式堆叠。
 
-
-
 TARA（Taxonomy-Aware Representation Alignment）的整体训练框架遵循**交替优化**策略，将分类学感知的表征对齐与无思考强化微调（No-Thinking RFT）交织进行，其核心设计如图2所示。
 
 ### 框架总览
@@ -167,12 +161,8 @@ TARA（Taxonomy-Aware Representation Alignment）的整体训练框架遵循**�
 - **特征粒度**：$\mathcal{L}_V$ 使用所有视觉token的平均特征，$\mathcal{L}_C$ 仅使用首个回答token——消融证实该配置在效率和效果间取得最佳平衡。
 - **推理零开销**：BFMs和投影器仅在训练阶段作为知识桥梁存在，推理时完全移除，LMM以标准方式运行，这是TARA实用性的核心优势。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2750_https_arxiv_org_abs_2603_00431/figures/002_Figure_2.jpg]]
 *Figure 2: Illustration of the training framework. Taxonomy-Aware Representation Alignment (TARA) is conducted alternately with No-Thinking RFT to improve the hierarchical recognition performance of LMMs with taxonomic knowledge absorbed from BFMs*
-
-
 
 ### 3.1 问题形式化：层次视觉识别（HVR）
 
@@ -233,8 +223,6 @@ $$\mathcal{L}_{\mathrm{alignment}} = (\mathcal{L}_{\mathrm{V}} + \mathcal{L}_{\m
 ![[assets/figures/papers/paper_list_l2750_https_arxiv_org_abs_2603_00431/figures/006_Figure_3.jpg]]
 *Figure 3: Different designs of target alignment features. (a) and (b) are for*
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与实验动机
@@ -286,13 +274,8 @@ $$\mathcal{L}_\mathrm{alignment} = (\mathcal{L}_\mathrm{V} + \mathcal{L}_\mathrm
 4. **评估场景受限**：评估仍局限于固定答案的 VQA 设置，开放生成场景下的层次一致性尚未充分探索。
 5. **分类树范围**：若目标分类树的深度和分支数远超生物学分类，TARA 的对齐策略是否依然有效仍有待验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2750_https_arxiv_org_abs_2603_00431/figures/003_Table_1.jpg]]
 *Table 1: Effects of TARA on iNat-Plant and iNat-Animal datasets*
-
-![[assets/figures/papers/paper_list_l2750_https_arxiv_org_abs_2603_00431/figures/004_Table_2.jpg]]
-*Table 2: Effects of TARA on TerraIncognita dataset [8]*
 
 ![[assets/figures/papers/paper_list_l2750_https_arxiv_org_abs_2603_00431/figures/005_Table_3.jpg]]
 *Table 3: Ablation on target alignment layers of TARA*
@@ -300,19 +283,8 @@ $$\mathcal{L}_\mathrm{alignment} = (\mathcal{L}_\mathrm{V} + \mathcal{L}_\mathrm
 ![[assets/figures/papers/paper_list_l2750_https_arxiv_org_abs_2603_00431/figures/007_Table_4.jpg]]
 *Table 4: Ablation on target alignment features of TARA*
 
-![[assets/figures/papers/paper_list_l2750_https_arxiv_org_abs_2603_00431/figures/008_Table_5.jpg]]
-*Table 5: Left: visual probing results on the last and averaged image hidden states. Right: evaluation results on ImageWikiQA [58]*
-
-![[assets/figures/papers/paper_list_l2750_https_arxiv_org_abs_2603_00431/figures/010_Figure_5.jpg]]
-*Figure 5: Training efficiency. Models trained with TARA achieve faster convergence*
-
 ![[assets/figures/papers/paper_list_l2750_https_arxiv_org_abs_2603_00431/figures/011_Figure_4.jpg]]
 *Figure 4: Qualitative comparison of No-Thinking RFT with and without TARA. The two columns show that TARA can achieve better leaf node accuracy and hierarchical consistency*
-
-![[assets/figures/papers/paper_list_l2750_https_arxiv_org_abs_2603_00431/figures/001_Figure_1.jpg]]
-*Figure 1: LMMs struggle with hierarchical visual recognition (HVR), failing to obey the hierarchical consistency on both known and novel categories*
-
-
 
 ## 定位与知识库关联
 
@@ -354,8 +326,6 @@ TARA 的有效性建立在以下前提之上：
 3. **动态层次对齐。** 当前 $\mathcal{L}_C$ 在单一固定层级进行标签对齐。对于深度和分支数远超生物学分类的树结构，是否需要在多个层级进行分阶段或加权对齐？层级间的梯度冲突如何解决？
 
 4. **开放生成场景的层次一致性评估。** 在无候选选项的完全生成模式下，如何定义和度量层次一致性？TARA 的对齐信号是否足以约束生成路径的逻辑一致性，还是需要额外的解码策略？
-
-
 
 ## 原文 PDF
 

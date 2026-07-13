@@ -56,8 +56,6 @@ claims:
 
 消融实验进一步证实，“重新激活-探索”步骤是性能提升的关键——移除该步骤后准确率从 74.3% 降至 73.1%，与 RigL 持平；同时，探索阶段冻结活跃结构也是必要的设计选择（Table 4）。
 
-
-
 深度神经网络在资源受限环境中的部署持续推动着模型压缩技术的发展。稀疏化——通过移除冗余权重（非结构化稀疏）或整个结构单元（结构化稀疏）来精简网络——已成为平衡模型效率与性能的核心范式。然而，当前方法在两个关键维度上仍面临根本性瓶颈。
 
 ### 现有重要性准则的不完美性与不可逆剪枝
@@ -82,8 +80,6 @@ claims:
 - 能否在生长决策前，为当前被排除的参数提供一个“试运行”机会，通过短暂训练预览其潜在增益，从而克服短视性？
 
 本文提出的 **IEE（Iterative Exploitation and Exploration）** 方法正是沿着这一思路展开：将模型划分为活跃结构（exploitation）与探索空间（exploration），在探索阶段暂时重激活所有被剪枝参数并训练少量步，同时冻结当前活跃结构以隔离干扰，从而获得更准确的参数重要性评估。这一“重新激活-探索”（Reactivate & Explore）机制，使得生长决策从“基于瞬时梯度的猜测”升级为“基于实际训练的预览”，为动态稀疏训练提供了更可靠的探索基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -127,8 +123,6 @@ $$ \operatorname*{min}_{\Theta_P} \sum_{i=1}^{Q} \ell(f(\Theta_P \cup \Theta_K; 
 
 生长神经元存活率的对比（Figure 5(b)）进一步佐证了这一优势——IEE 生长的神经元在后续训练中被保留的比例显著高于 RigL，说明其探索策略确实找到了更具长期价值的结构连接。
 
-
-
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2502_03658/figures/008_Figure_5.jpg]]
 *Figure 5: (a) Architecture convergence with IoU after pruning and growing; (b) Grown Neurons Survival Rate for ours and RigL [12]*
 
@@ -161,8 +155,6 @@ IEE（Iterative Exploitation and Exploration）将模型参数划分为两个互
 **模块间的因果链路**：重激活与探索阶段（阶段 4）为生长阶段（阶段 5）提供了可靠的重要性评估，而统一的显著性准则确保了剪枝（阶段 2）和生长（阶段 5）的决策一致性。消融实验证实了这一设计的必要性：移除重激活与探索步骤后，性能从 74.3% 下降到 73.1%（与 RigL 持平）；若不冻结 $\Theta_K$，性能同样显著下降（Table 4）。此外，生长参数的初始化策略也影响最终效果——使用 MRU（Most Recently Used）初始化优于零初始化。
 
 **输入输出流**：输入为初始稀疏分布（如 Uniform 或 ERK）下的模型参数划分 $\{\Theta_K, \Theta_P\}$ 和总更新预算衰减调度器；输出为经过 $T$ 步 IEE 更新后收敛的稀疏结构 $\Theta_K$，可直接用于推理。
-
-
 
 ### 3.1 模型划分与双空间机制
 
@@ -216,8 +208,6 @@ $$\Theta_P \gets \Theta_P - \mathrm{ArgTopK}(I(\Theta_P), \Omega^t)$$
 
 **更新预算 $\Omega^t$ 的衰减调度。** $\Omega^t$ 随训练进程逐步衰减（采用固定衰减策略，如指数衰减），使得早期允许较大的结构探索幅度，后期趋于精细调整。具体的衰减调度器未针对不同网络自适应调整，这一点在局限性中被指出。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -236,12 +226,10 @@ IEE 在结构化稀疏和非结构化稀疏两种范式下均进行了验证。�
 
 在 ImageNet1K 上使用 ResNet50 的非结构化稀疏实验中（Table 2），IEE 在 90% ERK 稀疏度下达到 74.3% Top-1 准确率，比 **RigL** 的 73.0% 提高了 1.3 个百分点。在 80% ERK 稀疏度下，IEE 达到 77.0%，比 RigL 的 75.9% 提高了 1.1 个百分点。值得注意的是，当训练轮数扩展到 500 轮（IEE5×）时，IEE 在 80% ERK 稀疏度下达到 77.8% Top-1 准确率，超越了密集 ResNet50 的 76.8%，这表明 IEE 的探索-利用机制能够发现优于原始密集结构的稀疏子网络。
 
-
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2502_03658/figures/006_Table_2.jpg]]
 *Table 2: ImageNet1K unstructured sparsity results on ResNet50, averaged over two runs. IEEX× scales the baseline training epochs (100) by X. IEEuniInit and $\mathrm { I E E } _ { e r k I n i t }$ (Non-Uniform) refer to using uniform or ERK for initializing the sparsity distribution. Results are grouped by Train FLOPs. MEST [84] employs dataset sieving and layer freezing for cost reduction. ∗: approximated cost with ERK*
 
 在 CIFAR-10 上使用 WideResNet22-2 的非结构化稀疏实验中（Table 3），IEE 在多种稀疏度设置下均保持领先，进一步验证了该方法在小规模数据集上的鲁棒性。
-
 
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2502_03658/figures/007_Table_3.jpg]]
 *Table 3: CIFAR-10 unstructured sparsity results using WideResNet22-2. Averaged results over three runs*
@@ -250,14 +238,12 @@ IEE 在结构化稀疏和非结构化稀疏两种范式下均进行了验证。�
 
 IEE 同样适用于 Ampere 架构的 N:M 结构化稀疏模式。在 ImageNet1K 上使用 ResNet50 的 2:4 稀疏实验中（Table 5），IEE 达到 77.5% Top-1 准确率，超越了 **SR-STE** 的 77.0%，且在相同训练 FLOPs 下优于其他专用 N:M 剪枝方法。这表明 IEE 的统一探索-利用框架无需针对 N:M 稀疏性进行特殊设计即可取得有竞争力的结果。
 
-
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2502_03658/figures/010_Table_5.jpg]]
 *Table 5: ImageNet1K N:M sparsity results with ResNet50. IEE surpasses strong latest specialized ampere pruning methods in Top-1 with the same training FLOPs needed*
 
 ### 消融实验
 
 消融实验（Table 4）在 ImageNet1K 上使用 ResNet50 在 90% ERK 非结构化稀疏度下进行，揭示了 IEE 各组件的关键贡献：
-
 
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2502_03658/figures/009_Table_4.jpg]]
 *Table 4: Performance of IEE as a function of the update period, grown initialization, weight freezing, and inclusion of Accuracy Improvement stage. Results with 90% unstructured ERK sparsity on ImageNet1K and ResNet50 trained for 100 epochs*
@@ -287,13 +273,6 @@ Figure 5 从架构演化的角度分析了 IEE 的有效性。Figure 5(a) 展示
 3. **超参数固定**：更新预算 Ω^t 的衰减调度器采用固定策略（如指数衰减），更新周期 H、J、Q 需手动设定，未针对不同网络或任务自适应调整，可能无法在所有场景下达到最优。
 
 4. **架构覆盖有限**：实验主要在 ResNet 系列和 MobileNet 上进行，对于 Transformer 等新型架构的适用性尚未验证，其探索-利用机制是否适用于注意力机制的稀疏化仍是开放问题。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2502_03658/figures/003_Table.jpg]]
-
-
-
 
 ## 定位与知识库关联
 
@@ -330,8 +309,6 @@ IEE 的适用边界受以下因素制约：
 3. **探索空间的采样策略**：是否可以对探索空间进行子采样（如仅重激活最近被剪枝的参数或高梯度参数），在保持探索效果的同时降低 Reactivate & Explore 阶段的训练开销？
 
 4. **大规模模型的扩展性**：在大型语言模型（如 LLaMA 系列）的稀疏化场景中，IEE 的 exploit-explore 循环是否能够有效发现 Transformer 注意力头和 FFN 层的结构化稀疏模式？冻结活动结构进行探索的策略在分布式训练环境下如何实现高效的梯度通信？
-
-
 
 ## 原文 PDF
 

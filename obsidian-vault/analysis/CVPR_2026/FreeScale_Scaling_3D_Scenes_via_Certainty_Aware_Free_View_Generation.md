@@ -53,8 +53,6 @@ FreeScale 提出了一条**确定度感知的自由视角生成**路径来解决
 
 **方法定位**：FreeScale 属于数据增广驱动的新视角合成增强框架，与前馈方法（如 LVSM）、基于优化的方法（如 3DGS，Kerbl et al., SIGGRAPH 2023）、扩散增强方法（如 DIFIX3D+）以及几何先验增强方法（如 Nerfbusters）形成互补或增强关系。其独特之处在于将确定度感知的视角图采样作为统一的数据生成策略，同时服务于前馈训练和每场景优化两种范式。
 
-
-
 三维场景理解与重建是计算机视觉的核心任务，其关键瓶颈之一在于可泛化的新视角合成模型受限于训练数据的规模与多样性。当前的前馈式新视角合成方法（如 **LVSM**）虽然在稀疏视角重建上展现出潜力，但其泛化能力严重受制于训练场景的数量与相机轨迹的丰富程度。真实世界捕获数据虽然具备高度真实性，但通常稀疏且离散，难以覆盖大范围相机运动下的视角变化；合成数据虽然可以无限生成，却存在显著的合成-真实域间隙；而基于扩散模型的生成方法尽管能产出逼真图像，却无法提供精确的相机位姿，难以直接用于三维任务训练。
 
 现有数据增广策略面临一个根本性困境：从不完美的重建几何中简单采样新视角，会不可避免地放大重建伪影，反而损害模型的泛化能力。具体而言，基于3D高斯泼溅（**3DGS**, Kerbl et al., SIGGRAPH 2023）等优化方法重建的场景，在未充分观测区域往往存在漂浮体、几何噪声等伪影。若不加区分地从这些区域渲染新视角，生成的训练数据将携带大量错误信号，导致前馈模型学习到偏差化的几何先验。另一方面，现有的视角选择策略——无论是随机采样还是基于位姿距离的顺序采样——均无法有效区分“信息丰富且重建可靠”的视角与“受伪影污染”的视角，造成数据增广的效率低下甚至适得其反。
@@ -62,8 +60,6 @@ FreeScale 提出了一条**确定度感知的自由视角生成**路径来解决
 这一困境在真实应用场景中尤为突出：当训练相机运动幅度较小而测试时需处理大相机运动时，模型的性能会急剧下降。例如，**LVSM** 在大相机运动场景下的PSNR仅为18.75 dB，远不能满足实际部署需求。这表明，现有方法缺乏一种系统性的机制，能够从有限且不完美的重建中挖掘出对泛化能力真正有益的训练信号。
 
 FreeScale正是针对上述缺口提出的解决方案。其核心动机在于：将不完美的重建场景视为几何代理，而非最终的真值；通过设计确定度感知的采样策略，主动识别那些既能捕捉丰富语义信息、又受重建伪影影响最小的新视角，从而在“信息增益”与“伪影风险”之间取得精细平衡。这一思路将数据增广从被动的几何采样升级为主动的质量引导探索，为突破前馈模型的数据瓶颈提供了新的范式。
-
-
 
 ## 核心方法与创新机理
 
@@ -112,8 +108,6 @@ FreeScale 将视角图进一步应用于前馈模型的训练策略设计。传�
 - **视角图的必要性**：与随机加入自由视图（+FV random）相比，基于视角图的选择在两项任务上性能均显著更优（Table 5），且移除视角图导致候选视角冗余度高、训练效果下降（Table 6）。
 - **跨任务泛化**：FreeScale 生成的自由视角数据一致地提升了前馈模型 LVSM 的泛化能力（DL3DV 大运动场景 PSNR 从 18.75 dB 提升至 21.45 dB）和每场景 3DGS 的重建质量（DL3DV、Nerfbusters、Tanks & Temples 三个数据集上均有提升，Table 2）。
 
-
-
 FreeScale 的整体流程围绕一个核心洞察展开：**将不完美的重建场景视为几何代理，通过确定度引导的采样策略生成大量高质量、多样化的自由视角图像**。这些生成数据既能扩展训练集以提升前馈模型的泛化能力，又能通过主动不确定性探索增强每场景的 3D 高斯优化。
 
 如图 2 所示，整个 pipeline 由三个紧密衔接的阶段构成：
@@ -145,15 +139,8 @@ FreeScale 的整体流程围绕一个核心洞察展开：**将不完美的重�
 
 **关键设计决策的因果链路**：确定度网格 → 视角图 → 非冗余采样 → 高质量自由视角 → 数据增广 + 不确定性探索 → 泛化能力与重建质量双提升。消融实验（Table 6）证实，移除视角图仅靠确定度得分选择候选视角会导致高冗余且性能下降；移除确定度网格则只能依赖位姿距离计算视角对应，既不准确又计算低效。Table 7 进一步表明，即使去除扩散增强，PSNR 仍大幅提升（+2.14 dB），说明主要增益来自视角覆盖的扩展，而非扩散先验的注入。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2491_https_arxiv_org_abs_2604_10512/figures/002_Figure_2.jpg]]
 *Figure 2: FreeScale generation pipeline. Our overall pipeline consists of three phases. First, given an image sequence, we reconstruct the scene as a continuous 3D representation, which allows us to place arbitrary viewpoint candidates. Second, we perform certainty-aware freeview synthesis: we establish a view graph based on a certainty grid and filter redundant candidates. Finally, we apply image rectification to produce the final free-views. The generated data can then be used to train feed-forward models like LVSM and refine the scene Gaussians*
-
-![[assets/figures/papers/paper_list_l2491_https_arxiv_org_abs_2604_10512/figures/001_Figure_1.jpg]]
-*Figure 1: We introduce FreeScale, a framework that scales current scene data by generating free-view images from reconstructed scene geometry, which can be used for feed-forward model training. Training LVSM with an additional 22% of generated free-views significantly improves sparse-view reconstruction from PSNR 18.75 to 21.45, particularly enhancing its generalization to large camera motion*
-
-
 
 FreeScale 将不完美的 3DGS 重建场景转化为几何代理，通过确定度感知的采样策略生成高质量自由视角图像。整个生成管线包含四个核心模块：场景重建、确定度感知自由视角合成、图像校正增强、以及自由视角引导训练。以下聚焦前三者的关键设计与公式。
 
@@ -216,13 +203,6 @@ $$
 
 **每场景优化**：同样选择低 WIoU 自由视角作为伪标签，对 3DGS 进行额外优化，主动探索重建不确定区域，提升单场景重建质量。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2491_https_arxiv_org_abs_2604_10512/figures/010_Figure_6.jpg]]
-*Figure 6: Comparison of reference image selection. Our view graph identifies the shared visible region with the noisy view (red circle), ensuring accurate image rectification*
-
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -264,25 +244,13 @@ Table 7 的消融实验明确区分了视角覆盖与扩散先验的各自贡献
 
 Table 6 直接验证了视角图在自由视角生成中的关键性。移除视角图、仅依赖确定度得分选择候选视角时，PSNR 从 17.75 dB 降至 17.63 dB，且生成的图像冗余度显著升高，无法为前馈模型训练提供有效指导。移除确定度网格、仅基于位姿距离计算视角对应关系时，不仅性能不稳定，计算开销也大幅增加。这证明 **WIoU 视角图在平衡信息多样性与去冗余方面具有不可替代的作用**。
 
-![[assets/figures/papers/paper_list_l2491_https_arxiv_org_abs_2604_10512/figures/011_Table_6.jpg]]
-*Table 6: Ablation study on Free-View generation. Our certainty-aware generation relies fundamentally on the certainty grid and the established view graph. Without the view graph, selecting the top-500 candidates solely by certainty score results in high redundancy and fails to provide valuable guidance for feed-forward model training. Without the certainty grid, we must resort to calculating inter-view correspondence only via position and rotation distance, which is both inaccurate and computationally inefficient*
-
 #### 视角图引导的参考选择
 
 Table 3 针对每场景优化的消融显示，将视角图引导的参考选择替换为基于位姿距离的最近参考选择（w/ dist ref）后，PSNR 从 19.18 dB 骤降至 17.88 dB，降幅达 1.30 dB。Figure 6 和 Figure 8 直观对比了两种策略的差异：基于位姿距离的参考选择可能选取与目标视角可见区域重叠不足的图像，导致扩散校正阶段引入严重伪影（蓝色框标注）；而视角图能够准确识别共享可见区域（红色圆圈标注），确保图像校正的一致性。
 
-![[assets/figures/papers/paper_list_l2491_https_arxiv_org_abs_2604_10512/figures/008_Table_3.jpg]]
-*Table 3: Ablation of per-scene optimization on DL3DV. “w/ dist ref”: distance-based reference for rectification. “w/ sparse init.”: incomplete initialization*
-
-![[assets/figures/papers/paper_list_l2491_https_arxiv_org_abs_2604_10512/figures/014_Figure_8.jpg]]
-*Figure 8: Consistent showcases of view graph impact. Compared to DIFIX3D+’s distance-based reference selection strategy, our view graph provides better overlap and higher free-view consistency for reference. The red bounding boxes delineate artifacts introduced by inaccurate reference images during the image rectification stage*
-
 #### 视角图引导的数据选择
 
 Table 5 对比了基于视角图的自由视角选择与随机选择对两项任务的影响。在前馈模型训练中，随机加入自由视图（+FV random）的性能显著低于视角图引导的联合训练（View-graph）；在每场景优化中，基于 WIoU 选择低重叠度的自由视角同样优于随机选择。这一结果验证了 **“选择与现有训练视角信息互补最大的自由视角”这一策略的有效性**。
-
-![[assets/figures/papers/paper_list_l2491_https_arxiv_org_abs_2604_10512/figures/009_Table_5.jpg]]
-*Table 5: Ablation study on free-view images. “FV” indicate generated free-view images, “View-graph” means graph-guided joint training and certainty-guided per-scene reconstruction*
 
 #### 数据稀疏度鲁棒性
 
@@ -295,8 +263,6 @@ Figure 16 展示了 FreeScale 自由视角生成的两类典型失败案例。�
 ### 方法谱系与知识库定位
 
 FreeScale 处于**数据增广驱动的新视角合成**这一研究脉络中。与传统的基于位姿插值或随机采样的数据增广策略不同，FreeScale 首次将重建几何的确定度显式建模为采样指导信号。其核心创新——确定度感知的 WIoU 视角图——在概念上区别于 **DIFIX3D+** 的纯扩散增强路径和 **Nerfbusters** 的几何先验注入路径：前者依赖生成先验修复图像质量，后者通过深度正则化约束几何优化，而 FreeScale 通过主动探索欠观测区域来扩展数据覆盖，从数据层面提升模型的泛化边界。在技术定位上，FreeScale 是一种**模型无关的数据增广框架**，可与各类前馈模型（如 LVSM）和基于优化的方法（如 3DGS）协同工作，其增广数据可作为即插即用的训练资源直接融入现有流程。
-
-
 
 ## 定位与知识库关联
 
@@ -351,8 +317,6 @@ Nerfbusters 代表利用几何先验增强重建的基线方向。FreeScale 在 
 3. **动态场景扩展**：当前方法假设静态场景，对于包含动态物体的场景，确定度网格和视角图的构建逻辑需要重新设计，以区分静态几何和动态区域的可靠性。
 
 4. **与其他数据增广范式的融合**：FreeScale 的确定度感知采样策略是否可与基于生成式模型（如视频扩散模型）的自由视角生成方法互补，在更稀疏的输入条件下联合提升数据多样性？
-
-
 
 ## 原文 PDF
 

@@ -57,8 +57,6 @@ claims:
 
 在THuman2数据集上，HGD将原始几何FID从gDNA的42.90降至16.16，相对提升57%；数据集规模重建的Chamfer距离从0.0101降至0.0032。在4DDress新姿态生成任务上，用户评分的质量（4.04 vs. 2.54）与物理合理性（4.36 vs. 2.66）均显著优于现有方法。
 
-
-
 高保真三维人体生成是计算机视觉与图形学领域的核心问题，其目标是从姿态、身份等条件信号中合成具有丰富几何细节的数字化人体。该任务面临双重挑战：一方面需要捕获衣物褶皱、发型纹理等细粒度几何特征，另一方面必须保证生成结果在任意姿态下的物理合理性。
 
 现有方法可大致归为三类。基于隐式函数的方法（如 **gDNA** (Xu et al., CVPR 2022)、**ENARF** (Noguchi et al., CVPR 2022)）通过神经网络建模连续占据场或符号距离场，能够表达连续表面，但对宽松衣物和复杂拓扑的支持有限。基于显式表示的方法（如 **EVA3D** (Hong et al., CVPR 2022)）利用三平面或体素网格生成几何，细节保真度受限于网格分辨率。基于点云或高斯泼溅的方法（如 **E3Gen** (Zhang et al., ACM Multimedia 2024)）虽能高效渲染，但在几何一致性和随机采样多样性上存在不足。**Table 1** 系统对比了各类方法在宽松衣物、可扩展性和细节表现三个维度的差异，揭示了当前技术的结构性短板。
@@ -84,8 +82,6 @@ claims:
 - **分布层面**：将流匹配的源分布从高斯分布替换为SMPL模板表面分布 $\Phi_{\mathcal{S}}$，并通过最近邻配对与零中心化归一化构造训练对。由于SMPL模板在拓扑上与目标人体几何高度相似，流速度场只需学习从模板到具体几何的“残差位移”，学习难度显著降低。
 
 基于上述设计，HGD采用两阶段训练范式：第一阶段通过自动解码器（auto-decoder）将目标几何压缩为特征图；第二阶段在特征图潜空间上训练扩散流模型，实现姿态条件的随机生成和新姿态生成（**Figure 2**）。实验表明，该方法在THuman2数据集上将原始几何的FID从42.90降至16.16，相对提升57%（**Table 4**），并在4DDress数据集的新姿态生成任务中显著优于现有方法（**Table 5**）。
-
-
 
 ## 核心方法与创新机理
 
@@ -121,11 +117,6 @@ HGD 将几何生成拆解为两个阶段：（1）**自动解码器压缩阶段*
 
 三项创新形成因果闭环：**SMPL 源分布**降低了流匹配的学习难度，使**自动解码器压缩**成为可能；**2D 特征图编码**将分布信息从网络参数中解耦，使**两阶段生成框架**能够规模化；而**分布归一化与训练对构造**则为这一耦合提供了训练稳定性保障。三者共同实现了从“单几何体网络参数”到“数据集规模潜空间生成”的范式跃迁。
 
-
-
-![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_YsQM7sQl0j/figures/020_Figure_14.jpg]]
-*Figure 14: This figure shows the results of our method after full training, using the same identities and poses as in Fig. 7*
-
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_YsQM7sQl0j/figures/005_Figure_4.jpg]]
 *Figure 4: Overview of our method. (a) We encode a geometry into a feature map, which is decompressed with a SMPL vertex map. The decompressed feature serves as a condition for our denoising network. (b) The human generation task is formulated as the conditional generation of feature maps, guided by the SMPL vertex map, optionally incorporating additional conditioning inputs*
 
@@ -138,8 +129,6 @@ HGD 采用**两阶段生成范式**，将人体几何分布的学习分解为压
 **流匹配的源分布改进。** 区别于先前工作从高斯分布 $\mathcal{N}(0,1)$ 出发的做法，HGD 将流匹配的源分布替换为 SMPL 模板表面分布 $\Phi_\mathcal{S}$，并通过最近邻配对与扰动策略构造训练对 $(\mathbf{x}_0', \mathbf{x}_1)$。在此基础上，系统对源和目标分布同时进行零中心化归一化——减去 $\mathbf{x}_0'$ 后源分布退化为标准高斯，目标变为位移场 $\Delta\mathbf{x} = \mathbf{x}_1 - \mathbf{x}_0'$，而 $\mathbf{x}_0'$ 本身作为条件信号重新注入去噪网络。这一设计大幅降低了流匹配的学习难度，使得模型能够高效扩展到数据集规模训练。
 
 **端到端推理流程。** 推理时，第二阶段生成的特征图送入第一阶段的解码器与去噪网络，直接在 SMPL 模板表面采样点上回归几何位移，输出高保真的人体点云。整个过程无需渲染增强即可获得高质量的原始几何输出。
-
-
 
 ### 几何分布建模的核心瓶颈与解决路径
 
@@ -199,8 +188,6 @@ $$\arg \min_{\theta, \phi, \{\mathbf{z}_{\mathcal{T}|\mathcal{S}}\}} \mathbb{E}_
 
 HGD采用两阶段训练范式（Sec 4.1, Sec 4.4）：第一阶段通过自动解码器将每个几何体压缩为2D特征图，同时训练解码器和去噪网络完成重建；第二阶段冻结自动解码器，在特征图空间上训练潜在扩散/流模型，实现从随机噪声或身份条件到特征图的生成，再经解码器还原为几何体。这一设计将几何分布学习解耦为“压缩-生成”两步，使模型能够高效扩展到数据集规模。
 
-
-
 ## 实验与关键发现
 
 ### 主结果：姿态条件随机生成
@@ -208,7 +195,6 @@ HGD采用两阶段训练范式（Sec 4.1, Sec 4.4）：第一阶段通过自动�
 本节评估模型在给定姿态下随机生成人体几何的能力。所有方法均在THuman2数据集上训练，评估时从每个身份渲染50个视角的法向图，共生成25,000张图像计算FID。为避免渲染增强带来的不公平优势，核心指标基于原始几何输出（raw geometry）计算。
 
 **Table 4** 汇总了各方法的FID对比。HGD在原始几何FID上达到 **16.16**，相比当前最优的隐式函数方法 **gDNA**（Xu et al., CVPR 2022）的42.90，**绝对降低26.74，相对提升57%**。在渲染后FID指标上，HGD同样以16.16优于gDNA的17.41（相对提升约7%），表明几何质量的提升直接转化为视觉质量的改善。其他对比方法中，**E3Gen**（Zhang et al., ACM Multimedia 2024）的原始几何FID为25.24，**GetAvatar**（Zhang et al., ICCV 2023）为26.64，HGD分别领先36%和39%。
-
 
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_YsQM7sQl0j/figures/011_Table_4.jpg]]
 *Table 4: Comparison of FID scores. The * results are adopted from E3Gen (Zhang et al., 2024d). For some methods, the results are rendered directly from their raw geometries, so the numbers in both rows are identical*
@@ -221,7 +207,6 @@ HGD采用两阶段训练范式（Sec 4.1, Sec 4.4）：第一阶段通过自动�
 
 **Table 5** 显示，HGD在生成质量上获得 **4.04** 分，物理合理性获得 **4.36** 分，分别比gDNA的2.54和2.66高出 **+1.50** 和 **+1.70**。这表明HGD的姿态感知特征图能有效捕获身份相关的衣物细节，并在新姿态下保持物理一致性。
 
-
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_YsQM7sQl0j/figures/013_Table_5.jpg]]
 *Table 5: User study on quality and physical plausibility*
 
@@ -233,12 +218,10 @@ HGD采用两阶段训练范式（Sec 4.1, Sec 4.4）：第一阶段通过自动�
 
 **Table 2** 报告了不同分布公式的Chamfer距离。在数据集规模训练中，完整HGD（含配对+归一化）达到 **0.0032**，显著优于无配对变体（w/o Pairs）的0.0101和无分布归一化变体（w/o DistNorm）的0.0056。值得注意的是，无归一化变体在单几何体拟合实验中可达到最低Chamfer距离（见 **Figure 5**），但在多姿态数据集中性能退化——论文将此归因于该变体过度拟合单一几何而缺乏跨姿态泛化能力。HGD的归一化策略在单几何精度与数据集泛化之间取得了最佳平衡。
 
-
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_YsQM7sQl0j/figures/010_Table_2.jpg]]
 *Table 2: Chamfer distance of different distribution formulations*
 
 **Figure 7** 可视化了训练至第30,000次迭代时各公式的生成结果。无配对变体产生大量噪声和缺失区域，无归一化变体虽有改善但仍存在局部伪影，完整HGD最接近真实几何。
-
 
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_YsQM7sQl0j/figures/007_Figure_7.jpg]]
 *Figure 7: Visualization results of different geometry distribution formulations at the 30, 000th training iteration. GT represents the ground-truth result*
@@ -248,7 +231,6 @@ HGD采用两阶段训练范式（Sec 4.1, Sec 4.4）：第一阶段通过自动�
 ### 消融实验：网络架构
 
 **Table 3** 对比了不同编码器设计的表面距离。基于自编码器的 **VecSet**（Zhang et al., SIGGRAPH 2023）和FeatureMap变体在重建精度上均不及HGD的自动解码器（auto-decoder）。FeatureMap相比VecSet有所改善，但自动解码器通过联合优化潜变量和网络参数，实现了最优的压缩-重建平衡。
-
 
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_YsQM7sQl0j/figures/009_Table_3.jpg]]
 *Table 3: Surface distance comparison between various designs*
@@ -263,18 +245,6 @@ HGD采用两阶段训练范式（Sec 4.1, Sec 4.4）：第一阶段通过自动�
 4. **极端姿态下的稀疏性**：面对夸张姿态和宽松衣物时，点云覆盖不足可能导致局部几何退化（尽管泊松重建在边界情况下表现出一定鲁棒性）。
 
 这些局限指向了论文提出的开放问题：如何实现目标表面的均匀采样、如何扩展至训练数据之外的服装风格、以及如何消除UV贴图接缝伪影。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_YsQM7sQl0j/figures/022_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_YsQM7sQl0j/figures/025_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_YsQM7sQl0j/figures/003_Table_1.jpg]]
-*Table 1: Comparison of 3D human representation methods*
-
-
-
 
 ## 定位与知识库关联
 
@@ -332,8 +302,6 @@ HGD采用两阶段训练范式（Sec 4.1, Sec 4.4）：第一阶段通过自动�
 - **极端姿态鲁棒性**：在极端姿态和宽松服饰区域，如何进一步保证点云的均匀覆盖和细节保真度？
 
 这些问题的解决将推动几何分布方法从“数据集内插值”向“真正泛化生成”的跨越。
-
-
 
 ## 原文 PDF
 

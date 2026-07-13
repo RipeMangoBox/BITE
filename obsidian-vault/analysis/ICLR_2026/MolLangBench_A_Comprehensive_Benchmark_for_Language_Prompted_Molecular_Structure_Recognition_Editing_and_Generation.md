@@ -50,15 +50,11 @@ MolLangBench 提出了一个面向语言提示的分子结构识别、编辑与�
 
 主要实验结果揭示了清晰的性能梯度与系统失败模式：GPT‑5 在识别任务中平均识别准确率达 92.3%，但定位准确率降至 86.2%（降低 6.1%），编辑准确率为 85.5%，而生成准确率仅 43.0%。进一步的消融分析表明，BPE 分词将相邻原子合并为单一 token 是原子枚举错误的直接原因；显式分子结构描述可将下游性质预测准确率提升超过 5%，佐证了结构化理解的价值。此外，SELFIES 替代 SMILES 后各模型性能全面崩溃，视觉语言模型虽能识别分子图像却几乎无法完成编辑与生成任务，凸显了当前跨模态对齐的不足。这些发现共同指向，实现可靠的分子-语言交互必须从根本上改进底层分词策略、引入结构化化学约束，并对立体化学与原子级定位建立专用推理机制。
 
-
-
 大型语言模型（LLM）在众多科学计算任务中已展现出跨领域能力，然而在分子科学场景中，其对分子结构的理解仍停留在浅层统计层面。**当前模型的根本瓶颈在于缺乏原子级的精确理解**：原子枚举（局部定位）与立体化学推理能力严重不足，导致在需要精确定位原子和从头生成分子的复杂任务上，模型表现远逊于化学家的专业水平。这一缺陷不仅限制了 LLM 在分子设计中的直接应用，更可能使得下游性质预测产生级联错误——已有实验表明，若先让模型显式分析分子结构，性质预测准确率可提升超过 5%（Table S8），说明结构理解的精度直接制约模型在化学任务中的上限。
 
 现有工作多聚焦于粗略的分子性质预测或简单的文本描述生成，缺乏对 **原子级一致性** 和 **立体化学精确性** 的系统评测。实际化学设计流程（如分子优化与从头设计）要求模型不仅能识别官能团，还需准确定位指定原子、给出局部拓扑关系，并能根据自然语言指令精确编辑或生成符合化学规则的分子结构。然而，当前主流模型在这些维度上暴露出的缺口令人担忧：以目前最强的 GPT‑5 为例，其在分子结构识别中平均准确率达 92.3%，但当任务进一步要求原子级定位时，准确率骤降至 86.2%，降幅达 6.1%（Table 1）；在 E/Z 双键构型识别任务上，所有被评测的语言模型准确率均低于 50%，甚至不如随机猜测，表明模型并未真正“理解”立体化学；在分子生成任务中，GPT‑5 生成 SMILES 的有效性仅 69.0%，最终匹配准确率仅 43.0%，且最主要错误类型为“无效的 SMILES 语法”（Table 2, Table 3）。进一步分析揭示，这种原子级错乱的直接原因是 **BPE 分词机制将多个相邻原子合并为同一 token**，导致模型在输出原子索引时频繁遗漏或错位（Figure S6, Appendix A.18）。
 
 上述现象表明，当前语言模型在分子‑语言跨模态对齐方面存在根本性缺口：它们可以记忆和复述常见的分子模式，却难以像化学家一样进行灵活的原子级推理和精确的结构操控。受化学家日常工作中 **分子优化**（在已知骨架上的局部修饰）与 **从头设计**（根据结构描述生成新分子）两大核心场景的启发（Figure 1），本文致力于系统回答一个关键问题：**语言模型在多大程度上能够通过自然语言与分子结构进行精确交互？** 基于此，我们构建了 MolLangBench——首个面向语言提示的分子结构识别、编辑与生成的综合基准，旨在通过高精度、唯一答案的任务设计，量化 LLM 在上述三类接口任务中的原子级理解能力，揭示失败模式，并为未来的分子‑语言对齐研究提供坚实的评测基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -92,8 +88,6 @@ MolLangBench 的另一突出贡献在于构建了**严格专家标注的分子�
 
 综上，MolLangBench 相对于 baseline 模式的关键创新，不在于提升某一指标的绝对数值，而在于**通过精细的解耦任务设计和严谨的数据构建，首次定量刻画了语言模型在原子级分子理解上的失败分布与因果机制**，为下一代分子‑语言联合模型提供了明确的攻坚靶点。
 
-
-
 ![[assets/figures/papers/iclr26_0013_KbXl2jfFRn_MolLangBench_A_Comprehensive_Benchmark_for_Langu/figures/002_Figure_2.jpg]]
 *Figure 2: Annotation pipeline for molecule editing and generation tasks. The illustrated example is a simplified case for clarity; real annotations are much more complex*
 
@@ -106,8 +100,6 @@ MolLangBench 将分子‑语言交互抽象为三个核心函数，并围绕它�
 数据构造由两条正交的管道支撑（见图 2）。对于识别任务，使用 RDKit 化学信息学工具从 UniChem 数据库随机采样，自动提取官能团、原子邻居、立体化学配置等确定性答案，无需人工介入，从而低成本获得大规模且无歧义的标签。对于编辑与生成任务，自动提取不可行——编辑指令和结构描述的歧义极易导致多解。因此，MolLangBench 引入了严格的专家标注与验证流程：从 UniChem 中筛选非氢原子数少于 40 的候选分子，由化学背景的标注员编写指令或描述，经同行评审与两名独立验证者交叉核验，确保每条实例具有唯一正确答案。该流程产出了核心集（编辑与生成各约 200 例），同时通过简化的单标注-单验证管道扩展了数据集，以扩大覆盖范围。每条编辑实例平均耗时约 30 分钟，生成实例约 60 分钟，体现了高质量标注的代价。
 
 评估模块采用零样本提示，为每类任务定制指令，并要求模型在输出答案时显式提供原子索引或有效 SMILES。识别任务独立报告识别准确率与定位准确率；编辑和生成任务则以模型返回的 SMILES 为目标，先后检验其有效性、分子指纹相似度以及与标准答案的完全匹配准确率。这种分层评估直接暴露了当前大语言模型在分子表征上的两个根本性瓶颈：因 BPE 分词将相邻原子合并为单个 token 而导致的原子枚举错误（定位准确率显著低于识别准确率），以及因缺乏分子语法约束而频繁输出无效 SMILES 的倾向（尤其在生成任务中，即使最强的 GPT‑5 也仅能达到 43.0% 的完全匹配准确率）。通过这一模块化的输入‑输出流与评估策略，MolLangBench 不仅衡量模型表现，更系统性地剖析了分子‑语言对齐中的关键缺陷。
-
-
 
 MolLangBench 的方法核心由三个模块构成，分别解决数据生成、质量控制和能力评估的问题。以下结合其与模型瓶颈的因果关联加以归纳。
 
@@ -146,20 +138,16 @@ MolLangBench 将三个分子‑语言交互任务抽象为以下映射函数（�
 
 > 注：以上公式均直接取自原文，未作新增推导。具体的提示模板与评测细节见原文附录 A.21 及相关分析。
 
-
-
 ## 实验与关键发现
 
 ### 主结果：识别尚可，生成暴露根本性缺陷
 
 MolLangBench 的零样本评测揭示了当前大语言模型在分子-语言接口任务上的能力断层。在分子结构识别任务中，最强模型 GPT-5 的平均识别准确率达到 92.3%，但定位准确率降至 86.2%，存在 **6.1 个百分点的系统性差距**（Table 1）。这一差距并非随机波动，而是指向原子枚举（atom enumeration）这一结构性瓶颈——模型能够"看懂"分子类别特征，却无法可靠地映射到具体原子索引。
 
-
 ![[assets/figures/papers/iclr26_0013_KbXl2jfFRn_MolLangBench_A_Comprehensive_Benchmark_for_Langu/figures/006_Table_1.jpg]]
 *Table 1: Performance of representative models on molecular structure recognition tasks. For tasks where both recognition and localization accuracy are evaluated, values are reported as recognition accuracy / localization accuracy. For tasks involving only recognition, a single accuracy value is shown. Bold entries indicate the best performance among all evaluated language models (excluding vision-language multimodal models). Complete results are provided in Table S4 in the Appendix*
 
 分子编辑任务表现相对稳健：GPT-5 的 SMILES 有效性为 94.5%，编辑准确率达 85.5%，领先第二名 o3 约 7 个百分点（Table 2）。然而 **分子生成任务暴露了根本性缺陷**：GPT-5 的 SMILES 有效性仅 69.0%，最终匹配准确率仅 43.0%（Table 2）。这意味着即使是最先进的模型，在从头生成分子时也有超过一半的情况无法输出化学上正确的结构。
-
 
 ![[assets/figures/papers/iclr26_0013_KbXl2jfFRn_MolLangBench_A_Comprehensive_Benchmark_for_Langu/figures/007_Table_2.jpg]]
 *Table 2: Performance of representative models on molecule editing and generation tasks. Each entry reports SMILES validity / generation or editing accuracy. Results are shown for the core set; for o3, GPT-5, and Gemini-2.5-Pro models, results on the extended set are additionally reported in brackets. Bold values indicate the best performance among all evaluated language models. Tanimoto similarity scores and the complete results for all evaluated models are provided in Appendix Table S5*
@@ -182,7 +170,6 @@ MolLangBench 的零样本评测揭示了当前大语言模型在分子-语言接
 
 Table 3 的错误类型统计揭示了生成任务的核心失败模式：**"无效的 SMILES 语法"是最主要错误类型**。这并非简单的后处理可修复问题，而是反映了语言模型对分子语法表征的深层对齐不足——模型在"说化学语言"时，其 token 级预测与化学合法性约束之间存在结构性错位。
 
-
 ![[assets/figures/papers/iclr26_0013_KbXl2jfFRn_MolLangBench_A_Comprehensive_Benchmark_for_Langu/figures/008_Table_3.jpg]]
 *Table 3: Counts of error types observed in the molecule editing and generation tasks. A single failed sample may exhibit multiple error types*
 
@@ -199,16 +186,11 @@ Table 3 的错误类型统计揭示了生成任务的核心失败模式：**"无
 
 当前结论限于非氢原子数少于 40 的小分子（Section 3.2），向大分子或生物大分子的迁移性未评估。编辑与生成任务的数据量受限于专家标注成本（核心集每生成实例约 60 分钟、编辑实例约 30 分钟，Appendix A.6），稀有结构或反应类型的覆盖可能不全。所有模型均为零样本评估，未进行化学领域微调，可能低估专项训练后的潜力。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0013_KbXl2jfFRn_MolLangBench_A_Comprehensive_Benchmark_for_Langu/figures/035_Figure_14.jpg]]
 *Figure 14: Figure S6: Illustration of enumeration errors in LLMs. Atoms grouped by the same color are merged into a single token*
 
 ![[assets/figures/papers/iclr26_0013_KbXl2jfFRn_MolLangBench_A_Comprehensive_Benchmark_for_Langu/figures/009_Table_4.jpg]]
 *Table 4: Table S1: Summary of molecule edit categories with sample counts (brackets indicate extended set) and o3 model accuracy per category for core set. Editing instructions may belong to multiple categories*
-
-
-
 
 ## 定位与知识库关联
 
@@ -248,8 +230,6 @@ MolLangBench 在分子‑语言界面的基准体系中填补了对**原子级�
 - **规模泛化与自动化扩展**：手工标注的高成本迫使基准扩展依赖自动化策略，今后可借助**程序化合成从结构化数据库生成约束性描述**，推动基准覆盖大分子空间，并测试预训练‑微调范式在化学领域的性能跃迁。
 
 综上，MolLangBench 不但构建了跨任务、多粒度的分子‑语言评测体系，更通过分词、立体化学盲区与跨模态断裂带三大核心瓶颈的系统性诊断，为标准语言模型向化学精密推理演进提供了机理层面的改进路线图。
-
-
 
 ## 原文 PDF
 

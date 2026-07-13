@@ -166,8 +166,6 @@ $$ \mathcal{L} = \mathcal{L}_{\mathrm{diff}} + \lambda_{\mathrm{dpt}} \mathcal{L
 - **输出**：RGB 视频 + 每帧深度图 + 点云 + 标定相机位姿 + 光流 + 场景流 + 动态前景掩膜
 - **骨干模型**：CogVideoX-5B-I2V（Yang et al., arXiv 2024），作为视频扩散 Transformer 的基础架构
 
-### 补充图表
-
 WorldReel 的核心架构围绕三个关键模块展开：**几何-运动增强潜在空间**、**时序 DPT 解码器**以及**解耦正则化训练目标**。以下逐一拆解其设计原理与关键公式。
 
 ### 几何-运动增强潜在空间
@@ -265,8 +263,6 @@ Table 3的系统消融揭示了三个关键设计选择的因果效应：
 ### 失败模式与局限性的实验证据
 
 尽管整体表现优异，实验中也暴露了若干边界条件。首先，当前方法依赖合成数据提供精确的4D监督（相机、点云、场景流），对真实视频仅利用几何与运动伪标签，这意味着在分布外真实场景上的深度与位姿精度可能低于Table 2报告的值——该结论需要额外的跨域评估来验证。其次，生成视频的时间长度固定，扩散模型的离线特性使其难以支持流式推演，这在需要持久世界状态的应用场景中构成瓶颈。此外，模型缺乏可控的场景分解能力，无法对独立实体进行分离编辑，限制了交互式长程生成的灵活性。这些限制在消融实验中虽未直接量化，但构成了方法向实际部署演进时需要解决的核心工程挑战。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l12_https_openaccess_thecvf_com_content_CVPR2026_html_Fang_WorldReel_4D_Vide/figures/003_Table_1.jpg]]
 *Table 1: Quantitative comparison on image-to-video (I2V) generation under two splits: General motion and Complex motion. Metrics: dynamic degree (d.d.; ↑), motion smoothness (m.s.; ↑), I2V-subject/background (i2v-s./i2v-b.; ↑), subject consistency (s.c.; ↑), Frechet Video ´ Distance (FVD; ↓), and FID (↓). WorldReel achieves the best overall performance, with notably higher dynamic degree while maintaining strong s.c. and perceptual quality (lower FVD/FID). Bold indicates best; underline second-best. Gray rows denote methods that primarily focus on nearly-static scenes*

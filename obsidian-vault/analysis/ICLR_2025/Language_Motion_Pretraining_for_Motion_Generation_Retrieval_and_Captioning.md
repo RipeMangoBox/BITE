@@ -182,11 +182,6 @@ $$l_f = (1 + \alpha) \cdot l_c - \alpha \cdot l_{uc}$$
 
 整个框架的数据流可以概括为：原始运动序列 → VQ-VAE 令牌化 → 运动令牌 + 文本令牌 → LaMP 联合预训练（四个任务共享参数）→ 冻结/微调的特征提取器 → 下游任务适配器（生成/检索/描述）。模块间的关系是松耦合的——预训练阶段产生的对齐表示可以被任一适配器复用，这种设计使得 LaMP 能够同时服务于三个性质不同的任务，而无需为每个任务从头训练独立的特征提取器。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1901_Language_Motion_Pretraining_for_Motion_Generation_Retrieval_and_Captioni/figures/001_Figure_1.jpg]]
-*Figure 1: LaMP overview. We conduct joint training for contrastive learning, matching, and bidirectional text-motion translation by leveraging the textual features extracted from tokenized text descriptions via the text transformer and the motion features derived from the motion transformer*
-
 ### 运动离散化：VQ-VAE 令牌化
 
 LaMP 采用标准的 VQ-VAE 将连续运动序列转换为离散令牌序列，作为后续所有任务的基础表示。运动序列经编码器映射为潜变量后，通过最近邻查找替换为码本中的离散嵌入：
@@ -253,11 +248,6 @@ LaMP-M2T 将预训练 LaMP 的运动 Transformer 输出的运动特征 $f_m$ 通
 1. **LaMP 文本编码器 vs. CLIP 文本编码器**：替换 CLIP 后 FID 从 0.226 降至 0.109，R Precision Top1 从 0.423 升至 0.554，验证了语言-运动对齐预训练对条件信号质量的显著提升。
 2. **因果注意力掩码 vs. 双向掩码**：采用解码器架构后 FID 从 0.109 进一步降至 0.032，R Precision Top3 从 0.829 提升至 0.843。论文认为因果注意力掩码通过防止低秩矩阵导致的表达能力退化，增强了掩码区域内的信息交互。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1901_Language_Motion_Pretraining_for_Motion_Generation_Retrieval_and_Captioni/figures/002_Figure_2.jpg]]
-*Figure 2: LaMP-T2M and LaMP-M2T frameworks overview. (Left) Pretrained LaMP’s text transformer is employed to extract condition embedding and autoregressive mask prediction is performed. (Right) Finetuning an LLM to achieve motion captioning*
-
 ![[assets/figures/papers/paper_list_l1901_Language_Motion_Pretraining_for_Motion_Generation_Retrieval_and_Captioni/figures/011_Figure.jpg]]
 *Figure: A1: Overview of VQVAE*
 
@@ -323,8 +313,6 @@ $$l_f = (1 + \alpha) \cdot l_c - \alpha \cdot l_{uc}$$
 
 其中引导尺度 $\alpha$ 设为 4，在生成质量和文本一致性之间取得平衡。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1901_Language_Motion_Pretraining_for_Motion_Generation_Retrieval_and_Captioni/figures/009_Table_5.jpg]]
 *Table 5: Ablation study of the impact of different tasks in LaMP on generative performance on HumanML3D*
 
@@ -334,17 +322,8 @@ $$l_f = (1 + \alpha) \cdot l_c - \alpha \cdot l_{uc}$$
 ![[assets/figures/papers/paper_list_l1901_Language_Motion_Pretraining_for_Motion_Generation_Retrieval_and_Captioni/figures/007_Table_3.jpg]]
 *Table 3: Text-motion (left) and motion-text (right) retrieval benchmark on the HumanML3D and KIT-ML*
 
-![[assets/figures/papers/paper_list_l1901_Language_Motion_Pretraining_for_Motion_Generation_Retrieval_and_Captioni/figures/006_Table_2.jpg]]
-*Table 2: Evaluation results of text-to-motion generation with LaMP evaluator on T2M-GPT, MoMask, and ours*
-
-![[assets/figures/papers/paper_list_l1901_Language_Motion_Pretraining_for_Motion_Generation_Retrieval_and_Captioni/figures/008_Table_4.jpg]]
-*Table 4: The quantitative results of motion captioning on the HumanML3D, we adhere to the evaluation frameworks outlined in (Jiang et al., 2023)*
-
 ![[assets/figures/papers/paper_list_l1901_Language_Motion_Pretraining_for_Motion_Generation_Retrieval_and_Captioni/figures/004_Figure_4.jpg]]
 *Figure 4: Qualitative results of text-to-motion generation on HumanML3D*
-
-![[assets/figures/papers/paper_list_l1901_Language_Motion_Pretraining_for_Motion_Generation_Retrieval_and_Captioni/figures/003_Figure_3.jpg]]
-*Figure 3: Heatmap of similarity matrix. The diagonal represents positive sample pairs, with darker colors indicating better quality*
 
 ## 定位与知识库关联
 

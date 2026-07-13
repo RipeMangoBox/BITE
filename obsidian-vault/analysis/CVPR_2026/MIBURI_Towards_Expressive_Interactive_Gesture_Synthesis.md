@@ -58,8 +58,6 @@ claims:
 
 **局限与开放问题**：因果建模导致语义性手势（如隐喻手势）有限，节拍手势占主导；当前框架尚未利用对话对方的肢体动态信息，无法实现完整双向交互；对域外说话人和极端风格的泛化能力有待验证。未来方向包括从 LLM 中间特征解耦对话意图以提升因果手势的语义性，以及将多模态对话线索融入生成过程。
 
-
-
 ### 具身对话代理中的手势生成困境
 
 具身对话代理（Embodied Conversational Agent, ECA）需要实时生成与语音同步的全身手势和面部表情，以支撑自然的人机交互。协同语音手势（co-speech gesture）不仅传递语义信息，还承担着调节对话节奏、表达情感与态度的关键功能。然而，现有手势生成方法普遍面临一个根本性矛盾：**生成质量与交互实时性难以兼得**。
@@ -79,8 +77,6 @@ claims:
 本文提出的 **MIBURI**（Multimodal Interactive Body and Utterance Rendering Interface）直接针对这一瓶颈。核心思路是**绕过传统级联管线的信息瓶颈，直接利用语音-文本基础模型Moshi内部对齐的令牌流作为条件**，在因果约束下实现低延迟、富有表现力的手势生成。Moshi作为全双工口语对话模型，其内部令牌流天然融合了语义、韵律与声学信息，且以流式方式逐帧产出，为构建真正的在线因果手势生成系统提供了理想的条件信号。
 
 通过体素感知的残差矢量量化（RVQ）编码层次化运动细节，并设计时间-运动学双重自回归Transformer结构，MIBURI在保持每帧仅36ms低延迟的前提下，首次在因果生成框架中实现了超越离线基线的生成质量——在多说话人BEAT2评估中，FGD达到0.480，BeatAlign达到0.461，均显著优于EMAGE等非因果方法。这标志着实时手势生成从“牺牲质量换速度”走向“质量与速度兼得”的重要一步。
-
-
 
 ## 核心方法与创新机理
 
@@ -122,8 +118,6 @@ MIBURI直接利用**Moshi语音-文本基础模型内部对齐的令牌流**作�
 
 上述四项创新并非孤立存在，而是构成了一个**因果生成能力栈**：Moshi令牌流提供了因果条件的语义-韵律基础（第1层），分体素RVQ提供了层次化运动表示（第2层），双重Transformer提供了匹配该表示的生成架构（第3层），而对比损失与语音激活损失则确保了在该架构下生成质量不退化（第4层）。这一能力栈使得MIBURI实现了每帧仅36ms的低延迟（Table 4），在BEAT2多说话人评估中以FGD 0.480和BeatAlign 0.461超越了包括EMAGE、GestureLSM等离线基线（Table 2），并在用户感知研究中显著优于对比方法（Figure 4，$p<0.001$）。
 
-
-
 MIBURI 提出一种**在线、完全因果**的协同语音手势生成框架，其核心设计目标是在极低延迟下同时输出富有表现力的全身手势与面部表情，以支撑实时具身对话代理（ECA）。与传统 ECA 管线（Figure 2）依赖级联的语音识别、文本理解、手势合成等多组件不同，MIBURI 直接从语音-文本基础模型 **Moshi** 的内部令牌流中提取条件信息，从而消除因等待未来语音上下文而产生的推理延迟。
 
 ![[assets/figures/papers/paper_list_l995_https_arxiv_org_abs_2603_03282/figures/002_Figure_2.jpg]]
@@ -148,8 +142,6 @@ Figure 3 展示了各模块的拓扑关系：Moshi 的语音/文本令牌流并�
 ### 实时部署架构
 
 Figure 5 展示了实时演示系统的部署方案：主推理进程以连续循环运行 Moshi 与 MIBURI，两个并行进程分别负责语音/文本可视化与运动渲染，进程间通过 WebSocket 在每个时间步流式传输数据，实现低延迟的全双工交互。消融实验（Table 4）表明，该架构在 NVIDIA RTX 3090 上达到每帧仅 **36 ms** 的推理延迟，是现有方法中延迟最低的实时方案。
-
-
 
 ### 语音-文本条件令牌流提取
 
@@ -208,24 +200,11 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{CE}} + \alpha \mathcal{L}_{\mathrm{con}} + 
 
 其中 $\alpha=0.1$，$\beta=0.01$，$\mathcal{L}_{\mathrm{CE}}$ 为标准的交叉熵损失。消融实验表明，移除对比损失后 FGD 从 0.480 退化至 0.704，验证了其在维持生成质量中的关键作用。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l995_https_arxiv_org_abs_2603_03282/figures/004_Figure_3.jpg]]
-*Figure 3: MIBURI Architecture. Given Moshi’s speech/text tokens(Sec. 3.1), our approach generates a sequence of gesture tokens, which are obtained through Body-part aware Gesture Codecs(Sec. 3.2). This online framework takes in Moshi’s text/speech token as input and predict gesture tokens through autoregressive temporal and kinematic transformers(Sec. 3.3)*
-
-![[assets/figures/papers/paper_list_l995_https_arxiv_org_abs_2603_03282/figures/015_Figure_6.jpg]]
-*Figure 6: Kinematic Dependency Analysis. Here, “→” means “attends to”*
-
-
-
 ## 实验与关键发现
 
 ### 核心性能：多说话人量化评估
 
 Table 2 报告了在BEAT2数据集23个说话人上的多说话人评估结果。MIBURI在生成质量与语音对齐度上全面超越所有离线与在线基线。
-
-![[assets/figures/papers/paper_list_l995_https_arxiv_org_abs_2603_03282/figures/006_Table_2.jpg]]
-*Table 2: Multi-speaker evaluation. Facial-MSE scaled by*
 
 - **FGD（Fréchet Gesture Distance）**：MIBURI+Face 达到 **0.480**，相比 EMAGE* 的 0.850 降低 0.370，降幅达 43.5%。GestureLSM 为 0.517，MambaTalk* 为 0.656，RAG-Gesture 为 0.772。该指标衡量生成手势分布与真实分布的差异，数值越低表示分布越接近真实。
 - **BeatAlign**：MIBURI+Face 达到 **0.461**，显著高于 EMAGE* 的 0.236（↑0.225）和 GestureLSM 的 0.414。该指标衡量手势与语音节拍的一致性，数值越高表示节拍对齐越好。
@@ -236,9 +215,6 @@ Table 2 报告了在BEAT2数据集23个说话人上的多说话人评估结果�
 ### 单说话人评估
 
 Table 3 展示了单说话人（Scott）上的评估结果。MIBURI 的 BeatAlign 达到 **0.790**，与最强离线基线 EMAGE 的 0.795 基本持平，同时 FGD 为 0.491，优于 EMAGE 的 0.508。这表明 MIBURI 在因果约束下仍能达到与离线方法相当的手势-语音对齐质量。
-
-![[assets/figures/papers/paper_list_l995_https_arxiv_org_abs_2603_03282/figures/007_Table_3.jpg]]
-*Table 3: Single-speaker evaluation. Facial-MSE scaled by*
 
 ### 延迟与实时性分析
 
@@ -256,9 +232,6 @@ Table 4 对比了各方法的推理延迟与因果性。所有测量在同一 NV
 ### 跨域泛化评估
 
 Table 9 展示了在 Embody3D 数据集上的跨域评估结果。MIBURI 的 FGD 为 **1.642**，显著优于 GestureLSM 的 3.744（↓2.102），证明该方法对不同说话人和对话场景具有较好的泛化能力。
-
-![[assets/figures/papers/paper_list_l995_https_arxiv_org_abs_2603_03282/figures/014_Table_9.jpg]]
-*Table 9: Quantitative evaluation on the Embody3D dataset*
 
 ### 消融实验
 
@@ -298,9 +271,6 @@ Table 8 展示了残差码书数量 K 对运动重建精度的影响。K=8 时 M
 
 Figure 4 展示了用户感知研究结果。在自然度（Naturalness）和语音匹配度（Speech Matching）两个维度上，MIBURI 均显著优于 EMAGE 和 GestureLSM（p < 0.001）。然而，MIBURI 在两项指标上仍低于真实数据（GT），表明生成手势在整体交互质量上存在改进空间。
 
-![[assets/figures/papers/paper_list_l995_https_arxiv_org_abs_2603_03282/figures/005_Figure_4.jpg]]
-*Figure 4: User Study for Perceptual Evaluation. Here, the red line indicates chance level (50%), * stands for*
-
 ### 运动学依赖分析
 
 Figure 6 分析了运动学 Transformer 中自注意力在各体素之间的分布。结果表明，面部令牌的自注意力集中在自身（Face→Face），模型隐式学习到忽略无关的下身令牌，验证了分体素建模的有效性。
@@ -312,8 +282,6 @@ Figure 6 分析了运动学 Transformer 中自注意力在各体素之间的分�
 3. **缺乏双向交互**：当前框架尚未利用对话对方的肢体动态信息，无法实现完整的双向交互手势建模。
 4. **域外泛化**：模型性能受限于 BEAT2 训练数据，对域外说话人及极端风格的泛化能力有待验证。
 5. **资源受限设备**：尽管在 RTX 3090 上延迟很低，但在资源受限设备上的实时性能尚需进一步优化。
-
-
 
 ## 定位与知识库关联
 
@@ -358,8 +326,6 @@ MIBURI 在协同语音手势生成领域的知识库中占据以下位置：
 - **关键区分点：** 首个直接利用语音-文本基础模型内部令牌流进行因果手势生成的框架；时间-运动学双重自回归架构；分体素 RVQ 编码
 - **性能定位：** 在 BEAT2 多说话人评估中达到 SOTA 级别的 FGD 和 BeatAlign，同时保持最低的推理延迟（34.9ms/帧）
 - **未解决挑战：** 语义性手势生成、双向交互建模、域外泛化
-
-
 
 ## 原文 PDF
 

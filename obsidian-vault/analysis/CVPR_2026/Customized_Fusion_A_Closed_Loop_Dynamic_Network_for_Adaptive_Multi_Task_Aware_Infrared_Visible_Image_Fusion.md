@@ -55,8 +55,6 @@ claims:
 
 **主要结果**：在M3FD、FMB和VT5000三个数据集上，CLDyN在融合质量指标（如Q_AB/F达到0.6900，MI达到2.6219）和多任务性能上均取得领先。相比重训练和联合训练方法，CLDyN仅需**0.46M可训练参数**和**174.06G FLOPs**，参数减少超过100倍，同时在显著性目标检测（SOD）任务上取得最高mFβ（0.8129）。消融实验证实BVB和A2SI模块对多任务适应至关重要，奖励-惩罚系数δ=5时综合性能最优。
 
-
-
 ### 红外-可见光图像融合的任务驱动需求
 
 红外与可见光图像融合旨在将热辐射信息与可见光纹理细节结合，生成兼具目标显著性和场景保真度的融合图像。随着自动驾驶、视频监控和无人机侦察等应用的发展，融合结果不再仅服务于人类视觉感知，而是越来越多地作为目标检测、语义分割、显著性检测等下游任务的输入。这一转变催生了一个核心需求：融合网络不仅需要保持高视觉质量，还必须为多个下游任务提供“任务定制化”的语义支持。
@@ -85,8 +83,6 @@ claims:
 
 这一设计范式从根源上区别于现有方法的“一图多用”或“重训适配”策略，为多任务感知的图像融合提供了新的闭环动态框架。
 
-
-
 ## 核心方法与创新机理
 
 CLDyN 的核心创新在于构建了一条**闭环语义传输链**，将下游任务的语义需求显式反馈至融合网络，从而在不重新训练视觉引导融合网络（VFN）的前提下，动态生成面向多任务的定制化融合结果。这一设计从根本上改变了现有任务感知融合方法的范式：传统方法（如损失驱动的 **TDAL** 或联合训练的 **MRFS**）需要针对每个下游任务重新训练整个融合网络或下游任务网络（DTN），导致多任务泛化成本极高；而 CLDyN 仅需训练一个轻量的需求驱动语义补偿（RSC）模块，即可同时适配目标检测、语义分割与显著性检测等多个固定任务集。
@@ -110,8 +106,6 @@ CLDyN 的核心创新在于构建了一条**闭环语义传输链**，将下游�
 **3. 多任务优化策略：从简单加权到性能反馈驱动的奖励-惩罚**
 
 多任务学习中常见的简单损失加权容易导致任务间梯度冲突，且无法反映语义补偿的实际效果。CLDyN 的闭环优化目标 $\ell_{cl}^n = \ell_r^n + \delta \ell_p^n$ 直接以补偿前后的任务性能变化作为优化信号，而非预设的损失权重。结合 **CAGrad** 缓解多任务梯度冲突，超参数 $\delta=5$ 时模型在所有下游任务上取得稳定最优，证实了该策略对任务平衡的有效调控。
-
-
 
 **CLDyN** 采用两阶段闭环范式，将视觉引导融合网络（VFN）与需求驱动的语义补偿（RSC）模块解耦，形成一条从下游任务语义反馈到融合特征调整的**语义传输链**（Figure 2）。其核心设计在于：VFN 仅需训练一次并保持冻结，而轻量级的 RSC 模块通过接收下游任务网络（DTN）的语义特征，对 VFN 中间层多模态特征进行任务特定的动态补偿，从而在无需重新训练融合网络的前提下，为多个下游任务生成定制化融合结果。
 
@@ -143,12 +137,8 @@ RSC 模块内部由两个关键组件构成：
 
 该框架的关键优势在于：VFN 作为通用融合骨架保持稳定，所有任务适应性学习被压缩至轻量 RSC 模块中，使得整个系统在面对未经训练的 DTN 时仍能通过语义传输链动态调整，无需重新训练融合网络。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2116_https_arxiv_org_abs_2604_08924/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the adaptive multi-task-aware infrared-visible image fusion network. The network forms a semantic transmission chain, where semantic features from multiple downstream tasks guide the RSC module to perform task-specific compensation for the VFN. The reward-penalty strategy optimizes the compensation process by evaluating task performance before and after semantic compensation*
-
-
 
 ### 两阶段训练框架
 
@@ -219,15 +209,8 @@ $$
 
 消融实验（Table 7, Figure 11）证实：移除 BVB 导致所有下游任务性能全面下降；将 A2SI 分支结构固定（取消自适应调整）则使模型偏向目标检测任务，多任务适应性显著恶化。这验证了动态架构选择与基向量生成机制对多任务泛化的关键作用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2116_https_arxiv_org_abs_2604_08924/figures/012_Figure_7.jpg]]
 *Figure 7: Qualitative and quantitative comparison between precompensation and post-compensation results*
-
-![[assets/figures/papers/paper_list_l2116_https_arxiv_org_abs_2604_08924/figures/016_Figure_9.jpg]]
-*Figure 9: Network architecture of VFN. The VFN (a) consists of a Feature Extraction Blocks (FEB) (b) and a Fusion Feature Reconstruction Block (FRB) (c)*
-
-
 
 ## 实验与关键发现
 
@@ -266,30 +249,11 @@ $$
 
 论文在Table 13中分析了CLDyN在复杂场景下的性能表现。在正常光照条件下，CLDyN的检测和分割性能稳定领先；但在模拟的暴雨、低光照和强噪声等恶劣环境下，性能下降幅度较明显。这表明当前方法假设输入图像来自正常天气条件，对极端环境的鲁棒性有限。此外，论文未考虑传感器老化导致的复合退化（噪声、坏点、伪影），这在实际部署中可能成为瓶颈。未来工作需拓展至开放世界复杂环境下的鲁棒多任务适应。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2116_https_arxiv_org_abs_2604_08924/figures/004_Table_1.jpg]]
 *Table 1: Quantitative comparison between the proposed method and existing state-of-the-art approaches. The best and second-best performances for each metric are highlighted with Red and Blue backgrounds, respectively*
 
 ![[assets/figures/papers/paper_list_l2116_https_arxiv_org_abs_2604_08924/figures/005_Table_2.jpg]]
 *Table 2: Quantitative comparison of the proposed method with the “task network retraining” methods. The number of parameters and the computational cost of the trainable parts are reported in the table. The best and second-best performances for each metric are highlighted with Red and Blue backgrounds*
-
-![[assets/figures/papers/paper_list_l2116_https_arxiv_org_abs_2604_08924/figures/008_Table_3.jpg]]
-*Table 3: Quantitative comparison of the proposed method with the “joint training” methods. The number of parameters and the computational cost of the trainable parts are reported in the table. The best and second-best performances for each metric are highlighted with Red and Blue backgrounds, respectively*
-
-![[assets/figures/papers/paper_list_l2116_https_arxiv_org_abs_2604_08924/figures/015_Table_7.jpg]]
-*Table 7: Quantitative comparison between the full model and its ablated variants across multiple downstream tasks. The best performance for each metric is marked with a Red background*
-
-![[assets/figures/papers/paper_list_l2116_https_arxiv_org_abs_2604_08924/figures/021_Table_9.jpg]]
-*Table 9: Quantitative analysis of the hyperparameter δ across multiple downstream tasks. The hyperparameter settings of our proposed method are highlighted in bold, while the best performance for each metric is marked with a Red background*
-
-![[assets/figures/papers/paper_list_l2116_https_arxiv_org_abs_2604_08924/figures/009_Figure_6.jpg]]
-*Figure 6: Qualitative (a) and quantitative (b) comparison between the proposed method and IDF-TDDT*
-
-![[assets/figures/papers/paper_list_l2116_https_arxiv_org_abs_2604_08924/figures/019_Figure_11.jpg]]
-*Figure 11: Qualitative comparison between the full model and the ablation models (Model IV and Model V)*
-
-
 
 ## 定位与知识库关联
 
@@ -334,8 +298,6 @@ CLDyN的适用性受以下条件约束：
 3. **计算效率与任务扩展性**：能否进一步减少RSC模块的计算开销（当前174.06G FLOPs），或使框架支持任意新增的下游任务而无需重新训练？后者可能涉及元学习或任务编码器的引入，使RSC能够泛化至未见任务。
 
 4. **任务冲突的理论分析**：CAGrad虽然缓解了梯度冲突，但多任务语义需求的内在冲突（如检测关注边缘、分割关注区域一致性）是否可通过更优的语义注入策略从根本上调和，仍需进一步研究。
-
-
 
 ## 原文 PDF
 

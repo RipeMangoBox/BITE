@@ -48,8 +48,6 @@ VersatileMotion 是一个统一的多模态运动大语言模型（Multimodal Mo
 
 **主要结果**：在 MotionHub 基准上，VersatileMotion 在文本到运动（T2M）、多智能体文本到运动（M-T2M）、运动到文本（M2T）、音乐到舞蹈（M2D）、舞蹈到音乐（D2M）等任务上均达到最优或极具竞争力的水平。消融实验证实，FlowVQ 的流匹配解码器、多智能体数据联合训练以及 LayerNorm+SiLU 的归一化激活组合是性能提升的关键因素。
 
-
-
 人体运动生成与理解是计算机视觉与图形学领域的核心挑战，其应用覆盖动画制作、虚拟人交互、游戏开发等广泛场景。近年来，扩散模型与自回归Transformer的快速发展推动了运动合成质量的显著提升，但现有方法普遍遵循“一任务一模型”的范式——文本到运动（T2M）、音乐到舞蹈（M2D）、语音到手势（S2G）、运动到文本（M2T）等任务各自依赖独立的专用架构与训练流程。
 
 这一碎片化格局带来了三个关键瓶颈：
@@ -65,8 +63,6 @@ VersatileMotion 是一个统一的多模态运动大语言模型（Multimodal Mo
 - **统一智能体**：同时支持SMPL-H（单人）与InterHuman（双人交互）运动格式，打破单/多智能体的数据与模型隔离。
 
 该工作的目标不仅是追求单一任务的性能上限，更在于验证一个基本假设：**一个经过充分设计的统一架构，能否在覆盖九类任务的同时，在多数任务上达到甚至超越专用模型的水平？** 这一问题的回答将为人形运动智能的通用化建模提供重要参照。
-
-
 
 ## 核心方法与创新机理
 
@@ -89,8 +85,6 @@ FlowVQ 是 VersatileMotion 实现高质量运动压缩与重建的核心组件�
 VersatileMotion 是**首个在单一框架内同时支持单智能体和多智能体运动合成与理解的方法**。通过在 MotionHub 数据集中统一处理 SMPL-H（单智能体）和 InterHuman（多智能体）两种骨架格式，并将多智能体交互建模为统一的运动消息序列，模型可以无缝处理多智能体文本到运动（M-T2M）、多智能体运动到文本（M-M2T）等任务。这一能力在以往的方法中是缺失的——现有工作要么仅支持单智能体，要么需要为多智能体场景设计完全独立的模型。
 
 **需要人工核验的点**：关于 FlowVQ 中流匹配解码器的具体 Transformer 架构细节（如层数、注意力机制设计）以及 FSQ 量化器的具体配置（码本大小、维度），当前分析证据中未提供足够的锚定信息，需查阅原文第 4.2 节及图 3 确认。
-
-
 
 VersatileMotion 是一个统一的多模态运动大语言模型（Multimodal Motion LLM），其设计遵循三个核心原则：**统一离散词汇表**、**三阶段“通才到专才”训练策略**，以及**FlowVQ 运动分词器**。整体框架将运动合成与理解任务统一为序列到序列的翻译问题，支持文本、音频（语音/音乐）与运动（单人/多人）之间的跨模态转换。
 
@@ -116,13 +110,6 @@ FlowVQ 是框架的核心组件，其结构如图 3 所示。它在标准 VQ-VAE
 ### 统一离散词汇表
 
 为实现多模态统一，所有输入模态（文本、音频、音乐）和运动输出均被转换为单一的离散词汇表。文本和音频通过各自的 tokenizer 编码为离散 token，运动则通过 FlowVQ 编码为离散 token。这种统一的离散表示使得单个自回归 Transformer 骨干网络能够无缝处理所有模态的组合，支撑至少九种核心任务的跨模态转换。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2411_17335/figures/001_Figure_1.jpg]]
-*Figure 1: VersatileMotion supports both single-agent and multi-agent motion synthesis and understanding, enabling seamless cross-modal conversion among text, audio, and motion (both single and multi-agent)*
-
-
 
 ### 3.1 FlowVQ：融合离散量化与流匹配的运动分词器
 
@@ -153,13 +140,6 @@ VersatileMotion 采用三阶段训练策略逐步提升模型能力：
 
 该策略使得单一模型能够同时覆盖单智能体和多智能体运动合成与理解，在 9 项核心任务中的 7 项上达到最优性能（见 Table 1）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2411_17335/figures/005_Figure_3.jpg]]
-*Figure 3: The schematic of FlowVQ*
-
-
-
 ## 实验与关键发现
 
 ### 统一多任务能力与主结果
@@ -187,15 +167,9 @@ VersatileMotion 的核心主张是在单一框架内覆盖至少九类运动理�
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2411_17335/figures/011_Table_7.jpg]]
 *Table 7: Motion Prediction and In-between results. The gray color denotes motion in-between*
 
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2411_17335/figures/014_Table_9.jpg]]
-*Table 9: Speech-to-Gesture evaluation on MotionHub*
-
 ### 运动分词器消融
 
 FlowVQ 是 VersatileMotion 的核心组件之一，其设计决策通过 **Table 8** 进行了消融验证。该表对比了不同运动分词器在运动重建任务上的精度，FlowVQ 通过结合 VQ-VAE 离散量化与 Flow Matching Transformer 解码器，在重建保真度上优于纯 VQ-VAE 方案。这一结果支撑了论文的核心洞察：**离散 token 化提供统一的序列表示接口，而 flow matching 解码器则补偿了量化带来的信息损失**，两者协同是统一多任务框架的关键使能因素。
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2411_17335/figures/013_Table_8.jpg]]
-*Table 8: Accuracy comparison of different motion tokenizers in motion reconstruction tasks*
 
 ### 架构初始化与规模消融
 
@@ -221,16 +195,6 @@ FlowVQ 是 VersatileMotion 的核心组件之一，其设计决策通过 **Table
 - **Table 4**：FlowVQ + VerMo-1B-Spe 在 T2M 和 M-T2M 上均取得最优 FID，验证了 flow matching 解码器对生成质量的贡献。
 - **Table 8**：FlowVQ 在重建精度上优于纯 VQ-VAE，为“离散量化 + 连续流匹配”的混合设计提供了实证支撑。
 - **Table 10**：揭示了预训练初始化和架构选择对生成与理解任务的不同影响，是理解统一框架内部张力的关键证据。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2411_17335/figures/004_Table_2.jpg]]
-*Table 2: The constituent subsets of MotionHub. All values reflect post-processed data—after operations such as slicing, annotation, filtering, and resampling. Superscripts indicate caption annotation granularity: 1 Macro-level, 2 Meso-level, 3 Micro-level*
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2411_17335/figures/006_Table_3.jpg]]
-*Table 3: Examples of different tasks and their corresponding motion message formats*
-
-
 
 ## 定位与知识库关联
 
@@ -267,8 +231,6 @@ VersatileMotion 相对于通用运动生成基线的关键改进集中在两个�
 - 在超出 12 秒的长时序运动生成中，FlowVQ 的离散码本是否会遭遇码本坍塌或时序一致性问题？
 - 多智能体场景下，如何引入显式的物理约束（如穿透避免、接触力）来提升交互的真实性？
 - 统一词汇表策略是否会在模态间引入语义混淆？例如，音乐到舞蹈任务中的节奏信息是否会被文本语义干扰？
-
-
 
 ## 原文 PDF
 

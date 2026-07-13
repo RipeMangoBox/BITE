@@ -293,8 +293,6 @@ Figure 7 的跨运动类别影响重叠热力图揭示了不同运动之间的�
 - 多数投票聚合时使用的百分位阈值 $\tau$ 未在论文中明确公开，可能影响完全可复现性。
 - 所有对比基线均使用相同的 10% 数据预算和相同的微调超参数（分辨率 $480 \times 832$，学习率 $1 \times 10^{-5}$，仅更新 DiT 骨干），确保了比较的公平性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2601_08828/figures/015_Figure_8.jpg]]
 *Figure 8: Illustration of motion query set. We generate near-realistic video queries with Veo-3 across ten motion categories. Each category contains five query videos synthesized with controlled prompts and manually screened for clarity and physical plausibility. Table 6: Runtime Breakdown. Detailed computational complexity and runtime for each component of our motion attribution framework on 10k training samples with Wan2.1-T2V-1.3B model*
 

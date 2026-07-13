@@ -85,8 +85,6 @@ NOWA在多项基准上取得显著优势：
 
 当前框架主要适用于景深范围内的场景；大景深变化或微距成像中PSF变为深度依赖，零空间结构随之变化。实际部署中残余零空间能量从仿真的~10⁻⁵升高到~10⁻⁴，且需针对每个相机原型进行PSF校准和网络微调。未来方向包括：深度感知校准策略、可编程光学元件实现动态零空间签名、以及针对近似成像算子攻击的增强防御。
 
-
-
 ### 数字图像认证的脆弱性
 
 生成式人工智能（AIGC）的快速发展使图像编辑的门槛降至前所未有的低点。扩散模型、大语言模型驱动的图像修复工具可以在数秒内完成高度逼真的局部篡改，而传统取证方法——无论是基于像素统计异常的被动检测，还是拍摄后嵌入的数字水印——都面临结构性困境。
@@ -104,8 +102,6 @@ NOWA在多项基准上取得显著优势：
 NOWA 的核心洞察在于利用成像算子的数学结构来回答这个问题。具体而言，当相机孔径处插入一块精心设计的相位掩膜时，成像过程可建模为线性算子 $\mathbf{A}_\phi$。该算子的零空间 $\mathcal{N}(\mathbf{A}_\phi) = \{\mathbf{z} \mid \mathbf{A}_\phi \mathbf{z} = 0\}$ 具有一个关键性质：零空间内的任何信号经光学系统后，在传感器上的测量值为零——它在光学上完全不可观测，但在数学上被唯一定义。这构成了一个天然的安全嵌入域：水印在拍摄时不可见，但可通过零空间投影被精确恢复。
 
 基于这一原理，NOWA 建立了一种**结构性的安全不对称性**：合法认证方持有相位掩膜参数 $\phi$ 和零空间网络参数 $\theta$，可精确提取并验证水印签名；而攻击者即使获得保护图像，在缺乏光学参数的情况下无法伪造有效的零空间签名。本文的动机正是充分挖掘这一不对称性，构建一个从光学编码、计算重建到篡改检测的完整认证流水线。
-
-
 
 ## 核心方法与创新机理
 
@@ -155,8 +151,6 @@ $$\mathbf{s} = \Pi_{\mathcal{N}}(\mathbf{x}_p) = \Pi_{\mathcal{N}} \mathcal{U}_\
 
 这四个changed slots并非独立的改进，而是围绕**零空间作为安全水印通道**这一核心洞察的有机整体：光学嵌入创建通道，NSN重建锚定签名，零空间投影提取签名，三者共同实现了从“拍摄后添加”到“拍摄时嵌入”、从“图像域隐藏”到“零空间分离”的范式转变。
 
-
-
 NOWA提出了一种混合物理-数字的脆弱认证流水线，其核心思想是在图像形成阶段——而非拍摄之后——将不可见的水印签名嵌入成像算子的零空间中。该流水线由四个紧密耦合的模块构成，形成一条从光学编码到篡改检测的端到端可训练链路。
 
 ### 流水线总览
@@ -201,12 +195,8 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{rec}} + \beta \mathcal{L}_
 
 NOWA的安全保障根植于其物理-数字混合架构的结构性不对称：攻击者若想伪造有效的NOWA签名，必须同时掌握光学参数 $\phi$（获取零空间结构）和NSN参数 $\theta$（生成正确的零空间分量）。即使攻击者拥有大量配对数据 $(\mathbf{x}_p, \mathbf{y})$ 并尝试学习近似成像算子，对抗实验表明NOWA在此类攻击下仍保持F1=0.901–0.946的检测性能。移除学习到的相位掩膜后，检测F1降至0.89，进一步证明优化设计的零空间对水印强度和稳定性至关重要。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2107_https_arxiv_org_abs_2512_22501/figures/001_Figure_1.jpg]]
 *Figure 1: A hybrid physical-digital pipeline for fragile authentication. (a) Optical-digital fingerprint: A phase mask (PM) in the camera aperture optically encodes the scene, embedding a unique physical signature before digitization. A neural network*
-
-
 
 NOWA的核心架构由四个功能模块串联构成，形成一条从光学编码到像素级篡改定位的完整流水线。
 
@@ -268,15 +258,8 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{rec}} + \beta \mathcal{L}_
 
 **核心洞察**：该流水线建立了结构性的安全不对称性——相位掩膜参数 $\phi$ 和NSN参数 $\theta$ 共同定义了零空间签名。攻击者即使拥有保护图像，若不知道光学参数和网络参数，也无法伪造有效的零空间签名（消融实验表明，移除学习到的相位掩膜后检测F1降至0.89）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2107_https_arxiv_org_abs_2512_22501/figures/004_Figure_3.jpg]]
 *Figure 3: Qualitative ablation of detector input. Comparison of detected tamper when input to*
-
-![[assets/figures/papers/paper_list_l2107_https_arxiv_org_abs_2512_22501/figures/008_Figure_6.jpg]]
-*Figure 6: Optical encoding. A commercial YONGNUO lens is disassembled to attach the design phase mask on the back side of the lens aperture. The inset shows the quantized designed phase mask*
-
-
 
 ## 实验与关键发现
 
@@ -318,33 +301,17 @@ Figure 8展示了真实原型相机（Figure 6）的实验结果。使用商业Y
 4. **对抗学习威胁**：攻击者若拥有大量配对数据(x_p, y)，可能尝试学习近似成像算子以伪造签名。论文初步评估显示此类攻击下F1降至0.901-0.946，但防御策略仍需进一步探索。
 5. **部署复杂度**：每个相机原型需进行实测PSF校准和NSN/检测器微调，增加了部署工作量和数据采集成本。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2107_https_arxiv_org_abs_2512_22501/figures/002_Table_1.jpg]]
 *Table 1: Comparison with other competitive tamper localization methods under different AIGC-based editing methods*
 
 ![[assets/figures/papers/paper_list_l2107_https_arxiv_org_abs_2512_22501/figures/003_Figure_2.jpg]]
 *Figure 2: Qualitative comparison between the proposed method and state-of-the-art approaches. Our method produces more precise localization of manipulated regions and better preserves structural details compared to existing techniques*
 
-![[assets/figures/papers/paper_list_l2107_https_arxiv_org_abs_2512_22501/figures/005_Figure_4.jpg]]
-*Figure 4: Robustness of the proposed system against generative and analytical adversaries. For each attack, we show the protected image produced by our system*
-
 ![[assets/figures/papers/paper_list_l2107_https_arxiv_org_abs_2512_22501/figures/006_Table_2.jpg]]
 *Table 2: Comparison of tampering localization under different levels of noise and compression degradations*
 
-![[assets/figures/papers/paper_list_l2107_https_arxiv_org_abs_2512_22501/figures/007_Figure_5.jpg]]
-*Figure 5: Tamper localization from real captures. Each column shows (top) the protected image with the target edit region outlined in green, and (bottom) the tampered image with the estimated manipulation mask overlaid in translucent red. Edits were manually made using Photoshop tools. The IoU scores below each example indicate strong localization accuracy and robust detection of real digital edits, as supported by the visual results*
-
 ![[assets/figures/papers/paper_list_l2107_https_arxiv_org_abs_2512_22501/figures/009_Figure_7.jpg]]
 *Figure 7: PSF Calibration. Comparison between the optimized simulated PSF (left) and the experimentally measured PSF from the physical prototype (right). The similarity in structure confirms the fidelity of the fabrication process*
-
-![[assets/figures/papers/paper_list_l2107_https_arxiv_org_abs_2512_22501/figures/010_Figure_8.jpg]]
-*Figure 8: Real-world prototype results. From left to right: raw capture y, protected reconstruction*
-
-![[assets/figures/papers/paper_list_l2107_https_arxiv_org_abs_2512_22501/figures/011_Figure_8.jpg]]
-*Figure 8: (cont.). Real-world prototype results. From left to right: raw capture y, protected reconstruction*
-
-
 
 ## 定位与知识库关联
 
@@ -393,8 +360,6 @@ NOWA的有效性建立在以下假设之上，违反任一条将导致性能退�
 - **密钥化安全增强**：能否在零空间签名中引入基于密钥的随机化或数字嵌入层，进一步增强安全性，防御利用大量配对数据集近似成像算子的攻击？这将是物理签名与数字密码学的深度融合方向。
 - **自动化部署流水线**：能否开发自动化PSF测量和在线微调流程，降低实际部署的校准门槛和人工干预需求？
 - **多光谱扩展**：当前框架基于单波长模型。能否扩展至多光谱或高光谱成像，利用不同波长的零空间差异实现更丰富的签名容量？
-
-
 
 ## 原文 PDF
 

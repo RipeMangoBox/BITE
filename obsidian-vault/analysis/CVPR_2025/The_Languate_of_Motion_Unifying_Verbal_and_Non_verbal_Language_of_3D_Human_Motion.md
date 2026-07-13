@@ -61,8 +61,6 @@ claims:
 - 在数据极度稀缺场景下，完整模型始终优于无预训练消融方案和EMAGE，验证了预训练赋予的强运动先验（Figure 5）。
 - 模型解锁了从运动预测情绪等新任务，在此任务上远超MotionGPT（Rouge Cider 26.67 vs 10.67，BertScore 16.94 vs 2.31），而MotionGPT表现几乎与随机基线持平（Table 3）。
 
-
-
 ### 3D人体运动生成中的模态割裂
 
 3D人体运动生成是计算机视觉与图形学领域的核心问题，其应用涵盖虚拟数字人、影视制作、游戏交互等场景。然而，现有运动生成模型普遍遵循“单模态专用”的设计范式：协同语音手势生成仅处理音频到姿态的映射，文本驱动运动生成仅处理文本到姿态的映射，两类任务由完全独立的模型架构完成。这种模态割裂带来了两个根本性瓶颈：
@@ -84,8 +82,6 @@ claims:
 - **指令精调**：将下游任务（如协同语音手势生成、运动到情绪预测）统一为自然语言指令格式，在预训练模型基础上进行微调，使其能遵循指令完成多样化任务。
 
 该框架以预训练Flan-T5 Base（220M参数）编码器-解码器Transformer为骨干，输入与输出均表示为统一多模态词汇表中的离散令牌，实现了“任意模态到任意模态”的灵活映射。
-
-
 
 ## 核心方法与创新机理
 
@@ -135,8 +131,6 @@ $$\mathcal{L}_{LM} = - \sum_{k=0}^{L_t-1} \log p_{\theta}(s_t^k | s_t^{<k}, s_i)
 
 三项创新构成一条清晰的因果链：**组合式分词**提供了细粒度的运动表示基础，**跨模态预训练**建立了空间、时间与语义的三维对齐，**预训练语言模型骨干**则赋予了系统语义推理与任务泛化的能力。这一设计使模型在BEATv2协同语音手势生成基准上显著超越现有最佳方法（包括EMAGE, Liu et al., CVPR 2024），并在数据稀缺和涌现任务上展现出传统方法无法比拟的鲁棒性。
 
-
-
 本文提出一种基于语言模型的多模态运动理解与生成框架，其核心思想是将3D人体运动视为一种“语言”，与语音和文本共享统一的多模态词汇表。框架整体遵循“分词—对齐—指令”三阶段流水线，如 Figure 2 所示。
 
 ![[assets/figures/papers/paper_list_l1867_The_Languate_of_Motion_Unifying_Verbal_and_Non_verbal_Language_of_3D_Hum/figures/002_Figure_2.jpg]]
@@ -161,12 +155,8 @@ $$\mathcal{L}_{LM} = - \sum_{k=0}^{L_t-1} \log p_{\theta}(s_t^k | s_t^{<k}, s_i)
 
 **框架的关键创新**在于组合式运动分词与两阶段跨模态对齐预训练的结合：前者将复杂人体运动解耦为可组合的语义单元，后者赋予模型强运动先验，使其在数据稀缺时仍能保持竞争力（见 Figure 5）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1867_The_Languate_of_Motion_Unifying_Verbal_and_Non_verbal_Language_of_3D_Hum/figures/001_Figure_1.jpg]]
 *Figure 1: We introduce a language-model-based motion understanding and generation framework that takes in any of the audio/motion/text modalities and outputs the desired target modality. Coupled with our generative pre-training strategy, our model demonstrates competitive performance on an array of tasks, showing promising signs toward unified verbal and non-verbal language of human motions*
-
-
 
 ### 3.1 组合式身体运动 VQ-VAE 分词器
 
@@ -200,13 +190,6 @@ $$\mathcal{L}_{LM} = - \sum_{k=0}^{L_t-1} \log p_{\theta}(s_t^k | s_t^{<k}, s_i)
 
 通过共享的多模态词汇表 $V$，模型无需额外的模态适配器即可处理任意模态的组合输入，并以统一的语言建模范式生成目标模态输出。这种架构选择充分利用了预训练语言模型已有的语义推理能力，为后续的跨模态生成与理解任务提供了强大的基础。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1867_The_Languate_of_Motion_Unifying_Verbal_and_Non_verbal_Language_of_3D_Hum/figures/003_Figure_3.jpg]]
-*Figure 3: Illustration of pre-training. We pre-train our language model by translating one modality to another using paired data*
-
-
-
 ## 实验与关键发现
 
 ### 4.1 协同语音手势生成主结果
@@ -238,15 +221,9 @@ $$\mathcal{L}_{LM} = - \sum_{k=0}^{L_t-1} \log p_{\theta}(s_t^k | s_t^{<k}, s_i)
 
 预训练赋予模型强运动先验，使其在数据稀缺场景下具有显著优势。**Figure 5**展示了生成性能随后训练数据量的变化曲线：当训练数据从100%逐步缩减至1%时，完整模型始终优于“无预训练”消融变体和EMAGE。这一结果表明，生成式预训练策略有效降低了对大规模配对标注数据的依赖。
 
-![[assets/figures/papers/paper_list_l1867_The_Languate_of_Motion_Unifying_Verbal_and_Non_verbal_Language_of_3D_Hum/figures/007_Figure_5.jpg]]
-*Figure 5: Generation performance vs. the amount of post-training data. Our model learns a stronger motion prior from pre-training and thus shows much better under data scarcity*
-
 ### 4.4 运动到情绪的零样本迁移
 
 预训练后的指令精调使模型解锁了训练期间未见的新任务。我们测试了“给定运动序列，预测说话者情绪”的能力，结果如**Table 3**所示：本方法取得Rouge Cider 26.67、BertScore 16.94，而通用文本-运动模型**MotionGPT**（Zhang et al., AAAI 2024）仅获得10.67和2.31，几乎与随机基线（4.44, 0.19）持平。**Figure 7**的定性示例展示了模型从手势中准确推断情绪的典型场景。这一跨任务泛化能力源于预训练阶段建立的多模态语义对齐。
-
-![[assets/figures/papers/paper_list_l1867_The_Languate_of_Motion_Unifying_Verbal_and_Non_verbal_Language_of_3D_Hum/figures/010_Table_3.jpg]]
-*Table 3: Motion to emotion. We prompt our model to predict emotion given a motion sequence*
 
 ![[assets/figures/papers/paper_list_l1867_The_Languate_of_Motion_Unifying_Verbal_and_Non_verbal_Language_of_3D_Hum/figures/009_Figure_7.jpg]]
 *Figure 7: Qualitative example of emotion prediction*
@@ -259,15 +236,8 @@ $$\mathcal{L}_{LM} = - \sum_{k=0}^{L_t-1} \log p_{\theta}(s_t^k | s_t^{<k}, s_i)
 2. **可编辑手势生成的量化缺失。** 如**Figure 6**所示，模型可根据文本+音频提示生成兼具表达性手势与通用肢体动作的运动，但目前仅展示了定性结果，缺乏系统的量化评估指标。
 3. **分布外泛化风险。** 训练数据主要来自BEATv2等数据集，覆盖的说话人风格、语言和文化背景有限，模型在分布外手势和情绪上的表现仍需进一步验证。
 
-![[assets/figures/papers/paper_list_l1867_The_Languate_of_Motion_Unifying_Verbal_and_Non_verbal_Language_of_3D_Hum/figures/008_Figure_6.jpg]]
-*Figure 6: Editable gesture generation. We prompt the language with text and audio information and it outputs motions that are both expressional gesture motion as well as general movement motion*
-
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1867_The_Languate_of_Motion_Unifying_Verbal_and_Non_verbal_Language_of_3D_Hum/figures/005_Table_2.jpg]]
 *Table 2: Ablations of pre-training*
-
-
 
 ## 定位与知识库关联
 
@@ -317,8 +287,6 @@ $$\mathcal{L}_{LM} = - \sum_{k=0}^{L_t-1} \log p_{\theta}(s_t^k | s_t^{<k}, s_i)
 
 **开放问题4：运动“语言”的语法结构**
 本文将运动视为语言，但未显式建模运动的“语法”（如手势的过渡规则、身体部位间的协调约束）。探索运动序列的层次化语法结构是否能进一步提升生成质量和可控性，是一个值得深入的方向。
-
-
 
 ## 原文 PDF
 

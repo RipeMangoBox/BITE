@@ -55,8 +55,6 @@ claims:
 
 在实验验证上，该框架在POPE基准上取得平均绝对**2%的准确率提升**（LLaVA-1.5），推理延迟仅增加**1.06倍**，并在CHAIR、MME、MMHal-Bench等多个基准上全面超越训练无关的基线方法（包括**VISTA**, Li et al., ICML；**ONLY**, Wan et al., arXiv 2025）。方法在四种不同架构的MLLM（LLaVA-1.5、Shikra、MiniGPT-4、InstructBLIP）上均验证有效，覆盖线性投影与Q-Former两类视觉-语言对齐方式，展现出良好的泛化性。
 
-
-
 ### 多模态大模型的幻觉困境
 
 多模态大模型（MLLM）在视觉理解与生成任务中展现出强大的能力，但其输出中频繁出现的“幻觉”现象——即生成与图像内容不一致的描述——严重制约了其在真实场景中的可靠性。幻觉问题的根源并非简单的感知错误，而是深植于模型架构内部的系统性失衡。
@@ -85,8 +83,6 @@ claims:
 2. **因果表示校准（CRC）**：通过随机剪枝视觉令牌至仅剩 $N_h=5$ 个，在隐空间构造信息缺口，生成分布内的负样本。如 Figure 2 (F3) 及 Figure 8 的 t-SNE 可视化所示，剪枝产生的负样本聚类在原始图像表示附近，构成稳定的分布内探针；相比之下，像素级掩码产生的表示则发散且偏离分布。基于这些负样本，CRC 计算稳定的幻觉方向向量，在浅层逐层净化隐状态，实现偏差消除。
 
 与碎片化的现有方法不同，该框架将增强与校准统一在中间表示层 $L_c=16$ 完成，无需触及最终解码器，从而避免了信号冲突。实验表明，该方法在 POPE 基准上平均绝对提升 2%，而推理延迟仅增加 1.06 倍，实现了性能与效率的优异平衡。
-
-
 
 ## 核心方法与创新机理
 
@@ -132,8 +128,6 @@ t-SNE 可视化（Figure 8）证实，剪枝令牌产生的负样本紧密聚类
 
 消融实验（Table 5）证实，SVC 和 CRC 各自独立均能带来性能提升，而融合两个模块后达到所有指标的最佳分数，验证了统一表示层级校准的协同效应。值得注意的是，CRC 探针最终捕获的是**纯视觉差异** $\mathbf{v}_{\mathrm{crc}}^{(l)} \approx \mathcal{E}(V - V_{\mathrm{neg}})$（Eq.14），在消除共享查询与偏差效应后，该方向精确对应视觉信息衰减所损失的真实信号，为反事实校准提供了理论依据。
 
-
-
 **核心诊断：视觉-语言失衡是幻觉的系统性瓶颈。** 多模态大模型在自回归生成过程中，视觉注意力随解码步数增加而急剧衰减，而模型内部强大的语言先验逐渐占据主导地位。这一失衡被本文的发现 **F1** 所证实：视觉注意力与幻觉频率呈显著负相关（Figure 2, F1）。基于此诊断，本文提出一个统一的隐空间校准框架，在单一表示层级上同时调节视觉信号的强度与文本惯性的抑制。
 
 **框架由两条并行流和两个核心模块构成。** 如 Figure 3 所示，模型同时处理两条输入流：
@@ -150,18 +144,8 @@ t-SNE 可视化（Figure 8）证实，剪枝令牌产生的负样本紧密聚类
 
 **模块间的协同机制。** SVC 与 CRC 虽作用于同一表示层级，但功能互补：SVC 通过增强视觉上下文提升模型对图像信息的利用，CRC 通过消除偏差方向抑制语言先验的过度主导。两者均以视觉令牌为唯一操作对象——增强令牌提供互补语义，剪枝令牌构造分布内探针——实现了“一令牌，两命运”的设计理念。消融实验（Table 5）证实，两个模块各自独立均较 Vanilla 基线带来性能提升，融合后达到所有指标的最佳分数，且推理延迟仅增加 $1.06\times$。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2263_https_arxiv_org_abs_2603_10360/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of our unified framework. The model processes an original input stream (orange path) and a parallel hallucinationprobe stream (purple path) derived from pruned vision tokens. Our Synergistic Visual Calibration (SVC) module injects complementary visual context from augmented images into a critical middle layer*
-
-![[assets/figures/papers/paper_list_l2263_https_arxiv_org_abs_2603_10360/figures/001_Figure_1.jpg]]
-*Figure 1: Disjoint Paradigms vs. Our Unified Latent Calibration. (a) Prior work includes Visual Attention Enhancement [27] and (b) Textual Decoding Refinement at final logits [20]. Naively combining these disjoint paradigms (a)+(b) degrades performance, highlighting conflicting signals. (c) Our Unified Latent Calibration is a unified system operating entirely at the representation level, using the vision token as a single source for both SVC and CRC, achieving superior and synergistic results*
-
-![[assets/figures/papers/paper_list_l2263_https_arxiv_org_abs_2603_10360/figures/002_Figure_2.jpg]]
-*Figure 2: Our Three Core Findings. (F1) Diagnosing the Imbalance: Inverse Correlation. Visual attention decays sharply as generation proceeds, while hallucination frequency surges where visual grounding is weakest. (F2) Enabling Enhancement: Semantic Complementarity. Original and augmented image attentions show complementary focus (e.g., on ’Camera’); their synergy enables enhanced visual grounding. (F3) Enabling Calibration: Superiority of Information-Gap. Latent-space token removal (information-gap) generates stable, grounded hallucinations, proving more suitable for bias probing than unstable, noisy pixel-level masking (modality-gap)*
-
-
 
 ### 2.1 问题形式化
 
@@ -205,9 +189,6 @@ $\lambda_s=0.06$ 是消融实验确定的最优值（Figure 9b），在该取值
 
 CRC 通过构造隐空间负样本来估计并消除“幻觉方向”，其理论基础源于结构因果模型（SCM，Figure 5）：模型内在偏差 $B$ 对隐表示 $H^{(l)}$ 存在虚假因果路径，混淆了真实的视觉因果路径 $V \to H^{(l)}$。
 
-![[assets/figures/papers/paper_list_l2263_https_arxiv_org_abs_2603_10360/figures/005_Figure_5.jpg]]
-*Figure 5: The simplified Structural Causal Model (SCM) for MLLM hallucination. We posit that hallucination arises from a spurious causal path from the model’s intrinsic bias (B) to its latent representation*
-
 **负样本构造。** 将视觉令牌随机剪枝至仅保留 $N_h=5$ 个，形成信息缺口。与像素级掩码（模态缺口）不同，这种隐空间剪枝产生的负样本在 t-SNE 可视化中紧密聚集于原始图像表示附近，构成分布内探针（Finding F3，Figure 8）。
 
 **幻觉方向估计。** 对 $K=3$ 个独立剪枝样本，分别计算其与原始表示的差分向量，取平均得到稳定的幻觉方向：
@@ -231,13 +212,6 @@ $$\mathbf{h}_{\mathrm{crc}} = \mathbf{h}_{\mathrm{norm}} + \lambda_{c} \cdot \ma
 $$\mathbf{H}_{t,\mathrm{pos}}^{(l)} = \frac{\mathbf{h}_{\mathrm{crc}}}{||\mathbf{h}_{\mathrm{crc}}||_{2}} \cdot ||\mathbf{H}_{t,\mathrm{org}}^{(l)}||_{2} \tag{Eq.(11)}$$
 
 CRC 在 $l=1$ 到 $L_c$ 的每一层独立执行，逐层净化隐状态。幻觉方向向量 $\mathbf{v}_{\mathrm{crc}}^{(l)}$ 可预先计算并缓存，推理时直接复用，因此额外计算开销极小。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2263_https_arxiv_org_abs_2603_10360/figures/004_Figure_4.jpg]]
-*Figure 4: Illustration of the Causal Representation Calibration (CRC) mechanism. By subtracting the hallucinated representation*
-
-
 
 ## 实验与关键发现
 
@@ -281,8 +255,6 @@ CRC 在 $l=1$ 到 $L_c$ 的每一层独立执行，逐层净化隐状态。幻�
 
 4. **干预层的经验性选择**：当前固定 Lc=16 进行干预，但不同模型的最优层可能不同。该方法依赖于经验性选择，缺乏自适应的层级决策机制。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2263_https_arxiv_org_abs_2603_10360/figures/006_Table_1.jpg]]
 *Table 1: Evaluation results on POPE benchmark across four MLLMs. Results show averaged accuracy and F1 scores in % computed across random, popular, and adversarial object splits. Best and second best results are bolded and underlined, respectively*
 
@@ -297,14 +269,6 @@ CRC 在 $l=1$ 到 $L_c$ 的每一层独立执行，逐层净化隐状态。幻�
 
 ![[assets/figures/papers/paper_list_l2263_https_arxiv_org_abs_2603_10360/figures/011_Table_5.jpg]]
 *Table 5: Ablation study on LLaVA-1.5 (POPE benchmark in %) evaluating our SVC variants (visual context) and CRC variants (negative sampling strategy). Best results are bolded*
-
-![[assets/figures/papers/paper_list_l2263_https_arxiv_org_abs_2603_10360/figures/010_Figure_6.jpg]]
-*Figure 6: MMHal-Bench Evaluation across four MLLMs. Our method (Ours, orange line) consistently achieves superior performance across all eight categories, demonstrated by the larger area covered in the radar plots compared to Vanilla, PAI, and VISTA*
-
-![[assets/figures/papers/paper_list_l2263_https_arxiv_org_abs_2603_10360/figures/012_Figure_7.jpg]]
-*Figure 7: Visualizing SVC’s effect with TAM [22]. For the token ’bulldog’, Vanilla LLaVA shows diffuse attention*
-
-
 
 ## 定位与知识库关联
 
@@ -360,8 +324,6 @@ CRC 在 $l=1$ 到 $L_c$ 的每一层独立执行，逐层净化隐状态。幻�
 2. **跨模态扩展**：该统一隐空间校准框架是否能够扩展到视频、语音等其他模态的幻觉抑制？
 3. **负样本构造的理论上限**：隐空间偏差消除的理论上限在何处？是否存在比随机剪枝更优的负样本构造方式？
 4. **单次前向传播**：能否在单个前向传播中同时完成增强与校准，从而进一步降低延迟开销？
-
-
 
 ## 原文 PDF
 

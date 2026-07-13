@@ -53,8 +53,6 @@ claims:
 
 实验覆盖类别条件生成（ImageNet 256×256）、无条件生成（LSUN-Bedroom/Churches 256×256）以及文本引导生成（MS-COCO 512×512）等多种场景。在稀疏步快速采样设定下，SA-PTQ在W8A8配置下相较PTQD将FID降低0.5–1.2，SA-QLoRA在W4A4配置下相较EfficientDM将FID降低约5.5。消融实验进一步证实混合阶轨迹对齐模块对FID与sFID均有显著增益。整体而言，该方法在保持快速采样收敛特性的同时，显著缩小了量化模型与全精度模型之间的生成质量差距。
 
-
-
 扩散模型已在图像生成领域取得显著进展，但其推理过程需要反复执行去噪网络的前向传播，计算开销极大。为降低部署成本，网络量化成为自然选择——将浮点权重与激活值映射为低位宽定点表示，从而压缩模型体积并加速推理。
 
 然而，直接对扩散模型应用标准量化方案会导致生成质量严重退化。这一退化在**稀疏步数快速采样**场景下尤为突出：当采样步数从数百步缩减至20步甚至更少时，量化模型的FID指标急剧上升，与全精度模型的差距被显著放大。现有量化方法（如PTQ4DM、Q-Diffusion、PTQD、EfficientDM）主要关注单步重建误差的最小化，却忽视了量化噪声在**多步采样轨迹中的累积效应**。
@@ -64,8 +62,6 @@ claims:
 从几何角度看，量化造成的方向偏差通过高阶项的反复迭代，将原本确定性的概率流ODE转变为具有发散特性的随机微分方程（SDE），导致采样轨迹偏离真实数据分布。图2直观展示了这一过程：一阶采样器仅在区间起点进行一次方向估计，而二阶采样器通过中间步骤细化方向；量化误差使这些中间步骤的方向估计发生漂移，最终污染整个区间的采样方向。
 
 上述分析表明，**现有量化方法的根本缺口在于缺乏对采样过程的感知**——它们在校准和优化阶段仅考虑单点重建精度，未能约束量化模型在不同阶数采样轨迹下的行为一致性。这促使本文提出**采样感知量化**框架，其核心动机是通过对齐低阶与高阶采样方向，线性化概率流，从而将量化累积误差压制至与离散化误差同阶的水平。
-
-
 
 ## 核心方法与创新机理
 
@@ -108,8 +104,6 @@ $$\arg\min_{s,z} \mathbb{E}_{(\mathbf{x}_t,t)\sim\mathcal{D}, (\mathbf{x}_s,s)\s
 $$\arg\min_{w,s,z} \mathcal{L}_{COS} + \mathcal{L}_{MOTA}$$
 
 消融实验（Table 4）证实了各模块的独立贡献：MOTA模块相较于基线BRECQ降低FID 4.1、sFID 3.83；额外加入方向对齐约束 $\mathcal{L}_{COS}$ 后，FID再降0.95、sFID降0.31，验证了混合阶对齐与方向约束的协同效应。
-
-
 
 本文提出的**采样感知量化（Sampling-Aware Quantization）**框架，其核心设计动机源于一个关键观察：量化噪声对高阶采样器的方向估计产生干扰，导致快速采样轨迹偏离，误差在高阶项中持续累积，最终使确定性概率流ODE退化为发散性SDE。为应对这一瓶颈，框架通过**混合阶轨迹对齐（Mixed-Order Trajectory Alignment, MOTA）**策略，约束低阶与高阶采样方向的一致性，从而线性化概率流，迫使量化误差与离散化误差保持同阶，抑制误差累积。
 
@@ -155,13 +149,6 @@ $$\arg\min_{w,s,z} \mathcal{L}_{COS} + \mathcal{L}_{MOTA}$$
 ### 框架统一性
 
 两种变体的共同本质在于：**将量化校准/训练的数据分布从“图像空间”迁移到“采样轨迹空间”**，并通过混合阶对齐约束，使量化模型在快速采样场景下的方向估计偏差得到显式控制。消融实验（Table 4）证实，MOTA模块相较于基线BRECQ可降低FID 4.1、sFID 3.83；额外加入方向对齐约束 $\mathcal{L}_{COS}$ 后，FID再降0.95，sFID降0.31，验证了各模块的独立贡献。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l928_https_arxiv_org_abs_2505_02242/figures/003_Figure_3.jpg]]
-*Figure 3: Sampling-aware quantization workflow. (a) Module-level reconstruction process employed in SA-PTQ, where*
-
-
 
 ### 量化误差的累积机制
 
@@ -252,13 +239,6 @@ $$
 
 消融实验（Table 4）验证了 MOTA 模块的有效性：相比基础 BRECQ 重建，MOTA 使 FID 降低 4.1、sFID 降低 3.83；额外加入 $\mathcal{L}_{COS}$ 后 FID 再降 0.95。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l928_https_arxiv_org_abs_2505_02242/figures/002_Figure_2.jpg]]
-*Figure 2: Direction estimation in reverse diffusion sampling. (a) The first-order sampler performs a single direction estimation at the beginning of the sampling interval. (b) The second-order sampler refines the direction estimation by evaluating additional intermediate steps within the interval. (c) Quantization errors lead to deviations in direction estimation, causing the intermediate steps in high-order samplers to drift over time, ultimately impacting the final direction estimation. (d) Our proposed Mixed-Order Trajectory Alignment achieves a more linearized probability flow*
-
-
-
 ## 实验与关键发现
 
 ### 瓶颈验证：量化误差如何破坏快速采样
@@ -274,9 +254,6 @@ $$\Delta_{quant} = \sum_{n=0}^{k-1} \Delta \epsilon_{\theta}^{(n)}(\mathbf{x}_{\
 #### 类别条件生成（ImageNet 256×256）
 
 Table 1 展示了 LDM-4 在 20 步 DPM-Solver-2 采样下的类别条件生成性能。在 W8A8 设定下，SA-PTQ 的 FID 与全精度模型差距极小，显著优于 PTQ4DM、Q-Diffusion、PTQD 等基线。在更具挑战性的 W4A4 低比特场景，SA-QLoRA 的 FID 接近全精度水平，而 EfficientDM 等同位宽方法则出现明显退化。Figure 6 和 Figure 7 的可视化对比进一步证实：SA-QLoRA 在 W8A8 和 W4A4 下均能保持与全精度高度一致的生成质量，基线方法则出现纹理模糊或结构失真。
-
-![[assets/figures/papers/paper_list_l928_https_arxiv_org_abs_2505_02242/figures/004_Table_1.jpg]]
-*Table 1: Performance evaluation of class-conditioned image generation on the ImageNet 256 × 256 dataset using LDM-4 with 20 sampling steps of DPM-Solver-2*
 
 ![[assets/figures/papers/paper_list_l928_https_arxiv_org_abs_2505_02242/figures/011_Figure_6.jpg]]
 *Figure 6: Comparison of generative performance on the ImageNet 256×256 dataset with 20-step sampling among the full-precision LDM4 and its W8A8 quantized counterparts using PTQ4DM, Q-diffusion, PTQD, EfficientDM, and our proposed SA-LoRA. (Revised version of the main figure in the main text, supplemented with the names of the applied quantization algorithms.)*
@@ -297,18 +274,9 @@ Table 1 展示了 LDM-4 在 20 步 DPM-Solver-2 采样下的类别条件生成�
 ![[assets/figures/papers/paper_list_l928_https_arxiv_org_abs_2505_02242/figures/013_Figure_8.jpg]]
 *Figure 8: Comparison of generative performance between the full-precision LDM8 and its W4A8 quantized counterpart, utilizing our proposed SA-QLoRA, on the LSUN-Church 256×256 dataset under 50-step sampling*
 
-![[assets/figures/papers/paper_list_l928_https_arxiv_org_abs_2505_02242/figures/016_Figure_11.jpg]]
-*Figure 11: Comparison of generative performance between the full-precision LDM4 and its W4A8 quantized counterpart, utilizing our proposed SA-QLoRA, on the LSUN-Bedroom 256×256 dataset under 50-step sampling*
-
 #### 文本引导生成（MS-COCO 512×512）
 
 Table 3 的结果表明，SA-QLoRA 在文本引导的 512×512 高分辨率生成任务上同样有效。Figure 12 展示了具体生成案例（如“戴帽子的小狗”和“躺在绿草地上的柯基”），量化模型准确保留了文本语义和视觉细节。
-
-![[assets/figures/papers/paper_list_l928_https_arxiv_org_abs_2505_02242/figures/008_Table_3.jpg]]
-*Table 3: Performance evaluation of text-guided image generation on MS-COCO 512 × 512*
-
-![[assets/figures/papers/paper_list_l928_https_arxiv_org_abs_2505_02242/figures/017_Figure_12.jpg]]
-*Figure 12: Generation performance of our SA-QLoRA under W8A8 quantization. quantization*
 
 ### 消融实验：混合阶轨迹对齐的关键作用
 
@@ -333,8 +301,6 @@ Table 4 的消融实验直接验证了 MOTA 模块和方向约束 $\mathcal{L}_{
 ### 局限性
 
 论文未明确讨论方法在以下场景的表现：极端低比特（如 W2A2）、非 DPM-Solver 系列的其他高阶求解器兼容性、以及更大规模模型（如 SDXL）上的扩展性。这些方面需要进一步验证。
-
-
 
 ## 定位与知识库关联
 
@@ -380,8 +346,6 @@ SA-PTQ和SA-QLoRA分别覆盖了PTQ和QLoRA两种主流量化范式，形成了�
 3. **时间步依赖的量化敏感性**：扩散模型在不同时间步对量化的敏感性可能存在差异（如噪声水平高时容错性更强），是否可以通过时间步自适应的量化位宽分配进一步提升效率，是一个值得探索的方向。
 
 4. **与其他压缩技术的协同**：混合阶轨迹对齐的框架是否可以推广到剪枝、蒸馏等其他压缩范式，形成统一的“采样感知压缩”理论，尚待研究。
-
-
 
 ## 原文 PDF
 

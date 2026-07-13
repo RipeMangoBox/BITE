@@ -51,8 +51,6 @@ claims:
 
 **主要结果** 在InnoComposer-Bench上，Stage I模型以文字准确率0.857、主体空间一致性IoU 0.972、整体质量IR-Score 1.036等指标全面超越所有开源基线，与最强闭源模型Seedream 4.0并驾齐驱。Stage II通过令牌剪枝与解耦注意力，在保持竞争力分数的同时，相比全量注意力的Flux-Kontext将推理延迟降低37.8%，FLOPs减少38.1%，为多条件DiT的高效部署提供了新范式。
 
-
-
 电商海报是品牌营销的核心载体，其设计需要同时满足三重独立控制——**背景风格**（氛围与品牌调性）、**主体外观**（产品形象与掩码一致性）和**字形文本**（促销信息、品牌标语）——且三者之间需保持视觉和谐。传统设计流程依赖多阶段人工或半自动化管线，通常先由图像生成模型产出背景，再通过图像修复嵌入主体，最后叠加文字图层。这种串行范式存在三个根本性瓶颈：
 
 1. **主体失准**：主体生成与背景生成解耦，导致产品与场景之间的光照、透视和语义一致性难以保证。
@@ -64,8 +62,6 @@ claims:
 现有工作对此问题的应对存在明显不足：**Flux-Kontext**等基线采用全量条件注入与完整双向注意力，虽然生成质量较高，但推理成本巨大；**OmniControl2**等高效注入方法虽尝试减少条件开销，但缺乏对条件重要性的细粒度感知，在剪枝时容易丢失关键控制信号。更根本的是，此前的研究尚未系统揭示**不同条件在模型深度与去噪时间步上的响应模式差异**——这一认知缺口使得条件令牌的稀疏化缺乏理论指导，只能依赖经验性的均匀剪枝，导致质量与效率难以兼得。
 
 本文的核心动机正是填补上述缺口：通过**层与时间步的重要性分析**，我们发现背景风格、主体和字形三种条件在MM-DiT的深度维度和去噪阶段呈现非均匀的互补响应模式——例如，字形条件在浅层和中间时间步的重要性显著高于深层，而背景风格则在中深层持续发挥作用。这一发现意味着，**并非所有条件都需要在所有层和时间步注入**。据此，我们提出**InnoAds-Composer**，一个基于重要性感知稀疏路由的高效条件组合框架，其目标是在保持多条件可控生成质量的前提下，大幅压缩有效序列长度，实现推理效率的帕累托最优。
-
-
 
 ## 核心方法与创新机理
 
@@ -125,8 +121,6 @@ $$h^{c} \gets \mathrm{Softmax}\Big( \frac{ (h^{c1} W_{Q}) (h^{c2} W_{K})^{\top} 
 
 上述创新存在明确的作用边界。重要性感知剪枝存在上限：当剪枝比例进一步推至 [90%, 60%, 70%]（字形/主体/风格）时，NED 跌至 0.582，表明过度剪枝会引发质量崩溃（Table 3, Figure 9）。此外，当前重要性分析依赖固定的主体区域掩码和文字区域掩码，对于无掩码的开放条件（如非矩形装饰元素）的泛化性尚未探索。
 
-
-
 InnoAds-Composer 以多模态 DiT（MM-DiT）为骨干，将电商海报生成形式化为一个**单阶段三条件可控生成**问题。模型同时接收三种异构控制信号——**背景风格**（文本提示或风格图像）、**主体**（产品掩码图像）和**字形**（文本渲染图像），并在一次扩散去噪过程中合成符合所有条件的高质量海报。其核心设计围绕一个关键瓶颈展开：全量注入条件令牌会导致 MM-DiT 中注意力计算随序列长度呈二次方增长，严重制约推理效率。
 
 为解决这一问题，框架引入了三个协同模块，形成“条件编码 → 稀疏路由 → 高效交互”的处理流水线：
@@ -139,12 +133,8 @@ InnoAds-Composer 以多模态 DiT（MM-DiT）为骨干，将电商海报生成�
 
 训练采用两阶段策略：Stage I 保留全量条件令牌充分训练一个完全可控的海报生成器；Stage II 移除选定令牌后进行微调，且扩散时间步按全局重要性分布采样，以对齐推理时的剪枝分布并减少性能下降。最终，Stage I 模型在 InnoComposer-Bench 上以文字准确率（Sen. Acc 0.857）、主体一致性（IoU 0.972）和整体质量（IR-Score 1.036）全面超越所有开源基线；Stage II 模型在保持竞争力分数的同时，相比全量注意力的 Flux-Kontext 将推理延迟降低 37.8%，FLOPs 减少 38.1%。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l888_https_arxiv_org_abs_2603_05898/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of InnoAds-Composer. The framework comprises three modules: (1) Multi-Condition Tokenization, which maps heterogeneous controls into a shared token space and aligns them with the MM-DiT backbone; (2) Importance-Aware Condition Injection, which routes each control to its importance layers to improve efficiency while preserving controllability; and (3) Decoupled Attention, which allows the main stream to attend to condition cues while the condition branch performs self-attention only, removing the extra path to reduce cost and maintain training–inference consistency*
-
-
 
 InnoAds-Composer 围绕“异构条件统一注入—重要性感知稀疏路由—解耦高效计算”三条主线，构建了四个紧密协作的模块：多条件令牌化、文字特征增强模块（TFEM）、重要性感知条件注入与解耦注意力。以下逐一展开其核心机制与关键公式。
 
@@ -220,18 +210,8 @@ $$O = [O_{n}, O_{ci}]$$
 
 直接对剪枝后的网络从头训练会导致收敛困难。InnoAds-Composer 采用两阶段训练策略：Stage I 保留全量条件令牌，充分训练一个完全可控的海报生成器；Stage II 移除选定令牌后微调，且扩散时间步按全局重要性分布采样，使训练分布与推理时的剪枝分布对齐，有效抑制性能下降。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l888_https_arxiv_org_abs_2603_05898/figures/004_Figure_4.jpg]]
-*Figure 4: The importance heatmaps of the three conditions across timesteps and layers*
-
 ![[assets/figures/papers/paper_list_l888_https_arxiv_org_abs_2603_05898/figures/007_Figure_6.jpg]]
 *Figure 6: Comparison of image generation quality under different condition token pruning strategies*
-
-![[assets/figures/papers/paper_list_l888_https_arxiv_org_abs_2603_05898/figures/008_Figure_7.jpg]]
-*Figure 7: Ablation study of Text Feature Enhancement Module. Zoom in for details*
-
-
 
 ## 实验与关键发现
 
@@ -252,9 +232,6 @@ Stage II 模型在引入重要性感知剪枝与解耦注意力后，各项指�
 ### 2. 效率分析：推理延迟与计算量
 
 Table 2 对比了不同训练阶段的推理效率。全量注意力的 Flux-Kontext 基线在 A100 上推理延迟为 76.02s，FLOPs 达 218.45T。Stage I 因保留全量令牌，延迟与计算量基本持平。经两阶段训练与令牌剪枝后，Stage II 将推理延迟降至 47.32s（降低 37.8%），FLOPs 降至 135.25T（降低 38.1%），GPU 内存占用减少 28.7%。这一效率提升的核心机制在于：解耦注意力消除了条件流对噪声流的冗余关注（即 $Q_c \to K_n$ 交叉项），且条件流激活可在推理中跨步缓存，避免了重复计算。
-
-![[assets/figures/papers/paper_list_l888_https_arxiv_org_abs_2603_05898/figures/009_Table_2.jpg]]
-*Table 2: Efficiency analysis across different training stages*
 
 ### 3. 消融实验
 
@@ -285,16 +262,6 @@ Table 2 的对比表明，若直接在 Stage I 模型上应用剪枝而不进行
 ### 4. 失败模式与局限性
 
 尽管 Stage II 在效率上取得显著提升，其在 Sen. Acc（0.847 vs 0.857）和 DINO（0.914 vs 0.923）上的轻微下降揭示了当前方法的固有权衡：文字与主体的极致保真度仍需要更充分的条件令牌交互。此外，实验均在 InnoComposer-80K 电商数据集上进行，文字渲染验证范围限于中英文，尚未覆盖其他语种、多行密集文本或复杂排版场景。重要性分析依赖固定掩码（主体区域、文字区域），对无掩码的开放条件（如非矩形装饰元素）的泛化性未经验证，需人工评估后谨慎推广。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l888_https_arxiv_org_abs_2603_05898/figures/001_Figure_1.jpg]]
-*Figure 1: Inno-Composer generates high-quality e-commerce posters under three independent controls—background style, subject appearance, and glyph text. Each row varies a single condition while keeping the other two fixed. The bottom-right inset shows the input of the varied condition*
-
-![[assets/figures/papers/paper_list_l888_https_arxiv_org_abs_2603_05898/figures/010_Figure_8.jpg]]
-*Figure 8: Additional qualitative results generated by our method*
-
-
 
 ## 定位与知识库关联
 
@@ -331,8 +298,6 @@ InnoAds-Composer 处于多模态条件图像生成与高效推理的交叉点。
 4. **三维文字渲染扩展**：TFEM 中的位置编码能否扩展至三维场景（如立体包装文字渲染、曲面文字），或与图形引擎结合实现**实时预览**？这需要将 2D 的绝对位置、字体大小编码升级为 3D 空间变换参数。
 
 5. **训练效率的进一步优化**：两阶段训练虽然提升了推理效率，但增加了训练复杂度。能否通过**知识蒸馏**或**一次性剪枝训练**（在训练过程中动态丢弃令牌）将两个阶段合并，同时保持质量与效率？
-
-
 
 ## 原文 PDF
 

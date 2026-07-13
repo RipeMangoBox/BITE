@@ -58,8 +58,6 @@ claims:
 
 UMF 的局限性在于：当前设计以主角色为中心，仅适用于约 10 人规模的中等群体交互，尚无法直接扩展到密集人群动态（≈100 人）。如何借助大规模视频扩散模型的视觉先验突破这一规模限制，是未来的开放方向。
 
-
-
 ### 问题背景：从固定人数到无人数约束的文本-动作生成
 
 文本驱动的三维人体运动生成旨在根据自然语言描述合成逼真的动作序列。这一任务在电影制作、游戏开发、虚拟现实和人机交互等领域具有广泛的应用前景。然而，现实场景中的交互往往涉及**可变数量**的参与者——从单人独舞到双人搏击，再到多人群体协作——这对生成模型的泛化能力提出了严峻挑战。
@@ -82,8 +80,6 @@ UMF 的局限性在于：当前设计以主角色为中心，仅适用于约 10 
 2. **多次反应生成**：基于已生成的上下文，通过联合概率路径学习反应变换，从根本上缓解自回归误差累积。
 
 这一设计的因果调节变量在于：**用流匹配的概率路径替代确定性条件映射**，使反应生成阶段能够同时考虑反应变换与上下文重建，从而在概率层面实现误差的自纠正。图 1c 示意了这一两阶段设计如何将异构运动先验作为反应流路径的自适应起点，从而打破确定性条件网络的单向误差传播链条。
-
-
 
 ## 核心方法与创新机理
 
@@ -151,8 +147,6 @@ UMF在推理时采用**非对称步数分配**策略：P-Flow获得充足的推�
 
 UMF当前以主角色为中心，适用于中等规模群体交互（约10人），尚无法直接扩展到密集人群动态（约100人）。如何利用大规模视频扩散模型的视觉先验突破这一规模限制，是论文提出的开放问题。
 
-
-
 UMF 将“无人数限制”的运动生成分解为两个核心阶段：**单次运动先验生成**与**多次反应生成**，并在统一的潜空间中完成异构数据的联合训练。其整体 pipeline 由三个关键模块串联而成，形成从原始运动编码到最终多人运动序列的完整生成链路。
 
 ### 数据预处理与统一表示
@@ -208,13 +202,6 @@ S-Flow 基于已生成的上下文运动，为后续角色逐一生成反应运�
 - **阶段一**：P-Flow 在统一潜空间中生成第一个角色的运动先验 $\hat{z}$
 - **阶段二**：S-Flow 以已生成的动作集合为上下文，通过 Context Adapter 编码后，逐角色生成反应运动
 - **输出**：解码后的多人运动序列，人数由文本描述动态决定，无需预设
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l14_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Unified_Number_F/figures/001_Figure_1.jpg]]
-*Figure 1: Core contribution of UMF. We show dual-agent cases here for simplicity. (a) Standard methods [51, 57] are restricted to a fixed number of agents. (b) Autoregressive methods [12] decouple generation into a motion prior and subsequent reaction. The reaction is typically guided by the prior using a conditioning network. (c) Our UMF leverages a heterogeneous motion prior as the adaptive start point of the reaction flow path, mitigating error accumulation*
-
-
 
 UMF 将无人数约束的运动生成分解为三个核心模块：统一运动 VAE、金字塔流匹配（P-Flow）先验生成、半噪声流匹配（S-Flow）反应生成。其理论基础建立在流匹配（Flow Matching）框架之上。
 
@@ -280,8 +267,6 @@ $$\hat{w}_{t_{m+1}} \gets \hat{w}_{t_m} + (t_{m+1} - t_m) G_{\theta}^{S}(\hat{w}
 
 值得注意的是，UMF 采用非对称的推理预算分配策略：P-Flow 获得充足的推理步数（如 50 步）以生成高质量运动先验，而 S-Flow 仅需极少的推理步数（如 10 步）即可完成反应生成。这种设计源于高质量先验降低了反应生成的难度，使得 S-Flow 在轻量推理下仍能保持鲁棒性。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -317,16 +302,8 @@ UMF 在两个核心基准上均取得最优性能：多人生成基准 InterHuma
 - **Figure 2** 展示了三阶段架构：统一运动 VAE 将异构数据编码到多令牌潜空间，P‑Flow 层级式生成运动先验，S‑Flow 基于上下文适配器联合学习反应变换与上下文重建。
 - **Figure 4** 的用户研究表明，UMF 在真实感、交互合理性和文本匹配度三个维度上均优于 FreeMotion，进一步佐证了定量指标的提升具有感知层面的实际意义。
 
-![[assets/figures/papers/paper_list_l14_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Unified_Number_F/figures/008_Figure_4.jpg]]
-*Figure 4: The UMF number-free zero-shot generation user study. We asked users to compare our UMF (Blue Bar) to the FreeMotion (Red Bar) in a side-by-side view. The dashed line marks 50%. UMF outperforms FreeMotion in all three aspects of generation*
-
 ![[assets/figures/papers/paper_list_l14_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Unified_Number_F/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the Unified Motion Flow (UMF) architecture. The UMF framework consists of three stages. (A) Unified motion VAE: A motion VAE with latent adapters encodes raw motions from heterogeneous datasets (e.g., HumanML3D [13], InterHuman [32]) into a regularized multi-token latent representation (Z). (B) P-Flow motion prior generation: The Pyramid Flow Transformer synthesizes the latent motion prior (Zˇ) based on noisy latent motion and text conditions. The P-Flow operates hierarchically based on the timestep*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l14_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Unified_Number_F/figures/004_Table_1.jpg]]
-*Table 1: Quantitative evaluation on the InterHuman test sets. ± indicates a 95% confidence interval and → means the closer to ground truth the better. Boldface indicates the best result, while underline refers to the second best*
 
 ![[assets/figures/papers/paper_list_l14_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Unified_Number_F/figures/005_Table_2.jpg]]
 *Table 2: Comparison to state-of-the-art for human action-reaction synthesis on the InterHuman-AS dataset. ± indicates 95% confidence interval, → means that closer to Real is better. Bold indicates best result and underline indicates second best*
@@ -339,8 +316,6 @@ UMF 在两个核心基准上均取得最优性能：多人生成基准 InterHuma
 
 ![[assets/figures/papers/paper_list_l14_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Unified_Number_F/figures/009_Table_4.jpg]]
 *Table 4: Ablation study of Pyramid Flow on the InterHuman dataset. UMF has a 2-stage temporal pyramid structure. We report FLOPs(G) and AITS (Average Inference Time in Seconds)*
-
-
 
 ## 定位与知识库关联
 
@@ -388,8 +363,6 @@ UMF在文本到运动生成领域的方法谱系中占据**通用无人数约束
 3. **S-Flow半噪声联合路径**：为自回归/级联生成中的误差累积问题提供了概率框架内的解决方案，可推广至其他序列条件生成场景。
 
 与同期工作的关系上，UMF在通用性上超越特化方法（InterMask、ReGenNet），在生成质量上超越同类通用方法（FreeMotion），其核心优势源于对“表示统一”和“概率路径设计”两个维度的联合优化。
-
-
 
 ## 原文 PDF
 

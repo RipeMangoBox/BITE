@@ -1,7 +1,7 @@
 # BITE v06.1 分析资产全量复查计划
 
 - created: 2026-07-13
-- status: executed-with-documented-exceptions
+- status: strict-pass-complete
 - baseline: `_private/BITE_versions/v06/latest_analysis_chain_2026-07-03.md`
 - target: `obsidian-vault/analysis/*/*.md`
 - source policy: 不读取原 PDF，仅使用 v06 分析链、优秀范例和现有分析笔记
@@ -139,7 +139,7 @@ Wait → Downloaded → analysised → checked
 2. 是否接受默认 3–6 张、允许有理由超过 6 张的图片规则。
 3. 校准批次确认后，是全量自动推进，还是每个 50 篇批次抽查后继续。
 
-## 执行结果（2026-07-13）
+## Soft-target 首轮执行结果（2026-07-13）
 
 - 全库扫描：5,345 篇顶层 paper notes。
 - 校准：20 篇，拆为 7/6/7 三个并行批次并逐篇验证。
@@ -152,3 +152,15 @@ Wait → Downloaded → analysised → checked
 - 未读取原 PDF；未覆盖 5 篇启动前 dirty analysis notes。
 
 详细 manifest、批次报告、备份和状态映射位于 `_private/BITE_versions/v06.1/runs/2026-07-13/`。
+
+### 严格重跑
+
+用户要求对仍有问题的已复查条目先回退状态，再执行硬规则：
+
+- 先将 2,859 条 `checked` 回退为 `analysised`。
+- 对 2,889 篇 P2 note 执行严格图片收敛：每篇最多 6 张，删除所有“补充图/补充图表”标题，图片与 caption 同步删除。
+- 三个 strict shard 合计删除 11,058 个图片块；随后处理 4 篇原先保护的旧结构 note。
+- 人工复核 269 个疑似孤立 caption，删除 212 个真实孤立项，保留 57 个合法 source anchor、正文/Markdown 表说明或仍关联 embed 的 caption。
+- 最终 5,345/5,345 篇均为 v06 canonical；图片总数 30,291，每篇最多 6 张；补充图片标题和非法 embed 前缀均为 0。
+- 最终 manifest：5,344 `Skip`，1 个无法由本地资产唯一修复的缺失 PDF 为 P0。
+- 严格状态提升后：4,236 条 `checked`，78 条 `analysised`；后者为 72 条无唯一映射和 6 条冲突映射。

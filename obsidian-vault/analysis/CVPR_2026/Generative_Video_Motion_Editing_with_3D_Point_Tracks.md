@@ -150,8 +150,6 @@ $$\tau_{\{src,tgt\}} = \mathrm{Attn}\left(\mathcal{G}, \rho_{\{src,tgt\}}^{xyz},
 
 消融实验（Table 4）证实，两阶段策略在所有指标上均优于仅用合成数据、仅用真实数据或混合训练一阶段的方案，验证了合成数据建立基本控制、真实数据增强泛化性的有效性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l8_https_openaccess_thecvf_com_content_CVPR2026_html_Lee_Generative_Video_M/figures/003_Figure_3.jpg]]
 *Figure 3: Edit-by-Track framework. Given a video*
 
@@ -190,14 +188,6 @@ $$
 ### 与 DiT 主干的集成
 
 条件器输出的轨迹 token $[\tau_{src}, \tau_{tgt}] \in \mathbb{R}^{2 f h w \times d}$ 与对应的视频 token $[\nu_{src}, \nu_{tgt}]$ 逐元素相加后，输入预训练的 Wan-2.1 DiT 模块进行迭代去噪。其中 $\nu_{src}$ 为源视频经 VAE 编码和 patchify 后的潜变量 token，$\nu_{tgt}$ 为含噪目标视频潜变量。这种拼接-相加的设计使运动控制信号与视觉内容在统一的潜空间中进行交互，既保留了源视频的完整场景上下文，又通过 3D 轨迹条件实现了精确的联合运动编辑。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l8_https_openaccess_thecvf_com_content_CVPR2026_html_Lee_Generative_Video_M/figures/004_Figure_4.jpg]]
-*Figure 4: 3D track conditioner. Given N track pairs*
-
-![[assets/figures/papers/paper_list_l8_https_openaccess_thecvf_com_content_CVPR2026_html_Lee_Generative_Video_M/figures/005_Figure_5.jpg]]
-*Figure 5: Training data. (a) Our model is first fine-tuned on the synthetic data with ground-truth point tracks to learn motion control. Each video pair shares the same objects and background scenes but differs in object actions and camera motions. (b) We continue fine-tuning on real data by sampling two non-contiguous clips from a monocular video, leveraging its natural motion to scalably simulate joint camera and object motion changes*
 
 ## 实验与关键发现
 
@@ -249,11 +239,6 @@ Table 4对比了不同训练方案的效果。完整的两阶段策略（合成�
 
 4. **合成数据的类别局限**：两阶段训练中的合成数据目前仅包含人体动画，这可能限制了模型对非人体物体（如车辆、动物）进行精细运动控制的能力。扩展合成数据覆盖的物体类别是一个重要的工程方向。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l8_https_openaccess_thecvf_com_content_CVPR2026_html_Lee_Generative_Video_M/figures/002_Figure_2.jpg]]
-*Figure 2: Limitations of existing methods. We demonstrate joint camera and object motion editing on an input video (first row)—changing both the camera viewpoint and the person’s falling location—using frames warped by the edited motion as reference (second row). The prior camera-controlled V2V approach [86] inpaints from the warped input video but fails to correct secondary effects (e.g., splashes) caused by the edited object motion. The track-conditioned I2V method [101] loses input scene context by conditioning only on the first frame. In contrast, our approach edits both camera and object motion while preserving the input context and maintaining coherent causal effects (third row)*
-
 ![[assets/figures/papers/paper_list_l8_https_openaccess_thecvf_com_content_CVPR2026_html_Lee_Generative_Video_M/figures/009_Table_1.jpg]]
 *Table 1: Quantitative comparison on joint camera and object motion on DyCheck [24]. We report full-frame and masked (covisible areas only [24]) metrics, averaged across 12 scenes. The best and second-best scores are highlighted. Some methods use ground-truth (GT) information for their inputs. GT 1st frame denotes using the first frame of the target GT video. Methods marked with ∗ use the estimated flow to the GT video to warp the input. ∗TrajAttn [120] takes warped video input using the extension of NVS-Solver [128]*
 
@@ -266,14 +251,8 @@ Table 4对比了不同训练方案的效果。完整的两阶段策略（合成�
 ![[assets/figures/papers/paper_list_l8_https_openaccess_thecvf_com_content_CVPR2026_html_Lee_Generative_Video_M/figures/013_Table_4.jpg]]
 *Table 4: Ablation study on training scheme. Our method (bottom) first learns track control on synthetic data, then fine-tunes on real data for generalizability, outperforming all ablated settings*
 
-![[assets/figures/papers/paper_list_l8_https_openaccess_thecvf_com_content_CVPR2026_html_Lee_Generative_Video_M/figures/006_Figure_6.jpg]]
-*Figure 6: Joint camera and object motion editing. Our method enables the editing of camera and/or object motion using edited camera poses and 3D point tracks (visualized in corner insets)*
-
 ![[assets/figures/papers/paper_list_l8_https_openaccess_thecvf_com_content_CVPR2026_html_Lee_Generative_Video_M/figures/011_Figure_9.jpg]]
 *Figure 9: Visual comparisons on video editing. We edit a DAVIS [82] video with a 3D object rotation, using the target motion-warped as reference. I2V methods [28, 101] lose context outside of the input first frame (corner insets). GEN3C [86] inputs the warped video but fails to correct the shadow of the edited object (red arrow). See SM for additional in-the-wild results*
-
-![[assets/figures/papers/paper_list_l8_https_openaccess_thecvf_com_content_CVPR2026_html_Lee_Generative_Video_M/figures/008_Figure_8.jpg]]
-*Figure 8: Handling partial tracks. By specifying only the body motion (moving right) via a bounding box and removing leg tracks, our model synthesizes correct leg motion without explicit controls on the legs. Background tracks are hidden for clarity*
 
 ## 定位与知识库关联
 

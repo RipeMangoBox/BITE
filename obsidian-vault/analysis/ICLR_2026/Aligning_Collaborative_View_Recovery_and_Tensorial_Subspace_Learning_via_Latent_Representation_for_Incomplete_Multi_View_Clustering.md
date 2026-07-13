@@ -47,8 +47,6 @@ claims:
 
 本文提出了一种名为 **ARSL-IMVC**（Aligning Collaborative View Recovery and Tensorial Subspace Learning via Latent Representation for Incomplete Multi-View Clustering）的新方法，用于解决不完整多视图聚类（Incomplete Multi-View Clustering, IMVC）问题。核心思想是通过引入一个共享的潜在表示 H 作为桥梁，将协作视图恢复（Collaborative View Recovery, CVR）和张量子空间学习（Tensorial Subspace Learning, TSL）统一到一个框架中，使得视图恢复和子空间表示学习能够相互促进，从而更充分地利用多视图间的互补性和一致性。实验结果表明，ARSL-IMVC 在多个基准数据集上显著优于现有方法。
 
-
-
 多视图聚类（Multi-View Clustering, MVC）旨在利用来自不同视角或来源的数据进行无监督聚类。然而，在实际应用中，数据往往存在视图缺失问题，即某些样本在某些视图上不可用，这被称为不完整多视图聚类（IMVC）。
 
 现有基于插补的 IMVC 方法通常将视图恢复和子空间表示学习作为两个独立或顺序执行的步骤，缺乏显式对齐和协作交互。具体来说，现有方法存在以下瓶颈：
@@ -57,8 +55,6 @@ claims:
 - **互补性与一致性探索不足**：无法同时充分利用多视图间的互补性（多样性）和一致性（共享结构）。
 
 本文的核心动机是：**通过共享潜在表示 H 作为桥梁，将协作视图恢复和张量子空间学习显式对齐，使得两者在互补性和一致性探索上能够相互促进，从而提升聚类性能。**
-
-
 
 ## 核心方法与创新机理
 
@@ -69,8 +65,6 @@ ARSL-IMVC 的核心创新体现在以下三个关键设计变更：
 | 视图恢复与子空间学习的交互方式 | 弱耦合或顺序执行，缺乏显式对齐 | 通过共享潜在表示 H 实现显式对齐和协作交互 | "leveraging the latent representation as a bridge in a unified framework, the ARSL-IMVC seamlessly aligns the complementarity and consistency exploration across view recovery and subspace representation learning" |
 | 视图恢复中的多样性建模 | 通常仅考虑一致性或简单正则化 | 引入 HSIC 正则化项，显式鼓励视图特定估计器之间的多样性 | "HSIC(E_1^v, E_1^w) = Tr(K_v \tilde{H} K_w \tilde{H}) / (n-1)^2" |
 | 子空间表示的结构建模 | 通常仅考虑视图共享或视图特定表示之一 | 同时学习视图共享子空间 Z 和视图特定子空间 Z^v，并堆叠成低秩张量以捕获高阶相关性 | "Z = Φ(Z^1, Z^2, ..., Z^V, Z)" |
-
-
 
 ![[assets/figures/papers/iclr26_representation_self_supervised_transfer__representation_learning__b001_a5aRjldX9l_Alignin/figures/001_Figure_1.jpg]]
 *Figure 1: The overall framework of proposed ARSL-IMVC method, which mainly consists of CVR and TSL modules and aligns them in cross-view consistency and complementarity exploration by a latent representation.*
@@ -83,8 +77,6 @@ ARSL-IMVC 的整体框架如 Figure 1 所示，主要由两个核心模块组成
 2. **张量子空间学习（TSL）模块**：对潜在表示和恢复视图施加自表示约束，学习共享子空间 Z 和视图特定子空间 Z^v，并堆叠成低秩张量以捕获高阶相关性。
 
 两个模块通过共享潜在表示 H 实现对齐和协作交互。
-
-
 
 ### 5.1 协作视图恢复（CVR）
 
@@ -165,14 +157,11 @@ H = H Z + E_H, \quad P^v H + E_1^v = (P^v H + E_1^v) Z^v + E_2^v
 \mathbf{S} = ( |\mathbf{Z}| + |\mathbf{Z}^T| + \sum_{v=1}^V |Z^v| + \sum_{v=1}^V |(Z^v)^T| ) / (V+1)
 \]
 
-
-
 ## 实验与关键发现
 
 ### 6.1 主要实验结果
 
 **Table 2: Clustering results of all methods on the BBCSport, HW, and BDGP datasets.**
-
 
 ![[assets/figures/papers/iclr26_representation_self_supervised_transfer__representation_learning__b001_a5aRjldX9l_Alignin/figures/003_Table_2.jpg]]
 *Table 2: Clustering results of all methods on the BBCSport, HW, and BDGP datasets.*
@@ -193,7 +182,6 @@ H = H Z + E_H, \quad P^v H + E_1^v = (P^v H + E_1^v) Z^v + E_2^v
 
 **Table 4: Clustering results of some methods on HDigit datasets with the missing rate of 0.1.**
 
-
 ![[assets/figures/papers/iclr26_representation_self_supervised_transfer__representation_learning__b001_a5aRjldX9l_Alignin/figures/010_Table_4.jpg]]
 *Table 4: Clustering results of some methods on HDigit datasets with the missing rate of 0.1.*
 
@@ -208,7 +196,6 @@ H = H Z + E_H, \quad P^v H + E_1^v = (P^v H + E_1^v) Z^v + E_2^v
 ### 6.2 消融实验
 
 **Table 3: The experimental results of ARSL-IMVC and its ablation variant with the 0.1 missing ratio.**
-
 
 ![[assets/figures/papers/iclr26_representation_self_supervised_transfer__representation_learning__b001_a5aRjldX9l_Alignin/figures/005_Table_3.jpg]]
 *Table 3: The experimental results of ARSL-IMVC and its ablation variant with the 0.1 missing ratio.*
@@ -229,7 +216,6 @@ H = H Z + E_H, \quad P^v H + E_1^v = (P^v H + E_1^v) Z^v + E_2^v
 
 **Figure 2: Clustering results on Yale, NGs, 100leaves and Scene-15 with different missing rates.**
 
-
 ![[assets/figures/papers/iclr26_representation_self_supervised_transfer__representation_learning__b001_a5aRjldX9l_Alignin/figures/004_Figure_2.jpg]]
 *Figure 2: + BSV+ConCact +DAIMC→UEAF IMSC-AGL *HCLS-CGL +HCP-IMSC→BWIC-TIMCRMoGLOurS Figure 2: Clustering results on Yale, NGs, 100leaves and Scene-15 with different missing rates.*
 
@@ -247,13 +233,8 @@ ARSL-IMVC 在缺失率增加时，性能下降幅度小于其他方法，表现�
 - 比较方法均使用作者提供的原始代码或公开实现，并采用推荐参数设置。
 - ARSL-IMVC 在多个数据集和不同缺失率下均取得最佳或次优结果，表明其泛化能力。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_representation_self_supervised_transfer__representation_learning__b001_a5aRjldX9l_Alignin/figures/002_Table_1.jpg]]
 *Table 1: Main notations and descriptions in this study.*
-
-
-
 
 ## 定位与知识库关联
 
@@ -281,8 +262,6 @@ ARSL-IMVC 的创新在于同时解决了三个关键问题：
 - HSIC 正则化项的计算复杂度较高，是否存在更高效的多样性正则化方法？
 - 如何自动确定潜在表示 H 的维度 k？
 - 方法在非随机缺失模式下的表现如何？
-
-
 
 ## 原文 PDF
 

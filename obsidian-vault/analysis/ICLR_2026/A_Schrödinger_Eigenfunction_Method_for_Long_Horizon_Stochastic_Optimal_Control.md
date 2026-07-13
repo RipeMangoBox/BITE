@@ -53,8 +53,6 @@ claims:
 
 实验结果表明，在多个d=20的高维长时域基准问题（包括各向同性/各向异性/排斥型二次成本、双阱势、环形势）上，提出的方法在控制L²误差上比现有最优方法提升约一个数量级。例如，在DOUBLE WELL设置中，混合方法（COMBINED SOCM）的控制目标为32.4421 ± 0.0088，而最佳基线（IDO Log variance）为32.8645 ± 0.0094。消融实验验证了相对损失相对于绝对损失的显著优势、纯本征函数方法在近终端区域的退化以及混合方法的必要性。
 
-
-
 长时域随机最优控制（SOC）问题在科学和工程中广泛存在，但其求解面临严重的计算瓶颈。现有方法——包括基于前向-后向随机微分方程（FBSDE）的深度求解器和迭代扩散优化（IDO）系列方法——在时间域 $T$ 增长时性能急剧下降：内存和运行时间至少线性增长于 $T$（复杂度 $O(Td)$），误差估计随 $T$ 增大而恶化（Han & Long, 2020, Theorem 4），重要性采样权重方差可能随 $T$ 指数增长（Liu et al., 2018）。如图 Figure 1 所示，现有方法在固定 $d$ 下随 $T$ 增大控制误差显著上升。
 
 该问题的根源在于传统方法将控制参数化为全时域神经网络 $u_\theta(x,t)$，需同时处理整个时间区间 $[0,T]$。当 $T$ 增大时，网络需要拟合的时空复杂度线性增长，同时终端条件的影响通过时间反向传播传播，导致梯度信号衰减或爆炸。
@@ -64,8 +62,6 @@ claims:
 然而，直接学习本征函数面临现有损失函数的缺陷：Deep Ritz 损失和 PINN 损失 $\|\mathcal{L}\psi - \lambda\psi\|^2$ 隐式地重加权，导致在高价值函数区域学习失败（Figure 3 展示）。为此，本文提出相对本征函数损失 $\|\mathcal{L}\psi/\psi - \lambda\|^2$，消除重加权效应，正确恢复控制所需的主导本征对。
 
 基于此，本文方法（EIGF+IDO）采用混合控制参数化：远终端时域（$t \leq T_{cut}$）仅用 $\partial_x \log \phi_0$，近终端时域（$t > T_{cut}$）添加指数衰减的短时域修正项 $e^{-(\lambda_1-\lambda_0)(T-t)/(2\beta)} v^{\theta_1}(x,t)$。这一设计在多个高维（$d=20$）长时域基准上实现控制 $L^2$ 误差比现有方法提升约一个数量级（Table 3, Table 4），同时为对称 LQR 问题提供了任意终端成本的闭式解析解（Theorem 4）。
-
-
 
 ## 核心方法与创新机理
 
@@ -139,8 +135,6 @@ $$
 
 消融实验表明：增加本征函数数量在d=20 LQR中收益递减；仅用基态本征函数的遍历估计器（EIGF）随T增长误差降低，但混合方法（EIGF+IDO）显著更优。
 
-
-
 ![[assets/figures/papers/iclr26_0003_lcEw5NcSij_A_Schrödinger_Eigenfunction_Method_for_Long-Hori/figures/013_Figure_9.jpg]]
 *Figure 9: In this experiment EIGF method uses an ergodic estimator based only on the first eigenfunction. EIFG+IDO curve corresponds to the application of the proposed controller (22) with Relative Entropy loss. The figure shows L ^ { 2 } control error for different methods after 30000 iterations*
 
@@ -159,8 +153,6 @@ $$
 **关键因果机制**：长时域控制的瓶颈在于现有方法（FBSDE、IDO 等）需要处理整个时间域 [0,T]，导致内存和运行时间线性增长于 T，且误差随 T 增大而恶化（Figure 1）。该方法通过谱分解将时间依赖转移到指数衰减因子 $e^{-\lambda_i \tau}$ 上，使得长时域行为由基态主导，从而将时域复杂度从 O(Td) 降至 O(d)。这一降维的代价是要求系统满足梯度漂移假设，且有效势能 V(x) → ∞ 当 ||x|| → ∞。
 
 **证据强度**：理论部分（酉等价、谱离散性）有严格证明，置信度 1.0。实验部分（Figure 5, Table 3, Table 4）显示在多个 d=20 的高维长时域基准上，控制 L² 误差比现有方法提升约一个数量级。但需注意，T_cut 的选择缺乏先验方法，需根据谱隙和具体应用决定，这是一个需要手动验证的弱点。
-
-
 
 ### 问题形式化与线性化
 
@@ -261,8 +253,6 @@ $$
 
 其中 $T_{cut}$ 为截止时间（实验中取 $T_{cut} = T-1$），$v^{\theta_1}$ 由短时域 IDO/FBSDE 求解器学习。该参数化将复杂度从 $O(Td)$ 降至 $O(d)$，同时通过指数衰减因子 $e^{-(\lambda_1-\lambda_0)(T-t)}$ 平滑衔接两个区域。
 
-
-
 ## 实验与关键发现
 
 ### 主结果：控制目标与L²误差
@@ -287,7 +277,6 @@ $$
 
 **SOCM收敛失败**：在QUADRATIC (REPULSIVE)设置中，SOCM方法未收敛导致动力学发散（Table 3），表明该方法对势能函数类型敏感。
 
-
 ![[assets/figures/papers/iclr26_0003_lcEw5NcSij_A_Schrödinger_Eigenfunction_Method_for_Long-Hori/figures/014_Table_3.jpg]]
 *Table 3: Control objective for the different methods in the QUADRATIC (ISOTROPIC) and QUADRATIC (REPULSIVE) settings. The SOCM method did not converge, and hence the dynamics diverge*
 
@@ -295,22 +284,16 @@ $$
 
 **计算成本差异**：Table 2报告了不同方法的迭代时间，但未对总计算时间进行公平性校正。本征函数方法因需要计算网络对输入的导数（要求GELU等平滑激活函数），单次迭代成本可能高于IDO方法。
 
-
 ![[assets/figures/papers/iclr26_0003_lcEw5NcSij_A_Schrödinger_Eigenfunction_Method_for_Long-Hori/figures/008_Table_2.jpg]]
 *Table 2: Iteration times by method and loss*
 
 **公平性说明**：所有方法使用相同神经网络架构（IDO方法使用ReLU激活的简化U-Net，本征函数方法使用GELU激活以保证导数平滑性）。训练迭代次数统一，但本征函数预训练需要额外80k次迭代。控制目标通过N=65536次蒙特卡洛模拟估计，报告均值±标准误差。
-
-### 补充图表
 
 ![[assets/figures/papers/iclr26_0003_lcEw5NcSij_A_Schrödinger_Eigenfunction_Method_for_Long-Hori/figures/005_Table_1.jpg]]
 *Table 1: Opinion dynamics, final control objective (smaller is better)*
 
 ![[assets/figures/papers/iclr26_0003_lcEw5NcSij_A_Schrödinger_Eigenfunction_Method_for_Long-Hori/figures/015_Table_4.jpg]]
 *Table 4: Control objective for the different methods in the QUADRATIC (ANISOTROPIC) and DOUBLE WELL settings*
-
-
-
 
 ## 定位与知识库关联
 
@@ -363,8 +346,6 @@ $$
 5. 能否将方法扩展到多个本征函数以处理更小的谱隙？附录C.2给出了PINN和变分损失的多本征函数扩展，但实验表明收益递减，需要更高效的多模态学习策略。
 
 **公平性说明**：所有方法使用相同神经网络架构（IDO方法使用ReLU激活的简化U-Net，本征函数方法使用GELU激活），训练迭代次数统一为30k次（除本征函数预训练80k次外）。控制目标通过 $N=65536$ 次蒙特卡洛模拟估计。但迭代时间因方法而异（Table 2），未对总计算时间进行公平性校正。
-
-
 
 ## 原文 PDF
 

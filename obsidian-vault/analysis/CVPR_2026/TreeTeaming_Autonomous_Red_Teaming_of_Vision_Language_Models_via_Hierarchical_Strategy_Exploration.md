@@ -50,8 +50,6 @@ claims:
 
 在12个主流VLM上的实验表明，TreeTeaming在其中11个模型上取得了最先进的攻击成功率，在GPT-4o上达到87.60%，比此前最优的红队方法**Trust-VLM**（MM'24/ICML'25）高出5.56个百分点，且仅需5次样本细化迭代（后者需50次）。更重要的是，TreeTeaming自主发现的策略在多样性上超过了由15种已有越狱方法组成的联合集（kNN-entropy从2.694提升至2.723），同时生成样本的视觉毒性降至9.86%、文本毒性降至6.63%，平均毒性降低23.09%。消融实验进一步证实，将分层策略树替换为平铺策略库后，GPT-4o上的ASR从87.60%骤降至71.80%，策略多样性同步下降，验证了树结构在策略空间探索中的关键作用。
 
-
-
 ### 视觉语言模型的安全挑战
 
 视觉语言模型（VLMs）的快速发展使其在视觉问答、多模态推理等任务中展现出强大能力，但同时也暴露出严重的安全隐患。恶意攻击者可通过精心构造的图像-文本组合诱导模型生成有害内容，例如非法行为指导、仇恨言论或隐私泄露。这种跨模态攻击的复杂性远超纯文本场景：图像通道提供了隐蔽的语义注入途径，而视觉与文本的交互又产生了新的漏洞面。因此，构建系统化的红队测试方法以发现和修复这些漏洞，已成为VLM安全研究的核心议题。
@@ -73,8 +71,6 @@ claims:
 3. **多模态策略的精确执行**：抽象策略必须被准确转化为具体的图像-文本测试用例，且生成的样本需与策略意图严格对齐，否则将引入噪声、降低测试有效性。
 
 TreeTeaming正是围绕上述动机构建的：通过引入**分层策略树**和**LLM驱动的编排器**，框架从单一种子示例出发，自主生长出完整的策略树，实现对未知攻击向量的系统性发现。这一范式转换——从“测试已知策略”到“发现未知策略”——构成了本文的核心贡献。
-
-
 
 ## 核心方法与创新机理
 
@@ -106,8 +102,6 @@ $$\tau_{\mathrm{dynamic}} = \max\left\{ \tau_{\mathrm{initial}} \cdot \left(1 - 
 
 TreeTeaming 的第三个协同模块——失败原因分析模型——构成了完整的反馈闭环。该模块在样本层面分析单次攻击失败的具体原因，在策略层面统计聚合所有叶节点的失败日志，识别主导失败模式。这一双层面归因信息反馈给编排器，驱动后续的利用与探索决策，使整个红队测试过程具备自我进化的能力。
 
-
-
 TreeTeaming 通过三个协同模块构建了一个从策略发现到攻击执行再到反馈学习的闭环系统。与现有方法依赖静态、手工设计的攻击模板不同，该框架将整个策略树从**单个种子示例**开始动态生长，实现了攻击策略空间的自主探索与利用。
 
 ### 模块架构与数据流
@@ -128,8 +122,6 @@ TreeTeaming 通过三个协同模块构建了一个从策略发现到攻击执�
 - **输入**：单个种子示例（包含有害查询的文本-图像对）和目标任务描述。
 - **内部循环**：编排器从策略树中选择策略节点 → 执行器生成多模态测试样本 → 一致性检查器过滤 → 样本发送至目标VLM → 失败原因分析模型收集结果并反馈 → 编排器更新策略状态并决定下一轮探索/利用。
 - **输出**：一组多样化的攻击策略及其对应的测试样本，以及各目标VLM的攻击成功率评估。
-
-
 
 TreeTeaming 的核心工作流围绕三个协同模块展开：**策略树与编排器（Strategy Tree & Orchestrator）**、**多模态执行器与策略一致性检查器（Multimodal Actuator & Strategy Consistency Checker）**，以及**失败原因分析模型（Failure Cause Analysis Model）**。三者共同构成一个闭环的自主红队测试系统。
 
@@ -165,16 +157,11 @@ $$\tau_{\mathrm{dynamic}} = \max\left\{ \tau_{\mathrm{initial}} \cdot \left(1 - 
 
 编排器使用 Qwen2.5-72B（temperature=0.8）进行策略决策和失败分析，执行器则协作 Qwen-Image 和 Qwen-Image-Edit 生成多模态测试样本。三个模块形成“决策—执行—反馈”的闭环，使红队测试从静态策略测试转变为动态的、进化的漏洞发现过程。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验结果
 
 TreeTeaming在VLM红队测试任务上展现出显著优势。在SafeBench基准上，该方法在12个测试VLM中的11个上取得了最优攻击成功率（ASR），平均ASR达到89.48%（Table 1）。其中，在GPT-4o上达到87.60%的ASR，较此前最优红队方法**Trust-VLM**（MM'24 ICML'25）高出5.56个百分点。值得注意的是，Trust-VLM需50次样本细化迭代，而TreeTeaming仅使用5次迭代即实现超越，表明分层策略探索的效率优势。在安全对齐较强的Claude-3.5上，TreeTeaming以61.60%的ASR领先最佳越狱基线**SI-Attack**（ICCV'25）14.40个百分点，验证了自主策略发现对高安全模型的有效性。
-
-![[assets/figures/papers/paper_list_l2425_https_arxiv_org_abs_2603_22882/figures/003_Table_1.jpg]]
-*Table 1: Attack Success Rates (%, ↑) comparing seven jailbreak and two red-teaming methods across target VLMs. A higher ASR is better. The best and second-best results for each model are shown in bold and underlined, respectively, while a “/” denotes unavailable results due to the method not being open-source*
 
 在攻击样本质量方面，TreeTeaming生成的样本毒性显著降低：视觉毒性降至9.86%，文本毒性降至6.63%，平均毒性较Trust-VLM降低23.09%（Table 2）。这表明框架并非通过生成极端有害内容来提升ASR，而是通过更精巧的策略设计实现攻击。
 
@@ -207,9 +194,6 @@ Figure 3展示了三个关键超参数的影响。策略数量（Figure 3a）和
 
 策略可迁移性实验（Table 12）表明，从弱模型向强模型的上游迁移仍存在性能差距：DeepSeek-VL策略迁移至GPT-4o仅达81.60% ASR，低于在GPT-4o上从头发现的87.60%。但下游迁移（从强到弱）效果较好，说明强模型发现的策略具有更广泛的适用性。
 
-![[assets/figures/papers/paper_list_l2425_https_arxiv_org_abs_2603_22882/figures/016_Table_12.jpg]]
-*Table 12: Attack Success Rate (ASR) under strategy transfer. ‘Source’ denotes the model from which the test samples were generated, and ‘Target’ denotes the Vision Language Model (VLM) being tested*
-
 此外，TreeTeaming发现的策略能够增强现有方法（Table 6）：将自主发现的“注意力转移”范式注入FigStep和MMSafety后，两者ASR均获提升，验证了策略发现成果的可复用性。
 
 ![[assets/figures/papers/paper_list_l2425_https_arxiv_org_abs_2603_22882/figures/009_Table_6.jpg]]
@@ -219,24 +203,8 @@ Figure 3展示了三个关键超参数的影响。策略数量（Figure 3a）和
 
 尽管结果全面，仍需注意以下局限：完整评估单个VLM耗时11.75小时，计算开销较高；部分基线方法（如Arondight）未开源，导致在部分模型上的对比缺失，可能影响公平性评估的完整性；攻击样本生成依赖强大的多模态生成模型（Qwen-Image-Edit），在资源受限环境下的适用性需进一步验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2425_https_arxiv_org_abs_2603_22882/figures/005_Figure_3.jpg]]
 *Figure 3: Ablation study on the impact of hyperparameters on ASR (in %, ↑). (a) the number of strategies, (b) the number of attack attempts, and (c) the initial exploration threshold*
-
-![[assets/figures/papers/paper_list_l2425_https_arxiv_org_abs_2603_22882/figures/008_Table_5.jpg]]
-*Table 5: Attack Success Rate (in %, ↑) of different Orchestrator-Actuator combinations against various target VLMs*
-
-![[assets/figures/papers/paper_list_l2425_https_arxiv_org_abs_2603_22882/figures/013_Table_9.jpg]]
-*Table 9: Comparison of Attack Success Rate (ASR) with and without a checker*
-
-![[assets/figures/papers/paper_list_l2425_https_arxiv_org_abs_2603_22882/figures/018_Table_15.jpg]]
-*Table 15: Computational efficiency of TreeTeaming*
-
-![[assets/figures/papers/paper_list_l2425_https_arxiv_org_abs_2603_22882/figures/019_Table_14.jpg]]
-*Table 14: ASR comparison under defense mechanism*
-
-
 
 ## 定位与知识库关联
 
@@ -277,8 +245,6 @@ TreeTeaming 的适用边界由以下条件界定：
 4. **编排器的学习能力**：当前编排器依赖预训练 LLM（Qwen2.5-72B）的启发式决策。是否可以通过强化学习进一步优化编排器的探索-利用决策，使其从历史红队测试经验中学习，而非仅依赖当前树状态和失败分析反馈？
 
 5. **伦理与安全部署**：在现实世界部署中，如何确保生成的有害内容不会意外泄露？TreeTeaming 生成的攻击样本毒性虽已显著降低，但仍包含有害内容（视觉毒性 9.86%，文本毒性 6.63%），需要严格的访问控制和内容隔离机制。
-
-
 
 ## 原文 PDF
 

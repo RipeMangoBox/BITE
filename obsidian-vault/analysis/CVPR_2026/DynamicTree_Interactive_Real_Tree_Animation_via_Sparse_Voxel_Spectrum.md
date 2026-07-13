@@ -152,11 +152,6 @@ $$\mathcal{D}(t) = \sum_{k=1}^K \phi_k \cdot q^k(t)$$
 
 这使得 DynamicTree 在单帧仿真仅需约 18 ms（其中网格运动计算 13 ms、高斯变形计算 2.57 ms、渲染 2.65 ms），真正实现了实时交互。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1060_https_arxiv_org_abs_2510_22213/figures/001_Figure_1.jpg]]
-*Figure 1: DynamicTree achieves structurally consistent and realistic long-term animation and dynamic interaction on real-world 3DGS trees. It first generates mesh motion via a compact sparse voxel spectrum representation and then deforms the surface-bound Gaussian primitives. We visualize the slice of the generated motion at the orange scanline along the time dimension*
-
 ### 4D 动画生成的整体范式
 
 DynamicTree 将真实树木 4D 动画生成形式化为一个两阶段流水线（Figure 2）：**第一阶段**在频域生成网格运动，**第二阶段**通过网格表面绑定将变形传递到 3DGS 高斯体。这一设计的关键动机在于——直接预测海量高斯体（$H$ 个）在长序列（$T$ 帧）上的变形参数 $\bar{\mathcal{D}}_g$ 在内存和数据层面均不可行，因此必须寻找一种紧凑的中间运动表示。
@@ -344,18 +339,6 @@ Table 3 展示了体素分辨率对性能的影响：
 - **Figure 4**：交互仿真中产生更自然的振荡运动，模态分析框架赋予细粒度细节。
 - **Figure 5 + Table 3**：两阶段训练和 128³ 体素分辨率是生成无发散、长期一致运动的关键设计选择。
 - **Table 2**：在用户偏好中显著超过传统树木动画方法 Weber，证明学习型频谱生成的有效性。
-
-![[assets/figures/papers/paper_list_l1060_https_arxiv_org_abs_2510_22213/figures/003_Figure_3.jpg]]
-*Figure 3: Comparison with 4D generation methods. We visualize the middle frame of the sequence, where our method better preserves 3D structures. Space-time slices are shown, with vertical and horizontal axes representing time and the spatial profile along the brown line*
-
-![[assets/figures/papers/paper_list_l1060_https_arxiv_org_abs_2510_22213/figures/005_Figure_4.jpg]]
-*Figure 4: Interactive simulation comparison of different methods. We apply a dragging external force and then visualize the response of the scene, where our approach produces more natural oscillatory motion with finer-grained details. t and T denote the middle and final frames, respectively*
-
-### 补充图表
-
-
-![[assets/figures/papers/paper_list_l1060_https_arxiv_org_abs_2510_22213/figures/009_Table_4.jpg]]
-*Table 4: Architecture Parameters*
 
 ![[assets/figures/papers/paper_list_l1060_https_arxiv_org_abs_2510_22213/figures/010_Figure_6.jpg]]
 *Figure 6: Examples from our 4DTree dataset. For clarity of visualization, the leaves and trunk are rendered using two simplified material configurations*

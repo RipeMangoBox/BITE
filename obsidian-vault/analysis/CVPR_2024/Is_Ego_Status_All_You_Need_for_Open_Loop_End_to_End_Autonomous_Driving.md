@@ -55,8 +55,6 @@ claims:
 
 综上，本文的核心结论是：**在当前开环基准下，自车状态几乎就是规划性能的全部所需，但这恰恰反映了评测体系而非模型能力的缺陷**。这一发现对端到端自动驾驶领域的基准设计、公平比较和模型评估提出了根本性质疑。
 
-
-
 端到端自动驾驶旨在将感知、预测与规划统一于一个可学习的框架中，从而避免传统模块化架构中的信息损失与误差累积。近年来，以 **UniAD** (Hu et al., CVPR 2023) 为代表的方法在 nuScenes 开环规划基准上取得了显著进展，通过引入检测、跟踪、建图与轨迹预测等多重辅助任务，逐步提升了规划性能。然而，这一研究范式的评估体系存在一个被长期忽视的致命缺陷：**开环评测中的规划性能究竟来自模型对场景的感知理解，还是仅仅来自对自车状态（ego status）的过拟合？**
 
 本文通过系统性的分析揭示，当前开环端到端自动驾驶评测存在三个相互关联的瓶颈：
@@ -68,8 +66,6 @@ claims:
 **3. 自车状态捷径的隐蔽性。** 许多现有方法在 BEV 特征生成阶段通过 BEVFormer 等模块隐式引入了自车状态信息（附录 Figure 4），但未在论文中明确讨论这一设计对规划性能的决定性影响。这导致不同方法之间的比较缺乏公平性——使用自车状态的方法天然具有巨大优势，而这一优势与感知能力无关。
 
 基于上述分析，本文提出核心洞察：**在现有基准下，端到端自动驾驶模型对自车状态存在过度依赖，感知信息并未有效贡献于规划决策。** 这一现象并非某个特定模型的缺陷，而是当前评测范式系统性失效的体现。为验证这一假设，本文设计了 Ego-MLP（仅使用自车速度、加速度、偏航角和驾驶指令的简单 MLP）和 BEV-Planner 系列基线，并通过引入路缘碰撞率（Curb Collision Rate, CCR）作为补充度量，试图揭示被传统指标掩盖的安全隐患，推动社区重新审视开环评测的可靠性与公平性。
-
-
 
 ## 核心方法与创新机理
 
@@ -123,8 +119,6 @@ claims:
 
 与现有方法的本质区别在于：**BEV-Planner 系列不依赖任何人类标注数据**，其设计目标不是追求 SOTA 性能，而是通过最小化感知依赖来暴露 ego status 捷径的严重性。这一方法论贡献对社区重新审视开环评测基准具有警示意义——在数据集分布偏斜和度量缺陷的双重作用下，复杂的感知-预测-规划流水线可能只是在学习一个精致的自车状态插值器。
 
-
-
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2312_03031/figures/001_Figure_1.jpg]]
 *Figure 1: (a) AD-MLP uses both ego status and past trajectory GTs as input. Our reproduced version (Ego-MLP) drops the past trajectories. (b) The existing end-to-end autonomous driving pipeline consists of perception, prediction, and planning modules. Ego status can be integrated into the bird’s-eye view (BEV) generation module or within the planning module. (c) We design a simple baseline for comparison with existing methods. The simple baseline does not leverage the perception or prediction module and directly predicts the final trajectories based on BEV features*
 
@@ -162,8 +156,6 @@ BEV-Planner 的流水线刻意省略了传统端到端驾驶框架中的显式�
 - **模块关系**：BEV 编码器与规划器之间通过 ego query 交叉注意力连接，形成端到端的可微分通路。自车状态可在 BEV 编码阶段或规划阶段注入，这两种注入方式对最终性能的影响是本文消融实验的核心关注点。
 
 值得注意的是，BEV-Planner 系列**不需要任何人工标注数据**（如 3D 检测框、跟踪 ID、高精地图），仅依赖自车轨迹的真值进行监督，这使其成为检验感知信息是否真正贡献于规划的“最小可行基线”。
-
-
 
 ### 3.1 BEV-Planner 整体架构
 
@@ -216,8 +208,6 @@ $$CR(t) = \left(\sum_{i=0}^{N} \mathbb{I}_i\right) > 0, \quad N = t/0.5$$
 - **BEV-Planner++**：在规划器中引入自车状态，将其与 ego query 特征拼接后输入 MLP 预测头。
 - **BEV-Planner+Map**：在 BEV-Planner 基础上引入地图感知任务（主要遵循 UniAD 的设计），向 BEV 特征添加地图分割头，以引入道路边界等信息。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：自车状态对开环规划的支配性影响
@@ -227,7 +217,6 @@ $$CR(t) = \left(\sum_{i=0}^{N} \mathbb{I}_i\right) > 0, \quad N = t/0.5$$
 #### 主结果：简单基线即可匹敌 SOTA
 
 **Table 1** 汇总了各方法在 L2 距离、碰撞率（Collision Rate）和新提出的路缘碰撞率（CCR）上的对比。最引人注目的结果是：
-
 
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2312_03031/figures/004_Table_1.jpg]]
 *Table 1: Open-loop planning performance. †: The official implementation of ST-P3 (ID-0) utilized partial erroneous ground truth trajectories, with details provided in the appendix. The official UniAD (ID-2) utilized ego status in its BEV module. It is of particular note that the performance of the officially open-sourced model exceeds the results reported in the original paper [13]. We implemented minor modifications to the official codebases of UniAD and VAD to investigate the variations in results arising from different applications of ego status (ID-1, 3 & 4). A naive strategy (ID-7) of proceeding at the current speed also yields satisfactory results. Without the perception module, Ego-MLP (ID-8)...*
@@ -241,14 +230,9 @@ $$CR(t) = \left(\sum_{i=0}^{N} \mathbb{I}_i\right) > 0, \quad N = t/0.5$$
 
 **因果机制**：nuScenes 数据集中 73.9% 的场景为直行（Figure 2），自车状态本身已编码了足够的运动先验来应对这些简单场景。模型学会了利用这一捷径，而非真正理解场景语义。
 
-
-![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2312_03031/figures/002_Figure_2.jpg]]
-*Figure 2: (a) The ego car trajectory heatmap on nuScenes dataset. (b) The majority of the scenes within the nuScenes dataset consist of straightforward driving situations*
-
 #### 鲁棒性分析：感知崩溃不影响规划
 
 **Table 2** 和 **Figure 3**（正文）展示了 VAD-Base 模型对图像腐败和自车状态噪声的敏感性：
-
 
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2312_03031/figures/005_Table_2.jpg]]
 *Table 2: The VAD-base model’s robustness to images and ego status. To ascertain the impact of perceptual information and ego status on the ultimate planning performance, we systematically introduced noise into each component separately. We utilize the official VAD-Base checkpoint that uses ego status in its planner module. *: the results of VAD-Base without ego status in its planner. We can observe that introducing corruption to images markedly affects the perception results, especially in the case of using blank images; nonetheless, this does not markedly disrupt the ultimate planning results. In contrast to the minor impact of image corruption on planning, modifications to the ego vehicle’s veloci...*
@@ -277,21 +261,10 @@ $$CR(t) = \left(\sum_{i=0}^{N} \mathbb{I}_i\right) > 0, \quad N = t/0.5$$
 
 **Table 3**（正文）展示了向 BEV-Planner 添加地图感知任务（BEV-Planner+Map）后的效果：
 
-
-![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2312_03031/figures/019_Table_3.jpg]]
-*Table 3: Omitting camera inputs in the VAD model, when it does not utilize ego status, results in a marked reduction in performance, as evidenced by the metrics for L2 distance and collision rate*
-
 - L2 均值从 0.55m 恶化至 0.96m，碰撞率从 0.59% 恶化至 0.89%。
 - 但 CCR 从 4.26% 显著改善至 2.60%。
 
 按驾驶指令拆分（Table 4, Table 5）进一步揭示：地图信息在直行场景下增加了 L2 误差和碰撞率，但在转弯场景下降低了碰撞率。这表明地图感知确实提供了道路边界信息以减少偏离道路的风险，但同时也干扰了模型对自车状态捷径的利用，导致整体 L2 和碰撞率指标变差。
-
-
-![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2312_03031/figures/008_Table_4.jpg]]
-*Table 4: L2-ST is the L2 distance with going straight driving commands. L2-LR is the L2 distance with turning left/right commands. Table 5. Collision-ST is the collision rate with going straight driving commands. Collision-LR is the collision rate with turning left/right commands*
-
-![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2312_03031/figures/020_Table_4.jpg]]
-*Table 4: CCR-ST is the CCR rate with going straight driving commands. CCR-LR is the CCR rate with turning left/right commands*
 
 #### UniAD 后处理的隐性风险
 
@@ -329,15 +302,6 @@ UniAD 的后处理优化模块旨在通过非线性优化避免与占用网格�
 - **连续转弯场景**：附录 Figure 6 显示，所有方法在需要连续转弯的场景下均产生次优轨迹，说明当前模型对复杂机动仍缺乏鲁棒性。
 - **无自车状态时移除相机**：附录 Table 3 和 Figure 5 显示，当模型不使用自车状态时，移除相机输入导致 L2 和碰撞率急剧恶化，说明此时模型确实需要感知信息，但其规划能力远弱于使用自车状态时。
 - **CCR 的零速度奖励问题**：当自车速度为零时，CCR 无法区分安全静止与危险静止，可能奖励不合理的静止策略。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2312_03031/figures/003_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2312_03031/figures/011_Table.jpg]]
-
-
-
 
 ## 定位与知识库关联
 
@@ -400,8 +364,6 @@ nuScenes 数据集中 **73.9% 的场景为直行**（Figure 2），自车状态�
 ### 5. 方法定位总结
 
 本文的方法贡献不在于提出新的 SOTA 模型，而在于**通过构造极简基线和引入新度量，系统性地揭示了当前开环端到端自动驾驶评测的危机**：现有基准下的“高性能”可能主要来自对自车状态的过拟合，而非感知能力的提升。这一发现对后续研究具有警示意义——任何未显式控制自车状态变量的性能声明，都可能是不公平比较的产物。
-
-
 
 ## 原文 PDF
 

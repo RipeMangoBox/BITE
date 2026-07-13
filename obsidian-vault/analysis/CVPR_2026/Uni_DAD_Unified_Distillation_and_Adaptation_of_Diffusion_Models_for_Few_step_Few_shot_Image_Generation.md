@@ -61,8 +61,6 @@ claims:
 
 **方法定位**：Uni-DAD 属于扩散模型蒸馏与少样本领域适应的交叉方向，与 **DMD2** 等分布匹配蒸馏方法、**DreamBooth**（Ruiz et al., CVPR 2023）等主题驱动微调方法、以及 **CRDI**、**DDPM-PA** 等少样本适应方法形成对比。其单阶段统一训练的范式区别于现有的两阶段流水线，为极低步数、极少样本条件下的图像生成提供了新的技术路径。
 
-
-
 扩散模型在图像生成领域取得了显著进展，但其推理过程通常需要数十甚至上百步去噪采样，计算开销巨大。分布匹配蒸馏（Distribution Matching Distillation, DMD）技术通过将多步教师模型压缩为少步学生模型，有效缓解了这一问题。然而，当面对特定目标域（如特定物体、稀有类别或艺术风格）且仅有极少量样本（≤10 张）可用时，现有方法陷入了两难困境。
 
 **两阶段流水线的结构性缺陷。** 当前的主流方案是将领域适应（Adaptation）与模型蒸馏（Distillation）拆分为两个独立阶段：要么先蒸馏后适应（Distill-then-Adapt），要么先适应后蒸馏（Adapt-then-Distill）。先蒸馏后适应（如 DMD2-FT）首先将源域教师压缩为少步学生，再在目标域上微调该学生，但蒸馏后的学生模型容量有限，微调时容易饱和，难以充分吸收目标域的新结构。先适应后蒸馏（如 FT-DMD2）则先在目标域上微调教师模型，再将其蒸馏为少步学生，但微调后的教师容易过拟合到少量样本，导致蒸馏出的学生继承了这一过拟合倾向，生成结果多样性急剧下降。两种路径均无法在保持源域丰富先验的同时，有效捕获目标域的真实结构。
@@ -70,8 +68,6 @@ claims:
 **核心瓶颈。** 在极少量目标样本（≤10）和极低采样步数（≤4）的双重约束下，现有方法生成的图像往往出现过度平滑、纹理缺失、多样性崩塌等问题。根本原因在于：两阶段流水线将分布匹配与领域适应解耦，使得蒸馏学生要么缺乏目标域结构信息（先蒸馏后适应时适应不足），要么丧失了源域的多样性支撑（先适应后蒸馏时过拟合偏差被蒸馏放大）。此外，现有蒸馏框架（如 DMD2）仅使用源域教师提供分布匹配信号，缺乏来自目标域的直接结构引导，对抗训练也仅采用单头判别器，难以在多尺度特征层面抑制过拟合和增强局部细节真实性。
 
 **本文动机。** 针对上述困境，Uni-DAD 提出将蒸馏与适应统一在单阶段训练框架中，核心思路是：通过双域分布匹配蒸馏（Dual-domain DMD）损失同时引导生成器逼近源域分布与目标域分布，并联合多尺度生成对抗网络（Multi-head GAN）损失进行协同优化。源域教师提供稳定的多样性保持信号，目标域教师促进结构适应，多级特征判别器则抑制过拟合、增强局部细节真实性。这一设计使得模型能够在仅用 ≤4 步采样和 ≤10 张目标图像的条件下，实现高质量、高多样性的个性化生成。
-
-
 
 ## 核心方法与创新机理
 
@@ -115,8 +111,6 @@ Uni-DAD 支持**预蒸馏源模型作为学生初始化**（检查点无关）�
 
 这些创新协同作用，使 Uni-DAD 在 FSIG 基准上以 **3 步采样**获得了优于非蒸馏方法（≥ 25 步）的 FID（Table 1），在 SDP 基准上以 **1 步采样**取得了与 DreamBooth 微调（100 步）相当的身份保持和文本对齐能力（Table 3, Figure 6），同时将 5K 样本的推理时间从 35 分钟降至 **4.2 分钟**，TFLOPs/img 从 55.7 降至 **2.2**（Table 2）。
 
-
-
 Uni-DAD 将扩散模型的蒸馏与领域适应统一在一个单阶段训练框架中，核心目标是仅用 ≤4 步采样和 ≤10 张目标域图像，实现高质量、高多样性的个性化生成。其整体 pipeline 围绕三个关键模块的交替更新展开，如 Figure 2 所示。
 
 ![[assets/figures/papers/paper_list_l950_https_arxiv_org_abs_2511_18281/figures/002_Figure_2.jpg]]
@@ -150,13 +144,6 @@ Uni-DAD 将扩散模型的蒸馏与领域适应统一在一个单阶段训练框
 - **单阶段统一**：与两阶段流水线（先蒸馏后适应或先适应后蒸馏）不同，Uni-DAD 在单一训练过程中同时完成蒸馏与适应，避免了蒸馏学生饱和或过拟合导致的纹理缺失与多样性下降。
 - **双域 DMD 引导**：同时利用源域教师和目标域教师（可选）的评分信号，通过权重因子 $ a $ 平衡源域先验保留与目标域结构适应。对于相近领域取较小 $ a $（如 $ a=0.25 $），对于遥远领域取较大 $ a $（如 $ a=0.75 $）。
 - **多头 GAN 增强**：复用假教师编码器各层特征进行多尺度判别，相比单头 GAN 或无 GAN 的设置，能更有效地抑制过拟合、提升目标域真实感。消融实验（Table 5）表明，多头 GAN 与双域 DMD 的组合是实现少样本高质量适应的关键。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l950_https_arxiv_org_abs_2511_18281/figures/001_Figure_1.jpg]]
-*Figure 1: Uni-DAD (Distill & Adapt) vs. two-stage pipelines, Distill-then-Adapt , and Adapt-then-Distill Adapt is performed by fine-tuning, and Distill by DMD2 [48]. The source domain is represented by 70K diverse faces, and the target domain by 10 babies. Sampling steps are reduced from 25 to 3*
-
-
 
 Uni-DAD 的训练框架由五个核心模块与三个交替更新的损失函数构成，其设计目标是在单阶段训练中同时完成分布蒸馏与领域适应。
 
@@ -221,16 +208,6 @@ $$
 
 其中 $y$ 为目标域真实图像，$y_t$ 为其加噪版本。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l950_https_arxiv_org_abs_2511_18281/figures/004_Figure_4.jpg]]
-*Figure 4: Qualitative ablation of the dual-domain DMD weighting factor a for FSIG on Babies and MetFaces. See Fig. 9 for SDP*
-
-![[assets/figures/papers/paper_list_l950_https_arxiv_org_abs_2511_18281/figures/016_Figure_9.jpg]]
-*Figure 9: Qualitative ablation of the dual-domain DMD weighting factor a for SDP across prompts on a live subject and an object*
-
-
-
 ## 实验与关键发现
 
 ### 实验设置
@@ -248,9 +225,6 @@ Table 1 汇总了 FSIG 任务上的定量结果。Uni-DAD 以仅 3 步采样（N
 
 Table 2 的计算开销分析显示，Uni-DAD 的推理效率优势显著：生成 5K 样本仅需 4.2 分钟，而直接微调（FT）需要 35 分钟；每张图像的 TFLOPs 从 55.7 降至 2.2，加速比超过 25 倍。
 
-![[assets/figures/papers/paper_list_l950_https_arxiv_org_abs_2511_18281/figures/007_Table_2.jpg]]
-*Table 2: Training and test-time computational cost analysis for FSIG. Mem: memory. h: hour, m: minute*
-
 #### SDP：主题驱动个性化生成
 
 Table 3 展示了 SDP 任务的定量对比。Uni-DAD 在 NFE=1 的条件下取得 DINO 0.47、CLIP-I 0.73、CLIP-T 0.29，在身份保持和文本对齐能力上显著优于 DMD2-FT（DINO 0.20, CLIP-I 0.60, CLIP-T 0.23），并与使用 100 步采样的 DreamBooth 微调（DINO 0.50, CLIP-I 0.74, CLIP-T 0.30）表现相当。值得注意的是，PSO（Turbo-PSO）使用了 SDXL 骨干和 1024×1024 分辨率，与 Uni-DAD（SDv1.5, 512×512）存在骨干和分辨率的不公平优势，直接比较需谨慎。
@@ -259,9 +233,6 @@ Table 3 展示了 SDP 任务的定量对比。Uni-DAD 在 NFE=1 的条件下取�
 *Table 3: Comparison of quality (DINO↑, CLIP-I↑, CLIP-T↑) and diversity (Intra-LPIPS↑, Inter-LPIPS↑) for SDP across methods, evaluated on the DreamBooth benchmark (30 subjects, 25 prompts) [34]. Best and second best distilled method at NFE=1*
 
 Figure 6 的定性对比进一步印证：Uni-DAD 在配饰添加和场景重构等提示下，生成结果保持了目标主体的身份特征，同时保留了源域丰富的纹理和背景多样性，而 DMD2-FT 和 FT-DMD2 两阶段方法则出现了明显的过平滑和身份丢失。
-
-![[assets/figures/papers/paper_list_l950_https_arxiv_org_abs_2511_18281/figures/008_Figure_6.jpg]]
-*Figure 6: Qualitative comparison for SDP, adapting SDV1.5 [33] to the DreamBooth [34] cat2 subject, evaluated on accessorization and re-contextualization prompts. See additional results on other subjects (dog6, vase) and prompts in Fig. 12. Zoom in for details*
 
 ### 消融实验
 
@@ -299,9 +270,6 @@ Table 6 探索了不同初始化检查点的效果。使用预蒸馏学生（G�
 
 Table 7 对比了不同 GAN 损失函数在多头设置下的表现。二元交叉熵（BCE）在 Babies 上 FID 45.09，优于 Hinge（47.80）、LSGAN（46.31）和 WGAN（46.89），且训练过程更稳定。
 
-![[assets/figures/papers/paper_list_l950_https_arxiv_org_abs_2511_18281/figures/014_Table_7.jpg]]
-*Table 7: Ablation of GAN losses evaluated on FID↓. Bold indicates best result. Selected variant for main results is in gray*
-
 ### 公平性说明
 
 需注意以下公平性限制：DDPM-PA 未提供公开代码，仅引用其原始报告结果；CRDI 在 MetFaces 上的复现 FID 为 121.36，与原文报告的 94.86 存在显著差异；PSO 使用 SDXL 骨干和更高分辨率，与 Uni-DAD 的 SDv1.5 骨干不直接可比。
@@ -309,8 +277,6 @@ Table 7 对比了不同 GAN 损失函数在多头设置下的表现。二元交�
 ### 失败模式与局限性
 
 在结构差异极大的目标域上，Uni-DAD 可能牺牲一定多样性以换取更好的结构适应。在线目标教师训练增加了约 21% 的峰值显存占用。当目标域与源域差距较大时，权重因子 a 需仔细手动调节，缺乏自适应机制。目前仅在 DDPM 和 SDv1.5 两个骨干上验证，扩展到更大模型及视频、音频等模态尚未探索。
-
-
 
 ## 定位与知识库关联
 
@@ -369,8 +335,6 @@ Uni-DAD 的核心创新在于将蒸馏与适应**统一为单阶段训练框架*
 3. **多概念与风格适应**：Uni-DAD 是否适用于更开放式的文本到图像生成任务，例如同时适应多个概念或风格？这需要扩展双域 DMD 到多域分布匹配。
 4. **大规模模型验证**：在 SD3、Flux 等更大规模扩散模型上训练并评估 Uni-DAD 的性能，验证方法的可扩展性。
 5. **极端少样本稳定性**：单阶段训练是否会对极端少样本（1-shot）或极低 NFE（1-step）下的生成带来不稳定性？Table 4 显示 NFE=1 时 FID 显著升高（Babies 上 98.52），需要进一步分析失效模式。
-
-
 
 ## 原文 PDF
 

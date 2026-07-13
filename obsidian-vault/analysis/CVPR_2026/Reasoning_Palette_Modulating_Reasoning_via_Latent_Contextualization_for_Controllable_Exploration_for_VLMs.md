@@ -56,8 +56,6 @@ claims:
 
 Reasoning Palette的方法定位在于：将推理策略多样性建模为可学习的连续潜在空间，并通过轻量监督微调（SFT）适配与调度驱动的RL训练，实现从探索到利用的平滑过渡，为(V)LMs的可控推理探索提供了新的范式。
 
-
-
 大语言模型与视觉语言模型在复杂推理任务上的突破，很大程度上依赖于强化学习（RL）训练中的探索质量。然而，当前主流的探索手段——如温度采样（temperature sampling）、核采样（nucleus sampling）等token级随机解码策略——存在一个根本性瓶颈：**这些方法产生的推理路径虽然在表层token序列上呈现差异，但其高层次的推理策略往往高度相似**。换言之，token级的随机性并未有效转化为策略级的多样性，导致RL训练在探索阶段难以接触到足够广泛的高层推理行为，进而限制了学习效率与最终性能的持续提升。
 
 这一瓶颈在标准GRPO（Group Relative Policy Optimization，Shao et al., 2024）等RL基线上表现得尤为明显：模型在训练早期快速收敛于某些局部最优的推理模式，后续训练难以突破，性能曲线趋于平缓。
@@ -65,8 +63,6 @@ Reasoning Palette的方法定位在于：将推理策略多样性建模为可学
 本文的**核心动机**来源于一个关键观察：若能在生成开始之前，对模型的**内部推理策略进行结构化采样**，而非依赖生成过程中的token级随机扰动，是否能从根本上提升探索的广度与效率？Figure 1 提供了一个有力的初步验证——仅向Qwen-4B-Base的输入提示前注入一个高斯噪声token嵌入，并在每个候选回答中仅使用贪心解码，即可在pass@k准确率上获得大幅提升。这一现象表明，**在嵌入空间中对推理上下文进行微小的结构性扰动，足以激发模型产生截然不同的推理路径**，从而验证了“策略级采样”的巨大潜力。
 
 基于上述洞察，本文提出**Reasoning Palette**框架，其核心思想是：**通过潜在情境化（latent contextualization），将探索从token级随机性转化为生成前的策略级结构化采样**。具体而言，Reasoning Palette引入一个由变分自编码器（VAE）学习的随机潜在变量，该变量的采样值被解码为可学习的token前缀并前置插入到输入提示中，从而在生成开始前即调节模型的内部推理策略。这一设计使得RL训练能够访问到更丰富的高层级推理行为，在探索阶段覆盖更广泛的策略空间，并在训练后期平滑过渡到利用阶段，最终显著提升探索效率与收敛性能。
-
-
 
 ## 核心方法与创新机理
 
@@ -118,8 +114,6 @@ $$\mathcal{I}_{\mathrm{sched}}(\theta) = \mathbb{E}_\tau \mathbb{E}_{\mathbf{q} 
 
 这种从 token 级到策略级的探索范式转换，使得 RL 训练能够访问到更丰富的高层推理行为。训练曲线（Figure 6）清晰地展示了这一机制的效果：潜在引导变体在训练早期因探索更广泛的策略空间而准确率增长较慢，但在后期逐渐超越 GRPO 基线，体现了“先广泛探索、后精准利用”的学习动态。
 
-
-
 Reasoning Palette 的核心思想是将推理过程中的探索从 **token 级随机性** 提升为 **策略级结构化采样**。框架通过一个随机潜在变量在生成开始前调节模型的内部推理策略，使模型能够访问更丰富的高层级推理行为，而非仅依赖温度采样或核采样产生的表层差异。
 
 ### 框架总览
@@ -154,8 +148,6 @@ Reasoning Palette 的核心思想是将推理过程中的探索从 **token 级�
 - **调度控制**：在 RL 训练中，调度器决定每条响应的生成是否注入潜在前缀，控制组内响应的策略多样性。
 
 这一流水线将探索从 token 级随机性解耦出来，转化为生成前的策略空间采样，使得模型在 RL 训练中能够访问到更丰富的高层级推理行为，从而显著提升探索效率与最终性能。
-
-
 
 Reasoning Palette 的核心由四个模块构成，分别负责潜在空间构建、模型适应、推理引导与RL探索控制。
 
@@ -210,15 +202,8 @@ $$\mathcal{I}_{\mathrm{sched}}(\theta) = \mathbb{E}_\tau \mathbb{E}_{\mathbf{q} 
 | $\rho(\tau)$ | 训练进度 $\tau$ 处的调度比例 |
 | $\mathcal{L}_{\mathrm{PPO}}$ | PPO裁剪目标函数 |
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2577_https_arxiv_org_abs_2512_17206/figures/001_Figure_1.jpg]]
-*Figure 1: Motivation: Injecting a Gaussian noise token embedding before the prompt embeddings of Qwen-4B-Base enables substantial gains in pass@k accuracy by merely sampling in the Gaussian, despite using greedy decoding for each candidate*
-
 ![[assets/figures/papers/paper_list_l2577_https_arxiv_org_abs_2512_17206/figures/003_Figure_3.jpg]]
 *Figure 3: Visualization of the learned latent space and generated prefix embeddings via PCA and t-SNE. Left two panels: projections of decoded prefix embeddings*
-
-
 
 ## 实验与关键发现
 
@@ -242,9 +227,6 @@ Reasoning Palette 在 RL 训练中引入调度策略来控制潜在前缀的注�
 
 训练动态曲线（Figure 6）进一步揭示了潜在变体的行为特征：在训练早期，潜在引导变体的准确率增长慢于 GRPO 基线，这是因为模型需要花费更多步骤探索多样化、有时甚至是次优的推理路径；然而在训练后期，这些变体逐渐超越基线，体现了前期广泛探索所积累的策略多样性红利。这一“先慢后快”的模式与调度策略的设计初衷高度吻合。
 
-![[assets/figures/papers/paper_list_l2577_https_arxiv_org_abs_2512_17206/figures/009_Figure_6.jpg]]
-*Figure 6: Performance curves of the GRPO baseline and the proposed latent variants during training. Latent variants perform more thorough exploration in early stages of training and then shift toward exploitation in the latter stages, resulting in a performance curve that gradually overtakes baselines*
-
 ### 潜在空间的领域解耦与可控性
 
 VAE 学习到的潜在空间是否真正编码了可区分的推理策略？Figure 3 通过 PCA 和 t-SNE 投影给出了肯定的答案：解码后的前缀嵌入与对应的潜变量均按推理领域（数学、代码、QA 等）形成清晰聚类。这表明 VAE 成功将高层推理策略解耦到潜在空间的不同区域。
@@ -258,12 +240,8 @@ VAE 学习到的潜在空间是否真正编码了可区分的推理策略？Figu
 
 所有 RL 训练均在统一条件下进行：每组生成 8 条响应用于优势估计，基础模型均为 Qwen3 系列架构，SFT 步骤统一为 10 步。VAE 训练数据来源公开且覆盖多样化领域，确保了实验的可比性与可复现性。潜在引导仅在贪心解码下即可大幅超越随机采样基线的消融结果，进一步排除了 token 级随机性对增益的混淆解释。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2577_https_arxiv_org_abs_2512_17206/figures/006_Figure_5.jpg]]
 *Figure 5: Qualitative results on RefCOCO dataset. From left to right: input image with the ground-truth bounding box, prediction from Qwen2.5VL-3B (greedy decoding), and prediction from our method, Qwen2.5VL-3B (greedy decoding) with a randomly sampled latent. The referring expressions for the top and bottom rows are train closest to the bottom and a zebra standing behind two other zebras, with only its mane and rear showing, respectively*
-
-
 
 ## 定位与知识库关联
 
@@ -309,8 +287,6 @@ RL 训练中探索与利用的平衡是经典问题。Reasoning Palette 提出�
 3. **与推理时扩展方法的结合**：Reasoning Palette 在生成前进行策略采样，而诸如多数投票、最优-N 重排序等推理时扩展方法在生成后进行选择。两者如何协同以获得更大增益，是一个值得探索的方向。
 
 4. **训练稳定性**：潜在引导 RL 训练在早期阶段准确率增长较慢（Figure 6），虽然最终超越基线，但训练过程中的不稳定性是否会在更大规模训练中被放大，需要更多实验证据。
-
-
 
 ## 原文 PDF
 

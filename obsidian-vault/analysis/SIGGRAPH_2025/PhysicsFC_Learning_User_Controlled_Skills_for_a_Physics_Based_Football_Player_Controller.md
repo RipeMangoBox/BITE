@@ -52,8 +52,6 @@ PhysicsFC 提出了一种在物理仿真环境中实现用户可控、多技能�
 
 实验表明，各技能策略通过针对性设计的奖励函数和初始化方案取得了显著效果：盘带策略目标达成率 90.3%，停球成功率 78.3%，踢球成功率 99.9%。消融实验揭示了关键设计的作用——移除早期终止使盘带几乎完全失效（降至 2.0%），移除抛射体动力学初始化使停球成功率骤降至 21.1%，而 STI 使盘带到踢球的过渡成功率从 16.95% 跃升至 100%。在交互式场景中，PhysicsFC 支持用户操控角色完成二过一配合、竞争性停球盘带乃至 11v11 足球比赛仿真，展示了从单一技能训练到复杂多智能体场景的可扩展性。
 
-
-
 ### 物理仿真足球控制的挑战
 
 在电子游戏与计算机动画领域，构建具有物理真实感的交互式角色一直是核心目标之一。足球运动因其丰富的技能组合（跑动、停球、盘带、踢球）和高动态的球-人-环境交互，成为检验物理角色控制能力的理想场景。然而，现有方法面临一个根本性瓶颈：**在物理仿真环境中，难以让单一角色同时掌握多项足球技能，并在用户实时操控下实现平滑的技能间切换**。
@@ -85,8 +83,6 @@ PhysicsFC 提出了一种在物理仿真环境中实现用户可控、多技能�
 - **运动数据的结构化利用**：移动策略若仅追求任务目标（速度、朝向），容易产生不自然的步态。DEGCL 通过从运动捕捉数据中提取“目标-潜变量”对，在训练中引导策略输出与数据一致的动作潜变量，从而在任务完成与运动质量之间取得平衡。
 
 这些设计共同构成了 PhysicsFC 的方法论基础，使其能够在物理仿真中实现用户可控的、包含跑动、停球、盘带、踢球及平滑过渡的完整足球技能体系。
-
-
 
 ## 核心方法与创新机理
 
@@ -132,8 +128,6 @@ PhysicsFC放弃了统一奖励函数的思路，为每项足球技能设计了�
 
 PhysicsFC的创新本质上是**通过分技能奖励工程与状态空间桥接，将复杂的多技能物理控制问题分解为可独立优化的子问题，再通过STI实现子策略间的平滑拼接**。其方法谱系上承CALM等物理运动嵌入模型，但在技能特化训练与过渡机制上提供了系统性的增量贡献。
 
-
-
 PhysicsFC 的整体框架围绕“高层技能策略 + 共享低层运动模型”的分层架构展开，并通过有限状态机（FSM）管理技能间的动态切换。其设计目标是在物理仿真环境中实现用户可控、多技能无缝切换的足球角色控制。
 
 ### 核心模块与数据流
@@ -169,16 +163,11 @@ PhysicsFC 的整体框架围绕“高层技能策略 + 共享低层运动模型�
 
 所有策略训练和运行时仿真均基于 Isaac Gym Preview 4，使用固定的物理参数配置。角色脚部采用足球靴凸包碰撞体（而非简单盒状碰撞体），这对盘带和踢球技能的学习至关重要——使用方形脚碰撞时，盘带无法学习方向调整，踢球速度偏差显著。
 
-
-
 PhysicsFC 的完整技能控制器由四个核心设计要素构成：共享的低层运动嵌入模型、面向各足球技能的高层策略、实现无缝切换的技能过渡初始化（STI）机制，以及提升运动质量的数据嵌入目标条件潜变量引导（DEGCL）方法。以下逐一展开其关键模块与公式。
 
 ### 低层运动嵌入模型（CALM）
 
 所有技能策略共享一个基于物理的运动嵌入模型，该模型在足球运动捕捉数据上预训练，接收高层策略输出的潜变量 $z$ 和角色状态，生成低层关节扭矩动作。这一设计使高层策略只需学习“选择什么动作”而非“如何执行动作”，大幅降低了技能学习的难度。模型结构见原文 Figure 14，预训练细节见 Appendix A。
-
-![[assets/figures/papers/paper_list_l1805_PhysicsFC_Learning_User_Controlled_Skills_for_a_Physics_Based_Football_P/figures/023_Figure_14.jpg]]
-*Figure 14: Structure of CALM model*
 
 ### 盘带策略（Dribble Policy）
 
@@ -239,19 +228,11 @@ $$r_t^{\mathrm{move}} = 0.5\, r_t^{\mathrm{mv\_task}} + 0.5\, r_t^{\mathrm{lt\_s
 
 STI 是打通技能间无缝切换的枢纽机制。其流程为：先用已训练的前序技能策略（如停球、移动）模拟大量回合，将角色和球的状态存入各技能的 STI 缓冲区；在训练目标技能（如盘带）时，一半回合从相关前序技能的 STI 缓冲区中随机采样初始状态，使策略学会从各种中间状态快速恢复并启动新技能（Figure 3）。
 
-![[assets/figures/papers/paper_list_l1805_PhysicsFC_Learning_User_Controlled_Skills_for_a_Physics_Based_Football_P/figures/003_Figure_3.jpg]]
-*Figure 3: Example of Dribble Policy Training with Skill Transition-Based State Initialization (STI): (a) Numerous episodes are simulated using trained skill policies, and the character and ball states are stored in STI buffers for each skill. (b) During Dribble policy training, half of the episodes are initialized with states randomly sampled from the Trap STI buffer, while the other half are initialized from the Move STI buffer. Through these episodes, the Dribble policy learns to initiate dribbling quickly in various situations, both while moving and immediately after trapping*
-
 STI 的效果在过渡实验中极为显著：盘带到踢球过渡中，使用 STI 的踢球成功率（KSR）为 100%，而不使用 STI 仅 16.95%（Table 9）；移动到停球过渡中，停球成功率从 55.1% 提升至 74.1%（Table 8）。这表明 STI 使策略具备了从动态中间状态恢复的能力，而非仅能从精心设计的初始状态启动。
 
 ### 足球靴形碰撞网格
 
 除奖励和训练机制外，物理建模层面的一个关键设计是采用**足球靴凸包碰撞体**替代默认的盒状脚部碰撞体（Figure 4）。实验表明，使用方形脚碰撞时，盘带策略无法学习方向调整，踢球速度偏差显著。靴形网格提供了更精确的足-球接触几何，是盘带和踢球技能得以成功学习的物理基础。
-
-![[assets/figures/papers/paper_list_l1805_PhysicsFC_Learning_User_Controlled_Skills_for_a_Physics_Based_Football_P/figures/005_Figure_4.jpg]]
-*Figure 4: Foot collision mesh*
-
-
 
 ## 实验与关键发现
 
@@ -314,24 +295,11 @@ STI的有效性源于一个简单的因果机制：强化学习策略对初始�
 
 所有量化结果均来自消融对比，未与外部方法进行直接指标比较，因此无法判断PhysicsFC相对于其他足球角色控制方法的绝对性能优势。交互式场景（如11v11比赛、二过一配合）仅提供定性演示（Figures 10-12），缺乏客观的多人协作或对抗指标。仿真环境固定于Isaac Gym Preview 4，物理参数（Table 10）的敏感性未做系统分析，但论文附录提供了完整配置以便复现。此外，论文明确指出的局限性——包括盘带时单脚偏好、缺乏马格努斯效应、身体部位坐标偏差、高扭矩动作——均未在实验中量化评估其影响程度，这些需要后续工作验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1805_PhysicsFC_Learning_User_Controlled_Skills_for_a_Physics_Based_Football_P/figures/017_Table_4.jpg]]
 *Table 4: Comparison of our Move policy and its ablated models*
 
 ![[assets/figures/papers/paper_list_l1805_PhysicsFC_Learning_User_Controlled_Skills_for_a_Physics_Based_Football_P/figures/022_Table_9.jpg]]
 *Table 9: Comparison of Dribble-to-Kick transition performance with and without STI*
-
-![[assets/figures/papers/paper_list_l1805_PhysicsFC_Learning_User_Controlled_Skills_for_a_Physics_Based_Football_P/figures/016_Figure_13.jpg]]
-*Figure 13: Effect of DEGCL. (a), (b): For backward movement, the w/o DEGCL model shows excessively short step lengths and high step frequency compared to Ours. (c), (d): For sideways movement, the w/o DEGCL model repeatedly exhibits a posture that appears as if the character is about to fall sideways. In all figures, the character moves from left to right*
-
-![[assets/figures/papers/paper_list_l1805_PhysicsFC_Learning_User_Controlled_Skills_for_a_Physics_Based_Football_P/figures/011_Figure_11.jpg]]
-*Figure 11: Competitive trapping and dribbling*
-
-![[assets/figures/papers/paper_list_l1805_PhysicsFC_Learning_User_Controlled_Skills_for_a_Physics_Based_Football_P/figures/012_Figure_12.jpg]]
-*Figure 12: Simulated 11v11 football game with user-controlled player switching*
-
-
 
 ## 定位与知识库关联
 
@@ -374,8 +342,6 @@ PhysicsFC 为物理足球角色控制开辟了若干值得探索的方向：
 - **运动自然性增强**：能否通过模仿学习或肌骨模型约束，在保持任务完成率的同时降低策略输出的扭矩，使动作更符合人体生物力学规律？
 
 - **多智能体定量评估**：在更复杂的多智能体场景（如 2v2、11v11）中，如何设计标准化的定量评估指标来衡量整体足球表现，包括传球成功率、防守干扰下的控球稳定性等？
-
-
 
 ## 原文 PDF
 

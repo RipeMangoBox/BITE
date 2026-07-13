@@ -50,8 +50,6 @@ MoSa针对这一问题提出两个核心创新。**多尺度令牌保留策略�
 
 实验表明，MoSa在HumanML3D和Motion-X两个主流基准上均取得最优性能。在Motion-X上，FID达到0.061，显著优于MoMask的0.20；推理时间降低约27%。消融实验验证了卷积-注意力混合VQ-VAE（CAQ-VAE）、ℓ₂归一化、尺度感知RoPE等设计选择的必要性。此外，MoSa通过MASK_edit令牌机制支持运动修复、扩展等编辑任务，无需额外微调。
 
-
-
 ### 文本驱动人体运动生成
 
 文本驱动的人体运动生成旨在根据自然语言描述合成逼真、语义一致的三维人体动作序列，在动画制作、虚拟人交互、游戏开发等领域具有广泛应用。近年来，该领域的主流范式逐渐收敛于**矢量量化–生成式Transformer（VQ-GT）**框架：首先使用VQ-VAE将连续运动序列压缩为离散令牌（tokens），再通过自回归或掩码Transformer在令牌空间中进行生成。这一范式在**T2M-GPT**（Zhang et al., CVPR 2023）、**MoMask**（Guo et al., CVPR 2024）等工作中取得了显著进展，在HumanML3D和Motion-X等基准上实现了领先的生成质量。
@@ -74,8 +72,6 @@ MoSa针对这一问题提出两个核心创新。**多尺度令牌保留策略�
 ### 与现有方法的对比定位
 
 现有文本驱动运动生成方法可大致分为三类：基于VAE的方法（如**TEMOS**, Petrovich et al., ECCV 2022）、基于扩散模型的方法（如**MotionDiffuse**, Zhang et al., arXiv 2022; **MLD**, Chen et al., CVPR 2023）以及基于VQ-GT的方法（如**T2M-GPT**; **MoMask**）。MoSa属于VQ-GT范式的改进工作，但与MoMask的“双Transformer分层独立生成”不同，MoSa通过MTPS和SAR实现了**单Transformer跨尺度联合生成**，在方法谱系上填补了“多尺度一致建模”的空白。
-
-
 
 ## 核心方法与创新机理
 
@@ -104,8 +100,6 @@ $$p(x^{(1)}, \ldots, x^{(Q)} | c) = \prod_{q=1}^Q p(x^{(q)} | x^{(1)}, \ldots, x
 ### 需要手动验证的潜在局限
 
 MTPS 的尺度调度器 $S$ 是预定义的固定序列，论文未探索其根据运动类型或文本语义自适应调整的可能性。此外，虽然推理步数大幅减少，但每步需并行预测多个令牌，对内存和计算的要求在极大规模序列上可能仍构成挑战。运动编辑任务目前仅提供了定性示例（Fig. 7），缺乏定量指标，其鲁棒性和泛化性有待进一步考察。
-
-
 
 MoSa 的整体 pipeline 由两个核心阶段构成：**CAQ‑VAE（卷积‑注意力混合矢量量化变分自编码器）** 和 **可扩展自回归 Transformer（Scalable Autoregressive Transformer，SAR）**。前者将运动序列压缩为多尺度离散令牌集，后者以尺度为步长自回归地预测该令牌集，实现从粗到细的生成。整个框架的关键创新在于：在残差矢量量化（RQ‑VAE）中嵌入 **多尺度令牌保留策略（Multi‑scale Token Preservation Strategy，MTPS）**，使量化过程不再仅保留单一精细尺度的令牌，而是显式维护一个从粗到细的多尺度令牌集合 $X$（见 Fig. 2）。
 
@@ -139,8 +133,6 @@ $$p(x^{(1)}, \ldots, x^{(Q)} \mid c) = \prod_{q=1}^{Q} p(x^{(q)} \mid x^{(1)}, \
 5. （可选）**运动编辑模块** → 通过 `MASK_edit` 令牌实现修复、扩展等任务，无需微调
 
 CAQ‑VAE 与 SAR 的解耦设计使得运动表示学习与生成建模可以独立优化：前者通过混合卷积‑注意力架构（GroupNorm + SiLU + 自注意力）和非共享、逐层增大的码本提升重建质量与表示能力；后者借助尺度感知 RoPE 和交叉注意力文本融合，在仅 10 步推理内实现跨层一致的粗到细生成。
-
-
 
 MoSa 的核心架构由三个关键模块构成：**多尺度令牌保留策略（MTPS）**、**可扩展自回归（SAR）建模**和**卷积-注意力混合 VQ-VAE（CAQ-VAE）**。这三个模块协同工作，解决了传统 VQ-GT 范式中跨层信息不对齐的根本瓶颈。
 
@@ -194,15 +186,8 @@ $$\mathcal{L}_{\mathrm{rvq}} = \| m - \hat{m} \|_1 + \sum_{q=1}^Q \left( \| \ope
 - **尺度感知 RoPE**：SAR Transformer 使用尺度感知的位置编码，将位置索引归一化至当前尺度 $s_q$，使模型感知不同尺度下的相对位置关系。消融实验表明，该策略在所有指标上优于标准 RoPE、Sinusoidal 和可学习位置编码。
 - **运动编辑机制**：通过引入 `MASK_edit` 令牌，MoSa 无需微调即可支持运动修复、前后缀填充等编辑任务。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2511_01200/figures/003_Figure_3.jpg]]
-*Figure 3: Previous VQ-VAE compared to our CAQ-VAE. Our CAQ-VAE uses residual blocks with GroupNorm and SiLU, along with a self-attention layer to capture global dependencies*
-
 ![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2511_01200/figures/007_Figure_6.jpg]]
 *Figure 6: Visualization of the coarse-to-fine generation process. Starting at a coarse scale (3 tokens, Step 1) and progressively refined to a fine scale (49 tokens, Step 10). The final representation is achieved through dequantization and upsampling from the multi-scale token set and incremental accumulation into the VQ model for reconstruction*
-
-
 
 ## 实验与关键发现
 
@@ -257,8 +242,6 @@ Fig. 8展示了从推理步1到步10的逐步累积性能曲线。FID从初始�
 
 4. **代码开源状态**：论文仅提供了项目页面和GitHub issue讨论，完整训练和推理代码尚未正式发布，部分实现细节（如CFG衰减策略的具体公式）需要从论文描述中推断。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2511_01200/figures/004_Table.jpg]]
 *Table: I: Quantitative evaluation on the HumanML3D and Motion-X test set. ± indicates a 95% confidence interval. Blue and Red indicate the best and the second best result. ‘†’ denotes our reimplementation. The results of MoMask are slightly inconsistent with those reported in the paper (shown in gray). The relevant issue has been discussed in https://github.com/EricGuo5513/momask-codes/issues/27 as well as in *
 
@@ -267,14 +250,6 @@ Fig. 8展示了从推理步1到步10的逐步累积性能曲线。FID从初始�
 
 ![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2511_01200/figures/009_Table.jpg]]
 *Table: III: We evaluate the impact of text fusion methods and position encoding (PE) strategies, including RoPE and our proposed Scale-wise RoPE. The result was evaluated using the HumanML3D test set*
-
-![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2511_01200/figures/011_Figure_8.jpg]]
-*Figure 8: Step-wise cumulative performance on HumanML3D. From inference steps 1 to 10, the metrics show a progressive improvement, indicating MoSa’s coarse-to-fine characteristics*
-
-![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2511_01200/figures/005_Figure.jpg]]
-*Figure: (b) MM-Dist↓ (a) FID↓*
-
-
 
 ## 定位与知识库关联
 
@@ -318,8 +293,6 @@ MoSa 属于**基于矢量量化的离散令牌自回归生成**路线。该路�
 - SAR 建模框架能否推广到超长运动序列（如数万帧）或其他时序数据模态（如视频、语音）的生成？
 - 运动编辑中 MASK_edit 令牌的尺度一致性和编辑边界保持是否存在理论保证，是否有更优的编辑控制策略（如基于扩散的编辑）？
 - 论文仅提供了项目页面和代码链接，完整训练与推理代码的开源状态尚不明确，社区复现和后续改进存在不确定性。
-
-
 
 ## 原文 PDF
 

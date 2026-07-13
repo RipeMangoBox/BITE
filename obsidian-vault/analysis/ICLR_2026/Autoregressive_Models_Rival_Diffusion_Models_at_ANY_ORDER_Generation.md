@@ -46,8 +46,6 @@ claims:
 
 本文提出 **Any-order Any-subset Autoregressive modeling (A3)**，一种新的序列建模范式。A3将扩散语言模型的组级预测重新形式化为广义自回归框架，在保留自回归多层依赖结构的同时，支持任意顺序和任意子集的生成。核心思想是将标准自回归分解 `P(x_{1:N}) = ∏_{t=1}^N P(x_t | x_{<t})` 推广到任意token组上的分解 `P(x_{1:N}) = ∏_{k=1}^K P(x_{G_k} | x_{G_{<k}})`，从而在概率严谨性、依赖深度和生成灵活性之间取得平衡。实验表明，A3-8B在条件生成质量上优于Dream和DiffuLlama等扩散模型，并在长上下文QA任务上实现了30%的推理加速。
 
-
-
 **真实瓶颈**：扩散语言模型在每一步去噪中仅形成单层依赖结构，限制了模型捕捉深层层次化依赖的能力，导致生成质量和训练稳定性低于自回归模型。
 
 **现有方法的局限**：
@@ -56,8 +54,6 @@ claims:
 - **掩码语言模型**（如MaskGIT、MDLM）：同样受限于单步预测的依赖深度。
 
 **核心洞察**：通过将标准自回归分解推广到任意token组和生成顺序，A3框架在保留自回归概率严谨性和多层依赖建模的同时，继承了扩散模型在并行和双向生成方面的灵活性。
-
-
 
 ## 核心方法与创新机理
 
@@ -72,8 +68,6 @@ claims:
 | 训练策略 | 标准自回归语言模型预训练 | 三阶段渐进式训练：阶段1（AR初始化，单token组）→ 阶段2（组扩展，组大小从1增至4）→ 阶段3（顺序排列，随机排列token到各组） |
 | 推理策略 | 标准从左到右逐token自回归解码 | 组级AR采样（支持token级、固定大小组、任务特定组）和动态重采样（基于置信度或熵） |
 
-
-
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_vtDUomlazQ_Autoregressive_/figures/001_Figure_1.jpg]]
 *Figure 1: Architecture of the A3 model. Blue entries in the attention mask denote 0, and white entries denote −∞. The model employs a two-stream attention module with distinct causal masks. The content stream encodes contextual information and attends to tokens within its own group as well as all preceding groups. The query stream encodes positional conditions and attends only to tokens in preceding groups. The final cross-entropy loss is computed between the input context and the query stream’s output. For illustration, we provide an example grouping with $G _ { 1 } = \{$ 1 , 2 , 3 $\} , \bar { G } _ { 2 } = \{$ 5 , 6 $\} , G _ { 3 } = \{$ 4 $\}$ , showing how the forward process and causal masks...*
 
@@ -82,8 +76,6 @@ A3的整体框架包含三个核心模块：
 1. **双流注意力模块**：支持任意顺序预测的核心架构组件，包含内容流和查询流，借鉴自XLNet（Yang et al., 2019）的双流注意力机制。
 2. **渐进式训练策略**：将预训练AR模型逐步适应任意顺序预测的三阶段课程学习。
 3. **组级解码策略**：支持组级AR采样和动态重采样的灵活推理方法。
-
-
 
 ### 5.1 组级自回归分解
 
@@ -121,8 +113,6 @@ A3采用三阶段课程学习，逐步从标准自回归过渡到任意顺序预
 - **阶段1：AR初始化** — 使用单token组（组大小=1），完全复现标准自回归分解。
 - **阶段2：组扩展** — 允许组大小大于1（从1逐步增至4），学习组内并行预测。
 - **阶段3：顺序排列** — 引入随机排列，将token随机分配到各组，学习任意顺序预测。
-
-
 
 ## 实验与关键发现
 
@@ -175,12 +165,8 @@ Table 7显示，推测解码达到更低的困惑度（1.9 vs 2.1），但计算
 - 与扩散模型Dream和DiffuLlama的比较中，A3使用了更少的训练数据。
 - A3的推理速度与组大小相关，组大小越大速度越快但困惑度越高，存在速度-质量权衡。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_vtDUomlazQ_Autoregressive_/figures/011_Table_6.jpg]]
 *Table 6: The hyperparameter list*
-
-
 
 ## 定位与知识库关联
 
@@ -203,8 +189,6 @@ A3位于自回归模型和扩散模型的交叉点，其方法谱系包括：
 - A3在更长的上下文（如32k或128k）下是否仍能保持稳定性和效率优势？
 - A3的组划分策略是否可以自适应学习，而非随机或固定大小？
 - A3在机器翻译、代码生成等其他任务上的泛化能力如何？
-
-
 
 ## 原文 PDF
 

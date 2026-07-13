@@ -74,8 +74,6 @@ REACT 基于 Qwen2.5-VL-7B 多模态大语言模型构建，通过三个关键�
 
 REACT 的帧级分析范式也存在固有局限：它可能无法捕捉需要跨帧时序上下文的瞬时失真（如闪烁、物体瞬移）；在通用视频评估基准（如 VideoGen-RewardBench）上，其综合视觉质量评估能力略低于视频级评估器。此外，动态采样依赖预设阈值，训练数据集中于特定 T2V 模型生成的视频，分布偏移可能影响泛化能力。这些边界为未来将帧级推理扩展至时空上下文、融合视频级评估能力等方向留下了开放问题。
 
-
-
 ### 生成视频质量评估的现状与盲区
 
 近年来，以 **Sora**（OpenAI, 2024）、**Hailuo**（MiniMax, 2024）等为代表的文本到视频（T2V）生成模型取得了长足进步，但生成视频中仍普遍存在一类被现有评估体系系统性忽视的缺陷——**结构失真**（structural distortions）。这类失真表现为肢体变形、物体穿透、异常融合等违反物理直觉的视觉错误，严重损害了生成内容的可用性和真实感。
@@ -103,8 +101,6 @@ REACT 的帧级分析范式也存在固有局限：它可能无法捕捉需要�
 3. **对齐人类偏好**：通过构建包含超过15,000对偏好标注（约30,000帧）的大规模数据集，并结合两阶段训练（监督微调 + 分组相对策略优化 GRPO），使模型的评分分布与人类对结构完整性的偏好判断高度一致。
 
 简言之，REACT 试图填补视频评估与图像评估之间的空白地带——以帧为基本评估单元，以结构失真为专门评估对象，以可解释推理为输出形式，从而为生成视频的质量把关提供更精准、更可信的自动化工具。
-
-
 
 ## 核心方法与创新机理
 
@@ -155,8 +151,6 @@ REACT 的训练流程包含三个关键的设计选择，构成其性能提升�
 
 这些创新共同构成了 REACT 在结构失真评估任务上显著超越现有视频评估器和图像评估器的能力基础。
 
-
-
 REACT 的整体框架围绕“帧级结构失真评估”这一核心目标，构建了从数据构造、模型训练到推理采样的完整流水线，如 Figure 2 所示。框架由三个关键模块串联而成：
 
 ![[assets/figures/papers/paper_list_l2284_https_arxiv_org_abs_2601_04033/figures/002_Figure_2.jpg]]
@@ -206,13 +200,6 @@ $$R(\boldsymbol{\sigma}_i^j) = \lambda_1 R_{\mathrm{fmt}}(\boldsymbol{\sigma}_i^
 ### 模块间数据流
 
 整体数据流可概括为：**标注边界框 → Gemini 2.5 Pro 合成 CoT 数据（含伪分数与归因标签）→ SFT 注入领域知识（第二轮使用 masked loss）→ GRPO 对齐人类偏好（格式 + 归因 + 配对偏好奖励）→ 动态采样推理输出帧级分数与失真归因**。这一设计使得 REACT 能够输出可解释的帧级评估结果，而非仅给出单一的视频级评分。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2284_https_arxiv_org_abs_2601_04033/figures/001_Figure_1.jpg]]
-*Figure 1: Comparison of REACT with SOTA Video and Image Evaluators. (a) While existing evaluators tend to assign high scores based on aesthetics and temporal consistency, even in the presence of structural defects, our REACT model outperforms them by accurately identifying structural distortions in generative videos and providing more reliable scores (b) While image evaluators excel in recognizing image artifacts, they struggle to detect distortions in generative video frames. In contrast, REACT demonstrates superior performance in recognizing and evaluating structural distortions in video frames*
-
-
 
 REACT 的核心技术路线围绕三个关键模块展开：面向结构失真的精细化数据构建、两阶段奖励模型训练（SFT + GRPO），以及推理时的动态帧采样机制。以下逐一剖析各模块的设计逻辑与关键公式。
 
@@ -270,13 +257,6 @@ $$R(\pmb{\sigma}_{i}^{j}) = \lambda_{1} R_{\mathrm{fmt}}(\pmb{\sigma}_{i}^{j}) +
 
 推理时，REACT 采用两阶段动态采样策略以在固定帧数约束下最大化失真帧的捕获概率。第一阶段对视频均匀采样 $N$ 帧并评分；根据第一阶段得分分布，第二阶段自适应选择得分最低（即最可能包含失真）的 $M$ 帧进行补充分析。最终视频分数由两阶段采样帧的得分取平均得到。消融实验中，禁用动态采样使偏好对齐准确率降至 0.519，证实了该机制对性能的显著贡献。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2284_https_arxiv_org_abs_2601_04033/figures/007_Figure_3.jpg]]
-*Figure 3: Detailed Explanation of Our Proposed Taxonomy of Structural Distortions in Generative Videos. Representative examples for each distortion category are also provided*
-
-
-
 ## 实验与关键发现
 
 ### 实验设置与基准构建
@@ -320,15 +300,8 @@ $$R(\pmb{\sigma}_{i}^{j}) = \lambda_{1} R_{\mathrm{fmt}}(\pmb{\sigma}_{i}^{j}) +
 
 REACT的主要失败模式集中在以下方面：①帧级分析无法有效捕获需要时序上下文的失真类型（如瞬时闪烁、物体消失），这是方法设计的固有局限；②动态采样机制依赖预设阈值，在失真分布极端的场景下可能采样不足或过度；③训练数据集中于特定T2V模型生成的视频，当面对分布偏移较大的新模型输出时，泛化能力可能受限。这些失败模式指向了未来将帧级推理扩展到时空上下文建模的必要性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2284_https_arxiv_org_abs_2601_04033/figures/005_Table_3.jpg]]
 *Table 3: Ablation Study on RL Starting Point, Reward Design, and Sampling Mechanism in Human Preference Alignment. Our REACT model with the default settings performs best*
-
-![[assets/figures/papers/paper_list_l2284_https_arxiv_org_abs_2601_04033/figures/006_Table_4.jpg]]
-*Table 4: Ablation Study on RL Starting Point, SFT Epoch, and Loss Function in Distortion Recognition Task. Our REACT model, trained with a two-stage paradigm (i.e., SFT and GRPO) and utilizing masked loss in the second epoch of SFT, achieves the best performance in distortion recognition*
-
-
 
 ## 定位与知识库关联
 
@@ -378,8 +351,6 @@ Table 6 进一步验证了互补性：将 REACT 与 UnifiedReward 等视频级�
 3.  **自动化阈值调优**：动态采样机制的阈值是否可以自动化学习？例如，通过元学习或基于验证集反馈的自适应调整策略，减少人工调参的依赖。
 
 4.  **失真分类体系的完备性**：当前八类失真是否覆盖了所有生成视频结构缺陷？随着视频生成技术的发展，可能需要持续扩展分类体系（如增加"物理规律违反"类别），这要求数据标注和模型训练流程具备可扩展性。
-
-
 
 ## 原文 PDF
 

@@ -157,8 +157,6 @@ FlowMDM 的整体流程围绕一个核心设计展开：**利用扩散模型的�
 
 这一流程的核心因果机制在于：扩散模型的早期去噪步骤天然地重建全局低频结构，而后期步骤恢复局部高频细节——这与 APE 提供全局位置信息、RPE 提供局部平移不变性的特性高度吻合。BPE 正是通过将这两种编码与去噪阶段对齐，实现了在无任何过渡标注训练的情况下，同时保证子序列的语义准确性和过渡的自然平滑性。
 
-### 补充图表
-
 FlowMDM 的核心由三个关键模块构成：**混合位置编码（BPE）**、**姿态中心交叉注意力（PCCAT）** 和 **双向扩散 Transformer**。这三个模块协同工作，使得模型能够在一次去噪过程中生成全长无缝动作序列，无需任何后处理或冗余去噪步骤。
 
 ### 混合位置编码（BPE）
@@ -269,8 +267,6 @@ Figure 5 展示了绝对编码去噪步数占比对各项指标的影响。随�
 #### 外推任务（Appendix Table A）
 
 在外推任务中，FlowMDM 同样保持了最低的 AUJ，证明 BPE 策略不仅适用于多段动作组合，也能在周期性运动外推中保持平滑过渡。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l1842_FlowMDM_Seamless_Human_Motion_Composition_with_Blended_Positional_Encodi/figures/012_Table.jpg]]
 *Table: C. Scenario-wise comparison in HumanML3D*

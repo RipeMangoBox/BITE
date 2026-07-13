@@ -71,8 +71,6 @@ FlashMesh 在 ShapeNetV2 / gObjaverse 测试集上取得了生成质量与推理
 
 上述核心结论由多项高置信度实验支撑：Table 1 和 Table 2 的结果置信度达 0.98，多 token 预测目标对互信息放大的理论分析（Section 8.2）置信度为 0.95。所有实验均在 NVIDIA H20 GPU 上测量，训练配置（优化器、学习率、batch size）在正文及补充材料中透明公开。当前论文未明确讨论方法在早期预测误差敏感性方面的局限，该方向仍需进一步探索。
 
-
-
 三维网格（Mesh）是计算机图形学、工业设计与具身智能等领域的核心几何表示。近年来，自回归模型在网格生成任务上展现出强大的表达能力，其基本思路是将网格结构序列化为离散 token 序列，再由 Transformer 逐 token 预测下一个 token。然而，这一范式面临一个根本性瓶颈：**标准自回归网格生成模型必须逐 token 顺序解码，导致推理速度极慢，难以满足交互式应用和大规模生成的需求。**
 
 现有加速自回归解码的方法主要分为两类。一类是 token 压缩策略，如 **BPT**（基于 token 压缩的自回归网格生成），通过减少需要生成的 token 总数来降低延迟，但压缩本身可能损失几何细节。另一类是推测解码（speculative decoding），利用轻量级 draft 模型并行预测多个未来 token，再由主干模型验证。然而，网格数据具有独特的层次化结构——面（face）由点（point）组成，点由三维坐标（coordinate）定义——这种“面-点-坐标”的层级依赖使得通用推测解码难以直接迁移：并行预测多个 token 极易破坏顶点共享一致性（多个面引用同一顶点时，并行生成会为同一顶点产生不同坐标），导致生成的网格出现裂缝或错位。
@@ -80,8 +78,6 @@ FlashMesh 在 ShapeNetV2 / gObjaverse 测试集上取得了生成质量与推理
 本文的核心洞察在于：**网格的层次化表示内在地包含可预测的结构模式**。面、点、坐标 token 之间存在强结构性和几何相关性，这些相关性使得模型能够在尊重层次架构和几何一致性的前提下，并行预测多个未来 token。基于此，我们提出 **FlashMesh**，一个基于“预测-校正-验证”（predict–correct–verify）范式的快速高质量自回归网格生成框架。FlashMesh 通过专门适配 Hourglass Transformer 的多层多头推测解码模块（SP-Block 与 HF-Block）实现并行 token 预测，并引入结构感知的顶点共享一致性校正机制，在突破顺序解码瓶颈的同时保证几何保真度。
 
 初步实验表明，FlashMesh 在 Meshtron 2B 骨干网络上实现 **2.03× 加速**，同时将 Chamfer Distance 从 0.092 **降至 0.089**，实现了生成质量与速度的同步提升（Figure 1, Table 1）。
-
-
 
 ## 核心方法与创新机理
 
@@ -98,8 +94,6 @@ FlashMesh 的核心创新在于将标准自回归网格生成从**逐 token 顺�
 上述 changed slots 的协同效果在消融实验中得到了明确验证：仅添加 SP-Block 仅带来有限加速（TPS +14.2），加入 HF-Block 后 TPS 大幅跃升至 176.5；再引入校正机制后 TPS 达到最高的 180.4，且生成质量（CD 0.120）与完整配置持平（Table 2）。这证明推测模块与校正机制各自贡献独立且协同叠加，共同实现了速度与质量的双重提升。
 
 从信息论角度，多 token 预测目标将互信息 $I(X;Y)$ 的权重从系数 1 提高至系数 2（Equation 11），激励模型更好地捕获相邻 token 的依赖关系，从而降低联合熵 $H(X,Y)$ 和每 token 误差，这也是 FlashMesh 在加速的同时实现质量提升（CD 从 0.092 降至 0.089）的理论基础（Section 8.2）。
-
-
 
 FlashMesh 的核心推理流程遵循 **predict–correct–verify** 三阶段范式，旨在将标准 Hourglass Transformer 的顺序自回归解码转化为高效的并行推测解码。其整体 pipeline 与模块关系如 Figure 2 所示。
 
@@ -125,8 +119,6 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{coord}} + \gamma \mathcal{
 其中 $\mathcal{L}_{\mathrm{coord}}$ 为主 token 与 draft token 的平均交叉熵坐标预测损失，$\mathcal{L}_{\mathrm{label}}$ 为点级别分类损失，$\gamma$ 控制校正信号的强度。多 token 预测目标使互信息 $I(X;Y)$ 的权重从系数 1 提高至 2，激励模型更好地捕获相邻 token 的依赖关系，从而降低联合熵和每 token 误差，提升几何一致性。
 
 **模块关系总结**：Hourglass Transformer 主干提供基础生成能力与验证时的因果掩码 forward pass；SP‑Block 和 HF‑Block 构成层次化推测解码的核心，实现从面级到坐标级的多层并行预测；校正机制消除并行生成的结构冲突；验证机制确保最终输出的正确性。四者协同，使 FlashMesh 在 Meshtron 2B 上实现 2.03× 加速的同时，将 Chamfer Distance 从 0.092 降至 0.089（Table 1），达成速度与质量的双重提升。
-
-
 
 FlashMesh 的核心由四个协同模块构成：**Hourglass Transformer 主干**、**推测预测模块（SP-Block 与 HF-Block）**、**几何一致性校正机制**和**验证机制**。下面逐一阐述其关键设计与公式。
 
@@ -182,19 +174,6 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{coord}} + \gamma \mathcal{
 
 验证阶段，主干网络在单次前向传播中重新计算草稿 token 对应的输出，并与原草稿 token 逐一比较。从位置 $s+2$ 开始，找到最后一个与原草稿一致的 token 位置 $s^*$，接受从 $s+2$ 到 $s^*$ 的所有 token 作为有效输出。未被接受的后续 token 将被丢弃并进入下一轮预测。此机制保证了推测解码的输出与顺序解码严格等价，不牺牲生成质量。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2488_https_arxiv_org_abs_2511_15618/figures/004_Figure_3.jpg]]
-*Figure 3: (a) The Speculative Prediction Block (SP-Block) predicts multiple draft tokens in parallel from the current hidden state. (b) The Hierarchical Fusion Block (HF-Block) refines speculative embeddings by fusing them with cached local context for accurate token prediction*
-
-![[assets/figures/papers/paper_list_l2488_https_arxiv_org_abs_2511_15618/figures/005_Figure_4.jpg]]
-*Figure 4: Example of vertex misalignment in parallel face generation and our correction mechanism*
-
-![[assets/figures/papers/paper_list_l2488_https_arxiv_org_abs_2511_15618/figures/006_Figure_5.jpg]]
-*Figure 5: Example of the verify mechanism with*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -243,19 +222,6 @@ FlashMesh 在 ShapeNetV2 / gObjaverse 测试集上与多个基线进行了定量
 ![[assets/figures/papers/paper_list_l2488_https_arxiv_org_abs_2511_15618/figures/010_Table_4.jpg]]
 *Table 4: Quantitative comparison of different parameters. We conduct experiments based on 0.5B, 1B and 2B of the original Meshtron method as well as that of our FlashMesh method. All results are measured on the H20 GPU*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2488_https_arxiv_org_abs_2511_15618/figures/011_Table_5.jpg]]
-*Table 5: Ablation study on different values of*
-
-![[assets/figures/papers/paper_list_l2488_https_arxiv_org_abs_2511_15618/figures/015_Table_6.jpg]]
-*Table 6: Ablation study on different optimizations*
-
-![[assets/figures/papers/paper_list_l2488_https_arxiv_org_abs_2511_15618/figures/016_Table_7.jpg]]
-*Table 7: Ablation study on the variant*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 与基线方法的关系
@@ -295,8 +261,6 @@ FlashMesh 的推测解码设计深度耦合于**层次化网格表示**（面 �
 - **几何先验的显式集成**：当前框架的推测和校正主要依赖数据驱动的结构模式学习，尚未显式编码几何先验（如平滑性、对称性、闭合性等）。论文将"How to integrate geometric priors more explicitly for robustness?"列为开放问题，暗示未来工作可探索将微分几何约束或物理启发的正则项融入推测模块的训练目标。
 - **跨骨干架构的泛化**：当前验证仅限于 Hourglass Transformer 系列，推测解码策略是否适用于其他自回归网格生成架构（如基于纯 Transformer 解码器或状态空间模型的方案）尚待验证。
 - **更大规模推测的可行性**：Table 7 显示，多层推测解码（面部、点、坐标三级）显著优于仅在坐标级别预测大量 token 的单层变体（TPS 180.4 vs 166.1），但三级推测的上限是否已触及、是否存在更优的层级划分策略，仍需进一步探索。
-
-
 
 ## 原文 PDF
 

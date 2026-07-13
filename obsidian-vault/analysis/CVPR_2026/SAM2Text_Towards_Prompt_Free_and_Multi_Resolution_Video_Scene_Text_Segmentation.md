@@ -71,8 +71,6 @@ SAM2Text处于**视频分割基础模型域适应**与**场景文本分割**的�
 
 > **注意**：SAM2Text的消融基线（如+SAM2.1、+LoRA）在评估时使用了oracle提示（GT边界框），而完整模型在无提示设定下运行，因此报告的增益可能部分来自基线评估条件更严苛这一因素。合成数据训练的模型在真实复杂场景下的泛化边界、以及极长视频或严重运动模糊条件下的稳定性，仍需进一步验证。
 
-
-
 ### 视频场景文本分割的独特挑战
 
 场景文本分割（Scene Text Segmentation, STS）要求在像素级别精确分离文本前景与背景，是文本检测、识别、编辑和擦除等下游任务的基础。然而，现有研究几乎全部集中在静态图像领域，视频场景文本分割长期处于空白状态。与图像分割相比，视频文本分割面临三重核心挑战：
@@ -103,8 +101,6 @@ SAM2Text处于**视频分割基础模型域适应**与**场景文本分割**的�
 4. **增强记忆机制**：设计短时 FIFO 缓存与 Top-K 历史检索相结合的两级记忆模块，将注意力复杂度从 $O(T)$ 降至 $O(L+K)$，在降低计算开销的同时抑制掩码闪烁，保障跨帧时间一致性。
 
 此外，为填补数据空白，本文构建了首个大规模视频场景文本分割数据集，包含合成数据集 **STS-SynthV**（1,410 段视频，147,852 帧）和真实场景数据集 **STS-RealV**（660 段视频，69,000 帧），为该方向的系统评估提供了基准。
-
-
 
 ## 核心方法与创新机理
 
@@ -162,8 +158,6 @@ $$r_j = \cos(q_t, k_j) + \lambda \cdot \mathrm{qual}_j$$
 
 四个 changed slots 构成一条因果链路：LoRA 适配解决特征域不匹配 → 自提示模块消除外部提示依赖 → 多分辨率解码器恢复笔划细节 → 增强记忆机制保障时间一致性。各组件增益在消融实验中呈累加效应，从 SAM2.1 基线（fgIOU 77.45%）逐级提升至完整 SAM2Text（fgIOU 80.71%），验证了每项改造的独立贡献与协同作用。
 
-
-
 SAM2Text 在 SAM2 的流式视频分割架构之上，围绕四个核心瓶颈进行改造：**文本域适应性不足**、**对外部提示的依赖**、**掩码分辨率受限**以及**长序列时间一致性退化**。框架整体保持 SAM2 的逐帧流式处理范式，通过 LoRA‑adapted 图像编码器、自提示模块、多分辨率掩码解码器和增强记忆模块四个组件串联，实现从原始视频帧到高保真文本掩码的端到端映射。
 
 ### 数据流与模块关系
@@ -209,12 +203,8 @@ SAM2Text 在 SAM2 的流式视频分割架构之上，围绕四个核心瓶颈�
 
 > **注意**：消融实验中的早期变体（如仅加 LoRA 的 SAM2.1、无自提示版本）在评估时使用了 oracle 提示（GT 边界框），而完整 SAM2Text 在完全免提示的自动设定下运行，因此 Table 3 中各组件的实际增益可能被低估——基线条件比完整模型更宽松。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2414_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_SAM2Text_Towards/figures/002_Figure_2.jpg]]
 *Figure 2: The overview of our proposed SAM2Text*
-
-
 
 SAM2Text 在 SAM2 基座上引入四个关键改造模块，协同解决视频场景文本分割中的域适应、免提示、精细掩码和时间一致性难题。
 
@@ -280,12 +270,8 @@ $$r_j = \cos(q_t, k_j) + \lambda \cdot \mathrm{qual}_j$$
 
 其中 $\mathrm{qual}_j$ 为第 $j$ 个记忆条目的预测质量分数，$\lambda$ 为平衡系数。选取得分最高的 $K$ 个条目与短时缓存合并，构成有效记忆集 $\mathcal{U}_t$，解码器的交叉注意力仅在该集合上运算。此设计既保留了近期帧的时序连贯性，又通过检索机制回溯关键历史上下文，有效抑制掩码闪烁。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2414_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_SAM2Text_Towards/figures/003_Figure_3.jpg]]
 *Figure 3: Two-tier memory: Top-K retrieval from the bounded long-term memory pool*
-
-
 
 ## 实验与关键发现
 
@@ -335,12 +321,8 @@ Table 3 展示了在 STS-RealV 上的逐组件消融结果，以 SAM2.1 基线�
 - **Table 2**：在视频数据集上，SAM2Text 对 Hi-SAM 的优势在真实场景下更为显著，表明增强记忆机制有效抑制了掩码闪烁问题。
 - **Table 3**：四个组件均带来正向增益，其中 LoRA 微调贡献最大（+1.47% fgIOU），增强记忆模块在已有较高基线（80.15% fgIOU）上仍提供 0.56% 的增量，证明了各模块的互补性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2414_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_SAM2Text_Towards/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of existing datasets [1–11] for text detection and segmentation: rich for image/video detection and image segmentation, but missing for video segmentation*
-
-
 
 ## 定位与知识库关联
 
@@ -381,8 +363,6 @@ SAM2Text 的设计前提是视频中存在可辨识的场景文本实例，其�
 - 两层记忆机制中的 Top‑K 检索质量分数 $\mathrm{qual}_j$ 的具体计算方式及其对检索鲁棒性的影响，论文未充分展开。
 - 多分辨率分支之间是否存在互补或冗余，能否通过尺度自适应融合进一步压缩计算开销？
 - 在实时视频流场景下，1024×1024 分支的推理延迟是否满足部署要求，论文未提供推理速度的基准测试。
-
-
 
 ## 原文 PDF
 

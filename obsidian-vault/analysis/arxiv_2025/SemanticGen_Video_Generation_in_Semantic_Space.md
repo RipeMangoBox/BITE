@@ -138,11 +138,6 @@ SemanticGen 提出了一种**两阶段视频生成范式**，将传统的单阶�
 
 对于长视频生成，SemanticGen 采用**混合注意力策略** (Figure 5)：在极度压缩的语义空间中使用全注意力进行全局建模，而在映射到 VAE 潜空间时使用 **shifted window attention (Swin)** 交替处理，从而避免全双向注意力随视频长度平方增长的计算开销，同时保持长程一致性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l84_https_arxiv_org_abs_2512_20619/figures/002_Figure_2.jpg]]
-*Figure 2: Illustration of the proposed SemanticGen*
-
 ![[assets/figures/papers/paper_list_l84_https_arxiv_org_abs_2512_20619/figures/014_Figure_10.jpg]]
 *Figure 10: Overview of the base text-to-video generation model*
 
@@ -182,15 +177,10 @@ $$z_{input} := [z_t, z_{sem}]$$
 
 对于长视频生成，全双向注意力在 VAE 潜空间的计算复杂度随帧数平方增长，成为主要瓶颈。SemanticGen 利用语义空间的高压缩比特性，设计了一种混合注意力策略（Figure 5）：
 
-![[assets/figures/papers/paper_list_l84_https_arxiv_org_abs_2512_20619/figures/006_Figure_5.jpg]]
-*Figure 5: Implementation of Swin-Attention. When generating long videos, we apply full attention to model the semantic representations and use shifted-window attention [43] to map them into the VAE space. The blue squares indicate VAE latents, while the yellow squares denote semantic representations*
-
 - **语义空间**：对所有帧的语义 token 施加全注意力（full attention），实现全局布局和运动的统一规划。
 - **VAE 潜空间**：将语义 token 与 VAE 潜码 token 交错排列，在 VAE 潜码 token 之间使用 shifted window attention（Swin attention），限制每个窗口内的注意力范围，从而将计算量控制在线性级别。
 
 这种设计使模型既能通过语义空间的全局注意力保持长程时空一致性，又能在 VAE 空间以可承受的计算代价补充高频细节，从机制层面缓解了长视频生成中的漂移问题（Fig. 13, Supplementary B.2）。
-
-### 补充图表
 
 ## 实验与关键发现
 
@@ -230,8 +220,6 @@ SemanticGen 在视频生成方法谱系中占据“语义先验驱动”的新�
 
 SemanticGen 的核心创新在于将生成过程解耦为“语义规划—细节填充”两阶段，与 **Base-CT**（无语义建模的继续训练基线）形成鲜明对比：后者在长视频上漂移严重，而 SemanticGen 通过全局语义注意力有效抑制了漂移。该方法与 **LongLive** 等交互式长视频方法的目标一致，但实现路径不同——LongLive 依赖实时交互控制，SemanticGen 则通过架构层面的语义分工实现长时序一致性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l84_https_arxiv_org_abs_2512_20619/figures/009_Table_1.jpg]]
 *Table 1: Quantitative comparison with state-of-the-art methods on short video generation*
 
@@ -240,15 +228,6 @@ SemanticGen 的核心创新在于将生成过程解耦为“语义规划—细�
 
 ![[assets/figures/papers/paper_list_l84_https_arxiv_org_abs_2512_20619/figures/012_Figure_8.jpg]]
 *Figure 8: Qualitative ablation on semantic space compression. Row 1: SemanticGen without compression; Row 2: Compress the semantic space using an MLP with 64 output channels; Row 3: Compress the semantic space using an MLP with 8 output channels*
-
-![[assets/figures/papers/paper_list_l84_https_arxiv_org_abs_2512_20619/figures/013_Figure_9.jpg]]
-*Figure 9: Ablation on the representation space. We visualize the generation results of learning on the semantic space and the compressed VAE latent space with the same training steps*
-
-![[assets/figures/papers/paper_list_l84_https_arxiv_org_abs_2512_20619/figures/007_Figure_6.jpg]]
-*Figure 6: Comparison with state-of-the-art methods on short video generation. It shows that SemanticGen generates high-quality videos that adhere to the text prompts and are comparable to strong baselines*
-
-![[assets/figures/papers/paper_list_l84_https_arxiv_org_abs_2512_20619/figures/008_Figure_7.jpg]]
-*Figure 7: Comparison with state-of-the-art methods on long video generation. It demonstrates that SemanticGen generates videos with long-term consistency and significantly alleviates the drifting issues*
 
 ## 定位与知识库关联
 

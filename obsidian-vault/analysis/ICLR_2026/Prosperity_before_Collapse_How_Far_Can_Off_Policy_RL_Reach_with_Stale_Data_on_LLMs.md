@@ -51,8 +51,6 @@ M2PO 的核心优势在于：
 
 在 1.7B 至 32B 参数规模的六组模型和八个数学推理基准上，M2PO 在 off-policy 设置（s=256）下平均准确率最高提升 11.2%，且在五组模型中取得最优平均准确率，验证了其在解耦生成与训练、提升 RL 训练吞吐量方面的实用价值。
 
-
-
 ### 大语言模型推理能力的强化学习训练
 
 近年来，强化学习（RL）已成为提升大语言模型（LLM）推理能力的核心技术路径。通过将推理任务建模为策略优化问题，模型在数学、编程等复杂场景中展现出显著的性能跃升。GRPO（Group Relative Policy Optimization）是这一范式中的代表性算法，其核心机制是在同一提示词的多个采样响应之间进行组内奖励归一化，并利用裁剪后的优势加权概率比进行策略更新：
@@ -82,8 +80,6 @@ $$A_{i,t} = \frac{r_i - \mathrm{mean}(\{R_i\}_{i=1}^G)}{\mathrm{std}(\{R_i\}_{i=
 基于上述分析，本文提出核心问题：**能否设计一种自适应、方差敏感的信任区域机制，既能抑制极端离群值对训练的破坏，又能保留绝大多数信息丰富的更新信号？**
 
 这一动机直接导向 M2PO（Second-Moment Trust Policy Optimization）的设计：利用重要性权重的二阶矩统计量 $M_2$ 作为分布偏移的实时度量，在批次层面动态确定信任区域。$M_2$ 兼具方差敏感性（能捕获高熵 token 引入的不稳定性）和统计稳定性（避免了 KL 散度中正负项抵消的问题），使其成为离线 RL 训练中信任区域自适应的理想指标。
-
-
 
 ## 核心方法与创新机理
 
@@ -128,8 +124,6 @@ M2PO 的掩码策略改变了这一逻辑：
 
 这一 changed slot 组合使得 M2PO 在极端离线策略条件下（staleness ≥ 256）仍能保持稳定训练，并在 6 个模型规模（1.7B–32B）上实现与在线策略 GRPO 相当甚至更优的精度（Table 1），其中 Qwen3-Base-1.7B 上 M2PO（$s=256$）以 36.6% 的平均准确率显著超越在线策略 GRPO 的 33.0%。
 
-
-
 M2PO 的整体 pipeline 围绕**批级二阶矩约束下的选择性掩码**展开，在标准 GRPO 的基础上仅改造策略更新的信任域机制，其余数据流保持不变。其核心逻辑可归纳为四个阶段：
 
 ### 1. 数据生成与 staleness 控制
@@ -173,8 +167,6 @@ Prompt → 当前模型采样 → 响应序列缓存（staleness 延迟）
 ```
 
 整个 pipeline 仅在“信任域约束”环节替换了 GRPO 的逐 token 裁剪机制，输入（prompt 集、采样响应、奖励信号）和输出（策略梯度更新）的接口与 GRPO 完全兼容。唯一的额外超参数 $\tau_{M_2}$ 经实验验证不敏感（见 Figure 7），使得该方法在实际部署中易于调参。
-
-
 
 ### M2PO 的核心设计逻辑
 
@@ -225,8 +217,6 @@ $$\mathcal{L}_{M2PO}(\theta) = \frac{1}{\sum_{i=1}^G |o_i|} \sum_{i=1}^G \sum_{t
 
 M2PO 仅有一个超参数 $\tau_{M_2}$。实验表明该阈值不敏感（见 Figure 7），默认值 $\tau_{M_2}=0.04$ 在多个模型尺度和任务上均表现稳定，保证了方法的易用性。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：M2PO 在极端陈旧数据下的稳定性与性能
@@ -234,7 +224,6 @@ M2PO 仅有一个超参数 $\tau_{M_2}$。实验表明该阈值不敏感（见 F
 M2PO 的核心实验结论是：在数据陈旧度高达 256 次模型更新的极端离线策略条件下，M2PO 不仅保持了训练稳定性，而且实现了与在线策略 GRPO 相当甚至更优的推理性能。这一结论在多个模型规模和任务类型上得到了一致验证。
 
 **主结果（Table 1）** 覆盖了从 1.7B 到 32B 的六种模型（Llama-3.2-3B、Qwen2.5-Math-7B、Qwen3-Base-1.7B/4B/8B、Qwen2.5-32B）在八个数学推理基准（AIME、AMC、Math500、Gaokao、Minerva、Olympiad 等）上的表现。关键对比数据如下：
-
 
 ![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_IIgl5MWelz/figures/009_Table_1.jpg]]
 *Table 1: Performance (%) comparison across eight math reasoning benchmarks using models from 1.7B to 32B parameters. We report results for GRPO, GSPO, and M2PO under both on-policy (s = 0) and off-policy (s = 256) settings. Underlined numbers denote the best average accuracy, while bold numbers highlight the best average accuracy under stale rollouts (s = 256). M2PO consistently improves stability under staleness and achieves higher average accuracy than GRPO*
@@ -244,7 +233,6 @@ M2PO 的核心实验结论是：在数据陈旧度高达 256 次模型更新的�
 - **GSPO 同样失效**：GSPO 作为另一个基线方法，在 s=256 下同样出现大幅性能退化，表明仅靠重要性采样重加权不足以解决离线策略训练的稳定性问题。
 
 **训练动态（Figure 1, Figure 5）** 进一步揭示了 M2PO 的收敛特性。在 Qwen-2.5-32B 上，M2PO (s=256) 在训练初期由于使用基础模型生成的陈旧数据而暂时落后于在线基线，但随后迅速追赶并最终匹配在线策略的性能轨迹。相比之下，GRPO (s=256) 不仅收敛更慢，而且最终准确率明显更低。在训练奖励曲线上，M2PO (s=256) 同样表现出与 s=0 轨迹高度对齐的特性。
-
 
 ![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_IIgl5MWelz/figures/002_Figure_1.jpg]]
 *Figure 1: Comparison of on-policy GRPO and off-policy training under a staleness of 256 model updates on Qwen-2.5-32B. Left: Standard GRPO suffers from degradation with stale rollouts, while removing the trust region (GRPO no TR) reveals a clear prosperity-before-collapse phenomenon. In contrast, M2PO achieves stable training and matches on-policy performance even under high staleness. Right: Token clipping ratio comparison shows that M2PO dramatically reduces clipping events compared to GRPO with the same staleness, while avoiding training collapse*
@@ -263,7 +251,6 @@ M2PO 稳定性的直接证据来自对 token 裁剪率的分析。**Figure 6c �
 
 **信任区域移除实验（Figure 3）** 揭示了"繁荣-崩溃"现象，这是理解 M2PO 设计动机的关键。在 Llama-3.2-Instruct-3B 上，当完全移除信任区域（ε=∞）并使用陈旧数据 (s=256) 训练时，模型初期表现出比带裁剪训练更高的准确率，有时甚至匹配在线策略基线。然而，训练随后发生灾难性崩溃，性能急剧下降。这一现象说明：
 
-
 ![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_IIgl5MWelz/figures/005_Figure_3.jpg]]
 *Figure 3: Prosperity before Collapse. Training without a trust region (TR) ( $\epsilon$ ~ = ~ $\infty$ ) under stale data (s = 256) initially achieves higher performance than clipped training, sometimes even matching the onpolicy baseline (s = 0). However, it eventually collapses due to uncontrolled variance
 
@@ -275,7 +262,6 @@ M2PO 稳定性的直接证据来自对 token 裁剪率的分析。**Figure 6c �
 
 **与 TIS 的兼容性（Figure 10）** 显示，将 M2PO 与 TIS（一种缓解 FSDP 与 VLLM 之间分布差距的技术）结合使用时，性能有轻微提升。但 TIS 单独无法解决陈旧数据导致的离线策略问题，这确认了分布偏移的核心来源是策略陈旧而非推理框架差异。
 
-
 ![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_IIgl5MWelz/figures/018_Figure_10.jpg]]
 *Figure 10: Combining TIS with GRPO and M2PO on Qwen2.5-Math-7B with s = 256. Combined with TIS, M2PO shows a slight performance improvement, as TIS better mitigates the distribution gap between FSDP and VLLM. However, TIS alone cannot address the off-policy caused by staleness*
 
@@ -285,12 +271,7 @@ M2PO 稳定性的直接证据来自对 token 裁剪率的分析。**Figure 6c �
 
 **不同陈旧度下的鲁棒性（Figure 13）**：在 Qwen2.5-Math-7B 上，M2PO 在多个陈旧度水平（s=0, 64, 128, 256）下均保持相对稳定的性能，而 GRPO 的性能随陈旧度增加呈明显单调下降趋势。
 
-
-![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_IIgl5MWelz/figures/023_Figure_13.jpg]]
-*Figure 13: The performance of M2PO and GRPO under different staleness on Qwen2.5-Math-7B*
-
 **计算开销（Table 2）**：M2PO 的损失计算时间约为 0.065 秒，占总训练时间（约 34-35 秒）的不到 0.2%。虽然略高于 GRPO 的 0.038 秒，但这一差异在实际训练中可忽略不计。
-
 
 ![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_IIgl5MWelz/figures/021_Table_2.jpg]]
 *Table 2: Comparison of computation time between GRPO and M2PO. Loss computation contributes a negligible portion of the total training time*
@@ -301,13 +282,8 @@ M2PO 稳定性的直接证据来自对 token 裁剪率的分析。**Figure 6c �
 
 **需注意的实验局限**：当前实验的陈旧度上限为 256 次更新，更大陈旧度下的行为尚待验证。此外，τ_M₂=0.04 的通用性在不同模型规模和任务类型上虽有 Figure 7 的敏感性分析支持，但论文未提供跨所有模型配置的系统性阈值扫描结果。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_IIgl5MWelz/figures/013_Figure_6.jpg]]
 *Figure 6: (a) Methods comparison under staleness ( s = 2 5 6 ) on Llama3.2-Instruct-3B. (b) Performance comparison between M2PO and GRPO on coding tasks. (c) Clipping ratio dynamics during RL on the Qwen-3-Base-1.7B model. (d) Comparison of the average clipping ratio across models and methods*
-
-
-
 
 ## 定位与知识库关联
 
@@ -352,8 +328,6 @@ M2PO 的有效性建立在以下前提之上：
 3. **自适应阈值机制**：当前 $\tau_{M_2}$ 为固定值。根据训练阶段的动态特征（如 $M_2$ 的历史分布、奖励信号的稳定性）自适应调整阈值，可能进一步提升 M2PO 在不同训练阶段的效率——在稳定阶段放松约束以加速学习，在波动阶段收紧约束以保证安全。
 
 4. **$M_2$ 约束与奖励塑形的交互**：GRPO 的组内归一化本身是一种隐式的奖励塑形。$M_2$ 约束改变了有效更新 token 的分布，这可能间接影响组内优势估计的统计性质。这种交互效应是否会影响模型探索-利用平衡，需要更系统的分析。
-
-
 
 ## 原文 PDF
 

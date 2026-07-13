@@ -51,15 +51,11 @@ claims:
 
 **方法定位**：InfinityHuman 属于两阶段音频驱动全身动画方法，区别于单阶段直接生成的基线。其关键创新在于将姿态序列与外观表现解耦作为长期控制信号，并首次在音频驱动人体动画中引入手部专项优化。当前框架仅训练于单人连续视频，对多人交互和场景切换的支持仍需扩展。
 
-
-
 音频驱动的人体动画旨在从语音信号中合成逼真的说话人物视频，在虚拟主播、数字人交互、电影制作等领域具有广泛应用。然而，现有方法在生成**长时间视频**时面临根本性瓶颈：随着生成时长增加，累积误差导致人物身份漂移、颜色偏移、场景不稳定等视觉退化现象（Figure 2）。这一问题的根源在于，先前工作通常将前一时刻的生成帧作为下一时刻的条件输入，误差沿时间轴逐步放大，形成“滚雪球”效应。
 
 与此同时，**手部运动建模**是另一长期被忽视的挑战。由于手部关节自由度极高、训练数据中手部区域占比较小，现有方法生成的视频频繁出现手指畸变、手势与音频节奏不对齐等问题。此前的工作如 **HunyuanVideo-Avatar**（Chen et al., arXiv 2025）、**OmniAvatar**（Gan et al., arXiv 2025）、**OmniHuman-1**（Lin et al., ICCV 2025）等虽在全身体动画上取得进展，但均未专门优化手部生成质量；而 **Hallo3**（Cui et al., CVPR 2025）、**FantasyTalking**（Wang et al., ACM Multimedia 2025）等方法仅聚焦于头部动画，无法处理全身动作。
 
 上述两大缺口——**长时视觉一致性**与**手部运动保真度**——构成了本文的核心动机。InfinityHuman 的出发点是：若能引入一种结构上不受外观退化影响的控制信号来引导生成，并辅以手部特定的反馈机制，就有望同时解决身份漂移与手势失真问题。具体而言，姿态序列（pose sequence）作为纯几何信息，天然不受颜色、纹理等外观退化影响，可作为长时生成中的**无漂移引导**；同时，参考帧可作为身份锚点，锁定人物外观；而手部奖励反馈则可针对性地纠正细小关节畸变。基于这些洞察，本文提出由粗到细的两阶段框架 InfinityHuman，系统性地应对长时间音频驱动人体动画中的核心挑战。
-
-
 
 ## 核心方法与创新机理
 
@@ -102,8 +98,6 @@ InfinityHuman 将这一过程解耦为两个级联阶段：
 $$\mathrm{CA}_{\mathrm{mm}}(x^{\mathrm{lr}}, c_{\mathrm{text}}, c_{\mathrm{audio}}) = \mathrm{CA}(x^{\mathrm{lr}}, c_{\mathrm{text}}) + \mathrm{CA}(x^{\mathrm{lr}}, c_{\mathrm{audio}})$$
 
 文本和音频条件通过独立的交叉注意力分支注入，避免了模态间的信息干扰。配合训练时的多重条件 Dropout 策略（文本和音频各以 10% 概率独立丢弃，参考图和首帧以 10% 概率丢弃），增强了模型对各条件信号的解耦感知能力，从而提升音画对齐精度和身份保持鲁棒性。
-
-
 
 InfinityHuman 提出了一种**由粗到细的两阶段生成框架**，专门解决长时间音频驱动人体动画中的视觉退化与身份漂移问题。其核心设计思路是：先以低分辨率生成与音频同步的粗粒度运动视频，再通过姿态引导的细化器将其恢复为高分辨率、身份一致的长时间输出。
 
@@ -163,8 +157,6 @@ $$\mathcal{L}_{\mathrm{hand}}(\theta) = \mathbb{E}_{c \sim p(c)} \mathbb{E}_{X_i
 
 这一框架的核心洞察在于：**姿态序列结构上不受外观退化影响，可作为长期生成中保持身份一致性和动作连贯性的无漂移引导**；同时利用参考帧建立身份锚点，并通过手部奖励机制纠正细小关节失真。
 
-
-
 InfinityHuman 采用两阶段由粗到细的生成框架，其核心由四个关键模块构成：低分辨率音频到视频生成器（LR-A2V）、姿态引导细化器（PG-Refiner）、手部特定奖励反馈学习机制，以及多模态条件交叉注意力。以下逐一阐述各模块的设计逻辑与关键公式。
 
 ### 3.1 低分辨率音频到视频生成（LR-A2V）
@@ -223,13 +215,6 @@ $$\mathcal{L}_{\mathrm{hand}}(\theta) = \mathbb{E}_{c \sim p(c)} \mathbb{E}_{X_i
 
 四个模块形成递进式协同：LR-A2V 提供粗粒度的音画对齐运动基元；PG-Refiner 以姿态序列为无漂移几何引导，以前缀帧为身份锚点，将低分辨率输出恢复为高保真长视频；手部奖励反馈学习作为细粒度校正，专门修复细小关节的失真；多模态交叉注意力则贯穿第一阶段，从源头增强音频-视觉的对齐精度。这一由粗到细、从全局到局部的设计，使 InfinityHuman 在长时生成中有效抑制了误差累积。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1066_https_openaccess_thecvf_com_content_CVPR2026_html_Li_InfinityHuman_Towar/figures/002_Figure_2.jpg]]
-*Figure 2: Progressive Degradation in Long Video Animation by Previous Methods. Existing methods suffer from cumulative errors leading to pronounced identity drift (facial inconsistencies), color shifts (hair, clothing), scene instability (background fluctuations), and hand motion artifacts. These challenges underscore the necessity of InfinityHuman’s pose-guided refiner and hand-specific optimization for producing high-fidelity, temporally coherent animations over extended sequences*
-
-
-
 ## 实验与关键发现
 
 ### 实验设置
@@ -274,15 +259,11 @@ Table 3 报告了从 10s 到 50s 的累计指标变化，这是验证长时生�
 - **Table 2**：消融实验证实姿态引导细化器和手部奖励反馈是不可或缺的组件，去除后 FID 上升 17.8、HKC 下降 0.02。
 - **Table 3**：10s 到 50s 的累计指标保持稳定，证明框架具备真正的长时生成能力，无误差累积导致的退化。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1066_https_openaccess_thecvf_com_content_CVPR2026_html_Li_InfinityHuman_Towar/figures/007_Figure_5.jpg]]
 *Figure 5: Visualization of Ablation Study. Demonstrating the effects of key components on animation quality*
 
 ![[assets/figures/papers/paper_list_l1066_https_openaccess_thecvf_com_content_CVPR2026_html_Li_InfinityHuman_Towar/figures/001_Figure_1.jpg]]
 *Figure 1: InfinityHuman is an audio-driven full-body animation framework that synthesizes long-duration videos with (a) temporally consistent visual appearance, (b) expressive and style-rich hand gestures, (c) dynamic human-object interactions, and (d) emotion-controllable, audio-aligned full-body motions*
-
-
 
 ## 定位与知识库关联
 
@@ -337,8 +318,6 @@ InfinityHuman 的适用边界由其训练数据分布和框架设计共同界定
 4. **实时或低延迟推理**：当前两阶段流程虽通过蒸馏实现高效推理，但实时应用场景（如虚拟主播）对延迟有更高要求。进一步压缩模型或设计单阶段等价模型是工程化方向。
 
 5. **跨身份泛化**：参考帧作为身份锚点的策略在训练身份与推理身份一致时效果最佳。对于零样本跨身份生成场景，前缀潜在参考策略的泛化能力需要进一步验证。
-
-
 
 ## 原文 PDF
 

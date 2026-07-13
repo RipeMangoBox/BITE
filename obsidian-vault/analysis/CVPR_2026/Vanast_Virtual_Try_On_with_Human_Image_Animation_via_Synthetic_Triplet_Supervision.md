@@ -58,8 +58,6 @@ claims:
 
 3. **全面的实验验证**：在 Internet 数据集上，Vanast 在所有评估指标（L1、PSNR、SSIM、LPIPS、FID、VFID）上均优于由主体到图像模型（如 **Mosaic** (She et al., arXiv 2025)、**VisualCloze** (Li et al., arXiv 2025)）或虚拟试穿模型（如 **OOTDiffusion** (Xu et al., AAAI 2025)、**CatVTON** (Chong et al., arXiv 2024)）与动画模型（如 **Champ** (Zhu et al., ECCV 2024)、**StableAnimator** (Tu et al., CVPR 2025)）构成的所有两阶段组合基线，定性比较也显示出最优的视觉保真度。
 
-
-
 虚拟试穿人物动画（Virtual Try-On with Human Image Animation）旨在将目标服装图像转移到给定人物图像上，并同时驱动该人物按照指定的姿势序列生成连贯的动画视频。这一任务在电子商务、虚拟时尚和数字人内容创作中具有广泛的应用前景。然而，现有方法普遍采用**两阶段流水线**：先执行图像级虚拟试穿（VTON）或主体到图像（Subject-to-Image）生成，再将结果输入独立的动画模型。这种解耦范式带来了三个核心瓶颈：
 
 1. **身份漂移**：两阶段模型各自优化独立目标，动画阶段可能改变第一阶段生成的人物身份特征，导致最终视频中的人物与原始输入不一致。
@@ -69,8 +67,6 @@ claims:
 上述问题的根源在于**训练数据的结构性缺失**：现有数据集通常只包含穿着特定服装的人物视频，缺乏“同一人物穿着不同服装、且对应相同姿势序列”的三元组数据。这使得模型无法直接学习“服装转移”与“动画生成”之间的联合映射，只能退而求其次地采用分阶段近似。
 
 针对这一缺口，本文提出 **Vanast**——一个端到端的统一框架，直接从人物图像、服装图像和姿势视频合成服装转移后的人物动画。Vanast 的核心动机在于：通过构建**合成三元组监督**来填补数据空白，并设计**双模块条件注入架构**以在冻结的预训练文本到视频扩散主干上独立控制人体动画与服装转移两个关键因素，从而在保持预训练生成质量的前提下，实现高保真的服装精度、姿势遵循和身份保持。
-
-
 
 ## 核心方法与创新机理
 
@@ -120,8 +116,6 @@ $$h_{l+1} = \mathrm{B}_l^{\mathrm{T2V}}(h_l) + \alpha \cdot \mathrm{B}_l^{\mathr
 
 Vanast 的创新链条清晰且自洽：**合成三元组监督**解决了训练数据的结构性缺失，迫使模型学习服装转移而非运动复现；**双模块架构**将异质性条件（人体动画与服装转移）解耦为独立路径，在冻结主干的前提下实现精准的条件控制；**加性注入与冻结主干**的组合策略保留了预训练生成质量，同时支持零样本服装插值。这一设计使得 Vanast 在统一的端到端框架中，全面超越了所有两阶段组合基线（Table 1, Table 2），在姿势遵循、服装精度和身份保持三个维度上均取得最优结果。
 
-
-
 Vanast 是一个端到端的统一框架，直接从人物图像、服装图像和姿势引导视频合成服装转移后的人物动画视频，无需传统的两阶段流水线（先虚拟试穿再动画生成）。其核心设计围绕两个关键创新展开：**合成三元组数据集生成流水线**和**双模块架构**。
 
 ### 输入输出定义
@@ -165,12 +159,8 @@ $$h_{l+1} = \mathrm{B}_l^{\mathrm{T2V}}(h_l) + \alpha \cdot \mathrm{B}_l^{\mathr
 
 如图 2 所示，Vanast 的整体流水线分为两个阶段：**数据生成阶段**通过合成流水线构建三元组训练数据；**推理阶段**将目标服装 $\mathbf{G}$、合成人物图像 $\mathbf{I}^{\mathbf{G}'}$、姿势序列 $\mathbf{K}$ 和文本提示 $\mathbf{T}$ 输入双模块架构，由冻结的 T2V 主干生成最终的服装转移动画视频。这一端到端设计消除了两阶段流水线中常见的身份漂移、服装变形和前后视图不一致问题。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1085_https_arxiv_org_abs_2604_04934/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of Vanast Pipeline. Our Vanast framework generates virtual try-on human animation videos from a human image, garment images, and a pose video. By incorporating scalable human-image and garment-image generation pipelines, our method avoids dataset-specific constraints and trains effectively at scale. The Dual Modules architecture ensures that the three conditioning signals, human image IG′ , garment images G, and pose video K, are faithfully reflected in the resulting video*
-
-
 
 Vanast 的核心设计围绕两个关键机制展开：**合成三元组监督**构建训练数据，以及**双模块注入架构**实现服装转移与人体动画的解耦控制。以下从数据生成、模型架构和公式化定义三个层面进行解析。
 
@@ -201,11 +191,6 @@ $$h_{l+1} = \begin{cases} \mathrm{B}_l^{\mathrm{T2V}}(h_l), & \text{if } l \neq 
 $$h_{l+1} = \mathrm{B}_l^{\mathrm{T2V}}(h_l) + \alpha \cdot \mathrm{B}_l^{\mathrm{HAM}}(h_l) + \gamma \cdot \mathrm{B}_l^{\mathrm{GTM}}(h_l; \mathbf{G}_A) + (1-\gamma) \cdot \mathrm{B}_l^{\mathrm{GTM}}(h_l; \mathbf{G}_B) \tag{3}$$
 
 其中 $\gamma \in [0,1]$ 控制插值比例。这一性质源于 GTM 输出的服装表示在特征空间中具有语义连续性，使得加权求和能产生有意义的中间服装样式（Fig. 10 展示了平滑的服装过渡效果）。
-
-![[assets/figures/papers/paper_list_l1085_https_arxiv_org_abs_2604_04934/figures/013_Figure_10.jpg]]
-*Figure 10: Result of Garment Interpolation. Without requiring any additional finetuning, our Vanast model performs zero-shot transfer of interpolated garments by GTM. γ denotes a scalar interpolation weight*
-
-
 
 ## 实验与关键发现
 
@@ -245,8 +230,6 @@ $$h_{l+1} = \mathrm{B}_l^{\mathrm{T2V}}(h_l) + \alpha \cdot \mathrm{B}_l^{\mathr
 
 当前验证的分析未提供显式的失败案例（limitations 字段为空）。根据方法设计推断，潜在局限可能包括：极端姿势或遮挡下的服装转移精度下降、合成三元组数据中人类图像生成质量对整体性能的制约、以及多服装转移时服装间交互（如衣领重叠）的建模不足。这些推断需要人工对照原文进一步确认。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1085_https_arxiv_org_abs_2604_04934/figures/006_Table_1.jpg]]
 *Table 1: Quantitative Comparison with the Combination of Subject-to-Image and Animation Models. We compare our model with a baseline that combines a subject-to-image model and an animation model. Our model achieves the best performance across all metrics. Bold text indicates the best score in each column*
 
@@ -261,23 +244,6 @@ $$h_{l+1} = \mathrm{B}_l^{\mathrm{T2V}}(h_l) + \alpha \cdot \mathrm{B}_l^{\mathr
 
 ![[assets/figures/papers/paper_list_l1085_https_arxiv_org_abs_2604_04934/figures/005_Figure_5.jpg]]
 *Figure 5: Qualitative Comparisons (Virtual Try-On-based). We compare our results with baselines formed by combining image virtual try-on models with animation models. Our method achieves the most accurate pose following and garment transfer while preserving identity with the highest fidelity*
-
-![[assets/figures/papers/paper_list_l1085_https_arxiv_org_abs_2604_04934/figures/011_Figure_7.jpg]]
-*Figure 7: Ablation Study. We present the ablation study results for the lower garment transfer. The red box in the “Single Module” result demonstrates vulnerability to pose conditions. Both “Backbone-LoRA” and “w/o SynthHuman” fail to achieve accurate garment transfer, as indicated in blue box. In contrast, our full model produces results most similar to the ground truth*
-
-![[assets/figures/papers/paper_list_l1085_https_arxiv_org_abs_2604_04934/figures/008_Figure_6.jpg]]
-*Figure 6: Result of Single Garment Transfer. We present virtual try-on with human image animation results generated from a single garment image*
-
-![[assets/figures/papers/paper_list_l1085_https_arxiv_org_abs_2604_04934/figures/009_Figure_8.jpg]]
-*Figure 8: Result of Multiple Garment Transfer. We present zero-shot garment transfer results where both upper and lower garments are transferred simultaneously. The logos and fine details of the garments are well preserved and accurately reflected in the generated animation videos*
-
-![[assets/figures/papers/paper_list_l1085_https_arxiv_org_abs_2604_04934/figures/012_Figure_9.jpg]]
-*Figure 9: Result of In-the-wild Garment Transfer. We present garment transfer results using in-the-wild garment images provided by the TikTokDress [21] dataset*
-
-![[assets/figures/papers/paper_list_l1085_https_arxiv_org_abs_2604_04934/figures/003_Figure_3.jpg]]
-*Figure 3: Samples of Synthetic Triplet Datasets. We show samples of the datasets used for generation and training. The triplet construction contributes to enabling the model to preserve identity while accurately transferring garments and producing animation videos that follow the target pose*
-
-
 
 ## 定位与知识库关联
 
@@ -341,8 +307,6 @@ Vanast 在训练数据构建上做出了根本性创新：通过合成三元组�
 3. **扩展到更多条件**：HAM 和 GTM 的解耦架构是否可自然扩展到其他条件（如背景、光照、相机运动），形成更通用的可控视频生成框架，是一个值得探索的方向。
 
 4. **与 3D 方法的结合**：当前方法完全基于 2D 表示，与基于 3D 人体模型（如 SMPL）的方法在服装几何保真度上的差距未量化。
-
-
 
 ## 原文 PDF
 

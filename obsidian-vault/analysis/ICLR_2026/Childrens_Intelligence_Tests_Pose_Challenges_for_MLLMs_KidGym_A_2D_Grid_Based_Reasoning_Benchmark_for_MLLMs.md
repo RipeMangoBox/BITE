@@ -59,13 +59,9 @@ claims:
 
 **方法谱系与知识库定位**：KIDGYM 处于 MLLM 评估基准与认知能力测试的交叉地带。它继承了强化学习环境（如 **MiniGrid** (Chevalier-Boisvert et al., NeurIPS 2023)）的交互范式，但面向 MLLMs 而非 RL 智能体；同时吸收了视觉推理基准（如 ARC-AGI-2）的抽象推理设计，但通过动态场景和多维能力框架提供了更全面的评估体系。其可扩展的 Gym API 接口使其成为研究 MLLM 认知能力的通用实验平台。
 
-
-
 多模态大语言模型（MLLMs）在视觉问答、图像描述等语义密集型任务上已取得显著进展，但其在抽象视觉推理、数量感知以及多能力协同方面的表现仍不明朗。现有评估基准多聚焦于静态场景下的单一能力测试，难以系统揭示模型在动态交互环境中整合执行、记忆、学习、规划与感知推理等核心认知能力的真实水平。例如，**Crafter**（Hafner, 2021）和 **MiniGrid**（Chevalier-Boisvert et al., NeurIPS 2023）主要面向强化学习范式，而 **LogicGame**（Gui et al., 2024）、**EgoPlan**（Chen et al., 2024）等基准则缺乏难度层级划分与用户可扩展性（Table 1）。
 
 儿童智力测验通过多维度、分难度的任务设计来评估认知发展，这一思路为诊断 MLLMs 的根本性缺陷提供了启示。本文的核心动机在于：借鉴韦氏智力测验的评估框架，构建一个动态、可定制、覆盖五大核心能力的 2D 网格基准，以揭示 MLLMs 在非语义抽象推理、数量感知及复合能力上的真实瓶颈。
-
-
 
 ## 核心方法与创新机理
 
@@ -80,8 +76,6 @@ KIDGYM 的核心创新在于将儿童智力测验范式系统性地迁移至多�
 **完全可扩展的开放框架。** 基于标准化 Gym API 构建的环境使得研究人员可以自定义新场景、新任务和新难度级别（Section 1, Section 6.2）。配合场景与物品的随机生成机制——每次交互的布局和物品位置均不同——有效降低了数据泄露和记忆效应的风险。这种用户可扩展性在现有 MLLM 基准中极为罕见。
 
 上述四个 changed slots 共同构成了 KIDGYM 的方法论贡献：它并非简单增加任务数量，而是通过动态性、层级化、多维度和可扩展性四个维度的协同设计，构建了一个能够揭示 MLLM 根本性能力缺陷的评估框架。
-
-
 
 ![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_Hj8Dc14nk1/figures/013_Table_1.jpg]]
 *Table 1: Comparison of KIDGYM with existing benchmarks across target paradigm, difficulty-level support, user extensibility, evaluated capabilities, and dynamic vs. static settings*
@@ -117,8 +111,6 @@ Table 1 将 KIDGYM 与 10 个现有基准进行了系统性对比。在目标范
 
 **证据强度说明**：上述模块关系与输入输出流均基于论文第 4 节（Mechanics）和第 6.2 节（实验设置）的明确描述，置信度较高。Table 1 的对比结论来自原文表格的直接呈现。需注意，框架内部各模块的具体实现细节（如随机种子管理、API 调用频率限制）未在论文中完整披露，若需复现应参考其开源代码仓库。
 
-
-
 KIDGYM 本身是一个基准测试框架，不涉及模型架构层面的公式推导。其核心设计体现在环境构建与任务生成的工程化模块中，以下梳理支撑该基准的关键组件。
 
 ### 环境与任务生成模块
@@ -153,8 +145,6 @@ $$ \text{Success Rate} = \frac{\text{成功完成的任务轮数}}{\text{总评�
 
 > 注：本文未提供任何模型架构或损失函数相关的数学公式，因此本节不进行额外推导。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -162,7 +152,6 @@ $$ \text{Success Rate} = \frac{\text{成功完成的任务轮数}}{\text{总评�
 KIDGYM 在零样本设定下对 9 个前沿 MLLM 进行了系统评估，包含 6 个闭源模型（**o3**、**GPT-5**、**GPT-4o**、**Gemini-2.5-Pro**、**Gemini-2.5-Flash**、**Claude-3.7-Sonnet**）和 3 个开源模型（**DeepSeekVL-2**、**QwenVL-2.5**、**InternVL-3**）。所有模型在相同随机种子上进行 100 轮评估，封闭模型通过官方 API 调用，开源模型使用 NVIDIA RTX A6000 运行，确保可比性。
 
 **总体性能格局**：闭源 MLLM 在 KIDGYM 上的整体表现显著高于开源模型（Table 2），其中 **o3**、**GPT-5** 和 **Gemini-2.5-Pro** 在所有能力维度上占据主导地位。然而，即便是最强模型，在特定任务上仍与人类水平存在巨大差距。
-
 
 ![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_Hj8Dc14nk1/figures/015_Table_2.jpg]]
 *Table 2: Zero-shot performance comparison of MLLMs across 12 KIDGYM tasks. “L” denotes the task level. Performance is measured by the success rate over 100 rounds under the ground-truth optimal solution, rounded to two decimal places*
@@ -189,7 +178,6 @@ KIDGYM 在零样本设定下对 9 个前沿 MLLM 进行了系统评估，包含 
 
 通过计算五个维度的能力分数并生成雷达图（Figure 3），可以更直观地比较模型的能力轮廓：
 
-
 ![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_Hj8Dc14nk1/figures/016_Figure_3.jpg]]
 *Figure 3: Five-dimensional capability radar chart. The chart on the left shows the capability scores of the closed-source models, while the chart on the right shows those of the open-source models*
 
@@ -211,16 +199,11 @@ KIDGYM 在零样本设定下对 9 个前沿 MLLM 进行了系统评估，包含 
 2. **数量感知偏差**：模型依赖视觉启发式而非精确计数，在物品密集或布局复杂的场景中错误率显著上升。
 3. **复合能力整合困难**：当任务需要同时调动多种认知能力（如记忆+规划、学习+感知推理）时，模型表现明显下降，表明能力模块之间的协同机制尚未建立。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_Hj8Dc14nk1/figures/006_Figure_6.jpg]]
 *Figure 6: (f) Puzzle*
 
 ![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_Hj8Dc14nk1/figures/008_Figure_8.jpg]]
 *Figure 8: (h) Counting*
-
-
-
 
 ## 定位与知识库关联
 
@@ -235,8 +218,6 @@ KIDGYM 的定位介于传统强化学习环境与静态多模态语言模型基�
 **适用边界与局限。** KIDGYM 的适用边界受限于三个因素：（1）2D 网格环境的抽象性使其无法完全反映真实世界多模态任务的复杂性和噪声特征；（2）评估指标仅为成功率，未考虑效率、泛化能力或错误类型分析；（3）部分封闭模型通过 API 评估，内部推理过程不透明，难以深入诊断失败机制。此外，尽管任务场景和物品布局完全随机生成以降低数据泄露风险，但在有限的任务类型下，模型仍可能通过记忆特定模式而非真正推理来获得高分。
 
 **开放问题。** 本基准揭示的瓶颈指向四个关键研究方向：（1）如何提升模型对非语义、抽象视觉信息和数量特征的鲁棒处理能力，而非依赖高分辨率视觉线索的捷径；（2）如何设计训练策略使 MLLM 在复合能力任务中有效整合多种认知能力，而非各能力间的简单叠加；（3）ICL 在某些记忆和学习任务中劣于零样本的机理尚不明确，需进一步研究其适用范围和失效条件；（4）如何将 KIDGYM 的评估范式扩展到三维或真实世界环境，同时保持任务的可控性和可复现性。
-
-
 
 ## 原文 PDF
 

@@ -57,8 +57,6 @@ claims:
 
 该方法在**方法谱系**上属于“排序驱动的判别性美学学习”，区别于传统的绝对分数回归（如NIMA）或多任务学习范式（如TANet），其核心创新在于将细粒度相对排序信号与粗粒度绝对评分信号进行联合建模，实现了两类评估的平衡。
 
-
-
 ### 图像美学评估的粗粒度现状
 
 图像美学评估（Image Aesthetic Assessment, IAA）旨在自动预测图像的美学质量分数或偏好排序。近年来，深度学习的进展推动了一系列IAA模型的发展，包括 **NIMA**（Tal et al., TIP 2018）、**MLSP**（Hou et al., CVPR 2019）、**MUSIQ**（Ke et al., ICCV 2021）、**TANet**（Jin et al., IJCAI 2022）、**VILA**（Zhong et al., CVPR 2023）、**Charm**（Xu et al., CVPR 2025）、**Q-Align**（Wu et al., ICML 2024）、**UNIAA**（Yang et al., arXiv 2024）和 **RealQA**（He et al., arXiv 2025）等。这些方法在AVA等粗粒度数据集上取得了显著进展，其核心范式是对视觉差异明显的独立图像进行绝对分数回归。
@@ -72,8 +70,6 @@ claims:
 针对上述缺口，本文的核心洞察是：**通过从图像序列的相对排序中学习判别性美学分数，可以同时保持粗粒度评估能力，并显著提升细粒度美学区分能力。** 这一动机源于一个关键观察——在细粒度场景中，人类标注者更容易给出“A比B好”的相对判断，而非为每张图像分配绝对分数。相对排序天然地揭示了图像间的美学差异信号，为模型提供了更具判别性的监督信息。
 
 基于此，本文提出 **FGAesQ**，一个从相对排序中学习判别性美学分数的新框架。FGAesQ通过三个协同模块实现这一目标：**差分保持Token化（DiffToken）** 在美学决定性区域保持原始分辨率细节，其他区域降采样以节省计算量；**对比文本辅助对齐（CTAlign）** 将视觉嵌入差与MLLM生成的对比文本嵌入对齐，增强判别性表征；**排序感知回归（RankReg）** 使用Bradley-Terry模型和ListMLE损失，将预测的成对偏好概率与真实排序对齐。同时，本文构建了 **FGAesthetics** 基准数据集，包含来自自然、AIGC和裁剪三个来源的32,217张图像、10,028个序列，为细粒度IAA研究提供了标准化评估平台。
-
-
 
 ## 核心方法与创新机理
 
@@ -123,8 +119,6 @@ $$\mathcal{L} = \underbrace{\delta \cdot (\lambda \mathcal{L}_{F.align} + \mathc
 
 与现有方法相比，FGAesQ 的根本区别在于**学习范式的转变**：从学习绝对美学分数转向从相对排序中学习判别性分数。这一转变使得模型不再依赖单一的绝对评分监督，而是利用图像序列中蕴含的丰富相对信息，从而在细粒度场景中获得更强的区分能力。实验结果表明，FGAesQ 在 FGAesthetics 的所有评估协议（成对级别和序列级别，三个图像源）上均取得最优性能（Table 2），同时在 AVA 粗粒度评估上保持竞争力（SRCC=0.770/PLCC=0.781，Table 3），实现了粗-细粒度评估的最佳平衡。
 
-
-
 FGAesQ 的整体设计围绕一个核心矛盾展开：细粒度美学评估中，图像间强烈的语义相似性与微小的美学差异使得标准模型难以提取判别性特征。为解决这一问题，FGAesQ 将相对排序信号作为训练的核心驱动力，构建了一个三模块协同的评估框架，如 Figure 4 所示。
 
 ![[assets/figures/papers/paper_list_l2124_https_arxiv_org_abs_2603_03907/figures/005_Figure_4.jpg]]
@@ -165,8 +159,6 @@ $$\mathcal{L} = \underbrace{\delta \cdot (\lambda \mathcal{L}_{F.align} + \mathc
 FGAesQ 的推理流程为：输入图像经 DiffToken 进行混合分辨率 Token 化后，送入 ViT 编码器提取视觉嵌入；视觉嵌入直接通过回归头输出美学分数。CTAlign 和 RankReg 仅在训练阶段发挥作用——CTAlign 通过对比文本对齐引导视觉编码器学习判别性表征，RankReg 通过排序损失校准回归头的评分分布。这种设计确保了推理时无需额外的文本输入或成对比较，保持了与标准 IAA 模型相同的推理效率。
 
 消融实验（Table 5）系统验证了各模块的独立贡献：移除 CTAlign 使 Pair 从 0.753 降至 0.747、Series 从 0.600 降至 0.581；移除 RankReg 使 Pair 降至 0.742、Series 降至 0.571。三个模块的叠加效果表明，特征保持、语义对齐和排序校准在细粒度美学建模中存在互补增益。
-
-
 
 FGAesQ 的核心设计围绕一个瓶颈展开：现有 IAA 模型在细粒度场景下，由于图像间强烈的语义相似性和微小的美学差异，难以提取判别性美学特征。为解决这一问题，FGAesQ 引入三个协同模块——差分保持Token化（DiffToken）、对比文本辅助对齐（CTAlign）和排序感知回归（RankReg），并通过两阶段训练策略将粗粒度美学感知与细粒度排序信号联合优化。
 
@@ -220,8 +212,6 @@ $$\mathcal{L} = \underbrace{\delta \cdot (\lambda \mathcal{L}_{F.align} + \mathc
 
 **消融关键发现**：移除 DiffToken 对性能影响最大，Pair 从 0.753 降至 0.666，Series 从 0.600 降至 0.423（Table 5），表明保持美学差异区域的细节是细粒度判别的核心瓶颈所在。
 
-
-
 ## 实验与关键发现
 
 ### 实验设置
@@ -258,21 +248,13 @@ $$\mathcal{L} = \underbrace{\delta \cdot (\lambda \mathcal{L}_{F.align} + \mathc
 
 2. **可解释性不足。** 模型虽能准确判断图像间的美学优劣，但缺乏对判断依据的显式解释。CTAlign 模块利用 MLLM 生成了对比文本描述（Figure 9 词云展示了常见判别依据，如构图、色彩、清晰度等），但这些文本仅在训练中作为对齐信号，未在推理时输出。用户无法获知“为什么这张图更好”或“如何改进”，限制了实际应用深度。
 
-![[assets/figures/papers/paper_list_l2124_https_arxiv_org_abs_2603_03907/figures/014_Figure_9.jpg]]
-*Figure 9: Word clouds visualizing most frequent rationales for MLLM-generated comparative textual descriptions*
-
 3. **OOD 场景下的性能退化。** Table 8 显示，当训练数据中缺失某个图像源时，该源上的性能下降明显，表明模型对训练分布有较强依赖，在完全未知的美学风格或图像类型上可能需要额外的领域适应。
 
 ![[assets/figures/papers/paper_list_l2124_https_arxiv_org_abs_2603_03907/figures/017_Table_8.jpg]]
 *Table 8: Out-of-Distribution generalization performance. OOD generalization is evaluated by training FGAesQ with one source category excluded and testing on fine-grained (all three categories) and coarse-grained (AVA [26]) benchmarks*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2124_https_arxiv_org_abs_2603_03907/figures/006_Table_2.jpg]]
 *Table 2: Performance comparison between the proposed FGAesQ and state-of-the-art IAA methods on FGAesthetics. Results are reported across all three image sources (Natural, AIGC, and Cropping) for both pair-level and series-level evaluations. Model parameter counts are also provided. The top two results are highlighted in bold and underlined, respectively*
-
-![[assets/figures/papers/paper_list_l2124_https_arxiv_org_abs_2603_03907/figures/007_Table_3.jpg]]
-*Table 3: Balance between coarse-grained (AVA) and fine-grained (FGAesthetics) evaluations. Metrics shown are (Acc, F1)/2 for Pair and (s-Acc, s-SRCC)/2 for Series. Best in bold*
 
 ![[assets/figures/papers/paper_list_l2124_https_arxiv_org_abs_2603_03907/figures/010_Table_5.jpg]]
 *Table 5: Ablation study on training strategies and model components. ‘w/o’ is removal of the specified training or component. Metrics are (Acc, F1)/2 for Pair and (s-Acc, s-SRCC)/2 for Series*
@@ -280,22 +262,8 @@ $$\mathcal{L} = \underbrace{\delta \cdot (\lambda \mathcal{L}_{F.align} + \mathc
 ![[assets/figures/papers/paper_list_l2124_https_arxiv_org_abs_2603_03907/figures/018_Figure_10.jpg]]
 *Figure 10: Ablation study on DiffToken configuration. Performance is evaluated across different difference localization patch sizes and percentile thresholds for identifying aesthetics-decisive regions. Fine-grained metrics show pair- and series-averaged performance across Natural, AIGC, and Cropping categories. Coarsegrained metrics report SRCC and PLCC on AVA [26]*
 
-![[assets/figures/papers/paper_list_l2124_https_arxiv_org_abs_2603_03907/figures/016_Table_7.jpg]]
-*Table 7: Backbone ablation results on fine-grained and coarse-grained IAA tasks. For fine-grained evaluation on FGAesthetics, we report pair-level local discrimination using Acc and F1, and series-level ranking quality using s-Acc and s-SRCC across three source categories (Natural, AIGC, Cropping). Pair and Series represent category-averaged values of (Acc+F1)/2 and (s-Acc+s-SRCC)/2, respectively. For coarse-grained evaluation, we report SRCC and PLCC on AVA [26]*
-
-![[assets/figures/papers/paper_list_l2124_https_arxiv_org_abs_2603_03907/figures/009_Table_4.jpg]]
-*Table 4: Cross-dataset validation on three IAA benchmarks: ICAA17K [12], AADB [21], and TAD66K [11]. Results for UNIAA [53] on AADB are omitted as data is used in training*
-
 ![[assets/figures/papers/paper_list_l2124_https_arxiv_org_abs_2603_03907/figures/008_Figure_5.jpg]]
 *Figure 5: Visualization of evaluation results on three test series. Images arranged left-to-right in decreasing aesthetic quality. Red boxes and text indicate the best aesthetics*
-
-![[assets/figures/papers/paper_list_l2124_https_arxiv_org_abs_2603_03907/figures/003_Figure_2.jpg]]
-*Figure 2: Overview of the construction pipeline for FGAesthetics. The pipeline consists of three stages: (a) Data Collection. Visually similar photo series are collected from three distinct sources: Natural, AIGC, and Cropping. (b) Series Refinement. Noisy series data undergo rigorous filtering using a Metric-MLLMs-Human refinement protocol. (c) Rank Calibration. Pairwise comparisons are annotated within each series, excluding data that cannot be aesthetically distinguished to obtain calibrated aesthetic rankings*
-
-![[assets/figures/papers/paper_list_l2124_https_arxiv_org_abs_2603_03907/figures/004_Figure_3.jpg]]
-*Figure 3: Statistical analysis of FGAesthetics. (a) Image and series count distribution across Natural, AIGC, and Cropping. (b) Within-series similarity distributions measured by LPIPS (lowlevel) [51], DreamSim (mid-level) [9], and CLIPScore (high-level) [13] across three sources. Note that LPIPS and DreamSim are subtracted from 1, ensuring consistent polarity with CLIPScore, where higher values indicate greater similarity*
-
-
 
 ## 定位与知识库关联
 
@@ -336,8 +304,6 @@ FGAesQ 的设计隐含若干适用边界，需在实际应用中审慎考量：
 **可操作反馈生成**：从“判断哪个更好”到“解释为什么更好并提供改进建议”的跨越，需要模型具备更细粒度的美学属性解耦能力。CTAlign的对齐机制为此提供了潜在基础，但需要进一步将对比文本嵌入映射到具体的视觉属性（构图、色彩、光影等），并建立属性到改进操作的因果链。
 
 **跨源泛化与域适应**：Table 8的OOD实验结果揭示了不同图像源（Natural、AIGC、Cropping）之间的域差异。AIGC图像的审美标准可能与自然图像存在系统性偏差，Cropping变体的美学判断涉及构图规则的特定知识。如何设计具备跨源泛化能力的细粒度IAA模型，或建立高效的域适应机制，值得进一步探索。
-
-
 
 ## 原文 PDF
 

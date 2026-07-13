@@ -57,8 +57,6 @@ claims:
 
 **决定性证据表明**：在物体外观保持性上，AnchorCrafter相比现有最先进方法提升**7.5%**，物体定位精度（Obj-IoU）达到**0.906**，约为竞争方法的两倍；物体CLIP相似度达到**0.921**，在所有评估方法中最高（Table 1）。用户研究在所有五个评价维度（外观质量、运动准确性等）均排名第一，综合评分达**4.64/5**（Table 2）。同时，人脸相似度和VBench视频质量指标与现有最优方法持平或更优。消融实验证实，多视角特征融合、3D手部网格注入、重加权损失以及微调阶段各自对物体外观保持和交互精度有显著贡献。
 
-
-
 ### 虚拟主播带货：从姿势驱动到交互驱动的范式缺口
 
 随着直播电商的爆发式增长，利用AI生成虚拟主播进行产品带货已成为一个极具商业价值的应用方向。该任务的核心需求是：给定一张主播的参考图像和一个待展示的产品，生成一段主播自然手持、操作该产品并进行讲解的视频。这本质上是一个**人物-物体交互（Human-Object Interaction, HOI）视频生成**问题。
@@ -100,8 +98,6 @@ claims:
 - **HOI区域重加权损失**：在训练时对交互区域（手部和物体所在区域）施加更高的损失权重，迫使模型更关注这些关键区域的细节学习。
 
 这种设计使得AnchorCrafter在物体外观保持性上相比现有最优方法提升7.5%，物体定位精度（Obj-IoU）翻倍，在用户研究中所有评价维度均排名第一，综合评分达到4.64/5。
-
-
 
 ## 核心方法与创新机理
 
@@ -157,8 +153,6 @@ $$L_{final} = (1 - M_{inter}) \odot L_{diff} + L_{object}$$
 ### 创新协同效应
 
 三个 changed slots 并非孤立运作：外观解耦确保物体“长什么样”不受人体干扰，运动控制决定物体“怎么动”，重加权损失则强制模型在训练中优先学习交互区域的生成质量。消融实验（Table 1, Fig. 7）表明，移除任一模块均导致性能显著下降——多视角融合缺失降低 Obj-CLIP，手部网格缺失增大手部关键点误差（LMD），重加权损失缺失损害交互区域细节。三者的协同构成了 AnchorCrafter 在物体外观保持（+7.5%）和定位精度（翻倍）上超越现有方法的因果基础。
-
-
 
 AnchorCrafter 是一个基于扩散模型的视频生成系统，其核心目标是给定一张主播参考图像、一个目标商品的多视角图像以及一系列运动控制条件，生成一段该主播与商品自然交互的高保真带货视频。系统通过两阶段学习范式实现这一目标：**大规模 HOI 视频分布预训练**与**目标商品微调**。
 
@@ -216,12 +210,8 @@ $$L_{final} = (1 - M_{inter}) \odot L_{diff} + L_{object}$$
 - **训练优化**：交互区域重加权损失强化手部-物体细节学习
 - **输出**：主播与商品自然交互的高保真带货视频
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1912_AnchorCrafter_Animate_CyberAnchors_Saling_Your_Products_via_Human_Object/figures/002_Figure_2.jpg]]
 *Figure 2: We propose AnchorCrafter, a diffusion-based human video generation framework for creating high-fidelity anchorstyle product promotion videos by animating reference human images with specific products and motion controls. By incorporating human-object interaction into the generation process, AnchorCrafter achieves high preservation of object appearance and enhanced interaction awareness*
-
-
 
 AnchorCrafter 的核心架构建立在视频扩散模型之上，围绕三个关键模块解决人-物交互视频生成中的外观解耦与运动控制难题。
 
@@ -236,9 +226,6 @@ $$L_{diff} = \mathbb{E}_{\epsilon \sim \mathcal{N}(0,I), Z, c, t} [ \| \epsilon 
 ### HOI外观感知模块
 
 该模块是本方法的核心创新，旨在将物体外观从人体外观中解耦出来，实现独立的物体外观注入。其结构如 Fig. 5 所示，包含两个子组件：
-
-![[assets/figures/papers/paper_list_l1912_AnchorCrafter_Animate_CyberAnchors_Saling_Your_Products_via_Human_Object/figures/005_Figure_5.jpg]]
-*Figure 5: HOI-appearance perception: The feature of the target object*
 
 **多视角物体特征融合**：针对单视角无法完整捕捉物体外观的问题，系统从三个不同视角拍摄物体图像 $I_O = \{i_O^1, i_O^2, i_O^3\}$，分别通过预训练的 DINOv2-large 模型提取嵌入 $E_O$。随后，这些嵌入经过两个独立的可学习线性投影层生成 Query 和 Key/Value，通过自注意力机制融合为统一的物体特征 $f_O$。该设计使得模型能够从多视角推断物体的完整三维外观。
 
@@ -269,8 +256,6 @@ $$L_{object} = \eta \frac{S}{S_{obj} + S_{hand}} M_{inter} \odot L_{diff}$$
 $$L_{final} = (1 - M_{inter}) \odot L_{diff} + L_{object}$$
 
 该设计使得模型在训练时对交互区域施加更大的优化力度，从而显著提升物体外观保持和手部交互的生成质量。消融实验证实，移除该损失会导致交互区域物体细节明显退化（见 Table 1 和 Fig. 7 的 "w/o reweight" 行）。
-
-
 
 ## 实验与关键发现
 
@@ -340,33 +325,14 @@ AnchorCrafter采用两阶段训练策略。第一阶段在多样化的HOI视频�
 
 需注意，AnchorCrafter在训练阶段额外收集了每人一分钟的交互视频用于微调，相比无需微调的基线方法（如MimicMotion、StableAnimator）具有数据资源优势。论文认为该成本在直播带货等应用场景中可接受，但在严格公平对比中应予以考虑。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1912_AnchorCrafter_Animate_CyberAnchors_Saling_Your_Products_via_Human_Object/figures/007_Table_1.jpg]]
 *Table 1: The quantitative results of our method were compared with those of SOTAs and ablation studies. Our method significantly outperforms existing approaches regarding numerical performance for spatial movement and appearance preservation of objects while also matching or exceeding current methods in image and video quality and human pose control capability. Subject consistency (Subj-Cons) and background consistency (Back-Cons) are percentages*
-
-![[assets/figures/papers/paper_list_l1912_AnchorCrafter_Animate_CyberAnchors_Saling_Your_Products_via_Human_Object/figures/011_Table_2.jpg]]
-*Table 2: User study scores. The rating score is on a scale from one to five, where five is the highest score and one is the lowest*
 
 ![[assets/figures/papers/paper_list_l1912_AnchorCrafter_Animate_CyberAnchors_Saling_Your_Products_via_Human_Object/figures/008_Figure_7.jpg]]
 *Figure 7: Ablation studies. Our modules improve the preservation of the object and its interactions with the hands. The error section has been enlarged in the lower right corner*
 
 ![[assets/figures/papers/paper_list_l1912_AnchorCrafter_Animate_CyberAnchors_Saling_Your_Products_via_Human_Object/figures/009_Figure_8.jpg]]
 *Figure 8: Ablation study of fine-tuning. After fine-tuning, the model can learn the texture details of objects*
-
-![[assets/figures/papers/paper_list_l1912_AnchorCrafter_Animate_CyberAnchors_Saling_Your_Products_via_Human_Object/figures/001_Figure_1.jpg]]
-*Figure 1: Existing methods accurately follow human poses but struggle with realistic hand-object interactions, often misinterpreting the object as part of the human, leading to static animations. In contrast, our approach ensures natural and dynamic movement by precisely synthesizing humanobject interactions while preserving object appearance*
-
-![[assets/figures/papers/paper_list_l1912_AnchorCrafter_Animate_CyberAnchors_Saling_Your_Products_via_Human_Object/figures/014_Figure_9.jpg]]
-*Figure 9: Anchorcrafter is able to perform the action of ”opening the headphone case”, demonstrating the adaptability and interactive ability of our model in complex scenarios*
-
-![[assets/figures/papers/paper_list_l1912_AnchorCrafter_Animate_CyberAnchors_Saling_Your_Products_via_Human_Object/figures/012_Figure_10.jpg]]
-*Figure 10: Generalization over similar object shapes. Driving iPhone interaction videos with another mobile phone*
-
-![[assets/figures/papers/paper_list_l1912_AnchorCrafter_Animate_CyberAnchors_Saling_Your_Products_via_Human_Object/figures/013_Figure_11.jpg]]
-*Figure 11: Limitations. Handling transparent objects remains challenging, and erroneous conditions introduce interference*
-
-
 
 ## 定位与知识库关联
 
@@ -433,8 +399,6 @@ AnchorCrafter 适用于以下条件：
 3. **少样本/零样本定制**：是否可以进一步减少微调所需数据，甚至通过物体类别先验实现零样本或少量样本的产品定制？
 4. **多主体扩展**：在多主体交互或多人协作场景下（如两人共同展示产品），方法应如何扩展控制条件和解耦机制？
 5. **实时性优化**：当前基于扩散模型的生成范式在推理速度上可能难以满足实时直播需求，模型蒸馏或高效采样策略是潜在方向。
-
-
 
 ## 原文 PDF
 

@@ -51,8 +51,6 @@ claims:
 
 实验表明，SketchFaceGS在手绘草图生成集上达到FID 92.65、KID 4.00，编辑FID 44.60，端到端延迟仅0.3秒，渲染帧率高达243 FPS，在生成保真度、编辑灵活性和实时交互性方面均显著优于现有方法。
 
-
-
 ### 问题背景：从二维草图到三维真实感头部的鸿沟
 
 手绘草图是人类最直观、最自由的视觉表达方式之一，尤其在人脸设计与编辑场景中，用户往往希望通过寥寥数笔快速勾勒出期望的面部几何结构。然而，将这种稀疏、深度模糊且高度抽象的二维线条转化为具有几何一致性、高频细节和真实感材质的三维头部模型，始终是计算机图形学与视觉计算领域的一个核心挑战。
@@ -84,8 +82,6 @@ SketchFaceGS正是为填补这一缺口而提出。其设计动机可归纳为�
 3. **编辑一致性动机**：将二维草图编辑操作映射到UV纹理空间，并在生成器的多尺度特征层级上进行按元素混合，从根本上避免三维空间中的拼接伪影和身份泄露，确保未编辑区域在任意视角下保持原貌。
 
 简言之，SketchFaceGS试图在“抽象草图的自由度”与“三维真实感的约束”之间建立一座实时、可控的桥梁，为交互式三维头像创作和编辑提供新的技术范式。
-
-
 
 ## 核心方法与创新机理
 
@@ -140,8 +136,6 @@ $$F_{\mathrm{UV-align}} = G_{c}(F_{\mathrm{UV-G}}, F_{\mathrm{UV-A}})$$
 
 这些创新共同构成了从稀疏2D草图到密集3D高斯的实时映射链路，在生成质量（FID 92.65, KID 4.00）和编辑质量（FID 44.60, KID 0.69）上均达到最优水平，同时保持了0.3秒的编辑延迟和最高243 FPS的渲染帧率。
 
-
-
 SketchFaceGS 提出了一套端到端、无需优化的前馈框架，首次实现从单张 2D 手绘草图直接生成照片级真实感 3D 高斯头部模型，并支持实时交互式编辑。该框架的核心设计思想是“粗到细”（coarse-to-fine），将抽象的草图结构与预训练 3D GAN 的强先验相结合，在保证几何一致性的同时注入高频真实感细节。
 
 ### 输入与输出
@@ -179,12 +173,8 @@ $$\mathbf{f}_k^{\mathrm{fused}} = (1 - \mathbf{M}_{\mathrm{UV}}^{(k)}) \odot \ma
 
 整个框架的关键瓶颈突破在于：将 Transformer 编码的草图结构与 StyleGAN 的 3D 高斯生成先验解耦并重新耦合，形成一条从 2D 草图到 3D 高斯的端到端映射通路。相比需要逐实例优化的 SketchFaceNeRF 等前置方案，SketchFaceGS 的前馈特性使端到端编辑延迟降至 0.3 秒，渲染帧率达到 243 FPS，首次实现了真正意义上的实时草图驱动 3D 面部编辑与生成。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2269_https_arxiv_org_abs_2604_19202/figures/001_Figure_1.jpg]]
 *Figure 1: SketchFaceGS presents a real-time, sketch-driven editing framework tailored for 3D Gaussian Splatting (3DGS) facial heads. Starting with an original 3D face (a), sequential editing operations (b) are applied to targeted local regions. Our approach delivers photorealistic editing results (c) while preserving the 3D consistency*
-
-
 
 SketchFaceGS 的核心由三个紧密耦合的模块构成，分别对应**粗粒度 UV 特征预测**、**细粒度 3D UV 特征增强**和**实时 UV Mask 融合编辑**。整个流水线以前馈方式运行，无需任何逐实例优化。
 
@@ -258,15 +248,11 @@ $$\mathbf{f}_{k+1}^{\mathrm{new}} = \mathrm{Layer}_k(\mathbf{f}_k^{\mathrm{fused
 
 这种**逐层融合**策略的关键优势在于：StyleGAN 的不同层控制不同尺度的属性（粗层控制姿态和脸型，中层控制五官布局，细层控制纹理细节），在特征空间而非最终高斯属性空间进行混合，天然避免了直接 3D 高斯合成产生的接缝和几何不连续问题。消融实验证实，层级特征融合的编辑 FID（44.60）显著优于直接重新生成和 3D 高斯合成策略。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2269_https_arxiv_org_abs_2604_19202/figures/012_Figure_7.jpg]]
 *Figure 7: Ablation study on the generation pipeline. (a) Input sketch. (b) Input appearance. (c) Without AdaIN alignment, identity conflicts arise. (d) Without the enhancement module, details are lost. (e) Without identity vectors, identity is inconsistent. (f) With a simple CNN for appearance, style transfer fails. (g) Our full model yields the best result*
 
 ![[assets/figures/papers/paper_list_l2269_https_arxiv_org_abs_2604_19202/figures/013_Figure_8.jpg]]
 *Figure 8: Ablation study on the editing module. Our method (e) achieves the superior results compared with re-generation (c) and direct 3DGS composition (d)*
-
-
 
 ## 实验与关键发现
 
@@ -317,33 +303,11 @@ Figure 6的编辑对比显示：**MagicQuill**（Liu et al., CVPR 2025）产生�
 
 这些失败模式指向了核心瓶颈：**固定的预训练3D-GAN先验在提供强正则化与高频细节的同时，也限制了模型对分布外输入的适应能力**。缓解这一矛盾——例如通过引入可微的几何变形模块或可学习的先验更新机制——是提升鲁棒性的关键方向。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2269_https_arxiv_org_abs_2604_19202/figures/005_Table_1.jpg]]
 *Table 1: Quantitative comparison for sketch-based 3D head generation. Lower values indicate better performance*
 
 ![[assets/figures/papers/paper_list_l2269_https_arxiv_org_abs_2604_19202/figures/009_Table_2.jpg]]
 *Table 2: Quantitative comparison for sketch-based 3D head editing. We report image quality (FID, KID) and interaction/rendering performance*
-
-![[assets/figures/papers/paper_list_l2269_https_arxiv_org_abs_2604_19202/figures/010_Table_3.jpg]]
-*Table 3: Quantitative comparison of identity preservation in unedited regions with SketchFaceNeRF. Higher values indicate better preservation of the original content outside the edited area*
-
-![[assets/figures/papers/paper_list_l2269_https_arxiv_org_abs_2604_19202/figures/015_Table_4.jpg]]
-*Table 4: Quantitative ablation study for the generation pipeline. All ablated versions show a significant drop in performance compared to our full model. Lower values are better*
-
-![[assets/figures/papers/paper_list_l2269_https_arxiv_org_abs_2604_19202/figures/014_Table_5.jpg]]
-*Table 5: Quantitative ablation study for the editing module. Our layer-wise feature fusion significantly outperforms alternative strategies. Lower values are better*
-
-![[assets/figures/papers/paper_list_l2269_https_arxiv_org_abs_2604_19202/figures/008_Figure_6.jpg]]
-*Figure 6: Qualitative comparison for sketch-based 3D head editing. Given an original head (a) and an edit sketch (b), MagicQuill (c) produces stylized/blurry results; Nano-LAM (d) suffers from imprecise editing with poor novel-view quality. SketchFaceNeRF (e) is optimization-based and non-interactive. Our method (f) achieves real-time, high-quality editing that faithfully follows the sketch*
-
-![[assets/figures/papers/paper_list_l2269_https_arxiv_org_abs_2604_19202/figures/007_Figure_5.jpg]]
-*Figure 5: Qualitative comparison for sketch-to-3D generation. In each example, (a) is the input sketch and (c) is the reference appearance. S3D (b) shows geometric inconsistencies. Nano-LAM (d) produces cartoonish results. SketchFaceNeRF (e) lacks fine-grained detail and realism. Our method (f) generates superior results with high fidelity to both geometry and appearance*
-
-![[assets/figures/papers/paper_list_l2269_https_arxiv_org_abs_2604_19202/figures/004_Figure_3.jpg]]
-*Figure 3: Given a hand-drawn sketch and a reference image, our method produces a photorealistic 3D head (Top). Our method also support detailed local editing (Bottom)*
-
-
 
 ## 定位与知识库关联
 
@@ -380,8 +344,6 @@ SketchFaceGS 的性能建立在以下关键假设之上，这些假设同时定�
 3. **动态编辑与表情控制。** 如何在保持实时性能的前提下，将编辑能力融入动态 3D 头部动画流水线？这涉及将 UV Mask Fusion 机制与时序一致的形变场或 blendshape 参数化相结合。
 
 4. **OOD 鲁棒性与公平性评估。** 针对罕见配饰、严重遮挡等 OOD 输入，以及不同种族、年龄群体的公平性表现，需要构建更具挑战性和多样性的测试基准，并探索针对性的鲁棒训练策略。
-
-
 
 ## 原文 PDF
 

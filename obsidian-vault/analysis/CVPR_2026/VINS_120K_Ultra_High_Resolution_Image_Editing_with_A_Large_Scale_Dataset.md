@@ -86,8 +86,6 @@ claims:
 - 高频感知后适应需要多 GPU 训练，计算开销较高。
 - 如何将该策略推广至视频超高清编辑、以更轻量的注意力近似降低长序列计算成本、以及在动态场景下保证时间一致性，是值得进一步探索的开放问题。
 
-
-
 ### 超高清图像编辑的兴起与瓶颈
 
 图像编辑技术近年来取得了长足进步，以 **FLUX.1-Kontext-dev**（Black Forest Labs, arXiv 2025）、**AnyEdit**（Yu et al., CVPR 2025）、**OmniGen2**（Wu et al., arXiv 2025）和 **Step1X-Edit**（Liu et al., arXiv 2025）为代表的非超高分辨率（NHR）模型，已在 1K 分辨率下展现出令人瞩目的指令遵徇能力与编辑质量。然而，当这些模型被直接应用于 4K 及以上的超高清（UHR）图像时，性能会急剧退化——编辑区域出现模糊、纹理细节丢失，甚至产生与指令不一致的伪影。
@@ -116,8 +114,6 @@ claims:
 3.  **提出轻量级后适应策略**，在不重新训练基座模型的前提下，通过分辨率感知的注意力缩放、位置编码内插和频率聚焦监督，将 NHR 编辑模型高效泛化至 UHR 场景。
 
 这一思路的核心洞察在于：**将长序列建模问题分解为注意力锐化、位置编码内插与频率域动态加权三个可控维度，三者协同可按比例将低分辨率编辑模型泛化至超高分辨率，同时保持指令遵徇与纹理真实感。**
-
-
 
 ## 核心方法与创新机理
 
@@ -170,8 +166,6 @@ $$\mathcal{L}_{\mathrm{freq}} = \frac{1}{UV} \sum_{u=1}^{U} \sum_{v=1}^{V} \math
 
 值得注意的是，这三个模块并非孤立有效——它们共同构成了一条完整的因果链：注意力重缩放确保模型“看得清”长序列中的关键区域，RoPE 重缩放确保模型“知道”这些区域的空间位置，FFS 则确保这些区域被“画得精细”。任一环节缺失，链条即断裂，性能急剧退化。
 
-
-
 VINS-120K 提出的核心方法是一条**高频感知后适应（High-Frequency-Aware Post-Adaptation）**管线，旨在将预训练的非超高分辨率（NHR）编辑模型高效泛化至超高分辨率（UHR）场景。整个框架围绕一个关键洞察展开：超长序列建模问题可以分解为注意力锐化、位置编码内插与频率域动态加权三个子问题，三者协同作用，使模型在保持指令遵徇能力的同时合成高保真纹理细节。
 
 ### 输入输出流
@@ -205,15 +199,11 @@ VINS-120K 提出的核心方法是一条**高频感知后适应（High-Frequency
 
 上述三个模块直接针对分析揭示的双重瓶颈：**长序列注意力熵偏移**与**高频纹理缺乏显式建模**。消融实验提供了强因果证据——移除注意力重缩放使 pFID 从 9.15 升至 15.01（Table 3），移除 RoPE 重缩放同样导致质量急剧下降；完整的后适应策略在 VINS-4KEval 上将 Kontext-dev 的 pFID 从 12.66 降至 9.15（Table 2），并在 ImageJudge-Avg 上从 3.98 提升至 4.47（Table 3），改善幅度显著且一致。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l806_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_VINS_120K_Ultra_H/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison at ultra-high-resolution editing: From left to right are the input image, our edited result, and the edited image from Kontext+SR. Kontext+SR first downsamples the input, edits it using non-high-resolution models (Kontext), and then upsamples with super-resolution techniques. Our approach outperforms by synthesizing fine-grained details and consistently adhering to instructions*
 
 ![[assets/figures/papers/paper_list_l806_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_VINS_120K_Ultra_H/figures/004_Figure_4.jpg]]
 *Figure 4: Data Filtering Pipeline. We filter images sequentially for corruption, low quality, inconsistent instructions, and poor aesthetics, retaining only 20% of the highest-quality data*
-
-
 
 ### 问题瓶颈
 
@@ -281,12 +271,8 @@ $$\mathcal{L}_{\mathrm{freq}} = \frac{1}{UV} \sum_{u=1}^{U} \sum_{v=1}^{V} \math
 
 消融实验（Table 3）的完整后适应配置（注意力重缩放 + RoPE 重缩放 + FFS）在 VINS-4KEval 上取得 pFID=9.15、ImageJudge-Avg=4.47，相较 naive UHR 缩放（pFID=15.01, ImageJudge-Avg=3.98）提升显著，验证了三模块的必要性与协同效果。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l806_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_VINS_120K_Ultra_H/figures/010_Figure_8.jpg]]
 *Figure 8: Ablation on attention-score rescaling. Blue: with rescaling; Purple: without rescaling*
-
-
 
 ## 实验与关键发现
 
@@ -328,33 +314,14 @@ $$\mathcal{L}_{\mathrm{freq}} = \frac{1}{UV} \sum_{u=1}^{U} \sum_{v=1}^{V} \math
 - **图6、图7** 从定性角度验证了方法在纹理合成和指令遵徇方面的优势。
 - **图8** 直观展示了注意力重缩放对注意力分布锐化与细节保留的关键作用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l806_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_VINS_120K_Ultra_H/figures/007_Table_2.jpg]]
 *Table 2: Quantitative comparison on VINS-4KEval. Higher values indicate better performance (↑), except*
-
-![[assets/figures/papers/paper_list_l806_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_VINS_120K_Ultra_H/figures/011_Table_3.jpg]]
-*Table 3: Analysis of post-adaptation, data curation, and crossbackbone generality on VINS-4KEval*
 
 ![[assets/figures/papers/paper_list_l806_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_VINS_120K_Ultra_H/figures/008_Figure_6.jpg]]
 *Figure 6: Qualitative comparisons on the VINS-4KEval benchmark*
 
 ![[assets/figures/papers/paper_list_l806_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_VINS_120K_Ultra_H/figures/009_Figure_7.jpg]]
 *Figure 7: Qualitative comparison with Seedream 4.0*
-
-![[assets/figures/papers/paper_list_l806_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_VINS_120K_Ultra_H/figures/005_Table_1.jpg]]
-*Table 1: Comparison of existing image editing datasets: VINS-120K is the first large-scale UHR image editing dataset and achieves the highest quality (ImageJudge-Avg)*
-
-![[assets/figures/papers/paper_list_l806_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_VINS_120K_Ultra_H/figures/002_Figure_2.jpg]]
-*Figure 2: An overview and visualized examples of edited triplets (instruction, input image, edited image) for each edit type in VINS-120K. Clip score:0.991, Optical flow:10.59 1€*
-
-![[assets/figures/papers/paper_list_l806_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_VINS_120K_Ultra_H/figures/003_Figure_3.jpg]]
-*Figure 3: Filtered examples of video frames. Purple indicates similar frames (high CLIP score), while blue shows frames with semantic misalignment (high optical flow)*
-
-![[assets/figures/papers/paper_list_l806_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_VINS_120K_Ultra_H/figures/006_Figure_5.jpg]]
-*Figure 5: Comparison of image statistics between AnyEdit [52] and X2Edit [30] on aesthetics, clarity, and texture distributions*
-
-
 
 ## 定位与知识库关联
 
@@ -395,8 +362,6 @@ VINS-120K 在数据层面填补了关键空白。如 Table 1 所示，此前最�
 - **轻量化长序列注意力**：分辨率提升导致的序列长度平方级增长是根本性计算瓶颈。能否通过稀疏注意力、线性注意力近似或分块处理策略，在保持编辑质量的前提下降低推理成本？
 
 - **动态场景的时间一致性**：VINS-120K 的数据来源（视频帧对）天然蕴含时序信息，但当前方法未显式建模时间一致性约束。在动态场景编辑中，如何保证跨帧的纹理和结构一致性？
-
-
 
 ## 原文 PDF
 

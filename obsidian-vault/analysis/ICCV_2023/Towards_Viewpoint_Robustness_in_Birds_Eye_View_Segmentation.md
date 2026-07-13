@@ -50,8 +50,6 @@ claims:
 
 在NVIDIA DRIVE Sim合成环境下的系统评估表明，所提方法在多种视点变化场景（包括pitch、深度、高度变化）中，平均能够恢复因视点变化而损失的IoU的**14.7%**。消融实验进一步揭示，将训练数据中**25%–50%**的图像通过NVS变换至目标视点并与源数据混合，可获得最佳的泛化IoU；完全使用变换数据（100%）反而会因NVS引入的合成artifact导致性能下降。这些结果确立了NVS视点增强作为一种轻量、高效的数据域适应策略，在提升BEV分割视点鲁棒性方面的有效性。
 
-
-
 鸟瞰图（BEV）分割是自动驾驶感知的核心任务，旨在从多视角2D图像中推理出车辆周围道路元素（如车道线、可行驶区域）的俯视语义布局。近年来，以 **LSS**（Lift-Splat-Shoot, Philion & Fidler, ECCV 2020）和 **CVT**（Cross-View Transformers, Zhou & Krähenbühl, ECCV 2022）为代表的方法在BEV分割上取得了显著进展，它们分别代表了基于卷积的显式几何投影和基于Transformer的隐式几何学习两条技术路线。
 
 然而，现有研究普遍忽视了一个关键问题：**BEV分割模型对测试时相机视点的微小变化极其敏感**。如 Figure 1 所示，当目标车辆的相机俯仰角（pitch）仅降低10°时，CVT的BEV分割IoU便急剧下降17%。这种脆弱性源于训练数据与部署平台之间的“视点域差距”——模型在训练期间仅见过源相机平台采集的特定视角数据，一旦部署到相机安装位置（pitch、yaw、高度）略有不同的新车型或改装平台上，泛化性能便大幅衰退。
@@ -59,8 +57,6 @@ claims:
 为系统量化这一问题的严重性，本文首先在CARLA仿真环境中进行了受控分析（Figure 3）。实验覆盖了偏航角、俯仰角、相机高度及其组合共36种视点配置，结果表明：无论是LSS还是CVT，在所有测试的视点变化下，IoU均出现大幅度下降——例如，偏航角增加12°时，LSS的IoU从约0.35降至约0.15。即使为每个目标视点单独训练“oracle”模型作为性能上界，源模型与oracle之间的巨大差距依然表明，**视点鲁棒性是当前BEV分割方法的系统性缺陷**，而非特定架构的偶然问题。
 
 解决这一缺陷的传统思路——为每种目标车辆平台重新采集并标注大量数据——成本高昂且难以规模化。因此，本文的核心动机在于：**能否在不增加任何真实采集和标注成本的前提下，弥合源视点与目标视点之间的域差距？** 本文提出了一种基于新视角合成（Novel View Synthesis, NVS）的视点增强框架，通过将源视点的已标注图像变换到目标视点，生成混合训练集，从而赋予BEV模型对未见相机配置的泛化能力。该方法在NVIDIA DRIVE Sim评估中平均恢复了因视点变化而损失的IoU的14.7%，为BEV分割的实际部署提供了一条低成本、可扩展的鲁棒性提升路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -94,8 +90,6 @@ claims:
 
 在NVIDIA DRIVE Sim的六种目标视点配置上，该框架平均恢复了因视点变化而损失的IoU的14.7%（Table 2），且仅需25%–50%的训练数据经过NVS变换即可实现。
 
-
-
 本文提出一种**基于新视角合成的视点增强框架**，核心思路是：在训练阶段，利用新视角合成（Novel View Synthesis, NVS）将源相机平台采集的已标注图像变换到目标相机平台的视点，再将变换后的数据按一定比例混入训练集，使BEV分割模型在未见过的目标视点上获得鲁棒性。
 
 ### 管线总览
@@ -124,12 +118,8 @@ claims:
 
 当前框架仅基于单前视相机进行验证，未涉及多相机环视配置。评估依赖NVIDIA DRIVE Sim合成数据，虽较CARLA更真实，但与实际道路场景仍存在域差距。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l39_https_arxiv_org_abs_2309_05192/figures/004_Figure_4.jpg]]
 *Figure 4: Proposed Pipeline. Current methods for bird’s eye view (BEV) segmentation are trained on data captured from one set of camera rigs (the source rig). At inference time, these models perform well on that camera rig, but, according to our analysis, even small changes in camera viewpoint lead to large drops in BEV segmentation accuracy. Our solution is to use novel view synthesis to augment the training dataset. We find this simple solution drastically improves the robustness of BEV segmentation models to data from a target camera rig, even when no real data from the target rig is available during training*
-
-
 
 ### 方法管线总览
 
@@ -172,8 +162,6 @@ NVS模块建立在Worldsheet（Hu et al., 2022）之上，将其从静态场景�
 给定已标注的BEV分割源数据集 $\mathcal{D}_{source}$（规模为 $N$），NVS模块将其中 $n$ 张图像变换到目标相机视点，生成目标视点数据集 $\mathcal{D}_{target\_pred}$（规模为 $n$）。变换过程包括四个步骤：(1) 估计每张图像的深度图；(2) 构建3D网格；(3) 修改相机参数至目标视点；(4) 将网格渲染到目标视点。
 
 将 $\mathcal{D}_{target\_pred}$ 与 $\mathcal{D}_{source}$ 按一定比例混合，构建最终训练集。下游BEV分割模型（如CVT）在该混合数据集上训练，学习从2D多视图图像预测鸟瞰视角分割结果。消融实验（Figure 8）表明，变换25%–50%的训练数据可获得最佳泛化IoU；完全使用变换数据（100%）反而因NVS引入的合成artifact导致性能下降，揭示了合成数据质量与数量之间的权衡关系。
-
-
 
 ## 实验与关键发现
 
@@ -243,8 +231,6 @@ Figure 8揭示了训练数据中NVS变换图像比例与BEV分割性能之间的
 
 实验设计中的若干因素值得读者注意：（1）CARLA分析中CVT未使用外参嵌入（因仿真中外参无噪声），而真实数据实验中外参嵌入被启用，这可能影响两种设置下结果的可比性；（2）CARLA oracle模型在高相机高度下IoU反而更高，可能与视场角变化导致的地面采样密度差异有关，而非模型本身更优；（3）所有对比均使用相同的CVT架构和训练配置，确保了方法层面的公平比较。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l39_https_arxiv_org_abs_2309_05192/figures/003_Figure_3.jpg]]
 *Figure 3: Analysis of impact of viewpoint changes in CARLA: We train a source BEV model using Lift Splat Shoot (LSS) [21] and Cross View Transformers (CVT) [29], denoted at point 0 on the x axis of each graph. We then test the model across different target rigs where the camera pitch, yaw, height, or pitch and height are changed, as denoted by the different points along the x axes. We also trained each model on the target rig directly and refer to this model as the ”oracle”, as it reflects the expected upper bound IoU for each viewpoint*
 
@@ -253,8 +239,6 @@ Figure 8揭示了训练数据中NVS变换图像比例与BEV分割性能之间的
 
 ![[assets/figures/papers/paper_list_l39_https_arxiv_org_abs_2309_05192/figures/009_Table_2.jpg]]
 *Table 2: Results: We report the IoU of the CVT model trained on a source rig and tested across target rigs where pitch, depth, and height are changed (source). We then compare against two baselines, described in text. Last, we compare with our method, which is trained with some data transformed to the target rig view. The first row shows IoU of the source evaluated on sim data from the same viewpoint, and is our best estimate of oracle performance*
-
-
 
 ## 定位与知识库关联
 
@@ -299,8 +283,6 @@ Figure 8揭示了训练数据中NVS变换图像比例与BEV分割性能之间的
 - **跨任务泛化。** 视点鲁棒性问题是否同样影响其他3D感知任务（3D目标检测、在线高精地图构建、占据预测）？本文提出的NVS增强框架在方法论上具有任务无关性，但具体效果和最优配置可能因任务特性而异，需逐一验证。
 
 - **与架构内生鲁棒性的协同。** 将数据层面的NVS增强与架构层面的外参鲁棒设计（如外参扰动训练、视角无关特征学习）相结合，能否产生超加性收益，是一个值得探索的方向。
-
-
 
 ## 原文 PDF
 

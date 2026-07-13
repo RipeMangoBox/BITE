@@ -55,8 +55,6 @@ claims:
 - 在SUN RGB-D 5%标记数据下，mAP@0.25和mAP@0.5分别提升**4.8和8.0个百分点**。
 - 在KITTI上首次实现半监督3D目标检测，在不同标记率和类别下超越全监督PV-RCNN基线**1.8至7.6个百分点**。
 
-
-
 三维目标检测是自动驾驶、机器人导航和增强现实等应用的核心感知任务。近年来，基于点云的全监督3D检测器取得了显著进展，但其性能高度依赖大规模高质量的人工标注。3D点云标注需要标注员在稀疏且不完整的几何信息中精确放置三维边界框，成本远高于2D图像标注。因此，如何利用少量标注数据和大量无标注数据实现高性能检测——即半监督3D目标检测——成为一个迫切且具有实际价值的研究方向。
 
 在半监督3D目标检测中，主流范式采用教师-学生互学习框架：教师网络对无标签数据生成伪标签，学生网络利用这些伪标签进行训练。然而，该范式的核心瓶颈在于**伪标签质量**。由于3D场景中物体几何信息不完整、遮挡严重，教师网络生成的伪标签存在显著噪声，尤其是**目标框的定位精度普遍较差**。现有方法（如SESS, Zhao et al., CVPR 2020）仅依赖物体性分数（objectness）和分类置信度来过滤伪标签，这两类指标主要反映语义置信度，却无法有效衡量定位质量。一个分类得分高但位置严重偏移的伪标签可能通过过滤，导致学生网络从低质量监督信号中学习，损害半监督训练效果。
@@ -64,8 +62,6 @@ claims:
 此外，在伪标签去重环节，标准做法是采用基于物体性分数的NMS（Non-Maximum Suppression），其固定阈值设计在伪标签质量参差不齐的半监督场景下存在两难困境：高阈值会过度抑制覆盖度，使部分真阳性被错误移除；低阈值则保留大量低质量重复框，引入噪声监督。
 
 针对上述问题，3DIoUMatch提出了一个核心洞察：**将可微分的3D IoU估计引入半监督框架，作为定位质量的直接度量**。通过联合物体性、分类置信度和预测IoU对伪标签进行三重过滤，并设计IoU引导的下半抑制（Lower-Half Suppression, LHS）作为动态去重机制，在伪标签质量与覆盖度之间取得更好的平衡。该方法在室内（ScanNet, SUN RGB-D）和室外（KITTI）数据集上均取得显著提升，并首次在KITTI上验证了半监督3D目标检测的可行性。
-
-
 
 ## 核心方法与创新机理
 
@@ -98,8 +94,6 @@ $$s > \tau_{obj}, \quad \max(p_{cls}) > \tau_{cls}, \quad v > \tau_{IoU}$$
 
 这些创新使得 3DIoUMatch 在 ScanNet 10% 标记数据上相较 SESS 提升 **+7.7 mAP@0.25** 和 **+8.5 mAP@0.5**，并在 KITTI 上首次实现半监督 3D 检测且超越全监督基线 1.8%~7.6%（Table 1, Table 3）。
 
-
-
 3DIoUMatch 采用**教师-学生互学习框架**（Teacher-Student Mutual Learning），将标注数据的信息以伪标签形式传播到无标注数据中。整体流程如 Figure 1 所示，核心由以下模块串联构成：
 
 ![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2012_04355/figures/001_Figure_1.jpg]]
@@ -122,8 +116,6 @@ $$s > \tau_{obj}, \quad \max(p_{cls}) > \tau_{cls}, \quad v > \tau_{IoU}$$
 整体训练损失为：
 $$L = L_{l}(\{ \mathbf{x}_i^l \}_{i=1}^{N_l}, \{ \mathbf{y}_i^l \}_{i=1}^{N_l}) + \lambda_u L_u(\{ \mathbf{x}_i^u \}_{i=1}^{N_u}, \{ \tilde{\mathbf{y}}_i^u \}_{i=1}^{N_u})$$
 其中 $L_l$ 为有标注数据上的全监督损失，$L_u$ 为无标注数据上的伪标签损失，$\lambda_u$ 为无监督损失权重。
-
-
 
 ### 3.1 总体半监督学习框架
 
@@ -173,8 +165,6 @@ $$\tau_{car}=0.5, \quad \tau_{ped}=\tau_{cyc}=0.25$$
 
 同时设置 RPN 分类得分过滤阈值 $\tau_{cls}=0.4$，配合物体性阈值构成联合过滤机制。
 
-
-
 ## 实验与关键发现
 
 ### 主要结果
@@ -219,7 +209,6 @@ $$\tau_{car}=0.5, \quad \tau_{ped}=\tau_{cyc}=0.25$$
 
 Figure 3展示了ScanNet 10%设定下半监督训练过程中的性能提升与伪标签覆盖度变化。随着训练推进，伪标签质量逐步提高，覆盖度保持稳定，验证了教师-学生互学习框架的良性循环机制——教师网络通过EMA持续优化，产生更高质量的伪标签，进而促进学生网络的学习。
 
-
 ### 逐类性能与可视化
 
 Table 6和Table 7分别报告了ScanNet 10%和SUN RGB-D 5%设定下的逐类mAP。3DIoUMatch在大多数类别上均优于SESS，尤其在定位精度要求更高的mAP@0.5指标上优势更为明显，这与方法聚焦于提升伪标签定位质量的动机一致。
@@ -240,21 +229,8 @@ Table 5报告了IoU估计模块的显存和时间开销。该模块设计轻量�
 
 3. **IoU估计泛化性**：所提出的3D IoU估计模块在室外大范围物体（如卡车）和小物体（如行人）上的泛化能力可能需要进一步调整。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2012_04355/figures/012_Figure_5.jpg]]
 *Figure 5: Qualitative results on ScanNet, with 10% labeled data. Here green bounding boxes have an IoU ≥ 0.25 while red bounding boxes are with an IoU \< 0.25. Figure 6. Qualitative results on SUNRGB-D, with 5% labeled data*
-
-![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2012_04355/figures/009_Table_5.jpg]]
-*Table 5: Memory and time overhead of the IoU module*
-
-
-
-![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2012_04355/figures/013_Table_8.jpg]]
-*Table 8: Comparison of our IoU module with box-query on Scan-Net 100% and SUN RGB-D 100%*
-
-
-
 
 ## 定位与知识库关联
 
@@ -302,8 +278,6 @@ Table 5报告了IoU估计模块的显存和时间开销。该模块设计轻量�
 3. **IoU 模块泛化性**：3D Grid Pooling IoU 估计模块在室外大范围物体（如卡车）和小物体（如行人）上的精度差异是否需要进一步调整网格分辨率或插值策略？
 4. **推理开销**：测试时 IoU 优化步骤对推理时间的实际影响能否进一步降低？Table 5 仅给出了 IoU 模块本身的开销，未单独分析 IoU 优化步骤的增量成本。
 5. **LHS 的通用性**：保留一半框的硬编码比例是否为最优？是否存在自适应确定抑制比例的可能？
-
-
 
 ## 原文 PDF
 

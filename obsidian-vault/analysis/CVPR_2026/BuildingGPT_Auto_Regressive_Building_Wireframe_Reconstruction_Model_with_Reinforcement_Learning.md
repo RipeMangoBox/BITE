@@ -46,8 +46,6 @@ claims:
 
 在 MunichWF 数据集上，BuildingGPT 全面超越现有最先进方法，取得 WED 0.98、CF1 97.4、EF1 94.4 等最优指标。消融实验证实，分层分词与 DPO 后训练各自带来显著性能增益，验证了每个组件的有效性。
 
-
-
 城市三维建模是数字孪生、智慧城市与自动驾驶等应用的基础技术，而建筑作为城市场景中最主要的构成元素，其精确重建一直是该领域的核心挑战。建筑线框（building wireframe）以顶点和边的拓扑结构描述建筑几何，是实现轻量级、结构化建筑表达的关键形式。
 
 现有建筑线框重建方法主要沿三条技术路线展开：**基于顶点检测的方法**（如 **PC2WF**，Liu et al., ICLR 2021）首先从点云中检测候选顶点，再通过后处理步骤连接成边；**基于边检测的方法**（如 **Building3D**，Wang et al., ICCV 2023；**BWFormer**，Liu et al., CVPR 2025）直接预测边及其连接关系；**基于扩散模型的方法**（如 **EdgeDiff**，Liu et al., CVPR 2025）将线框生成建模为去噪扩散过程。这些方法虽然在特定场景下取得了可观效果，但存在一个共同的**结构性瓶颈**：它们或依赖非端到端的后处理来连接检测到的基元，或难以显式建模建筑全局拓扑结构，导致重建结果中频繁出现顶点丢失、边断裂或拓扑错乱等问题。
@@ -59,8 +57,6 @@ claims:
 **BuildingGPT** 正是基于这一动机提出的。该方法将建筑线框重建重新定义为**边序列的自回归生成问题**，并设计了**分层建筑线框分词策略**，将线框按照“足迹→墙壁→屋顶”的层次顺序组织为离散标记序列。这一分词策略为自回归模型提供了强烈的结构与语义先验，使其能够学习序列间的长程依赖关系，从而在生成过程中更好地保持拓扑一致性。在此基础上，BuildingGPT 进一步引入**基于直接偏好优化（DPO）的后训练阶段**，通过构造偏好对数据集并利用强化学习微调，使重建结果与人类对几何精度和拓扑正确性的偏好对齐，有效缓解预训练模型中的局部错误。
 
 简言之，BuildingGPT 的核心创新在于**以层次化分词为桥梁，将自回归序列生成范式引入建筑线框重建**，并通过偏好对齐后训练进一步提升重建质量，为这一任务开辟了全新的技术路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -96,8 +92,6 @@ $$L_{\mathrm{DPO}} = -\log \sigma (\beta \log \frac{\pi_p(y^+|p)}{\pi_r(y^+|p)} 
 
 BuildingGPT 的三个创新点形成递进关系：**自回归范式**为端到端拓扑学习提供了框架基础；**分层分词**注入建筑结构先验，使序列生成更具语义合理性；**DPO 后训练**则通过人类偏好信号进一步修正局部错误。这一创新链条在 MunichWF 数据集上取得了 WED 0.98、CF1 97.4、EF1 94.4 的最优性能（Table 1），全面超越现有最先进方法。
 
-
-
 BuildingGPT 将建筑线框重建任务重新定义为**自回归序列生成问题**，并采用**两阶段训练范式**：预训练与后训练。整体流程如图 2 所示。
 
 **输入与编码。** 原始输入为建筑点云 $P$。点云编码器首先通过最远点采样（FPS）选取 $n_q$ 个查询点，随后利用自注意力和交叉注意力操作，将查询点特征聚合成一个固定长度的全局结构隐码。该隐码作为条件信号，被前置到待生成的线框序列之前。
@@ -128,15 +122,11 @@ $$L_{\mathrm{NLL}} = -\frac{\log \pi_p(y^+|p)}{|y^+|}$$
 
 **模块关系总结。** 四个核心模块形成端到端管线：点云编码器提取全局几何上下文 → 分层分词器将线框结构转化为语义有序的离散序列 → 自回归解码器在隐码条件下逐标记生成线框 → DPO 后训练模块利用偏好对进一步消除局部错误，提升几何精度与拓扑正确性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2714_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_BuildingGPT_Auto_R/figures/001_Figure_1.jpg]]
 *Figure 1: Comparisons of different pipelines. Prior works focus on primitive detection (vertex (a) / edge (b)) or edge diffusionbased generation (c). In contrast, BuildingGPT (d) formulates the building wireframe reconstruction task as an edge-sequence autoregressive generation process*
 
 ![[assets/figures/papers/paper_list_l2714_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_BuildingGPT_Auto_R/figures/002_Figure_2.jpg]]
 *Figure 2: Overall architecture of BuildingGPT. Our BuildingGPT is trained in two stages. In the first stage, the model is pre-trained in an auto-regressive manner. Given the latent code encoded by the point cloud encoder, the wireframe sequence is generated through next-token prediction. In the second stage, we construct a preference pair dataset using the proposed Preference Score Function (PSF) and post-train the model with Direct Preference Optimization (DPO) to further enhance reconstruction quality*
-
-
 
 BuildingGPT 的核心架构由四个功能模块构成，协同完成从点云到建筑线框的自回归重建。
 
@@ -174,12 +164,8 @@ $$L_{\mathrm{NLL}} = -\frac{\log \pi_p(y^+|p)}{|y^+|}$$
 
 整个两阶段训练流程（预训练 + DPO 后训练）的架构如 Figure 2 所示：第一阶段通过自回归方式从点云隐码生成线框序列，第二阶段利用 DPO 对预训练模型进行偏好微调，以进一步提升重建的几何精度与拓扑正确性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2714_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_BuildingGPT_Auto_R/figures/003_Figure_3.jpg]]
 *Figure 3: Examples of the constructed preference pair dataset. Using the Preference Score Function (PSF), the preference pair dataset is constructed in which the positive samples align with human preferences, while the negative ones exhibit representative errors such as: (a) missing structural details, (b) incomplete edge connections, and (c) disordered edge topology. The input point cloud and ground-truth wireframe are overlaid for clearer visualization. Green boxes highlight the differences between the positive and negative samples*
-
-
 
 ## 实验与关键发现
 
@@ -211,9 +197,6 @@ Table 2 系统消融了 BuildingGPT 的两个核心设计：**分层建筑线框
 
 Figure 6(a) 展示了模型与数据规模的扩展规律：同时增大模型参数量和训练数据规模能够持续提升重建性能，表明 BuildingGPT 框架具备良好的可扩展性。Figure 6(b) 给出了不同规模模型的具体配置，其中 L、H、Hd 分别表示层数、注意力头数和隐藏维度。
 
-![[assets/figures/papers/paper_list_l2714_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_BuildingGPT_Auto_R/figures/010_Figure_6.jpg]]
-*Figure 6: Scaling experiments and model configurations. (a) Scaling up the model and the dataset consistently leads to improved performance. (b) Configurations of BuildingGPT models at different scales, where L, H, Hd denote the number of layers, attention heads, and hidden dimensions, respectively*
-
 ### 鲁棒性分析
 
 Table 3 评估了 BuildingGPT 对输入点云质量退化的鲁棒性。实验通过随机移除点模拟稀疏性，通过高斯扰动引入噪声。结果表明：
@@ -228,9 +211,6 @@ Table 3 评估了 BuildingGPT 对输入点云质量退化的鲁棒性。实验�
 
 Figure 7 展示了 BuildingGPT 在未见过的 AHN3 数据集上的泛化能力。无需微调，模型重建的线框能够准确捕捉建筑几何结构并保持拓扑一致的连接性。需要注意的是，AHN3 数据集提供的是 mesh 格式的真值，而 BuildingGPT 输出的是线框，因此该对比为定性评估。
 
-![[assets/figures/papers/paper_list_l2714_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_BuildingGPT_Auto_R/figures/011_Figure_7.jpg]]
-*Figure 7: Cross-data generalization on the unseen AHN3 dataset [11]. Our results are presented as wireframes while the ground truth provided by the dataset are meshes*
-
 ### 失败案例分析
 
 Figure 8 展示了 BuildingGPT 的典型失败案例。对于结构复杂的建筑，模型仍会出现**局部边缘缺失**或**边缘拓扑错乱**的问题。这些失败模式与当前分层分词仅覆盖足迹、墙壁和屋顶三类边有关——门窗、楼梯等细粒度构件未被纳入分词体系，导致模型对复杂细节的建模能力不足。
@@ -238,22 +218,6 @@ Figure 8 展示了 BuildingGPT 的典型失败案例。对于结构复杂的建�
 ### 实验总结
 
 BuildingGPT 的实验体系覆盖了主结果验证、组件消融、扩展性、鲁棒性和泛化性五个维度，证据链完整。核心结论是：分层分词为自回归序列建模提供了有效的结构先验，DPO 后训练通过偏好对齐进一步消除局部错误，两者协同使 BuildingGPT 在 MunichWF 上取得最优性能。当前主要局限在于复杂结构下的局部失败和分词粒度的限制，这指向了未来构建更大规模精细标注数据集和设计更细粒度分词策略的方向。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2714_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_BuildingGPT_Auto_R/figures/005_Figure_4.jpg]]
-*Figure 4: Qualitative evaluation of post-training effectiveness. The DPO-based post-training effectively mitigates local errors in the pre-trained model. Green boxes highlight improvements of the DPO-enhanced model over the pre-trained baseline without DPO*
-
-![[assets/figures/papers/paper_list_l2714_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_BuildingGPT_Auto_R/figures/007_Figure_5.jpg]]
-*Figure 5: Qualitative comparison between BuildingGPT and baseline methods. The reconstruction results of BuildingGPT exhibit superior accuracy in fine details, benefiting from its strong ability to model sequential dependencies among building edges. For better visualization, the raw point clouds are overlaid with the reconstruction results of PC2WF [22], which fails in the 3rd, 6th, 7th, and 8th rows. Green boxes highlight missing edges and blue boxes indicate inaccuracies in fine details*
-
-![[assets/figures/papers/paper_list_l2714_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_BuildingGPT_Auto_R/figures/008_Figure.jpg]]
-*Figure: Point Cloud Ground Truth Ours Point Cloud Ground Truth*
-
-![[assets/figures/papers/paper_list_l2714_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_BuildingGPT_Auto_R/figures/009_Figure.jpg]]
-*Figure: (a) Scaling experiments*
-
-
 
 ## 定位与知识库关联
 
@@ -332,8 +296,6 @@ BuildingGPT 开辟了若干值得探索的方向：
 - **更细粒度的分词策略**可以扩展至门窗、楼梯、烟囱等建筑组件，使自回归模型捕捉更完整的建筑语义层次。
 - **超越 DPO 的强化学习方法**（如基于过程奖励的 RLHF 变体）可能进一步提升几何精度，特别是对长序列中误差累积的抑制。
 - **极端条件下的鲁棒性增强**：Table 3 显示模型在 75% 点云稀疏度或 0.05 尺度噪声下性能显著下降，设计针对性的鲁棒训练策略是一个实用需求。
-
-
 
 ## 原文 PDF
 

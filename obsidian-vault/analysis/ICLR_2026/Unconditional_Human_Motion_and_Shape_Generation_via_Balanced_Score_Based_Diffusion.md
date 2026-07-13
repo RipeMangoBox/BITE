@@ -54,8 +54,6 @@ claims:
 
 **局限与待验证点**：基于SMPL参数的模型脚滑动率（16.31%）仍高于使用3D关节坐标的MDM（8.58%），可能需要额外运动学约束；生成网格偶现自相交伪影（训练数据中亦存在）；楼梯行走场景下高度保持不稳定。这些问题指向物理约束与后处理优化的潜在改进方向。
 
-
-
 ### 问题背景
 
 人体运动生成是计算机视觉与图形学中的核心任务之一，其目标是从噪声或条件信号中合成自然、多样的人体运动序列。主流方法通常依赖参数化人体模型（如SMPL）来表示姿态与形状，并将运动建模为高维参数序列的分布学习问题。近年来，扩散模型在该领域取得了显著进展，但现有工作普遍面临一个深层瓶颈：**异构特征空间的统计特性失配**。
@@ -83,8 +81,6 @@ claims:
 
 最终目标是构建一个**最小化、自洽的无条件人体运动与形状生成框架**，其性能可与依赖大量工程技巧的SOTA方法相媲美，同时保持方法的简洁性和理论可解释性。
 
-
-
 ## 核心方法与创新机理
 
 本工作提出 **Balanced Score-Based Diffusion**，在不引入辅助损失、冗余特征或后处理步骤的条件下，通过两个关键创新使分数基扩散模型能够高效生成高质量的无条件人体运动与形状：
@@ -106,8 +102,6 @@ claims:
 
 **与 baseline 的核心差异**在于：baseline 沿用 EDM2 的连续不确定性加权 $\mathcal{L}_{EDM2}$ 与简单 Z 分数归一化，仅关注时间步维度的损失平衡，忽略了特征空间内部的异构性与维度差异。本方法通过**结构保持归一化**与**多维梯度均衡**两个 changed slots，将平衡性从单一时间维度扩展至特征组维度，从而在最小化模型复杂度的前提下显著提升生成质量。
 
-
-
 本文提出一种基于分数基扩散模型的无条件人体运动与形状生成方法，其核心在于不依赖辅助损失或冗余特征，仅通过**结构保持的特征归一化**与**理论驱动的梯度平衡损失加权**，即可在标准SMPL参数空间上实现高质量生成。整体pipeline由以下模块串联构成：
 
 1. **SMPL运动表示**：将每帧人体姿态编码为SMPL参数的拼接向量 $\mathbf{x}(0)_i = [J_i \quad \Phi_i \quad \tau_i \quad \beta]^T$，包含21个关节的6D旋转 $J_i$、全局朝向6D $\Phi_i$、全局平移3D $\tau_i$ 以及形状参数10D $\beta$（Equation 9）。这一表示直接输出可驱动SMPL-H网格的参数，无需后处理。
@@ -125,8 +119,6 @@ claims:
 **数据流**：原始SMPL参数序列 → 结构保持归一化 → 加噪前向扩散 → EDM2 U-Net去噪预测 → 梯度平衡损失反向传播（含 $u_\psi$ 联合优化）→ 训练收敛后通过ODE求解器采样 → 直接输出SMPL参数并提取网格。
 
 该框架的关键因果机制在于：通过结构保持归一化消除特征组间的统计偏差，再通过梯度分析驱动的自适应损失权重使各特征组在不同时间步的梯度动态趋于均衡，从而让扩散模型能够高效匹配人体运动分布。消融实验（Table 1）验证了这一机制的有效性——仅改进归一化即可将FID从6.23降至3.32，叠加梯度平衡策略后进一步降至2.40。
-
-
 
 ### 3.1 运动表示与预处理模块
 
@@ -201,8 +193,6 @@ $$\mathcal{L}_{\mathrm{final}}(\theta) = \sum_{k \in \{J, \Phi, \tau, \beta\}} \
 ![[assets/figures/papers/paper_list_l1908_Unconditional_Human_Motion_and_Shape_Generation_via_Balanced_Score_Based/figures/003_Figure_2.jpg]]
 *Figure 2: Average L2 norms of gradients with respect to*
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈验证：梯度不平衡是性能劣化的根源
@@ -276,15 +266,11 @@ Figure 3 展示了概率流ODE框架下的系统评估。在归一化特征空�
 
 所有对比实验遵循严格公平性协议：MDM使用作者公布的代码和默认超参数进行无条件重训练；所有模型采用相同的训练/验证/测试划分（10626/665/1997）；FID和多样性计算遵循HumanML3D官方协议；足滑动和肢体长度标准差作为补充质量指标；三次运行取最佳值，变化幅度≤3%。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1908_Unconditional_Human_Motion_and_Shape_Generation_via_Balanced_Score_Based/figures/001_Figure_1.jpg]]
 *Figure 1: Unconditionally generated samples from our final model. SMPL parameters are generated directly and the mesh is extracted with the SMPL-H model. Generated with 31 NFE. Darker color indicates later frames in the sequence. See supplementary videos for more qualitative results*
 
 ![[assets/figures/papers/paper_list_l1908_Unconditional_Human_Motion_and_Shape_Generation_via_Balanced_Score_Based/figures/006_Table_3.jpg]]
 *Table 3: Hyperparameters used for all versions of our model*
-
-
 
 ## 定位与知识库关联
 
@@ -337,8 +323,6 @@ Figure 3 展示了概率流ODE框架下的系统评估。在归一化特征空�
 5. **小样本与少轮次的鲁棒性**：当前消融实验基于600 epoch的充分训练。在小批量（如batch size < 32）或更少训练轮次下，$u_\psi$ 的估计方差增大，平衡策略是否仍能稳定收敛？这关系到方法在计算资源受限场景中的实用性。
 
 6. **与其他生成范式的结合**：梯度均衡思想是否可推广至其他生成框架（如流匹配、一致性模型）？其核心在于识别并补偿损失景观中的各向异性，这一原理可能具有跨范式的适用性。
-
-
 
 ## 原文 PDF
 

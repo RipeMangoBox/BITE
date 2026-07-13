@@ -53,8 +53,6 @@ claims:
 
 **方法定位**：RAIN-Merging 属于无训练合并方法，仅需少量校准数据（150 条推理样本 + 365 条指令样本）用于构建零空间和计算注意力指标，无需梯度更新。其核心贡献在于将输出格式保护显式编码为参数子空间约束，并以注意力信号引导模块级合并强度，为推理与指令遵循能力的协同增强提供了新的调控范式。
 
-
-
 大型推理模型（LRM）通过显式的链式思考（Chain-of-Thought）机制在数学、编程等复杂推理任务上取得了显著进展，但其指令遵循能力相对薄弱。以 **DeepSeek-R1-Distill-Qwen-7B** 为代表的 LRM 在输出中具有明确的 `<think>...</think>` 思考段，而指令微调模型（ITM，如 **Qwen2.5-7B-Instruct**）仅输出最终答案，两者在输出格式上存在根本性差异。
 
 模型合并（Model Merging）作为一种无需训练即可融合不同模型能力的技术，为增强 LRM 的指令遵循提供了轻量级路径。然而，直接合并面临两个核心瓶颈：
@@ -66,8 +64,6 @@ claims:
 现有合并方法——包括无数据的 **Task Arithmetic**（Ilharco et al., 2023）、**TIES**、**DARE-TIES**，以及数据依赖的 **ACM-TIES**、**LEWIS-TIES**、**AIM-TIES**——均未针对 LRM 特有的思考格式约束设计保护机制，导致合并后模型在指令遵循基准上的提升以牺牲推理性能为代价，或在推理保持上表现不佳。
 
 上述缺口驱动了 **RAIN-Merging** 的提出：一种无需梯度的两阶段合并方法，核心动机在于**在保持思考格式不变的前提下，选择性增强指令遵循能力**。
-
-
 
 ## 核心方法与创新机理
 
@@ -111,8 +107,6 @@ $$\theta_\star = \theta_R + \lambda \bigoplus_{k=1}^{K} \alpha_\star^k \Delta_I^
 
 **方法定位**：RAIN-Merging属于**数据依赖的模型合并**方法，与Task Arithmetic（Ilharco et al., 2023）、TIES、DARE-TIES等无数据方法以及ACM-TIES、LEWIS-TIES、AIM-TIES等数据依赖方法形成对比。其独特之处在于首次将**思考格式的结构约束**显式建模为参数空间的零空间投影，并结合**指令注意力代理指标**实现模块级自适应合并。
 
-
-
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_PO2iULmu5e/figures/001_Figure_1.jpg]]
 *Figure 1: An overview of RAIN-Merging. In the case, the LRM arrives at the correct solution but ignores the required format and specific code. To preserve the reasoning structure, we perform training-free merging by combining a task vector projected onto the null space of the thinking format with instruction-attention guided coefficients. The merged model remains correct while satisfying the specified constraints. See Sec. 3 for details*
 
@@ -129,8 +123,6 @@ RAIN-Merging 是一种无需梯度的两阶段模型合并方法，其核心目�
 2. **Stage 2：指令注意力引导的模块缩放**。使用从 IFEval 蒸馏并通过 LLM-as-Judge 筛选得到的 365 条指令校准集，对每个注意力头计算指令对齐度 $a^{\tilde{k}}$（注意力在指令相关区域的聚集程度）和泄漏度 $u^{\tilde{k}}$（注意力在无关区域的分散程度），合并为指令注意力代理目标 $\mathcal{I}_I^{\mathrm{Proxy}}$（Eq. 11）。在初始合并点对该目标做二阶泰勒展开，利用前向注意力统计线性近似梯度 $g^{\tilde{k}}$（Eq. 14）和对角 Hessian $\tilde{H}^{\tilde{k}}$，通过带盒约束的凸二次规划闭式解求得每模块最优缩放系数 $\alpha_{\star}^{\tilde{k}}$（Eq. 15）。
 
 最终合并模型由推理锚点参数、全局标量 $\lambda$ 和缩放后的投影任务向量组合而成（Eq. 16），仅合并对注意力输出敏感的 Q、K、V、O 及 FFN 模块。整个合并过程仅需约 21 分钟，无需任何梯度计算。
-
-
 
 RAIN-Merging 的核心调控机制由两个级联阶段构成：**推理感知的零空间投影（Stage 1）** 与 **指令注意力引导的模块缩放（Stage 2）**。两阶段共同解决一个约束优化问题——在保持思考格式 KL 散度不超过阈值 $\delta$ 的前提下，最大化指令跟随代理目标 $\mathcal{I}_I$：
 
@@ -207,14 +199,11 @@ $$
 - **校准数据**：Stage 1 从 Mixture-of-Thoughts 采样 150 个思考格式样本；Stage 2 从 IFEval 蒸馏并通过 LLM-as-Judge 筛选得到 365 条带标注指令范围的样本
 - **公平性**：所有数据依赖合并方法使用相同的校准数据，并统一应用 TIES 后处理（符号一致性与幅度截断）
 
-
-
 ## 实验与关键发现
 
 ### 主结果：指令遵循与推理能力的全面权衡
 
 RAIN-Merging 在合并 Qwen2.5-7B-Instruct（ITM）到 DeepSeek-R1-Distill-Qwen-7B（LRM）的主实验中，实现了指令遵循与推理能力的双重提升（Table 1）。在指令遵循平均分（IFEval、CELLO、InfoBench、ComplexBench）上，RAIN-Merging 达到 48.11，较原始 LRM 的 44.12 提升 3.99 分；在推理与通用能力平均分（Math、GPQA、Aider、Arena-Hard-v2）上达到 55.59，较 LRM 的 51.03 提升 4.56 分。两项指标均显著超越所有基线合并方法，包括 Task Arithmetic（Ilharco et al., 2023）、TIES、DARE-TIES 等无数据方法，以及 ACM-TIES、LEWIS-TIES、AIM-TIES 等数据依赖方法。
-
 
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_PO2iULmu5e/figures/004_Table_1.jpg]]
 *Table 1: Comprehensive comparison of instruction following and reasoning & general capabilities. We merge Qwen2.5-7B-Instruct (ITM) into DeepSeek-R1-Distill-Qwen-7B (LRM) and compare our RAIN-Merging against multiple merging methods as well as SFT trained on the same calibration data. “Avg.” denotes the average over all subsets. “RT” reports the run-time for merging or training in minutes. The best and second-best results are highlighted in bold and underlined, respectively*
@@ -268,7 +257,6 @@ Figure 6 展示了合并后模型在各层的指令注意力得分（对齐度 �
 
 在 MathIF 基准（Table 5）上，RAIN-Merging 的“Both Acc.”（指令约束与数学答案同时正确）达到 20.48%，较 LRM 的 12.62% 相对提升 62.26%。这表明 RAIN-Merging 不仅提升了指令遵循和数学推理的独立能力，更重要的是增强了二者的协同——模型能在遵循格式约束的前提下完成复杂推理。
 
-
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_PO2iULmu5e/figures/009_Table_5.jpg]]
 *Table 5: Merging performance of RAIN-Merging on MathIF under the same configuration as Tab. 1. IF Acc. and Math Acc. are the accuracy of instruction constraints and math answers, respectively. Both Acc. represents both constraints and math answers are correct. Table 6: Evaluation of reasoning and answer traces under the same configuration as Tab. 1. We report Reasoning Internal Coherence (RIC) and Reasoning-Answer Alignment (RAA) on IFEval, AIME25, and GPQA (0-5 scale). The subsequent “(relative gain)” row reports the relative improvement of our method over the LRM, highlighted in green*
 
@@ -279,7 +267,6 @@ Figure 6 展示了合并后模型在各层的指令注意力得分（对齐度 �
 ### 智能体场景与资源效率
 
 在智能体设置（Table 3）中，RAIN-Merging 在 ALFWorld 上达到 25.00%，在 WebShop 上达到 29.42%，均优于原始 LRM（分别为 18.33% 和 25.24%）和 ITM（分别为 15.83% 和 26.12%）。这证明合并模型在需要多步交互和指令遵循的具身场景中同样有效。
-
 
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_PO2iULmu5e/figures/006_Table_3.jpg]]
 *Table 3: Performance of RAIN-Merging in agent settings. We merge Qwen2.5-7B-Instruct (ITM) into DeepSeek-R1-Distill-Qwen-7B (LRM). Figure 4: GPU memory usage comparison between different methods under the same configuration as Tab. 1*
@@ -305,29 +292,6 @@ Figure 6 展示了合并后模型在各层的指令注意力得分（对齐度 �
 | Figure 6 | 指令注意力引导系数使各层注意力得分持续优于 LRM 和 Task Arithmetic |
 | Table 5 | MathIF 联合正确率相对提升 62.26%，证明约束推理能力的协同增强 |
 | Table 6 | 推理-答案对齐度在 AIME25 和 GPQA 上分别提升 13.89% 和 13.31% |
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_PO2iULmu5e/figures/010_Figure.jpg]]
-*Figure: A1: Principal subspace cosine similarity between DeepSeek-R1-Distill-Qwen-1.5B (LRM) and Qwen2.5-1.5B-Instruct (ITM) task vectors for each layer and submodule. Figure A2: Principal subspace cosine similarity between DeepSeek-R1-Distill-Qwen-14B (LRM) and Qwen2.5- 14B-Instruct (ITM) task vectors for each layer and submodule*
-
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_PO2iULmu5e/figures/015_Table.jpg]]
-*Table: A4: The hyperparameters of various merging methods in Tab. 1. λ means the global scaling coefficient in merging. k denotes the trim ratio in TIES-Merging. p means the drop rate in DARE merging. τ is sharpness the ACM. ρ is the pruning ratio in LEWIS. ω means the balance factor in AIM. Table A5: The hyperparameters of RAIN-Merging in different model sizes. λ means the global scaling coefficient in RAIN-Merging*
-
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_PO2iULmu5e/figures/011_Table.jpg]]
-*Table: A1: Reasoning calibration set construction from Mixture-of-Thoughts. We uniformly sample 50 examples per domain for calibration and 50 for validation. Raw sizes are taken from the official dataset composition page*
-
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_PO2iULmu5e/figures/013_Table.jpg]]
-*Table: A2: Instruction-following benchmarks. We list dataset size, constraint taxonomy, composition types, verification, and aggregation strategy*
-
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_PO2iULmu5e/figures/014_Table.jpg]]
-*Table: A3: Test set sizes of the six math benchmarks used in our mathematical reasoning (Math) evaluation*
-
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_PO2iULmu5e/figures/016_Table.jpg]]
-*Table: A6: Math benchmark results under the same configuration as in Tab. 1. “Avg.” denotes the average over all math benchmarks. The best and second-best results are highlighted in bold and underlined, respectively*
-
-
-
 
 ## 定位与知识库关联
 
@@ -413,8 +377,6 @@ RAIN-Merging在合并范式上的三个关键改进槽位：
 4. **大规模验证**：在70B+参数规模和更多架构（如非Qwen系列、混合专家模型）上的效果如何？
 5. **多模态扩展**：RAIN-Merging的零空间投影和指令注意力引导机制能否适配视觉-语言模型的多模态输入输出格式？
 6. **动态合并策略**：当前方法使用静态校准集计算合并系数，能否设计在线自适应机制，根据推理时的指令类型动态调整缩放系数？
-
-
 
 ## 原文 PDF
 

@@ -80,8 +80,6 @@ Fracture-GS 位于 **物理仿真与神经渲染的交叉点**，其方法谱系
 
 > **注意**：定量评估采用自参照协议（以断裂前最后一帧为参考），缺乏真实动态序列基准，指标反映的是视觉连贯性而非绝对物理精度。未来需发展专门用于物理渲染的评估度量。
 
-
-
 ### 问题背景：动态断裂模拟的视觉与物理双重挑战
 
 在计算机图形学中，动态断裂模拟长期面临一个核心矛盾：物理求解器追求力学精度，而渲染管线要求视觉真实感。传统有限元法（FEM）虽能精确模拟断裂，但计算成本极高，难以扩展到复杂多体碰撞场景。材料点法（MPM）因其天然的拓扑变化处理能力，已成为断裂模拟的主流选择——粒子携带连续介质属性，在欧拉网格上求解动量方程，无需显式处理裂纹面。
@@ -99,8 +97,6 @@ Fracture-GS 位于 **物理仿真与神经渲染的交叉点**，其方法谱系
 ### 本文动机：物理-渲染联合优化的断裂模拟
 
 针对上述缺口，Fracture-GS提出了一条物理-渲染深度耦合的技术路线：**在MPM求解器中嵌入动量守恒的碰撞界面力，从根本上消除非物理黏附；同时，通过断裂粒子追踪与最小体积外接椭球（MVEE）优化，为断裂面生成物理一致的高斯属性。** 这一设计理念的核心洞察是：碰撞界面的质量分布梯度天然编码了接触方向信息，而硬化参数$\alpha$则提供了粒子是否处于断裂状态的连续信号——将这两者分别引入碰撞力计算和断裂粒子识别，即可在不增加显著计算开销的前提下，实现物理准确性与视觉真实性的同步提升。
-
-
 
 ## 核心方法与创新机理
 
@@ -143,8 +139,6 @@ Fracture-GS 提出 **Collision-MPM**，核心机制包含两个步骤：
 
 > **注意**：该方法对隐藏/不可见区域的断裂面缺乏纹理信息，可能导致 FID 指标偏高；未来工作可探索 3D AI 纹理修复以改善此问题。
 
-
-
 Fracture-GS 构建了一条从多视图图像到动态断裂渲染的端到端管道，其核心设计围绕“物理模拟—几何追踪—外观重建”三个阶段的紧密耦合展开。整个框架的输入为物体的多视图 RGB 图像，输出为任意视角下具有物理一致断裂效果的高质量渲染序列。
 
 **管道总览**（对应 Figure 2）包含五个递进模块：
@@ -161,12 +155,8 @@ Fracture-GS 构建了一条从多视图图像到动态断裂渲染的端到端�
 
 **输入输出流**：输入为多视图图像与预定义的材料物理参数（杨氏模量、泊松比、屈服应力等，见 Table 1）；输出为动态断裂过程的连续渲染帧序列。管道中，SDF 重建与高斯学习阶段在模拟前一次性完成，而 MPM 模拟、断裂追踪与渲染在每帧迭代执行，形成“模拟—追踪—渲染”的闭环。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_zcAwK50ft0/figures/002_Figure_2.jpg]]
 *Figure 2: Pipeline. The object is implicitly reconstructed from multi-view images, followed by sampling both surface and internal particles. Surface particles learn Gaussian attributes using isotropic kernels. Next, the sampled particles undergo extreme mechanical collision simulation with dynamic fracture using our enhanced Collision-MPM. Finally, fracture particles are tracked and their Gaussian attributes are optimized through our proposed Fracture Particle Gaussian Optimization strategy, enabling high-quality rendering of the simulation results. For Collision-MPM, the key parameters are highlighted in red. The yield surface determines whether a particle enters the plastic region, triggering a ret...*
-
-
 
 ### 3.1 Collision-MPM：动量守恒的碰撞界面处理
 
@@ -218,9 +208,6 @@ Fracture-GS 采用 **NACC 本构模型**（Wolper et al., 2019）描述材料的
 
 如 Figure 3（右）所示，断裂追踪在每个时间步动态执行：随着碰撞与变形加剧，越来越多的内部粒子因塑性累积而被识别为断裂粒子，从而驱动断裂面的动态演化。
 
-![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_zcAwK50ft0/figures/003_Figure_3.jpg]]
-*Figure 3: (left) Illustration of the mass distributions of particles*
-
 **MVEE 优化重构高斯属性**
 
 断裂粒子本身缺乏外观信息（它们原本是不可见的内部粒子），直接渲染会导致断裂面出现空洞或颜色异常。Fracture-GS 通过 **最小体积外接椭球**（MVEE）优化来解决这一问题：
@@ -246,13 +233,6 @@ Fracture-GS 的完整管道（见 Figure 2）由以下关键模块串联构成�
 5. **实时高斯泼溅渲染**：将优化后的高斯粒子经遮挡感知采样投影并混合，输出最终图像。
 
 各模块间的数据流与参数传递关系在 Figure 2 中以红色高亮标注，其中屈服面判定决定了粒子是否进入塑性区域并触发返回映射（return mapping）以更新变形梯度。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_zcAwK50ft0/figures/004_Figure_4.jpg]]
-*Figure 4: Illustration of Fracture Particles Gaussian Optimization*
-
-
 
 ## 实验与关键发现
 
@@ -293,18 +273,9 @@ Table 2 报告了断裂粒子追踪对渲染性能的影响。引入断裂粒子
 
 Figure 9 展示了不同初始硬化因子对断裂模式的影响。增大初始硬化因子系统性地增强物体碎裂程度和裂缝扩展范围，验证了基于硬化参数 α 的断裂追踪准则对材料塑性的敏感性。这一参数直接控制 NACC 本构模型中粒子进入塑性区域的阈值，从而影响断裂面的生成密度与分布。
 
-![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_zcAwK50ft0/figures/012_Figure_9.jpg]]
-*Figure 9: Collisions with three distinct initial hardening factors*
-
 #### 内部采样密度消融
 
 Table 3 和 Figure 12 展示了内部粒子采样密度对模拟精度的影响。随采样密度增加，坐标误差呈收敛趋势，但不同密度导致不同的断裂模式与碰撞动力学响应——这是粒子法的固有特性，而非方法缺陷。Figure 12 的可视化对比显示，低采样密度下断裂面较粗糙，高密度下裂纹更精细，但计算成本相应增加。
-
-![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_zcAwK50ft0/figures/015_Table_3.jpg]]
-*Table 3: Coordinate errors at different interior point densities*
-
-![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_zcAwK50ft0/figures/016_Figure_12.jpg]]
-*Figure 12: Visual comparison of simulation and rendering results under different internal sampling densities (Nv) across three representative timesteps*
 
 ### 失败模式与局限性
 
@@ -315,11 +286,6 @@ Table 3 和 Figure 12 展示了内部粒子采样密度对模拟精度的影响�
 3. **参数敏感性**：硬化因子、内部采样密度等参数直接影响断裂模式与模拟精度，论文未系统报告方法对这些参数的敏感度及所需的手动调参程度。实际应用中可能需要针对不同材质进行参数搜索。
 
 4. **材料参数依赖**：Table 1 列出了各物体的材料参数（杨氏模量、泊松比、屈服应力等），这些参数的选择依赖领域知识，论文未探讨参数估计的自动化方法。
-
-![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_zcAwK50ft0/figures/010_Table_1.jpg]]
-*Table 1: Material Parameters*
-
-
 
 ## 定位与知识库关联
 
@@ -361,8 +327,6 @@ Fracture-GS 的方法创新可归纳为三个紧密耦合的模块：
 3. **参数敏感度量化**：物理参数（尤其是硬化因子 α）对断裂模式的影响虽已通过消融实验定性展示，但缺乏系统性的敏感度分析和自动调参策略。
 4. **与物理模拟基线的直接对比**：当前定量评估主要与 PhysGaussian 等渲染基线对比，缺少与专业断裂模拟软件或高级 MPM 变体的直接物理精度对比。
 5. **计算效率的进一步优化**：断裂粒子追踪使每帧渲染时间增加约 20–80%（如 Ficus 场景从 49.19ms 增至 62.78ms），在实时应用场景下仍有优化空间。
-
-
 
 ## 原文 PDF
 

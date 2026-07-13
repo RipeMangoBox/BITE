@@ -54,8 +54,6 @@ claims:
 
 实验表明，MASQuant 在双模态（视觉-语言）和三模态（全模态）MLLM 的多个基准上均优于现有 PTQ 方法（SmoothQuant、**AWQ**（Lin et al., MLSys 2024）、**MBQ**（Li et al., CVPR 2025）等）。在 W8A8 设置下，MASQuant 的精度可匹配 FP16 基线；在 W4A8 下，LibriSpeech 的词错误率（WER）从统一平滑的 77.4% 降至 3.8%。端到端测试中，Qwen2.5-VL-7B 在 W4A4 设置下实现 2.5 倍预填充加速，且延迟开销极小。
 
-
-
 ### 多模态大语言模型的量化困境
 
 多模态大语言模型（MLLM）通过同时处理文本、视觉和音频等多种模态信息，在视觉问答、语音识别等任务中展现出强大的能力。然而，这类模型庞大的参数量和计算开销严重阻碍了其在资源受限设备上的部署。训练后量化（PTQ）作为一种关键的模型压缩技术，通过将高精度浮点权重和激活值映射到低比特整数表示，能够显著降低模型的内存占用和推理延迟。
@@ -93,8 +91,6 @@ $$\text{SQNR}(\mathbf{s}^{\text{uni}}, \mathbf{x}_t^{m'}) = \text{SQNR}(\mathbf{
 上述分析揭示了多模态大语言模型量化面临的核心矛盾：**模态感知的平滑因子是消除平滑错位的必要条件，但直接使用多套量化权重又会丧失计算不变性带来的存储和推理效率优势。**
 
 MASQuant 的设计动机正是要打破这一困境。其核心洞见在于：跨模态的平滑后激活差异具有低秩特性。这意味着可以在推理时仅维护一套文本模态的基础量化权重，同时通过轻量的低秩修正矩阵来补偿其他模态与文本模态之间的差异，从而同时实现模态专属的量化精度和单一权重的计算效率。这一思路为多模态大语言模型的高效部署开辟了新的技术路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -140,8 +136,6 @@ SVD 白化使补偿所需秩减少 4 倍：在秩比仅 0.08 时，CMC 的 SQNR 
 
 MASQuant 的两个 changed slot 构成了“先解耦，后补偿”的完整方案：MAS 通过模态专属平滑因子消除平滑错位，将各模态推向量化最优；CMC 则利用跨模态差异的低秩特性，以极少的额外参数恢复计算不变性。这一设计使得 MASQuant 在 W8A8 下即可匹配 FP16 精度（Table 1, MMMU 46.6），并在 W4A4 极端量化下实现 2.5 倍推理加速（Table 7），同时将音频模态从崩溃边缘（WER 77.4）拉回可用水平（WER 3.8）。
 
-
-
 MASQuant 框架由两个级联的核心模块构成：**模态感知平滑（Modality-Aware Smoothing, MAS）** 和 **跨模态补偿（Cross-Modal Compensation, CMC）**。其设计目标是在多模态大语言模型的训练后量化（PTQ）中，同时解决平滑错位与跨模态计算不变性两大瓶颈。
 
 ### 问题根源与设计动机
@@ -164,8 +158,6 @@ MASQuant 的完整流程分为校准阶段与推理阶段，如 Figure 3 所示�
    - 非文本模态在基权重计算的基础上，叠加对应的低秩修正项：$\mathrm{Q}(\mathbf{X}_m \mathbf{S}_m^{-1}) \cdot \mathrm{Q}(\mathbf{S}_t \mathbf{W}) + \mathbf{X}_m \mathbf{S}_m^{-1} \cdot \mathbf{L}_1^m \mathbf{L}_2^m$。
 
 这一设计使得推理时仅需存储**一套文本基量化权重**，其他模态通过轻量低秩矩阵实现模态专属适应，在保持计算不变性的同时消除了平滑错位。
-
-
 
 ### 问题形式化：平滑错位的量化分析
 
@@ -225,12 +217,6 @@ $$
 
 其中 $\mathbf{U}_r, \Sigma_r, \mathbf{V}_r$ 为白化残差的秩-$r$ 截断 SVD 结果。Figure 5 证实，白化后 $\Delta \mathbf{W}$ 的有效秩在各层均大幅下降；Figure 6 进一步表明，CMC 仅需非白化基线 1/4 的秩即可达到同等补偿效果，SQNR 在秩比 0.08 时即超越单独使用 MAS。
 
-![[assets/figures/papers/paper_list_l763_https_arxiv_org_abs_2603_04800/figures/007_Figure_5.jpg]]
-*Figure 5: Effective ranks of ∆W is reduced across layers after SVD-based Whitening b SQNR improves as the rank ratio increases on both Qwen2.5-VL-3B and Qwen2.5-Omni-3B*
-
-![[assets/figures/papers/paper_list_l763_https_arxiv_org_abs_2603_04800/figures/008_Figure_6.jpg]]
-*Figure 6: SQNR as a function of rank ratio for CMC on Qwen2.5- Omni-3B under W4A6 quantization. MAS applies independent modality-specific smoothing. MBQ employs a uniform factor optimized by modality balance reconstruction*
-
 最终推理时，文本模态直接使用文本平滑的量化权重；其他模态在基权重计算后叠加对应的低秩修正项：
 
 $$
@@ -242,16 +228,6 @@ $$
 ### 方法谱系与知识库定位
 
 MASQuant 继承并扩展了通道级平滑量化的技术路线。**SmoothQuant** (Xiao et al., ICML 2023) 开创了通过数学等价的平滑变换将激活异常值迁移至权重的范式，但其统一平滑因子在多模态场景下产生错位。**AWQ** (Lin et al., MLSys 2024) 引入激活感知的权重保护，但仅针对权重进行量化。**MBQ** (Li et al., CVPR 2025) 首次关注多模态量化中的模态平衡问题，通过统一平滑因子的模态平衡重建来缓解偏差，但未从根本上消除平滑错位。MASQuant 的 MAS 模块通过模态专属平滑因子的直接优化，将错位问题从“缓解”推向“消除”；CMC 模块则通过 SVD 白化与低秩补偿，在保持计算不变性的前提下实现了模态专属适应，这是此前方法均未解决的系统性难题。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l763_https_arxiv_org_abs_2603_04800/figures/001_Figure_1.jpg]]
-*Figure 1: (a). Activation distributions during multimodal reasoning in MLLMs. Different dominant modalities emerge across MLLM components, leading to failure of general PTQ methods that diminish vision importance. (b). Impact of SmoothQuant’s uniform smoothing factors S computation on MLLM quantization performance (low SQNR, high PPL). (c). MASQuant addresses smoothing misalignment through the combination of MAS and CMC, thereby significantly enhancing PTQ performance in MLLMs. MBR Loss indicates Modality Balanced Reconstruction Loss*
-
-![[assets/figures/papers/paper_list_l763_https_arxiv_org_abs_2603_04800/figures/006_Figure_4.jpg]]
-*Figure 4: Percentage of unified smoothing factors from different modalities using SmoothQuant on Omni and VL MLLMs*
-
-
 
 ## 实验与关键发现
 
@@ -285,9 +261,6 @@ MASQuant 在两个多模态大语言模型系列上进行了全面评估：双�
 #### 推理效率
 
 在 RTX 4090 上对 Qwen2.5-VL-7B 的端到端预填充阶段测试（Table 7），MASQuant 在 W4A4 设置下实现 **2.5 倍加速**（batch size 1），且随着 batch size 增大加速比保持稳定。CMC 引入的低秩补偿矩阵带来的额外计算开销极小：解码阶段每 token 额外 FLOPs 为 $2drm$（Table 6），其中 $d$ 为隐藏维度，$r$ 为秩，$m$ 为额外模态数，在典型设置下占比不到 1%。
-
-![[assets/figures/papers/paper_list_l763_https_arxiv_org_abs_2603_04800/figures/013_Table_6.jpg]]
-*Table 6: Computation cost and memory at decoding phase, where d is hidden size, r is rank, and m is the number of extra modalities*
 
 ![[assets/figures/papers/paper_list_l763_https_arxiv_org_abs_2603_04800/figures/012_Table_7.jpg]]
 *Table 7: End-to-end prefill-stage performance of Qwen2.5-VL-7B on Desktop RTX 4090 with fused GPU kernels (sequence length = 2048) under W4A4 setting. MAS: MASQuant. BS: Batch Size*
@@ -324,13 +297,6 @@ Figure 5 揭示了 CMC 的核心机理：SVD 白化后跨模态权重残差 $\De
 2. **模态数量扩展的边际成本**：CMC 为每个额外模态引入独立的低秩补偿矩阵，参数开销与模态数线性增长（Table 6 中内存开销为 $2dr \times m$）。当模态数较多时，需要在补偿精度与存储开销间权衡。
 
 3. **校准数据依赖性**：MAS 的平滑因子优化依赖模态特定的校准数据，若校准数据分布与实际推理分布存在偏移，可能导致次优平滑。论文未提供跨分布泛化性的系统分析，该点需在实际部署中手动验证。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l763_https_arxiv_org_abs_2603_04800/figures/002_Figure_2.jpg]]
-*Figure 2: Comparative analysis of SQNR degradation of Qwen2.5- Omni-3B under multimodal input condition. We selected 32 samples from OmniBench and computed the average SQNR for each layer*
-
-
 
 ## 定位与知识库关联
 
@@ -372,8 +338,6 @@ MASQuant 的“模态感知平滑 + 低秩补偿”范式为后续研究打开�
 1. **音频模态的极端敏感性**：Table 2 显示，在 W4A4 设置下，SmoothQuant 和 MBQ 在 LibriSpeech 上的 WER 分别飙升至 77.4 和 85.5，而 MASQuant 将其降至 3.8。音频模态为何对量化误差如此敏感？其激活分布是否存在特殊的尖峰结构？论文未对此给出机理解释。
 2. **SVD 白化的理论基础**：CMC 的 SVD 白化步骤被证明能有效降低 $\Delta\mathbf{W}$ 的有效秩，但论文未严格证明为何跨模态权重差在白化后呈现低秩——这一性质可能与 MLLM 中跨模态共享的语义子空间有关，需要进一步的理论分析。
 3. **与 KV-Cache 量化的协同**：MLLM 推理中 KV-Cache 的内存瓶颈同样显著。MASQuant 的模态感知思想是否可迁移到 KV-Cache 量化中，实现模态自适应的缓存压缩，是值得探索的开放方向。
-
-
 
 ## 原文 PDF
 

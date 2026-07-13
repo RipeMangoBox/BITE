@@ -188,8 +188,6 @@ MagicMotion 在自建的 **MagicData** 数据集上进行训练，该数据集�
 
 尽管 MagicMotion 在现有基准上表现优异，以下问题仍需进一步验证：在物体严重遮挡或快速运动场景下，稀疏框轨迹能否保持稳健的形状预测；MagicData 自动化标注流水线产生的标注噪声对最终性能的定量影响；该框架在实时或低延迟推理场景下的可行性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2_MagicMotion_Controllable_Video_Generation_with_Dense_to_Sparse_Trajector/figures/011_Table_4.jpg]]
 *Table 4: Comparisons on each method’s backbone*
 

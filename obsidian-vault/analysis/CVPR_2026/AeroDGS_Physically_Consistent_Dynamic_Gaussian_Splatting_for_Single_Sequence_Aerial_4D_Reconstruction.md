@@ -52,15 +52,11 @@ claims:
 
 **主要结果**：在真实数据集Aero4D与合成数据集UAV3D上，AeroDGS均显著优于现有方法，尤其动态区域PSNR最高提升约4 dB。消融实验证实，三个物理约束对动态重建质量至关重要，移除任一项均导致Dyn-PSNR下降。
 
-
-
 **应用场景与核心矛盾** 无人机航拍是城市监测、交通分析和应急响应的关键感知手段。从单目航空视频中重建动态城市场景的4D表示（3D几何+时间），能够支撑自由视角渲染、场景编辑和时空分析等下游任务。然而，这一任务面临根本性的病态挑战：单目航空视角下，动态物体（如车辆）在图像中占据极小像素面积，且伴随大幅位移，导致深度估计严重模糊、运动轨迹难以稳定恢复。传统依赖多视图几何或预训练先验的方法在此类场景中极易失效，单目4D重建高度欠定。
 
 **现有方法缺口** 当前动态场景重建方法主要分为两类。一类基于动态高斯泼溅的通用框架，如**4DGS**（Wu et al., CVPR 2024）和**Dynamic 3D Gaussian Fields**（Fischer et al., NeurIPS 2024），它们依赖多视图一致性或稠密时序观测来解耦动静结构，但在单目航空场景下因缺乏有效几何约束而性能骤降。另一类面向自动驾驶场景的方法，如**CoDA-4DGS**（Song et al., ICCV 2025）和**DeGauss**（Wang et al., ICCV 2025），假设地面平面已知或相机运动平滑，这些先验在无人机自由飞行、视角大幅变化的条件下不再成立。此外，**Uni4D**（Yao et al., CVPR 2025）等前馈模型虽能快速推理，但在域外航空数据上泛化能力有限。上述方法均未显式利用城市场景的结构化物理规律来约束动态物体的运动自由度，导致重建结果出现漂浮、倾斜或抖动等非物理伪影。
 
 **核心动机与洞察** 城市场景中的动态物体（车辆）遵循可归纳的物理规律：它们始终与地面保持接触（地面支撑）、竖直方向对齐于重力方向（直立稳定性）、运动轨迹连续平滑（轨迹平滑性）。这些约束在物理世界中普遍成立，但在纯数据驱动的单目重建流程中被忽略。AeroDGS的核心动机是将上述物理先验编码为可微损失函数，嵌入到高斯泼溅的优化过程中，从而将原本欠定的单目姿态估计问题转化为物理一致的确定性求解。这一思路将场景结构规律转化为正则化信号，为单目航空4D重建提供了新的范式。
-
-
 
 ## 核心方法与创新机理
 
@@ -98,8 +94,6 @@ $$A_{i} = f_{\phi}(\mu_{i}, d, t, e_{o})$$
 
 现有动态高斯泼溅方法在单目航空场景中的失败根源在于其运动估计策略不适用于该场景的病态特性：**Dynamic 3D Gaussian Fields**（Fischer et al., NeurIPS 2024）依赖多视图一致性，**4DGS**（Wu et al., CVPR 2024）和**CoDA-4DGS**（Song et al., ICCV 2025）面向自动驾驶场景假设了更丰富的观测条件，**Uni4D**（Yao et al., CVPR 2025）的前馈先验在航空视角下泛化不足。AeroDGS的关键突破在于认识到城市场景的结构化规律——车辆接触地面、保持竖直、连续运动——并显式地将这些规律编码为可微正则化，而非依赖数据驱动的隐式先验。这一设计哲学使其在动态区域取得最高4 dB的PSNR提升（Table 1, Table 2），证明了物理约束在解决单目动态重建病态性方面的核心作用。
 
-
-
 AeroDGS 以单目航空视频为输入，输出物理一致的动态 4D 场景模型。其核心挑战在于：单视角观测下，动态物体在图像中占据的像素面积小、位移幅度大，导致深度估计与运动恢复高度病态。AeroDGS 通过将城市场景的结构化先验（地面支撑、直立稳定、轨迹平滑）编码为可微约束，将欠定的姿态估计问题转化为物理一致的求解过程。
 
 ### 框架总览
@@ -128,12 +122,8 @@ AeroDGS 由四个核心模块串联构成，形成从原始视频到可渲染 4D
 
 Figure 3 直观展示了这一机制的运作方式：在单目无人机视角下，动态物体因单视图几何和小图像足迹而呈现不确定的 3D 位置与朝向；物理引导约束分别强制地面接触（b）、竖直对齐（c）和轨迹平滑（d），最终将欠定姿态转化为单一的真实世界一致配置（e），实现准确的运动恢复与稳定的优化过程。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2602_22376/figures/001_Figure_1.jpg]]
 *Figure 1: Summary. Given (a) a monocular aerial video of dynamic urban scenes, AeroDGS reconstructs a physically consistent 4D model by jointly integrating static structures and dynamic motion with Gaussian representation. The framework (b) performs photorealistic novelview synthesis with temporally coherent geometry and (c) achieves higher reconstruction fidelity compared to state-of-the-art methods. Please use Adobe Reader / PDF-XChange Editor to see animations*
-
-
 
 AeroDGS 的核心架构由三个紧密耦合的模块构成，形成从几何初始化到物理约束优化的完整管线。
 
@@ -201,12 +191,8 @@ $$\mathcal{L}_{\mathrm{traj}} = \mathbb{E}_{o,t} \left[ \| \mathbf{c}_{o,t+1} - 
 
 该约束惩罚轨迹中的突变和抖动，确保运动加速度连续。三种物理约束协同作用，将单目深度歧义转化为符合现实世界物理规律的唯一解。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2602_22376/figures/003_Figure_3.jpg]]
 *Figure 3: Physics-Guided Optimization. (a) In monocular UAV scenes, dynamic objects exhibit uncertain 3D positions and orientations due to single-view geometry and small image footprints. AeroDGS introduces differentiable physics-guided constraints that enforce (b) ground support, maintaining consistent contact with the local plane; (c) upright stability, aligning the vertical axis with the reference direction; and (d) trajectory smoothness, ensuring continuous acceleration and temporally coherent motion. (e) These constraints transform under-determined poses into a single real-world-consistent configuration, yielding accurate motion recovery and stable optimization*
-
-
 
 ## 实验与关键发现
 
@@ -248,21 +234,14 @@ AeroDGS在真实航空数据集Aero4D和合成数据集UAV3D上均取得最优�
 
 **表3（消融实验）**：三个物理约束均对动态重建质量有正向贡献，地面支撑和直立稳定性贡献最大，三者互补构成完整的物理一致优化框架。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2602_22376/figures/004_Table_1.jpg]]
 *Table 1: Novel-view synthesis results on Aero4D dataset. AeroDGS performs better than state-of-the-art methods under varying altitudes, illumination, and real-world conditions*
-
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2602_22376/figures/006_Table_2.jpg]]
-*Table 2: Novel-view synthesis results on the challenging synthetic UAV3D [49] dataset. AeroDGS outperforms the state of the art, with notably better performance in dynamic scene regions*
 
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2602_22376/figures/005_Table_3.jpg]]
 *Table 3: Ablation study. Novel view synthesis on the Aero4D dataset*
 
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2602_22376/figures/007_Figure_4.jpg]]
 *Figure 4: Qualitative comparison of novel-view synthesis results. Our method achieves high overall reconstruction quality on both synthetic and real-world UAV datasets, maintaining high fidelity under diverse altitudes, illumination, and object motion patterns. Sharper structures and more consistent appearance are preserved compared with state-of-the-art methods. Yellow and red rectangular boxes highlight enlarged views of corresponding areas for visual comparison*
-
-
 
 ## 定位与知识库关联
 
@@ -308,8 +287,6 @@ AeroDGS的方法论创新在于将**城市场景的结构性规律**编码为可
 2. **物理先验与学习先验的融合。** 能否将物理引导优化与基于学习的运动先验（如从大规模数据中习得的车辆运动模式）结合，在极端条件下（如部分遮挡、剧烈光照变化）提供更强的正则化？
 3. **多物体遮挡与交互。** 当前方法独立处理每个动态实例，未显式建模物体间的遮挡关系和交互约束（如车辆跟驰、避让）。在密集交通场景中，这类交互可能成为重要的物理先验。
 4. **多无人机协同与长时序扩展。** 单目观测的信息瓶颈可通过多无人机协同观测缓解，但多视角下的物理约束融合和时序一致性维护是新的挑战。
-
-
 
 ## 原文 PDF
 

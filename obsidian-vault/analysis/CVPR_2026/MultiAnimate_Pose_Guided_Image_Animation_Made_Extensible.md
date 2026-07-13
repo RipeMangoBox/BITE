@@ -52,8 +52,6 @@ MultiAnimate 是首个基于现代 DiT 视频生成器的可扩展多角色图�
 
 在 Swing Dance、Gen-dataset 和未见舞蹈视频三个基准上，MultiAnimate 均取得最优性能：在 Swing Dance 上 PSNR 达到 19.40（相比 UniAnimate-DiT 提升 +3.25），在未见舞蹈视频上 FVD 降至 358.74（相比 UniAnimate-DiT 降低 265.71）。消融实验进一步证实，掩码驱动的标识符设计比加法驱动设计更能保持身份一致性，并成功扩展到三角色动画。
 
-
-
 姿态引导的图像动画（Pose-Guided Image Animation）旨在从单张参考图像和一段驱动姿态序列生成目标视频，使参考人物按照驱动姿态运动，同时保持外观与身份的一致性。这一任务在虚拟主播、数字人、电影制作等领域具有广泛应用。近年来，基于扩散模型（Diffusion Models）的方法在单角色动画上取得了显著进展，代表性工作包括**MimicMotion**（Zhang et al., ICML 2025）、**DisPose**（Li et al., arXiv 2024）和**UniAnimate-DiT**（Wang et al., Sci. China Inf. Sci. 2025）等。
 
 然而，当场景从单人扩展到多角色时，现有方法面临两个核心困境（Figure 2）：
@@ -66,8 +64,6 @@ MultiAnimate 是首个基于现代 DiT 视频生成器的可扩展多角色图�
 基于此，MultiAnimate 提出了两个关键设计目标：
 - **多角色身份一致性**：在复杂交互场景下保持每个角色的外观和身份不混淆；
 - **可扩展性**：模型在仅使用两角色数据训练后，能够泛化到任意数量的角色，无需为不同人数重新训练。
-
-
 
 ## 核心方法与创新机理
 
@@ -97,8 +93,6 @@ MultiAnimate 通过两个关键模块改变了这一因果结构：
 ### 双流架构中的创新嵌入
 
 上述创新通过双流架构实现（Figure 4）：Reference Stream 编码参考图像和参考姿态以捕获外观信息，Motion Stream 编码目标姿态序列和跟踪掩码以建模运动和空间条件。Identifier Assigner 和 Identifier Adapter 嵌入在 Motion Stream 中，将空间身份信息注入 DiT 的特征空间，与姿态特征协同指导生成过程。两流通过元素级加法融合，保持了与单角色方法的架构兼容性（Figure 10, Table 2）。
-
-
 
 MultiAnimate 是一个基于现代 DiT 视频生成器的多角色图像动画框架，其核心设计目标是解决现有多角色动画中身份混淆与可扩展性不足的问题。框架的整体 pipeline 由两条并行的处理流构成：**参考流（Reference Stream）** 和 **运动流（Motion Stream）**，两条流通过逐元素相加的方式进行特征融合。
 
@@ -130,21 +124,11 @@ MultiAnimate 是一个基于现代 DiT 视频生成器的多角色图像动画�
 
 与简单的“加法驱动”设计（如 **DanceTogether** (Chen et al., 2025) 直接将每人的姿态和掩码特征求和）相比，MultiAnimate 的掩码驱动设计通过 Identifier Assigner 和 Identifier Adapter 显式建模每个角色的空间组织关系。消融实验表明，加法驱动设计在角色数量增加时会出现背景噪声和身份混淆，而掩码驱动设计能够保持清晰的角色空间布局，并具备更强的可扩展性（Figure 8, Figure 9）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1074_https_arxiv_org_abs_2602_21581/figures/004_Figure_4.jpg]]
-*Figure 4: Overview of our framework. Our pipeline contains two main streams: the reference stream, which encodes the reference image and its pose to capture appearance information, and the motion stream, which encodes multi-character pose sequences and tracking masks to model motion and spatial conditions. The two streams are fused through element-wise addition of latent tokens. The Identifier Assigner unifies per-person tracking masks into a structured label representation, preserving spatial relationships and interactions among multiple characters. This representation is converted to the feature space of the DiT backbone by the Identifier Adapter*
-
-
-
 ### 问题形式化
 
 MultiAnimate 的形式化输入包括参考图像 $I_{\mathrm{ref}} \in \mathbb{R}^{3 \times H \times W}$、驱动姿态序列 $P \in \mathbb{R}^{T \times 3 \times \breve{H} \times W}$、以及每人的跟踪掩码 $\{M_i\}_{i=1}^n$，其中 $M_i \in \mathbb{R}^{T \times 1 \times H \times W}$。目标是生成包含 $n$ 个角色的目标视频 $V_{\mathrm{tar}} \in \mathbb{R}^{T \times 3 \times H \times W}$，且各角色身份与外观保持一致。
 
 这一设定直接暴露了多角色动画的核心矛盾：相同的姿态序列可能对应多种不同的运动轨迹分配（Figure 3）。因此，仅靠姿态信息无法消除角色间的运动歧义，必须引入空间标识机制来绑定每个角色与其对应的运动路径。
-
-![[assets/figures/papers/paper_list_l1074_https_arxiv_org_abs_2602_21581/figures/003_Figure_3.jpg]]
-*Figure 3: In multi-character image animation, identical pose sequences can lead to multiple plausible motion trajectories*
 
 ### 双流架构与融合策略
 
@@ -161,9 +145,6 @@ Identifier Assigner 解决的核心问题是：如何将 $n$ 个独立的二值�
 对于两角色场景，Assigner 将所有掩码合并为一幅标签图 $\mathcal{L} \in \{0, a, b\}^{H \times W}$，其中 0 表示背景，$a$ 和 $b$ 分别为角色 A 和 B 的非零标识符。随后对 $\mathcal{L}$ 进行独热编码，生成三通道二进制张量 $\hat{\mathcal{L}} \in \{0, 1\}^{3 \times H \times W}$，分别对应背景、角色 A 和角色 B 的空间占据区域。
 
 这一设计的因果机制在于：通过独热编码将“谁在哪里”的空间信息显式注入特征空间，使模型能够区分不同角色的空间布局，而非像加法驱动设计那样将多角色信息简单求和后丢失个体边界（消融实验 Figure 8 证实加法驱动仅能处理两角色，扩展到更多角色时出现背景噪声和身份混淆）。
-
-![[assets/figures/papers/paper_list_l1074_https_arxiv_org_abs_2602_21581/figures/009_Figure_8.jpg]]
-*Figure 8: Addition-driven design works for two characters but fails to generalize to more characters*
 
 ### Identifier Adapter：空间标签到 DiT 特征空间
 
@@ -183,13 +164,6 @@ Identifier Adapter 将 Assigner 输出的独热标签图转化为 DiT backbone �
 ![[assets/figures/papers/paper_list_l1074_https_arxiv_org_abs_2602_21581/figures/005_Figure_5.jpg]]
 *Figure 5: Our framework performs well at early training stages, but inconsistencies emerge when the person-assigned labels at inference differ from those seen during training*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1074_https_arxiv_org_abs_2602_21581/figures/002_Figure_2.jpg]]
-*Figure 2: Dilemmas of current methods in multi-character image animation*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果与定量分析
@@ -206,9 +180,6 @@ MultiAnimate 在三个不同来源的测试基准上均取得了最优性能，�
 ### 定性分析
 
 Figure 6 的定性对比显示，MultiAnimate 在 Swing Dance 数据集上生成的视频保持了每个角色一致的身份外观和清晰的空间关系。相比之下，其他方法在复杂交互场景中容易出现身份混淆或背景噪声。Figure 7 展示了在 Gen-dataset 上微调的效果：模型能够更好地维持时序一致性，并在武器持有等复杂运动-场景交互中保持物体的完整性。
-
-![[assets/figures/papers/paper_list_l1074_https_arxiv_org_abs_2602_21581/figures/007_Figure_6.jpg]]
-*Figure 6: Quality comparison with state-of-the-art methods on the Swing Dance dataset. More examples are provided in the supplementary material*
 
 ![[assets/figures/papers/paper_list_l1074_https_arxiv_org_abs_2602_21581/figures/008_Figure_7.jpg]]
 *Figure 7: Training on the Gen-dataset enhances the model’s ability to maintain temporal consistency and adapt to diverse motion–scene interaction*
@@ -232,11 +203,6 @@ Figure 6 的定性对比显示，MultiAnimate 在 Swing Dance 数据集上生成
 
 ![[assets/figures/papers/paper_list_l1074_https_arxiv_org_abs_2602_21581/figures/012_Table_2.jpg]]
 *Table 2: Quantitative results on TikTok dataset. Our approach maintains comparable performance to other models which target at single character animation*
-
-![[assets/figures/papers/paper_list_l1074_https_arxiv_org_abs_2602_21581/figures/011_Figure_10.jpg]]
-*Figure 10: Our framework remains compatible with single-person image animation, even though the introduction increasing training complexity*
-
-
 
 ## 定位与知识库关联
 
@@ -285,8 +251,6 @@ MultiAnimate 的可扩展性并非来自网络结构的特殊设计，而是源�
 3. **与视频编辑方法的融合潜力。** **VACE**（Jiang et al., ICCV 2025）等视频创建和编辑方法提供了对生成内容的精细控制能力。MultiAnimate 的掩码驱动设计天然提供了逐角色的空间控制接口，与视频编辑方法的结合可能实现更灵活的多角色内容创作流程，这一方向尚待探索。
 
 4. **跨域泛化能力。** 当前实验主要在舞蹈场景（Swing Dance）和通用人物场景（Gen-dataset）上进行。模型在更复杂的交互场景（如体育竞技、多人对话）中的泛化能力尚未验证。这些场景中的人物姿态和空间关系模式与舞蹈有显著差异，可能需要额外的域适应策略。
-
-
 
 ## 原文 PDF
 

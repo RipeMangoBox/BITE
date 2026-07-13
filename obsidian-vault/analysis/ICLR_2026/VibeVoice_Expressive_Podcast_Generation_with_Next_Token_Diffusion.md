@@ -57,8 +57,6 @@ VibeVoice采用**下一令牌扩散框架**，其核心设计包括三个关键�
 
 在主观评估中，VibeVoice-7B的平均MOS达3.76，超越Gemini 2.5 Pro TTS的3.66，并在真实感（3.71）、丰富度（3.81）和偏好度（3.75）三个维度均取得最优。在客观指标上，VibeVoice-1.5B在VIBEVOICE-Eval短时长子集上取得WER-W 1.22，显著优于Cosyvoice2-Concat的4.27；VibeVoice-7B的SIM-O达0.75，远超MoonCast成功案例的0.55。声学分词器在LibriTTS test-clean上取得UTMOS 4.181，优于WavTokenizer（75 Hz）的4.049。推理效率方面，1.5B模型在单张NVIDIA A6000上RTF为0.83，低于MoonCast的1.43，实现实时生成。
 
-
-
 ### 播客生成的规模化困境
 
 播客作为一种长篇、多说话人、富含表现力的对话媒介，近年来成为语音合成领域的新兴挑战。传统文本到语音（TTS）系统在设计之初便以单说话人、短句合成为目标——它们擅长在数秒内生成高保真语音，却难以将这种能力自然扩展至数十分钟的多方对话。当这些系统被强行拼接以生成长播客时，一系列根本性问题随之暴露：话轮转换缺乏自然的节奏与重叠，非词汇线索（如呼吸、唇齿音、犹豫填充）被抹平或丢失，长时间跨度的说话人音色一致性难以维持。这些缺陷并非工程实现层面的疏忽，而是源于传统TTS架构对“对话流”这一时间维度上的结构性盲区。
@@ -81,8 +79,6 @@ VibeVoice的动机源于对上述瓶颈的因果性诊断：**序列长度膨胀
 
 这两个目标的实现，将使LLM能够在可管理的序列长度内（数万而非数十万令牌）建模长达90分钟的多人对话，同时保持说话人一致性和自然交互节奏。这正是VibeVoice通过**7.5 Hz连续σ-VAE声学分词器**与**声学-语义混合表示**所瞄准的核心突破点。
 
-
-
 ## 核心方法与创新机理
 
 VIBEVOICE 针对多说话人长篇播客生成的核心瓶颈——长序列建模效率低、自然话轮转换与声学细节（呼吸、唇齿音）难以保持——提出了三个相互协同的创新设计，构成其与现有方案的本质差异。
@@ -102,8 +98,6 @@ VIBEVOICE 将长序列生成统一为**下一令牌扩散**框架：LLM（基于
 ### 课程学习驱动的长上下文扩展
 
 为使模型适应超长播客，VIBEVOICE 采用课程学习策略，将 LLM 训练序列长度从 4,096 tokens 逐步提升至 65,536 tokens（分四个阶段，共 110k 训练步）。这使得 7B 模型在 12–30 分钟的长播客上仍保持 WER‑W 1.24、SIM‑O 0.75，且推理实时因子（RTF）在单 NVIDIA A6000 上为 0.97，接近实时生成。相比之下，端到端基线 MoonCast 在 3 人以上或长音频场景下频繁崩溃，其有效指标仅基于成功子集。
-
-
 
 ![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_FihSkzyxdv/figures/009_Figure_4.jpg]]
 *Figure 4: An illustration of the Coupled Tokenizer architecture. A single encoder produces a shared latent representation $\mu$ , which is utilized for both speech reconstruction (Acoustic Decoder) and ASR (Semantic Decoder). This design contrasts with our final Hybrid architecture (Figure 2), which employs separate encoders to decouple semantic and acoustic representations*
@@ -131,8 +125,6 @@ LLM（基于 Qwen2.5，提供 1.5B 和 7B 两个版本）作为核心序列模�
 ### 推理流程示意
 
 推理时，系统逐段生成语音：每生成一个语音片段，其声学隐变量与对应文本的语义特征融合为新的混合表示 $z_{p,i+1}$，追加至 LLM 的上下文窗口，驱动下一段的生成。这一自回归式的扩展机制使 VIBEVOICE 能够合成具有自然话轮转换、丰富非词汇线索（如呼吸、唇齿音）和长时间说话人一致性的多说话人播客。
-
-
 
 ### 2.1 连续语音分词器：声学与语义解耦
 
@@ -206,8 +198,6 @@ $$
 - **解耦 vs 耦合分词器**：消融实验（Table 5）显示，耦合分词器（共享编码器）的 SIM‑O 仅 0.45，而解耦的混合分词器在保持 SIM‑O 0.64 的同时将多说话人 WER 从纯声学模型的 6.22 降至 1.84，验证了解耦设计的必要性。
 - **课程学习策略**：LLM 训练序列长度从 4,096 tokens 逐步扩展至 65,536 tokens（前 40k 步 4K，40k–80k 步 16K，80k–100k 步 32K，100k–110k 步 65K），使模型能够稳定合成最长达 90 分钟、4 说话人的播客。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与因果机制
@@ -268,28 +258,6 @@ Table 8展示了推理实时因子（RTF）对比。VIBEVOICE-1.5B使用10步扩
 3. **场景泛化**：模型主要在播客数据上训练，对多人会议、多角色有声书等场景的泛化能力尚未验证。
 4. **说话人数量限制**：当前最多支持4名说话人且需独立语音提示，零样本扩展至更多说话人仍需研究。
 5. **超长播客连贯性**：超过30分钟的极长播客中，LLM如何维持主题连贯性、避免事实冲突和保持一致情感脉络是开放问题。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_FihSkzyxdv/figures/008_Table_4.jpg]]
-*Table 4: List of models and tools used in our data processing pipeline*
-
-![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_FihSkzyxdv/figures/011_Table_6.jpg]]
-*Table 6: presents the results on the SEED test sets. Although our model is primarily trained on long-form speech, it demonstrates strong generalization on short-utterance benchmarks. In addition, by employing a lower frame rate, our model substantially reduces the number of decoding steps required to synthesize one second of speech. Table 6: Results on the SEED test sets*
-
-![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_FihSkzyxdv/figures/012_Table_7.jpg]]
-*Table 7: Reconstruction results on LibriSpeech test-clean set. N _ { q } denotes the number of quantizers; VIBEVOICE uses a single continuous σ-VAE. Higher PESQ, STOI, and UTMOS scores indicate better performance*
-
-![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_FihSkzyxdv/figures/014_Table_9.jpg]]
-*Table 9: Summary of training hyperparameters for Tokenizer and VIBEVOICE model stages*
-
-![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_FihSkzyxdv/figures/015_Table_10.jpg]]
-*Table 10: Distribution of the VIBEVOICE-Eval dataset, stratified by the number of speakers per sample. Durations are provided in seconds (average) and hours (total)*
-
-![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_FihSkzyxdv/figures/019_Table_11.jpg]]
-*Table 11: Subjective and objective evaluation on podcast generation. For all subjective metrics and SIM-O, higher scores indicate better performance. For WER, lower scores are better*
-
-
 
 ## 定位与知识库关联
 
@@ -354,8 +322,6 @@ VibeVoice 的设计在以下场景展现出明确优势：
 5. **更精细的说话人相似度评估**：需要开发能够捕捉人类感知到的音色、韵律和风格一致性的评估指标，而非仅依赖嵌入余弦相似度。
 
 6. **跨语言与跨领域迁移**：VibeVoice 从播客数据中学习到的自然对话模式能否迁移至其他语言（尤其是低资源语言）和其他多说话人场景（如会议、有声书）？这需要在多样化数据上进行系统验证。
-
-
 
 ## 原文 PDF
 

@@ -56,8 +56,6 @@ claims:
 
 **方法定位：** HALO 属于基于可微仿真的系统识别与 sim-to-real 迁移范式，其两阶段解耦策略区别于传统的单阶段参数估计或纯域随机化方法，为重载人形机器人的零样本敏捷运动部署提供了新的技术路线。
 
-
-
 人形机器人在物流、制造与家庭服务等场景中，常需在携带未知重载的条件下执行敏捷运动任务。有效载荷的引入会显著改变系统的质量分布、质心位置与惯性张量，导致仿真环境与真实物理之间出现**结构化、大尺度的动力学失配**（structured sim-to-real gap）。这种失配并非随机扰动，而是由载荷引起的系统性偏移，使得在标称仿真中训练的控制策略直接迁移至真实重载场景时性能急剧退化，甚至完全失效。
 
 现有应对仿真-真实差距的主流范式存在明显局限。**域随机化（Domain Randomization, DR）**通过在训练时对质量、质心、关节编码器偏置等物理参数施加广域扰动来训练鲁棒策略（Peng et al., ICRA 2018）。然而，面对重载引起的大幅参数偏移，广域随机化往往迫使策略学习过于保守的行为，牺牲敏捷性与跟踪精度。另一类方法采用**系统识别（System Identification, SysID）**在仿真中估计真实物理参数，例如基于协方差矩阵自适应进化策略（CMA-ES）的零阶优化方法。但这类单阶段识别将标称模型误差与有效载荷误差混合优化，导致**误差归因混乱**：优化器可能将有效载荷的质量错误地分配到其他身体环节，或收敛至物理上不合理的局部最优——尤其在极端重载条件下，CMA-ES会出现质量估计为负值等违反物理常识的结果（见Table II）。
@@ -65,8 +63,6 @@ claims:
 上述困境的核心瓶颈在于：**标称模型的固有偏差与有效载荷引入的局部变化相互耦合，难以在单一优化阶段中被解耦辨识**。若不能准确恢复重载条件下的动力学参数，后续强化学习（RL）策略便无法获得高保真的仿真训练环境，零样本迁移的性能上限因此被锁定。
 
 HALO的动机正是针对这一瓶颈：通过**两阶段可微系统识别**，先利用无载荷轨迹校准基座模型以消除固有仿真-真实偏差，再利用有载轨迹仅优化有效载荷相关的质量与质心参数，从根本上避免误差归因混乱。借助MuJoCo XLA可微仿真的解析梯度，该框架能以轨迹级优化高效收敛至准确的物理参数，为RL策略提供高保真仿真环境，从而在真实重载任务中同时保持敏捷性与鲁棒性。
-
-
 
 ## 核心方法与创新机理
 
@@ -104,8 +100,6 @@ HALO 的第三个重要创新是**摆脱了对运动捕捉系统或关节扭矩�
 
 **证据支撑**：真实重载实验中，HALO 相比 WDR 将前向行走最大位置误差降低 $73.33\%$，相比 CMA-ES 降低 $45.45\%$；在 $90^\circ$ 原地跳跃任务中将角度跟踪误差降低 $72.97\%$；在三项高敏捷挑战动作（燕式平衡、侧踢、回旋踢）中达到 $100\%$ 成功率，而基线方法均出现任务失败。
 
-
-
 HALO 面向重载人形机器人的仿真-真实迁移，构建了一条从数据采集到零样本部署的完整管线。其核心思路是将有效载荷引起的结构化动力学失配建模为可解耦的参数识别问题，而非单纯依靠域随机化进行保守的鲁棒训练。
 
 **管线总览**（参见 Figure 2）：
@@ -126,12 +120,8 @@ HALO 面向重载人形机器人的仿真-真实迁移，构建了一条从数�
 - **可微仿真梯度**：利用 MuJoCo XLA 提供的解析梯度进行轨迹级优化（学习率：质量 0.03，质心位置 0.0002），相比 CMA-ES 等零阶方法在极端载荷下具有更强的收敛鲁棒性。
 - **解耦识别策略**：两阶段设计是弥合结构化 sim-to-real gap 的核心机制，消融实验表明其参数估计精度显著优于单阶段直接优化所有参数的方法（Figure 4）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l50_https_arxiv_org_abs_2603_15084/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of HALO. (a) Data Collection: Trajectories are collected under both loaded and unloaded conditions using exploration policy trained with wide DR, followed by real-world deployment with a fixed foot constraint. (b) Data Processing: Full-body trajectories reconstruction from joint-state measurements via forward kinematics and foot-height alignment. (c) Two-stage Payload-related Parameter Identification: Stage 1 optimize the full set of model parameters to yield a calibrated base model using trajectories without payload. Based on the calibrated model, stage 2 optimize only the payload-related parameters, using trajectories collected under loaded conditions. (d) Heavy-loaded Motion Ski...*
-
-
 
 HALO 的核心管线由四个模块串联构成（对应 Figure 2），其理论根基是将系统识别形式化为可微仿真中的**轨迹级优化问题**，并通过两阶段解耦策略实现重载参数的精准估计。
 
@@ -181,15 +171,8 @@ $$\pmb{\theta}_{k+1} = \pmb{\theta}_k - \eta \nabla_{\theta} \mathcal{L}_{\mathr
 
 基于识别后的动力学参数，在 mjlab 框架中使用 PPO 训练运动模仿策略。奖励函数鼓励关节状态与身体姿态跟随参考轨迹，随后直接零样本部署至真实重载人形机器人。所有策略使用相同的 MLP 网络架构和 PPO 超参数，域随机化范围保持一致以保证公平对比（Table I）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l50_https_arxiv_org_abs_2603_15084/figures/003_Figure_3.jpg]]
-*Figure 3: Inconsistent left-right foot heights caused by sensor noise. (a) In the original trajectory, the right foot position calculated via forward kinematics remains suspended in the air. (b) In the optimized trajectory, the right foot maintains physically consistent ground contact*
-
 ![[assets/figures/papers/paper_list_l50_https_arxiv_org_abs_2603_15084/figures/007_Figure_4.jpg]]
 *Figure 4: Comparison of convergence performance between two-stage and one-stage methods. The proposed Two-Stage method HALO (orange) demonstrates superior accuracy, converging significantly closer to the estimated reference values (red dashed lines) compared to the One-Stage baseline (blue)*
-
-
 
 ## 实验与关键发现
 
@@ -239,8 +222,6 @@ $$\pmb{\theta}_{k+1} = \pmb{\theta}_k - \eta \nabla_{\theta} \mathcal{L}_{\mathr
 
 所有RL策略使用相同的MLP网络架构与PPO超参数，在相同的MuJoCo环境中训练，域随机化范围设定一致（详见表I）。系统识别阶段HALO与CMA-ES均运行2000次迭代。真实世界实验在同一机器人平台、相同有效载荷配置、相同关节PD控制器下执行。参考运动轨迹保持一致。这些控制措施确保了性能差异可归因于系统识别策略本身，而非训练或实验条件的混杂因素。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l50_https_arxiv_org_abs_2603_15084/figures/005_Table.jpg]]
 *Table: II: Convergence comparison between CMA-ES and HALO. Results are reported as mean ± standard deviation. Groundtruth values (e.g., +6.000, +2.4000) denote the incremental offsets added to the absolute nominal values. Bold values indicate performance closer to the ground truth. While CMA-ES converges under light payloads, it exhibits sensitivity to random seeds under heavy payloads*
 
@@ -250,22 +231,8 @@ $$\pmb{\theta}_{k+1} = \pmb{\theta}_k - \eta \nabla_{\theta} \mathcal{L}_{\mathr
 ![[assets/figures/papers/paper_list_l50_https_arxiv_org_abs_2603_15084/figures/010_Table.jpg]]
 *Table: IV: Summary of identified parameters*
 
-![[assets/figures/papers/paper_list_l50_https_arxiv_org_abs_2603_15084/figures/009_Table.jpg]]
-*Table: V: Performance of Walking Forward and Backward*
-
 ![[assets/figures/papers/paper_list_l50_https_arxiv_org_abs_2603_15084/figures/011_Table.jpg]]
 *Table: VI: Comparison of success rates for performing challenging maneuvers between HALO and baselines*
-
-![[assets/figures/papers/paper_list_l50_https_arxiv_org_abs_2603_15084/figures/008_Figure_5.jpg]]
-*Figure 5: Experiment settings and results of scenario 1. The metrics we defined are shown in the image, HALO outperforms the baselines across all metrics*
-
-![[assets/figures/papers/paper_list_l50_https_arxiv_org_abs_2603_15084/figures/001_Figure_1.jpg]]
-*Figure 1: Performance of HALO in heavy-loaded scenarios. (a) The payload settings used by HALO. (b, c) Compared to DR, HALO significantly improves the accuracy of straightline bidirectional walking. (d) Data collection under payload conditions with a single-foot constraint. (e) HALO enables challenging humanoid locomotion skills*
-
-![[assets/figures/papers/paper_list_l50_https_arxiv_org_abs_2603_15084/figures/004_Table.jpg]]
-*Table: I: Domain Randomization Settings*
-
-
 
 ## 定位与知识库关联
 
@@ -330,8 +297,6 @@ HALO框架留下了若干值得后续探索的方向：
 - **初始误差敏感性**：当前框架对不同初始标称参数误差的敏感性如何？若标称模型与真实模型相差过大（如使用完全不同的机器人平台），两阶段策略是否仍然有效？
 
 - **鲁棒性与安全边界**：所生成的敏捷运动策略在承受突发外部冲击（如碰撞、推力干扰）时的安全边界和泛化能力如何？这涉及从参数识别到策略鲁棒性的完整闭环验证。
-
-
 
 ## 原文 PDF
 

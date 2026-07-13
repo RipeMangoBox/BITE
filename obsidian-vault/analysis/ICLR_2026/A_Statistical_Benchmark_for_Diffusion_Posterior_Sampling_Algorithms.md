@@ -50,15 +50,11 @@ claims:
 
 主要结果基于四个线性逆问题（去噪、反卷积、插值、部分傅里叶测量重建）和一维信号（d=64）的系统实验。定量评估采用MMSE最优性差距（以分贝为单位）和后验覆盖检验。结果显示：在稀疏/重尾设定下DPS算法显著优于模型驱动基线（如伯努利-拉普拉斯增量下，DiffPIR的最优性差距为0.24–1.09 dB，而ℓ2基线为1.10–12.22 dB）；但DPS算法获得的后验覆盖值通常远低于目标水平α=0.9，其中C-DPS和DiffPIR的覆盖值几乎总是0，仅对伯努利-拉普拉斯和Student-t增量例外。
 
-
-
 扩散后验采样（DPS）算法旨在解决线性逆问题中的贝叶斯后验采样任务，其核心挑战在于如何从高维、非高斯的后验分布中高效生成样本。然而，当前对该类算法的评估存在根本性缺陷。
 
 **现有评估方法的瓶颈。** 主流评估手段依赖下游应用指标（如 SSIM、FID、LPIPS）或过于简化的先验模型。正如 Pierret & Galerne (2025b) 和 Cardoso et al. (2024) 所指出的，这些指标本质上不适合用于后验采样算法的统计评估。更关键的是，现有基准通常采用高斯混合先验，其尾部以最宽分量的指数速率衰减，属于轻尾分布。这种选择无法再现真实世界中普遍存在的重尾或稀疏特性——例如金融资产收益中常见的幂律极端值（Blattberg & Gonedes, 1974; Cont, 2001）以及自然图像的统计特征（Wainwright & Simoncelli, 2000）。使用此类先验评估算法，可能会系统性地高估后验采样质量，因为算法在应对重尾或稀疏结构时的失败模式被完全掩盖。
 
 **因果机制与核心洞察。** 该研究将问题归因于评估框架中两个可调控的“旋钮”：先验分布的选择和黄金标准后验样本的可获得性。其核心洞察在于，通过将离散化 Lévy 过程作为测试信号，可以同时解决这两个问题。Lévy 过程的增量分布可以灵活地设定为高斯、拉普拉斯、Student-t 或伯努利-拉普拉斯分布，从而精确控制信号的稀疏性和尾部行为。更重要的是，对于这类先验，其后验分布可以通过高效的 Gibbs 方法进行无参数、无偏差的采样。这使得研究者能够获得“黄金标准”的后验样本，用于与 DPS 算法进行直接的、分布级别的比较。此外，利用 Gibbs 方法可以构建任意精度的蒙特卡洛 MMSE 去噪器，从而在评估 DPS 算法时，将算法本身的误差与学习组件（如神经网络去噪器）的近似误差分离开来——这是当前评估体系无法做到的。
-
-
 
 ## 核心方法与创新机理
 
@@ -78,8 +74,6 @@ claims:
 
 **核心洞察**在于，通过将Lévy过程先验与高效的Gibbs采样方法结合，可以同时解决上述三个问题：Lévy过程提供了逼真且可控的先验，Gibbs方法提供了黄金标准的后验样本（用于计算分布级指标和任意精度的去噪器），从而构建了一个能够严格、公平地评估DPS算法统计性能的基准平台。
 
-
-
 ![[assets/figures/papers/iclr26_0004_zDI2G8t0of_A_Statistical_Benchmark_for_Diffusion-Posterior-/figures/163_Figure_18.jpg]]
 *Figure 18: Qualitative results for reconstruction from partial Fourier measurements using the learned denoiser. Rows: increment distributions. For each increment distribution, the MMSE estimates obtained by the different DPS algorithms and the gold-standard Gibbs methods are shown on top of the corresponding index-wise marginal variances. Columns: Different measurements*
 
@@ -96,8 +90,6 @@ claims:
 4.  **通用 DPS 算法模板**：该模板（Algorithm 2）将 C-DPS、DiffPIR、DPnP 等 DPS 算法统一为一个标准流程。其输入是观测数据 $\mathbf{y}$、前向算子 $\mathbf{A}$ 和噪声方差 $\sigma_n^2$。在每一步反向扩散过程中，算法会调用一个去噪器（可以是学习的神经网络，也可以是来自模块 3 的任意精度蒙特卡洛去噪器）来估计 $\mathbb{E}[\mathbf{X}_0 | \mathbf{X}_t = \mathbf{x}_t]$。模板的核心优势在于，通过替换去噪器，可以隔离 DPS 算法本身的误差与学习组件的近似误差。其输出是 DPS 算法生成的后验样本。
 
 **模块间的关系**：模块 1 和 2 共同提供了有明确先验和真值的测试问题。模块 3 提供了评估的“黄金标准”。模块 4 是待评估的目标。通过对比模块 4 的输出（如 MMSE 估计 $\hat{\mathbf{x}}^{\mathrm{est}}(\mathbf{y})$）与模块 3 的黄金标准输出，可以计算 **MMSE 最优性差距**（MMSE optimality gap），即 $10 \log_{10}\left( \frac{\|\hat{\mathbf{x}}^{\mathrm{est}}(\mathbf{y}) - \mathbf{x}\|^2}{\|\hat{\mathbf{x}}_{\mathrm{MMSE}}^{\mathrm{Gibbs}}(\mathbf{y}) - \mathbf{x}\|^2} \right)$，从而在分布级别上量化 DPS 算法的性能。此外，还可以利用黄金标准样本进行后验覆盖检验（posterior-coverage tests），评估 DPS 算法生成的不确定性是否校准。
-
-
 
 本节梳理该统计基准的核心数学模块与关键公式，聚焦于线性逆问题的概率建模、扩散后验采样（DPS）的通用模板，以及用于评估的最优性差距度量。
 
@@ -161,8 +153,6 @@ $$ 10 \log_{10} \left( \frac{ \| \hat{\mathbf{x}}^{\mathrm{est}}(\mathbf{y}) - \
 
 其中 $\hat{\mathbf{x}}^{\mathrm{est}}(\mathbf{y})$ 是待评估方法（如C-DPS、DiffPIR、DPnP）的估计，$\hat{\mathbf{x}}_{\mathrm{MMSE}}^{\mathrm{Gibbs}}(\mathbf{y})$ 是通过Gibbs方法获得的黄金标准MMSE估计。该指标以分贝为单位，0 dB表示完美重建，正值越大表示与最优估计的差距越大。
 
-
-
 ## 实验与关键发现
 
 ### 主要结果：MMSE最优性差距
@@ -199,8 +189,6 @@ $$ 10 \log_{10} \left( \frac{ \| \hat{\mathbf{x}}^{\mathrm{est}}(\mathbf{y}) - \
 3.  **伯努利-拉普拉斯采样器效率：** 尽管实现了74.61倍的累积加速，伯努利-拉普拉斯增量分布的Gibbs采样器运行时仍显著长于其他分布。
 4.  **超参数脆弱性：** DPS算法的性能高度依赖于针对特定去噪器调优的超参数，缺乏鲁棒性。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0004_zDI2G8t0of_A_Statistical_Benchmark_for_Diffusion-Posterior-/figures/008_Table_1.jpg]]
 *Table 1: MMSE optimality gap in decibel (mean ± standard deviation; lower is better; 0 is a perfect reconstruction) of various estimation methods over the test set. Bold: best among DPS algorithms*
 
@@ -212,8 +200,6 @@ $$ 10 \log_{10} \left( \frac{ \| \hat{\mathbf{x}}^{\mathrm{est}}(\mathbf{y}) - \
 
 ![[assets/figures/papers/iclr26_0004_zDI2G8t0of_A_Statistical_Benchmark_for_Diffusion-Posterior-/figures/019_Table_5.jpg]]
 *Table 5: Runtime of the benchmark with learned objects*
-
-
 
 ## 定位与知识库关联
 
@@ -253,8 +239,6 @@ $$ 10 \log_{10} \left( \frac{ \| \hat{\mathbf{x}}^{\mathrm{est}}(\mathbf{y}) - \
 2. **超参数鲁棒性**：当去噪器质量改变时，C-DPS和DiffPIR能否在不重新调优的情况下改善性能？当前证据表明不能，但这是否是算法固有缺陷尚待验证。
 3. **可扩展性**：Gibbs方法在更大维度（如d=8096）下的可扩展性如何？Perturb-and-MAP方法虽然表现出次线性运行时，但Cholesky方法的内存瓶颈需要解决。
 4. **泛化性**：该基准能否扩展到非线性测量模型和非高斯噪声？这需要新的Gibbs方法或替代的黄金标准采样策略。
-
-
 
 ## 原文 PDF
 

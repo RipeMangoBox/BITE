@@ -56,8 +56,6 @@ claims:
 
 **方法定位**：本工作属于动态场景高斯泼溅（Gaussian Splatting）重建谱系中的动静分解分支，与 **Swift4D**（Wu et al., ICLR 2025）、**Ex4DGS**（Lee et al., NeurIPS 2024）等显式分解方法形成对比。其核心贡献在于将动静分解的两个关键环节——掩码先验生成和标签表示——分别从“手工设计”和“连续+后处理”推进到“可学习 4D 场”和“脉冲神经元直接二值化”，为动态场景重建提供了一种更精确、更稳定的分解范式。
 
-
-
 ### 动态场景新视角合成的核心挑战
 
 从多视角视频中重建动态场景并合成任意新视角的图像，是计算机视觉与图形学中长期存在的难题。近年来，以 3D Gaussian Splatting (3DGS) 为代表的显式辐射场方法在静态场景上取得了实时渲染与高质量重建的突破，但其向动态场景的扩展面临根本性困难：场景中同时存在静态区域（如背景、桌面）和动态区域（如运动的人体、物体），二者的几何与外观变化模式截然不同。若将所有高斯原语统一处理，静态区域会因不必要的形变建模而引入噪声，动态区域则可能因建模能力不足而丢失细节。
@@ -80,8 +78,6 @@ claims:
 
 通过这两个模块的协同，本文方法在侧视图评测设定下实现了更清晰的动静分解边界和更优的新视角合成质量，为动态场景的显式辐射场重建提供了新的技术路线。
 
-
-
 ## 核心方法与创新机理
 
 本工作针对动态场景新视角合成中**动静分解**这一核心环节，揭示了现有方法的两大瓶颈，并提出了对应的创新模块。
@@ -97,8 +93,6 @@ claims:
 **创新三：属性解耦交替优化。** 在训练策略上，我们将高斯几何属性 $G^{geo}$ 与动静标签 $d^s$ 解耦，采用交替优化范式：固定标签优化几何，固定几何优化标签。这一策略避免了联合优化中标签分配与几何重建之间的干扰，进一步提升了分解精度和渲染质量。
 
 两个核心模块的协同作用——4D掩码场提供准确的时空先验，脉冲神经元标记场实现精准的离散分配——构成了本方法在动静分解上的关键优势。消融实验（Table 3）证实，单独使用4D掩码场或脉冲神经元均能带来渲染质量提升，而二者组合达到最佳效果；脉冲神经元相比连续优化（Sigmoid+阈值）以及其他离散化方法（STE、Gumbel-Softmax）均有显著优势（Figure 6）。
-
-
 
 本文提出一种基于动静分解的动态场景新视角合成框架，其核心思路是**将场景显式拆分为动态高斯与静态高斯，分别建模并最终融合渲染**。框架整体由四个关键模块串联构成，信息流遵循“掩码先验生成 → 动静标签分配 → 形变建模 → 混合渲染”的管线。
 
@@ -129,12 +123,8 @@ claims:
 
 与现有动静分解方法（如 **Swift4D** (Wu et al., ICLR 2025)、**Ex4DGS** (Lee et al., NeurIPS 2024)）相比，本框架的两处关键改进——4D掩码场和脉冲神经元标记场——分别解决了“掩码先验时空不一致”和“连续标签离散化不确定性”两个瓶颈问题。定量实验表明，在 N3DV 和 MeetRoom 数据集的侧视图设定下，本方法分别达到 26.30 PSNR 和 26.64 PSNR，优于现有 SOTA 方法（Table 1）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2472_https_openaccess_thecvf_com_content_CVPR2026_html_Dai_Dynamic_Static_Dec/figures/002_Figure_2.jpg]]
 *Figure 2: Our method has two key modules: Spatio-Temporal Fine-Grained Mask Field to provide mask priors and Discontinuous Dynamic-Static Tagging Field to directly optimize discontinuous dynamic-static labels. Based on different reconstruction pipelines for dynamic and static Gaussians, we alternatively optimize Gaussian geometric attributes*
-
-
 
 本方法在动态-静态分解框架中引入两个核心模块，分别解决掩码先验时空不一致和连续标签离散化不确定性问题。
 
@@ -188,18 +178,8 @@ $$\mathcal{L}_{\mathrm{render}} = (1-\lambda)\mathcal{L}_1 + \lambda\mathcal{L}_
 
 $$\mathcal{L}_{\mathrm{mask}} = -M \cdot \log(\hat{M}) - (1-M) \cdot \log(1-\hat{M})$$
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2472_https_openaccess_thecvf_com_content_CVPR2026_html_Dai_Dynamic_Static_Dec/figures/001_Figure_1.jpg]]
-*Figure 1: (A).Dynamic–static decomposition methods [45, 50, 58] use dynamic–static mask priors to supervise the dynamic–static tag representation, obtaining dynamic and static Gaussians for separate processing. (B). Current methods suffer from inaccurate mask priors brought by multi-view inconsistent external models [7] or temporal invariant priors [50]. Instead, we generate spatio-temporal fine-grained mask priors and yield better performance on fine-grained motions (shown in (E)); (C). Current methods use an improper tag representation that optimizes continuous probabilities and uses threshold-based post-processing for discrete labels, introducing postprocessing uncertainty. Instead, we directly op...*
-
 ![[assets/figures/papers/paper_list_l2472_https_openaccess_thecvf_com_content_CVPR2026_html_Dai_Dynamic_Static_Dec/figures/003_Figure_3.jpg]]
 *Figure 3: Visualization of rendered image and rendered dynamic map with dynamic tag/label for post-processing driven methods [17, 50] and our binary mapping on two dynamic regions. (a). Our binary mapping achieves a clear boundary between static and dynamic pixels and fine-grained rendering details; (b). Ground truth rendering for chosen dynamic regions; (c). Existing method using a continuous function(e.g., Sigmoid) to normalize the tag and rely on threshold-based post-processing. Post-processing not only results in a distribution gap between continuous tag and discrete label(different dynamic map) but also introduces threshold sensitivity. Please zoom in to observe fine details*
-
-![[assets/figures/papers/paper_list_l2472_https_openaccess_thecvf_com_content_CVPR2026_html_Dai_Dynamic_Static_Dec/figures/004_Figure.jpg]]
-*Figure: (a) Prior Methods (b) Ours*
-
-
 
 ## 实验与关键发现
 
@@ -236,24 +216,11 @@ Figure 3 提供了动态映射图的可视化消融：本文的二值映射在�
 - **色彩不一致的训练视图。** 当训练视图间存在色彩差异时，4D 掩码场依赖的残差信号可能破坏时空一致性，导致掩码先验质量下降。该场景下的鲁棒性需进一步验证。
 - **完全动态场景。** 该方法的核心依赖是动态-静态区域分解。在无静态区域的完全动态场景下，动静分解的效用和标签场的学习行为尚未被系统研究，需手动验证其有效性边界。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2472_https_openaccess_thecvf_com_content_CVPR2026_html_Dai_Dynamic_Static_Dec/figures/007_Table_1.jpg]]
 *Table 1: Quantitative comparison of PSNR, LPIPS, and FPS on the N3DV and MeetRoom datasets under the side view setting*
 
 ![[assets/figures/papers/paper_list_l2472_https_openaccess_thecvf_com_content_CVPR2026_html_Dai_Dynamic_Static_Dec/figures/009_Table_2.jpg]]
 *Table 2: Comparison of PSNR, LPIPS, and FPS across different methods on VRU dataset. Following [50], each scene is trained and tested every 20 frames*
-
-![[assets/figures/papers/paper_list_l2472_https_openaccess_thecvf_com_content_CVPR2026_html_Dai_Dynamic_Static_Dec/figures/006_Figure_6.jpg]]
-*Figure 6: Our method observes better side view synthesis on the VRU dataset, outperforming continuous optimization and other discrete optimization(e.g., STE [1], Gumbel-Softmax [15]) methods*
-
-![[assets/figures/papers/paper_list_l2472_https_openaccess_thecvf_com_content_CVPR2026_html_Dai_Dynamic_Static_Dec/figures/010_Figure_7.jpg]]
-*Figure 7: Visualization of novel view synthesis on cut beef and coffee martini scenes from the N3DV dataset under the side view setting. Please zoom in to observe fine details*
-
-![[assets/figures/papers/paper_list_l2472_https_openaccess_thecvf_com_content_CVPR2026_html_Dai_Dynamic_Static_Dec/figures/011_Figure_8.jpg]]
-*Figure 8: Visualization of novel view synthesis on dg, gz scenes from the VRU dataset. Please zoom in to observe fine details*
-
-
 
 ## 定位与知识库关联
 
@@ -286,8 +253,6 @@ Figure 3 提供了动态映射图的可视化消融：本文的二值映射在�
 **脉冲标记场的泛化能力。** 脉冲神经元的代理梯度设计（本文采用反正切函数）引入了超参数 $\beta$，其对不同场景的敏感性尚未被消融。探索自适应代理梯度或替代脉冲模型可能进一步降低调参负担。
 
 **动静分解框架的扩展性。** 当前框架将动静分解用于高斯原语的属性解耦优化，该思路可推广至其他需要离散分配的动态场景表示任务，如语义高斯分割、多物体独立运动建模等。4D掩码场的时空一致性生成能力在这些场景中具有潜在复用价值。
-
-
 
 ## 原文 PDF
 

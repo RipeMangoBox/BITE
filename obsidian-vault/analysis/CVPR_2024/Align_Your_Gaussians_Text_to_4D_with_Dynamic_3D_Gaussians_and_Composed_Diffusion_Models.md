@@ -288,13 +288,8 @@ AYG在文本到4D合成任务上与先前方法**MAV3D**进行了系统对比。
 
 5. **评估协议的主观性**：用户研究虽为4D评估提供了有效手段，但存在固有的主观性——参与者的判断可能受视觉呈现方式、个人偏好等因素影响。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2312_13763/figures/011_Table_3.jpg]]
 *Table 3: Hyperparameters for the first stage (3D synthesis)*
-
-![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2312_13763/figures/012_Table_4.jpg]]
-*Table 4: Hyperparameters for the second stage (dynamic 4D synthesis)*
 
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2312_13763/figures/015_Table_6.jpg]]
 *Table 6: Ablation study by user study on synthesized 4D scenes with 30 text prompts. For each pair of numbers, the left number is the percentage that the full AYG model is preferred and the right number indicates preference percentage for ablated model as described in left column. The numbers do not add up to 100 and the difference is due to users voting “no preference” (table copied here from main paper for extended discussion in Appendix F.2)*

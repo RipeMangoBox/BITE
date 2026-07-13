@@ -49,11 +49,7 @@ claims:
 
 本文提出了一套全栈开放多模态大语言模型（MLLM）解决方案，包括高质量监督微调（SFT）数据集 **Honey-Data-15M**、数据策展流水线 **HoneyPipe** 及其底层框架 **DataStudio**，以及基于此训练的8B参数模型 **Bee-8B**。核心贡献在于通过系统性的数据清洗和双层级思维链（CoT）增强策略，构建了一个约1500万问答对的高质量SFT数据集，使全开放模型Bee-8B在多个基准上达到与半开放模型（如InternVL3.5-8B）竞争甚至超越的性能，建立了全开放MLLM的新最优水平（SOTA）。
 
-
-
 现有开源SFT数据集普遍存在两大根本性质量问题：一是广泛的数据噪声，包括事实错误、图文不匹配和格式缺陷；二是复杂推理数据的严重不足，特别是缺乏链式思维（Chain-of-Thought, CoT）数据。这些问题导致全开放MLLM与半开放或闭源模型之间存在显著的性能差距。论文指出，数据质量是核心可调节变量，通过系统性的数据清洗和双层级CoT增强，可以显著提升模型性能。
-
-
 
 ## 核心方法与创新机理
 
@@ -62,8 +58,6 @@ claims:
 3. **双层级CoT增强策略**：短CoT（约1210万对，用于中等推理）和长CoT（约290万对，用于复杂指令），通过保真度验证确保事实一致性。
 4. **五阶段训练策略**：MLP预热、视觉-语言对齐、大规模SFT（15M）、高效精炼SFT（1M）、GRPO强化学习（50K）。
 5. **Bee-8B模型**：基于Qwen3-8B和SigLIP2视觉编码器，在Honey-Data-15M上训练，建立全开放MLLM新SOTA。
-
-
 
 整体框架由数据策展流水线（HoneyPipe）和模型训练流水线两部分组成。
 
@@ -79,8 +73,6 @@ claims:
 - **Stage 3: 多模态SFT**：在完整Honey-Data-15M（1500万项）上训练一个epoch。
 - **Stage 4: 高效精炼SFT**：在Honey-Data-1M（100万高质量子集）上精炼。
 - **Stage 5: GRPO强化学习**：在50K项上使用GRPO算法优化。
-
-
 
 ### 1 数据清洗模块
 
@@ -117,8 +109,6 @@ $$MA = MB, NA = NC$$
 **弧长公式**：
 $$s = \frac{\theta}{360^\circ} \times 2\pi r$$
 给定圆心角（度）和半径的弧长。
-
-
 
 ## 实验与关键发现
 
@@ -172,8 +162,6 @@ Tables 3-6展示了Stage 3、4、5在通用VQA、表格/图表/文档理解、�
 - 5次独立推理运行的评估结果标准差极低。
 - 论文详细列出了所有使用数据集的许可条款（附录G），部分数据集许可信息缺失。
 
-
-
 ## 定位与知识库关联
 
 ### 1 方法谱系
@@ -212,10 +200,7 @@ Tables 3-6展示了Stage 3、4、5在通用VQA、表格/图表/文档理解、�
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_IVluwK8q9q_Bee_A_High-Qual/figures/001_Figure_1.jpg]]
 
-
 ### 实验与分析
-
-### 补充图表
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_IVluwK8q9q_Bee_A_High-Qual/figures/004_Figure_3.jpg]]
 *Figure 3: Data collection of Honey-Data-15M. A detailed breakdown of our dataset’s composition across seven major categories. The number of samples (in thousands) is listed for each source. The * denotes that the data contains the long CoT response*
@@ -231,8 +216,6 @@ Tables 3-6展示了Stage 3、4、5在通用VQA、表格/图表/文档理解、�
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_IVluwK8q9q_Bee_A_High-Qual/figures/010_Table_4.jpg]]
 *Table 4: Performance comparison of our model after Stage 3, Stage 4, and Stage 5 on general VQA benchmarks (Part 2). The top and second-best scores for each benchmark are highlighted*
-
-
 
 ## 原文 PDF
 

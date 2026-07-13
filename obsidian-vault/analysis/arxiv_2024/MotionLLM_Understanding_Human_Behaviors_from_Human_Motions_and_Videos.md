@@ -73,8 +73,6 @@ MotionLLM 属于**多模态大语言模型在人体行为理解领域的延伸**
 
 这些结果表明，通过分离的模态转换器与大规模生成式指令数据，MotionLLM 在细粒度时空理解和推理能力上取得了可观的进步。同时，该工作也揭示了若干局限：视频编码器仅提取 8 帧关键帧，可能遗漏快速动作的时序细节；配对运动-视频数据仅 24k 对且依赖 GPT-4V 标注，存在标注偏差风险；联合训练中的模态知识共享机制尚不明确。这些问题为后续研究指明了方向。
 
-
-
 ### 问题背景：从人体运动到细粒度行为理解
 
 理解人类行为是计算机视觉与人工智能领域的核心挑战之一。人体运动（human motion）作为行为的直接载体，承载着丰富的时空动态信息；而视频则提供了运动发生的完整环境上下文，包括场景、物体交互和多人关系。然而，现有研究大多将运动与视频视为两条独立的模态轨道：运动理解模型专注于从骨架序列或参数化人体模型中提取动作语义，却忽略了行为发生的物理与社会环境；视频理解模型虽然能够捕捉场景信息，但往往缺乏对细粒度人体姿态、关节运动和时序动态的精确感知能力。
@@ -101,8 +99,6 @@ MotionLLM 属于**多模态大语言模型在人体行为理解领域的延伸**
 -   **大规模配对数据集MoVid**：本文构建了包含272k H3DQA指令问答对、200k Motion-XQA指令问答对和24k重标注视频描述的MoVid数据集，首次提供了成对的运动-视频-文本指令数据，使得联合指令微调成为可能。
 
 通过上述设计，MotionLLM旨在实现两大目标：在运动理解上超越纯运动模型（如MotionGPT），在视频理解上超越纯视频模型（如Video-LLaVA），并最终通过联合训练实现跨模态的知识增强。
-
-
 
 ## 核心方法与创新机理
 
@@ -161,8 +157,6 @@ MotionLLM 构建了 **MoVid 数据集**（Table 1），包含：
 - 配对数据规模有限（仅 24k 对），且依赖 GPT-4V 生成标注，可能存在标注偏差；
 - 如何将这一多模态架构扩展至运动生成、人机交互等下游任务仍有待研究。
 
-
-
 MotionLLM 的整体设计遵循“视觉编码 → 模态翻译 → 语言模型自回归生成”的流水线架构，核心创新在于**分离的视觉-语言（V-L）转换器**与**运动-视频联合指令微调**两阶段训练策略。
 
 ### 架构总览
@@ -203,15 +197,8 @@ MotionLLM的训练分为两个阶段：
 
 > **注意**：视频编码器仅提取8帧关键帧，这意味着长时序依赖的捕捉能力存在固有限制，后续消融实验也证实了这一点。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2405_20340/figures/002_Figure_2.jpg]]
 *Figure 2: System overview of MotionLLM. (a) MotionLLM takes videos or human motions as visual input V. It first processes the visual input with a vision encoder and translates the vision embeddings into linguistic space via a V-L translator. (b) MotionLLM is trained in two stages. In the first stage, we train the V-L translator to learn the modality translation. In the second stage, we fine-tune the LLM and the V-L translator via instruction tuning data*
-
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2405_20340/figures/005_Figure_5.jpg]]
-*Figure 5: GPT-4V annotation pipeline*
-
-
 
 ### 3.1 自回归生成框架
 
@@ -255,8 +242,6 @@ MotionLLM 的训练分为两个阶段（Figure 2b）：
 
 上述两个公式构成了 MotionLLM 的训练与推理基础。模型在推理时接收运动序列或视频帧作为视觉输入 $\mathbf{V}$，经编码器和 V-L 转换器形成 $\mathbf{P}$，再由 LLM 自回归生成回答。训练时通过最小化交叉熵损失 $\mathcal{L}$ 来优化 V-L 转换器和 LLM 的参数，使生成的文本序列尽可能接近真实答案。
 
-
-
 ## 实验与关键发现
 
 ### 评估协议与实验设置
@@ -295,9 +280,6 @@ MotionLLM采用GPT-3.5-turbo作为自动化评估器，通过比较模型生成�
 
 在MVBench的人体行为相关子任务上（Table 6），MotionLLM平均准确率为**31.6%**，略优于VideoChat的30.0%。提升幅度有限（+1.6个百分点），可能受限于视频编码器仅提取8帧关键帧，遗漏了长时序依赖信息。
 
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2405_20340/figures/011_Table_6.jpg]]
-*Table 6: Comparison with different video-based LLMs on MV-Bench. MotionLLM outperforms baselines on overall average metric*
-
 ### 失败模式与局限性
 
 1. **时序信息丢失**：视频编码器仅提取8帧关键帧，在长视频或快速动作场景下可能遗漏细粒度的时序信息，限制了时序理解能力（MVBench提升有限即为佐证）。
@@ -305,24 +287,8 @@ MotionLLM采用GPT-3.5-turbo作为自动化评估器，通过比较模型生成�
 3. **模态融合机制不透明**：联合训练时不同模态的知识共享机制尚不明确，模型可能未充分利用环境交互信息。Table 14-15的幻觉现象表明，缺乏视频输入时模型对空间关系和物体交互的推理能力显著下降。
 4. **闭集任务泛化不足**：BABEL-QA上不经微调的性能（0.372）与微调后（0.436）差距明显，说明模型在特定领域的闭集分类任务上仍需任务特定适配。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2405_20340/figures/009_Table_4.jpg]]
-*Table 4: Comparison on the MoVid-Bench. The top table is for motion and the bottom table is for video. The larger the accuracy and score, the better the result*
-
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2405_20340/figures/015_Table_8.jpg]]
 *Table 8: Ablation studies for modeling different datasets and modalities. The top table is for motion and the bottom table is for video. Unpair refers to using unpaired instruction datasets, including H3DQA, BabelQA, Video-ChatGPT instruction datasets, while Pair means using Motion-XQA to do instruction tuning*
-
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2405_20340/figures/006_Table_1.jpg]]
-*Table 1: Dataset statistics. MoVid dataset includes new caption data for Motion-X and QA pairs for H3DQA*
-
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2405_20340/figures/031_Table_13.jpg]]
-*Table 13: Comparison on whether using motion data. The blue text highlights a comprehensive description of the motion and speed in the given video, a feature absent in training that lacks motion data. Training without motion data provides only a basic overview*
-
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2405_20340/figures/012_Figure_7.jpg]]
-*Figure 7: Examples of motions comprehension. The results demonstrate the proficiency of Motion-LLM in captioning, spatial-temporal understanding, and reasoning. Comparison with TM2T [20] and MotionGPT [25] underscores the effectiveness of MotionLLM in handling unseen motions*
-
-
 
 ## 定位与知识库关联
 
@@ -378,8 +344,6 @@ MotionLLM 的适用场景主要集中在**需要同时理解人体运动细节�
 3. **联合训练中如何更好地平衡多模态信息？** 是否存在最优的模态混合策略（如动态门控、跨模态注意力正则化）以避免模态偏置，并最大化互补信息的利用效率？
 
 4. **如何将 MotionLLM 扩展至更多下游任务？** 当前工作聚焦于行为理解，但运动-视频-语言的联合表征是否可迁移至运动生成（motion generation）、人机交互（HCI）、运动质量评估等任务，仍需进一步探索。
-
-
 
 ## 原文 PDF
 

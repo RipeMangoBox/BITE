@@ -70,8 +70,6 @@ HDR-4DGS处于动态场景新视角合成与高动态范围重建的交叉点。
 
 HDR-4DGS仍存在三方面局限：（1）底层4DGS表示未针对HDR内容专门设计，极端光照变化下的建模能力受限；（2）DTM使用固定时间上下文窗口，无法自适应调整感受野；（3）在前后景外观相似的动态边界处可能出现颜色再现不佳或空间模糊。未来工作可围绕HDR 4D场景的定制化表示、自适应上下文窗口机制、以及显式语义/运动边界建模等方向展开。
 
-
-
 高动态范围（HDR）新视角合成旨在从一组多曝光或单一曝光的低动态范围（LDR）图像中，重建任意视角下具有完整亮度范围的高保真HDR视图。该技术对于计算摄影、虚拟现实和电影后期制作等应用至关重要，因为这些场景中同时存在极亮和极暗区域，LDR成像无法同时保留高光和阴影细节。
 
 近年来，神经辐射场（NeRF）及其变体在静态HDR新视角合成上取得了显著进展。**HDR-NeRF**（Huang et al., CVPR 2022）首次将物理成像模型引入NeRF框架，通过显式建模相机响应函数和非线性色调映射，从包围曝光LDR图像中恢复HDR辐射场。随后，基于3D高斯溅射（3DGS）的**HDR-GS**（Cai et al., CVPR 2024）将这一思路迁移到显式点云表示，利用静态多层感知机（MLP）实现HDR到LDR的色调映射，在渲染速度和视觉质量上实现了双重提升。
@@ -85,8 +83,6 @@ HDR-4DGS仍存在三方面局限：（1）底层4DGS表示未针对HDR内容专�
 **HDR-HexPlane**（Wu et al., 3DV 2024）作为首个尝试将HDR重建与动态场景表示相结合的工作，将HexPlane的时空分解与HDR色调映射模块拼接，但该方法仍采用静态色调映射策略，未考虑辐射度的时间上下文，导致在光照剧烈变化的场景中辐射度一致性差，色彩保真度不足。
 
 本文的核心动机在于：**借鉴人类视觉系统的适应性机制**——人眼能够根据场景整体亮度分布动态调整感知灵敏度，从而在不同光照条件下保持对细节和色彩的稳定感知。受此启发，我们提出HDR-4DGS，通过构建**动态色调映射模块（DTM）**，利用过去时间戳的辐射度统计信息生成时间自适应的逐通道色调映射曲线，显式桥接HDR与LDR域，从而在统一的4D高斯溅射框架下实现动态几何与HDR辐射度的联合重建。
-
-
 
 ## 核心方法与创新机理
 
@@ -125,8 +121,6 @@ HDR-4DGS 解决的**真实瓶颈**是：现有 HDR 新视角合成方法（如 *
 
 **注意**：HDR-4D-Real 数据集上的 HDR 评价受真实 HDR 标签噪声影响，且 PSNR 倾向于过度平滑的图像（Figure 9），因此 HDR-HexPlane 的 HDR PSNR 较高并不反映真实感知质量；定性对比（Figure 3）显示 HDR-4DGS 保留更多细节和准确色彩。
 
-
-
 HDR-4DGS的整体pipeline围绕一个核心矛盾展开：如何在动态场景中同时保持几何-辐射度的时空一致性与高动态范围重建精度。如图1所示，框架由三个协同模块构成流水线：
 
 1. **动态场景表示（4DGS with HDR colors）**：以4D高斯溅射（**4DGS**, Yang et al., ICLR 2024）为基础表示，将其颜色空间从LDR扩展至HDR域，统一建模时空几何与辐射度。该模块接收多曝光LDR图像序列及对应曝光时间，输出任意时间戳与视角下的HDR辐射场。
@@ -139,12 +133,8 @@ HDR-4DGS的整体pipeline围绕一个核心矛盾展开：如何在动态场景�
 
 > **证据强度说明**：DTM的因果作用由消融实验强力支持——动态色调映射器相比静态色调映射器（MLP/Reinhard/Durand）在HDR重建上PSNR提升约1.35 dB（Table 4）；像素级监督将HDR PSNR从24.85提升至25.88（Table 5）；DRCL采用GRU实现最优性能25.88 PSNR / 0.865 SSIM / 0.076 LPIPS（Table 9）。这些消融构成因果链条的验证闭环，置信度均≥0.95。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_10iBNwPtl2/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of HDR-4DGS. (a) Input data and scene representation; (b) Our proposed Dynamic Tone Mapper (DTM) for temporally adaptive HDR–LDR translation; (c) Loss formulation for joint optimization of geometry, radiance, and tone mapping. ⊗ : Dot product. ©: Concatenation*
-
-
 
 ### 3.1 总体框架
 
@@ -217,13 +207,6 @@ $$\hat{\mathbf{I}}^h = \frac{\log(1 + \mu \cdot \operatorname{norm}(\mathbf{I}^h
 
 消融实验证实，像素级色调映射监督将 HDR PSNR 从 24.85 提升至 25.88（Table 5），验证了双重监督策略对色调映射泛化能力的增强效果。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_10iBNwPtl2/figures/006_Figure_4.jpg]]
-*Figure 4: Temporal variation with learned tone mapping patterns by DTM in two scenes*
-
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -272,8 +255,6 @@ Figure 5定量展示了不同方法在HDR渲染中的时间辐射度变化。HDR
 - **自适应上下文窗口**：构建基于运动幅度或辐射度方差的动态色调映射上下文窗口自适应调节机制，使DTM能够根据场景动态程度灵活调整时间感受野。
 - **边界感知的辐射度建模**：显式建模语义或运动边界来消除动态内容的歧义，提升边界处的辐射度一致性和空间清晰度。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_10iBNwPtl2/figures/002_Table_1.jpg]]
 *Table 1: Results on HDR-4D-Syn. ∗: HDR only supervision; †: LDR+HDR supervision*
 
@@ -283,28 +264,11 @@ Figure 5定量展示了不同方法在HDR渲染中的时间辐射度变化。HDR
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_10iBNwPtl2/figures/010_Table_4.jpg]]
 *Table 4: Ablation on dynamic tone mapping*
 
-![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_10iBNwPtl2/figures/018_Table_9.jpg]]
-*Table 9: Analysis of DRCL design*
-
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_10iBNwPtl2/figures/007_Figure_5.jpg]]
 *Figure 5: Comparison of HDR renderings’ temporal radiance variations*
 
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_10iBNwPtl2/figures/005_Figure_3.jpg]]
 *Figure 3: Visual comparison of HDR DNVS on HDR-4D-Real*
-
-![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_10iBNwPtl2/figures/011_Table_5.jpg]]
-*Table 5: Analysis of pixel-level supervision*
-
-![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_10iBNwPtl2/figures/012_Table_6.jpg]]
-*Table 6: Analysis of the temporal context length*
-
-![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_10iBNwPtl2/figures/008_Table_3.jpg]]
-*Table 3: Results of 4DGS with independent HDR*
-
-![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_10iBNwPtl2/figures/017_Figure_9.jpg]]
-*Figure 9: PSNR prefers over-smooth or blurry images. HDR images are tone-mapped by Photomatix Pro (HDRsoft Team, 2025)*
-
-
 
 ## 定位与知识库关联
 
@@ -361,8 +325,6 @@ HDR-4DGS 的能力边界受限于其基础表示的选择和 DTM 的设计假设
 3. **语义/运动边界的显式建模**：如何显式建模语义或运动边界来消除动态内容的歧义并提升边界处的辐射一致性？当前方法的边界模糊问题指向了将运动分割或光流估计融入辐射度建模的可能性。
 
 4. **HDR 评价指标的改进**：真实 HDR 标签噪声和 PSNR 对平滑图像的偏好暴露了现有评价体系的不足。开发更鲁棒的 HDR 感知质量指标，对于推动该领域的公平比较和技术进步具有重要意义。
-
-
 
 ## 原文 PDF
 

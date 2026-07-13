@@ -69,8 +69,6 @@ claims:
 
 模型在精确旋转控制、双臂协调和推理速度（集成模式6.1 Hz）方面仍有不足，且大规模预训练需760K轨迹、超10K A800 GPU小时。未来方向包括加速推理、动态损失权重调整、跨具身泛化以及协同训练的理论分析。
 
-
-
 视觉-语言-动作（VLA）模型的核心目标是将视觉感知、语言理解与机器人动作生成统一于单一模型中，使机器人能够根据图像观测 $o_t$、语言指令 $l_t$ 和自身状态 $r_t$，直接预测未来的动作序列 $a_{t+1:t+H}$。动作通常表示为 SE(3) 空间中的 7 维向量：$a = [\Delta x, \Delta y, \Delta z, Roll, Pitch, Yaw, 0/1]$，涵盖末端执行器的相对平移、欧拉角旋转和夹爪开合状态。这一任务对生成范式的选择极为敏感：既需要连续控制的精细精度，又需要语义层面的鲁棒推理。
 
 当前 VLA 方法主要沿两条技术路线展开，但各自存在结构性缺陷。
@@ -82,8 +80,6 @@ claims:
 **核心洞察：互补而非替代。** 实验证据表明，自回归与扩散生成在 VLA 建模中具有清晰的互补优势：扩散擅长精细控制和动态场景（动作精度显著更高），而自回归对未见对象和指令更为鲁棒（性能退化更小，见 Figure 3）。这意味着，两种范式并非竞争关系，而是可以通过协同设计实现相互增强。关键问题在于：如何在保持 VLM 预训练知识完整性的前提下，将扩散的连续精度能力注入动作生成过程？
 
 **现有方案的架构断层。** 无论是自回归还是扩散 VLA，现有方法都将两种生成范式割裂开来——要么完全依赖离散化，要么将扩散作为外部模块附加。缺少一种统一的架构设计，使得 LLM 自身能够同时作为自回归推理引擎和扩散去噪专家，从而在单一骨干网络中融合两种范式的优势。这一架构断层正是 HybridVLA 试图填补的核心缺口。
-
-
 
 ## 核心方法与创新机理
 
@@ -112,14 +108,6 @@ PCA特征分析揭示了协同训练的表征层面机制：联合训练使扩�
 ### 从“单一动作”到“自适应动作集成”
 
 推理阶段，HybridVLA同时生成扩散动作 $a_{t+1}^{d}$ 和自回归动作 $a_{t+1}^{ar}$。基于自回归令牌的平均置信度 $c_{t+1}^{ar}$ 与阈值 $\theta = 0.96$ 的比较，自适应地选择融合策略：当置信度高于阈值时集成两种动作，否则仅使用扩散动作。这一机制将集成模式下的成功率从单独使用扩散动作的0.72进一步提升至0.78（Table 3, Ex4 vs Ex5），在保持扩散动作精细控制优势的同时，利用自回归动作的语义鲁棒性增强整体控制稳定性。
-
-
-
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_H1KDMNOKQn/figures/001_Figure_1.jpg]]
-*Figure 1: (a) Unlike recent diffusion-based VLA methods that attach a separate diffusion head after VLMs, (b) HybridVLA innovatively integrates diffusion and autoregressive action prediction within a single LLM, embedding the denoising process of diffusion into the next-token prediction. Under our proposed methods, HybridVLA achieves remarkable performance across a wide range of tasks*
-
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_H1KDMNOKQn/figures/002_Figure_2.jpg]]
-*Figure 2: HybridVLA Framework. All multimodal inputs are encoded into tokens and subsequently organized into our designed token sequence formulation within the LLM’s embedding space. For diffusion tokens, HybridVLA simultaneously projects the denoising timestep and noise into continuous vector representations. The corresponding noisy samples are iteratively fed into the LLM to predict the noise at each step. The marker tokens, ${ \bf \mathrm { < B O D > } }$ (Beginning of Diffusion) and <EOD> (End of Diffusion), are introduced to bridge the two generation paradigms. Subsequently, autoregressive actions are generated via next action-token prediction, explicitly conditioned on the preceding tokens. The t...
 
 HybridVLA 的核心设计是将扩散去噪过程嵌入 LLM 的 next-token 预测机制中，使单一 LLM 骨干同时承担自回归与扩散两种动作生成范式，而非像现有方法那样在 VLM 后附加独立的扩散头（Figure 1）。
 
@@ -160,8 +148,6 @@ $$\mathcal{L}_{hybrid} = \mathcal{L}_{ar} + \mathcal{L}_{dif}$$
 - **将扩散模块嵌入 LLM 内部**优于附加外部扩散头：移除 LLM 内扩散模块改为外部 Transformer 扩散头后，性能从 0.72 降至 0.67（Variation 1），若同时禁用自回归则进一步降至 0.59（Variation 2，Table 13），验证了 LLM 作为动作专家的必要性。
 - **协作动作集成**进一步将成功率从 0.72（纯扩散）提升至 0.78（+6%），证明两种范式具有互补优势。
 - **协同训练**产生更紧密的类内聚类（扩散 token 类内距离 0.49 vs 独立训练 0.73）和更大的类间分离（自回归 token 类间距离 10.8 vs 4.4，Table 7），表明特征表示质量显著提升。
-
-
 
 ### 问题形式化
 
@@ -206,8 +192,6 @@ $$\mathcal{L}_{hybrid} = \mathcal{L}_{ar} + \mathcal{L}_{dif}$$
 训练分两阶段：先在大规模机器人数据集（35 个数据集、760K 轨迹、33M 帧）上预训练 10 个 epoch，再在下游数据上微调 300 个 epoch，全程使用混合目标 $\mathcal{L}_{hybrid}$。
 
 推理时，扩散生成采用 DDIM 采样，去噪步数可压缩至 4 步而不显著牺牲性能（Figure 5），在速度与精度间取得平衡。扩散动作与自回归动作经置信度阈值机制自适应融合后输出。集成模式下推理速度约 6.1 Hz，纯扩散模式可达 9.4 Hz。
-
-
 
 ## 实验与关键发现
 
@@ -254,9 +238,6 @@ Table 3的系统消融揭示了各组件的因果贡献：
 
 Figure 3和Table 6揭示了两种生成范式的相对优势：
 
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_H1KDMNOKQn/figures/014_Figure_3.jpg]]
-*Figure 3: Respective strengths of diffusion-based and autoregressive action generation paradigms. We evaluate the performance of Our-ar and Our-dif across a variety of scenarios*
-
 - **扩散生成**在已见场景中表现更强（成功率0.72 vs 0.65），擅长精细控制和动态场景；
 - **自回归生成**对未见指令和对象更鲁棒，在未见语言场景中成功率下降幅度更小（相对下降-0.09 vs -0.20），表明其更好地保留了VLM的语义理解能力。
 
@@ -291,9 +272,6 @@ Table 7的PCA分析为协同训练的有效性提供了表征层面的证据：�
 
 Table 6展示了在未见物体、背景、空间位置和光照条件下的泛化性能。HybridVLA在Pick and place任务上对未见配置的平均成功率为0.71，而CogACT为0.51，π₀为0.52。整体上，HybridVLA在泛化场景中的精度下降比基线方法低5–16%，表明统一框架更好地保留了VLM的语义泛化能力。
 
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_H1KDMNOKQn/figures/010_Table_6.jpg]]
-*Table 6: Generalization. “Object”, “Background”, “Height”, and “Lighting” denote unseen manipulated objects, backgrounds, spatial positions, and lighting conditions, respectively. The image on the left depicts the unseen test scenarios, with red boxes marking the key differences*
-
 ### 失败模式与局限性
 
 尽管整体性能优异，HybridVLA存在以下典型失败模式：
@@ -302,16 +280,6 @@ Table 6展示了在未见物体、背景、空间位置和光照条件下的泛�
 2. **动作超出物理限制**：模型有时会预测超出机械臂工作空间或关节极限的位姿，表明对机器人运动学约束的隐式学习仍不充分。
 3. **双臂协调故障**：在双臂协作任务中，一臂的动作会改变物体状态，可能导致另一臂的先前预测失效，模型缺乏对动作间动态耦合的显式建模。
 4. **推理速度瓶颈**：集成模式下的6.1 Hz推理速度低于部分基线，可能不满足高频控制场景的需求。仅使用扩散生成可提升至9.4 Hz，但仍需进一步优化。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_H1KDMNOKQn/figures/006_Table_4.jpg]]
-*Table 4: The impact of different confidence threshold. We report success rates for HybridVLA (7B) and HybridVLA (2.7B) on various tasks with confidence threshold from 0.90 to 0.98*
-
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_H1KDMNOKQn/figures/016_Table_8.jpg]]
-*Table 8: The dataset name and sampling weight used in our mixed large-scale pretraining dataset*
-
-
 
 ## 定位与知识库关联
 
@@ -360,8 +328,6 @@ HybridVLA的核心洞察在于：**自回归与扩散并非互斥的替代方案
 4. **协同训练的理论机制。** PCA分析（Table 7）已初步验证协同训练导致扩散token特征的类内聚类更紧密（类内距离0.49 vs 0.73独立训练）和自回归token特征的类间分离更大（10.8 vs 4.4）。但两种损失函数在优化动力学中如何相互作用、是否存在隐式的互信息最大化机制，仍需更深入的理论分析。
 
 5. **扩展到全身控制。** 当前方法仅预测末端执行器位姿，是否能将该统一框架扩展到包含基座移动、躯干姿态、手指关节的全身控制任务？扩散与自回归的分工模式在更高维动作空间中是否依然有效？
-
-
 
 ## 原文 PDF
 

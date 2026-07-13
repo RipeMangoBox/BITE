@@ -53,8 +53,6 @@ claims:
 
 从方法谱系来看，HuTuMotion 属于**基于人类反馈的潜在扩散先验优化**范式，与现有的无监督文本条件运动扩散方法（如 MLD、**MDM**（Tevet et al., 2022）、**T2M**（Guo et al., CVPR 2022a）、**TEMOS**（Petrovich, Black, and Varol, ECCV 2022））形成互补：后者依赖固定的标准正态先验，而 HuTuMotion 引入了可在线调优的数据驱动先验，为运动生成领域开辟了“最少反馈即插即用”的新路径。
 
-
-
 文本驱动的人体运动生成旨在根据自然语言描述合成逼真的三维人体动作序列，在动画制作、虚拟现实和人机交互等领域具有广泛应用。近年来，扩散模型在该领域取得了显著进展，代表性工作包括在原始运动空间建模的 **MDM**（Tevet et al., 2022）和在潜在空间建模的 **MLD**（Chen et al., CVPR 2023）。其中，MLD 作为当前最优的潜在扩散方法，其训练目标为：
 
 $$\mathcal{L}_{\mathrm{MLD}} := \mathbb{E}_{\epsilon, t, c}\left[\|\epsilon - \epsilon_{\theta}(z_t, t, \tau_{\theta}(c))\|_2^2\right]$$
@@ -70,8 +68,6 @@ $$\mathcal{L}_{\mathrm{MLD}} := \mathbb{E}_{\epsilon, t, c}\left[\|\epsilon - \e
 现有方法的另一个共同缺陷是**完全无监督的训练范式**——模型仅依赖文本-运动配对数据进行训练，缺乏对生成质量的直接反馈机制。这使得模型难以针对特定语义概念或个性化需求进行定向优化。
 
 针对上述问题，HuTuMotion 提出了一个核心洞察：**通过少量人类排序反馈，直接优化潜在扩散模型的先验分布，使采样朝向人类偏好的区域，从而在不重新训练模型的前提下显著提升生成质量**。这一思路将人类偏好注入生成过程的关键控制节点——先验分布，而非修改模型参数，实现了轻量且有效的语义对齐。
-
-
 
 ## 核心方法与创新机理
 
@@ -115,8 +111,6 @@ $$m = \arg \max_i \frac{c_x \cdot c_i}{\|c_x\| \|c_i\|}, \quad \text{for } i \in
 ### 创新边界与限制
 
 需要指出的是，该方法的核心创新聚焦于**先验分布的优化与选择**，扩散模型本身（包括去噪网络 $\epsilon_\theta$、文本编码器 $\tau_\theta$、运动解码器）完全继承自 MLD，未做任何修改。这一设计选择带来了即插即用的便利性，但也将方法的适用范围限制在潜在扩散框架内——由于显式扩散模型（如 MDM）的高维性难以优化，该方法无法直接推广到其他类型的扩散模型。
-
-
 
 HuTuMotion 的整体框架由两个核心阶段构成：**代表性分布优化** 和 **语义引导运动生成**，如 Figure 1 所示。该方法建立在潜在运动扩散模型 **MLD**（Chen et al., CVPR 2023）之上，其训练目标为：
 
@@ -162,17 +156,12 @@ $$
 
 该框架还支持**个性化运动生成**和**风格感知运动生成**。对于风格感知生成，方法针对同一风格描述符 $ST_i$ 识别多样化文本，从零开始优化获得最优潜在向量，构建风格-潜在对集合 $\{(ST_1, z_1^{**}), \dots, (ST_M, z_M^{**})\}$，推理时根据目标风格选择对应先验。
 
-
-
 ### 模块一：代表性文本生成
 
 HuTuMotion 框架的第一阶段是**代表性分布优化**，其起点是获取少量（默认 5 个）具有代表性的运动描述文本。论文提供了两种获取方式：
 
 1. **K-Means 聚类**：在训练数据集的文本嵌入上执行 K-Means 聚类，以聚类中心对应的文本作为代表性描述。
 2. **大语言模型生成**：直接向 ChatGPT 提问，要求其生成一组多样且具有代表性的人体动作句子（见 Figure 6）。
-
-![[assets/figures/papers/paper_list_l1817_HuTuDiffusion_Human_Tuned_Navigation_of_Latent_Motion_Diffusion_Models_w/figures/010_Figure_6.jpg]]
-*Figure 6: A dialogue with ChatGPT for generating a set of diverse and representative human action sentences*
 
 这两种方式均旨在覆盖运动语义空间的主要模式，为后续的潜在分布优化提供锚点。
 
@@ -228,13 +217,6 @@ $$ \mathcal{L}_{\mathrm{MLD}} := \mathbb{E}_{\epsilon, t, c}\left[\|\epsilon - \
 
 其中 $\epsilon$ 为添加的高斯噪声，$z_t$ 为时间步 $t$ 的噪声潜在变量，$\tau_{\theta}(c)$ 为 CLIP 文本编码器输出的条件嵌入。该损失仅用于预训练扩散模型，HuTuMotion 在推理时通过调整先验分布实现性能提升，**无需重新训练或微调扩散模型本身**。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1817_HuTuDiffusion_Human_Tuned_Navigation_of_Latent_Motion_Diffusion_Models_w/figures/008_Figure_5.jpg]]
-*Figure 5: Text embedding (left) and optimal latent distribution (right) clustering by t-SNE. We initially applied spectral clustering to random 50 text embeddings, categorizing them into 8 distinct classes based on cosine similarity matrix. Subsequently, we employed the labels assigned to the text embeddings to visualize the t-SNE results of the 50 optimal latent distributions*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -272,12 +254,6 @@ HuTuMotion 在两个主流文本驱动人体运动生成基准数据集 HumanML3
 
 HuTuMotion 的框架天然支持个性化和风格化运动生成，无需额外训练。对于个性化生成，用户可提供描述自身动作风格的代表性文本，通过人类反馈优化获得对应的先验分布，推理时即可生成符合个人风格的运动序列。对于风格感知生成，方法为每种风格描述符（如“优雅的”、“僵硬的”）构建对应的风格-潜在向量对集合 {(ST₁, z₁**), ..., (ST_M, z_M**)}，在推理时根据所需的风格选择相应的先验分布。Figure 3 和 Figure 9 展示了相关定性结果，验证了该方法在无需重新训练的情况下实现风格迁移和个性化生成的能力。
 
-![[assets/figures/papers/paper_list_l1817_HuTuDiffusion_Human_Tuned_Navigation_of_Latent_Motion_Diffusion_Models_w/figures/005_Figure_3.jpg]]
-*Figure 3: Personalized (left) and style-aware motion generation (right). More results are provided in the supplementary material. The darker colors indicate the later frame in time*
-
-![[assets/figures/papers/paper_list_l1817_HuTuDiffusion_Human_Tuned_Navigation_of_Latent_Motion_Diffusion_Models_w/figures/012_Figure_9.jpg]]
-*Figure 9: Personalized (left) and style-aware motion generation (right). The darker colors indicate the later frame in time. The darker colors indicate the later frame in time*
-
 ### 失败模式与局限性
 
 尽管 HuTuMotion 在主实验结果上取得了显著提升，论文明确指出了以下局限性：
@@ -291,13 +267,6 @@ HuTuMotion 的框架天然支持个性化和风格化运动生成，无需额外
 ### 公平性说明
 
 所有对比实验均在相同评估协议下进行：使用 Guo et al.（CVPR 2022a）提供的运动编码器计算评估指标，每种指标重复 20 次并报告 95% 置信区间。除先验采样策略外，扩散模型架构和超参数与 MLD 基线完全一致（“All other settings are consistent with MLD”）。基线方法性能直接引用原论文或公开结果，确保了对比的公平性和可复现性。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1817_HuTuDiffusion_Human_Tuned_Navigation_of_Latent_Motion_Diffusion_Models_w/figures/007_Figure_4.jpg]]
-*Figure 4: Effect of varying the number of representative texts on R Precision Top 1, FID and MM Dist*
-
-
 
 ## 定位与知识库关联
 
@@ -314,8 +283,6 @@ $$\mathcal{L}_{\mathrm{MLD}} := \mathbb{E}_{\epsilon, t, c}\left[\|\epsilon - \e
 消融实验揭示了两个关键设计选择。代表性文本数量从 1 增加到 50 并未持续提升性能（Figure 4），默认使用 5 个代表性文本在性能与优化开销间取得平衡，表明少量精心选择的代表性文本足以覆盖主要运动语义空间。标准差 $\sigma$ 的消融（Table 3）显示：$\sigma=0.2$ 时 R Precision Top1 最优，$\sigma=0.1$ 时 FID 最优，$\sigma=0.4$ 时 Diversity 最高，综合选择 $\sigma=0.2$ 体现了语义对齐与生成多样性之间的折中。
 
 开放问题包括：（1）如何将该方法扩展至显式扩散模型或其他生成框架，突破当前对潜在空间的依赖；（2）能否通过自动评估指标替代人工排序反馈，实现完全无监督的在线先验优化；（3）对于非常长的动作序列描述，如何保证生成的运动能完整覆盖所有动作；（4）少样本反馈的具体所需数量在不同任务间如何确定；（5）优化的潜在分布是否具有跨数据集的泛化能力，能否迁移到未见过的运动类型。这些问题指向了人类反馈驱动的生成模型从“特定框架适配”走向“通用框架集成”的关键挑战。
-
-
 
 ## 原文 PDF
 

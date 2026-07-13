@@ -52,8 +52,6 @@ claims:
 
 **主要结果**：在Web360数据集单视图360°视频生成任务上，Pantheon360在所有指标上显著超越基线——FVD降至356.15（GEN3C为380.08），SSIM提升至0.746（GEN3C为0.583），几何一致性指标MET3R降至0.2840（GEN3C为0.3496）。在Habitat稀疏视图生成任务上同样取得最优几何一致性。双锚点潜变量融合在插值任务上达到PSNR 28.95，有效缓解了3D Cache质量不足导致的几何不一致。与GenEX的对比表明，显式3D Cache框架在长时生成中保持稳定质量与几何精度，不会出现快速退化。
 
-
-
 数字孪生与沉浸式内容创作对可控、一致的3D场景视频生成提出了迫切需求。现有视频扩散模型在透视视频生成上取得了显著进展，但其视场范围（FoV）存在根本性局限：当相机沿长轨迹移动或进行多视角探索时，模型必须反复“臆测”视野外的不可见区域，导致跨视角几何不一致和时序漂移。如图Figure 2所示，透视锚帧在穿越至房间背面时缺乏完整场景上下文，生成结果出现严重伪影；而360°锚帧天然覆盖全场景信息，能够准确生成被遮挡区域。
 
 360°视频格式为上述困境提供了清晰的解决方案。通过从初始时刻即捕获完整场景上下文，360°表示提供了透视模型所缺乏的整体理解。然而，360°视频生成面临双重挑战：一方面，等距矩形投影（ERP）固有的几何畸变使得直接应用透视视频模型变得困难；另一方面，如何在全景视野下实现精确的相机轨迹控制和跨视角形状连贯性，仍是一个开放问题。
@@ -61,8 +59,6 @@ claims:
 现有方法在解决上述问题时各有不足。基于透视视频的生成方法——如**ViewCrafter**（Yu et al., arXiv 2024）、**TrajectoryCrafter**（Yu et al., ICCV 2025）和**GEN3C**（Ren et al., CVPR 2025）——虽然可通过逐视角拼接模拟360°输出，但跨视角一致性难以保证（Figure 4）。基于3D重建的方法如**PanoSplatt3R**（Ren et al., ICCV 2025）在360°新视角合成中表现出几何伪影和结构畸变（Figure 6）。360°世界模型**GenEX**（Lu et al., ICLR 2025）仅支持高层动作控制，缺乏精确轨迹跟随能力，且生成质量随轨迹延长快速退化（Figure 7）。并发工作**CamPVG**主要在合成数据上验证，对真实场景的泛化能力有限。
 
 本文的核心动机在于：若能构建一个显式的3D几何骨架来强制执行全局一致性，便可将复杂的3D推理与逼真纹理合成解耦——让扩散模型专注于纹理细化，而由3D骨架保证几何正确性。这一思路构成了Pantheon360的设计基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -89,8 +85,6 @@ Pantheon360的训练数据从带已知位姿的透视视频数据集切换至**3
 ### 与最相关工作的本质差异
 
 与同为360°世界模型的**GenEX**（Lu et al., ICLR 2025）相比，Pantheon360的关键差异在于控制粒度：GenEX仅支持高层动作控制（如“前进”“左转”），缺乏精确的轨迹跟随能力，且生成质量随帧数增加快速退化（Figure 7）；Pantheon360通过显式3D Cache实现了对任意用户定义相机轨迹的精确跟随，并在长时生成中保持稳定的质量与几何精度。与并发工作**CamPVG**相比，Pantheon360在真实场景数据上进行了全面验证，而非仅限于合成数据。
-
-
 
 Pantheon360 的整体设计围绕一个核心解耦思路展开：将复杂的 3D 几何推理与逼真的纹理合成分离，使视频扩散模型专注于纹理细化，而由显式 3D Cache 强制全局几何一致性。该框架基于预训练的潜变量视频扩散模型 SVD (Blattmann et al., 2023) 构建，但引入了一套由显式 3D 场景表征引导的鲁棒条件注入机制。
 
@@ -120,13 +114,6 @@ Pantheon360 的整体设计围绕一个核心解耦思路展开：将复杂的 3
 $$L = \mathbb{E}_{y_{\text{equi}}, v_{\text{equi}}, c_{\text{img}}, t, \epsilon} [\lambda(t) ||\epsilon - f_\theta(y_{\text{equi},t}, t, v_{\text{equi}}, c_{\text{img}})||_2^2]$$
 
 推理时，对于单视图输入，先通过 PI3 构建 3D Cache，沿目标轨迹渲染几何支架后送入扩散模型生成视频。对于稀疏多视图输入，则对每个视图预测深度后融合为统一 3D Cache，其余流程一致。在插值任务中，框架进一步采用双锚点潜变量融合机制，融合起始与结束锚帧的潜变量以平滑过渡并缓解因 3D Cache 质量不足导致的几何不一致。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2560_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Pantheon360_Tamin/figures/001_Figure_1.jpg]]
-*Figure 1: Pantheon360: Controllable 360° Video Generation. Given sparse or single 360° input images, Pantheon360 generates temporally consistent 360° videos along user-defined camera trajectories with precise geometric control. Top: From sparse views or a single view, our method synthesizes smooth videos following diverse camera trajectories across varied scenes, demonstrating flexible trajectory control from minimal input. Bottom: Our framework enables practical applications, including video stabilization (left, transforming shaky footage into smooth output) and motion interpolation (right, generating smooth transitions between distant anchor frames marked in red)*
-
-
 
 ### 问题形式化
 
@@ -198,13 +185,6 @@ Pantheon360处于**360°视频生成**与**3D感知视频扩散**的交叉地带
 - 框架能否扩展至多模态条件（文本、语义地图）？
 - 快速运动或大幅度视差场景下，当前几何支架是否足以保持所有区域的逼真度？
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2560_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Pantheon360_Tamin/figures/002_Figure_2.jpg]]
-*Figure 2: Motivation for Using 360° Images for Generation. Left: When traversing to the back of the room, 360° anchor frames provide complete scene context, enabling accurate generation of occluded regions. In contrast, perspective anchor frames have a limited field-of-view and must hallucinate unseen areas, leading to significant artifacts. Right: Generating 360° outputs in a single pass ensures global coherence and cross-view consistency. Our method maintains consistent object structures (red boxes highlight the same door/cabinet viewed from different angles), while GEN3C’s perspective-based generation produces geometrically inconsistent results across views*
-
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -239,16 +219,7 @@ Figure 7 对比了 Pantheon360 与 GenEX 的长时生成质量。GenEX 作为 36
 
 Figure 6 和 Figure 8 分别对比了 PanoSplatt3R 和 GEN3C 在新视角合成任务上的表现。PanoSplatt3R 作为专门的 360° 重建方法，在插值结果中出现可见伪影和几何畸变；GEN3C 在 Google Maps Street View 场景中产生鬼影伪影、几何畸变和跨视角不一致。Pantheon360 生成的视角具有清晰的几何结构和准确的空间关系，表明扩散模型的纹理细化能力与 3D Cache 的几何约束形成了有效的互补。
 
-![[assets/figures/papers/paper_list_l2560_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Pantheon360_Tamin/figures/009_Figure_6.jpg]]
-*Figure 6: Comparison to PanoSplatt3R [51]. Our method produces geometrically accurate interpolations with clean structure, while PanoSplatt3R exhibits visible artifacts and geometric distortions*
-
-![[assets/figures/papers/paper_list_l2560_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Pantheon360_Tamin/figures/010_Figure_8.jpg]]
-*Figure 8: Novel View Synthesis on Google Maps Street View. Our method produces geometrically accurate renderings across different viewing angles with consistent structures. GEN3C [52] suffers from ghosting artifacts, geometric distortions, and inter-view inconsistencies*
-
 Figure 9 从 3D 重建质量角度提供了间接证据：使用 π³ 从生成视频重建 3D 点云时，Pantheon360 生成的点云密集且结构连贯，而 GEN3C 生成的点云稀疏且碎片化。这说明 Pantheon360 生成的视频不仅在视觉上逼真，其底层 3D 结构也更为一致，进一步验证了显式几何支架对生成过程的正向约束作用。
-
-![[assets/figures/papers/paper_list_l2560_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Pantheon360_Tamin/figures/011_Figure_9.jpg]]
-*Figure 9: 3D Point Cloud Reconstruction Quality. We reconstruct 3D point clouds from generated videos using π3 [72]. Our method yields dense, structurally coherent reconstructions (right), while GEN3C [52] produces sparse, fragmented results (left), demonstrating our superior 3D consistency*
 
 ### 消融实验：双锚点潜变量融合
 
@@ -271,9 +242,6 @@ Table 3 报告了插值任务上的消融实验，验证了双锚点潜变量融
 
 Figure 5 展示了在 Google Street View 上的视频合成应用。Pantheon360 从稀疏的街景图像生成长距离的连贯 360° 导航视频，验证了方法在真实世界大规模场景中的实用性。视频稳定应用（Figure 1 底部左侧）进一步展示了框架对任意相机轨迹的精确控制能力：通过将抖动轨迹处理为平滑轨迹 $C_{\text{smooth}}$，Pantheon360 能够重新渲染出稳定的 360° 视频。
 
-![[assets/figures/papers/paper_list_l2560_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Pantheon360_Tamin/figures/006_Figure_5.jpg]]
-*Figure 5: Application. Video Synthesis from Google Street View. Our method generates consistent 360° videos from sparse Google Street View imagery, enabling smooth navigation across extended trajectories*
-
 ### 失败模式与局限性
 
 尽管 Pantheon360 在整体性能上表现优异，但分析揭示了以下失败模式：
@@ -284,8 +252,6 @@ Figure 5 展示了在 Google Street View 上的视频合成应用。Pantheon360 
 4. **域外泛化未经充分验证**：训练数据依赖 360‑1M 数据集，对极端室内环境、高度动态场景或域外场景的泛化能力需要进一步评估。
 
 这些失败模式直接指向了方法的核心权衡：显式 3D Cache 提供了强大的几何约束，但其质量瓶颈也成为了系统性能的上限。未来的改进方向包括结合更强的 3D 基础模型以提升稀疏输入下的重建鲁棒性，以及引入显式运动表征以实现物体级别的动态控制。
-
-
 
 ## 定位与知识库关联
 
@@ -331,8 +297,6 @@ Pantheon360 的生成质量存在一个根本性的上游依赖：初始3D Cache
 2. **3D Cache 鲁棒性**：结合更强的3D基础模型（如更大规模的 DUSt3R 变体或多视图立体匹配），能否提升极端稀疏输入下的几何支架质量？
 3. **多模态条件扩展**：该框架能否扩展到文本描述、语义地图等多模态条件，实现更丰富的可控生成？
 4. **大视差场景保真度**：对于快速运动或大幅度视差场景，当前的几何支架是否足以保持所有区域（尤其是 ERP 投影边缘）的逼真度？是否需要自适应分辨率或局部细化机制？
-
-
 
 ## 原文 PDF
 

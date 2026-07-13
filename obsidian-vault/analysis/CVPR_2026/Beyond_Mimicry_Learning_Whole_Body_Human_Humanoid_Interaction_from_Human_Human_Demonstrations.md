@@ -65,8 +65,6 @@ claims:
 
 **局限与开放问题。** 量化实验主要在仿真中进行，真实世界性能受视觉感知噪声和延迟影响；仅在 Unitree G1 上验证了三种交互，泛化到其他机器人形态需重新优化 PAIR；系统依赖单目 SMPL 估计，姿态误差会直接影响交互成功率。开放问题包括：能否处理实时、未预标定伙伴的动态交互；如何结合力触觉反馈提升接触鲁棒性；解耦时空推理框架能否泛化到非接触性社会交互（如眼神交流、手势理解）；以及面对全新交互类型时的零样本泛化能力。
 
-
-
 人形机器人与人类进行自然、流畅的全身交互，是机器人学迈向通用服务场景的核心愿景之一。然而，当前主流方法面临一个根本性瓶颈：**标准运动重定向在保持物理交互时破坏了关键接触**，而传统的模仿学习策略仅能复制轨迹，缺乏对交互语义的理解和实时响应能力。这导致面向人-机器人交互（Human-Humanoid Interaction, HHoI）的数据获取与策略设计双双失效。
 
 问题的根源可从两个层面理解。在**数据层面**，现有运动重定向方法（如 Simple MSE、基于逆运动学的 IK Baseline 或 **ImitationNet**（Yan et al., Humanoids 2023））仅追求关节位置或角度的运动学相似性，完全忽略了交互过程中至关重要的物理接触约束。当源人类与目标人形机器人之间存在形态差异（如臂长、躯干比例）时，天真重定向会直接导致握手、击掌等接触动作断开，使生成的数据丧失交互意义（见 Figure 2 对比）。在**策略层面**，标准模仿学习方法（包括 Naive Mimicry 行为克隆、Transformer、TCN 乃至 **Diffusion Policy**（Chi et al., IJRR 2023））采用单一时间编码器直接映射至动作空间，缺乏对“何时行动”与“在何处行动”的显式解耦推理，难以在动态交互中实现同步的全身协同行为。
@@ -77,8 +75,6 @@ claims:
 - **D-STAR（Decoupled Spatio-Temporal Action Reasoner）**：一种解耦时空动作推理策略，通过相位注意力（PA）解决“何时行动”，通过多尺度空间模块（MSS）解决“在何处行动”，再由扩散规划头融合二者生成参考动作，经全身控制器执行。
 
 Figure 1 展示了从 HHI 到 HHoI 的完整流水线，以及仿真与真实 Unitree G1 机器人上的交互执行结果，验证了该框架在六种交互任务（弯腰、挥手、飞吻、拥抱、击掌、握手）上的有效性。
-
-
 
 ## 核心方法与创新机理
 
@@ -121,8 +117,6 @@ PA 和 MSS 的特征融合后输入扩散规划头，生成高维参考动作目
 
 PAIR 和 D-STAR 并非独立创新，而是形成上下游依赖：PAIR 生成物理一致、接触保持的 HHoI 数据，为 D-STAR 提供可学习的交互基础；D-STAR 则利用解耦时空推理从这些数据中学习超越简单轨迹回放的同步全身协同行为。仅改进数据而使用天真策略（如 Diffusion Policy 使用 PAIR 数据但架构不解耦），或仅改进策略而使用破坏接触的数据，均无法实现有效交互——这一依赖关系在 Table 3 中 Diffusion Policy 的失败中得到了间接验证。
 
-
-
 本文提出了 **Beyond Mimicry** 框架，旨在从人-人交互（HHI）演示数据中学习全身人形机器人与人交互（HHoI）的策略。该框架由两个核心阶段构成：**物理感知交互重定向（PAIR）** 与 **解耦时空动作推理器（D-STAR）**，二者分别解决数据生成和策略学习中的根本瓶颈。
 
 ### 核心瓶颈与解决思路
@@ -151,12 +145,8 @@ PAIR 和 D-STAR 并非独立创新，而是形成上下游依赖：PAIR 生成�
 
 该设计确保了从数据到执行的每个环节都具备物理一致性和交互语义保持能力，为全身人形机器人交互提供了完整的解决方案。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1054_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Beyond_Mimicry_L/figures/001_Figure_1.jpg]]
 *Figure 1: From HHI to HHoI with simulation and real-robot results. Left: PAIR (Physics-Aware Interaction Retargeting) converts human–human interaction sequences into physically consistent human–humanoid (HHoI) clips by aligning morphology and explicitly preserving contact semantics via a two-stage pipeline. Top (Sim): Rollouts of the learned policy (D-STAR) in simulation, showing Bend, Wave, Fly-Kiss, Hug, High-Five, and Handshake, demonstrating synchronized whole-body interactions. Bottom (Real, a–c): Deployment on a Unitree G1 under a standard whole-body controller; the policy executes Hug, Handshake, and High-Five selected via text commands*
-
-
 
 ### 3.1 物理感知交互重定向 (PAIR)
 
@@ -218,18 +208,11 @@ PA 和 MSS 的特征融合后输入**扩散规划头 (Diffusion Planning Head)**
 
 PAIR 与 D-STAR 并非独立设计，而是构成了一条因果链：PAIR 解决了数据层面的接触语义保持问题，为 D-STAR 提供了物理一致的训练数据；D-STAR 在此基础上通过解耦时空推理，学习到超越简单轨迹回放的交互策略。证据是：即使使用相同的 PAIR 数据和相同的全身控制器，**Diffusion Policy** (Chi et al., IJRR 2023) 这一强基线在六项交互任务上的平均成功率仍显著低于 D-STAR，表明仅重放轨迹不足以应对交互任务，验证了解耦时空推理的必要性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1054_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Beyond_Mimicry_L/figures/003_Figure_3.jpg]]
 *Figure 3: PAIR preserves contact semantics and physical consistency via a two-stage retargeting pipeline. From HHI to HHoI while retaining contact semantics across morphology differences*
 
 ![[assets/figures/papers/paper_list_l1054_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Beyond_Mimicry_L/figures/004_Figure_4.jpg]]
 *Figure 4: Overview of D-STAR (Decoupled Spatio-Temporal Action Reasoner): Phase Attention (PA, “when to act”) and Multi-Scale Spatial module (MSS, “where to act”) are fused by a diffusion planning head to yield synchronized whole-body interaction beyond mimicry; a low-level Whole-Body Controller (WBC) executes the final physically plausible action*
-
-![[assets/figures/papers/paper_list_l1054_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Beyond_Mimicry_L/figures/002_Figure_2.jpg]]
-*Figure 2: PAIR preserves physical consistency where naive methods fail. Left: A source HHI handshake. Center: Naive retargeting breaks essential contact due to morphological disparities. Right: PAIR first ensures kinematic plausibility, then applies an interaction-aware objective (Lcon) to refine and enforce the critical physical contact*
-
-
 
 ## 实验与关键发现
 
@@ -287,9 +270,6 @@ Table 3 报告了六项交互任务（Bend、Wave、Fly-Kiss、Hug、High-Five�
 
 Table 4 展示了在伙伴身体比例（0.8×–1.2×）和运动速度（0.8×–1.2×）联合变化下的平均成功率矩阵。中心值（标准设置）为 75.4%，向边缘逐渐平滑下降，最低为 52.1%（0.8× scale + 0.8× speed），未出现断崖式崩溃。这种“优雅退化”特性表明 D-STAR 学到了真正鲁棒的交互表征，而非过拟合于特定训练分布。
 
-![[assets/figures/papers/paper_list_l1054_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Beyond_Mimicry_L/figures/008_Table_4.jpg]]
-*Table 4: Robustness Matrix: Average Success Rate (%) under combined variations in human partner’s scale and speed. The central value (bold) is our standard performance. The graceful degradation towards the edges demonstrates true robustness*
-
 ---
 
 ### 失败模式与局限性
@@ -299,9 +279,6 @@ Table 4 展示了在伙伴身体比例（0.8×–1.2×）和运动速度（0.8×
 1. **Handshake 任务成功率仅 61.3%**，即使在仿真环境中也未完全解决。这表明精细接触交互对空间推理精度要求极高，MSS 模块的当前设计可能仍有改进空间。
 
 2. **量化实验主要在仿真中进行**，真实世界性能受限于：单目 RGB 相机（Figure 5 中的 Logitech C1000e）的感知噪声、SMPL 估计误差（依赖 4D-Humans）、以及标定误差。真实机器人测试仅在 Unitree G1 上验证了三种较简单的交互（Hug、Handshake、High-Five），未覆盖 Hug 等更复杂的持续接触场景。
-
-![[assets/figures/papers/paper_list_l1054_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Beyond_Mimicry_L/figures/009_Figure_5.jpg]]
-*Figure 5: Monocular SMPL perception setup and result. (a) Unitree G1 with a Logitech C1000e RGB camera (1280 × 720@30 fps). (b) Input RGB frame. (c) SMPL mesh estimated from the single RGB stream (4D-Humans [14]) and mapped to the robot base frame after extrinsic calibration*
 
 3. **系统依赖特定机器人形态**：PAIR 的形态调整和接触约束针对 Unitree G1 优化，泛化到其他机器人型号需重新执行两阶段优化。
 
@@ -316,8 +293,6 @@ Table 4 展示了在伙伴身体比例（0.8×–1.2×）和运动速度（0.8×
 - **Table 3**：D-STAR 以 75.4% 平均成功率显著超越所有基线，消融验证 PA 和 MSS 模块分别对时序同步和空间协调任务的关键作用。
 - **Table 4**：在伙伴身体比例和速度联合变化下呈平滑退化，证明策略的鲁棒性。
 - **Figure 5**：真实机器人部署的感知管线，验证策略在异步单目感知下的可执行性。
-
-
 
 ## 定位与知识库关联
 
@@ -357,8 +332,6 @@ Table 4 展示了在伙伴身体比例（0.8×–1.2×）和运动速度（0.8×
 3. **交互类型泛化**：解耦时空推理框架能否零样本泛化到训练数据中未出现的新交互类型？
 4. **跨形态迁移**：接触保持约束和形态调整策略如何系统化地迁移到不同尺寸、自由度的机器人平台？
 5. **感知鲁棒性**：在 SMPL 估计误差较大或部分遮挡场景下，D-STAR 策略的性能退化模式与容错机制是什么？
-
-
 
 ## 原文 PDF
 

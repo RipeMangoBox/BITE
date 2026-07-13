@@ -63,8 +63,6 @@ PALUM在方法谱系中处于**基于学习的统一动作重定向**分支。�
 
 在Mixamo数据集上的实验表明，PALUM在跨结构动作重定向上的平均MSE误差为**0.00567**，相较于最强基线MoMa的0.02340**相对降低约75.8%**（Table 1）。内部结构重定向的平均MSE为**0.00272**，同样显著优于所有基线方法。消融实验进一步验证了组间共享关节连接的关键作用：去除共享连接后，内部结构误差从0.00272升至0.00377，并出现头部异常倾斜等运动伪影（Table 2, Figure 5）。
 
-
-
 动作重定向（Motion Retargeting）旨在将源角色的运动序列迁移至具有不同骨骼结构的目标角色，是计算机动画与角色驱动的核心技术。随着虚拟人、游戏、影视制作对多样化角色需求的激增，手工为每个骨骼拓扑重新制作动画已不可行，自动化重定向方法成为产业刚需。然而，人体骨骼在关节数量、骨骼长度比例和拓扑连接上呈现高度异构性——例如，标准Mixamo骨架可能包含65个关节，而SMPL模型仅24个关节，MetaHuman则可达上百个关节——这使得统一处理不同骨骼结构成为长期瓶颈。
 
 现有方法在处理这一问题上存在系统性缺陷。**R²ET**（Zhang et al., CVPR 2023）基于Transformer进行动作重定向，但要求源与目标骨架关节数一致，并需复制源旋转作为解码器初始值；其扩展版本M-R²ET虽支持不同关节数，仍需手动指定关节链对应关系，缺乏自动化能力。**PAN**（Hu et al., TVCG 2024）采用基于部位操作的图神经网络，将身体分为多个部分独立处理，但因缺乏全局协调机制，导致不同部位间运动连贯性不足。**MoMa**（Martinelli et al., CVIU 2024）通过掩码Transformer处理可变关节数，但其全局注意力机制对所有关节进行统一建模，引入了大量冗余信息，不仅增加了学习难度，更难以捕获人体运动的层次化特征——即同一肢体内部关节高度相关、不同肢体间交互相对稀疏的局部性规律。
@@ -72,8 +70,6 @@ PALUM在方法谱系中处于**基于学习的统一动作重定向**分支。�
 上述方法的共同瓶颈可归结为两点：其一，缺乏对人体运动生物力学先验的有效利用，即人体运动天然呈现**部位局部性**——手臂、腿、躯干等部位内部关节协同运动，而跨部位耦合相对较弱；其二，全局或独立分组的特征聚合方式无法在保持运动全局一致性的同时，从可变数量的关节中提取固定维度的骨骼无关表征，导致跨拓扑泛化能力受限。
 
 针对这些缺口，本文提出**PALUM（Part-based Attention Learning for Unified Motion Retargeting）**。核心思路是将骨骼按生物力学原理划分为六个语义部位（左右臂、左右腿、脊椎、头部），并在相邻部位间共享髋部和脊椎连接关节，以此在部位独立性与全身协调性之间取得平衡。在每个部位内部，通过空间注意力池化（Spatial Attention Pooling）从可变数量的关节中提取固定维度的运动特征，再经由时序Transformer编码器捕获跨部位交互与时序动态，最终通过交叉注意力解码器将运动表征映射至目标骨架。配合循环一致性损失保持运动语义，PALUM实现了无需手工指定关节对应、可处理任意关节数和拓扑结构的统一动作重定向框架。
-
-
 
 ## 核心方法与创新机理
 
@@ -110,8 +106,6 @@ $$\mathcal{L}_{cyc} = \frac{1}{T \times B \times M \times D} \sum |\mathbf{H}_A 
 ### 创新本质
 
 上述四个 changed slots 共同指向一个核心洞察：**人体运动呈现部位局部性**——同一肢体内关节高度相关，不同部位间交互较弱。PALUM 通过部位内注意力池化提取关键特征，通过组间共享连接维持全身协调，通过循环一致性保持运动语义，从而在无需任何手工关节对应的情况下，实现了对不同关节数量和拓扑结构的统一动作重定向。
-
-
 
 PALUM 的整体流程围绕一个**编码器-解码器架构**构建，其核心设计目标是实现与骨骼拓扑无关的统一动作重定向。该框架将源骨架的动作序列映射到任意目标骨架上，无论两者的关节数量、骨骼比例或拓扑结构是否相同。
 
@@ -159,12 +153,8 @@ PALUM 的整体流程围绕一个**编码器-解码器架构**构建，其核心
 
 框架的核心因果机制可概括为：**部位分组 + 共享连接关节** → 局部运动特征的结构化提取 → **注意力池化** → 消除关节数量差异的固定维度表征 → **循环一致性训练** → 跨骨架运动语义保持。消融实验（Table 2）证实，去除组间共享连接关节会导致身体部位运动不一致，内部结构误差从 0.00272 升至 0.00377，并出现头部异常倾斜等伪影（Figure 5）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2601_07272/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our motion retargeting framework. (a) Encoder-decoder architecture: The transformer encoder processes source motion sequences through multiple attention pooling layers to extract skeleton-agnostic motion representations. These representations are fed to an MLP that outputs key-value pairs for cross-attention in the transformer decoder. The decoder takes uniformly sampled noise and skeleton-specific embeddings to generate target motion sequences. Note that the target skeleton shown in this pipeline includes pauldron joints, demonstrating our method’s capability to handle diverse skeletal topologies. (b) Training pipeline: The model is trained using reconstruction and cycle consis...*
-
-
 
 PALUM 的核心架构由四个关键模块串联构成：关节语义分组、空间注意力编码、时序 Transformer 编码与交叉注意力解码。以下逐一剖析各模块的机制与关键公式。
 
@@ -221,12 +211,8 @@ $$\mathcal{L}_{total} = \mathcal{L}_{rec} + \lambda_{cyc} \mathcal{L}_{cyc} + \l
 
 权重设置为 $\lambda_{cyc}=20$，$\lambda_{root}=7$。测试阶段仅使用前向重定向路径，循环一致性组件被禁用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2601_07272/figures/005_Figure_4.jpg]]
 *Figure 4: Qualitative results of our method and the baselines. Our method preserves the natural motion dynamics and joint relationships*
-
-
 
 ## 实验与关键发现
 
@@ -275,14 +261,10 @@ Figure 4展示了各方法的定性对比。PALUM生成的运动保持了自然�
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2601_07272/figures/004_Table_1.jpg]]
 *Table 1: Comparison with state-of-the-art methods on intra-structure and cross-structure motion retargeting*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2601_07272/figures/006_Table.jpg]]
 
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2601_07272/figures/003_Figure_3.jpg]]
 *Figure 3: T-pose examples after our joint elimination strategy. (1) Warrok: the pauldron joints are named as ”RightArmourx” (x=1,2,3,4,5) in the BVH file, so they match our ”RightArm” joint name selection and they are preserved. (2) BigVegas: the hair joints are named as ”HeadTop Endx” (x=1,2), which match our ”Head” joint name selection, so they are preserved*
-
-
 
 ## 定位与知识库关联
 
@@ -334,8 +316,6 @@ PALUM 的四个关键设计槽位及其消融验证：
 3. **拓扑泛化边界**：如何将该框架推广到四足动物、多足动物或任意拓扑的非人形骨骼？部位分组的定义是否需要自适应学习？
 4. **表征容量**：注意力池化的固定维度表征是否足以保留极端姿态或快速复杂运动的细节？是否需要根据运动复杂度自适应调整查询数量？
 5. **评估基准局限**：当前评估仅基于 Mixamo 数据集，缺乏在更广泛骨架类型（如不同体型比例、非人形角色）上的标准化基准。
-
-
 
 ## 原文 PDF
 

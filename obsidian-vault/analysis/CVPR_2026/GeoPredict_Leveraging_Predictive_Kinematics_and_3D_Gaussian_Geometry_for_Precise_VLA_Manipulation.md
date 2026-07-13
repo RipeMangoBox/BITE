@@ -52,8 +52,6 @@ GeoPredict 的核心思路是“以预测促感知”：模型联合学习未来
 
 消融实验进一步揭示了各组件的因果贡献：仅添加历史轨迹编码器使成功率从 42.3% 提升至 44.8%，加入未来轨迹预测损失后提升至 47.2%，联合深度监督达到 50.5%，而启用完整的轨迹引导细化机制后达到最高的 **52.4%**，证明自适应几何容量分配是性能提升的核心机制。
 
-
-
 视觉-语言-动作（VLA）模型近年来在机器人操控领域取得了显著进展，但其核心能力仍受限于对2D图像和瞬时观测的依赖。当前主流VLA模型，如**π0**（连续动作流匹配）和**OpenVLA**（Kim et al., CoRL 2025，基于离散动作token），主要从当前时刻的多视角RGB图像中提取特征来生成动作指令。这种设计在需要精确3D空间推理的操控任务中暴露出根本性缺陷：模型缺乏对三维空间关系的深层理解，也无法预判机器人运动与环境交互的未来动态。
 
 具体而言，现有VLA方法面临两个关键缺口。第一，**运动学先验缺失**：模型仅从单帧视觉输入推断动作，无法利用机器人关键点的运动历史来捕捉运动趋势，导致在需要精确轨迹规划的接触式操作中表现不稳定。第二，**几何先验缺失**：2D视觉编码器无法显式建模工作空间的三维几何结构，使得模型难以推理空间占据、遮挡关系和精细的物体位姿——这些恰是抓取、插入、对准等操控原语的核心需求。尽管**SpatialVLA**（Qu et al., arXiv 2025）等近期工作尝试显式集成3D信息，但现有方法普遍未将运动预测与几何推理统一在端到端框架中，且在推理时引入额外3D解码会带来显著的计算开销。
@@ -61,8 +59,6 @@ GeoPredict 的核心思路是“以预测促感知”：模型联合学习未来
 上述瓶颈在仿真和真实世界基准中均有明确体现。在RoboCasa Human-50基准上，基础π0模型的平均成功率仅为42.3%；在LIBERO四套评估集上，OpenVLA的平均成功率为76.5%，与当前最优通用模型**UniVLA**（Li et al., arXiv 2025）仍存在差距。真实世界实验中，π0在空间推理、几何理解和鲁棒性三类任务上的成功率分别仅为60.0%、50.0%和35.0%，凸显了精确3D推理能力的严重不足。
 
 GeoPredict的核心动机在于：**能否在不增加推理开销的前提下，为VLA策略注入预测性运动学和几何先验？** 其关键洞察是——仅在训练阶段利用未来深度渲染监督来学习预测性3D表示，推理时保持与标准VLA一致的计算流程，即可显著提升策略的3D感知和长时域规划能力。这一设计通过两个互补的预测模块实现：轨迹级预测模块编码机器人关键点运动历史并预测未来多步3D轨迹，3D高斯几何模块则预测未来工作空间的几何结构。两个模块作为训练时的辅助监督信号，驱动底层LLM Transformer学习更丰富的时空表征，而推理阶段无需调用任何3D解码器。
-
-
 
 ## 核心方法与创新机理
 
@@ -103,8 +99,6 @@ GeoPredict最具实用价值的创新在于其**训练-推理解耦策略**：�
 | 几何容量分配 | 均匀 | 均匀 | 轨迹引导自适应细化 |
 
 GeoPredict的独特之处在于：它不改变VLA的基础架构，而是通过训练时的辅助预测任务，迫使模型学习更丰富的3D时空表示。这种“免费午餐”式的设计使其在保持推理效率的同时，获得了显著的3D推理能力提升。
-
-
 
 GeoPredict 在连续动作 VLA 策略的基础上引入两个仅在训练阶段使用的预测模块：**轨迹级运动学预测**和**预测性 3D 高斯几何建模**。其核心设计思想是，通过训练时学习未来机器人关键点轨迹和场景深度结构，为策略提供运动学先验与空间几何先验，而在推理时不增加任何 3D 解码开销。
 
@@ -151,12 +145,8 @@ Transformer 内部同时学习两个并行的预测任务：
 
 消融实验（Table 3）严格验证了各模块的因果贡献：基线 $\pi_0$ 成功率 42.3%，添加 Track Encoder 升至 44.8%，加入未来轨迹预测升至 47.2%，联合深度监督升至 50.5%，最终启用轨迹引导细化达到最高 52.4%。值得注意的是，加入颜色渲染无增益（49.2% vs 仅深度的 49.4%），表明**深度几何信息是核心驱动因素**，纹理信息对 3D 推理帮助有限。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l972_https_arxiv_org_abs_2512_16811/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of GeoPredict. Given an instruction, multi-view images and motion history encoded by the Track Encoder, a central LLM Transformer learns two main tasks. First, it predicts multi-timestep 3D keypoint trajectories using learnable Future Track Query. Second, it forecasts future workspace geometry as a predictive 3D Gaussian by processing a 3D Spatial Query through a Voxel Decoder. A track-guided refinement mechanism leverages the predicted future tracks to allocate geometric capacity to task-relevant interaction regions. Our policy then generates the final action via an Action Expert. Crucially, these predictive modules serve exclusively as trainingtime supervision and are not invoked...*
-
-
 
 GeoPredict 的核心设计思想是在训练阶段引入两个预测性模块——轨迹级运动学预测与 3D 高斯几何预测——为底层 VLA 策略提供未来运动学先验和空间几何先验，而在推理时这两个模块均不执行，从而在不增加推理开销的前提下显著提升 3D 感知与长时域规划能力。
 
@@ -224,13 +214,6 @@ $$
 
 > **推理效率**：预测性 3D 高斯几何模块（体素解码器、深度渲染）在推理时不执行，动作生成流程与标准 VLA 策略一致，保证了推理效率。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l972_https_arxiv_org_abs_2512_16811/figures/002_Figure_2.jpg]]
-*Figure 2: Block-wise Causal Attention Mechanism. For simplicity, the detailed attention pathways from the 3D Token and State Token blocks to other blocks are not fully drawn*
-
-
-
 ## 实验与关键发现
 
 ### 仿真基准评估
@@ -269,8 +252,6 @@ GeoPredict在两个主流的机器人操控仿真基准上进行了系统评估�
 3. **深度几何足够，颜色纹理冗余**：深度渲染与颜色渲染性能无显著差异，说明策略所需的3D先验本质上是几何结构信息，而非外观纹理。
 4. **仿真到真实的迁移增益**：真实世界实验中GeoPredict相对π0的提升幅度（25-55个百分点）远大于仿真基准（10.1个百分点），暗示预测性先验在应对真实世界不确定性时具有更强的鲁棒性补偿效应。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l972_https_arxiv_org_abs_2512_16811/figures/004_Table_1.jpg]]
 *Table 1: RoboCasa Simulation Benchmark Results. Task success rates (%) across 24 sub-tasks and the Average Success Rate (%). ∗Denotes our fine-tuned experimental results. Bold indicates the best performing model. See Appendix for detailed sub-task definitions*
 
@@ -283,13 +264,8 @@ GeoPredict在两个主流的机器人操控仿真基准上进行了系统评估�
 ![[assets/figures/papers/paper_list_l972_https_arxiv_org_abs_2512_16811/figures/008_Table_4.jpg]]
 *Table 4: Ablation Study on Depth Rendering*
 
-![[assets/figures/papers/paper_list_l972_https_arxiv_org_abs_2512_16811/figures/009_Table_5.jpg]]
-*Table 5: Real-World Experiment Results. Task success rates (%) across three distinct settings: Spatial, Geometry, and Robustness*
-
 ![[assets/figures/papers/paper_list_l972_https_arxiv_org_abs_2512_16811/figures/006_Figure_4.jpg]]
 *Figure 4: Qualitative Comparisons of Future Depth Rendering. Visualizations are shown for timesteps*
-
-
 
 ## 定位与知识库关联
 
@@ -328,8 +304,6 @@ GeoPredict 的设计存在若干明确的适用边界：
 3. **预测窗口的时域扩展**：H=50 的预测窗口是否适用于更长时间的任务？增加预测窗口是否会引入累积误差，以及如何通过训练策略缓解这一问题？
 
 4. **多模态感知融合的潜力**：当前方法使用多视角 RGB 图像作为视觉输入。触觉、力觉等模态的融入是否能进一步增强几何预测的精度和操控的鲁棒性？
-
-
 
 ## 原文 PDF
 

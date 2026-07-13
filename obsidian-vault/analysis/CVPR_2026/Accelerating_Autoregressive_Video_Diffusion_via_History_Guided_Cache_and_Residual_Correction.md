@@ -47,8 +47,6 @@ claims:
 
 自回归视频扩散模型（ARDM）通过逐段生成的方式有效缓解了长视频合成中的时序一致性问题，但其高昂的计算开销严重制约了实际部署。现有的免训练缓存加速方法主要面向标准扩散模型（SDM）设计，直接迁移至 ARDM 时会因自回归架构的顺序依赖性而引发严重的误差累积——每段内的近似误差会沿时间顺序传播至后续帧，导致画面逐渐失真。本文提出 **ARCache**，首个专为自回归视频扩散模型设计的免训练缓存加速框架，其核心在于两个关键洞察：① 历史令牌（history tokens）的变化与模型输出变化之间存在强相关性，可作为缓存刷新的可靠决策依据；② 未加速的首段残差轨迹在不同段落间高度一致且稳定，可作为清洁参考来矫正加速导致的残差漂移。基于此，ARCache 通过**历史引导缓存（HGC）** 监控历史令牌的累积偏差以自适应调度缓存刷新，抑制段内近似误差；通过**增强残差校正（ERC）** 将首段的清洁残差轨迹参数迁移至后续段落，以几乎可忽略的计算开销阻断误差跨段传播。实验表明，ARCache 在 FramePack-F1、SkyReels-V2 及自回归世界模型 Matrix-Game 上分别实现 **2.88×**、**1.87×** 和 **3.13×** 的加速，同时保持高视觉保真度，验证了其广泛的适用性。
 
-
-
 自回归视频扩散模型（Auto-Regressive Diffusion Models, ARDMs）已成为高质量视频生成的主流范式之一，其核心思想是将视频逐段（segment）生成，每一段的去噪过程依赖于前一段产生的历史上下文。然而，这种逐段自回归生成方式带来了极高的推理成本——每一段内部仍需执行完整的迭代去噪过程，导致端到端生成耗时过长，严重制约了实际部署。
 
 ### 标准缓存加速在 ARDM 中的失效
@@ -73,8 +71,6 @@ $$\mathcal{F}([\mathbf{h}_{t-k}^s, \mathbf{x}_{t-k}^s]) := \mathcal{F}([\mathbf{
 2. **跨段层面**：缺乏有效的误差阻断机制。即使段内缓存调度得当，残余的近似误差仍会传递至下一段，若无校正手段，误差将随段落数增加而持续累积。
 
 针对以上缺口，本文提出 **ARCache**——首个专为自回归视频扩散模型设计的免训练缓存加速框架。ARCache 包含两个协同模块：**历史引导缓存（History-Guided Cache, HGC）** 通过监控历史令牌的累积偏差自适应调度缓存刷新，抑制段内近似误差；**增强残差校正（Enhanced Residual Correction, ERC）** 利用首段的清洁残差轨迹参数对后续段落进行跨段校正，以几乎可忽略的计算开销阻断误差传播。
-
-
 
 ## 核心方法与创新机理
 
@@ -107,8 +103,6 @@ $$\mathbf { r } _ { t } ^ { s } = \mathbf { r } _ { t _ { b } } ^ { s } + { \fra
 ### 双槽协同：从段内抑制到跨段阻断的完整防御
 
 HGC 与 ERC 并非两个孤立的技术点，而是针对 ARDM 误差传播链的**分段防御体系**：HGC 在段内层面，通过监控历史令牌的累积偏差，在误差尚未扩散时精准触发缓存刷新，抑制段内近似误差的产生；ERC 在跨段层面，利用首段清洁轨迹参数校正后续段落的残差，阻断已产生的误差向更远段落传播。两者协同，构成了从“误差源头控制”到“误差传播阻断”的完整防御链，使得 ARCache 在 FramePack-F1（2.88×）、SkyReels-V2（1.87×）和 Matrix-Game（3.13×）上均实现了领先的加速比与视觉保真度。
-
-
 
 ARCache 是首个专为自回归视频扩散模型（ARDM）设计的免训练缓存加速框架。其核心 pipeline 由两个协同模块构成：**历史引导缓存（History-Guided Cache, HGC）** 与 **增强残差校正（Enhanced Residual Correction, ERC）**，二者分别针对自回归生成中两类根本性误差——段内近似误差与段间误差传播——进行联合抑制。
 
@@ -147,12 +141,8 @@ $$\mathbf { r } _ { t } ^ { s } = \mathbf { r } _ { t _ { b } } ^ { s } + \lambd
 
 HGC 与 ERC 形成“抑制-阻断”的双重防护：HGC 在段内通过历史令牌引导的自适应调度，从源头减少近似误差的产生；ERC 则在段间利用首段清洁轨迹进行残差校正，阻断已产生误差的跨段传播。消融实验表明，仅使用 HGC（$\delta=0.30$）即可在 FramePack-F1 上实现 2.88× 加速，且 PSNR、SSIM、LPIPS 均优于基于全局输入（IGC）或常量缓存（CGC）的调度策略；在 HGC 基础上引入 ERC，PSNR 从 24.13 进一步提升至 24.79，SSIM 从 0.8169 升至 0.8266，LPIPS 从 0.1159 降至 0.1117，而推理速度几乎不受影响。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l831_https_openaccess_thecvf_com_content_CVPR2026_html_Nan_Accelerating_Autor/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of ARCache. The proposed ARCache integrates a History-Guided Cache (HGC) and an Enhanced Residual Correction (ERC) module to efficiently reuse features while mitigating error accumulation in ARDMs. The left panel illustrates the adaptive cache scheduling mechanism, which leverages correlations between historical inputs and model outputs to optimize cache usage. The right panel depicts the process of residual feature correction along the generation trajectory, effectively suppressing error accumulation*
-
-
 
 ### 问题形式化：自回归扩散模型中的缓存误差传播
 
@@ -207,16 +197,6 @@ HGC 与 ERC 协同工作：HGC 在每段内部通过历史令牌监控抑制近�
 
 当前方法存在两个主要局限：① HGC 的阈值 $\delta$ 需手动设定（实验中固定为 0.30 以获得 2.88× 加速），尚未实现完全自适应的阈值机制；② ERC 假设首段残差轨迹对所有后续段具有代表性，当视频内容发生剧烈变化或首段自身加速质量不佳时，校正准确性可能下降。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l831_https_openaccess_thecvf_com_content_CVPR2026_html_Nan_Accelerating_Autor/figures/003_Figure_3.jpg]]
-*Figure 3: Comparison of Spearman Correlation and P-Value across various input–output pairs on FramePack-F1. In ARDMs, historical context serves as a more reliable basis for caching decisions relative to the full model input, which is the standard practice in previous caching-based acceleration methods*
-
-![[assets/figures/papers/paper_list_l831_https_openaccess_thecvf_com_content_CVPR2026_html_Nan_Accelerating_Autor/figures/004_Figure_4.jpg]]
-*Figure 4: PCA projections of residual features across timesteps in ARDMs*
-
-
-
 ## 实验与关键发现
 
 ### 核心加速效果
@@ -259,8 +239,6 @@ Table 2 的消融实验首先对比了三种缓存调度策略：基于常量间
 
 尽管 ARCache 在三个基准上表现出色，其设计仍存在以下边界条件。第一，HGC 依赖手动设定的阈值 δ，尚未实现完全自适应的缓存调度，在视频内容统计特性剧烈变化时可能需要重新调参。第二，ERC 假设首段残差轨迹对所有后续段落具有代表性；当首段本身因加速导致质量显著下降，或视频内容发生场景切换等剧烈变化时，校正的准确性可能降低。第三，当前实验覆盖的模型架构有限，在更大规模世界模型或不同噪声调度下的泛化性仍需进一步验证。上述局限性在论文中已明确讨论，建议在实际应用中针对具体模型和场景进行适配性测试。
 
-
-
 ## 定位与知识库关联
 
 ### 与标准扩散模型缓存方法的差异
@@ -290,8 +268,6 @@ ARCache 的有效性建立在两个核心假设之上，这些假设同时划定
 ### 开放问题
 
 基于上述局限，一个自然的开放问题是：能否设计完全自适应的、无预定义阈值的缓存刷新策略，使 ARCache 在无需人工调参的情况下自动适应不同模型和生成任务的速度‑质量平衡需求？这需要更深入地理解历史令牌动态与输出质量之间的函数关系，或引入轻量级的在线质量估计模块。
-
-
 
 ## 原文 PDF
 

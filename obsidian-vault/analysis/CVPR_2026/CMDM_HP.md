@@ -65,8 +65,6 @@ claims:
 
 CMDM 属于**扩散生成与自回归生成融合**的新范式，通过因果扩散强制（Causal Diffusion Forcing）将扩散模型的迭代去噪能力赋予自回归框架。与现有方法相比，其关键区分在于：扩散范式从全序列双向扩散变为帧级因果扩散，潜在空间从标准 VAE 升级为运动-语言对齐的因果 VAE，推理采样从完整自回归扩散变为帧级不确定性调度。这一设计使 CMDM 兼具扩散模型的高质量与自回归模型的因果性和实时性，为流式运动生成和长序列合成提供了新的技术路径。
 
-
-
 ### 文本驱动运动生成的核心挑战
 
 文本到运动生成（Text-to-Motion Generation）旨在根据自然语言描述生成逼真、语义对齐的三维人体运动序列。这一任务在动画制作、虚拟现实、人机交互等领域具有广泛应用前景。然而，现有方法面临一个根本性的困境：**高质量生成与时间因果性难以兼得**。
@@ -98,8 +96,6 @@ CMDM 的关键思路是在三个层面实现因果性与质量的融合：
 - **帧级采样调度**：在推理阶段，设计帧级采样调度器（FSS），利用因果不确定性机制——过去帧保持较低噪声水平以提供稳定条件，未来帧逐渐去噪以减少曝光偏差。这一设计显著降低了自回归生成中的误差累积问题。
 
 通过上述设计，CMDM 仅需 114M 参数即可在 HumanML3D 数据集上取得最优的语义对齐精度（R-Precision Top1 0.588）和文本匹配度（CLIP-score 0.685），同时实现最高 125 fps 的推理速度，较传统自回归模式加速 5–12 倍。这一结果表明，扩散模型的高质量生成与自回归模型的因果性并非不可调和的对立面，而是可以通过精心设计的因果架构实现有机融合。
-
-
 
 ## 核心方法与创新机理
 
@@ -154,8 +150,6 @@ $$\mathcal{L}_{\mathrm{align}} = \mathcal{L}_{\mathrm{mcos}} + \mathcal{L}_{\mat
 
 CMDM 仅含 114M 参数，FSS 推理模式可实现最高 **125 fps** 的生成速度，较自回归模式加速 **5–12 倍**（Section 4.3, B.4）。这一效率优势源于因果潜在空间的低维表征（64 维）和 FSS 的并行去噪能力，使 CMDM 成为首个同时满足高质量、因果性和实时性要求的文本到运动生成框架。
 
-
-
 CMDM 提出了一种融合扩散模型生成质量与自回归模型因果性的统一范式，其核心矛盾在于：现有方法要么采用全序列双向扩散（破坏时间因果关系，无法实现流式生成），要么采用纯自回归模型（误差累积、生成不稳定）。CMDM 通过三个关键模块的系统协作来解决这一瓶颈。
 
 **Pipeline 概览。** 给定文本描述 $\mathbf{c}$ 和目标运动序列长度 $T$，整体流程分为三个阶段：
@@ -169,8 +163,6 @@ CMDM 提出了一种融合扩散模型生成质量与自回归模型因果性的
 **模块间的因果闭环。** MAC-VAE 为 Causal-DiT 提供了语义对齐且时间因果的压缩表示，使得扩散过程可以在低维空间高效运行；Causal-DiT 的因果自注意力与帧级噪声注入则确保了去噪过程的有序性；FSS 利用这一因果结构，通过可控的不确定度尺度 $L$ 在生成质量与推理延迟之间取得平衡。三者共同构成了从文本到运动的因果生成闭环，使得 CMDM 既能保持扩散模型的高质量输出，又能实现自回归式的流式推理（最高 125 fps，较自回归模式加速 5–12 倍）。
 
 **与基线方法的关键差异。** 相较于全序列扩散方法（如 MDM、MLD），CMDM 将统一的噪声水平替换为帧级独立噪声，将双向注意力替换为因果自注意力，从根本上保证了时间因果性；相较于纯自回归方法（如 MARDM+），CMDM 通过 FSS 的因果不确定性调度显著缓解了曝光偏差问题，在长时域生成中实现了更平滑的过渡（过渡 FID 降至 1.64，AUJ 降至 0.38）。
-
-
 
 CMDM 由三个核心模块构成：**MAC-VAE**（运动-语言对齐的因果变分自编码器）、**Causal-DiT**（因果扩散变压器）和 **FSS**（帧级采样调度器）。三者协同，在因果约束的潜在空间中实现帧级扩散去噪与流式推理。
 
@@ -257,8 +249,6 @@ $$
 - **语义对齐**：MAC-VAE 的对齐损失同时约束局部特征（$\mathcal{L}_{\mathrm{mcos}}$）和全局结构（$\mathcal{L}_{\mathrm{mdms}}$），确保潜在空间与语言空间的一致性。
 - **推理效率**：FSS 利用因果不确定性调度，使 CMDM 仅含 114M 参数即可实现最高 125 fps 的推理速度，较自回归模式加速 5–12 倍。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与实验动机
@@ -281,14 +271,6 @@ $$
 *Table 2: Results of text-to-motion generation on SnapMoGen. The average is reported over 10 runs with 95% confidence intervals. Table 3. Results of long-horizon motion generation on HumanML3D and SnapMoGen. The motion quality of each subsequence and the smoothness of each transition are evaluated*
 
 定性结果（Figure 3–5）展示了 CMDM 生成的连续长序列——在“走路→转身→坐下”等多段文本描述的场景中，动作过渡无明显跳变或滑步伪影，而全序列扩散方法在段间边界常出现不自然的静止帧或速度突变。
-
-![[assets/figures/papers/CMDM-HP_Causal_Motion_Diffusion_Models_1abbad72e178/figures/013_Figure.jpg]]
-
-![[assets/figures/papers/CMDM-HP_Causal_Motion_Diffusion_Models_1abbad72e178/figures/014_Figure.jpg]]
-
-![[assets/figures/papers/CMDM-HP_Causal_Motion_Diffusion_Models_1abbad72e178/figures/017_Figure.jpg]]
-
-![[assets/figures/papers/CMDM-HP_Causal_Motion_Diffusion_Models_1abbad72e178/figures/018_Figure.jpg]]
 
 ![[assets/figures/papers/CMDM-HP_Causal_Motion_Diffusion_Models_1abbad72e178/figures/005_Figure_3.jpg]]
 *Figure 3: Qualitative results of long-horizon motion generation. Comparison between our CMDM and previous methods. The generated motion is continuous and seamless; for visualization purposes, we split each long sequence into shorter segments corresponding to their captions. Please refer to the videos in the supplementary materials for the complete motion sequences*
@@ -332,18 +314,8 @@ Table 5（BABEL 数据集）验证了 CMDM 在长时域动作捕捉数据上的�
 ![[assets/figures/papers/CMDM-HP_Causal_Motion_Diffusion_Models_1abbad72e178/figures/008_Table_7.jpg]]
 *Table 7: Comparison with prior compositional motion generation methods on the Multi-track timeline (MTT) dataset [32]*
 
-### 补充图表
-
 ![[assets/figures/papers/CMDM-HP_Causal_Motion_Diffusion_Models_1abbad72e178/figures/009_Table_9.jpg]]
 *Table 9: Comparison of motion-language models in MAC-VAE on HumanML3D. MPJPE is measured in millimeters*
-
-![[assets/figures/papers/CMDM-HP_Causal_Motion_Diffusion_Models_1abbad72e178/figures/003_Table_1.jpg]]
-*Table 1: Results of text-to-motion generation on HumanML3D. The average is reported over 10 runs with 95% confidence intervals. Methods marked with † were originally implemented with different motion representations and have been re-trained using our codebase to ensure a fair comparison. Bold indicates the best result, while underline denotes the second-best result*
-
-![[assets/figures/papers/CMDM-HP_Causal_Motion_Diffusion_Models_1abbad72e178/figures/010_Table_10.jpg]]
-*Table 10: Comparison of model sizes on HumanML3D. The notation (H, L, D) denotes the number of attention heads H, layers L, and hidden dimension D. Table 11. Comparison of text encoders on HumanML3D*
-
-
 
 ## 定位与知识库关联
 
@@ -404,8 +376,6 @@ CMDM 采用 **DistilBERT** 提取词级嵌入，而非基线常用的句子级 C
 ### 5. 知识库贡献总结
 
 CMDM 的核心知识贡献在于**因果扩散强制**这一训练-推理范式：在训练时对每帧施加独立噪声并因果去噪，在推理时通过帧级采样调度利用因果不确定性实现高效流式生成。该范式为顺序数据生成提供了一种新的融合思路——在保持扩散模型高质量的同时获得自回归模型的因果性，而非在两者之间做取舍。
-
-
 
 ## 原文 PDF
 

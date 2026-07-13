@@ -76,8 +76,6 @@ D²GS 建立在 3DGS（Kerbl et al., 2023）的基础框架之上，与现有稀
 
 DD-Drop 仍需手工设定的深度阈值和固定权重系数，可能无法充分捕捉复杂场景的特异性先验。IMR 指标仅关注模型间一致性，尚未考虑动态视图合成下的感知稳定性。值得探索的方向包括：自适应 Dropout 调度策略替代手工深度阈值、可学习的监督掩码改善场景特异性、以及面向动态视图合成的感知时间稳定性指标。
 
-
-
 ### 稀疏视图重建的核心矛盾
 
 3D高斯泼溅（3DGS）在稠密多视图重建中展现了卓越的渲染质量与实时性能，但当输入视图极度稀疏（如3–6张）时，其重建质量会出现严重退化。这种退化并非均匀分布，而是呈现鲜明的空间不对称性：**近场区域过拟合产生伪影，远场区域欠拟合导致细节模糊**。
@@ -103,8 +101,6 @@ D$^2$GS的核心动机源于一个关键观察：**高斯原语的过程与不�
 2. **距离感知保真度增强（DAFE）**：利用单目深度估计生成远场掩码，对远场区域施加额外的L1损失，强化欠拟合区域的监督信号。
 
 此外，稀疏视图下3DGS训练的随机性导致不同训练轮次之间渲染质量高度不一致（Figure 3左），现有图像域指标（PSNR/SSIM/LPIPS）无法捕捉这种模型间的不稳定性。为此，D$^2$GS提出基于高斯混合分布间Wasserstein距离的**模型间鲁棒性指标（IMR）**，从几何一致性角度量化重建的可靠性。
-
-
 
 ## 核心方法与创新机理
 
@@ -160,8 +156,6 @@ $$\mathrm{IMR} = \ln\left(\frac{\sum_{1 \leq i < j \leq N} S_{ij}^2}{\sum_{1 \le
 
 三个创新形成因果闭环：**DD-Drop 抑制近场过拟合（减），DAFE 增强远场监督（加），IMR 量化模型间鲁棒性（评）**。相较于 DropGaussian 的均匀随机 Dropout 和现有方法的无差别损失，D$^2$GS 首次将深度与密度信息同时编码为 Dropout 的先验引导和损失的空间权重，实现了稀疏视图下高斯原语分布的显式结构调控。
 
-
-
 D$^2$GS 的整体流程以稀疏视图图像为输入，首先通过 Structure-from-Motion（SfM）从输入图像中提取初始点云与相机位姿。随后，该初始点云被送入一个包含两个核心模块的 3DGS 训练管线中：**深度与密度引导的自适应 Dropout（DD-Drop）** 模块和**距离感知保真度增强（DAFE）** 模块。DD-Drop 模块在训练过程中根据每个高斯原语的局部密度和相机距离计算 Dropout 分数，自适应地移除近场区域中冗余的高斯原语，以抑制过拟合；DAFE 模块则利用单目深度估计器预测的深度图生成远场掩码，对远场区域施加额外的 L1 损失，从而增强欠拟合区域的监督信号。训练完成后，D$^2$GS 还引入了一个**模型间鲁棒性指标（IMR）**，通过将独立训练的多个 3DGS 模型抽象为高斯混合分布，并计算它们之间的 Wasserstein 距离来量化模型在稀疏视图条件下的训练稳定性和一致性。整个框架的输入输出流和模块关系如 Figure 2 所示。
 
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_7yvz93kBw9/figures/002_Figure_2.jpg]]
@@ -210,8 +204,6 @@ $$G_i = \sum_{j=1}^{K_i} w_{i,j} \cdot N(m_{i,j}, \Sigma_{i,j}), \quad w_{i,j} =
 $$\mathrm{IMR} = \ln\left(\frac{\sum_{1 \leq i < j \leq N} S_{ij}^2}{\sum_{1 \leq i < j \leq N} S_{ij}}\right)$$
 
 IMR 值越低，表明多次独立训练得到的模型在几何结构上越一致，即模型鲁棒性越强。
-
-
 
 ### 深度与密度引导的自适应Dropout（DD-Drop）
 
@@ -273,15 +265,8 @@ $$\mathrm{IMR} = \ln\left(\frac{\sum_{1 \leq i < j \leq N} S_{ij}^2}{\sum_{1 \le
 
 其中 $S_{ij}$ 为模型 $i$ 与 $j$ 之间的混合Wasserstein距离。IMR值越低，表明模型间一致性越强。在LLFF 3视图设定下，D²GS的IMR达到3.039，优于DropGaussian的3.205。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_7yvz93kBw9/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of Gaussian primitives and rendered images between dense views (55 views) and sparse views (3 views) settings. Overfitting occurs in the near field (green box), while underfitting appears in the far field (red box). The number of Gaussian primitives in the corresponding field is shown below the images*
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_7yvz93kBw9/figures/003_Figure_3.jpg]]
-*Figure 3: Left: The instability phenomenon of the previous method. PSNR fluctuates significantly across different training rounds, and the quality of the rendered images is highly inconsistent. Right: Calculation procedure of the IMR. The Gaussian point clouds are abstracted as Gaussian mixture distributions, and the 2-Wasserstein Distance and Optimal Transport are used*
-
-
 
 ## 实验与关键发现
 
@@ -319,10 +304,6 @@ D²GS的核心动机源自对3DGS在稀疏视图下失败模式的精确诊断�
 
 尽管D²GS在多个基准上取得一致优势，仍存在以下局限：（1）DD-Drop依赖手工设定的深度阈值（D_near、D_middle）和固定权重系数，可能无法充分捕捉复杂场景的特异性先验；（2）IMR指标仅度量模型间几何一致性，尚未覆盖动态视图合成下的感知时间稳定性。这些方向值得后续探索，但当前证据已充分支撑D²GS在稀疏视图重建中的有效性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_7yvz93kBw9/figures/004_Figure.jpg]]
-
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_7yvz93kBw9/figures/005_Figure_4.jpg]]
 *Figure 4: Qualitative Comparison on LLFF dataset (Mildenhall et al., 2019). Comparisons were conducted with 3DGS, CoR-GS, DropGaussian. Our method effectively avoids the artifacts and maintains accurate reconstructions*
 
@@ -334,20 +315,6 @@ D²GS的核心动机源自对3DGS在稀疏视图下失败模式的精确诊断�
 
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_7yvz93kBw9/figures/008_Table_4.jpg]]
 *Table 4: Ablation Study on proposed components. The ✓indicates adding the module*
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_7yvz93kBw9/figures/009_Table_5.jpg]]
-*Table 5: Ablation study on different parameters in our model. In DD-Drop module*
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_7yvz93kBw9/figures/010_Table_6.jpg]]
-*Table 6: Ablation Study on different monocular depth estimators: MiDas (Ranftl et al., 2022) with VIT-small backbone, DPT (Ranftl et al., 2021) with VIT-Hybrid backbone, and DepthAnything V2 (Yang et al., 2024)*
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_7yvz93kBw9/figures/011_Table_7.jpg]]
-*Table 7: Training time comparison on LLFF Dataset (Mildenhall et al., 2019) with 3-view*
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_7yvz93kBw9/figures/012_Table_8.jpg]]
-*Table 8: Performance comparisons of sparse-view synthesis on LLFF dataset (Mildenhall et al., 2019) with 6-view and MipNeRF360 dataset (Barron et al., 2022) with 24-view*
-
-
 
 ## 定位与知识库关联
 
@@ -403,8 +370,6 @@ D²GS 的适用边界受以下因素约束：
 3. **感知时间稳定性指标**：能否开发考虑感知时间稳定性的鲁棒性指标，用于动态视图合成场景？IMR 的 Wasserstein 距离框架可扩展至时序高斯分布序列，衡量模型在相邻帧间的输出一致性。
 
 4. **与伪视图方法的深度融合**：DD-Drop 和 DAFE 目前仅利用输入视图的深度信息。结合 FSGS 或 CoR-GS 生成的伪视图深度，能否在更极端的稀疏设置（如 2 视图）下维持重建质量？
-
-
 
 ## 原文 PDF
 

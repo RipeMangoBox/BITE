@@ -58,8 +58,6 @@ claims:
 
 这些结果表明，通过时间一致性的内在约束替代显式拓扑正则化，SGDIR 在精度、拓扑保证和计算效率三个维度上同时实现了突破。
 
-
-
 医学图像配准的核心任务是为图像对建立空间对应关系，其输出通常是一个变形场 $\phi$。在临床应用中，变形场不仅需要高精度的解剖对齐，还必须满足**拓扑保持**——即形变应当是平滑、可逆且无折叠的。数学上，这类理想形变由**微分同胚**（diffeomorphism）来刻画：一个光滑、可逆且逆映射同样光滑的映射。违反拓扑保持会导致网格折叠（表现为雅可比行列式 $|J| < 0$），这在手术导航、脑图谱映射等场景中是不可接受的。
 
 ### 现有微分同胚方法的瓶颈
@@ -88,8 +86,6 @@ $$\phi_0 = \mathrm{Id}, \qquad \phi_t \circ \phi_s = \phi_{t+s}, \quad \forall t
 - **消除显式积分方案**：通过时间嵌入架构直接输出任意 $t \in [-1,1]$ 时刻的连续变形场，无需缩放-平方递推。
 - **仅用单一正则项保证微分同胚**：用部分半群正则化 $\mathcal{L}_{\mathrm{sg}}$ 替代所有辅助约束，并数学证明该弱条件足以诱导 ODE 流。
 - **统一微分同胚与非微分同胚配准**：通过单一超参数 $\lambda$ 控制正则化强度，$\lambda=10^5$ 时强制严格微分同胚流，$\lambda=10^4$ 或更小时允许非微分同胚形变，从而在同一框架下兼顾拓扑保持与形变灵活性。
-
-
 
 ## 核心方法与创新机理
 
@@ -132,8 +128,6 @@ $$\phi_t(x; \theta) = x + t \,\mathbf{F}(x, t; I_f, I_m, \theta)$$
 半群正则化的核心作用在消融实验中得到直接验证：当 $\lambda$ 从 $10^5$ 降至 $0$ 时，OASIS 数据集上的负雅可比体素比例从 0.0% 单调上升至 1.3%，同时 Dice 从 85.90 降至 79.80（Table 6）。这证明半群正则化是拓扑保持的唯一控制因素，而非其他隐式正则效应的副产品。此外，连续时间采样训练优于离散时间采样（Figure 8），验证了时间嵌入架构与半群约束的协同效应——连续时间采样使网络在更多时间点上接受半群约束，从而更充分地学习 ODE 流结构。
 
 值得注意的是，$\lambda = 10^5$ 的 SGDIR 在整个时间轴上保持 $|J|<0\% = 0\%$，而 $\lambda = 10^4$ 的版本仅在 $t \to 1$ 时出现少量折叠（Figure 7），表明半群正则化强度与拓扑保持程度之间存在精确的单调关系，这为实际部署中的参数选择提供了清晰的指导原则。
-
-
 
 SGDIR 的整体设计围绕一个核心思想展开：**仅用一个部分半群约束，无需显式积分方案或任何辅助正则项，即可迫使网络学习一个常微分方程（ODE）的流**，从而内生地保证变形的可逆性、循环一致性与拓扑保持。整个框架由三个关键模块构成，分别对应架构设计、训练流程与推理流程（Figure 2）。
 
@@ -180,8 +174,6 @@ $$\mathcal{L} = \mathbb{E}_{(I_f, I_m) \sim \mathcal{D}, t \sim \mathrm{Uni}(0,1
 ### 与现有方法的根本差异
 
 传统微分同胚配准方法依赖两条路径保证拓扑保持：**缩放-平方积分方案**（Eq. 2–3）将速度场逐步合成为最终变形，以及**多种辅助正则项**（雅可比惩罚、平滑约束、逆一致性损失等）。SGDIR 通过部分半群正则化将这两条路径一并消除——网络在训练中被迫满足流的合成一致性，从而在推理时天然输出满足 ODE 性质的变形场，无需任何显式积分或辅助约束。这是 SGDIR 在方法学上最根本的差异点。
-
-
 
 ### 问题形式化：连续时间变形场
 
@@ -240,8 +232,6 @@ $$\mathcal{L} = \mathbb{E}_{(I_f, I_m) \sim \mathcal{D}, t \sim \mathrm{Uni}(0, 
 
 **证据强度说明**：定理 1 的数学证明在论文第 4 节给出，声称部分半群条件足以保证 ODE 流的学习；消融实验（Table 6）证实 $\lambda$ 从 $10^5$ 降至 0 时，$\vert J \vert < 0\%$ 从 0\% 逐渐上升至 1.3\%，Dice 从 85.90 降至 79.80，直接验证了半群正则化对拓扑保持的因果控制作用。
 
-
-
 ## 实验与关键发现
 
 ### 5.1 实验设置与基线方法
@@ -295,33 +285,11 @@ SGDIR 评估四个变体：两个微分同胚模型（λ = 10⁵）使用时间�
 ![[assets/figures/papers/paper_list_l2126_https_openaccess_thecvf_com_content_CVPR2026_html_Matinkia_Learning_Diff/figures/008_Table_3.jpg]]
 *Table 3: Quantitative registration results on the AbdomenCTCT dataset. The best result is shown in bold and the best competing method is presented in blue*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2126_https_openaccess_thecvf_com_content_CVPR2026_html_Matinkia_Learning_Diff/figures/005_Table_1.jpg]]
-*Table 1: Quantitative registration results on the OASIS dataset in atlas-based and inter-subject settings. The best result is shown in bold and the best competitor is presented in blue*
-
-![[assets/figures/papers/paper_list_l2126_https_openaccess_thecvf_com_content_CVPR2026_html_Matinkia_Learning_Diff/figures/009_Table_4.jpg]]
-*Table 4: Quantitative registration results on the LungCT dataset.The best result is shown in bold and the best competing result is presented in blue*
-
-![[assets/figures/papers/paper_list_l2126_https_openaccess_thecvf_com_content_CVPR2026_html_Matinkia_Learning_Diff/figures/015_Table_7.jpg]]
-*Table 7: Computational analysis of SGDIR reveals the highest inference speed and lowest memory usage compared to top performing deformable and integration-based diffeomorphic methods*
-
-![[assets/figures/papers/paper_list_l2126_https_openaccess_thecvf_com_content_CVPR2026_html_Matinkia_Learning_Diff/figures/013_Figure_7.jpg]]
-*Figure 7: The Dice score (top) and topology preservation of forward deformation (bottom) of SGDIR variants throughout time*
-
-![[assets/figures/papers/paper_list_l2126_https_openaccess_thecvf_com_content_CVPR2026_html_Matinkia_Learning_Diff/figures/014_Figure_8.jpg]]
-*Figure 8: The effect of training with discrete vs. continuous (cont) time sampling on the inference for SGDIR DiT*
-
 ![[assets/figures/papers/paper_list_l2126_https_openaccess_thecvf_com_content_CVPR2026_html_Matinkia_Learning_Diff/figures/004_Figure_4.jpg]]
 *Figure 4: Visual comparison of SGDIR performance on the AbdomenCTCT dataset with top diffeomorphic and non-diffeomorphic methods. The -diff suffix denotes the SGDIR trained with*
 
 ![[assets/figures/papers/paper_list_l2126_https_openaccess_thecvf_com_content_CVPR2026_html_Matinkia_Learning_Diff/figures/007_Figure_5.jpg]]
 *Figure 5: Visual comparisons of SGDIR performance on the ACDC dataset with overlaid segmentation masks*
-
-![[assets/figures/papers/paper_list_l2126_https_openaccess_thecvf_com_content_CVPR2026_html_Matinkia_Learning_Diff/figures/001_Figure_1.jpg]]
-*Figure 1: A performance summary of SGDIR in diffeomorphic and non-diffeomorphic settings comparing with best performing (non)diffeomorphic methods in the experiments. SGDIR shows on-par performance with top deformable models in diffeomorphic setting and outperforms them in non-diffeomorphic setting*
-
-
 
 ## 定位与知识库关联
 
@@ -388,8 +356,6 @@ SGDIR 在微分同胚设定下（λ = 10⁵）与现有微分同胚方法的对�
 3. **自适应 λ 调度**：如何设计自适应的 λ 调度机制，在训练过程中动态平衡相似度与拓扑保持？当前手动调参的方式限制了方法的易用性，自适应策略可能进一步提升不同数据集上的性能鲁棒性。
 
 4. **理论边界的实证验证**：部分半群约束仅在连续区间内施加，其在大变形极限下的理论保证是否在极端临床场景中仍能成立，需要进一步的实证验证。
-
-
 
 ## 原文 PDF
 

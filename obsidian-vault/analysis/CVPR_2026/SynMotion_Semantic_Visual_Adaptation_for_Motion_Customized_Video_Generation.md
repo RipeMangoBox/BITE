@@ -56,8 +56,6 @@ claims:
 
 > **待验证**：代码与模型权重尚未公开；大规模罕见动作上的扩展性、多动作组合定制能力及在其他视频生成基座上的迁移效果仍需进一步探索。
 
-
-
 ### 视频运动定制：从主体泛化到运动迁移
 
 给定少量展示特定运动模式的示例视频，运动定制（Motion Customization）要求生成模型将该运动迁移至任意新主体，同时保持主体的视觉特征与运动的时间一致性。这一任务的核心挑战在于：模型必须同时理解“谁在动”与“怎么动”，并将两者在生成过程中解耦控制。
@@ -71,8 +69,6 @@ claims:
 ### 本文动机：语义-视觉协同定制
 
 针对上述瓶颈，本文提出 **SynMotion**，其核心动机是：有效的运动定制需要**语义理解**与**视觉适应**的协同作用。语义层面负责将主体与运动显式解耦，视觉层面负责增强运动特征的时间一致性建模，两者通过专门设计的训练策略防止相互干扰。这一思路将运动定制从单一层级的“特征注入”或“嵌入学习”范式，推进到语义-视觉联合自适应的新框架。
-
-
 
 ## 核心方法与创新机理
 
@@ -93,8 +89,6 @@ SynMotion 的核心创新在于将运动定制的瓶颈从单一层级建模推�
 直接对所有可学习参数进行端到端优化会导致主体与运动嵌入相互干扰——模型倾向于将主体外观信息泄漏到运动嵌入中，从而损害主体泛化能力。SynMotion 提出**嵌入特定交替训练策略**：在每个训练步，以概率 $\alpha = 0.75$ 采样真实用户提供的示例视频，联合优化运动嵌入和主体嵌入；以概率 $1 - \alpha = 0.25$ 采样**主体先验视频（SPV）**——即同一主体执行无关动作的合成视频——并冻结运动嵌入，仅优化主体嵌入。SPV 阶段的正则化迫使主体嵌入学习与运动无关的主体特征，而运动嵌入则仅在真实示例阶段吸收运动信息。这种交替机制从训练动力学层面实现了主体与运动的彻底解耦。
 
 三个创新槽位形成因果闭环：双嵌入分解提供了可独立操作的语义表示空间，运动适配器在视觉层级补足了语义嵌入无法覆盖的时序细节，而嵌入特定训练策略则确保了两个空间的学习过程互不污染。消融实验（Figure 5）验证了每个组件的必要性——移除任一项均导致运动定制效果的显著退化。
-
-
 
 SynMotion 的整体流程围绕“语义引导 + 视觉适应”双通道展开，目标是在冻结的视频生成主干上，仅通过少量示例视频即可将特定运动模式迁移到任意新主体上。图 2 给出了完整的 pipeline 示意。
 
@@ -119,15 +113,8 @@ $$e' = e + \mathcal{Z}(\mathcal{R}(e))$$
 **生成流程**  
 推理时，用户只需提供少量示例视频和新的主体提示，MLLM 编码后经双嵌入分解与精炼器融合，条件嵌入 $e'$ 与运动适配器协同引导冻结的 MM-DiT 完成视频去噪生成。整个过程中，视频生成主干保持冻结，仅需训练轻量的嵌入残差、精炼器和运动适配器，参数高效且收敛迅速。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l15_https_openaccess_thecvf_com_content_CVPR2026_html_Tan_SynMotion_Semantic/figures/002_Figure_2.jpg]]
 *Figure 2: The pipeline of SynMotion. Given a prompt in the form of \< subject, motion >, we use a MLLM to obtain the corresponding text embedding, which is then decomposed into a subject embedding*
-
-![[assets/figures/papers/paper_list_l15_https_openaccess_thecvf_com_content_CVPR2026_html_Tan_SynMotion_Semantic/figures/001_Figure_1.jpg]]
-*Figure 1: Generated customization results of our SynMotion. Given a few exemplar videos demonstrating a common motion, SynMotion learns motion pattern and successfully synthesizes diverse subjects performing the same action in both T2V and I2V setting*
-
-
 
 SynMotion 的核心设计围绕一个关键洞察展开：有效的运动定制必须同时依赖**语义层面的解耦理解**与**视觉层面的时序适应**。为此，方法在冻结的视频生成主干上引入三个紧密协作的模块：双嵌入语义理解、运动感知适配器，以及嵌入特定交替训练策略。以下逐一剖析其结构与作用机理。
 
@@ -171,8 +158,6 @@ $$\mathcal{L} = \mathbb{E}_{\mathcal{E}(x),\,\epsilon \in \mathcal{N}(0,1),\,e_\
 
 SPV 的引入起到了正则化作用：它迫使主体嵌入学习到与运动无关的主体表征，从而防止运动嵌入被主体信息“污染”。这一策略是 SynMotion 实现“运动精准、主体多样”的关键机制。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -211,8 +196,6 @@ SPV 的引入起到了正则化作用：它迫使主体嵌入学习到与运动�
 
 > **注意**：上述失败模式与局限部分基于方法设计的合理推断，论文原文未提供具体的失败案例分析，建议在正式发表后结合补充材料进行人工核验。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l15_https_openaccess_thecvf_com_content_CVPR2026_html_Tan_SynMotion_Semantic/figures/003_Figure_3.jpg]]
 *Figure 3: Qualitative comparisons with state-of-the-art motion customization methods*
 
@@ -221,11 +204,6 @@ SPV 的引入起到了正则化作用：它迫使主体嵌入学习到与运动�
 
 ![[assets/figures/papers/paper_list_l15_https_openaccess_thecvf_com_content_CVPR2026_html_Tan_SynMotion_Semantic/figures/006_Table_1.jpg]]
 *Table 1: Quantitative comparison results. The best results for each column are bold*
-
-![[assets/figures/papers/paper_list_l15_https_openaccess_thecvf_com_content_CVPR2026_html_Tan_SynMotion_Semantic/figures/008_Table_2.jpg]]
-*Table 2: User study results*
-
-
 
 ## 定位与知识库关联
 
@@ -283,8 +261,6 @@ SynMotion 的双嵌入分解 + 运动适配器范式为以下方向提供了可�
 - **多运动组合定制**：可将单运动嵌入扩展为多个运动嵌入的联合优化。
 - **跨模型迁移**：运动适配器的低秩设计使其可插入其他 DiT 架构的视频生成模型。
 - **交互式运动编辑**：解耦的主体-运动嵌入天然支持独立编辑主体或运动属性。
-
-
 
 ## 原文 PDF
 

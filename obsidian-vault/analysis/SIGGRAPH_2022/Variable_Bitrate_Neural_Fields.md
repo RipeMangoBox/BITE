@@ -55,8 +55,6 @@ claims:
 
 方法的局限性包括：训练时软化索引矩阵在6-bit位宽下导致峰值内存高达18 GB；压缩后的几何表示（SDF）会在法线方向引入可见伪影（Fig. 5）；未采用熵编码以保持流式传输兼容性。
 
-
-
 ### 神经场与特征网格的兴起
 
 神经场（Neural Fields）已成为三维场景表示的核心范式。以 **NeRF**（Mildenhall et al., ECCV 2020）为代表的全局方法将整个场景编码进一个多层感知机（MLP）的权重中，通过可微体积渲染实现高质量的新视角合成。然而，这类方法的表达能力受限于 MLP 容量，且查询效率较低。
@@ -90,8 +88,6 @@ claims:
 
 在 NGLOD-NeRF 基线上，VQ-AD 将特征网格存储从约 20 MB 压缩至 **0.33 MB**（4-bit 索引，61.3 倍压缩），PSNR 仅下降约 2.6 dB，SSIM 仍超过 0.94；若使用 6-bit 索引，存储为 0.49 MB（40.9 倍压缩），PSNR 下降仅约 1.96 dB（见 Table 2）。这一结果首次证明了：**特征网格可以在保持实用视觉质量的同时，被压缩到适合流式传输的量级**。
 
-
-
 ## 核心方法与创新机理
 
 VQ-AD 的核心创新在于将神经场的特征网格压缩问题转化为一个**端到端可学习的向量量化自解码器**框架。其关键洞察是：通过将每个网格顶点的完整浮点特征向量替换为一个低比特整数索引和一个共享码本，并利用可微分的软化索引机制，使压缩表示能够针对下游任务（如新视角合成）进行联合优化，从而在维持视觉质量的同时实现两个数量级的存储压缩。
@@ -121,8 +117,6 @@ $$\underset{D, C, \theta}{\arg\min} \ \mathbb{E}_{x, y} \left\| \psi_{\theta}\le
 **学习索引优于静态随机索引**：与基于哈希的静态随机索引方法（Müller et al., 2022, Instant NGP）相比，VQ-AD 通过学习索引实现了自适应碰撞解决，使得在更小码本尺寸下仍能获得更高重建质量。在近似压缩率下，4 比特学习索引（29.60 PSNR）显著优于 12 比特哈希索引（26.66 PSNR）（Table 3, Fig. 6）。
 
 **天然支持渐进式流式传输**：由于压缩后的多分辨率八叉树在所有层级都存储了数据，VQ-AD 天然支持按广度优先顺序流式传输，仅需约 10 kB 数据即可显示粗糙细节层次（Fig. 2），实现了可变比特率的细节层次渲染。
-
-
 
 VQ-AD 的核心思路是将特征网格的压缩问题转化为一个**端到端可学习的向量量化自解码器**。整个 pipeline 围绕一个关键替换展开：将每个网格顶点存储的完整浮点特征向量（例如 16 维 × float32 = 64 bytes/顶点）替换为一个低比特整数索引和一个共享的码本（codebook），从而将存储需求压缩两个数量级，同时保持可微渲染下的重建质量。
 
@@ -157,15 +151,11 @@ VQ-AD 的核心思路是将特征网格的压缩问题转化为一个**端到端
 
 训练时使用软化索引（softmax + 直通估计器）保证梯度流动，但软化矩阵 $C$ 的尺寸为 $m \times 2^b$，在 $b=6$ 时导致训练峰值内存高达 18 GB，限制了更高比特宽度的实验。推理时切换为硬索引，速度与未压缩基线相当（约 15 FPS），且可通过缓存优化进一步提升。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2206_07707/figures/008_Figure_5.jpg]]
 *Figure 5: Ours (72 kB) Fig. 5. Compressing geometry. We show how VQ-AD can compress signed distance functions as in NGLOD. Our method introduces visible artifacts in the normals, however it does result in a significant bitrate reduction. We also compare against a quantized Draco mesh which has similar bitrates when entropy coded (2 MB as the decompressed binary .ply mesh)*
 
 ![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2206_07707/figures/001_Figure_1.jpg]]
 *Figure 1: Compressed streaming level of detail. Using our vector-quantized auto-decoder (VQ-AD) method, we compactly encode a 3D signal in a hierarchical representation which can be used for progressive streaming and level of detail (LOD). Two example neural radiance fields are shown after streaming from 5 to 8 levels of their underlying octrees. The sizes shown are the total bytes streamed; that is, the finer LODs include the cost of the coarser ones. Prior work such as NeRF [Mildenhall et al. 2020] requires ≈ 2.5 MB to be transferred before anything can be drawn*
-
-
 
 ### 问题形式化：将压缩纳入特征网格学习
 
@@ -213,8 +203,6 @@ $$
 
 压缩表示被组织在稀疏八叉树中，所有细节层次的数据同时存储。查询点 $\boldsymbol{x}$ 的特征通过多分辨率插值获得。由于码本和索引天然支持不同 LOD 的独立解码，该结构支持渐进式流式传输：仅需传输约 10 kB 的粗糙层级数据即可显示初始结果（Fig. 2），随后逐步加载更精细层级。
 
-
-
 ## 实验与关键发现
 
 ### 核心结果：压缩率与重建质量的权衡
@@ -247,18 +235,11 @@ VQ-AD 在符号距离函数（SDF）压缩上也能显著降低比特率（Fig. 
 
 所有对比实验均采用相同的 NGLOD-NeRF 架构和超参数，确保压缩方案是唯一变量。报告结果均未使用熵编码——若采用 gzip 可额外压缩 4-7%，但熵编码会破坏流式传输能力（Section 8.2）。训练时软化索引矩阵 $C \in \mathbb{R}^{m \times 2^b}$ 的尺寸随比特位宽指数增长，6 比特时训练峰值内存高达 18 GB（Section 8.1.2），这限制了更高位宽（如 8-bit）的实验。压缩模型的推理速度与未压缩基线相当（约 15 FPS），预估可通过缓存优化进一步提升（Section 8.1.1）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2206_07707/figures/007_Figure_4.jpg]]
-*Figure 4: Ours (bw-4) Fig. 4. Post-Process vs. Learned Vector Quantization. We compare applying k-means vector quantization on the feature grid as a post-processing after training, vs. learning vector quantization end-to-end with the same number of codebook entries. We see the k-means quantization has visible discoloration, whereas ours preserves the visual quality*
-
 ![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2206_07707/figures/009_Figure_6.jpg]]
 *Figure 6: Ours (learned,4 bitwidth) Fig. 6. Qualitative comparison of static and learned indices. We qualitatively compare a hash approach with 12 bitwidth codebooks and our learned indices with 4 bitwidth codebooks which have similar compression rates. We see that our learned indices are able to reconstruct with less noise*
 
 ![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2206_07707/figures/010_Table_3.jpg]]
 *Table 3: Comparison between random indices and learned indices. This table shows the effects of learning codebook indices with VQAD at 120 epochs with different quantization bitwidths (bw). To highlight the tradeoff, we list the size of the indices ?? and codebook ?? separately. We see that even when storing indices, we are able to achieve higher quality than the hash-based approach*
-
-
 
 ## 定位与知识库关联
 
@@ -335,8 +316,6 @@ VQ-AD 留下的研究缺口包括：
 - **码本优化替代方案**：能否利用可微渲染的梯度直接优化码本，而无需软化索引，例如使用直通估计器的变体？
 
 这些问题的解决将推动压缩神经场从“演示级”走向“实用级”，特别是在移动设备、Web 端和带宽受限的流式应用中。
-
-
 
 ## 原文 PDF
 

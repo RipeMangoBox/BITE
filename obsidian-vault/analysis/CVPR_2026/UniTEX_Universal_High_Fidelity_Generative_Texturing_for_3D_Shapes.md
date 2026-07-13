@@ -60,8 +60,6 @@ UniTEX 是一个两阶段三维纹理生成框架。第一阶段利用经 LoRA �
 
 在艺术家创建网格上，UniTEX 的 CMMD 指标降至 0.826（Paint3D 为 1.196），FIDCLIP 降至 16.03（Paint3D 为 20.52）。在更具挑战性的生成式网格上，UniTEX 的用户偏好率达到 **65.91%**，远超 Paint3D 的 6.82% 及其他基线方法。消融实验证实，纹理函数监督（TFS）相比仅表面监督，将 PSNR 从 25.81 提升至 27.01，UV PSNR 从 20.31 提升至 20.99，验证了完整体积监督的增益。
 
-
-
 ### 三维纹理生成的现状与瓶颈
 
 为三维形状生成高质量纹理是计算机图形学与三维内容创作中的核心任务，其应用涵盖游戏、影视、虚拟现实等众多领域。近年来，基于扩散模型的二维图像生成技术取得了突破性进展，推动了三维纹理生成方法的大量涌现。这些方法通常遵循一个两阶段范式：首先生成多视图图像，然后将这些图像“映射”到三维网格表面以形成完整纹理。
@@ -79,8 +77,6 @@ UniTEX 是一个两阶段三维纹理生成框架。第一阶段利用经 LoRA �
 针对上述瓶颈，UniTEX 提出了一条根本性的替代路径：**完全绕过 UV 空间，直接在统一的三维函数空间中进行纹理操作**。核心洞察在于：将纹理从仅定义在表面的信号，扩展为覆盖整个三维空间的连续函数——类似于有符号/无符号距离场（SDF/UDF）对几何的表示方式。这种被称为 **Texture Functions (TFs)** 的表示天然与网格拓扑无关，从而从根本上消除了 UV 布局差异带来的泛化障碍。
 
 基于这一表示，UniTEX 设计了一个基于 Transformer 架构的 **Large Texturing Model (LTM)**，在体积空间中直接回归完整纹理，并通过密集的体积监督信号进行训练。这一设计使得模型能够学习到与几何结构内在关联的纹理先验，而非记忆特定的 UV 展开模式，从而在艺术家创建网格和生成式网格上均能输出完整、平滑且贴合几何形状的纹理。
-
-
 
 ## 核心方法与创新机理
 
@@ -133,8 +129,6 @@ UniTEX 通过三个相互耦合的 changed slots 实现了对 UV 范式的系统
 | 细化阶段模型 | UV inpainting 扩散模型 | Large Texturing Model (Transformer 回归) | 体积空间直接推理 |
 | 训练监督信号 | 仅表面点颜色监督 | 完整体积纹理函数监督 | 更完整的纹理学习 |
 
-
-
 UniTEX 采用两阶段纹理生成框架，核心设计动机在于**绕过 UV 参数化固有的拓扑模糊性**——基于 UV inpainting 的方法（如 **Paint3D** (Zeng et al., CVPR 2024)、**TexGEN** (Yu et al., TOG 2024)）在分布外的生成式网格上会产生碎片化、不完整的纹理（见 Figure 2）。UniTEX 通过将纹理建模为连续三维体积场来消除对特定 UV 布局的依赖。
 
 ### 流水线概览
@@ -167,8 +161,6 @@ LTM 的核心机制是在三维函数空间中直接回归**完整的纹理函�
 | 仅表面点监督导致纹理不完整 | 扩展监督信号至表面薄壳区域 | 纹理函数监督 (TFS) |
 
 消融实验证实了上述设计的有效性：纹理函数监督将 PSNR 从 25.81 提升至 27.01，UV PSNR 从 20.31 提升至 20.99（Table 4），并产生更完整、高质量的纹理（Figure 9）。在生成网格上，UniTEX 的用户偏好率达 65.91%，显著高于 Paint3D 的 6.82%（Table 1），验证了绕过 UV 空间的体积回归策略在泛化能力上的决定性优势。
-
-
 
 ### 纹理函数 (Texture Functions, TF)
 
@@ -206,14 +198,6 @@ $$
 
 在第一阶段的多视图纹理生成中，UniTEX 对 DiTs (Flux) 进行 LoRA 微调。为降低训练成本，提出 Drop Training 策略：在每个训练步中仅保留部分令牌（如 50%），扩散 Transformer 仅基于这些选中令牌进行条件生成。表 3 显示，该策略在 MV 纹理生成任务中节省 22.5% 显存（69.2GB → 53.6GB），训练速度提升 44.5%（38.76s/it → 21.50s/it），且生成质量与全令牌微调相当。
 
-### 补充图表
-
-
-![[assets/figures/papers/paper_list_l2619_https_arxiv_org_abs_2505_23253/figures/005_Figure_5.jpg]]
-*Figure 5: Visualized example of the Texture Functions (TF) for represent the texture for the whole 3D space. (a) A textured mesh. (b) Unsigned Distance Function (UDF) samples representing 3D geometry. (c) Inspired by UDF, we define texture as a continuous function over 3D space (details in Sec. 3.3.2), enabling volumetric texture representation*
-
-
-
 ## 实验与关键发现
 
 ### 主结果：纹理质量与泛化性
@@ -238,17 +222,11 @@ UniTEX 在两类网格上均展现出显著优势：艺术家创建的规整网�
 
 论文未明确报告失败案例。从方法设计推断，潜在风险包括：纹理函数在远离表面的空间区域可能产生无意义的颜色外推；Large Texturing Model 依赖多视图生成质量，当第一阶段生成图像出现严重多视图不一致时，回归的纹理函数可能继承这些伪影。上述推断需通过进一步实验验证。
 
-### 补充图表
-
-
 ![[assets/figures/papers/paper_list_l2619_https_arxiv_org_abs_2505_23253/figures/007_Table_1.jpg]]
 *Table 1: Quantitative comparison between artist-created and generative mesh on different texturing methods*
 
 ![[assets/figures/papers/paper_list_l2619_https_arxiv_org_abs_2505_23253/figures/008_Figure_7.jpg]]
 *Figure 7: Qualitative comparison of refinement stage across different methods. In the first case, automatically unwrapping makes fragmented and noisy UV layout on the face. UV-based methods such as Paint3D and TexGen struggle with these (blue boxs). In contrast, our method generates smooth and coherent textures that more respect to geometry (glasses in the first row and the ribcage and emblem in the second row)*
-
-![[assets/figures/papers/paper_list_l2619_https_arxiv_org_abs_2505_23253/figures/012_Table_2.jpg]]
-*Table 2: Refinement Stage Comparision, PSNRuv∗ indicates the PSNR calculated exclusively in the invisible regions, whereas PSNRuv is computed over the entire set of valid UV regions*
 
 ![[assets/figures/papers/paper_list_l2619_https_arxiv_org_abs_2505_23253/figures/014_Figure_9.jpg]]
 *Figure 9: Visualization of the effectiveness of Texture Function Supervision (TFS). Under identical training iterations, models trained with TFS yield significantly higher-quality and completed textures compared to those supervised solely on surface signals. (Best viewed when zoomed in)*
@@ -258,13 +236,6 @@ UniTEX 在两类网格上均展现出显著优势：艺术家创建的规整网�
 
 ![[assets/figures/papers/paper_list_l2619_https_arxiv_org_abs_2505_23253/figures/016_Table_4.jpg]]
 *Table 4: Ablation studies on Texture function*
-
-![[assets/figures/papers/paper_list_l2619_https_arxiv_org_abs_2505_23253/figures/001_Figure_1.jpg]]
-*Figure 1: UniTEX generates high-quality and complete textures for both artist-created low-polygon mesh (the van shell) and generative high-polygon meshes (robots, toy bear, bust and roadsign)*
-
-![[assets/figures/papers/paper_list_l2619_https_arxiv_org_abs_2505_23253/figures/006_Figure.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -303,8 +274,6 @@ UniTEX 的方法论转折在于提出 **Texture Functions (TFs)**——受无符
 2. **纹理编辑与局部控制**：UV 参数化的一个优势是支持直观的二维编辑，UniTEX 的体积表示是否支持类似的局部纹理编辑操作，论文未予讨论。
 3. **与生成式几何的联合优化**：当前 UniTEX 假定输入网格固定，未来是否可将纹理函数与几何表示（如 SDF、NeRF）统一建模，实现几何-纹理的端到端生成，值得探索。
 4. **训练数据依赖性**：TFS 需要从纹理网格中提取体积监督信号，该方法对训练数据质量和多样性的敏感度尚未量化评估。
-
-
 
 ## 原文 PDF
 

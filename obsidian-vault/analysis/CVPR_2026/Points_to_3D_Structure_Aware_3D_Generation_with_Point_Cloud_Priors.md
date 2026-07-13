@@ -149,8 +149,6 @@ $$\mathcal{L}_{CFM} = \mathbb{E}_{t, \mathbf{q}_{\mathrm{gt}}, \epsilon} \left\|
 
 整个框架的核心创新在于**将点云先验显式注入潜空间**，而非通过注意力机制间接整合几何信息。这使得可见区域的几何能够被忠实保留（可见区域 F-score 达 0.998，CD 仅 0.007），同时修复网络在不可见区域进行合理补全。两阶段采样策略是平衡结构一致性与边界平滑性的关键：纯修复（50步）会导致边界区域产生几何空洞，而引入细化阶段后边界质量显著提升（Table 4, Figure 6）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2572_https_arxiv_org_abs_2603_18782/figures/001_Figure_1.jpg]]
 *Figure 1: We introduce explicit 3D point cloud priors into 3D generation framework, given a pre-existing point cloud or a feed-forward point cloud prediction from image input, our model generates high-quality 3D assets that faithfully preserve the observed structure while plausibly completing unobserved regions with coherent geometry*
 
@@ -207,11 +205,6 @@ $$
 
 这一分阶段策略的核心洞见在于：纯修复（全程保持掩码）会在边界区域产生几何空洞，而全程标准去噪则会丢失点云先验的硬约束。两阶段结合能够在忠实保留可见几何的同时，实现边界区域的平滑过渡。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2572_https_arxiv_org_abs_2603_18782/figures/003_Figure_3.jpg]]
-*Figure 3: Training data processing. We preserve the visible portion of the complete point cloud and convert it into training inputs*
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -266,8 +259,6 @@ Figure 4展示了单物体生成的定性对比。使用显式点云先验时，
 2. **边界修复的局限**：虽然两阶段采样缓解了边界空洞问题，但在极端遮挡或复杂拓扑变化场景下，修复边界仍可能出现不自然的过渡。
 3. **场景泛化未验证**：当前实验集中在物体和室内场景，对于大规模室外场景或高度动态复杂场景的泛化性尚未验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2572_https_arxiv_org_abs_2603_18782/figures/004_Table_1.jpg]]
 *Table 1: Comparison on single-object generation on Toy4K dataset. We showcase the performance of our method in two scenarios: one where explicit point cloud priors are provided, and another where point cloud are inferred from condition images using VGGT [66]*
 
@@ -276,16 +267,6 @@ Figure 4展示了单物体生成的定性对比。使用显式点云先验时，
 
 ![[assets/figures/papers/paper_list_l2572_https_arxiv_org_abs_2603_18782/figures/010_Table_4.jpg]]
 *Table 4: Ablation study. We evaluate the number of inpainting steps (Inp.) and refinement steps (Ref.) in our sampling strategy*
-
-![[assets/figures/papers/paper_list_l2572_https_arxiv_org_abs_2603_18782/figures/005_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l2572_https_arxiv_org_abs_2603_18782/figures/008_Figure_5.jpg]]
-*Figure 5: Scene-level generation on 3D-FRONT. The input point cloud priors setting is the same as in Fig. 4*
-
-![[assets/figures/papers/paper_list_l2572_https_arxiv_org_abs_2603_18782/figures/007_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l2572_https_arxiv_org_abs_2603_18782/figures/020_Table_5.jpg]]
-*Table 5: Comparison on single-object generation with 3 views input on Toy4K dataset*
 
 ## 定位与知识库关联
 

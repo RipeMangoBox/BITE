@@ -69,8 +69,6 @@ InterActHuman 在方法谱系中处于**扩散Transformer + 显式布局引导**
 
 当前方法的掩码预测在多人物严重重叠时可能不准确，且掩码质量受限于 VAE 的低分辨率潜在空间。训练数据以 2-3 人对话场景为主，向更多人数扩展时虽性能稳定，但尚未充分优化。此外，模型依赖于 T2V 先验，当文本提示与训练分布偏差较大时可能产生不自然内容。开放问题包括：如何改进掩码预测以处理高重叠区域、如何缓解低分辨率潜在空间带来的边界精度损失，以及能否将布局条件绑定扩展到文本等其他模态。
 
-
-
 ### 问题背景
 
 音频驱动的人体动画旨在根据语音信号生成逼真的人物视频，使其口型、表情和肢体动作与音频内容同步。近年来，扩散模型在该领域取得了显著进展，涌现出**DiffTED**（Hogue et al., 2024）、**DiffGest + Mimiction**（Zhu et al., 2023; Zhang et al., 2024）、**CyberHost**（Lin et al., 2024）以及**OmniHuman**（Lin et al., 2025a）等方法。然而，这些工作主要聚焦于**单人场景**——即给定一段音频和一张参考人物图像，生成该人物说话的视频。
@@ -99,8 +97,6 @@ InterActHuman的动机在于打破上述困局：**在扩散Transformer中引入
 - **布局控制机制**：从隐式学习条件与区域的对应关系（通过注意力机制）转变为显式预测逐身份时空掩码，并跨扩散步缓存迭代优化。
 
 通过这一设计，InterActHuman不仅能够处理多说话人对话场景，还支持多概念定制（如人物换装、人-物交互、动漫风格等），实现了统一的音频驱动多概念生成框架。
-
-
 
 ## 核心方法与创新机理
 
@@ -141,13 +137,8 @@ InterActHuman 在三个关键维度上对基线方法进行了根本性改造：
 
 当多人物重叠严重时，掩码预测可能不准确，导致音频分配错误（Figure 5）。此外，掩码质量受限于预训练 VAE 的低分辨率潜在空间，可能影响边界精度。当前训练数据主要为 2-3 人的对话场景，扩展到更多人数时虽性能稳定（Table 13），但尚未针对更大规模进行优化。
 
-
-
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_rJilRU8D3c/figures/002_Figure_2.jpg]]
 *Figure 2: Illustration of our framework, which adaptively predicts masks as the spatial guidance of audio condition injection. In training, we train the mask predictor (cross-attn w/ MLP) with mask loss; in inference, we collect mask predictions to cache and leverage masks predicted from the last denoising step (t − 1) to guide the audio cross-attn in the current denoising step (t)*
-
-![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_rJilRU8D3c/figures/001_Figure_1.jpg]]
-*Figure 1: Video frames generated from audio and multi-concept reference images (human heads/full bodies, objects, scenes) display rich, audio-matched expressions. Our method enables compositional generation including outfit changes, human–object interactions, anime styles, dialogues even without a start frame. Red and green wave icons denote speaking and listening, respectively*
 
 InterActHuman 的整体 pipeline 围绕一个核心因果机制构建：**在扩散 Transformer 的去噪过程中，通过显式预测各身份的空间布局掩码，打破条件全局注入的“鸡与蛋”困局，实现音频与说话人的精确时空绑定**。
 
@@ -185,8 +176,6 @@ pipeline 由五个关键模块串联构成，数据流遵循“压缩→去噪�
 -   **局部模态**（音频）：通过预测掩码绑定到特定身份区域，仅在掩码覆盖的视频令牌中注入对应音频特征，避免多说话人场景下的音频串扰。
 
 这种设计使得模型在无需真实布局标注的情况下，能够自动推断各身份的空间位置，并据此精确分配音频条件。消融实验（Table 4）表明，预测动态掩码在 Sync-D（6.670）和 FVD（22.881）上均显著优于全局音频注入（Sync-D 9.482, FVD 33.895）和固定掩码（Sync-D 7.068, FVD 40.239），验证了显式布局对齐对唇同步和视频质量的关键作用。掩码预测器的开销极小（仅增加 56M 参数，每额外参考图像增加约 0.4 秒推理时间），但带来了显著的性能提升。
-
-
 
 ### 整体架构
 
@@ -228,8 +217,6 @@ $$\mathbf{h}^v \gets \mathbf{h}^v + m_i \odot \mathbf{p}_i + (1 - m_i) \odot \ma
 
 掩码预测器仅增加约56M参数（相对于7B的DiT主干），每个额外参考图像在每DiT块上仅增加约0.013秒推理时间。完整模型在3个参考图像下的总推理时间为8.9秒（Table 5），表明该模块在几乎不牺牲效率的前提下实现了显著的性能增益。
 
-
-
 ## 实验与关键发现
 
 ### 主要结果
@@ -238,26 +225,19 @@ InterActHuman 在音频驱动的多人物动画和多概念视频定制两项核
 
 **音频驱动多人物动画**：Table 1 的定量对比显示，本方法在多人物测试集上取得了最低的 FVD（22.881），显著优于商业方案 Kling1.6+Lip-sync（33.555）和开源方案 OmniHuman（27.048）。在唇同步指标 Sync-D 上，本方法（6.670）同样优于使用真实固定掩码的 OmniHuman（7.068），表明预测的动态掩码在无真实布局信息的情况下，能够更精确地实现音频-说话人的空间绑定。在单人物测试集上，本方法取得最高的 HKV（59.635），验证了方法在保持视频质量方面的一致性。
 
-
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_rJilRU8D3c/figures/005_Table_1.jpg]]
 *Table 1: Quantitative comparisons with audio-conditioned full-body animation baselines*
 
 **多概念视频定制**：Table 3 的结果表明，本方法在主体一致性指标上全面领先。CLIP-I 达到 0.744，DINO-I 达到 0.533，分别比最强基线 Phantom* 高出 0.041 和 0.057。面部细节保持方面，Face-Arc（0.598）和 Face-Cur（0.600）同样为最优，说明显式的布局预测机制有效防止了多概念场景下的身份混淆。
-
 
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_rJilRU8D3c/figures/007_Table_3.jpg]]
 *Table 3: Quantitative comparison of subject consistency, prompt following and visual quality. ⋆ means publicly available version with Wan2.1-1.3B*
 
 **用户偏好研究**：Table 2 展示了更具说服力的人类评估结果。在音频驱动任务上，本方法获得平均分 2.48（OmniHuman 为 1.82），Top-1 选择率达 59.9%；在多概念定制任务上，平均分 4.01（Vidu2.0 为 3.40），Top-1 选择率 49.4%。两项任务均显著领先，且优势在统计上具有高置信度（confidence ≥ 0.98）。
 
-
-![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_rJilRU8D3c/figures/006_Table_2.jpg]]
-*Table 2: User preference evaluation. ⋆ means publicly available version with Wan2.1-1.3B*
-
 ### 消融实验
 
 消融实验系统性地验证了布局对齐音频注入的核心设计选择（Table 4）。
-
 
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_rJilRU8D3c/figures/009_Table_4.jpg]]
 *Table 4: Ablation study on audio-driven multi-person animation methods*
@@ -270,12 +250,10 @@ InterActHuman 在音频驱动的多人物动画和多概念视频定制两项核
 
 **掩码缓存的作用**：Table 12 专门消融了推理时的掩码缓存策略。移除缓存后，Sync-D 从 6.921 急剧退化至 11.046，证实了交错掩码预测策略（上一步掩码指导当前步音频注入）是解决推理时无真实布局这一“鸡与蛋”困局的必要条件。
 
-
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_rJilRU8D3c/figures/016_Table_12.jpg]]
 *Table 12: Mask cache significantly improves multi-person lip sync*
 
 **计算开销分析**：Table 5 显示，掩码预测器仅增加约 56M 参数（相对于 7B 的 DiT 主干），每增加一个参考图像仅增加约 0.4 秒推理时间。在 3 个参考图像的配置下，完整推理时间为 8.9 秒，表明方法在性能与效率之间取得了良好平衡。
-
 
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_rJilRU8D3c/figures/010_Table_5.jpg]]
 *Table 5: Runtime and parameters versus number of reference images*
@@ -290,25 +268,7 @@ InterActHuman 在音频驱动的多人物动画和多概念视频定制两项核
 
 3. **人数扩展的泛化性**：训练数据主要包含 2-3 人的对话场景。Table 13 显示扩展到 4-5 人时性能保持稳定（Sync-D 6.608 vs. 6.670），但尚未针对更大规模人群进行专门优化。
 
-
-![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_rJilRU8D3c/figures/017_Table_13.jpg]]
-*Table 13: Stable performance when scaling to 4–5 subjects*
-
 4. **文本先验偏差**：由于基座模型为 T2V 扩散模型，当文本提示与训练数据分布偏差较大时，可能生成不自然的内容。这一局限源于基座模型的先验，而非本方法特有的问题。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_rJilRU8D3c/figures/013_Table_6.jpg]]
-*Table 6: CelebV-HQ: higher is better for IQA/ASE/Sync-C; lower is better for FID*
-
-![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_rJilRU8D3c/figures/014_Table_7.jpg]]
-*Table 7: RAVDESS: higher is better for IQA/ASE/Sync-C; lower is better for FID*
-
-![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_rJilRU8D3c/figures/015_Table_8.jpg]]
-*Table 8: Qualitative capability comparison. ✓: supported; x: not supported*
-
-
-
 
 ## 定位与知识库关联
 
@@ -377,8 +337,6 @@ InterActHuman 直接对标的是**OmniHuman**（Lin et al., 2025a），后者代
 - **隐式方法的潜在超越**：当前显式掩码方案在可控性上占优，但隐式匹配方案（如更强的注意力机制或可学习的空间绑定）是否可能在未来以更低的计算开销达到同等或更优的性能？
 
 - **跨模态布局绑定**：布局条件机制是否可以扩展到其他模态？例如将文本描述绑定到特定空间区域，实现更精细的文本引导视频生成。
-
-
 
 ## 原文 PDF
 

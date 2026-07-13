@@ -60,8 +60,6 @@ Latte3D的核心洞察是：**将3D知识系统性地引入摊销优化的全过
 
 **主要局限**：组合提示下常退化为单一对象；薄特征几何细节可能因阶段间体积-表面转换而丢失；第二阶段几何冻结限制了进一步几何调整。
 
-
-
 ### 文本到3D生成范式演进
 
 文本到3D生成旨在从自然语言描述中创建三维数字资产，这一能力对游戏开发、影视制作、AR/VR内容创作等领域具有重要应用价值。早期方法以**DreamFusion**（Poole et al., 2022）为代表，开创性地提出了分数蒸馏采样（Score Distillation Sampling, SDS）范式——利用预训练的2D扩散模型作为可微分的图像先验，通过迭代优化将随机初始化的3D表示（如NeRF）逐步塑形为目标物体。这一优化过程通常需要数十分钟到数小时的单次推理时间，且每个新提示词都需要从头开始优化。
@@ -92,8 +90,6 @@ Latte3D的核心洞察是：**将3D知识系统性地引入摊销优化的全过
 - **两阶段摊销架构**：设计包含几何网络和纹理网络的统一架构，第一阶段摊销体素渲染生成粗几何，第二阶段摊销表面渲染实现高分辨率纹理细化，两阶段共享编码器权重，在400ms内完成从文本到纹理网格的全流程生成。
 
 这些设计使Latte3D能够在包含约101k提示的大规模数据集（gpt-101k）上稳定训练，在保持与逐提示优化方法（如MVDream 36分钟优化）相当的用户偏好的同时，实现约5400倍的推理加速，重新定义了文本到3D生成的速度-质量权衡边界。
-
-
 
 ## 核心方法与创新机理
 
@@ -144,8 +140,6 @@ $$\mathcal{L}_{\mathrm{train}} = (1-\alpha) \mathcal{L}_{\mathrm{SDS}} + \alpha 
 | 架构 | 超网络 | Triplane U-Net + PointNet | Fig. 4 |
 
 这些创新共同实现了**5400倍推理加速**（400ms vs 36min）的同时，保持与逐提示优化方法MVDream相当的用户偏好（Table 2, Fig. 7），并在未见提示上展现出强泛化能力。
-
-
 
 Latte3D 提出一种两阶段摊销式文本到 3D 生成框架，将神经场生成与表面细化统一为单次前馈推理，在约 400ms 内从文本提示直接输出带纹理的三角网格。其核心设计思路是将 3D 知识注入摊销优化过程，通过 3D 感知扩散先验、形状正则化和 3D 重建预训练三个关键机制，使模型能够稳定处理超 10 万规模的大规模提示集。
 
@@ -211,8 +205,6 @@ Latte3D 包含两个核心网络（Fig. 4, Fig. A.1）：
 
 该框架的核心瓶颈突破在于：通过两阶段摊销将原本需要 36 分钟优化的 MVDream 级质量压缩至 400ms 推理，同时利用 3D 数据作为强先验（gpt-101k 数据集包含 101k 提示和 34k 形状）实现大规模泛化。
 
-
-
 ### 3D重建预训练
 
 Latte3D的训练首先通过一个重建预训练阶段进行初始化，该阶段让模型学习编码-解码3D形状的能力，从而稳定后续的摊销SDS优化。预训练使用L2损失在渲染的不透明度和RGB图像上，比较预测形状$o$和输入形状$s$在相机$c$下的差异：
@@ -248,8 +240,6 @@ $$\mathcal{L}_{\mathrm{train}} = (1-\alpha) \mathcal{L}_{\mathrm{SDS}} + \alpha 
 ### 点云退火策略
 
 为实现推理时仅使用文本输入，训练过程中采用点云退火策略：逐渐将输入的真实点云替换为虚拟点云，使模型学会在缺乏真实几何输入时仍能生成高质量形状。消融实验表明，退火训练后使用虚拟输入的用户偏好达到51.2%（Table 4）。
-
-
 
 ## 实验与关键发现
 
@@ -300,9 +290,6 @@ Latte3D 支持可选的测试时优化（test-time optimization），为用户�
 
 在 3D 风格化任务上，Latte3D 的摊销架构展现出显著的成本优势。Fig. 11 显示，在 animal-style 风格化场景中，Latte3D 以几乎可忽略的额外推理成本实现了与 MVDream 4000 步优化相当的竞争力，优化成本缩减约 **10倍**。这验证了该方法在特定领域内容生成中的迁移效率。
 
-![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2403_15385/figures/015_Figure_11.jpg]]
-*Figure 11: Ours v.s. baselines on Unseen prompts Fig. 11: Results of user study showing the average preference rate for MVDream at different amounts of optimization time to Latte3D stylization results on animal-style*
-
 ### 已知失效模式
 
 尽管整体性能优异，Latte3D 存在以下已识别的失效模式：
@@ -313,29 +300,11 @@ Latte3D 支持可选的测试时优化（test-time optimization），为用户�
 
 这些失效模式指向了未来改进方向：扩展训练提示的多样性以覆盖组合场景、在第二阶段引入可控的几何微调能力、以及进一步减少对 3D 数据集的依赖。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2403_15385/figures/034_Figure.jpg]]
-*Figure: Stage 1 MVDream Fig. C.11: We show the frontier of the tradeoff between Mask FID and Render-FID at various blending α (annotated) on the realistic (top) and stylized (bottom) animals for training (red) and testing (green) prompts in stage-1 (solid lines) and stage-2 (dashed lines) as optimization progresses from low-alpha in the start to high-alpha at the end of training. We display results of 5 evenly spaced points in training for stages 1 and 2, with optimization horizons of 50k iterations for realistic and 100k for stylized. Notably, the gap between seen (training) and unseen (testing) prompts at the end of training is small, showing effective generalization. Our Render-FID improves over...*
-
-![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2403_15385/figures/047_Figure.jpg]]
-*Figure: Fig. D.22: We compare models with an amortized blend-factor α and single blendfactor by showing the frontier of the tradeoff between Mask IoU and Render-FID, at various blending α (annotated) on the realistic (top) and stylized (bottom) animals, for training (red/blue) and testing (green/cyan) prompts, in stage-1 (solid lines) and stage-2 (dashed lines). The amortized-blend-factor model receives the same compute budget as each single-blend-factor model. As such, the single-blend-factor models receive more training at their respective α values. Notably, after stage-2, we achieve similar qualities as measured by FID, with stronger adherence to 3D data per α as measured by a higher mask IoU. Q...*
-
-![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2403_15385/figures/007_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2403_15385/figures/017_Table.jpg]]
-*Table: A.1: Glossary and notation*
-
-![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2403_15385/figures/019_Table.jpg]]
-*Table: B.2: We show details for various amortized datasets, where the source generated the prompts. Each row is one curated dataset, with our assigned name for each dataset. Each prompt is tied to one or multiple shapes. The last column shows example prompts that are tied to the same training shape*
-
 ![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2403_15385/figures/020_Table.jpg]]
 *Table: B.3: Ablation of components in stage-1 training. Trained on gpt-101k data and evaluated on unseen prompts. Preference indicate average user preference of baseline over Latte3D*
 
 ![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2403_15385/figures/021_Table.jpg]]
 *Table: B.4: Ablation over whether we use upsampling on the latent triplanes during stage-2 using α = .9 on the realistic animals with samples shown in Fig. C.12. Upsampling the triplane gets better performance*
-
-
 
 ## 定位与知识库关联
 
@@ -386,8 +355,6 @@ Latte3D 的适用边界由以下约束定义：
 4. **对3D数据的依赖程度**：形状正则化损失和重建预训练均依赖3D资产库，能否通过更强的2D先验（如视频扩散模型的多视图一致性）减少这种依赖？这是一个基础性问题——2D监督能否完全替代3D监督在几何学习中的作用。
 
 5. **测试时优化的上限**：当前测试时优化（Fig. 8）在600步内持续改善 FID 和 CLIP 分数，其收敛行为和最优步数尚未被充分探索。理解这一动态有助于在质量和成本之间做出更精细的权衡。
-
-
 
 ## 原文 PDF
 

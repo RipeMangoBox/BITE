@@ -81,8 +81,6 @@ DCFold属于基于蒸馏的一致性模型方法，需依赖预训练的AlphaFol
 3. 双重一致性训练轻微降低了结构多样性，需通过其他策略补偿。
 4. 目前仅在蛋白质和蛋白-配体复合物上验证，尚未推广到核酸等其他生物分子。
 
-
-
 蛋白质结构预测是计算生物学中的核心问题，其目标是从氨基酸序列出发，确定蛋白质在三维空间中的折叠构象。近年来，以 **AlphaFold3**（Abramson et al., 2024）为代表的深度学习模型在该领域取得了突破性进展，不仅能够高精度预测蛋白质单体结构，还支持蛋白质-配体复合物、蛋白质-蛋白质相互作用等多种生物分子体系的建模。
 
 然而，AlphaFold3 的推理效率成为其在高通量应用场景中的关键瓶颈。这一瓶颈根源于其架构中的两个迭代过程：
@@ -93,8 +91,6 @@ DCFold属于基于蒸馏的一致性模型方法，需依赖预训练的AlphaFol
 这两个迭代过程的叠加导致单次结构预测的推理时间达到数十秒甚至上百秒的量级，严重限制了 AlphaFold3 在大规模虚拟筛选、蛋白质组学注释以及需要大量采样的蛋白质设计（如 binder 设计）等任务中的应用。直接减少采样步数或循环次数（如 AF3 ODE 的单步采样）会导致预测精度显著下降，表明简单的步数压缩无法在精度与效率之间取得平衡。
 
 针对上述效率瓶颈，本文提出 **DCFold**，一个单步生成的蛋白质结构预测模型。其核心动机在于：**能否通过训练策略的革新，将 AlphaFold3 的多步迭代推理过程压缩为单步前向传播，同时保持预测精度不降？** 为实现这一目标，DCFold 引入了双重一致性训练（Dual Consistency）框架，联合解决扩散迭代和 Pairformer 循环两个效率瓶颈，并结合时间测地线匹配（Temporal Geodesic Matching, TGM）调度器来稳定变长序列的训练过程。最终，DCFold 在 Posebusters V2 等基准上实现了与 AlphaFold3 相当的精度，并将推理速度提升约 15 倍。
-
-
 
 ## 核心方法与创新机理
 
@@ -143,8 +139,6 @@ TGM 在 Posebusters V2 上达到 77.5% 成功率，显著优于 ECM（75.7%）�
 
 双重一致性训练依赖预训练的 AlphaFold3 进行蒸馏，无法从头训练。此外，对于长序列（>255 tokens），Pairformer 的计算占比上升，加速比从 24× 降至约 7.7×（Table 7）。双重一致性训练也轻微降低了结构多样性（Table 4），但可通过其他策略补偿。
 
-
-
 ![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_LMsdys7t1L/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of Dual Consistency framework (top: AlphaFold3; bottom: DCFold)*
 
@@ -176,8 +170,6 @@ DCFold 的 pipeline 由以下核心模块串联构成：
 - **阶段二**：施加 Pairformer 一致性。仅更新 16-block Pairformer，优化目标为 $\mathcal{L}_{\mathrm{confidence}} + \mathcal{L}_{\mathrm{pairformer}}$。此阶段使 Pairformer 的单次循环输出逼近多次循环的结果。
 
 两个阶段均使用 TGM 调度器选择训练时间对，以稳定梯度并平衡不同长度序列的学习难度（TGM 将数据维度 $D$ 纳入调度以应对变长序列的挑战）。
-
-
 
 ### 双重一致性训练框架
 
@@ -239,14 +231,11 @@ $$\mathcal{I}(t) = \frac{2D \cdot p \left( s_{\mathrm{max}}^{1/p} - s_{\mathrm{m
 - **TGM调度器显著优于基线**：在Posebusters V2上，TGM成功率达77.5%，优于ECM（75.7%）、sCM和CD（Table 6）。且TGM的训练梯度保持平衡，而ECM呈现阶梯状不稳定模式（Figure 5）。
 - **采样器修改是单步稳定性的必要条件**：关闭噪声注入和固定缩放因子使单步ODE积分成为可能。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能：Posebusters V2 基准
 
 DCFold 在 Posebusters V2 蛋白质-配体复合物结构预测基准上与 AlphaFold3 进行了系统对比。核心发现是：**DCFold 以单步扩散和单次 Pairformer 循环，在关键指标上达到或超越了全配置 AlphaFold3 的性能**（Table 2）。
-
 
 ![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_LMsdys7t1L/figures/004_Table_2.jpg]]
 *Table 2: Posebusters V2 RMSD benchmark results. We report the percentage of predictions with RMSD below different thresholds*
@@ -259,23 +248,14 @@ DCFold 在 Posebusters V2 蛋白质-配体复合物结构预测基准上与 Alph
 
 在按同源性划分的 Recent PDB 数据集上（Table 3），DCFold 在所有蛋白质类别上均超越了 AF3 ODE 基线。单体蛋白的 TM-score 从 0.830 提升至 0.850（+0.020），蛋白-蛋白复合物的成功率从 87.0% 提升至 92.2%（+5.2 个百分点）。这一跨类别的一致性提升表明双重一致性训练学到的单步映射具有良好的泛化性，并非对特定结构类型的过拟合。
 
-
 ![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_LMsdys7t1L/figures/005_Table_3.jpg]]
 *Table 3: TM-score and Success Rate (SR) on different protein categories in the Homology Recent PDB dataset. Values in parentheses denote the absolute improvement relative to AF3 ODE*
 
 Figure 3 的 lDDT 对比进一步支持了这一结论：DCFold 在 Pairformer 循环数（NFE）和扩散步数（NFE）均压缩至 1 的条件下，lDDT 仍接近 AlphaFold3 水平，显著优于 Protenix-Mini 等轻量级替代方案。
 
-
-![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_LMsdys7t1L/figures/006_Figure_3.jpg]]
-*Figure 3: lDDT performance on the Recent PDB dataset*
-
 ### 推理效率
 
 Table 7 按 token 数量分箱报告了推理时间。对于短序列（≤255 tokens），DCFold 平均推理时间仅为 3.76 秒，而 AlphaFold3 为 92.63 秒，加速比约 24×。随着序列增长，Pairformer 在总计算中的占比上升，加速比逐步下降：在 1024-1279 token 区间，DCFold 为 24.94 秒，AlphaFold3 为 192.44 秒，加速比约 7.7×。这一趋势与 Pairformer 的 $O(L^2)$ 复杂度一致，也是方法局限性的直接体现——当 Pairformer 本身成为瓶颈时，仅压缩扩散步数的边际收益递减。
-
-
-![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_LMsdys7t1L/figures/015_Table_7.jpg]]
-*Table 7: Average inference time of AlphaFold3 and DCFold across token bins*
 
 ### 消融研究：双重一致性的两个组件
 
@@ -285,12 +265,10 @@ Table 7 按 token 数量分箱报告了推理时间。对于短序列（≤255 t
 
 Table 6 对比了四种一致性模型调度器在 Posebusters V2 上的成功率。传统的一致性蒸馏（CD）和 sCM 未能提升性能，甚至有所下降。ECM 将成功率提升至 75.7%，而 TGM 达到最高的 77.5%，且推理时间与 ECM 相同（11.6 s/step）。
 
-
 ![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_LMsdys7t1L/figures/009_Table_6.jpg]]
 *Table 6: Success Rates of Different Consistency Models on Posebusters V2*
 
 TGM 的优势根源于其训练稳定性。Figure 5 的梯度范数和损失曲线揭示了关键差异：ECM 的训练动态呈现明显的阶梯状模式，伴随较大的梯度方差，表明网络在不同训练阶段面临的学习难度不均衡；而 TGM 始终保持平衡的梯度，验证了其核心设计——通过测地线距离 $d_g(t, r) = C(u)$ 将训练对的难度固定在网络当前能力的等距面上，有效抵消了变长序列训练引入的不稳定性。
-
 
 ![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_LMsdys7t1L/figures/012_Figure_5.jpg]]
 *Figure 5: Gradient norm and loss curve during training for ECM and TGM*
@@ -301,17 +279,12 @@ Figure 4 进一步分析了 TGM 中欧拉求解器的近似误差：训练早期
 
 Table 4 报告了 Posebusters V2 上的多样性和置信度指标。DCFold 的多样性（以 pairwise RMSD 的标准差衡量）为 0.9701 ± 0.0565，略高于 AlphaFold3 的 0.9642 ± 0.0556（数值越高多样性越低），表明一致性训练轻微压缩了采样多样性。置信度方面，DCFold 的 pLDDT 均值为 94.14 ± 2.97，略低于 AlphaFold3 的 94.67 ± 3.01，差异不显著。这一轻微的多样性损失是分布收紧的必然代价，论文指出可通过其他多样性增强策略补偿。
 
-
 ![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_LMsdys7t1L/figures/007_Table_4.jpg]]
 *Table 4: Diversity and confidence metrics on the Posebusters V2 benchmark*
 
 ### Binder 设计下游应用
 
 在六个靶点的 binder 设计任务中（Table 5），DCFold 展现出优于 BindCraft（Pacesa et al., 2024）的平均 in silico 成功率。基于物理约束的成功率从 0.26 提升至 0.29，基于模型约束的成功率从 0.69 提升至 0.78。值得注意的是，该评估使用 AlphaFold2 的置信度输出而非 DCFold 自身的置信度，以避免校准偏差——这一设计选择虽然合理，但引入了间接评估的系统性局限，实际湿实验验证仍需进一步确认。
-
-
-![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_LMsdys7t1L/figures/008_Table_5.jpg]]
-*Table 5: In silico success rates across six targets for binder design (values shown as physics-based constraints / model-based constraints)*
 
 ### 失败模式与局限
 
@@ -320,20 +293,6 @@ Table 4 报告了 Posebusters V2 上的多样性和置信度指标。DCFold 的�
 长序列场景下加速比衰减是另一个明确瓶颈。当 token 数超过 1024 时，Pairformer 成为主要计算负载，加速比降至 10× 以下（Table 7）。对于大型蛋白复合物或长链蛋白，DCFold 的效率优势部分被稀释。
 
 此外，DCFold 依赖 AlphaFold3 预训练权重进行蒸馏，无法从头训练，这限制了其方法在缺乏强教师模型场景下的推广。目前验证范围限于蛋白质和蛋白-配体复合物，尚未拓展至核酸、翻译后修饰等更广泛的生物分子体系。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_LMsdys7t1L/figures/003_Table_1.jpg]]
-*Table 1: Training stages and the weights of each term*
-
-![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_LMsdys7t1L/figures/016_Table_8.jpg]]
-*Table 8: The total number of generated samples in the binder hallucination experiments*
-
-![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_LMsdys7t1L/figures/017_Table_9.jpg]]
-*Table 9: Detailed information of binder targets in the binder hallucination experiments*
-
-
-
 
 ## 定位与知识库关联
 
@@ -387,8 +346,6 @@ DCFold 的性能提升可分解为三个因果组件，各自有明确的消融�
 4. **单步模型的多样性-精度权衡**：如何在保持单步生成优势的同时，恢复或超越 AlphaFold3 的多样性水平？可能的路径包括 latent space 扰动、温度调节或多头输出策略，但均需实验验证。
 
 5. **TGM 超参数的敏感性**：$C(u)$ 的单调递减函数形式、初始值 $C_0$ 和衰减率 $\beta$ 对训练稳定性和最终精度的影响尚未系统分析，这限制了 TGM 在新任务上的调参指导。
-
-
 
 ## 原文 PDF
 

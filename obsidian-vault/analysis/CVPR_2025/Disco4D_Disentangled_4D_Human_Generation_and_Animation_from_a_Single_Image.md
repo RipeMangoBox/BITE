@@ -52,8 +52,6 @@ Disco4D 针对这一瓶颈提出了结构化解耦方案。其核心思路是：
 
 该方法也存在若干已知局限：SMPL-X 估计在挑战性姿态下不够鲁棒；视觉外壳初始化依赖多视图扩散模型，侧面与背面视角存在不准确风险；服装类别解耦受限于二维分割模型精度，可能发生误分类；当前仅支持单层服装，无法处理多层叠加与遮挡场景。
 
-
-
 ### 问题背景
 
 从单张图像生成可动画的 3D 人体是虚拟试穿、数字人定制、影视特效等应用的核心需求。理想的人体生成模型不仅需要在新视角下保持高保真度的外观重建，还应支持对衣物资产进行独立的编辑、换装和物理准确的动画驱动。然而，现有方法在这一目标上存在根本性瓶颈。
@@ -71,8 +69,6 @@ Disco4D 针对这一瓶颈提出了结构化解耦方案。其核心思路是：
 ### 本文动机
 
 Disco4D 的动机正是填补上述空白：**构建一个从单张图像出发，能够解耦身体与衣物、支持 4D 动画和编辑的人体生成框架**。其核心思路是将人体基础模型 SMPL-X 转化为固定的高斯表示，并在其外部拟合可分离的衣物高斯，同时为每个衣物高斯引入可学习的身份编码（Identity Encoding），从而在训练中对身体与衣物进行结构化解耦。这一设计使得身体由 SMPL-X 姿态直接驱动，衣物则结合重姿态变换与学习到的形变网络分开控制，为后续的独立编辑和物理合理动画奠定基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -109,8 +105,6 @@ Disco4D 的核心创新在于将人体与衣物从表示层面进行**结构化�
 | 优化策略 | 身体与衣物同时优化 | 固定身体高斯，仅优化衣物高斯 |
 | 衣物初始化 | 随机或 SMPL-X 表面初始化 | 视频扩散模型 + GRM 生成视觉外壳初始化 |
 | 4D 动画 | 单一形变场驱动所有高斯 | 身体姿态直驱 + 衣物重姿态 + 学习形变网络 |
-
-
 
 ![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2409_17280/figures/001_Figure_1.jpg]]
 *Figure 1: Disco4D is a novel Gaussian Splatting framework for 4D disentangled human generation, animation and editing from a single image*
@@ -153,8 +147,6 @@ $$\mathcal{L} = \mathcal{L}_{ori} + \mathcal{L}_{id} + \mathcal{L}_{ani} + \math
 - **输入**：单张 RGB 人物图像（3D 生成）；或单张图像 + 驱动视频/姿态序列（4D 动画）
 - **中间表示**：固定的 SMPL-X 身体高斯 + 嵌入网格的衣物高斯（各高斯携带身份编码）
 - **输出**：可分层的 3D 高斯化身（支持独立编辑）；或按时间序列渲染的 4D 动画帧
-
-
 
 ### 3.1 基础表示：3D高斯与SMPL-X
 
@@ -210,8 +202,6 @@ $$S'' = \phi(S', t)$$
 
 其中 $S'$ 为重姿态后的衣物高斯空间描述。形变网络初始化为预测零形变，避免动态与静态模型之间的发散。这种“重姿态+学习形变”的组合使衣物既能跟随身体运动，又能表现其材质特有的动态行为（如裙摆飘动）。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -256,9 +246,6 @@ Disco4D 的评估覆盖三个维度：**3D 生成质量**、**4D 动画能力**�
 
 Disco4D 的失败案例（Figure 9）可归纳为三类：
 
-![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2409_17280/figures/015_Figure_9.jpg]]
-*Figure 9: Failure cases of Disco4D. (a) Poor SMPL-X estimation (b) Poor visual hull initialization (c) Misclassification of clothing categories*
-
 - **SMPL-X 估计失败**：在挑战性姿态（如大幅度扭转、遮挡严重）下，SMPL-X 参数估计不准确，导致身体高斯骨架错位，进而影响衣物高斯的附着和动画质量。
 - **视觉外壳初始化质量不足**：侧面和背面视角的视觉外壳依赖于多视图扩散模型的生成能力，当模型输出不准确时，初始化衣物高斯的位置和形状会偏离真实衣物，后续优化难以完全纠正。
 - **衣物类别误分类**：身份编码的监督信号来自 2D 分割模型，当分割模型将手臂误判为上衣、或将裙子误判为裤子时，衣物高斯的类别标签出错，导致编辑时无法精确选取目标衣物。
@@ -267,19 +254,8 @@ Disco4D 的失败案例（Figure 9）可归纳为三类：
 
 需要指出，3D 生成实验主要在合成数据集（SynBody、CloSe）上进行，其评估结果可能不完全代表真实拍摄场景的性能。4D 动画对比中，DreamGaussian4D 并非专为人体设计，直接比较可能存在系统偏差。与 2D 动画方法（Animate-Anyone、Magic-Animate、CHAMP）的对比（Figure 8）仅提供了定性结果，未进行定量分析——定性上 Disco4D 在保持身体形态和细节方面表现更好，但缺乏数值支撑。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2409_17280/figures/012_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2409_17280/figures/013_Figure.jpg]]
-
 ![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2409_17280/figures/002_Table_1.jpg]]
 *Table 1: Overview of 3D/4D generation methods from a single image*
-
-![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2409_17280/figures/003_Table_2.jpg]]
-*Table 2: Overview of 4D generation methods from video*
-
-
 
 ## 定位与知识库关联
 
@@ -345,8 +321,6 @@ Disco4D 的性能受限于多个上游模块的精度：
 4. **身份编码泛化**：能否利用更先进的分割基础模型或弱监督策略提升身份编码的准确性与泛化能力？当前对 2D 分割模型的强依赖限制了在开放场景中的适用性。
 
 5. **多人场景推广**：Disco4D 的解耦表示是否可以推广至多人场景或交互式动画任务？这涉及多人空间关系的建模和遮挡处理。
-
-
 
 ## 原文 PDF
 

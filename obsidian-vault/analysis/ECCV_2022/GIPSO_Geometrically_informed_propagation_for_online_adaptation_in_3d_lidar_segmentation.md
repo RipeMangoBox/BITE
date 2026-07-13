@@ -66,8 +66,6 @@ GIPSO的核心洞察在于：**低层几何特征具有跨域泛化能力**，�
 
 GIPSO属于**在线源自由域适应**方法，其技术路线融合了自训练、几何感知传播和自监督时间学习三条线索。与离线方法（如ADABN通过批归一化统计适配、RayCast通过光线投射生成目标样式源数据）不同，GIPSO完全在目标域在线运行。与同期在线方法相比：CBST*和ProDA*依赖置信度或质心选择伪标签，TPLD*使用空间最近邻传播，而GIPSO的**不确定性驱动自适应阈值+几何传播+时间平滑**三重机制构成了差异化技术路径。方法在3D点云域适应领域首次系统性地将几何特征传播与在线自训练相结合，开辟了利用低层几何先验引导高层语义适应的新范式。
 
-
-
 ### 3D点云语义分割的域迁移困境
 
 基于深度学习的3D LiDAR点云语义分割模型在自动驾驶感知中扮演关键角色，但其性能高度依赖大规模高质量标注数据。由于真实场景的点云标注成本极高，研究者普遍借助合成数据集（如GTA-V、Synthia、CARLA等）生成带标签的训练数据。然而，合成数据与真实传感器采集的点云之间存在显著的**域差异**——包括激光雷达的物理特性（波束数量、扫描模式、点密度）、环境光照、物体材质和场景布局等因素——导致在源域上训练的模型直接部署到目标域时性能急剧退化。
@@ -101,8 +99,6 @@ GIPSO属于**在线源自由域适应**方法，其技术路线融合了自训�
 - 如何利用几何特征的跨域泛化性将稀疏种子标签安全地传播到更大区域？
 - 如何利用时序信息平滑在线适应过程，防止帧间剧烈波动？
 
-
-
 ## 核心方法与创新机理
 
 GIPSO 的核心创新在于针对**在线源自由无监督域适应（SF-OUDA）**这一极具挑战性的设定，设计了三个相互协同的机制，系统性地解决了现有方法在动态点云分割中的关键瓶颈。
@@ -131,8 +127,6 @@ Oracle 研究（Table 6）证实，基于不确定性的选择在 Top-1 准确�
 
 消融实验（Table 5）清晰揭示了各组件的贡献：仅使用自适应伪标签选择（A）可获得 **+1.07 mIoU** 改进；加入时间一致性（A+T）提升至 **+3.65**；最终融入几何传播（A+T+P）达到完整 GIPSO 的 **+4.31 mIoU**。这表明三个创新组件之间存在显著的协同效应，共同构成了 GIPSO 在 SF-OUDA 设定下的性能优势。
 
-
-
 GIPSO 是一个面向三维 LiDAR 点云语义分割的在线、源自由无监督域适应（SF-OUDA）方法。其核心 pipeline 由四个主要模块串联构成：**源预训练模型**、**自适应伪标签选择器**、**几何引导传播模块**和**时间一致性约束模块**，最终通过在线更新头完成目标域模型的持续适应。
 
 ### 输入输出流
@@ -154,12 +148,6 @@ GIPSO 是一个面向三维 LiDAR 点云语义分割的在线、源自由无监�
 ### 关键设计逻辑
 
 三个模块形成递进互补关系：**自适应选择**提供高质量种子标签，**几何传播**将其扩散到几何一致区域，**时间一致性**则跨帧平滑语义特征，三者协同克服了在线场景下伪标签稀疏、噪声大和分布漂移的瓶颈。消融实验证实这一递进关系：仅自适应选择（A）带来 +1.07 mIoU，加入时间一致性（A+T）提升至 +3.65，完整 GIPSO（A+T+P）达到 +4.31 mIoU（Table 5）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l37_https_arxiv_org_abs_2207_09763/figures/004_Figure_3.jpg]]
-*Figure 3: Overview of GIPSO. A source pre-trained model $F _ { S }$ selects seed pseudo-labels through our adaptive-selection approach. An auxiliary model $F _ { a u x }$ extracts geometric features to guide pseudo-label propagation. $\mathcal { L } _ { d i c e }$ is minimised over the pseudo-labels $Y _ { T } ^ { t }$ In parallel, semantic smoothness is enforced with $\mathcal { L } _ { r e g }$ over time. () frozen parameters. () learnable parameters
-
 
 
 GIPSO 的核心架构由三个相互协同的模块构成：**自适应伪标签选择器**、**几何特征引导的伪标签传播模块**和**自监督时间一致性约束模块**。三者共同作用于一个预训练的源分割模型 $F_{\mathcal{S}}$，实现在线、源自由的域适应。
@@ -218,8 +206,6 @@ $$\mathcal{L} = \mathcal{L}_{dice}(F_{\mathcal{T}}(X_{\mathcal{T}}^{t}), \hat{Y}
 
 其中 $F_{\mathcal{T}}$ 由 $F_{\mathcal{S}}$ 初始化，逐帧更新。这种在线学习范式无需存储源数据，也无需访问目标域真实标签，完全符合源自由在线无监督域适应（SF-OUDA）的设定。
 
-
-
 ## 实验与关键发现
 
 ### 1 实验设置
@@ -268,8 +254,6 @@ Fig. 5(b) 使用 Davies-Bouldin Index（DB-Index）追踪了适应过程中特�
 ![[assets/figures/papers/paper_list_l37_https_arxiv_org_abs_2207_09763/figures/009_Figure_5.jpg]]
 *Figure 5: (b) Fig. 5. (a) Per-class improvement of GIPSO over time on Synth4D→SemanticKITTI. (b) DB-Index over time on Synth4D→SemanticKITTI. The lower the DB-Index, the better the class separation of the features*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l37_https_arxiv_org_abs_2207_09763/figures/002_Table_1.jpg]]
 *Table 1: Comparison between public synthetic datasets and Synth4D in terms of sensor specifications, acquisition areas, number of scans, number of points, presence of odometry data, and whether the semantic classes are all or partially shared*
 
@@ -279,24 +263,8 @@ Fig. 5(b) 使用 Davies-Bouldin Index（DB-Index）追踪了适应过程中特�
 ![[assets/figures/papers/paper_list_l37_https_arxiv_org_abs_2207_09763/figures/007_Table_3.jpg]]
 *Table 3: SynLiDAR → SemanticKITTI online adaptation. Source: pre-trained source model (lower bound). We report absolute mIoU for Source and mIoU relative to Source for the other methods. Key. SF: Source-Free. UDA: Unsupervised DA. O: Online*
 
-![[assets/figures/papers/paper_list_l37_https_arxiv_org_abs_2207_09763/figures/008_Table_4.jpg]]
-*Table 4: Synth4D → nuScenes online adaptation. Source: pre-trained source model (lower bound). We report absolute mIoU for Source and mIoU relative to Source for the other methods. Key. SF: Source-Free. UDA: Unsupervised DA. O: Online*
-
-![[assets/figures/papers/paper_list_l37_https_arxiv_org_abs_2207_09763/figures/010_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l37_https_arxiv_org_abs_2207_09763/figures/013_Table_1.jpg]]
-*Table 1: Online adaptation on Synth4D → SemanticKITTI with different propagation size K*
-
-![[assets/figures/papers/paper_list_l37_https_arxiv_org_abs_2207_09763/figures/014_Table_2.jpg]]
-*Table 2: Online adaptation on Synth4D → SemanticKITTI with a different time window w*
-
 ![[assets/figures/papers/paper_list_l37_https_arxiv_org_abs_2207_09763/figures/015_Table_3.jpg]]
 *Table 3: Ablation study on Synth4D → SemanticKITTI reporting the improvement of state-of-the-art methods by using GIPSO adaptive selection strategy and propagation strategy*
-
-![[assets/figures/papers/paper_list_l37_https_arxiv_org_abs_2207_09763/figures/016_Table_4.jpg]]
-*Table 4: Class mapping from CARLA [?] format to Synth4D*
-
-
 
 ## 定位与知识库关联
 
@@ -344,8 +312,6 @@ GIPSO 的有效性存在明确的适用边界：
 - **几何编码器的在线进化**：当前 F_aux 在源域预训练后冻结。如果能在线更新几何编码器以适应目标域的几何分布偏移，传播质量可能进一步提升。
 - **多传感器扩展与里程计替代**：能否利用 IMU 或视觉里程计替代激光里程计？如何融合相机纹理信息来消解几何-语义歧义？
 - **不确定性阈值的自适应调节**：当前阈值参数 a 为固定值。能否根据目标域的数据流统计特性（如序列级别的难度变化）动态调整 a？
-
-
 
 ## 原文 PDF
 

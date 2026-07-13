@@ -57,8 +57,6 @@ claims:
 
 方法的局限性在于：Critic 仅提供软性可行性偏好，不包含硬物理约束，无法保证生成的运动绝对安全；数据集与角色高度特定，当文本提示严重超出角色能力时，Critic 可能缺乏有效信号。
 
-
-
 ### 问题背景：运动学生成与物理执行之间的鸿沟
 
 近年来，数据驱动的运动学生成模型取得了显著进展。以**MDM**（Tevet et al., ICLR 2023）为代表的文本条件运动扩散模型，能够根据自然语言描述生成多样化且视觉上富有表现力的人体运动序列。这类模型从大规模运动捕捉数据中学习运动先验，在生成质量、语义匹配度和多样性方面表现优异。
@@ -82,8 +80,6 @@ claims:
 本文的核心动机在于**弥合运动学生成与物理执行之间的鸿沟**。作者观察到，预训练的跟踪控制策略本身蕴含了丰富的物理知识——它隐式地编码了“在当前状态下，哪些运动参考是可执行的、哪些会导致失败”这一关键信息。如果能将这种物理理解以可微分的形式反馈给生成模型，就有可能在保持生成多样性的同时，使生成的运动天然具备物理可行性。
 
 基于这一洞察，本文提出训练一个**边缘化奖励代理（Critic）**，该网络仅基于运动学参考运动预测下游跟踪任务的预期累计回报。这个 Critic 充当了物理可行性的可微分替身，使得生成模型可以在微调阶段直接优化运动的“可执行性”，而无需频繁调用昂贵的物理仿真。最终，这一思路演化为**Robot Motion Diffusion Model（RobotMDM）**——一个文本条件的运动学扩散模型，与基于强化学习的跟踪控制器无缝衔接，能够生成既保持语义多样性又具备物理合理性的运动，并可直接部署于仿真与真实机器人系统。
-
-
 
 ## 核心方法与创新机理
 
@@ -147,8 +143,6 @@ RobotMDM 处于**运动学运动生成**与**物理角色控制**的交叉点，
 - Critic 的训练依赖于预训练的 Actor 策略。若 Actor 本身泛化能力有限，Critic 的指导信号将受限于该策略的能力边界，难以推广至全新运动模式。
 - 数据集与角色高度特定：当文本提示严重超出角色能力范围时，Critic 可能缺乏有效信号，此时物理对齐的效果需要手动验证。
 
-
-
 ![[assets/figures/papers/paper_list_l50_https_doi_org_10_1145_3680528_3687626/figures/001_Figure_1.jpg]]
 *Figure 1: Robot Motion Diffusion Model (RobotMDM) generates motions that are physics-aware and respect character limits. Our method enables the seamless integration of kinematic motion generators with physics-based character control and can be deployed on robots. The example shows a robot performing the prompt "a person who performed a right-handed uppercut."*
 
@@ -177,8 +171,6 @@ RobotMDM 的整体流程围绕三个核心模块展开，形成“评价—对�
 - **输入**：文本提示（如 “a person who performed a right-handed uppercut”），通过 MDM 的文本编码器转化为条件信号。
 - **中间表示**：运动序列编码为 $n \times (7+2j)$ 矩阵，包含根部位高度、线速度、角速度、根姿态及各关节的位置与速度信息。
 - **输出**：物理可行的运动学参考运动，可直接馈入 Actor 生成关节扭矩等物理动作，部署于仿真或真实机器人平台。
-
-
 
 RobotMDM 的核心架构由三个解耦模块构成，通过两阶段训练将物理可行性注入运动学扩散模型。
 
@@ -236,8 +228,6 @@ $$\mathcal{L}_{RobotMDM} = \mathcal{L}_{MDM} - \beta \sum_{t=0}^{|M|} v^{\theta}
 
 部署时将微调后的 RobotMDM 与 Actor 串联：RobotMDM 根据文本提示生成运动参考序列，Actor 逐帧跟踪该参考并输出物理动作，直接在仿真或真实机器人上执行。整个流程无需在线优化或物理投影。
 
-
-
 ## 实验与关键发现
 
 ### 运动学生成质量与物理可行性
@@ -290,13 +280,6 @@ $$\mathcal{L}_{RobotMDM} = \mathcal{L}_{MDM} - \beta \sum_{t=0}^{|M|} v^{\theta}
 
 4. **Actor 依赖上限**：Critic 的训练依赖于预训练跟踪控制器的性能天花板。若 Actor 本身对某些运动模式的泛化能力有限，Critic 的指导信号将在这些区域变得不可靠，从而限制 RobotMDM 的可行运动空间。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l50_https_doi_org_10_1145_3680528_3687626/figures/003_Table_1.jpg]]
-*Table 1: Training Parameters*
-
-
-
 ## 定位与知识库关联
 
 ### 方法在谱系中的位置
@@ -331,8 +314,6 @@ RobotMDM 处于**运动学生成模型**与**物理角色控制**的交汇地带
 - **联合训练范式**：当前 Critic 与生成模型分阶段训练，Actor 保持冻结。能否设计联合优化框架，使 Critic 和生成模型协同进化，突破固定 Actor 带来的上限？
 - **动力学自适应**：当角色动力学参数（质量、摩擦系数等）发生变化时，Critic 需要多快重新适应？是否可能训练一个以动力学参数为条件的 Critic，实现跨角色的零样本迁移？
 - **可扩展性**：该方法在更复杂的形态（如四足机器人、带手爪的移动操作平台）或更大规模运动数据集上的表现尚待验证。Critic 的边缘化假设在更高维运动空间中是否仍然有效，值得进一步研究。
-
-
 
 ## 原文 PDF
 

@@ -54,8 +54,6 @@ claims:
 
 在方法谱系上，SenCache 属于训练无关的全前向缓存方法，与 TeaCache、MagCache 共享“跳过部分去噪网络评估”的加速范式，但其关键区分点在于用基于 Jacobian 范数的理论准则替换了启发式触发器，实现了模态无关、架构无关、采样器无关的动态缓存决策。该方法与全局时间步优化方法（如直接搜索最优采样轨迹）形成互补：SenCache 的局部灵敏度可视为跳过一步的边际代价代理，未来可结合全局调度提供动态 $\varepsilon(t)$ 以进一步优化速度-质量权衡。
 
-
-
 扩散模型已成为视觉内容生成的核心架构，但其推理过程需要执行数十甚至上百次序列化去噪步骤，每次步骤都需完整调用参数量庞大的去噪网络。这一串行计算范式导致推理延迟极高，严重制约了扩散模型在实时交互、大规模内容生产等场景中的实际部署。
 
 为缓解上述瓶颈，研究者提出了多种训练无关的缓存加速策略。其核心思路是：在采样轨迹中，相邻时间步的去噪网络输出往往高度相似，因此可以跳过部分网络前向计算，直接复用先前缓存的结果。代表性工作包括 **TeaCache**（Liu et al., CVPR 2025）和 **MagCache**（Ma et al., arXiv 2025）。TeaCache 基于时间嵌入差异与残差幅度构建启发式缓存判据，MagCache 则以残差幅度比率作为复用决策依据。
@@ -63,8 +61,6 @@ claims:
 然而，这些方法存在两个根本性缺陷。其一，**判据依赖启发式设计**，缺乏对缓存误差的理论刻画——它们无法定量回答“复用缓存会在输出中引入多大偏差”这一核心问题。其二，**缓存调度策略是静态且全局固定的**，对所有样本采用相同的重用步长，完全忽视了不同样本在去噪轨迹上的难度差异以及模型在不同区域敏感性的显著变化。这种“一刀切”策略在简单样本上可能过度缓存导致质量退化，在困难样本上则可能缓存不足而浪费加速机会。
 
 SenCache 的提出正是为了填补上述理论与实用层面的缺口。该方法将缓存决策建立在**去噪网络对其输入扰动的局部敏感性**这一具有理论依据的度量之上，从而将缓存问题从经验试错提升为有理论保证的自适应决策。其核心动机可以概括为：**用网络输出的 Jacobian 范数作为局部 Lipschitz 常数，显式建模潜在向量漂移和时间步间隔对输出的影响，建立一个统一、可解释且无需训练的缓存准则**。这一视角不仅为缓存决策提供了严格的上界保证，还能从理论上解释先前启发式方法为何有时有效、何时会失效。
-
-
 
 ## 核心方法与创新机理
 
@@ -106,8 +102,6 @@ SenCache 属于**训练无关的扩散模型推理加速**方法，与 TeaCache�
 
 **局限性提示**：当前固定 $\varepsilon$ 的策略无法像全局调度方法那样动态分配误差预算；一阶近似在高度非线性区域可能低估输出变化；敏感性预计算需针对每个模型单独进行（但仅需极少样本）。这些限制为后续研究指明了方向。
 
-
-
 SenCache 是一种训练无关、架构无关、采样器无关的全前向缓存方法，其核心思想是将扩散模型去噪网络对输入扰动的局部敏感性作为缓存决策的理论依据。整个推理加速框架由三个功能模块串联构成：**敏感性预计算模块**、**自适应缓存循环**与**缓存生命周期控制**。
 
 ### 整体流程
@@ -124,8 +118,6 @@ SenCache 是一种训练无关、架构无关、采样器无关的全前向缓�
 ### 模块间的输入输出关系
 
 三个模块形成清晰的单向数据依赖链。敏感性预计算模块的输出（$\|J_x\|$ 和 $\|J_t\|$ 曲线）是自适应缓存循环的静态输入，仅在模型切换时需要重新计算。自适应缓存循环接收当前采样状态（$\mathbf{x}_t$, $t$, 条件 $c$）和缓存状态作为动态输入，输出缓存命中/刷新的二元决策，并据此决定是否调用去噪网络 $f_\theta$。缓存生命周期控制则作为循环内部的约束条件，通过对连续命中计数的监控来触发强制刷新信号。整个框架无需修改预训练模型权重，也不依赖特定的采样器实现，因此可以即插即用地嵌入各类扩散模型推理管线中。
-
-
 
 ### 问题形式化：缓存误差的敏感性分解
 
@@ -188,18 +180,8 @@ SenCache 属于**训练无关的全前向缓存方法**，与 TeaCache（Liu et 
 
 SenCache 的统一敏感性框架解释了 TeaCache 和 MagCache 有效性的条件：当 $\|J_x\| \|\Delta \mathbf{x}_t\|$ 主导时，残差幅度是合理代理；当 $\|J_t\| |\Delta t|$ 主导时，时间嵌入差异是合理代理。但两者均无法在两项贡献可比时做出准确决策，而 SenCache 通过显式建模两项避免了这一失效模式。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2054_https_arxiv_org_abs_2602_24208/figures/004_Figure.jpg]]
-*Figure: (a) Network Sensitivity Analysis. (Left) Norm of the Jacobian w.r.t. the noisy latent. (Right) Norm of the Jacobian w.r.t. the timestep*
-
 ![[assets/figures/papers/paper_list_l2054_https_arxiv_org_abs_2602_24208/figures/003_Figure.jpg]]
 *Figure: (b) Comparison of 25-step sampling between Sensitivity-guided selection vs. Uniform selection*
-
-![[assets/figures/papers/paper_list_l2054_https_arxiv_org_abs_2602_24208/figures/005_Figure_4.jpg]]
-*Figure 4: Effect of calibration set size on sensitivity estimation. We compare sensitivity profiles estimated from 8 videos versus 4096 videos and find that 8 diverse videos already yield a close match, indicating that large calibration sets are not required*
-
-
 
 ## 实验与关键发现
 
@@ -233,15 +215,11 @@ Figure 5 展示了不同模型在连续时间步上去噪器输出的平均绝�
 
 尽管 SenCache 在多个模型上展现了稳定的性能优势，其设计仍存在若干边界条件。首先，固定 ε 策略在整个去噪过程中分配相同的误差容忍度，但不同时间步对输出质量的影响并非均等：在去噪早期，输出变化剧烈，一阶近似可能低估真实误差，导致缓存引入的漂移超出预期；而在去噪后期，输出趋于平滑，固定的 ε 可能过于保守，错失进一步加速的机会。其次，在高度非线性的网络响应区域，一阶 Taylor 展开的截断误差不可忽略，敏感性评分 S_t 可能低估实际输出变化，导致缓存决策失误。这些失效模式提示，未来的改进方向可考虑引入时间步自适应的动态容忍度 ε(t)，或采用高阶敏感性估计器以提升非线性区域的近似精度。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2054_https_arxiv_org_abs_2602_24208/figures/007_Table_2.jpg]]
 *Table 2: Ablation study on*
 
 ![[assets/figures/papers/paper_list_l2054_https_arxiv_org_abs_2602_24208/figures/008_Table_3.jpg]]
 *Table 3: Ablation study on the error tolerance ε. Performed on Wan 2.1 [38] with*
-
-
 
 ## 定位与知识库关联
 
@@ -297,8 +275,6 @@ $$S_t = \|J_x\| \|\Delta \mathbf{x}_t\| + \|J_t\| |\Delta t|$$
 4. **全局轨迹优化与局部敏感性的融合**：当前方法仅依赖局部敏感性进行贪婪决策。若能结合全局轨迹优化（如通过 ODE 求解器的自适应步长控制），为每个时间步提供上下文感知的容忍度，有望进一步逼近理论最优的效率-质量前沿。
 
 5. **与模型压缩技术的协同**：SenCache 与量化、剪枝、蒸馏等正交加速技术结合时，敏感性准则是否需要重新校准？压缩后的网络其局部 Lipschitz 常数可能发生显著变化，这为联合优化提供了研究空间。
-
-
 
 ## 原文 PDF
 

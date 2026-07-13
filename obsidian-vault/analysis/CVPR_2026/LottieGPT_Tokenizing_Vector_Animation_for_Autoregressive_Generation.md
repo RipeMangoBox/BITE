@@ -60,8 +60,6 @@ claims:
 
 **局限与开放问题**：矢量图形固有的颜色表示难以表达复杂渐变与纹理；当前分词器对粒子系统、复杂路径、高级混合模式和 3D 变换的编码效率较低；受限于上下文长度，长时序动画的时序一致性仍具挑战。未来方向包括扩展分词器以支持更丰富的动画效果、设计层次化生成策略突破长度限制，以及探索矢量与光栅混合表示。
 
-
-
 ### 矢量动画的表示困境
 
 矢量图形与动画因其分辨率无关性、紧凑的文件体积和天然的可编辑性，在UI动效、数据可视化和数字内容创作中占据核心地位。Lottie格式作为Airbnb开源的矢量动画标准，以JSON描述层次化的几何图元、变换属性和关键帧驱动的缓动插值，已被广泛应用于移动端和Web端的高性能渲染。然而，矢量动画的自动生成仍是一个几乎未被探索的领域——现有生成模型几乎全部面向栅格输出。
@@ -81,8 +79,6 @@ claims:
 上述缺口指向一个根本瓶颈：**现有生成模型缺乏一种能够将矢量动画的结构化时空信息紧凑编码为令牌序列的表示机制。** 栅格方法将动画展平为像素网格，丢失了结构；代码生成方法将动画视为非结构化文本，丢失了几何语义和时间约束。
 
 本文的核心动机在于：将矢量动画重新定义为**结构化代码**而非像素序列，利用Lottie格式天然具备的层次化图层和关键帧插值表示，设计专用分词器将动画压缩为紧凑的令牌序列，使自回归视觉语言模型能够高效学习生成可编辑、分辨率无关的矢量动画。这一思路的关键洞察是：Lottie的关键帧+缓动表示天然支持时间压缩——仅存储关键帧和插值方法，而非逐帧数据，可大幅缩减序列长度（约34–63%），同时完整保留结构信息和运动质量。
-
-
 
 ## 核心方法与创新机理
 
@@ -139,8 +135,6 @@ LottieGPT 通过专用分词器与两阶段训练，首次将自回归视觉语�
 
 当前 Lottie Tokenizer 对复杂效果（粒子系统、高级混合模式、3D 变换等）的编码效率较低，且受限于视觉语言模型的上下文长度，长时序复杂动画的生成仍具挑战。如何扩展分词器以覆盖更丰富的动画效果、设计层次化生成策略突破上下文限制，是值得探索的方向。
 
-
-
 LottieGPT 的整体框架建立在预训练视觉语言模型 **Qwen2.5-VL** 之上，通过引入专用的 **Lottie Tokenizer** 和两阶段课程学习策略，将矢量动画生成转化为自回归令牌预测任务。图3展示了系统的完整架构。
 
 **多模态输入编码**。模型接受文本描述与可选的图像/关键帧作为条件输入。文本通过语言模型的标准分词器编码，图像则经过 Qwen2.5-VL 的视觉编码器提取特征，再通过一个 **MLP 适配器** 将视觉特征映射到语言模型的表示空间。所有输入最终被统一为前缀令牌序列，为后续的自回归生成提供多模态条件 $\mathbf{c}$。
@@ -161,15 +155,11 @@ $$\mathcal{L} = - \sum_{i=1}^{N} \log P(t_i \mid t_{<i}, \mathbf{c})$$
 
 **消融验证**。框架中各组件的必要性得到了严格的消融实验支持。去掉 Lottie Tokenizer、仅用原始 Lottie JSON 微调时，JSON 结构相似度骤降至 0.0089，有效率仅 22.61%；而引入专用分词器后相似度回升至 0.8062，有效率达 96.96%（Table 2）。同样，仅完成 Stage 1 训练的模型在动画生成上的有效率仅 78.35%，远低于完整两阶段训练的 96.96%，验证了课程学习策略的关键作用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l994_https_arxiv_org_abs_2604_11792/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of LottieGPT. LottieGPT is built upon the pre-trained vision-language model Qwen2.5-VL and incorporates a Lottie tokenizer. The model encodes both text and image inputs as prefix tokens, while the Lottie tokenizer encodes vector animation commands into a unified representation space. We first train the model on static Lottie images, followed by training on Lottie animations*
 
 ![[assets/figures/papers/paper_list_l994_https_arxiv_org_abs_2604_11792/figures/002_Figure_2.jpg]]
 *Figure 2: Data curation pipeline. We collected 10M SVG resources and 660K After Effects (AE) animation resources from the internet, then converted them to Lottie Json format, filtered them using simplification algorithms that do not affect rendering results, and used QwenVL to generate text labels for vector graphics and vector animations*
-
-
 
 LottieGPT 的核心架构由三个关键模块构成：**Lottie Tokenizer**（动画标记化）、**Qwen2.5-VL 视觉语言骨干**（多模态编码）与**自回归语言模型**（序列生成）。三者协同实现从文本或图像条件到结构化 Lottie JSON 的端到端生成。
 
@@ -200,13 +190,7 @@ $$\mathbf{B}(u) = (1-u)^3 P_0 + 3(1-u)^2 u P_1 + 3(1-u)u^2 P_2 + u^3 P_3$$
 
 端点固定为 $P_0 = (0, 0)$、$P_3 = (1, 1)$，控制点 $P_1(o_x, o_y)$ 和 $P_2(i_x, i_y)$ 决定曲线形状。通过对 $u$ 求解 $\mathbf{B}_x(u) = t_{\mathrm{norm}}$ 获得参数 $u$，再代入 $\mathbf{B}_y(u)$ 得到缓动后的进度值（Figure 24 展示了典型缓动曲线的效果）。
 
-![[assets/figures/papers/paper_list_l994_https_arxiv_org_abs_2604_11792/figures/022_Figure_24.jpg]]
-*Figure 24: Bezier easing curve transforms time progress (x-axis) ´ into animation progress (y-axis). At 25% time, animation has only progressed 16% (slow start); at 75% time, animation has reached 84% (slow end)*
-
 统计表明，Lottie 动画中最常见的 8 种缓动曲线覆盖了 75.4% 的使用场景（Figure 25），其中第三种最常用模式（15.78%）的控制点 $(0.167, 0.167)$ 和 $(0.833, 0.833)$ 位于线性对角线上，功能上与线性插值等价。分词器利用这一冗余，将高频缓动模式编码为预设令牌，进一步压缩序列长度。
-
-![[assets/figures/papers/paper_list_l994_https_arxiv_org_abs_2604_11792/figures/024_Figure_25.jpg]]
-*Figure 25: Top 8 most common Bezier easing curves in Lottie animations, covering 75.4% of all usage. Each curve is defined by control ´ points*
 
 ### JSON 扁平化与结构评估
 
@@ -231,8 +215,6 @@ $$\mathrm{JsonStructSim} = 0.7 \cdot \mathrm{Key}\text{-}F_1 + 0.3 \cdot \mathrm
 $$\mathcal{L} = - \sum_{i=1}^{N} \log P(t_i \mid t_{<i}, \mathbf{c})$$
 
 其中 $t_i$ 为第 $i$ 个令牌，$\mathbf{c}$ 为多模态条件（文本或文本+图像前缀）。训练采用两阶段课程学习策略：Stage 1 在静态 Lottie 图像数据上学习矢量构图基础，Stage 2 引入时间动态学习关键帧驱动的动画生成。消融实验证实，仅完成 Stage 1 的模型在动画生成上的有效率仅为 78.35%，而完整两阶段训练后提升至 96.96%（Table 2），验证了该策略的必要性。
-
-
 
 ## 实验与关键发现
 
@@ -283,9 +265,6 @@ Lottie Tokenizer 在不同数据集上展现出显著的压缩效果（Table 3�
 
 LottieGPT 的典型失败案例（Figure 13）表现为可渲染但视觉不一致：生成结果中出现多余或缺失的形状，偏离预期设计。这类错误的根源在于自回归解码的累积误差——早期令牌的微小偏差通过层次化依赖关系传播至后续几何图元，导致整体构图的偏移。
 
-![[assets/figures/papers/paper_list_l994_https_arxiv_org_abs_2604_11792/figures/017_Figure_13.jpg]]
-*Figure 13: LottieGPT may still generate cases that are renderable but visually inconsistent with expectations, typically manifesting as extraneous or missing shapes relative to the intended design*
-
 更根本的局限来自矢量图形本身的表达能力边界：难以表示真实照片中的复杂渐变、纹理和细节。当前 Lottie 格式与分词器对粒子系统、复杂路径、高级混合模式和 3D 变换的编码效率较低。此外，受限于视觉语言模型的上下文长度，生成长时间复杂动画时的时序一致性仍具挑战。
 
 ### 关键图表结论
@@ -294,19 +273,6 @@ LottieGPT 的典型失败案例（Figure 13）表现为可渲染但视觉不一�
 - **Table 3** 量化了 Lottie Tokenizer 的压缩效率，支撑“关键帧插值压缩”这一核心设计动机。
 - **Figure 8 与 Figure 9** 分别展示 Text-to-Animation 和 Text+Image-to-Animation 的定性比较，揭示了少样本 LLM 基线频繁出现不可渲染输出的问题（多次尝试后仍标记为 ✗）。
 - **Figure 13** 呈现失败案例，为理解模型的能力边界提供了直观参考。
-
-![[assets/figures/papers/paper_list_l994_https_arxiv_org_abs_2604_11792/figures/012_Figure_8.jpg]]
-*Figure 8: For the Text-to-Animation task, all LLM baselines were provided with identical 3-shot examples. ✗ indicates that no renderable Lottie JSON was obtained even after the fifth attempt. More results on vector animation can be found in the supplementary video and on the project website*
-
-![[assets/figures/papers/paper_list_l994_https_arxiv_org_abs_2604_11792/figures/013_Figure_9.jpg]]
-*Figure 9: Using Text+Image as input to generate animations. Few-shot refers to providing three description-Lottie JSON data pairs. Except for Deepseek which does not support image input, all other methods use a single image and text description as input. pass@x indicates that x attempts were required to generate a renderable Lottie JSON. ✗ indicates that no renderable Lottie JSON was obtained even after the fifth attempt*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l994_https_arxiv_org_abs_2604_11792/figures/016_Figure_12.jpg]]
-*Figure 12: A manually edited Lottie animation where we modified the wing color using LottieLab*
-
-
 
 ## 定位与知识库关联
 
@@ -369,8 +335,6 @@ LottieGPT 的能力边界受以下因素制约：
 4. **可编辑性的量化评估**：当前评估体系主要关注渲染质量和结构相似度，但矢量动画的核心价值——可编辑性——尚未有系统的量化指标。如何设计衡量生成动画的图层可分离性、运动可调整性和形状可修改性的评估基准，是推动该领域发展的关键问题。
 
 5. **交互式动画编辑的闭环**：LottieGPT 生成的动画已展示出在 LottieLab 中进行手动编辑的能力（Figure 12），但如何实现“生成-编辑-再生成”的交互闭环，使用户能够通过自然语言指令迭代修改动画的特定属性，是一个具有实际应用价值的方向。
-
-
 
 ## 原文 PDF
 

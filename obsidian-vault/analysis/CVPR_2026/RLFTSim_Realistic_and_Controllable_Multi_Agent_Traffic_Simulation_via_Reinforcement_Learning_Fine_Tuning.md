@@ -56,8 +56,6 @@ claims:
 - 目标条件微调在非真实轨迹的机动控制基准上大幅超越基线（Table S5），验证了可控性蒸馏的有效性。
 - 方法具有模型无关性，可提升不同基础模型（如TrafficBots V1.5）的真实感（Table S6）。
 
-
-
 自动驾驶系统的安全验证高度依赖高保真交通仿真，以生成多样化且真实的交互场景。Waymo Open Sim Agents Challenge（WOSAC）为此提供了标准化评估框架，其核心指标**现实性元指标（RMM）**通过比较仿真轨迹与真实轨迹在多种特征维度上的离散分布来度量仿真真实感：
 
 $$\mathrm{RMM} = \sum_{d=1}^D w_d \left[ \prod_{(a,t) \in V} \hat{P}_{d,a}(k_{d,a,t}^*) \right]^{\frac{1}{|V|}}$$
@@ -69,8 +67,6 @@ $$\mathrm{RMM} = \sum_{d=1}^D w_d \left[ \prod_{(a,t) \in V} \hat{P}_{d,a}(k_{d,
 上述困境揭示了该领域的核心缺口：**如何在闭环训练中获得低方差、密集的奖励信号，使基于强化学习的现实性对齐成为可能？** 更进一步，如何在提升真实感的同时，赋予仿真器明确的**可控性**——使仿真器能够根据外部指定的目标（如特定机动）生成条件化场景——而不牺牲已获得的真实感？
 
 RLFTSim 正是针对这一双重动机而设计：通过引入**元指标留一法（MLOO）**将 RMM 转化为每个回滚的相对贡献信号，并利用闭环在线策略梯度进行微调；同时引入目标条件微调与事后经验回放，在不损害真实感的前提下蒸馏可控行为。
-
-
 
 ## 核心方法与创新机理
 
@@ -124,8 +120,6 @@ KL 正则化项约束微调策略不偏离预训练模型过远，防止灾难�
 
 RLFTSim 的四项 changed slots 构成一个完整的创新链条：**闭环训练范式**提供正确的优化环境，**MLOO 奖励**解决信号质量瓶颈，**GCFT+HER** 赋予可控性，**REINFORCE+KL** 保证稳定微调。这一链条的核心理论贡献在于揭示了 MLOO 的方差衰减性质，使原本不可行的 RMM 直接优化成为现实。
 
-
-
 RLFTSim是一个基于强化学习微调的后训练框架，旨在解决开环模仿学习在闭环部署中因分布偏移和因果混淆导致的仿真真实感不足问题。其核心思路是：将多智能体交通仿真建模为上下文马尔可夫决策过程（Contextual MDP）$(S_t, A_t, S_{t+1}, R_{t+1}, C, G)$，在预训练模型的基础上进行闭环在线RL微调，直接优化Waymo现实性元指标（RMM）。
 
 框架包含两种工作模式，对应不同的仿真需求：
@@ -159,13 +153,6 @@ $$g = \sum_{i=1}^N \nabla_\theta \log \pi_\theta(\tau_i) \; \mathrm{RMM}_i^{\mat
 **输出**：微调后的策略模型，能够在给定场景下生成高真实感仿真轨迹，或在指定目标条件下生成符合要求且保持真实感的机动行为。
 
 整个pipeline的闭环在线优化特性使其能够克服开环训练中的分布偏移问题，而MLOO的低方差特性（方差随回滚数 $N$ 呈 $1/N^2$ 下降）则保证了RL训练的样本效率和稳定性。框架具有模型无关性，已在SMART-tiny和TrafficBots V1.5两种不同基础模型上验证有效。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2720_https_arxiv_org_abs_2605_19033/figures/001_Figure_1.jpg]]
-*Figure 1: Post-training with RLFTSim. For a seed scenario from the dataset, multiple rollouts are generated. The main reward function is defined based on time-independent distribution matching of the simulated scenarios and the expert demonstration in several feature spaces. This closed-loop on-policy optimization enhances realism beyond what open-loop imitation learning achieves alone*
-
-
 
 RLFTSim 围绕一个核心洞察展开：**开环模仿学习无法应对闭环部署中的分布偏移**，而直接以 Waymo 现实性元指标（RMM）作为强化学习奖励信号又面临信号稀疏、方差过大的问题。为此，RLFTSim 设计了三个关键模块，构成完整的闭环微调管线。
 
@@ -218,13 +205,6 @@ RLFTSim 的完整管线（Figure 1）包含以下模块：
 2. **MLOO 奖励计算**：基于留一法 RMM 估计为每个回滚计算低方差贡献信号。
 3. **策略梯度更新**：使用 REINFORCE + KL 正则化进行在线策略优化。
 4. **可控性蒸馏**（可选）：在 GCFT 模式下，结合目标条件和 HER 赋予仿真器明确的可控性。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2720_https_arxiv_org_abs_2605_19033/figures/005_Figure_2.jpg]]
-*Figure 2: Empirical reward variance of MLOO and RLOO on the validation set, computed over rollouts per scenario for varying N . Shaded regions represent ±1 std. in log space*
-
-
 
 ## 实验与关键发现
 
@@ -350,24 +330,8 @@ RMM^RLOO 虽然也使用了 RMM 作为基础，但其方差远高于 MLOO。**Fi
 ![[assets/figures/papers/paper_list_l2720_https_arxiv_org_abs_2605_19033/figures/014_Table_S.6.jpg]]
 *Table S.6: Model agnosticism ablation study. Experiments are done using 20% of the WOMD validation split*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2720_https_arxiv_org_abs_2605_19033/figures/007_Table_S.1.jpg]]
-*Table S.1: Hyperparameter sweep ranges explored for RLFTSim. Final values are highlighted in bold*
-
 ![[assets/figures/papers/paper_list_l2720_https_arxiv_org_abs_2605_19033/figures/008_Table_S.2.jpg]]
 *Table S.2: Extended Benchmarking. Top: Performance scaling comparison of our RLFTSim vs. CAT-K with the number of fine-tuning epochs. † indicates a weaker reference model with only 1 epoch of pre-training. Middle: Stronger realism enhancement with a weaker reference model. Bottom: Max realism metametric for the ground truth trajectories*
-
-![[assets/figures/papers/paper_list_l2720_https_arxiv_org_abs_2605_19033/figures/009_Table_S.4.jpg]]
-*Table S.4: Paired t-test on per-scenario RMM scores from the full validation set (Tab. 2) at significance threshold*
-
-![[assets/figures/papers/paper_list_l2720_https_arxiv_org_abs_2605_19033/figures/010_Table_S.3.jpg]]
-*Table S.3: Heuristic rewards for the realism meta-metric. All metrics are evaluated on the ego vehicle and agents tagged as tracks to predict (up to 9 agents). (↑) indicates that larger values are better, and (↓) indicates smaller values are better. Miss rate is computed with the passing goal criterion. Bold and underline indicate the best and second best values, respectively*
-
-![[assets/figures/papers/paper_list_l2720_https_arxiv_org_abs_2605_19033/figures/011_Figure_S.1.jpg]]
-*Figure S.1: Controllability benchmark performance across various experimental conditions: (a) all goals are set to ground-truth maneuvers, (b) goals are randomly sampled from all maneuvers, (c) goals are exclusively sampled from alternative maneuvers, and (d) simulation controllability with kinematic perturbations. GCFT models consistently outperform the baseline across all conditions, demonstrating effective controllability distillation*
-
-
 
 ## 定位与知识库关联
 
@@ -420,8 +384,6 @@ RLFTSim 的方法边界和局限性在论文中有明确讨论或可从实验设
 **闭环微调的理论理解。** 论文通过实验证明了闭环 RL 微调优于开环模仿学习，但对“为什么闭环微调能克服分布偏移”缺乏更深入的理论分析。未来工作可以探索闭环微调的收敛性质、微调对模型泛化能力的影响，以及微调过程中灾难性遗忘的机制与缓解策略。
 
 **跨仿真器的迁移能力。** RLFTSim 在 SMART-tiny 和 TrafficBots V1.5 上验证了模型无关性，但其是否适用于其他类型的仿真器（如基于物理的仿真器、不同传感器配置的仿真器）仍是一个开放问题。特别是当基础模型使用连续动作空间而非离散令牌时，MLOO 和 GCFT 的适用性需要进一步验证。
-
-
 
 ## 原文 PDF
 

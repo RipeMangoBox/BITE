@@ -59,8 +59,6 @@ claims:
 
 GEARS 属于**感知驱动的轨迹条件手部姿态生成**方法。其方法谱系可追溯至基于虚拟传感器的手-物交互建模，但通过将感知粒度从全局/半全局推进到关节局部几何，并引入规范帧对齐机制，实现了从“记住物体形状”到“理解局部表面”的范式转变。在知识库中的定位介于手部姿态估计、抓取合成与神经运动先验之间，为需要精确接触建模的交互生成任务提供了新的技术路径。
 
-
-
 ### 任务定义：手-物交互姿态合成
 
 手-物交互姿态合成（Hand-Object Interaction Synthesis）的目标是：给定手部与物体的运动轨迹，生成与物体表面合理接触、无穿透且时序连贯的手部姿态序列。该任务在机器人操作学习、虚拟现实与增强现实、人类行为模拟等领域具有广泛的应用前景。
@@ -79,8 +77,6 @@ GEARS 属于**感知驱动的轨迹条件手部姿态生成**方法。其方法�
 ### 本文动机
 
 本文的核心观察是：**局部几何感知是泛化到任意物体表面的关键**。人类在抓取陌生物体时，并非依赖全局的物体形状记忆，而是根据手指接触点附近的局部表面几何来调整手部姿态。受此启发，GEARS 提出了一种**关节中心的局部几何传感器**——在每个关节周围采样物体表面点云，并将其变换到手部模板的规范坐标系下，再用共享的 PointNet 提取关节无关的局部几何特征。这一设计使得网络能够学习到可迁移的手-物交互特征，从而大幅提升对未见物体的泛化能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -123,8 +119,6 @@ $$\tilde{X}_S = \mathrm{softmax}\left( \frac{Q_S K_S^T}{\sqrt{l}} \right) V_S$$
 
 这三个设计改变背后贯穿着同一个核心洞察：**局部几何感知是泛化到任意物体表面的关键**。通过将物体点云对齐到关节规范帧，GEARS 使网络学到的不是“某个特定物体上的抓取位置”，而是“某种局部表面几何对应的接触模式”。这种可迁移的表征使得模型在面对训练中未见过的物体时，依然能够生成合理的手部姿态——定性结果（Figure 1, Figure 6）显示 GEARS 对小型工具和大型物体均能产生有效接触且避免穿透。
 
-
-
 GEARS 的整体 pipeline 由四个串联模块构成，以手部轨迹与物体轨迹为输入，逐帧合成手部姿态序列。其核心设计在于**关节中心的局部几何传感器**：在每个关节周围采样物体表面点云，转换到关节规范帧后，用共享的 PointNet 提取关节无关的局部几何特征，从而将“手如何接触物体表面”这一关键信息与具体关节身份解耦，大幅提升对未见物体类别与尺寸的泛化能力。
 
 **输入与预处理**。每一帧的输入包含手部轨迹 $\{\pmb{w}^t, \pmb{R}_H^t\}_{t=1}^T$（手腕平移与全局朝向）和物体轨迹 $\{\pmb{o}^t, \pmb{R}_O^t\}_{t=1}^T$（物体平移与全局朝向），以及物体的模板网格。在每一帧，首先以手腕为中心放置一个立方体虚拟传感器，裁剪出与手部交互相关的局部物体网格 $M_O^{t'}$，并将其上采样的点云 $\tilde{\pmb{P}}^t$ 变换到手腕局部坐标系（Figure 2）。
@@ -139,15 +133,11 @@ GEARS 的整体 pipeline 由四个串联模块构成，以手部轨迹与物体�
 
 **数据增强**。为缓解动态手-物交互训练数据稀少的问题，GEARS 利用 ObMan 静态抓取数据，通过 SLERP 插值关节姿态、线性插值平移与朝向，合成 200 条、每条 60 帧的动态序列（Figure 5），使所有模型在相同数据量下公平比较。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1712_GEARS_Local_Geometry_aware_Hand_object_Interaction_Synthesis/figures/002_Figure_2.jpg]]
 *Figure 2: An overview of our method. The input consists of the hand trajectory, object trajectory and object template mesh. For each time frame, the object mesh is cropped with a cube-shaped virtual sensor positioned and oriented based on the wrist. The cropped object points together with the hand trajectory are fed to the Joint Initialization Network to predict coarse joints locations. We then place more fine-grained geometry sensors at each joint to extract joint-local object features. The features are subsequently processed by the Joint Displacement Network to refine the initialized joints. Finally, we fit MANO hand model [27] to the joints to get the hand mesh sequence*
 
 ![[assets/figures/papers/paper_list_l1712_GEARS_Local_Geometry_aware_Hand_object_Interaction_Synthesis/figures/006_Figure_5.jpg]]
 *Figure 5: A sample training sequence synthesized by our heuristic rule. At the rightmost side of the time axis is a static grasping pose from ObMan [12]. We synthesize intermediate poses by interpolating joint angles from the mean MANO pose*
-
-
 
 GEARS 由四个核心模块构成：关节初始化网络、局部几何传感器、关节位移网络和手部拟合。以下逐一解析关键模块及其核心公式。
 
@@ -217,15 +207,8 @@ $$P^t = \mathrm{SLERP}(P^0, P^T, t)$$
 
 其中 $P^0$ 为噪声均值姿态，$P^T$ 为目标静态抓取姿态。这一策略为模型提供了丰富的运动先验，与局部几何传感器共同支撑了 GEARS 的强泛化能力。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1712_GEARS_Local_Geometry_aware_Hand_object_Interaction_Synthesis/figures/003_Figure_3.jpg]]
 *Figure 3: Visualization of our joint-local geometry sensor. (Left) Given the joints positions and the object mesh, we sample points on the object surface within a specified radius centered at each joint. The object points are represented in a joint-local frame. (Right) We transform the sampled object points from global frame to the canonical frame defined by the MANO template hand*
-
-![[assets/figures/papers/paper_list_l1712_GEARS_Local_Geometry_aware_Hand_object_Interaction_Synthesis/figures/004_Figure_4.jpg]]
-*Figure 4: An illustration of spatial and temporal attention networks. We first process the features of each joint by PointNet. For spatial attention, every joint attends to every other joint of the same hand. While for temporal attention, a joint in one frame attends to the same joint in every other frame*
-
-
 
 ## 实验与关键发现
 
@@ -253,8 +236,6 @@ GEARS 在两个公开数据集上均展现出对现有方法的显著优势。
 
 尽管 GEARS 在定量和定性评估中表现优异，但分析中未提供系统性的失败案例分析。根据方法设计推断，以下场景可能存在挑战：（1）当物体表面几何极其复杂或存在严重自遮挡时，关节局部传感器的点云采样可能不完整；（2）数据增强依赖静态抓取插值生成动态序列，可能无法覆盖快速或高动态的交互模式；（3）MANO 拟合作为后处理步骤，可能在关节预测与手部网格之间存在拟合误差。这些潜在限制需要进一步的手动验证和针对性实验来确认。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1712_GEARS_Local_Geometry_aware_Hand_object_Interaction_Synthesis/figures/007_Table_1.jpg]]
 *Table 1: We quantitatively compare GEARS to other baselines on the GRAB dataset. Each model is trained with the same amount data, including the synthetic sequences generated from ObMan*
 
@@ -263,11 +244,6 @@ GEARS 在两个公开数据集上均展现出对现有方法的显著优势。
 
 ![[assets/figures/papers/paper_list_l1712_GEARS_Local_Geometry_aware_Hand_object_Interaction_Synthesis/figures/009_Table_3.jpg]]
 *Table 3: Ablaion studies evaluated on GRAB. The variable r refers to the radius of joint-local sensor in millimeters*
-
-![[assets/figures/papers/paper_list_l1712_GEARS_Local_Geometry_aware_Hand_object_Interaction_Synthesis/figures/001_Figure_1.jpg]]
-*Figure 1: We propose GEARS, a method to synthesize sequence of hand poses during interaction with an object. GEARS takes hand and object trajectory as input. It generates realistic hand poses that are well-adapted to object surface, irrespective of object category and size. We show sample results on different datasets. Hands colored in blue are inputs while hands colored in cyan are our predictions*
-
-
 
 ## 定位与知识库关联
 
@@ -337,8 +313,6 @@ GEARS 可被定位为**从全局粗粒度感知到局部精细感知的范式转
 3. **在线自适应与闭环控制**：当前方法为离线生成，无法根据实时传感器反馈调整手部姿态。在机器人灵巧操作等应用中，需要具备在线推理和闭环调整能力。
 
 4. **更大规模与多样性的数据**：尽管数据增强缓解了数据稀缺问题，但合成数据的分布偏差可能限制模型在真实场景中的表现。构建更大规模、覆盖更多物体类别和交互模式的真实数据集仍是该领域的基础性需求。
-
-
 
 ## 原文 PDF
 

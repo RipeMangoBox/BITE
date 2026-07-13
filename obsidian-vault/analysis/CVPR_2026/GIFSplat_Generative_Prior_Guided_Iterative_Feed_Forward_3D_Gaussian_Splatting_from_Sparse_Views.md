@@ -62,8 +62,6 @@ GIFSplat提出了一种**生成先验引导的迭代前馈三维高斯泼溅框�
 
 在RealEstate10K、DL3DV和DTU三个数据集上，GIFSplat在所有视图重叠度设置下均超越了现有的前馈三维重建方法（包括需要相机位姿和无需位姿的方法），PSNR最高提升**+2.1 dB**。消融实验表明，迭代细化模块是最关键的组件，移除后PSNR从26.559降至24.781；生成先验模块在所有指标上均有额外增益（PSNR从26.291升至26.559，LPIPS从0.145降至0.138）。推理时间随迭代步数近似线性增长，在T=3时实现质量-延迟的最优平衡。
 
-
-
 ### 稀疏视图三维重建的范式困境
 
 从少量二维图像重建完整的三维场景是计算机视觉的核心挑战。当前主流方案可归为两类范式，但各自存在根本性瓶颈。
@@ -94,8 +92,6 @@ GIFSplat的应对策略可概括为三个层次：
 3. **效率-质量可控**：通过调整迭代步数$T$灵活控制质量与延迟的平衡——实验表明约3步后性能趋于饱和，推理时间随$T$近似线性增长（见Figure 7），实际部署中可采用$T=3$实现最优折衷。
 
 这一设计使得GIFSplat在多个数据集（DL3DV、RealEstate10K、DTU）和不同视图重叠度下均超越了现有前馈方法，PSNR最高提升+2.1 dB，同时保持了亚秒级推理速度。
-
-
 
 ## 核心方法与创新机理
 
@@ -131,8 +127,6 @@ $$\Delta\mathcal{G}_i^{(t)} = U_\theta([g_i^{(t)} \parallel \{\mathbf{o}_i\}^{(t
 
 三项创新并非孤立存在，而是形成了**因果闭环**：点基高斯与窗口注意力为迭代细化提供了高质量的初始表达和邻域上下文；迭代前馈残差更新机制为生成先验的注入提供了多步递进的载体——每一步的渲染结果都可被扩散增强器提炼为新的先验线索，反馈至下一步更新；而冻结扩散模型的设计则确保了整个迭代循环保持纯前馈效率。这一协同设计使得 GIFSplat 在多个数据集（DL3DV、RealEstate10K、DTU）和不同视图重叠度下均超越最新前馈方法，PSNR 最高提升 +2.1 dB（Table 1, Table 2, Table 3）。
 
-
-
 GIFSplat 提出一种**迭代前馈式三维高斯泼溅框架**，其核心设计围绕一个因果闭环展开：现有前馈方法采用一次性预测范式，受模型容量限制而缺乏逐场景细化能力，同时难以在保持前馈效率的前提下有效注入生成先验。GIFSplat 的解决方案是将三维高斯泼溅视为可迭代更新的表达，通过权重共享的细化模块，将渲染差异与扩散模型增强的生成先验转化为高斯级线索，在纯前馈下近似最小化观察误差，且参数规模与迭代步数解耦。
 
 ### 三组件流水线
@@ -164,9 +158,6 @@ GIFSplat 提出一种**迭代前馈式三维高斯泼溅框架**，其核心设�
 
 该设计的关键优势在于：**迭代细化模块与生成先验模块可独立启用或关闭**。当仅使用观察线索时，框架退化为 IFSplat 模式（Eq. 2）；同时启用先验线索时即为完整的 GIFSplat 模式（Eq. 5）。这种模块化设计使得质量与效率的平衡可通过迭代步数 $T$ 灵活控制——实验表明性能在约 3 步后趋于饱和，推理时间随 $T$ 近似线性增长（Figure 7）。
 
-![[assets/figures/papers/paper_list_l2511_https_arxiv_org_abs_2602_22571/figures/011_Figure_7.jpg]]
-*Figure 7: Time complexity analysis. Inference time of our methods IFSplat and GIFSplat on two datasets as a function of the number of refinement steps. Both methods scale approximately linearly with T*
-
 ### 两阶段训练策略
 
 为稳定训练这一多步迭代系统，GIFSplat 采用两阶段训练：
@@ -176,12 +167,8 @@ GIFSplat 提出一种**迭代前馈式三维高斯泼溅框架**，其核心设�
 
 这一框架的边界条件在于：当前设计仅针对静态场景，未处理动态内容；扩散增强器在推理时完全冻结且无梯度回传，虽保证了效率，但可能限制了细节恢复的上限。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2511_https_arxiv_org_abs_2602_22571/figures/001_Figure_1.jpg]]
 *Figure 1: Conceptual comparison of reconstruction paradigms. Gradient optimization performs thousands updates, incurring heavy test-time cost, often achieving high quality in dense-view scenarios but struggling in sparse-view scenarios; One-shot feedforward [7] is efficient but leaves noticeable artifacts; Our iterative residual feed-forward scheme keeps feed-forward efficiency and achieves higher reconstruction quality without test-time gradient backpropagation*
-
-
 
 ### 3.1 框架总览
 
@@ -217,9 +204,6 @@ $$\Delta\mathcal{G}^{(t+1)} \gets U_\theta([\mathcal{G}^{(t)} \parallel \{o_i\}^
 
 生成先验融合模块（Figure 4）引入冻结的扩散增强器 **DIFIX**，在无梯度回传的前提下为细化过程注入高频纹理先验。具体流程：
 
-![[assets/figures/papers/paper_list_l2511_https_arxiv_org_abs_2602_22571/figures/004_Figure_4.jpg]]
-*Figure 4: Generative prior fusion. Given sparse input views (left), our feed-forward 3DGS first produces a rendered view (middle). A frozen diffusion-based enhancer then refines this rendering into an enhanced image (right) with sharper textures and richer details, which is converted into Gaussian-level prior cues for subsequent residual updates*
-
 1. 对当前步渲染视图 $R_m^{(t)}$ 施加 DIFIX 增强，得到增强图像 $\tilde{R}_m^{(t)}$；
 2. 将增强图像与原始渲染图像送入特征编码器，计算特征空间残差 $P_m^{(t)}(u)$；
 3. 通过相同的软分配权重池化，形成**先验线索** $\mathbf{p}_i^{(t)}$：
@@ -245,13 +229,6 @@ $$\mathcal{L}_{\mathrm{stage1}} = \sum_{m \in \mathcal{M}} (\mathcal{L}_{\mathrm
 $$\mathcal{L}_{\mathrm{stage2}} = \sum_{t=1}^{T} \omega_t \sum_{m \in \mathcal{M}} \| I_m - R_m^{(t)} \|_2 \quad \text{(Eq. 9)}$$
 
 其中 $\omega_t$ 为步骤权重。该多步监督信号驱动迭代头逐步减小渲染误差，实现无梯度场景自适应细化。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2511_https_arxiv_org_abs_2602_22571/figures/003_Figure_3.jpg]]
-*Figure 3: Visualizing iterative residual refinement. Starting from the initial 3DGS prediction (left column), our iterative Gaussian head progressively refines geometry and appearance over three forward-only steps (S1–S3). The zoomed regions highlighted by red dashed boxes show reduced blur, sharper edges, and fewer artifacts as the iteration proceeds, illustrating how the proposed updates gradually improve the scene representation without test-time gradient backpropagation*
-
-
 
 ## 实验与关键发现
 
@@ -291,8 +268,6 @@ Table 5和Figure 7分析了细化步数T对性能与效率的影响。从初始�
 
 4. **跨域泛化的边界。** 尽管DTU零样本结果优于基线，但绝对PSNR（20.214）仍显著低于域内结果，表明迭代细化机制虽具泛化性，但在领域差异极大时仍存在性能衰减。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2511_https_arxiv_org_abs_2602_22571/figures/005_Table_1.jpg]]
 *Table 1: Novel view synthesis performance comparison on the RealEstate10K with 2 views as input. Our method largely outperforms pose-free and pose-required methods across all overlap settings, especially for small overlap setting. The best and second-best results are highlighted*
 
@@ -304,17 +279,6 @@ Table 5和Figure 7分析了细化步数T对性能与效率的影响。从初始�
 
 ![[assets/figures/papers/paper_list_l2511_https_arxiv_org_abs_2602_22571/figures/012_Table_4.jpg]]
 *Table 4: Ablation study. We ablate the iterative refinement module (w/o Refinement), the window attention (w/o window att.), and the generative prior (w/o Gen. prior) from our full model, respectively. The full configuration achieves the best performance across all metrics. The best and second-best results are highlighted*
-
-![[assets/figures/papers/paper_list_l2511_https_arxiv_org_abs_2602_22571/figures/010_Table_5.jpg]]
-*Table 5: Analysis of iterative steps. We report metrics as the number of refinement steps T increases from the initial prediction, for both IFSplat and our GIFSplat. Performance improves steadily and saturates around 3 iterations*
-
-![[assets/figures/papers/paper_list_l2511_https_arxiv_org_abs_2602_22571/figures/006_Figure_5.jpg]]
-*Figure 5: Qualitative comparisons on representative indoor scenes from RealEstate10K. Columns: sparse input views, FLARE, AnySplat, our GIFSplat with generative prior, and ground truth (GT). Red dashed boxes highlight that GIFSplat recovers sharper boundaries (e.g., door frames, wall corners), more faithful textures, and fewer artifacts such as texture sticking*
-
-![[assets/figures/papers/paper_list_l2511_https_arxiv_org_abs_2602_22571/figures/008_Figure_6.jpg]]
-*Figure 6: Qualitative comparisons on DL3DV. Columns: FLARE, AnySplat, GIFSplat (ours), and GT. Across representative scenes, GIFSplat preserves sharper edges and textures while suppressing blur and texture sticking compared with feed-forward baselines*
-
-
 
 ## 定位与知识库关联
 
@@ -349,8 +313,6 @@ GIFSplat 引入的迭代残差头 $U_\theta$ 改变了这一范式：它不依�
 4. **表达方式的泛化性**：参数共享的迭代细化模块是否可能泛化到完全不同的三维表达方式，如 NeRF 或三平面？这需要验证残差预测机制对不同参数空间的适应性。
 
 5. **训练效率优化**：当前两阶段训练策略（先训练初始器，再训练迭代头）虽保证了稳定性，但增加了训练复杂度。端到端联合训练是否可行，且能否进一步提升性能，尚待验证。
-
-
 
 ## 原文 PDF
 

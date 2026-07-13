@@ -55,8 +55,6 @@ claims:
 
 在方法谱系上，ANI3DHUMAN处于运动学动画与扩散先验驱动的4D重建交叉点。相较于 **Disco4D** 和 **SV4D 2.0** 等基于SDS或多视图扩散的4D重建方法，它通过视频恢复而非直接生成来规避质量与身份的矛盾；相较于 **PERSONA** 等姿态驱动视频扩散方法，它采用“恢复-优化”两阶段策略，将扩散模型的生成能力转化为4D表示的监督信号，从而实现了身份保持与非刚性动态的真实感统一。
 
-
-
 ### 问题背景
 
 三维人体动画是计算机视觉与图形学的核心任务之一，其目标是从给定的参考图像和运动序列出发，合成具有真实感外观和动态细节的三维人体动画。这一任务在虚拟现实、数字人交互、影视制作等领域具有广泛的应用前景。然而，实现高质量的三维人体动画面临两大核心挑战：**身份一致性保持**和**真实感非刚性动态建模**。
@@ -84,8 +82,6 @@ claims:
 3. 如何在视频恢复过程中同时保持身份一致性和生成质量？
 
 为解决这些问题，本文提出 **ANI3DHUMAN** 框架，其核心思想是：利用分层运动表示解耦刚性与非刚性运动，通过运动学方法生成粗渲染作为结构先验，再设计自引导随机采样策略从粗渲染中恢复高质量、身份一致的视频，最终以恢复视频为监督信号优化完整的三维人体动画表示。
-
-
 
 ## 核心方法与创新机理
 
@@ -128,8 +124,6 @@ $$\hat{\mathbf{x}}_{0|t} \leftarrow \hat{\mathbf{x}}_{0|t} - \lambda \nabla_{\ma
 
 三个 changed slots 并非孤立存在，而是形成因果闭环：分层运动表示产生粗渲染 $y$ → 自引导随机采样将 $y$ 恢复为高质量视频 $x^*$ → $x^*$ 通过对角线采样为残差运动场提供强监督 → 优化后的残差场反过来改善刚性运动的基础渲染质量。这一闭环使得 Ani3DHuman 在 ActorsHQ 数据集上 FID 达到 105.3，比最佳竞争者 LHM（124.1）提升 18.8，用户研究总体偏好达 54.4%（Table 1, Table 2）。
 
-
-
 ANI3DHUMAN 的整体 pipeline 围绕一个核心矛盾展开：运动学驱动的网格变形能提供刚性的结构骨架，却无法捕捉衣物的自然褶皱、摆动等非刚性动态；而直接让视频扩散模型从姿态条件生成视频，又会因缺乏结构先验而导致身份漂移和严重伪影。该方法的解决思路是**将刚性动画作为“粗稿”，由扩散模型负责“精修”出非刚性动态，再以精修结果作为监督信号优化可微的4D表示**。
 
 ### 输入输出流
@@ -154,8 +148,6 @@ Figure 2 清晰展示了四个模块的串联关系：
 ### 信息流动的关键逻辑
 
 粗渲染 $y$ 为扩散模型提供了**强结构和身份先验**——它已经具备正确的人体姿态和大致外观，只是缺失了非刚性动态细节。这一设计使得视频恢复任务从“从零生成”降级为“从OOD输入恢复”，大幅降低了扩散模型的生成难度。恢复后的视频 $x^*$ 再反哺4D优化，形成闭环：**扩散先验负责“想象”非刚性动态，4D优化负责将其蒸馏为可自由视点的显式表示**。
-
-
 
 ANI3DHUMAN 的核心技术链路包含四个紧密耦合的模块：**分层运动表示**、**自引导随机视频恢复**、**个性化扩散先验**以及**渐进式4D优化**。本节聚焦前两个核心模块的公式化描述与设计动机。
 
@@ -238,21 +230,11 @@ $$
 
 其中 $\mathcal{L}_{\mathrm{reg}}$ 包含深度正则化项。为高效利用多视图-时间信息，方法采用**对角线视图-时间采样**（Fig. 4）：相机视角与时间步同步演进，以最少轨迹数捕获时空信息，最小化多视图不一致性的暴露。同时，**渐进数据集更新**策略在优化过程中逐步替换监督帧，防止过度平滑，使衣物褶皱等高频纹理保持清晰（Fig. 11c消融验证）。优化使用AdamW，恒定学习率 $1\times10^{-5}$，共25k次迭代。
 
-![[assets/figures/papers/paper_list_l1007_https_arxiv_org_abs_2602_19089/figures/004_Figure_4.jpg]]
-*Figure 4: Diagonal view-time sampling. (a) Illustration of diagonal sampling in a view-time matrix*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1007_https_arxiv_org_abs_2602_19089/figures/003_Figure_3.jpg]]
-*Figure 3: Distribution mismatch in deterministic flow matching. Our degraded input y (out-of-distribution, OOD) creates a noisy latent*
-
 ![[assets/figures/papers/paper_list_l1007_https_arxiv_org_abs_2602_19089/figures/007_Figure_6.jpg]]
 *Figure 6: Comparison on other video re-rendering methods. (a) original rendering x; (b-f) competitive sampling methods; (g) our results x∗. Only our self-guided stochastic sampling can generate sharp details while preserving the original identity well*
 
 ![[assets/figures/papers/paper_list_l1007_https_arxiv_org_abs_2602_19089/figures/011_Figure_8.jpg]]
 *Figure 8: Ablation study on motion field. Our layered motion (right) captures intricate hand details, while the single-layer baseline (left) fails*
-
-
 
 ## 实验与关键发现
 
@@ -292,22 +274,8 @@ Table 3从动画表示、运动类型、优化过程等维度系统对比了各�
 
 尽管ANI3DHUMAN在整体性能上表现优异，仍存在以下局限。首先，最终的4DGS表示因高斯原语的离散性，可能导致极高频纹理细节相比源视频略有平滑。其次，动画质量依赖底层SMPL参数估计的准确性——不准确的SMPL拟合会引入空间对齐误差，导致非刚性运动学习出现偏差。此外，单次视频恢复采样仍需约67秒，虽优于PERSONA的逐帧优化，但尚未达到交互速率。在极端视角或高度复杂的多服装交互场景下，自引导机制的鲁棒性有待进一步验证（需人工确认具体边界条件）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1007_https_arxiv_org_abs_2602_19089/figures/001_Figure_1.jpg]]
 *Figure 1: Given a reference human image and a target SMPL mesh sequence, our method synthesizes photorealistic 3D human animation. Unlike the previous state-of-the-art (SOTA) methods (e.g., LHM [58] (top-right)) that are limited to rigid motion, our ANI3DHUMAN (bottom) can further generate high-fidelity nonrigid dynamics, capturing the natural flow of the dress*
-
-![[assets/figures/papers/paper_list_l1007_https_arxiv_org_abs_2602_19089/figures/005_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l1007_https_arxiv_org_abs_2602_19089/figures/013_Table_4.jpg]]
-*Table 4: Quantitative ablation study of the proposed components. The results demonstrate that the full model configuration achieves the most robust performance across all evaluation metrics*
-
-![[assets/figures/papers/paper_list_l1007_https_arxiv_org_abs_2602_19089/figures/006_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l1007_https_arxiv_org_abs_2602_19089/figures/010_Figure.jpg]]
-*Figure: (a) Single-layer Motion Field (b) Layered Motion Field*
-
-
 
 ## 定位与知识库关联
 
@@ -360,8 +328,6 @@ ANI3DHUMAN 的方法创新可归纳为三个因果链环环相扣的设计：
 4. **多角色扩展**：分层运动表示和自引导采样的设计是否可推广至多人物交互场景？多角色间的遮挡和相互运动耦合将引入新的分布偏移，对采样策略的鲁棒性提出更高要求。
 
 5. **与物理仿真的融合**：当前残差运动场完全由数据驱动，缺乏物理约束（如布料力学）。将物理先验融入残差场的学习过程，可能进一步提升非刚性动态的物理合理性，尤其是在训练数据覆盖不足的运动模式上。
-
-
 
 ## 原文 PDF
 

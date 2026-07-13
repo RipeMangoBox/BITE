@@ -53,8 +53,6 @@ claims:
 
 **主要结果**：在皮肤病理诊断、Cyst-X 3D MRI 和 OfficeHome 三个互补基准上，DK-DDIL 在平均准确率（A）和最终准确率（AT）上均一致优于现有最先进方法。以皮肤病理诊断为例，AT 达到 71.52%，较最强基线 RanPAC 提升 4.63 个百分点；在仅使用 0.26% 可训练参数的情况下，实现了显著优于参数规模更大的适配器方法的性能，验证了动态容量分配与知识整合策略的有效性。
 
-
-
 ### 医学影像连续学习的现实挑战
 
 持续学习（Continual Learning）旨在使模型在顺序到达的数据流中逐步积累知识，而不会灾难性地遗忘先前学到的信息。在医学影像分析领域，这一需求尤为迫切：临床数据并非一次性静态收集，而是随着时间推移、设备更新、采集协议变化和疾病谱演化而持续涌现。然而，现有的域增量学习（Domain-Incremental Learning, DIL）方法在设计上存在两个根本性假设，使其难以直接部署于真实临床场景。
@@ -86,8 +84,6 @@ DK-DDIL 的核心洞察在于：**将低秩自适应的动态秩选择与参数�
 3. **原型级对比精炼**：在特征空间施加多粒度对比约束——正对齐损失缓解原型漂移、域内负样本分离增强类间判别、跨域负样本抑制防止新旧类别混淆、类内紧凑性损失强化特征内聚——从而在无回放（rehearsal-free）条件下巩固跨域知识。
 
 这一设计直接回应了动态域增量学习的核心因果机制：通过 DAM 的连续秩调节与 KIR 的参数-原型双重巩固，稳定了模型可塑性与稳定性的平衡点，使模型在标签空间动态扩展和域分布高度异构的双重挑战下，仍能有效抑制灾难性遗忘。
-
-
 
 ## 核心方法与创新机理
 
@@ -130,8 +126,6 @@ DCL 通过课程加权系数 $s/S_t$ 随域内观测增加逐渐增强负对比�
 
 **证据强度**：消融实验（Figure 3a）表明，移除 DAM 和 KIR 仅微调分类头（FT）导致性能急剧下降，证实了自适应适配器与知识整合的不可或缺性。主实验（Table 1）显示 DK-DDIL 在 Skin Pathology Diagnosis、Cyst-X 3D MRI 和 OfficeHome 三个基准上的最终准确率 $A_T$ 分别达到 71.52%、51.08% 和 86.29%，较最强基线 RanPAC 提升 +4.63%、+2.88% 和 +1.59%，同时仅使用 0.26% 的可训练参数，验证了创新的有效性。
 
-
-
 DK-DDIL 构建了一个**无回放（rehearsal-free）的动态域增量学习框架**，其核心瓶颈在于真实临床场景中标签空间随时间动态演变、域分布高度异构，而现有方法依赖固定标签空间且缺乏自适应的容量分配与跨域知识整合机制，导致灾难性遗忘与泛化退化。该框架通过两个协同模块——**动态适配模块（Dynamic Adaptation Module, DAM）**和**知识继承与精炼模块（Knowledge Inheritance and Refinement, KIR）**——在冻结的 ViT-B/16 骨干上实现域感知的自适应容量扩展与跨域一致性保持，整体结构如图 Figure 1 所示。
 
 ![[assets/figures/papers/paper_list_l2119_https_openaccess_thecvf_com_content_CVPR2026_html_Ma_DK_DDIL_Adaptive_Kn/figures/001_Figure_1.jpg]]
@@ -161,8 +155,6 @@ DK-DDIL 构建了一个**无回放（rehearsal-free）的动态域增量学习�
 ### 关键证据与效能
 
 实验表明，该框架在 Skin Pathology Diagnosis（7 个序贯域）、Cyst-X 3D MRI 和 OfficeHome 三个互补基准上均一致超越现有最优 DIL 方法。以 Skin Pathology Diagnosis 为例，DK-DDIL 的平均准确率 A 达到 77.03%，最终准确率 AT 达到 71.52%，分别较最强基线 RanPAC（McDonnell et al., NeurIPS 2023）高出 +2.24 和 +4.63 个百分点，同时可训练参数仅占 0.26%，显著低于多数适配器方法。消融实验进一步证实：移除 DAM 和 KIR 仅微调分类头会导致性能急剧下降，验证了自适应适配器与知识整合的不可或缺性。
-
-
 
 ### 3.1 动态域增量学习形式化
 
@@ -272,8 +264,6 @@ $$\mathcal{L} = \mathcal{L}_{\text{CE}} + \mathcal{L}_{\text{reg}} + \mathcal{L}
 
 三者的协同作用体现在：$\mathcal{L}_{\text{CE}}$ 保证当前域的分类性能，$\mathcal{L}_{\text{reg}}$ 通过稀疏性约束实现自适应容量分配，$\mathcal{L}_{\text{DCL}}$ 则在特征空间巩固跨域知识、抑制灾难性遗忘。消融实验（Figure 3a）证实，移除 DAM 和 KIR 仅微调分类头（FT）会导致性能急剧下降，验证了自适应适配器与知识整合机制的不可或缺性。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -326,12 +316,8 @@ Figure 3 系统剖析了各组件和关键超参数的贡献。
 
 5. **Cyst-X 基准的绝对性能偏低。** 尽管 DK-DDIL 相对基线有提升，但 3D MRI 跨中心场景下 AT 仅约 51%，表明域偏移极大时，仅靠低秩适配和原型对比仍不足以完全弥合分布鸿沟，可能需要更强的域对齐或数据增强策略。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2119_https_openaccess_thecvf_com_content_CVPR2026_html_Ma_DK_DDIL_Adaptive_Kn/figures/002_Figure_2.jpg]]
 *Figure 2: Sample distribution across seven sequential domains in the Skin Pathology Diagnosis setting. Each domain corresponds to a distinct clinical dataset or acquisition period, representing the temporal evolution of real-world dermatopathology practice. The y-axis is plotted on a logarithmic scale to emphasize cross-domain imbalance. Both the category composition and the sample size vary notably across domains—new lesion types (e.g., AK, SCC, MAL OTH) appear in later stages, whereas earlier domains contain fewer samples with a more limited set of lesion categories*
-
-
 
 ## 定位与知识库关联
 
@@ -415,8 +401,6 @@ DK‑DDIL 特别适用于以下条件同时满足的场景：
 4. **与视觉‑语言模型的结合**：DK‑DDIL 的原型分类器天然支持余弦相似度推理，与 CLIP 等视觉‑语言模型的嵌入空间高度兼容。如何将 DAM 的动态秩适配与语言引导的零样本域适应结合，是提升开放域泛化能力的潜在方向。
 
 5. **计算开销的权衡**：DCL 需要维护和更新原型记忆库，其计算开销随类别数线性增长。在超大规模类别空间（如 >10K 类）下，原型存储和对比损失计算的效率需要进一步优化。
-
-
 
 ## 原文 PDF
 

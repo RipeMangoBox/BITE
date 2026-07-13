@@ -56,8 +56,6 @@ WorldForge 由三个关键模块构成：
 
 实验结果表明，WorldForge 在多个基准上显著超越现有方法。在静态3D场景生成任务上，FID 降至 **96.08**（See3D 为 123.26），CLIP相似度达到 **0.948**，轨迹精度指标 ATE 降至 **0.077**。在动态4D场景重渲染任务上，FVD 达到 **93.17**，CLIP-V相似度为 **0.938**。消融实验验证了三个组件的互补性：移除 IRR 导致模型退化为无约束生成；移除 FLF 使运动噪声污染所有通道；移除 DSG 或用标准 CFG 替代则因大角度差异产生严重伪影。该框架具有良好的模型无关性，可无缝迁移至 **SVD**、**Wan 2.1**、**LongCat** 等不同架构的视频扩散模型。
 
-
-
 ### 问题域：视频扩散模型在空间任务中的相机控制困境
 
 大规模预训练视频扩散模型（Video Diffusion Models, VDMs）在文本驱动的视频生成中展现出强大的时空先验，然而将其应用于3D场景生成、4D动态场景重渲染、新视角合成等空间任务时，面临一个根本性瓶颈：**缺乏精确的6自由度（6-DoF）相机轨迹控制能力**。现有模型在生成过程中，场景内容与相机运动高度纠缠——模型无法区分“物体自身运动”与“观测视角变化”，导致输出视频出现时空不一致、几何破碎和视觉伪影。
@@ -87,8 +85,6 @@ WorldForge 由三个关键模块构成：
 WorldForge的提出正是为了系统性解决上述三个子问题。其核心洞察是：**通过光学流相似性识别潜在空间中与运动高度相关的通道，实现运动与外观的解耦；在此基础上，利用引导路径与非引导路径之间的正交分量进行自适应校正，能够在无需任何重新训练的情况下平衡轨迹准确性与生成质量。**
 
 具体而言，WorldForge引入三个协同组件：**Intra-Step Recursive Refinement (IRR)** 在每个去噪步内嵌入微预测-校正循环，将观测区域的预测内容替换为轨迹对应区域，实现细粒度轨迹注入；**Flow-Gated Latent Fusion (FLF)** 通过光流相似性得分动态识别并选择性更新高运动相关性通道，保留外观通道不受污染；**Dual-Path Self-Corrective Guidance (DSG)** 利用引导路径与非引导路径之间的正交差异（通常50°–70°大角度差）进行自适应校正，消除因轨迹扭曲引入的伪影。三者协同，使WorldForge成为一个完全训练自由、模型无关的框架，可适配SVD、Wan 2.1、LongCat等多种视频扩散模型骨干网络。
-
-
 
 ## 核心方法与创新机理
 
@@ -121,8 +117,6 @@ $$\mathbf{v}_t^{\mathrm{corr}} = \mathbf{v}_t^{\mathrm{traj}} + \rho \cdot \beta
 ### 创新协同与范式意义
 
 三个改造点形成递进依赖关系：IRR 提供轨迹注入的基础设施，FLF 在注入过程中实现运动-外观解耦以保护视觉质量，DSG 则在采样层面进一步矫正因轨迹变形引入的伪影。这种“注入-解耦-矫正”的三阶段设计使得 WorldForge 成为**完全训练自由且模型无关**的框架——它不需要任何相机标注数据进行微调，可直接适配 SVD、Wan 2.1、LongCat 等多种视频扩散骨干网络（Fig. 6, Table 4 supplementary），在 3D 静态场景生成（FID 96.08 vs. See3D 123.26）和 4D 动态场景重渲染（FVD 93.17）上均取得最优结果。
-
-
 
 WorldForge 是一个完全无需训练的框架，其核心思想是将预训练视频扩散模型（VDM）的丰富时空先验“驯服”为精确的相机轨迹控制，从而实现高质量的 3D 场景生成与 4D 动态场景重渲染。整个 pipeline 由三个关键模块串联构成：**Intra-Step Recursive Refinement (IRR)**、**Flow-Gated Latent Fusion (FLF)** 和 **Dual-Path Self-Corrective Guidance (DSG)**。它们共同解决了一个核心瓶颈——如何在保留预训练模型视觉质量的前提下，将精确的 6-DoF 相机轨迹约束注入到生成过程中，同时抑制因深度估计误差和扭曲操作引入的视觉伪影。
 
@@ -159,12 +153,8 @@ WorldForge 是一个完全无需训练的框架，其核心思想是将预训练
 
 三个模块形成了一条清晰的因果链：**IRR** 提供了轨迹注入的基础机制，使模型在去噪过程中持续受到空间约束；**FLF** 通过通道选择性融合解决了全通道更新带来的外观退化问题，实现了运动与外观的解耦；**DSG** 则在引导层面矫正了因轨迹扭曲引入的噪声，用正交分量替代直接 CFG，处理了引导路径与非引导路径之间的大角度差异。三者协同作用，使得 WorldForge 能够在零样本、无训练的条件下，将预训练视频扩散模型转化为精确的 3D/4D 生成引擎。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2607_https_arxiv_org_abs_2509_15130/figures/019_Figure_7.jpg]]
 *Figure 7: Robustness in challenging scenarios. Our framework maintains structural integrity even under fast motion and complex occlusions*
-
-
 
 WorldForge 在预训练视频扩散模型的去噪过程中嵌入三个训练自由的轨迹控制模块，构成一个从粗到精的注入–解耦–校正管线。
 
@@ -219,11 +209,6 @@ $$\mathbf{v}_t^{\mathrm{corr}} = \mathbf{v}_t^{\mathrm{traj}} + \rho \cdot \beta
 
 消融实验证实：移除 DSG 或替换为标准 CFG 均导致显著伪影和结构破损（Figure 5, supplementary Figure 1）；移除自适应权重 $\beta_t$ 则破坏引导稳定性。
 
-![[assets/figures/papers/paper_list_l2607_https_arxiv_org_abs_2509_15130/figures/016_Figure_5.jpg]]
-*Figure 5: Large camera movements (e.g., 180◦). Single-pass generation of large angles often suffers from poor quality. Our method effectively resolves this problem via iterative generation*
-
-
-
 ## 实验与关键发现
 
 ### 评估设置与公平性说明
@@ -275,30 +260,11 @@ Table 3给出了单步计算代价分解。以NVIDIA A100生成832×480分辨率
 - 推理速度虽可接受，但实时生成仍有挑战——IRR的迭代特性使得单步延迟较高，能否通过蒸馏或少步采样缓解需要进一步探索。
 - 在DiT架构上的通道选择统计（类似Figure 4）尚未提供，FLF的通道角色分化是否具有跨架构一致性有待验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2607_https_arxiv_org_abs_2509_15130/figures/005_Table_1.jpg]]
 *Table 1: Quantitative comparison with existing methods on 3D static scenes. We evaluate generation quality (FID*
 
 ![[assets/figures/papers/paper_list_l2607_https_arxiv_org_abs_2509_15130/figures/008_Figure_5.jpg]]
 *Figure 5: Ablation of the proposed components. IRR enables trajectory injection; without it, the model defaults to prompt-only free generation, and FLF/DSG cannot be applied. FLF decouples trajectory cues from noisy content; removing it introduces noise from warped frames. DSG guides sampling toward highquality, trajectory-consistent results; without it, detail and plausibility drop. If the standard CFG formulation is applied in DSG, the large angular difference between the two velocity fields causes severe artifacts and errors. The full model achieves the best fidelity and control, demonstrating their complementary effects*
-
-![[assets/figures/papers/paper_list_l2607_https_arxiv_org_abs_2509_15130/figures/007_Figure_6.jpg]]
-*Figure 6: Ablation across different VDMs. To verify our method’s transferability, we port it to the U-Net–based SVD model [8] and compare it against other SVD-based methods. Our guidance achieves excellent results on native SVD. Furthermore, we applied our method to the recent LongCat-Video [70] model. Leveraging its rich world priors, our method again achieves SOTA results*
-
-![[assets/figures/papers/paper_list_l2607_https_arxiv_org_abs_2509_15130/figures/010_Figure_1.jpg]]
-*Figure 1: Qualitative ablation study of the DSG method. Substituting DSG with a standard CFG formulation fails to handle the large angular disparity between the two velocity fields, resulting in significant visual artifacts and errors. Removing the adaptive weighting factor*
-
-![[assets/figures/papers/paper_list_l2607_https_arxiv_org_abs_2509_15130/figures/013_Table_3.jpg]]
-*Table 3: Computational cost breakdown of a single generation step. We report the runtime of each component on an NVIDIA A100, taking the generation of a 49-frame video at 832 × 480 resolution as an example. By default, we apply our guidance during the first 20 sampling steps. The primary overhead comes from the IRR module, while the DSG module incurs negligible cost*
-
-![[assets/figures/papers/paper_list_l2607_https_arxiv_org_abs_2509_15130/figures/015_Table_4.jpg]]
-*Table 4: Quantitative comparison across different backbones. Using single-view 3D scene generation as a benchmark, we evaluate our method on SVD [8], Wan 2.1 [75], and LongCat [70]. The results demonstrate the scalability of our approach and its ability to generalize across different VDM architectures. Furthermore, the performance gains on advanced backbones indicate that our method effectively leverages the capabilities of the underlying model, promising improved generation quality as base models continue to evolve*
-
-![[assets/figures/papers/paper_list_l2607_https_arxiv_org_abs_2509_15130/figures/009_Table_1.jpg]]
-*Table 1: Default coefficient settings used in our experiments (taking Wan 2.1 implementation as an example). While these values serve as a robust baseline, users can fine-tune them for specific scenes to maximize generation quality*
-
-
 
 ## 定位与知识库关联
 
@@ -339,8 +305,6 @@ WorldForge 的适用边界由以下因素决定：
 3. **架构迁移性**：论文已在 U-Net 架构（SVD）和 DiT 架构（Wan 2.1、LongCat）上验证了迁移性（Figure 6, supplementary Table 4），但在其他视频扩散架构（如 CogVideoX）上的潜力仍需进一步探索。
 
 4. **多模态条件扩展**：当前框架的输入为单图或视频帧加轨迹。能否扩展至多模态条件（如文本+轨迹联合控制）或更复杂的物理世界模拟（如刚体运动、流体动力学），是值得探索的方向。
-
-
 
 ## 原文 PDF
 

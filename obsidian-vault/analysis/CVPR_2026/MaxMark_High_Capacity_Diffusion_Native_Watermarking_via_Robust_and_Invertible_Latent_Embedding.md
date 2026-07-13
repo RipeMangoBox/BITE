@@ -135,8 +135,6 @@ MaxMark 的整体 pipeline 由两个协同工作的核心模块构成：**鲁棒
 
 INN 的训练仅需前向过程，通过最小化最大似然估计损失与 KL 散度的加权和来匹配标准高斯分布，无需扩散模型的反向传播。推理时，嵌入与提取均依赖 INN 的完全可逆性，保证了信息的精确恢复。
 
-### 补充图表
-
 MaxMark由两个协同工作的核心模块构成：**鲁棒水印嵌入模块**与**分布变换模块**，二者共同解决高容量水印嵌入与图像质量保持之间的矛盾。
 
 ### 鲁棒水印嵌入模块
@@ -175,14 +173,6 @@ $$\mathcal { L } _ { t o t a l } = \mathcal { L } _ { M L E } ( z , J ) + \lambd
 
 提取阶段通过DDIM反演从生成图像恢复潜变量，再经逆INN变换得到带水印潜变量，最后从符号位解码出水印信息。整个流程的精确性依赖于INN的可逆性——前向映射到高斯分布保证生成质量，反向映射精确恢复嵌入信息，形成闭环。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l898_https_openaccess_thecvf_com_content_CVPR2026_html_Chang_MaxMark_High_Cap/figures/012_Figure_5.jpg]]
-*Figure 5: Bit accuracy with different embedding positions for fp32 in the latent space, using the distribution transformation module*
-
-![[assets/figures/papers/paper_list_l898_https_openaccess_thecvf_com_content_CVPR2026_html_Chang_MaxMark_High_Cap/figures/007_Figure_4.jpg]]
-*Figure 4: Impact of the Distribution Transformation Module on Image Quality*
-
 ## 实验与关键发现
 
 ### 主结果：高容量水印的有效性与图像质量
@@ -205,8 +195,6 @@ MaxMark在Stable Diffusion V1.5上进行了系统评估，与基于潜空间的�
 
 MaxMark的方法不仅限于图像生成。Table 7和Table 8分别展示了在视频和音频模态上的性能，在不同水印载荷下均保持了较高的比特准确率，表明符号位嵌入与分布变换的核心思想具有跨模态的通用性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l898_https_openaccess_thecvf_com_content_CVPR2026_html_Chang_MaxMark_High_Cap/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison between MaxMark and baselines across different watermark payload sizes. MaxMark significantly outperforms baselines in both bit accuracy and robustness*
 
@@ -221,15 +209,6 @@ MaxMark的方法不仅限于图像生成。Table 7和Table 8分别展示了在�
 
 ![[assets/figures/papers/paper_list_l898_https_openaccess_thecvf_com_content_CVPR2026_html_Chang_MaxMark_High_Cap/figures/009_Table_5.jpg]]
 *Table 5: Bit accuracy(%) with different ECC methods*
-
-![[assets/figures/papers/paper_list_l898_https_openaccess_thecvf_com_content_CVPR2026_html_Chang_MaxMark_High_Cap/figures/010_Table_6.jpg]]
-*Table 6: Bit accuracy with different ECC settings across different watermark payload sizes. Clearly that ECC can enhance the recovery ability, but a limited effect on a random setting. Our automatic hyper-parameters searching performs better across different watermark payload sizes*
-
-![[assets/figures/papers/paper_list_l898_https_openaccess_thecvf_com_content_CVPR2026_html_Chang_MaxMark_High_Cap/figures/011_Table_7.jpg]]
-*Table 7: Video modality performance on bit accuracy (%), across different watermark payload sizes*
-
-![[assets/figures/papers/paper_list_l898_https_openaccess_thecvf_com_content_CVPR2026_html_Chang_MaxMark_High_Cap/figures/013_Table_8.jpg]]
-*Table 8: Audio modality performance on bit accuracy (%), across different watermark payload sizes*
 
 ## 定位与知识库关联
 

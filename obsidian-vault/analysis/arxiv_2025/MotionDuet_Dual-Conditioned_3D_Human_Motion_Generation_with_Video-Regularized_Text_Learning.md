@@ -51,8 +51,6 @@ claims:
 
 在 HumanML3D 基准上，MotionDuet（纯文本推理）相比 MLD 基线取得显著提升：R@3 从 0.772 升至 0.795，FID 从 0.473 降至 0.179，Diversity 更接近真实分布（9.532 vs 真实 9.503）。消融实验证实 DUET 模块使 FID 从 0.168 降至 0.101，DASH 损失进一步将 FID 改善至 0.084（过滤数据集），且 dropout 扰动策略比高斯噪声更稳定。需要指出的是，在部分定量指标上 MotionDuet 仍逊于 MoMask，但定性上运动方向与时序连贯性更优；此外，训练需大量计算资源（8×A800-80GB），视频数据集经清洗后仍有约 39% 异常样本，可能影响训练稳定性。
 
-
-
 三维人体运动生成是计算机视觉与图形学中的核心问题，在游戏动画、电影制作、虚拟现实和机器人仿真等领域有广泛应用。近年来，基于扩散模型的文本到运动生成取得了显著进展，代表性工作包括**MLD**（Motion Latent Diffusion）、**MDM**、**MotionDiffuse**、**MotionGPT**和**MoMask**等。这些方法以文本描述作为条件，通过潜空间扩散去噪生成运动序列，在HumanML3D等标准基准上展现了令人瞩目的性能。
 
 然而，现有方法存在一个关键瓶颈：**它们仅从文本生成运动或仅依赖视频条件，导致生成的运动分布偏离真实运动统计特性，缺乏有效的多模态对齐机制和时空先验迁移**。具体而言，纯文本条件虽然语义灵活，但难以捕捉真实运动中微妙的物理约束和时序连贯性——文本描述“一个人向前走并挥动右手”无法精确传达步态节奏、重心转移和肢体协调等细粒度时空模式。另一方面，现有视频条件方法往往将视频作为简单的输入信号，未能有效提取和迁移视频中蕴含的丰富时空先验。
@@ -62,8 +60,6 @@ claims:
 MotionDuet针对上述问题提出了一个明确的解决思路：**在训练中引入视频条件作为正则化手段，通过分布感知对齐和双流融合将真实视频的时空先验注入运动生成器，使得即使在纯文本推理时也能生成物理一致、时序连贯的高质量运动**。这一思路的核心洞察在于，视频条件不应仅被视为额外的输入模态，而应作为运动生成器的“教师信号”，在训练阶段提供分布级别的正则化约束。具体而言，MotionDuet利用预训练VideoMAE编码器提取视频时空特征，通过DUET融合模块实现多模态特征的自适应整合，并通过DASH损失在令牌级和结构级对齐运动潜空间与视频特征分布。最终，自适应引导机制使得模型在推理时即使仅使用文本输入，也能保持训练阶段学到的物理先验。
 
 这一设计将视频从“推理时依赖”转变为“训练时正则化”，从根本上改变了多模态运动生成的范式。
-
-
 
 ## 核心方法与创新机理
 
@@ -124,8 +120,6 @@ Table 7/8 的消融表明，Dropout 扰动比高斯噪声更稳定，能提供�
 
 MotionDuet 的四个 changed slots 形成了一条完整的创新链条：**双条件输入**提供视频先验来源 → **DUET 融合**实现多模态特征的有效整合与自适应路由 → **DASH 损失**将视频分布显式蒸馏进运动潜空间 → **自适应引导**在推理时平衡多模态信号。这条链条的核心洞察是“视频正则化文本学习”——视频仅在训练时作为正则化手段存在，推理时模型已内化了真实运动的统计先验，从而在纯文本条件下也能生成超越单模态基线的高质量运动。
 
-
-
 MotionDuet 是一个以扩散模型为骨干的多模态运动生成框架，核心目标是将文本语义与视频时空先验统一为互补的双条件信号，从而在纯文本推理时也能生成物理一致、时序连贯的三维人体运动。其整体 pipeline 遵循“视频特征提取 → 双流融合与自适应引导 → 多模态分布对齐”的三阶段范式（Figure 2）。
 
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2511_18209/figures/002_Figure_2.jpg]]
@@ -140,11 +134,6 @@ MotionDuet 是一个以扩散模型为骨干的多模态运动生成框架，核
 **训练目标与分布对齐**：训练损失由扩散重建损失 $\mathcal{L}_{\mathrm{MLD}}$ 与 DASH（Distribution-Aware Structural Harmonization）正则项联合构成。DASH 损失包含令牌级余弦相似度边界损失 $\mathcal{L}_{\mathrm{token}}$ 和成对结构一致性损失 $\mathcal{L}_{\mathrm{pair}}$，通过在训练过程中将运动潜空间与真实视频特征分布对齐，将视频的时空先验“蒸馏”进运动生成器，从而在推理时即使不提供视频也能受益于这一正则化效果。
 
 **模块关系总结**：VideoMAE 编码器与 CLIP 编码器为条件提供方，DUET 模块负责多模态信息融合与路由，自适应引导机制实现多模态平衡与互校正，DASH 损失在训练阶段完成跨模态分布对齐，MldVae 与 MldDenoiser 构成运动潜空间的压缩-生成闭环。各模块的参数量与训练状态详见 Table 12。
-
-### 补充图表
-
-
-
 
 MotionDuet 的核心架构围绕三个关键模块展开：**双条件编码**、**DUET 多模态融合** 和 **自适应引导**，辅以 **DASH 分布对齐损失** 在训练阶段注入视频时空先验。以下逐一拆解其公式与变量含义。
 
@@ -260,8 +249,6 @@ $$
 
 DASH 损失通过令牌级与结构级双重正则化，将视频特征的分布先验注入运动潜空间，使得即使在纯文本推理（无视频输入）时，生成的运动仍能保持物理一致性与时序连贯性。DUET 模块则通过频域增强、动态掩码选择与残差融合，实现多模态信息的有效整合。自适应引导以退化分支替代无条件分支，稳定平衡多模态条件强度，且 $\omega$ 可固定无需动态调整。三个模块协同作用，构成了“训练时视频正则化、推理时文本驱动”的核心因果链路。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -277,9 +264,6 @@ MotionDuet 在 HumanML3D 基准上与多种文本到运动生成方法进行了�
 *Figure 3: Qualitative results. MotionDuet captures motion direction and temporal coherence more accurately than prior methods, more results can be seen in Appendix D. MoMask uses parallel masked modeling, while MLD adopts progressive diffusion denoising. In both rows, MotionDuet achieves smoother coordination and more precise dynamics. † denotes text-only inference without video guidance*
 
 在经数据清洗的 HumanML3D 子集上，MotionDuet 的 FID 进一步降至 0.084，R@3 提升至 0.764（Table 11），验证了视频正则化策略在高质量数据下的增益。
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2511_18209/figures/018_Table_11.jpg]]
-*Table 11: Evaluation on each component. The top results are highlighted in each column with bold*
 
 ### 消融实验
 
@@ -318,12 +302,6 @@ Table 10 对比了不同视频编码器的效果。VideoMAEv2 ViT-G 经微调后
 
 Table 7 和 Table 8 分别验证了退化策略和引导权重的选择。Dropout 扰动（随机置零 $p$ 比例特征维度）比高斯噪声扰动更稳定，在不同 $\omega$ 取值下性能波动更小。固定外推因子 $\omega$ 经一次性轻量验证搜索后即可固定，无需逐样本调整，降低了推理复杂度。
 
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2511_18209/figures/014_Table_7.jpg]]
-*Table 7: Parameter Study on ω and Dropout. ↑ indicates higher is better, and*
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2511_18209/figures/015_Table_8.jpg]]
-*Table 8: Evaluation of Loss Function. ↑ indicates higher is better, ↓ indicates lower is better, and → indicates closer is better*
-
 ### 失败模式与局限性
 
 1. **定量指标的固有偏差**：由于引入视频特征导致分布差异，MotionDuet 的 FID 与 R@3 在纯文本设定下可能逊于 MoMask 等纯文本优化方法，但定性上生成的运动更符合物理约束和时序逻辑。
@@ -343,14 +321,6 @@ Table 7 和 Table 8 分别验证了退化策略和引导权重的选择。Dropou
 - **Table 11**：DASH 损失使 FID 进一步降至 0.084，验证了分布对齐正则化的必要性。
 - **Table 10**：ViT-G 微调 vs 零样本的 FID 差距（0.179 vs 0.238）表明领域适配不可忽略。
 - **Table 6**：$\lambda_{\mathrm{DASH}}$ 在 100 附近最优，300 时 FID 崩溃至 14.676，需谨慎调参。
-
-### 补充图表
-
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2511_18209/figures/009_Table_5.jpg]]
-*Table 5: Parameter study for ω and dropout. Only core metrics reported. More grid searching results are shown in Appendix K*
-
-
 
 ## 定位与知识库关联
 
@@ -386,8 +356,6 @@ MotionDuet 构建于**运动潜空间扩散模型**（Motion Latent Diffusion, M
 3. **数据质量闭环**：能否结合运动先验（如物理约束、骨骼长度一致性）构建自动化数据清洗流水线，将异常率从 39% 降至可接受水平，减少人工干预？
 4. **跨模态扩展性**：视频正则化策略是否可以迁移至其他时序生成任务（如手势生成、舞蹈合成）？DUET 融合框架能否扩展到音频、场景图等其他模态，实现更通用的可控运动生成？
 5. **真实视频泛化边界**：模型对未见过真实视频的泛化仍局限于训练动作类型的组合。如何通过少样本学习或测试时自适应，扩展对开放域视频的运动理解与生成能力？
-
-
 
 ## 原文 PDF
 

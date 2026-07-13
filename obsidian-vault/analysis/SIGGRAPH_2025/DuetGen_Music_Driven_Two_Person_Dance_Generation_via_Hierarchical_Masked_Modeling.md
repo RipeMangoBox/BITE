@@ -147,8 +147,6 @@ DuetGen 采用**两阶段训练**与**层次化生成**的流水线，将音乐�
 
 关键设计在于**统一双人表示**（将舞者 B 的全局位置表示为相对 A 的偏移，A 的全局位置表示为速度）与**层次化标记化**的协同：前者使 VQ-VAE 能够将双人交互内化为单一运动表征，后者则让 Transformer 以粗-细方式逐步生成，既降低了人际协调的建模难度，又保证了单人运动的自然度。消融实验证实，移除关系全局定位（A1）会使 FID 从 1.31 升至 5.03、PFID 从 2.54 升至 14.97；移除层次标记化（A2）则使 VQ 重建的相对距离误差从 0.17 mm 飙升至 7.12 mm（表 1、表 2）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1803_DuetGen_Music_Driven_Two_Person_Dance_Generation_via_Hierarchical_Masked/figures/002_Figure_2.jpg]]
 *Figure 2: DuetGen Training Framework. Left: Our hierarchical two-person motion VQ-VAE encodes a unified two-person motion sequence ?? of length ?? into two-scale discrete token sequences. Top-level tokens at a coarse temporal resolution*
 
@@ -290,8 +288,6 @@ DuetGen在DD100双人舞蹈数据集上进行训练和评估。该数据集包�
 4. **推理效率**：迭代生成需要多轮掩码预测，实时性可能受限。论文未明确讨论推理速度，该点需要手动验证。
 
 5. **数据集局限**：DD100仅包含特定风格的双人舞蹈，模型在更广泛舞蹈类型上的表现有待进一步验证。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l1803_DuetGen_Music_Driven_Two_Person_Dance_Generation_via_Hierarchical_Masked/figures/005_Table_2.jpg]]
 *Table 2: Quantitative Evaluation of Dance Generation. Comparison of motion generation quality between baselines, ablated versions, and our method on the DD100 dataset. Bold indicates best*

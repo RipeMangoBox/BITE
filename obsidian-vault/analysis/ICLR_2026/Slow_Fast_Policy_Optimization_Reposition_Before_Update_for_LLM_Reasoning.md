@@ -67,8 +67,6 @@ claims:
 - **机制验证**：消融实验证实，重定位插值是防止大 $K$ 时训练崩溃的关键；自适应 $\alpha$ 调度在收敛附近关闭快速轨迹，保障训练稳定性。
 - **通用性**：SFPO可叠加于DAPO之上并持续带来额外提升，在编程任务（LiveCodeBench）上同样有效，展现出跨任务和跨底层算法的鲁棒性。
 
-
-
 ### 大语言模型推理能力的强化学习范式
 
 将大语言模型（LLM）的推理能力从“模仿”推向“探索”，是在线策略强化学习（On-Policy RL）在近期取得突破的核心驱动力。与监督微调（SFT）不同，RL使模型能够在试错中自我进化——通过从当前策略采样rollout、计算奖励信号、再沿策略梯度方向更新参数，模型可以逐步习得长链推理、自我验证与回溯等复杂行为。GRPO（Shao et al., 2024）作为这一范式下的代表性算法，通过组内奖励归一化替代传统的价值函数估计，大幅降低了训练开销，成为当前LLM推理RL的主流选择。
@@ -95,8 +93,6 @@ claims:
 ### 与现有改进路线的差异
 
 现有针对GRPO的改进主要沿两条路线展开：一是修改奖励设计或优势估计（如DAPO通过动态采样缓解零优势问题；Yu et al., 2025a），二是引入更复杂的KL正则或信赖域约束。SFPO与这些路线**正交**：它不改变目标函数的形式，而是在更高层的优化流程上进行重构——将单步更新替换为“快-重定位-慢”三阶段更新。这使得SFPO可以**作为即插即用的插件**，无缝集成到GRPO、DAPO等现有策略梯度框架之上，持续带来额外提升。
-
-
 
 ## 核心方法与创新机理
 
@@ -126,10 +122,6 @@ SFPO引入了基于策略熵滑动窗口的自适应α调度机制（Section 3.4
 SFPO作为高层优化插件，保持目标函数和rollout流程不变，可无缝集成到GRPO变体上。实验证实，在DAPO（Yu et al., 2025a）之上叠加SFPO仍能带来一致的额外提升（Figure 12, Table 3），表明其独立于底层GRPO的具体实现。此外，SFPO不增加GPU显存开销——由于不需存储重优化器状态，仅需多保存一份模型权重副本，实测显存消耗与GRPO相当（Figure 8）。
 
 
-
-![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_xBlHiHdXap/figures/001_Figure_1.jpg]]
-*Figure 1: Pipeline of SFPO at iteration s. Starting from the current policy $\pi _ { \theta ^ { s , 0 } }$ , we first generate rollouts for training. Stage I (Fast Trajectory): apply K successive gradient updates on the same batch to obtain $\theta ^ { s , \widetilde { K } }$ . Stage II (Reposition): interpolate between $\theta ^ { s , K }$ and the starting point $\theta ^ { s , 0 }$ to form $\widetilde { \theta } ^ { s , K }$ , controlling off-policy drift. Stage III (Slow Correction): perform one additional update on $\widetilde { \theta } ^ { s , K }$ , yielding $\pi _ { \theta ^ { s + 1 , 0 } }$ for the next iteration
-
 SFPO（Slow-Fast Policy Optimization）将标准在线策略RL中的一次性参数更新重构为**快–重定位–慢**三阶段协调管道，在不改变目标函数与rollout生成流程的前提下，显著提升梯度方向稳定性与采样效率。图1给出了单次迭代的完整数据流。
 
 **输入与初始化。** 在第 $s$ 轮迭代开始时，当前策略参数记为 $\theta^{s,0}$。首先从该策略采样一批rollout，用于后续所有阶段的梯度计算——这与GRPO等标准方法一致，SFPO不引入额外采样开销。
@@ -153,8 +145,6 @@ $$Z_s = \frac{H_s - \mu_s}{\sigma_s}$$
 **统一更新规则。** 三阶段可整合为单一参数更新公式：
 $$\theta^{s+1} = \theta^{s,0} - \eta \left[ \alpha \sum_{k=0}^{K-1} \nabla_{\theta} \mathcal{L}(\theta^{s,k}) + \nabla_{\theta} \mathcal{L}(\widetilde{\theta}^{s,K}) \right]$$
 这表明SFPO可视为对标准梯度下降的一个**结构化修正项**：快速轨迹累积方向、重定位控制步长、慢速校正精调终点。整个管道作为即插即用的高层优化插件，可无缝集成到GRPO、DAPO等现有策略梯度管线中（见Figure 12、Table 3），且实测GPU显存开销与GRPO相当（Figure 8），因为SFPO仅需额外保存一份模型权重副本，无需存储重优化器状态。
-
-
 
 ### 问题背景：GRPO 的单步更新瓶颈
 
@@ -222,8 +212,6 @@ $$
 
 当 $|Z_s| \geq \tau$ 时，策略熵发生显著波动，表明模型已接近收敛或分布发生变化，此时将 $\alpha$ 置零，关闭快速轨迹，回退到纯在线单步更新。这一机制在接近收敛时自动平衡探索与利用，消融实验证实移除该控制会导致约 100 步后精度明显下降（Figure 6）。
 
-
-
 ## 实验与关键发现
 
 ### 瓶颈与核心机制回顾
@@ -234,7 +222,6 @@ GRPO在LLM推理训练中面临双重瓶颈：其一，训练早期低质量roll
 
 **Table 1**汇总了六项数学推理基准上的Pass@1性能。SFPO在所有模型规模和所有基准上均一致优于GRPO基线：
 
-
 ![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_xBlHiHdXap/figures/002_Table_1.jpg]]
 *Table 1: Performance on math reasoning benchmarks with DAPO and Math training dataset*
 
@@ -244,16 +231,11 @@ GRPO在LLM推理训练中面临双重瓶颈：其一，训练早期低质量roll
 
 在更大规模训练集Skywork-or1上（**Table 2**），SFPO在AIME24/25上持续优于GRPO，例如DS-Qwen-1.5B的AIME25从25.83提升至27.50（+1.67），验证了方法的跨数据集鲁棒性。
 
-
-![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_xBlHiHdXap/figures/003_Table_2.jpg]]
-*Table 2: Performance on AIME24/25 with Skywork-or1 training dataset*
-
 ### 训练动态与效率分析
 
 **Figure 2**展示的训练过程中验证精度曲线表明，SFPO的优势贯穿整个训练周期，而非仅在收敛点附近。**Figure 3**进一步揭示了训练行为差异：SFPO的回复长度增长更平缓，策略熵下降更稳定，奖励分数提升更平滑，说明三阶段结构有效抑制了训练早期的剧烈波动。
 
 效率方面，**Figure 4**给出了决定性证据：为达到GRPO的最佳精度，SFPO所需的rollout数仅为GRPO的1/4.93（DS-Qwen-7B）、1/3.50（Qwen3-4B-Base）和1/3.21（DS-Qwen-1.5B）；对应的端到端训练时间加速比分别为4.19×、2.65×和2.62×。尽管SFPO单步计算开销约为GRPO的1.37倍（K=3时），但总采样和时钟时间的显著减少使其总体计算效率更高。
-
 
 ![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_xBlHiHdXap/figures/012_Figure_4.jpg]]
 *Figure 4: Comparison between GRPO and SFPO. (a) Number of rollouts required to achieve the same best accuracy as GRPO. (b) Corresponding training time*
@@ -276,7 +258,6 @@ GRPO在LLM推理训练中面临双重瓶颈：其一，训练早期低质量roll
 
 **Figure 9**的消融实验最为关键：当K=7且完全移除Stage II插值时，训练直接崩溃；而保留插值的SFPO训练始终稳定且性能最优。这直接证实了重定位是防止离策略过拟合的核心机制，而非可选的锦上添花。
 
-
 ![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_xBlHiHdXap/figures/022_Figure_9.jpg]]
 *Figure 9: Ablation on interpolation scheme in Stage II with DeepSeek-R1-Distill-Qwen-1.5B*
 
@@ -296,7 +277,6 @@ GRPO在LLM推理训练中面临双重瓶颈：其一，训练早期低质量roll
 
 **Figure 12**和**Table 3**验证了SFPO作为高层优化插件的兼容性：在DAPO之上叠加SFPO，DS-distilled-Qwen-1.5B平均分从49.30提升至50.56（+1.26），Qwen3-4B-Base从46.48提升至47.87（+1.39），所有基准均有一致增益。这表明SFPO独立于底层GRPO变体的具体实现。
 
-
 ![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_xBlHiHdXap/figures/029_Figure_12.jpg]]
 *Figure 12: Comparison of DAPO and SFPO on math benchmarks. Validation average accuracy versus training step for DeepSeek-R1-Distill-Qwen-1.5B (left) and Qwen3-4B-Base (right)*
 
@@ -306,8 +286,6 @@ GRPO在LLM推理训练中面临双重瓶颈：其一，训练早期低质量roll
 ### 公平性与资源开销
 
 所有实验基于verl框架，批次大小256、每条问题8条回复、总训练步数400等配置均保持一致。SFPO不增加GPU显存开销：**Figure 8**证实，由于不需存储重优化器状态，仅需多保存一份模型权重副本，SFPO的显存消耗与GRPO相当。GRPO与SFPO使用相同的clip范围和KL正则系数，客观比较了更新规则本身的效果差异。
-
-
 
 ## 定位与知识库关联
 
@@ -348,8 +326,6 @@ SFPO 的插件特性进一步体现在其与 GRPO 变体的兼容性上。**DAPO
 3. **向其他算法的推广**：将 SFPO 的“快-重定位-慢”思想推广至 PPO、Reinforce 等其他在线策略算法的可行性与收益如何？
 4. **插值与 KL 正则化的互补**：插值与 KL 正则化是否存在互补组合方式，可以在更宽的 α 范围内保持稳定性？
 5. **大规模并行训练的系统挑战**：在大规模并行训练（如数百 GPU）场景下，SFPO 的快-重定位-慢结构会带来哪些新的系统优化挑战？
-
-
 
 ## 原文 PDF
 

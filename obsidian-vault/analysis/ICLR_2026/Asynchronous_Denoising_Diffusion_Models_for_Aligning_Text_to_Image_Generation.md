@@ -46,8 +46,6 @@ claims:
 
 本文提出**异步扩散模型（Asynchronous Diffusion Models, AsynDM）**，一种无需微调、即插即用的方法，用于提升文本到图像生成中的文本-图像对齐效果。核心思想是：在扩散模型的去噪过程中，为不同像素分配不同的时间步（pixel-level timesteps），使提示相关区域去噪更慢、无关区域去噪更快，从而让提示相关区域能够从已经更清晰的无关区域获取更好的上下文参考。在Animal Activity、Drawbench、GenEval和MSCOCO四个提示集上，AsynDM在BERTScore、CLIPScore、ImageReward和QwenScore四个指标上均一致优于所有基线方法。
 
-
-
 ### 2.1 同步去噪的根本瓶颈
 
 现有扩散模型（如Stable Diffusion）采用**同步去噪（synchronous denoising）**机制：所有像素同时从噪声逐步演变为清晰图像。论文指出，这种机制是导致文本-图像不对齐的根本原因——"synchronous denoising treats all pixels equally, overlooking the heterogeneous nature of different regions"。在同步去噪中，与提示相关的区域只能参考处于相同噪声水平的无关区域，无法获得清晰的上下文信息，从而损害了对齐效果。
@@ -57,8 +55,6 @@ claims:
 现有提升文本-图像对齐的方法主要分为两类：
 - **微调方法**：需要额外训练，计算成本高。
 - **无微调方法**：如Z-Sampling（锯齿形扩散步骤）、SEG（自注意力能量视角）、S-CFG和CFG++（改进无分类器引导）。这些方法虽然无需训练，但未从根本上解决同步去噪导致的上下文不清晰问题。
-
-
 
 ## 核心方法与创新机理
 
@@ -79,8 +75,6 @@ claims:
 | 去噪过程索引 | 从T到0的逆序索引 | 从0到T的正序索引i，因为不同像素有不同的时间步t |
 | 掩码生成 | 无掩码 | 从交叉注意力图动态提取二进制掩码M，标识提示相关区域 |
 
-
-
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__image_and_video_generation__b001_ZHb4bduWkM_Asynchronous_/figures/001_Figure_1.jpg]]
 *Figure 1: Existing diffusion models generate images through synchronous denoising, where all pixels are simultaneously denoised step-by-step from noises to images, hindering text-to-image alignment. Asynchronous diffusion models denoise the prompt-related regions more gradually than other regions, thereby receiving clearer inter-pixel context and ultimately achieving improved alignment.*
 
@@ -90,8 +84,6 @@ AsynDM的整体框架如Figure 2所示，包含四个核心模块：
 2. **交叉注意力掩码提取器**：从交叉注意力图提取提示相关区域的二进制掩码M。
 3. **异步调度器**：根据掩码M为不同区域分配不同的时间步调度（凹函数 vs 线性）。
 4. **异步DDPM/DDIM采样器**：执行像素级时间步的去噪步骤，保持马尔可夫性质。
-
-
 
 ### 5.1 像素级时间步分配
 
@@ -155,8 +147,6 @@ $$\mathbf{x}_{i+1} = \sqrt{\alpha_{\mathbf{t}_{i+1}}} \cdot \hat{\mathbf{x}}_0 +
 
 $$\hat{\mathbf{x}}_0 = \frac{1}{\sqrt{\alpha_{\mathbf{t}_i}}}(\mathbf{x}_i - \sqrt{1 - \alpha_{\mathbf{t}_i}} \cdot \epsilon_\theta(\mathbf{x}_i, \mathbf{t}_i, \mathbf{c}))$$
 
-
-
 ## 实验与关键发现
 
 ### 6.1 主要定量结果
@@ -213,12 +203,8 @@ Figure 6展示了AsynDM的两个应用：
 - 人类评估涉及52名来自八所大学的参与者，样本量有限，可能无法完全代表一般用户偏好。
 - 实验主要在英文提示上进行，对非英文提示的对齐效果尚未验证。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__image_and_video_generation__b001_ZHb4bduWkM_Asynchronous_/figures/033_Table_3.jpg]]
 *Table 3: Hyperparameters of our experiments.*
-
-
 
 ## 定位与知识库关联
 
@@ -256,8 +242,6 @@ AsynDM建立在以下基础工作上：
 - 对于包含多个对象且对象间存在复杂关系的提示，如何更精确地提取掩码？
 - 异步去噪的思想是否可以推广到视频生成、3D生成等其他生成任务？
 - 在极少数去噪步数（如T=5）下，如何进一步优化对齐效果？
-
-
 
 ## 原文 PDF
 

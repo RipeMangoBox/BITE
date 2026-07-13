@@ -82,8 +82,6 @@ claims:
 
 相较于神经隐式化身（如**NeuralBody**、**HumanNeRF**、**MonoHuman**），SMAD在保持3DGS实时渲染优势的同时，首次将图神经网络和二阶动力学引入化身变形，实现了对次级运动的物理一致性建模。
 
-
-
 ### 3D高斯化身建模的现状与瓶颈
 
 近年来，基于3D高斯泼溅（3D Gaussian Splatting, 3DGS）的数字化身方法在渲染质量和速度上取得了显著进展，但现有方法在建模人体动态外观时存在一个根本性瓶颈：**变形被建模为当前身体姿态的瞬时函数**。具体而言，主流方法（如**GART** (Lei et al., 2024)、**GaussianAvatar** (Hu et al., 2024a)、**3DGS-Avatar** (Qian et al., 2024b)、**ExAvatar** (Moon et al., 2024)）依赖参数化身体模板（如SMPL）和线性混合蒙皮（LBS）来驱动高斯点的变形，这种设计存在两方面的结构性缺陷。
@@ -102,8 +100,6 @@ claims:
 - **次级运动感知变形（SMAD）**：将高斯点构建为图结构，通过自回归图神经网络（GNN）预测节点的速度和加速度，模拟质量-弹簧-阻尼器动力学，使衣物动态形变能够自然产生，而无需预定义骨骼蒙皮。
 
 这一设计使得系统在宽松衣物和动态运动场景下能够产生时序一致的、物理上合理的次级运动，填补了现有3DGS化身方法的关键能力缺口。
-
-
 
 ## 核心方法与创新机理
 
@@ -139,8 +135,6 @@ VE的效果在消融实验中极为显著：窗口 $\tau_v=11$ 相较于无VE基
 
 三个changed slot并非孤立改进，而是形成因果闭环：PGI提供与衣物几何匹配的初始高斯分布，使图结构的节点位置具有物理意义；速度编码为GNN提供时序上下文，使其能够推理惯性效应；GNN自回归变形器则利用这些信息模拟二阶动力学，产生自然的次级运动。消融实验的全量配置（A3）相较于基线（A0）实现 **+2.68 PSNR和31.0% LPIPS降低**（Table 2），证实了各组件的协同增益。
 
-
-
 ![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_2A3Q2EtGTF/figures/006_Figure_2.jpg]]
 *Figure 2: To model secondary motions in 3DGS-based avatars, we introduce a two-stage framework: (1) Personalized Gaussian Initialization using a deformable NeRF to estimate canonical Gaussians $\mathcal G ^ { \mathrm { c } }$ , and (2) Secondary Motion-Aware Deformation. $\breve { \mathscr { G } ^ { \mathrm { c } } }$ are structured as a Gaussian graph Γ, processed by a GNN-based autoregressive deformer, and decoded via $U _ { \psi }$ into deformed Gaussians $\bar { \boldsymbol { \mathcal { G } } } ^ { \mathrm { d } }$ . Motion descriptors derived from SMPL poses Θ guide temporally coherent deformation. Then GS Renderer then synthesizes the final images
 
@@ -170,8 +164,6 @@ $$\mathcal{L}_{\mathrm{SMAD}} = \mathcal{L}_{\mathrm{RGB}} + \lambda_{\mathrm{is
 **输入输出流**：输入为单目视频帧序列 $\{I_1, ..., I_T\}$ 及对应的SMPL姿态参数 $\Theta$。阶段一输出规范高斯点云 $\mathcal{G}^c$；阶段二以 $\mathcal{G}^c$ 和姿态序列为输入，经过速度编码高斯图和GNN自回归变形器，输出逐帧变形后的高斯集合 $\mathcal{G}_t^{\mathrm{d}} = \{ (\mu_{t,i}, \Sigma_{t,i}, c_{t,i}, \alpha_{t,i}) \}_{i=1}^{N}$，最终通过3DGS渲染器合成图像。
 
 消融实验验证了各模块的因果贡献：速度编码窗口 $\tau_v=11$ 时PSNR提升+5.83，LPIPS降低40.3%，运动误差尖峰减少35.5%（Figure 6, Table 2）；物理启发正则化和自适应弹簧系数带来+0.84 PSNR提升；SMAD节点数 $M=40k$ 达到最佳性能。这些证据表明，框架通过图结构动力学建模和时序编码，有效突破了现有方法在次级运动建模上的瓶颈。
-
-
 
 本文提出的两阶段框架（Figure 2）围绕一个核心洞察展开：将3D高斯点构建为图结构，利用GNN自回归地预测节点速度和加速度，从而绕开对预定义骨骼蒙皮的依赖，使衣物的动态形变能够自然产生。以下聚焦于次级运动感知变形（SMAD）模块的关键设计与公式。
 
@@ -215,8 +207,6 @@ $$\mathcal{L}_{\mathrm{SMAD}} = \mathcal{L}_{\mathrm{RGB}} + \lambda_{\mathrm{is
 ### 个性化高斯初始化
 
 作为SMAD的前置阶段，该方法通过可变形NeRF估计穿着衣物的规范密度场 $\bar{\boldsymbol{\sigma}}(\mathbf{x}) = \frac{1}{T}\sum_t \boldsymbol{\sigma}(\mathbf{x}, t)$，从中提取个性化高斯点，避免裸体SMPL模板与宽松衣物几何不匹配导致的高斯分布误差。此初始化与SMAD协同，使变形器在无骨骼蒙皮先验的条件下自然产生次级运动。
-
-
 
 ## 实验与关键发现
 
@@ -276,12 +266,8 @@ $$\mathcal{L}_{\mathrm{SMAD}} = \mathcal{L}_{\mathrm{RGB}} + \lambda_{\mathrm{is
 
 4. **训练效率**：图J(a)的t-SNE可视化显示OOD姿态与训练姿态在隐空间中存在一定距离。虽然统计检验未检测到显著差异，但极端OOD场景下的性能下降趋势仍然存在，引入双向时间上下文或生成式流匹配可能是潜在的改进方向。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_2A3Q2EtGTF/figures/044_Figure_37.jpg]]
 *Figure 37: (b) Figure J: (a) Visual check of in-distribution (blue) and out-of-distribution (orange) driving poses with t-sne plot. (b) Average perceptual metric (LPIPS; lower is better) with standard error plot of 4D-Dress over motion similarity between train and test set. Our method (red) maintains consistent rendering performance even for test motions with low similarity to the training motion—showing relatively less performance degradation compared to high-similarity cases—whereas a baseline (blue) exhibits a significant drop in perceptual quality when handling test motions with low motion similarity*
-
-
 
 ## 定位与知识库关联
 
@@ -324,8 +310,6 @@ SMAD的核心设计选择均经过消融验证：
 1. **分布外加速度预测**：如何预测超出训练分布的复杂加速度分布？双向时间上下文编码或生成式流匹配技术可能提供解决方案。
 2. **多件衣物分层建模**：如何从单视角视频中实现高精度的多件衣物语义分割，以支持分层高斯图建模多件衣物的独立运动与交互？
 3. **物理模拟约束的引入**：是否可以通过引入显式物理模拟约束（如布料本构模型）来进一步提升分布外运动的泛化能力？
-
-
 
 ## 原文 PDF
 

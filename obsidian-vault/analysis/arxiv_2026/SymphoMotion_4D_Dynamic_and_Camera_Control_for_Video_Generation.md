@@ -225,17 +225,6 @@ $$\min_{\theta} \mathbb{E}_{z_0, t, \epsilon, c_y, c_f, c_{cam}, c_{pcd}} \left[
 
 > **待验证**：轨迹编码器中时间降采样器（从 $N$ 帧到 $\tilde{N}$ 帧）的具体设计细节，以及 Object Motion Module 是否包含跨注意力之外的额外结构（如 Transformer 块），在现有材料中未明确说明，需查阅完整论文或代码确认。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2604_03723/figures/001_Figure_1.jpg]]
-*Figure 1: Joint Control of Camera and Object Motion. Given a reference image, a set of 3D object trajectories, and a camera trajectory, SymphoMotion generates videos that are spatially consistent and faithfully reflect both object and camera motion*
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2604_03723/figures/005_Figure_5.jpg]]
-*Figure 5: Independent camera motion control*
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2604_03723/figures/006_Figure_6.jpg]]
-*Figure 6: Simultaneous control over camera and object motions. MotionCtrl struggles to generate realistic object dynamics, causing objects to disappear from view, whereas SymphoMotion achieves high-quality simultaneous control*
-
 ## 实验与关键发现
 
 ### 核心性能对比
@@ -273,14 +262,6 @@ Table 3 通过系统消融揭示了各模块的独立贡献，所有实验均在
 在独立相机运动控制场景 (Figure 5) 中，CameraCtrl 和 ViewCrafter 虽能大致跟随相机轨迹，但在大视角变化时出现几何失真；SymphoMotion 借助点云渲染保持了更稳定的空间结构。同步控制场景 (Figure 6) 的对比更为显著：MotionCtrl 在同时处理相机与物体运动时，物体常从画面中消失或产生不真实的动态，而 SymphoMotion 实现了高质量的解耦控制——相机视角平滑变化的同时，物体运动保持精确和一致。
 
 需要指出的是，当前评估主要基于 RealCOD-25K 数据集，该数据集的物体和相机轨迹分布特性可能影响结论的泛化性。此外，论文未报告该方法在更长视频（超过 16 帧）或多物体交互场景下的表现，这些场景下的控制精度和一致性需要进一步验证。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2604_03723/figures/012_Figure_10.jpg]]
-*Figure 10: Independent camera control for static object*
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2604_03723/figures/004_Figure_4.jpg]]
-*Figure 4: RealCOD-25K dataset construction pipeline*
 
 ## 定位与知识库关联
 

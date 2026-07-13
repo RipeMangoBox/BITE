@@ -53,8 +53,6 @@ claims:
 
 方法上，WaveBlender在均匀交错网格上运行，支持多种声源着色器（刚体模态、薄壳、气泡水声、点源加速度噪声等），采用单向源耦合和阶梯近似边界处理，以精度换取统一的显式GPU并行结构。其流水线涵盖栅格化、β‑混合FDTD求解、声源着色、逐批次开销处理与CUDA并行化等模块。主要局限包括仅支持单向耦合、边界为阶梯近似、栅格化等部分仍在CPU执行，以及尚未包含壁面损耗与衍射等复杂边界效应。
 
-
-
 计算机图形学中的声学仿真长期面临一个核心矛盾：高保真度的波动求解器需要精细的几何离散化，而动画场景中的物体却在持续移动和变形。当声源界面在离散网格上发生突变时——例如一个振动的薄壳从一个网格单元跳变到相邻单元——声场求解器会引入严重的不连续性，在可听频谱中表现为刺耳的“popping”伪影（Figure 2）。这一问题在粗网格、长时间仿真中尤为突出，严重制约了动画声音合成的实用化。
 
 ### 现有FDTD方案的瓶颈
@@ -86,8 +84,6 @@ WaveBlender的动机源于一个关键洞察：**将混合操作从连续方程�
 3. **鲁棒性**：通过在两个连续键帧的离散化之间连续改变 $\beta$ 场，将界面突变转化为平滑过渡，从根本上消除了popping伪影的产生机制。
 
 Figure 1 以“糖果在手中摇动”的场景直观展示了这一混合域概念：给定两个60Hz动画帧的栅格化结果（“Begin”和“End”），WaveBlender在两者之间连续混合离散化状态，同时解析糖果碰撞产生的加速度噪声在变化的手部空腔中的散射和共振——这是传统逐帧切换方案无法实现的。
-
-
 
 ## 核心方法与创新机理
 
@@ -142,8 +138,6 @@ $$\rho_\beta = \frac{\rho_0}{1-\beta}, \quad c_\beta^2 = (1-\beta) c_0^2, \quad 
 
 这些创新共同构成了 WaveBlender 的核心贡献：**在保持显式 FDTD 的 GPU 并行优势的同时，通过离散层面的 β‑混合方案实现了动态界面的鲁棒、低噪声声学仿真**，在粗网格下消除了 Wang et al. 2018 反复出现的低频 popping 伪影（Figure 2），并在相同条件下实现了约 1000 倍的单机串行加速（Table 1）。
 
-
-
 ![[assets/figures/papers/paper_list_l20_https_research_nvidia_com_labs_prl_xue2024waveblender_waveblender_pdf/figures/004_Figure_4.jpg]]
 *Figure 4: Velocity update weight ???? plotted against normalized blending time ?? shows that our method smoothly blends in the boundary conditions, whereas the original “Aerophones scheme” (FDTD step rate at 128 kHz, blending over 10 ms windows) suffers from rapid changes near the end*
 
@@ -177,8 +171,6 @@ WaveBlender 提出了一套面向动态动画声源的实用声学仿真管线�
 ### 关键设计取舍
 
 WaveBlender 的实用性建立在明确的取舍之上：采用阶梯近似边界和一阶精度换取均匀网格的简单性和完全显式时间步进；仅支持单向源耦合，放弃薄壳振动对声场的反馈，但大幅简化了声源集成和多物理场耦合的复杂度；栅格化和部分几何处理保留在 CPU 上执行，在快速界面运动时可能成为瓶颈（Figure 7），但避免了复杂的 GPU 几何算法开发。这些取舍使得 WaveBlender 在保持鲁棒性和低噪声输出的同时，首次将动态场景声学仿真推进到接近实时的性能水平。
-
-
 
 ### 1. 问题瓶颈与核心洞察
 
@@ -280,8 +272,6 @@ WaveBlender将仿真划分为固定长度的批次，每个批次内执行以下
 
 - **PML吸收边界**：采用**Liu and Tao 1997**的分裂场PML公式，所有示例使用8个单元宽度的PML层。GPU实现中仅对穿透PML的线程束计算分裂场，以优化性能。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -290,12 +280,10 @@ WaveBlender将仿真划分为固定长度的批次，每个批次内执行以下
 
 **伪影消除的定性验证。** 图2展示了在粗网格（Δx = 12.5 mm）条件下“玻璃倾倒”动画的声谱图对比：Wang et al.的结果在低频段出现反复的“popping”伪影（图中高亮标注），而WaveBlender的β‑混合方案即使在几何欠分辨的情况下也能有效消除这些不连续性。这一结果直接验证了核心因果机制——通过β(t)的三次平滑阶梯函数控制离散化过渡，可以从根本上抑制界面突变引起的声场不连续。
 
-
 ![[assets/figures/papers/paper_list_l20_https_research_nvidia_com_labs_prl_xue2024waveblender_waveblender_pdf/figures/002_Figure_2.jpg]]
 *Figure 2: Avoiding Popping Artifacts: A procedural “Glass Pour” animation is simulated using coarse cells (Δ?? = 12.5 mm) with both the [Wang et al. 2018] wavesolver and WaveBlender. While the [Wang et al. 2018] result suffers from repeated “popping” artifacts visible in the spectrogram’s low frequencies (here, a few instances are highlighted), WaveBlender’s ??-blending scheme helps avoid discontinuities even when geometry is under-resolved*
 
 **声源着色器性能分解。** 图7给出了不同声源着色器的计算时间分解。当混合速率较低时（如“2016 Pouring Faucet”和“Cup Phone”），GPU端的FDTD时间步进是主要瓶颈；而当界面运动较快时（如“Spolling Bowl”、“Cymbal”和“Talk Fan”），CPU端的栅格化、逐批次开销以及着色器评估和内存管理的成本显著增加。逐批次开销主要由新鲜单元速度的CPU端QR求解主导。
-
 
 ![[assets/figures/papers/paper_list_l20_https_research_nvidia_com_labs_prl_xue2024waveblender_waveblender_pdf/figures/010_Figure_7.jpg]]
 *Figure 7: Timing Breakdowns: Different acoustic shaders feature unique performance considerations. Here, “Overhead” refers to per-batch overhead (§6.2) and is largely dominated by fresh cell velocity QR solves on CPU, while “Misc.” refers to miscellaneous example-specific data I/O and pre-processing costs excluded from the “core” WaveBlender timings. In examples where the blend rate is low (e.g., “2016 Pouring Faucet” and “Cup Phone”), GPU-based FDTD timestepping is the bottleneck. For other examples, rapid interface movements (such as in “Spolling Bowl”, “Cymbal”, and “Talk Fan”) necessitate increased CPU-based rasterization and overhead costs, as well as more frequent shader evaluation and memory m...*
@@ -312,7 +300,6 @@ WaveBlender将仿真划分为固定长度的批次，每个批次内执行以下
 
 与Wang et al.（SIGGRAPH 2018）的所有对比均使用相同的单元尺寸、时间步长率和相似的区域尺寸（表1）。“2016 Pouring Faucet”的1000倍加速比是在单台机器上串行运行两个求解器获得的。WaveBlender采用与Wang et al.一致的单向源耦合假设，不涉及双向耦合，因此性能对比是公平的。需注意的是，Wang et al.的原始时间并行方案可将批次分发到多台机器（表1中括号内标注机器数量），而WaveBlender的串行单机实现已能在多个示例上接近或达到实时性能。
 
-
 ![[assets/figures/papers/paper_list_l20_https_research_nvidia_com_labs_prl_xue2024waveblender_waveblender_pdf/figures/008_Table_1.jpg]]
 *Table 1: Example Statistics: Using identical cell sizes, step rates, and similar dimensions as [Wang et al. 2018], we compare our WaveBlender GPU timings with their original parallel-in-time CPU timings. The parallel-in-time method splits a simulation temporally into batches and distributes the batches across multiple machines, each running a CPU wavesolver instance; the number of machines is shown in parentheses (fourth-to-last column). In contrast, our WaveBlender implementation runs serially on a single machine. We show the full runtime, including example-specific data I/O and pre-processing costs (e.g., loading vertex accelerations from disk for thin shells and computing coupled-bubble velocitie...*
 
@@ -327,12 +314,8 @@ WaveBlender将仿真划分为固定长度的批次，每个批次内执行以下
 5. **简化边界效应**：未包含壁面损耗、频率相关吸收和衍射等复杂边界效应，可能影响高保真度应用中的声音真实感。
 6. **点源模型精度**：点源模型假设声源物体远小于网格尺寸，对接近网格尺度的物体精度可能不足。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l20_https_research_nvidia_com_labs_prl_xue2024waveblender_waveblender_pdf/figures/011_Figure_8.jpg]]
 *Figure 8: Reference images for comparisons with [Wang et al. 2018]. See the supplementary video for other examples. Fig. 9. Fill’er Up! A rigid-body simulation of 264 hard candies falling into a tube-like concrete container (3cm × 3cm × 20cm) generates 366832 contact impulses that are approximated as point-like acceleration-noise sources. Our WaveBlender acoustic wave simulation framework approximates such scenes on uniform grids but represents the changing air-domain shape using an auxiliary ?? field, which can be used to model auxiliary scene geometry (in blue) in addition to the container. WaveBlender timesteps modified finite-difference time-domain (FDTD) equations and boundary conditions to appr...*
-
-
 
 ## 定位与知识库关联
 
@@ -374,8 +357,6 @@ WaveBlender 的设计决策定义了其明确的适用边界：
 4. **自适应网格**：能否开发动态自适应网格技术，使模拟域随声源移动而自动调整形状和分辨率？
 5. **非均匀网格支持**：如何支持非均匀或自适应细化网格，在复杂几何附近获得更高精度，同时保持 β‑混合方案的简洁性？
 6. **实时交互系统**：未来能否将 WaveBlender 发展为实时的动画‑声音集成系统，用于游戏、VR 等交互式应用？
-
-
 
 ## 原文 PDF
 

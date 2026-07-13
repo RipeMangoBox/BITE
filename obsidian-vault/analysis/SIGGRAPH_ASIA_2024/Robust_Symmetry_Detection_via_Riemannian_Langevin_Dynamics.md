@@ -50,8 +50,6 @@ claims:
 
 **主要结果**：在3D形状的反射对称检测中，本方法在0%、1%、3%噪声水平下的F1分数均优于**PRS-Net**（Gao et al., IEEE TVCG 2020）和**E3Sym**（Li et al., ICCV 2023）等无监督学习基线；在2D字体形状上，随着噪声增加，本方法相对Mitra et al.的优势从-0.026扩大至+0.332（1%噪声），展现出显著的噪声鲁棒性优势。消融实验表明，朗之万步数从1K增至50K时F1从0.759提升至0.857，验证了退火采样的关键作用。
 
-
-
 ### 对称性检测的核心问题
 
 对称性是几何形状中普遍存在的结构规律，检测对称性对于形状理解、重建、压缩与编辑等任务具有基础意义。形式上，给定一个形状 $S$，若存在一个变换 $T$ 和一个形状区域 $R \subset S$，使得变换后的区域 $T(R)$ 与 $R$ 之间的距离小于阈值 $\varepsilon$，且该区域的显著性度量 $M(R)$ 超过阈值 $\tau$，则称 $T$ 为 $S$ 的一个对称性（见 Eq. 1）。其中，距离函数通常采用 Chamfer 距离（见 Eq. 2），以衡量两个点集之间的平均最近点距离。
@@ -73,8 +71,6 @@ claims:
 本文的核心洞察在于：**均值漂移与朗之万动力学之间存在内在联系**——当朗之万更新公式中的噪声项系数设为零时，其退化为均值漂移（见 Section 4.1 的理论推导）。这意味着朗之万动力学是均值漂移的严格推广，通过引入随机性和多尺度噪声退火，能够在变换空间中更鲁棒地发现不同强度的对称性模式。
 
 基于这一洞察，本文提出将反射对称性检测重新定义为：在**黎曼流形上的变换空间**中，利用**退火朗之万动力学**进行模式寻找。与传统方法相比，这一框架无需训练数据，却能显著提升噪声鲁棒性，并同时捕获全局和部分对称性（Fig. 1 展示了在不同噪声水平下的检测效果）。
-
-
 
 ## 核心方法与创新机理
 
@@ -109,8 +105,6 @@ $$ x^{(t+1)} \gets x^{(t)} + \alpha_t \nabla_x \log P_{\sigma_t}(x^{(t)}) + \sqr
 ### 创新边界与局限
 
 上述创新主要针对**反射对称性**设计。论文展示了向平移和旋转对称性的初步扩展（Fig. 11），但缺乏系统的定量验证。此外，得分函数基于经验核密度估计而非学习得到，可能限制对复杂噪声模式的建模能力。这些构成了方法在当前版本中的能力边界。
-
-
 
 本方法将反射对称性检测重新表述为**变换空间中的模式寻找问题**，并利用黎曼流形上的退火朗之万动力学替代传统的均值漂移聚类，从而在噪声环境下实现鲁棒的全局与部分对称性检测。整个pipeline由六个核心模块串联构成，形成从点对采样到对称性输出的完整推理链路。
 
@@ -147,12 +141,8 @@ $$ x^{(t+1)} \gets x^{(t)} + \alpha_t \nabla_x \log P_{\sigma_t}(x^{(t)}) + \sqr
 
 整个框架的关键设计在于**用黎曼流形上的退火朗之万动力学替代均值漂移**作为模式寻找引擎。这一替换带来了两个直接收益：（1）随机噪声项和多尺度退火策略使算法能够跳出局部次优模式，在噪声数据中更鲁棒地定位真实对称性；（2）基于测地线距离的得分估计正确处理了反射对称性空间的几何结构，避免了欧氏距离在原点附近的歧义。消融实验证实，在噪声条件下，将Mitra等人的均值漂移替换为DBSCAN会导致性能下降，而本方法的朗之万动力学管线则保持鲁棒（Table A3）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2410_02786/figures/012_Figure_11.jpg]]
 *Figure 11: We show that our pipeline can be extended to translation and rotational symmetries. For translation, we identify global negative (a) and local positive shifts (b, c). For rotation, we identify global (a) and local rotational axis (b, c, d). The transformation space (left) and the identified modes (right) for both symmetry types are shown*
-
-
 
 ### 对称性的形式化定义
 
@@ -212,8 +202,6 @@ $$\nabla _ { x } \log P _ { \sigma } ( x ) \approx \left( \frac { \sum _ { y \in
 
 算法流程（Algorithm 1）为：从随机初始化的样本点出发，在逐渐降低的噪声水平 $\{\sigma_t\}$ 下迭代执行朗之万更新。噪声退火策略使采样过程先探索全局结构（大 $\sigma$），再精细定位局部模式（小 $\sigma$）。收敛后的样本点通过 DBSCAN 聚类提取模式质心，每个质心对应一个检测到的对称平面。最后通过区域生长验证每个对称性对应的形状支持区域，滤除显著性低于阈值 $\tau$ 的虚假检测。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -271,23 +259,17 @@ Fig. 6 可视化了朗之万动力学在变换空间中的完整轨迹及其在�
 3. **后处理依赖人工调参**：DBSCAN 的密度阈值需针对不同场景手动调整，缺乏自适应性。
 4. **合成噪声与真实噪声的差距**：评估使用的合成高斯噪声无法完全模拟真实传感器噪声（如扫描缺失、非均匀采样），实际部署效果需进一步验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2410_02786/figures/007_Figure_7.jpg]]
 *Figure 7: Symmetry groups found within a castle wall. The shape patches that support the detected symmetries are colored the same as the corresponding plane. We identify both local and global reflective symmetries*
 
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2410_02786/figures/009_Table.jpg]]
 *Table: detected symmetry planes, evaluate our method quantitatively with other baselines, and provide potential downstream applications*
 
-![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2410_02786/figures/015_Table.jpg]]
-
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2410_02786/figures/016_Table.jpg]]
 *Table: A2. Hyperparameter setup*
 
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2410_02786/figures/017_Table.jpg]]
 *Table: A3. Ablation study on the impact of DBSCAN*
-
-
 
 ## 定位与知识库关联
 
@@ -335,8 +317,6 @@ Fig. 6 可视化了朗之万动力学在变换空间中的完整轨迹及其在�
 3. **数据驱动融合**：能否构建大规模、细粒度的对称性标注数据集，使基于学习的方法与基于得分的无训练方法形成互补，实现半监督或自监督的对称性检测？
 4. **自适应参数选择**：如何根据输入形状的噪声水平和几何复杂度，自动确定最优的朗之万步数、噪声调度和聚类阈值？
 5. **真实噪声鲁棒性**：在真实传感器噪声（如扫描缺失、离群点、非均匀采样）下的鲁棒性如何？需要更贴近实际应用的评估协议。
-
-
 
 ## 原文 PDF
 

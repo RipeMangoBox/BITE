@@ -89,8 +89,6 @@ GHOST 是首个同时覆盖物体、属性、关系三个维度，并在物体�
 
 GHOST 的当前局限包括：数据集主要源自 Visual Genome / GQA，场景覆盖有限；困难负样本仍需人工筛选，扩展成本高；仅支持判别式 True/False 问题，未涵盖生成式幻觉。未来方向包括：将一致性框架扩展到视频等多模态场景，探索自动化负样本生成方法，以及将一致性度量应用于需要多步推理的复杂问题。
 
-
-
 ### 幻觉评估的瓶颈：从图像级到物体级
 
 多模态大语言模型（MLLM）在视觉-语言任务中展现出强大的能力，但幻觉问题——即模型生成与视觉内容不一致的陈述——仍是制约其可靠性的核心瓶颈。现有的幻觉评估基准，如 **POPE**（Li et al., EMNLP 2023）、**AMBER**（Wang et al., 2024）、**THRONE**（Kaul et al., 2024）和 **CIEM**（Hu et al., NeurIPS 2023 Workshop），大多采用图像级别的评估范式：它们询问关于整张图像的问题，并以准确率或 F1 分数作为主要度量指标。
@@ -127,8 +125,6 @@ GHOST 通过实验揭示了准确率指标的系统性欺骗效应。如 **Figur
 
 通过这一框架，GHOST 旨在揭示 MLLM 在物体级理解上的真实能力边界，为幻觉研究提供一个更诚实、更严格的评估基准。
 
-
-
 ## 核心方法与创新机理
 
 GHOST 的核心创新在于将幻觉评估从**图像级别下沉到物体级别**，并通过**多轮一致性检查**揭露模型的自相矛盾，而非仅依赖传统的独立准确率指标。其关键设计体现在以下四个维度：
@@ -152,8 +148,6 @@ GHOST 引入多轮一致性检查框架：对同一物体，模型需在正样�
 ### 4. 负样本设计：基于条件共现的困难负样本
 
 现有基准多采用随机或简单负样本。GHOST 利用多个 MLLM 训练数据集的共现矩阵，生成**看似合理但实际为假的困难负样本**，并经人工筛选确保挑战性。**Table 5** 的消融实验表明，这种条件共现负样本比随机负样本或 LLaMA 生成的负样本更具挑战性，能更有效地限制模型保持一致性。
-
-
 
 GHOST 提出了一套从数据构建到一致性度量再到模型评估的完整流水线，其核心设计目标是将幻觉评估从图像级别下沉至物体级别，并通过多轮一致性检查暴露模型的自相矛盾。
 
@@ -180,8 +174,6 @@ GHOST 提出了一套从数据构建到一致性度量再到模型评估的完�
 ### 与传统准确率评估的关键区别
 
 Figure 2 揭示了一个反直觉现象：当负样本数量增加时，模型的标准准确率反而上升，但“无幻觉物体”的比例却持续下降。这意味着准确率可能掩盖幻觉——模型只需学会对所有问题回答“否”即可在负样本主导的评估中获得高准确率，而一致性检查通过追踪同一物体上正负样本回答的自洽性，能够穿透这种表面正确性。GCS 公式正是基于这一洞察设计：它使用加权几何平均（权重随幻觉次数指数衰减）来惩罚假阳性（FP）和假阴性（FN），而非简单地计算正确率。
-
-
 
 ### 关键模块
 
@@ -219,8 +211,6 @@ $$\mathrm{GCS} = 1 - \frac{\sum_{i=1}^{N_{\mathrm{hallu}}} \frac{1}{2^{i-1}}}{\s
 $$\mathrm{Overall\ GCS} = \frac{1}{3} \left( \mathrm{GCS}_{\mathrm{obj}} + \mathrm{GCS}_{\mathrm{attr}} + \mathrm{GCS}_{\mathrm{rel}} \right)$$
 
 对物体（obj）、属性（attr）、关系（rel）三个维度的 GCS 取算术平均，得到跨维度的综合一致性评价。Table 4 的跨三元组实验表明，综合 GCS 远低于单独评估时的 GCS，揭示了跨组件累积不一致性的严重程度。
-
-
 
 ## 实验与关键发现
 
@@ -278,8 +268,6 @@ Figure 3 展示了语言模型规模对幻觉的影响：**更大的语言模型
 - 如何进一步改进属性和关系理解，以缩小与物体识别之间的性能差距？
 - 在同等计算预算下，语言模型容量与视觉编码器质量的最优权衡是什么？
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2_https_openaccess_thecvf_com_content_WACV2026_papers_VS_GHOST_Getting_to/figures/001_Figure_1.jpg]]
 *Figure 1: Top: Illustration of GHOST benchmark’s object-centric evaluation, where each object (e.g., "bat") is assessed using compositional triplets consisting of the object’s type, attributes, and relations. During consistency check rounds, plausible negative variations are introduced to evaluate whether the model truly understands the object or is hallucinating. Bottom: The GHOST Consistency Score (GCS) framework evaluates the model’s consistency across positive and negative statements by penalizing hallucinated responses. Unlike traditional accuracy metrics that treat each question independently, GCS is a function of the consistency checks and accounts for the frequency of hallucinations. By focus...*
 
@@ -288,17 +276,6 @@ Figure 3 展示了语言模型规模对幻觉的影响：**更大的语言模型
 
 ![[assets/figures/papers/paper_list_l2_https_openaccess_thecvf_com_content_WACV2026_papers_VS_GHOST_Getting_to/figures/007_Table_5.jpg]]
 *Table 5: Ablation study on hard negatives generation*
-
-![[assets/figures/papers/paper_list_l2_https_openaccess_thecvf_com_content_WACV2026_papers_VS_GHOST_Getting_to/figures/009_Table_3.jpg]]
-*Table 3: GHOST Comparison against previous benchmarks*
-
-![[assets/figures/papers/paper_list_l2_https_openaccess_thecvf_com_content_WACV2026_papers_VS_GHOST_Getting_to/figures/010_Table_6.jpg]]
-*Table 6: Prompt sensitivity ablation for different models with corresponding response types. Italics represent our GHOST prompt*
-
-![[assets/figures/papers/paper_list_l2_https_openaccess_thecvf_com_content_WACV2026_papers_VS_GHOST_Getting_to/figures/011_Table_7.jpg]]
-*Table 7: Ablation study for all order permutation of CC rounds*
-
-
 
 ## 定位与知识库关联
 
@@ -354,8 +331,6 @@ GHOST 的设计决定了其适用范围存在明确的边界条件：
 5. **LLM 容量与视觉编码器的最优权衡**：Figure 3 和 Figure 4 分别展示了语言模型规模和视觉编码器质量对 GCS 的影响。在同等的计算预算下，如何最优地分配 LLM 参数和视觉编码器容量，以达到最佳的幻觉抑制效果？这一权衡关系对实际模型设计具有直接指导意义。
 
 6. **一致性检查的深度与广度权衡**：Table 7 表明增加检查轮数会持续降低 GCS，但边际效应和计算成本的平衡点尚未系统探索。是否存在一个最优的检查深度，能够在评估精度和计算开销之间取得最佳折中？
-
-
 
 ## 原文 PDF
 

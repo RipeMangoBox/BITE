@@ -57,8 +57,6 @@ claims:
 
 实验验证了问题诊断与方法的有效性。**Figure 3** 表明，HILP-pixel 的值-回报 Spearman 相关性显著低于 HILP-state 和 HILP-SDE-pixel，证实次优表示主要损害后继度量而非基础特征。**Table 1** 的全面对比显示，SRCP 在 Walker、Quadruped、Cheetah 域的平均性能分别超出当时最佳方法 13%、33% 和 11%。**Table 2** 的消融实验进一步证实，移除显著性动态编码器或一致性策略均导致性能下降，两者结合达到最优。
 
-
-
 ### 视觉无监督强化学习的泛化困境
 
 无监督强化学习（Unsupervised Reinforcement Learning, URL）的核心目标是在没有任务奖励的条件下，预训练出能够快速适应多种下游任务的通用智能体。后继表示（Successor Representation, SR）方法因其优雅的线性奖励分解结构——将价值函数表达为基础特征与技能向量的内积 $Q_r^\pi(s,a) = \psi^\pi(s,a)^\top z$——而在零样本泛化方面展现出独特优势：智能体只需从少量任务样本中通过最小二乘回归推断技能向量 $z_r := \mathbb{E}_{\rho}[\varphi\varphi^\top]^{-1}\mathbb{E}_{\rho}[\varphi r]$，即可泛化到新任务。
@@ -84,8 +82,6 @@ $$\|\hat{V}^{\pi_{z_r}} - V^\star\|_\infty \leq \frac{3\|z_r\|_*}{1-\gamma} \sup
 ### 本文动机
 
 上述分析揭示了视觉 URL 的两个核心缺口：(1) 表示学习与 SR 目标的耦合导致动态无关的视觉偏差；(2) 策略建模缺乏对多模态行为分布的表达能力和高效推理机制。SRCP 的提出正是为了填补这两个缺口——通过显著性引导的动态表示学习将编码器从 SR 目标中解耦，同时引入一致性策略与 URL 特定的无分类器引导，在技能多样性与可控性之间取得平衡。
-
-
 
 ## 核心方法与创新机理
 
@@ -126,8 +122,6 @@ SRCP 通过两个核心操作柄打破上述级联失效：
 
 三个 changed slots 形成闭环协同（见 Figure 5 框架总览）：(1) 显著性图从当前后继度量中提取动态注意力区域；(2) 显著性引导的动力学任务利用该图训练编码器，更新后的编码器反过来改进后继度量的输入质量；(3) 一致性策略基于高质量的后继度量学习多模态技能行为，其生成的动作又为下一轮显著性图计算提供新的数据。这种迭代优化的设计使得表示质量、度量精度和策略表达力相互促进，最终在 Walker、Quadruped、Cheetah 域分别以 13%、33%、11% 的优势超越当时最佳方法（见 Table 1）。
 
-
-
 SRCP 的整体预训练框架由五个核心模块构成，它们在一个迭代训练循环中协同工作，如图 Figure 5 所示。这五个模块分别是：无监督数据集、显著性图生成、显著性动态表示学习、后继度量训练以及一致性策略学习。框架的核心设计理念是将视觉表示学习与后继表示（SR）目标解耦，同时引入高效的多模态策略建模，从而解决现有 SR 方法在视觉无监督强化学习（URL）中泛化性能急剧下降的问题。
 
 ![[assets/figures/papers/paper_list_l2722_https_arxiv_org_abs_2604_05931/figures/005_Figure_5.jpg]]
@@ -158,13 +152,6 @@ SRCP 的整体预训练框架由五个核心模块构成，它们在一个迭代
 ### 关键设计选择
 
 框架的两个关键操作柄——表示学习与 SR 目标的解耦、一致性策略与无分类器引导的引入——直接回应了视觉 URL 中观察到的瓶颈。Figure 2 显示，传统 SR 方法（如 HILP、FB）在视觉输入下泛化性能急剧下降，且注意力热力图集中在任务无关区域；Figure 3 进一步揭示，HILP-pixel 的值-回报 Spearman 相关性显著低于 HILP-state，说明次优表示主要损害后继度量而非基础特征。SRCP 通过显著性引导的动力学任务强制编码器关注动态相关区域，并利用一致性策略实现单步高效的多模态动作生成，从而在 Walker、Quadruped、Cheetah 等域上取得了显著优于现有方法的零样本泛化性能（Table 1）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2722_https_arxiv_org_abs_2604_05931/figures/001_Figure_1.jpg]]
-*Figure 1: Illustration of traditional RL and SR methods: (a) Traditional RL trains with task-specific rewards. (b) Traditional RL generalizes poorly to tasks with different rewards. (c) SR methods learn skill-conditioned skills without reward. (d) SR agents infer skills from minimal task information and generalize across tasks*
-
-
 
 ### 5.1 总体框架与模块划分
 
@@ -268,19 +255,6 @@ $$\|\hat{V}^{\pi_{z_r}} - V^{\star}\|_{\infty} \leq \frac{3 \|z_r\|_*}{1 - \gamm
 
 该界表明：后继特征估计越精确，零样本泛化性能越接近最优。这从理论上解释了 SRCP 通过显著性动态表示解耦来提升后继度量质量、进而改善泛化的内在机制。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2722_https_arxiv_org_abs_2604_05931/figures/002_Figure_2.jpg]]
-*Figure 2: Generalization performance and attention analysis of prior methods and SCPL. (a) Task generalization performance of previous SR methods (HILP and FB) under low-dimensional state and high-dimensional visual inputs. (b) Comparison of saliency mask maps and attention heatmaps of prior methods and SRCP in the DMC Walker and Quadruped domains*
-
-![[assets/figures/papers/paper_list_l2722_https_arxiv_org_abs_2604_05931/figures/003_Figure_3.jpg]]
-*Figure 3: Value and performance analysis of methods in Walker Stand task. (a) Implicit reward and value estimations of methods across trajectories with varying returns; (b) Spearman correlations of reward and value with return, and performance across methods*
-
-![[assets/figures/papers/paper_list_l2722_https_arxiv_org_abs_2604_05931/figures/004_Figure_4.jpg]]
-*Figure 4: Trajectory comparison of methods with random and walking skills in the walker domain*
-
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈验证：视觉后继表示为何失效？
@@ -296,9 +270,6 @@ SRCP 首先对现有后继表示（SR）方法在视觉无监督强化学习（U
 ### 主要结果：零样本泛化性能
 
 SRCP 在 ExORL 基准的 4 个域、16 个任务上进行了全面评估，每个任务使用 4 个无监督数据集（RND、PROTO、APS、APT）和 4 个随机种子，共 16 次运行取平均。**Table 1** 汇总了主要结果：
-
-![[assets/figures/papers/paper_list_l2722_https_arxiv_org_abs_2604_05931/figures/006_Table_1.jpg]]
-*Table 1: Zero-shot generalization results across 16 tasks. Each score is averaged over 4 datasets and 4 seeds (i.e. 16 runs)*
 
 | 域 | SRCP 平均回报 | 最佳基线 (HILP) | 提升幅度 |
 |---|---|---|---|
@@ -352,9 +323,6 @@ SRCP 以单步推理达到了接近 40 步扩散策略的性能（485 vs 492）�
 
 SRCP 的设计具有方法级兼容性。将 SRCP 的表示学习与策略学习组件集成到 FB 方法中形成 SRCP(FB)，在 Walker 和 Quadruped 域上 SRCP(FB) 均一致优于原始 FB（**Figure 8**），验证了该框架可作为通用增强模块适用于不同的 SR 基方法。
 
-![[assets/figures/papers/paper_list_l2722_https_arxiv_org_abs_2604_05931/figures/010_Figure_8.jpg]]
-*Figure 8: Generalization performance of FB and SRCP(FB)*
-
 在推理数据量敏感性方面，SRCP 在 500 至 20k 条任务转移样本下性能保持稳定（**Table 16**），表明其对少量下游数据的适应能力，适合低样本零样本迁移场景。
 
 ### 失败模式与局限性
@@ -372,8 +340,6 @@ SRCP 的设计具有方法级兼容性。将 SRCP 的表示学习与策略学习
 - **Table 1**：16 任务零样本泛化主结果
 - **Table 2**：RND 数据集组件消融
 - **Table 15**：扩散策略与一致性策略效率对比
-
-
 
 ## 定位与知识库关联
 
@@ -434,8 +400,6 @@ SRCP 在以下条件下展现出显著优势：
 4. **显著性稳定性**：显著性图生成过程中的随机性或噪声如何影响训练稳定性？是否需要引入平滑机制或贝叶斯不确定性估计？
 
 5. **真实机器人验证**：该框架能否应用于真实机器人视觉控制任务，并验证其对领域转移（sim-to-real）的泛化能力？这涉及视觉编码器对真实纹理和光照的适应性问题。
-
-
 
 ## 原文 PDF
 

@@ -52,8 +52,6 @@ LuxDiT 将光照估计重新定义为条件生成任务，通过微调视频扩�
 
 实验结果表明，LuxDiT 在多个基准上取得显著提升：在 Laval Outdoor 数据集上，峰值角度误差（PAE）降低近50%（均值从44.4降至23.7）；在 Poly Haven 上角度误差降低约44%（1.235 vs. 2.199）；虚拟物体插入用户研究中获得68%的偏好率。消融实验进一步证实，token级条件机制和合成数据预训练是性能提升的决定性因素。
 
-
-
 ### 问题背景
 
 光照估计是计算机视觉与图形学中长期存在的核心问题，其目标是从单张或序列低动态范围（LDR）图像中恢复完整的HDR环境光照信息。准确的环境光照对于虚拟物体插入、增强现实和场景重光照等应用至关重要——不匹配的光照方向、强度和颜色会立即破坏视觉真实感。
@@ -80,8 +78,6 @@ LuxDiT 将光照估计重新定义为条件生成任务，通过微调视频扩�
 
 这一设计使得LuxDiT在方向精度上实现近50%的误差降低（Laval Outdoor峰值角度误差从44.4°降至23.7°），同时在用户研究中以68%的偏好率显著优于DiffusionLight。
 
-
-
 ## 核心方法与创新机理
 
 LuxDiT 的核心创新在于将光照估计重新定义为**条件生成任务**，并通过三个关键机制突破现有方法的瓶颈：**注意力驱动的条件嵌入**、**合成数据驱动的物理先验学习**、以及**低秩适配的语义对齐**。
@@ -92,10 +88,6 @@ LuxDiT 的核心创新在于将光照估计重新定义为**条件生成任务**
 
 这一设计的核心洞察在于，光照估计是一个**非局部推理任务**——光源可能位于画面之外，其位置、强度、颜色需要通过阴影、反射等间接线索推断。通道级联将条件与目标
 
-
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2509_03680/figures/002_Figure_2.jpg]]
-*Figure 2: Method Overview. Given an input image or video I, LuxDiT predicts an environment map E as two tone-mapped representations, $\mathbf { E } _ { \mathrm { l d r } }$ and $\mathbf { E } _ { \mathrm { l o g } } ^ { \mathrm { ~ \tiny ~ \hat { ~ } { ~ \ x ~ } ~ } }$ , guided by a directional map $\mathbf { E } _ { \mathrm { d i r } }$ . Environment maps are encoded with a ${ \mathrm { V A E } }$ , , and the resulting latents are concatenated and jointly processed with visual input by a DiT. The outputs $\mathbf { E } _ { \mathrm { l d r } }$ and $\mathbf { E } _ { \mathrm { l o g } }$ are decoded and fused by a lightweight MLP to reconstruct the final HDR panorama
 
 LuxDiT 将光照估计建模为一个**条件生成任务**：给定单张图像或视频序列 $\mathbf{I}$，生成高动态范围（HDR）环境图 $\mathbf{E}$。其整体 pipeline 由四个核心环节构成，形成从视觉输入到 HDR 光照的端到端映射。
 
@@ -130,8 +122,6 @@ $$\hat{\mathbf{E}} = \psi(\mathbf{E}_{\mathrm{ldr}}, \mathbf{E}_{\mathrm{log}})$
 - **第二阶段**：在筛选的真实 HDR 全景图上使用 LoRA 低秩适配微调，注入少量可学习参数 $\Delta\theta$（Equation 5），在保持预训练能力的同时提升输入场景与预测光照之间的语义对齐。
 
 这种“合成预训练 + LoRA 语义适配”的策略，使得模型既能从合成数据中学习泛化的物理光照线索，又能通过真实数据适应语义场景。
-
-
 
 ### 3.1 双色调映射表示
 
@@ -178,8 +168,6 @@ $$
 $$
 
 LoRA适配器注入于Transformer层中，在保持预训练物理先验的同时提升输入场景与预测光照之间的语义对齐。Table 4显示，提高LoRA缩放因子可单调降低Poly Haven上的角度误差，但过大的LoRA尺度可能导致前景内容泄漏到环境图中（Table 13）。
-
-
 
 ## 实验与关键发现
 
@@ -235,15 +223,6 @@ LuxDiT 在三个标准基准数据集上与现有方法进行了全面对比，�
 
 **Table 9** 报告了室内数组球面协议上的评分，LuxDiT 在多数指标上优于 **Weber et al.**（2022）和 **EMLight** 等室内光照估计基线。**Table 10** 在 Cube++ 数据集上的 SpyderCube 白面渲染评估进一步验证了颜色和强度估计的准确性。**Table 11** 与 NeuS+Mitsuba 在 Objects with Lighting 数据集上的对比表明，LuxDiT 的生成式估计可与基于几何重建的方法相媲美。**Figure 11** 展示了从 NeRF 合成物体估计光照并重渲染的定性结果。
 
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2509_03680/figures/020_Figure_11.jpg]]
-*Figure 11: Lighting estimation from the NeRF synthetic objects. We use the estimated lighting from different methods to re-render the original NeRF Blender scenes*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2509_03680/figures/014_Table_9.jpg]]
-*Table 9: Scores on indoor array-of-spheres*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2509_03680/figures/016_Table_10.jpg]]
-*Table 10: Scores on SpyderCube white face rendering on Cube++ dataset*
-
 ### 5.5 已知限制与失败模式
 
 1. **颜色偏移与伪影：** 预测环境图中偶尔出现轻微颜色偏移（如 NeRF Lego 场景），且在某些纹理区域产生棋盘状伪影。
@@ -255,16 +234,6 @@ LuxDiT 在三个标准基准数据集上与现有方法进行了全面对比，�
 ### 5.6 实验公平性说明
 
 所有对比均采用与先前工作一致的三球渲染协议和评估脚本，确保度量计算的一致性。对于 Laval Indoor 数据集，使用了与 DiffusionLight 完全相同的测试 HDR 环境图和透视裁剪，数据分割无重叠。用户研究采用与先前工作相同的指令和图像对随机化，避免顺序偏差。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2509_03680/figures/001_Figure_1.jpg]]
-*Figure 1: LuxDiT is a generative lighting estimation model that predicts high-quality HDR environment maps from visual input. It produces accurate lighting while preserving scene semantics, enabling realistic virtual object insertion under diverse conditions*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2509_03680/figures/005_Table.jpg]]
-*Table: Stage II: Semantic adaptation. After base training, we fine-tune the model to improve semantic alignment between the input appearance and the predicted HDR environment map*
-
-
 
 ## 定位与知识库关联
 
@@ -309,8 +278,6 @@ LuxDiT 的性能边界主要由训练数据分布和模型设计选择共同定�
 5. **联合建模光照、几何与材质**：LuxDiT 当前仅估计光照，未联合建模场景几何和材质。如何构建端到端的通用场景重建框架，将光照估计作为逆渲染流水线的一个可学习模块，是通往完整场景理解的关键一步。
 
 6. **不确定性量化**：扩散模型天然支持多次采样以估计预测分布，但 LuxDiT 尚未探索如何量化光照估计的不确定性，这对于安全关键应用（如自动驾驶中的光照感知）具有重要意义。
-
-
 
 ## 原文 PDF
 

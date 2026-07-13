@@ -52,8 +52,6 @@ claims:
 
 实验表明，基于AgentFrontier数据训练的模型在四个多学科基准上全面超越先前微调数据集。在最具挑战性的 **Humanity’s Last Exam (HLE)** 上，Qwen3-30B-A3B经拒绝采样微调（RFT）后达到25.7%，较最佳基线MegaScience的20.2%提升5.5个百分点；引入继续预训练（CPT）后进一步达到28.6%，超越若干专有深度研究代理。消融实验证实，ZPD数据筛选策略相比随机采样带来4至10个绝对百分点的平均增益，验证了该策略的有效性。
 
-
-
 ### 大型语言模型代理的能力瓶颈
 
 大型语言模型（LLM）驱动的自主代理在复杂推理与工具调用方面取得了长足进步，但其能力增长正面临一个根本性瓶颈：**缺乏位于模型能力前沿的高质量训练数据**。现有代理的训练数据主要来源于两类途径：一是单步查询生成，即从单一文档或知识源直接生成问答对；二是文档中心生成，围绕特定文档构造任务。这两种范式产生的数据往往停留在模型已掌握的“舒适区”内——模型无需深度知识融合即可独立解决，因而无法有效驱动能力向更高层次演进。
@@ -77,8 +75,6 @@ claims:
 - **MKO**：工具增强的强代理（如DeepSeek-V3.1 + 搜索/学者/浏览器/代码工具），代表模型通过辅助可达的能力上限。
 
 通过对抗校准，自动筛选出那些LKP无法独立解决、但MKO能够验证正确的任务——这些任务恰好落在模型的ZPD内，构成了对能力成长最优价值的训练数据。这种ZPD引导的数据合成策略，能够持续产生推动代理从LKP向MKO演进的学习材料，从根本上区别于传统的数据生成范式。
-
-
 
 ## 核心方法与创新机理
 
@@ -137,8 +133,6 @@ $$\mathcal{L}_{\mathrm{RFT}}(\theta) = -\sum_{i=1}^K \sum_{j=1}^{L_i} \log p_{\t
 
 Table 6/Table 12显示，CPT在所有基准上带来一致的增益：HLE +2.9点、ZPD Exam +2.0点、xBench-ScienceQA +7.0点。这一设计解决了纯RFT的一个隐含缺陷——模型可能缺乏对多学科知识的深层编码，而CPT阶段恰好弥补了这一基础能力缺口，使后续的推理训练建立在更坚实的知识地基之上。
 
-
-
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_c5bf47nDx1/figures/002_Figure_2.jpg]]
 *Figure 2: The three-stage pipeline of the AgentFrontier Engine. Stage I generates seed QA pairs from multiple sources. Stage II iteratively escalates their complexity using a tool-augmented agent. Stage III applies a ZPD-based calibration filter to isolate high-value training samples*
 
@@ -184,8 +178,6 @@ Figure 6 展示了一个典型案例：一个生物医学的种子问题，通�
 ### 流水线的整体逻辑
 
 三个阶段形成了一条从**广度构建**到**深度挖掘**再到**精准筛选**的完整数据生产链。阶段一确保知识覆盖的广度，阶段二注入推理深度，阶段三则通过 LKP/MKO 的对抗校准，精确识别那些对模型成长最优的“跳一跳够得着”的任务。这种设计使得数据合成不再是盲目的复杂度堆砌，而是有理论指导的、面向能力前沿的定向生成。
-
-
 
 ### 三阶段合成管线概览
 
@@ -296,8 +288,6 @@ $$
 
 其中 $q^{(i)}$ 为第 $i$ 条问题，$r_j^{(i)}$ 为第 $j$ 轮推理报告，$o_{j-1}^{(i)}$ 为上一轮工具观测结果，$L_i$ 为该轨迹的推理轮数。训练仅使用经拒绝采样筛选的 12,000 条完全正确轨迹，共训练 3 个 epoch。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与因果机制验证
@@ -334,9 +324,6 @@ $$
 
 **Table 13** 提供了最关键的因果证据：在所有三个骨干模型（Qwen3-8B/32B/30B-A3B）和所有四个基准上，ZPD数据筛选策略相比随机采样均带来显著增益，幅度从+0.8到+10.0个绝对百分点。其中，xBench-ScienceQA上的增益最大（+10.0点），HLE上次之（+4.0至+5.0点），ZPD Exam上增益最小（+0.8至+1.5点）。这一模式表明，ZPD筛选的价值在需要深度知识融合和复杂推理的任务上最为突出，而在与筛选标准同构的ZPD Exam上，随机采样也能捕获部分有效数据，因此增益收窄。
 
-![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_c5bf47nDx1/figures/033_Table_13.jpg]]
-*Table 13: Ablation study comparing our ZPD-based data selection against a random sampling baseline. Models are fine-tuned on 12,000 trajectories from $D _ { \mathrm { r e f i n e d } }$ . Scores are reported on four benchmarks, with the performance delta over the baseline shown in parentheses. Best results are in bold*
-
 ---
 
 ### LKP/MKO配置：能力间隙的调节效应
@@ -366,32 +353,14 @@ $$
 
 **Table 7** 对人工审查集D_human（即MKO在N次尝试中全部失败的样本）进行了失败模式分布分析。这些样本代表了当前框架的能力上限——即便是最强的MKO代理也无法可靠解决。主要失败模式包括：（1）需要极深领域专业知识的问题；（2）涉及多步数学推导且中间步骤易出错的问题；（3）依赖最新实时信息而工具检索未能覆盖的问题。这些失败模式为后续迭代改进提供了明确方向。
 
-![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_c5bf47nDx1/figures/015_Table_7.jpg]]
-*Table 7: Distribution of Failure Modes in $\mathcal { D } _ { \mathrm { h u m a n } }$
 
 **Table 8** 的难度分布分析表明，AgentFrontier生成的问题中，推理密集型类别（多跳推理、概念抽象、计算转化）占主导，而简单检索类问题占比较低，证实了知识融合生成和代理迭代精炼在提升任务复杂度方面的有效性。
-
-![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_c5bf47nDx1/figures/016_Table_8.jpg]]
-*Table 8: Distribution of primary difficulty types in a random sample of 200 AgentFrontier questions. The analysis reveals a balanced composition, with a significant emphasis on reasoningintensive categories over simple retrieval*
 
 ---
 
 ### 公平性说明
 
 所有微调数据集均采用统一的拒绝采样流程——筛选出最终答案完全正确的12,000条轨迹，训练总轮数统一为25,600轮，每轮token上限相同，均训练3个epoch。评估采用统一的o3-mini作为LLM评判模型，生成参数固定为温度0.6、top-p 0.95。这些控制措施确保了性能差异可归因于数据质量本身，而非训练或评估协议的不一致。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_c5bf47nDx1/figures/004_Table_1.jpg]]
-*Table 1: Statistics of trajectories across the training datasets. Avg. Rounds and Avg. Calls are computed per trajectory*
-
-![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_c5bf47nDx1/figures/017_Table_9.jpg]]
-*Table 9: SFT Hyperparameters for the MoE Model*
-
-![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_c5bf47nDx1/figures/018_Table_10.jpg]]
-*Table 10: SFT Hyperparameters for the Dense Model*
-
-
 
 ## 定位与知识库关联
 
@@ -428,8 +397,6 @@ AgentFrontier在训练策略上也引入了重要创新。现有方法通常仅�
 3. **多模态迁移**：该方法在处理非文本模态（如图像、视频）以及多模态融合任务时的迁移效果如何？当前框架的知识融合机制主要针对文本，向多模态扩展需要重新设计块划分和主题关联策略。
 
 4. **动态对抗框架**：对抗校准与生成式对抗网络（GAN）思想结合，能否形成更完善的动态数据生成框架？当前LKP/MKO是静态配置的，引入动态博弈机制可能进一步提升数据质量。
-
-
 
 ## 原文 PDF
 

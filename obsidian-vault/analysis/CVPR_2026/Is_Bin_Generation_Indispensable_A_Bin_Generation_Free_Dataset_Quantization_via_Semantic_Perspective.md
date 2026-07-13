@@ -53,8 +53,6 @@ claims:
 
 实验结果表明，BGFDQ（不含 SPD）在 CIFAR-10 上相比基线减少 15%–35% 的总运行时间，同时验证准确率提升超过 1%（见 Figure 1(c)）；加入 SPD 后，性能进一步提升超过 2%。在 CIFAR-100 上，BGFDQ 实现了高达 5% 的验证准确率提升。在 ImageNet-1K 和 Fakeddit 等大规模数据集上，BGFDQ 在现有分箱方法因内存溢出而失败的场景下仍能成功运行，并取得一致的性能优势（见 Table 2、Table 4）。
 
-
-
 ### 数据集量化的核心任务与挑战
 
 深度学习模型的性能高度依赖大规模、高质量的训练数据，但海量数据带来的存储、传输与训练开销已成为实际部署的瓶颈。数据集量化（Dataset Quantization）作为一种数据压缩范式，旨在从原始数据集中选取一个紧凑且具有代表性的核心集（coreset），并通过图像块丢弃（patch dropping）进一步压缩每个样本的存储体积，从而在保持模型训练精度的前提下大幅降低数据规模。
@@ -83,8 +81,6 @@ claims:
 - **用语义偏移驱动自适应压缩**：为每个样本动态计算其最优图像块丢弃率，约束条件为丢弃后的语义偏移不超过类内语义变化阈值，从而在保持语义完整性的前提下最大化压缩比。
 
 Figure 1 从范式层面对比了现有方法与 BGFDQ 的差异，并展示了初步的性能优势：BGFDQ（不含 SPD）相比基线减少 15%–35% 的总运行时间，同时验证准确率提升超过 1%；加入 SPD 后性能进一步提升超过 2%。
-
-
 
 ## 核心方法与创新机理
 
@@ -138,8 +134,6 @@ $$\lambda_C = \min\{d_{ij} \mid i,j \in C, i \neq j\}$$
 
 三个 changed slots 构成了从“分组-随机-固定”到“样本-感知-自适应”的完整范式转换。邻居识别为后续的核心集选择和图像块丢弃提供了统一的语义基础；邻居感知选择在样本层面最大化覆盖率并最小化冗余；语义偏移驱动的自适应丢弃则在样本内部进一步去除冗余。这一协同设计使得 BGFDQ 在 CIFAR-100 上实现了高达 5% 的验证准确率提升，并在 Fakeddit 等大规模类数据集上成功运行（而现有分箱方法出现内存溢出），验证了无分箱范式在精度、效率和可扩展性上的综合优势。
 
-
-
 BGFDQ 的整体工作流程如图 3 所示，由三个核心模块串联构成：**邻居识别（Neighbor Identification, NI）**、**邻居感知核心集选择（Neighbor-Aware Coreset Selection, NCS）** 和 **语义偏移驱动的图像块丢弃（Semantic-Shift Patch Dropping, SPD）**。这三个模块共同实现了从原始数据集到量化核心集的端到端映射，完全摒弃了传统数据集量化方法中计算代价高昂的分箱生成步骤。
 
 ### 输入与输出
@@ -162,15 +156,8 @@ BGFDQ 的整体工作流程如图 3 所示，由三个核心模块串联构成�
 
 传统数据集量化方法遵循“分箱生成 → 核心集选择 → 图像块丢弃”的固定范式，其中分箱生成通过迭代求解子模优化问题将样本划分为互不相交的箱，计算复杂度为 $O(CM^3)$，在大规模数据集上容易导致内存溢出。BGFDQ 将这一范式重构为“邻居识别 → 邻居感知核心集选择 → 语义偏移驱动的图像块丢弃”，以样本粒度的语义邻居关系替代粗粒度的分箱结构，实现了更低计算开销下的更高质量压缩。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2688_https_openaccess_thecvf_com_content_CVPR2026_html_Deng_Is_Bin_Generation/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of paradigms and performance for dataset quantization approaches. (a) Previous works follow a paradigm consisting of bin generation, coreset selection and patch dropping. (b) Our approach first performs neighbor identification to guide coreset selection, followed by a semantic-shift patch dropping to adaptively remove unimportant patches. (c) Runtime breakdown for quantizing CIFAR-10 and the validation accuracy by training ResNet-18 on the quantized coreset. BGFDQ (w/o SPD) reduces total runtime by 15%–35% compared to baselines while achieving over 1% higher accuracy. Although BGFDQ (w/ SPD) introduces additional computation, its more adaptive compression yields over 2% performan...*
-
-![[assets/figures/papers/paper_list_l2688_https_openaccess_thecvf_com_content_CVPR2026_html_Deng_Is_Bin_Generation/figures/003_Figure_3.jpg]]
-*Figure 3: Bin-Generation-Free Dataset Quantization (BGFDQ). We first analyze the original dataset using our (a) Neighbor Identification, where each sample is assigned its neighbor information. Then, we perform (b) Neighbor-aware Coreset Selection, which removes samples based on the neighbor information. Finally, we apply (c) Semantic-shift Patch Dropping to drop unimportant sample patches. Each sample is quantized according to its adaptive drop ratio. The output of BGFDQ is a representative quantized coreset of the original dataset*
-
-
 
 ### 3.1 邻居识别（Neighbor Identification, NI）
 
@@ -228,12 +215,8 @@ $$\rho = \frac{|S^*| \times w_{\text{samples}}}{|D|} \times 100\%$$
 
 其中 $|S^*|$ 为核心集样本数，$w_{\text{samples}}$ 为 SPD 产生的样本权重（保留的图像块比例），$|D|$ 为原始数据集大小。该定义将图像块丢弃带来的信息损失纳入核心集规模的计算。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2688_https_openaccess_thecvf_com_content_CVPR2026_html_Deng_Is_Bin_Generation/figures/002_Figure_2.jpg]]
 *Figure 2: (a) The pipeline of patch dropping; The patch importance scores are computed using GradCAM++ [1]. (b) Examples of suboptimal patch dropping; (c) The diverse distribution of the number of unimportant patches indicates that most samples are not optimally quantized, which degrades the quality of the dataset*
-
-
 
 ## 实验与关键发现
 
@@ -280,16 +263,6 @@ BGFDQ 在四个规模与特性各异的数据集上进行了评估：CIFAR-10、
 ![[assets/figures/papers/paper_list_l2688_https_openaccess_thecvf_com_content_CVPR2026_html_Deng_Is_Bin_Generation/figures/005_Table_2.jpg]]
 *Table 2: Overall performance of BGFDQ and baseline methods under different coreset fractions*
 
-![[assets/figures/papers/paper_list_l2688_https_openaccess_thecvf_com_content_CVPR2026_html_Deng_Is_Bin_Generation/figures/009_Table_5.jpg]]
-*Table 5: Validation accuracy (%) on CIFAR-10 using different coreset selection strategies*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2688_https_openaccess_thecvf_com_content_CVPR2026_html_Deng_Is_Bin_Generation/figures/004_Table_1.jpg]]
-*Table 1: Component abbreviations used throughout this paper*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 与数据集压缩方法的谱系关系
@@ -332,8 +305,6 @@ BGFDQ 继承了数据集量化“选择+压缩”的思路，但通过语义驱�
 ### 4. 知识库定位总结
 
 BGFDQ 在数据集量化技术线上完成了从“分箱依赖”到“语义驱动”的范式转换。其核心贡献不在于提出全新的压缩框架，而在于**识别并消解了分箱生成这一计算瓶颈**，同时用语义邻居关系替代了基于子模函数的全局分区。这一思路与近年来计算机视觉中“从全局结构到局部邻域”的范式迁移（如从全连接注意力到局部窗口注意力）形成呼应，暗示了在数据压缩领域，样本粒度的语义分析可能比全局聚类更高效且更保真。
-
-
 
 ## 原文 PDF
 

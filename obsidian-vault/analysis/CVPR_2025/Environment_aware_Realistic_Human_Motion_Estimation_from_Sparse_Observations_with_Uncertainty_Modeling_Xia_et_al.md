@@ -51,8 +51,6 @@ EnvPoser 面向一个严重欠定问题：从 VR 头显和手柄仅有的头/手
 
 **局限与待解决问题**：当前方法假设静态环境，未考虑动态多用户或移动物体交互；依赖预扫描点云质量，未利用原始视觉语义线索；泛化到全新环境布局的能力尚未充分验证。
 
-
-
 从稀疏穿戴式传感器（如VR头显和手柄）仅有的头部和双手三点跟踪信号恢复全身运动，是虚拟现实、人机交互和具身智能领域的核心挑战。这一问题本质上是**严重欠定的**：同一组稀疏的三点输入，在真实物理世界中可以对应多种合理的全身姿态假设——例如，当用户端坐时，腿部可以交叉、前伸或自然下垂，而头手信号几乎完全相同。这种**一对多映射歧义**在下肢关节表现得尤为突出，因为下肢完全缺乏直接观测信号，仅能依赖运动先验进行推断，导致估计结果中误差和离群值显著偏高。
 
 现有方法主要沿两条技术路径展开。一类方法完全忽略环境上下文，仅从稀疏信号和人体运动先验出发进行回归或生成。**AvatarPoser** 采用纯数据驱动的姿态估计，直接输出单一平均姿态，缺乏对多假设本质的显式建模。**AGRoL** 和 **AvatarJLM** 分别引入扩散模型和两阶段联合层面建模，提升了运动自然度，但依然无法区分不同环境下的合理姿态差异。另一类方法开始尝试融入环境信息，如 **S2Fusion** 利用场景几何约束侧重下肢交互，但其环境利用方式较为简单（仅足-地接触），未充分挖掘环境语义信息对全身运动的引导潜力。
@@ -60,8 +58,6 @@ EnvPoser 面向一个严重欠定问题：从 VR 头显和手柄仅有的头/手
 更深层的瓶颈在于：现有方法普遍**缺乏对稀疏观测下多假设运动分布的显式表征能力**。当模型只能输出单一确定性姿态时，它被迫在多个合理假设之间“平均化”，导致估计结果模糊、与环境脱节，甚至出现穿透物体等物理不合理现象。这一问题在复杂人-环境交互场景（如坐姿、倚靠、上下楼梯）中尤为严重，因为此时环境对运动的约束强度急剧上升，而稀疏信号本身无法提供足够的下肢信息。
 
 EnvPoser 的核心洞察是：**关节不确定性估计可以显式捕获稀疏观测下运动估计的多假设本质；引入预扫描环境点云的语义和几何约束，能够有效减少不确定性，引导多假设估计收敛到与稀疏输入和环境上下文一致的最可信全身运动**。这一思路将问题从“从稀疏信号猜测唯一姿态”转变为“先保留多种可能，再利用环境信息筛选最优解”，为突破现有方法的性能上限提供了新的因果路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -117,8 +113,6 @@ EnvPoser的核心洞察在于：**关节不确定性估计可以显式捕获稀�
 
 四个changed slot形成闭环：不确定性估计生成多假设运动分布（探索空间），环境语义交叉注意力注入场景上下文（引导方向），接触概率提供显式交互先验（约束目标），COAP碰撞损失确保几何可行性（边界条件）。这一协同机制使EnvPoser在复杂人-环境交互场景（如不同形状物体的坐姿）中，能生成贴合环境且物理合理的全身运动，显著优于仅依赖稀疏信号的SOTA方法（Fig. 3定性对比，置信度0.95）。
 
-
-
 EnvPoser 采用**两阶段流水线**（Figure 2），从 VR 头显和手柄仅有的三点稀疏跟踪信号恢复全身运动，并利用预扫描环境点云进行精炼。
 
 ![[assets/figures/papers/paper_list_l1734_Environment_aware_Realistic_Human_Motion_Estimation_from_Sparse_Observat/figures/002_Figure_2.jpg]]
@@ -155,13 +149,6 @@ $$L_{S\text{-}I} = \lambda_M \lVert \widetilde{\pmb{\theta}} - \pmb{\theta} \rVe
 ### 核心设计逻辑
 
 整个框架的核心在于**不确定性显式建模与环境语义/几何约束的协同**：阶段一通过异方差不确定性回归捕获稀疏观测下的多假设运动分布；阶段二利用环境点云的交叉注意力和 COAP 碰撞损失，从多种可能中“筛选”出与物理场景一致的最可信全身运动。消融实验表明，移除不确定性模块（EnvPoser w/o UNC）使 EgoBody 上 MPJRE 和 MPJPE 分别上升 8.11% 和 5.68%；仅使用语义或几何约束均导致性能下降，验证了两阶段设计的互补性。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1734_Environment_aware_Realistic_Human_Motion_Estimation_from_Sparse_Observat/figures/001_Figure_1.jpg]]
-*Figure 1: EnvPoser can estimate the full-body motion using three tracking signals (HMD and hand controllers) and a pre-scanned environment mesh*
-
-
 
 EnvPoser 采用两阶段框架解决稀疏观测下的全身运动估计问题。第一阶段在 AMASS 数据集上训练不确定性感知的初始运动估计模块，第二阶段在运动-环境交互数据集上联合训练环境感知的运动精炼模块。以下按管线顺序阐述关键模块及其核心公式。
 
@@ -219,8 +206,6 @@ $$L_{S\text{-}II} = L_{S\text{-}I} + L_{M'} + \lambda_1 L_{posi} + \lambda_2 L_{
 
 整个管线的核心因果机制为：**不确定性估计显式捕获多假设运动分布 → 环境语义注意力筛选与场景上下文一致的假设 → 接触概率预测与几何碰撞约束进一步消除物理不可行的解**。移除不确定性模块（w/o UNC）导致 EgoBody 上 MPJRE/MPJPE 分别上升 8.11%/5.68%（Table 3）；去除接触概率估计（w/o Contact）使 MPJPE 上升 3.0%–3.7%（Supp. Table 2）；仅使用语义或几何约束均导致性能下降（Table 2），验证了两种环境信息的互补性。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -260,36 +245,17 @@ EnvPoser 在 EgoBody 和 GIMO 两个主流交互数据集上与多个 SOTA 方�
 
 4. **仅依赖点云，未利用视觉线索。** 环境信息仅来自预扫描 3D 点云，未利用原始图像或视频流中的丰富语义线索（如物体类别、材质、功能区域）。在复杂遮挡场景下，纯几何点云可能无法提供足够的上下文来区分外观相似但功能不同的物体表面。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1734_Environment_aware_Realistic_Human_Motion_Estimation_from_Sparse_Observat/figures/005_Table_1.jpg]]
 *Table 1: The performance comparison with SOTAs*
 
 ![[assets/figures/papers/paper_list_l1734_Environment_aware_Realistic_Human_Motion_Estimation_from_Sparse_Observat/figures/006_Table_2.jpg]]
 *Table 2: The ablation study on environment refinement module*
 
-![[assets/figures/papers/paper_list_l1734_Environment_aware_Realistic_Human_Motion_Estimation_from_Sparse_Observat/figures/007_Table_3.jpg]]
-*Table 3: The effectiveness of the uncertainty estimation*
-
-![[assets/figures/papers/paper_list_l1734_Environment_aware_Realistic_Human_Motion_Estimation_from_Sparse_Observat/figures/010_Table_2.jpg]]
-*Table 2: The effectiveness of contact estimation module*
-
 ![[assets/figures/papers/paper_list_l1734_Environment_aware_Realistic_Human_Motion_Estimation_from_Sparse_Observat/figures/004_Figure_3.jpg]]
 *Figure 3: Visualization of motion estimation on three test sequences from EgoBody Dataset [51]*
 
 ![[assets/figures/papers/paper_list_l1734_Environment_aware_Realistic_Human_Motion_Estimation_from_Sparse_Observat/figures/003_Figure_4.jpg]]
 *Figure 4: Qualitative Comparison of Interaction Details*
-
-![[assets/figures/papers/paper_list_l1734_Environment_aware_Realistic_Human_Motion_Estimation_from_Sparse_Observat/figures/009_Figure_1.jpg]]
-*Figure 1: Environmental point cloud with different sampling strategies*
-
-![[assets/figures/papers/paper_list_l1734_Environment_aware_Realistic_Human_Motion_Estimation_from_Sparse_Observat/figures/012_Figure_3.jpg]]
-*Figure 3: Visualization of various sitting motions from EgoBody and GIMO Datasets*
-
-![[assets/figures/papers/paper_list_l1734_Environment_aware_Realistic_Human_Motion_Estimation_from_Sparse_Observat/figures/013_Figure_4.jpg]]
-*Figure 4: Visualization of full-body estimation on three test sequences from GIMO Datasets*
-
-
 
 ## 定位与知识库关联
 
@@ -323,8 +289,6 @@ EnvPoser 的有效运行依赖以下前提，超出这些条件时性能可能�
 - *网格质量鲁棒性。* 如何设计对噪声点云鲁棒的几何约束（如基于概率占用的碰撞损失），以适应实时重建的低质量网格？
 - *新环境泛化。* 模型在未见环境布局中的迁移能力如何？是否需要测试时在线适应（如通过少量无标注交互数据微调）？
 - *联合优化。* 当前不确定性估计与环境精炼是两阶段训练，能否将二者联合优化，使不确定性预测直接感知环境约束，形成端到端的“不确定性-环境”协同闭环？
-
-
 
 ## 原文 PDF
 

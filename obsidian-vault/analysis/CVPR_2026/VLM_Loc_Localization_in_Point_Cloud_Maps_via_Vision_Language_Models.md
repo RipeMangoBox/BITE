@@ -53,15 +53,11 @@ claims:
 
 **主要结果** 在 CityLoc‑K 测试集上，VLM‑Loc 的 Recall@5m 达 35.91%，相比最强基线 CMMLoc 提升 14.20 个百分点；Recall@10m 达 63.81%，提升 17.14 个百分点。消融实验证实，PNA 机制的引入使 Recall@5m 提高 7.72%（测试集），而部分分配策略相比全部分配提升 18.10%，验证了显式节点对齐与仅关注可见对象的有效性。跨域泛化测试（CityLoc‑C）上，VLM‑Loc 同样显著优于所有基线，但绝对精度仍有限（Recall@5m ≈ 21.37%），提示跨传感器模态与城市场景的迁移鲁棒性有待进一步提升。
 
-
-
 **任务定义与核心矛盾**。文本到点云定位（Text-to-Point Cloud Localization, T2P）要求系统根据自然语言空间描述，在给定3D点云地图中估计目标位置的2D坐标 $\xi = (x, y) \in \mathbb{R}^2$。该任务的核心矛盾在于：文本描述天然是稀疏、语义化且以自我为中心的，而点云地图则是密集、几何化且以世界为中心的——如何弥合这两种模态之间的巨大鸿沟，是T2P定位的根本挑战。
 
 **现有方法的瓶颈**。当前T2P定位方法普遍缺乏有效的空间推理能力。以 **Text2Loc**（Xia et al., CVPR 2024）为代表的典型方案，采用Transformer交叉注意力在隐空间中对齐文本与点云特征，本质上依赖于浅层的文本-点云特征匹配。这种隐式对齐策略在面对复杂的大规模城市场景时暴露出两个结构性缺陷：（1）缺乏对物体间空间关系（如“在红色汽车东侧”）的显式建模，导致模型难以执行多步空间推理；（2）文本描述中可能包含在当前局部地图中不可见的物体，强制匹配这些不可见对象会引入噪声，严重损害定位精度。后续方法如 **MNCL**（多级对比学习）和 **CMMLoc**（Xu et al., CVPR 2025，基于柯西混合模型与方向提示）虽在特征学习层面有所改进，但均未从根本上突破“隐式对齐、缺乏显式空间推理”的范式瓶颈。在CityLoc-K基准上，最强基线CMMLoc的Recall@5m仅为20.77%（验证集），表明现有方法的定位能力远未达到实用水平。
 
 **动机：从隐式匹配到显式空间推理**。人类在根据语言描述进行空间定位时，会自然地将文本中的物体提及与环境中可辨识的地标进行显式对应，并利用物体间的方向、距离关系进行推理（Figure 1a）。受此启发，本文提出核心动机：**将大型视觉-语言模型（VLM）固有的空间推理能力引入T2P定位任务**。然而，直接应用VLM面临两个关键障碍：（1）3D点云与VLM常用的2D视觉输入之间存在模态鸿沟；（2）VLM缺乏将文本中的物体提及与3D场景中的具体空间节点进行显式绑定的机制。VLM-Loc正是围绕这两个障碍展开设计：通过将点云地图转换为BEV图像与场景图来弥合模态鸿沟，并通过部分节点分配（PNA）机制实现可解释的文本-空间节点对齐，从而驱动精准的自回归位置预测。
-
-
 
 ## 核心方法与创新机理
 
@@ -99,8 +95,6 @@ VLM‑Loc 的核心创新在于将**大型视觉‑语言模型（VLM）的固�
 
 三个 changed slots 之间存在因果依赖关系：BEV 图像与场景图的双表示提供了 VLM 可消费的输入形式；PNA 在此基础上实现了显式的文本‑空间节点对齐；自回归生成范式则将对齐结果转化为可解释的坐标预测。组件消融（Table 1）证实了这一协同效应——全组件（BEV+SG+PNA）在 CityLoc‑K 验证集上 Recall@5m 达 36.23%，相比仅使用 BEV 的 13.04% 提升 **23.19 个百分点**，相比 BEV+SG 的 29.29% 提升 **6.94 个百分点**，验证了每个创新 slot 的独立贡献与组合增益。
 
-
-
 VLM‑Loc 的整体定位流程围绕一个核心洞察展开：将 3D 点云地图转换为 VLM 能够自然理解的 2D 表示，并通过显式的文本‑空间节点对齐机制，驱动自回归坐标预测。该框架由数据生成和训练/推理两个阶段构成，如图 Figure 2 所示。
 
 ![[assets/figures/papers/paper_list_l2430_https_arxiv_org_abs_2603_09826/figures/002_Figure_2.jpg]]
@@ -128,12 +122,8 @@ $$\mathcal{L} = -\sum_{t=1}^{T} \log P(y_t \mid y_{<t}, s, \mathcal{T}, I, \math
 
 各模块之间的数据依赖关系可概括为：**BEV 图像渲染模块**和**场景图生成模块**并行地将原始点云转换为 VLM 可消费的表示；**PNA 模块**在训练和推理时接收文本查询与场景图，产生显式的节点对齐信号；**VLM 推理与解码模块**以 BEV 图像、场景图和文本查询为联合输入，自回归地输出节点分配与像素坐标；最后由**坐标转换模块**将像素坐标还原为世界坐标。这一设计使得 VLM‑Loc 能够同时利用密集几何线索（BEV 图像）和高层语义关系（场景图），并通过 PNA 实现可解释的文本‑空间节点匹配，驱动精准的位置预测。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2430_https_arxiv_org_abs_2603_09826/figures/001_Figure_1.jpg]]
 *Figure 1: (a) illustrates the human-like logic behind text-to-point cloud localization, where spatial descriptions are used to infer the target position. (b) and (c) show the architectures of a typical method, Text2Loc [57], and our proposed VLM-Loc, respectively*
-
-
 
 VLM‑Loc 将文本到点云（T2P）定位重新表述为一个**视觉‑语言模型引导的空间推理与自回归生成任务**。其核心架构包含五个紧密协作的模块，共同完成从 3D 点云到 2D 世界坐标的端到端映射。
 
@@ -155,9 +145,6 @@ $$
 
 这是 VLM‑Loc 实现**显式文本‑空间对齐**的关键创新。给定文本查询中的 $N_t = 6$ 个提示词（涵盖语义、颜色、方向），PNA 通过距离阈值 $\tau$ 判断每个文本对象是否在当前局部地图中可见：若文本对象在查询视图中的中心点与场景图中对应节点的距离小于 $\tau$，则该对象被视为“可接地”（groundable），并被显式分配给相应节点；否则标记为不可见并忽略（Figure 3, Sec. 4.2）。
 
-![[assets/figures/papers/paper_list_l2430_https_arxiv_org_abs_2603_09826/figures/003_Figure_3.jpg]]
-*Figure 3: Illustration of the node assignment process. PNA determines whether a textual object is groundable by comparing the distance between points A and B with the threshold τ*
-
 该机制的核心优势在于**只关注局部可见对象**，从而避免了对全局地图中不相关节点的错误匹配。消融实验表明，相比强制对所有文本对象进行全部分配，部分分配策略在 CityLoc‑K 验证集上将 Recall@5m 从 18.23% 提升至 36.23%（+18.00 个百分点），测试集上提升 18.10 个百分点（Table 2），证实了选择性对齐对定位鲁棒性的决定性作用。
 
 ### 4.4 VLM 推理与解码模块
@@ -177,8 +164,6 @@ VLM 输出的像素坐标 $\xi_{\text{pixel}}$ 通过预设的 BEV 空间分辨�
 ### 4.6 关键设计选择与证据
 
 组件消融实验（Table 1）系统验证了各模块的贡献：单独使用 BEV 图像时 Recall@5m 仅为 13.04%；加入场景图后提升至 29.29%；进一步引入 PNA 后达到 36.23%。这一递进式增益表明，**BEV 提供密集几何线索，场景图补充高层语义关系，PNA 实现精确的节点级对齐**，三者协同构成了 VLM‑Loc 性能突破的因果链条。此外，正确分配的节点数量与定位误差呈强负相关（Figure 4）：当正确分配 $\ge 4$ 个节点时，定位中位误差显著降低，进一步验证了 PNA 机制的可解释性和有效性。
-
-
 
 ## 实验与关键发现
 
@@ -226,36 +211,17 @@ VLM‑Loc 在 CityLoc‑K 基准上显著超越了所有现有 T2P 定位方法�
 
 此外，VLM‑Loc 的推理速度受限于 VLM 骨干（8B 模型约 0.23 FPS），且当前仅支持固定模板生成的文本查询，对开放性自然语言描述的处理能力尚未验证。跨域泛化实验中 CityLoc‑C 上的绝对精度较低，表明模型在不同传感器模态间的迁移鲁棒性有限。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2430_https_arxiv_org_abs_2603_09826/figures/006_Table_1.jpg]]
 *Table 1: Ablation study on each component. Input: BEV = BEV image, SG = scene graph. Output: PNA = partial node assignment. Best results are in bold, and second-best results are underlined*
 
 ![[assets/figures/papers/paper_list_l2430_https_arxiv_org_abs_2603_09826/figures/005_Table_2.jpg]]
 *Table 2: Ablation study on partial and full node assignment*
 
-![[assets/figures/papers/paper_list_l2430_https_arxiv_org_abs_2603_09826/figures/007_Table_3.jpg]]
-*Table 3: Ablation study on text query components*
-
-![[assets/figures/papers/paper_list_l2430_https_arxiv_org_abs_2603_09826/figures/004_Table_4.jpg]]
-*Table 4: Ablation study on the effect of different VLM backbones*
-
-![[assets/figures/papers/paper_list_l2430_https_arxiv_org_abs_2603_09826/figures/008_Table_5.jpg]]
-*Table 5: Localization results of VLM-Loc and baseline methods on CityLoc-K. Green numbers indicate improvements over baselines*
-
-![[assets/figures/papers/paper_list_l2430_https_arxiv_org_abs_2603_09826/figures/009_Figure_4.jpg]]
-*Figure 4: Relationship between localization error and the number of correctly assigned nodes on the CityLoc-K test set. More correct node assignments correspond to lower localization errors*
-
 ![[assets/figures/papers/paper_list_l2430_https_arxiv_org_abs_2603_09826/figures/011_Figure_5.jpg]]
 *Figure 5: Qualitative results of VLM-Loc and baseline methods on the CityLoc-K. Each example visualizes the predicted and GT positions on colorized BEV maps rendered with semantic labels. The red circles ● and black circles ● denote the GT and predicted positions, respectively. The localization error is shown below each image, and green/red borders indicate localization error below/above 5 m*
 
 ![[assets/figures/papers/paper_list_l2430_https_arxiv_org_abs_2603_09826/figures/012_Figure_6.jpg]]
 *Figure 6: Example point clouds from the CityLoc benchmark. (a) A roadside LiDAR scene from KITTI-360 [32]. (b) A photogrammetric urban block from CityRefer [42]*
-
-![[assets/figures/papers/paper_list_l2430_https_arxiv_org_abs_2603_09826/figures/015_Table_9.jpg]]
-*Table 9: Inference analysis of VLM-Loc on the CityLoc-K val set*
-
-
 
 ## 定位与知识库关联
 
@@ -317,8 +283,6 @@ VLM‑Loc 处于三个研究方向的交汇点：
 3. **高效部署**：在更大的开源 VLM 上（如 Qwen3‑VL‑32B）提升性能的同时，如何通过蒸馏、量化或高效微调保持其在消费级 GPU 上的可部署性？
 
 4. **跨域泛化**：CityLoc‑C 的较差泛化性能是否源于 LiDAR 与摄影测量点云的密度差异？引入域适应或更强的几何特征（如法向量、曲率）能否改进跨传感器迁移能力？
-
-
 
 ## 原文 PDF
 

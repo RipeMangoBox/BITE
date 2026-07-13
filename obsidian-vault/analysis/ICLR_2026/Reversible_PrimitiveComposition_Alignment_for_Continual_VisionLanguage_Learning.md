@@ -48,15 +48,11 @@ claims:
 
 本文提出 **COMPO-REALIGN**，一种用于持续视觉-语言模型（VLM）的轻量级对齐头，旨在解决持续学习中组合结构（属性与物体的绑定关系）的退化问题。核心发现是：在持续适应过程中，模型能够保持原始（属性/物体）识别能力，但会丧失组合结构，即属性与物体的绑定关系。COMPO-REALIGN 通过三个关键设计——可逆作曲家（正交 Cayley 核心）、多正例 InfoNCE 损失和谱信任区域——在不依赖大量图像重放的情况下，显式地保持组合结构的可逆性和几何稳定性。在组合 DIL 和多域 MTIL 检索任务上，该方法相比最强基线（C-CLIP/DIKI）在 Avg R@1 (Image→Text) 上提升了 +2.4，遗忘率降低了约 40%。
 
-
-
 持续视觉-语言学习的目标是让模型在顺序任务中不断适应新数据，同时不遗忘已学知识。现有方法（如 EWC、LwF、Replay）主要关注整体性能的保持，但忽略了组合结构（即属性与物体的绑定关系）的退化问题。
 
 **探索性研究**（Figure 1）揭示了关键瓶颈：在顺序微调（FT）过程中，原始识别（属性和物体）保持稳定，但组合准确率随任务索引下降，组合保留率（CRR）降至 1 以下，零样本组合准确率受影响最大。这表明模型能够记住“红色”和“汽车”这两个概念，但无法保持“红色的汽车”这一组合关系。
 
 **误差分析**（Figure 2）进一步表明，组合误差与雅可比谱半径和循环一致性误差（CCE）共同增加。文本中心微缓冲区能够同时抑制谱敏感性和不可逆性，扩大低误差区域。**子空间漂移热图**（Figure 3）显示，FT 在深层和后期任务中产生显著的子空间漂移，EWC 有所缓解，而 Replay-Text 漂移最小。
-
-
 
 ## 核心方法与创新机理
 
@@ -67,8 +63,6 @@ COMPO-REALIGN 的核心创新在于将组合结构的保持问题转化为几何
 2. **多正例 InfoNCE 损失**：将文本组合嵌入和从原始组合的嵌入都作为图像的正例，隐式地将两者对齐，无需额外的循环损失或集合损失。
 
 3. **谱信任区域**：通过裁剪梯度来限制雅可比矩阵的最大奇异值，而非添加额外的损失项，从而稳定对齐几何结构。
-
-
 
 ![[assets/figures/papers/iclr26_0001_eiTy6AYeQi_Reversible_PrimitiveComposition_Alignment_for_Co/figures/001_Figure_1.jpg]]
 
@@ -81,8 +75,6 @@ COMPO-REALIGN 的整体框架如下：
 - **谱信任区域**：当雅可比矩阵敏感性过高时，通过因子 α = min{1, γ/σ̂_max} 缩放梯度。
 
 训练仅更新 Θ、A、φ 三个轻量组件，编码器保持冻结，无需任务 ID。
-
-
 
 ### 5.1 归一化嵌入
 
@@ -137,8 +129,6 @@ $$\mathrm{CRR}^{(t)} = \frac{A_{\mathrm{pair}}^{(t)}}{A_{\mathrm{attr}}^{(t)} \c
 **循环一致性误差（CCE）**：原始嵌入与其经过组合映射再返回后的重建之间的误差：
 
 $$\mathrm{CCE} = \| E_p - R_{pc}(R_{cp}(E_p)) \|_2$$
-
-
 
 ## 实验与关键发现
 
@@ -232,14 +222,10 @@ $$\mathrm{CCE} = \| E_p - R_{pc}(R_{cp}(E_p)) \|_2$$
 - **Theorem 2**：在噪声下，当 ε < Δ₀/(4+Δ₀) 时，精确恢复仍然成立。
 - **概率 CRR 下界**：在亚高斯噪声下，期望 CRR 的下界随维度指数级增长。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0001_eiTy6AYeQi_Reversible_PrimitiveComposition_Alignment_for_Co/figures/002_Figure_2.jpg]]
 
 ![[assets/figures/papers/iclr26_0001_eiTy6AYeQi_Reversible_PrimitiveComposition_Alignment_for_Co/figures/003_Figure_3.jpg]]
 *Figure 3: (a) Composition accuracy (mean (b) CRR (higher is better). Text- (c) Zero-shot composition accuracy on ±95% CI) across tasks for FT, EWC, centric replay slows CRR decay. unseen pairs. Replay-Text.*
-
-
 
 ## 定位与知识库关联
 
@@ -267,8 +253,6 @@ COMPO-REALIGN 的独特定位在于：
 - 自适应确定谱信任区域阈值 γ。
 - 在更大规模 VLM（如 LLaVA）上的表现。
 - 文本中心缓冲区的最佳构建策略。
-
-
 
 ## 原文 PDF
 

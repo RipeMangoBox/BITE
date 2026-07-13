@@ -77,8 +77,6 @@ FlowRL处于**GFlowNets × RL for LLMs**的交叉点。与GRPO等基于优势函
 
 FlowRL目前依赖结果奖励（outcome reward），未使用过程监督信号，可能无法捕捉推理步骤的局部正确性。可学习配分函数 $Z_\phi$ 引入了额外参数，略微增加训练开销。实验范围目前限于数学与代码推理，在对话、摘要等其他任务上的有效性有待验证。开放问题包括：如何将过程奖励融入分布匹配框架、$Z_\phi$ 在大规模模型上的扩展性、以及 $\beta$ 超参数的自适应调节策略。
 
-
-
 ### 推理能力增强的现状与瓶颈
 
 大语言模型在数学推理、代码生成等复杂任务上的能力提升，高度依赖于强化学习（RL）驱动的后训练优化。当前主流方法——如近端策略优化**PPO**（Schulman et al., 2017）、组相对策略优化**GRPO**（Shao et al., 2024）以及**REINFORCE++**（Hu et al., 2025）——均遵循奖励最大化范式：通过估计优势函数并沿梯度方向更新策略，使模型生成高奖励响应的概率持续上升。
@@ -96,8 +94,6 @@ FlowRL 的核心动机源于一个根本性的视角转换：**不再追求最�
 $$\min_{\theta} \mathcal{D}_{\mathrm{KL}}\left(\pi_{\theta}(\mathbf{y} \mid \mathbf{x}) \,\|\, \frac{\exp(\beta r(\mathbf{x}, \mathbf{y}))}{Z_{\phi}(\mathbf{x})}\right)$$
 
 即最小化策略与奖励加权分布之间的反向 KL 散度。该目标的梯度天然包含奖励最大化项和熵正则化项，理论上同时促进高奖励生成与多样性保持。为实现这一目标，FlowRL 引入可学习配分函数 $Z_\phi$ 将标量奖励归一化为概率分布，并以轨迹平衡损失作为可操作的优化代理，从而在数学与代码推理任务上实现准确率与多样性的双重提升。
-
-
 
 ## 核心方法与创新机理
 
@@ -151,8 +147,6 @@ $$\mathcal{L}_{\mathrm{FlowRL}} = w \cdot \bigg( \log Z_{\phi}(\mathbf{x}) + \fr
 | 重要性采样 | 带裁剪的旧策略比率 | 带梯度分离和裁剪的全损失权重 | 修正off-policy分布偏差 |
 
 这些创新的协同效果在实验中得到验证：FlowRL在32B模型上实现数学推理平均准确率48.39%，显著超过GRPO的38.34%（+10.05个百分点），并在多样性评测中远高于所有奖励最大化基线（Figure 4）。
-
-
 
 ![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_lObnTKbm9U/figures/001_Figure_1.jpg]]
 *Figure 1: Top: Comparison between distribution-matching and reward-maximizing approaches. FlowRL (left) learns to match the full reward distribution, maintaining diversity across multiple modes with low KL divergence. In contrast, reward-maximizing methods (right) such as RE-INFORCE++ (R++; Sutton et al., 1999b; Hu et al., 2025), PPO (Schulman et al., 2017), and GRPO (Shao et al., 2024) concentrate on a single high-reward peak, leading to mode collapse and higher KL divergence. Bottom: Performance comparison. FlowRL consistently outperforms GRPO across math and code domains*
@@ -222,8 +216,6 @@ FlowRL 则将目标重新定义为分布匹配：
 $$\min_{\theta} \mathcal{D}_{\mathrm{KL}}(\pi_{\theta}(\mathbf{y} \mid \mathbf{x}) \| \frac{\exp(\beta r(\mathbf{x}, \mathbf{y}))}{Z_{\phi}(\mathbf{x})})$$
 
 通过最小化反向 KL 散度，策略被迫覆盖奖励分布的所有模式，而非仅追求最高峰。Figure 1 的示意对比清晰展示了这一差异：FlowRL 的 KL 散度仅为 0.11，而奖励最大化方法达到 8.68。
-
-
 
 ### 问题瓶颈与优化目标转换
 
@@ -305,8 +297,6 @@ $$
 
 其中 $\hat{r}_i = \frac{r_i - \mathrm{mean}(\mathbf{r})}{\mathrm{std}(\mathbf{r})}$ 为组内奖励归一化。该目标通过轨迹平衡损失实现分布匹配，通过重要性采样修正off-policy偏差，通过长度归一化稳定可变长度训练，通过参考模型先验约束策略空间。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -344,8 +334,6 @@ FlowRL 在所有三个代码基准上均取得最强表现，表明分布匹配�
 
 Table 3 显示，移除重要性采样后，六项数学基准平均准确率从 **35.63% 骤降至 26.71%**，降幅达 8.92 个百分点。该模块对纠正 off-policy 采样偏差、维持分布匹配的准确性至关重要。
 
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_lObnTKbm9U/figures/005_Table_3.jpg]]
-
 #### 配分函数 $Z_\phi$
 
 Table 11 的消融表明，完全移除可学习配分函数 $Z_\phi$ 后，AIME 2024 准确率从 **15.41% 降至 9.79%**；若替换为常数值，则进一步降至 **7.50%**。Table 10 进一步验证 3 层 MLP 架构（15.41%）优于 1 层（14.58%）和 5 层（13.75%），过深或过浅的网络均损害配分函数的学习能力。
@@ -360,8 +348,6 @@ Figure 3 和 Table 7 展示了 $\beta \in \{5, 10, 15, 30\}$ 的影响：$\beta 
 ![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_lObnTKbm9U/figures/010_Table_7.jpg]]
 *Table 7: Ablation study on the effect of the $\beta$ parameter in FlowRL. We report Avg@16 accuracy across six math reasoning benchmarks for different values of β*
 
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_lObnTKbm9U/figures/011_Table_7.jpg]]
-
 #### 长度归一化
 
 Figure 6 揭示了移除长度归一化项 $1/|\mathbf{y}|$ 的严重后果：训练出现严重不稳定，响应长度剧烈爆炸或崩溃，梯度范数（对数尺度）出现尖峰。该组件对可变长度思维链训练的稳定性不可或缺。
@@ -370,14 +356,8 @@ Figure 6 揭示了移除长度归一化项 $1/|\mathbf{y}|$ 的严重后果：�
 
 Figure 4 展示了 GPT-4o-mini 评测的多样性分数：FlowRL 的生成多样性显著高于 REINFORCE++、GRPO 和 PPO。Table 4 的典型案例进一步佐证——在 AIME 问题上，GRPO 表现出重复模式（AM-GM 使用 3 次、恒等循环 2 次），而 FlowRL 遵循了包含对称性假设、有理根检验、因式分解的多样化求解路径。人类评估（Table 8）同样确认 FlowRL 的多样性优势。
 
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_lObnTKbm9U/figures/007_Figure_4.jpg]]
-*Figure 4: GPT-judged diversity scores on rollouts of AIME 24/25 problems. FlowRL generates more diverse solutions than R++, GRPO, and PPO*
-
 ![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_lObnTKbm9U/figures/008_Table_4.jpg]]
 *Table 4: Case study comparing GRPO and FlowRL rollouts on an AIME problem. GRPO exhibits repetitive patterns (AM-GM ×3, identity loops ×2), while FlowRL follows a more diverse solution path*
-
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_lObnTKbm9U/figures/012_Table_8.jpg]]
-*Table 8: Human-evaluated diversity scores ( $\mathrm { M e a n } \pm \mathrm { S t d }$ )
 
 ### 训练动态
 
@@ -387,19 +367,11 @@ Figure 5 展示了 Qwen2.5-7B 上的训练动态：FlowRL 的 AIME 2025 Acc@8 �
 
 在低温（0.6）和高温（1.0）设置下（Table 5、Table 6），FlowRL 均一致超越所有基线，表明其对生成随机性具有鲁棒性。跨域评估（Table 9）显示 FlowRL 在 MMLU（72.13%）和 GPQA（36.87%）上同样优于 GRPO 和 PPO，初步验证了方法的泛化能力。
 
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_lObnTKbm9U/figures/009_Table_5.jpg]]
-*Table 5: Math reasoning performance (Avg@64) at temperature = 0.6. Relative improvements are shown as subscripts, with positive gains in green and negative changes in red. FlowRL consistently outperforms all baselines and achieves the best average score under this low-temperature setting. Table 6: Math reasoning performance (Avg@64) at temperature = 1.0. Relative improvements are shown as subscripts, with positive gains in green. FlowRL maintains robust performance under higher generation randomness and continues to outperform all baselines on average*
-
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_lObnTKbm9U/figures/013_Table_9.jpg]]
-*Table 9: MMLU and GPQA benchmark performance*
-
 ### 局限与失败模式
 
 1. **过程监督缺失**：FlowRL 仅依赖结果奖励，无法捕捉推理步骤的正确性，在需要细粒度反馈的任务上可能受限。
 2. **配分函数开销**：$Z_\phi$ 引入额外参数，虽开销不大，但在极大规模模型上的扩展性尚未验证。
 3. **任务覆盖有限**：当前实验仅涵盖数学与代码推理，对话、摘要等非推理领域的有效性需进一步验证。
-
-
 
 ## 定位与知识库关联
 
@@ -451,8 +423,6 @@ FlowRL目前存在以下适用边界和局限：
 3. **非推理领域的多样性收益**：FlowRL在安全对齐、长文本生成等非推理领域是否同样能带来多样性收益？这些任务中奖励信号的定义和分布特性可能与数学/代码推理有本质差异。
 
 4. **$\beta$的自适应策略**：能否设计$\beta$的自适应调整策略以进一步减少手动调参工作？例如，根据训练过程中的奖励分布统计量动态调整温度参数，或采用元学习的方法自动搜索最优$\beta$。
-
-
 
 ## 原文 PDF
 

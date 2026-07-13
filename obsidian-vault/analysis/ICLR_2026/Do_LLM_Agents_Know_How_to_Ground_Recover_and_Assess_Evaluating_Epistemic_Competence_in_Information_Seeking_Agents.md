@@ -66,8 +66,6 @@ claims:
 
 **方法谱系与知识库定位**：SeekBench在评测粒度上区别于仅关注最终答案的传统QA评测，在证据利用率上引入了证据状态的条件化评估，在可扩展性上以LLM-as-Judge替代纯人工评判。其评测对象涵盖基座模型（**Qwen-2.5-7B-Instruct**，Qwen et al., 2024）、少样本提示策略（Few-shot、CoT、ReAct）以及RL训练的搜索智能体（**SEARCH-R1**，Jin et al., 2025；**RESEARCH**，Chen et al., 2025；**ASEARCHER**，Gao et al., 2025；**DEEPRESEARCHER**，Zheng et al., 2025），为信息寻求型智能体的认知能力提供了系统性的诊断工具。
 
-
-
 ### 信息寻求型LLM智能体的崛起与评测盲区
 
 大型语言模型（LLM）驱动的搜索智能体正被广泛部署于开放域问答、事实核查和深度研究等场景。这些智能体通过多轮“搜索-推理”循环与外部环境交互：每一轮先进行内部推理（$r_t$），再发起搜索查询（$s_t$），获取证据（$e_t$），最终给出答案（$a_T$）。当前主流的评测范式——无论是**Qwen-2.5-7B-Instruct**基座模型、**SEARCH-R1**（Jin et al., 2025）、**RESEARCH**（Chen et al., 2025）、**ASEARCHER**（Gao et al., 2025）还是**DEEPRESEARCHER**（Zheng et al., 2025）等RL训练变体——几乎无一例外地仅以最终答案的正确性作为评判标准（如Exact Match、F1）。
@@ -97,8 +95,6 @@ claims:
 针对上述缺口，本文提出**SeekBench**——首个面向LLM搜索智能体的过程级认知能力评测框架。其核心思路是：**将评测维度从单一的最终答案指标扩展为过程级的认知能力指标**，通过系统标注智能体的多轮搜索-推理轨迹，并定义证据状态（Evidence State），对扎根性、恢复性和校准性三个核心认知能力进行可操作的量化。
 
 这一转变使得评测不仅能回答“智能体答对了吗”，更能回答“智能体是如何答对的”——其推理是否扎根于证据、能否从信息困境中恢复、是否在恰当的时机做出回答决策。通过揭示这些过程级的认知薄弱环节，SeekBench为智能体的诊断与改进提供了传统答案指标无法提供的细粒度信号。
-
-
 
 ## 核心方法与创新机理
 
@@ -131,8 +127,6 @@ SeekBench 最反直觉的发现是：**RL 训练虽然显著降低了过度自�
 ### 4. 认知能力的模块化复用：智能体合成揭示互补潜力
 
 SeekBench 进一步探索了认知能力是否可跨智能体模块化复用——将一个智能体作为“证据搜集者”（Producer），另一个作为“答案合成者”（Synthesizer）。结果显示，**SEARCH-R1 作为合成器在利用其他智能体的证据时带来平均 +2.61 F1 的提升**（Table 7），这表明其信息综合能力强且回答保守，能够有效利用他人搜集的证据。这一发现指向一个开放方向：模块化智能体架构（分别负责证据搜集、推理综合与决策）可能弥补单一智能体的认知短板，同时缓解扎根推理与答案校准之间的逆向关系。
-
-
 
 ![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_r0L9GwlnzP/figures/002_Table_1.jpg]]
 *Table 1: Epistemic competencies and associated metrics. Each competency is quantified by a specific metric calculated from annotated features within the agent’s trace (shown in the rightmost column), enabling systematic evaluation of reasoning quality, recovery behavior, and evidence-aligned decision-making*
@@ -180,8 +174,6 @@ SeekBench 的评测流水线由五个核心模块串联而成：
 | 可扩展性 | 依赖专家人工评判 | LLM-as-Judge 自动化流水线，与人类高度一致 |
 
 Figure 2 展示了这一标注模式的整体结构：每条轨迹被分解为搜索步骤（检索信息）、推理步骤（处理证据并指导调查）和证据步骤（捕获检索信息的质量与清晰度），三者交织形成可被系统评测的认知过程全景。
-
-
 
 ### 3.1 标注模式构建与验证
 
@@ -261,16 +253,11 @@ $$\mathrm{CE}_i := \sum_{k=0}^{2}\mathbb{P}(E_{i,t}=k)\left|\mathbb{P}(\text{ans
 
 三者共同覆盖了信息寻求型智能体“搜集证据—基于证据推理—根据证据决策”的完整认知链条，使得过程级缺陷可被定位到具体环节。例如，Figure 3 揭示 Few-shot 提示在 RQI（0.27）上全面优于 RL 训练智能体，但 Table 3 显示 RL 训练将过度自信回答率从 63.1% 降至 35.3%，表明 RL 优化了决策校准却损害了推理扎根性——这一矛盾仅在三维指标同时观测时才可被发现。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：答案正确性 ≠ 认知能力
 
 SeekBench在7个问答基准上对8个智能体变体进行了大规模评测，共分析28,493条多轮搜索-推理轨迹。实验揭示了一个关键脱节：**高答案准确率并不等同于高认知能力**。如表5所示，经RL训练的ASEARCHER以39.77%的整体F1分数领先，但扎根推理质量（RQI）却仅为0.14，远低于Few-shot提示版本的0.27（图3左）。这一发现直接验证了本文的核心瓶颈——仅关注最终答案的评测体系会掩盖推理过程中的严重认知缺陷。
-
-![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_r0L9GwlnzP/figures/006_Figure_3.jpg]]
-*Figure 3: RQI Analysis Summary. Left: RQI by model level, showing the overall reasoning quality across different agent types. Right: RQI by reasoning type, revealing that models struggle most with plan formation and state assessment compared to information synthesis*
 
 ![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_r0L9GwlnzP/figures/021_Table_5.jpg]]
 *Table 5: Overall F1 performance across agent variants. Trained agents consistently outperform the base model, with ASearcher achieving the highest score*
@@ -288,9 +275,6 @@ SeekBench在7个问答基准上对8个智能体变体进行了大规模评测，
 
 证据恢复函数（ERF）曲线（图4左）显示，不同智能体从低质量证据中恢复的速度存在显著差异。Kaplan-Meier生存分析被用于处理变长轨迹的右删失数据，确保恢复概率估计的鲁棒性。
 
-![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_r0L9GwlnzP/figures/008_Figure_4.jpg]]
-*Figure 4: Recovery Analysis. Left: ERFs by model showing recovery from low to sufficient evidence (E=2) as turn t increases. Right: Recovery efficiency by action type. Steeper curves indicate faster escape from low evidence states. REFINE and FOLLOW-UP enable fastest recovery, while REPEAT shows minimal improvement*
-
 更具操作性价值的发现来自操作类型的恢复效率分析（图4右）：**REFINE（搜索优化）和FOLLOW-UP（追问）操作能最快使智能体摆脱低证据状态**，其ERF曲线斜率显著高于其他操作类型。相比之下，REPEAT（重复搜索）操作几乎不带来证据改善，表明盲目重复检索是低效的恢复策略。这一发现为智能体的搜索策略设计提供了明确指引：应优先采用查询细化和信息追踪，而非简单重复。
 
 ### 校准性：RL训练降低过度自信但仍有盲区
@@ -305,9 +289,6 @@ SeekBench在7个问答基准上对8个智能体变体进行了大规模评测，
 ### 智能体合成：过程能力的模块化复用
 
 表7的跨智能体合成实验验证了认知能力的模块化可复用性。实验将不同智能体分别作为证据搜集者（P）和答案合成器（S），测量合成器利用他人证据时的F1提升。核心发现：
-
-![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_r0L9GwlnzP/figures/029_Table_7.jpg]]
-*Table 7: Agent Synthesis Performance. Each cell shows F1 score improvement (∆F1) when using row agent (S) as synthesizer to generate answers based on evidence collected by column agent (P). Positive values indicate the synthesizer improved upon the original policy’s performance. Search-R1 demonstrates the highest overall improvement (+2.61 F1) across all evidence sources*
 
 - **SEARCH-R1作为合成器表现最优**，在所有证据源上平均带来+2.61 F1的提升，表明其信息综合能力强且回答保守，适合作为“决策层”。
 - 不同智能体展现出互补性：某些智能体擅长证据搜集（高恢复力），而另一些擅长基于证据进行推理综合（高扎根性）。
@@ -333,19 +314,6 @@ SeekBench在7个问答基准上对8个智能体变体进行了大规模评测，
 2. **计划与评估盲区**：所有智能体在形成搜索计划和评估当前证据状态时扎根性极低，表明元认知能力是当前LLM智能体的系统性短板。
 3. **伪校准**：RL训练虽降低了极端过度自信，但智能体仍未实现真正的证据条件化决策——过早回答行为在所有模型中普遍存在（图14）。
 4. **恢复策略低效**：智能体倾向于使用REPEAT等低效操作，而非REFINE和FOLLOW-UP等高效恢复策略，说明搜索行为的策略性不足。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_r0L9GwlnzP/figures/004_Table_2.jpg]]
-*Table 2: Examples of evidence states. E = C + Q , where C $\in \{$ 0 , 1 $\}$ indicates clarity and Q $\in \{$ 0 , 1 $\}$ indicates sufficiency
-
-![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_r0L9GwlnzP/figures/027_Table_6.jpg]]
-*Table 6: Calibration Error Breakdown by Agent Type. Trajectories categorized as: overconfident answering (answering before sufficient evidence), overcautious abstention (failing to answer despite strong evidence), and overall calibration error. Lower values indicate better calibration. ASearcher show the lowest calibration errors. Bold indicates best performance in each category*
-
-![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_r0L9GwlnzP/figures/030_Table_8.jpg]]
-*Table 8: Epistemic Metrics for ASearcher and WebSailor on GAIA (7B and 32B) and GPT-5-mini on GAIA with Web search tools. RQI (groundedness), ERF recovery rate by Turn 8, and CE (calibration error, lower is better)*
-
-
 
 ## 定位与知识库关联
 
@@ -397,8 +365,6 @@ SeekBench 的可扩展性依赖于 **LLM-as-Judge 自动化标注流水线**。�
 3. **认知维度的扩展：** 除扎根性、恢复性和校准性外，还有哪些认知维度（如信息源的权威性批判评估、不确定性表达的质量）可通过类似的过程级指标体系量化？
 
 4. **RL 训练机制的诊断：** 为什么 RL 训练会损害扎根推理质量？是奖励信号的稀疏性问题，还是探索-利用的权衡导致智能体学会了“捷径”？这需要进一步剖析 RL 训练的中间过程。
-
-
 
 ## 原文 PDF
 

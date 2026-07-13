@@ -51,15 +51,11 @@ SplineGS针对上述瓶颈提出了三个因果性改进：
 
 核心结论：SplineGS在NVIDIA数据集上新视角合成达到平均PSNR 27.21 dB、LPIPS 0.053，渲染速度400 FPS，显著优于所有对比方法（Table 1）。消融实验证实，MAS在运动建模上优于MLP、网格、多项式及贝塞尔曲线等替代方案（Table 3-a），MACP以更少控制点实现更高PSNR（Table 3-c），去除光度一致性损失则导致PSNR骤降至17.49（Table 3-b）。
 
-
-
 动态场景的新视角合成是计算机视觉与图形学的核心问题，其目标是从一组稀疏的二维观测中重建并渲染任意时刻、任意视角下的三维动态场景。近年来，以3D Gaussian Splatting（3DGS）为代表的显式辐射场表示凭借其高保真渲染与实时性能，迅速成为该领域的主流范式。然而，将3DGS从静态场景拓展至动态场景时，一个根本性瓶颈浮现：**如何精确、高效地建模每个3D高斯随时间的连续运动轨迹**。
 
 现有动态3DGS方法在运动建模上存在明显的机制性缺陷。一类方法采用MLP网络直接预测每一帧的变形场（如4DGS），虽具备一定的表达能力，但MLP推理延迟高，严重拖累渲染速度，且隐式建模缺乏对运动轨迹的结构化约束，容易产生时间不一致的伪影。另一类方法将运动轨迹建模为固定阶次的多项式（如STGS），或使用时空网格分解，这些参数化形式过于刚性，无法灵活适应场景中不同区域运动复杂度的巨大差异——例如，背景区域的静态高斯仅需常数表示，而快速运动的肢体则需要高阶曲线描述。此外，几乎所有现有方法都依赖COLMAP等外部SfM工具进行相机参数预处理。在真实单目视频中，COLMAP常因纹理稀疏、运动模糊或动态前景干扰而失效，导致整个重建流程崩溃。即便是少数COLMAP-free的动态NeRF方法（如RoDynRF），其渲染速度也远不能满足实时交互需求。
 
 上述缺口揭示了动态3DGS领域的一个核心因果杠杆：**运动表示的选择直接决定了重建质量、渲染效率与系统鲁棒性的三角平衡**。SplineGS正是围绕这一杠杆展开设计。其核心洞察是：三次Hermite样条作为一种经典的分段插值工具，能够以极少的控制点精确描述任意复杂度的连续轨迹，同时保持解析可微与计算轻量。通过将每个动态高斯的均值轨迹建模为可学习的样条函数，并引入自适应控制点剪枝机制（MACP）动态调节每条样条的复杂度，SplineGS从根本上解决了“统一参数化无法适配异质运动”的难题。在此基础上，联合优化相机参数的两阶段训练框架消除了对COLMAP的依赖，使系统在真实单目视频上具备端到端的鲁棒性。
-
-
 
 ## 核心方法与创新机理
 
@@ -102,8 +98,6 @@ $$E = \frac{1}{N_f} \sum_{t=0}^{N_f-1} \| \pi_{\hat{K}}(\hat{R}_t S(t, \mathbf{P
 
 SplineGS 的三个创新形成了完整的因果链：MAS 提供了灵活且高效的连续运动表示，MACP 使这一表示自适应地匹配局部运动复杂度，COLMAP-free 联合优化则将整个流程从预处理依赖中解放出来。三者协同使得 SplineGS 在 NVIDIA 数据集上以 27.21 dB PSNR 和 400 FPS 的渲染速度显著超越所有对比方法，同时无需任何外部相机标定。
 
-
-
 SplineGS 的整体架构围绕“无需 COLMAP 预处理的动态 3DGS 实时渲染”这一目标设计，核心思路是用**可学习的样条控制点**替代传统 MLP 或固定阶多项式来建模每个动态高斯的连续运动轨迹，并通过**两阶段联合优化**同时估计相机参数与高斯属性。
 
 ### 两阶段优化流程
@@ -129,8 +123,6 @@ SplineGS 采用**预热阶段（Warm-up Stage）**与**主训练阶段（Main Tr
    采用与原始 3DGS 一致的可微分光栅化管线，对静态和动态高斯分别处理：动态高斯的均值由 MAS 根据时间 $t$ 插值得到，随后通过 $\alpha$ 混合（Eq. 2）合成像素颜色 $\mathbf{C}$ 和运动掩码 $\hat{M}_t$（Eq. 17）。运动掩码用于分离动态/静态区域，指导掩码损失 $\mathcal{L}_{\mathrm{M}}$（Eq. 16）的优化。
 
 整个框架的输入为单目视频帧序列，输出为新时空视角的渲染图像，无需任何外部相机标定预处理。
-
-
 
 SplineGS 将动态场景建模分解为三个紧密耦合的核心模块：运动自适应样条（MAS）描述高斯均值轨迹、自适应控制点剪枝（MACP）平衡表达力与效率、以及无 COLMAP 的相机参数联合优化。以下逐一推导其数学形式与变量含义。
 
@@ -192,8 +184,6 @@ $$\mathcal{L}_{\mathrm{total}}^{\mathrm{main}} = \lambda_{\mathrm{rgb}} \mathcal
 
 其中 $\mathcal{L}_{\mathrm{rgb}}$ 为 L1 与 SSIM 的组合，$\mathcal{L}_{\mathrm{d}}$ 为深度损失，$\mathcal{L}_{\mathrm{M}}$ 为动态/静态分离的 Dice 掩码损失，$\mathcal{L}_{\mathrm{pc}}$ 和 $\mathcal{L}_{\mathrm{gc}}$ 分别为光度和几何一致性损失，$\mathcal{L}_{\mathrm{d-pc}}$ 为深度一致性损失。各损失项的协同作用通过消融实验得到充分验证（Table 3-(b)）。
 
-
-
 ## 实验与关键发现
 
 ### 主要结果：NVIDIA 数据集新视角合成
@@ -210,7 +200,6 @@ Table 1 还揭示了 COLMAP-free 与 COLMAP-based 方法之间的性能格局：
 
 Table 3 系统性地消融了 SplineGS 的三个核心设计：运动表示、损失函数和控制点剪枝。
 
-
 ![[assets/figures/papers/paper_list_l10_SplineGS_Robust_Motion_Adaptive_Spline_for_Real_Time_Dynamic_3D_Gaussian/figures/010_Table_3.jpg]]
 *Table 3: Ablation studies. We ablate our framework and report the average results on the NVIDIA dataset with the same setting as Novel View Synthesis experiment in Sec. 5.1*
 
@@ -224,14 +213,9 @@ Table 3 系统性地消融了 SplineGS 的三个核心设计：运动表示、�
 
 Figure 8 的热力图和直方图展示了 MACP 对不同运动复杂度的自适应行为。在运动简单的区域（如静态背景），动态高斯的控制点数被剪枝至接近最小值；在运动复杂的区域（如快速移动的肢体），保留了更多控制点。这种运动自适应的控制点分配机制是 SplineGS 在保持高渲染质量的同时控制计算开销的关键。
 
-
-![[assets/figures/papers/paper_list_l10_SplineGS_Robust_Motion_Adaptive_Spline_for_Real_Time_Dynamic_3D_Gaussian/figures/011_Figure_8.jpg]]
-*Figure 8: Analysis of MACP’s Efficacy. (a) $N _ { c }$ Heatmaps as the averaged $N _ { c }$ values of dynamic 3D Gaussians and their corresponding rendered frames $\hat { I } _ { t }$ for ‘Balloon2’ and ‘Skating’ scenes. (b) Histograms of the number of control points ( $N _ { c }$ ) in percentages (%) of dynamic 3D Gaussians in two scenes*
-
 ### 运动跟踪可视化
 
 Figure 6 通过 2D 像素轨迹可视化了动态高斯的运动建模能力。与 STGS 和 4DGS 相比，SplineGS 的 MAS 能够更准确地跟踪像素级运动轨迹，这归因于样条表示的连续性和控制点初始化的物理合理性。
-
 
 ![[assets/figures/papers/paper_list_l10_SplineGS_Robust_Motion_Adaptive_Spline_for_Real_Time_Dynamic_3D_Gaussian/figures/008_Figure_6.jpg]]
 *Figure 6: Visual comparisons for motion tracking. We visualize 2D pixel tracks to analyze motions of dynamic 3D Gaussians*
@@ -244,16 +228,8 @@ Table 4 比较了各方法的内存占用。SplineGS 在保持较少高斯总数
 
 当输入单目视频帧存在运动模糊时，SplineGS 无法有效重建清晰的新视角图像（Figure 12）。根本原因在于当前框架未集成去模糊模块，模型会过拟合到模糊的训练帧，导致渲染结果中出现伪影。这一问题在快速运动场景的真实视频中尤为突出，需要将去模糊方法直接整合到联合优化流程中才能解决。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l10_SplineGS_Robust_Motion_Adaptive_Spline_for_Real_Time_Dynamic_3D_Gaussian/figures/001_Figure.jpg]]
 *Figure: horsejump-low, t=20 (Ours) (a) Visual comparison for novel view synthesis on the DAVIS dataset (b) Performance gain on the NVIDIA dataset*
-
-![[assets/figures/papers/paper_list_l10_SplineGS_Robust_Motion_Adaptive_Spline_for_Real_Time_Dynamic_3D_Gaussian/figures/014_Figure_11.jpg]]
-*Figure 11: Visual results of novel view synthesis at a specific time using the same STGS [21] models after optimization with (a) their original time-varying opacity and (b) timeindependent spatial opacity, respectively. Please note that we use their original time-varying opacity during training*
-
-![[assets/figures/papers/paper_list_l10_SplineGS_Robust_Motion_Adaptive_Spline_for_Real_Time_Dynamic_3D_Gaussian/figures/022_Figure.jpg]]
-*Figure: D3DGS [49] RoDynRF [27] STGS [21] SplineGS (Ours) DynNeRF[11]*
 
 ![[assets/figures/papers/paper_list_l10_SplineGS_Robust_Motion_Adaptive_Spline_for_Real_Time_Dynamic_3D_Gaussian/figures/004_Figure_3.jpg]]
 *Figure 3: Visual comparisons for novel view synthesis on the NVIDIA dataset*
@@ -263,18 +239,6 @@ Table 4 比较了各方法的内存占用。SplineGS 在保持较少高斯总数
 
 ![[assets/figures/papers/paper_list_l10_SplineGS_Robust_Motion_Adaptive_Spline_for_Real_Time_Dynamic_3D_Gaussian/figures/017_Figure_13.jpg]]
 *Figure 13: Visual comparisons for novel view synthesis on the Jumping scene from the NVIDIA dataset*
-
-![[assets/figures/papers/paper_list_l10_SplineGS_Robust_Motion_Adaptive_Spline_for_Real_Time_Dynamic_3D_Gaussian/figures/018_Figure_14.jpg]]
-*Figure 14: Visual comparisons for novel view synthesis on the Playground scene from the NVIDIA dataset*
-
-![[assets/figures/papers/paper_list_l10_SplineGS_Robust_Motion_Adaptive_Spline_for_Real_Time_Dynamic_3D_Gaussian/figures/019_Figure_15.jpg]]
-*Figure 15: Visual comparisons for novel view synthesis on the Truck scene from the NVIDIA dataset*
-
-![[assets/figures/papers/paper_list_l10_SplineGS_Robust_Motion_Adaptive_Spline_for_Real_Time_Dynamic_3D_Gaussian/figures/020_Figure_16.jpg]]
-*Figure 16: Visual comparisons for novel view and time synthesis on the Balloon2 scene from the NVIDIA dataset*
-
-
-
 
 ## 定位与知识库关联
 
@@ -305,8 +269,6 @@ SplineGS处于动态3D高斯泼溅（3DGS）方法谱系中，其核心目标是
 3. **动态场景分解的鲁棒性。** 当前方法依赖运动掩码（通过Dice loss监督）分离静态和动态高斯。在动态纹理丰富或静态区域存在光照变化的场景中，掩码预测的准确性可能下降，影响整体重建质量。如何在没有精确运动掩码标注的情况下实现更鲁棒的动静态分解仍需探索。
 
 4. **相机轨迹先验的引入。** 当前相机参数估计完全从数据驱动，预热阶段仅使用光度与几何一致性。在极端运动或纯旋转场景中，引入惯性测量单元（IMU）等传感器先验或学习型单目深度估计的强约束，可能进一步提升相机估计的稳定性和重建精度。
-
-
 
 ## 原文 PDF
 

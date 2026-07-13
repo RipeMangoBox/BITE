@@ -52,8 +52,6 @@ claims:
 
 在方法谱系上，DistillNeRF定位为可泛化前馈NeRF，与逐场景优化的EmerNeRF形成“教师-学生”关系，同时显著超越同为可泛化方法的SelfOcc和UniPAD。其关键创新在于将知识蒸馏从传统的模型压缩范式，拓展为连接离线优化质量与实时推理效率的桥梁，为自动驾驶场景的3D表征学习提供了新的技术路径。
 
-
-
 ### 自动驾驶场景下的3D感知困境
 
 自动驾驶系统需要从有限的2D传感器观测中理解复杂的3D环境。与传统的物体级3D重建不同——后者通常采用“向内”的多视角设置，即大量相机环绕目标物体进行密集拍摄——自动驾驶场景面临截然不同的挑战（Figure 5）。车载相机呈“向外”的稀疏布局，相邻相机之间的重叠区域极为有限，导致基于多视图几何的深度推断面临严重的模糊性。同时，场景中的物体分布在从近处到远方的广阔范围内，像素占用极不均匀：近处物体占据大量像素但只需粗略深度即可定位，而远处物体仅占极少像素却需要精确的深度估计才能正确重建。
@@ -75,8 +73,6 @@ claims:
 这引出了一个自然的动机：能否将离线NeRF的强大重建能力“迁移”到可泛化前馈模型中？具体而言，离线NeRF在逐场景优化后能生成稠密的深度图和高质量的虚拟视角渲染，这些信息恰好可以作为额外的几何监督信号，弥补稀疏视角下的深度模糊。同时，2D视觉基础模型（如CLIP、DINOv2）已在海量数据上学习了丰富的语义特征，若能将其蒸馏到3D场景表示中，则有望赋予模型超越纯几何重建的语义理解能力。
 
 DistillNeRF正是沿着这一思路，通过知识蒸馏将离线NeRF的几何精确性与基础模型的语义丰富性统一注入到可泛化前馈模型中，使模型能够在单帧稀疏多视角输入下实时预测高质量的3D神经场景表示，同时实现渲染、深度估计、零样本语义占用预测和开放词汇查询。
-
-
 
 ## 核心方法与创新机理
 
@@ -118,8 +114,6 @@ Baseline 方法通常采用密集固定分辨率体素（如 UniPAD、SelfOcc �
 
 上述四个 changed slots 形成了一条清晰的因果链：**两阶段深度预测**提供更准确的 2D→3D 提升 → **稀疏层次体素**高效表示大规模场景 → **参数化坐标变换**处理无界范围 → **多源蒸馏**注入离线 NeRF 的精确几何和基础模型的语义先验。这些创新共同使 DistillNeRF 在 RGB 重建上达到与逐场景优化的 EmerNeRF 相当的水平（PSNR 30.11 vs 30.88，SSIM 0.917 vs 0.879），并远超可泛化 SOTA（SelfOcc PSNR 20.67，UniPAD 19.44），同时支持零样本语义占用预测和开放词汇查询等 emergent capability。
 
-
-
 DistillNeRF 是一个面向室外自动驾驶场景的可泛化前馈模型，其核心设计目标是从**单时间步的多视角相机图像**出发，在不进行任何测试时逐场景优化的情况下，实时预测高质量的 3D 场景表示。该框架由三个紧密耦合的模块构成：单视图两阶段 LSS 编码器、多视图融合与稀疏层次化体素构建、以及可微体积渲染，整体架构如 Figure 2 所示。
 
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2406_12095/figures/002_Figure_2.jpg]]
@@ -140,8 +134,6 @@ $$L = \underbrace{L_{rgb} + L_{depth} + L_{density}}_{\text{rendering}} + \under
 其中 $L_{rgb}$ 结合 L2 损失与 LPIPS 感知损失（Appendix Eq 6），$L_{depth}$ 为归一化 L1 和 MSE 深度损失（Appendix Eq 7），$L_{density}$ 为密度熵损失以鼓励清晰表面。蒸馏部分 $L_{NeRF}$ 利用离线逐场景优化的 EmerNeRF 教师模型生成的稠密深度图和虚拟相机视图作为额外几何监督，$L_{found}$ 则从 CLIP 和 DINOv2 等 2D 视觉基础模型蒸馏语义特征。消融实验显示，增加深度蒸馏将 PSNR 从 28.01 提升至 30.11（Table 5），是解决稀疏视角下深度模糊的决定性因素。
 
 **推理流程**：给定单帧多视角图像，模型经单视图编码→多视图融合→体积渲染的端到端前向传播，即可同时输出 RGB 重建、深度估计和基础模型特征渲染，无需任何测试时优化。在 RTX 4090 上以 228×128 分辨率推理，整体速度显著优于逐场景优化的 EmerNeRF（Table 7）。
-
-
 
 DistillNeRF 的核心设计围绕三个关键模块展开：单视图两阶段深度预测、稀疏层次化体素表示、以及多源蒸馏训练。以下逐一阐述其机制与关键公式。
 
@@ -195,8 +187,6 @@ $$L = \underbrace{L_{rgb} + L_{depth} + L_{density}}_{\text{rendering}} + \under
 
 这种多源蒸馏策略的核心洞察在于：将离线 NeRF 的强大几何重建能力与 2D 基础模型的语义潜力，通过知识蒸馏统一迁移到可泛化前馈模型中，使其在单帧稀疏多视角输入下即可实时预测高质量的 3D 神经场景表示。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -248,24 +238,8 @@ Table 7 报告了推理时间分解。DistillNeRF 在 RTX 4090 上的总推理�
 3. **语义利用深度有限**：蒸馏得到的基础模型特征目前仅用于简单的开放词汇查询（Figure 3），其在 3D 多模态对齐、闭环规划等下游任务中的潜力尚未系统验证。
 4. **训练开销**：完整训练在 8 张 A100 GPU 上约需 4 天，主要瓶颈在于离线 NeRF 的预计算和多源蒸馏损失的联合优化。
 
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2406_12095/figures/003_Figure_3.jpg]]
-*Figure 3: DistillNeRF Capabilities - Given single-frame multi-view cameras as input and without test-time per-scene optimization, DistillNeRF can reconstruct RGB images (row 2), estimate depth (row 3), render foundation model features (rows 4, 5) which enables open-vocabulary text queries (rows 6, 7, 8), and predict binary and semantic occupancy in zero shot (rows 9, 10)*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2406_12095/figures/006_Table_2.jpg]]
-*Table 2: Depth estimation results on the nuScenes validation set. Depth targets are defined by (a) sparse LiDAR scans or (b) dense depth images rendered from EmerNerf. We use highlighting across comparable methods with rendering support and no test-time optimization. DistillNeRF outperforms comparable generalizable NeRF methods, especially on dense depth targets*
-
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2406_12095/figures/007_Table_3.jpg]]
-*Table 3: Trained on the nuScenes dataset, Distill-NeRF shows strong generalizability to the unseen Waymo NOTR dataset*
-
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2406_12095/figures/008_Table_4.jpg]]
-*Table 4: Unsupervised 3D occupancy prediction on the Occ3D-nuScenes [5] dataset. Our method learns meaningful geometry and reasonable semantics compared to alternative unsupervised methods. F-mIoU, mIoU and G-IoU denote the IoU for foreground-object classes, IoU for all classes, and geometric IoU ignoring the classes*
-
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2406_12095/figures/004_Figure_4.jpg]]
 *Figure 4: DistillNeRF Generalizability - Trained on the nuScenes dataset, our model demonstrates strong zero-shot transfer performance on the unseen Waymo NOTR dataset, achieving decent reconstruction quality (row 2). This quality can be further enhanced by applying simple color alterations to account for camera-specific coloring discrepancies (row 3). After fine-tuning (row 4), our model surpasses the offline per-scene optimized EmerNeRF, achieving higher PSNR (29.84 vs. 28.87) and SSIM (0.911 vs. 0.814). See Tab 3 for quantitative results*
-
-
 
 ## 定位与知识库关联
 
@@ -338,8 +312,6 @@ DistillNeRF 处于以下研究脉络的交汇点：
 - **知识蒸馏** 脉络：将逐场景优化 NeRF 作为教师，通过稠密深度和虚拟视图将几何知识迁移到前馈模型，这与 MonoDepth 系列中利用 SfM 或 LiDAR 作为监督有相似动机，但蒸馏源更丰富（包含 RGB、深度、密度熵）。
 - **2D 基础模型→3D 迁移** 脉络：将 CLIP、DINOv2 的特征通过体积渲染蒸馏到 3D 表示中，与 LERF、3D-OVS 等工作的目标一致，但 DistillNeRF 是在前馈可泛化框架中实现，而非逐场景优化。
 - **自监督 3D 场景理解** 脉络：无需 3D 标注即可生成语义占用预测（Table 4），与 SelfOcc、OccNeRF 等方法同属自监督占用预测方向，但通过基础模型蒸馏获得了更强的语义能力（有蒸馏 mIoU 8.93 vs 无蒸馏 4.63）。
-
-
 
 ## 原文 PDF
 

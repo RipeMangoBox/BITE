@@ -51,8 +51,6 @@ claims:
 
 在 PKU-SafeRLHF-30K 基准上，SafeDPO 将无害率从 DPO-HELPFUL 的 38.6% 提升至约 97%（模型评测）和 100%（GPT-4 评测），同时保持有竞争力的有用性。方法在不同模型规模（1.5B–13B）和随机种子上表现稳健，训练效率约为 SafeRLHF 的 24 倍，且所需网络组件和标注信号大幅减少。主要局限在于：仅在一个安全对齐数据集上验证，模型规模限于 13B，高安全边际下有用性可能受损，GPT-4 自动评估存在安全性与有用性评分耦合问题，且在 XSTest 上展现出 12.4% 的过度拒绝率。
 
-
-
 大型语言模型（LLM）的安全对齐是确保其在真实部署中不产生有害输出的核心挑战。当前主流的安全对齐范式，如基于人类反馈的强化学习（RLHF），通常依赖辅助奖励模型和成本模型，并通过多阶段在线策略优化（如PPO-λ）来平衡有用性与无害性。然而，这类方法存在两个根本性瓶颈：
 
 **计算与概念复杂性**：以SafeRLHF（Dai et al., 2023）为代表的安全对齐方法需要额外训练奖励模型、成本模型及其价值函数，并在训练过程中执行昂贵的在线采样与策略评估。这种多阶段、多组件的训练流程显著增加了内存开销和计算时间——SafeRLHF的训练时间约为SafeDPO的24倍（Table 15），且需要更多类型的标注信号（Table 16）。
@@ -60,8 +58,6 @@ claims:
 **松弛约束的局限性**：现有方法通常将安全对齐建模为带松弛期望约束的优化问题，而非严格硬约束。这意味着在最优策略下，不安全响应仍可能以非零概率出现，无法从根本上杜绝有害输出。这种“惩罚但不禁止”的策略在安全攸关场景中留下了系统性风险。
 
 针对上述缺口，本文的核心动机在于探索一条更简洁、更彻底的路径：**能否在直接偏好优化（DPO）框架内，以硬约束的形式实现安全对齐，同时避免引入辅助模型和在线采样？** 这一问题的关键在于，标准DPO仅优化有用性偏好，缺乏对安全性的显式建模；而简单地将安全偏好与有用性偏好混合训练（如DPO-HARMLESS）或过滤不安全样本（如DPO-SAFEBETTER）均无法达到令人满意的安全水平。因此，需要一种理论上严谨、实践中轻量的方法，将硬约束安全对齐目标转化为可直接优化的DPO风格损失函数。
-
-
 
 ## 核心方法与创新机理
 
@@ -100,8 +96,6 @@ SafeDPO 相对于各基线的 changed slots 可归纳为：
 
 值得注意的是，向其他 DPO 变体（DPO-HELPFUL、DPO-HARMLESS、DPO-SAFEBETTER）简单添加边际 Δ 仅产生有限的安全改进，无法达到 SafeDPO 的安全水平（Appendix C.1, Tables 5-7），进一步验证了安全感知变换是不可或缺的创新组件。
 
-
-
 ![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_PJdw4VBsXD/figures/003_Figure_3.jpg]]
 *Figure 3: Harmlessness and Helpfulness Variations with Changing ∆. The dashed horizontal line indicates the harmless ratio and helpfulness of each baseline method*
 
@@ -131,8 +125,6 @@ SafeDPO 的核心理论贡献在于证明了硬约束安全对齐目标（Equati
 ### 关键设计选择
 
 消融实验表明，安全感知转换 T 是 SafeDPO 安全性能的关键驱动因素。仅靠数据集过滤（如 DPO-SAFEBETTER，仅移除首选响应不安全的样本）无法达到同等的无害率水平。安全边际 Δ 则在此基础上进一步增强安全性，但 Δ 过大（如 50）会损害有用性（Figure 3）。向其他 DPO 变体（如 DPO-HELPFUL、DPO-HARMLESS）添加边际仅产生有限改进，无法达到 SafeDPO 的安全水平，进一步验证了安全感知转换的核心作用。
-
-
 
 ### 3.1 硬约束安全对齐的闭式解
 
@@ -210,8 +202,6 @@ SafeDPO 的训练流水线由三个模块串联构成：
 | $\beta$ | KL 惩罚系数，控制策略偏离参考策略的程度 |
 | $\tilde{h}_w, \tilde{h}_l$ | 变换后的安全标签（0=安全，1=不安全） |
 
-
-
 ## 实验与关键发现
 
 ### 安全性与有用性的核心权衡
@@ -267,29 +257,8 @@ SafeDPO 在不同模型规模上表现出一致的有效性（Table 1 / Table 9�
 3. **高安全边际下的有用性退化**：Δ=50 时性能显著下降，实际部署需谨慎调节。
 4. **GPT-4 评估耦合问题**：自动评估器可能将安全性混入有用性评分，高估安全对齐方法的有用性表现。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_PJdw4VBsXD/figures/025_Figure.jpg]]
-*Figure: (a) GPT-4 evaluation results against SFT using Template T1. (b) GPT-4 evaluation results against SFT using Template T2. (c) GPT-4 evaluation results against SFT using Template T3*
-
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_PJdw4VBsXD/figures/007_Table_4.jpg]]
-*Table 4: Training hyperparameter configuration shared by DPO and its variants*
-
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_PJdw4VBsXD/figures/008_Table_5.jpg]]
-*Table 5: DPO-HELPFUL performance across various $\Delta$ values on Helpfulness, Harmlessness, and Harmless Ratio*
-
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_PJdw4VBsXD/figures/009_Table_6.jpg]]
-*Table 6: DPO-HARMLESS performance across various $\Delta$ values on Helpfulness, Harmlessness, and Harmless Ratio*
-
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_PJdw4VBsXD/figures/010_Table_7.jpg]]
-*Table 7: DPO-SAFEBETTER performance across various $\Delta$ values on Helpfulness, Harmlessness, and Harmless Ratio*
-
 ![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_PJdw4VBsXD/figures/011_Table_8.jpg]]
 *Table 8: Alpaca-7b model using the PKU-SafeRLHF-30K dataset, consistent with the original implementation, and no additional modifications are introduced. Table 8: Comparison of PeCAN (P) and MoCAN (M) models across varying λ values on helpfulness, harmlessness, and harmless ratio*
-
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_PJdw4VBsXD/figures/013_Table.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -336,8 +305,6 @@ SafeDPO的核心贡献在于将安全对齐从多阶段、多模型的复杂流�
 3. **评估框架改进**：如何构建更公正的自动评估框架以解耦安全性与有用性，避免GPT-4评估中的耦合偏差？
 4. **推理时集成**：SafeDPO与推理时安全干预（如System Prompt、安全分类器）的集成效果如何？能否形成训练-推理协同的安全保障体系？
 5. **跨域泛化**：在PKU-SafeRLHF之外的安全领域（如生物安全、网络安全）上，安全感知变换的泛化能力如何？
-
-
 
 ## 原文 PDF
 

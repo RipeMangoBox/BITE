@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2025
 pdf_ref: paperPDFs/ICLR_2025/MotionCritic_Aligning_Human_Motion_Generation_with_Human_Perceptions.pdf
+project_link: https://motioncritic.github.io/
+code_link: null
 aliases:
 - MotionCritic
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | MotionCritic: 将人体运动生成与人类感知对齐 |
 | 英文题名 | MotionCritic: Aligning Human Motion Generation with Human Perceptions |
 | 会议/期刊 | ICLR 2025 |
-| Links | [paper](https://arxiv.org/pdf/2407.02272); [Project](https://motioncritic.github.io/) |
+| Links | [paper](https://arxiv.org/abs/2407.02272); [Project](https://motioncritic.github.io/) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | MotionCritic |
 | Dataset | MotionPercept (MDM 子集), MotionPercept (FLAME 子集, 跨域), HumanAct12 GT test set (主观一致性) |
@@ -40,7 +42,7 @@ claims:
 > - MotionPercept (FLAME 子集, 跨域) 上，Accuracy (%) 为 81.43，对比 69.82 (Person-Ground Contact)，变化 +11.61。
 > - HumanAct12 GT test set (主观一致性) 上，Elo 评分与分数的单调性 为 与人类 Elo 评分高度正相关，对比 FID 指标与人类评分几乎无关，变化 显著提升。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -67,8 +69,6 @@ MotionCritic 的核心洞察是：利用大规模人类偏好比较数据训练�
 ### 局限与开放问题
 
 当前方法存在若干局限：评价器仅支持固定 60 帧运动输入，对不同序列长度需插值或截断，鲁棒性有待提升；学习到的评价函数表现出非光滑的能量景观，给基于梯度的优化带来挑战；评价器只能给出全局质量分数，缺乏关节级、时间级的细粒度反馈。开放问题包括：如何设计更细粒度的感知评价方法以获得更丰富的训练信号，如何将生物力学约束显式融入评价模型，以及如何借鉴强化学习的优化策略来应对非平滑评价器景观下的生成优化。
-
-## 背景与动机
 
 ### 问题背景
 
@@ -103,7 +103,7 @@ MotionCritic 的核心洞察是：利用大规模人类偏好比较数据训练�
 2.  **MotionCritic 评价器**：以 DSTformer 为骨干网络，将 SMPL 运动序列映射为标量质量分数，通过 Bradley-Terry 模型的成对对数损失学习人类偏好。
 3.  **评价器监督的生成微调**：在 MDM 扩散模型的去噪过程中，引入评价器对预测运动的打分作为监督信号，结合 KL 散度正则项，以极低的计算开销提升生成运动的主观质量。
 
-## 核心创新
+## 核心方法与创新机理
 
 MotionCritic 的核心创新在于**将人体运动质量的评估从“规则定义”范式切换为“数据驱动的感知对齐”范式**，并进一步将这种对齐后的评价能力转化为生成模型的直接监督信号。具体体现在以下三个关键维度的改变：
 
@@ -137,8 +137,6 @@ $$\mathcal{L}_{\mathrm{FT}} = \mathcal{L}_{\mathrm{MDM}} + \lambda \mathcal{L}_{
 
 这些证据共同表明：MotionCritic 不仅是一个更准确的评价指标，更是一个**可迁移的感知质量模型**，其学到的隐式标准超越了任何单一启发式规则的表达能力。
 
-## 整体框架
-
 MotionCritic 的整体框架围绕一个核心发现展开：现有运动生成评估指标与人类感知之间存在系统性的脱节。无论是基于真值配对的距离误差（如 Root AE、Joint AVE）、运动平滑性启发式规则（Jerk、Acceleration），还是分布距离（FID），都无法在实例级别可靠地反映生成运动的主观质量。MotionCritic 通过三个紧密耦合的模块来解决这一问题。
 
 **模块一：MotionPercept 数据集构建。** 框架的第一步是获取大规模的人类感知偏好数据。研究者利用预训练的运动生成模型（MDM 和 FLAME）产生多样化的运动候选，通过多项选择题的方式收集人工标注——受试者从 6 个生成运动选项中选出质量最佳的一个。最终构建的 MotionPercept 数据集包含 52,563 对偏好标注，规模是此前类似工作 MoBERT（Voas et al., 2023，约 1.4K 标注）的数十倍。感知一致性实验表明，82.37% 的问题中 10 名受试者达成完全一致，所有受试者之间的成对一致性高达 90%，这为后续训练提供了可靠的监督信号。
@@ -160,8 +158,6 @@ $$\mathcal{L}_{\mathrm{FT}} = \mathcal{L}_{\mathrm{MDM}} + \lambda \mathcal{L}_{
 这一微调方案的计算开销极低，仅需数百步即可显著提升生成运动的主观质量。
 
 三个模块之间的因果链路清晰：MotionPercept 提供人类感知的“金标准”训练数据，MotionCritic 将这种感知知识压缩为可微分的标量评价函数，而微调模块则利用该函数的梯度信号直接优化生成器，使输出运动与人类偏好的对齐程度持续提升。
-
-## 核心模块与公式推导
 
 MotionCritic 的核心由两个关键模块构成：一个基于成对偏好学习的运动评价器，以及一个将评价器作为监督信号的生成器微调框架。以下分别阐述其设计逻辑与数学形式。
 
@@ -219,7 +215,7 @@ $$
 
 该微调框架的计算开销极低——仅需在随机采样的去噪时间步插入一次评价器前向传播，即可在数百步内显著提升生成运动的主观质量。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验：感知评价准确率
 
@@ -286,30 +282,10 @@ $$\mathcal{L}_{\mathrm{FT}} = \mathcal{L}_{\mathrm{MDM}} + \lambda \mathcal{L}_{
 
 4. **物理合理性未显式建模**：评价器通过人类偏好数据隐式学习质量标准，但未显式融入生物力学约束（如关节角度限制、力矩平衡）。在某些情况下，高评价器分数的运动仍可能违反物理规律。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l42_https_arxiv_org_pdf_2407_02272/figures/002_Figure_2.jpg]]
-*Figure 2: We conduct a perceptual consensus experiment with 10 subjects on 312 multiple-choice questions, each with 6 options. (A): The distribution of the number of supporters for the most chosen option in each question. (B): Distribution of the number of options chosen by all subjects for each question. (C): Pairwise agreement ratio of all subjects*
-
-![[assets/figures/papers/paper_list_l42_https_arxiv_org_pdf_2407_02272/figures/032_Figure_14.jpg]]
-*Figure 14: Metrics’ venn fiagram and SHAP values*
-
-![[assets/figures/papers/paper_list_l42_https_arxiv_org_pdf_2407_02272/figures/033_Figure_15.jpg]]
-*Figure 15: Fine-tuning process. (A): Critic score in 1000-step denoising process. (B): Critic output in 800-step fine-tuning process. (C): Full finetuning process of our strategy based on ReFL (Xu et al., 2024) and 1-step back-propagation based on DRaFT-LV (Clark et al., 2024)*
-
 ![[assets/figures/papers/paper_list_l42_https_arxiv_org_pdf_2407_02272/figures/034_Figure_16.jpg]]
 *Figure 16: Visualization of critic scores on fine-tuning experiments. (A): Fine-tuning 400 steps with and without MotionCritic supervision compared. (B): Fine-tuning with 400 and 800 steps compared*
 
-![[assets/figures/papers/paper_list_l42_https_arxiv_org_pdf_2407_02272/figures/035_Figure_17.jpg]]
-*Figure 17: Results from fine-tuning process. (A): Elo ratings and Critic scores. (B): FID, PFC(Tseng et al., 2023), Multimodality and Critic scores*
-
-![[assets/figures/papers/paper_list_l42_https_arxiv_org_pdf_2407_02272/figures/010_Table_3.jpg]]
-*Table 3: 12 action labels from HumanAct12 (Guo et al., 2020)*
-
-![[assets/figures/papers/paper_list_l42_https_arxiv_org_pdf_2407_02272/figures/011_Table_4.jpg]]
-*Table 4: 40 action labels from UESTC (Ji et al., 2018)*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 核心瓶颈与因果机制
 

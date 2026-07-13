@@ -248,8 +248,6 @@ Table 1同时对比了多种后处理水印方法和生成时水印方法：
 - 前缀调优的具体搜索范围和最优κ选择策略在片段中未详细展开，需参考原文Section 3.4确认细节。
 - 聚类分类器微调的训练数据量和扰动增强配置在片段中未明确说明，建议核验Section 3.3及附录。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l846_https_openaccess_thecvf_com_content_CVPR2026_html_Lukovnikov_ClusterMark/figures/002_Table_1.jpg]]
 *Table 1: Main results on a set of challenging perturbations. Detailed perturbation configurations are provided in Appendix A of the Supplementary Material. We report AUC and TPR@FPR=1% across various perturbation and regeneration attacks. For Ours (No Clustering) we set the penalty δ = 5 and the green-token fraction γ = 0.25. For Ours (Clustering) and for our method using the token/cluster classifier we use k = 64 clusters and the same δ and γ. To improve readability, the best and second best entries in each column are highlighted*
 

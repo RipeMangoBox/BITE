@@ -87,8 +87,6 @@ claims:
 
 这些发现共同指向一个结论：**当前三维视觉方法缺乏对材料物理属性的感知能力**，需要将物理先验（如 BRDF 模型、折射定律）显式集成到学习框架中，才能突破挑战性材料上的重建瓶颈。
 
-
-
 三维重建是计算机视觉的基石问题，其核心目标是从二维观测中恢复场景或物体的三维几何与外观。传统方法——从运动恢复结构（Structure-from-Motion, SfM）与多视角立体视觉（Multi-View Stereo, MVS）——以及近年兴起的神经辐射场（NeRF）与三维高斯溅射（3D Gaussian Splatting, 3DGS）系列方法，已经在朗伯表面（Lambertian surfaces）和纹理丰富的场景上取得了令人瞩目的成果。然而，这些方法的底层运作依赖于两个关键假设：**光度一致性**（photometric consistency）与**纹理特征的跨视角可匹配性**。
 
 ### 挑战性材料的根本瓶颈
@@ -108,8 +106,6 @@ claims:
 ### 本文动机
 
 上述分析揭示了领域的一个核心缺口：**缺乏一个大规模、系统性地覆盖挑战性材质的三维重建基准**。为此，本文构建了3DReflecNet——一个包含超过12万个合成实例和超过1000个真实世界扫描的混合数据集，专门面向反射、透明和低纹理物体的三维重建。通过在该数据集上对五个基准任务（图像匹配、相机位姿估计、新视角合成、表面重建、反射去除）的现有先进方法进行系统评估，本文旨在：（1）量化揭示当前方法在挑战性材料上的普遍失效模式；（2）为社区提供一个标准化的诊断平台；（3）推动物理感知三维视觉模型的未来发展。
-
-
 
 ## 核心方法与创新机理
 
@@ -136,8 +132,6 @@ claims:
 | 镜面反射模拟 | 无专门模拟 | 通过相机-玻璃设置模拟视图相关的镜面反射 |
 
 这些 changed slots 直接回应了论文的核心洞察：现有方法建立在光度一致性和纹理特征对应的假设上，而这些假设在挑战性材质上不成立。3DReflecNet 通过系统性地打破这些假设，为物理感知的三维视觉模型提供了评估基准和训练数据。
-
-
 
 3DReflecNet 并非提出一种新的重建算法，而是构建了一个面向挑战性材质三维重建的大规模混合数据集与评估框架。其整体 pipeline 围绕三个核心目标展开：**大规模数据生成**、**多模态标注**和**系统性基准测试**，为物理感知的三维视觉模型提供训练与评估基础。
 
@@ -171,12 +165,8 @@ claims:
 
 该框架的瓶颈不在于数据规模，而在于合成渲染与真实传感器噪声之间的域差距，以及现有方法对光度一致性假设的根本性依赖——这两点构成了后续算法改进的关键突破口。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2047_https_arxiv_org_abs_2605_10204/figures/005_Figure_5.jpg]]
 *Figure 5: The Dataset Construction and Evaluation Pipeline*
-
-
 
 ### 数据集构建管线
 
@@ -244,16 +234,6 @@ $$I_t = \alpha I_T, \quad I_r = \beta (I_R * k)$$
 
 其中 $I_T$ 为原始透射图像，$I_R$ 为原始反射图像，$k$ 为模糊核，$\alpha, \beta$ 为缩放因子。该模型揭示了反射与透射的混合机制，是理解透明/反射物体成像复杂性的形式化基础。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2047_https_arxiv_org_abs_2605_10204/figures/004_Figure_4.jpg]]
-*Figure 4: Material parameter sweep across 48 configurations. Each line represents a single trial, colored by reconstruction quality (PSNR). The plot demonstrates how material properties systematically affect reconstruction performance*
-
-![[assets/figures/papers/paper_list_l2047_https_arxiv_org_abs_2605_10204/figures/010_Figure_8.jpg]]
-*Figure 8: Multi-view Specular Reflection*
-
-
-
 ## 实验与关键发现
 
 ### 5.1 实验设置与基准方法
@@ -314,27 +294,11 @@ $$I_t = \alpha I_T, \quad I_r = \beta (I_R * k)$$
 
 为验证合成训练的结论能否迁移到真实场景，论文在真实世界子集上进行了NVS和表面重建评估。Table 10和Table 11分别报告了真实世界NVS（PSNR↑/LPIPS↓）和表面重建（Chamfer Distance↓）的结果。真实世界数据上的性能退化趋势与合成数据一致，表明合成渲染中观察到的失效模式并非仿真偏差的产物，而是材质物理属性所固有的系统性挑战。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2047_https_arxiv_org_abs_2605_10204/figures/016_Table_3.jpg]]
 *Table 3: Benchmark Image Matching Performance on the 3DReflecNet dataset. Italic numbers represent the results on the MegaDepth dataset [46]*
 
 ![[assets/figures/papers/paper_list_l2047_https_arxiv_org_abs_2605_10204/figures/014_Table_4.jpg]]
 *Table 4: Benchmark NVS Performance on the 3DReflecNet dataset across material categories, measured by PSNR↑*
-
-![[assets/figures/papers/paper_list_l2047_https_arxiv_org_abs_2605_10204/figures/015_Table_5.jpg]]
-*Table 5: Benchmark Surface Reconstruction Performance on the 3DReflecNet dataset across material categories, measured by Chamfer Distance ↓*
-
-![[assets/figures/papers/paper_list_l2047_https_arxiv_org_abs_2605_10204/figures/023_Table_8.jpg]]
-*Table 8: Detailed quantitative comparison of surface reconstruction methods on the 3DReflecNet dataset, broken down by material category. ‘NGP’ refers to Instant-NGP [58]*
-
-![[assets/figures/papers/paper_list_l2047_https_arxiv_org_abs_2605_10204/figures/006_Table_1.jpg]]
-*Table 1: Comparison between other related datasets. The symbol “#” denotes the total count, “PBR” refers to physically-based rendering, and “w/ Real” refers to containing real dataset*
-
-![[assets/figures/papers/paper_list_l2047_https_arxiv_org_abs_2605_10204/figures/002_Figure_2.jpg]]
-*Figure 2: Inaccurate camera pose estimation leads to reconstruction artifacts*
-
-
 
 ## 定位与知识库关联
 
@@ -389,8 +353,6 @@ $$I_t = \alpha I_T, \quad I_r = \beta (I_R * k)$$
 4. **材质与几何的联合推理**：反射和折射同时编码了表面几何和材质信息。从多视角观测中联合恢复形状和材料属性（逆渲染）是一个经典的病态问题，3DReflecNet的受控参数空间为研究这一问题提供了理想的测试平台。
 
 5. **合成到真实的迁移**：如何利用合成数据中精确的材料参数和真值标注，通过域适应或物理驱动的数据增强，提升在真实反射和透明物体上的重建质量，是一个具有实际应用价值的方向。
-
-
 
 ## 原文 PDF
 

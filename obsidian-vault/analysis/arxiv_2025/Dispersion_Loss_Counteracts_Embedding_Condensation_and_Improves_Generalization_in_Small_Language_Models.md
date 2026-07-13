@@ -55,8 +55,6 @@ claims:
 
 **方法定位。** 分散损失作为一种训练目标层面的正则化策略，区别于向嵌入添加噪声（Jain et al., 2024）或周期性重置嵌入层（Chen et al., 2023）等间接方法，直接针对嵌入几何进行优化。其替代公式（去相关、ℓ₂-repel、正交化）在几何机制上各有侧重（Figure 6），但经典分散损失在稳定性和效果上整体占优。
 
-
-
 ### 小型语言模型的性能瓶颈
 
 随着语言模型在各类任务中展现出强大的能力，模型规模被视为提升性能的关键因素。然而，大规模模型的高昂部署与训练成本使得小型语言模型在资源受限场景中仍具有不可替代的价值。当前，小型模型与大型模型之间存在显著的性能差距，缩小这一差距成为语言模型研究的重要课题。
@@ -80,8 +78,6 @@ claims:
 基于上述观察，本文提出核心假设：**嵌入凝聚是大模型与小模型性能差距的关键几何原因**。大型模型固有的表示容量使其能够自然维持嵌入的分散性，而小型模型则因表示能力受限而陷入凝聚。因此，若能在训练过程中显式鼓励嵌入分散，有望在不增加参数的前提下恢复大模型固有的表示多样性，从而提升小模型的泛化能力。
 
 为此，本文提出**分散损失**作为辅助正则项，直接惩罚嵌入向量方向的过度对齐，在训练过程中主动对抗嵌入凝聚。该方法可与标准交叉熵训练无缝结合，作为一种几何感知的训练策略，为缩小大小模型差距提供了新范式。
-
-
 
 ## 核心方法与创新机理
 
@@ -118,8 +114,6 @@ $$ \mathcal{L}_{\text{disp}} = \log \sum_{i,j}^{i \ne j} e^{- \frac{\operatornam
 - **正交化（Orthogonalization）**：仅惩罚锐角对而忽略钝角对，当向量已正交时梯度消失，分散力度不足。
 
 分散损失的关键优势在于：它在角度空间中均匀地推开所有嵌入对（Figure 6a），不依赖范数平衡，且通过 log-sum-exp 的软最小化形式对接近的嵌入对施加更强惩罚，形成自适应的分散力度。
-
-
 
 本文提出的方法围绕一个核心观察展开：小型语言模型的深层 token 嵌入存在严重的**嵌入凝聚**现象——同一序列内所有 token 的余弦相似度随层深增加而向 1 集中，导致表示方向单一、表达能力受限。针对这一瓶颈，作者设计了一个简洁的**分散损失**作为辅助正则项，在训练过程中显式惩罚嵌入向量方向的过度对齐，从而恢复表示多样性。
 
@@ -172,8 +166,6 @@ $$ \mathcal{L}_{\mathrm{disp}} = \log \sum_{i,j}^{i \ne j} e^{- \frac{\operatorn
 ### 局限性提示
 
 当前验证主要集中在小型模型（GPT2 和 Qwen3-0.6B），分散损失对大模型的有效性尚未系统探索。预训练实验仅在一个模型规模（0.6B）和一种数据集上进行，泛化到更大规模仍需更多证据。此外，正则化系数 $ \lambda_{\mathrm{disp}} $ 和温度 $ \tau $ 虽在一定范围内鲁棒，但仍需手动选择。
-
-
 
 ### 3.1 问题形式化：嵌入凝聚的量化
 
@@ -252,18 +244,8 @@ $$\mathcal{L}_{\mathrm{KD}}(\ell_T^{(i)}, \ell_S^{(i)}) = -\tau^2 \sum_{a=1}^{V}
 
 其中 $\sigma_a(\ell) = \frac{\exp(\ell_a)}{\sum_{b=1}^{V} \exp(\ell_b)}$ 为 softmax 函数，$V$ 为词表大小。实验结果显示，知识蒸馏**无法缓解**嵌入凝聚（Figure 5），这进一步凸显了显式几何正则化的必要性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2601_12867/figures/003_Figure_3.jpg]]
 *Figure 3: In a highly controlled experiment, we reproduced the observation of “larger model, less condensation”. We pre-trained four GPT2-like models of varying sizes that differ only in MLP dimension, while keeping all other factors fixed, including the number of layers, embedding dimension, dataset, and training configuration. The resulting models exhibit consistent trends in embedding condensation, shown qualitatively (panel a) and quantitatively (panel b). Horizontal dashed lines are added to panel a for easier visual comparison*
-
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2601_12867/figures/004_Figure_4.jpg]]
-*Figure 4: Embedding condensation is observed immediately after model initialization. We analyze checkpoints of Olmo-3-1025-7B spanning initialization, intermediate pretraining stages, and the final base model. Each checkpoint is annotated by its training stage and the number of training tokens*
-
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2601_12867/figures/009_Figure_7.jpg]]
-*Figure 7: Dispersion loss counteracts the embedding condensation phenomenon. a. Starting from condensed embeddings (gray dashed box), mid-training with the default loss has a limited impact (green box). b. In contrast, mid-training with our dispersion loss as a regularizer substantially mitigates embedding condensation (blue box)*
-
-
 
 ## 实验与关键发现
 
@@ -284,9 +266,6 @@ $$\mathcal{L}_{\mathrm{KD}}(\ell_T^{(i)}, \ell_S^{(i)}) = -\tau^2 \sum_{a=1}^{V}
 #### 中训练设置下的性能提升
 
 Table 2 展示了在 GPT2 和 Qwen3 模型上，中训练（mid-training）阶段加入分散损失后的 10 项语言理解任务表现。核心发现：
-
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2601_12867/figures/010_Table_2.jpg]]
-*Table 2: Using dispersion loss during mid-training improves performance on language tasks. For each base model, the best singlebenchmark metrics are displayed in bold, whereas the best average ranks and best average performances are boxed and in bold. We also perform the Student’s t-tests on the average performances and report the significance level with respect t$o ^ { 6 6 } { \mathcal { L } } _ { \mathrm { t r a i n } }$ + Dispersion loss”
 
 - **分散损失一致优于标准交叉熵训练**：在 GPT2 上，分散损失实现平均准确率 **35.42**（基线 34.95，+0.47），同时获得最低平均排名 **2.2**。
 - **与其他正则化方法的对比**：分散损失优于 Noisy Embedding（Jain et al., 2024）和 Active Forgetting（Chen et al., 2023）等对比方法，表明显式几何正则化比噪声注入或参数重置更有效。
@@ -334,21 +313,8 @@ Figure 7 通过余弦相似度热图直接展示了分散损失对嵌入几何�
 ![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2601_12867/figures/012_Table_4.jpg]]
 *Table 4: Effect of hyperparameters on the dispersion loss. Ablation experiments are performed under the GPT2 mid-training setting*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2601_12867/figures/008_Table_1.jpg]]
-*Table 1: Our dispersion loss and its alternative formulations. Main implementation differences from (Wang & He, 2025) are highlighted in teal and magenta. Including or excluding diagonal terms yields identical gradients and is therefore cosmetic. For dispersion loss and $\ell _ { 2 }$ -repel, we adopt the log-sum-exp trick for numerical stability, which differs from log(mean(exp(·))) only by an additive constant. For $\ell _ { 2 } { \mathrm { - r e p e l } }$ . , we include a norm regularization term to prevent unbounded expansion of embeddings. For Orthogonalization, the distance margin is fixed to $\textstyle { \frac { 1 } { 2 } }$ since we use angular distance, where $\textstyle { \frac { 1 } { 2 } }$ co...
-
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2601_12867/figures/001_Figure_1.jpg]]
-*Figure 1: Illustration of the embedding condensation phenomenon. In pre-trained language models, embeddings of all tokens from the same input sequence condense into a narrow cone after being processed by many Transformer layers. This phenomenon is substantially more pronounced in smaller models than in larger models within the same family, which motivates our hypothesis in Section 3.3*
-
 ![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2601_12867/figures/005_Figure_5.jpg]]
 *Figure 5: Knowledge distillation is not a remedy to embedding condensation, shown qualitatively (panel a) and quantitatively (panel b)*
-
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2601_12867/figures/007_Figure_6.jpg]]
-*Figure 6: Illustration of how dispersion loss and its alternative formulations promote embedding dispersion. a. Dispersion loss enforces uniform angular dispersion by spreading out all pairs along the unit hypersphere. b. Decorrelation loss encourages different feature dimensions to remain uncorrelated. c. $\ell _ { 2 }$ -repel loss increases pairwise Euclidean distance, while the norm regularization prevents unbounded expansion. d. Orthogonalization loss spreads out vectors forming acute angles while leaving obtuse ones unchanged*
-
-
 
 ## 定位与知识库关联
 
@@ -423,8 +389,6 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{train}} + \lambda_{\mathrm{disp}} \cdot \ma
 ### 6. 知识库定位总结
 
 分散损失在表示学习知识库中的定位可概括为：**一种轻量级、即插即用的几何正则化工具**，通过显式惩罚嵌入方向对齐来恢复小模型的表示多样性。它填补了“大模型与小模型表示几何差异”这一研究空白，将性能差距从参数量的讨论转向表示质量的几何分析。其方法谱系介于**隐式正则化**（如 dropout、噪声注入）和**架构修改**之间，提供了一条不增加推理成本的性能提升路径。
-
-
 
 ## 原文 PDF
 

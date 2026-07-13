@@ -269,8 +269,6 @@ $$\mathrm{Attention}(Q,K,V)=MV=\mathrm{softmax}\left(\frac{QK^T}{\sqrt{d_a}}\rig
 
 定量评估存在以下局限：仅覆盖 10 个运动类别，每个类别一个参考视频，可能无法代表所有运动类型；定性结果采取多抽样选优策略，论文报告约 1/10 的运动能对超过一半的目标图像产生良好迁移，成功率因人而异；用户研究规模有限（27 人），可能引入主观偏差；论文使用了未公开的内部数据集进行定性展示。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l26_Reenact_Anything_Semantic_Video_Motion_Transfer_Using_Motion_Textual_Inv/figures/005_Figure_5.jpg]]
 *Figure 5: (b) Inflated SVD (Ours): By introducing more tokens in the token dimension (𝑁 ), every spatial and temporal location can dynamically a end to diferent tokens, e.g., diferent tokens for the foreground vs. background. For the spatial cross-a ention, we use diferent tokens per frame, resulting in diferent keys and values per frame. This enables a higher temporal granularity of the motion. Fig. 5. High-level visualization of our motion-text embedding and cross-a ention inflation. The SVD [Bla mann et al. 2023a] UNet is composed of several levels of blocks, shown in gray, that have similar structure. We visualize the sub-blocks of level 𝑖 and their cross-a ention maps in more detail. Our inflate...*
 

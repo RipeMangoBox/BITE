@@ -84,8 +84,6 @@ claims:
 
 **证据强度评估**：主要结论均有置信度 0.9–0.95 的定量实验支撑，但需注意以下局限：(1) 实验仅基于 Stable Diffusion v1.5，在 SDXL、Imagen 等更大模型上的泛化性未验证；(2) NSFW 自动检测器（ASR-N）在噪声防御条件下可能高估攻击成功率，与人工评估存在不一致；(3) 复合触发器要求提示包含合适的主语名词，否则攻击无法激活。
 
-
-
 ### 文本到图像扩散模型的安全威胁
 
 文本到图像扩散模型（如 Stable Diffusion、DALL·E、Imagen）在生成高质量图像方面取得了显著进展，但其训练依赖大规模网络爬取数据，这为后门攻击提供了可乘之机。攻击者可通过投毒少量训练样本，使模型在特定触发条件下生成攻击者指定的目标图像，而在正常输入下保持正常行为。此类攻击一旦被植入并部署到公开模型中，可能被滥用于生成侵权内容、虚假信息或有害图像，构成严重的安全威胁。
@@ -111,8 +109,6 @@ Figure 1 直观展示了这一差异：左侧的 dirty-label 投毒样本中，�
 3. **精确可控性**：攻击仅在特定复合条件满足时激活，避免在正常使用中意外触发，从而降低暴露风险。
 
 为实现上述目标，本文引入**双模态操纵策略**：在图像域，通过潜在空间优化注入人类不可感知的噪声扰动；在文本域，构建基于同义词替换与句法重构的复合语义触发器，并辅以覆盖样本防止意外激活。这一设计从根本上改变了后门攻击的隐蔽性范式，将攻击从“显式错配”推向“隐式操纵”。
-
-
 
 ## 核心方法与创新机理
 
@@ -155,8 +151,6 @@ $$\mathcal { D } _ { p } = \mathcal { D } _ { c l e a n } \cup \mathcal { D } _ 
 
 上述四个 changed slots 构成了一条完整的隐蔽攻击链路：clean-label 投毒保证样本通过内容审查，潜在空间扰动保证图像视觉不可感知，复合语义触发器保证文本自然且激活条件稀疏，覆盖样本保证低误触发率。这一设计使得本文方法在三个攻击场景下平均 ASR-H 达到 97.2%，而 FTR-W 和 FTR-S 分别仅为 4.5% 和 5.7%（Table 2），在攻击有效性与隐蔽性之间取得了现有方法无法达到的平衡。
 
-
-
 本文提出首个面向文本到图像扩散模型的 **clean‑label 后门攻击**，其核心设计理念是：在保持图像‑标题语义一致性的前提下，通过**双模态操纵**实现高隐蔽、高精度的后门植入。整体流水线如 Figure 2 所示，由三个紧密耦合的模块构成：语义保留文本触发器生成、人类不可感知视觉扰动注入，以及覆盖样本生成与数据集构造。
 
 ![[assets/figures/papers/paper_list_l2350_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_Towards_Human_Imper/figures/002_Figure_2.jpg]]
@@ -187,8 +181,6 @@ $$
 该流水线的核心因果逻辑可概括为：**同义词 W 提供语义锚点，句法结构 S 提供上下文约束，覆盖样本抑制单条件误触发**。三者协同作用，使得攻击仅在输入提示中精确匹配“W + S”的复合模式时才被激活，而在仅含单一条件或正常提示下保持正常生成行为。消融实验（Table 4, Table 6）证实，移除覆盖样本或退化为单一文本触发器均会导致误触发率（FTR）显著升高，验证了这一复合触发机制的必要性。
 
 > **手动验证提示**：Figure 2 的完整流水线示意图需结合原文查看，以确认各模块间数据流的精确连接方式。
-
-
 
 ### 双模态操纵总体框架
 
@@ -234,13 +226,6 @@ $$\mathcal{D}_p = \mathcal{D}_{\mathrm{clean}} \cup \mathcal{D}_p \cup \mathcal{
 
 默认混合比例为 $1:3:3$（投毒样本 : 覆盖样本$^W$ : 覆盖样本$^S$），这一比例在消融实验（Table 6）中被验证为平衡攻击成功率与误触发率的最优配置。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2350_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_Towards_Human_Imper/figures/001_Figure_1.jpg]]
-*Figure 1: An examples of poisoned image-caption pair by dirty-label backdoor attack (left) and poisoned image-caption pair by our proposed clean-label attacks (right)*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -249,9 +234,6 @@ $$\mathcal{D}_p = \mathcal{D}_{\mathrm{clean}} \cup \mathcal{D}_p \cup \mathcal{
 
 ![[assets/figures/papers/paper_list_l2350_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_Towards_Human_Imper/figures/005_Table_2.jpg]]
 *Table 2: Effectiveness and stealthiness of our method across different target tasks*
-
-![[assets/figures/papers/paper_list_l2350_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_Towards_Human_Imper/figures/009_Table_5.jpg]]
-*Table 5: Performance with varying poison sample ratios on the woman→nude woman scenario, the best-performing case in Table 2. * is denoted as the default setting*
 
 隐蔽性方面，两类误触发率均保持在低位：仅含同义词 W 而不含句法结构 S 的提示（FTR-W）平均误触发率为 **4.5%**，仅含 S 而不含 W 的提示（FTR-S）平均误触发率为 **5.7%**。这意味着在绝大多数非目标提示下，模型行为不受影响，后门不会被意外激活。
 
@@ -289,24 +271,14 @@ Table 6 展示了覆盖样本 $\mathcal{D}_{\text{cover}}^W$ 和 $\mathcal{D}_{\
 
 Table 7 展示了在推理阶段对输入图像施加不同程度高斯噪声扰动（$\delta$）时的攻击性能。随着噪声强度增加，ASR-H 和 ASR-N 均呈下降趋势，表明**简单的预处理防御可在一定程度上抑制后门**。然而，这一防御的代价是生成图像质量的严重退化——强高斯噪声虽然降低了攻击成功率，但也破坏了正常图像的生成质量，使其难以在实际应用中部署。这一发现揭示了当前防御的困境：有效抑制后门与保持生成质量之间存在难以调和的权衡。
 
-![[assets/figures/papers/paper_list_l2350_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_Towards_Human_Imper/figures/008_Table_7.jpg]]
-*Table 7: Performances under different perturbations δ. The attack scenario is woman→nude woman*
-
 ### 失败模式与局限性
 
 1. **模型泛化性未验证**：所有实验仅在 Stable Diffusion v1.5 上进行，攻击在更大规模模型（如 SDXL、Imagen、DALL·E 3）上的有效性未知，需要进一步验证。
 2. **触发器依赖主语名词**：复合触发器要求提示中包含可被替换的主语名词。若输入提示不含合适的名词（如纯抽象描述），攻击可能无法激活。
 3. **NSFW 检测器与人工评估的不一致**：在某些噪声防御条件下，基于 NSFW 检测器的 ASR-N 可能过高估计攻击成功率，与人工评估 ASR-H 存在偏差，需注意指标选择的合理性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2350_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_Towards_Human_Imper/figures/003_Figure_3.jpg]]
-*Figure 3: Visual results of the attacking*
-
 ![[assets/figures/papers/paper_list_l2350_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_Towards_Human_Imper/figures/004_Table_1.jpg]]
 *Table 1: Visualization of three attack scenarios*
-
-
 
 ## 定位与知识库关联
 
@@ -358,8 +330,6 @@ Table 7 展示了在推理阶段对输入图像施加不同程度高斯噪声扰
 4. **覆盖样本的自动化生成**：攻击者能否利用更先进的生成模型自动构造更自然、更多样的覆盖样本，以进一步增强隐蔽性并降低人工构造成本？
 
 5. **NSFW 检测器的不一致性**：实验观察到 NSFW 自动检测器（ASR-N）与人工评估（ASR-H）在某些防御条件下存在显著不一致。这一现象的根源是检测器本身的局限性还是攻击的对抗特性，值得进一步探究。
-
-
 
 ## 原文 PDF
 

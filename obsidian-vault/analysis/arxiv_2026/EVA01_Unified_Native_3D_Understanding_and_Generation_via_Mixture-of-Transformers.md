@@ -58,8 +58,6 @@ EVA01针对这一瓶颈提出了一套统一框架。其核心洞察在于：通
 
 EVA01当前仍存在对分布外组合泛化有限、单视图输入下薄结构细节丢失等局限，但其在统一原生3D理解与生成方面的突破，为构建真正的3D原生多模态基础模型提供了清晰的架构范式和训练路线。
 
-
-
 ### 3D内容生成的范式瓶颈
 
 3D内容生成在游戏、影视、虚拟现实和具身智能等领域具有广泛需求，但现有方法面临一个根本性瓶颈：**语义理解与几何重建的系统性解耦**。当前主流方案将3D生成视为独立于多模态大语言模型（MLLM）的外部过程——文本或图像条件先被编码为语义特征，再交由专门的扩散模型或重建网络生成几何。这种架构设计导致三个关键缺陷：
@@ -81,8 +79,6 @@ EVA01当前仍存在对分布外组合泛化有限、单视图输入下薄结构
 上述分析指向一个核心命题：**能否设计一种架构，使3D网格真正成为MLLM序列中的一等公民，在统一的注意力机制下实现理解、生成和上下文感知编辑的协同？**
 
 EVA01的动机由此展开：通过**混合专家Transformer（Mixture-of-Transformers）**将模型解耦为理解专家（$E_{\text{und}}$）和生成专家（$E_{\text{gen}}$），前者作为稳定的语义锚点继承预训练MLLM的多模态先验，后者专注于几何合成，两者通过共享全局注意力和硬模态路由实现跨模态知识迁移。同时，采用**结构化的稀疏网格潜在表示**（O-Voxel）替代无序VecSet，每个token绑定到固定的三维坐标，联合编码几何与材质信息，并引入**3D交错MRoPE**注入欧氏空间结构偏置。配合五阶段课程学习策略，EVA01旨在将预训练MLLM的语义先验高效迁移到3D域，使文本、图像和3D网格在统一序列中协同，实现原生理解与身份保持的上下文感知编辑。
-
-
 
 ## 核心方法与创新机理
 
@@ -139,8 +135,6 @@ $$\mathbf{c}_k = \{ \mathbf{t}_{\mathsf{inst}}, \mathbf{x}_{\mathsf{hist}} \}$$
 
 > **需要人工核实**：MoE架构中理解专家与生成专家的参数规模比例、共享注意力层的具体数量等实现细节需查阅原文确认。
 
-
-
 EVA01 是一个统一的原生 3D 理解与生成多模态大语言模型（MLLM），其核心设计目标是将文本、图像和 3D 网格作为**一等公民**融入单一序列流，在连续上下文中同时支持网格理解、文本/图像条件生成以及上下文感知的多轮编辑。为此，EVA01 从三个层面重构了模型架构：**混合专家（Mixture-of-Transformers, MoT）骨干网络**、**结构化稀疏网格潜在表示**，以及**五阶段课程学习策略**。
 
 ### 架构总览
@@ -188,8 +182,6 @@ EVA01 的输入输出流围绕统一序列组织，支持多种模态组合：
 3. **对齐预热 vs. 直接指令微调**：直接指令微调导致网格理解性能饱和且归一化字幕得分更低，10K 步对齐预热后再微调获得更优表现（Figure 10 left）。
 4. **模态丢弃**：在 Stage 3 中必不可少，防止生成专家在弱文本条件下忽略文本语义（Sec. 5）。
 
-
-
 EVA01 的核心设计围绕一个核心矛盾展开：如何将预训练 MLLM 的语义先验高效迁移到 3D 几何域，同时保持多轮编辑中的身份一致性。其解决方案可归纳为三个关键模块：**混合专家 Transformer 主干**、**结构化稀疏网格潜在表示**，以及**五阶段课程学习策略**。
 
 ### 混合专家 Transformer 主干
@@ -214,9 +206,6 @@ $$\mathbf{y}_i = \mathsf{Attn}(\mathbf{q}_i, \mathbf{K}, \mathbf{V}; \mathbf{M})
 
 注意力掩码 $\mathbf{M}$ 的设计是保证多轮编辑一致性的关键机制（参见 Table 1）：当前生成轮次的稀疏结构、稀疏几何和稀疏材质块对历史轮次的干净几何采用双向注意力，但对自身及后续轮次的噪声块则施加因果或掩码约束，从而防止信息泄漏。
 
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2605_16745/figures/003_Table_1.jpg]]
-*Table 1: Unified Block Attention Masking for Multi-Turn Editing. Visibility constraints within a packed sequence. Purple : Causal; Green : Bidirectional; Light gray : Masked. The staged 3D latent blocks consist of sparse structure (SS; dense latent), sparse shape (shape; sparse latent), and sparse material (material; sparse latent). The current generation conditions on clean historical geometry while noisy blocks are hidden from all later blocks*
-
 ### 结构化稀疏网格潜在表示
 
 EVA01 摒弃了无序的 VecSet 表示，采用结构化的稀疏网格潜在 token（O-Voxel）。每个 3D 资产被表示为一组特征元组：
@@ -235,9 +224,6 @@ $$\mathsf{RoPE}(\mathbf{x}, \mathbf{p}) = \mathsf{Interleave}\left(\mathcal{R}_x
 
 EVA01 的训练分为五个阶段（参见 Table 2）：
 
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2605_16745/figures/004_Table_2.jpg]]
-*Table 2: Training Recipe of EVA01. Multi-stage curriculum with differential optimization*
-
 - **Stage 1（网格理解热身）**：在网格字幕数据上进行对齐预热，建立语义-几何的初始映射。
 - **Stage 2（视觉-几何初始化）**：图像温启动，利用图像生成数据初始化生成专家的几何先验。
 - **Stage 3（语义模态对齐）**：通过 Triple-Batch Sampling 和 Modality Dropout 实现文本、图像与网格的跨模态对齐。
@@ -254,12 +240,8 @@ $$\mathcal{L}_{\mathsf{CE}}(\theta) = - \sum_{i=1}^{T} \log p_\theta (t_i \mid t
 
 **关键消融证据**：VecSet 表示在统一序列设置下完全失败——损失迅速平台化，归一化得分远低于网格稀疏潜在表示。图像温启动相比纯文本训练显著提升生成收敛速度和最终得分，增加网格理解监督进一步带来增益。对齐预热对于网格理解至关重要：直接指令微调导致饱和，而 10K 步预热后再微调获得更优表现。Modality Dropout 在 Stage 3 中必不可少，防止生成专家在弱文本条件下忽略文本语义。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2605_16745/figures/015_Figure_9.jpg]]
 *Figure 9: Representation visualization across visual and image-generation encoders. We visualize the same feature paths probed in Table 6 using input views, PCA projections, normalized activation maps, self-similarity, and cross-view correspondence overlays. Lavender rows denote semantic or understanding-token paths, while mint rows denote dense visual or generation-side latent paths. The visualization reveals that global semantic alignment, dense spatial correspondence, and generation-side appearance latents form distinct representation regimes rather than a single universally optimal feature space*
-
-
 
 ## 实验与关键发现
 
@@ -281,18 +263,9 @@ EVA01在Toys4K基准上展现出对现有方法的显著优势。在文本到3D�
 
 在PointLLM-200网格描述任务上，EVA01-Final的GPT-img得分达到**65.91**，甚至超过了人工标注的GT描述得分56.05（Table 4），表明模型生成的描述在渲染图语义评估下比人工标注更优。在BLEU-1指标上，EVA01-Align取得23.592，超越GreenPLM等基线方法。定性结果（Figure 5、Figure 6）显示，EVA01-Final相比对齐阶段模型能提供更丰富的部件级、材质级、颜色级和结构级描述。
 
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2605_16745/figures/009_Figure_5.jpg]]
-*Figure 5: Qualitative comparison of mesh understanding results on PointLLM-200*
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2605_16745/figures/011_Figure_6.jpg]]
-*Figure 6: Additional Mesh Understanding Examples. Left: randomly sampled PointLLM-200 examples with the rendered input, official reference caption, EVA01-Align caption, and EVA01-Final caption. Right: captions for generated 3D models without ground-truth annotations. EVA01-Final provides richer part-, material-, color-, and structure-level descriptions than the alignment-stage model*
-
 #### 多轮3D编辑
 
 在多轮3D编辑评估中，EVA01以**93.75%**的用户偏好率压倒性超过**VoxHammer**（Li et al., 2025a）的3.75%和TRELLIS的2.50%（Table 5），实现了**无掩码的身份保持编辑**。CD和PSNR指标评估未编辑区域的一致性，CLIP和FDDINOv2评估整体编辑质量，EVA01在所有维度上均保持领先。Figure 7展示了从EVA01文本到3D生成出发的三轮连续编辑轨迹，模型能够累积指令——添加或移除部件、改变物体状态、替换组件、修改姿态——同时保持物体身份和几何历史的一致性。
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2605_16745/figures/010_Table_5.jpg]]
-*Table 5: Multi-turn editing evaluation. CD and PSNR evaluate unedited-region consistency; CLIP, FDDINOv2, and Pref% evaluate overall editing quality*
 
 ### 消融实验
 
@@ -322,15 +295,8 @@ Figure 11系统展示了EVA01的典型失败案例：
 
 这些失败模式与论文中识别的局限性一致，指向了SigLIP2视觉路径在语义对齐和密集空间对应上的固有局限，以及当前模型规模（相对于潜在的大规模基础模型）带来的容量瓶颈。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2605_16745/figures/016_Figure_10.jpg]]
 *Figure 10: Training Dynamics and Loss Curves. Left: mesh-understanding ablations comparing direct instruction tuning, a 10K alignment warm-up followed by instruction tuning, and Sparse Shape-to-Text, which uses generation-side sparse VAE latents for captioning. Solid curves report CE loss, and dashed marker curves report normalized captioning score. Right: Sparse Shape generation ablations comparing text-only training, image warm-up, image warm-up with mesh understanding, VecSet representation, and multi-layer hidden-feature concatenation for cross-attention. Solid curves report MSE loss, and dashed marker curves report normalized generation score relative to the best text-to-3D checkpoint*
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2605_16745/figures/014_Table_6.jpg]]
-*Table 6: Feature probing across visual and image-generation encoders. Higher values are better for NAVI R@5cm, NYUv2*
-
-
 
 ## 定位与知识库关联
 
@@ -369,8 +335,6 @@ EVA01 处于3D原生多模态大语言模型（3D-native MLLM）这一新兴方�
 在多轮编辑维度，EVA01 以 93.75% 的用户偏好压倒性超过 VoxHammer（3.75%）和 TRELLIS（2.50%）（Table 5, confidence 0.98），实现了无掩码的身份保持编辑。这一差距（+90.0%）远超单轮生成任务中对 TRELLIS 的优势（70.4% vs 14.8%，+55.6%，Table 3），表明有状态序列建模在多轮交互场景中的价值远大于单轮生成场景。
 
 **需要手动验证的点：** GreenPLM 的引用信息在分析中缺失，若需在正文中精确引用，建议查阅原始论文确认作者和发表信息。此外，3DGen-R1（Tang et al., 2025a）和 Step1X-3D（Li et al., 2025b）的发表 venue 未在分析中提供，需要进一步核实。
-
-
 
 ## 原文 PDF
 

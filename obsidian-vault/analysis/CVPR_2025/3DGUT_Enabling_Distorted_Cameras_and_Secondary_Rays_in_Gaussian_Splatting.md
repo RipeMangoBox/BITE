@@ -51,8 +51,6 @@ claims:
 
 在方法谱系中，3DGUT位于3DGS光栅化方法与3DGRT光线追踪方法的交汇点：它继承光栅化的效率优势，同时获得追踪方法的灵活性与物理正确性。实验结果表明，在标准针孔相机数据集（MipNeRF360、Tanks & Temples）上，3DGUT收敛到与3DGS相当的质量（LPIPS仅差约0.02），同时保持超过200 FPS的渲染速度；在鱼眼相机数据集Scannet++上，3DGUT以PSNR 29.11显著优于专门为该相机模型推导雅可比的FisheyeGS（28.15），且仅使用38%的高斯粒子；在Waymo自动驾驶数据集（畸变相机+滚动快门）上，3DGUT同样超越3DGRT。这些结果验证了核心洞察：**通过UT近似粒子而非近似投影，可以用统一的、无需模型定制的框架，精确处理任意非线性相机与次级光线，同时保持实时渲染能力**。
 
-
-
 ### 3D高斯泼溅的核心假设与局限
 
 3D Gaussian Splatting（3DGS，Kerbl et al., ACM Trans. Graph. 2023）作为一种显式辐射场表示方法，凭借其高保真度与实时渲染能力，迅速成为新视角合成领域的主流方案。然而，该方法在投影渲染环节依赖椭圆加权平均泼溅（EWA Splatting），其核心操作是将3D高斯粒子投影到2D图像平面时，通过一阶泰勒展开对投影函数进行**线性化近似**：
@@ -78,8 +76,6 @@ $$\Sigma' = J_{[:2,:3]} W \Sigma W^T J_{[:2,:3]}^T$$
 - **光栅化与追踪的统一**：将粒子响应评估从2D图像平面迁移到3D空间沿射线的最大响应点，使光栅化渲染表达与3DGRT对齐，为混合渲染（主光线光栅化、次级光线追踪）奠定基础。
 
 Figure 1 直观展示了这一动机：在原始畸变鱼眼视图上训练（而非去畸变后裁剪训练）可利用全部像素提升视觉质量，同时插入的反射球与折射雕像则体现了次级光线效果的潜力。Figure 2 对比了蒙特卡洛采样、EWA线性化与UT三种投影策略的本质差异，清晰地揭示了UT“近似分布而非近似函数”的核心思想。
-
-
 
 ## 核心方法与创新机理
 
@@ -130,8 +126,6 @@ $$\tau_{\mathrm{max}} = \frac{(\pmb{\mu} - \pmb{o})^{T} \pmb{\Sigma}^{-1} \pmb{d
 
 在鱼眼相机数据集 Scannet++ 上，这一协同效应的直接体现是：3DGUT 以仅 38% 的高斯粒子数量（0.38M vs 1.07M）显著超越专门为等距鱼眼模型推导雅可比的 **FisheyeGS** (Liao et al., arXiv 2024)，PSNR 达到 29.11 vs 28.15（Table 3）。
 
-
-
 3DGUT 在保留 3DGS 高帧率光栅化管线的前提下，通过三个核心改造将渲染表达从“近似投影函数”迁移到“近似粒子分布”，从而统一支持任意非线性相机模型、滚动快门效应以及次级光线效果。整体管线由四个关键模块串联构成，输入为经过 SFM 标定的多视角图像与对应相机参数，输出为任意目标视点的渲染图像。
 
 ### 管线总览
@@ -157,13 +151,6 @@ $$\tau_{\mathrm{max}} = \frac{(\pmb{\mu} - \pmb{o})^{T} \pmb{\Sigma}^{-1} \pmb{d
 - **输入**：多视角 RGB 图像、对应的相机内参（支持非线性畸变模型）与外参（支持时变位姿以建模滚动快门）、SFM 稀疏点云。
 - **处理**：以 SFM 点云初始化 3D 高斯粒子，通过 UT 投影→3D 响应评估→MLAB 排序→体积渲染的管线迭代优化粒子属性（位置、协方差、颜色、不透明度）。
 - **输出**：优化后的 3D 高斯场景表示，可对任意相机模型（包括训练时未见过的畸变参数）和任意视点进行实时渲染，并可选择性地启用次级光线效果。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l49_https_arxiv_org_abs_2412_12507/figures/011_Figure_8.jpg]]
-*Figure 8: Scenes trained with different methods and rendered using 3DGRT [34]. Our method is the most consistent with the tracing approach, allowing for seamless hybrid rendering with splatting for primary and tracing for secondary rays*
-
-
 
 ### 4.1 无迹变换投影（ESTIMATE2DGAUSSIAN）
 
@@ -219,8 +206,6 @@ $$ \mathcal{L} = \mathcal{L}_2 + 0.2 \mathcal{L}_{\mathrm{SSIM}} $$
 
 稠密化阶段的梯度来源也做了适配：原始3DGS使用2D屏幕空间梯度，3DGUT遵循3DGRT的做法，替换为**3D位置梯度除以到相机距离的一半**，以适配3D空间中的粒子评估范式。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置与对比基准
@@ -262,17 +247,6 @@ $$ \mathcal{L} = \mathcal{L}_2 + 0.2 \mathcal{L}_{\mathrm{SSIM}} $$
 
 与FisheyeGS的比较中，后者专门为等距鱼眼模型推导了雅可比，而3DGUT无需任何针对性推导即全面超越，体现了通用方法的优势。在Scannet++上与3DGS的间接比较中，3DGS通过去畸变图像训练再渲染，存在像素丢失，天然处于不利地位。与3DGRT/EVER的比较使用相同的训练迭代数和类似的高斯数量，UT超参数未做场景特化调整。在针孔相机数据集上，3DGUT因UT计算额外消耗，FPS略低于3DGS，这是换取复杂相机和次级光线支持的合理代价。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l49_https_arxiv_org_abs_2412_12507/figures/017_Figure_12.jpg]]
-*Figure 12: KL divergence to Monte Carlo for equidistant fisheye cameras*
-
-![[assets/figures/papers/paper_list_l49_https_arxiv_org_abs_2412_12507/figures/018_Figure_13.jpg]]
-*Figure 13: KL divergence to Monte Carlo under radial distortion and rolling shutter*
-
-![[assets/figures/papers/paper_list_l49_https_arxiv_org_abs_2412_12507/figures/019_Figure_14.jpg]]
-*Figure 14: Gaussian Projection Quality: for both distortion-free pinhole and fisheye camera models, as well as static and rolling-shutter (RS, top-top-bottom shutter direction) poses, we evaluate the Kullback–Leibler (KL ↓) divergence of each Gaussian projected using either EWA (•) or UT-based (•) projections against Monte-Carlo-based reference projection. The distribution of KL-divergences for each rendering is shown in the histograms below*
-
 ![[assets/figures/papers/paper_list_l49_https_arxiv_org_abs_2412_12507/figures/005_Table_1.jpg]]
 *Table 1: Quantitative results of our approach and baselines on the MipNERF360 [1] and Tanks & Temples [21] datasets*
 
@@ -290,14 +264,6 @@ $$ \mathcal{L} = \mathcal{L}_2 + 0.2 \mathcal{L}_{\mathrm{SSIM}} $$
 
 ![[assets/figures/papers/paper_list_l49_https_arxiv_org_abs_2412_12507/figures/022_Table_6.jpg]]
 *Table 6: Detailed evaluation results of our methods on the Tanks & Temples [21] dataset*
-
-![[assets/figures/papers/paper_list_l49_https_arxiv_org_abs_2412_12507/figures/023_Table_7.jpg]]
-*Table 7: Per-scene evaluation results of our methods on the MipNeRF360 [1] dataset*
-
-![[assets/figures/papers/paper_list_l49_https_arxiv_org_abs_2412_12507/figures/024_Table_8.jpg]]
-*Table 8: Per-scene evaluation results of our methods on the Scannet++ dataset*
-
-
 
 ## 定位与知识库关联
 
@@ -389,8 +355,6 @@ $$c(\pmb{o},\pmb{d}) = \sum_{i=1}^{N} c_i(\pmb{d}) \alpha_i \prod_{j=1}^{i-1} (1
 ### 4. 知识库定位总结
 
 3DGUT 的核心知识贡献在于提出了一个**统一的投影-渲染框架**，其关键洞察是：**通过 UT 近似粒子分布而非近似投影函数**。这一框架将 3DGS 的适用边界从“针孔相机 + 主光线”扩展到“任意非线性相机 + 次级光线”，同时保持了光栅化的高帧率优势。在知识谱系中，3DGUT 是 3DGS 和 3DGRT 之间的桥梁——它继承了前者的光栅化效率，对齐了后者的渲染表达，从而实现了两者的优势互补。
-
-
 
 ## 原文 PDF
 

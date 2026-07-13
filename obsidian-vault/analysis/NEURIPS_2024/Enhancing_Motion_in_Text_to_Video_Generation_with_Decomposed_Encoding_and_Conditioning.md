@@ -50,15 +50,11 @@ claims:
 
 实验结果表明，DEMO在多个基准数据集上取得了运动动态性和整体视频质量的显著提升。在MSR-VTT上，FVD从557降至422，FID从14.89降至11.77；在EvalCrafter上，运动评分Flow Score从2.51提升至4.89，Motion AC-Score从44提升至58。消融实验进一步验证了各损失组件的必要性：移除视频-运动损失后，Motion AC-Score骤降至46，运动提升效果有限。同时，论文也指出了方法的局限性，包括无法生成文本指定的顺序动作、运动增强可能伴随时序闪烁的轻微增加等。
 
-
-
 文本到视频生成（Text-to-Video Generation, T2V）的目标是根据自然语言描述合成逼真且动态的视频。近年来，基于潜在视频扩散模型（Latent Video Diffusion Models, LVDMs）的方法在这一领域取得了显著进展，其核心架构通常采用3D U-Net，通过空间与时间维度的自注意力和交叉注意力机制，在压缩的潜空间中逐步去噪以生成视频帧。然而，现有T2V模型在生成视频的运动质量方面仍存在明显不足——生成的视频往往呈现静态或仅有微弱运动的场景，与文本中描述的动作语义之间存在显著差距。
 
 这一瓶颈的根源在于两个关键环节的设计缺陷。首先，**文本编码器对运动信息的表征能力不足**。目前主流的T2V模型普遍采用CLIP文本编码器提取文本特征，但如本研究通过先导实验（Figure 1）所揭示的，CLIP编码器对表示运动的词性（如动词）的敏感性显著低于对表示内容的词性（如名词）的敏感性。当文本中包含丰富的动作描述时，编码器倾向于忽略这些动态信息，导致后续生成过程缺乏有效的运动语义引导。其次，**文本条件机制缺乏时间维度的运动整合能力**。现有模型的条件注入方式仅通过逐帧的空间交叉注意力实现，每一帧独立地融合文本特征，缺少跨帧的运动信息交互通道。这种设计使得模型难以从文本中捕捉和传递时序动态信息，即使文本编码器能够提取运动特征，这些特征也无法有效转化为视频中的连贯运动。
 
 针对上述问题，本文提出DEMO（Decomposed Encoding and Conditioning for Motion Enhancement），其核心动机是：**将文本编码和条件机制分解为内容与运动两个独立分支，通过专门的编码器增强运动语义提取，通过时间维度的条件模块实现运动信息注入，并辅以双重运动监督信号保障运动生成质量**。这一设计使得模型能够在保持静态内容生成质量的前提下，显著提升生成视频的运动动态性和真实感。
-
-
 
 ## 核心方法与创新机理
 
@@ -114,10 +110,6 @@ $$\mathcal{L}_{\text{video-motion}} = \mathbb{E}_{t, z_0, \epsilon \sim \mathcal
 这三个改动槽位形成因果链条：运动编码器提取运动敏感的文本表示 → 运动条件模块在时间维度注入该表示 → 视频-运动损失直接约束生成结果的运动模式。三者协同作用，使DEMO在MSR-VTT上FVD从557降至422、FID从14.89降至11.77（Table 1），在EvalCrafter上Flow Score从2.51提升至4.89（Table 4）。
 
 
-
-![[assets/figures/papers/paper_list_l14_Enhancing_Motion_in_Text_to_Video_Generation_with_Decomposed_Encoding_an/figures/001_Figure_2.jpg]]
-*Figure 2: Overview of DEMO Training. As shown in the left-hand side, DEMO incorporate dual text encoding and text conditioning (for simplicity, other layers in the UNet are omitted). As shown in the right-hand side, during training, the $\mathcal { L } _ { \mathrm { t e x t - m o t i o n } }$ is used to enhance motion encoding, the $\mathcal { L } _ { \mathrm { r e g } }$ is used to avoid catastrophic forgetting, the $\cdot$ is to enhance motion integration. The snowflakes and flames denote frozen and trainable parameters, respectively
-
 DEMO 的整体框架围绕一个核心洞察展开：现有文本到视频（T2V）模型中的文本编码器偏向于表示静态内容而忽略运动动态，且条件机制仅进行逐帧空间交叉注意力，缺乏时间维度上的运动信息整合。为解决这一问题，DEMO 在标准潜变量视频扩散模型（LVDM）的基础上，将文本编码与文本条件过程分别分解为内容与运动两个独立分支，并通过三个额外的监督信号——文本-运动损失、正则化损失和视频-运动损失——来分别增强运动编码和运动生成。
 
 ### Pipeline 结构与模块关系
@@ -145,8 +137,6 @@ DEMO 的整体框架围绕一个核心洞察展开：现有文本到视频（T2V
 
 - **运动编码器的有效性**：先导研究（Figure 1）表明，原始 CLIP 文本编码器对表示运动的词性（如动词）的敏感性显著低于对表示内容的词性（如名词）。仅使用文本-运动损失微调会导致灾难性遗忘；只有联合使用正则化损失时，运动编码器才能在保持内容敏感性的同时显著提升运动敏感性。
 - **视频-运动损失的必要性**：消融实验（Table 4, Table 6）显示，仅添加运动编码器而不使用视频-运动损失时，MSR-VTT 上的 FVD 仅从 557 降至 552，EvalCrafter 上的 Motion AC-Score 仅为 46；而完整模型将 Motion AC-Score 提升至 58，证明了视频-运动监督对于生成强运动动态的关键作用。
-
-
 
 ### 3.1 基础扩散框架
 
@@ -216,8 +206,6 @@ $$\mathcal { L } = \mathcal { L } _ { \mathrm { d i f f u s i o n } } + \alpha \
 
 其中 $\alpha$、$\beta$、$\gamma$ 为超参数权重，完整训练超参数见 Table 7。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -226,27 +214,20 @@ DEMO在多个零样本文本到视频生成基准上对运动动态性和视频�
 
 **MSR-VTT零样本结果**（Table 1）显示，DEMO在视频质量指标上取得显著提升：FVD从557降至422（降低135），FID从14.89降至11.77（降低3.12），同时CLIPSIM从0.2941微升至0.2965，表明文本-视频对齐能力得到保持。值得注意的是，ModelScopeT2V微调版本仅将FVD降至552，说明DEMO的改进并非单纯来自额外微调。
 
-
 ![[assets/figures/papers/paper_list_l14_Enhancing_Motion_in_Text_to_Video_Generation_with_Decomposed_Encoding_an/figures/003_Table_1.jpg]]
 *Table 1: Results of zero-shot T2V generation on MSR-VTT (Evaluation protocol comparison can be found in the appendix)*
 
 **WebVid-10M域内验证**（Table 3）进一步验证了方法的有效性：FVD从508降至351（降低157），FID从10.80降至8.98，CLIPSIM从0.3105提升至0.3142，表明在训练分布内DEMO同样具有稳定的质量增益。
-
 
 ![[assets/figures/papers/paper_list_l14_Enhancing_Motion_in_Text_to_Video_Generation_with_Decomposed_Encoding_an/figures/005_Table_3.jpg]]
 *Table 3: Results of T2V generation on WebVid-10M (Val)*
 
 **运动质量专项评估**是DEMO的核心验证维度。在EvalCrafter基准（Table 4）上，运动评分Flow Score从2.51提升至4.89（提升95%），Motion AC-Score从44提升至58（提升14分），验证了运动动态性的显著增强。在VBench基准（Table 5）上，Motion Dynamics从62.50提升至68.90（提升6.40），进一步确认了运动质量的改善。
 
-
 ![[assets/figures/papers/paper_list_l14_Enhancing_Motion_in_Text_to_Video_Generation_with_Decomposed_Encoding_an/figures/006_Table_4.jpg]]
 *Table 4: Results of zero-shot T2V generation on EvalCrafter*
 
-![[assets/figures/papers/paper_list_l14_Enhancing_Motion_in_Text_to_Video_Generation_with_Decomposed_Encoding_an/figures/007_Table_5.jpg]]
-*Table 5: Results of zero-shot T2V generation on VBench*
-
 **UCF-101零样本结果**（Table 2）显示，DEMO的FVD从647降至576，但IS从36.21微降至35.79——模型可能因过度关注运动而略微限制了生成多样性，这构成一个值得注意的权衡。
-
 
 ![[assets/figures/papers/paper_list_l14_Enhancing_Motion_in_Text_to_Video_Generation_with_Decomposed_Encoding_an/figures/004_Table_2.jpg]]
 *Table 2: Results of zero-shot T2V generation on UCF-101 (Evaluation protocol comparison can be found in the appendix)*
@@ -263,12 +244,10 @@ DEMO在多个零样本文本到视频生成基准上对运动动态性和视频�
 
 **视频-运动损失的关键作用**（Table 4, Table 6）是最具决定性的消融发现。去除$\mathcal{L}_{\text{video-motion}}$后，EvalCrafter上的Motion AC-Score从58骤降至46，运动提升极为有限。在MSR-VTT上，仅添加运动编码器而不使用视频-运动损失时，FVD仅从557降至552（改进仅5点），而完整DEMO降至422（改进135点）。这明确证明：视频-运动监督是驱动生成强运动动态的核心因果机制，运动编码器单独存在不足以产生显著的运动质量增益。
 
-
 ![[assets/figures/papers/paper_list_l14_Enhancing_Motion_in_Text_to_Video_Generation_with_Decomposed_Encoding_an/figures/008_Table_6.jpg]]
 *Table 6: Ablation study on additional parameters in motion encoder*
 
 **方法泛化性验证**（Table 11）将DEMO方法应用于**ZeroScope**基线，同样观察到一致的性能提升，表明分解编码与条件的设计不依赖于特定的基础模型架构。
-
 
 ![[assets/figures/papers/paper_list_l14_Enhancing_Motion_in_Text_to_Video_Generation_with_Decomposed_Encoding_an/figures/014_Table_11.jpg]]
 *Table 11: Quantitative results on ZeroScope*
@@ -281,25 +260,7 @@ DEMO在多个零样本文本到视频生成基准上对运动动态性和视频�
 
 **视觉质量上限受限**于训练数据。Table 8显示DEMO使用WebVid-10M数据集训练，而LaVie和VideoCrafter2使用了更高质量的Vimeo-25M和JDB数据集，因此DEMO在纯视觉质量上仍存在差距——这是数据约束而非方法缺陷。
 
-
-![[assets/figures/papers/paper_list_l14_Enhancing_Motion_in_Text_to_Video_Generation_with_Decomposed_Encoding_an/figures/011_Table_8.jpg]]
-*Table 8: Training dataset of current T2V models*
-
 **过拟合迹象**：论文指出继续微调仅带来边际视频质量改进，且CLIPSIM出现轻微退化，表明当前训练策略存在性能饱和点。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l14_Enhancing_Motion_in_Text_to_Video_Generation_with_Decomposed_Encoding_an/figures/010_Table_7.jpg]]
-*Table 7: Training Hyperparameters*
-
-![[assets/figures/papers/paper_list_l14_Enhancing_Motion_in_Text_to_Video_Generation_with_Decomposed_Encoding_an/figures/012_Table_9.jpg]]
-*Table 9: Comparison of different evaluation protocol on MSR-VTT*
-
-![[assets/figures/papers/paper_list_l14_Enhancing_Motion_in_Text_to_Video_Generation_with_Decomposed_Encoding_an/figures/013_Table_10.jpg]]
-*Table 10: Comparison of different evaluation protocols on UCF-101*
-
-
-
 
 ## 定位与知识库关联
 
@@ -334,8 +295,6 @@ DEMO 的适用边界清晰。它适用于需要增强生成视频中运动动态
 - 如何在不依赖大规模高质量视频数据集的前提下提升视觉质量？
 
 这些问题指向了文本到视频生成领域从“静态质量”向“动态真实感”演进过程中的关键瓶颈：运动建模不仅需要空间-时间维度的解耦，更需要时序因果性和物理一致性的深层建模。DEMO 的分解式框架为后续研究提供了可扩展的架构基础，但其在时序推理和长程运动连贯性方面的能力仍有待突破。
-
-
 
 ## 原文 PDF
 

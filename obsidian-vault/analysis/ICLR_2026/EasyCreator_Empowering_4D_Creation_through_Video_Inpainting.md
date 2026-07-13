@@ -52,8 +52,6 @@ claims:
 
 **主要结果**：在VBench基准上，EasyCreator的总体一致性指标达到0.2915，超越TrajectoryCrafter的0.2463；在Kubric-4D上PSNR达到22.15（对比最佳基线15.82）；在真实场景视频、长视频（>30帧）及挑战性相机运动下均取得SOTA性能。用户研究排名第一。消融实验证实，组合掩码微调是任务可行性的基础（去掉后FID从58.26升至78.27），自迭代调优保障大角度时序一致性（FVD从145.71升至197.24），时间打包推理增强多视图一致性（FVD-V从119.52升至137.64）。
 
-
-
 4D视频创作——即给定一段单目视频，在任意新相机轨迹下生成时空一致且支持内容编辑的新视频——是视觉生成领域的前沿挑战。该任务要求模型同时具备**新视角合成**的几何准确性、**时序一致性**的保持能力，以及**多视图一致性**的全局协调能力。现有方法在这三个维度上存在系统性缺口。
 
 **现有方法的瓶颈**。当前4D生成方法大致分为三类：（1）基于新视角合成的方法，如**GCD**（Hoorick et al., 2024），通常依赖显式3D表示（如点云或NeRF），但在大角度相机运动和复杂动态场景下容易出现几何失真和时序抖动；（2）相机可控视频生成方法，如**Trajectory-Attention**（Xiao et al., 2024b）、**ReCamMaster**（Bai et al., 2025）、**TrajectoryCrafter**（YU et al., 2025），通过注入相机姿态条件来控制生成视角，但缺乏对多视图间一致性的显式建模，导致不同轨迹生成的视频在重叠区域出现内容冲突；（3）基于视频修复的4D方法，如**Reangle-A-Video**（Jeong et al., 2025），将新视角生成视为修复任务，但未充分利用预训练大模型的视频先验，且缺乏针对大角度运动的专门优化。
@@ -61,8 +59,6 @@ claims:
 **核心瓶颈的深层分析**。本文识别出阻碍4D视频生成质量提升的**根本瓶颈**：预训练视频修复基础模型（如Wan2.1-14B）虽然拥有强大的视频先验，但无法直接处理由动态点云渲染产生的遮挡掩码——这类掩码属于分布外（out-of-distribution）信号，与模型训练时见到的随机遮挡掩码存在本质差异。此外，基础模型缺乏三维感知能力，在大角度相机运动下无法保持几何一致性和时序连贯性，导致生成结果出现伪影、闪烁和多视图不一致。
 
 **本文动机**。基于上述分析，本文提出**EasyCreator**，核心动机是将4D视频创作重新定义为**视频修复任务**，通过三个关键设计解锁预训练视频修复模型的4D生成潜力：（1）构建组合掩码数据集，使模型学会处理点云可见性掩码的分布外特性；（2）设计自迭代调优策略，从小视角逐步扩展到大视角，渐进式增强模型的大角度生成能力；（3）提出时间打包推理机制，利用已生成视图的信息引导后续视图生成，显式增强多视图一致性。这一框架在极少量额外训练（约2000步LoRA微调）下，即可实现高质量、多视图一致的4D视频生成与灵活的提示编辑。
-
-
 
 ## 核心方法与创新机理
 
@@ -110,8 +106,6 @@ EasyCreator 的核心创新在于将 4D 视频生成重新定义为**视频修�
 
 三个 changed slots 并非孤立存在，而是形成了一条完整的因果链：**组合掩码**为模型提供了理解 3D 遮挡的基础能力；**自迭代调优**在此基础上逐步扩展视角处理范围；**时间打包推理**则利用已解锁的多视图生成能力进一步提升一致性。这一“数据构造→能力扩展→推理增强”的递进设计，使得 EasyCreator 在仅需约 2 小时单视频优化的条件下，即可实现高质量、多视图一致的 4D 视频生成与灵活的内容编辑。
 
-
-
 EasyCreator 将 4D 视频生成重新定义为**视频修复（video inpainting）**任务，其核心 pipeline 包含四个紧密耦合的模块：**动态点云生成**、**组合掩码构建**、**视频修复基础模型微调**、以及**自迭代调优与时间打包推理**。整体流程如图 Figure 2 所示。
 
 ![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_mU8Ubd8aNK/figures/002_Figure_2.jpg]]
@@ -124,13 +118,6 @@ EasyCreator 将 4D 视频生成重新定义为**视频修复（video inpainting�
 **时间打包推理**：在推断阶段，从已生成视图的修复区域中按面积选取 Top-K 帧作为先验，将其 token 与当前轨迹的洞视频 token 沿时间维度拼接（Eq. 7-8），借助预训练模型的全局时空自注意力机制增强多视图一致性。
 
 **关键瓶颈与因果调节**：预训练视频修复模型无法直接处理由点云渲染产生的分布外遮挡掩码，且缺乏三维感知能力。EasyCreator 通过**组合掩码微调**注入 4D 感知能力，通过**自迭代调优**逐步扩展视角范围，通过**时间打包推理**显式利用多视图重叠区域，三者协同以极少量额外训练解锁高质量、多视图一致的 4D 视频生成与灵活编辑（Figure 4 展示了方法在相机轨迹变化和首帧编辑下的生成画廊）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_mU8Ubd8aNK/figures/003_Figure_4.jpg]]
-*Figure 4: Gallery of our proposed method. Our EasyCreator enables achieving flexible and highquality 4D video creation using the given camera trajectory and the edited first frame (2nd row). Additionally, it also supports the 4D video creation using various prompts in frozen camera (“exhibition” in 4th row and “robot” in 6th row)*
-
-
 
 EasyCreator将4D视频生成重新定义为视频修复任务，其核心由四个关键模块构成，通过组合掩码、自迭代调优与时间打包推理三大策略解锁预训练视频修复基础模型的4D生成能力。
 
@@ -186,19 +173,6 @@ $$x_{input} = [\mathrm{patchify}(\mathcal{E}(\mathbf{F})), \mathrm{patchify}(\ma
 
 借助预训练模型的全局时空自注意力机制，先验帧为当前轨迹的遮挡区域提供多视图上下文约束，从而提升生成结果的多视图一致性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_mU8Ubd8aNK/figures/004_Figure_3.jpg]]
-*Figure 3: Motivation of temporal-packing inference. During the generation, there are existing overlaps (overlap mask) between various camera poses, which enables improving the consistency in multiple views*
-
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_mU8Ubd8aNK/figures/010_Figure_6.jpg]]
-*Figure 6: Ablation study about composite mask (a) and self-iterative tuning (b). Fig. 6 (a) demonstrates that our proposed composite mask not only keeps a smooth camera trajectory during the generation process but also enables the performance of the editing task. Fig. 6 (b) shows that the self-iterative tuning helps maintain a better temporal coherence in a larger camera motion angle*
-
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_mU8Ubd8aNK/figures/011_Figure_7.jpg]]
-*Figure 7: Ablation study of temporal-packing inference*
-
-
-
 ## 实验与关键发现
 
 ### 主要结果
@@ -210,9 +184,6 @@ EasyCreator 在涵盖真实场景视频、生成视频、合成基准及挑战�
 
 ![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_mU8Ubd8aNK/figures/008_Table_3.jpg]]
 *Table 3: Comparison results on Kubric-4D. Red and Blue denote the best and second best results*
-
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_mU8Ubd8aNK/figures/012_Table_1.jpg]]
-*Table 1: User Study Scores. User study scores report the average rank (1=best, 5=worst) for all the methods; lower is better. Red and Blue denote the best and second best results*
 
 从视觉质量与多视图一致性维度看，EasyCreator 同样表现最优。在定量对比中，FID 降至 **58.26**（TrajectoryCrafter 为 61.57），FVD 降至 **145.71**（TrajectoryCrafter 为 154.23），均取得最佳结果（Table 2）。针对真实场景视频，FID 为 **59.14**，优于 TrajectoryCrafter 的 62.49；在长视频（>30 帧）条件下，FVD 为 **165.71**，同样优于 TrajectoryCrafter 的 174.23；在挑战性相机运动（大视角、快速运动）下，FID 为 **65.32**，领先 TrajectoryCrafter 达 5.94（Table 5）。
 
@@ -231,9 +202,6 @@ EasyCreator 在涵盖真实场景视频、生成视频、合成基准及挑战�
 ![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_mU8Ubd8aNK/figures/009_Table_4.jpg]]
 *Table 4: Quantitative ablation results. Red and Blue denote the best and second best results*
 
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_mU8Ubd8aNK/figures/015_Table_4.jpg]]
-*Table 4: Comparison results based on longer videos(>30 frames). We assess visual quality, camera accuracy, and view synchronization. Red stands for the best result, Blue stands for the second best result*
-
 **组合掩码微调（Composite Mask Tuning）** 是方法可行的基础。去除该组件后，模型无法完成 4D 视频生成与编辑任务，视觉质量大幅退化：FID 从 58.26 攀升至 **78.27**，FVD 从 145.71 升至 153.28，CLIP-T 从 33.23 降至 30.81（Table 4, W/o composite mask tuning）。定性结果（Figure 6a）进一步显示，缺乏组合掩码时生成结果出现严重的时序不一致与伪影。
 
 **自迭代调优（Self-Iterative Tuning）** 对大角度相机运动下的时序一致性至关重要。移除该策略后，FVD 从 145.71 升至 **197.24**，FVD-V 从 119.52 升至 157.25，CLIP-V 从 89.87 降至 83.76（Table 4, W/o iterative tuning）。Figure 6b 的视觉对比表明，无自迭代调优时大角度运动下的时序连贯性显著恶化。
@@ -249,8 +217,6 @@ EasyCreator 的失败模式主要源于其依赖链中的上游组件。首先�
 其次，作为**基于拟合的方法**，EasyCreator 需要为每个特定视频进行单独优化，相比一次性调优方法更耗时（约 2 小时），尽管其资源需求相对较低。使用 WAN 模型作为基础模型导致 LoRA 优化时间较长，未来需探索更高效的加速策略。
 
 第三，方法**无法处理自由风格的输入视频**（如缺乏相机参数的视频），受限于预训练基础模型对相机参数等结构化输入的需求。深度估计误差在极端遮挡或高度动态场景下仍可能影响点云质量，进而降低生成结果的几何一致性。
-
-
 
 ## 定位与知识库关联
 
@@ -303,8 +269,6 @@ EasyCreator 的适用性受以下条件约束：
 5. **多模态编辑融合**：文本提示与首帧编辑的最佳融合策略是什么？消融实验（Figure 4）表明两者结合优于单独使用，但其协同机制尚缺乏深入分析。
 
 6. **评估基准完善**：当前评估依赖 VBench、Kubric-4D 等合成或半合成数据集。真实场景下的 4D 生成质量评估缺乏统一的基准和指标，特别是对于多视图一致性的感知评价。
-
-
 
 ## 原文 PDF
 

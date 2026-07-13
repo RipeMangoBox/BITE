@@ -71,8 +71,6 @@ DriveVLA-W0并非一个全新的模型架构，而是一种**训练范式**，�
 
 DriveVLA-W0处于**VLA自动驾驶与世界模型**的交叉点。与BEV-based方法（如**UniAD** (Hu et al., CVPR 2023)、**TransFuser** (Prakash et al., TPAMI 2023)、**Hydra-MDP** (Li et al., arXiv 2024)）不同，它直接使用前视图图像作为VLA输入，无需显式BEV转换或多视图融合。与现有VLA方法（如**AutoVLA** (Zhou et al., NeurIPS 2025)、**ReCogDrive** (Li et al., arXiv 2025)）相比，其关键区别在于引入世界建模作为辅助训练目标，而非仅依赖动作监督。在世界模型方面，该方法借鉴了自回归视觉生成和潜在扩散模型的思想，但将其重新定位为VLA训练的密集监督源，而非独立的生成任务。
 
-
-
 ### 自动驾驶VLA模型的“监督赤字”困境
 
 视觉-语言-动作（VLA）模型已成为端到端自动驾驶的核心范式。这类模型将语言指令、前视图像和过去动作序列交织为多模态输入序列，通过大规模骨干网络（如Emu3 8B或Qwen2.5-VL 7B）直接输出驾驶动作。然而，当前VLA模型面临一个根本性瓶颈：**监督赤字**。模型容量巨大，参数量可达数十亿，但监督信号仅来自稀疏的低维动作标签——通常只是几个轨迹路点的坐标值。这种稀疏的动作监督导致模型的大量表示能力未被利用，无法学习丰富的世界表示，使得数据扩展的收益迅速饱和。
@@ -106,8 +104,6 @@ $$Q = [Q_{\mathrm{VLA}}; Q_{\mathrm{AE}}], \quad K = [K_{\mathrm{VLA}}; K_{\math
 这一设计使推理延迟大幅降低：查询式专家延迟约74ms（仅为基线的63.1%），自回归专家在NAVSIM平均5.6 tokens时仅95ms（基线118ms）。世界建模本身在推理时被跳过以保证实时性，但其在训练中建立的丰富表示已内化到模型参数中。
 
 综上，DriveVLA-W0通过世界建模解决了VLA模型的监督赤字问题，将数据扩展律从饱和转为持续提升，并在仅使用单目相机输入的条件下，在NAVSIM v1/v2上超越了使用多相机+LiDAR的方法，达到最先进水平。
-
-
 
 ## 核心方法与创新机理
 
@@ -163,8 +159,6 @@ $$Q = [Q_{\mathrm{VLA}}; Q_{\mathrm{AE}}], \quad K = [K_{\mathrm{VLA}}; K_{\math
 
 这一创新组合使得DriveVLA-W0在仅使用单目相机输入的条件下，超越了使用多相机和激光雷达的SOTA方法，在NAVSIM v1上达到PDMS 93.0，在NAVSIM v2上达到EPDMS 86.1。
 
-
-
 DriveVLA-W0 的整体训练范式围绕一个核心洞察展开：**通过世界建模提供密集自监督信号，放大视觉-语言-动作（VLA）模型在大规模数据上的扩展规律**。传统 VLA 方法仅依赖稀疏的动作标签作为监督，导致模型容量巨大但表示能力未被充分利用。DriveVLA-W0 在动作监督的基础上，引入预测未来图像的世界建模任务，迫使模型学习环境的底层动态和丰富的预测性世界表示。
 
 ### 输入与标记化
@@ -210,8 +204,6 @@ $$Q = [Q_{\text{VLA}}; Q_{\text{AE}}], \quad K = [K_{\text{VLA}}; K_{\text{AE}}]
 ### 两阶段训练范式
 
 模型采用两阶段训练：第一阶段使用 6VA 序列配置预训练 VLA 骨干，联合优化世界模型损失和动作损失；第二阶段集成动作专家，使用 2VA 输入，仅通过动作损失进行监督。在推理时，世界模型模块被跳过以保证实时性，仅保留动作专家进行高效解码。
-
-
 
 DriveVLA-W0 的核心架构围绕一个关键洞察展开：**通过预测未来图像提供密集自监督信号，解决大型 VLA 模型的“监督赤字”问题**。传统 VLA 仅由稀疏的低维动作信号监督，大量表示能力未被利用；DriveVLA-W0 引入世界建模作为补充训练目标，迫使模型学习环境的底层动态和丰富的预测性世界表示。
 
@@ -269,15 +261,11 @@ $$Q = [Q_{\mathrm{VLA}}; Q_{\mathrm{AE}}], \quad K = [K_{\mathrm{VLA}}; K_{\math
 
 训练采用两阶段范式：第一阶段使用 6VA 序列配置（6 步交错的视觉-动作历史）预训练 VLA 骨干，联合优化世界模型损失和动作损失；第二阶段集成 Action Expert，使用 2VA 输入，仅由动作损失监督。世界建模模块在推理时被跳过以保证实时性，其生成的密集监督信号仅在训练阶段发挥作用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l68_https_openreview_net_forum_id_plrGn3RdzN/figures/002_Figure_2.jpg]]
 *Figure 2: The architecture of DriveVLA-W0, which achieves world modeling in two ways: (a) an AR World Model that predicts discrete visual tokens, and (b) a Diffusion World Model that denoises latent representations conditioned on multimodal inputs*
 
 ![[assets/figures/papers/paper_list_l68_https_openreview_net_forum_id_plrGn3RdzN/figures/003_Figure_3.jpg]]
 *Figure 3: (a) Our Mixture-of-Experts (MoE) architecture pairs a large VLA Expert with a lightweight Action Expert for efficient inference. (b-d) This framework serves as a testbed for comparing three action decoding schemes: query-based, autoregressive, and flow matching*
-
-
 
 ## 实验与关键发现
 
@@ -322,15 +310,9 @@ Figure 4 和 Table 7 揭示了一个关键现象：在仅动作监督下，预�
 ![[assets/figures/papers/paper_list_l68_https_openreview_net_forum_id_plrGn3RdzN/figures/011_Table_7.jpg]]
 *Table 7: World model enhances generalization to new action distributions. This table presents the detailed result of Figure 4*
 
-![[assets/figures/papers/paper_list_l68_https_openreview_net_forum_id_plrGn3RdzN/figures/006_Figure_4.jpg]]
-*Figure 4: World modeling unlocks generalization with data scaling. Our world model turns pretraining from a detriment for sparse-supervision baselines (red arrows) into a benefit for our VLA-W0s (green arrows), enabling positive knowledge transfer across datasets with similar visuals (b) but different action distributions (a). Figure (a) is from Dauner et al. (2024)*
-
 ### 动作专家性能反转
 
 Table 4 展示了一个值得注意的现象：在小规模数据上表现最优的查询式（query-based）动作专家，在 70M 帧大规模数据上被自回归（AR）专家超越。AR 专家在 70M 帧上达到 ADE 1.0069，优于查询式专家的 1.0563。这一反转揭示了**模型容量与精度的权衡**：简单的 AR 解码在大数据下受益于更强的序列建模能力，而查询式专家可能在小数据下因其归纳偏置更有效。
-
-![[assets/figures/papers/paper_list_l68_https_openreview_net_forum_id_plrGn3RdzN/figures/008_Table_4.jpg]]
-*Table 4: Action experts reverse performance with data scaling. For each dataset, all three experts are initialized from an identical pretrained VLA model. Notably, the query-based expert that performs best on the small-scale data is surpassed by the autoregressive expert at the larger scale, highlighting a clear performance reversal*
 
 ### 消融实验
 
@@ -346,9 +328,6 @@ Table 4 展示了一个值得注意的现象：在小规模数据上表现最优
 
 MoE 动作专家大幅降低推理延迟（Figure 6）：查询式专家延迟约 74ms（基线的 63.1%），自回归专家在 NAVSIM 平均生成 5.6 tokens 时仅 95ms（基线 118ms）。流匹配和查询式专家延迟恒定，而 AR 专家和 VLA 基线延迟随生成 token 数线性增长。
 
-![[assets/figures/papers/paper_list_l68_https_openreview_net_forum_id_plrGn3RdzN/figures/012_Figure_6.jpg]]
-*Figure 6: Latency analysis. The latency of the AR expert and the VLA baseline scale linearly with the number of generated tokens L, while the flow matching and query-based experts maintain a constant inference time*
-
 ### 失败模式分析
 
 论文通过 Figure 11 和 Figure 12 展示了两个典型失败模式：
@@ -357,24 +336,11 @@ MoE 动作专家大幅降低推理延迟（Figure 6）：查询式专家延迟�
 
 2. **动态物体预测困难**：世界模型在复杂交叉路口未能预测对面来车的出现，导致规划器在不知潜在冲突的情况下错误执行左转。这指出了精细动态物体建模是未来研究的重要方向。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l68_https_openreview_net_forum_id_plrGn3RdzN/figures/004_Table_1.jpg]]
 *Table 1: Comparison with state-of-the-art methods on the NAVSIM v1. NC: no at-fault collision. DAC: drivable area compliance. TTC: time-to-collision. C.: comfort. EP: ego progress. PDMS: the predictive driver model score. Abbreviations: 1x Cam (single front-view camera), Nx Cam (surroundview cameras), L (LiDAR). ∗: Using the query-based action expert. †: Using the query-based action expert with multiple trajectory anchors following Li et al. (2024b). ‡: Using the AR action expert with the best-of-N (N=6) strategy following Zhou et al. (2025d)*
 
-![[assets/figures/papers/paper_list_l68_https_openreview_net_forum_id_plrGn3RdzN/figures/005_Table_2.jpg]]
-*Table 2: Comparison with state-of-the-art methods on the NAVSIM v2 with extended metrics. NC: No at-fault Collision. DAC: Drivable Area Compliance. DDC: Driving Direction Compliance. TLC: Traffic Light Compliance. EP: Ego Progress. TTC: Time to Collision. LK: Lane Keeping. HC: History Comfort. EC: Extended Comfort. EPDMS: Extended Predictive Driver Model Score*
-
 ![[assets/figures/papers/paper_list_l68_https_openreview_net_forum_id_plrGn3RdzN/figures/009_Table_5.jpg]]
 *Table 5: Ablation study on vision-only vs*
-
-![[assets/figures/papers/paper_list_l68_https_openreview_net_forum_id_plrGn3RdzN/figures/013_Table_8.jpg]]
-*Table 8: Positive Correlation Between Generative Fidelity and Planning Performance. ∗: indicates the images reconstructed by the MoVQGAN encoder-decoder, which serves as an upper bound for generative quality*
-
-![[assets/figures/papers/paper_list_l68_https_openreview_net_forum_id_plrGn3RdzN/figures/015_Table_9.jpg]]
-*Table 9: Ablation on the temporal interval for world model inputs. The results reveal a clear performance trade-off, with a 1-second interval being optimal. Using only the current frame (VA) lacks sufficient temporal context, while a 4-second interval introduces excessive scene variation*
-
-
 
 ## 定位与知识库关联
 
@@ -443,8 +409,6 @@ VLA 方法将视觉-语言模型（VLM）扩展到动作预测，是近年来自
 4. **世界模型生成信息的在线利用**：世界模型生成的未来图像是否可以直接作为额外的输入信息来辅助实时规划？这需要在推理延迟和额外信息收益之间找到平衡。
 
 5. **多模态世界建模的扩展**：如何将 DriveVLA-W0 的世界建模范式扩展到多相机或 LiDAR 输入？是否需要为不同模态设计不同的世界建模目标？
-
-
 
 ## 原文 PDF
 

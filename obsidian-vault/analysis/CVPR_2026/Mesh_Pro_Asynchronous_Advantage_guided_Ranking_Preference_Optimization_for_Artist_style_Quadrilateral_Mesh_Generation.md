@@ -53,8 +53,6 @@ Mesh-Pro针对上述瓶颈提出了三项关键创新。**对角感知tokenizati
 
 实验表明，Mesh-Pro在稠密网格和艺术家网格上均大幅超越此前最优方法。在稠密网格上，相比QuadGPT，倒角距离（CD）降低52.5%，破碎率（BR）从50%降至22%，四边化率（QR）达81%。在艺术家网格上，相比Mesh-RFT，CD降低7.3%，BR从38%降至32%。消融实验证实了异步ARPO各组件、新tokenization以及奖励设计的有效性。Mesh-Pro生成的原生四边形主导拓扑在下游任务（UV展开、纹理绘制、动画）中展现出鲁棒性能。
 
-
-
 ### 3D网格生成：从三角面到艺术家级四边形拓扑
 
 3D网格是计算机图形学、游戏开发与工业设计中最核心的几何表示形式之一。近年来，基于自回归Transformer的网格生成方法取得了显著进展，能够从点云、图像或文本等条件输入中重建出具有高几何保真度的三角网格。然而，**艺术家级别的网格远不止几何精度**——它要求网格具有规整的四边形拓扑结构、流畅的边流（edge flow），以及适合下游任务（如UV展开、纹理绘制、动画绑定）的清洁布局。四边形主导的网格因其规则的结构和良好的细分特性，成为行业标准，但其自动生成仍是一个极具挑战性的开放问题。
@@ -76,8 +74,6 @@ Mesh-Pro针对上述瓶颈提出了三项关键创新。**对角感知tokenizati
 2. **排序偏好优化与优势函数可以互补。** 基于排序的偏好优化（如DPO变体）具有快速稳定收敛的优点，但对奖励分布的显式建模不足；而显式优势最大化方法（如GRPO）在复杂奖励分布下收敛缓慢。将归一化优势函数作为加权机制引入排序偏好优化，可以在保持快速收敛的同时增强泛化能力，实现更好的效率-泛化折中。
 
 3. **tokenization的决策时机决定生成质量。** 将对角感知融入tokenization设计——先生成三角形基面，再在序列末尾决定是否附加第四顶点形成四边形，并在第四顶点中编码对角方向——可以推迟面类型决策、降低预测负担。同时强制全局最小顶点索引排序，能够从根本上减少结构破损。
-
-
 
 ## 核心方法与创新机理
 
@@ -132,8 +128,6 @@ Mesh-Pro 的**对角感知 tokenization** 从根本上解决了这些问题：
 
 消融实验（Fig.7）证实：移除射线奖励导致网格破碎率大幅上升；移除拓扑奖励则使输出质量显著下降，远离艺术家水准。
 
-
-
 Mesh-Pro 的整体 pipeline 围绕“预训练 + 异步在线 RL 后训练”两阶段范式构建，其核心设计目标是生成兼具几何保真度与艺术家级四边形拓扑的混合三角-四边形网格。图 2 给出了架构总览，清晰展示了从输入到输出的完整数据流与模块关系。
 
 **输入与特征提取。** 系统以稠密点云（40,960 点）作为统一输入表示，无论目标网格来源于稠密重建还是艺术家手工建模。点云编码器基于 **Michelangelo** 构建，负责将原始点云压缩为几何条件特征，供后续解码器使用。
@@ -173,12 +167,8 @@ $$R(M_t) = \begin{cases} w_{\mathrm{qr}} \cdot N_{\mathrm{qr}} + N_{\mathrm{ql}}
 
 **输出。** 最终生成的混合三角-四边形网格平均面数约 8k（图 13），在几何一致性（CD、HD）、结构完整性（BR）、四边化率（QR）和用户主观评分（US）上均达到 SOTA 水平。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2204_https_arxiv_org_abs_2603_00526/figures/002_Figure_2.jpg]]
 *Figure 2: Architecture Overview. Mesh-Pro begins by sampling point clouds from the input dense and artist meshes. The features from the point cloud encoder are then passed to an auto-regressive Hourglass Transformer [18] for mesh decoding. This decoder is trained with truncation to output triangle-quad tokens. The pre-training objective is to reconstruct the input mesh. Subsequently, asynchronous ARPO is used for RL post-training to generate high-quality, well-structured meshes, guided by ray and topological rewards*
-
-
 
 ### 对角感知网格Tokenization
 
@@ -250,24 +240,11 @@ $$R(M_t) = \left\{\begin{array}{ll} w_{\mathrm{qr}} \cdot N_{\mathrm{qr}} + N_{\
 - **拓扑奖励**：$N_{\mathrm{qr}}$ 为四边形环（Quad Rings）数量，$N_{\mathrm{ql}}$ 为四边形线（Quad Lines）数量，$w_{\mathrm{qr}}$ 为权重系数。通过鼓励闭合环和开放线的形成，引导模型生成规则的边流和清洁的四边形布局。
 - **Hausdorff距离门控**：$D_{\mathrm{hd}} < \theta_{hd}$ 确保生成网格与输入点云的几何一致性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2204_https_arxiv_org_abs_2603_00526/figures/003_Figure_3.jpg]]
 *Figure 3: Diagonal-Aware Mesh Tokenization. “P” denotes vertex tokens. The minimum vertex always appears first in each face (i.e., lower coordinates). Triangles use padding tokens*
 
 ![[assets/figures/papers/paper_list_l2204_https_arxiv_org_abs_2603_00526/figures/004_Figure_4.jpg]]
 *Figure 4: Asynchronous Online RL Framework*
-
-![[assets/figures/papers/paper_list_l2204_https_arxiv_org_abs_2603_00526/figures/014_Figure_10.jpg]]
-*Figure 10: Illustration of ray casting integrity check. When a ray is cast toward the mesh from a given direction, it may pass through the broken region surrounding a “bad*
-
-![[assets/figures/papers/paper_list_l2204_https_arxiv_org_abs_2603_00526/figures/016_Figure_12.jpg]]
-*Figure 12: Illustration of quad rings and quad lines*
-
-![[assets/figures/papers/paper_list_l2204_https_arxiv_org_abs_2603_00526/figures/018_Figure_14.jpg]]
-*Figure 14: Training loss curves for DPO, GRPO, and ARPO*
-
-
 
 ## 实验与关键发现
 
@@ -327,8 +304,6 @@ Mesh-Pro在稠密网格（来自Hunyuan3D 2.5）和艺术家网格（Toys4k）�
 
 图17展示了Mesh-Pro生成的高质量原生四边形主导拓扑在下游任务中的鲁棒表现，包括UV展开、纹理绘制和动画，证实了其在实际生产管线中的应用价值。与闭源商业方法（Tripo、Hunyuan3D）的定性对比（图16）进一步表明，Mesh-Pro在几何一致性、细节丰富度和拓扑边流质量上均展现出优势。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2204_https_arxiv_org_abs_2603_00526/figures/007_Table_1.jpg]]
 *Table 1: Quantitative comparison on Dense and Artist Meshes*
 
@@ -337,17 +312,6 @@ Mesh-Pro在稠密网格（来自Hunyuan3D 2.5）和艺术家网格（Toys4k）�
 
 ![[assets/figures/papers/paper_list_l2204_https_arxiv_org_abs_2603_00526/figures/008_Table_2.jpg]]
 *Table 2: Effectiveness analysis of each component of asynchronous ARPO. “*” denotes the pretrained model*
-
-![[assets/figures/papers/paper_list_l2204_https_arxiv_org_abs_2603_00526/figures/010_Figure_7.jpg]]
-*Figure 7: Performance curves of asynchronous RL methods and reward function over training steps*
-
-![[assets/figures/papers/paper_list_l2204_https_arxiv_org_abs_2603_00526/figures/015_Figure_11.jpg]]
-*Figure 11: Boundary edge–based reward leads to misjudgments of the multi-component object. When a mesh consists of multiple components, boundary edges (highlighted by the green line) often appear between components. However, this mesh is still a good output and should be encouraged. In Mesh-Pro, the ray-based reward does not suffer from this issue*
-
-![[assets/figures/papers/paper_list_l2204_https_arxiv_org_abs_2603_00526/figures/017_Figure_13.jpg]]
-*Figure 13: Distribution of face count (consisting of a mixture of triangles and quadrilaterals) in Mesh-Pro predictions. Point clouds are sampled from dense meshes and artist meshes. The average face count is approximately 8k*
-
-
 
 ## 定位与知识库关联
 
@@ -426,8 +390,6 @@ Mesh-Pro 的方法设计适用于以下场景：
 5. **数据扩展的边际效应**：Table 4显示数据从400增至1000时BR从22.35%降至21.83%，提升幅度较小。针对更大规模（如500万+）高质量四边形网格数据的预训练和RL扩展，性能提升的边际效应如何？是否存在数据效率的瓶颈？
 
 6. **与闭源商业方法的差距**：Fig.16的定性对比显示Mesh-Pro在几何一致性、细节丰富度和拓扑质量上优于闭源商业方法（Tripo、Hunyuan3D），但缺乏定量指标。如何在标准化benchmark上系统评估与商业方法的差距？
-
-
 
 ## 原文 PDF
 

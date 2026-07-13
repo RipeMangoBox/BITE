@@ -56,8 +56,6 @@ claims:
 
 **局限与开放问题**：模型在处理细节丰富但运动差异微妙的编辑指令时可能失败；当源-目标运动 TMR 相似度较低时，生成结果可能偏离源运动。现有评估主要依赖检索指标，对编辑保真度和运动质量的衡量仍不充分。未来方向包括提升对复杂多步指令的泛化能力、扩展至长序列连续编辑，以及结合物理约束生成更符合动力学的编辑结果。
 
-
-
 ### 问题背景
 
 三维人体运动生成是计算机视觉与图形学中的核心课题，近年来基于扩散模型的文本到运动生成取得了显著进展，如 **MDM**（Tevet et al., ICLR 2023）等模型已能根据自然语言描述生成高质量的运动序列。然而，在实际创作与交互场景中，用户往往并非从零开始生成运动，而是希望对一段已有运动进行局部或全局的修改——例如“将手臂举过头顶”、“放慢动作速度”或“镜像这个动作”。这种**文本驱动的运动编辑**任务要求模型同时满足两个约束：忠实保留源运动中未提及的部分，并精确执行编辑文本所描述的修改。
@@ -77,8 +75,6 @@ claims:
 2. **训练条件扩散编辑模型 TMED**：以源运动和编辑文本为联合条件，训练一个 Transformer 去噪器直接回归目标运动的 SMPL 参数。通过推导条件概率分解，TMED 在采样时引入独立的文本引导尺度 $s_L$ 和源运动引导尺度 $s_{M_S}$，实现对编辑忠实度与源保真度的精细控制（Eq. (5)）。
 
 这一设计将运动编辑从“测试时技巧”提升为“有监督学习问题”，为文本驱动的运动编辑建立了可扩展的范式。
-
-
 
 ## 核心方法与创新机理
 
@@ -119,8 +115,6 @@ TMED 在 MDM（Tevet et al., ICLR 2023）文本到运动扩散框架的基础上
 
 综上，MotionFix 的核心创新可概括为：**以数据构建驱动模型设计，通过三元组数据集使扩散模型学会“源运动+编辑文本→目标运动”的条件映射，并以双引导机制实现可控编辑**。这一思路从根本上改变了文本驱动运动编辑的范式——从测试时的启发式重定向转向训练时的条件生成学习。
 
-
-
 MotionFix 提出了一个完整的文本驱动三维人体运动编辑流水线，其核心由**数据构建**与**条件扩散模型**两大阶段构成。
 
 ### 数据构建流水线
@@ -160,8 +154,6 @@ $$\tilde{e}_{\theta}(M_T, s_{M_S}, s_L) = e_{\theta}(M_T, \emptyset, \emptyset) 
 - **条件注入**：文本经冻结 CLIP 编码，源运动经线性投影后与加噪目标运动在帧维度拼接，通过 SEP Token 分隔。
 - **去噪过程**：Transformer 在时间步、文本、源运动三重条件下逐步去噪。
 - **输出**：编辑后的目标运动 $M_T$，与源运动具有相同的 SMPL 参数化表示，可直接用于下游动画应用。
-
-
 
 ### 运动表示
 
@@ -207,8 +199,6 @@ $$\tilde{e}_{\theta}(M_T, s_{M_S}, s_L) = e_{\theta}(M_T, \emptyset, \emptyset) 
 
 其中 $e_{\theta}(\cdot)$ 为模型预测的分数函数，$s_{M_S}$ 为源运动引导尺度，$s_L$ 为文本引导尺度，$\emptyset$ 表示对应条件置空。通过调节 $s_{M_S}$ 和 $s_L$，可在源运动忠实度与编辑文本遵循度之间取得平衡。消融实验（Figure 4）表明，两个引导尺度需保持适度平衡，极端取值会导致某一维度性能显著下降。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -245,13 +235,6 @@ TMED 在采样时使用两个独立的 classifier-free guidance 尺度：源运�
 
 这些失败模式指向了当前方法的局限性：模型在训练过程中学习的是 MotionFix 数据集中运动对的编辑模式，对于数据分布之外的编辑类型或相似度过低的运动对，其泛化能力有限。此外，现有的检索式评估指标（R@1）主要衡量生成运动与目标运动在嵌入空间中的接近程度，可能无法完全捕捉编辑的精确度和运动质量，这是评估体系本身的一个固有限制。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l6_MotionFix_Text_Driven_3D_Human_Motion_Editing/figures/007_Figure_4.jpg]]
-*Figure 4: Guidances of conditions: We illustrate the R@1 performance of TMED for generated-to-target (left) and generated-to-source (right) retrieval benchmarks for $s _ { L } , s _ { M _ { S } } \in \left$[ 1 , 5 $\right$]
-
-![[assets/figures/papers/paper_list_l6_MotionFix_Text_Driven_3D_Human_Motion_Editing/figures/009_Figure_6.jpg]]
-*Figure 6: Failure cases: We show four failure examples from our model. For each sample, we provide the source motion (red) overlaid both with the generation (blue, left) or the ground-truth target motion (green, right). In the top row, we observe that the model may fail to generate the edited motions when the edit text is detailed and the motions differences are subtle. In the bottom row, although the generated motions follow the edit text, they diverge from the source motions*
 
 ![[assets/figures/papers/paper_list_l6_MotionFix_Text_Driven_3D_Human_Motion_Editing/figures/002_Table_1.jpg]]
 *Table 1: Comparison with existing datasets: MotionFix is the first dataset supporting the task of text-based motion editing*
@@ -262,19 +245,11 @@ TMED 在采样时使用两个独立的 classifier-free guidance 尺度：源运�
 ![[assets/figures/papers/paper_list_l6_MotionFix_Text_Driven_3D_Human_Motion_Editing/figures/006_Table_3.jpg]]
 *Table 3: Effect of training data size in MotionFix: We observe significant performance improvement as we increase the amount of training data*
 
-![[assets/figures/papers/paper_list_l6_MotionFix_Text_Driven_3D_Human_Motion_Editing/figures/011_Table.jpg]]
-*Table: A.1. Statistics of the MotionFix textual data: There are relatively low number of duplicate texts (given 6730 triplets and 5992 unique texts). The vocabulary is diverse (1479 unique words) and the average number of words per text (8.46) has a good trade-off between conciseness and expressiveness*
-
 ![[assets/figures/papers/paper_list_l6_MotionFix_Text_Driven_3D_Human_Motion_Editing/figures/013_Table_2.jpg]]
 *Table 2: Fig. A.1. Word frequencies in the MotionFix dataset: On the left, we display a word cloud for the text annotations in in the dataset. Most frequent words appear in larger fonts. Examples of such words are ‘hand’, ‘arm’ referring to body parts, ‘instead’ referring to the source motion, ‘higher’, ‘lower’, ‘opposite’, ‘slower’ referring to spatial, directional or speed edits. On the right, we show the histogram of the 30 most frequent words in the data. Table A.2. Results on the MotionFix benchmark using the whole test set as a gallery: We evaluate the models in Table 2 of the main paper on the full test set of 1013 samples (as opposed to a random subset of 32). While the retrieval metrics are...*
 
 ![[assets/figures/papers/paper_list_l6_MotionFix_Text_Driven_3D_Human_Motion_Editing/figures/014_Table.jpg]]
 *Table: A.3. Text-based motion editing benchmark on MotionFix test set with different training data sizes. We observe that the performance increases significantly when more data are used during training*
-
-![[assets/figures/papers/paper_list_l6_MotionFix_Text_Driven_3D_Human_Motion_Editing/figures/015_Table.jpg]]
-*Table: 14 • Nikos Athanasiou, Alpár Cseke, Markos Diomataris, Michael J. Black, and Gül Varol*
-
-
 
 ## 定位与知识库关联
 
@@ -337,8 +312,6 @@ TMED 与这些基线的本质区别在于 **训练范式**：基线均为测试�
 - 如何结合更强的时空感知机制，减少模型对源运动的无意识发散？
 - 是否可以自动检测或推断需要编辑的身体部位，以避免依赖外部不完美的自动标注？
 - 该方法能否与物理模拟或动力学约束结合，生成更符合物理规律的编辑？
-
-
 
 ## 原文 PDF
 

@@ -52,8 +52,6 @@ claims:
 
 在FROZENLAKE、MAZE和MINIBEHAVIOR三个视觉导航与操作任务上，VPRL的平均Exact Match达80.6%，比最强文本基线高出27个百分点。其中FROZENLAKE上EM达91.6%，远超闭源模型Gemini 2.5 Pro的72.0%和开源文本SFT的68.6%。随网格复杂度增加，视觉规划的PR曲线保持平坦，而文本推理性能急剧下降，显示出更强的分布外鲁棒性。
 
-
-
 ### 视觉-空间规划中的模态瓶颈
 
 当前多模态视觉-语言模型在空间规划任务中普遍遵循“视觉感知→文本描述→文本推理→动作输出”的流水线。这一范式隐含地将视觉场景转换为语言符号进行推理，再映射回空间动作。然而，该模态转换过程存在根本性信息损失：视觉场景的精确空间布局、物体间的拓扑关系以及动态状态转移往往难以用离散语言符号无损编码。
@@ -79,8 +77,6 @@ claims:
 3. **绕过描述误差**：消除坐标/ASCII描述中23%-26%的布局不匹配错误源。
 
 基于此，本文提出**视觉规划（Visual Planning）**范式，将推理定义为纯粹在视觉模态中自回归生成图像序列的过程，并配套设计**VPRL（Visual Planning via Reinforcement Learning）**两阶段强化学习框架，以解决纯视觉策略的探索与优化问题。
-
-
 
 ## 核心方法与创新机理
 
@@ -142,8 +138,6 @@ $$r(v_{i}, \hat{v}_{i+1}^{(k)}) = \alpha_{\mathrm{opt}} \cdot \mathbb{I}[\mathca
 
 上述三个changed slots的协同作用带来了显著的性能提升：VPRL在三个任务上的平均Exact Match达80.6%，比最强文本基线Qwen SFT的53.6%高出27个百分点。更重要的是，视觉规划在分布外场景下展现出更强的鲁棒性——随网格复杂度增加，VPRL的性能曲线保持平坦，而Gemini 2.5 Pro的EM从98%骤降至38.8%。文本RL基线（GRPO with progress reward或PR metric）均未超过文本SFT，进一步验证了文本模态在视觉-空间任务中存在根本性瓶颈，而非训练策略问题。
 
-
-
 ![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_wsnse46kRO/figures/002_Figure_2.jpg]]
 *Figure 2: An overview of the proposed VPRL framework, illustrated with autoregressive large vision models for image generation in the context of a visual navigation task. We train the visual policy model with GRPO, using the progress reward that encourages progressing actions and penalizes invalid actions, yielding goal-aligned visual planning*
 
@@ -192,8 +186,6 @@ $$\mathcal{T}_{\mathrm{VPRL}}(\theta) = \mathbb{E} \left[ \frac{1}{G} \sum_{i=1}
 ### 两阶段协同机制
 
 Stage 1与Stage 2的分工明确且互补：Stage 1仅提供探索友好的初始化，本身不直接贡献规划能力——实验表明，从Stage 1初始化的VPFT*性能甚至低于标准VPFT（Table 8），证实其角色是**为RL创造探索条件而非传授规划策略**。Stage 2则利用复合进度奖励，引导模型从“能生成有效状态”进化为“能生成最优轨迹”。这一协同使VPRL相比纯监督的VPFT，将因无效动作导致的失败比例降低至少24%（VPFT 61-78%，VPRL 25-37%，Table 6）。
-
-
 
 ### 视觉规划的自回归生成范式
 
@@ -256,8 +248,6 @@ $$\mathrm{EM} = \max_{m \in \{1,\dots,M\}} \prod_{j=1}^{n} \mathbb{I}(\hat{v}_{j
 
 $$\mathrm{PR} = \max_{m \in \{1,\dots,M\}} \frac{1}{n} \sum_{j=1}^{n} \left[ \prod_{k=1}^{j} \mathbb{I}(\hat{v}_{k} = v_{k}^{(m)}) \right]$$
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：视觉规划范式全面超越文本推理
@@ -300,9 +290,6 @@ VPRL 的两阶段 RL 框架是其性能优势的关键。消融实验揭示了�
 
 **Stage 2 的 RL 优化效果**：VPRL Stage 2 相比 Stage 1 在所有三个任务上均有大幅提升（Table 10），验证了 GRPO 配合进度奖励的有效性。VPRL 将因无效动作导致的失败比例相比 VPFT **降低至少 24%**（VPFT 61%-78%，VPRL 25%-37%，Table 6），表明 RL 训练有效约束了动作合法性。
 
-![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_wsnse46kRO/figures/012_Table_6.jpg]]
-*Table 6: We compute the percentage of failed trajectories that are caused by at least one invalid action, rather than a suboptimal but valid action. Lower values indicate better action validity control*
-
 ![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_wsnse46kRO/figures/024_Table_10.jpg]]
 *Table 10: Performance comparison of VPRL Stage 1 and Stage 2 across all three tasks*
 
@@ -312,15 +299,9 @@ VPRL 的两阶段 RL 框架是其性能优势的关键。消融实验揭示了�
 
 在分布外泛化实验中（Table 9），模型在小网格上训练、大网格上评估，视觉规划方法同样表现出更强的迁移能力。
 
-![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_wsnse46kRO/figures/016_Table_9.jpg]]
-*Table 9: Out-of-distribution (OOD) performance on enlarged grids. Models are trained on smaller grids and evaluated on the sizes indicated in parentheses*
-
 ### 推理鲁棒性
 
 VPRL 对生成图像的中间伪影具有鲁棒性。Table 11 显示，推理时使用环境真实图像替换自生成图像，性能几乎不变（平均 EM 91.6 vs 92.1），说明视觉规划不依赖像素级精确重建，而是捕捉了状态转移的语义本质。
-
-![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_wsnse46kRO/figures/031_Table_11.jpg]]
-*Table 11: Exact Match (EM) and Progress Rate (PR) on FROZENLAKE under VPRL when using ground-truth images versus self-generated images as inputs during inference*
 
 此外，在输入图像部分遮挡的扰动条件下，VPRL 仍能保持与可见结构一致的规划轨迹（Figure 12），进一步验证了其鲁棒性。
 
@@ -331,19 +312,6 @@ VPRL 对生成图像的中间伪影具有鲁棒性。Table 11 显示，推理时
 ### 失败模式分析
 
 VPRL 的失败轨迹主要分为两类：**无效动作**（生成的状态不符合环境转移规则）和**非最优有效动作**（动作合法但未朝向目标推进）。Table 6 显示 VPRL 已将无效动作失败比例大幅压缩，但非最优路径仍是剩余错误的主要来源。这提示复合奖励函数中 $\alpha_{\text{nopt}} = 0$ 的设置可能过于保守，适度惩罚非最优动作或引入更细粒度的进度信号可能进一步提升性能。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_wsnse46kRO/figures/009_Table_3.jpg]]
-*Table 3: Distribution of training dataset by grid sizes for each task. Value indicates the number of environments*
-
-![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_wsnse46kRO/figures/010_Table_4.jpg]]
-*Table 4: Number of training and test samples for each task and method. For visual planning, the numbers here are represented in image pairs, which correspond to the same number of trajectories for SFT in Text*
-
-![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_wsnse46kRO/figures/011_Table_5.jpg]]
-*Table 5: Hyper-parameters of training both textual and visual planners*
-
-
 
 ## 定位与知识库关联
 
@@ -390,8 +358,6 @@ VPRL通过两阶段强化学习框架（随机轨迹初始化 + GRPO进度奖励
 5. **更强生成模型的利用**：能否利用扩散模型等更强的图像生成骨干网络，进一步提升规划质量和视觉保真度？
 
 6. **更广泛任务的验证**：该范式在3D空间推理、物理动力学预测、具身操作等更复杂的视觉-认知任务中是否依然有效？这需要构建相应的基准和环境。
-
-
 
 ## 原文 PDF
 

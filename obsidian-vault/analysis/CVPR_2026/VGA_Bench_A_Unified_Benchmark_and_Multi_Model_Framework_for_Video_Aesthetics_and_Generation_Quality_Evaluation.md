@@ -86,8 +86,6 @@ VGA-Bench 的独特贡献在于首次将**美学评估系统性地分解为质�
 
 当前验证主要限于内部人工标注数据集，尚未与 FVD、CLIP Score 等传统客观指标或外部评估模型进行直接数值对比。用户研究规模较小（40份调查），统计稳健性有待加强。此外，美学维度继承自 VADB，对生成视频特有的美学失真（如纹理断裂、时序闪烁）的覆盖是否完备，仍需进一步研究。
 
-
-
 ### 视频生成模型的评估困境
 
 文本到视频生成领域近年来经历了爆发式发展，涌现出大量高质量模型。然而，如何系统、可靠地评估这些模型的输出质量，始终是一个悬而未决的核心挑战。当前主流的评估范式存在两个根本性缺陷：
@@ -111,8 +109,6 @@ VGA-Bench 的核心设计理念在于三点：
 3. **专用评估模型**：训练 VAQA-Net、VTag-Net 和 VGQA-Net 三个多任务神经网络，分别负责美学评分、标签预测和生成质量等级评估，替代外部模型间接推断的旧范式。
 
 通过这种细粒度的评估框架，VGA-Bench 旨在超越传统单一分数评估的局限，为视频生成模型提供更全面、可解释且与人类主观感知更准确对齐的质量画像。
-
-
 
 ## 核心方法与创新机理
 
@@ -145,8 +141,6 @@ VGA-Bench 的核心应对策略是**训练专用的多任务神经网络评估�
 ### 创新边界与待验证问题
 
 需要指出的是，VGA-Bench 的创新集中在**评估框架本身**，而非生成模型的改进。其评估模型仅在内部人工标注数据集上验证准确率，未与传统指标（如 FVD、CLIP Score）或外部评估模型进行直接数值对比，因此无法断言其在所有场景下优于现有指标。此外，美学维度继承自 VADB，对生成视频特有的美学失真（如纹理断裂、时间闪烁）的覆盖是否完备，仍需进一步研究。用户研究规模较小（40份调查），可能影响结论的统计稳健性，这一点需要手动验证。
-
-
 
 VGA-Bench 的整体框架围绕一个核心洞察展开：**将视频评估系统性地分解为美学质量、美学标签、生成质量三大维度共52个细粒度子维度，结合专业人工标注和专用多任务模型，能够超越传统单一分数评估，实现更全面、可解释且与人类主观感知更一致的对齐**。框架的设计直接回应了现有AIGC视频评估基准的瓶颈——将美学质量过度简化为单一分数，并依赖外部模型（如MUSIQ、DINO）进行间接推断，导致美学评估粒度不足、存在显著偏差，无法与人类感知准确对齐。
 
@@ -183,13 +177,6 @@ VGA-Bench 首先建立了一个三层评估分类法，将视频评估分解为�
 ### 输入输出流
 
 整个框架的输入输出流清晰：**输入**为文本提示（通过提示套件生成），**中间产物**为12个模型生成的大规模视频数据集及人工标注子集，**输出**为三个评估模型给出的多维评分、标签和等级。这些输出最终汇聚为对生成模型的全面评估排名——在生成质量维度上，VGA-Bench模型排名与用户排名的Recall@5达到**0.83**，表明评估结果与人类喜好高度一致。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l805_https_arxiv_org_abs_2604_10127/figures/001_Figure_1.jpg]]
-*Figure 1: Overview of VGA-Bench. We propose a unified benchmark and multi-model framework for video aesthetic and generation quality assessment, comprising a Prompt Suite with design guidelines, a large-scale generated video dataset, a subset of human-annotated data, and three trained evaluation models—VAQA-Net, VTag-Net, and VGQA-Net—for assessing video aesthetic quality, aesthetic tags, and generation quality, respectively*
-
-
 
 ### 三层评估维度体系
 
@@ -233,13 +220,6 @@ $$ \hat{y}_d = g_d^{\text{MLP}} \big( [E_{\text{VADB}}(V); E_{\text{CLIP}}(V)] \
 其中 $[\cdot;\cdot]$ 表示特征拼接，$E_{\text{CLIP}}$ 为 CLIP 视觉编码器，$g_d^{\text{MLP}}$ 为第 $d$ 个生成质量维度的预测头。
 
 各模型在人工标注数据集上以分类准确率为优化目标进行监督训练，具体损失函数（如交叉熵或 MSE）原文未详细展开，需参考 VADB 原始工作的训练设置。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l805_https_arxiv_org_abs_2604_10127/figures/003_Figure_2.jpg]]
-*Figure 2: Prompts for the three core dimensions, their corresponding sub-dimensions, and example generated videos*
-
-
 
 ## 实验与关键发现
 
@@ -292,28 +272,12 @@ VGA-Bench 对12个领先的文本到视频生成模型进行了系统评估，�
 - **Table 2-4**：三个评估模型在各自任务上均大幅超越随机基线，证明专用多任务架构的有效性；但色温、视觉纹理等维度的准确率偏低，指向未来改进方向。
 - **Table 5-6 & Figure 6**：Sora2 在美学质量上领先，HunyuanVideo 在生成质量上占优；模型排名与人类偏好在生成质量维度上高度一致（Recall@5=0.83），验证了 VGA-Bench 作为自动化评估工具的可靠性。
 
-![[assets/figures/papers/paper_list_l805_https_arxiv_org_abs_2604_10127/figures/002_Table_1.jpg]]
-*Table 1: Comparison of existing evaluation methods for text-to-video generative models*
-
-![[assets/figures/papers/paper_list_l805_https_arxiv_org_abs_2604_10127/figures/006_Table_2.jpg]]
-*Table 2: 5-Class Accuracy of VAQA-Net*
-
 ### 公平性说明与局限
 
 需注意以下实验设计约束：
 1. 评估模型的准确率仅在内部标注数据集上验证，未与 FVD、CLIP Score 等传统指标或外部评估模型进行直接数值对比，跨基准的绝对性能对齐需进一步研究。
 2. 用户研究样本量较小（40份），Recall@1 在美学维度上仅0.10，该指标的统计稳健性可能不足。
 3. 基准的美学维度继承自 VADB 数据集，对生成视频特有的美学失真（如纹理断裂、语义不一致）的覆盖完备性尚需验证。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l805_https_arxiv_org_abs_2604_10127/figures/007_Table_3.jpg]]
-*Table 3: Accuracy of VTag-Net (Top-2 Predicted Tags Match Ground Truth)*
-
-![[assets/figures/papers/paper_list_l805_https_arxiv_org_abs_2604_10127/figures/008_Table_4.jpg]]
-*Table 4: Accuracy of VGQA-Net*
-
-
 
 ## 定位与知识库关联
 
@@ -353,8 +317,6 @@ VGA-Bench 为视频美学评估建立了新的基准，但留下了两个关键�
 **闭环优化问题**：如何将 VGA-Bench 的多维评估信号有效集成到生成模型的训练或微调回路中，以直接优化美学质量和可控性？当前基准仅提供“评估”功能，尚未打通“评估→反馈→优化”的闭环。将 52 维细粒度信号转化为可微损失函数或强化学习奖励信号，是一个具有高研究价值的方向。
 
 **跨领域泛化问题**：VGA-Bench 在真实世界视频（如电影、纪录片、用户生成内容）上的美学评估能力是否同样适用，仍需跨领域验证。生成视频与真实视频在噪声模式、运动特征和语义一致性上存在本质差异，直接迁移可能导致评估偏差。
-
-
 
 ## 原文 PDF
 

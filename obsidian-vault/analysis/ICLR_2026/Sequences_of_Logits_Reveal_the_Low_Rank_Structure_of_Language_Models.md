@@ -61,8 +61,6 @@ claims:
 
 **局限与开放问题**：理论泛化界（如 Lemma D.18）依赖强假设且不紧凑，难以直接应用；LINGEN 需要大量模型查询以构建回归矩阵，可能被滥用于绕过安全过滤器；低秩观察基于有限子集，尚未对全序列空间提供严格近似保证；此外，低秩性质随序列长度增长的变化、与标准解码策略的直接比较等问题仍有待探索。
 
-
-
 大规模语言模型（LLM）已展现出令人瞩目的生成与推理能力，然而我们对这些模型内部工作机制的理解仍然相当有限。当前研究面临一个核心瓶颈：**缺乏简单、通用的数学抽象来刻画语言模型内在的低维结构**，这使得我们难以对模型行为做出可测试的预测，更无法提供可证明的理论保证。
 
 现有的大多数分析方法往往依赖于特定的架构细节（如 Transformer 的注意力机制或状态空间模型的状态转移），这限制了其普适性。本文试图绕开架构细节，将语言模型视为一个**从序列到序列的顺序概率映射**，从而在统一的视角下研究其结构特性。
@@ -78,8 +76,6 @@ $$\log \Pr_M[f \mid h] \approx \langle \phi(h), \psi(f) \rangle$$
 此外，本文进一步建立了低秩结构与**输入切换仿射网络（ISAN）**之间的理论等价性（Theorem 4.3），表明语言模型等价于一个隐藏维度为 $d$ 的时间变化 ISAN 当且仅当所有时间步的扩展对数概率矩阵的秩不超过 $d$。这为语言模型的学习与表示提供了可证明的理论支撑，并在 logit 查询模型下给出了可证明的学习算法（Theorem 4.4）。
 
 综上，本文的动机在于：**通过对数概率矩阵的低秩结构，为语言模型建立一个架构无关的数学框架，从而实现对模型行为的可预测操控和理论理解**。
-
-
 
 ## 核心方法与创新机理
 
@@ -120,8 +116,6 @@ $$\mathrm{Rank}(\mathcal{L}_M(\Sigma^t, \Sigma^{\leq T-t})) \leq d \quad \forall
 ### 4. 创新边界与局限
 
 需注意，LINGEN的生成质量尚未与标准解码策略（如温度采样、束搜索）进行直接比较，其实用性有待验证。理论泛化界（如Lemma D.18）依赖强假设且不紧凑，难以直接指导实践。此外，低秩结构的观察基于有限的历史/未来子集，尚未对全序列空间提供严格的近似保证。
-
-
 
 本文提出了一套与架构无关的分析框架，将任意语言模型视为从序列到序列的序贯概率映射，并通过**扩展对数概率矩阵**（extended logit matrix）揭示其内在的低维结构。整个工作流程由三个核心模块构成，形成“观测—利用—理论解释”的完整闭环。
 
@@ -170,8 +164,6 @@ $$x_t = A_{z_t, t} \, x_{t-1}, \quad z_t \sim \mathsf{softmax}(B_t \, x_{t-1})$$
 ```
 
 三个模块之间的因果关系清晰：模块一观测到的近似低秩性（奇异值幂律衰减，$\alpha > 1/2$）是模块二可行的必要条件；模块三则为这种可行性提供了严格的数学解释。整个框架不依赖任何特定的模型架构，仅通过 logit 查询接口即可运作，具有广泛的适用性。
-
-
 
 ### 均值中心化对数概率
 
@@ -233,8 +225,6 @@ $$\mathrm{Rank}(\mathcal{L}_M(\Sigma^t, \Sigma^{\leq T-t})) \leq d \quad \forall
 
 该等价性将语言模型的低秩结构从经验观察提升为表示学习的理论基础（Section 4.1）。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：对数概率矩阵的近似低秩结构
@@ -264,12 +254,10 @@ $$D_{\mathsf{KL}}^{\mathsf{avg}}(\mathcal{L}_M(\mathcal{H}, \mathcal{F}), A) \le
 
 **主实验结果。** 在OLMo-1b上，使用wiki数据集构造的提示集（Option 1），LINGEN在15步生成过程中的总KL散度显著低于所有基线（Figure 6）。特别值得注意的是与单token基线（single-token baseline）的对比：该基线仅使用空future（即单步logits）进行线性组合，在第一步表现尚可，但随后KL散度迅速上升，而LINGEN通过利用完整的多步futures信息，在整个生成过程中保持了较低的KL散度。Table 2的生成示例进一步佐证了这一点：LINGEN的生成文本能够合理利用提示中的上下文信息，而单token基线的生成在初始token之后往往偏离主题。
 
-
 ![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_gdZ6J5hZzF/figures/046_Table_2.jpg]]
 *Table 2: Sample generations from LINGEN (Option 1) and single-token baseline. Prompts are shown in gray and italicized, and continuations are shown in black. Samples were not cherry-picked, i.e., the first generation from each prompt was selected. The generations from LINGEN (left) all read well and make clear use of context in the prompt; in contrast, while generations from LINGEN with the single-token logit matrix (right) typically are reasonable for the first token or few, they become derailed soon thereafter*
 
 **分布外设置的鲁棒性。** 在使用无意义futures的Option 2设置下（Figure 1b），LINGEN的KL散度虽高于原位设置，但仍优于所有基线方法。Table 3的生成示例显示，尽管并非所有生成都是目标提示的自然延续，但大多数生成仍能明显利用提示中的信息。这表明低秩结构对futures的语义扰动具有一定鲁棒性。
-
 
 ![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_gdZ6J5hZzF/figures/047_Table_3.jpg]]
 *Table 3: Sample generations from LINGEN and single-token baseline with Hnonsense (i.e., Option 2), for the same 5 target prompts as in Table 2. Prompts are shown in gray and italicized, while LINGEN’s generations are in black. While not all of the generations are natural continuations of the target prompt, most of the generations show clear use of information from the prompt*
@@ -306,12 +294,8 @@ $$D_{\mathsf{KL}}^{\mathsf{avg}}(\mathcal{L}_M(\mathcal{H}, \mathcal{F}), A) \le
 | Figure 12 | 不同模型间的列空间存在显著主角度重叠，暗示跨模型表示迁移 |
 | Table 2 | LINGEN生成文本合理利用上下文，单token基线生成后期偏离主题 |
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_gdZ6J5hZzF/figures/045_Table_1.jpg]]
 *Table 1: For 10 values of h $\in \mathcal$ H (left column) we display the history $h ^ { \prime } \in \mathcal { H } , h ^ { \prime } \ne$ h minimizing the distance between the respective rows of the logits matrix, i.e., \| $\dot { \mathcal { L } _ { M } } ( \{$ h $\} , \mathcal { F }$ ) - $\dot { \mathcal { L } } _ { M } ( \{ h ^ { \prime } \} , \mathcal { F }$ ) \|$_ { 2 } ^ { \infty }$ . Examples were not cherry-picked (they correspond to the first 10 examples in the set H described in Section 3.1, as obtained from wiki)
-
-
 
 ## 定位与知识库关联
 
@@ -365,8 +349,6 @@ LINGEN 的关键特性在于：**生成过程完全不需要查询目标提示�
 - **安全攻击与防御**：LINGEN 或其变体是否能够通过拆分目标提示来绕过安全防护？该框架是否暗示了针对此类攻击的防御技术？
 - **近似低秩的理论扩展**：能否将理论结果扩展到近似低秩情形，并确定哪些近似度量（如全变差 vs 矩阵范数）在理论上可行且贴近实践？
 - **架构偏置的起源**：为什么未训练的模型（如 OLMo-1b step 0）也显示出比随机子空间稍多的列空间重叠（Figure 12）？这是否源于架构的归纳偏置？
-
-
 
 ## 原文 PDF
 

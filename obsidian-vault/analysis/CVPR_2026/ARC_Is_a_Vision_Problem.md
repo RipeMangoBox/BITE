@@ -52,8 +52,6 @@ claims:
 
 VARC 的方法定位具有显著特点：仅使用 ARC 数据和 RE-ARC 扩充进行训练，未利用互联网规模预训练数据；模型参数规模远小于主流 LLM；测试时训练独立于每个测试任务，确保评估的严格性。这一工作表明，ARC 本质上是一个视觉问题，视觉驱动的范式为抽象推理提供了更简洁、更高效的路径。
 
-
-
 ARC（Abstraction and Reasoning Corpus）是一个用于评估通用人工智能抽象与推理能力的基准。每个 ARC 任务由极少量的输入-输出网格对（通常 2–4 对）作为演示，要求模型从这些示例中推断出隐含的转换规则，并将其应用于新的测试输入。ARC 的核心挑战在于任务的高度多样性：训练集、评估集与测试集之间的任务互不重叠，模型必须在少样本条件下实现跨任务泛化。
 
 现有方法主要沿两条路径展开。一类是**基于语言或循环推理的模型**，例如将网格序列化为离散 token 后送入 Transformer 解码器或循环网络进行自回归生成。代表性工作包括 **HRM**（Hierarchical Reasoning Model, Wang et al., arXiv 2025）和 **TRM**（Transductive Reasoning Model），它们从零开始在 ARC 数据上训练，但精度有限（HRM 在 ARC-1 上 pass@2 仅 40.3%，TRM 为 44.6%）。另一类是**大规模语言模型（LLM）**，如 GPT-5、o3-mini-high、Deepseek R1、Claude 3.7 等，借助互联网规模的预训练知识进行推理，但它们在 ARC-1 上的最优表现（GPT-5 为 44.0%）同样未超越循环模型，且计算成本极高。此外，**ViT-ARC**（Li et al., 2024）曾尝试直接使用视觉模型拟合训练任务，却未能实现泛化。
@@ -61,8 +59,6 @@ ARC（Abstraction and Reasoning Corpus）是一个用于评估通用人工智能
 这些方法的共同瓶颈在于：**未能充分利用 ARC 任务固有的视觉与空间结构**。ARC 的底层概念——如反射、对称、重力、物体计数等——天然与视觉和物理世界紧密相关（Figure 1）。然而，将网格展平为 token 序列会破坏 2D 空间拓扑，使模型丧失对平移、缩放、局部邻域等基本视觉不变性的归纳偏置。语言模型则进一步受限于离散符号推理的路径，缺乏对连续空间变换的隐式建模能力。
 
 本文提出 **Vision ARC (VARC)** 框架，核心洞察是：**将 ARC 重构为图像到图像的翻译问题**，使标准视觉模型能够从少量视觉演示中隐式学习空间不变性和组合性规则，而无需显式符号推理或大规模语言预训练。具体而言，VARC 将 ARC 任务建模为逐像素分类（类似语义分割），采用视觉 Transformer（ViT）或卷积 U-Net 作为骨干网络，结合 2D 位置编码、画布增强与补丁化等视觉先验，并通过两阶段训练（离线训练 + 测试时训练）实现少样本适应。这一范式转换使仅 18M 参数的 ViT 模型在 ARC-1 上达到 54.5% 的 pass@2 准确率，集成后更达到 60.4%，超越所有从零训练的循环模型，并接近人类平均水平（60.2%）。
-
-
 
 ## 核心方法与创新机理
 
@@ -113,8 +109,6 @@ VARC 摒弃了自回归生成或递归迭代，采用**前馈单次推理**：�
 
 这些创新使 VARC 以仅 **18M 参数**（远小于数十亿参数的 LLM）在 ARC-1 上达到 **54.5%** 的单模型准确率，超越从零训练的循环方法 TRM（44.6%），集成后达到 **60.4%**，与人类平均水平（60.2%）持平（Table 3）。值得注意的是，VARC 仅使用 ARC 数据和 RE-ARC 扩充进行训练，未利用互联网规模预训练数据，确保了对比的公平性。
 
-
-
 VARC 将 ARC 基准重构为**图像到图像翻译**问题，以逐像素分类的形式进行建模，类似于语义分割任务。整个 pipeline 由离线训练和测试时训练两个阶段构成，核心模块包括输入预处理、视觉主干网络、任务条件化以及多视图推理。
 
 ### 输入预处理与画布增强
@@ -152,15 +146,11 @@ $$\mathcal{L}(\theta) = \mathbb{E}_{T,i} \left[ \mathcal{D}(y_i, f_{\theta}(x_i 
 
 其中 $f_{\theta}$ 为以任务 $T$ 为条件的神经网络，$\mathcal{D}$ 为模型输出与真实标签 $y_i$ 之间的逐像素交叉熵损失。该目标在离线训练阶段对所有训练任务进行优化，在测试时训练阶段对单个未见任务进行微调。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2511_14761/figures/001_Figure_1.jpg]]
 *Figure 1: The ARC benchmark (top) consists of a collection of many different tasks, where each task has a few (e.g., 2-4) examples. We propose the Vision ARC (VARC) framework, which addresses the ARC problem as an image-to-image translation problem, from a computer vision perspective (bottom). In this illustration, the underlying concepts of the three tasks can be roughly described by humans as: “reflection” (left), “symmetry” (middle), and “gravity” (right). These concepts are closely related to the visual and physical world*
 
 ![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2511_14761/figures/005_Figure_5.jpg]]
 *Figure 5: The ViT architecture in VARC. The input is randomly placed on a canvas, which is then treated as a natural image and processed by a standard ViT, conditioned on the task token*
-
-
 
 VARC 将 ARC 推理任务重构为图像到图像的逐像素分类问题，其核心架构由五个关键模块串联构成，整体遵循“预处理→嵌入→编码→条件调节→分类”的流水线设计。
 
@@ -183,13 +173,6 @@ $$\mathcal{L}(\theta) = \mathbb{E}_{T,i} \left[ \mathcal{D}(y_i, f_{\theta}(x_i 
 **测试时训练模块。** 对于未见过的测试任务，VARC 在推理前先用少量演示对进行微调。TTT 阶段通过翻转、旋转（90°、180°、270°）和颜色置换将单个任务扩充为多个辅助任务，同时继续应用平移和缩放增强。实验表明，独立对每个测试任务进行 TTT 比联合所有测试任务训练高出约 10 个百分点（Figure 9），说明任务特异性微调对泛化至关重要。
 
 **多视图推理与投票。** 推理时，模型对同一输入生成多个随机视图的预测，通过多数投票保留前 2 个最可能的输出用于 pass@2 评估。多视图推理将 pass@1 准确率从 35.9% 提升至 49.8%，最终实现 54.5% 的 pass@2 准确率（Table 2）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2511_14761/figures/004_Figure_4.jpg]]
-*Figure 4: The raw input undergoes random scale and translation transformations and is placed on the “canvas” (denoted in gray)*
-
-
 
 ## 实验与关键发现
 
@@ -246,27 +229,8 @@ VARC 在 ARC-1 基准上取得了与人类平均水平相当的准确率。如 *
 
 4. **增强策略的局限性**：当前方法依赖手工设计的增强策略（翻转、旋转、颜色置换），可能无法覆盖所有可能的任务变换类型，限制了模型对更复杂变换的泛化能力。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2511_14761/figures/008_Figure_7.jpg]]
-*Figure 7: Effects of visual priors in VARC. Accuracy is reported on the ARC-1 evaluation set. The model used is ViT-18M. Entries (a-c) use a patch size of 1×1 on a 32×32 canvas, whereas entries (d-f) use a patch size of 2×2 on a 64×64 canvas. Each entry modifies the one above it. We start from a na¨ıve baseline with components (b-f) removed. These vision priors cumulatively yield 27.7 improvement (a→f), in which the canvas-based designs (c→f) contribute an 11.5 gain*
-
 ![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2511_14761/figures/007_Table_1.jpg]]
 *Table 1: Vision backbones. We compare variants of ViTs and U-Nets of similar sizes. U-Net settings are in appendix*
-
-![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2511_14761/figures/012_Table_2.jpg]]
-*Table 2: Single-view vs. multi-view inference*
-
-![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2511_14761/figures/009_Figure_8.jpg]]
-*Figure 8: Scalability: ViTs with different width (x-axis) and depth. The circle areas denote model sizes*
-
-![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2511_14761/figures/010_Figure_9.jpg]]
-*Figure 9: TTT strategies: with vs. without offline training, and joint vs. independent for each task*
-
-![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2511_14761/figures/024_Figure_17.jpg]]
-*Figure 17: Successful and failed examples on ARC-1. (Top): Examples of test tasks successfully solved by VARC. (Bottom): Examples of test tasks unsolved by VARC. (Left): Two demonstration example pairs shown for each task (some have more demonstrations not shown here). (Right): Inference input and the first and second solutions proposed by VARC. The green box indicates the correct output*
-
-
 
 ## 定位与知识库关联
 
@@ -325,8 +289,6 @@ TTT 期间的辅助任务增强（翻转、旋转、颜色置换）是关键的�
 4. **测试时训练的效率**：TTT 对每个测试任务独立微调，计算成本随任务数量线性增长。能否通过元学习或参数高效微调（如 LoRA）降低 TTT 成本，同时保持独立训练的泛化优势？
 
 5. **歧义的显式建模**：对于存在多种合理解释的任务，当前方法缺乏对歧义的显式表征。引入概率推理或生成式建模（如扩散模型）来捕捉输出分布的多模态性，可能是一个有前景的方向。
-
-
 
 ## 原文 PDF
 

@@ -55,8 +55,6 @@ claims:
 
 **方法定位**：SeNaTra 属于基于分组的分层视觉骨干方法，在架构层面将分割能力内嵌到骨干网络中，区别于依赖专用分割头（如 UperNet、Mask2Former）的传统范式。它继承了标准分层 Transformer 的四阶段结构，但将下采样操作从“均匀网格”替换为“内容感知分组”，将上采样操作从“双线性插值”替换为“分组分配矩阵的组合”。这一设计使其既能原生输出分割掩码，又能无缝集成到现有分割框架中。
 
-
-
 ### 视觉骨干网络中的均匀下采样困境
 
 现代视觉骨干网络——无论是卷积架构还是Transformer架构——普遍采用均匀网格下采样（如池化、跨步卷积）来构建层次化特征金字塔。这种操作对所有空间位置一视同仁，完全不感知图像内容。当这些骨干网络被应用于语义分割、全景分割等像素级密集预测任务时，均匀下采样带来的特征错位问题便暴露无遗：边界区域的像素可能被错误地合并到相邻语义区域中，迫使下游的解码器头承担额外的补偿负担。
@@ -82,8 +80,6 @@ Figure 1 清晰地展示了这一困境：传统骨干网络（上图）通过�
 3. **端到端可微且可扩展**：分组操作完全可微，支持标准反向传播训练，且通过局部稀疏化设计将计算复杂度控制在可接受范围内。
 
 这种“原生分割”范式从根本上重新思考了视觉骨干网络的设计：骨干网络不应仅仅是特征提取器，而应成为分割任务的一等公民。
-
-
 
 ## 核心方法与创新机理
 
@@ -128,8 +124,6 @@ $$A_{l\to l-k}^{\mathsf{ups}} := A_{l-k+1}^{\mathsf{ups}} \times \cdots \times A
 
 这一设计使分割能力从“解码器补偿”转变为“骨干内建”，在零样本分割、有监督语义分割和全景分割三个场景下均实现了对标准骨干的显著超越，同时保持了端到端的可微性和可扩展性。
 
-
-
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2505_16993/figures/002_Figure_2.jpg]]
 *Figure 2: Overall model design. Visualization of our hierarchical architecture and its key components. (a) Our backbone architecture consists of four processing stages interconnected by content-aware grouping layers for downsampling. (b) Core operations of our Spatial Grouping Layer, which computes soft token assignments and updates group features iteratively (detailed in Algorithm 1). (c) The composition of learned assignment matrices across grouping layers in consecutive backbone stages enables principled feature upsampling*
 
@@ -164,8 +158,6 @@ SeNaTra 的 pipeline 由以下关键模块构成，其整体架构如 **Figure 2
 ### 与传统范式的本质区别
 
 传统分割流程（如 **Swin Transformer** 或 **NAT** 搭配 **UperNet**/**Mask2Former**）依赖均匀下采样提取特征，再通过专用的分割头（像素解码器 + Transformer 解码器）进行上采样和掩码预测。SeNaTra 将分割能力内化到骨干网络中：分组层在下采样时已学习对齐语义边界，上采样则直接复用分组分配矩阵的转置乘积，无需额外的双线性插值或可学习的上采样模块。这种设计使分割掩码从骨干网络中自然涌现，而非依赖外部分割头的补偿。
-
-
 
 ### 整体架构：四阶段层次化骨干网络
 
@@ -202,8 +194,6 @@ $$
 
 每个阶段内部使用标准 Transformer 编码器块进行特征处理。SeNaTra 将自注意力层中的相对位置偏置替换为 **RoPE**（旋转位置编码），并使用局部自注意力机制。不同模型变体（Tiny/Base/Large）的阶段层数、输出维度和 MLP 比率详见 Table 5，输出嵌入维度分别为 512、1024 和 1536。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -222,9 +212,6 @@ SeNaTra 的实验覆盖三种监督范式：无掩码监督（图像分类与图
 #### 零样本文本监督语义分割
 
 Table 1 展示了 SeNaTra 在六个基准上的零样本分割性能。SeNaTra-B（CC3M+CC12M）在 Pascal VOC 上达到 **61.3 mIoU**，较 TCL 的 55.0 提升 **+6.3**，六个数据集平均 mIoU 为 **31.9**。额外使用 RedCaps12M 数据后，平均 mIoU 进一步提升至 **33.1**。值得注意的是，SeNaTra 在多数基准上超越了一众专用方法，包括那些利用 CLIP 在 4 亿图像-文本对上预训练的模型，且完全无需后处理——而 TCL、CoDe、SimSeg 等方法均依赖 CRF/PAMR 获得性能增益。
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2505_16993/figures/004_Table_1.jpg]]
-*Table 1: Zero-shot, text-supervised semantic segmentation. We compare our method to state-ofthe-art methods on six datasets, and report average mIoU across datasets where applicable. We bolden top-performers, and underline 2nd, and indicate postprocessing techniques (CRF [57], PAMR [58])*
 
 Table 7 的消融进一步验证了骨干网络本身的能力：SeNaTra-B 无后处理平均 mIoU 达 **41.4**，显著优于 ViT-B+CRF 的 37.8，说明分组层带来的空间归纳偏置是零样本分割性能的关键来源。
 
@@ -270,12 +257,6 @@ Table 4 的分析表明，在标准骨干（NAT）上添加像素解码器可带
 
 Table 8 比较了 SeNaTra 原生掩码与 NAT+UperNet 的端到端效率。尽管分组层相比均匀下采样引入了约 20–40% 的延迟开销，但在端到端分割场景中，这一开销被整体性能提升所摊销。Table 9 进一步展示了不同输入分辨率和分组实现方式下的骨干级吞吐量与内存消耗，高分辨率下内存需求仍是需要关注的问题。
 
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2505_16993/figures/014_Table_8.jpg]]
-*Table 8: End-to-end model performance and resource usage. We compare our native masks against the NAT baseline (with a UPerNet [37] decoder) in terms of throughput, latency, GPU memory, and final downstream mIoU on ADE20k*
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2505_16993/figures/015_Table_9.jpg]]
-*Table 9: Backbone-level throughput and resource usage. We report FPS, per-image latency, and peak GPU memory for different input resolutions and grouping implementations. “OOM” indicates out-of-memory*
-
 ### 定性分析：从 ImageNet 预训练中涌现的分割能力
 
 Figure 3 提供了最具说服力的定性证据：即使在**完全没有掩码监督**的 ImageNet 分类预训练下，SeNaTra 的早期层中自发涌现出超像素状结构，并在最后的密集分组层中被组合成语义连贯的区域。Figure 4 进一步展示了从图像-文本对比预训练中获得的零样本分割结果，模型在 Pascal VOC 验证图像上产生了与真实掩码高度一致的层次化分割，且未经过任何启发式后处理。
@@ -285,16 +266,6 @@ Figure 3 提供了最具说服力的定性证据：即使在**完全没有掩码
 1. **延迟开销**：分组层相比均匀下采样引入约 20–40% 的延迟，作为纯特征提取器使用时仍是一个额外负担。
 2. **全景分割中的过度分割**：原生全景分割中出现的过度分割错误需要额外的细化步骤（如重新计算最终分组层的分配矩阵）来处理，增加了设计复杂性。
 3. **高分辨率下的资源需求**：尽管通过稀疏 CUDA 内核进行了优化，在极高分辨率下的内存和计算需求仍未达到与均匀下采样完全相同的效率水平（Table 9 中部分配置出现 OOM）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2505_16993/figures/005_Table.jpg]]
-*Table: Backbone Seg. Head mIoU #Params FLOPs (a) Semantic segmentation on ADE20k-val*
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2505_16993/figures/012_Table_6.jpg]]
-*Table 6: Image classification on ImageNet-1k and -22k. We compare various standard and grouping-based backbones both trained from scratch on 1k and pre-trained on 22k*
-
-
 
 ## 定位与知识库关联
 
@@ -362,8 +333,6 @@ SeNaTra 提出了三种分割范式（Table 2c 概念图）：
 | 分割头独立性 | 像素解码器对 SeNaTra 影响极小，证明分组层已提供丰富空间信息（Table 4） | 高 |
 | 效率权衡 | 分组层引入 20-40% 延迟开销，但在端到端分割中被性能提升摊销（Table 8, 9） | 中（需更多硬件环境验证） |
 | 全景分割 | 原生全景分割存在过度分割，需额外细化步骤 | 中（需更系统的错误分析） |
-
-
 
 ## 原文 PDF
 

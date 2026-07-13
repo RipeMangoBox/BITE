@@ -54,8 +54,6 @@ claims:
 
 在主要基准上的结果表明：SGRS+LocoRE 将 LLaVA-1.5-7B 的 CHAIRS 幻觉率从 48.0 降至 35.6（降幅 25.8%），将 Qwen2-VL-7B 从 25.0 降至 19.3（降幅 22.8%），同时在 POPE、MME 和 LLaVAW 等综合能力基准上保持或提升性能（Table 1, Table 2）。该方法属于推理阶段解码干预范式，与 OPERA（Huang et al., CVPR 2024）、VCD（Leng et al., CVPR 2024）等方法同属一路，但其独特之处在于引入梯度信息构建显著性度量，并通过拒绝采样与注意力增强的双重机制直接针对上下文断裂这一根本原因。
 
-
-
 ### 问题背景：大视觉语言模型的幻觉困境
 
 大视觉语言模型（LVLMs）在图像描述、视觉问答等任务中取得了显著进展，但一个核心缺陷始终困扰着它们的可靠性——**幻觉**（hallucination）。模型常常生成与图像内容不一致的描述，凭空捏造物体、颜色或关系。现有的幻觉缓解策略大致分为三类：（1）修改解码过程，如 **OPERA**（Huang et al., CVPR 2024）通过注意力图锚点引导解码、**VCD**（Leng et al., CVPR 2024）采用对比解码；（2）调整序列结束符（EOS）的 logit 以控制生成终止；（3）干预特定注意力头，如 **EAH**（Zhang et al., EMNLP 2025）替换注意力头以缓解视觉注意力沉降、**TAME**（Tang et al., ICLR 2025）动态调整锚点令牌。然而，这些方法大多依赖启发式规则或静态阈值，缺乏对幻觉生成机制的深层理解，导致在不同模型和场景下效果不稳定。
@@ -79,8 +77,6 @@ $$\mathbf{S}^{(l,h)} = \operatorname{tril}\left( |\mathbf{A}^{(l,h)} \odot \nabl
 显著性降低是幻觉的伴随现象还是直接原因？Table 6 的干预实验给出了明确的因果证据：人为将正确令牌的显著性乘以衰减因子 $r < 1$ 后，幻觉率单调上升——当 $r = 0.2$ 时，CHAIRS 从基线 48.0 飙升至 56.0。这直接验证了**显著性降低是导致幻觉的因果杠杆**，而非仅仅是副现象。
 
 基于这一洞察，本文的动机自然浮现：既然低显著性预示并导致幻觉，那么**在推理阶段主动监控并强化输出令牌的显著性**，就能在幻觉发生前将其阻断。这引出了两个互补的干预策略——显著性引导的拒绝采样（SGRS）过滤低显著性候选令牌，以及局部一致性增强（LocoRE）主动修复上下文依赖——从而在不修改模型参数的前提下，实现即插即用的幻觉抑制。
-
-
 
 ## 核心方法与创新机理
 
@@ -122,8 +118,6 @@ $$\mathbf{A}^{(P+1)}[b,h,P+1,j] \leftarrow \mathbf{A}^{(P+1)}[b,h,P+1,j] \cdot \
 
 在现有解码修改方法中，**OPERA**（Huang et al., CVPR 2024）依赖注意力图锚点，**VCD**（Leng et al., CVPR 2024）采用对比解码，**DOPRA**（Wei & Zhang, MM 2024）惩罚锚点令牌，**TAME**（Tang et al., ICLR 2025）动态调整注意力局部化程度——这些方法均未直接建模输出令牌间的上下文接地强度。**EAH**（Zhang et al., EMNLP 2025）和**Vissink**（Kang et al., ICLR 2025）干预视觉注意力沉降，但未处理文本上下文漂移。本工作的独特贡献在于：**用梯度增强的显著性度量替代纯注意力图作为诊断信号，并将诊断与干预闭环——SGRS在令牌选择阶段过滤低显著性候选，LocoRE在注意力计算阶段强化局部上下文依赖，二者协同覆盖了幻觉生成的令牌级和序列级两个层面**。
 
-
-
 本工作提出了一套推理阶段的双重干预框架，用于缓解大型视觉语言模型（LVLMs）在自回归生成中的幻觉问题。框架的核心逻辑链为：**诊断→过滤→增强**。
 
 **诊断模块（LVLMs-Saliency）** 是整个框架的感知基础。它在每一步解码时计算当前候选令牌相对于先前已生成输出令牌的显著性，定义为注意力权重与其梯度的Hadamard乘积的绝对值：
@@ -147,8 +141,6 @@ $$\mathbf{A}^{(P+1)}[b,h,P+1,j] \leftarrow \mathbf{A}^{(P+1)}[b,h,P+1,j] \cdot \
 该操作主动增强模型对最近输出上下文的依赖，直接对抗自回归生成中的“上下文遗忘”趋势，维持序列连贯性。
 
 **整体流程**为：输入图像与提示 → 模型前向传播 → LVLMs-Saliency计算候选令牌显著性 → SGRS过滤低显著性令牌 → 选定令牌输出 → LocoRE修改下一步注意力权重 → 循环至生成结束。两个模块均作为即插即用的推理阶段干预，不修改模型参数，无需额外训练。
-
-
 
 ### 1. LVLMs-Saliency 诊断模块
 
@@ -208,8 +200,6 @@ $$
 
 SGRS 与 LocoRE 形成双重干预机制：SGRS 在令牌选择阶段过滤上下文接地的候选，LocoRE 在注意力计算阶段主动强化对近期输出的依赖。两者互补——SGRS 直接抑制幻觉令牌的生成，LocoRE 维护序列连贯性。在 LLaVA-1.5-7B 上，SGRS+LocoRE 将 CHAIRS 从 48.0 降至 35.6（-25.8%），在 Qwen2-VL-7B 上从 25.0 降至 19.3（-22.8%）（Table 1, Table 2）。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：显著性降低是幻觉的直接前兆
@@ -218,15 +208,10 @@ SGRS 与 LocoRE 形成双重干预机制：SGRS 在令牌选择阶段过滤上�
 
 **第一层：统计差异。** 在LLaVA-1.5、Qwen2-VL和InternVL三个模型上，幻觉令牌的平均显著性均显著低于正确令牌（Table 5；Figure 10(a)）。这一跨模型的一致性表明，显著性崩溃是幻觉生成的稳定信号，而非特定模型的偶然现象。
 
-
-![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_sjnErRHXf3/figures/014_Figure_10.jpg]]
-*Figure 10: Statistical analysis of output-token saliency vs. hallucination. (a) Mean saliency for correct vs. hallucinated tokens across three models. (b) Hallucination probability as a function of saliency bin (per model average)*
-
 ![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_sjnErRHXf3/figures/015_Table_5.jpg]]
 *Table 5: Mean saliency scores for correct vs. hallucinated tokens across models*
 
 **第二层：因果干预。** 人为将正确令牌的显著性乘以衰减因子r<1，幻觉率随r降低而单调上升：当r=0.2时，CHAIRS从基准的48.0升至56.0（Table 6）。这直接证明了显著性降低是幻觉的充分条件，而非仅仅是伴随现象。
-
 
 ![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_sjnErRHXf3/figures/016_Table_6.jpg]]
 *Table 6: Hallucination experiments that artificially lower saliency scores*
@@ -237,12 +222,10 @@ SGRS 与 LocoRE 形成双重干预机制：SGRS 在令牌选择阶段过滤上�
 
 **幻觉基准表现。** 在CHAIR基准上，SGRS+LocoRE将LLaVA-1.5-7B的CHAIRS从48.0降至35.6（-25.8%），Qwen2-VL-7B从25.0降至19.3（-22.8%）（Table 1）。在POPE基准上，LLaVA-1.5-7B的F1从85.4提升至87.0（Table 1）。值得注意的是，仅使用LocoRE（无SGRS）即可在CHAIRS上取得38.4的显著改善，说明上下文连贯性增强本身就能有效抑制幻觉。
 
-
 ![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_sjnErRHXf3/figures/003_Table_1.jpg]]
 *Table 1: Compare results of LocoRE with other SOTA methods on POPE, CHAIR and MME datasets. The best performances within each setting are bolded, baseline: LLaVA-1.5-7B*
 
 **综合能力保持。** 方法在抑制幻觉的同时未损害综合能力：LLaVA-1.5-7B的LLaVAW准确率从72.5提升至76.7，MME总分从565.34提升至668.33（Table 1, Table 2）。这表明SGRS+LocoRE并非通过牺牲生成多样性或信息量来换取低幻觉率，而是精准地修复了上下文失联问题。
-
 
 ![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_sjnErRHXf3/figures/004_Table_2.jpg]]
 *Table 2: Comparison of different LVLMs and LocoRE across all image benchmarks. Notably, in the Hallucination Benchmark, lower scores on CHAIRI and CHAIRS indicate better performance, while higher scores are preferable for other metrics*
@@ -254,7 +237,6 @@ SGRS 与 LocoRE 形成双重干预机制：SGRS 在令牌选择阶段过滤上�
 ### 消融实验：双组件的贡献与参数敏感性
 
 **SGRS的α参数。** α控制过滤严格度：α=0.6时幻觉率与延迟取得最佳平衡；α升至0.9时延迟增加33%（从30.8 ms/token升至41.2 ms/token），但幻觉率改善边际（Figure 4；Table 3）。这表明过度严格的显著性过滤会导致频繁重采样，收益递减。
-
 
 ![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_sjnErRHXf3/figures/007_Table_3.jpg]]
 *Table 3: Ablation study on α (SGRS) and β (LocoRE). Best in bold. β: 0.15 (LLaVA-1.5), 0.20 (Qwen2-VL)*
@@ -273,7 +255,6 @@ SGRS 与 LocoRE 形成双重干预机制：SGRS 在令牌选择阶段过滤上�
 
 **视频基准表现。** Table 4展示了方法在视频LVLM上的扩展实验，但视频领域的幻觉抑制效果和失败模式需要进一步验证（此部分证据来自论文Table 4，需结合原文确认具体数值和结论）。
 
-
 ![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_sjnErRHXf3/figures/012_Table_4.jpg]]
 *Table 4: Comparison of different Video LVLMs and LocoRE across all video benchmarks. In the Video-Based Text Generation Benchmark, five scores are assessed: Cr. (Correctness of Information), Cs. (Consistency), De. (Detail Orientation), Ct. (Contextual Understanding) and Te. (Temporal Understanding). Following Maaz et al Maaz et al. (2023), we use the GPT-3.5 Turbo model to assign a relative score to the model outputs, with scores ranging from 0 to 5*
 
@@ -287,16 +268,6 @@ SGRS 与 LocoRE 形成双重干预机制：SGRS 在令牌选择阶段过滤上�
 | Figure 4 | α=0.6为SGRS的最佳效率-效果平衡点，过高α导致延迟激增而收益边际 |
 | Table 5 | 三模型上正确与幻觉令牌的平均显著性差异稳定存在，跨模型验证显著性作为幻觉信号的可靠性 |
 | Table 6 | 人工降低显著性导致幻觉率单调上升，建立显著性降低→幻觉的因果链 |
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_sjnErRHXf3/figures/019_Figure_13.jpg]]
-*Figure 13: Saliency map of LLaVA1.5 from layer1 to layer32 (hallucination pattern)*
-
-![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_sjnErRHXf3/figures/020_Figure_14.jpg]]
-*Figure 14: Saliency map of LLaVA1.5 from layer1 to layer32 (correct pattern)*
-
-
 
 ## 定位与知识库关联
 
@@ -351,8 +322,6 @@ SGRS和LocoRE的分工明确：SGRS直接抑制幻觉令牌的生成，LocoRE专
 3. **不确定性感知的自适应阈值**：当输入上下文本身具有高度不确定性时，显著性阈值如何自适应调整，以避免过滤掉合理但上下文关联弱的输出？当前基于历史令牌平均显著性的阈值设计未考虑输入端的模糊性。
 
 4. **与其他幻觉缓解方法的协同**：SGRS+LocoRE聚焦于输出令牌间的上下文依赖，而Vissink等方法关注视觉注意力沉降。两类方法的互补性已在Table 2中初步显现，但系统性协同机制的设计仍有待探索。
-
-
 
 ## 原文 PDF
 

@@ -218,9 +218,6 @@ SATO的核心价值在于显著提升模型对文本扰动的鲁棒性，同时�
 
 人类评估（Table 3）提供了感知层面的证据：在扰动文本条件下，SATO的生成准确率达到75.5%，显著优于基线模型。跨数据集评估中，模型在HumanML3D上训练、以KIT-ML文本测试时，SATO在扰动文本上的准确率为72.3%，原始文本为76.8%，展示了良好的泛化稳定性。
 
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2405_01461/figures/007_Table_3.jpg]]
-*Table 3: Human evaluation and cross-dataset results on the original or perturbed text. The cross-dataset evaluation result is that the model is trained on the HumanML3D dataset, with text from KIT-ML used for testing*
-
 ### 消融实验：三个损失函数的贡献
 
 Table 5的消融实验揭示了三个稳定性损失各自的作用机制。仅使用稳定注意力损失$\mathcal{L}_2$时，FID_P为0.614，FID_D为0.034；仅使用扰动损失$\mathcal{L}_3$时，FID_P为0.187，FID_D为0.013。当两者联合使用时，达到最优稳定性：FID_P降至0.155，FID_D降至0.010。这一结果验证了注意力稳定与预测稳定之间存在协同效应——稳定注意力为稳定预测提供了基础，而扰动一致性约束则直接强化了输出鲁棒性。
@@ -267,19 +264,8 @@ Table 8分析了三个辅助损失权重$\lambda_1$、$\lambda_2$、$\lambda_3$�
 
 4. **CLIP解冻的风险**：解冻预训练的CLIP文本编码器进行微调，可能引入灾难性遗忘，论文未对此进行深入分析，需要手动验证在极端微调设置下的退化程度。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2405_01461/figures/010_Table_5.jpg]]
 *Table 5: Ablation study results of SATO stability component. We conducted six separate ablation studies on three different loss functions. Bold indicates the best results*
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2405_01461/figures/009_Figure_5.jpg]]
-*Figure 5: Model stability evaluation under different perturbations. It can be observed that across all levels of perturbation, SATO (T2M-GPT) consistently outperforms T2M-GPT in terms of stability metrics. Even when subjected to significant perturbation, our model maintains excellent stability*
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2405_01461/figures/016_Table_8.jpg]]
-*Table 8: Parameter analysis. ± indicates a 95% confidence interval. R-top3 represents R-Precision Top3. The table displays the results of three different parameters for loss*
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2405_01461/figures/001_Figure_1.jpg]]
-*Figure 1: Comparisons on ???????? and ???????? . The closer the model is to the origin, the better. The arrow indicates the effect of our method on the model. Our SATO framework can make the text-to-motion model more stable*
 
 ## 定位与知识库关联
 

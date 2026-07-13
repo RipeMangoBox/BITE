@@ -53,8 +53,6 @@ claims:
 
 **主要结果**：在 COCO_half + LVIS 设定下，RNCDL 达到 **6.92 mAP_all**，比最强基线 UNO（2.18 mAP）提升 **4.74 mAP**；在新颖类别上达到 5.42 mAP，比 UNO 提升 4.06 mAP；在已知类别上达到 25.00 mAP。消融实验表明，移除记忆模块导致 mAP 下降 4.09，使用对数正态长尾先验显著优于均匀先验，端到端在线聚类比离线 k-means 方案在新类别 mAP 上提升 4.86。在 LVIS → VisualGenome 跨数据集泛化实验中，RNCDL 成功发现了 2.56 mAP 的新颖类别，验证了方法的通用性。
 
-
-
 ### 任务定义：新类别发现与定位
 
 传统的物体检测器依赖大规模人工标注，能够识别的类别受限于训练集中出现的语义概念。然而，现实世界中存在大量未被标注的物体类别，模型需要具备在无监督条件下发现并定位这些新颖类别的能力。该任务被定义为**新类别发现与定位**（Novel Class Discovery and Localization, NCDL）：给定一组包含已知类别标注的图像，以及另一组可能包含新颖类别实例但无任何标注的图像，要求模型同时完成对已知类别的识别与定位，以及对新颖类别的聚类式发现与定位（Figure 1）。
@@ -81,8 +79,6 @@ claims:
 2. **引入真实分布先验**：采用对数正态长尾先验替代均匀先验，更准确地建模自然场景中的类别分布，显著提升新颖类别的发现性能。
 3. **保持已知类别能力**：在发现新颖类别的过程中，通过双头分类架构（已知类分类头与新颖类分类头）和缩小的有监督损失，避免灾难性遗忘，维持对已知类别的识别能力。
 4. **提升伪标签质量**：引入记忆模块存储历史批次的RoI特征，结合多视图交换训练策略，增强自监督信号的一致性与稳定性。
-
-
 
 ## 核心方法与创新机理
 
@@ -122,8 +118,6 @@ RNCDL对每张图像生成两个增强视图，计算各自的伪标签后**交�
 
 上述四个模块并非孤立改进，而是形成正向协同：记忆模块提供更稳定的聚类上下文，在线Sinkhorn生成更准确的伪标签，多视图交换增强特征鲁棒性，双头架构确保已知类能力不退化。在COCO_half+LVIS基准上，RNCDL达到6.92 mAP_all，超过最强基线**UNO**（Fini et al.）达4.74 mAP（Table 4），其中新颖类mAP从1.36提升至5.42。
 
-
-
 RNCDL 采用两阶段训练范式，将新类别发现与定位统一在一个端到端的检测框架内。其核心思路是：先在带标注的已知类数据上训练一个标准的双阶段检测器，获得类不可知的区域提议能力和可迁移的视觉特征；随后冻结大部分网络参数，仅通过在线约束聚类与辅助分类头，在无标注图像中同时保持已知类识别能力并发现新类别。
 
 **第一阶段：有监督引导**。网络以 Faster/Mask R-CNN 为基础，使用标准 R-CNN 损失 $L_{sup} = L_{RPN} + L_{box} + L_{cls}$ 在已标注的已知类数据上训练。此阶段产出三个关键组件：一个经过预训练的主干网络（ResNet50-FPN，采用 MoCo 自监督初始化）、一个类不可知的区域提议网络（RPN），以及一个包含背景类的 $K+1$ 路分类头。该阶段的目标并非直接发现新类，而是为后续的发现阶段提供高质量的候选框和具备判别力的冻结特征。
@@ -138,15 +132,11 @@ RNCDL 采用两阶段训练范式，将新类别发现与定位统一在一个�
 
 **整体数据流**可概括为：无标注图像 → 冻结的 RPN 生成类不可知提议 → 冻结的 RoIAlign 提取特征 → 记忆模块增强 → 双头分类器输出 logits → Sinkhorn 在线聚类生成伪标签 → 交换多视图伪标签计算一致性损失 → 反向传播仅更新两个分类头。Figure 2 完整展示了从有监督引导到联合发现再到推理的全流程架构。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l27_https_arxiv_org_abs_2210_10774/figures/014_Figure.jpg]]
 *Figure: a) COCO → LVIS Figure H1: Visualization of predictions for validation images of the fully-supervised model and our RNCDL framework in \mathrm { C O C O } _ { h a l f } + LVIS setup. We color the discovered novel classes in red*
 
 ![[assets/figures/papers/paper_list_l27_https_arxiv_org_abs_2210_10774/figures/002_Figure_2.jpg]]
 *Figure 2: A high-level overview of our network. (top) During the supervised training phase, we train our backbone and RPN networks using labeled data, together with classification head and a class agnostic localization head. During the discovery phase, we freeze all the layers of the network apart from classification head and attach and train a novel classification head using unlabeled data. During the inference (bottom), we perform a standard R-CNN pass, using classification heads of both known and novel categories to predict a class assignment for each proposal. This can be either one of K classes, that were presented a labeled samples during the model training, or any novel object class that appea...*
-
-
 
 RNCDL 将新类别发现与定位任务分解为两个阶段：**有监督引导阶段**与**发现阶段**。在引导阶段，网络在已知类标注数据上学习类不可知的区域提议能力和可迁移的视觉特征；在发现阶段，网络冻结大部分参数，仅通过在线约束聚类生成伪标签来训练新颖类分类头。以下聚焦发现阶段的核心模块与关键公式。
 
@@ -207,8 +197,6 @@ $$\hat{\mathbf{p}} = \mathrm{softmax}([h^k(\hat{\mathbf{f}}), h^n(\hat{\mathbf{f
 
 随后通过匈牙利算法将预测的簇 ID 映射到真实语义类别，计算 mAP 进行评估。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能瓶颈与因果机制
@@ -254,23 +242,6 @@ RNCDL 要解决的核心瓶颈是：在无标注的真实图像中，标准检�
 
 **Figure 3** 展示了全监督模型与 RNCDL 在验证图像上的预测可视化对比（新颖类以红色标注）。RNCDL 成功发现了全监督模型完全忽略的多种新颖物体类别。**Figure 4** 进一步展示了在 LVIS 和 VisualGenome 两个数据集中共同发现的新颖类别，验证了方法跨数据集的语义发现一致性。**Figure H3** 对最大和最置信的发现簇进行了可视化分析，有助于理解聚类行为。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l27_https_arxiv_org_abs_2210_10774/figures/007_Figure.jpg]]
-*Figure: a) COCO → LVIS b) LVIS →VisualGenome*
-
-![[assets/figures/papers/paper_list_l27_https_arxiv_org_abs_2210_10774/figures/013_Table.jpg]]
-*Table: G1: Detailed results for the RCNDL model. (a) Detection scores for the RNCDL model in \mathrm { C O C O } _ { h a l f } + LVIS setup (b) Segmentation scores for the RNCDL model in \mathrm { C O C O } _ { h a l f } + LVIS setup (c) Detection scores for the RNCDL model in LVIS + VG setup*
-
-![[assets/figures/papers/paper_list_l27_https_arxiv_org_abs_2210_10774/figures/016_Figure.jpg]]
-*Figure: size: 48536,confidence: 0.27 size:l39228,confidence: 0.08*
-
-![[assets/figures/papers/paper_list_l27_https_arxiv_org_abs_2210_10774/figures/017_Figure.jpg]]
-*Figure: d) LVIS → VG unmatched clusters, ordered by size Figure H3: The largest and the most confident clusters discovered*
-
-![[assets/figures/papers/paper_list_l27_https_arxiv_org_abs_2210_10774/figures/003_Table_1.jpg]]
-*Table 1: Impact of supervised loss strength. We check the results of our method as a function of the strength of the supervised loss*
-
 ![[assets/figures/papers/paper_list_l27_https_arxiv_org_abs_2210_10774/figures/005_Table_3.jpg]]
 *Table 3: Additional ablations. We experiment with removing individual components from the network and their impact on the overall performance*
 
@@ -279,11 +250,6 @@ RNCDL 要解决的核心瓶颈是：在无标注的真实图像中，标准检�
 
 ![[assets/figures/papers/paper_list_l27_https_arxiv_org_abs_2210_10774/figures/010_Table_5.jpg]]
 *Table 5: LVIS → VisualGenome comparisons with a fully-supervised method*
-
-![[assets/figures/papers/paper_list_l27_https_arxiv_org_abs_2210_10774/figures/011_Table.jpg]]
-*Table: C1: Performance of fully-supervised models on \mathbf { C O C O } _ { h a l f } and LVIS datasets. In bold, we highlight the configuration used for the supervised training phase and the fully-supervised baseline*
-
-
 
 ## 定位与知识库关联
 
@@ -357,8 +323,6 @@ RNCDL 的知识体系建立在以下基础之上：
 5. **人机协同的语义精化**：能否通过主动学习或人在回环的交互机制，在发现阶段引入少量人工反馈，改善新类别簇的语义一致性和可解释性？
 
 6. **语义重叠的聚类解耦**：当前方法无法有效处理语义重叠导致的聚类碎片化问题，如何设计层次化或软分配聚类机制来建模类别间的包含与重叠关系？
-
-
 
 ## 原文 PDF
 

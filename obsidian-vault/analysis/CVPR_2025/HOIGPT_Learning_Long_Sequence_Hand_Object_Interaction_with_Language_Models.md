@@ -56,8 +56,6 @@ HOIGPT 的核心洞察在于：**将大型语言模型（LLM）的序列推理�
 
 当前工作的主要局限在于：仅在有限物体类别的 ARCTIC 和 GRAB 数据集上验证，对开放词汇场景的泛化能力尚不明确；依赖完整物体点云作为输入，尚未探索端到端从视觉感知到交互生成的路径；使用的语言模型规模较小（Flan-T5-Base, 220M 参数），更大模型可能进一步提升长序列的语义连贯性。
 
-
-
 手-物体交互（Hand-Object Interaction, HOI）是具身智能和人机交互领域的核心问题，涉及对三维空间中手部与物体协同运动的感知、生成与理解。近年来，随着 ARCTIC、GRAB 等大规模 HOI 数据集的发布，基于深度学习的 HOI 生成方法取得了显著进展。然而，现有方法面临一个关键瓶颈：**缺乏统一的、双向的模型架构，难以同时满足长序列生成中的物理一致性要求和多条件输入的灵活性需求**。
 
 具体而言，当前 HOI 生成与理解方法存在以下结构性缺口：
@@ -69,8 +67,6 @@ HOIGPT 的核心洞察在于：**将大型语言模型（LLM）的序列推理�
 **3. 物理合理性保障不足。** 手-物体交互的核心在于物理接触的合理性：手部不能穿透物体表面，接触区域应符合真实交互模式。然而，现有方法普遍缺乏专门的几何约束机制，生成的 HOI 序列常出现穿透、接触不自然等问题，严重影响了生成结果的可用性。
 
 针对上述问题，HOIGPT 提出了一个统一的解决方案：**将大型语言模型（LLM）与专门设计的 HOI 分解标记器相结合**。其核心洞察在于：LLM 的序列推理能力可以自然地建模 HOI 序列的时序依赖，而分解式码本设计能够大幅降低标记空间的复杂度，同时引入几何约束损失确保物理合理性。这一设计首次实现了文本与 3D HOI 序列之间的双向高质量生成与理解，为手-物体交互的通用建模提供了新的范式。
-
-
 
 ## 核心方法与创新机理
 
@@ -119,8 +115,6 @@ $$\mathcal{L}_{lm} = - \sum_{i=0}^{L_t-1} \log p_{\theta} \left( \mathbf{T}_t^i 
 
 **证据强度评估**：上述三项 changed slots 均有消融实验（Table 3）和主实验结果（Table 1, Table 4）的直接支撑，置信度在 0.9–0.95 之间。HOI 分解式 VQ-VAE 的 23% 性能增益与几何损失的穿透抑制效果构成了因果链条的核心实证基础。需注意，LLM 规模（220M）对长序列连贯性的影响尚未通过更大模型的对比实验验证，这一点的泛化结论需要手动核实。
 
-
-
 HOIGPT 构建了一个统一的双向 3D 手-物交互（HOI）与文本生成框架，其核心设计思想是将 HOI 运动序列与自然语言映射到同一语言模型的标记空间中。如 Figure 2 所示，整个 pipeline 由三个关键模块串联构成：**HOI 编码器**负责将原始运动序列压缩为紧凑的潜在表示，**HOI 分解式 VQ-VAE 标记器**将该表示量化为离散标记，**语言模型**则自回归地处理文本与 HOI 标记的联合序列，实现双向转换。
 
 ![[assets/figures/papers/paper_list_l25_HOIGPT_Learning_Long_Sequence_Hand_Object_Interaction_with_Language_Mode/figures/002_Figure_2.jpg]]
@@ -165,8 +159,6 @@ $$\mathcal{L}_{lm} = - \sum_{i=0}^{L_t-1} \log p_{\theta} \left( \mathbf{T}_t^i 
 | 物理约束 | 无专门几何损失（如 **Text2HOI**） | 穿透 + 接触 + 接触区域三项几何损失 |
 
 这种“分解式标记化 + LLM 序列推理 + 几何约束”的组合，使 HOIGPT 首次在统一的框架内实现了文本与 3D HOI 序列之间的双向高质量生成。
-
-
 
 ### 3.1 HOI 运动序列的参数化
 
@@ -242,13 +234,6 @@ $$\mathcal{L} = \mathcal{L}_{geo} + \mathcal{L}_{tok}$$
 
 消融实验证实，移除几何损失会导致穿透体积显著增加，同时降低文本描述准确度，验证了物理约束对生成质量的关键作用。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l25_HOIGPT_Learning_Long_Sequence_Hand_Object_Interaction_with_Language_Mode/figures/003_Figure_3.jpg]]
-*Figure 3: Overview of HOI-decomposed VQ-VAE. Our framework processes hand and object features through dedicated hand and object encoders, which generate encoded representations. These representations are quantized using separate hand and object codebooks, resulting in corresponding codebook indices for each modality. The quantized indices are combined to form the HOI latent code, which is then decoded through object and hand decoders to reconstruct the HOI sequence. The reconstructed sequence captures realistic hand-object interactions that align closely with the input features. To further enhance physical plausibility, a geometric loss is applied, minimizing interpenetration between the hand and obj...*
-
-
-
 ## 实验与关键发现
 
 ### 实验设置概要
@@ -314,15 +299,8 @@ Table 3 的消融实验揭示了两个关键设计的作用：
 - **Table 3**：消融实验证实分解式标记器是性能核心驱动力（+23%），几何损失对物理合理性和语义准确性均有贡献。
 - **Table 4**：HOI 到文本生成任务上，R Precision 相对提升 +2.01%，验证了双向统一架构的有效性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l25_HOIGPT_Learning_Long_Sequence_Hand_Object_Interaction_with_Language_Mode/figures/008_Figure_5.jpg]]
 *Figure 5: Qualitative results of HOIGPT for HOI completion. HOIGPT is designed for multiple tasks including HOI interpolation (top) and HOI prediciton (bottom), the orange line indicts the input HOI sequence*
-
-![[assets/figures/papers/paper_list_l25_HOIGPT_Learning_Long_Sequence_Hand_Object_Interaction_with_Language_Mode/figures/001_Figure_1.jpg]]
-*Figure 1: HOIGPT can interpret a variety of input prompts for diverse HOI-related tasks. We illustrate examples of text to HOI generation, HOI completion conditioned on object movement, and HOI captioning. HOIGPT generates or interprets hand-object interaction sequences in response to user queries, showcasing its capability to understand and produce contextually relevant HOI motions. The sequences represent time order from left to right*
-
-
 
 ## 定位与知识库关联
 
@@ -383,8 +361,6 @@ HOIGPT 处于 **LLM 驱动的多模态运动生成** 与 **物理约束的 HOI �
 ### 4. 知识库定位总结
 
 HOIGPT 在知识库中的定位是 **首个统一 HOI 双向生成与理解的 LLM 基框架**。其核心贡献——HOI 分解 VQ-VAE 和几何约束损失——解决了 HOI 标记效率低和物理合理性差两个关键瓶颈。该方法桥接了运动-语言模型和物理约束 HOI 建模两条技术路线，为后续研究（如视觉端到端 HOI 生成、交互式 HOI 推理）提供了可扩展的基础架构。
-
-
 
 ## 原文 PDF
 

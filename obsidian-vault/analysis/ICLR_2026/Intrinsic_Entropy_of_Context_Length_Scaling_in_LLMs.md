@@ -219,9 +219,6 @@ $$\mathrm{Loss}(l, \theta_t, \theta_m) = R_{\mathrm{Bayes}}(l, \theta_t) + L_{\m
 
 **合成数据上的精确验证。** 在 Position-Weighted Multitask Sparse Parity 合成任务上，训练模型的交叉熵损失与理论最小损失（贝叶斯模型）几乎一致：上下文长度为 17 时，模型损失为 0.4648，理论最小值为 0.4643；上下文长度为 50 时，模型损失为 0.0613，理论最小值为 0.0612（Table 1）。这表明模型在合成任务上接近贝叶斯最优。同时，PCA 特征值对数求和测得的内在熵与交叉熵损失呈良好线性关系，$R^2$ 接近 1（Figure 7），进一步验证了内在熵作为信息度量的有效性。
 
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_vnipyA8c9V/figures/007_Figure_7.jpg]]
-*Figure 7: Eigen value and CE results measured on trained model for Synthetic Dataset in this section. Left: Eigen Value vs. Index of Eigen Value; Right: Correlation between Cross Entropy Loss and Measured Entropy. We see good linear relationship between CE Losses and Measured Intrinsic Entropy from Lower figures*
-
 ![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_vnipyA8c9V/figures/011_Table_1.jpg]]
 *Table 1: Comparison between trained model and Bayes Model (minimum CE Loss) for Synthetic Data*
 
@@ -262,14 +259,6 @@ $$\mathrm{Loss}(l, \theta_t, \theta_m) = R_{\mathrm{Bayes}}(l, \theta_t) + L_{\m
 - **Figure 7：** 合成数据上 PCA 特征值熵与交叉熵损失线性关系的精确验证。
 - **Figure 8：** RULER 基准上跨任务、跨模型规模的上下文长度缩放模式差异。
 - **Table 1：** 合成任务上训练模型接近贝叶斯最优的定量证据。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_vnipyA8c9V/figures/016_Figure_13.jpg]]
-*Figure 13: Left: Relative Eigen Value Measured for the last token, for LLaMa-3.1-8B on a subset of OpenWebText. Right: relative increment of relative eigenvalues (for different context lengths measured). We can see that the relative eigenvalues approximately increase at a same scale*
-
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_vnipyA8c9V/figures/012_Table_2.jpg]]
-*Table 2: In this Section (Appendix D) we formulate results from previous sections with Theorems derived with defined assumptions and properties of intrinsic space in this section. Ntp refers to Next-token-prediction, Ctl refers to Context Length. We derive data scaling for approximation loss with weaker assumptions compared to (Bahri et al., 2024), please refer to Theorem 1, 2 in Appendix D.2 for more details*
 
 ## 定位与知识库关联
 

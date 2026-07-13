@@ -52,8 +52,6 @@ SpaceMesh针对这一瓶颈提出了一个统一的连续表示框架。其核�
 
 SpaceMesh的提出标志着网格生成从“几何重建”向“连通性学习”的范式转变，为可微几何处理开辟了新的技术路径。
 
-
-
 ### 问题背景：多边形网格的生成式学习
 
 多边形网格是计算机图形学、几何处理与物理仿真中表示三维形状的基本数据结构。它由顶点位置（几何）与顶点间的边、面连接关系（连通性/拓扑）共同定义。随着深度生成模型在图像、体素、点云等模态上的成功，一个自然的问题是：能否让神经网络直接学习生成高质量的多边形网格？
@@ -83,8 +81,6 @@ SpaceMesh的提出标志着网格生成从“几何重建”向“连通性学�
 上述困境的根源在于**网格的连续几何与离散组合结构之间的根本张力**：缺乏一种连续参数化方案，使其既可被神经网络输出、又能在构造上自然导出流形网格。
 
 **SpaceMesh** 的核心动机正是弥合这一鸿沟。其关键洞察在于：**将流形多边形网格的离散连通性编码为每个顶点的低维连续嵌入向量**——通过精心设计的距离函数与置换匹配机制，使边存在性（edge）和半边的 next 关系（halfedge next）均可从嵌入中连续导出，从而将网格生成从不可微的组合搜索转化为可微的连续优化。这一表示天然保证流形输出，且能被标准神经网络直接预测，使得模型能够从数据中学习网格划分风格，而非仅拟合几何形状。
-
-
 
 ## 核心方法与创新机理
 
@@ -128,8 +124,6 @@ $$ \mathsf{next}(h_{ij}) := h_{ki} \quad \mathrm{for} \quad k = \mathrm{match}_{
 | 网格风格学习 | 主要拟合几何形状，连通性模式与数据分布脱节 | 连通性嵌入与数据集分布对齐，可学习网格划分风格 |
 
 在单网格拟合任务中，SpaceMesh不仅收敛速度远超**DMesh**（Son et al., 2024），还适用于三角/多边形混合网格（Figure 2）；而**DSE**（Rakotosaona et al., CVPR 2021）在顶点稀疏和非凸几何情况下即使过拟合单形状也表现挣扎（Figure 14）。
-
-
 
 SpaceMesh的生成流水线由三个级联模块构成：**点云编码器**、**顶点位置生成网络**和**顶点连通性预测网络**，最终通过**网格提取模块**恢复离散半边缘网格结构。整个流程的输入为三维点云，输出为具有流形保证的多边形网格。
 
@@ -183,12 +177,8 @@ SpaceMesh的生成流水线由三个级联模块构成：**点云编码器**、*
 
 该流水线的核心优势在于：将网格的离散连通性完全嵌入到连续参数空间中，使得网格生成从不可微的组合搜索转化为可微的连续优化，从而可被标准神经网络直接输出，并天然保证流形结构。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2409_20562/figures/009_Figure_6.jpg]]
 *Figure 6: Network architecture for learning to generate meshes*
-
-
 
 ### 3.1 半边缘连通性的连续参数化框架
 
@@ -242,8 +232,6 @@ $$\mathsf{next}(h_{ij}) := h_{ki} \quad \text{for} \quad k = \mathrm{match}_{\Ph
 
 流形性由表示本身的构造方式天然保证，无需额外约束。边的twin算子是对合映射，由边集的无向性自然满足；next算子的轨道度数至少为3，由Sinkhorn归一化与单轨道约束共同保证。这使得每个顶点的局部邻域构成一个循环置换，从而确保生成的网格在连通性层面是流形的。但需注意，流形性仅保证拓扑结构，不排除面之间的几何自交（见Section 6的讨论）。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果：ABC数据集网格重建
@@ -282,15 +270,11 @@ Figure 2展示了在三角/多边形混合网格上的连通性拟合任务中�
 
 Figure 13展示了典型失败案例：尽管模型始终保证流形连通性，但可能出现大面积错误面和过度几何自交，导致网格几何精度下降。这揭示了核心局限——流形性保证仅覆盖组合结构层面，几何有效性（无自交）缺乏理论保证。Section 6将此列为开放问题。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2409_20562/figures/019_Figure_14.jpg]]
 *Figure 14: Fi ing the ground truth connectivity of a single mesh with DSE [Rakotosaona et al. 2021]. The experiment se ing is described in Section 4.1. Here DSE is overfit to encode a single shape, but even then its representation struggles when vertices are sparse and geometry is highly nonconvex*
 
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2409_20562/figures/011_Table_1.jpg]]
 *Table 1: Accuracy and quality statistics for mesh reconstruction*
-
-
 
 ## 定位与知识库关联
 
@@ -341,8 +325,6 @@ DMesh和DSE将网格表示为Delaunay三角剖分上的概率分布或元素选�
 4. **表示维度的推广**：该表示方法是否可扩展到时变网格（4D）或体网格（四面体/六面体）的生成？半边缘结构在更高维度的推广需要重新设计next和twin算子的代数结构。
 
 5. **与大规模生成模型的融合**：当前方法使用Point-E扩散Transformer生成顶点位置，连通性由独立Transformer预测。是否可以将顶点生成与连通性预测统一到单一扩散框架中，实现端到端的联合去噪？
-
-
 
 ## 原文 PDF
 

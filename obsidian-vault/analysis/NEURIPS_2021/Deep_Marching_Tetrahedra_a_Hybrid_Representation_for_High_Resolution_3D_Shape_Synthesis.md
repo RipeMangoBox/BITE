@@ -57,8 +57,6 @@ claims:
 - 在点云重建任务（ShapeNet 风格）上，DMTET 的 Chamfer L1 达到 0.77，优于 ConvONet（0.95）、DefTet（0.97）、Mesh R-CNN（1.01）等，且推理速度约比 ConvONet 快 6.7 倍（Table 3）。
 - 消融实验证实，体积细分和表面细分是精细几何重建的关键模块，去除两者会使 Chamfer L1 从 0.77 退化至 0.81（Table 3）。
 
-
-
 ### 3D 形状生成的核心瓶颈：隐式与显式表示的两难
 
 近年来，基于神经网络的三维形状生成取得了长足进展，但其底层表示的选择始终制约着生成质量的上限。主流方法可大致分为两条技术路线，各自面临根本性困境。
@@ -84,8 +82,6 @@ Deep Marching Tetrahedra（DMTET）的核心动机正是弥合上述鸿沟。其
 3. **通过网格变形与选择性细分实现高效的高分辨率合成**。网络仅对当前表面附近的四面体进行体积细分，将计算资源聚焦于几何细节丰富的区域，避免了全局高分辨率网格的算力浪费。
 
 这一混合表示架构使得损失函数可以首次直接定义在显式曲面之上——Chamfer 距离、法向一致性、对抗损失等均作用于最终三角网格——而梯度却能穿透 MT 层，反向传播至隐式 SDF 和顶点变形参数，实现几何与拓扑的联合优化。论文的实验表明，这种端到端可微设计在粗糙体素超分辨任务上，较 ConvOnet 在 Chamfer L2 距离上提升约 9.6%（0.75 vs 0.83），推理速度更是快约 6.7 倍（129ms vs 866ms），验证了混合表示在质量与效率上的双重优势。
-
-
 
 ## 核心方法与创新机理
 
@@ -124,8 +120,6 @@ DMTET 提出的**可微行进四面体（Marching Tetrahedra, MT）层**从根�
 ### 创新总结
 
 DMTET 的三个 changed slots 形成了因果链条：顶点 SDF 表示提供了精确的隐式表面编码 → 可微 MT 层将隐式编码无损转换为显式网格并允许表面损失直接监督 → 可学习细分机制在训练过程中动态提升分辨率。这一设计使得 DMTET 在推理速度上比 ConvOnet 快约 6.7 倍（129ms vs 866ms），同时在所有几何指标上大幅领先，证明了混合表示在效率与质量之间的优越平衡。
-
-
 
 DMTET 的整体 pipeline 遵循“隐式编码—可微等值面提取—显式表面监督”的端到端范式，其核心设计在于将可变形四面体网格上的有符号距离函数（SDF）作为中间表示，通过可微的行进四面体层桥接隐式场与显式网格，从而在保留拓扑灵活性的同时实现对表面几何的直接损失监督。
 
@@ -170,8 +164,6 @@ $$L = \lambda_{\text{cd}} L_{\text{cd}} + \lambda_{\text{normal}} L_{\text{norma
 ### 数据流总结
 
 整体数据流可概括为：**输入点云 → PVCNN 特征体积 → MLP 初始 SDF → GCN 迭代细化（含网格变形与体积细分） → 可微 MT 层提取显式网格 → 可学习表面细分 → 判别器评估与多损失反向传播**。该流程实现了从粗糙输入到高分辨率三角网格的由粗到精（coarse-to-fine）合成，且在推理时无需进行等值面查询或后处理优化，推理速度较基于隐式场的方法（如 ConvOnet）快约 6.7 倍。
-
-
 
 ### 3.1 可变形四面体网格与隐式SDF表示
 
@@ -238,8 +230,6 @@ $$L_{\mathrm{SDF}} = \sum_{v_i \in V_T} |s(v_i) - \text{SDF}(v_i, M_{gt})|^2$$
 变形正则化对顶点偏移量施加L2惩罚，防止训练过程中产生异常变形：
 
 $$L_{\mathrm{def}} = \sum_{v_i \in V_T} ||\Delta v_i||_2$$
-
-
 
 ## 实验与关键发现
 
@@ -318,12 +308,8 @@ Figure 8 和 Figure 9 对比了 DMTET 与 Marching Cubes (MC) 和 Marching Tetra
 3. 对于极细薄结构（如飞机机翼、灯杆），当前表面细分策略的保真度是否可通过更高效的自适应四面体剖分进一步提升？
 4. 基于局部 SDF 体积的对抗损失是否能被更有效的全局纹理或结构判别器所取代，以进一步提升生成质量？
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2111_04276/figures/003_Figure_3.jpg]]
 *Figure 3: Three unique surface configurations in MT. Vertex color indicates the sign of signed distance value. Notice that flipping the signs of all vertices will result in the same surface configuration. Position of the vertex is linearly interpolated along the edges with sign change*
-
-
 
 ## 定位与知识库关联
 
@@ -373,8 +359,6 @@ DMTET 的核心贡献在于通过**可微行进四面体层**将隐式场与显�
 4. **与新兴表示的融合。** 3D Gaussian Splatting 等新兴显式表示在渲染质量上表现出色，DMTET 的混合表示思想能否与之结合，在保持高分辨率几何的同时获得更优的渲染效果，是潜在的研究方向。
 
 5. **训练稳定性与损失平衡。** 总损失包含五个加权项（Chamfer、法向一致性、GAN、SDF 正则化、变形正则化），各系数对训练稳定性和最终质量的影响机制尚需系统消融研究。
-
-
 
 ## 原文 PDF
 

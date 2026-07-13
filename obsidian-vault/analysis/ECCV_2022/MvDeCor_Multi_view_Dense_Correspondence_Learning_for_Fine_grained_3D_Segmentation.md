@@ -45,8 +45,6 @@ claims:
 
 主要结果：在 PartNet Level-3 的少样本分割设定下（仅 10 个标注形状），MvDeCor 达到 **32.6% mIoU**，优于 PointContrast（31.0%）、ImageNet 预训练（29.3%）及稠密对比学习基线（30.8%）；相比从头训练提升 **17.3% mIoU**。在 RenderPeople 数据集上同样展现出显著的少样本分割优势。
 
-
-
 三维形状理解是计算机视觉的核心问题之一，其中**三维形状的语义分割**——将形状表面划分为具有语义意义的部件——在机器人操作、增强现实和形状编辑等应用中至关重要。然而，获取大规模的三维逐点标注极其昂贵且耗时，这严重制约了全监督方法的可扩展性。
 
 近年来，自监督预训练（self-supervised pre-training）在二维视觉领域取得了显著成功，通过在无标签数据上学习可迁移的特征表示，大幅降低了下游任务对标注的依赖。这一范式也被引入三维领域，其中**PointContrast**（Xie et al., ECCV 2020）等方法直接在三维点云上通过对比学习进行预训练。然而，这些方法面临两个根本性难题：
@@ -58,8 +56,6 @@ claims:
 现有工作试图弥合这一鸿沟：直接使用 ImageNet 预训练的二维网络提取多视图特征，再反投影到三维表面进行聚合，但这类方法并未显式建模跨视图的像素级对应关系。单视图密集对比学习虽然增强了局部特征判别力，却仍然忽略了三维几何提供的天然监督信号——**已知相机位姿和三维几何时，不同视图间像素的对应关系是完全确定的**。
 
 本文的核心动机在于：**能否利用三维形状提供的几何信息，在二维域中学习视角不变且几何一致的密集特征表示，从而将二维网络强大的表征能力高效迁移到三维分割任务中？** 为此，我们提出 MvDeCor（Multi-View Dense Correspondence Learning），通过多视图密集对应学习框架，将三维几何一致性作为自监督信号，在无标签三维形状上预训练二维网络，使其输出的像素级嵌入在跨视角下对同一三维点保持一致。这一策略使得在仅需极少三维标注的小样本场景下，也能通过简单的微调和多视图聚合获得高质量的三维分割结果。
-
-
 
 ## 核心方法与创新机理
 
@@ -88,8 +84,6 @@ MvDeCor 的核心创新在于将 3D 形状理解问题转化为 **多视图密�
 ### 创新本质
 
 MvDeCor 的因果杠杆在于：**用 2D 卷积网络的成熟表征能力替代 3D 稀疏算子，同时通过密集跨视图对应约束注入 3D 几何先验**。这绕开了 3D 点云预训练中数据效率低和几何拓扑敏感的瓶颈，在 PartNet Level-3 小样本分割（k=10）上达到 32.6% mIOU，显著优于 PointContrast 的 31.0% 和 ImageNet 预训练的 29.3%（Tab. 1）。
-
-
 
 MvDeCor 的整体 pipeline 分为两个阶段：**自监督预训练**（self‑supervised pre‑training）与**下游任务微调**（fine‑tuning）。两阶段共享同一个 2D 嵌入网络 Φ，但目标函数不同。
 
@@ -133,12 +127,8 @@ $$
 
 嵌入网络 Φ 采用 **DeepLabV3+** 架构，搭配 ResNet‑50 骨干。为利用几何线索，在第一层增加额外输入通道以接收深度图和法向图。网络输出空间尺寸为 H × W × 64 的逐像素嵌入，嵌入维度固定为 64。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l42_https_arxiv_org_abs_2208_08580/figures/001_Figure_1.jpg]]
 *Figure 1: The MvDeCor pipeline. (a) Dense 2D representations are learned using pixel-level correspondences guided by 3D shapes. (b) The 2D representations can be fine-tuned using a few labels for 3D shape segmentation tasks in a multi-view setting*
-
-
 
 ### 整体框架：预训练-微调范式
 
@@ -194,8 +184,6 @@ $$l_t = \arg\max_{c \in C} \sum_{i \in I, p \in t} W^{(i)} P^{(i,p)}$$
 - 联合损失中 $\lambda$ 的具体取值在提供材料中未明确，需查阅原文补充
 - 视图权重 $W^{(i)}$ 的具体计算方式（熵阈值或 softmax 归一化）在提供材料中未详述，需手动核实
 
-
-
 ## 实验与关键发现
 
 ### 主实验：PartNet 少样本部件分割
@@ -241,15 +229,8 @@ MvDeCor 在 PartNet Level-3 数据集上进行了系统的少样本分割评估�
 ![[assets/figures/papers/paper_list_l42_https_arxiv_org_abs_2208_08580/figures/005_Table_2.jpg]]
 *Table 2: Few-shot segmentation on the PartNet dataset with limited labeled 2D views. 10 shapes, each containing v = 5 random labeled views, are used for training. Evaluation is done on the test set of PartNet using the mean part-iou metric (%). Training is done per category separately. Results are averaged over 5 random runs*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l42_https_arxiv_org_abs_2208_08580/figures/004_Table_1.jpg]]
 *Table 1: Few-shot segmentation on the Partnet dataset with limited labeled shapes. 10 fully labeled shapes are provided for training. Evaluation is done on the test set of PartNet using the mean part-iou metric (%). Training is done per category separately. Results are reported by averaging over 5 random runs*
-
-![[assets/figures/papers/paper_list_l42_https_arxiv_org_abs_2208_08580/figures/006_Table_3.jpg]]
-*Table 3: Few-shot segmentation on the PartNet dataset. Left: 30 fully labeled shapes are used for training. Right: 30 shapes are used for training, each containing v = 5 random labeled views. Evaluation is done on the test set of PartNet with the mean part-iou metric (%). Results are reported by averaging over 5 random runs*
-
-
 
 ## 定位与知识库关联
 
@@ -305,8 +286,6 @@ $$l_t = \arg\max_{c \in C} \sum_{i \in I, p \in t} W^{(i)} P^{(i,p)}$$
 2. **自监督预训练任务是否可以与下游任务解耦？** MvDeCor 的预训练目标是学习视角不变且几何一致的表示，但这一目标是否对所有 3D 理解任务（如 3D 检测、实例分割、姿态估计）均最优，仍是一个开放问题。
 3. **如何克服 2D 表示向 3D 反投影的信息损失？** 多视图聚合虽然缓解了单视图歧义，但反投影过程本身存在量化误差和遮挡区域的盲区。是否存在端到端的 3D 表示学习方案，同时保留 2D 预训练的效率优势？
 4. **在真实扫描数据（而非合成渲染）上的泛化能力？** 当前实验全部基于合成渲染的视图，真实世界的传感器噪声、光照变化和背景干扰对 MvDeCor 的影响尚未被研究。
-
-
 
 ## 原文 PDF
 

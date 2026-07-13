@@ -53,8 +53,6 @@ claims:
 
 **方法定位**：DreamVideo-2 属于零样本主体驱动视频定制方法，与需测试时微调的 **DreamVideo**（Wei et al., CVPR 2024）、**MotionBooth**（Wu et al., arXiv 2024）形成对比，同时区别于仅支持主体定制（**VideoBooth**, Jiang et al., 2024）或仅支持运动控制（**Peekaboo**, Jain et al., 2024; **Direct-a-Video**, Yang et al., 2024a; **MotionCtrl**, Wang et al., 2024f）的单任务基线。其核心贡献在于通过混合掩码注意力与重加权损失的联合设计，在零样本条件下首次实现了主体学习与运动控制的有效平衡。
 
-
-
 ### 视频定制生成的兴起与瓶颈
 
 随着扩散模型在图像生成领域的成功，视频生成技术正快速向**可控、可定制**的方向演进。用户不仅希望生成一段视频，更希望视频中出现**特定的主体**（如自家宠物、特定商品）并按照**指定的运动轨迹**移动。这种“主体驱动+运动控制”的联合视频定制需求，在虚拟试穿、广告制作、影视预演等场景中具有巨大的应用潜力。
@@ -76,8 +74,6 @@ claims:
 本文的动机源于一个观察：视频扩散模型自有的多尺度特征已经蕴含了丰富的语义信息，可以作为主体身份学习的天然载体。同时，边界框掩码作为一种简洁的运动控制信号，可以通过区域加权的机制与主体学习形成互补而非对抗的关系。
 
 基于这一洞察，**DreamVideo-2** 提出了一套零样本视频定制框架，核心思路是：利用模型自有的多尺度特征进行参考注意力学习，并将边界框掩码作为运动控制信号，通过**区域加权的扩散损失**与**混合掩码注意力**，在无需测试时微调的条件下实现主体学习与运动控制的平衡。这一设计直击“运动控制主导”这一瓶颈，为联合视频定制提供了新的范式。
-
-
 
 ## 核心方法与创新机理
 
@@ -119,8 +115,6 @@ $$\mathcal{L}(\theta) = \mathbb{E}_{z,\epsilon,c,t} \left[ \left( \lambda_{\math
 
 这四个 changed slots 形成了一条完整的因果链条：**参考注意力**提供高效的主体特征注入路径，**掩码引导运动模块**提供独立的运动控制通道，**混合掩码**在注意力层面抑制两者冲突，**重加权扩散损失**在优化目标层面强制平衡。三者共同作用，使得 DreamVideo-2 首次在无需测试时微调的条件下，实现了主体外观保真度与运动控制精度的同时保持。
 
-
-
 DreamVideo-2 是一个零样本视频定制框架，其核心目标是从**单张主体图像**与**一条边界框序列**出发，在无需测试时微调的条件下生成同时满足主体外观保真度与精准运动轨迹的视频。框架的瓶颈在于：若简单地将主体学习与运动控制进行联合训练，运动控制信号极易占据主导地位，导致主体身份特征在极少量训练步数内严重退化（见 Figure 3）。DreamVideo-2 通过三个关键设计来平衡这一冲突：**掩码参考注意力**、**掩码引导运动模块**以及**重加权扩散损失**。
 
 整体训练流程如 Figure 2 所示，输入包含一段训练视频及其对应的边界框标注。首先，从视频中随机采样一帧，通过分割预处理获得空白背景的主体图像，以剥离背景干扰、保留纯净的身份特征。同时，将训练视频的边界框序列转换为二进制框掩码，作为运动控制信号。主体图像被视作单帧视频，与原始视频并行输入冻结的 3D UNet，在自注意力与交叉注意力层中通过掩码参考注意力将主体特征注入视频特征；框掩码序列则送入由轻量时空编码器与空间 ControlNet 组成的掩码引导运动模块，提取时空运动信息并控制主体在生成帧中的位置。两个模块均依据重加权扩散损失进行联合训练——该损失在框内区域施加更大的噪声预测权重（$\lambda_{\mathcal{L}} > 1$），以强化主体身份表征，同时保持框外区域的标准权重，避免运动控制信号被削弱。
@@ -130,14 +124,9 @@ DreamVideo-2 是一个零样本视频定制框架，其核心目标是从**单�
 
 推理时，用户仅需提供一张主体图像和一条目标边界框序列，框架即可在零样本条件下生成定制视频，无需任何额外的微调或注意力图编辑。
 
-
-
 ### 3.1 核心瓶颈与设计动机
 
 DreamVideo-2 面临的核心瓶颈是：在零样本联合训练中，运动控制信号（边界框掩码）容易主导优化过程，导致主体身份特征迅速退化（Figure 3）。为平衡主体学习与运动控制，方法引入三个关键设计：**掩码参考注意力**、**掩码引导运动模块**和**重加权扩散损失**。
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2410_13830/figures/003_Figure_3.jpg]]
-*Figure 3: Illustration of motion control domination in DreamVideo-2. As seen in (b) and (c), motion control tends to dominate over subject 1 12 learning during training, causing the degradation of subject identity. In (d), our method ensures a balance between subject and motion control*
 
 ### 3.2 参考注意力机制
 
@@ -191,8 +180,6 @@ $$
 
 该损失在框内区域以权重 $\lambda_{\mathcal{L}}$ 强化主体身份学习，在框外区域保持权重1以维持运动控制精度。消融实验（Table 6）表明，$\lambda_{\mathcal{L}} = 2$ 时各项指标达到最优平衡；过高的 $\lambda_{\mathcal{L}} = 4$ 会损害运动控制精度（mIoU 和 CD 下降）。
 
-
-
 ## 实验与关键发现
 
 ### 实验设置
@@ -241,25 +228,6 @@ Table 5 和 Figure 8 系统验证了各组件的贡献：
 ### 失败模式
 
 Figure 10 展示了 DreamVideo-2 的两类典型失败案例：(a) 受限于基础模型 ModelScopeT2V 的固有能力，难以生成罕见或不自然的动作（如“狗在火星上弹吉他”）；(b) 方法难以解耦相机运动与物体运动控制，可能出现相机移动但主体静止的情况。此外，当前框架仅支持单主体与单条运动轨迹，尚未扩展到多主体场景。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2410_13830/figures/004_Table_1.jpg]]
-*Table 1: Comparsion of our dataset with related video datasets. Our dataset contains comprehensive annotations, and is larger and more diverse than previous video customization datasets*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2410_13830/figures/008_Figure_5.jpg]]
-*Figure 5: Qualitative comparison of subject customization. DreamVideo-2 generates videos with accurate subject appearance and enhanced motion dynamics, aligning with provided prompts*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2410_13830/figures/009_Figure_6.jpg]]
-*Figure 6: Qualitative comparison of motion control. Our DreamVideo-2 achieves precise motion trajectory control and effectively maintains subjects within the specified bounding boxes*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2410_13830/figures/014_Figure_7.jpg]]
-*Figure 7: Human evaluation on joint subject customization and motion control*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2410_13830/figures/012_Figure.jpg]]
-*Figure: (b) Effects of blended mask weight*
-
-
 
 ## 定位与知识库关联
 
@@ -316,8 +284,6 @@ DreamVideo-2 的适用边界由以下因素界定：
 4. **推理效率优化**：虽然方法是零样本的，但训练阶段仍需联合优化多个模块。能否通过预训练策略或模块解耦进一步降低训练成本？
 
 5. **评估体系的完善**：当前评估依赖 CLIP-T、DINO-I、mIoU、CD 等指标和人类评估，但缺乏对运动自然度、物理合理性等维度的系统度量。建立更全面的视频定制评估基准仍是开放问题。
-
-
 
 ## 原文 PDF
 

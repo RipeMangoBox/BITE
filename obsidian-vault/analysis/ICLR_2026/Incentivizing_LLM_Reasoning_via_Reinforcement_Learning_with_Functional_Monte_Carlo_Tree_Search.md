@@ -87,8 +87,6 @@ RFTT属于**树搜索增强的强化微调**方法，与现有工作的关键区
 
 > **注意**：当前工作主要聚焦于数学推理领域，在其他复杂领域（如法律、医学诊断）的有效性尚需更多验证。增强的推理能力并不消除LLM固有的偏见、过度自信或生成错误但令人信服的输出等问题。
 
-
-
 ### 大语言模型推理能力提升的范式演进
 
 大语言模型（LLM）在数学推理等复杂任务上的表现，近年来经历了从提示工程到训练干预的范式转变。早期工作依赖链式思考（Chain-of-Thought, CoT）提示，通过外部引导激发模型的逐步推理能力。然而，这类方法本质上受限于模型固有的推理边界——提示只能“唤醒”已有能力，无法从根本上拓展模型的推理深度。
@@ -118,8 +116,6 @@ RFTT属于**树搜索增强的强化微调**方法，与现有工作的关键区
 3. **如何在推理阶段将探索能力转化为性能增益**，使模型能自主扩展推理树？
 
 这些问题的解决，需要在模型架构、训练策略和搜索机制三个层面进行协同设计。本文提出的RFTT方法，通过将功能标记（functional tokens）嵌入模型词汇表，并构建功能标记引导的MCTS训练框架，为上述问题提供了一个统一的解决方案。
-
-
 
 ## 核心方法与创新机理
 
@@ -152,8 +148,6 @@ $$R_t(s_{0:t}, a_t, s_{t+1}) = \mathtt{RM}(s_{0:t}, a_t, s_{t+1}) - \beta \cdot 
 ### 功能标记的差异化贡献
 
 功能标记消融实验（Table 4）揭示了各标记的非对称重要性：掩蔽 `<verify>` 和 `<refine>` 标记导致准确率下降约 **7 个百分点**（从 79.8% 分别降至 72.8% 和 72.6%），表明自我验证与自我修正能力是 RFTT 性能增益的主要来源，而其他标记（如 `<analysis>`、`<subquestion>`）的贡献相对温和。这一发现暗示，**推理能力的提升并非均匀地来自所有推理行为，而是集中在纠正性元认知行为上**。
-
-
 
 ![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_lHbhzxiVI9/figures/001_Figure_1.jpg]]
 *Figure 1: A conceptual illustration of reasoning path generation based on functional tree search and our training framework. RFTT comprises two phases: supervised fine-tuning warmups the model with initial reasoning capability by functional token-annotated data, while online reinforcement learning allows the model to directly sample functional tokens from its vocabulary to autonomously expand reasoning trees for diverse exploration*
@@ -195,8 +189,6 @@ RFTT相较于现有工作的三个核心设计转变在于：
 ### 训练与推理配置
 
 在SFT阶段，使用约1.2k道MATH题目通过64个并发进程进行MCTS搜索，生成约1k条SFT数据；训练batch size为128，学习率为$7\times10^{-6}$，截断长度为8192。在RL阶段，每步训练对16个不同问题各搜索16条推理路径；策略模型学习率为$5\times10^{-7}$，温度为0.95，KL系数为0.01。过程奖励模型采用mathshepherd-mistral-7b-prm。推理时，RFTT可利用MCTS进一步扩展搜索，以推理时计算换取性能提升（见图3），且无需额外奖励模型引导。
-
-
 
 ### 功能标记动作空间
 
@@ -248,26 +240,21 @@ $$\mathcal{L}_{RL}(\theta) = -\mathbb{E}_t\left[\min\left(\frac{\pi_\theta(a_t|s
 
 其中 $\hat{A}_t$ 为优势估计，$\epsilon$ 为剪切范围。该目标通过限制策略更新幅度，在提升推理能力的同时保持训练稳定性。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
 
 RFTT在多个数学推理基准上显著提升了小模型的性能。Table 1展示了三个基础模型在MATH-500、GSM8K、SVAMP、Olympiad Bench和AMC上的Pass@1准确率。以Qwen-2.5-7B-Instruct为例，RFTT在MATH-500上达到79.8%，相比Zero-shot CoT基线（72.0%）提升7.8个百分点；在GSM8K上达到95.2%，提升4.1个百分点。对于LLaMA-3.1-8B-Instruct，MATH-500从50.6%提升至60.2%，增幅达9.6个百分点。与监督微调基线**ReFT**（Trung et al., 2024）相比，RFTT平均领先约5个百分点，表明功能标记引导的树搜索强化学习比单纯的行为克隆更有效。
 
-
 ![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_lHbhzxiVI9/figures/003_Table_1.jpg]]
 *Table 1: Accuracy of our proposed RFTT and baselines across different mathematical reasoning benchmarks. The best results in each box are highlighted in bold. The proposed RFTT significantly boosts the performance of smaller LLMs across all datasets*
 
 跨领域泛化实验（Table 2）显示，仅在MATH数据集上训练的RFTT在MMLU-Pro、GPQA、CommonsenseQA、FOLIO、TableBench和CRUXEval等非数学基准上同样取得一致提升。例如Qwen-2.5-7B-Instruct在MMLU-Pro上从52.4%提升至57.2%，在FOLIO上从68.5%提升至73.9%。这表明功能标记内化的推理行为（分析、验证、修正）具有一定的领域迁移能力。
 
-
 ![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_lHbhzxiVI9/figures/004_Table_2.jpg]]
 *Table 2: Performance of RFTT on out-of-domain benchmarks. Despite being trained only on math datasets, RFTT exhibits strong transferability*
 
 与其他树搜索方法的对比（Table 3）进一步验证了效率优势：RFTT在GSM8K上以95.2%的准确率和每题81秒的耗时，优于**rStar**（Qi et al., 2024）的92.1%/162秒和**LLaMA-Berry**（Zhang et al., 2024c）的94.9%/128秒；在MATH-500上以72.0%/131秒显著领先于rStar的61.0%/344秒。
-
 
 ![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_lHbhzxiVI9/figures/009_Table_3.jpg]]
 *Table 3: Comparison of different tree search methods*
@@ -277,11 +264,6 @@ RFTT在多个数学推理基准上显著提升了小模型的性能。Table 1展
 **功能标记消融**（Table 4）：逐一掩蔽各功能标记的实验表明，所有标记均有正向贡献。其中`<verify>`和`<refine>`的影响最大：掩蔽`<verify>`（a6）后准确率从79.8%降至72.8%，掩蔽`<refine>`（a7）后降至72.6%，降幅约7个百分点。这印证了自我验证与自我修正在复杂推理中的核心作用。
 
 **组件消融**（Table 6）揭示了三个关键设计的作用机制：
-
-
-![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_lHbhzxiVI9/figures/010_Table_6.jpg]]
-*Table 6: Ablation study on different components of RFTT. We additionally perform an analysis using Deepseek-R1 on 1,000 randomly selected questions from MMLU-Pro (a dataset that spans STEM, social sciences, law, and health). The sampled reasoning trajectories are broken down into discrete steps using predefined rules (e.g., newline delimiters). We then employ GPT-4o to assess whether each step could be mapped to one of our functional tokens. As presented in Table 5, approximately 98.4% of the steps aligned with the intended semantic coverage of our token set, which demonstrates the generation of our functional tokens across diverse tasks*
-
 
 ![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_lHbhzxiVI9/figures/011_Table_5.jpg]]
 
@@ -296,10 +278,6 @@ RFTT在多个数学推理基准上显著提升了小模型的性能。Table 1展
 ### 推理时计算量扩展
 
 Figure 3展示了推理时增加搜索rollout数量对性能的影响。随着rollout数从1增至20，所有方法（基础模型、SFT、RL+MCTS+ORM、RL+MCTS+PRM）的准确率均持续提升，但RFTT（RL+MCTS+PRM）的增益最为显著，在Qwen-2.5-7B-Instruct上最终达到约88%，接近o1-preview的水平。这一结果表明，功能标记内化的树搜索能力使模型在推理时能够有效利用额外计算资源进行更深度的探索。
-
-
-![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_lHbhzxiVI9/figures/008_Figure_3.jpg]]
-*Figure 3: Performance gains under scaling up the inference-time computation*
 
 ### 训练动态
 
@@ -320,23 +298,6 @@ Figure 5展示了RL阶段的训练曲线。随着训练推进，模型在MATH-50
 ### 计算成本
 
 Table 7对比了不同方法的计算开销。RFTT的SFT数据构建阶段使用64个并发进程对1200个问题进行约一天的MCTS搜索，生成1000条SFT训练数据。RL阶段每步采样256条路径（16问题×16路径），在计算效率与探索充分性之间取得折中。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_lHbhzxiVI9/figures/019_Table_9.jpg]]
-*Table 9: Accuracy of our proposed RFTT and baselines across different mathematical reasoning benchmarks. The best results in each box are highlighted in bold. The proposed RFTT significantly boosts the performance of smaller LLMs across all datasets*
-
-![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_lHbhzxiVI9/figures/017_Table_7.jpg]]
-*Table 7: Comparison of computational cost*
-
-![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_lHbhzxiVI9/figures/018_Table_8.jpg]]
-*Table 8: Performance of RFTT on wider reasoning domains*
-
-![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_lHbhzxiVI9/figures/020_Table_10.jpg]]
-*Table 10: Comparison with entropy-based RL methods for promoting exploration. The best results in each box are highlighted in bold*
-
-
-
 
 ## 定位与知识库关联
 
@@ -383,8 +344,6 @@ RFTT 处于**推理时搜索**与**强化微调**两条技术路线的交叉点�
 3. **规模扩展**：能否在不显著增加计算成本的前提下，将功能标记引导的树搜索与更大规模模型（如 70B+）集成？
 4. **训练稳定性**：在持续的自我改进循环中，如何避免模型遗忘原有能力或产生奖励破解（reward hacking）行为？
 5. **功能标记语义**：功能标记的语义与行为之间的关系（Figure 4）是否具有跨模型、跨任务的稳定性？能否设计更优的功能标记集合？
-
-
 
 ## 原文 PDF
 

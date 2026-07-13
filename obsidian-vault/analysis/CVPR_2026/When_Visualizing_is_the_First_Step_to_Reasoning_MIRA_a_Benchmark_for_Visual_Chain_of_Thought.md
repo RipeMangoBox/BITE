@@ -51,8 +51,6 @@ claims:
 
 **主要结果：** 物理推理任务从Visual-CoT中获益最大，准确率从20.7%跃升至40.0%，几乎翻倍；而谜题类任务提升幅度较小，仅从9.5%增至10.5%。扩大搜索空间（Pass@k从1到4）可带来平均15.3%的提升，但k=4到8时增益趋缓至3.0%，说明MIRA任务的本质困难难以通过简单采样策略克服。
 
-
-
 多模态大型语言模型（MLLMs）在现有视觉-语言基准上已展现出令人瞩目的性能。如 Figure 1 右侧所示，GPT-5、Gemini 2.5 Pro 和 o3 等领先模型在 MMMU、MMMU Pro、MMStar 和 RealWorldQA 等测试中均取得了高分。然而，这些基准主要考察模型对视觉内容的直接理解与文本回答能力，并未系统性地评估模型在需要“以图思考”的任务上的表现——即推理过程中必须生成或操作中间视觉表征才能得出正确答案的场景。
 
 这一缺口构成了当前 MLLMs 的核心瓶颈：**纯文本推理无法准确捕捉和操作复杂的空间关系、几何结构与物理动态**。当问题涉及欧几里得几何中的点集操作、物理模拟中的力合成与运动轨迹推演、或因果转换中的多步状态预测时，仅靠文字描述往往难以承载推理所需的空间信息密度。正如 Figure 1 左侧的示例所示，人类可以自然地借助中间可视化来辅助推理，而现有 MLLMs 在缺乏这种视觉辅助时则暴露出显著的认知差距。
@@ -60,8 +58,6 @@ claims:
 已有研究探索了文本思维链（Text-CoT）在纯文本推理中的作用，但将其直接应用于多模态空间推理任务时效果有限。问题在于，Text-CoT 以语言为载体，而语言在表达精确的空间拓扑、几何变换和物理约束时存在天然的带宽瓶颈——许多“一图胜千言”的信息难以被充分编码为文字。
 
 为系统性地诊断这一瓶颈，MIRA（Multimodal Imagination for Reasoning Assessment）基准被提出。MIRA 的核心洞察是：**对于需要空间推理、几何操作或物理模拟的复杂问题，中间视觉表征是有效推理的关键第一步**；视觉思维链（Visual-CoT）弥补了纯文本思维链在表达这些信息上的不足。通过提供人工标注的中间视觉状态作为推理的辅助线索，MIRA 能够量化“可视化”对推理性能的因果贡献，从而揭示当前模型在自主生成和利用视觉思维方面的真实能力边界。
-
-
 
 ## 核心方法与创新机理
 
@@ -100,8 +96,6 @@ MIRA 的第三项创新体现在其**数据构造哲学**上。与大多数基�
 
 MIRA 的三项创新构成了一条完整的逻辑链：**定义新问题 → 设计诊断性评估协议 → 构造针对性数据**。其本质贡献在于，它首次将“视觉思维链”从一种直觉性的能力描述，转化为一个可量化、可诊断、可改进的评估框架。这一框架揭示的核心发现——现有 MLLM 在需要“以图思考”的任务上存在根本性缺陷，而视觉线索的注入能带来显著且非平凡的增益——为下一代多模态推理模型的研究指明了方向：**可视化不应只是推理的输出，而应成为推理过程本身的第一步**。
 
-
-
 MIRA 基准的整体设计围绕一个核心命题展开：**对于需要空间推理、几何操作或物理模拟的复杂问题，中间视觉表征是有效推理的关键第一步**。现有 MLLM 的纯文本思维链（Text-CoT）无法准确捕捉和操作复杂的空间关系、几何结构与物理动态，而 MIRA 通过提供人工标注的中间视觉状态（Visual-CoT）作为推理过程的辅助线索，系统性地诊断了这一瓶颈。
 
 ### 数据设计与构建流水线
@@ -125,9 +119,6 @@ MIRA 的数据构建遵循一条严格的四阶段流水线（见 Figure 3），
 
 MIRA 将 Visual-CoT 推理任务分为两大类型：**静态（单步）** 和 **动态（多步）** 视觉思维链，数据集包含 20 种任务类型、546 张输入图像及 936 张人工构建的单步/多步中间图像（见 Figure 2）。
 
-![[assets/figures/papers/paper_list_l2756_https_arxiv_org_abs_2511_02779/figures/002_Figure_2.jpg]]
-*Figure 2: MIRA categorizes Visual-CoT reasoning tasks into two primary types: Static (Single-Step) and Dynamic (Multi-Step), with representative examples from each category illustrated in the figure. The dataset includes 20 types of tasks, 546 input images with manually designed questions, and 936 manually constructed single-step and multi-step intermediate images. For more cases, please refer to Appendix D*
-
 ### 三级诊断评估协议
 
 为解耦视觉信息与文本推理的贡献，MIRA 实施了一套三级评估协议：
@@ -142,12 +133,8 @@ MIRA 将 Visual-CoT 推理任务分为两大类型：**静态（单步）** 和 
 
 所有 API 模型均使用默认解码设置，最大输出长度统一为 16,384 tokens。评估采用微平均准确率（micro-averaged accuracy）作为核心指标，并通过分层答案提取流水线保证评判的鲁棒性：优先从 `<answer></answer>` 标签中解析确定性答案，若失败则回退到启发式正则表达式匹配，最终由 LLM 评判器兜底。这一设计最大限度地减少了人工评估偏差，确保了不同模型间的公平比较。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2756_https_arxiv_org_abs_2511_02779/figures/001_Figure_1.jpg]]
 *Figure 1: Left: an example from MIRA with responses from both MLLMs and humans, illustrating the visual reasoning and cognitive gaps revealed by our benchmark; Right: while leading MLLMs demonstrate strong performance on established benchmarks, they struggle significantly on the MIRA, with none surpassing a 20% accuracy rate with direct inputs. This highlights MIRA’s role in exposing the fundamental challenges these models face in complex reasoning tasks that require generating intermediate visual images*
-
-
 
 ### 关键模块
 
@@ -185,8 +172,6 @@ $$\ h ^ { \prime } \equiv ( 1 2 - h - \mathrm { c a r r y } ) \pmod { 1 2 }$$
 **完整长方块高度**（用于Cubes Count等任务）：
 $$H_{\mathrm{full}}$$
 通过前视图与侧视图推断立体结构中每个位置的最大可能高度，是计数类几何任务的核心推理依据。
-
-
 
 ## 实验与关键发现
 
@@ -236,8 +221,6 @@ Visual-CoT 的提升效果在不同领域间存在显著差异。**物理推理�
 
 需要指出的是，MIRA 目前仅评估模型**使用**人工标注视觉线索的能力，而非**自主生成**中间视觉图像的真实 Visual-CoT 能力。因此，实验所测得的 33.7% 相对提升应被理解为“辅助视觉信息的上限收益”，而非模型“边画边想”的实际表现。此外，基准数据属于特定领域，其泛化性尚未经过系统测试，部分结论可能需要更大规模、更多样化的数据集来进一步验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2756_https_arxiv_org_abs_2511_02779/figures/004_Table_1.jpg]]
 *Table 1: Main results of various models on MIRA. The models are grouped into three categories: Closed-Source SOTA MLLMs, Open-Weight MLLMs, and Open-Weight Unified MLLMs. We report model results under three different inputs: D for direct input, T for Text-Cot, and V for Visual-CoT. Detailed results on each sub-category can be found on Tables 4-10. We highlight the top-three performing models in each column with varying shades of blue, where a darker shade indicates a higher rank*
 
@@ -249,23 +232,6 @@ Visual-CoT 的提升效果在不同领域间存在显著差异。**物理推理�
 
 ![[assets/figures/papers/paper_list_l2756_https_arxiv_org_abs_2511_02779/figures/007_Figure_5.jpg]]
 *Figure 5: A representative failure case of Text-CoT on a Euclidean Geometry (EG) reasoning task. Even the strongest model (GPT-5) struggles to correctly reason through the problem using plain text, due to its inability to manipulate intermediate visual states. In contrast, the Visual-CoT approach, which leverages intermediate visualizations, enables more accurate localization of the overlapping region and correct counting of red points*
-
-![[assets/figures/papers/paper_list_l2756_https_arxiv_org_abs_2511_02779/figures/008_Table_3.jpg]]
-*Table 3: A comprehensive list of the models evaluated in our experiments. For all API-based models, the default decoding settings were used, as no specific sampling parameters (e.g., temperature) were set*
-
-![[assets/figures/papers/paper_list_l2756_https_arxiv_org_abs_2511_02779/figures/009_Table_4.jpg]]
-*Table 4: Detailed Results for Euclidean Geometry (Convex Hull, Mirror Pattern) and Physics-Based Reasoning (Mirror Clock) Tasks*
-
-![[assets/figures/papers/paper_list_l2756_https_arxiv_org_abs_2511_02779/figures/010_Table_5.jpg]]
-*Table 5: Detailed Results for Euclidean Geometry (Overlap), Abstract Puzzles (Unfolded Cube), and Physics-Based Reasoning (Billiards) Tasks*
-
-![[assets/figures/papers/paper_list_l2756_https_arxiv_org_abs_2511_02779/figures/011_Table_6.jpg]]
-*Table 6: Detailed Results for Euclidean Geometry (Localizer), Causal Transformations (Paper Airplane), and Abstract Puzzles (Defuse A Bomb) Tasks*
-
-![[assets/figures/papers/paper_list_l2756_https_arxiv_org_abs_2511_02779/figures/012_Table_7.jpg]]
-*Table 7: Detailed Results for Abstract Puzzles (Multi-piece Puzzle), Physics-Based Reasoning (Electric Charge), and Causal Transformations (Rolling Dice: Top) Tasks*
-
-
 
 ## 定位与知识库关联
 
@@ -310,8 +276,6 @@ MIRA 的局限性直接指向未来的研究方向：
 4. **视觉线索的传递格式**：当前 Visual-CoT 的提升受限于模型对附加视觉信息的理解能力。是否存在更有效的传递视觉线索的格式（如结构化草图、矢量化中间状态、动态标注叠加等），值得进一步探索。
 
 5. **开放权重模型的困境**：部分开放权重模型由于参数规模小且缺乏交错视觉-文本数据训练，在 MIRA 上提升有限。这是否意味着视觉推理能力存在参数规模的临界点，或者需要特定的训练数据配方？
-
-
 
 ## 原文 PDF
 

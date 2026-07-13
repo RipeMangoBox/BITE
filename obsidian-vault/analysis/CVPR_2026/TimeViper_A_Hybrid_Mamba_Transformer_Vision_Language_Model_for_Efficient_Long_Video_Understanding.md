@@ -50,8 +50,6 @@ claims:
 
 在效率方面，TransV在4096帧时将GPU内存占用降低54.8%，预填充时间减少15.7%，并使模型能够处理超过10,000帧的长视频（Figure 5, Figure 6）。在性能方面，TimeViper在VideoMME（56.9）、Charades-STA（mIoU 37.9）、VDC（39.1）和LVBench（35.6）等长视频理解基准上，取得了与Transformer基线相当甚至更优的结果（Table 2），同时保持了显著的推理效率优势。
 
-
-
 长视频理解是多模态大语言模型（MLLM）走向实际应用的关键能力，涵盖小时级视频问答、时间定位和详细描述等任务。然而，现有基于Transformer的MLLM面临一个根本性瓶颈：**自注意力机制的O(n²)计算复杂度**使得处理长视觉序列时效率急剧下降。随着视频帧数增加，视觉token数量线性增长，LLM内部的长序列处理成为主要计算瓶颈，严重阻碍了视频帧数的扩展。
 
 为缓解这一问题，混合Mamba-Transformer架构应运而生。该类模型将状态空间模型（SSM）的高效序列建模能力与注意力机制的精确上下文查询能力相结合：Mamba层以O(n)复杂度和O(1)隐藏状态缓存取代部分自注意力层，显著降低了内存占用和推理延迟。然而，仅靠架构替换仍不足以突破超长视频（万帧级别）的处理门槛——**视觉token本身存在严重冗余**，大量token在深层对任务贡献甚微，却持续消耗计算资源。
@@ -59,8 +57,6 @@ claims:
 现有视觉token压缩策略（如ToMe）通常在LLM输入前的投影器中进行一次性合并，缺乏对LLM内部信息流动的动态感知。这导致两个问题：一是压缩发生在信息聚合之前，可能丢失关键视觉细节；二是压缩率受限于输入阶段，无法随层深自适应增强。因此，**如何在LLM内部显式利用视觉token的冗余特性，实现更激进而无损的压缩，是长视频理解效率突破的核心挑战**。
 
 TimeViper正是针对上述缺口提出的解决方案。其核心动机源于一个关键发现：在混合MLLM中，视觉信息在浅层逐渐聚合到指令token，使得深层视觉token高度冗余（Figure 4显示深层几乎100%冗余）。基于此，TimeViper在LLM内部引入**TransV模块**，通过门控交叉注意力将冗余视觉token的信息显式转移到指令token中，在保留关键视觉信息的同时大幅压缩视觉token数量，使模型能处理超过10,000帧的长视频，并保持与Transformer基线相当的性能。
-
-
 
 ## 核心方法与创新机理
 
@@ -108,8 +104,6 @@ TransV 带来的效率提升是实质性的（Figure 5, Figure 6）：
 
 消融实验（Table 1）验证了 TransV 设计的每个关键选择：若仅使用 ToMe 而无 TransV 进行 token 转移，Charades mIoU 从 40.5 骤降至 26.1；引入 TransV 后恢复至 38.1，证明 token 信息转移而非简单丢弃是保持性能的关键。
 
-
-
 TimeViper 的整体 pipeline 围绕“在混合 Mamba-Transformer LLM 内部主动压缩视觉 token”这一核心思想构建，其设计目标是在保持长视频理解能力的前提下，突破 Transformer 自注意力机制的 O(n²) 计算瓶颈。模型由四个关键模块串联构成，形成从原始视频帧到最终文本响应的端到端流。
 
 **输入与视觉编码。** 视频首先以 1 fps 采样，每帧缩放到 384×384 分辨率，送入一个冻结的 ViT 视觉编码器，输出高维视觉 token 序列。ViT 在整个训练过程中保持冻结，这与部分竞争方法（如 LLaVA-Video、Qwen2.5-VL）不同，后者对 ViT 进行了微调以提升视觉特征质量。
@@ -128,16 +122,6 @@ $$X_1^{l+1} = X_1^l + \tanh(\alpha_l) \tilde{X}_1^l$$
 **输出生成。** 经过 TransV 压缩后，剩余的视觉 token 与指令 token 继续在 LLM 的后续层中交互，最终生成文本响应。整个 pipeline 的信息流可概括为：视频帧 → ViT 编码 → 投影器 + ToMe 帧级压缩 → 混合 LLM 浅层处理 → TransV 浅层信息转移与压缩 → 混合 LLM 深层处理 → TransV 深层信息转移与压缩 → 响应生成。
 
 **训练流程。** TimeViper 采用两阶段训练：第一阶段在 3M 高质量图文对上预训练投影器，实现视觉与语言模态的对齐；第二阶段在 7.8M 样本上进行视觉指令微调，涵盖多选问答、时间定位、视频描述等任务。TransV 模块额外引入约 100M 参数，在效率与参数量之间形成可控的权衡。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l787_https_arxiv_org_abs_2511_16595/figures/002_Figure_2.jpg]]
-*Figure 2: Illustration of TimeViper, our proposed hybrid MLLM for long video understanding. The model consists of a ViT visual encoder, a projector with token merging, and a hybrid Mamba-Transformer LLM equipped with TransV. The token merging [11] compresses each frame into 16 vision tokens. Inside the LLM, TransV transfers information from redundant vision tokens to instruction tokens to reduce the number of vision tokens. Specifically, TransV uniformly drops vision tokens in shallow layers and removes low-attention vision tokens in deeper layers. The compression module is implemented through a Gated Cross-Attention mechanism [3] with adaptive learnable weights. Note that TransV is illustrated befor...*
-
-![[assets/figures/papers/paper_list_l787_https_arxiv_org_abs_2511_16595/figures/001_Figure_1.jpg]]
-*Figure 1: We present TimeViper, a hybrid Mamba-Transformer vision-language model for efficient long video understanding. We reveal the severe vision token redundancy and a vision-to-text information aggregation phenomenon in hybrid models. To this end, we introduce TransV, the first token-transfer module that compresses vision tokens into text tokens inside the LLM, enabling the model to process over 10,000 frames. Benefitting from the Mamba layers’ O(n) computation and O(1) cache cost, TimeViper generates 40.1% more tokens per second than Qwen3 [97] when processing 32k input tokens (approximately 2k frames at 16 tokens per frame) and producing 1k output tokens with batch size 32. TimeViper delivers...*
-
-
 
 TimeViper 的核心设计围绕两个关键模块展开：**混合 Mamba-Transformer LLM 骨干**和**内部视觉Token压缩模块 TransV**。前者通过状态空间模型（SSM）与自注意力机制的混合实现长序列的高效建模，后者在LLM内部显式地将冗余视觉Token信息转移到指令Token中，从而大幅压缩视觉Token数量。
 
@@ -181,15 +165,8 @@ $$[X_0^{l+1}, X_1^{l+1}, Y_{:t}^{l+1}] = \begin{bmatrix} 1 & 0 & 0 \\ 1 & 1 & 0 
 
 其中 $Y_{:t}$ 为响应Token。通过在不同层施加阻断并观察性能变化，可精确定位视觉信息向指令Token转移的层深规律——这直接支撑了TransV在浅层和深层分别进行压缩的设计决策。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l787_https_arxiv_org_abs_2511_16595/figures/003_Figure_3.jpg]]
 *Figure 3: Comparison of information blocking to illustrate the vision-to-text information aggregation phenomenon in hybrid MLLMs. For instruction-centric tasks (e.g., multi-choice video QA), information is first aggregated from vision tokens to instruction tokens, which are then used for response generation. In contrast, for vision-centric tasks*
-
-![[assets/figures/papers/paper_list_l787_https_arxiv_org_abs_2511_16595/figures/004_Figure_4.jpg]]
-*Figure 4: Illustration of token redundancy. We compare performance under different vision-token dropping rates p using uniform dropping and attention-guided dropping strategies. In the hybrid MLLM, vision token redundancy increases progressively with layer depth, allowing more aggressive token removal in deeper layers with minimal performance loss*
-
-
 
 ## 实验与关键发现
 
@@ -268,21 +245,8 @@ Figure 7展示了测试时增加输入帧数的扩展性。模型训练时使用
 ![[assets/figures/papers/paper_list_l787_https_arxiv_org_abs_2511_16595/figures/014_Table_4.jpg]]
 *Table 4: Performance of applying TransV to Qwen2.5 and Nano*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l787_https_arxiv_org_abs_2511_16595/figures/008_Table_2.jpg]]
-*Table 2: Comparison with state-of-the-art models. Our work differs from previous studies both the choice of LLM backbone and the design of token compression strategy, while achieving competitive performance across benchmarks. Most existing methods fine-tune the ViT (indicated with *), whereas we do not due to computational constraints. Additionally, while the concurrent work Nanov2-VL [24] is trained on 46.7M samples, we uses only 7.8M, making Nanov2-VL a reasonable upper bound for hybrid models*
-
-![[assets/figures/papers/paper_list_l787_https_arxiv_org_abs_2511_16595/figures/009_Figure_7.jpg]]
-*Figure 7: Comparison of performance as the number of input frames increases on long-video understanding benchmarks. We train our models with 256 frames as inputs, and sample 1 frame per second during evaluation. The x-axis here denotes the maximum number of frames. If a video exceeds this length, we take only the first max frames for inference*
-
-![[assets/figures/papers/paper_list_l787_https_arxiv_org_abs_2511_16595/figures/010_Figure_8.jpg]]
-*Figure 8: Illustration of attention score matrices in Nanov2 [9] and Qwen2.5 [96] at shallow and deep layers. White lines divide the input sequence into four distinct segments: system prompt, vision tokens, user instruction, and the generated response*
-
 ![[assets/figures/papers/paper_list_l787_https_arxiv_org_abs_2511_16595/figures/011_Figure_9.jpg]]
 *Figure 9: Qualitative results of TimeViper on three long video understanding tasks. (1) MCQ: The model demonstrates reasoning capability by correctly answering a multi-choice question about the video’s content. (2) TVG: It accurately localizes the temporal boundaries for a specific event, reaching an IoU of 0.75. (3) VDC: The model generates a detailed description that showcases its fine-grained comprehension. Green text highlights accurate detailed descriptions. Some output in the middle is omitted for brevity*
-
-
 
 ## 定位与知识库关联
 
@@ -355,8 +319,6 @@ TimeViper的设计选择决定了其适用的场景边界：
 5. **规模化行为**：在更大规模数据（>50M样本）和更大模型尺寸（>13B参数）下，混合架构的线性复杂度优势能否持续保持？TransV的压缩-性能权衡曲线是否会发生变化？这需要更大规模的实验验证。
 
 6. **与长上下文技术的结合**：TransV的token压缩与RoPE外推、位置编码插值等长上下文技术是否存在协同效应？两者的结合能否进一步扩展可处理视频的时长上限？
-
-
 
 ## 原文 PDF
 

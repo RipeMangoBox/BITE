@@ -54,8 +54,6 @@ claims:
 
 **局限性**：DreamMotion 强依赖原始视频的结构和运动，在需要大幅度结构变化的编辑任务上能力有限，无法执行显著的几何变形或对象替换。
 
-
-
 ### 视频编辑的范式瓶颈：从祖先采样到分数蒸馏
 
 文本到视频（T2V）扩散模型的快速发展催生了一系列零样本视频编辑方法，其核心思路是将图像编辑技术迁移到视频域。主流方案——包括 **Tune-A-Video**（Wu et al., ICCV 2023）、**ControlVideo**（Zhang et al., arXiv 2023）、**TokenFlow**（Geyer et al., arXiv 2023）等——普遍采用基于祖先采样的逆向扩散流程：先通过DDIM反演将原始视频映射到噪声空间，再在去噪过程中注入目标文本条件，从而在保留原始结构的同时修改外观。
@@ -79,8 +77,6 @@ DreamMotion的核心洞察在于：**扩散U-Net中间层特征的自相似性�
 - **时间自相似性**：不同帧在空间池化后的特征向量之间的相似度刻画了视频的时序演进模式，是运动信息在特征空间中的紧凑表示。
 
 通过在SDS优化过程中强制编辑视频与原始视频的扩散特征保持空间和时间自相似性一致，DreamMotion实现了**外观注入与运动保持的精细平衡**——外观由V-DDS（Video Delta Denoising Score）梯度驱动注入，而结构和运动则由自相似性匹配损失约束在原始视频的流形上。图3的优化过程可视化直观展示了这一机制的效果：仅使用V-DDS会导致结构逐渐漂移，而加入时空自相似性正则化后，编辑视频在获得目标外观的同时稳定保持了原始运动轨迹。
-
-
 
 ## 核心方法与创新机理
 
@@ -106,8 +102,6 @@ DreamMotion 的核心创新在于**从根本上绕开了传统零样本视频编
 ### 级联模型的轻量适配
 
 对于级联视频扩散模型（如 Show-1），DreamMotion 将优化**仅作用于关键帧生成阶段**，而非整个级联管线。这一策略在保持编辑质量的同时大幅降低了计算开销，使方法可无缝嵌入现有级联框架。
-
-
 
 ![[assets/figures/papers/paper_list_l32_DreamMotion_Space_Time_Self_Similarity_Score_Distillation_for_Zero_Shot/figures/001_Figure_1.jpg]]
 *Figure 1: Zero-shot video editing results. The second row presents videos produced with our method with a non-cascaded video diffusion model, while those in the bottom row are from a cascaded model. For a full display of results, visit our project page*
@@ -135,8 +129,6 @@ DreamMotion 的优化框架以**视频差分去噪分数蒸馏（V‑DDS）**为
 ### 级联模型适配
 
 对于 Show‑1 等级联视频扩散框架（由关键帧生成、时序插值、空间超分辨率三阶段组成），DreamMotion 将上述优化过程**仅应用于关键帧生成阶段**。这一策略在保持编辑质量的同时大幅降低了计算成本，后续的插值与超分模块沿用原始管线即可完成全分辨率视频合成。
-
-
 
 DreamMotion 的核心由三个损失函数和一个梯度过滤策略构成，它们共享同一组噪声 $\epsilon$ 和时间步 $t$，在单次前向传播中完成计算，从而实现高效联合优化。
 
@@ -193,8 +185,6 @@ V-DDS 的梯度在非编辑区域可能引入模糊和过饱和。DreamMotion �
 ### 级联模型适配
 
 对于 Show-1 等级联视频扩散模型（Keyframe Generation → Temporal Interpolation → Spatial Super Resolution），DreamMotion 仅对 Keyframe Generation 阶段施加优化，大幅降低计算开销，后续模块保持不变以继承时间插值和超分能力。
-
-
 
 ## 实验与关键发现
 
@@ -280,17 +270,11 @@ Fig. 10 展示了 DreamMotion 的主要失败模式：**无法处理需要大幅
 
 所有对比实验均在相同预训练视频扩散模型上进行（非级联用 Zeroscope，级联用 Show-1），基线方法使用官方实现和默认超参数。人类评估采用匿名视频和一致界面以避免偏差。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l32_DreamMotion_Space_Time_Self_Similarity_Score_Distillation_for_Zero_Shot/figures/003_Figure_3.jpg]]
 *Figure 3: Appearance Injection with Space-TimeSelf-Similarity Man→spider-man Fig. 3: Optimization progress visualization. The proposed self-similarity regularization effectively preserves the structure and motion of the original video*
 
 ![[assets/figures/papers/paper_list_l32_DreamMotion_Space_Time_Self_Similarity_Score_Distillation_for_Zero_Shot/figures/018_Figure_14.jpg]]
 *Figure 14: “Amanisdoingakickflip.”→“Anastronautisdoingakickflip." Fig. 14: Visualization of optimization progress*
-
-![[assets/figures/papers/paper_list_l32_DreamMotion_Space_Time_Self_Similarity_Score_Distillation_for_Zero_Shot/figures/012_Table.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -344,8 +328,6 @@ DreamMotion 的适用边界由其核心机制决定：
 3. **自相似性特征的层级选择**：当前方法使用U-Net特定层的key特征计算自相似性，不同层级对结构和纹理的敏感度不同。系统性研究特征层级的选择策略可能进一步提升效果。
 
 4. **泛化到更复杂的运动模式**：T-SSM基于帧间余弦相似性，对快速运动或大幅度遮挡场景的鲁棒性尚待验证。引入多尺度时间窗口或可变形的时间对齐机制可能是改进方向。
-
-
 
 ## 原文 PDF
 

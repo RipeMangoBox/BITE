@@ -54,8 +54,6 @@ Morph 提出了一种无需真实运动数据的物理优化框架。其核心�
 
 在方法谱系上，Morph 区别于 **PhysDiff**（Yu et al., 2023）等将物理优化嵌入扩散过程的方法，提出了两阶段协同训练范式：先训练 MPR 精炼噪声运动，再用精炼数据微调生成器。其先验奖励机制采用轻量运动 VAE 提供平滑稳定的分布约束，避免了对抗性奖励的不稳定性。该方法可即插即用地与多种生成器（扩散、自回归、掩码建模）结合，展现出良好的通用性。
 
-
-
 ### 物理伪影：动作生成中被忽视的瓶颈
 
 文本到动作生成领域近年来取得了显著进展，扩散模型、自回归模型和掩码建模等方法在生成多样性和文本匹配度上不断刷新记录。然而，几乎所有现有方法都共享一个隐含假设：只要生成的动作“看起来像”真实数据分布中的样本，它就是合理的。这一假设导致了一个系统性问题——**物理伪影**的普遍存在。
@@ -76,8 +74,6 @@ Figure 1 展示了典型的问题模式：生成的人物动作出现漂浮（�
 2. **闭环互促潜力**：一旦物理精炼模块在合成数据上训练完成，它可以将噪声运动投影到物理合理空间；这些精炼后的数据反过来可以用于微调生成器，使生成器输出本身更接近物理合理分布，进而在下一轮为精炼模块提供更高质量的输入。
 
 这一“生成-精炼-反哺”的闭环机制，使得系统可以在**无需任何真实运动数据**的条件下，实现物理合理性与生成质量的同步提升。这正是 Morph 框架的核心动机：构建一个运动无关（Motion-Free）的物理优化框架，让物理约束的施加不再受制于昂贵的数据获取成本。
-
-
 
 ## 核心方法与创新机理
 
@@ -104,8 +100,6 @@ Morph 的核心创新在于构建了一个**无需真实运动数据的闭环物
 ### 创新边界与局限
 
 需要指出的是，当前框架仅适用于地面接触动作（如行走、跑步），对于涉及环境交互的动作（如坐椅子、游泳），MPR 模块无法在仿真器中复现，需借助模仿选择操作过滤。此外，框架的有效性依赖于生成器产生的合成数据质量，且物理仿真与强化学习训练需要较高计算资源（8 块 Tesla V100 GPU）。这些限制为后续研究指明了方向。
-
-
 
 Morph 框架的核心思想是**在无需真实运动数据的前提下，通过生成器与物理精炼模块的协同训练，实现物理合理性与生成质量的双向提升**。其整体架构由两个关键模块构成，并通过两阶段训练流程形成闭环。
 
@@ -143,15 +137,8 @@ $$\mathcal{L}_{\mathrm{MG}}(\xi) = \mathbb{E}\left[\|\pmb{x}^{1:L} - f_{\xi}(\pm
 
 推理时，给定条件信号 $c$，运动生成器首先生成含噪声运动序列，随后 MPR 模块将其投影为物理合理运动，最终输出兼顾语义一致性与物理真实性的动作序列。对于非地面接触的动作类型，模仿选择操作在推理阶段同样生效，将其直接交由生成器输出而不经过物理精炼。
 
-### 补充图表
-
 ![[assets/figures/papers/arxiv_2024_morph_2411_14951/figures/002_Figure_2.jpg]]
 *Figure 2: An overview of the Morph framework. Morph comprises a Motion Generator and a Motion Physics Refinement module. Morph employs a two-stage training process: Motion Physics Refinement module training and Motion Generator fine-tuning. And a Imitation Selection Operation is employed to ensure the motion quality after physics refinement. The solid curved arrows on the left and right (in orange and green) represent the iterative, collaborative optimization between Stage 1 and Stage 2*
-
-![[assets/figures/papers/arxiv_2024_morph_2411_14951/figures/001_Figure_1.jpg]]
-*Figure 1: Examples of physical inconsistencies in generations*
-
-
 
 Morph 框架由两个核心模块构成：**运动生成器（Motion Generator, MG）** 与 **运动物理精炼模块（Motion Physics Refinement, MPR）**。二者通过两阶段训练形成闭环，无需真实运动数据即可实现物理合理性的持续提升。
 
@@ -206,13 +193,6 @@ $$\mathcal{L}_{\mathrm{MG}}(\boldsymbol{\xi}) = \mathbb{E}\left[ \left\| \boldsy
 ### 模仿选择操作
 
 对于坐、游泳、爬楼梯等非地面接触动作，当前物理仿真器无法正确模拟。Morph 通过**模仿选择操作（Imitation Selection Operation）** 过滤此类动作：基于 MPJPE（平均关节位置误差）阈值 $\tau$ 判断物理精炼是否成功，仅将精炼成功的样本送入生成器微调。超参数分析表明 $\tau=0.5$ 可在生成质量与物理合理性之间取得最佳平衡。
-
-### 补充图表
-
-![[assets/figures/papers/arxiv_2024_morph_2411_14951/figures/008_Figure_4.jpg]]
-*Figure 4: A flowchart illustrating the data preprocessing process. The parameters are calculated from the first frame and then applied to all generated motion sequences before they are fed into the MPR module*
-
-
 
 ## 实验与关键发现
 
@@ -271,27 +251,11 @@ Table 2 将 Morph 与多种类型生成器结合——扩散模型（MotionDiffu
 
 Table 8 的用户研究提供了感知层面的验证：Morph-MoMask 在物理合理性维度以 **97.5%** 的胜率显著优于 MoMask 基线。这一极端高的胜率与客观物理指标中渗透降至零、滑动降至近零的结果相互印证，说明物理指标的改善确实转化为人类可感知的质量提升。
 
-![[assets/figures/papers/arxiv_2024_morph_2411_14951/figures/010_Table_8.jpg]]
-*Table 8: The win rate of Morph over baselines*
-
 ### 失败模式与局限
 
 尽管物理指标改善显著，Morph 仍存在明确的应用边界。当前的物理仿真器无法复现非地面接触动作（如坐椅子、游泳、爬楼梯），因此方法依赖模仿选择操作过滤此类动作。这意味着对于涉及环境交互的动作类型，Morph 无法提供物理优化，限制了其在更广泛动作生成场景中的应用。
 
 此外，物理仿真和强化学习训练需要较高计算资源（8 块 Tesla V100 GPU），且框架的有效性依赖于生成器产生的合成数据质量——若生成器本身偏差过大，可能影响 MPR 的训练效果。这些局限指向了未来的改进方向：扩展仿真器以支持环境交互、探索更轻量的物理仿真方案、以及研究多轮优化的自动收敛判定策略。
-
-### 补充图表
-
-![[assets/figures/papers/arxiv_2024_morph_2411_14951/figures/005_Table_3.jpg]]
-*Table 3: Comparison results on common generation metrics for text-to-motion on HumanML3D dataset*
-
-![[assets/figures/papers/arxiv_2024_morph_2411_14951/figures/006_Table_4.jpg]]
-*Table 4: Comparison results for music-to-dance on AIST++ dataset. † denotes Morph without fine-tuning motion generator*
-
-![[assets/figures/papers/arxiv_2024_morph_2411_14951/figures/015_Table_9.jpg]]
-*Table 9: Cross-Task generalization results on Music2Dance and Text2Motion*
-
-
 
 ## 定位与知识库关联
 
@@ -324,8 +288,6 @@ Morph 的核心贡献在于提出了一种**无需真实运动数据的物理优
 **多轮优化的收敛策略。** Morph 的多轮交替训练（MG 与 MPR 互相优化）在三轮时达到最佳性能（Table 7：FID 0.034，PFC 0.618），但论文未给出自动判断收敛的机制。多轮优化的最佳停止策略，以及生成器微调阶段是否可能引入灾难性遗忘、如何保持原有生成多样性，仍是未充分探索的问题。
 
 **泛化到更多角色模型。** 当前验证基于单一的人体角色模型。在不同仿真器或更复杂的角色模型（如不同体型、非人形角色）上，该方法的有效性仍需验证。
-
-
 
 ## 原文 PDF
 

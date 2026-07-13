@@ -56,8 +56,6 @@ claims:
 
 该方法的主要局限在于推理需要多步扩散反推，无法实时交互；当前仅在短时片段（5.9 秒）上验证；潜在频谱的可解释性仅覆盖 genre、tempo、pitch 等有限属性。未来的开放问题包括能否支持流式频率控制、沿语义轴进一步解耦，以及扩展到更长音乐段落或其他时序模态。
 
-
-
 音乐生成模型的核心挑战之一，是如何让用户以直观、可控的方式指定生成条件。现有主流方法——扩散模型、自回归模型、掩码语言模型——在条件生成上存在一个共同的瓶颈：它们以“粗到细”（coarse-to-fine）的方式运作，不同噪声级别或量化层级天然地耦合了时间尺度信息。这意味着，用户无法选择性地提取参考音频中特定时间尺度的模式（如仅保留节奏骨架而替换音色细节，或仅保留和弦进行而改变旋律走向）。
 
 具体而言，现有条件生成范式存在以下缺口：
@@ -71,8 +69,6 @@ claims:
 上述方法的共同缺陷在于：**它们缺乏一条显式、连续且可学习的频率轴来按时间尺度正交化音乐特征**。这导致三个关键能力缺失——（1）无法从参考音频中精确提取指定时间尺度的模式进行条件生成；（2）无法将两段音频在不同时间尺度上进行可控混合；（3）无法对潜在表征的频谱进行解释性分析，以理解不同音乐属性（genre、tempo、pitch等）在时间尺度上的分布。
 
 本文的核心动机正是填补这一缺口：**能否设计一种方法，使得潜在空间中的频率轴成为时间尺度的直观代理，从而让用户通过简单的频谱掩膜即可实现对音乐模式的选择性提取与生成控制？** 这一动机直接催生了LATENTFT——将扩散自编码器与潜在空间傅里叶变换相结合，并引入频率掩膜训练策略，迫使编码器将不同时间尺度的音乐特征分离到不同的潜频率bin中。
-
-
 
 ## 核心方法与创新机理
 
@@ -109,8 +105,6 @@ LATENTFT 的核心因果机制可概括为：**在潜在序列的傅里叶域进
 
 综上，LATENTFT 的创新不在于引入全新的模块类型，而在于**将 DFT 的频率分解能力与扩散自编码器的表示学习能力通过掩膜训练策略有机耦合**，创造出一条可解释、可操控的连续频率轴，使音乐生成中的时间尺度控制从隐式、耦合变为显式、正交。
 
-
-
 LATENTFT 的核心 pipeline 由五个模块串联构成：**编码器 → 潜在傅里叶变换（DFT）→ 频率掩膜 → 逆傅里叶变换（IDFT）→ 解码器（扩散模型）**。整个流程在训练和推理阶段共享相同的前向通路，但掩膜策略和下游目标不同。
 
 ### 训练流程
@@ -139,8 +133,6 @@ LATENTFT 的核心 pipeline 由五个模块串联构成：**编码器 → 潜在
 | **编码器** | 将音频映射到可学习的表示域 | 消除编码器直接掩膜波形时 adherence 急剧下降（Table 10） |
 
 > **注意**：上述消融数据均来自 Table 9 和 Table 10，其中 Mel-Cepstral Distortion（Timbre）指标已被除以 100 以便显示。
-
-
 
 LATENTFT 的核心架构由五个模块串联构成：**编码器**、**潜在傅里叶变换（DFT）**、**频率掩膜**、**逆傅里叶变换（IDFT）** 和 **扩散解码器**。训练时，系统通过随机掩膜潜频谱迫使编码器将不同时间尺度的音乐模式分离到不同的潜频率 bin 中；推理时，用户通过指定频谱掩膜来选择性地提取参考音频中特定时间尺度的特征。
 
@@ -193,8 +185,6 @@ $$\hat{x}_0 \gets \mathrm{Dec}_\theta(z^{\text{masked}}, x_\tau, \tau)$$
 ### 模块间因果机制
 
 整个流水线的核心因果链条可概括为：**频率掩膜训练 → 编码器被迫按时间尺度分离特征 → 潜频谱获得可解释的频率轴 → 推理时通过频谱掩膜实现选择性条件控制**。消融实验（Table 9）验证了这一链条的每个环节：移除频率掩膜使 FAD 从 0.349 升至 5.341；取消频率 bin 相关性使 FAD 增至 2.744；移除对数频率缩放使 FAD 升至 1.196 并削弱条件遵循能力；移除编码器则导致条件遵循指标急剧下降。
-
-
 
 ## 实验与关键发现
 
@@ -291,9 +281,6 @@ LATENTFT-UNet 的 FAD（0.337）比最佳基线 ILVR（1.124）降低了 **0.787
 
 **Figure 5** 和 **Figure 11** 通过“保留曲线”（preservation curves）揭示了潜在频谱中不同频率 bin 与音乐语义属性的对应关系：
 
-![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_ogMxCjdCCq/figures/005_Figure_5.jpg]]
-*Figure 5: Preservation curves indicating where tempo, pitch, genre reside in in the latent spectra of two reference songs*
-
 - **流派（genre）**：主要集中在 0 Hz 附近的极低频段，说明流派是全局性、大尺度的音乐特征
 - **和弦进行（chord changes）**：同样位于低频段，与音乐结构的大尺度时间模式一致
 - **速度（tempo）和音高（pitch）**：关联于较高的潜在频率，对应更细粒度的时间模式
@@ -310,27 +297,8 @@ LATENTFT-UNet 的 FAD（0.337）比最佳基线 ILVR（1.124）降低了 **0.787
 4. **语义解耦不完整**：潜在频谱的可解释性仅针对 genre、tempo、pitch、chord 等有限属性进行了验证，尚未覆盖所有语义轴（如音色、配器密度、情感表达等）。
 5. **声码器依赖**：基于 Mel 频谱的解码依赖外部 BigVGAN 声码器，可能引入额外质量损失；端到端波形生成实验尚未展示，LATENTFT-DAC 变体的条件遵循能力不足也暗示了波形域编码的挑战。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_ogMxCjdCCq/figures/006_Table_2.jpg]]
 *Table 2: MLP Encoder Architecture*
-
-![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_ogMxCjdCCq/figures/007_Table_3.jpg]]
-*Table 3: 1D U-Net Encoder Hyperparameters*
-
-![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_ogMxCjdCCq/figures/008_Table_4.jpg]]
-*Table 4: DAC Encoder Hyperparameters*
-
-![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_ogMxCjdCCq/figures/009_Table_5.jpg]]
-*Table 5: Decoder Hyperparameters*
-
-![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_ogMxCjdCCq/figures/010_Table_6.jpg]]
-*Table 6: Training Hyperparameters*
-
-![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_ogMxCjdCCq/figures/011_Table_7.jpg]]
-*Table 7: Other Hyperparameters. Full descriptions can be found in the Methods section (Sec. 3)*
-
-
 
 ## 定位与知识库关联
 
@@ -384,8 +352,6 @@ LATENTFT 相对于基线方法的关键变化体现在三个维度：
 3. **长时生成扩展**：方法能否扩展到更长音乐段落，或应用于视频、语音等其他时序模态？
 4. **自适应掩膜策略**：是否可能引入自适应或可学习的频率掩膜策略，以进一步减少信息泄漏并提高鲁棒性？
 5. **混合相干性保证**：如何量化并保证混合时不同段的相干性，避免不自然的拼接？
-
-
 
 ## 原文 PDF
 

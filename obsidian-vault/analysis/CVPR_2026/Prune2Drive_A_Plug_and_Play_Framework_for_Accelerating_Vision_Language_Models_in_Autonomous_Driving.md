@@ -48,15 +48,11 @@ claims:
 
 在 DriveLM 和 DriveLMM-o1 两个自动驾驶 VLM 基准上，Prune2Drive 仅保留约 10% 的视觉 token 即可实现：预填充阶段 **6.40× 加速**，仅消耗 **13.4% FLOPs**，同时平均性能下降控制在 **3%** 以内，达到该设定下的最优结果。方法无需重新训练底层 VLM，收敛仅需约 3 个 H100 GPU 小时，展现出良好的实用性与可部署性。
 
-
-
 视觉语言模型（VLMs）正逐渐成为自动驾驶（AD）感知与决策的核心组件，尤其是在多视图输入场景下，模型需要同时处理来自前视、后视、侧视等多个摄像头的视觉信息。然而，VLM 的自注意力机制具有关于序列长度 $N$ 的 $\mathcal{O}(N^2)$ 计算复杂度，当多视图的高分辨率图像被转换为大量视觉 token 后，推理延迟和显存占用急剧膨胀，严重制约了实时部署的可行性。
 
 现有 token 压缩方法（如 FastV 等）在多视图场景下暴露出两个关键缺陷。其一，它们通常对所有视图采用统一的压缩策略，忽略了不同摄像头视角对驾驶决策的差异化贡献——例如前视图通常比侧视图包含更多安全关键信息。其二，压缩过程中缺乏对 token 语义与空间多样性的显式保护，容易丢弃远处小目标或边缘区域的重要线索，导致场景理解出现事实性错误。如 Figure 1 所示，FastV 错误地将前视图中的白色货车描述为“摩托车骑手”，而 Prune2Drive 则通过保留语义和空间上更具代表性的 token 正确识别了该目标。
 
 针对上述瓶颈，本文提出 **Prune2Drive**，一个即插即用的多视图 VLM 视觉 token 剪枝框架。其核心动机在于：通过**视图自适应**的剪枝比例分配与**多样性感知**的 token 选择，在显著降低计算开销的同时，最大限度地保留对驾驶决策关键的多视图信息。具体而言，Prune2Drive 在 DriveLM 基准上仅消耗 13.4% 的 FLOPs 即可将平均性能下降控制在约 3%，并在预填充阶段实现 6.40× 的加速比，同时达到 SOTA 水平。
-
-
 
 ## 核心方法与创新机理
 
@@ -94,8 +90,6 @@ $$\mathcal{M}(\boldsymbol{\alpha}) = R(\boldsymbol{\alpha}) - \lambda P(\boldsym
 | 优化目标 | 启发式规则 | 奖励-惩罚联合优化 |
 | 即插即用性 | 需修改模型结构 | 无需微调 VLM 权重 |
 
-
-
 Prune2Drive 的整体 pipeline 围绕“视觉 token 裁剪”这一核心操作展开，其设计目标是在不修改 VLM 内部参数的前提下，以即插即用的方式大幅降低多视图输入带来的计算开销。框架由两条正交但协同的支路构成：**视图自适应裁剪比例优化**（view-adaptive pruning ratio optimization）和**多样性感知的 token 选择策略 T-FPS**（diversity-aware token pruning via Farthest Point Sampling）。
 
 ### Pipeline 总览
@@ -117,12 +111,8 @@ Prune2Drive 的整体 pipeline 围绕“视觉 token 裁剪”这一核心操作
 
 这种“先分配、后选择”的解耦设计使得框架可以灵活适配不同的 VLM 架构和任务场景：比例优化只需在验证集上运行一次（约 3 个 H100 GPU 小时即可收敛），而 T-FPS 在推理时对每张图（$N=729$ 个 token）仅需约 0.02 秒，额外计算量不足总 FLOPs 的 0.1%。二者均不涉及对 VLM 权重的任何微调或梯度回传，因此 Prune2Drive 天然具备即插即用特性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l777_https_arxiv_org_abs_2508_13305/figures/003_Figure_3.jpg]]
 *Figure 3: Detailed architecture of Prune2Drive. (a) VLM workflow in Prune2Drive, (b) View-adaptive pruning ratio optimization, where view-specific token pruning ratios are automatically determined, and (c) Diversity-aware T-FPS token pruning strategy, which preserves visual tokens that contain rich semantic and spatial information across multi-view inputs*
-
-
 
 Prune2Drive 由两个关键模块构成：**多样性感知的 T-FPS 令牌剪枝策略** 和 **视角自适应剪枝比例优化框架**。两者协同工作，在预填充阶段对多视图视觉令牌进行高效压缩。
 
@@ -172,19 +162,6 @@ $$d_H(V_i, S_i) := \max \Bigl\{ \sup_{v \in V_i} \inf_{s \in S_i} d(v, s),\ \sup
 - **视角自适应优化** 则策略性地将更大的令牌预算分配给内在重要性 $w_i$ 更高的视角，直接减小加权误差总和中的主导项。
 
 这一理论框架为 Prune2Drive 的“多样性保留 + 视角差异化分配”设计提供了形式化支撑。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l777_https_arxiv_org_abs_2508_13305/figures/001_Figure.jpg]]
-*Figure: FastV: There is a person riding a motorcycle to the front of the ego vehicle, a white straight arrow to the front of the ego vehicle, and a black traffic sign to the back of the ego vehicle. Ours: There is a white van to the front of the ego vehicle, a black sedan to the back of the ego vehicle, and a person riding a motorcycle to the front of the ego vehicle*
-
-![[assets/figures/papers/paper_list_l777_https_arxiv_org_abs_2508_13305/figures/011_Figure_4.jpg]]
-*Figure 4: Quantitative results of selected visual tokens. We compare selected visual tokens by FastV, DART and Prune2Drive. The red box indicates the position bias of attention-based token-pruning method, where posterior tokens are retained, and the green bounding boxes highlight critical objects captured by Prune2Drive, which enables view-importance assignment and diversity-aware token selection*
-
-![[assets/figures/papers/paper_list_l777_https_arxiv_org_abs_2508_13305/figures/014_Figure_5.jpg]]
-*Figure 5: Quantitative results of selected visual tokens. We compare selected visual tokens by FastV, DART, and Prune2Drive. FastV shows position bias (red boxes), retaining mostly posterior tokens, DART neglects view importance, while our Prune2Drive (green boxes) captures critical objects through view-importance and diversity-aware selection*
-
-
 
 ## 实验与关键发现
 
@@ -236,19 +213,6 @@ Prune2Drive 在自动驾驶视觉语言模型（VLM）的两个核心基准上�
 3. **VLM 架构依赖**：T-FPS 依赖视觉编码器输出的 token 嵌入质量，若底层视觉编码器对某些视角的表示能力不足，多样性采样可能放大该缺陷。
 
 4. **基准覆盖有限**：当前实验主要在 DriveLM、DriveLMM-o1 和 OmniDrive 上进行，缺乏在更多真实驾驶场景（如复杂天气、夜间条件）下的系统性验证，该结论需手动核实。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l777_https_arxiv_org_abs_2508_13305/figures/006_Table_3.jpg]]
-*Table 3: Regular VLM benchmarks*
-
-![[assets/figures/papers/paper_list_l777_https_arxiv_org_abs_2508_13305/figures/012_Table_8.jpg]]
-*Table 8: Hyperparameters in pruning ratio optimization*
-
-![[assets/figures/papers/paper_list_l777_https_arxiv_org_abs_2508_13305/figures/013_Table_9.jpg]]
-*Table 9: Sensitivity of λ*
-
-
 
 ## 定位与知识库关联
 
@@ -308,8 +272,6 @@ $$\| y - \hat{y} \| \leq C_f \sum_{i=1}^{M} w_i \cdot d_H(V_i, S_i)$$
 - **与模型量化的协同**：Prune2Drive 专注于 token 级别的压缩，与模型量化、蒸馏等正交的加速技术结合后的叠加效应尚未探索。
 - **实时部署验证**：论文报告了 6.40× prefill 加速和 13.4% FLOPs 降低，但未提供端到端延迟的详细分解（如 token 剪枝开销、GPU 内存占用变化），这对于实际部署评估至关重要。
 - **跨传感器模态扩展**：当前方法仅处理视觉 token。在 LiDAR-视觉融合的多模态 VLM 中，T-FPS 的多样性保持原则是否可扩展到点云 token 的剪枝，是一个值得探索的方向。
-
-
 
 ## 原文 PDF
 

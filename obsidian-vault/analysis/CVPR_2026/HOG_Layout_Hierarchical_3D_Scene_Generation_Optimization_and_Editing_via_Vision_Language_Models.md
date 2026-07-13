@@ -54,8 +54,6 @@ claims:
 
 该方法的局限性包括：移动指令编辑成功率相对较低（80%），源于自然语言空间描述的固有歧义性；依赖现有3D资产库，对库外物体需借助生成式管线；当前实验局限于室内场景，户外及大规模环境下的泛化性有待验证。
 
-
-
 3D场景生成是计算机视觉与图形学中的核心任务，其目标是根据自然语言指令自动合成包含合理物体布局的室内外环境。近年来，大语言模型（LLM）与视觉语言模型（VLM）在该领域展现出巨大潜力，能够将文本描述直接映射为场景中物体的位置、朝向与类别。然而，**现有基于VLM的3D场景生成方法普遍缺乏对物理一致性的显式建模**，导致生成的布局频繁出现物体碰撞、不合理放置（如悬空物体）以及较低的语义遵循度。纯文本或视觉输出的生成范式无法保证场景中物体的空间关系、支撑逻辑和边界约束，这成为制约该技术走向实际应用的核心瓶颈。
 
 具体而言，当前主流方法可归纳为三类范式，各有其结构性缺陷：
@@ -67,8 +65,6 @@ claims:
 上述方法的共同症结在于：**场景中的物体被视作平坦的列表，缺乏显式的结构组织**。在真实世界中，物体之间存在天然的支撑层级关系——例如，地板支撑家具、桌面支撑物品——这种层次结构是维持物理稳定性的基础。忽视该结构意味着优化算法无法区分不同层级的约束优先级，也难以将复杂的空间规则有效分解。
 
 本文的核心动机在于：**将场景优化建模为基于层次结构的力导向物理仿真**。通过将复杂的空间约束（碰撞、边界、支撑、邻近、靠墙、朝向、对齐）统一转化为可叠加的连续力——包括水平力、垂直力和旋转扭矩——使VLM预测的初始布局在迭代过程中逐步收敛至物理上稳定、语义上合理的最终状态。同时，引入死锁检测机制以打破局部最优，确保优化过程的高效与鲁棒。这一思路将3D场景生成从“一次性预测”转变为“层次化迭代精炼”，从根本上弥补了现有方法在物理可行性上的系统性缺陷。
-
-
 
 ## 核心方法与创新机理
 
@@ -96,8 +92,6 @@ HOG-Layout 的核心创新在于将 3D 场景生成重新定义为**层次化力
 
 不同于单步生成全场景的基线方法，HOG-Layout 采用**按功能区域分组迭代**的策略：首组基于空场景俯视图生成布局并优化，优化后的场景俯视图作为下一组生成的视觉上下文输入 VLM。这种“生成-优化-反馈”的闭环使后续组的布局能够感知已优化物体的空间占位，从源头减少跨组冲突，与层次化优化形成协同效应。
 
-
-
 HOG-Layout 是一个面向文本驱动 3D 场景合成与编辑的模块化流水线，由四个核心组件串联构成：**场景规划（Scene Planning）**、**布局生成（Layout Generation）**、**层次化优化（Hierarchical Optimization）** 和 **场景编辑（Scene Editing）**。其核心设计理念是将场景中的物体按支撑关系组织为层次化的父子结构，并将物理可行性与语义逻辑约束统一抽象为可叠加的连续力，通过迭代力导向仿真驱动布局收敛至稳定状态。
 
 ### 输入输出流与模块协作
@@ -113,8 +107,6 @@ Figure 2 和 Figure 3 分别展示了生成流水线与编辑流水线的完整�
 
 ![[assets/figures/papers/paper_list_l2170_https_arxiv_org_abs_2604_10772/figures/002_Figure_2.jpg]]
 *Figure 2: The pipeline of HOG-Layout. In the layout generation phase, layouts are generated sequentially according to groups and then optimized. The optimized scene is used as input for generating the layout for the next group. In the optimization phase, iterative optimization is performed according to the parent-child hierarchy, with optimization occurring simultaneously across different layers*
-
-
 
 HOG-Layout 由四个关键模块构成：**场景规划 (Scene Planning)**、**布局生成 (Layout Generation)**、**层次化优化 (Hierarchical Optimization)** 和 **场景编辑 (Scene Editing)**。本节聚焦于前三个核心模块及其关键公式。
 
@@ -194,15 +186,8 @@ $$F_{residual}(t) < \epsilon_{\mathrm{conv}}$$
 
 消融实验（Table 3）为这一模块提供了决定性证据：移除层次化优化后（w/o HierOpt），物体碰撞率 COL_ob 从 5.28% 飙升至 36.46%，场景碰撞率 COL_sc 从 16.00% 升至 65.00%，保真度 OOR 从 43.09% 骤降至 35.85%，充分证明层次化力导向优化是保证物理可行性的关键机制。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2170_https_arxiv_org_abs_2604_10772/figures/003_Figure_3.jpg]]
 *Figure 3: The editing pipeline of HOG-Layout*
-
-![[assets/figures/papers/paper_list_l2170_https_arxiv_org_abs_2604_10772/figures/014_Figure_8.jpg]]
-*Figure 8: Optional object acquisition methods. (a) The retrieval-based pipeline matches query text and geometry against a fixed database using semantic and visual similarity. (b) The generative pipeline replaces retrieval with generative objects: generating an image from text (e.g., via DALL-E) and then converting it to a 3D model (e.g., via Hunyuan 3D)*
-
-
 
 ## 实验与关键发现
 
@@ -224,9 +209,6 @@ HOG-Layout 在 SceneEval 基准上对所有基线方法取得了全面且显著�
 ### 人工评估
 
 Table 2 报告了 15 名用户对生成场景的 7 分制评分。HOG-Layout 在物理合理性上得分 **5.33 ± 0.88**，在语义对齐度上得分 **5.75 ± 0.87**，均显著高于所有基线（LayoutGPT 分别为 3.87 和 4.13，Holodeck 分别为 4.53 和 4.67，LayoutVLM 分别为 4.93 和 5.07）。人工评估与自动指标高度一致，说明 SceneEval 的自动度量能够有效反映人类感知的质量差异。
-
-![[assets/figures/papers/paper_list_l2170_https_arxiv_org_abs_2604_10772/figures/007_Table_2.jpg]]
-*Table 2: Human evaluation results*
 
 ### 消融实验
 
@@ -252,9 +234,6 @@ Table 7 报告了编辑模块的量化结果。添加（add）和删除（delete
 ![[assets/figures/papers/paper_list_l2170_https_arxiv_org_abs_2604_10772/figures/019_Table_7.jpg]]
 *Table 7: Quantitative results of scene editing. We report the Editing Success Rate (ESR), Scene-level Collision*
 
-![[assets/figures/papers/paper_list_l2170_https_arxiv_org_abs_2604_10772/figures/010_Table_5.jpg]]
-*Table 5: Editing time results*
-
 ### 可视化分析
 
 Figure 5 的定性对比直观展示了 HOG-Layout 的优势：LayoutGPT 常产生物体重叠和位置不合理；Holodeck 虽满足硬约束，但物体朝向和语义分组欠佳；LayoutVLM 在复杂场景中出现物体遗漏。HOG-Layout 生成的场景在物体位置、朝向、分组和指令遵循上均最接近预期。Figure 6 的编辑示例验证了移动、添加、删除操作的端到端可行性。
@@ -262,22 +241,9 @@ Figure 5 的定性对比直观展示了 HOG-Layout 的优势：LayoutGPT 常产�
 ![[assets/figures/papers/paper_list_l2170_https_arxiv_org_abs_2604_10772/figures/006_Figure_5.jpg]]
 *Figure 5: Generation Examples of different methods on the benchmark*
 
-![[assets/figures/papers/paper_list_l2170_https_arxiv_org_abs_2604_10772/figures/009_Figure_6.jpg]]
-*Figure 6: Editing Examples*
-
 ### 失败模式与局限
 
 消融实验中 w/o HierOpt 的碰撞率飙升（COL_sc 65%）揭示了纯 VLM 输出的根本缺陷：VLM 缺乏对物理连续约束的隐式建模能力，仅靠视觉推理无法保证碰撞避免和边界遵循。移动指令 80% 的成功率暴露了自然语言空间指代的解析瓶颈，需要交互式消歧或更精确的空间锚定机制。此外，当前框架依赖预定义 3D 资产库，对库外物体的生成式获取耗时较长（≥10 秒）且质量不稳定，限制了开放词汇场景合成的实用性。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2170_https_arxiv_org_abs_2604_10772/figures/005_Figure_4.jpg]]
-*Figure 4: Results of SP Score Distribution (Kernel Density Estimation, KDE) of different methods*
-
-![[assets/figures/papers/paper_list_l2170_https_arxiv_org_abs_2604_10772/figures/011_Table_4.jpg]]
-*Table 4: Comparison of retrieval methods*
-
-
 
 ## 定位与知识库关联
 
@@ -326,8 +292,6 @@ HOG-Layout 与三类代表性基线方法在场景组织方式、布局生成策
 4. **交互式编辑的消歧机制**：如何提高移动指令的编辑鲁棒性？可能的路径包括交互式消歧（主动询问用户精确位置）或更精确的空间指代解析（如结合点云或深度信息）。
 
 5. **超参数的自适应校准**：力导向优化中的大量超参数（权重、步长、死锁阈值等）虽经自动调参，但在不同场景规模下可能需要重新校准。开发场景规模自适应的参数调节机制是提升泛化性的关键。
-
-
 
 ## 原文 PDF
 

@@ -48,8 +48,6 @@ claims:
 
 核心结论是：**完全开放数据驱动的视频grounding可以匹配甚至超越专有模型**。Molmo2-8B在视频计数准确率上达到35.5，显著超过开源权重模型Qwen3-VL-8B的29.6；在视频指向F1上达到38.4，远超专有模型Gemini 3 Pro的20.0；在目标追踪J&F上达到56.2，同样大幅领先Gemini 3 Pro的41.1。这些结果表明，通过人机协作数据采集和学术数据转换，无需依赖专有模型蒸馏，即可让开放VLM在细粒度视频理解任务上取得有竞争力的性能。
 
-
-
 ### 问题背景：视觉语言模型的视频理解与定位鸿沟
 
 近年来，视觉语言模型（VLM）在图像理解任务上取得了显著进展，但在视频领域仍存在根本性挑战。视频不仅包含静态视觉信息，还涉及复杂的时空动态、对象运动、事件演变和多帧关联推理。现有的视频语言模型主要集中于高层语义理解（如视频问答、动作识别），但在细粒度时空定位能力上严重不足——即模型不仅要理解“发生了什么”，还需要精确指出“在哪里发生”、“何时发生”以及“如何随时间变化”。
@@ -81,8 +79,6 @@ Molmo2的提出正是为了填补上述缺口。其设计哲学基于一个核�
 - **能力完整性**：支持单图像、多图像和视频输入，可同时生成自由形式文本和grounding输出（时空点、对象轨迹、定位思维链），实现理解与定位的统一。
 
 这一设计使得Molmo2在视频计数准确率上达到35.5（显著超过Qwen3-VL-8B的29.6），在视频指向F1上达到38.4（远超Gemini 3 Pro的20.0），证明了开放数据驱动grounding的有效性，为开放视频语言模型的发展提供了新的范式。
-
-
 
 ## 核心方法与创新机理
 
@@ -138,8 +134,6 @@ Molmo2将点、轨迹和对象ID统一编码为紧凑的文本格式，使LLM能
 
 Molmo2的核心创新可归纳为**因果操纵变量**的实现路径：通过构建全开放的大规模视频定位数据集（数据层面），结合三阶段联合训练和任务定制化技术（算法层面），使开放权重的视觉语言模型首次在视频计数、指向和追踪等细粒度时空定位任务上达到甚至超越专有模型水平，同时保持通用视觉理解能力不退化。
 
-
-
 Molmo2 采用“视觉编码器 → 连接器 → 大语言模型”的标准多模态架构，但在训练流水线、数据组织方式和任务表示上做了系统性设计，使其能够同时处理单张图像、多图像集合和视频，并输出自由文本与时空定位结果（点、轨迹、带定位的思维链）。
 
 ### 三阶段训练流水线
@@ -174,15 +168,8 @@ Molmo2 的训练分为三个序贯阶段，每个阶段承担不同的能力构�
 
 消融实验（Table 8）系统验证了各设计的作用：联合训练其他视频数据可改善视频字幕性能；双向注意力、token 加权和时间 token 均显著提升性能；Molmo2-Cap 和 Molmo2-QA 均优于仅使用学术数据集；视频+帧融合字幕（VF）至关重要。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2601_10611/figures/004_Figure_2.jpg]]
-*Figure 2: Molmo2 follows the standard design of connecting a vision encoder and a language model to process video inputs*
-
 ![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2601_10611/figures/044_Figure_18.jpg]]
 *Figure 18: Overview of the annotation pipeline for Molmo2-VideoTrack and the Molmo2-Track benchmark*
-
-
 
 Molmo2 的模型架构遵循“视觉编码器 → 视觉-语言连接器 → 大语言模型”的标准设计，并在训练流程中引入多项关键技术创新。本节聚焦于对性能有决定性影响的模块与公式。
 
@@ -202,9 +189,6 @@ Molmo2 采用 SigLIP 2 作为视觉编码器（ViT）将图像和视频帧编码
 - 不同训练示例之间完全屏蔽交叉注意力；
 - 同一示例内不同 QA 对之间也屏蔽交叉注意力；
 - 帧 token 保留前向注意力以维持时序因果性。
-
-![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2601_10611/figures/003_Figure_3.jpg]]
-*Figure 3: Attention mask for a packed sequence with two examples. The first contains two QA pairs for one image. Frame tokens (dark pink) have forward attention, while masking blocks cross-attention between different examples (lower-left empty block) and between distinct QA pairs within the same example (upper empty block)*
 
 ### 点与轨迹的紧凑文本表示
 
@@ -254,8 +238,6 @@ $$HOTA = \sqrt{DetA \times AssA}$$
 | 预训练中移除图像指向 | 导致基准小幅下降 | Table 18 |
 
 这些模块共同构成了 Molmo2 从数据到训练的系统性创新，使其在保持通用视觉语言能力的同时获得强大的视频 grounding 能力。
-
-
 
 ## 实验与关键发现
 
@@ -340,8 +322,6 @@ Molmo2-Cap和Molmo2-QA两个自建数据集均优于仅使用学术数据集，�
 
 这些失败模式为后续研究指明了方向：开发完全开放数据的图像编码器、改进视频grounding的一致性约束、扩展长视频支持，以及优化多任务训练中的能力平衡。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2601_10611/figures/015_Table_8.jpg]]
 *Table 8: Video ablations. For ablations (a)(b)(c) we train models on only video data; ablation (d) has models with only video captions*
 
@@ -351,22 +331,8 @@ Molmo2-Cap和Molmo2-QA两个自建数据集均优于仅使用学术数据集，�
 ![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2601_10611/figures/007_Table_4.jpg]]
 *Table 4: Tracking Results on Academic Benchmark. J &F is reported for specialized segmentation or points-tosegmentation models. F1 is the point accuracy measured for VLMs that can generate points per frame. HOTA [97] is the tracking accuracy that accounts for association accuracy for models that provide tracking IDs*
 
-![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2601_10611/figures/008_Table_5.jpg]]
-*Table 5: Tracking results on Molmo2-Track by video domain. Overall is the accuracy across all samples*
-
 ![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2601_10611/figures/009_Table_6.jpg]]
 *Table 6: Image benchmark results for a range of proprietary APIs, open-weight baselines, and our Molmo2 family across image understanding and counting benchmarks. The result of the best-performing open-weight model is in bold. The Molmo1 models do not support multi-image input, so those evaluations are left blank*
-
-![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2601_10611/figures/010_Table_7.jpg]]
-*Table 7: Point-Bench results1 baseline scores taken from the Point-Bench leaderboard. Qwen3-VL-235B-A22B-Instruct and VisionReasoner-7B scores were taken from their evaluation in Poivre [171], which did not include sub-category scores*
-
-![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2601_10611/figures/017_Table_9.jpg]]
-*Table 9: Counting and pointing ablations. BVC represents Burst-VideoCount accuracy; and MVC and MVP are Molmo2-VideoCount accuracy and Molmo2-VideoPoint F1 on the validation sets*
-
-![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2601_10611/figures/018_Table_10.jpg]]
-*Table 10: Tracking ablations. We report average metrics across the five tracking benchmarks (the valid-u split for MeViS). HOTA [97] measures association accuracy*
-
-
 
 ## 定位与知识库关联
 
@@ -432,8 +398,6 @@ Molmo2的工作揭示了以下待解决的关键问题：
 6. **长上下文SFT的泛化性**：长上下文SFT对其他未列出的视频任务（如动作检测、事件定位）影响如何？这需要更广泛的基准评估。
 
 7. **多模态训练对语言能力的侵蚀**：Molmo2在编程基准上的下降是否普遍存在于多模态训练中？如何通过训练数据混合或训练策略减轻这种负面影响？
-
-
 
 ## 原文 PDF
 

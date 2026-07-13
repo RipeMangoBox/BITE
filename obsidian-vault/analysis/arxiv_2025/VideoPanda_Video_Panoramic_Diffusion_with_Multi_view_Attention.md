@@ -58,8 +58,6 @@ VideoPanda 提出了一项核心洞察：**将全景视频生成转化为多视�
 
 VideoPanda 在方法谱系中定位为**多视图视频扩散模型的统一框架**：它继承了视频潜在扩散模型（VideoLDM）的时空建模能力，引入 MVDream 风格的多视图注意力机制，并通过多任务训练统一了文本条件、视频条件和自回归生成三种模式。该方法可灵活适配不同的基础模型（如 CogVideoX-2B），在保持多视图一致性的同时实现全景视频的高质量生成与扩展。
 
-
-
 ### 全景视频生成的挑战
 
 360°全景视频的自动生成是计算机视觉与图形学中的一个新兴问题。其核心挑战在于：在保持多视图一致性的前提下，高效生成高质量的全景视频，并支持长视频的自回归扩展。现有的视频生成模型（如VideoLDM、CogVideoX）在透视视频生成上取得了显著进展，但直接将其应用于全景视频生成面临两个根本性困难：
@@ -86,8 +84,6 @@ VideoPanda的核心洞察是：**将全景视频生成转化为多视图透视�
 - **统一多种条件模式**：通过多任务训练策略（文本条件、视频条件、自回归条件），使单一模型能够处理多种生成任务。
 
 这种设计在因果机制上构成了一个完整的闭环：**训练时的随机子采样（因果旋钮）→ 模型泛化能力的提升 → 推理时高质量全景视频的生成**，从而解决了数据稀缺和计算资源限制下的全景视频生成瓶颈。
-
-
 
 ## 核心方法与创新机理
 
@@ -119,8 +115,6 @@ VideoPanda 通过随机二元掩码将三种条件模式统一到单一模型中
 
 综合来看，VideoPanda 的创新链条可概括为：**多视图透视投影**避免等量矩形失真 → **多视图注意力**确保帧内视图一致性 → **随机矩阵训练**突破内存限制并提升泛化能力 → **多任务统一条件**赋予模型多模式生成能力 → **噪声增强与噪声调度偏移**保障自回归长视频生成质量。这一系列设计使 VideoPanda 在文本条件生成上 FIDpair 较 360DVD 降低 15%（Table 1），在视频条件生成上 FID 较 MVDiffusion 降低 34.7%（Table 2）。
 
-
-
 VideoPanda 将 360° 全景视频生成重新定义为**多视图透视图像的联合生成**问题。其核心 pipeline 由三个关键阶段串联而成：投影分解 → 多视图视频扩散 → 全景拼接。
 
 ### 输入输出流
@@ -145,9 +139,6 @@ VideoPanda 将 360° 全景视频生成重新定义为**多视图透视图像的
 5. **噪声增强**：条件帧在输入扩散模型前被施加少量噪声，同时传入噪声水平 σ，以提升对条件误差的鲁棒性并支持自回归扩展。
 6. **去噪与解码**：扩散模型以 v-预测参数化、向高噪声水平偏移的噪声调度进行去噪，生成 8 个视图的潜在表示，经 VAE 解码为透视图像。
 
-![[assets/figures/papers/paper_list_l79_https_arxiv_org_abs_2504_11389/figures/002_Figure_2.jpg]]
-*Figure 2: We divide the equi-rectangular video into 8 perspective views via projection. Our diffusion model consists of interleaved spatial, multi-view, and temporal blocks, conditioned on text prompts. Attention is used to propagate information through the multi-view videos to ensure consistency. The input views are embedded using the ray directions as visualized by the color map behind the perspective images*
-
 ### 训练时的随机矩阵策略
 
 训练阶段内存限制最多容纳 8 视图 × 6 帧的矩阵。为支持推理时扩展到 16 帧或更多视图，VideoPanda 采用**随机子采样训练**：每次迭代随机选择视图数（如 4、6、8）和帧数（如 6、8、12），构成不同的视图×帧矩阵进行训练。这一策略作为数据增强，使模型学会泛化到训练时未见过的矩阵配置，是实现长视频自回归生成的关键机制。
@@ -155,8 +146,6 @@ VideoPanda 将 360° 全景视频生成重新定义为**多视图透视图像的
 ### 推理与拼接
 
 推理时，模型生成 8 个透视视图的视频帧，通过双三次插值将各视图 warp 到等量矩形全景坐标，重叠区域像素值均匀平均，最终拼接为无缝全景视频。由于模型原生生成透视视图而非直接生成等量矩形投影，有效避免了传统方法在天空/地面区域的高畸变问题（Figure A5）。
-
-
 
 ### 整体架构：从等量矩形到多视图潜在空间
 
@@ -202,9 +191,6 @@ VideoPanda 通过**随机二元掩码**统一了三种条件模式（Figure 3）
 - **视频条件生成**：掩码第一列（第一个视图的所有帧）为 1，其余为零；
 - **自回归生成**：掩码第一行（第一帧的所有视图）和第一列均为 1。
 
-![[assets/figures/papers/paper_list_l79_https_arxiv_org_abs_2504_11389/figures/003_Figure_3.jpg]]
-*Figure 3: The model is trained using three frame conditioning regimes. (a) No image conditions and the initial inputs are pure noise; (b) Conditioning only on the first view of the video; (c) Conditioning on the first frame and first views for auto-regressive video generation. At inference time, we autoregressively condition on long videos by using conditioning (b) to generate the first window and subsequently using the last multi-view images row from the previous time step (the shaded region) as the first row input to our model using condition-type (c)*
-
 三种模式在训练中以等概率随机采样，使单一模型能同时处理所有任务。Table 3 的消融表明，多任务训练引入的性能损失可忽略不计（各指标接近单任务模型），同时使模型获得了处理多种输入模式的灵活性。
 
 为支持自回归长视频生成，模型对条件帧施加**噪声增强**：在条件帧的潜在表示上添加小量噪声，并将噪声水平 $\sigma$ 作为额外条件输入。消融实验（Figure A3）显示，缺乏噪声增强时自回归生成的质量迅速退化（色彩饱和度过高），而使用噪声增强后退化更为平缓，模型在 10 次自回归迭代后仍能保持合理输出。
@@ -218,13 +204,6 @@ VideoPanda 通过**随机二元掩码**统一了三种条件模式（Figure 3）
 
 ![[assets/figures/papers/paper_list_l79_https_arxiv_org_abs_2504_11389/figures/012_Figure.jpg]]
 *Figure: A1: Qualitative figure comparing IP vs CAT type architecture for input conditioning. When using IP adapter, the consistency between input conditioning views and neighbouring views (highlighted in red box) is worse compare to CAT*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l79_https_arxiv_org_abs_2504_11389/figures/006_Figure_6.jpg]]
-*Figure 6: A visualization of the 8 frames used during training, consisting of 6 horizontal views with 90 FOV and 2 views for the top/bottom with 100 FOV*
-
-
 
 ## 实验与关键发现
 
@@ -290,19 +269,6 @@ VideoPanda的训练数据为**WEB360数据集**，包含2114个全景视频片�
 3. **视图配置刚性**：8个视角的固定FOV布局需用户预定义，无法根据输入条件自动调整，且不支持相机内参变化——要求输入视图具有相同的FOV和水平方向。
 4. **计算开销**：多视图注意力层虽然提升了跨视图一致性，但增加了显著的计算负担，可能影响高效推理和实时应用场景。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l79_https_arxiv_org_abs_2504_11389/figures/007_Table_1.jpg]]
-*Table 1: Quantitative comparison for text-conditional panorama video generation*
-
-![[assets/figures/papers/paper_list_l79_https_arxiv_org_abs_2504_11389/figures/008_Table_2.jpg]]
-*Table 2: Quantitative comparison of single view video-conditional panorama generation with image panorama outpainting method MVDiffusion. We extract the middle frame from our 16 frame generations to compare at a per image level*
-
-![[assets/figures/papers/paper_list_l79_https_arxiv_org_abs_2504_11389/figures/009_Table_3.jpg]]
-*Table 3: Quantitative ablations of our model on single view video-conditional panoramic video generation. Training our model to be multi-task capable incurs a negligible drop in performance. Randomizing the matrix of frames during training results in much improved video quality at a slightly worse color consistency as measured by PSNR*
-
-
-
 ## 定位与知识库关联
 
 ### 与基线方法的关系
@@ -347,8 +313,6 @@ VideoPanda 的关键技术决策可从因果角度归纳为以下链条：
 **计算效率与一致性的权衡**：多视图注意力是维持跨视图一致性的核心机制，但其计算开销限制了视图数量的扩展和推理速度。如何在保持多视图一致性的前提下降低注意力计算成本（例如通过稀疏注意力或视图间信息压缩），是一个具有实际价值的研究问题。
 
 **长视频自回归的时空一致性**：在自回归扩展中，需要同时维持窗口内的时间一致性和窗口间的空间一致性。当前方法通过将前一窗口的最后一行多视图图像作为条件传递给下一窗口（Figure 3c），但这一机制在更长的时间跨度下可能累积空间偏移。如何有效平衡图像质量、时间一致性和空间一致性三者之间的关系，仍需进一步探索。
-
-
 
 ## 原文 PDF
 

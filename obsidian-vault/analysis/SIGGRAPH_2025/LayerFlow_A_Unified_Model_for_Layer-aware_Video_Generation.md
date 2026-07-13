@@ -81,9 +81,6 @@ claims:
 ![[assets/figures/papers/paper_list_l8_http_arxiv_org_abs_2506_04228v1/figures/004_Figure_4.jpg]]
 *Figure 4: Qualitative comparison for multi-layer video generation with generation then animation pipeline, i.e., composition of LayerDiffuse [Zhang and Agrawala 2024] and motion module [Guo et al. 2023], where LayerFlow achieves better layer-level coherence and clearer separation of layers*
 
-![[assets/figures/papers/paper_list_l8_http_arxiv_org_abs_2506_04228v1/figures/001_Figure_1.jpg]]
-*Figure 1: Demonstration for the applications of LayerFlow. Given layer-wise prompts, our method produces videos for a transparent foreground, a clean background, and a blended scenario. It also supports different user-provided conditions, enabling users to decompose and recompose videos creatively*
-
 ## 实验与关键发现
 
 ### 核心定量结果

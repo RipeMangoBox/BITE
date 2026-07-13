@@ -60,8 +60,6 @@ claims:
 
 RALI的成功表明：在IQA任务中，高质量文本表征所携带的泛化信息，可以通过直接对齐的方式被轻量模型高效继承，推理过程并非泛化的必要条件。
 
-
-
 ### 图像质量评估的范式演进
 
 图像质量评估（IQA）旨在自动预测与人类感知一致的图像质量分数，是计算机视觉中的基础任务。传统方法可分为两类：基于手工特征的经典算法（如**NIQE**（Mittal et al., 2012b）、**BRISQUE**（Mittal et al., 2012a））和基于深度学习的回归模型（如**CLIP-IQA+**（Wang et al., 2023））。然而，这些方法的核心瓶颈在于：它们依赖高维视觉表征进行质量评分，而视觉特征空间在不同数据集的分布之间存在显著的域间隙（domain gap），导致模型容易在训练集上过拟合，跨域泛化能力薄弱。
@@ -84,8 +82,6 @@ RALI的成功表明：在IQA任务中，高质量文本表征所携带的泛化�
 这引发了一个根本性问题：**既然推理的作用是将视觉信息压缩为紧凑的文本表征，那么能否绕过实际的推理过程，直接学习这种压缩映射？**
 
 本文的核心动机正是基于这一洞察：RL使MLLM学得的推理本质上是一种从视觉到文本的跨域对齐压缩，该压缩可通过对比学习直接复现，从而无需实际推理过程即可获得同等泛化。基于此，本文提出了**RALI（Reasoning-Aligned Lightweight IQA）**框架，仅使用约4%的参数和3.4%的推理时间，达到与Q-Insight可比的跨数据集评分精度（Figure 1）。
-
-
 
 ## 核心方法与创新机理
 
@@ -139,8 +135,6 @@ RALI的核心创新产生了两个关键结果：
 - **跨域泛化**：在四数据集混合训练场景下，RALI的跨域变体RACT（Reasoning-Aligned Cross-Domain Training）达到平均PLCC 0.855，显著优于Q-Insight混合训练的0.791（Table A.2），提升+0.064。
 
 值得注意的是，跨域SFT的消融实验（Table 5）揭示了一个重要发现：仅使用文本标签（无分数）微调视觉编码器，即可达到与同时使用文本+分数标签相近的跨域性能。这表明**推理文本对齐本身已足够支撑跨域泛化**，分数标签携带的标注者偏置反而可能干扰泛化能力。
-
-
 
 ![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_DkHt2K1g2Y/figures/006_Figure_5.jpg]]
 *Figure 5: Illustration of the proposed reasoning-aligned lightweight IQA (RALI) framework. (a) presents the components and functions of the RL-based IQA model. (b)–(d) jointly constitute our lightweight RALI scheme, including contrastive learning with quality reasoning text, feature compression, and score definition. The model’s inference pipeline is identical to (d)*
@@ -224,8 +218,6 @@ $$\hat{f} = \sum_{i=1}^K w_i f_i$$
 
 整个推理过程不涉及任何LLM加载或文本生成，仅需执行视觉编码器前向传播和轻量级向量运算。这使得RALI在batch size=16时仅消耗Q-Insight约14.7%的显存和3.4%的推理时间（Figure 6），同时保持可比的评分精度（Table 2，平均PLCC 0.798 vs. 0.806）。
 
-
-
 ### 特征压缩：PCA降维与分桶K-Means聚类
 
 经对比对齐后的图像嵌入首先通过PCA从原始768维降至512维，随后进入分桶K-Means聚类阶段。该阶段的核心思想是：将训练样本按质量分数划分为多个桶（buckets），在每个桶内独立执行K-Means聚类，从而在保留分数结构的前提下构建紧凑的基向量集合。
@@ -248,8 +240,6 @@ $$w_i = \frac{\exp(\cos<\mathbf{U}^\top \mathcal{E}_{align}(\mathbf{I}), \mu_i>)
 
 该公式的物理含义是：图像质量评分被解耦为 $K$ 个基分数的软组合，每个基分数代表特征空间中某个局部区域的质量水平。权重 $w_i$ 反映了图像嵌入与各基向量的语义相似度，相似度越高则对应基分数的贡献越大。整个评分模块（基向量 $\mu_i$ 和基分数 $f_i$）在训练阶段端到端优化，使预测分数逼近人工标注。消融实验显示，去除评分微调后平均PLCC从0.798骤降至0.743（Table 4, Case 5 vs. Case 6），损失在所有组件中最大，证明端到端拟合对性能至关重要。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -259,7 +249,6 @@ $$w_i = \frac{\exp(\cos<\mathbf{U}^\top \mathcal{E}_{align}(\mathbf{I}), \mu_i>)
 ### 主结果：单域评分回归
 
 Table 2 展示了各方法在 KonIQ 单域训练下的跨数据集泛化性能。RALI 在七个数据集上的平均 PLCC 达到 **0.798**，仅比基于 RL 的 MLLM 方法 Q-Insight（0.806）低 0.008，却仅使用其约 4% 的参数量。在所有非 MLLM 深度学习方法中，RALI 取得最高平均 PLCC/SRCC，较 CLIP-IQA+ 分别提升 0.056 和 0.059。值得注意的是，RALI 在 SPAQ（0.897）、LiveW（0.896）和 CSIQ（0.828）等域外数据集上表现尤为突出，证明其继承了 RL 推理模型的跨域泛化能力。
-
 
 ![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_DkHt2K1g2Y/figures/007_Table_2.jpg]]
 *Table 2: PLCC / SRCC comparison on the single-domain score regression tasks between RALI and other competitive IQA methods. All methods except handcrafted ones are trained on the KonIQ dataset. The best and second-best results of each test setting are highlighted in bold red and underlined blue*
@@ -271,7 +260,6 @@ Table 3 展示了 RACT 框架在四数据集混合训练下的表现。RACT 在�
 ### 消融实验：RALI 组件贡献
 
 Table 4 系统验证了 RALI 各关键组件的贡献（以 Case 6 完整配置为基准，平均 PLCC=0.798）：
-
 
 ![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_DkHt2K1g2Y/figures/009_Table_4.jpg]]
 *Table 4: Ablation studies on the key components of RALI. It can be observed that alignment to descriptions and scoring definition based on basis vectors with scores significantly enhance the performance of our method*
@@ -306,16 +294,11 @@ Table 1 验证了推理过程的跨域一致性：在 KonIQ 和 KADID 上分别�
 2. **复杂场景未验证**：当前实验集中于自然图像质量评估，尚未在视频 IQA 和 AIGC 评价任务上验证方法的可扩展性。
 3. **极端缺陷的泛化边界**：面对极其复杂的复合质量缺陷时，轻量对齐方法是否仍能保持与显式推理同等的泛化能力，尚需进一步探索。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_DkHt2K1g2Y/figures/001_Figure_1.jpg]]
 *Figure 1: Performance comparison among IQA methods in PLCC/SRCC and parameter numbers. RALI uses only about 4% of Q-Insight’s (Li et al. (2025)) parameters while achieving comparable accuracy*
 
 ![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_DkHt2K1g2Y/figures/012_Table_6.jpg]]
 *Table 6: Table A.1: PLCC / SRCC comparison of different training strategies. Q-Insight with the reasoning capability disabled exhibits a significant performance drop*
-
-
-
 
 ## 定位与知识库关联
 
@@ -371,8 +354,6 @@ RALI 与上述方法的本质区别在于：它通过对比学习将视觉编码
 2. **跨模态迁移**：将 RALI 的思想迁移到视频 IQA 和 AIGC 评价任务中，是否需要额外的时序/结构对齐设计？推理文本空间的压缩特性是否在不同模态中保持一致？
 
 3. **自适应推理调度**：能否设计一种动态机制，根据图像内容难度自适应地选择是否调用推理，从而在保证精度的前提下最大化效率？
-
-
 
 ## 原文 PDF
 

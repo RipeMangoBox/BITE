@@ -59,8 +59,6 @@ claims:
 
 消融实验证实了 PTS 和 ABS 的独立贡献与协同效应：PTS 单独使用带来 +3.57 的准确率提升，联合 ABS 进一步增加 +1.67。理论分析从梯度期望放大、梯度范数放大和正偏差引入三个角度，为动态采样的有效性提供了形式化支撑。该方法还展现出良好的通用性，成功扩展到 32B 参数模型、指代表达理解（REC）任务以及纯文本大语言模型。
 
-
-
 ### 多模态大语言模型RL训练的现状与瓶颈
 
 强化学习（Reinforcement Learning, RL）已成为提升多模态大语言模型（MLLM）推理能力的关键范式。以GRPO（Shao et al., 2024）为代表的群体相对策略优化方法，通过采样多条轨迹并利用组内归一化的优势函数进行梯度更新，在视觉推理任务上取得了显著进展。然而，当前RL训练框架大多采用**静态采样范式**——对每个查询均匀采样固定数量的轨迹，所有轨迹平等地参与梯度更新，这一设计隐含地假设每条轨迹携带的学习信号质量是均等的。
@@ -84,8 +82,6 @@ claims:
 本文的动机源于一个关键观察：**不同轨迹的学习信号质量存在根本性差异**。如**Figure 3**所示，增大rollout数量可以提升模型准确率，但不同难度的查询在训练过程中的准确率变化模式各异，产生的轨迹在多样性和质量上也存在显著差异。这暗示着，并非所有轨迹对学习的贡献是等价的——通过识别并优先利用那些携带高信息量梯度信号的轨迹，有望在相同甚至更少的计算资源下实现更高效的RL训练。
 
 基于此，本文提出**数据中心动态重组（Data-centric Dynamic Shuffle）** 的核心思路：在RL训练的每个迭代中，通过动态优先级采样机制，放大高信息量的梯度信号，抑制低质量轨迹的影响，从而将有限的模型更新资源集中到最有价值的梯度信号上。这一思路催生了Shuffle-R1框架的两个关键模块——**对比度轨迹对选择（Pairwise Trajectory Sampling, PTS）** 和**基于优势的批次重组（Advantage-based Batch Shuffle, ABS）**，分别针对优势值坍塌和有效轨迹沉默这两个瓶颈进行精准干预。
-
-
 
 ## 核心方法与创新机理
 
@@ -148,8 +144,6 @@ PTS 和 ABS 并非孤立运作，而是形成互补的级联机制。PTS 负责�
 
 Shuffle-R1 的动态采样策略虽然引入了额外的计算开销（扩展采样和批次重组），但换来了训练效率的大幅提升。Figure 7 的 wall-clock 训练曲线显示，Shuffle-R1 在早期训练阶段即大幅领先 GRPO，仅需约一半的训练步数即可达到 GRPO 的最终性能，总 GPU 时间仅增加 4%~7.7%。这种“以少量额外计算换取显著加速收敛”的特性，使 Shuffle-R1 在实际部署中具有明显的效率优势。
 
-
-
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_mYP33u1QBK/figures/004_Figure_4.jpg]]
 *Figure 4: Overview of our proposed Shuffle-R1. After advantage calculation, we first conduct Pairwise Trajectory Sampling to obtain valuable trajectory pairs from original rollout pool, then perform Advantage-based Batch Shuffle to reshape the distribution of valid trajectories in a batch*
 
@@ -201,8 +195,6 @@ Shuffle-R1 的整体流程如图4所示，包含两个串行的核心模块：
 ### 与基线的本质区别
 
 与 GRPO 等静态采样方法相比，Shuffle-R1 的核心差异不在于优化目标函数，而在于**梯度信号的来源控制**：PTS 通过对比度筛选决定哪些轨迹参与更新，ABS 通过自适应批次重组决定各轨迹的曝光频率。这种数据中心的视角使得 Shuffle-R1 能够在不改变基础 RL 算法（如 PPO 裁剪目标）的前提下，显著提升训练效率和最终性能——在 Geometry3K 上仅需 GRPO 约 60% 的 wall-clock GPU 时间即可达到同等精度。
-
-
 
 ### 基础RL目标
 
@@ -278,16 +270,11 @@ ABS旨在缓解**有效轨迹沉默**（Rollout Silencing）——即产生非�
 
 PTS和ABS形成级联管道（Figure 4）：PTS首先从扩展的rollout池中筛选出高对比度轨迹对，过滤低信号样本；ABS随后对筛选后的轨迹对进行自适应批次重组，优化计算资源分配。消融实验（Table 4）证实：PTS单独使用将Geo3K准确率从42.64%提升至46.21%（+3.57），联合ABS进一步提升至47.88%（额外+1.67），验证了两模块的互补性。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：两大训练瓶颈
 
 Shuffle-R1 的出发点是对当前 MLLM 强化学习训练中两个被忽视的瓶颈进行系统诊断。如 **Figure 1** 所示，GRPO 等基线方法在训练过程中暴露出两个根本性问题：
-
-![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_mYP33u1QBK/figures/001_Figure_1.jpg]]
-*Figure 1: (a) Advantage Collapsing, where most advantages concentrate near zero. (b) Rollout Silencing, where the ratio of rollouts with nonzero gradient consistently drops*
 
 **优势值坍塌（Advantage Collapsing）**：绝大多数轨迹的优势值集中在零附近，导致梯度信号微弱，模型难以从大量样本中获取有效的学习方向。这意味着即使生成了大量轨迹，真正能驱动模型更新的信息量极为有限。
 
@@ -301,17 +288,11 @@ Shuffle-R1 的出发点是对当前 MLLM 强化学习训练中两个被忽视的
 
 **Table 1** 报告了在 Geometry3K 数据集上的主实验结果。在 Qwen2.5-VL-3B 基座模型上，Shuffle-R1 达到 **47.88%** 准确率，相比 GRPO（42.64%）提升 **+5.24 个百分点**，相比 DAPO（45.14%）提升 +2.74，相比 GSPO（43.16%）提升 +4.72。在 Qwen2.5-VL-7B 上，Shuffle-R1 以 **55.89%** 领先 GRPO（52.60%）**+3.29 个百分点**，同时超越 DAPO（54.48%）和 GSPO（53.30%）。
 
-![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_mYP33u1QBK/figures/005_Table_1.jpg]]
-*Table 1: Performance of Shuffle-R1 trained on Geometry3K dataset*
-
 值得注意的是，基座模型 Qwen2.5-VL-3B 在 Geometry3K 上的初始准确率仅为 25.79%，Shuffle-R1 实现了 +22.09 的绝对提升，充分体现了 RL 训练的有效性。
 
 #### K12 数据集
 
 **Table 2** 展示了在 K12 数据集上的训练结果，验证了方法的跨数据鲁棒性。Qwen2.5-VL-3B 基座准确率为 42.42%，Shuffle-R1 将其提升至 **62.22%**（+19.80）。Qwen2.5-VL-7B 从 51.13% 提升至 **68.78%**（+17.65）。在 Math Avg.、HallBench、ChartQA 等域外基准上，Shuffle-R1 同样保持一致的领先优势，表明方法学到的推理能力具有良好的泛化性。
-
-![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_mYP33u1QBK/figures/006_Table_2.jpg]]
-*Table 2: Performance of Shuffle-R1 trained on K12 dataset*
 
 #### 多基准综合评估
 
@@ -323,9 +304,6 @@ Shuffle-R1 的出发点是对当前 MLLM 强化学习训练中两个被忽视的
 #### 30K 大规模联合训练
 
 **Table 10** 展示了在 30K 样本（Geometry3K + K12 + MM-Eureka 联合）上的扩展实验。Shuffle-R1-Qwen-7B 在六个基准上的总平均准确率达到 **64.7**，相比 GRPO（61.5）提升 +3.2，相比 DAPO（63.0）提升 +1.7，相比 GSPO（61.6）提升 +3.1。这一结果证明方法在大规模数据场景下依然有效。
-
-![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_mYP33u1QBK/figures/021_Table_10.jpg]]
-*Table 10: Full 30k experiment on Qwen2.5-VL-7B. Highest accuracy marked in Bold*
 
 ### 训练效率分析
 
@@ -370,15 +348,9 @@ Shuffle-R1 不仅在最终性能上领先，在训练效率方面同样展现出
 
 **Table 6** 将方法扩展到 Qwen2.5-VL-32B 巨型模型。Shuffle-R1-32B 在六个基准上的总平均准确率达到 **69.1**，证明了方法对大规模模型的有效性。
 
-![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_mYP33u1QBK/figures/017_Table_6.jpg]]
-*Table 6: Extension experiments on Qwen2.5-VL-32B*
-
 #### 任务类型扩展
 
 **Table 7** 展示了在 Referring Expression Comprehension（REC）任务上的迁移效果。在 RefCOCOg 测试集上，Shuffle-R1 达到 **86.07** 准确率，验证了方法在非数学推理任务上的适用性。
-
-![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_mYP33u1QBK/figures/018_Table_7.jpg]]
-*Table 7: Extension experiments on Referring Expression Comprehension task*
 
 **Table 8** 将方法应用于纯文本 LLM（Qwen2.5-Math-1.5B）。在 MATH500 基准上，Shuffle-R1 达到 **71.0** 准确率，相比 GRPO 提升显著。这表明 PTS 和 ABS 的数据中心设计理念具有跨模态的通用性。
 
@@ -406,8 +378,6 @@ Shuffle-R1 的实验效果得到了严格的理论分析支持。三个命题（
 - 超参数（学习率 1e-6、温度 1.0 训练/0.5 评估、全局批大小 128、rollout 批大小 512）保持一致
 - 评估使用相同的外部评估器 Gemini-2.0-Flash-001，报告 8 次运行的 pass@1 平均准确率
 - 扩展实验（32B、REC、纯文本 LLM）均采用与主实验相同的设置
-
-
 
 ## 定位与知识库关联
 
@@ -458,8 +428,6 @@ Shuffle-R1 可被定位为 **数据驱动 RL 训练效率优化** 这一新兴�
 4. **与模型架构改进的协同**：本方法的数据中心理念与记忆增强、世界模型等架构改进方向是否存在协同效应？将动态优先级采样与结构化推理能力相结合，可能进一步推动多模态推理的边界。
 
 5. **理论收敛性分析**：Proposition 3 揭示了动态采样引入正偏差，但该偏差对策略梯度收敛性的长期影响尚未给出严格的收敛性保证。建立完整的理论分析框架将是重要的后续工作。
-
-
 
 ## 原文 PDF
 

@@ -67,8 +67,6 @@ SEELE属于3DGS推理加速方法族，与现有工作的关键区别在于：
 
 **局限与开放问题**：当前方法依赖线性外推相机姿态进行场景预取，在非平滑运动下可能失效；仅在Nvidia Orin系列移动GPU上验证，其他移动平台（如Qualcomm Adreno、Apple GPU）的适用性未知；离线聚类需逐场景执行，不适用于跨场景通用模型。此外，极端视角下聚类效率的退化程度、与高斯点剪枝/量化技术的正交叠加潜力，以及在更大规模城市场景中的扩展性，仍有待进一步探索。
 
-
-
 ### 3D 高斯泼溅与移动端实时渲染的困境
 
 3D 高斯泼溅（3D Gaussian Splatting, 3DGS）凭借其显式点云表示和可微光栅化管线，在逼真新视角合成上实现了前所未有的速度与质量平衡。然而，这一高效性在移动端设备上迅速瓦解：移动 GPU 的计算能力与内存带宽远逊于桌面级硬件，而 3DGS 渲染管线需要对每个像素处理数千个高斯点，且统一对待所有高斯点，导致大量计算浪费和内存占用过高。
@@ -95,8 +93,6 @@ $$\alpha _ { i } = o _ { i } e ^ { - \frac 1 2 ( { \bf p } - x ^ { \prime } ) ^ 
 基于上述观察，本文提出 **SEELE**——一个面向移动设备的统一加速框架，其核心洞察是：**可以安全地剔除不相关和低贡献的高斯点，在几乎不影响渲染质量的前提下实现数倍加速**。
 
 SEELE 从两个维度重构 3DGS 渲染管线：在预处理阶段，设计视角相关的场景表示，将高斯点划分为共享集群和独占集群，运行时仅加载相关集群，从源头削减计算量和内存占用；在光栅化阶段，引入贡献感知光栅化算法，动态识别并跳过低贡献高斯点的颜色混合计算，提升 GPU 并行效率。这一“预处理过滤 + 光栅化跳跃”的组合策略，使得 SEELE 能够以统一框架加速多种 3DGS 变体，在移动端实现最高 6.3× 的渲染加速和 39.1% 的运行时模型缩减。
-
-
 
 ## 核心方法与创新机理
 
@@ -151,8 +147,6 @@ $$\mathcal { L } _ { total } = \mathcal { L } _ { 3DGS } + \gamma * \mathcal { L
 - 贡献感知光栅化中的像素组机制是否可适配其他基于图块的渲染管线（如 Instant NGP）仍是开放问题。
 - 该方法能否与高斯点剪枝、量化等正交压缩技术叠加获得更高加速，论文未进行组合实验。
 
-
-
 SEELE 是一个面向移动端 3DGS 渲染的统一加速框架，其核心设计围绕一个关键发现展开：不同视角之间仅共享极少部分高斯点，且约 **1.5% 的高斯点贡献了 99% 的最终像素透明度**（Fig. 4）。基于这一洞察，SEELE 对原始 3DGS 渲染管线的两个阶段——预处理与光栅化——进行了系统性改造，提出了 **混合预处理（Hybrid Preprocessing）** 与 **贡献感知光栅化（Contribution-Aware Rasterization）** 两项核心技术，整体框架如 Fig. 2 所示。
 
 ![[assets/figures/papers/paper_list_l2266_https_openaccess_thecvf_com_content_CVPR2026_html_Zhu_Seele_A_Unified_Ac/figures/002_Figure_2.jpg]]
@@ -185,8 +179,6 @@ SEELE 的完整渲染管线由以下模块串联构成：
 ### 适用范围
 
 SEELE 作为统一加速框架，可应用于多种 3DGS 变体。在相同 Nvidia AGX Orin 移动设备上，SEELE 对 **3DGS**（Kerbl et al., ACM TOG 2023）实现 3.2× 加速，对 **LightGaussian** 实现 2.7× 加速，对 **AdR-Gaussian**（Wang et al., SIGGRAPH Asia 2024）实现 1.7× 加速，对 **Mini-Splatting** 实现 1.8× 加速，展现出良好的算法无关性。
-
-
 
 ### 1. 问题定义：3DGS 渲染的累积瓶颈
 
@@ -222,9 +214,6 @@ $$( \mathbf{p} - x_i' )^T \Sigma_i'^{-1} ( \mathbf{p} - x_i' ) = \min\left( 2 \l
 
 光栅化阶段，GPU 以 warp 为单位对瓦片内所有高斯点执行“透明度计算 → 颜色混合”的锁步操作。当 warp 内某些线程对应的高斯点贡献极低时，这些线程仍需等待其他线程完成颜色混合，造成 warp 发散（Fig. 5）。
 
-![[assets/figures/papers/paper_list_l2266_https_openaccess_thecvf_com_content_CVPR2026_html_Zhu_Seele_A_Unified_Ac/figures/005_Figure_5.jpg]]
-*Figure 5: An example of warp divergence in GPU. All threads compute α and then perform color blending in “lockstep”. Our algorithm can detect the insignificant Gaussians (e.g., Gaussian A) and skip their color blending, as highlighted by the red cross*
-
 SEELE 的**贡献感知光栅化**将像素分组（默认 $2 \times 2$），每组仅由领头像素计算透明度 $\alpha_i$，并依据 $\alpha_i$ 判定该高斯点对整组像素的贡献是否可忽略。若 $\alpha_i$ 低于阈值，则整组像素跳过该高斯点的颜色混合计算。这一机制带来双重收益：(a) 直接减少颜色混合的计算量；(b) 缓解 warp 发散——低贡献高斯点不再阻塞高贡献高斯点的处理，提升 GPU 并行效率。
 
 ### 4. 集成微调：补偿加速引入的质量损失
@@ -234,13 +223,6 @@ SEELE 的**贡献感知光栅化**将像素分组（默认 $2 \times 2$），每
 $$\mathcal { L } _ { total } = \mathcal { L } _ { 3DGS } + \gamma * \mathcal { L } _ { consistency }, \quad \gamma = 0.1 \tag{6}$$
 
 其中 $\mathcal{L}_{3DGS}$ 是原始 3DGS 的 L1 + SSIM 损失，$\mathcal{L}_{consistency}$ 是视图一致性损失，使用 7 帧 FLIP 分数度量相邻视角间的渲染一致性。该微调直接作用于 SEELE 加速管线，而非先训练后加速的两阶段范式，避免了分布偏移问题。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2266_https_openaccess_thecvf_com_content_CVPR2026_html_Zhu_Seele_A_Unified_Ac/figures/003_Figure_3.jpg]]
-*Figure 3: Our scene representation clusters Gaussians into shared ones and exclusive ones. Here, we show the Gaussian positions without scales. The yellow points in Fig. 3b represent the shared Gaussians, while the other colors correspond to the exclusive Gaussians in different clusters*
-
-
 
 ## 实验与关键发现
 
@@ -264,9 +246,6 @@ SEELE 在三个标准数据集（Mip-NeRF360、Tanks&Temples、DeepBlending）�
 
 跨 GPU 实验（Table 3）在 Nvidia Orin NX（低功耗）和 Nvidia A6000（桌面级）上进行。SEELE 在两类设备上均保持加速优势，表明框架不局限于单一移动 GPU，但论文未在 Qualcomm Adreno 或 Apple GPU 等非 Nvidia 平台上验证。
 
-![[assets/figures/papers/paper_list_l2266_https_openaccess_thecvf_com_content_CVPR2026_html_Zhu_Seele_A_Unified_Ac/figures/008_Table_3.jpg]]
-*Table 3: The performance (FPS) over other GPUs: a low-power GPU on Nvidia Orin NX [2] and Nvidia A6000 [1]*
-
 ### 消融实验：各模块贡献
 
 Table 4 以 3DGS 为基准逐模块消融：
@@ -284,15 +263,6 @@ Table 4 以 3DGS 为基准逐模块消融：
 - **聚类数与邻居数**（Figure 6）：聚类数过少导致视角相关分离不充分，过多则增加预取开销。论文给出了 Mip-NeRF360 上的敏感度曲线，需参考原文 Fig. 6 获取具体数值。
 - **像素组大小**（Figure 7）：贡献感知光栅化中像素组大小设为 **2×2** 在质量与性能间取得最佳平衡。过大的组会导致颜色混合跳过决策过于粗糙，质量显著下降。
 - **贡献者数量**（Figure 8）：控制贡献感知光栅化中保留的 top 高斯点比例。论文通过实验给出了质量-性能权衡曲线，需参考原文 Fig. 8 获取具体数值。
-
-![[assets/figures/papers/paper_list_l2266_https_openaccess_thecvf_com_content_CVPR2026_html_Zhu_Seele_A_Unified_Ac/figures/010_Figure_7.jpg]]
-*Figure 7: Sensitivity of rendering quality and performance to the pixel group size*
-
-![[assets/figures/papers/paper_list_l2266_https_openaccess_thecvf_com_content_CVPR2026_html_Zhu_Seele_A_Unified_Ac/figures/011_Figure_8.jpg]]
-*Figure 8: Sensitivity of rendering quality and performance to the number of contributors*
-
-![[assets/figures/papers/paper_list_l2266_https_openaccess_thecvf_com_content_CVPR2026_html_Zhu_Seele_A_Unified_Ac/figures/014_Figure_6.jpg]]
-*Figure 6: Sensitivity of rendering quality and performance to the number of clusters and cluster neighbors in Sec. 3.3*
 
 ### 微调策略对比
 
@@ -321,8 +291,6 @@ Table 6 进一步消融视图一致性损失：加入该损失后 FLIP 指标从
 - 在更大规模城市场景（如 Block-NeRF）中，聚类数量与预取策略如何扩展？
 - 贡献感知光栅化中的像素组机制是否可适配其他基于图块的渲染管线（如 Instant NGP）？
 - 论文未提供代码仓库，开源后可在实际移动设备上独立验证加速比与质量声明。
-
-
 
 ## 定位与知识库关联
 
@@ -361,8 +329,6 @@ SEELE 并非一个独立的渲染算法，而是一个**正交于现有 3DGS 变
 3. **像素分组机制的跨管线可移植性**：贡献感知光栅化中的像素分组和领头像素预判机制，在概念上可适配其他基于图块的渲染管线（如 Instant NGP 的哈希网格渲染），但具体实现需要针对不同管线的瓦片调度和线程模型进行调整，其通用性尚待验证。
 4. **代码未开源**：截至论文发表，SEELE 的代码仓库未公开。上述适用边界和叠加假设需要在开源后通过实际设备测试进行验证和修正。
 5. **动态场景适应性**：论文未讨论动态场景（如含有运动物体的 4D 高斯泼溅）下聚类预取的有效性。动态物体的高斯点可能在不同聚类间迁移，预取策略需要引入时间维度的预测，这是 SEELE 框架向动态场景扩展的核心挑战。
-
-
 
 ## 原文 PDF
 

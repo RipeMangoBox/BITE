@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/Hunyuan3D_2_5_Towards_High_Fidelity_3D_Assets_Generation_with_Ultimate_Details.pdf
+project_link: null
+code_link: https://github.com/Tencent/Hunyuan3D-2
 aliases:
 - H25
 - H25THF3AGUD
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | Hunyuan3D 2.5：面向极致细节的高保真3D资产生成 |
 | 英文题名 | Hunyuan3D 2.5: Towards High-Fidelity 3D Assets Generation with Ultimate Details |
 | 会议/期刊 | arXiv 2025 |
-| Links | [paper](https://arxiv.org/abs/2506.16504) · [Code](https://github.com/Tencent/Hunyuan3D-2) · [arXiv](https://arxiv.org/abs/2503.19011) |
+| Links | [paper](https://arxiv.org/abs/2506.16504) · [Code](https://github.com/Tencent/Hunyuan3D-2) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction #topic/generative_models_diffusion |
 | Method | Hunyuan3D 2.5 |
 | Dataset | Shape generation, Texture generation |
@@ -41,7 +43,7 @@ claims:
 > - Shape generation 上，ULIP-T(↑) 0.07853 vs 0.0771 (Hunyuan3D 2.0) (+0.00143)；Uni3D-T(↑) 0.2542 vs 0.2519 (Hunyuan3D 2.0) (+0.0023)。
 > - Texture generation 上，CLIP-FID↓ 23.97 vs 26.86 (Paint3D) (-2.89)；FID↓ 165.8 vs 176.9 (Paint3D) (-11.1)；CMMD↓ 2.064 vs 2.400 (Paint3D) (-0.336)。
 
-## 概述
+## 概要
 
 Hunyuan3D 2.5 是一个端到端的图像到3D资产生成模型，旨在解决现有方法无法同时实现精细几何细节、锐利边缘与光滑表面，以及缺乏物理真实感PBR材质生成的瓶颈问题。该模型延续了Hunyuan3D 2.0的两阶段管线架构：首先生成无纹理的3D网格形状，再基于该形状生成纹理贴图。
 
@@ -50,8 +52,6 @@ Hunyuan3D 2.5 是一个端到端的图像到3D资产生成模型，旨在解决�
 在纹理生成阶段，Hunyuan3D 2.5 提出了一个基于物理的PBR材质多视图生成框架，能够同时生成albedo、粗糙度和金属度贴图。其核心创新在于**双通道注意力机制**：将语义最丰富的albedo分支的参考注意力掩码共享给金属度-粗糙度通道，确保多通道材质在空间上严格对齐；同时采用**双阶段分辨率增强策略**，通过随机zoom-in的高分辨率训练逐步注入高频几何细节，在计算可行范围内实现多通道材料的一致高保真生成。
 
 实验结果表明，Hunyuan3D 2.5 在形状生成和纹理生成任务上均取得了领先性能。在形状生成定量比较中，模型在ULIP-T、Uni3D-T和Uni3D-I三项指标上均达到最优或持平水平（Table 1）。在纹理生成比较中，模型在CLIP-FID、FID、CMMD、CLIP-I和LPIPS五个指标上全面优于所有公开对比方法（Table 2）。用户研究进一步验证了端到端生成质量的显著优势：在图像到3D任务上，Hunyuan3D 2.5的胜率达到72%，是对比商业模型的9倍（Figure 8）。
-
-## 背景与动机
 
 ### 3D资产生成的核心瓶颈
 
@@ -80,7 +80,7 @@ Hunyuan3D 2.5 是一个端到端的图像到3D资产生成模型，旨在解决�
 
 这一动机链条直接对应了Figure 3所示的两阶段管线设计：输入图像经预处理后，首先由形状生成模型LATTICE输出高保真无纹理网格，经后处理提取几何条件（法线、UV坐标等），再由PBR材质生成模型输出多视图一致的三通道材质贴图。
 
-## 核心创新
+## 核心方法与创新机理
 
 Hunyuan3D 2.5 在继承 Hunyuan3D 2.0 两阶段管线（先形状、后纹理）的基础上，针对“精细几何细节”与“真实感材质”两大瓶颈进行了系统性的方法替换与机制创新。其核心创新可归结为四个关键的 changed slots。
 
@@ -116,8 +116,6 @@ $$\begin{array} { r } { z _ { a l b e d o } ^ { n e w } = z _ { a l b e d o } + 
 
 这一策略的效用在于：zoom-in 训练迫使模型关注局部高频几何细节与纹理的对应关系，从而在复杂高多边形几何体上改善纹理-几何对齐，同时降低融合与烘焙阶段出现伪影和接缝的风险。然而，论文也指出，多视图一致性仍然是挑战，高多边形几何体上的精确对齐依然困难（Section 2.2），这一点需要读者在评估方法时予以关注。
 
-## 整体框架
-
 Hunyuan3D 2.5 延续了 Hunyuan3D 2.0（Zhao et al., 2025）的两阶段级联范式，将图像到 3D 资产生成解耦为**形状生成**与**纹理生成**两个顺序执行的阶段，如 Figure 3 所示。整体管线由四个核心模块串联构成：图像预处理、形状生成（LATTICE）、网格后处理、以及 PBR 材质纹理生成。
 
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2506_16504/figures/003_Figure_3.jpg]]
@@ -135,16 +133,11 @@ Hunyuan3D 2.5 延续了 Hunyuan3D 2.0（Zhao et al., 2025）的两阶段级联�
 
 最终输出为带 PBR 材质的高保真 3D 资产，可直接用于支持物理渲染的下游应用。
 
-## 核心模块与公式推导
-
 Hunyuan3D 2.5 延续了 Hunyuan3D 2.0（Zhao et al., 2025）的两阶段管线架构（Figure 3）：先进行形状生成，再基于生成的形状进行纹理生成。两阶段的核心模块分别进行了根本性的升级。
 
 ### 2.1 形状生成模块：LATTICE
 
 形状生成阶段的核心模块是 **LATTICE**——一个参数量扩展至 10B 的大规模扩散模型。其设计思路并非引入新的网络结构，而是将现有扩散模型在**高质量数据集、模型规模与计算预算**三个维度上进行大规模扩展（Section 2.1）。这一扩展策略使得模型能够从单张图像或多视图条件中捕捉到丰富的几何先验，从而生成具有以下关键特性的形状（Figure 4）：
-
-![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2506_16504/figures/004_Figure_4.jpg]]
-*Figure 4: Illustration of major features of the new shape generation model in Hunyuan3D 2.5*
 
 - **精细几何细节**：能够生成如自行车辐条、正确手指数量等复杂结构。
 - **锐利边缘与光滑表面**：在保持边缘锐利度的同时，不牺牲曲面的平滑性，解决了传统方法中细节与平滑度难以兼得的矛盾。
@@ -179,12 +172,10 @@ $$\begin{array} { r } { z _ { a l b e d o } ^ { n e w } = z _ { a l b e d o } + 
 
 该策略有效改善了复杂高多边形几何体上的纹理-几何对齐质量，并降低了融合与烘焙阶段的伪影与接缝风险。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2506_16504/figures/005_Figure_5.jpg]]
 *Figure 5: Overview of material generation framework*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 形状生成定量评估
 
@@ -217,9 +208,6 @@ CLIP-I 的提升幅度最大（+0.0410），表明生成的纹理与参考图像
 
 端到端图像到 3D 任务的用户偏好测试（**Figure 8**）显示，Hunyuan3D 2.5 的胜率达到 **72%**，是对比商业模型的 **9 倍**。这一结果直接验证了端到端生成质量在人类感知层面的显著领先，弥补了自动指标可能无法捕捉的视觉质量维度。但需注意，测试集的具体类别分布和规模未公开，结果的普适性有待进一步验证。
 
-![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2506_16504/figures/010_Figure_8.jpg]]
-*Figure 8: User study against three latest commerical models in terms of end-to-end textured results*
-
 ### 消融分析与关键设计验证
 
 论文通过定性消融验证了两个核心设计选择的有效性：
@@ -242,8 +230,6 @@ CLIP-I 的提升幅度最大（+0.0410），表明生成的纹理与参考图像
 
 部分基线方法（如两个商业模型）为闭源系统，无法保证完全公平的比较环境。此外，测试集的具体来源、大小及类别分布未公开，可能影响结果的普适性与可复现性。在解读定量结果时应将这些因素纳入考量。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2506_16504/figures/009_Table_2.jpg]]
 *Table 2: Quantitative comparison with state-of-the-art methods. We compare with two classes of methods, one conditioned on text only, and the other one based on image. Our method achieves the best performance compared with both classes*
 
@@ -253,13 +239,7 @@ CLIP-I 的提升幅度最大（+0.0410），表明生成的纹理与参考图像
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2506_16504/figures/007_Figure_7.jpg]]
 *Figure 7: Visual comparison of different methods in terms of texture generation. We compared the front and back of models generated by different methods, as well as the effects of the corresponding complete material maps and albedo maps*
 
-![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2506_16504/figures/002_Figure_2.jpg]]
-*Figure 2: Drawbacks of existing methods: failure at detail generation and incorrect PBR*
-
-![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2506_16504/figures/001_Figure_1.jpg]]
-*Figure 1: High quality 3D assets generated by Hunyuan3D 2.5*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 技术脉络与基线关系
 

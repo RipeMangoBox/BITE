@@ -57,8 +57,6 @@ claims:
 
 Frozen-PINN 的方法定位处于**随机特征方法**（ELM/SWIM）与**自适应 ODE 求解器**的交叉点，通过解耦损失函数各分量（PDE 残差、初始条件、边界条件），将 PINN 的训练重新定义为一系列可独立、高效求解的子问题。这一框架为时间依赖 PDE 的快速高精度求解开辟了新的技术路径。
 
-
-
 ### 物理信息神经网络的核心瓶颈
 
 物理信息神经网络（PINN）通过将物理定律以偏微分方程（PDE）残差的形式嵌入神经网络的损失函数，实现了在无标签数据条件下求解正问题和逆问题。然而，标准 PINN 的训练面临一个根本性瓶颈：其损失函数是 PDE 残差、初始条件、边界条件和数据项的高维加权组合，构成一个多目标、高度非凸的优化问题。更关键的是，PINN 将时间视为一个额外的空间维度，在整个时空域内同时最小化残差，这从根本上违背了物理系统的时间因果性——未来的状态不应影响过去的演化。
@@ -78,8 +76,6 @@ Frozen-PINN 的方法定位处于**随机特征方法**（ELM/SWIM）与**自适
 这一转换的关键在于时空分离。如果能够将空间依赖的基函数预先确定并冻结，那么 PDE 的求解就简化为寻找一组时间依赖的系数，使其满足 PDE 约束。此时，PDE 残差不再是一个关于所有网络参数的非凸函数，而是一个关于时间系数的 ODE 系统。这个 ODE 系统可以通过成熟的自适应求解器高效求解，既天然保证了时间因果性（系数沿时间方向逐步演化），又彻底消除了梯度下降带来的训练困难。
 
 这一思路在概念上简洁而有力，但其实现面临若干技术挑战：如何采样合适的空间基函数以提供足够的表示能力？如何处理不同类型的边界条件？如何控制 ODE 系统的规模以避免刚性或维度灾难？Frozen-PINN 正是围绕这些问题展开的系统性解决方案。
-
-
 
 ## 核心方法与创新机理
 
@@ -130,8 +126,6 @@ Frozen-PINN 处于 PINN（Raissi et al., 2019）与随机特征方法（ELM, SWI
 
 为进一步降低 ODE 系统的刚性和计算代价，Frozen-PINN 在空间基函数后引入可选的 **SVD 层**：对 $\mathcal{A}\Phi(X)$ 进行截断 SVD，将基函数维度从 $M$ 压缩至 $r \ll M$，同时通过正交化改善 ODE 的数值稳定性。消融实验表明，SVD 层可将计算速度提升**高达 75 倍**，ODE 系统维度降低 **20 倍**，且对精度影响可控。
 
-
-
 Frozen-PINN 的核心设计在于将时间依赖偏微分方程的求解从高维非凸优化问题转化为一个常微分方程初值问题。其整体 pipeline 由五个顺序衔接的模块构成，输入为 PDE 定义、初始/边界条件及空间配点集，输出为全时空近似解。
 
 ### Pipeline 模块关系与数据流
@@ -174,8 +168,6 @@ $$
 整个框架的关键在于**时空分离**与**损失解耦**：空间基函数冻结后，时间依赖性完全由输出层系数 $C(t)$ 承载，PDE 被转化为关于 $C(t)$ 的 ODE。初始条件通过最小二乘单独满足，边界条件通过边界兼容层或增广 ODE 单独处理，使得 ODE 求解器仅需最小化 PDE 残差。这一设计不仅消除了梯度下降带来的训练困难，还自然引入了时间因果性——$C(t)$ 的演化严格遵循时间顺序。
 
 > **注意**：关于网络参数重采样在克服 Kolmogorov n-宽度障碍中的作用，以及具体 PDE 设置下的普遍逼近性质，目前尚缺乏理论证明，需要进一步研究。
-
-
 
 ### 问题形式化
 
@@ -225,8 +217,6 @@ $$V_r \Sigma_r U_r^\top = \mathcal{A}\Phi(X)$$
 
 Frozen-PINN 的完整训练算法（见 Algorithm 1）可概括为：采样并冻结空间基函数 → 构造边界兼容基函数 → SVD 截断降维 → 最小二乘初始化 $C(0)$ → 调用自适应 ODE 求解器（如 RK45、LSODA）沿时间推进 $C(t)$。整个流程无需任何反向传播或梯度下降迭代，训练时间由 ODE 求解器的步长控制决定。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能表现
@@ -263,8 +253,6 @@ Figure 7 展示了 Frozen-PINN 在高维热传导方程上的表现。在维度�
 
 尽管 Frozen-PINN 在实验中表现优异，但其理论分析尚存空白：尚未从理论上证明该方法在具体 PDE 设置下的普遍逼近性质，网络参数重采样在克服 Kolmogorov n-宽度障碍方面的作用也尚不明确。这些开放问题为后续理论研究指明了方向。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_3VdSuh3sie/figures/008_Table_2.jpg]]
 *Table 2: Comparison of Frozen-PINNs with mesh-based FEM and classical PINNs in different problem settings presented in this paper: The comparison is grounded in results reported in Section 3 for the PDEs and solvers studied. ✓ denotes compatibility, and ✗ denotes either incompatibility or the need for substantial modifications. Curse of Dimensionality is abbreviated as CoD. Figure 7: High-dimensional heat equation: (Top): comparison of test errors for varying PDE dimensions (different hatch patterns indicate different benchmarks), (Bottom): fast decay of test error with network width (dashed: Frozen-PINN-swim, solid: Frozen-PINN-elm)*
 
@@ -274,28 +262,8 @@ Figure 7 展示了 Frozen-PINN 在高维热传导方程上的表现。在维度�
 ![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_3VdSuh3sie/figures/013_Figure_11.jpg]]
 *Figure 11: Examples of B-Splines representing the 1D domain [0, 1]. Number of nodes = 6 and degree of polynomials = 2. (Left): The original B-Splines. (Middle): Adapted B-Splines to satisfy the Dirichlet boundary condition. (Right): Adapted B-Splines to satisfy the periodic boundary condition. Note that the first (blue) spline is identical to the second last (brown) one, and the second (orange) spline is identical to the last (pink) one, as they share the same coefficient. The gray dashed lines indicate where the domain starts and ends*
 
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_3VdSuh3sie/figures/015_Figure.jpg]]
-*Figure: (a) Frozen-PINN-swim*
-
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_3VdSuh3sie/figures/026_Figure.jpg]]
-*Figure: (a) Frozen-PINN-swim (b) Frozen-PINN-elm (c) IGA*
-
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_3VdSuh3sie/figures/027_Figure.jpg]]
-*Figure: (d) PINN (LBFGS) (e) PINN (Adam) (f) Ground truth*
-
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_3VdSuh3sie/figures/029_Figure_17.jpg]]
-*Figure 17: The Euler-Bernoulli beam equation on Winkler foundation: absolute error plots and ground truth*
-
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_3VdSuh3sie/figures/033_Figure_18.jpg]]
-*Figure 18: Wave equation Equation (27e): Ground truth, Frozen-PINN-swim solution, absolute error*
-
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_3VdSuh3sie/figures/034_Figure.jpg]]
-*Figure: (a) (Left): Ground truth, (Middle): Frozen-PINN-swim solution, (Right): point-wise absolute error*
-
 ![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_3VdSuh3sie/figures/037_Figure_20.jpg]]
 *Figure 20: (b) (Left): Ground truth, (Middle): Frozen-PINN-swim solution, where black and gray dashed lines mark time snapshots selected for a comparison (in (d) on the right) and the collocation points resampling times, respectively, (Right): point-wise absolute error. (c) Comparison between Frozen-PINN-swim and numerical solutions at three time instances. Figure 20: Illustration of experimental results for the Burgers’ equation*
-
-
 
 ## 定位与知识库关联
 
@@ -348,8 +316,6 @@ Frozen-PINN 的创新在于将这些原本用于静态函数逼近的随机特�
 1. **普遍逼近性质的理论研究**：针对具体 PDE 设置（如非线性算子的 Lipschitz 条件、初边值的光滑性），建立 Frozen-PINN 的误差收敛理论。
 2. **网络参数重采样的作用机制**：理解随机基函数重采样如何克服 Kolmogorov n-宽度障碍，以及最优重采样频率和策略的设计。
 3. **扩展到稳态 PDE 和逆问题**：当前框架聚焦于时间依赖的正问题；能否将时空分离思想推广到稳态 PDE 或参数反演问题，尚待探索。
-
-
 
 ## 原文 PDF
 

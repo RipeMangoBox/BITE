@@ -239,8 +239,6 @@ ORCA 是一个免训练的框架，其核心组件均基于预训练模型构建
 
 这些失败模式揭示了当前框架的上限瓶颈：ORCA 的闭环推理可以有效检测和纠正部分错误，但当底层 VLM 的感知能力或 I2V 模型的生成精度不足时，系统仍会失效。未来的改进方向包括增强 VLM 的时空理解能力，以及通过微调或反馈学习提升 I2V 模型的指令跟随精度和长期一致性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2512_20615/figures/005_Table_1.jpg]]
 *Table 1: Main Results on L-IVA Benchmark. All metrics are evaluated per scenario. (a) Task completion metrics. (b) Video quality and human preference. Best in bold*
 

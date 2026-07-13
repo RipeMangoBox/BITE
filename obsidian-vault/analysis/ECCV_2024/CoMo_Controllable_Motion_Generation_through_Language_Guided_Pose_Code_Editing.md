@@ -54,8 +54,6 @@ CoMo 的核心贡献在于构建了一个统一的文本驱动运动生成与编
 
 在 HumanML3D 和 KIT 两个标准基准上，CoMo 的运动生成指标排名前三，其中**多样性（Diversity）指标达到 9.936，为所有对比方法中最高**。更重要的是，在一项包含 54 名参与者的用户研究中，**超过 70% 的标注者偏好 CoMo 的编辑结果**，显著优于基于文本重生成的基线方法（T2M-GPT、FineMoGen），验证了语义姿态代码表示在细粒度运动编辑中的有效性。
 
-
-
 ### 问题背景：文本到运动生成的细粒度控制困境
 
 文本驱动的人体运动生成旨在根据自然语言描述合成逼真的三维人体动作序列，在动画制作、虚拟现实和人机交互等领域具有广泛应用。近年来，基于扩散模型和自回归变换器的方法在运动生成质量上取得了显著进展，但一个根本性瓶颈始终存在：**现有模型缺乏对生成运动的细粒度控制能力**。
@@ -84,8 +82,6 @@ CoMo 的核心动机源于一个关键洞察：**如果运动能够被分解为�
 - **如何让 LLM 可靠地编辑代码序列？** LLM 需要理解运动序列的时空结构，准确识别编辑目标，并在修改局部代码时保持序列的全局一致性。这要求精心设计提示策略和代码表示格式。
 
 CoMo 通过三个协同组件——运动编解码器（Motion Encoder-Decoder）、运动生成器（Motion Generator）和运动编辑器（Motion Editor）——系统性地回应了这些挑战，构建了首个统一的文本驱动运动生成与细粒度编辑框架。
-
-
 
 ## 核心方法与创新机理
 
@@ -120,8 +116,6 @@ CoMo 的核心创新在于将运动生成与编辑问题重新定义为**可解�
 
 这些创新共同构成了 CoMo 的核心竞争力：**以语义姿态代码为桥梁，将 LLM 的常识推理能力引入运动生成与编辑，在保持生成质量的同时实现了前所未有的细粒度可控性**。用户研究（54 名参与者，超过 70% 偏好 CoMo 编辑结果）和自动指标（HumanML3D 上 Diversity 9.936 为所有方法最佳）均支撑了这一设计理念的有效性。
 
-
-
 CoMo 是一个面向文本驱动人体运动生成与细粒度编辑的统一框架，其核心设计理念在于：**将运动分解为语义有意义、可解释的离散姿态代码（pose codes），使大语言模型（LLM）能够直接理解并编辑运动序列的时空属性**。如图 2 和图 3 所示，整个 pipeline 由三个关键模块串联构成：
 
 1. **Motion Encoder‑Decoder（运动编解码器）**：负责运动表示与重构的闭环。编码端利用预定义的语义姿态代码本（pose codebook），将原始运动序列 $X$ 通过骨架解析器 $\mathcal{P}$ 编码为 $K$-hot 姿态代码序列 $Z$；解码端则从激活的代码本项求和得到潜在特征 $\hat{Z}$，经一维卷积解码器重构回运动 $X_{\mathrm{rec}}$。该模块是整个框架的**表示基础**——它将连续的运动信号量化为离散、可解释的符号空间，为后续生成与编辑提供结构化接口。
@@ -131,8 +125,6 @@ CoMo 是一个面向文本驱动人体运动生成与细粒度编辑的统一框
 3. **Motion Editor（运动编辑器）**：基于 LLM 的零样本编辑模块，无需任何微调。给定源运动及其编码后的姿态代码序列，以及用户的编辑指令，LLM 通过三步顺序提示策略（理解指令 → 定位目标代码 → 修改代码）直接操作姿态代码，编辑后的代码序列经解码器还原为最终运动。该模块使 CoMo 区别于仅通过修改文本提示重新生成运动的基线方法（如 **T2M‑GPT** 和 **FineMoGen**），实现了**对源运动序列的直接解释与操控**。
 
 三个模块之间的数据流关系清晰：Motion Encoder‑Decoder 提供了运动 ↔ 姿态代码的双向映射能力，Motion Generator 和 Motion Editor 均依赖这一映射——前者从文本生成代码再解码为运动，后者将运动编码为代码、经 LLM 编辑后再解码。这种设计使生成与编辑共享同一表示空间，保证了框架的统一性与可扩展性。
-
-
 
 CoMo 的核心架构由三个模块构成：运动编解码器（Motion Encoder-Decoder）、运动生成器（Motion Generator）和运动编辑器（Motion Editor）。其设计的关键在于将运动分解为语义可解释的离散姿态代码，使后续的生成与编辑均可直接操作这些代码。
 
@@ -172,15 +164,8 @@ $$\mathcal{L}_{\mathrm{gen}} = -\frac{1}{L(N+1)} \sum_{i=1}^{L} \sum_{n=1}^{N+1}
 
 运动编辑器利用大语言模型（LLM）的常识推理能力，通过三步顺序提示策略实现零样本运动编辑：首先将源运动编码为姿态代码序列并转为文本表示；然后 LLM 根据编辑指令识别需修改的目标代码并更新；最后将编辑后的代码序列通过预训练的解码器重构为运动。整个过程无需对 LLM 进行任何微调。
 
-### 补充图表
-
-![[assets/figures/papers/motion_editing_inpainting_20260603_como/figures/001_Figure_1.jpg]]
-*Figure 1: CoMo, a language-guided human motion synthesis model, enables controllable generation from text inputs. CoMo allows for the control of individual body part movements, facilitates fine-grained editing of each joint and frame, and supports iterative editing that preserves the essence of the original motions*
-
 ![[assets/figures/papers/motion_editing_inpainting_20260603_como/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of CoMo for text-driven motion generation. Motion Encoder-Decoder (left) utilizes a predefined codebook to encode motions into pose codes and learns a decoder to reconstruct the motions. Motion Generator (right), a transformer-based model, predicts pose codes autoregressively, conditioned on the text descriptions and LLM-generated fine-grained keywords. The generated pose codes are then decoded back into motions using the previously trained decoder*
-
-
 
 ## 实验与关键发现
 
@@ -200,9 +185,6 @@ CoMo 在 HumanML3D 和 KIT-ML 两个标准基准上进行了文本驱动运动�
 ### 细粒度运动编辑评估
 
 运动编辑是 CoMo 的核心贡献场景。论文设计了包含 54 名参与者的用户研究，评估四种编辑类型：身体部位修改、速度变化、风格/情感变化、动作添加/删除。**Figure 5** 展示了人工偏好评分结果：在所有五种编辑类型（含平均）上，超过 70% 的标注者偏好 CoMo 的编辑结果，显著优于基于文本重生成的基线方法 **T2M-GPT** 和 **FineMoGen**。
-
-![[assets/figures/papers/motion_editing_inpainting_20260603_como/figures/007_Figure_5.jpg]]
-*Figure 5: Human preference on Motion Editing by comparing CoMo with T2M-GPT and FineMoGen. We report the scores on five editing types and average results*
 
 这一优势的根源在于编辑机制的本质差异。**T2M-GPT** 和 **FineMoGen** 通过修改文本提示后重新生成整个运动序列来实现“编辑”，这导致源运动的关键特征（如未编辑肢体的姿态、运动节奏）难以保留。而 CoMo 通过 LLM 直接定位并修改目标帧的姿态代码，仅改变编辑指令指定的部分，其余帧保持不变。**Figure 6** 的定性示例佐证了这一点：绿色标注的成功编辑区域与红色标注的未对齐区域形成对比，CoMo 在准确执行编辑指令的同时，最大程度地保留了源运动的本质特征。
 
@@ -242,27 +224,11 @@ CoMo 在 HumanML3D 和 KIT-ML 两个标准基准上进行了文本驱动运动�
 
 附录 Table A9 报告了在 NVIDIA RTX A6000 GPU 上的推理时间对比。CoMo 的每句平均推理时间处于可接受范围，具体数值需查阅原表确认（此处证据仅提及该表存在，未提供具体数据）。自回归生成范式使得推理时间与生成序列长度线性相关，下采样率 l=4 的设计在一定程度上缓解了长序列生成的效率压力。
 
-### 补充图表
-
-![[assets/figures/papers/motion_editing_inpainting_20260603_como/figures/017_Figure.jpg]]
-*Figure: Fig. A9: Prompt template for identifying the frames for editing. Fig. A10: Prompt template for identifying the body parts/joints for editing (above) and the prompt for executing the edits (below)*
-
-![[assets/figures/papers/motion_editing_inpainting_20260603_como/figures/023_Figure.jpg]]
-*Figure: Fig. C14: Failure cases in motion editing. Left: The edited motion does not depict the target emotion adequately. Right: The edited motion mistakenly added the ’sidestep’ near the start of the motion rather than in between the two exercises*
-
 ![[assets/figures/papers/motion_editing_inpainting_20260603_como/figures/005_Table_2.jpg]]
 *Table 2: Comparison with the state-of-the-art methods on the KIT test set. The best performance is bold, and the second best is underlined, the third best is italic*
 
 ![[assets/figures/papers/motion_editing_inpainting_20260603_como/figures/009_Table_3.jpg]]
 *Table 3: Ablation study of LLM-generated fine-grained keywords on HumanML3D and KIT. −Fine stands for the model without augmented keywords*
-
-![[assets/figures/papers/motion_editing_inpainting_20260603_como/figures/011_Table_5.jpg]]
-*Table 5: Ablation study of different sampling rates l. We report the reconstruction performance on the HumanML3D validation set*
-
-![[assets/figures/papers/motion_editing_inpainting_20260603_como/figures/006_Figure_4.jpg]]
-*Figure 4: Qualitative examples of Motion Generation on the HumanML3D test set. The motion sequences progress from left to right. The red boxes identify misalignments between the generated motion sequence and the text description. CoMo achieves competitive results in motion generation compared to T2M-GPT and FineMoGen. More visual results are available in the Appendix*
-
-
 
 ## 定位与知识库关联
 
@@ -318,8 +284,6 @@ CoMo 的能力边界受限于其姿态代码的**局部运动学属性**：
 4. **LLM 推理的可靠性**：在更长、更复杂的编辑指令链下，LLM 的多步推理是否保持自一致性？是否需要引入验证或自纠正机制？
 
 5. **与物理仿真引擎的集成**：编辑后的运动能否与物理仿真环境对接，实现更真实的交互式运动编辑？
-
-
 
 ## 原文 PDF
 

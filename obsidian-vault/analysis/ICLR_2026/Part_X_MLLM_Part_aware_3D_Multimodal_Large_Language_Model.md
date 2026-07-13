@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Part_X_MLLM_Part_aware_3D_Multimodal_Large_Language_Model.pdf
+project_link: https://chunshi.wang/Part-X-MLLM/
+code_link: null
 openreview_forum_id: WffiETiSeU
 aliases:
 - PXM
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 部件感知三维多模态大语言模型 Part-X-MLLM |
 | 英文题名 | Part-X-MLLM: Part-aware 3D Multimodal Large Language Model |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=WffiETiSeU); [Project](https://chunshi.wang/Part-X-MLLM/) |
+| Links | [paper](https://arxiv.org/abs/2511.13647); [OpenReview](https://openreview.net/forum?id=WffiETiSeU); [Project](https://chunshi.wang/Part-X-MLLM/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Part-X-MLLM |
 | Dataset | UniPart-Bench, UniPart-Bench (Ablation) |
@@ -42,7 +44,7 @@ claims:
 > - UniPart-Bench 上，SBERT 为 78.98，对比 61.30 (PointLLM-7B)，变化 +17.68。
 > - UniPart-Bench 上，SBERT 为 53.82，对比 49.52 (MiniGPT-3D)，变化 +4.30。
 
-## 概述
+## 概要
 
 三维物体理解长期受困于**结构不透明性**——现有模型将物体视为不可分割的整体，缺乏持久的部件标识与可执行输出，因而无法对“扶手”“轮毂”等具体部件进行细粒度推理和操作。针对这一瓶颈，**Part-X-MLLM**（2025）将广泛的3D交互统一为**基于部件的结构化程序生成**：给定RGB点云与自然语言指令，模型自回归地输出一段统一的标记序列，其中编码了部件级边界框、语义描述与编辑操作符，从而提供一种语言原生、与几何引擎无关的通用控制界面。
 
@@ -54,7 +56,7 @@ claims:
 
 **证据强度与注意事项**：上述定量结论均来自UniPart-Bench上的受控实验，置信度高。但需注意：（1）长标记序列会减慢推理速度，当前采用简单压缩缓解；（2）3D任务微调可能导致基础语言模型通用能力下降；（3）当前方法聚焦单一对象，扩展到室内全场景仍需后续工作。
 
-## 背景与动机
+
 
 三维形状理解是视觉智能的核心能力，它在机器人操作、增强现实、数字内容创作等场景中至关重要。近年来，多模态大语言模型（MLLM）在二维视觉理解上取得了显著进展，但将其扩展到三维领域仍面临根本性挑战：**现有的3D模型普遍存在“结构不透明性”**——它们倾向于将物体视为不可分割的整体，缺乏对内部部件的持久标识和结构化推理能力。
 
@@ -64,7 +66,9 @@ claims:
 
 Part-X-MLLM 的出发点正是弥合这一断裂。其核心动机是将广泛的3D交互任务——包括部件定位、理解问答、对象字幕、形状生成和局部编辑——统一为**单一几何感知的部件语法下的语言建模问题**。模型不再输出自由文本，而是自回归地生成一个统一的标记序列，其中包含部件边界框的量化坐标、语义描述以及编辑操作符。这种设计将“符号规划”（决定做什么、在哪里做）与“几何执行”（实际修改或生成形状）解耦，使模型成为一个语言原生的、与下游几何引擎无关的通用控制界面。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Part‑X‑MLLM 的核心创新在于将“结构不透明”的 3D 理解彻底重构为**基于部件的结构化程序生成**。传统 3D 模型将物体视为不可分割的整体，缺乏持久部件标识和可执行输出，无法对具体部件进行细粒度推理与操作。Part‑X‑MLLM 通过两个关键的 *changed slots* 打破这一瓶颈。
 
@@ -101,7 +105,7 @@ Part‑X‑MLLM 的核心创新在于将“结构不透明”的 3D 理解彻底
 
 这些创新共同构成了 Part‑X‑MLLM 的方法论内核：以部件为第一性原语，以结构化规划语言为统一接口，以双编码器解耦为感知基础，最终实现从“整体黑箱”到“部件透明”的范式转变。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_WffiETiSeU/figures/002_Figure_2.jpg]]
 *Figure 2: The Part-X-MLLM Framework. Our pipeline begins by encoding geometry and appearance features separately using a dual-encoder architecture, which are then fused together with text prompts. These combined features are passed to an autoregressive decoder that generates a program-like token sequence representing a plan (e.g., bounding boxes, edit commands). Finally, specialized geometry heads execute this plan to enable part-aware generation and editing*
@@ -137,7 +141,7 @@ Part‑X‑MLLM 将多样的三维交互统一为**单一几何感知的部件�
 
 模型的输入是**点云 + 自然语言提示**，输出是**单一的程序标记序列**。这一序列本身就是可执行的规划，无需额外的中间表示或后处理步骤。下游的几何引擎（合成模块或编辑模块）直接解释这些标记，实现从“理解”到“操作”的闭环。这种统一性使得 Part‑X‑MLLM 成为目前唯一同时支持**字幕、问答、对象/部件定位、部件生成和编辑**六种能力的模型（Table 6），覆盖了理解、定位、生成和修改四个维度的任务。
 
-## 核心模块与公式推导
+
 
 ### 双编码器架构
 
@@ -211,7 +215,9 @@ $$
 
 **局部编辑模块** 利用生成的边界框定义立体掩码（cuboid masks），结合编辑命令标记（`<adds>`、`<dels>`、`<mods>`）执行局部化操作，在保持物体完整性的前提下实现语义精确的局部编辑（Figure 5）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -260,7 +266,9 @@ Table 6 的系统能力对比表明，Part-X-MLLM 是唯一同时支持字幕生
 
 Table 7 报告了平均意见分（MOS，1–5 分制）的人类评估结果。Part-X-MLLM 在部件感知生成、编辑和问答三个维度上均获得最高评分，表明其输出不仅在自动指标上占优，在人类主观判断中也更符合语义准确性和视觉合理性预期。具体 MOS 数值需查阅原表确认。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -295,6 +303,8 @@ Part‑X‑MLLM 的核心贡献是将 3D 理解、生成与编辑统一到一个
 4. **双编码器设计的跨模态泛化。** 结构-外观解耦的双编码器在静态点云上验证有效，但该设计是否能直接泛化到动态点云（如 4D 人体运动序列）或包含时间维度的 3D 数据，是一个开放的理论问题——时间维度上的结构变化可能要求编码器具备时序建模能力。
 
 5. **语义粒度控制的自动化程度。** 当前通过 CLIP 语义特征聚类实现部件合并（$\mathbf{f}_i = \frac{(1-\alpha)\mathbf{f}_{\mathrm{sem}, i} \oplus \alpha\hat{\mathbf{f}}_{\mathrm{spat}, i}}{\lVert \cdot \rVert_2}$，Figure 6），但权重 $\alpha$ 和聚类阈值仍需人工设定。能否让模型根据任务上下文自动选择最优粒度，是一个值得研究的方向。
+
+
 
 ## 原文 PDF
 

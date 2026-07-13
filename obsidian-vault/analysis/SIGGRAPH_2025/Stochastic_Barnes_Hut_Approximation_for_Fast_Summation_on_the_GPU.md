@@ -59,8 +59,6 @@ Barnes-Hut（BH）算法（Barnes and Hut, Nature 1986）通过空间树将远�
 
 方法的理论保证在于估计器的**无偏性**（Theorem 3.1，附录 A 给出完整证明）。其应用范围涵盖库仑势、引力势、缠绕数和平滑距离场等多种全局支撑核函数。
 
-
-
 大规模核函数求和是计算机图形学与科学计算中的基础运算，广泛出现在引力势场计算、缠绕数评估、平滑距离场生成等场景中。给定 $M$ 个携带质量 $m_i$ 的源点 $\mathbf{p}_i$，对查询点 $\mathbf{q}$ 的精确全对求和为：
 
 $$F(\mathbf{q}) = \sum_{i=1}^{M} m_i f(\mathbf{p}_i, \mathbf{q})$$
@@ -78,8 +76,6 @@ $$F_{BH}(\mathbf{q}, \beta) = \sum_{T_a \in D(\mathbf{q}, \beta)} \tilde{m}_a f(
 尽管 Barnes-Hut 在 CPU 上取得了巨大成功，其 GPU 并行化却面临根本性困难。**核心瓶颈在于深度树遍历导致的线程发散**：不同查询点的远场条件判定结果各异，使得各线程需要遍历的树深度和路径截然不同。即便采用栈式遍历和 warp voting 等 GPU 优化策略，线程束内的执行路径分歧仍然严重，导致内存访问延迟和计算资源浪费。这一瓶颈使得标准 Barnes-Hut 在 GPU 上的效率远未达到硬件潜力。
 
 本文的**核心动机**正是突破这一并行化瓶颈。作者洞察到：Barnes-Hut 的细节层次（LOD）近似族本质上可视为控制变量——它不是被抛弃的近似，而是构建更优估计器的基石。通过将确定性树遍历替换为随机路径采样，并用俄罗斯轮盘赌概率控制路径长度，可以构造一个**无偏的蒙特卡洛估计器**。该估计器用少量随机路径样本替代完整的确定性遍历，从根本上减少线程发散，在保持甚至提升精度的同时实现显著的 GPU 加速。
-
-
 
 ## 核心方法与创新机理
 
@@ -124,8 +120,6 @@ $$\hat{F}_1(\mathbf{q}) = \tilde{m}_{I,0} f(\tilde{\mathbf{p}}_{I,0}, \mathbf{q}
 在116个网格数据集上（Table 1），$S=1$ 时本方法的**平均误差比Barnes-Hut（$\beta=2$）低约5倍，中位数误差低约17倍**，同时**速度快2倍以上**。在Fig. 1的电力塔电势场计算中，随机方法在**8 ms内计算超过4万亿粒子对相互作用**，Barnes-Hut需14 ms，暴力方法需2800 ms。在相同中位数误差下，随机方法**比优化的Barnes-Hut快至多9.4倍**（Fig. 5）。
 
 值得注意的是，这些加速并非通过缩水基线获得——Barnes-Hut已采用栈式遍历和warp voting进行GPU优化，而本方法通过根本性的算法重构实现了超越。
-
-
 
 本文提出的随机Barnes-Hut近似方法将传统Barnes-Hut的细节层次（LOD）近似族重新解释为控制变量，构建了一个无偏的蒙特卡洛估计器，从而将GPU上原本因深度树遍历导致的线程发散问题转化为统一的随机路径采样问题。其整体pipeline由以下核心模块串联而成：
 
@@ -183,8 +177,6 @@ $$\hat{F}_1(\mathbf{q}) = \tilde{m}_{I,0} f(\tilde{\mathbf{p}}_{I,0}, \mathbf{q}
 
 整体而言，该方法将Barnes-Hut的“是否深入子节点”的确定性决策替换为“以多大概率深入”的随机决策，从而将原本导致GPU线程发散的变长树遍历转化为统一长度的随机路径采样，实现了显著的并行加速。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2506_02219/figures/006_Figure_5.jpg]]
 *Figure 5: Convergence of our method vs Barnes-Hut, for 1 million random and grid query points, and $2 ^ { 1 5 }$ and $2 ^ { 2 0 }$ source points sampled from the Stanford bunny. Each point on the curves for our method (green) correspond to the number of samples per subdomain ?? from 1 to 32; each point on the curves for Barnes-Hut (orange) correspond to the accuracy parameter $\beta$ from 1 to 40. The ?? = 1 point on each curve for our method is outlined in black, and the point on the Barnes-Hut curve that achieves the same error is also marked (found by linear interpolation on the log-log plot). Across all source point sets and query distributions, and for both mean and median error, our method is roughly...*
 
@@ -196,8 +188,6 @@ $$\hat{F}_1(\mathbf{q}) = \tilde{m}_{I,0} f(\tilde{\mathbf{p}}_{I,0}, \mathbf{q}
 
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2506_02219/figures/008_Figure_6.jpg]]
 *Figure 6: In the example from Fig. 1, Barnes-Hut (left) exhibits discontinuous error patterns when the far field condition causes a change in contribution nodes, while our method (right) does not exhibit such artifacts and instead is more concentrated in regions where the field rapidly changes, while being lower on average than Barnes-Hut*
-
-
 
 ### 3.1 空间树构建与Barnes-Hut回顾
 
@@ -261,8 +251,6 @@ $$\hat{F}_1(\mathbf{q}) = \tilde{m}_{I,0} f(\tilde{\mathbf{p}}_{I,0}, \mathbf{q}
 
 **与Barnes-Hut的关键差异**：本方法将细节层次（LOD）近似族视为控制变量，用少量随机路径样本替代完整确定性树遍历，从根本上消除了线程发散问题。树分支因子从Barnes-Hut的 $d=2$（总分支8）提升至 $d=4$（总分支64），进一步适配随机采样策略。
 
-
-
 ## 实验与关键发现
 
 ### 主要性能对比
@@ -311,12 +299,8 @@ $$\hat{F}_1(\mathbf{q}) = \tilde{m}_{I,0} f(\tilde{\mathbf{p}}_{I,0}, \mathbf{q}
 5. **端到端效率**：树构建在CPU进行，未集成GPU树构建器（如fVDB），整体端到端加速受限。
 6. **内存带宽**：未对节点数据进行量化和压缩优化，在未来扩展中可能成为障碍。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2506_02219/figures/010_Table_1.jpg]]
 *Table 1: Timings and errors of our method and Barnes-Hut on a dataset of 116 meshes, run with typical parameter settings. Barnes-Hut is evaluated with $\beta$ = 2 , , and our algorithm is evaluated with S = 1 $\left( \mathrm { i . e . } \right$. , one sample per subdomain). We vary the number of source samples ?? to be $2 ^ { 1 5 }$ \ : ( 3 2 , 7 6 8 ) , $2 ^ { 1 7 }$ (131,072), and $2 ^ { 2 0 }$ \ : ( 1 , 0 4 8 , 5 7 6 )$_ { \div }$ , draw them from each mesh surface in the dataset, and their total gravitational potential kernel on a grid of 1 0 $0 ^ { 3 }$ points. The mean and standard deviation for each error statistic across the dataset are reported, and the better metric is highlighted in bold at each sourc...
-
-
 
 ## 定位与知识库关联
 
@@ -365,8 +349,6 @@ $$\hat{F}_1(\mathbf{q}) = \tilde{m}_{I,0} f(\tilde{\mathbf{p}}_{I,0}, \mathbf{q}
 5. **数据压缩**：通过量化和压缩节点数据是否能在不引入偏差的前提下显著降低内存流量？
 6. **最优概率计算**：能否结合零方差理论预先为给定查询点计算所有Russian roulette概率以最小化方差？
 7. **去噪结合**：如何将随机求和方法与去噪器（如深度学习降噪）结合，消除低样本时的噪声artifact？
-
-
 
 ## 原文 PDF
 

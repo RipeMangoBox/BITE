@@ -54,8 +54,6 @@ claims:
 
 **方法定位**：GenOmni3D属于“文本→深度条件图像→3D网格”的生成式数据扩增范式，其核心调控变量是深度条件信号，区别于纯文本提示的生成方法（如GenVegeFruits3D）和纯合成渲染流水线（如Omni6D）。该方法在数据规模、对齐质量与生成效率三个维度上同时实现了突破，为类别级3D视觉任务提供了可规模化的数据基础。
 
-
-
 类别级6D姿态估计旨在从单张RGB-D图像中预测物体实例的三维位置、朝向及尺寸，是机器人抓取、增强现实和场景理解等下游任务的关键感知能力。然而，该领域长期受困于一个根本性瓶颈：**大规模、高质量且规范对齐的3D数据极度匮乏**。与实例级任务不同，类别级方法需要覆盖同一类别内丰富的几何与纹理变化，这对训练数据的数量、多样性和一致性提出了极高要求。
 
 现有3D数据集在三个维度上存在显著缺口。第一，**规模与类别覆盖不足**：真实扫描数据集（如NOCS）仅包含6个类别、每个类别数十个实例，难以支撑深度学习模型对类内变化的充分建模；艺术家手工创建的合成资产虽然质量可控，但制作成本高昂，难以规模化扩展。第二，**规范朝向缺失**：大多数现有3D网格缺乏统一的规范坐标系对齐——同一类别的不同实例可能具有任意的初始朝向，这使得从数据中学习一致的姿态表示变得极为困难。第三，**生成效率低下**：先前的生成式3D数据集方法（如**GenVegeFruits3D**，Duret et al., HAL 2025）仅适用于对称物体，且需要大量人工过滤筛除低质量生成结果（过滤比例超过15倍），无法支撑大规模、多类别的自动化数据生产。
@@ -63,8 +61,6 @@ claims:
 上述数据瓶颈直接制约了下游任务性能的上限。在6D姿态估计中，基于纯合成渲染的流水线（如**Omni6D**，Zhang et al., ECCV 2024）虽然能够生成大规模标注数据，但其使用的3D资产仍依赖现有数据集，未能从根本上解决资产匮乏问题。在机器人抓取中，**CenterGrasp**（Chisari et al., IEEE RA-L 2024）和**GIGA**（Jiang et al., arXiv 2021）等方法高度依赖训练数据的3D几何质量，数据不足直接导致抓取成功率受限。
 
 本文的核心动机源于一个关键观察：**文本到图像生成模型具备保留物体全局结构与空间姿态的能力，而深度图作为中间表示可以显式编码规范朝向信息**。这一洞察指向了一条从零自动化生成对齐3D资产的全新路径——通过在前端引入深度条件控制，将规范对齐能力内嵌于生成流水线，从而彻底摆脱对人工对齐或后处理过滤的依赖。基于此，本文提出GenOmni3D流水线，旨在以每个物体不到3分钟的速度、5–20倍于传统扫描的加速比，实现大规模、高质量、规范对齐的3D网格生成，为类别级6D姿态估计和机器人抓取提供前所未有的数据支撑。
-
-
 
 ## 核心方法与创新机理
 
@@ -93,8 +89,6 @@ GenOmni3D 的核心洞察在于：**深度图是连接语义控制与几何约�
 
 在6D姿态数据生成流水线方面，本工作继承并扩展了 **Omni6D**（Zhang et al., ECCV 2024）的合成渲染框架和 **Omni6DPose**（Zhang et al., ECCV 2024）的混合现实渲染策略，但将上游的3D资产来源从人工建模替换为全自动生成，使数据生产速度提升5–20倍（每对象不到3分钟）。下游实验中，用生成的GenNOCS网格替换原始NOCS合成物体后，域内6D姿态精度从15.66提升至23.91（+8.25），验证了生成资产的质量足以支撑高精度学习。
 
-
-
 GenOmni3D流水线旨在以全自动方式将类别描述转化为大规模、高质量且具有规范朝向一致性的3D网格资产。其核心设计逻辑在于：**将规范对齐能力内嵌于生成流水线的前端**——通过在文本到图像的生成阶段引入深度图作为显式空间控制信号，使后续3D重建天然继承一致的物体朝向，从而彻底摆脱对后期手动对齐的依赖。
 
 ### 流水线总览
@@ -119,12 +113,8 @@ GenOmni3D流水线旨在以全自动方式将类别描述转化为大规模、�
 
 从效率维度看，该流水线在每个物体不到3分钟的时间内即可生成高质量、对齐的3D网格，相比传统扫描方式加速5–20倍。以100张深度图作为输入，流水线可全自动生成每类别1000个对齐网格，为下游的6D姿态估计与机器人抓取任务提供了前所未有的数据规模与质量保障。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2202_https_openaccess_thecvf_com_content_CVPR2026_html_Guillaume_Breaking_the/figures/001_Figure_1.jpg]]
 *Figure 1: Our text-to-image pipeline: (a) Category-based geometry prompt engineering and images generation; (b) Depth-conditioned image generation for texture variation and automatic alignment*
-
-
 
 GenOmni3D流水线由四个顺序模块构成，其核心设计目标是：在保证生成网格规范对齐的前提下，最大化几何与纹理的类别内多样性。整个流水线可在单张消费级GPU上运行，每个物体生成时间少于3分钟。
 
@@ -181,14 +171,8 @@ GenOmni3D流水线由四个顺序模块构成，其核心设计目标是：在�
 
 若需深入理解上述组件的数学细节，建议直接查阅Stable Diffusion、ControlNet（Zhang et al., ICCV 2023）及Hunyuan3D-v2.0的原始论文。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2202_https_openaccess_thecvf_com_content_CVPR2026_html_Guillaume_Breaking_the/figures/004_Figure_3.jpg]]
 *Figure 3: Qualitative examples of final textured images of the 6 categories in the NOCS dataset (on the left) and final resulting 3D textured meshes using Hunyuan3D-v2.0 model [26] (on the right)*
-
-![[assets/figures/papers/paper_list_l2202_https_openaccess_thecvf_com_content_CVPR2026_html_Guillaume_Breaking_the/figures/006_Table.jpg]]
-
-
 
 ## 实验与关键发现
 
@@ -227,27 +211,8 @@ Table 4对比了多种3D网格生成方法。**Hunyuan3D-v2.0**在输出质量�
 ![[assets/figures/papers/paper_list_l2202_https_openaccess_thecvf_com_content_CVPR2026_html_Guillaume_Breaking_the/figures/015_Figure_10.jpg]]
 *Figure 10: Robotic perception and grasping visualizations on can object of Centergrasp trained on our custom ”Can” dataset. Top: All 6 category objects used in real-world setup. Bottom (2×2 grid): top row—RGB image of a scene of cans and associated depth; bottom row—shape-based grasp prediction and heatmap indicating grasp confidence*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2202_https_openaccess_thecvf_com_content_CVPR2026_html_Guillaume_Breaking_the/figures/003_Table_1.jpg]]
 *Table 1: Comparison of existing 3D mesh datasets, highlighting their number of instances by categories. R/S/SAI indicates whether the dataset consists of real-world scanned objects (R), synthetic assets created by artists (S), or assets from generative 3D models (SAI)*
-
-![[assets/figures/papers/paper_list_l2202_https_openaccess_thecvf_com_content_CVPR2026_html_Guillaume_Breaking_the/figures/005_Table_2.jpg]]
-*Table 2: Comparison of existing category-level 6D pose estimation methods, including quantitative metrics of 3D data usage. Rast: rasterization; RT: ray tracing; R: real data; MR: Mixed-reality*
-
-![[assets/figures/papers/paper_list_l2202_https_openaccess_thecvf_com_content_CVPR2026_html_Guillaume_Breaking_the/figures/007_Table_4.jpg]]
-*Table 4: Comparison of state-of-the-art 3D mesh generation methods. We have evaluated four approaches based on output quality (Qlty), generation time (Time), and visual results (Mesh)*
-
-![[assets/figures/papers/paper_list_l2202_https_openaccess_thecvf_com_content_CVPR2026_html_Guillaume_Breaking_the/figures/008_Figure_4.jpg]]
-*Figure 4: Images with random textures*
-
-![[assets/figures/papers/paper_list_l2202_https_openaccess_thecvf_com_content_CVPR2026_html_Guillaume_Breaking_the/figures/010_Figure_5.jpg]]
-*Figure 5: Images with object textures*
-
-![[assets/figures/papers/paper_list_l2202_https_openaccess_thecvf_com_content_CVPR2026_html_Guillaume_Breaking_the/figures/012_Figure_9.jpg]]
-*Figure 9: Real images of REAL275 [27]*
-
-
 
 ## 定位与知识库关联
 
@@ -277,8 +242,6 @@ GenOmni3D并非孤立的数据生成工具，而是与6D姿态估计和机器人
 ### 知识库定位
 
 GenOmni3D处于**生成式3D数据**与**类别级6D姿态估计**的交叉点。其上游依赖文本到图像扩散模型（ControlNet）和单视图3D重建模型（Hunyuan3D-v2.0），下游赋能6D姿态估计网络（DualPoseNet）和抓取策略（Custom-CG）。与纯合成渲染管线（Omni6D）和纯真实扫描管线（NOCS）不同，GenOmni3D开创了“深度条件生成→对齐3D重建→混合现实渲染”的第三条路径，以不到3分钟/物体的速度实现5–20倍的加速，同时保持与手工建模相当的网格质量和显著更优的姿态一致性。
-
-
 
 ## 原文 PDF
 

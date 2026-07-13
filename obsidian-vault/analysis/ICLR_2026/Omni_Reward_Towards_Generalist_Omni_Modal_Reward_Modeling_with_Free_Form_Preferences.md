@@ -52,8 +52,6 @@ claims:
 
 **主要局限**：音频生成（T2A准确率44.77%）与3D生成（T23D准确率39.40%）任务性能显著偏低，模态不平衡问题未完全解决；指令微调数据完全由GPT-4o生成，尽管经过多模型验证过滤，仍可能存在未被检测的偏差。
 
-
-
 ### 问题背景
 
 大型多模态模型（LMMs）的快速发展使其在文本、图像、视频、音频乃至3D内容生成等任务上展现出强大能力。然而，将这些模型的输出与人类偏好对齐仍高度依赖奖励模型（Reward Model, RM）。一个理想的奖励模型应当能够：**跨模态**地理解多样化内容，并**灵活适应**不同用户细粒度的评价标准。
@@ -74,8 +72,6 @@ claims:
 2. **从固定偏好到自由形式偏好**：引入自由形式偏好描述（free-form preference descriptions）作为条件输入，使RM能够根据用户指定的任意评价标准动态调整判断，从而缓解偏好刚性。
 
 这一设计将奖励建模从“单一模态+固定标准”的封闭范式推向“全模态+动态标准”的开放范式，目标是实现一个通用全模态奖励模型（generalist omni-modal reward model），在不牺牲可解释性的前提下，使开源模型性能接近甚至匹敌商业闭源方案。
-
-
 
 ## 核心方法与创新机理
 
@@ -111,8 +107,6 @@ $$\mathcal{L}_{\mathrm{BT}} = -\log \frac{\exp(r_{\mathrm{BT}}(c, x, y_c))}{\exp
 
 尽管上述创新显著提升了全模态奖励建模的性能，但模态不平衡问题并未完全解决：音频生成任务（T2A）准确率仅 44.77%，3D 生成任务（T23D）仅 39.40%，与文本、图像任务之间存在高达 28.37% 的性能差距。此外，指令微调数据完全由 GPT-4o 生成，尽管经过多模型验证流程（GPT-4o-mini、Qwen2.5-VL 7B、Gemma-3-12B-it）筛除不一致样本，仍可能引入未被发现的偏差。
 
-
-
 ![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_9C4gVbPqSy/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the architecture of Omni-RewardModel*
 
@@ -146,8 +140,6 @@ $$\mathcal{L}_{\mathrm{BT}} = -\log \frac{\exp(r_{\mathrm{BT}}(c, x, y_c))}{\exp
 框架的核心设计在于将“自由形式偏好指令微调”作为连接多模态输入与奖励信号的桥梁。消融实验表明，移除指令微调数据会导致 Omni-RewardBench 上性能明显下降；同时使用混合多模态数据的全量训练（65.36% w/ Ties 准确率）优于单一模态训练，验证了跨模态联合训练的必要性。
 
 该框架的瓶颈在于弱势模态（音频、3D）的性能仍显著偏低——T2A 准确率仅 44.77%，T23D 为 39.40%，模态不平衡问题未完全解决。此外，指令微调数据完全由 GPT-4o 生成，尽管经过多模型验证，仍可能引入未被发现的偏差。
-
-
 
 ### 架构总览
 
@@ -184,8 +176,6 @@ $$(x, y_1, y_2, c, p)$$
 - $p$：偏好标签，在 w/o Ties 设定下取值为 $\{y_1, y_2\}$，在 w/ Ties 设定下扩展为 $\{y_1, y_2, \text{tie}\}$。
 
 这一表示将固定二元偏好对泛化为可动态适应的自由形式偏好条件，是模型实现偏好灵活性的结构基础。
-
-
 
 ## 实验与关键发现
 
@@ -231,30 +221,8 @@ Figure 7 分析了思维链推理对生成式 RM 性能的影响。结果表明�
 ![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_9C4gVbPqSy/figures/016_Table_9.jpg]]
 *Table 9: Evaluation results on Multimodal RewardBench*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_9C4gVbPqSy/figures/009_Table_4.jpg]]
-*Table 4: The comparison between Omni-RewardBench and other reward modeling benchmarks*
-
-![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_9C4gVbPqSy/figures/010_Table_5.jpg]]
-*Table 5: Data statistics of Omni-RewardBench. The Avg. #Tokens (Prompt), Avg. #Tokens (Response), and Avg. #Tokens (Criteria) columns report the average number of tokens in the prompt, model-generated response, and human-written evaluation criteria, respectively, all measured using the tokenizer of Qwen2.5-VL-7B-Instruct. The Prompt Source column specifies where the prompts were collected from, while the Model column identifies which models were used to produce the corresponding responses. The letters “V”, “I”, “A”, and “D” in the table stand for Video, Image, Audio, and 3D content, respectively*
-
-![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_9C4gVbPqSy/figures/011_Table_6.jpg]]
-*Table 6: Statistics of free-form criteria per preference pair in Omni-RewardBench*
-
-![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_9C4gVbPqSy/figures/012_Table_7.jpg]]
-*Table 7: Data statistics of Omni-RewardData. * denotes the subset constructed in this work*
-
-![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_9C4gVbPqSy/figures/015_Table_8.jpg]]
-*Table 8: Evaluation results on Omni-RewardBench under the w/o Tie setting*
-
 ![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_9C4gVbPqSy/figures/018_Table_10.jpg]]
 *Table 10: Ablation results on Omni-RewardBench under the w/o Tie setting*
-
-![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_9C4gVbPqSy/figures/019_Table_11.jpg]]
-*Table 11: Overall performance of generative RMs under different scoring strategies*
-
-
 
 ## 定位与知识库关联
 
@@ -304,8 +272,6 @@ Omni-Reward 的核心贡献在于**将奖励建模从“固定模态+固定偏�
 - **下游启示**：为多模态对齐（如 RLHF、DPO）提供了更通用的奖励信号源，也为研究跨模态偏好迁移和个性化奖励建模提供了实验平台。
 
 对于后续工作，Omni-Reward 提供了两条可追踪的改进路径：（1）**提升弱势模态的性能**，通过数据增强或模态特定的架构设计缩小模态间差距；（2）**优化生成式 RM 的训练效率**，使可解释的奖励建模在低资源场景下更具竞争力。
-
-
 
 ## 原文 PDF
 

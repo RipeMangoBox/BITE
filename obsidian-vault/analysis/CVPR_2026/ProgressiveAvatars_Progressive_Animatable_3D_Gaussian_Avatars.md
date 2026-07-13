@@ -52,8 +52,6 @@ claims:
 
 **主要结果**：在NeRSemble数据集上，ProgressiveAvatars完整模型的新视角合成（NVS）PSNR达到31.47 dB，略优于GaussianAvatars的31.10 dB，同时仅需5%的传输预算即可获得可用的可驱动化身（27.89 dB）。相比存储10个离散LoD层级的压缩方案，其存储需求仅为43.4 MB，减少约80.9%。消融实验证实，多级监督在35%预算下提升NVS PSNR达9.81 dB，重要性排序在25%预算下较随机排序提升0.74 dB。
 
-
-
 ### 3D化身流式传输的现实需求
 
 数字化身是沉浸式通信、虚拟社交和远程呈现的核心媒介。随着网络基础设施的演进，用户期望化身能够在不同带宽和计算条件下即时可用，而非等待完整模型下载后才能交互。然而，现有高保真可驱动化身方法普遍采用“全量下载—整体渲染”的范式，这带来了两个关键矛盾：**启动延迟与带宽突发**——接收端必须获取全部模型资产才能生成第一帧；**资源刚性**——模型质量在传输完成前不可用，无法根据可用带宽动态调整。
@@ -81,8 +79,6 @@ claims:
 4. **单资产连续流式替代离散LOD切换**：与存储多个独立LOD副本的传统方案不同，ProgressiveAvatars构建单一连续资产，由层次树和重要性排序支持流式传输。如图7(a)所示，该方法以43.4 MB的单一资产即可实现渐进式质量提升，而GaussianAvatars + LightGaussian的10级离散LOD方案需要227.2 MB存储（减少80.9%）。
 
 综上，ProgressiveAvatars首次将渐进式流式传输能力引入3DGS可驱动化身，解决了现有方法“全量下载才能渲染”的根本瓶颈，为动态网络条件下的化身传输提供了实用框架。
-
-
 
 ## 核心方法与创新机理
 
@@ -124,8 +120,6 @@ $$\mathcal{L}_{\mathrm{rgb}} = \sum_{\ell \in \mathcal{S}} w_\ell \big[ (1 - \la
 
 传统 LOD 方案需存储多个离散副本，存储开销线性增长（如 GaussianAvatars + LightGaussian 的 10 级离散 LOD 需 227.2 MB）。ProgressiveAvatars 将范式转变为**单一连续资产**（仅 43.4 MB），通过层次树和重要性排序支持流式传输，无需模型切换，存储效率提升 80.9%（Figure 7a）。
 
-
-
 ProgressiveAvatars 的完整流水线如 Figure 2 所示，由六个核心模块串联构成：**FLAME 网格追踪 → 隐式细分与层次构建 → 面局部高斯绑定 → 多级自适应训练 → 重要性评分计算 → 渐进式传输与渲染**。输入为多视角头部视频，输出为可在不同带宽预算下即时渲染的可驱动 3D 高斯化身。
 
 ![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2603_16447/figures/002_Figure_2.jpg]]
@@ -144,8 +138,6 @@ $$\mathbf{R} = \Delta\mathbf{R} \, \mathbf{r}, \quad \mathbf{S} = \Delta\mathbf{
 **自适应训练。** 训练阶段将 3DGS 的自适应密度控制与层次树耦合：每隔 $k$ 次迭代，对屏幕空间梯度 $g_i > \varepsilon$ 的叶面执行隐式细分，使层次结构在训练中动态生长。同时采用 coarse-to-fine 深度上限递增策略——初始深度上限设为 1，每 50k 迭代增加上限并触发自适应细分——配合多级光度损失联合监督各层，鼓励跨级一致性。
 
 **渐进式传输与渲染。** 训练完成后，预计算每个面的重要性分数 $W_i = \sum_{j \in \mathcal{G}_i} \sum_{p} \alpha_{j,p} T_{j,p}$，即该面绑定高斯在所有像素上的聚合渲染贡献。推理时按重要性降序逐步激活高斯：每次增量加载向已有内容添加更精细层级的高斯，已加载内容保持不变，渲染质量随数据到达平滑提升。这一“重要性优先”调度策略确保早期部分渲染与完整模型的像素颜色高度一致，有效减少颜色漂移。
-
-
 
 ProgressiveAvatars 的核心设计围绕一个可渐进式传输与渲染的3D高斯化身表示展开。该方法通过将3D高斯绑定到FLAME网格的局部三角面坐标系，并基于屏幕空间梯度信号驱动自适应隐式细分，构建一个多级三角面森林层次结构。以下逐一剖析关键模块及其公式。
 
@@ -223,15 +215,8 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{rgb}} + \lambda_{\mathrm{scale}} \mathcal{L
 
 推理阶段，预计算的重要性评分指导传输顺序。接收端按面重要性降序逐步激活对应高斯，将其添加到已有渲染管线中。已加载的高斯保持不变，新到达的高斯持续累积细节。这一机制实现了从粗粒度到细粒度的连续质量提升，无需等待完整模型下载即可获得可用的可驱动化身。Table 1 显示，在仅5%传输预算下，该方法即可达到NVS PSNR 27.89 dB、SSIM 0.851，远超需要完整模型的 **GaussianAvatars** 在此预算下的不可用状态。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2603_16447/figures/007_Figure_6.jpg]]
 *Figure 6: Comparison of adaptive and uniform subdivision. Right: visualization of per-face subdivision levels. Highfrequency regions like facial hair receive more aggressive splitting, whereas smoother areas require substantially fewer subdivisions*
-
-![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2603_16447/figures/003_Figure_3.jpg]]
-*Figure 3: The center row shows the full model containing all 3D Gaussians within one level. Transmitting in descending importance makes early partial renderings closely match the full-model pixel color because dominant contributors arrive first. In contrast, sending low-importance Gaussians first re-normalizes partial weights and amplifies weak contributors, causing noticeable color drift from the full model. This motivates an importance-first schedule within each level for faithful progressive rendering*
-
-
 
 ## 实验与关键发现
 
@@ -281,8 +266,6 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{rgb}} + \lambda_{\mathrm{scale}} \mathcal{L
 
 4. **压缩结合潜力**：当前方法在存储效率上已显著优于离散LOD方案，但尚未探索将向量量化等压缩技术与层次结构深度结合的可能性，以进一步降低传输比特率同时保持可驱动性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2603_16447/figures/005_Table_1.jpg]]
 *Table 1: Performance comparison across varying transmission budgets. We report Novel View Synthesis (NVS) and Novel Expression Synthesis (NES) using PSNR/SSIM/LPIPS. We also list the number of Gaussians, the amount of data to transmit (in Megabytes), and rendering speed. Rendering speed is measured on an RTX 4090 at 550 × 802 resolution*
 
@@ -292,22 +275,8 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{rgb}} + \lambda_{\mathrm{scale}} \mathcal{L
 ![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2603_16447/figures/011_Table_3.jpg]]
 *Table 3: Ablation study across all subjects. We report average Novel View Synthesis (NVS) and Novel Expression Synthesis (NES) metrics over all subjects. “W/o MLS” supervises only the finest level, whereas “W/ MLS” supervises all levels*
 
-![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2603_16447/figures/009_Figure_7.jpg]]
-*Figure 7: Progressive streaming and multi-level ablation*
-
-![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2603_16447/figures/010_Figure_8.jpg]]
-*Figure 8: Ablation study on multi-level supervision*
-
 ![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2603_16447/figures/004_Figure_4.jpg]]
 *Figure 4: Qualitative results on NeRSemble dataset across different transmission percentages*
-
-![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2603_16447/figures/006_Figure_5.jpg]]
-*Figure 5: Qualitative comparison with state-of-the-art methods*
-
-![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2603_16447/figures/001_Figure_1.jpg]]
-*Figure 1: ProgressiveAvatars is a novel progressive representation that supports adaptive rendering quality of 3D Gaussian avatars under bandwidth or compute constraints. Qualitative (left) and quantitative (right) results demonstrate that ProgressiveAvatars rapidly attains high quality and continues to refine the avatar as more data arrives, whereas GaussianAvatars [15] only becomes usable once nearly the entire asset has been transmitted*
-
-
 
 ## 定位与知识库关联
 
@@ -349,8 +318,6 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{rgb}} + \lambda_{\mathrm{scale}} \mathcal{L
 3. **压缩-可驱动性联合优化**：是否可将向量量化等压缩技术与层次结构深度结合，在进一步降低传输比特率的同时保持各级别的可驱动性？当前43.4 MB的存储虽已显著低于离散LOD方案，但在移动网络场景下仍有压缩空间。
 
 4. **跟踪鲁棒性**：能否通过联合优化跟踪与高斯重建，或引入跟踪不确定性建模，减轻跟踪误差对渐进式表示的级联影响？
-
-
 
 ## 原文 PDF
 

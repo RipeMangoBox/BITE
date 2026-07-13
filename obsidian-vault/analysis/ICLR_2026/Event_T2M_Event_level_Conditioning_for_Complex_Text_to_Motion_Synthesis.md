@@ -58,8 +58,6 @@ Event-T2M针对这一瓶颈提出了因果性解法：**将文本到动作的生
 
 方法的局限性在于：当前未考虑长时间运动的物理合理性及人物与物体的交互，LLM事件分解环节引入了约1.43秒的额外延迟。
 
-
-
 文本到动作生成（Text-to-Motion）旨在根据自然语言描述合成三维人体运动序列，其应用涵盖动画制作、虚拟现实和具身智能等领域。近年来，基于扩散模型和自回归架构的方法在这一任务上取得了显著进展，代表性工作包括 **MDM**（Tevet et al., 2022）、**MotionDiffuse**（Zhang et al., 2024a）、**T2M-GPT**（Zhang et al., 2023a）和 **MoMask**（Guo et al., 2024）等。然而，这些方法在应对包含多个独立动作的复杂提示时，暴露出一个根本性瓶颈。
 
 ### 全局嵌入的语义压缩瓶颈
@@ -81,8 +79,6 @@ Event-T2M针对这一瓶颈提出了因果性解法：**将文本到动作的生
 上述分析指向一个明确的研究动机：**如何将文本到动作生成的条件表示从单一全局嵌入扩展到事件级的结构化注入**，使得模型能够在生成过程中显式地感知每个独立动作单元及其先后关系？
 
 为此，Event-T2M 提出了一套系统性的解决方案：首先通过大语言模型（LLM）将复杂提示分解为事件子句序列，然后为每个事件生成专用的运动感知嵌入，最后通过事件级交叉注意力（ECA）将这些事件标记注入扩散模型的 Conformer 块中。这一设计将生成问题从“给定一个全局描述生成整个运动”重新定义为“给定一个事件序列，按序合成并平滑连接各个动作单元”，从而在保持整体连贯性的同时，实现对复杂多动作序列的精确建模。
-
-
 
 ## 核心方法与创新机理
 
@@ -120,8 +116,6 @@ $$ECA(x_t, E) = \gamma \cdot \mathrm{Dropout}(Z)$$
 - **ATII（自适应文本信息注入器）**：通过门控机制根据运动上下文自适应注入全局文本语义，确保整体连贯性不被事件级条件破坏。
 
 消融实验（Table 16）表明，移除 LIMM 或 ATII 均导致 FID 和 R-Precision 下降，验证了这些模块对事件级生成的必要性。
-
-
 
 ![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_mXPeXZ1KWT/figures/001_Figure_1.jpg]]
 *Figure 1: Main Architecture of Event-T2M. An input prompt is split into clauses by an LLM, encoded as event tokens with a TMR encoder, and fused with a global token. Tokens guide the diffusion process through an event-level module, enabling generation of sequentially complex motions*
@@ -164,8 +158,6 @@ Event-T2M 的架构由以下核心模块协同构成（Figure 1）：
 - **ATII 与 LIMM 的必要性**：移除 LIMM 或 ATII 均导致 FID 和 R-Precision 下降（Table 16），尤其在复杂事件条件下，表明局部平滑和自适应全局语义注入对于事件级生成至关重要。
 
 整体而言，Event-T2M 的 pipeline 通过将文本到动作生成问题从单一全局嵌入扩展到事件级条件注入，使模型能够在生成过程中专注于每个语义自包含的动作单元，同时通过全局标记保持整体连贯性，从而在复杂的多动作序列上实现顺序准确、过渡自然的运动合成。
-
-
 
 Event-T2M 的生成框架围绕一个核心设计展开：将文本到动作的条件建模从单一全局嵌入扩展为**事件序列的显式注入**。其关键模块链路由 LLM 事件分解器、TMR 事件编码器、全局标记提取、以及扩散去噪器中的 Conformer 块与事件交叉注意力（ECA）组成。以下聚焦于决定模型行为的关键公式及其变量含义。
 
@@ -221,8 +213,6 @@ $$\mathcal{L}(\boldsymbol{\theta}) = \mathbb{E}_{\boldsymbol{x}_0, t, \epsilon} 
 
 该损失函数驱动模型从噪声中恢复出与事件序列一致的干净运动。推理时采用 10 步 DDPM 采样（Table 5 消融证实该设置在效率与质量间取得平衡）。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与因果机制
@@ -277,8 +267,6 @@ HumanML3D-E 基准按事件数量分层评估，是验证事件级条件设计�
 
 Figure 2(a) 直观展示了这一趋势：随着事件数从 ≥1 增加到 ≥4，所有基线的 FID 急剧上升、R-Precision 快速下降，而 Event-T2M 保持了最低的 FID 和最高的 R-Precision，退化幅度远小于其他方法。Figure 2(b) 的效率分析显示，在 ≥4 事件条件下，Event-T2M 以较小的模型参数量实现了最高的准确度，展现了紧凑性与可扩展性。
 
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_mXPeXZ1KWT/figures/007_Figure_2.jpg]]
-*Figure 2: Overall comparison of Event-T2M: (a) As event counts increase ( $\geq$ 1 , $\geq$ 2 , $\geq$ 3 , $\geq$ 4 ) , Event-T2M consistently achieves the lowest FID and the highest R-Precision, while baselines degrade sharply under compositional complexity. (b) Efficiency analysis at ≥4 events shows that Event-T2M achieves high accuracy with low model size, demonstrating its compactness and scalability
 
 在 KIT-ML-E 和 Motion-X-E 上的扩展实验（Table 10、Table 11）进一步验证了跨数据集的一致性优势。
 
@@ -302,16 +290,7 @@ Table 4 对比了 TMR 和 CLIP 编码器在词级（Token-level）和事件级�
 
 **Conformer vs. Transformer**（Table 7）：在相同事件条件下，Conformer 架构相比 Transformer 在 FID 和 R-Precision 上均提供更优性能。例如，Condition 4 下 Conformer 的 FID 为 0.265、R-Precision Top-1 为 0.466，而 Transformer 为 0.313 和 0.451。Conformer 中卷积与自注意力的结合有效增强了局部时序建模能力。
 
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_mXPeXZ1KWT/figures/015_Table_7.jpg]]
-*Table 7: Ablation study on the architecture design (Transformer vs. Conformer)*
-
 **CFG Scale 与采样步数**（Table 5、Table 6）：CFG Scale=4 在各项指标上达到最佳平衡；采样步数为 10 时综合性能最优，验证了扩散过程配置的合理性。
-
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_mXPeXZ1KWT/figures/013_Table_5.jpg]]
-*Table 5: Sampling Step ablation. R represents R-Precision*
-
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_mXPeXZ1KWT/figures/014_Table_6.jpg]]
-*Table 6: CFG Scale ablation*
 
 #### 编码器公平性验证
 
@@ -324,9 +303,6 @@ LLM 的事件分解准确度达到 93.3%。为进一步验证方法不依赖于�
 ### 用户研究
 
 Figure 3 展示了基于 7 分 Likert 量表的用户研究结果，评估维度包括保真度（Fidelity）、顺序对齐（Order alignment）和自然度（Naturalness）。Event-T2M 在所有三个维度上均显著优于其他方法（p < 0.01），且与真实运动（GT）之间无统计学显著差异。这表明 Event-T2M 生成的复杂多动作序列不仅在自动指标上表现优异，在人类感知层面也达到了接近真实的水平。
-
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_mXPeXZ1KWT/figures/011_Figure_3.jpg]]
-*Figure 3: Results of the user study (7-point Likert scale). Error bars denote standard errors. (a) Fidelity, (b) Order alignment, and (c) Naturalness. Event-T2M achieves significant gains over all competing methods and performs on par with ground-truth (GT)*
 
 ### 定性分析
 
@@ -351,13 +327,6 @@ Table 17 显示，Event-T2M 包含 LLM 预处理的总推理时间为 1.6 秒，
 - 如何实现生成运动中的细粒度事件编辑，支持交互式创作？
 - 如何将事件条件扩展到涉及视觉和音频的多模态环境？
 - 如何进一步提高事件分解的效率和准确性，降低预处理延迟？
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_mXPeXZ1KWT/figures/020_Table_8.jpg]]
-*Table 8: Event-aware prompt: Incorporates our proposed definition of event to guide segmentation*
-
-
 
 ## 定位与知识库关联
 
@@ -403,8 +372,6 @@ Event-T2M的架构由以下核心模块构成，其因果作用已通过消融�
 - 如何实现生成运动中的细粒度事件编辑（如替换、插入或删除单个事件）？
 - 如何将事件条件扩展到涉及视觉和音频的多模态环境？
 - 如何进一步提高事件分解的效率和准确性，降低LLM调用的延迟开销？
-
-
 
 ## 原文 PDF
 

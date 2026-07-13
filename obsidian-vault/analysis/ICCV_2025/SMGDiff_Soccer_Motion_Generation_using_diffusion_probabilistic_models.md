@@ -217,8 +217,6 @@ $$L = \sum_{i=1}^{F} d^i \cdot \frac{\mathbb{I}(d^i > \tau_d) \cdot \hat{c}_b^i}
 
 其中 $\delta$ 为防止除零的小常数。消融实验表明，仅在扩散过程的最后两步施加该引导（End 2 策略）可获得最低 FID（0.3580），优于全程引导（Table 4）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1775_SMGDiff_Soccer_Motion_Generation_using_diffusion_probabilistic_models/figures/006_Figure_6.jpg]]
 *Figure 6: Qualitative evaluation of the Contact Guidance Module (CGM). Given identical conditions, CGM effectively prevents instances of missed contact when the ball changes direction. Contact frames represent points where the ball’s trajectory shifts*
 

@@ -53,8 +53,6 @@ claims:
 
 在性能方面，自定义的舒尔补线性求解器相比 MKL Pardiso 快 6–40 倍，相比带块 Jacobi 预条件的 Eigen CG 快高达 70 倍。在输出视觉质量与全空间 IPC 等价的条件下，自适应子空间仿真实现了超过一个数量级的端到端加速。该方法在 Mushroom Madness 等大规模复杂场景（250 万四面体）中成功捕获了橡胶靴踩踏蘑菇王国时的精细局部形变与异构材料交互，充分展示了其在实际应用中的有效性。
 
-
-
 ### 弹性体仿真的计算困境
 
 高分辨率弹性体仿真在视觉特效、虚拟现实和机器人仿真中需求广泛，但全自由度（full-space）求解面临严重的计算瓶颈。以增量势能接触（Incremental Potential Contact, IPC）方法（Li et al., ACM Trans. Graph. 2020）为代表的现代弹性体仿真框架，通过优化形式的时间步求解保证了无条件不穿透和无反转等关键物理性质，然而其计算成本随网格规模急剧增长——典型场景中单个时间步的求解需耗时5至30分钟，严重制约了交互式应用和大规模场景的可行性。
@@ -77,8 +75,6 @@ claims:
 - **并行时间步求解器**：基于Schur补系统的定制线性求解器，结合密集Cholesky分解与对角预条件共轭梯度法。
 
 实验表明，该方法在输出视觉质量与全空间IPC等价的条件下，实现了超过一个数量级的端到端加速。
-
-
 
 ## 核心方法与创新机理
 
@@ -156,8 +152,6 @@ Fig. 5 给出了一个典型示例：软方块在无摩擦斜面上纯刚性滑�
 
 降采样模块的消融实验（Fig. 11）显示，启用降采样可减少活跃 DOF 并在端到端仿真中实现 **1.7 倍加速**，且无视觉质量损失，验证了该模块在维持精度前提下的资源回收有效性。
 
-
-
 本文提出的自适应子空间时间积分方法，其核心设计理念是**将全自由度坐标作为唯一的状态存储，而在每个时间步的求解过程中，仅将自适应更新的子空间模态与局部节点丰富化作为加速计算的“临时便签”**。这一策略确保了最终输出与全空间 IPC（Incremental Potential Contact）解在物理上保持一致，同时将求解复杂度从网格规模解耦，转而与当前动态的局部复杂程度成比例。
 
 ### 时间步求解的优化形式
@@ -194,12 +188,8 @@ $$E(x) = K(x) + \alpha h^2 (\Psi(x) + B(x) + D(x))$$
 
 这一管线设计使得方法的输出复杂度与当前动态的局部复杂度成比例，而非与网格规模或材料刚度绑定，从而在复杂接触场景（如 Mushroom Madness，Fig. 1）中实现了超过一个数量级的端到端加速。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l6_https_dl_acm_org_doi_10_1145_3687946/figures/002_Figure_2.jpg]]
 *Figure 2: Top left: available subspace models are generally well-suited for large global deformation but unable to resolve local deformations. Bottom: with our adaptive method a small amount of combined nodal and subspace enrichment closely captures the full-space solution’s deformation (top right)*
-
-
 
 ### 自适应子空间时间积分框架
 
@@ -271,8 +261,6 @@ $$(H_x - J^T H_q^{-1} J) d_x = H_q^{-1} g_q - g_x$$
 
 自适应 Oracle 在每个时间步内持续评估子空间解质量：当候选节点或模态同时满足误差超过阈值 $G(x) > \varepsilon_G$ 且进度低于目标 $E(x) < \varepsilon_E$ 时，激活相应的丰富化。用户可调的节点误差阈值 $\varepsilon_G^e$ 与模态误差阈值 $\varepsilon_G^s$ 直接控制丰富化的敏感度，在精度与计算成本之间提供连续调节杠杆。随着误差阈值收紧，自适应子空间求解器单调收敛至全空间 IPC 解。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能表现
@@ -311,10 +299,6 @@ $$(H_x - J^T H_q^{-1} J) d_x = H_q^{-1} g_q - g_x$$
 
 所有对比实验均采用相同的IPC模型与BDF2时间积分器，确保一致的物理保障（不穿透、无反转）。基线IPC求解器（Pardiso LLT、CG）配置为相同的收敛容差（相对残差1e-5）。在子空间模型对比中，保持相同的oracle容差与场景参数，仅改变子空间表示。存储全空间状态的内存开销与IPC相当；性能增益来源于时间步求解期间有效自由度的减少。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l6_https_dl_acm_org_doi_10_1145_3687946/figures/001_Figure.jpg]]
-
 ![[assets/figures/papers/paper_list_l6_https_dl_acm_org_doi_10_1145_3687946/figures/014_Figure.jpg]]
 *Figure: Error Threshold (full DOF)*
 
@@ -327,13 +311,9 @@ $$(H_x - J^T H_q^{-1} J) d_x = H_q^{-1} g_q - g_x$$
 ![[assets/figures/papers/paper_list_l6_https_dl_acm_org_doi_10_1145_3687946/figures/008_Table_1.jpg]]
 *Table 1: We report statistics for a single time-step solve (choosing a step with large deformation and contact) for both our method and IPC. |𝑉 |, |𝐹 |, |𝑇 | are the number of vertices, faces, and tetrahedra, respectively, in the scene. | $\mathcal { E } _ { a }$ | / | V | is the ratio of enriched vertices to total vertices. | $U _ { a }$ | / | U | is the ratio of enriched bases to the total number of available bases. These values are measured at the end of the time-step. Timings are reported in 𝑚𝑖𝑛𝑢𝑡𝑒 : 𝑠𝑒𝑐𝑜𝑛𝑑𝑠 format for our algorithm as well the time taken for a full-space IPC to solve the same time-step*
 
-![[assets/figures/papers/paper_list_l6_https_dl_acm_org_doi_10_1145_3687946/figures/009_Table_2.jpg]]
-*Table 2: Scene parameters: 𝐸 is Young’s Modulus, 𝜈 is Poisson’s Ratio, Δ𝑡 is the time-step size, 𝐿 is the number of subdomains (same for both nodal enrichment and BFGS), $\epsilon _ { \mathcal { G } } ^ { s }$ and $\epsilon _ { \mathcal { G } } ^ { e }$ are the error thresholds for the subspace DOF and nodal DOF, respectively. $\epsilon _ { d }$ is the downdating threshold and | $U _ { \mathrm { i n i t } }$ | is the size of the initial basis
 
 ![[assets/figures/papers/paper_list_l6_https_dl_acm_org_doi_10_1145_3687946/figures/020_Table_3.jpg]]
 *Table 3: We report the linear solver costs of the scenes shown, comparing our Schur complement solver against IPC with Pardiso LLT, and IPC-CG with 3 × 3-block-jacobi preconditioning. Linear systems are collected from the beginning of a representative time-step (large deformation and contact). We report the number nonzero in our full coupled system, the number of nonzeros for the full-space IPC problem, as well the number of iterations. Both iterative solvers are solved to a relative residual of 1e-5*
-
-
 
 ## 定位与知识库关联
 
@@ -414,8 +394,6 @@ Oracle 的丰富化行为自然地适应材料刚度与时间步长变化：
 | **控制杠杆** | $\varepsilon_G^e$（节点误差阈值）与 $\varepsilon_G^s$（模态误差阈值）提供精度-成本连续调节 |
 
 该方法在子空间仿真与接触力学交叉领域填补了“在线自适应评估子空间充分性”这一关键空白，为后续研究（异构子空间库、神经子空间、GPU 加速）提供了可扩展的框架基础。
-
-
 
 ## 原文 PDF
 

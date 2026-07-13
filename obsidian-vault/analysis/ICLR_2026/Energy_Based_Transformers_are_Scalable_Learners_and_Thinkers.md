@@ -58,8 +58,6 @@ claims:
 
 方法定位：EBT属于能量基模型家族，通过无监督的优化式训练学习能量景观，在推理时利用梯度下降进行迭代预测精炼。与扩散模型相比，EBT被显式训练为验证器；与标准自回归模型相比，EBT在架构层面内置了动态计算分配与自验证能力（Table 1）。当前局限包括FLOP效率较低（因需二阶梯度）、训练稳定性对超参数敏感，以及尚未在大规模基础模型上验证。
 
-
-
 当前深度学习模型，特别是自回归Transformer，在处理标准预测任务时展现出强大的系统1能力——即快速、自动的前馈推理。然而，这些模型在需要系统2思维的场景中暴露了本质缺陷：它们无法动态分配计算资源，也缺乏对自身预测进行显式验证的机制。**系统2思维**，指代深思熟虑的、迭代的、自验证的认知过程，对于分布外（OOD）泛化和复杂推理至关重要。
 
 ### 现有方法的认知缺口
@@ -89,8 +87,6 @@ claims:
 2. **统一生成与验证**：如果能将验证器与生成器统一在单一模型中——生成器由验证器的梯度隐式定义——那么模型就能通过优化过程同时实现预测生成和自验证。
 
 基于此，本文提出**基于能量的变换器（Energy-Based Transformers, EBTs）**：训练一个显式的能量基模型（EBM）作为验证器，学习为每个输入-候选预测对分配一个能量标量（表示兼容性），并将预测重新定义为在该能量景观上的梯度下降优化。这一框架使模型在推理时能够动态分配计算（Facet 1）并进行显式预测验证（Facet 2），从而仅通过无监督学习自然涌现系统2思维。
-
-
 
 ## 核心方法与创新机理
 
@@ -134,13 +130,8 @@ EBT的**Facet 2**——显式预测验证——通过自验证机制实现：并
 
 EBT的设计哲学根植于一个简单直觉：**验证比生成容易**。通过训练一个评判输入-预测对兼容性的能量函数，模型学会了一个“验证器”；而生成则被隐式定义为验证器梯度的负方向——沿能量下降最快的方向移动预测。这统一了传统上分离的生成器与验证器，使“思考”成为能量景观上的自然动力学过程，而非需要外部监督信号引导的搜索。
 
-
-
 ![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_ZBj3Qp1bYg/figures/002_Table_1.jpg]]
 *Table 1: Architectures and Cognitive Facets. For each prediction, Feed-Forward (FF) Transformers and RNNs generally1 have a finite amount of computation. DiTs (Diffusion Transformers) can increase inference computation by denoising longer, but lack explicit prediction verification. In contrast, EBMs support dynamic computation through flexible iteration, and give an energy scalar for prediction verification*
-
-![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_ZBj3Qp1bYg/figures/003_Figure_2.jpg]]
-*Figure 2: EBT for Autoregressive Modeling. Each blue box corresponds to a different prediction at each step of the thinking process, where the initial prediction starts as random. At each step, a new prediction is fed into the model, which gives an energy scalar for the prediction’s current compatibility (unnormalized likelihood) with the context (Facet 2). Then, the gradient of this energy with respect to the prediction is calculated and used to update the prediction. This gradient descent update is done iteratively to refine the prediction until convergence of the predicted energy, which allows for dynamic use of computation (Facet 1)*
 
 ![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_ZBj3Qp1bYg/figures/001_Figure_1.jpg]]
 *Figure 1: Autoregressive Architecture Comparison. (a) Autoregressive (AR) Transformer is the most common, with (b) RNNs becoming more popular recently Gu & Dao (2023); Peng et al. (2023). (c) Diffusion Transformers (DiTs) Li et al. (2025b); Peebles & Xie (2023) are similar to EBT, being able to dynamically allocate computation during inference. However, diffusion models are not trained as explicit verifiers, unlike EBTs*
@@ -191,8 +182,6 @@ $$\hat{y}_{i+1} = \hat{y}_i - \alpha \nabla_{\hat{y}_i} E_\theta(x, \hat{y}_i)$$
 
 EBT 的 FLOP 效率是主要瓶颈：使用两步优化时，计算开销约为同参数标准 Transformer 的 6.66 倍。训练稳定性对优化步长、噪声幅度等超参数敏感，需仔细调参。此外，当前实验规模限于中等模型（最大约 400M 参数），在更大规模上的表现有待验证。
 
-
-
 ### 能量基模型范式
 
 EBT将预测问题重新定义为在可学习能量景观上的优化问题。给定输入 $x$ 和候选预测 $\hat{y}$，能量函数 $E_{\theta}(x, \hat{y})$ 输出一个标量，表示二者的兼容性——能量越低，预测越合理。模型通过无监督学习来塑造该能量景观，使真实数据位于低能量区域，而错误预测处于高能量区域。
@@ -241,8 +230,6 @@ $$\mathrm{scores} = \begin{bmatrix} \alpha_{z_1,z_1} & \alpha_{z_1,\hat{z}_2} & 
 
 该设计确保了自回归生成的因果性不被破坏，同时允许能量函数充分评估当前预测与上下文的兼容性。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验结果
@@ -259,9 +246,6 @@ EBT在三个核心维度上验证了其设计优势：预训练可扩展性、�
 
 **推理时计算分配（Facet 1：动态思考）。** 在四个分布外语言数据集上，EBT通过增加推理时的前向传播次数（即“思考更久”），可将困惑度改善最高达29%，而Transformer++完全无法通过增加计算来改善预测（Figure 7a）。这一对比揭示了关键因果机制：标准自回归模型的前馈预测机制不具备动态分配计算的能力，而EBT的梯度下降优化范式天然支持以计算换性能。
 
-![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_ZBj3Qp1bYg/figures/015_Figure_7.jpg]]
-*Figure 7: EBT Thinking Analysis. (a) Mean performance degradation of the standard Transformer++ recipe Touvron et al. (2023) and the Energy-Based Transformer (EBT) on four Out-of-Distribution (OOD) datasets. The Transformer++, not being explicitly designed for inference-time computation, is unable to reduce perplexity at a per-token level. Alternatively, EBTs can improve performance with more forward passes over a single token/sample (Longer Thought) as well as generating many samples and choosing the minimum energy one (Self-Verification). (b) The performance of EBTs with and without self-verification; as scale increases, the benefits from self-verification increase. These results suggest EBTs gener...*
-
 **跨任务泛化。** 尽管EBT的预训练困惑度略高于Transformer++（33.43 vs 31.36），但在GSM8K、BigBench Math QA、BigBench Dyck等下游任务上，EBT的困惑度均更低（Table 3）。例如在GSM8K上，EBT达到43.3，而Transformer++为49.6，差距达6.3点。这表明EBT学到的能量函数具有更好的泛化性质——预训练时看似“浪费”计算在优化过程中，实际上塑造了更平滑、更可泛化的能量景观。
 
 ![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_ZBj3Qp1bYg/figures/012_Table_3.jpg]]
@@ -269,13 +253,7 @@ EBT在三个核心维度上验证了其设计优势：预训练可扩展性、�
 
 **图像降噪与分类。** 在图像降噪任务上，EBT仅需DiT（Peebles & Xie, 2023）1%的前向次数即可达到同等或更高的PSNR：分布内数据上EBT为27.25 dB，DiT为26.58 dB；分布外噪声上差距急剧扩大，EBT为23.29 dB，DiT仅为19.56 dB（Table 4）。在图像分类的线性探测评估中，EBT的Top-1准确率达到5.32%，而DiT仅为0.31%，提升超过10倍。这进一步验证了能量基训练范式能学到更高质量的图像表征。
 
-![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_ZBj3Qp1bYg/figures/016_Table_4.jpg]]
-*Table 4: Image Denoising and Classification Comparison. For image denoising, EBTs significantly outperform DiTs Peebles & Xie (2023) in Peak Signal to Noise Ratio (PSNR), as well as MSE, on both in-distribution and Out-Of-Distribution (OOD) data, while using 99% less forward passes. On image classification, EBTs also perform better than DiTs, yielding around 10× higher accuracy, suggesting that EBTs learn better image representations and therefore understand images better than DiTs*
-
 **算法推理（数独）。** 在数据受限的数独算法推理任务上，EBT在分布外测试集上达到29.7%的准确率，远超前馈Transformer的0.03%和现代RNN（Jolicoeur-Martineau, 2025）的17.7%（Table 5）。这一结果凸显了系统2思维在需要组合泛化的结构化推理任务上的关键作用。
-
-![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_ZBj3Qp1bYg/figures/018_Table_5.jpg]]
-*Table 5: Sudoku OOD Test Set Performance. We compare a Feed-Forward (FF.) Transformer, an RNN based on recent work Jolicoeur-Martineau (2025), and an EBT on data-constrained algorithmic reasoning using a Sudoku dataset Palm et al. (2018)*
 
 ### 系统2思维的消融分析
 
@@ -304,16 +282,6 @@ Figure 7b展示了自验证增益随训练计算量增加而提升的趋势：�
 尽管EBT在多个维度上展现出优势，但存在不可忽视的效率瓶颈。由于训练时需要反向传播穿过整个梯度下降优化链（需要二阶梯度/Hessian-向量积），在使用两步优化时，EBT的FLOPs开销约为同参数Transformer++的6.66倍（Figure 5b）。这意味着在等FLOPs比较下，EBT的缩放优势会被部分抵消。论文明确指出，在当前实现下，EBT的FLOP效率较低，限制了短期内的直接应用。
 
 训练稳定性是另一个实际挑战。系统2配置对优化步长、噪声幅度、随机步数范围等超参数敏感，需要仔细调参。在高度多模态分布（如无条件文本到图像生成）上，能量最小化倾向于捕捉单一模式，可能导致模式坍塌问题。此外，当前实验规模限于约400M参数的中等模型，在数十亿参数规模上的定性表现仍有待验证。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_ZBj3Qp1bYg/figures/030_Table_6.jpg]]
-*Table 6: Table D.1: Pretraining Scaling Law Loss Across Model Sizes and Seeds. Cross-entropy loss for the Transformer++ and EBT models at five model sizes (XXS to Large) and three random seeds (33, 34, 35). Medium and Large models were trained with a single seed due to increased compute requirements*
-
-![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_ZBj3Qp1bYg/figures/031_Table_7.jpg]]
-*Table 7: Table D.2: Model sizes and hyperparameters for scaling experiments. For most model sizes we follow Gu & Dao (2023)*
-
-
 
 ## 定位与知识库关联
 
@@ -362,8 +330,6 @@ EBT的系统2思维能力依赖于能量景观正则化技术的精心配置。T
 5. **快慢系统协同**：是否可以将EBT作为系统2验证器与轻量系统1模型（如标准自回归Transformer）结合，实现“快慢结合”的协同推理——系统1快速生成候选，系统2进行能量验证与精炼？
 
 6. **连续域世界模型**：在视频预测等连续域任务中，EBT的缩放规律是否持续优于前馈模型，并展现出更强的世界模型能力？这关系到EBT能否成为通用预测架构的基础。
-
-
 
 ## 原文 PDF
 

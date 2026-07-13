@@ -60,8 +60,6 @@ claims:
 
 **方法定位**：本文的核心贡献不在于提出新的领域自适应架构或损失函数，而是在优化算法层面，通过博弈动力学分析揭示了 DAL 训练不稳定的数学根源，并给出了基于 Runge–Kutta 积分的高阶求解方案。该方法可无缝嵌入现有的领域对抗框架（如 DANN、CDAN、f-DAL），作为一种通用的优化器替换策略。
 
-
-
 ### 领域对抗训练的博弈本质
 
 领域对抗训练（Domain-Adversarial Training, DAL）是无监督领域自适应（UDA）中最具影响力的范式之一。其核心架构由三个神经网络构成：特征提取器 $g$、分类器 $\hat{h}$ 和域分类器 $\hat{h}'$，三者通过梯度反转层（Gradient Reversal Layer, GRL）耦合为一个对抗系统（Figure 1）。GRL 在前向传播时表现为恒等映射，在反向传播时将梯度乘以 $-\lambda$，使得特征提取器同时优化两个目标——最小化源域分类损失、最大化域分类损失——从而学习领域不变的特征表示。
@@ -81,8 +79,6 @@ $$\dot{w} = -v(w) - \frac{\eta}{2} \nabla v(w) v(w) + O(\eta^2)$$
 领域对抗训练的优化困难已被广泛认知，实践中常采用 Nesterov 动量（GD-NM）或 Adam 等自适应优化器来缓解。但这些方法本质上是**启发式的**，并未从根本上解决 Euler 离散化引入的稳定性问题。近期博弈优化领域提出的 Extra-Gradient（EG）和 Consensus Optimization（CO）等方法虽然针对微分博弈设计，但在 DAL 场景下表现不佳：CO 对额外超参数 $\gamma$ 极其敏感，移除最优 $\gamma$ 后性能显著下降（Table 7）；EG 在多个基准上未能超越 GD-NM（Table 6）。
 
 本文的核心动机在于：**用高阶 ODE 求解器替代低阶 Euler 离散化，从根本上消除一阶修正项对稳定性的破坏**。具体而言，采用二阶 Runge–Kutta 方法（改进 Euler 方法，RK2）时，其高分辨率 ODE 仅包含 $\dot{w} = -v(w) + O(\eta^2)$，不再出现 $\nabla v(w) v(w)$ 项，因此在局部纳什均衡处具有**无条件渐进稳定性**，无需对学习率施加理论上界（Theorem 3）。这一理论洞察直接转化为实际收益：RK2 和 RK4 允许使用更大的学习率，带来更快的收敛速度和更好的迁移性能，同时保持对超参数的鲁棒性。
-
-
 
 ## 核心方法与创新机理
 
@@ -119,8 +115,6 @@ $$w^{+} = w - \frac{\eta}{2} (v(w) + v(w - \eta v(w)))$$
 ### 方法定位
 
 本方法**不改变网络架构、损失函数或域适配框架**，仅将优化器从 GD/GRL 替换为 RK 求解器。因此它可作为一种即插即用的优化器，与 DANN、CDAN、MCC、f-DAL 等主流域对抗框架无缝结合（Table 2 验证了该兼容性）。相比 Extra-Gradient（Korpelevich, 1976）和 Consensus Optimization（Mescheder et al., 2017）等博弈优化器，RK 求解器无需引入额外超参数（如 CO 的梯度惩罚系数 $\gamma$），且对学习率和域适配系数 $\lambda$ 具有显著更强的鲁棒性（Figure 4）。
-
-
 
 本文提出的方法并非重新设计领域对抗训练（DAL）的模型架构，而是从博弈动力学视角重新审视其优化过程，并用高阶常微分方程（ODE）求解器替代传统的梯度下降法。整体框架由两个层次构成：**博弈建模层**与**优化求解层**。
 
@@ -176,15 +170,11 @@ RK2 的高分辨率 ODE 仅包含 $\dot{w} = -v(w) + O(\eta^2)$，消去了导�
 
 这一框架的关键优势在于：**RK 求解器作为优化器的即插即用替代**，无需修改模型架构或损失函数，可直接嵌入现有的 DAL 框架（如 DANN、CDAN、f-DAL 等），在保持相同计算图的前提下显著提升训练稳定性和收敛速度。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2202_05352/figures/002_Figure_2.jpg]]
 *Figure 2: Our method vs popular optimizers on the Digits Benchmark. (Top-Left) Loss in target domain. (Top-Right) Transfer performance. (Bottom) t-SNE Visualization of the last layer representations during training. Our method converges faster, has better performance and produces more aligned features faster*
 
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2202_05352/figures/004_Figure_4.jpg]]
 *Figure 4: Robustness to hyperparameters. We compare the transfer performance of our method for different hyperarameters in the task M→ U in the Digits benchmark. Green line shows the best score for the best performing hyperparameters of GD. Blue star corresponds to the best solution. Our method performs well for a wide variety of hyperparameters*
-
-
 
 ### 三玩家博弈的向量场与梯度反转层
 
@@ -267,8 +257,6 @@ $$
 
 该流水线将优化器从 GD with GRL 替换为 RK2/RK4，其余模块保持不变，实现了即插即用的改进。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置与公平性保障
@@ -313,29 +301,11 @@ RK2 每一步需要两次前向-反向传播，导致每次迭代挂钟时间约
 2. **理论假设的局限**：稳定性分析假设权重初始化在局部纳什均衡附近，这一条件在实际中未必满足。尽管实验显示方法在随机初始化下依然有效，严格的理论保证仍有待建立。
 3. **随机梯度下的理论缺口**：分析主要基于全批量梯度动力学，随机小批量下的严格收敛保证仍是一个开放问题。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2202_05352/figures/008_Table.jpg]]
-
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2202_05352/figures/009_Table_1.jpg]]
 *Table 1: Accuracy (DANN) on Visda 2017 with ResNet-50*
 
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2202_05352/figures/010_Table_2.jpg]]
 *Table 2: Comparison using SoTA DA adversarial frameworks with ResNet-50 on Visda*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2202_05352/figures/011_Table_4.jpg]]
-*Table 4: Accuracy (%) on the Amazon Reviews Sentiment Analysis Dataset (NLP)*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2202_05352/figures/012_Table_5.jpg]]
-*Table 5: Sensitivity to Sampling Noise controlled by the batch size in the Visda Dataset. Resnet-50*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2202_05352/figures/014_Table_7.jpg]]
-*Table 7: Performance of CO vs others. $\mathrm { C O } ( \gamma$ = 1 $\mathrm { e } { - }$ 3 ) corresponds to the best result after removing 1e-4 from the grid search
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2202_05352/figures/006_Table_3.jpg]]
-*Table 3: Accuracy (%) on Digits (DANN). Figure 6: Transfer Performance on Visda (DANN)*
-
-
 
 ## 定位与知识库关联
 
@@ -400,8 +370,6 @@ RK 求解器作为**即插即用的优化器**，可与多种前沿 DA 框架结
 ### 知识库定位
 
 本文的核心贡献在于**桥接了两个此前相对独立的研究方向**：数值 ODE 求解理论与博弈优化。通过将 DAL 的优化问题识别为连续梯度博弈动力学的离散化问题，本文为领域对抗训练的不稳定性提供了可分析的因果机制，并给出了原理性的解决方案。该方法在方法谱系中属于**优化器层面的改进**，不改变模型架构或损失函数设计，因此具有广泛的兼容性和即插即用特性。
-
-
 
 ## 原文 PDF
 

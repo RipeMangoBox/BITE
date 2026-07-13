@@ -59,8 +59,6 @@ claims:
 
 **局限与开放问题**：当模型无法准确遵循组合提示（如生成对象不属于目标类别）时方法可能失败（Figure 6）；更激进的语义擦除或对抗性微调是否能够彻底消除指纹仍待探索。
 
-
-
 ### 文本到图像生成模型的激增与溯源困境
 
 近年来，以扩散模型（Diffusion Models）为核心的文本到图像（T2I）生成模型经历了爆发式增长。从开源的 **Stable Diffusion** 系列（v1.5、v2.1、XL、v3）到 **FLUX**（Black Forest Labs, 2024）、**Kandinsky** 等，大量基础模型被发布并广泛部署于商业API中。这些模型随后通过风格迁移、LoRA微调、模型融合、DPO对齐等方式衍生出海量微调变体，形成了一个庞大而复杂的模型谱系。
@@ -100,8 +98,6 @@ CSF方法的核心洞察在于一个根本性的视角转换：将T2I模型重�
 1. **组合语义探测**：构造稀有组合提示，探测模型对欠指定语义的类别解释分布；
 2. **语义分布距离度量**：使用Wasserstein距离比较模型间的语义类别分布，保留类别间的联合结构；
 3. **贝叶斯统计推断**：跨多个提示聚合证据，提供具有统计显著性检验和可信区间的归属决策。
-
-
 
 ## 核心方法与创新机理
 
@@ -149,8 +145,6 @@ $$\theta \sim \mathrm{Beta}(\alpha, \beta), \quad \theta \mid s, f \sim \mathrm{
 | 决策框架 | 确定性匹配/简单投票 | Beta-Binomial 贝叶斯聚合 | 提供置信区间和风险控制，支持统计推断 |
 
 这四个 changed slots 协同作用，使得 CSF 能够在仅通过 API 查询的严格黑盒条件下，可靠地将微调模型归属到其基础模型谱系——这是现有水印方法（需预部署注入）和白盒/灰盒指纹方法（需权重或激活访问）均无法实现的能力。
-
-
 
 CSF将文本到图像模型重新抽象为**语义类别生成器**（semantic category generator），而非传统的像素级合成器。这一抽象层的转换是方法的核心：它使指纹提取过程天然隔离了微调引入的视觉风格、色彩和构图变化，仅保留基础模型对语义组合的固有解释偏差。
 
@@ -204,12 +198,8 @@ CSF在三个关键维度上与传统指纹方法形成对比（见Figure 1）：
 - **传统白盒/灰盒指纹**：依赖权重或激活等内部访问，CSF仅需API查询。
 - **朴素提示指纹**：使用LAION-2B随机采样提示，缺乏组合性和稀有性，人类归属准确率仅18%（vs. CSF的71%，见Figure 4）；在视觉空间（CLIP嵌入t-SNE）和文本空间（I2T字幕）上均无法形成模型家族聚类（见Figure 3）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2301_https_arxiv_org_abs_2604_16363/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of model identification scenarios. (a) Watermarking requires pre-deployment access to inject a trigger into the base model. (b) Traditional Fingerprinting relies on white-box or gray-box ‘Internal Access’ (e.g., weights or activations), which is not available in commercial API. (c) Our approach (CSF) is designed for the most restrictive ‘Query Only’ black-box setting, where the defender only has access to the final T2I generation API, reflecting realworld infringement scenarios*
-
-
 
 ### 方法总览：从像素到语义的抽象
 
@@ -266,18 +256,11 @@ $$\theta \mid s, f \sim \mathrm{Beta}(1 + s, 1 + f) \tag{10}$$
 
 这一框架将单次试验的硬决策转化为概率推断，允许在任意数量的提示上增量聚合证据，并以可控的风险阈值做出最终归属判断。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2301_https_arxiv_org_abs_2604_16363/figures/004_Figure_3.jpg]]
 *Figure 3: Challenges in naive fingerprinting approaches. (a) Visual space: t-SNE visualization of CLIP embeddings shows no family clustering. (b) Text space: Even when images are converted to captions via I2T models, style information leaks into the text, causing models from different families (e.g., SD1.5 DPO and SD2.1) to cluster together due to similar style descriptors*
 
-![[assets/figures/papers/paper_list_l2301_https_arxiv_org_abs_2604_16363/figures/002_Figure_2.jpg]]
-*Figure 2: The “Name That Dataset” game [52] in Diffusion Fingerprinting. Image (a) is from a fine-tuned model (SD1.5- DreamShaper). One of the images (b, c, d) is its base model. This figure illustrates how difficult it is to identify the base model using a naive prompt (right column, randomly sampled from LAION-2B [46]), compared to our CSF prompt (left column). All images are uncurated results generated with different random seeds. Can you specify which model (b, c, or d) is the base model for (a)? Answer: (a) SD1.5-DreamShaper (fine-tuned), (b) SD2.1-DPO (fine-tuned), (c) SD1.5 Base, and (d) SDXL Base. The correct base model for (a) is (c)*
-
 ![[assets/figures/papers/paper_list_l2301_https_arxiv_org_abs_2604_16363/figures/024_Table.jpg]]
 *Table: A8. Compositional structure of fingerprinting prompts. Each category systematically varies semantic attributes and visual contexts, yielding 42 total prompts (9+9+6+9+9). The dimmed studio setting appears across all categories to enable cross-category comparison*
-
-
 
 ## 实验与关键发现
 
@@ -322,30 +305,11 @@ Figure 6展示了CSF的典型失败案例。当模型无法准确遵循组合提
 
 Table A3和A4显示，在原始指纹向量上直接应用层次聚类无法实现可靠的模型家族识别，进一步验证了CSF方法中Wasserstein距离度量和贝叶斯聚合框架的必要性——简单的距离聚类无法有效捕捉高维语义分布中的细微但系统性的模型间差异。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2301_https_arxiv_org_abs_2604_16363/figures/005_Table_1.jpg]]
 *Table 1: Posterior Mean of the Derived Models. In this table, indicates significance a (Confidence Interval (CI) low > 0.167), indicates Not significant (CI includes 0.167), and indicates Sig. below chance (CI high*
 
-![[assets/figures/papers/paper_list_l2301_https_arxiv_org_abs_2604_16363/figures/006_Figure_4.jpg]]
-*Figure 4: User study results for the “Name That Dataset” game (Fig. 2). Participants attempted to identify the correct base model using naive prompts (LAION-2B [46]) vs. our CSF prompts*
-
 ![[assets/figures/papers/paper_list_l2301_https_arxiv_org_abs_2604_16363/figures/009_Table_2.jpg]]
 *Table 2: Attribution confidence: Wasserstein vs. JSD*
-
-![[assets/figures/papers/paper_list_l2301_https_arxiv_org_abs_2604_16363/figures/010_Table_3.jpg]]
-*Table 3: Attribution results under adversarial concept removal. Posterior mean attribution scores computed from 9 animalspecific probes after removing animal-related concepts using UCE*
-
-![[assets/figures/papers/paper_list_l2301_https_arxiv_org_abs_2604_16363/figures/007_Figure_5.jpg]]
-*Figure 5: Generated category distributions vary substantially with scene context. Compared with the dimmed-studio setting, the dish and wooden-floor settings produce broader and systematically shifted category mixtures. Each donut summarizes 40 samples, and the same color denotes the same category across scenes*
-
-![[assets/figures/papers/paper_list_l2301_https_arxiv_org_abs_2604_16363/figures/008_Figure_6.jpg]]
-*Figure 6: Failure cases of CSF. Top: prompts for baked goods in front of a brick wall. Bottom: prompts for tropical flowers on a pot. In both cases, models failed to generate identifiable objects within the target categories*
-
-![[assets/figures/papers/paper_list_l2301_https_arxiv_org_abs_2604_16363/figures/012_Table.jpg]]
-*Table: A2. Average Normalized Wasserstein Distance Matrix across all prompts. Each value is the mean of column-normalized distances across all 42 prompts. Short, Medium-low, Medium-high, Long distance*
-
-
 
 ## 定位与知识库关联
 
@@ -407,8 +371,6 @@ CSF的有效性依赖于以下前提条件，这些条件定义了其适用边�
 3. **自动化提示发现**：能否自动化地发现最优组合提示，而无需人工设计？这涉及对模型语义偏见空间的自动探索。
 
 4. **大规模部署的可行性**：在涉及数十个基础模型家族的场景中，CSF的统计推断框架是否仍能维持可接受的置信度水平，需要进一步验证。
-
-
 
 ## 原文 PDF
 

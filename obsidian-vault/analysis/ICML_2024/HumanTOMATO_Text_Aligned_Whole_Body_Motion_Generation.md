@@ -86,8 +86,6 @@ HumanTOMATO 属于**离散潜空间生成**范式的文本驱动动作生成方�
 -   模型尚未在大规模多源文本-运动数据上训练，泛化能力有待验证。
 -   面部表情质量的客观评估指标缺失，该点需要手动验证。
 
-
-
 ### 问题背景
 
 文本驱动的动作生成旨在根据自然语言描述合成逼真的人体运动序列，在虚拟人动画、人机交互和游戏影视等领域具有广泛应用。近年来，基于离散令牌的自回归模型（如 **T2M-GPT**，Zhang et al., 2023）和基于扩散模型的连续生成方法（如 **MDM**，Tevet et al., 2023；**MLD**，Chen et al., 2023b）在身体动作生成上取得了显著进展。然而，一个完整的人体运动不仅包含躯干和四肢的动作，还需要协调的手部手势和面部表情，才能真正传递出文本所描述的语义和情感。
@@ -107,8 +105,6 @@ HumanTOMATO 属于**离散潜空间生成**范式的文本驱动动作生成方�
 - **构建全身动作生成框架**：将动作解耦为身体、手部和面部三个组成部分，分别建模并最终融合，实现文本驱动的高质量全身动作生成。
 - **设计层次化离散表示（H2VQ）**：通过整体层次向量量化，对身体和手部动作进行分层离散编码，在极低比特率下保留细粒度运动信息，同时建立身体与手部之间的层次结构关系。
 - **引入运动感知的语言先验与显式对齐**：采用预训练的文本-动作检索模型（TMR）提供运动感知的文本嵌入，并通过对比对齐损失实现序列级的显式文本-动作对齐监督，从根本上提升生成动作与文本语义的一致性。
-
-
 
 ## 核心方法与创新机理
 
@@ -143,8 +139,6 @@ HumanTOMATO 围绕“文本对齐的全身动作生成”这一目标，针对�
 ### 创新之间的协同关系
 
 三项创新并非孤立设计，而是形成因果闭环：**H²VQ** 提供高质量的身体-手部分层离散表示，为 **Hierarchical-GPT** 的层次预测提供结构化令牌序列；**TMR 语言先验与对齐监督** 则驱动 Hierarchical-GPT 生成与文本语义高度一致的令牌序列。三者叠加使得 HumanTOMATO 在极低比特率下实现了高质量且文本对齐的全身动作生成。
-
-
 
 HumanTOMATO 的总体 pipeline 围绕一个核心洞察展开：**将全身动作解耦为身体、手部和面部三个异质组分，分别采用层次化离散表示与生成策略，并引入运动感知的语言先验进行显式的序列级对齐监督**。这一设计解决了现有方法仅生成身体动作、忽略手部和面部细节，以及文本-动作对齐仅停留在帧级别的瓶颈问题。
 
@@ -192,8 +186,6 @@ $$
 - **面部生成**：Facial cVAE 基于表情文本生成面部运动
 - **输出**：融合身体、手部、面部三者的全身动作序列 $\mathbf{m}$
 - **监督信号**：生成动作与文本之间的对比对齐损失，确保序列级语义一致性
-
-
 
 ### 整体层次向量量化（H²VQ）
 
@@ -251,8 +243,6 @@ HumanTOMATO 的语言先验引入方式与现有方法存在本质差异（Figur
 
 面部动作生成采用独立的条件 VAE 模块（Figure 2(c)），由面部编码器、文本编码器和面部解码器组成。该模块以表情文本描述为条件，生成与身体-手部运动时间对齐的面部表情序列。当前设计为分离式架构，尚未与 H²VQ 和 Hierarchical-GPT 统一为端到端框架，这一局限在论文的 open questions 中被明确指认为未来改进方向。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -269,9 +259,6 @@ HumanTOMATO 在 Motion‑X 全身动作生成基准上全面优于现有方法�
 
 H²VQ 是生成质量提升的根基。Table 2 对比了不同量化方法在 Motion‑X、GRAB、HumanML3D 三个数据集上的 MPJPE（mm）。在 Motion‑X 上，H²VQ 的总体 MPJPE 仅为 **92.97**，相比 Vanilla VQ（512 码本）的 140.66 降低 47.69 mm，相比残差 VQ（RVQ）的 110.94 降低 17.97 mm；身体和手部分别评估时，H²VQ 同样一致最优。Table 10 的扩展消融进一步验证了分层结构的必要性：若将身体和手部合并为单一码本但保持分层解码，MPJPE 回升至 103.85；若完全取消分层（Vanilla VQ‑1024），则升至 130.42。这表明分离编码器与分层码本设计以极低比特率（码本尺寸仅 512×2）实现了高保真运动重建，为后续生成提供了干净、紧凑的离散令牌空间。
 
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2310_12978/figures/006_Table_2.jpg]]
-*Table 2: Comparison of the motion reconstruction errors (MPJPE in mm) of different quantization methods on Motion-X, GRAB, and HumanML3D. Our $\mathrm { H } ^ { 2 } \mathrm { V }$ Q shows significant improvements
-
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2310_12978/figures/021_Table_10.jpg]]
 *Table 10: Different vector quantization methods on Motion-X*
 
@@ -286,8 +273,6 @@ Table 3 系统消融了预训练文本‑动作对齐模型（TMR）作为语�
 
 H²VQ 不仅提升重建质量，还直接惠及下游生成。Table 13 显示，在 T2M‑GPT 框架下，使用 H²VQ 令牌替代原始连续表示或 Vanilla VQ 令牌后，FID 从 1.366 降至 **1.086**，TMR‑R‑Precision(256) Top‑1 从 0.368 升至 **0.405**。这说明层次化离散表示有效降低了生成模型的建模难度，使其更容易学习文本到运动令牌的映射。
 
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2310_12978/figures/024_Table_13.jpg]]
-*Table 13: The ablation on how can $\mathrm { H } ^ { 2 } \mathrm { V }$ Q help the whole-body motion generation on T2M-GPT
 
 ### 面部生成与整体协调
 
@@ -300,15 +285,6 @@ H²VQ 不仅提升重建质量，还直接惠及下游生成。Table 13 显示
 
 本文指出传统 R‑Precision(32) 和 Matching‑Score 在全身动作场景下区分度不足。Figure 5 对比了新旧指标在 Motion‑X 上的检索能力：TMR‑R‑Precision(256) 和 TMR‑Matching‑Score 在文本‑动作和动作‑文本双向检索中均表现出更高的 Recall@K，能更准确反映语义对齐质量。Table 5 和 Table 6 分别报告了 Motion‑X 和 HumanML3D 上真实动作与文本的 Recall@K，为指标的可信度提供了上限参考。
 
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2310_12978/figures/008_Figure_5.jpg]]
-*Figure 5: Comparison with existing metrics on Motion-X. Existing evaluation metrics (Guo et al., 2022) are illustrated in red, and ours are in green. The B = 3 2 and B = 2 5 6 settings for retrieval are denoted as $\sp { 6 6 } - \bullet - \sp { 5 5 }$ and $\twoheadleftarrow$ respectively
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2310_12978/figures/011_Table_5.jpg]]
-*Table 5: Recall@K (T2M and M2T) of GT motions and texts on the Motion-X dataset*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2310_12978/figures/012_Table_6.jpg]]
-*Table 6: Recall@K (T2M and M2T) of GT motions and texts on the HumanML3D dataset*
-
 ### 失败模式与局限
 
 尽管整体性能领先，HumanTOMATO 仍存在以下可观测或作者指出的失败模式：
@@ -316,13 +292,6 @@ H²VQ 不仅提升重建质量，还直接惠及下游生成。Table 13 显示
 - **面部生成独立性**：Facial cVAE 与身体‑手部生成管道分离，缺乏统一的全身生成框架，在面部数据更丰富时可能成为瓶颈。
 - **泛化边界未充分测试**：模型仅在 Motion‑X 等现有数据集上验证，尚未在更大规模、多源文本‑运动配对数据上训练，跨域泛化能力待考证。
 - **评估维度不完整**：面部表情质量和对齐度缺乏客观量化指标，当前主要依赖定性观察，该点需读者注意。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2310_12978/figures/003_Figure_3.jpg]]
-*Figure 3: (a) Learning image-text aligned prior explicitly. (b) Learning image-text aligned prior implicitly. (c) Learning motion-text alignment explicitly(Ours). Figure 3: Technical comparisons on introducing language priors of existing methods*
-
-
 
 ## 定位与知识库关联
 
@@ -377,8 +346,6 @@ HumanTOMATO 通过三个核心设计解决上述问题：
 4. **面部生成评估**：如何客观评估全身动作生成中的面部表情质量和对齐度？现有指标（FID、R-Precision）主要针对身体动作，缺乏面部表情的专门评估指标。
 
 5. **层次化结构的泛化性**：H²VQ 的身体-手部层次分解策略是否可以推广到其他多部位运动生成任务（如四足动物、多智能体协作）？这需要验证层次化离散表示在不同运动结构上的适应性。
-
-
 
 ## 原文 PDF
 

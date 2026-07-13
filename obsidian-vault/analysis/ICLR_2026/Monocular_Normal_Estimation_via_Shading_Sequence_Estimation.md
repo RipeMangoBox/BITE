@@ -51,8 +51,6 @@ claims:
 
 在真实世界基准数据集上的实验结果显示，RoSE 取得了领先性能：在 **DiLiGenT** 数据集上，MAE 达到 **16.36°**，优于此前最优的单目方法 NiRNE（17.27°）（Table 1）；在 **LUCES** 数据集上同样表现突出（Table 2）。消融实验表明，9 个规范光源的配置在精度与效率之间取得最优平衡。
 
-
-
 从单张图像恢复物体表面法线是计算机视觉中的经典任务，其核心挑战在于：输入图像是几何、材质与光照三者耦合的结果，而仅凭单目观测无法唯一地分解这些因素。现有主流方法大多采用端到端的数据驱动策略，直接从 RGB 图像回归法线图。这些方法虽然在视觉上能产生看似合理的法线估计，但存在一个隐蔽而关键的问题——**三维几何失配（3D misalignment）**：估计的法线图在整体外观上可能正确，但由其重建的表面往往缺乏准确的几何细节，呈现出过度平滑的结果（见 **Figure 2**）。这意味着，仅凭法线图的视觉质量并不足以保证底层几何的准确性。
 
 进一步分析表明，这一问题的根源在于**法线图表示本身对几何变化的敏感性不足**。如 **Figure 3** 所示，通过平均总变差（Total Variation）度量，法线图在不同几何细节下的响应强度明显弱于本文提出的**着色序列（shading sequence）表示**。着色序列记录的是物体在多个预定义平行光源下的着色响应，其像素值直接随表面朝向变化，因此对几何细节具有更强的区分能力。这一观察构成了本文方法设计的核心动机。
@@ -60,8 +58,6 @@ claims:
 基于上述洞察，本文提出了一个**新的范式转换**：将单目法线估计重新定义为着色序列估计任务。具体而言，给定任意光照下的单张输入图像，首先利用图像到视频生成模型预测物体在一组规范平行光下的着色序列，再通过普通最小二乘法（OLS）从着色序列解析导出法线图。这一范式将困难的法线直接回归问题，转化为生成模型更擅长的高维序列预测问题，同时利用物理约束保证了几何精度。
 
 为实现这一范式，本文提出了 **RoSE**（**R**estoration of **S**urface normal from **E**stimated shading sequence），并构建了大规模合成数据集 **MultiShade**，涵盖 5657 种 PBR 材质与多样化的光照条件，以支持模型在通用场景下的训练。在真实世界基准数据集 DiLiGenT 和 LUCES 上的实验表明，RoSE 在单目法线估计任务中达到了当时的最优性能（MAE 分别为 16.36° 和 14.48°），验证了着色序列作为中间表示的有效性。
-
-
 
 ## 核心方法与创新机理
 
@@ -81,8 +77,6 @@ RoSE 的核心创新在于将单目法向估计**重新定义为明暗序列估�
 
 **证据强度评估**：DiLiGenT 上的对比数据来自 Table 1，置信度 0.98，属于强证据。但需注意，当前分析未提供 NiRNE 之外的完整 baseline 对比细节，且缺乏关于“明暗序列敏感性优势”的定量消融（仅 Figure 3 提供定性可视化），该因果链条的严格验证需进一步确认。
 
-
-
 ![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_d7itDxMD1n/figures/001_Figure_1.jpg]]
 *Figure 1: We present RoSE, a method using a video generative model for monocular normal map estimation, built on a new paradigm that reformulates normal estimation as a shading sequence estimation task. Results on complex and diverse scenarios show that RoSE reconstructs fine-grained geometric details and generalizes robustly to unseen datasets, achieving state-of-the-art performance in object-based monocular normal estimation on benchmark datasets*
 
@@ -98,8 +92,6 @@ RoSE 将单目法向估计重构为**着色序列估计**任务，整体 pipelin
 **解析法向求解。** 获得着色序列后，法向图通过求解一个**普通最小二乘**问题解析导出。由于每个像素在多个已知光源方向下的着色值构成线性方程组，法向可直接闭合求解，无需可学习参数。
 
 整个 pipeline 的输入是单张任意光照 RGB 图像，输出是高质量法向图 $\mathbf{N}$，中间表示着色序列作为几何信息的可泛化载体，将生成模型的先验与物理约束解耦。
-
-
 
 ### 范式重构：从法向估计到明暗序列估计
 
@@ -145,8 +137,6 @@ $$\mathcal{L}_{\mathrm{diff}} = \mathbb{E}_{\mathbf{z}_0, c, t} \left\| \mathbf{
 
 模型在自建的 **MultiShade** 合成数据集上训练，包含约 300 万对图像-法向对。数据使用 Blender 以 $576 \times 576$ 分辨率渲染，材质来自 MatSynth 数据集（5,657 种高质量 PBR 材质），其中金属和非金属类别各以 0.25 的概率采样。训练使用 8 块 NVIDIA H100 GPU（80GB），优化器为 AdamW，学习率 $1 \times 10^{-5}$。
 
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -185,12 +175,6 @@ RoSE 在两个真实世界基准数据集上均取得单目法向估计的最优
 
 在 LUCES 数据集上，RoSE 估计的 shading sequence 在 PSNR（20.74）、SSIM 和 LPIPS 三项指标上均达到最优（Table 4），表明视频扩散模型能够有效预测与真实几何一致的多光照 shading 模式。此外，在锐利法向误差（Sharp Normal Error, SNE）指标上，RoSE 达到 26.74，与 NiRNE 相当（Table 5），说明方法在保持边缘锐度方面具有竞争力。
 
-![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_d7itDxMD1n/figures/010_Table_4.jpg]]
-*Table 4: Quantitative comparison on estimated shading sequence in terms of PSNR (↑), SSIM (↑), and LPIPS (↓) on LUCES benchmark dataset (Mecca et al., 2021). Highlighted numbers indicate the best and second best results*
-
-![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_d7itDxMD1n/figures/011_Table_5.jpg]]
-*Table 5: Quantitative analysis in terms of MAE and SNE of the normal map on LUCES benchmark dataset (Mecca et al., 2021). Highlighted numbers indicate the best and second best results*
-
 ### 已知局限与失败模式
 
 论文讨论部分（Section 5）指出以下局限，需在阅读时注意：
@@ -199,8 +183,6 @@ RoSE 在两个真实世界基准数据集上均取得单目法向估计的最优
 2. **计算开销**：视频扩散模型的推理计算量较大，限制了实时应用场景的部署。
 3. **材质覆盖边界**：对透明或半透明物体，当前 shading 模型（基于漫反射假设）可能失效，方法尚未支持此类材质。
 4. **个别物体表现**：在 DiLiGenT 的 GOBLET 和 LUCES 的 HOUSE 物体上，RoSE 未进入前两名（Table 1, Table 2），可能与非朗伯反射或复杂几何结构有关，具体原因需进一步分析。
-
-
 
 ## 定位与知识库关联
 
@@ -237,8 +219,6 @@ RoSE 在两个真实世界基准数据集上均取得单目法向估计的最优
 4. **特定物体的性能波动。** 在 DiLiGenT 的 GOBLET 物体和 LUCES 的 HOUSE 物体上，RoSE 未进入前两名（part_006 开放问题）。这可能与这些物体包含的凹面结构、自遮挡或材质特性有关，但论文未提供针对性的失败案例分析。
 
 5. **合成到真实的域间隙。** 尽管 MultiShade 数据集在材质多样性上做了增强，训练数据仍完全来自 Blender 合成渲染。论文未系统分析合成数据与真实基准（DiLiGenT、LUCES）之间的域间隙对性能的具体影响。
-
-
 
 ## 原文 PDF
 

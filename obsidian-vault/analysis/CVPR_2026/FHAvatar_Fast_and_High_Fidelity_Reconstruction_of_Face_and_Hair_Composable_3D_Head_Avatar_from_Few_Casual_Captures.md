@@ -253,17 +253,9 @@ Table 2和Figure 4呈现了关键消融结果：
 
 FHAvatar的面部-头发可组合设计支持发型迁移（Figure 6），即使跨性别也能无缝转移。纹理空间编辑直接反映到3D高斯（Figure 7），无需重新推理。Figure 9展示了在非正面、极稀疏等挑战性输入下的鲁棒重建结果，Figure 12进一步验证了对长波浪、卷曲等复杂发型的处理能力。
 
-![[assets/figures/papers/paper_list_l1022_https_arxiv_org_abs_2603_23345/figures/007_Figure_6.jpg]]
-*Figure 6: Hairstyle Transferring. The compositional face-andhair dual-branch design enables seamless hairstyle transfer between our avatars, even across different genders*
-
-![[assets/figures/papers/paper_list_l1022_https_arxiv_org_abs_2603_23345/figures/008_Figure_7.jpg]]
-*Figure 7: Stylize Editing. Texture-based editing or stylization on the reconstruction result enables convenient 3D-aware manipulation without re-inference*
-
 ### 局限性
 
 尽管FHAvatar在面部-头发重建上表现优异，其重建和动画基于FLAME模型，难以表示舌头、细微面部皱纹等FLAME未建模的静态区域和动态细节。此外，训练数据的发型分布偏差可能导致复杂配饰或不常见发型的重建失败。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l1022_https_arxiv_org_abs_2603_23345/figures/003_Table_1.jpg]]
 *Table 1: Quantitative Results under both single-view and multi-view input settings. Note that our model was trained once on mixed input numbers to learn generalizable priors. Modeling time denotes the time required to reconstruct the 3DGS model, excluding the estimation of driving parameters that can be precomputed in advance, while FPS corresponds to the frame rate during the animation rendering process of the output model. All methods are rendered on a black background for metrics calculation*
@@ -273,15 +265,6 @@ FHAvatar的面部-头发可组合设计支持发型迁移（Figure 6），即使
 
 ![[assets/figures/papers/paper_list_l1022_https_arxiv_org_abs_2603_23345/figures/006_Figure_4.jpg]]
 *Figure 4: Ablation Study. Best viewed with zoom-in*
-
-![[assets/figures/papers/paper_list_l1022_https_arxiv_org_abs_2603_23345/figures/011_Table_3.jpg]]
-*Table 3: Face-Region and Hair-Region Evaluation Results*
-
-![[assets/figures/papers/paper_list_l1022_https_arxiv_org_abs_2603_23345/figures/013_Table_4.jpg]]
-*Table 4: Adaptive Hair Gaussians*
-
-![[assets/figures/papers/paper_list_l1022_https_arxiv_org_abs_2603_23345/figures/012_Figure_9.jpg]]
-*Figure 9: Results under challenging inputs and viewpoints*
 
 ![[assets/figures/papers/paper_list_l1022_https_arxiv_org_abs_2603_23345/figures/004_Figure_3.jpg]]
 *Figure 3: Qualitative Comparison on reconstructing unseen identities from both in-the-wild data and the NeRSemble dataset under different capture conditions. LAM struggles to preserve identity similarity, while GAGAvatar and DiffusionRig fail to maintain accurate control under novel expressions or viewpoints. Optimization-based methods such as GaussianAvatars, FlashAvatar, and MeGA often fail to fit under sparse inputs. In contrast, our method delivers high rendering quality, supports accurate expression reenactment, and maintains consistent identity*

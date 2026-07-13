@@ -53,8 +53,6 @@ claims:
 
 实验结果表明，UDP 在 DIP-IMU、DanceDB、TotalCapture 等多个数据集上均取得 SOTA 性能，关节位置误差（JPE）相对最优 IMU+UWB 基线最多降低 22%。消融研究进一步验证了显式几何建模的必要性：同时移除 Spatial Layout Module 和 UWB-Diffusion Guidance 会使 JPE 增加 17%，而单独应用 UWB-Diffusion Guidance 可降低 SIP 误差 5%、JPE 7%。
 
-
-
 ### 可穿戴人体运动捕捉的传感器融合瓶颈
 
 基于惯性测量单元（IMU）的可穿戴运动捕捉系统因其不受光照、遮挡限制的户外可用性，已成为视觉动捕的重要替代方案。然而，纯 IMU 方案面临两大根本性挑战：**全局漂移**导致长时间定位误差累积，以及**下肢运动模糊**使得腿部姿态难以可靠推断。为缓解这些问题，近年工作引入超宽带（UWB）测距作为补充模态——通过在身体关键点部署 UWB 模块，可实时获取传感器对之间的物理距离测量。
@@ -72,8 +70,6 @@ claims:
 ### 本文动机
 
 上述分析指向一个明确的研究缺口：**如何将 UWB 距离从被动的输入特征升级为主动的几何约束，使其在模型结构和推理过程中都发挥物理引导作用？** 本文提出的 **Ultra Diffusion Poser (UDP)** 正是针对这一缺口设计：通过多维尺度分析（MDS）从距离中封闭形式地重建 3D 传感器布局，将其作为扩散模型的显式空间条件；同时在扩散采样中引入基于前向运动学的距离一致性引导，使预测姿态始终满足观测约束。这一设计使得 UDP 无需依赖外部物理优化器即可产生平滑、高保真的运动估计，在多个基准上将关节位置误差最多降低 22%。
-
-
 
 ## 核心方法与创新机理
 
@@ -101,8 +97,6 @@ UDP 采用**自回归扩散修复模型（autoregressive diffusion inpainting）
 
 上述三个创新形成闭环：Spatial Layout Module 提供几何先验条件，自回归扩散修复模型生成平滑运动，UWB-Diffusion Guidance 在采样中强制执行距离约束。消融实验清晰揭示了各模块的贡献——同时移除 Spatial Layout Module 和 UWB-Diffusion Guidance 导致 JPE 增加 17%；单独应用 UWB-Diffusion Guidance 可使 SIP 降低 5%、JPE 降低 7%，表明扩散引导能有效纠正违反距离约束的预测。这一“重建—条件—引导”的几何约束闭环，使 UDP 在所有评估基准上均取得 SOTA 性能，关节位置误差相对最佳 IMU+UWB 基线 UIP 最多降低 22%。
 
-
-
 Ultra Diffusion Poser (UDP) 是一个端到端可学习的自回归扩散修复模型，其核心设计在于将 UWB 传感器间距离从传统的辅助特征升级为显式几何约束的载体。整体映射关系为：
 
 $$( \Theta , {\bf T} ) = \mathrm { UDP } ( {\bf R} , {\bf A} , {\bf D} , \beta )$$
@@ -123,8 +117,6 @@ Figure 1 展示了方法概览，Figure 2 详细描绘了模块间的交互关�
 
 ![[assets/figures/papers/paper_list_l1004_https_openaccess_thecvf_com_content_CVPR2026_html_Hollidt_Ultra_Diffusio/figures/001_Figure_1.jpg]]
 *Figure 1: Our method UDP improves wearable IMU+UWB pose estimation by extending UWB as an auxiliary feature to actively model its geometric constraints. The Spatial Layout Module reconstructs 3D sensor positions from UWB measurements, providing a physically-informed input that conditions a diffusion model to predict SMPL poses. UWB-Diffusion Guidance encourages alignment between predicted poses and measured distances during diffusion sampling, improving accuracy and producing consistent motions*
-
-
 
 ### 3.1 问题建模与运动表示
 
@@ -212,13 +204,6 @@ $$\epsilon _ { uwb } = \sum _ { i < j } \| \hat { d } _ { i j } ( \hat { \mathca
 
 该损失的梯度用于修正扩散采样方向，使生成的姿态满足观测距离约束。这一机制无需外部物理优化器，内嵌于扩散迭代中，是 UDP 实现平滑、物理一致运动的关键。消融实验表明，单独应用 UWB-Diffusion Guidance 可使 SIP 误差降低 5%，JPE 降低 7%。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1004_https_openaccess_thecvf_com_content_CVPR2026_html_Hollidt_Ultra_Diffusio/figures/002_Figure_2.jpg]]
-*Figure 2: The Spatial Layout Module applies metric MDS to the pairwise distance matrix D to recover initial sensor positions, which are then oriented by a learnable Rotation Estimator. The resulting 3D sensor layout provides a strong conditioning signal for the diffusion model. The autoregressive diffusion inpainting model extends the previously predicted motion based on the current conditioning signal to ensure smooth motion prediction. UWB-Diffusion Guidance steers the pose predictions to align with the measured inter-sensor distances*
-
-
-
 ## 实验与关键发现
 
 ### 核心性能验证
@@ -263,8 +248,6 @@ Figure 3 的定性对比以红色热力图展示位置误差分布。UDP 在 Dan
 - **传感器配置泛化**：当前系统限定为六个固定位置的传感器布局（头、骨盆、手腕、膝盖），尚未验证在更少或任意位置传感器配置下的泛化能力。
 - **计算延迟**：扩散模型的迭代采样过程可能引入较高延迟，论文未提供在低功耗设备上的实时性分析，实际部署时需评估推理速度是否满足实时需求。
 - **训练数据偏差**：模型在现有 MoCap 数据集生成的合成 IMU/UWB 数据上训练，真实场景中的传感器噪声分布差异可能影响精度，需要在实际硬件平台上进一步验证。
-
-
 
 ## 定位与知识库关联
 
@@ -333,8 +316,6 @@ UDP 在可穿戴人体运动估计知识库中占据“几何约束驱动的扩�
 - **架构贡献**：提出了自回归扩散修复模型与几何引导采样的联合框架，为扩散模型在物理约束估计任务中的应用提供了可复用的设计模式。
 
 - **经验贡献**：在 DIP-IMU、DanceDB、TotalCapture、UIP-DB 和 GIP-DB 五个数据集上的全面评估（包括 UWB 噪声鲁棒性分析）为后续研究提供了可靠的基准参照。
-
-
 
 ## 原文 PDF
 

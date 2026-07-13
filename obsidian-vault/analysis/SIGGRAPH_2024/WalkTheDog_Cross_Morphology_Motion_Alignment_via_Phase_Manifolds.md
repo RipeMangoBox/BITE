@@ -53,15 +53,11 @@ claims:
 
 **主要结果**：在 Dog 与 Human-Locomotion 两个骨骼结构截然不同的数据集上，当振幅码本大小设为 32 并采用重新初始化训练时，流形重叠率达到 **100%**；而不使用重新初始化的基线方法在码本大小 2048 时重叠率仅为 0.00%，完全崩溃。这一结果表明，极窄瓶颈下的共享码本训练能够实现近乎完美的跨形态语义对齐。
 
-
-
 跨形态运动对齐是计算机动画与机器人学习中的基础性难题。现实世界中，运动数据往往来自骨骼结构截然不同的角色——例如人类、四足动物或风格化虚拟角色——它们拥有的关节数量、拓扑连接和运动频率各不相同。传统运动合成与重定向方法通常依赖手工指定的骨骼对应关系或成对数据来建立不同形态间的映射，这不仅需要大量专家知识，而且难以泛化到未见过的角色组合。
 
 现有工作的根本困境在于：运动数据同时承载着“时间”（节奏与相位）与“语义”（动作类别与风格）两重信息，而这两者在异构骨骼表示中高度纠缠。监督学习方法试图通过配对数据解耦这些因素，但获取跨形态的精确对应标注成本极高；自监督或无监督方法虽然减少了对标注的依赖，却往往需要精心设计的辅助损失函数来强制对齐，且容易在骨骼差异过大时失效。更为关键的是，大多数方法缺乏一个统一的、可解释的中间表示空间，使得不同形态的运动能够在其中自然对齐。
 
 WalkTheDog 的核心动机源于一个关键观察：尽管运动在关节空间中的表示差异巨大，但其内在的周期性与语义结构是共通的。论文提出，如果能够学习到一个紧凑、结构化且解耦的相位流形，将运动的时间相位与语义幅度分离，那么不同形态的运动就有可能在这个共享流形上自动对齐——无需任何监督信号、无需骨骼对应关系、也无需自监督损失。这一思路的核心假设是：**浅层网络的有限表达能力与极窄的瓶颈设计**，会迫使模型捕捉运动最本质的周期性结构，而非过拟合到特定骨骼的细节，从而在异构数据集之间产生自然的对齐效果。
-
-
 
 ## 核心方法与创新机理
 
@@ -100,8 +96,6 @@ $$ c(i, k) = D(P_{i:i+t(i)}, Q_{k:k+t(k)}) + w_1 \|J_{\text{start}} - J_k\|_2^2 
 
 这三个改变共同构成了一个极简但高度有效的无监督跨形态对齐框架，其有效性在跨物种（人-狗）设定下达到了 100% 的流形重叠率（|A|=32，Table 2），而基线方法在此设定下完全失效（重叠率 0.00%）。
 
-
-
 WalkTheDog 的核心目标是在一个统一的紧凑流形上，对齐来自不同骨骼形态的运动数据，同时保留时序与语义信息。整个系统由两条主线构成：**VQ-PAE 流形学习**与**频率缩放运动匹配**。
 
 ### VQ-PAE 流形学习
@@ -138,12 +132,8 @@ $$c(i, k) = D(P_{i:i+t(i)}, Q_{k:k+t(k)}) + w_1 \|J_{\text{start}} - J_k\|_2^2 +
 
 $$\mathcal { L } _ { \mathrm { p o s e } } = \mathbb { E } _ { ( \boldsymbol { p } _ { i } , \mathbf { Y } _ { i } ) \sim \mathcal { D } _ { k } } \| \mathbf { Y } _ { i } - M _ { k } ( \boldsymbol { p } _ { i } ) \| _ { 2 }$$
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l5_https_peizhuoli_github_io_walkthedog_papers_walk_the_dog_camera_ready_wi/figures/002_Figure_2.jpg]]
 *Figure 2: Architecture of VQ-PAE. Starting with a short motion sequence $\mathbf { X } \in \mathbb { R } ^ { J \times T }$ , the encoder learns an intermediate representation using convolution. The representation is fed into the timing and the amplitude branch for predicting the phase ??, the frequency ?? and the amplitude A of the pivot frame (rendered with mesh). A vector quantization (i.e. nearest neighbor search) is used in the amplitude branch to ensure the structure of the phase manifold. Note the codebook A is shared among multiple VQ-PAEs. We calculate the embedding P of the sequence assuming the frequency and amplitude stay constant in the sequence. The predicted phase manifold sequence is the...
-
-
 
 ### 3.1 相位流形（Phase Manifold）
 
@@ -214,8 +204,6 @@ $$c(i, k) = D(P_{i:i+t(i)}, Q_{k:k+t(k)}) + w_1 \|J_{\text{start}} - J_k\|_2^2 +
 
 该代价函数同时考虑了**相位流形距离**（语义一致性）、**姿态差异**（空间连续性）和**周期差异**（频率一致性），从而在跨形态匹配中既能对齐语义，又能自适应不同频率的运动节奏。
 
-
-
 ## 实验与关键发现
 
 ### 主结果：跨形态运动对齐
@@ -270,8 +258,6 @@ Figure 6 进一步揭示了相位流形的内部结构：在同一连通分量�
 2. **MOCHA 数据集的高误差原因**：分析指出风格化角色误差较高，但未提供误差是否集中于特定运动类型或特定关节的细粒度分析。
 3. **流形重叠率的计算方式**：Table 2 报告了 100% 与 0.00% 的极端值，但其统计方式（基于码字分配还是流形采样点）需要确认，以确保指标本身不会因码本容量变化而产生偏差。
 
-
-
 ## 定位与知识库关联
 
 ### 核心机制与理论锚点
@@ -313,8 +299,6 @@ $$c(i, k) = D(P_{i:i+t(i)}, Q_{k:k+t(k)}) + w_1 \|J_{\text{start}} - J_k\|_2^2 +
 3. **周期检测的鲁棒性**：频率缩放运动匹配依赖准确的逐帧频率预测 $f_k$，但论文未讨论在非周期性运动（如跌倒、转向过渡）上的频率预测稳定性，这可能是实际应用中的潜在失效模式。
 
 4. **与大规模运动生成模型的集成**：VQ-PAE 的离散码本天然适合作为运动 GPT 类模型的 tokenizer，但论文未探索将学习到的流形作为条件信号注入扩散模型或自回归模型的可能性，这可能是将该方法扩展到开放域运动生成的关键方向。
-
-
 
 ## 原文 PDF
 

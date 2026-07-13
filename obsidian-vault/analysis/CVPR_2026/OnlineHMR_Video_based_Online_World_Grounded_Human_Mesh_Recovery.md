@@ -151,7 +151,6 @@ OnlineHMR 采用**双分支在线推理架构**，将局部人体运动估计与
 
 训练阶段采用**滑动窗口学习**（Figure 3），将完整序列切分为重叠窗口进行监督，同时在窗口内施加**速度正则化损失** $\mathcal{L}_v$ 以惩罚相邻帧关节位置的剧烈变化，缓解推理时的时序抖动。模型在 BEDLAM、3DPW 和 H3.6M 数据集上联合训练，约 52K 迭代收敛，使用单张 Nvidia 80GB H100 GPU 完成。
 
-
 ![[assets/figures/papers/paper_list_l1032_https_arxiv_org_abs_2603_17355/figures/001_Figure_1.jpg]]
 *Figure 1: An in-the-wild example of our framework. Given a streaming monocular RGB video, our method leverages a two-branch inference to recover the world-grounded human motion in an online manner*
 
@@ -217,11 +216,6 @@ $$\mathbf{S}(i, f) = \left| \sum_{k=0}^{L-1} \mathbf{y}(k) w(k-i) e^{-j 2\pi f k
 
 其中 $w$ 为窗函数，$N_w$ 为窗口长度。通过计算预测序列与真值序列的频谱差异（Figure 8），可在时间-频率域定位抖动频段。收敛模型（52K 迭代）的频谱差异显著小于未收敛模型（1K 迭代），验证了训练过程对时序一致性的改善。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1032_https_arxiv_org_abs_2603_17355/figures/003_Figure_3.jpg]]
-*Figure 3: Sliding window learning pipeline. The input sequence is sliced to overlapping windows, learning spatial and temporal information fusion inside each window, and alleviate jitter effect through velocity regularization*
-
 ## 实验与关键发现
 
 ### 实验设置
@@ -274,9 +268,6 @@ Table 3 报告了世界坐标 HMR 方法的效率。OnlineHMR 的**平均延迟�
 
 Table 4 验证了速度正则化项 $\mathcal{L}_v$ 的作用。加入速度正则化后，3DPW 上的 Accel 从 8.6 降至 **6.4** mm/frame²，Jitter 指标从 28.1 降至 **19.5**，证明显式的帧间速度约束有效抑制了高频抖动。Figure 8 的频谱差异图进一步佐证：收敛模型（52K 迭代）与真值的频谱差异显著小于未充分训练的模型（1K 迭代），表明时间-频率域的对齐程度随训练改善。
 
-![[assets/figures/papers/paper_list_l1032_https_arxiv_org_abs_2603_17355/figures/011_Table_4.jpg]]
-*Table 4: The comparison of jittering effect w/ or w/o the velocity regularization*
-
 ![[assets/figures/papers/paper_list_l1032_https_arxiv_org_abs_2603_17355/figures/012_Figure_8.jpg]]
 *Figure 8: Difference spectrograms computed as GT-Pred, visualizing discrepancies in the time–frequency domain. The left figure corresponds to a model trained for 1K iterations, and the right for 52K iterations. Lower values (darker/closer to zero) indicate better alignment with the ground truth. The converged model (52K) exhibits substantially reduced differences*
 
@@ -284,15 +275,9 @@ Table 4 验证了速度正则化项 $\mathcal{L}_v$ 的作用。加入速度正�
 
 Table 7 消融了滑动窗口大小（SWS）对相机坐标指标的影响。窗口大小为 **4** 时取得最优 PA-MPJPE 和 MPJPE，但进一步增大窗口会导致 Accel 上升——更大的时序感受野虽能融合更多上下文，但也引入了过度平滑的风险，使模型对快速运动变化的响应变迟钝。
 
-![[assets/figures/papers/paper_list_l1032_https_arxiv_org_abs_2603_17355/figures/014_Table_7.jpg]]
-*Table 7: Ablation study on sliding window size (SWS)*
-
 #### SLAM 掩码策略
 
 Table 5 和 Table 8 分别从 SLAM 轨迹精度和世界坐标人体重建两个角度消融掩码策略。在 MASt3R-SLAM 上：
-
-![[assets/figures/papers/paper_list_l1032_https_arxiv_org_abs_2603_17355/figures/010_Table_5.jpg]]
-*Table 5: Comparison of ATE using different masking strategies for DROID-SLAM and MAST3R-SLAM. Lower is better*
 
 - **软掩码（Soft Mask）**：WA-MPJPE 为 93.5 mm，W-MPJPE 和 RTE 均最优。
 - **硬掩码（Hard Mask）**：WA-MPJPE 升至 112.6 mm，性能显著下降。
@@ -303,9 +288,6 @@ Table 5 和 Table 8 分别从 SLAM 轨迹精度和世界坐标人体重建两个
 #### EMA 校正
 
 Figure 10 的定性对比显示，启用 EMA 校正后相机轨迹和世界坐标系人体平移的抖动明显减少。EMA 通过对平移量施加指数移动平均和速度相关钳位，有效抑制了增量 SLAM 中高频噪声的累积。
-
-![[assets/figures/papers/paper_list_l1032_https_arxiv_org_abs_2603_17355/figures/016_Figure_10.jpg]]
-*Figure 10: Qualitative results w/ and w/o EMA correction on custom videos*
 
 #### 频谱域指标
 
@@ -322,8 +304,6 @@ Figure 11 展示了典型失败案例，主要集中于以下场景：
 5. **实时性瓶颈**：当前 3.3 FPS 受限于增量 MASt3R-SLAM 的计算开销，距离实时交互（>15 FPS）仍有差距。
 
 这些失败模式揭示了系统对 SLAM 前端质量的强依赖性，以及掩码策略在极端人体尺度下的脆弱性，为后续研究指明了改进方向。
-
-### 补充图表
 
 ## 定位与知识库关联
 

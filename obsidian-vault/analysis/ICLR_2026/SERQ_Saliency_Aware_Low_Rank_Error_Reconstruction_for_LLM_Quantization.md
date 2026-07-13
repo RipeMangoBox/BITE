@@ -57,8 +57,6 @@ claims:
 - 端到端GPU推理中，SERQ-MXFP4实现超过2倍的整体加速，峰值内存占用相对FP16降低约2.48倍。
 - 消融实验表明，仅对显著行进行误差重建相较于覆盖全矩阵，在相同秩预算下可提升1–4%精度；方法对校准数据规模和领域鲁棒。
 
-
-
 ### 大规模语言模型部署的效率瓶颈
 
 大规模语言模型（LLM）的推理成本已成为实际部署的核心约束。模型量化通过将浮点权重和激活映射到低位宽整数表示，能够显著压缩模型体积并加速推理。给定一个 $n$ 位量化方案，张量 $\pmb{X}$ 的量化过程可表述为：
@@ -92,8 +90,6 @@ $$\hat{\pmb{W}} = \mathrm{Q}(\pmb{W}) + \pmb{L}_1 \pmb{L}_2, \quad \pmb{L}_1 \pm
 SERQ 的核心洞察在于将这一矛盾转化为可离线解决的设计问题：**激活离群值的危害可以通过静态展平转嫁到权重上，而权重的显著性分布恰可指导低秩误差重建集中在少数关键行**。具体而言，通过 SmoothQuant 式的静态激活展平，将激活缩放因子离线融入权重矩阵，消除在线变换需求；随后，利用激活显著性识别最关键的权重行，仅对这些显著行的量化误差进行低秩重建，并使用单个量化后的低秩矩阵 $\pmb{R}$ 同时补偿激活离群值与权重显著性的量化误差。这一设计使得推理时仅需一个纯4位残差分支，无需在线变换或顺序计算。
 
 SERQ 在三个维度上区别于现有工作：（1）用**单个低秩矩阵**替代双因子结构，消除在线量化步骤；（2）将**显著性感知**引入误差重建，使有限的秩预算集中于关键行；（3）通过**离线权重置换**将行列重排传播至相邻层，完全消除推理时的动态重排序开销。这些设计使得 SERQ 能够在 W4A4 和 W4A8 设置下，以极低的延迟开销实现与 FP16 基线接近的精度。
-
-
 
 ## 核心方法与创新机理
 
@@ -162,11 +158,6 @@ SERQ 相对于基线的关键变化可归纳为四个维度：
 
 这些创新共同实现了 SERQ 的核心承诺：在 W4A4 设置下，以单个量化低秩矩阵同时补偿激活离群值与权重显著性的量化误差，且所有展平与置换操作均在离线完成，推理时无额外延迟。端到端 GPU 实测中，SERQ-MXFP4 实现超过 2 倍的整体加速，峰值内存占用相对 FP16 降低约 2.48 倍（Table 3）。
 
-
-
-![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_nFjj8NEBqv/figures/002_Figure_2.jpg]]
-*Figure 2: (a) Overall SERQ implementation. During calibration, saliency rows are determined via activation scaling, followed by weight row permutation. During inference, error reconstruction is performed through a residual path computed only on the salient components, alongside the main path. (b) Computation flow of a decoder layer. The merged row- and column-wise weight permutation enables offline preprocessing of both current weight rows and subsequent activation channels*
-
 SERQ 的整体流程围绕一个核心设计原则展开：**将激活离群值的危害通过静态展平转嫁到权重侧，再利用权重显著性分布指导低秩误差重建，最终用一个量化后的单残差矩阵恢复精度，且所有变换均在离线完成**。该框架包含三个顺序执行的模块，分别解决激活分布不均、量化误差补偿以及推理时重排开销三个瓶颈。
 
 ### Pipeline 总览
@@ -199,8 +190,6 @@ SERQ 的整体流程围绕一个核心设计原则展开：**将激活离群值�
 | 权重置换 | 无或推理时动态重排 | 离线行列置换并传播至相邻层 |
 
 这一框架使得 SERQ 在 W4A4 设置下首次实现了与旋转方法相当甚至更优的精度，同时将每层延迟开销控制在约 18.7%，显著低于双因子重建方案。
-
-
 
 ### 基础量化与线性层
 
@@ -246,8 +235,6 @@ $$\mathrm{Q}(\widehat{\pmb{X}}) \cdot \mathrm{Q}(\widehat{\pmb{W}}) \approx \wid
 
 为使显著行在推理时自然对齐，SERQ 在离线阶段完成行列置换。权重行按显著性重排，对应的列置换传播至前一层（如下投影层的行置换传播至上一层门控/上投影层的列），确保激活通道顺序与置换后的权重行匹配。所有线性层均避免推理时的动态重排序，完全消除在线开销。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈验证：SERQ 为何能在 W4A4 下显著优于双因子误差重建
@@ -263,19 +250,11 @@ $$\mathrm{Q}(\widehat{\pmb{X}}) \cdot \mathrm{Q}(\widehat{\pmb{W}}) \approx \wid
 
 **Table 2** 将 SERQ 与当前 SOTA 的 W4A4 旋转量化方法 **QuaRot**（Ashkboos et al., 2024）和 **SpinQuant**（Liu et al., 2025）进行了系统对比。在 LLaMA-2 7B 上，SERQ (GPTQ) 以 5.97 的困惑度优于 QuaRot 的 6.15 和 SpinQuant 的 6.0，同时在 0-shot 和 MMLU 准确率上均保持优势。更关键的是效率维度：SERQ 的每层延迟开销仅为 18.7%，低于旋转方法的额外开销。这一优势源于 SERQ 将所有展平与置换操作完全离线处理——缩放因子融入相邻层权重，行列置换在标定阶段预计算并传播至前一层（Figure 2b），推理时无需任何在线重排序或在线量化。
 
-![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_nFjj8NEBqv/figures/004_Table_2.jpg]]
-*Table 2: Comparison with W4A4 distribution flattening methods. Latency overhead is measured as the additional computation time per linear layer relative to 4-bit GEMM (See Appendix A.7)*
-
 **Table 9**（附录）进一步揭示了校准效率的显著差异：SERQ 的标定时间远低于需要学习旋转矩阵的 SpinQuant，同时保持精度优势。这一结果确立了 SERQ 作为训练无关 W4A4 方案中精度-效率 Pareto 前沿的地位。
 
 ### 端到端 GPU 推理：2 倍加速与 2.48 倍内存压缩
 
 **Table 3** 报告了 LLaMA-3 8B 在 2k 输入序列长度下的端到端 GPU 推理性能。SERQ-MXFP4 在所有批次大小（1/8/16/32）下均实现超过 2 倍的 TTFT（Time to First Token）加速，峰值内存占用相对 FP16 基线降低最多 2.48 倍。值得注意的是，在 batch size=1 的极小批量下，SERQ-MXFP4 的 TPOT（Time per Output Token）略高于纯 MXFP4 方案，这是单残差路径在极低计算密度场景下的固有开销，但总体加速比仍保持在 2.09 倍。
-
-![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_nFjj8NEBqv/figures/010_Table_3.jpg]]
-*Table 3: End-to-end GPU inference speed and memory measurements for LLaMA-3 8B. We report Time to First Token (TTFT), Time per Output Token (TPOT), and peak memory consumption. The input sequence length is fixed at 2k tokens for all measurements*
-
-![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_nFjj8NEBqv/figures/005_Table_3.jpg]]
 
 **Figure 3** 的 GPU 延迟分析进一步表明，SERQ 的残差路径在较大行尺寸矩阵上尤为高效——这是因为单矩阵乘法相比双因子的顺序窄矩阵乘更好地利用了 GPU 的并行计算能力。SERQ 的延迟开销比 L2QER 的 LoRA 路径降低最多 4.5 倍，这在附录 **Table 10** 的线性层延迟测量中得到了定量验证。
 
@@ -296,9 +275,6 @@ $$\mathrm{Q}(\widehat{\pmb{X}}) \cdot \mathrm{Q}(\widehat{\pmb{W}}) \approx \wid
 
 **校准数据的鲁棒性（Table 5）**：SERQ 对校准数据集的大小（512/128/32 样本）和领域（WikiText/Pile）表现出高度鲁棒性，困惑度变化极小。这表明显著性行的识别主要依赖于激活分布的统计特性，而非特定领域的语义内容。
 
-![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_nFjj8NEBqv/figures/012_Table_5.jpg]]
-*Table 5: Effect of calibration data on perplexity. layer. As a result, SERQ achieves the best perplexity score while delivering comparable speedups to rotation-based methods, with only about one percent additional latency overhead*
-
 **静态激活展平（SAF）的贡献（Table 7）**：在小模型上，SAF 的效果尤为显著——Qwen-2.5 3B 在 W4A4 设置下，SAF 将困惑度从 10.83 降至 9.57。这是因为小模型的激活离群值相对更集中，展平操作将离群值的危害从激活侧转嫁到权重侧后，显著行的误差重建能更有效地补偿精度损失。
 
 ![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_nFjj8NEBqv/figures/014_Table_7.jpg]]
@@ -307,9 +283,6 @@ $$\mathrm{Q}(\widehat{\pmb{X}}) \cdot \mathrm{Q}(\widehat{\pmb{W}}) \approx \wid
 ### 生成任务评估
 
 **Table 6** 展示了 SERQ 在 GSM8K（数学推理）和 LongBench（长文本理解）上的生成质量。在 W4A8 和 W4A4 设置下，SERQ 全面超过 L2QER 与 LLM.int4()，且 W4A8 下的表现已接近 FP16 基线。这验证了 SERQ 的精度恢复不仅限于困惑度指标，在需要连贯推理和长程依赖的下游任务中同样有效。
-
-![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_nFjj8NEBqv/figures/013_Table_6.jpg]]
-*Table 6: Generation task evaluation with GSM8K and LongBench datasets*
 
 ### 量化信号质量分析
 
@@ -323,8 +296,6 @@ $$\mathrm{Q}(\widehat{\pmb{X}}) \cdot \mathrm{Q}(\widehat{\pmb{W}}) \approx \wid
 1. **极小批量下的 TPOT 开销**：Table 3 显示 batch size=1 时 SERQ-MXFP4 的 TPOT 略高于纯 MXFP4，单残差路径在极低计算密度下的延迟优势有限。
 2. **领域偏移鲁棒性未验证**：显著性行的确定依赖于校准数据集的激活统计，极端领域偏移下显著性分布可能发生变化，该场景的鲁棒性在文中未讨论。
 3. **非线形层适用性**：当前方法聚焦于线性层的量化误差重建，对注意力机制中 softmax 等非线性算子的推广尚未探索。
-
-
 
 ## 定位与知识库关联
 
@@ -374,8 +345,6 @@ SERQ 本身不限定权重量化算法，与 **GPTQ**（Frantar et al., ICML 202
 1. **算子泛化性**：SERQ当前仅应用于线性层，是否可直接推广至注意力机制中的QKV投影或注意力分数计算，仍需验证。
 2. **更大规模模型**：实验覆盖至LLaMA-2 70B，但在超大规模模型（>70B）或多模态LLM中，单低秩残差路径的秩预算是否足够，以及显著性行识别策略是否需要调整，尚无定论。
 3. **训练后量化的极限**：SERQ在W4A4下已接近FP16基线的生成质量（Table 6中GSM8K和LongBench结果），但进一步提升至W3A3或更低精度时，仅靠低秩误差重建是否仍有效，仍需探索。
-
-
 
 ## 原文 PDF
 

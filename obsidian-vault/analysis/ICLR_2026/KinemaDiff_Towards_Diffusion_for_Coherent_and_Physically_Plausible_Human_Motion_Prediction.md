@@ -56,8 +56,6 @@ claims:
 
 需要指出的是，该方法在追求高物理真实度时，生成多样性（APD）略低于不强调物理约束的模型（如 **MotionDiff**, Wei et al., AAAI 2023），这属于真实度与多样性之间的可控权衡。此外，当前验证仅限于受控室内场景（Human3.6M）与多数据集汇集场景（AMASS），在遮挡、多人交互等复杂条件下的泛化能力尚待检验。
 
-
-
 人体运动预测是计算机视觉与具身智能中的核心任务，其目标是根据观测到的历史姿态序列，生成未来一段时间的合理运动轨迹。该任务在自动驾驶、人机交互、运动分析和虚拟角色动画等领域具有广泛的应用前景。然而，人体运动的高维性、时空耦合性以及物理约束的隐式性，使得生成既准确又物理合理的长期运动序列成为一个极具挑战性的问题。
 
 近年来，扩散模型在图像和视频生成领域取得了显著成功，其通过逐步去噪生成高质量样本的能力也被引入到人体运动预测中。以 **MotionDiff**（Wei et al., AAAI 2023）为代表的早期工作建立了二阶段扩散运动预测框架，**HumanMAC**（Chen et al., ICCV 2023）则通过掩码补全简化了训练流程。在此基础上，**CoMusion**（Sun & Chowdhary, ECCV 2024）在 DCT 空间使用图卷积网络捕获时空依赖，取得了当时最优的生成质量。**BeLFusion**（Barquero et al., ICCV 2023）则探索了基于 VAE 潜在空间的扩散方法，并将物理一致性检验作为后处理步骤。
@@ -69,8 +67,6 @@ claims:
 上述两个缺陷——均匀噪声与缺失结构约束——并非孤立存在，而是相互耦合的：均匀噪声破坏了运动学上合理的关节协同模式，而缺乏结构约束则使得去噪过程无法纠正由此产生的骨骼变形，两者共同导致生成运动的物理可信度下降。
 
 针对这些问题，本文提出 **KinemaDiff**，一个从扩散过程内部重塑人体运动生成的新框架。其核心动机在于：**将人体骨骼结构和关节特异性运动动力学直接嵌入扩散过程**，而非将其视为后处理或外部约束。具体而言，KinemaDiff 通过两个关键模块实现这一目标：（1）**联合自适应噪声生成器**，根据关节索引和历史运动轨迹学习每个关节的实例化噪声方差，使噪声注入与关节的运动学自由度相匹配；（2）**结构对齐正则化器**，在每一步去噪过程中强制预测的骨骼长度与历史观测的平均骨骼长度保持一致，从源头上消除骨骼变形。通过这种“噪声异质化 + 结构逐步骤约束”的双重机制，KinemaDiff 旨在同时提升运动多样性和物理合理性，实现更逼真的人体运动生成。
-
-
 
 ## 核心方法与创新机理
 
@@ -112,8 +108,6 @@ $$\mathcal { L } _ { \mathrm { a l i g n } } = \frac { 1 } { | \mathcal { E } | 
 
 消融实验（Table 3）揭示了两个模块的协同关系：仅使用联合自适应噪声（Encoder+J-Noise）时，FID 为 0.088；加入结构对齐正则化后，FID 进一步降至 0.083。反过来，若移除结构对齐而仅保留自适应噪声，FID 急剧恶化至 0.177。这表明自适应噪声主要贡献于运动多样性和关节级建模精度，而结构对齐正则化是物理真实性的核心保障——两者并非独立改进，而是在“多样性-真实性”轴上形成互补。
 
-
-
 ![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_uxTQeKAUh5/figures/003_Figure_3.jpg]]
 *Figure 3: The overview of our proposed Kinemadiff. (a): Our Joint-adaptive noise generator. We learn joint-adaptive noise from the historical human joints and add it to the future human motions. (b): Initial motion reconstruction. The future human motion with injected noise is processed through a self-attention mechanism, which generates an initial prediction in the absence of external conditioning. (c): Structure-Aligned Regularizer. The initial prediction is concatenated with the motion observations and then processed in the frequency domain through a frequency-aware GCN, and subsequently transformed back to the temporal domain for structural alignment*
 
@@ -141,8 +135,6 @@ KinemaDiff 的整体 pipeline 围绕一个核心洞察构建：**在扩散过程
 推理时采用 10 步 DDPM 采样。每一步的去噪过程为：从当前含噪运动 $y_t$ 出发，经初始编码器得到 $\hat{y}_0$，再经结构对齐正则化器施加骨骼长度约束，最后通过逆向扩散步更新得到 $y_{t-1}$。两个核心模块——联合自适应噪声生成器和结构对齐正则化器——均内嵌于扩散步内，而非作为后处理步骤。
 
 消融实验（Table 3）验证了这一协同设计的必要性：去除结构对齐正则化器后，FID 从 0.083 急剧升至 0.177，ADE/FDE 也明显恶化；去除联合自适应噪声则导致多样性下降和预测精度损失。全模型在 Human3.6M 上取得了 ADE 0.331、FDE 0.449、FID 0.083 的最优结果。
-
-
 
 ### 扩散过程基础
 
@@ -201,8 +193,6 @@ $$\mathcal{L}_{\mathrm{align}} = \frac{1}{|\mathcal{E}|} \sum_{(i,j) \in \mathca
 $$\mathcal{L}_{\mathrm{total}} = \alpha \cdot \mathcal{L}_{\mathrm{rec}} + \beta \cdot \mathcal{L}_{\mathrm{align}} \tag{8}$$
 
 其中 $\mathcal{L}_{\mathrm{rec}}$ 为预测运动与真实运动之间的重建损失。消融实验（Table 3）验证了两个模块的独立贡献：移除结构对齐正则化器使 FID 从 0.083 飙升至 0.177，而移除联合自适应噪声生成器则导致 ADE 和 FDE 显著恶化，证实了两者在提升准确度和物理真实性方面的互补作用。
-
-
 
 ## 实验与关键发现
 
@@ -275,15 +265,9 @@ KinemaDiff 在 Human3.6M 数据集上与 GAN 类、VAE 类及扩散类共 13 种
 
 表 10 展示了学习到的各关节噪声尺度：腕部、脚部等动态关节获得更大的噪声幅度，与运动学自由度高度一致。表 11 进一步验证了这一分配的必要性——若反转噪声分配（动态关节小噪声、静态关节大噪声），ADE 退化至 0.349、FID 恶化至 0.115，证实了该机制并非简单的噪声幅度调节，而是对关节运动特性的精准建模。
 
-![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_uxTQeKAUh5/figures/024_Table_10.jpg]]
-*Table 10: The Learned Noise Scale per Joint in different noise settings on Human3.6M*
-
 #### 结构约束的施加时机
 
 表 14 对比了在不同去噪阶段施加骨骼长度约束的效果：
-
-![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_uxTQeKAUh5/figures/030_Table_14.jpg]]
-*Table 14: Comparison with Late-Stage Constraints*
 
 | 约束时机 | Stretch ↓ | ADE ↓ | FDE ↓ | FID ↓ |
 |----------|-----------|-------|-------|-------|
@@ -300,9 +284,6 @@ KinemaDiff 在 Human3.6M 数据集上与 GAN 类、VAE 类及扩散类共 13 种
 - KinemaDiff 的**肢体拉伸**（Limb Stretch）为 2.42，远低于 **SkeletonDiffusion**（Curreli et al., CVPR 2025）的 3.90。
 - 额外引入**帧间骨骼长度抖动损失**（Jitter Loss）可将肢体抖动从 0.45 降至 0.28，且不损害主要指标。
 
-![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_uxTQeKAUh5/figures/012_Table_5.jpg]]
-*Table 5: Comparison of physical realism metrics on Human3.6M*
-
 ---
 
 ### 定性分析
@@ -316,19 +297,6 @@ KinemaDiff 在 Human3.6M 数据集上与 GAN 类、VAE 类及扩散类共 13 种
 1. **多样性-真实度权衡**：KinemaDiff 的 APD（6.912）低于不强调物理约束的方法（如 MotionDiff 的 15.353）。作者认为这是可接受的取舍，因为高多样性方法常伴随大量物理不合理样本。
 2. **验证场景有限**：当前仅在 Human3.6M（室内受控环境）和 AMASS（多数据集汇集）上验证，尚未在极端遮挡或多人交互等复杂场景中评估。
 3. **扩散步数敏感**：图 4 的消融显示模型在 10 步时达到最佳性能，步数过少或过多均会导致指标下降，表明该配置需针对具体场景调优。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_uxTQeKAUh5/figures/013_Table_6.jpg]]
-*Table 6: Effect of different loss functions in Structure-Aligned Regularizer*
-
-![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_uxTQeKAUh5/figures/021_Table_7.jpg]]
-*Table 7: Evaluation metrics used for motion prediction*
-
-![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_uxTQeKAUh5/figures/023_Table_9.jpg]]
-*Table 9: Comparison with Standard Bone-Length Constraints*
-
-
 
 ## 定位与知识库关联
 
@@ -377,8 +345,6 @@ KinemaDiff 的关键跃迁在于同时解决两个因果旋钮——**噪声注�
 3. **多模态条件与物理约束的融合。** 当前方法仅以历史运动为条件。当引入文本、音频等额外模态时，结构对齐正则化器如何与跨模态信号协同工作，是一个未探索的方向。
 
 4. **物理合理性指标的标准化。** 论文使用了骨骼拉伸（Limb Stretch）和骨骼抖动（Limb Jitter）作为物理合理性指标，但这些指标尚未成为社区标准。建立统一的物理合理性评估体系，对于推动该方向的发展具有方法论意义。
-
-
 
 ## 原文 PDF
 

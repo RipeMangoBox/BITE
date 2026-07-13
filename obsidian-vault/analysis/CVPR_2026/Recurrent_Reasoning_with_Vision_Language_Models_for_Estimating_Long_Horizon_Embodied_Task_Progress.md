@@ -78,15 +78,11 @@ R²VLM 的核心贡献在于将“循环更新思维链”作为**因果调节�
 
 > **注意**：本文的发表信息（会议/期刊、年份）在分析材料中未提供，需手动核实。
 
-
-
 长周期具身任务的执行过程往往持续数分钟甚至更长，智能体需要依次完成多个子步骤才能达成最终目标。准确估计任务进度——即当前时刻已完成任务的比例——对于监控执行状态、及时纠正异常行为以及提供主动辅助至关重要。然而，这一任务面临两个核心挑战：一是长视频流中的复杂时间依赖关系难以建模，二是实际部署场景对计算效率与实时性有严格要求。
 
 现有方法大致可分为两类。一类基于预训练的图像或文本编码器，通过计算当前观察与目标状态的特征距离来表征进度，例如 **LIV** 方法。这类方法缺乏对任务结构的显式建模，难以捕捉跨步骤的逻辑依赖。另一类则借助视觉-语言模型（VLMs）的视频理解能力，将完整长视频输入模型进行端到端推理，如 **GVL-SFT** 通过微调 Flamingo 作为成功检测器提供稀疏二进制反馈，**ROVER** 则利用提示策略和推理轨迹进行进度估计。这些方法虽然利用了 VLMs 的语义理解优势，但存在两个明显瓶颈：**（1）忽略了 VLMs 的复杂推理潜力**，仅将其视为视频编码器或简单分类器，未能充分发挥模型对任务结构的分解与推理能力；**（2）处理完整长视频轨迹会带来巨大的计算和时间开销**，随着视频时长增长，推理成本线性甚至超线性增加，不利于实际部署。
 
 上述瓶颈的根源在于，现有方法将进度估计视为一次性前馈映射：要么从单帧或短片段直接回归进度值，要么将整个历史视频压缩后输入模型。这种范式无法在保持全局任务上下文的同时实现高效增量推理。本文的核心动机正是打破这一范式——**引入一个不断进化的思维链（Chain of Thought, CoT）作为全局记忆载体**，记录任务分解、关键步骤及其完成状态，并在每一轮推理中仅输入当前视频片段与历史思维链进行循环更新。这一设计既能避免重复处理长视频的冗余计算，又能通过思维链保持对复杂时间依赖关系的推理能力，从而生成准确且可解释的进度估计。
-
-
 
 ## 核心方法与创新机理
 
@@ -129,8 +125,6 @@ R²VLM（Recurrent Reasoning Vision-Language Model）的核心创新在于将进
 
 Figure 4的消融实验直接验证了这一设计优势：在视频时长增加时，使用完整视频输入的变体不仅MAE持续恶化，推理时间也线性攀升；而采用视频片段+历史思维链的R²VLM保持恒定推理时间，且MAE显著更低。这证明思维链作为压缩的全局上下文表示，有效替代了对完整历史视频的重复处理。
 
-
-
 R²VLM 将长周期具身任务进度估计重新定义为一种**循环推理过程**，其核心设计在于避免一次性处理完整长视频，而是以流式局部视频片段为输入，通过不断演化的思维链（Chain of Thought, CoT）保持全局任务上下文。整体框架由三个关键模块串联而成：**流式视频片段化**、**多轮循环推理**和**两阶段训练策略**。
 
 ### 1. 流式输入与状态维护
@@ -172,12 +166,8 @@ $$R_{\mathrm{overall}} = R_{\mathrm{fmt}} \cdot (R_{\mathrm{bin}} \cdot R_{\math
 - **计算效率**：推理时间不随视频长度线性增长，消融实验证实片段输入在长视频上 MAE 更低且推理时间恒定（Figure 4）。
 - **可解释性**：思维链显式记录了任务分解、步骤完成状态和进度推导过程，使进度估计不再是一个黑箱数值，而是一个可追溯的推理链条。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2411_https_arxiv_org_abs_2603_17312/figures/002_Figure_2.jpg]]
 *Figure 2: Framework of*
-
-
 
 ### 多轮循环推理框架
 
@@ -236,16 +226,6 @@ $$R_{\mathrm{overall}} = R_{\mathrm{fmt}} \cdot (R_{\mathrm{bin}} \cdot R_{\math
 1. **有监督微调（SFT）**：使用自动化管道生成的思维链数据进行监督学习，使模型初步掌握循环推理和进度估计能力。
 2. **多轮强化学习（RL）**：采用**近端策略优化（PPO）**而非GRPO进行多轮训练。选择PPO的原因在于其独立计算每个样本的优势函数，而GRPO需要为同一样本生成多个候选响应，在循环推理的多轮设置中难以高效实现。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2411_https_arxiv_org_abs_2603_17312/figures/001_Figure_1.jpg]]
-*Figure 1: R2VLM performs multi-turn recurrent reasoning. It takes a video snippet and the CoT from the previous iteration as input, and outputs the updated CoT and a progress estimation*
-
-![[assets/figures/papers/paper_list_l2411_https_arxiv_org_abs_2603_17312/figures/003_Figure_3.jpg]]
-*Figure 3: An illustration of the CoT structure and its update process in recurrent reasoning*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -282,8 +262,6 @@ R²VLM的进度估计能力在两个下游任务中得到了验证：
 
 - **奖励建模（表4）。** 基于预训练SPRINT模型，利用R²VLM提供的进度信号进行在线强化学习，在奖励建模任务上取得了性能增益，进一步验证了进度估计作为密集反馈信号在具身任务中的实用价值。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2411_https_arxiv_org_abs_2603_17312/figures/004_Table_1.jpg]]
 *Table 1: We evaluated our three model variants and all baselines on the Alfred and Ego4D benchmarks*
 
@@ -298,20 +276,6 @@ R²VLM的进度估计能力在两个下游任务中得到了验证：
 
 ![[assets/figures/papers/paper_list_l2411_https_arxiv_org_abs_2603_17312/figures/009_Table_4.jpg]]
 *Table 4: Performance on the reward modeling task. We perform online reinforcement learning based on the pretrained SPRINT model on the*
-
-![[assets/figures/papers/paper_list_l2411_https_arxiv_org_abs_2603_17312/figures/014_Figure_7.jpg]]
-*Figure 7: We visualize the model’s progress estimation on four tasks, where key steps trigger sharp progress increases, and irrelevant steps yield zero progress increments*
-
-![[assets/figures/papers/paper_list_l2411_https_arxiv_org_abs_2603_17312/figures/013_Table_7.jpg]]
-*Table 7: Cross-domain generalization evaluation of*
-
-![[assets/figures/papers/paper_list_l2411_https_arxiv_org_abs_2603_17312/figures/011_Table_5.jpg]]
-*Table 5: Detailed statistics information of two generated datasets*
-
-![[assets/figures/papers/paper_list_l2411_https_arxiv_org_abs_2603_17312/figures/010_Figure_6.jpg]]
-*Figure 6: Demonstration of R2VLM as a proactive assistant. The monitoring task is “cutting a carrot on a chopping board”*
-
-
 
 ## 定位与知识库关联
 
@@ -373,8 +337,6 @@ R²VLM采用两阶段训练策略——有监督微调（SFT）后接多轮强�
 - **弱监督与自监督扩展**：能否在减少对精确进度标注依赖的前提下，利用任务完成信号或自然语言指令等弱监督源训练循环推理模型？这将显著降低方法在新任务上的部署门槛。
 
 - **与策略学习的深度耦合**：R²VLM已初步展示了作为策略学习奖励模型和主动辅助工具的潜力（Table 3、Table 4、Figure 6），但进度估计与策略优化的联合训练框架仍有探索空间——模型能否在估计进度的同时，预测达成剩余进度所需的最优动作序列？
-
-
 
 ## 原文 PDF
 

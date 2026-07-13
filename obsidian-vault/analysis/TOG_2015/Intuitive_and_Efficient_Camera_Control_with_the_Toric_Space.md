@@ -61,8 +61,6 @@ claims:
 
 **局限性**：当前方法原生仅支持两个目标，未处理遮挡可见性约束，且插值路径无法保持线性推轨运动。这些构成了后续研究的主要开放问题。
 
-
-
 在三维虚拟环境（如电影预演、游戏关卡编辑、建筑漫游）中，相机控制是创作者与场景交互的核心环节。一个理想的相机系统需要同时满足两类需求：**自动视角计算**——根据给定的视觉属性约束（如目标在屏幕上的位置、大小、视角角度）求解最优相机位姿；以及**交互式操纵**——让用户能直观、实时地调整画面构图。然而，这两类任务在传统方法中长期面临一个共同的瓶颈：**搜索空间的高维度与视觉属性表达之间的断层**。
 
 具体而言，一个虚拟相机的完整配置包含7个自由度（7-DOF）：三维位置、三维朝向（通常用欧拉角或四元数表示）以及视场角（field of view）。当用户或自动化算法需要满足“目标A位于画面左三分之一处，目标B占据画面约20%面积，且从侧面约45°观察”这类高层视觉约束时，7-DOF空间中的搜索本质上是一个代价高昂的逆向问题。现有方法主要沿两条路径应对这一挑战：
@@ -76,8 +74,6 @@ claims:
 本文的核心动机正是基于这一缺口：**能否构建一个统一的表示空间，使得所有关键的视觉属性都能在其中被代数化地表达为区间约束，从而将相机控制问题转化为确定性的可行域剪枝与搜索？** 这一问题的肯定回答将带来三重收益：（1）自动视角计算可以从随机优化转变为高效、可预测的确定性求解；（2）交互式操纵可以从低层相机变换升级为直接在屏幕空间拖拽视觉属性的直观控件；（3）视角插值可以在保持构图约束的前提下进行代数化路径规划。
 
 本文提出的**Toric空间（Toric Space）**正是对这一问题的系统回应。它将Lino & Christie的二维流形推广为一个三维搜索空间，用角度三元组 $(\alpha, \theta, \varphi)$ 参数化相机位置，并在此基础上代数推导出朝向的确定性计算方式。更重要的是，Toric空间使得**构图、距离、屏幕大小、视角角度**等视觉属性可以被表达为该空间中的角度区间或二维子集——这为后续的区间剪枝搜索和屏幕空间操纵器奠定了理论基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -114,8 +110,6 @@ Toric空间是**Lino & Christie**（SCA 2012）提出的二维Toric流形的三�
 
 Toric空间目前原生仅支持两个目标，多目标场景需通过目标切换或两两组合间接处理。可见性约束（遮挡）未被整合到区间剪枝框架中。用户评估仅与MotionBuilder比较，未与**Gleicher & Witkin**（1992）的Through-The-Lens等经典屏幕空间技术进行定量对比。这些方向仍需进一步验证。
 
-
-
 Toric空间相机控制系统围绕一个核心降维表示构建，将涉及两个目标的虚拟相机问题从传统的7自由度优化空间压缩至4自由度搜索空间。整个pipeline由五个功能模块串联而成，形成“参数化—约束表达—自动求解—交互操纵—轨迹插值”的完整闭环。
 
 **Toric空间参数化**是整个框架的数学基础。给定场景中的两个目标A和B，相机位置被编码为三元组 `(α, θ, φ)`——α控制相机到两目标的夹角（生成相机可定位的流形面），θ定义绕目标的水平角，φ定义垂直角。通过四元数公式 `C = A + (q_φ · q_θ · AB) · sin(α + θ/2)` 可将Toric坐标直接转换为笛卡尔位置，而相机朝向则通过三步代数过程确定：先计算look-at方向四元数，再施加屏幕定位变换，最后叠加横滚角（公式1: `q = q_ψ · q_look · (q_trans)⁻¹`）。这一参数化将搜索维度从7-DOF（位置3+朝向3+视场角1）降至4-DOF（Toric参数3+视场角1）（Section 1）。
@@ -132,18 +126,8 @@ Toric空间相机控制系统围绕一个核心降维表示构建，将涉及两
 
 **局限性说明**：当前框架原生仅支持最多两个目标，多目标场景需通过切换目标对或提取点对间接处理；未集成可见性约束（遮挡检查仅在求解器中部分实现，操纵与插值过程不检查视线阻挡）；插值方法适用于弧线绕拍等最小化画面变化的运动，无法保持线性推轨路径；目标大小计算依赖包围球近似，无法处理精确物体形状。这些限制在原文中已明确标注，后续研究可沿可见性集成、多目标扩展、直线路径支持等方向推进。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l10_https_doi_org_10_1145_2766965/figures/012_Figure_11.jpg]]
 *Figure 11: Overview of the interpolation pipeline, between two key viewpoints. (a)(b) The user drafts two viewpoints at times t0 and t1. (c) (S)he controls interpolation curves over the camera motion and re-framing along time; (s)he is required to handle few controllers, encompassing the duration of enforcement, as well as ease-in/easeout values controlling the speed of the camera. (d) For each key framing, we compute a camera path (τ and τ 0 respectively) that smoothly moves the camera between key positions while enforcing this framing. We finally interpolate both paths (in terms of the camera position and orientation) by relying on the interpolation curves*
-
-![[assets/figures/papers/paper_list_l10_https_doi_org_10_1145_2766965/figures/006_Figure_5.jpg]]
-*Figure 5: Computation of the vantage function in the space ( $\beta , \varphi$ ) in the case of an ellipse. The resolution is done through the intersection of the ellipse with a circle of radius r = $\tan ( \beta$ ) . This resolution is similar in case of a parabola or a hyperbola
-
-![[assets/figures/papers/paper_list_l10_https_doi_org_10_1145_2766965/figures/011_Figure_10.jpg]]
-*Figure 10: Composition-based interpolation of the camera position around a pair of targets ( A , B ) . For two key camera positions and a key framing to enforce on a pair of targets, we algebraically interpolate the camera position as a path which provides linear changes over their on-screen appearance. The path is defined through a function $F _ { ( A , B ) }$ ( x ) such that any intermediate position ( $\mathrm { i . e . }$ f o r \ x $\in$ ] 0 ; 1 [ ) is computed by relying on a linear interpolation of all visual properties of the pair of targets
-
-
 
 ### Toric空间参数化
 
@@ -231,8 +215,6 @@ $$q(t) = q_{(A,B)} (1 - g_f(t)) + q_{(A',B')} g_f(t)$$
 
 该代数方法在45秒序列（7个关键视角）上总计算时间仅91ms，80秒序列（15个关键视角）上仅160ms，满足实时性能（约2ms/秒，30fps下）。
 
-
-
 ## 实验与关键发现
 
 ### 自动视角计算：与随机优化方法的定量对比
@@ -274,12 +256,7 @@ Toric空间的确定性区间剪枝算法在计算效率与属性满足度上均
 
 这些失败模式指向了Toric空间的适用边界：在需要精确可见性保证、线性相机路径、或同时处理三个以上目标的场景中，当前方法需要补充机制或与其它技术结合使用。
 
-### 补充图表
 
-![[assets/figures/papers/paper_list_l10_https_doi_org_10_1145_2766965/figures/004_Figure_4.jpg]]
-*Figure 4: Solution sets (in white) corresponding to all camera positions within a range of distances to targets A and B. (a) Solution pairs ( $\alpha , \theta$ ) for a distance to A within [5, 10]; each red curve corresponds to a bounding value of the interval of distance. (b) Solution pairs (α, θ) for a distance to B within [4, 8]; each green curve corresponds to a bounding value of the interval of distance
-
-![[assets/figures/papers/paper_list_l10_https_doi_org_10_1145_2766965/figures/005_Figure_6.jpg]]
 *Figure 6: Solution range of a vantage angle, for a given view d i - rection (vantage vector) and an accepted angular deviation $\gamma$ . In these examples, the angle between the line (AB) and the vantage vector is ${ \frac { \pi } { 4 } }$ . . In each case, the white area represents the set of pairs ( $\theta , \varphi$ ) satisfying the vantage angle constraint
 
 ![[assets/figures/papers/paper_list_l10_https_doi_org_10_1145_2766965/figures/008_Figure.jpg]]
@@ -288,13 +265,8 @@ Toric空间的确定性区间剪枝算法在计算效率与属性满足度上均
 ![[assets/figures/papers/paper_list_l10_https_doi_org_10_1145_2766965/figures/009_Figure_7.jpg]]
 *Figure 7: Our screen-space manipulators. (a) the Position manipulator enables repositioning one target on the screen while the other target’s on-screen position is maintained; (b) the Size manipulator enables resizing one target while both targets’ on-screen positions are maintained; (c) the Vantage manipulator enables changing the view angle around one target, while targets’ on-screen positions are maintained as much as possible; (d) the Vertigo manipulator enables changing the camera’s field of view while both targets’ on-screen positions are exactly maintained. (a) Novice user of 3D modelers*
 
-![[assets/figures/papers/paper_list_l10_https_doi_org_10_1145_2766965/figures/002_Figure_3.jpg]]
-*Figure 3: Constraining the projection of targets A and B in onscreen convex shapes s A and sB reduces the domain of variable α in the Toric space. The set of cameras which satisfy the framing constraint (white area) is then given by a horizontal strip $\alpha \in [ \alpha _ { \operatorname* { m i n } } , \alpha _ { \operatorname* { m a x } }$ ] in the plane ( $\theta , \alpha$ )
-
 ![[assets/figures/papers/paper_list_l10_https_doi_org_10_1145_2766965/figures/010_Figure_8.jpg]]
 *Figure 8: Evolution of the distance from the user’s manipulated viewpoint to a reference viewpoint, for a novice user and an expert user of MotionBuilder (both displayed in red). The distance obtained using our tool is displayed in blue. The manipulation time is in seconds. Figure 9: Mean manipulation time (in seconds) required by the participants to reproduce a viewpoint using our manipulators (blue) compared to using the classical interaction of MotionBuilder (red)*
-
-
 
 ## 定位与知识库关联
 
@@ -358,8 +330,6 @@ $$d_{\varphi} = 2 \sqrt[3]{N/2}, \quad d_{\theta} = 4 \sqrt[3]{N/2}, \quad d_{\a
 5. **与其他屏幕空间技术的定量比较**：Toric 屏幕操作器与经典的 Through-The-Lens（Gleicher & Witkin 1992）等基于屏幕的相机控制技术在精度和易用性上的定量比较仍有待开展。
 
 6. **动态场景扩展**：区间剪枝算法能否扩展到包含动态目标（移动角色）的场景，以实现实时相机规划？这需要处理目标运动导致的 Toric 空间约束动态变化问题。
-
-
 
 ## 原文 PDF
 

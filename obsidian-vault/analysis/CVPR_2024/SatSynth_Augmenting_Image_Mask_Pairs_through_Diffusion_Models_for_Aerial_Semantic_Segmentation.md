@@ -56,8 +56,6 @@ claims:
 
 该方法在方法谱系上定位于**生成式数据增强**，区别于仅生成图像（如 DDPM）或分别生成图像与掩码（如 SemGAN）的路线，亦不同于基于判别式扩散模型直接预测分割掩码的方案（如 **SegDiff**, Amit et al., CVPR 2021）。与 Cutout、CutMix、Copy-Paste 等经典增强策略相比，SatSynth 带来的分割精度提升更为显著（Table 5）。当前方案的主要局限在于高分辨率生成（>256×256）仍面临训练不稳定和计算开销大的挑战，且尚未在变化检测等更广泛的地球观测任务上验证其通用性。
 
-
-
 遥感图像的语义分割是地球观测领域的核心任务之一，广泛应用于城市规划、灾害评估、环境监测等场景。然而，高精度的语义分割模型通常依赖于大规模、高质量的逐像素标注数据。对于卫星和航空图像而言，获取此类标注的成本极高——不仅需要领域专家的参与，还面临地理空间覆盖范围广、地物类别多样、成像条件多变等挑战。这一标注瓶颈直接导致可用训练数据稀缺，严重制约了分割模型的泛化能力和实际部署效果。
 
 传统的数据增强策略，如随机翻转、旋转、缩放、颜色抖动等，虽然能在一定程度上缓解过拟合，但其本质是对现有样本的几何或光度变换，无法引入真正新颖的场景组合、地物布局和尺度变化。对于卫星图像中复杂多样的城市场景、农田纹理、水域边界等，这类浅层变换所能提供的多样性极为有限。因此，如何在有限标注的前提下，生成具有足够多样性和真实性的新训练样本，成为提升遥感分割性能的关键突破口。
@@ -69,8 +67,6 @@ claims:
 **挑战二：如何在有限计算资源下生成高分辨率、语义连贯的卫星图像？** 直接在高分辨率（如 256×256 或更高）上训练扩散模型面临训练不稳定、计算开销巨大、生成质量下降等问题。卫星图像中地物的精细结构和多尺度特征对分辨率尤为敏感，低质量生成将直接损害下游分割性能。
 
 针对上述瓶颈，本文提出 **SatSynth**——一种基于扩散模型的联合数据增强框架，其核心动机在于：**通过学习图像与语义标签的联合分布 $p(\mathbf{x}, \mathbf{y})$，直接从分布中采样全新的（图像，掩码）训练对，作为数据扩充手段注入下游分割训练**。该方法的关键洞察是将离散语义标签编码到比特空间（binary embedding），使得扩散模型能够将图像与掩码视为统一的连续信号进行联合建模；同时采用两阶段生成策略（低分辨率扩散 + 条件超分辨率），解耦语义布局的全局一致性与细节纹理的局部恢复，从而在有限标注和计算预算下显著提升分割性能。
-
-
 
 ## 核心方法与创新机理
 
@@ -107,10 +103,6 @@ $$\mathcal{G}_{\text{SR}} : \mathbb{R}^{L} \times \mathbb{R}^{H \times W \times 
 综合而言，SatSynth 的创新链条为：**二进制编码解决模态对齐 → 联合扩散实现一致生成 → 两阶段策略突破分辨率瓶颈 → 合成扩充提升分割鲁棒性**。在 iSAID 上，PSPNet 的 mIoU 从 48.95% 提升至 56.54%（+7.59%），验证了这一技术路线的有效性。
 
 
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2403_16605/figures/002_Figure_2.jpg]]
-*Figure 2: Approach overview. (a) We train a generative image diffusion model G on the joint data instances $\left( \mathbf { x } _ { i } , \mathbf { y } _ { i } \right$) \ $\in$ \ ${ \mathcal { D } }$ of images $\mathbf { x } _ { i }$ and corresponding labels $\mathbf { y } _ { i }$ . . We then employ G to generate a dataset $\mathcal { D } ^ { \prime }$ of novel training samples $\left( \mathbf { x } _ { i } ^ { \prime } , \mathbf { y } _ { i } ^ { \prime } \right$) . (b) Both the real D and generated $\mathcal { D } ^ { \prime }$ pairs are integrated and leveraged for the downstream semantic segmentation task. (c) Moreover, we compare the resulting distributions of foreground classes, highlighting that the set of...
-
 SatSynth 的整体 pipeline 围绕一个核心目标展开：从有限标注的遥感数据集中学习图像与语义标签的联合分布 $p(\mathbf{x}, \mathbf{y})$，并以此生成成对的合成样本用于下游分割模型的数据扩充。整个框架由四个关键模块串联而成，形成“编码—生成—超分—训练”的闭环流程，如 Figure 2 所示。
 
 **模块一：标签二进制编码器（Binary Encoder）**
@@ -126,8 +118,6 @@ SatSynth 的整体 pipeline 围绕一个核心目标展开：从有限标注的�
 生成的高质量合成数据集 $\mathcal{D}' = \{(\mathbf{x}_i', \mathbf{y}_i')\}$ 与原始标注数据集 $\mathcal{D}$ 合并为 $\mathcal{D} \cup \mathcal{D}'$。通过重采样比率 $R$ 控制每个原始样本对应的合成样本数量，在保持真实-合成数据比例可控的前提下训练下游分割骨干网络（默认采用 FPN with ResNet-50，同时验证了 SegFormer、PSPNet、PFSegNet、FarSeg 等多种架构的兼容性）。
 
 **输入输出流总结**：原始图像-掩码对 → 二进制编码 → 拼接为 $[0,1]^{H\times W\times(3+\lceil\log_2 K\rceil)}$ 的张量 → $G$ 生成 128×128 合成对 → 阈值解码 → $G_{SR}$ 上采样至 256×256 → 合并入训练集 → 分割模型训练。这一流程将“标注稀缺”的瓶颈转化为“生成模型学习联合分布”的可控问题，其有效性在 iSAID、LoveDA、OpenEarthMap 三个基准上得到一致验证（Table 1, Table 2）。
-
-
 
 SatSynth 的核心目标是从标注数据集中学习图像与语义标签的联合分布 $p(\mathbf{x}, \mathbf{y})$，并从中采样新的训练样本对 $(\mathbf{x}', \mathbf{y}')$ 用于数据扩充。该方法由四个关键模块串联构成。
 
@@ -176,8 +166,6 @@ $\mathcal{G}_{\text{SR}}$ 是一个以低分辨率图像-掩码对为条件的�
 - **二进制编码 + 噪声预测的最优性**：Table 3 消融实验提供了直接对比，bin+$\epsilon$ 组合在 IoU 和 F1 上均优于其他变体，置信度高。
 - **两阶段超分辨率的必要性**：Table 4 和 Fig. 10 分别从定量和定性角度证实 DDPM-256 的训练不稳定和伪影问题，所提方案的下游分割精度更高，置信度高。
 - **联合生成的有效性**：Table 1a 中 SatSynth 在 FID/sFID/IS 上均优于 SemGAN 和 DDPM，Table 1b 中分割精度显著超越 SegDiff，构成强证据链。
-
-
 
 ## 实验与关键发现
 
@@ -229,9 +217,6 @@ Fig. 7 分析了合成数据对各类别的差异化影响。以 PSPNet 在 iSAI
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2403_16605/figures/013_Table_6.jpg]]
 *Table 6: Per-class segmentation scores on iSAID 256 × 256. We provide a detailed analysis of the per-class segmentation scores on iSAID. Specifically, we report mean IoU scores for approaches tailored for high-resolution satellite imagery [34, 73] and the generalpurpose segmentation models SegFormer [65], FPN [31], and PSPNet [71]. Each model is trained on the combined dataset of original and generated samples $\mathcal { D } \cup \mathcal { D } ^ { \prime }$ . , and compared against models trained solely on the original data D. For a majority of classes, the synthesized data yields marked improvements in performance. We abbreviate the 16 semantic classes with the following acronyms: background (BG),...
 
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2403_16605/figures/010_Figure_7.jpg]]
-*Figure 7: Class imbalance. We analyze the per-class IoU score for the results from Tab. 2 in the main paper. Specifically, we contrast the relative occurrence of the 15 foreground classes, with their absolute improvement in the mean IoU score on PSPNet [71]. The resulting negative correlation confirms that our approach implicitly mitigates class imbalances, since rare classes disproportionally benefit from additional generated samples*
-
 ### 失败模式与局限性
 
 尽管 SatSynth 在多个维度上表现出色，实验中也暴露了若干局限：
@@ -240,13 +225,6 @@ Fig. 7 分析了合成数据对各类别的差异化影响。以 PSPNet 在 iSAI
 2. **计算开销**：扩散模型的训练和采样本身计算密集，加上超分辨率模块的两阶段流水线，整体训练成本显著高于传统增强方法。
 3. **任务泛化未验证**：评估仅聚焦于语义分割任务，合成数据在变化检测、实例分割等其他地球观测任务上的有效性仍是开放问题。
 4. **分布偏移风险**：Fig. 2(c) 显示生成标签的分布匹配原始数据，但在更复杂的实际场景中，生成数据与真实数据之间的潜在分布偏移可能引入偏差，这一点尚未进行系统性分析。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2403_16605/figures/003_Table.jpg]]
-*Table: (a) Visual sample quality. (b) Semantic segmentation*
-
-
 
 ## 定位与知识库关联
 
@@ -331,8 +309,6 @@ SatSynth 目前与全监督分割模型结合使用。将其与自监督预训�
 **（5）多模态扩展**
 
 卫星数据通常包含多光谱波段（超出 RGB），而 SatSynth 目前仅处理 RGB 图像。将联合生成框架扩展到多光谱数据，需要考虑不同波段间的物理约束和统计特性，这是一个具有实际价值但技术上具有挑战性的方向。
-
-
 
 ## 原文 PDF
 

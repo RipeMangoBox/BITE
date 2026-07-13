@@ -52,8 +52,6 @@ HPL的核心洞察是：**分层多粒度偏好优化**（轨迹级、步级、�
 
 实验结果表明，HPL在ALFWorld、WebShop和InterCode-SQL三个基准上显著优于现有方法。以Qwen2.5-7B-Instruct为基座，HPL平均得分达到67.28，分别超过轨迹级DPO方法ETO和步级DPO方法IPR 3.81和3.46分。消融实验进一步验证了组级DPO损失和课程学习机制的关键作用：去除课程学习导致平均性能下降2.51分，而去除组级DPO损失对性能影响最大。
 
-
-
 ### 长周期LLM智能体的偏好学习挑战
 
 大语言模型驱动的自主智能体在长周期交互任务中面临核心瓶颈：如何将稀疏的终局奖励信号高效地转化为每一步决策的信用分配。当前主流的偏好优化方法主要沿两个粒度展开：**轨迹级DPO**与**步级DPO**，但二者各自存在结构性缺陷。
@@ -79,8 +77,6 @@ HPL的核心洞察是：**分层多粒度偏好优化**（轨迹级、步级、�
 1. **引入动作组级中间粒度**：将专家轨迹分解为语义连贯的动作组，在轨迹级、步级、动作组级三个层次同时施加DPO偏好优化，构建从粗到细的多粒度监督体系。
 2. **设计双重课程学习策略**：沿子任务复杂度（组长度）和样本难度（奖励差距）两个正交维度组织训练进程，从简单短序列逐步过渡到复杂长序列，模拟人类从易到难的学习路径。
 3. **保持离线偏好优化范式**：HPL遵循与ETO、IPR相同的两阶段协议（单次探索+离线偏好优化），在不引入在线交互成本的前提下实现多粒度偏好学习的集成。
-
-
 
 ## 核心方法与创新机理
 
@@ -113,12 +109,8 @@ $$\mathcal{L}_{\mathrm{final}}^{(s)} = \mathcal{L}_{\mathrm{BC}} + \mathcal{L}_{
 
 **证据强度说明**：组级 DPO 和双重课程的核心作用有明确的消融实验支持（置信度 0.9–0.95）。语义分割策略依赖外部大模型（如 GPT-4o），引入额外成本和依赖性，这是该方法的一个已知局限。
 
-
-
 ![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_s8usvGHYlk/figures/002_Figure_2.jpg]]
 *Figure 2: An overview of our proposed framework, HPL. Stage 1 generates hierarchical preference data with Action Group Segmentation component. Stage 2 then optimizes the agent with a composite objective, where the training is guided by dual-layer curriculum scheduler*
-
-![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_s8usvGHYlk/figures/003_Figure_3.jpg]]
 
 HPL 遵循与现有偏好优化工作一致的两阶段协议：**单轮探索 → 离线偏好优化**，但在偏好数据构建与训练调度上进行了层次化重构。如图 2 所示，框架包含两个核心阶段：
 
@@ -149,8 +141,6 @@ HPL 遵循与现有偏好优化工作一致的两阶段协议：**单轮探索 �
 $$\mathcal{L}_{\text{final}}^{(s)} = \mathcal{L}_{\text{BC}} + \mathcal{L}_{\text{traj-DPO}} + \mathcal{L}_{\text{step-DPO}} + \mathcal{L}_{\text{group-DPO}}^{(s)}$$
 
 其中 $\mathcal{L}_{\text{group-DPO}}^{(s)}$ 的数据子集 $\mathcal{D}_{\text{group}}^{(s)}$ 随课程阶段动态变化，而轨迹级和步级 DPO 损失始终使用全量数据。这种设计使模型从简单的、高置信度的子任务开始学习，逐步过渡到复杂的多步序列，在偏置-方差权衡中取得平衡。
-
-
 
 HPL框架的核心由四个模块串联构成，分别解决策略初始化、多粒度偏好数据生成、课程调度与联合优化问题。
 
@@ -209,8 +199,6 @@ $$\mathcal{L}_{\mathrm{group-DPO}}(\theta;\mathcal{D}_{\mathrm{group}}) = -\math
 
 其中 $\beta$ 控制策略偏离参考策略的惩罚强度，$\sigma$ 为sigmoid函数。组级DPO损失仅在当前课程阶段 $s$ 对应的数据子集 $\mathcal{D}_{\mathrm{group}}^{(s)}$ 上计算，而轨迹级和步级损失在整个训练过程中保持不变。这种设计使得模型在偏置-方差权衡中取得平衡：轨迹级信号稳定但信用分配粗糙，步级信号细粒度但方差大，组级信号作为中间粒度填补了两者之间的空白。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与验证目标
@@ -249,13 +237,7 @@ Table 6和Table 7的ALFWorld子任务分解进一步揭示：HPL在seen和unseen
 
 Table 2的消融实验直接验证了课程学习的必要性。移除课程学习（HPL Static，即静态混合所有难度和长度的样本）导致7B模型平均得分下降**2.51分**（从67.28降至64.77），1.5B模型下降**0.92分**（从59.44降至58.52）。单独移除长度课程（HPL Difficulty CL Only）或难度课程（HPL Length CL Only）均导致性能下降，完整课程在所有基准上表现最优。这表明**组长度（子任务复杂度）和奖励差距（样本可区分性）两个维度对课程调度均有独立贡献**，仅保留单一维度不足以达到最佳效果。
 
-![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_s8usvGHYlk/figures/005_Table_2.jpg]]
-*Table 2: Ablation study on our curriculum learning mechanism of HPL across three agent benchmarks*
-
 Figure 4通过ALFWorld上的阶段性能进展为课程学习提供了过程性证据。随着训练从Phase 1（仅简单短组）推进到Phase 3（全量数据），两个模型规模的成功率均单调上升。1.5B模型在6个子任务类型上的分解显示，不同子任务对课程的响应存在差异，但整体趋势一致——这暗示课程调度器成功组织了从简单到复杂的学习路径。
-
-![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_s8usvGHYlk/figures/013_Figure_4.jpg]]
-*Figure 4: Phase-wise performance progression of HPL on the ALFWorld benchmark. (a) Success rates for both 1.5B and 7B models across the three curriculum phases. (b) A detailed breakdown for the 1.5B model on 6 sub-task types*
 
 ### 损失组件的消融
 
@@ -286,18 +268,6 @@ Table 5对比了各方法在ALFWorld上的资源消耗。HPL (Semantic) 因依�
 | Figure 5 | 组级DPO损失对性能贡献最大，验证了中间粒度的核心地位 | 中高（单一模型规模） |
 | Figure 4 | 课程三阶段推进中性能单调上升，验证了从简单到复杂的调度有效性 | 中（仅ALFWorld基准） |
 | Table 5 | HPL (Semantic) 需外部LLM调用，其他变体计算开销与基线可比 | 中（资源对比，非性能指标） |
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_s8usvGHYlk/figures/015_Table_3.jpg]]
-*Table 3: Hyperparamenters for SFT stage across three agent benchmarks*
-
-![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_s8usvGHYlk/figures/016_Table_4.jpg]]
-*Table 4: Hyperparamenters for Group-DPO stage across three agent benchmarks*
-
-![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_s8usvGHYlk/figures/020_Table_8.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -347,8 +317,6 @@ HPL的有效性建立在以下前提之上，超出这些边界时性能可能�
 - **在线扩展**：如何在在线强化学习设置中整合层次化偏好学习，利用在线探索进一步增强组级信用分配的准确性？
 - **跨模态泛化**：该方法能否推广到视觉语言模型或多模态智能体任务，其中动作组的语义边界可能需要结合视觉信息定义？
 - **最优组长度理论**：组级DPO的偏置-方差权衡是否存在理论上的最优组长度，能否根据任务结构自动推导？
-
-
 
 ## 原文 PDF
 

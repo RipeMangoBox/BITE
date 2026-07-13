@@ -51,8 +51,6 @@ claims:
 
 在理论加速方面，本文根据量子数据接入假设划分了三种体制（图1）：(1) 输入与权重均通过 QRAM 高效访问，此时可实现推理代价 $O(\mathrm{polylog}(N/\varepsilon)^k)$，相对经典方法获得多对数加速；(2) 仅权重存储于 QRAM 而输入为经典存储，得到 $O(N\log(1/\varepsilon)^{2k})$ 的复杂度，比精确经典实现带来四次方加速；(3) 完全不依赖 QRAM 的输入假设，仍可实现二次方加速。这些结果首次在多层量子网络中结合了相干非线性与范数保持保证，并在对比表（表1）中展示了相对于现有方案在相干多层构造、无 QRAM 操作、$\mathrm{polylog}(1/\varepsilon)$ 误差依赖和输入维度多对数标度等维度上的关键提升。部分证据（如无 QRAM 卷积编码）置信度极高（1.0），而范数保持的理论保证仍需在具体激活缩放细节上稍作人工验证（置信度 0.85）。此外，网络深度的多项式指数增长（如 $O(\log(\sqrt{N}/\varepsilon)^{2k})$）依然对极深网络构成规模化挑战，且 QRAM 假设在真实大规模量子硬件上的可行性尚未解决，这些因素在实际应用中需予以关注。
 
-
-
 ### 問題背景
 
 深度神經網路在電腦視覺、自然語言處理等領域取得了顯著成功，但其推理過程對經典計算資源的需求隨輸入維度 $N$ 和網路深度 $k$ 急劇增長。對於 $d$ 維卷積輸入，經典精確計算的下界可達 $\Omega(N^d)$ 甚至 $\Omega(N^{d+1})$，這促使研究者探索量子加速的可能性。近年來，多項工作嘗試將卷積神經網路（CNN）、前饋網路和 Transformer 架構映射到量子電路上，期望利用量子平行性和振幅編碼實現多對數級別的推理複雜度。
@@ -76,8 +74,6 @@ claims:
 - **電路深度多項式增長**：範數下界的保持直接解耦了電路複雜度與網路深度的指數依賴。由於每層無需對衰減後的微弱訊號進行多次重複放大，酉電路實現的代價僅隨層數 $k$ 多項式增長，為 $O(\log(N/\epsilon)^{2k})$ 甚至 $O(\mathrm{polylog}(N/\epsilon)^k)$（在三種量子數據訪問模式下）。
 
 論文進一步提供了兩項關鍵的子程式創新以支撐上述架構：**(1)** 無需 QRAM 的二維多濾波器卷積塊編碼（Lemma 5），消除了對 QRAM 硬體假設的依賴；**(2)** 任意滿秩密集矩陣與向量逐元素平方乘積的量子算法（Section 2.3），避免了 Frobenius 範數或秩依賴帶來的額外開銷。這些技術組件與殘差跳躍連接、相干 erf/sigmoid 多項式近似、歸一化層共同構成了一個完整的推理管線（見 Figure 1，三種數據訪問假設下的架構），使得首次在嚴格的理論保證下實現了全相干多層非線性網路的量子加速。
-
-
 
 ## 核心方法与创新机理
 
@@ -120,8 +116,6 @@ claims:
 
 *（复杂度声明均源自 Theorem 2 与 Section 4 的三个 Regime 分析；消融与误差传播见附录与 main results 列的 anchor。）*
 
-
-
 ![[assets/figures/papers/iclr26_0005_QcRto0GjxC_Accelerating_Inference_for_Multilayer_Neural_Net/figures/001_Figure_1.jpg]]
 *Figure 1: Architecture for Convolutional Neural Networks. This figure shows the architectures we consider with provable quantum complexity guarantees for inference under three regimes of quantum data access assumptions. (a) Depicts the architecture where both the inputs and network weights are provided in an efficient quantum data structure. (b) Only the network weights are provided in an efficient quantum data structure. (c) No input assumptions are made. In all architectures, the input is assumed to be a rank-3 tensor (e.g., images with 4 channels)*
 
@@ -149,8 +143,6 @@ claims:
 - **输出**：最后通过池化与线性层得到 C 维输出量子态，其各分量概率幅度对应该输入属于各类别的概率（近似采样型分类，见 Definition 1）。采样该量子态即可获得分类标签及对应概率。
 
 整个框架无需在层间进行量子态断层扫描，且核心的卷积块编码摆脱了对 QRAM 的依赖，从而为量子神经网络的可扩展性提供了关键支撑（相关比较见表 1）。
-
-
 
 该工作的核心突破在于构建了一套全相干的多层量子神经网络推理流程，**不依赖中间量子态断层扫描或经典读出**，并给出了多项式级电路深度的严格保证。以下逐一提炼构成该流程的关键模块及支撑其正确性与复杂度的核心公式。
 
@@ -195,8 +187,6 @@ $$O\left(\log\left(\frac{\sqrt{N}}{\epsilon}\right)^{2k+1} (T_X + n^2)\right)$$
 最后一层将高维特征向量压缩为类别概率。文中采用**任意密秩全秩矩阵与向量逐元素平方的乘积**的量子算法（Section 2.3），避免了对 Frobenius 范数或秩的依赖。结合线性组合和池化操作，输出模块可被表达为 VE 到最终概率抽样的映射，维持了全流程的相干性。
 
 > 以上模块的量化结论严格依赖 QRAM 存在假设（除 Regime 3 外），多项式近似误差会随深度累积；极深网络的实际加速效果仍需数值验证。但残差保持范数这一机制在理论上已排除了以往工作中指数深度这一根本障碍。
-
-
 
 ## 实验与关键发现
 
@@ -253,15 +243,11 @@ $$O\left(\log\left(\frac{\sqrt{N}}{\epsilon}\right)^{2k+1} (T_X + n^2)\right)$$
 
 总体而言，以上理论实验和分析表明：通过残差连接与 Lipschitz 约束的组合设计，量子多层神经网络确实可以在不破坏相干性、不依赖中间测量的前提下实现可证明的多项式深度电路，并能在不同数据加载假设下提供从二次到多对数的加速。该结论在很大程度上依赖于 QRAM 假设与多项式误差控制，未来需要在更现实的量子计算模型下进一步验证。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0005_QcRto0GjxC_Accelerating_Inference_for_Multilayer_Neural_Net/figures/004_Figure_3.jpg]]
 *Figure 3: Circuit for addition of VE encoded vectors. Given two unitary matrices, $U_\psi$ which is a $($\alpha$, a, $\epsilon_$0)$-VE for the n-qubit state $|$\psi\rangle$, and $U_\phi$ which is a $($\beta$, b, $\epsilon_$1)$-VE for the n-qubit state $|$\phi\rangle$ define $c := $\max$(a, b)$. We define $\tilde{U}_\psi$ by appropriately tensoring $U_\psi$ with $I_{c-a}$ and we define $\tilde{U}_\phi$ by appropriately tensoring $U_\phi$ with $I_{c-b}$, such that $\tilde{U}_\psi$ and $\tilde{U}_\phi$ both act on $n+c$ qubits. Then, the given circuit yields a $($\alpha+\beta$, c+1, $\epsilon_$0+$\epsilon_$1)$-VE for $|$\psi\rangle$ + |$\phi\rangle$.
 
 ![[assets/figures/papers/iclr26_0005_QcRto0GjxC_Accelerating_Inference_for_Multilayer_Neural_Net/figures/005_Figure_4.jpg]]
 *Figure 4: Full-rank linear-pooling output block*
-
-
 
 ## 定位与知识库关联
 
@@ -272,8 +258,6 @@ $$O\left(\log\left(\frac{\sqrt{N}}{\epsilon}\right)^{2k+1} (T_X + n^2)\right)$$
 **关键局限。** 第一，多数加速结果（regime 1 和 2）依赖 QRAM 硬件，而大规模容错 QRAM 的物理可实现性仍未解决，这构成从理论到运行的重要鸿沟。第二，虽然误差对数值精度的依赖是 polylog(1/ε)，但在深度网络中，电路复杂度依赖于 $O(\mathrm{polylog}(N/\varepsilon)^{2k})$，当层数 $k$ 很大时，多项式对数的指数增长仍然不可忽视；同时，激活函数的多项式逼近误差随深度累积，可能进一步约束极深网络的可行精度。第三，当前工作专注于推理阶段，未涉及训练或梯度计算，且所有保证建立在输入为 rank‑3 张量（如图像）和特定线性‑归一化‑残差块组合之上，直接泛化至其他网络拓扑（如注意力机制）尚待验证。
 
 **开放问题。** 作者明确给出若干延伸方向。一个核心问题是：能否在保证 polylog(1/ε) 误差依赖的前提下，实现非残差、多层非线性变换序列的全相干量子模拟而不遭遇指数级电路深度（Conclusion: "Is it possible to coherently enact sequences of non-linear transformations without an exponentially increasing circuit depth…"）。此外，文末呼吁探索该技术与量子微分方程求解器、有限差分等科学计算工具的连接，并尝试将方法适配至 UNet 风格的蒸馏扩散模型等浅层架构，以推动量子推理的实际落地。在电路实现层面，改进无 QRAM 的 2D 卷积块编码（例如利用傅里叶变换对角化或混合使用 QRAM）也是降低常数因子的重要开放问题。
-
-
 
 ## 原文 PDF
 

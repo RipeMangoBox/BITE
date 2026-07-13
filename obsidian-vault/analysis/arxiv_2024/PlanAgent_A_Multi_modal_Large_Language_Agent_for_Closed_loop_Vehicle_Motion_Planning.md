@@ -50,8 +50,6 @@ PlanAgent 的核心洞察在于：将多模态大语言模型（MLLM）作为认
 
 在 nuPlan Val14 和 Test14-hard 基准上，PlanAgent 取得闭环运动规划 SOTA：Val14 上 NR-CLS 达 93.26（较 PDM-Closed 提升 +0.75），R-CLS 达 92.75（+0.96）；在更具挑战性的 Test14-hard 上，NR-CLS 达 72.51（较 PDM-Closed 提升 +7.44），R-CLS 达 76.82（+1.64）。消融实验证实，分层思维链中的场景理解、运动指令以及 Reflection 模块分别对 NR-CLS 贡献 2.42、1.91 和 2.67，验证了各模块设计的有效性。该方法首次将 MLLM 引入中到中闭环规划系统，为自动驾驶中常识驱动的高效场景编码与安全规划提供了新范式。
 
-
-
 自动驾驶运动规划的核心挑战在于，车辆必须在动态、交互且充满长尾场景的开放环境中生成安全、合理的行驶轨迹。现有的规划方法大致可分为三类，但各自存在明显的能力边界。
 
 **规则基方法**，如 **PDM-Closed**（Dauner et al., CoRL 2023），依赖人工设计的智能驾驶员模型（IDM）参数搜索与代价评估，在常见场景下表现稳健，但在长尾场景中泛化能力严重不足——其性能高度受限于人工规则的完备性，无法应对规则未覆盖的复杂交互。
@@ -67,8 +65,6 @@ PlanAgent 的核心洞察在于：将多模态大语言模型（MLLM）作为认
 3. **安全验证机制薄弱**：LLM的生成具有固有的不确定性，直接将其输出用于车辆控制存在安全隐患。现有方法或缺乏安全验证，或仅依赖简单的后优化，无法在闭环中有效降低MLLM不确定性带来的风险。
 
 综上，核心瓶颈在于：**缺乏一个能够将MLLM的常识推理能力高效注入闭环运动规划的系统框架，该框架需同时解决场景表示效率、推理层次化以及安全验证三大问题。** PlanAgent正是针对这一瓶颈，首次提出了基于MLLM的中到中闭环规划智能体系统。
-
-
 
 ## 核心方法与创新机理
 
@@ -94,8 +90,6 @@ PlanAgent 的核心创新在于将多模态大语言模型（MLLM）引入中到
 
 PlanAgent 的四项 changed slots 构成了一个完整的创新闭环：**高效场景编码**降低了 MLLM 的输入负担，**分层思维链**引导了结构化的常识推理，**反思模块**提供了安全兜底，**代码生成范式**则赋予了规划器在长尾场景中的适应能力。这一设计使 PlanAgent 成为首个在闭环中到中规划中同时实现 SOTA 性能和强泛化能力的 MLLM 智能体系统。
 
-
-
 PlanAgent 是首个基于多模态大语言模型（MLLM）的中到中闭环运动规划系统，其整体架构由三个核心模块串联而成：**环境变换模块（Environment Transformation）**、**推理引擎模块（Reasoning Engine）** 和 **反思模块（Reflection Module）**。三个模块形成闭环反馈流：环境变换模块将感知数据转化为多模态场景提示，推理引擎据此通过分层思维链生成规划器代码，反思模块对生成的规划器进行仿真验证并决定是否触发重新推理。
 
 **输入输出流。** 系统输入为自动驾驶环境中的感知信息，包括道路元素（车道线、交叉口等）和周围智能体状态。输出为可直接执行的 IDM 规划器代码，该规划器实时计算自车的纵向加速度与横向控制指令，驱动车辆完成闭环运动规划。
@@ -104,12 +98,8 @@ PlanAgent 是首个基于多模态大语言模型（MLLM）的中到中闭环运
 
 **核心设计动机。** 现有规则基方法（如 **PDM-Closed**，Dauner et al., CoRL 2023）在长尾场景中泛化能力不足，学习基方法（如 **PlanTF**，Cheng et al., ICRA 2024）缺乏常识推理能力，而早期 LLM 基方法（如 **GPT-Driver**、**Agent-Driver**，Mao et al., arXiv 2023）仅适用于开环设定且场景编码 token 开销巨大。PlanAgent 通过上述三模块设计，首次将 MLLM 的常识推理能力引入闭环规划，同时以 BEV 地图与车道图文本描述的组合将场景编码 token 数降至其他 LLM 方法的约三分之一（平均 141.32 tokens），在 nuPlan Val14 和 Test14-hard 基准上均取得 SOTA 性能。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2406_01587/figures/003_Figure_2.jpg]]
 *Figure 2: Based on a MLLM, we propose a novel planning agent pipeline comprising three modules: Environment Transformation, Reasoning Engine, and Reflection Module. In the Environment Transformation module, key information about the environment is extracted to form a BEV map and construct a lane-graph representation. Subsequently, the lane graph is translated into textual descriptions and used as scenario prompts along with the BEV map. In the Reasoning Engine module, an MLLM generates planner codes based on the IDM [16] planner through hierarchical chain-of-thought reasoning with scenario prompts and pre-defined system prompts (including task definition prompts, common sense prompts, and chain-of-th...*
-
-
 
 PlanAgent 的整体架构由三个核心模块串联构成：**环境变换**、**推理引擎**与**反思模块**（Fig. 2）。三个模块协同完成“多模态场景编码→分层常识推理→安全闭环验证”的闭环规划流程。
 
@@ -162,13 +152,6 @@ MLLM 最终输出的规划器调用形式为式 (3)：
 $$Generate\_IDM\_Planner(c, la, v_0, acc, dec)$$
 
 其中 $c$ 为目标中心线，$la$ 为前导车辆信息，$v_0, acc, dec$ 为 MLLM 根据场景推理确定的规划器参数。这些参数的选择直接体现了 MLLM 对驾驶情境的常识推理结果——例如在拥堵场景下降低 $v_0$、在湿滑路面增大 $dec$ 的绝对值。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2406_01587/figures/004_Figure_3.jpg]]
-*Figure 3: The top of the picture shows the process of constructing a lane map (top right) based on the environment (top left). The white square on the left represents the ego vehicle. The red node on the right indicates the centerline segment where the ego vehicle is located, while nodes of other colors correspond to lane segments of the same color on the left. The bottom of the picture displays the converted text description of the scenario based on the lane-graph, including node relationships and motion states*
-
-
 
 ## 实验与关键发现
 
@@ -223,8 +206,6 @@ Figure 6展示了PlanAgent与PDM-Closed在具体场景中的定性对比，以�
 
 Table I系统比较了PlanAgent与近期LLM基规划方法的属性差异。PlanAgent是首个同时具备**闭环规划**、**多模态输入**（BEV图像+文本）、**中到中规划范式**、**安全验证机制**的MLLM基系统。相比之下，**GPT-Driver**和**Agent-Driver**（Mao et al., arXiv 2023）仅支持开环规划，**DiLu**（Wen et al., ICLR 2024）虽支持闭环但仅适用于highway-env简化环境，**LLM-ASSIST**仅生成控制器参数而缺乏完整的场景理解与推理链。这一属性对比凸显了PlanAgent在系统完整性和实用性上的领先。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2406_01587/figures/005_Table.jpg]]
 *Table: II COMPARISON WITH COMPETITIVE METHODS ON VAL14 AND TEST14-HARD BENCHMARKS OF NUPLAN CLOSED-LOOP PLANNING CHALLENGE*
 
@@ -239,20 +220,6 @@ Table I系统比较了PlanAgent与近期LLM基规划方法的属性差异。Plan
 
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2406_01587/figures/008_Table.jpg]]
 *Table: IV ABLATION STUDY OF ENVIRONMENT TRANSFORMATION MODULE ON TEST14-HARD BENCHMARK*
-
-![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2406_01587/figures/009_Table.jpg]]
-*Table: ABLATION STUDY OF THE INTERVAL OF MLLM CALLS ON TEST14-HARD BENCHMARK*
-
-![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2406_01587/figures/010_Table.jpg]]
-*Table: VII PERFORMANCE OF DIFFERENT MULTI-MODAL LARGE LANGUAGE MODELS FOR PLANAGENT ON TEST14-HARD BENCHMARK*
-
-![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2406_01587/figures/002_Table.jpg]]
-*Table: I COMPARISON BETWEEN PLANAGENT AND RECENT LLM-BASED APPROACHES*
-
-![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2406_01587/figures/011_Figure_6.jpg]]
-*Figure 6: Qualitative comparison between PlanAgent (ours) and PDM-Closed and qualitative example of the hierarchical reasoning of PlanAgent*
-
-
 
 ## 定位与知识库关联
 
@@ -313,8 +280,6 @@ PlanAgent 的设计决策划定了其方法边界：
 ---
 
 **需要人工验证的点**：论文未披露Reflection模块评分函数的具体构成（如各子指标的权重），也未详细说明max_exe的取值及其对性能的影响。消融实验中各模块的贡献值（2.42/1.91/2.67）来自单一MLLM（GPT-4V）的实验，其在不同MLLM上的稳定性需要进一步验证。
-
-
 
 ## 原文 PDF
 

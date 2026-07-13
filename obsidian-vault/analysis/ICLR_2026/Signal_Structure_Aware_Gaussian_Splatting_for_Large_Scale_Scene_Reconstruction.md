@@ -54,8 +54,6 @@ claims:
 
 **主要结果**：在多个大规模场景基准上，SIG实现了显著的质量与效率提升。以Mill-19 rubble场景为例，相比CityGS基线，PSNR提升**+0.9 dB**（27.35 vs 26.45），SSIM提升至0.843，LPIPS降至0.189，同时训练速度提升约**1.4倍**（71 min/block vs 98 min/block）。消融实验（Table 2）验证了频率一致训练策略的核心作用：去除FARS导致PSNR下降约1.17 dB，高斯数量从1.5M激增至2.2M。SCG和DR分别通过空间约束和几何正则化进一步减少冗余高斯并提升渲染质量。
 
-
-
 ### 大规模场景重建的核心挑战
 
 大规模场景的神经渲染与重建在数字孪生、自动驾驶仿真、虚拟现实等领域具有重要应用价值。以3D Gaussian Splatting（3DGS）（Kerbl et al., ACM Trans. Graph. 2023）为代表的高斯散点方法，凭借其显式表示和可微光栅化管线，在渲染质量和速度上取得了突破性进展。然而，当面对城市级或建筑级大规模场景时，现有方法普遍面临一个深层瓶颈：**稀疏初始点云导致高斯表示在训练初期呈现低频特性，而直接使用高频图像进行监督，会引发采样频率与目标信号频率之间的严重失配**。
@@ -90,8 +88,6 @@ Figure 1 直观展示了这一现象：直接以高频图像监督的方法会�
 
 该方法在多个大规模场景基准上实现了显著的质量提升（Mill-19 rubble场景PSNR提升+0.9 dB）和训练加速（每块训练时间减少至1/1.5），验证了频域视角在场景重建中的有效性。
 
-
-
 ## 核心方法与创新机理
 
 本工作将大规模场景重建重新定义为**信号结构恢复问题**，从频域视角揭示了现有高斯散点法在大规模场景中的根本瓶颈，并围绕该瓶颈提出了三项关键创新。
@@ -124,8 +120,6 @@ Figure 1 直观展示了这一现象：直接以高频图像监督的方法会�
 
 消融实验（Table 2）量化了各创新的贡献：去除FARS导致PSNR下降约1.17 dB（26.18 vs 27.35）且高斯数量从1.5M增至2.2M；去除DS使PSNR下降0.46 dB；去除SCG和DR分别导致PSNR下降0.3 dB和0.34 dB，同时高斯数量增加。这些结果表明，频率对齐调度是性能提升的主要驱动因素，而SCG和DR作为几何约束进一步巩固了重建质量与效率。
 
-
-
 SIG 的整体训练流程建立在分块重建范式之上，其核心创新在于引入了一个**频率对齐的粗到细调度机制**，将场景重建重新表述为信号结构恢复问题。如 Figure 2 所示，框架由五个关键模块串联构成，形成从低频支架到高频细节的渐进式优化管线。
 
 ![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_DavFcTeTbK/figures/002_Figure_2.jpg]]
@@ -156,8 +150,6 @@ $$\frac{df}{d\mathfrak{iter}} < k \cdot \mathrm{mean}(\frac{1}{d})$$
 ### 数据流与模块关系
 
 整个管线的数据流可概括为：**低分辨率图像 → 粗训练支架 → 场景频率监控（FARS）→ 分辨率提升 + 稠密化（DS）→ SCG 约束优化 + DR 正则化 → 高分辨率细训练 → 最终渲染**。FARS 作为调度中枢，同时控制图像分辨率和稠密化节奏；SCG 和 DR 则作为约束层，在优化过程中持续过滤冗余和错误的高斯，确保频率提升带来的额外原语被有效用于高频细节捕获，而非产生浮点。
-
-
 
 ### 问题形式化：从信号频域视角看高斯散点重建
 
@@ -205,9 +197,6 @@ $$
 
 该定义的有效性得到了实验验证：Figure 3(a) 显示场景平均带宽与采样频率（图像分辨率）呈明显正相关，且随训练迭代稳定增长，表明该频率度量能够准确反映场景表示的信息容量变化。
 
-![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_DavFcTeTbK/figures/003_Figure_3.jpg]]
-*Figure 3: Effectiveness Validation: (a) Average Scene Bandwidth during Training under Different Image Resolutions and*
-
 ### 关键模块二：频率对齐的分辨率调度器（FARS）
 
 基于上述场景频率定义，FARS模块实现了训练图像分辨率与高斯表示频率的自适应同步。核心思想是：**当场景频率收敛时，提升图像分辨率以引入更高频的监督信号**。
@@ -246,13 +235,6 @@ SIG的完整训练流程分为两个阶段：
 
 1. **粗训练支架**：采用CityGS的分块策略，使用低分辨率图像构建场景的几何支架，为后续细训练提供稳定的初始表示。
 2. **细训练优化**：在每个分块内，FARS和DS协同工作——FARS监控场景频率收敛并自适应提升分辨率，DS在每次分辨率更新后执行稠密化；SCG和DR分别从空间约束和多视图一致性角度约束优化过程，最终完成高频细节的恢复。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_DavFcTeTbK/figures/001_Figure_1.jpg]]
-*Figure 1: Floaters and redundancy. Prior methods that directly supervise with high-frequency images lead to redundancy and cannot exploit more primitives to capture high-frequency details*
-
-
 
 ## 实验与关键发现
 
@@ -293,15 +275,11 @@ SIG的完整训练流程分为两个阶段：
 
 当前方法的一个显著局限是未能充分利用粗到细训练过程自然产生的层次化高斯结构。在频率逐步提升的训练过程中，不同阶段生成的高斯天然具有不同的频率特性（粗高斯对应低频结构，细高斯对应高频细节），但本方法并未将这些高斯组织为内在的细节级别（LOD）层次。在更大规模场景中，这一缺失可能限制渲染效率的进一步提升。如何从频率一致的训练过程中自动构建层次化LOD结构，是值得探索的开放方向。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_DavFcTeTbK/figures/006_Table_1.jpg]]
 *Table 1: Quantitative comparison of NVS results. The best, the second best, and the third best results are highlighted in red , orange and yellow*
 
 ![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_DavFcTeTbK/figures/004_Figure_4.jpg]]
 *Figure 4: Qualitative Results. The top two rows illustrate sparse observations, whereas the bottom two represent regular regions. For regions corresponding to sparse viewpoints, our approach effectively minimizes the generation of redundant and erroneous Gaussian components. For general regions, our method recovers high-frequency details while maintaining intact geometric structures*
-
-
 
 ## 定位与知识库关联
 
@@ -334,8 +312,6 @@ SIG 的有效性依赖于以下前提条件，超出这些边界时性能可能�
 **开放问题**：如何从频率一致的粗到细训练过程中自动生成层次化的 LOD 结构？具体而言，训练过程中不同阶段产生的高斯原语天然具有不同的频率特性（早期粗高斯对应低频结构，后期细高斯对应高频细节），能否设计一种机制，将这些高斯按频率层级组织，并在渲染时根据视距或屏幕空间采样率动态选择合适的层级组合？
 
 **需要人工验证的问题**：论文未提供在非 SfM 初始点云（如 LiDAR 扫描或随机初始化）条件下的消融实验。SCG 对初始点云质量的敏感度边界，以及 FARS 在初始点云极度稀疏时的频率估计稳定性，需要进一步验证。此外，与基于 NeRF 的大规模场景方法（如 Block-NeRF、Mega-NeRF）的直接对比缺失，这限制了在渲染质量-训练效率权衡空间中的完整定位。
-
-
 
 ## 原文 PDF
 

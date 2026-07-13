@@ -56,8 +56,6 @@ claims:
 
 实验结果表明，Copernicus-FM在15个下游任务中的11个上超越了监督训练基线，尤其对非光学模态效果显著：在EuroSAT-S1上达到87.2%总体精度（超越最强基线CROMA 3.3个百分点），在S5P大气成分回归任务中RMSE下降超过500。消融实验进一步揭示，**元数据编码是贡献最大的单一组件**——仅添加地理位置信息即可使SAR分类精度提升约22个百分点。这些证据共同表明，统一多模态预训练与元数据集成是提升EO基础模型泛化能力的关键路径。
 
-
-
 对地观测（EO）领域正经历一场由基础模型驱动的范式变革。然而，现有EO基础模型普遍受限于三个结构性瓶颈：**传感器光谱固定**、**观测对象局限于地表**、以及**对图像以外元数据的系统性忽视**。这些限制导致模型在面对哥白尼计划（Copernicus）多传感器、多模态的复杂数据生态时，灵活性与通用性严重不足。
 
 具体而言，当前主流模型如**CROMA**（S1+S2多模态预训练）和**DOFA**（支持任意光谱输入的预训练模型）虽已尝试突破单模态限制，但仍存在关键缺口：其一，它们仅能处理光谱传感器，无法原生支持Sentinel-5P大气成分、数字高程模型（DEM）等非光谱变量；其二，地理位置、时间戳、空间覆盖范围等元数据——这些对区分地表类型和大气状态至关重要的上下文信息——在预训练阶段被完全丢弃；其三，现有评估基准碎片化，缺乏覆盖地表分类、大气回归、云检测、变化检测等多层次任务的统一评测框架。
@@ -65,8 +63,6 @@ claims:
 上述缺口直接导致了两个层面的能力缺失：在**地表观测**上，合成孔径雷达（SAR）等非光学模态的表示学习效果远逊于光学模态；在**大气观测**上，缺乏有效机制将地表与大气数据流联合建模。更根本的是，EO基础模型与气候/天气建模社区之间长期存在鸿沟——前者生成的是图像级表示，后者需要的是网格级静态或动态变量，二者缺乏可互操作的接口。
 
 本文的核心动机正是弥合这些缺口。我们提出**Copernicus-FM**，一个统一的哥白尼地球视觉基础模型，其设计围绕一个核心洞察展开：**通过扩展的动态超网络动态生成适配任意模态的补丁嵌入，并显式编码元数据，可以消除传感器异构性，实现地表与大气观测的联合建模**。为此，我们同时构建了三个配套基础设施：**Copernicus-Pretrain**（涵盖Sentinel-1/2/3/5P共18.7M对齐图像的大规模预训练数据集）、**Copernicus-Bench**（15个层次化下游任务的系统评估基准）、以及**Copernicus-Embed**（全球0.25°网格嵌入数据集），以期为EO基础模型的统一化、可复现评估和跨领域桥接提供完整支撑。
-
-
 
 ## 核心方法与创新机理
 
@@ -112,8 +108,6 @@ Copernicus-FM 将三类元数据通过**统一的傅里叶编码**处理后，�
 
 这三项创新协同作用，使 Copernicus-FM 在 15 个下游任务中的 11 个上超越监督训练基线（Table 4），并首次展示了 EO 基础模型与气候参数预测的有效连接（Table 5）。
 
-
-
 Copernicus-FM 的预训练与评估体系围绕三个核心组件构建：**Copernicus-Pretrain**（大规模多模态对齐预训练数据集）、**Copernicus-FM**（统一基础模型架构）和 **Copernicus-Bench**（分层下游任务基准）。整体流程如 Figure 1 所示，从数据构建到模型预训练，再到系统化评估，形成闭环。
 
 ### 数据流与预处理
@@ -139,8 +133,6 @@ Copernicus-Pretrain 数据集将全球划分为约 100 万个 0.25°×0.25° 的
 ### 下游评估统一协议
 
 预训练完成后，冻结的编码器通过统一的评估协议在 Copernicus-Bench 的 15 个分层任务上进行测试：分类任务采用线性探测（SGD，50 轮，批大小 64）；分割与回归任务使用 UPerNet 解码器（AdamW，50 轮，批大小 16）；变化检测任务则分别编码事件前后图像，计算特征图差异后输入 UPerNet 解码器。所有基线模型使用相同的 ViT-B/16 骨干（SoftCon 和 CROMA 为 ViT-B/14 或 B/8），并在每个任务上独立搜索最佳学习率，确保公平可比。
-
-
 
 ### 动态补丁嵌入：光谱超网络与变量超网络
 
@@ -187,8 +179,6 @@ $$
 ### 模块协同机制
 
 上述模块形成闭环：超网络根据模态特性生成适配的补丁嵌入 → 元数据编码注入时空上下文 → MIM 迫使模型学习跨模态的通用表示 → 蒸馏加速收敛并提升表示质量。消融实验（Table 2）量化了各组件的独立贡献：元数据编码贡献最大（EuroSAT-S1 OA 提升 22.4 点），变量超网络和持续蒸馏次之，验证了每个模块设计的必要性。
-
-
 
 ## 实验与关键发现
 
@@ -241,8 +231,6 @@ Copernicus-FM的预训练基于**Copernicus-Pretrain**数据集，该数据集�
 3. **模态覆盖有限**：实验仅限于Sentinel-1/2/3/5P和DEM，未验证其他卫星系列或非EO模态（如海洋、冰冻圈变量）的扩展性。
 4. **气候集成浅层**：气候预测仅采用简单线性回归，未探索与非线性天气预报模型的深度集成，当前证据仅具指示性意义。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2503_11849/figures/015_Figure_8.jpg]]
 *Figure 8: Histogram of local patch numbers for S1 and S2 (union)*
 
@@ -252,15 +240,6 @@ Copernicus-FM的预训练基于**Copernicus-Pretrain**数据集，该数据集�
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2503_11849/figures/017_Figure_10.jpg]]
 *Figure 10: Histogram of time series lengths for S1 and S2 (union)*
 
-![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2503_11849/figures/018_Figure_11.jpg]]
-*Figure 11: Histogram of time series lengths for S1 and S2 (joint)*
-
-![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2503_11849/figures/019_Figure_12.jpg]]
-*Figure 12: Histogram of time series lengths for S3 (left: union; right: joint)*
-
-![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2503_11849/figures/020_Figure_13.jpg]]
-*Figure 13: Histogram of time series lengths for S5P (union)*
-
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2503_11849/figures/024_Figure_15.jpg]]
 *Figure 15: Fourier encoding visualization for wavelengths and bandwidths of S2 and S1*
 
@@ -269,17 +248,6 @@ Copernicus-FM的预训练基于**Copernicus-Pretrain**数据集，该数据集�
 
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2503_11849/figures/028_Figure_18.jpg]]
 *Figure 18: Fourier encoding visualization for area (left) and time (right)*
-
-![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2503_11849/figures/032_Figure_19.jpg]]
-*Figure 19: Copernicus-Bench-Cloud-S2*
-
-![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2503_11849/figures/033_Figure_20.jpg]]
-*Figure 20: Copernicus-Bench-Cloud-S3. Left: “multi-class” mode. Right: “binary” mode*
-
-![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2503_11849/figures/034_Figure_21.jpg]]
-*Figure 21: Copernicus-Bench-EuroSAT-S1 and Copernicus-Bench-EuroSAT-S2*
-
-
 
 ## 定位与知识库关联
 
@@ -327,8 +295,6 @@ Copernicus-FM 的核心设计意图是解决现有地球观测（EO）基础模�
 - 是否需要修改架构以原生支持多模态融合（而非独立编码各模态）和时变输入处理？
 - 变量超网络能否扩展至任意科学参数（如海洋盐度、海冰浓度、土壤湿度），从而构建真正通用的地球系统科学基础模型？
 - 元数据丢弃策略是否应为不同元数据类型（地理位置 vs. 时间 vs. 面积）设计独立的丢弃率？当前统一的 0.7 丢弃率（Table 11）是否为最优配置？
-
-
 
 ## 原文 PDF
 

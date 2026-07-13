@@ -59,8 +59,6 @@ claims:
 
 PAS 的局限性同样明确：当采样率足够高时增益趋于消失；在 Nyquist 欠采样场景下改进窗口更窄；仅适用于采用 M-RoPE 且具备独立时序维度编码的模型；当前默认设置虽表现良好，但偏移量的自适应学习策略仍有待探索。
 
-
-
 ### 视频LLM中的时序位置编码
 
 视频大语言模型（Video LLM）的核心挑战之一是如何让模型感知帧之间的时序关系。与文本不同，视频信号天然具有时间维度，模型必须理解“动作的先后顺序”“事件的时间跨度”等时序信息才能正确回答诸如“他先拿起杯子还是先打开门”之类的问题。
@@ -103,8 +101,6 @@ $$\big| A(\Delta t + \delta t) - A(\Delta t) \big| \leq \big| \langle \mathbf{q}
 基于这一洞察，本文提出**Phase Aggregated Smoothing（PAS）**——一种训练无关、即插即用的推理时稳定器。其核心思想是：在推理时对查询流（Q）施加按注意力头分组的小幅度、反向相位偏移，使不同头在略微偏移的时滞处采样同一IFT调制波形，然后通过标准的多头聚合实现受控移动平均，从而平滑有效调制（Figure 2）。
 
 PAS的优雅之处在于：它不改变token化、模型参数、视频帧数量或任何输入，仅修改查询流的时序相位；每个注意力头独立地保持其频谱幅值不变（定理4），平滑效应仅在多头聚合后自然产生；计算开销在统计上与原始backbone不可区分。
-
-
 
 ## 核心方法与创新机理
 
@@ -159,8 +155,6 @@ $$\frac{C_{\mathrm{PAS}}}{C_{\mathrm{attn}}} \leq \frac{S_v d_t}{S^2 d_h} = \fra
 
 由于时序维度占比p_t很小且序列长度S很大，该比值可忽略。实测吞吐量（原始backbone 77.2±3.1 ×10³ tokens/s vs PAS 76.8±4.0 ×10³ tokens/s）在统计上不可区分，证实改进并非以计算开销为代价。
 
-
-
 PAS（Phase Aggregated Smoothing）是一个**训练无关、即插即用**的推理时稳定器，作用于视频大语言模型（Video LLM）中已部署M-RoPE的注意力层。其核心操作极为精简：在标准多头注意力的计算流程中，**仅对查询流（Q）施加按注意力头分组的小幅度时序相位偏移，随后依赖模型自身的标准多头聚合机制自然产生平滑效应**。整个pipeline不修改任何模型参数、token化策略、视频帧数量或输入表示。
 
 ### 输入输出流
@@ -195,15 +189,11 @@ PAS的即插即用特性使其可以**透明地叠加**在其他训练无关的V
 
 PAS的理论计算开销与注意力计算之比为 $\frac{C_{\text{PAS}}}{C_{\text{attn}}} \leq \frac{S_v d_t}{S^2 d_h} = \frac{p_t S_v}{S^2}$。由于时序维度占比 $p_t$ 很小（通常为1/4或更小）且序列长度 $S$ 很大，该比值在实际部署中可忽略。实测吞吐量数据验证了这一点：原始backbone吞吐量为 $(77.2 \pm 3.1) \times 10^3$ tokens/s，PAS为 $(76.8 \pm 4.0) \times 10^3$ tokens/s，两者在统计上不可区分。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2133_https_arxiv_org_abs_2511_10979/figures/002_Figure_2.jpg]]
 *Figure 2: Temporal non-smoothness of the time domain modulation from original M-RoPE (upper) and how Phase Aggregated Smoothing (PAS) mitigates it (lower). PAS assigns small, opposed phase shifts to the query stream per head. Each head preserves its spectrum magnitude because a time shift only rotates phases. Head aggregation then acts as a controlled moving average in time, producing a smoother effective modulation across adjacent frames and reducing low gain induced suppression of key frames*
 
 ![[assets/figures/papers/paper_list_l2133_https_arxiv_org_abs_2511_10979/figures/003_Figure_3.jpg]]
 *Figure 3: Implementation of PAS. For the*
-
-
 
 ### 问题形式化：M-RoPE 的时序非平滑性
 
@@ -280,8 +270,6 @@ $$\frac{C_{\mathrm{PAS}}}{C_{\mathrm{attn}}} \leq \frac{S_v d_t}{S^2 d_h} = \fra
 
 其中 $S_v$ 为视频 token 数，$S$ 为总序列长度，$d_t$ 为时间半维度，$p_t$ 为时间维度占比。由于 $p_t$ 很小且 $S$ 很大，该比值在实践中可忽略。实验验证：原始 backbone 吞吐量为 $(77.2 \pm 3.1) \times 10^3$ tokens/s，PAS 为 $(76.8 \pm 4.0) \times 10^3$ tokens/s，两者在方差范围内统计不可区分。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -336,21 +324,14 @@ $$\frac{C_{\mathrm{PAS}}}{C_{\mathrm{attn}}} \leq \frac{S_v d_t}{S^2 d_h} = \fra
 
 **Table 2**的Nyquist条件标注为理解各基准上的性能差异提供了关键背景。满足Nyquist条件的基准(如20BN-Jester、Kinetics-700)上PAS改进显著且稳定;欠Nyquist的基准(如Breakfast Actions)上改进受限——这从频域角度解释了失败模式的根本原因。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2133_https_arxiv_org_abs_2511_10979/figures/004_Table_1.jpg]]
 *Table 1: Training-free, matched-token results including stacked variants. PAS applies per-head offsets [0, 0.5] in bin units. Rows above the horizontal rule list the backbone and single-method baselines; rows below show PAS stacked with other methods. Color coding: blue marks the best score within the upper block (above the rule) for each metric column, and green marks the best score over the entire column*
 
 ![[assets/figures/papers/paper_list_l2133_https_arxiv_org_abs_2511_10979/figures/005_Table_2.jpg]]
 *Table 2: Benchmarks used in our evaluation. The Nyquist column indicates whether the effective temporal sampling meets the Nyquist condition for the temporal RoPE line set*
 
-![[assets/figures/papers/paper_list_l2133_https_arxiv_org_abs_2511_10979/figures/006_Figure_4.jpg]]
-*Figure 4: Offset sweep with fixed K=2. Offsets ∆ are applied to only one of the two groups of query heads in bin units. We report accuracy as a function of*
-
 ![[assets/figures/papers/paper_list_l2133_https_arxiv_org_abs_2511_10979/figures/007_Figure_5.jpg]]
 *Figure 5: Sampling ratio ablation with fixed K=2, ∆=0.5. Classification accuracy as a function of the sampling ratio r*
-
-
 
 ## 定位与知识库关联
 
@@ -413,8 +394,6 @@ PAS 的适用性受以下前提约束：
 5. **与其他推理时方法的组合**：PAS 与多 pass 平均、Temporal Coherent Test-Time Optimization 等方法的组合效果如何？PAS 的可堆叠性已在 SlowFast/TS-LLaVA 上验证，但更广泛的推理时方法组合空间尚未探索。
 
 6. **视频分词策略的影响**：不同的视频分词和帧合并策略（如均匀采样 vs. 关键帧提取）如何影响 PAS 的最优偏移量选择？这涉及 token 化阶段的时序粒度与注意力阶段平滑操作的匹配问题。
-
-
 
 ## 原文 PDF
 

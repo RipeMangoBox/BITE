@@ -60,8 +60,6 @@ claims:
 
 **方法定位**：该方法属于差分隐私深度学习与视觉表征学习的交叉，针对细粒度结构化输出任务提出梯度空间降维与特征级隐私解耦的双重策略，为隐私保护下的高精度人体感知提供了新的范式。
 
-
-
 二维人体姿态估计（2D HPE）是计算机视觉的基础任务，广泛应用于人机交互、运动分析和医疗康复等领域。随着深度学习模型的成熟，高精度HPE系统通常需要在大规模人体图像数据集上进行训练，但这些数据往往包含敏感的个人身份信息（如面部、体型、纹身等），直接使用带来显著的隐私泄露风险。差分隐私（Differential Privacy, DP）作为严格的隐私保护框架，本应成为解决这一矛盾的自然选择，然而在实际部署中面临一个根本性瓶颈。
 
 **核心瓶颈：维度灾难下的信噪比崩溃。** 标准的DP-SGD（Abadi et al., 2016）在训练过程中对整个参数空间添加高斯噪声，其噪声强度与参数维度 $p$ 及梯度范数 $G$ 的乘积成正比。在2D HPE任务中，即使是轻量级架构（如TinyViT）的参数维度也高达数百万量级，导致添加的噪声远超过梯度信号本身，关键点定位精度急剧下降。实验表明，在MPII数据集上使用DP-SGD进行微调，即使隐私预算放宽至 $\varepsilon=0.8$，PCKh@0.5也仅能达到78.17%，与非隐私基线之间存在巨大的性能鸿沟。
@@ -69,8 +67,6 @@ claims:
 **现有方法的局限性。** 当前在隐私保护深度学习领域存在两类主要思路，但均未有效解决HPE场景下的效用退化问题。第一类方法通过改进DP-SGD的噪声机制或裁剪策略来减缓性能损失，但本质上仍受限于 $p \cdot G^2$ 的误差尺度，在高维视觉任务中收效甚微。第二类方法尝试利用公开数据辅助训练，如通过知识蒸馏或预训练-微调范式，但这些方法未能从梯度更新的空间结构层面降低隐私噪声的维度影响，隐私-效用权衡的改善有限。此外，特征差分隐私（Feature DP, Leemann et al., 2024）虽然提出将原始图像视为私有、模糊特征视为公有的思想，但单独使用时仍无法充分挖掘梯度空间的低维结构优势。
 
 **本文动机。** 针对上述困境，本文提出一个核心洞察：梯度更新的有效信号天然约束在低维流形内，而隐私噪声却均匀分布在全维空间。若能精确识别并限制梯度更新于该低维子空间，同时仅对真正包含敏感信息的原始像素施加隐私保护，则可以实现隐私-效用权衡的乘法增益。基于这一洞察，本文设计Feature-Projective DP-SGD框架，通过两个互补机制——子空间投影（将隐私误差从 $\mathcal{O}(p \cdot G^2)$ 降至 $\mathcal{O}(k \cdot C^2)$，其中 $k \ll p$）和特征差分隐私（将损失分解为公有特征损失与私有图像损失，仅对后者加噪）——在严格差分隐私保证下大幅提升HPE性能，恢复隐私引入的性能差距的73%。
-
-
 
 ## 核心方法与创新机理
 
@@ -118,8 +114,6 @@ $$\frac{1}{T}\sum_{t=1}^T\mathbb{E}\|\nabla \hat{L}_n(w_t)\|_2^2 \le \tilde{\mat
 
 这种乘法增益的本质在于：投影从**空间维度**压缩噪声方差，FDP 从**语义维度**减少需要加噪的梯度总量——二者作用于隐私-效用权衡的不同环节，形成互补而非冗余。
 
-
-
 本文提出 **Feature-Projective DP-SGD**，一个面向二维人体姿态估计的差分隐私训练框架。该框架将隐私保护机制深度嵌入模型训练流程，通过两个互补的模块——**子空间投影去噪**和**特征差分隐私损失分解**——协同降低差分隐私噪声对关键点定位精度的损害。
 
 ### 架构总览
@@ -153,8 +147,6 @@ $$\frac{1}{T}\sum_{t=1}^T\mathbb{E}\|\nabla \hat{L}_n(w_t)\|_2^2 \le \tilde{\mat
 - **特征差分隐私**将原始图像定义为私有、高斯模糊图像定义为公有，仅对私有梯度添加噪声，公有梯度保持无噪，从而大幅提升信噪比。
 
 两种机制产生**乘法增益效应**：子空间投影降低噪声维度，特征 DP 减少需加噪的梯度分量，二者叠加使模型在严格隐私预算下仍能逼近非隐私性能上限。收敛分析（Eq. 13）表明，期望梯度范数上界由两项主导——隐私误差项 `O(k·ρ·C²/(nε))` 和公开数据集重构误差项 `O(ΛG⁴ρ²γ₂² ln p / m)`，前者因 `k ≪ p` 而显著降低，后者随公开数据量 `m` 增大而衰减。
-
-
 
 Feature-Projective DP-SGD 的核心架构由三个相互耦合的模块构成：**子空间投影去噪**、**特征差分隐私损失分解**与**混合梯度合并**。这三个模块协同作用，将隐私保护下的梯度更新信号约束在低维有效流形内，实现隐私-效用权衡的乘法增益。
 
@@ -226,8 +218,6 @@ $$\frac{1}{T}\sum_{t=1}^T\mathbb{E}\|\nabla \hat{L}_n(w_t)\|_2^2 \le \tilde{\mat
 
 该上界从理论上解释了 Feature-Projective DP-SGD 的乘法增益来源：子空间投影降低隐私误差的维度因子，特征差分隐私通过公有梯度减少对噪声梯度的依赖，两者共同收紧收敛界。
 
-
-
 ## 实验与关键发现
 
 ### 实验设置概述
@@ -239,9 +229,6 @@ $$\frac{1}{T}\sum_{t=1}^T\mathbb{E}\|\nabla \hat{L}_n(w_t)\|_2^2 \le \tilde{\mat
 ### 非隐私基线性能
 
 Table 1 展示了模型在 MPII 数据集上的非隐私基线结果。全微调策略下，模型在原始图像上达到 **89.36%** 的平均 PCKh@0.5，在公有特征（高斯模糊图像）上达到 **88.49%**；冻结微调策略下分别为 87.79% 和 87.64%。从头训练时性能显著下降，原始图像上为 80.68%，公有特征上仅为 17.99%。这些结果确立了隐私保护方法的性能上界，并表明公有特征在微调场景下保留了足够的姿态信息，但不足以支撑从头训练。
-
-![[assets/figures/papers/paper_list_l1013_https_arxiv_org_abs_2504_10190/figures/004_Table_1.jpg]]
-*Table 1: MPII Results: Non-Private Baselines for our HPE model on the MPII dataset*
 
 ### 主实验结果
 
@@ -281,13 +268,7 @@ Figure 2 和 Figure 3 分别以可视化方式汇总了 MPII 和 HumanART 上各
 
 2. **特征差分隐私的独立贡献**（Table 5 vs Table 3）：Feature DP 的优势在于其对裁剪阈值 C 的鲁棒性——当 C 从 0.1 降至 0.01 时，标准 DP-SGD 性能急剧下降，而 Feature DP 的衰减更为平缓。这是因为公有特征梯度不受裁剪和加噪影响，为模型提供了稳定的学习信号。
 
-![[assets/figures/papers/paper_list_l1013_https_arxiv_org_abs_2504_10190/figures/010_Table_5.jpg]]
-*Table 5: MPII Results: Feature DP*
-
 3. **乘法增益验证**（Table 6 vs Tables 4, 5）：Feature-Projective DP 在所有 (ε, C, 训练策略) 组合下均优于任一单独机制，且增益幅度大于两独立增益之和的简单叠加。这证实了两种机制作用于互补的误差来源：投影降低参数空间维度的噪声方差，特征 DP 降低需要加噪的梯度分量数量。
-
-![[assets/figures/papers/paper_list_l1013_https_arxiv_org_abs_2504_10190/figures/009_Table_6.jpg]]
-*Table 6: MPII Results: Feature Projective DP*
 
 ### 定性结果分析
 
@@ -298,9 +279,6 @@ Figure 4 和 Figure 5 展示了定性对比结果。在 ε=0.5、C=0.1 的冻结
 
 ![[assets/figures/papers/paper_list_l1013_https_arxiv_org_abs_2504_10190/figures/005_Figure_4.jpg]]
 *Figure 4: Depiction of qualitative results on DP-SGD, Projection DP-SGD and Feature Projection DP-SGD. We specifically show results on Finetuning with C = 0.1 at various privacy budgets*
-
-![[assets/figures/papers/paper_list_l1013_https_arxiv_org_abs_2504_10190/figures/015_Figure_5.jpg]]
-*Figure 5: Figures (a-e)Depiction of qualitative results on DP-SGD, Projection DP-SGD and Feature Projection DP-SGD. We specifically show results on Finetuning with C = 0.1 at various privacy budgets. (f) Representation of Raw (Private) image compared to public feature (gaussian blurred)*
 
 Figure 5(f) 展示了原始私有图像与高斯模糊公有特征的对比，直观说明了公有特征如何在不泄露身份信息的前提下保留足够的姿态结构信息。
 
@@ -319,16 +297,6 @@ Figure 5(f) 展示了原始私有图像与高斯模糊公有特征的对比，�
 ### 收敛性分析验证
 
 理论收敛上界（Eq.13）表明，期望梯度范数由两项主导：第一项 $\tilde{\mathcal{O}}(k \cdot \rho \cdot C^2 / (n \varepsilon))$ 为隐私误差，由子空间维度 k 和裁剪阈值 C 控制；第二项 $\mathcal{O}(\Lambda G^4 \rho^2 \gamma_2^2 \ln p / m)$ 为公开数据集引入的重构误差。实验结果与理论预测一致：增大公开数据集规模 m 可降低重构误差，降低 k 可减小隐私误差，但过小的 k 会增加重构误差——这解释了消融实验中 k 值选择的非单调效应。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1013_https_arxiv_org_abs_2504_10190/figures/013_Table_10.jpg]]
-*Table 10: HumanART Results: Feature Projection DP-SGD plus projection*
-
-![[assets/figures/papers/paper_list_l1013_https_arxiv_org_abs_2504_10190/figures/011_Table_7.jpg]]
-*Table 7: HumanART Results: DP-SGD*
-
-
 
 ## 定位与知识库关联
 
@@ -388,8 +356,6 @@ $$\frac{1}{T}\sum_{t=1}^T\mathbb{E}\|\nabla \hat{L}_n(w_t)\|_2^2 \le \tilde{\mat
 5. **跨任务泛化能力**：该框架能否推广到其他细粒度视觉任务（如人脸关键点检测、医学图像分割、细粒度分类）并保持类似的乘法增益？这需要验证梯度子空间假设在不同任务结构下的普适性。
 
 6. **与差分隐私合成数据方法的对比**：近年来，基于生成模型的隐私保护方法（如DP扩散模型生成合成训练数据）在部分视觉任务上展现了竞争力。Feature-Projective DP与这类方法的相对优劣势尚待系统比较。
-
-
 
 ## 原文 PDF
 

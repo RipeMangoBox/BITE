@@ -57,8 +57,6 @@ VC-STaR 的核心机制包含三个关键设计：
 
 在六个具有挑战性的基准上，VC-STaR 平均提升 **2.6 个百分点**，尤其在幻觉基准 MMVP 和 Hallusion 上分别提升 **5.7%** 和 **3.2%**，超过所有自改进基线。该方法在 Qwen2.5VL-3B 和 InternVL2.5-8B 上也表现出显著增益，具有良好的模型架构泛化性。
 
-
-
 视觉语言模型（VLMs）在视觉问答、数学推理、图表理解等多模态任务中展现出令人瞩目的能力，但其推理过程常受**视觉幻觉**困扰——模型生成的推理路径中掺杂与图像事实不符的描述或判断，导致最终答案错误。这种幻觉现象在需要细粒度视觉辨别的场景中尤为突出，例如区分两张外观高度相似但细节不同的图像，或准确定位图中的微小文字与符号。
 
 现有提升VLM推理质量的方法大致分为两类：一类是构建高质量视觉推理数据集进行监督微调，如**LLaVA-CoT**（Xu et al., 2025）、**R1-Onevision**（Yang et al., 2025b）等；另一类是自改进方法，让模型通过自我验证或反馈迭代优化推理路径，典型代表包括**STaR**（Zelikman et al., NeurIPS 2022）、**Verifier**（Lu et al., 2024a）和**Feedback**（Qu et al., 2024）。然而，这两类方法均存在一个根本性瓶颈：**它们无法有效验证并修复视觉推理路径中的视觉幻觉**。文本域的自改进方法（如STaR）仅利用正确答案作为提示重新生成推理，但正确答案本身并不包含视觉纠错信息，因此错误的视觉依据可能被保留甚至放大，导致模型在幻觉基准上表现不佳。
@@ -66,8 +64,6 @@ VC-STaR 的核心机制包含三个关键设计：
 本文的核心洞察源自一个反直觉的观察：**VLM在进行图像对比时，其视觉辨别能力显著优于单图推理**。如图1所示，当VLM面对两张视觉相似但细节不同的图像并配合同义问题时（即“对比VQA对”），模型能够更准确地提取和区分视觉信息，从而纠正原本在单图推理中产生的幻觉。这一现象揭示了VLM内在的对比能力可被重新利用，作为抑制自身视觉幻觉的自我监督信号，使**无需额外奖励模型或人工分解步骤的自我改进视觉推理**成为可能。
 
 基于上述动机，本文提出**VC-STaR**（Visual Contrastive Self-Taught Reasoner），通过构造对比VQA对激发模型的细粒度对比分析能力，并将多图对比的精确视觉辨别迁移到单图推理中，系统性地纠正推理路径中的视觉幻觉。
-
-
 
 ## 核心方法与创新机理
 
@@ -104,8 +100,6 @@ VC-STaR 进一步揭示了对比类型对推理改进的差异化影响（Table 
 
 值得注意的是，VC-STaR 的对比管道仅在**数据构造阶段**使用，微调后的模型在推理时遵循标准VLM推理范式，无需额外的对比流水线。这一设计保证了方法在推理效率上与基线方法公平可比，同时将对比能力内化到模型参数中。
 
-
-
 ![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_ZymCPON45y/figures/005_Figure_4.jpg]]
 *Figure 4: Faithful rationale generation pipeline. A contrastive analysis can be obtained based on the curated contrastive VQA pair. Leveraging the property of VLMs illustrated in Fig. 1, the contrastive analysis is then used to trigger a rethinking procedure, which refines the naive rationale into a more faithful one. This pipeline is designed to generate rationales for supervised finetuning*
 
@@ -141,8 +135,6 @@ VC-STaR 的完整流程由两大阶段、五个核心模块构成：
 - **对比对类型**：负面对比（答案不同）比正面对比（答案相同）在改善视觉推理方面更为有效，两者组合可带来最优增益（Table 4：GQA上从基础45.4提升至54.7）。
 - **难度采样**：仅保留中等难度对比对生成推理路径是最优策略（Table 3），暗示过于简单的样本无法提供有效的对比学习信号，反而引入噪声。
 - **对比对构造策略**：基于相似度搜索的策略优于编辑式（HQ-Edit）或描述式（DOCCI）策略（Figure 6），说明精心选择视觉相似的同义问答对是激发VLM对比能力的关键。
-
-
 
 VC-STaR 的核心流程围绕两个关键挑战展开：(1) 如何构造有意义的对比VQA对；(2) 如何将双图对比中的细粒度辨别能力迁移到单图推理的修正中。整个方法包含三个关键模块：对比VQA对构建、忠实推理路径生成、以及后处理过滤。
 
@@ -186,14 +178,11 @@ $$\tilde{r}_i = f(r_i, c_i \vert \psi, \delta^r)$$
 
 值得注意的是，对比流水线仅在数据构造阶段使用。微调后的模型在推理时遵循标准VLM推理范式，无需执行对比流水线，保证了推理效率与基线方法公平可比。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：VC-STaR 在幻觉与推理基准上全面超越自改进基线
 
 VC-STaR 在六个具有挑战性的基准上取得了 **58.1** 的平均准确率，较基础模型 Qwen2.5VL-7B 的 55.5 提升了 **+2.6 个百分点**，显著优于所有自改进基线方法（Table 1）。这一提升的关键驱动力在于视觉幻觉的有效抑制：在专门评估幻觉的 **MMVP** 和 **Hallusion** 基准上，VC-STaR 分别取得了 **75.7**（+5.7）和 **56.3**（+3.2）的突出成绩，远超 STaR（Zelikman et al., NeurIPS 2022）等仅依赖文本提示的自改进方法。在数学推理基准 **MathVista** 和 **MathVision** 上，VC-STaR 也分别实现了 69.7（+1.3）和 25.3（+1.3）的稳定提升，表明对比机制对视觉密集型推理任务的普适增益。
-
 
 ![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_ZymCPON45y/figures/006_Table_1.jpg]]
 *Table 1: Performance comparison with self-improving baselines and the models trained on offthe-shelf visual reasoning datasets on hallucination, math, and general benchmarks. We adopt the Qwen2.5VL-7B as our base model, and report its reasoning performance as a baseline. MME-RW is short for MME-RealWorld Zhang et al. (2025b); R1-OV is short for R1-Onevision (Yang et al., 2025b). Blue (red) numbers in parentheses represent performance gains (drops) relative to the baseline. The best performance is in boldface, and the second best is underlined*
@@ -204,18 +193,15 @@ VC-STaR 在六个具有挑战性的基准上取得了 **58.1** 的平均准确�
 
 **难度采样策略**是 VC-STaR 数据构建中的关键设计选择。Table 3 的消融实验表明，仅保留中等难度对比对训练的模型性能最优；额外加入 20K 简单样本导致 Hallusion 下降 4.1、MathVision 下降 2.0、MMStar 下降 1.1；加入 40K 简单样本后性能进一步恶化。这一反直觉结果揭示了自改进推理中的一个重要瓶颈：过于简单的样本无法提供足够的视觉歧义来激发有意义的对比分析，反而稀释了训练数据中精细视觉辨别的信号密度。
 
-
 ![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_ZymCPON45y/figures/010_Table_3.jpg]]
 *Table 3: Effect of the easy samples adding to VisCoR-55K. Red numbers in parentheses represent performance drops*
 
 **对比对类型**同样至关重要。Table 4 在 GQA 基准上的分析显示，负面对比（答案不同）带来的提升远大于正面对比（答案相同）：仅使用正面对比从基础 45.4 提升至 50.6（+5.2），而仅使用负面对比提升至 53.7（+8.3）；两者结合达到最优的 54.7（+9.3）。这一结果表明，负面对比迫使模型在视觉相似但语义不同的图像间进行更精细的辨别，从而更有效地抑制“视觉近似即答案相同”的幻觉倾向。正面对比则强化了跨视觉变化的语义不变性识别，两者在功能上互补。
 
-
 ![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_ZymCPON45y/figures/011_Table_4.jpg]]
 *Table 4: Analysis about the effect of positive and negative contrastive VQA counterparts on GQA benchmark. We adopt the Qwen2.5VL-7B as our base model, and report its reasoning performance as a baseline. QR: query for relationships; QA: query for attributes; QG: query for global information; QC: query for category; CA: comparing of attribute; CC: choosing the object of one certain category; CAt: choosing the object of one certain attribute. Blue (red) numbers in parentheses represent performance gains (drops) relative to the baseline*
 
 **对比对构造策略**的比较进一步验证了 VC-STaR 设计选择的合理性。Figure 6 显示，基于相似度搜索的对比对构造策略在多个基准上优于编辑式策略（HQ-Edit）和描述式策略（DOCCI）。后两者的性能甚至在某些基准上低于基础模型（红色虚线），论文将其归因于 HQ-Edit 和 DOCCI 的数据分布偏差限制了对比对的有效覆盖范围。这强化了“精心选择视觉相似的同义问答对”这一设计原则的实证基础。
-
 
 ![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_ZymCPON45y/figures/008_Figure_6.jpg]]
 *Figure 6: Performance comparison with other contrastive VQA pair construction strategies. Rationales in all settings are generated from the proposed VC-STaR. The red dashed line represents the base model (Qwen2.5VL-7B) performance*
@@ -224,27 +210,14 @@ VC-STaR 在六个具有挑战性的基准上取得了 **58.1** 的平均准确�
 
 **模型架构泛化性**方面，VC-STaR 在 Qwen2.5VL-3B 和 InternVL2.5-8B 上也表现出显著增益（Table 2）。在 Qwen2.5VL-3B 上，Hallusion 提升 6.3、MathVision 提升 3.5、MMStar 提升 0.7；在 InternVL2.5-8B 上，三者分别提升 7.2、2.1 和 1.4。这一跨模型家族的一致性增益表明，对比自我改进机制不依赖于特定视觉编码器或语言模型的架构特性，而是利用了 VLM 在对比条件下普遍增强的视觉辨别能力。
 
-
 ![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_ZymCPON45y/figures/009_Table_2.jpg]]
 *Table 2: Evaluation of the effect of VC-STaR on other base models. Blue numbers in parentheses represent performance gains*
 
 **定性对比**（Figure 5）直观展示了 VC-STaR 的改进效果：基础模型直接回答时容易忽略关键视觉细节；添加“逐步思考”提示后推理路径仍可能包含视觉幻觉；而 VC-STaR 改进后的模型能够准确定位并引用图像中的关键视觉证据（图中以红色框标注），生成更忠实于视觉输入的推理路径。VisCoR-55K 中的推理路径示例（Figure 8）和附加定性对比（Figure 9）进一步佐证了这一模式。
 
-
-![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_ZymCPON45y/figures/007_Figure_5.jpg]]
-*Figure 5: Qualitative Comparison with base model. The second row shows the directly response from the base model, the third row shows the response when the base model is prompted to “think stey by step”, the last row shows the model improved with our VC-STaR. We highlight the key visual evidences with red boxes for clarity of visualization. More results are in Sec. A.4*
-
-![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_ZymCPON45y/figures/014_Figure_8.jpg]]
-*Figure 8: Examples of rationales in VisCoR-55K*
-
-![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_ZymCPON45y/figures/015_Figure_9.jpg]]
-*Figure 9: Additional qualitative comparison*
-
 ### 失败模式与局限性
 
 尽管 VC-STaR 在整体上表现优异，但其有效性高度依赖对比VQA对的质量。对比对的构建依赖嵌入空间和相似性阈值的选择，贪婪首次匹配策略可能遗漏更优的对比样本。此外，难度采样的分类依赖于 VLM 本身的表现，可能引入模态偏置，使得采样策略在不同模型上的适应性存在差异。推理生成的两阶段过程（对比与反思）也增加了数据构造的计算成本。当前仅在 Qwen2.5-VL 和 InternVL2.5 家族上验证，对 LLaVA 系列等其他架构的泛化性有待进一步检验。
-
-
 
 ## 定位与知识库关联
 
@@ -283,8 +256,6 @@ VC-STaR 的关键突破在于识别出 VLM 的一种内在能力：当面对两�
 4. **显式视觉差异信号**：是否可以利用图像差异图作为显式的学习信号，指导模型生成更忠实于视觉证据的解释？当前方法依赖文本形式的对比分析，直接利用视觉差异可能提供更强的监督。
 
 5. **难度定义的自动化**：对比采样中的难度定义能否实现自动化，以达成完全任务无关的自我改进？当前难度分类依赖 VLM 的初始表现，一个自适应的难度估计器可能提升方法的通用性。
-
-
 
 ## 原文 PDF
 

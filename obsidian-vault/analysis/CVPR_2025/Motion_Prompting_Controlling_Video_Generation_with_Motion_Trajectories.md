@@ -82,8 +82,6 @@ Motion Prompting 属于**轨迹条件视频生成**这一新兴方向。与基�
 - 生成速度慢（单视频约 12 分钟），不支持实时交互或因果生成。
 - 极端相机运动下组合运动提示可能不准确。
 
-
-
 视频生成模型近年来取得了显著进展，但精确的运动控制仍然是一个核心瓶颈。现有方法主要依赖文本提示（text prompts）来引导视频中的运动，然而自然语言在表达运动的细微动态、时序关系和空间细节方面存在固有局限。例如，文本难以精确描述“加速旋转”、“同步动作”或“部分遮挡下的运动轨迹”等复杂运动模式。这种文本与运动之间的语义鸿沟，使得用户无法对生成视频中的物体运动、相机运动及其组合进行细粒度的、可预期的控制。
 
 为弥补这一缺口，一些工作开始探索超越纯文本的运动控制方式。例如，**Image Conductor** 基于 AnimateDiff 微调，尝试使用轨迹条件引导视频生成；**DragAnything** 则在 Stable Video Diffusion 基础上针对实体移动引入轨迹控制。然而，这些基线方法通常采用多阶段微调、特定损失函数或复杂的数据筛选等工程手段，且往往仅支持稀疏轨迹或特定类型的运动，缺乏统一的运动控制框架。
@@ -91,8 +89,6 @@ Motion Prompting 属于**轨迹条件视频生成**这一新兴方向。与基�
 本文的核心动机在于：**是否存在一种统一的运动表示，既能灵活编码从稀疏到密集、从局部物体到全局场景的任意运动，又能通过简洁的训练策略和直观的用户交互实现多样化的运动控制任务？**
 
 为此，本文提出 **Motion Prompting** 方法，其核心洞察是采用**点轨迹（point trajectories）**作为统一的运动表示。点轨迹天然具备以下优势：（1）可编码空间和时间上稀疏或密集的运动；（2）可描述单个物体或整个场景的运动；（3）通过可见性标志（visibility flag）可处理遮挡和出屏情况。基于这一表示，本文在预训练视频扩散模型 Lumiere 之上训练一个 ControlNet 适配器，以单阶段方式注入运动轨迹条件，无需复杂的工程技巧。在推理阶段，通过**运动提示扩展（motion prompt expansion）**机制，将用户的高级意图（如鼠标拖拽、几何图元操作、深度估计等）自动转化为详细的运动轨迹，从而在单一训练模型上实现物体控制、相机控制、运动传递、模型探测等多种能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -131,8 +127,6 @@ $$\mathbf{c}[t, x_{t}^{n}, y_{t}^{n}] = \mathbf{v}[n, t] \phi_{n}$$
 
 这一设计使得单一训练模型能够支持物体控制、相机控制、运动传递、模型探测等多种应用，构成统一的运动控制框架。
 
-
-
 Motion Prompting 的整体管线由两个阶段构成：**训练阶段**构建一个通用的轨迹条件视频生成模型；**推理阶段**则通过运动提示扩展（motion prompt expansion）将用户的高级意图转化为详细的运动轨迹，驱动该模型生成视频。
 
 ### 训练阶段：轨迹条件视频扩散模型
@@ -167,8 +161,6 @@ Motion Prompting 的整体管线由两个阶段构成：**训练阶段**构建�
 - **输出**：128×128 分辨率、80 帧、16 fps 的视频，其运动模式由输入轨迹控制。
 
 该框架的统一性在于：单一训练模型无需针对不同控制任务进行微调，仅通过改变推理阶段的运动提示扩展方式，即可覆盖物体控制、相机控制、运动传递等多种应用场景。
-
-
 
 ### 运动提示：点轨迹与可见性
 
@@ -218,8 +210,6 @@ $$\mathbf{c}[t, x_t^n, y_t^n] = \mathbf{v}[n, t] \cdot \phi_n$$
 | $\mathbf{p} \in \mathbb{R}^{N \times T \times 2}$ | $N$ 条长度为 $T$ 的点轨迹集合 |
 | $\mathbf{v} \in \mathbb{R}^{N \times T}$ | 轨迹可见性数组，$\{0,1\}$ 取值 |
 | $\mathbf{c}[t, x_t^n, y_t^n] = \mathbf{v}[n, t] \phi_n$ | 时空条件体积赋值规则，可见位置写入轨迹嵌入，否则置零 |
-
-
 
 ## 实验与关键发现
 
@@ -277,24 +267,11 @@ $$\mathbf{c}[t, x_t^n, y_t^n] = \mathbf{v}[n, t] \cdot \phi_n$$
 
 当前模型的生成速度较慢，单个视频（128×128分辨率、80帧、16fps）约需12分钟，远未达到实时交互的要求。这是限制该方法走向实际交互式应用的主要工程瓶颈。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l16_Motion_Prompting_Controlling_Video_Generation_with_Motion_Trajectories/figures/015_Figure.jpg]]
-*Figure: A2. Test and Train Metrics. Here we plot out training loss, along with PSNR, SSIM, LPIPS, and EPE on our DAVIS test set. Note that there is no correlation between the training loss and the test metrics, and that the test metrics show no signs of improvement until step 20,000 at which point the network learns quite rapidly*
-
-![[assets/figures/papers/paper_list_l16_Motion_Prompting_Controlling_Video_Generation_with_Motion_Trajectories/figures/019_Figure.jpg]]
-*Figure: A4. Motion Magnification. We show the result of using our model to perform motion magnification. We show the first frame of two videos, and space-time slices through the blue line at different magnification factors*
-
 ![[assets/figures/papers/paper_list_l16_Motion_Prompting_Controlling_Video_Generation_with_Motion_Trajectories/figures/014_Table.jpg]]
 *Table: A1. Figure Details. We provide details about qualitative samples shown in our figures, including text prompts fed to the model and licensing information. In general, these are sorted by the order that they appear in the paper, moving from left to right, top to bottom*
 
 ![[assets/figures/papers/paper_list_l16_Motion_Prompting_Controlling_Video_Generation_with_Motion_Trajectories/figures/017_Table.jpg]]
 *Table: A2. Quantitative Evaluations. We evaluate the appearance (PSNR, SSIM, LPIPS, FVD) and motion (EPE) of generated videos using the validation set of the DAVIS dataset. Please note that each method is trained from a different base model*
-
-![[assets/figures/papers/paper_list_l16_Motion_Prompting_Controlling_Video_Generation_with_Motion_Trajectories/figures/016_Figure.jpg]]
-*Figure: A3. Pose Conditioning. We estimate human pose, animate it, translate it to tracks, and then feed it to our model. In each row, we show frames from generated videos with input tracks overlaid on top*
-
-
 
 ## 定位与知识库关联
 
@@ -350,8 +327,6 @@ $$\mathbf{c}[t, x_t^n, y_t^n] = \mathbf{v}[n, t] \phi_n$$
 5. **长视频与多物体交互**：模型是否能够泛化到更长的视频生成或更复杂的多物体交互场景？
 
 **注意**：本文与基线方法（Image Conductor、DragAnything）基于不同的基础模型（Lumiere vs AnimateDiff vs Stable Video Diffusion），这可能影响生成视频视觉质量的直接比较。此外，DAVIS 评估中 DragAnything 需要额外的分割掩码输入（本文方法不需要），但评估时使用了数据集提供的真实掩码，可能有利于 DragAnything——这些因素在解读定量结果时需加以考虑。
-
-
 
 ## 原文 PDF
 

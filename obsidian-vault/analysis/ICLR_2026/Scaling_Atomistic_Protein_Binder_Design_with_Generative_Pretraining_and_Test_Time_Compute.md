@@ -62,8 +62,6 @@ claims:
 
 **重要局限**：所有评估均基于计算指标（ipAE、pLDDT 等），尚未经湿实验验证；对极难靶点（如 TNF-α、H1）仍需数百至上千 GPU 小时才能获得足量唯一结合剂；当前框架仅针对蛋白质和小分子靶点演示，尚未扩展至 DNA、RNA 等其他模态。
 
-
-
 蛋白质结合蛋白（protein binder）的从头设计是蛋白质工程的核心挑战之一，其目标是为给定的靶点分子生成能够高亲和力、高特异性结合的蛋白质序列与结构。这一能力在治疗性抗体开发、生物传感器设计、酶工程等领域具有广泛的应用前景。近年来，随着深度生成模型和结构预测模型的快速发展，计算驱动的结合蛋白设计取得了显著进展，但现有方法仍面临根本性的瓶颈。
 
 ### 现有方法的二元分裂
@@ -92,8 +90,6 @@ claims:
 - **生成与幻觉的混合策略**：允许先由生成模型初始化候选结构，再通过幻觉方法进行序列精修，实现两种范式的优势互补。
 
 这一统一框架使得 Complexa 在归一化的计算预算下，能够显著超越纯生成方法和纯幻觉方法，为蛋白质结合蛋白的从头设计提供了新的技术路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -133,8 +129,6 @@ Complexa的推理框架将生成模型视为**可操纵的搜索先验**，集�
 ### 创新机制间的因果依赖
 
 上述创新并非独立生效，而是形成因果链条：Teddymer提供训练信号→翻译噪声迫使空间推理→分阶段训练稳定习得→生成先验赋能高效搜索。消融实验中去除任一环节均导致性能崩塌，验证了这一依赖关系。此外，“生成+幻觉”混合策略（以生成模型初始化BindCraft）在简单靶点上优于纯幻觉方法，但在困难靶点上仍不及内置搜索算法（Figure 16-18），进一步证明生成先验与搜索算法的深度耦合是突破性能瓶颈的关键。
-
-
 
 ### 设计动机与统一范式
 
@@ -216,8 +210,6 @@ $$i = \arg\max_i \frac{R(\ldots)}{V(\ldots)} + C \sqrt{\frac{\ln(V(\mathrm{paren
 ### 输入输出流与模块耦合
 
 整个框架的数据流是单向且模块间松耦合的：VAE编码器与解码器在条件生成训练期间保持冻结，靶点条件仅注入流匹配模型；测试时优化器作为独立模块，以生成模型的中间状态为输入，以结构预测分数为反馈信号，通过修改采样路径来提升最终输出质量。这种设计使得生成先验与搜索优化可以灵活组合——简单靶点可直接采样，困难靶点则投入更多计算资源进行引导搜索。
-
-
 
 ### 部分潜在流匹配框架
 
@@ -308,8 +300,6 @@ Complexa 采用三阶段训练流程以实现稳定的条件生成能力：
 
 这种分阶段策略的核心优势在于：模型先在大量单体数据上学习通用的蛋白质结构生成能力，再通过相对较小的结合剂-靶点配对数据将这一能力转化为条件生成。消融实验表明，跳过 Teddymer 预训练或移除平移噪声均会导致性能崩溃（Table 6），验证了各模块的必要性。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设计
@@ -366,15 +356,6 @@ Teddymer合成二聚体数据集是Complexa性能的核心支柱。移除Teddyme
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_qmCpJtFZra/figures/021_Table_6.jpg]]
 *Table 6: Translation noise and Teddymer ablation studies. average unique successes and the number of times each method ranks best across 19 targets. Results are shown for Complexa, and variants without Teddymer data and without translation noise*
 
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_qmCpJtFZra/figures/022_Table_7.jpg]]
-*Table 7: Translation noise and Teddymer ablation studies (detailed results). Unique successes across 19 targets for Complexa and its variants without Teddymer data or translation noise, evaluated with different sequence redesign methods. Results are visualized in Fig. 13*
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_qmCpJtFZra/figures/025_Table_8.jpg]]
-*Table 8: Teddymer ablation study with Boltz-2. Boltz-2-based evaluation of the average unique successes across 19 targets. Results are shown for Complexa and the variant trained without Teddymer data*
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_qmCpJtFZra/figures/027_Table_9.jpg]]
-*Table 9: Teddymer ablation study with RF3. RF3-based evaluation of the average unique successes across 19 targets. Results are shown for Complexa and the variant trained without Teddymer data*
-
 Teddymer的关键在于其与真实多聚体界面具有分布重叠（Figure 3），提供了大规模、多样化的界面互作模式，使模型能学习到可泛化的结合几何先验。
 
 #### 翻译噪声：空间定位能力的关键
@@ -389,9 +370,6 @@ Teddymer的关键在于其与真实多聚体界面具有分布重叠（Figure 3�
 
 波束搜索结合不同奖励函数的实验（Table 3）揭示了折叠评分（f_ipAE）与氢键能量（f_H-Bond）的互补性。单独使用折叠评分已能有效引导搜索，而加入界面氢键能量奖励可进一步产生具有更广泛互作界面的结合剂（Figure 11），但可能以牺牲唯一成功数为代价（Figure 24）。界面氢键数量与ipAE之间存在负相关（Figure 28），表明更强的极性互作倾向于伴随更低的预测对齐误差，但这一关系并非单调，需要在优化中权衡。
 
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_qmCpJtFZra/figures/013_Table_3.jpg]]
-*Table 3: Inference-time optimization using beam search with different combinations of folding and hydrogen bond rewards. Details in Sec. I.6*
-
 ### 失败模式与局限
 
 1. **计算指标与实验活性的鸿沟**：所有成功评估均基于计算指标（ipAE、pLDDT、RMSD），尚未经湿实验验证。这些指标与真实结合活性的关联存在不确定性，是当前计算设计的根本局限。
@@ -403,16 +381,6 @@ Teddymer的关键在于其与真实多聚体界面具有分布重叠（Figure 3�
 4. **模态覆盖范围**：当前框架仅针对蛋白质和小分子靶点进行演示，尚未扩展到DNA、RNA或抗体等其他分子模态。
 
 5. **Teddymer的构建局限**：Teddymer数据集虽与真实多聚体接口具有分布重叠，但基于预测结构（AFDB）构建，可能缺少某些生物物理约束和翻译后修饰信息。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_qmCpJtFZra/figures/019_Table_4.jpg]]
-*Table 4: Selected protein targets with their structural information, binding specifications, and data source*
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_qmCpJtFZra/figures/020_Table_5.jpg]]
-*Table 5: Selected small molecule targets with their structural information, binding specifications, and data source*
-
-
 
 ## 定位与知识库关联
 
@@ -473,8 +441,6 @@ Complexa 的核心贡献在于**打破这一错误二分法**。它构建在 **L
 4. **推理时搜索的效率优化**：在保证生成多样性的前提下，能否进一步降低推理时搜索的计算成本？例如，通过学习搜索策略或蒸馏搜索过程，使其适用于更大规模的靶点库筛选。
 
 5. **Teddymer 数据集的增强方向**：引入翻译后修饰、界面动力学特征或多构象采样，能否进一步提升模型对真实结合界面的泛化能力？
-
-
 
 ## 原文 PDF
 

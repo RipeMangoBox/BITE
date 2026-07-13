@@ -59,8 +59,6 @@ Selfi 的完整流水线包含三个关键模块：
 
 Selfi 的局限性主要体现在：VGGT 在天空、远距离区域的深度预测可能不准确；模型在动态场景上可能失效；训练需要大量计算资源（128 块 H100 GPU）。未来工作将聚焦于动态场景的特征匹配、更精细的深度预测，以及将自提升的特征对齐思想推广到其他三维基础模型和下游任务。
 
-
-
 ### 三维重建与无姿态新视角合成的技术瓶颈
 
 新视角合成（Novel View Synthesis, NVS）是三维视觉的核心任务之一。以**3DGS**（Kerbl et al., ACM TOG 2023）为代表的逐场景优化方法虽能生成高保真渲染结果，却高度依赖精确的相机位姿参数和密集的输入视图，限制了其在非受控场景中的实用性。近年来，前馈式重建方法试图从稀疏图像直接预测三维表示，但多数方法（如**pixelNeRF**、**PixelSplat**、**MVSplat**、**GS-LRM**）仍假设相机参数已知，无法处理真实世界中常见的无姿态（unposed）图像输入。
@@ -84,8 +82,6 @@ Selfi 的局限性主要体现在：VGGT 在天空、远距离区域的深度预
 具体而言，Selfi冻结VGGT作为骨干网络，在其上附加一个轻量级的DPT特征适配器，通过重投影一致性损失进行自监督训练。该损失利用VGGT预测的深度图和相机参数作为伪真值，将源视图中的查询点重投影到目标视图，并约束两个视图中对应位置的特征具有高相似度。这一设计使得适配器学会输出几何对齐的特征表示，为后续的高斯预测和束调整提供了统一且鲁棒的基础。
 
 在此基础上，Selfi进一步引入两个关键组件以提升渲染质量：（1）**视角依赖的球谐密度**，作为置信度评分抑制远离目标视角的输入帧中的错误高斯；（2）**束调整后的仿射深度校正**，将稀疏三维点的深度变化传播到所有密集高斯上，实现渲染的无缝对齐。整个流水线构成一个闭环的自改进系统：对齐特征 → 高斯预测 → 束调整优化位姿 → 深度校正更新几何 → 最终渲染，每一步的输出都为下一步提供了更优的初始条件。
-
-
 
 ## 核心方法与创新机理
 
@@ -129,8 +125,6 @@ Selfi 的核心洞察在于：**三维基础模型自身输出的深度图和相
 
 Selfi 的四项创新构成了一个完整的**自改进重建引擎**：几何特征对齐为所有下游任务提供了高质量的特征基础；全局加权平均确保了特征学习的稳定性；视角依赖密度增强了多视图融合的鲁棒性；BA 后的深度校正则打通了位姿优化到渲染提升的“最后一公里”。这些创新协同作用，使得 Selfi 在无姿态新视角合成任务上大幅超越现有前馈方法，逼近甚至在某些设置下超越使用真值相机参数的 3DGS 上限。
 
-
-
 Selfi 是一个**自改进的三维重建引擎**，其核心设计理念是：利用冻结的三维基础模型（VGGT）的自输出作为密集的自监督信号，将基础模型的特征空间转化为几何对齐的特征空间，并在此基础上预测三维高斯基元，最终通过束调整（BA）和深度校正实现渲染质量的二次提升。整个 pipeline 由三个关键阶段串联而成，形成“特征对齐 → 高斯预测 → 自改进优化”的闭环。
 
 ### Pipeline 总览
@@ -171,8 +165,6 @@ Selfi 的 pipeline 设计体现了三个核心洞察：
 - **阶段二（高斯预测器）**：混合 DL3DV 和 RealEstate10K 数据集，采样 6 个源帧和 5 个插值目标帧，使用 L1 渲染损失 $`\mathcal{L}_{\text{RGB}}`$ 训练 U-Net 解码器。学习率为 $2 \times 10^{-4}$，在 128 块 H100 GPU 上约需 1.5 天。
 
 两个阶段均使用 VGGT 的冻结权重，确保基础模型的通用三维先验不被破坏，仅通过轻量级适配器实现任务特定的特征转化。
-
-
 
 ### 3.1 几何特征对齐
 
@@ -242,19 +234,6 @@ $$\mathbf{s}_s' = \frac{\phi(\mathbf{D}_s + \Delta\mathbf{D}_s)}{\mathbf{D}_s + 
 
 实验表明，该仿射深度校正操作对于BA后渲染质量至关重要：移除该步骤会导致PSNR显著下降，渲染结果出现明显错位。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2094_https_arxiv_org_abs_2512_08930/figures/002_Figure_2.jpg]]
-*Figure 2: Geometric Feature Alignment with Self-Labeled Pseudo-Ground-Truth. Using a pretrained VGGT [54] backbone, we use predicted depth and camera parameters as pseudo-ground-truth to align features obtained from a DPT adapter on top of VGGT image tokens. We sample query points and reproject these points to a target view using depth and camera parameters. Our loss function encourages the features at these two corresponding locations from source and target frames to be similar*
-
-![[assets/figures/papers/paper_list_l2094_https_arxiv_org_abs_2512_08930/figures/004_Figure_4.jpg]]
-*Figure 4: Bundle Adjustment with Depth Shift. (a) After refining the camera poses with bundle adjustment, naively rendering the predicted Gaussian primitives with the new poses results in misalignment. (b) Propagating the adjustments in sparse 3D points during BA to the dense depth maps results in improved rendering. (c) We plot the sparse point depths before and after BA, and observe that a linear fit suffices for this adjustment*
-
-![[assets/figures/papers/paper_list_l2094_https_arxiv_org_abs_2512_08930/figures/015_Figure_8.jpg]]
-*Figure 8: Contrastive Loss Experiment. Using a CLIP-style contrastive training objective encourages features of correct 2D-2D matching points to be more similar than those of incorrect matches. In our experiments, we found that this objective simply resulted in the features converging to the same value, so that all queries match to the same target point. Thus we adopted the alternative strategy that encourages features of the correct match to be more similar than all other pixels in the target image*
-
-
-
 ## 实验与关键发现
 
 ### 核心实验设计
@@ -315,19 +294,6 @@ Table 7的消融结果揭示了三个关键模块的因果效应：
 ![[assets/figures/papers/paper_list_l2094_https_arxiv_org_abs_2512_08930/figures/013_Figure_6.jpg]]
 *Figure 6: View-dependent Density. Given six input views (top row), we render the Gaussians from each individual input to a target camera at the midpoint of the two center views. This process is shown for models trained without (middle row) and with (bottom row) view-dependent density. The view-dependent density serves as a confidence score that learns to downweight input views that are farther from the target view*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2094_https_arxiv_org_abs_2512_08930/figures/007_Table_2.jpg]]
-*Table 2: Novel View Synthesis with Varying Overlap. We vary the degree of overlap between the input images by changing the sampling stride. With more overlap, all methods demonstrate improved rendering performance, with our method achieving the best performance overall compared to other feed-forward baselines. Notably, our method can achieve performance on par with 3DGS [23], despite 3DGS using ground-truth poses and SfM point initialization*
-
-![[assets/figures/papers/paper_list_l2094_https_arxiv_org_abs_2512_08930/figures/009_Table_4.jpg]]
-*Table 4: Quantitative Comparisons in RayZer [18] Setup. We evaluate renderings from our model using the evaluation index proposed in RayZer, consisting of 16 inputs and 8 targets at 256×256 resolution. We attain competitive performance to RayZer, outperforming on SSIM and LPIPS, and our scene representation can be directed rasterized to novel views without the need for an additional network pass. Rayzer∗ is the external re-implementation*
-
-![[assets/figures/papers/paper_list_l2094_https_arxiv_org_abs_2512_08930/figures/011_Table_6.jpg]]
-*Table 6: Pose Estimation Evaluation. VGGT achieves reasonable performance, but the estimated poses can be further improved via BA. We report results for different numbers of input images and compare our BA results against Co-Tracker [22]. Our method consistently improves the predictions, even when Co-Tracker [22] fails due to out-of-memory*
-
-
-
 ## 定位与知识库关联
 
 ### 无姿态新视角合成的方法谱系
@@ -376,8 +342,6 @@ Selfi 的核心创新在于**将 VGGT 从直接的特征提供者转变为自监
 - 能否通过更精细的深度预测或自适应曝光校正来进一步缩小与逐场景优化式方法的差距？
 - 本方法对室外大规模场景（如城市级重建）的适应性和效率如何？
 - 动态场景下的特征匹配和重建性能提升是否可以通过引入时序建模或运动分割来实现？
-
-
 
 ## 原文 PDF
 

@@ -160,8 +160,6 @@ Efficient-LVSM 的处理管道由两个功能独立、参数分离的模块组�
 
 相较于 LVSM 解码器仅用模式（复杂度 $O(M(N+1)^2)$，其中 $M$ 为目标视图数），Efficient-LVSM 的每层复杂度降至 $O(NM+N)$：编码器为 $O(N)$，解码器为 $O(NM)$。这一线性复杂度特性使得模型在输入视图数量增加时仍保持高效，为大规模视图合成场景提供了可扩展的基础。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_tzBPOXJ3QC/figures/001_Figure_1.jpg]]
 *Figure 1: Latent Novel View Synthesis Paradigms Comparison. The proposed decoupled architecture disentangles the input and target streams with lower*
 
@@ -211,9 +209,6 @@ $$
 
 该设计的核心洞察在于：编码器浅层保留细粒度细节，深层富含语义上下文，解码器通过逐层查询可同时融合多粒度视觉特征。消融实验证实，共精炼结构相较仅使用交叉注意力的变体提升 **1.28 dB PSNR**（Table 6(a)），特征图可视化也表明共精炼能捕获更多目标视图的细节（Figure 3）。
 
-![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_tzBPOXJ3QC/figures/004_Figure_3.jpg]]
-*Figure 3: Vanilla Encoder-Decoder vs. Dual-Stream Co-refinement. (a) Hidden features in middle layers in vanilla encoder-decoder are wasted while the dual-stream co-refinement structure utilizes these features to extract more information. (b) Feature maps indicate that co-refinement structure catches more details of the target view*
-
 ### REPA 蒸馏
 
 REPA（Representation Alignment）蒸馏在训练阶段引入预训练视觉编码器（DINOv3）作为教师，通过最大化教师特征与学生隐藏层投影特征之间的 patch 级相似度来增强表示学习：
@@ -227,8 +222,6 @@ $$
 ### KV 缓存与增量推理
 
 解耦架构使得输入视图的键值对可被缓存复用。当新增输入视图或生成新目标视图时，只需计算增量部分的注意力，已有视图的 KV 对直接从缓存读取。实验数据显示，在 64 个输入视图下，KV 缓存带来 **66.7 倍**的推理加速（延迟从 9231 ms 降至 138.43 ms，Table 8），实现了近恒定成本的增量推理。
-
-### 补充图表
 
 ## 实验与关键发现
 
@@ -273,17 +266,6 @@ Efficient-LVSM 的效率优势源于两个关键机制。其一，输入编码�
 1. **工业部署差距**：大型 Transformer 架构在产业级应用中的延迟和内存约束依然严峻。当前模型仍属学术概念验证，需通过模型压缩、量化或知识蒸馏等手段进一步小型化。
 2. **定制内核缺失**：LVSM w/ Mask 等竞争性变体虽在理论上可行，但因缺乏定制 CUDA 内核而无法实现实际加速，这限制了架构比较的工程公平性。
 3. **大规模泛化未验证**：现有实验集中在 RealEstate10K、ABO、GSO 等受控数据集上，解耦共精炼架构在更大规模、更多样化的真实场景数据上的泛化能力尚待检验。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_tzBPOXJ3QC/figures/010_Figure_6.jpg]]
-*Figure 6: Inference Speed Comparison. We compare the inference time (ms) against (a) the number of target views and (b) the number of input views. Our model achieves consistently low latency. The performance of the LVSM baselines, particularly LVSM Decoder-Only, degrades severely as view counts increase. This highlights our model’s significant computational efficiency, achieving up to a 14.9x speedup over LVSM Decoder-Only*
-
-![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_tzBPOXJ3QC/figures/011_Figure.jpg]]
-*Figure: (a) Incremental Inference Experiments. We compare the inference latency and memory consumption when the input view is fed one by one. We observe that Efficient LVSM achieves near constant latency and memory consumption due to its KV-cache ability*
-
-![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_tzBPOXJ3QC/figures/012_Figure.jpg]]
-*Figure: (b) Training Speed Comparison. Efficient LVSM delivers roughly 2× faster training and consistently achieves higher PSNR. (c) Zero-Shot Generalization to Input View Count. Trained with 4 input views and tested on varying numbers of input views*
 
 ![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_tzBPOXJ3QC/figures/014_Table_5.jpg]]
 *Table 5: Ablation Study of REPA Distillation*

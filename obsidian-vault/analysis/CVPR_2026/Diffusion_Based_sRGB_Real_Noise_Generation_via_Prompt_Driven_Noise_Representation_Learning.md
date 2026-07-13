@@ -52,8 +52,6 @@ claims:
 
 **主要结果**：在 SIDD 验证集上，PNG 的合成噪声质量显著优于所有对比方法，平均 KLD 和 AKLD 较 NAFlow 分别降低 0.0111 和 0.0143。使用 PNG 生成数据集训练的去噪网络（DnCNN）在 SIDD-Benchmark 上达到 37.55 dB PSNR，优于 NAFlow 的 37.22 dB，且与仅用真实数据训练的模型性能几乎一致。在跨数据集泛化实验中，PNG 在纯合成（100%）和合成-真实混合（50%）设置下均取得最优平均性能。
 
-
-
 真实世界图像去噪是计算摄影中的核心任务。在 sRGB 域，真实噪声呈现出复杂的信号依赖特性——噪声强度随像素亮度变化，且不同相机传感器和图像信号处理（ISP）管线会引入截然不同的噪声模式。然而，获取大规模、高质量的配对真实噪声-清洁图像数据集成本极高，这促使研究者转向噪声合成范式：先建模真实噪声分布，再生成成对的合成噪声-清洁图像以训练去噪网络。
 
 现有 sRGB 真实噪声合成方法可大致分为两类。一类基于物理模型，通过模拟光子散粒噪声和读出噪声等传感器噪声源来合成噪声，但这类方法难以精确复现 ISP 管线引入的非线性变换。另一类基于数据驱动的生成模型，如 **C2N** 和 **Flow-sRGB** 利用条件生成对抗网络或归一化流学习噪声分布，**NeCA-W** 和 **NAFlow** 则进一步采用扩散模型提升合成质量。然而，这些方法的共同瓶颈在于：**它们依赖显式相机元数据（如 ISO 感光度、设备型号）作为条件输入**（Figure 1a）。当元数据缺失、不准确或跨设备不一致时，模型的泛化能力严重受限，无法在真实应用场景中灵活部署。
@@ -61,8 +59,6 @@ claims:
 这一瓶颈的根源在于真实噪声的分布高度依赖于拍摄参数和传感器特性。ISO 值决定了噪声的整体强度，而传感器的空间相关性和 ISP 的降噪处理则塑造了噪声的局部结构。显式元数据试图用离散标签捕捉这些连续、高维的噪声特性，本质上是一种信息瓶颈——不同设备在相同 ISO 下可能产生截然不同的噪声模式，而同一设备在不同场景下的噪声也远非单一参数所能描述。
 
 本文的核心动机正是**彻底摆脱对显式元数据的依赖**。我们提出一个根本性问题：能否直接从噪声图像本身提取出足够丰富的特征，用以条件化生成模型，使其合成出符合目标噪声分布的图像？这一思路将噪声生成从“元数据驱动”转变为“数据驱动”——让模型从噪声图像中自主学习那些传统方法需要人工标注的噪声属性。这种范式转变不仅消除了训练和推理阶段对元数据的硬性依赖，还使模型能够捕捉到元数据无法编码的细粒度噪声特征，从而在跨设备、跨数据集的泛化场景中展现出更强的适应性。
-
-
 
 ## 核心方法与创新机理
 
@@ -115,8 +111,6 @@ claims:
 
 开放问题包括：能否进一步减少对配对数据的依赖（如仅利用非配对噪声图像和任意洁净图像训练）；提示特征能否支撑盲去噪任务（无需显式输入噪声图像）；以及框架在 RAW 域或视频帧上的适用性。
 
-
-
 PNG 框架的核心设计动机在于彻底消除真实噪声生成对显式相机元数据（如 ISO、设备型号）的依赖。如图 2 所示，整个系统由两个串行训练的关键模块构成：**Prompt Autoencoder（PAE）** 和 **Prompt DiT（P-DiT）**，二者在紧凑的潜空间中协同工作。
 
 ### 训练流程
@@ -141,12 +135,8 @@ PNG 框架的核心设计动机在于彻底消除真实噪声生成对显式相�
 ![[assets/figures/papers/paper_list_l2305_https_arxiv_org_abs_2603_04870/figures/014_Table_S.1.jpg]]
 *Table S.1: Inference speed comparison between NeCA-W, NAFlow, and PNG*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2305_https_arxiv_org_abs_2603_04870/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed method. (a) Training pipeline. (b) Inference pipeline*
-
-
 
 PNG 框架由两个核心模块构成：**Prompt Autoencoder (PAE)** 和 **Prompt DiT (P-DiT)**，二者分两阶段顺序训练。第一阶段，PAE 学习将真实噪声图像编码为紧凑的潜变量，同时通过提示块提取输入噪声的特性；第二阶段，P-DiT 在潜空间中基于一致性模型（CM）学习潜变量的分布，以洁净图像和提示特征为条件生成符合目标噪声分布的潜变量，再经 PAE 的解码器重建为噪声图像。
 
@@ -210,8 +200,6 @@ GPB 和 LPB 提取的提示特征被拼接后作为条件注入 P-DiT 的生成�
 
 P-DiT 是基于 DiT（Diffusion Transformer）架构的一致性模型，在潜空间中根据提示特征和洁净图像条件生成符合目标噪声分布的潜变量。P-DiT 在训练时接收 PAE 编码的潜变量作为 $\mathbf{x}_0$，通过前向扩散加噪后，以 CM 损失 $\mathcal{L}_{\mathrm{CT}}$ 进行优化。提示特征通过两种途径注入 P-DiT：**时间步嵌入的条件化**和**注意力层的 Prompt Attention 机制**。消融实验表明，同时在时间步嵌入和注意力层进行条件注入能显著降低 KLD 和 AKLD，是取得最优噪声生成质量的关键设计选择（Table S2）。增加 P-DiT 的 Transformer 块数 $B$ 可持续提升生成质量，$B=8$ 时 KLD 从 $B=4$ 的 0.0350 降至 0.0261（Table S4）。
 
-
-
 ## 实验与关键发现
 
 ### 合成噪声质量评估
@@ -250,33 +238,11 @@ Table S1 比较了各方法的推理速度。在高分辨率（1024×1024）下�
 
 尽管 PNG 在多项指标上表现优异，仍存在以下局限：第一，PAE 训练仍需成对的噪声-清洁图像，无法完全在无配对数据场景下直接学习，这限制了其在数据获取极度困难场景下的适用性；第二，所有实验均局限于 sRGB 域，未验证提示特征在 RAW 域或视频帧上的有效性，跨域迁移能力尚不明确；第三，在高分辨率场景下推理速度仍不及轻量级方法（如 NeCA-W），对于实时应用存在性能瓶颈。以上局限需要在实际部署中结合具体需求进行手动验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2305_https_arxiv_org_abs_2603_04870/figures/005_Table_2.jpg]]
 *Table 2: Denoising performance of DnCNN on SIDD-Benchmark in terms of PSNR↑ and SSIM↑. All methods are trained with synthetic noisy-clean pairs. Note that Real indicates denoising results by training using real noisy-clean pairs. The best and secondbest results are highlighted in bold and underline*
 
 ![[assets/figures/papers/paper_list_l2305_https_arxiv_org_abs_2603_04870/figures/008_Table_3.jpg]]
 *Table 3: Quantitative comparison of DnCNN denoising performance on the PolyU, Nam, SIDD validation, and SIDD+ benchmarks. The percentage (%) denotes the mixing ratio between the two training subsets. The best and second-best results are highlighted in bold and underline*
-
-![[assets/figures/papers/paper_list_l2305_https_arxiv_org_abs_2603_04870/figures/011_Table_7.jpg]]
-*Table 7: Effect of GPB and LPB on SIDD validation noise generation. The best results are shown in bold*
-
-![[assets/figures/papers/paper_list_l2305_https_arxiv_org_abs_2603_04870/figures/016_Table_S.2.jpg]]
-*Table S.2: Effect of conditioning features on different components in P-DiT. The best results are shown in bold*
-
-![[assets/figures/papers/paper_list_l2305_https_arxiv_org_abs_2603_04870/figures/015_Table_S.4.jpg]]
-*Table S.4: KLD score depending on different number of blocks B*
-
-![[assets/figures/papers/paper_list_l2305_https_arxiv_org_abs_2603_04870/figures/009_Table_4.jpg]]
-*Table 4: Quantitative results of synthetic noise on the PolyU, Nam, and MAI2021. All methods are trained with SIDD training set. The results are computed with KLD↓ and AKLD↓. The best results are shown in bold*
-
-![[assets/figures/papers/paper_list_l2305_https_arxiv_org_abs_2603_04870/figures/017_Table_S.3.jpg]]
-*Table S.3: Effect of GPB and LPB on SIDD validation noisy image reconstruction. The best results are shown in bold*
-
-![[assets/figures/papers/paper_list_l2305_https_arxiv_org_abs_2603_04870/figures/018_Figure_S.2.jpg]]
-*Figure S.2: Overview of unpaired noise generation process*
-
-
 
 ## 定位与知识库关联
 
@@ -319,8 +285,6 @@ PNG 的适用边界由以下要素共同划定：
 3. **框架能否扩展到盲去噪任务？** 目前 PNG 需要显式输入噪声图像以提取提示特征。在盲去噪场景中，仅有单张噪声图像可用，如何从该图像自身提取有效的提示特征并用于条件生成，是一个具有实际价值的研究方向。
 
 4. **潜空间的可解释性**：全局提示块（GPB）和局部提示块（LPB）分别捕捉 ISO 等全局统计量和空间相关性等局部模式，但这些高维提示特征的具体语义含义尚未被深入分析，理解其与物理噪声参数的对应关系可能指导更高效的架构设计。
-
-
 
 ## 原文 PDF
 

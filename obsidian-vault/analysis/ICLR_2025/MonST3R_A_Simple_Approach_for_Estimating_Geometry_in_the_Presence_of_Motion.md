@@ -58,8 +58,6 @@ MonST3R的核心洞察在于，点云图表示可以被推广到每帧独立估�
 
 消融实验证实，仅微调解码器优于全模型微调（ATE 0.108 vs 0.118），混合四个数据集将ATE从单数据集的0.174提升至0.108，而平滑损失和光流损失的引入进一步提升了姿态估计精度，对深度影响极小。MonST3R以轻量级全局优化（约1分钟）即可实现上述性能，避免了CasualSAM等方法的昂贵测试时优化。
 
-
-
 从二维图像恢复三维几何结构是计算机视觉的核心任务，其典型应用涵盖自动驾驶、机器人导航与增强现实等领域。近年来，以 **DUSt3R** (Wang et al., 2024c) 为代表的一类方法取得了显著进展——它们以“几何优先”的范式，直接从图像对中预测稠密的三维点云图（pointmap），并在静态场景中展现出令人瞩目的泛化能力与重建精度。
 
 然而，现实世界是动态的。DUSt3R 等方法的根本瓶颈在于：其训练数据完全由静态场景构成，模型从未学习过如何处理运动物体。当面对包含显著前景运动的动态场景时，这种数据分布的不匹配导致了两种典型的失效模式。其一，模型倾向于将运动前景对齐，从而迫使背景点云发生错位（见图2左）；其二，模型完全无法估计前景物体的深度，将其错误地放置于背景之后（见图2右）。简言之，静态点云表示缺乏时间维度，无法表达场景在不同时刻的几何变化，这是现有方法在动态场景中失效的因果根源。
@@ -67,8 +65,6 @@ MonST3R的核心洞察在于，点云图表示可以被推广到每帧独立估�
 针对上述缺口，一个直接的思路是引入显式的运动估计或光流模块来补偿动态元素。但此类方案往往将几何重建与运动估计解耦，流程复杂且易受中间表示误差的累积影响。另一类方法如 **CasualSAM** (Zhang et al., ECCV 2022) 虽然能联合估计深度与相机姿态，却依赖昂贵的测试时优化（test-time optimization），难以满足实时或大规模应用的需求。视频深度估计专用方法如 **DepthCrafter** (Hu et al., 2024) 则专注于单任务，无法同时输出相机轨迹与场景几何。
 
 本文的核心动机由此而生：是否能够保留 DUSt3R 简洁的“几何优先”范式，仅通过表示层面的最小改动与有限数据的微调，使其自然泛化至动态场景？核心洞察在于：点云图可以被推广为每时间步独立估计，且在同一相机坐标系下表示依然具有概念上的合理性。这一推广无需显式建模物体运动——模型只需从小规模、有姿态、有深度标签的动态视频数据中隐式学习动态场景的几何结构。本文提出的 **MonST3R (Motion DUSt3R)** 正是基于这一洞察，旨在以简单的架构适配实现动态场景下的几何估计，同时输出视频深度、相机姿态与动静态分割，为下游应用提供统一的几何先验。
-
-
 
 ## 核心方法与创新机理
 
@@ -96,11 +92,6 @@ MonST3R 不直接预测运动掩码，而是通过**比较相机运动诱导的�
 
 DUSt3R 的全局优化仅使用对齐损失 $\mathcal{L}_{\mathrm{align}}$，这在动态场景中容易因动态物体的干扰而产生不稳定的相机轨迹。MonST3R 引入了两项视频特定的损失函数：**相机轨迹平滑损失** $\mathcal{L}_{\mathrm{smooth}}$ 惩罚相邻帧间旋转和平移的剧烈变化，**光流投影损失** 约束优化后的深度和姿态与观测光流的一致性。消融实验（表 5）证实，这两项损失对姿态估计有显著增益，且对视频深度精度影响极小，体现了“几何优先”的设计哲学——深度估计主要依赖前馈网络的能力，优化仅用于精细化相机轨迹。
 
-
-
-![[assets/figures/papers/paper_list_l2_MonST3R_A_Simple_Approach_for_Estimating_Geometry_in_the_Presence_of_Mot/figures/004_Figure_3.jpg]]
-*Figure 3: Dynamic global point cloud and camera pose estimation. Given a fixed sized of temporal window, we compute pairwise pointmap for each frame pair with MonST3R and optical flow from off-the-shelf method. These intermediates then serve as inputs to optimize a global point cloud and per-frame camera poses. Video depth can be directly derived from this unified representation*
-
 MonST3R 的整体 pipeline 围绕一个核心表示展开：**逐时间步的点云图（per-timestep pointmap）**。与 DUSt3R 为静态场景输出单一全局点云不同，MonST3R 为视频的每一帧独立估计一个点云图 $\mathbf{X}^{t} \in \mathbb{R}^{H \times W \times 3}$，且所有点云均在同一相机坐标系下表示。这一设计的根本动机在于：DUSt3R 的训练数据仅包含静态场景，导致其在动态场景中将运动前景与静态背景错误对齐，且无法正确估计前景物体深度（Figure 2）。MonST3R 通过在有限的动态、有姿态、有深度标签的视频数据集上微调，使模型隐式学习动态场景的几何结构，而无需显式运动建模。
 
 ### 模块关系与数据流
@@ -118,8 +109,6 @@ MonST3R 的整体 pipeline 围绕一个核心表示展开：**逐时间步的点
 - **输入**：动态场景视频帧序列。
 - **中间表示**：每帧对的点云图、置信度图、光流场、静态掩码。
 - **输出**：每帧的深度图（视频深度）、相机内参与外参（相机轨迹）、以及动态/静态分割掩码，这些输出共同构成时间一致的动态点云表示，可直接支持视频深度估计、相机姿态估计和动态场景重建等下游任务。
-
-
 
 MonST3R 的核心架构继承自 DUSt3R，由共享权重的 ViT 编码器、交叉注意力解码器和 DPT 点云预测头部构成。关键改造在于将静态点云表示推广为**逐时间步点云图**（per-timestep pointmap），使模型能够隐式学习动态场景的几何结构，而无需显式建模物体运动。
 
@@ -174,8 +163,6 @@ $$\mathcal{L}_{\mathrm{smooth}} = \sum_{t=0}^{N} \left( \| \mathbf{R}^{t^\top} \
 
 消融实验表明，$\mathcal{L}_{\mathrm{smooth}}$ 和 $\mathcal{L}_{\mathrm{flow}}$ 的权重均设为 $w=0.01$ 时鲁棒性最佳；过高的平滑权重反而将 ATE 从 0.108 提升至 0.138（Table A2）。光流损失仅在平均误差低于 20 时启用，且在优化过程中动态更新运动掩码（每像素光流损失 > 50 时标记为动态），以自适应处理复杂运动场景。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验结果
@@ -226,29 +213,11 @@ Table 5 系统分析了训练数据、微调策略和损失函数对性能的影
 2. **动态内参。** 处理可变相机内参时需谨慎调整超参数或施加手动约束，否则优化容易不稳定。
 3. **分布外场景。** 在开阔田野等训练数据中罕见的场景，模型估计质量下降，反映了动态视频训练数据覆盖范围的局限。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2_MonST3R_A_Simple_Approach_for_Estimating_Geometry_in_the_Presence_of_Mot/figures/001_Figure.jpg]]
-
 ![[assets/figures/papers/paper_list_l2_MonST3R_A_Simple_Approach_for_Estimating_Geometry_in_the_Presence_of_Mot/figures/010_Figure.jpg]]
 *Figure: Input Frames GT Depth DepthCrafter MonST3R (Ours) Figure A1: Video depth estimation comparison on Bonn dataset. Evaluation protocol is persequence scale & shift. We visualize the prediction result after alignment. Note, in the first row, our depth estimation is more aligned with the GT depth (e.g., the wall) compared to DepthCrafter’s*
 
-![[assets/figures/papers/paper_list_l2_MonST3R_A_Simple_Approach_for_Estimating_Geometry_in_the_Presence_of_Mot/figures/012_Figure.jpg]]
-*Figure: LEAP -VO CasualSAM MonST3R (Ours)*
-
 ![[assets/figures/papers/paper_list_l2_MonST3R_A_Simple_Approach_for_Estimating_Geometry_in_the_Presence_of_Mot/figures/013_Figure.jpg]]
 *Figure: A3: Camera pose estimation comparison on the Sintel dataset. The trajectories are plotted along the two axes with the highest variance to capture the most significant motion. The predicted trajectory (solid blue line) is aligned to match the ground truth trajectory (dashed gray line). Our MonST3R is more robust at challenging scenes, “temple 3” and “cave 2” (the last two rows). LEAP-VO CasualSAM MonST3R (Ours) Figure A4: Camera pose estimation comparison on the Scannet dataset. The trajectories are plotted along the two axes with the highest variance to capture the most significant motion*
-
-![[assets/figures/papers/paper_list_l2_MonST3R_A_Simple_Approach_for_Estimating_Geometry_in_the_Presence_of_Mot/figures/003_Table_1.jpg]]
-*Table 1: Training datasets used fine-tuning on dynamic scenes. All datasets provide both camera pose and depth, and most of them include dynamic objects*
-
-![[assets/figures/papers/paper_list_l2_MonST3R_A_Simple_Approach_for_Estimating_Geometry_in_the_Presence_of_Mot/figures/017_Table.jpg]]
-*Table: A1: Ablation study on different training/inference window sizes on the Sintel dataset. Each cell displays two values: ATE ↓ / Abs \mathbf { R e l } \downarrow , , corresponding to camera pose and video depth estimation, respectively. The cells where the inference window size exceeds the training window size are highlighted in grey. The default setup is underlined, and the best results are in bold. GPU memory consumption for each inference setup is listed in the leftmost column*
-
-![[assets/figures/papers/paper_list_l2_MonST3R_A_Simple_Approach_for_Estimating_Geometry_in_the_Presence_of_Mot/figures/018_Table.jpg]]
-*Table: A2: Ablation study on loss weight sensitivity. The table shows the effect of varying the loss weights w _ { \mathrm { s m o o t h } } and { w } _ { \mathrm { f l o w } } on camera pose and video depth estimation. The default setup is underlined, and the best results are in bold*
-
-
 
 ## 定位与知识库关联
 
@@ -291,8 +260,6 @@ MonST3R 的适用边界主要由以下几个因素定义：
 4. **动态物体的显式建模**：当前方法隐式处理动态物体，未来工作可能探索将显式的物体运动估计与场景几何估计相结合，以同时输出场景流或物体轨迹。
 
 5. **与生成式模型的结合**：MonST3R 的逐帧点云图表示为视频生成、新视角合成等任务提供了几何先验，探索其在生成式模型中的应用是一个有前景的方向。
-
-
 
 ## 原文 PDF
 

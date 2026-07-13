@@ -59,8 +59,6 @@ claims:
 
 **主要局限**：对局部细微运动（如面部微表情）和交织重叠运动的处理能力不足（Figure 10）；定量评估样本量有限（40 个视频），泛化性尚需更大规模验证。
 
-
-
 ### 问题背景：视频生成中的运动控制困境
 
 近年来，文本到视频（T2V）扩散模型在生成质量和多样性上取得了显著进展，但如何精确控制生成视频中的运动模式仍然是一个核心挑战。用户往往希望将一段参考视频中的特定运动——无论是物体运动（如“猎豹奔跑”）还是摄像机运动（如“从左到右的平移镜头”）——迁移到全新的视觉场景中，同时保持对新场景文本描述的忠实响应。这一需求催生了“运动克隆”（motion cloning）这一研究方向。
@@ -80,8 +78,6 @@ MotionClone 的出发点建立在一个关键观察之上：在预训练的 T2V 
 这一动机直接导向了两个关键设计选择。首先，通过对时序注意力权重进行稀疏化处理——在每个空间位置上仅保留最强的 top-k 个帧间关联（k=1）——可以构造出一个稀疏掩码，将引导信号聚焦于真正驱动运动的主导注意力连接。其次，这种稀疏运动表征可以在单次去噪步骤中直接提取，无需繁琐的 DDIM 反演或模型微调，使得整个运动克隆流程保持“免训练”（training-free）的特性。
 
 此外，MotionClone 还观察到运动引导只需作用于扩散采样的早期步骤，这为后期的语义调整留出了足够的灵活性，从而在运动保真度与文本对齐之间取得平衡。这一设计使得框架能够在不牺牲生成内容多样性的前提下，实现高质量的运动迁移，支持物体运动克隆、摄像机运动克隆，以及图像到视频、草图到视频等多种下游应用场景（Figure 1）。
-
-
 
 ## 核心方法与创新机理
 
@@ -130,8 +126,6 @@ MotionClone 定位于**免训练的运动可控视频生成**，其方法谱系�
 
 其基础模型可灵活替换为 **AnimateDiff**（Guo et al., arXiv 2023b）或 **SparseCtrl** 等预训练 T2V/I2V 模型，运动表征提取与引导机制作为即插即用模块叠加于现有扩散采样流程之上（Figure 4）。
 
-
-
 ![[assets/figures/papers/paper_list_l50_MotionClone_Training_Free_Motion_Cloning_for_Controllable_Video_Generati/figures/004_Figure_4.jpg]]
 *Figure 4: The pipeline of MotionClone, in which the motion representation $\mathcal { H } ^ { t _ { \alpha } }$ extracted from reference videos serves as motion guidance in novel video synthesis
 
@@ -154,8 +148,6 @@ $$\epsilon_\theta = \epsilon_\theta(z_t, c, t) + s(\epsilon_\theta(z_t, c, t) - 
 其中运动引导**仅在早期去噪步骤施加**，为后续步骤留出足够的灵活性，使文本条件能够完成语义调整，从而在运动保真度和文本对齐之间取得平衡。
 
 **输入输出流总结**：参考视频经单步去噪提取 $\mathcal{L}^{t_\alpha}$ 后，与目标文本提示一同送入扩散采样循环。早期去噪步中，运动引导强制生成视频的稀疏时序注意力向参考表征对齐；后期去噪步中，文本引导主导语义生成。最终输出一段既保留参考运动模式、又遵循新文本描述的视频。该框架还支持以首帧图像或草图作为附加条件，拓展至 Image-to-Video 和 Sketch-to-Video 等应用场景。
-
-
 
 ### 3.1 运动克隆的因果瓶颈与主控策略
 
@@ -209,8 +201,6 @@ MotionClone 的核心模块可归纳为：
 
 消融实验进一步确认：在 `up block.1` 层施加运动引导表现最优，兼顾运动操纵与视觉质量（Figure 9）；使用与参考视频内容匹配的精确文本提示优于通用空文本提示（Figure 9）。
 
-
-
 ## 实验与关键发现
 
 ### 定量评估与用户研究
@@ -258,15 +248,6 @@ MotionClone 在处理两类运动时存在明显不足（Figure 10）：一是�
 ![[assets/figures/papers/paper_list_l50_MotionClone_Training_Free_Motion_Cloning_for_Controllable_Video_Generati/figures/008_Figure_7.jpg]]
 *Figure 7: MotionClone also supports I2V and sketch-to-video, facilitating versatile applications. The red arrows indicate the motion direction*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l50_MotionClone_Training_Free_Motion_Cloning_for_Controllable_Video_Generati/figures/011_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l50_MotionClone_Training_Free_Motion_Cloning_for_Controllable_Video_Generati/figures/015_Figure.jpg]]
-*Figure: Prompt: Blue car, runs on the beach. Prompt: Greek sculpture, walks in the forest. Prompt: Cat, turns its head in house*
-
-
-
 ## 定位与知识库关联
 
 ### 与基线工作的关系
@@ -305,8 +286,6 @@ MotionClone 的方法论创新可归结为三个相互关联的因果节点：
 2. **反演策略改进**：消融实验（Figure 9）显示单步去噪的运动表征优于 DDIM 反演方法，但能否结合更精确的反演策略（如更优的时间步选择或噪声调度）进一步提升运动保真度？
 3. **鲁棒性验证**：在更大规模、更多样化的参考视频集上，稀疏注意力方法的鲁棒性如何？$k=1$ 的极端稀疏设置是否在所有运动类型上都是最优选择？
 4. **与微调方法的融合**：免训练范式提供了灵活性，但能否与轻量微调结合，在特定场景下进一步提升运动克隆的精度？
-
-
 
 ## 原文 PDF
 

@@ -52,8 +52,6 @@ claims:
 
 **主要结果**：在VBench基准上，M4V（PyramidFlow）获得81.55总分，M4V（Wan2.1）获得86.14总分，均为使用公开数据训练的模型中的最佳结果。在768×1280分辨率下生成241帧视频时，MM-DiM块相比全注意力基线减少约45%的FLOPs（29.52 vs 55.44 TFLOPs）。消融实验证实，文本令牌重组显著提升文本-视频对齐，逐帧寄存器与轻量时序分支分别提升视频质量指标和总体得分，三者组合达到最优效率-性能平衡。
 
-
-
 文本生成视频（Text-to-Video, T2V）旨在根据自然语言描述合成逼真且时序连贯的视频序列。近年来，基于扩散模型（Diffusion Models）的方法在该领域取得了显著进展，涌现出如**Sora**、**Kling**、**Gen-3 Alpha**等商业级系统，以及**CogVideoX**、**Open-Sora Plan**、**PyramidFlow**、**Wan2.1**等开源方案。这些模型通常采用基于Transformer的扩散主干网络（Diffusion Transformer, DiT），利用自注意力机制对文本和视觉令牌进行统一建模。
 
 然而，Transformer架构的核心瓶颈在于自注意力机制的计算复杂度与序列长度呈二次关系。在视频生成场景中，输入序列需同时包含空间维度上平展的视觉令牌和文本令牌，当处理高分辨率、长时长视频时，序列长度急剧膨胀——例如，一段241帧、768p分辨率的视频，其全序列注意力复杂度可达$\mathcal{O}((T M)^2)$，其中$T$为帧数，$M$为每帧序列长度。这导致训练和推理的计算成本极高，严重限制了实际部署的规模和效率。
@@ -65,8 +63,6 @@ claims:
 2. **时空依赖建模不足**：视频数据包含复杂的空间结构和时序动态。标准的1D扫描策略无法充分捕获二维空间中的局部邻域关系，而简单的逐帧串行处理则忽略了帧间长程时序依赖。Mamba的递归状态更新虽能传递时序信息，但在长序列中可能面临信息衰减问题。
 
 针对上述问题，本文提出**M4V（Multi-Modal Video Mamba）**——一个基于多模态Mamba的高效文本生成视频框架。M4V的核心动机并非完全抛弃Transformer，而是在保留前端多模态DiT块（来自**FLUX**）的前提下，将后续计算密集的统一Transformer块替换为所提出的**多模态扩散Mamba（MM-DiM）块**。通过精心设计的令牌重组策略、空间扫描机制和轻量时序分支，MM-DiM块在几乎不损失生成质量的前提下，将计算量大幅降低——在生成768×1280分辨率视频时，相比全注意力基线减少**45%的FLOPs**（见**Figure 1**）。这一设计使得M4V能够在公开数据训练的条件下，在VBench基准上取得领先的生成质量（M4V-PyramidFlow总分81.55，M4V-Wan2.1总分86.14），同时保持显著的计算效率优势。
-
-
 
 ## 核心方法与创新机理
 
@@ -96,8 +92,6 @@ Transformer通过QKV注意力自然地实现文本与视觉令牌的交互，而
 
 当前设计的替换范围限于后16个统一块，前8个MM-DiT块仍保留Transformer结构。是否可将MM-DiM推广至全架构、在更大规模公开数据集上的效率优势能否持续、以及能否引入视频级奖励模型，均为论文明确指出的开放问题。此外，训练依赖大规模预训练权重初始化，且使用了包含专有数据的混合数据集，可能影响完全公开条件下的复现性。
 
-
-
 M4V 的整体生成架构遵循“先多模态融合，后高效扩散建模”的宏观设计。如图 2(a) 所示，模型前端保留 8 个 **MM-DiT 块**（来自 FLUX），它们拥有独立的文本与视觉参数，负责初始的文本-视觉深度交互。在此之后，所有后续的 16 个统一块被替换为本文提出的 **多模态扩散 Mamba（MM-DiM）块**，这是整个框架效率瓶颈突破的核心所在。
 
 ### 输入输出流
@@ -123,12 +117,8 @@ M4V 的整体生成架构遵循“先多模态融合，后高效扩散建模”�
 
 整个 pipeline 可概括为：**文本编码 → MM-DiT 初始融合 → MM-DiM 高效扩散建模（含令牌重组、SSM 扫描、时序分支）→ 流匹配解码 → 奖励学习后优化**。这种设计将 Transformer 的二次复杂度 $O((TM)^2)$ 降至 MM-DiM 的 $O(TM + T^2)$，在保持多模态交互能力的同时实现了显著的效率提升。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2222_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_M4V_Multimodal_M/figures/002_Figure_2.jpg]]
 *Figure 2: (a) Overview of the generation architecture. (b) Detailed strcture of our MM-DiM Block*
-
-
 
 ### 3.1 状态空间模型基础
 
@@ -196,12 +186,8 @@ $$\boldsymbol{c}^i = [K_{\downarrow_2}(x^0), \ldots, K_{\downarrow_2}(x^{i-3}), 
 
 其中 $K_{\downarrow_1}$ 和 $K_{\downarrow_2}$ 分别表示不同级别的空间压缩操作。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2222_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_M4V_Multimodal_M/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of FLOPS between full attention baseline and ours*
-
-
 
 ## 实验与关键发现
 
@@ -256,9 +242,6 @@ $$\mathcal{L}_{\mathrm{reward}} = - r_1(D(\hat{x}_1^i)) - r_2(D(\hat{x}_1^i))$$
 
 单独使用奖励学习在 VBench 上带来 **0.16%** 的 Total Score 提升。当结合合成数据增强（使用 HunyuanVideo 生成额外训练数据）时，Total Score 进一步提升至 **81.91**。**Figure 5** 提供了奖励学习的可视化效果对比，直观展示了该策略对生成质量的改善。
 
-![[assets/figures/papers/paper_list_l2222_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_M4V_Multimodal_M/figures/010_Figure_5.jpg]]
-*Figure 5: Visual analysis of reward learning*
-
 ### 用户偏好研究
 
 **Figure 3** 展示了用户研究结果，将 M4V 与 T2V-Turbo、CogVideoX、HunyuanVideo 和 PyramidFlow 进行对比。M4V 在用户偏好中取得了具有竞争力的结果，进一步验证了其生成质量在实际人眼评估中的表现。
@@ -275,24 +258,11 @@ $$\mathcal{L}_{\mathrm{reward}} = - r_1(D(\hat{x}_1^i)) - r_2(D(\hat{x}_1^i))$$
 
 4. **超长视频场景未验证**：Mamba 的线性复杂度理论上在超长视频（>1000 帧）生成中应带来显著的吞吐量优势，但当前实验主要在 241 帧条件下进行，该假设需要进一步验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2222_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_M4V_Multimodal_M/figures/004_Table_2.jpg]]
 *Table 2: Generation speed comparison across models*
 
-![[assets/figures/papers/paper_list_l2222_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_M4V_Multimodal_M/figures/005_Figure_3.jpg]]
-*Figure 3: User study between Ours, T2V-Turbo, CogvideoX, HunyanVideo and Pyramidflow*
-
-![[assets/figures/papers/paper_list_l2222_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_M4V_Multimodal_M/figures/006_Table_3.jpg]]
-*Table 3: Ablation study of the model architecture using the proposed fast evaluation protocol. Text: Enables bi-directional information aggregation through text token re-composition. Vis: Adds per-frame registers within the visual sequence. Temp: Incorporates a temporal branch within each block. Overall-Con measures the consistency between the generated video and the input text, while the other metrics assess different aspects of video quality. Significant metric changes with Text and Vis are highlighted for clarity*
-
 ![[assets/figures/papers/paper_list_l2222_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_M4V_Multimodal_M/figures/009_Table_5.jpg]]
 *Table 5: Ablation study of training improvements on official VBench [23]*
-
-![[assets/figures/papers/paper_list_l2222_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_M4V_Multimodal_M/figures/008_Figure.jpg]]
-*Figure: (a) A stylish woman walks down the streets of Tokyo, surrounded by warm neon lights and vibrant city signs. She wears a black leather jacket, ... (b) A futuristic cityscape at dusk, with flying cars zipping between towering skyscrapers adorned with neon lights. (c) A determined individual in a sleek, black athletic outfit jogs along a winding forest trail, surrounded by towering trees and*
-
-
 
 ## 定位与知识库关联
 
@@ -353,8 +323,6 @@ M4V引入了基于奖励学习的训练后优化策略，使用HPSv2和CLIP两�
 3. **视频级奖励模型集成**：能否将VBench评估器或其他视频级质量模型纳入奖励学习框架，以直接优化时序一致性和运动质量？
 4. **超长视频生成**：Mamba的线性复杂度$\mathcal{O}(T M + T^2)$是否在超长视频（>1000帧）生成中带来显著的吞吐量优势？此时时序注意力的$\mathcal{O}(T^2)$项可能成为新瓶颈。
 5. **与其他高效架构的对比**：M4V与基于线性注意力、稀疏注意力或状态空间对偶（如Mamba-2）的视频扩散模型之间的效率-质量权衡尚未被系统比较。
-
-
 
 ## 原文 PDF
 

@@ -57,8 +57,6 @@ claims:
 
 **局限与展望**：当前评估主要依赖合成事件数据集，合成数据与真实事件数据之间的域差异可能使结果偏向理想化分布；模型在真实场景下的泛化能力尚需更多真实世界事件步态数据验证。此外，脉冲神经网络在通用硬件上的推理效率仍有待优化，未来可探索事件与 RGB/LiDAR 的多模态融合以进一步提升极端条件下的鲁棒性。
 
-
-
 步态识别因其非侵入性和远距离感知优势，在安防监控与身份认证领域具有重要应用价值。然而，当前主流方法严重依赖RGB相机采集的剪影序列，在低光、夜间等复杂光照条件下，RGB成像质量急剧退化，导致步态表征丧失判别力，系统性能大幅下降。如图1所示，事件相机凭借其高动态范围（>120 dB）和微秒级时间分辨率，能够在极端光照变化下稳定输出异步事件流，为全天候步态识别提供了新的感知模态。
 
 尽管事件相机在数据采集端展现出显著优势，现有的事件步态识别方法却未能充分释放其潜力。以 **EVGait**（CVPR 2019）为代表的首批工作，将长时间窗口内的事件流聚合成稀疏的事件图像，再交由标准CNN或GNN处理。这一范式存在一个核心瓶颈：长时间聚合操作抹去了事件流中固有的细粒度时间动态，同时产生的稀疏空间表示使标准CNN难以有效编码密集的结构信息。简言之，现有方法在“时间分辨率保留”与“空间结构提取”之间陷入两难——保留短时窗口则空间稀疏难以学习，扩大聚合窗口则丧失动态细节。
@@ -66,8 +64,6 @@ claims:
 这一瓶颈的因果根源在于：事件流本质上是一种高时间分辨率、空间稀疏的异步信号，而传统CNN架构设计之初面向的是空间密集、帧率固定的同步图像。直接套用CNN处理事件数据，必然导致模型无法自适应地应对不同光照强度和运动速度下事件发放模式的剧烈变化。例如，在低光场景中事件噪声增多、有效信号稀疏；在快速运动下事件密度激增、时间结构压缩。单一时间常数的特征提取器难以同时覆盖这些多样化的动态模式。
 
 针对上述缺口，本文提出 **EventGait**，一个端到端的双流事件步态识别框架，其核心动机在于：**鲁棒的事件步态表征必须同时保留高时间分辨率的运动动态，并通过大规模视觉基础模型蒸馏获得空间密集的结构先验，二者互补方能实现光照鲁棒且身份判别的步态描述**。具体而言，EventGait通过两条互补通路分别建模步态的“动”与“静”——动态运动流利用脉冲神经网络（SNN）中的混合专家（MoSE）捕获短时精细运动模式，静态形状流则通过跨模态结构对齐（CroSA）从预训练视觉基础模型（DINOv2）中蒸馏密集空间先验。这种双流解耦设计从根本上回应了事件步态识别的核心矛盾：时间动态与空间结构的不可兼得问题。
-
-
 
 ## 核心方法与创新机理
 
@@ -120,8 +116,6 @@ $$\mathcal{L}_{\mathrm{align}} = \|\mathbf{z}_{\mathrm{evs}} - \mathbf{z}_{\math
 
 > **需要人工验证**：论文未明确报告 venue 和 year，若需精确引用请核实原始发表信息。
 
-
-
 EventGait 是一个端到端的双流步态识别框架，其核心设计目标是在保留事件相机高时间分辨率优势的前提下，分别建模步态中的**运动动态**与**空间形状**两个互补维度。Figure 2 给出了框架的完整工作流。
 
 ![[assets/figures/papers/paper_list_l1046_https_arxiv_org_abs_2605_22139/figures/002_Figure_2.jpg]]
@@ -163,8 +157,6 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{ce}} + \mathcal{L}_{\mathr
 ### 关键设计逻辑
 
 该双流架构的根本动机来自现有方法的瓶颈诊断：长时间窗口聚合的事件图像丢失了细粒度时间动态，而稀疏事件表示又使标准 CNN 难以有效编码空间结构。EventGait 通过**动态流保留高时间分辨率运动信息**、**静态流借助 VFM 蒸馏获取密集空间先验**，二者互补实现了光照鲁棒且身份判别的步态表征。消融实验（Table 6）直接验证了这一互补性——移除任一流均导致性能显著下降。
-
-
 
 EventGait 的核心设计围绕一个双流架构展开，分别从事件流中提取高时间分辨率的运动动态和密集的空间结构形状，二者通过可学习的融合模块生成统一的步态描述符。以下按管线顺序解析关键模块及其数学表达。
 
@@ -232,16 +224,6 @@ $$\mathcal{L}_{\text{total}} = \mathcal{L}_{\text{ce}} + \mathcal{L}_{\text{tri}
 
 其中 $\mathcal{L}_{\text{ce}}$ 为交叉熵损失，$\mathcal{L}_{\text{tri}}$ 为三元组损失，$\mathcal{L}_{\text{align}}$ 为前述跨模态对齐损失，$\lambda_d$ 控制对齐损失的权重。端到端的联合训练使得模型在保持身份判别力的同时，获得光照鲁棒的结构表征能力。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1046_https_arxiv_org_abs_2605_22139/figures/003_Figure_3.jpg]]
-*Figure 3: (a) The simplified schematic of the different spiking neurons’ dynamics across complex conditions (e.g., illumination and motion) for intuitive understanding, (b) The details of the Dynamic Motion Stream, which consists of our Mixture of Spiking Experts (MoSE)*
-
-![[assets/figures/papers/paper_list_l1046_https_arxiv_org_abs_2605_22139/figures/004_Figure_4.jpg]]
-*Figure 4: The details of the Static Shape Stream, which is trained with our Cross-modal Structure Alignment (CroSA)*
-
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈验证：事件步态识别需要同时保留时间动态与空间结构
@@ -280,9 +262,6 @@ MoSE 中专家数量的消融（Table 8）显示，采用 **3 个专家** 在精
 
 跨域评估（Table 3）显示，EventGait 在不同数据集之间迁移时仍保持较强性能，但合成事件数据与真实事件数据之间的域差异仍然存在。在真实事件数据集 DVS128-Gait 上（Table 5），EventGait 达到 87.4% Rank-1 准确率，相较 EV-Gait 的 81.8% 提升 +5.6%，但相较合成数据上的巨大增益有所收窄，表明合成-真实域差异是当前方法的一个瓶颈。
 
-![[assets/figures/papers/paper_list_l1046_https_arxiv_org_abs_2605_22139/figures/007_Table_3.jpg]]
-*Table 3: Cross-domain Evaluation*
-
 跨视角性能比较（Figure 5）通过雷达图展示了 EventGait 与基于 LiDAR 的最先进方法 **LidarGait++**（CVPR 2025）的对比。EventGait 在多个视角下展现出与 LiDAR 方法竞争的性能，同时仅需 4.6M 参数，远低于典型的 LiDAR 方法。
 
 ![[assets/figures/papers/paper_list_l1046_https_arxiv_org_abs_2605_22139/figures/011_Figure_5.jpg]]
@@ -295,19 +274,6 @@ MoSE 中专家数量的消融（Table 8）显示，采用 **3 个专家** 在精
 1. **合成-真实域差异**：主要评估在合成数据集 SUSTech1K-E 上进行，真实场景下的表现有待更多真实数据验证。CCGR-Mini-E 上 40.3% 的 Rank-1 准确率（Table 2）表明，在更复杂的真实事件分布下，性能仍有较大提升空间。
 2. **脉冲推理效率**：动态流中的脉冲神经元在通用硬件上的模拟推理效率仍有待优化，实际部署的延迟和功耗可能较高。尽管参数仅 4.6M，但脉冲计算的时间步展开增加了推理时间。
 3. **单模态局限**：当前方法仅依赖事件单模态，尚未探索与 RGB 或 LiDAR 的多模态融合可能带来的进一步提升。
-
-![[assets/figures/papers/paper_list_l1046_https_arxiv_org_abs_2605_22139/figures/006_Table_2.jpg]]
-*Table 2: Within-domain Evaluation on CCGR-Mini [104] / CCGR-Mini-E (Ours) and CASIA-B* [97] / EV-CASIA-B [83]*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1046_https_arxiv_org_abs_2605_22139/figures/005_Table_1.jpg]]
-*Table 1: Within-domain Evaluation on SUSTech1K [71] and SUSTech1K-E (ours)*
-
-![[assets/figures/papers/paper_list_l1046_https_arxiv_org_abs_2605_22139/figures/001_Figure_1.jpg]]
-*Figure 1: Comparison of RGB and event cameras under day and night conditions. RGB cameras fail to capture usable gait representations in low-light conditions. While event cameras are robust to illumination changes and capture extremely high-temporalresolution data, preserving spatiotemporal cues in all lighting*
-
-
 
 ## 定位与知识库关联
 
@@ -362,8 +328,6 @@ $$\mathcal{L}_{\mathrm{align}} = \|\mathbf{z}_{\mathrm{evs}} - \mathbf{z}_{\math
 3. **SNN推理效率的硬件协同设计**：脉冲神经网络的实时推理效率与硬件协同设计如何优化，以降低实际应用中的功耗和延迟？这涉及神经形态芯片的适配、脉冲编码策略的优化以及训练-部署协同等系统级问题。
 
 4. **跨域泛化能力的系统评估**：当前跨域评估（Table 3）已初步展示了模型在不同数据集间的迁移能力，但评估规模有限。更系统的跨域泛化研究——包括跨数据集、跨光照、跨视角、跨穿着等维度的组合泛化——对于理解方法的真实鲁棒性边界至关重要。
-
-
 
 ## 原文 PDF
 

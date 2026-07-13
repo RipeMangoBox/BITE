@@ -76,8 +76,6 @@ LongStream 属于**流式自回归视觉几何**框架，在统一的时空Trans
 
 当前方法假设场景基本静止，对动态目标处理能力有限；关键帧调度依赖手工设定的固定间隔（N=10），未学习自适应策略；未集成回环闭合优化，在长距离回环时仍存在轻微漂移。未来方向包括动态场景建模、自适应关键帧选择、轻量在线回环检测，以及超长序列下的点云精度提升。
 
-
-
 从单目或双目视频流中在线恢复公制尺度的三维几何与相机位姿，是自动驾驶、机器人导航和混合现实等应用的核心能力。传统方法依赖基于优化的SLAM系统（如ORB-SLAM系列），通过局部BA和回环检测维持全局一致性，但在纹理稀疏、运动剧烈或长距离场景中鲁棒性有限。近年来，基于学习的3D重建模型展现出更强的数据驱动先验，但其主流范式仍以离线处理为主：将完整序列一次性输入模型，通过双向注意力融合全局上下文，推理时内存和延迟随序列长度线性或超线性增长，无法满足流式在线需求。
 
 为实现在线处理，近期工作**Stream3R**和**StreamVGGT**将离线模型改造为自回归流式架构：逐帧输入，通过Transformer的KV缓存机制保留历史信息，预测当前帧的绝对位姿和几何。然而，这些流式模型在实际长序列中迅速崩溃，轨迹误差在数十米内即不可接受（见Figure 1）。经本文分析，其根本瓶颈在于**规范耦合（gauge coupling）**设计——固定第一帧为全局坐标锚点，要求模型预测当前帧相对于遥远起点的绝对位姿。这导致三个连锁问题：
@@ -89,8 +87,6 @@ LongStream 属于**流式自回归视觉几何**框架，在统一的时空Trans
 上述问题共同构成**长序列流式重建的核心挑战**：如何在严格在线、不可见未来帧的约束下，维持公里级序列的稳定公制精度？现有流式方法因规范耦合设计而无法突破这一瓶颈，离线模型虽精度更高但无法实时运行（如VGGT在长序列上内存溢出，见Figure 2），基于优化的SLAM系统虽可在线但依赖回环检测且缺乏数据驱动的几何先验。
 
 本文的动机即在于：**解除规范耦合，将长程外推重新表述为局部相对估计任务**，从而从根本上消除对第一帧锚点的依赖，使每步推理难度恒定。同时，通过正交尺度学习实现几何与尺度的完全解耦，并引入缓存一致性训练对齐训练与推理行为，最终实现公里级序列的稳定在线重建。
-
-
 
 ## 核心方法与创新机理
 
@@ -137,8 +133,6 @@ LongStream 通过两项机制解决上述问题：
 ### 消融验证
 
 Table 5 的消融实验量化了各模块的贡献：从基线（8.043 ATE）开始，依次启用相对位姿头和正交尺度学习将 ATE 降至 2.645，加入缓存一致性训练进一步降至 0.984，最终加入周期缓存刷新降至 0.115。每一模块均带来显著且不可替代的增益。
-
-
 
 LongStream 是一个**规范解耦的流式几何框架**，在统一的时空 Transformer 内联合预测位姿、深度和尺度。其核心设计思想是将长程外推问题重新表述为恒定难度的局部相对姿态估计任务，并通过正交尺度学习实现几何与尺度的完全解耦。
 
@@ -190,8 +184,6 @@ LongStream 由以下核心模块串联构成，形成端到端的流式推理管
 - **训练-推理一致性**：缓存一致性训练强制模型在纯滑动窗口下运作，消除注意力沉没；周期性缓存刷新定期清除饱和特征，维持长时记忆质量
 
 Figure 2 进一步验证了该设计的工程优势：LongStream 的内存占用和推理延迟随序列增长保持稳定，而离线模型 VGGT 和 FastVGGT 的内存消耗快速增长并最终触发显存溢出。
-
-
 
 ### 3.1 整体框架与概率图模型
 
@@ -284,8 +276,6 @@ LongStream 的端到端架构（见 Figure 3）包含以下核心模块：
 
 - **Streaming KV Cache with CCT & Periodic Refresh**：在训练中传递并裁剪 KV 缓存以对齐推理，并每 $N$ 个关键帧重置陈旧缓存，实现训练-推理一致性并防止长时记忆饱和。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -335,30 +325,8 @@ LongStream 在以下场景中仍存在退化：
 - **动态场景**：模型假设场景基本静止，对动态目标处理能力有限，该方向的验证数据尚不充分，需人工核实具体退化程度。
 - **手工关键帧调度**：固定间隔 N=10 的关键帧选择策略可能非最优，无法适应不同场景的运动模式。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2538_https_arxiv_org_abs_2602_13172/figures/001_Figure_1.jpg]]
-*Figure 1: Streaming Autoregressive Model Comparison for Metric-Scale Scene Reconstruction. Existing streaming models (e.g., Stream3R [1], StreamVGGT [2]) collapse within tens of meters, suffering from extrapolation errors. In contrast, our proposed LongStream delivers stable, kilometer-scale reconstruction. Its gauge-decoupled formulation and cache-consistent training preserve metric accuracy and geometric stability, sustaining 18 FPS performance across multi-kilometer sequences*
-
 ![[assets/figures/papers/paper_list_l2538_https_arxiv_org_abs_2602_13172/figures/002_Figure_2.jpg]]
 *Figure 2: Memory and runtime comparison. Our method keeps memory and latency stable, whereas VGGT and FastVGGT grow rapidly and hit OOM on long sequences*
-
-![[assets/figures/papers/paper_list_l2538_https_arxiv_org_abs_2602_13172/figures/005_Figure_5.jpg]]
-*Figure 5: Qualitative comparison on long-sequence pose estimation. We compare LongStream against streaming and SLAM baselines on KITTI and vKITTI sequences spanning several hundred meters. Stream3R and StreamVGGT accumulate drift over long trajectories, and VGGT-SLAM runs out of memory on the second vKITTI sequence. LongStream preserves stable and coherent poses across all scenes, maintaining trajectory continuity even under large loop motions*
-
-![[assets/figures/papers/paper_list_l2538_https_arxiv_org_abs_2602_13172/figures/006_Table_1.jpg]]
-*Table 1: Quantitative comparison on the KITTI dataset in terms of ATE. The upper block lists optimization-based baselines, and the lower block reports streaming methods. Our approach achieves the best accuracy across all sequences*
-
-![[assets/figures/papers/paper_list_l2538_https_arxiv_org_abs_2602_13172/figures/007_Figure_6.jpg]]
-*Figure 6: Qualitative comparison on indoor sequences. We evaluate challenging scenes with strong viewpoint changes, occlusions, and repeated back-tracking. While Stream3R, StreamVGGT, and VGGT-SLAM drift on these highly folded trajectories, LongStream maintains stable poses and consistent 3D structure throughout the sequence. The symbol * denotes runs with out-of-memory errors or more than three tracking failures*
-
-![[assets/figures/papers/paper_list_l2538_https_arxiv_org_abs_2602_13172/figures/008_Table_2.jpg]]
-*Table 2: Quantitative comparison on TUM [55], Oxford Spires [56], and Waymo [57]. Top: optimization-based methods; Bottom: streaming methods. Our method demonstrates robustness on these small-scale trajectories, achieving the best performance across all online benchmarks. † Reported in [58]*
-
-![[assets/figures/papers/paper_list_l2538_https_arxiv_org_abs_2602_13172/figures/009_Table_3.jpg]]
-*Table 3: Quantitative comparison on vKITTI. Top: optimization-based methods; Bottom: streaming methods. Our method achieves the best accuracy across all sequences*
-
-
 
 ## 定位与知识库关联
 
@@ -405,8 +373,6 @@ LongStream 的设计假设和当前实现定义了其适用范围：
 ### 5. 知识库定位
 
 LongStream 处于**流式自回归3D视觉**与**在线SLAM**的交叉地带。其核心贡献——规范解耦、正交尺度学习、缓存一致性训练——为流式几何估计提供了新的设计范式。相较于依赖后端优化的传统SLAM，LongStream 代表了纯前馈、无优化的在线重建路径，在计算效率和长程稳定性之间取得了独特的平衡。其缓存一致性训练策略（CCT）对更广泛的流式Transformer应用（如视频理解、在线导航）也具有方法论迁移价值。
-
-
 
 ## 原文 PDF
 

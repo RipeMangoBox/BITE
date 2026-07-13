@@ -60,8 +60,6 @@ claims:
 
 **局限性**：合成层面存在快速运动下的手部伪影和大角度转头时的身份退化；推理层面MLLM代理偶尔产生过度夸张的动作，且推理过程引入约20‑30秒额外延迟。
 
-
-
 ### 问题背景
 
 数字人化身（Avatar）生成旨在根据音频输入驱动静态肖像或全身图像产生自然的说话动作，在虚拟主播、影视制作、在线教育等领域具有广泛应用。近年来，基于扩散模型（Diffusion Models）和变换器（Transformer）架构的视频生成方法取得了显著进展，使得化身动画在视觉质量、唇音同步精度等方面达到了较高水平。
@@ -86,8 +84,6 @@ claims:
 - **系统1（反应式合成）**：在高层语义计划的指导下，通过专门的对称多模态扩散变换器（MMDiT）将语义指导与低层视听信号融合，执行快速、流畅的运动合成——类似于人类的“执行”过程。
 
 这一双系统设计的关键优势在于：通过显式解耦“规划”与“合成”，使得模型既能保持语境感知的语义一致性（系统2的贡献），又能继承扩散模型在视觉质量和唇音同步方面的优势（系统1的贡献）。同时，针对参考图像条件困境和多模态融合冲突，本文提出了**伪最后一帧策略**（Pseudo Last Frame）和**对称音频分支设计**作为配套解决方案，从架构层面解除静态约束并实现模态间的平等交互。
-
-
 
 ## 核心方法与创新机理
 
@@ -133,8 +129,6 @@ claims:
 
 上述四个创新并非孤立存在，而是形成了紧密的因果链条：**MLLM推理模块**提供语义规划的上层建筑，**对称MMDiT融合**确保高层语义与低层信号的有效整合，**伪最后一帧策略**解除静态约束以释放运动自由度，**MM‑Warmup**则保障了多模态训练的稳定性。这一协同效应在主观评估中得到了充分验证：与当前领先方法OmniHuman‑1相比，本文方法在唇音不一致（LSI 0.21→0.03）、运动不自然感（MU 0.39→0.25）和整体偏好（GSB ‑0.23→+0.23）上均实现了大幅超越（Table 2b）。
 
-
-
 ![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_80JylHgQn1/figures/002_Figure_2.jpg]]
 *Figure 2: The Dual-System Simulation Framework. Our framework models avatar behavior by integrating a deliberative System 2 for planning with a reactive System 1 for synthesis. Left: Overall Pipeline. An MLLM-based System 2 reasons over multimodal inputs (audio, image, text) to generate a high-level “schedule”. This schedule guides the System 1 MMDiT, which synthesizes the final video by fusing information through dedicated text, audio and video branches. Right: Key Components. (a) The System 2 reasoning pipeline, comprising an MLLM Analyser and Planner. (b, c) Our proposed MM-Branch Warm-up and Pseudo Last Frame strategies, designed to mitigate modal conflicts*
 
@@ -160,8 +154,6 @@ claims:
 **数据流与协同机制**：整个框架的数据流可概括为“语义规划先行，多模态合成跟进”。MLLM代理输出的reasoning text通过文本分支注入MMDiT，与音频分支提取的韵律特征、视频分支的时空潜变量在共享自注意力中深度融合。这一设计使系统2的高层语义推理能够直接调控系统1的低层运动生成，实现了从“听到什么就动什么”到“理解语境后再行动”的范式跃迁。
 
 > **需要手动验证的点**：关于MMDiT骨干的具体预训练细节（如基础模型版本、预训练数据规模）在已有分析材料中未明确给出，建议查阅原文Section 3.1获取精确信息。
-
-
 
 本文提出的双系统认知模拟框架在方法层面引入了四个关键模块，分别对应高层语义规划与低层视听合成中的瓶颈突破。以下逐一阐述各模块的设计逻辑与技术细节。
 
@@ -202,8 +194,6 @@ claims:
 ### 公式说明
 
 本文未引入新的数学公式。模型核心基于扩散变换器（DiT）的标准去噪范式，其训练目标为常规的噪声预测损失。各模块的创新集中在架构设计、条件策略与训练流程层面，不涉及公式层面的推导或修改。
-
-
 
 ## 实验与关键发现
 
@@ -248,29 +238,9 @@ Table 4 展示了在标准基准上的定量结果。在 CyberHost 全身动画�
 
 Figure 13 系统展示了方法的局限性，分为合成层面和推理层面两类。
 
-![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_80JylHgQn1/figures/026_Figure_13.jpg]]
-*Figure 13: Limitations of our method. Despite its strong performance, our method exhibits limitations in both synthesis and reasoning. On the synthesis level, the model can struggle with fine details during rapid movements, leading to hand artifacts (row 1) and degraded facial identity during large head turns (row 2). Separately, on the reasoning level, the agent can generate motions that, while plausible, are occasionally over-articulated (e.g., excessive gesturing), lacking the subtlety required for cinematic performance*
-
 **合成层面**，模型在快速运动时容易出现手部细节伪影，在大角度头部转动时面部身份一致性下降，偶尔出现身份漂移。这些失败模式与 DiT 骨干在极端姿态和快速运动下的生成能力边界有关，需要更大规模、更高质量的训练数据来缓解。
 
 **推理层面**，MLLM 代理有时会生成过度夸张的手势动作，缺乏影视级表演所需的细腻与内敛。这表明当前的语义规划粒度尚不足以捕捉人类行为中的微妙变化，未来需要更精细的动作描述语言或更强的推理约束。此外，代理推理过程引入约 20–30 秒的额外延迟，虽然论文认为在非交互场景下可接受，但对于实时应用仍需优化。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_80JylHgQn1/figures/008_Table_5.jpg]]
-
-![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_80JylHgQn1/figures/013_Table_7.jpg]]
-
-![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_80JylHgQn1/figures/014_Table_8.jpg]]
-*Table 8: Illustrating the Reasoning Process for the Sample in Row 2*
-
-![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_80JylHgQn1/figures/016_Table_5.jpg]]
-*Table 5: MLLM-based Evaluation. Pairwise comparison results (GSB Score) with individual scores for Overall Quality, Prompt Following, and Motion-Context Coherence*
-
-![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_80JylHgQn1/figures/017_Table_6.jpg]]
-*Table 6: Subjective Evaluation vs. Wan2.2-S2V. Subjective evaluation against Wan2.2-S2V, including a GSB preference score (Which is better?) and a pairwise comparison of artifacts (Which is less bad?)*
-
-
 
 ## 定位与知识库关联
 
@@ -333,8 +303,6 @@ Figure 13 系统展示了方法的局限性，分为合成层面和推理层面�
 3. **反射重规划集成**：当前推理过程为一次性前向规划，能否以低开销方式集成反射重规划（reflection）机制，进一步提升长视频的逻辑连贯性？
 4. **合成伪影消除**：如何通过更大规模、更高质量的数据训练进一步消除快速运动和大角度旋转场景下的合成伪影？
 5. **泛化边界探索**：当前方法在非人物角色和复杂交互场景下的泛化边界尚未被充分探索，是否存在更多未知的失效模式？
-
-
 
 ## 原文 PDF
 

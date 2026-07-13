@@ -55,8 +55,6 @@ claims:
 
 DPoser-X 的局限性同样值得关注：训练数据偏向常见站立动作，对瑜伽等极端姿态泛化不足；变分扩散采样的模式寻求特性导致生成多样性受限（Recall 仅 0.163），难以覆盖真实分布的长尾区域；对低质量二维关键点估计较为敏感。这些开放问题指向未来方向：通过重要性采样或粒子变分推断增强分布覆盖，以及在盲逆问题中联合建模测量算子与数据分布。
 
-
-
 三维人体姿态建模是计算机视觉与图形学中的核心问题，其关键在于构建能够刻画真实人体运动分布的先验模型。此类先验不仅需要生成自然、多样化的姿态，还必须能够作为通用正则化组件嵌入各类下游任务，如人体网格恢复、运动去噪和姿态补全。
 
 然而，现有姿态先验在表达能力与泛化性之间长期面临两难困境。早期方法采用高斯混合模型（GMM）作为姿态先验，虽计算高效但表达能力极为有限，难以捕捉人体姿态的高维非线性流形结构。变分自编码器（VAE）类方法如 **VPoser** 通过隐空间建模提升了表达力，但其高斯隐变量假设本质上限制了分布拟合的精度，难以覆盖复杂姿态的长尾分布。基于神经距离场（NDF）的先验如 **Pose-NDF** 和 **NRDF** 虽在单姿态优化任务中表现优异，但训练不稳定且泛化能力不足。
@@ -66,8 +64,6 @@ DPoser-X 的局限性同样值得关注：训练数据偏向常见站立动作�
 扩散模型在图像、视频等领域的突破性进展，展示了其在高维复杂分布建模上的巨大潜力。直觉上，扩散模型通过逐步去噪的学习范式，天然适合捕捉人体姿态流形中的多模态结构与细粒度约束。然而，如何将扩散模型从生成任务适配为通用的姿态先验，并将其无缝嵌入各类逆问题求解框架，仍是一个开放挑战。
 
 本文提出 **DPoser-X**，旨在以扩散模型为核心构建一种鲁棒、通用且可扩展的三维全身人体姿态先验。核心动机在于：将姿态估计、补全、去噪等异构任务统一建模为逆问题，利用扩散模型的噪声预测过程作为通用的正则化项，通过测试时优化实现任务无关的即插即用。针对全身数据匮乏问题，进一步提出混合训练策略，融合局部数据集与全身数据集，在保持泛化能力的同时显著提升全身姿态建模精度。
-
-
 
 ## 核心方法与创新机理
 
@@ -96,8 +92,6 @@ $$t = t_{\mathrm{max}} - \frac{(t_{\mathrm{max}} - t_{\mathrm{min}}) \times \mat
 ### 4. 全身训练策略：从分部独立到混合训练
 
 高质量全身姿态数据的匮乏是全身先验建模的主要障碍。DPoser-X 提出**混合训练策略**：冻结预训练的身体、手部、脸部分部模型，仅训练一个融合模块；同时利用分部数据集（仅有部分关节标注）和全身数据集进行训练，对分部数据仅计算可用部分的损失，对全身数据则随机掩码部分关节以防止网络对缺失部分产生任意预测。该策略使 DPoser-X-mixed 的手部误差 PA-MPVPE_hands 降至 15.83，显著优于基础版本（17.54）和仅融合版本（17.79）（Table 11），有效缓解了数据匮乏问题。
-
-
 
 DPoser-X 的核心思路是将**无条件扩散模型**作为三维人体姿态的通用先验，通过**变分扩散采样**将其嵌入各类姿态逆问题的测试时优化中。整个框架围绕三个关键设计展开：扩散先验的学习、先验与任务损失的融合机制、以及面向全身姿态的混合训练策略。
 
@@ -165,12 +159,8 @@ DPoser-X 将全身姿态拆分为身体、手部、面部三个部分，分别�
 
 **证据强度说明**：上述框架描述基于论文 Section 2 的方法论陈述及 Figure 2、Figure 4 的结构可视化，核心公式（Eq. 1-6, 8, 11）均来自原文，置信度较高。截断调度的因果机制（姿态细化集中在后期时间步）有 Figure 3 的定性可视化支撑，但该结论基于 DDIM 有限步采样的观察，其在不同采样器下的普适性需进一步验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l8_DPoser_X_Diffusion_Model_as_Robust_3D_Whole_body_Human_Pose_Prior_motion20v2/figures/001_Figure_1.jpg]]
 *Figure 1: An overview of DPoser-X’s versatility and performance across multiple pose-related tasks. Built on diffusion models, DPoser-X serves as a robust and adaptable prior for 3D whole-body human pose modeling. Shown are scenarios in (a) pose generation, (b) human mesh recovery, and (c) pose completion. With up to 61% improvement across 8 benchmarks, DPoser-X consistently outstrips existing priors like VPoser [51] and NRDF [24], proving its superiority in tasks involving the human body, hand, and face*
-
-
 
 DPoser-X 的核心是将无条件扩散模型作为三维人体姿态的通用先验，并通过变分扩散采样将其嵌入各类姿态逆问题的测试时优化中。其方法体系由三个关键模块构成：**扩散姿态先验学习**、**DPoser 正则化与逆问题求解**、以及**截断时间步调度**。以下逐一展开其公式推导与设计逻辑。
 
@@ -254,18 +244,11 @@ $$
 
 为应对高质量全身姿态数据匮乏的瓶颈，DPoser-X 采用分治与融合策略：首先在分部数据集上训练身体、手部、脸部的独立扩散模型并冻结，随后在全身数据集上训练一个融合模块，将各分部特征整合为统一的全身姿态表示。训练时采用**混合训练策略**——对于仅含部分关节的分部数据，仅对可用部分计算损失；对于全身数据，则随机掩码部分身体区域以模拟分部数据分布，防止模型在缺失区域产生任意预测。这一设计使 DPoser-X-mixed 在全身体网格恢复中将手部误差 PA-MPVPE_hands 降至 15.83，显著优于仅融合版本（17.79）和基础版本（17.54）（Table 11）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l8_DPoser_X_Diffusion_Model_as_Robust_3D_Whole_body_Human_Pose_Prior_motion20v2/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the DPoser-regularized optimization framework. Task inputs (e.g., 2D keypoints in human mesh recovery) and current poses are used to compute the measurement loss based on the degradation pattern*
 
 ![[assets/figures/papers/paper_list_l8_DPoser_X_Diffusion_Model_as_Robust_3D_Whole_body_Human_Pose_Prior_motion20v2/figures/004_Figure_4.jpg]]
 *Figure 4: Overview of the DPoser-X methodology. (a) The whole-body network consists of frozen part-only networks, and a fused module trained on whole-body datasets. (b) The mixed training strategy utilizes part-only datasets by applying loss only to available parts. To prevent arbitrary predictions on unavailable parts, the whole-body data is sometimes randomly masked, and loss is applied to all parts*
-
-![[assets/figures/papers/paper_list_l8_DPoser_X_Diffusion_Model_as_Robust_3D_Whole_body_Human_Pose_Prior_motion20v2/figures/003_Figure_3.jpg]]
-*Figure 3: Illustration of the rationale behind the proposed truncated timestep scheduling. We employ the DDIM sampler [60] with limited steps and visualize the generated poses. Our observations reveal that pose refinement occurs at later timesteps*
-
-
 
 ## 实验与关键发现
 
@@ -301,33 +284,14 @@ DPoser 在无条件身体姿态生成任务中展现出强大的分布拟合能�
 2. **生成多样性受限。** 变分扩散采样的模式寻求（mode-seeking）特性导致 Recall 仅 0.163，难以覆盖真实姿态分布的长尾区域。这一问题在需要多样化输出的场景（如姿态生成）中尤为突出。
 3. **关键点质量敏感性。** 优化过程依赖 2D 关键点估计的准确性，低质量的关键点输入会通过测量损失项误导优化方向，导致重建姿态偏离真实值。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l8_DPoser_X_Diffusion_Model_as_Robust_3D_Whole_body_Human_Pose_Prior_motion20v2/figures/006_Figure_5.jpg]]
 *Figure 5: Qualitative comparison of generated human poses: (e) illustrates naturalistic poses aligned with real-world data, whereas (f) shows poses that, despite superior APD, lack natural appearance. *We use a DDIM sampler [60] with only 10 steps*
 
 ![[assets/figures/papers/paper_list_l8_DPoser_X_Diffusion_Model_as_Robust_3D_Whole_body_Human_Pose_Prior_motion20v2/figures/008_Figure_6.jpg]]
 *Figure 6: Visualization of human mesh recovery results (body only) on EHF [51] when fitting from scratch*
 
-![[assets/figures/papers/paper_list_l8_DPoser_X_Diffusion_Model_as_Robust_3D_Whole_body_Human_Pose_Prior_motion20v2/figures/009_Table_3.jpg]]
-*Table 3: Performance metrics (MPJPE) for motion denoising*
-
-![[assets/figures/papers/paper_list_l8_DPoser_X_Diffusion_Model_as_Robust_3D_Whole_body_Human_Pose_Prior_motion20v2/figures/010_Table_4.jpg]]
-*Table 4: Quantitative evaluation of hand inverse kinematics on the ReInterhand dataset [48] under various masking settings*
-
-![[assets/figures/papers/paper_list_l8_DPoser_X_Diffusion_Model_as_Robust_3D_Whole_body_Human_Pose_Prior_motion20v2/figures/013_Table_8.jpg]]
-*Table 8: Whole-body mesh recovery results on ARCTIC [16]*
-
 ![[assets/figures/papers/paper_list_l8_DPoser_X_Diffusion_Model_as_Robust_3D_Whole_body_Human_Pose_Prior_motion20v2/figures/018_Table_9.jpg]]
 *Table 9: Ablation of timestep scheduling on key pose-related tasks*
-
-![[assets/figures/papers/paper_list_l8_DPoser_X_Diffusion_Model_as_Robust_3D_Whole_body_Human_Pose_Prior_motion20v2/figures/019_Table_11.jpg]]
-*Table 11: Ablation of training strategies for whole-body mesh recovery on the Fit3D dataset [19]*
-
-![[assets/figures/papers/paper_list_l8_DPoser_X_Diffusion_Model_as_Robust_3D_Whole_body_Human_Pose_Prior_motion20v2/figures/007_Figure.jpg]]
-*Figure: DPoser (ours)*
-
-
 
 ## 定位与知识库关联
 
@@ -387,8 +351,6 @@ DPoser-X 的全身扩展面临一个关键瓶颈：高质量全身姿态数据�
 3. **盲逆问题扩展**：当前方法假设测量算子 $\mathcal{A}$（如相机投影）已知。如何在未知相机参数等盲逆问题场景中联合建模测量算子与数据分布，将 DPoser 扩展至更一般的 HMR 场景？
 
 4. **实时集成**：能否通过知识蒸馏或扩散模型加速技术，将扩散先验的约束能力集成到基于回归的实时 HMR 方法中，兼顾效率与合理性？
-
-
 
 ## 原文 PDF
 

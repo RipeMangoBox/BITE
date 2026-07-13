@@ -54,8 +54,6 @@ claims:
 
 GFPO 无需复杂的奖励工程，可灵活适配长度、token 效率等多种过滤指标，并支持根据问题难度自适应调整保留数量。该方法在 DeepSeek-R1 蒸馏模型（Qwen、Llama，7B–14B）上同样有效，展现出良好的模型和任务泛化能力。
 
-
-
 ### 推理模型中的“长度膨胀”困境
 
 近年来，通过强化学习（RL）训练推理模型已成为提升数学、编程等复杂任务准确率的主流范式。**GRPO**（Shao et al., 2024）作为代表性方法，通过组内归一化优势估计消除了对价值网络的需求，显著推动了开源推理模型的发展。然而，GRPO训练过程中暴露出一个关键问题：**响应长度会不可控地膨胀**。
@@ -76,8 +74,6 @@ GFPO 无需复杂的奖励工程，可灵活适配长度、token 效率等多种
 本文的核心观察是：**GRPO训练中，所有采样响应都参与策略更新，包括那些冗长但恰好获得高奖励的响应。** 这些响应虽然正确，却携带了大量不必要的推理步骤，它们的存在持续向策略传递“长推理是可接受的”信号。
 
 基于此，本文提出**Group Filtered Policy Optimization（GFPO）**，其核心思想是：**在训练时增加采样数量，但仅让满足简洁性偏好的响应参与学习。** 通过将冗长响应的优势直接置零，GFPO从梯度层面切断了冗长行为的强化路径，从而在保持准确率的同时，大幅抑制长度膨胀。
-
-
 
 ## 核心方法与创新机理
 
@@ -116,8 +112,6 @@ GFPO 的核心创新在于**在训练时通过“采样更多、保留更少”�
 | **GFPO（本方法）** | 采样更多、过滤保留 top-k、屏蔽非保留响应优势 | 训练稳定，长度控制精确，准确率无统计显著下降 |
 
 GFPO 的优势在于其过滤机制与优势归一化正交，可与 Dr. GRPO 等其他 RLVR 改进兼容叠加；同时，它通过拒绝步骤隐式塑造学习信号，避免了显式惩罚项带来的奖励工程复杂性。
-
-
 
 ![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_UKOqoULbZS/figures/001_Figure_1.jpg]]
 *Figure 1: Left: GFPO introduces simple yet powerful modifications to GRPO: sample more responses during training (↑ G), rank them by a target attribute (e.g., length, token efficiency), and learn only from the top-k—setting the advantages of the rest to zero. This selective learning functions as implicit reward shaping, steering the policy toward desired behaviors. Right: When optimizing for length or token efficiency, GFPO curbs GRPO’s length inflation—letting the model think less at inference-time by sampling more at training-time—while maintaining its core reasoning capabilities*
@@ -163,8 +157,6 @@ $$\mathcal{J}_{\mathrm{GFPO}}(\theta) = \mathbb{E}_{q \sim P(Q), \{o_i\}_{i=1}^G
 - **输出**：更新后的策略参数 $\theta$，该策略在推理时生成比 GRPO 基线更短的推理链，同时保持准确率无统计显著性差异（Wilcoxon 符号秩检验）。
 
 整个管线对 GRPO 的改动集中在采样规模放大和优势计算屏蔽两个环节，与 Dr. GRPO（Liu et al., 2025）等基于归一化修改的方法正交，理论上可与之叠加使用。
-
-
 
 ### GFPO 的五个核心模块
 
@@ -217,8 +209,6 @@ $$R = w_{\mathrm{acc}} \cdot \mathrm{LENGTHSCALE}(R_{\mathrm{acc}}) + w_{\mathrm
 
 **要点**：GFPO 并未修改奖励函数本身，而是通过**优势屏蔽**在策略梯度层面间接传递简洁性偏好，避免了复杂奖励工程可能引入的偏差。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与因果机制
@@ -233,7 +223,6 @@ GFPO的核心洞察在于：**在训练时增加采样数量并进行选择性�
 
 Table 1展示了GFPO各变体在五个基准上的综合表现。Token Efficiency GFPO（按奖励/token效率排序，G=16，k=8）实现了最显著的长度缩减效果：
 
-
 ![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_UKOqoULbZS/figures/002_Table_1.jpg]]
 *Table 1: Pass@1 Accuracy, Response Lengths, and Length Inflation Reduction. Across all benchmarks, GFPO cuts length inflation while matching GRPO accuracy (no significant difference under Wilcoxon signed-rank test). Sampling more responses is key and lowering k/G effectively controls length. Token Efficiency delivers the largest reduction in length inflation (79.5%) at GRPO-level accuracy, and Adaptive Difficulty outperforms shortest k/G at equal compute. On LiveCodeBench (OOD coding), GRPO lengthens chains without accuracy gains, whereas GFPO shortens them and sometimes improves accuracy (e.g., 8/16, 4/24). GFPO also outperforms Dr. GRPO, with higher accuracy and larger excess-length reductions. Pa...*
 
@@ -245,14 +234,12 @@ Table 1展示了GFPO各变体在五个基准上的综合表现。Token Efficienc
 
 Figure 2的帕累托前沿图进一步揭示：在除AIME 25外的所有基准上，至少有一种GFPO变体严格支配GRPO——即同时实现更高准确率和更短响应。在AIME 25上，GRPO虽在准确率上略占优势，但GFPO变体以显著更短的长度实现了相近的准确率，整体权衡更优。
 
-
 ![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_UKOqoULbZS/figures/003_Figure_2.jpg]]
 *Figure 2: Pareto Trade-off Between Accuracy and Response Length. For all benchmarks except AIME 25, at least one GFPO variant strictly dominates GRPO—achieving both higher accuracy and shorter responses (green region above and to the left of GRPO). For AIME 25, GRPO attains the highest accuracy, but several GFPO variants, while taking non-significant accuracy dips, remain Pareto-optimal because their responses are shorter, and no other method is simultaneously more accurate and more concise. On average, Shortest 4/24, Adaptive Difficulty, and Shortest 8/16 are strictly Pareto-superior to GRPO with Token Efficiency close behind. Dr. GRPO generally falls outside the Pareto frontier–yielding lower accur...*
 
 ### 消融实验
 
 **保留比例k/G是核心控制变量**。Figure 6显示，当k/G比例从50%（如Shortest 8/16）降至约17%（如Shortest 4/24）时，平均响应长度几乎线性下降。仅在小采样组内过滤（如Shortest 6/8，k/G=75%）无法产生有意义的长度缩减（ELR仅为1.8%–11.5%），说明**必须同时增大采样组G才能获得显著效果**。
-
 
 ![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_UKOqoULbZS/figures/013_Figure_6.jpg]]
 *Figure 6: Average Response Length vs k/G. Reducing k/G, reduces average response length but beyond a point leads to diminishing returns*
@@ -282,16 +269,11 @@ Table 2展示了GFPO在DeepSeek-R1蒸馏模型上的跨架构泛化能力。在D
 3. **训练计算开销**：增大采样组G需更多训练计算。虽然14B模型上仅增加7%时间，但对于更大规模模型或更高吞吐场景，这一开销可能被放大。
 4. **任务范围受限**：当前实验集中于数学和编程等可验证奖励的任务，GFPO在开放式文本生成或主观评估任务上的表现尚未验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_UKOqoULbZS/figures/009_Figure_4.jpg]]
 *Figure 4: Accuracy Across Response Lengths for AIME 25. (a) GFPO cuts long-tail verbosity (32% to 22% outputs ≥ 20k tokens) and solves hard problems with shorter responses (∼9x harder prompts solved with ≤ 5k tokens). (b) Accuracy declines with increasing response length even at fixed difficulty. On hard problems, most models peak at 12k-16k tokens, while GFPO variants outperform GRPO in the longest bin by producing shorter, more accurate long responses. Table 3: Train–Test Trade-off. Training step time vs. end-to-end latency for GRPO and GFPO variants. Token Efficiency GFPO reduces latency by ∼29% with only a 7% increase in training time, eliminating three-quarters of the latency overhead introduced...*
 
 ![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_UKOqoULbZS/figures/012_Table_4.jpg]]
 *Table 4: Pass@1 Accuracy and Average Response Lengths on AIME 25, AIME 24, GPQA, Omni-MATH, and LiveCodeBench. GFPO variants substantially reduce response lengths while matching GRPO accuracy. We find no statistically significant differences in GFPO’s accuracy under the Wilcoxon signed-rank test for any dataset. Dr. GRPO yields lower accuracy (66.6% vs 69.5% on AIME 25, 74.4% vs 76.4% on AIME 24, 66.7% vs 68.5% on GPQA) and substantially longer responses than GFPO (43.6% vs 70.9% len reduction on AIME 25, 48.5% vs 84.6% on AIME 24, 65.1% vs 79.7% on GPQA, and 7.2% vs 79.7% on LiveCodeBench)*
-
-
-
 
 ## 定位与知识库关联
 
@@ -334,8 +316,6 @@ GFPO直接建立在GRPO（Shao et al., 2024）的强化学习框架之上，其�
 4. **跨任务泛化机制**：GFPO在分布外的代码基准LiveCodeBench上同样抑制了长度膨胀，表明过滤机制学习到的简洁性偏好具有一定的任务泛化能力。这种泛化的深层原因——是简洁推理本身具有跨域共性，还是过滤机制隐式地正则化了策略——值得进一步研究。
 
 5. **大规模部署的可行性**：在更大规模模型或更复杂的推理任务中，GFPO的额外采样开销和过滤策略是否仍能维持当前的效率优势？特别是当单次推理成本已经很高时，增大G的边际收益可能递减。
-
-
 
 ## 原文 PDF
 

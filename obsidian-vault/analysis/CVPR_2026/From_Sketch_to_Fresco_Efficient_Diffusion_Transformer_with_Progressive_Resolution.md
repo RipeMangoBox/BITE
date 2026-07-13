@@ -55,8 +55,6 @@ claims:
 
 实验表明，Fresco在**FLUX.1-dev**上以30个函数评估步数（NFE）实现**2.81倍加速**，同时ImageReward提升**8.13%**；在**HunyuanVideo**上以23 NFE实现**3.51倍加速**，质量总分提升**1.22%**。Fresco可与步长蒸馏和特征缓存等方法正交叠加：与蒸馏结合可达**22倍加速**，与特征缓存结合可达**9倍训练无关加速**。消融研究证实，基于方差的令牌选择策略在随机、边缘、注意力等多种策略中取得了最佳的速度-质量平衡（4.51倍加速）。
 
-
-
 扩散Transformer（Diffusion Transformer, DiT）已成为文本到图像与文本到视频生成的主流架构，其核心优势在于通过Transformer的自注意力机制建模全局上下文，从而生成高保真、语义一致的视觉内容。然而，DiT的推理过程需要在完整分辨率下执行数十步去噪迭代，每一步都涉及对全部令牌的Transformer前向传播，导致极高的计算开销。以**FLUX.1-dev**（Black Forest Labs, 2024）为例，生成一张1024×1024图像通常需要50个NFE（Number of Function Evaluations），在消费级GPU上耗时数十秒，严重制约了其在实际部署中的可用性。
 
 为缓解这一瓶颈，研究者提出了两类主流的免训练加速策略。第一类是**特征缓存**方法，如**TaylorSeer**（Liu et al., 2025），通过缓存相邻时间步的Transformer中间特征来跳过部分计算，但这类方法通常以牺牲细节保真度为代价。第二类是**动态分辨率采样**方法，如**Bottleneck Sampling**（Tian et al., 2025）和**RALU**（Jeong et al., 2025），其核心思想是在低分辨率下完成大部分去噪步骤，仅在最后阶段上采样至高分辨率进行细节细化，从而大幅降低总计算量。
@@ -70,8 +68,6 @@ claims:
 上述两个缺陷共同指向一个深层瓶颈：**现有方法缺乏对令牌级收敛状态的感知能力，以及跨分辨率阶段的轨迹连续性保证。** 换言之，它们将动态分辨率视为粗粒度的阶段切换问题，而非细粒度的令牌级调度问题。
 
 Fresco的动机正是从这两个缺口切入：通过构建**统一噪声场**（Token-Encoded Unified Noise Field）来保证跨阶段轨迹的数学连续性，同时引入**基于令牌时间方差的渐进式上采样**策略，使计算资源精准聚焦于语义尚未稳定的令牌。这种设计使得Fresco能够在低分辨率下快速建立全局结构（如同绘制草图），然后仅对语义稳定的区域逐步分配高分辨率计算资源（如同细化壁画细节），从而在显著加速的同时保持甚至提升生成质量。
-
-
 
 ## 核心方法与创新机理
 
@@ -119,8 +115,6 @@ $$[ \mathbf{z}_1, \mathbf{z}_2, \mathbf{z}_3, \mathbf{z}_4 ] = H_4 \cdot [ \math
 
 消融实验证实了每个创新的独立贡献：基于方差的令牌选择策略在随机、边缘、注意力等策略中取得了最佳的速度-质量平衡（4.51×加速），验证了“收敛状态驱动计算分配”这一核心直觉的合理性。
 
-
-
 Fresco 的核心管线围绕两个关键机制展开：**统一噪声场**（Token‑Encoded Unified Noise Field）与**基于令牌时间方差的渐进式上采样**（Progressive Variance‑Guided Upsampling）。整个生成过程从低分辨率开始，逐步将收敛的令牌提升到高分辨率进行细化，从而在保持语义一致性的同时大幅降低计算开销。
 
 ### 管线总览
@@ -160,15 +154,8 @@ $$\mathbf{z}^{(s+1)} = \beta_s \mathbf{z}^{(s)} + \alpha_s \epsilon_{y,x,d}$$
 
 该框架的核心优势在于：**低分辨率阶段快速建立全局结构，高分辨率计算资源仅分配给语义已稳定的区域**。消融实验表明，基于方差的令牌选择策略在随机、边缘、注意力等策略中取得了最佳的速度‑质量平衡，实现 4.51× 加速（Table 4）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l877_https_arxiv_org_abs_2601_07462/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of re-noising strategies. (a) Standard Sampling: one initial noise with no re-noise during process. (b) Traditional Dynamic Resolution: inject stage-specific noise independently at every resolution change, disrupting semantic and reset denoising trajectory, causing aliasing and artifacts. (c) Unified renoise (ours): all stages query the same noise field, ensuring stable refinement and clean results*
-
-![[assets/figures/papers/paper_list_l877_https_arxiv_org_abs_2601_07462/figures/002_Figure_2.jpg]]
-*Figure 2: Overview of the Fresco framework. Fresco starts sampling at a reduced resolution while assigning each token a fixed coordinatebound noise vector from a unified noise field. During generation, Fresco tracks each token’s temporal variance: tokens with small variance, indicating stable semantics, are upsampled for high-resolution refinement, whereas unstable tokens remain at low resolution for further denoising. This unified-noise, variance-guided process enables smooth and efficient coarse-to-fine generation*
-
-
 
 Fresco 框架围绕两个核心机制展开：**统一噪声场（Unified Noise Field）** 与 **基于令牌时间方差的渐进式上采样（Progressive Variance-Guided Upsampling）**。前者解决跨分辨率阶段语义一致性问题，后者实现计算资源的非均匀分配。
 
@@ -233,8 +220,6 @@ Fresco 的完整采样流程可概括为四个协同模块：
 
 这一流程使 Fresco 在无需额外训练的前提下，实现了对现有扩散 Transformer 模型（如 FLUX、HunyuanVideo）的即插即用加速。
 
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -252,9 +237,6 @@ Fresco 在两个主流生成模型上均实现了显著的质量-速度联合提
 ### 与加速方法的兼容性
 
 Fresco 与现有加速范式高度互补。当与步长蒸馏方法 **FLUX.1-schnell**（Black Forest Labs, 2024）结合时，Fresco 实现 **22.10 倍**加速（Figure 5）。与特征缓存方法 **TaylorSeer**（Liu et al., 2025）结合时，Fresco 实现 **9 倍**无训练加速。这表明 Fresco 的动态分辨率策略与蒸馏、缓存等方法作用于不同的计算瓶颈，叠加后产生接近乘性的加速效果。
-
-![[assets/figures/papers/paper_list_l877_https_arxiv_org_abs_2601_07462/figures/010_Figure_5.jpg]]
-*Figure 5: Compatibility with other acceleration methods. Fresco achieves 22× speedup when combined with step distillation and 9× training-free acceleration when paired with feature caching, while preserving high visual fidelity*
 
 ### 消融研究：令牌选择策略
 
@@ -274,9 +256,6 @@ Fresco 与现有加速范式高度互补。当与步长蒸馏方法 **FLUX.1-sch
 
 Table 5 展示了 Fresco 在不同分辨率下的加速效果。随着分辨率从 1024×1024 提升至 2048×2048，加速比从 4.51 倍增长至 **5.68 倍**。这一趋势符合预期：分辨率越高，低分辨率阶段节省的计算量越大，且全局结构在低分辨率下即可有效建立，高分辨率仅需处理细节细化。
 
-![[assets/figures/papers/paper_list_l877_https_arxiv_org_abs_2601_07462/figures/009_Table_5.jpg]]
-*Table 5: Acceleration on different resolutions*
-
 ### 视觉质量分析
 
 Figure 3 和 Figure 4 分别展示了 FLUX.1-dev 和 HunyuanVideo 上的生成样本对比。与传统动态分辨率方法 **Bottleneck Sampling**（Tian et al., 2025）和 **RALU**（Jeong et al., 2025）相比，Fresco 生成的图像和视频在语义一致性和细节真实性上均表现更优。传统方法因独立重噪声导致跨阶段语义破坏，常出现伪影和纹理错位；Fresco 的统一噪声场有效抑制了这一问题，使生成结果更加干净。
@@ -289,9 +268,6 @@ Figure 3 和 Figure 4 分别展示了 FLUX.1-dev 和 HunyuanVideo 上的生成�
 
 Figure 6 进一步展示了 Fresco 在极低步数下的快速收敛能力：在仅 6 步低分辨率采样后（50→44 步），Fresco 已草拟出清晰的全局结构，而原始 FLUX.1-dev 模型在相同步数下仍被噪声主导。这验证了“低分辨率快速建立全局结构”的核心设计假设。
 
-![[assets/figures/papers/paper_list_l877_https_arxiv_org_abs_2601_07462/figures/011_Figure_6.jpg]]
-*Figure 6: Fast convergence with fewer steps. Fresco drafts the global structure within the first few low-resolution steps (50→44), while the original model remains dominated by noise*
-
 ### 关键证据强度总结
 
 | 声明 | 证据锚点 | 置信度 |
@@ -301,13 +277,6 @@ Figure 6 进一步展示了 Fresco 在极低步数下的快速收敛能力：在
 | 方差策略在令牌选择消融中取得最佳平衡（4.51×） | Table 4 消融数据 | 0.95 |
 | Fresco 与步长蒸馏结合达 22× 加速 | Figure 5 兼容性实验 | 0.95 |
 | 加速比随分辨率提升而增长（4.51×→5.68×） | Table 5 分辨率实验 | 0.95 |
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l877_https_arxiv_org_abs_2601_07462/figures/006_Table_3.jpg]]
-*Table 3: Quantitative comparison of text-to-image generation with other accleration methods*
-
-
 
 ## 定位与知识库关联
 
@@ -352,8 +321,6 @@ Fresco的工作为动态分辨率生成开辟了若干值得探索的方向：
 - **跨架构泛化**：统一噪声场和渐进上采样的思想是否可以推广到非Transformer架构（如U-Net）的扩散模型中？这需要重新定义U-Net特征图上的“令牌”概念和方差度量。
 - **训练阶段的嵌入**：统一噪声场目前仅用于推理阶段的采样过程。如果将其嵌入到训练过程中，能否使模型学会利用这种跨分辨率一致性，从而进一步提升生成质量或加速训练收敛？
 - **与其他加速范式的深度融合**：Fresco已初步展示了与步长蒸馏和特征缓存的兼容性，但三者的联合优化策略（如动态分配步长、缓存和分辨率）仍有待系统研究，可能催生更高效的混合加速框架。
-
-
 
 ## 原文 PDF
 

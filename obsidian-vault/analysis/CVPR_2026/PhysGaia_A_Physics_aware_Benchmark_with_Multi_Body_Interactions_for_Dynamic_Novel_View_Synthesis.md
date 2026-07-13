@@ -53,8 +53,6 @@ claims:
 
 PhysGaia在运动复杂度和视觉真实感方面均显著优于现有物理基准：动态得分0.444（最高），FID 207.8（最低），KID 0.118（最低），为动态场景重建领域提供了更具挑战性和诊断力的评估平台。
 
-
-
 ### 动态新视角合成的现状与瓶颈
 
 动态新视角合成（Dynamic Novel View Synthesis, DyNVS）旨在从一组稀疏的输入视图重建任意时刻、任意视角下的动态场景。近年来，以NeRF和3D高斯泼溅（3DGS）为代表的神经渲染方法在该领域取得了显著进展，在多个基准数据集上展现出令人印象深刻的光度真实感。然而，现有评估体系存在一个根本性瓶颈：**它们仅关注渲染图像的光度质量（如PSNR、SSIM、LPIPS），却完全忽略了动态场景的物理一致性**。这意味着，一个在视觉上看似逼真的重建结果，其底层运动可能严重违背物理定律——例如物体穿透、流体不守恒、形变不符合材料本构关系等。
@@ -87,8 +85,6 @@ PhysGaia作为基准工作，其定位在于为现有DyNVS方法提供统一的�
 
 PhysGaia的独特贡献在于填补了评估体系中的“物理真值”空缺。与上述方法侧重于重建算法本身不同，PhysGaia提供了物理模拟器生成的精确三维轨迹和材料参数，使得对物理一致性的定量诊断成为可能。这一基准不仅暴露了现有方法在复杂多体交互场景下的根本性缺陷，也为未来物理感知的动态重建方法指明了方向。
 
-
-
 ## 核心方法与创新机理
 
 PhysGaia 的核心创新在于将动态新视角合成（DyNVS）的评估范式从**单一的光度真实推进到物理一致性**。这一转变通过以下三个相互关联的关键改进实现。
@@ -106,8 +102,6 @@ PhysGaia 的核心创新在于将动态新视角合成（DyNVS）的评估范式
 为量化物理一致性，PhysGaia 引入了两个专用度量指标：**轨迹距离（TD）** 和**离群百分比下面积（AUOP）**。TD 衡量重建高斯原语与最近地面真实轨迹之间的平均欧氏距离，直接度量运动重建的物理保真度；AUOP 则通过累积时序上的离群点比例，捕捉整个序列中的异常行为（Section 4）。这一度量体系填补了现有 PSNR/SSIM/LPIPS 仅评估光度质量而无法反映物理运动一致性的空白。
 
 **核心因果链条**：物理求解器提供精确真值 → 多体多材料场景暴露方法缺陷 → 专用物理度量实现定量评估。这一链条使 PhysGaia 成为一个“压力测试”基准：现有方法在 PhysGaia 上的表现显著下降（Table 4, Table E），尤其在高动态的气体和流变物质场景中，揭示了其物理真实性的根本不足。
-
-
 
 PhysGaia 构建了一套以物理模拟器为核心、路径追踪渲染器为桥梁、多模态真值生成为输出的完整数据流水线，其设计目标是为动态新视角合成（DyNVS）任务提供兼具光度真实与物理真实的多体交互基准。
 
@@ -145,9 +139,6 @@ PhysGaia 的核心创新在于针对不同材料类型选用最适合的物理�
 
 更重要的是，仿真节点图（node graphs）允许用户生成远超 RGB 的辅助模态（Figure 3），包括深度图、法向图、重光照图像等。这种多模态输出机制使得 PhysGaia 不仅是一个评估基准，更是一个可定制的数据生成平台，能够灵活适配逆渲染、物理参数估计等下游任务。
 
-![[assets/figures/papers/paper_list_l2239_https_arxiv_org_abs_2506_02794/figures/005_Figure_3.jpg]]
-*Figure 3: Examples of diverse modalities that users can generate from the provided simulation node graphs. This can facilitate adaptation to specific downstream tasks*
-
 ### 评估流水线：双维度度量
 
 PhysGaia 的评估体系分为两个维度：
@@ -162,13 +153,6 @@ PhysGaia 的评估体系分为两个维度：
 - **最终输出**：多视角 RGB 图像 + 辅助模态（深度、法向等）+ 完整物理真值（三维轨迹、粘度、杨氏模量等）。
 
 这一流水线使得 PhysGaia 在运动复杂度（动态得分 0.444，为现有物理基准最高）和视觉真实感（FID 207.8、KID 0.118，均为最低）两个关键维度上均显著超越现有数据集，为 DyNVS 研究从“看起来对”迈向“物理上对”提供了基础设施。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2239_https_arxiv_org_abs_2506_02794/figures/004_Figure_2.jpg]]
-*Figure 2: Examples from the proposed physics-aware benchmark, PhysGaia. They exhibit complex physical interactions between multiple objects composed of diverse materials such as liquid, gas, rheological substance, and textile. More importantly, our benchmark enables evaluation of physics realism to foster physics reasoning in dynamic scenes*
-
-
 
 ### 物理模拟管线
 
@@ -224,8 +208,6 @@ $$
 
 物理模拟生成的三维粒子轨迹经路径追踪渲染器生成多视角 RGB 图像，每个像素采样 256 条光线。稀疏视角的相机位姿通过 COLMAP 从渲染图像中重建，为高斯泼溅等下游方法提供初始化点云。
 
-
-
 ## 实验与关键发现
 
 ### 基准特性验证：运动复杂度与真实感
@@ -254,16 +236,10 @@ Table 4 按材料类别汇总了各算法的平均定量结果。一个清晰的
 
 光度指标仅反映视觉质量，而 PhysGaia 独有的物理真值信息允许直接度量重建的物理一致性。Table 6 报告了 Trajectory Distance (TD) 和 AUOP 两个物理真实性指标。
 
-![[assets/figures/papers/paper_list_l2239_https_arxiv_org_abs_2506_02794/figures/012_Table_6.jpg]]
-*Table 6: Performance for physics realism. The box-smoke scene shows higher TD and AUOP; existing methods are hard to capture physics with simplified visuals*
-
 在 Box-smoke（气体）场景中，**D-3DGS** 的 TD 高达 4.01，而真值为 0.84——这意味着重建的高斯原语轨迹与真实粒子运动之间存在数量级的偏差。AUOP 的差距更为惊人：D-3DGS 为 37.9，真值为 0.3。Figure 7 通过重建粒子流与地面真实物理流的可视化对比，直观展示了这一失败：现有方法生成的“流”在空间分布和运动方向上与真实物理流几乎无关。Figure 8 进一步显示，离群百分比随时间持续攀升，表明方法无法在长时间跨度上跟踪物理运动——这恰恰是物理一致性评估所揭示的、光度指标无法捕捉的根本性缺陷。
 
 ![[assets/figures/papers/paper_list_l2239_https_arxiv_org_abs_2506_02794/figures/013_Figure_7.jpg]]
 *Figure 7: Comparison of reconstructed flows and ground truth on the Box-smoke and Pisa scenes. Reconstructed flows deviate significantly from ground truth, where photorealism is achieved through local surface fluctuations rather than following actual physical motion*
-
-![[assets/figures/papers/paper_list_l2239_https_arxiv_org_abs_2506_02794/figures/014_Figure_8.jpg]]
-*Figure 8: Outlier percentage over time on the box-smoke scene with AUOP values indicated. The oracle (GT-GT) achieves nearzero outliers, while existing methods exhibit rapidly increasing outlier percentages, resulting in significantly higher AUOP values. This highlights their inability to track physically plausible flows*
 
 在流变物质场景（Cow）中，TD 的差距相对较小（D-3DGS: 0.07 vs. GT: 0.03），这与该类材料运动速度较慢、形变更可预测的特性一致。但即便如此，多体碰撞引起的局部快速形变仍导致明显的轨迹偏离。
 
@@ -283,16 +259,6 @@ Table 7 展示了逆物理参数估计任务的结果。**PAC-NeRF** 和 **GIC**
 3. **物理参数估计失败**：逆物理方法因无法解耦多体力学信号而系统性低估材料刚度。
 
 这些失败模式共同指向一个核心结论：现有方法在 PhysGaia 上的表现瓶颈并非来自光度重建能力不足，而是源于对复杂物理动态的根本性建模缺陷。PhysGaia 通过提供完整物理真值，使这一缺陷首次可被定量诊断。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2239_https_arxiv_org_abs_2506_02794/figures/002_Table_1.jpg]]
-*Table 1: Comparison with Dynamic NVS datasets. Our PhysGaia benchmark offers diverse scenes with complex multi-body interactions and complete ground-truth physical information (parameters and trajectories)*
-
-![[assets/figures/papers/paper_list_l2239_https_arxiv_org_abs_2506_02794/figures/003_Table_2.jpg]]
-*Table 2: Comparison with physics-simulated datasets for the DyNVS task. Our PhysGaia benchmark offers diverse materials, multi-body interactions, and complete physical ground truth (parameters and trajectories)*
-
-
 
 ## 定位与知识库关联
 
@@ -330,8 +296,6 @@ PhysGaia 揭示的开放问题指向三个关键方向：
 2. **细尺度物理建模**：基于仿真的方法如何更好地捕捉复杂材料响应（如流变物质的粘弹性应力分解 $\pmb{\sigma} = \pmb{\sigma}_{\mathrm{elastic}} + \pmb{\sigma}_{\mathrm{viscous}}$）或细尺度交互（如飞溅）？现有 MLP 和网格表示在流体飞溅等细粒度动态上表现失败（Section 5.2.1）。
 
 3. **物理感知的重建架构**：现有方法（D-3DGS、4DGS、STG、MoSca、SoM）在 PhysGaia 上表现显著下降，尤其在高动态场景中（Tables 4-5），表明需要将物理先验（如动量守恒 $\rho \left( \frac{\partial \mathbf{u}}{\partial t} + (\mathbf{u} \cdot \nabla) \mathbf{u} \right) = -\nabla p + \mu \nabla^2 \mathbf{u} + \rho \mathbf{g}$）显式嵌入重建架构，而非仅依赖数据驱动的变形场。
-
-
 
 ## 原文 PDF
 

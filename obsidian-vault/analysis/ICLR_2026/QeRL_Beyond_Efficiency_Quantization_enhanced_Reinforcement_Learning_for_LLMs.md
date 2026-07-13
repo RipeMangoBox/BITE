@@ -50,15 +50,11 @@ claims:
 
 在Qwen2.5-7B模型上，QeRL的GSM8K准确率达到90.8%，超越BF16 LoRA（88.1%）并逼近全参数微调（91.2%），同时rollout吞吐提升约1.3倍（batch=8），端到端训练速度相对QLoRA提高约1.8倍。量化噪声使初始策略熵更高、奖励增长更快；AQN消融实验显示，添加AQN后3B和7B模型性能分别提升22.6和13.5个点（相对未训练BF16基线），且在不同量化格式下均有一致增益。这些结果揭示了量化噪声在RL中的探索价值，为LLM高效RL训练提供了新范式。
 
-
-
 大语言模型（LLM）的强化学习（RL）训练已在数学推理、安全对齐等任务中取得显著提升，但其计算开销主要集中于 **rollout（采样生成）阶段**：每一轮策略更新都需要通过当前模型生成大量候选输出，这一过程的推理速度和GPU显存占用成为瓶颈。已有的高效微调方法，如低秩适应（LoRA）仅缩减可训练参数，**并未加速基础模型的推理**；而将低秩适应与权重量化结合的QLoRA（NF4+LoRA）虽降低了参数精度，却因NormalFloat 4（NF4）需要解包为浮点格式才能计算，**在前向推理中反而慢于16位LoRA**（Figure 1/2），无法解决rollout的效率问题。
 
 进一步，量化引入的噪声在监督微调（SFT）中被普遍视为精度损失的有害因素，需要尽可能消除。然而，QeRL的作者通过分析发现，这一认知在RL训练中可能被**逆转**：量化噪声并非必然破坏策略学习，相反，它能**提高初始策略的熵（entropy）**，从而增强探索性（Figure 3）。这揭示了一个新的因果机制：**低位量化（如NVFP4的4-bit浮点）固有的量化误差可以作为隐式的探索驱动，加速奖励增长并提升最终评价得分**（Figure 4,5）。这意味着，若能在RL训练中主动利用并调控量化噪声，就有可能同时获得推理加速和更优的策略性能。
 
 正是基于这一洞察，QeRL的工作动机双线并进：**效率侧**，采用NVFP4权重格式并配合高吞吐Marlin乘法内核，实现高质量4-bit推理，大幅降低显存并提升rollout吞吐（对7B模型，相比BF16 LoRA加速约1.3倍，端到端相对于QLoRA整体加速约1.8倍；32B模型可达2倍吞吐，Table 3,12）；**性能侧**，设计自适应量化噪声（AQN）机制，在LayerNorm权重中注入可调控的高斯噪声，结合指数衰减调度器，**动态平衡探索与利用**，无需额外训练参数。消融实验表明，仅加入AQN即可在3B模型中相对未训练的BF16基线提升22.6个点的GSM8K准确率（Table 1），且该收益在不同量化格式甚至全精度设定下均一致存在。最终，QeRL在GSM8K（7B模型）上达到90.8%准确率，超越BF16 LoRA的88.1%，逼近全参数微调的91.2%（Table 1），以更低的资源消耗实现了更强的数学推理能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -84,8 +80,6 @@ QeRL转变了对低精度权重的认知：在SFT中，量化噪声被视为精�
 
 上述创新协同，使QeRL不仅比原有LoRA/QLoRA方案更快、更省显存，还在数学推理基准上达到甚至超越16位全精度性能，并保持了训练过程对更高学习率（1e-5）的鲁棒性——该学习率下BF16 LoRA会出现训练崩溃（Figure 16、17）。
 
-
-
 ![[assets/figures/papers/iclr26_0013_zw8zxMJJlm_QeRL_Beyond_Efficiency_-_Quantization-enhanced_R/figures/005_Figure_2.jpg]]
 *Figure 2: The illustration of QeRL. (a) RL via LoRA: reducing trainable parameters, but does not alleviate the rollout bottleneck. (b) RL via QLoRA: NF4 quantization with LoRA, but NF4 is slower than LoRA. (c) QeRL: NVFP4 quantization with LoRA, reducing memory and enabling faster RL while matching full-parameter finetuning performance with adaptive quantization noise. AQN dynamically adjusts quantization noise, enhancing exploration in LoRA-based RL*
 
@@ -101,8 +95,6 @@ QeRL转变了对低精度权重的认知：在SFT中，量化噪声被视为精�
 6. **GRPO / DAPO 策略优化**（Section 3.1, 3.2）：给定输入问题 $q$，策略模型（NVFP4 主干 + LoRA + 实时噪声）采样一组 $G$ 个候选回答 $\{o_i\}$，由外部奖励模型或规则计算奖励 $r_i$，进而求得组内标准化优势 $A_i$。优化目标基于剪切后的重要性采样比率与 KL 惩罚项（Eq 3），仅更新 LoRA 适配器参数，冻结量化主干与噪声参数（噪声权重在训练过程中固定合并）。
 
 整个训练过程的端到端数据流为：输入提示 → (Marlin 加速的) NVFP4 量化主干前向推理 + LoRA 适配器输出 → 通过 LayerNorm 注入的 AQN 扰动影响 token 分布 → 采样获得候选序列 → 奖励计算 → GRPO/DAPO 计算梯度并更新 LoRA 权重。训练完成后，推理阶段可关闭 AQN（$\sigma=0$），仅保留量化主干与精确适配器，以获得最佳数学推理性能。在 Qwen2.5-7B 的 GSM8K 基准上，该框架达到 90.8% 的准确率，超过 BF16 LoRA 的 88.1% 并接近全参数微调的 91.2%（Table 1b），同时保持了显著的内存与延迟优势。
-
-
 
 QeRL 以提升 LLM 强化学习训练效率与效果为目标，构建了四个协同工作的关键模块：
 1) **NVFP4 量化与 Marlin 加速推理**，将权重压缩为 4 位浮点并在 rollout 阶段高速计算；
@@ -159,8 +151,6 @@ $q$ 为输入 prompt，$G$ 为每组采样数，$\pi_{\theta_{\text{old}}}$ 为�
 
 上述模块与公式共同构成了 QeRL 效率与效果兼顾的技术路径：NVFP4 量化加 Marlin 内核破解 rollout 速度瓶颈，LoRA 保持参数高效，而 AQN 将量化噪声转化为可控探索源，使 4 位量化模型在 GSM8K（90.8%）等基准上不仅超越 16 位 LoRA（88.1%），且逼近全参数微调（91.2%）。
 
-
-
 ## 实验与关键发现
 
 ### 模型与基准概览
@@ -212,12 +202,8 @@ QeRL 主要在 Qwen2.5 系列（3B、7B、14B、32B）上评估，覆盖数学�
 
 整体而言，QeRL 在保持或超越 16 位 LoRA 性能的同时，显著提升了推理速度和内存效率，其核心机制 —— 利用并主动调控量化噪声 —— 为低比特 LLM 的强化学习训练提供了新的设计空间。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0013_zw8zxMJJlm_QeRL_Beyond_Efficiency_-_Quantization-enhanced_R/figures/004_Figure_1.jpg]]
 *Figure 1: Rollout speedup and accuracy of QeRL on Qwen2.5-7B-Instruct. QeRL achieves faster RL rollout and end-to-end training speeds (batch=8), while delivering performance superior to vanilla LoRA and QLoRA, also comparable to full-parameter RL on mathematical benchmarks*
-
-
 
 ## 定位与知识库关联
 
@@ -247,8 +233,6 @@ QeRL 承接 LLM 强化学习（RL）中参数高效微调与推理加速的双�
 - 在非推理任务中，量化噪声是否仍能有效提升策略熵并促进探索？多轮交互与密集奖励建模下 AQN 的收益是否依然成立？  
 - 本方法对非 Transformer 架构、或与更复杂的 RL 算法（如 Online RLHF、PPO 变体）结合时的通用性如何？  
 - AQN 的动态噪声调节与显式熵正则化（如 policy entropy bonus）存在何种互补或替代关系？这些问题的回答将决定 QeRL 能否从数学推理的“特化方案”升维为高效 LLM RL 训练的一般化组件。
-
-
 
 ## 原文 PDF
 

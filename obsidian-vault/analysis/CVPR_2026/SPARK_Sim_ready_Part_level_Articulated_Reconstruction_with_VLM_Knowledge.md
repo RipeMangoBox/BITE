@@ -114,8 +114,6 @@ SPARK 的整体设计围绕一个核心矛盾展开：从单张 RGB 图像重建
 
 整个管道的输入输出流清晰：单张 RGB 图像 → VLM 语义解析（粗 URDF + 部件参考图像 + 打开状态图像）→ DiT 几何生成（部件网格 + 完整铰接对象）→ 纹理生成 → 可微关节优化（高精度 URDF）。这种从语义到几何再到物理的分阶段设计，使得每个模块可以专注于其擅长的子问题，同时通过先验注入和损失监督实现跨阶段的协同改进。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2033_https_arxiv_org_abs_2512_01629/figures/001_Figure_1.jpg]]
 *Figure 1: SPARK is a novel framework that integrates VLM-guided part-level and global image guidance with diffusion transformers to produce high-quality articulated object reconstructions*
 
@@ -177,8 +175,6 @@ $$\mathcal{L}_{\mathrm{reg}} = \lambda_{t} \|\Delta \mathbf{t}\|_{2}^{2} + \lamb
 
 三个模块形成闭环：VLM 提供粗粒度的结构与视觉先验，DiT 将这些先验转化为几何一致的部件网格，关节优化则利用生成结果与 VLM 预测的打开状态图像进一步校准运动学参数，最终输出可直接导入仿真器的完整 URDF 模型。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2033_https_arxiv_org_abs_2512_01629/figures/002_Figure_2.jpg]]
 *Figure 2: Pipeline Overview. We use a VLM to generate per-part reference images, predicted open-state images, and URDF templates with preliminary joint and link estimations. A Diffusion Transformer (DiT) equipped with local, global, and hierarchical attention mechanisms simultaneously synthesizes part-level and complete articulated meshes from a single image with VLM priors. We further employ a generative texture model to generate realistic textures and refine the URDF parameters using differentiable forward kinematics and differentiable rendering under the guidance of the predicted open-state images*
 
@@ -220,8 +216,6 @@ Articulate-AnyMesh作为基于3D网格启发式的方法，其URDF估计精度�
 ### 下游应用验证
 
 SPARK生成的铰接对象资产可直接导入仿真环境。图7展示了使用SPARK重建的抽屉模型在Isaac Sim中训练机器人完成打开抽屉任务的示例，验证了该方法生成的资产具备仿真就绪的运动学属性，能够支撑机器人操作策略的学习与迁移。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2033_https_arxiv_org_abs_2512_01629/figures/003_Table_1.jpg]]
 *Table 1: Quantitative Shape Reconstruction Comparison. We report F-score to measure reconstruction accuracy, Chamfer Distance (CD) for geometric fidelity*

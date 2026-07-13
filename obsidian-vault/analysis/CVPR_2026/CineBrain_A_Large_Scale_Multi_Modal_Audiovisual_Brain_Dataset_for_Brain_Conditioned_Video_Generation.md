@@ -52,8 +52,6 @@ claims:
 
 **主要结果**：在自建的大规模多模态视听脑数据集 **CineBrain**（6 名受试者，每人约 6 小时同步 fMRI‑EEG 记录）上，CineSync 实现了最先进的视频重建性能，2‑way 语义检索准确率达 0.909，FVD 降至 52.78；融合听觉 ROI 的 CineSync⋆ 变体进一步将准确率提升至 0.926，FVD 降至 44.77。消融实验证实，双转换器分离编码策略显著优于联合自注意力等早期融合方案，且多层级对比损失与 EEG 表征容量的增加均对性能有正向贡献。
 
-
-
 ### 神经解码的模态瓶颈：从静态图像到动态视频的鸿沟
 
 从人脑信号中重建视觉体验是计算神经科学与人工智能交叉领域的核心挑战之一。过去十年，基于功能磁共振成像（fMRI）的视觉解码取得了长足进步，研究者已能根据大脑活动模式重建出被试所看到的静态图像。然而，这些成果主要局限于单视觉模态、单脑信号源（fMRI或脑电图EEG）的静态重建范式，与人类在自然环境中实时整合多感官信息、处理动态视觉刺激的神经本质存在根本性脱节。
@@ -78,8 +76,6 @@ CineBrain正是在上述背景下应运而生。该工作的核心动机在于�
 
 CineBrain填补了这一空白：每名被试贡献约6小时的同步fMRI-EEG数据（对应约27,000帧fMRI扫描），总计提供覆盖视觉皮层（8,405个体素）和听觉皮层（总计18,946个体素）的丰富脑激活模式。基于此数据集，CineSync框架首次系统验证了fMRI-EEG联合建模相较于单模态方法的显著增益——2-way视频检索准确率从单模态最优的0.893（仅fMRI）提升至0.909（联合建模），融合听觉ROIs后进一步达到0.926（Table 3），为多模态脑解码研究确立了新的基准。
 
-
-
 ## 核心方法与创新机理
 
 CineSync 的核心创新在于**首次将同步采集的 fMRI 与 EEG 信号进行多模态联合建模**，以突破现有神经解码研究中仅依赖单一脑模态的信息瓶颈。其创新点可归纳为以下四个关键维度：
@@ -93,8 +89,6 @@ CineSync 的核心创新在于**首次将同步采集的 fMRI 与 EEG 信号进�
 4. **听觉皮层信息增强视觉解码**：CineSync 的扩展变体 CineSync$^\star$ 将 fMRI 感兴趣区（ROIs）从仅视觉皮层（8,405 个体素）扩展至视觉+听觉皮层（共 18,946 个体素）。加入听觉 ROIs 后，2-way 视频检索准确率从 0.909 提升至 0.926，FVD 从 52.78 降至 44.77（Tab. 3），首次直接验证了听觉皮层激活对视觉知觉重建的跨模态增强效应。
 
 综上，CineSync 通过“同步多模态输入—分离编码—末期融合—多层级语义对齐—跨模态信息增强”的技术路径，实现了脑信号视频重建在语义准确性与时间一致性上的显著突破。
-
-
 
 CineSync 的整体设计遵循“编码—对齐—解码”的两阶段范式，其核心思路是将多模态脑信号（fMRI + EEG）转化为统一的脑表征，再以该表征为条件驱动预训练视频扩散模型生成动态视频。框架由两大模块构成：**多模态融合编码器（Multi-Modal Fusion Encoder, MFE）** 和 **神经潜变量解码器（Neural Latent Decoder, NLD）**，如 Figure 5 所示。
 
@@ -125,12 +119,8 @@ $$\mathcal{L} = \mathbb{E}_{V,\epsilon,t}\left[\left\|\epsilon - \epsilon_\theta
 
 **整体数据流可概括为：** 同步 fMRI + EEG → 双转换器独立编码 → 融合 MLP 生成 $\mathbf{z}_b$ →（训练时）多层级对比对齐 → LoRA 微调的扩散解码器 → 动态视频输出。该流程的瓶颈突破点在于同时利用 fMRI 的高空间分辨率与 EEG 的高时间分辨率，并通过跨模态对比学习将脑表征锚定到可解码的语义空间，从而显著提升视频重建的语义准确性与时间一致性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2045_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_CineBrain_A_Large/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of CineBrain. To leverage the complementary strengths of fMRI and EEG, CineBrain provides simultaneous audiovisual stimuli to participants while recording their EEG and fMRI signals. Engaging narrative-driven content from the television series The Big Bang Theory is utilized to facilitate the study of complex brain dynamics and multimodal neural decoding*
-
-
 
 CineSync 框架由两个核心模块构成：**多模态融合编码器（Multi-Modal Fusion Encoder, MFE）** 与 **神经潜变量解码器（Neural Latent Decoder, NLD）**。MFE 负责从同步采集的 fMRI 和 EEG 信号中提取并融合脑表征，NLD 则以此表征为条件，通过扩散模型重建动态视频。
 
@@ -172,16 +162,6 @@ $$\mathcal{L} = \mathbb{E}_{V,\epsilon,t}\left[\left\|\epsilon - \epsilon_\theta
 
 该设计使扩散模型能够从统一的脑表征中解码出具有语义准确性和时间一致性的动态视频帧序列。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2045_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_CineBrain_A_Large/figures/005_Figure_4.jpg]]
-*Figure 4: Architectural exploration for integrating fMRI and EEG. We compare five encoder variants, each adopting a distinct fusion mechanism to integrate the complementary information from fMRI and EEG signals*
-
-![[assets/figures/papers/paper_list_l2045_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_CineBrain_A_Large/figures/004_Figure_3.jpg]]
-*Figure 3: ROIs from the fMRI signals used in our experiments*
-
-
-
 ## 实验与关键发现
 
 ### 实验设置
@@ -212,8 +192,6 @@ Table 2对比了五种fMRI-EEG融合编码器架构的性能。**双转换器分
 
 尽管CineSync取得了显著进展，但以下局限性需要关注：首先，数据集仅包含6名受试者，样本代表性有限，模型在更大规模、更多样化人群上的泛化能力尚未验证。其次，视频刺激内容单一（仅选自《生活大爆炸》情景剧），可能未涵盖野外复杂视听场景的多样性，模型在更广泛刺激类型下的解码性能需要进一步检验。此外，fMRI-EEG同步采集依赖3T扫描仪和定制非磁性脑电帽，实验门槛较高，其他站点复现需额外校准。这些因素限制了当前结论的外部有效性，在推广到临床或实际应用场景前需要更多验证工作。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2045_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_CineBrain_A_Large/figures/009_Table_3.jpg]]
 *Table 3: Performance comparison of CineSync with baselines. The average metrics across all subjects are reported. CineSync⋆ indicates the experiment that includes audio-related ROIs in fMRI. Bold denotes the best performance, while underlined denotes the second-best*
 
@@ -223,13 +201,8 @@ Table 2对比了五种fMRI-EEG融合编码器架构的性能。**双转换器分
 ![[assets/figures/papers/paper_list_l2045_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_CineBrain_A_Large/figures/002_Table_1.jpg]]
 *Table 1: Overview of the CineBrain Dataset. We present detailed statistics of our proposed CineBrain dataset and compare it with other existing video-based brain datasets. CineBrain provides comprehensive multimodal brain recordings during audiovisual stimulation. Each participant watched a total of 6 hours of audiovisual stimuli, corresponding to approximately 27,000 frames of fMRI data*
 
-![[assets/figures/papers/paper_list_l2045_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_CineBrain_A_Large/figures/008_Figure_6.jpg]]
-*Figure 6: Qualitative comparison of our method with baselines. We compare the results of CineSync, CineSync-fMRI, and CineSync-EEG with the ground truth (GT). CineSync demonstrates higher accuracy, greater temporal consistency, and improved video quality*
-
 ![[assets/figures/papers/paper_list_l2045_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_CineBrain_A_Large/figures/003_Figure_2.jpg]]
 *Figure 2: Visualization of fMRI and EEG Responses in Cine-Brain. fMRI and EEG responses of subjects 1–4 to identical stimuli, illustrating individual differences in brain activation*
-
-
 
 ## 定位与知识库关联
 
@@ -280,8 +253,6 @@ CineSync 及 CineBrain 数据集的适用性受以下因素制约：
 4. **融合策略的自适应优化**：当前 CineSync 采用固定的末期融合策略，但五种对比损失的权重分配以及融合时机的选择（早期 vs 晚期）是否存在刺激内容或受试者特异性的最优解？自适应融合机制可能进一步提升性能。
 
 5. **个体差异建模**：Figure 2 显示不同受试者在相同刺激下的 fMRI 和 EEG 响应存在显著个体差异，当前模型在受试者内训练-测试设置下评估，跨受试者泛化和个性化微调的策略值得深入研究。
-
-
 
 ## 原文 PDF
 

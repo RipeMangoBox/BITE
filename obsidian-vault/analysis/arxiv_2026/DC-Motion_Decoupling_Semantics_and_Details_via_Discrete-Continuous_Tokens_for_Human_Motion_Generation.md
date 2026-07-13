@@ -127,8 +127,6 @@ DC-Motion 提出了一种**分解式生成框架**，其核心思想是将人体
 
 消融实验从因果层面验证了这一设计的必要性：若移除连续残差分支，DC-VAE 的重建 MPJPE 从 25.8 急剧上升至 41.7，表明残差是保留细粒度物理细节的关键通路；若移除离散分支，生成 FID 从 0.041 恶化至 0.081，证明离散语义令牌对全局结构和文本对齐具有不可替代的作用。
 
-### 补充图表
-
 DC-Motion 的核心架构由三个关键模块构成：DC-VAE 分词器、MaskGIT 语义生成器和残差扩散模型。其设计原则是将运动生成显式解耦为语义结构规划与物理细节精修两个阶段。
 
 ### DC-VAE 分词器：离散-连续解耦表示
@@ -247,8 +245,6 @@ Table 4对比了MaskGIT与标准自回归（Standard AR）在离散语义令牌�
 2. **运动表征范围**：DC-Motion目前聚焦于关节人体动作，未覆盖精细面部表情、复杂手势或多物种动物运动。这些场景的语义-细节解耦方式可能需要不同的表示设计。
 
 3. **三阶段训练开销**：DC-VAE、MaskGIT、残差扩散的分阶段训练虽保证了模块解耦，但增加了训练流程的复杂性，端到端联合优化的可行性尚待探索。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2606_14721/figures/008_Table_4.jpg]]
 *Table 4: Ablation on discrete token generation paradigms. MaskGIT effectively mitigates the exposure bias inherent in standard AR models, significantly improving global semantic alignment, particularly for long sequences and complex instructions*

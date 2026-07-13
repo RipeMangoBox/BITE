@@ -57,8 +57,6 @@ claims:
 
 当前方法仍存在局限：仅支持双帧输入，扩展到长序列面临线性内存增长问题；假设线性运动，难以处理非线性动态；在Bonn等纹理缺乏区域因高斯重叠导致精度略低于逐像素表示（Table 1, Figure F）。这些方向值得后续探索。
 
-
-
 从二维图像恢复三维世界是计算机视觉的核心目标。近年来，基于前馈网络（feedforward）的静态场景重建取得了显著进展，仅需少量无姿态图像即可直接输出三维几何。然而，现实世界是动态的——物体在运动、相机在移动，将这些方法扩展到**动态4D场景**（3D几何 + 3D运动）仍面临根本性挑战。
 
 ### 现有方法的缺口
@@ -81,8 +79,6 @@ claims:
 
 基于这一洞察，**UFO-4D** 提出了一种统一的**无姿态前馈4D重建方法**：输入两张无姿态图像，直接输出动态3D高斯集合和相对相机位姿。该显式4D表示可同时支撑三维几何（点云、深度）、三维运动（场景流、光流）以及任意时刻/视角的图像渲染（Figure 1），并通过对渲染信号的自监督训练，在标注稀缺的条件下实现高精度重建。
 
-
-
 ## 核心方法与创新机理
 
 UFO-4D的核心创新在于将动态3D高斯泼溅（Dynamic 3DGS）确立为统一的显式4D场景表示，并围绕该表示构建了一个端到端的前馈重建框架。相较于现有方法，这一选择在三个关键维度上形成了根本性的变革：
@@ -104,8 +100,6 @@ UFO-4D的核心创新在于将动态3D高斯泼溅（Dynamic 3DGS）确立为统
 现有方法（如 **MonST3R**、**St4RTrack** (Feng et al., 2025)）普遍采用PnP+RANSAC后处理步骤从估计的点云中求解相机位姿，这一过程不仅引入额外的计算开销，还对点云噪声高度敏感。UFO-4D在网络中直接集成了前馈位姿预测头，通过可学习的位姿token与图像特征进行交叉注意力交互，直接输出相对相机位姿 $\mathbf{P}$。
 
 实验表明（Table G），前馈位姿估计比PnP+RANSAC方案准确约16.6%，且几何质量也优于其他方法。注意力可视化（Figure G）进一步揭示了其工作机制：位姿token在特定解码器层（第8、11、12层）倾向于关注静态区域的图像token，自动学习忽略运动物体以获取可靠的位姿估计线索。
-
-
 
 UFO-4D 是一个从**两帧无姿态图像**中直接进行前馈式4D重建的统一框架。其核心设计在于：将整个重建过程建模为一个从图像对到**动态3D高斯泼溅（Dynamic 3DGS）**和**相对相机位姿**的端到端映射，而非分步处理几何、运动与位姿。
 
@@ -168,13 +162,6 @@ $$
 ### 不透明度作为可学习置信度
 
 框架中一个值得注意的机制是不透明度的双重作用：除了参与α混合渲染外，不透明度还充当了**可学习的置信度**。在（去）遮挡场景中（图5），模型学会对去遮挡区域分配高不透明度（高置信度），而对两帧共视区域只选择来自某一帧的对应高斯，从而构建出高效紧凑的4D表示。这一机制使得模型能够自动处理遮挡歧义，无需显式的遮挡推理模块。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l32_https_openreview_net_forum_id_8gDDWqO59H/figures/001_Figure_1.jpg]]
-*Figure 1: Given a pair of unposed images, the proposed UFO-4D outputs dynamic 3D Gaussians in the canonical space and relative camera pose in a feedforward manner. This explicit 4D represen-Input image pairtation can solve various downstream tasks such as 3D geometry (point, depth) and motion (scene flow, optical flow). Besides, it can interpolate image, geometry, and motion at novel view and time*
-
-
 
 UFO-4D 的核心设计是将双图输入映射为一个统一的显式4D表示——动态3D高斯泼溅（Dynamic 3DGS），并通过可微渲染同时输出多模态信号，实现端到端的联合优化。整个pipeline由四个关键模块串联构成。
 
@@ -240,19 +227,6 @@ $$L_{\mathrm{self}} = L_{\mathrm{photo}} + w_{\mathrm{smooth}} L_{\mathrm{smooth
 
 其中 $L_{\mathrm{photo}}$ 为渲染图像与原始输入之间的光度一致性损失，$L_{\mathrm{smooth}}$ 为边缘感知的平滑正则项。这种半监督框架有效缓解了4D标注数据稀疏的问题——消融实验（Table 4）表明，移除光度损失梯度会导致点云和运动精度显著下降，而移除渲染点云/运动损失则会使所有任务严重退化。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l32_https_openreview_net_forum_id_8gDDWqO59H/figures/003_Figure.jpg]]
-*Figure: (a) Translation*
-
-![[assets/figures/papers/paper_list_l32_https_openreview_net_forum_id_8gDDWqO59H/figures/004_Figure.jpg]]
-*Figure: (b) Rasterization t′ = tFigure 3: (a) Each Gaussian is translated with its motion to represent 3D scene at time $t + \Delta$ t . . (b) Point and motion as well as an image are rasterized together*
-
-![[assets/figures/papers/paper_list_l32_https_openreview_net_forum_id_8gDDWqO59H/figures/009_Figure_5.jpg]]
-*Figure 5: Opacity as learnable confidence: Opacity maps show the model’s behavior in a (dis)occlusion scenario. Our model learns to assign high confidence (opacity) to disoccluded regions, and for mutually-visible regions, it selects only one corresponding Gaussian from the two views, enabling an efficient and compact 4D representation*
-
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -296,27 +270,17 @@ UFO-4D 在几何估计、运动估计和相机位姿估计三个维度上均取�
 
 UFO-4D 采用混合数据集训练：Stereo4D（采样概率 60%）、PointOdyssey（20%）和 Virtual KITTI 2（20%）。网络使用 **NoPoSplat**（Ye et al., 2025）的权重初始化高斯预测头，使用 **MASt3R**（Leroy et al., 2024）的权重初始化其余部分，位姿头从头训练。训练在 4×A100 40GB GPU 上约需 3 天。数据集消融（Table C）显示，仅使用 Stereo4D 训练可在 Stereo4D 测试集上获得最佳精度，添加 Virtual KITTI 2 可改善 KITTI 上的运动精度但损害 Bonn 的点云精度，添加 PointOdyssey 则相反——这揭示了不同合成/真实数据集之间存在精度权衡。初始化方案消融（Table D）表明，从 MASt3R 初始化整体精度更优，而从 MonST3R 初始化则在 KITTI 和 Bonn 的点云精度上略有提升。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l32_https_openreview_net_forum_id_8gDDWqO59H/figures/005_Table_1.jpg]]
 *Table 1: Geometry estimation: We report end-point error (EPE) for pointmap accuracy and absolute relative error (Abs. Rel.) and δ\<1.25 for depth accuracy. Lower is better for EPE and Abs. Rel., and higher is better for δ\<1.25*
 
-![[assets/figures/papers/paper_list_l32_https_openreview_net_forum_id_8gDDWqO59H/figures/006_Table_2.jpg]]
-*Table 2: Motion estimation. We evaluate the scene flow accuracy on the Stereo4D test split (Jin et al., 2025) and KITTI Scene Flow 2015 Training (Menze et al., 2018). Our approach substantially outperforms others, achieving the best numbers on all metrics*
-
 ![[assets/figures/papers/paper_list_l32_https_openreview_net_forum_id_8gDDWqO59H/figures/007_Figure_4.jpg]]
 *Figure 4: Qualitative comparison of depth and projected 2D optical flow on Stereo4D, Bonn, and KITTI. For motion on KITTI, it visualizes motion relative to the camera, as GT is defined. Unlike DynaDUSt3R, ZeroMSF and St4RTrack, which suffers from residual motions in static region and inaccurate motion on object boundaries, UFO-4D exhibits clear motion boundaries and separation between moving objects and background. More qualitative results are in Section A.1*
-
-![[assets/figures/papers/paper_list_l32_https_openreview_net_forum_id_8gDDWqO59H/figures/008_Table_3.jpg]]
-*Table 3: Pose estimation. We report standard metrics, ATE and RPE translation*
 
 ![[assets/figures/papers/paper_list_l32_https_openreview_net_forum_id_8gDDWqO59H/figures/010_Table_4.jpg]]
 *Table 4: Loss ablation. We report image reconstruction in PSNR and accuracy of Gaussian center (Point), rasterized point (Point rast.), Gaussian velocity (Motion), and rasterized motion (Motion rast.) in end-point error (EPE). Integrating the photometric loss gradient (Eq. (7c)) with all heads boosts overall performance. Losses on rendered motion (Eq. (6b)) and point map (Eq. (6c)) are crucial for achieving high accuracy*
 
 ![[assets/figures/papers/paper_list_l32_https_openreview_net_forum_id_8gDDWqO59H/figures/011_Figure_6.jpg]]
 *Figure 6: Qualitative comparison on loss ablation. Gradient backpropagation from the image synthesis loss and rendering losses on point and motion helps UFO-4D improve motion and point estimates, especially on object and motion boundaries*
-
-
 
 ## 定位与知识库关联
 
@@ -371,8 +335,6 @@ UFO-4D 处于**无姿态前馈4D重建**这一新兴技术路线的交叉点：�
 4. **纹理缺乏区域的改进**：如何更好地处理纹理缺乏区域以减少高斯重叠带来的误差？可能的方案包括自适应高斯尺度约束或引入结构先验（如平面假设）。
 
 5. **训练数据效率**：Table C 的数据集消融显示不同数据集之间存在 trade-off（Stereo4D 单独训练在该数据集上最优，但加入 Virtual KITTI 2 或 PointOdyssey 会改善对应测试集的性能而损害其他），如何设计更优的数据混合策略或域适应方法？
-
-
 
 ## 原文 PDF
 

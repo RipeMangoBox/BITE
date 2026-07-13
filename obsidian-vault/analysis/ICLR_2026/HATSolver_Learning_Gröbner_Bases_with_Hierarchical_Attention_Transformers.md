@@ -54,8 +54,6 @@ HATSolver（Hierarchical Attention Transformer for Gröbner bases）针对上述
 
 需要指出的是，当前方法仅在形状位置理想和有限域上验证，训练数据由特定的后向生成算法构造，其分布可能与真实多项式系统存在偏差，分布外泛化性能有待进一步检验。
 
-
-
 ### 多项式系统求解与Gröbner基
 
 多元多项式系统的求解是计算代数几何的核心问题，在密码学、机器人运动规划、化学反应网络分析等领域有广泛应用。给定理想 $I \subseteq k[x_1, \ldots, x_n]$，其**Gröbner基**是一组具有良好消元性质的多项式生成元，使得理想成员判定、方程求解等问题变得可计算。然而，Gröbner基的计算复杂度极高——在最坏情况下，其计算复杂度是**双指数级**的，这严重限制了经典符号算法（如F4/F5、FGLM）在大规模系统上的可扩展性。
@@ -73,8 +71,6 @@ HATSolver（Hierarchical Attention Transformer for Gröbner bases）针对上述
 上述扩展性瓶颈的根源在于：标准Transformer将多项式系统视为扁平的token序列，忽略了其天然的**树形层次结构**。一个多项式系统天然呈现“系统→方程→项→符号”的层级组织——同一项内的符号之间、同一方程内的项之间、同一系统内的方程之间，其交互强度和信息密度存在本质差异。全局注意力不加区分地计算所有token对之间的交互，既浪费了大量计算资源，又引入了噪声。
 
 本文的核心动机正是利用这一层次结构先验，设计一种**计算高效的层次化注意力机制**，在保留必要长程依赖的前提下，将注意力限定在局部和父子节点之间，从而突破标准Transformer的扩展性瓶颈。同时，辅以**课程学习策略**逐步提升训练难度，使模型能够稳定地学习更大规模系统的Gröbner基计算模式。
-
-
 
 ## 核心方法与创新机理
 
@@ -120,8 +116,6 @@ HATSolver提供两种层次深度配置（Section 4.1）：
 
 **证据强度说明**：以上创新点的核心证据（Figure 2, Table 1, Table 2, Figure 5）置信度均在0.9以上，因果关系明确。课程学习消融实验提供了直接的因果证据。复杂度分析的理论推导与实验观察一致，但更深层次（n>3）的扩展行为尚未验证，需进一步探索。
 
-
-
 HATSolver 的整体流水线由五个核心模块串联构成，围绕“后向数据生成→层次化编码→自回归解码→课程调度”这一闭环展开，目标是在给定多元多项式系统后直接预测其约化Gröbner基。
 
 **数据生成模块**采用后向生成策略（Kera et al., NeurIPS 2024），从随机采样的Gröbner基出发，通过可逆变换构造对应的非Gröbner基多项式系统，形成有监督训练对 $(F, G)$。这一反向构造保证了每个训练样本都有精确的Ground Truth标签，但同时也引入了分布偏差——生成系统的统计特性可能与真实多项式系统不同，构成泛化能力的潜在瓶颈。
@@ -137,8 +131,6 @@ HATSolver 的整体流水线由五个核心模块串联构成，围绕“后向�
 整体输入输出流为：多项式系统 $F$ → 树状token序列 → 层次化编码器（含多维位置编码 $\mathrm{PE}(i_{n-1}, \ldots, i_0) = \sum_{j=0}^{n-1} E_{i_j}^{(j)}$）→ 层次化解码器 → Gröbner基token序列。训练时，课程调度器动态选择训练样本的难度分布；推理时，模型直接端到端生成预测结果。
 
 **关键局限**：整个框架目前仅适用于形状位置（shape position）理想和有限域（$\mathbb{F}_7, \mathbb{F}_{16}, \mathbb{F}_{17}$），向一般理想或特征零域的推广尚未验证。此外，后向数据生成引入的分布偏差可能导致模型在真实多项式系统上的分布外性能下降，这一点需要在实际部署时手动评估。
-
-
 
 HATSolver的核心创新在于将标准Transformer的全局扁平自注意力替换为**树状分层注意力机制**（Hierarchical Attention），并辅以课程学习策略。以下按模块拆解其设计逻辑。
 
@@ -204,8 +196,6 @@ $$p(t,i) = \frac{\exp\left(-\frac{(i-\mu(t))^2}{2\sigma^2}\right)}{\sum_{j=0}^{n
 
 HATSolver的完整处理流水线包括：①后向数据生成（构造Gröbner基与非Gröbner基系统的监督训练对）；②树状tokenization（将多项式系统编码为层次化token序列）；③分层编码器（执行上述自下而上+自上而下注意力）；④分层解码器（基于编码器输出自回归生成Gröbner基）；⑤课程调度器（控制训练难度渐进）。其中编码器是核心创新所在，解码器沿用标准Transformer的自回归架构。
 
-
-
 ## 实验与关键发现
 
 ### 核心结果：13变量系统的突破
@@ -259,15 +249,9 @@ Table 3和Table 5报告了HATSolver在$\mathbb{F}_7$、$\mathbb{F}_{16}$、$\mat
 ![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_5C3LljOEGC/figures/005_Table_3.jpg]]
 *Table 3: Exact Match Accuracy (%) of our model on Grobner basis prediction of multivariate poly- ¨ nomial systems with $\mathbf { n }$ = 5 variables across different densities over multiple finite fields. Training is done on 1 A100 GPU per field for 24 hours using the backward data generation method from Kera et al. (2025). Model parameters are 2 encoder layers, 6 decoder layers, 1024 embedding dimensions*
 
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_5C3LljOEGC/figures/011_Table_5.jpg]]
-*Table 5: Exact Match Accuracy (%) of our model on Grobner basis prediction of multivariate ¨ polynomial systems with $\mathbf { n }$ = 7 variables across different densities over the prime and non-prime finite fields $\dot { \mathbb { F } _ { 1 7 } }$ and $\mathbb { F } _ { 2 ^ { 4 } }$ . Training is done on 1 A100 GPU per field for 24 hours. Model parameters are 2 encoder layers, 6 decoder layers, 1024 embedding dimensions
-
 ### 基线Transformer的扩展极限
 
 Table 4报告了基线Transformer配合课程学习在2至7变量系统上的表现。在7变量、$\rho=100\%$时，完全匹配准确率仅为**0.0%**（支持准确率2.0%）。Figure 5进一步显示，在10变量、$\rho=0.1$上，基线Transformer准确率始终为0%，而HATSolver-3达到**8%**，且训练步数多3倍以上。这构成了分层注意力优于扁平注意力的最直接证据：当序列长度随变量和密度急剧增长时，标准Transformer的二次复杂度使其完全无法学习，而HATSolver的分层设计将复杂度从$O(L^2 d)$降至$O(L^{1+1/n} d)$，从而在极端规模下仍能捕获有效信号。
-
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_5C3LljOEGC/figures/006_Table_4.jpg]]
-*Table 4: (Exact Match) Accuracy (%) / Support Accuracy (%) of the base transformer model in predicting Grobner bases for multivariate polynomial systems over ¨ $\mathbb { F } _ { 7 }$ . Each cell reports accuracy over 1,000 test samples, after training with 1 million samples per training setting (values shown in red: ( n , * $\rho ) \in \{$ ( 2 , , 1), (3, 0.5, 1), (4, 0.5, 1), (5, 0.33, 0.67, 1), (6, 0.33, 0.67, 1), (7, 0.25, 0.5, 0.75, 1)}. Non-colored cells correspond to interpolated evaluations. n is the number of variables, ρ is the density of the randomly generated system (backward generation method). The curriculum learning approach enables scaling to larger and denser systems compared to prior w...
 
 ### 失败模式与公平性警示
 
@@ -279,27 +263,12 @@ Table 4报告了基线Transformer配合课程学习在2至7变量系统上的表
 4. **资源消耗**：模型训练需多GPU长时间计算（如Table 1实验使用特定超参数配置，见Table 12），且超参数搜索空间有限，可能未充分调优。
 5. **准确率天花板**：在$\rho=100\%$时完全匹配准确率仅60.8%，对序列偏差敏感，仍有较大提升空间。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_5C3LljOEGC/figures/008_Figure_4.jpg]]
 *Figure 4: Training dynamics comparison; training models for 7 2 hours on multivariate datasets of n = 7 variables and density $\rho$ = 0 . 2 5*
 
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_5C3LljOEGC/figures/012_Table_6.jpg]]
-*Table 6: Data Generation Configuration and explanations*
-
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_5C3LljOEGC/figures/013_Table_7.jpg]]
-*Table 7: Statistics about the 13-variable datasets over $\mathbb { F } _ { 7 }$ . Max # Monoms in Sys. is the maximum number of monomials per equation in each system, for which we report max/mean/std over the whole dataset. This is the metric we cap to 400 for training. This means that for $\rho$ = 0 . 4 for example, we trained on most of the dataset as mean+std = 2 7 7 + 7 5 < 4 0 0 while for $\rho$ = 1 , we considered less than 10% of the dataset as mean - std > 400. We also report the total number of monomials in each system Total # Monoms in Sys. which would be relevant for HATSolver-2 which considers this entity instead
 
 ![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_5C3LljOEGC/figures/014_Table_8.jpg]]
 *Table 8: Statistical Comparison of Forward and Backward Generation Datasets for n = 3 over $\mathbb { F } _ { 7 }$*
-
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_5C3LljOEGC/figures/015_Table_9.jpg]]
-*Table 9: Intrinsic Dimensionality Analysis*
-
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_5C3LljOEGC/figures/016_Table_10.jpg]]
-*Table 10: BART Model Performance on Grobner Basis Prediction over ¨ $\mathbb { F } _ { 7 }$*
-
-
 
 ## 定位与知识库关联
 
@@ -342,8 +311,6 @@ HATSolver 的适用边界由以下约束定义：
 4. **混合系统的潜力**：是否可以将 HATSolver 与经典代数软件混合使用，例如用 HATSolver 快速生成候选 Gröbner 基，再用 STD-FGLM 进行验证和后处理？这种混合策略可能结合学习方法的效率和符号计算的正确性保证。
 
 5. **数据生成策略的鲁棒性**：不同的采样分布（如改变后向生成中矩阵 $U_2$ 的稀疏模式）会对模型的泛化能力和鲁棒性产生多大影响？这直接关系到模型在真实代数几何问题上的实用性。
-
-
 
 ## 原文 PDF
 

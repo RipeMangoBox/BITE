@@ -59,8 +59,6 @@ claims:
 
 值得注意的是，DiT‑IC 在极低码率（<0.01 bpp）下可能面临潜在条件语义信息不足的问题，且训练数据规模有限（约 150K 图像），在长尾内容覆盖上仍需进一步验证。对抗训练在提升感知真实感的同时也引入了失真–感知权衡，以轻微牺牲 PSNR 为代价。这些局限性为后续研究指明了方向。
 
-
-
 图像压缩是数字媒体传输与存储的基础技术。传统基于均方误差（MSE）优化的编码器（如 **ELIC**，He et al., CVPR 2022）在高压缩率下虽能保持信号保真度，却不可避免地丢失高频纹理细节，导致重建图像出现模糊和过度平滑。扩散模型的出现为感知导向的图像压缩开辟了新路径：通过在解码端引入生成式先验，扩散编码器能够合成逼真的纹理，显著提升视觉质量。
 
 然而，现有扩散图像压缩方法面临一个核心瓶颈：**它们几乎全部基于 U‑Net 架构，迫使扩散过程在较浅的潜在空间（通常仅 8× 下采样）中运行**。U‑Net 的层级下采样设计使得潜在特征图的空间分辨率仍然较高，导致去噪网络的计算量和内存消耗巨大。这带来了两个直接后果：
@@ -77,8 +75,6 @@ claims:
 - **预训练先验的保持与适配**：全量微调成本高昂且易破坏预训练知识，需要更轻量的适配策略。
 
 本文提出 **DiT‑IC**，核心动机是：**将扩散操作下移至 32× 下采样的深层潜在空间，采用 DiT 替代 U‑Net，并通过三个对齐机制将多步扩散蒸馏为单步重建**。这一设计从根本上解耦了扩散架构与潜在空间深度之间的绑定，使得模型既能享受深层压缩的效率优势，又能保留扩散模型的生成能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -125,8 +121,6 @@ DiT-IC 的核心技术贡献在于设计了三个互补的对齐机制，将预�
 
 训练采用**两阶段隐式码率剪枝（IBP）**策略：第一阶段以较小的码率惩罚系数 $\lambda_{\mathrm{base}}$ 宽松约束率失真（Eq. 7），保护特征丰富度；第二阶段加大码率惩罚并引入对抗损失 $\mathcal{L}_{\mathrm{adv}}$（Eq. 8），增强感知质量。失真损失联合 MSE、LPIPS 和 DISTS 三项指标（Eq. 10），对齐损失由自蒸馏对齐和条件对比对齐加权组成（Eq. 11）。
 
-
-
 DiT‑IC 的整体流程围绕“深层潜在空间中的单步扩散重建”这一核心思想展开，其 pipeline 可划分为编码压缩、熵建模、条件化单步去噪、解码重建四个阶段，如 Figure 3 所示。
 
 ![[assets/figures/papers/paper_list_l859_https_arxiv_org_abs_2603_13162/figures/003_Figure_3.jpg]]
@@ -162,8 +156,6 @@ Figure 2 对比了 DiT‑IC 与传统 U‑Net 扩散编码器的根本区别：U
 
 ![[assets/figures/papers/paper_list_l859_https_arxiv_org_abs_2603_13162/figures/002_Figure_2.jpg]]
 *Figure 2: Architectural comparison. The left panel illustrates the overall diffusion-based image compression framework. U-Netbased diffusers perform multi-stage downsampling, while DiTs maintain a constant spatial resolution throughout the denoising process, making them naturally compatible with deeply compressed latent inputs*
-
-
 
 ### 3.1 概率流ODE与方差引导重建流
 
@@ -255,19 +247,6 @@ $$
 
 消融实验（Table 2）显示：去除 $\mathcal{L}_{\mathrm{adv}}$ 导致PSNR BD-rate下降37.10%；DISTS项的引入在低码率下显著提升了与人类感知的相关性。LoRA适配采用VAE秩32、DiT秩64的配置，在适应能力与训练稳定性间达到最优平衡。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l859_https_arxiv_org_abs_2603_13162/figures/005_Figure_4.jpg]]
-*Figure 4: Variance-Guided Flow Matching. Unlike standard diffusion that starts from Gaussian noise, compression reconstruction begins from a quantized latent*
-
-![[assets/figures/papers/paper_list_l859_https_arxiv_org_abs_2603_13162/figures/006_Figure_6.jpg]]
-*Figure 6: Self-Distillation Alignment. DiT-IC distills the multistep diffusion process into a single forward pass by aligning its denoised latent with the frozen encoder representation, while jointly optimizing the diffusion transformer and decoder*
-
-![[assets/figures/papers/paper_list_l859_https_arxiv_org_abs_2603_13162/figures/007_Figure_8.jpg]]
-*Figure 8: Latent-Conditioned Guidance. We replace text-based guidance in DiT with a latent-conditioned projection derived from the compressed representation by aligning projected latent and text embeddings, enabling text-free conditioning at inference*
-
-
-
 ## 实验与关键发现
 
 ### 主结果：BD‑rate与延迟的全面领先
@@ -320,19 +299,6 @@ DiT‑IC在三个标准基准（Kodak、CLIC2020、DIV2K）上以PerCo为零点�
 *Figure 10: Visualization comparison. MSE-optimized ELIC [16] suffers from high-frequency detail loss, whereas diffusion-based codecs such as StableCodec [64] and OSCAR [15] produce inconsistent semantic content, e.g., incorrect numbers or window panes. In contrast, DiT-IC achieves a more favorable balance between perceptual quality and semantic consistency*
 
 > **公平性备注**：BD‑rate以PerCo（多步扩散、性能较低）为零点参考，可能放大相对改善幅度；延迟测量均在单张A100上执行，不同实现的并行优化程度可能影响对比公平性；用户研究的参与者数量和筛选标准未明确，偏好分数的统计显著性有待独立验证。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l859_https_arxiv_org_abs_2603_13162/figures/004_Figure_5.jpg]]
-*Figure 5: Ablation study of variance-guided reconstruction flow*
-
-![[assets/figures/papers/paper_list_l859_https_arxiv_org_abs_2603_13162/figures/008_Figure_7.jpg]]
-*Figure 7: Ablation of self-distillation alignment*
-
-![[assets/figures/papers/paper_list_l859_https_arxiv_org_abs_2603_13162/figures/009_Figure_9.jpg]]
-*Figure 9: Ablation of latent-conditioned guidance*
-
-
 
 ## 定位与知识库关联
 
@@ -406,8 +372,6 @@ DiT-IC在两阶段训练中覆盖了较宽码率范围，但其设计假设潜�
 5. **失真-感知权衡的量化与控制**：对抗训练引入的失真-感知权衡目前通过损失权重间接控制。如何量化这一权衡，并设计可控的机制（如感知约束下的保真度最大化），使重建同时满足不同应用场景的需求？
 
 6. **用户偏好分数的统计显著性**：论文报告的用户研究中DiT-IC获得56.8%的最高偏好分数，但未明确说明参与者数量及筛选标准。该结果的统计显著性和生态效度需要独立验证。
-
-
 
 ## 原文 PDF
 

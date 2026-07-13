@@ -50,15 +50,11 @@ claims:
 
 实验表明，该方法在技能多样性得分上分别超出 **ASE** (Peng et al., SIGGRAPH 2022)、**CASE** (Dou et al., SIGGRAPH Asia 2023) 和 **ET** (Won et al., SIGGRAPH 2021) 30.7%、32.3% 和 9.4%，显著缓解了模式坍塌；在乒乓球对打任务中平均击球次数达 10.93 次（ET 为 6.28 次），落点分布更接近人类；策略控制器在对抗场景中取得 68.7% 胜率，经两次迭代优化后提升至 78%。
 
-
-
 基于物理的角色动画旨在生成逼真且可控的运动，在游戏、影视和虚拟现实等领域具有重要应用。乒乓球作为一项高速、高技巧性的对抗运动，对动画系统提出了极高的要求：智能体不仅需要掌握多种击球技能（如正手攻球、反手推挡、正手扣杀等），还必须具备根据对手状态和来球轨迹进行实时战术决策的能力。构建一个既能执行多样化技能又能进行策略博弈的乒乓球动画系统，是该领域长期以来的核心挑战。
 
 近年来，基于可重用技能嵌入（reusable skill embedding）的方法在运动生成中展现出潜力，其核心思路是学习一个连续隐空间，使智能体能够通过采样不同隐变量来调用不同技能。然而，当技能之间的运动差异较为细微时（例如正手 drive 与 push），现有方法普遍面临**模式坍塌（mode collapse）**的严重问题。具体而言，在任务训练阶段，智能体倾向于仅探索少数几个隐变量对应的技能，导致已学习的多样技能无法被充分利用。例如，**ASE**（Peng et al., SIGGRAPH 2022）和 **CASE**（Dou et al., SIGGRAPH Asia 2023）在接收到特定技能指令时，仍可能错误地执行其他技能；而 **ET**（Won et al., SIGGRAPH 2021）通过离散技能切换虽能缓解该问题，但在技能过渡时往往需要提前终止当前动作以返回准备姿态，造成运动不连贯。这些局限性使得现有方法难以在复杂对抗场景中同时保证技能的准确执行与平滑过渡。
 
 上述瓶颈的根源在于：单一通用策略无法显式区分不同技能的运动特征，而技能切换机制又缺乏对过渡过程的精细控制。因此，本文的核心动机是设计一种新的分层控制架构，将技能执行的多样性与技能切换的平滑性进行解耦，从而从根本上缓解模式坍塌。在此基础上，进一步引入策略级控制器，使智能体能够根据实时博弈状态自主选择技能和目标落点，最终实现从底层运动生成到高层战术决策的完整闭环。
-
-
 
 ## 核心方法与创新机理
 
@@ -95,8 +91,6 @@ $$a = \varphi \odot \pi^u(\cdot | s, z^u) + (1 - \varphi) \odot \sum_{i=1}^{5} \
 
 PhysicsPingPong 的创新本质上是**将技能多样性和战术决策这两个耦合难题进行了架构层面的解耦**：技能层通过混合专家和平滑混合机制保证了运动的多样性与连贯性；策略层通过 CVAE 和迭代学习实现了对复杂博弈场景的适应性决策。这种“下层稳定执行，上层灵活决策”的分层设计，为物理仿真角色动画中的技能学习与策略规划提供了一套完整的解决方案。
 
-
-
 PhysicsPingPong 采用“策略-技能”双层分层控制架构，将乒乓球对打任务分解为高层决策与底层运动执行两个解耦的子问题。该设计直接回应了核心瓶颈：现有基于可重用技能嵌入的方法在技能差异细微时，容易在任务训练阶段出现模式坍塌，导致智能体仅在少数技能上进行探索。通过显式分离“何时使用何种技能”与“如何执行技能”，本方法实现了技能多样性与战术决策的独立优化。
 
 ### 系统架构与数据流
@@ -126,8 +120,6 @@ PhysicsPingPong 采用“策略-技能”双层分层控制架构，将乒乓球
 ### 策略级控制器的迭代学习
 
 技能级控制器训练完成并冻结权重后，开始训练策略级控制器。该控制器采用迭代行为克隆方法：首先收集专家数据训练初始策略，随后让策略与环境交互生成新数据，再通过行为克隆进行策略细化。这一迭代过程使策略能够在对抗和协作场景中持续优化决策质量。
-
-
 
 ### 技能级控制器：三层递进训练
 
@@ -176,8 +168,6 @@ $$\sum_{k=1}^{K} ||c_{k}^{\mathrm{expert}} - c_{k}'|| + \beta_{KL} D_{KL}(Q(u|\m
 
 第一项为技能指令与目标落点的重构误差，第二项为隐变量后验分布与标准正态先验的 KL 散度。训练采用迭代行为克隆：初始用人类对打数据训练 CVAE，随后让智能体与自身对打收集新数据，将胜者的决策作为专家轨迹进行下一轮克隆，逐步优化策略。
 
-
-
 ## 实验与关键发现
 
 ### 技能学习评估
@@ -203,12 +193,6 @@ $$\sum_{k=1}^{K} ||c_{k}^{\mathrm{expert}} - c_{k}'|| + \beta_{KL} D_{KL}(Q(u|\m
 
 策略控制器的有效性还体现在技能指令分布和落点分布上。**Figure 6** 显示，本方法的技能指令分布覆盖了全部五种技能，而 RL 基线倾向于仅使用少数技能，再次印证了模式坍塌的缓解。**Figure 7** 的落点分布对比表明，本方法生成的落点分布更接近人类选手的模式，具有更好的空间多样性和战术合理性。
 
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2407_16210/figures/008_Figure_6.jpg]]
-*Figure 6: Skill command distribution of our method and RL*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2407_16210/figures/009_Figure_7.jpg]]
-*Figure 7: Target landing locations of our method, RL and Human*
-
 ### 迭代行为克隆与消融分析
 
 策略控制器的核心学习机制是迭代行为克隆。**Table 5** 的人机交互评估提供了关键的消融证据：策略控制器在初始训练后对人机对打的胜率为 55%，经过第一次迭代细化后提升至 64%，第二次迭代后进一步提升至 78%。每次迭代中，CVAE 使用上一轮策略生成的专家数据进行行为克隆，逐步将策略分布向更优的决策区域收缩。这一结果表明，迭代行为克隆能够有效利用自博弈产生的数据进行策略自改进，而无需额外的强化学习奖励设计。
@@ -222,24 +206,8 @@ $$\sum_{k=1}^{K} ||c_{k}^{\mathrm{expert}} - c_{k}'|| + \beta_{KL} D_{KL}(Q(u|\m
 
 尽管本方法在技能多样性和策略决策上取得了显著进展，仍存在以下局限。首先，当前框架针对五种乒乓球技能设计，技能特定策略的数量与技能种类线性相关；扩展到数百种技能时，混合专家架构的计算开销和训练复杂度将显著增加。其次，物理仿真中未考虑马格努斯效应（Magnus effect），球的旋转轨迹不够真实，可能影响策略控制器对落点选择的决策质量。在实验中，我们观察到当对手发出高而慢的球时，正手扣杀（forehand smash）的执行不够明显（如 **Figure 9** 所述），部分原因在于球轨迹的物理简化限制了扣杀时机的自然出现。
 
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2407_16210/figures/014_Figure_9.jpg]]
-*Figure 9: Agent-agent gameplay. Blue agent is applying our strategy-level controller. The red dot is the target. We demonstrate four skills; the forehand smash is less obvious because the opponent does not deliver high and slow shots*
-
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2407_16210/figures/006_Table_1.jpg]]
 *Table 1: Comparisons on Discriminator Score, Skill Accuracy, and Diversity Score*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2407_16210/figures/007_Table_2.jpg]]
-*Table 2: Task performance evaluation. Our method can achieve the longest average hits and the second best accuracy*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2407_16210/figures/005_Figure_4.jpg]]
-*Figure 4: Comparison with other methods with four skill commands. ASE and CASE may use wrong skills as shown in the red box. ET may terminate earlier to return to a preparation pose, as shown in the yellow boxes*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2407_16210/figures/010_Table_3.jpg]]
-*Table 3: Strategy evaluation. We report the winning rates for the competition setting and average rounds for the cooperation setting*
-
-
 
 ## 定位与知识库关联
 
@@ -294,8 +262,6 @@ PhysicsPingPong 的设计存在明确的适用边界：
 1. **大规模技能扩展**：如何将混合专家架构扩展到包含数百种不同技能的数据集，同时保持技能间可区分性和计算效率？
 2. **物理真实性增强**：如何引入马格努斯效应等高级物理现象，以获得更真实的球轨迹和相应的战术策略？
 3. **策略泛化**：如何在无需大量额外训练的前提下，使策略控制器泛化到未见过的对手风格和比赛场景？
-
-
 
 ## 原文 PDF
 

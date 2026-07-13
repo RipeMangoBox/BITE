@@ -178,8 +178,6 @@ $$
 
 三个模块形成清晰的因果链：**Plücker 坐标**提供细粒度的相机控制信号（调节变量：相机参数化粒度），**ECA 模块**将这种控制约束在几何合理的像素对应中（调节变量：跨帧注意力范围），而**动态数据管线**则确保模型在获得精确几何约束的同时不退化目标运动生成能力。消融实验（Table 2）证实，移除任一模块均会导致相机控制精度或视觉质量的显著下降。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2406_02509/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our proposed CamCo framework. (a) shows the architecture, where we introduce Plücker coordinates as an effective camera parameterization and an epipolar constraint attention block to enforce geometry consistency. (b) illustrates our epipolar constraint attention block. For each queried pixel via grid sampling from the i-th frame $z _ { t } ^ { i }$ , we gather information from the corresponding epipolar line in the source frame $z _ { t } ^ { 1 }$ using a cross-attention layer. The features $E _ { t } ^ { i }$ along the latent space epipolar line encode the local regions around it in the image space*
 
@@ -222,8 +220,6 @@ $$\mathbf{L} = \mathbf{o} + c \left( \mathbf{p} - \mathbf{o} \right) \tag{6}$$
 其中 $\mathbf{o}$ 为相机原点，$\mathbf{p}$ 为三维点投影到图像平面的坐标，$c$ 为实参数。ECA 的计算复杂度为 $O(hwl)$，其中 $l$ 为极线采样点数，远低于密集注意力的 $O((hw)^2)$。
 
 **几何意义**：根据对极几何，目标帧中某像素对应的三维点必然位于源帧的极线上。ECA 将注意力搜索空间限制在这一几何合理的区域内，从机制层面强制跨帧特征聚合遵循投影几何约束，消除像素拷贝伪影，确保生成视频的三维一致性。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2406_02509/figures/003_Figure_3.jpg]]
 *Figure 3: Static scene video generation results. The last column provides reference videos that visualize the camera trajectories. The images and trajectories are unseen during training. Regions are highlighted to reveal camera motion. Please check the video results for better visualizations on the project page: https://ir1d.github.io/CamCo/*

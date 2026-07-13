@@ -55,8 +55,6 @@ NoRD（No Reasoning for Driving）给出了肯定的回答。该方法仅使用�
 
 这一改进带来了决定性的性能跃升：在NAVSIM基准上，NoRD-BASE经Dr. GRPO后训练后，PDM得分从76.66提升至85.62，相对提升**11.68%**；在WaymoE2E端到端驾驶基准上，NoRD以远少于基线模型的数据量取得排名第三的Rated Feedback Score，并拥有最低的平均位移误差（ADE@3s = 1.2504）。在Best-of-6设置下，NoRD的PDM得分（92.4）甚至超越了需要推理标注和大规模数据的AutoVLA（92.1），证明了数据高效、无推理VLA范式的可行性。
 
-
-
 ### 端到端自动驾驶的VLA范式与数据瓶颈
 
 视觉-语言-动作（Vision-Language-Action, VLA）模型已成为端到端自动驾驶领域的前沿范式。这类模型将多视图图像、车辆状态和驾驶指令作为输入，通过大规模预训练的语言模型骨干直接生成未来轨迹，从而将感知、决策和规划统一在一个自回归框架中。然而，当前主流的VLA训练流程存在两个核心瓶颈：
@@ -82,8 +80,6 @@ $$ \hat{A}_{i,t}^{\mathrm{GRPO}} = \frac{r_i - \mu_{\text{group}}}{\sigma_{\text
 - **能否设计一种新的RL后训练方法，消除GRPO中的难度偏差，使弱SFT策略也能从高方差困难场景中有效学习？**
 
 为此，本文提出**NoRD（No Reasoning for Driving）**——一种数据高效、无需推理的VLA模型，并配套设计**Dr. GRPO**强化学习算法作为GRPO的直接替代。NoRD仅使用不到60%的驾驶数据，完全去除推理标注，直接预测轨迹token（Figure 1b）；而Dr. GRPO通过移除优势估计中的标准差归一化，从根本上消除对高方差样本的惩罚偏差，使RL后训练能够对全部难度层级的样本施加有效的梯度信号。
-
-
 
 ## 核心方法与创新机理
 
@@ -139,8 +135,6 @@ $$
 
 最终，这种无推理、数据高效的范式使 NoRD 在 **WaymoE2E** 基准上，以远少于基线模型的数据量，在不使用推理标注和模型集成的前提下，取得了排名第三的 RFS 分数，并拥有最低的 ADE（Table 2），证明了其在性能与效率上的双重竞争力。
 
-
-
 NoRD 的整体设计围绕一个核心原则展开：**在不依赖任何推理标注的前提下，用尽可能少的驾驶数据训练出高性能的视觉-语言-动作（VLA）模型**。图 5 给出了完整的前向推理流程——多视图图像与自车状态进入视觉编码器，经语言模型主干直接自回归地输出代表未来轨迹的离散 token，再由解码器恢复为可执行的轨迹点序列。整个过程没有生成任何自然语言推理链，因此模型的 token 产出量和推理延迟均显著低于需要 CoT 的 VLA 方案（图 9）。
 
 ### 输入与感知模块
@@ -178,19 +172,12 @@ NoRD 的训练分为两个阶段：
 
 整个 pipeline 的设计使得 NoRD 在 NAVSIM 上成为唯一同时处于高性能区和高数据效率区的 VLA 模型（Figure 6a），并在 WaymoE2E 上以远少于基线模型的数据量取得排名第三的 RFS，同时拥有最低的 ADE（Table 2）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2238_https_arxiv_org_abs_2602_21172/figures/008_Figure_5.jpg]]
 *Figure 5: Model architecture of NORD. NORD directly predicts action tokens without requiring reasoning traces, enabling a significantly more efficient training and inference pipeline*
-
-
 
 ### 3.1 弱SFT策略的难度偏差：问题根源
 
 NoRD的核心发现源于对弱监督微调（SFT）后策略行为的深入分析。当使用仅80,000个NAVSIM样本且无推理标注的数据对**Qwen-2.5VL-3B-Instruct**进行SFT后，得到的NoRD-BASE模型在组内奖励分布上呈现出显著的极化现象（**Figure 2**）：
-
-![[assets/figures/papers/paper_list_l2238_https_arxiv_org_abs_2602_21172/figures/002_Figure_2.jpg]]
-*Figure 2: Reward distribution in the weak SFT model. The group-mean PDM score is shown with band representing the mean of the corresponding group standard deviation for NORD-BASE. GRPO struggles to optimize high-variance regions (the majority) and is effective only in low-variance regions (the trajectories in green and red are for ground truth and NORD-BASE prediction)*
 
 - **低难度场景**：组内方差小，PDM得分集中在高分段，优化空间有限
 - **中高难度场景**：组内方差大，PDM得分分布在[0.2, 0.65]区间，占据样本多数
@@ -251,13 +238,6 @@ NoRD将连续轨迹转化为离散token序列以适配语言模型的自回归�
 最终RL奖励由三项加权合并：
 $$r = \frac{r_f + r_l + r_d}{1.5}$$
 其中 $r_f$ 为格式奖励，$r_l$ 为长度奖励，$r_d$ 为数据集专用奖励。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2238_https_arxiv_org_abs_2602_21172/figures/006_Figure_3.jpg]]
-*Figure 3: Evolution of group-mean PDM score during RL fine-tuning. (a) GRPO struggles to optimize samples with high group variance during training, particularly in the range [0.2–0.65]. (b) Dr. GRPO effectively optimizes high-variance samples during training, resulting in significant overall performance gains*
-
-
 
 ## 实验与关键发现
 
@@ -336,27 +316,11 @@ Dr. GRPO 采用了不对称裁剪策略（低裁剪 -0.2，高裁剪 0.1），�
 - **RL 后训练阶段**：使用 verl 框架配合 FSDP 和 vLLM 进行 rollout 生成。NAVSIM 上以 PDM 得分作为主奖励，WaymoE2E 上使用归一化 RFS 得分。最终奖励由格式奖励、长度奖励和数据集专用奖励加权合并：$r = \frac{r_f + r_l + r_d}{1.5}$。
 - **评估协议**：NAVSIM 使用 PDM Score 综合指标（$\mathrm{PDM Score} = \mathrm{NC} \times \mathrm{DAC} \times \frac{5 \cdot \mathrm{TTC} + 2 \cdot \mathrm{C} + 5 \cdot \mathrm{EP}}{12}$）；WaymoE2E 使用 RFS 和 ADE@3s。BoN 结果基于 6 次不同随机种子的输出取每样本最优得分平均。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2238_https_arxiv_org_abs_2602_21172/figures/009_Table_2.jpg]]
 *Table 2: Test results on the Waymo Vision-based End-to-End Driving Benchmark. NORD achieves competitive performance, without reasoning or ensembling*
 
 ![[assets/figures/papers/paper_list_l2238_https_arxiv_org_abs_2602_21172/figures/010_Table_3.jpg]]
 *Table 3: Test results on NAVSIM benchmark (navtest subset). NORD achieves competitive performance (w/o R: Without reasoning data, w/o L: without LiDAR data, and C: Number of RGB frames; * BoN refers to the average over best score per sample out of 6 outputs with different random seeds)*
-
-![[assets/figures/papers/paper_list_l2238_https_arxiv_org_abs_2602_21172/figures/017_Table_4.jpg]]
-*Table 4: Detailed comparison of RL-fine-tuning of NORD-BASE with GRPO and Dr. GRPO. Dr. GRPO based RL fine-tuning is almost always better than GRPO*
-
-![[assets/figures/papers/paper_list_l2238_https_arxiv_org_abs_2602_21172/figures/012_Figure_6.jpg]]
-*Figure 6: Pareto-optimal curves on two driving benchmarks. (a) NORD is the only VLA in NAVSIM operating in the high-performance, high–data-efficiency region using only RGB inputs. (b) NORD achieves competitive RFS on WaymoE2E with a fraction of the training data, without ensembling or reasoning supervision. Shaded regions provide a qualitative categorization of model efficiency and performance for ease of visualization*
-
-![[assets/figures/papers/paper_list_l2238_https_arxiv_org_abs_2602_21172/figures/007_Figure_4.jpg]]
-*Figure 4: Qualitative comparison of RL fine-tuning (RLFT) on the weak SFT model using GRPO and Dr. GRPO. With Dr. GRPO, NORD successfully learns complex maneuvers such as sharp turns and lane changes without collisions, whereas GRPO fails to optimize the weak SFT model (NORD-BASE) and collides (in red)*
-
-![[assets/figures/papers/paper_list_l2238_https_arxiv_org_abs_2602_21172/figures/015_Figure_9.jpg]]
-*Figure 9: Comparison of token and runtime efficiency. NORD is the most (a) token and (b) runtime efficient VLA*
-
-
 
 ## 定位与知识库关联
 
@@ -434,8 +398,6 @@ NoRD 的 k-disc tokenization 将轨迹聚类为 2048 个离散 token。Table 5 �
 ---
 
 **小结**：NoRD 在 VLA 方法谱系中定位为“数据高效、无推理”路线的代表性工作。它通过 Dr. GRPO 修正了标准 GRPO 在弱 SFT 策略下的难度偏差，证明在放弃推理标注和减少数据量的条件下仍可达到竞争性能。但其适用边界受限于难度偏差的残留、token 粒度的依赖和可解释性的缺失，这些限制也为后续研究指明了方向。
-
-
 
 ## 原文 PDF
 

@@ -49,8 +49,6 @@ claims:
 
 方法上，论文提出**边际重平衡SVM**（Margin-Rebalanced SVM），通过超参数τ调整少数类的边际权重（τ>1），从而对齐两类错误率。理论分析表明，在比例极限（n,d→∞, n/d→δ）下，存在三个信号强度区间：高信号下无需重平衡，中等信号下重平衡至关重要，低信号下无法优于随机猜测。实验在合成2-GMM数据以及IFNB单细胞RNA-seq、CIFAR-10（ResNet-18）、IMDb（BERT base）、TruthfulQA（Llama-3-8B-Instruct）等真实数据上验证了截断现象的普遍存在，并展示了边际重平衡有效降低少数类错误率与平衡错误率。此外，论文还分析了校准误差与Brier分数随不平衡加剧而恶化的单调性。
 
-
-
 不平衡分类（imbalanced classification）是机器学习的核心挑战之一：当少数类样本比例极低时，标准分类器（如SVM、逻辑回归）倾向于将几乎所有样本预测为多数类，导致少数类精度趋近于零。现有工作多从重采样、代价敏感学习等工程角度出发，但缺乏对**高维空间中过拟合如何被不平衡加剧**这一根本机制的严格理论理解。本文（ICLR 2025）正是针对这一缺口展开系统分析。
 
 **问题的根源在于高维特征空间中的logit分布截断效应**。作者发现，在可分离的高维线性分类问题中，训练集logit分布收敛到截断高斯分布 $\max\{\kappa, N(0,1)\}$，而测试集logit分布保持标准高斯分布 $N(0,1)$。这种截断效应源于两类共享一个共同的“过拟合预算”（overfitting budget），该预算**不成比例地移动了少数类的边界**，导致少数类的截断损失更多概率质量，从而表现更差（Figure 1）。这一现象在表格数据（IFNB单细胞RNA-seq）、图像数据（CIFAR-10 + ResNet-18）、文本数据（IMDb + BERT）甚至LLM激活探测（TruthfulQA + Llama-3-8B-Instruct）中均被复现（Figure 2, 3），表明其具有跨模态的普遍性。
@@ -62,8 +60,6 @@ claims:
 **理论贡献的独特之处**在于：作者不仅刻画了过拟合的统计机制（截断高斯分布），还提供了可操作的相变条件（Theorem 3.2）：在高信号强度下无需边际重平衡，中等信号下边际重平衡至关重要，低信号下无法优于随机猜测。这为实际应用中的 $\tau$ 选择提供了理论指导，而此前缺乏此类基于渐近极限的定量分析。
 
 **值得注意的局限性**包括：理论分析主要基于高斯混合模型（2-GMM），对非高斯数据的适用性仅通过t分布实验初步验证（Figure 16）；边际重平衡的最优 $\tau$ 表达式依赖于渐近极限，在有限样本下可能不精确；多类分类的扩展仅给出猜想，缺乏严格证明；校准误差的单调性仅在 $\pi \leq 0.25$ 时成立（Claim D.10），更极端的 $\pi$ 行为未完全刻画。此外，本文仅分析线性探测（linear probing）场景，未考虑端到端特征学习的复杂交互——后者在深度神经网络中可能引入额外的过拟合源。
-
-
 
 ## 核心方法与创新机理
 
@@ -108,8 +104,6 @@ $$
 
 论文明确指出其理论主要基于高斯混合模型（2-GMM），对非高斯数据的适用性仅通过t分布实验初步验证。多类分类（$K \geq 3$）的扩展仅给出猜想（联合logit分布渐近为投影到凸多面体的多元高斯），缺乏严格证明。此外，理论仅分析线性探测（linear probing）场景，未涉及端到端深度神经网络的特征学习。校准误差的单调性也仅在 $\pi \leq 0.25$ 时成立，更极端不平衡下的行为未完全刻画。
 
-
-
 本文的pipeline围绕“特征提取 → 线性分类 → 边际重平衡”三层结构展开，核心目标是揭示并缓解高维不平衡分类中的过拟合现象。
 
 **特征提取器** 采用预训练深度神经网络（如ResNet-18、BERT base、Llama-3-8B-Instruct），从原始数据（图像、文本、表格）中提取高维特征，并在下游任务中冻结参数（即线性探测模式）。这一设计将分析焦点锁定在最后一层线性分类器的行为上，排除了特征学习带来的干扰。
@@ -125,8 +119,6 @@ $$
 **输入输出流** 的因果链条为：原始数据 → 预训练特征提取器（冻结）→ 高维特征向量 → 线性分类器（SVM或逻辑回归）→ logit → 边际重平衡模块（调整τ）→ 最终预测。整个pipeline中，特征提取器是固定的，仅线性分类器的参数受τ影响，这使得论文能够严格分析高维性如何通过截断logit分布来导致过拟合，以及τ如何通过移动少数类边界来缓解这一效应。
 
 **关键瓶颈** 在于：高维特征导致训练集logit分布被截断为rectified Gaussian（max{κ, N(0,1)}），而测试集logit保持高斯分布N(0,1)；这种截断效应在少数类上更严重，因为两类共享一个共同的“过拟合预算”，该预算不成比例地移动了少数类的边界。边际重平衡正是通过调整τ来对齐两类错误率，从而缓解少数类精度下降。
-
-
 
 ### 数据生成模型
 
@@ -210,8 +202,6 @@ $$\tau^{\mathrm{opt}} = \frac{g_1^{-1}\left( \frac{\rho^*}{2 \pi \|\boldsymbol{\
 - **中等信号**（$b < a - c < 2b$）：边际重平衡至关重要，需 $\tau \gg d^{a-b-c}$ 才能使少数类错误率趋于0；若 $\tau \asymp 1$，则少数类错误率趋近1。
 - **低信号**（$a - c > 2b$）：无论 $\tau$ 如何选择，平衡错误率不低于 $1/2$，无法优于随机猜测。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：logit分布的截断效应
@@ -235,7 +225,6 @@ Theorem 3.2刻画了高不平衡区间的三个相区（Figure 5）：
 
 不平衡不仅恶化分类精度，还严重损害概率校准。Figure 6的可靠性图显示，随着 $\pi$ 减小（不平衡加剧），SVM预测的置信度被系统性高估（预测概率膨胀）。校准误差 $\mathrm{CalErr}(\widehat{p})$ 和均方误差 $\mathrm{MSE}(\widehat{p})$（Brier分数）随不平衡比、信号强度和宽高比增大而单调下降（Table 2, Theorem 4.1），但校准误差的单调性仅在 $\pi \leq 0.25$ 时成立（Claim D.10），更极端不平衡下的行为未被完全刻画。
 
-
 ![[assets/figures/papers/iclr26_0004_cKthi6QfUr_A_Statistical_Theory_of_Overfitting_for_Imbalanc/figures/002_Table_2.jpg]]
 *Table 2: Monotonicity of test errors and miscalibration metrics on model parameters*
 
@@ -254,8 +243,6 @@ Table 2总结了测试错误率和误校准指标关于模型参数的单调性�
 3. **异方差协方差**：当两类协方差不同（$\boldsymbol{\Sigma}_+ \neq \boldsymbol{\Sigma}_-$）时，logit分布出现不同缩放效应，仅给出猜想。
 4. **特征学习**：本文仅分析线性探测（linear probing）场景，未考虑端到端深度神经网络的特征学习影响。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0004_cKthi6QfUr_A_Statistical_Theory_of_Overfitting_for_Imbalanc/figures/001_Table_1.jpg]]
 *Table 1: Qualitative comparison between low/high dimensions for binary classification, where a linear classifier $\hat { y } ( \pmb { x } ) \overset { - } { \underset { - } { = } }$ 2 $\mathbb { 1 } \hat { \{ f ( \pmb { x } ) > 0 \} }$ - 1 with $\hat { f } ( \hat { \pmb x }$ ) = $\langle \pmb { x } _ { \lambda } \hat { \beta } \rangle + \hat { \beta _ { 0 } }$ is trained on $\{ ( \pmb { x } _ { i } , y _ { i } ) \} _ { i = 1 } ^ { n } { \overset { \underset { \mathrm { 1 . 1 . 0 . } } { \mathrm { 1 . 1 . 0 . } } } { \sim } } P _ { \pmb { x } , y }$ . bHere, the logits $\{ { \hat { f } } ( \pmb { x } _ { i } ) \} _ { i = 1 } ^ { n }$ 1 are obtained by evaluating f on the training set
 
@@ -264,9 +251,6 @@ Table 2总结了测试错误率和误校准指标关于模型参数的单调性�
 
 ![[assets/figures/papers/iclr26_0004_cKthi6QfUr_A_Statistical_Theory_of_Overfitting_for_Imbalanc/figures/046_Table_4.jpg]]
 *Table 4: Comparison of logit distributions on separable and non-separable data ( $\tau$ = 1 )*
-
-
-
 
 ## 定位与知识库关联
 
@@ -303,8 +287,6 @@ Table 2总结了测试错误率和误校准指标关于模型参数的单调性�
 - **非可分离情况的刻画**：当δ>δ_c时，过拟合行为如何通过非线性收缩（nonlinear shrinkage）刻画？
 - **校准退化的理论刻画**：Figure 6中观察到的校准退化能否作为不平衡比π的函数进行精确理论描述？
 - **多类分类的严格理论**：对于一般K≥3类，经验logit的联合分布是否渐近为投影到凸多面体的多元高斯？
-
-
 
 ## 原文 PDF
 

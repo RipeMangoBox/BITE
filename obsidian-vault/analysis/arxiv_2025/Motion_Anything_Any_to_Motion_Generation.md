@@ -60,8 +60,6 @@ Motion Anything 提出一种**任意条件到人体动作生成**框架，核心
 
 消融实验进一步证实：基于注意力的掩码策略（FID 0.028）明显优于随机掩码（0.049）及 KMeans、GMM、置信度、密度等替代策略；掩码比率在 30% 附近性能最优且方法对比率变化具有鲁棒性；TAT 在文本到动作任务中使用自注意力优于跨注意力；多模态条件（文本+音乐）相比单模态条件在 TMD 上 FID_k 从 25.07 降至 21.46，提升显著。
 
-
-
 ### 问题域：从条件到人体动作的生成
 
 人体动作生成旨在根据给定的控制信号（如文本描述、音乐节拍或两者的组合）合成自然、多样的人体运动序列。该任务在动画制作、虚拟人交互、游戏开发等领域具有广泛应用。近年来，扩散模型和掩码自回归方法在该领域取得了显著进展，但一个核心瓶颈始终存在：**现有方法难以根据条件信号自适应地关注动作序列中的关键动态帧和关键身体部位**。
@@ -83,8 +81,6 @@ Motion Anything 提出一种**任意条件到人体动作生成**框架，核心
 ### 目标定位
 
 综上，Motion Anything 旨在构建一个统一的任意条件到动作生成框架，通过注意力引导的时空掩码策略和模态自适应 Transformer 架构，实现对文本、音乐及多模态组合条件的高质量、可控动作生成。
-
-
 
 ## 核心方法与创新机理
 
@@ -110,8 +106,6 @@ Motion Anything 将掩码策略改为**基于注意力的时空选择性掩码**
 
 与 **TM2D**、**MotionCraft** 等方法仅支持单模态条件或简单的嵌入拼接不同，Motion Anything 通过 TAT 的模态自适应切换实现了**同时编码多种模态条件**（Table 1 对比了各方法的多模态能力）。在 TMD 数据集上，文本+音乐双模态条件的 FID_k 达到 21.46，显著优于仅使用音乐的 25.07（Table 8），验证了多模态对齐对生成质量的提升。这一能力使得 Motion Anything 成为首个在统一框架下支持文本到动作、音乐到舞蹈、文本+音乐到舞蹈三种任务的 any-to-motion 方法。
 
-
-
 Motion Anything 的整体 pipeline 围绕一个核心思想构建：**通过条件引导的注意力掩码，迫使模型在时空维度上学习条件与运动之间的对应关系**。整个框架由四个主要模块串联而成，形成“编码 → 掩码 → 恢复 → 生成”的闭环。
 
 ### 模块关系与数据流
@@ -132,8 +126,6 @@ Motion Anything 的整体 pipeline 围绕一个核心思想构建：**通过条�
 ### 与基线方法的关键差异
 
 现有掩码自回归方法（如 **MoMask**）采用随机掩码策略，无法根据条件自适应地关注关键动态帧和身体部位。Motion Anything 将掩码策略从“随机”改为“注意力引导”，并将单一的掩码 Transformer 升级为模态自适应的 TAT + SAT 双阶段架构，从而在多模态条件下实现了更精细的时空可控生成。
-
-
 
 Motion Anything 的生成管线由四个核心模块串联构成，其关键创新集中在 **Attention-based Masking** 与两个级联的掩码 Transformer——**Temporal Adaptive Transformer (TAT)** 和 **Spatial Aligning Transformer (SAT)**。以下按数据流顺序拆解各模块的设计逻辑。
 
@@ -176,13 +168,6 @@ SAT 接收 TAT 恢复后的动作序列，在空间维度上对被掩码的身�
 四个模块的堆叠方式为：条件编码器 → Attention-based Masking（时空两个分支）→ TAT（2 层）→ SAT（2 层），共 4 层掩码 Transformer。模型总参数量 12.65M，计算量 137.35 GFLOPs（Section 4.2）。消融实验（Table 9）表明，层数 N=4 时性能最优，继续增加层数不再带来明显增益。
 
 **注**：本文未提供各模块的显式数学公式（如注意力分数计算、掩码选择函数的具体形式），仅通过算法伪代码描述流程。若需精确公式推导，需查阅原论文补充材料或代码实现。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2503_06955/figures/002_Figure_2.jpg]]
-*Figure 2: Masking strategy comparison. This figure demonstrates the key differences between the previous random masking strategy [21] (top) and our attention-based masking (bottom). Our masking strategy focuses on the more significant and dynamic parts of the motion (colored) corresponding to the condition*
-
-
 
 ## 实验与关键发现
 
@@ -238,25 +223,6 @@ Motion Anything 在三个核心任务（文本到动作、音乐到舞蹈、文�
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2503_06955/figures/012_Table_5.jpg]]
 *Table 5: Ablation study of the masking strategy on HumanML3D [19]. The best and runner-up values are bold and underlined. The right arrow → indicates that closer values to ground truth are better*
 
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2503_06955/figures/014_Table_7.jpg]]
-*Table 7: Ablation study of the TAT on HumanML3D [19]. The best values are bold. The right arrow → indicates that closer values to ground truth are better*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2503_06955/figures/016_Table_8.jpg]]
-*Table 8: Single-modal vs. multimodal generation on TMD dataset*
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2503_06955/figures/013_Table_6.jpg]]
-*Table 6: Ablation study of masking ratio on HumanML3D [19]. The best and runner-up values are bold and underlined. The right arrow → indicates that closer values to ground truth are better*
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2503_06955/figures/017_Table_9.jpg]]
-*Table 9: Ablation study of number of layers on HumanML3D [19]*
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2503_06955/figures/004_Table_1.jpg]]
-*Table 1: Methods comparison. Either single-task or multi-task models can handle only one condition at a time, overlooking the importance of integrating multiple modalities for more controllable generation. Our Motion Anything introduces an innovative approach that encodes different modalities simultaneously and adaptively for more controllable generation*
-
-
-
 ## 定位与知识库关联
 
 ### 问题定位：掩码自回归运动的可控性瓶颈
@@ -310,8 +276,6 @@ Motion Anything 向运动生成知识库贡献了三个可复用的技术要素�
 - **时空解耦掩码的消融证据**：Table 5–Table 9 的系统消融为后续工作提供了明确的超参数选择参考（30% 掩码比率、4 层网络、文本到动作使用自注意力）。
 
 这些贡献的可靠性受到实验覆盖范围的支撑（四个数据集、多组消融），但在跨任务泛化和长序列场景下的验证仍需后续工作补充。
-
-
 
 ## 原文 PDF
 

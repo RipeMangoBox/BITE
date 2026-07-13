@@ -50,8 +50,6 @@ claims:
 
 实验表明，PhysHead 在保持与 GaussianHaircut 可比的外观重建质量（PSNR 30.28 vs 30.55，SSIM 0.946 vs 0.915）的同时，大幅提升了动态真实感：用户研究中头发物理合理性达 98.5%（基线 0–1.5%），结构一致性达 88.5%（基线 3.1–8.5%）；动力学指标上，主成分解释方差降至 93.28%（基线 95.42–96.16%），时序平滑度降至 0.863（基线 2.13–6.23），验证了动态头发运动的有效性。消融实验进一步证实，颜色一致性损失和分层优化策略是实现仿真就绪化身的关键。
 
-
-
 真实感头部化身是沉浸式远程呈现与数字人应用的核心技术。现有方法在静态场景下已能取得令人印象深刻的渲染质量，但一旦进入动态驱动，一个关键瓶颈便暴露出来：**头发运动的物理真实感严重缺失**。无论是基于 3D 高斯泼溅的 **Gaussian Avatars (GA)** 还是 **Gaussian Head Avatars (GHA)**，其头发表示均附着在参数化头部模型（如 FLAME）上，随头部做刚性运动。这种假设在头部转动或点头时会导致头发与头部同步旋转，完全忽略了惯性、重力与碰撞等基本物理效应，产生“头盔式”的僵硬动画。
 
 更深层的问题在于**头发与头部的耦合困境**。真实世界中，头发并非头部的附属品——它覆盖、遮挡头部表面，同时拥有独立的运动自由度。要构建一个既能精确控制面部表情、又能独立模拟头发动力学的化身，必须实现两者的彻底解耦。然而，解耦面临双重挑战：其一，被头发遮挡的头部区域在训练视图中不可见，缺乏合理的重建约束；其二，发丝内部隐藏区域（如被外层发丝遮挡的内层发丝）的外观同样缺乏监督信号。**GaussianHaircut (GH)** 虽引入了基于发丝的几何表示，但隐藏发丝的颜色呈随机分布，导致在物理模拟中这些发丝一旦暴露便产生视觉伪影，无法直接用于动画。**HairCUP** 尝试通过组合式架构分离头部与头发，但其依赖 Score Distillation Sampling (SDS) 来恢复遮挡区域，容易引入肤色偏差与伪影，且其非结构化的高斯头发表示仍无法与物理引擎对接。
@@ -63,8 +61,6 @@ claims:
 3. **隐藏区域外观正则化**：如何为不可见发丝赋予合理颜色，确保在物理模拟中外露时不会破坏视觉连贯性？
 
 PhysHead 正是围绕这三个问题展开。其核心动机在于：通过视觉语言模型（VLM）构建秃头外观代理，实现头发的彻底剥离与头部的完整重建；采用基于发丝的结构化 3D 高斯表示，使头发几何天然兼容物理模拟管线；并引入发丝间颜色一致性损失，将外层可见发丝的颜色传播至内层隐藏区域。这一设计使得 PhysHead 首次实现了同时支持面部表情参数化控制与头发物理模拟的真实感头部化身，并在用户研究中取得了 98.5% 的物理真实感评分——相比之下，基线方法仅为 0–1.5%。
-
-
 
 ## 核心方法与创新机理
 
@@ -101,8 +97,6 @@ $$\mathcal{L}_{\mathrm{consistency}} = \sum_{i \in \mathcal{S}} \sum_{j \in \mat
 PhysHead 采用**两阶段优化策略**：第一阶段仅优化附着在 FLAME 网格上的面部高斯，第二阶段优化发丝上的头发高斯。这一分层优化避免了单层表示在物理模拟时出现的皮肤剥落伪影（Fig 15），确保面部表情由 FLAME 参数化模型驱动，头发动力学由物理引擎独立控制，二者互不干扰。
 
 **创新总结**：PhysHead 通过“发丝结构化高斯 + VLM 秃头代理 + 颜色一致性正则 + 分层优化”的技术组合，首次将静态外观重建与动态物理模拟统一在单一框架内。用户研究表明，其头发物理真实性达 98.5%，结构一致性达 88.5%，远超基线方法（0-1.5% / 3.1-8.5%），验证了该创新路径的有效性。
-
-
 
 PhysHead 的整体设计遵循**分层解耦—代理重建—物理驱动**的流水线，将头部化身明确拆分为面部层与头发层，分别采用不同的表示与动力学机制，最终通过可微分渲染合成仿真就绪的动态头像。
 
@@ -148,11 +142,6 @@ $$\mathbf{x}(t+\Delta t) = \mathbf{x}(t) + \mathbf{v}(t+\Delta t) \Delta t$$
 
 最终输出为**仿真就绪的分层头部化身**：面部层响应 FLAME 的表情参数，头发层响应物理引擎的动力学解算。该分层架构天然支持头发几何编辑（Figure 9）与发型交换（Figure 10）等下游应用。
 
-![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2604_06467/figures/010_Figure_10.jpg]]
-*Figure 10: The layered avatar representation allows for editing operations like hair-swapping*
-
-
-
 PhysHead 的核心架构围绕“分层表示-物理模拟-外观约束”三条主线展开，通过五个关键模块协同实现仿真就绪的动态头发化身。
 
 ### 分层高斯表示模块
@@ -170,9 +159,6 @@ $$H \in \mathbb{R}^{N_d \times N_{\mathrm{seg}} \times 3}$$
 其中 $N_d$ 为发丝数量，$N_{\mathrm{seg}}$ 为每根发丝的段数。每个发丝段分配一个 3D 高斯原语，其位置和方向由发丝几何的 TNB 框架（切向量-法向量-副法向量）对齐，使高斯表示与物理模拟所需的发丝结构天然兼容。
 
 两阶段优化策略实现了面部与头发的彻底解耦：第一阶段仅优化 FLAME 网格覆盖区域的高斯原语，第二阶段在固定面部层后优化头发区域。这一设计避免了单层表示在动画时出现的皮肤剥落伪影（见 Figure 15）。
-
-![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2604_06467/figures/018_Figure_15.jpg]]
-*Figure 15: Single layer animation. Single layer of optimization results in artifacts during animation despite the usage of hair strands*
 
 ### VLM 秃头图像生成与头部外观代理模块
 
@@ -192,9 +178,6 @@ $$\mathbf{x}(t+\Delta t) = \mathbf{x}(t) + \mathbf{v}(t+\Delta t) \Delta t$$
 
 其中 $\mathbf{F}(t)$ 包含重力、弹簧力和阻尼力，$m$ 为质点质量，$\Delta t$ 为时间步长。引导发丝的运动通过 KNN 插值（$k=10$）驱动约 60,000 根密集发丝，插值权重与距离成反比（见 Figure 4）。物理模拟基于离线 Maya 引擎，参数需针对不同发型进行调整。
 
-![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2604_06467/figures/004_Figure_4.jpg]]
-*Figure 4: Using strand-skinning [10], the dense strands are affected by*
-
 ### 外观优化与颜色一致性约束
 
 头发外观优化的核心挑战在于：大量发丝段在训练视角下不可见，缺乏外观监督信号。PhysHead 引入颜色一致性损失来解决这一问题：
@@ -212,11 +195,6 @@ $$\mathcal{L}_{\mathrm{hair}} = \mathcal{L}_{\mathrm{rgb}} + \lambda_{\mathrm{co
 $$\mathcal{L}_{\mathrm{rgb}} = (1-\lambda) \cdot \mathcal{L}_1 + \lambda \cdot \mathcal{L}_{\mathrm{D-SSIM}}, \quad \lambda = 0.2$$
 
 消融实验表明，移除颜色一致性损失后，隐藏发丝呈现随机颜色，无法用于物理动画（见 Figure 8），验证了该约束对仿真就绪外观的关键作用。
-
-![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2604_06467/figures/011_Figure_8.jpg]]
-*Figure 8: The consistency loss helps to assign meaningful colors to hidden 3D gaussian primitives*
-
-
 
 ## 实验与关键发现
 
@@ -289,16 +267,6 @@ PhysHead 存在以下已知局限：
 3. **VLM 多视角一致性**：VLM 生成秃头图像时可能改变头部姿态，需要人工过滤多视角不一致的视图，限制了全自动流程的鲁棒性。
 4. **物理模拟离线**：当前物理模拟基于离线 Maya 引擎，尚未实时集成，且参数（如 Start Curve Attract，Table 4）需针对每个发型手动调整。
 
-![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2604_06467/figures/020_Figure_16.jpg]]
-*Figure 16: Curly Hair Curly Hair results with GT and Ours*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2604_06467/figures/008_Figure_9.jpg]]
-*Figure 9: The strand-based hair layer can be edited by the user to change the geometry and appearance*
-
-
-
 ## 定位与知识库关联
 
 ### 一、工作定位与核心区分
@@ -355,8 +323,6 @@ PhysHead 在知识库中应定位于 **动态数字化身 → 头部化身 → �
 - **颜色一致性正则化**：相邻发丝色差惩罚，使隐藏区域获得可模拟外观
 
 这些资产为后续工作（如全身动态化身、端到端可微物理模拟）提供了可复用的技术模板。
-
-
 
 ## 原文 PDF
 

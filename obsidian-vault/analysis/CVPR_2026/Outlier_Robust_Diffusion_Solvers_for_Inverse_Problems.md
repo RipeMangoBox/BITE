@@ -52,8 +52,6 @@ claims:
 
 实验覆盖线性逆问题（超分辨率、随机修复、高斯/运动去模糊）和非线性去模糊，在 CelebA、FFHQ、ImageNet 三个数据集上验证。在典型设置下（高斯噪声 $\sigma=0.05$，污染率 $\rho=0.02$），Robust-CG 在 CelebA 高斯去模糊任务上达到 **29.38 dB PSNR**，比 DPS 的 22.06 dB 高出 **7.32 dB**；在随机修复任务（$\rho=0.10$）上达到 **31.20 dB**，比 DAPS 的 15.60 dB 高出 **15.60 dB**。消融实验进一步证实：将显式噪声估计与 Huber 损失嵌入 DPS 和 DiffPIR 后，Robust-DPS 与 Robust-DiffPIR 均显著优于原始基线，验证了核心组件的独立有效性。
 
-
-
 ### 扩散模型求解逆问题的基本范式
 
 逆问题旨在从含噪观测 $\pmb{y}$ 中恢复未知信号 $\pmb{x}_0^*$，其标准观测模型为：
@@ -80,8 +78,6 @@ $$y_i = \begin{cases} \xi_i, & \text{if } i \in \mathcal{C} \\ (\mathcal{A}(\mat
 2. **噪声与离群未解耦**：现有方法未显式区分加性高斯噪声与离群污染，导致测量中的离群值被误作为高噪声处理，进一步加剧了重建偏差。
 
 因此，核心瓶颈在于：如何在扩散采样框架下构建对离群点鲁棒的优化目标，同时保持对高斯噪声的有效抑制。
-
-
 
 ## 核心方法与创新机理
 
@@ -133,8 +129,6 @@ $$ \alpha_j = \frac{\boldsymbol{g}_j^{\mathrm{T}} \boldsymbol{g}_j}{\frac{1}{r_t
 
 两项 changed slot 形成因果闭环：**Huber 损失 + 显式噪声估计**解决了“保真项对离群值敏感”的瓶颈，**共轭梯度法**解决了“梯度下降对学习率敏感”的工程瓶颈。两者的结合使得方法在离群污染场景下（ρ=0.02–0.10）相比现有 DM 逆问题求解器获得 5–15 dB 的 PSNR 增益，且 Huber 阈值 δ 在 $\{0.005, 0.01, 0.02, 0.04\}$ 范围内性能波动小于 0.5 dB（表 10），表现出良好的参数鲁棒性。
 
-
-
 本文提出的 Robust-GD 与 Robust-CG 方法在扩散模型逆问题求解的通用流程中插入了两个关键模块：**显式噪声估计**与**鲁棒目标函数构建**，从而在测量包含离群污染时保持重建质量。整体 pipeline 如图 1 所示，每个时间步 $t_i$ 的处理流程如下：
 
 1. **信号估计**：利用预训练扩散模型的数据预测网络 $x_\theta$，从当前带噪潜变量 $\tilde{\mathbf{x}}_t$ 估计干净信号 $\hat{\mathbf{x}}_0(\tilde{\mathbf{x}}_t, t)$。
@@ -147,12 +141,8 @@ $$ \alpha_j = \frac{\boldsymbol{g}_j^{\mathrm{T}} \boldsymbol{g}_j}{\frac{1}{r_t
 
 **Robust‑GD 与 Robust‑CG 的差异**：两者共享相同的鲁棒目标函数，区别在于求解器。Robust‑GD 使用梯度下降，需手动调节学习率 $\eta_x$，对学习率高度敏感（表 11 显示同一任务 PSNR 可从 16.20 变化至 28.29）。Robust‑CG 采用共轭梯度法，通过线搜索自动确定步长——线性前向算子下具有闭式解，非线性场景则通过有限差分近似 Jacobian‑向量积，完全避免了学习率调参问题。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l908_https_arxiv_org_abs_2605_09477/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of our proposed Robust-GD and Robust-CG methods. At each timestep*
-
-
 
 ### 3.1 观测模型与离群污染建模
 
@@ -251,8 +241,6 @@ $$
 
 为验证各组件可独立迁移，本文将显式噪声估计与 Huber 损失嵌入到两个代表性基线中，得到 **Robust-DPS** 和 **Robust-DiffPIR**。消融结果（表 13）表明，在 CelebA Gaussian deblurring（$\rho=0.10$）任务上，Robust-DPS 达到 27.70 PSNR 而原始 DPS 仅 22.06，证明两个核心模块均对性能提升有独立贡献。
 
-
-
 ## 实验与关键发现
 
 ### 主要结果：离群污染下的鲁棒重建
@@ -287,31 +275,11 @@ $$
 
 **噪声方差已知假设**。显式噪声估计依赖σ²的准确值。若实际噪声方差偏离预设值，修正测量ȳ的权重γ_t²/(γ_t²+σ²)将失配。实验未覆盖噪声方差误设场景，该点需手动验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l908_https_arxiv_org_abs_2605_09477/figures/008_Table_2.jpg]]
 *Table 2: (Linear IPs) Gaussian deblurring and motion deblurring with additive Gaussian noise*
 
-![[assets/figures/papers/paper_list_l908_https_arxiv_org_abs_2605_09477/figures/004_Table_1.jpg]]
-*Table 1: (Linear IPs) Super-resolution (4×), inpainting (random 70%) with additive Gaussian noise (σ = 0.05) and contamination fraction ρ = 0.02 or 0.10. Measurement Reference DPS DiffPIR*
-
-![[assets/figures/papers/paper_list_l908_https_arxiv_org_abs_2605_09477/figures/018_Table_13.jpg]]
-*Table 13: (Linear IPs) Gaussian deblurring and motion deblurring with additive Gaussian noise*
-
-![[assets/figures/papers/paper_list_l908_https_arxiv_org_abs_2605_09477/figures/015_Table_10.jpg]]
-*Table 10: Performance of Robust-CG with different value of the Huber loss threshold δ on Gaussian deblurring and motion deblurring with additive Gaussian noise*
-
-![[assets/figures/papers/paper_list_l908_https_arxiv_org_abs_2605_09477/figures/016_Table_11.jpg]]
-*Table 11: Performance of Robust-GD with different value of learning rate*
-
 ![[assets/figures/papers/paper_list_l908_https_arxiv_org_abs_2605_09477/figures/019_Figure_6.jpg]]
 *Figure 6: Visualization of the relationship between the distortion metric PSNR and computational cost for the CelebA Gaussian deblurring task. The computational cost is measured in terms of (left) average inference time over 100 images, (middle) number of function evaluations, and (right) number of forward operator evaluations*
-
-![[assets/figures/papers/paper_list_l908_https_arxiv_org_abs_2605_09477/figures/007_Table_3.jpg]]
-*Table 3: Nonlinear deblurring with additive Gaussian noise*
-
-![[assets/figures/papers/paper_list_l908_https_arxiv_org_abs_2605_09477/figures/010_Table_4.jpg]]
-*Table 4: Super-resolution (4×) and inpainting (random 70%) with additive Gaussian noise (σ = 0.5) and contamination fraction*
 
 ![[assets/figures/papers/paper_list_l908_https_arxiv_org_abs_2605_09477/figures/006_Figure_4.jpg]]
 *Figure 4: Visualization results of our methods and other DM-based approaches for the Gaussian deblurring task, with Gaussian noise*
@@ -321,8 +289,6 @@ $$
 
 ![[assets/figures/papers/paper_list_l908_https_arxiv_org_abs_2605_09477/figures/003_Figure_3.jpg]]
 *Figure 3: Visualization results of our methods and other DMbased approaches for the super-resolution task, with Gaussian noise (σ = 0.05) and a contamination fraction of*
-
-
 
 ## 定位与知识库关联
 
@@ -374,8 +340,6 @@ $$
 - **共轭梯度优化**：将 CG 方法引入扩散逆问题，替代手工调参的梯度下降，提供了更稳定的优化路径。
 
 后续工作可沿两个方向延伸：（1）**更复杂的污染模型**（结构化离群、对抗性污染）与更强的鲁棒损失函数；（2）**理论层面**的鲁棒恢复保证，将压缩感知中的鲁棒恢复理论扩展到扩散先验约束下的逆问题。
-
-
 
 ## 原文 PDF
 

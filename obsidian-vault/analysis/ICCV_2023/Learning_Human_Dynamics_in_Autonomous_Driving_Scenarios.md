@@ -52,15 +52,11 @@ claims:
 
 **方法定位**：该方法属于物理感知的人体运动捕捉与轨迹填补交叉领域，其核心创新在于将条件变分自编码器（cVAE）运动先验、强化学习控制策略与物理模拟器深度耦合，填补了从纯运动学估计到物理合理动态生成的空白。
 
-
-
 自动驾驶场景中的人体动力学恢复是理解行人行为、保障安全决策的关键任务。从车载摄像机序列中重建全局一致的人体运动序列，面临移动摄像机视角、严重遮挡和复杂地形等多重挑战。现有最先进的方法，如 **GLAMR**（Yuan et al., CVPR 2022），虽然在遮挡感知的全局人体运动恢复方面取得了显著进展，但其输出普遍存在**物理不合理性**——包括漂浮（floating）、滑动（sliding）和地面穿透（terrain penetration）等伪影（Figure 1）。
 
 这些伪影的根本原因在于，现有方法忽略了**环境的物理约束**。GLAMR 等基于运动学的方法仅考虑关节角度等运动学约束，既不保证脚与地面的接触关系，也不防止身体穿透地形。此外，这些方法通常在室内平坦地面数据上训练，难以适应自动驾驶场景中由 LiDAR 点云重建的不平坦户外地形。当面对长时间遮挡时，基于 transformer 的 cVAE 一次性填补多个缺失帧的策略缺乏逐步的物理反馈，进一步加剧了运动的不真实性。
 
 本文的核心动机正是填补这一**物理空白**：在自动驾驶场景中，仅恢复视觉上一致的运动是不够的，必须保证人体运动在物理世界中是合理且可执行的。为此，本文提出一个物理感知的运动跟踪框架，通过引入强化学习训练的分层运动控制器、物理模拟器中的模仿执行，以及对真实地形的显式建模，系统性地解决上述问题。
-
-
 
 ## 核心方法与创新机理
 
@@ -83,8 +79,6 @@ claims:
 在物理感知运动跟踪之后，本文引入第三阶段后优化（Section 3.3），在物理模拟器内基于 2D 关键点投影误差和置信度加权奖励 $r_{proj} = \exp(-\alpha_p \sum(\|\Pi(\overline{j}_t) - \widetilde{j}_t^{2D}\| \times \widetilde{c}_t))$ 进一步优化运动参数。这一阶段显著提升了遮挡帧的 PA-MPJPE 和 2D 关键点投影误差指标（Table 3），使生成的运动在保持物理合理性的同时，与视频视觉证据更加一致（Figure 7）。
 
 **证据强度**：上述创新点的有效性由 Table 1 的 FID 指标（1.96，显著优于基线）、Table 2 的物理指标消融实验（地面穿透、脚滑动、漂浮度均显著降低）以及 Table 3 的后优化消融实验（遮挡帧 PA-MPJPE 和 2D-LE 进一步改善）共同支撑，证据置信度均高于 0.95。
-
-
 
 本文提出一个三阶段物理感知运动跟踪框架，从快速移动车载摄像机拍摄的单目视频中恢复行人的物理合理人体动力学。输入为包含 $M$ 帧的单目视频序列 $\boldsymbol{I} = (I_1, ..., I_M)$，输出为目标行人 $N$ 个完整运动序列在世界坐标系下的物理合理运动 $\{Q^i\}_{i=1}^N$，其中每个运动序列 $Q = (T, R, \Theta)$ 由根平移 $T$、根旋转 $R$ 和身体姿态 $\Theta$ 组成（Figure 2）。
 
@@ -135,12 +129,8 @@ $$r_{proj} = \exp(-\alpha_p \sum(\|\Pi(\overline{j}_t) - \widetilde{j}_t^{2D}\| 
 
 当前框架主要处理静态地形，对动态障碍物（如车辆）交互未深入探讨；身体形状参数由离线 MoCap 估计，未在物理感知框架内优化；高度图到网格转换误差及 SMPL 模型精度限制导致脚部穿透等微小伪影未完全消除；高层控制器训练需大量计算资源（单 V100 GPU >12 小时），且对每个视频需微调。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l37_https_openaccess_thecvf_com_content_ICCV2023_papers_Wang_Learning_Human/figures/001_Figure_1.jpg]]
 *Figure 1: We compare our method against GLAMR [67], the state-of-the-art method for global human motion mesh recovery. The output of GLAMR (left) suffers from various physical implausibilities, such as floating, sliding, or terrain penetration. Our method (right) yields a clear improvement*
-
-
 
 ### 人体运动表示
 
@@ -187,8 +177,6 @@ $$r_{proj} = \exp(-\alpha_p \sum(\|\Pi(\overline{j}_t) - \widetilde{j}_t^{2D}\| 
 ### 地形适配策略
 
 为将室内训练的运动先验迁移到户外场景，框架在合成多样化地形上预训练高层次控制器，再在 Waymo Open Dataset 的真实数据上微调。这一策略显著加快了收敛速度并提升了最终奖励（Figure 6），验证了合成数据预训练对真实场景泛化的有效性。
-
-
 
 ## 实验与关键发现
 
@@ -251,12 +239,8 @@ Figure 6 展示了高层次控制器在合成数据上预训练对收敛速度�
 - **Figure 6**：为预训练策略的必要性提供了实验依据，同时揭示了训练效率的瓶颈。
 - **Figure 7**：后优化的定性效果展示，说明优化后运动与视频证据的对齐程度明显改善。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l37_https_openaccess_thecvf_com_content_ICCV2023_papers_Wang_Learning_Human/figures/002_Figure_2.jpg]]
 *Figure 2: System Overview. Our approach processes each pedestrian mesh sequence in a stage-wise fashion. We first estimate motions for visible frames $\widetilde { Q }$ using an off-the-shelf motion capture method. We also reconstruct the ground terrain G in preparation for the physicsbased stages (Details in Section 3.1). The physics-aware motion tracking (Section 3.2) infills the motion Q for the occluded frames, as well as adapts the previously reconstructed motion to the reconstructed ground. In the last stage (Section 3.3), we optimize the entire motion $\widehat { Q }$ to closely match the evidence from a 2D keypoint-based system to produce the final motion Q
-
-
 
 ## 定位与知识库关联
 
@@ -292,8 +276,6 @@ Figure 6 展示了高层次控制器在合成数据上预训练对收敛速度�
 -   **端到端可微分性**：当前框架为模块化级联设计，身体形状优化与物理模拟分离。能否将身体形状优化集成到物理感知框架中，实现端到端的可微分动态，是提升整体一致性的潜在路径。
 -   **泛化能力验证**：论文仅在 Waymo Open Dataset 上进行了验证。在更多样化的真实驾驶场景（如不同城市、天气条件、交通密度）中，该框架的泛化能力尚待检验。
 -   **感知一致性**：定性指标（如 FID）的改进是否与人类感知的物理真实性完全一致，仍是一个值得追问的问题。物理指标的降低不一定线性对应感知质量的提升，需要用户研究等进一步验证。
-
-
 
 ## 原文 PDF
 

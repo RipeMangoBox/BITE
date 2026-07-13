@@ -46,8 +46,6 @@ claims:
 
 GELATO（Graph Edit distance Learning via Autoregressive neural combinaTorial Optimization）是一种基于图神经网络的自回归模型，用于近似求解图编辑距离（Graph Edit Distance, GED）问题。GED是NP-hard的组合优化问题，传统精确求解器难以处理超过20个节点的图，而经典启发式方法经常产生次优解。GELATO将GED求解建模为顺序决策过程，通过自回归方式逐步构建节点匹配，每一步的预测都基于之前的选择，从而能够捕捉复杂的结构依赖关系。实验结果表明，GELATO在所有数据集上的归一化平均绝对误差（nMAE）和精确命中率（EHR）指标均显著优于所有基线方法，并且能够在训练时未见过的更大图上保持领先性能。
 
-
-
 ### 2.1 问题定义
 
 图编辑距离（GED）定义为将一个图变换为另一个图所需的最小编辑操作成本。通过匹配公式化，GED可以表示为：
@@ -66,8 +64,6 @@ $$c(\mu) = \sum_{(u,v) \in \bar{\mu}} c_n(G_1, G_2, u, v) + \sum_{(u,v),(w,z) \i
 
 GELATO的核心洞察在于：一旦固定了一个匹配（如(u₁, v₁)）并将其解释为辅助边，原本不可区分的节点对（如(u₅, v₅)和(u₅, v₆)）就变得可区分了。因此，自回归模型可以做出更明智的选择。通过将GED求解建模为顺序决策过程，每一步的预测都基于之前的选择，从而能够捕捉复杂的结构依赖关系。
 
-
-
 ## 核心方法与创新机理
 
 GELATO的核心创新包括以下四个关键设计变更：
@@ -78,8 +74,6 @@ GELATO的核心创新包括以下四个关键设计变更：
 | 状态空间表示 | 使用完整的图表示，不进行约简 | 通过reduce函数移除已匹配且邻居也已匹配的节点，压缩状态空间 | Theorem 1 |
 | 训练监督信号处理 | 仅将最优匹配中的节点对作为正样本 | 考虑自同构类，将最优匹配中节点对的自同构类也视为正样本 | Lemma 3 |
 | 推理策略 | 单次贪婪选择 | 使用top-k集成策略，从多个起始匹配分支中选取最优解 | Section 4.4 |
-
-
 
 ![[assets/figures/papers/iclr26_0001_6ZTcLNmguc_Gelato_Graph_Edit_Distance_via_Autoregressive_Ne/figures/001_Figure_1.jpg]]
 *Figure 1: Conceptual visualization of GELATO. Graph matchings are generated in a step-by-step manner. In each step, GELATO is fed autoregressively the previous partial matching, and it predicts the next source-target node pair to be matched, until every source node has been mapped.*
@@ -95,8 +89,6 @@ GELATO的整体框架包含四个核心模块，形成一个端到端的自回�
 4. **自回归推理模块（Autoregressive Inference）**：逐步选择最高分的节点对进行匹配，并使用top-k集成策略探索多个起始分支。
 
 Figure 1展示了GELATO的自回归逐步匹配过程：在每一步，GELATO自回归地接收之前的局部匹配，并预测下一个要匹配的源-目标节点对，直到所有源节点都被映射。
-
-
 
 ### 5.1 GEDFM递归定义
 
@@ -131,8 +123,6 @@ $$o_{u,v} = \mathrm{MLP}\left(h_u^{\mathcal{L}} \| h_v^{\mathcal{L}}\right)$$
 ### 5.6 推理策略
 
 推理时采用贪婪顺序过程，并使用top-k集成策略：选择top-k个得分最高的起始节点对，每个起始对初始化一个独立的搜索分支，最终选取最优解。
-
-
 
 ## 实验与关键发现
 
@@ -201,14 +191,10 @@ Table 3显示GELATO的推理时间极短（每对图3-5毫秒），比GEDGNN、G
 - 对于每个数据集，所有方法使用相同的编辑成本函数。
 - 实验结果报告了五次独立运行的平均值和标准差，以确保统计可靠性。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0001_6ZTcLNmguc_Gelato_Graph_Edit_Distance_via_Autoregressive_Ne/figures/010_Table_2.jpg]]
 
 ![[assets/figures/papers/iclr26_0001_6ZTcLNmguc_Gelato_Graph_Edit_Distance_via_Autoregressive_Ne/figures/011_Table_2.jpg]]
 *Table 2: Solution quality on edgeunlabeled graphs. Eval. metrics in %. Table 3: Average inference runtime per graph pair (ms).*
-
-
 
 ## 定位与知识库关联
 
@@ -235,8 +221,6 @@ GELATO属于神经组合优化（Neural Combinatorial Optimization）领域，�
 3. 更复杂的推理策略（如beam search）能否进一步提升GELATO的性能？
 4. GELATO在具有不同特征空间的图之间进行迁移学习时，如何更好地泛化？
 5. GELATO的架构能否扩展到其他组合优化问题，如旅行商问题（TSP）或车辆路径问题（VRP）？
-
-
 
 ## 原文 PDF
 

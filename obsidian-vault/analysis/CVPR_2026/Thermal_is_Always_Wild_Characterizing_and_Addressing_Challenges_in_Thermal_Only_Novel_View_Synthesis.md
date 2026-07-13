@@ -53,8 +53,6 @@ claims:
 
 在 MSX、ThermalMix、MVTV、Lin et al.、Ye et al.、TINSD 六个公开数据集上，Wild Thermal 以仅 11 分钟的训练时间全面超越 NeRF、ThermalMix‑TS、Lin et al.、ThermoNeRF 及 Thermal3D‑GS 等基线方法，取得 SOTA PSNR 与 SSIM。消融实验证实，光度稳定化与发射 MLP 两者独立有效且高度互补：预处理将平均 PSNR 从 22.25 dB 提升至 23.01 dB，发射 MLP 进一步提升至 24.93 dB，完整系统达到 26.14 dB，各组件缺一不可。定性结果表明，本文方法在保持锐利边界与稳定背景温度的同时，有效消除了 Thermal3D‑GS 中常见的漂浮伪影。
 
-
-
 热红外成像在安防监控、自动驾驶、工业检测和夜间感知等场景中具有不可替代的价值——它直接捕获物体自身的热辐射，无需外部光源即可全天候工作。然而，与成熟的 RGB 新视角合成（NVS）技术相比，纯热成像驱动的三维重建与渲染仍然是一个几乎未被探索的领域。这一差距并非偶然：热成像数据携带一系列独特的物理与信号退化特性，使得直接迁移 RGB 领域的 NeRF 或 3DGS 方法面临系统性失败。
 
 ### 热成像数据的“野性”本质
@@ -84,8 +82,6 @@ claims:
 3. 将预处理与嵌入条件的外观建模相结合，可以在**不扭曲底层几何**的前提下稳定光度表现，避免现有方法中常见的“以几何畸变为代价换取光度拟合”的失败模式。
 
 基于这一洞察，本文提出 **Wild Thermal**——一个由光度稳定化预处理与嵌入条件发射 3DGS 组成的纯热成像 NVS 流水线，旨在以极低的计算开销（训练仅需约 11 分钟）实现跨数据集的鲁棒高保真热重建。
-
-
 
 ## 核心方法与创新机理
 
@@ -139,8 +135,6 @@ claims:
 ### 局限与开放性问题的创新启示
 
 当前方法的局限也为后续创新指明了方向。光度稳定化依赖于已知相机位姿和完整的序列帧，这限制了其在纯热成像 SLAM 场景中的应用——**热成像原生位姿估计**仍是一个开放挑战。此外，预处理在放大动态范围的同时也放大了传感器噪声，在极低纹理区域可能引入结构化伪影。这些局限暗示了下一阶段创新的可能方向：将光度稳定化与三维重建**联合优化**，使系统在缺乏完整序列先验时也能自适应调整；或引入**显式的噪声建模模块**，在增强对比度与抑制噪声之间取得动态平衡。
-
-
 
 ### 问题本质与设计动机
 
@@ -206,8 +200,6 @@ claims:
 
 相比于 **Thermal3D-GS**（物理启发的热成像高斯泼溅）和 **ThermalMix-TS**（基于 Instant-NGP 的快速 NeRF 变体）等方法，本文 pipeline 的核心区分点在于：(1) 在进入重建之前主动稳定输入光度，而非依赖网络自身消化辐射波动；(2) 将外观变化建模从“每高斯固定颜色”升级为“嵌入条件标量发射”，赋予了模型吸收帧间残余瞬变的表达能力。消融实验证实，这两个设计独立有效且高度互补——预处理将平均 PSNR 从 22.25 dB 提升至 23.01 dB，发射 MLP 进一步提升至 24.93 dB，完整系统达到 26.14 dB（Table 2）。
 
-
-
 ### 4.1 光度稳定化与对比度增强
 
 热红外视频序列存在严重的帧间辐射漂移，直接导致多视图几何一致性被破坏。本文提出一种轻量级预处理流水线，包含两个串联步骤：**光度稳定化**与**对比度增强**。
@@ -240,14 +232,8 @@ $$\hat{I}_{t}(x) = \begin{cases} T_{t}^{L}(x), & x \leq T_{t}^{\mu} \\ T_{t}^{U}
 
 该操作在扩宽动态范围的同时保留整体亮度水平，避免传统全局直方图均衡带来的过增强伪影。实验证实传统直方图均衡反而损害性能（见 Table S1），而 BBHE 能有效提升 SIFT 特征点数量并使空间频谱更接近 RGB 分布（Figure 3）。
 
-![[assets/figures/papers/paper_list_l2610_https_arxiv_org_abs_2603_20448/figures/003_Figure_3.jpg]]
-*Figure 3: Photometric stabilization and contrast enhancement (a) An input thermal frame, with less contrast and texture than the corresponding RGB image (b). Notice the photometric drift when compared to reference frame (c), which shows the same scene at a different time point. (d) Our invertible enhancement improves photometric inconsistency and image contrast. (e) Temporal mean intensity across frames showing reduced radiometric drift after stabilization. (f) Normalized spatial frequency spectrum with enhanced thermal data resembling RGB statistics. (g) Our preprocessing expands the effective dynamic range of thermal images, shown with pixel instensity distributions on a sample frame. (h) Improved...*
-
 ![[assets/figures/papers/paper_list_l2610_https_arxiv_org_abs_2603_20448/figures/010_Figure_S.2.jpg]]
 *Figure S.2: Spatial frequency characteristics of thermal versus RGB images. Thermal images generally exhibit weaker mid- and high-frequency components than RGB images. This is partly due to sensor-resolution limits, but also because heat diffuses across surfaces and through the surrounding air, producing the naturally smoother appearance typical of thermal scenes. As a result, fine texture and sharp edges are often diminished, reducing the highfrequency cues that NeRF and 3D Gaussian Splatting rely on for accurate geometry and appearance estimation. Our pipeline increases contrast and strengthens spatial gradients, making features more distinguishable while unavoidably amplifying noise and discretizati...*
-
-![[assets/figures/papers/paper_list_l2610_https_arxiv_org_abs_2603_20448/figures/012_Figure_S.4.jpg]]
-*Figure S.4: Revisit of*
 
 ---
 
@@ -293,21 +279,11 @@ $$\mathcal{L} = \lambda_{1} \mathcal{L}_{\mathrm{L1}} + \lambda_{2} \mathcal{L}_
 
 整个系统的因果链路清晰可追溯：**光度稳定化**抑制帧间均值漂移，为 COLMAP 初始化与 3DGS 训练提供一致的多视图监督；**BBHE 增强**提升动态范围，缓解梯度稀疏问题；**标量发射约束**防止模型将辐射波动误建模为视角效应；**嵌入条件 MLP** 吸收残余瞬变，使几何优化不受外观变化干扰。消融实验（Table 2）证实：预处理单独将平均 PSNR 从 22.25 dB 提升至 23.01 dB，发射 MLP 单独提升至 24.93 dB，二者组合达到 26.14 dB，各组件缺一不可。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2610_https_arxiv_org_abs_2603_20448/figures/001_Figure_1.jpg]]
-*Figure 1: Our method overcomes significant challenges in thermal images. Thermal data contain limited texture and lack multispectral cues, making correspondence estimation harder than in RGB. They also exhibit sensor-specific degradations, including (a) frame-to-frame photometric inconsistency from sensor heating, (b) softened transitions between hot and cold regions characteristic of microbolometer sensors, (c) vignetting that produces viewpoint-dependent attenuation, and (d) fixed-pattern noise visible as structured artifacts. Our method explicitly stabilizes the photometry in (a), while the effects in (b–d) are mitigated in our SOTA reconstructions (e) through multiview consistency enabled by a no...*
-
-
-
 ## 实验与关键发现
 
 ### 数据集与评估协议
 
 本文在六个公开热成像多视图数据集上进行评测：**MSX**、**ThermalMix**、**MVTV**、**Lin et al.**、**Ye et al.** 和 **TINSD**。这些数据集涵盖了从建筑立面到室内物体等多种场景，且在辐射稳定性与空间频率特性上存在显著差异（见 Figure 2）。所有方法均在已知相机位姿下训练与测试，评测指标采用 PSNR 和 SSIM。对比基线包括 **NeRF**、**ThermalMix-TS**（基于 Instant-NGP 的快速变体）、**Lin et al.**（RGB-热双分支 NeRF）、**ThermoNeRF** 和 **Thermal3D-GS**。所有对比方法均基于官方开源代码复现，缺失结果已向原作者索取；预处理对所有数据集采用统一参数，未进行场景特化调优。
-
-![[assets/figures/papers/paper_list_l2610_https_arxiv_org_abs_2603_20448/figures/002_Figure_2.jpg]]
-*Figure 2: Dataset-level radiometric and spatial-frequency characteristics. (a) Standard deviation of the relative mean-intensity change*
 
 ### 主实验结果
 
@@ -328,15 +304,9 @@ Table 1 给出了纯热成像新视角合成的全面定量对比。**Wild Therm
 
 Figure 7 通过平滑相机路径渲染实验，直观展示了光度一致性对高质量重建的促进机制。Thermal3D-GS 产生明亮的漂浮结构，这些结构在视角间漂移并严重损害几何稳定性。相比之下，Wild Thermal 的预处理与嵌入条件发射模型有效吸收了帧间辐射异常，未引入漂浮物，几何结构保持稳定。这一实验直接验证了本文核心洞察：**将热成像的帧间辐射不一致视为“野外观”（in‑the‑wild）外观变化，并通过物理约束的标量发射模型进行建模，是在不扭曲几何的前提下实现光度稳定的关键**。
 
-![[assets/figures/papers/paper_list_l2610_https_arxiv_org_abs_2603_20448/figures/008_Figure_7.jpg]]
-*Figure 7: Photometric consistency promotes high-quality reconstruction. We render a smooth camera path for our method (top) and Thermal3D-GS (bottom). Thermal3D-GS produces bright floating structures that drift across frames and then assemble into a copy of the photometrically inconsistent training frame (right) when the viewpoint aligns. Our preprocessing and embedding-conditioned emission model handle this outlier without introducing floaters, yielding stable geometry throughout the trajectory*
-
 ### 消融实验
 
 Table 2 和 Table S1 提供了详尽的消融分析，量化了各组件对性能的独立贡献与协同效应。
-
-![[assets/figures/papers/paper_list_l2610_https_arxiv_org_abs_2603_20448/figures/009_Table_2.jpg]]
-*Table 2: Ablation study. We demonstrate that our preprocessing algorithm and “in-the-wild” architecture (3DGS + Emission MLP) independently improve 3DGS performance, and combining them yields superior results. Additional analysis comparing our method to traditional histogram equalization and evaluating each preprocessing step is provided in Tab. S1*
 
 ![[assets/figures/papers/paper_list_l2610_https_arxiv_org_abs_2603_20448/figures/014_Table_S.1.jpg]]
 *Table S.1: Ablation study. We demonstrate that our preprocessing steps (constrast enhancement as an improvement over traditional histogram equalization, in combination with photometric stabilization) improve 3DGS performance, but not to the level of our method. We then demonstrate the effect of per-frame embedding ablation, with and without pre-processing*
@@ -350,8 +320,6 @@ Table 2 和 Table S1 提供了详尽的消融分析，量化了各组件对性�
 ### 失败模式与局限性
 
 尽管 Wild Thermal 在多个数据集上取得了 SOTA 性能，论文仍诚实报告了若干局限性。首先，方法假设相机位姿已知——在实际纯热成像场景中，位姿估计本身极具挑战性，通常需要 IMU 等外部传感器辅助。其次，光度稳定化与对比度增强在扩宽动态范围的同时，不可避免地放大了传感器噪声和离散化伪影；在极低纹理区域，这可能引入结构化瑕疵。此外，发射 MLP 虽能吸收大部分帧间辐射瞬变，但对极端的固定模式噪声或严重晕影可能仍无法完全消除。最后，模型尚未在实时推理约束下验证，且对超出所测数据集分布的传感器类型（如冷却型红外探测器）的泛化性尚未评估。这些局限性为后续研究指明了方向，包括热成像原生位姿估计、动态场景扩展以及更显式的辐射补偿机制等。
-
-
 
 ## 定位与知识库关联
 
@@ -404,8 +372,6 @@ Table 2 和 Table S1 提供了详尽的消融分析，量化了各组件对性�
 3. **动态场景扩展**：当前方法假设静态场景。热成像中运动物体（如行人、车辆）的温度变化与帧间辐射漂移耦合，如何解耦并同时保持帧间光度一致性？
 
 4. **外观嵌入的表达上限**：针对低纹理、大基线、严重辐射偏移等极端情形，当前嵌入条件外观建模的表达能力上限在哪里？是否需要更显式的物理辐射补偿模块（如传感器响应函数反演）作为补充？
-
-
 
 ## 原文 PDF
 

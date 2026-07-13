@@ -53,8 +53,6 @@ claims:
 
 在方法谱系中，VISTA-R1区别于 **VTool-R1**、**R1-VL**、**R1-Onevision**、**Perception-R1** 等近期工具/推理集成基线，其关键创新在于：(1) 构建了首个面向视觉工具集成推理的大规模交互式训练环境VISTA-Gym，而非仅在静态数据上训练；(2) 采用BC+在线RL的两阶段训练范式，使模型在真实交互反馈中学习动态工具协调；(3) 设计了格式感知的稀疏奖励，显式约束“思考-工具调用-答案”的结构化输出。该方法在知识库中定位为“面向VLM的工具增强推理智能体训练框架”，为开源模型缩小与商用模型在工具集成推理上的差距提供了可复现的训练方案。
 
-
-
 ### 视觉推理的范式瓶颈：从“看”到“算”的断裂
 
 视觉-语言模型（VLMs）在图像描述、物体识别等感知任务上已取得显著进展，但在需要精确量化、空间计算或结构化解析的复杂视觉推理任务（如几何问题求解、图表问答、地图分析）中，其表现仍远逊于人类。根本原因在于，VLMs的推理能力受限于其静态的视觉嵌入——模型只能“看”图像，却无法“计算”图像。例如，在几何问题中，模型需要测量角度、计算线段长度；在图表问答中，需要提取数据点并进行数值比较；在地图分析中，需要计算距离和方位。这些操作本质上超出了纯视觉编码的能力边界，必须借助外部工具（如OCR引擎、数学求解器、目标检测器）来完成。
@@ -90,8 +88,6 @@ claims:
 3. **稀疏但有效的奖励设计**：在缺乏中间步骤标注的情况下，设计格式感知的组合奖励，引导模型避免重复、保持结构有效，并最终给出正确答案。
 
 这一动机的落脚点是：通过规模化智能体强化学习，使小型开源VLM获得超越其体量的工具增强推理能力，甚至在某些任务上媲美大规模商用模型。
-
-
 
 ## 核心方法与创新机理
 
@@ -142,8 +138,6 @@ VISTA-R1最具说服力的创新证据来自消融实验：**同时启用推理�
 ### 6. 可扩展的交互式训练设施
 
 VISTA-Gym本身也是一项工程创新。它基于Ray构建高并发微服务架构，将计算密集型的VLM工具封装为HTTP服务，支持异步训练与多线程采样。该环境统一了7大类推理任务（覆盖13个公开数据集）和26种视觉工具（分为感知、图表理解、图表形式化、数学求解器四大家族），为工具集成推理的规模化训练提供了标准化基础设施。多任务与多工具训练的消融实验表明，这种多样性设计有效缓解了过拟合，提升了跨任务泛化能力（Figure 4d,e）。
-
-
 
 VISTA-R1 的整体 pipeline 围绕一个核心洞察展开：将视觉-语言模型的工具集成推理（Tool-Integrated Reasoning, TIR）建模为部分可观测马尔可夫决策过程（POMDP），并通过一个标准化、可执行的交互环境——**VISTA-Gym**——对模型进行两阶段训练，使其内化“思考→工具调用→答案”的推理协议。
 
@@ -210,8 +204,6 @@ $$R(U) = R_{\mathrm{rep}}(U) + R_{\mathrm{format}}(U) + R_{\mathrm{correct}}(U)$
 
 整个 pipeline 的端到端数据流可概括为：输入图像与问题 → VLM 骨干生成思考 → 动态选择并调用工具（通过 VISTA-Gym 标准化接口） → 环境执行工具并返回观察 → 模型基于观察继续推理 → 循环直至生成最终答案。训练信号来自 RL 阶段的稀疏组合奖励，驱动模型在交互中习得何时调用何种工具、如何解读工具返回、以及如何将工具结果融入推理链的能力。
 
-
-
 ### 1. 问题形式化：将工具集成推理建模为 POMDP
 
 VISTA-R1 将视觉-语言模型（VLM）的工具集成推理（Tool-Integrated Reasoning, TIR）过程建模为一个部分可观测马尔可夫决策过程（POMDP）。给定输入 $x$，模型策略 $\pi_\theta$ 生成一条由思考（thoughts）、动作（actions）和观察（observations）交错构成的轨迹 $\tau$：
@@ -268,16 +260,6 @@ $$R_{\mathrm{correct}}(U) = \mathbb{I}\{\widehat{y} = y\}$$
 
 VISTA-Gym 提供标准化的 Gymnasium 风格 API（`reset()` / `step()`），将 26 种视觉工具抽象为四大家族（感知、图表理解、图表形式化、数学求解器），并严格约束动作空间为可用工具集。环境执行工具调用并返回观察，形成多轮交互循环，为上述训练框架提供可验证的反馈信号。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2723_https_arxiv_org_abs_2511_19773/figures/001_Figure_1.jpg]]
-*Figure 1: Directly augmenting VLMs with tools significantly degrades accuracy (w/ T), yet intrinsic reasoning offers limited gains on complex VQA (w/ R). Supplying tool-selection prior knowledge and interleaving reasoning with tool execution improve performance (w/ T&R); gains are task-dependent for commercial VLMs, while small open-source VLMs remain particularly struggling*
-
-![[assets/figures/papers/paper_list_l2723_https_arxiv_org_abs_2511_19773/figures/004_Figure_3.jpg]]
-*Figure 3: Top tool call distribution of different tasks in SFT data*
-
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与因果验证
@@ -328,29 +310,15 @@ Figure 6（原文 Section 6.4）对工具调用错误的追踪显示，经过 VI
 
 尾部补丁课程学习（tail-patch curriculum）的策略效果在 Figure 7 中展示：**将性能从 69.54% 推至 71.27%**。该方法聚焦于“困难但可学习”的样本（即模型当前成功率低但并非完全不可解的尾部样本），避免了在已掌握样本上的无效训练和在完全无法解决样本上的浪费。
 
-![[assets/figures/papers/paper_list_l2723_https_arxiv_org_abs_2511_19773/figures/009_Figure_7.jpg]]
-*Figure 7: Training scaling from easy to hard*
-
 ### 轨迹质量与案例研究
 
 Figure 5 揭示了专家思维轨迹质量与长度的关系：**过短或过长的轨迹质量均较低，存在一个最优长度区间**，说明有效的工具集成推理需要适度的思考深度而非简单堆砌 token。Figure 8 的人类评估研究进一步证实，经过 RL 训练后的轨迹在连贯性、工具调用合理性和推理逻辑上均显著优于仅 SFT 的轨迹。
 
-![[assets/figures/papers/paper_list_l2723_https_arxiv_org_abs_2511_19773/figures/008_Figure_5.jpg]]
-*Figure 5: Quality of expert thinking trajectories by length*
-
-![[assets/figures/papers/paper_list_l2723_https_arxiv_org_abs_2511_19773/figures/010_Figure_8.jpg]]
-*Figure 8: Human study on trajectory quality*
-
 Table 4 提供了几何推理任务的案例研究，展示了 VISTA-R1-8B 在实际推理过程中的工具使用模式：模型能够自主选择适当的几何解析工具，将视觉输入转化为结构化表示，在此基础上进行逻辑推导并得出正确答案。这些案例直观体现了“感知→解析→推理”的闭环能力。
-
-![[assets/figures/papers/paper_list_l2723_https_arxiv_org_abs_2511_19773/figures/011_Table_4.jpg]]
-*Table 4: Case studies on geometric reasoning tasks with VISTA-R1-8B trained in VISTA-Gym*
 
 ### 实验公平性与局限说明
 
 本文未专门讨论模型公平性或偏见问题，实验主要聚焦于推理准确率的提升。训练计算开销较大，需 8 块 H200 GPU，且在适配不同骨干模型（如 InternVL3）时需要定制化处理视觉编码器与工具接口的对接。当前 Verifier 主要依赖终端正确性和结构有效性，缺乏对中间步骤语义的细粒度奖励，这可能限制了更复杂的长期工具集成推理策略的探索空间。
-
-
 
 ## 定位与知识库关联
 
@@ -391,8 +359,6 @@ VISTA-Gym 与 VISTA-R1 的适用边界由以下几个维度界定：
 2. **更大规模与更广动作空间**：将 VISTA-Gym 范式扩展到 70B+ 参数 VLM 或更丰富的工具动作空间时，GRPO 的群组归一化优势是否仍能保持低方差特性？
 3. **无完美专家轨迹的 RL 探索**：当前 BC 预热依赖 GPT-5 生成并过滤的专家轨迹。若移除这一依赖，RL 能否自主探索出更优甚至超越人类先验的工具使用策略？
 4. **跨模态扩展**：VISTA-Gym 的 POMDP 建模与可执行交互循环设计，能否迁移到视频理解、具身智能等多模态时序决策场景？
-
-
 
 ## 原文 PDF
 

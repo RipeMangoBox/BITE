@@ -157,13 +157,8 @@ $$\tau_{t} = K_{p}(q_{t}^{des} - q_{t}) + K_{d}(\dot{q}_{t}^{des} - \dot{q}_{t})
 
 **关键因果机制**：通用跟踪器在大规模多源数据上获得了丰富的运动先验，但在真实遥操作中因接口延迟（VR 端到端约 0.4 s，惯性动捕约 0.2 s，Fig. S5）、噪声和抖动而产生域偏移；残差适配器通过冻结主干、仅蒸馏接口特定的修正量，在保持通用性的前提下快速补偿这些偏移。决定性证据来自 Table V：Adapter (W) 在 VR 遥操作数据集上将全局锚点位置误差 $E_{AP}$ 从基础模型的 2.9352 m 降至 1.1940 m，同时 Table IV 显示其在 OOD 通用运动集上的成功率（77.25%）与基础模型（77.88%）几乎持平，验证了“适应不牺牲通用性”的核心设计目标。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l53_https_arxiv_org_abs_2602_08594v2/figures/003_Figure_2.jpg]]
 *Figure 2: MOSAIC System Overview. MOSAIC consists of a unified training–deployment pipeline for humanoid motion tracking and teleoperation. Training/Simulation aggregates heterogeneous multi-source motions, two-level adaptive resampling, policy training process, yielding a deployable policy that preserves generality while improving real-robot robustness. Deployment/Real Robot supports both offline motion replay and online teleoperation. Finally, RobotBridge provides a modular interface that enables consistent evaluation and portable deployment across platforms*
-
-![[assets/figures/papers/paper_list_l53_https_arxiv_org_abs_2602_08594v2/figures/001_Figure_1.jpg]]
-*Figure 1: MOSAIC in Action. MOSAIC enables a single humanoid policy to operate in two modes: offline motion replay (top) and online whole-body teleoperation from multiple wearable interfaces (bottom). In offline replay, the robot robustly tracks diverse and highly dynamic reference motions—walking, running, kicking, kungfu-style strikes, jumping, and squatting. In online teleoperation, MOSAIC faithfully mirrors real-time human motion streams and supports challenging contact-rich and high-agility behaviors, including mid-air jump turns, single-leg support, and jump-shot–style movements*
 
 ### 3.1 控制基础：关节空间PD控制
 
@@ -218,8 +213,6 @@ $$
 ### 3.6 部署框架：RobotBridge
 
 RobotBridge提供标准化的策略推理、仿真/机器人后端及底层控制器之间的接口抽象，支持离线运动回放与在线遥操作的无缝切换，并实现跨平台可移植部署（Fig. 2）。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l53_https_arxiv_org_abs_2602_08594v2/figures/005_Figure.jpg]]
 *Figure: (a) Quantitative Comparison of Data Source. (b) Quantitative Ablation of Reward Design and Training Paradigms Alongside Benchmarking with Prior Work*
@@ -295,16 +288,8 @@ Fig. 4 展示了高动态运动的定性对比。从左至右依次为 MOSAIC、
 
 > **注意**：关于系统在超过 10 分钟连续遥操作中的稳定性极限，以及多接口统一适配器的可行性，原文未提供充分实验证据，这些开放问题需要进一步验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l53_https_arxiv_org_abs_2602_08594v2/figures/007_Table.jpg]]
 *Table: IV. Evaluation results on Motion-X-Sub. ↓ denotes lower is better, ↑ denotes higher is better. TABLE V. Evaluation results on VR dataset*
-
-![[assets/figures/papers/paper_list_l53_https_arxiv_org_abs_2602_08594v2/figures/008_Table.jpg]]
-*Table: VI. Data scaling analysis on VR dataset*
-
-![[assets/figures/papers/paper_list_l53_https_arxiv_org_abs_2602_08594v2/figures/002_Table.jpg]]
-*Table: I. Dataset summary. We will open-source all highquality multi-source motion data collected in-house*
 
 ## 定位与知识库关联
 

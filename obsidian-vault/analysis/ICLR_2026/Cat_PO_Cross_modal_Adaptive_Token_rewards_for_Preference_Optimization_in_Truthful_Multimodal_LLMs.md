@@ -78,8 +78,6 @@ Cat-PO 属于**Token 级偏好优化**范畴，与现有方法的根本区别在
 
 **需注意的局限**：所有实验仅基于 RLHF-V 数据集，在其他多模态偏好数据上的泛化性有待检验；对抗样本（POPE adversarial）下性能有 2-4% 的轻微下降；可学习融合权重的尝试反而导致性能下降（Table 4），暗示奖励融合方式仍需进一步研究。
 
-
-
 多模态大语言模型（MLLM）在视觉问答和图像描述等任务中展现出令人瞩目的能力，但幻觉问题——即生成内容与视觉输入不一致——仍然是制约其可靠性的核心瓶颈。现有的偏好优化方法，如 DPO（Rafailov et al., 2023），通过在偏好数据上最大化正负响应的对数概率差来抑制幻觉，但其在解码阶段对响应中的每个 token 赋予相同权重，忽视了一个关键事实：不同 token 与视觉内容的关联程度存在显著差异。
 
 以图 1(a) 为例，当模型回答“桌上有笔记本电脑和杯子”时，内容词“laptop”（跨模态相似度 0.673）和“cup”（0.633）与视觉区域高度对齐，而功能词“a”（0.336）和“the”（0.160）的视觉关联则弱得多。然而标准 DPO 在优化时对所有 token 一视同仁——无论该 token 是真正基于图像生成的，还是模型凭空想象的幻觉内容。这种粗粒度的优化策略使得幻觉纠正不够精细，限制了模型真实性的进一步提升。
@@ -87,8 +85,6 @@ Cat-PO 属于**Token 级偏好优化**范畴，与现有方法的根本区别在
 这一观察引出了一个自然的假设：如果能在 DPO 中根据 token 与视觉内容的关联程度赋予差异化的奖励，是否可以更有效地抑制幻觉？图 1(b) 的初步实验提供了有力证据：仅对跨模态注意力奖励最高的前 50% token 应用 DPO，即可在 AMBER-F1 和 MM-Hal 幻觉率上获得改善；当对所有 token 按视觉相关性加权时，效果更为显著。这表明，token 级的视觉相关性信号确实能够引导更精准的幻觉纠正。
 
 然而，如何可靠地量化每个 token 的视觉相关性，并将其有效融入偏好优化框架，仍是一个未被系统解决的问题。现有方法要么依赖外部工具提取视觉线索，要么仅使用单一维度的跨模态信号，未能充分利用 MLLM 内在的多层次视觉理解能力。Cat-PO 正是针对这一缺口，提出利用 MLLM 自身的跨模态注意力机制，从全局、局部和语义三个层次计算 token 级的视觉相关性奖励，并将其整合到带 KL 正则化的加权 DPO 损失中，在不引入外部依赖的前提下实现更细粒度的幻觉抑制。
-
-
 
 ## 核心方法与创新机理
 
@@ -125,11 +121,6 @@ Figure 1(b) 的预实验提供了直接的动机证据：仅对奖励最高的�
 ### 与同类方法的本质区别
 
 相较于其他 token 级优化方法（如 **TPO**，Gu et al., 2024），Cat-PO 的独特之处在于**奖励信号的来源**：TPO 依赖外部信号或启发式规则，而 Cat-PO 完全利用 MLLM 内在的跨模态注意力与语义表示，无需额外模型或工具。相较于视觉引导的 **V-DPO**（Xie et al., 2024），Cat-PO 将视觉引导从响应级细化到 token 级，实现了更精准的幻觉定位与纠正。
-
-
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_iIbe6qDN0A/figures/002_Figure_2.jpg]]
-*Figure 2: Overview of our proposed Cat-PO framework: (1) The visual images are first projected into the feature space via CLIP+ViT, and the textual question/response tokens are embedded by LLM tokenizer. (2) Cross-modal attention and semantic similarity are extracted in the multi-modal transformer to hierarchically form the global, local, and semantic relevance scores. (3) Token weights are computed by normalizing these scores with positive/negative sample formulas. (4) The weights are integrated into the standard DPO loss to enhance alignment and mitigate hallucinations*
 
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_iIbe6qDN0A/figures/001_Figure_1.jpg]]
 *Figure 1: The motivation of our framework. (a) A visual question answering example where the model identifies "a laptop and a cup" on a table, with cross-modal attention heatmaps and cross-modal similarity scores indicating the model’s visual focus and word importance in the response. (b) A performance comparison of token-rewarded DPO, showing AMBER F1 (↑) improving and MM-Hal Hallucination Rate (↓) declining as the percentage of rewarded tokens increases. (c) A comparison of standard DPO versus our Cross-modal Adaptive Token-rewarded Preference Optimization (Cat-PO). The former uses a flat gradient distribution for maximal likelihood optimization. And the latter employs a targeted gradient distribut...*
@@ -177,8 +168,6 @@ $$s_i = \alpha \big[ 0.5 \cdot S_{\text{global},i} + 0.5 \cdot S_{\text{local},i
 ### 效率特征
 
 Cat-PO 的训练时间较标准 DPO 增加约 38%（平均每样本 2.9s vs. 2.1s），但峰值内存占用几乎不变（40.450 GB vs. 40.420 GB，+0.07%），整体计算代价可控（Table 5）。推理阶段无额外开销，因为 token 奖励计算仅在训练时进行。
-
-
 
 Cat-PO 的核心机制是在标准 DPO 损失中引入**分层视觉相关性奖励**与**Token 级 KL 正则化**，从而在解码阶段对每个响应 token 施加差异化的优化信号。整体流程可概括为三步：多层级视觉相关性计算、Token 权重映射、加权损失构建。
 
@@ -244,8 +233,6 @@ $$\mathcal{L}_{\mathrm{Cat-PO}} = \mathcal{L}_{\mathrm{wDPO}} + \mathcal{L}_{\ma
 
 整个框架的核心洞察在于：利用 MLLM 内在的跨模态注意力机制，在不引入外部工具的前提下，为每个 token 计算多层级视觉相关性奖励，并将其映射为差异化权重融入 DPO 优化。这使得模型能够对与视觉内容紧密关联的 token 施加更强的偏好信号，同时对幻觉 token 施加更重的惩罚，从而实现更细粒度的幻觉抑制。
 
-
-
 ## 实验与关键发现
 
 ### 主要结果：幻觉抑制与通用能力
@@ -294,8 +281,6 @@ Cat-PO 在 LLaVA-v1.5-7B 和 LLaVA-v1.5-13B 两个模型规模上均取得了领
 
 **Table 4** 对比了固定等权融合与可学习融合权重的效果。令人意外的是，可学习融合（Equation 11: $s_i = \gamma S_{global,i} + \delta S_{local,i} + (1-\gamma-\delta) S_{semantic,i}$）反而导致性能下降（MM-Hal Score 从 2.76 降至 2.55）。论文推测这可能源于 DPO 训练中可学习参数的不稳定性或过拟合，但未给出严格证明——**该点需要进一步研究确认**。
 
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_iIbe6qDN0A/figures/014_Table_4.jpg]]
-
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_iIbe6qDN0A/figures/013_Table_3.jpg]]
 *Table 3: CatPO performance on overall and adversarial subsets of POPE Li et al. (2023c). Table 4: Comparison of Cat-PO (general) and Cat-PO (with learnable fusion)*
 
@@ -304,8 +289,6 @@ Cat-PO 在 LLaVA-v1.5-7B 和 LLaVA-v1.5-13B 两个模型规模上均取得了领
 ### 训练效率与代价
 
 **Table 5** 对比了 DPO 与 Cat-PO 的训练开销：
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_iIbe6qDN0A/figures/019_Table_5.jpg]]
 
 - 平均每样本处理时间：DPO 为 **2.1s**，Cat-PO 为 **2.9s**（**+38%**）。
 - 峰值显存占用：DPO 为 **40.420 GB**，Cat-PO 为 **40.450 GB**（**+0.07%**，几乎不变）。
@@ -325,13 +308,6 @@ Cat-PO 在 LLaVA-v1.5-7B 和 LLaVA-v1.5-13B 两个模型规模上均取得了领
 3. **训练时间增加**：38% 的时间开销在实际部署中可能成为瓶颈，尤其在大规模数据或更大模型上。
 4. **评估指标局限**：主要指标集中在幻觉检测（CHAIR、Hal、MM-Hal），对生成多样性、流畅性、事实一致性等维度尚未全面评估。
 5. **数据与模型泛化性**：所有实验基于 RLHF-V 数据集和 LLaVA/Qwen 架构，其他多模态偏好数据或模型架构上的泛化性有待检验。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_iIbe6qDN0A/figures/025_Figure_10.jpg]]
-*Figure 10: Four comparative examples showing generation differences between DPO and our Cat-PO. (1) Beach horse riding: Cat-PO provides specific details about rider attire and horse movement. (2) Sand skateboarding: Cat-PO adds contextual information about terrain and activity. (3) Beach dogs: Cat-PO correctly identifies three dogs with distinct color patterns. (4) Children playing: Cat-PO notes precise subject count, positions, and presence of a toy*
-
-
 
 ## 定位与知识库关联
 
@@ -382,8 +358,6 @@ Cat-PO 在现有方法谱系中的定位可概括为：**基于内在跨模态�
 4. **与强化学习的结合**：Token 级奖励机制天然适合与 PPO 等 RL 方法结合，这种组合是否能进一步降低幻觉？其资源消耗和收敛特性如何？
 
 5. **评估维度的扩展**：除幻觉指标外，Cat-PO 对生成文本的多样性、流畅性、事实一致性以及复杂推理能力的影响需要系统评估。
-
-
 
 ## 原文 PDF
 

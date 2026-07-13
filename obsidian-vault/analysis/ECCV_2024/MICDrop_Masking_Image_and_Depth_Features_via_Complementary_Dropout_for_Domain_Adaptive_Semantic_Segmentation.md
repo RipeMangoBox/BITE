@@ -56,15 +56,11 @@ claims:
 - 边界IoU分析表明，MICDrop 对精细结构边界的提升（+1.6）远大于标准IoU（+0.7），直接验证了深度信息对边界感知的增强作用（Tab. 2）。
 - 互补掩码消融确认：跨层级一致互补掩码带来 +1.0 mIoU，而独立按层掩码反而下降 0.4 mIoU（Tab. 3a）。
 
-
-
 语义分割是场景理解的核心任务，而无监督域自适应（Unsupervised Domain Adaptation, UDA）旨在将源域（如合成数据）上训练的模型迁移到未标注的目标域（如真实街景）。当前UDA方法在细致结构（如杆、交通标志）和外观模糊物体的分割中表现不佳，容易出现过分割问题——即将同一对象错误地切割为多个碎片。这一瓶颈的根源在于，RGB特征对光照、纹理等域差异高度敏感，无法充分利用几何信息提供的精确边界线索。
 
 深度估计为语义分割提供了互补的几何先验：深度不连续性常与语义分割边界重合，而深度在大物体内部平滑一致。然而，现有方法对深度信息的利用存在两个关键缺口。其一，多数UDA方法将深度仅作为辅助任务（如多任务学习），而非直接参与特征表示学习，导致几何信息未能有效注入分割决策。其二，简单的特征相加或拼接无法充分挖掘跨模态互补性，模型容易过度依赖某一模态（通常是RGB），在RGB特征失效时缺乏鲁棒的几何支撑。
 
 针对上述缺口，本文提出**MICDrop**，其核心动机是：通过互补掩码策略强制网络同时利用RGB和深度两种模态，防止对单一模态的过度依赖。具体而言，MICDrop在训练时对RGB和深度特征图施加互补的块级Dropout——当RGB的某块特征被遮盖时，对应位置的深度特征保持可见，反之亦然。这一设计迫使网络在缺失某一模态信息时，必须利用另一模态进行重建，从而学习到真正跨模态的联合表示。结合全局深度引导交叉注意力与局部自注意力融合模块，MICDrop能够同时捕获大物体内部的深度一致性（抑制过分割）和边界处的深度不连续性（提升细粒度分割精度）。
-
-
 
 ## 核心方法与创新机理
 
@@ -96,8 +92,6 @@ MICDrop冻结预训练的RGB编码器参数，仅训练轻量级深度编码器�
 ### 创新效果验证
 
 在GTA→Cityscapes基准上，MICDrop将DAFormer的mIoU从68.3提升至70.1（+1.8），将HRDA从73.8提升至74.8（+1.0），并在MIC（HRDA）上取得75.9（+0.7），刷新SOTA（Tab. 1）。边界IoU分析进一步证实，MICDrop在边界IoU上的提升（+1.6）显著高于标准IoU（+0.7），直接验证了深度信息对精细结构分割的改善（Tab. 2）。
-
-
 
 MICDrop 是一种即插即用的跨模态域自适应语义分割框架，其核心思想是通过互补掩码策略强制网络同时利用 RGB 与深度几何信息，从而解决现有 UDA 方法对细致结构过分割和对域差异敏感的问题。整体架构由四个关键模块串联构成：**冻结的 RGB 编码器**、**轻量级深度编码器**、**跨模态特征融合模块**以及 **DAFormer 解码头**，如图 Fig. 2 所示。
 
@@ -142,8 +136,6 @@ $$\mathbf{M}_{\mathrm{depth}}(u,v) = 1 - \mathbf{M}_{\mathrm{rgb}}(u,v)$$
 
 源域和目标域图像分别通过学生编码器，在各特征分辨率上施加互补掩码后，经融合模块与解码头生成预测。整体训练沿用 DAFormer 的自训练范式与损失函数，深度编码器、融合模块和解码头参与参数更新，RGB 编码器保持冻结。MICDrop 在单张 GTX Titan X（12 GB）上约 11 小时即可完成训练，体现了其作为插件模块的轻量高效特性。
 
-
-
 MICDrop 的核心由两个可插拔模块构成：**跨模态特征融合模块**（Cross-Modal Feature Fusion）和**互补Dropout掩码模块**（Complementary Dropout Masking）。前者将深度几何信息注入RGB特征表示，后者在训练时强制网络同时依赖两种模态，防止退化为单模态捷径。
 
 ### 跨模态特征融合模块
@@ -181,8 +173,6 @@ $$\mathbf{M}_{\mathrm{depth}}(u,v) = 1 - \mathbf{M}_{\mathrm{rgb}}(u,v)$$
 掩码比例 $m_r^t$ 采用动态线性调度：训练初期保留较高比例的深度特征以加速深度编码器训练并提升特征质量，随着训练推进逐渐调整至均衡比例（Sec. 4, Fig. S2）。掩码块大小设为64（相对于输入图像）时取得最优70.1 mIoU，较大的块迫使网络必须利用另一模态重建被遮盖区域的信息，从而验证了跨模态学习的核心假设（Tab. S3）。
 
 消融实验（Tab. 3a）揭示了该策略的关键设计约束：跨所有层级的互补掩码相比无掩码基线带来+1.0 mIoU增益，而独立按层级掩码（即不同层级掩码模式不一致）导致性能下降0.4 mIoU。这证明跨层级一致的互补掩码对于有效跨模态特征学习至关重要。推理阶段不应用任何掩码，融合模块直接处理完整的RGB和深度特征。
-
-
 
 ## 实验与关键发现
 
@@ -231,8 +221,6 @@ MICDrop 对精细结构的分割改善在边界 IoU（Boundary IoU）指标上�
 
 3. **深度估计质量依赖。** 方法假设输入的深度估计具备合理质量。在深度估计本身存在严重伪影的场景（如透明表面、镜面反射区域），深度不连续性可能与语义边界产生错误对应，从而引入噪声。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2408_16478/figures/001_Figure_1.jpg]]
 *Figure 1: b) Qualitative Examples Fig. 1: Previous UDA methods such as MIC [23] struggle with the segmentation of fine structures (top row) and oversegmentation of difficult objects (bottom row). Therefore, we propose MICDrop to improve semantic segmentation UDA with depth estimates, which can capture fine structures and are consistent within object boundaries. We apply MICDrop to four different methods on the GTA→Cityscapes benchmark and show consistent improvements*
 
@@ -247,16 +235,6 @@ MICDrop 对精细结构的分割改善在边界 IoU（Boundary IoU）指标上�
 
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2408_16478/figures/009_Table.jpg]]
 *Table: S1: Effect of freezing the RGB encoder. The tables highlight the benefits gained from freezing the RGB encoder. This process notably decreases resource usage while also yielding slight performance improvements*
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2408_16478/figures/011_Table.jpg]]
-*Table: S2: Detailed analysis of the choice of image batches used for loss computation. The chosen composition of image batches used in the paper is highlighted in green*
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2408_16478/figures/013_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2408_16478/figures/010_Figure.jpg]]
-*Figure: Fig. S1: Classwise performance. This figure highlights not only improved average performance but also a reduction of strong deviations in classwise performances when using a frozen backbone. The dotted checkpoint line indicates the model’s performance at its initialization with pretrained weights*
-
-
 
 ## 定位与知识库关联
 
@@ -297,8 +275,6 @@ MICDrop 属于**基于深度几何线索的多模态域自适应语义分割**�
 3. **跨模态泛化能力。** 互补掩码策略能否泛化到其他模态（如热成像、激光雷达点云）并取得类似的交叉模态学习增益，是方法普适性的关键验证方向。深度与RGB之间的几何-外观互补关系在其他模态组合中可能呈现不同的特性。
 
 4. **与自训练方法的深度结合。** MICDrop 当前以特征级融合和掩码正则化为核心，与基于伪标签的自训练方法（如 ProDA、HRDA 的伪标签机制）形成松耦合。如何将互补掩码策略与伪标签质量评估、置信度加权等机制深度结合，可能进一步释放跨模态学习的潜力。
-
-
 
 ## 原文 PDF
 

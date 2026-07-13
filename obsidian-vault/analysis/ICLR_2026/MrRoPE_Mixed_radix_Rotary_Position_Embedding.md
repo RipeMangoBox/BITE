@@ -74,8 +74,6 @@ MrRoPE-Pro 在多项长上下文基准上取得显著提升：
 
 这些结果表明，递进式基数转换策略能系统性地突破 RoPE 的上下文窗口限制，为长文本大语言模型的部署提供了无需训练的实用方案。
 
-
-
 ### 超长序列处理中的位置外推困境
 
 大语言模型在预训练后通常受限于固定的上下文窗口长度。以旋转位置嵌入（RoPE）为例，其核心机制是通过不同频率的旋转矩阵为每个位置赋予唯一表示。然而，当推理时的序列长度超出训练长度，RoPE 高频维度的旋转周期不完整，导致位置信息进入“分布外”（out-of-distribution）状态——这类似于混合基数编码中高位数被截断的问题，使得模型无法正确区分远距离位置，注意力模式随之崩溃。
@@ -95,8 +93,6 @@ MrRoPE-Pro 在多项长上下文基准上取得显著提升：
 MrRoPE 的核心洞察在于：**将 RoPE 扩展重新理解为一种混合基数转换**。在基数系统中，不同“位”（digit）具有不同的基数权重；类似地，RoPE 的不同维度承担着不同粒度的位置编码功能。通过为各维度设计特定的基数扩展因子 $\lambda_j$，可以系统性地重新分配位置信息在频率谱上的分布——在保留高频细节的同时，为低频维度提供足够的扩展以避免外推崩溃。
 
 这一视角不仅统一了 PI、NTK‑aware Interpolation 和 YaRN 等方法——它们均可被映射为特定的基数转换策略——更重要的是，它揭示了一个关键调节变量：**中间维度上基数扩展因子 $\lambda_j$ 的分布策略**。正是这一策略，决定了模型能否在“保留局部细节”与“扩展全局范围”之间取得最优平衡。
-
-
 
 ## 核心方法与创新机理
 
@@ -140,8 +136,6 @@ $$\frac { \lambda _ { j } } { \lambda _ { j - 1 } } = \frac { c ^ { 2 } / r _ { 
 
 NTK-aware Interpolation 可视为对所有维度进行均匀基数缩放（$\lambda_j = S^{1/(D_r-1)}$），不区分高频与低频维度的不同需求。Position Interpolation (PI)（Chen et al., 2023）则通过均匀缩放位置索引进行扩展，同样缺乏维度特异性的调节。MrRoPE-Pro 首次在中间维度上引入递进式缩放，这是其在长上下文任务上显著超越 YaRN 和 NTK 方法的根本原因。
 
-
-
 ![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_1J63FJYJKg/figures/001_Figure_1.jpg]]
 *Figure 1: The overall framework of our work. Our key contributions are: (1) a unified theoretical framework for major RoPE-extensions, reflecting them into a specific radix conversion behavior; (2) a progressive radix conversion method MrRoPE-Pro, which outperforms other SoTA methods across various tasks*
 
@@ -158,8 +152,6 @@ MrRoPE 提出了一种基于混合基数转换（Mixed‑Radix Conversion）的�
 3. **旋转角度修正与注意力重缩放**：利用累积缩放因子 $\prod_{d=1}^{j-1} \lambda_d$ 调整各维度的基频，得到扩展后的旋转角 $m\theta'_j = (m \cdot b^{-(j-1)/D_r} / \prod_{d=1}^{j-1} \lambda_d) \bmod 2\pi$。最后，沿用 YaRN 的温度因子 $t$ 对注意力得分进行重缩放，以补偿高频维度的改变。
 
 **关键调节变量**：中间维度的基数扩展因子 $\lambda_j$ 的分布策略是决定外推性能的核心调节变量。MrRoPE‑Pro 采用的递进式策略（$\lambda_j < \lambda_{j+1}$）与 YaRN 的回归式策略（$\lambda_j > \lambda_{j+1}$）形成根本性对立。实验证据表明，递进式策略在保留高频细节的同时，避免了低频维度的外推崩溃，从而系统性地突破上下文窗口上限——MrRoPE‑Pro 将 RoPE 的理论上下文窗口上界从约 1K 提升至 28K（见 Figure 5），并在 128K Needle‑in‑a‑Haystack 测试中保持 85% 以上的召回率，而 YaRN 在 64K 后性能急剧下降。
-
-
 
 ### 3.1 混合基数RoPE（MrRoPE）统一框架
 
@@ -214,8 +206,6 @@ $$\frac { \lambda _ { j } } { \lambda _ { j - 1 } } = \frac { c ^ { 2 } / r _ { 
 
 该不等式表明 $\lambda_{j-1} > \lambda_j$，即YaRN的缩放因子单调递减，构成回归式基数转换。MrRoPE-Pro的递进式策略正是在此关键环节上做出了反向设计。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能验证
@@ -229,9 +219,6 @@ MrRoPE-Pro在多个长上下文基准上展现出对基线方法的系统性优�
 
 **Needle-in-a-Haystack压力测试。** Figure 4的热力图直观展示了两种方法在LLaMA3-8B上的性能差异：YaRN的有效上下文窗口约在64K后出现明显衰减，而MrRoPE-Pro将有效窗口扩展至近96K，在128K深度下仍保持85%以上的ROUGE-1召回率。这一结果直接验证了递进式基数转换在避免高频维度外推崩溃方面的有效性。
 
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_1J63FJYJKg/figures/005_Figure_4.jpg]]
-*Figure 4: In the Needle-IN-A-Haystack test, MrRoPE-Pro (right) effectively extends LLaMA3-8B’s context window to nearly 96K, which is much longer than the performance of YaRN (left)*
-
 **RULER综合基准。** Table 2汇总了13个子任务的检索得分。在LLaMA3-8B-Instruct的128K设置下，MrRoPE-Pro取得86.6的平均分，较YaRN（79.9）提升6.7分。值得注意的是，YaRN在64K后性能急剧下降，而MrRoPE-Pro的衰减曲线更为平缓，说明递进式策略有效缓解了中频维度的外推失效问题。
 
 ![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_1J63FJYJKg/figures/006_Table_2.jpg]]
@@ -243,9 +230,6 @@ MrRoPE-Pro在多个长上下文基准上展现出对基线方法的系统性优�
 *Table 3: Long context performance comparison on Infinite-Bench. In each subset, we randomly choose 100 samples with lengths ranging from 100K to 128K. MrRoPE-Pro outperforms YaRN under the same settings while approaching GPT-4 in some tasks (e.g., QA Dialogue, Math Find)*
 
 **LongBench-v2下游任务。** Table 5进一步验证了MrRoPE-Pro在多类型长文本理解（单文档QA、长对话历史理解、多文档QA、长上下文学习、结构化数据理解、代码仓库理解）上的广泛适用性，在两个模型上均保持对YaRN的领先。
-
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_1J63FJYJKg/figures/013_Table_5.jpg]]
-*Table 5: Resultes of LLaMA3-8B-Instruct and Qwen2.5-3B-Instruct on LongBenchV2 dataset. SD: Single-Document QA, LD: Long-dialogue History Understanding, MD: Multi-Document QA, LICL: Long In-context Learning, LSD: Long Structured Data Understanding, CU: Code Repository Understanding*
 
 ### 消融实验
 
@@ -263,13 +247,7 @@ MrRoPE-Pro在多个长上下文基准上展现出对基线方法的系统性优�
 
 **上下文窗口理论上界。** 基于RoPE Bound Theory的分析（Figure 5），MrRoPE-Pro通过提升余弦和函数B_θ(m)的零根范围，将理论上下文窗口上界从原始RoPE的约1K扩展至28K。这一理论结果与实验观测到的有效窗口扩展（NIAH测试中近96K）在趋势上一致，为递进式策略的有效性提供了机理性解释。
 
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_1J63FJYJKg/figures/008_Figure_5.jpg]]
-*Figure 5: The cosine sum of the rotation angles in each dimension, measuring the ability to give more attention to similar tokens than a random one. The base value and original context length are consistent with the settings of LLaMA2-7B*
-
 **中间维度注意力分布。** Figure 6展示了中间维度注意力得分随相对位置的分布。MrRoPE-Pro能更稳定地保持高注意力聚集，而YaRN在长距离下注意力分布趋于平坦。这表明递进式基数转换通过优化中间维度的特征表示，稳定了扩展后的注意力得分分布，从而维持了模型对远距离依赖的建模能力。
-
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_1J63FJYJKg/figures/009_Figure_6.jpg]]
-*Figure 6: Middle-partial attention score on extended context windows. For each relative position, we randomly selected 50 token pairs’ corresponding attention score calculated by the middle dimensions*
 
 ### 公平性说明
 
@@ -278,16 +256,6 @@ MrRoPE-Pro在多个长上下文基准上展现出对基线方法的系统性优�
 ### 局限性
 
 当前方法聚焦于训练自由的上下文窗口扩展，缺少微调实验限制了与xPOS、LongRoPE等需要训练的扩展方法的直接对比。此外，混合基数转换思想高度依赖RoPE机制本身，其能否推广至其他位置编码方案仍是一个开放问题。理论分析仅在LLaMA2-7B设置下验证，未在其他更大规模模型或非常见基频配置下系统评估。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_1J63FJYJKg/figures/003_Figure_3.jpg]]
-*Figure 3: The cumulative scaling factor s _ { d } of different RoPE extension methods across varying dimension index.(Scale-up to 16x and 4x)*
-
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_1J63FJYJKg/figures/012_Table_4.jpg]]
-*Table 4: Perplexity scores of LLaMA2-7B-chat-hf on proofpile dataset. The best and second best results are boldfaced and underlined respectively*
-
-
 
 ## 定位与知识库关联
 
@@ -342,8 +310,6 @@ MrRoPE 提出了两种训练-自由的扩展策略：
 - 混合基数转换框架能否被证明是最优的 RoPE 扩展方式，还是仅作为现有方法的一种重新诠释？
 - 对于任意模型和上下文扩展长度，是否存在理论指导的自动 $\lambda$ 策略搜索算法，而非手工设计的递进式方案？
 - 该框架是否能无缝结合微调以进一步突破理论编码上限，并与长上下文适配器等方法结合？
-
-
 
 ## 原文 PDF
 

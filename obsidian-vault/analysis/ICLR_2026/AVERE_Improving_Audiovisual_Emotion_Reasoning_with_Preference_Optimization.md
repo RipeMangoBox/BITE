@@ -49,8 +49,6 @@ claims:
 
 在作者提出的 **EmoReAlM** 基准上，AVEm-DPO 平均准确率达 83.3%，相对基模型提升 28.0%（Table 13）。在 DFEW、RAVDESS、MER2023 和 EMER 等现有基准上，AVEm-DPO 均取得最优零样本性能（Table 2）。用户评估中，AVEm-DPO 在情感描述、线索关联和不一致性方面分别以 54.74%、43.35% 和 4.67% 的比例被选为最佳（Table 4）。
 
-
-
 ### 2.1 现有方法的不足
 
 现有视听 MLLM 在情感推理中存在两类关键错误（Figure 1）：
@@ -66,8 +64,6 @@ claims:
 
 EmoReAlM 基准包含 4000 个人工验证的多选题，覆盖 2649 个唯一视频（Table 1），随机准确率基线为 25%（基础推理）和 50%（模态一致性和压力测试）。
 
-
-
 ## 核心方法与创新机理
 
 AVEm-DPO 的核心创新在于构建细粒度的多模态偏好对并引入文本先验正则项，具体包括：
@@ -77,8 +73,6 @@ AVEm-DPO 的核心创新在于构建细粒度的多模态偏好对并引入文�
 2. **基于情感的反应偏好（ERP）**：为每个选择的响应构建两种加权拒绝响应——视频相关虚假关联响应（\(y_l^{vr}\)）和情感相关幻觉响应（\(y_l^{er}\)），分别抑制虚假关联和幻觉。
 
 3. **文本先验去偏（TPD）**：在奖励函数中减去文本仅输入的对数概率，惩罚模型对纯文本先验的过度依赖，从而消除线索幻觉。
-
-
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_td682AAuPr_AVERE_Improving/figures/001_Figure_1.jpg]]
 *Figure 1: Existing MLLMs (i) include spurious associations between AV cues and emotions – reasoning errors (blue highlight) and (ii) hallucinate AV cues to explain emotions – perception errors (red highlight). AV: audiovisual.*
@@ -95,8 +89,6 @@ AVEm-DPO 的整体框架如 Figure 4 所示，包含以下模块：
 训练流程：
 - 使用 MAFW 和 MER2025 Track-1 训练集作为源数据集，通过 Gemini 2.5 Flash 自动生成偏好数据，共 41687 个偏好样本。
 - 训练超参数：学习率 5e-7，batch size 2 per GPU，8×H100 GPU，β=0.1，λ_av=1.0，β_er=β_vr=0.5，γ_TPD=0.2，LoRA rank 8 scale 4，梯度累积 4 步。
-
-
 
 ### 5.1 标准 DPO 框架
 
@@ -164,14 +156,11 @@ r(a,v,x,y) = \beta \log \frac{\pi_\theta(y|a,v,x)}{\pi_{\mathrm{ref}}(y|a,v,x)} 
 \mathcal{L}_{\mathrm{AVEm-DPO}} = \mathcal{L}_{\mathrm{DPO-TPD}}^{y} + \lambda_{av} \mathcal{L}_{\mathrm{DPO}}^{av-prompt}
 \]
 
-
-
 ## 实验与关键发现
 
 ### 6.1 主要结果
 
 **Table 2: 零样本性能对比**
-
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_td682AAuPr_AVERE_Improving/figures/006_Table_2.jpg]]
 *Table 2: Zero-shot performance comparison of different methods on existing audiovisual emotion recognition benchmarks. Mod. are the modalities input to the model with the prompt. A: Audio, V:Video, T: Text Subtitles. ‡: evaluation without text subtitle input.*
@@ -202,7 +191,6 @@ r(a,v,x,y) = \beta \log \frac{\pi_\theta(y|a,v,x)}{\pi_{\mathrm{ref}}(y|a,v,x)} 
 
 **Table 5: 组件消融**
 
-
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_td682AAuPr_AVERE_Improving/figures/013_Table_5.jpg]]
 *Table 5: Ablation study over different components of the proposed AVEm-DPO approach. PMP: Prompt-based Modality Preference, ERP: Emotion-based Response Preference, TPD: Text Prior Debiasing.*
 
@@ -223,7 +211,6 @@ r(a,v,x,y) = \beta \log \frac{\pi_\theta(y|a,v,x)}{\pi_{\mathrm{ref}}(y|a,v,x)} 
 ### 6.3 用户评估
 
 **Table 4: EMER 用户评估**
-
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_td682AAuPr_AVERE_Improving/figures/008_Table_4.jpg]]
 *Table 4: User evaluation on EMER.*
@@ -250,16 +237,11 @@ r(a,v,x,y) = \beta \log \frac{\pi_\theta(y|a,v,x)}{\pi_{\mathrm{ref}}(y|a,v,x)} 
 - γ_TPD=0.1 时幻觉样本性能显著提升，γ_TPD>0.2 时饱和。
 - λ_av>1.0 时 PMP 性能饱和。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_td682AAuPr_AVERE_Improving/figures/004_Table_1.jpg]]
 *Table 1: EmoReAlM Benchmark Statistics.*
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_td682AAuPr_AVERE_Improving/figures/007_Table_3.jpg]]
 *Table 3: Performance comparison of different methods on the proposed EmoReAlM Benchmark.*
-
-
-
 
 ## 定位与知识库关联
 
@@ -302,8 +284,6 @@ AVEm-DPO 在以下方面填补了现有方法的空白：
 - TPD 中 γ_TPD 的最优值是否与模型规模或数据集有关？
 - AVEm-DPO 是否能在保持通用能力的同时提升情感推理？
 - 如何减少对大规模人工验证的依赖？
-
-
 
 ## 原文 PDF
 

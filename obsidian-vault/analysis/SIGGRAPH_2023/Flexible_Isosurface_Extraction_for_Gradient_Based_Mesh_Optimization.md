@@ -343,9 +343,6 @@ Table 7 和 Table 8 提供了完整的性能画像。FlexiCubes 的等值面提�
 
 **关键结论**：FlexiCubes 的计算开销是“固定成本”而非“比例成本”——它不随下游任务复杂度增长而放大，因此在实际应用中几乎可以忽略。
 
-### 补充图表
-
-
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2308_05371/figures/002_Table_1.jpg]]
 *Table 1: Taxonomy of isosurfacing methods. Grad means gradient-based based optimization is effective in practice, and Uniform means the resulting tessellations are generally uniform without sliver triangles*
 

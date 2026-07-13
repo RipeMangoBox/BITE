@@ -54,8 +54,6 @@ claims:
 
 在方法谱系上，PromptLoop 位于提示优化与强化学习的交叉点：它改变了四个关键设计槽位——对齐目标从直接微调模型参数转向动态优化提示文本（冻结扩散模型）、反馈机制从无反馈或仅终态反馈转向时间步感知的隐空间反馈、训练策略从监督学习转向在线 GRPO 强化学习、推理开销通过稀疏优化策略控制在 23% 以内。这一框架为扩散模型对齐提供了一条兼具有效性与灵活性的新路径。
 
-
-
 扩散模型在文本到图像生成领域取得了显著进展，但其输出质量与人类偏好之间的对齐仍面临根本性挑战。用户提供的自然语言提示往往无法精确传达视觉意图，导致生成结果与人类期望之间存在系统性偏差。解决这一问题的现有路径可大致分为两类：**参数级对齐**与**提示级对齐**，两者各自存在难以调和的矛盾。
 
 ### 参数级对齐的困境：泛化性、组合性与奖励破解
@@ -91,8 +89,6 @@ claims:
 - **泛化性与组合性**：冻结扩散模型权重，仅训练提示优化策略，使其能够泛化到未见过的扩散模型（包括flow-matching架构），并与现有对齐方法正交组合；
 - **抗过优化能力**：隐空间反馈为策略模型提供了对生成过程的细粒度感知，有助于缓解奖励破解和语义漂移。
 
-
-
 ## 核心方法与创新机理
 
 PromptLoop 的核心创新在于将扩散模型的对齐问题从**参数空间**迁移到**提示空间**，并通过**时间步感知的隐空间反馈闭环**，实现了功能上等价于扩散模型 RL、但保留即插即用灵活性的全新范式。其关键创新点可从以下四个维度解构：
@@ -122,8 +118,6 @@ PromptLoop 采用在线的 GRPO（Group Relative Policy Optimization）训练策
 ### 4. 稀疏优化策略：兼顾对齐效果与推理效率
 
 尽管闭环 MDP 要求在多个时间步进行提示优化，PromptLoop 通过稀疏优化策略将额外推理开销控制在可接受范围内。在 5 步提示优化的设置下，总推理时间仅从 15 秒增加至约 18 秒（增幅约 23%），对用户体验影响很小（Table 4）。此外，策略模型学习到扩散过程的转移动态后，可在推理时提前生成所有时间步的优化提示，使扩散过程无中断地进行。
-
-
 
 PromptLoop 的整体设计围绕一个核心洞察展开：将提示优化建模为闭环马尔可夫决策过程（MDP），使多模态大语言模型（MLLM）策略能够在去噪过程的每个时间步上，根据隐空间状态迭代优化提示文本。这一设计在功能上等价于直接对扩散模型进行参数级强化学习微调，同时保留了提示方法即插即用的灵活性、泛化性和组合性。
 
@@ -166,8 +160,6 @@ Figure 3 揭示了 PromptLoop 与扩散模型 RL 之间的结构性类比与关�
 
 框架的核心优势在于其即插即用特性：策略模型仅在原始扩散模型环境中训练一次，即可直接应用于多种已对齐的基线方法（如 **Diffusion-DPO**、**ReFL** 等）和未见过的扩散模型（包括 flow-matching 模型如 **FLUX.1-dev**），无需重新训练。这一特性源于提示优化与参数优化的解耦——策略模型保持固定大小，通过调控文本输入而非模型权重来实现对齐。
 
-
-
 ### 3.1 闭环MDP形式化
 
 PromptLoop 将提示优化建模为一个有限时域的马尔可夫决策过程（MDP），其状态空间、动作空间和转移动态与扩散模型的去噪过程深度耦合。该形式化的核心洞察在于：**通过在每个去噪时间步引入隐空间反馈，提示优化在功能上等价于对扩散模型参数的强化学习微调，同时保留了提示方法的即插即用特性**。
@@ -206,13 +198,6 @@ $$\hat{\pmb{x}}_t = \frac{1}{\sqrt{\bar{\alpha}_t}} \big( \pmb{x}_{t+1} - \sqrt{
 
 为控制推理开销，PromptLoop 并非在每个去噪步都调用策略模型。实验表明，在 50 步去噪过程中仅进行 5 次提示优化（均匀分布），即可实现大部分性能增益，同时将总推理时间从 15 秒仅增加至约 18 秒（增加约 23%）。此外，训练收敛后的策略模型可以在推理前预先计算所有时间步的优化提示，使扩散过程无需中断。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2337_https_arxiv_org_abs_2510_00430/figures/003_Figure_3.jpg]]
-*Figure 3: Structural analogy and key differences in MDP formulation between Diffusion RL and proposed framework. Latent feedback establishes a functional correspondence with Diffusion RL, while PromptLoop diverges by adjusting the diffusion dynamics through timestep-aware prompts as actions*
-
-
-
 ## 实验与关键发现
 
 ### 核心实验设计
@@ -220,9 +205,6 @@ $$\hat{\pmb{x}}_t = \frac{1}{\sqrt{\bar{\alpha}_t}} \big( \pmb{x}_{t+1} - \sqrt{
 PromptLoop 的实验设计围绕三个核心目标展开：验证闭环提示优化的对齐有效性、证明其与现有方法的正交组合能力、以及测试其跨模型的泛化性能。实验采用 ImageReward 作为主要单一奖励信号，并在 SDXL 和 SD1.5 两个主流扩散模型上进行评估。复合奖励实验则引入 Aesthetic Score 和 CLIP Score 等多维度指标，在 SDXL-turbo 上验证方法对多目标对齐的适应性。
 
 策略模型基于 Qwen2.5-VL-3B 初始化，使用 GRPO 算法在 4 块 NVIDIA A100 (80GB) GPU 上训练约 3 天。扩散模型和奖励模型在训练过程中完全冻结，作为黑箱环境组件。推理时采用稀疏优化策略，仅在 5 个关键时间步进行提示优化，将额外推理时间控制在 23% 以内（约 18 秒/图，见 Table 4）。
-
-![[assets/figures/papers/paper_list_l2337_https_arxiv_org_abs_2510_00430/figures/009_Table_4.jpg]]
-*Table 4: Inference time analysis showing minimal runtime overhead of the proposed method (A100×1, batch size = 8)*
 
 ### 单一奖励对齐：主结果
 
@@ -269,31 +251,17 @@ Table 6 展示了策略模型在未见过的扩散模型上的零样本泛化能
 
 Table 5 揭示了提示词在不同时间步的演变模式：早期时间步（高噪声阶段）的优化提示倾向于强调整体氛围和风格属性；中间时间步逐步扩展为具体细节描述；后期时间步则维持或微调这些细节。Figure 11 显示提示长度随优化步数平缓增长，未出现灾难性膨胀或超出文本编码器限制。Figure 12 的语义漂移分析表明，BERTScore-recall 和 LLM-based recall 均保持在较高水平，核心用户意图在优化过程中得到良好保留。
 
-![[assets/figures/papers/paper_list_l2337_https_arxiv_org_abs_2510_00430/figures/014_Table_5.jpg]]
-*Table 5: Comparative analysis of prompt evolvement at different timesteps. Early prompts emphasize broad atmospheric qualities, intermediate prompts expand into concrete details, and later prompts either preserve these specifics or revert to prototypical descriptors*
-
-![[assets/figures/papers/paper_list_l2337_https_arxiv_org_abs_2510_00430/figures/015_Figure_11.jpg]]
-*Figure 11: Token counts of raw and refined prompts across improvement steps. Prompt length increases gradually without catastrophic growth or exceeding the text encoder limit (ImageReward task)*
-
-![[assets/figures/papers/paper_list_l2337_https_arxiv_org_abs_2510_00430/figures/016_Figure_12.jpg]]
-*Figure 12: Quantitative analysis of semantic drift during prompt refinement. Overall semantic similarity (BERTScore-recall) shows minor changes, while core user intent (LLM-based recall) is well preserved (1.0 indicates identical semantics; ImageReward task)*
-
 ### 失败模式与局限
 
 尽管 PromptLoop 在多项指标上表现优异，仍需注意以下局限：
 
 1. **奖励模型依赖性**：方法的优化方向完全由奖励模型决定。Figure 4 的定性对比显示，ReFL 虽然获得较高奖励分数，但存在明显的奖励破解现象（生成图像过度迎合奖励模型的浅层特征）。PromptLoop 通过视觉反馈机制部分缓解了这一问题，但无法从根本上纠正奖励模型的系统性偏差。
 
-![[assets/figures/papers/paper_list_l2337_https_arxiv_org_abs_2510_00430/figures/007_Figure_4.jpg]]
-*Figure 4: Qualitative comparison of single-reward alignment, illustrating improvements over baseline methods. (SDXL & ImageReward)*
-
 2. **训练资源需求**：4 块 A100 GPU 训练 3 天的资源门槛对学术研究团队构成一定障碍。策略模型的蒸馏或轻量化可能是降低训练成本的可行方向。
 
 3. **推理延迟的固有增加**：尽管 23% 的额外时间开销在可接受范围内，但在实时或大规模生成场景下仍需进一步优化。稀疏优化步数的自适应选择（根据任务复杂度动态调整）可能是一个改进方向。
 
 4. **定性评估的局限性**：现有自动评估指标（如 ImageReward）可能未能完全捕捉人类主观偏好。部分定性结果显示，高奖励分数并不总是对应更符合人类审美的图像，提示需要更全面的评估体系。
-
-
 
 ## 定位与知识库关联
 
@@ -364,8 +332,6 @@ PromptLoop 与两类基线方法的核心差异体现在三个维度：
 4. **多目标偏好冲突的解决**：在同时兼顾美观性、安全性、多样性和文本对齐度的复合奖励场景下，不同奖励函数之间可能存在冲突（如高美观性可能导致多样性下降）。如何设计奖励聚合机制或帕累托优化策略，避免优化方向的相互抵消，是一个重要的开放问题。
 
 5. **评估指标的局限性**：现有自动评估指标（如 ImageReward、Aesthetic Score）与人类主观判断之间的 gap 尚未完全弥合。开发更鲁棒的、能检测奖励破解现象的评估基准，对于推动该领域的发展至关重要。
-
-
 
 ## 原文 PDF
 

@@ -61,8 +61,6 @@ claims:
 
 **方法谱系与知识库定位。** AC3D建立在冻结的VDiT主干（11.5B参数，32个DiT块）之上，采用ControlNet风格的轻量级相机分支进行条件注入。与现有相机控制方法相比，**MotionCtrl**和**CameraCtrl**基于U‑Net架构，**VD3D**则探索了FIT主干及ControlNet方案；AC3D的独特贡献在于**从信号频谱角度重新审视条件注入的时空范围**，而非设计更复杂的条件编码器或注入机制。该分析框架具有普适性——在CogVideoX上的补充实验验证了相机运动低频偏重的结论跨架构成立（Figure 7, Figure 8）。
 
-
-
 视频生成模型近年来取得了显著进展，特别是基于扩散Transformer（DiT）的大规模文本到视频模型，已能合成具有丰富视觉细节和复杂场景动态的高质量视频。然而，将这些预训练模型转化为精确可控的创作工具仍面临关键挑战：**如何在引入相机控制的同时，不损害合成内容的视觉质量与场景动态性？**
 
 ### 问题现状：相机控制的精度-质量权衡
@@ -93,8 +91,6 @@ AC3D通过系统的实证分析，揭示了上述瓶颈的三个深层原因：
 - **数据域解耦**：引入20K动态场景但固定相机的视频作为补充训练数据，显式解耦相机运动与场景动态的虚假关联。
 
 这一框架不仅实现了更精确的相机控制（相机跟随度提升30%），同时显著改善了视觉质量（FID/FVD平均提升14%）和场景动态性（分布外FID改善17%），从根本上解决了现有方法的权衡困境。
-
-
 
 ## 核心方法与创新机理
 
@@ -139,8 +135,6 @@ AC3D的核心创新在于**重新定义了相机控制信号在视频扩散模�
 ### 创新本质总结
 
 AC3D的创新不在于提出新的条件注入机制，而在于**通过分析VDiT内部表征与扩散动态，揭示了相机控制的“最小充分作用域”**——仅需在去噪早期的浅层注入相机条件即可实现精确可控。这一“减法式”设计哲学直接回应了相机控制与视觉质量之间的根本性权衡，使AC3D在相机跟随精度（TransErr降低15%）与视觉保真度（FID/FVD平均改善14%）两个维度上同时超越强基线VD3D (DiT)。
-
-
 
 ![[assets/figures/papers/paper_list_l18_AC3D_Analyzing_and_Improving_3D_Camera_Control_in_Video_Diffusion_Transf/figures/001_Figure_1.jpg]]
 *Figure 1: Camera-controlled video generation. Our method enables precise camera controllability in pre-trained video diffusion transformers, allowing joint conditioning of text and camera sequences. We synthesize the same scene with two different camera trajectories as input. The inset images visualize the cameras for the videos in the corresponding columns. The left camera sequence consists of a rotation to the right, while the right camera visualizes a zoom-out and up trajectory*
@@ -188,8 +182,6 @@ AC3D 的训练数据由两部分组成：
 - 基线方法通常向所有 32 个 DiT 块注入相机条件，并在全时间步范围内进行条件控制；
 - AC3D 将条件注入限定在前 8 个块和前 40% 去噪步，使训练参数量减少约 4 倍，训练与推理加速约 15%，同时视觉质量提升约 10%。
 
-
-
 ### 整体架构：VDiT‑CC
 
 AC3D 构建于冻结的大规模视频扩散 Transformer（VDiT，11.5B 参数，32 个 DiT 块，隐维度 4096）之上，采用 ControlNet 风格的轻量级分支注入相机条件。该分支由三个核心模块串联构成：
@@ -215,8 +207,6 @@ RealEstate10K 的 COLMAP 重建与真实度量尺度之间存在不一致，直�
 $$\hat{\lambda} = \arg\min_{\lambda} \mathbb{E}_{f \sim F} | \lambda D_c^{f} - D_m^{f} |$$
 
 其中 $D_c^{f}$ 和 $D_m^{f}$ 分别为帧 $f$ 的 COLMAP 深度和度量深度。消融表明，不进行重标定会使 RE10K 上 FVD 增加 4.65，视觉质量显著下降。
-
-
 
 ## 实验与关键发现
 
@@ -278,18 +268,8 @@ Table 2的消融部分逐项验证了AC3D各设计选择的因果贡献：
 4. **动态数据的标注依赖**：当前动态固定相机视频数据集依赖人工筛选，大规模自动化构建方法仍有待探索。
 5. **深度估计误差传递**：度量尺度重标定虽然缓解了COLMAP深度与真实尺度的不一致，但深度估计本身的误差仍可能影响绝对相机轨迹的精确性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l18_AC3D_Analyzing_and_Improving_3D_Camera_Control_in_Video_Diffusion_Transf/figures/010_Figure_8.jpg]]
 *Figure 8: (b) Motion spectral volumes of VDiT’s generated videos for different diffusion timesteps (left) and their ratio w.r.t. the motion spectral volume at t = 0 (i.e., a fully denoised video). Figure 8. How camera motion is modeled by diffusion (CogVideoX)? As visualized in Figure 4a and Figure 3, the motion induced by camera transitions is a low-frequency type of motion. We observe that a video DiT creates low-frequency motion very early in the denoising trajectory: Figure 4b (left) shows that even at t=0.96 (first ≈4% of the steps), the low-frequency motion components have already been created, while high frequency ones do not fully unveil even till t=0.5. We found that controlling the camera p...*
-
-![[assets/figures/papers/paper_list_l18_AC3D_Analyzing_and_Improving_3D_Camera_Control_in_Video_Diffusion_Transf/figures/012_Figure_9.jpg]]
-*Figure 9: Comparing rectified flow noise schedules: (orange) vanilla standard logit-normal noise schedule proposed by [30] and used for baseline experiments; (purple) biased but non-truncated noise schedule; (pink) biased and truncated noise schedule*
-
-![[assets/figures/papers/paper_list_l18_AC3D_Analyzing_and_Improving_3D_Camera_Control_in_Video_Diffusion_Transf/figures/013_Figure_10.jpg]]
-*Figure 10: Our annotations collected for 200 randomly generated videos from VDiT and used in our camera motion analysis in Section 3.3*
-
-
 
 ## 定位与知识库关联
 
@@ -341,8 +321,6 @@ AC3D的改进并非简单的工程优化，而是源于对视频扩散模型中�
 4. **低频建模的进一步优化**：如果进一步提高去噪早期低频信号的建模精度（例如通过专门的损失函数或更精细的时间步调度），是否会带来相机控制效果与动态场景质量的二次提升？
 
 5. **分析框架的推广**：AC3D的分析框架——通过运动频谱分解识别信号频段，再据此限定条件注入的作用域——能否推广到其他运动控制任务（如物体轨迹控制、人体动作控制），在保持合成质量的同时实现精确可控？
-
-
 
 ## 原文 PDF
 

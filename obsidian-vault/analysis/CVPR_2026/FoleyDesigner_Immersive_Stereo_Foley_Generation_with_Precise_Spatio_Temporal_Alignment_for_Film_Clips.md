@@ -52,8 +52,6 @@ FoleyDesigner 的核心洞察在于将专业拟音工作的三级流程自动化
 
 在方法谱系上，FoleyDesigner 区别于以文本/图像为条件的立体声生成方法（如 **Stable Audio Open**、**SpatialSonic**、**See2Sound**），以及单声道拟音方法（如 **Diff-Foley**、**FoleyCrafter**），首次实现了帧级时空对齐的立体声拟音，并完整覆盖从脚本分解到专业混音的全流程。
 
-
-
 电影后期音频制作中，拟音（Foley）是将视觉叙事转化为听觉沉浸感的关键环节。专业拟音师需要在录音棚中实时观看画面，同步执行脚步声、衣物摩擦、道具碰撞等声音表演，并通过多轨录音、空间声像定位和精细混音，最终输出与画面精确同步的立体声乃至环绕声音轨。这一流程高度依赖人工经验，耗时巨大，且难以规模化。
 
 近年来，生成式音频模型取得了显著进展，但在电影级拟音场景中仍存在三个核心缺口：
@@ -65,8 +63,6 @@ FoleyDesigner 的核心洞察在于将专业拟音工作的三级流程自动化
 **3. 缺乏系统化的拟音流程建模。** 专业拟音工作遵循“场景分解—分轨录制—诊断精修—混音输出”的多级流程，而现有方法多为端到端的单阶段生成，缺乏对声音事件层次化分解、分轨空间控制和后期精修的完整建模，导致生成结果在事件完整性、声学真实感和混音平衡等方面存在明显不足。
 
 上述缺口的根本瓶颈在于：**现有音频生成范式无法同时满足立体声空间定位和帧级时序同步的双重约束**。这促使本文提出 FoleyDesigner，通过模拟专业拟音师的三级工作流，将细粒度场景分解、时空条件生成和多智能体精炼融为一体，实现端到端的电影级立体声拟音。
-
-
 
 ## 核心方法与创新机理
 
@@ -104,8 +100,6 @@ $$\mathcal{T}^{(k+1)} = \mathrm{Generator}(\mathcal{V}, \mathrm{Feedback}(\mathc
 
 > **需要手动验证**：FoleyDesigner 在推理延迟方面存在明显局限——生成 3 秒立体声片段总耗时约 108 秒（单张 A6000 GPU），尚无法满足实时交互需求。此外，多目标跟踪能力有限，当前主要针对单一声源的空间定位，密集重叠并发事件的分离与定位仍是开放问题。
 
-
-
 FoleyDesigner 将专业拟音师的工作流程抽象为三个顺序衔接的功能模块，形成端到端的自动化拟音管线。如图 1 所示，该管线模拟了人工拟音从场景理解、分轨录制到后期混音的全过程，最终输出可直接用于电影制作的 5.1 环绕声音轨。
 
 ### 三级流水线架构
@@ -138,15 +132,11 @@ FoleyDesigner 将专业拟音师的工作流程抽象为三个顺序衔接的功
 
 为训练和评估上述管线，作者构建了 **FilmStereo** 数据集——首个同时带有时间戳和空间标注的立体声拟音数据集。其构建流程（图 3）包括音频过滤与扩展、随机定位的空间模拟、基于思维链的空间丰富描述生成，以及事件检测的时间标注四个步骤。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2489_https_arxiv_org_abs_2604_05731/figures/001_Figure_1.jpg]]
 *Figure 1: FoleyDesigner Overview. The left column detailing the actual steps of a human Foley designer. The right column presents the corresponding simulated functional modules of FoleyDesigner, showcasing outputs at each phase, resulting in a soundtrack suitable for film use*
 
 ![[assets/figures/papers/paper_list_l2489_https_arxiv_org_abs_2604_05731/figures/012_Figure_1.jpg]]
 *Figure 1: FilmStereo Dataset Pipeline. The process begins with sourcing data using randomly sampled parameters to define sound event attributes, followed by a simulated sound design scenario in Step 2 to generate film foley annotations. The resulting data undergoes manual verification to ensure quality and accuracy*
-
-
 
 FoleyDesigner 将专业拟音工作流抽象为三个序贯阶段：**细粒度影片分解**、**时空拟音生成**与**拟音精炼与专业混音**。本节聚焦前两个阶段的核心公式与关键模块，精炼阶段的混音公式见 Eq. (8)。
 
@@ -213,8 +203,6 @@ $$\mathbf{s}_{\mathrm{LFE}}(t) = \mathrm{LPF}(\mathbf{s}_{\mathrm{mix}}(t), 120\
 
 去除时空条件（w/o STC）导致 GCC 恶化 21.3%、CRW 恶化 38.8%、FAD 恶化 12.1%（Table 4），直接验证了上述时空注入机制对空间精度与生成质量的决定性作用。多智能体精炼框架使事件召回率从 68.5% 提升至 84.2%（Table 5），印证了三级流水线的协同增益。
 
-
-
 ## 实验与关键发现
 
 FoleyDesigner 在音频质量、时空对齐、电影级拟音性能及人类主观偏好等多个维度上均展现出对现有基线方法的显著优势，并通过系统的消融实验验证了各核心模块的必要性。
@@ -235,23 +223,11 @@ FoleyDesigner 在音频质量、时空对齐、电影级拟音性能及人类主
 
 定性分析（Figure 6, Figure 7, Figure 8）进一步印证了这一结论：在爆炸序列中，FoleyDesigner 的频谱能量与三个关键事件帧精确对齐，而基线方法普遍存在时间错位；在声像移动场景中，FoleyDesigner 的左右声道能量随声源位置变化呈现清晰的此消彼长，而 SpatialSonic 尽管输出双声道，却缺乏明显的空间变化。
 
-![[assets/figures/papers/paper_list_l2489_https_arxiv_org_abs_2604_05731/figures/020_Figure_6.jpg]]
-*Figure 6: Temporal Analysis. Each video frame corresponds to a temporal segment in the spectrogram below. Yellow checkmarks indicate successful audio-visual synchronization. Our method achieves consistent temporal alignment across key events, while baseline methods show varying degrees of synchronization failure regardless of their output channel configuration*
-
-![[assets/figures/papers/paper_list_l2489_https_arxiv_org_abs_2604_05731/figures/021_Figure_7.jpg]]
-*Figure 7: Spatial Analysis. Our method demonstrates proper stereo separation with left channel (L) strengthening and right channel (R) weakening, while SpatialSonic (stereo output) shows limited spatial variation despite having two-channel capability*
-
 ### 电影级拟音性能
 
 在真实电影剪辑上的评估（Table 3）揭示了 FoleyDesigner 在专业影视场景中的实用价值。ImageBind Score 达到 **0.402**，比 SpatialSonic 的 0.251 高出 60.2%，表明其生成的音效与视觉内容的跨模态一致性远超现有方法。AV-Sync 指标为 **0.726**，较 SpatialSonic 提升 33.2%，验证了帧级同步的有效性。在电影质感维度上，Sonic Richness Score 和 Cinematic Clarity Score 均为最优，这与 FoleyDesigner 模拟专业拟音师三级流程（分解-生成-精修）的设计理念一致。
 
-![[assets/figures/papers/paper_list_l2489_https_arxiv_org_abs_2604_05731/figures/007_Table_3.jpg]]
-*Table 3: Film Foley Performance. Evaluation on film clips covering audio-visual synchronization (ImageBind Score, AV-Sync) and cinematic quality (Sonic Richness Score, Cinematic Clarity Score). Best and second-best results are highlighted*
-
 人类主观评测（Figure 5）提供了最直接的体验证据：在沉浸感（Immerse）、情感对齐（Emo Align）、节奏对齐（Tempo Align）、空间对齐（Spatial Align）和音色（Timbre）五个维度上，FoleyDesigner 的偏好选择率均显著高于基线方法（卡方检验 p < 0.001）。尤其在空间对齐维度上，FoleyDesigner 的选择率超过 60%，而 SpatialSonic 不足 20%，直接反映了时空注入机制对主观听感的决定性影响。
-
-![[assets/figures/papers/paper_list_l2489_https_arxiv_org_abs_2604_05731/figures/008_Figure_5.jpg]]
-*Figure 5: Human Evaluation Results. We compared the selection ratio of four methods from five perspectives: (1) Immerse, (2) Emo Align, (3) Tempo Align, (4) Spatial Align, and (5) Timbre*
 
 ### 消融实验
 
@@ -277,16 +253,6 @@ FoleyDesigner 在音频质量、时空对齐、电影级拟音性能及人类主
 1. **多声源重叠场景**：当前时空线索提取主要针对单一声源的边界框，当多个声源在空间中密集重叠时，模型倾向于生成主导声源而忽略次要事件，导致事件召回率下降。
 2. **视觉信息不足场景**：混响等声学参数的估计依赖视觉空间线索，在黑暗、烟雾或快速切换镜头中，深度估计和方位角计算存在偏差，导致空间定位失准。
 3. **数据集覆盖范围**：FilmStereo 仅覆盖 8 类常见音效（Table 2 Supp），对于数据集外的声音类别（如特殊机械、自然现象），模型的泛化能力尚待验证。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2489_https_arxiv_org_abs_2604_05731/figures/003_Figure_3.jpg]]
-*Figure 3: FilmStereo Construction. Our four-step pipeline for creating spatially and temporally annotated audio data. (1) Audio filtering and extension, (2) Spatial simulation with random positioning, (3) Spatial-rich caption generation via chain-of-thought, and (4) Temporal annotation with event detection*
-
-![[assets/figures/papers/paper_list_l2489_https_arxiv_org_abs_2604_05731/figures/016_Table_5.jpg]]
-*Table 5: Ablation Study on Agents Framework. Best results are highlighted. ER: Event Recall (%); LSD: Log-spectral distance (dB); LE: Loudness Error (LU); RT60E: RT60 Error (s)*
-
-
 
 ## 定位与知识库关联
 
@@ -333,8 +299,6 @@ FoleyDesigner 的提出直接回应了当前音频生成领域的一个结构性
 - **跨域泛化**：FilmStereo 的 8 类音效覆盖有限，如何将时空控制能力泛化到更广泛的音效类型和场景，需要更大规模、更多样化的标注数据集支持。
 
 需要手动验证的是：论文未提供与最新视频到音频方法（如 2024-2025 年出现的基于视频扩散模型的生成方法）的直接对比，这可能是由于论文投稿时间与这些方法出现的时间窗口重叠。建议读者在定位本方法时，补充与同期工作的横向比较。
-
-
 
 ## 原文 PDF
 

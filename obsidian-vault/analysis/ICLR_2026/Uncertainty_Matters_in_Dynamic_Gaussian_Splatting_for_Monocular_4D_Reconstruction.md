@@ -56,8 +56,6 @@ claims:
 
 该方法在无纹理区域、快速运动场景及高度可变形对象上仍存在局限性，但其“不确定性引导运动传播”的范式为动态高斯泼溅的鲁棒优化提供了新的思路。
 
-
-
 ### 单目动态场景重建的挑战
 
 从单目视频中重建随时间变化的4D场景是计算机视觉中的核心难题。给定一段单目相机拍摄的动态视频，目标是在任意视角和时间戳下合成逼真的新视图。这一任务在增强现实、自由视点视频、电影制作等领域具有重要应用价值，但由于单目输入固有的深度-运动耦合模糊性和观测稀疏性，重建的时空一致性和极端视角下的合成质量始终面临严峻挑战。
@@ -77,8 +75,6 @@ claims:
 本文的核心洞察在于：**经常被观测到的高斯应当作为可靠锚点，利用其运动信息约束观测不足的区域**。这一思路将单目4D重建问题重新表述为一个不确定性感知的时空信息传播问题——先识别出哪些高斯是“可信的”，再通过它们将运动线索传递给“不可信的”高斯，从而在全局层面提升重建的时空一致性和鲁棒性。
 
 基于这一动机，我们提出**USPLAT4D**（Uncertainty-aware dynamic Gaussian Splatting for 4D reconstruction），一个不确定性感知的动态高斯泼溅框架。该方法首次为每个高斯显式估计时间变化的各向异性不确定性，并以此为核心构建不确定性编码的时空图，通过可靠高斯引导整体优化，显著改善了遮挡区域和极端视角下的重建质量。
-
-
 
 ## 核心方法与创新机理
 
@@ -132,8 +128,6 @@ $$\mathcal{L}^{\mathrm{key}} = \sum_{t=0}^{T-1} \sum_{i \in \mathcal{V}_k} \| \m
 
 三个 changed slots 并非孤立改进，而是形成了正向协同：不确定性估计为图构建提供了节点可靠性依据，图构建将可靠性信息编码为空间拓扑结构，优化策略则利用这一结构实现差异化的运动约束。这种协同在极端视角下尤为显著——Objaverse 数据集 (120°, 180°] 视角范围内，USPLAT4D 相较 SoM 的 PSNR 提升 0.58、LPIPS 降低 0.05（Table 2），而小视角偏移下的提升幅度较小，直接印证了不确定性引导的运动传播在观测稀疏区域的核心价值。
 
-
-
 USPLAT4D 的整体流程围绕一个核心思想构建：在动态高斯泼溅中，并非所有高斯点具备同等的观测可靠性——经常被稳定观测到的高斯应作为可靠锚点，其运动信息可传播至观测不足的区域，从而约束整体 4D 重建的时空一致性。基于此，方法将动态高斯泼溅的优化过程重构为三个阶段：**动态不确定性估计**、**不确定性编码图构建** 与 **不确定性感知优化**（Figure 2）。
 
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_m3rZ7Fdlst/figures/002_Figure_2.jpg]]
@@ -150,8 +144,6 @@ USPLAT4D 的整体流程围绕一个核心思想构建：在动态高斯泼溅�
 **优化模块**：最终优化目标由三部分构成——光度损失 $\mathcal{L}^{\mathrm{rgb}}$、关键节点损失 $\mathcal{L}^{\mathrm{key}}$ 与非关键节点损失 $\mathcal{L}^{\mathrm{non-key}}$（Equation 12）。关键节点损失鼓励其接近预优化位置，并按逆不确定性加权，使低不确定性节点受到更强约束（Equation 9）；非关键节点损失同时约束其接近初始位置及基于图的插值轨迹（DQB），同样以逆不确定性加权（Equation 11）。不确定性在此框架中扮演三重角色：重加权关键节点偏差、引导非关键节点插值、以及在总损失中平衡各节点的影响权重。
 
 **设计瓶颈与因果机制**：现有动态高斯泼溅方法（如 SoM、MoSca）对所有高斯均匀优化，忽略了因遮挡、视角偏移等因素导致的观测可靠性差异，这是造成运动漂移与极端视角合成退化的核心瓶颈。USPLAT4D 通过引入时间变化的不确定性估计，将“经常被观测到的高斯”识别为可靠锚点，利用其运动信息通过图结构传播至观测稀疏区域，从而在因果层面改善了时空一致性与极端视角鲁棒性。消融实验证实了这一因果链：移除关键节点的不确定性估计导致 PSNR 从 19.63 降至 18.86（Table 3），移除不确定性感知 kNN 则降至 19.50，验证了不确定性在节点选择与图构建中的关键作用。
-
-
 
 USPLAT4D 的核心设计围绕一个中心命题展开：并非所有高斯对 4D 重建的贡献是等价的。经常被多帧观测到的区域应作为“可靠锚点”，其运动信息通过图结构传播至观测稀疏的区域。这一思想通过三个紧密耦合的模块实现：动态不确定性估计、不确定性编码图构建、以及不确定性感知优化。
 
@@ -222,13 +214,6 @@ $$\mathcal{L}^{\mathrm{non.key}} = \sum_{t=0}^{T-1} \sum_{i \in \mathcal{V}_n} \
 $$\mathcal{L}^{\mathrm{total}} = \mathcal{L}^{\mathrm{rgb}} + \mathcal{L}^{\mathrm{key}} + \mathcal{L}^{\mathrm{non-key}} \tag{12}$$
 
 不确定性在该框架中扮演三重角色：(1) 重加权关键节点的位置偏差惩罚；(2) 引导非关键节点的插值轨迹；(3) 平衡两类节点在总损失中的影响力。消融实验（Table 3）验证了这一设计的必要性：移除关键节点的不确定性估计导致 PSNR 从 19.63 骤降至 18.86；将不确定性感知 kNN 替换为普通距离基 kNN 导致 PSNR 降至 19.50；移除训练中的不确定性加权同样造成性能退化。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_m3rZ7Fdlst/figures/009_Figure_7.jpg]]
-*Figure 7: Key node weight matrix and Gaussian segmentation. The weight matrix visualizes edge connections among key nodes. Nodes belonging to different diagonal blocks do not share weights, indicating the no connections across those blocks. The images further illustrate the corresponding Gaussian segmentation, where colors represent the block assignment of each key and non-key node*
-
-
 
 ## 实验与关键发现
 
@@ -304,30 +289,11 @@ Figure 6在Objaverse上的对比进一步验证：在大视角偏移（红色视
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_m3rZ7Fdlst/figures/005_Table_1.jpg]]
 *Table 1: Quantitative results on DyCheck. We report results on 5 scenes at 1× resolution and 7 scenes at 2× resolution, following existing protocols. USPLAT4D consistently outperforms state-of-the-art Gaussian Splatting based methods. See Figure 3 for qualitative results on validation views and Figure 4 for extreme views*
 
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_m3rZ7Fdlst/figures/007_Table_2.jpg]]
-*Table 2: Results on the Objaverse dataset. We evaluate novel view synthesis across increasing horizontal angular ranges: (0◦, 60◦], (60◦, 120◦], and (120◦, 180◦]. USPLAT4D consistently improves over SoM (Wang et al., 2025a) and MoSca (Lei et al., 2025), with gains most pronounced at larger viewpoint shifts*
-
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_m3rZ7Fdlst/figures/010_Table_3.jpg]]
 *Table 3: Ablation study on uncertainty usage and key node selection. We assess the impact of uncertainty estimation and key node selection strategy by removing them from key components in USPLAT4D individually*
 
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_m3rZ7Fdlst/figures/013_Table_S.3.jpg]]
-*Table S.3: Per-scene results on the DyCheck dataset (Gao et al., 2022). We provide a detailed breakdown of the results summarized in Table 1 of the main paper. ⋆: results reproduced by us, as the original numbers in Table 1 were directly reported from the SoM and MoSca papers. Minor discrepancies may exist due to differences in training. We note that the validation views are near the training views in the DyCheck dataset. Therefore, the observed improvements do not fully reflect the advantages of USPLAT4D in extreme novel view synthesis. Results are formatted as PSNR (↑) / SSIM (↑) / LPIPS (↓)*
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_m3rZ7Fdlst/figures/015_Table_S.4.jpg]]
-*Table S.4: Per-scene results on the Objaverse dataset. We provide a detailed breakdown of the results summarized in Table 2 of the main paper. We evaluate novel view synthesis across increasing horizontal angular ranges: (0◦, 60◦], (60◦, 120◦], and (120◦, 180◦]*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_m3rZ7Fdlst/figures/004_Figure_3.jpg]]
-*Figure 3: Qualitative results on validation views of the DyCheck dataset (Gao et al., 2022). We show comparisons with two strong baselines, SoM (Wang et al., 2025a) and MoSca (Lei et al., 2025). USPLAT4D improves visual quality and better preserves geometry (e.g., arms in “Spin”, hands in “Space-out”) and pose (e.g., “Windmill”). Please zoom in for details. See supplementary for more examples and other baselines*
-
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_m3rZ7Fdlst/figures/006_Figure_5.jpg]]
 *Figure 5: Qualitative results on extreme novel views from DAVIS. For each case, we show an input-view rendering and compare the baseline (SoM (Wang et al., 2025a) or MoSca (Lei et al., 2025)) with our USPLAT4D on an extreme novel view (red). USPLAT4D yields clearer reconstructions under challenging conditions*
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_m3rZ7Fdlst/figures/008_Figure_6.jpg]]
-*Figure 6: Qualitative results on Objaverse. Each case shows a 3D rendering from an input view and a comparison between the baseline (SoM (Wang et al., 2025a) or MoSca (Lei et al., 2025)) and our USPLAT4D at an extreme novel view (red). Please see the supplementary video for clearer visualization*
-
-
 
 ## 定位与知识库关联
 
@@ -372,8 +338,6 @@ USPLAT4D 的核心贡献不在于提出全新的表示或运动建模范式，�
 3. **极端可变形区域的先验增强**：当先验轨迹极度稀疏或不可靠时，是否可以通过引入语义先验或物理约束来补充不确定性引导的优化？
 
 4. **不确定性估计的理论紧致性**：闭式方差估计基于局部最小值假设，该假设在遮挡边界和深度不连续区域的紧致性如何？是否存在更精确且计算可行的替代方案？
-
-
 
 ## 原文 PDF
 

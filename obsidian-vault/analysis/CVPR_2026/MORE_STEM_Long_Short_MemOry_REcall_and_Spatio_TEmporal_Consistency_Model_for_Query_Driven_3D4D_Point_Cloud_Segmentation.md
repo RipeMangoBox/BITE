@@ -61,8 +61,6 @@ MORE-STEM 在方法谱系上处于 **查询驱动分割 × 时序建模 × 记�
 
 在3D指令分割基准 Instruct3D 上，MORE-STEM 取得 mIoU 35.9、Acc 31.4，相较此前最优方法 **SegPoint**（mIoU 31.6, Acc 27.5）分别提升 4.3 和 3.9 个点（Table 1）。在 ScanRefer 引用分割任务上，方法同样取得 mIoU 52.7、Acc@50 54.8 的最佳性能（Table 3）。消融实验进一步表明，依次移除 CFTVA、STEM、LTM、STM 模块后，mIoU 从 35.9 分别降至 33.1、32.5、32.0、31.4，验证了各组件的必要性（Table 5）。此外，本文基于 SemanticKITTI 自动构建了首个户外4D指令分割基准 InstructKITTI（含超过15K对查询-掩码样本），MORE-STEM 在该基准的4D任务上取得 Acc@50 42.19、mIoU 40.67，为动态场景指令分割提供了初始性能基线。
 
-
-
 ### 3D点云理解：从静态到动态的范式迁移
 
 点云理解是三维计算机视觉的核心任务之一，其目标是从离散、非结构化的三维点集中提取语义信息，服务于自动驾驶、机器人导航、增强现实等应用场景。近年来，随着大规模预训练模型和跨模态对齐技术的发展，**查询驱动的3D分割**（query-driven 3D segmentation）逐渐成为研究热点。该范式允许用户通过自然语言查询直接指定目标对象或区域，系统据此输出对应的分割掩码，从而摆脱了传统语义分割中固定类别体系的限制，实现了更灵活、开放的人机交互方式。
@@ -90,8 +88,6 @@ MORE-STEM 在方法谱系上处于 **查询驱动分割 × 时序建模 × 记�
 此外，为填补动态场景查询驱动分割的基准空白，本文基于SemanticKITTI自动构建了**InstructKITTI**基准，包含超过15K对（查询，3D掩码）的户外4D指令分割数据，为后续研究提供了评测平台。
 
 图1对比了传统3D引用/指令分割任务与本文提出的4D指令分割任务的差异：前者仅处理单帧静态点云，后者则要求模型在多帧动态序列中保持分割的时空一致性和语义连贯性。这一范式迁移对模型的时间建模能力提出了更高要求，也是MORE-STEM设计的根本出发点。
-
-
 
 ## 核心方法与创新机理
 
@@ -134,8 +130,6 @@ MORE-STEM 的核心创新在于首次将查询驱动的3D点云分割从静态�
 
 消融实验（Table 5）系统性地验证了各模块的必要性：完整模型在 Instruct3D 上取得 mIoU 35.9；依次移除 CFTVA、STEM、LTM、STM 后，mIoU 分别降至 33.1、32.5、32.0、31.4。其中 CFTVA 的移除导致最大幅度的性能下降（-2.8 mIoU），表明跨帧文本-视觉对齐是整个框架的基础性创新；而 LTM 和 STM 的独立贡献（分别 -0.5 和 -0.6 mIoU）则验证了分级记忆设计的互补性。
 
-
-
 MORE-STEM 的整体设计围绕一个核心洞察展开：**将语言查询与多帧点云特征进行时间感知的跨模态对齐，并利用长短期记忆模块平衡长期跨场景语义召回与短期帧级连续性，同时通过状态空间模型和可控制 Transformer 实现体素级时空一致性**。整个框架由四个关键模块串联构成，形成一条从多模态输入到时空一致分割掩码的端到端推理管线。
 
 ### 输入与特征提取
@@ -169,8 +163,6 @@ MORE-STEM 的整体设计围绕一个核心洞察展开：**将语言查询与�
 这一管线设计的因果逻辑在于：**CFTVA 解决了“语言查询与动态视觉特征如何在时间维度上对齐”的问题，STEM 解决了“对齐后的特征如何在体素级保持时空一致”的问题，LTM+STM 则解决“历史信息如何被有效召回以改善当前推理”的问题**。三者形成递进关系——没有对齐，一致性建模缺乏语义锚点；没有一致性，记忆召回会在时序漂移的特征上积累误差；没有记忆召回，模型在遮挡、大位移等困难场景下缺乏历史参照。
 
 消融实验（Table 5）从反面验证了这一因果链：在 Instruct3D 上，完整模型的 mIoU 为 35.9；依次移除 CFTVA、STEM、LTM、STM 后，mIoU 分别降至 33.1、32.5、32.0、31.4，每个模块的移除都导致性能的阶梯式下降，且定性可视化（Figure 6）显示缺少时空一致性或记忆召回会在遮挡场景下产生明显的时序漂移和错误分割。
-
-
 
 MORE-STEM 围绕三个核心模块构建：跨帧文本-视觉对齐（CFTVA）、时空一致性模型（STEM）以及长短期记忆召回（LTM + STM）。三个模块协同工作，将语言查询与多帧点云特征进行时间感知的跨模态对齐，并通过状态空间时序传播和分级记忆机制确保分割结果的时空一致性。
 
@@ -240,8 +232,6 @@ $$w_{i}^{bias} = \frac{w_{i}^{init}}{\sum_{j \in c} w_{j}^{init}}$$
 
 三个模块的协同作用在消融实验中得到验证：完整模型在 Instruct3D 上取得 mIoU 35.9；依次移除 CFTVA、STEM、LTM、STM 后，mIoU 分别降至 33.1、32.5、32.0、31.4（Table 5），表明各模块对最终性能均有不可替代的贡献。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l33_https_openaccess_thecvf_com_content_CVPR2026_html_Li_MORE_STEM_Long_Shor/figures/004_Figure_3.jpg]]
 *Figure 3: Framework of the proposed Cross-Frame Text-Visual Alignment module*
 
@@ -250,8 +240,6 @@ $$w_{i}^{bias} = \frac{w_{i}^{init}}{\sum_{j \in c} w_{j}^{init}}$$
 
 ![[assets/figures/papers/paper_list_l33_https_openaccess_thecvf_com_content_CVPR2026_html_Li_MORE_STEM_Long_Shor/figures/005_Figure_5.jpg]]
 *Figure 5: Framework of the proposed Long-Short Memory Recall module*
-
-
 
 ## 实验与关键发现
 
@@ -262,9 +250,6 @@ MORE-STEM 在多个 3D 和 4D 理解基准上取得了最优性能，覆盖指�
 **3D 指令分割。** 在 Instruct3D 基准上，MORE-STEM 以 mIoU 35.9、Acc 31.4 显著超越此前最优方法 **SegPoint**（He et al., ECCV 2024）的 31.6 和 27.5，分别提升 4.3 和 3.9 个百分点（Table 1）。这一提升的核心驱动力来自两方面：一是跨帧文本-视觉对齐（CFTVA）建立了语言查询与多帧几何特征之间的细粒度时间感知对应；二是长短期记忆召回机制通过文本-视觉关系映射维持了鲁棒且精确的目标一致性。值得注意的是，由于该方法以多帧点云为输入，在 3D 指令分割任务中，将同一场景的三份相同点云与三条不同文本查询同时送入网络，相当于单次前向传播处理三个任务，在一定程度上增加了计算并行度，但性能增益仍主要归因于模型本身的时序建模与记忆能力。
 
 在自建的 InstructKITTI 3D 基准上，MORE-STEM 取得 Acc 38.62、mIoU 37.95（Table 2）。定性结果（Figure 6）显示，蓝色掩码（MORE-STEM 输出）与绿色掩码（真值标注）高度重合，而 **3D-STMN**（Wu et al., AAAI 2024）和 **3D-LLaVA**（Deng et al., CVPR 2025）的预测（红色/橙色）在遮挡区域和小目标上出现明显偏差，进一步验证了时空一致性和记忆召回在提升分割精度方面的作用。
-
-![[assets/figures/papers/paper_list_l33_https_openaccess_thecvf_com_content_CVPR2026_html_Li_MORE_STEM_Long_Shor/figures/007_Table_2.jpg]]
-*Table 2: Instruction segmentation results on proposed InstructKITTI*
 
 ![[assets/figures/papers/paper_list_l33_https_openaccess_thecvf_com_content_CVPR2026_html_Li_MORE_STEM_Long_Shor/figures/008_Figure_6.jpg]]
 *Figure 6: Qualitative results of 3D instruction segmentation experiment on our InstructKITTI 3D benchmark. In the visualization results, the blue masks denote the segmentation outputs from the proposed MORE-STEM, the red ones and orange ones represent the predictions of the 3D-STMN [36] and 3D-LLaVA [7], and the green masks indicate the ground truth annotations*
@@ -297,22 +282,6 @@ MORE-STEM 在多个 3D 和 4D 理解基准上取得了最优性能，覆盖指�
 2. **基准泛化性**：InstructKITTI 基准仅基于 SemanticKITTI 的户外驾驶场景构建，其泛化性到其他动态环境（如室内机器人、拥挤人群）尚未验证。
 3. **长期记忆漂移**：尽管引入了偏置权重更新，长期记忆在极端长序列或类别极度不平衡时仍可能产生表示漂移，论文未讨论记忆淘汰或主动遗忘机制。
 4. **时序依赖长度**：时空一致性模型主要用于两帧间传播，对于更长的时序依赖（如数十帧）的效果未深入分析。在真实世界多传感器异步输入（如 LiDAR 与相机帧率不一致）的情况下，跨帧对齐和记忆召回机制的鲁棒性也尚待验证。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l33_https_openaccess_thecvf_com_content_CVPR2026_html_Li_MORE_STEM_Long_Shor/figures/001_Figure_1.jpg]]
-*Figure 1: Comparison of the 3D referring/instruction segmentation task and proposed 4D instruction segmentation task*
-
-![[assets/figures/papers/paper_list_l33_https_openaccess_thecvf_com_content_CVPR2026_html_Li_MORE_STEM_Long_Shor/figures/006_Table_1.jpg]]
-*Table 1: Instruction segmentation results on Instruct3D [10]*
-
-![[assets/figures/papers/paper_list_l33_https_openaccess_thecvf_com_content_CVPR2026_html_Li_MORE_STEM_Long_Shor/figures/009_Table_3.jpg]]
-*Table 3: Referring segmentation results on ScanRefer [4]*
-
-![[assets/figures/papers/paper_list_l33_https_openaccess_thecvf_com_content_CVPR2026_html_Li_MORE_STEM_Long_Shor/figures/010_Table_4.jpg]]
-*Table 4: Semantic segmentation results on the validation set of SemanticKITTI [3]*
-
-
 
 ## 定位与知识库关联
 
@@ -355,8 +324,6 @@ MORE-STEM 的工作锚定在两条相互交叉的研究线上：**查询驱动�
 4. **标注依赖**：该方法是否能与自监督预训练范式结合，从而减少对细粒度文本标注的依赖？当前框架仍需要大量文本-掩码对进行监督训练。
 
 5. **更长时序建模**：STEM 的两帧传播机制能否扩展为多帧联合优化或引入更长的时序感受野（如Mamba的远距离依赖），值得进一步探索。
-
-
 
 ## 原文 PDF
 

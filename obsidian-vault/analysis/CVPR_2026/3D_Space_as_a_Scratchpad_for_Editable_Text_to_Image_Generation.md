@@ -145,8 +145,6 @@ $$\mathcal{S}^{\mathrm{TR}} = \mathrm{SubjectEditor}(E, I, C, \mathcal{S}^{\math
 
 这一架构的关键优势在于：三维空间作为因果调节因子，直接控制最终图像的空间准确性和身份一致性，使得复杂提示的遵循度显著提升——在GenAI-Bench上实现了32%的文本对齐改进，且无需额外训练。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2160_https_arxiv_org_abs_2601_14602/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of a 3D spatial scratchpad. Given an input prompt P we illustrate how our method uses a 3D space as an underlying representation to generate an image that has superior alignment to the prompt. Agent ⃝1 is responsible for decomposing the input prompt into subjects and background. Agent ⃝2 provides 3D bounding boxes for each subject. We render the scratchpad and subsequently generate an image based on these placements which is then given to agent ⃝3 that adjusts transformations of the meshes. Finally, agent ⃝4 chooses the best camera viewpoint from a set of proposals to generate the final image*
 
@@ -240,8 +238,6 @@ $$\mathcal{S}^{\mathrm{TR}} = \mathrm{SubjectEditor}(E, I, C, \mathcal{S}^{\math
 ### 三维编辑一致性验证
 
 **Figure 7** 展示了空间草稿板的编辑能力：无论是手动拖拽编辑还是基于文本的编辑指令，对三维草稿板的修改都能一致地反映到最终生成图像中，同时保持主体身份和背景不变。这一特性源于编辑操作发生在统一的三维空间表示层——SubjectEditor 代理（Equation 3）将用户编辑指令转换为三维变换，随后通过相同的深度+身份条件生成管线渲染，确保了编辑前后的空间一致性和身份保真度。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2160_https_arxiv_org_abs_2601_14602/figures/004_Table_1.jpg]]
 *Table 1: Quantitative comparison with baselines. We show that using a 3D space as a reasoning scratchpad improves text alignment compared to using only text or a 2D space as a reasoning modality. We also maintain or improve in terms of image quality*

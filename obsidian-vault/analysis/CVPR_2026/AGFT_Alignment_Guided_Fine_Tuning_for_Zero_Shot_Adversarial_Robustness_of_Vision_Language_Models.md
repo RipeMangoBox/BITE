@@ -56,8 +56,6 @@ claims:
 
 **局限性**：当前评估仅限于 $\ell_\infty$ 范数约束下的对抗样本，尚未验证在 $\ell_2$ 扰动、文本级别攻击或联合图文攻击下的有效性；实验主要在CLIP系列模型上完成，未扩展到BLIP、SigLIP等其他跨模态架构；目前仅针对零样本图像分类任务，尚未在视觉问答、图像描述等更复杂的多模态下游任务中验证迁移效果。
 
-
-
 ### 零样本对抗鲁棒性的核心矛盾
 
 视觉-语言模型（VLMs）如CLIP通过大规模图文对比预训练，在零样本图像分类任务上展现了强大的泛化能力。然而，这些模型对对抗扰动极为脆弱——微小的、人眼不可察觉的像素扰动即可导致模型做出完全错误的预测。为提升鲁棒性，对抗训练（adversarial training）被广泛采用，其标准形式为最小-最大鞍点优化：
@@ -81,8 +79,6 @@ $$\min_{\theta} \mathbb{E}_{(x,y) \sim \mathcal{D}} \left[ \max_{x+\delta \in B(
 然而，直接使用原始预训练分布作为目标面临一个技术挑战：预训练模型的输出分布可能过于“尖锐”（高置信度），导致对抗训练过程中的梯度信号不足或过拟合。为此，本文进一步引入**分布一致性校准**机制，通过对预训练分布的logits进行温度缩放，生成一个适度平滑的目标分布，在语义结构保持与训练有效性之间取得平衡。
 
 基于上述动机，本文提出**AGFT（Alignment-Guided Fine-Tuning）**——一种以对齐引导为核心范式的零样本对抗微调方法，其整体流程如图2所示：首先获取预训练模型的概率预测作为软对齐分布，经温度缩放校准后作为对抗训练的目标分布，最终在对抗样本上最小化与该分布的交叉熵损失。
-
-
 
 ## 核心方法与创新机理
 
@@ -122,8 +118,6 @@ $$L(\boldsymbol{x}_{adv}, t, \boldsymbol{p}_{rob}, \tau) = -\mathbb{E}_{i,j} \le
 
 消融实验进一步揭示了两个模块的协同作用。温度缩放比 $\gamma=0.4$ 时取得鲁棒性与清洁度的最佳平衡（Table 8）；分布一致性校准使对抗样本上的Top-5预测重叠率（IoU）从47.32%提升至56.12%，直接证明了其保持语义结构的能力（Table 9）。此外，AGFT在ViT-B/16和RN50×4等不同架构上均取得最优鲁棒性（Table 5, Table 14, Table 15），表明该方法具有良好的架构通用性。
 
-
-
 AGFT的整体框架围绕一个核心矛盾展开：如何在对抗微调中提升鲁棒性的同时，避免破坏预训练CLIP模型已建立的跨模态语义对齐。为此，AGFT设计了一条“对齐引导”的对抗训练流水线，由四个关键模块串联构成。
 
 ### 流水线总览
@@ -154,12 +148,8 @@ AGFT的整体框架围绕一个核心矛盾展开：如何在对抗微调中提�
 - **输出**：微调后的图像编码器 $f_{\theta}$，在对抗样本上具有鲁棒性的同时，保持与文本编码器的语义对齐。
 - **推理阶段**：仅使用微调后的图像编码器与冻结的文本编码器进行零样本分类，无需额外的校准步骤。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2760_https_arxiv_org_abs_2603_29410/figures/002_Figure_2.jpg]]
 *Figure 2: The overall pipeline of AGFT. First, we obtain the probabilistic predictions of the pre-trained model and use the resulting distribution as the target for adversarial fine-tuning to encourage adversarial visual features to align with textual embeddings. To mitigate the discrepancies in visual–textual semantic structure, we calibrate the pre-trained output distribution through temperature adjustment, while maintaining the cross-modal similarity structure across images and textual descriptions*
-
-
 
 AGFT 的核心由两个紧密耦合的模块构成：**文本引导对抗训练**与**分布一致性校准**。前者将监督信号从硬标签替换为预训练模型的概率预测，后者通过温度缩放修正该分布与鲁棒模型之间的语义偏差，二者共同保证对抗不变性学习过程中跨模态对齐结构不被破坏。
 
@@ -195,8 +185,6 @@ $$\min \mathbb{E}_{\pmb{x} \in \mathcal{D}} \left[ \max_{{\pmb x}_{adv} \in B({\
 
 该框架的核心机制在于：内层最大化生成对抗扰动，外层最小化使鲁棒图像特征与校准后的文本分布对齐，从而在提升对抗鲁棒性的同时保留预训练的跨模态语义结构。分布一致性校准的实证效果由 Table 9 验证——引入校准后对抗样本上的 Top-5 预测重叠率（IoU）从 47.32% 提升至 56.12%，证明语义保持能力显著增强。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能对比
@@ -230,9 +218,6 @@ Table 5 报告了 ViT-B/32、ViT-B/16 和 RN50×4 三种 CLIP 架构上的平均
 
 Table 7 评估了在 ImageNet 变体（ImageNet-A, ImageNet-R, ImageNet-Sketch, ImageNet-V2）上的分布外性能。AGFT 在鲁棒准确率上全面领先，在 ImageNet-A 上达到 **29.18%**，比 GLADIATOR 高 3.57 个百分点。同时清洁准确率也保持竞争力，表明温度缩放校准有效防止了模型在对抗训练中对源分布的结构性遗忘。
 
-![[assets/figures/papers/paper_list_l2760_https_arxiv_org_abs_2603_29410/figures/010_Table_7.jpg]]
-*Table 7: Out-of-distribution performance on ImageNet variants under PGD-20 attack with perturbation budget*
-
 ### 消融实验
 
 **温度缩放参数 γ**：Table 8 展示了 γ 和温度倒数 1/τ 的消融结果。预训练 CLIP 的原始设置对应 (γ=1.0, 1/τ=100)。实验发现 **γ=0.4** 时取得鲁棒性与清洁度的最佳平衡——此时校准温度 τ/γ 增大，使目标分布更加平滑，为对抗训练提供了更宽容的监督信号。进一步减小 γ 会过度平滑分布，导致鲁棒准确率下降；增大 γ 则趋近于原始硬分布，清洁度提升但鲁棒性降低。
@@ -242,9 +227,6 @@ Table 7 评估了在 ImageNet 变体（ImageNet-A, ImageNet-R, ImageNet-Sketch, 
 ### Pareto 前沿分析
 
 Figure 3 展示了不同方法在鲁棒性与清洁准确率之间的权衡。AGFT 的 Pareto 前沿明显优于其他方法——在相同清洁准确率下，AGFT 可提供更高的鲁棒性；在相同鲁棒准确率下，AGFT 的清洁度损失更小。这说明对齐引导范式从根本上改变了鲁棒性与泛化性之间的折中关系，而非简单的超参数调优所能达到的。
-
-![[assets/figures/papers/paper_list_l2760_https_arxiv_org_abs_2603_29410/figures/009_Figure_3.jpg]]
-*Figure 3: Trade-off between robust and clean accuracy across different methods. Each marker type denotes one method, and each point corresponds to a different trade-off configuration*
 
 ### 特征空间可视化
 
@@ -270,22 +252,6 @@ Table 10 比较了各方法的计算开销。AGFT 需要额外的前向传播来
 ### 公平性说明
 
 所有对比方法均采用相同的 CLIP ViT-B/32 骨干，并在 ImageNet 上使用相同的对抗训练配置（PGD-20, ε=1/255, 步长 1/255）。对于 PMG-AFT 和 TGA-ZSR，作者进行了学习率调优以使其适应本任务的设置，具体超参数搜索见 Table 11。GLADIATOR 由于代码未开源，直接引用其原始论文中报告的性能。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2760_https_arxiv_org_abs_2603_29410/figures/013_Table_9.jpg]]
-*Table 9: Empirical study of distribution consistency calibration. conf*
-
-![[assets/figures/papers/paper_list_l2760_https_arxiv_org_abs_2603_29410/figures/007_Table_4.jpg]]
-*Table 4: Average accuracy (%) under strong attacks with different perturbation budgets used during both fine-tuning and inference*
-
-![[assets/figures/papers/paper_list_l2760_https_arxiv_org_abs_2603_29410/figures/006_Table_3.jpg]]
-*Table 3: Average zero-shot robust accuracy (%) under PGD-20 attacks with varying perturbation budgets during inference*
-
-![[assets/figures/papers/paper_list_l2760_https_arxiv_org_abs_2603_29410/figures/008_Table_6.jpg]]
-*Table 6: Zero-shot robust accuracy (%) under diverse unseen untargeted and targeted attacks with the perturbation budget*
-
-
 
 ## 定位与知识库关联
 
@@ -321,8 +287,6 @@ AGFT 的关键突破在于将监督信号从**硬标签（独热编码）替换�
 3. **生成式任务适配**：AGFT 是否适用于零样本下的视觉问答、图像描述等生成式多模态任务？如何调整文本引导的监督形式——例如，将图像-文本匹配分布替换为图像-答案/描述的条件分布？
 4. **对抗攻击的对称性**：当前仅考虑图像侧的对抗扰动。若同时考虑文本提示的对抗扰动（或图文联合攻击），对齐引导范式能否提供比分类引导更强的鲁棒性？这需要重新定义“零样本对抗鲁棒性”的威胁模型。
 5. **温度缩放的自动化选择**：当前 $\gamma$ 和 $1/\tau$ 通过网格搜索确定（Table 8，$\gamma=0.4$ 为最优平衡点）。是否存在基于数据特性或模型状态的自动化校准策略，以减少超参数调优成本？
-
-
 
 ## 原文 PDF
 

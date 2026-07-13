@@ -50,15 +50,11 @@ claims:
 
 方法层面，PoseGAM 以 DINOv2 编码多视图图像令牌，PTv3 点云网络提取全局几何特征并按视图重排为特征图，经交叉注意力与多视图令牌交互，弥合了 RGB 预训练与 3D 模态的鸿沟，同时充分利用 VGGT 的多视图架构预训练权重。该方法在范式上从“显式匹配 + 几何求解”转向“端到端前馈直接预测”，在几何信息利用上从“仅 2D-3D 对应”升级为“点图与学习特征的视图级融合”，构成未见物体姿态估计的新基线。
 
-
-
 未见物体姿态估计（unseen object pose estimation）面临一个根本性瓶颈：**现有方法普遍依赖显式特征匹配**——先建立查询图像与物体模型之间的2D-3D对应关系，再通过PnP等几何求解器计算位姿。这类范式（如**OSOP**、**ZS6D**、**MegaPose**、**GenFlow**、**GigaPose**、**FoundPose**、**RayPose**）在匹配不可靠时精度急剧下降，而匹配不可靠在纹理稀疏、遮挡严重或光照变化剧烈的真实场景中恰恰是常态。
 
 另一条路径是直接利用多视图基础模型（如**VGGT**）预测相对位姿，但这类模型存在两个致命缺陷：**一是缺乏物体的3D几何信息**，仅依赖RGB外观进行跨视图推理；**二是强假设渲染视图与真实查询图像之间外观一致**。当真实查询图像与合成渲染视图之间存在域差异（domain gap）时，多视图基础模型的重建点云会出现显著离散，导致姿态预测严重偏离——这一脆弱性在论文附录的定性分析（Figure 5）中得到了直接验证。
 
 上述两条路径的困境指向同一个因果杠杆：**如何将物体3D几何信息有效注入多视图推理框架，同时弥合RGB预训练与3D模态之间的鸿沟**。这正是PoseGAM的核心动机——通过显式点云图与学习几何特征的双重注入机制，使网络能够在端到端的前馈过程中直接、鲁棒地预测绝对位姿，从而绕开显式匹配的脆弱环节。
-
-
 
 ## 核心方法与创新机理
 
@@ -105,8 +101,6 @@ $$\mathrm{CA}(Q \gets \mathbf{multiview~tokens}, KV \gets \mathbf{geometry~token
 
 这一数据策略使得网络在训练阶段即暴露于广泛的域差异，从而在推理时对真实查询图像的外观不一致具有更强的容忍度。
 
-
-
 PoseGAM 将未见物体姿态估计重新定义为**端到端前馈多视图推理任务**，彻底摒弃了传统方法中显式特征匹配与几何求解（如 PnP）的级联范式。其核心输入为一张查询图像 $I_{\text{query}}$ 和物体 3D 模型 $\mathcal{M}$，输出为物体到相机的刚体变换 $T_{\text{query}}$：
 
 $$T_{\text{query}} = \mathrm{Network}(I_{\text{query}}; \mathcal{M})$$
@@ -126,15 +120,8 @@ $$T_{\text{query}} = \mathrm{Network}(I_{\text{query}}; \mathcal{T}, \mathcal{V}
 
 该框架的核心创新在于**几何信息的双重注入机制**：显式点图提供精确的空间坐标约束，学习几何特征则捕获物体的全局形状上下文，二者以视图图（view-map）格式统一表示，使多视图基础模型的预训练权重得以充分利用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2058_https_arxiv_org_abs_2512_10840/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of PoseGAM. Given a query image*
-
-![[assets/figures/papers/paper_list_l2058_https_arxiv_org_abs_2512_10840/figures/001_Figure_1.jpg]]
-*Figure 1: PoseGAM aligns CAD models with the query image. Given the input CAD models, PoseGAM accurately estimates object poses that align with their spatial arrangements in the query image. Objects on the red plane indicate the initial CAD poses, while those on the green plane represent the poses after estimation*
-
-
 
 PoseGAM 的核心目标是从查询图像 $I_{\mathrm{query}}$ 和物体模型 $\mathcal{M}$ 直接预测物体到相机的变换矩阵 $T_{\mathrm{query}}$，其整体范式定义为：
 
@@ -195,8 +182,6 @@ Fusion Transformer 输出的查询图像相机令牌被送入位姿解码头，�
 $$T_{\mathrm{query}} = [\mathbf{R}, \mathbf{t}] = [\mathbf{R}_{\mathrm{norm}}, \frac{\mathbf{t}_{\mathrm{norm}}}{s}]$$
 
 物体到相机的最终位姿 $T_{\mathrm{query}}$ 由矩阵求逆得到。
-
-
 
 ## 实验与关键发现
 
@@ -270,8 +255,6 @@ PoseGAM通过注入物体几何信息（点图与几何特征图）缓解了这�
 
 PoseGAM模型参数量约**1.5B**，训练需4块A100 GPU约8天。推理阶段需已知相机内参及目标物体的分割掩码（实验中由CNOS提供），实际部署时需额外考虑分割模块的精度与延迟。对于实时应用场景，当前推理成本偏高，模型压缩与加速是未来工程化的重要方向。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2058_https_arxiv_org_abs_2512_10840/figures/005_Table_1.jpg]]
 *Table 1: Performance Comparisons on BOP Datasets. We report Average Recall (AR) scores on five BOP core datasets. All methods are evaluated without using refinement networks or multi-hypothesis strategies [30, 43]. The best results are shown in bold, and the secondbest results are underlined*
 
@@ -283,20 +266,6 @@ PoseGAM模型参数量约**1.5B**，训练需4块A100 GPU约8天。推理阶段�
 
 ![[assets/figures/papers/paper_list_l2058_https_arxiv_org_abs_2512_10840/figures/008_Table_4.jpg]]
 *Table 4: Effect of finetuning strategy. Comparison of performance using different pretrained weight strategies*
-
-![[assets/figures/papers/paper_list_l2058_https_arxiv_org_abs_2512_10840/figures/009_Table_5.jpg]]
-*Table 5: Comparison of geometry injection strategies. We evaluate different geometry representations (VecSet [76] and PTv3 [69]), their formats, and injection methods*
-
-![[assets/figures/papers/paper_list_l2058_https_arxiv_org_abs_2512_10840/figures/010_Figure_5.jpg]]
-*Figure 5: Analysis of the Fragility of Multi-View Foundation Models to Appearance-Inconsistent Inputs. The input set consists of several rendered images along with a cropped region from the query image. When only rendered images are provided, VGGT [64] predicts consistent poses across views, as evidenced by the clean and coherent reconstructed point cloud without outliers. These point clouds are obtained by back-projecting image pixels into 3D using the predicted camera poses. However, once the cropped query image is included, VGGT fails to maintain consistency: the predicted pose for the query image becomes inaccurate. The red bounding box highlights the resulting deviations in the reconstructed poi...*
-
-![[assets/figures/papers/paper_list_l2058_https_arxiv_org_abs_2512_10840/figures/012_Figure_7.jpg]]
-*Figure 7: Visual comparison with other methods. From left to right: the query image for pose estimation, object masks with each object shown in a distinct color, and the projection results of different methods after applying the estimated poses to the 3D object models. The projected 3D models are outlined with borders matching the colors of their corresponding masks. The last three rows show samples from the T-LESS dataset [20]; since this dataset does not provide object textures, we display the rendered normal images of the objects for clearer visualization*
-
-![[assets/figures/papers/paper_list_l2058_https_arxiv_org_abs_2512_10840/figures/003_Figure_3.jpg]]
-*Figure 3: Examples from the constructed object pose estimation dataset. The leftmost column shows the object mesh after texture rebaking. The four columns on the right illustrate the four types of rendered image data*
-
-
 
 ## 定位与知识库关联
 
@@ -351,8 +320,6 @@ PoseGAM 的设计假设和实验设定定义了其当前的适用边界：
 3. **数据效率**：是否可以通过自监督学习或少样本微调减少对大规模合成数据的依赖，使方法能快速适配新物体？
 4. **动态场景**：如何处理存在运动模糊或动态光照的查询图像？能否结合时序信息对视频中的物体进行平滑位姿跟踪？
 5. **轻量化部署**：在保持几何感知能力的前提下，如何通过模型压缩或知识蒸馏降低推理成本，使方法适用于实时机器人应用？
-
-
 
 ## 原文 PDF
 

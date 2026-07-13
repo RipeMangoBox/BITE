@@ -75,8 +75,6 @@ FineMotion本质上是一种**数据增强方法**，而非全新的生成模型
 
 当前方法在空间编辑上的精度仍弱于时间编辑；获取BPM描述依赖多步流水线，尚未实现端到端；编辑过程中可能在指定区域外引入意外变化；且缺乏直接评估细粒度运动编辑质量的定量指标。
 
-
-
 人体运动生成旨在根据文本描述合成逼真的3D人体运动序列，在动画制作、虚拟现实和人机交互等领域具有广泛应用。近年来，基于扩散模型和自回归模型的文本驱动运动生成方法取得了显著进展，但其生成质量高度依赖于训练数据的文本标注质量。
 
 现有的人体运动-文本数据集（如HumanML3D、KIT-ML）存在一个核心瓶颈：**文本描述过于粗糙，缺乏对特定身体部位运动及其时间信息的细粒度刻画**。如图1(a)所示，这些数据集的标注通常仅提供一个概括性的动作短语或简短描述，例如“一个人向前走”，而忽略了“左臂摆动幅度”、“脚步节奏变化”等细节。这种粗粒度的文本-运动对应关系导致生成的运动难以实现精确的空间和时间控制。
@@ -84,8 +82,6 @@ FineMotion本质上是一种**数据增强方法**，而非全新的生成模型
 为缓解这一问题，近期工作尝试通过大语言模型对现有文本进行增强，生成更详细的描述。然而，如图1(b)所示，这些方法存在一个关键缺陷：**增强后的文本描述并未与实际的运动序列严格对齐**，即语言模型生成的细节可能并不反映真实运动数据中的具体变化。这种“文本增强但未对齐”的策略无法从根本上建立细粒度文本与运动之间的因果对应关系。
 
 上述缺口引出了本文的核心动机：**能否构建一个大规模、严格对齐的细粒度运动-文本数据集，使模型能够学习到身体部位运动在空间和时间维度上的精确对应关系？** 为实现这一目标，FineMotion提出了一种可扩展的数据构建流水线，通过对运动序列进行固定时长的短时切片，并利用PoseFix修正文本生成模型自动生成每个切片的身体部位运动描述（Body Part Movement description, BPM），再经人工校正和段落组织，最终构建了包含超过442,000个人体运动片段及对应细粒度描述的数据集。该数据集不仅显著提升了现有文本-运动生成模型对细节和时间控制的性能，还首次支持了零样本细粒度运动编辑能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -131,8 +127,6 @@ FineMotion提出了一套高效、可扩展的数据构建流水线，包含三�
 ### 创新边界与局限
 
 需要指出的是，FineMotion的创新主要集中在**数据层面**和**文本编码策略层面**，其运动生成骨干网络（MDM、T2M-GPT、MoMask等）本身并未进行架构创新。此外，时间编辑效果优于空间编辑，反映了当前方法在空间维度精细控制上的不足；重新生成过程可能在指定编辑区域之外引入意外变化，这也是零样本编辑流水线的固有局限。
-
-
 
 FineMotion 的整体框架围绕一个核心洞察展开：现有运动-文本数据集缺乏对**特定身体部位运动（Body Part Movement, BPM）及其时间信息**的细粒度描述，导致生成的运动难以精确控制。为解决这一问题，FineMotion 构建了一套从运动序列到细粒度文本描述，再反向支撑生成与编辑的完整流水线。
 
@@ -183,8 +177,6 @@ FineMotion 数据集进一步支撑了零样本细粒度运动编辑能力（Fig
 -   **分离编码策略（T&DT）**：粗文本和细文本分别编码后再拼接嵌入，而非拼接为单一文本后编码。消融实验证实，分离编码策略显著优于拼接编码策略（MoMask BPMSD 的 R-Top3: 0.811 vs 0.434），表明模型能更有效地从独立编码中解耦粗、细语义。
 -   **时间增强训练**：训练时使用 FineMotion 的细粒度时间对齐文本，使模型学习到运动与文本在时间维度上的精确对应关系，这是支撑零样本时间编辑能力的核心机制。
 
-
-
 ### 3.1 数据集构建流水线的关键模块
 
 FineMotion 数据集的核心贡献在于其自动化、可扩展的细粒度运动描述生成流水线（Figure 3），该流水线包含三个关键模块：
@@ -223,8 +215,6 @@ L = - \sum_{i=1}^{\lfloor T / l \rfloor} \log(P(c_i \mid t_{\mathrm{coarse}}, \h
 $$
 
 其中 $c_i$ 为第 $i$ 个运动令牌，$c_{<i}$ 为之前时刻的运动令牌序列，$T$ 为运动序列长度，$l$ 为运动 VQ-VAE 的下采样因子，$\theta_{\mathrm{GPT}}$ 为 GPT 模型参数。该损失函数使模型在粗、细两种文本条件的共同约束下，学习生成与描述严格对齐的运动序列。
-
-
 
 ## 实验与关键发现
 
@@ -285,21 +275,11 @@ FineMotion数据集还解锁了一项重要能力：零样本细粒度运动编�
 3. **缺乏定量评估指标**：目前尚无直接评估细粒度运动编辑结果的标准定量指标，用户研究是目前唯一可靠的评估手段，这限制了方法的可复现比较。
 4. **文本获取流程复杂**：从运动序列获取详细的BPM文本描述仍需多步骤处理（切片→PoseFix生成→人工校正），端到端的运动-文本联合建模仍是开放问题。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l7_FineMotion_A_Dataset_and_Benchmark_with_both_Spatial_and_Temporal_Annota/figures/002_Table_1.jpg]]
 *Table 1: Comparisons of 3D human motion-language datasets*
 
 ![[assets/figures/papers/paper_list_l7_FineMotion_A_Dataset_and_Benchmark_with_both_Spatial_and_Temporal_Annota/figures/008_Table_3.jpg]]
 *Table 3: Benchmark of FineMotion & Comparisons with HumanML3D. We conduct all evaluations 20 times, reporting the average with a 95% confidence interval, except for MModality, which is run 5 times. ‘→’ means results are better if the metric is closer to the real motions. For methods marked with †, we re-implement them using the same text encoder (T5) as ours to ensure fair comparisons. All our variants exhibit performance improvements, with (T&DT)-MDM showing a notable +15.3% increase in Top-3 retrieval accuracy*
-
-![[assets/figures/papers/paper_list_l7_FineMotion_A_Dataset_and_Benchmark_with_both_Spatial_and_Temporal_Annota/figures/015_Table_4.jpg]]
-*Table 4: Generation performance of all our variants on the T2M test set, i.e., motion generation conditioned on coarse descriptions only*
-
-![[assets/figures/papers/paper_list_l7_FineMotion_A_Dataset_and_Benchmark_with_both_Spatial_and_Temporal_Annota/figures/016_Table_5.jpg]]
-*Table 5: Ablation study on different strategies for encoding coarse and detailed texts*
-
-
 
 ## 定位与知识库关联
 
@@ -352,8 +332,6 @@ FineMotion 的适用性受以下因素制约：
 - 能否训练一个直接从运动序列推断详细 BPM 描述的端到端模型？
 
 > **注意**：上述基线工作的具体作者、会议和年份信息在提供的分析材料中未明确给出，建议读者根据论文原文的参考文献列表进行核实。
-
-
 
 ## 原文 PDF
 

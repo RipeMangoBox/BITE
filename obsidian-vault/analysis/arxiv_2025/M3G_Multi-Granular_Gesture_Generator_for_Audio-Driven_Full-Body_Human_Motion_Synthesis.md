@@ -51,8 +51,6 @@ claims:
 
 该方法在动作表示范式上引入了从单帧静态到多粒度动态的关键转变，为音频驱动的全身动作合成提供了新的技术路径。
 
-
-
 ### 问题背景：音频驱动的全身手势生成
 
 音频驱动的全身手势生成旨在根据语音音频自动合成与语音内容、节奏和情感相协调的全身三维人体动作，包括身体姿态、手势、面部表情以及脚部接触等。这一任务在虚拟人、数字人交互、游戏动画和影视制作等领域具有广泛的应用前景。
@@ -75,8 +73,6 @@ claims:
 - **从粗到细的生成**：在生成阶段，先预测粗粒度的动作Token确定整体手势框架，再逐步细化到更细粒度，使生成的动作兼具结构一致性和细节丰富性。
 
 这一思路直接催生了本文提出的**M3G（Multi-Granular Gesture Generator）**框架，其核心创新——**多粒度VQ-VAE（MGVQ-VAE）**和**多粒度Token预测器**——正是围绕“多粒度动作模式编码与生成”这一因果机制展开的。
-
-
 
 ## 核心方法与创新机理
 
@@ -119,8 +115,6 @@ M3G 通过 MGVQ‑VAE 将全身动作序列在不同时间粒度下编码为共�
 
 粒度数量选择实验（Table 2）进一步表明，随着粒度数量从 1 增至 4，性能持续提升（FGD: $4.784\times10^{-1}$，MSE: $7.291\times10^{-8}$），但继续增加粒度会导致性能下降，揭示出粒度层次与表示容量之间存在最优权衡。
 
-
-
 M3G 采用两阶段训练范式，将音频驱动的全身手势生成分解为动作离散化与条件预测两个子问题。第一阶段训练**多粒度 VQ‑VAE（MGVQ‑VAE）**，学习全身动作的离散多粒度潜在表示；第二阶段训练**多粒度令牌预测器**，从音频与文本特征中预测这些离散令牌。
 
 ### 输入与输出定义
@@ -157,12 +151,8 @@ $$\hat{\mathbf{q}}_i^{parts} = \text{MLP}(\tilde{\mathbf{h}}_i^{parts} + \hat{\m
 
 最终，预测的多粒度令牌序列送入已训练好的 MGVQ‑VAE 解码器，生成完整的全身手势动作。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2505_08293/figures/002_Figure_2.jpg]]
 *Figure 2: The Overall Workflow of M3G. We illustrate the workflow in two stages: 1. Training MGVQ-VAE to learn discrete latent representations of motions, as known as tokens, for encode and reconstruction. 2. Training Multi-Granular Token Predictor to predict the discrete latent representations from audio*
-
-
 
 M3G 采用两阶段训练范式：第一阶段训练**多粒度 VQ-VAE（MGVQ-VAE）**，学习全身动作的离散多粒度潜在表示；第二阶段训练**多粒度令牌预测器**，从音频和文本特征中预测这些离散令牌。
 
@@ -220,13 +210,6 @@ $$\hat{\mathbf{q}}_i^{parts} = \text{MLP}(\tilde{\mathbf{h}}_i^{parts} + \hat{\m
 
 这种从粗到细的预测策略使模型能够先捕捉整体动作趋势，再逐步细化局部细节。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2505_08293/figures/001_Figure_1.jpg]]
-*Figure 1: Illustration of gesture sequences with expressive motion patterns in different granularities*
-
-
-
 ## 实验与关键发现
 
 ### 整体性能对比
@@ -267,8 +250,6 @@ Figure 3展示了18名参与者在40个随机片段上的A/B测试结果。参�
 2. **跨数据集泛化**：当前实验仅基于BEAT数据集，该方法在其他数据集（如TED Gesture、Trinity）上的表现需要额外验证。
 3. **失败模式**：原文未系统报告失败案例，但从粒度消融可以推断，在动作模式极为单一或极度复杂的场景下，固定的4粒度配置可能不是最优选择。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2505_08293/figures/004_Table_1.jpg]]
 *Table 1: Overall Comparison of various methods. The best performance of each metric is in boldface fonts. The sign ↑ beside the metric denotes that the larger the value, the better it is, while the sign ↓ is the reverse*
 
@@ -281,13 +262,8 @@ Figure 3展示了18名参与者在40个随机片段上的A/B测试结果。参�
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2505_08293/figures/008_Table_4.jpg]]
 *Table 4: Experiments for Reconstruction Errors*
 
-![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2505_08293/figures/005_Figure_3.jpg]]
-*Figure 3: Perceptual study results on motion generation*
-
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2505_08293/figures/007_Figure_4.jpg]]
 *Figure 4: Qualitative results*
-
-
 
 ## 定位与知识库关联
 
@@ -328,8 +304,6 @@ M3G 的两阶段流水线——先训练 **MGVQ‑VAE** 学习离散多粒度潜
 2. **长时序一致性**：多粒度Token能否有效建模段落级甚至篇章级的时序依赖，从而保证长时间手势序列的风格一致性？
 3. **跨域泛化**：该方法在不同语言、情感强度和说话风格条件下的泛化性能如何？是否需要域适应策略？
 4. **与生成式大模型的结合**：能否将多粒度离散表示与扩散模型或大型语言模型结合，利用后者的强先验进一步提升手势生成的自然度和可控性？
-
-
 
 ## 原文 PDF
 

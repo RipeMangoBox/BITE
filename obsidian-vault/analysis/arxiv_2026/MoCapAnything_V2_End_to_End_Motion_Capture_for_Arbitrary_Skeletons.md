@@ -53,8 +53,6 @@ claims:
 
 实验结果表明，该方法在 Truebones Zoo 和 Objaverse 基准上实现了显著提升：平均旋转角度误差从因子化管线的约17°降至约10°，在未见骨骼（Zoo-Unseen）上进一步降至6.54°；同时，去除网格中间表示带来了约20倍的推理加速。消融实验系统性地验证了参考条件化、端到端联合训练和显式关节位置瓶颈各自的贡献：无参考对时Zoo-Unseen误差骤升至24.05°，梯度截断变体升至7.82°，直接V→R变体仅23.73°，分别证明了坐标轴锚定、梯度耦合和显式中间表示的必要性。
 
-
-
 ### 问题背景：从单目视频到任意骨骼动作捕捉
 
 从单目视频中恢复三维人体运动是计算机视觉与图形学的长期目标。近年来，基于参数化人体模型（如SMPL）的方法取得了显著进展，但其核心假设——所有目标对象共享相同的骨骼拓扑——严重限制了应用的边界。现实世界中的动作捕捉需求远超人体范畴：从四足动物到鸟类的运动分析、从虚拟角色到机器人遥操作，目标骨骼的拓扑结构、关节数量、肢体比例和静止姿态千差万别。因此，**面向任意骨骼的动作捕捉**——即从单目视频输入直接输出与目标资产骨骼兼容的动画就绪旋转——成为一个具有高度实用价值但极具挑战性的开放问题。
@@ -88,8 +86,6 @@ claims:
 **动机二：解锁端到端联合优化。** 一旦P→R模块可学习，整个V→P→R管线就可以端到端联合训练。梯度从旋转损失回传至视觉编码器，使中间姿态表示不再仅仅是位置精度的优化目标，而是自动重塑为最有利于旋转恢复的表示形式——这一能力是任何带有不可微IK的因子化管线无法实现的。
 
 同时，本文直接预测3D关节位置作为中间表示，消除了V1中的网格瓶颈，在保持旋转精度的同时实现约20倍推理加速。通过GL-GMHA（全局-局部图引导多头注意力）作为共享结构骨干，模型天然适应多样化的骨骼拓扑，无需针对不同骨骼重新设计网络架构。
-
-
 
 ## 核心方法与创新机理
 
@@ -135,8 +131,6 @@ V2 在两个阶段共享的结构骨干中引入了 **GL-GMHA（Global-Local Gra
 V2 坚持保留显式的关节位置中间表示（而非直接从视频回归旋转），这一设计选择有深层原因。Table 5 的消融实验显示，直接 V→R 变体在 Zoo-Unseen 上仅达到 23.73°，而显式姿态中间表示（Full）达到 6.54°。显式关节位置作为结构瓶颈，迫使模型学习可解释的中间几何表示，这对跨骨骼泛化起到了关键的**正则化作用**——不同骨骼的旋转空间差异巨大，但关节位置空间具有更强的跨骨骼不变性。
 
 **总结**：MoCapAnything V2 的创新链条呈现清晰的因果逻辑——参考条件化解决了 P→R 的病态性（必要条件），端到端联合优化释放了 V→P 与 P→R 的协同潜力（充分条件），而 GL-GMHA 和显式姿态瓶颈则为这一框架提供了跨骨骼泛化的结构基础。三者缺一不可，共同构成了从“因子化不可微”到“端到端可学习”的范式转变。
-
-
 
 MoCapAnything V2 将任意骨骼的动作捕捉问题分解为一个端到端可学习的**两阶段管线**：
 
@@ -202,12 +196,8 @@ $$
 
 端到端联合训练使梯度从旋转损失回传至视觉编码器，中间姿态表示不再仅是位置精度优化目标，而是被自动重塑为最有利于旋转恢复的表示形式。消融实验直接验证了这一收益：相比梯度截断变体，联合训练将 Zoo-Unseen 角度误差从 7.82° 进一步降至 6.54°（Table 3）。这一能力是因子化管线（带有不可微 IK）无法实现的。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l56_https_arxiv_org_abs_2604_28130v1/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of MoCapAnything V2. Given an input video of a human or an animal, our method infers a topology-agnostic skeleton sequence across diverse skeleton topologies. Conditioned on a reference asset, the model predicts animation-ready rotations via an end-to-end framework, enabling the reference asset to perform the input motion*
-
-
 
 ### 问题形式化与两阶段分解
 
@@ -259,12 +249,8 @@ $$p_{\mathrm{pred}}(e) = p_{\mathrm{start}} + (p_{\mathrm{end}} - p_{\mathrm{sta
 
 其中 $p_{\mathrm{start}} = 0.1$，$p_{\mathrm{end}} = 1.0$，$E_{\mathrm{warmup}} = 30$。该调度使 P→R 模块在训练初期从真实姿态中学习稳定的旋转映射，随后逐步适应预测姿态的噪声分布，最终实现与 V→P 模块的协同优化。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l56_https_arxiv_org_abs_2604_28130v1/figures/003_Figure_3.jpg]]
 *Figure 3: Framework of MoCapAnything V2. Our method unifies video-to-pose and pose-to-rotation within a single end-to-end trainable architecture. The video-to-pose stage consists of a reference-conditioned pose prompt encoder (A), which encodes skeleton and image cues into joint prompt, and a unified pose decoder (B), which predicts temporally coherent joint positions via cross-attention with video features. The pose-to-rotation stage is formulated as a learnable inverse kinematics module, composed of a rotation prompt encoder (C) that maps predicted poses into rot prompt, an anchor encoder (D) that encodes reference pose–rotation pairs to establish a consistent rotation coordinate space, and a unifi...*
-
-
 
 ## 实验与关键发现
 
@@ -330,24 +316,8 @@ Table 1 展示了全面对比结果。MoCapAnything V2 在所有评估集上均�
 
 3. **稀有物种的旋转质量受限**：训练集中各物种覆盖不均匀（Truebones Zoo 包含约 1000 条序列但仅涵盖几十个物种），稀有物种的旋转质量受数据稀缺限制。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l56_https_arxiv_org_abs_2604_28130v1/figures/006_Table_3.jpg]]
 *Table 3: Ablation of training strategies on Zoo (Seen/Rare/Unseen) and Obj. Position in cm; rotation in degrees (↓). Best angle error per split in bold*
-
-![[assets/figures/papers/paper_list_l56_https_arxiv_org_abs_2604_28130v1/figures/007_Table_4.jpg]]
-*Table 4: Ablation of reference conditioning (Ref ) and rest pose (Rest). Position in cm; rotation in degrees (↓). Best angle error per split in bold*
-
-![[assets/figures/papers/paper_list_l56_https_arxiv_org_abs_2604_28130v1/figures/008_Table_5.jpg]]
-*Table 5: Ablation of the intermediate pose representation. Position in cm; rotation in degrees (↓). “Direct (V→R)” regresses rotations directly from video without a pose branch; joint positions for this variant are recovered by applying forward kinematics to the predicted rotations. “Latent +*
-
-![[assets/figures/papers/paper_list_l56_https_arxiv_org_abs_2604_28130v1/figures/010_Table_7.jpg]]
-*Table 7: Effect of model depth (Video-to-Pose and Pose-to-Rotation jointly scaled). Position in cm; rotation in degrees (↓). Best angle error per split in bold*
-
-![[assets/figures/papers/paper_list_l56_https_arxiv_org_abs_2604_28130v1/figures/011_Table_8.jpg]]
-*Table 8: Effect of reference cross-attention depth*
-
-
 
 ## 定位与知识库关联
 
@@ -440,8 +410,6 @@ Table 7 显示 8 层模型深度达到最优（Zoo-Unseen 6.54°），12 层反�
 4. **物种覆盖度扩展**：Truebones Zoo 的物种覆盖有限，如何高效采集或生成更多物种的运动数据以提升稀有骨骼的旋转质量？
 
 5. **参考对选择策略**：当前参考姿态-旋转对从同一资产中采样，其对模型性能的敏感性尚未系统研究。参考对的选择策略（如运动范围最大化）是否影响旋转恢复质量？
-
-
 
 ## 原文 PDF
 

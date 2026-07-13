@@ -57,8 +57,6 @@ SegMo 提出了一种**算法-系统协同设计**方法论，从 VLM 注意力�
 
 > **方法定位**：SegMo 属于推理系统层面的稀疏化-并行化联合优化方法，与单纯基于 token 剪枝或传统张量并行的方案正交，可视为对现有 VLM 推理栈的即插即用增强。其场景感知的稀疏化策略与 **MPGD**（He et al., CVPR 2023）等基于均匀采样的方案形成对比，而通信免并行的设计则区别于依赖全局 KV Cache 共享的全量并行方案。
 
-
-
 ### 长视频 VLM 推理的性能墙
 
 视频大语言模型（Video LLM）通过将长视频编码为大量视觉 token 来理解时序内容，但这一范式带来了根本性的计算瓶颈：视觉 token 数量随视频长度线性增长，而标准 Transformer 自注意力的 Prefill 阶段计算复杂度为 $O(N^2)$。当输入视频长达数十分钟甚至数小时时，单次推理的 Prefill 延迟变得无法承受。这一**视觉 token 爆炸**问题构成了当前长视频 VLM 推理的性能墙，使模型在真实部署场景中难以满足延迟要求。
@@ -91,8 +89,6 @@ SegMo 的核心动机源自对 VLM 注意力模式的四项实证观察（见 Fi
 - **局部凝聚段并行（Locally-Cohesive Segment Parallelism, LSP）**：以场景边界为分片依据，将同一场景的所有帧协同放置在同一 GPU 上，消除 Prefill 阶段的跨 GPU 通信；同时通过首帧注入轻量级全局上下文，弥补并行化带来的跨场景信息损失。
 
 通过将稀疏化和并行化统一在一个优化框架下，SegMo 旨在打破现有方法普遍存在的精度-延迟权衡困境。
-
-
 
 ## 核心方法与创新机理
 
@@ -137,8 +133,6 @@ CAS 在 CPU 上运行，LSP 在 GPU 上运行，两者通过生产者-消费者�
 
 这一系列 changed slots 的协同效应体现在：CAS 的非均匀帧分配天然适配 LSP 的场景级并行粒度，而 LSP 的通信免预填充特性使 CAS 的精度增益不因并行化而被延迟代价抵消。最终系统在 LVBench 上实现最高 12.00% 精度提升，同时达到 3.55× 的 Prefill 加速（Table 1, Table 2），打破了精度-延迟的固有权衡。
 
-
-
 SegMo 的推理流水线遵循**算法-系统协同设计**原则，将视频大语言模型（VLM）的长视频推理拆分为两个解耦的物理域：CPU 端的**内容感知稀疏化（Content-Aware Sparsification, CAS）** 与 GPU 端的**局部凝聚段并行（Locally-Cohesive Segment Parallelism, LSP）**，二者通过多线程生产者-消费者流水线重叠执行，以隐藏 CPU 预处理延迟（Figure 5, Figure 6）。
 
 ![[assets/figures/papers/paper_list_l782_https_openaccess_thecvf_com_content_CVPR2026_html_Li_SegMo_Co_Designing/figures/004_Figure_5.jpg]]
@@ -169,13 +163,6 @@ SegMo 的推理流水线遵循**算法-系统协同设计**原则，将视频大
 - **输入**：原始长视频 $V$、用户文本查询 $Q$、总帧数预算 $M_{max}$、可用 GPU 数量 $N$ 及其计算能力 $Cap(g_j)$。
 - **输出**：VLM 对查询 $Q$ 的文本回答。
 - **中间产物**：CAS 输出的非均匀关键帧集合（各场景 $m_k$ 帧）及场景分区方案 $\pi = \{P_1, \dots, P_N\}$；LSP 输出的聚合 KV 缓存用于解码阶段。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l782_https_openaccess_thecvf_com_content_CVPR2026_html_Li_SegMo_Co_Designing/figures/001_Figure_1.jpg]]
-*Figure 1: SegMo unifies CAS (Accuracy) and LSP (Latency) to break the Accuracy-Latency Trade-off. The system utilizes Local Cohesion for communication-free parallelism. Validated on longvideo benchmarks, SegMo achieves a peak accuracy and prefill acceleration gains of 12.00% and 3.55×, respectively*
-
-
 
 ### 问题形式化
 
@@ -221,21 +208,11 @@ CAS 的三步流水线为：(1) 使用 PySceneDetect 进行结构分解，将视
 
 LSP 模块运行在 GPU 端，利用 VLM 注意力的局部凝聚特性实现通信免预填充并行。其关键洞察来自实证观察：**VLM 注意力在场景内形成强对角块，场景间注意力极弱**（Figure 2）。这意味着将同一场景的所有帧协同定位在同一 GPU 上，场景边界处几乎不需要跨 GPU 通信。
 
-![[assets/figures/papers/paper_list_l782_https_openaccess_thecvf_com_content_CVPR2026_html_Li_SegMo_Co_Designing/figures/003_Figure_2.jpg]]
-*Figure 2: Intra-Scene Cohesion: Strong diagonal blocks (high intra-scene attention) and negligible inter-scene attention*
-
 **硬件感知贪婪分区。** 给定 CAS 输出的非均匀帧预算 $\{m_k\}$，LSP 采用贪婪算法近似求解 Eq. 3 的 makespan 最小化问题。算法在满足各 GPU 显存容量的前提下，按场景顺序将帧分配到当前负载最小的 GPU，动态平衡各 GPU 的计算负载。
 
 **全局上下文注入（GCI）。** 场景级并行化虽然消除了 Prefill 阶段的通信，但也切断了跨场景的全局上下文。LSP 利用"头部帧优先"洞察（Figure 4：每场景首帧获得更高注意力分数）来弥补这一损失：从信息价值最高的 $\log_2 M$ 个场景中各取首帧，构建轻量全局上下文序列注入到每个 GPU 的输入中。这一设计以极小的计算开销（仅增加数个 token）替代了传统方法中庞大的 KV 缓存共享或全对全注意力通信。消融实验表明，GCI 将 LongVideoBench 整体准确率从 48.46% 提升至 49.83%（+1.37%），其中时序动作理解（T2A）准确率提升达 10.71%（Table 4）。
 
 **系统优化层。** 多线程生产者-消费者流水线将 CPU 端的 CAS 预处理与 GPU 端的 LSP 推理重叠：当前请求在 GPU 上执行 Prefill 时，下一请求的场景检测和帧预算计算已在 CPU 上并行进行（Figure 7），有效隐藏了预处理延迟，提升服务吞吐。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l782_https_openaccess_thecvf_com_content_CVPR2026_html_Li_SegMo_Co_Designing/figures/002_Figure_3.jpg]]
-*Figure 3: Non-Uniform VLM Attention: Highlighted Top-5 relevant scenes (e.g., 1, 7, 8, 10, 16) motivate the Relevance metric*
-
-
 
 ## 实验与关键发现
 
@@ -276,19 +253,12 @@ Table 4 验证了 LSP 中全局上下文注入（GCI）机制的贡献。启用 
 
 Figure 7 展示了 SegMo 的多线程生产者-消费者流水线设计。CAS 模块运行在 CPU 端（场景分解、信息价值评估、帧预算分配），LSP 模块运行在 GPU 端（硬件感知分片、通信免预填充、KV 缓存聚合）。通过将下一个请求的 CPU 预处理与当前请求的 GPU 计算重叠，系统有效隐藏了 CAS 的预处理延迟，最大化服务吞吐。
 
-![[assets/figures/papers/paper_list_l782_https_openaccess_thecvf_com_content_CVPR2026_html_Li_SegMo_Co_Designing/figures/006_Figure_7.jpg]]
-*Figure 7: System optimizations for hiding CPU pre-processing time consumed by the proposed CAS module. The pipeline overlaps CPU pre-processing for the next request with the GPU computation for the current request*
-
 ### 公平性与局限性说明
 
 当前实验仅在 **2 张 H100 GPU** 配置下验证，且限于两个 VLM 模型。SegMo 在更多 GPU 规模（如 4/8 卡）或不同互联拓扑（如 PCIe）下的扩展效率，以及在其他 video-LLM 任务（如 dense captioning、temporal grounding）上的适用性，有待进一步验证。此外，CAS 依赖 CLIP 相似度和手工灰度差异特征，其端到端可学习性仍是一个开放问题。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l782_https_openaccess_thecvf_com_content_CVPR2026_html_Li_SegMo_Co_Designing/figures/010_Figure_8.jpg]]
 *Figure 8: Qualitative visualization*
-
-
 
 ## 定位与知识库关联
 
@@ -325,8 +295,6 @@ SegMo 的方法论贡献不仅在于稀疏化和并行化的独立创新，更�
 **全局上下文完整性**：GCI 仅使用头部帧作为全局映射，可能遗漏需要跨场景密集推理的任务（如跨场景人物关系推理、长时序因果链分析）。对于此类任务，轻量级全局上下文可能不足以替代完整的跨场景注意力。
 
 **任务泛化性**：当前验证集中在视频问答（VideoQA）任务上，方法对视频描述生成（captioning）、视频定位（grounding）等其他 video-LLM 应用的适用性尚未得到实验检验。
-
-
 
 ## 原文 PDF
 

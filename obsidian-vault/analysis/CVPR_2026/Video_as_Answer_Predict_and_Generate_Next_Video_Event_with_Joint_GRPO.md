@@ -53,8 +53,6 @@ claims:
 
 **主要结果**：在程序性基准上，VANS（Joint-GRPO）的ROUGE-L达到0.3631，较最强基线Gemini-FilmWeaver（0.2802）提升29.6%；FVD降至78.32（对比110.54，降低29.1%）；CLIP-V达到0.8021（对比0.7102，提升12.9%）。在预测性基准上同样取得显著提升。消融实验证实两阶段设计、各奖励组件均为必要，且Joint-GRPO显著优于独立优化VLM或VDM的GRPO变体。人类评估中，VANS在语义正确性（4.7/5）、视觉一致性（4.6/5）和整体满意度上均获最高评分。
 
-
-
 视频理解与生成领域正经历从“文本回答”到“视频回答”的范式转变。传统视觉问答（VQA）系统仅输出文本描述，在面对程序性（“如何操作？”）或预测性（“接下来会发生什么？”）问题时，文本回答往往缺乏直观性与可操作性——例如，用文字描述“取下口罩”的动作远不如直接生成一段演示视频来得清晰（Figure 2）。
 
 ### 任务定义：视频即答案
@@ -81,8 +79,6 @@ claims:
 
 上述分析揭示了一个核心洞察：**弥合语义到视觉鸿沟的关键，在于将VLM与VDM视为一个协同单元进行联合优化**。VLM需要内化VDM的可视化能力与约束，生成“可视化友好”的描述；VDM则需要忠实遵循VLM提供的语义锚点，同时保持与输入视频的视觉一致性。为此，本文提出**VANS（Video-as-Answer System）** 及其核心策略**Joint-GRPO**——一种通过联合奖励函数驱动VLM与VDM协同优化的两阶段强化学习框架，从根本上解决跨模态对齐问题。
 
-
-
 ## 核心方法与创新机理
 
 VANS 的核心创新在于提出了 **Joint-GRPO** 策略，通过联合奖励函数驱动视觉语言模型（VLM）与视频扩散模型（VDM）的协同优化，从根本上解决了“语义到视觉的跨模态对齐鸿沟”这一瓶颈问题。传统级联方案中，VLM 生成的文本描述虽语言正确，却可能视觉上不可行或 VDM 难以执行；VDM 则面临协调 VLM 特定描述与输入视觉上下文两个条件信号的挑战，导致语义忠实度与视觉一致性难以兼顾。Joint-GRPO 将 VLM 与 VDM 视为一个协同单元，通过两阶段强化学习实现共同引导（co-steering），迫使 VLM 内化 VDM 的可视化能力与约束，同时迫使 VDM 忠实遵循 VLM 的语义锚点描述。
@@ -104,8 +100,6 @@ VANS 的核心创新在于提出了 **Joint-GRPO** 策略，通过联合奖励�
 ### 创新效果量化
 
 Joint-GRPO 相较于 SFT 基线实现了显著提升：ROUGE-L 从 0.2812 提升至 0.3631（相对提升 29.1%），CLIP-V 从 0.7655 提升至 0.8021。相较于最强级联基线 Gemini-FilmWeaver，VANS 在程序性基准上 FVD 降低 29.1%（78.32 vs 110.54），CLIP-T 提升 37.9%（0.3824 vs 0.2773），充分验证了联合优化策略相较于独立优化的根本优势。
-
-
 
 VANS（Video-as-Answer System）构建了一条**VLM推理→VDM生成**的级联流水线，将“下一个视频事件预测与生成”（VNEP）形式化为一个以视频为答案的跨模态生成任务。其核心设计理念在于：将VLM与VDM视为一个协同单元，通过联合奖励驱动两阶段强化学习（Joint-GRPO），迫使VLM内化VDM的可视化能力与约束，同时迫使VDM忠实遵循VLM的语义锚点描述，从而弥合语义到视觉的跨模态对齐鸿沟。
 
@@ -137,12 +131,8 @@ VANS的训练分为两个阶段，其关键变革在于将标准监督微调（S
 
 此外，all-in-one变体（同时训练VLM和VDM）因奖励模糊性导致优化不稳定，ROUGE-L降至0.3577（vs. Joint-GRPO的0.3631），验证了两阶段设计的必要性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2711_https_arxiv_org_abs_2511_16669/figures/004_Figure_4.jpg]]
 *Figure 4: Overall architecture of VANS*
-
-
 
 ### 系统流水线模块
 
@@ -193,15 +183,11 @@ $$r_2(v_{\mathrm{out}}^i, s_{\mathrm{anchor}}) = \lambda_{v2} r_{v2}(v_{\mathrm{
 
 阶段二的关键在于：VLM 作为冻结锚点模型，提供稳定的语义锚点 $s_{\mathrm{anchor}}$；VDM 在 $r_{c2}$ 的驱动下必须忠实遵循该锚点描述，同时 $r_{v2}$ 防止 reward hacking（如生成静态帧以骗取高语义对齐分数）。两阶段递进设计避免了 all-in-one 联合训练中因奖励模糊性导致的优化不稳定。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2711_https_arxiv_org_abs_2511_16669/figures/005_Figure_5.jpg]]
 *Figure 5: Comparison of standard GRPO with Joint-GRPO. While standard GRPO optimizes a single model at a time, our Joint-GRPO coordinates their optimization under a joint reward function*
 
 ![[assets/figures/papers/paper_list_l2711_https_arxiv_org_abs_2511_16669/figures/008_Table_2.jpg]]
 *Table 2: Quantitative results of ablation study*
-
-
 
 ## 实验与关键发现
 
@@ -222,9 +208,6 @@ VANS (Joint-GRPO) 在程序性（Procedural）和预测性（Predictive）两类
 *Table 4: Results on procedural VNEP. The comparison with finetuned baselines (*) shows that our architectural design, rather than data advantage, is the primary source of improvement*
 
 人类评估结果（Table 5，30 名评估者，1-5 分制）从语义正确性、视觉一致性和整体满意度三个维度进一步验证：VANS (Joint-GRPO) 在所有指标上均获最高分，与自动评估结论一致。
-
-![[assets/figures/papers/paper_list_l2711_https_arxiv_org_abs_2511_16669/figures/016_Table_5.jpg]]
-*Table 5: Human evaluation results (scale: 1-5). Our VANS with Joint-GRPO achieves the highest scores across all criteria*
 
 ### 消融实验
 
@@ -254,25 +237,6 @@ Table 2 和 Figure 7 系统验证了 Joint-GRPO 各组件的必要性。
 ### 训练动态
 
 Figure 9 展示了 Joint-GRPO 的训练曲线。阶段一（VLM 调优）中，格式奖励 $r_f$ 快速收敛至接近满分，表明 VLM 迅速学会了输出结构化 caption。文本保真度奖励 $r_{t1}$ 和视频保真度奖励 $r_{v1}$ 在初期波动后稳步上升，反映了 VLM 逐步内化 VDM 可视化能力的过程。阶段二（VDM 适配）中，视频保真度奖励 $r_{v2}$ 和语义对齐奖励 $r_{c2}$ 呈现协同上升趋势，验证了联合奖励设计使 VDM 在保持视觉质量的同时忠实于锚点描述。训练曲线未出现明显的奖励退化或发散，表明两阶段优化策略具有良好的稳定性。
-
-![[assets/figures/papers/paper_list_l2711_https_arxiv_org_abs_2511_16669/figures/012_Figure_9.jpg]]
-*Figure 9: Training curves of Joint-GRPO: (a) format reward*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2711_https_arxiv_org_abs_2511_16669/figures/007_Figure_6.jpg]]
-*Figure 6: Visual comparison on VNEP. Captions are color-coded: green (correct), red (incorrect), blue (semantically correct but visually unfriendly). Yellow boxes highlight key regions. Baselines often fail in event prediction or visual consistency. Our SFT model improves reasoning but retains errors like semantic hallucination (predicting non-existent inreview in Case 1) and action misalignment (“adding cheese” yields pouring in Case 2). Joint-GRPO addresses both issues, enhancing model capability (correctly identifying document relationships and maintaining character appearance in Case 1) and fine-grained alignment (“sprinkle cheese” matching the GT “shower” in Case 2)*
-
-![[assets/figures/papers/paper_list_l2711_https_arxiv_org_abs_2511_16669/figures/003_Figure_3.jpg]]
-*Figure 3: Data curation pipeline of VANS-Data-100K, which processes raw videos through shot splitting, clip selection, and QA generation to produce high-quality data for both procedural and predictive Video-Next-Event Prediction*
-
-![[assets/figures/papers/paper_list_l2711_https_arxiv_org_abs_2511_16669/figures/014_Figure_10.jpg]]
-*Figure 10: Visual comparison results on UI2V-Bench*
-
-![[assets/figures/papers/paper_list_l2711_https_arxiv_org_abs_2511_16669/figures/002_Figure_2.jpg]]
-*Figure 2: Video answer (our VANS) versus text-only answer (Gemini) on a procedural question. Video answer provides an intuitive and customized response by demonstrating the action directly, while text-only answer falls short in clarity*
-
-
 
 ## 定位与知识库关联
 
@@ -325,8 +289,6 @@ Joint-GRPO 的核心洞察是将 VLM 与 VDM 视为一个协同单元，通过�
 4. **跨任务泛化**：Joint-GRPO 的跨模态协同优化框架是否能泛化到其他需要语义-视觉对齐的生成任务（如文本-3D 场景生成、音频-视频对齐等）？
 
 5. **更大规模验证**：在更多样化的 VNEP 场景（体育、医疗、科学实验）和更大规模基准上，VANS 的性能优势是否仍然保持？
-
-
 
 ## 原文 PDF
 

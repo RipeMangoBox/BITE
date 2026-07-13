@@ -49,15 +49,11 @@ TaskForce 的核心洞察在于：将多任务优化重构为一个**合作马�
 
 实验表明，TaskForce 在三个异构基准（NYU-v2 三任务密集预测、Cityscapes 三任务语义场景理解、QM9 十一任务分子性质预测）上一致超越现有 MTO 基线。消融研究进一步证实，合作 MARL 的各个组件（Gram 观测、多智能体架构、集中式评论家、去中心化执行、共享奖励）均带来显著且一致的性能增益。
 
-
-
 多任务学习（Multi-Task Learning, MTL）的核心目标是通过跨任务共享表征来提升泛化能力与数据效率。然而，其优化过程本质上是一个多目标优化（Multi-Task Optimization, MTO）问题——需要同时最小化多个可能相互冲突的任务损失函数。这引出了一个根本性的瓶颈：**现有MTO方法要么依赖确定性启发式策略而缺乏随机性探索，易陷入局部最优；要么未显式建模和解决梯度冲突，导致负迁移（negative transfer）难以根除。**
 
 具体而言，现有MTO方法可分为两大范式。**基于梯度的方法**（如**MGDA** (Sener & Koltun, NeurIPS 2018)、**PCGrad** (Yu et al., NeurIPS 2020)、**CAGrad** (Liu et al., NeurIPS 2021)）通过求解一个公共下降方向或对冲突梯度进行投影/修正来聚合任务梯度，但这些操作是确定性的，缺乏对权重空间的有效探索。**基于损失的方法**（如**Uncertainty** (Kendall et al., CVPR 2018)、**DWA** (Liu et al., CVPR 2019)）通过动态重加权任务损失来间接影响梯度，但同样依赖固定启发式规则，无法主动感知和化解梯度冲突。尽管**IGBv2** (Dai et al., UAI 2023) 率先将单智能体强化学习引入MTO，但其奖励信号仅基于损失改进，未能利用梯度层面的冲突信息，且单智能体架构难以捕捉任务间的协同关系。
 
 上述缺口揭示了一个关键因果机制：**梯度冲突的解决需要一种能够感知梯度对齐状态、并在权重空间中执行随机探索的协同决策机制。** 确定性方法之所以受限，是因为它们将梯度聚合视为一个静态优化问题，而实际上MTO是一个动态过程——任务间的梯度关系随训练进程不断演化，单一公共下降方向往往无法兼顾各方利益。TaskForce的动机正是源于这一洞察：将多任务优化重构为一个合作马尔可夫博弈（cooperative Markov game），让每个任务拥有自己的自适应策略智能体，通过多智能体强化学习（MARL）来学习如何在每一步协同选择梯度聚合权重——既保持随机探索以跳出局部最优，又通过梯度层面的显式奖励信号来抑制冲突。
-
-
 
 ## 核心方法与创新机理
 
@@ -101,8 +97,6 @@ $$r_{\mathcal{G}} = -\| \sum_{t=1}^{T} w_t g_t \|_2^2$$
 
 上述三个 changed slots 并非孤立运作，而是形成正向协同：紧凑的 Gram 观测使智能体能够在低维空间中感知梯度冲突模式；随机性策略赋予系统逃离局部最优的能力；混合奖励则同时从损失下降和梯度对齐两个维度引导学习。这一组合突破了现有 MTO 方法“确定性启发式 + 单一信号源”的范式瓶颈，在 NYU-v2、Cityscapes 和 QM9 三个异构基准上均取得了一致且显著的性能提升。
 
-
-
 TaskForce 将多任务优化（MTO）重构为一个**合作马尔可夫博弈**，其中多任务骨干网络本身充当交互式、动态演化的环境，每个任务被分配一个独立的策略智能体（演员），各智能体协同学习如何聚合任务梯度，以最有效地降低整体损失。整体 pipeline 如 Figure 1 所示，核心模块与数据流可概括为以下闭环：
 
 ![[assets/figures/papers/paper_list_l2727_https_openaccess_thecvf_com_content_CVPR2026_html_Choi_TaskForce_Coopera/figures/001_Figure_1.jpg]]
@@ -119,8 +113,6 @@ TaskForce 将多任务优化（MTO）重构为一个**合作马尔可夫博弈**
 4. **集中式训练**：采用标准 MADDPG 框架。每个任务配备一个集中式评论家 $Q_t^\mu(\mathcal{O}, A; \psi_t)$，利用全局联合观测 $\mathcal{O}$ 与所有智能体的联合动作 $A$ 最小化 TD 误差（Eq. 11）；演员则通过确定性策略梯度更新（Eq. 12）。目标网络通过指数移动平均缓慢更新以稳定训练（Eq. 13）。
 
 该框架的关键因果机制在于：**随机性策略探索**突破了确定性聚合方法（如 MGDA、CAGrad 等）易陷入局部最优的瓶颈；**Gram 矩阵观测**以极低开销为智能体提供梯度冲突的结构化信息；**混合奖励**将短期损失改进与长期梯度对齐统一在同一强化学习目标下，从而系统性地缓解负迁移。
-
-
 
 TaskForce将多任务优化建模为合作马尔可夫博弈，核心由七个模块串联构成一个完整的训练循环。以下按执行顺序展开关键模块及其支撑公式。
 
@@ -200,8 +192,6 @@ $$\phi_t' \leftarrow \tau \phi_t + (1 - \tau) \phi_t', \quad \psi_t' \leftarrow 
 
 上述模块协同解决现有MTO方法的两大瓶颈。**观测构建**用紧凑的Gram矩阵替代完整梯度，使智能体在低维空间中感知梯度冲突模式。**混合奖励**的双信号设计是核心因果旋钮：纯损失奖励（如IGBv2）可能使智能体贪婪追逐短期损失下降而忽视梯度冲突，导致负迁移累积；纯梯度奖励则可能使智能体过度追求梯度对齐而牺牲收敛速度。TaskForce通过 $\lambda_{\mathcal{L}}$ 和 $\lambda_{\mathcal{G}}$ 的平衡，使智能体在解决梯度冲突的同时维持有效的收敛轨迹。**多智能体合作博弈**框架赋予每个任务自适应策略，其随机性探索能力使系统能够跳出确定性启发式方法（如PCGrad、CAGrad求解单一公共下降方向）易陷入的局部最优。
 
-
-
 ## 实验与关键发现
 
 ### 主要结果：跨基准一致优势
@@ -264,18 +254,8 @@ Figure 2 展示了 QM9 十一任务场景下各任务权重随训练进程的动
 - 强化学习训练的收敛速度与超参数鲁棒性需更系统的消融与敏感性分析。
 - 在动态任务关系（如持续学习、任务增量）场景中的适用性尚未得到实验支持。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2727_https_openaccess_thecvf_com_content_CVPR2026_html_Choi_TaskForce_Coopera/figures/002_Table_1.jpg]]
 *Table 1: Evaluation results of NYU-v2 3-tasks setup. We report MTAN [28] model performance averaged over 3 random seeds*
-
-![[assets/figures/papers/paper_list_l2727_https_openaccess_thecvf_com_content_CVPR2026_html_Choi_TaskForce_Coopera/figures/003_Table_2.jpg]]
-*Table 2: Evaluation results of Cityscapes 3-tasks setup. We report PSPNet [48] model performance averaged over 3 random seeds*
-
-![[assets/figures/papers/paper_list_l2727_https_openaccess_thecvf_com_content_CVPR2026_html_Choi_TaskForce_Coopera/figures/004_Table_3.jpg]]
-*Table 3: Evaluation results of QM9 11-tasks setup. We report MPNN [13] model performance averaged over 3 random seeds*
-
-
 
 ## 定位与知识库关联
 
@@ -329,8 +309,6 @@ TaskForce 处于**多任务优化**、**多智能体强化学习**与**梯度冲
 3. **收敛性理论**：MARL 策略的引入使收敛性分析复杂化，混合奖励下的 Pareto 收敛保证尚未建立形式化证明。
 4. **动态任务关系**：在持续学习或任务关系动态变化（如课程学习）的场景中，TaskForce 的适应能力与灾难性遗忘问题尚未探索。
 5. **超参数鲁棒性**：$\lambda_{\mathcal{L}}$ 与 $\lambda_{\mathcal{G}}$ 的相对权重、软更新系数 $\tau$、演员学习率等对最终性能的敏感性需更系统的消融研究。
-
-
 
 ## 原文 PDF
 

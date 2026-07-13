@@ -62,8 +62,6 @@ Yo’City由四个核心模块构成一个完整的生成与扩展流水线（�
 **主要结果**  
 在自定义多维评估基准上，Yo’City在语义一致性（VQAScore 0.7151）上超越最强基线SynCity（0.6975）。在视觉质量的GPT-5与人工成对评估中，Yo’City对SynCity的几何保真度胜率均≥85%，纹理清晰度胜率分别为78.5%和81.5%，布局连贯性GPT-5胜率达86%。消融实验进一步证实，**粗到细规划策略**是布局连贯性（GPT-5胜率从27%提升至73%）和总体真实感（从24.5%提升至75.5%）大幅提升的关键因素。此外，关系引导扩展机制使城市在多次扩展中VQAScore保持稳定，验证了无界生成的能力。
 
-
-
 ### 问题背景：3D城市场景生成的现实需求
 
 大规模、高真实感的3D城市场景生成是数字孪生、影视制作、游戏开发和自动驾驶仿真等领域的核心需求。理想的城市场景生成系统需要同时满足三个关键目标：**真实性**（几何与纹理的高保真度）、**个性化**（根据用户意图定制城市风格与功能布局）和**可扩展性**（能够无边界地扩展城市范围）。然而，这三个目标的协同实现构成了一个开放性的技术挑战。
@@ -91,8 +89,6 @@ Yo’City由四个核心模块构成一个完整的生成与扩展流水线（�
 - **用关系引导扩展实现无界演化**：将城市扩展建模为场景图（scene graph）关系推理与距离/语义感知的布局优化问题，使城市能够根据用户需求持续演化，而非一次性静态生成。
 
 这种设计使得 Yo’City 能够生成个性化定制、空间连贯且可无限扩展的真实感3D城市，在语义一致性、几何保真度和纹理清晰度等关键维度上实现对现有方法的显著超越。
-
-
 
 ## 核心方法与创新机理
 
@@ -135,8 +131,6 @@ Yo'City 处于**训练自由 3D 场景生成**与**LLM/VLM 驱动空间规划**�
 - **vs Trellis / Hunyuan3D**（3D 资产生成）：二者聚焦单资产质量，缺乏场景级布局与扩展能力；Yo'City 将其作为 3D 生成后端，在上层引入规划与关系推理。
 - **vs CityCraft**（城市生成）：Yo'City 通过 LLM/VLM 世界知识实现个性化与无界扩展，而非依赖固定模板。
 
-
-
 Yo’City 提出了一种**层次化规划 + 并行生成 + 自批评优化**的 3D 城市场景生成范式，其核心设计在于打破传统自回归逐块生成的因果依赖，转而采用“城市–区域–网格”三级结构进行自上而下的粗到细规划，并在网格级别实现并行生成与迭代质量评估。整个框架由四个关键模块串联构成：**Global Planner**、**Local Designer**、**3D Generator** 和 **Expansion Module**（关系引导扩展），Figure 2 给出了完整的流水线概览。
 
 ![[assets/figures/papers/paper_list_l2632_https_openaccess_thecvf_com_content_CVPR2026_html_Lu_YoCity_Personalized/figures/002_Figure_2.jpg]]
@@ -165,8 +159,6 @@ Figure 2 清晰地展示了四个模块之间的输入输出关系：
 ### 粗到细规划与自批评循环的协同
 
 Yo’City 将城市生成建模为**层次化布局规划与自批评生成相结合**的任务。Global Planner 和 Local Designer 构成粗到细的规划链路，利用 LLM 的世界知识进行自上而下的推理；3D Generator 中的“产生–优化–评估”循环则在网格级并行执行，通过迭代评估保证每个网格的视觉质量与语义一致性。消融实验（Table 3）证实，粗到细规划策略将布局连贯性的 GPT-5 胜率从 27% 提升至 73%，总体真实感胜率从 24.5% 提升至 75.5%，VQAScore 从 0.7034 提升至 0.7151，验证了该框架设计的有效性。
-
-
 
 ### 城市生成范式转换：从自回归拼贴到并行自批评
 
@@ -209,8 +201,6 @@ $$L(x) = L_{\mathrm{dist}}(x) + \lambda L_{\mathrm{sem}}(x)$$
 $$x^{*} = \arg\min_{x \in \mathcal{X}} L(x)$$
 其中 $\lambda$ 为平衡空间目标与语义正则化的超参数。求得最优位置 $x^{*}$ 后，3D 生成器合成对应网格的 3D 模型并拼入城市场景。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -251,13 +241,6 @@ Yo'City在自定义多维评估基准上与多个基线方法进行了对比，�
 
 ![[assets/figures/papers/paper_list_l2632_https_openaccess_thecvf_com_content_CVPR2026_html_Lu_YoCity_Personalized/figures/006_Figure_4.jpg]]
 *Figure 4: Visualization of expansion. The first row presents the city’s global instruction. The leftmost city shows the initial generation result, followed by five successive expansion iterations. In the top-left corner, a BEV thumbnail depicts the city layout, with blue regions indicating newly expanded grids, while red boxes in the rendered images highlight their appearances*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2632_https_openaccess_thecvf_com_content_CVPR2026_html_Lu_YoCity_Personalized/figures/004_Figure_3.jpg]]
-*Figure 3: Qualitative comparison between our method and the baselines given the same city instructions. The red boxes highlight regions in SynCity that exhibit spatial inconsistency, lack of realism, and poor texture fidelity. We additionally provides zoom-in visualizations for Yo’City, demonstrating clearer structural coherence and finer visual details. More cases are shown in Appendix. A.1*
-
-
 
 ## 定位与知识库关联
 
@@ -309,8 +292,6 @@ Yo'City 的“产生-优化-评估”循环（Sec. 3.5）将 2D 图像生成从�
 4. **评估维度的完整性**：当前评估聚焦于语义一致性和视觉质量，缺乏对生成多样性、用户满意度、以及极端提示下鲁棒性的系统评估。原文未报告失败案例，方法的失效模式尚不明确。
 
 5. **与物理仿真引擎的衔接**：生成的3D资产直接按布局拼装（Sec. 3.5），未涉及物理合理性验证（如建筑间距、日照遮挡等），这在实际城市规划应用中可能构成限制。
-
-
 
 ## 原文 PDF
 

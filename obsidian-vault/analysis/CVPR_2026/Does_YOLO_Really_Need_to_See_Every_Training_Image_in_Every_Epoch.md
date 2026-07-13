@@ -51,8 +51,6 @@ YOLO系列检测器以极快的推理速度著称，但其训练过程却异常�
 
 实验结果表明，AFSS在多个YOLO系列模型和数据集上均取得了显著的训练加速效果，同时保持甚至提升了检测精度。在MS COCO 2017上，AFSS使YOLO11s的训练加速**1.54倍**，AP从47.0提升至**47.2**；在YOLOv8、YOLOv10、YOLO11、YOLO12等多个模型上实现了超过**1.43倍**的训练加速且精度无损；在遥感图像检测数据集DOTA-v1.0和DIOR-R上，为旋转目标检测器带来了超过**1.63倍**的训练加速，同时mAP一致提升。消融实验进一步证实，学习充分性度量、持续回顾、短期覆盖和状态更新四大组件协同作用，是AFSS取得上述性能的关键。
 
-
-
 目标检测是计算机视觉的核心任务之一，YOLO系列检测器凭借其极快的推理速度在实时应用中占据主导地位。然而，YOLO的训练效率却远不如其推理效率那样令人满意——标准训练流程要求每个epoch遍历全部训练图像，导致训练时间异常冗长。以YOLO11s在MS COCO 2017上的训练为例，完整训练需耗时43.9小时，显著慢于Faster R-CNN等两阶段检测器。
 
 这一效率瓶颈的根源在于**“全覆盖”训练范式对样本学习状态的漠视**。在训练初期，大量图像对模型而言是困难样本，需要充分学习；但随着训练推进，绝大多数图像逐渐被模型可靠检测，继续在每个epoch中全量使用这些“已学好”的图像只会产生冗余计算，对模型提升贡献甚微。标准YOLO训练未对图像的学习程度加以区分，等价处理所有样本，造成了严重的计算资源浪费。
@@ -62,8 +60,6 @@ YOLO系列检测器以极快的推理速度著称，但其训练过程却异常�
 上述方法的共同缺陷在于：**缺乏一个直接反映检测器对单张图像“学得如何”的统一度量，以及基于该度量的、能主动防止已学知识遗忘的动态调度机制**。检测任务要求模型同时准确分类和精确定位，仅靠损失或梯度等间接信号难以判断一张图像是否真正被“充分学习”。此外，简单地从训练集中丢弃样本或降低权重，可能引发灾难性遗忘——模型在长期未见某些图像后，其上的检测能力会逐渐退化。
 
 本文的核心动机正是针对这一缺口：**设计一种能感知每张训练图像学习充分性、并据此动态调节其参与频次的训练调度策略，在显著削减冗余计算的同时，通过精心设计的“反遗忘”机制稳定保留已学知识，从而实现训练加速与精度保持的双赢**。
-
-
 
 ## 核心方法与创新机理
 
@@ -115,8 +111,6 @@ Vanilla 训练的数据遍历顺序固定，不使用长期状态信息，模型
 
 这一设计使得随着训练推进，越来越多的图像从“困难”迁移至“中等”乃至“简单”（Figure 3 展示了这一动态过程），AFSS 自动削减其参与频次，将计算资源集中于仍需学习的样本。消融实验表明，每 5 epoch 更新一次状态是最优选择——既能及时反映模型学习进展，又不会引入过多评估开销（Table 5d）。
 
-
-
 AFSS（Anti-Forgetting Sampling Strategy）的核心设计理念是将训练数据视为具有动态学习价值的资源，而非在每个epoch中无差别地全量遍历。其整体框架围绕一个闭环的“评估—分级—调度—更新”循环构建，如图2所示，在每个训练epoch中依次执行以下四个核心模块：
 
 1. **学习充分性度量（Learning Sufficiency Metric, LSM）**：使用当前检测器对每张训练图像计算精确率 $P_i$ 和召回率 $R_i$，并取两者的最小值作为该图像的“学习充分性”分数——即 $\mathrm{min}(P_i, R_i)$。这一度量聚焦于检测器中较弱的预测维度，确保图像只有在分类和定位都可靠时才被视为充分学习。随后，根据该分数将图像动态划分为三个难度级别：简单（$>0.85$）、中等（$[0.55, 0.85]$）和困难（$<0.55$）。
@@ -129,12 +123,8 @@ AFSS（Anti-Forgetting Sampling Strategy）的核心设计理念是将训练数�
 
 困难图像则始终全量参与训练，不施加任何采样约束。整个pipeline的输出是一个经过AFSS筛选的训练图像子集，该子集被送入标准的YOLO检测器（如YOLOv8、YOLOv10、YOLO11、YOLO12等）执行正常的前向和反向传播。四个模块协同作用，使得训练计算量从“全覆盖”范式转变为“按需分配”范式：简单样本的计算冗余被大幅削减，困难样本获得充分的学习机会，中等样本则通过强制覆盖机制避免表征退化。消融实验证实，缺少任一组件都会导致加速比下降或精度损失（Table 4）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2120_https_arxiv_org_abs_2603_17684/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed Anti-Forgetting Sampling Strategy (AFSS) at the t-th epoch of training*
-
-
 
 AFSS 的核心由四个协同模块构成：**学习充分性度量（LSM）**、**连续回顾（CR）**、**短期覆盖（STC）** 和 **状态更新（SU）**。它们共同定义了“每张训练图像在每个 epoch 中是否应该参与训练”的动态调度策略。
 
@@ -199,8 +189,6 @@ Figure 2 展示了 AFSS 在第 $t$ 个 epoch 的完整流程：
 
 四个模块的协同作用在消融实验中得到了严格验证：完整 AFSS 在 YOLO11s 上取得 47.2 AP 和 1.54× 加速；去除任一组件均导致精度下降或加速比减小（Table 4）。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -242,24 +230,11 @@ AFSS 在多个 YOLO 模型上实现了超过 1.43 倍的训练加速，同时准
 
 **Figure 4** 通过一个困难样本的可视化例子，对比了 YOLO11s 与 YOLO11s+AFSS 在第 100、300、600 个训练 epoch 的检测结果。标准训练在早期对困难样本检测效果不佳，而 AFSS 通过将困难图像全量参与训练，使模型在相同 epoch 下对该样本的检测质量明显更优，直观体现了 AFSS 对难样本的持续学习能力。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2120_https_arxiv_org_abs_2603_17684/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of YOLO11s with and without AFSS in terms of the training images used and the corresponding training efficiency and accuracy on MS COCO 2017. (a) Training data used per epoch: AFSS adaptively selects the images used for training, progressively reducing the number of images utilized over time, whereas the vanilla YOLO11s employs the full training set in every epoch; (b) Training efficiency and accuracy: AFSS accelerates YOLO11s training by 1.54 × while improving detection accuracy*
 
 ![[assets/figures/papers/paper_list_l2120_https_arxiv_org_abs_2603_17684/figures/006_Table_4.jpg]]
 *Table 4: Ablation of AFSS core components using YOLOv11s as the baseline. LSM: Learning Sufficiency Metric; CR: Continuous Review; STC: Short-Term Coverage; SU: State Update*
-
-![[assets/figures/papers/paper_list_l2120_https_arxiv_org_abs_2603_17684/figures/007_Table_5.jpg]]
-*Table 5: Ablation studies on learning sufficiency metric, continuous review interval, short-term coverage interval, and state update interval*
-
-![[assets/figures/papers/paper_list_l2120_https_arxiv_org_abs_2603_17684/figures/009_Figure_4.jpg]]
-*Figure 4: An example illustrating the learning performance of YOLO11s and YOLO11s+AFSS at the 100th, 300th, and 600th training epochs on the hard image*
-
-![[assets/figures/papers/paper_list_l2120_https_arxiv_org_abs_2603_17684/figures/008_Figure_3.jpg]]
-*Figure 3: Changes in the number of samples at easy, moderate, and hard levels during the training of YOLO11s with AFSS*
-
-
 
 ## 定位与知识库关联
 
@@ -337,8 +312,6 @@ SuperLoss 是一种基于损失值的训练样本加权/选择方法，通过对
 3. **更细粒度的调度**：当前 AFSS 在图像级做决策，是否可以将调度粒度细化到实例级（每个 GT 框的学习充分性）或类别级，以进一步提升效率？这需要额外的方法设计和实验验证。
 
 4. **理论收敛性保证**：AFSS 改变了训练数据的采样分布，这种非均匀采样的理论收敛性质尚未被分析。是否存在某些条件下 AFSS 可能导致次优收敛？这是一个开放的理论问题。
-
-
 
 ## 原文 PDF
 

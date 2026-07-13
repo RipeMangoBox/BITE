@@ -56,8 +56,6 @@ claims:
 
 在方法谱系上，RealCam-I2V 以 **DynamiCrafter**（Xing et al., arXiv 2023）为基础扩散主干，继承了 CameraCtrl 和 CamI2V 的 Plücker 嵌入与极线注意力等相机条件化策略，但通过尺度对齐与噪声成形两个即插即用模块，将相对尺度轨迹控制范式升级为公制尺度的真实世界可控生成，并额外支持循环视频、帧插值与场景过渡等多模式拼接。
 
-
-
 ### 问题背景
 
 图像到视频（Image-to-Video, I2V）生成旨在从单张静态图像出发，合成一段具有时间连续性和视觉真实感的视频。随着扩散模型在图像和视频生成领域的突破性进展，I2V 的质量近年来取得了长足进步。然而，大多数现有方法将生成过程视为完全自动化的“黑箱”——用户提供一张图像和一段文本描述，模型输出视频，用户对镜头如何运动几乎没有控制权。在实际创作中，摄影师、导演和内容创作者需要精确控制相机的平移、旋转、变焦等运动，以传达特定的叙事意图和视觉节奏。因此，**可控相机运动**成为 I2V 生成从“能生成”走向“可创作”的关键瓶颈。
@@ -79,8 +77,6 @@ claims:
 2. **交互式 3D 预览与场景约束噪声成形（Scene-constrained Noise Shaping, SNS）**：在推理阶段，同样通过公制深度估计为用户提供的参考图像重建 3D 场景，用户可以在其中自由绘制相机轨迹并实时获得预览视频。这一预览视频随后作为噪声成形的参考，在扩散早期的高噪声阶段引导生成过程，确保最终视频的布局和相机运动与用户期望一致。
 
 通过将单目公制深度估计作为训练和推理的统一参考，RealCam-I2V 不仅解决了尺度不一致这一根本性问题，还为用户提供了直观的交互式轨迹绘制界面，使得高可控性的真实世界图像到视频生成成为可能。
-
-
 
 ## 核心方法与创新机理
 
@@ -125,8 +121,6 @@ Table 2 的组合消融验证了这一协同效应：MSA 与 SNS 组合（即完
 
 上述两个 changed slots 共同催生了交互范式的转变：从“绘制轨迹 → 等待生成 → 查看结果 → 重新调整”的**多轮试错**模式，转变为“在三维场景中实时预览 → 确认轨迹 → 一次生成”的**单轮交互**模式。这一转变的关键在于公制深度重建使得预览视频的相机运动与最终生成结果共享尺度空间，用户所见即所得，从根本上提升了系统的可用性。
 
-
-
 RealCam-I2V 的整体流程围绕一个核心矛盾展开：现有相机轨迹可控的图像到视频（I2V）方法在训练时依赖**相对尺度**的相机参数，而真实世界的应用场景要求**公制尺度**下的精确控制。这一尺度不一致性构成了从“相对可控”到“公制可控”的关键瓶颈。为解决这一问题，RealCam-I2V 将单目公制深度估计作为预处理环节引入，在训练和推理两端建立统一的公制尺度参考系，从而将相机控制从相对空间迁移到物理世界。
 
 ### 训练与推理的双阶段对齐
@@ -159,13 +153,6 @@ $$\mathcal{L} = \mathbb{E}_{z, c_{\mathrm{txt}}, c_{\mathrm{img}}, c_{\mathrm{ca
 ### 模块间因果链路
 
 整个框架的因果链路可归纳为：**公制深度估计**为训练和推理提供统一的尺度锚点 → **MSA** 消除训练中的尺度歧义，使模型学习到物理一致的相机运动 → **交互式三维场景**将用户的绘制轨迹与训练尺度对齐，实现精确控制 → **SNS** 在扩散早期注入场景约束，平衡可控性与动态性。消融实验证实了这一链路的协同效应：MSA 与 SNS 组合使用达到最优，在所有相机控制指标和视频质量指标上均优于单独使用任一组件。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l95_https_arxiv_org_abs_2502_10059/figures/001_Figure_1.jpg]]
-*Figure 1: We propose RealCam-I2V, a camera controllable image-to-video generation framework for complex real-world camera control and extra applications including camera-controlled loop video generation, generative frame interpolation, and smooth scene transitions*
-
-
 
 RealCam-I2V 的核心技术路线围绕一个关键瓶颈展开：现有基于相机轨迹的图像到视频（I2V）方法在训练时使用**相对尺度**的相机参数，而真实世界应用需要**公制尺度**，导致严重的尺度不一致问题。此外，用户缺乏场景深度信息，难以精确绘制相机轨迹。RealCam-I2V 通过两个核心模块——**公制场景尺度对齐（MSA）** 和 **场景约束噪声成形（SNS）**——在训练与推理两端协同解决上述问题。
 
@@ -222,9 +209,6 @@ $\epsilon_{\theta}$ 为去噪网络，$t$ 为扩散时间步，$\alpha_t$ 和 $\
 ![[assets/figures/papers/paper_list_l95_https_arxiv_org_abs_2502_10059/figures/004_Figure_5.jpg]]
 *Figure 5: One-round generation versus multi-round generation. Our framework decouples camera adjustment via interactive 3D scenes, enabling fast feedback before slow generation*
 
-![[assets/figures/papers/paper_list_l95_https_arxiv_org_abs_2502_10059/figures/007_Figure_7.jpg]]
-*Figure 7: Preview video rendering for user-expected camera trajectory. It also serves as the reference video in our proposed scene-constrained noise shaping*
-
 ### 场景约束噪声成形（SNS）
 
 **核心问题**：即使模型在公制尺度下训练，扩散采样的随机性仍可能导致生成视频的全局布局和相机运动偏离用户预期，尤其在复杂轨迹和大运动场景下。
@@ -245,24 +229,11 @@ $$z_t = m \cdot (\alpha_t z_{\mathrm{preview}} + \sigma_t \epsilon) + (1 - m) \c
 
 RealCam-I2V 通过简单的帧拼接策略支持三种视频生成模式（Figure 8），无需额外训练：
 
-![[assets/figures/papers/paper_list_l95_https_arxiv_org_abs_2502_10059/figures/008_Figure_8.jpg]]
-*Figure 8: Concatenation strategies for different tasks. Basic mode, interpolation mode, and continuation mode can be supported with only minor modification*
-
 - **基础模式**：直接生成完整视频序列。
 - **插值模式**：在给定首尾帧之间生成中间帧，实现生成式帧插值。
 - **循环/延续模式**：将生成视频的末帧作为新一轮生成的条件帧，通过相机轨迹的平滑拼接实现循环视频或长视频延续。
 
 以上模块共同构成了 RealCam-I2V 的完整技术框架：MSA 从数据层面消除尺度歧义，SNS 从采样层面注入场景约束，二者协同实现了真实世界场景下高精度的交互式相机控制视频生成。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l95_https_arxiv_org_abs_2502_10059/figures/003_Figure_3.jpg]]
-*Figure 3: Scene scale mismatch. Point clouds reconstructed from metric depth estimation (RGB) are robust and unified, whereas SfM reconstructions (yellow) are relative-scale that may vary across frames. Our alignment enables relative-to-metric conversion of scene scale for real-world applications*
-
-![[assets/figures/papers/paper_list_l95_https_arxiv_org_abs_2502_10059/figures/005_Figure_4.jpg]]
-*Figure 4: Camera trajectory ambiguity. The relative scene-scale measurement fundamentally hinders models from learning physically consistent camera motion*
-
-
 
 ## 实验与关键发现
 
@@ -312,18 +283,11 @@ RealCam-I2V 在 RealEstate10K 数据集上与所有前沿相机控制方法进�
 
 3. **SfM 对齐鲁棒性。** 公制尺度对齐过程依赖 COLMAP 的稀疏重建结果。在极端纹理缺失或纯旋转场景下，SfM 重建可能失败，导致尺度因子无法可靠估计。该问题需要人工验证具体退化程度。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l95_https_arxiv_org_abs_2502_10059/figures/011_Table_3.jpg]]
 *Table 3: Ablation study on Vbench-I2V [30], investigating how camera-conditioned fine-tuning exclusively on static RealEstate10K [101] data affects the generation quality and camera motion of the base model. Notably, even fine-tuned on a static dataset, it preserves dynamics (Dynamic Degree) without compromise. Introducing dynamic datasets will better enhance dynamics, we leave it for future work*
 
 ![[assets/figures/papers/paper_list_l95_https_arxiv_org_abs_2502_10059/figures/012_Figure_9.jpg]]
 *Figure 9: Visualization on various domains in real life scenarios. Despite training on RealEstate10K [101], our method can generalize naturally to out-of-domain images, including pets, landscape, anime, food and etc*
-
-![[assets/figures/papers/paper_list_l95_https_arxiv_org_abs_2502_10059/figures/013_Figure_10.jpg]]
-*Figure 10: Visualization on complex trajectory, large movement and video dynamism. Our framework achieves precise trajectory adherence for complex camera motion paths while preserving high-fidelity video generation with dynamics*
-
-
 
 ## 定位与知识库关联
 
@@ -390,8 +354,6 @@ $$z_t = m \cdot (\alpha_t z_{\mathrm{preview}} + \sigma_t \epsilon) + (1 - m) \c
 3. **交互范式的进一步简化**：当前交互式轨迹绘制仍要求用户在三维点云上手动指定路径。是否可以引入自然语言或草图等更直观的交互方式，进一步降低使用门槛？
 
 4. **多模态条件融合**：RealCam-I2V 目前以文本、图像和相机轨迹为条件。是否可以将场景的语义分割、法线图等几何先验纳入条件体系，以进一步提升生成视频的结构一致性？
-
-
 
 ## 原文 PDF
 

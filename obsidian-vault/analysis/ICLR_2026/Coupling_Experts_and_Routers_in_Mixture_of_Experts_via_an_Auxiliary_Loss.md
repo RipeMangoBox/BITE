@@ -60,8 +60,6 @@ ERC 损失的关键优势体现在三个层面：
 
 在方法谱系中，ERC 损失定位于**辅助损失驱动的稀疏 MoE 优化**路径，与负载均衡损失（Fedus et al., 2022）等现有辅助损失形成互补。不同于 AoE（Lv et al., 2025）通过稠密激活范数选择路由的激进方案，ERC 损失保留了标准稀疏 MoE 的路由效率，仅通过训练阶段的轻量约束重塑专家-路由器的对齐关系，在性能与效率之间取得了优异的平衡。
 
-
-
 ### 混合专家模型的路由困境
 
 混合专家（Mixture-of-Experts, MoE）架构通过稀疏激活机制，使每个 token 仅由少量专家处理，从而在扩大模型容量的同时控制计算成本。在标准 MoE 中，路由器根据输入 token $x$ 计算专家权重向量 $\pmb{w} = \mathrm{softmax}(\pmb{x} \pmb{R}^{\top})$，并选择 Top-K 个专家进行激活，最终输出为加权和 $\sum_k^K \pmb{w}[k] E_k(\pmb{x})$。每个专家 $E_i$ 通常采用 SwiGLU 结构：
@@ -83,8 +81,6 @@ $$E_i(\pmb{x}) = \left( \mathrm{SiLU}(\pmb{x} \pmb{W}_g^i) \odot (\pmb{x} \pmb{W
 3. **固定开销**：辅助损失的计算复杂度必须与输入 token 数量无关，且不增加激活密度，确保训练开销可忽略。
 
 这一设计思路直指 MoE 架构的根本矛盾：如何在保持稀疏激活效率的同时，让路由器“了解”每个专家的真实能力，从而做出更优的路由决策。
-
-
 
 ## 核心方法与创新机理
 
@@ -132,8 +128,6 @@ ERC 损失的计算复杂度为 $O(n^2 D d)$，仅依赖于专家数量 $n$ 和�
 
 消融实验进一步证实，即使 baseline 模型的路由器嵌入已接近正交（平均绝对余弦相似度仅 0.15），单独施加正交化损失带来的增益极为有限，而 ERC 损失仍能带来显著提升——这直接证明 **路由器-专家耦合才是核心瓶颈，而非路由器的正交性**。
 
-
-
 ![[assets/figures/papers/paper_list_l30_https_openreview_net_forum_id_MpeyjgWbKt/figures/003_Figure_2.jpg]]
 *Figure 2: The overview of MoE and AoE models*
 
@@ -175,8 +169,6 @@ $$\mathcal{L}_{\mathrm{ERC}} = \frac{1}{n^2} \sum_{i=1}^{n} \sum_{j \neq i}^{n} 
 **与 AoE 的架构对比**
 
 Figure 2 展示了标准 MoE 与 Autonomy-of-Experts (AoE)（Lv et al., 2025）的架构差异。AoE 通过计算所有专家的激活范数来选择路由，虽然能天然实现专家-路由器耦合，但需要每个 token 激活全部 $n$ 个专家，导致训练时间增加 1.6 倍、内存占用增加 1.3 倍。ERC 损失在保持标准稀疏激活的前提下，以辅助损失的形式达到了接近 AoE 的耦合效果，在 15B 参数规模下显著缩小了与 AoE 的性能差距，同时保持了与 vanilla MoE 几乎相同的吞吐量和内存开销。
-
-
 
 ### 3.1 动机与设计约束
 
@@ -235,8 +227,6 @@ ERC 损失引入的额外计算量仅为 $2 n^2 D d$ FLOPs（其中 $n$ 为专�
 
 消融实验（Figure 6c）还对比了单独施加路由器正交化损失 $\hat{R}\hat{R}^{\top} = I$ 的效果。结果表明，正交化损失的增益非常有限，因为基准 MoE 的路由器嵌入已经接近正交（平均绝对余弦相似度仅 0.15）。这证明路由器-专家耦合才是核心瓶颈，而非路由器的正交性。ERC 损失不能被简单地归约为对路由器或专家单独施加的对比技术。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能增益：从 3B 到 15B 的稳定提升
@@ -287,8 +277,6 @@ Figure 5(a) 进一步量化了这一关系。由于路由器与专家深度耦�
 
 一个自然的质疑是：模型是否通过简单地扩大或缩小参数范数来“欺骗”ERC 损失？Table 3 排除了这种可能性。对比有无 ERC 损失的模型，$R[i]$ 和 $W_g^i$ 的参数范数变化极小（例如 $||W_g^i||$ 仅从约 25–32 降至约 24–31.5），而各层的 ERC 损失却精确降至零。这表明模型确实学习了有意义的专家-路由器耦合，而非通过范数操纵来最小化损失。
 
-![[assets/figures/papers/paper_list_l30_https_openreview_net_forum_id_MpeyjgWbKt/figures/013_Table_3.jpg]]
-*Table 3: The first four columns show parameter norms for models trained with and without ERC loss, while the last two show the corresponding layer-wise ERC loss. These results show that $\mathbf { M o E } + \mathcal { L } _ { \mathrm { E R C } }$ learns a meaningful coupling, rather than trivially minimizing the loss through norm manipulation. All values are evaluated on the last checkpoint
 
 ### 负载均衡的保持
 
@@ -303,8 +291,6 @@ Figure 5(a) 进一步量化了这一关系。由于路由器与专家深度耦�
 - **训练阶段的局限性**：ERC 损失仅应用于预训练阶段，微调、指令调优或强化学习阶段是否仍需该损失尚不明确。
 - **噪声分布的设计空间**：代理点噪声目前仅采用有界均匀分布，更复杂的噪声分布能否进一步提升泛化性有待探索。
 - **跨架构移植**：该方法基于 SwiGLU 结构及 $W_g$ 的中间激活范数设计，移植到其他 MoE 变体时需要调整。
-
-
 
 ## 定位与知识库关联
 
@@ -361,8 +347,6 @@ ERC 损失的设计基于以下前提条件，超出这些边界时需谨慎评�
 4. **推理阶段的负载影响**：更强的专家专业化是否会在推理阶段加剧负载不均衡或增加冷启动专家的问题？论文在训练阶段验证了负载均衡基本不受影响，但推理时的分布偏移可能带来新的挑战。
 
 5. **训练动态监控**：是否可以通过分析 ERC 损失的层间动态演化来自动检测训练中的专家坍塌或冗余？Table 2 的事后评估已展示了不同层对约束的满足程度存在差异，这暗示了层级诊断的可能性。
-
-
 
 ## 原文 PDF
 

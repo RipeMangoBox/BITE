@@ -52,8 +52,6 @@ claims:
 
 在方法谱系上，本工作位于**视频扩散生成**与**三维基础模型**的交叉地带。它区别于仅依赖二维扩散先验的轨道视频生成方法（如SV3D、Hi3D），也不同于需要显式三维表示（如NeRF、3DGS）或网格提取的新视图合成与三维生成管线（如**Wonder3D**、**Era3D**、**Trellis**），而是以隐式形状特征为桥梁，实现了二维视频生成与三维几何理解的深度融合。
 
-
-
 ### 轨道视频生成的任务定位
 
 从单张物体图像生成环绕该物体的轨道视频（orbital video），是连接二维图像理解和三维内容创作的关键任务。给定一张输入图像，模型需要渲染出一系列围绕物体旋转的连续帧，每一帧都应当保持物体的形状真实性和多视图一致性。这一任务的核心难点在于，模型必须从有限的单视图观测中外推出物体被遮挡或不可见部分的结构和外观。
@@ -79,8 +77,6 @@ claims:
 - **软约束特性**：形状先验作为“提示”而非硬性约束，使得模型在遵循几何结构的同时，仍能保留生成式模型的随机性和多样性。
 
 这种“视频生成 + 三维先验”的融合范式，为解决大视角变化下的长程外推问题提供了一条新的技术路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -115,8 +111,6 @@ claims:
 
 这一创新设计的核心洞察在于：通过多尺度三维适配器将预训练三维模型的几何先验注入视频扩散模型，可以在显著提升形状真实性和多视图一致性的同时，保持原视频模型的时间先验和泛化能力。实验结果表明，仅引入全局潜在向量即可使多视图一致性指标 MEt3R 显著下降，而全局与局部特征的组合达到了最佳整体性能（PSNR 22.78, CLIP-S 94.19, MEt3R 0.05）。
 
-
-
 本方法的目标是从单张物体图像生成真实且一致的轨道视频。核心思路是将预训练三维基础模型的形状先验注入视频扩散模型，以弥补纯像素级注意力在大视角变化下对未见区域几何约束不足的瓶颈。
 
 整体流程如图2所示，由三个关键阶段串联构成：
@@ -129,12 +123,8 @@ claims:
 
 该框架的关键设计在于：形状先验以潜在特征形式传递，避免了耗时的网格提取过程；适配器采用即插即用设计，不改变基础模型的预训练权重，从而保留了其原有的相机控制能力和生成多样性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2612_https_arxiv_org_abs_2604_12309/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the method. Given an input image I, we aim to generate a realistic and consistent orbital video V in a base video diffusion model*
-
-
 
 ### 基础视频扩散模型
 
@@ -179,8 +169,6 @@ $$\mathbf{f}_i^{(1)} = \mathbf{f}_i^{(0)} + \mathrm{CrossAttn}(\mathbf{f}_i^{(0)
 $$\mathbf{f}_i^{(2)} = \mathbf{f}_i^{(1)} + \mathrm{CrossAttn}(\mathbf{f}_i^{(1)} ; \mathrm{MLP}(\hat{l}))$$
 
 该设计的关键优势在于：以潜在特征作为形状表示，避免了耗时的网格提取过程；同时交叉注意力机制最大程度保留了基础视频模型的预训练时间先验，消融实验证实其优于特征拼接和帧堆叠等替代方案。
-
-
 
 ## 实验与关键发现
 
@@ -234,28 +222,9 @@ Figure 6 揭示了三维基础先验的作用机制：从全局潜在向量解�
 
 Figure 5（附录）展示了典型失败案例。由于基础视频模型和三维基础模型的分辨率限制，复杂场景的细粒度细节难以恢复，导致结果模糊且形状控制失效。当形状先验与真实视频内容不一致时，形状控制可能无效。此外，三维基础模型的纹理质量不够鲁棒，合成复杂未见面外观仍具挑战。
 
-![[assets/figures/papers/paper_list_l2612_https_arxiv_org_abs_2604_12309/figures/010_Figure_5.jpg]]
-*Figure 5: Extension to dynamic orbits. Our method can follow complex camera trajectories with non-zero elevations, i.e. dynamic orbits defined by [42] to achieve accurate camera controls*
-
-![[assets/figures/papers/paper_list_l2612_https_arxiv_org_abs_2604_12309/figures/015_Figure_5.jpg]]
-*Figure 5: Examples of failure cases. Due to the limited resolution, both base video model and 3D foundation model fail to recover fine-grained details on complex scenes, leading to blurry results and ineffective shape control particular when the shape priors disagree with ground truth videos*
-
 ### 关键结论
 
 实验证据链支持以下因果路径：**三维基础先验（全局+局部）→ 多尺度交叉注意力适配器 → 形状真实性与多视图一致性提升**。该方法在不牺牲原视频模型时间先验和泛化能力的前提下，有效解决了大视角变化下的几何外推难题。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2612_https_arxiv_org_abs_2604_12309/figures/001_Figure.jpg]]
-*Figure: Input SV3D Ours*
-
-![[assets/figures/papers/paper_list_l2612_https_arxiv_org_abs_2604_12309/figures/006_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l2612_https_arxiv_org_abs_2604_12309/figures/007_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l2612_https_arxiv_org_abs_2604_12309/figures/008_Figure.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -299,8 +268,6 @@ Figure 5（附录）展示了典型失败案例。由于基础视频模型和三
 ### 5. 知识库定位
 
 本文在方法谱系中的位置可概括为：**以冻结的三维基础模型为条件先验源，通过多尺度交叉注意力适配器将其注入视频扩散模型，在不破坏预训练时间先验的前提下显著提升形状真实性和多视图一致性。** 其核心贡献不在于提出新的生成范式，而在于揭示并有效解决了“像素级注意力无法约束未观测几何”这一瓶颈，并验证了隐式三维特征作为视频生成条件的可行性与有效性。这一思路可泛化为“冻结的三维先验编码器 + 可训练的轻量适配器 + 冻结或微调的视频生成器”的插件式框架，为后续工作提供了清晰的扩展接口。
-
-
 
 ## 原文 PDF
 

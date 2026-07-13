@@ -50,8 +50,6 @@ claims:
 
 在四种主流视频扩散模型（Latte、Open-Sora、Wan2.1 等）上的实验表明，D2Cache 在相同缓存调度和加速比下始终优于 TeaCache。在 Latte 超快模式下，D2Cache 的 VBench 得分达到 76.03%，比 TeaCache 的 75.61% 提升 0.42 个百分点（Table 1）；消融实验进一步证实，移除自适应缩放因子 $s$ 会导致性能大幅下降 1.72 个百分点（Table 2），验证了二阶校正机制的关键作用。在定性对比中，D2Cache 在超快加速下仍能保持接近无缓存的视频连贯性和清晰度，而一阶方法则出现严重伪影（Figure 6）。
 
-
-
 ### 视频扩散模型的加速瓶颈
 
 视频扩散模型在生成高质量视频方面取得了显著进展，但其推理过程需要反复执行大型去噪网络，导致巨大的计算开销与延迟。为缓解这一问题，**增量缓存（Delta Caching）** 被提出作为一种训练无关的加速范式：其核心思想是利用扩散步骤间模型输出的残差（一阶增量）来预测未来时间步的输出，从而跳过部分网络前向计算。
@@ -71,8 +69,6 @@ D2Cache 将扩散模型缓存重新建模为**离散导数问题**。关键观�
 ### 非均匀间隔的挑战
 
 实际缓存策略中，缓存步之间的间隔是动态变化的。直接将一阶增量复用于非连续时间步会引入额外的近似偏差，而现有方法缺乏针对间隔波动的自适应调节机制。D2Cache 通过利用时间步嵌入导出的误差代理 $e_t$ 对二阶累积和进行**自适应缩放**（因子 $s$），首次解决了任意间隔下的二阶校正问题，以训练无关的即插即用方式突破了一阶方法的质量瓶颈。
-
-
 
 ## 核心方法与创新机理
 
@@ -114,8 +110,6 @@ $$ \delta_2(t) = \delta_1(t) - \delta_1(t+1) $$
 
 上述四个 changed slots 共同指向一个核心洞察：将扩散模型缓存重新建模为离散导数问题。一阶缓存对应一阶后向差分近似，而 D2Cache 通过引入二阶差分实现了更高精度的预测。这一视角不仅为缓存方法提供了严格的理论框架（定理1），还使得方法天然具备训练无关、即插即用的特性——D2Cache 不改变缓存调度策略与超参数，仅作为预测修正模块嵌入现有管线，在保持相同加速比的前提下提升生成质量。在 Latte 超快模式下，D2Cache 以可忽略的延迟开销（<0.3s）将 VBench 得分从 TeaCache 的 75.61% 提升至 76.03%，并在 Wan2.1 等复杂模型上展现出更显著的伪影抑制能力（Figure 6）。
 
-
-
 D2Cache 的整体管线在已有的一阶增量缓存（如 **TeaCache**，Liu et al., arXiv 2024）之上，引入一个轻量的二阶校正分支，形成训练无关、即插即用的预测增强架构。其核心设计遵循“计算—缓存—预测—校正”四阶段流，所有额外模块均不改变去噪步的调度频率，因此加速比与基线完全可比。
 
 ### 管线总览
@@ -155,8 +149,6 @@ D2Cache 的六个核心模块按执行时序组织如下：
 一阶缓存方法在非均匀间隔下，被忽略的高阶项导致近似误差沿去噪步骤快速累积，成为质量瓶颈。D2Cache 通过引入二阶差分 $\delta_2$ 作为校正项，将局部截断误差从一阶的 $O((\Delta t)^2)$ 降至 $O((\Delta t)^3)$（Theorem 1），从理论上保证了误差抑制能力。同时，时间步嵌入误差代理 $e_t$ 使缩放因子 $s$ 能够动态适配任意缓存间隔，解决了非均匀调度下二阶项幅值波动的问题（Figure 4 验证了代理与真实二阶残差的相关性）。
 
 > **注意**：更高阶差分（如三阶）的缓存潜力、在非 DiT 架构上的适用性等问题尚未在本文中探索，属于开放问题。
-
-
 
 D2Cache 将视频扩散模型中的缓存预测问题建模为离散导数问题，通过引入二阶差分动态突破一阶增量缓存的精度瓶颈。其核心由三个紧密协作的模块构成：二阶差分计算、时间步嵌入误差估计，以及自适应缩放因子计算。
 
@@ -204,18 +196,8 @@ $$\hat { f } ( t - y ) = f ( t - y + 1 ) + \delta _ { 1 } ( t - x ) + s \cdot \s
 
 该公式将一阶增量与自适应缩放后的二阶累积和相结合，在保持训练无关、即插即用特性的同时，显著抑制了非均匀缓存策略下的累积误差。消融实验证实，移除缩放因子 $s$ 会导致 VBench 得分大幅下降 1.72%（从 76.03% 降至 74.31%），验证了自适应缩放机制对维持高质量的关键作用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l851_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_D2Cache_Second_Ord/figures/003_Figure_3.jpg]]
 *Figure 3: Comparison of the first-order (green) and the secondorder (red) deltas in L2 norm value across diffusion steps*
-
-![[assets/figures/papers/paper_list_l851_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_D2Cache_Second_Ord/figures/004_Figure_4.jpg]]
-*Figure 4: L1 norm values of second-order residuals, timestep embedding modulated input, and polynomial-fitted modulated input across diffusion steps for Latte, Open-Sora, and Wan2.1 models. The observed correlation validates embedding-derived proxies et for estimating second-order delta magnitudes*
-
-![[assets/figures/papers/paper_list_l851_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_D2Cache_Second_Ord/figures/005_Figure_5.jpg]]
-*Figure 5: L2 norm trajectories of generated outputs under superfast acceleration: default (no caching), first-order caching, and D2Cache using the same strategy. D2Cache’s trajectory aligns more closely with the default, demonstrating reduced cumulative errors and tighter adherence to the ground-truth denoising path*
-
-
 
 ## 实验与关键发现
 
@@ -244,8 +226,6 @@ D2Cache 的二阶差分计算和缩放因子推导引入的开销可忽略（延
 ![[assets/figures/papers/paper_list_l851_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_D2Cache_Second_Ord/figures/008_Figure_6.jpg]]
 *Figure 6: Qualitative comparisons on complex prompts using Wan2.1-1.3B under superfast acceleration (3.61×). Frames from default (no caching), TeaCache-superfast, and D2Cache-superfast settings are shown, with zoomed-in details on the right. TeaCache suffers severe degradation (e.g., artifacts, incoherence), while D2Cache preserves fidelity close to default*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l851_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_D2Cache_Second_Ord/figures/001_Figure_1.jpg]]
 *Figure 1: Quality-latency comparison of video diffusion models. Visual quality versus latency curves of the proposed D2Cache and TeaCache [26] using 4 different video diffusion models. D2Cache significantly outperforms TeaCache under identical caching schedules*
 
@@ -254,11 +234,6 @@ D2Cache 的二阶差分计算和缩放因子推导引入的开销可忽略（延
 
 ![[assets/figures/papers/paper_list_l851_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_D2Cache_Second_Ord/figures/007_Table_2.jpg]]
 *Table 2: Ablation study on scale factor s with Latte under superfast mode*
-
-![[assets/figures/papers/paper_list_l851_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_D2Cache_Second_Ord/figures/009_Table_3.jpg]]
-*Table 3: Sharpness metrics on 50 complex videos (Wan2.1, superfast: higher is better)*
-
-
 
 ## 定位与知识库关联
 
@@ -319,8 +294,6 @@ D2Cache 的核心主张拥有较强的证据支撑：
 3. **叠加加速范式**：能否与稀疏注意力、模型量化、步长蒸馏等正交加速技术组合，获得叠加效益？
 4. **超长序列扩展**：在更长视频序列或更大规模模型上的可扩展性和效果如何？
 5. **实时交互适用性**：实时交互式视频生成场景下的实际用户体验与延迟是否满足需求？
-
-
 
 ## 原文 PDF
 

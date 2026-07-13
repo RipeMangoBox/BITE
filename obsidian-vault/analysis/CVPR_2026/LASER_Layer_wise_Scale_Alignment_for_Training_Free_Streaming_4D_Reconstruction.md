@@ -60,8 +60,6 @@ claims:
 
 **方法定位**：LASER 属于训练无关的流式重建框架，位于离线前馈重建模型（VGGT/π³）与纯流式学习方法（Spann3R、CUT3R、STream3Rβ 等）之间，通过几何后处理弥合离线模型与流式需求之间的鸿沟。
 
-
-
 ### 从离线重建到流式 4D 重建
 
 从单目视频中恢复稠密的 4D 几何（每帧的深度图与相机姿态，以及全局一致的点云）是计算机视觉的核心课题。近年来，前馈式重建模型取得了长足进展：**DUSt3R** 系列方法能够直接从图像对中预测稠密点图与相机姿态，而 **VGGT** 和 **π³** 等工作进一步将这一能力扩展到多帧联合推理，在离线设定下展现出令人瞩目的几何精度。然而，这些模型在设计上假设可以一次性访问全部帧，其计算复杂度与输入帧数呈超线性增长，难以直接部署到对实时性要求严苛的流式场景中。
@@ -87,8 +85,6 @@ claims:
 一个关键的洞察是：**自然场景天然组织为深度有序的层结构，不同层具有相对独立的几何属性**。这一经典认知在传统三维视觉中被广泛利用，但在现代深度学习重建范式中却被忽视。LASER 的核心动机正是弥合这一鸿沟——在深度学习模型已经能够提供强局部几何的前提下，通过显式建模深度层的尺度变化，将各窗口的输出统一为全局一致的长期重建，**无需任何重新训练或微调**。
 
 具体而言，LASER 提出**逐层尺度对齐（Layer-wise Scale Alignment, LSA）**：将深度图分割为离散的深度层，为每一层独立估计尺度因子，并通过层图结构沿时间轴与窗口间传播和聚合这些尺度，从而纠正各层的非均匀缩放。这一设计使得 LASER 能够作为通用框架，将任意离线重建模型（如 VGGT 或 π³）无缝转换为流式系统，在保持 14 FPS 实时性和 6 GB 峰值内存的同时，显著超越现有学习型流式方法和训练无关基线。
-
-
 
 ## 核心方法与创新机理
 
@@ -126,8 +122,6 @@ LASER 的核心创新在于用**逐层尺度对齐**替代全局 Sim(3) 变换�
 - **去掉 IRLS 尺度估计**（w/o IRLS）：用闭式解替代鲁棒 IRLS 会严重恶化深度和姿态精度，说明配准阶段的鲁棒估计至关重要。
 - **去掉相机锚点**（w/o Anchor）：改用缩放后的点图进行刚性配准，导致 Sintel 旋转误差 RPE_rot 从 0.249 急剧升至 0.742，验证了基于相机姿态的最小锚点对保持轨迹一致性的必要性。
 
-
-
 LASER 是一个**无需训练**的流式框架，将任意离线 4D 重建模型转换为在线流式系统。其核心流水线由三个递进阶段构成：**滑动窗口帧分组与局部重建**、**子地图到全局地图的 Sim(3) 配准**，以及**逐层尺度对齐（LSA）**。整个流程沿时间轴增量执行，每到达一个新窗口，系统便将其融合到持续增长的全局地图中，无需回看全部历史帧。
 
 ### 滑动窗口与局部重建
@@ -164,12 +158,8 @@ LASER 可实例化于不同骨干模型，论文中使用 **VGGT** 和 **π³** 
 
 整个流水线在单张 RTX A6000 GPU 上以 **14 FPS** 运行，峰值内存仅 **6 GB**（Figure 5）。各模块的运行时分解（Figure 8）表明，前馈重建器是主要计算瓶颈，LSA 与子地图配准的额外开销相对较小，保持了流式处理的实时性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2512_13680/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of LASER. LASER converts an offline reconstruction model to a streaming version without retraining. Given a video stream, we process frames in overlapping temporal windows with a frozen feed-forward reconstructor. We incrementally register the submap to the global map with Sim(3) estimation and the proposed layer-wise scale alignment*
-
-
 
 ### 3.1 滑动窗口与子地图构建
 
@@ -217,13 +207,6 @@ $$\hat{s}_{t,n}^{(i)} = \arg \min_{s>0 \atop (d_{p}, d_{q}) \in \mathcal{C}_{t,n
 
 **消融验证**：完全去掉 LSA 后，Sintel Abs Rel 从 0.247 升至 0.278，Bonn 从 0.048 升至 0.113，证实 LSA 对缓解层间尺度不一致的关键作用。去掉时序传播边（$\mathcal{E}_{\mathrm{intra}}$）会忽略非重叠帧之间的尺度关系，导致长序列全局一致性受损。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2512_13680/figures/003_Figure_3.jpg]]
-*Figure 3: Layer Depth Misalignment Issue. After the global Sim(3) alignment, surfaces at different depths may exhibit layer-wise scale inconsistency: foreground regions appear over- or under-scaled relative to background structures across consecutive windows. This anisotropic scaling leads to visible distortions and metric drift in the fused reconstruction. We introduce Layer-wise Scale Alignment (LSA), a geometry-driven refinement that corrects distortions based on a layer graph*
-
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -236,38 +219,23 @@ LASER 是一个训练无关（training‑free）的流式框架，其实验评�
 
 Table 1 报告了在 Sintel、Bonn 和 KITTI 三个数据集上的视频深度估计结果。LASER 使用 π³ 骨干时，在 Sintel 上取得 Abs Rel 0.247，比最佳流式基线 **STream3Rβ** 的 0.264 降低了 6.4%；在 Bonn 上 Abs Rel 为 0.048，比 STream3Rβ 的 0.069 降低 30.4%；在 KITTI 上 Abs Rel 为 0.054，比 STream3Rβ 的 0.080 降低 32.5%。即使在 VGGT 骨干下，LASER 也一致优于所有流式方法，验证了训练无关对齐策略的泛化能力。
 
-![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2512_13680/figures/005_Table_1.jpg]]
-*Table 1: Video Depth Estimation on Sintel [2], Bonn [42] and KITTI [16]. We report Abs Rel and δ\<1.25*
-
 **关键发现：** LASER 在三个不同场景类型（合成、室内、室外驾驶）上均取得最低的 Abs Rel，且优势在真实场景（Bonn、KITTI）上更为显著，说明 LSA 对真实世界中复杂的层间尺度不一致具有更强的纠正能力。
 
 ### 相机姿态估计
 
 Table 2 报告了小规模数据集上的姿态估计结果。LASER（π³）在 Sintel 上取得 ATE 0.061，比 STream3Rβ 的 0.213 降低 71.4%；在 ScanNet 和 TUM 上也一致优于所有流式基线。值得注意的是，LASER 在平移和旋转 RPE 上均显著领先，表明逐层尺度对齐不仅改善了深度精度，也间接提升了相机轨迹的全局一致性。
 
-![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2512_13680/figures/006_Table_2.jpg]]
-*Table 2: Camera Pose Estimation on Sintel [2], ScanNet [8], and TUM [52]. We report ATE, translational RPE, and rotational RPE*
-
 Table 3 进一步展示了公里级 KITTI 里程计上的大规模姿态估计。LASER（π³+Ours）的平均 ATE 为 24.17，比训练无关的并发工作 **VGGT‑Long** 的 33.12 降低 27.0%（排除高速序列后降幅为 12–21%）。这验证了 LSA 在长序列、大尺度场景下对累积漂移的有效抑制。
-
-![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2512_13680/figures/007_Table_3.jpg]]
-*Table 3: Large-scale Camera Pose Estimation on KITTI [16]. We report ATE (lower is better). CF: checkmark*
 
 ### 点图重建
 
 Table 4 报告了室内短期多视图点图估计结果。LASER（VGGT+Ours）在 7‑Scenes 上取得 Mean Accuracy 0.021，甚至优于离线 VGGT 的 0.032（降低 34.4%），说明逐层对齐不仅弥补了流式处理的精度损失，反而通过纠正层间尺度不一致提升了重建质量。在 NRGBD 上，LASER 同样在 Accuracy、Completeness 和 Normal Consistency 三项指标上全面领先。
-
-![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2512_13680/figures/011_Table_4.jpg]]
-*Table 4: Indoor, Short-term Multi-view Point Map Estimation on 7 scenes and NRGBD. We report Accuracy (Acc, lower is better), Completeness (Comp, lower is better), and Normal Consistency (NC, higher is better)’s Mean and Median*
 
 Table 7 展示了 Waymo 室外长期点图估计结果。LASER 在平均 Chamfer Distance 上显著优于 VGGT‑Long，进一步证明了 LSA 在动态室外场景下的鲁棒性。
 
 ### 效率分析
 
 Figure 5 综合对比了各方法的 FPS、峰值内存和姿态误差。LASER 以 14 FPS 运行，峰值内存仅 6 GB，在精度‑效率曲线上形成明显的帕累托前沿——精度远超所有流式方法，同时内存消耗远低于基于全局优化的 VGGT‑SLAM 等方案。Figure 8 的运行时分解显示，前馈推理占据主要耗时，而 LSA 模块本身十分轻量，不会成为吞吐瓶颈。
-
-![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2512_13680/figures/010_Figure_5.jpg]]
-*Figure 5: We report the running FPS (on a RTX A6000 GPU), peak memory usage, and pose estimation error (ATE)*
 
 ![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2512_13680/figures/015_Figure_8.jpg]]
 *Figure 8: Runtime analysis of each module within the pipeline*
@@ -308,8 +276,6 @@ Figure 12 展示了 LASER 的典型失败案例，主要集中在动态场景。
 
 此外，框架的超参数（窗口大小、重叠比例、置信度阈值）需要针对室内/室外不同环境手动调节，缺乏自适应性，这在实际部署中增加了调参负担。
 
-
-
 ## 定位与知识库关联
 
 ### 1. 与流式前馈重建方法的关系
@@ -343,8 +309,6 @@ LASER 的核心定位是 **训练无关的流式框架**，它不引入任何可
 **开放问题 2：随着离线重建模型的进步，LASER 如何更好地利用动态场景或非刚性运动的处理能力？** 这可能需要重新设计对齐模块，使其能够区分静态背景和动态前景，并分别处理其尺度一致性。
 
 **开放问题 3：能否通过引入原始图像的外观信息来增强 LSA 在复杂场景和严重遮挡下的鲁棒性与时序追踪能力？** 这涉及将视觉特征与几何深度层融合，构建更稳定的跨窗口对应关系。
-
-
 
 ## 原文 PDF
 

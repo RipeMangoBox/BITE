@@ -74,8 +74,6 @@ UNIMA的方法定位处于“智能体框架下的多模态推理与生成”这
 
 这一设计将多模态推理从“黑箱生成”转变为“可验证的规划执行”范式，在交织多模态任务上实现了结构完整性和语义一致性的质变式提升。
 
-
-
 ### 交织多模态：从单模态到任意模态组合的范式跃迁
 
 现实世界的交互天然是多模态交织的。人类在对话中自由切换文字、图像、语音、视频，信息并非孤立模态的简单拼接，而是以交织序列的形式动态组合。然而，当前的多模态大语言模型（MLLMs）大多仍局限于“文本+图像”的双模态范式，即便部分模型宣称支持任意到任意（any-to-any）生成，其评估基准却远远滞后——现有交织多模态基准仅覆盖文本和图像两种模态，缺乏对任意模态组合的统一评估，且评估维度单一，无法反映真实交织推理的复杂性。
@@ -102,8 +100,6 @@ Table 1 将 UNIM 与现有交织多模态基准进行了系统对比。现有基
 
 - **UNIM 基准**：首个统一任意到任意交织多模态基准，包含 31K 高质量实例，覆盖 30 个领域和 7 种模态（文本、图像、音频、视频、文档、代码、3D），并设计三维度评估套件（语义正确性与生成质量、响应结构完整性、交织连贯性），系统衡量模型的综合交织能力。
 - **UNIMA 基线模型**：基于智能体框架的任意到任意交织多模态基线，其核心创新是**可追溯证据推理模块（Traceable Evidence Reasoning, TER）**——将隐式思维链转化为显式、可验证、可回溯修正的结构化推理链，强制模型在生成前构建可靠的逻辑基础，从而大幅提升交织输出的结构完整性和语义一致性。
-
-
 
 ## 核心方法与创新机理
 
@@ -134,8 +130,6 @@ UNIMA 的 **Generating Module** 将生成控制权交给了 TER 模块产出的*
 ### 创新协同效应
 
 上述三个变更槽位并非孤立创新，而是形成了紧密的因果链条：TCDC 提供任务感知的统一语义基础 → SERC 在此基础上进行可验证的结构化推理并生成最终报告 → 生成模块严格按报告执行输出。这一链条解释了为何 UNIMA 在三个评估维度上均大幅领先基线：语义正确性（SQCS 62.2 vs. 基线最高 21.2）、结构完整性（StS/LeS 领先 2–40 倍）、交织连贯性（ICS 69.8 vs. 基线最高 60.0）同时获得显著提升。
-
-
 
 UNIMA 是一个面向任意到任意交织多模态任务的智能体框架，其核心设计目标是将隐式的多模态推理过程转化为显式、可验证的结构化推理链。整个框架由三个功能模块串联构成，形成“感知—推理—生成”的闭环流水线。
 
@@ -170,15 +164,8 @@ TER 模块是 UNIMA 的核心创新，其内部包含一个四步结构化证据
 
 生成模块本身不进行语义决策，而是忠实地执行最终报告中的指令。它根据报告中指定的模态类型调用对应的生成工具（如图像生成模型、音频合成模型等），将生成内容插入到对应的占位符位置，最终拼装成完整的交织多模态输出。这种“推理与生成分离”的设计使得推理链的质量可以独立评估和优化，同时保证了输出格式的精确可控。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l800_https_arxiv_org_abs_2603_05075/figures/006_Figure_4.jpg]]
 *Figure 4: Overview of the UNIMA architecture*
-
-![[assets/figures/papers/paper_list_l800_https_arxiv_org_abs_2603_05075/figures/001_Figure_1.jpg]]
-*Figure 1: Illustration of the any-to-any interleaved multimodal paradigm with different real-world application scenarios. Solving any-to-any interleaved multimodal learning requires complex and combined capabilities*
-
-
 
 ### UNIMA 三大核心模块
 
@@ -248,13 +235,6 @@ $$\mathcal{X}^{rel} = \tau \cdot \mathcal{X}^{abs}$$
 
 其中 $\mathcal{X}^{abs}$ 为绝对性能得分，$\mathcal{X}^{rel}$ 为考虑支持率后的相对性能。这一设计避免了因模型不支持某些模态而导致的评分不公，使得跨模型比较更加客观。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l800_https_arxiv_org_abs_2603_05075/figures/003_Figure_3.jpg]]
-*Figure 3: Illustration of the UNIM evaluation suite. ① refers to the calculation process of the StS and LeS (§4.2). ② represents the calculation process of the ICS in Eq. (2). ③ refers to the calculation process of the SQCS; please refer to Eq. (1)*
-
-
-
 ## 实验与关键发现
 
 ### 1. 基准数据集概览
@@ -293,9 +273,6 @@ Table 4 展示了语义正确性与生成质量（SQCS）及支持率（τ）的
 
 Table 5 报告了交织连贯性（ICS）的评估结果。ICS 由整体连贯性（HC）和风格和谐性（SH）加权组合：$\mathrm{ICS} = \eta^{\mathrm{ICS}} \cdot \mathrm{HC} + (1 - \eta^{\mathrm{ICS}}) \cdot \mathrm{SH}$。UNIMA 在通用领域达到 69.8，领先 MIO 的 60.0（+9.8）和 AnyGPT 的 43.6（+26.2）。NExT-GPT 仅得 28.1，表明其在跨模态逻辑衔接和表达协调方面存在严重不足。
 
-![[assets/figures/papers/paper_list_l800_https_arxiv_org_abs_2603_05075/figures/012_Table_5.jpg]]
-*Table 5: Evaluation results on Interleaved Coherence*
-
 消融实验进一步揭示，用无条件描述替换任务条件稠密描述（TCDC）后，SQCS 下降 6.7，ICS 下降 5.7，说明任务感知的语义基础对语义准确性和跨模态连贯性具有重要影响。
 
 ### 3. 消融实验
@@ -313,24 +290,13 @@ Table 6 系统性拆解了 UNIMA 各组件的贡献，结论如下：
 
 Figure 7 展示了 10 项能力维度上的表现对比。UNIMA 在所有维度上均取得最高且最均衡的性能，而基线模型在不同能力间表现出剧烈波动，缺乏稳定的跨能力泛化能力。Figure 9 进一步揭示了难度梯度下的性能变化趋势：仅有 UNIMA 呈现出与难度递增相匹配的清晰性能梯度，基线模型在不同难度级别上的表现几乎无差异，说明其缺乏应对复杂交织任务的基本推理能力。
 
-![[assets/figures/papers/paper_list_l800_https_arxiv_org_abs_2603_05075/figures/010_Figure_7.jpg]]
-*Figure 7: Results across 10 capabilities on UNIM. C1: Perceptual Understanding, C2: Spatial Understanding, C3: Temporal Understanding, C4: Semantic Generation, C5: Content Editing, C6: Creative Expression, C7: Reasoning Capability, C8: Emotional Analysis, C9: Structural Analysis, and C10: Planning Capability. Refer to Appendix §C.4 for details*
-
 ### 5. 评估指标合理性验证
 
 Figure 5 验证了 SQCS 和 ICS 与人工评分的相关性：SQCS 的 Pearson 相关系数达到 r = 0.974，ICS 达到 r = 0.960，表明两项指标与人类判断高度一致。Figure 6 通过受控扰动实验验证了 StS 和 LeS 的合理性：当增加或移除模态类型和占位符标签时，StS 均会下降；而 LeS 仅在模态类型被移除时下降，符合其宽松匹配的设计预期。
 
-![[assets/figures/papers/paper_list_l800_https_arxiv_org_abs_2603_05075/figures/007_Figure_5.jpg]]
-*Figure 5: Results for rationality verification of SQCS and ICS*
-
-![[assets/figures/papers/paper_list_l800_https_arxiv_org_abs_2603_05075/figures/008_Figure_6.jpg]]
-*Figure 6: Results for rationality verification of StS and LeS*
-
 ### 6. 失败模式与局限性
 
 尽管 UNIMA 在所有维度上大幅领先，但在极端复杂任务中仍存在退化现象。结构指标（StS/LeS）在高阶模态交织场景下会出现下降，表明当前方法对复杂交织结构的建模能力仍有提升空间。此外，评估套件依赖外部描述工具和 LLM-as-a-Judge，可能引入一定偏差，且对高度开放式生成任务的评估敏感性有待进一步验证。UNIM 当前仅覆盖 7 种模态，未来扩展至更多模态将有助于更全面地模拟真实世界交互。
-
-
 
 ## 定位与知识库关联
 
@@ -379,8 +345,6 @@ UNIMA 的核心方法论贡献在于将 **智能体式推理框架** 引入任�
 6. **认知式交织建模**：如何构建模拟人类多模态推理策略（如选择性注意、跨模态联想、层级化规划）的认知式方法？
 
 这些问题共同指向一个核心挑战：**从“工具拼接式”的任意到任意生成迈向“原生统一”的任意到任意理解与生成**。UNIM 和 UNIMA 为这一方向提供了首个系统性的评估基准和方法论基线，但其方法本质上是智能体框架对现有专用模型的编排，距离真正的统一多模态大模型仍有显著差距。
-
-
 
 ## 原文 PDF
 

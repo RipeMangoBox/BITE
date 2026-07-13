@@ -54,8 +54,6 @@ claims:
 
 在Hyper-NeRF和N3DV两个主流动态场景数据集上，所提方法在PSNR、SSIM和LPIPS指标上均超越现有SOTA方法（包括Grid4D、4DGS、SC-GS等），同时在渲染速度（70 FPS vs. 4DGS的34 FPS）和存储开销（25 MB vs. 4DGS的61 MB）方面展现出显著优势。消融实验进一步验证了MANI和样条轨迹各自的关键贡献，以及VFM先验对框架的稳定支撑作用。
 
-
-
 ### 动态场景重建的核心挑战
 
 从单目视频重建动态三维场景是计算机视觉与图形学中的基础问题，其核心困难在于：观测数据仅提供稀疏的二维投影，而场景本身同时存在几何、外观与运动的复杂耦合。近年来，三维高斯溅射（3D Gaussian Splatting, 3DGS）凭借其显式表示和高效可微光栅化，迅速成为静态场景重建的主流方案。然而，将其扩展到动态场景时，如何紧凑且准确地表示时变几何与外观成为一个关键瓶颈。
@@ -81,8 +79,6 @@ claims:
 基于这一观察，本文提出一个根本性的思路转变：**将控制点分配从“几何均匀”转向“运动自适应”**。具体而言，我们利用VFM提取的语义标记和运动先验，建立图像补丁-标记-节点之间的对应关系，使节点分布能够跟随运动倾向自适应地集中于动态区域，同时在静态区域大幅压缩冗余节点。此外，我们用三次Hermite样条替代MLP来参数化节点轨迹，并用2D跟踪进行初始化，从而获得更平滑、更紧凑的运动表示。
 
 这一方法在Hyper-NeRF和N3DV数据集上均取得了最优的重建质量（PSNR分别达到25.78和23.31），同时保持了显著的计算效率优势——渲染速度达70 FPS，存储仅需25 MB，相比4DGS分别提升约2倍和压缩约2.4倍。消融实验进一步证实，运动自适应节点初始化（MANI）和样条轨迹参数化各自贡献显著，组合后达到最佳效果。
-
-
 
 ## 核心方法与创新机理
 
@@ -150,8 +146,6 @@ $$\operatorname* { m i n } _ { \{ P _ { k } \} _ { k = 1 } ^ { K } } \ \sum _ { 
 
 **因果杠杆**：控制点分配密度与运动复杂度的匹配程度是核心杠杆——MANI通过语义和运动先验重新平衡静态与动态区域的资源分配，样条轨迹提供平滑紧凑的运动表示，两者协同实现了在高效计算下显著提升动态细节重建质量的目标。
 
-
-
 本文提出的动态3D高斯溅射运动控制框架，以“从标记到节点”为核心设计理念，通过引入视觉基础模型（VFM）的语义与运动先验，将控制点密度与场景运动复杂度自适应对齐。整个pipeline由五个紧密耦合的模块构成，其输入为单目视频，输出为可动态渲染的规范空间3D高斯表示。
 
 **输入与先验提取。** 给定单目视频，系统首先调用一组预训练的视觉基础模型提取多模态先验（Figure 1A）：**VGGT** 提供图像块的语义标记（token），**Track-Anything** 生成前景掩码，**DepthCrafter** 估计单目深度图，**TAPIR** 输出跨帧的2D跟踪轨迹（tracklets）。这些先验为后续的节点初始化、轨迹参数化和损失监督提供了关键信号。
@@ -168,12 +162,8 @@ $$\operatorname* { m i n } _ { \{ P _ { k } \} _ { k = 1 } ^ { K } } \ \sum _ { 
 
 **关键设计决策的因果逻辑。** 框架的核心瓶颈突破在于：通过MANI将控制点分配从“几何均匀”转变为“运动自适应”，使得有限的节点预算能够集中在动态细节丰富的区域；同时，样条轨迹参数化相比MLP变形场提供了更平滑的运动插值和更少的可优化参数，2D跟踪初始化则为早期优化提供了可靠的初始解，避免了MLP变形场常见的欠拟合与过平滑问题。消融实验（Table 3a）定量验证了这一因果链：基线（FPS+MLP）PSNR为22.35 dB，添加MANI提升至23.89 dB，进一步替换为样条轨迹（+MS）提升至24.51 dB，再加入跟踪初始化（+Init）达到25.78 dB，每一步均带来显著且互补的增益。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_ginzNWATI1/figures/001_Figure_1.jpg]]
 *Figure 1: The overview of our method. (A) Given a monocular video, we extract semantic and motion priors from pre-trained vision foundation models. (B) These priors guide motion-adaptive node initialization, yielding compact distributions aligned with dynamic regions. (C) The initialized nodes are assigned splineparameterized trajectories to provide a motion basis. (D) Node motions are propagated to Gaussians through deformation, transforming the canonical representation. (E) The deformed model is rendered and optimized for consistent reconstruction*
-
-
 
 ### 3DGS 渲染基础
 
@@ -253,12 +243,8 @@ $$\mathcal { L } _ { \mathrm { a r a p } } = \displaystyle \sum _ { t = 1 } ^ { 
 
 消融实验（Table 6）表明，移除任一 VFM 相关损失项（mask、depth、track）会导致性能中等下降，但框架整体保持鲁棒。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_ginzNWATI1/figures/009_Figure_4.jpg]]
 *Figure 4: Visualization of different Node init. meth. on Chicken scene of Hyper-NeRF data (Park et al. (2021b))*
-
-
 
 ## 实验与关键发现
 
@@ -280,9 +266,6 @@ $$\mathcal { L } _ { \mathrm { a r a p } } = \displaystyle \sum _ { t = 1 } ^ { 
 *Table 12: Efficiency comparison on Hyper-NeRF dataset. We highlight the best , second best and the third best results in each scene*
 
 定性可视化（Figure 3 及补充对比图）显示，我们的方法在动态细节（如 Chicken 场景的鸡头运动、Broom 场景的扫帚摆动）上重建更为清晰锐利，而 Grid4D 和 D-3DGS 在运动边界处存在模糊或伪影。
-
-![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_ginzNWATI1/figures/007_Figure_3.jpg]]
-*Figure 3: Qualitative comparison on the N3DV dataset (Li et al. (2022))*
 
 ### 消融实验
 
@@ -317,25 +300,6 @@ $$\mathcal { L } _ { \mathrm { a r a p } } = \displaystyle \sum _ { t = 1 } ^ { 
 3. **硬件公平性**：效率对比中使用了不同 GPU 硬件（V100 vs RTX 3090/A6000），虽然作者指出 V100 计算能力较低，但这种不公平比较可能减弱效率优势结论的严谨性。
 
 4. **单目重建固有挑战**：使用单目视频进行重建时，在严重遮挡或快速运动下可能遇到点云缺失和深度歧义问题，依赖深度和跟踪先验仅能部分缓解。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_ginzNWATI1/figures/014_Table_6.jpg]]
-*Table 6: Ablation study on VFM prior loss*
-
-![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_ginzNWATI1/figures/011_Table_4.jpg]]
-*Table 4: Additional ablation study on different Depth prior on Chiken scene of Hyper-NeRF dataset per-scene*
-
-![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_ginzNWATI1/figures/012_Table_5.jpg]]
-*Table 5: Additional ablation study on different 2D Tracklets prior on Chiken scene of Hyper-NeRF dataset per-scene*
-
-![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_ginzNWATI1/figures/015_Table_7.jpg]]
-*Table 7: Ablation study on*
-
-![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_ginzNWATI1/figures/016_Table_8.jpg]]
-*Table 8: Ablation study on η*
-
-
 
 ## 定位与知识库关联
 
@@ -399,8 +363,6 @@ $$\mathcal { L } _ { \mathrm { a r a p } } = \displaystyle \sum _ { t = 1 } ^ { 
 4. **扩展到多目和长视频**：当前方法针对单目视频设计，扩展到多目设置或长视频（需处理循环运动、场景进出等）时，节点管理和样条参数化策略需要相应调整。
 
 5. **实时训练**：训练时间39分钟仍远未达到实时，探索更高效的节点初始化策略、简化优化流程或引入预训练先验加速收敛，是走向实际应用的关键一步。
-
-
 
 ## 原文 PDF
 

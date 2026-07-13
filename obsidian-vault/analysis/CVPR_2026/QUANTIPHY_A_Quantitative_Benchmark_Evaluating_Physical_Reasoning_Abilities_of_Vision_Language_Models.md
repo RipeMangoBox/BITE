@@ -51,8 +51,6 @@ QUANTIPHY是首个系统性评估视觉语言模型（VLM）对视频中物体�
 
 **方法定位**：QUANTIPHY构建了一个包含Blender仿真、多视角实验室捕捉和互联网筛选三种来源的视频数据集，经分割、标注后为每个视频生成多个（先验，提问，真值）三元组，并归类为2D/3D与静态/动态四个核心任务组合。任务要求模型在给定单一物理先验（尺寸/速度/加速度）的条件下，推断目标物体在世界空间的相应运动学量——从物理原理上仅需简单的比例关系即可精确求解，但现有VLM仍大量产生“数值幻觉”，其推理更接近“记忆与猜测”而非“观测与计算”，为迈向真正物理世界的AI系统指明了关键差距。
 
-
-
 ### 物理推理：从定性到定量的范式跃迁
 
 理解物理世界中的运动规律是通用具身智能系统的核心能力之一。现实场景中，物体的尺寸、速度、加速度等运动学属性通过物理定律相互关联：给定任一属性的先验值，理论上即可通过比例关系精确推导其余未知量。这一看似简单的推理链条——从视频中提取像素级运动信息，结合给定的物理先验进行数值换算——构成了定量物理推理的基本逻辑。
@@ -77,8 +75,6 @@ QUANTIPHY 的设计直指当前 VLM 物理推理的根本瓶颈——并非视�
 
 这一“定性合情性与定量准确性之间的巨大鸿沟”构成了 QUANTIPHY 的核心洞察，也为迈向真正物理世界的 AI 系统指明了关键差距。
 
-
-
 ## 核心方法与创新机理
 
 QUANTIPHY的核心创新在于将VLM物理推理能力的评估从**定性VQA范式**彻底转向**定量数值回归范式**。这一转变并非简单的输出格式调整，而是对模型“是否真正理解物理运动”这一问题的重新定义——从“能否选对答案”变为“能否算对数值”。
@@ -102,8 +98,6 @@ QUANTIPHY通过**维度（2D/3D）** 和**先验类型（静态/动态）** 的�
 ### 数据构建：仿真-实验室-互联网的三源融合
 
 为兼顾可控性与真实性，QUANTIPHY从三个维度收集原始视频：**Blender仿真**提供完全可控的环境和精确的真值标注；**多视角实验室捕捉**通过定制动作捕捉系统获取真实物体的物理属性；**互联网筛选**引入自然场景的多样性。这种三源融合策略确保了基准既具有精确的定量真值，又覆盖了真实世界的视觉复杂性。
-
-
 
 QUANTIPHY 的整体框架围绕一个核心命题展开：**评估视觉语言模型（VLM）能否利用给定的单一物理先验，从视频中观测到的像素运动出发，定量推断目标物体的运动学属性**。该框架并非提出新的模型架构，而是构建了一套从数据生成到模型评估的标准化流程，用以系统性地暴露当前 VLM 在“定性合情”与“定量准确”之间的鸿沟。
 
@@ -177,12 +171,8 @@ QUANTIPHY 的构建遵循一个三阶段流水线（Figure 4），确保数据�
 
 QUANTIPHY 框架的设计本身即蕴含了一个关键的可控变量：**输入忠实度**——模型是否真正使用提供的物理先验和视频观测到的像素运动来推导未知量，而非依赖内部记忆。通过在后续实验中对比“视频+先验”与“仅先验”条件下的性能，以及引入反事实先验，这一框架能够显式地检验 VLM 的推理机制是否忠实于输入。正如后续实验所揭示的，现有 VLM 的推理更接近“记忆与猜测”而非“观测与计算”，这正是 QUANTIPHY 框架所瞄准的根本性问题。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2747_https_arxiv_org_abs_2512_19526/figures/001_Figure_1.jpg]]
 *Figure 1: On a crowded city street, a bird’s nest falls from a branch, a car rushes by, an eagle flits over a building, and a person walks in a crosswalk — the real world is full of complex physical motion. To enable AI to understand and navigate this environment, it is essential for generalist embodied systems to reason about physical properties quantitatively. Because objects obey common laws of physics, their kinematic properties (such as size, velocity, and acceleration) are interrelated. This interdependence makes it possible for visual AI to systematically reason about these properties with respect to available priors. In this work, we present QUANTIPHY, the first benchmark to evaluate the reas...*
-
-
 
 QUANTIPHY基准的核心目标并非提出新的模型架构，而是定义一套可量化评估VLM物理推理能力的任务范式与评测协议。其“方法”本质上由**任务形式化**、**数据构建流水线**与**评估指标**三个关键模块构成。
 
@@ -232,8 +222,6 @@ QUANTIPHY的数据构建遵循三阶段流水线，如图4所示：
 **第二阶段：分层数据标注**。针对不同数据源采用差异化标注策略：Blender数据直接从仿真引擎导出物理属性；实验室数据通过多目立体重建和人工像素测量获取精确尺寸与轨迹；互联网数据则通过人工像素级测量工具标注。对于3D任务，额外提供深度信息以支持深度方向的推理。
 
 **第三阶段：问题构建**。为每个视频生成多个（先验，提问，真值）三元组。每个三元组指定一个源物体的物理先验值，并提出一个关于目标物体物理量的定量问题。三元组按2D/3D和静态/动态两个维度分类，确保基准覆盖全面的任务类型。此外，通过对视频进行分割处理并替换背景，系统性地控制了场景复杂度（纯色背景、简单纹理背景、复杂背景）和目标数量（单目标、多目标），为后续的细粒度分析提供条件。
-
-
 
 ## 实验与关键发现
 
@@ -286,33 +274,11 @@ Figure 5分析了场景背景复杂度和物体数量对性能的影响。结果
 ![[assets/figures/papers/paper_list_l2747_https_arxiv_org_abs_2512_19526/figures/045_Figure_39.jpg]]
 *Figure 39: Distribution of human quantitative reasoning performance. Horizontal boxplots summarize participant-level mean MRA scores for the 2D (top) and 3D (bottom) survey conditions*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2747_https_arxiv_org_abs_2512_19526/figures/005_Table_1.jpg]]
-*Table 1: Evaluation results on QUANTIPHY. We report Mean Relative Accuracy (MRA %) on four kinematic categories (2S, 2D, 3S, 3D) and their average. Dark cell marks the best overall model and light cell marks the best open-weight model*
-
-![[assets/figures/papers/paper_list_l2747_https_arxiv_org_abs_2512_19526/figures/006_Table_2.jpg]]
-*Table 2: Extensive results on an analysis subset. We report Mean Relative Accuracy (MRA) in %. Rows follow the same model order as in Table 1*
-
 ![[assets/figures/papers/paper_list_l2747_https_arxiv_org_abs_2512_19526/figures/007_Figure_5.jpg]]
 *Figure 5: Effect of scene context. We plot the MRA (%) scores for all benchmark models on different categories, sorted in descending order according to their average MRA performance*
 
-![[assets/figures/papers/paper_list_l2747_https_arxiv_org_abs_2512_19526/figures/008_Figure_6.jpg]]
-*Figure 6: Case 1: Faithful pixel–prior reasoning*
-
-![[assets/figures/papers/paper_list_l2747_https_arxiv_org_abs_2512_19526/figures/010_Figure_7.jpg]]
-*Figure 7: Case 2: Counterfactual prior breaks faithfulness*
-
 ![[assets/figures/papers/paper_list_l2747_https_arxiv_org_abs_2512_19526/figures/009_Figure_8.jpg]]
 *Figure 8: Case 3: Video ablation reveals reliance on priors*
-
-![[assets/figures/papers/paper_list_l2747_https_arxiv_org_abs_2512_19526/figures/011_Figure_9.jpg]]
-*Figure 9: Case 4: Strong gravitational prior overrides counterfactual physics*
-
-![[assets/figures/papers/paper_list_l2747_https_arxiv_org_abs_2512_19526/figures/012_Figure_10.jpg]]
-*Figure 10: Distribution of MRA by model. One caveat to note is that the Avg. MRA in Table 1 reflects the mean MRA across inference task categories for each model (i.e., the average MRA of 2D-Static, 2D-Dynamic, 3D-Static, and 3D-Dynamic). In contrast, the mean in this distribution plot represents the average MRA at the individual-question level for each model*
-
-
 
 ## 定位与知识库关联
 
@@ -364,8 +330,6 @@ QUANTIPHY揭示的核心矛盾——模型在理论可精确求解的任务上�
 **基准的扩展维度**：对于更复杂的物理场景（如旋转、碰撞、流体），定量基准应如何扩展以全面评估模型对物理原理的掌握？这需要在保持数值可验证性的同时引入更丰富的物理现象，可能涉及多体动力学、非刚体运动等新任务类型。
 
 **人类-模型差异的本质**：尽管人类平均MRA仅略高于最强模型，但人类和模型在“如何得出答案”上存在根本差异——人类参与者能够忠实利用视觉线索进行比例估算，而模型则被文本先验所支配。理解这一差异的认知根源，将是构建真正物理世界AI的关键一步。
-
-
 
 ## 原文 PDF
 

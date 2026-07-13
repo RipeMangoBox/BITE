@@ -57,8 +57,6 @@ claims:
 
 **局限性**：方法仍存在左右歧义问题（无法区分对称部位），且当扩散模型生成质量下降（如遮挡区域、多视图不一致）时，预测精度会受到影响。此外，扩散模型前传带来的计算开销（约7787 GFLOPs）限制了实时应用场景。
 
-
-
 ### 单目3D关键点估计的核心困境
 
 从单张二维图像恢复三维关键点位置是计算机视觉中的一个基础性难题。其根本瓶颈在于：单目观测本身是极度欠约束的——同一个二维投影可能对应无穷多个三维解，而遮挡和深度歧义进一步加剧了这种不确定性。传统的有监督方法依赖大量手工标注的三维关键点真值，但精确的三维标注成本极高，尤其对于非刚性、多关节的物体（如人体、动物），需要昂贵的动作捕捉系统或繁琐的人工校准。无监督方法试图摆脱标注依赖，但多数现有工作仍需**校准的多视图图像**作为训练监督（如 **BKinD-3D** 在训练和推理阶段均需多视图输入；**Honari et al.** 和 **KeypointNet** 虽支持单帧推理，但仍需多视图训练数据）。这些方法面临一个共同的扩展性瓶颈：多视图校准数据的采集与处理成本限制了它们在大规模、非受限场景下的应用。
@@ -81,8 +79,6 @@ claims:
 - **端到端3D建模**：直接在三维体积空间中预测关键点，避免“2D检测→三角化”带来的信息损失和几何不一致。
 
 简言之，本文探索一个根本性问题：**能否仅凭预训练扩散模型中的多视图生成能力，从单张图片中无监督地发现几何一致的三维关键点？** 这一思路若成功，将大幅降低3D关键点估计的数据门槛，使其可泛化至缺乏标注和多视图校准的任意对象类别。
-
-
 
 ## 核心方法与创新机理
 
@@ -108,8 +104,6 @@ KeyDiff3D 引入可学习的邻接矩阵 $\mathcal{A} \in \mathbb{R}^{N \times N
 
 上述四个 changed slots 构成了一个紧密耦合的创新链条：扩散生成视图（新监督源）→ 多视图扩散特征（新特征提取器）→ 体积反投影与积分回归（新3D推理策略）→ 可学习结构图（新拓扑表示）。消融实验表明，**仅使用输入视图（$K=1$）时 MPJPE 退化为 166.29**（Table 3c），验证了多视图扩散先验是整个方法有效性的基础；而扩散时间步 $\tau=500$ 的最优选择（Table 5b）进一步说明，适中的去噪阶段能最好地平衡几何先验的丰富性与特征的判别力。
 
-
-
 KeyDiff3D 的整体流水线如图2所示，由三个核心模块串联构成：**扩散特征聚合**、**3D关键点提取**和**自监督训练**。给定单张输入图像 $I$，系统输出一组 $N$ 个3D关键点 $\mathbf{S} = \{\mathbf{s}_n\}_{n=1}^N$ 以及一个可学习的邻接矩阵 $\mathcal{A} \in \mathbb{R}^{N \times N}$，后者编码了关键点之间的拓扑关系。
 
 **模块间的数据流与因果链路**如下：
@@ -126,15 +120,8 @@ KeyDiff3D 的整体流水线如图2所示，由三个核心模块串联构成：
 
 **关键设计决策**：默认配置使用 $N=18$ 个关键点、体素分辨率 $M=72$、扩散时间步 $\tau=500$。消融实验表明，引入随机仿射变换对输入图像的扰动可防止重建网络走捷径（MPJPE从134.54降至121.34），而跨视图特征聚合采用softmax加权优于基于可见性的聚合（121.34 vs 127.12），后者易受深度估计误差影响。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2620_https_arxiv_org_abs_2507_12336/figures/002_Figure_2.jpg]]
 *Figure 2: The overall pipeline of KeyDiff3D. From a single image, (1) a pretrained multi-view diffusion model provides novel views and multi-view features, (2) which are aggregated and lifted into a 3D feature volume for keypoint prediction, and (3) the predicted 3D keypoints are projected to the generated views to provide structural cues for self-supervised reconstruction*
-
-![[assets/figures/papers/paper_list_l2620_https_arxiv_org_abs_2507_12336/figures/001_Figure_1.jpg]]
-*Figure 1: KeyDiff3D enables 3D keypoint prediction and object manipulation from a single image using multi-view diffusion priors. It generalizes effectively to in-the-wild and out-of-domain scenarios across diverse categories, including both human and animal domains*
-
-
 
 KeyDiff3D 的核心设计围绕一个因果链条展开：**将扩散模型的隐式3D几何先验转化为显式3D体积表示，并在该体积空间中直接预测3D关键点**。整个流水线由三个紧密耦合的模块构成。
 
@@ -221,8 +208,6 @@ $$
 3. **多视图监督不可或缺**：单视图自监督（$K = 1$）无法提供足够的几何约束，而少量生成视图（$K \geq 3$）即可显著改善性能。
 4. **软边图提供有效结构先验**：可学习的邻接矩阵和可微分高斯线条为重建网络提供了类骨架的结构线索，使其能够更有效地利用重建损失来优化关键点位置。
 
-
-
 ## 实验与关键发现
 
 ### 一、核心定量结果
@@ -282,9 +267,6 @@ $$
 
 如 **Figure 5** 所示，在Human3.6M上训练的模型可直接泛化至自然场景（DAVIS）和跨域数据（GSO），在Stanford Dogs上训练的模型可泛化至AP-10K灵长类数据集。这种跨域泛化能力源于：扩散先验提供的是类别无关的通用3D几何线索，而非人体特化的骨架结构约束，使得学到的关键点提取机制具有类别通用性。
 
-![[assets/figures/papers/paper_list_l2620_https_arxiv_org_abs_2507_12336/figures/007_Figure_5.jpg]]
-*Figure 5: Out-of-domain generalization results. (a) In-the-wild DAVIS results and (b) out-of-domain GSO results using a model trained on Human3.6M. (c) AP-10K results using a model trained on Stanford Dogs*
-
 ### 五、失败模式与局限性
 
 **Figure 8** 揭示了本方法的两个典型失败模式：
@@ -308,24 +290,8 @@ $$
 ![[assets/figures/papers/paper_list_l2620_https_arxiv_org_abs_2507_12336/figures/009_Table_3.jpg]]
 *Table 3: Ablation results on (a) 2D feature backbones, (b) 3D lifting strategies, and (c) the number of virtual viewpoints. All results are reported using 2-layer MLP regression*
 
-![[assets/figures/papers/paper_list_l2620_https_arxiv_org_abs_2507_12336/figures/013_Table_5.jpg]]
-*Table 5: Additional ablation results on the Human3.6M dataset. ‘default’ indicates the default configuration used in our main experiments*
-
-![[assets/figures/papers/paper_list_l2620_https_arxiv_org_abs_2507_12336/figures/015_Table_6.jpg]]
-*Table 6: Comparison of inference-time computational cost on an NVIDIA A6000 GPU*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2620_https_arxiv_org_abs_2507_12336/figures/008_Figure_6.jpg]]
-*Figure 6: Animatable 3D model results*
-
 ![[assets/figures/papers/paper_list_l2620_https_arxiv_org_abs_2507_12336/figures/006_Figure_4.jpg]]
 *Figure 4: Qualitative results on the (a) CUB-200-2011 and (b) Stanford Dogs datasets*
-
-![[assets/figures/papers/paper_list_l2620_https_arxiv_org_abs_2507_12336/figures/014_Figure_9.jpg]]
-*Figure 9: Keypoint prediction results according to the number of keypoints*
-
-
 
 ## 定位与知识库关联
 
@@ -383,8 +349,6 @@ Table 3(a) 的消融实验量化了这种差异：多视图扩散特征（SV3D, 
 4. **跨类别语义对齐**：当N=18时，人体和鸟类的关键点语义天然不同。能否通过跨类别联合训练，使关键点在不同类别间建立语义对应（如"头部""肢体末端"）？这将推动通用3D对象理解。
 
 5. **视频序列的无监督3D理解**：当前方法逐帧独立处理，未利用时序一致性。将KeyDiff3D扩展到视频输入，利用时序平滑约束，可能同时提升精度和消除左右歧义。
-
-
 
 ## 原文 PDF
 

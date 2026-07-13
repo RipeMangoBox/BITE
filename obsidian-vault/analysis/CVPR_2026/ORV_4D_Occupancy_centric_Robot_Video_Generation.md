@@ -55,8 +55,6 @@ claims:
 
 ORV在方法谱系上定位于**动作条件视频生成**与**视觉规划**的交叉地带，与IRASim、HMA、AVID等动作条件基线以及iVideoGPT等视觉规划基线形成对比。其独特之处在于将4D占用作为统一的几何-语义先验，同时服务于单视图生成、多视图生成和仿真到现实的迁移，这是现有方法尚未探索的方向。
 
-
-
 机器人视频生成的核心目标，是从稀疏的机器人控制信号出发，合成高保真、时序连贯且物理合理的未来观测视频。这一能力被视为构建通用机器人模拟器与视觉规划器的关键前提。然而，当前方法面临一个根本性瓶颈：**7-DoF末端执行器动作序列所承载的控制信息极为稀疏，而需要生成的像素级视频动态却高度密集，二者之间存在巨大的表示鸿沟**。这一鸿沟直接导致生成视频在保真度、时序一致性以及动作-视觉对齐性上的显著不足。
 
 现有工作主要沿着两条路径探索。其一是**动作条件视频生成**，如IRASim、HMA、AVID等方法，它们试图直接将动作序列编码为生成条件，但受限于稀疏控制的表达能力，难以精确约束场景中物体与背景的细粒度运动。其二是**基于文本条件的通用视频生成模型**（如CogVideoX），它们虽能产生逼真画面，却缺乏对机器人动作的精确响应能力，无法满足操控任务对动作对齐的严苛要求。在视觉规划领域，iVideoGPT等模型同样面临生成质量与控制精度难以兼顾的困境。
@@ -66,8 +64,6 @@ ORV在方法谱系上定位于**动作条件视频生成**与**视觉规划**的
 ORV正是在这一动机下提出的。其核心洞察是：**将4D语义占用（4D Semantic Occupancy）引入生成框架，通过耦合动作先验与占用视觉先验，弥合稀疏控制与密集输出之间的鸿沟**。具体而言，ORV从真实环境或物理仿真器中采集7-DoF动作轨迹与对应的4D语义占用序列（Figure 2），将占用渲染为2D视图后作为软性视觉条件注入扩散模型，从而为视频生成提供精细的几何与语义指导（Figure 1）。这一设计使得生成过程既能忠实响应动作指令，又能保持场景结构的时空一致性。
 
 此外，ORV还充分利用预训练视频基础模型（如CogVideoX-2B）的生成先验来提升视觉真实感，并在此基础上扩展出多视图一致生成（ORV-MV）与仿真到现实迁移（ORV-S2R）的能力。这些扩展进一步拓宽了机器人视频生成的应用边界——从数据增强到视觉规划，再到策略学习——为构建以生成为核心的机器人学习范式提供了新的可能性。
-
-
 
 ## 核心方法与创新机理
 
@@ -91,8 +87,6 @@ ORV-MV引入**视图注意力模块**，在时间注意力之前处理跨视图�
 
 三个changed slots的耦合构成了ORV的核心机制：**动作先验提供控制意图，占用视觉先验提供几何约束，两者协同弥合稀疏控制与密集输出之间的鸿沟**。
 
-
-
 ORV 是一个以 4D 语义占用为中心的条件视频生成框架，其核心设计动机在于弥合**稀疏的 7-DoF 动作控制信号**与**密集的像素级视频动态**之间的表示鸿沟。如图 3 所示，框架以占用表示 $\mathcal{C}$ 和动作序列 $\mathcal{A}$ 为双条件输入，通过非交互式方法分别从真实环境或物理仿真器中采集这两类先验，进而驱动单视图、多视图以及仿真到现实（Sim-to-Real）的操控视频生成。
 
 **输入输出流。** 给定历史状态与观测，框架建模未来状态与观测的联合转移概率：
@@ -112,16 +106,6 @@ $$z_{\mathrm{in}} = \mathtt{Zero-MLP}\big(z_{\mathrm{in}} + \mathtt{MLP}(\mathca
 3. **动作调制与视频生成。** 7-DoF 动作序列采用分块方案进行时序对齐——每 $r$ 个连续动作映射为一个 token，通过动作专家 AdaLN（Action Expert AdaLN）注入 DiT 块（图 4）。该调制机制重用视觉专家参数以降低开销，同时为参考帧填充动作占位符。在多视图变体 ORV-MV 中，额外引入视图注意力模块（图 5），置于时间注意力之前处理跨视图关系，且多视图模块排除动作先验以保持视图间的一致性。
 
 **关键设计决策。** 消融实验揭示了两个因果瓶颈的解决方案：分块动作调制（去除后 PSNR 下降 3.2%，视觉规划成功率下降 5.5%）和占用视觉先验注入（相比 ControlNet 等深层注入方式，PSNR 由 26.974 提升至 28.258）。这些证据表明，框架通过耦合动作先验与占用视觉先验，有效弥合了稀疏控制与密集输出之间的鸿沟。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2558_https_arxiv_org_abs_2506_03079/figures/003_Figure_3.jpg]]
-*Figure 3: Overview of ORV framework. Centered on occupancy representation C, along with actions A, which are extracted from physical simulators (e.g., ManiSkill [27]) or real-world data (e.g., Bridge [92]), we leverage the soft visual priors to enable robot video generation with high visual quality and control alignment. Furthermore, we design a data curation pipeline to construct the robot occupancy data for training purposes. ORV, as a powerful neural simulator, can greatly boost downstream applications (e.g., policy learning, visual planning, etc)*
-
-![[assets/figures/papers/paper_list_l2558_https_arxiv_org_abs_2506_03079/figures/002_Figure_2.jpg]]
-*Figure 2: Establishment of non-interactive methods (π, π′) both in the real-world environment and physical simulator to collect trajectory priors (7-DoF EE Pose) and visual priors (Occupancy)*
-
-
 
 ### 3.1 问题形式化与条件建模
 
@@ -167,15 +151,8 @@ $$\min_{\alpha,\beta} \sum_{i\in\mathcal{V}} \left(\alpha D_i' + \beta - D_i\rig
 
 将不同重建方法（如MonST3R、NKSR）的深度图对齐到统一空间，确保占用体素网格的几何一致性。该管线产出的ORV-Data数据集覆盖BridgeV2、DROID、RT-1三个真实操控场景，是支撑占用条件训练的基石。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2558_https_arxiv_org_abs_2506_03079/figures/004_Figure_4.jpg]]
-*Figure 4: Illustration of three modulations (Expert AdaLN) and injecting actions in our DiT block. And indicates the action paddings serving as the placeholders for reference frames, where ε encodes actions and*
-
 ![[assets/figures/papers/paper_list_l2558_https_arxiv_org_abs_2506_03079/figures/005_Figure_5.jpg]]
 *Figure 5: Architecture of ORV-MV, which generates multiview robot manipulation videos with cross-view consistency*
-
-
 
 ## 实验与关键发现
 
@@ -208,9 +185,6 @@ Table 1汇总了ORV与多个基线在单视图条件视频生成上的对比。O
 
 策略学习实验（Table 3）将ORV作为数据引擎，为RoboVLM和SpatialVLA两个策略模型生成约3万条增强样本。在SimplerEnv-WidowX的四个操控任务上，RoboVLM+ORV的平均成功率从29.8%提升至33.9%（+13.7%），SpatialVLA+ORV从36.2%提升至38.5%（+6.5%）。这表明ORV生成的合成数据具有有效的分布外泛化价值，能够补充真实数据的不足。
 
-![[assets/figures/papers/paper_list_l2558_https_arxiv_org_abs_2506_03079/figures/011_Table_3.jpg]]
-*Table 3: Evaluation results on SimplerEnv-WidowX [55] across four manipulation tasks. “+Finetune” indicates the additional finetuning on domain-specific dataset; and “+ORV” indicates that we augment the finetuning dataset with ORV-synthesized data*
-
 ### 关键消融分析
 
 **先验注入方式的影响**（Table 4）。消融实验对比了三种注入方案：ControlNet式深层注入、直接通道拼接和ORV的零初始化MLP注入。ORV方案在BridgeV2上取得PSNR 28.258，显著优于ControlNet（26.974）和拼接（27.201）。去除分块动作调制（No Chunks）导致PSNR降至24.813，视觉规划成功率从74.7%降至70.6%，证实分块对齐对时序一致性的关键作用。
@@ -230,11 +204,6 @@ Table 1汇总了ORV与多个基线在单视图条件视频生成上的对比。O
 
 这些局限指向了明确的研究方向：在线占用预测模块的集成、更丰富的动作表示（如全关节姿态）、单视图到多视图的首帧合成，以及长时域规划能力的扩展。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2558_https_arxiv_org_abs_2506_03079/figures/007_Table_1.jpg]]
-*Table 1: Evaluation results of Conditional Video Generation on three datasets. Top-1 performance within all variants and each type of model is represented with bold text and underlines*
-
 ![[assets/figures/papers/paper_list_l2558_https_arxiv_org_abs_2506_03079/figures/010_Table_4.jpg]]
 *Table 4: Ablation results of Video Generation and Visual Planning on approaches of priors injection*
 
@@ -243,11 +212,6 @@ Table 1汇总了ORV与多个基线在单视图条件视频生成上的对比。O
 
 ![[assets/figures/papers/paper_list_l2558_https_arxiv_org_abs_2506_03079/figures/014_Table_6.jpg]]
 *Table 6: Ablation results of Multiview Video Generation on occupancy conditionings on BridgeData V2 [92] with 3 views. Numbers are reported as “with / without” visual priors*
-
-![[assets/figures/papers/paper_list_l2558_https_arxiv_org_abs_2506_03079/figures/015_Table_7.jpg]]
-*Table 7: Ablation results of zero-shot Conditional Video Generation on different occupancy conditioning resources*
-
-
 
 ## 定位与知识库关联
 
@@ -311,8 +275,6 @@ ORV 的知识贡献可分解为以下可复用模块：
 - **单视图到多视图的扩展**：能否仅凭一个相机视图合成多视图首帧图像，从而实现从单视图到多视图一致视频的端到端生成？
 - **长时域规划与生成**：ORV 如何扩展为长时域操控数据的规划与生成系统，以支持更复杂的层次化策略学习？
 - **仿真到现实的泛化理论**：Table 7 显示在粗糙视觉条件（Coarse）上训练的模型泛化能力更强（Coarse→Fine PSNR 仅下降 -1.423），而在像素对齐条件（Fine）上训练的模型在粗糙输入下性能大幅下降（-11.240）。这一现象背后是否存在可形式化的泛化理论，以指导条件粒度的选择？
-
-
 
 ## 原文 PDF
 

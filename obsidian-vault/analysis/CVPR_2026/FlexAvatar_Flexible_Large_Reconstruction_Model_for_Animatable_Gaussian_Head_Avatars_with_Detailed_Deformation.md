@@ -179,9 +179,6 @@ $$F_{\mathrm{UV}} \in \mathbb{R}^{H \times W \times D}, \quad N_H = H \cdot W \t
 
 这一操作将 Transformer 的 token 空间映射到 FLAME 模型的 UV 参数域，为后续的几何约束和动态变形提供了结构化的空间载体。本文采用 $400 \times 400$ 的 UV 分辨率（详见 Figure 8）。
 
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2512_17717/figures/011_Figure_8.jpg]]
-*Figure 8: UV Structure. Our method use a 400 × 400 UV map structure to establish the mapping relationship between the Gaussian primitives and the FLAME model*
-
 ---
 
 ### 3.2 UV 空间特征解码与静态高斯生成
@@ -225,9 +222,6 @@ $$I = \mathcal{R}(\mathrm{LBS}(G_{\mathrm{dyn}}), \Theta) \tag{9}$$
 ### 3.4 数据分布调整策略
 
 训练数据的表情分布天然不均衡：中性表情占据主导，而眼轮匝肌夸张收缩、张嘴露齿等边际表情样本稀少。FlexAvatar 采用一种**锚点表达重采样**策略：从训练集中选取 20 个锚点表情（如 Figure 10 所示），计算每个样本与锚点的 FLAME 余弦相似度，据此调整采样权重，增加边际表情的出现频率。这一策略不改变模型结构，却显著提升了稀有表情的动态纹理质量（消融实验中移除该策略导致 PSNR 下降 0.58 dB，见 Table 2）。
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2512_17717/figures/014_Figure_10.jpg]]
-*Figure 10: Anchor Expressions. Subset of our selected anchor expressions for training*
 
 ---
 
@@ -317,26 +311,15 @@ FlexAvatar 在 **NeRSemble** 多视角视频数据集上进行主实验训练与
 3. **光照泛化中等**：虽然微调有所改善，但在极端光照条件下仍可能出现不一致，构建完全可重光照的头像仍是未来方向。
 4. **输入视图数量受限**：当前最多 4 张输入（受 GPU 内存限制），更多视图可进一步提升重建稳定性，但需要更高效的融合机制。
 
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2512_17717/figures/015_Figure_11.jpg]]
-*Figure 11: Back head results. 360-degree rendering of our head avatars*
-
 ### 架构超参数
 
 **Table 3** 列出了网络架构的关键超参数，包括 UV 特征图分辨率（400×400，**Figure 8**）、Transformer 层数、UNet 通道数等。这些配置在实时性（45 FPS）与重建质量之间取得了平衡。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2512_17717/figures/005_Table_1.jpg]]
-*Table 1: Quantitative comparisons on Nersemble test dataset. In feedforward evaluations, our method surpasses other Gaussian-based single-image avatar generation approaches on every tested metric. Moreover, applying a subsequent finetuning stage yields additional gains in reconstruction fidelity and perceptual quality, further improving the realism and accuracy of generated outputs*
 
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2512_17717/figures/009_Table_2.jpg]]
 *Table 2: Quantitative Ablation Study on FaceCap*
 
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2512_17717/figures/004_Figure_3.jpg]]
 *Figure 3: Qualitative comparisons with baseline methods. Our single-image feed-forward and finetuned results both outperform other methods in terms of 3D consistency and animation quality, especially on details like wrinkles or teeth. Please zoom in to see the details*
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2512_17717/figures/010_Figure_7.jpg]]
-*Figure 7: Evaluation on the camera pose and expression of input images. Our model can automatically adapt to different input viewpoints and expressions while maintaining good ID preservation capability and animation results*
 
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2512_17717/figures/012_Table_3.jpg]]
 *Table 3: Hyperparameters of our network architecture*

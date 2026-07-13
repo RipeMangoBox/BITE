@@ -251,17 +251,11 @@ $$
 
 DINOv2与CLIP作为视觉编码器的对比消融（Figure 15, Figure 16）揭示了关键差异：
 
-![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_cSDXx8V6K9/figures/015_Figure_15.jpg]]
-*Figure 15: FID and DreamSim evaluations based on DINOv2 and CLIP as vision encoders for foveal and peripheral feature extraction. (Left) The image generation quality (FID) for DINOv2- based peripheral generations is consistently better than CLIP patch embeddings. For DINOv2, we observe a sharp drop when decreasing the blur level, showing how decreasing blur results in the model encoding different, more accurate image features. This is not true for CLIP patch tokens, which seem to encode the same limited information across all blur levels. (Right) With increasing numbers of foveal token inputs, the DreamSim distance for both DINOv2 and CLIP-based embeddings decreases. However, DINOv2-based generations...*
-
 - **周边信息编码：** DINOv2在周边条件下FID显著优于CLIP，且随模糊程度降低（下采样率从28×28升至448×448），DINOv2的生成质量持续改善，而CLIP几乎无变化。这表明CLIP的patch token在不同模糊级别下编码的信息量有限且相似。
 - **中央凹信息编码：** 随中央凹token数量增加，两种编码器的DreamSim距离均下降，但DINOv2在低token数下语义相似性优势更明显。
 - **定性对比（Figure 16）：** DINOv2生成的图像在物体大小和空间位置上更好地保留了原始图像的结构，而CLIP生成在低模糊度下改善甚微。
 
 增加中央凹token数量可改善生成质量（FID和DreamSim），但仅凭中央凹token远不及周边信息（Figure 11 Bottom），再次验证了双流信息融合的必要性。
-
-![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_cSDXx8V6K9/figures/011_Figure_11.jpg]]
-*Figure 11: Influence of blur-level and foveal token count on image generation quality. (Top Row) Image generation quality decreases as greater blur degrades the base image. (Bottom Row) Image generation quality increases as a function of increasing foveal tokens*
 
 ### 局限性与失败模式
 

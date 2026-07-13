@@ -58,8 +58,6 @@ claims:
 
 **局限与开放问题**：方法依赖已知的 IMU 安装位置和外部 2D 姿态估计器，在遮挡、低光照及无约束佩戴场景下的泛化性有待验证；如何无监督发现传感器-部位对应关系、处理动态变化的传感器配置，是值得探索的方向。
 
-
-
 ### 问题背景：IMU与视觉信号的跨模态对齐需求
 
 惯性测量单元（IMU）传感器因其低功耗、隐私友好和环境无关的特性，在可穿戴设备、增强现实和健康监测等领域得到广泛应用。IMU能够捕捉人体运动的加速度和角速度信息，而视频则提供了丰富的视觉上下文。将IMU信号与视频数据进行精确对齐，是实现跨模态检索、时间同步、人员识别和动作理解等下游任务的关键基础。
@@ -89,8 +87,6 @@ claims:
 此外，MoBind引入了一个**Masked Token Prediction（MTP）**辅助任务，在训练时随机遮蔽IMU的时间令牌并要求模型重建，以防止模型过度聚焦于细粒度对齐而丧失对动作类别语义的保留能力。消融实验表明，MTP对动作识别性能的提升至关重要——在TotalCapture数据集上，加入MTP后微调准确率从0.55跃升至0.72，相对提升超过30%（Table 6）。
 
 综上所述，MoBind的目标是建立一个统一的IMU-视频运动绑定框架，在多个粒度上实现精确对齐，从而同时支持跨模态检索、亚秒级时间同步、身体部位定位、人员识别和动作识别等多种下游任务。
-
-
 
 ## 核心方法与创新机理
 
@@ -126,8 +122,6 @@ $$\mathcal{L} = \underbrace{\lambda_g \mathcal{L}_{\mathrm{global}} + \lambda_l 
 
 其中每个对比项均为双向InfoNCE，分别作用于全局表征、局部身体部位表征和时间token。层次消融实验（Table 5）表明，从仅有全局对比逐步加入局部和token级对比，在检索、时间同步和动作识别三项任务上均带来一致且显著的性能提升，验证了层次化设计的因果有效性。
 
-
-
 MoBind 的整体设计围绕一个核心洞察展开：**将 IMU 信号与从视频中提取的 2D 骨骼运动序列对齐，而非与原始像素对齐**，从而剥离无关的视觉背景，聚焦于运动本身。在此基础上，框架将全身运动**分解为局部身体部位轨迹**，并将每个 IMU 传感器严格与其对应的身体部位配对，实现语义上有根基的多传感器对齐。
 
 ### 框架总览
@@ -161,12 +155,8 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{align}} + \lambda_{\mathrm{mtp}} \mathcal{L
 
 与现有 IMU-视频对比学习方法的核心差异在于**对齐粒度的层次化升级**。IMU2CLIP（Moon et al., 2022）和 DeSPITE（Kreutz et al., 2025）等方法仅在全局 clip 级别对齐，丢失了亚秒级时序同步信息；SyncNet（Chung & Zisserman, ACCV Workshop 2016）虽能估计偏移但依赖相关性计算，缺乏显式的多粒度对比学习。MoBind 通过三层对齐同时控制细粒度时间同步和粗粒度语义保留，而 MTP 辅助任务则进一步防止模型在追求细粒度对齐时丢失动作类别语义——消融实验表明，移除 MTP 后 TotalCapture 上动作识别微调准确率从 $0.72$ 骤降至 $0.55$（Table 6），相对下降超过 30%。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2602_19004/figures/001_Figure_1.jpg]]
 *Figure 1: Proposed framework for motion binding between IMUs and 2D pose sequence from video. Contrastive learning is applied at both the local space, aligning each IMU with its corresponding body-part, and the global space, aligning full-body representations. This representation supports several downstream tasks, including cross-modal retrieval, temporal synchronization, subject and body parts localization, and human action recognition*
-
-
 
 ### 3.1 双流模态编码器
 
@@ -224,12 +214,8 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{align}} + \lambda_{\mathrm{mtp}} \mathcal{L
 
 其中 $\lambda_{\mathrm{mtp}}=0.3$。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2602_19004/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed MoBind. The framework first encodes each IMU stream together with the motion of its corresponding body part, yielding token-level and local-level representations per sensor. These local representations are then aggregated across sensors to form global-level embeddings. The contrastive objective applies at all three levels. In addition, a Masked Token Prediction (MTP) module is used only during training to preserve coarse semantic structure, preventing the model from over-focusing on fine-grained alignment*
-
-
 
 ## 实验与关键发现
 
@@ -315,39 +301,17 @@ $$\mathcal{L}_{\mathrm{mtp}} = \frac{1}{|\mathcal{M}|} \sum_{(n,t) \in \mathcal{
 - MTP辅助任务是否可改进为跨模态掩码预测（同时覆盖姿态tokens），以进一步提升语义保留？
 - 模型在异步IMU采样率下的鲁棒性如何？跨采样率对齐是否可行？
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2602_19004/figures/003_Table_1.jpg]]
 *Table 1: Cross-modal retrieval performance on the mRi, TotalCapture and EgoHumans datasets. We compare our method against prior contrastive learning baselines in both retrieval directions: IMU→Video and Video→IMU. Our method consistently outperforms all others across all ranks, demonstrating strong alignment between modalities. This superior performance is particularly critical for downstream tasks that rely on accurate similarity scores between embedded features*
-
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2602_19004/figures/004_Figure_3.jpg]]
-*Figure 3: IMU→Video retrieval results on mRi (left) and Ego-Humans (right). Each example shows the query IMU signal, its corresponding ground-truth video segment, and the top three retrieved video segments. Our method successfully retrieves the ground-truth segment, and the other top-ranked results are also visually similar to the ground truth, demonstrating robust crossmodal alignment*
 
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2602_19004/figures/005_Table_2.jpg]]
 *Table 2: Synchronization results on three datasets. All models are evaluated on 20-second videos with random temporal offsets sampled uniformly from [−7, 7] seconds. Top-k retrieval is performed with*
 
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2602_19004/figures/006_Figure_4.jpg]]
-*Figure 4: Per-action synchronization accuracy on EgoHumans (left) and mRi (right). MoBind achieves sub-50ms error on all EgoHumans actions and under 1s on all mRi actions, despite the challenges posed by repetitive movements and near-duplicate segments. Results confirm MoBind’s robustness across diverse motion types and environments*
-
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2602_19004/figures/007_Figure_5.jpg]]
-*Figure 5: Examples of body-part localization on EgoHumans. Each column shows the query IMU (top) and the predicted body part with the highest similarity score (bottom), demonstrating accurate identification of sensor placement*
-
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2602_19004/figures/008_Figure_6.jpg]]
-*Figure 6: Results for the challenging combined task of temporal synchronization and spatial localization. The query 20s IMU signal from the left wrist precedes the video by 6.8 s. MoBind accurately recovers this offset using a weighted histogram and simultaneously localizes the signal to the correct body part, demonstrating robustness to dynamic and highly repetitive motion*
-
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2602_19004/figures/009_Table_3.jpg]]
 *Table 3: IMU-to-person identification in multi-person scenes from EgoHumans. This experiment evaluates who wears the IMU sensor, and MoBind achieves the highest accuracy and F1 score*
 
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2602_19004/figures/011_Figure_7.jpg]]
-*Figure 7: Robustness to Sensor Failure. Retrieval performance (R@1 and R@5) under different sensor availability conditions. R@k measures the percentage of queries for which the groundtruth video appears within the top-k retrieved results, given the representation computed from a subset of IMU sensors. In general, using more IMUs provides a more complete motion representation and thus improves retrieval accuracy. MoBind remains highly effective even when some sensors are unavailable, demonstrating strong performance under partial sensor input and highlighting its robustness for real-world deployment*
-
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2602_19004/figures/012_Table_5.jpg]]
 *Table 5: Ablation studies on contrastive objectives on mRi. Results show consistent gains across all tasks as each contrastive level is added, highlighting the effectiveness of the hierarchical design*
-
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2602_19004/figures/013_Table_6.jpg]]
-*Table 6: Effect of Masked Token Prediction on model performance. The MTP significantly improves action recognition on both datasets, demonstrating its importance for retaining actionlevel semantics*
-
-
 
 ## 定位与知识库关联
 
@@ -396,8 +360,6 @@ MoBind通过一个**三层因果控制机制**解决上述瓶颈：(1) **表示�
 4. **跨模态掩码预测的改进**：MTP辅助任务当前仅在IMU流上执行。是否可改进为跨模态的掩码预测（例如同时覆盖姿态token），以进一步提升语义保留？这可能在动作识别任务上带来额外增益。
 
 5. **异步采样率的鲁棒对齐**：模型在何种程度上能够处理异步IMU采样率，以及如何实现跨采样率的鲁棒对齐？当前实验使用统一的采样率设置（5秒窗口，T=25个token），实际部署中不同传感器的采样率可能不一致。
-
-
 
 ## 原文 PDF
 

@@ -71,8 +71,6 @@ claims:
 
 该方法仍需弱监督信号，无法完全无监督运行。当前前景聚类依赖 DBSCAN 假设对象空间分离，在密集交互场景可能失效。当背景仅剩地面点时，自运动估计可能失败；稀有对象（如卡车）的掩码预测也不可靠。此外，lidarKITTI 标注噪声影响定量评估的精确性。未来方向包括：结合多帧信息提升时序一致性、改进困难场景和稀有对象的处理、以及加速测试时优化以适应实时自动驾驶应用。
 
-
-
 ### 三维场景流估计的核心瓶颈
 
 三维场景流估计旨在从连续两帧点云中恢复每个点的三维运动向量，是自动驾驶、机器人导航等动态环境感知的基础任务。然而，获取密集的点级场景流真值标注极其困难：人工标注成本高昂且易出错，合成数据（如 FlyingThings3D）虽可提供自动标注，却引入了显著的域间差异，限制了全监督方法在真实 LiDAR 数据上的泛化能力和实际部署。
@@ -101,8 +99,6 @@ claims:
 3. **测试时优化**：利用推断出的对象掩码，通过 ICP 迭代精化每个刚性体的变换，进一步提升精度。
 
 这一框架在全监督和弱监督两种设定下均展现出竞争力：在 stereoKITTI 上以全监督训练达到 0.042 m EPE3D，在 lidarKITTI 上以弱监督训练（Ours++）将 EPE3D 降至 0.094 m，相比全监督 PointPWC-Net 降低约 0.3 m，甚至在 stereoKITTI（含地面）上以弱监督超越全监督 FlowNet3D（0.068 m vs 0.177 m）。
-
-
 
 ## 核心方法与创新机理
 
@@ -144,16 +140,11 @@ claims:
 
 需注意，本方法并非完全无监督——它仍需要前景/背景掩码和自运动作为弱监督信号。当前前景聚类依赖 DBSCAN 假设对象空间分离，在密集交互场景可能失效。此外，当背景仅剩地面点时（如移除所有前景后），自运动估计可能失败（Figure 10）。这些局限为后续研究指明了方向。
 
-
-
 ### 核心设计理念：从逐点流到对象级刚性抽象
 
 传统场景流方法直接预测每个点的无约束三维运动向量，这带来了两个根本性困难：其一，获取逐点密集流标注成本极高且易出错；其二，无约束的逐点预测容易产生违反物理刚性的变形（如车辆被拉伸）。Rigid3DSceneFlow 的核心洞察是：**将动态场景分解为刚性移动的基本单元**——背景作为一个整体受传感器自运动支配，前景中的每个独立运动对象各服从一个刚性变换。这一抽象将场景流的自由度从数万个逐点向量压缩为少量 SE(3) 变换参数，使得训练仅需前景/背景二值掩码和自运动等弱监督信号。
 
 Figure 2 将这一设计置于方法谱系中：全监督方法受限于合成数据（如 FlyingThings3D）与真实 LiDAR 数据之间的域鸿沟，无监督方法则因缺乏引导而性能显著下降。弱监督路径恰好取两者之长——用廉价标注换取对真实数据的直接学习能力。
-
-![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2102_08945/figures/002_Figure_2.jpg]]
-*Figure 2: Recent scene flow methods either use full supervision (and suffer from domain gap) or no-supervision (and suffer from reduced performance). Instead, our method uses weak supervision and benefits from the best of both worlds*
 
 ### 整体 Pipeline 与模块关系
 
@@ -203,18 +194,8 @@ $$\mathbf{v}_i^{\star} = \frac{\sum_{j : \mathbf{x}_j^{v} \in \mathcal{E}(\mathb
 | 刚性拟合 | 聚类 + 初始流 | 每对象刚性变换 $\{\mathbf{T}_k\}$ |
 | 后处理 | 变换 + 掩码 | 逐点刚性场景流 $\mathbf{V}^{\text{rigid}}$ |
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2102_08945/figures/006_Figure_4.jpg]]
 *Figure 4: Qualitative results of our weakly supervised method on lidarKITTI (top) and waymo open (bottom). For improved visibility, the EPE3D (top row b,c ) is clipped to the range between 0.0 m (white) at 0.3m (red). As a result of predicting an unconstrained pointwise sceneflow, the rigid objects (car) in the results of FLOT might get deformed (d)*
-
-![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2102_08945/figures/017_Figure_6.jpg]]
-*Figure 6: Successful cases of our method on the lidarKITTI dataset. By correctly splitting the scene into foreground and background (d), our method estimates the accurate scene flow vectors (b), which align the two frames (c)*
-
-![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2102_08945/figures/018_Figure_7.jpg]]
-*Figure 7: Failure cases of our method on the lidarKITTI dataset. Top: even though the car’s object mask (d) is correctly predicted, its predicted scene flow vectors yield large end-point-errors (b). Bottom: a pillar in the middle of the scene is wrongly predicted as foreground object (d), hence its scene flow does not agree with the background and GT (b)*
-
-
 
 ### 3.1 整体能量函数
 
@@ -281,8 +262,6 @@ $$SE(3) = \left\{ \mathbf{T} \in \mathbb{R}^{4 \times 4} \colon \mathbf{T} = \be
 
 骨干网络基于 **MinkowskiNet**（Choy et al., CVPR 2019），采用 U-Net 风格的编码器-解码器架构，包含跳跃连接和稀疏三维卷积层（详见 Figure 5）。场景流头在潜在空间中计算初始软对应关系，随后通过残差稀疏卷积层进行细化。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设计
@@ -294,8 +273,6 @@ $$SE(3) = \left\{ \mathbf{T} \in \mathbb{R}^{4 \times 4} \colon \mathbf{T} = \be
 ### 全监督设定下的性能验证
 
 在 FT3D 和 stereoKITTI 上的全监督结果 (Table 1) 表明，即使在传统密集流监督范式下，引入刚性运动表示本身已具竞争力：**Ours** 在 stereoKITTI (无地面) 上取得 **EPE3D = 0.042 m**，优于同期全监督方法 **FLOT** (0.056 m) 和 **PointPWC-Net** (0.118 m)。该优势源于刚性归纳偏置有效抑制了非刚性变形对点级流预测的干扰，尤其在车辆等刚体对象上避免了 FLOT 中常见的“对象扭曲”现象 (Figure 4)。
-
-
 
 ![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2102_08945/figures/004_Table_1.jpg]]
 *Table 1: Evaluation results in a fully supervised setting on FT3D and stereoKITTI datasets*
@@ -335,9 +312,6 @@ $$SE(3) = \left\{ \mathbf{T} \in \mathbb{R}^{4 \times 4} \colon \mathbf{T} = \be
 
 本文坦诚展示了三类典型失败情况 (Figure 7, Figure 10)：
 
-![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2102_08945/figures/021_Figure_10.jpg]]
-*Figure 10: Failure cases on waymo open dataset. Top: our model is unable to estimate accurate ego-motion and scene flow (b) if the background points consists only of the ground points after foreground removal (c). Bottom: rare objects such as trucks (top right corner in c and d) appear ambiguous to our model and cause prediction of the wrong masks (c)*
-
 1. **背景仅剩地面点**：当前景移除后背景仅含地面点时，自运动估计因缺乏三维结构约束而失效。地面点近乎共面，退化了几何匹配的自由度，导致自运动沿某些方向不可观。这是“刚性假设”在极端稀疏场景下的结构性盲区。
 
 2. **罕见对象掩码错误**：稀有类别（如卡车、柱状物）因训练数据中样本不足，前景/背景分割头易产生误判。Figure 7 底部案例中，路中柱体被误标为前景，导致其流向量与真实背景运动不一致。
@@ -354,8 +328,6 @@ $$SE(3) = \left\{ \mathbf{T} \in \mathbb{R}^{4 \times 4} \colon \mathbf{T} = \be
 - 测试时 ICP 优化的计算开销较大，能否通过网络预测的初始化变换近似或学习式优化器加速，以满足自动驾驶的实时性需求？
 - 若引入更强大的实例分割模块替代简单 DBSCAN，在密集交互场景下能否获得显著增益？当前实验 (Table 10) 中 GT 实例掩码并未带来明显提升，暗示瓶颈可能不在聚类本身，而在于网络对对象边界的特征判别力。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2102_08945/figures/014_Table_9.jpg]]
 *Table 9: Comparison of the model fine-tuned on waymo open with the model trained only on semantiKITTI (generalization), on the waymo open dataset. Fine-tuned model outperforms the directly generalized one in terms of FG precision and ego-motion error*
 
@@ -364,8 +336,6 @@ $$SE(3) = \left\{ \mathbf{T} \in \mathbb{R}^{4 \times 4} \colon \mathbf{T} = \be
 
 ![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2102_08945/figures/008_Table_3.jpg]]
 *Table 3: Ablation study of the proposed training objective. All models are trained on semanticKITTI and evaluated without test-time optimization on lidarKITTI (with ground) dataset*
-
-
 
 ## 定位与知识库关联
 
@@ -441,8 +411,6 @@ $$SE(3) = \left\{ \mathbf{T} \in \mathbb{R}^{4 \times 4} \colon \mathbf{T} = \be
 ### 知识库定位总结
 
 本方法属于**弱监督三维场景流估计**，其核心贡献在于将**对象级刚性先验**显式编码进网络架构与损失函数，从而在仅需弱标注的条件下实现可解释、高性能的场景流估计。它在方法谱系中桥接了全监督方法（性能高但标注昂贵）与无监督方法（标注经济但性能受限）之间的鸿沟，为自动驾驶等实际部署场景提供了一种高性价比的解决方案。
-
-
 
 ## 原文 PDF
 

@@ -92,8 +92,6 @@ claims:
 
 当前方法未利用彩色图像信息，尾类物体（通常体积小、几何分辨率低）的性能仍有较大提升空间。文本锚点仅使用类别名称，未引入功能描述、形状属性等更丰富的语言信息。方法在室外场景或不同传感器上的泛化能力尚未验证。此外，当前假设所有类别均出现在预训练标签集中，零样本扩展能力的探索仍是开放问题。
 
-
-
 ### 问题背景：室内3D语义分割的“野外”挑战
 
 3D语义分割是场景理解的核心任务，旨在为三维空间中的每个点赋予语义标签。近年来，基于深度学习的3D分割方法取得了显著进展，但现有研究几乎完全局限于小规模、类别数有限的基准数据集——典型基准如ScanNet仅包含20个语义类别。这一设定与真实世界的复杂性存在巨大鸿沟：现实室内环境包含数百种语义类别，且呈现极度不平衡的长尾分布。
@@ -131,8 +129,6 @@ ScanNet200揭示了一个此前被忽视的关键瓶颈：**在严重类别不�
 基于上述分析，本文提出**语言引导的3D特征预训练**方法。其核心思想是：利用CLIP文本编码器为200个类别生成文本锚点特征，在预训练阶段通过对比损失将3D几何特征强制对齐到这些锚点——正样本拉近（同类别3D-文本对），负样本推开（非同类别对）。这一机制使得语言模型蕴含的类别语义结构得以“迁移”到3D特征空间，从而为所有类别（包括几何数据极度匮乏的尾类）提供正则化的表示基础。
 
 该方法的核心优势在于：语言锚点来自独立于3D数据分布的外部知识源，其类别间的语义关系已在海量图文数据上得到充分学习。因此，即便某个尾类在3D训练数据中仅出现数次，其对应的文本锚点仍然携带着丰富的语义信息，能够有效引导3D编码器学习到有意义的特征表示。
-
-
 
 ## 核心方法与创新机理
 
@@ -193,8 +189,6 @@ $$
 
 **局限性**：当前方法未利用彩色图像信息，文本锚点仅使用了类别名称的嵌入而未利用更详细的文本描述（如属性、功能），可能限制了细粒度识别；实例采样可能导致插入物体与原始场景存在轻微光照不一致。
 
-
-
 本文提出了一种**语言引导的室内3D语义分割框架**，其核心思想是利用大规模预训练语言模型（CLIP）的文本嵌入作为结构化锚点，通过跨模态对比学习将3D几何特征空间强制对齐到语义丰富的文本空间，从而在ScanNet200这一200类大词汇量、严重长尾分布的基准上构建更鲁棒的3D特征表示。
 
 ### 框架总览
@@ -228,8 +222,6 @@ $$
 - 相较于**从头训练（Scratch）**和仅使用数据增强/损失重加权的方案，语言引导预训练提供了根本性的特征空间改进。
 - 相较于**CSC**（Hou et al., 2021）等基于几何对比的无监督预训练方法，本方法利用语言语义作为外部知识源，在预训练信息更少的情况下（有限标注场景）仍大幅领先（5%标注下尾类mIoU高出+8）。
 - 方法具有良好的骨干泛化性，在80M和20M参数量的3D U-Net上均保持一致的改进（Table 3）。
-
-
 
 ### 3.1 语言引导的对比预训练框架
 
@@ -277,8 +269,6 @@ $$\mathrm{FL}(p_t) = -\alpha (1-p_t)^\gamma \log(p_t), \quad \alpha_i = \frac{\l
 ### 3.3 下游任务微调
 
 预训练完成后，3D骨干网络在下游任务上进行微调。对于语义分割，直接使用类别平衡focal loss训练；对于实例分割，则额外预测逐点偏移向量，通过投票聚类机制生成实例结果。两个任务共享相同的预训练权重，体现了语言引导特征表示的通用性。
-
-
 
 ## 实验与关键发现
 
@@ -369,33 +359,11 @@ Table 4展示了与RandLA-Net和SCF-Net等基于点的3D分割方法的对比，
 
 这些失败模式指向明确改进方向：融合彩色图像信息提供纹理线索、利用更丰富的文本描述增强语义锚点、探索更先进的采样策略以进一步弥合长尾性能差距。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l43_https_arxiv_org_abs_2204_07761/figures/006_Figure_5.jpg]]
 *Figure 5: 3D semantic segmentation under varying amounts of limited annotations. Even when considering only a small number of annotated surface points for our supervised language-guided 3D pre-training, our approach improves notably over the state-of-the-art 3D pre-training of CSC [20]*
 
 ![[assets/figures/papers/paper_list_l43_https_arxiv_org_abs_2204_07761/figures/009_Figure_7.jpg]]
 *Figure 7: (d) Ours Fig. 7: We show a comparison with the representation learned by CSC [20], SupCon [26], as well as our approach when training with only positive samples. Our full language-grounded pre-training results in a more structured feature representation space with improved semantic segmentation performance*
-
-![[assets/figures/papers/paper_list_l43_https_arxiv_org_abs_2204_07761/figures/005_Table_1.jpg]]
-*Table 1: Comparison to state of the art on ScanNet200. Our language-grounded 3D feature learning enables improved performance across frequent and infrequently seen categories in comparison with pure data augmentation or loss balancing techniques as well as state-of-the-art 3D pre-training. Our approach achieves over 5% mIoU performance over training from scratch, more than double the performance improvement of CSC [20]*
-
-![[assets/figures/papers/paper_list_l43_https_arxiv_org_abs_2204_07761/figures/011_Table_4.jpg]]
-*Table 4: Comparison with point-based RandLA-Net and SCF-Net on Scan-Net200 semantic segmentation (mIoU)*
-
-![[assets/figures/papers/paper_list_l43_https_arxiv_org_abs_2204_07761/figures/012_Table_5.jpg]]
-*Table 5: Ablation study on different language models for generating the text anchors during the pre-training stage. We show that while the model benefited from pretraining guided by all language models, CLIP was found to be the most suitable for this task. We also show that more rigid loss distance metrics such as l1 or l2 can even significantly hinder the performance*
-
-![[assets/figures/papers/paper_list_l43_https_arxiv_org_abs_2204_07761/figures/014_Table.jpg]]
-*Table: Class IoU*
-
-![[assets/figures/papers/paper_list_l43_https_arxiv_org_abs_2204_07761/figures/015_Table_6.jpg]]
-*Table 6: Class IoU scores on the ScanNet200 benchmark of our proposed method, and compared with other state-of-the-art approaches*
-
-![[assets/figures/papers/paper_list_l43_https_arxiv_org_abs_2204_07761/figures/001_Figure_1.jpg]]
-*Figure 1: We present the ScanNet200 benchmark, which studies 200-class 3D semantic segmentation – an order of magnitude more categories than previous 3D scene understanding benchmarks. To address this challenging task, we propose to guide 3D feature learning by anchoring it to the richly-structured text embedding space of CLIP for the semantic class labels. This results in improved 3D semantic segmentation across the large set of class categories*
-
-
 
 ## 定位与知识库关联
 
@@ -452,8 +420,6 @@ Table 4展示了与RandLA-Net和SCF-Net等基于点的3D分割方法的对比，
 **长尾优化的上限**：在极度数据不平衡条件下（如某些类别仅有个位数实例），实例采样和focal loss的组合是否已达到性能上限？是否存在更先进的采样策略（如基于特征空间的难例挖掘）或损失加权方法（如基于类别间语义相似度的软权重分配）可以进一步突破？
 
 **跨任务泛化**：语言引导的预训练策略能否扩展到其他3D感知任务？本方法已在实例分割上验证了初步泛化能力（Table 2, +0.85 mAP@0.5 over CSC），但在3D目标检测、全景分割等任务上的有效性尚待证实。
-
-
 
 ## 原文 PDF
 

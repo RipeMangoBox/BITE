@@ -65,8 +65,6 @@ claims:
 
 在全身数据集（AGORA、ARCTIC、EHF）和手部数据集（IH26M、ReIH、HIC）上的综合评估表明，Hand4Whole++ 在全身与手部指标上均取得最优。以 AGORA 为例，全身 MPVPE 降至 76.84 mm，手部 MPVPE 降至 49.71 mm，显著优于 SMPLer-X 及其微调版本，也超越了手部专用 WiLoR。消融实验证实，CHAM 特征调制策略是性能提升的核心——在 AGORA 上全身 MPVPE 达 76.88 mm，手部 50.56 mm，明显优于直接分配手腕方向或替换手部网格的朴素组合策略。手指关节与形状转移进一步将 IH26M、ReIH、HIC 上的手部 MPVPE 分别压缩至 9.40、7.98、17.72 mm。
 
-
-
 三维全身姿态与网格恢复旨在从单目图像中重建包含身体、手部和面部的完整三维人体模型。该任务在虚拟现实、人机交互和动作捕捉等领域具有广泛应用。然而，现有方法在实现高精度手部重建方面仍面临根本性挑战。
 
 **核心瓶颈：全身与手部估计器的结构性矛盾。** 全身姿态估计器（如 **SMPLer-X**，Cai et al., NeurIPS 2023）通常在包含有限手部姿态多样性的全身数据集上训练，导致手部细节预测能力不足——手腕方向不准确、手指姿态模糊。另一方面，手部专用估计器（如 **WiLoR**，Potamias et al., CVPR 2025）虽能精细恢复手部姿态和形状，却缺乏全身上下文信息，在双手交互或遮挡场景下容易产生解剖学上不合理的配置。直接组合两类模型（如 **FrankMocap**，Rong et al., ICCVW 2021；**Hand4Whole**，Moon et al., CVPRW 2022）往往导致手部与身体运动链不一致，尤其是在手腕方向预测上出现明显偏差（Figure 1）。
@@ -74,8 +72,6 @@ claims:
 **现有方法的三个缺口。** 第一，早期方法采用简单的后处理拼接策略，将手部网络输出直接嫁接到身体网格上，忽略了手腕作为运动链关键节点的空间连贯性。第二，单阶段方法（如 **OSX**，Lin et al., CVPR 2023；**Multi-HMR**，Baradel et al., ECCV 2024）试图从统一模型中同时预测身体和手部，但受限于训练数据中手部样本的稀疏性，手部精度难以与专用模型匹敌。第三，微调全身模型以适配手部数据虽能部分改善手部预测，却会破坏预训练模型的泛化能力，在未见数据集上产生失真的全身姿态（Figure 5）。
 
 **本文动机。** 针对上述矛盾，本文提出 **Hand4Whole++**，一个模块化框架，旨在在不牺牲预训练模型泛化性的前提下，将手部专用估计器的精细能力注入全身姿态估计流程。核心思想是：通过冻结的预训练模型，利用轻量级特征调制（CHAM）将手部特有信息注入全身特征流，以改善手腕方向预测；同时通过可微刚性对齐直接转移手指关节和手部形状，既保留手部估计器的精细度又维持全身结构一致性。
-
-
 
 ## 核心方法与创新机理
 
@@ -109,8 +105,6 @@ Hand4Whole++ 的核心创新在于**通过冻结的预训练模型实现高效�
 
 该方法依赖两个预训练模型，导致推理时间增加（约 10 fps），限制了实时应用场景。当手部检测失败时，CHAM 将手部 ViT 特征置零，可能导致手腕预测退化。训练数据仅限于 IH26M、ReIH、ARCTIC 和 AGORA，可能无法覆盖所有手部交互多样性。此外，在仅包含手部标注的数据集上训练时，非手部关节可能因缺乏全身标注而与输入图像对齐不精确。
 
-
-
 Hand4Whole++ 是一个模块化框架，旨在将预训练的全身姿态估计器与预训练的手部姿态估计器的优势进行整合，以提升三维全身姿态估计中手部的精度与解剖学合理性。其核心设计理念是：**冻结两个预训练模型，仅训练轻量级的条件手部调制器（CHAM）**，从而在不破坏预训练模型泛化能力的前提下，注入手部特有的精细信息。
 
 ### 框架组成与数据流
@@ -138,8 +132,6 @@ Hand4Whole++ 是一个模块化框架，旨在将预训练的全身姿态估计�
 - **输入**：单张 RGB 图像。
 - **中间特征流**：手部 ViT 特征 → CHAM 空间对齐与交叉注意力处理 → 加法调制全身 ViT 特征流。
 - **输出**：融合了精细手部网格的全身 SMPL-X 网格，其中手腕方向由受 CHAM 调制的全身模型预测，手指关节和手部形状由 MANO 模型转移而来。
-
-
 
 ### 整体架构与设计理念
 
@@ -182,16 +174,6 @@ Hand4Whole++ 是一个模块化框架，其核心设计原则是**冻结所有�
 - 训练数据需求低，仅需 IH26M、ReIH、ARCTIC、AGORA 等有限数据集即可完成 CHAM 训练。
 
 **局限性**：该策略也带来推理速度的代价——需要运行两个预训练模型，推理速度约 10 fps（Table S3）。此外，当手部检测失败时，CHAM 将手部 ViT 特征置零，可能导致手腕预测退化。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1017_https_arxiv_org_abs_2603_14726/figures/003_Figure_3.jpg]]
-*Figure 3: Architecture of the proposed CHAM. The gray dashed box (2D positional encoding and cross-attention) is used only when both hands are detected. Otherwise, each hand feature is directly passed to its corresponding branch. For simplicity, we illustrate only three layers instead of the full 24-layer design*
-
-![[assets/figures/papers/paper_list_l1017_https_arxiv_org_abs_2603_14726/figures/004_Figure_4.jpg]]
-*Figure 4: Pipeline of the finger and shape transfer. We align the canonical 3D hand mesh to the initial whole-body mesh using the wrist and the four MCP joints (index, middle, ring, and pinky)*
-
-
 
 ## 实验与关键发现
 
@@ -267,22 +249,6 @@ CHAM 中的交叉注意力模块对双手交互场景尤为重要。在 IH26M �
 | Table S1/Figure S1 | MANO 手部形状表达力优于 SMPL-X，为转移模块提供了更强的几何基础 |
 | Table S2 | 交叉注意力在双手交互场景下有效降低误差 |
 
-![[assets/figures/papers/paper_list_l1017_https_arxiv_org_abs_2603_14726/figures/010_Table_4.jpg]]
-*Table 4: Comparisons with full-body pose estimators on full-body and hand-only datasets. * represents evaluated with GT scale of hands following previous protocols [14]*
-
-![[assets/figures/papers/paper_list_l1017_https_arxiv_org_abs_2603_14726/figures/011_Table_5.jpg]]
-*Table 5: MPVPE/MRRPE comparisons with hand pose estimators on hand-only datasets. * represents evaluated with GT scale of hands following previous protocols [14]*
-
-![[assets/figures/papers/paper_list_l1017_https_arxiv_org_abs_2603_14726/figures/005_Table_1.jpg]]
-*Table 1: Comparisons of baselines and our Hand4Whole++ on full-body and hand-only datasets*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1017_https_arxiv_org_abs_2603_14726/figures/001_Figure_1.jpg]]
-*Figure 1: Comparison between (b) previous works and (c) the proposed Hand4Whole++. Hand pose estimators [29, 30] recover each hand well but fail under interaction due to missing full-body context. Whole-body pose estimators [3] lack hand accuracy due to limited hand diversity in whole-body training data. Na¨ıvely combining both leads to implausible hands, especially under occlusion. In contrast, Hand4Whole++ recovers accurate and plausible hands within full-body context*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 方法谱系与基线关系
@@ -327,8 +293,6 @@ Hand4Whole++ 的核心贡献在于提出了一种 **非侵入式的特征调制�
 3. **多人交互扩展**：如何将方法扩展到多人场景，处理不同个体之间的手部-身体、手部-手部交互？
 4. **跨模型泛化**：CHAM 当前与特定预训练模型（SMPLer-X + WiLoR）绑定，能否设计模型无关的特征调制机制，支持任意全身/手部估计器的即插即用组合？
 5. **手部检测鲁棒性**：当手部检测失败或置信度较低时，能否设计渐进式特征融合策略，而非直接将手部特征置零？
-
-
 
 ## 原文 PDF
 

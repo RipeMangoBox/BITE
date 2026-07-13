@@ -52,8 +52,6 @@ claims:
 
 **局限与开放问题** 当前方法假设物体为刚体，对可变形物体（如衣物）不适用；在严重遮挡、快速运动或仅有限视角观测时，重建质量会下降。未来方向包括扩展到多人与多物体场景、引入时序先验处理快速运动、以及支持铰接或可变形物体的重建。
 
-
-
 ### 问题背景
 
 从单目 RGB 视频中重建三维场景、人体及其与物体的交互，是计算机视觉与图形学中长期存在的核心挑战。随着神经隐式表示（NeRF、NeuS 等）和参数化人体模型（SMPL-X）的成熟，静态场景与孤立人体的 4D 重建已取得显著进展。然而，当场景中的人开始**动态操纵未知物体**时，重建难度急剧上升：相机视角在移动，物体在运动，二者运动在图像平面上纠缠为单一的“表观运动”（apparent motion），使得从像素观测中分离出各运动分量变得极为困难。
@@ -83,8 +81,6 @@ RHINO 的核心动机正是填补这一空白：**从一段移动相机拍摄的
 - **物理合理的接触建模**：将接触作为可微信号纳入优化过程，使得重建结果不仅视觉上逼真，而且在物理上合理——手不穿透物体、不悬空漂浮。
 
 RHINO 通过三个技术支柱实现这一目标：利用 3D 感知基础模型（MASt3R）提取稠密特征匹配以稳定运动估计；通过运动解耦公式将相机与物体运动分离；以及使用合成式神经符号距离场（per-component neural SDF）同时表达几何与接触，以交替优化策略联合提升形状精度与物理合理性。
-
-
 
 ## 核心方法与创新机理
 
@@ -123,8 +119,6 @@ RHINO 对人、物体和场景分别建模独立的神经 SDF 和外观场，通
 $$C(r) = \sum_{i=1}^{3N} \tau_i \mathbf{c}^{(\cdot)}(\mathbf{x}^i)$$
 
 这一设计使得接触损失可以直接在物体 SDF 上计算，同时各组件通过逆 LBS（人体）和刚体变换（物体）映射到规范空间，实现统一优化。这种“表达即约束”的设计是 RHINO 在物理合理性上超越基线（如 HSR 仅假设静态场景，HOLD 缺乏全局建模）的关键架构优势。
-
-
 
 RHINO 是一个三阶段框架，从单目 RGB 视频中恢复统一世界坐标系下的**人体**、**未知被操纵物体**和**静态场景**的三维重建。其核心设计围绕一个瓶颈展开：当相机与物体同时运动时，表观运动是二者的纠缠结果，直接使用会导致重建崩溃。RHINO 的因果调控旋钮在于**运动解耦**——利用 3D 感知基础模型提取的稠密特征匹配，将物体运动从相机运动中分离出来——以及**可微神经 SDF 统一表达几何与接触**，使接触信号以距离损失的形式参与优化，从而在无模板、无先验知识的前提下获得物理一致的人-物交互重建。
 
@@ -179,19 +173,6 @@ RHINO 是一个三阶段框架，从单目 RGB 视频中恢复统一世界坐标
 ### 限制与边界条件
 
 当前框架假设物体为**刚体**，无法处理可变形物体（如衣物、软玩具）；当物体仅被有限视角观察、存在快速运动模糊或极端遮挡时，特征匹配与运动解耦的可靠性下降，可能导致形状不完整或位姿噪声。这些场景仍需手动验证重建质量。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2605_17014/figures/004_Figure_4.jpg]]
-*Figure 4: Method Overview. Starting with initialized global human and decoupled object poses (Sec. 3.1, Sec. 3.2), we sample points along the camera ray for the human, object and static scene. To enable consistent representation, sampled points are warped into canonical space using inverse LBS for the human and the estimated rigid transformation for the object. All components are then rendered holistically via compositional volume rendering. A global optimization (Sec. 3.3) helps learn the 3D representation of all elements and refine the initial poses via a photometric loss, while encouraging physically plausible contact by leveraging differentiable contact priors (Sec. 3.4)*
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2605_17014/figures/001_Figure_1.jpg]]
-*Figure 1: We develop RHINO, a novel framework that reconstructs detailed (dynamic) 3D human-object interactions (HOI) and the surrounding scene within a common world frame from a monocular RGB video with a moving viewpoint. RHINO uses per-component neural SDFs to: (i) capture shape details, and (ii) encourage contact via a differentiable distance term. The “zoom-in insets” highlight plausible contacts. RHINO requires neither a pre-scanned object template nor prior knowledge of the object, unlike most existing work*
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2605_17014/figures/002_Figure_2.jpg]]
-*Figure 2: Existing work, such as the HSR [70] SotA method, can faithfully reconstruct the 3D shape of a static scene and of a person moving in it, but struggles when people manipulate objects. As illustrated, when a person pushes a table (top), the static part of the scene is reconstructed well (bottom row, two views), but the table’s reconstruction is degenerate (see the red highlight). Here we do not show the reconstructed person to reduce occlusions*
-
-
 
 RHINO 采用三阶段级联框架（Fig. 4），将单目动态视频中的人、未知物体与静态场景统一重建在世界坐标系中。其核心模块按执行顺序为：**初始化与运动解耦**、**合成式神经场联合优化**、**可微接触精细化**。以下逐一阐述各模块的关键机制与支撑公式。
 
@@ -249,13 +230,6 @@ RHINO 的核心洞察在于将 **per-component 神经 SDF 同时用于几何重�
 
 接触优化采用**两阶段交替策略**：先冻结形状参数优化人体/物体位姿以减少穿透与悬空，再联合微调形状与位姿。消融实验（Table 5, Fig. 8）表明，该模块将穿透深度（PD）降低约 56%（从 1.088 降至 0.477），同时大幅提升接触召回率与 F1，证明了可微接触先验对物理合理性的关键作用。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2605_17014/figures/003_Figure_3.jpg]]
-*Figure 3: Camera & Object motion (Sec. 3.1, Sec. 3.2). When both the camera and object move, their motion entangles into “apparent” motion. To disentangle them, we (a) estimate camera motion in the world frame via SfM on scene-only pixels, (b) estimate apparent motion via SfM on object-only pixels, (c–d) estimate object motion in the world frame by “removing” the camera motion from the apparent one*
-
-
-
 ## 实验与关键发现
 
 ### 数据集与评估协议
@@ -299,9 +273,6 @@ Table 4 展示了移除运动解耦模块（w/o MD）的影响。当不分离相
 
 Table 5 和 Figure 8 展示了可微接触先验的贡献。移除接触优化后（w/o Contact Opt），穿透深度（PD）从 **0.477 升至 1.088**（恶化约 56%），接触召回率和 F1 分数也显著降低。定性结果（Figure 8 及补充材料 Figure S.4）直观地展示了差异：无接触优化时，重建的手部要么穿透物体内部，要么悬浮在物体表面之上而无法形成有效接触；完整方法则恢复出物理上更合理的抓握姿态，与真值更为一致。
 
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2605_17014/figures/016_Table_5.jpg]]
-*Table 5: Ablation on contact refinement (Sec. 4.5). Refining pose via contact reduces penetration depth (PD) and increases contact recall and F1, showing its importance for physical plausibility*
-
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2605_17014/figures/014_Figure_8.jpg]]
 *Figure 8: Effects of contact. We show reconstructions of our framework with (“RHINO (Ours)”) and without (“w/o Contact Opt”) the physical losses of Eq. (12) and Eq. (13). For a bigger version with zoom-in impressions, see Supp. Mat*
 
@@ -315,12 +286,6 @@ Table 5 和 Figure 8 展示了可微接触先验的贡献。移除接触优化�
 4. **刚体假设**：当前方法假设物体为刚体，无法处理可变形物体（如衣物、软玩具），刚性运动模型会引入伪影。
 
 这些局限性也指向了未来的研究方向：引入时间先验和生成式形状先验以应对快速运动和严重遮挡，扩展至铰接或可变形物体，以及探索多人与多物体的交互场景。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2605_17014/figures/009_Figure.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -367,8 +332,6 @@ RHINO 的能力边界由以下假设和实际约束共同定义：
 4. **多智能体交互。** 将框架从单人-单物扩展到多人-多物场景，需要解决实例级运动解耦、交互图推理和全局一致性约束等组合问题。这不仅是工程扩展，更涉及场景理解层面的方法创新。
 
 5. **评估基准的完善。** BenchRHINO 是首个面向世界坐标系下人-物交互重建的基准，但其序列数量和物体多样性有限。更大规模、涵盖更多物体类别和交互类型的基准将推动该领域的标准化评估。
-
-
 
 ## 原文 PDF
 

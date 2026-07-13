@@ -53,8 +53,6 @@ LiteVSR的核心洞察在于，流匹配（Flow Matching）学习的是恒定速
 
 **方法定位**：LiteVSR属于基于预训练视频扩散模型的VSR方法，与**Upscale-A-Video**（Zhou et al., CVPR 2024）、**DiffVSR**（Li et al., 2025）、**FlashVSR**（Zhuang et al., 2025）等处于同一技术脉络，但其独特的冻结骨干+轻量适配器范式显著区别于全量微调或骨干复制方案。
 
-
-
 视频超分辨率（VSR）旨在从低质、退化的视频输入中恢复高保真细节。近年来，大规模预训练视频生成模型凭借其强大的先验知识，在生成式 VSR 中展现出卓越的重建能力。然而，如何高效地适配这些大模型到 VSR 任务，已成为制约其实际应用的核心瓶颈。
 
 ### 现有适配范式的困境
@@ -84,8 +82,6 @@ $$\mathcal{L}_{FM} = \mathbb{E}_{t, x_0, x_1} \left[ \| v_\theta(x_t, t, c) - (x
 3. **状态感知而非静态条件**：设计双流适配器，同时感知低质输入的静态结构线索和中间去噪状态的动态细化需求，实现从结构对齐到纹理细化的自适应引导。
 
 这一设计使得 LiteVSR 能够以仅 11.25% 的可训练参数和单张 A100 GPU 上约 12 小时的训练代价，获得有竞争力的恢复质量（Table 1），将大规模视频生成模型在 VSR 中的适配效率推向了新的边界。
-
-
 
 ## 核心方法与创新机理
 
@@ -127,8 +123,6 @@ $$M(t) = \left\lfloor 1 + \frac{s \cdot (1 - t)}{1 + (s - 1) \cdot (1 - t)} \cdo
 
 综上，LiteVSR 通过“冻结骨干 + 流匹配恒定速度场 + 双流状态感知适配器”的组合，实现了仅 **11.25% 可训练参数**、单张 A100 GPU 约 12 小时训练即可获得有竞争力恢复质量的轻量级 VSR 方案（Table 1）。
 
-
-
 LiteVSR 的整体架构围绕一个核心设计原则展开：**完全冻结预训练视频生成器的骨干网络，仅通过轻量级适配器注入条件信号**。这一设计根植于流匹配（flow matching）的一个关键性质——目标速度场 $v = x_1 - x_0$ 在整个时间步上保持恒定，使得条件注入不再需要学习时变的变换，适配器只需学习一个固定的引导模式（见 Eq.3—Eq.4）。
 
 ### 框架总览
@@ -158,12 +152,8 @@ LiteVSR 采用**单阶段纯潜在空间流匹配训练**，无需像素域监�
 
 需要指出的是，训练数据规模有限（266 个片段），可能影响模型在更广泛退化场景下的泛化能力；当前评估主要依赖合成退化，现实世界退化分布的偏移尚未充分测试。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2606_09250/figures/004_Figure_3.jpg]]
 *Figure 3: LiteVSR. Left: The overall framework keeps all DiT blocks frozen and injects control signals via zero-initialized linear layers. The State-Aware Adapter processes both the LR latent and the current noisy state to produce conditioning features. Right: The adapter employs dual-stream patch embeddings to extract features from the LR input and the denoising state, which are concatenated as keys and values. A learnable query attends to these features via cross-attention to produce the output. Bottom: Resolution-agnostic query tiling enables inference at arbitrary resolutions by repeating and cropping the learned query prototypes to match the target spatial dimensions*
-
-
 
 ### 3.1 流匹配与条件注入简化
 
@@ -207,9 +197,6 @@ $$C_{out} = \text{Attention}(Q_t, [K_{str} \oplus K_{ref}], [V_{str} \oplus V_{r
 
 其中 $Q_t$ 是可学习查询原型，$t$ 调制注意力权重，使早期去噪步侧重结构对齐，后期侧重纹理细化（Figure 4 验证了这一转移）。
 
-![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2606_09250/figures/005_Figure_4.jpg]]
-*Figure 4: Attention maps illustrating the shift of focus across timesteps*
-
 ### 3.4 递归细化与自适应展开策略
 
 训练时采用 $M$ 步递归展开生成精细化条件：
@@ -231,13 +218,6 @@ $$M(t) = \left\lfloor 1 + \frac{s \cdot (1 - t)}{1 + (s - 1) \cdot (1 - t)} \cdo
 $$\mathcal{L} = \mathbb{E}_{t, z_0, z_1} \left[ \lambda(t) \left\| v_\theta(z_t, t, c_{ref}) - (z_1 - z_0) \right\|^2 \right] \tag{11}$$
 
 训练完全在潜在空间进行，无需像素域监督，采用单阶段流程。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2606_09250/figures/003_Figure_2.jpg]]
-*Figure 2: ControlNet paradigms for DiT. (A) Standard Control-Net duplicates the backbone for condition processing. (B) Our approach shares frozen DiT blocks via batch processing, requiring only a lightweight adapter*
-
-
 
 ## 实验与关键发现
 
@@ -292,25 +272,9 @@ Figure 4 展示了不同时间步下结构流和细化流的注意力图。在�
 
 Figure 7 揭示了生成式 VSR 方法在文字重建上的共性局限。在严重退化下，所有对比方法（包括 LiteVSR）均无法忠实恢复文字内容，往往生成看似合理但实际错误的字符。这是因为扩散模型的生成先验倾向于产生视觉上连贯的纹理，但缺乏对文字语义的精确约束。该问题指向一个开放方向：如何整合 OCR 引导的约束或文字感知模块，以改进生成式 VSR 在文字区域的保真度。
 
-![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2606_09250/figures/014_Figure_7.jpg]]
-*Figure 7: Limitation of generative VSR methods on text reconstruction. All methods, including ours, struggle to faithfully restore text content under degradation, often generating plausible but incorrect characters*
-
 ### 训练细节与超参数
 
 Table 6 汇总了实现细节和关键超参数。LiteVSR 采用单阶段纯潜在空间流匹配训练，无任何像素域损失。训练目标为加权流匹配损失（Eq. 11），权重函数 $\lambda(t) = \sigma_t^{-2}$ 优先关注高信噪比的时间步。自适应展开调度（Eq. 10）中 $s = 5$，$M_{max}$ 控制最大展开步数。这些设计使得 LiteVSR 能够在不破坏预训练生成动力学的前提下，以极少的训练开销实现有竞争力的 VSR 质量。
-
-![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2606_09250/figures/012_Table_6.jpg]]
-*Table 6: Implementation details and hyperparameters*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2606_09250/figures/010_Figure_6.jpg]]
-*Figure 6: Visual comparison on high-density detail regions (greenery and hair)*
-
-![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2606_09250/figures/001_Figure_1.jpg]]
-*Figure 1: Visual comparisons of LiteVSR with SOTA methods (Zoom-in for best view)*
-
-
 
 ## 定位与知识库关联
 
@@ -342,8 +306,6 @@ LiteVSR 与现有方法存在三个结构性差异：
 2. **数据规模与泛化**：当前训练仅使用 REDS 的 266 个片段，评估主要依赖合成退化，模型在更广泛真实世界退化分布下的泛化能力尚待验证。
 3. **骨干替换的灵活性**：该方法对 Wan2.2-5B 的冻结策略是否可平滑迁移到其他 DiT 架构（如 Sora 类模型），仍需实验验证。
 4. **推理效率**：虽然训练成本极低，但推理仍需多步采样，能否与蒸馏策略（如 FlashVSR 的一步蒸馏）结合以进一步降低推理延迟，是实用化部署的关键问题。
-
-
 
 ## 原文 PDF
 

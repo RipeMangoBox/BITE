@@ -60,8 +60,6 @@ L2Seg 提供三种解码器变体：**L2Seg-NAR**（非自回归，一次性全�
 
 在方法谱系中，L2Seg 定位于**学习引导的迭代求解加速**，区别于端到端构造方法（如 AM、POMO）和完全手工设计的分解策略（如 LNS 的邻域破坏）。其神经网络推理开销始终低于总迭代时间的 10%（Table 15），在计算效率上具备实用价值。当前验证集中于 CVRP 和 VRPTW，扩展到更广泛的 VRP 变体及与 HGS 等闭箱求解器的集成仍是开放问题。
 
-
-
 车辆路径问题（Vehicle Routing Problem, VRP）是组合优化领域的核心问题之一，在物流配送、共享出行等场景中具有广泛的应用价值。随着问题规模的增长，精确求解器因指数级的时间复杂度而难以在可接受的时间内获得最优解，迭代启发式求解器成为大规模 VRP 的主要求解手段。然而，当前迭代求解器面临一个关键瓶颈：**在迭代搜索过程中，大部分解结构保持稳定，导致大量冗余计算，严重限制了求解器的可扩展性和效率**。
 
 这一现象在 **Figure 1** 中得到了实证支持：在使用 **LKH-3**（Helsgaun, 2017）对 100 个 CVRP 实例进行迭代搜索时，每一轮迭代中仅有少量边被重新优化，绝大多数边保持不变。这意味着求解器在每一轮迭代中重复计算了大量已收敛的路径片段，造成了计算资源的浪费。这一冗余计算问题在大规模实例（如 CVRP2k、CVRP5k）上尤为突出，因为随着节点数增加，稳定段的规模也随之扩大，但求解器仍需对整个解空间进行全局搜索。
@@ -69,8 +67,6 @@ L2Seg 提供三种解码器变体：**L2Seg-NAR**（非自回归，一次性全�
 现有方法在应对这一问题时存在明显缺口。传统的分解策略——如 **LNS**（Shaw, 1998）基于预定义邻域选择相邻子路径进行破坏与修复——依赖手工设计的启发式规则，无法自适应地识别哪些解片段真正需要重新优化。近年来兴起的神经组合优化方法，如 **L2D**（Li et al., 2021）通过学习将子问题委派给不同求解器，虽然在一定程度上提升了求解效率，但并未从根本上解决迭代搜索中的冗余计算问题。当前最优的经典启发式求解器 **HGS**（Vidal, 2022）虽然解质量出色，但其设计并不接受初始解输入，难以与分解-聚合框架直接集成。
 
 本文的核心动机源于一个关键洞察：**如果能够提前识别解中哪些边不稳定、哪些边保持稳定，就可以将稳定段聚合成超节点以缩小问题规模，从而将搜索资源集中到真正需要优化的不稳定部分**。这一思路将稳定性感知首次引入迭代求解器的搜索过程，有望在不牺牲解质量的前提下实现显著的加速效果。为此，本文提出 **Learning to Segment（L2Seg）** 框架，通过端到端学习预测不稳定边，并结合 **First-Segment-Then-Aggregate（FSTA）** 分解框架，将稳定段聚合为超节点，使骨干求解器仅需在简化后的子问题上进行搜索，从而在保证解质量的同时实现 2 至 7 倍的加速。
-
-
 
 ## 核心方法与创新机理
 
@@ -130,8 +126,6 @@ FSTA 框架的适用性得到了形式化研究和理论证明（Section 1），
 
 需要指出的是，L2Seg 目前仅在 CVRP 和 VRPTW 上进行了验证，扩展到其他 VRP 变体（如 VRPB、VRPPD）以及更广泛的组合优化问题仍有待探索。此外，L2Seg 尚未与 **HGS**（Vidal, 2022）等不接受初始解输入的顶级求解器集成，限制了其在某些场景下的直接应用。训练数据生成依赖于预定义的骨干求解器，可能引入求解器特异性偏差，但 Table 5 显示 HGS 和 LKH-3 的标签相似度达 78.3%，表明**稳定性主要由问题实例的内在结构决定**，偏差有限。
 
-
-
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_pN261iTKvr/figures/002_Figure_2.jpg]]
 *Figure 2: The overview of our FSTA decomposition framework (top) and the three proposed L2Seg models (bottom). L2Seg-SYN employs a four-step synergized approach: (1) problem decomposition into subproblems, (2) unstable nodes detection globally via NAR decoding, (3) clustering of NARpredicted nodes to localize unstable regions and select initial target nodes, and (4) refining unstable edge predictions locally via AR decoding starting from these identified initial target nodes*
 
@@ -165,8 +159,6 @@ L2Seg 作为 FSTA 的“感知模块”，负责从数据中学习预测不稳�
 训练阶段采用模仿学习范式：以迭代求解器（如 LKH-3 或 HGS）作为前瞻启发式，通过比较重优化前后的解差异生成不稳定边缘的真实标签。NAR 模型使用加权二元交叉熵损失 $\mathcal{L}_{\mathrm{NAR}}$（正样本权重 $w_{\mathrm{pos}} > 1$），AR 模型使用加权交叉熵损失 $\mathcal{L}_{\mathrm{AR}}$（插入阶段权重 $w_{\mathrm{insert}} >$ 删除阶段权重 $w_{\mathrm{delete}}$），以平衡数据集中不稳定边缘的稀疏性。
 
 推理阶段，L2Seg-SYN 的神经网络开销始终低于总迭代时间的 10%（Table 15），证明其扩展效率可控。预测结果直接输入 FSTA 框架，驱动问题简化与聚焦求解，最终实现对 LKH-3、LNS、L2D 等骨干求解器 2 至 7 倍的加速（Figure 5）。
-
-
 
 ### 编码器：融合图级与路径级特征
 
@@ -216,8 +208,6 @@ $$\mathcal{L}_{\mathrm{AR}} = -\sum_{x_{\pi_{2k}} \in y_K} w_{\mathrm{insert}} \
 
 L2Seg-SYN 将 NAR 的全局感知能力与 AR 的局部精炼能力相结合，形成四步协同推理流程：首先将问题分解为子问题，然后通过 NAR 解码器全局检测不稳定节点，接着对 NAR 预测的不稳定节点进行 K-means 聚类以定位不稳定区域并选择初始目标节点，最后以这些初始节点为起点进行 AR 解码，局部精炼不稳定边预测。这种协同设计使 L2Seg-SYN 在召回率和真负率（TNR）之间取得了最佳平衡——NAR 提供较高的召回率，AR 提供较高的 TNR，二者互补实现了最优的加速与解质量权衡。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与动机验证
@@ -238,7 +228,6 @@ Figure 5 的搜索曲线进一步揭示了加速效果的时间维度：L2Seg �
 
 Table 2 将 L2Seg-SYN-L2D 与当前最优经典启发式求解器 HGS（Vidal, 2022）在标准 CVRP 和 VRPTW 基准上进行对比。在小容量 CVRP5k 上，L2Seg-SYN-L2D 相对于 HGS 的 gap 为 **-3.55%**；在 VRPTW5k 上，gap 为 **-3.14%**。这表明 L2Seg 不仅在加速方面有效，而且在绝对解质量上也具有竞争力，尽管其骨干求解器本身并非当前最优。
 
-
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_pN261iTKvr/figures/008_Table_2.jpg]]
 *Table 2: Performance comparisons of our L2Seg-SYN-L2D against baselines on benchmark CVRP and VRPTW instances. The gap % (lower the better) is w.r.t. the performance of HGS*
 
@@ -248,14 +237,12 @@ Table 2 将 L2Seg-SYN-L2D 与当前最优经典启发式求解器 HGS（Vidal, 2
 
 Table 3 的关键消融对比了 L2Seg-SYN 与 Random FSTA（随机选择不稳定边缘的 FSTA 方法）在加速 LNS 求解器上的表现。结果显示，L2Seg-SYN 在所有 CVRP 实例上显著优于 Random FSTA，证明了**学习预测不稳定边缘**是加速效果的核心来源，而非 FSTA 分解框架本身的简单效果。
 
-
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_pN261iTKvr/figures/009_Table_3.jpg]]
 *Table 3: Performance of L2Seg-SYN v.s. Random FSTA to accelerate LNS on CVRP instances*
 
 #### NAR 与 AR 的协同机制
 
 Table 4 从预测分析角度解释了 L2Seg-SYN 优于单独变体的原因。在 CVRP2k 上，L2Seg-NAR 具有较高的召回率（Recall）但真负率（TNR）较低，倾向于过度预测不稳定边；L2Seg-AR 具有较高的 TNR 但召回率不足，倾向于遗漏不稳定区域。L2Seg-SYN 结合了 NAR 的全局识别能力（高召回率）和 AR 的局部细化能力（高 TNR），在召回率和 TNR 之间取得了最佳平衡，最终实现了最优的目标值（Obj 43.42）。Figure 6 和 Figure 12 从概念和案例层面可视化了这一协同行为。
-
 
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_pN261iTKvr/figures/026_Figure_12.jpg]]
 *Figure 12: Prediction comparison of L2Seg-SYN, L2Seg-NAR, and L2Seg-AR on two adjacent routes from a small-capacity CVRP1k solution. Red dashed lines indicate predicted unstable edges. L2Seg-SYN provides the most reasonable predictions, while L2Seg-NAR over-predicts unstable edges and L2Seg-AR fails to identify unstable regions*
@@ -267,17 +254,12 @@ Table 4 从预测分析角度解释了 L2Seg-SYN 优于单独变体的原因。�
 
 Table 5 分析了不同求解器（HGS 和 LKH-3）生成的训练标签之间的相似度，结果为 **78.3%**。这一较高的相似度表明，解的稳定性主要由**问题实例的内在结构**决定，而非特定求解器的搜索行为。这一发现降低了 L2Seg 对特定骨干求解器的过拟合风险，也为跨求解器的迁移训练提供了依据。
 
-
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_pN261iTKvr/figures/013_Table_5.jpg]]
 *Table 5: Label similarity across different solvers*
 
 #### 超参数敏感性
 
 Figure 11 分析了两个关键超参数：K-means 聚类数 `nKMEANS` 和平衡因子 `η`。结果表明 `nKMEANS=3` 和 `η=0.6` 是最佳配置，偏离这些值会导致性能下降，但总体变化幅度可控，说明方法对超参数具有一定的鲁棒性。
-
-
-![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_pN261iTKvr/figures/022_Figure_11.jpg]]
-*Figure 11: Analysis of key hyperparameters: (a) number of clusters nMEANS, and (b) balancing factor η*
 
 ### 泛化性与计算开销
 
@@ -292,24 +274,6 @@ Table 15 详细分析了 L2Seg 的神经网络推理开销。在所有问题规�
 ### 局限性
 
 尽管 L2Seg 在 CVRP 和 VRPTW 上展现了显著的加速效果，仍存在以下局限：（1）当前验证范围仅限于 CVRP 和 VRPTW，扩展到其他 VRP 变体（如 VRPB、VRPPD）以及更广泛的组合优化问题仍有待探索；（2）L2Seg 尚未与 HGS 等不接受初始解输入的顶级求解器集成，限制了其直接应用范围；（3）神经网络推理开销虽可控（<10%），但在极短时间限制下可能影响性价比；（4）训练数据生成依赖于预定义的骨干求解器，可能引入求解器特异性偏差，但 Table 5 的标签相似度分析表明这种偏差有限。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_pN261iTKvr/figures/015_Figure.jpg]]
-*Figure: (a) Random instance 1 at step 1*
-
-![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_pN261iTKvr/figures/016_Figure_9.jpg]]
-*Figure 9: Illustration of our FSTA applied to one CVRP instance. Each FSTA step corresponds to the descriptions in Appendix B.1.4. Red dashed lines: unstable edges; blue dashed lines: re-optimized edges. Note that the subproblem (d) contains substantially fewer nodes than the original instance (a)*
-
-![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_pN261iTKvr/figures/007_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_pN261iTKvr/figures/014_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_pN261iTKvr/figures/017_Table_7.jpg]]
-*Table 7: Implementation specifications of FSTA hypernode aggregation for CVRP, VRPTW, VRPB variants. Refer to Equation 3 for the definitions of $\bar { \bar { s } } _ { j } , \bar { t } _ { j } ^ { l }$ and $\bar { \bar { t } } _ { j } ^ { r }$
-
-
-
 
 ## 定位与知识库关联
 
@@ -368,8 +332,6 @@ FSTA 框架本身在理论上被证明适用于多种 VRP 变体（论文声称�
 4. **AR-NAR 协同的泛化**：L2Seg 中 AR 和 NAR 的协同思想（全局快速扫描 + 局部精确细化）能否推广到神经组合优化中的其他联合决策问题，如同时决策节点选择和路径构造？
 
 5. **多模态特征融合**：当前 L2Seg 主要基于图结构特征和路径特征进行稳定性预测。能否将节点和边的多模态特征（如时间窗紧度、需求分布密度）纳入预测模型，进一步提高不稳定边缘的识别精度？
-
-
 
 ## 原文 PDF
 

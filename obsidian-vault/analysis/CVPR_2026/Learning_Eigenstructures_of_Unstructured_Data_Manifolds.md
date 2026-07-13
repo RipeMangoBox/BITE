@@ -69,8 +69,6 @@ claims:
 
 当前方法存在训练计算成本高的问题，且在高频特征向量（$k > 20$）上与oracle的偏离较大。探测函数分布目前需人工设计，如何自动学习探测函数分布以适配不同算子类型是重要的开放问题。此外，框架向非对称算子的扩展、通用基础模型的训练、以及在大规模数据集上的实用化，均为值得探索的方向。
 
-
-
 ### 谱方法在几何处理中的核心地位
 
 谱方法（spectral methods）是几何处理、流形学习和科学计算中的基础工具。其核心思想是将数据流形上定义的线性算子（最经典的为Laplace-Beltrami算子，LBO）进行特征分解，得到的特征值和特征向量（谱基）编码了流形的内蕴几何与拓扑信息。这些谱基被广泛应用于形状分析、形变、参数化、聚类、降维和物理模拟等下游任务。
@@ -100,8 +98,6 @@ claims:
 具体而言，本文提出通过训练神经网络，在预测的正交基上最小化探测函数（probe functions）的重构误差。不同的探测函数分布隐式定义了不同的最优重构算子，从而控制所学谱基的性质。该框架将传统流程中的“算子选择→离散化→特征分解”三步压缩为一个端到端的学习过程，仅需非结构化点云坐标作为输入，无需网格连接或图构造。
 
 这一方法论的转变使得谱分析可以优雅地扩展到任意维度的非结构化数据，为构建通用的几何基础模型开辟了新的可能。
-
-
 
 ## 核心方法与创新机理
 
@@ -136,8 +132,6 @@ $$M = \mathrm{diag}(\mathbf{q}_1 \odot \mathbf{q}_1)$$
 
 这三个changed slots的协同效应使得方法具有前所未有的数据灵活性：仅需非结构化点云（任意维度d），无网格或图连接要求。实验验证覆盖了1D区间、3D表面点云、3D体点云、以及高达数百维的图像特征流形（DINOv2特征），在过拟合设置下学到的谱基与oracle cotangent Laplacian的特征向量余弦相似度普遍超过0.93（Table 1），且模型在仅训练于表面点云后可直接泛化到未见形状和三维体点云（Figure 6），展现出基础模型级别的泛化能力。
 
-
-
 本文提出的**最优逼近谱基学习（Optimal-Approximation Spectral Basis Learning）**框架，从根本上改变了传统谱分析的范式。传统流程需要三步：①显式选择目标算子（如Laplace-Beltrami算子）；②对算子进行离散化，构造质量矩阵和刚度矩阵；③调用数值特征求解器求解广义特征值问题。这一流程对网格质量高度敏感，且难以扩展到高维非结构化数据。本框架的核心突破在于：**无需在任何时刻显式构造算子或其离散矩阵，也无需调用数值特征求解器**，直接从非结构化点云坐标中端到端地学习谱基。
 
 ### 整体数据流
@@ -168,8 +162,6 @@ $$M = \mathrm{diag}(\mathbf{q}_1 \odot \mathbf{q}_1)$$
 ### 关键因果机制
 
 整个框架的理论根基在于定理 3.1 和定理 3.2 所揭示的等价性：对于任意对称正定算子 $L$，受约束信号类的最优正交基恰好是 $L$ 的特征向量，且该解同时可通过 PCA 形式的期望优化达到。因此，通过训练神经网络在预测的正交基上最小化探测函数的重构误差，网络**隐式地学习某个算子的谱分解全过程**。探测函数的分布选择成为控制所学算子类型的核心旋钮——在默认配置下，$k$ 近邻图上的高斯核平滑探测函数诱导出类 Laplacian 算子；改变探测函数的生成方式（如不同程度的平滑或不同的分布族），则对应不同的隐式算子（见 Figure 7 的消融实验）。
-
-
 
 ### 3.1 理论基础：最优逼近与算子有界PCA
 
@@ -229,12 +221,8 @@ $$\lambda_{k+1} = \frac{1}{\max_i \|\mathbf{f}^{(i)} - \mathbf{f}_{\mathrm{proj}
 
 整个框架的核心创新在于**将谱分析的全流程——算子选择、离散化、特征分解——压缩为一个端到端的神经网络训练过程**。传统的三个步骤（显式选择算子→构造质量矩阵和刚度矩阵→调用数值特征求解器）被替换为三个隐式操作：（1）探测函数分布隐式定义算子类型；（2）$\mathbf{q}_1$ 的逐元素平方隐式编码度量矩阵；（3）最小化重构误差隐式执行特征分解。这一设计使得方法可以优雅地扩展到高维非结构化数据，而无需面对传统方法中图 Laplacian 构造的敏感性和数值求解的可扩展性瓶颈。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2127_https_openaccess_thecvf_com_content_CVPR2026_html_Velich_Learning_Eigens/figures/005_Figure_5.jpg]]
 *Figure 5: Estimated mass metric M from q1 (overfitting setting)*
-
-
 
 ## 实验与关键发现
 
@@ -318,24 +306,11 @@ $$\lambda_{k+1} = \frac{1}{\max_i \|\mathbf{f}^{(i)} - \mathbf{f}_{\mathrm{proj}
 | 探测函数分布是关键旋钮 | **中强** | Figure 7消融验证，但仅展示定性差异 |
 | 高频退化是明确失败模式 | **中强** | Table 1中k>20时部分形状相似度骤降 |
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2127_https_openaccess_thecvf_com_content_CVPR2026_html_Velich_Learning_Eigens/figures/002_Figure_3.jpg]]
 *Figure 3: Unnormalized spectral basis (top) and xyz reconstruction from k basis vectors (bottom), using either the oracle cotangent Laplacian or our method (overfitting setting). Scalars are cosine similarities between basis vectors. We get similar if not more detailed reconstructions. More in Appendix C*
 
-![[assets/figures/papers/paper_list_l2127_https_openaccess_thecvf_com_content_CVPR2026_html_Velich_Learning_Eigens/figures/008_Figure_6.jpg]]
-*Figure 6: Unnormalized spectral basis v1 on unseen shapes, either surfaces (left) or volumes (right), when the model was trained on a wide collection of surface point clouds (generalization setting). Our model exhibits foundation-level generalization capabilities*
-
-![[assets/figures/papers/paper_list_l2127_https_openaccess_thecvf_com_content_CVPR2026_html_Velich_Learning_Eigens/figures/009_Figure_8.jpg]]
-*Figure 8: Average clustering performance over 50 runs of manifold learning methods on DINOv2 features of random data subsets (1500 images). Higher is better. More in Appendix C*
-
-![[assets/figures/papers/paper_list_l2127_https_openaccess_thecvf_com_content_CVPR2026_html_Velich_Learning_Eigens/figures/003_Figure_2.jpg]]
-*Figure 2: Learned eigenfunctions on [0,1] recover frequencyordered harmonics resembling the Laplacian’s spectrum*
-
 ![[assets/figures/papers/paper_list_l2127_https_openaccess_thecvf_com_content_CVPR2026_html_Velich_Learning_Eigens/figures/010_Figure_9.jpg]]
 *Figure 9: Manifold learning visualization of a random subset of STL10 by 2D embedding DINOv2 features. More in Appendix C*
-
-
 
 ## 定位与知识库关联
 
@@ -388,8 +363,6 @@ $$\lambda_{k+1} = \frac{1}{\max_i \|\mathbf{f}^{(i)} - \mathbf{f}_{\mathrm{proj}
 3. **高维下游任务的应用**：学到的谱基在图神经网络中替代现有谱滤波器、在物理模拟中替代传统有限元基函数等应用潜力有多大？
 4. **算子类型的扩展**：能否将框架扩展到非对称或非自伴算子，从而捕获更丰富的几何结构（如方向性扩散过程）？
 5. **计算效率的工程化**：能否通过优化代码和 CUDA 实现显著降低训练开销，使该方法在大规模数据集上更具实用性？
-
-
 
 ## 原文 PDF
 

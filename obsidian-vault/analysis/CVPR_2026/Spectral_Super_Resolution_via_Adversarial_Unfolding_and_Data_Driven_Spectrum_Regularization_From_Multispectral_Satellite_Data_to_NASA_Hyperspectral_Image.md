@@ -50,8 +50,6 @@ Sentinel-2 卫星多光谱影像仅包含 12 个波段且空间分辨率不统�
 
 在 Sentinel-2 到 AVIRIS-NG 的模拟数据集上，UALNet 以 **1.76 M 参数**和 **120.14 G MACs** 取得了 **PSNR 32.60、SAM 2.49、SSIM 0.9214** 的最优性能，在 PSNR 上优于次优方法 COS2A（Lin et al., arXiv 2025）0.30 dB，而参数量仅为其约 38%，MACs 仅约 15%，实现了性能与效率的双重突破。消融实验表明，移除 PriorNet 提供的数据驱动先验后，PSNR 下降约 2.1 dB，SAM 上升约 0.28，验证了谱先验正则化的关键作用。
 
-
-
 高光谱影像（Hyperspectral Image, HSI）在遥感应用中具有不可替代的材料识别能力，但获取高空间分辨率的高光谱数据成本高昂且覆盖有限。相比之下，以 Sentinel-2 为代表的多光谱卫星影像（Multispectral Image, MSI）虽然具备全球覆盖和重访周期短的优势，但其光谱分辨率极为有限——仅包含 12 个波段，且空间分辨率不统一（10 m、20 m 和 60 m GSD）。这一结构性缺陷严重制约了 MSI 在精准农业、矿物勘探、环境监测等需要精细光谱信息的任务中的实用价值。
 
 从 Sentinel-2 的 12 波段 MSI 重建 AVIRIS 级别的 186 波段 HSI，本质上是一个高度病态的**光谱超分辨率（Spectral Super-Resolution, SSR）**问题，其核心瓶颈在于：输入信号的光谱维度远低于目标维度，且空间分辨率存在跨波段的非均匀性。现有方法大致可分为两类：基于手工先验的传统优化方法和基于深度学习的端到端方法。前者依赖稀疏性、低秩性等人工设计的正则项，在复杂场景下表达能力不足；后者以 HSCNN+、HRNet、Restormer、MST 系列、SPECAT 以及 COS2A 等为代表，虽然取得了显著进展，但普遍面临以下缺口：
@@ -61,8 +59,6 @@ Sentinel-2 卫星多光谱影像仅包含 12 个波段且空间分辨率不统�
 3. **对抗学习的应用局限**：传统 GAN 框架中，判别器仅在训练阶段通过对抗损失间接影响生成器，测试阶段被完全丢弃，未能充分利用判别器对重建结果的实时指导能力。
 
 本文的动机正是针对上述缺口，提出一种兼具高性能、低计算开销和高可解释性的光谱超分辨率框架。核心思路是将数据驱动的谱域先验与展开优化架构深度融合，并将对抗学习从损失函数层面提升至网络架构层面，使判别器在训练和测试阶段均能持续引导重建过程，从而在保持轻量化的同时实现最优的重建质量。
-
-
 
 ## 核心方法与创新机理
 
@@ -107,8 +103,6 @@ UALNet 将非凸优化问题通过 Quasi-SB 框架分解为可解释的子问题
 
 > **注意**：Quasi-SB 优化缺乏严格的非凸收敛理论证明，虽实验有效但理论保证不足，这一点在论文的 limitations 中亦有提及。
 
-
-
 UALNet 的整体 pipeline 围绕一个核心洞察展开：**将对抗学习从损失函数层面提升至优化展开的架构层面**，使判别器在训练和测试阶段均能持续提供对抗性指导。如图 3 所示，框架由三个关键模块串联构成：**PriorNet**（先验网络）、**UALNet 展开网络**和**判别器** $D_{\theta_D}$。
 
 ### 输入与预处理
@@ -140,13 +134,6 @@ $$
 $$
 
 其中权重 $\alpha_j$ 通过光谱角映射器（SAM）自适应调整，以平衡不同光谱位置的误差贡献。最终输出为 186 波段、5 m GSD 的 AVIRIS 级别高光谱重建影像。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l932_https_arxiv_org_abs_2603_00920/figures/003_Figure_3.jpg]]
-*Figure 3: The schematic pipeline of the proposed UALNet for the challenging Sentinel-2 S to AVIRIS-level HSI A transformation. To fulfill this goal, we first develop an efficient PriorNet (see Supplementary Figure 1) to provide the 5 m GSD spatial prior image Su from the target multiresolution MSI S, together with a spectral prior matrix*
-
-
 
 UALNet 的核心设计思想是将对抗学习从损失函数层面提升至优化展开的架构层面，通过 Quasi-SB 优化框架将判别器最大化正则项嵌入迭代过程，使判别器在训练和测试阶段均能持续指导重建。整体流水线如 Figure 3 所示，由三个关键模块协同工作：PriorNet、UALNet 展开网络和判别器。
 
@@ -204,9 +191,6 @@ PriorNet 是一个轻量级网络（仅 0.05 M 参数量、2.6 G MACs），承�
 
 PriorNet 的详细结构见 Figure 8 和 Supplementary Figure 1，其第一分支执行空间分辨率统一，后续通过多尺度模块、通道注意力和空间-光谱注意力机制提取特征。
 
-![[assets/figures/papers/paper_list_l932_https_arxiv_org_abs_2603_00920/figures/010_Figure_8.jpg]]
-*Figure 8: Overall pipeline of the proposed lightweight PriorNet, where the notation “ka-nb-gc” denotes a 2D convolution with a kernel size of a, output channel of b, and group number of c (a full convolution would not exhibit a group number additionally). The architectural details of Multiscale Module, Channel Attention, and Spe-Spa Attention are illustrated in Figure 9(a), Figure 9(b), and Figure 9(c), respectively. In our design, the fist branch of PriorNet perform a spatial resolution unification (SRU) to obtain the high and uniform resolution (5 m GSD) prior image*
-
 ### 3.4 损失函数
 
 UALNet 采用谱自适应 $\ell_1$ 损失进行训练：
@@ -214,13 +198,6 @@ UALNet 采用谱自适应 $\ell_1$ 损失进行训练：
 $$\mathcal{L}_{\mathrm{G}} := \frac{1}{186 L} \sum_{i=1}^{186} \sum_{j=1}^{L} \alpha_j \left| [\boldsymbol{A}]_{i,j} - [\widehat{\boldsymbol{A}}]_{i,j} \right|$$
 
 其中权重 $\alpha_j$ 由光谱角映射器（SAM）自适应调整，使损失函数对不同光谱位置的误差具有差异化敏感度。值得注意的是，由于对抗学习过程已通过 DMR（判别器最大化正则项）嵌入展开架构，UALNet 无需额外的对抗损失函数。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l932_https_arxiv_org_abs_2603_00920/figures/011_Figure_9.jpg]]
-*Figure 9: Schematic diagrams of the network architectures, including (a) Multiscale Module, (b) Channel Attention, (c) Spe-Spa Attention, and (d) Discriminator*
-
-
 
 ## 实验与关键发现
 
@@ -302,19 +279,6 @@ UALNet 的训练不依赖传统的对抗损失函数——其架构设计已通�
 ![[assets/figures/papers/paper_list_l932_https_arxiv_org_abs_2603_00920/figures/008_Table_2.jpg]]
 *Table 2: Ablation study on the effectiveness of data-driven priors learned from the proposed PriorNet*
 
-![[assets/figures/papers/paper_list_l932_https_arxiv_org_abs_2603_00920/figures/006_Figure_5.jpg]]
-*Figure 5: Qualitative comparisons between the estimated results and the corresponding GT, shown in true-color compositions (left) and the spectral signatures (right). The ROI is located near Okmulgee County, Eastern Oklahoma, USA, and was captured on Oct. 27, 2019*
-
-![[assets/figures/papers/paper_list_l932_https_arxiv_org_abs_2603_00920/figures/007_Figure_6.jpg]]
-*Figure 6: Qualitative comparisons between the estimated results and the corresponding GT, shown in true-color compositions (left) and the spectral signatures (right). The ROI is located near Garvin County, Southern Oklahoma, USA, and was captured on Oct. 27, 2019*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l932_https_arxiv_org_abs_2603_00920/figures/009_Figure_7.jpg]]
-*Figure 7: Qualitative comparisons between the Prior images and the real Sentinel-2 images, and the model-order selection (the horizontal axis is the number of sources, the vertical axis indicates the code length) using the minimum description length (MDL) [62]*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 方法谱系：从手工先验到数据驱动展开对抗学习
@@ -367,8 +331,6 @@ UALNet 采用 Quasi-SB（非凸交替分裂 Bregman）优化框架，将含判�
 3. **减少空间校准依赖**：能否通过设计空间变换不变的特征学习机制，降低模型对精细空间预校准的依赖？
 4. **理论收敛分析**：Quasi-SB 优化在非凸设定下的收敛性质能否得到更深入的理论刻画？这对于将该框架推广至更广泛的逆问题具有重要意义。
 5. **先验矩阵的动态适应性**：当前谱先验矩阵 $P$ 在训练后固定，未来是否可设计场景自适应的动态先验，以应对不同大气条件和地物组合？
-
-
 
 ## 原文 PDF
 

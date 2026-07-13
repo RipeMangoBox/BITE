@@ -58,8 +58,6 @@ claims:
 
 **关键证据**：消融实验表明，移除可微松弛后即使在更高码率下性能也急剧恶化（DISTS 从 0.1005 升至 0.2147），证明可微索引分布是实现有效端到端 RD 优化的关键；而采用 K-means 簇尺寸控制码率的启发式方案虽能匹配码率，但所有感知指标均明显劣于联合 RD 学习，表明启发式控制无法有效消除索引分布的冗余。
 
-
-
 ### 图像压缩的率失真优化框架
 
 有损图像压缩的核心是在编码比特率与重建失真之间寻求最优权衡，这一目标通常形式化为拉格朗日率失真函数 $\mathcal{L} = \lambda R + D(\mathbf{x}, \hat{\mathbf{x}})$。在基于学习的压缩范式中，编码率 $R$ 定义为量化潜变量在熵模型下的期望负对数似然 $R = \mathbb{E}_{\hat{\mathbf{y}}} [ -\log_2 q_{\psi}(\hat{\mathbf{y}}) ]$。通过梯度下降联合优化编码器、量化器和熵模型，可以实现端到端的率失真优化——这是标量量化（scalar quantization, SQ）压缩方法取得成功的核心机制。
@@ -85,8 +83,6 @@ claims:
 上述分析揭示了一个清晰的改进空间：**能否在保留VQ高效离散表示能力的同时，恢复从率损失到编码器的梯度路径，从而实现真正的端到端联合率失真优化？**
 
 RDVQ的核心动机正是回答这一问题。其关键洞察在于：**训练时解耦重建/编码路径与率优化路径**——在推理侧保持标准的硬量化流程不变，而在训练侧的率估计分支引入基于距离的可微软分布作为代理率目标。这一设计使得梯度 $\partial R_{soft} / \partial \mathbf{y} \neq 0$，让熵模型能够直接塑造编码器诱导的潜在分布，从而将标准VQ框架无缝扩展为可联合优化的RDVQ，且不改变部署时的推理管线。
-
-
 
 ## 核心方法与创新机理
 
@@ -125,8 +121,6 @@ Table 1 的对比清晰揭示了联合 RD 优化的不可替代性：采用 K-me
 
 RDVQ 的“可微松弛+自回归熵模型”组合本质上是一种**训练时解耦、推理时透明的代理优化策略**：软分布纯粹作为训练代理，不改变传统 VQ 编解码器的部署流程。这使得 RDVQ 能够以极轻量的架构（参数量不到多数现有方法的 20%，Figure 6）在极低码率下取得领先的感知质量，同时保持与标准 VQ 管线完全兼容的推理效率。
 
-
-
 RDVQ 的核心设计在于将传统 VQ 压缩中的**硬重建/编码路径**与一个新增的**软率估计路径**解耦，从而在保持推理时标准硬量化流程不变的前提下，恢复从率损失到编码器的梯度通路，实现端到端的率失真联合优化。
 
 ### 双通路架构
@@ -156,15 +150,8 @@ RDVQ 的梯度流设计是其可端到端优化的关键。在硬量化路径（
 
 整体训练目标为标准的率失真拉格朗日函数 $\mathcal{L} = \lambda R + D(\mathbf{x}, \hat{\mathbf{x}})$，其中率项 $\mathcal{L}_R = \mathrm{CE}(p_{\text{soft}}, q_\psi)$ 采用软分布与熵模型预测的交叉熵，失真项 $\mathcal{L}_D$ 则由码本损失、MSE、LPIPS 和 GAN 损失加权组合构成。通过调节 $\lambda$，可以在不同码率区间实现灵活的率失真权衡。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2051_https_arxiv_org_abs_2604_10546/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of RDVQ. The analysis transform*
-
-![[assets/figures/papers/paper_list_l2051_https_arxiv_org_abs_2604_10546/figures/001_Figure_1.jpg]]
-*Figure 1: Gradient-based rate control in VQ compression is challenging due to non-differentiable indices*
-
-
 
 ### 率失真优化框架
 
@@ -242,21 +229,11 @@ $\mathcal{L}_{\mathrm{codebook}}$ 为码本学习损失（commitment loss），$
 
 推理阶段，熵模型 $q_{\psi}$ 扮演双重角色：既用于算术编码/解码离散索引序列，也支持通过前缀传输实现无重训练的测试时码率控制——仅传输索引序列的前缀部分，剩余索引由熵模型自回归预测补全。该机制的有效操作范围受限于训练分布内的前缀比例。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2051_https_arxiv_org_abs_2604_10546/figures/003_Figure_3.jpg]]
-*Figure 3: Dependency-aware ordering for autoregressive entropy modeling. Scale-wise spatial orders are defined within each scale and concatenated into a unified order vector*
-
-![[assets/figures/papers/paper_list_l2051_https_arxiv_org_abs_2604_10546/figures/008_Figure_8.jpg]]
-*Figure 8: Codebook usage becomes more concentrated under stronger rate constraints*
-
 ![[assets/figures/papers/paper_list_l2051_https_arxiv_org_abs_2604_10546/figures/010_Figure_9.jpg]]
 *Figure 9: Test-time rate adjustment via prefix transmission. Left: Rate–distortion curves on Kodak. Right: Visual comparisons at similar bitrates (Bpp / DISTS). RDVQ-Adj maintains competitive performance with gradual degradation, while AE-Entropy and Zero-padding suffer from more noticeable artifacts*
 
 ![[assets/figures/papers/paper_list_l2051_https_arxiv_org_abs_2604_10546/figures/011_Figure_10.jpg]]
 *Figure 10: PCA visualization of the largest-scale encoder features under different compression ratios. As the bitrate decreases, the features become progressively smoother, with high-frequency details suppressed*
-
-
 
 ## 实验与关键发现
 
@@ -288,27 +265,14 @@ RDVQ的自回归熵模型赋予了无需重训练的测试时码率调整能力�
 
 补充实验揭示了两个对性能有显著影响的训练策略。首先，分段调整温度参数$\\tau$和率权重$\\lambda$的策略在极低码率下优于固定锐利松弛（图S2），这是因为不同码率区间对软分布的锐度要求不同——过低码率时过于锐利的松弛会削弱梯度信号。其次，从ImageNet到OpenImage再到DF2K的高分辨率逐步微调策略显著提升了DIV2K重建质量（图S1），证明了跨分辨率适配对生成式压缩泛化的重要性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2051_https_arxiv_org_abs_2604_10546/figures/009_Table_1.jpg]]
 *Table 1: Quantitative comparison of ablation variants on DIV2Kval. Lower DISTS, LPIPS, FID indicate better perceptual quality*
-
-![[assets/figures/papers/paper_list_l2051_https_arxiv_org_abs_2604_10546/figures/004_Figure_4.jpg]]
-*Figure 4: Rate-distortion curves on the Kodak, the DIV2k-val and the CLIC2020-test datasets*
 
 ![[assets/figures/papers/paper_list_l2051_https_arxiv_org_abs_2604_10546/figures/006_Figure_6.jpg]]
 *Figure 6: Model efficiency comparison on DIV2K [1]. RDVQ achieves the best BD-DISTS with less than 20% of the parameters of most baselines, while maintaining competitive latency*
 
-![[assets/figures/papers/paper_list_l2051_https_arxiv_org_abs_2604_10546/figures/005_Figure_5.jpg]]
-*Figure 5: Visual examples on the CLIC2020 test set. Zoom in for better view*
-
 ![[assets/figures/papers/paper_list_l2051_https_arxiv_org_abs_2604_10546/figures/014_Table_S.1.jpg]]
 *Table S.1: Comparison with additional VQ-based methods on the Kodak dataset in terms of BD-DISTS. Lower is better*
-
-![[assets/figures/papers/paper_list_l2051_https_arxiv_org_abs_2604_10546/figures/013_Figure_S.2.jpg]]
-*Figure S.2: Effectiveness of piecewise strategy (evaluated on Div2K validation set)*
-
-
 
 ## 定位与知识库关联
 
@@ -357,8 +321,6 @@ RDVQ 的设计在以下范围内经过验证，超出这些边界时性能可能
 3. **自回归熵模型的增强**：当前的依赖感知排序（Figure 3）基于固定的粗到细尺度顺序。能否引入上下文感知或后验校正方法，提升前缀补全质量并扩大有效比特率操作范围？
 4. **与预训练基础模型的协同**：RDVQ 以不到多数基线 20% 的参数量（Figure 6）取得了领先的感知质量，且仅使用 GAN 和 LPIPS 损失从零训练。在与大规模预训练模型（如 ViT、扩散模型）结合时，轻量的 VQ-熵架构能否提供互补增益，避免冗余参数？
 5. **下游任务性能评估**：当前评估聚焦于感知质量指标（DISTS, LPIPS, CLIPIQA, FID），缺乏对检测、分割等下游任务性能的系统评估。生成式压缩在感知质量与任务性能之间可能存在鸿沟，需要建立更全面的评估体系。
-
-
 
 ## 原文 PDF
 

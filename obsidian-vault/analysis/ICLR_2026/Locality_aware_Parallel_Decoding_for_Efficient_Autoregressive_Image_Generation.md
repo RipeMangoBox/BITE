@@ -57,8 +57,6 @@ claims:
 
 **方法定位**：LPD属于并行化自回归生成方法，区别于固定区域并行的PAR、随机顺序+位置指令token的RandAR、编码器-解码器交叉注意力的ARPG等方案。其关键差异在于：通过解耦上下文与生成的角色，避免了RandAR中因果掩码将并行生成退化为批量逐token预测的问题，且仅缓存已生成token而不缓存指令token，节省了KV缓存内存。
 
-
-
 自回归（Autoregressive, AR）模型在语言生成领域取得了巨大成功，其核心范式——将联合分布按序列分解为条件概率的乘积——也被自然地迁移到图像生成任务中。标准自回归图像生成将图像编码为离散token序列，并按照固定的光栅顺序（raster order）逐token预测：
 
 $$p ( x _ { 1 } , x _ { 2 } , . . . , x _ { N } ; c ) = \prod _ { n = 1 } ^ { N } p ( x _ { n } | x _ { < n } ; c )$$
@@ -91,8 +89,6 @@ $$p ( x _ { 1 } , x _ { 2 } , \ldots , x _ { N } ; c ) = \prod _ { g = 1 } ^ { G
 1. **灵活并行自回归建模**：将上下文提供与token生成解耦——已生成token仅提供上下文，而可学习的位置查询token（position query tokens）驱动目标位置的并行生成。专用注意力掩码保证并行token间的相互可见性，实现真正的联合预测。
 
 2. **局部感知生成顺序调度**：利用空间局部性，在每一步优先选择靠近已生成token（最大化上下文支持）且远离同组其他token（最小化组内依赖）的位置。这一调度策略使模型在将生成步数从256大幅压缩至20（256×256）的同时，维持与光栅顺序基线相当的图像质量。
-
-
 
 ## 核心方法与创新机理
 
@@ -132,8 +128,6 @@ LPD 的核心创新在于对自回归图像生成的两个关键维度进行了�
 
 - 位置查询 token 引入额外计算开销：在计算受限的大批次推理场景下，加速比从内存受限场景的 ~12 倍下降至约 3 倍（Figure 14）。
 - 生成顺序需根据分辨率和步数预先计算，无法在推理时根据内容动态调整。
-
-
 
 LPD（Locality-aware Parallel Decoding）的整体框架围绕一个核心洞察展开：**将上下文提供与token生成解耦**，从而在保持自回归建模优势的同时实现高度并行解码。该框架由三个关键模块协同工作，形成一条从输入到输出的高效生成流水线。
 
@@ -180,8 +174,6 @@ LPD（Locality-aware Parallel Decoding）的整体框架围绕一个核心洞察
 
 这一架构设计使得LPD在将生成步数从256压缩至20（256×256分辨率）时，仍能保持与光栅顺序基线相当的生成质量（FID 2.10 vs 2.12，Table 1），同时实现约12.9倍的延迟降低。
 
-
-
 ### 标准自回归与分组并行分解
 
 传统自回归图像生成将图像token序列 $\{x_1, x_2, \ldots, x_N\}$ 的联合分布按光栅顺序分解为条件概率的乘积：
@@ -221,8 +213,6 @@ $$PTA_{s} = \frac{1}{N} \sum_{i=1}^{N} \frac{\sum_{j} \mathrm{Attention}(T_{i}, 
 2. **低并发邻近性**：同组token彼此远离，以最小化组内依赖。
 
 具体流程：对每个待选位置计算其到已选集合的逆欧氏距离作为邻近性度量；将满足邻近阈值 $\rho$ 且相互间距离超过排斥阈值 $\tau$ 的位置优先入队；当高邻近性池耗尽时，使用最远点采样填充剩余位置。调度结果在推理时直接查表使用，不引入额外延迟。
-
-
 
 ## 实验与关键发现
 
@@ -279,42 +269,20 @@ LPD在多个基准上实现了生成步数的数量级压缩，同时维持甚�
 
 在内存受限的小批次推理场景下（Figure 14），生成步数的减少几乎线性地转化为延迟降低。LPD在相同批次大小下实现比光栅顺序约**12倍**的更高吞吐量。即使在最大可行批次大小下（计算受限场景），LPD仍保持约**3倍**的吞吐量优势。额外的位置查询token引入了计算开销，这是大批次下加速比下降的主要原因。
 
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_h06l9w1clt/figures/021_Figure_14.jpg]]
-*Figure 14: Throughput vs. Batch Size on ImageNet 256×256 Class-Conditional Generation. For LPD, we use 20 generation steps. Raster refers to the traditional fixed-raster-order generation model. We progressively increase the batch size until the process runs out of memory. The throughput values on the y-axis are plotted on a logarithmic scale*
-
 ### 注意力局部性分析：调度策略的动机验证
 
 对**LlamaGen**模型的注意力权重分析（Figure 7）为局部感知调度提供了实证基础：
 - Per-Token Attention（PTA，Equation 3）随空间距离急剧下降，大部分注意力集中在局部邻域内（$s \leq 3$）。
 - 该空间局部性在所有注意力头中一致观察到（Figure 7b），证明图像自回归生成中确实存在强烈的局部依赖模式，支持"靠近已生成token的位置获得更强上下文支持"这一核心假设。
 
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_h06l9w1clt/figures/006_Figure_7.jpg]]
-*Figure 7: Attention Analysis of LLAMAGEN. (a) Attention diminishes with distance (b) Spatial locality is consistently observed in all heads*
-
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_h06l9w1clt/figures/002_Figure_2.jpg]]
 *Figure 2: Visualization of attention maps in the LLAMAGEN-1.4B model. There is strong spatial locality, as the attention of a decoding token is concentrated on nearby spatial tokens. LLAMAGEN encodes images into 24 × 24 tokens, where a token that is 24 positions earlier in the attention map corresponds to the token directly above it in the 2D grid*
-
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_h06l9w1clt/figures/003_Figure_3.jpg]]
-*Figure 3: Raster Order vs. Flexible Parallelized Autoregressive Modeling. (a) In raster order, each token simultaneously provides context and predicts the next token, restricting flexibility and efficiency. (b) Our approach decouples these roles: previously generated tokens supply context, while position query tokens drive parallel generation at arbitrary target positions. This separation enables both flexible order and efficient parallelization*
-
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_h06l9w1clt/figures/004_Figure_4.jpg]]
-*Figure 4: Illustration of the training attention mask. Context Attention allows subsequent tokens to attend to the context tokens causally. Query Attention ensures mutual visibility among the position query tokens within the same step, and prevents any subsequent tokens from attending to the query tokens. For example, image token 4 can be attended to by all subsequent tokens, including image tokens and position query tokens, to provide context information. The two position query tokens P3 and P5 in the same generation step attend to the condition, to the image token 4, and to each other, while ignoring the earlier query P4*
 
 ![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_h06l9w1clt/figures/005_Figure_6.jpg]]
 *Figure 6: Comparison with other methods. (a) Encoder–decoder approaches such as SAR and ARPG generate tokens independently, since query tokens contribute no key–value pairs. (b) Decoderonly methods like RANDAR rely on positional instruction tokens, but the causal mask reduces parallel generation to batched next-token prediction and forces instruction tokens to be cached, doubling memory. (c) In contrast, our method employs a specialized training mask that ensures mutual visibility among concurrently predicted tokens while caching only the generated tokens*
 
 ![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_h06l9w1clt/figures/016_Figure_10.jpg]]
 *Figure 10: More visualization of attention maps in the LLAMAGEN-1.4B model*
-
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_h06l9w1clt/figures/017_Figure_11.jpg]]
-*Figure 11: More visualization of attention maps in the LLAMAGEN-1.4B model*
-
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_h06l9w1clt/figures/019_Figure_13.jpg]]
-*Figure 13: Generation Examples of Our Model. We show 1024×1024 text-to-image generation samples*
-
-
 
 ## 定位与知识库关联
 
@@ -368,8 +336,6 @@ LPD的另一个关键贡献在于**将图像生成中的空间局部性显式建
 4. **极低步数下的质量保障**：当生成步数进一步压缩至8步甚至更少时，如何保证生成质量？当前20步（256×256）和48步（512×512）的设置已接近质量持平边界，更激进的压缩可能需要新的建模策略。
 
 5. **视频生成中的时空局部性**：视频生成中时间维度的局部性（相邻帧的token高度相关）是否可以利用类似的调度策略？时空联合的局部性感知调度可能成为视频自回归生成加速的关键。
-
-
 
 ## 原文 PDF
 

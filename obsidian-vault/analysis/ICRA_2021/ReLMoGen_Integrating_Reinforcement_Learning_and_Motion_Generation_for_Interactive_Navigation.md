@@ -49,15 +49,11 @@ claims:
 
 在七项涵盖导航、桌面操作、交互式导航和移动操作的仿真任务上，ReLMoGen 均取得了最高或与最优基线持平的任务完成度，且所需的梯度更新步数比基线少一个数量级，平均训练速度提升约 **7 倍**。更重要的是，训练时使用 RRT-Connect 的策略在测试时切换为 Lazy PRM 后性能几乎无下降，表明学到的子目标策略对底层运动生成器的变化具有鲁棒性。该方法仅依赖模拟传感器信号，未使用环境真值，为后续的 Sim2Real 迁移保留了可行性。
 
-
-
 移动操控（Mobile Manipulation）要求机器人在大范围环境中完成导航、避障和物体交互等复合任务。这类任务通常由导航和操作两个子阶段交替构成，时间跨度长、奖励信号稀疏。若直接在关节空间输出速度或扭矩等底层控制量进行强化学习（RL），智能体面临严重的探索困难：高维连续动作空间中，随机探索几乎不可能偶然完成“导航至门前→推动门→穿过门”这类长序列行为，导致训练不稳定或收敛至次优策略。
 
 现有端到端RL方法（如SAC、OAC）在关节空间操作，需要同时学习碰撞避免、精确控制和任务决策，样本效率极低。分层强化学习（HRL）虽然通过高层子目标与底层策略的分离提供了时间抽象，但其底层策略仍需从头学习控制技能，训练难度和样本消耗依然显著。因此，核心瓶颈在于：**如何在不牺牲探索效率的前提下，让RL策略聚焦于高层任务决策，而将底层安全运动执行交给可靠的非学习模块**。
 
 ReLMoGen的动机正是基于这一观察：经典运动规划与控制方法（如基于采样的RRT-Connect规划器）已能在已知环境模型下高效、安全地生成无碰撞轨迹。将这些成熟能力作为“运动生成器”（Motion Generator, MG）嵌入RL环路，将动作空间从关节速度提升为运动生成器的子目标（如基座的2D目标位姿、臂部末端执行器的3D目标位置），可以使RL策略仅需学习“往哪里移动/交互”，而将“如何无碰撞地移动”完全外包给运动生成器。这一设计从根本上改变了探索的粒度——策略每一步跨越的不再是微小的关节增量，而是一段完整的无碰撞运动轨迹，从而显著提升探索效率、样本效率和训练速度。
-
-
 
 ## 核心方法与创新机理
 
@@ -91,8 +87,6 @@ ReLMoGen 形成清晰的分层控制器：
 - **样本效率与训练速度**：ReLMoGen 所需的梯度更新步数比基线少一个数量级，平均训练速度提升约 7 倍。
 - **对底层变化的鲁棒性**：训练时使用 RRT-Connect 的策略，在测试时切换为 Lazy PRM，任务成功率几乎无下降（Table II），表明学到的子目标策略不依赖于特定运动生成器的实现细节。
 
-
-
 ReLMoGen 的核心设计是将经典运动生成（Motion Generation）作为不可抢占的子程序嵌入强化学习闭环，从而将原始 POMDP 中的底层关节控制问题提升为子目标预测问题。整个框架由两个关键模块串联构成：**子目标生成策略（Subgoal Generation Policy, SGP）** 与 **运动生成器（Motion Generator, MG）**。
 
 ### 模块关系与数据流
@@ -115,12 +109,8 @@ ReLMoGen 的核心设计是将经典运动生成（Motion Generation）作为不
 
 论文明确提到当前仅实现了参数化“推动”交互，框架虽支持扩展到抓取、拉拽等其他原语，但尚未给出实现与验证。此外，运动生成器依赖实时传感器数据构建局部模型，在真实机器人部署中感知噪声和动力学差异的影响未经验证，相关结论均基于仿真环境。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l37_https_arxiv_org_abs_2008_07792/figures/002_Figure_2.jpg]]
 *Figure 2: Two types of action parameterization of ReLMoGen and network architecture of SGP-D and SGP-R. (b) TabletopReachM (c) Push/ButtonDoorNav*
-
-
 
 ### 1. 问题形式化：基础POMDP与提升后的动作空间
 
@@ -155,8 +145,6 @@ ReLMoGen 由两个核心模块构成分层控制架构：
 - **臂部运动生成器**：接收末端执行器目标位置或推动参数，规划并执行机械臂运动轨迹。
 
 这一分层设计的关键在于：运动生成器是**预定义的经典规划与控制方案**，而非需要学习的策略。这使得子目标策略的训练避开了底层控制的探索困难，同时保留了运动生成器带来的安全性与可靠性保证。
-
-
 
 ## 实验与关键发现
 
@@ -198,42 +186,20 @@ SAC和OAC在关节空间操作的失败并非源于算法本身的缺陷，而�
 
 HRL4IN虽然采用了分层结构，但其底层策略仍需从头学习控制，因此继承了端到端RL的探索困难。相比之下，ReLMoGen的底层运动生成器是预定义的经典方法，无需学习即可提供无碰撞的轨迹执行，使得高层RL只需专注于“往哪里去”的战略决策。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l37_https_arxiv_org_abs_2008_07792/figures/003_Figure_3.jpg]]
-*Figure 3: (f) ArrangeChairMM Fig. 3: The simulation environments and tasks. (a)(b) navigationonly and manipulation-only tasks, (c)(d) three Interactive Navigation tasks, (e)(f) two Mobile Manipulation tasks*
-
 ![[assets/figures/papers/paper_list_l37_https_arxiv_org_abs_2008_07792/figures/004_Figure_4.jpg]]
 *Figure 4: (g) ArrangeChairMM Fig. 4: Training curves for ReLMoGen and the baselines (SAC, OAC, and HRL4IN). ReLMoGen achieves higher reward with the same number of environment episodes and higher task completion for all seven tasks while the baselines often converge to sub-optimal solutions. The curve indicates the mean and standard deviation of the return across three random seeds. Note that the x-axis indicates environment episodes rather than steps to allow for a fair comparison between solutions that use actions with different time horizons*
 
 ![[assets/figures/papers/paper_list_l37_https_arxiv_org_abs_2008_07792/figures/005_Table.jpg]]
 *Table: I: Task completion metrics for two version of ReLMoGen, one using DQN with discrete subgoal parameterization (ReLMoGen-D) and one using SAC with continous subgoal parameterization (ReLMoGen-R). We compare with two baselines (see Sec. IV-A). The entries of this table are in the format of mean/std/max over 3 random seeds and the method with the highest mean value is highlighted in bold. (a) PushDoorNav Task (b) ArrangeKitchenMM Task TABLE II: Our policy trained with RRT-Connect as the motion planner for base and arm can perform equally well when changing to Lazy PRM at test time (the first row shows the training setup)*
 
-![[assets/figures/papers/paper_list_l37_https_arxiv_org_abs_2008_07792/figures/006_Figure_5.jpg]]
-*Figure 5: (b) Cartesian Space (c) Interaction map Fig. 5: Exploration of ReLMoGen-R and SAC. (a) shows the 2D projection of latent state space: SAC traverses nearby states with low-level actions, while ReLMoGen-R jumps between distant states linked by a motion plan. (b) shows the physical locations visited by ReLMoGen-R and SAC in 100 episodes: ReLMoGen-R covers a much larger area. (c) shows a top-down map of meaningful interactions (duration ≥1s) during exploration. ReLMoGen-R is able to interact with the environment more than SAC*
-
 ![[assets/figures/papers/paper_list_l37_https_arxiv_org_abs_2008_07792/figures/009_Table.jpg]]
 *Table: A.3: Hyperparameters for SGP-R TABLE A.6: Hyperparameters for iGibson simulator*
-
-![[assets/figures/papers/paper_list_l37_https_arxiv_org_abs_2008_07792/figures/010_Table.jpg]]
-*Table: A.4: Hyperparameters for SGP-D TABLE A.7: Fine-tuning performance for PushDoorNav on a new scene*
-
-![[assets/figures/papers/paper_list_l37_https_arxiv_org_abs_2008_07792/figures/012_Figure.jpg]]
-*Figure: (a) Movo and Fetch (d) (b) Task Success Rate (c) Arm MP Success Rate (e) (g) Fig. A.1: Fine-tuning on the new robot Movo. (a) We choose Movo because it is geometrically similar to Fetch. (b) We show that with only 2 \times 1 0 ^ { 4 } fine-tuning episodes, we can significantly improve the success rate for the new robot. Our Subgoal Generation Policy learns to adapt the subgoals to better accommodate the new embodiment, e.g. setting the base subgoal slightly further away from the door so that the new, longer arm has enough clearance for planning. (c) shows the arm motion planner success rate through the fine-tuning process, as the subgoal generation gets refined, the arm motion planner succe...*
-
-![[assets/figures/papers/paper_list_l37_https_arxiv_org_abs_2008_07792/figures/014_Table.jpg]]
-*Table: (a) TabletopReachM (b) InteractiveObstaclesNav (c) ArrangeChairMM TABLE A.8: This table complements Table II and includes more tasks. Our policy trained with RRT-Connect as the motion planner for base and arm can perform equally well when we change to Lazy PRM at test time (the first row shows the setup used at training)*
 
 ![[assets/figures/papers/paper_list_l37_https_arxiv_org_abs_2008_07792/figures/015_Figure.jpg]]
 *Figure: (i) InteractiveObstaclesNav Fig. A.2: This figure shows visualization of ReLMoGen-D action maps during evaluation. The image pairs contain the input RGB frames on the left and normalized predicted Q-value maps on the right. The predicted Q-value spikes up at image locations that enable useful interactions, e.g. goals, chairs, cabinets, doors, buttons, and obstacles. (a) shows that the agent correctly predicts high Q-value on the goal. (b) and (c) show that the agent learns to push the most suitable part of the chair. (d) shows that the agent prioritizes pushing a drawer that is “more open” than an almost closed cabinet to harvest more reward. Vice versa for (e). (f) and (i) show that the ag...*
 
-![[assets/figures/papers/paper_list_l37_https_arxiv_org_abs_2008_07792/figures/016_Figure.jpg]]
-*Figure: (a) ReLMoGen-R on PushDoorNav (b) ReLMoGen-R on ButtonDoorNav (c) ReLMoGen-D on PushDoorNav (d) ReLMoGen-D on ButtonDoorNav*
-
 ![[assets/figures/papers/paper_list_l37_https_arxiv_org_abs_2008_07792/figures/017_Figure.jpg]]
 *Figure: Fig. A.3: Subgoal distribution during training. The subgoal success rate increases over time, indicating our policy learns to use MG better and set more feasible subgoals as training progresses. The policy is also able to accomplish the task with fewer and fewer subgoals. (a) PushDoorNav (b) ArrangeKitchenMM Fig. A.4: Policy visualization for ReLMoGen. A base subgoal is depicted as a red circle with an arrow on the floor to indicate the desired base position and yaw angle. An arm subgoal is depicted as a yellow ball that indicates the desired end-effector position, and a red arrow that indicates the desired pushing action from that position. For PushDoorNav task, the robot first navigates t...*
-
-
 
 ## 定位与知识库关联
 
@@ -281,8 +247,6 @@ ReLMoGen 的有效性建立在以下假设之上：
 3. 在动态障碍物或半结构化环境中，运动生成器可能频繁失败。策略应如何感知规划器的失败信号并做出适应性调整（如重新规划、切换子目标、或回退至安全状态）？
 4. 当前方法能否扩展至多机器人协作场景或更复杂的长期任务（如跨多个房间的序列化操作）？多智能体场景中运动生成器间的协调与冲突消解是额外的挑战。
 5. 如何进一步提升在高维连续观测/动作空间下的深度探索效率，使乐观探索方法（如 OAC）在机器人任务中真正发挥优势，而非仅依赖动作空间提升来回避探索困难？
-
-
 
 ## 原文 PDF
 

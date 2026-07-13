@@ -59,8 +59,6 @@ claims:
 
 **方法谱系与知识库定位**：本文工作处于**视觉表征学习 × 机器人世界模型**的交叉点。在表征端，它比较了以 **SD3 VAE**（Esser et al., 2024）、**Cosmos**（Agarwal et al., 2025）为代表的重建对齐自编码器与以 **V-JEPA 2.1**（Bardes et al., 2025）、**Web-DINO**（Darcet et al., 2025，改编自 DINOv2）、**SigLIP 2**（Zhai et al., 2024）为代表的语义对齐方法。在世界模型端，它基于动作条件 DiT 转移模型和流匹配训练范式，与近期扩散世界模型（如 Genie、DINO-WM）共享技术基础，但明确聚焦于潜空间选择这一上游决策对下游规划与策略闭环评估的因果效应，填补了该方向的系统性诊断空白。
 
-
-
 ### 机器人世界模型的核心诉求
 
 机器人世界模型旨在从历史观测和动作序列中预测未来的视觉状态，其形式化目标为学习一个动作条件的预测分布：
@@ -84,8 +82,6 @@ $$p ( o_{t+1:t+K} \mid o_{t-H:t}, a_{t-H:t+K-1} )$$
 本文通过严格的变量控制实验来回答这一问题。在保持DiT转移模型架构、动作条件机制、训练数据（BridgeV2）、优化器和训练超参数完全不变的前提下，仅切换不同的冻结预训练编码器及其配套的解码/适配器路径，从而将性能差异直接归因于“潜空间种类”这一个控制变量。这一设计使得对重建对齐家族（VAE、VA-VAE、Cosmos）与语义对齐家族（V-JEPA 2.1、Web-DINO、SigLIP 2）的系统性对比成为可能。
 
 研究从三个维度评估世界模型的效用：(1) 潜空间本身对动作和任务信息的保留能力；(2) 生成视频的视觉质量；(3) 下游策略闭环评估中的任务成功率与行为鲁棒性。这一多维评估框架旨在揭示：当视觉保真度与动作语义保留发生冲突时，哪一个维度对世界模型的实际效用更具决定性。
-
-
 
 ## 核心方法与创新机理
 
@@ -115,8 +111,6 @@ $$p ( o_{t+1:t+K} \mid o_{t-H:t}, a_{t-H:t+K-1} )$$
 ### 方法谱系与知识库定位
 
 本工作位于**语义世界模型**与**潜空间扩散模型**的交叉点。与传统的重建对齐世界模型（如Dreamer系列、基于VAE的扩散世界模型）不同，本文证明预训练的语义视觉表征（来自JEPA、DINO、SigLIP家族）天然保留了动作引起的变化和任务完成信号。与纯语义预测器（如DINO-WM、V-JEPA 2-AC）相比，本文保留了扩散模型的视觉生成能力，同时通过潜空间选择而非架构修改来提升下游任务性能。这一发现对机器人世界模型的设计具有直接的工程指导意义：**潜空间选择应优先考虑动作与任务结构，而非纯粹的像素重建质量**。
-
-
 
 本研究构建了一个动作条件潜扩散世界模型（action-conditioned latent diffusion world model），其核心目标是回答一个根本性问题：**对于机器人世界模型而言，什么样的潜空间是“好”的？** 为此，作者设计了一套高度可控的对比框架——在固定所有其他组件的前提下，仅切换编码器定义的潜空间接口，从而直接归因不同视觉表征对下游规划与策略性能的因果效应。
 
@@ -148,8 +142,6 @@ $$p ( o_{t+1:t+K} \mid o_{t-H:t}, a_{t-H:t+K-1} )$$
 为建立因果推断，作者严格固定了以下因素：DiT 架构、训练数据、历史帧数、动作条件协议、优化器与训练调度。唯一变动的槽位是**编码器选择及配套的解码/适配器路径**。对于高维语义原生变体，通过浅层宽头 DDT 头保持 DiT token 数固定为每帧 256，确保可比的计算量（参见 Table 4）。
 
 这一框架使得“重建 vs. 语义”的对比具有高度可信的因果归因——任何性能差异均可追溯至编码器所定义的潜空间特性，而非架构或训练协议的混杂效应。
-
-
 
 ### 问题形式化
 
@@ -201,12 +193,8 @@ $$\widehat{o}_{t+1:t+K} = \mathrm{Dec}(\tilde{z}_{t+1:t+K})$$
 
 **适配器的双重角色**：适配器在压缩维度的同时，也引入了对细粒度动作信息的潜在损害——语义编码器的原生高维变体在 CEM 动作规划误差和 OOD 鲁棒性上通常优于适配器压缩版本，但在扩散训练的便利性和多数策略指标上适配器版本表现更强。这揭示了压缩与动作信息保留之间的根本张力。
 
-### 补充图表
-
 ![[assets/figures/papers/SemanticWM_2605.06388_ae409282f58b/figures/003_Figure_3.jpg]]
 *Figure 3: Latent space effect overview: each point is a DiT-S world model trained by varying only the encoder and the associated decoder path. (a) Upper-right is favorable. Latent space metrics show that semantic encoders improve action recoverability, task-success separability, and action planning error (CEM) relative to reconstruction-aligned encoders. (b) Lower-right is favorable. Visual utility metrics show that pixel fidelity alone does not explain downstream performance: reconstruction-aligned spaces remain competitive on low-level image quality, while semantic spaces often improve video and motion quality. (c) Upper-right is favorable. Closed-loop evaluations show that semantic spaces generall...*
-
-
 
 ## 实验与关键发现
 
@@ -226,9 +214,6 @@ $$\widehat{o}_{t+1:t+K} = \mathrm{Dec}(\tilde{z}_{t+1:t+K})$$
 *Table 3: Visual realism quality for DiT-S and L. Best and runner-up within each size group*
 
 值得注意的是，**语义编码器在自回归外推中展现出更长的有效预测视野**。在45步滚动期间，语义编码器的SSIM差距增长更慢，PCK覆盖率更高（Figure 9），表明其预测的潜轨迹在更长时序上保持与真实轨迹的结构对齐。
-
-![[assets/figures/papers/SemanticWM_2605.06388_ae409282f58b/figures/016_Figure_9.jpg]]
-*Figure 9: SSIM gap, LPIPS gap, and PCK coverage over 45 rollout steps. While all encoders show a strictly increasing SSIM/LPIPS gap over the full rollout due to compounding errors (each autoregressive step feeds back slightly corrupted predictions as context), semantic latent spaces from SigLIP2, V-JEPA 2.1 and Web-DINO remain particularly competitive when forced to extrapolate beyond the 10-frame horizon length seen during training. Conversely, PCK coverage remains the highest for semantic encoders*
 
 ### 适配器与维度消融：压缩的收益与代价
 
@@ -266,27 +251,8 @@ S-VAE适配器将高维语义潜变量压缩至d=96，显著改善了扩散训�
 ![[assets/figures/papers/SemanticWM_2605.06388_ae409282f58b/figures/004_Table_1.jpg]]
 *Table 1: DiT-S policy and behavioral metrics. Best and runner-up per column. In-distribution (ID) SR and Out-of-Distribution (OOD) SR are calculated on a subset of 10 episodes with InternVL 3.5. Consenus SR and Borda rank aggregate InternVL3.5-14B and Qwen3.6-27B rankings. Interaction quality measures the plausibility of robot-object contact. PCK coverage measures point tracking recall (Appx. C). Muted ± terms show one standard deviation error averaged over episodes*
 
-### 补充图表
-
 ![[assets/figures/papers/SemanticWM_2605.06388_ae409282f58b/figures/011_Table_4.jpg]]
 *Table 4: Architecture size and compute. Adapter-based semantic encoders are marked with ^ { 9 6 } and use the S-VAE adapter with d=96. Native semantic rows do not use adapter in the DiT and use a shallow-wide DDT head. All DiT parameter counts are for DiT-L. Note that the extra DiT parameters are due to the shallow-wide head, which does not contribute much to the depth of the DiT. For DiTs using high-dimensional latents of V-JEPA 2.1, Web-DINO, and SigLIP, decoding uses the adapter’s pixel decoder as the surrogate*
-
-![[assets/figures/papers/SemanticWM_2605.06388_ae409282f58b/figures/019_Table_10.jpg]]
-*Table 10: Policy and behavioral metrics for different DiT sizes: small (S), base (B), and large (L). Best and runner-up within each size group. In-distribution (ID) SR: InternVL3.5 on the 10 episodes shared with OOD evaluations. OOD SR: InternVL3.5 only. Borda rank (lower = better) aggregates InternVL3.5-14B, and Qwen3.6-27B rankings. Muted ± terms show one standard deviation averaged over episode for SR and CEM metrics*
-
-![[assets/figures/papers/SemanticWM_2605.06388_ae409282f58b/figures/021_Table_12.jpg]]
-*Table 12: Uncertainty estimates for policy-facing metrics. Cells show means with 95% bootstrap confidence intervals. VLA SR uses consensus VLM success; OOD SR pools distractor and instruction shifts; CEM is one-step controllability error. Family-level rows compare semantic encoders against reconstruction encoders. Best and runner-up are scoped per column*
-
-![[assets/figures/papers/SemanticWM_2605.06388_ae409282f58b/figures/022_Table_13.jpg]]
-*Table 13: Inverse Dynamics Model action-recovery (Pearson r averaged over action dimensions) for horizons k=1 and k=4. Real = on encoded GT latents (the encoder ceiling); WM = on world-model rollouts. Best and runner-up per column*
-
-![[assets/figures/papers/SemanticWM_2605.06388_ae409282f58b/figures/023_Table_14.jpg]]
-*Table 14: Trajectory success-probe accuracy across DiT sizes. Enc. Acc/AUC is computed on encoded ground-truth latents (the probe ceiling); per-DiT columns are accuracy on world-model rollouts and the absolute Drop from the encoder ceiling (lower is better). Best and runner-up per column. Dashed rule separates VAE-like and SSL encoders*
-
-![[assets/figures/papers/SemanticWM_2605.06388_ae409282f58b/figures/025_Table_15.jpg]]
-*Table 15: DiT-S single-view vs multi-view. Each cell for PSNR and LPIPS shows the WM value with the gap to its encoder’s reconstruction ceiling in parentheses (smaller = closer to ceiling). Best and runner-up per column across all rows; the WM value and gap are highlighted independently. The two adapter pairs (V-JEPA $2 _ { 9 6 } , \mathrm { W e b – D I N O _ { 9 6 } }$ ) only have multi-view data for CEM. Best within each column*
-
-
 
 ## 定位与知识库关联
 
@@ -357,8 +323,6 @@ $$p ( o_{t+1:t+K} \mid o_{t-H:t}, a_{t-H:t+K-1} )$$
 3. **与非扩散语义世界模型的融合**：如何将语义潜空间扩散世界模型与JEPA预测器等非扩散方法结合，实现更高效且更具解释性的规划？这涉及扩散采样的计算成本与语义空间判别效率之间的权衡。
 
 4. **任务感知的表示选择**：不同下游任务（如视觉伺服、力控装配、长序列任务规划）可能偏好不同类型的语义信息。是否存在一种“表示选择策略”，能够根据任务需求动态调整潜空间的使用方式？
-
-
 
 ## 原文 PDF
 

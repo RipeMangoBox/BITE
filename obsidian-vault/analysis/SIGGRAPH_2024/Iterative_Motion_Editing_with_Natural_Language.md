@@ -53,8 +53,6 @@ claims:
 
 **方法定位**：该方法属于**结构化中间表示 + 扩散生成**的技术路线，通过将模糊的自然语言编辑意图映射到预定义的、可精确执行的算子空间，解决了文本到运动编辑的可控性瓶颈。其核心创新不在于扩散模型本身，而在于MEO作为“语言-运动”之间的结构化桥梁，以及LLM程序合成在运动编辑任务中的新颖应用。
 
-
-
 文本驱动的三维人体运动生成近年来取得了显著进展，扩散模型与掩码生成模型已能根据自然语言描述合成逼真的运动序列。然而，这些模型本质上是从文本到运动的“一次性”生成范式：用户提供一个描述性提示，模型输出完整运动。当用户对生成结果不满意、希望进行局部调整时，现有工具几乎无法提供有效的支持。
 
 **核心瓶颈在于编辑控制粒度的缺失。** 直接修改输入文本提示（如将“踢腿”改为“踢得更高”）虽然直观，但文本条件的非结构化特性使得编辑结果不可预测——模型可能完全改变原始运动的结构，而非仅调整目标关节的运动范围。更根本的是，文本提示无法精确表达空间-时间约束（如“在第30帧将右手抬高至头顶”），这使得细粒度的运动编辑难以实现。
@@ -62,8 +60,6 @@ claims:
 现有运动编辑方法面临一个基本的**保真度-结构保持权衡**：基于文本条件扩散的编辑方法（如 **MDM-Edit**，Tevet et al., ICLR 2023）和基于掩码生成模型的方法（如 **MoMask-Edit**，Guo et al., 2023）在用户研究中均表现出编辑保真度（Fidelity）与结构相似度（StrucSim）之间的负相关——高保真度的编辑往往以破坏原始运动结构为代价，反之亦然（见Figure 7）。这一权衡源于这些方法缺乏将编辑意图结构化地注入生成过程的机制。
 
 **本文的动机**正是解决上述矛盾：如何设计一个系统，既能通过自然语言接受编辑指令，又能实现可预测、精确的运动编辑，同时最大程度保留原始运动的结构？作者的核心洞察是：将运动编辑的语义空间约束到一组有限的、预定义的运动编辑算子（Motion Editing Operators, MEOs）上。MEOs将编辑意图形式化为空间约束（如关节目标位置）和时间约束（如动作速度调整），从而在自然语言的灵活性与关键帧编辑的精确性之间建立桥梁。借助大语言模型（LLM）的程序合成能力，系统可将自然语言指令自动翻译为MEO程序，再通过扩散填充模型在约束条件下生成连贯的编辑运动。这一设计使得迭代式、对话式的运动精修成为可能——用户可像“教练”一样逐步指导角色动作的改进（Figure 1）。
-
-
 
 ## 核心方法与创新机理
 
@@ -108,8 +104,6 @@ $$\mathcal{L} = \mathbb{E}_{\mathbf{X}, t} [ \| \mathbf{X} - G(\mathbf{X}_t, \ma
 
 需要指出，MEO 的预定义集合构成了编辑能力的硬边界：系统无法表达超出算子词汇表的编辑意图（如物理动力学层面的“跳得更用力”或风格化调整“更优雅”）。此外，系统依赖准确的运动上下文描述 $E_{ctx}$ 来消解指令歧义，错误或不完整的描述可能导致编辑失败。扩散填充模型在涉及复杂动力学变化时，也可能产生物理不一致的运动。
 
-
-
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2312_11538/figures/002_Figure_2.jpg]]
 *Figure 2: System overview: Our system uses a LLM to translate a natural language editing instruction (??) into source code for a Python program that executes motion editing operations (MEOs). Our MEO execution engine applies MEOs to the source motion by first generating motion constraints (e.g., keyframes, retiming constraints). In the case shown above, E describes a sub-movement that should start at the beginning of the motion and lead to a pose in the future; the engine determines the explicit frame requiring editing. A diffusion-based motion infilling step then produces output motions that embody the desired edit, preserve the original motion when possible, and look realistic. Our system can be us...*
 
@@ -138,8 +132,6 @@ $$\mathcal{L} = \mathbb{E}_{\mathbf{X}, t} [ \| \mathbf{X} - G(\mathbf{X}_t, \ma
 流水线的核心设计在于**编辑空间的离散化**：MEO将空间约束限定为有限的离散方向（如 higher/lower、above/below），而非连续的数值向量。这一设计使得编辑效果与用户预期高度一致，同时降低了LLM程序合成的难度。扩散填充模型则负责处理MEO无法覆盖的连续运动细节，确保输出运动的物理真实感。
 
 Figure 2 展示了完整的系统架构：用户指令经LLM转化为MEO程序，执行引擎生成约束后，扩散模型完成运动填充，最终输出编辑结果。
-
-
 
 ### 系统流水线模块
 
@@ -179,8 +171,6 @@ $$\mathcal{L} = \mathbb{E}_{\mathbf{X}, t} [ \| \mathbf{X} - G(\mathbf{X}_t, \ma
 $$G(\text{input}=\mathbf{M} \odot \mathbf{X} + (1-\mathbf{M}) \odot q(\mathbf{X}_t|\mathbf{X}), \ \text{cond}=\mathbf{M} \odot \mathbf{X}, \ t)$$
 
 其中 $\mathbf{M}$ 为二进制掩码，标记需要保留的上下文帧（值为1）和需要填充的编辑区域（值为0）。输入分支将上下文区域保持为原始运动，编辑区域填充为带噪运动；条件分支仅提供上下文区域的干净运动作为引导信号。
-
-
 
 ## 实验与关键发现
 
@@ -222,15 +212,11 @@ $$G(\text{input}=\mathbf{M} \odot \mathbf{X} + (1-\mathbf{M}) \odot q(\mathbf{X}
 
 4. **关键帧选取的启发式局限**：系统依赖关节极值来确定编辑关键帧，当编辑涉及非极值点的精细调整时，这种启发式策略可能无法准确定位目标帧。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2312_11538/figures/001_Figure.jpg]]
 *Figure: Edit 2: Kick faster! Edit 1: Can you get that kick higher out? Edit 3: After you kick, guard your face with your hands*
 
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2312_11538/figures/006_Figure_6.jpg]]
 *Figure 6: (b) Edit: As you jump, kick both legs out to the side. (d) Edit: Synchronize your arms. Figure 6: Handling natural-language instructions. Starting from a source motion (left column, in purple) and editing instruction (italicized), our system produces plausible motions (right column, blue) that preserve the structure of the original motion and abide by the editing instruction*
-
-
 
 ## 定位与知识库关联
 
@@ -279,8 +265,6 @@ $$G(\text{input}=\mathbf{M} \odot \mathbf{X} + (1-\mathbf{M}) \odot q(\mathbf{X}
 3. **关键帧选取的智能化**：当前系统依赖关节位置极值选取关键帧，这在复杂运动（如多关节协调动作）中可能不够鲁棒。更智能的运动理解方法（如基于相位的运动分割、基于学习的显著性检测）可能改进关键帧选取质量。
 
 4. **风格化编辑的语义映射**：如何将“更优雅”等抽象风格描述映射为可执行的MEO组合或参数调整？这可能需要学习风格标签与运动特征之间的对应关系，或引入风格迁移技术作为MEO的补充。
-
-
 
 ## 原文 PDF
 

@@ -53,8 +53,6 @@ claims:
 
 在BallPlay-M（5项篮球技能）上，完整方法达到**96.9%的平均技能成功率**，较基线提升43.6个百分点；技能转移成功率从15.1%跃升至**93.8%**。在ParaHome（7项日常交互技能）上，成功率从5.5%提升至**100%**。消融实验表明，STF是最关键的组件——移除后成功率骤降至68.67%。方法还展现出对数据噪声的强鲁棒性：在物体位置叠加σ=30mm噪声时仍保持84.9%以上的成功率，而基线完全失效。
 
-
-
 ### 问题背景：物理仿真中交互技能的模仿学习
 
 让物理仿真角色从人类演示中学习复杂的交互技能，是计算机图形学与机器人学中长期存在的挑战。与纯运动技能（如行走、奔跑）不同，交互技能涉及角色与动态物体之间的精细协调——例如运球时手与球的持续接触、倒茶时水壶与茶杯的相对位姿约束、或抓取书本时手指与物体的稳定接触。这类技能的成功执行不仅要求角色自身姿态的准确性，还要求物体状态的精确控制，因此对演示数据的质量和覆盖范围提出了更高要求。
@@ -88,8 +86,6 @@ claims:
 基于这一洞察，本文提出**SkillMimic-V2**框架，核心动机是：**通过显式构造这些潜在轨迹并将其转化为RL训练信号，将稀疏噪声演示转化为覆盖丰富的训练数据，从而学习鲁棒且可泛化的交互技能**。具体而言，框架通过拼接轨迹图（STG）发现技能间的潜在转移、通过状态转移场（STF）为邻域内的任意状态建立唯一的定向连接、通过自适应轨迹采样（ATS）动态调节训练难度以解决链断裂问题，并通过预训练的历史编码器（HE）赋予策略记忆依赖行为的能力。
 
 这一方法在BallPlay-M（5项篮球技能）和ParaHome（7项日常交互技能）两个基准上进行了验证：完整方法在BallPlay-M上达到96.9%的平均技能成功率（基线53.3%），技能转移成功率从15.1%提升至93.8%；在ParaHome上平均成功率从5.5%提升至100%。这些结果表明，通过数据增强和结构化探索，从稀疏噪声演示中学习鲁棒交互技能是可行的。
-
-
 
 ## 核心方法与创新机理
 
@@ -130,8 +126,6 @@ $$ \mathbf{h}_t = \theta(\mathbf{s}_{t-k}, ..., \mathbf{s}_{t-1}), \quad \mathbf
 上述四个组件并非孤立工作，而是形成递进式协同：STG 在技能层面发现潜在转移，STF 在状态层面建立结构化连接，ATS 在采样层面聚焦困难样本，HE 在表征层面赋予策略时序推理能力。完整的 SkillMimic-V2（SM+STG+STF+ATS+HE）在 BallPlay-M 上达到 96.94% SR 和 93.80% TSR，在 ParaHome 上达到 100% SR——而基线 SkillMimic 在相同任务上分别为 53.3% 和 5.5%（Table 1, Table 2）。
 
 在数据噪声鲁棒性方面，当物体位置叠加 $\sigma=30$mm 噪声时，SkillMimic-V2 仍保持 84.9% 以上的 SR，而基线在相同条件下完全失效（Table 4），进一步验证了结构化数据增强策略对噪声的固有容忍度。
-
-
 
 SkillMimic-V2 的整体框架围绕一个核心洞察构建：**尽管演示数据有限且噪声显著，物理世界中存在无数可行轨迹，可以自然桥接不同技能或从演示邻域涌现，形成连续的技能变化和转移空间**。通过显式构造这些轨迹并指导强化学习训练，可以将噪声演示转化为覆盖丰富的训练信号。
 
@@ -174,13 +168,6 @@ $$r_t = S(s_{t+1}, \hat{s}_{t+1}) = r_t^b \cdot r_t^o \cdot r_t^{\text{rel}} \cd
 ### 数据流总览
 
 稀疏演示片段 → **STG** 拼接跨技能转移路径 → **STF** 在邻域内建立状态级定向连接 → **ATS** 按难度加权采样轨迹片段 → **HE** 提供历史嵌入 → **RLID (PPO)** 训练统一技能策略。整个流程在单块 NVIDIA RTX 4090 GPU 上运行，使用 2048 个并行环境，训练约需 24 小时（>1.3B 样本）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1806_SkillMimic_v2_Learning_Robust_and_Generalizable_Interaction_Skills_from/figures/003_Figure_3.jpg]]
-*Figure 3: Given sparse demonstrations (e.g., two short trajectories of Shot and Dribble), there exist infinite valid but uncaptured trajectories that can either bridge between them or emerge from their neighboring states (illustrated by question marks). Our method uncovers these potential trajectories via three key steps: (1) construct a Stitched Trajectory Graph (STG) to identify possible transitions, (2) expand STG into a State Transition Field (STF) that establishes connections for arbitrary states within the demonstration neighborhood, and (3) learn a skill policy via Adaptive Trajectory Sampling (ATS) and Reinforcement Learning from Interaction Demonstrations (RLID). This enables robust skill tr...*
-
-
 
 ### 3.1 问题形式化与RLID基础
 
@@ -235,8 +222,6 @@ $$\mathbf{h}_t = \theta(\mathbf{s}_{t-k}, ..., \mathbf{s}_{t-1})$$
 $$\mathbf{a}_t \sim \pi(\cdot | \mathbf{c}, \mathbf{s}_t, \mathbf{h}_t)$$
 
 编码器预训练后冻结，嵌入维度仅为3，在提供记忆能力的同时避免维度爆炸。消融实验表明HE对Layup等技能的成功率提升至关重要。
-
-
 
 ## 实验与关键发现
 
@@ -309,27 +294,8 @@ Table 3 在 BallPlay-M 上系统消融了各组件（以 SM+ε-NSI 为基础，�
 ![[assets/figures/papers/paper_list_l1806_SkillMimic_v2_Learning_Robust_and_Generalizable_Interaction_Skills_from/figures/005_Figure_4.jpg]]
 *Figure 4: Qualitative comparison on BallPlay-M. Blue trajectories in (a,b) indicate executions beyond the reference Layup data length. In*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1806_SkillMimic_v2_Learning_Robust_and_Generalizable_Interaction_Skills_from/figures/006_Table_1.jpg]]
 *Table 1: Quantitative comparison on BallPlay-M. The neighborhood range ?? for ??NSR test is consistent with training settings*
-
-![[assets/figures/papers/paper_list_l1806_SkillMimic_v2_Learning_Robust_and_Generalizable_Interaction_Skills_from/figures/007_Table_2.jpg]]
-*Table 2: Quantitative comparison on ParaHome. The neighborhood range ?? for ??NSR test is object-centric*
-
-![[assets/figures/papers/paper_list_l1806_SkillMimic_v2_Learning_Robust_and_Generalizable_Interaction_Skills_from/figures/011_Table_4.jpg]]
-*Table 4: Performance under different levels of data noise*
-
-![[assets/figures/papers/paper_list_l1806_SkillMimic_v2_Learning_Robust_and_Generalizable_Interaction_Skills_from/figures/012_Table_5.jpg]]
-*Table 5: Performance under different data amounts of ball pickup*
-
-![[assets/figures/papers/paper_list_l1806_SkillMimic_v2_Learning_Robust_and_Generalizable_Interaction_Skills_from/figures/014_Table_7.jpg]]
-*Table 7: More Comparisons*
-
-![[assets/figures/papers/paper_list_l1806_SkillMimic_v2_Learning_Robust_and_Generalizable_Interaction_Skills_from/figures/013_Table_6.jpg]]
-*Table 6: Quantitative comparison on locomotion skills*
-
-
 
 ## 定位与知识库关联
 
@@ -410,8 +376,6 @@ SkillMimic-V2 的核心洞察在于：**尽管演示数据有限且噪声显著�
 3. **真实机器人数据的适配**：在实时动态变化或高噪声的真实机器人数据中，数据增强和转移场构建规则需要如何调整？当前方法依赖物理模拟器的精确状态访问，这在真实场景中难以保证。
 
 4. **拼接轨迹的质量提升**：是否可以通过更智能的掩码策略或图结构学习进一步提高拼接轨迹的质量？当前掩码状态数量由相似度启发式决定 $N = \min(-\lfloor \log_{10}(\beta) \rfloor, N_{max})$，可能存在更优的自适应方案。
-
-
 
 ## 原文 PDF
 

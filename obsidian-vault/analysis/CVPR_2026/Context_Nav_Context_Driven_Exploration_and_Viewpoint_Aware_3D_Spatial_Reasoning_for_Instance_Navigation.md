@@ -124,8 +124,6 @@ Context-Nav 采用模块化、免训练的流水线架构，将自由形式的�
 
 整个流水线无需任何任务特定的训练或微调，保证了跨场景和开放词汇的泛化能力。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2635_https_arxiv_org_abs_2603_09506/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the text-goal instance navigation task and our context-driven pipeline. Given a long description that mixes intrinsic attributes (“mainly yellow and green”) with extrinsic context (“located above the cabinet and near the staircase”), the agent explores guided by the context-driven value map and performs viewpoint-aware 3D spatial reasoning. The agent rejects early picture candidates because either the color or nearby context objects do not match, and ultimately exploits the region containing both the cabinet and staircase, where 3D verification confirms that all intrinsic and extrinsic constraints are satisfied*
 
@@ -164,8 +162,6 @@ $$\mathbf{near}: \|c_t - c_r\|_2 \leq d_{\mathrm{near}}, \quad \mathbf{above}: \
 其中 $\varepsilon_m$、$\varepsilon_\theta$、$\varepsilon_z$、$d_{\mathrm{near}}$ 为预设阈值，$b(\tilde{t})$ 表示目标在局部坐标系下的方位角偏差。候选实例被接受的条件是：存在至少一个采样视角 $v^*$，使得 (1) $v^*$ 与每个关系三元组的两个端点位于同一墙体限定的房间内；(2) 所有空间谓词从该视角同时得到满足。这种视角感知的验证机制显式建模了观测视角对空间关系判断的影响，是避免在同类别干扰物前误停的关键设计。
 
 **局部策略模块**采用现成的仅依赖深度的点目标导航策略（Variable Experience Rollout，基于 HM3D 训练），负责将高层决策（探索目标点或验证候选）转化为底层运动控制，无需针对文本目标导航任务进行任何微调。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2635_https_arxiv_org_abs_2603_09506/figures/005_Figure_3.jpg]]
 *Figure 3: Stage-wise qualitative example of context-driven navigation. An episode where the agent must find a dresser described as “located next to the bed” and “a white dresser with a mirror on top”. Early dresser candidate is not selected because context objects are absent; after the bed is detected, the map concentrates around the corresponding room, frontier selection focuses on that area, and a dresser that satisfies both intrinsic attributes and 3D spatial relations with the bed and mirror is finally verified as the goal*
@@ -212,24 +208,8 @@ Table S2 给出了各模块的每次调用延迟。感知与建图模块（包�
 ![[assets/figures/papers/paper_list_l2635_https_arxiv_org_abs_2603_09506/figures/010_Table_S.2.jpg]]
 *Table S.2: Per-call latency (in seconds) of each module*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2635_https_arxiv_org_abs_2603_09506/figures/003_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l2635_https_arxiv_org_abs_2603_09506/figures/006_Table_3.jpg]]
-*Table 3: Ablation of pipeline components on CoIN-Bench Val Seen Synonyms. Replacing value-map–guided frontier ranking with a nearest-frontier heuristic or removing VLM category, attribute, or context verification each degrades SR and SPL*
-
 ![[assets/figures/papers/paper_list_l2635_https_arxiv_org_abs_2603_09506/figures/004_Table_2.jpg]]
 *Table 2: Ablation of similarity backbone and prompt on CoIN-Bench Val Seen Synonyms. We compare BLIP-2 and GOAL-CLIP under different prompt designs (category only, category with intrinsic attributes, and full contextual text)*
-
-![[assets/figures/papers/paper_list_l2635_https_arxiv_org_abs_2603_09506/figures/007_Figure_4.jpg]]
-*Figure 4: Qualitative results across diverse categories and context descriptions. Successful episodes on CoIN-Bench for nine different target categories, showing top-down trajectories and corresponding goal views. The instructions span a wide range of natural language, from captions that only specify extrinsic context to descriptions that combine intrinsic and extrinsic attributes, and from short hints to detailed multi-sentence goals*
-
-![[assets/figures/papers/paper_list_l2635_https_arxiv_org_abs_2603_09506/figures/011_Figure_S.2.jpg]]
-*Figure S.2: Qualitative comparison on CoIN-Bench. Context-Nav trajectories are compared with those of the RL-trained PSL policy and the training-free AIUTA agent on CoIN-Bench episodes featuring multiple same-category distractors. For each text goal, top-down trajectories are overlaid on the floor map: Context-Nav is shown in orange and the baselines in light gray. Insets show the final egocentric view and outcome label for each method: Target indicates that the correct instance is reached within the step budget, Time-out denotes failure to reach any candidate in time, and Distractor indicates that the agent stops at a different instance of the same category. In these examples, Context-Nav co...*
-
-![[assets/figures/papers/paper_list_l2635_https_arxiv_org_abs_2603_09506/figures/012_Figure_S.3.jpg]]
-*Figure S.3: Qualitative comparison on InstanceNav. Representative episodes from InstanceNav compare Context-Nav with the RL-trained PSL policy and the training-free UniGoal pipeline. As in Fig. S2, top-down trajectories and final goal views are visualized, drawing Context-Nav in orange and the baselines in light gray. The terminal state is annotated as Target when the correct instance is reached, Distractor when the agent stops at a different instance of the same category, and Off-target when the agent stops at an object from a different category than the described target. These examples highlight that Context-Nav successfully reaches the correct goal instances, whereas PSL and UniGoal o...*
 
 ## 定位与知识库关联
 

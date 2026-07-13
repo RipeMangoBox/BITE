@@ -58,8 +58,6 @@ claims:
 
 **局限性**：坐标量化导致几何细节损失；LLM上下文长度（8k tokens）限制可处理的网格复杂度；纹理、材质等属性尚未纳入统一表示；语言-3D能力的平衡有待优化。
 
-
-
 三维内容创作在游戏、影视、虚拟现实和工业设计中扮演着核心角色，而网格（mesh）作为最通用的三维表示形式，其高效生成一直是计算机图形学与人工智能交叉领域的关键挑战。近年来，大语言模型在文本、代码、图像等多模态任务上展现了强大的生成与理解能力，但在三维网格生成这一模态上，LLM 的能力仍未得到有效释放。
 
 **核心瓶颈在于表示鸿沟。** LLM 本质上是离散序列模型，其输入输出均为 token 序列。将连续的三维几何数据（顶点坐标、面拓扑关系）转换为 LLM 可处理的离散序列，面临三重约束：其一，若引入专用离散 token（如基于 VQ-VAE 的 codebook），则需扩展词汇表并修改分词器，破坏预训练权重的完整性；其二，三维数据的序列化极易导致 token 序列过长，超出 LLM 的上下文窗口限制；其三，从零训练一个能理解三维结构的语言模型需要巨大的计算开销，难以普惠。
@@ -71,8 +69,6 @@ claims:
 基于上述观察，LLaMA-Mesh 提出了一个直接而优雅的方案：**将三维网格表示为 OBJ 纯文本格式，从而在不修改分词器或词汇表的前提下，使预训练 LLM 能够原生地处理和生成网格数据。** 这一选择的核心优势在于：OBJ 是广泛使用的文本化三维格式，其顶点坐标和面定义本身就是可读的数值序列；LLM 无需学习新的模态 token，只需将坐标视为普通数字文本即可。为进一步压缩序列长度，该方法将顶点坐标量化到每轴 64 个 bin，显著减少了 token 数量，使 LLM 能够处理更复杂的网格结构。
 
 在训练策略上，LLaMA-Mesh 构建了包含网格生成、网格理解和通用对话的混合监督微调数据集（比例 4:2:4），在预训练 LLaMA-3.1-8B-Instruct 上进行全参数微调。这一设计旨在激活并强化 LLM 已有的空间知识，同时保持其语言理解与对话能力，最终实现一个既能生成高质量三维网格、又能进行自然语言交互的统一模型。
-
-
 
 ## 核心方法与创新机理
 
@@ -118,8 +114,6 @@ LLaMA-Mesh 的监督微调数据集并非仅包含网格生成任务，而是采
 
 *注：以上局限及开放问题均来自论文自身讨论，定量对比中与Unique3D的比较需注意其中间步骤（通过SDXL从文本生成图像再转换为3D）可能引入额外偏差。*
 
-
-
 ![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2411_09595/figures/001_Figure_1.jpg]]
 *Figure 1: An illustration of our method, LLAMA-MESH, which enables the generation of 3D meshes from human instructions via a conversational interface. Users provide textual prompts, and the model responds with both text and 3D mesh outputs, facilitating interactive 3D content creation. LLAMA-MESH allows large language models to generate and interpret 3D meshes from text directly, seamlessly unifying language and 3D modalities within a single model*
 
@@ -155,8 +149,6 @@ LLaMA-Mesh 的核心设计思路是将三维网格生成任务完全嵌入大语
 3. **输出**：生成的文本可直接解析为 OBJ 文件，渲染为三维网格；同时模型可在同一回复中穿插自然语言解释，实现对话式交互（Figure 1, Figure 7）。
 
 这种设计使 LLaMA-Mesh 成为一个统一的多模态对话系统：用户无需切换工具，即可在同一个界面中完成三维内容创作和语言交流。
-
-
 
 ### 3.1 三维网格的文本表示模块
 
@@ -196,8 +188,6 @@ LLaMA‑Mesh 的核心设计在于将三维网格直接表示为纯文本，从�
 量化后的网格以 OBJ 文本序列表示，直接作为 LLM 的自回归生成目标。训练目标为标准的下一个 token 预测交叉熵损失，无需额外设计。
 
 > **注意**：上述公式为基于论文描述的推导，原文未提供显式公式。量化参数（64 bins）和缩放策略的具体实现细节需参考原文实验部分进一步确认。
-
-
 
 ## 实验与关键发现
 
@@ -255,14 +245,10 @@ LLaMA-Mesh 的核心优势之一在于其训练效率。得益于预训练 LLM �
 
 整体而言，LLaMA-Mesh 的实验验证具有中等偏上的证据强度。训练效率（Table 2）和语言能力保持（Table 3）有明确的定量指标支撑，置信度较高。网格生成质量的评估主要依赖定性对比（Figure 11），缺乏 Chamfer Distance、F-score 等几何度量指标的系统比较，这一点削弱了生成质量声称的客观性。消融实验的缺失也使得我们无法精确归因各设计选择（如量化 bin 数、数据混合比例）的独立贡献。这些缺口为后续工作留下了明确的验证方向。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2411_09595/figures/008_Figure.jpg]]
 *Figure: (a) Mesh generation (rule-based). (b) Mesh understanding (rule-based). (c) Mesh generation (LLM augmented). (d) Mesh understanding (LLM augmented)*
 
 ![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2411_09595/figures/012_Figure.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -313,8 +299,6 @@ LLaMA-Mesh 的有效性依赖于以下关键假设和边界条件：
 5. **网格质量定量评估体系：** 建立包含几何精度（Chamfer Distance、Hausdorff Distance）、拓扑质量（流形性、非流形边数量）、视觉质量（用户研究）的多维度评估基准，以实现与 MeshXL、Unique3D 等方法的公平、可量化比较。
 
 6. **对话交互深度的挖掘：** 当前工作展示了对话式网格生成的基本能力（Figure 1、Figure 7），但交互式编辑、迭代优化、多轮修正等更深层次的对话能力仍有待探索。如何利用 LLM 的指令遵循和上下文学习能力实现网格的逐步精化，是将生成工具推向创作助手的关键一步。
-
-
 
 ## 原文 PDF
 

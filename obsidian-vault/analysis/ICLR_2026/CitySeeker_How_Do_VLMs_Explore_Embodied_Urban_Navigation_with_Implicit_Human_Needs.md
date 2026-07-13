@@ -56,8 +56,6 @@ CitySeeker是一项面向具身城市导航的基准测试，核心挑战在于*
 
 **方法定位**：CitySeeker采用ReAct风格的“观察-思考-行动-反思”循环，智能体在每步独立决策，不依赖持久记忆。BCR策略通过基于置信度的回溯触发（$\bar{s} < 0.75$）、拓扑认知图构建、Neo4j图数据库检索等手段，模拟人类的空间元认知过程，为空间智能研究提供了可操作的干预框架。
 
-
-
 ### 隐性需求：城市导航中被忽视的认知鸿沟
 
 城市导航研究长期聚焦于显式指令——如“前往最近的星巴克”或“左转进入主街”——这类任务的核心是将明确的实体标签与视觉环境对齐。然而，人类日常导航中大量存在另一类更为本质的需求：**隐性需求**（implicit needs）。例如，“我渴了”并不直接指定目标，而是要求导航系统理解“渴”对应便利店、饮水机或自动贩卖机等**功能可供性**（affordance），并结合当前城市环境做出合理选择。这种从抽象需求到具体POI的映射，涉及常识推理、空间认知和文化语境理解，构成了视觉语言导航（Vision-Language Navigation, VLN）中一个尚未被系统探索的认知断层。
@@ -73,8 +71,6 @@ CitySeeker基准的提出正是为了填补这一空白。如图1所示，该基
 初步实验揭示了一个反直觉的发现：**当前最优VLM（Qwen2.5-VL-32B-Instruct）的任务完成率（TCP）仅为21.1%，远低于人类参与者的30.1%**。更值得注意的是，模型的失败模式与人类存在本质差异——人类的主要失败模式为战略性/导航性错误（60.7%），而VLM的主要瓶颈在于**认知性错误**（32.9%的过度推理或推理不足）。这意味着，当前VLMs在城市导航中的短板并非视觉识别能力不足，而是缺乏人类般的**认知地图**（cognitive map）和常识推理机制。模型虽然有完美的记忆潜力，但无法像人类一样形成稳定的空间心理表征，导致路径偏离、重复徘徊和过早终止。
 
 这一诊断将问题焦点从传统的感知-控制流水线转移到了**空间智能**（spatial intelligence）的深层挑战：VLMs能否学习从第一人称视角的街景观察中构建内在的空间信念，并动态更新以支持长距离目标导向导航？CitySeeker的设计正是为了将这一根本问题置于可量化评估的框架之内。
-
-
 
 ## 核心方法与创新机理
 
@@ -124,8 +120,6 @@ BCR策略的组合并非简单加性。组合策略（B2+B3+C1+R3）将Qwen2.5-V
 
 BCR策略本质上是**推理时的启发式补丁**，并未改变VLM自身的空间推理能力。核心因果杠杆——模型是否具备城市生活常识（如功能可供性推理）和鲁棒的空间心理模型——仍未被触及。如何将人类水平的常识推理注入VLM，以及如何实现真正的认知地图式内在空间表征，是CitySeeker揭示的根本性开放问题。
 
-
-
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_hzf23XSDcs/figures/005_Figure_4.jpg]]
 *Figure 4: The CitySeeker Implicit-Need-Driven Embodied Urban Navigation Framework. 4 EVALUATION ON CITYSEEKER*
 
@@ -162,8 +156,6 @@ $$(\Phi_t, a_t, c_t) = \pi_{\Theta}(\mathcal{W}, s_t)$$
 CitySeeker基准包含6,440条轨迹，覆盖全球8个城市区域（包括北京、纽约等），涉及7个认知难度递增的任务类别：Basic POI（基本POI识别）、Brand-Specific（品牌特定导航）、Transit Hub（交通枢纽）、Latent POI（隐性POI映射）、Abstract Demand（抽象需求推理）、Inclusive Infrastructure（无障碍设施）、Semantic Preference（语义偏好）。每条轨迹配有经跨文化共识验证（N=120，平均共识度83.39%）的需求-POI映射真值。
 
 评测指标包括任务完成率（TCP，以距目标50米内为成功）、严格完成率（TCE，精确到达目标节点）、任务完成覆盖率（TCC）、路径长度加权成功率（SPL）和归一化动态时间规整距离（nDTW）等。
-
-
 
 ### 导航任务形式化
 
@@ -225,8 +217,6 @@ $$\phi(a) = \mathbb{I}_{\theta_a \in \Theta_{optimal}} \cdot \cos(\theta_a - \th
 
 **记忆检索**基于Neo4j图数据库实现，包含三种检索模式：拓扑检索沿图结构查询关联节点、空间检索按邻近度召回位置、历史轨迹查找提供当前回合内的短期路径记忆。
 
-
-
 ## 实验与关键发现
 
 ### 评估设置与基线
@@ -284,28 +274,6 @@ CitySeeker基准在8个全球城市区域上构建了6,440条导航轨迹，涵�
 2. **2D地图融合是敏感调节点**：简单地增强全局地图理解反而降低任务完成率，说明正确的空间认知表示形式至关重要。
 3. **BCR策略缓解但远未解决差距**：认知启发式策略能部分提升成功率，但组合优化空间大，且效果受模型基础能力制约。
 4. **失败模式存在质的不同**：人类偏战略性失误，VLM偏认知性失误，指向了常识注入和空间表征学习的根本性研究需求。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_hzf23XSDcs/figures/003_Table_1.jpg]]
-*Table 1: Overview of Vision-Language Navigation datasets*
-
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_hzf23XSDcs/figures/013_Table_4.jpg]]
-*Table 4: Latent POI Navigation Mapping Examples*
-
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_hzf23XSDcs/figures/014_Table_5.jpg]]
-*Table 5: Abstract Demand Navigation Mapping Examples*
-
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_hzf23XSDcs/figures/015_Table_6.jpg]]
-*Table 6: Full Cross-Cultural Consistency Statistics (Part 1). Survey results (N = 120) validating Need-to-POI mappings. SD indicates Cross-Cultural Standard Deviation*
-
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_hzf23XSDcs/figures/016_Table_7.jpg]]
-*Table 7: Full Cross-Cultural Consistency Statistics (Part 2)*
-
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_hzf23XSDcs/figures/017_Table_8.jpg]]
-*Table 8: Navigation Instruction Categories and Examples*
-
-
 
 ## 定位与知识库关联
 
@@ -365,8 +333,6 @@ BCR 策略的有效性存在明确的边界条件：
 3. VLM 能否通过学习获得类似认知地图的内在空间表征，而非依赖外部图结构？这触及空间智能研究的根本问题。
 4. BCR 策略的组合优化空间远未穷尽，如何找到特定场景下的最优策略组合？
 5. 跨城市泛化能力如何提升？语言本地化实验表明语言偏见并非城市间性能差异的主要驱动因素，暗示更深层的视觉和文化因素在起作用。
-
-
 
 ## 原文 PDF
 

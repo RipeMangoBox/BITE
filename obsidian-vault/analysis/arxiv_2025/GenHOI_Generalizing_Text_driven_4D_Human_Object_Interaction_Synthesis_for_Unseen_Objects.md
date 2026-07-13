@@ -82,8 +82,6 @@ GenHOI的差异化优势在于：通过第一阶段在3D HOI数据上学习可�
 
 用户感知研究进一步表明，GenHOI生成的交互运动在自然度和真实性上被持续偏好于现有方法。这些结果共同证实：**通过空间-时间解耦和接触感知条件化，GenHOI有效突破了4D HOI生成中的数据稀缺瓶颈，实现了对未见物体的泛化能力**。
 
-
-
 ### 问题背景
 
 生成真实的人-物交互（Human-Object Interaction, HOI）运动是计算机视觉和图形学中的核心挑战，其应用涵盖虚拟现实、具身智能和动画制作。随着扩散模型在人体运动生成领域的成功，研究者开始探索**文本驱动的4D HOI合成**——即根据自然语言描述，同时生成人体运动序列和物体运动轨迹。然而，这一任务面临两大根本性瓶颈：
@@ -109,8 +107,6 @@ GenHOI的差异化优势在于：通过第一阶段在3D HOI数据上学习可�
 - **空间-时间解耦**：将4D HOI合成分解为两个可管理的子任务——先恢复稀疏的3D HOI关键帧（空间关系），再将其插值为密集的4D序列（时序连贯性）。这一解耦使得第一阶段可以充分利用**大规模3D HOI数据集**（Grab, Behave, Open3DHOI）学习丰富的空间交互模式，从而大幅降低对4D数据的依赖。
 
 - **接触感知条件化**：引入专用的**接触感知编码器**和**交叉注意力融合机制**，从3D HOI关键帧点云中提取精细的接触几何特征，并将其动态注入扩散模型的生成过程。这一设计的核心洞察在于：**精细的接触区域信息是生成真实人-物交互的关键**，而简单的特征拼接或加法嵌入无法有效传递这一信息。
-
-
 
 ## 核心方法与创新机理
 
@@ -155,8 +151,6 @@ GenHOI的两阶段设计本质上是一种数据效率策略：第一阶段在�
 
 GenHOI的核心贡献在于识别出**精细接触几何信息是4D HOI生成的关键瓶颈**，并围绕这一洞察设计了完整的解耦框架：通过Object-AnchorNet利用3D数据学习空间交互、通过接触感知编码器提取接触特征、通过交叉注意力实现动态条件注入。这三个changed slots相互协同，使得模型能够为训练中未见过的物体生成真实、物理合理的人-物交互序列。
 
-
-
 GenHOI 将文本驱动的 4D 人-物交互（HOI）合成分解为空间建模与时序建模两个解耦阶段，以降低对大规模 4D HOI 数据集的依赖。整体流程如 Figure 2 所示：
 
 ![[assets/figures/papers/paper_list_l1681_GenHOI_Generalizing_Text_driven_4D_Human_Object_Interaction_Synthesis_fo/figures/002_Figure_2.jpg]]
@@ -195,13 +189,6 @@ ContactDM（扩散去噪）→ 4D HOI 序列 + 接触标签
 ```
 
 该框架的模块化设计使得各组件可独立训练与验证：Object-AnchorNet 在 3D 数据上预训练后固定，ContactDM 在 4D 数据上训练时直接使用其输出的关键帧作为条件，避免端到端优化对 4D 数据规模的苛刻要求。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1681_GenHOI_Generalizing_Text_driven_4D_Human_Object_Interaction_Synthesis_fo/figures/001_Figure_1.jpg]]
-*Figure 1: GenHOI synthesizes interaction between human and unseen object conditioned on text*
-
-
 
 GenHOI 将文本驱动的 4D HOI 生成解耦为两个阶段：**空间交互关键帧恢复**与**时序运动插值**。其核心模块包括 Object-AnchorNet、Contact-Aware Encoder 和 Contact-Aware HOI Attention，三者协同实现从稀疏关键帧到密集交互序列的生成。
 
@@ -242,12 +229,8 @@ $$\pmb{F}_{\mathrm{fused}} = \mathrm{Softmax}\left(\frac{Q K^T}{\sqrt{d}}\right)
 - **KNN 采样策略**：Contact-Aware Encoder 中对人体点云采用 KNN 采样而非均匀采样。均匀采样导致模型无法收敛（C_F1 从 0.77 降至 0.20），表明接触区域的精细几何信息对交互生成至关重要。
 - **交叉注意力 vs. 加法嵌入**：交叉注意力条件化显著优于加法嵌入融合。加法嵌入的全局特征嵌入 $\check{F} = \frac{1}{T} \sum_{i=1}^{T} F_i$ 丢失了时序特异性，而交叉注意力保留了帧级接触信息的动态注入能力。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1681_GenHOI_Generalizing_Text_driven_4D_Human_Object_Interaction_Synthesis_fo/figures/014_Table_6.jpg]]
 *Table 6: Object-AnchorNet Architecture*
-
-
 
 ## 实验与关键发现
 
@@ -277,16 +260,8 @@ GenHOI 在已见与未见物体场景下均取得最优性能，验证了空间-
 
 为保证公平比较，实验采取了以下措施：将 InterDiff 修改为支持文本条件输入；将 MDM 扩展至 HOI 数据并采用统一的物体几何表示；所有方法在 OMOMO 未见物体划分上使用相同的训练/测试分割；用户研究采用双盲方式，参与者对方法来源不知情。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1681_GenHOI_Generalizing_Text_driven_4D_Human_Object_Interaction_Synthesis_fo/figures/003_Table_1.jpg]]
 *Table 1: Interation synthesis on the seen objects. OMOMO-GT utilizes ground truth object motion as input for OMOMO*
-
-![[assets/figures/papers/paper_list_l1681_GenHOI_Generalizing_Text_driven_4D_Human_Object_Interaction_Synthesis_fo/figures/004_Table_2.jpg]]
-*Table 2: Interation synthesis on the unseen objects of the OMOMO dataset. The best performance is indicated in bold, with the second-best performance being underlined*
-
-![[assets/figures/papers/paper_list_l1681_GenHOI_Generalizing_Text_driven_4D_Human_Object_Interaction_Synthesis_fo/figures/005_Table_3.jpg]]
-*Table 3: Interaction Synthesis on unseen objects of the 3D-FUTURE dataset [7].In OMOMO* method, we generate evaluation conditions by integrating these objects with motion from the test set of the OMOMO dataset, following [22]*
 
 ![[assets/figures/papers/paper_list_l1681_GenHOI_Generalizing_Text_driven_4D_Human_Object_Interaction_Synthesis_fo/figures/012_Table_4.jpg]]
 *Table 4: Comparison of interaction quality for different number of keyframes on OMOMO dataset*
@@ -294,13 +269,8 @@ GenHOI 在已见与未见物体场景下均取得最优性能，验证了空间-
 ![[assets/figures/papers/paper_list_l1681_GenHOI_Generalizing_Text_driven_4D_Human_Object_Interaction_Synthesis_fo/figures/013_Table_5.jpg]]
 *Table 5: Comparison of Conditioning Strategies for 4D HOI Generation on OMOMO dataset*
 
-![[assets/figures/papers/paper_list_l1681_GenHOI_Generalizing_Text_driven_4D_Human_Object_Interaction_Synthesis_fo/figures/011_Figure_5.jpg]]
-*Figure 5: Results of human perceptual studies. The numbers shown in the chart represent the percentage (%) over motion preferences*
-
 ![[assets/figures/papers/paper_list_l1681_GenHOI_Generalizing_Text_driven_4D_Human_Object_Interaction_Synthesis_fo/figures/006_Figure_3.jpg]]
 *Figure 3: Examples of synthetic motions for qualitative evaluation*
-
-
 
 ## 定位与知识库关联
 
@@ -362,8 +332,6 @@ GenHOI的知识增量集中于两个相互协同的设计：
 - 两阶段解耦对长时间序列的时序连贯性是否存在根本性局限？
 
 这些问题构成了该方向的后续研究空间。
-
-
 
 ## 原文 PDF
 

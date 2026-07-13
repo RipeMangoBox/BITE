@@ -53,8 +53,6 @@ UFEval在任务泛化评估中表现突出：在FRA-OOD上，NLG任务准确率�
 
 在方法谱系中，UFEval区别于GPT-4o、Claude-3.5等提示型模型，也与Themis（Hu et al., 2024b）、LLaVA-Critic（Xiong et al., 2024）等单任务微调评估器形成对比——后者仅覆盖有限任务和方面，而UFEval首次实现了跨NLG、IU、IG、ITIG四大任务类型及28个子任务的统一细粒度评估。其局限性主要体现在图像生成评估性能相对有限、对阴暗图像的Harmfulness误判倾向，以及数学推理任务上的薄弱表现。
 
-
-
 ### 问题背景：MLLM-as-a-Judge 的评估瓶颈
 
 随着多模态大语言模型（MLLM）能力的快速提升，如何可靠地评估其输出质量已成为制约模型迭代的关键瓶颈。传统的单一数值评分（如整体质量分）无法揭示模型在具体维度上的优劣，而“MLLM-as-a-Judge”范式——即使用另一个（更强）模型作为评估器——虽然展现出了一定的细粒度评估潜力，但现有方法普遍存在两个根本性缺陷：
@@ -80,8 +78,6 @@ UFEval在任务泛化评估中表现突出：在FRA-OOD上，NLG任务准确率�
 ### 核心洞见：多任务协同带来泛化能力
 
 本文的核心假设是：**评估方面之间存在内在关联，联合学习多个视觉任务和多个评估方面可以产生协同效应**。这种协同效应使得在部分方面上训练的评估器能够泛化到其他相关方面，甚至扩展到训练时完全未见过的任务类型。后续实验将通过任务泛化评估（在 FRA-OOD 上测试）和方面泛化评估（在未见过的 TAs 上测试）来系统验证这一假设。
-
-
 
 ## 核心方法与创新机理
 
@@ -114,8 +110,6 @@ UFEval的泛化能力体现在两个维度：
 
 - **方面泛化**：在完全未见过的任务特定方面（TAs）上，UFEval仍保持高效评估，总体准确率达86.2%（与GPT-4o一致性）和83.2%（与人类一致性）（Table 2）。这得益于多任务联合训练中习得的跨方面判别能力。
 
-
-
 UFEval 的评估流水线由两个核心步骤构成：**方面选择（Aspect Selection）** 与 **评估执行（Evaluating）**，其设计目标是在统一框架下实现对多模态输出的细粒度、可泛化评估。
 
 **方面选择阶段**：给定一个评估任务（包含指令、图像等输入内容及待评估的模型响应），系统首先根据任务属性（属于 NLG、IU、IG 还是 ITIG）和输出模态，从事先构建的层次化方面分类法（aspect taxonomy）中选取适用的评估方面。该分类法由一个根节点“overall”统领，其下分为两个子树——**通用方面（Universal Aspects, UAs）** 和 **任务特定方面（Task-specific Aspects, TAs）**。UAs 跨任务共享（如 Helpfulness、Harmfulness），TAs 则与具体子任务绑定（如 IG 下的 Aesthetics）。方面之间的层次关系通过双向匹配策略（bidirectional matching strategy）自动构建，确保分类法兼具系统性与可扩展性。
@@ -125,8 +119,6 @@ UFEval 的评估流水线由两个核心步骤构成：**方面选择（Aspect S
 UFEval 本身以 **Qwen2-VL-7B-Instruct** 为基座，在 FRABench 数据集上通过监督微调（SFT）训练得到。FRABench 是支撑整个框架的关键数据基础，包含 60.4k 个成对样本，覆盖 28 个子任务，共产生 325k 个细粒度评估标签（由人工标注与 GPT-4o 标注混合生成）。这一数据构造流程与方面分类法的设计共同赋予了 UFEval 对未见任务和未见方面的泛化能力——模型在训练中接触的是部分 UAs 和 TAs 的组合，但联合学习多个视觉任务和多个评估方面所产生的协同效应，使其能够将评估能力迁移到训练时未曾见过的任务-方面组合上。
 
 > **证据强度说明**：上述流水线描述基于 Figure 1 的示意及 Section 3 的方法论阐述，数据规模来自 Section 1 和 Section 3.2.1 的明确声明。方面分类法的构建细节（双向匹配策略、UA/TA 划分）在 Section 3.1.2 中有详细说明，置信度较高。泛化能力的具体实验证据见 Table 2 及相关消融实验，此处仅描述框架设计逻辑，不展开量化结果。
-
-
 
 ### 评估流水线模块
 
@@ -169,8 +161,6 @@ $$L(\theta) = -\mathbb{E}_{(x_0^w,x_0^l)\sim\mathcal{D}_{Gen}, t\sim\mathcal{U}(
 - $\omega(\lambda_t)$ 为信噪比相关的权重函数
 
 该损失通过比较获胜图像和失败图像上的噪声预测误差差异，引导扩散模型生成更符合人类偏好的图像。
-
-
 
 ## 实验与关键发现
 
@@ -239,8 +229,6 @@ Figure 5和Table 5中的多任务变体训练结果揭示了核心机制：**联
 2. **Harmfulness误判**：在判断有害内容时，UFEval对阴暗或阴沉色调的图像存在过度敏感，倾向于将其误判为有害内容。这可能需要更细粒度的方面定义或增加针对性训练数据来解决。
 3. **逻辑推理短板**：在数学推理等需要强逻辑能力的任务上，UFEval表现较差，这反映了当前多模态语言模型在符号推理上的通用局限。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_7WdY3Cojy9/figures/044_Figure_14.jpg]]
 *Figure 14: Comparison of UFEval-72B on FRA-ID and FRA-ID-H. The top shows alignment with GPT-4o using FRA-ID, the bottom shows alignment with human annotators using FRA-ID-H. Each point is the average accuracy (with ties) for an aspect shared across sub-tasks of the same task*
 
@@ -252,26 +240,6 @@ Figure 5和Table 5中的多任务变体训练结果揭示了核心机制：**联
 
 ![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_7WdY3Cojy9/figures/075_Table_57.jpg]]
 *Table 57: Statistics of Aspect-level Correlation*
-
-![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_7WdY3Cojy9/figures/076_Figure_19.jpg]]
-*Figure 19: Heatmap of Kendall’s Tau (τ ) correlations between evaluation aspects across different tasks. (Part 1)*
-
-![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_7WdY3Cojy9/figures/077_Figure_20.jpg]]
-*Figure 20: Heatmap of Kendall’s Tau (τ ) correlations between evaluation aspects across different tasks. (Part 2)*
-
-![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_7WdY3Cojy9/figures/078_Figure_21.jpg]]
-*Figure 21: Heatmap of Kendall’s Tau (τ ) correlations between evaluation aspects across different tasks. (Part 3)*
-
-![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_7WdY3Cojy9/figures/079_Figure_22.jpg]]
-*Figure 22: Heatmap of Kendall’s Tau (τ ) correlations between evaluation aspects across different tasks. (Part 4)*
-
-![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_7WdY3Cojy9/figures/092_Figure.jpg]]
-*Figure: Response 1*
-
-![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_7WdY3Cojy9/figures/094_Figure.jpg]]
-*Figure: 2. My cousin says Mr. Shadow stole her favorite toy" or "My best friend saw Mr. 1. Show scenes of Oliver chasing his shadow and the moment he reclaims the stolen shadows. A boy named Jack had an imaginary friend, Mr. Shadow, who would follow him around wherever he went in school or at home when no one else was watching. At first it didn’t bother Jack much, but soon after that people started talking about their own experiences with Mr. Shadow too! "I don’t believe*
-
-
 
 ## 定位与知识库关联
 
@@ -306,8 +274,6 @@ UFEval 与上述工作的核心差异在于：它是首个以统一模型覆盖 
 - **方面粒度的优化空间**：更细粒度的方面定义或增加针对性训练数据是否能够减少 Harmfulness 误判？当前方面分类法的层次结构是否足够灵活以容纳新的评估维度？
 - **模态扩展的可能性**：UFEval 的方面泛化机制——即通过方面之间的内在关联实现从已知方面到未知方面的迁移——在理论上不依赖特定模态。该框架能否扩展到音频、视频等更多模态的评估任务中？
 - **评估器的自我改进循环**：UFEval 已展示了“评估→构造偏好数据→DPO 训练→模型提升”的闭环。是否存在“用提升后的模型生成更难样本→再训练评估器”的迭代改进路径？这需要进一步实验验证。
-
-
 
 ## 原文 PDF
 

@@ -55,8 +55,6 @@ claims:
 
 方法的主要局限在于精细手-物交互（如捡衣服、擦黑板）仍表现不佳，因其侧重腿部运动约束，尚未纳入全身物理约束。
 
-
-
 从稀疏的上半身追踪信号（如头戴式显示器与手柄的6-DoF位姿）中估计全身人体运动，是VR/AR应用中的核心需求。然而，该任务存在一个根本性的**一对多映射模糊性**：仅凭头部和双手的稀疏观测，下半身运动存在无穷多种可能解。现有方法主要分为两类：基于回归的方法（如**AvatarPoser**）直接映射稀疏信号到全身姿态，但往往产生不真实、不平滑的腿部运动；基于概率生成模型的方法（如**AGRoL**采用normalizing flow，**AvatarJLM**（Zheng et al., ICCV 2023）采用关节级建模）试图建模运动分布，但由于缺乏下半身观测，生成的腿部运动仍常与上半身不协调，且易与3D场景几何发生穿透。
 
 一个关键的观察是：**人体上下半身运动存在内在的周期性协调关系**。如Figure 3所示，从AMASS数据集中随机采样的运动序列，其上、下半身的运动特征在频率、相位和幅值上呈现出显著的对齐模式——相位偏移反映了时间对齐关系，而幅值则对应运动动量。这一观察揭示了从上半身信号推断下半身运动的可行路径：若能有效提取并利用这种周期性对齐特征，就能为稀疏到密集的映射提供强有力的先验约束。
@@ -67,8 +65,6 @@ claims:
 1. **利用预训练运动先验初始化扩散采样**，使生成从符合真实运动分布的非高斯空间开始，而非标准高斯噪声；
 2. **引入场景几何特征与周期性对齐特征**作为条件输入，从空间约束和运动协调两个维度缩小解空间；
 3. **在采样过程中施加场景穿透损失与相位匹配损失**的梯度引导，进一步正则化下半身运动，确保生成结果既场景相容又上下半身协调。
-
-
 
 ## 核心方法与创新机理
 
@@ -92,8 +88,6 @@ $$\ell_{\mathrm{sample}} = \alpha \cdot \ell_{\mathrm{penetration}} + \beta \cdo
 - **相位匹配损失 $\ell_{\mathrm{phase}}$**：计算上半身（手腕）与下半身（骨盆、脚踝）运动相位之间的差异，强制上下半身运动保持协调。消融研究表明，相位匹配损失的有效性高于穿透损失（CIRCLE 上单独使用相位损失 MPJPE 为 19.8，穿透损失为 20.1），这验证了周期性耦合假设的正确性。
 
 通过梯度更新 $\bar{\mathbf{x}}_0^{1:N} \gets \hat{\mathbf{x}}_0^{1:N} - \eta \nabla \ell_{\mathrm{sample}}$，这些物理约束被直接注入到采样轨迹中，使得最终生成的运动既符合场景几何，又保持了上下半身的运动一致性。
-
-
 
 S2Fusion 是一个统一的条件扩散框架，目标是从极稀疏的上半身追踪信号（仅头部与双手的 6-DoF 位姿）和 3D 场景几何中估计全身运动。其核心设计围绕三个瓶颈展开：**稀疏到密集的一对多映射模糊性**、**下半身观测缺失导致的运动不协调**，以及**人-场景交互的物理合理性**。
 
@@ -126,13 +120,6 @@ S2Fusion 是一个统一的条件扩散框架，目标是从极稀疏的上半�
 ### 与基线方法的差异
 
 相较于现有方法，S2Fusion 在三个关键维度上进行了改进：**AvatarPoser** 等回归方法直接映射稀疏信号到全身姿态，缺乏对一对多模糊性的建模；**AGRoL** 等概率生成模型虽能产生多样输出，但未利用场景信息约束解空间；**AvatarJLM** (Zheng et al., ICCV 2023) 等关节级建模方法在下半身估计上仍有较大误差（GIMO Lower PE 132.6 mm vs. S2Fusion 107.9 mm，Table 2）。S2Fusion 通过融合场景、运动先验和周期对齐特征，并在采样过程中施加物理损失引导，系统性地解决了上述局限。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1709_A_Unified_Diffusion_Framework_for_Scene_aware_Human_Motion_Estimation_fr/figures/021_Figure_5.jpg]]
-*Figure 5: The failure cases of our motion generation pipeline*
-
-
 
 S2Fusion 的核心设计围绕三个关键改造展开：**非高斯运动先验初始化**、**多模态条件融合**以及**损失引导的扩散采样**。以下逐一拆解各模块的机理与关键公式。
 
@@ -210,13 +197,6 @@ $$\bar{\mathbf{x}}_0^{1:N} \gets \hat{\mathbf{x}}_0^{1:N} - \eta \nabla_{\hat{\m
 
 消融实验（Table 5/6）表明，相位匹配损失对运动质量的提升大于穿透损失：在 CIRCLE 上，仅用相位损失时 MPJPE 为 19.8 mm，仅用穿透损失时为 20.1 mm，两者联合使用达到最优的 19.2 mm。这验证了“上下半身相位协调”是比“避免穿透”更根本的约束——穿透往往是不合理运动的症状，而非根因。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1709_A_Unified_Diffusion_Framework_for_Scene_aware_Human_Motion_Estimation_fr/figures/003_Figure_3.jpg]]
-*Figure 3: A visualization of the periodic motion features of the upper and lower body extracted from randomly selected motion sequences in AMASS[40]. The phase shift of the sinusoidal functions indicates the time-alignment of the upper and lower body motions, while the amplitude resembles the momentum. It can be shown that the periodic motion features of the upper body are correlated with that of the lower body*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -247,12 +227,6 @@ S2Fusion 在两个基准数据集 **GIMO** 和 **CIRCLE** 上均取得了最优�
 
 为验证各模块的独立贡献，作者在 CIRCLE 和 GIMO 数据集上进行了系统的部件消融实验（Table 3 和 Table 4）。完整模型 S2Fusion 在 CIRCLE 上取得 19.2 mm MPJPE，消融结果如下：
 
-![[assets/figures/papers/paper_list_l1709_A_Unified_Diffusion_Framework_for_Scene_aware_Human_Motion_Estimation_fr/figures/007_Table_3.jpg]]
-*Table 3: Ablation on various components of our model on CIRCLE. MP denotes the pre-trained motion prior, Scene indicates whether the model receives the scene information as an extra input, and PAE denotes the periodic autoencoder*
-
-![[assets/figures/papers/paper_list_l1709_A_Unified_Diffusion_Framework_for_Scene_aware_Human_Motion_Estimation_fr/figures/010_Table_4.jpg]]
-*Table 4: Ablation on various components of our model on GIMO. MP denotes the pre-trained motion prior, Scene indicates whether the model receives the scene information as an extra input, and PAE denotes the periodic autoencoder*
-
 - **场景模态（Scene）**：移除场景输入后，MPJPE 从 19.2 上升至 26.2，性能下降约 **36.5%**。这验证了核心洞察：3D 场景几何信息能够极大缩小稀疏信号到全身运动的一对多映射模糊性，是实现场景感知运动估计的关键。
 - **预训练运动先验（MP）**：将扩散采样的初始分布从预训练 VAE 先验替换为标准高斯噪声后，MPJPE 上升至 21.2。这表明从大规模运动数据集（AMASS）学习的运动先验能够有效规避有限训练数据的问题，提升运动平滑度和估计精度。
 - **周期性自编码器（PAE）**：移除 PAE 提取的时空对齐特征后，MPJPE 上升至 20.8。PAE 通过 FFT 从稀疏追踪信号中提取幅值、频率和相位偏移，并在时域重建平滑的周期性特征，为扩散模型提供了有效的时序先验。
@@ -261,9 +235,6 @@ S2Fusion 在两个基准数据集 **GIMO** 和 **CIRCLE** 上均取得了最优�
 
 ![[assets/figures/papers/paper_list_l1709_A_Unified_Diffusion_Framework_for_Scene_aware_Human_Motion_Estimation_fr/figures/008_Table_5.jpg]]
 *Table 5: Ablation on the effect of our designed loss function during loss-guided sampling on CIRCLE*
-
-![[assets/figures/papers/paper_list_l1709_A_Unified_Diffusion_Framework_for_Scene_aware_Human_Motion_Estimation_fr/figures/009_Table_6.jpg]]
-*Table 6: Ablation on the effect of our designed loss function during loss-guided sampling on GIMO*
 
 - 仅使用**场景穿透损失**时，MPJPE 为 20.1 mm。
 - 仅使用**相位匹配损失**时，MPJPE 为 19.8 mm。
@@ -274,11 +245,6 @@ S2Fusion 在两个基准数据集 **GIMO** 和 **CIRCLE** 上均取得了最优�
 ### 局限性分析
 
 S2Fusion 在精细的手-物交互场景中表现不佳。典型失败案例（Figure 9）显示，对于捡衣服、擦黑板等需要精确手部操作的任务，生成的运动缺乏足够的细节和物理合理性。这一局限源于方法设计侧重于利用场景和相位约束改善腿部运动，未纳入全身物理约束（如接触力、摩擦力等）。作者指出，系统整合更全面的物理合理性约束是未来工作方向。
-
-![[assets/figures/papers/paper_list_l1709_A_Unified_Diffusion_Framework_for_Scene_aware_Human_Motion_Estimation_fr/figures/014_Figure_9.jpg]]
-*Figure 9: The failure cases of our motion generation pipeline*
-
-
 
 ## 定位与知识库关联
 
@@ -336,8 +302,6 @@ S2Fusion 在扩散模型框架下，从三个维度对上述基线进行了系�
 - 损失引导的权重 $\alpha, \beta$ 和步长 $\eta$ 目前为固定超参数，是否可设计自适应调节机制以应对不同场景复杂度？
 
 **注意**：上述局限与开放问题均来自论文自身的讨论和失败案例分析，部分细节（如非周期性动作的泛化性）论文未提供定量实验，需后续工作验证。
-
-
 
 ## 原文 PDF
 

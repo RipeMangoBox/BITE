@@ -56,8 +56,6 @@ claims:
 
 该方法仍存在若干局限：依赖外部光流模型（RAFT）和语义分割模型（YOLOv9），其失效可能影响动态分割与高斯传播精度；主要针对RGB-D输入，深度缺失或噪声大的场景可能影响位姿估计；GMM时变建模假设动态对象的透明度与旋转连续变化，对快速、非连续外观变化的适应能力有限。
 
-
-
 ### 动态SLAM与3D重建的双重困境
 
 同时定位与地图构建（SLAM）是机器人、增强现实和自动驾驶等领域的核心感知技术。近年来，基于3D高斯溅射（3D Gaussian Splatting, 3DGS）的SLAM方法在静态场景中取得了令人瞩目的进展——**MonoGS**（Matsuki et al., CVPR 2024）和**SplaTAM**（Keetha et al., CVPR 2024）等方法实现了高保真的隐式场景重建与精确的相机跟踪。然而，现实世界充斥着动态元素：行走的行人、移动的车辆、摆动的物体。这些动态对象对SLAM系统构成了根本性挑战。
@@ -84,8 +82,6 @@ Flow4DGS-SLAM的提出正是为了突破上述瓶颈。其核心动机可以概�
 3. **保持甚至超越现有方法的精度**：在解决效率和泛化问题的同时，不牺牲跟踪精度与渲染质量。
 
 这三个目标共同指向一个愿景：**让SLAM系统能够在动态世界中，既稳健地定位自身，又完整地重建所见的一切——无论它们是静止的背景，还是运动中的物体。**
-
-
 
 ## 核心方法与创新机理
 
@@ -120,8 +116,6 @@ Flow4DGS-SLAM 的核心创新在于通过**光流先验**重构了动态 SLAM �
 与恒速模型或上一帧位姿的常规初始化不同，Flow4DGS-SLAM 利用相机诱导运动分解估计的 6-DoF 运动进行位姿初始化，形成从粗到精的跟踪管线。这一设计增强了在动态场景中跟踪的收敛鲁棒性，消融实验中移除该初始化（w/o Camera Init.）导致渲染出现明显伪影。
 
 **需要手动验证的点**：GMM 组件数 $K=3$ 的选择依据在现有证据中仅体现为经验设定，缺乏不同 $K$ 值的系统对比实验支撑。此外，光流模型 RAFT 在无纹理区域的失效对动态分割和传播精度的级联影响，在现有消融中未被量化评估。
-
-
 
 Flow4DGS-SLAM 的整体 pipeline 以 RGB-D 视频流作为输入，围绕**光流先验**构建了一条从动态分割、位姿初始化到动态高斯映射的闭环系统。如 Figure 2 所示，系统可分解为四个核心阶段：**预处理**、**相机诱导运动分解**、**跟踪**与**动态映射**。
 
@@ -164,8 +158,6 @@ $$ \mathcal { L } _ { m a p } = \lambda _ { 1 } \mathcal { L } _ { c } + \lambda
 ### 模块间数据流
 
 光流作为贯穿全系统的信号载体：在运动分解中驱动动态分割和位姿初始化，在映射中指导高斯传播和自适应插入。这种设计使得各模块共享同一先验，避免了多源信息融合的冲突，同时将动态分割从类别依赖中解耦，实现了对未知动态对象的泛化能力。
-
-
 
 ### 3.1 相机诱导运动分解模块
 
@@ -261,8 +253,6 @@ $$\mathcal{L}_{map} = \lambda_1 \mathcal{L}_c + \lambda_2 \mathcal{L}_d + \lambd
 
 其中 $\mathcal{L}_c$、$\mathcal{L}_d$ 为颜色和深度渲染损失，$\mathcal{L}_f$ 为光流一致性损失，$\mathcal{L}_m$ 为动态掩码监督损失，$\mathcal{L}_{iso}$ 为各向同性正则项，用于约束高斯的形状。
 
-
-
 ## 实验与关键发现
 
 ### 主结果
@@ -314,19 +304,6 @@ Flow4DGS-SLAM 在 TUM RGB-D 动态序列上同时评估了相机跟踪精度和�
 
 - **GMM 时变建模假设**：GMM 假设动态对象的透明度和旋转随时间连续变化，对于快速、非连续的外观突变（如物体瞬间出现或消失）适应能力有限。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2604_22339/figures/008_Figure.jpg]]
-*Figure: (a) 4DGS-SLAM (b) w/o Motion Decomp. (c) w/o Camera Init. (d) Ours*
-
-![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2604_22339/figures/009_Figure_4.jpg]]
-*Figure 4: Tracking Results on BONN [29] ballon2 (first row) and person_tracking (second row) scenes*
-
-![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2604_22339/figures/001_Figure_1.jpg]]
-*Figure 1: Overview of our results. Our method achieves high-quality renderings with spatially and temporally coherent Gaussian motion*
-
-
-
 ## 定位与知识库关联
 
 ### 一、与动态SLAM基线的定位关系
@@ -372,8 +349,6 @@ Flow4DGS-SLAM 与离线动态3DGS重建方法（如 **SC-GS**，Huang et al., CV
 4. **长期运行的累积误差**：SLAM系统在长期运行中面临累积漂移问题。Flow4DGS-SLAM 的动态高斯表示是否会在长时间序列中出现形变累积？是否需要引入全局优化或回环检测机制？
 
 5. **多动态对象交互**：当前方法将动态区域作为一个整体处理。当场景中存在多个相互遮挡、交互的动态对象时，GMM时变建模和光流传播策略是否需要扩展为多实例感知的形式？
-
-
 
 ## 原文 PDF
 

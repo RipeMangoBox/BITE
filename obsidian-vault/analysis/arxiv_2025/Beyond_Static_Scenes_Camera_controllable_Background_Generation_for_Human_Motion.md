@@ -49,8 +49,6 @@ claims:
 
 实验表明，DynaScene 在所有定量指标上均优于现有竞争方法。消融研究进一步验证了各模块的有效性：加入相机控制使 FVD_I3D 提升 7.7%；背景外推和场景变化分别在 FID 和感知指标上带来增益；两阶段训练策略相比单阶段训练，FID 降低 2.26，FVD_I3D 降低 1.70。
 
-
-
 ### 问题背景
 
 在视频生成与编辑领域，将人体运动无缝嵌入到任意静态场景中是一个具有广泛应用前景的任务，涵盖影视制作、虚拟现实和数字人等方向。该任务的核心挑战在于：给定一段人体前景视频和一张静态场景图像，需要生成与该场景一致、且与前景运动协调的背景视频。
@@ -78,8 +76,6 @@ claims:
 - **两阶段训练策略**：第一阶段在图像层面学习空间关系（背景外推与场景变化），第二阶段在视频层面学习时间一致性。这种分解使模型先掌握“单帧场景理解”，再学习“跨帧运动连贯性”，从而更稳定地收敛。
 
 通过这些设计，DynaScene 旨在实现一个统一框架：既能处理相机移动带来的新区域生成问题，又能保持已有区域的时间一致性，同时确保背景与前景在运动、纹理和光照上的协调。
-
-
 
 ## 核心方法与创新机理
 
@@ -122,8 +118,6 @@ DynaScene 在视频背景生成的方法谱系中占据了“相机可控”这�
 - 模型性能高度依赖前景掩码质量；不准确的掩码会在前景-背景边缘产生伪影，这一鲁棒性问题在论文中仅被定性提及，缺乏定量评估。
 - 自适应背景光照调整（ABIA）被提及为有效组件（Figure 9），但其具体实现细节和消融实验的定量结果在已有证据中覆盖有限，需查阅附录 D 进行验证。
 
-
-
 DynaScene 的整体框架围绕一个核心设计展开：**将相机姿态作为显式控制信号注入视频扩散模型**，使生成的背景运动与前景人体运动及相机运动保持一致。框架接收三类输入：(1) 一张静态场景图像 $I_s$，(2) 一段人体前景帧序列 $\{ I_f^1, ..., I_f^n \}$ 及其对应的前景掩码，(3) 从原始视频中提取的相机姿态。输出为与前景运动同步、且响应相机变化的连贯背景视频。
 
 ### 数据流与模块关系
@@ -161,15 +155,11 @@ $$h^{t} = h_{ori}^{t} \times M + h_{fore}^{t} \times (1 - M)$$
 
 框架的性能高度依赖前景掩码的精度。当掩码边缘不准确时，前景与背景交界处会出现明显伪影或融合不佳。此外，当输入存在冲突信号（如放大的人体前景与缩小的相机姿态），模型可能难以生成合理结果（见图 10）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2504_02004/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of DynaScene framework. The noise latent, foreground mask, and human foreground are concatenated into the denoising U-Net. We employ the CLIP encoder and ReferenceNet to capture both high-level semantic features and fine-grained details from the scene image, respectively. The camera pose is integrated into the Camera Encoder. To enhance the model’s ability to generate coherent textures for newly revealed areas and preserve consistency in previously visible areas, we introduce multi-task learning including background outpainting in Stage I and scene variation across all stages. All tasks are trained on the same U-Net model*
 
 ![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2504_02004/figures/012_Figure_8.jpg]]
 *Figure 8: Pipeline of constructing DynaScene Dateset*
-
-
 
 DynaScene 以 Stable Diffusion 1.5 为基础扩散模型，通过四个关键模块的协同设计实现相机可控的背景生成。整体架构如 Figure 2 所示。
 
@@ -199,9 +189,6 @@ $$\mathcal{L} = \mathbb{E}_{\mathbf{z}_t, c, \epsilon, t} \left( || \epsilon - \
 
 相机编码器负责将 Plücker 嵌入转换为多尺度特征，相机适配器则通过两层线性层将这些特征与去噪网络的特征进行融合（结构细节见 Figure 7）。这种显式相机姿态控制使得背景运动能够与前景运动保持几何一致性，解决了现有方法中背景运动不可控的核心瓶颈。
 
-![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2504_02004/figures/010_Figure_7.jpg]]
-*Figure 7: Details of camera encoder and camera adaptor*
-
 ### 3.4 运动模块
 
 模型集成了来自 **AnimateDiff v2** 的运动模块，将其插入扩散 U-Net 中以引入时间注意力机制。运动模块在帧间建立时序依赖，确保生成的视频背景在时间维度上平滑连续，避免帧间闪烁和不一致。
@@ -217,8 +204,6 @@ $$\mathcal{L} = \mathbb{E}_{\mathbf{z}_t, c, \epsilon, t} \left( || \epsilon - \
 $$h^{t} = h_{ori}^{t} \times M + h_{fore}^{t} \times (1 - M)$$
 
 其中 $h_{ori}^{t}$ 为原始去噪潜变量，$h_{fore}^{t}$ 为前景潜变量，$M$ 为人体前景掩码。该操作确保在去噪的每个时间步 $t$，前景区域保持与原始输入一致，仅背景区域由模型生成，从而消除前景重建质量的差异对比较结果的干扰。
-
-
 
 ## 实验与关键发现
 
@@ -260,26 +245,7 @@ DynaScene 在自建测试集上与两类代表性方法进行了系统对比：�
 
 1. **前景运动与相机姿态冲突**：当人体前景的运动方向或尺度与相机姿态信号产生矛盾时（例如前景人物放大而相机姿态指示缩小），模型难以协调这两种冲突信号，导致生成背景出现不合理的运动或变形（Figure 10）。目前尚缺乏对该冲突容忍极限的量化分析。
 
-![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2504_02004/figures/014_Figure_10.jpg]]
-*Figure 10: Conflicts between human foreground and camera pose*
-
 2. **前景掩码质量敏感**：DynaScene 对输入的人体前景掩码质量高度依赖。当掩码提取不准确时，在前景与背景的边缘区域会出现明显的伪影或融合不佳，直接影响最终生成质量。模型对噪声掩码的鲁棒性仍有提升空间。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2504_02004/figures/011_Table_4.jpg]]
-*Table 4: Comparison of single- and two-stage training strategy*
-
-![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2504_02004/figures/007_Figure_4.jpg]]
-*Figure 4: Analyses of DynaScene w/ and w/o camera control (CC). With CC, background aligns better with the foreground*
-
-![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2504_02004/figures/009_Figure_5.jpg]]
-*Figure 5: Analyses of DynaScene w/ and w/o background outpainting (BO). With BO, artifacts are removed effectively*
-
-![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2504_02004/figures/008_Figure_6.jpg]]
-*Figure 6: Analyses of DynaScene w/ and w/o scene variation (SV ). With SV , the scenery are better-preserved (green box)*
-
-
 
 ## 定位与知识库关联
 
@@ -348,8 +314,6 @@ DynaScene 的技术架构呈现明显的模块化继承特征：
 4. **泛化到非人体前景**：DynaScene 的设计以人体前景为核心假设（使用人体掩码、人体视频数据集）。将其扩展到通用前景对象（动物、车辆等）需要重新审视掩码提取和运动先验的设计。
 
 5. **场景图像与视频背景的语义鸿沟**：当场景图像与视频中实际需要的背景存在语义差异时（如场景图像是客厅但视频中人物走到了厨房区域），模型如何决定何时“忠于场景图像”何时“合理外推”？这涉及到场景理解的更高层次语义推理。
-
-
 
 ## 原文 PDF
 

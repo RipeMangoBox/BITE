@@ -59,15 +59,11 @@ claims:
 
 **主要局限**：深度估计目前仅为物体级文本描述，缺乏像素级深度图，绝对相对误差仍较高（AbsRel ~70%）；模型对透明物体（围栏）和强反射表面（建筑玻璃）容易产生误判；泛化性仅在 PAVE 数据集上验证，对光照、天气等变化的鲁棒性尚不明确。
 
-
-
 视觉-语言模型（Vision-Language Models, VLMs）近年来在图像描述、视觉问答等任务上取得了显著进展。然而，当面向行人导航这一安全关键场景时，现有模型暴露出根本性缺陷：**缺乏像素级接地能力与深度空间推理**。具体而言，主流的大视觉-语言模型（Large Vision-Language Models, LVLMs）仅能在图像级生成描述性文本，无法将语言输出精确绑定到图像中的具体区域，更无法提供物体距离等三维空间信息。这导致两类严重问题——**对象幻觉**（模型提及不存在的物体或错误描述物体属性）和**不可靠的空间理解**（无法判断障碍物的实际距离与可通行性），使得此类模型在行人导航、无障碍辅助等场景中不具备实用安全性。
 
 现有方法对此瓶颈的应对存在明显缺口。一方面，以 **LISA**、**PixelLM**、**GLAMM** 为代表的像素接地LVLM虽然能够根据文本指令生成分割掩码，但它们**不包含深度推理模块**，无法输出距离感知的导航指导。另一方面，**OMG-LLaVA**、**GSVA** 等视觉接地对话模型虽支持区域指代，但其视觉投影器通常采用简单MLP架构，缺乏跨尺度特征聚合能力，导致细粒度空间信息丢失。更关键的是，**零样本基线模型在深度估计任务上完全失败**（Table 1中所有零样本模型的深度指标均为N/A），说明现有LVLM架构本身不具备隐式距离感知能力，必须通过专门设计的结构化输出机制和训练范式才能赋予模型这一能力。
 
 上述缺口直接催生了本文的核心动机：**构建一个能在统一自回归框架内同时完成接地对话、分割掩码预测和物体级深度估计的像素接地LVLM**。这一目标要求模型满足三个关键条件：（1）视觉编码器能够为语言生成和掩码预测提供共享的多尺度特征；（2）文本到视觉的映射必须保持语义一致性，确保 `<SEG>` 令牌能准确定位目标区域；（3）深度信息需以结构化令牌（如 `<distance>`）的形式嵌入语言生成过程，无需额外的密集深度监督。WalkGPT正是围绕这些条件设计，通过 **Multi-Scale Query Projector (MSQP)** 聚合多层级视觉特征、**Calibrated Text Projector (CTP)** 结合区域对齐损失实现精确的语言-视觉映射，以及结构化令牌体系连接分割、深度与语言推理，从而填补了现有LVLM在深度感知接地导航上的空白。
-
-
 
 ## 核心方法与创新机理
 
@@ -107,8 +103,6 @@ $$\mathcal{L}_{\mathrm{total}} = \alpha_1 \mathcal{L}_{\mathrm{CE}} + \alpha_2 \
 
 其中 $\mathcal{L}_{\mathrm{CE}}$ 为自回归语言生成交叉熵损失，$\mathcal{L}_{\mathrm{seg}}$ 为分割损失（Dice + BCE），$\mathcal{L}_{\mathrm{NCE}}$ 为区域对齐对比损失。这种设计使对话生成、像素接地和深度推理在单一自回归过程中相互增强，无需用户提供额外输入即可输出深度感知的接地导航指导。
 
-
-
 WalkGPT 的整体架构围绕“统一像素编码器 + 多尺度视觉聚合 + 校准文本投影 + 结构化令牌生成”这一核心设计展开，将语言对话、分割掩码预测和物体级深度估计整合进单一的自回归生成框架。
 
 ### 架构总览
@@ -136,12 +130,8 @@ $$\mathcal{L}_{\mathrm{total}} = \alpha_1 \mathcal{L}_{\mathrm{CE}} + \alpha_2 \
 
 其中 $\mathcal{L}_{\mathrm{CE}}$ 为标准自回归交叉熵损失，用于接地对话生成；$\mathcal{L}_{\mathrm{seg}}$ 为 Dice + BCE 的组合分割损失，监督掩码预测；$\mathcal{L}_{\mathrm{NCE}}$ 为对比对齐损失，将 CTP 投影嵌入拉向正样本区域嵌入、推远负样本，强化文本-视觉的空间对应关系。三者联合优化使模型在对话质量、分割精度和深度估计三个维度上同步提升。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2184_https_arxiv_org_abs_2603_10703/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of WalkGPT for grounded navigation guidance. (a) Overall framework. (b) The Multi-Scale Query Projector (MSQP), which aggregates multi-level visual features into spatially aligned image tokens for language reasoning. (c) The Calibrated Text Projector (CTP), guided by the proposed Region Alignment Loss, maps \<SEG> tokens into the visual space. Structured tokens (\<SEG>, \<distance>, \<assessment>, \<p>) link language generation with segmentation and depth reasoning*
-
-
 
 WalkGPT 的核心架构围绕三个关键设计展开：**多尺度查询投影器（MSQP）** 实现跨尺度视觉特征聚合、**校准文本投影器（CTP）** 配合区域对齐损失实现精确的语言-视觉接地、以及**结构化令牌**将分割与深度推理统一到自回归生成过程中。
 
@@ -198,8 +188,6 @@ $\mathcal{L}_{\mathrm{seg}}$ 为分割损失，组合 Dice 损失与二元交叉
 
 消融实验（Table 5）表明：移除 `<distance>` 令牌主要损害深度预测（Depth Acc. −10.18），但对分割影响极小（mIoU 仅降 0.15）；冻结 LLM（移除 LoRA）导致所有指标骤降（METEOR −7.81，mIoU −2.36，Depth Acc. −8.74），验证了多模态微调对于接地导航任务的必要性。
 
-
-
 ## 实验与关键发现
 
 ### 4.1 实验设置
@@ -254,8 +242,6 @@ Figure 5和Figure 7展示了WalkGPT的两类典型失败案例：
 
 Figure 4展示了PAVE验证集上的定性输出。WalkGPT能够从单张行人视角图像生成包含<assessment>、<distance>、<SEG>和<p>结构化令牌的接地对话，同时输出分割掩码和深度感知的距离估计。Figure 6进一步展示了非道路场景（不平坦地形、密集植被）下的泛化能力，模型能识别有限的可行走表面并提供相应的可访问性评估。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2184_https_arxiv_org_abs_2603_10703/figures/005_Table_1.jpg]]
 *Table 1: Performance comparison on grounded navigation conversation generation. Models marked with † are zero-shot; “-FT” indicates fine-tuned on PAVE. Depth metrics for zero-shot models are listed as N/A because they fail to produce any depth estimations. Best results are bold-faced*
 
@@ -265,28 +251,11 @@ Figure 4展示了PAVE验证集上的定性输出。WalkGPT能够从单张行人�
 ![[assets/figures/papers/paper_list_l2184_https_arxiv_org_abs_2603_10703/figures/008_Table_5.jpg]]
 *Table 5: Ablation study examining the impact of different design choices in WalkGPT*
 
-![[assets/figures/papers/paper_list_l2184_https_arxiv_org_abs_2603_10703/figures/004_Figure_4.jpg]]
-*Figure 4: Qualitative results of WalkGPT on the PAVE validation set. Given a scene image, WalkGPT generates grounded conversations together with segmentation masks and depth-aware distance estimates, reflecting its understanding of accessibility and spatial context. Additional examples are provided in the Appendix*
-
 ![[assets/figures/papers/paper_list_l2184_https_arxiv_org_abs_2603_10703/figures/010_Table_4.jpg]]
 *Table 4: Comparison of hallucination (CHAIRi) and object coverage (Cover) scores across LVLMs on the PAVE dataset*
 
-![[assets/figures/papers/paper_list_l2184_https_arxiv_org_abs_2603_10703/figures/007_Table_3.jpg]]
-*Table 3: Segmentation performance on PAVE compared with representative vision-only segmentation benchmarks*
-
-![[assets/figures/papers/paper_list_l2184_https_arxiv_org_abs_2603_10703/figures/011_Figure_6.jpg]]
-*Figure 6: Additional qualitative results of WalkGPT on the PAVE validation set for off-road scenes. Examples illustrate the model’s ability to handle unstructured outdoor environments with uneven terrain, dense vegetation, and limited walkable surfaces*
-
 ![[assets/figures/papers/paper_list_l2184_https_arxiv_org_abs_2603_10703/figures/009_Figure_5.jpg]]
 *Figure 5: Failure case study on PAVE. WalkGPT misinterprets strong road reflections on the building fac¸ade as physical obstacles, producing incorrect guidance even though the path itself is fully accessible. Part of the image is blurred for privacy*
-
-![[assets/figures/papers/paper_list_l2184_https_arxiv_org_abs_2603_10703/figures/012_Figure_7.jpg]]
-*Figure 7: Another failure case on PAVE. WalkGPT incorrectly infers that the fenced area provides an open and accessible path, misled by the transparency of the fence and the clear view of the space behind it*
-
-![[assets/figures/papers/paper_list_l2184_https_arxiv_org_abs_2603_10703/figures/014_Figure_9.jpg]]
-*Figure 9: Per-class sample occurrence counts across all semantic categories (including background class 0). The x-axis denotes class IDs and the y-axis indicates the number of samples containing each class*
-
-
 
 ## 定位与知识库关联
 
@@ -330,8 +299,6 @@ WalkGPT 与上述基线的本质差异在于三个技术槽位：
 3. **鲁棒性扩展**：如何通过数据增强（合成反射、透明物体、极端光照）或物理感知预训练，提升模型对透明围栏、镜面反射、低光照等 adversarial 条件的鲁棒性？
 
 4. **安全关键类精度**：针对 stairs、obstacle 等低频但高风险类别，是否需要重采样、焦点损失或类特定评估协议来确保导航指导的安全性？
-
-
 
 ## 原文 PDF
 

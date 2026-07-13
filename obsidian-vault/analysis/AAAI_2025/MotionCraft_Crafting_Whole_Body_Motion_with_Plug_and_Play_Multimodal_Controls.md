@@ -55,8 +55,6 @@ MotionCraft 针对这一瓶颈提出了**两阶段粗到细的即插即用多模
 
 当前方法的主要局限包括：缺乏帧级或细粒度的全身文本描述（尤其在 S2G 和 M2D 任务中只能使用伪文本标注）；SMPL-X 轴角表示中根旋转和根轨迹的 6D 参数影响训练稳定性；模型规模扩展受限于带标注的多模态运动数据量。这些方向为后续研究提供了明确的改进空间。
 
-
-
 ### 问题背景
 
 人体运动生成是计算机视觉与图形学领域的核心问题，涵盖文本到运动（Text-to-Motion, T2M）、语音到手势（Speech-to-Gesture, S2G）和音乐到舞蹈（Music-to-Dance, M2D）等多个子任务。这些任务共享一个共同目标：根据给定的控制信号生成逼真、多样化且语义一致的全身运动序列。然而，现有方法通常将每个子任务视为独立问题，设计专门的模型架构和训练策略，缺乏统一的生成框架。
@@ -99,8 +97,6 @@ Table 1系统对比了MotionCraft与先前方法的能力差异，揭示了现�
 
 **应用动机：** 构建统一的全身运动基准MC-Bench，将所有数据转换为SMPL-X轴角格式，为跨任务运动生成研究提供标准化评估平台，并支持未来新控制模态的灵活扩展。
 
-
-
 ## 核心方法与创新机理
 
 MotionCraft 的核心创新在于**通过可分解的人体拓扑知识实现跨场景运动生成的泛化**，并采用**两阶段粗到细训练策略**解耦不同粒度的控制信号。与现有方法相比，其关键改进体现在以下三个维度的“changed slots”上。
@@ -134,8 +130,6 @@ Stage 2 中，MotionCraft 可选择性地解冻与特定控制信号相关的身
 
 **局限与待验证点**：当前 MC-Attn 中动态拓扑学习是否存在崩溃或错误收敛的失败案例，论文未提供明确分析，需进一步验证。此外，SMPL-X 轴角表示中根旋转和根轨迹的 6D 参数可能影响训练稳定性，作者已将其列为未来改进方向。
 
-
-
 MotionCraft 是一个基于扩散 Transformer 的两阶段、粗到细多模态全身运动生成框架，其核心设计目标是在统一架构下支持文本、语音、音乐等多种控制信号的即插即用式生成。框架的整体信息流如下：
 
 **输入层**：不同任务的控制信号（文本、语音、音乐）首先经过各自的模态编码器提取特征。文本条件由预训练语言模型编码为特征张量 $\mathbf{H}_{text} \in \mathbb{R}^{B \times \check{F}_t \times D_i}$，运动序列经身体部位编码器（Body-wise Encoder）编码为 $\mathbf{H}_{motion} \in \mathbb{R}^{B \times F_m \times D_m}$，其中 $B$ 为批次大小，$F_t$/$F_m$ 为文本/运动长度，$D_i$/$D_m$ 为特征维数。
@@ -155,15 +149,8 @@ MotionCraft 是一个基于扩散 Transformer 的两阶段、粗到细多模态�
 
 **输出层**：经多步扩散去噪后，身体部位解码器（Body-wise Decoder）将特征解码为统一的 SMPL-X 轴角格式全身姿态表示 $\mathbf{m}_i = \{ \dot{r}^r, \dot{r}^t, \theta^r, \mathbf{f}^s, \mathbf{f}^e, \theta^j, \theta^b \}$，包含根旋转、根轨迹、局部关节旋转、面部形状、面部表情、颌旋转及体型参数，实现全身运动的统一生成。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1824_MotionCraft_Crafting_Whole_Body_Motion_with_Plug_and_Play_Multimodal_Con/figures/004_Figure_3.jpg]]
 *Figure 3: Architecture of MotionCraft. MotionCraft is a transformer-based diffusion model. In the first stage, MotionCraft uses text as a semantic control guide to learn coarse-grained cross-scenario motion knowledge across multiple datasets; in the second stage, MotionCraft freezes the backbone while adding a plug-and-play control branch to learn the different low-level control signals. The core of MotionCraft is*
-
-![[assets/figures/papers/paper_list_l1824_MotionCraft_Crafting_Whole_Body_Motion_with_Plug_and_Play_Multimodal_Con/figures/001_Figure_1.jpg]]
-*Figure 1: We propose MotionCraft, a diffusion transformer that crafts whole-body motion with plug-and-play multimodal controls, encompassing robust motion generation abilities including Text-to-Motion, Speech-to-Gesture, and Music-to-Dance*
-
-
 
 ### 全身运动表示
 
@@ -231,13 +218,6 @@ $$
 
 其中 $\mathcal{L}_{rec}$ 为重构损失，$\mathcal{L}_{KL}$ 为 KL 散度，$\mathcal{L}_{E}$ 为跨模态相似度损失，$\mathcal{L}_{NCE}$ 为 InfoNCE 对比损失。该检索模型用于计算 R-Precision 和 MM-Dist 等语义相关性指标。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1824_MotionCraft_Crafting_Whole_Body_Motion_with_Plug_and_Play_Multimodal_Con/figures/003_Figure_2.jpg]]
-*Figure 2: The t-SNE latent space of motion in different generation tasks. It illustrates the motion distribution drifts across different generation scenarios*
-
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与实验设计逻辑
@@ -300,21 +280,11 @@ MotionCraft 的实验设计围绕一个核心观察展开：不同运动生成�
 ![[assets/figures/papers/paper_list_l1824_MotionCraft_Crafting_Whole_Body_Motion_with_Plug_and_Play_Multimodal_Con/figures/011_Table_6.jpg]]
 *Table 6: Additional Ablation Study. we explored the second stage model training strategy about the body-wise encoder (decoder) and motion sequence temporal relationship modeling paradigm. The “Local-Unfreeze” column indicates that during the second phase, only specific body parts corresponding to certain control signals are unfrozen in the body-wise encoder and decoder. For instance, in the Speech-to-Gesture task, only the encoders and decoders for hands and face are unfrozen, while in Music-to-Dance, only the encoder and decoder for the hands are unfrozen. The ”Temporal-Patching” column means performing patching operations on adjacent frames, compressing a specified number of neighboring frames int...*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1824_MotionCraft_Crafting_Whole_Body_Motion_with_Plug_and_Play_Multimodal_Con/figures/008_Table_4.jpg]]
 *Table 4: Ablation Study. (a) Ablation on model design (Upper half). The results suggest that jointly modeling dynamic and static human skeleton topologies significantly improves performance since this provides robust topology knowledge against distribution drifts. (b) Ablation on scaling up impacts (Lower half). We design four scaling model variants, where*
 
 ![[assets/figures/papers/paper_list_l1824_MotionCraft_Crafting_Whole_Body_Motion_with_Plug_and_Play_Multimodal_Con/figures/002_Table_1.jpg]]
 *Table 1: Comparison of MotionCraft with previous motion generation methods. MotionCraft jointly models the static human skeleton structure and dynamic human topology relationships to achieve flexible motion knowledge transfer across various whole-body generation scenarios, supporting plug-and-play with any new control signal modality*
-
-![[assets/figures/papers/paper_list_l1824_MotionCraft_Crafting_Whole_Body_Motion_with_Plug_and_Play_Multimodal_Con/figures/006_Figure_4.jpg]]
-*Figure 4: The qualitative results of MotionCraft and other state-of-the-art baselines on three representative tasks, text-to-motion, speech-to-gesture, and music-to-dance. More detailed visualization comparisons are in our supplementary*
-
-![[assets/figures/papers/paper_list_l1824_MotionCraft_Crafting_Whole_Body_Motion_with_Plug_and_Play_Multimodal_Con/figures/009_Figure_5.jpg]]
-*Figure 5: Multimodal video generation application with our generated motions conditioned on music (upper row) or speech (lower row). We project them to 2D images to serve as motion conditions for MimicMotion (Zhang et al. 2024c)*
-
-
 
 ## 定位与知识库关联
 
@@ -351,8 +321,6 @@ MotionCraft 处于多模态全身运动生成的交汇点，其设计思路与�
 **时间打块失效的深层原因。** 为什么在运动序列中时间打块反而降低性能？论文推测与 SMPL-X 轴角表示的特殊耦合有关，但这一现象的具体机制尚不明确。如果轴角表示中各关节参数的相互依赖使得帧间压缩破坏了运动学一致性，那么这一发现可能对更广泛的运动建模范式（如基于 VQ-VAE 的离散化方法）具有警示意义。
 
 **跨任务泛化的上限。** 在有限的运动数据下，模型规模扩展已触及收益递减的拐点。一个根本性的开放问题是：在数据量不变的约束下，如何进一步提升大规模模型的跨任务泛化能力？可能的探索方向包括更高效的数据增强策略、元学习框架下的任务自适应微调，或引入物理仿真器作为额外的监督信号。
-
-
 
 ## 原文 PDF
 

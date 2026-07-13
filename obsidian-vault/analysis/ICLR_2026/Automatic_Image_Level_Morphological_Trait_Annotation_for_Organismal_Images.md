@@ -46,15 +46,11 @@ claims:
 
 本文提出了一种自动化的图像级形态性状标注流水线，旨在解决大规模生态学研究中高质量性状数据集极度匮乏的瓶颈问题。该方法利用稀疏自编码器（Sparse Autoencoder, SAE）从预训练基础模型（DINOv2）的特征中分解出单语义、空间可定位的潜在单元，并通过物种对比排序筛选出具有物种判别力的性状相关区域，最终由多模态大语言模型（MLLM）生成可解释的形态性状描述。在BIOSCAN-5M昆虫图像数据集上，该方法使用最佳配置标注了19K张图像，获得80K条形态性状描述（平均每张图像4.2条），构建了BIOSCAN-TRAITS数据集。人类评估表明，SAE引导的MLLM（多图像设置）平均评分为3.91（5分制），显著高于仅使用MLLM的3.15。此外，在BIOSCAN-TRAITS上微调BioCLIP后，在Insects基准上的零样本物种分类准确率从34.8%提升至39.9%。
 
-
-
 形态性状（morphological traits）是生态学和进化生物学研究的核心数据，能够预测物种与环境之间的相互作用（Díaz et al., 2016; Kennedy et al., 2020; McGill et al., 2006）。研究表明，形态性状预测生态位的准确率可达85%（Pigot et al., 2020）。然而，传统性状提取依赖领域专家的手工劳动，测量简单特征就需要数分钟/标本（Hardisty et al., 2022），而全球自然历史博物馆收藏的超过30亿标本（Nelson & Ellis, 2019）使得人工标注几乎不可行。此外，人工标注还存在观察者主观性和系统偏差问题（Heberling, 2022）。
 
 现有自动化解方法包括：使用卷积三元组网络学习表型嵌入空间（Hoyal Cuthill et al., 2019）、深度模型分割植物标本相关区域（Ariouat et al., 2025）、以及变分自编码器学习潜在表示（Tsutsumi et al., 2023）。但这些方法要么需要大量人工标注数据，要么缺乏可解释性，难以直接生成可用的性状描述。
 
 本文的核心洞察在于：稀疏自编码器在无监督条件下从基础模型特征中分解出单语义的潜在单元，这些单元的空间激活图能精确定位有意义的形态部位；结合物种对比排序和多图像一致性约束，可自动生成高质量、可解释的性状描述，从而将大规模物种标注的图像库转化为丰富的性状数据集。
-
-
 
 ## 核心方法与创新机理
 
@@ -66,8 +62,6 @@ claims:
 
 3. **端到端自动标注流水线**：该方法仅需图像及其物种标签——这种监督信息在iNaturalist（Horn et al., 2018）、TreeOfLife（Stevens et al., 2024）、Caltech-UCSD Birds-200-2011（Wah et al., 2011）等数据集中广泛可用——即可自动生成大规模、高质量的性状描述数据集。
 
-
-
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_oFRbiaib5Q_Automatic_Image/figures/001_Figure_1.jpg]]
 *Figure 1: Given an input specimen image, we first compute dense visual representations using an off-the-shelf backbone (e.g., DINOv2). These features are passed through a pre-trained sparse autoencoder (SAE), which identifies high-activation latent units corresponding to semantically meaningful regions (Algorithm 1). We extract the spatial masks associated with these activations and overlay them on the original image to localize trait-relevant boxes. Finally, a multimodal language model (MLLM) is prompted with the annotated image to generate fine-grained morphological trait descriptions. This results in a large-scale, automatically labeled image-level trait dataset.*
 
@@ -78,8 +72,6 @@ claims:
 **步骤二：空间掩码提取与性状定位**。提取与高激活单元关联的空间掩码，将其叠加到原始图像上，定位性状相关的边界框。通过物种对比排序和频率阈值筛选，保留在物种内一致表达且具有物种判别力的性状区域。
 
 **步骤三：MLLM性状描述生成**。将定位后的图像区域输入多模态大语言模型（Qwen2.5-VL-72B），使用轻量级提示模板生成细粒度的形态性状描述。通过提供同一物种的多张图像，鼓励模型关注跨图像一致的共享形态特征。
-
-
 
 ### 5.1 稀疏自编码器（SAE）
 
@@ -112,8 +104,6 @@ $$\mathcal{T}(\phi) = \|z - \tilde{z}\|_2^2 + \alpha \mathcal{R}(g(z))$$
 
 对SAE单元按物种对比分数排序，该分数优先考虑对目标物种强激活但对近缘物种弱激活的单元。高分的掩码被裁剪为紧凑的边界框，然后输入MLLM生成性状描述。
 
-
-
 ## 实验与关键发现
 
 ### 6.1 数据集与实验设置
@@ -138,7 +128,6 @@ SAE+多图像MLLM的平均人类评分为3.91，显著高于仅用MLLM的3.15（
 
 **Table 5**展示了性状级监督对零样本物种分类的提升：
 
-
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_oFRbiaib5Q_Automatic_Image/figures/024_Table_5.jpg]]
 *Table 5: Zero-shot species classification accuracy (%) on the Insects (Ullah et al., 2022) benchmark. Incorporating trait-level supervision yields clear gains over the baseline pretrained model. BioCLIP 2 is pretrained on BIOSCAN-5M; therefore, we evaluate it directly under trait-level supervision.*
 
@@ -155,7 +144,6 @@ SAE+多图像MLLM的平均人类评分为3.91，显著高于仅用MLLM的3.15（
 ### 6.3 消融实验
 
 **SAE稀疏度的影响（Table 2）**：较低稀疏度（α=2e-4, L0=1081.1）比较稀疏度（α=8e-4, L0=242.2）获得更高评分。较低的α值导致更低的MSE和更好的重建，提高了潜在单元的覆盖率，从而改善召回率。
-
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_oFRbiaib5Q_Automatic_Image/figures/020_Table_2.jpg]]
 *Table 2: SAEs often trade off between reconstruction error (MSE) and sparsity ( $L _ { 0 }$ ) . We investigate the effect of choosing between different balances of these errors. We find that lower sparsity performs better for both values of frequency threshold $\begin{array} { r } { ( t _ { \mathrm { f r e q } } ) . } \end{array}$ . A lower value of the sparsity coefficient (α) leads to lower MSE and thus better reconstruction. It improves the coverage of latents, leading to better recall. The experimental setup uses an input dataset of 1,000 images.
@@ -181,8 +169,6 @@ SAE+多图像MLLM的平均人类评分为3.91，显著高于仅用MLLM的3.15（
 - 当前流水线仅依赖图像和物种标签，未利用DNA条形码、地理信息等多模态数据。
 - 下游评估仅在一个基准（Insects）上进行，泛化性有待进一步验证。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_oFRbiaib5Q_Automatic_Image/figures/006_Figure_3.jpg]]
 *Figure 3: Comparison of salient morphological trait description generation using a just MLLM vs. $\mathbf { M L L M } + \mathbf { S A E } \left( t _ { \mathrm { f r e q } }$ = 1 e - 2 $\right$) for Agyneta straminicola. Each red box highlights a region selected by SAE neurons with high activation, indicating regions used for prompting the MLLM + SAE. The use of SAE helps MLLMs focus on salient morphological traits rather than general descriptions of all body parts. Table 1: Incorporating latent-specific patches significantly improves the quality of trait descriptions. Including multiple images in the prompt encourages MLLMs to focus on the traits common across all images, at the cost of more to...
 
@@ -191,9 +177,6 @@ SAE+多图像MLLM的平均人类评分为3.91，显著高于仅用MLLM的3.15（
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_oFRbiaib5Q_Automatic_Image/figures/023_Table_4.jpg]]
 *Table 4: Runtime and throughput of the proposed pipeline, measured on two NVIDIA H100 80GB GPUs. Times are averaged over the BIOSCAN-TRAITS workload.*
-
-
-
 
 ## 定位与知识库关联
 
@@ -206,8 +189,6 @@ SAE+多图像MLLM的平均人类评分为3.91，显著高于仅用MLLM的3.15（
 **自动性状提取**：传统方法依赖手工特征或深度学习分割（Hoyal Cuthill et al., 2019; Ariouat et al., 2025），但缺乏可解释性和可扩展性。本文提出的SAE+MLLM流水线实现了从“黑箱特征”到“可解释性状描述”的端到端自动转换。
 
 **知识库定位**：BIOSCAN-TRAITS数据集填补了大规模、高质量、带性状标注的生物图像数据集的空白。该数据集可直接用于生态学中的功能性状分析、物种分类模型训练、以及生物多样性监测等下游任务。
-
-
 
 ## 原文 PDF
 

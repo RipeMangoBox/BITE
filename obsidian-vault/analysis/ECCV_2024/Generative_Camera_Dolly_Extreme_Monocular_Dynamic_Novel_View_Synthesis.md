@@ -73,8 +73,6 @@ GCD 在现有方法谱系中占据独特位置。与每场景优化的动态新�
 
 尽管在合成数据上表现优异，GCD 在真实世界泛化方面仍存在明显局限：对包含人体、动物或可变形物体的视频，常产生模糊或形状错误的结果；对不熟悉的运动模式（如机器人手臂）可能发生截断或错误重建。这些失败案例指向一个开放问题：如何在不牺牲生成多样性的前提下，增强模型对对象形状与运动的时间对应关系建模。
 
-
-
 ### 问题背景：从多视角到单目的动态新视角合成
 
 动态新视角合成（Dynamic Novel View Synthesis）旨在从有限的观测视角中恢复一个动态三维场景，并渲染出任意新视角下的视频。这一任务在自动驾驶仿真、机器人视觉、增强现实和影视制作等领域具有重要应用价值。然而，现有方法在输入条件和视角变化幅度上存在根本性限制，使得该问题远未解决。
@@ -103,8 +101,6 @@ GCD 在现有方法谱系中占据独特位置。与每场景优化的动态新�
 
 基于上述动机，本文提出的 **GCD（Generative Camera Dolly）** 方法旨在实现以下目标：从一段单目 RGB 视频出发，合成从任意新视角观察同一动态场景的视频，且视角变化幅度可达 90° 以上。通过在合成数据集 Kubric‑4D 和 ParallelDomain‑4D 上的系统评估，验证该方法在极端视角变化下的高保真合成能力，并探索其在真实世界场景中的泛化潜力。
 
-
-
 ## 核心方法与创新机理
 
 GCD 的核心创新在于将一个极具挑战性的几何重建问题——单目动态新视角合成——**重新建模为端到端的视频到视频翻译任务**，并借助大规模预训练视频扩散模型的生成先验来填补几何建模的缺失。这一范式转换绕开了传统方法对显式 3D 表示或深度输入的依赖，带来三个紧密耦合的关键创新点。
@@ -122,8 +118,6 @@ GCD 的核心创新在于将一个极具挑战性的几何重建问题——单�
 GCD 并非从零开始训练一个扩散模型，而是从公开的 **Stable Video Diffusion（SVD）** 图像到视频生成检查点初始化网络权重。SVD 在大规模视频数据上习得的丰富运动先验和场景生成能力，为单目视角合成提供了强大的归纳偏置。新增的摄像机嵌入模块以随机初始化开始训练，而 U-Net 主体权重则从 SVD 微调。消融实验表明，这一初始化策略相比从随机权重训练，在 Kubric‑4D 上带来了 **+1.34 dB PSNR** 的显著增益，证明了生成先验迁移对几何任务的有效性。
 
 上述三个创新点并非孤立存在，而是形成了一条完整的因果链：**预训练先验提供了“能生成合理视频”的基础能力，时空联合条件化确保了“生成内容忠于输入”，摄像机微条件则精确控制了“从哪个角度看”**。三者协同，使 GCD 在不依赖深度图或显式 3D 几何的情况下，实现了极端视角变化下的高保真动态新视角合成。
-
-
 
 GCD 将单目动态新视角合成为一个端到端的视频到视频翻译任务。其核心映射关系为：
 
@@ -165,12 +159,8 @@ $$\hat{\pmb{y}}_{u-1} = w \epsilon(\hat{\pmb{y}}_u \parallel \pmb{x}, \Delta \ma
 
 输入单目视频 → KL‑VAE 编码 → 潜在空间表示 → 与噪声样本通道拼接 → 逐帧 CLIP 嵌入交叉注意力 → 相机外参 MLP 微条件注入 → 时空 U‑Net 迭代去噪 → KL‑VAE 解码 → 输出多帧新视角视频。整个流程中，相机轨迹插值决定了每帧的目标外参，而 SVD 预训练权重为时空一致性提供了强大的生成先验。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2405_14868/figures/002_Figure_2.jpg]]
 *Figure 2: Method. Our model, GCD, is an end-to-end video translation pipeline that maps an input video from any viewpoint into an output video from any other perspective, with the objective of respecting all objects and dynamics occurring within the observed dynamic scene, and faithfully reconstructing the corresponding visual details from this novel viewpoint. The relative camera extrinsics matrix ∆E guides the relationship between the two camera poses*
-
-
 
 ### 问题形式化
 
@@ -212,16 +202,6 @@ $$ \mathcal{E}_{dst,t} = \begin{cases} g(\alpha \mathcal{P}_{dst} + (1-\alpha) \
 
 GCD 从公开的 Stable Video Diffusion 图像到视频检查点初始化所有权重，仅随机初始化新增的摄像机嵌入 MLP。这一策略使得模型在微调阶段能够快速适应新视角合成任务，同时继承 SVD 在大规模视频数据上习得的丰富运动和外观先验。相比之下，从头训练不仅收敛更慢，且最终性能显著低于微调版本，进一步印证了预训练先验对极端视角合成场景的不可替代性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2405_14868/figures/016_Figure_10.jpg]]
-*Figure 10: Network architecture. Our model performs diffusion in latent space [35, 52]. The input video is encoded by a KL-VAE, and then channel-concatenated with the noisy sample. At training time, the output video is estimated and supervised; at inference time, multiple denoising steps are performed. In both cases, per-frame CLIP embeddings condition the U-Net by means of cross-attention, and and other relevant pieces of information (frame rate, desired camera pose transformation, and motion value) condition the U-Net by adding their embeddings onto the feature vectors in-between convolutions*
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2405_14868/figures/015_Figure_9.jpg]]
-*Figure 9: Spherical coordinate system. Models trained on Kubric-4D accept an azimuth*
-
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -261,22 +241,13 @@ GCD 在 Kubric‑4D 基准上显著超越所有对比方法。在全部像素的
 
 GCD 的一个显著优势在于**推理效率与数据效率**。与需要多视角输入并进行每场景优化的方法（如 HexPlane、4D‑GS）不同，GCD 仅需单目视频即可前向推理。Fig. 7 的对比研究显示：GCD 使用单视角输入的 SSIM 已**超过 HexPlane 使用 16 个视角进行每场景优化后的结果**。这一发现揭示了大规模生成先验在补偿显式几何建模缺失方面的潜力。
 
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2405_14868/figures/013_Figure_7.jpg]]
-*Figure 7: Comparative study over number of views. We plot the SSIM over the test set as a function of the number of input views that HexPlane uses for training. The numbers are averaged over 20 scenes*
-
 ### 旋转幅度的影响分析
 
 Fig. 8 展示了在 Kubric‑4D 上不同相机旋转幅度下的性能变化。分析表明，动态视角合成的主要难度集中在**前约 80° 的旋转范围内**；超过此范围后，性能下降趋于平缓。这为理解任务的困难边界提供了定量依据，也解释了为何 gradual 轨迹策略（将大幅度旋转分解为小步增量）能有效降低合成难度。
 
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2405_14868/figures/014_Figure_8.jpg]]
-*Figure 8: Comparative study over camera rotation magnitude in Kubric-4D. Note that PSNR is measured at the last output frame, because only then the desired horizontal azimuth angle has been reached. We conclude that the main difficulty in performing dynamic view synthesis comes from handling roughly the first 80 degrees, after which the performance stays mostly flat*
-
 ### 失败模式与局限性
 
 尽管 GCD 在受控场景中表现优异，但在真实世界泛化中暴露出若干系统性失败模式（Fig. 11）：
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2405_14868/figures/017_Figure_11.jpg]]
-*Figure 11: Failure cases. We show inputs and predictions of real-world examples. Since deformable objects are not present in our Kubric-4D finetuning set, our model occasionally struggles with reconstructing their shape, appearance, and motion correctly. This can sometimes lead to objects becoming vague or blending in with each other. Similarly, videos in the bottom two rows are possibly related to them bordering on being out-of-distribution with respect to ParallelDomain-4D*
 
 1. **可变形物体处理失败**：由于微调数据集 Kubric‑4D 仅包含刚性物体，模型在遇到人体、动物等可变形对象时产生模糊、形状错误或外观不一致的结果。
 2. **分布外类别**：不熟悉的运动模式（如机器人手臂）可能被截断或错误重建。
@@ -289,13 +260,6 @@ Fig. 8 展示了在 Kubric‑4D 上不同相机旋转幅度下的性能变化。
 ### 公平性说明
 
 实验设计包含多项公平性保障措施：基线对比中排除第一帧以消除条件帧邻近效应；对 ZeroNVS 逐视频手动调整尺度参数以确保视觉对齐；概率性方法（GCD、Vanilla SVD、ZeroNVS）生成 4 个样本取平均，确定性方法仅运行一次；Vanilla SVD 以其原生分辨率 1024×576 评估并居中裁剪/缩放，而 GCD 推理分辨率为 384×256。这些措施确保了定量比较的可靠性。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2405_14868/figures/005_Table_1.jpg]]
-*Table 1: Ablation study results on Kubric. We evaluate various versions of our dynamic view synthesis model on only the last frame for fairness, i.e. to ensure that the direct and gradual trajectory models are spatially aligned. See Figure 3 for qualitative illustrations*
-
-
 
 ## 定位与知识库关联
 
@@ -334,8 +298,6 @@ GCD 的有效性受到训练数据分布和模型设计选择的双重约束。
 **分辨率与时长限制。** 当前模型推理分辨率为 384×256，输出 14 帧视频。如何将框架扩展至更高分辨率和更长时序，同时保持生成质量与计算效率的平衡，是走向实际应用必须解决的问题。
 
 **显式几何的潜在增益。** GCD 刻意避免了显式 3D 几何建模，这既是其简洁性的来源，也是其局限性的根源。是否可能在保留扩散先验优势的前提下，引入轻量级的显式几何表示（如单目深度估计或稀疏点云）以提高合成精度和时空一致性，是一个开放的架构设计问题。
-
-
 
 ## 原文 PDF
 

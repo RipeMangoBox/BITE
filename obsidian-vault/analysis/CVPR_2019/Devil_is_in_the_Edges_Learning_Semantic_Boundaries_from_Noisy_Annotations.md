@@ -57,8 +57,6 @@ claims:
 - 在 Cityscapes val 上，STEAL 预测的边界比 **DeepLab v3+**（Chen et al., ECCV 2018）分割掩码提取的边缘在严格匹配阈值下高 **4.2%**（Fig. 5）。
 - 当训练标注存在 8px 模拟噪声时，主动对齐使 MF(ODS) 从 46.26% 大幅提升至 **56.41%**，验证了其对标注质量的鲁棒性（Table 4）。
 
-
-
 ### 语义边界检测的任务定位与瓶颈
 
 语义边界检测（semantic boundary detection）要求同时定位物体边缘并识别其所属语义类别，是连接底层视觉线索与高层场景理解的关键中间表示。与经典边缘检测不同，语义边界检测需要处理类内纹理、遮挡和细粒度物体轮廓，因此对边界的**清晰度（sharpness）**和**精确性（precision）**提出了更高要求。
@@ -88,8 +86,6 @@ claims:
 2. **全局对齐：迭代推理真实边界**。如果标注本身不可靠，则不应将其视为固定目标。主动对齐（active alignment）框架将标注视为可优化的变量，在训练过程中利用网络当前的高置信度预测，通过水平集演化（level set evolution）将标注曲线向真实边界调整，形成“网络指导标注、标注训练网络”的协同循环。
 
 这两条途径——边界方向的局部约束与标注的全局迭代对齐——**均不改变主干网络结构**，可作为即插即用的模块叠加于现有检测器之上。其核心洞察在于：通过显式建模边界形状先验和标注不确定性，可以在不增加推理复杂度的前提下，显著提升边界清晰度和检测精度，并支持粗标注数据的自动精化。
-
-
 
 ## 核心方法与创新机理
 
@@ -136,8 +132,6 @@ $$\frac{\partial \phi}{\partial t} = g_k (\kappa + c) |\nabla \phi| + \nabla g_k
 
 两个变更槽形成互补：**NMS 损失层**提供局部的、边界法线方向的形状约束，使网络本身具备预测细边界的能力；**主动对齐**则从全局标注层面迭代消除训练目标中的系统误差。二者协同使得 STEAL 在高质量重新标注的 SBD 测试集上将 CASENet 的 MF(ODS) 从 63.52% 提升至 68.15%（+4.63%），AP 提升超过 18 个百分点（Table 1），且该方法可即插即用于任意现有语义边界检测网络。
 
-
-
 STEAL（Semantically Thinned Edge Alignment Learning）是一个即插即用的语义边界学习框架，其核心设计目标是从带噪声的标注中学习细粒度、高精度的语义边界。该框架由两条互补的技术路径构成：**边界细化层（Boundary Thinning Layer）及其配套损失函数**，以及**主动对齐（Active Alignment）机制**。前者在局部尺度上约束边界预测的形状，后者在全局尺度上迭代修正训练标注的质量。
 
 ### Pipeline 总览
@@ -158,8 +152,6 @@ STEAL（Semantically Thinned Edge Alignment Learning）是一个即插即用的�
 *Figure 2: STEAL architecture. Our architecture plugs on top of any backbone architecture. The boundary thinning layer acts upon boundary classification predictions by computing the edge normals, and sampling 5 locations along the normal at each boundary pixel. We perform softmax across these locations, helping us enhance the boundary pixels as in standard NMS. During training, we iteratively refine ground-truth labels using our predictions via an active alignment scheme. NMS and normal direction losses are applied only on the (refined) ground-truth boundary locations*
 
 **关键设计决策**：主动对齐在网络精度趋于平稳后才引入，以减少计算开销；边界细化层仅在训练时使用，推理时被移除，主干网络直接输出细化后的边界预测。
-
-
 
 STEAL 的核心由三个功能模块构成：**边界细化层 (Boundary Thinning Layer)**、**主动对齐 (Active Alignment)** 以及一个**组合损失函数**。这些模块可插入任意现有语义边界检测网络（如 **CASENet**, Yu et al., CVPR 2017）之上，无需修改主干网络。
 
@@ -221,8 +213,6 @@ $$\frac{\partial \phi}{\partial t} = g_k (\kappa + c) |\nabla \phi| + \nabla g_k
 
 在推理阶段，给定一个粗分割掩码，可利用训练好的网络和水平集演化（设 $\lambda=0, c=1$）进行 $t$ 次迭代，使掩码边界与网络预测的语义边界对齐，从而生成精化掩码。该过程无需额外训练。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设计逻辑
@@ -275,9 +265,6 @@ STEAL的粗到精细化能力在两个数据集上得到验证。在SBD上（Tab
 ![[assets/figures/papers/paper_list_l51_https_arxiv_org_abs_1904_07934/figures/010_Table_6.jpg]]
 *Table 6: Refining coarse labels on SBD. Model is trained on the noisy SBD training set (approx 4px error). The re-annotated test set is then simplified to simulate coarse data with a given quality (see main text). Score (%) represents mean over all the 20 object classes. Table 7: Refining coarse labels on Cityscapes. Model trained on fine Cityscapes trainset and used to refine coarse data. Real Coarse corresponds to coarsely human annotated val set, while x-px error correspond to simulated coarse data. Score (%) represents mean over all 8 object classes*
 
-![[assets/figures/papers/paper_list_l51_https_arxiv_org_abs_1904_07934/figures/011_Figure_6.jpg]]
-*Figure 6: Semantic Segmentation on Cityscapes val: Performance of DeepLab V3+ when trained with fine data and (blue) vanilla train extra set, (orange) our refined data (8 object classes) from train extra. We see improvement of more than 1.2 IoU % in rider, truck and bus*
-
 ---
 
 ### 定性分析
@@ -293,19 +280,8 @@ Figure 3展示了STEAL预测边界与CASENet及Ground Truth的视觉对比，STE
 - **超参数敏感性**：损失权重α₁=1, α₂=10, α₃=1在SBD上经验设定（Part 006），其在不同数据集上的迁移需要手动验证。
 - **计算开销**：主动对齐需在训练中周期性执行水平集演化，虽然作者指出可每n次迭代执行一次以节省计算（Part 006），但在实时或移动端场景中仍构成额外负担。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l51_https_arxiv_org_abs_1904_07934/figures/012_Figure_7.jpg]]
 *Figure 7: Qualitative Results on the Cityscapes Dataset*
-
-![[assets/figures/papers/paper_list_l51_https_arxiv_org_abs_1904_07934/figures/013_Figure_8.jpg]]
-*Figure 8: Qualitative Results. Coarse-to-Fine on the coarsely annotated Cityscapes train extra set*
-
-![[assets/figures/papers/paper_list_l51_https_arxiv_org_abs_1904_07934/figures/004_Table_4.jpg]]
-*Table 4: Effect of Active Alignment on the SBD dataset. Score (%) represents mean over all classes*
-
-
-
 
 ## 定位与知识库关联
 
@@ -345,8 +321,6 @@ STEAL 的两条互补途径分别对应不同的技术传统：
 - **计算效率**：主动对齐需在训练中周期性执行水平集演化（可在网络精度趋于平稳后引入，或每 n 次迭代执行一次以节省计算），在移动端或实时系统中，仅使用 NMS 损失（无主动对齐）可能是更实际的选择，但性能会有所下降。
 - **任务迁移性**：边界细化层和主动对齐是否可迁移到深度边界估计、实例分割边缘等像素级预测任务，尚待验证。
 - **粗到精细化与人工精修的定量比较**：论文未提供精化效率与质量相对于人工精修的定量对比。
-
-
 
 ## 原文 PDF
 

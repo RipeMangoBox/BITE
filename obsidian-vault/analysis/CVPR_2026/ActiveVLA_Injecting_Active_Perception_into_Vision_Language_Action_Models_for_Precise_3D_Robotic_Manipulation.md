@@ -142,8 +142,6 @@ $$S(\mathbf{g}) = \sum_{v=1}^{3} w_v h_v(\pi_v(\mathbf{g}))$$
 
 整个管线的设计使 ActiveVLA 能够从固定被动的感知模式升级为任务驱动的主动感知，在遮挡严重或精细操作场景中获取更高质量的视觉信息，从而提升操作精度与鲁棒性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2178_https_arxiv_org_abs_2601_08325/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison between previous VLA methods and ActiveVLA. Traditional VLA systems often fail in tasks like “bring the apples on the table” because their fixed cameras miss critical details or become occluded. In contrast, ActiveVLA leverages 3D scene understanding to freely place virtual cameras and synthesize optimal viewpoints, enabling robots to adjust their view for clearer, more informative observations and thus achieve more reliable manipulation performance even under occlusion*
 
@@ -201,8 +199,6 @@ $$W(z) = 2d \tan\left(\frac{\alpha}{2z}\right)$$
 
 精细阶段生成的局部上下文 tokens 与粗糙阶段的全局 tokens 拼接后，通过 MLP 头预测末端执行器的平移、旋转、夹爪状态和碰撞标志。这种全局‑局部融合设计使模型同时保持场景级理解与毫米级空间精度，是实现安全、精确 3D 操作的关键架构选择。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2178_https_arxiv_org_abs_2601_08325/figures/005_Figure_3.jpg]]
 *Figure 3: Qualitative results of fine-grained manipulation tasks. Left of the dotted line (coarse stage): (a) project 3D modalities onto orthographic images, then (b) predict heatmaps to mark critical regions. Right of the dotted line (fine stage): using these regions, perform (c) active view selection and (d) active 3D zoom-in for fine-grained manipulation in complex scenes*
 
@@ -253,8 +249,6 @@ Figure 5展示了两个关键超参数的影响：
 
 4. **未见物体类别的泛化能力**：尽管GemBench测试了场景级泛化，但模型在全新物体类别上的表现仍需进一步验证。热图预测模块依赖VLM的语义理解能力，其对训练时未见物体的关键区域定位准确性可能下降。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2178_https_arxiv_org_abs_2601_08325/figures/003_Table_1.jpg]]
 *Table 1: Results on RLBench. “Avg. Rank” denotes the average rank across all 18 tasks, where a lower value signifies better overall performance. ActiveVLA attains first place in 10 tasks, highlighting its dominance in the benchmark*
 
@@ -263,19 +257,6 @@ Figure 5展示了两个关键超参数的影响：
 
 ![[assets/figures/papers/paper_list_l2178_https_arxiv_org_abs_2601_08325/figures/008_Table_4.jpg]]
 *Table 4: Ablation study on key components. We report the success rate (%) and inference time (s) over 100 trials. A-VS (Active View Selection) dynamically acquires informative views, while A-3Z (Active 3D Zoom-in) refines local focus*
-
-![[assets/figures/papers/paper_list_l2178_https_arxiv_org_abs_2601_08325/figures/009_Figure_5.jpg]]
-*Figure 5: Success rates of ActiveVLA under different hyperparameters: (a) Number of selected views; (b) Active 3D zoom-in factor. Experiments are evaluated on the RLBench benchmark*
-
-![[assets/figures/papers/paper_list_l2178_https_arxiv_org_abs_2601_08325/figures/010_Table_5.jpg]]
-*Table 5: Success rates (%) on the Real-World Experiment. We compare our ActiveVLA with more baselines on real-world tasks. The tasks involve complex spatial occlusion and manipulation*
-
-![[assets/figures/papers/paper_list_l2178_https_arxiv_org_abs_2601_08325/figures/011_Table_6.jpg]]
-*Table 6: Success rates (%) of ActiveVLA under different perturbations in COLOSSEUM. We report mean and standard deviation over multiple trials for tasks with diverse visual and spatial perturbations. ActiveVLA achieves consistently high performance, demonstrating robustness to environmental variations and the benefit of active perception for precise manipulation*
-
-![[assets/figures/papers/paper_list_l2178_https_arxiv_org_abs_2601_08325/figures/006_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l2178_https_arxiv_org_abs_2601_08325/figures/007_Figure.jpg]]
 
 ## 定位与知识库关联
 

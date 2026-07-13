@@ -133,8 +133,6 @@ $$\mathcal{L}_{final} = \mathbb{E}_{\mathbf{z} \sim p(z), \epsilon \sim \mathcal
 
 **模块关系与职责分工。** 五个核心模块形成清晰的分工：VAE Encoder/Decoder 负责潜空间压缩与重建；Motion Residual Computation 将帧预测问题转化为残差学习问题；SSIM-based Motion Intensity Embedding 提供用户可控的运动幅度调节；Motion Diffusion Model（LaVie 骨干）执行条件去噪生成；DCTInit Noise Refinement 在推理端稳定生成过程。三个关键设计——运动残差学习、SSIM 强度控制、DCTInit——分别针对内容一致性、运动可控性和时间稳定性三个瓶颈问题，形成互补的因果干预体系。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2407_15642/figures/002_Figure_2.jpg]]
 *Figure 2: Model pipeline overview. During training, instead of predicting the subsequent frames directly, our model learns the distribution of motion residuals, while providing effective motion intensity control. The details of the training procedure can be seen in Algorithm. 1. During inference, we use Discrete Cosine Transformation to extract low-frequency components to refine the inference noise, which can stabilize the generation process of image animation*
 

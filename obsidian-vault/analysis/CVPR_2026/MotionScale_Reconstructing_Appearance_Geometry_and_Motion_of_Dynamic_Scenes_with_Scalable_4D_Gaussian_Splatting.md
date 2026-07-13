@@ -179,8 +179,6 @@ MotionScale 的整体框架围绕一个核心设计展开：**将动态场景表
 
 框架的核心因果链条可概括为：**集群层次运动基 → 自适应分裂/剪枝 → 渐进式解耦优化**。集群运动场提供了比全局 MLP 更强的局部几何约束，避免了传统 4DGS 方法中的几何崩塌；自适应控制使运动表示容量随场景复杂度动态伸缩；背景-前景解耦的渐进优化则从根本上抑制了长序列中的误差累积与运动漂移。阴影高斯的引入进一步隔离了瞬时光照效应，防止其对几何与运动学习的干扰。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2603_29296/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of MotionScale. Our method adopts a scalable motion field that progressively captures object motions through an adaptive control mechanism, enabling efficient splitting and refinement of motion components. For optimization, the background is updated through region sampling, camera refinement, and shadow handling, while the foreground propagation employs a three-stage refinement to propagate motion across long temporal windows for consistent 4D reconstruction*
 

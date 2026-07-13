@@ -49,8 +49,6 @@ claims:
 
 在CARLA仿真环境中，该方法在Town10HD上取得碰撞率0.006/km、CTE 0.65，相比ST-P3（碰撞率0.011/km、CTE≈0.91）分别降低45.5%和28.6%；在Town02上获得驾驶评分214.3、路线完成率84.1%，显著超越TransFuser、ThinkTwice、RaSc等基线方法。消融实验证实，移除不确定性加权注意力使CTE升高0.11，移除熵门控使碰撞率增加0.002/km，去除迁移对齐使Town02评分降至194.1，验证了各模块的必要性与互补贡献。
 
-
-
 端到端自动驾驶旨在直接从传感器输入映射到控制指令，近年来基于模仿学习（IL）和深度强化学习（DRL）的方法在仿真环境中取得了显著进展。然而，安全关键场景下的可靠决策仍然是一个核心瓶颈。当前方法面临三个深层困境：
 
 **感知与控制的割裂。** 主流端到端架构通常将感知编码和策略优化视为两个独立阶段——感知模块输出全局张量融合特征，控制模块在此基础上进行决策。这种设计缺乏对感知不确定性的显式建模：当检测噪声增大或交互对象处于感知边缘时，策略无法区分“高置信度关键障碍物”与“低置信度背景杂波”，导致在密集交通或恶劣天气下出现过度反应或欠反应。**ST-P3**（Hu et al., ECCV 2022）和**TransFuser**（Chitta et al., TPAMI 2023）等代表性方法虽然在特征融合机制上做了改进，但均未将不确定性信号作为控制层的结构化输入。
@@ -60,8 +58,6 @@ claims:
 **跨域迁移缺乏因果对齐。** 从源域（如训练城镇）到目标域（如未见城镇）的迁移通常仅依赖感知层面的域适应，忽略了控制策略本身的因果结构差异。当目标域的交通规则、道路拓扑或交互密度发生变化时，源域策略的注意力分布和不确定性统计量可能与目标域的真实需求失配，导致“看似正确感知、实则错误决策”的迁移失效。**ThinkTwice**（Jia et al., CVPR 2023）和**RaSc**（Fan et al., ECCV 2024）在感知端引入了可解释性机制，但未将因果一致性和不确定性对齐纳入迁移目标。
 
 上述问题的共同根源在于：**控制层缺乏统一的因果与不确定性接口**，使得感知编码、奖励塑造、探索和策略迁移各自为政，在分布偏移下安全性差、泛化能力弱。本文的核心动机正是构建这样一个统一接口——将不确定性信号作为控制层可靠性接口的核心，贯穿场景表示、奖励塑造、探索和跨域迁移，从而系统性地提升闭环驾驶的安全性与泛化性。
-
-
 
 ## 核心方法与创新机理
 
@@ -107,8 +103,6 @@ $$\mathcal{L}_{trans} = \mathcal{L}_{KL} + \lambda_\alpha \mathrm{MMD}(\alpha_s,
 
 上述四个创新并非孤立改进，而是通过**$\\bar{\\sigma}$ 作为统一控制层可靠性接口**形成闭环：不确定性加权注意力利用 $\\bar{\\sigma}$ 抑制噪声感知；不确定性奖励项驱动策略规避高风险状态；熵门控利用 $\\bar{\\sigma}$ 调节探索-利用平衡；迁移对齐确保 $\\bar{\\sigma}$ 统计量在域间一致。这一系统化设计使安全性、稳定性和泛化性得到协同提升，构成了本工作的核心方法论贡献。
 
-
-
 本文提出一个**统一安全感知深度强化学习框架**，其核心设计理念是将不确定性信号作为控制层的可靠性接口，贯穿场景表示、奖励塑造、探索策略和跨域迁移四个关键环节。框架由四个协同模块构成（Figure 1）：
 
 ![[assets/figures/papers/paper_list_l2719_https_openaccess_thecvf_com_content_CVPR2026_html_Borhan_Reliable_Policy/figures/001_Figure_1.jpg]]
@@ -131,8 +125,6 @@ $$\mathcal{L}_{ent} = -\beta(\bar{\sigma}) H(\pi_\theta); \quad \beta(\bar{\sigm
 跨域迁移时，除了标准的KL散度对齐动作分布外，还引入MMD距离对齐源域和目标域的注意力分布 $\alpha_s, \alpha_t$，以及L2距离匹配不确定性统计量 $u_s, u_t$（Eq. 16）。这确保了迁移过程中因果注意模式和可靠性感知的一致性。此外，通过MAML元学习（Eq. 17）获取跨多域的共享初始化 $\theta^*$，使模型能在目标域以小样本快速适应。
 
 **输入输出流**：原始传感器数据经感知模块提取实体特征后，输入关系图编码器生成决策状态 $s_t$；策略网络基于 $s_t$ 输出控制动作；奖励函数根据状态-动作对计算多目标奖励信号；不确定性估计模块持续更新 $\bar{\sigma}$，同时驱动注意力权重、熵门控和迁移对齐三个下游环节。整个pipeline形成闭环，$\bar{\sigma}$ 作为统一的可靠性接口贯穿始终。
-
-
 
 本方法将闭环驾驶策略分解为四个协同模块，以归一化不确定性信号 $\bar{\sigma}$ 作为贯穿全链路的可靠性接口，实现从场景表示到跨域迁移的统一调控。
 
@@ -200,18 +192,11 @@ $$\theta^* = \arg\min_\theta \sum_{d\in\mathcal{D}} \mathcal{L}_{\text{RL}}^{(d)
 
 消融实验（Table 2）表明：去除迁移目标（w/o Transfer）使 Town02 DS 从 214.3 降至 194.1，去除 MAML 降至 200.8，证明迁移对齐和元初始化的互补贡献。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2719_https_openaccess_thecvf_com_content_CVPR2026_html_Borhan_Reliable_Policy/figures/003_Figure_3.jpg]]
 *Figure 3: Ego-relational state on Town10HD: CTE and heading error reduced by uncertainty-weighted attention versus baselines*
 
-![[assets/figures/papers/paper_list_l2719_https_openaccess_thecvf_com_content_CVPR2026_html_Borhan_Reliable_Policy/figures/005_Figure_6.jpg]]
-*Figure 6: Uncertainty-aware exploration and safety metrics*
-
 ![[assets/figures/papers/paper_list_l2719_https_openaccess_thecvf_com_content_CVPR2026_html_Borhan_Reliable_Policy/figures/006_Figure_5.jpg]]
 *Figure 5: Reward comparison where differentiable multi-objective shaping yields higher, more stable returns than baselines*
-
-
 
 ## 实验与关键发现
 
@@ -262,13 +247,6 @@ Table 2 报告了在Town10HD和Town02上的组件级消融结果，系统验证�
 
 所有方法在相同CARLA版本、地图（Town10HD、Town05、Town02）、天气条件和交通密度下评估，每场景运行20个回合取平均。超参数通过网格搜索确定，论文提供了灵敏度分析。对比基线均使用其开源实现和推荐配置，确保比较的公平性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2719_https_openaccess_thecvf_com_content_CVPR2026_html_Borhan_Reliable_Policy/figures/004_Figure_4.jpg]]
-*Figure 4: Route completion metrics. Off-road (%) decreases and goal rate increases when the policy uses the causal state*
-
-
-
 ## 定位与知识库关联
 
 ### 与现有基线的结构性差异
@@ -310,8 +288,6 @@ Table 2 报告了在Town10HD和Town02上的组件级消融结果，系统验证�
 3. **实时部署的复杂度压缩**：如何通过模型蒸馏、注意力剪枝或不确定性估计的轻量化降低集成模型的计算开销，同时保持安全性指标的退化在可接受范围内？
 
 4. **标准化基准的泛化验证**：当前实验在自定义 CARLA 场景上进行，在 CARLA Leaderboard 和 Bench2Drive 等标准化基准上的表现尚待验证。这些基准的交通密度、路线复杂度和评估协议更具挑战性，可进一步检验框架的泛化边界。
-
-
 
 ## 原文 PDF
 

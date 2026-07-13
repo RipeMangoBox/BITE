@@ -47,8 +47,6 @@ claims:
 
 扩散模型在高引导尺度下生成图像时普遍出现过饱和与不真实伪影，这一问题严重限制了**分类器自由引导**（Classifier-Free Guidance, CFG）的实际可用引导范围。本文揭示了一个关键瓶颈：CFG的更新方向可以分解为平行于和正交于条件模型预测的两个分量——正交分量是提升图像质量的主要来源，而平行分量仅增加饱和度且在高引导尺度下乘以大于1的增益因子，导致过饱和。基于此洞察，本文提出**自适应投影引导**（Adaptive Projected Guidance, APG），通过正交投影降低平行分量权重，辅以更新幅度重缩放和反向动量，在保持CFG质量增益的同时显著缓解过饱和问题。实验表明，APG在多种扩散模型（EDM2、DiT-XL/2、Stable Diffusion XL等）上一致改善FID、Recall和饱和度指标，且保持与CFG相当的精度，有效扩展了引导尺度的可用范围。
 
-
-
 扩散模型已成为图像生成领域的核心范式，其采样过程可被统一描述为一个常微分方程（ODE）：
 
 $$
@@ -76,8 +74,6 @@ D_{\theta}(z_t, t, y) + (w-1)\Delta D_t^{\parallel} = \left[1 + (w-1)\frac{\|\De
 $$
 
 这一发现揭示了CFG过饱和的因果机制：随着 $w$ 增大，平行分量的增益因子不断放大，导致像素值趋向饱和。基于此洞察，本文提出 **自适应投影引导（Adaptive Projected Guidance, APG）**，通过降低平行分量权重并结合重新缩放与反向动量，在保持CFG质量增益的同时显著缓解过饱和问题，从而大幅扩展扩散模型实际可用的引导尺度范围。
-
-
 
 ## 核心方法与创新机理
 
@@ -147,8 +143,6 @@ Table 2 的消融实验量化了三个组件的贡献（EDM2-S, $w=4$）：
 
 三者协同作用，缺一不可。正交投影是解决过饱和的核心机制，重新缩放和反向动量则分别从稳定性和多样性维度进一步提升了生成质量。
 
-
-
 APG（Adaptive Projected Guidance）是一种即插即用的采样端引导方法，旨在保持分类器自由引导（CFG）质量增益的同时，系统性地消除高引导尺度下的过饱和与伪影。其整体流程在标准扩散采样循环中嵌入三个串行模块，对CFG更新方向进行自适应调整，如图3所示。
 
 **输入**：当前噪声潜变量 $z_t$、时间步 $t$、条件 $y$，以及预训练扩散模型 $D_\theta$（需支持条件与无条件双路推理）。
@@ -173,13 +167,6 @@ APG（Adaptive Projected Guidance）是一种即插即用的采样端引导方�
 **关键实现细节**：投影操作必须作用于去噪预测 $D_\theta(z_t, t, y)$ 而非噪声预测 $\epsilon_\theta(z_t, t, y)$，后者会导致结果几乎与标准CFG无异（Figure 12）。APG兼容各类扩散模型（EDM2、DiT、Stable Diffusion系列）、蒸馏模型（如SDXL-Lightning）以及多样性增强方法（CADS、IG），仅需在采样循环中替换CFG更新逻辑即可，无需重新训练或修改模型权重。
 
 **与CFG的关系**：APG可视为CFG的通用超集——当 $\eta=1$、$r \to \infty$、$\beta=0$ 时退化为标准CFG。三个模块的协同作用使得APG在保持条件对齐精度（Precision）的同时，显著降低FID和饱和度（Table 1），且各组件对性能提升均有独立贡献（Table 2）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_e2ONKX6qzJ/figures/003_Figure_2.jpg]]
-*Figure 2: Influence of the parallel and orthogonal components*
-
-
 
 ### 问题定位：CFG 更新的几何分解
 
@@ -243,15 +230,8 @@ $$
 
 APG 在每步采样中依次执行：① 计算条件与无条件去噪预测，得到 $\Delta D_t$；② 对 $\Delta D_t$ 做正交投影，按 $\eta$ 降权平行分量；③ 施加重新缩放约束；④ 施加反向动量更新。三个模块协同作用：投影解决过饱和的根源，重新缩放防止单步漂移，反向动量提升多样性。Table 2 的消融实验证实，移除任一模块均导致 FID 恶化，其中投影对饱和度的影响最为显著。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_e2ONKX6qzJ/figures/014_Figure_12.jpg]]
-*Figure 12: The importance of projecting onto the denoised samples. When performing projection w.r.t. the predicted noise (b), the outputs are barely different than standard CFG (a). However, projecting onto denoised samples (c) more effectively reduces saturation*
-
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_e2ONKX6qzJ/figures/012_Figure_10.jpg]]
 *Figure 10: Comparison of CFG and APG for text quality in generated images using Stable Diffusion 3 (Esser et al., 2024). In contrast to CFG, APG consistently produces correct spellings*
-
-
 
 ## 实验与关键发现
 
@@ -293,16 +273,11 @@ APG在类条件生成与文本到图像生成两大类任务上，均展现出�
 
 3. **极端引导尺度下的残余伪影**：虽然APG大幅缓解了高引导尺度下的过饱和问题，但在极端的引导尺度设置下，仍可能出现少量不自然的纹理或结构伪影，需要进一步研究。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_e2ONKX6qzJ/figures/007_Table_1.jpg]]
 *Table 1: Quantitative comparison between CFG and APG. APG consistently improves FID, recall and color metrics while maintaining similar or better precision compared to CFG*
 
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_e2ONKX6qzJ/figures/015_Table_2.jpg]]
 *Table 2: Importance of different components in APG*
-
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_e2ONKX6qzJ/figures/009_Figure_7.jpg]]
-*Figure 7: Kernel density estimates of pixel and saturation values for two sets of samples generated with CFG and APG. Compared to CFG, images generated with APG show less concentration around saturated pixels, indicated by the spikes at the extreme values in both plots*
 
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_e2ONKX6qzJ/figures/026_Table_9.jpg]]
 *Table 9: Ablation study examining various design elements in APG*
@@ -310,19 +285,8 @@ APG在类条件生成与文本到图像生成两大类任务上，均展现出�
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_e2ONKX6qzJ/figures/013_Figure_11.jpg]]
 *Figure 11: Comparison between APG and CFG Rescale using Stable Diffusion XL. CFG Rescale is unable to solve the saturation issue at high guidance scales compared with APG*
 
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_e2ONKX6qzJ/figures/011_Figure_9.jpg]]
-*Figure 9: Showcasing the compatibility of APG with distilled diffusion models using SDXL-Lightning. Compared to CFG, using APG does not result in degradation in the output quality*
-
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_e2ONKX6qzJ/figures/018_Table_4.jpg]]
-*Table 4: Compatibility of APG with CADS (Sadat et al., 2024a) and IG (Kynkäänniemi et al., 2024). Combining APG with other methods that improve diversity results in better FID than each method in isolation*
-
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_e2ONKX6qzJ/figures/021_Table_5.jpg]]
-*Table 5: Impact of using APG with popular diffusion samplers using the class-conditional ImageNet model (DiT-XL/2). Compared to CFG, APG showes improved metrics across all samplers*
-
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_e2ONKX6qzJ/figures/024_Table_8.jpg]]
 *Table 8: Condition alignment comparison between CFG and APG*
-
-
 
 ## 定位与知识库关联
 
@@ -367,8 +331,6 @@ APG 在扩散模型引导方法的谱系中处于 **CFG 的解析改进层**。�
 2. **自适应超参数**：能否根据当前采样步的噪声水平、更新幅度等状态信息，自动调节 $\eta$、$r$ 和 $\beta$，消除手动调参负担？
 
 3. **跨模态泛化**：APG 在视频生成、3D 生成等更多样化条件生成任务中的有效性尚未验证，其与新兴引导范式（如基于能量的引导、对比引导）的结合潜力也待探索。
-
-
 
 ## 原文 PDF
 

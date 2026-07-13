@@ -54,8 +54,6 @@ claims:
 
 **方法定位**：区别于依赖单视图输入、无显式相机几何条件、主要使用合成数据训练的现有图像到三维生成基线（TRELLIS、Hunyuan3D 系列、**SAM 3D** 等），Asset Harvester 通过几何感知的稀疏多视图条件扩散、前馈式三维高斯提升、面向自动驾驶的混合数据管理及系统级资产插入和谐化，形成了从驾驶日志到可操纵三维资产的完整闭环。
 
-
-
 自动驾驶仿真对闭环验证至关重要，其核心需求是能够在重建的三维场景中自由操纵交通参与者，同时保持逼真的视觉一致性。然而，现有基于神经场景重建的仿真方法面临一个根本性瓶颈：它们仅能重建已观测区域的场景表示，无法为可操纵的交通参与者生成**完整的三维对象资产**。当进行闭环仿真时——例如改变自车轨迹或移动场景中的车辆——这些方法会暴露不可见的物体区域（如车辆背面、侧面或顶部），从而无法提供逼真的新视角合成和物体操纵能力。
 
 这一瓶颈的根源在于真实驾驶数据的内在挑战。自动驾驶日志中的对象观测通常是**稀疏视角、有限角度**的——一个交通参与者往往只被少数几个相机捕捉到，且视角覆盖范围狭窄。此外，真实数据中普遍存在的遮挡、传感器噪声、不准确的跟踪标注以及非刚性人体变形等问题，进一步加剧了从单一或少量观测中恢复完整三维几何与外观的难度。
@@ -63,8 +61,6 @@ claims:
 现有的图像到三维生成方法（如 **TRELLIS**（Xiang et al., arXiv 2024）、**Hunyuan3D 2.1**（Tencent Hunyuan3D Team, 2025）、**SAM 3D**（SAM 3D Team et al., arXiv 2025）等）主要依赖合成数据（如 Objaverse）进行训练，缺乏对自动驾驶领域的专门适配。它们通常以单视图作为输入，且未显式利用相机几何信息作为条件信号，在面对真实驾驶场景中常见的运动模糊、欠曝光和视角受限等退化条件时，重建质量显著下降。更重要的是，这些方法缺少一个**端到端的系统级设计**，无法将大规模对象中心化训练数据的构建、几何感知的异构传感器融合预处理、稀疏视角条件生成与三维重建的联合训练，以及资产插入与场景和谐化紧密耦合。
 
 针对上述缺口，本文提出 **Asset Harvester**，一个从大规模自动驾驶日志中提取完整三维资产的系统。其核心动机在于：通过设计面向稀疏、有限角度观测的扩散模型 **SparseViewDiT**，并结合前馈式三维高斯提升模块 **Object TokenGS**，系统性地解决从真实驾驶日志中恢复完整三维几何与外观的核心挑战。关键思路是利用大规模、多样化、经过精心管理的数据集（包括真实野外数据、合成域内数据和自蒸馏数据）进行多阶段训练，并引入几何感知预处理（如 Plücker 光线编码、相机参数注入）和鲁棒的数据增强策略，使模型能够从极其稀疏的条件视图（例如单张或少量图像）中稳定地重建高质量三维资产。
-
-
 
 ## 核心方法与创新机理
 
@@ -103,8 +99,6 @@ $$f_{\phi} : (\Pi_{out}, X_{out}) \mapsto \mathcal{G}$$
 其中 $\mathcal{G} = \{g_k\}_{k=1}^K$ 为 $K$ 个高斯点的集合，每个高斯包含中心 $\mu_k$、协方差 $\boldsymbol{\Sigma}_k$、不透明度 $\alpha_k$ 和视角相关颜色 $\mathbf{c}_k$。该架构的关键优势在于：**解耦高斯数量与输入像素数量**，使得模型能够以固定计算预算处理任意数量的输入视图，支持快速推理（Table 4 报告了推理时间统计）。
 
 在 NuRec AV Object Benchmark 的 Part A 上，Asset Harvester（单视图，解析相机姿态）的 PSNR 达到 **22.23 dB**，ED-R 为 **0.099**，显著优于 TRELLIS（20.47 dB, 0.143）和 HY2.1（21.12 dB, 0.117）（Table 2）。在 Part B 的 GPT-5.2 成对偏好评估中，Asset Harvester 对 TRELLIS 的偏好率达 **73.9%**（Table 3），进一步验证了其在视觉质量上的优势。
-
-
 
 Asset Harvester 是一个从大规模自动驾驶日志中提取可操纵三维资产、用于闭环仿真的端到端系统。其核心设计目标并非单纯追求重建精度，而是解决一个更根本的瓶颈：现有神经场景重建方法只能渲染已观测区域，一旦在仿真中改变自车轨迹或移动交通参与者，就会暴露不可见区域，导致新视角合成失败。Asset Harvester 通过将资产提取问题分解为三个紧密耦合的模块，系统性地克服了这一限制。
 
@@ -150,8 +144,6 @@ Asset Harvester 的系统架构体现了三个关键的因果干预：
 - **系统输出**：紧致的三维高斯资产 $\mathcal{G} = \{g_k\}_{k=1}^K$，其中每个高斯点 $g_k = (\mu_k, \boldsymbol{\Sigma}_k, \alpha_k, \mathbf{c}_k)$ 包含中心位置、协方差矩阵、不透明度和视角相关颜色。该资产可直接插入三维场景并进行动画化。
 
 整个流程的推理时间统计见 Table 4，系统在单视图输入下即可在 NuRec AV Object Benchmark 上显著优于现有图像到三维生成基线（Table 2, Table 3），验证了端到端系统设计的有效性。
-
-
 
 ### 2.1 数据摄取模块 (Data Ingestion Module)
 
@@ -209,12 +201,8 @@ $$\mathcal{L}_{rec} = \mathbb{E}_{(X_{out},\Pi_{out})} \left[ \frac{1}{v_{out}} 
 
 生成的三维资产通过 DiffusionHarmonizer 进行光照和谐化后插入到 NuRec 重建的场景中。该模块对插入资产与场景背景的光照不一致、阴影缺失和局部光度不连续进行校正，以生成逼真的闭环仿真视频。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l68_https_arxiv_org_abs_2604_18468/figures/002_Figure_2.jpg]]
 *Figure 2: Architecture overview of SparseViewDiT for sparse-view-conditioned multi-view generation*
-
-
 
 ## 实验与关键发现
 
@@ -268,8 +256,6 @@ $$\mathcal{L}_{rec} = \mathbb{E}_{(X_{out},\Pi_{out})} \left[ \frac{1}{v_{out}} 
 4. **长尾类别盲区**：当前系统仅覆盖常见的几类道路对象，对于完全未见的长尾类别（如动物、异形车辆）缺乏泛化能力，需要额外的微调或提示机制。
 5. **评估指标争议**：GPT-5.2 成对偏好评估的稳定性和与人类专家判断的一致性尚未经过严格校准，可能存在未知偏差。ED-R/ED-P 依赖 DINOv3 特征空间，其对几何误差与纹理误差的敏感度分离尚不明确。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l68_https_arxiv_org_abs_2604_18468/figures/004_Table_2.jpg]]
 *Table 2: Quantitative comparison with image-to-3D baselines on Part A of the NuRec AV Object Benchmark. The best and second-best results for each metric are highlighted in bold. ED-P is a non-rigid metric and is computed only for pedestrian instances*
 
@@ -278,26 +264,6 @@ $$\mathcal{L}_{rec} = \mathbb{E}_{(X_{out},\Pi_{out})} \left[ \frac{1}{v_{out}} 
 
 ![[assets/figures/papers/paper_list_l68_https_arxiv_org_abs_2604_18468/figures/010_Table_5.jpg]]
 *Table 5: Ablation on number of input views*
-
-![[assets/figures/papers/paper_list_l68_https_arxiv_org_abs_2604_18468/figures/011_Table_4.jpg]]
-*Table 4: Asset Harvester inference-time*
-
-![[assets/figures/papers/paper_list_l68_https_arxiv_org_abs_2604_18468/figures/012_Figure_6.jpg]]
-*Figure 6: OOD image editing and generalization with Asset Harvester. We edit AV inputs with Nano Banana to create out-of-distribution objects while preserving viewpoints, object poses, and scene background, then reconstruct plausible 3D assets from the edited observations*
-
-![[assets/figures/papers/paper_list_l68_https_arxiv_org_abs_2604_18468/figures/014_Figure_8.jpg]]
-*Figure 8: Insertion and harmonization results with Asset Harvester. We reinsert generated assets into NuRecreconstructed 3D scenes and apply DiffusionHarmonizer to reduce residual artifacts, improve shadows, and enhance local photometric consistency for better scene integration*
-
-![[assets/figures/papers/paper_list_l68_https_arxiv_org_abs_2604_18468/figures/015_Table_6.jpg]]
-*Table 6: Quantitative comparison with image-to-3D baselines on Part A of the NuRec AV Object Benchmark. For each class, we compute mean over samples. PSNR in dB; ED-R is mean embedding distance*
-
-![[assets/figures/papers/paper_list_l68_https_arxiv_org_abs_2604_18468/figures/016_Table_7.jpg]]
-*Table 7: GPT-5.2 pairwise preference rates on Part B of the NuRec AV Object Benchmark. Higher percentages indicate more preferred results. In this experiment, Asset Harvester (AH) estimates camera parameters from a single input view with C-Radio linear probing*
-
-![[assets/figures/papers/paper_list_l68_https_arxiv_org_abs_2604_18468/figures/017_Table_8.jpg]]
-*Table 8: GPT-5.2 pairwise preference rates on Part B of the NuRec AV Object Benchmark. Higher percentages indicate more preferred results. In this experiment, Asset Harvester (AH) parses object camera from NCore scene for the single view input*
-
-
 
 ## 定位与知识库关联
 
@@ -348,8 +314,6 @@ Asset Harvester 在三个关键维度上构成了对上述基线的系统性改�
 **合成-真实域差异。** 合成数据训练与真实数据分布间的域差异是否可以通过更强的物理渲染或风格迁移进一步缩小？当前混合数据策略（Section 3.2）已部分缓解此问题，但域间隙仍然存在。
 
 **评估协议的稳定性。** 当前 GPT-5.2 成对偏好评估的稳定性和与人类专家判断的一致性如何，是否存在潜在偏差？这是一个影响所有采用 LLM-as-Judge 方法的研究的共性问题。
-
-
 
 ## 原文 PDF
 

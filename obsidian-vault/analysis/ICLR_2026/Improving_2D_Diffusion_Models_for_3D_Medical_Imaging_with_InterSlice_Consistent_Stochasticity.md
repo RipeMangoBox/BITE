@@ -54,8 +54,6 @@ claims:
 
 **主要结果**：在稀疏CT（30视角）、有限角CT（[0,100]°）和MRI 5×超分辨率三个任务上，DDS+ISCS 在轴向/冠状/矢状面的 PSNR、SSIM 和 LPIPS 上均取得最优结果，且层间差异指标 |Δ| 显著低于所有对比方法。消融实验证实：Slerp 噪声策略在辅助视图质量上全面超越 BCS 的相同噪声策略；方法对锚点选择、切片厚度变化和随机性强度均表现出高度鲁棒性；在病理保留方面，ISCS 能够清晰保留小病灶的边界和内部纹理，而 TV 正则化可能导致病灶模糊或消失。
 
-
-
 ### 3D医学成像中的逆问题与2D扩散先验的困境
 
 三维医学成像——包括稀疏视图CT（SVCT）、有限角度CT（LACT）和MRI各向同性超分辨率（SR）——本质上都是高度病态的逆问题：从欠定的测量 $\mathbf{y} = \mathbf{A}\mathbf{x} + \mathbf{n}$ 中恢复三维体积 $\mathbf{x}$。近年来，基于扩散模型（Diffusion Model）的逆问题求解器（如 **DDNM**，Wang et al., arXiv 2022；**DDS**，Chung et al., arXiv 2024）展现出强大的重建能力，其核心思路是利用预训练的2D扩散模型作为生成先验，通过迭代交替执行去噪预测、数据保真更新和重加噪三个步骤来逼近真实解。
@@ -77,8 +75,6 @@ claims:
 因此，本文提出一个根本性的问题重塑：**如果能在保持每切片噪声统计特性（标准高斯分布）的前提下，使相邻切片的随机噪声具有平滑的相关性，能否在不引入任何额外损失项、优化步骤或模型重训练的情况下，从根本上对齐采样轨迹，实现3D一致的生成过程？**
 
 这一动机催生了本文的核心方法——**切片间一致随机性（Inter-Slice Consistent Stochasticity, ISCS）**：一种即插即用的策略，通过在高维高斯分布的概率质量集中区域——超球面薄壳上——沿测地线进行球面线性插值（Slerp），生成既满足每切片标准高斯分布又具有自然层间衰减相关性的噪声体积，从而将2D扩散先验无缝提升为3D一致的生成过程。
-
-
 
 ## 核心方法与创新机理
 
@@ -110,11 +106,6 @@ ISCS的另一个关键创新在于其**零成本集成**的特性。与需要在
 - **计算开销可忽略**：Slerp插值的计算量相对于扩散模型的推理开销几乎可以忽略。
 
 实验证据有力地支持了这一设计的有效性：DDS+ISCS在SVCT（30视图）上将轴向PSNR从34.76提升至36.97（+2.21 dB），在LACT（[0,100]°）上从29.07提升至31.65（+2.58 dB），同时将层间差异指标 $|\Delta|$ 从0.005588降至0.001835（SVCT）和从0.011592降至0.001966（LACT），达到了与真实值最为接近的层间一致性（Table 1, Table 3）。
-
-
-
-![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_R5ETdN6ifA/figures/004_Figure_1.jpg]]
-*Figure 1: Geometric interpretation of how different noise strategies in the re-noising step affect the stochasticity and resulting consistency in diffusion sampling. (a) Independent Noise (Conventional): Independently sampled noise for each slice, leading to uncorrelated sampling paths. (b) Identical Noise (BCS (Kwon & Ye, 2025)): Applying the same noise to all slices forces identical sampling paths. (c) Slerp Noise (Ours): Our proposed ISCS interpolates noise on the hypersphere, generating smoothly correlated information across slices*
 
 ### 问题定位与核心矛盾
 
@@ -149,8 +140,6 @@ ISCS 的关键技术路径建立在**高维高斯分布的浓度现象（Gaussia
 | **ISCS（本文）** | 超球面 Slerp 插值生成相关噪声 | 适度且平滑 | 无明显伪影，保留自然层间过渡 |
 
 ISCS 可无缝集成到任意基于2D扩散的逆问题求解器（如 **DDNM** (Wang et al., arXiv 2022)、**DDS** (Chung et al., arXiv 2024)）中，仅需将重加噪步骤中的独立噪声 $\boldsymbol{\epsilon}$ 替换为 $\boldsymbol{\epsilon}^{\mathrm{ISCS}}$，不改变网络架构、不增加推理计算量、不需要后处理正则化。
-
-
 
 ### 3.1 问题根源：逐切片独立随机性导致的层间不一致
 
@@ -218,8 +207,6 @@ BCS（Batch-Consistent Sampling）对所有切片施加完全相同的噪声 $\b
 
 3. **ISCS重加噪**：使用Slerp生成层间相关噪声体积 $\boldsymbol{\epsilon}^{\mathrm{ISCS}}$，按公式(12)执行反向重加噪得到 $\mathbf{x}_{t-1}$。
 
-
-
 ## 实验与关键发现
 
 ### 核心定量结果：ISCS 在三种 3D 医学成像任务上一致提升重建质量
@@ -253,9 +240,6 @@ Table 2 和 Figure 4 系统比较了两种噪声同步策略——BCS（所有�
 
 Figure 5 展示了 PSNR、LPIPS 和层间差异随反向采样步数 (T→0) 的演变曲线。关键发现是：DDS+ISCS（橙色曲线）的层间差异在采样早期即快速下降并趋近真值参考线（黑色虚线），而 DDS 基线（蓝色曲线）的层间差异始终维持在高位。这表明 ISCS 的噪声相关性在扩散过程的粗粒度阶段（高 t 值）就已有效引导各切片朝向一致的解空间区域收敛，而非仅在后期精细调整。
 
-![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_R5ETdN6ifA/figures/012_Figure_5.jpg]]
-*Figure 5: Performance curves across the sampling process, where a higher PSNR and lower LPIPS and inter-slice difference reflect improved data fidelity and better inter-slice consistency*
-
 ### 确定性采样下的表现：仅初始化噪声相关即有效
 
 Table 6 展示了在完全确定性采样（DDIM, η=0）下，仅对初始噪声施加 ISCS 相关性的效果。结果显示，即使整个反向过程无随机噪声注入，ISCS 仍显著改善辅助视图质量：冠状 LPIPS 从 0.239 降至 0.065，矢状 LPIPS 从 0.241 降至 0.102。这证明 ISCS 的一致性机制不仅作用于重加噪步骤，也可通过初始化噪声的层间相关性为整个采样轨迹提供一致性引导。
@@ -267,14 +251,10 @@ Table 6 展示了在完全确定性采样（DDIM, η=0）下，仅对初始噪�
 
 Table 7 的 η 消融实验表明，重建性能随随机性强度单调提升：η=0.2 时轴向 PSNR 为 36.48，η=1.0 时达到最佳 37.08。这一趋势说明，虽然 ISCS 控制了噪声的层间相关性，但保留适当的随机性对逃逸局部极小和恢复高频结构细节至关重要。完全确定性采样（η=0）反而限制了模型探索解空间的能力。
 
-![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_R5ETdN6ifA/figures/017_Table_7.jpg]]
-
 ### 锚点选择鲁棒性：对夹角不敏感
 
 Table 8 验证了 ISCS 对 Slerp 插值中两个锚点噪声向量之间夹角的鲁棒性。在 30° 至 175° 的广泛范围内，10 次独立运行的 PSNR 均值波动极小（轴向 36.97 ± 0.02），标准差可忽略。这从实证角度验证了高维高斯分布的浓度现象——任意两个独立采样的高维噪声向量间夹角高度集中于 90° 附近，使得 ISCS 在实际使用中无需精细调节锚点选择策略。
 
-![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_R5ETdN6ifA/figures/018_Table_8.jpg]]
-*Table 8: Stability of Anchor Selection Strategy. Quantitative results ( $\mathrm { M e a n } \pm \mathrm { S t d }$ ) of ISCS under different anchor angles (10 independent runs each) on SVCT-30 task. The method shows minimal sensitivity to the specific geometric configuration of the latent noise
 
 ### 切片厚度鲁棒性：无需参数调整
 
@@ -294,9 +274,6 @@ Table 4 和 Table 5 将 DDS+ISCS 与两种显式 3D 感知方法（**TPDM**, Lee
 ![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_R5ETdN6ifA/figures/014_Table_4.jpg]]
 *Table 4: Quantitative comparison on the SVCT task of 30 views. Higher PSNR/SSIM and lower LPIPS indicate better performance*
 
-![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_R5ETdN6ifA/figures/015_Table_5.jpg]]
-*Table 5: Quantitative comparison on the LACT task of [0, 100]°. Higher PSNR/SSIM and lower LPIPS indicate better performance*
-
 ### 失败模式与局限
 
 尽管 ISCS 在多数场景下表现优异，分析揭示了以下边界条件：
@@ -308,12 +285,6 @@ Table 4 和 Table 5 将 DDS+ISCS 与两种显式 3D 感知方法（**TPDM**, Lee
 3. **等距网格假设**：Slerp 插值通过 α_i 参数隐式假设切片等距分布，对于极度不均匀的网格间距，插值权重与物理距离的对应关系缺乏理论保证（尽管 Table 9 已展示对常见层厚变化的鲁棒性）。
 
 4. **病理评估规模有限**：病灶保留能力的验证仅基于 DeepLesion 数据集的两个案例（Figure 6），缺乏大规模、多类型病灶的系统性量化评估，该结论需谨慎外推。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_R5ETdN6ifA/figures/013_Table_3.jpg]]
-*Table 3: Slice-to-slice difference of compared methods for three 3D medical imaging tasks: SVCT of 30 views, LACT of [0, 100]◦, and MRI SR of 5×. $\operatorname { S D i f f } _ { \operatorname { r e c o n } }$ and SDiffGT denote the mean absolute difference between adjacent slices for the reconstruction and ground truth, respectively; $\Delta = \mathrm { S D i f f _ { r e c o n } - S D i f f _ { G T } }$ measures the signed gap, and |∆| is its absolute value (smaller is better)
-
 
 
 ## 定位与知识库关联
@@ -374,8 +345,6 @@ $$ \epsilon_i^{\mathrm{ISCS}} = \mathrm{slerp}(\mathbf{z}_1, \mathbf{z}_S; \alph
 4. **与3D感知框架的协同**：将ISCS与DiffusionBlend或TPDM集成，能否在保持计算效率的同时进一步提升层间一致性？ISCS的噪声相关策略与多平面一致性约束是否存在互补或冗余？
 
 5. **病理鲁棒性系统验证**：当前病灶保留能力的评估仅基于两个案例，需在更大规模、更多类型的病理数据上系统验证ISCS是否确实优于TV正则化等后处理方法。
-
-
 
 ## 原文 PDF
 

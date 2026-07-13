@@ -53,8 +53,6 @@ claims:
 
 在方法谱系上，Kontinuous Kontext 属于**推理时连续控制**与**参数高效微调**的交叉范式：它以 **Flux Kontext**（DiT架构的指令编辑模型）为基座，通过训练秩-4 LoRA适配器和4层MLP强度投影器实现强度注入，区别于基于LoRA权重插值（ConceptSliders）、扩散特征空间插值（Freemorph）或视频帧插值（WAN-Video）的编辑后插值路线。该方法也存在明确局限：对本质上离散的编辑（如物体插入/移除）不适用，继承了基模型在精确几何变换上的弱点，且无法实现编辑强度的外推（s > 1 时编辑效果不再增强）。
 
-
-
 ### 指令驱动图像编辑的现状与瓶颈
 
 指令驱动的图像编辑（instruction-driven image editing）允许用户通过自然语言描述对图像进行修改，极大地降低了编辑门槛。以 **Flux Kontext** 为代表的最新模型基于扩散Transformer（DiT）架构，能够根据文本指令生成高质量的编辑结果。然而，这类模型存在一个根本性局限：**它们仅通过文本指令控制编辑的“内容”，却无法控制编辑的“程度”**。用户只能得到离散的“有编辑/无编辑”二值结果，缺乏对编辑强度的精细、连续调节能力。
@@ -86,8 +84,6 @@ claims:
 3. **可校准性**：设计一个轻量级的**强度投影器（strength projector）**，将标量强度与编辑指令嵌入共同映射为调制空间的偏移量，确保用户输入的强度值与实际编辑程度之间建立可靠的对应关系。
 
 通过将连续强度控制注入指令驱动编辑模型，Kontinuous Kontext 填补了“编辑内容”与“编辑程度”之间的控制鸿沟，为图像编辑提供了更细粒度的表达维度。
-
-
 
 ## 核心方法与创新机理
 
@@ -124,8 +120,6 @@ Kontinuous Kontext 通过**统一的强度投影器 + LoRA 适配**方案解决�
 | 泛化能力 | 领域特定方法需每属性单独训练 | 单一模型覆盖所有编辑属性的连续控制 |
 
 **需要手动验证的点**：论文未提供与 ConceptSliders、MARBLE 等基线方法的详细架构对比（如参数量、训练数据规模），建议在阅读完整论文时核实这些方法的实现细节，以确保公平性评估的准确性。
-
-
 
 Kontinuous Kontext 的整体 pipeline 围绕一个核心目标展开：在指令驱动的图像编辑模型中引入**标量编辑强度**这一连续控制维度，使用户能够像调节“滑块”一样精细控制编辑的程度。整个框架分为两个关键阶段：**合成数据集构建**与**强度感知模型训练**。
 
@@ -167,13 +161,6 @@ $$\mathcal{L}_{\theta} = \mathbb{E}_{t \sim p(t), x, e, s, y_s} \left[ \| v_{\th
 
 这种设计使得 Kontinuous Kontext 成为一个**统一的连续强度控制框架**，无需为每种编辑属性单独训练模型。用户只需调节标量 s，即可在同一条编辑指令下获得从无编辑到全编辑之间的平滑过渡。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2320_https_arxiv_org_abs_2510_08532/figures/001_Figure_1.jpg]]
-*Figure 1: Kontinuous Kontext produces smooth edit trajectories across diverse attributes given an image, instruction, and an edit scalar strength. Unlike prior methods that require attribute-specific training, ours is a unified approach to enable fine-grained control*
-
-
-
 ### 关键模块设计
 
 Kontinuous Kontext 的核心架构建立在 **Flux Kontext** 之上——一个基于扩散Transformer（DiT）的指令驱动图像编辑模型。为引入连续编辑强度控制，方法在基模型上增加两个轻量级模块：
@@ -183,9 +170,6 @@ Kontinuous Kontext 的核心架构建立在 **Flux Kontext** 之上——一个�
 - **LoRA适配层**：对Flux Kontext的注意力投影矩阵施加秩-4的低秩适配（LoRA），与强度投影器共同训练，使基模型能适应强度条件信号的引入。
 
 架构设计的核心洞察来自一个简单实验：直接用标量 $v \in (0.5, 1.3)$ 缩放文本令牌的调制参数可以产生不同强度的编辑效果，但变化与强度并非线性对齐（Fig. 6a, Fig. 14）。这表明调制空间天然编码了编辑强度信息，但需要专门的校准模块将用户可解释的强度值映射为精确的调制参数偏移。
-
-![[assets/figures/papers/paper_list_l2320_https_arxiv_org_abs_2510_08532/figures/016_Figure_14.jpg]]
-*Figure 14: Inference time control in modulation space. We conducted a simple experiment by scaling the text modulation parameters with values of*
 
 ### 关键公式
 
@@ -234,15 +218,8 @@ $$D_{\text{clip-dir}} = \frac{\sum_{i=0}^{N} (d_i / s_i)}{N}$$
 
 其中 $d_i$ 为在强度 $s_i$ 处编辑方向与文本指令方向的CLIP空间余弦相似度。该指标衡量编辑过程是否始终沿着指令指定的语义方向推进。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2320_https_arxiv_org_abs_2510_08532/figures/006_Figure_6.jpg]]
 *Figure 6: Model architecture. (a) In a simple experiment, we scale the text-token modulation parameters in Flux Kontext with a scalar to generate edit variations. This perturbation produces edits of varying strengths, revealing that modulation parameters can govern edit strength. (b) Building on this insight, we design a lightweight projector network that maps a scalar edit strength s to offsets of the text modulation parameters, enabling precise control over edit strength*
-
-![[assets/figures/papers/paper_list_l2320_https_arxiv_org_abs_2510_08532/figures/007_Figure_7.jpg]]
-*Figure 7: Adding text embeddings into the slider projector improves smoothness of edit transitions*
-
-
 
 ## 实验与关键发现
 
@@ -252,9 +229,6 @@ $$D_{\text{clip-dir}} = \frac{\sum_{i=0}^{N} (d_i / s_i)}{N}$$
 
 - **编辑平滑度（δ_smooth）**：采用基于 DreamSim 距离的二阶三角形赤字度量。该指标衡量相邻三帧编辑结果之间的局部一致性——值越小，表示编辑过渡越平滑、无突变。用户研究（Figure 15）证实，该二阶度量与人类对平滑度的偏好高度对齐，优于一阶距离度量。
 - **指令跟随度（CLIP-Dir）**：在所有编辑强度下计算 CLIP 方向相似度的加权平均，评估编辑轨迹与文本指令的整体对齐程度。
-
-![[assets/figures/papers/paper_list_l2320_https_arxiv_org_abs_2510_08532/figures/017_Figure_15.jpg]]
-*Figure 15: We performed one user study where we compute the alignment of the users scores given for smoothness of the sequence with the different variations of smoothness metrics. We found*
 
 训练数据通过合成管线生成：首先用 VLM 为源图像生成编辑指令，由 Flux Kontext 产生完整强度编辑，再借助 Freemorph 在扩散潜空间中进行特征插值以生成中间强度样本，最后经过反转质量与序列均匀性过滤，剔除不一致的编辑序列。
 
@@ -319,8 +293,6 @@ $$D_{\text{clip-dir}} = \frac{\sum_{i=0}^{N} (d_i / s_i)}{N}$$
 
 Kontinuous Kontext 继承了 Flux Kontext 在精确几何操作上的弱点，例如无法实现准确的物体旋转或平移。尽管 **Figure 8** 展示了在“熊猫变哈士奇”等几何变换上的连续控制能力，但编辑的几何精度仍受限于基模型本身的能力边界。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2320_https_arxiv_org_abs_2510_08532/figures/010_Figure_9.jpg]]
 *Figure 9: Visual Comparison. We evaluate against (a) image interpolation methods, where we first generate a full strength edit with Flux-Kontext and interpolate to obtain intermediate edits, and (b) domain-specific methods, which train separate LoRAs/Adapters for each attribute. Our generalized method achieves superior slider control with consistent image identity and smooth edit transitions*
 
@@ -329,14 +301,6 @@ Kontinuous Kontext 继承了 Flux Kontext 在精确几何操作上的弱点，�
 
 ![[assets/figures/papers/paper_list_l2320_https_arxiv_org_abs_2510_08532/figures/012_Figure_10.jpg]]
 *Figure 10: User study win-rates (%) of our method against baselines in pairwise comparisons*
-
-![[assets/figures/papers/paper_list_l2320_https_arxiv_org_abs_2510_08532/figures/021_Figure_18.jpg]]
-*Figure 18: Ablation over architecture of Kontinuous Kontext*
-
-![[assets/figures/papers/paper_list_l2320_https_arxiv_org_abs_2510_08532/figures/009_Table_1.jpg]]
-*Table 1: Baseline comparison*
-
-
 
 ## 定位与知识库关联
 
@@ -406,8 +370,6 @@ Kontinuous Kontext 的核心技术决策可归纳为“**在调制空间而非�
 ### 知识库定位总结
 
 Kontinuous Kontext 在方法谱系中的核心贡献是**发现了调制空间作为连续编辑强度控制接口的潜力**，并通过轻量级投影器实现了校准后的统一控制。它既避免了编辑后插值方法的身份不一致和突变问题（δ_smooth 从 0.371 降至 0.329，Table 1a），又克服了领域特定方法需要为每个属性单独训练的局限性。该方法为指令驱动图像编辑引入了一个新的连续控制维度，其“调制空间注入”的设计范式可能对更广泛的生成模型可控性研究具有启发意义。
-
-
 
 ## 原文 PDF
 

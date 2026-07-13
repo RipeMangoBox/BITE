@@ -213,28 +213,17 @@ $$r = \frac{1}{T} \sum_{t} b_{t}, \quad s = \frac{\sum_{t} m_{t}}{\max(1, \sum_{
 
 > **鲁棒性说明**：消融实验（Figure 8, Figure 9）表明，在不同容忍度尺度、不同姿态估计器（MeTRAbs vs. PromptHMR）以及频率-严重性-持久性权重组合的网格搜索下，模型排名保持高度一致，验证了指标设计的鲁棒性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_20157/figures/004_Figure_5.jpg]]
-*Figure 5: Prompt Design. Different models tend to have different biases when generating videos, which may lead to unnatural scenes, truncated bodies, moving cameras, or multiple people. We experimented extensively with prompt engineering to mitigate these model biases and obtain the most stable motions in the generated videos, which facilitates metric calculation. Best viewed when zoomed in*
-
 ## 实验与关键发现
 
 ### 主实验结果
 
 HumanScore 对 12 个前沿视频生成模型进行了系统评估，涵盖解剖正确性、运动学正确性和动力学正确性三个维度。**Table 1** 展示了完整的排行榜结果。真实视频在所有维度上均获得最高分，总体得分达到 94.3，验证了指标对真实人体运动的偏好。在生成模型中，Seedance 1.0 Pro fast 和 HunyuanVideo 1.5 以 91.1 的总体得分并列第一，紧随其后的是 Sora 2（90.2）和 Veo 3.1 Fast（89.3）。值得注意的是，即使表现最佳的生成模型仍与真实视频存在 3.2 分的差距，表明当前生成器在人体运动生物力学忠实度上仍有改进空间。
 
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_20157/figures/006_Table_1.jpg]]
-*Table 1: HumanScore Leaderboard. Higher scores indicate better performance. The best score in each dimension is highlighted in cell colors*
-
 从各维度细分来看，解剖正确性维度上模型间差异最小（最高 95.0，最低 88.2），而动力学正确性维度差异最大（最高 89.1，最低 76.1）。这表明现有模型在基础解剖结构保持方面相对成熟，但在运动平滑度和速度合理性等动力学层面存在明显短板。
 
 ### 与人类偏好的一致性验证
 
 为验证指标的有效性，研究团队进行了大规模人类偏好研究。如 **Figure 7** 所示，HumanScore 的总体得分与人类偏好的胜率之间呈现出极强的相关性，Spearman 相关系数接近 1.0。这一结果在解剖、运动学、动力学三个子维度上均保持一致，证明自动化指标能够有效替代人类评估，捕捉到人类观察者所关注的生物力学质量信号。
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_20157/figures/007_Figure_7.jpg]]
-*Figure 7: HumanScore metric values show strong alignment with human preference. The plot compares the averaged HumanScore win rate (Y-axis) against the overall human preference win ratio (X-axis). A linear fit is included to visualize the correlation and the overall Spearman’s correlation coefficient (ρ) is reported*
 
 ### 与现有基准的互补性分析
 
@@ -266,16 +255,8 @@ HumanScore 对 12 个前沿视频生成模型进行了系统评估，涵盖解�
 2. **接触与逆动力学指标缺失**：研究排除了脚-地接触检测和逆动力学分析，因为这些模块在复杂运动中依赖不可靠的接触检测或动力学分解，误差较大。
 3. **评估范围受限**：当前基准仅适用于单人、全身可见、固定相机、中性背景的生成视频，无法覆盖多人交互或复杂场景。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_20157/figures/008_Table_2.jpg]]
-*Table 2: Spearman correlations between our biomechanics-informed metrics and VBench [23] evaluation axes*
-
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_20157/figures/011_Figure_10.jpg]]
 *Figure 10: Detailed breakdown of benchmark results across each evaluation dimension (left) and motion difficulty level (right). The value range shown in the plots is (50, 100)*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_20157/figures/002_Figure_2.jpg]]
-*Figure 2: The performance of human mesh recovery methods is converging at low errors and video generators are becoming more realistic*
 
 ## 定位与知识库关联
 

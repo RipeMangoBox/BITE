@@ -48,8 +48,6 @@ claims:
 
 在 PosterOmni-Bench 上，PosterOmni 的总体得分达到 **4.37**，较基线模型 Qwen-Image-Edit（3.51）提升 **+0.86**；在布局驱动任务上领先 **+0.76**，在风格驱动任务上领先 **+1.40**，在所有开源基线中取得最优，并在人类偏好研究中与商业系统 Seedream-4.0 表现持平。该方法在方法谱系上属于**任务蒸馏 + 统一奖励强化学习**的扩散模型对齐范式，为多任务图像编辑与生成提供了一条可复现的整合路径。
 
-
-
 ### 图像到海报生成的双重困境
 
 海报创作是一项高度复合的视觉设计任务，要求系统同时具备两类截然不同的能力：**局部编辑精度**（如实体保留、空间一致性、文本渲染准确性）与**全局创作理解**（如布局规划、风格迁移、美学和谐）。现有开源图像编辑模型——包括 **ICEdit**（Zhang et al., arXiv 2025）、**Step1X-Edit**（Liu et al., arXiv 2025）、**FLUX.1 Kontext**（Batifol et al., arXiv 2025）以及 **Qwen-Image-Edit**（Chenfei Wu et al., arXiv 2025）——虽然在单一编辑任务上取得了进展，但在面对多任务图像到海报生成时，普遍存在布局错位、文本失真和美学质量下降等问题。其根本瓶颈在于：这些模型的设计范式未能将局部编辑与全局创作视为两个需要协同优化的互补子空间，导致任务干扰和能力割裂。
@@ -75,8 +73,6 @@ claims:
 - **统一奖励对齐**：构建覆盖多任务的统一奖励模型，同时注入美学偏好与任务精度信号，并通过基于 DiffusionNFT 的强化学习方法将奖励反馈融入前向扩散目标，使模型输出与人类偏好对齐。
 
 通过这一数据–蒸馏–奖励流水线，PosterOmni 旨在成为首个统一局部编辑与全局创作的开源图像到海报生成系统，在参考一致性、全局构图质量和美学和谐性上全面超越现有开源基线，并与商业系统形成竞争力。
-
-
 
 ## 核心方法与创新机理
 
@@ -111,8 +107,6 @@ PosterOmni 提出了**统一 PosterOmni 奖励模型 $R_{\text{omni}}$**，其�
 ---
 
 **综上**，PosterOmni 的创新本质是**任务分解-蒸馏整合-统一奖励对齐**的三阶段协同：任务蒸馏解决了多任务能力融合中的干扰问题，统一奖励模型提供了覆盖精度与美学的细粒度反馈，Omni-Edit RL 则将该反馈高效地注入生成过程。三者共同构成了从数据到模型的对齐闭环。
-
-
 
 PosterOmni 构建了一个**数据–蒸馏–奖励**三阶段闭环，将图像到海报的生成统一为局部编辑与全局创作的协同优化问题。整个框架围绕一个核心洞察展开：海报生成任务天然存在两个互补的子空间——局部编辑（实体保留、空间一致性）和全局创作（布局、风格、美学和谐），现有开源模型难以同时兼顾二者，导致布局错位、文本失真和美学质量下降。PosterOmni 通过显式分解任务、专家知识蒸馏和统一奖励反馈，将这两类能力整合到一个统一模型中。
 
@@ -156,15 +150,8 @@ PosterOmni 构建了一个**数据–蒸馏–奖励**三阶段闭环，将图�
 
 最终，PosterOmni 在 PosterOmni-Bench 上取得 4.37 的总体评分，相较基线 **Qwen-Image-Edit**（Chenfei Wu et al., arXiv 2025）的 3.51 提升 +0.86，在布局驱动和风格驱动任务上分别提升 +0.76 和 +1.40（Table 1），并在人类偏好研究中与商业系统 **Seedream-4.0**（Seedream Team, arXiv 2025）表现相当（Figure 9）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2290_https_arxiv_org_abs_2602_12127/figures/002_Figure_1.jpg]]
 *Figure 1: PosterOmni unifies local editing and global creation within a single image-to-poster generation framework. It covers six representative tasks—extending, filling, rescaling, identity-driven, layout-driven, and style-driven poster generation—enabling the model to achieve both fine-grained visual editing and holistic aesthetic composition*
-
-![[assets/figures/papers/paper_list_l2290_https_arxiv_org_abs_2602_12127/figures/010_Figure_6.jpg]]
-*Figure 6: Examples from our PosterOmni-data ( PosterOmni-200K and PosterOmni-Bench). For each of the six core image-to-poster tasks—style-driven generation, layout-driven generation, ID-driven generation, extending, rescaling, and filling—we show the reference image(s) together with the corresponding image-to-poster prompts in both English and Chinese. The examples illustrate diverse commercial scenarios, layouts, and visual styles, as well as the explicit task-specific instructions*
-
-
 
 PosterOmni 的训练流程由四个关键模块串联构成（Figure 4），其核心思想是将图像到海报生成任务显式分解为局部编辑与全局创作两个子空间，通过任务蒸馏（Task Distillation）和统一奖励反馈（Unified Reward Feedback）驱动强化学习，将两类能力整合到一个统一模型中。
 
@@ -214,16 +201,6 @@ $$ v_{\theta}^{-}(x_t, c, t) = (1 + \beta) v_{\mathrm{old}}(x_t, c, t) - \beta v
 
 $\beta$ 控制更新强度：当奖励为正时，模型向当前策略方向更新；奖励为负时则反向远离。与策略梯度类 RL 方法不同，DiffusionNFT 保持了前向扩散的一致性，隐式地将强化信号融入速度场，避免了似然近似，实现了简单且稳定的对齐优化。消融实验（Table 3）表明，完整的 $R_{\mathrm{omni}}$ 配合 Omni-Edit RL 达到 4.76/4.20（Local/Global），移除负样本对或图像到海报提示分别降至 4.64/4.03 和 4.67/4.09，验证了统一奖励反馈中多维度信号的必要性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2290_https_arxiv_org_abs_2602_12127/figures/005_Figure.jpg]]
-*Figure: PosterOmni-SFTFigure 4 PosterOmni training workflow through four stages: (i) task-specific SFT for local and global experts, (ii) task distillation to integrate them into a single PosterOmni-SFT model, (iii) reward training for the unified PosterOmni Reward R _ ${ \mathrm { o m n i } } ,$ and (iv) Omni-Edit RL using DiffusionNFT to align creation with human-preferred aesthetics and precision. For clarity, only one task is illustrated in (iii) and (iv)*
-
-![[assets/figures/papers/paper_list_l2290_https_arxiv_org_abs_2602_12127/figures/012_Figure_8.jpg]]
-*Figure 8: Examples of preference pairs for PosterOmni Reward Training. For several representative style-driven and layout-driven cases, we show the reference image together with the rejected and chosen candidates produced by PosterOmni-SFT, as well as the corresponding image-to-poster prompts in English and Chinese. Each triplet (reference, rejected, chosen) constitutes a concrete example of the preference pairs used to train the unified reward model Romni*
-
-
-
 ## 实验与关键发现
 
 PosterOmni 的实验体系围绕自建基准 PosterOmni-Bench 展开，通过自动评估与人类偏好研究双重验证，系统性地回答了三个核心问题：统一模型能否同时胜任局部编辑与全局创作、任务蒸馏是否优于其他专家集成策略、以及统一奖励反馈能否带来进一步的性能增益。
@@ -261,19 +238,6 @@ Omni-Edit RL 基于 DiffusionNFT 框架（Eq. 17-18），其核心机制是将�
 ### 失败模式与局限性
 
 尽管整体性能优异，PosterOmni 仍存在若干结构性局限。首先，当前框架仅覆盖六种预定义任务，无法处理动态元素、交互组件等更复杂的海报设计需求，任务边界的外推能力未经验证。其次，评估体系对 Gemini-2.5-Pro 的强依赖意味着评分标准可能偏向该模型的审美偏好，大规模人工标注基准的缺失使得绝对性能的校准存在不确定性。此外，框架在幻灯片、网页横幅、多页宣传册等非海报图形设计任务上的泛化能力尚未测试，任务蒸馏的跨域迁移特性仍是开放问题。最后，模型不支持多轮交互式共创或序列化海报的一致性控制，限制了其在真实协作场景中的适用性。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2290_https_arxiv_org_abs_2602_12127/figures/009_Table_3.jpg]]
-*Table 3: Ablation of unified reward feedback. Scores are averaged on the selected local (extend) and global (layout) tasks*
-
-![[assets/figures/papers/paper_list_l2290_https_arxiv_org_abs_2602_12127/figures/016_Table_6.jpg]]
-*Table 6: Ablation of expert integration strategies. Scores are averaged on a local task (extend, L) and a global task (layout-driven, G) on PosterOmni-Bench-en*
-
-![[assets/figures/papers/paper_list_l2290_https_arxiv_org_abs_2602_12127/figures/006_Figure_5.jpg]]
-*Figure 5: Visual comparison of different model outputs. Red boxes highlight errors and distorted entities, while yellow boxes indicate incorrect or missing text elements. Compared to other methods, our method is able to accomplish all image-generated poster tasks more effectively, while also achieving excellent aesthetic quality*
-
-
 
 ## 定位与知识库关联
 
@@ -316,8 +280,6 @@ PosterOmni 的核心贡献在于**将这两个子空间显式建模为互补任�
 4. **奖励模型的鲁棒性。** $R_{\mathrm{omni}}$ 的训练依赖 Gemini-2.5-Pro 过滤和人工标注构建偏好对，这一过程是否引入了标注者的文化偏见（如对特定美学风格的偏好）？跨文化场景下的公平性需要进一步验证。
 
 5. **效率优化。** 四阶段训练流程的计算开销是否可以通过联合优化（如端到端可微蒸馏 + RL）或模型剪枝来降低？这在工业部署场景下尤为重要。
-
-
 
 ## 原文 PDF
 

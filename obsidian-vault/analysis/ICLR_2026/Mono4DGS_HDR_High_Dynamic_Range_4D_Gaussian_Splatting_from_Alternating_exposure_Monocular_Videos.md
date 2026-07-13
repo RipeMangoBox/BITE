@@ -144,8 +144,6 @@ Mono4DGS-HDR 采用**两阶段高斯优化范式**，核心思路是将相机位
 
 整个 pipeline 的因果链路可归纳为：**正交空间视频高斯消除位姿依赖 → 获得一致 HDR 训练视频 → 视频-世界变换提供强初始化 → TLR 与 HDR 重投影损失协同保障时域稳定与位姿精度**。这一设计使 Mono4DGS-HDR 在无需已知位姿的条件下，从交替曝光单目视频中重建出高质量的 4D HDR 场景。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_9ZrjgzlAuh/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of Mono4DGS-HDR. (a) We infer vision foundation models on the input alternating-exposure video to extract 2D priors, which provide scene initialization and regularization. (b) We propose a novel two-stage Gaussian optimization procedure, which includes video Gaussian training in the first stage, world Gaussian fine-tuning in the second stage, and a videoto-world Gaussian transformation strategy. The HDR Gaussians are optimized through 2D prior supervision, Gaussian motion regularization, temporal luminance regularization and HDR photometric reprojection loss*
 
@@ -269,8 +267,6 @@ Mono4DGS-HDR 在合成与真实数据集上均取得最优性能。表 1 和表 
 
 - 是否可结合 RAW 域表示以更好地处理极低光/高噪声场景？
 - 如何进一步放宽对成对光流计算的曝光一致性要求，以适应更任意的曝光调度？
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_9ZrjgzlAuh/figures/005_Table_1.jpg]]
 *Table 1: Quantitative comparisons on the test frames of Syn-Exp-3 scenes. Metrics are averaged over all scenes. LDR-OE and LDR-NE denote the LDR results with observed and novel exposures, respectively. HDR denotes the HDR results. FPS is measured at 864 × 480 resolution. † We use our initial camera parameters from bundle adjustment as the required camera inputs for GaussHDR (Liu et al., 2025a) and HDR-HexPlane (Wu et al., 2024a). ‡ We extend SplineGS (Park et al., 2025) and MoSca (Lei et al., 2025) to HDR mode for fair comparison*

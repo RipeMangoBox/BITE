@@ -52,8 +52,6 @@ claims:
 
 当前方法主要局限于驾驶场景训练数据，在非驾驶环境及闭环仿真等下游应用中的泛化性尚待验证。
 
-
-
 世界模型旨在构建对物理环境的内部表征，以支持预测、规划和决策。近年来，随着自回归视觉生成技术的快速发展，利用大规模视频数据学习世界模型已成为一条极具前景的技术路径。然而，当前的世界模型普遍面临一个核心瓶颈：**空间与时间相关性被解耦处理**，模型通常依赖固定相机配置、相邻视角或显式3D表示（如BEV、体积渲染）等强归纳偏置来维持时空一致性。这种设计虽然在一定程度上简化了建模难度，却严重限制了模型对新型传感器布局、灵活相机运动及开放世界环境的泛化能力。
 
 具体而言，现有方法存在以下结构性缺口：
@@ -65,8 +63,6 @@ claims:
 3. **显式3D先验的局限**：基于BEV或NeRF的表示虽能提供几何约束，但在稀疏视角、大范围运动或复杂遮挡场景下，其重建质量会显著下降，且计算开销随分辨率增长而急剧增加。
 
 针对上述问题，RAYNOVA 提出了一种**光线空间中的尺度-时序自回归世界建模**范式。其核心动机在于：通过消除对特定相机拓扑和运动模式的结构性依赖，以最小归纳偏置实现物理上合理的世界建模。具体而言，RAYNOVA 利用相机光线空间中的相对位置编码，构造一个几何无关的连续4D表示，使模型能够在统一的全局注意力中进行跨视角、跨帧的尺度-时序自回归，从而在无显式3D先验的情况下获得高时空一致性和强泛化性。这一设计使得模型可以零样本泛化至未见过的相机配置，并在新视角合成、条件视频生成等任务上显著超越现有基线。
-
-
 
 ## 核心方法与创新机理
 
@@ -112,8 +108,6 @@ $$a _ { i , j } = \mathbf { q } _ { k _ { i } } ^ { v _ { i } , t _ { i } } ^ { 
 | 自回归顺序 | 单尺度 next-token 或独立图像/视频生成 | 双因果顺序：先尺度后时间，联合建模 | Table 7: 前缀尺度 FID 17.2 vs 全部尺度 60.4 |
 
 这些创新共同构成了 RAYNOVA 在 nuScenes 多视角视频生成任务上以 FID 10.5、FVD 91、吞吐量 1.96 images/s 全面领先现有基线（如 Panacea 的 FID 17.0、FVD 139、吞吐量 0.67）的技术基础，并在仅使用公开数据训练的条件下展现了显著的数据效率和泛化优势。
-
-
 
 RAYNOVA 的整体框架围绕“双因果自回归”范式构建，旨在以最小归纳偏置实现多视角视频的统一生成。其核心设计原则是：**在相机光线空间中构造各向同性的时空表示，并通过统一的全局注意力同时建模跨视角、跨帧的尺度-时序依赖关系**。
 
@@ -179,12 +173,8 @@ $$\mathbf{R} = \begin{bmatrix} \mathbf{R_m} & 0 & 0 \\ 0 & \mathbf{R_d} & 0 \\ 0
 - **统一时空建模**：全局自注意力同时处理空间和时间维度，消融实验表明其性能大幅超越解耦时空注意力设计（FID: 10.5 vs 15.6, FVD: 91 vs 140, Table 8）。
 - **高效推理**：自回归架构结合 KV 缓存机制，推理吞吐量达 1.96 images/s，远超扩散模型基线（Table 1）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2602_20685/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of RAYNOVA Framework. RAYNOVA is composed of dual-casual (scale and time) blocks. The local scale attention and local cross attention works on each image indepedently, while the global causal attention works across multi-view and multiframe images enhanced with a unified ray-level relative position embedding for better spatio-temporal consistency*
-
-
 
 ### 3.1 多尺度图像分词与下一尺度预测
 
@@ -238,13 +228,6 @@ $$\mathbf { R } = \left[ \begin{array} { c c c } { \mathbf { R _ { m } } } & { 0
 
 为缩小训练与推理的分布差异，RAYNOVA 采用循环训练范式（Alg. 1）。由于全局自注意力是唯一跨帧操作的模块，训练时缓存其隐状态（KV cache），逐帧进行前向/反向传播。同时注入随机位错误以模拟推理时的累积误差。消融实验表明，该策略将 FVD 从约 100 降至 91，对提升长时域视频的时间连贯性尤为关键（Table 9, Sec. 4.4）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2602_20685/figures/003_Figure_3.jpg]]
-*Figure 3: Dual-Causality for Multi-View Video Generation. Green arrows represent the causal dependency, while the darkness indicates the topological order of autoregression (from light to dark)*
-
-
-
 ## 实验与关键发现
 
 ### 4.1 多视角视频生成主结果
@@ -285,17 +268,6 @@ RAYNOVA 的几何无关光线空间表示使其天然具备新视角合成能力
 
 当前实验存在以下局限：训练数据局限于驾驶场景，在非驾驶环境（机器人、无人机等）中的泛化性能尚未验证；评估主要聚焦于多视角视频生成质量与条件保真度，尚未探索闭环仿真等更广泛的世界模型应用。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2602_20685/figures/004_Table_1.jpg]]
-*Table 1: Multi-view Video Generation Performance*
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2602_20685/figures/005_Table_2.jpg]]
-*Table 2: Fidelity to Object Condition*
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2602_20685/figures/007_Table_5.jpg]]
-*Table 5: Novel View Synthesis Performance with Camera Shifts*
-
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2602_20685/figures/008_Table_6.jpg]]
 *Table 6: Ablation Study on Camera Ray*
 
@@ -310,14 +282,6 @@ RAYNOVA 的几何无关光线空间表示使其天然具备新视角合成能力
 
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2602_20685/figures/009_Figure_4.jpg]]
 *Figure 4: Ablation Study on Scale Causality. Conditioning on all scales in history hurts the modeling of dynamics, while condition-130M Model 2B Model ing only on same scale is insufficient for temporal coherence*
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2602_20685/figures/011_Figure_5.jpg]]
-*Figure 5: Ablation Study on Model Size. Large scale model can bring significantly better visual quality*
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2602_20685/figures/014_Figure_6.jpg]]
-*Figure 6: Zero-Shot to Unseen Waymo Open Dataset Camera Configuration*
-
-
 
 ## 定位与知识库关联
 
@@ -367,8 +331,6 @@ RAYNOVA 开辟了若干值得探索的方向：
 3.  **数据规模化律**：在更大规模、更多样化的视频数据上训练 RAYNOVA，量化数据规模与生成质量、泛化能力之间的缩放关系，对于理解该方法的潜力上限至关重要。
 4.  **记忆与遗忘机制**：为隐状态缓存引入更复杂的记忆管理策略（如选择性遗忘、动态容量分配），以支持更长时域的视频生成和更稳定的闭环仿真。
 5.  **多模态条件融合**：当前模型已支持文本、3D 框、HD 地图等条件，未来可探索动作指令、自然语言导航等更丰富的控制信号，以拓展其在具身智能和人机交互中的应用。
-
-
 
 ## 原文 PDF
 

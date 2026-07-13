@@ -68,8 +68,6 @@ ViMoGen属于**基于扩散变换器的双分支条件运动生成框架**。与
 
 在MBench泛化性基准上，ViMoGen取得**Motion Generalizability 0.68**，远超最佳基线MotionLCM的0.55（+0.13）；Motion Condition Consistency达到0.53，同样优于MotionLCM的0.48（+0.05）。消融实验表明，自适应门控分支选择是泛化性提升的关键——相比仅使用T2M分支（0.54）或M2M分支（0.59），自适应策略达到0.68。在数据层面，逐步添加合成视频数据带来最大的泛化增益（从0.44提升至0.55）。蒸馏变体ViMoGen-light在MBench上Generalizability得分0.55，与最强基线持平；在HumanML3D测试集上，MLD+ViMoGen-light取得R Precision Top-1 0.542的SOTA文本-运动一致性，FID从MLD基线的0.473大幅降至0.114。
 
-
-
 ### 文本到运动生成的泛化瓶颈
 
 3D人体运动生成是计算机视觉与图形学领域的核心任务之一，其目标是根据自然语言描述生成逼真、语义一致的人体运动序列。近年来，基于扩散模型（如**MDM**，Tevet et al., 2023）和自回归架构（如**T2M-GPT**，Zhang et al., 2023a）的方法在标准基准HumanML3D上取得了显著进展，R Precision Top-1等指标持续攀升。
@@ -93,8 +91,6 @@ ViMoGen属于**基于扩散变换器的双分支条件运动生成框架**。与
 - **数据维度**：构建**ViMoGen-228K**，一个包含228,236个运动片段（369.4小时）的大规模多源数据集，整合光学MoCap（171,542片段）、野外视频和合成视频数据，通过Gemini 2.0自动标注和CameraHMR/SMPLest-X视觉MoCap管线实现规模化处理。
 - **模型维度**：设计门控双分支扩散变换器架构，包含Text-to-Motion（T2M）分支和Motion-to-Motion（M2M）分支。T2M分支基于MoCap先验保证运动质量，M2M分支通过离线ViGen模型引入视频语义泛化知识；自适应门控模块根据数据质量和VLM对齐检查动态选择分支。进一步提出**ViMoGen-light**，通过知识蒸馏移除对视频生成模型的推理依赖。
 - **评估维度**：构建**MBench**基准，系统评估九个维度（运动质量、提示遵循、泛化性等），并通过人类偏好标注验证自动评估指标的可靠性（Spearman ρ显著正相关）。
-
-
 
 ## 核心方法与创新机理
 
@@ -139,8 +135,6 @@ ViMoGen属于**基于扩散变换器的双分支条件运动生成框架**。与
 
 ViMoGen 处于**扩散运动生成**与**视频先验迁移**的交叉点。其 DiT 骨干基于流匹配（Flow Matching）框架，采用整流流插值 $x_t = (1 - t) \epsilon + t x_0$ 和速度场预测损失 $\mathcal{L} = \mathbb{E}_{x_0, \epsilon, t, c} [\| f_{\theta}(x_t, t, c) - v_t \|_2^2]$。与 MotionLCM（Dai et al., 2024）的潜在一致性蒸馏、DNO（Karunratanakul et al., 2024）的扩散噪声优化等后处理增强不同，ViMoGen 从数据和架构层面系统性解决泛化问题。与 MotionCraft（Bian et al., 2025）等基于视频的运动生成方法相比，ViMoGen 的门控双分支设计实现了视频先验与 MoCap 先验的自适应融合，而非简单的条件拼接。
 
-
-
 ViMoGen 构建了一个多模态条件融合的文本到运动生成框架，其核心目标是通过引入视频生成模型在大规模数据中习得的丰富语义先验，突破现有模型在长尾、复杂语义指令上的泛化瓶颈。整体 pipeline 以文本提示为唯一显式输入，经由三条并行的信息提取通路汇聚到基于流匹配（Flow Matching）的扩散变换器（DiT）骨干网络，最终生成 3D 人体运动序列。
 
 **输入与多源条件提取。** 给定文本提示后，系统同时启动三条信息提取流水线（Figure 2(a)）：
@@ -162,12 +156,8 @@ $$\\mathcal{L} = \\mathbb{E}_{x_0, \\epsilon, t, c} [\\| f_{\\theta}(x_t, t, c) 
 
 **数据闭环。** 整个框架的训练数据来自 ViMoGen-228K 数据集（228,236 个运动片段，369.4 小时），涵盖光学 MoCap、野生视频和合成视频三类来源（Table 1），为双分支架构提供了从简单室内活动到复杂户外运动的广泛语义覆盖。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1906_The_Quest_for_Generalizable_Motion_Generation_Data_Model_and_Evaluation/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of ViMoGen. (a) Our model takes a text prompt as input and leverages both a text encoder and an offline video generation model to produce textual and video motion tokens. These are fused with noisy motion inputs through a stack of gating Diffusion Blocks. (b) Each block includes self-attention, an adaptive gating module, and two cross-attention branches: Text-to-Motion (T2M) and Motion-to-Motion (M2M). Only one branch is activated at a time, enabling the model to adaptively balance robustness and generalization*
-
-
 
 ### 流匹配运动生成基础
 
@@ -218,8 +208,6 @@ ViMoGen 的视频语义先验并非端到端在线生成，而是通过离线管
 ### ViMoGen-light 知识蒸馏
 
 ViMoGen-light 是 ViMoGen 的轻量蒸馏变体。教师模型（完整 ViMoGen）首先生成约 14k 个合成运动-文本对，覆盖长尾语义场景；学生模型仅保留 T2M 分支结构，在这些合成数据上进行训练，从而在不依赖任何视频生成模型的情况下保留泛化能力。
-
-
 
 ## 实验与关键发现
 
@@ -317,28 +305,6 @@ ViMoGen-light 是 ViMoGen 的轻量蒸馏变体。教师模型（完整 ViMoGen�
 ![[assets/figures/papers/paper_list_l1906_The_Quest_for_Generalizable_Motion_Generation_Data_Model_and_Evaluation/figures/017_Table_8.jpg]]
 *Table 8: Quantitative evaluation on the HumanML3D test set. ± indicates a 95% confidence interval during 20 times repeating evaluations. Bold indicates the best result*
 
-![[assets/figures/papers/paper_list_l1906_The_Quest_for_Generalizable_Motion_Generation_Data_Model_and_Evaluation/figures/013_Figure_6.jpg]]
-*Figure 6: MBench’s Human Alignment. In each plot, a dot represents the human preference win ratio (horizontal axis) and MBench automatic evaluation win ratio (vertical axis) for a motion generation model. We linearly fit a straight line to visualize the correlation and calculate the Spearman’s correlation coefficient (ρ) for each dimension*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1906_The_Quest_for_Generalizable_Motion_Generation_Data_Model_and_Evaluation/figures/010_Table_6.jpg]]
-*Table 6: Ablation on the choice of text encoder. Compared to CLIP (Radford et al., 2021) and MLLM (Kong et al., 2024), T5-XXL (Raffel et al., 2020) provides the best balance of generalization and motion quality*
-
-![[assets/figures/papers/paper_list_l1906_The_Quest_for_Generalizable_Motion_Generation_Data_Model_and_Evaluation/figures/008_Table_4.jpg]]
-*Table 4: Ablation on text prompt style. Training with descriptive video-style text and testing on concise motion-style text yields the best overall performance*
-
-![[assets/figures/papers/paper_list_l1906_The_Quest_for_Generalizable_Motion_Generation_Data_Model_and_Evaluation/figures/011_Table_7.jpg]]
-*Table 7: Analysis of mutual benefits between T2M and M2M branches. We compare our joint training approach against baselines using MotionLCM (Dai et al., 2024) and DNO (Karunratanakul et al., 2024)*
-
-![[assets/figures/papers/paper_list_l1906_The_Quest_for_Generalizable_Motion_Generation_Data_Model_and_Evaluation/figures/005_Figure_3.jpg]]
-*Figure 3: Overview of MBench. (a) MBench features more balanced distribution and vastly different prompt designs compared to HumanML3D. (b) MBench designed is to systematically evaluate motion generation algorithms across nine dimensions, focusing on motion quality, prompt-following, and generalization capability*
-
-![[assets/figures/papers/paper_list_l1906_The_Quest_for_Generalizable_Motion_Generation_Data_Model_and_Evaluation/figures/015_Figure_8.jpg]]
-*Figure 8: Comprehensive Data Preprocess Pipeline. The pipeline is organized into sequential modules, utilizing a central database to aggregate metadata like scores, keypoints, captions, and text masks*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 技术路径与基线关系
@@ -387,8 +353,6 @@ ViMoGen-light 通过知识蒸馏（教师模型生成 14K 合成提示并训练�
 - **视觉 MoCap 伪影的系统性消除**：足部滑动、运动模糊导致的姿态抖动等伪影能否通过改进的视觉 MoCap 管线（如融合物理约束的优化后处理）或生成视频的动态范围增强来系统性缓解？
 - **弱标注数据的有效利用**：ViMoGen-228K 的构建依赖 Gemini 2.0 进行自动标注，产生了大量弱标注数据。如何设计预训练策略（如掩码运动建模或对比学习）更高效地利用这些数据，减少对高质量人工标注的依赖？
 - **评估维度的细化**：MBench 虽然经过人类对齐验证（Figure 6，Spearman ρ 显著正相关），但某些维度（如脚部浮动）上自动指标与人类偏好的相关性较弱。这提示需要更精确的物理合理性自动评估指标，以支撑未来方法在该方向上的可靠迭代。
-
-
 
 ## 原文 PDF
 

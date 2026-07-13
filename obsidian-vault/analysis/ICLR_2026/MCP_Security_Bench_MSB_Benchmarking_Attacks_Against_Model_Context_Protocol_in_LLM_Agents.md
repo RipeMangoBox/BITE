@@ -54,8 +54,6 @@ claims:
 
 实验覆盖 10 种主流 LLM 骨干，基于 2,000 个攻击实例的评估显示：所有攻击方法的平均 ASR 达 **40.35%**，其中越界参数攻击（OP）效果最强（平均 ASR **76.5%**），名称碰撞-虚假错误（NC-FE）最弱（14.62%）。混合攻击展现出协同增强效应（PI-UI 平均 ASR 56.07%，高于单一攻击）。防御方案 MCIP 可将平均 ASR 降至 28.69%，但 NRP 仅微增 1.18%，且伴随 PUA 下降 7.59%，表明现有防御在安全-性能平衡上仍有显著不足。
 
-
-
 ### 模型上下文协议（MCP）与新兴攻击面
 
 大语言模型（LLM）驱动的智能体正在快速进入生产环境，其核心能力之一是调用外部工具完成复杂任务。模型上下文协议（Model Context Protocol, MCP）作为一种标准化的工具调用协议，通过统一的接口规范连接LLM与外部工具服务器，显著降低了集成成本并推动了智能体应用的规模化部署。然而，MCP在提升互操作性的同时，也系统性地扩展了攻击面：攻击者可以在**任务规划**、**工具调用**和**响应处理**三个关键阶段注入恶意载荷，而传统安全评估无法覆盖这一完整流水线。
@@ -83,8 +81,6 @@ claims:
 3. **韧性度量指标**：引入**净弹性性能（Net Resilient Performance, NRP）**，定义为 $\mathrm{NRP} = \mathrm{PUA} \cdot (1 - \mathrm{ASR})$，综合衡量智能体在抵抗攻击的同时维持任务完成能力的整体韧性，弥补了ASR和PUA单独使用的不足。
 
 通过MSB，本文旨在回答一个核心问题：**在标准化的MCP协议下，当前主流LLM智能体究竟有多脆弱，以及安全性与性能之间存在怎样的根本性权衡？**
-
-
 
 ## 核心方法与创新机理
 
@@ -119,8 +115,6 @@ NRP在对抗环境中同时衡量智能体维持性能与抵抗攻击的整体�
 MSB首次系统性地评估了跨阶段混合攻击的协同增强效应。实验显示，将诱导恶意工具调用的攻击（NC、PM、TT）与造成实际损害的攻击（FE、UI、OP）组合后，ASR显著高于单一攻击：PI-UI的平均ASR达56.07%，远超PI的20.21%和UI的45.69%（Tab. 3, Sec. 6.2）。这一发现揭示了MCP多阶段攻击面的叠加脆弱性——攻击者可通过组合不同阶段的攻击向量，显著提高绕过模型安全层的概率（Sec. E.3）。
 
 **总结**：MSB的创新本质在于将安全评估从“函数调用范式下的攻击模拟”升级为“MCP真实协议栈下的全流水线攻击执行与弹性度量”，从而暴露了传统基准无法覆盖的MCP特有脆弱性。
-
-
 
 ![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_irxxkFMrry/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the MCP-specific attacking framework, including Tool Signature Attack, Tool Parameters Attack, Tool Response Attack, and Retrieval Injection Attack, which cover the full tool-use pipeline stages: task planning, tool calling and response handling*
@@ -181,8 +175,6 @@ MSB的构建包含五个核心模块：
 | 安全性衡量指标 | 仅ASR与PUA | 新增NRP，在对抗环境中综合衡量性能与安全性 |
 
 这些差异使得MSB能够暴露MCP特有的全流水线脆弱性——尤其是工具调用阶段（该阶段平均ASR超过70%，见Figure 3）和MCP新增的攻击类型（UI和FE），这些在传统函数调用范式的基准中无法被覆盖。
-
-
 
 ### 攻击形式化框架
 
@@ -245,8 +237,6 @@ $$\mathrm{PUA} = \frac{\mathrm{Number~of~completed~user~tasks~under~attack}}{\ma
 $$\mathrm{NRP} = \mathrm{PUA} \cdot (1 - \mathrm{ASR})$$
 
 NRP基于对抗环境中的PUA计算（而非良性环境性能），因为模型在对抗与良性环境下的行为差异显著且无法简单外推。该指标直接揭示了安全性与性能之间的反向关系——提升模型易用性可能同时增加安全风险。
-
-
 
 ## 实验与关键发现
 
@@ -314,28 +304,6 @@ NC-FE的低ASR（14.62%）揭示了攻击链断裂的典型失败模式：当名
 
 此外，部分模型对特定攻击类型展现出较强鲁棒性。例如，Claude 4 Sonnet在多种攻击下的ASR低于平均水平，但其PUA也相对较低，再次印证了安全性与性能的权衡关系。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_irxxkFMrry/figures/011_Table_5.jpg]]
-*Table 5: Context dependent notions and agent action changes in the equation*
-
-![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_irxxkFMrry/figures/020_Table_6.jpg]]
-*Table 6: Examples of benign tools*
-
-![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_irxxkFMrry/figures/021_Table_7.jpg]]
-*Table 7: Overview of ten scenarios, agent roles, user task and number. Each scenario represents a distinct domain where the agent operates*
-
-![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_irxxkFMrry/figures/024_Table_8.jpg]]
-*Table 8: Examples of attack tools*
-
-![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_irxxkFMrry/figures/025_Table_9.jpg]]
-*Table 9: Six attack tasks and their measurements, as well as the applicable attack types. OP-Based: OP, PM-OP and TT-OP. Other: Other attack types*
-
-![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_irxxkFMrry/figures/028_Table_10.jpg]]
-*Table 10: Quantitative comparisons of different aspects among MSB, MCPTox (Wang et al., 2025a), ASB (Zhang et al., 2025a), AgentDojo (Debenedetti et al., 2025) and InjecAgent (Zhan et al., 2024) “Environment” refers to whether the agent actually invokes the tool. Numbers indicate the respective quantities for each aspect, while $\therefore X ^ { , }$ indicates that the aspect is not included in the respective system*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 与现有基准的关系
@@ -384,8 +352,6 @@ MSB揭示的瓶颈指向以下开放方向：
 3. **自动化攻击生成**：能否利用LLM自动生成新的MCP攻击向量，使基准能够持续更新以覆盖新兴威胁？
 
 4. **安全-性能权衡的深层机制**：实验揭示了一个矛盾现象——启用思维链模式使Qwen3 8B的PUA从51.15%升至64.97%，但ASR也从47.23%升至57.08%，NRP仅微增0.87%（Tab. 13, Sec. E.4）。这表明更强的指令遵循能力可能同时放大攻击面。如何在模型层面解耦这一反向关系，是MCP安全研究的核心挑战。
-
-
 
 ## 原文 PDF
 

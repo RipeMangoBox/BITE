@@ -63,8 +63,6 @@ claims:
 
 **局限性**：当前RevINN主要面向白盒攻击设计，尚未在完全黑盒或转移攻击场景下评估；恢复图像并非绝对无损，在大对抗预算下可能存在轻微细节损失；在自监督模型上的攻击成功率和泛化性有待进一步验证；论文未报告模型大小、推理延迟等部署相关指标。
 
-
-
 ### 对抗样本与可逆性需求
 
 深度神经网络在图像分类等任务中取得了显著成功，但极易受到对抗样本的攻击——攻击者通过对原始图像施加人眼难以察觉的微小扰动，即可使模型产生错误预测。这一脆弱性引发了学术界对对抗攻击与防御的广泛研究。在对抗样本的诸多研究方向中，**可逆对抗样本（Reversible Adversarial Examples, RAE）** 提出了一个独特且具有实际价值的目标：生成的对抗样本不仅要能成功攻击目标模型，还必须能够被授权用户无损或近无损地恢复为原始图像。这种可逆性在军事图像传输、医学影像共享、隐私保护等场景中具有重要应用前景。
@@ -90,8 +88,6 @@ claims:
 RevINN的核心洞察在于：**利用图像自身的频率特性，通过可逆信息交换机制直接生成RAE，无需依赖外部代理模型优化，也无需额外的嵌入步骤。** 具体而言，RevINN将图像经离散小波变换（DWT）分解为低频（LL）和高频（LH、HL、HH）子带后，通过两个关键模块——**交叉频率调制攻击模块（CFMA）** 和**高频扰动增强模块（HFPE）**——在不同频率分量之间建立双向调制关系。CFMA实现低频与高频间的粗粒度交叉攻击，HFPE对三个高频子带进行细粒度三支路增强。整个过程通过可逆神经网络的双射性质保证：前向过程生成RAE，逆向过程通过共享参数精确恢复原始图像。
 
 这一设计的优势在于：扰动的来源是图像自身的高低频信息交换，而非外部梯度信号，因此既保持了攻击强度，又通过逆小波变换与逆调制过程实现了近乎无损的恢复。如Figure 1中红色星标所示，RevINN在PSNR-ASR空间中实现了显著优于所有两阶段方法的综合性能。
-
-
 
 ## 核心方法与创新机理
 
@@ -135,8 +131,6 @@ $$
 
 论文进一步将 CFMA 和 HFPE 的调制过程抽象为统一的信息交换框架：两支路间丢弃判别信息 $\tau$ 并注入信息 $\gamma$，形式化为 $x_{1}' = x_{1} - \tau + \gamma$ 和 $x_{2}' = x_{2} + \tau - \gamma$。这一抽象揭示了 RevINN 生成 RAE 的本质机制——通过可逆变换在不同频率分量间重新分配图像信息，而非引入外部噪声，从而在保证攻击强度的同时维持了近乎无损的恢复能力（恢复图像 PSNR 58.94 dB，SSIM 0.998）。
 
-
-
 RevINN 是一种端到端的单阶段可逆对抗样本生成框架，其核心思路是在小波域内通过可逆信息交换直接生成可逆对抗样本（Reversible Adversarial Example, RAE），从而绕开现有两阶段方法中“先攻击、后嵌入”所引入的质量退化瓶颈。
 
 ### 整体流程
@@ -174,8 +168,6 @@ $$\mathcal{L} = \lambda_{1}\mathcal{L}_{freq} + \lambda_{2}\mathcal{L}_{adv} + \
 ### 与两阶段范式的本质区别
 
 现有两阶段方法（如 RAE-RDH、RAE-YUV、INN-RAE 等）先独立生成对抗样本，再通过额外嵌入步骤保存扰动信息。这一额外操作会破坏原有对抗样本的扰动分布，导致 RAE 的攻击有效性和视觉质量双双下降。RevINN 将对抗扰动生成与可逆恢复统一在单阶段网络内，利用图像内在频率信息进行交叉调制，从机制上消除了额外嵌入带来的退化。Figure 1 直观展示了这一优势：两阶段方法的 RAE 在 PSNR-ASR 空间中相对其原始 AE 出现明显退化，而 RevINN 以红色星标指示的位置同时达到高视觉质量和高攻击成功率。
-
-
 
 RevINN 的核心架构由四个关键模块串联构成，在小波域内完成从原始图像到可逆对抗样本（RAE）的端到端生成。整体流程见 Figure 2。
 
@@ -278,8 +270,6 @@ $$
 
 由于 CFMA 和 HFPE 的双射性质，该损失在训练中可快速收敛至极小值，使恢复图像的 SSIM 接近 1、PSNR 高达 58.94 dB，实现近乎无损的复原。
 
-
-
 ## 实验与关键发现
 
 ### 实验设置
@@ -325,9 +315,6 @@ Figure 3 和 Figure 4 分别展示了 RAE 和恢复图像的可视化对比。Re
 
 Figure 1 以 PSNR 为横轴、ASR 为纵轴，展示了各方法从原始对抗样本（AE）到可逆对抗样本（RAE）的质量退化轨迹。每条虚线连接同一方法的 AE 与 RAE 性能点：
 
-![[assets/figures/papers/paper_list_l926_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_RevINN_An_End_to/figures/001_Figure_1.jpg]]
-*Figure 1: Performance comparison between existing two-stage methods and the proposed one-stage RevINN. The x-axis denotes image visual quality measured by PSNR (dB), and the y-axis shows the attack success rate (ASR, %). Each dashed line links a method’s original adversarial examples (AE) and reversible adversarial examples (RAE) performance. While existing methods suffer quality degradation in their RAEs, our RevINN achieves a superior trade-off between visual fidelity and attack effectiveness, as indicated by the red star marker*
-
 - 所有两阶段方法的 RAE 点均相对于其 AE 点发生明显的 **右下偏移**，即攻击有效性和视觉质量同时下降。
 - RevINN 的红色星标位于 **右上角**，同时实现了高视觉质量和高攻击成功率，证明单阶段频率调制机制从根本上消除了两阶段嵌入引入的质量退化。
 
@@ -349,18 +336,12 @@ Table 3 报告了模块消融与对抗预算消融结果，揭示了 CFMA 和 HF
 
 Figure 5 对比了 RAE-YUV 与 RevINN 在多种图像操作下的攻击鲁棒性：
 
-![[assets/figures/papers/paper_list_l926_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_RevINN_An_End_to/figures/006_Figure_5.jpg]]
-*Figure 5: Attack Performance of RAE-YUV vs. RevINN under Diverse Image Operations. (a) From left to right, no processing, Flip(horizontal and vertical), Resize (twice the original dimensions), Resize(half the original dimensions), Center crop(90% proportion) and JPEG compression(quality factor = 70). (b) Different bits of Bit-Depth Reduction*
-
 - **常规图像变换**（Figure 5a）：包括水平/垂直翻转、2×放大、0.5×缩小、90%中心裁剪、JPEG 压缩（质量因子 70）。RevINN 在所有操作下均保持高于 RAE-YUV 的 ASR，展现出更强的扰动结构稳定性。
 - **位深度缩减**（Figure 5b）：在 2-bit 位深度缩减下，RAE-YUV 的 ASR 降至 15% 以下，而 RevINN 仍保持 **23%** 的 ASR。这是因为 RevINN 的扰动嵌入在小波域，对像素域的量化操作具有天然鲁棒性。
 
 ### 自监督学习场景
 
 Table 4 将 RevINN 与 RAEncoder 在自监督学习模型（Barlow Twins 等）上进行对比。RevINN 在 RAE 视觉质量（PSNR）上优于 RAEncoder，达到 **49.76 dB**。然而，在自监督模型上的攻击成功率相对有监督场景有所下降，且仅与 RAEncoder 做了对比，泛化性待进一步验证。
-
-![[assets/figures/papers/paper_list_l926_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_RevINN_An_End_to/figures/009_Table_4.jpg]]
-*Table 4: The performance of RevINN and RAEncoder [39] on self-supervised learning models*
 
 ### 失败模式与局限性
 
@@ -374,8 +355,6 @@ Table 4 将 RevINN 与 RAEncoder 在自监督学习模型（Barlow Twins 等）�
 - 为什么随着对抗预算 ε 的增加，恢复图像的质量反而提高？这一反直觉现象可能与更大扰动提供了更强的可逆性学习信号有关，但论文未给出解释。
 - 在三支路 HFPE 中，为何选择 HH 子带作为 LH 和 HL 的引导，而非其他组合？该设计选择的消融验证尚不充分。
 - RevINN 如何扩展到黑盒攻击并保持可逆性？频率调制机制不依赖代理模型信息，理论上可自然迁移，但需实验证实。
-
-
 
 ## 定位与知识库关联
 
@@ -457,8 +436,6 @@ $$x_{2}' = x_{2} + \tau - \gamma$$
 5. **三支路设计的理论依据**：在HFPE中，为何选择HH子带作为LH和HL的引导，而非其他组合（如LH引导HL和HH）？这一设计选择的频率域理论依据值得深入探讨。
 
 6. **与其他防御机制的交互**：RevINN生成的RAE在面对对抗训练、输入变换、检测器等防御机制时的鲁棒性尚未评估，这对其实际应用至关重要。
-
-
 
 ## 原文 PDF
 

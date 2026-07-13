@@ -58,8 +58,6 @@ claims:
 
 **方法框架**：CRC 包含三个核心模块：（1）参数化预测集合构建（盒子、椭圆、多面体），将决策与风险证书参数化；（2）经验鲁棒性控制优化器（Algorithm 1），通过平滑对偶问题的梯度优化直接最小化期望风险证书；（3）测试时校准器（Algorithm 2, Cal-CRC），基于样本分割与保形推理提供有限样本鲁棒性保证。
 
-
-
 在数据驱动的风险厌恶决策中，一个核心挑战是如何在不确定环境下做出既鲁棒又高效的决策。标准的条件风险优化（CRO）框架通过构建预测集来刻画结果变量的不确定性，然后在该集合上求解最坏情况下的决策问题。其基本逻辑是：先保证预测集以高概率覆盖真实结果，再基于该集合进行鲁棒优化。
 
 然而，这一框架存在一个根本性的结构性偏差。CRO强制要求预测集满足覆盖概率约束：
@@ -79,8 +77,6 @@ $$\mathbb{P}\{\phi(Y, z(X)) \le r(X)\} \ge 1 - \alpha$$
 即决策损失不超过风险证书的概率至少为 $1-\alpha$。这一约束直接对准了决策者真正关心的目标——决策本身的鲁棒性，而非预测集的统计覆盖性质。
 
 通过这一约束替换，CRC框架在理论上实现了与原风险厌恶决策问题的等价性（定理3.1），消除了因使用代理约束带来的性能损失。同时，借助保形推理的样本分割校准机制，CRC能够提供有限样本下的鲁棒性保证，填补了现有方法在统计保证方面的空白。
-
-
 
 ## 核心方法与创新机理
 
@@ -112,10 +108,6 @@ CRC 的约束替换并非启发式简化。**定理 3.1** 证明了预测集优�
 
 定理 3.2 和 3.3 分别给出了鲁棒性差距与风险证书最优性的非渐近界，收敛速率为 $O(\sqrt{d \log n / n})$，为 CRC 的统计有效性提供了理论支撑。
 
-
-
-![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_bt4Ahpemmi/figures/001_Figure_1.jpg]]
-*Figure 1: Comparison of CRO and our method CRC. Portfolio optimization problem with $\phi$ ( y , z ) = - $\bar { y } ^ { \top }$ z , $\mathcal { Z } = \{$ z $\in \mathbb { R } ^ { 2 } : z _ { 1 } + z _ { 2 }$ = 1 , $z _ { 1 } , z _ { 2 } \geq$ 0 $\}$ , and $\alpha$ = 0 . 1 . Blue lines show CRO solutions for the brown circular prediction sets. The shaded blue regions indicate where the loss $\phi$ ( y , z ( X ) ) ) is below the risk certificate r(X). The prediction set in CRO achieves exact 90% coverage, with r ( X ) = 1 . 9 3 . In contrast, CRC meets the 90% robustness requirement, yielding a more efficient decision with r ( X ) = 1 . 2 5
 
 保形鲁棒控制（Conformal Robustness Control, CRC）框架的核心思路是**将鲁棒决策问题转化为预测集合的参数化优化问题**，并通过显式的鲁棒性概率约束替代传统方法中的覆盖率代理约束，从根本上消除结构性保守偏差。整个框架由三个紧密协作的模块组成。
 
@@ -169,8 +161,6 @@ $$\mathbb{P}\left\{\phi\left(Y_{n+1}, z_{\mathcal{U}_{\mathrm{Cal}}}(X_{n+1})\ri
 $$\mathbb{P}\{\phi(Y, z_{\hat{\theta}}(X)) \leq r_{\hat{\theta}}(X) \mid \mathcal{D}_n\} \geq 1-\alpha - \Delta_n$$
 
 且 $\Delta_n$ 随样本量增大以 $O(\sqrt{d \log n / n})$ 速率收敛至零。这些保证为 CRC 框架的统计可靠性提供了严格的理论基础。
-
-
 
 ### 1. 从覆盖约束到鲁棒性约束：核心洞察
 
@@ -235,20 +225,16 @@ CRC提供两个关键理论保证（定理3.2和3.3）：
 
 值得注意的是，鲁棒性约束在模型参数上**不满足单调性**（Remark 3.1），这与保形风险控制形成本质区别，使得标准保形校准方法无法直接适用，必须采用本文提出的专用优化与校准框架。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能对比：消除保守偏差的实证证据
 
 CRC框架的核心主张——用显式鲁棒性约束替代覆盖代理约束可消除结构性保守偏差——在多个基准上得到一致验证。表1展示了美国股票投资组合优化问题上的主结果：在名义鲁棒性水平α=0.1下，**CRC-E**的风险证书仅为1.028±0.047，而**CRO-E**（Sun et al., 2023）高达1.723±0.032，降幅约40%；决策损失同样从0.319±0.009降至0.251±0.015。与此同时，CRC-E将鲁棒性维持在90.8±0.7%，恰好贴近目标水平，而CRO-E过度保守地达到99.5±0.3%。这一对比直接印证了图1的定性结论：覆盖概率只是鲁棒性的充分条件而非必要条件。
 
-
 ![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_bt4Ahpemmi/figures/010_Table_1.jpg]]
 *Table 1: The results of risk certificate, decision loss, and robustness under nominal levels $\alpha$ = 0 . 1 and $\alpha$ = 0 . 2 on the US stock problem
 
 合成数据实验进一步揭示了CRC的行为模式。图2显示，在不同名义水平α下，CRC-E的风险证书和决策损失始终低于CRO-E和E2E-E，且鲁棒性精准跟踪目标水平（灰色虚线），而两个基线方法均显著高于目标。值得注意的是，CRC的覆盖率远低于鲁棒性水平——这正是方法动机的直接验证：模型无需维持高覆盖概率即可满足鲁棒性要求。图3表明，随着样本量从500增至2000，所有方法的性能均改善，但CRC-E的优势保持稳定，且其鲁棒性始终贴近名义水平，而基线方法即使在n=2000时仍存在明显保守偏差。
-
 
 ![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_bt4Ahpemmi/figures/005_Figure_2.jpg]]
 *Figure 2: The results of risk certificate, decision loss, robustness, and coverage on synthetic data when varying nominal level α with identical sample size n = 1 5 0 0 . The horizontal gray dashed lines refer to robustness levels. The prediction sets are ellipsoids*
@@ -257,14 +243,12 @@ CRC框架的核心主张——用显式鲁棒性约束替代覆盖代理约束�
 
 CRC框架的有效性不限于特定预测集合几何结构。表5汇报了多面体预测集下的仿真结果：**CRC-P**的风险证书为1.493，决策损失为0.852，均显著优于CRO-P和E2E-P，而覆盖率仅为23.5%。这表明CRC的核心机制——直接约束决策鲁棒性而非覆盖概率——在不同集合参数化下均能发挥作用。盒形集（CRC-B）和椭圆集（CRC-E）在表1中同样表现出一致的优势模式。
 
-
 ![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_bt4Ahpemmi/figures/025_Table_5.jpg]]
 *Table 5: The simulation results under polyhedral prediction set with nominal level $\alpha$ = 0 . 1 , where the sample size is n = 2 0 0 0*
 
 ### 消融实验：校准步骤的关键作用
 
 表6的消融实验揭示了校准模块的贡献。未经校准的**CRC-E**风险证书最低（8.641±0.043），但覆盖率仅59.8±1.8%，鲁棒性为88.4±0.6%，略低于90%目标。引入保形校准后，**Cal-CRC-E**将覆盖率提升至90.5±1.2%，鲁棒性达到90.9±1.1%，恰好满足名义要求，代价是风险证书小幅增至8.716±0.059。这一结果与定理4.1的有限样本鲁棒性保证一致：校准以微小的效率损失换取严格的鲁棒性满足。作为对照的**Cal-E**（仅校准而无CRC优化）风险证书高达9.471±0.087，表明CRC优化阶段对降低风险证书至关重要。
-
 
 ![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_bt4Ahpemmi/figures/026_Table_6.jpg]]
 *Table 6: The results of CRC ablation experiments with nominal level $\alpha$ = 0 . 1 , where the sample size is n = 1 5 0 0 . The prediction sets are ellipsoids*
@@ -273,12 +257,10 @@ CRC框架的有效性不限于特定预测集合几何结构。表5汇报了多�
 
 CRC框架对关键超参数表现出良好的鲁棒性。表2显示，平滑参数σ在0.01至0.20范围内变化时，风险证书在8.64附近波动，鲁棒性稳定在89%-90%区间，决策损失和覆盖率同样保持稳定。这表明梯度优化中使用的平滑近似对最终解质量影响有限。
 
-
 ![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_bt4Ahpemmi/figures/017_Table_2.jpg]]
 *Table 2: The results of different smoothing parameters sensitivity of CRC at the nominal level $\alpha$ = 0 . 1 , where the sample size is n = 1 5 0 0 . The prediction sets are ellipsoids*
 
 表3考察了拉格朗日乘子λ的更新频率。当λ更新步长从每1步增至每8步时，风险证书从8.641略微降至8.452，覆盖率从59.8%小幅升至62.0%，鲁棒性和决策损失保持稳定。更频繁的乘子更新对约束满足有轻微促进作用，但整体影响不显著，说明算法对乘子更新策略不敏感。
-
 
 ![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_bt4Ahpemmi/figures/018_Table_3.jpg]]
 *Table 3: The results of lagrange multiplier update schedule of CRC at the nominal level $\alpha$ = 0 . 1 where the sample size is n = 1 5 0 0 . The prediction sets are ellipsoids*
@@ -286,10 +268,6 @@ CRC框架对关键超参数表现出良好的鲁棒性。表2显示，平滑参�
 ### 与离散化方法的对比
 
 表4将CRC与基于离散化的风险厌恶控制方法**RAC**进行对比。CRC-E在风险证书（1.384±0.049）和决策损失（0.541±0.065）上均优于所有RAC变体，但覆盖率仅为36.1%，远低于RAC方法的约90%。这一结果再次验证了CRC的核心洞察：高覆盖率并非低决策风险的必要条件。RAC方法的性能随离散化精度（J, L参数）提升而改善，但即使在最高精度设置下仍不及CRC，且面临离散化带来的计算开销与精度损失。
-
-
-![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_bt4Ahpemmi/figures/020_Table_4.jpg]]
-*Table 4: The simulation results of CRC and RAC at the nominal level $\alpha$ = 0 . 1 , where the sample size is n \ : = \ : 2 0 0 0 For the abbreviation $\mathrm { R A C }$ ( J , L ) , the numbers J , L refer to the discretization refinement of decision space and label space, respectively
 
 ### 电池存储问题上的验证
 
@@ -306,7 +284,6 @@ CRC框架对关键超参数表现出良好的鲁棒性。表2显示，平滑参�
 3. **理论最优性间隙**：定理3.3的最优性保证建立在略微放宽的鲁棒性水平上（$1-\alpha-\Delta_n$），与原始名义水平$1-\alpha$之间存在微小间隙，该间隙以$O(\sqrt{d\log n / n})$速率收敛，在小样本下可能不可忽略。
 
 4. **覆盖率与鲁棒性的解耦程度**：虽然低覆盖率是CRC方法动机的实证验证，但在某些应用场景中，预测集本身的覆盖质量可能具有独立价值（如可解释性需求），此时CRC的低覆盖率特性可能成为劣势。
-
 
 ## 定位与知识库关联
 
@@ -348,8 +325,6 @@ CRC 与 E2E 的关键差异体现在两个层面：
 2. **非凸损失与非参数化集合**：将 CRC 扩展到非凸损失函数和更复杂的预测集形状（如非规则化深度生成模型产生的集合）需要重新设计校准机制，因为当前的全保形校准依赖于嵌套集合结构。
 3. **高维标签空间的校准策略**：针对多维时间序列等任务，设计面向特定任务的预测集参数化方法和高效校准策略，以在保持有限样本保证的同时降低计算开销。
 4. **与在线决策场景的结合**：当前 CRC 假设批量学习设置，其在在线或自适应决策场景下的扩展（如结合在线保形推理）尚未探索。
-
-
 
 ## 原文 PDF
 

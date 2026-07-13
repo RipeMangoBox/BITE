@@ -61,8 +61,6 @@ claims:
 
 当前方法的主要局限在于：主要适用于椭圆型方程，对强非线性 PDE（如 Navier-Stokes 方程）可能无法直接应用；纯 Neumann 问题需特殊处理；蒙特卡洛噪声仍需通过缓存和方差缩减技术加以抑制。未来方向包括向更广泛物理问题（热传导、亥姆霍兹方程、弹性力学）的扩展、高性能 GPU 实时求解器、与深度学习去噪的结合，以及多物理场耦合统一框架的构建。
 
-
-
 ### 模拟的瓶颈：网格划分
 
 传统偏微分方程（PDE）数值求解器——以有限元方法（FEM）为代表——遵循一条根深蒂固的管线：首先将计算域离散化为体网格（如四面体网格），然后在有限维函数空间上构造和求解大规模线性系统。这条管线在工程和科学计算中取得了巨大成功，但它始终背负着一个沉重的代价：**网格划分本身就是模拟的瓶颈**。
@@ -92,8 +90,6 @@ $$u(x) = \frac{1}{|\partial B(x)|} \int_{\partial B(x)} u(y) dy$$
 ### 本文动机
 
 本课程系统性地介绍了蒙特卡洛几何处理这一新兴范式。其核心动机在于：将 PDE 求解从网格划分的桎梏中解放出来，使模拟任务能够像现代路径追踪渲染那样，直接处理极端复杂的几何，天然支持并行计算和视点依赖评估，并在不牺牲物理精度的前提下大幅降低预处理开销。课程涵盖了从基础 WoS 到带源项 Poisson 方程、Neumann 边界条件处理、变系数问题扩展（Walk on Stars、Delta Tracking）以及边界值缓存（Boundary Value Caching）等一系列方法，构建了一个完整的蒙特卡洛 PDE 求解工具链。
-
-
 
 ## 核心方法与创新机理
 
@@ -137,8 +133,6 @@ $$\hat{u}(x_i) = \begin{cases} \hat{u}(x_{i+1}) & \text{if } x_{i+1} \notin \par
 
 在复杂几何热传导问题的基准测试中，WoS在**10分钟**内完成求解，而FEM需要**1.5小时**，FEM配合自适应网格细化甚至需要**2.5小时** (page_219_Figure_ea1279f12479)，实现了约9倍的加速。
 
-
-
 蒙特卡洛几何处理的核心流程围绕“以采样替代离散化”这一思想展开。其整体 pipeline 摒弃了传统有限元方法（FEM）必需的体网格划分步骤，转而通过随机游走在连续域上直接估计偏微分方程（PDE）的解。该框架的输入仅为域边界表示（如三角网格）与边界条件，输出为目标评测点上的无偏解估计值。
 
 ### 模块关系与数据流
@@ -168,8 +162,6 @@ $$\hat{u}(x_i) = \begin{cases} \hat{u}(x_{i+1}) & \text{if } x_{i+1} \notin \par
 
 *   **输入**：域边界 $\partial\Omega$（通常为三角网格）、PDE 类型与参数（如拉普拉斯方程 $\Delta u = 0$ 或 screened Poisson 方程）、边界条件 $g$、源项 $f$（可选）、评测点集合 $\{x_{\text{eval}}\}$。
 *   **输出**：每个评测点上的解估计值 $\hat{u}(x_{\text{eval}})$，通过对该点发起的多条游走路径结果取平均获得，估计值无偏且方差随游走数 $n$ 以 $O(1/\sqrt{n})$ 速率收敛。
-
-
 
 ### 关键公式与变量含义
 
@@ -213,8 +205,6 @@ WoS 求解器的流水线由以下四个关键模块串联构成：
 
 WoS 将这一范式彻底反转：**域离散化**从“划分体网格”变为“仅需边界表示和最近点查询”；**解的表达**从“有限维基函数逼近”变为“无偏随机游走估计”。这一转变使求解器天然绕过了网格生成的难题，且支持视点依赖评估——仅在用户关心的评测点进行计算，而非全局求解。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -247,8 +237,6 @@ WoS 将这一范式彻底反转：**域离散化**从“划分体网格”变为
 
 4. **ε-shell 偏差**：虽然消融实验表明 ε 引入的偏差极小，但理论上该偏差始终存在。在需要极高精度的场景下，需谨慎选择 ε 值或采用无偏的边界处理策略。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l21_https_github_com_rohan_sawhney_mcgp_resources_raw_main_SGP_24_slides_pdf/figures/001_Figure.jpg]]
 
 ![[assets/figures/papers/paper_list_l21_https_github_com_rohan_sawhney_mcgp_resources_raw_main_SGP_24_slides_pdf/figures/005_Figure.jpg]]
@@ -260,20 +248,6 @@ WoS 将这一范式彻底反转：**域离散化**从“划分体网格”变为
 ![[assets/figures/papers/paper_list_l21_https_github_com_rohan_sawhney_mcgp_resources_raw_main_SGP_24_slides_pdf/figures/009_Figure.jpg]]
 
 ![[assets/figures/papers/paper_list_l21_https_github_com_rohan_sawhney_mcgp_resources_raw_main_SGP_24_slides_pdf/figures/011_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l21_https_github_com_rohan_sawhney_mcgp_resources_raw_main_SGP_24_slides_pdf/figures/015_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l21_https_github_com_rohan_sawhney_mcgp_resources_raw_main_SGP_24_slides_pdf/figures/018_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l21_https_github_com_rohan_sawhney_mcgp_resources_raw_main_SGP_24_slides_pdf/figures/019_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l21_https_github_com_rohan_sawhney_mcgp_resources_raw_main_SGP_24_slides_pdf/figures/025_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l21_https_github_com_rohan_sawhney_mcgp_resources_raw_main_SGP_24_slides_pdf/figures/026_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l21_https_github_com_rohan_sawhney_mcgp_resources_raw_main_SGP_24_slides_pdf/figures/027_Figure.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -308,8 +282,6 @@ WoS及其扩展方法（Walk on Stars, Boundary Value Caching, Delta Tracking）
 ### 4. 知识库定位
 
 在几何处理与物理模拟的知识谱系中，蒙特卡洛几何处理占据了一个独特的位置：它既非传统数值方法的简单替代，也非渲染领域蒙特卡洛光线追踪的直接移植。其核心贡献在于**将PDE求解重新表述为递归的几何查询问题**——这一视角转换使得几何处理的瓶颈从“网格生成”转移至“最近点查询”，从而天然继承了计算机图形学在空间加速结构（BVH、KD树）和并行计算方面的数十年积累。课程材料以一句精炼的对比概括了这一哲学：“Meshing is hard…finding closest point is easy!”
-
-
 
 ## 原文 PDF
 

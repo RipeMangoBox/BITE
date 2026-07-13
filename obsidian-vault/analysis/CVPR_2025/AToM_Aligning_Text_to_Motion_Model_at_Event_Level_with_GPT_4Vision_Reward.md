@@ -77,8 +77,6 @@ AToM 的关键差异化在于：用 GPT-4V **自动标注**替代人工标注，
 
 当前验证仅限于 HumanML3D 数据集和 MotionGPT 单一模型架构，对其他数据集和扩散模型（如 MDM、MLD）的泛化性未知。GPT-4V 的评分准确性与人类判断的系统相关性尚未量化，且依赖商业 API 带来了成本与可复现性问题。此外，对于包含更多动作事件或更长序列的复杂描述，事件级对齐性能的退化程度尚待探索。如何进一步降低对闭源大模型的依赖，实现完全开源可复现的训练流程，是该方向的重要开放挑战。
 
-
-
 文本驱动的三维人体动作生成旨在根据自然语言描述合成逼真且语义一致的人体运动序列。随着扩散模型与自回归语言模型的发展，如**MotionGPT**（Jiang et al., NeurIPS 2023）等方法在整体动作质量上取得了显著进展。然而，现有模型普遍存在一个关键瓶颈：**细粒度的事件级对齐能力不足**。
 
 具体而言，当文本描述涉及多个动作事件的组合时（如“先走两步，再跳起来转身”），模型往往难以准确捕捉三个核心维度：
@@ -90,8 +88,6 @@ AToM 的关键差异化在于：用 GPT-4V **自动标注**替代人工标注，
 这一瓶颈的根源在于两个层面。其一，预训练阶段使用的文本-动作数据缺乏针对上述维度的细粒度标注，模型无法从现有监督信号中学习到事件级的语义对应关系。其二，该领域长期缺乏高质量、多维度的偏好数据，使得直接通过强化学习优化事件级对齐变得困难。尽管**InstructMotion**（Sheng et al., CVPR 2024）首次将基于人类反馈的强化学习引入文本-动作对齐任务，但其依赖人工标注的粗粒度偏好信号，标注成本高且难以扩展到多维度细粒度评估。
 
 为突破上述局限，AToM提出利用视觉-语言大模型GPT-4Vision的细粒度理解能力，自动构建包含完整性、时间顺序和频率三维度评分的偏好数据集，并据此对基础动作生成模型进行强化学习微调，从而系统性地提升事件级对齐质量。
-
-
 
 ## 核心方法与创新机理
 
@@ -129,8 +125,6 @@ AToM 的创新目前受限于以下边界条件，需在实际应用中审慎评
 - **商业 API 依赖**：框架依赖闭源的 GPT-4V API，存在成本、可复现性和访问稳定性的问题，如何实现完全开源的训练流程仍是开放问题。
 - **细粒度维度的覆盖范围**：当前仅聚焦三个事件级维度，未涉及运动风格、情感等其他细粒度属性。
 
-
-
 AToM 框架由三个顺序衔接的阶段构成，形成一条从数据构建到模型优化的闭环流水线（Figure 2）。
 
 ![[assets/figures/papers/paper_list_l2_AToM_Aligning_Text_to_Motion_Model_at_Event_Level_with_GPT_4Vision_Rewar/figures/003_Figure_2.jpg]]
@@ -147,8 +141,6 @@ $$\mathbb{E}_{(m_w, m_l, p) \sim D} \left( h_{\pi}(m_w, m_l, p) - \frac{1}{2\bet
 其中 $h_{\pi}$ 为策略模型 $\pi$ 与参考模型 $\pi_{ref}$ 在胜者动作 $m_w$ 和败者动作 $m_l$ 上的对数概率比率。这一阶段的核心机制在于：GPT-4Vision 提供的事件级细粒度奖励信号通过 IPO 损失反向传导至动作生成器，使其学会在三个事件维度上更好地对齐文本描述。
 
 **模块间的数据流关系：** 提示构建器 → MotionGPT 动作生成器 → 动作渲染与帧采样器 → GPT-4V 评分器 → 偏好数据构造算法 → LoRA 微调 + IPO RL。整个流水线中，GPT-4Vision 的评分环节是连接数据构建与模型优化的关键瓶颈——其评分质量直接决定了偏好数据的可靠性和最终微调效果的上限。
-
-
 
 AToM框架由三个顺序衔接的核心模块构成，形成“数据构建→奖励标注→偏好优化”的闭环，其整体流程如Figure 2所示。
 
@@ -199,8 +191,6 @@ $$\mathbb{E}_{(m_w, m_l, p) \sim D} \left( h_{\pi}(m_w, m_l, p) - \frac{1}{2\bet
 - **评分过滤机制**：仅保留评分高于3的样本作为正例，可有效剔除GPT-4V判定为低质量的生成结果，使MM Dist从5.640降至5.576，FID从0.693降至0.613（Table 6b）。
 - **LoRA微调**：相比全量微调或无微调，LoRA在保持参数效率的同时显著提升检索准确率（top-1从0.128提高到0.199）并大幅降低FID（从2.131降至0.613）（Table 6c）。
 - **IPO vs. DPO**：在相同条件下，IPO损失在FID指标上优于DPO（Figure 5），表明其对偏好分布的建模更适合本任务的优化目标。
-
-
 
 ## 实验与关键发现
 
@@ -259,30 +249,14 @@ Figure 6探索了帧采样间隔的影响。较短的采样间隔（4帧或8帧�
 - Pick-a-Move数据集的确切数据量未见公开，其与MotionPrefer的公平对比有待验证。
 - 如何进一步降低对闭源大模型API的依赖，实现完全开源的训练流程？
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2_AToM_Aligning_Text_to_Motion_Model_at_Event_Level_with_GPT_4Vision_Rewar/figures/011_Figure_4.jpg]]
-*Figure 4: Win rates of AToM fine-tuned compared to MotionGPT by human judgments in three tasks. Figure 5. Performance distribution of different reinforcement learning strategies after generative model finetuning*
-
 ![[assets/figures/papers/paper_list_l2_AToM_Aligning_Text_to_Motion_Model_at_Event_Level_with_GPT_4Vision_Rewar/figures/010_Figure_3.jpg]]
 *Figure 3: Generated qualitative samples comparison of pretrained model MotionGPT and finetuned model AToM*
-
-![[assets/figures/papers/paper_list_l2_AToM_Aligning_Text_to_Motion_Model_at_Event_Level_with_GPT_4Vision_Rewar/figures/002_Table_1.jpg]]
-*Table 1: Statistics of existing preference datasets for text-tomotion generative models. “Fine Grained” represents containing preference regarding multiple aspects or not*
-
-![[assets/figures/papers/paper_list_l2_AToM_Aligning_Text_to_Motion_Model_at_Event_Level_with_GPT_4Vision_Rewar/figures/005_Table_3.jpg]]
-*Table 3: Details of amounts of MotionPrefer dataset*
-
-![[assets/figures/papers/paper_list_l2_AToM_Aligning_Text_to_Motion_Model_at_Event_Level_with_GPT_4Vision_Rewar/figures/006_Table_4.jpg]]
-*Table 4: Scoring rules for sub-tasks*
 
 ![[assets/figures/papers/paper_list_l2_AToM_Aligning_Text_to_Motion_Model_at_Event_Level_with_GPT_4Vision_Rewar/figures/007_Table_5.jpg]]
 *Table 5: Comparison of AToM with baselines in different tasks. AToM♠ represents the process of mixing preference data from three tasks and randomly selecting a subset of preference data (approximately 3.5K pairs) that matches the size of the RLHF framework InstructMotion, ensuring fair comparison with the baseline model*
 
 ![[assets/figures/papers/paper_list_l2_AToM_Aligning_Text_to_Motion_Model_at_Event_Level_with_GPT_4Vision_Rewar/figures/012_Table_6.jpg]]
 *Table 6: Ablation studies for motion injection methods, score filtering, and LoRA utilization on the test set*
-
-
 
 ## 定位与知识库关联
 
@@ -321,8 +295,6 @@ AToM 处于“视觉-语言大模型驱动的生成模型对齐”这一交叉�
 3. **复杂度扩展**：对于包含更多动作事件或更长序列的复杂描述，事件级对齐性能的退化程度如何？需要进一步实验验证。
 4. **开源可行性**：如何进一步降低对闭源大模型 API 的依赖，实现完全开源的训练流程？这是社区推广的重要前提。
 5. **数据公平性**：Pick-a-Move 数据集的确切数据量未见公开，其与 MotionPrefer 的公平对比有待验证。
-
-
 
 ## 原文 PDF
 

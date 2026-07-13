@@ -81,8 +81,6 @@ MEGADance 处于**音乐条件舞蹈生成**与**离散潜变量运动建模**�
 
 尽管 MEGADance 在流派可控性上取得突破，其仍依赖预定义的离散流派标签，无法表达流派内细粒度风格差异或混合流派等复杂条件。此外，模型对运动捕捉数据中的噪声鲁棒性有限，且在低资源流派或开放域音乐上的泛化能力尚未检验。未来方向包括：将离散标签扩展至自由形式的文本描述以支持个性化生成，以及设计噪声鲁棒的架构与数据增强策略。
 
-
-
 音乐驱动的3D舞蹈生成旨在从音乐信号中合成逼真且风格一致的人体动作序列，在虚拟现实、游戏开发和人机交互等领域具有广泛应用。该任务的核心挑战在于同时满足两个高度耦合的需求：**音乐-动作同步性**（舞蹈动作需与音乐节拍、节奏和情绪精确对齐）与**流派连续性**（动作风格需在整个序列中保持一致的舞蹈类型特征）。
 
 现有方法主要沿两条技术路线展开。基于Transformer的自回归模型（如**Bailando**、**Bailando++**）通过跨模态注意力机制建模音乐-动作的时序依赖，在运动质量上取得了显著进展。基于扩散模型的方法（如**EDGE**）则通过逐步去噪生成多样化动作。然而，这些方法普遍将舞蹈流派视为**弱辅助条件**——或通过特征相加、或通过交叉注意力进行浅层融合——难以在复杂音乐场景下（如节奏突变、风格混合）维持流派语义的稳定表达。当音乐节奏发生剧烈转换时，弱条件化的流派信息容易被音乐特征淹没，导致生成的动作出现风格漂移或流派混淆。
@@ -98,8 +96,6 @@ MEGADance的动机正是针对上述两个核心缺口展开：
 3. **局部-全局协同的时序建模**：设计Mamba-Transformer混合骨干网络，利用Mamba的状态空间模型高效捕获模态内局部时序依赖，同时保留Transformer的跨模态全局注意力能力，兼顾计算效率与建模容量。
 
 简言之，MEGADance试图回答一个核心问题：**能否在不牺牲舞蹈质量的前提下，实现精准、鲁棒的流派可控舞蹈生成？**
-
-
 
 ## 核心方法与创新机理
 
@@ -152,8 +148,6 @@ $$\mathrm{Attention}(Q, K, V, M) = \mathrm{softmax}\left( \frac{QK^T + M}{\sqrt{
 
 MEGADance 的四项改进形成了完整的因果链条：FSQ 保障码本多样性的“原材料”供给，运动学-动力学双约束确保重构保真度，MoE 解耦实现流派可控的“语义驱动”，Mamba-Transformer 混合骨干提供高效的时序-跨模态建模能力。这一设计将流派从辅助条件升级为生成的核心控制维度，在 FineDance 和 AIST++ 两个数据集上均取得了最优的 FID_k（分别为 50.00 和 25.89），用户研究中舞蹈同步性得分达到 4.30/5.0，显著超越现有基线。
 
-
-
 MEGADance 是一个两阶段框架，将音乐驱动的 3D 舞蹈生成分解为**高保真舞蹈量化（High-Fidelity Dance Quantization, HFDQ）**与**流派感知舞蹈生成（Genre-Aware Dance Generation, GADG）**两个级联模块（Figure 2）。其核心设计理念在于：**将流派条件从弱辅助信号升级为通过 Mixture-of-Experts（MoE）解耦的语义驱动力**，在保证动作质量的前提下实现精准的流派可控性。
 
 ![[assets/figures/papers/paper_list_l1918_MEGADance_Mixture_of_experts_architecture_for_genre_aware_3d_dance_gener/figures/002_Figure_2.jpg]]
@@ -197,8 +191,6 @@ GADG 预测的上下半身潜码分别送入对应的 **Up-Body / Low-Body Decod
 
 整个 pipeline 的信息流为：**音频 → 音乐特征 + 流派标签 → [HFDQ 编码器 → FSQ 量化 → 潜码] → [GADG MoE-Mamba-Transformer → 预测潜码] → 解码器 → SMPL 序列 → 3D 舞蹈**。两阶段联合训练，HFDQ 提供高保真、高利用率的离散表示空间，GADG 在此基础上实现流派可控的音乐驱动生成。
 
-
-
 MEGADance 采用两阶段流水线：**高保真舞蹈量化（HFDQ）** 与 **流派感知舞蹈生成（GADG）**。前者将舞蹈序列压缩为离散潜码，后者以自回归方式基于音乐与流派标签预测潜码序列。
 
 ### 高保真舞蹈量化（HFDQ）
@@ -240,13 +232,6 @@ Transformer 则负责跨模态全局上下文建模，引入滑动窗口注意�
 $$\mathrm{Attention}(Q, K, V, M) = \mathrm{softmax}\left( \frac{QK^T + M}{\sqrt{C}} \right) V$$
 
 消融实验表明，用纯 Transformer 替代 Mamba-Transformer 混合骨干后，FID_k 从 50.00 升至 61.76，音乐对齐度同步下降，证实 Mamba 的局部依赖建模对舞蹈时序一致性的关键作用。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1918_MEGADance_Mixture_of_experts_architecture_for_genre_aware_3d_dance_gener/figures/001_Figure_1.jpg]]
-*Figure 1: MEGADance enhances choreography consistency by decoupling it into dance generality and genre specificity via the Mixture-of-Experts design. Compared to previous methods, it produces synchronized dance with genre continuity, even under complex music conditions*
-
-
 
 ## 实验与关键发现
 
@@ -311,22 +296,6 @@ MEGADance在整体运动质量上取得FID_k=50.00，显著优于此前最优方
 ![[assets/figures/papers/paper_list_l1918_MEGADance_Mixture_of_experts_architecture_for_genre_aware_3d_dance_gener/figures/010_Figure_5.jpg]]
 *Figure 5: Qualitative Analysis for Ablation Study. MEGADance generates visually expressive dance motions, outperforming others in terms of stylistic consistency and movement diversity*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1918_MEGADance_Mixture_of_experts_architecture_for_genre_aware_3d_dance_gener/figures/004_Figure_3.jpg]]
-*Figure 3: Qualitative Analysis on a typical Breaking Battle music clip*
-
-![[assets/figures/papers/paper_list_l1918_MEGADance_Mixture_of_experts_architecture_for_genre_aware_3d_dance_gener/figures/007_Figure_4.jpg]]
-*Figure 4: Visualization of Genre Controllability on a representative Chinese music clip*
-
-![[assets/figures/papers/paper_list_l1918_MEGADance_Mixture_of_experts_architecture_for_genre_aware_3d_dance_gener/figures/008_Table.jpg]]
-*Table: (b) Genre-Aware Dance Generation Stage*
-
-![[assets/figures/papers/paper_list_l1918_MEGADance_Mixture_of_experts_architecture_for_genre_aware_3d_dance_gener/figures/011_Figure_6.jpg]]
-*Figure 6: The screenshots of user study website for participants*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 与基线方法的关系
@@ -376,8 +345,6 @@ MEGADance 的设计假设与适用条件可从以下几个维度界定：
 4. **Mamba-Transformer 的效率优化**：混合骨干能否通过状态空间模型的参数共享、注意力头的剪枝或知识蒸馏进一步压缩计算量，以适应实时或移动端部署？这是将该方法推向实际应用的关键工程问题。
 
 5. **多模态条件融合的扩展**：除了音乐和流派标签，舞蹈生成是否可融入更多条件信号（如歌词情感、舞者身份、场景上下文）？MoE 架构的可扩展性为此提供了潜在框架，但需要验证多条件路由的冲突消解机制。
-
-
 
 ## 原文 PDF
 

@@ -53,8 +53,6 @@ claims:
 
 方法在谱系中的定位清晰：在子空间仿真这一支线上，本文以 Skinning Eigenmodes（Benchekroun et al. 2023）替代传统的模态导数（Barbič and James, 2005）作为降阶基，因为后者无法准确重建旋转运动（Figure 5）；在求解器层面，将全空间 MFEM（Trusty et al., SIGGRAPH Asia 2022）的混合格式完整迁移至子空间，并通过 Schur 补缩并实现高效求解；在积分近似层面，以基于 k-means 聚类的 cubature 方案替代传统的 NNLS 贪心训练策略（An et al. 2008），无需训练阶段且自然感知材料与几何异质性——柔软薄壁区域采样密集，刚硬厚实区域采样稀疏（Figure 6, Figure 16）。
 
-
-
 ### 实时异构弹性模拟的核心瓶颈
 
 在计算机图形学与交互式仿真中，对包含显著材料异质性的弹性体进行实时模拟一直是一个突出问题。许多自然与人造物体——例如同时具有坚硬外壳与柔软关节的螃蟹、由骨骼、肌肉和关节构成的生物体——其杨氏模量（Young’s modulus）可在不同区域跨越数个数量级。这种极端的刚度差异对数值求解器构成了严峻挑战。
@@ -85,8 +83,6 @@ claims:
 3. **拉伸自由度的放置策略**：在全空间 MFEM 中，拉伸自由度附着于每一个网格元素。降维后，若拉伸自由度仍遍布全网格，则子空间缩并带来的收益将被严重稀释。需要一种与子空间规模相匹配的稀疏放置方案。
 
 本文的动机正是系统性地解决这三个挑战，构建一个在极低迭代次数下既能保持正确旋转运动、又能实现实时性能的异构弹性模拟框架。其核心洞察在于：**将材料感知的 Skinning Eigenmode 子空间与 MFEM 格式相结合，并辅以异质性敏感的 cubature 积分近似，可使模拟性能完全与网格分辨率脱钩。**
-
-
 
 ## 核心方法与创新机理
 
@@ -141,8 +137,6 @@ $$(H_{u} + K) du = -f_{u} + G_{u}^{T} G_{z}^{-1} (f_{z} - H_{z} G_{z}^{-1} f_{\m
 
 上述三个创新的协同效应使得求解器性能**完全与网格分辨率脱钩**：子空间变量 $(u, z, \mu)$ 的维度仅取决于 skinning modes 数量 $m$ 和 cubature 点数 $|C|$，与原始网格顶点数 $|\mathcal{V}|$ 无关。在哺乳象示例（98K 顶点，531K 四面体）上，子空间 MFEM 达到 120 FPS，相对于全空间 MFEM 的 0.003 FPS 实现了超过三个数量级的加速（Table 1, Figure 1）。计时分解显示，MFEM 仿真时间主要由 $O(m^2 k)$ 的稠密矩阵组装主导，而额外的局部拉伸和乘子求解仅增加可忽略的计算开销（Figure 10）。
 
-
-
 本文提出的**子空间混合有限元法（Subspace MFEM）**通过三个核心设计将异构弹性力学模拟推至实时：**材料感知的 Skinning Eigenmode 子空间**、**异质性自适应的 cubature 积分近似**，以及**混合有限元格式**本身。三者协同使得求解代价与网格分辨率完全脱钩，同时在全空间 MFEM 的基础上实现超过三个数量级的加速（猛犸象示例：从 263 秒/迭代降至 120 FPS，见 Table 1 与 Figure 1）。
 
 ![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2405_13730/figures/001_Figure_1.jpg]]
@@ -189,8 +183,6 @@ MFEM 通过**引入辅助拉伸自由度并施加显式一致性约束**，将�
 - **cubature 异质性感知**由 Figure 6 和 Figure 16 可视化验证，置信度较高（0.93）。
 - **消融实验中 cubature 点数启发式规则**（20× skinning modes）来自 Figure 14 的经验观察，置信度中等（0.85），实际应用中可能需要根据场景调整。
 - **全局子空间远端伪影**（Figure 12）是已知局限，需手动验证增加模式数在特定场景下的缓解效果。
-
-
 
 ### 模块一：Skinning Eigenmode 子空间构建
 
@@ -266,8 +258,6 @@ $$(\mathbf{H}_u + \mathbf{K}) \, d\mathbf{u} = -\mathbf{f}_u + \mathbf{G}_u^T \m
 
 每步 SQP 迭代完成后，更新后的子空间系数通过 $\mathbf{x} = \mathbf{B} \mathbf{u}$ 投影回全空间网格。该步骤在 GPU 上完成，其时间在性能分解（Figure 10）中被单独列出，不影响 MFEM 与 FEM 求解器核心的相对比较。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能与加速比
@@ -315,12 +305,8 @@ Figure 10 给出了 Octobot、Gatorman、Crab 和 Mammoth 四个场景的单步�
 3. **极低迭代抖动**：在仅 1 次迭代的极端情况下，MFEM 可能因过高的能量保持特性引入抖动伪影。
 4. **碰撞处理缺失**：当前框架尚未涉及碰撞和接触模拟，子空间下的接触求解仍是开放问题。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2405_13730/figures/013_Figure_13.jpg]]
 *Figure 13: We pin the pendulum from the top, twist the bottom end, and simulate the unwinding. We compare results from FEM and MFEM with one solver iteration per timestep against a converged subspace FEM solution. Even at low iterations our MFEM solvers show much better agreement, which is reflected on the plot on the right where total angular momentum for each pendulum block is plotted over time*
-
-
 
 ## 定位与知识库关联
 
@@ -355,8 +341,6 @@ Figure 10 给出了 Octobot、Gatorman、Crab 和 Mammoth 四个场景的单步�
 4. **Cubature的自适应选择**：能否根据仿真过程中的变形状态动态调整cubature点分布，以在保持精度的同时进一步降低计算成本？当前静态聚类方案未利用仿真的时间相干性。
 
 5. **多材料模型的理论分析**：本文验证了方法对多种超弹性材料模型（ARAP、FCR、Neo-Hookean）的兼容性（Figure 15），但不同材料模型在混合格式下的收敛行为差异缺乏系统性的理论刻画。
-
-
 
 ## 原文 PDF
 

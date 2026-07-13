@@ -50,15 +50,11 @@ claims:
 
 在实验结果方面，DGN在多个基准数据集上取得了领先性能：在TIDIGITS上达到99.10%的top-1准确率（超越LIF基线1.27%），在SHD上达到88.98%（超越LIF基线5.16%），在SSC和Ti46Alpha上分别达到75.63%和96.31%。在鲁棒性方面，DGN展现出显著优势：在TIDIGITS加性噪声下，前馈网络保持95.34%的准确率，比LIF高出48.51%；在SHD上PGD攻击下，循环DGN比循环LIF高出35.54%。同时，DGN的能量消耗（3.03 nJ）远低于LSTM（604.7 nJ），接近LIF（1.02 nJ），保持了SNN的低能耗优势。理论分析通过稳态电压方差公式（Eq. 13）揭示了DGN鲁棒性的数学根源，验证了其双重噪声抑制机制的有效性。
 
-
-
 脉冲神经网络（SNN）因其生物合理性和低功耗潜力被视为下一代神经形态计算的核心范式。然而，传统SNN的神经元模型——尤其是广泛使用的漏积分放电（LIF）模型——存在一个根本性瓶颈：其膜电导（泄漏率）是固定不变的。这种静态设计使得LIF神经元在面对输入噪声和时间变异性时缺乏自适应调节能力，导致在噪声环境下的鲁棒性严重不足，成为SNN从实验室走向实际部署的关键障碍。
 
 现有改进方案试图通过引入异质性（HeterLIF）、自适应阈值（ALIF）或门控机制（GLIF）来缓解这一问题，但这些方法均未从神经元动力学的最底层——电导——入手。LSTM等人工门控网络虽然通过遗忘门和输入门实现了强大的时序鲁棒性，但其高能耗（每步约604.7 nJ）与SNN的能效优势背道而驰。
 
 本文的核心动机在于：能否在保留SNN低功耗特性的前提下，通过生物启发的动态电导机制赋予神经元类似LSTM的自适应门控能力？作者提出的动态门控神经元（DGN）正是这一思路的产物。DGN通过引入可学习的动态电导因子C_i，使膜电导随输入活动自适应变化，在功能上等价于LSTM的遗忘门（Figure 2展示了二者的拓扑同源性）。这一设计同时实现了两个协同的噪声抑制机制：自适应泄漏缩放（通过分母项G_0）和突触噪声补偿（通过分子中的补偿项），为SNN提供了理论保证的鲁棒性。
-
-
 
 ## 核心方法与创新机理
 
@@ -78,8 +74,6 @@ DGN（Dynamic Gated Neuron）的核心创新在于将生物神经元中的**动�
 
 **简化版本s-DGN**（共享平衡电位）在SHD上达到84.30%准确率，参数更少但仍优于LIF，说明动态电导机制本身是性能提升的主要来源，而非参数增加带来的容量优势。DGN的能量消耗（3.03 nJ）远低于LSTM（604.7 nJ），接近LIF（1.02 nJ）（Table 8），表明门控机制的引入并未显著牺牲SNN的核心优势。
 
-
-
 DGN（Dynamic Gated Neuron）的整体pipeline围绕一个核心架构展开：将传统LIF神经元中固定的泄漏电导替换为**动态电导门控机制**。整个系统由四个紧密耦合的模块组成，形成从突触输入到脉冲输出的完整计算流。
 
 **模块关系与数据流：**
@@ -97,8 +91,6 @@ DGN（Dynamic Gated Neuron）的整体pipeline围绕一个核心架构展开：�
 **与LSTM的结构同源性：** 如图2所示，DGN的 $\rho^t$ 对应LSTM遗忘门 $\breve{f}^t$，$W_i D_i^t$ 路径对应输入门，软重置对应细胞状态更新中的遗忘操作。这种拓扑同源性解释了DGN为何能继承LSTM的鲁棒时序处理能力，同时保持SNN的低能耗特性（DGN: 3.03 nJ vs LSTM: 604.7 nJ）。
 
 **训练方式：** 采用BPTT（Backpropagation Through Time）沿时间和空间维度展开计算图（图5），梯度通过Eq. 7反向传播。损失函数对可学习参数 $W_i$ 和 $C_i$ 的梯度分别由 $dE/dW_i = \sum_t dE/dz^t \cdot dz^t/dW_i$ 和 $dE/dC_i = \sum_t dE/dz^t \cdot dz^t/dC_i$ 计算。
-
-
 
 ### 3.1 动态门控神经元（DGN）模型
 
@@ -217,14 +209,11 @@ $$
 
 其中脉冲梯度 $\frac{dz^t}{dW_i}$ 和 $\frac{dz^t}{dC_i}$ 通过替代梯度法（surrogate gradient）近似，因为Heaviside阶跃函数不可导。梯度沿时间反向传播时，需要累积Eq. 7中 $\rho^t$ 和 $V^{t-1}$ 的递归依赖关系。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能对比
 
 DGN在四个音频/神经形态时间序列基准上全面超越现有SNN基线（Table 1）。在TIDIGITS上，循环DGN（128-128隐藏层）达到**99.10%** top-1准确率，超越LIF的97.83%（+1.27%）。在SHD上，DGN达到88.98%，比LIF的83.82%高出5.16%。在SSC和Ti46Alpha上，DGN分别达到75.63%和96.31%，对应提升为+3.20%和+2.89%。DVS-Gesture（Table 10）上，DGN在干净样本上达到95.14%，比LIF的93.06%高2.08%。所有基线使用公开代码复现，架构与超参数保持一致。
-
 
 ![[assets/figures/papers/iclr26_0002_5h741EyfQM_A_Brain-Inspired_Gating_Mechanism_Unlocks_Robust/figures/004_Table_1.jpg]]
 *Table 1: Comparison of model performance on Ti46Alpha, TIDIGITS, SHD, and SSC datasets. Rec=N/Y represents feedforward networks (N) and recurrent networks (Y), respectively. * indicates results we reproduced using public code, while bold entries indicate the best performance*
@@ -234,8 +223,6 @@ DGN在四个音频/神经形态时间序列基准上全面超越现有SNN基线�
 ### 鲁棒性分析
 
 **噪声与对抗攻击**（Table 2, Figure 4, Figure 6-8）：DGN在加性噪声下，前馈网络在TIDIGITS上保持**95.34%**准确率，比LIF高48.51%（绝对值）。在SHD上，PGD攻击下循环DGN比循环LIF高35.54%。整体鲁棒性（Table 3-4）：DGN前馈在SHD上为61.54±1.95%，显著优于LIF的42.07±2.13%；循环DGN在TIDIGITS上达到91.67±3.62%，前馈为88.56±5.64%。Figure 4/6-8显示，随着扰动概率p或攻击强度ε增加，DGN的准确率下降最平缓，在所有扰动类型（加性、减性、混合、FGSM、PGD、BIM）上保持最高绝对性能。
-
-
 
 ![[assets/figures/papers/iclr26_0002_5h741EyfQM_A_Brain-Inspired_Gating_Mechanism_Unlocks_Robust/figures/008_Table_4.jpg]]
 
@@ -267,13 +254,8 @@ DGN每步能耗（3.03 nJ）远低于LSTM（604.7 nJ），接近LIF（1.02 nJ）
 
 **需要人工验证的点**：DGN在TIDIGITS上加性噪声下比LIF高48.51%这一极端数值，虽然置信度标注为0.95，但建议核对原始Table 2中LIF在该条件下的具体数值，确认是否存在基线复现差异。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0002_5h741EyfQM_A_Brain-Inspired_Gating_Mechanism_Unlocks_Robust/figures/012_Table_5.jpg]]
 *Table 5: Network parameters for different datasets*
-
-
-
 
 ## 定位与知识库关联
 
@@ -303,8 +285,6 @@ DGN 的适用场景具有明确边界：
 4. 神经形态硬件上的高效部署方案是什么？动态电导的实时计算可能引入额外的硬件开销。
 
 **需人工验证的点**：论文声称 DGN 的鲁棒性优势来源于双重噪声抑制机制（自适应泄漏缩放 + 噪声补偿），但理论推导（Eq. 13）假设输入为高斯白噪声且忽略了脉冲发放的非线性。实际场景中脉冲发放的离散性可能使理论保证弱化，需要更严格的实验验证。
-
-
 
 ## 原文 PDF
 

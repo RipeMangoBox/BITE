@@ -257,18 +257,8 @@ Figure 5 展示了 MDP 剪枝后的 ResNet50 架构。高剪枝比下，MDP 不�
 3. **求解器可扩展性**：尽管 MINLP 在 ResNet50 上求解仅需约 5 秒，但在超大规模模型（如 ViT-Huge）上的求解时间和内存消耗尚未验证，可能需要引入近似求解或分解策略。
 4. **微调超参数未优化**：剪枝后的微调学习率、epoch 数等直接按经验设定，未针对每个剪枝结构进行调优，精度恢复可能未达到理论上限。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2406_12079/figures/005_Figure.jpg]]
-*Figure: (a) FPS versus mAP are plotted(top-right is better). FPS measured on NVIDIA TITANV. (b) FLOPs versus mAP are plotted(top-left is better)*
-
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2406_12079/figures/011_Figure.jpg]]
 *Figure: (a) Comparison with smaller networks on ImageNet with pruning ResNet50. Our approach of (b) Results of ours with soft masking on pruning large models across various ratios achieves a ImageNet with ResNet50. Improvement is superior accuracy-speed trade-off compared to existing observed in Top1 at a high FPS level. Topsmaller networks. Top-right is better. right is better*
-
-![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2406_12079/figures/004_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2406_12079/figures/012_Table_5.jpg]]
-*Table 5: Training Detail*
 
 ## 定位与知识库关联
 

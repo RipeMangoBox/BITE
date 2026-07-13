@@ -53,8 +53,6 @@ claims:
 
 实验在两个动态场景基准上验证了 CIF 的有效性。在新视角全景分割任务中，CIF 在 **HyperNeRF** 数据集上取得了 79.47 的平均 mIoU，较 **VLGS** 的 68.05 提升 11.42；在 **Neu3D** 数据集上达到 88.31 mIoU，较 VLGS 提升 5.82。开放词汇 4D 查询任务中，CIF 以 84.90 的平均 mIoU 大幅领先 **SA4D** 的 57.83。消融实验进一步证实，独立占位建模、身份校准和实例引导重采样三者缺一不可：移除任一组件均会导致语义漂移、边界模糊和跨视角一致性下降。
 
-
-
 随着神经渲染技术的快速演进，动态场景理解已成为计算机视觉领域的核心挑战之一。现有方法在静态场景的语义分割与三维重建上取得了显著进展，但将这些能力迁移至动态场景时，普遍面临一个根本性瓶颈：**实例身份与表面外观的耦合**。
 
 以 **SA4D** 为代表的基于可变形 3D Gaussian Splatting 的动态语义方法，以及 **VLGS**、**4D LangSplat** 等开放词汇语义表征方法，均依赖视角相关的 RGB 调制特征来编码语义信息。这种设计将实例身份与表面辐射属性绑定在一起，导致三个连锁问题：
@@ -66,8 +64,6 @@ claims:
 这些问题的根源在于，现有方法缺乏一个**将物理存在与语义身份显式解耦**的建模框架。理想情况下，动态场景应被理解为一个由持久实体构成的连续概率场——每个时空点同时编码“是否存在物体”和“该物体属于哪个实例”。这种解耦使得身份建模能够超越可见性偏差，在变形和视角变化下维持稳定的语义一致性。
 
 基于上述动机，本文提出 **Consistent Instance Field (CIF)**，一种面向动态场景的连续概率时空形式化框架。CIF 的核心洞察在于：将动态场景建模为 4D 联合分布 $\gamma(\mathbf{x}, t, k) = P(E=1, K=k \mid \mathbf{x}, t)$，并将其分解为占位概率 $\pi(\mathbf{x}, t)$ 和条件实例分布 $p(\mathbf{x}, t, k)$ 的乘积。通过这一解耦，CIF 在可变形 Gaussian 表示的基础上，引入独立占位建模、身份校准和实例引导重采样三个关键模块，系统性地解决了上述瓶颈问题。
-
-
 
 ## 核心方法与创新机理
 
@@ -117,8 +113,6 @@ $$\alpha_{\mathrm{src}}^{\mathrm{new}} = 1 - (1 - \alpha_{\mathrm{src}})^{1/(n+1
 
 CIF 的三个改动槽位形成闭环：**占位解耦**提供干净的物理存在信号，**身份校准**消除视角偏差以获得稳定身份，**引导重采样**将有限的高斯容量动态聚焦于语义关键区。三者共同支撑起一个在变形和视角变化下维持连贯语义描述的 4D 实例一致性场。
 
-
-
 CIF 将动态场景建模为一个定义在 4D 时空域上的**一致实例场**（Consistent Instance Field），其核心是一个联合编码“物理存在性”与“实例身份”的连续概率场。如图 2 所示，整个 pipeline 由四个关键模块串联构成：场形式化与高斯表征、实例身份估计与校准、实例引导重采样，以及场感知 Splatting 渲染。
 
 **输入与场定义**。给定多视角视频序列，CIF 将每个时空点 $(\mathbf{x}, t)$ 映射为一个联合分布 $\gamma(\mathbf{x}, t, k) = P(E{=}1, K{=}k \mid \mathbf{x}, t)$，表示该点被实例 $k$ 占据的概率。这一联合分布被显式分解为占位概率 $\pi(\mathbf{x}, t)$ 和条件身份分布 $p(\mathbf{x}, t, k)$（Eq. 2），从根本上将“物体是否存在”与“存在时属于哪个实例”解耦，避免了现有方法将身份与视角相关的 RGB 透明度 $\alpha$ 耦合所带来的跨视角不一致。
@@ -133,12 +127,8 @@ CIF 将动态场景建模为一个定义在 4D 时空域上的**一致实例场*
 
 **模块间数据流**。场形式化为身份估计提供概率语义基础；身份估计的输出 $p_i^k$ 与占位 $\pi_i$ 共同构成实例响应 $\gamma_i^k$，驱动重采样模块调整高斯分布；重采样后的高斯集最终通过场感知 Splatting 渲染为语义图和 RGB 图像，损失梯度反向传播至所有参数，形成闭环优化。这种设计使物理占位、身份推断和容量分配相互解耦又协同工作，共同维持动态场景下的几何-语义一致性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2512_14126/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our Consistent Instance Field. Our method models each dynamic scene as a continuous 4D Consistent Instance Field that encodes existence and identity distributions (Sec. 3.1.1). We realize the field as an Instance-Embedded Gaussian Representation, which jointly models geometry, appearance, occupancy, and instance identity (Sec. 3.1.2). (Bottom) Instance Identity Estimation. Per-Gaussian identity distributions are inferred by aggregating 2D observations over time and views. A learnable calibration then corrects visibility-induced biases (Eqs. (6), (7), (8)), yielding stable identity under occlusion and appearance changes (Sec. 3.2). (Right) Instance-Guided Resampling. To align rep...*
-
-
 
 CIF 将动态场景建模为一个连续的概率场，其核心由四个紧密耦合的模块构成：场形式化、身份估计与校准、实例引导重采样，以及场感知 Splatting 渲染。
 
@@ -198,13 +188,6 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{rgb}} + \lambda_{\mathrm{inst}} \mathcal{L}
 
 其中 $\mathcal{L}_{\mathrm{rgb}}$ 为 RGB L1 重建损失，$\mathcal{L}_{\mathrm{inst}}$ 为作用于渲染身份图 $\mathbf{M}_k$ 的交叉熵损失，$\lambda_{\mathrm{inst}}$ 为平衡权重。所有参数——包括高斯几何、外观、占位概率 $\pi_i$、身份分布 $p_i^k$ 以及校准因子 $m_i^k$——均通过该目标联合优化。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2512_14126/figures/001_Figure_1.jpg]]
-*Figure 1: Comparisons with prior work SA4D [16]. Previous methods like SA4D often rely on view-dependent features with RGB modulation, leading to semantic inconsistencies in dynamic scenes: unstable under cross-view instance supervision, confusing color opacity with object occupancy, and underrepresenting semantically meaningful regions. Our approach formulates a continuous probabilistic field over existence and identity in space-time, enabling identity modeling beyond visibility cues and adaptive redistribution of Gaussian capacity. This results in a coherent instance field across deformation and changing viewpoints*
-
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -249,21 +232,12 @@ Figure 4 的定性结果表明，CIF 在多相机环绕拍摄的复杂场景中�
 
 Table S1 展示了 HyperNeRF 上开放词汇查询的定量结果。CIF 平均 mIoU 达 **84.90**，远超 SA4D（57.83），提升幅度达 **+27.07**。4D LangSplat 在部分场景（如 *americano*）完全无法定位文本查询对应的物体（标记为 *），而 CIF 在所有场景均稳定输出。Figure 5 的定性对比进一步表明，即使面对透明玻璃杯和反光金属壶等挑战性材质，CIF 仍能准确分离实例边界。
 
-![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2512_14126/figures/012_Table_S.1.jpg]]
-*Table S.1: Quantitative comparison of our method with the state-of-the-art on open-vocabulary 4D querying using the HyperNeRF dataset. We report mAcc and mIoU metrics. The best, second best, and third best results are highlighted. * indicates failure of localizing the objects based on the text queries, as also demonstrated in Figure 5 of the main paper*
-
-![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2512_14126/figures/007_Figure_5.jpg]]
-*Figure 5: Qualitative comparison of our method with the state-of-the-art on open-vocabulary 4D querying using the HyperNeRF [41] dataset. For clarity, we crop and zoom in on the central regions. Our method produces clearer boundaries and more accurate instance separation, even under transparent and reflective materials such as the glass cup and steel jug*
-
 ### 消融实验
 
 Table 3 和 Figure 6 在 *split-cookie* 场景上系统消融了三个核心设计：
 
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2512_14126/figures/008_Table_3.jpg]]
 *Table 3: Ablation study. We evaluate our method under different configurations on the “split-cookie” scene from HyperNeRF [41]*
-
-![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2512_14126/figures/009_Figure_6.jpg]]
-*Figure 6: Ablation study. We present the corresponding qualitative results for each configuration shown in Table 3*
 
 | 配置 | mIoU | mAcc-pix | PSNR |
 |------|------|----------|------|
@@ -287,8 +261,6 @@ Figure 6 的定性消融可视化直观展示了各配置的分割质量差异�
 2. **跨视图伪标签不一致**：Neu3D 的实例掩码依赖 DEVA 生成并通过伪单目序列同步，在严重遮挡下仍可能出现跨视图 ID 错配，影响身份估计的精度上限。
 3. **开放词汇评估缺乏标准基准**：4D 查询任务使用 Grounded DINO 生成的 2D 掩码作为伪真值，边界精度受语言模型区域理解能力限制，定量结果存在近似偏差。
 4. **对初始几何重建的依赖**：CIF 的语义优化建立在预训练的几何高斯场之上，若初始重建质量不足（如极端稀疏视角），语义场也会受到连带影响。
-
-
 
 ## 定位与知识库关联
 
@@ -331,8 +303,6 @@ CIF 的当前设计存在明确的适用边界：
 3. **标准化的 4D 开放词汇评估协议**：建立标准化的 4D 开放词汇查询评估协议和数据集，将有助于公平比较不同方法，推动领域的健康发展。
 
 4. **实例场的编辑与交互**：CIF 的显式占位与身份解耦为场景编辑提供了自然的接口——修改 $\pi_i$ 可控制物体的存在性，修改 $p_i^k$ 可改变物体身份。探索基于 CIF 的 4D 编辑应用是一个有前景的方向。
-
-
 
 ## 原文 PDF
 

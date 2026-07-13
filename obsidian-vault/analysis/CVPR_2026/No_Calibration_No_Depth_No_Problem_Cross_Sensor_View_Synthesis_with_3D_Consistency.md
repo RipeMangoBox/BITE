@@ -53,8 +53,6 @@ claims:
 
 **主要结果：** 在 METU‑VisTIR‑Cloudy 热红外数据集上，本方法在所有指标上均优于基线（p50 达 34.39，较 MINIMA 提升 +2.32）；在 RGB‑NIR‑Stereo 上 PSNR 达 21.152 dB，超越所有带 3DGS 的基线方法；消融实验证实，置信度感知稠密化与融合（CADF）贡献约 1 dB 提升，自匹配滤波贡献约 0.8 dB 提升；即使完全移除 3DGS 阶段，方法仍以 21.042 dB 的 PSNR 优于所有带 3DGS 的基线，验证了稠密化本身的核心作用。
 
-
-
 ### 跨传感器数据对齐的工程瓶颈
 
 多模态感知系统（如 RGB-热红外、RGB-近红外、RGB-SAR）在自动驾驶、遥感、安防等领域具有重要应用价值。然而，获取像素级对齐的 RGB‑X 图像对需要同时满足三个严苛条件：**内参标定**（两种传感器的焦距、主点等）、**外参标定**（传感器间的相对位姿变换）以及**精确深度**（用于将 X 传感器像素投影到 RGB 视图）。这一标定流程工程成本高昂、难以规模化，且在野外部署或传感器更换时需重复执行，成为构建大规模真实 RGB‑X 数据集的核心障碍。
@@ -72,8 +70,6 @@ claims:
 上述分析揭示了一个关键瓶颈：**现有方法要么依赖完整的 3D 先验（深度 + 双模态标定）而不可规模化，要么放弃 3D 一致性而牺牲合成质量**。本文的核心动机在于打破这一困境——能否在不使用 X 传感器任何 3D 先验（无深度、无内参、无外参）的前提下，实现像素对齐且多视图一致的跨传感器视角合成？
 
 这一目标在工程上具有显著吸引力：RGB 传感器的 SfM 标定（如 COLMAP）已高度成熟且近乎零成本，若能仅依赖 RGB 的 3D 信息来驱动 X 视图合成，即可彻底消除对 X 传感器标定的依赖。本文正是沿此思路，通过“匹配-稠密化-三维巩固”三阶段流程，在 RGB 的 3DGS 框架中统一两种模态，实现了既无须 X 的 3D 先验又能保证多视图一致性的跨传感器视角合成。
-
-
 
 ## 核心方法与创新机理
 
@@ -112,8 +108,6 @@ $$A = \frac{F_{\mathcal{T}} F_{\mathcal{X}}^{\top}}{\tau}$$
 ### 创新总结
 
 上述四个 changed slots 形成了完整的因果链条：**匹配建立稀疏锚点 → CADF 鲁棒稠密化 → 自匹配滤波剔除错误 → 3DGS 统一巩固**。整个流程无需 X 传感器的任何 3D 先验，仅依赖 RGB 的 COLMAP 位姿，从根本上降低了跨传感器数据获取的工程门槛，为大规模 RGB‑X 数据集建设提供了可规模化的技术路径。
-
-
 
 本文提出一种**匹配‑稠密化‑三维巩固（Match‑Densify‑Consolidate）** 的三阶段流程，在完全不依赖 X 传感器 3D 先验（深度、内参、外参）的前提下，实现像素对齐的跨传感器视角合成。整个管线仅需对 RGB 图像运行近乎零成本的 COLMAP 以获得相机位姿，X 传感器端无需任何标定信息。
 
@@ -162,15 +156,11 @@ $$
 - **输入**：未配对的 RGB 多视图图像（含 COLMAP 位姿）与 X 传感器图像（无任何 3D 信息）。
 - **输出**：与 RGB 视图像素对齐的稠密 X 图像，以及可在任意新视角渲染的 RGB‑X 3DGS 辐射场。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2554_https_arxiv_org_abs_2602_23559/figures/001_Figure_1.jpg]]
 *Figure 1: Problem Setup. Given unpaired RGB-X images from sensors, the task is to synthesize X-images that are pixel-wise aligned with the RGB views for multi-modal applications. Traditional 3D approaches rely on complete 3D priors—including depth and the poses/intrinsics of both modalities—to align and render cross-sensor images. In contrast, our scalable framework removes these dependencies, enabling RGB-guided X-image synthesis without the 3D priors for X to replace calibration for different types of sensors and metric depth acquisition*
 
 ![[assets/figures/papers/paper_list_l2554_https_arxiv_org_abs_2602_23559/figures/003_Figure_3.jpg]]
 *Figure 3: Method Overview. Our approach consists of three stages. In the first stage, we perform cross-modality feature matching to establish correspondences between RGB and X-images. The matched points are sampled and accumulated onto RGB views to produce semi-dense X-images*
-
-
 
 本方法的核心在于将“匹配—稠密化—三维巩固”三阶段流程中的两个关键机制——**置信度感知稠密化与融合（CADF）**和**自匹配滤波**——进行数学化建模，使得跨模态先验信息（匹配置信度、图块自相似度）能够显式地注入稠密化过程，从而在无需 X 传感器 3D 先验的条件下提升合成质量。
 
@@ -240,13 +230,6 @@ $$
 
 在推理阶段，利用已训练的 $A$ 矩阵进行质量过滤：计算对角线元素集中度 $q$，取 $(1-q)$ 分位数作为阈值，将对角线得分低于该阈值的图块标记为低质量并剔除。随后，将归一化的自匹配相似度作为新的 $C_m$ 代入式 (4)，对过滤后的 X 图像执行精细阶段稠密化。这一“评估—过滤—再稠密化”的闭环设计是消融实验中贡献 0.8 dB 提升的关键。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2554_https_arxiv_org_abs_2602_23559/figures/002_Figure_2.jpg]]
-*Figure 2: Homography warping assumes 3D planar structures and causes visible misalignment (statue areas) when the scene contains distinct fore-/background layers*
-
-
-
 ## 实验与关键发现
 
 ### 核心实验设置与评估基准
@@ -297,22 +280,8 @@ Table 5在RGB‑NIR‑Stereo上逐步移除各组件，揭示了每个模块的�
 
 Table 6展示了所有方法在完全移除COLMAP/3DGS后的各序列PSNR。本方法在无3DGS条件下仍优于所有带3DGS的基线（均值21.042），这从根本上验证了match‑densify‑consolidate流程不依赖X传感器的任何3D先验——仅凭RGB引导的稠密化即可生成高质量的像素对齐X图像。这一特性使得方法可规模化应用于无法获取X传感器深度和标定的真实场景。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2554_https_arxiv_org_abs_2602_23559/figures/005_Table_1.jpg]]
-*Table 1: Results on METU-VisTIR-Cloudy. Results are the mean of all six sequences. We compare with warping by different image matchers, all trained and rendered by 3DGS*
-
 ![[assets/figures/papers/paper_list_l2554_https_arxiv_org_abs_2602_23559/figures/014_Table_5.jpg]]
 *Table 5: Ablation Study. We ablate each component in turn from the pipeline and report the average scores on RGB-NIR-Stereo*
-
-![[assets/figures/papers/paper_list_l2554_https_arxiv_org_abs_2602_23559/figures/012_Table_4.jpg]]
-*Table 4: Results on RGB-NIR-Stereo. Image quality metrics are shown. All methods are run with 3DGS*
-
-![[assets/figures/papers/paper_list_l2554_https_arxiv_org_abs_2602_23559/figures/004_Figure_4.jpg]]
-*Figure 4: Visual Results on METU-VisTIR-Cloudy. Our results attain much clearer, sharper, and smoother surface for rendering*
-
-![[assets/figures/papers/paper_list_l2554_https_arxiv_org_abs_2602_23559/figures/009_Figure_7.jpg]]
-*Figure 7: Visual Results on RGB-NIR-Stereo. Our view synthesis showcases better structures closer to the groundtruth (GT)*
 
 ![[assets/figures/papers/paper_list_l2554_https_arxiv_org_abs_2602_23559/figures/006_Figure_5.jpg]]
 *Figure 5: Comparison on Temporal Consistency for Image Generation. StyleBooth [25] generation for thermal images cannot guarantee temporal consistency due to inherent ambiguity, while ours densification creates more consistent multi-views. NIR is closer to the visual spectrum and thus easier to ensure consistency, but the specialized method PixNext [35] still cannot ensure the correct intensity. Compared with our strategy, image translation from the original domain still suffers from inaccurate transformations, whereas our match-densifyconsolidate approach uses information from the target domain as anchors for densification and achieves better results*
@@ -322,11 +291,6 @@ Table 6展示了所有方法在完全移除COLMAP/3DGS后的各序列PSNR。本�
 
 ![[assets/figures/papers/paper_list_l2554_https_arxiv_org_abs_2602_23559/figures/011_Table_6.jpg]]
 *Table 6: Comparison without 3DGS for all methods. PSNR↑ on each sequence is shown on RGB-NIR-Stereo*
-
-![[assets/figures/papers/paper_list_l2554_https_arxiv_org_abs_2602_23559/figures/013_Table_7.jpg]]
-*Table 7: Comparison DDHR-HK SAR. We show image quality metrics against groundtruth*
-
-
 
 ## 定位与知识库关联
 
@@ -383,8 +347,6 @@ Table 6展示了所有方法在完全移除COLMAP/3DGS后的各序列PSNR。本�
 3. **下游任务验证。** 所生成的伪对齐数据在语义分割、目标检测等下游任务中的实际增益尚需大规模基准验证。这是衡量方法实用价值的关键维度。
 
 4. **跨模态泛化理论。** 匹配‑稠密化策略在不同模态对（RGB‑Thermal, RGB‑NIR, RGB‑SAR, RGB‑Depth 等）间的泛化能力是否有理论保证？模态间特征空间的几何关系值得深入分析。
-
-
 
 ## 原文 PDF
 

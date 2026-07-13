@@ -56,8 +56,6 @@ SpeeDe3DGS针对上述瓶颈提出了两个因果性调控手段：**减少需�
 
 **局限性**方面，该方法继承了动态3DGS基线对高度非刚性运动场景的建模挑战；GroupFlow通过共享刚性变换建模非刚性运动，在极度变形区域可能不够灵活；训练与评测在不同GPU上进行，存在硬件差异导致的对比公平性风险（论文已明确标注测量GPU）。
 
-
-
 ### 动态3DGS的效率瓶颈
 
 3D高斯泼溅（3DGS）在静态场景的新视角合成中实现了实时渲染，但将其扩展到动态场景时，现有方法面临严重的效率问题。以**DeformableGS**为代表的神经形变方法，对每一帧、每一个高斯原语都需要执行MLP形变推理，导致计算开销极大，渲染速度远低于实时要求。这种逐原语、逐帧的密集推理构成了动态3DGS的核心效率瓶颈。
@@ -79,8 +77,6 @@ SpeeDe3DGS的动机直接针对上述两个缺口：**减少需要形变推理�
 第二条路径通过**GroupFlow**实现：将MLP形变场蒸馏为分组的SE(3)刚性变换。方法首先基于轨迹相似度将高斯聚类到若干运动组，然后利用Umeyama对齐为每组估计从规范帧到各时间戳的刚性变换。形变推理从“逐高斯MLP前传”简化为“逐组SE(3)作用”，在几乎不损失精度的情况下大幅降低计算量。
 
 两条路径协同作用：剪枝移除了冗余原语，为GroupFlow提供了更紧凑、运动更一致的高斯集合；GroupFlow的共享刚性变换进一步压缩了形变表示。在HyperNeRF上，单独TSP+TSS实现9.37×渲染加速，单独GroupFlow实现15.66×加速，两者结合达到29.21×加速（Table 9），验证了“剪枝+分组”这一组合策略的有效性。
-
-
 
 ## 核心方法与创新机理
 
@@ -132,8 +128,6 @@ TSP+TSS 和 GroupFlow 解决的是**不同维度**的效率瓶颈：前者减少
 
 GroupFlow 通过共享刚性变换建模非刚性运动，在极度变形区域可能不够灵活。增加 $J$ 可缓解此问题，但固定分组数存在建模能力上限。此外，方法继承了动态 3DGS 基线对高度非刚性运动和噪声相机位姿的敏感性。
 
-
-
 SpeeDe3DGS 是一个面向动态3D高斯泼溅（3D Gaussian Splatting, 3DGS）的加速框架，其核心目标是解决现有可变形3DGS方法（如 **DeformableGS**）中逐高斯、逐帧的神经网络形变推理带来的巨大计算开销。该框架通过两条正交的加速路径——**原语精简**与**运动表示简化**——在保持视觉质量的前提下实现数量级的渲染与训练加速。
 
 ### 核心洞察
@@ -170,12 +164,8 @@ SpeeDe3DGS 的训练分为两个阶段：
 
 三个模块在加速机制上相互正交且可叠加：TSP/TSS 通过减少高斯数量降低形变和光栅化的计算量；GroupFlow 通过共享刚性变换降低每个剩余高斯的形变推理成本。消融实验证实了两条路径的独立性——在 HyperNeRF 上，单独 TSP 实现 9.37× 渲染加速，单独 GroupFlow 实现 15.66× 加速，两者结合达到 29.21× 加速。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2506_07917/figures/001_Figure_1.jpg]]
 *Figure 1: Our SpeeDe3DGS framework achieves 9.88× faster rendering, 11.37× fewer Gaussians, and 2.87× shorter training on the HyperNeRF [37] chicken scene while preserving the image quality of DeformableGS [53] through Temporal Sensitivity Pruning (TSP) and Sampling (TSS). Applying our GroupFlow method on top of pruning accelerates rendering and training by 33.13× and 4.24×, respectively*
-
-
 
 SpeeDe3DGS 围绕两个因果旋钮展开：**减少需要形变推理的高斯原语数量**（通过时序敏感性剪枝）和**降低每个原语的形变推理成本**（通过分组共享 SE(3) 刚性变换）。以下按模块展开其核心机制与关键公式。
 
@@ -251,15 +241,11 @@ $$\boldsymbol { r } _ { i } ^ { t } = \operatorname { q u a t } \big ( \boldsymb
 
 SpeeDe3DGS 的训练分两阶段进行（Section 4.3）：**稠密化阶段**应用软剪枝（默认移除 60% 高斯），在保持模型探索能力的同时逐步压缩容量；**稠密化后**执行硬剪枝（默认再移除 30%），进一步精简模型；随后初始化 GroupFlow 控制点与分组，端到端优化 SE(3) 变换参数。软剪枝 60% + 硬剪枝 30% 在渲染速度与 PSNR 之间取得最佳权衡（Figure 5 热力图）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2506_07917/figures/004_Figure_4.jpg]]
 *Figure 4: Overview of our GroupFlow method. Given a dynamic Gaussian Splatting model G, we identify a subset of Gaussians as control points and assign each Gaussian to the control point*
 
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2506_07917/figures/003_Figure_3.jpg]]
 *Figure 3: Comparison of our pruning methods on the real-world NeRF-DS [52] bell scene. Our proposed Temporal Sensitivity Pruning (TSP) and Temporal Sensitivity Sampling (TSS) methods achieve higher SSIM than the baseline DeformableGS [53] model while using 11× fewer Gaussians. The left regions of the renderings appear visually identical, while the right regions show that combining TSP with TSS significantly reduces temporal flicker and floating artifacts compared to both standard pruning and the unpruned baseline*
-
-
 
 ## 实验与关键发现
 
@@ -302,30 +288,8 @@ Table 1 在真实世界 NeRF-DS 数据集上对 SpeeDe3DGS 的三个核心组件
 3. **极端剪枝比例。** 当剪枝比例超过 90% 时，当前敏感度指标可能无法精确区分关键原语与冗余原语，导致视觉质量显著下降。如何设计更智能的剪枝策略或引入原语重新增补机制仍是开放问题。
 4. **硬件差异导致的对比偏差。** 论文中 FPS 统一在 RTX 3090 上测量，但训练时间分别在 RTX A5000（NeRF-DS、D-NeRF）和 RTX A6000（HyperNeRF）上测量。尽管已明确标注，跨方法的训练时间对比仍需注意这一硬件差异。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2506_07917/figures/006_Table_2.jpg]]
 *Table 2: Results on Monocular Dynamic Gaussian Splatting Benchmark (MonoDyGauBench) [25]. Quantitative results averaged across five datasets and 50 scenes for all methods in Section 3.2. We cumulatively apply our SpeeDe3DGS methods to the DeformableGS [53] and 4DGS [49] baselines, keeping the original neural variants with low FPS for reference, but excluding them from comparisons to focus on real-time methods. Pruning is performed using TSP and TSS. Each experiment is repeated three times and averaged. The best and second-best results are highlighted; improvements over corresponding baselines are bolded. FPS and baseline Train Time are measured on an RTX 3090 GPU, while our Train Time* is measured o...*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2506_07917/figures/013_Table_9.jpg]]
-*Table 9: Results on the eight real-world scenes from the HyperNeRF dataset [37] in the DeformableGS [53] paper with our SpeeDe3DGS framework. TSP, TSS, and GF denote Temporal Sensitivity Pruning, Sampling, and GroupFlow, respectively. Size measures the combined deformation network and point cloud storage. Each experiment is run three times and averaged to reduce training variance. The best and second-best results are highlighted. FPS and Train Time are measured on RTX 3090 and RTX A6000 GPUs, respectively. Per-scene results are reported in Appendix A.6. Results with MonoDyGauBench [25] are reported in Table 4*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2506_07917/figures/016_Figure_5.jpg]]
-*Figure 5: Ablation on pruning percentages with our SpeeDe3DGS framework. We sweep soft (densification-stage) and hard (postdensification) pruning ratios in 5% increments for the NeRF-DS [52] and D-NeRF [39] datasets using the DeformableGS [53] codebase. Each configuration is run three times without TSS or GroupFlow, and results are averaged across all runs. (0%, 0%) corresponds to the unpruned baseline, while the first row and column show pruning in isolation. The red dot marks our selected (60%, 30%) soft–hard ratio. FPS and Train Time improvements are measured on an RTX A5000 GPU*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2506_07917/figures/014_Table_10.jpg]]
-*Table 10: Ablation on group count J on the NeRF-DS [52] and D-NeRF [39] datasets with our SpeeDe3DGS framework. J= indicates that GroupFlow is not used. Each experiment is repeated three times and averaged to reduce training variance. The best and second best results are highlighted. FPS and Train Time are measured on RTX 3090 and RTX A5000 GPUs, respectively*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2506_07917/figures/015_Table_11.jpg]]
-*Table 11: Ablation on perturbation magnitude β and annealing period τ on the NeRF-DS [52] dataset with our SpeeDe3DGS framework. β=− and τ =− indicate that TSS is not used. Each experiment is repeated three times and averaged to reduce training variance*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2506_07917/figures/012_Table_8.jpg]]
-*Table 8: Results on the eight scenes in the synthetic D-NeRF dataset [39] with our SpeeDe3DGS framework. TSP, TSS, and GF denote Temporal Sensitivity Pruning, Sampling, and GroupFlow, respectively. Size measures the combined deformation network and point cloud storage. Each experiment is run three times and averaged to reduce training variance. The best and second-best results are highlighted. FPS and Train Time are measured on RTX 3090 and RTX A5000 GPUs, respectively. Per-scene results are provided in Appendix A.6. Results with MonoDyGauBench [25] are reported in Table 3*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2506_07917/figures/008_Table_4.jpg]]
-*Table 4: Results for the 17 scenes in the real-world HyperNeRF dataset [37] with MonoDyGauBench [25]. Results with our SpeeDe3DGS framework are reported in Table 9*
-
-
 
 ## 定位与知识库关联
 
@@ -367,8 +331,6 @@ SpeeDe3DGS 并非从零构建一个全新的动态场景表示框架，而是在
 - **极端剪枝下的质量保持**：在剪枝比例超过 90% 的极端情况下，如何设计更智能的敏感度指标（如融合不透明度、尺度、视点依赖可见性）或引入重新增补高斯的机制，以同时维持渲染速度和视觉质量？
 - **GroupFlow 的泛化增强**：能否通过融合更多运动基（如混合形变场）或引入 2D 光流先验来增强 GroupFlow 对高度变形场景的泛化能力？这涉及到将数据驱动的运动先验注入分组过程。
 - **时序敏感度度量的扩展**：当前的 TSP 分数基于 L2 损失的二阶敏感度近似，是否可与其他重要性度量（如对感知损失的贡献、对时序一致性的影响）结合，以进一步提升剪枝的针对性和鲁棒性？
-
-
 
 ## 原文 PDF
 

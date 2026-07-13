@@ -56,8 +56,6 @@ claims:
 
 值得注意的是，该方法仍存在一定局限：溢出能量可能在标点符号和句子开头token上产生误报，且当前仅在所测试的模型架构上得到验证，对其他架构的泛化性尚需进一步确认。
 
-
-
 大型语言模型（LLM）在广泛任务中展现出卓越能力，但其输出仍频繁出现幻觉——包括事实性错误、偏见和推理失败。这些错误在表面上与正确输出难以区分，严重制约了LLM在高可靠性场景中的部署。
 
 当前主流的幻觉检测方法存在明显瓶颈。最直接的方式是利用模型输出的softmax置信度（即答案token的logit或概率值）作为可靠性指标，但这种方法跨任务的检测能力不稳定，在许多场景下无法可靠分离正确与错误输出。另一类方法是在模型内部表示上训练探测分类器（如Orgad et al., 2025），虽然性能有所提升，但需要为每个任务和数据集单独训练，缺乏跨任务泛化性，且引入了额外的训练开销。
@@ -65,8 +63,6 @@ claims:
 上述困境的根源在于：LLM的softmax输出层本质上是一个判别式分类器，其置信度仅反映当前token在给定上下文中的相对概率，而非模型对输出真实性的可靠度量。这引出了一个核心问题——能否从LLM已有的输出信号中，提取出一种无需训练、且与幻觉内在相关的检测信号？
 
 本文的动机正是从能量基模型（Energy-Based Model, EBM）的视角重新审视LLM的解码过程。将LLM的softmax分类器重新解释为EBM后，序列概率可通过链式法则分解为多个交互的EBM。理论上，相邻时间步的边际能量与条件能量应当相等，但在实际LLM实现中，两者之间存在不匹配——即“溢出能量”（spilled energy）。这一溢出量与模型输出的正确性高度相关，从而提供了一种完全无需训练、仅从输出logits计算得到的幻觉检测信号。
-
-
 
 ## 核心方法与创新机理
 
@@ -112,8 +108,6 @@ $$\Delta E_{\theta}(\mathbf{x}_{i:1}) \triangleq -E_{\theta}^{m}(\mathbf{x}_{i:1
 
 此外，论文还提出了缩放溢出能量 $\Delta \bar{E}_s(\mathbf{x}_{i:1}) = |E_{\theta}^{m}(\mathbf{x}_{i:1})| \Delta E_{\theta}(\mathbf{x}_{i:1})$，将溢出能量与边际能量的绝对值相乘，组合两种度量（Section 4.2）。
 
-
-
 ![[assets/figures/papers/iclr26_0011_EXFKk4Y3yc_Spilled_Energy_in_Large_Language_Models/figures/006_Figure_6.jpg]]
 *Figure 6: (d) MNLI MathFigure 2: How energy spills in LLMs. (a) Language Modeling p ( $\mathbf { x } _ { i : 1 }$ ) Hotpotqa WC is attained as a decomposition problem following the chain rule of probability, implemented as autoregressive: we recursively apply a discriminative classifier over the vocabulary V to attain generative modeling with larger context size i.e. p ( $\mathbf { x } _ { i } | \mathbf { x } _ { i - 1 : 1 }$ ) . (b) We reinterpret each discriminative classifier as a generative EBM, finding a connection between two quantities that should be the same across time steps yet are different. We call this difference “the spilled energy” $\Delta E _ { \pmb { \theta } } ( \mathbf { x } _ { i : 1 }$...
 
@@ -134,8 +128,6 @@ $$\Delta E_{\theta}(\mathbf{x}_{i:1}) \triangleq -E_{\theta}^{m}(\mathbf{x}_{i:1
 **模块四：池化策略与检测输出。** 在答案token区间$[u, w]$上，对溢出能量（或边际能量）应用池化聚合，以获得单一检测分数。论文比较了Min、Max和Mean三种池化策略，其中Min池化在多数设置下表现最优（Section 5.2）。最终输出为一个标量检测信号，通过阈值即可区分正确与错误答案——正确答案的溢出能量值较低，错误答案则显著偏高（Fig. 2(d), Fig. 3）。
 
 整个pipeline的输入仅为LLM在生成过程中的logits序列和答案token区间，输出为一个无需训练的幻觉检测分数。该框架在LLaMA、Mistral、Gemma等多个模型系列上均得到了验证（Table 1, Table 3），且对预训练和指令微调变体均有效。
-
-
 
 ### 能量基模型（EBM）重解释
 
@@ -186,8 +178,6 @@ $$\Delta \bar{E}_s(\mathbf{x}_{i:1}) = |E_{\theta}^{m}(\mathbf{x}_{i:1})| \cdot 
 3. **溢出能量计算**：按 Eq. 8 计算相邻步间能量差。
 4. **答案 token 定位与池化**：识别生成序列中精确答案所在的 token 区间 $[u, w]$（Section 4.2），在该区间上应用 Min/Max/Mean 池化聚合溢出能量或边际能量，得到单一检测值。消融实验表明，精确的答案 token 定位可带来约 24% 的性能提升（Table 2），而 Min 池化策略整体优于 Max 和 Mean（Section 5.2）。
 
-
-
 ## 实验与关键发现
 
 ### 合成算术任务：溢出能量的分离能力
@@ -195,7 +185,6 @@ $$\Delta \bar{E}_s(\mathbf{x}_{i:1}) = |E_{\theta}^{m}(\mathbf{x}_{i:1})| \cdot 
 为验证溢出能量与错误的关联，论文首先在可控的合成算术任务（Math Sums, 13-digit）上进行测试。LLM 被要求计算两个数的和，通过改变错误答案与正确答案的差值来构造不同难度级别。
 
 Figure 3 的直方图表明，溢出能量能够清晰分离正确与错误答案：正确答案的溢出能量值集中在较低区间，而错误答案的值显著偏高。这种分离在多个模型（LLaMA、Mistral、Qwen3）上一致出现。更重要的是，在**难以检测的范围**（错误与正确答案的差值在 [1,10] 之间）上，溢出能量（Spilled ΔE）的 ROC 曲线显著优于传统的 logit 置信度（E^ℓ），表明溢出能量对细微错误的敏感度更高。
-
 
 ![[assets/figures/papers/iclr26_0011_EXFKk4Y3yc_Spilled_Energy_in_Large_Language_Models/figures/015_Figure_3.jpg]]
 *Figure 3: Histograms of Spilled Energy values across models (rows) on Math Sums with different error ranges in the answer (columns, decreasing range left to right, making it harder to detect errors). All sums are performed on 13-digit integers. In the fourth column, we show ROC curves for Hallucination Detection across the error ranges (colors) and methods (line styles). (a) Results by Orgad et al*
@@ -205,7 +194,6 @@ Figure 3 的直方图表明，溢出能量能够清晰分离正确与错误答�
 ### 真实世界基准：跨任务幻觉检测性能
 
 Table 1 汇总了在 9 个标准基准（HotpotQA, TriviaQA, Movies, MNLI, Math, IMDB, Winobias, Winogrande 等）上的 AuROC 幻觉检测性能，涵盖 4 个 LLM（LLaMA-3, LLaMA-3-Instruct, Mistral, Mistral-Instruct）。
-
 
 ![[assets/figures/papers/iclr26_0011_EXFKk4Y3yc_Spilled_Energy_in_Large_Language_Models/figures/017_Table_1.jpg]]
 *Table 1: Hallucination detection performance, in terms of AuROC, across nine benchmarks and four different LLMs. We measure the generalization across all tasks by computing the average*
@@ -217,14 +205,12 @@ Table 1 汇总了在 9 个标准基准（HotpotQA, TriviaQA, Movies, MNLI, Math,
 
 **跨任务泛化**：Figure 4 的热力图对比了 Orgad et al. 探测分类器与 Spilled ΔE with Min pooling 的跨数据集泛化能力。探测分类器在分布外（out-of-distribution）测试集上性能大幅下降至接近随机猜测水平，而溢出能量无需训练即可在不同任务间保持稳定的检测能力。热力图中正值区域（红色）广泛分布，表明溢出能量在多数跨任务设置下优于探测分类器。
 
-
 ![[assets/figures/papers/iclr26_0011_EXFKk4Y3yc_Spilled_Energy_in_Large_Language_Models/figures/016_Figure_4.jpg]]
 *Figure 4: (a) AuROC performance as percentages of probing classifiers on exact answer tokens by Orgad et al. for LlaMA-3-Instruct. (b) depicts the performance difference between our Spilled ∆E with Min pooling and theirs. Positive values indicate cases where Spilled ∆E outperforms Orgad et al.. This comparison highlights the generalization capabilities of our method, compared to probing classifiers. Legend: low performance high performance*
 
 ### 池化策略与答案定位的消融
 
 **池化策略**：Table 1 和补充实验（Table 3）比较了 Max、Mean、Min 三种池化策略。Min 池化在大多数方法上取得最优性能——Spilled ΔE with Min pooling 达到 73.32% 平均 AuROC，优于 Mean（约 70%）和 Max（约 66%）。边际能量（Marginal E^m）同样受益于 Min 池化，但整体性能略低于溢出能量。
-
 
 ![[assets/figures/papers/iclr26_0011_EXFKk4Y3yc_Spilled_Energy_in_Large_Language_Models/figures/019_Table_3.jpg]]
 *Table 3: generalizes robustly across diverse benchmarks. We observe that instruction-tuned models tend to amplify the margin by which spilled energy outperforms other methods, whereas on non-aligned Mistral, spilled energy may rank slightly behind marginal energy. We also compare pooling strategies and find that min pooling yields the best overall performance across methods. Table 3 shows our method generalizes to Gemma over different LLM size, 1B and 4B. Table 2: Improvements in AuROC with the exact answer. Average across 4 LLMs and 9 benchmarks*
@@ -249,13 +235,8 @@ Table 3 展示了在 Gemma-Instruct 1B 和 4B 上的结果。溢出能量在 Gem
 - **中等置信度（0.9）**：池化策略的最优选择（Min）在不同设置下表现一致，但并非在所有模型/数据集组合上都严格最优；边际能量与溢出能量的互补性需要更多实验验证。
 - **需手动验证**：论文未提供对代码生成、翻译等任务的评估，溢出能量在这些场景下的有效性仍是开放问题。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0011_EXFKk4Y3yc_Spilled_Energy_in_Large_Language_Models/figures/052_Figure_7.jpg]]
 *Figure 7: ROC curves for Hallucination Detection across models (rows) on Math Sums with different error ranges in the answer (columns, decreasing range left to right). All sums are performed on 13-digit integers. Legend: Spilled (ours) Spilled ∆E Logit Eℓ Marginal $\bar { \boldsymbol { E } } ^ { m }$
-
-
-
 
 ## 定位与知识库关联
 
@@ -296,8 +277,6 @@ Table 3 展示了在 Gemma-Instruct 1B 和 4B 上的结果。溢出能量在 Gem
 - **解码时干预**：能否利用溢出能量在解码过程中直接干预生成过程以减少幻觉？例如，当检测到高溢出能量时触发重新采样或回溯机制。
 
 - **任务扩展**：对于代码生成、翻译、摘要等结构化或半结构化任务，溢出能量的有效性如何？是否需要针对不同任务设计特定的池化策略或答案定位方法？
-
-
 
 ## 原文 PDF
 

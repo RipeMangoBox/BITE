@@ -58,8 +58,6 @@ claims:
 
 **方法定位**：AdvFM 属于基于生成模型的非限制对抗攻击，其方法论上从扩散模型范式切换至流匹配速度场范式，扰动注入位置从重建图像空间改为速度场空间，并通过前瞻损失实现沿概率流 ODE 轨迹的时域梯度对齐。
 
-
-
 ### 对抗攻击的生成模型范式
 
 深度神经网络在图像分类等任务上对精心设计的对抗扰动高度脆弱，这一现象催生了大量攻击方法。传统攻击方法（如 PGD）直接在像素空间施加 $L_p$ 范数约束的扰动，但受限于扰动预算，其黑盒迁移性和对净化防御的鲁棒性往往不足。近年来，扩散模型被引入对抗攻击领域，形成了以 **AdvDiffuser**（Chen et al., ICCV 2023）、**DiffPGD**（Xue et al., NeurIPS 2023）、**DiffAttack**（Kang et al., NeurIPS 2023）、**AdvAD**（Li et al., NeurIPS 2024）和 **APA**（Jiang et al., arXiv 2025）为代表的无限制攻击范式。这些方法利用扩散模型的去噪过程生成对抗样本，在保持视觉质量的同时突破了像素空间约束的限制。
@@ -75,8 +73,6 @@ $$x_0' = \frac{1}{\sqrt{\bar{\alpha}_t}} \Big( x_t - \sqrt{1 - \bar{\alpha}_t} \
 ### 流匹配的机遇与本文动机
 
 流匹配（Flow Matching）作为扩散模型的替代范式，通过学习连续时间速度场 $v_\theta(x_t, t)$ 直接参数化概率流 ODE 的向量场，具有确定性和平滑动态的特性。本文的核心洞察在于：**将攻击扰动从像素空间转移至流匹配的连续时间速度场，并引入前瞻双点优化以对齐概率流 ODE 轨迹**。这一设计有望从根本上解决扩散攻击的三重困境——流匹配的确定性传播降低梯度方差，速度场空间的扰动放大机制提升单步攻击效率，而流形切向的扰动偏置则增强对净化防御的鲁棒性。基于此，本文提出 **AdvFM**（Lookahead Flow-Matching Velocity-Field Attack），在保持对抗样本不可感知性的同时，系统性地提升黑盒迁移性和防御鲁棒性。
-
-
 
 ## 核心方法与创新机理
 
@@ -138,8 +134,6 @@ $$\mathbb{E}\|P(x + \eta^{\mathrm{FM}}) - P(x)\|^2 > \mathbb{E}\|P(x + \eta^{\ma
 
 这直接转化为对净化防御（NRP、Smooth）的显著 ASR 提升（+13.8% 和 +11.1%）。
 
-
-
 AdvFM 将无限制对抗攻击从扩散模型的随机去噪/重加噪范式迁移至流匹配（Flow Matching）的连续时间速度场，构成一条“噪声桥采样 → 速度场重建 → PGD 扰动注入 → 速度扰动转换 → 欧拉前向推进 → 前瞻双点评估”的闭环管线（参见 Algorithm 1）。
 
 **管线概览。** 给定干净图像 $x$，首先通过噪声桥 $x_t = t x + (1-t) \epsilon$ 采样时间索引的噪声状态（$\epsilon \sim \mathcal{N}(0,I), t \in [0,1]$），将问题嵌入一个平滑的噪声景观。随后，流匹配重建算子 $R_t(x_t) := x_t + (1-t) v_\theta(x_t, t)$ 单步预测流终点 $\hat{x}_1^t$，作为攻击的起点。在 $\hat{x}_1^t$ 上执行投影梯度下降（PGD），注入对抗扰动 $\delta$，并计算分类损失。若启用前瞻模式，则额外沿概率流 ODE 推进一个时间步，评估未来重建 $\hat{x}_1^{t+\Delta t}$ 上的损失，形成联合双点损失 $\mathcal{L}_f^{\mathrm{LA}}$（式 12）。最后，将图像空间扰动 $\delta$ 转换为速度场扰动 $\hat{v}_t = v_\theta(x_t, t) + \frac{\delta}{1-t}$（式 8），并通过欧拉推进 $x_{t+\Delta t} = x_t + \Delta t \hat{v}_t$（式 9）更新噪声状态，进入下一轮迭代。
@@ -155,8 +149,6 @@ AdvFM 将无限制对抗攻击从扩散模型的随机去噪/重加噪范式迁�
 **与扩散攻击的关键差异。** 传统扩散攻击（如 AdvDiffuser、DiffPGD）在重建图像空间注入扰动，并通过扩散重采样步更新状态，其扰动传播受衰减因子 $\sqrt{\bar{\alpha}_t} < 1$ 抑制。AdvFM 将扰动注入位置从像素空间转移至速度场空间，利用欧拉推进的放大因子 $\frac{\Delta t}{1-t} > 1$ 实现噪声空间中的有效步长放大（式 11 vs 式 4），从而在单步内获得更大的目标损失增益（Lemma 1, 式 17）。同时，流匹配的确定性动态消除了扩散攻击中随机噪声耦合引入的高方差，使替代梯度方向更稳定，与目标模型共享梯度子空间的对齐显著改善（Theorem 1, 式 23）。前瞻损失进一步降低了梯度方差（Figure 2, Sec. 5.4），并将扰动偏置到数据流形的切向方向，增强了对净化防御和对抗训练模型的鲁棒性（Theorem 2, Theorem 3）。
 
 **输入输出规格。** 输入为干净图像 $x$、真实标签 $y$、替代模型 $f$ 及流匹配速度场 $v_\theta$；输出为对抗样本 $x_{\mathrm{adv}}$。管线从 $t=t_0$ 迭代至 $t=1$，每一步在流终点评估损失并反向传播梯度，最终在 $t=1$ 处输出对抗图像。
-
-
 
 AdvFM 的攻击范式建立在**流匹配（Flow Matching）连续时间速度场**之上，核心思路是将对抗扰动从像素空间转移至速度场空间，并利用概率流 ODE 的确定性动态实现扰动放大与梯度方差降低。整个攻击管线由五个关键模块串联构成。
 
@@ -207,8 +199,6 @@ $$\mathcal{L}_f^{\mathrm{LA}}(\delta; t) = w \mathcal{L}_f(x_1^t + \delta, y) + 
 ![[assets/figures/papers/paper_list_l836_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_AdvFM_Lookahead_Fl/figures/004_Figure_2.jpg]]
 *Figure 2: Ablation of the lookahead objective on ImageNet with ResNet50 as the surrogate. We plot white-box ASR on the surrogate and the average black-box ASR on the remaining models along the reverse flow from t to 1*
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果：黑盒迁移性
@@ -233,12 +223,8 @@ Figure 2 展示了在 ResNet50 作为替代模型时，沿反向流从时间 $
 
 在 DiffPure 防御下 AdvFM 未能超越 APA，构成一个值得注意的边界条件。DiffPure 采用随机前向扩散与多步去噪的组合，其噪声注入机制可能部分抵消了流匹配扰动在流形切向方向上的集中优势。此外，当前实验均在 $\\ell_\\infty$ 约束下进行，未探索其他扰动范数下的行为。若实际部署中防御方采用更强的自适应净化策略（如动态调整扩散步数或噪声强度），AdvFM 的优势可能被削弱，这一点需要在实际应用中通过自适应评估进行验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l836_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_AdvFM_Lookahead_Fl/figures/002_Figure_1.jpg]]
 *Figure 1: Qualitative comparison of adversarial examples on ImageNet under ResNet50*
-
-
 
 ## 定位与知识库关联
 
@@ -287,8 +273,6 @@ AdvFM 在以下防御场景中展现出差异化的鲁棒性，其适用边界�
 3. **前瞻损失的超参数敏感性**：Eq. 12 中的权重 $w$ 和前瞻步长 $\Delta t$ 的联合优化策略尚未被理论化，其在不同替代模型-目标模型组合下的最优配置可能具有任务依赖性。
 
 4. **与基于分数的扩散模型的统一框架**：流匹配与分数匹配（Score Matching）在连续时间极限下具有等价性，AdvFM 的方法论是否可推广至基于分数的扩散攻击范式，形成统一的连续时间攻击框架，是值得探索的理论方向。
-
-
 
 ## 原文 PDF
 

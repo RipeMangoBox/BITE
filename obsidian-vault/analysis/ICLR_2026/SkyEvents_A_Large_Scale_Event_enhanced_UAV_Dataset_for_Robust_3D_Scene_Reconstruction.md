@@ -56,8 +56,6 @@ claims:
 
 **主要局限**：当前 RGB 与事件相机之间尚未实现完美的时空同步；低光评估采用合成数据（伽马校正与线性缩放），而非真实低光采集；实验仅在合成退化条件下进行，缺乏真实极端环境的验证。这些因素限制了结论向实际部署的直接外推能力。
 
-
-
 无人机（UAV）搭载的视觉感知系统在城市建模、灾害评估、基础设施巡检等任务中扮演着日益关键的角色。基于多视角图像的3D重建与新型视图合成，尤其是以3D Gaussian Splatting（3DGS）为代表的显式辐射场方法，已展现出卓越的渲染质量与实时性能。然而，现有无人机视觉系统几乎完全依赖传统RGB相机，其固有的物理局限正构成大规模城市场景鲁棒重建的核心瓶颈。
 
 **核心瓶颈：低动态范围与运动模糊。** RGB相机在低光照环境下信噪比急剧下降，而在高速飞行或快速机动中又不可避免地产生运动模糊。这两种退化在无人机航拍中往往同时出现——例如黄昏时分的城市巡检——导致图像丢失关键的纹理与几何信息。传统去模糊或低光增强方法属于后处理，无法恢复已丢失的场景细节，从根本上限制了3DGS等方法的渲染保真度与几何精度。
@@ -67,8 +65,6 @@ claims:
 **现有数据集的缺口。** 尽管已有若干面向事件驱动视觉的数据集（如MVSEC、DSEC），但它们缺乏面向无人机3D重建的关键要素：同步的高分辨率RGB图像（≥ 120 Hz）、稠密深度真值、准确的6自由度位姿，以及覆盖城市级尺度的大范围场景。如Table 1所示，SkyEvents是首个同时提供上述全部模态的大规模事件增强无人机数据集，包含45个序列、超过8小时的配对RGB-事件数据，以及覆盖0.72 km²的稠密点云真值。
 
 **本文动机。** 为填补上述空白，本文构建了SkyEvents数据集，并提出几何约束的时间戳对齐模块（GTA）与区域感知事件渲染损失（RER），将事件相机的高动态范围与高时间分辨率特性系统性地融入3DGS重建管线。核心假设是：通过最大化RGB帧与事件帧之间的几何一致性来实现精确同步，并在渲染优化中约束合成亮度变化与累积事件图像的一致性，可以在低光和模糊条件下显著提升渲染质量与几何精度。
-
-
 
 ## 核心方法与创新机理
 
@@ -125,8 +121,6 @@ SkyEvents 提出的 **RER（Region‑wise Event Rendering）损失** 直接利�
 - **时空同步的硬件瓶颈**：GTA 模块通过后处理优化时间戳对齐，但 RGB 与事件相机之间尚未实现完美的硬件级同步，这可能在高动态场景中引入残余误差。
 - **开放问题**：事件增强 3DGS 能否扩展到动态场景？GTA 能否适应更灵活的传感器配置（如不同 FOV 或异步曝光）？这些方向需要进一步探索。
 
-
-
 SkyEvents 的整体框架围绕“多模态数据采集 → 时空同步 → 事件增强三维重建”三条主线展开，核心目标是利用事件相机的高动态范围和高时间分辨率特性，弥补传统 RGB 相机在低光和运动模糊条件下的不足，从而提升无人机航拍场景的三维重建质量。
 
 ### 数据采集与传感器套件
@@ -182,21 +176,11 @@ RER 损失的核心机制如下：
 
 整个框架的模块关系和数据流如图 2 所示：数据采集平台输出配对的 RGB 与事件数据，经 GTA 模块同步时间戳并完成空间对齐后，送入 3DGS 重建管线，最终由 RGB 渲染损失与 RER 事件损失联合优化。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_dxHPqQindP/figures/011_Figure_8.jpg]]
 *Figure 8: Multi-modal UAV data collection platform overview. The DJI Matrice 350 RTK is equipped with a synchronized sensor suite and An onboard mini-PC*
 
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_dxHPqQindP/figures/014_Figure_9.jpg]]
-*Figure 9: Key components of the UAV data collection system. (a) Custom carbon fiber plate provides rigid mounting for sensors and computing unit while damping vibrations. (b) Power conversion module regulates DJI battery output to stable 12V/5V for onboard electronics. (c) Remote controller with pre-loaded KML routes enables fully autonomous flight operations*
-
 ![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_dxHPqQindP/figures/015_Figure_10.jpg]]
 *Figure 10: Campus region overview. The map shows five distinct areas: (1) Main Building complex, (2) North Dormitory, (3) Data Center, (4) Playground, and (5) South Dormitory, covering diverse urban scenarios for multi-modal data collection*
-
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_dxHPqQindP/figures/003_Figure_2.jpg]]
-*Figure 2: Data collection and rendering pipelines. The data acquisition platform consists of an UAV payload, an event camera, a 120HZ RGB camera, and a Mini PC. After collecting paired RGB and event data, we utilized the proposed GTA module to synchronize timestamps and warp between the event and RGB cameras*
-
-
 
 SkyEvents 并未提出全新的三维重建架构，而是在现有 3D Gaussian Splatting（3DGS）框架之上，通过两个关键模块引入事件模态的监督信号：**几何约束时间戳对齐（GTA）** 和 **区域感知事件渲染损失（RER）**。两者分别解决了事件数据与 RGB 数据的时间同步问题，以及如何将异步、稀疏的事件流转化为对 3DGS 渲染过程的有效约束。
 
@@ -248,13 +232,6 @@ GTA 和 RER 构成了一个因果闭环：GTA 提供精确的时间对齐，使�
 
 需要指出的是，公式 (6) 中的事件监督依赖于合成对数亮度差，而事件相机的实际响应并非严格对数线性。论文未对这一近似引入的系统偏差进行定量分析。此外，当前 GTA 模块假设 RGB 与事件相机之间的单应变换是静态的，在无人机剧烈姿态变化时可能存在对齐误差——这一点在论文的局限性讨论中未被充分展开，需读者自行评估。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_dxHPqQindP/figures/016_Figure_11.jpg]]
-*Figure 11: Matching results with the proposed GTA module on SkyEvents and MVSEC datasets*
-
-
-
 ## 实验与关键发现
 
 ### 实验设置与评估协议
@@ -299,9 +276,6 @@ Table 3 和 Figure 7 展示了多种事件到视频重建方法（E2VID+、FireN
 
 Figure 6 展示了深度估计的可视化结果。事件增强的 3DGS 在模糊和低光区域能够恢复出更清晰的深度边界，与 RGB 渲染质量的提升趋势一致。然而，当前深度估计仍依赖 3DGS 的隐式几何，缺乏专门针对无人机航拍大范围深度变化的显式优化机制。
 
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_dxHPqQindP/figures/008_Figure_6.jpg]]
-*Figure 6: Depth Estimation*
-
 ### 局限性与失败模式
 
 尽管事件增强带来了全面的性能提升，但以下局限性值得关注：
@@ -309,16 +283,6 @@ Figure 6 展示了深度估计的可视化结果。事件增强的 3DGS 在模�
 1. **时空同步精度受限。** 由于当前硬件限制，RGB 与事件相机之间尚未实现完美的时空同步，残余的时空偏差可能在快速运动场景中引入额外的对齐误差。
 2. **低光评估为合成数据。** 实验中的低光图像通过伽马校正和线性缩放合成，而非真实低光采集数据，因此事件监督在真实极端低光环境下的增益幅度有待进一步验证。
 3. **未在真实极端环境中验证。** 目前的实验仅在合成模糊和低光条件下进行，缺乏真实暴雨、浓雾或夜间等极端环境下的鲁棒性评估。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_dxHPqQindP/figures/006_Figure_4.jpg]]
-*Figure 4: Comparison of 3D scene reconstruction with Improved-GS and Improved-GS+RER in blurred environments*
-
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_dxHPqQindP/figures/007_Figure_5.jpg]]
-*Figure 5: Comparison of 3D scene reconstruction using existing 3D GS methods (Improved-GS and Luminance-GS), with and without event enhancement. The integration of event modality through RER markedly enhances rendering quality*
-
-
 
 ## 定位与知识库关联
 
@@ -367,8 +331,6 @@ Figure 6 展示了深度估计的可视化结果。事件增强的 3DGS 在模�
 2. **深度估计的扩展**：当前事件辅助的深度估计（Figure 6）在无人机航拍的大范围深度变化场景中仍有明显误差，如何改进事件引导的单目深度估计以适应高空视角是重要方向。
 3. **GTA 的通用性边界**：GTA 模块依赖特征匹配与单应估计，在纹理稀疏或重复纹理场景（如大面积草坪、水面）中可能失效，其退化条件需要系统研究。
 4. **动态场景与长时序**：将事件增强 3DGS 扩展到包含运动物体的动态场景，以及更长的时序序列（如数十分钟的连续飞行），是迈向实际部署的关键一步。
-
-
 
 ## 原文 PDF
 

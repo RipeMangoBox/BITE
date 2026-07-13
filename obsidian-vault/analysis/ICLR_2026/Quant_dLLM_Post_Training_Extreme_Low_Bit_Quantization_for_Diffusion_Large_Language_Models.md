@@ -56,15 +56,11 @@ claims:
 
 在五个扩散LLM模型（LLaDA-8B-Base/Instruct、LLaDA-1.5、Dream-7B-Base/Instruct）上的实验表明，Quant-dLLM在7个通用任务上的平均准确率达到**51.3%**，显著优于Slim-LLM（40.9%）、GPTQ（36.5%）等所有2-bit基线方法（Table 1）。在数学推理与代码生成任务上，Quant-dLLM是唯一保持可用性能的方法，基线方法几乎完全失效（Figure 3）。消融实验分别验证了MCS、DAQ（RSR+DOR）和ABMP的独立增益，三者协同作用将LLaDA-8B-Base的MMLU 5-shot准确率从基线的39.26%提升至56.87%（Table 2）。
 
-
-
 扩散大语言模型（diffusion Large Language Models, dLLMs）通过逐步去噪掩码序列生成文本，在推理质量与可控性上展现出独特优势。然而，其自回归式的迭代去噪过程使得单次推理需执行数百至上千步前向传播，计算量与显存开销远超同规模的自回归模型，严重制约了实际部署。后训练量化（Post-Training Quantization, PTQ）是缓解这一瓶颈的常见手段，但现有方法几乎全部为自回归LLM设计，直接迁移到扩散LLM时面临根本性障碍。
 
 **核心瓶颈**在于扩散LLM的推理过程存在时间步依赖的掩码机制。在每一步去噪中，模型仅能看到部分未被掩码的token，而标准PTQ方法在校准时使用全可见序列，忽略了这一分布差异。当量化精度降至2-bit时，这种分布错配导致激活统计量严重偏离推理时的真实分布，使得量化误差急剧放大，性能崩塌。此外，固定码本的2-bit权重量化表示能力有限，难以捕捉扩散LLM权重中关键的离群结构；均匀的精度分配策略则无法将有限的比特预算集中于最敏感的权重块。
 
 针对上述缺口，**Quant-dLLM**提出了三个协同模块：掩码校准模拟（Masked Calibration Simulation, MCS）通过模拟扩散过程的时间步感知掩码，生成与推理分布对齐的校准数据；数据感知任意阶量化器（Data-aware Any-order Quantizer, DAQ）采用多二进制行-列缩放叠加参数化，以数据感知的封闭形式优化替代传统固定码本；自适应块混合精度（Adaptive Blockwise Mixed Precision, ABMP）基于重要性分数在严格2-bit平均预算下重新分配块级精度。三者共同构成了首个面向扩散LLM的极低比特后训练量化框架。
-
-
 
 ## 核心方法与创新机理
 
@@ -125,8 +121,6 @@ $$\frac{1}{|\mathcal{G}|} \sum_{g} b_g = 2, \quad b_g \in \{1, 2, 3\}$$
 
 三个创新并非孤立运作，而是形成协同增强的闭环：MCS提供分布对齐的校准数据，为DAQ的数据感知优化奠定基础；DAQ通过DOR识别关键权重，其输出的重要性矩阵$\mathbf{Z}$直接驱动ABMP的精度分配决策；ABMP则将DAQ的多二进制表示能力聚焦于最需要表达精度的区域。这一协同使得Quant-dLLM在五个模型上的平均准确率达到51.3%，显著超过Slim-LLM的40.9%（+10.4个百分点，Table 1），且在数学推理和代码生成等复杂任务上，Quant-dLLM是唯一有效保留准确率的方法（Figure 3）。
 
-
-
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_HD7tuVakmR/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our Quant-dLLM. Masked Calibration Simulation: Aligns calibration with diffusion by simulating masked, timestep-aware inputs. Adaptive Blockwise Mixed Precision: Assigns binary orders by importance under a 2-bit average. Data-aware Any-order Quantizer: Builds multi-binary RC forms with data-aware optimization*
 
@@ -155,8 +149,6 @@ Quant-dLLM 是一个面向扩散大语言模型（dLLM）的后训练极低比�
 - **校准数据对齐**：MCS 并非简单地使用原始文本作为校准数据，而是通过模拟扩散前向过程的掩码调度，生成与推理时激活分布一致的输入。这一设计是性能提升的基础——消融实验表明，仅引入 MCS 就将 LLaDA-8B-Base 的 MMLU 5-shot 准确率从 52.10% 提升至 56.87%。
 - **多二进制参数化**：DAQ 将权重矩阵近似为多个二进制矩阵的加权叠加，每个二进制矩阵配有独立的行-列缩放因子。相比于固定码本的 2-bit 量化，这种参数化提供了更丰富的表示能力。
 - **严格预算约束下的自适应精度**：ABMP 不改变总比特预算，而是通过“劫富济贫”的方式重新分配——将有限的表示能力集中于对输出误差影响最大的权重块。默认重分配比例为每层 5%，即约 5% 的块获得 3-bit 精度，等量的块降为 1-bit。
-
-
 
 ### 瓶颈与因果路径
 
@@ -224,8 +216,6 @@ $$\frac{1}{|\mathcal{G}|} \sum_{g} b_g = 2, \quad b_g \in \{1, 2, 3\}$$
 
 **消融证据**：在5%重分配比例下，ABMP将LLaDA-8B-Base的MMLU从54.32%提升至56.87%（Table 2b）。校准集大小为128时性能最优，增大至256反而导致性能略降（Table 2d），提示过大的校准集可能引入噪声。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与因果机制
@@ -290,19 +280,8 @@ $$\frac{1}{|\mathcal{G}|} \sum_{g} b_g = 2, \quad b_g \in \{1, 2, 3\}$$
 - 多二进制分解在GPU/边缘设备上的实际推理加速效果如何？
 - 该方法对其他类别扩散模型（如文本到图像生成的扩散Transformer）是否适用？
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_HD7tuVakmR/figures/008_Table_4.jpg]]
-
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_HD7tuVakmR/figures/001_Figure_1.jpg]]
-*Figure 1: dLLMs’ performance on 7 general tasks. Our Quant-dLLM yields the best accuracy at equal memory cost*
-
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_HD7tuVakmR/figures/009_Table_5.jpg]]
-
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_HD7tuVakmR/figures/010_Table_3.jpg]]
 *Table 3: Model size of LLaDA-8B-Base under different methods*
-
-
 
 ## 定位与知识库关联
 
@@ -360,8 +339,6 @@ Quant-dLLM的关键区分点在于**校准数据生成范式的根本转变**—
 5. **跨领域泛化**：MCS-DAQ-ABMP框架的核心思想——掩码对齐校准、多二进制分解、重要性引导精度分配——是否能迁移到其他扩散生成模型（如图像扩散模型、视频扩散模型）的量化？这些领域的激活分布特性可能提供新的挑战和机遇；
 6. **校准集鲁棒性**：校准集大小128的最优性是否具有普适性？能否设计校准集质量评估指标或自适应采样策略来替代固定大小的经验选择？
 7. **训练感知量化的潜力**：当前方法严格遵循后训练设定（无重训练、无数据增强），但在极端低比特下，轻量级量化感知微调（如仅更新缩放因子）是否能进一步缩小与全精度的差距？
-
-
 
 ## 原文 PDF
 

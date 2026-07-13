@@ -49,8 +49,6 @@ claims:
 
 > **注意：** 本文所有数值均来自论文提供的 Table 1、Table 2 及 Figure 1，未发现矛盾或需要人工核验的弱证据点。
 
-
-
 三维医学图像分割是肿瘤诊断与治疗规划中的关键步骤，PET/CT 等多模态成像能够同时提供代谢功能信息与解剖结构信息，对提高分割精度具有重要价值。然而，现有高性能分割方法普遍面临计算效率瓶颈：高精度模型参数量大、推理吞吐低、训练与推理阶段 GPU 内存占用高，难以在资源受限的临床环境中部署。
 
 当前主流方法可分为两类。一类以 nnUNet 为代表的基础模型在分割精度上表现稳健，但其参数量可达数千万，FLOPs 高达数千 G，推理吞吐极低（例如 CPU 吞吐仅约 0.1 图像/秒），严重限制了实际可用性。另一类轻量化模型虽在参数和计算量上有所缩减，但往往以牺牲分割精度为代价，难以在精度-效率权衡中取得突破。此外，多模态融合策略的选择（早期融合、中期融合、晚期融合）对模型效率和精度的影响尚未在轻量化框架下得到系统验证。
@@ -58,8 +56,6 @@ claims:
 上述瓶颈的根源在于两个相互关联的设计挑战。其一，如何在保持局部细节捕捉能力的同时有效建模长程依赖——纯卷积网络局部性强但感受野受限，Transformer 结构能捕获全局信息但计算开销随 token 数量平方增长。其二，如何在不破坏特征空间几何结构的前提下压缩模型——常规的深度可分离卷积或剪枝方法可能导致空间邻接信息的丢失，进而损害分割质量。
 
 针对这些问题，本文提出 VeloxSeg，一个以效率为导向的双流 CNN-Transformer 分割框架。其设计动机明确：通过理论指导的模块设计，在显著降低计算和内存开销的同时保持甚至提升分割精度。具体而言，Paired Window Attention（PWA）通过并行多尺度窗口注意力机制协调短程与长程信息，避免全注意力带来的平方复杂度；Johnson-Lindenstrauss 引理引导的卷积（JLC）从理论上确定每组的通道数下界，以最小计算代价保留 token 间的几何邻接关系。这一“理论约束 + 架构协同”的设计思路，使得 VeloxSeg 能够在 AutoPET-II 等数据集上以 1.66M 参数、1.79 GFLOPs 的极低成本取得 62.51% Dice 的竞争性精度，为高效医学图像分割提供了新的范式。
-
-
 
 ## 核心方法与创新机理
 
@@ -87,8 +83,6 @@ $$C_{\mathrm{group}} = d' \geq c_{\mathrm{JL}} \varepsilon^{-2} \log N(M, v)$$
 
 上述三个 changed slots 并非孤立运作。PWA 提供多尺度感受野，JLC 保证特征提取的几何保真，SDKT 补充纹理细节——三者在 VeloxSeg 的编码器-解码器框架中形成互补。Table 2 的最终配置（Conv.+Trans.+SDKT）以 1.66 M 参数量和 1.79 GFLOPs 的计算代价，在 AutoPET-II 上达到 62.51% Dice，相比参数量更大的 Swin UNETR（62.24%）和 Nestedformer（61.38%）均取得边际优势，同时 GPU 吞吐量提升至 599.06 Patches/s。
 
-
-
 ![[assets/figures/papers/iclr26_0010_fmWlDfCFMR_Johnson-Lindenstrauss_Lemma_Guided_Network_for_E/figures/003_Figure_2.jpg]]
 *Figure 2: Overview of VeloxSeg. VeloxSeg employs an encoder-decoder architecture with Paired Window Attention (PWA) and Johnson-Lindenstrauss lemma-guided convolution (JLC) on the left, using 1×1 convolution as modal mixer. GC: group convolution; GA: multimodal grouped attention*
 
@@ -110,8 +104,6 @@ VeloxSeg 采用**编码器-解码器**架构，核心由两条并行的特征流
 3. **同步扩展窗口**：PWA 中大小窗口按相同扩张率 $r$ 同步缩放，保证 Q、K、V 序列长度跨尺度一致，使多尺度注意力可并行计算。
 
 > **注意**：Figure 2 给出了整体架构概览，Figure 3 和 Figure 10 分别展示了 PWA 的模块结构与详细特征流，Algorithm 1 提供了 PWA 的 PyTorch 风格伪代码。
-
-
 
 ### Paired Window Attention (PWA)
 
@@ -157,20 +149,16 @@ $$\operatorname{GM}(\mathbf{X}) = \frac{1}{C H W D} (\mathbf{X} \mathbf{X}^T) \i
 
 该矩阵编码了特征通道间的相关性，作为风格表示的代理。SDKT 是唯一展示正向知识迁移的方法（Table 4），为轻量模型补充了仅靠监督信号难以获取的纹理先验。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
 
 VeloxSeg 在 AutoPET-II 和 Hecktor2022 两个 PET/CT 数据集上进行了全面评估，与 20 种分割方法对比（Table 1）。在 AutoPET-II 上，VeloxSeg 取得 **62.51% Dice**，超越 Nestedformer（61.38%）和 Swin UNETR（62.24%），提升分别为 +1.13 和 +0.27 个百分点。在 Hecktor2022 上达到 56.48% Dice。两项结果均为表中最佳。
 
-
 ![[assets/figures/papers/iclr26_0010_fmWlDfCFMR_Johnson-Lindenstrauss_Lemma_Guided_Network_for_E/figures/006_Table_1.jpg]]
 *Table 1: i) Due to the small object and camouflage recognition involved, DINOv3-L (CT) cannot recognize tumors. ii) “−” means that the value is out of range. Table 1: Comparisons of segmentation performance on PET/CT datasets. The best performance is highligted by red, followed by blue. VeloxSeg is highlighted in green*
 
 计算效率方面（Table 6），VeloxSeg 仅需 **1.66 MParams** 和 **1.79 GFLOPs**，GPU 吞吐量达 599.06 Patches/s，CPU 吞吐量达 117.65 Patches/s。与 nnUNet 对比（Table 9），参数量从 88.62M 压缩至 1.66M（约 1/53），FLOPs 从 3078.83G 降至 1.79G（约 1/1720），GPU 吞吐量提升 4.8×，CPU 吞吐量提升约 52×，训练峰值 GPU 内存仅为其 1/20，推理内存为其 1/24。
-
 
 ![[assets/figures/papers/iclr26_0010_fmWlDfCFMR_Johnson-Lindenstrauss_Lemma_Guided_Network_for_E/figures/027_Table_6.jpg]]
 *Table 6: Computational performance comparison of all models on AutoPET-II and Hecktor2022 datasets. “MP.”: Million Parameters; “GF.”: GFLOPs; “ThrG.”: Throughput on GPU; “ThrC.”: Throughput on CPU*
@@ -183,7 +171,6 @@ VeloxSeg 在 AutoPET-II 和 Hecktor2022 两个 PET/CT 数据集上进行了全�
 ### 消融实验分析
 
 Table 2 系统拆解了各模块的贡献（AutoPET-II）：
-
 
 ![[assets/figures/papers/iclr26_0010_fmWlDfCFMR_Johnson-Lindenstrauss_Lemma_Guided_Network_for_E/figures/007_Table_2.jpg]]
 *Table 2: Module ablation experiments on AutoPET-II. “Conv.”: convolution encoder; “Trans.”: transformer encoder; “SDKT.”: spatially decoupled knowledge transfer. The best performance is in red and the second is in blue. Final setting is highlighted in green*
@@ -212,13 +199,8 @@ Table 2 系统拆解了各模块的贡献（AutoPET-II）：
 - **Figure 5**：PWA 的多尺度窗口机制实现了从局部到全局的注意力距离自适应，无需手工设计感受野调度。
 - **Table 9**：与 nnUNet 对比，VeloxSeg 以约 1/53 参数量和 1/1720 FLOPs 实现可比甚至更优的分割精度，验证了 JL 引理引导的轻量化设计的有效性。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0010_fmWlDfCFMR_Johnson-Lindenstrauss_Lemma_Guided_Network_for_E/figures/005_Figure_4.jpg]]
 *Figure 4: Intuitive difference between depth-wise (DW) convolution and Johnson-Lindenstrauss (JL) guided Convolution in the feature space*
-
-
-
 
 ## 定位与知识库关联
 
@@ -252,8 +234,6 @@ VeloxSeg 在四个公开数据集上进行了验证：AutoPET-II、Hecktor2022�
 - 在更大规模临床部署场景下，VeloxSeg 的 CPU 吞吐量（48× 相对基线）优势是否能在边缘设备上稳定复现，缺乏硬件多样性测试。
 
 > **注意**：上述局限与开放问题中，部分推断（如 PWA 对小目标的响应机制、Gram 矩阵的 3D 适用性）来自论文自身的开放问题声明或间接证据，具体结论需结合原文手动核实。
-
-
 
 ## 原文 PDF
 

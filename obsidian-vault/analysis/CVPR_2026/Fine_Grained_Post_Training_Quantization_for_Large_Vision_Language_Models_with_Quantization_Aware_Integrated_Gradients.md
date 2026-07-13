@@ -50,8 +50,6 @@ claims:
 
 实验表明，在 LLaVA-onevision-7B 的 W3A16 设置下，QIG 的平均准确率比模态平衡基线 MBQ 高出 **1.60%**，将性能差距缩小到全精度模型的仅 **1.33%**；在 InternVL2-8B 和 InternVL2-26B 上同样取得一致提升。该方法计算开销可忽略，且与 GPTQ 等权重量化方法正交兼容。
 
-
-
 ### 大视觉语言模型的量化挑战
 
 大视觉语言模型（Large Vision-Language Models, LVLMs）通过融合视觉编码器与大语言模型，在多模态理解任务上取得了显著进展。然而，其庞大的参数量与计算开销严重制约了实际部署。训练后量化（Post-Training Quantization, PTQ）作为一种高效的模型压缩手段，通过将浮点权重和激活值映射到低位宽整数表示，能够大幅降低推理成本。在LVLM中，权重-激活（WA）量化通常采用通道均衡（Channel-wise Equalization, CWE）框架，其核心目标是最小化每个Transformer块内量化输出与原始输出的均方误差：
@@ -73,8 +71,6 @@ $$\mathbf{E}^{*} = \underset{\mathbf{E}}{\arg\min} \left\| Q_{W}(\mathbf{W} * \m
 ### 本文动机
 
 综上，现有LVLM量化方法面临的核心缺口在于：敏感性建模的粒度受限于模态层面，而缺乏一种能够直接量化每个输入令牌对量化误差贡献的细粒度机制。本文的动机正是填补这一空白——通过引入公理化归因（axiomatic attribution）的思想，开发一种量化专用的令牌级敏感性估计方法，将量化误差精确分解到每个输入令牌，从而实现从“模态级”到“令牌级”的细粒度量化优化。
-
-
 
 ## 核心方法与创新机理
 
@@ -111,8 +107,6 @@ $$QIG(x) = (x - x^{q}) \int_{0}^{1} \frac{\partial (f(x_{\alpha}, w) - f(x_{\alp
 ### 方法正交性与可组合性
 
 QIG的令牌级敏感性加权机制与现有量化方法是正交的。Table 5显示，将QIG的细粒度令牌敏感性与GPTQ的二阶近似框架结合后，在LLaVA-onevision-7B W3A16上VizWiz准确率额外提升2.08%。这表明**令牌级敏感性可以作为一种通用增强模块**，叠加于不同的量化重建框架之上。
-
-
 
 QIG 方法构建了一套从令牌级量化误差归因到细粒度通道均衡的完整训练后量化管线，其核心流程由三个顺序耦合的模块构成。
 
@@ -153,8 +147,6 @@ $$ \mathbf{E}^{*} = \arg\min_{\mathbf{E}} \sum_{i=1}^{T} \lambda_i \left\| Q_{W}
 ### 计算开销
 
 整个管线在校准阶段引入的额外计算开销极小。据 Table 6 报告，在单张 A800 80GB GPU 上，细粒度量化的总耗时与 MBQ 等基线方法相比几乎无增加，这得益于 QIG 计算仅需沿插值路径采样有限步数（默认 32 步）即可完成归因估计。
-
-
 
 ### 3.1 通道均衡基础：CWE目标
 
@@ -200,15 +192,8 @@ $$\mathbf{E}^{*} = \arg\min_{\mathbf{E}} \sum_{i=1}^{T} \lambda_i \left\| Q_{W}(
 
 在这两个目标中，$\lambda_i$ 使得优化过程对高敏感性令牌的重建误差施加更大惩罚，从而在通道缩放因子的搜索中优先保护关键令牌的量化精度。这一机制将敏感性建模的粒度从模态级别细化到令牌级别。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l751_https_arxiv_org_abs_2603_17809/figures/001_Figure_1.jpg]]
-*Figure 1: Token-level quantization sensitivity across layers in the form of heatmap and curves. At layers 1 and 16, we show both the token-level sensitivity heatmap and its channel-averaged line curve for special, vision, and text tokens, measured using our Quantization-aware Integrated Gradients (QIG)*
-
 ![[assets/figures/papers/paper_list_l751_https_arxiv_org_abs_2603_17809/figures/002_Figure_2.jpg]]
 *Figure 2: Visualization of activation distributions in InternVL2-8B during calibration. We visualize two representative layers and four linear sub-layers. In each panel, the horizontal axis denotes token positions in the multimodal sequence and the vertical axis indexes hidden channels; color encodes the average activation magnitude per token–channel pair over the calibration set. The plots reveal four recurring phenomena: massive activations, layer heterogeneity, sub-layer divergence, and token variability. These patterns indicate that coarse modality-level sensitivity modeling is insufficient, motivating our token-level sensitivity weighting*
-
-
 
 ## 实验与关键发现
 
@@ -241,13 +226,7 @@ $$\mathbf{E}^{*} = \arg\min_{\mathbf{E}} \sum_{i=1}^{T} \lambda_i \left\| Q_{W}(
 
 QIG的令牌级敏感性加权策略与现有量化方法是正交的，可叠加使用（Table 5）。将细粒度令牌敏感性与GPTQ结合后，在LLaVA-onevision-7B的W3A16设置下，VizWiz准确率进一步提升2.08%，证明该方法可以作为插件式模块增强现有量化框架。
 
-![[assets/figures/papers/paper_list_l751_https_arxiv_org_abs_2603_17809/figures/009_Table_5.jpg]]
-*Table 5: Results of combining our fine-grained quantization with GPTQ under the W3A16*
-
 在计算效率方面（Table 6），QIG的量化时间开销与MBQ等基线方法相当，在单张A800 80GB GPU上仅增加可忽略的额外耗时。这得益于QIG计算仅在校准阶段执行一次，且集成梯度的数值积分步长（默认32步）已在精度与效率之间取得平衡。
-
-![[assets/figures/papers/paper_list_l751_https_arxiv_org_abs_2603_17809/figures/008_Table_6.jpg]]
-*Table 6: Quantization time (in GPU hours) of differnet models using a single A800 80GB GPU. Fine-Grained Quantization incurs negligible overhead compared to baseline methods*
 
 ### 失败模式与局限分析
 
@@ -255,21 +234,8 @@ QIG的令牌级敏感性加权策略与现有量化方法是正交的，可叠�
 
 综合来看，QIG通过将量化误差归因细化为令牌级粒度，有效解决了模态级方法的关键瓶颈，在多个LVLM和量化配置下取得一致且显著的性能提升，同时保持了计算效率。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l751_https_arxiv_org_abs_2603_17809/figures/007_Table_4.jpg]]
 *Table 4: Ablation of the integrated-gradients configuration for token-wise sensitivities, varying the reference baseline*
-
-![[assets/figures/papers/paper_list_l751_https_arxiv_org_abs_2603_17809/figures/010_Table.jpg]]
-*Table: A1. Ablation on sensitivity stabilization strategies. Our IQR Clipping achieves the best overall performance on LLaVA-OneVision-7B under W4A8 quantization*
-
-![[assets/figures/papers/paper_list_l751_https_arxiv_org_abs_2603_17809/figures/012_Table.jpg]]
-*Table: A3. Results on Qwen2-VL-7B using OCR-specific calibration data. Our method shows significant robustness improvements over MBQ in textrich scenarios*
-
-![[assets/figures/papers/paper_list_l751_https_arxiv_org_abs_2603_17809/figures/011_Table.jpg]]
-*Table: A2. Comparison of GPTQ and Our Fine-Grained Quantization on LLaMA-2-7B (3bit)*
-
-
 
 ## 定位与知识库关联
 
@@ -308,8 +274,6 @@ QIG的设计使其在以下条件下表现最优，但也存在明确的适用�
 4. **归因步长的动态调节。** 集成梯度的近似精度与步数正相关。是否可以根据每层量化误差的幅度动态分配步数，在保持归因质量的同时进一步降低校准开销？
 
 5. **与量化训练的融合潜力。** QIG当前定位于训练后量化。其令牌级敏感性信号是否可以作为量化感知训练（QAT）中的正则化项或权重，引导训练过程更精细地保护关键令牌的表示能力，是一个值得探索的方向。
-
-
 
 ## 原文 PDF
 

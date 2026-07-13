@@ -54,8 +54,6 @@ claims:
 
 **主要结果**：在 HanCo、DexYCB-MV、OakInk-MV 三个多视角基准上，UST-Hand 均显著超越先前最佳自监督方法。其中在 HanCo 上，MPVPE 指标相对 HaMuCo 降低 **37.8%**（5.82 mm vs. 9.35 mm），PA-V 降低 23.2%，AUC-V 提升 8.7%；在 DexYCB-MV 和 OakInk-MV 上 MPVPE 分别降低 14.5% 和 23.2%。消融实验证实，热图监督、投影融合模块、时空点云Transformer及各注意力子模块均对最终性能有显著贡献。
 
-
-
 ### 手部姿态估计的范式困境
 
 3D手部姿态与网格重建是增强现实、机器人灵巧操作和人机交互的核心使能技术。全监督方法依赖精确的3D标注，而获取真实3D手部关节或MANO参数的成本极高——多视角标定、动作捕捉设备、人工标注均构成规模化瓶颈。因此，近年来自监督方法逐渐成为主流替代路径：它们仅需多视角同步图像和相机外参，利用现成的2D检测器（如**Wilor**, Potamias et al., CVPR 2025）生成伪标签进行训练，从而规避3D标注依赖。
@@ -83,8 +81,6 @@ UST-Hand旨在构建一个端到端的自监督手部姿态估计框架，核心
 - 提出统一概率3D点云空间，将2D不确定性假设与3D几何约束无缝桥接。
 - 设计置信度感知的自注意力机制（CASA），使噪声伪标签对应的特征在交互中自然衰减。
 - 在三个多视图基准（HanCo、DexYCB-MV、OakInk-MV）上显著超越先前最佳方法HaMuCo，MPVPE最高降低37.8%。
-
-
 
 ## 核心方法与创新机理
 
@@ -123,8 +119,6 @@ $$\mathbf{Q} = W_q \tilde{\mathbf{G}}, \; \mathbf{K} = W_k \tilde{\mathbf{G}}, \
 
 **创新协同效应**：四个创新形成闭环——归一化流保留不确定性→概率点云空间承载不确定性→CASA抑制噪声传播→STPT利用时空冗余去噪精炼。这一闭环使得UST-Hand在HanCo数据集上相较HaMuCo的MPVPE降低37.8%（9.35mm→5.82mm），验证了不确定性感知时空交互范式的有效性。
 
-
-
 UST-Hand 采用**两阶段协同重建**架构，核心思路是将单视图姿态估计中不可避免的不确定性显式保留，并在统一的概率3D点云空间中利用多视角与时间维度进行去噪和精细化。
 
 **第一阶段：概率化2D多假设生成。** 对每个视图独立预测2D关节热图，从中提取关节坐标与置信度分数（confᵢ = max(Hᵢ)）。置信度被嵌入到跨视图图注意力（CASA）中，使低质量伪标签对应的Query/Key量纲自然衰减，从而抑制噪声传播。融合后的多视图特征作为条件输入到**条件归一化流（Real-NVP）**中，该可逆变换将潜在变量z映射为多样化的2D关节假设x，显式建模手部姿态的不确定性分布。
@@ -133,12 +127,8 @@ UST-Hand 采用**两阶段协同重建**架构，核心思路是将单视图姿�
 
 **数据流概览：** 多视图同步RGB帧 → 2D热图预测（含置信度）→ 置信度感知跨视图特征融合 → 条件归一化流多假设采样 → 概率3D点云提升 → STPT时空迭代精炼 → MANO参数化输出。总损失为热图MSE、2D关节L2、负对数似然（NF损失）和置信度加权2D投影L2损失的加权和（λ₀=0.001, λ₁=10, λ₂=0.1, λ₃=10）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l979_https_arxiv_org_abs_2605_17742/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the UST-Hand framework. The reconstruction consists of two stages: (1) generating confidence-aware 2D features and sampling multi-view hypotheses via conditional normalizing flow (NF) to model uncertainty, and (2) lifting them into a unified probabilistic 3D point cloud space to explore spatiotemporal correlations via a Spatiotemporal Point Transformer (STPT)*
-
-
 
 UST-Hand 的核心架构由五个紧密耦合的模块构成，形成一条从 2D 不确定性建模到 3D 时空交互的完整推理链路。
 
@@ -204,8 +194,6 @@ $$
 
 其中 $\mathcal{L}_{\mathrm{hmap}}$ 为热图 MSE 损失（提供坐标先验），$\mathcal{L}_{\mathrm{hm2d}}$ 为 2D 关节 L2 损失，$\mathcal{L}_{\mathrm{nll}}$ 为归一化流的负对数似然损失（驱动不确定性建模），$\mathcal{L}_{\mathrm{proj2d}}$ 为置信度加权的 2D 投影损失（确保 3D-2D 一致性）。权重设置为 $\lambda_0=0.001, \lambda_1=10, \lambda_2=0.1, \lambda_3=10$。
 
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -258,28 +246,6 @@ UST-Hand 在三个多视图手部姿态基准上全面超越现有自监督方�
 ![[assets/figures/papers/paper_list_l979_https_arxiv_org_abs_2605_17742/figures/007_Figure_5.jpg]]
 *Figure 5: The 3D mesh visualization (overlaid in the images) between ground-truth, Wilor, and UST-Hand on (a) HanCo, (b) DexYCB-MV, and (c) OakInk-MV datasets. The regions with significant prediction errors have been circled in red*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l979_https_arxiv_org_abs_2605_17742/figures/005_Table_3.jpg]]
-*Table 3: Multi-view inference results under the supervision of 2D pseudo-labels of varying quality on the HanCo dataset*
-
-![[assets/figures/papers/paper_list_l979_https_arxiv_org_abs_2605_17742/figures/006_Figure_3.jpg]]
-*Figure 3: Average 2D pixel error under different view settings*
-
-![[assets/figures/papers/paper_list_l979_https_arxiv_org_abs_2605_17742/figures/008_Table_5.jpg]]
-*Table 5: Performance of UST-Hand on varying temporal length, the number of STPT blocks and cameras in the multi-view setting. The best results are highlighted in bold*
-
-![[assets/figures/papers/paper_list_l979_https_arxiv_org_abs_2605_17742/figures/010_Figure_6.jpg]]
-*Figure 6: 2D joints prediction and 3D mesh prediction between ground-truth, Wilor, HaMuCo, and ours on HanCo dataset*
-
-![[assets/figures/papers/paper_list_l979_https_arxiv_org_abs_2605_17742/figures/011_Figure_7.jpg]]
-*Figure 7: 2D joints prediction and 3D mesh prediction between ground-truth, Wilor, HaMuCo, and ours on DexYCB-MV dataset*
-
-![[assets/figures/papers/paper_list_l979_https_arxiv_org_abs_2605_17742/figures/012_Figure_8.jpg]]
-*Figure 8: 2D joints prediction and 3D mesh prediction between ground-truth, Wilor, HaMuCo, and ours on OakInk-MV dataset*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 脉络定位：从确定性自监督到概率性时空交互
@@ -330,8 +296,6 @@ UST-Hand 在三个多视图手部姿态基准上全面超越现有自监督方�
 4. **跨手部交互。** 对于双手交互场景，当前框架未考虑手间物理约束（如穿透避免）。将手间交互纳入概率建模是一个有前景的方向。
 
 5. **实时部署。** 如何在不牺牲不确定性建模优势的前提下降低推理计算量？轻量化流模型或假设采样策略的优化值得探索。
-
-
 
 ## 原文 PDF
 

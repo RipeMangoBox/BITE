@@ -73,8 +73,6 @@ DCR 属于**基于扩散模型的视觉表示增强**方法，与现有工作的
 
 方法训练开销较低（OpenAI ViT-L@224 约 7.7 小时，53.5 GB 显存），可扩展至多种 CLIP 架构。
 
-
-
 ### 视觉表示学习的双重能力失衡
 
 视觉表示学习长期面临一个核心矛盾：**判别能力（D-Ability）**与**细节感知能力（P-Ability）**难以兼得。以CLIP为代表的对比学习方法通过大规模图文配对训练，赋予了视觉编码器强大的语义判别能力，使其在零样本分类、聚类等任务上表现优异。然而，这类方法本质上优化的是全局语义对齐，编码器倾向于忽略细粒度的视觉细节——例如物体的精确朝向、数量关系、空间位置等——导致在需要精细感知的下游任务中频繁出错。
@@ -102,8 +100,6 @@ $$\cos(\mathbf{g}_{\text{con}}, \mathbf{g}_{\text{rec}}) = \frac{\mathbf{g}_{\te
 由此提出**扩散对比重建（Diffusion Contrastive Reconstruction, DCR）**方法，其关键思路是：**将对比信号从原始图像特征空间迁移至扩散模型的预测噪声空间**。具体而言，对于锚点图像，利用其CLIP特征作为条件，让扩散模型预测噪声 $\hat{\epsilon}$；同时，对正样本（增强视图）和负样本（批次中其他图像）也分别预测噪声。这些预测噪声天然构成了对比学习所需的三元组——锚点噪声应接近正样本噪声和真实噪声，远离负样本噪声。通过在这一统一的噪声空间中构造单一的对比损失 $\mathcal{L}_{\text{dcr}}$，从根本上消除了多目标优化中的梯度冲突。
 
 理论分析（定理1和定理2）进一步证明，$\mathcal{L}_{\text{dcr}}$ 可以同时满足判别性约束（最小化类内散度、最大化类间散度）和重建一致性约束（锚点噪声逼近真实噪声），为方法的有效性提供了严格保证。
-
-
 
 ## 核心方法与创新机理
 
@@ -153,8 +149,6 @@ $$S_{\mathrm{inner}} \leq \frac{1}{m^2} S_{\mathrm{inner}}^{(\epsilon)}(t), \qua
 
 DCR 的独特性在于：它不将对比学习和重建学习视为两个独立目标进行折中，而是**通过空间迁移将二者统一为同一优化问题**，使得模型在提升细节感知能力的同时，不牺牲甚至增强判别能力。这一设计使得 DCR 在 MMVP-VLM 基准上的 P-Ability 准确率比原始 CLIP 提升 14.1%（OpenAI ViT-L@224，Tab. 1），同时在 CIFAR-10 零样本分类上保持 95.6% 的准确率，而 GenHancer 降至 73.7%（Tab. 6）。
 
-
-
 DCR 的整体框架围绕一个核心设计展开：**将对比信号从原始图像空间迁移至扩散模型的预测噪声空间**，从而在单一优化目标下同时增强 CLIP 视觉编码器的判别能力（D-Ability）与细节感知能力（P-Ability）。框架由三个功能模块串联构成，并通过两阶段训练协议协调各模块的优化。
 
 ### 模块组成与数据流
@@ -196,13 +190,6 @@ $$\mathcal{L}_{\mathrm{dcr}} = -\frac{1}{2} \sum_{p \in P} \log \frac{d(\hat{\ep
 ### 训练开销与可扩展性
 
 DCR 的训练开销相对可控。以 OpenAI ViT-L@224 骨干为例，完整训练约需 7.7 小时、53.5 GB 显存（见 Tab. 8）。方法可扩展至多种 CLIP 架构，包括 ViT-B、ViT-L、ViT-H 和 ViT-SO 等不同规模的模型，且所有实验均在统一的 CC3M 数据集上进行训练，未引入额外人工标注或私有数据，保证了对比的公平性。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2517_https_arxiv_org_abs_2603_04803/figures/001_Figure_1.jpg]]
-*Figure 1: (a) Contrastive learning for D-Ability. (b) Reconstructive learning for P-Ability. (c) Our Diffusion Contrastive Reconstruction (DCR) for harmonizing D-Ability and P-Ability. (d) Performance overview of DCR and other methods on the OpenAI CLIP ViT-L@224 backbone*
-
-
 
 ### 问题形式化：判别能力与感知能力的双重约束
 
@@ -268,13 +255,6 @@ DCR 采用两阶段训练策略以稳定优化过程（Fig. 3）：
 
 消融实验证实该协议的必要性：端到端联合训练在 MMVP-VLM 上仅取得 25.93 的准确率，而两阶段训练提升至 33.30（Tab. 4(b)）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2517_https_arxiv_org_abs_2603_04803/figures/002_Figure.jpg]]
-*Figure: (b) Reconstruction loss $\mathcal { L }$ _ ${ \mathrm { r e c } }$ (a) Contrastive loss ${ \mathcal { L } }$ _ ${ \mathrm { c o n } }$ . (c) Cosine similarity between gradient ${ \bf$ g } _ ${ \mathrm { c o n } }$ and $\mathrm { { \bf g } }$ _ ${ \mathrm { r e c } }$*
-
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈的实证验证：梯度冲突
@@ -301,15 +281,9 @@ DCR 采用两阶段训练策略以稳定优化过程（Fig. 3）：
 ![[assets/figures/papers/paper_list_l2517_https_arxiv_org_abs_2603_04803/figures/012_Table_6.jpg]]
 *Table 6: Performance on zero-shot classification and retrieval*
 
-![[assets/figures/papers/paper_list_l2517_https_arxiv_org_abs_2603_04803/figures/006_Figure_5.jpg]]
-*Figure 5: Qualitative results of D-Ability on the MNIST benchmark by using the t-SNE method. The improved CLIP achieves better class separability*
-
 ### 多模态大模型下游迁移
 
 将 DCR 增强的视觉编码器集成到 LLaVA-1.5 中（Table 3），在多个 MLLM 基准上取得了有竞争力的表现，证明增强后的视觉表示能有效迁移至更复杂的多模态理解任务。
-
-![[assets/figures/papers/paper_list_l2517_https_arxiv_org_abs_2603_04803/figures/008_Table_3.jpg]]
-*Table 3: Performance of MLLMs (LLaVA-1.5 [49]) on various benchmarks. The champion and the runner-up are highlighted in bold and underline. Results on NaturalBench follow the setting in [57], which differs from that used in un2CLIP [43], leading to the missing entries*
 
 ### 关键消融实验
 
@@ -325,18 +299,8 @@ DCR 采用两阶段训练策略以稳定优化过程（Fig. 3）：
 
 尽管 DCR 在平衡判别能力与细节感知能力上取得了显著成效，但其增强效果仍受限于 CLIP 骨干网络固有的表示容量。当前框架仅基于扩散模型实现，尚未验证在 VAR 等非扩散生成范式上的适用性。此外，两阶段训练协议虽然有效，但增加了工程复杂性；方法对预训练 Stable Diffusion 模型的依赖也引入了额外的存储和部署成本。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2517_https_arxiv_org_abs_2603_04803/figures/009_Figure_6.jpg]]
 *Figure 6: Ablation study on different diffusion model structures*
-
-![[assets/figures/papers/paper_list_l2517_https_arxiv_org_abs_2603_04803/figures/014_Table_7.jpg]]
-*Table 7: Results under different ratios of local tokens ([CLS] + n% local tokens)*
-
-![[assets/figures/papers/paper_list_l2517_https_arxiv_org_abs_2603_04803/figures/013_Table_8.jpg]]
-*Table 8: Training costs of our DCR*
-
-
 
 ## 定位与知识库关联
 
@@ -384,8 +348,6 @@ DCR 的设计逻辑可追溯到以下技术脉络：
 4. **对比信号构造的优化**：DCR 损失中的正负样本构造方式是否有更优设计？例如，使用更强的数据增强策略、引入难负样本挖掘、或利用扩散时间步 $ t $ 的调度来调控对比信号的强度。
 5. **更大规模多模态模型中的收益**：在 LLaVA-1.5 上的实验已初步验证 DCR 增强编码器对 MLLM 的收益，但在更先进的多模态模型（如 LLaVA-NeXT、Qwen-VL）中，DCR 能带来多大程度的性能提升？这需要更大规模的系统性评估。
 6. **训练效率优化**：当前两阶段训练协议增加了训练步骤，能否设计单阶段训练策略（如动态调整投影器与编码器的学习率），在保持性能的同时降低工程复杂度？
-
-
 
 ## 原文 PDF
 

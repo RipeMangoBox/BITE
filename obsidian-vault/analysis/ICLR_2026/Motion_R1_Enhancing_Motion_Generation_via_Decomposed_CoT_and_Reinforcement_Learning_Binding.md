@@ -53,8 +53,6 @@ claims:
 
 **主要结果**：在 HumanML3D 上，MM-Dist 指标提升 3.5%（从 MoMask 的 2.958 降至 2.854），R-Precision Top-3 达 0.818；在 KIT-ML 上，FID 降至 0.287，R-Precision@1 达 0.431，均刷新记录；在 BABEL 多标签数据集上，四项指标全面 SOTA，FID 仅 0.53（此前最佳为 1.14）。消融实验证实，CoT 推理与多模态奖励缺一不可——单独使用 CoT 数据引擎时 R-Precision Top-1 仅 0.340、FID 高达 0.530，而完整的 CoT + 语义奖励 + 运动奖励组合使 FID 降至 0.201、R-Precision Top-1 升至 0.515。
 
-
-
 文本驱动的三维人体动作生成旨在根据自然语言描述合成逼真、语义一致的人体运动序列，在动画制作、虚拟现实和人机交互等领域具有广泛应用。然而，现有方法面临两个核心瓶颈。
 
 **端到端模型的泛化困境。** 以 **MDM**（Tevet et al., 2023）、**MoMask**（Guo et al., 2024）和 **MotionGPT**（Jiang et al., 2023）为代表的传统方法，将文本到动作的映射建模为直接的端到端生成过程。这些模型在分布内（in-distribution）指令上表现尚可，但面对需要多步时序推理或包含复杂因果关系的分布外（out-of-distribution）指令时，往往产生不连贯或过度简化的动作序列。其根本原因在于，高层指令中隐含的子动作分解、时序依赖和空间约束无法被单一前向映射有效捕捉——模型缺乏将复杂语义拆解为可执行子步骤的结构化推理能力（Figure 1a）。
@@ -62,8 +60,6 @@ claims:
 **基于强化学习方法的标注依赖。** 为提升语义对齐质量，近期工作尝试引入强化学习（RL）来优化动作生成。然而，现有 RL 方案通常依赖昂贵的人工标注来训练偏好模型（如 MotionCritic），以此构建奖励信号。这种设计不仅增加了数据获取成本，还限制了方法向大规模实际应用的扩展（Figure 1c）。同时，复杂的多阶段 RL 训练流程进一步提高了工程实现的门槛。
 
 针对上述缺口，本文提出 **Motion-R1**，其核心动机在于：**通过自动化的分解式思维链（Decomposed Chain-of-Thought, CoT）推理，将高层指令转化为结构化的子动作规划，并结合简化的 RL 绑定（RL Binding）策略，在无需人工标注的条件下实现语义准确、动作真实且可解释的运动生成**（Figure 1b, 1d）。具体而言，Motion-R1 引入两大创新：一是 Decomposed CoT Data Engine，利用大语言模型自动合成逐步推理数据，使模型显式学习“思考如何运动”的中间推理过程；二是 RL Binding 机制，将多模态对齐嵌入 GRPO 优化的奖励函数中，通过格式奖励、运动相似度奖励和语义相似度奖励三项自动化信号，直接指导模型在推理与生成两个层面同时对齐文本语义与运动真实性。
-
-
 
 ## 核心方法与创新机理
 
@@ -95,8 +91,6 @@ Motion-R1 引入的 Decomposed CoT 数据引擎改变了这一范式。该引擎
 ### 协同效应
 
 消融实验（Table 2）揭示了两个创新的协同关系：单独使用 Decomposed CoT 数据引擎时效果最差（HumanML3D 上 R-Precision Top-1 仅 0.340，FID 为 0.530），而同时使用 CoT 与完整的 $R_{\text{sem}} + R_{\text{motion}}$ 奖励组合时达到最优（FID 0.201，R-Precision Top-1 0.515）。这表明**推理分解与奖励对齐缺一不可**——CoT 提供了结构化的语义理解基础，RL Binding 则通过多模态奖励将其与真实动作分布对齐，二者共同驱动了性能的显著提升。
-
-
 
 Motion-R1 的整体 pipeline 由两大核心组件构成：一个预训练的**动作分词器（Motion Tokenizer）**和一个具备动作导向推理能力的**大语言模型（LLM）**。训练过程分为两个阶段：首先通过监督微调进行冷启动，然后引入基于 GRPO 的强化学习绑定（RL Binding）策略进行优化。
 
@@ -142,12 +136,8 @@ RL Binding 的核心创新在于**将多模态对齐直接嵌入奖励函数**�
 
 与现有基于 LLM 的动作生成方法（如 **MotionLLM**（Wu et al., 2024））相比，Motion-R1 的关键差异在于：前者仅进行端到端映射，而 Motion-R1 通过 Decomposed CoT 将高层指令显式分解为子动作序列，使模型具备可解释的逐步推理能力。与依赖昂贵人工标注偏好模型的 RL 方法（如 MotionCritic）相比，RL Binding 通过三种自动化奖励函数实现了同等的语义对齐和运动真实性约束，大幅降低了实际部署成本。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l15_Motion_R1_Enhancing_Motion_Generation_via_Decomposed_CoT_and_Reinforceme/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of traditional approaches and our Motion-R1 framework. (a) Traditional end-to-end models exhibit poor generalization on out-of-distribution motions. (b) Our Decomposed CoT Data Engine enables strong generalization by structuring high-level instructions into intermediate reasoning steps. (c) Existing RL-based methods rely on expensive human annotations to train preference models for reward signals. (d) Our RL Binding mechanism achieves efficient multimodal alignment without additional annotation cost*
-
-
 
 Motion-R1 框架的核心由两大模块构成：**Decomposed CoT Data Engine**（分解式思维链数据引擎）与 **RL Binding**（强化学习绑定机制）。前者负责将高层自然语言指令自动拆解为结构化的逐步推理路径，后者则通过多模态对齐奖励函数引导模型生成语义准确、动作真实的运动序列。以下逐一展开关键模块及其公式。
 
@@ -241,8 +231,6 @@ Motion-R1 的训练分为两个阶段：
 
 这一两阶段设计充分利用了 CoT 数据的结构化先验和 RL 的探索能力，在无需人工标注的条件下实现了高质量的动作生成。
 
-
-
 ## 实验与关键发现
 
 ### 主实验：跨基准定量对比
@@ -289,15 +277,11 @@ Figure 3 展示了 Motion-R1 与 MotionLLM（Wu et al., 2024）在分布内和�
 2. **奖励函数设计的敏感性**：虽然 RL Binding 简化了优化流程，但 R_semantic 和 R_motion 的精心设计仍是性能的关键保障。消融实验中单独使用任一奖励均导致明显性能下降，说明奖励函数的组合方式对最终效果有显著影响。
 3. **长序列生成的未验证性**：现有实验主要针对中等长度的动作序列，在更长或连续多任务生成场景下的效果尚待探索。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l15_Motion_R1_Enhancing_Motion_Generation_via_Decomposed_CoT_and_Reinforceme/figures/004_Table_1.jpg]]
 *Table 1: Quantitative results of Motion-R1 on HumanML3D Guo et al. (2022a) and KIT-ML Plappert et al. (2016). The evaluations are conducted 20 times to obtain a 95% confidence interval. Best results are highlighted in bold and the second best in underline*
 
 ![[assets/figures/papers/paper_list_l15_Motion_R1_Enhancing_Motion_Generation_via_Decomposed_CoT_and_Reinforceme/figures/007_Table_3.jpg]]
 *Table 3: Quantitative results of Motion-R1 on BABEL Punnakkal et al. (2021). The evaluations are conducted 20 times to obtain a 95% confidence interval. Best results are highlighted in bold and the second best in underline*
-
-
 
 ## 定位与知识库关联
 
@@ -338,8 +322,6 @@ Motion-R1 处于文本驱动动作生成从**端到端映射**向**结构化推�
 3. **长时域与多任务扩展**：本文方法在更长或连续多任务生成中的效果有待验证。如何将分解式 CoT 推理扩展到长时域动作规划，是一个具有实际价值的挑战。
 
 4. **推理效率优化**：引入 CoT 推理和 GRPO 优化增加了计算开销。如何在保持推理质量的前提下降低推理成本，是实际部署中需要考虑的问题。
-
-
 
 ## 原文 PDF
 

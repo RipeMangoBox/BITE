@@ -52,8 +52,6 @@ claims:
 
 在 InterHuman 和 InterX 两个基准数据集上，DHVAE 在 FID、R-Precision、Multimodal Distance 等主要指标上达到最优性能。具体而言，在 InterHuman 上 FID 降至 5.015，R-Prec@1 提升至 0.496；在更具挑战的 InterX（SMPLX 表示）上，FID 从 InterMask 的 1.295 大幅降至 0.339。物理合理性方面，接触比率从 0.468 提升至 0.581，穿透体积显著降低。消融实验证实：将解耦层次潜在空间替换为扁平 VAE 后，重建 FID 从 0.503 恶化至 1.024，生成 FID 从 5.015 升至 6.433，验证了解耦设计的决定性作用。
 
-
-
 ### 3D 人体交互生成的任务定义与挑战
 
 3D 人体交互生成旨在根据文本描述，生成两个或多个人物在三维空间中协调运动的序列。与单人运动生成不同，交互生成面临双重难题：(1) **个体运动的自然性**——每个人物的动作本身必须符合人体运动学规律；(2) **交互的语义一致性与物理合理性**——两人之间的接触、空间关系和时序协调必须与文本描述对齐，且避免穿透、错失接触等物理失真。
@@ -79,8 +77,6 @@ claims:
 3. **对比学习约束**：在 $z_o$ 上施加三元组损失，基于接触检测构造正负样本，促使潜在空间编码物理合理的交互模式，从而在生成阶段减少穿透和接触缺失。
 
 通过这一设计，DHVAE 在 InterHuman 和 InterX 两个主流基准上取得了新的最优性能，并在物理合理性指标上显著超越现有方法。
-
-
 
 ## 核心方法与创新机理
 
@@ -115,8 +111,6 @@ $$
 为配合结构化潜在空间，DHVAE 的去噪器采用了**跳跃连接 AdaLN‑zero 三参数 Transformer**，结合分段位置编码（SPE）和令牌缩放（Token Scaling），以稳定训练并提升对层次化潜变量的去噪能力。消融显示，移除 SPE 或 Token Scaling 均导致 R‑Precision 和 FID 显著恶化（Table 5）。
 
 **总结**：DHVAE 的三项核心创新——解耦层次潜在空间、CoTransformer 双向交互建模、对比学习物理合理性约束——构成了一个闭环的因果链条：结构化潜变量提供表达能力，CoTransformer 注入交互语义，对比学习确保物理一致性。三者协同作用，使得 DHVAE 在 InterHuman 和 InterX 双基准上全面超越 SOTA（Table 1），并在接触比率上比 InterMask 提升 11.3 个百分点（0.581 vs. 0.468, Table 4）。
-
-
 
 DHVAE 的整体 pipeline 围绕一个核心设计原则展开：**将双人交互运动显式解耦为个体运动与全局交互的层次化潜在表示**，并在此结构化潜在空间中进行扩散生成。整个框架由两大阶段串联构成——**DHVAE 变分自编码器**负责学习紧凑的解耦潜在表示，**潜在扩散模型**在该潜在空间中进行条件生成。
 
@@ -162,15 +156,8 @@ $$\mathcal{L}_{\mathrm{DHVAE}} = \mathcal{L}_{\mathrm{ELBO}} + \lambda_{\mathrm{
 
 消融实验（Table 5）强有力地验证了这一框架：将 DHVAE 替换为扁平 VAE 后，重建 FID 从 0.503 急剧上升至 1.024，生成 FID 从 5.015 升至 6.433；移除 CoTransformer 与 $\mathbf{z}_o$ 同样导致所有指标显著恶化。这确认了解耦层次潜在空间是性能提升的**决定性瓶颈**。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l52_https_openreview_net_forum_id_53eIDko6N5/figures/001_Figure_1.jpg]]
-*Figure 1: (a) InterLDM Li et al. (2025), (b) InterMask Javed et al. (2025) encode all motion information into a single latent. (c) Our encodes individual motions and interactions into separate disentangled latents*
-
 ![[assets/figures/papers/paper_list_l52_https_openreview_net_forum_id_53eIDko6N5/figures/002_Figure_2.jpg]]
 *Figure 2: Architecture of our DHVAE to encode the structured latent representation*
-
-
 
 DHVAE 的核心设计围绕一个结构化潜变量三元组展开：个体运动潜变量 $\mathbf{z}_a$、$\mathbf{z}_b$ 和全局交互潜变量 $\mathbf{z}_o$。该设计的根本动机来自现有方法的瓶颈——将所有运动信息压缩到单一扁平潜变量中，导致个体身份模糊、交互语义丢失和物理不合理（如穿透、接触缺失）。DHVAE 通过解耦层次化编码显式分离个体运动与全局交互，从而在潜空间结构层面解决了这一问题。
 
@@ -238,16 +225,6 @@ $$
 
 其中 $c$ 为文本条件，$\omega$ 为引导强度。消融实验（Table 5）表明，移除 SPE 或令牌缩放均导致 FID 和 R-Precision 显著恶化，验证了这些结构设计对去噪过程的重要性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l52_https_openreview_net_forum_id_53eIDko6N5/figures/014_Figure_8.jpg]]
-*Figure 8: PCA projections of the interaction latent*
-
-![[assets/figures/papers/paper_list_l52_https_openreview_net_forum_id_53eIDko6N5/figures/016_Figure_10.jpg]]
-*Figure 10: T-SNE projections of latents on the InterHuman test set*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -265,9 +242,6 @@ Table 2 的重建质量对比进一步验证了 DHVAE 的紧凑表达能力：�
 *Table 2: Reconstruction results for prior-based and SOTA models, best results in bold*
 
 Table 3 的计算效率比较表明，DHVAE 在参数量和推理延迟上均具有竞争力，未因结构化潜在设计引入显著计算开销。
-
-![[assets/figures/papers/paper_list_l52_https_openreview_net_forum_id_53eIDko6N5/figures/005_Table_3.jpg]]
-*Table 3: Computational cost of models including latency and size*
 
 ### 物理合理性分析
 
@@ -299,16 +273,6 @@ Table 5 的系统消融揭示了各组件的因果贡献：
 2. **双人场景限制**：当前设计仅支持两人交互，无法直接扩展到多人或群体场景。数据集的缺乏是主要瓶颈。
 3. **评价指标局限**：现有 FID、R‑Precision 等指标设计于单人任务，可能未能充分反映接触质量、同步性和人类感知真实性。Table 4 的物理指标部分弥补了这一不足，但仍需更全面的 HHI 专用评价协议。
 4. **训练成本**：尽管模型已轻量，训练变分自编码器与结构化潜在扩散仍对长序列和高分辨率运动有较高计算需求。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l52_https_openreview_net_forum_id_53eIDko6N5/figures/013_Figure_7.jpg]]
-*Figure 7: Comparison with TIMotion on InterHuman*
-
-![[assets/figures/papers/paper_list_l52_https_openreview_net_forum_id_53eIDko6N5/figures/017_Table_7.jpg]]
-*Table 7: Performance under different*
-
-
 
 ## 定位与知识库关联
 
@@ -369,8 +333,6 @@ DHVAE 相对于现有工作进行了四个关键设计变更，构成其在方�
 3. **HHI 专用评价协议**：如何构建 HHI 专用的评价协议（如接触比率、同步性评分、感知真实度），并结合人工评估或学习型质量评分器？当前指标体系的局限性已在实验中显现。
 
 4. **跨域泛化与效率**：如何通过跨运动域的预训练或参数高效变体降低训练成本并保持泛化能力？这对实际部署至关重要。
-
-
 
 ## 原文 PDF
 

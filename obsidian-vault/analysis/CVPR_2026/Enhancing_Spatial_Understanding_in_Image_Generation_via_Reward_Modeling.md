@@ -66,8 +66,6 @@ claims:
 ### 方法定位
 SpatialScore填补了现有奖励模型在空间评估上的空白，将VLM的视觉推理能力转化为可微的奖励信号。其与GRPO在线RL的结合，为提升扩散模型对复杂空间提示的遵循能力提供了一条有效路径。该方法属于“奖励建模引导的生成模型对齐”范式，区别于基于规则的评估和通用偏好模型，专注于空间关系的细粒度反馈。
 
-
-
 文本到图像（T2I）生成模型近年来取得了显著进展，但在准确遵循涉及多对象复杂空间关系的提示方面仍面临根本性挑战。用户提示中常包含诸如“A在B的左侧”、“C在D的上方”等空间约束，而现有模型生成的图像往往无法精确满足这些要求，这严重制约了生成内容在广告设计、产品展示等实际场景中的可用性。
 
 ### 现有奖励模型的空间评估缺陷
@@ -86,8 +84,6 @@ SpatialScore填补了现有奖励模型在空间评估上的空白，将VLM的�
 上述分析揭示了当前T2I生成领域的核心瓶颈：**缺乏专门针对空间关系评估的高质量奖励模型**。通用人类偏好奖励模型无法捕捉细粒度的空间准确性，而基于规则的GenEval奖励则因依赖检测器而缺乏鲁棒性和泛化能力。这一缺口导致在线RL训练缺乏可靠的空间反馈信号，使生成模型难以通过优化过程习得精确的空间布局能力。
 
 为此，本文提出构建专门针对空间关系的对抗性偏好数据集，并训练空间感知的VLM奖励模型**SpatialScore**，进而将其集成到GRPO在线强化学习框架中，为扩散模型提供精准的空间准确性反馈，直接引导其优化空间布局。
-
-
 
 ## 核心方法与创新机理
 
@@ -134,8 +130,6 @@ $$\mathcal{L}_{\mathrm{GRPO}}(\boldsymbol{\theta}) = \frac{1}{|\boldsymbol{S}|}\
 ### 创新总结
 
 上述三个 changed slots——**空间专用奖励模型、VLM 驱动的在线 RL 反馈、top-k 优势过滤**——构成了一个完整的闭环：对抗性构造的空间偏好数据训练出高精度空间评估器，该评估器为 GRPO 提供可靠的奖励信号，top-k 过滤则确保训练过程稳定高效。这一组合使得 Flux.1-dev 的 SpatialScore 从 2.18 跃升至 7.81，DPG-Bench 空间关系子维度从 0.871 提升至 0.932（Table 2），并在 Qwen-Image 基线上验证了方法的跨模型泛化能力（SpatialScore 从 6.74 提升至 8.25，Table 7）。
-
-
 
 本文提出的方法围绕一个核心闭环：**构造空间偏好数据 → 训练空间感知奖励模型 → 以该奖励模型驱动在线强化学习优化生成模型**。整个管线包含三个紧密耦合的模块，形成从数据到评估再到策略优化的完整反馈回路。
 
@@ -186,8 +180,6 @@ $$\mathcal{L}_{\mathrm{Reward}}(\theta) = \mathbb{E}_{c, y_w, y_l}\big[ -\log P(
 
 这一框架的核心优势在于：奖励模型专门针对空间关系进行训练，能够提供比通用 VLM 和规则式奖励（如 GenEval）更精准的空间反馈；而 top-k 过滤策略则有效缓解了在线 RL 中因提示难度差异导致的优势估计偏差，使训练更加稳定高效。
 
-
-
 ### 空间感知奖励模型（SpatialScore）
 
 SpatialScore 的核心架构以 **Qwen2.5-VL-7B**（Bai et al., 2025）作为视觉-语言骨干网络 $H_{\phi}$，用于提取给定指令 $c$ 与生成图像 $y$ 的联合特征。原始的语言建模头被替换为一个全新的线性奖励头 $R_{\phi}$，将特征投影为标量奖励分数：
@@ -224,22 +216,9 @@ $$A^{i} = \frac{ R(x_{i}^{0}, c) - \mathrm{mean}\big(\{R(x_{0}^{i}, c)\}_{i=1}^{
 
 然而，对于简单提示（多数样本均获高奖励），组均值偏高会导致部分高质量样本获得负优势，产生**优势估计偏差**（Figure 5）。为解决此问题，本文引入 **top-k 过滤策略**：仅选取组内 SpatialScore 奖励最高和最低的各 $k$ 个样本构成子集 $\boldsymbol{S}$，在该子集上执行优势归一化与策略更新。GRPO 目标函数修正为：
 
-![[assets/figures/papers/paper_list_l2203_https_arxiv_org_abs_2602_24233/figures/005_Figure_5.jpg]]
-*Figure 5: Advantage bias. For easy prompts with many highreward samples, some high-quality samples often obtain negative advantages due to the high group mean*
-
 $$\mathcal{L}_{\mathrm{GRPO}}(\boldsymbol{\theta}) = \frac{1}{|\boldsymbol{S}|}\sum_{i\in S}\frac{1}{T}\sum_{t=0}^{T-1} \operatorname*{min}\big( r_{t}^{i}(\boldsymbol{\theta}) A_{t}^{i},\, \dots \big) \tag{6}$$
 
 其中 $r_{t}^{i}(\boldsymbol{\theta})$ 为重要性采样比率，$\dots$ 表示裁剪项（与标准 PPO 一致）。默认配置采用 $k=6$，在保证样本多样性的同时将每步训练的函数评估次数（NFE）从 144 降至 72（Table 4）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2203_https_arxiv_org_abs_2602_24233/figures/001_Figure_1.jpg]]
-*Figure 1: Failure of Reward Models on Spatial Understanding. Existing reward models [17, 23, 29, 53] often assign higher reward values to spatially incorrect images than to spatially correct ones, thereby exposing their limited spatial reasoning capabilities*
-
-![[assets/figures/papers/paper_list_l2203_https_arxiv_org_abs_2602_24233/figures/002_Figure_2.jpg]]
-*Figure 2: Limitations of GenEval [9] as the reward model. (a) GenEval-based RL training fails to generalize to long prompts involving complex spatial relationships across multiple objects. (b) The rule-based GenEval rewards, which rely on object detectors, often produce incorrect evaluations under visual challenges like occlusion, while modern VLMs can accurately infer the correct response*
-
-
 
 ## 实验与关键发现
 
@@ -291,15 +270,9 @@ Table 3 展示了 DPG-Bench 五个主要维度的完整对比。我们的方法�
 
 Table 5 显示，在 Geneval 基准上，我们的模型将总体分数从 0.65 提升至 0.78（+0.13），证明了 SpatialScore 驱动的 RL 训练不仅提升了分布内性能，还带来了可观的零样本泛化能力。
 
-![[assets/figures/papers/paper_list_l2203_https_arxiv_org_abs_2602_24233/figures/015_Table_5.jpg]]
-*Table 5: Quantitative evaluations on the Geneval benchmark. Our model is trained using SpatialScore as the reward model*
-
 #### 跨模型泛化：Qwen-Image 基线
 
 Table 7 展示了 SpatialScore RL 在 **Qwen-Image** 基线上的迁移效果。应用相同训练流程后，Qwen-Image 的 SpatialScore 从 6.74 提升至 8.25（+1.51），在 DPG-Bench、TIIF-Bench 和 UnigenBench++ 的所有子维度上均取得一致改善，验证了该方法的模型无关性和泛化潜力。
-
-![[assets/figures/papers/paper_list_l2203_https_arxiv_org_abs_2602_24233/figures/017_Table_7.jpg]]
-*Table 7: Detailed comparisons for the Qwen-Image family on SpatialScore, DPG-Bench, TIIF-Bench (short/long), and UnigenBench++ (short/long). * denotes RL-training with our SpatialScore as the reward model. BR, AR, and RR denote basic relation, attribute+relation, and relation+reasoning. Lay-2D/3D refer to layout-2D/3D. Unibench denotes UnigenBench++*
 
 ### 消融实验：Top-k 过滤策略
 
@@ -315,9 +288,6 @@ Table 4 和 Figure 7 展示了 top-k 过滤策略的消融结果。
 ### 定性分析
 
 Figure 6 和 Figure 11 展示了复杂多对象空间关系提示的生成图像对比。经过 SpatialScore RL 训练的模型能够更准确地处理“左边/右边”、“上方/下方”、“前面/后面”等空间关系，在遮挡和多对象布局场景下表现尤为突出。相比之下，原始 Flux.1-dev 经常出现对象位置错误或关系混淆。
-
-![[assets/figures/papers/paper_list_l2203_https_arxiv_org_abs_2602_24233/figures/008_Figure_6.jpg]]
-*Figure 6: Qualitative comparison on prompts with complex spatial relationships across multiple objects*
 
 ### 失败模式与局限性
 
@@ -338,8 +308,6 @@ Figure 6 和 Figure 11 展示了复杂多对象空间关系提示的生成图像
 - **Table 7**：Qwen-Image 基线的跨模型泛化结果（SpatialScore 6.74→8.25）
 - **Figure 6**：复杂空间关系提示的定性对比
 - **Figure 7**：Top-k 过滤消融的训练曲线
-
-
 
 ## 定位与知识库关联
 
@@ -382,8 +350,6 @@ Figure 6 和 Figure 11 展示了复杂多对象空间关系提示的生成图像
 2. **奖励模型效率优化**：如何进一步降低空间奖励模型的计算开销，以满足更大规模在线RL训练的效率需求？可能的路径包括模型蒸馏、推理缓存或混合奖励策略（规则式粗筛+VLM精评）。
 
 3. **组合泛化的深度验证**：当前基准中的空间扰动类型有限，如何构建更系统的组合泛化测试集，以揭示奖励模型和生成模型在未见空间关系组合上的真实能力边界？
-
-
 
 ## 原文 PDF
 

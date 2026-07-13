@@ -55,8 +55,6 @@ claims:
 
 本工作揭示了合成3D真值驱动的强化学习是弥合2D全景感知与3D空间推理之间鸿沟的有效路径，为全景环境中的具身智能提供了新的基准和训练范式。
 
-
-
 ### 全景环境中的3D空间推理困境
 
 360°全景图像（等距柱状投影，ERP）能够一次性捕获全向场景信息，在自动驾驶、机器人导航和虚拟现实等领域具有天然优势。然而，这种投影方式引入了严重的几何畸变——球面场景被拉伸为平面矩形，物体的空间位置、距离和相对关系在像素空间中变得高度非线性。人类观察者可以凭借先验知识从全景图中推断3D结构，但对当前的视觉语言模型（VLM）而言，这构成了一个根本性挑战。
@@ -80,8 +78,6 @@ PanoEnv对14个主流VLM进行了系统基准测试，结果揭示了令人警�
 本文的核心动机在于探索一条因果路径：**能否利用合成数据的3D真值构建奖励函数，通过强化学习迫使模型从2D全景图中隐式重建3D空间关系，并将这种能力泛化到真实世界场景？**
 
 这一思路区别于传统的“更大模型、更多数据”的缩放范式，而是聚焦于**训练信号的质变**——用精确的几何奖励替代模糊的语言奖励，引导模型发展出真正的3D空间智能。初步的Sim-to-Real实验（Table 7）已经提供了正向证据：在合成数据上训练的7B模型，在真实OSR-Bench的物体计数和相对距离任务上超越了72B模型，暗示习得的是可迁移的几何逻辑而非表面记忆。
-
-
 
 ## 核心方法与创新机理
 
@@ -143,8 +139,6 @@ Sim-to-Real实验（Table 7）提供了决定性证据：在真实OSR-Bench上�
 
 PanoEnv-RL在方法谱系中占据一个独特位置：它将**合成3D真值监督**、**GRPO强化学习**和**课程学习**三者首次耦合用于全景空间推理。相比传统VLM后训练方法（如基于LLM裁判的RLHF），其关键区别在于奖励信号的客观性和几何精度；相比3D视觉的显式重建方法，它保持了2D输入的便捷性，将3D推理隐式编码进模型参数。这一框架的局限性在于依赖精确3D真值（在真实噪声数据上难以直接应用），且当前仅处理空间推理，尚未扩展到全景视频的时序任务。
 
-
-
 PanoEnv 的核心思路是通过**合成环境中的精确 3D 几何真值**，构建可验证的强化学习奖励信号，迫使 VLM 在 2D 全景图上隐式重建空间关系，从而解决现有模型在等距柱状投影（ERP）图像上缺乏 3D 推理能力的瓶颈。整个框架由两大模块串联构成：**PanoEnv-QA 数据集构建**与**基于 GRPO 的 3D 感知强化学习后训练（PanoEnv-RL）**。
 
 ### 数据流与模块关系
@@ -172,12 +166,8 @@ PanoEnv 的核心思路是通过**合成环境中的精确 3D 几何真值**，�
 
 **证据强度**：上述模块关系与数据流均有明确的图表和公式锚点支撑（Fig. 2 数据集构建流程，Fig. 3 GRPO 训练框架，Eq. 1–5 坐标转换与损失函数），消融实验（Table 4）进一步验证了两阶段课程的必要性。合成到真实的泛化能力则由 OSR‑Bench 上的零样本实验（Table 7）独立证实。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2718_https_arxiv_org_abs_2602_21992/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the PanoEnv framework, including the PanoEnv-QA benchmark and the RL-enhanced PanoEnv-RL model*
-
-
 
 ### 3.1 合成数据生成管道：从多视图到几何真值QA对
 
@@ -230,15 +220,11 @@ $$R(s, a) = w_{\mathrm{acc}} R_{\mathrm{acc}}(a, a^*) + w_{\mathrm{fmt}} R_{\mat
 
 消融实验表明，仅做阶段一会导致开放式问题崩溃（OE准确率仅5.7%），仅做开放式训练会削弱结构化能力（MCQ降至52.3%），而两阶段结合达到最优综合性能（总准确率52.93%，OE 14.83%）。反向课程（先开放式后混合）表现更差（50.9%），证实先学结构化输出对稳定优化至关重要。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2718_https_arxiv_org_abs_2602_21992/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the PanoEnv-QA construction pipeline. We convert multi-view TartanAir data into ERP panoramas and generate geometry-grounded QA pairs using depth, semantics, and 3D projections*
 
 ![[assets/figures/papers/paper_list_l2718_https_arxiv_org_abs_2602_21992/figures/004_Figure_3.jpg]]
 *Figure 3: Overview of our framework, including GRPO sampling, routed reward computation, and two-stage curriculum updates*
-
-
 
 ## 实验与关键发现
 
@@ -252,9 +238,6 @@ $$R(s, a) = w_{\mathrm{acc}} R_{\mathrm{acc}}(a, a^*) + w_{\mathrm{fmt}} R_{\mat
 ### 基线模型全面评测：开放式问题暴露致命短板
 
 在零样本设定下，对 14 个主流 VLM 进行了全面评测（**Table 2**）。结果显示，所有基线模型在开放式问题（OE）上表现极差：最强基线 **Qwen2.5-VL-7B** 总准确率仅 49.34%，OE 准确率低至 6.39%；14 个基线的平均总准确率为 36.72%，平均 OE 准确率仅 4.26%。这一结果直接验证了核心瓶颈——当前 VLM 在 360° ERP 图像上严重缺乏几何感知的 3D 推理能力，在需要精确度量输出的开放式问题中几乎失效。
-
-![[assets/figures/papers/paper_list_l2718_https_arxiv_org_abs_2602_21992/figures/005_Table_2.jpg]]
-*Table 2: Overall performance and per-type accuracy breakdown of 14 baseline VLMs. LLM scores (Q-Score, P-Score) are on a 0-10 scale*
 
 ### 主要结果：GRPO-Balanced 实现显著突破
 
@@ -304,27 +287,11 @@ $$R(s, a) = w_{\mathrm{acc}} R_{\mathrm{acc}}(a, a^*) + w_{\mathrm{fmt}} R_{\mat
 3. **开放式问题仍是瓶颈**：尽管 OE 准确率提升了 132%，14.83% 的绝对值仍远低于结构化问题，表明自由形式的 3D 推理仍极具挑战。
 4. **时序任务未覆盖**：当前框架仅处理静态全景图像的空间推理，尚未扩展到全景视频中的时序推理任务。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2718_https_arxiv_org_abs_2602_21992/figures/006_Table_3.jpg]]
 *Table 3: Comprehensive comparison of our GRPO-trained models (Ours) against 14 state-of-the-art baselines on the PanoEnv-QA test set. All our models are fine-tuned on Qwen2.5-VL-7B using LoRA*
 
 ![[assets/figures/papers/paper_list_l2718_https_arxiv_org_abs_2602_21992/figures/008_Table_4.jpg]]
 *Table 4: Unified ablation results across all variants*
-
-![[assets/figures/papers/paper_list_l2718_https_arxiv_org_abs_2602_21992/figures/010_Table_7.jpg]]
-*Table 7: Zero-Shot Performance on OSR-Bench (Real-World)*
-
-![[assets/figures/papers/paper_list_l2718_https_arxiv_org_abs_2602_21992/figures/007_Figure_4.jpg]]
-*Figure 4: Training dynamics of our two-stage GRPO curriculum. Stage 1 quickly learns output format and structured decisionmaking; Stage 2 inherits this and focuses on improving OE reasoning under balanced training*
-
-![[assets/figures/papers/paper_list_l2718_https_arxiv_org_abs_2602_21992/figures/003_Table_1.jpg]]
-*Table 1: Distribution of questions in the PanoEnv-QA dataset across major categories and question types*
-
-![[assets/figures/papers/paper_list_l2718_https_arxiv_org_abs_2602_21992/figures/011_Table_6.jpg]]
-*Table 6: Comprehensive comparison between PanoEnv and existing panoramic benchmarks*
-
-
 
 ## 定位与知识库关联
 
@@ -410,8 +377,6 @@ PanoEnv-RL 的贡献不在于提出全新的算法组件，而在于 **系统性
 ### 5. 知识库贡献总结
 
 PanoEnv 的核心知识贡献在于 **证明了合成数据的3D真值可以作为强化学习的有效奖励信号，从而在2D全景图上教会VLM进行3D推理**。这一发现具有方法论意义：它表明对于需要精确物理推理的任务，基于真值的可验证奖励可能比人类偏好或LLM裁判更为有效。同时，两阶段课程的设计原则——先稳定结构化输出再引入开放式探索——为类似的多任务RL训练场景提供了可复用的经验。
-
-
 
 ## 原文 PDF
 

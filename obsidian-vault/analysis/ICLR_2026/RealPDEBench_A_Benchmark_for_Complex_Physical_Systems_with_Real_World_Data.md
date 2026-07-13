@@ -56,8 +56,6 @@ RealPDEBench 的核心洞察是：直接在模拟数据上训练的模型难以�
 
 当前基准的局限在于范围仍集中于流体与燃烧系统，尚未覆盖电磁学、结构力学等其他物理领域，也未针对燃烧系统引入专门的物理导向指标，且缺乏对强分布外工况的系统探索。这些方向为后续扩展留下了明确空间。
 
-
-
 科学机器学习（SciML）在偏微分方程求解、物理场预测等任务中取得了显著进展，但其核心瓶颈正从模型设计转向数据层面：**真实物理实验数据极度稀缺且采集成本高昂**。当前绝大多数SciML模型——包括各类神经算子、Transformer架构乃至大规模预训练基础模型——均在纯模拟数据上训练和验证，缺乏对真实物理场景的可靠评估。这导致一个关键问题悬而未决：在模拟数据上表现优异的模型，部署到真实世界时是否依然有效？
 
 模拟数据与真实数据之间存在本质性鸿沟。真实实验数据包含测量噪声、边界条件不确定性、多物理场耦合效应以及传感器模态限制等复杂因素，而数值模拟即使采用高精度CFD方法，也难以完全复现这些真实世界的“脏”特征。图1直观展示了五个场景下真实数据与模拟数据的差异——模态不同、噪声分布不同、数值误差模式不同。这些差异使得**sim-to-real迁移**成为SciML走向实际应用的核心挑战，但长期以来缺乏系统性的基准来量化这一差距。
@@ -65,8 +63,6 @@ RealPDEBench 的核心洞察是：直接在模拟数据上训练的模型难以�
 现有基准工作存在明显缺口：它们要么仅提供模拟数据，要么仅提供真实数据，缺乏**配对**的模拟-真实数据来支撑对比分析。同时，评估指标多局限于逐点误差（如RMSE、相对L2），忽略了物理一致性——例如周期性特征的频率保真度、湍流动能误差、长期自回归预测的时均速度剖面偏差等。这些问题使得学界难以回答一个根本性问题：**利用大量廉价模拟数据能否有效提升真实场景下的预测能力？如果能，最佳迁移策略是什么？**
 
 RealPDEBench正是为填补这一空白而构建。它系统性地采集了五个场景（Cylinder、Controlled Cylinder、FSI、Foil、Combustion）下超过700条轨迹、每条超2000帧的配对真实-模拟数据，覆盖流体动力学和燃烧两大领域。在此基础上，该基准定义了三种训练范式——仅真实训练、仅模拟训练、模拟预训练后真实微调——并设计了九项评估指标，从数据精度和物理一致性两个维度全面量化模型表现，为sim-to-real迁移研究提供了首个标准化测试平台。
-
-
 
 ## 核心方法与创新机理
 
@@ -105,8 +101,6 @@ RealPDEBench并非仅仅“收集数据然后跑模型”。针对真实数据�
 
 现有PDE基准（如PDEBench、PDEArena）的评估完全建立在数值模拟数据之上，其“性能”仅反映模型对数值求解器的逼近能力。RealPDEBench将评估锚点从模拟转移到真实物理世界，揭示出**模型在模拟数据上的优越表现并不能保证其在真实场景中的有效性**——这一发现对科学ML领域的方法论具有根本性的警示意义。
 
-
-
 RealPDEBench 的核心 pipeline 由五个功能模块串联而成，形成从数据获取到模型评估的完整闭环。
 
 **数据采集与生成**是 pipeline 的起点。真实数据通过粒子图像测速（PIV）技术在水洞中采集流体系统速度场，燃烧系统则采用化学发光（CL）成像获取火焰强度分布（Section 3.2, Figure 2）。对应的模拟数据则采用计算流体动力学（CFD）方法生成：二维流体系统使用基于有限体积法（FVM）和浸入边界法（IBM）的 Lilypad 求解器，三维流体系统使用 Waterlily 求解器在 GPU 上运行；燃烧数据集则通过三维隐式非定常大涡模拟（LES）结合涡耗散概念（EDC）模型生成（Section 3.2, Appendix B.2）。这一配对数据生成策略是后续 sim-to-real 分析的基础。
@@ -123,8 +117,6 @@ RealPDEBench 的核心 pipeline 由五个功能模块串联而成，形成从数
 **基线评估模块**覆盖十种代表性方法，横跨传统降阶模型（**DMD**, Kutz et al., 2016）、CNN 架构（**U-Net**, Ronneberger et al., 2015）、神经算子（**CNO**, Raonic et al., 2023; **DeepONet**, Lu et al., 2021; **FNO**, Li et al., 2021; **WDNO**, Hu et al., 2025; **MWT**, Gupta et al., 2021）、Transformer 架构（**GK-Transformer**; **Transolver**, Wu et al., 2024a）以及大规模预训练 PDE 基础模型（**DPOT** 小模型 30M 和大模型 509M, Hao et al., 2024）。所有基线在三种训练范式下统一评测，超参数针对各数据集单独调优（Section 3.4）。
 
 pipeline 的输入输出流清晰：输入为初始物理场快照和工况参数，输出为未来时刻的物理场预测。评估时，所有模型在相同的参数级划分的真实验证集和测试集上进行，保证了实验协议的公平性。
-
-
 
 RealPDEBench 本身是一个基准框架，而非提出新模型的方法论文，其核心模块由**数据生成管线**、**任务范式定义**和**评估指标体系**三部分构成。
 
@@ -185,8 +177,6 @@ $$\mathrm{MVPE} = \frac{1}{K N_{\mathrm{probe}}} \sum_{k,j} \left| \bar{u}(x_{\m
 - **GK-Transformer**（Cao, 2021）、**Transolver**（Wu et al., 2024a）：Transformer 类 PDE 求解器。
 - **DPOT**（Hao et al., 2024）：自回归去噪算子 Transformer，提供小规模（30M）和大规模（509M）两种预训练版本，作为 PDE 基础模型参与基准测试。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：模拟到真实的鸿沟
@@ -233,33 +223,11 @@ RealPDEBench的核心实验揭示了一个关键结论：**直接在模拟数据
 
 尽管RealPDEBench在揭示sim-to-real鸿沟方面取得了系统性进展，但仍存在若干局限。首先，基准目前局限于流体动力学和燃烧领域，未覆盖电磁学、结构力学等其他重要物理系统。其次，燃烧数据集尚未引入专门的物理导向指标，对反应流动力学（如火焰面曲率、释热率分布）的评估仍不充分。此外，基准尚未系统性地探索强分布外参数区域，限制了泛化能力的测评。真实数据中的噪声模式和测量误差如何更有效地在模拟数据中建模，以提升sim-to-real迁移的鲁棒性，仍是一个开放问题。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_y3oHMcoItR/figures/002_Figure_2.jpg]]
-*Figure 2: Photos of real-world data collection. (a) Water tunnel after laser irradiation. (b) Particle imaging photos taken by the camera. (c) Motion control equipment. (d) Swirl combustor equipment*
-
-![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_y3oHMcoItR/figures/016_Figure_9.jpg]]
-*Figure 9: Schematic illustration of the Circulating Water Tunnel platform and the PIV measurement system installation. (a) A schematic of the water tunnel. (b) Experiment equipment*
-
-![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_y3oHMcoItR/figures/021_Figure.jpg]]
-*Figure: (a) (b)*
-
 ![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_y3oHMcoItR/figures/008_Table_2.jpg]]
 *Table 2: Results of other metrics. The bolded values are the best*
 
-![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_y3oHMcoItR/figures/009_Table_3.jpg]]
-*Table 3: 2 rounds of autoregressive evaluation. The bolded values are the best*
-
-![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_y3oHMcoItR/figures/010_Table_4.jpg]]
-*Table 4: 3 rounds of autoregressive evaluation. The bolded values are the best*
-
-![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_y3oHMcoItR/figures/014_Table_6.jpg]]
-*Table 6: Low, mid, high frequency error. The bolded values are the best*
-
 ![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_y3oHMcoItR/figures/015_Table_7.jpg]]
 *Table 7: Overview of datasets. $\mathtt { n \_ t r a j }$ is the number of trajectories. n frame is the number of frames*
-
-
 
 ## 定位与知识库关联
 
@@ -320,8 +288,6 @@ RealPDEBench 的实验设计揭示了各方法的适用边界：
 2. 在强分布外工况下，模拟预训练与真实微调的迁移能力如何？需要新的任务设计和数据集扩展。
 3. 基准是否应包含更多动态任务（如逆问题、参数估计）从而全面评估科学机器学习模型的真实世界适应能力？
 4. 真实数据中的噪声模式和测量误差如何更有效地在模拟数据中建模，以提升 sim-to-real 迁移的鲁棒性？
-
-
 
 ## 原文 PDF
 

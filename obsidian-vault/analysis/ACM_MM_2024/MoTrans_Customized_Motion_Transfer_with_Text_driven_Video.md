@@ -52,8 +52,6 @@ claims:
 
 当前方法的局限在于：主要适用于以人体为中心的动作迁移，难以泛化至无肢体物体（如鱼类）；且仅针对 2–3 秒的短视频片段优化，长时序运动生成仍面临挑战。
 
-
-
 文本到视频（T2V）扩散模型的快速发展使得从自然语言描述生成高质量视频成为可能。然而，预训练 T2V 模型在实际应用中面临一个核心瓶颈：**难以生成复杂、以人为中心的精确运动模式**。当用户希望将特定动作（如滑板推地、举杯饮水、弹吉他等）迁移到新的主体或场景时，现有方法暴露出明显的局限性。
 
 直接对预训练 T2V 模型（如 **ZeroScope**、**VideoCrafter**）在有限参考视频上进行微调，是解决运动定制化的直观思路。但这种方法存在根本性的缺陷：**外观与运动的耦合**。在少样本甚至单样本设置下，模型极易将参考视频中的外观信息（人物衣着、背景、物体纹理）与运动模式一同“记住”，导致生成结果缺乏外观多样性，无法将运动迁移到新的主体上。换言之，模型学到的不是“如何动”，而是“谁在动”以及“在什么环境中动”。
@@ -67,8 +65,6 @@ claims:
 3. **运动特定残差嵌入**：通过 MLP 学习动词标记的残差嵌入，增强文本条件中与运动相关的语义表示，使模型能够更精准地捕获参考视频中的特定运动模式。
 
 MoTrans 在包含 12 种动作类型的 Custom Motion Dataset 上验证了其有效性。定量结果表明，该方法在 CLIP-T、CLIP-E、TempCons 和 MoFid 四项指标上均优于 **MotionDirector**、**LAMP**、**DreamVideo** 等主流定制化方法。消融研究进一步证实，移除任一解耦组件都会导致外观过拟合或运动保真度下降，验证了各模块的必要性。
-
-
 
 ## 核心方法与创新机理
 
@@ -102,8 +98,6 @@ $$E_r = W_2 \cdot (\sigma_{GELU}(W_1 \cdot ([MeanPool(\psi(\mathcal{V})), \tau_{
 
 三个 changed slots 形成清晰的因果链条：**MLLM 重描述器**提供丰富的外观文本条件，**外观注入器**提供显式的视觉外观先验，二者共同将外观信息从时间模块的学习目标中剥离；**两阶段训练**在结构上强制执行这一分工；**运动增强器**则在时间模块获得“纯净”运动学习空间后，通过动词级残差嵌入精准捕获特定运动模式。Table 2 的消融数据和 Figure 9 中 MoFid 与 CLIP 分数的权衡关系，共同验证了这一因果链条的有效性：任一组件的缺失都会破坏外观-运动解耦，导致过拟合或运动学习不足。
 
-
-
 ![[assets/figures/papers/paper_list_l17_MoTrans_Customized_Motion_Transfer_with_Text_driven_Video/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed MoTrans. In the appearance learning stage, an MLLM-based recaptioner is employed to extend the base prompt, encouraging the spatial LoRAs to sufficiently learn appearance information. The weights of spatial LoRAs are shared in the second stage. In the motion learning stage, video frame embeddings are injected as appearance priors, compelling the temporal LoRAs to concentrate on motion learning. Furthermore, we adopt MLP to learn a motion-specific embedding, which is jointly trained with the temporal LoRAs to fit specific motion patterns in the reference video*
 
@@ -118,8 +112,6 @@ MoTrans 的整体训练流水线分为两个阶段：**外观学习阶段**与**
 **推理流程**。训练完成后，给定目标文本提示，MoTrans 利用冻结的空间 LoRA 保持外观信息，同时通过时间 LoRA 和增强的运动嵌入驱动生成具有参考视频运动模式的新视频。受益于两阶段解耦设计，外观与运动可分别由 UNet 的空间和时间 Transformer 独立控制——例如，可将参考视频的运动迁移至由示例图像指定的新主体上（图 8）。
 
 > **证据强度说明**：上述框架描述均来自论文第 3 节的明确声明（置信度 ≥ 0.95），消融实验（表 2、图 7）进一步证实了各模块的必要性：移除 MLLM 重描述器或外观注入器会导致 CLIP-T/CLIP-E 下降而 MoFid 升高，表明外观过拟合；移除运动增强器则使 MoFid 显著降低，验证了残差动词嵌入对运动学习的因果作用。
-
-
 
 ### 整体架构与两阶段训练
 
@@ -177,8 +169,6 @@ $$\mathcal{E}_m = \frac{1}{\vert \mathcal{M} \vert \vert \bar{v}_m \vert} \sum_{
 
 其中 $f(\cdot)$ 为 VideoMAE 编码器，$\bar{v}_k$ 为参考视频的第 $k$ 帧特征。该指标与 CLIP-T/CLIP-E 配合使用：高 MoFid 配合低 CLIP 分数表明外观过拟合参考视频，运动保真度与文本对齐度之间的权衡关系如 Figure 9 所示。
 
-
-
 ## 实验与关键发现
 
 ### 评估设置
@@ -229,17 +219,11 @@ $$\mathcal{E}_m = \frac{1}{|\mathcal{M}| |\bar{v}_m|} \sum_{m \in \mathcal{M}} \
 
 此外，MoFid 指标依赖 VideoMAE 特征，当动作类别与预训练分布不匹配时可能存在偏差，需要更鲁棒的运动评估方案，这一点尚待进一步验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l17_MoTrans_Customized_Motion_Transfer_with_Text_driven_Video/figures/003_Figure_4.jpg]]
 *Figure 4: Details of trainable LoRAs and appearance injector. (a) Parameters of the base model are frozen and only parameters of LoRAs are updated. (b) The image embedding is processed through a Linear layer before being fused with the hidden states from the spatial transformers. This preinjected appearance prior encourages the temporal LoRAs to capture motion patterns effectively*
 
-![[assets/figures/papers/paper_list_l17_MoTrans_Customized_Motion_Transfer_with_Text_driven_Video/figures/015_Figure.jpg]]
-
 ![[assets/figures/papers/paper_list_l17_MoTrans_Customized_Motion_Transfer_with_Text_driven_Video/figures/016_Figure_13.jpg]]
 *Figure 13: Additional qualitative comparisons on customized motion transfer given multiple reference videos*
-
-
 
 ## 定位与知识库关联
 
@@ -291,8 +275,6 @@ MoTrans 的核心创新在于**利用互补的多模态信息在不同训练阶�
 3. **运动评估的鲁棒性**：MoFid 依赖 VideoMAE 特征空间中的余弦相似度，当参考动作与生成动作在语义上相似但视觉表现不同时，该指标可能无法准确反映运动保真度。是否有更鲁棒的运动评估方案，能够捕捉运动模式的语义等价性？
 
 4. **多动作组合与过渡**：当前方法针对单一动作模式进行定制化，如何处理多个动作的组合与自然过渡，使生成视频包含更复杂的动作序列？
-
-
 
 ## 原文 PDF
 

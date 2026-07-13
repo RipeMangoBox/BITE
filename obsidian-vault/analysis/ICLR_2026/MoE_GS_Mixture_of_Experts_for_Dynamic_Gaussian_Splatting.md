@@ -57,8 +57,6 @@ claims:
 
 **方法定位**：MoE-GS 属于动态高斯泼溅方法的框架级改进，通过可学习的专家选择与融合机制，在不改变各专家内部结构的前提下，系统性地提升了动态场景的重建质量与鲁棒性。其知识蒸馏管线进一步为高质量动态重建的轻量化部署提供了可行路径。
 
-
-
 **动态场景重建的核心瓶颈：单一变形先验的普适性困境**
 
 动态高斯泼溅（Dynamic Gaussian Splatting）已成为新视角合成的前沿范式，其核心思路是为静态高斯表征引入时变变形场，从而在紧凑的显式几何基元上刻画场景运动。然而，现有方法在变形建模策略上存在根本性的分歧——不同方法采用截然不同的变形先验，包括基于每高斯嵌入的形变（如 **E-D3DGS**，Bae et al., 2024）、基于多项式轨迹的运动建模（如 **STG**，Li et al., 2024）、基于时空插值的变形（如 **Ex4DGS**，Lee et al., 2024），以及基于HexPlane编码的变形场（如 **4DGaussians**，Wu et al., 2024）。
@@ -74,8 +72,6 @@ claims:
 **现有方法缺口**：尽管已有工作尝试通过改进单一变形场的表达能力来缓解上述问题，但这一思路存在理论上限——当变形先验的结构性假设与局部运动模式失配时，仅靠增大模型容量无法从根本上弥补建模偏差。另一方面，直接训练多个独立模型并在后处理阶段进行硬性选择或简单融合，则面临训练成本线性增长、融合策略缺乏可微优化、以及模型间缺乏协同等实际障碍。
 
 **本文动机**：MoE-GS 的核心洞察是将“选择最优变形策略”这一决策本身建模为一个可学习的问题。通过引入专家混合（Mixture of Experts, MoE）架构，框架能够为每个局部时空区域自适应地选择和融合最合适的变形专家，从而突破单一先验的普适性瓶颈。这一思路将动态场景重建从“寻找一个万能模型”重新定义为“学习如何动态组合多个专用模型”，为弥合不同变形先验之间的性能差距提供了统一的解决方案。
-
-
 
 ## 核心方法与创新机理
 
@@ -108,8 +104,6 @@ MoE-GS 将上述方法集成为异构专家池，并引入 **Volume-aware Pixel 
 
 上述三个 changed slots 形成递进闭环：**自适应架构**提供质量上限，**效率优化**降低多专家推理成本，**知识蒸馏**将 MoE 能力迁移至轻量部署模型。三者共同支撑了 MoE-GS 在 N3V 和 Technicolor 数据集上一致超越所有单专家基线和 NeRF 类方法的实验结果（Table 1, Table 2）。
 
-
-
 MoE-GS 的整体框架遵循“先多样化、后自适应融合”的两阶段设计，将多个异构的动态高斯泼溅专家集成到一个统一的 Mixture of Experts 架构中。如 Figure 2 所示，整个 pipeline 由两个核心阶段构成：
 
 ![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_WrEQFwWCdT/figures/002_Figure_2.jpg]]
@@ -128,8 +122,6 @@ MoE-GS 的整体框架遵循“先多样化、后自适应融合”的两阶段�
 为弥合多专家推理的计算开销与单专家部署的效率需求之间的差距，MoE-GS 引入知识蒸馏策略。利用 MoE 渲染图像作为伪监督信号，结合路由器权重引导的蒸馏损失，重新训练各单一专家模型，使其逼近 MoE 的渲染品质。这一策略使得蒸馏后的单专家模型在显著降低计算成本的同时，性能大幅超越原始基线。
 
 框架的输入为多视角动态视频帧及其对应的相机参数与时间戳，输出为任意新视角、新时刻的渲染图像。整个流程中，第一阶段产出多样化的专家表征，第二阶段产出自适应融合权重，最终通过加权混合得到渲染结果。
-
-
 
 ### 3.1 标准 MoE 形式化
 
@@ -190,13 +182,6 @@ $$\mathcal{L}_k^{KD} = \lambda \cdot \mathcal{L}(G'_k \cdot I_{E_k}, G'_k \cdot 
 
 其中 $G'_k$ 为路由器分配给第 $k$ 个专家的权重，$I_{GT}$ 为真值图像，$I_{MoE}$ 为完整 MoE-GS 的渲染图像。第一项在高权重区域约束专家输出逼近真值，第二项在低权重区域约束其逼近 MoE 输出，使得蒸馏后的单专家模型在自身擅长的区域保持精度，在非擅长区域学习 MoE 的融合结果。实验验证了该蒸馏策略能一致提升单专家的 PSNR、SSIM 和 LPIPS（Table 7, Table 11），蒸馏后性能大幅超越原基线并逼近 MoE-GS。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_WrEQFwWCdT/figures/001_Figure_1.jpg]]
-*Figure 1: Limitations of existing dynamic Gaussian splatting methods. (a) Scene-level: No single method consistently dominates across scenes. (b) Spatial-level: Different spatial regions favor different deformation models. (c) Temporal-level: The best-performing method changes over time within the same scene. We also visualize representative motion trajectories of four experts—4DGaussians (Green), STG (Purple), E-D3DGS (Pink), and Ex4DGS (black)—to illustrate their distinct motion behaviors. Additional video results are provided on the project page*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -211,13 +196,7 @@ MoE-GS 在两个主流动态场景重建基准上均取得了最优的平均重�
 
 效率评估（Table 3）显示，N=2 专家变体（Ex4DGS + STG）在 55% 剪枝率下达到 **32.80 dB PSNR / 83 FPS / 351.2 MB**，相比 STG 的 31.92 dB / 88.5 FPS / 609.5 MB，PSNR 提升 +0.88 dB 的同时内存占用降低约 42%，FPS 仅轻微下降。这表明单通道多专家渲染与门控感知剪枝的组合能够在质量与效率之间取得实用平衡。
 
-![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_WrEQFwWCdT/figures/007_Table_3.jpg]]
-*Table 3: Efficiency evaluation with N=2 Expert Variants on N3V (Li et al., 2022)*
-
 定性结果（Figure 4）进一步揭示了 MoE-GS 的融合机制：路由权重图显示，不同空间区域自适应地激活不同专家——例如静态背景区域倾向于激活 Ex4DGS，而快速运动区域则更多依赖 STG 或 E-D3DGS——最终混合结果在细节保真度上一致优于任一单独专家。
-
-![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_WrEQFwWCdT/figures/006_Figure_4.jpg]]
-*Figure 4: N3V Qualitative Results Comparison of our MoE-GS with other dynamic Gaussian splatting methods on Neural 3D Video dataset (Li et al., 2022). black background highlight the method that produces the most visually accurate result among the baselines for each region*
 
 ### 路由器架构消融
 
@@ -225,12 +204,6 @@ Table 4 和 Figure 5 系统比较了三种路由器变体：
 - **Pixel Router**：直接在 2D 像素空间预测权重，忽略 3D 几何信息，导致细节模糊和结构不一致。
 - **Volume Router**：在高斯层级进行权重分配，虽保留几何信息但优化困难，训练不稳定。
 - **Volume-aware Pixel Router**（本文方案）：通过可微分权重投射将高斯层级的体素感知权重 splat 到像素空间，兼具几何感知能力和优化稳定性。
-
-![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_WrEQFwWCdT/figures/008_Table_4.jpg]]
-*Table 4: Performance Comparison of Different MoE Router Variants*
-
-![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_WrEQFwWCdT/figures/010_Figure_5.jpg]]
-*Figure 5: Qualitative comparison of MoE Router variants. Each router applies a different routing strategy, resulting in varied structural consistency and detail across the outputs*
 
 定量结果表明，Volume-aware Pixel Router 在 PSNR 上显著优于两种基线变体，定性对比（Figure 5）显示其能更好地保持边缘锐度和纹理细节。该消融直接验证了核心设计主张：**将 3D 几何信息注入路由过程是保证融合质量的关键**。
 
@@ -246,9 +219,6 @@ Table 5 对单通道渲染（Single-Pass Rendering）和门控感知剪枝（Gat
 Table 6 展示了专家训练预算对 MoE-GS 性能的影响。即使每个专家仅使用 **20% 的训练迭代预算**，MoE-GS（N=3）仍能超越完全训练的单专家基线。这一发现具有重要实践意义：MoE-GS 不仅提升性能上限，还能在有限训练资源下提供更强的重建能力。
 
 知识蒸馏实验（Table 7）表明，使用 MoE-GS 渲染图像作为伪标签对单专家进行蒸馏训练，可一致提升其 PSNR、SSIM 和 LPIPS。进一步引入路由权重引导（routing-weighted distillation）后，蒸馏模型性能更逼近完整 MoE-GS。Table 13 的补充消融确认了路由加权的额外增益。这意味着蒸馏后的单专家模型可在保持接近 MoE 质量的同时，消除多专家推理开销，弥合了质量与效率之间的差距。
-
-![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_WrEQFwWCdT/figures/012_Table_7.jpg]]
-*Table 7: Ablation Studies on MoE-GS Distillation Methods on Technicolor dataset*
 
 ### 训练稳定性
 
@@ -274,8 +244,6 @@ Table 12 报告了多次重复训练（不同随机种子）下的性能波动�
 - 探索路由器的在线学习或终身学习机制，避免额外的独立训练阶段。
 - 将 MoE-GS 的几何一致性提升与下游任务（如动态场景理解、目标跟踪）结合。
 - 通过硬件加速或模型量化进一步降低多专家推理开销，推动实时应用落地。
-
-
 
 ## 定位与知识库关联
 
@@ -335,8 +303,6 @@ MoE-GS 的三项核心设计分别填补了现有工作的不同空白：
 4. **下游任务集成。** MoE-GS 生成的路由权重本身编码了丰富的时空运动信息。这些权重能否作为动态场景理解的中间表征，服务于目标跟踪、动作识别或场景编辑等下游任务？
 
 5. **硬件加速与量化。** 在实时应用（如 VR/AR）中，可否通过 GPU 定制化算子、混合精度量化或专家剪枝进一步降低多专家推理的延迟和功耗？
-
-
 
 ## 原文 PDF
 

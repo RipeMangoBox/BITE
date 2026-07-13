@@ -51,8 +51,6 @@ claims:
 
 实验结果表明，AgentMath‑30B‑A3B 在 AIME24 上达到 **90.6%**，超越 OpenAI‑o3‑mini 和 Claude‑Opus‑4.0‑Thinking，接近 DeepSeek‑R1‑671B；在 AIME25 和 HMMT25 上分别取得 **86.4%** 和 **73.8%**。消融研究进一步揭示，逐步多维数据细化使 AIME24 准确率从 35.3% 跃升至 60.5%，工具增强 RL 仅需约 400 训练步数即可达到纯文本 RL 约 1600 步的性能水平，效率提升约 4 倍。这些结果一致表明，工具化轨迹合成与 Agentic RL 的组合是提升数学推理性能与效率的关键杠杆。
 
-
-
 数学推理是大语言模型迈向通用人工智能的核心能力之一。近年来，以 OpenAI-o1、DeepSeek-R1 为代表的长链思维模型在竞赛级数学基准上取得了显著进展。然而，**纯文本推理范式在处理需要精确计算或符号操作的数学问题时暴露出根本性瓶颈**：模型在长链推理中容易出现数值计算错误、代数化简失误，且为纠正这些错误往往需要生成大量冗余文本，导致推理效率低下。
 
 现有工具增强方法试图通过引入代码解释器来弥补这一缺陷，但面临三个关键缺口：
@@ -62,8 +60,6 @@ claims:
 3. **训练效率瓶颈**。工具调用产生的超长序列（可达 96k tokens）和动态代码执行使得传统同步批处理训练极其低效，严重制约了大规模工具增强 RL 的可行性。
 
 AgentMath 的工作正是在这一背景下展开：**通过工具化数据合成与 Agentic RL，让模型自主学会在推理链中适时调用代码解释器进行精确计算，从而同时提升准确率和效率**。其核心洞察在于——将代码执行视为推理过程的有机组成部分而非外部辅助，并通过专门的训练系统和奖励设计让模型内化这一能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -112,8 +108,6 @@ AgentMath 提出了 **Agentic RL** 范式，在标准 GRPO 基础上引入三个
 ### 创新总结
 
 AgentMath 的四个 changed slots 形成闭环：工具增强数据合成为模型提供了高质量的行为示范，Agentic RL 让模型在交互式环境中自主优化工具调用策略，而高效训练系统则使这一范式在大规模训练中切实可行。从因果机制看，**工具化数据合成**是性能提升的基础（SFT 阶段贡献约 3.4 个百分点的提升），而 **Agentic RL** 则是实现高效工具策略优化的关键杠杆（RL 阶段贡献约 7.5 个百分点的额外提升，且训练效率提升 4 倍）。
-
-
 
 ![[assets/figures/papers/iclr26_0010_e2s7YHeVZW_AgentMath_Empowering_Mathematical_Reasoning_for/figures/002_Figure_2.jpg]]
 *Figure 2: The diagram of agentic reinforcement learning. It depicts the structure and workflow of our agentic reinforcement learning system with core functions including Agent Loop, Asynchronous Scheduler, and Partial Rollout, along with key performance improvement. Based on the Asynchronous Scheduler, the Agent Loop continues running by default. It will stop early only when conditions are met: either the content length exceeds the max length (i.e., 32k) or the number of tool calls exceeds the maximum constraint*
@@ -173,8 +167,6 @@ $$\tau = \tau^{(1)} \oplus \tau^{(2)} \oplus ... \oplus \tau^{(N)}$$
 
 整体流程为：**纯文本 CoT 轨迹 → 工具增强数据合成 → SFT 训练 → Agentic RL 训练 → 最终模型**。SFT 阶段为 RL 提供具备基本工具调用能力的初始策略；RL 阶段通过与环境（代码解释器）的交互反馈，进一步优化工具调用的时机与效率。实验表明，工具增强 RL 仅需约 400 训练步数即可在 AIME24 上达到 76.2%，而纯文本 RL 需要约 1600 步，效率提升约 4 倍（Table 2, Figure 4）。
 
-
-
 AgentMath 的整体技术路线围绕三个核心模块展开：工具增强数据合成、Agentic RL 训练范式，以及高效RL基础设施。以下逐一展开其关键设计与形式化表达。
 
 ### 工具增强数据合成模块
@@ -223,8 +215,6 @@ $$k^* = \arg \min_{k \in \{1, \dots, M\}} W_k, \quad W_{k^*} \gets W_{k^*} + w_j
 
 结合分布式沙盒集群的请求级异步调度（将工具调用延迟从 175s 降至 1.2s），整体端到端训练吞吐量实现 4–5 倍提升（Figure 2）。
 
-
-
 ## 实验与关键发现
 
 ### 主要结果
@@ -232,7 +222,6 @@ $$k^* = \arg \min_{k \in \{1, \dots, M\}} W_k, \quad W_{k^*} \gets W_{k^*} + w_j
 AgentMath 在多个竞赛级数学基准上取得了领先性能。Table 1 展示了 AgentMath 各规模模型与前沿模型的对比。**AgentMath‑30B‑A3B** 在 AIME24 上达到 **90.6%**，超过 OpenAI‑o3‑mini（87.7%）和 Claude‑Opus‑4.0‑Thinking（88.3%），逼近 DeepSeek‑R1‑671B（91.0%）；在 AIME25 上为 **86.4%**，在 HMMT25 上为 **73.8%**。**AgentMath‑8B** 同样表现强劲，AIME24 达到 89.8%，较纯文本基线 DS‑0528‑Qwen3‑8B 提升 +3.8%；AIME25 达到 84.7%，提升幅度高达 +8.4%。即使是 1.7B 的小规模模型也取得了 59.6%（AIME24）和 48.1%（AIME25）的成绩，验证了工具增强方法在不同模型规模下的有效性。
 
 Table 2 和 Figure 4 进一步对比了 AgentMath 与纯文本模型在 SFT 和 RL 阶段的性能差异。在 SFT 阶段，AgentMath 已优于纯文本基线（AIME24 60.5% vs. 57.1%）；进入 RL 阶段后，差距显著扩大：AgentMath‑RL 在约 400 训练步达到 **76.2%**，而纯文本 RL 需要约 1600 步才达到 68.7%，**训练效率提升约 4 倍**。这表明工具增强的 RL 范式不仅提升了最终准确率，还大幅加速了收敛。
-
 
 ![[assets/figures/papers/iclr26_0010_e2s7YHeVZW_AgentMath_Empowering_Mathematical_Reasoning_for/figures/010_Table_2.jpg]]
 *Table 2: Performance comparison between AgentMath and Text-Based Model in SFT and RL stages*
@@ -243,7 +232,6 @@ Table 2 和 Figure 4 进一步对比了 AgentMath 与纯文本模型在 SFT 
 ### 消融分析
 
 **数据质量的关键作用**：Table 3 展示了逐步多维质量细化对性能的影响。未经细化的初始合成数据在 AIME24 上仅达 35.3%，经过代码注入、轨迹验证、自校正注入等累积细化步骤后，准确率提升至 **60.5%**（+25.2%），证明数据质量是性能提升的核心杠杆。
-
 
 ![[assets/figures/papers/iclr26_0010_e2s7YHeVZW_AgentMath_Empowering_Mathematical_Reasoning_for/figures/013_Table_3.jpg]]
 *Table 3: Performance improvements on AIME24/25 through progressive refinement steps*
@@ -270,13 +258,8 @@ Figure 3 展示了多阶段 RL 训练过程中关键指标的演变。随着�
 - 工具增强数据规模与性能提升之间是否持续保持对数线性增长？
 - 模型能否通过大规模 Agent RL 发展出完全自适应的工具调用策略，无需预设调用次数上限？
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0010_e2s7YHeVZW_AgentMath_Empowering_Mathematical_Reasoning_for/figures/014_Table_4.jpg]]
 *Table 4: Performance comparison (avg@32 accuracy) of AgentMath against state-of-the-art models on AIME24, AIME25, and HMMT25 benchmarks. Evaluation follows DeepSeek-R1 framework (temperature=0.6, top p=0.95). AgentMath models (highlighted in blue) achieve superior results across all scales, with the 30B variant competitive against 671B models*
-
-
-
 
 ## 定位与知识库关联
 
@@ -316,8 +299,6 @@ AgentMath 在多个规模上与纯文本和工具增强基线进行了系统对�
 2. **自适应工具调用策略。** 模型是否能通过大规模 Agent RL 持续改进，并发展出完全自适应的工具调用策略（如自主决定何时以及如何使用工具，而无需预设调用次数上限）？当前仍需人工设定预算约束。
 3. **跨领域迁移。** AgentMath 的工具增强范式是否能迁移至物理、化学、编程等需要精确计算的领域？不同领域的工具接口和奖励设计可能需要针对性的调整。
 4. **工具多样性的扩展。** 当前仅集成代码解释器，未来是否可扩展至符号计算引擎、定理证明器等多种工具，并让模型自主选择最优工具组合？
-
-
 
 ## 原文 PDF
 

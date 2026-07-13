@@ -51,8 +51,6 @@ MoReact 的核心洞察是：**全局轨迹是局部运动与交互真实性的�
 
 在 InterHuman 和 CHI3D 两个基准数据集上，MoReact 在 FID、R-precision 和 Diversity 等关键指标上均显著优于 **InterGen**（Liang et al., 2024）与 **MDM**（Tevet et al., 2023）等基线方法。消融实验进一步证实，运动学损失、交互损失、阈值策略以及两阶段框架本身对生成质量的提升均至关重要（Table 2）。
 
-
-
 ### 问题背景
 
 生成逼真的人体反应运动是计算机视觉与图形学中的核心挑战，其应用涵盖虚拟现实、人机交互、机器人学习与动画制作等领域。给定一个演员（actor）的运动序列和一段文本描述，系统需要合成一个反应者（reactor）的运动，使其在语义上与文本一致，在物理上与演员的交互真实可信。这一任务的关键难点在于：反应运动需要同时满足**全局轨迹的合理性**（反应者相对于演员的空间位置与移动路径）与**局部运动的精细度**（肢体动作、关节姿态），并且二者必须与文本语义高度对齐。
@@ -71,8 +69,6 @@ MoReact 的核心洞察是：**全局轨迹是局部运动与交互真实性的�
 MoReact 的动机源于一个关键观察：**全局轨迹对反应运动的交互真实性与语义合理性具有决定性作用**。如 **Figure 1(b)** 所示，当在反应运动中注入相同尺度的噪声时，对全局轨迹添加噪声对交互真实性的损害远大于对局部运动添加噪声。进一步地，**Figure 1(c)** 表明，全局轨迹的下降趋势暗示反应者应当跌倒，而非站立或行走——这说明全局轨迹直接约束了局部动作的语义空间。
 
 基于上述观察，MoReact 提出将反应生成**解耦为两阶段顺序生成**：首先生成反应者的全局轨迹，再基于该轨迹合成全身局部运动。这一设计从根本上改变了生成管线：全局轨迹不再是局部运动的附属产物，而是作为局部运动的**先验基础**被优先确定。同时，MoReact 引入**加权交互图损失**，在扩散去噪过程中动态突出近距离关节对的相对运动，从而强化文本描述中关键交互（如握手、击掌）的物理一致性。
-
-
 
 ## 核心方法与创新机理
 
@@ -126,12 +122,7 @@ $$L_{\mathrm{full}} = \lambda_{\mathrm{R}} L_{\mathrm{R}} + I(t \leq \bar{t}) (\
 
 这些创新共同构成了 MoReact 的技术骨架：**两阶段解耦**确立生成顺序的因果正确性，**加权交互损失**精细建模接触区域的相对运动，**修复机制**保证轨迹一致性，**损失门控**优化训练信号质量。三者协同作用，使 MoReact 在 InterHuman 和 CHI3D 数据集上均取得最优的 FID（2.412 与 10.801）与 Accuracy（0.687），同时生成多样性最接近真实分布（Table 1）。
 
-
-
 MoReact 将文本驱动的反应运动生成解耦为**两阶段顺序扩散管线**，其核心设计动机源于一个关键观察：对反应者全局轨迹施加噪声，比在局部运动上施加同等强度噪声对交互真实性的破坏更严重（Figure 1(b)），且全局轨迹的下降直接暗示反应者应当跌倒而非站立（Figure 1(c)）。据此，MoReact 确立了“先全局轨迹、后局部运动”的生成策略。
-
-![[assets/figures/papers/paper_list_l1929_MoReact_Generating_Reactive_Motion_from_Textual_Descriptions/figures/004_Figure_1.jpg]]
-*Figure 1: (a) Our model, MoReact, learns to generate lifelike reactions, represented by the blue mesh, based on the textual description and the actor’s motion, represented by the red mesh. (b) As an important motivating analysis for developing our approach, we introduce noise of the same scale to local motion, full-body motion, and global trajectory, respectively. The results indicate that the precision of the global trajectory has a greater impact on the perceptual realism of the reaction. (c) We demonstrate global trajectory’s significant influence on the motion’s semantic information in certain scenarios, such as fall actions*
 
 ### 两阶段生成管线
 
@@ -164,8 +155,6 @@ $$\hat{\mathbf{x}}_0 = (1 - M) \odot \tilde{\mathbf{x}}_0 + M \odot \mathbf{g}$$
 - **阶段一输出**：反应者全局轨迹（根位移 + 旋转）。  
 - **阶段二输入**：演员运动 + 文本 + 阶段一轨迹。  
 - **最终输出**：反应者全身运动序列，其中全局轨迹被显式约束，局部运动由扩散模型合成。
-
-
 
 ### 问题定义与运动表示
 
@@ -241,8 +230,6 @@ $$\hat{\mathbf{x}}_0 = (1 - M) \odot \tilde{\mathbf{x}}_0 + M \odot \mathbf{g}$$
 - $\odot$ 表示逐元素乘法。
 
 该操作在扩散去噪的每一步执行，将已知的轨迹信息“注入”到估计的干净运动中，使生成过程始终受到轨迹的引导（Sec. 3.4, Eq. 8）。这一机制是两阶段框架能够解耦全局与局部运动生成的关键技术环节。
-
-
 
 ## 实验与关键发现
 
@@ -329,21 +316,8 @@ Figure 4 展示了 MoReact 对反应者全局轨迹的控制能力。通过修�
 ![[assets/figures/papers/paper_list_l1929_MoReact_Generating_Reactive_Motion_from_Textual_Descriptions/figures/007_Table_2.jpg]]
 *Table 2: Ablation Studies on InterHuman dataset. The results demonstrate the effectiveness of kinematic loss*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1929_MoReact_Generating_Reactive_Motion_from_Textual_Descriptions/figures/010_Figure.jpg]]
-*Figure: FID Over Time Steps Figure C.1: Change of FID for different noising modes and diffusion steps. Adding noise to the global trajectory has a more detrimental effect on the realism of interactions compared with adding noise to the local motion*
-
 ![[assets/figures/papers/paper_list_l1929_MoReact_Generating_Reactive_Motion_from_Textual_Descriptions/figures/011_Figure.jpg]]
 *Figure: MoReact MoReact (1-Stage) MoReact (1-Stage) Figure E.1: Ablation study on the design choice within MoReact*
-
-![[assets/figures/papers/paper_list_l1929_MoReact_Generating_Reactive_Motion_from_Textual_Descriptions/figures/012_Table.jpg]]
-*Table: E.1: Ablation studies on predicted term of trajectory diffusion model. The trajectory model that predicts ϵ achieves better performance in R-precision, FID and Multi-Modality Distance*
-
-![[assets/figures/papers/paper_list_l1929_MoReact_Generating_Reactive_Motion_from_Textual_Descriptions/figures/013_Table.jpg]]
-*Table: E.2: Quantitative comparison of different interaction loss designs. Our weighted interaction loss consistently outperforms InterGen (Liang et al., 2024) and ReMoS (Ghosh et al., 2024) losses on R-precision, FID, and MM Dist, demonstrating its superior effectiveness in generating realistic reactions*
-
-
 
 ## 定位与知识库关联
 
@@ -411,8 +385,6 @@ MoReact 的方法贡献可归纳为三个“调控旋钮”（causal knobs），
 5. **稀疏文本条件**：在更稀疏的文本描述（如仅给出“做出反应”而非完整动作描述）条件下，模型是否仍能生成合理反应？这涉及反应生成的内在不确定性与多模态建模能力。
 
 6. **轨迹扩散模型的预测目标选择**：Table E.1 表明预测噪声（$\epsilon$）优于直接预测干净数据（$x_0$），这一现象是否在更广泛的运动生成任务中普遍成立？其理论根源值得深挖。
-
-
 
 ## 原文 PDF
 

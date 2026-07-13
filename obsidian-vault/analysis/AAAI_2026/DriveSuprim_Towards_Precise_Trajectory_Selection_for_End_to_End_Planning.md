@@ -50,8 +50,6 @@ claims:
 
 在 NAVSIM v1 基准上，DriveSuprim 使用 ViT-L 骨干达到 **93.5% PDMS**，超过此前最优方法 Hydra-MDP 的 89.9% 达 3.6 个百分点（Table 2）；在 NAVSIM v2 上达到 **87.1% EPDMS**，超过 HydraMDP++ 的 85.6% 共 1.5 个百分点（Table 3）；在 Bench2Drive 闭环评测中取得 **83.02 Driving Score**，领先 AutoVLA 4.18 分（Table 4）。消融实验证实，粗到细选择策略带来的增益（+0.7%）远超单纯增加解码器层数（+0.3%）（Table 6），自蒸馏软标签（EPDMS 83.1）显著优于标签平滑（82.5）和温度缩放（82.7）（Table 13）。所有对比均使用相同骨干网络与训练数据，未引入额外数据。
 
-
-
 端到端自动驾驶的目标是直接从传感器输入（图像、激光雷达等）映射到自车的未来行驶轨迹，即 $T = \mathrm{Planner}(Img, Lidar)$。在这一范式下，**选择式规划方法**（selection-based planning）因其可解释性和可控性而受到广泛关注：模型从预定义的轨迹词汇库（trajectory vocabulary）中为每条候选轨迹预测安全评分，最终选择得分最高的轨迹作为规划输出。
 
 然而，选择式规划面临一个核心瓶颈：**在数千条候选轨迹中精确区分子最优的“硬负样本”极其困难**。这些硬负样本与最优轨迹在几何形态上高度相似，仅在安全关键指标（如碰撞时间、偏离车道距离）上存在细微差异，单次全局评分难以有效辨识。Oracle实验（Table 1）表明，即使预测评分排序后的Top-K候选轨迹中已包含高质量轨迹，现有方法仍无法稳定地将其选出，说明**评分精度而非候选覆盖度**是当前性能的限制因素。
@@ -62,8 +60,6 @@ claims:
 - **硬二元决策边界**：传统训练使用硬标签（0/1）对候选轨迹进行二元分类，但轨迹优劣本质上是一个连续谱——一条轨迹可能并非完全错误，只是略逊于最优选择。硬边界使训练信号过于严苛，导致优化不稳定，且无法捕捉轨迹间的相对优劣关系。
 
 针对上述问题，**DriveSuprim** 提出了三条互补的技术路径：通过**粗到细的候选过滤与精细评分**逐步缩小搜索空间并对困难样本进行深度判别；通过**基于旋转的视角增强**合成转弯场景以平衡轨迹分布；通过**自蒸馏框架**引入软标签，将硬二元决策软化，提供更平滑、更稳定的训练信号。这些设计共同指向一个目标：**在大量候选轨迹中，精确、鲁棒地辨识出真正安全且符合驾驶意图的最优轨迹**。
-
-
 
 ## 核心方法与创新机理
 
@@ -94,8 +90,6 @@ Table 13 的对比实验表明，自蒸馏软标签（EPDMS 83.1）显著优于�
 ### 创新协同效应
 
 上述三项创新并非孤立生效，而是形成协同增益。Table 5 的逐步消融显示：引入多阶段选择后 EPDMS 从基线 81.4 提升至 82.4，加入旋转数据增强后升至 82.7，叠加自蒸馏后达到 83.1。三者叠加带来的总增益（+1.7%）大于各模块独立增益之和，表明粗到细选择为增强数据和软标签提供了更精准的优化空间，而软标签又反过来稳定了多阶段训练的收敛过程。
-
-
 
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2506_06659/figures/002_Figure_1.jpg]]
 *Figure 1: Overall pipeline of our method. Selection-based methods struggle to distinguish suboptimal trajectories, perform poorly in turning, and utilize hard binary labels in training. DriveSuprim introduces coarse-to-fine refinement and a rotation-based data augmentation method with self-distillation to address these weaknesses. The green trajectory is the ground-truth trajectory, and the red and orange trajectories are obviously unsafe and seemingly correct trajectory candidates in the trajectory vocabulary*
@@ -129,8 +123,6 @@ $$\mathcal{L} = \mathcal{L}_{ori} + \mathcal{L}_{aug} + \mathcal{L}_{soft}$$
 ### 模块间协同关系
 
 三个核心模块并非孤立运作，而是形成互补闭环：粗到细选择解决了候选轨迹中硬负样本的区分难题，旋转增强弥补了转弯场景的数据缺口，自蒸馏软标签则为整个选择过程提供了更平滑的优化目标。消融实验（Table 5）证实，各模块叠加使用带来持续的性能提升，最终在 NAVSIM v1 和 v2 基准上分别达到 93.5% PDMS 和 87.1% EPDMS 的最优性能。
-
-
 
 DriveSuprim 的核心架构围绕三个紧密协作的模块展开：**粗到细轨迹选择**（Coarse-to-Fine Trajectory Selection）、**基于旋转的数据增强**（Rotation-based Data Augmentation）以及**自蒸馏软标签训练**（Self-distillation with Soft-labeling）。三者分别针对选择式端到端规划中“硬负样本难以区分”、“转弯场景方向性偏差”和“硬二元决策边界导致训练不稳定”三个关键瓶颈。
 
@@ -178,8 +170,6 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{ori}} + \mathcal{L}_{\mathrm{aug}} + \mathc
 
 推理阶段仅使用教师模型输出规划轨迹。自蒸馏软标签在 EPDMS 上达到 83.1，显著优于标签平滑（82.5）和温度缩放（82.7），验证了教师模型提供的结构化软监督信号比传统平滑方法更有效（Table 13）。
 
-
-
 ## 实验与关键发现
 
 ### 主要结果
@@ -188,24 +178,15 @@ DriveSuprim 在三个主流基准上均取得最优性能，且在不同视觉�
 
 在 **NAVSIM v1**（开环规划）上，DriveSuprim 以 ViT-L 骨干达到 **93.5% PDMS**，超过此前最优方法 **Hydra-MDP**（Li et al., arXiv 2024）的 89.9%，提升幅度达 **3.6 个百分点**（Table 2）。在轻量级 ResNet34 骨干下，DriveSuprim 也达到 89.9% PDMS，领先 **DiffusionDrive**（Liao et al., CVPR 2025）1.8 个百分点。
 
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2506_06659/figures/005_Table_2.jpg]]
-*Table 2: Evaluation on NAVSIM v1. Results are grouped by backbone types. Table 3: Evaluation on NAVSIM v2. Results are grouped by backbone types*
-
 在 **NAVSIM v2**（更严格的开环评估）上，DriveSuprim 以 ViT-L 达到 **87.1% EPDMS**，超过 **HydraMDP++** 的 85.6%，提升 **1.5 个百分点**（Table 3）。ResNet34 骨干下同样领先 HydraMDP++ 1.7 个百分点（83.1 vs 81.4）。
 
 在 **Bench2Drive**（闭环驾驶）上，DriveSuprim 取得 **83.02 Driving Score** 和 **60.00 Success Rate**，相比此前最优的 **AutoVLA**（Zhou et al., arXiv 2025）在 Driving Score 上提升 **4.18 分**（Table 4）。值得注意的是，DriveSuprim 在 Bench2Drive 上采用两阶段轨迹预测进行纵向控制，所有方法均使用相同数据集训练，未引入额外数据。
-
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2506_06659/figures/006_Table_4.jpg]]
-*Table 4: Evaluation on Bench2Drive*
 
 ### 消融实验
 
 #### 各模块贡献（Table 5）
 
 以 ResNet34 骨干在 NAVSIM v2 上的 EPDMS 为指标，逐步加入各模块的增益如下：
-
 
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2506_06659/figures/007_Table_5.jpg]]
 *Table 5: Ablation study on different proposed modules. “Multi-stage” denotes using coarse-to-fine selection, “Aug Data” denotes introducing rotation-based augmentation data, and “Self-distill” denotes adopting self-distillation*
@@ -221,7 +202,6 @@ DriveSuprim 在三个主流基准上均取得最优性能，且在不同视觉�
 
 进一步拆解选择策略的演变路径，揭示了一个重要洞察：
 
-
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2506_06659/figures/008_Table_6.jpg]]
 *Table 6: Ablation study of the evolution from single-stage selection to coarse-to-fine selection*
 
@@ -234,7 +214,6 @@ DriveSuprim 在三个主流基准上均取得最优性能，且在不同视觉�
 #### 精化设置消融（Table 10）
 
 最优精细评分配置为：**Refinement Decoder 3 层，Top-K = 256**。该设置在计算开销与性能间取得最佳平衡。将过滤策略扩展到更多阶段未能带来额外提升，表明当前的两阶段设计已接近该框架的收益上限。
-
 
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2506_06659/figures/015_Table_10.jpg]]
 *Table 10: Ablation on refinement setting. “Stage Layer” is the layer number of the Refinement Decoder, and “Top-K” denotes the number of trajectories selected by the coarse filtering stage. Table 11: Results with different soft label thresholds. $\delta _ { m }$ denotes the soft label threshold in the Equation 9*
@@ -256,7 +235,6 @@ DriveSuprim 在三个主流基准上均取得最优性能，且在不同视觉�
 
 在按转弯方向划分的数据子集上，DriveSuprim 在左转（NAVTESTl）、近直行（NAVTESTf）和右转（NAVTESTr）场景中均取得领先，验证了旋转数据增强对缓解方向性偏差的有效性。Figure 7 进一步显示，增强后数据集中转弯轨迹的出现频率显著提升，原本严重不足的转弯样本分布得到有效均衡。
 
-
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2506_06659/figures/009_Table_7.jpg]]
 *Table 7: EPDMS on three dataset splits. NAVTESTl, NAVTESTf, and NAVTESTr involve left-turning scenarios, near-forward scenarios, and right-turning scenarios*
 
@@ -267,17 +245,6 @@ DriveSuprim 在三个主流基准上均取得最优性能，且在不同视觉�
 ### 推理效率（Table 14）
 
 在参数量和推理速度的对比中，DriveSuprim 在保持领先精度的同时，未显著增加推理开销，具备实际部署的可行性。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2506_06659/figures/001_Table_1.jpg]]
-*Table 1: PDM score of the best trajectory in the top-K candidates on ranked predicted scores*
-
-
-*Table 8: The inference coefficients on each metric of NAVSIM v1. “Imi” denotes the imitation metric, “Mul” denotes the multiplied penalties, an$d ^ { \mathrm { \bullet } } \mathrm { A v g } ^ { \mathrm { \bullet } }$ denotes the weighted averages. Table 9: The inference coefficients on each metric of NAVSIM v2. “Imi” denotes the imitation metric, “Mul” denotes the multiplied penalties, and “Avg” denotes the weighted averages
-
-
-
 
 
 ## 定位与知识库关联
@@ -317,8 +284,6 @@ DriveSuprim 相对于选择式规划基线的改进集中在三个关键槽位�
 1. **更有效的多阶段细化策略**：当前两阶段设计已达瓶颈，如何设计能持续带来增益的层次化选择机制（如自适应阶段数、基于不确定性的候选扩充）是值得探索的方向。
 2. **安全约束的显式建模**：当前方法依赖模仿学习和评分损失隐式学习安全行为，能否结合强化学习的安全约束或可达性分析，构建更鲁棒的规划系统，是一个重要的开放问题。
 3. **候选词汇表的动态生成**：DriveSuprim 依赖固定的预定义轨迹词汇表，在开集场景下可能覆盖不足。如何将粗到细选择与在线轨迹生成相结合，平衡效率与覆盖度，值得进一步研究。
-
-
 
 ## 原文 PDF
 

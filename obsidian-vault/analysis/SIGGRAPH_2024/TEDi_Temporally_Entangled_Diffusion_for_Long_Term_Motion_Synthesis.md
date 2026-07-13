@@ -52,8 +52,6 @@ claims:
 
 **主要结果**：在包含35名参与者的感知研究中，TEDi在运动多样性（34票 vs MDM的12票）和运动质量（33票 vs MDM的17票）上均显著优于MDM、ACRNN和Motion VAE等基线方法。消融实验证实，随机噪声调度是避免运动生成崩溃和维持长期多样性的关键因素——若仅使用单调调度，生成运动的方差会大幅下降。TEDi还支持运动引导生成和轨迹控制等扩展应用，能够根据给定的关键姿态或路径约束合成自然的长时运动。
 
-
-
 ### 问题背景
 
 生成逼真且多样化的人体运动序列是计算机图形学与具身人工智能领域的核心挑战之一，其应用涵盖动画制作、虚拟角色控制、机器人运动规划等。近年来，扩散模型（Diffusion Models）在图像、视频和运动生成任务中展现出强大的表现力，逐步成为运动合成的主流范式。然而，现有基于扩散的运动生成方法存在一个根本性局限：**它们被设计为一次性生成固定长度的短序列，无法直接合成任意长度的长时运动**。
@@ -77,8 +75,6 @@ claims:
 本文的核心动机源于对扩散过程本质的重新审视：**扩散模型的去噪过程本身是渐进的**——从纯噪声出发，经过多个时间步逐步恢复出干净信号。这一渐进特性与长时运动序列的时序展开具有天然的对应关系。如果能够将**扩散过程的时间轴与运动序列的时间轴进行纠缠（entangle）**，使得运动序列中的每一帧对应不同的噪声水平，那么就可以利用扩散模型的逐步去噪机制，持续产生新的干净运动帧，从而实现无限长、高质量的运动序列合成。
 
 基于这一洞察，本文提出了**TEDi（Temporally-Entangled Diffusion）**框架，通过引入**时序变化的噪声调度**和**运动缓冲区递归生成机制**，从根本上突破了现有方法在生成长度、运动质量和多样性方面的瓶颈。
-
-
 
 ## 核心方法与创新机理
 
@@ -108,8 +104,6 @@ TEDi 提出**运动缓冲区递归生成**机制（Fig. 3）：维护一个噪�
 ---
 
 **因果枢纽总结**：时序纠缠的本质是通过让扩散模型适应帧级变化噪声水平，将扩散的逐步去噪机制转化为持续产生新干净帧的引擎。三个 changed slots 中，帧级噪声注入是**使能条件**，缓冲区递归生成是**推理机制**，物理感知损失是**质量保障**——三者协同实现了无限长、高质量、物理合理的运动合成。
-
-
 
 TEDi（Temporally-Entangled Diffusion）的核心思想是将扩散过程的去噪时间轴与运动序列的时间轴进行纠缠，从而突破传统扩散模型只能生成固定长度短序列的限制。其整体框架由训练和推理两条协同设计的流程构成，共享同一个去噪网络，但噪声调度策略和生成范式截然不同。
 
@@ -177,13 +171,6 @@ $$\mathcal{L}_{\mathrm{contact}} = \frac{1}{K C} \sum_{j} \sum_{t=1}^{K-1} \left
 2. 训练时：$\mathbf{M}$ → **前向噪声注入**（混合调度）→ 噪声运动 → **1D U-Net** → 预测干净运动 → **损失函数组合**（$\mathcal{L}_{\mathrm{diff}} + \mathcal{L}_{\mathrm{pos}} + \mathcal{L}_{\mathrm{contact}}$）→ 反向传播
 3. 推理时：初始引导序列 → **运动缓冲区初始化** → 循环执行（**1D U-Net 去噪** → 弹出干净帧 → 推入噪声帧）→ 无限长运动序列输出
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l26_TEDi_Temporally_Entangled_Diffusion_for_Long_Term_Motion_Synthesis/figures/001_Figure_1.jpg]]
-*Figure 1: Inspired by the gradual nature of the diffusion process along a diffusion time-axis (left), our approach (right) entangles the temporal-axis of motion with the time-axis of the diffusion process (right), enabling a new mechanism for synthesizing arbitrarily long motion sequences*
-
-
-
 TEDi 的核心贡献在于将标准 DDPM 中全局统一的时间步噪声，替换为**沿运动时间轴逐帧变化的噪声调度**，从而将扩散过程的“去噪时间轴”与运动序列的“时序轴”纠缠在一起。这一设计使得模型能够学习从任意噪声水平组合中恢复干净运动，进而支撑自回归式的无限长序列生成。
 
 ### 运动表示
@@ -250,9 +237,6 @@ $$
 
 推理过程维护一个长度为 $K$ 的运动缓冲区，其噪声水平沿时间轴单调递增（采用单调调度）。生成循环包含三步（Fig. 3）：
 
-![[assets/figures/papers/paper_list_l26_TEDi_Temporally_Entangled_Diffusion_for_Long_Term_Motion_Synthesis/figures/003_Figure_3.jpg]]
-*Figure 3: TEDi Recursive Generation. TEDi is capable of generating an arbitrarily long motion sequence. First, we initialize our motion buffer with a a set of increasingly-noised motion frames. Then (step 1) we denoise the entire motion buffer, (step 2) pop the new, clean frame in the beginning of the motion buffer, and then (step 3) push noise into the end of the motion buffer. This process is repeated recursively*
-
 1. **去噪**：将整个缓冲区送入训练好的 1D U-Net，预测干净运动序列。
 2. **弹出**：取出去噪后缓冲区的第一帧作为生成的干净帧输出。
 3. **推入**：在缓冲区末尾追加一帧纯噪声（$\beta_T$ 对应的高斯噪声），保持缓冲区长度不变。
@@ -262,13 +246,6 @@ $$
 ### 去噪网络架构
 
 去噪网络采用 **1D U-Net** 结构，沿运动时间轴执行一维卷积、自注意力和跳跃连接。原文未披露具体的层数、通道数和注意力头数配置，这些细节对生成质量和效率的影响属于开放问题。网络接收噪声运动缓冲区和对应的噪声步信息，输出预测的干净运动序列。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l26_TEDi_Temporally_Entangled_Diffusion_for_Long_Term_Motion_Synthesis/figures/002_Figure_2.jpg]]
-*Figure 2: TEDi Training. We train our diffusion-based model to remove temporally-varying noise that is applied to clean sequences during training. In each iteration we fetch a motion sequence of ?? frames*
-
-
 
 ## 实验与关键发现
 
@@ -305,13 +282,7 @@ TEDi 能够生成任意长度的运动序列。Fig. 4 展示了一段 33 秒的�
 
 TEDi 支持通过运动引导（motion guides）实现交互式生成。给定一组目标运动片段 $Q$（Fig. 7 中以黄色标记），模型通过在运动缓冲区中替换对应帧为引导帧的加噪版本，在引导帧之间自动合成合理的过渡运动（蓝色标记）。生成的过渡运动能够“准备和规划”即将到来的引导动作，实现平滑衔接。
 
-![[assets/figures/papers/paper_list_l26_TEDi_Temporally_Entangled_Diffusion_for_Long_Term_Motion_Synthesis/figures/005_Figure_7.jpg]]
-*Figure 7: Guided Generation. Given a set of motion guides Q?? (shown in yellow), we are able to perform them in sequence at desired points while generating plausible motion in the interactively generated frames (blue). From top-left to bottom-right, our method generates an entire motion sequence that contains the desired motion guides and the interactively synthesized motion. The interactively generated motions will “prepare and plan” for the upcoming motion guides. See the supplementary video*
-
 类似地，轨迹控制通过修改运动缓冲区中的根位移和根高度信息实现。Fig. 8 展示了给定期望轨迹 $P \in \mathbb{R}^{3 \times N}$ 后，TEDi 生成的自然运动能够准确遵循指定路径，同时保持动作的物理合理性。
-
-![[assets/figures/papers/paper_list_l26_TEDi_Temporally_Entangled_Diffusion_for_Long_Term_Motion_Synthesis/figures/008_Figure_8.jpg]]
-*Figure 8: Trajectory Control. Similar to guided generation, given the desired trajectory information P (shown in yellow), our method can generate natural motions that adhere to the given trajectory*
 
 ### 消融实验：随机噪声调度的关键作用
 
@@ -333,13 +304,6 @@ TEDi 的主要局限在于推理延迟：从纯噪声生成干净帧需要经过
 ### 公平性说明
 
 感知研究中各基线模型的训练数据集、参数规模和计算资源可能不完全相同，这可能影响结果的绝对公平性。但 TEDi 在多样性和质量上的优势幅度（票数差距超过两倍）表明，时序纠缠机制带来的增益不太可能完全归因于训练配置差异。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l26_TEDi_Temporally_Entangled_Diffusion_for_Long_Term_Motion_Synthesis/figures/011_Figure_12.jpg]]
-*Figure 12: Example motions from perceptual study. From top to bottom: Ours, ACRNN, MDM, and Motion VAE*
-
-
 
 ## 定位与知识库关联
 
@@ -392,8 +356,6 @@ TEDi 在标准扩散损失之外引入了两个辅助损失，以缓解旋转误
 4. **损失权重自动调优**：$\lambda_{\mathrm{diff}}, \lambda_{\mathrm{pos}}, \lambda_{\mathrm{contact}}$ 的最优选择可能依赖于运动类型和数据集特性，开发自适应权重策略可提升方法的鲁棒性。
 
 5. **感知评估的局限性**：当前主要评估依赖 Amazon Mechanical Turk 上的 35 人感知研究（Table 1），TEDi 在多样性（34 vs MDM 12）和质量（33 vs MDM 17）上均显著领先。但各基线模型的训练数据集、参数规模和计算资源可能不完全相同，这影响了结果的绝对公平性——需要更标准化的基准测试来验证结论的稳健性。
-
-
 
 ## 原文 PDF
 

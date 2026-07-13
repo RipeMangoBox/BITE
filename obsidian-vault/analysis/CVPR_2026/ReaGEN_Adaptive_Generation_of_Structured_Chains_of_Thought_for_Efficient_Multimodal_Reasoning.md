@@ -50,8 +50,6 @@ ReaGEN 的核心洞察在于：将思维链结构本身视为可学习的对象�
 
 实验结果表明，ReaGEN 在多个多模态推理基准上相较测试时缩放方法最高提升26个绝对准确率百分点，同时将推理时平均token使用量降低79%（相当于4倍token消耗缩减），VLM调用次数平均减少53%。在MMMU-Pro 10选任务上，通过迭代调用GEN进一步优化思维链，3次迭代即可达到51.90%的准确率，超越单次预测。消融实验证实，移除注意力衍生信号后所有基准性能一致下降，验证了注意力引导对有效阶段选择的关键作用。ReaGEN 在视觉为主的任务（VStar、MMStar）上恢复了教师搜索的大部分性能，且在数学中心数据集上训练的GEN能有效泛化到视觉基准，展现出良好的跨领域迁移能力。
 
-
-
 ### 问题背景
 
 当前大型视觉语言模型（LVLM）在需要多步骤视觉推理的任务中面临一个核心矛盾：直接生成最终答案的方式难以可靠地引出结构化、多步骤的推理过程，模型往往跳过关键的中间推理环节，导致在复杂多模态基准上的表现不佳。与此同时，增强推理能力的现有方法在两个方向上各有代价：
@@ -70,8 +68,6 @@ ReaGEN 的核心洞察在于：将思维链结构本身视为可学习的对象�
 ReaGEN的提出基于以下核心洞察：**将思维链结构本身视为可学习的对象**。具体而言，通过利用推理过程中VLM的跨阶段注意力流，可以量化每个推理阶段对最终答案的直接与间接贡献（即阶段重要性），这一因果信号能够有效地区分高效与低效的推理阶段。基于此信号，可以通过教师引导的进化搜索自动发现每道问题的最优思维链结构，并训练一个轻量级生成器（GEN）来预测样本自适应的思维链，从而在推理时以单路径效率获得多路径搜索的灵活性，且无需微调基座VLM。
 
 这一设计旨在同时解决两个关键问题：（1）**效率**——避免推理时的昂贵搜索，将VLM调用次数从数十次降至2-5次；（2）**自适应能力**——为每个样本生成定制化的推理结构，而非依赖固定模板。
-
-
 
 ## 核心方法与创新机理
 
@@ -115,8 +111,6 @@ $$\mathrm{Imp}(i) = \underbrace{A_{i,F}}_{\mathrm{direct}} + \underbrace{\sum_{j
 
 消融实验（Table 3）揭示了 GEN 与教师引导搜索之间的能力边界：在视觉为主的任务（VStar、MMStar）上，ReaGEN 恢复了教师搜索的大部分性能，表明 GEN 能有效学习典型的推理结构；而在数学密集型任务（MathVision）上，ReaGEN 与完全教师搜索仍有一定差距，说明 GEN 在捕捉复杂数值推理模式方面仍有提升空间。这一差距也指向了未来工作的方向——可能通过强化学习使 GEN 在推理过程中根据结果反馈持续在线优化。
 
-
-
 ReaGEN 的核心思路是将**思维链（CoT）的结构本身**视为可学习的对象：它不修改基座视觉语言模型（VLM），而是训练一个轻量级生成器（GEN），在推理时根据输入样本自适应地预测最优的推理阶段序列，从而以单路径的效率获得多路径搜索的灵活性与鲁棒性。整个框架由三个关键阶段构成，其流程关系如 Figure 1 所示。
 
 ![[assets/figures/papers/paper_list_l2224_https_openaccess_thecvf_com_content_CVPR2026_html_Tian_ReaGEN_Adaptive_G/figures/001_Figure_1.jpg]]
@@ -146,8 +140,6 @@ ReaGEN 的核心思路是将**思维链（CoT）的结构本身**视为可学习
 - **推理**：输入样本 → 默认 CoT 执行（收集注意力）→ **GEN** 预测自适应 CoT → 最终 CoT 执行 → 答案；可选迭代将新注意力反馈至 GEN 进行优化
 
 这种设计使 ReaGEN 在保持基座 VLM 冻结的前提下，实现了对推理结构的显式建模与自适应优化，为多模态推理的效率与准确性提供了新的平衡点。
-
-
 
 ReaGEN 的核心机制围绕一个洞察展开：**思维链的结构（阶段序列）本身是可学习的对象**。系统通过教师引导的进化搜索自动发现每道问题的最优思维链，再训练一个轻量级生成器（GEN）在推理时预测样本自适应的结构，从而将多路径搜索的灵活性压缩为单路径推理的效率。以下按功能模块拆解其关键设计与公式。
 
@@ -203,8 +195,6 @@ $$\bar{\Psi}(E^{\mathrm{Img}}, E^{\mathrm{Q}}, A, \tau^{\mathrm{init}})$$
 
 在推理时，GEN 以自回归方式预测阶段 ID 序列，并通过两个输出头分别预测阶段序列和思维链长度。整个过程仅需 2 次 VLM 调用（一次收集注意力信号，一次执行预测的思维链），或通过迭代优化扩展至 3-4 次调用，在保持基座 VLM 完全冻结的前提下实现了样本自适应的结构化推理。
 
-
-
 ## 实验与关键发现
 
 ### 核心结果：多模态推理基准上的性能与效率
@@ -231,8 +221,6 @@ ReaGEN的迭代优化机制在困难任务上展现出持续增益。在MMMU-Pro
 
 所有对比实验均基于相同的冻结学生模型Qwen3-VL-4B，确保了公平性。对于VReST基线，论文还额外报告了使用与ReaGEN相同教师模型（Qwen3-VL-32B）作为奖励模型的结果，以排除教师模型能力差异的影响。需要指出的是，ReaGEN假设可以访问学生VLM的内部注意力信号，因此主要适用于自托管或开源VLM；对于无法暴露注意力的闭源API模型，本方法不适用。此外，GEN的训练质量依赖于教师模型的搜索能力，若教师模型本身能力不足，可能无法探索到足够好的思维链结构。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2224_https_openaccess_thecvf_com_content_CVPR2026_html_Tian_ReaGEN_Adaptive_G/figures/002_Table_1.jpg]]
 *Table 1: ReaGEN results on composite benchmarks. All numbers are accuracy (%). Bold denotes the best performance in each benchmark. Color-coded arrows show absolute change relative to the VReST baseline using the same student model (Qwen3-VL-4B).We also report VReST (Teacher-Reward, 32B), where VReST uses Qwen3-VL-4B as the base model and Qwen3-VL-32B as the reward model during search, matching the teacher used by ReaGEN. 2 iter denotes a single-pass ReaGEN: the first student call uses a default/seed CoT to collect attention; GEN predicts a tailored CoT; the second student call produces the final answer under that predicted CoT. Larger iteration counts $(\ge$ 3 ) indicate additional GEN-guided refinem...*
 
@@ -241,8 +229,6 @@ ReaGEN的迭代优化机制在困难任务上展现出持续增益。在MMMU-Pro
 
 ![[assets/figures/papers/paper_list_l2224_https_openaccess_thecvf_com_content_CVPR2026_html_Tian_ReaGEN_Adaptive_G/figures/006_Table_3.jpg]]
 *Table 3: Ablation: Teacher-Guided Search vs. ReaGEN. “T-Search” denotes the accuracy obtained by directly using the teacher-guided search output (no GEN). MMMU = MMMU(val), MVerse = MathVerse (w/o vision)*
-
-
 
 ## 定位与知识库关联
 
@@ -307,8 +293,6 @@ GEN的训练数据来自教师引导的进化搜索，搜索质量直接取决�
 
 **（4）在线强化学习的融合**
 当前GEN完全依赖离线搜索数据进行训练。能否将ReaGEN与强化学习相结合，使GEN在推理过程中根据结果反馈持续在线优化？这将消除对离线搜索数据的依赖，使系统具备自我改进能力，但同时引入了奖励信号稀疏性和训练稳定性等新挑战。
-
-
 
 ## 原文 PDF
 

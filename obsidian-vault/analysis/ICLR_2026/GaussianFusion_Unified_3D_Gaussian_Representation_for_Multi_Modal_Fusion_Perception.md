@@ -72,8 +72,6 @@ claims:
 
 消融实验进一步验证了关键设计的有效性：前向投影高斯初始化相比随机初始化带来+2.8 NDS提升（Table 8），共享高斯编码器相比独立编码器提升+0.7 mAP（Table 9），带有高斯先验的可变形注意力相比普通可变形注意力提升+0.4 NDS（Table 9），增量参数更新相比预测全新参数提升+0.9 mAP（Table 9）。这些结果一致表明，连续高斯表示及其配套设计是突破离散BEV瓶颈的有效路径。
 
-
-
 ### 离散BEV表示：多模态融合的性能瓶颈
 
 多模态3D感知——尤其是相机与激光雷达的融合——已成为自动驾驶系统的核心感知范式。其主流技术路线是将异构传感器数据统一投影到鸟瞰图（BEV）空间进行特征融合。代表性的工作如 **BEVFusion**（Liu et al., ICRA 2023）、**UniTR**（Wang et al., ICCV 2023）和 **MetaBEV**（Ge et al., ICCV 2023），均基于离散BEV网格构建融合架构，在nuScenes等基准上取得了显著成果。
@@ -107,8 +105,6 @@ claims:
 3. **融合机制**：如何从数学上自然地聚合两个高斯集合，而非简单地在BEV空间拼接特征？
 
 GaussianFusion的提出正是为了系统性地解决上述挑战，其核心洞察在于：**利用3D高斯函数的连续性和协方差矩阵的自适应不确定性建模能力，在统一高斯空间中实现多模态特征的自然对齐与互补增强，从而突破离散BEV的性能瓶颈。**
-
-
 
 ## 核心方法与创新机理
 
@@ -156,8 +152,6 @@ $$f(\mathbf{p}) = \sum_{i=1}^{J} \hat{g}_i (\mathbf{p}; \pmb{\mu}, \mathbf{s}, \
 
 上述创新点构成了一条清晰的因果链：**前向投影初始化**为相机高斯提供了有意义的3D初始位置 → **共享编码器**在迭代优化过程中实现跨模态特征对齐 → **高斯先验注意力**使特征采样更精准 → **增量更新**确保优化稳定性 → **GMM融合**在保留空间信息的前提下完成模态聚合。这一链条的终端效果是，GaussianFusion在nuScenes 3D目标检测上以200×200的BEV尺寸实现74.0 NDS，相比BEVFusion同尺寸下的71.4 NDS提升**+2.6**（Table 1），同时推理延迟降低15.4%，内存占用降低16.9%（Table 3）。
 
-
-
 GaussianFusion 提出了一套从离散 BEV 到连续 3D 高斯表示的统一多模态融合流水线。其核心设计思想是：将相机和 LiDAR 两种模态的特征分别初始化为独立的 3D 高斯分布，通过共享高斯编码器进行迭代优化与跨模态对齐，随后利用高斯混合模型自然聚合为统一的场景表示，最后经体素化后送入任务专用头完成下游感知。
 
 **整体数据流** 如图 2 所示，框架包含以下关键模块及其输入输出关系：
@@ -183,15 +177,8 @@ GaussianFusion 提出了一套从离散 BEV 到连续 3D 高斯表示的统一�
 
 **与基线范式的关键差异**：传统 BEVFusion（Liu et al., ICRA 2023）将多模态特征投影到离散 BEV 网格后进行拼接或求和，早期量化导致边缘和纹理细节丢失。GaussianFusion 将场景表示为连续 3D 高斯分布，利用协方差矩阵的自适应不确定性建模能力，在高维高斯空间中完成特征对齐与融合，仅在最后阶段才进行体素化以兼容下游任务头。这一“先连续融合、后离散化”的策略在 nuScenes 3D 检测中相比 BEVFusion 同 BEV 尺寸下 NDS 提升 2.6（74.0 vs 71.4, Table 1），同时推理延迟降低 15.4%、显存降低 16.9%（Table 3）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_7jXxQ9bGoU/figures/003_Figure_2.jpg]]
 *Figure 2: Overview of the GaussianFusion framework. Initial Gaussians are refined by a shared encoder and fused in Gaussian space, followed by task-specific heads for 3D perception*
-
-![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_7jXxQ9bGoU/figures/002_Figure_1.jpg]]
-*Figure 1: Comparison of the discrete BEV representation fusion paradigm (Liu et al., 2023b) and our proposed continuous Gaussian representation fusion paradigm. B, G, C, L, and F denote BEV, Gaussian, Camera, Lidar, and Fusion*
-
-
 
 GaussianFusion 的核心设计围绕“将离散 BEV 网格替换为连续 3D 高斯表示”这一因果开关展开，整个框架由四个关键模块串联：高斯初始化、共享高斯编码器、高斯混合融合以及高斯到体素的转换。
 
@@ -254,8 +241,6 @@ $$\hat{g} = \frac{1}{M} [\sum \mu_m, \sum \mathbf{s}_m, \sum \mathbf{r}_m], \qua
 
 这一设计使高斯混合模型天然处理了多模态分布的对齐与互补，避免了 BEV 融合中因离散化造成的空间信息丢失。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能验证：3D目标检测
@@ -264,9 +249,6 @@ GaussianFusion在nuScenes 3D目标检测任务上展现了显著的性能优势�
 
 ![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_7jXxQ9bGoU/figures/005_Table_2.jpg]]
 *Table 2: Comparisons with state-of-the-art 3D object detection methods on nuScenes dataset. C denote Camera, L denote Lidar. All methods construct BEV-based feature maps instead of objectcentric fusion based on proposals, which means these methods can also be naturally used for semantic tasks. UniTR uses a unified backbone for both the camera and Lidar*
-
-![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_7jXxQ9bGoU/figures/006_Table_3.jpg]]
-*Table 3: Latency and performance on nuScenes val. set*
 
 **效率瓶颈的突破**：GaussianFusion在推理效率上同样表现出色。在相同验证条件下，其推理延迟为132 ms，相比BEVFusion的156 ms降低了**15.4%**；显存占用从5140 MB降至4271 MB，降幅达**16.9%**（Table 3）。这一效率提升的核心在于连续的3D高斯表示避免了高分辨率BEV网格带来的计算负担，使得模型可以在较低分辨率设置下获得更优的性能。
 
@@ -298,9 +280,6 @@ GaussianFusion-T将历史帧的高斯表示通过运动补偿变换到当前时�
 
 在Waymo Open Dataset上的验证（Table 6）表明，GaussianFusion的连续高斯融合范式具有良好的跨数据集泛化能力，其性能优势不依赖于特定的传感器配置或场景分布。
 
-![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_7jXxQ9bGoU/figures/009_Table_6.jpg]]
-*Table 6: Waymo Open Dataset Result*
-
 ### 定性分析
 
 Figure 4展示了GaussianFusion在3D目标检测和语义占用预测任务上的定性结果。在目标检测场景中，融合后的高斯表示能够更准确地捕获物体的边界和朝向，尤其是对于细长物体（如卡车、公交车）和部分遮挡目标。在语义占用预测中，连续高斯表示有效保留了场景的精细几何结构，相比离散BEV方法在物体边缘和细小结构（如行人、护栏）的预测上更为锐利和完整。
@@ -309,24 +288,11 @@ Figure 4展示了GaussianFusion在3D目标检测和语义占用预测任务上�
 
 论文未明确报告具体的失败案例或定量局限性分析。从方法设计角度推断，潜在的失效场景可能包括：1）深度估计误差较大的区域（如远距离、镜面反射表面），前向投影初始化可能引入偏差，尽管后续的迭代更新具有一定纠偏能力；2）极端稀疏的LiDAR观测区域，高斯参数的估计可能因缺乏足够约束而退化。这些推断需在后续实验中进行手动验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_7jXxQ9bGoU/figures/012_Table_8.jpg]]
 *Table 8: Ablation of Gaussian initialization strategy*
 
-![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_7jXxQ9bGoU/figures/011_Table_9.jpg]]
-*Table 9: Ablation of the proposed Gaussian Encoder. DA.G means Deformable Attention with Gaussian*
-
 ![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_7jXxQ9bGoU/figures/013_Figure_4.jpg]]
 *Figure 4: Qualitative results on object detection and 3D semantic occupancy prediction*
-
-![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_7jXxQ9bGoU/figures/008_Table_5.jpg]]
-*Table 5: Semantic scene completion results on nuScenes (Wei et al., 2023; Caesar et al., 2020) val set. † represents trained on nuScenes. For Camera-only and C+L, the top performance is indicated in bold black and bold blue, respectively*
-
-![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_7jXxQ9bGoU/figures/007_Table_4.jpg]]
-*Table 4: Comparison with temporal methods*
-
-
 
 ## 定位与知识库关联
 
@@ -375,8 +341,6 @@ GaussianFusion为多模态融合提供了一个“连续表示”的新范式，
 3. **增量高斯更新**：预测参数偏移而非全新参数的更新策略，带来+0.9 mAP的提升，适用于任何迭代优化的高斯场景表示框架。
 
 这些组件为后续工作提供了明确的改进接口：例如，可将运动信息编码为高斯参数的时序演化规律，实现4D高斯场景流建模；或将高斯先验注意力推广到其他跨模态对齐任务（如文本-3D、图像-点云配准）。
-
-
 
 ## 原文 PDF
 

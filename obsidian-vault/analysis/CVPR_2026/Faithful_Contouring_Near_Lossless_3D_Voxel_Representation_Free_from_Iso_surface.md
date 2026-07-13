@@ -169,8 +169,6 @@ FaithC 进一步构建了基于 FCT 的 VAE 框架：编码器采用级联稀疏
 
 图3 直观展示了上述编码-解码流程中数据形态的转换：输入网格 → 活跃体素 → 交点质心 → 锚点拟合 → 半轴编码 → FCT → 聚合 → 定向 → 重网格化输出。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2079_https_arxiv_org_abs_2511_04029/figures/003_Figure_3.jpg]]
 *Figure 3: Faithful Contour pipeline. Encoder voxelizes the input mesh, then computes centroids, anchors, and semi-axis intersections, and stores them in the Faithful Contour Token (FCT) on K active voxels. Decoder gathers anchors, resolves orientations, and remeshes the tokens into highfidelity surfaces*
 

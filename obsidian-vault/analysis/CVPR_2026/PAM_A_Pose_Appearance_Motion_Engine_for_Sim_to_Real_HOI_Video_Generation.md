@@ -58,8 +58,6 @@ claims:
 - 消融实验证实，同时使用深度、分割和关键点三种条件在所有指标上均取得最佳性能。
 - 下游任务验证：使用 50% 真实数据加上 PAM 生成的 3400 个合成视频，手部姿态估计模型可达到与 100% 真实数据基线相同的 PA-MPJPE（5.5 mm），证明了合成数据的实用价值。
 
-
-
 ### 手物交互视频生成的困境
 
 手物交互（Hand-Object Interaction, HOI）视频生成在机器人操作学习、虚拟现实和增强现实中具有重要价值。高质量 HOI 视频能够为下游任务（如手部姿态估计、机器人策略学习）提供可扩展的训练数据。然而，真实世界中采集大规模、标注完备的 HOI 视频成本极高，这催生了从仿真向真实域迁移（sim-to-real）的生成需求。
@@ -82,8 +80,6 @@ PAM 的核心洞察是：将复杂的高维 HOI 视频生成任务解耦为三�
 2. **多模态桥接仿真与真实域**：深度图、语义分割、手部关键点三类条件在仿真器中可精确渲染，在真实域中可估计或标注，构成了跨越域差异的稳定信号桥梁。
 
 通过这一解耦设计，PAM 首次实现了无需任何真实帧输入的完整 HOI 视频生成引擎，为 sim-to-real 数据扩展提供了可行的技术路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -137,8 +133,6 @@ PAM 的创新在定量指标上得到充分验证：
 
 PAM 的创新不仅体现在生成质量上，更体现在合成数据的实际效用。在 DexYCB 数据集上，使用 **50% 真实数据 + PAM 生成的 3400 个合成视频**训练 SimpleHand 手部姿态估计模型，可达到与 100% 真实数据基线相同的 PA-MPJPE（5.5 mm）。这一结果直接证明了 PAM 在可扩展 HOI 数据生成中的实用价值，为仿真到真实的数据增强提供了可行路径。
 
-
-
 ### 问题定义与核心映射
 
 PAM 的目标是实现仿真到真实（sim-to-real）的手物交互（HOI）视频生成。给定初始手部姿态 $\mathbf{h}_0$、物体网格 $\mathbf{m}$（不含外观）、初始物体 6-DoF 姿态 $\mathbf{o}_0$ 和目标手部姿态 $\mathbf{h}_T$，生成模型学习一个映射：
@@ -184,12 +178,8 @@ Figure 2 将 PAM 与三种现有 HOI 合成范式进行了对比：
 
 PAM 的独特之处在于：视频生成既不依赖真实第一帧，也不需要完整的 HOI 姿态序列，从而实现了从仿真器到真实世界视频的真正迁移。这一设计使 PAM 成为首个统一姿态-外观-运动的 sim-to-real HOI 视频生成引擎。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l5_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_PAM_A_Pose_Appeara/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of our three-stage generation pipeline. (1) Pose Generation: A pretrained pose generation model generates the intermediate hand-object interaction (HOI) poses based on the initial and target poses, along with the object mesh. (2) Appearance Generation: A controllable image diffusion model synthesizes the first frame of the video, conditioned on multi-modal inputs (depth maps, semantic masks, and keypoint annotations). (3) Motion Generation: The generated HOI sequence and the first frame are rendered into a full video sequence by a video diffusion model, conditioned on the same multi-modal inputs used in the appearance generation stage*
-
-
 
 PAM 将高维手物交互视频生成任务解耦为三个顺序阶段：姿态生成、外观生成、运动生成。每个阶段专注于不同属性，并通过统一的多模态条件驱动，实现从仿真姿态序列到真实视频的迁移。
 
@@ -241,13 +231,6 @@ $$\mathbf{MF} = \frac{1}{|\tilde{\mathcal{T}}|} \sum_{\tilde{\tau} \in \tilde{\m
 
 三个阶段的解耦设计使得每个模块可独立优化和替换：姿态生成专注运动合理性，外观生成专注视觉真实感，运动生成专注时序连贯性。多模态条件（深度、语义、关键点）贯穿外观与运动两阶段，形成统一的几何-语义-姿态表示空间，是实现仿真到真实域迁移的核心机制。消融实验（Table 3）证实，三种条件联合使用在所有指标（FVD、LPIPS、MPJPE）上均优于单一或两条件组合，验证了多模态互补信息的必要性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l5_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_PAM_A_Pose_Appeara/figures/001_Figure_1.jpg]]
-*Figure 1: (a) Pose Generation. Given an initial and target hand–object pose, our pose generation module synthesizes a full MANO-based HOI trajectory. (b) Appearance Generation. Conditioned on rendered hand–object geometry, the appearance model produces diverse and realistic reference frame. (c) Motion Generation. Using the same rendered conditions, the motion model generates the full HOI video with coherent dynamics and hand–object interactions. (d) Quality and Downstream Validation. Our unified engine substantially improves video fidelity and geometric accuracy over prior methods*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -272,14 +255,9 @@ PAM 在两个主流手物交互基准上进行了全面评估，并与当前最�
 
 Figure 8 展示了 PAM 在 OAKINK2 上的零样本图像到视频（i2v）生成结果。模型仅使用 DexYCB 训练权重，无需在 OAKINK2 上微调，即可生成具有合理手物交互和运动一致性的视频序列，初步验证了该框架的跨数据集泛化潜力。
 
-![[assets/figures/papers/paper_list_l5_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_PAM_A_Pose_Appeara/figures/012_Figure_8.jpg]]
-*Figure 8: Zero-shot result on OAKINK2 dataset for i2v task. We use the weight trained on DexYCB dataset*
-
 ### 失败模式与局限性
 
 尽管 PAM 在主实验和消融中表现优异，论文指出了以下局限性：首先，未讨论模型的计算开销和推理速度，实际部署效率有待量化；其次，当前框架聚焦于单手-单物体场景，尚未扩展到多物体交互或双手协作等更复杂的 HOI 场景；最后，外观生成和运动生成阶段目前为顺序解耦训练，尚未实现端到端联合优化，可能限制了整体生成质量的上限。这些方面需要后续工作进一步探索，当前结论需结合这些限制审慎解读。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l5_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_PAM_A_Pose_Appeara/figures/004_Table_1.jpg]]
 *Table 1: Quantitative comparison on DexYCB dataset. Our method is evaluated against CosHand, InterDyn, and ManiVideo. Results for InterDyn and ManiVideo are taken from their original papers. For fair comparison, CosHand was fine-tuned on the s0-split training set identical to ours. Our approach achieves state-of-the-art performance across all metrics (FVD, LPIPS, MF, MPJPE) while generating high-resolution 480x720 videos*
@@ -290,22 +268,8 @@ Figure 8 展示了 PAM 在 OAKINK2 上的零样本图像到视频（i2v）生成
 ![[assets/figures/papers/paper_list_l5_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_PAM_A_Pose_Appeara/figures/006_Table_3.jpg]]
 *Table 3: Ablation study on input conditions on DexYCB dataset*
 
-![[assets/figures/papers/paper_list_l5_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_PAM_A_Pose_Appeara/figures/010_Table_4.jpg]]
-*Table 4: Downstream task evaluation on SimpleHand [92]*
-
 ![[assets/figures/papers/paper_list_l5_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_PAM_A_Pose_Appeara/figures/007_Figure_4.jpg]]
 *Figure 4: Qualitative comparison against CosHand. Example results on DexYCB and OAKINK2 highlight the strengths of our method in two key areas: (1) higher visual fidelity in both foreground and background generation, and (2) improved geometric accuracy of the synthesized hand poses*
-
-![[assets/figures/papers/paper_list_l5_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_PAM_A_Pose_Appeara/figures/011_Figure_7.jpg]]
-*Figure 7: Data augmentation analysis with varying ratios of real data. We augment different portions of the DexYCB training set (25%, 50%, 75%, 100%) with our generated synthetic data. The baseline (dashed line) indicates performance when training solely on 100% of the real DexYCB data without synthetic augmentation*
-
-![[assets/figures/papers/paper_list_l5_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_PAM_A_Pose_Appeara/figures/009_Figure_6.jpg]]
-*Figure 6: Sim-to-real transfer results. Our pipeline can generate realistic videos given initial and target states with diversity*
-
-![[assets/figures/papers/paper_list_l5_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_PAM_A_Pose_Appeara/figures/008_Figure_5.jpg]]
-*Figure 5: Ablation study on input conditions on DexYCB dataset*
-
-
 
 ## 定位与知识库关联
 
@@ -359,8 +323,6 @@ PAM 的适用边界由其设计假设和实验覆盖范围共同界定：
 3. **合成数据在真实机器人操作中的泛化性如何？** 虽然 Table 4 和 Figure 7 展示了合成数据在下游手部姿态估计任务上的数据增强效果（使用 50% 真实数据加 PAM 合成数据可达到与 100% 真实数据相同的 PA-MPJPE 5.5 mm），但这些实验仅限于静态姿态估计。合成视频数据是否能够提升机器人操作策略的学习效果，仍需在真实机器人平台上验证。
 
 4. **多模态条件的冗余性与互补性。** Table 3 的消融实验表明深度、分割和关键点三者联合使用始终最优，但各条件的相对贡献和失效模式尚未被深入分析。理解这一点对于在实际部署中简化条件获取流程（例如，是否可以用更易获取的深度图替代语义分割）具有重要意义。
-
-
 
 ## 原文 PDF
 

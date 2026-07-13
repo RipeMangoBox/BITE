@@ -76,8 +76,6 @@ EVATok 构建了一个四阶段框架（Figure 2）：
 
 质量-成本权衡曲线（Figure 4）表明，最大代理奖励策略在所有预算水平上均优于固定均匀分配，且路由器分配紧贴最优曲线，在未见过的 UCF-101 数据集上同样有效。消融实验（Table 5）证实 V-JEPA2 表示对齐和 VideoMAE 语义鉴别器对重建与生成质量均有显著贡献。
 
-
-
 ### 视频标记化的效率瓶颈
 
 视觉自回归（AR）生成模型在视频合成领域展现出巨大潜力，但其核心依赖的离散标记化（tokenization）环节正面临日益突出的效率挑战。当前主流的视频标记器——无论是基于3D VAE的方案还是基于Q-Former的方案——普遍采用**固定长度标记化**策略：将视频沿时间维度划分为若干时间块（temporal block），并为每个块分配**相同数量**的离散令牌。这一“一刀切”的做法忽视了一个根本事实：视频片段的内容复杂度存在巨大差异。
@@ -104,8 +102,6 @@ EVATok 构建了一个四阶段框架（Figure 2）：
 3. **如何消除训练-推理差距？** 标记器在训练时若学习所有可能的分配，但在推理时仅使用特定分配，会导致性能下降；需要一种机制使训练与推理阶段的令牌分配保持一致。
 
 EVATok正是围绕这三个问题展开，通过**代理奖励最大化**定义最优分配、**轻量级路由器**实现快速预测、以及**四阶段训练框架**消除训练-推理差距，构建了首个端到端的内容自适应视频标记化系统。
-
-
 
 ## 核心方法与创新机理
 
@@ -161,8 +157,6 @@ $$\mathcal{L}_{\mathrm{align}} = -\frac{1}{N}\sum_{n=1}^{N} \sin \bigl( f_n^{\ma
 
 EVATok 的四项核心创新形成一个完整的因果链条：**代理奖励**定义了“什么是最优分配”，**路由器**高效预测最优分配，**最终标记器重训练**消除训练-推理差距，**视频语义增强**提升重建的感知质量。这一组合使 EVATok 在 WebVid 上以 29.6% 令牌节省实现 rFVD 33（vs 均匀分配的 63），在 UCF-101 上以 24.4% 令牌节省达到 rFVD 9.7，并在下游 AR 生成中以更少令牌超越先前 SOTA（LARP: gFVD 57 vs EVATok: gFVD 48, -26.2% 令牌）。
 
-
-
 EVATok 采用四阶段训练框架，核心思路是**用代理奖励（proxy reward）量化每个视频在各候选令牌分配下的质量-成本权衡，并训练一个轻量路由器来预测最优分配，最终用该路由器引导的分配从头训练一个自适应长度标记器**。图 2 给出了四个阶段的整体流程。
 
 ### 阶段一：代理标记器训练
@@ -199,12 +193,8 @@ $$ a^* = \operatorname{argmax}_{a \in A} R_{\mathrm{proxy}} \tag{4} $$
 
 **训练-推理一致性**：表 1 的直接对比（A2 vs A1, B2 vs B1）表明，在相同训练迭代下，最终标记器显著优于直接使用路由器分配推理的代理标记器，验证了消除训练-推理差距的必要性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l868_https_arxiv_org_abs_2603_12267/figures/002_Figure_2.jpg]]
 *Figure 2: Four-stage framework for adaptive video tokenizer training. Stage 1 trains a proxy tokenizer to reconstruct videos under all candidate assignments. Stage 2 applies the proxy tokenizer to compute proxy rewards for all candidate assignments across videos (Videos, Optimal Assignments)from a dataset. It identifies the assignments with maximum proxy rewards to curate a classification dataset of videos and their optimal Max-proxy-reward Block4assignments. Stage 3 trains a router on the curated dataset to predict the optimal assignments for videos. Stage 4 trains the final tokenizer Block1from scratch, with the router determining the assignment for each input video during training*
-
-
 
 EVATok 的核心架构围绕**内容自适应的可变长度视频标记化**展开，由四个关键模块协同工作：1D可变长度标记器、代理奖励机制、轻量级路由器以及训练-推理差距消除策略。以下逐一剖析其设计逻辑与关键公式。
 
@@ -305,8 +295,6 @@ $$
 
 此外，最终标记器的训练可选择性地引入 **VideoMAE 语义鉴别器**，以冻结的 VideoMAE-B 提供多层级感知反馈。虽然这会降低 PSNR/LPIPS 等像素级指标，但显著减轻了模糊和伪影，提升了感知质量（Figure 8）。
 
-
-
 ## 实验与关键发现
 
 ### 核心结果：重建与生成效率的全面提升
@@ -362,25 +350,13 @@ Table 5 的消融实验揭示了两个关键训练增强的必要性：
 
 Table 1 的行间对比（A2 vs. A1, B2 vs. B1）验证了四阶段框架中 Stage 4（最终标记器）的必要性：在相同训练迭代（400k）下，使用路由器分配的最终标记器始终优于直接使用路由器分配的代理标记器（Stage 1）。例如，Router Final Tok. 的 rFVD 为 33，而 Router Proxy Tok. 为 36。这一差距源于代理标记器在训练时学习了所有候选分配，但推理时仅使用路由器预测的特定分配，导致训练-推理分布不匹配。Stage 4 通过使用路由器分配从头训练最终标记器，使训练和推理的分配完全一致，消除了这一差距。
 
-![[assets/figures/papers/paper_list_l868_https_arxiv_org_abs_2603_12267/figures/005_Table_1.jpg]]
-*Table 1: Final tokenizer validation on WebVid. The tokenizers are trained for 400k iterations. With the router, final tokenizers achieve comparable LPIPS and better rFVD with 29.6% saving in token length (row A2 vs. B2 and row A2+ vs. B2+). Final tokenizers outperform proxy tokenizers with the same training efforts (row A2 vs. A1, B2 vs. row B1), showing the importance of bridging the training-inference gap for variable-length tokenizers*
-
 ### 路由器准确率与代理奖励百分位数
 
 Table 8 揭示了一个重要的实践洞察：路由器的 top-1 分配准确率并不高（预测的分配通常不精确命中代理奖励最高的分配），但其**代理奖励百分位数**（proxy reward percentile）表现良好，且在 UCF-101 上泛化有效。这意味着路由器的预测偏差通常落在代理奖励的高分位区间，对最终性能影响有限。这一发现降低了路由器精确分类的要求，使得轻量级 ViT-S 路由器足以胜任分配预测任务。
 
-![[assets/figures/papers/paper_list_l868_https_arxiv_org_abs_2603_12267/figures/019_Table_8.jpg]]
-*Table 8: Accuracy vs. proxy reward percentile for the router assignment. In terms of accuracy. the assignments predicted by the router do not usually hit the top1 or top5 highest proxy reward assignments. However, in terms of proxy reward percentile, the router assignments achieve good results, and generalize to unseen dataset (UCF-101) well*
-
 ### 图像自适应令牌化的有限收益
 
 Table 9 和 Figure 12 显示，在 ImageNet 256×256 图像重建上，自适应令牌化节省 19.9% 令牌但 rFID 略有恶化。然而，下游 AR 生成的 FID 仍受益。这表明**视频特有的时间冗余**是自适应分配的主要受益来源——不同时间块之间的内容复杂度差异远大于图像内部的空间差异，因此按时间块分配令牌的收益远高于按空间区域分配。
-
-![[assets/figures/papers/paper_list_l868_https_arxiv_org_abs_2603_12267/figures/020_Figure_12.jpg]]
-*Figure 12: Image tokenization quality-cost trade-off curve. On ImageNet 256 × 256 reconstruction, the improvements of maxproxy-reward assignment can be marginal compared to uniform assignment*
-
-![[assets/figures/papers/paper_list_l868_https_arxiv_org_abs_2603_12267/figures/021_Table_9.jpg]]
-*Table 9: Image final tokenizer validation. For ImageNet*
 
 ### 失败模式与待验证边界
 
@@ -394,18 +370,8 @@ Table 9 和 Figure 12 显示，在 ImageNet 256×256 图像重建上，自适应
 
 5. **偏好权重的静态设定**：代理奖励中的 $w_q/w_l$ 需人工设定，缺乏根据输入内容或用户偏好动态调整的机制。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l868_https_arxiv_org_abs_2603_12267/figures/006_Table_2.jpg]]
-*Table 2: Final tokenizer validation on UCF. The final tokenizer with router beats the fixed uniform assignment baseline in both reconstruction and downstream AR generation, while saving 24.4% and 27.7% token length separately*
-
 ![[assets/figures/papers/paper_list_l868_https_arxiv_org_abs_2603_12267/figures/007_Table_3.jpg]]
 *Table 3: System-level comparison for tokenizers and downstream generation models. EVATok achieves superior performances in UCF-101 video reconstruction, downstream class-to-video generation and K600 frame prediction, while saving 24.4% tokens in reconstruction and 26.2% tokens in UCF class-to-video generation*
-
-![[assets/figures/papers/paper_list_l868_https_arxiv_org_abs_2603_12267/figures/008_Table_4.jpg]]
-*Table 4: K600 frame prediction comparison. In similar settings, EVATok performs the best with 15.8% less generated tokens*
-
-
 
 ## 定位与知识库关联
 
@@ -471,8 +437,6 @@ EVATok的方法论突破体现在三个层面：
 5. **高帧率与高分辨率场景。** 当时间块数量大幅增加（如高帧率视频）或空间分辨率显著提升时，现有路由器架构（ViT-S）是否依然高效？可能需要层次化或级联的路由器设计。
 
 6. **语义编码器的正交性。** 不同预训练语义编码器（V-JEPA2、VideoMAE等）的搭配对最终性能的影响是否正交？当前消融仅验证了各组件的必要性，但未探索不同语义特征的最优组合策略。
-
-
 
 ## 原文 PDF
 

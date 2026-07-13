@@ -69,8 +69,6 @@ claims:
 
 当前方法主要在刚性物体为主的驾驶场景上验证，向非刚性物体或数据稀缺场景的推广仍需探索。输入掩码的自动裁剪策略与基于真实去模态边界框的裁剪之间存在显著性能差距，设计更鲁棒的裁剪方法是一个重要的改进方向。此外，如何更有效地融合 RGB 图像信息、以及在完全无完整掩码标注的条件下扩展方法适用范围，仍是值得深入研究的开放问题。
 
-
-
 ### 问题定义：去模态物体补全
 
 在复杂的视觉场景中，物体之间相互遮挡是普遍现象。人类视觉系统能够自然地推断被遮挡物体的完整形状——这一能力被称为**去模态感知**（amodal perception）。在计算机视觉中，**去模态物体补全**（amodal object completion）的任务是：给定一张图像中物体的可见部分掩码，恢复其在遮挡情况下的完整二值掩码，包括不可见区域。
@@ -93,8 +91,6 @@ claims:
 - **概率生成框架**：将去模态补全重新建模为**条件生成问题**——给定可见部分掩码，学习完整掩码的**条件分布**，而非单一输出。这使得模型能够通过后验采样产生多样化且合理的补全结果，自然表达遮挡区域的不确定性。
 
 具体而言，本文提出 **Amodal-VAE**，一种基于变分自编码器（VAE）的生成框架。其核心设计思想是：先学习完整掩码的低维生成流形（解码器），再固定该流形学习从部分掩码到完整掩码的**概率映射**（编码器）。这种分离训练策略使得模型能够在弱监督条件下，捕获去模态补全的多种可能性，同时保持生成质量。
-
-
 
 ## 核心方法与创新机理
 
@@ -124,8 +120,6 @@ De-occlusion 等先前方法依赖去模态标注或合成标签进行监督训�
 
 为提升补全的语义合理性，Amodal-VAE 将物体类别 $c$ 作为条件同时输入编码器与解码器，使隐空间按类别组织。移除类别条件导致不可见区域 mIOU 下降 9.82 个百分点（62.85 → 53.03），验证了语义先验对形状推断的引导作用。此外，引入的**空间变换器**预测 2D 仿射变换参数，将解码器输出的完整掩码自动对齐至输入部分掩码的尺度与位置，解决了部分掩码裁剪区域与完整掩码范围不匹配的问题。
 
-
-
 Amodal-VAE 的整体流程围绕一个概率编码器‑解码器架构展开，其核心思想是**将完整物体掩码的生成先验与部分‑完整掩码的概率映射分离学习**，从而在不依赖任何去模态标注的情况下，捕获遮挡区域补全的多种可能性。
 
 ### 输入与输出
@@ -154,12 +148,8 @@ Amodal-VAE 的整体流程围绕一个概率编码器‑解码器架构展开，
 
 由于隐变量 $\mathbf{z}$ 是从概率分布中采样得到，多次采样可产生**多样化的合理补全结果**，自然表达了遮挡区域的不确定性——这是确定性方法（如 **De-occlusion**，Zhan et al., ECCV 2020）所不具备的能力。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l39_https_papers_nips_cc_paper_2020_hash_bacadc62d6e67d7897cef027fa2d416c_Ab/figures/001_Figure_1.jpg]]
 *Figure 1: We present a new method for amodal object completion (top), and showcase our work on scene editing (bottom). User is presented with interactive tools to complete, erase, and manipulate objects in an image*
-
-
 
 Amodal‑VAE 的核心架构由三个功能模块构成，分别负责部分掩码编码、完整掩码解码以及输出掩码的空间对齐。整个训练过程通过精心设计的损失函数将这三个模块有机耦合，实现了从可见部分到完整形状的概率映射。
 
@@ -215,8 +205,6 @@ $$\mathcal{L}_{\mathrm{Finetuning}}(w_3) = \mathbb{E}_{\hat{y}, c \sim \hat{\mat
 
 其中 $\hat{y}^{\mathrm{vis}}$ 表示仅保留可见区域像素的部分掩码。这一阶段使编码器适应真实场景中复杂多样的遮挡模式，而无需任何去模态标注。
 
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -266,8 +254,6 @@ Amodal-VAE 的概率本质使其能够从近似后验分布中采样多个隐变
 
 4. **微调阶段的脆弱性**：Stage 3 仅使用可见像素的重建损失进行微调，缺乏对不可见区域的任何监督信号。当真实遮挡模式与模拟遮挡分布存在系统性偏差时，编码器可能过拟合到可见区域的表面统计，削弱对不可见区域的泛化。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l39_https_papers_nips_cc_paper_2020_hash_bacadc62d6e67d7897cef027fa2d416c_Ab/figures/003_Figure_3.jpg]]
 *Figure 3: Qualitative results of amodal completion. Top: Results on KINS. Bottom: Results on Cityscapes*
 
@@ -278,8 +264,6 @@ Amodal-VAE 的概率本质使其能够从近似后验分布中采样多个隐变
 *Table 1: Amodal Completion on KINS. Invisible mIOU means we evaluate mIOU only on invisible areas. GT Crop denotes that input is cropped by GT amodal bounding box. Table 2: Ablation study of Amodal-VAE on KINS*
 
 ![[assets/figures/papers/paper_list_l39_https_papers_nips_cc_paper_2020_hash_bacadc62d6e67d7897cef027fa2d416c_Ab/figures/008_Table.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -340,8 +324,6 @@ Amodal-VAE 的核心技术贡献在于**分离式三阶段训练**，这一设�
 - **跨域泛化与数据效率**：在少量标注或完全无完整掩码的数据情景下，能否扩展该方法以处理更通用的场景和更丰富的物体类别？Table 5 的跨域实验（Cityscapes→KINS）显示不可见 mIOU 从 62.85 降至 56.18，提示域偏移仍是挑战。
 - **不确定性输出的下游利用**：概率框架生成的多模态补全如何用于下游任务（如运动规划、目标跟踪）的不确定性估计与融合？Table 4 显示通过 GT 区域搜索最优样本可将不可见 mIOU 提升至 69.96，但实际应用中缺乏 GT 指导，如何自动选择或融合多样本输出仍需探索。
 - **非刚性物体的扩展**：当前方法隐式假设物体形状在遮挡前后保持刚性，对于可变形物体（如动物、衣物）的补全需要引入形变建模能力。
-
-
 
 ## 原文 PDF
 

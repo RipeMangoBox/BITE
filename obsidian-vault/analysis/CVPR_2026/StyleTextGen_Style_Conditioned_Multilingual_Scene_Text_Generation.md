@@ -83,8 +83,6 @@ StyleTextGen 以 TextFlux 的 DiT 骨干为基座（冻结骨干，仅优化新�
 
 当前工作仅在中文和英文上进行了系统评估，对阿拉伯文、日文、韩文等文字系统的风格迁移能力未经验证。训练数据主要来源于合成数据，存在艺术风格和字体种类的偏差，真实复杂场景（强光照、严重遮挡）中的泛化性需进一步检验。此外，对于高度艺术化或扭曲的字体，当前风格编码是否足够捕捉极端的纹理和笔触变化，以及推理时风格注入的计算开销能否通过蒸馏进一步降低以适配实时应用，均为待探索的开放问题。
 
-
-
 ### 问题背景
 
 场景文本生成（Scene Text Generation, STG）旨在将指定的文字内容以逼真的视觉外观嵌入到自然场景图像中，在数据增强、虚拟试穿、海报设计、多语言内容本地化等领域具有广泛的应用价值。与通用图像生成不同，STG 面临一项独特而苛刻的挑战：生成文本不仅需要保持字符级别的字形准确性和可读性，还必须与参考图像中的文本风格——包括字体、笔触、颜色、纹理、光照和透视变形——实现高度一致的对齐。
@@ -112,8 +110,6 @@ StyleTextGen 以 TextFlux 的 DiT 骨干为基座（冻结骨干，仅优化新�
 - **遮罩引导的推理时风格注入**：在推理阶段，利用文本分割掩码对参考图像进行 DiT 特征反演，通过自适应实例归一化（AdaIN）和掩码混合策略，将风格特征精确注入生成结果的文本区域。
 
 通过这些设计，StyleTextGen 旨在突破现有方法在风格保真度和跨语言泛化性上的局限，为风格条件下的多语言场景文本生成提供一套更鲁棒、更精细的解决方案。
-
-
 
 ## 核心方法与创新机理
 
@@ -151,8 +147,6 @@ $$\mathcal{L}_{\mathrm{tsc}} = \sum_{j \in J} \left\| G_j^{\phi} \big( M_{\mathr
 ### 创新点的消融验证
 
 消融实验（Table 3）定量验证了上述每项创新的贡献：移除文本风格分支导致 FID 从 113.47 升至 133.62；移除视觉先验分支使 FID 升至 124.18；移除文本风格一致性损失使 FID 升至 126.94；禁用推理时风格注入使 FID 升至 118.36。这些结果表明，三项创新相互协同，共同构成了 StyleTextGen 在跨语言风格化文本生成任务上的核心优势。
-
-
 
 StyleTextGen 将风格条件下的多语言场景文本生成建模为一个**基于扩散变换器（DiT）的修复（inpainting）范式**。其核心思想是：给定一张带有文本的场景图像、对应的字形二值图以及一张风格参考图像，模型在目标文本区域生成与参考风格一致的新文本，同时保持背景不变。整体 pipeline 由四个关键模块串联构成，形成从输入构造到风格注入的完整数据流。
 
@@ -237,8 +231,6 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{CFM}} + \lambda_{\mathrm{tsc}} \mathcal{L}_
 ![[assets/figures/papers/paper_list_l2606_https_arxiv_org_abs_2605_14708/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of StyleTextGen. (a) Training process. The inpainting input to the diffusion transformer is constructed from a scene text image concatenated with its glyph map. A randomly cropped text patch serves as the style reference. The model is optimized with the flow-matching loss*
 
-
-
 StyleTextGen 的核心架构围绕三个关键模块展开：双分支风格编码器、文本风格一致性损失，以及推理阶段遮罩引导的风格注入策略。以下逐一解析其设计动机与数学形式。
 
 ### 双分支风格编码器
@@ -301,13 +293,6 @@ $$f_{\mathrm{out}} = (1 - M_{\mathrm{gen}}) \odot f_{\mathrm{base}} + M_{\mathrm
 
 消融实验显示，禁用推理时风格注入后 FID 升至 118.36（Table 3），证实了该模块对最终风格一致性的提升作用。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2606_https_arxiv_org_abs_2605_14708/figures/001_Figure_1.jpg]]
-*Figure 1: Examples of our StyleTextGen for style-conditioned scene text generation. Left: self-style reference (in-place generation). Right: external-style reference. For each example, the reference style image and the generated target text are shown at the bottom of the panel*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -338,8 +323,6 @@ StyleTextGen 在两个核心基准上进行了系统评估：**AnyWord-Eval**（
 
 当前评估主要覆盖英文和中文两种文字系统，模型在阿拉伯文、日文、韩文等其他文字上的风格迁移能力尚未验证。训练数据来源于合成数据与少量人工筛选的高质量合成图像，可能存在艺术风格和字体种类的偏差，在真实复杂场景（如强光照、严重遮挡）中的泛化性需进一步检验。此外，推理时风格注入需额外的前向反演步骤，计算开销高于纯前馈方案，是否可通过蒸馏或一次性编码降低延迟仍有待探索。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2606_https_arxiv_org_abs_2605_14708/figures/004_Table_1.jpg]]
 *Table 1: Comparison with state-of-the-art multi-lingual (English and Chines) methods. ↑/↓ indicates higher/lower is better. Our approach outperforms prior methods on all metrics*
 
@@ -348,11 +331,6 @@ StyleTextGen 在两个核心基准上进行了系统评估：**AnyWord-Eval**（
 
 ![[assets/figures/papers/paper_list_l2606_https_arxiv_org_abs_2605_14708/figures/003_Figure_3.jpg]]
 *Figure 3: Qualitative comparison on the StyleText-CE benchmark under the self-style reference setting*
-
-![[assets/figures/papers/paper_list_l2606_https_arxiv_org_abs_2605_14708/figures/007_Figure_5.jpg]]
-*Figure 5: Qualitative comparison on the StyleText-CE benchmark under the external-style reference setting*
-
-
 
 ## 定位与知识库关联
 
@@ -406,8 +384,6 @@ Calligrapher 等基线使用单分支编码器提取风格特征，缺乏对文�
 2. **极端风格鲁棒性**：对于高度艺术化、扭曲或带有强装饰性的字体，当前双分支编码器是否足够捕捉极端的纹理和笔触变化？
 3. **真实场景干扰**：强光照、严重遮挡、透视畸变等真实场景干扰对风格提取与生成鲁棒性的影响尚未评估。
 4. **推理效率优化**：推理时的风格注入步骤涉及 DiT 反演和多步特征调制，是否可通过蒸馏或一次性编码进一步降低计算开销，使其适用于实时应用场景？
-
-
 
 ## 原文 PDF
 

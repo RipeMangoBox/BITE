@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/Separate_Motion_from_Appearance_Customizing_Motion_via_Customizing_Text_to_Video_Diffusion_Models.pdf
+project_link: null
+code_link: "https://github.com/LiuHuijie6410/SeperateMotionFromAppearance"
 aliases:
 - SMFATAP
 - SMFACMCTVDM
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 分离运动与外观：通过定制文本到视频扩散模型实现运动定制 |
 | 英文题名 | Separate Motion from Appearance: Customizing Motion via Customizing Text-to-Video Diffusion Models |
 | 会议/期刊 | arXiv 2025 |
-| Links | [Code](https://github.com/LiuHuijie6410/SeperateMotionFromAppearance) · [arXiv](https://arxiv.org/abs/2205.15868) · [paper](https://doi.org/10.1145) |
+| Links | [paper](https://arxiv.org/abs/2501.16714) · [Code](https://github.com/LiuHuijie6410/SeperateMotionFromAppearance) |
 | Topic | #topic/vision_multimodal_applications #topic/generative_models_diffusion #topic/generative_models_diffusion/diffusion_image_video |
 | Method | Separate Motion from Appearance (TAP + AH + PLI) |
 | Dataset | One-shot motion customization |
@@ -40,7 +42,7 @@ claims:
 > [!tip] 效果简介
 > - One-shot motion customization (VBench) 上，Text Alignment 28.52 vs 27.55 (MotionDirector) (+0.97)；ViCLIP Score 26.52 vs 25.54 (MotionDirector) (+0.98)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -68,8 +70,6 @@ claims:
 
 本方法属于**基于微调的运动定制**范式，需要针对每个运动概念收集参考视频并进行训练，与 **Tune-A-Video**（Wu et al., ICCV 2023）、**VMC**（Jeong et al., CVPR 2024）等方法同属一类。与无需训练的 **VideoComposer**（Wang et al., NeurIPS 2024）和需要额外图像条件的 **LAMP**（Wu et al., CVPR 2024）、**DreamVideo**（Wei et al., CVPR 2024）相比，本方法在少样本场景下无需图像条件即可取得更优的外观对齐效果。
 
-## 背景与动机
-
 文本到视频扩散模型（T2V-DM）的快速发展使得高质量视频生成成为可能，但如何精确控制生成视频中的运动模式仍然是一个核心挑战。运动定制（motion customization）任务旨在从少量参考视频中学习特定的运动概念，并将其迁移到由文本描述引导的新外观场景中。这一能力对于电影制作、动画设计、虚拟现实等创意应用具有重要价值。
 
 现有运动定制方法面临一个根本性瓶颈：外观泄漏（appearance leakage）。以代表性方法 **MotionDirector**（Zhao et al., arXiv 2023）为例，其采用双路径 LoRA 框架，分别训练空间 LoRA 捕获外观和时间 LoRA 捕获运动。然而，由于时间注意力中的 Value 嵌入同时承载了运动信息和外观信息，时间 LoRA 在建模运动模式时不可避免地会将参考视频中的外观元素（如背景物体、纹理特征）编码进运动表示中。如 Figure 1 所示，当参考视频包含“窗户”这一外观元素时，先前方法生成的视频中会意外出现窗户，即使文本描述并未提及该元素——这表明外观信息已泄漏到运动 LoRA 中，削弱了模型根据文本生成多样化外观的能力。
@@ -78,7 +78,7 @@ claims:
 
 基于上述洞察，本文提出了一套系统的运动-外观分离框架，包含三个互补策略：时间注意力净化（Temporal Attention Purification, TAP）、外观高速公路（Appearance Highway, AH）和分阶段 LoRA 集成（Phased LoRA Integration, PLI）。TAP 将运动 LoRA 的作用范围严格限制在时间注意力的 Key 嵌入上，避免对 Value 嵌入的修改；AH 通过修改 U-Net 跳跃连接的起点，使解码器从空间 Transformer 而非 LoRA 适配的时间 Transformer 接收隐藏状态，进一步维持基础模型的外观生成能力；PLI 在推理时采用分阶段策略，早期去噪步使用适配模型专注运动建模，后期切换回原始 T2V-DM 完善外观细节。三者协同作用，在保持运动建模精度的同时显著抑制外观泄漏，实现了运动与外观的有效分离。
 
-## 核心创新
+## 核心方法与创新机理
 
 本工作围绕“运动-外观分离”这一核心目标，针对现有运动定制方法（如 **MotionDirector**，Zhao et al., arXiv 2023）中普遍存在的**外观泄漏**问题，提出了三个关键创新组件。其根本洞察在于：预训练时间注意力中的 Value 嵌入已包含描述运动的丰富基础组件，只需通过调整 Key 嵌入重塑注意力权重即可组合出新运动模式，而无需修改 Value 嵌入本身，从而阻断外观信息的混入路径。
 
@@ -115,8 +115,6 @@ claims:
 ### 创新点总结
 
 三个组件形成互补闭环：**TAP** 从 LoRA 注入范围上阻断外观信息进入运动编码，**AH** 从网络拓扑上切断外观泄漏的传播路径，**PLI** 从推理时序上实现运动建模与外观生成的解耦。三者协同使该方法在一次性运动定制基准上取得领先的文本对齐分数（28.52 vs. MotionDirector 27.55）和 ViCLIP 分数（26.52 vs. 25.54），在保持运动精度的同时显著提升了外观与文本描述的一致性。
-
-## 整体框架
 
 本方法建立在预训练的文本到视频扩散模型（T2V-DM）之上，其核心目标是在仅给定一个参考视频的条件下，学习其中的运动模式并迁移到由文本描述指定的新外观中，同时避免参考视频外观信息向生成结果的泄漏。整体框架由**训练**与**推理**两个阶段构成，并通过三个关键模块——**时间注意力净化（Temporal Attention Purification, TAP）**、**外观高速公路（Appearance Highway, AH）** 和**分阶段LoRA集成（Phased LoRA Integration, PLI）**——协同实现运动与外观的解耦。
 
@@ -164,8 +162,6 @@ $$
 
 三个模块在推理流程中形成递进式的解耦链路：**TAP** 从LoRA适配的源头限制外观信息进入运动编码，**AH** 在特征传播路径上阻断残留外观信息通过跳跃连接影响解码器，**PLI** 在时间维度上进一步隔离运动建模与外观生成阶段。消融实验（Table 4）表明，依次添加TAP、AH和PLI可累积提升文本对齐分数（27.55 → 27.91 → 28.32 → 28.52），验证了各组件的互补性。其中，虽然单独使用AH会使时间一致性从93.86微降至93.71，但结合PLI后可恢复至93.83，且均优于基线93.56。
 
-## 核心模块与公式推导
-
 本方法的核心架构建立在预训练文本到视频扩散模型（T2V-DM）的 3D U-Net 之上，通过三个关键模块的组合实现运动与外观的解耦定制。整体推理流程如图 Figure 2(a) 所示。
 
 ### 双路径 LoRA 训练框架
@@ -199,9 +195,6 @@ AH 的修改策略如图 Figure 2(c) 所示：将每个跳跃连接的起点从 
 
 - **定量分析**（Figure 4）：通过比较不同模型隐藏状态的余弦相似度发现：(a) AH 使解码器隐藏状态与原始 T2V-DM 的相似度显著高于仅使用 TAP 的情况，表明 AH 有效恢复了基础模型的外观生成能力；(b) 同时，AH 的隐藏状态与注入空间 LoRA 的 T2V-DM 相似度更低，说明 AH 成功阻断了空间 LoRA 所携带的外观信息；(c) 运动分类器仍将大部分 AH 隐藏状态识别为 TAP 运动，证明 AH 并未破坏已编码的运动信息。
 
-![[assets/figures/papers/paper_list_l1837_Separate_Motion_from_Appearance_Customizing_Motion_via_Customizing_Text/figures/005_Figure_4.jpg]]
-*Figure 4: Investigation of AH. (a) shows the similarity between the TAP/AH’s hidden states and T2V-DM’s. (b) shows the similarity between the hidden states of TAP/AH and hidden states of T2V-DM with inserted spatial LoRAs. (c) shows the accuracy and confidence of the motion classifier*
-
 ### 分阶段 LoRA 集成（Phased LoRA Integration, PLI）
 
 PLI 是一种推理阶段的策略，用于在运动建模与外观细节生成之间取得更优平衡。其核心思想是：去噪过程的早期步骤主要决定视频的整体结构和运动模式，而后期步骤则负责细化外观细节。
@@ -214,12 +207,7 @@ $$ z_{t-1} = \begin{cases} \frac{1}{\sqrt{\alpha_t}} \left( z_t - \frac{1-\alpha
 
 通过这种分阶段切换，PLI 既保证了运动建模的精度，又避免了适配模型在后期去噪步骤中对外观细节的潜在干扰。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1837_Separate_Motion_from_Appearance_Customizing_Motion_via_Customizing_Text/figures/001_Figure_1.jpg]]
-*Figure 1: Limitations of previous methods. Previous methods [47] suffer from the issue of “appearance leakage”, where elements from the reference videos, such as “window”, unexpectedly appear in the generated video*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果：一次性运动定制
 
@@ -270,24 +258,10 @@ $$ z_{t-1} = \begin{cases} \frac{1}{\sqrt{\alpha_t}} \left( z_t - \frac{1-\alpha
 
 尽管外观泄漏得到显著抑制，但在参考视频外观与目标文本描述高度冲突的场景下，仍可能残留少量泄漏。方法需针对每一个新的运动概念收集参考视频并进行微调，无法实现零样本泛化。此外，目前仅在 ZeroScope 和 ModelScope 两种 3D U-Net 架构上验证，迁移到其他视频扩散架构（如 DiT-based 模型）的有效性尚待实验确认。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1837_Separate_Motion_from_Appearance_Customizing_Motion_via_Customizing_Text/figures/003_Table_1.jpg]]
-*Table 1: Probing experiments on the temporal attention transformer block. For metric definitions, refer to Sec. 3.2*
-
-![[assets/figures/papers/paper_list_l1837_Separate_Motion_from_Appearance_Customizing_Motion_via_Customizing_Text/figures/011_Table_4.jpg]]
-*Table 4: Effect of each component and effect of motion customization with different T2V-DM. We test on two popular T2V-DM models: ZeroScope(ZS) and ModelScope(MS)*
-
 ![[assets/figures/papers/paper_list_l1837_Separate_Motion_from_Appearance_Customizing_Motion_via_Customizing_Text/figures/008_Figure_6.jpg]]
 *Figure 6: Qualitative results on few-shot. During training, few videos from UCF Sports dataset [25, 30] are used as reference videos. During inference, we use Stable Diffusion to generate images paired with the texts, which serve as the image conditions for LAMP [40] and DreamVideo [37]. MotionDirector [47] and our method do not need image conditions*
 
-![[assets/figures/papers/paper_list_l1837_Separate_Motion_from_Appearance_Customizing_Motion_via_Customizing_Text/figures/010_Table_5.jpg]]
-*Table 5: Training with AH vs. Post-processing with AH: (1) Training: apply it during both training and inference. (2) Post-processing: during training, the vanilla skip connection is used, while at inference, AH is employed. Experiments show that these two strategies are comparable*
-
-![[assets/figures/papers/paper_list_l1837_Separate_Motion_from_Appearance_Customizing_Motion_via_Customizing_Text/figures/012_Table_6.jpg]]
-*Table 6: Different choices of appearance highway’s scale ??*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 问题定位：外观泄漏瓶颈
 

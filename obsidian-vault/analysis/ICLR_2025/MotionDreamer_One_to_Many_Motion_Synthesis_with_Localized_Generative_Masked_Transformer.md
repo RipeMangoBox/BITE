@@ -53,8 +53,6 @@ claims:
 
 **证据强度**：上述结论由多项消融实验强力支撑——移除$\mathcal{L}_{\mathrm{token}}$后谐波均值从0.43骤降至0.34（Table 2）；将SlidAttn替换为标准全局自注意力导致模型严重过拟合，谐波均值仅0.07（Table 3）。这些结果表明，感受野约束与码本正则化是该方法有效性的必要条件。
 
-
-
 ### 问题背景：单参考运动的一对多合成
 
 在计算机动画与角色运动生成领域，从单个参考运动序列出发，生成一组在保持参考运动局部模式的同时又具备足够多样性的新运动，被称为**一对多运动合成**（one-to-many motion synthesis）。这一任务在游戏角色动画、影视特效、群体模拟等场景中具有广泛的应用需求：动画师通常仅提供一段示范运动，系统需要自动生成大量“看起来像同一类动作但又不完全重复”的变体，以丰富视觉表现力或适配不同交互情境。
@@ -81,8 +79,6 @@ MotionDreamer的核心动机源于一个关键的观察：**运动序列的多�
 - **可微反量化与重叠注意力融合（Sparsemax Dequantization & AttnFuse）**：通过sparsemax替代不可微的argmax操作，使梯度可以从重建损失回传至Local-M Transformer；同时，AttnFuse模块对齐并融合重叠窗口区域的注意力输出，保证局部模式之间的平滑过渡。
 
 这一设计哲学可以概括为：**在量化离散隐空间中，对运动局部模式进行显式分类分布建模，结合滑动窗口局部注意力以限制感受野，既能忠实保留参考运动的局部模式，又能生成多样化且新颖的运动序列**。后续的实验系统性地验证了这一假设：当使用标准Transformer块（无SlidAttn）时，模型严重过拟合，谐波均值（Harmonic Mean）仅0.07；引入SlidAttn并配合可微反量化后，谐波均值跃升至0.43，充分证明了感受野约束在单实例运动生成中的关键作用。
-
-
 
 ## 核心方法与创新机理
 
@@ -113,8 +109,6 @@ MotionDreamer 的核心创新在于将标准生成掩码 Transformer 的**全局
 ### 设计理念
 
 MotionDreamer 的核心洞察在于：在量化离散隐空间中对运动局部模式进行显式分类分布建模，结合滑动窗口局部注意力以限制感受野，既能忠实保留参考运动的局部模式，又能生成多样化且新颖的运动序列。这一设计使得模型在 SinMotion 数据集上取得了 0.43 的谐波均值，相比最佳基线 SinMDM 的 0.36 提升 19%。
-
-
 
 MotionDreamer 的整体 pipeline 围绕“在量化离散隐空间中显式建模运动内部模式的分类分布”这一核心思想构建，由两个阶段组成：**运动Token化（VQ阶段）** 与 **局部掩码生成建模（Local-M Transformer阶段）**。
 
@@ -157,15 +151,11 @@ $$\mathcal{L}_{\mathrm{M}} = \mathcal{L}_{\mathrm{mask}} + \lambda_{\mathrm{rec}
 ![[assets/figures/papers/paper_list_l1902_MotionDreamer_One_to_Many_Motion_Synthesis_with_Localized_Generative_Mas/figures/002_Figure_2.jpg]]
 *Figure 2: (a) Overview of MotionDreamer based on localized generative masked transformer. The single reference motion*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1902_MotionDreamer_One_to_Many_Motion_Synthesis_with_Localized_Generative_Mas/figures/011_Figure_8.jpg]]
 *Figure 8: (a) Inference pipeline illustration. (b) Single Motion-Beat Tokenization for beat-aligned dance synthesis*
 
 ![[assets/figures/papers/paper_list_l1902_MotionDreamer_One_to_Many_Motion_Synthesis_with_Localized_Generative_Mas/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the one-to-many motion synthesis. A single reference motion with arbitrary skeletons can be applied to generate natural and diverse novel motions while preserving the reference local motion patterns. Above shows the diverse generations from MotionDreamer of a girl doing breakdance (upper); a jaguar attacking (bottom)*
-
-
 
 ### 3.1 运动Token化与码本学习
 
@@ -223,15 +213,8 @@ $$\mathbf{Attn}_t = \mathrm{softmax}\left(\frac{\mathbf{q}_t \mathbf{K}_W + \mat
 
 标准VQ使用不可微的argmax操作选择码本条目，阻碍梯度从重建损失反向传播至Local-M Transformer。MotionDreamer 采用sparsemax激活函数实现可微反量化，使梯度能够畅通地流经Token选择过程，从而端到端优化生成质量。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1902_MotionDreamer_One_to_Many_Motion_Synthesis_with_Localized_Generative_Mas/figures/008_Figure_5.jpg]]
 *Figure 5: Ablation study on codebook distribution regularization technique based on optimizing Ltoken. Color closer to green representing higher per-frame similarity while color closer to orange referring to lower similarity*
-
-![[assets/figures/papers/paper_list_l1902_MotionDreamer_One_to_Many_Motion_Synthesis_with_Localized_Generative_Mas/figures/009_Figure_6.jpg]]
-*Figure 6: Ablation study on overlap attention fusion (AttnFuse). “Ours w/o. AttnFuse” refers to applying standard average pooling aggregation as the alternative baseline to AttnFuse. “backflip”, “handstand” pattern and transition between two patterns are marked. For generated motions, color closer to the pattern colors indicates higher per-frame similarity with the corresponding pattern, while color closer to orange indicates lower similarity*
-
-
 
 ## 实验与关键发现
 
@@ -257,9 +240,6 @@ Table 1 展示了 MotionDreamer 与现有单实例运动合成方法的定量对
 
 用户研究（Figure 4）从覆盖度、多样性和自然度三个维度进行主观评估，MotionDreamer 在所有维度均获得最高平均评分，进一步验证了其生成结果在感知质量上的优势。
 
-![[assets/figures/papers/paper_list_l1902_MotionDreamer_One_to_Many_Motion_Synthesis_with_Localized_Generative_Mas/figures/005_Figure_4.jpg]]
-*Figure 4: Score distribution and average score results from user study. The score level ranges from 1 to 5 of assessing Coverage, Diversity and Naturalness. The bars align with the right y-axis referring to percentage of votes of each method in each score level, and the horizontal lines align with left y-axis labeling the average score of each method*
-
 ### 消融实验
 
 **码本分布正则化（Table 2）。** 移除码本分布正则化损失 $\mathcal{L}_{\mathrm{token}}$ 后，谐波均值从 0.43 降至 0.34，覆盖率从 93.47% 降至 87.26%，VQ 困惑度从 28.13 降至 24.56。这表明 $\mathcal{L}_{\mathrm{token}}$ 通过 KL 散度约束码本使用分布接近均匀先验，有效缓解了单序列训练时的码本坍缩问题，提升了码本条目的利用率和生成质量。
@@ -275,22 +255,6 @@ Table 1 展示了 MotionDreamer 与现有单实例运动合成方法的定量对
 ### 失败模式与局限性
 
 尽管 MotionDreamer 在单参考运动合成上取得了显著提升，其性能高度依赖参考运动的质量：当参考运动包含模糊或不连贯的模式时，生成结果的质量会明显下降。此外，由于模型基于单实例学习，难以泛化到更广泛的运动编辑和条件合成任务。SlidAttn 的设计虽然有效捕获了局部依赖，但对长距离依赖和全局模式的建模能力有限，在需要全局一致性的长序列生成场景中可能存在不足。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1902_MotionDreamer_One_to_Many_Motion_Synthesis_with_Localized_Generative_Mas/figures/006_Table_2.jpg]]
-*Table 2: Ablation study on VQ regulatization strategies on SinMotion dataset. Bold text marks the best result*
-
-![[assets/figures/papers/paper_list_l1902_MotionDreamer_One_to_Many_Motion_Synthesis_with_Localized_Generative_Mas/figures/007_Table_3.jpg]]
-*Table 3: Ablation study on architecture of Local-M transformer on SinMotion dataset. Bold text marks the best result, and underline notes the second best*
-
-![[assets/figures/papers/paper_list_l1902_MotionDreamer_One_to_Many_Motion_Synthesis_with_Localized_Generative_Mas/figures/014_Table_6.jpg]]
-*Table 6: Ablation study for parameter settings. Bold text marks the best result*
-
-![[assets/figures/papers/paper_list_l1902_MotionDreamer_One_to_Many_Motion_Synthesis_with_Localized_Generative_Mas/figures/015_Table_7.jpg]]
-*Table 7: Impact of codebook regularization loss on other VQ methods for motion representation. Bold text marks the best result*
-
-
 
 ## 定位与知识库关联
 
@@ -336,8 +300,6 @@ MotionDreamer的方法定位可从以下四个关键维度与基线方法进行�
 2. 是否可以引入熵正则化或随机采样策略进一步优化码本利用率？
 3. 如何设计更鲁棒的注意力机制，以同时捕获局部模式与长程依赖？
 4. 滑动窗口局部注意力在处理极长运动序列时的效率与效果如何？
-
-
 
 ## 原文 PDF
 

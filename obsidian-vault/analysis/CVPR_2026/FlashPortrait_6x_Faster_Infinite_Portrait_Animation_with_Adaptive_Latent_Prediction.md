@@ -58,8 +58,6 @@ claims:
 
 方法上，FlashPortrait 属于**基于 DiT 的扩散人像动画加速范式**，与 TeaCache、FoCa 等缓存加速方法及 Self-Forcing 等蒸馏方法形成对比——前者加速有限，后者虽加速高但引入身份不一致和伪影，而 FlashPortrait 在 6 倍加速下仍保持视觉质量无明显下降。
 
-
-
 ### 问题背景
 
 人像动画（Portrait Animation）旨在根据一段驱动视频的运动信号，驱动一张静态参考图像生成同步的面部表情和头部姿态变化，同时严格保持参考图像中的身份特征。这项技术在虚拟主播、数字人交互、影视制作等领域具有广泛的应用前景。近年来，基于扩散模型（Diffusion Models）的方法，尤其是基于 DiT（Diffusion Transformer）架构的模型，如 **Wan-Animate**、**HunyuanPortrait** 和 **FantasyPortrait**，在人像动画的视觉质量和表情精度上取得了显著进展。与此同时，基于 GAN 的方法（如 **LivePortrait**）和基于 3D Morphable Model 的方法（如 **Skyreels-A1**）也在该领域占据一席之地。
@@ -82,8 +80,6 @@ claims:
 - **统一身份保持与加速**：将身份稳定机制与推理加速机制有机整合到同一 DiT 框架中，使二者协同工作，而非相互独立或彼此冲突。
 
 FlashPortrait 的设计正是围绕上述动机展开：通过**归一化面部表达块（Normalized Facial Expression Block）**对齐潜变量与面部特征的分布中心以稳定身份，通过**自适应潜在预测加速（Adaptive Latent Prediction Acceleration）**利用泰勒级数展开和动态调节函数跳过去噪步骤以实现 6 倍推理加速，并通过**加权滑动窗口融合策略**确保长动画片段间的平滑过渡。
-
-
 
 ## 核心方法与创新机理
 
@@ -142,8 +138,6 @@ $$
 
 **创新总结**：FlashPortrait 的三大 changed slots 形成因果链条——归一化面部表达块从结构层面锚定身份分布，加权滑动窗口从时序层面保障长程一致性，自适应潜在预测从计算层面实现训练无关加速。三者协同使得模型在 Hard100 长时域基准上相较 Wan-Animate 在 AED/APD/MAE 上分别提升 30.9%/30.4%/37.5%，同时推理速度提升 3 倍（Table 1），加速消融中达到 6 倍加速（Table 4）。
 
-
-
 FlashPortrait 以 Wan2.1 视频扩散 Transformer 为骨干网络，构建了一个面向无限时长、身份保持的人像动画合成框架。其核心设计围绕三个层次展开：**身份稳定性增强**、**长时域平滑过渡**、以及**训练无关的推理加速**。整体架构如 Figure 2 所示，输入为一张参考图像和一段驱动视频，输出为与驱动视频表情同步且保持参考身份的长动画。
 
 ![[assets/figures/papers/paper_list_l988_https_arxiv_org_abs_2512_16900/figures/002_Figure_2.jpg]]
@@ -175,8 +169,6 @@ FlashPortrait 以 Wan2.1 视频扩散 Transformer 为骨干网络，构建了一
 - 最终输出与驱动视频等长的身份保持动画序列。
 
 该框架的核心优势在于：归一化面部表达块从结构层面增强了身份稳定性，加权滑动窗口从时序层面保证了长动画的连贯性，自适应潜在预测从计算层面实现了 6 倍推理加速。三者协同工作，使得 FlashPortrait 在保持身份一致性的前提下，能够合成超过 1800 帧的无限时长动画。
-
-
 
 FlashPortrait 的核心架构由四个关键模块构成：归一化面部表达块、加权滑动窗口策略、自适应潜在预测加速机制，以及面部掩码加权的训练损失。这些模块协同工作，在保持身份一致性的前提下实现 6 倍推理加速。
 
@@ -248,8 +240,6 @@ $$\mathcal{L} = \mathbb{E}_{\theta} \left( \| (z_{gt} - z_{\varepsilon}) \odot (
 
 其中 $M_{face}$ 和 $M_{lip}$ 通过 MediaPipe 从输入视频帧中提取，$z_{gt}$ 为真实潜变量，$z_{\varepsilon}$ 为噪声潜变量。该损失使模型更关注面部和唇部区域的像素重建，进一步提升身份保持和表情准确性。训练时仅更新 DiT 的注意力模块参数。
 
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -301,25 +291,6 @@ FlashPortrait 在两个互补的测试基准上与现有方法进行了全面对
 
 FlashPortrait 在非真实人形角色（如游戏化身、神话人物）的身份保持上存在困难。如 **Figure 16** 所示，当参考图像为风格化或非写实人脸时，模型倾向于将其合成为更真实的人脸外观，导致身份特征丢失。作者指出这可能需要引入额外的参考网络来专门处理非真实人形角色的身份保持。此外，模型训练需要大量计算资源（200 H100 GPU），限制了社区复现和进一步探索的可行性。
 
-![[assets/figures/papers/paper_list_l988_https_arxiv_org_abs_2512_16900/figures/020_Figure_16.jpg]]
-*Figure 16: One failure case of our FlashPortrait. The images with red borders are the reference images*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l988_https_arxiv_org_abs_2512_16900/figures/003_Table_1.jpg]]
-*Table 1: Quantitative comparisons on Voxceleb2&Vfhq and Hard100. In the table elements a / b, a and b refer to the result on the Voxceleb2&Vfhq and Hard100, respectively. The average video duration of Voxceleb2&Vfhq is 10 seconds, while Hard100 is 1 minute. LMD/APD multiplied by*
-
-![[assets/figures/papers/paper_list_l988_https_arxiv_org_abs_2512_16900/figures/004_Table_2.jpg]]
-*Table 2: Ablation study on Normalized Facial Expression Blocks. z¯i in the Baseline, Pure Norm, and Centralization refer to*
-
-![[assets/figures/papers/paper_list_l988_https_arxiv_org_abs_2512_16900/figures/006_Table_3.jpg]]
-*Table 3: Ablation study on long portrait animation methods*
-
-![[assets/figures/papers/paper_list_l988_https_arxiv_org_abs_2512_16900/figures/009_Table_5.jpg]]
-*Table 5: Ablation study on K and n in our acceleration*
-
-
-
 ## 定位与知识库关联
 
 ### 问题域与基线关系
@@ -362,8 +333,6 @@ FlashPortrait 在人像动画领域贡献了两个可迁移的技术模块：
 
 1. **归一化面部表达块**：通过对齐潜变量与面部特征的分布中心（Eq. 3），增强跨帧身份稳定性。消融实验（Table 2）证实，移除该模块会使 AED 从 29.68 恶化至 44.78。这一思路可推广到其他需要身份保持的生成任务。
 2. **自适应潜在预测加速**：训练无关、即插即用的推理加速机制，为扩散模型的推理效率优化提供了不同于缓存和蒸馏的新范式。其动态函数设计（Eq. 12-13）体现了对去噪过程中时间步和层间差异的精细建模。
-
-
 
 ## 原文 PDF
 

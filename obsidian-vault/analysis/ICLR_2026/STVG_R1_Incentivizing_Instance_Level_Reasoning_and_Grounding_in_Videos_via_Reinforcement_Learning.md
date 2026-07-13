@@ -60,15 +60,11 @@ STVG-R1 的核心洞察在于**将逐帧坐标回归重新定义为基于视觉�
 
 **局限与待验证方向：** 视觉提示的质量受限于检测器和跟踪器的性能，且轻微遮挡视频内容；纯时序任务上视觉提示非必需；训练数据局限于两个STVG数据集，更大规模场景下的泛化性有待进一步验证。
 
-
-
 时空视频定位（Spatial-Temporal Video Grounding, STVG）要求模型根据自然语言查询，同时定位目标对象在视频中的时间区间和每一帧的空间位置。该任务的核心挑战在于：模型必须建立跨模态的时间-空间联合理解，而非孤立地处理时序或空间线索。
 
 **现有范式的瓶颈。** 当前主流的视觉-语言模型（VLM）在STVG任务上存在根本性的跨模态错位问题。如图Figure 2所示，现有方案大致分为两类：（a）基于对齐增强的范式——VLM输出时间戳和逐帧边界框坐标，再通过可训练的对齐模块将文本语义与视觉坐标关联；（b）基于解码器的范式——VLM生成分割token，再由专门的可训练解码器将其转化为掩码。这两种范式的共同缺陷在于，它们都试图让VLM直接学习跨模态的坐标或token对齐，而VLM本质上是为语义理解而非密集坐标回归设计的。这导致了严重的幻觉问题：逐帧输出的边界框坐标常常不一致，甚至产生无效预测。例如，通用VLM Qwen2.5-VL-7B在零样本条件下可能仅输出一个无时间戳的边界框，而专门设计的LLaVA-ST虽然能逐帧输出框，却缺乏对时序区间的整体推理能力（Figure 1）。
 
 **范式转换的动机。** 本文的核心洞察是：将复杂的逐帧坐标回归问题重新定义为基于视觉提示的紧凑实例级识别问题。具体而言，与其让VLM学习“对象在每帧的坐标是多少”，不如让VLM回答“哪个标记的对象是目标”——这恰好是VLM擅长的语义匹配任务。通过在每个候选实例的中心叠加带有唯一数字ID的视觉提示，VLM只需输出目标ID和时序区间，即可完成时空定位。这种以对象为中心的视觉提示范式无需任何可训练的坐标对齐模块，将跨模态错位问题从“语义-坐标对齐”降维为“语义-ID匹配”，从根本上规避了幻觉的来源。
-
-
 
 ## 核心方法与创新机理
 
@@ -101,8 +97,6 @@ STVG-R1 首次将强化学习引入 STVG 任务，采用 GRPO（Group Relative P
 ### 关键瓶颈的因果机制
 
 STVG-R1 的因果操纵杆在于**将跨模态对齐的负担从 VLM 转移到预处理管道**。视觉提示在输入侧完成了“像素→实例”的映射，VLM 只需在语义空间进行“查询→实例ID”的匹配，避开了直接学习跨模态坐标对齐这一核心瓶颈。这一设计的决定性证据包括：(1) 零样本视觉提示即可大幅提升多个 VLM 的性能；(2) 强化学习进一步带来 20%+ 的绝对增益；(3) 仅用单对象 STVG 数据训练的模型意外泛化到多对象视频分割任务，在 MeViS 上取得 47.3% J&F 的最佳结果（Table 3），说明视觉提示范式本身赋予了模型处理多实例场景的能力。
-
-
 
 ![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_zuPxAZgT9F/figures/002_Figure_2.jpg]]
 *Figure 2: Comparison of paradigms: (a) VLM produces both timestamps and frame-level coordinates with a trainable alignment block; (b) VLM generates segmentation tokens, which are then processed by a trainable decoder; (c) our method uses training-free object-centric visual prompted video for spatial-temporal video grounding*
@@ -157,8 +151,6 @@ STVG-R1 的整体框架如 Figure 3 所示，由四个核心模块串联构成�
 - **稀疏空间奖励**：分离的稀疏空间奖励优于耦合奖励和连续空间奖励，因为其更直接地对齐“选择单个正确实例”的目标（Section 4.5）。
 
 该框架的突出优势在于：视觉提示叠加是**免训练的**，不引入额外参数；强化学习的奖励设计直接联合优化时序精度、空间一致性和输出格式；且以对象为中心的提示使 VLM 的推理过程具有可解释性——模型可以“看到”并“推理”候选对象，而非盲目回归坐标。
-
-
 
 ### 3.1 视觉提示增强与范式重构
 
@@ -216,8 +208,6 @@ $$\mathcal{J}_{\mathrm{GRPO}}(\theta) = \mathbb{E}_{(\tilde{\nu}, q) \sim \mathc
 
 其中 $\epsilon$ 为裁剪参数，$\beta$ 控制 KL 正则化强度，$\pi_{\mathrm{ref}}$ 为冻结的参考策略。裁剪项防止策略更新过大，KL 惩罚约束策略偏离参考模型过远，二者共同保证训练稳定性。训练在 8×A100 GPU 上进行，数据仅包含单对象 STVG 数据集（HCSTVG 和 VidSTG）。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与因果机制
@@ -257,12 +247,6 @@ Table 1汇总了HCSTVG-v1和HCSTVG-v2上的核心结果。STVG-R1在HCSTVG-v2验
 
 在Charades-STA和TVGBench（Table 4）上，STVG-R1分别达到tIoU@0.5的**52.5%**和**27.4%**，超越TimeSuite（48.7%/24.4%）。然而，Table 10的消融显示，移除视觉提示后STVG-R1在Charades-STA上的tIoU@0.3从72.2%微升至**73.2%**，tIoU@0.5从52.1%升至**52.5%**。这表明视觉提示对纯时序任务并非必需，甚至可能因轻微遮挡而微弱降低性能。这一发现界定了视觉提示范式的适用边界：在空间定位为核心的任务中不可或缺，在纯时序任务中可选择性省略。
 
-![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_zuPxAZgT9F/figures/007_Table_4.jpg]]
-*Table 4: Performance comparison with state-of-the-art models on Charades-STA and TVGBench (%). The results marked with ∗ represent models training on corresponding dataset, while others indicate zero-shot settings*
-
-![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_zuPxAZgT9F/figures/019_Table_10.jpg]]
-*Table 10: Comparison of STVG-R1 with and without visual prompts on temporal grounding benchmarks Charades-STA and TVGBench (%). Adding visual prompts slightly affects temporal performance, showing that object-centric prompts are less critical for temporal-only tasks*
-
 ### 消融实验与设计选择
 
 #### 模块贡献：视觉提示与强化学习的协同效应
@@ -276,15 +260,9 @@ Table 7的模块消融揭示了各组件的贡献层级。在HCSTVG-v1上，基�
 
 Table 5系统比较了提示类型和大小。红色数字提示（font size 20）在零样本设定下达到最佳m_vIoU **28.2%**和vIoU@0.3 **43.4%**。字母提示（大写）的时序定位略优（m_tIoU 40.0% vs 数字的39.0%），但空间精度显著落后（m_vIoU 25.2% vs 28.2%）。这一差异可能源于VLM在预训练中对数字序列的更强先验。混合提示（数字+大写字母）并未带来增益（m_vIoU 27.6%），暗示一致性比多样性更重要。提示大小方面，font size 10-30性能稳定，但过小（难以识别）或过大（严重遮挡）均导致性能下降。
 
-![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_zuPxAZgT9F/figures/008_Table_5.jpg]]
-*Table 5: Ablation study on visual prompt designs on HCSTVG-v1 with zero-shot Qwen2.5-VL-7B. U-Letters denotes uppercase letters, L-Letters denotes lowercase letters, and Mix refers to a combination of numbers and uppercase letters*
-
 #### 掩码过滤阈值：数据质量与覆盖的权衡
 
 Table 6显示，掩码过滤阈值θ=1/3在数据质量与零样本性能间取得最佳平衡（m_vIoU 27.4%）。更激进的过滤（θ=1/2）虽提升数据质量上限（m_vIoU上界39.5% vs 1/3的38.0%），但零样本性能下降（26.8%），因为过强的过滤移除了部分有效的小目标实例，损害了训练数据的多样性。
-
-![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_zuPxAZgT9F/figures/009_Table_6.jpg]]
-*Table 6: Experimental results of mask filtering thresholds on HCSTVG-v1. Values before ‘/’ denote the upper bound, and those after ‘/’ are zero-shot results with Qwen2.5-VL-7B*
 
 #### 空间奖励设计：稀疏优于连续
 
@@ -300,9 +278,6 @@ Table 11显示，去除重检测组件（w/o re-detection）严重损害vIoU（�
 
 2. **视觉遮挡的微弱代价**：Table 9显示视觉提示对MME-VideoOCR基准的总体影响微小（总分59.4→58.9），但在纯时序任务上移除提示反而带来微弱提升（Table 10）。这说明提示的遮挡效应虽小但存在，在不需要空间定位的场景下可省略。
 
-![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_zuPxAZgT9F/figures/012_Table_9.jpg]]
-*Table 9: Evaluation results on MME-VideoOCR. ‘TR’ denotes Text Recognition, ‘VTQA’ Visualshoulder of the man. Text QA, ‘TG’ Text Grounding, ‘AR’ Attribute Recognition, ‘CDT’ Change Detection & Tracking, ‘STP’ Special Text Parsing, ‘CFTU’ Cross-Frame Text Understanding, ‘TBR’ Text-Based Reason-1 1 1 2 1 ing, ‘TBVU’ Text-Based Video Understanding, and ‘RVT’ Robust Video Testing*
-
 3. **训练数据规模有限**：仅使用HCSTVG和VidSTG两个数据集训练，尽管泛化能力出色（MeViS 47.3% J&F），但在更大规模、更多样场景下的性能上限尚未探明。
 
 4. **格式奖励的冗余性**：Figure 15显示，移除格式奖励r_f的训练曲线与完整奖励几乎一致。这是因为Qwen2.5-VL原生支持`<think>`和`<answer>`令牌，格式奖励成为冗余设计。这一发现提示在VLM的强化学习中，格式奖励的必要性取决于基座模型的指令遵循能力。
@@ -316,13 +291,6 @@ Table 11显示，去除重检测组件（w/o re-detection）严重损害vIoU（�
 - **Table 3**：仅用单对象数据训练的STVG-R1在多对象分割任务上达到47.3% J&F，验证了视觉提示范式的涌现泛化能力。
 - **Table 7**：GRPO强化学习贡献了总提升的约55%（19.5%→39.1%中的10.9%来自GRPO），远超SFT的增益，验证了奖励设计的因果作用。
 - **Table 10**：视觉提示在纯时序任务上可省略，界定了范式适用边界。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_zuPxAZgT9F/figures/011_Table_8.jpg]]
-*Table 8: Ablation study with different modules on ST-Align*
-
-
 
 ## 定位与知识库关联
 
@@ -372,8 +340,6 @@ STVG-R1的适用边界由其核心设计决定：
 - 强化学习奖励函数能否与更细粒度的评估指标（如vIoU@0.7）进行直接联合优化，以提升高精度场景下的表现？
 - 在无现成检测器或分割模型的条件下，能否通过VLM自身生成视觉提示实现端到端训练，从而消除上游依赖瓶颈？
 - 在更大规模、更多样化的视频数据上进行强化学习，是否会涌现出更复杂的推理行为（如时序因果推理、多对象关系建模）？
-
-
 
 ## 原文 PDF
 

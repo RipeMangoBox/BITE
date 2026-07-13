@@ -59,8 +59,6 @@ claims:
 
 **主要局限**：压缩过程仍然耗时，当前框架不支持在线训练，限制了其在流式捕捉场景中的适应性。
 
-
-
 ### 动态场景新视角合成的存储与实时性困境
 
 三维场景的新视角合成（Novel View Synthesis, NVS）在虚拟现实、增强现实、影视制作和自由视点视频等领域具有广泛的应用前景。近年来，以 **3D Gaussian Splatting (3DGS)**（Kerbl et al., TOG 2023）为代表的显式点基表示方法在静态场景渲染中取得了突破性进展，实现了高质量与高帧率的兼顾。然而，将此类方法扩展到**长动态场景**时，面临一个根本性的瓶颈：4D 高斯数量随视频时长急剧增长，导致 GPU 显存与存储需求过大，无法实现实时渲染和实际部署。
@@ -97,8 +95,6 @@ claims:
 
 实验结果表明，该方法在 N3DV 数据集上以仅 8.8 MB 的存储（Ours Small）取得 31.84 PSNR，渲染速度达 660.79 FPS；在 60 秒长序列上实现超过 20 倍压缩和超过 900 FPS 的实时渲染（RTX 5090），突破了长视频动态场景建模的内存与存储瓶颈。
 
-
-
 ## 核心方法与创新机理
 
 本文的核心创新在于构建了一套**感知驱动的分层-分桶时间组织结构**与**因子化协方差量化管线**，协同解决长动态场景中4D高斯数量急剧膨胀导致的存储与渲染瓶颈。其关键创新点可归纳为以下五个“changed slots”，均围绕“时间组织方式”与“压缩粒度”两个核心维度展开。
@@ -130,8 +126,6 @@ claims:
 **基线方法**使用统一的旋转学习率，导致静态区域纹理过平滑。**本文提出动态感知旋转学习率（DARLR）**：对时间跨度大的高斯分配更小的旋转学习率，抑制静态区域的过度更新。Figure 7定性结果表明，DARLR能有效保留静态区域的高频纹理细节，显著减少artifacts。
 
 **创新协同效应**：上述五个changed slots并非孤立改进。层-桶结构提供了时间局部性，使得分层压缩和RCQ能针对各层分布特性实施感知量化；FCQ将协方差分解为独立分量，为分层压缩提供了可分离的优化维度；DARLR则在训练阶段稳定了几何属性，为后续压缩管线提供了更高质量的初始表示。三者共同构成了从训练到压缩再到实时渲染的完整高效管线。
-
-
 
 L4DRotorGS 的整体框架围绕**分层时间组织—训练—压缩—实时渲染**四个阶段构建，形成一条从长视频输入到高压缩比实时渲染的完整管线。其核心设计目标是在保持视觉质量的前提下，将4D高斯的存储需求压缩20倍以上，同时实现超500 FPS的实时渲染。
 
@@ -169,13 +163,6 @@ L4DRotorGS 的整体框架围绕**分层时间组织—训练—压缩—实时�
 - **中间产物**：训练阶段产出未压缩的层–桶结构4D高斯；压缩阶段产出量化后的紧凑表示。
 
 该框架的整体流程可概括为：**视频 → 分层4D高斯初始化 → 三缓冲训练（含 DARLR） → FCQ + 分层压缩 + RCQ 压缩管线 → 压缩表示 → 按需解码渲染**。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l29_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_Layered_4D_Rotor_Ga/figures/002_Figure.jpg]]
-*Figure: (a) Layered Bucket Structure (b) Hierarchy Compression Structure*
-
-
 
 ### 4D高斯表示与时间切片
 
@@ -248,18 +235,8 @@ $$L = \lceil\log_2{n}\rceil + 1$$
 
 **动态感知旋转学习率（DARLR）**：对时间跨度大的高斯分配更小的旋转学习率，稳定静态区域训练。消融实验（Figure 7）证实DARLR保留静态区域精细纹理，无此策略时纹理过度平滑、高频结构丢失。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l29_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_Layered_4D_Rotor_Ga/figures/004_Figure.jpg]]
-*Figure: (a) (b) (c) (d)*
-
-![[assets/figures/papers/paper_list_l29_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_Layered_4D_Rotor_Ga/figures/007_Figure_6.jpg]]
-*Figure 6: Ablation of Compression Components. (a) Direct VQ on 4D covariance (Cov4D) fails to compress geometry attributes and degrades quality; (b) FCQ enables effective geometry compression; (c) adding the layered structure further improves fidelity; (d) RCQ provides an additional gain*
-
 ![[assets/figures/papers/paper_list_l29_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_Layered_4D_Rotor_Ga/figures/008_Figure_7.jpg]]
 *Figure 7: Ablation of Dynamic-Aware Rotor Learning Rate (DARLR). DARLR preserves fine detail in static regions; without it, textures appear over-smoothed and lose high-frequency structure*
-
-
 
 ## 实验与关键发现
 
@@ -303,24 +280,11 @@ L4DRotorGS在N3DV多视角动态视频数据集上进行了全面评测，与NeR
 
 需注意以下评测差异：N3DV评测统一使用RTX 3090单卡，而SelfCap使用RTX 5090，硬件环境不同可能影响FPS对比。DyNeRF等NeRF方法训练时间极长（如DyNeRF需1344小时），而本文方法仅需约30分钟，但FPS对比存在数量级差距。部分早期方法（如†标注）仅在N3DV的Flame Salmon单场景上评测，全面性有限。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l29_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_Layered_4D_Rotor_Ga/figures/013_Table_3.jpg]]
 *Table 3: Quantitative Results on diffenent video duration. Quantitative results across varying sequence lengths show that our training remains stable as duration increases*
 
 ![[assets/figures/papers/paper_list_l29_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_Layered_4D_Rotor_Ga/figures/014_Table_4.jpg]]
 *Table 4: Ablation of compression components. Quality improves progressively as components are added, with the largest gains from FCQ and the layered structure. The RCQ codebook size is set to 256*
-
-![[assets/figures/papers/paper_list_l29_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_Layered_4D_Rotor_Ga/figures/005_Figure_4.jpg]]
-*Figure 4: Ablation on VQ codebook size. We vary each VQ’s codebook from 1,024 to 16,384. Storage grows with size, while the compression visual quality benefits the most for SH VQ compared to other VQs*
-
-![[assets/figures/papers/paper_list_l29_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_Layered_4D_Rotor_Ga/figures/006_Figure_5.jpg]]
-*Figure 5: Ablation on VQ threshold. We set different thresholds for VQs. Decreasing the threshold increases storage but improves fidelity; consistent with the VQ codebook size study, the compression visual quality benefits most for SH VQ compared to others*
-
-![[assets/figures/papers/paper_list_l29_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_Layered_4D_Rotor_Ga/figures/011_Table_5.jpg]]
-*Table 5: Ablation on RCQ codebook size. We validate our RCQ method with different codebook sizes. Results show that RCQ keeps stable under different codebook sizes*
-
-
 
 ## 定位与知识库关联
 
@@ -368,8 +332,6 @@ L4DRotorGS在N3DV多视角动态视频数据集上进行了全面评测，与NeR
 2. **大规模场景泛化**：层-桶结构在更大规模场景（如城市场景、多主体交互）中，层数 $L = \lceil\log_2 n\rceil + 1$ 的自动确定策略是否仍有效？压缩率上限是否会因场景复杂度提升而显著下降？
 3. **DARLR 自适应化**：是否存在基于梯度统计或高斯时间跨度分布的自适应学习率调度方案，替代当前的手动映射？
 4. **跨模态扩展**：FCQ 的因子化思想是否可迁移至 4D 高斯的外观属性（SH 系数）压缩，形成统一的因子化量化框架？
-
-
 
 ## 原文 PDF
 

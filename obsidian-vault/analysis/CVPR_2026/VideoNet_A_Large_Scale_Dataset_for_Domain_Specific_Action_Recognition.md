@@ -57,8 +57,6 @@ claims:
 
 **方法定位**：VideoNet在方法谱系上属于**领域特定基准构建 + 自动训练数据生成 + 小模型领域微调**的交叉工作。与通用视频理解基准（如Kinetics、ActivityNet）不同，它强调同一领域内细粒度动作的判别难度；与已有的领域特定基准（如FineDiving、SurgicalActions）相比，它在覆盖领域广度与动作深度上均大幅超越。在数据构建策略上，其“硬负样本生成”与“SingleAction弱信号过滤”为资源受限场景下的高质量数据获取提供了可复用的范式。
 
-
-
 ### 领域特定动作识别的核心挑战
 
 动作识别是视频理解领域的基石任务之一。近年来，多模态大语言模型（VLMs）在通用视频问答和描述生成上展现出令人瞩目的能力，但当任务聚焦于**领域特定动作**——例如识别一个滑板动作是“Kickflip”还是“Heelflip”、判断一段医疗视频中是否出现了“Romberg征”——时，现有模型的性能急剧下降。这一现象揭示了当前VLM能力边界中的一个关键瓶颈：**模型缺乏对大量细粒度、领域特定动作的先验理解**，且难以将自身丰富的文本知识有效映射到视频中的细微运动线索上。
@@ -84,8 +82,6 @@ claims:
 3. **能力层面**：探索领域特定训练数据能否使小模型（4B参数）在领域内任务上超越未经微调的通用大模型（8B参数），并揭示VLM在少样本视频学习中的根本性缺陷。
 
 这三个层面的工作共同指向一个核心命题：**在资源有限的情况下，更强的领域内监督信号——而非更大的模型规模或更多的测试时计算——才是解锁精细动作识别能力的关键**。
-
-
 
 ## 核心方法与创新机理
 
@@ -113,8 +109,6 @@ VideoNet的核心创新并非提出一种新的模型架构，而是通过**系�
 ### 3. 创新点的协同效应
 
 上述两个创新并非孤立存在，而是形成了闭环验证：硬负样本评估暴露了通用VLM在缺乏领域内监督时的感知脆弱性，而SingleAction训练数据的有效性则证明了“更强的领域内监督”是解锁小模型潜力的关键杠杆。这一协同效应的最佳证据是：仅4B参数的微调模型Molmo2-4B FT在二分类零样本设置下达到66.6%的准确率，超越了所有未经微调的8B开源模型（如Qwen3-VL-8B的59.3%），并逼近闭源模型Gemini 3 Flash的70.3%（Table 4）。这充分说明，VideoNet的创新核心在于**通过数据生态的重新设计，以极低的模型参数量代价换取了领域特定能力的显著跃升**。
-
-
 
 VideoNet 的完整技术栈由两条主线构成：**领域特定动作识别基准的构建**与**训练数据的自动生成及模型微调**。二者共享同一套动作分类法（taxonomy），但服务于不同的目的——前者用于严格评估，后者用于提升模型能力。
 
@@ -171,15 +165,8 @@ VideoNet 的完整技术栈由两条主线构成：**领域特定动作识别基
 
 该设计的一个核心洞察是：**数据质量远比数据规模更能决定下游性能**。在三种过滤策略中，样本容量最小的 SingleAction（162K）反而在多项选择和二分类上均取得最高准确率（Table 6），而产量最大的 TranscriptLocalized 策略表现最差。这表明，在资源有限的情况下，通过严格的过滤机制获得“更强的领域内监督信号”，是解锁小模型潜力、补足 VLM 短板的关键路径。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2605_02834/figures/005_Figure_3.jpg]]
 *Figure 3: | Benchmark data collection pipeline, as described in Section 3.2. Given an action name and definition, humans (1) find clips on the web, (2) remove outliers among these clips, and (3) fix the clip trimmings. This pipeline yields five well-trimmed clips per action*
-
-![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2605_02834/figures/018_Figure_10.jpg]]
-*Figure 10: | System prompt for hard negative generation*
-
-
 
 VideoNet 的核心架构并非提出全新的神经网络模块，而是围绕**数据构建与评估范式**设计了多条创新流水线。其关键模块可归纳为三个层次：基准构建、训练数据自动生成、以及模型微调策略。
 
@@ -244,8 +231,6 @@ $$\text{Accuracy}_{\text{MC}} = \frac{1}{N} \sum_{i=1}^{N} \mathbb{1}[\hat{y}_i 
 
 其中 $N$ 为问题总数，$\hat{y}_i$ 为模型预测的动作选项，$y_i$ 为真实动作标签。二分类准确率同理，正负样本各半，随机基线为 50%。
 
-
-
 ## 实验与关键发现
 
 ### 主要结果：多项选择与二元零样本评估
@@ -259,15 +244,9 @@ VideoNet 在多项选择（Multiple-Choice）和二元零样本（Binary 0-shot�
 
 在二元零样本设定中（Table 4），任务难度降低（仅需判断视频中是否出现指定动作），但开源模型的困境依旧：Qwen3-VL-8B 仅 59.3%，而微调后的 Molmo2-4B FT 达到 66.6%，超越所有 8B 开源模型，仅落后 Gemini 3 Flash（70.3%）3.7 个百分点。然而，即使最优闭源模型 GPT-5 也仅取得 72.9%，表明**仅靠零样本推理难以突破领域动作识别的性能上限**，这直接引出了少样本学习的必要性。
 
-![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2605_02834/figures/009_Table_4.jpg]]
-*Table 4: | Binary 0-shot evaluation results. Despite a significantly easier evaluation setup, closed models begin to plateau, inspiring the inclusion of in-context examples in Section 5.3. Fine-tuning on our SingleAction dataset, Molmo2-4B (FT) catches up to just 3.7 points shy of Gemini 3 Flash. Highest accuracy for each column is in bold; highest accuracy by a non-proprietary model is underlined*
-
 ### 少样本学习：人类与模型的根本差异
 
 二元少样本（Binary Few-shot）实验揭示了 VLM 与人类在**上下文学习能力上的本质鸿沟**（Figure 5）。当提供 3 个上下文示例（3-shot）时，非专家人类在硬负样本设定下的准确率从 0-shot 的 69.1% 跃升至 82.7%（+13.6 pp），而 VLM 的平均提升幅度极为有限：Qwen3-VL 提升 7.0 pp，GPT-5.4 提升 5.7 pp，**Gemini 3.1 Pro 甚至下降 4.8 pp**。这一反常退化表明，某些模型不仅无法从示例中提取有效运动模式，反而被示例中的表面特征所干扰。模型间的少样本学习能力也呈现高度异质性：GPT-5.4 在 3-shot 硬负设定下达到 76.3%，而 Gemini 3.1 Pro 仅 65.1%，差距超过 11 pp。**VLM 缺失人类般的视频归纳学习能力，是当前领域动作识别的核心瓶颈之一。**
-
-![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2605_02834/figures/011_Figure_5.jpg]]
-*Figure 5: | Binary few-shot accuracy of VLMs and humans with ?? in-context video demonstrations. Humans (dotted lines) benefit significantly more than models (solid lines). Among models, there is great variation in their ability to exploit few-shot examples. For example, Gemini 3.1 Pro (red) loses 4.8 percentage points of accuracy while Qwen3-VL (green) gains 7.0 points from ?? = 0 to ?? = 3 in-context examples*
 
 ### 消融实验：视频输入与时域建模
 
@@ -299,9 +278,6 @@ VideoNet 在多项选择（Multiple-Choice）和二元零样本（Binary 0-shot�
 
 三种自动训练数据过滤策略的对比（Table 6）是本文最具启示性的消融发现：
 
-![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2605_02834/figures/013_Table_6.jpg]]
-*Table 6: | Comparing data filtering strategies. We compare Molmo2-4B [38] models fine-tuned using different data filtering strategies. Observe that the smallest dataset gives considerably better performance, yielding an additional 5 percentage point gain in the multiple-choice setting. The SingleAction binary 0-shot accuracy (66.6%) even exceeds Qwen3-VL-8B’s binary 3-shot accuracy (66.2%), confirming the effectiveness of domain-specific training data vs. test-time few-shot examples for the domain-specific action recognition task. The delta in a fine-tuned model’s accuracy over the base model is in (purple)*
-
 - **TranscriptLocalized**（基于转录时间戳定位，约 500K 样本）
 - **TranscriptLocalizedTitleMatch**（额外要求标题匹配，约 300K 样本）
 - **SingleAction**（仅保留每个视频中单一动作的剪辑，约 162K 样本）
@@ -313,9 +289,6 @@ VideoNet 在多项选择（Multiple-Choice）和二元零样本（Binary 0-shot�
 尽管微调带来了显著提升，但分析也揭示了若干系统性失败模式：
 
 1. **领域不均衡**：SingleAction 微调模型在 Beauty 和 Food 类别上表现持续较弱（Table 19）。Food 类别的动作常与特定物体或场景高度绑定（如“切洋葱”可通过砧板和洋葱识别，无需理解“切”的动作），可能高估模型能力；Beauty 类别则可能因训练数据质量不足导致微调后性能反而退化。
-
-![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2605_02834/figures/035_Table_19.jpg]]
-*Table 19: | Per-category performance of different filtering strategies. The first table reports multiplechoice accuracy; the second table reports binary 0-shot accuracy. In each table, the highest value in each column is in bold. The winning filtering strategy, SingleAction , has the same weaknesses – Beauty and Food – across evaluation settings, suggesting that its data for these categories is poor*
 
 2. **部分领域微调倒退**：在 Coffee、Cooking、Gardening 等领域，基础模型的表现甚至优于微调模型（Table 21），暗示这些领域的自动标注训练数据存在标签噪声，未能提供有效的监督信号。
 
@@ -331,13 +304,6 @@ VideoNet 在多项选择（Multiple-Choice）和二元零样本（Binary 0-shot�
 - **Table 6**：最小的 SingleAction 数据集（162K）带来最高性能提升，数据质量压倒规模。
 - **Table 5**：硬负样本使模型和人类准确率均显著下降，更真实地反映细粒度动作识别的难度。
 - **Table 11 / Figure 4**：微调模型从视频输入中获益最大（+7.7 pp），通用 VLM 的时域建模能力严重不足。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2605_02834/figures/006_Table_1.jpg]]
-*Table 1: | Expert Verification. These results confirm that our benchmark data pipeline is robust to annotator error*
-
-
 
 ## 定位与知识库关联
 
@@ -378,8 +344,6 @@ VideoNet的方法论和数据集存在以下明确边界：
 3. **从辨别到生成的评测升级**：多项选择/二分类的封闭式评估虽然可靠，但可能高估模型的真实理解能力——尤其是在Food等可通过物体检测捷径解决的类别上。引入开放式动作描述、时序定位等多模态评测方式，是推动领域特定动作理解研究深化的必要步骤。
 
 4. **自动标注流水线的泛化性**：当前流水线严重依赖教学视频的结构化特征（标题明确、语音与视觉对齐），能否推广到监控视频、体育赛事、工业操作等缺乏显式文本锚点的场景，仍有待验证。
-
-
 
 ## 原文 PDF
 

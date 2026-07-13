@@ -76,8 +76,6 @@ InterHandGen 属于**基于扩散模型的分解式生成方法**。与直接建
 
 消融实验进一步验证了各设计选择的必要性：移除分布分解或共享网络均导致生成质量显著下降；去除自注意力或分类器自由引导分别损害保真度和多样性；联合训练多数据集的通用先验可将多样性从 3.59 进一步提升至 4.39，但逼真度指标未同步改善，提示现有数据集仅捕获了真实分布的子集（Figure S1）。
 
-
-
 ### 问题背景：双手交互生成的组合复杂性
 
 生成自然、物理合理的双手交互是计算机视觉与图形学中的核心挑战之一。双手交互涉及高维的关节运动自由度——每只手通常由数十个姿态参数、形状参数和全局变换参数共同描述（例如基于 MANO 模型的 64 维表示 $\mathbf{x}_s = [\theta_s, \beta_s, \omega_s, \tau_s]$），而双手联合空间的高维度和交互模式的多样性使得直接建模其联合分布 $p(\mathbf{x}_l, \mathbf{x}_r)$ 面临极高的组合复杂性。这种复杂性在扩散生成框架中表现为学习困难：网络需要同时捕获双手各自的合理姿态以及双手之间微妙的空间关系（如接触、交叉、协同运动），导致生成质量不佳或出现模式崩溃。
@@ -97,8 +95,6 @@ $$p_{\phi}(\mathbf{x}_l, \mathbf{x}_r) = p_{\phi}(\mathbf{x}_l) \, p_{\phi}(\mat
 这一分解将高维联合生成问题转化为两个更低维度的子问题——先生成一只“锚点”手（左手），再以该手为条件生成与之交互的右手。通过降低每个生成目标的自由度，扩散模型能够更容易地捕获合理的交互模式。同时，左右手在解剖结构上的对称性使得可以通过镜像变换将左手样本映射到右手参数空间，从而统一训练域并增广数据，进一步简化学习过程。
 
 在此基础上，InterHandGen 引入三个关键机制以提升生成质量：(1) 通过**条件 dropout** 使用单一共享网络同时参数化无条件分布与条件分布，实现高效的多任务学习；(2) 在反向扩散的每一步施加**抗穿透梯度引导**，显式最小化穿透顶点对之间的距离；(3) 融合**分类器自由引导（CFG）** 以平衡生成保真度与多样性。这些设计共同构成了一个从分布分解出发、以级联反向扩散为核心的双手交互生成框架。
-
-
 
 ## 核心方法与创新机理
 
@@ -121,8 +117,6 @@ InterHandGen 的核心创新在于将双手交互生成的高维联合分布建�
 此外，InterHandGen 在条件采样中引入**分类器自由引导（CFG）**，混合条件与无条件噪声估计 $\tilde{f}_\phi(\mathbf{z}_t, t, \mathbf{c}) = (1+w) f_\phi(\mathbf{z}_t, t, \mathbf{c}) - w f_\phi(\mathbf{z}_t, t, \emptyset)$，以 $w_\text{cfg}=0.1$ 平衡生成保真度与多样性。消融实验（Table 3a）表明，移除 CFG 会导致精确率显著下降。
 
 **创新总结**：InterHandGen 的方法创新并非孤立技术的堆砌，而是以“分布分解”为轴心，通过镜像统一、共享网络、抗穿透引导和 CFG 形成闭环——降低建模难度的同时，保证了交互的物理合理性与样本多样性。这一设计思想具有较强的可推广性，可为其他多实例交互生成任务提供参考范式。
-
-
 
 InterHandGen 的整体框架围绕一个核心思想构建：**将双手交互的联合分布建模分解为两个更简单的子问题**，并通过级联扩散采样实现高质量生成。整个 pipeline 可分为训练与推理两大阶段，共享同一网络架构。
 
@@ -184,8 +178,6 @@ $$\mathcal{L}_{reg} = \| \mathcal{S}(D_{\phi}, \mathbf{x}_l, \mathbf{x}_r) - (\m
 - **共享网络**：使用单一共享网络（Ours）在召回率和多样性上明显优于分别训练两个独立网络的变体（Ours w/o Shared Network）。
 - **级联 vs. 并行**：级联生成在 FHID、精确率和多样性上全面优于并行生成（ComMDM），证实了顺序建模的优势（Table S1）。
 - **抗穿透引导**：移除 APG 使穿透体积从 0.76 cm³ 飙升至 4.23 cm³，而手部近距离比率未显著变化（Table 3b）。
-
-
 
 ### 核心设计思想：分布分解与级联生成
 
@@ -252,8 +244,6 @@ $$\mathcal{L}_{pen}(\mathbf{x}_{t-1}, \mathbf{x}_l) = \sum_{i,j \in \mathcal{P}(
 $$\mathcal{L}_{reg} = \left\| \mathcal{S}(D_{\phi}, \mathbf{x}_l, \mathbf{x}_r) - (\mathbf{x}_l, \mathbf{x}_r) \right\|_2$$
 
 其中 $\mathcal{S}$ 表示对 $\mathbf{x}_r$ 施加一步加噪后由 $D_\phi$ 去噪的操作。该损失约束双手状态保持在扩散模型学习的合理流形上，在单目双手重建任务中将 MPVPE 降至 12.10 mm（InterHand2.6M）和 15.04 mm（HIC），达到新 state-of-the-art（Table 2）。
-
-
 
 ## 实验与关键发现
 
@@ -322,9 +312,6 @@ Table 3b 的穿透指标消融直接量化了抗穿透引导（APG）的效果�
 
 1. **通用先验的逼真度瓶颈**：联合训练多数据集（双手 + 单手）的通用先验可将 Diversity 从 3.59 提升至 4.39（Figure S1），但 FHID/KHID 等逼真度指标并未同步改善。这说明现有数据集仅捕获了真实双手交互分布的子集，简单联合训练难以实现协同改进。
 
-![[assets/figures/papers/paper_list_l1719_InterHandGen_Two_Hand_Interaction_Generation_via_Cascaded_Reverse_Diffus/figures/009_Figure.jpg]]
-*Figure: (c) False positive samples with respect to the manifold modeled by the prior trained on InterHand2.6M only. Figure S1. Hands sampled by our prior trained on two-hand dataset and additional single-hand datasets [16, 71, 74, 75]*
-
 2. **级联采样速度**：级联生成需要顺序执行两次完整的扩散反向采样（先左手后右手），相比并行方法推理速度较慢。
 
 3. **抗穿透引导的局限性**：APG 仅在测试时通过梯度下降附加，缺乏与其他扩散引导方法（如重建引导、物理约束引导）的深入结合分析，且早期去噪步中引导权重的调度策略未充分优化。
@@ -333,33 +320,14 @@ Table 3b 的穿透指标消融直接量化了抗穿透引导（APG）的效果�
 
 5. **物体条件的封闭性**：物体条件生成仍依赖预定义的对象类别，未实现开放世界的任意物体条件生成。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1719_InterHandGen_Two_Hand_Interaction_Generation_via_Cascaded_Reverse_Diffus/figures/004_Table_1.jpg]]
 *Table 1: Quantitative comparisons of two-hand interaction synthesis with and without an object. Bold indicates the best scores, and underline indicates the second best scores. In both experiments, ours significantly outperforms the baselines on most of the metrics. We conduct 20 evaluations and report the average scores, where 10K samples are used in two-hand synthesis and 30K samples (3K samples per object category) are used for two-hand-object synthesis in each evaluation*
 
 ![[assets/figures/papers/paper_list_l1719_InterHandGen_Two_Hand_Interaction_Generation_via_Cascaded_Reverse_Diffus/figures/006_Table_3.jpg]]
 *Table 3: Ablation study results. We use the same setting as in the two-hand interaction generation experiments (Section 4.1)*
 
-![[assets/figures/papers/paper_list_l1719_InterHandGen_Two_Hand_Interaction_Generation_via_Cascaded_Reverse_Diffus/figures/007_Table.jpg]]
-*Table: (b) Comparisons on inter-penetration. We compare to our method variation where anti-penetration guidance is not used (Ours w/o APG). PenVol, PenDist, and ProxRatio denote penetration volume, penetration distance, and proximity ratio, respectively*
-
-![[assets/figures/papers/paper_list_l1719_InterHandGen_Two_Hand_Interaction_Generation_via_Cascaded_Reverse_Diffus/figures/001_Figure.jpg]]
-*Figure: (a) Generated two-hand interactions*
-
-![[assets/figures/papers/paper_list_l1719_InterHandGen_Two_Hand_Interaction_Generation_via_Cascaded_Reverse_Diffus/figures/005_Figure_4.jpg]]
-*Figure 4: Object-conditional two-hand interaction synthesized by InterHandGen. Ours can model plausible and diverse bimanual interactions*
-
 ![[assets/figures/papers/paper_list_l1719_InterHandGen_Two_Hand_Interaction_Generation_via_Cascaded_Reverse_Diffus/figures/010_Figure.jpg]]
 *Figure: S2. Qualitative results of our monocular two-hand reconstruction experiment in Section 4.3. The top four rows show results from the HIC dataset, while the bottom four rows show results from the InterHand2.6M dataset. Brown boxes highlight areas where shape penetration occurs, and blue boxes denote regions with inaccurate hand interaction (e.g., contact is absent where it should occur). Utilizing our generative prior leads to more plausible reconstructions*
-
-![[assets/figures/papers/paper_list_l1719_InterHandGen_Two_Hand_Interaction_Generation_via_Cascaded_Reverse_Diffus/figures/011_Figure.jpg]]
-*Figure: S3. Qualitative results of two-hand interaction synthesis experiment in Section 4.1. Brown boxes denote regions with implausible two-hand interaction (e.g., where penetration or unnatural hand articulation occurs). Our method can produce more plausible two-hand interactions with less penetration*
-
-![[assets/figures/papers/paper_list_l1719_InterHandGen_Two_Hand_Interaction_Generation_via_Cascaded_Reverse_Diffus/figures/012_Figure.jpg]]
-*Figure: S4. Qualitative results of two-hand interaction synthesis experiment in Section 4.2. Brown boxes denote implausible regions with penetration or unnatural hand articulation. Our approach can generate more realistic bimanual interactions*
-
-
 
 ## 定位与知识库关联
 
@@ -422,8 +390,6 @@ $$p_{\phi}(\mathbf{x}_l, \mathbf{x}_r) = p_{\phi}(\mathbf{x}_l) \, p_{\phi}(\mat
 4. **穿透避免的深层机制**：抗穿透引导在早期去噪步中使用较低权重是否最优？是否存在更高效的穿透避免机制（如将穿透约束直接嵌入扩散训练或使用约束优化替代梯度引导）？
 5. **扩散先验正则化的泛化**：$\mathcal{L}_{reg}$ 在其他下游任务（如双手跟踪、从视频生成、运动补全）中的适用性和性能表现尚待探索。
 6. **开放世界物体条件**：如何突破预定义对象类别的限制，实现基于文本描述或任意物体几何的条件生成？
-
-
 
 ## 原文 PDF
 

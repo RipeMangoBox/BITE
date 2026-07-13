@@ -57,8 +57,6 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{rec}} + \mathcal{L}_{\mathrm{global}} + \ma
 
 消融实验进一步证实，增加实例感知损失后，视频实例检索平均召回从 57.71 提升至 75.32；可学习的实例温度参数和轨迹数据集的引入均带来显著增益。
 
-
-
 ### 视觉语言预训练的全局对齐瓶颈
 
 视觉语言预训练（VLP）已成为多模态理解的基础范式，其核心目标是通过大规模图文/视频-文本数据学习通用视觉表征。当前主流的VLP框架——包括CLIP系列、**UMT**（Li et al., ICCV 2023）、**VideoPrism**（Zhao et al., 2024）等——几乎完全依赖**全局视频-文本对齐**：模型学习将整段视频与整句描述在共享嵌入空间中拉近。这种全局粒度的监督信号虽然支撑了零样本检索等任务，却存在一个根本性缺陷：**模型无法精确识别和区分文本中提到的特定对象或实体**。
@@ -81,8 +79,6 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{rec}} + \mathcal{L}_{\mathrm{global}} + \ma
 ### 数据层面的支撑：InstVL数据集
 
 为支撑实例感知预训练，本文构建了**InstVL**数据集，其核心特点是**双粒度文本标注**：每个视觉样本同时配备一个全局场景描述和一组实体锚定的轨迹实例描述。这种数据组织形式使得模型在训练时能够同时接收全局和实例级监督信号，为联合优化目标提供了必要的数据基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -129,8 +125,6 @@ $$\mathcal{L} = \mathcal{L}_{\text{rec}} + \mathcal{L}_{\text{global}} + \mathca
 ### 与现有工作的本质差异
 
 现有细粒度视觉语言工作（如基于 **CLIP4Clip** 的区域匹配或 **SigLIP** 的密集对齐）通常将实例理解作为后处理步骤或微调阶段的附加模块。InstAP 的根本不同在于：**实例感知是预训练损失函数的内生组成部分**，而非事后嫁接。这解释了为何在完全相同的训练数据下，InstAP 大幅超越仅使用全局描述或全局化实例描述的 UMT-L 基线（例如 InstVL-10K (img) 上 T2V R@1 44.05 vs 34.83），差距源于实例感知对齐机制本身，而非数据量的增加。
-
-
 
 InstAP 的整体设计围绕一个核心命题展开：**实例级理解不应是预训练后的附加任务，而应作为预训练阶段的内在特性**。为此，框架将全局场景对齐与细粒度实例感知对齐统一在一个端到端的联合优化目标下，形成“全局-局部”双支路协同的预训练范式。
 
@@ -203,8 +197,6 @@ $$\mathcal{L}_{\mathrm{VTC}}^{\mathrm{inst}} = -\frac{1}{N}\sum_{n=1}^{N} \log \
 
 三个阶段的输出通过联合损失 $\mathcal{L}$ 统一反向传播，使得视觉编码器在预训练过程中同时学习全局场景语义和细粒度实例-文本对应关系。消融实验（Table 4）证实，仅添加实例感知损失即可将 InstVL-1K 视频实例检索的平均召回从 57.71 提升至 75.32，验证了该支路的独立贡献。
 
-
-
 ### 3.1 掩码视频建模编码器
 
 InstAP 的视觉编码器采用教师-学生自监督框架进行时空掩码重建，以学习强视觉表征。该模块对输入视频进行注意力引导的掩码处理：首先计算每个 token 的重要性分数 $\mathbf{s} = \frac{1}{L} \mathbf{A} \mathbf{1}$（其中 $\mathbf{A}$ 为注意力矩阵，$L$ 为 token 数），然后按给定掩码比 $\rho$ 选择分数最低的 $L_m = \lceil \rho L \rceil$ 个 token 进行掩码。学生网络处理掩码后的视频，教师网络处理完整视频，通过回归未掩码 token 的高层语义特征来驱动学习。
@@ -271,13 +263,6 @@ $$
 
 该联合优化策略使模型在预训练阶段同时学习全局场景语义和细粒度实例-文本对应关系。实验证明，这种设计不仅未损害全局理解能力，反而使 InstAP 在 MSR-VTT 和 DiDeMo 上超越原始 UMT-L 基线，同时在实例检索和视觉定位任务上取得大幅提升——这验证了实例感知作为预训练核心特性而非附加任务的设计理念。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2397_https_arxiv_org_abs_2604_08337/figures/003_Figure_3.jpg]]
-*Figure 3: Our instance-aware alignment mechanism. Instance features (Query Q) from a Trajectory RoI Encoder (fθ) are fused with global context (Key K, Value V ) via an Attention Pool to create an instance-aware embedding. This embedding is contrasted with text features*
-
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -337,21 +322,8 @@ Table 3 报告了 InstVL-1K 上的视觉定位指标。InstAP 在所有 IoU 阈�
 
 **Figure 4** 的注意力可视化对比显示，InstAP 倾向于更精确地关注与描述相关的区域（如“dubai plate 61062”），而仅使用全局对齐的基线模型的注意力往往分散或错位。**Figure 5** 的检索案例进一步表明，InstAP 能一致地检索到正确的细粒度描述，而全局基线模型容易被语义干扰项混淆，导致查询匹配错误。这些定性证据与定量结果一致，共同支持实例感知机制在细粒度理解上的优势。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2397_https_arxiv_org_abs_2604_08337/figures/007_Table_4.jpg]]
-*Table 4: Effect of adding the instance-aware loss*
-
 ![[assets/figures/papers/paper_list_l2397_https_arxiv_org_abs_2604_08337/figures/009_Table_5.jpg]]
 *Table 5: Ablation of InstAP components on the InstVL instancelevel test sets. We report mean recall, averaged over R@1, R@5, and R@10 for both V2T and T2V retrieval*
-
-![[assets/figures/papers/paper_list_l2397_https_arxiv_org_abs_2604_08337/figures/010_Figure_4.jpg]]
-*Figure 4: InstAP tends to attend more closely to caption-relevant regions (e.g., ‘dubai plate 61062’) than the global-only baseline [29], which often exhibits diffuse or misaligned attention*
-
-![[assets/figures/papers/paper_list_l2397_https_arxiv_org_abs_2604_08337/figures/008_Figure_5.jpg]]
-*Figure 5: InstAP consistently retrieves correct fine-grained descriptions, whereas the global baseline [29] is confounded by semantic distractors and mismatches the query*
-
-
 
 ## 定位与知识库关联
 
@@ -392,8 +364,6 @@ InstAP 的能力边界由其预训练目标直接决定：
 2. 对更长视频序列或更密集交互场景，当前框架的可扩展性如何？44.6% 的多实例混淆率提示了扩展瓶颈。
 3. 实例感知表征能否作为多模态大模型（MLLM）的视觉编码器，为 MLLM 提供更细粒度的视觉基座？
 4. 如何进一步降低训练成本，使实例感知预训练更易被社区复现和改进？
-
-
 
 ## 原文 PDF
 

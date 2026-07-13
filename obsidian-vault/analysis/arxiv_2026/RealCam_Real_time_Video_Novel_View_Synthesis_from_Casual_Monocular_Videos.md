@@ -47,8 +47,6 @@ claims:
 
 RealCam通过一个核心洞察解决了上述问题：**将源帧与目标帧在帧维度上交织，构建交叉帧上下文学习（Cross-frame In-context Learning）范式**。这一设计使模型学习的是相对帧关系而非绝对位置，天然支持因果注意力机制和任意长度推理。在此基础上，RealCam采用两阶段训练策略——先训练一个高保真度的双向教师模型，再通过自强制分布匹配蒸馏（Self-Forcing DMD）将其转化为少步因果学生模型，同时引入闭环数据增强（LoopAug）来克服长视频生成中的漂移问题。最终，因果学生模型实现了亚秒级推理延迟（1.3B模型仅需1.15秒），比ReCamMaster快约370倍，同时在视觉质量、几何一致性和相机控制精度上保持领先水平（Table 1）。用户研究进一步表明，RealCam的教师和学生模型在视频质量和相机跟随能力上均获得超过50%的偏好（Table 2）。
 
-
-
 ### 单目视频新视角合成的现实需求
 
 从单目视频中合成任意相机轨迹下的新视角画面，是计算机视觉与图形学中的一项核心任务。该技术允许用户以非原始拍摄视角重新观察场景，在消费级视频编辑、电影后期制作、AR/VR 沉浸式体验等领域具有广泛的应用前景。一个理想的系统应当满足三个关键要求：（1）**高视觉保真度**，生成帧在几何结构和纹理细节上与源视频保持一致；（2）**高时间一致性**，相邻帧之间无闪烁或跳变；（3）**低延迟推理**，能够支持交互式、实时的相机操控体验。
@@ -71,8 +69,6 @@ RealCam 的核心动机在于重新思考条件视频的注入方式。与其将
 - **长度无关推理**：模型不再受限于固定的序列长度，可以在推理时处理任意长度的输入视频。
 
 基于这一洞察，RealCam 提出了一套完整的“教师-学生”两阶段框架，通过交叉帧上下文学习训练高保真度双向教师模型，再通过自强制分布匹配蒸馏将其转化为少步因果学生模型，最终实现亚秒级的实时新视角合成。
-
-
 
 ## 核心方法与创新机理
 
@@ -117,8 +113,6 @@ $$\nabla_{\theta} \mathcal{L}_{\mathrm{DMD}} \approx - \mathbb{E}_{t, z_0, c_{\m
 
 这些创新并非孤立存在，而是形成了一条从“交织条件→因果蒸馏→闭环增强”的完整技术链，最终实现了亚秒级延迟（1.3b模型1.15s，5b模型0.72s）的实时交互式相机控制视频生成。
 
-
-
 RealCam 采用“双向教师训练 → 因果学生蒸馏”的两阶段流水线，将相机控制的视频到视频（V2V）生成从离线高延迟范式转化为实时流式框架。其核心设计围绕三个模块展开：**交叉帧上下文学习教师训练**、**因果适应与自强制分布匹配蒸馏**，以及**闭环数据增强（LoopAug）**。
 
 **输入输出流**：系统接收一段源视频 $z_s$（任意长度）、一条目标相机轨迹 $c_{\text{cam}}$ 以及可选的文本描述 $c_{\text{text}}$，输出与目标相机轨迹对应的新视角视频。在教师阶段，源视频与目标视频的潜变量在帧维度上交织（Interleave），形成统一的上下文序列；在因果学生阶段，输入按块（chunk）组织，源帧与噪声帧交织后送入因果注意力网络，逐块生成目标帧并滚动拼接，实现流式输出。
@@ -131,8 +125,6 @@ RealCam 采用“双向教师训练 → 因果学生蒸馏”的两阶段流水�
 *Figure 2: Model architecture and training pipeline. Left: The training pipeline of teacher camera-controlled video-to-video model. (a) A latent diffusion model is optimized to reconstruct the target video*
 
 **关键瓶颈解除**：该流水线直接针对现有隐式方法（如 ReCamMaster）的两大瓶颈——刚性前缀式时间拼接导致的长度泛化失效，以及双向注意力带来的高推理延迟。交叉帧交织解除了前缀依赖，因果蒸馏将延迟从数百秒降至亚秒级（Table 1：1.3b 模型 1.15s，5b 模型 0.72s，对比 ReCamMaster 的 426s），LoopAug 则弥补了长视频场景下的全局一致性短板。
-
-
 
 RealCam 采用两阶段训练流水线：先训练一个基于交叉帧上下文学习的高保真双向教师模型，再通过自强制分布匹配蒸馏将其转化为少步因果学生模型，并辅以闭环数据增强保证长视频全局一致性。
 
@@ -172,12 +164,8 @@ $$\nabla_{\theta} \mathcal{L}_{\mathrm{DMD}} \approx - \mathbb{E}_{t, z_0, c_{\m
 
 长视频自回归生成面临误差累积导致漂移的问题。当相机轨迹形成闭环（如先向下平移再返回原点）时，这种漂移表现为生成的末帧与源视频不一致。**LoopAug** 通过合成闭环视频序列提供全局一致性监督：在训练数据中构造相机轨迹闭合的视频片段，强制模型学习闭环条件下的帧间一致性。该策略无需额外人工标注，直接作用于数据层面，显著改善长视频的视觉质量和几何一致性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2605_06051/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of direct temporal concatenation and ours cross-frame concatenation. Our method generalizes to arbitrary video length during inference and naturally extends to causal attention*
-
-
 
 ## 实验与关键发现
 
@@ -210,9 +198,6 @@ RealCam 在 MultiCamVideo 测试集上与三类代表性方法进行了全面对
 
 Figure 3 展示了交叉帧条件设计与前缀式拼接方法的根本差异。当推理长度偏离训练长度（81 帧）时，ReCamMaster 的性能严重下降，因为其刚性前缀依赖导致模型无法泛化到未见过的序列长度。相比之下，交叉帧交织使模型学习相对帧关系而非绝对位置，天然支持任意长度推理而不需重新训练。这一性质是 RealCam 实现长度无关泛化的瓶颈突破。
 
-![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2605_06051/figures/003_Figure_3.jpg]]
-*Figure 3: Length-agnostic inference without retraining. Each row corresponds to a distinct video sequence synthesized at different inference lengths (e.g., 49 denotes the total frames of the generated video). Both trained on fixed 81-frame clips, our model maintains high performance. In contrast, the direct concatenation method (e.g., ReCamMaster [Bai et al. 2025]) exhibits severe degradation when the inference horizon deviates from the training length, underscoring the brittleness of prefix-style conditioning*
-
 ### 失败模式与开放问题
 
 论文未在正文中明确讨论限制，但可从实验设置推断以下潜在失败模式：
@@ -222,8 +207,6 @@ Figure 3 展示了交叉帧条件设计与前缀式拼接方法的根本差异�
 - **LoopAug 截断策略的具体实施**：闭环数据增强中的截断策略细节未知，可能影响长视频训练的稳定性。
 - **因果蒸馏中的滚动策略差异**：自强制滚动策略与类似工作（如 Self-Forcing、Rolling Forcing）的具体差异未在已验证材料中明确，其独特贡献需要进一步厘清。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2605_06051/figures/004_Figure_4.jpg]]
 *Figure 4: Qualitative comparison with SOTA methods. Red boxes indicated low quality content across frames. Our method achieves better camera control and excellent temporal synchronization*
 
@@ -232,11 +215,6 @@ Figure 3 展示了交叉帧条件设计与前缀式拼接方法的根本差异�
 
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2605_06051/figures/007_Figure_5.jpg]]
 *Figure 5: Qualitative ablation on long video. The camera trajectory first translates down with rotation and then back to the origin. Red boxes indicated inconsistency with the source video*
-
-![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2605_06051/figures/008_Table_3.jpg]]
-*Table 3: Quantitative ablations on key training strategies*
-
-
 
 ## 定位与知识库关联
 
@@ -266,8 +244,6 @@ RealCam 处于相机控制视频到视频生成（camera-controlled V2V generati
 - 自强制滚动策略与现有工作（如 Self-Forcing、Rolling Forcing）的具体差异及其对蒸馏效率的影响；
 - 因果学生模型在块大小（chunk size）与延迟/质量之间的帕累托前沿——Table 3 仅比较了块大小 1 和 3，更大的块在质量与延迟上的 trade-off 未充分探索；
 - 该方法是否可以扩展到多源视频输入或非刚性相机轨迹（如手持晃动）场景。
-
-
 
 ## 原文 PDF
 

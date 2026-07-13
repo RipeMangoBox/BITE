@@ -150,8 +150,6 @@ $$ \text{Total Reward} = (1-\alpha-\beta) \cdot \text{Format} + \alpha \cdot \te
 
 消融实验证实了混合奖励的必要性：去除模型奖励使高级别分从83.7%降至78.6%，去除规则奖励使低级别分从83.9%降至78.2%。两阶段RL策略与混合奖励设计的协同，构成了MM-ReCoder实现有效自纠正的核心机制。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2695_https_arxiv_org_abs_2604_01600/figures/002_Figure_2.jpg]]
 *Figure 2: Training pipeline of MM-ReCoder. We first conduct two stages of cold start: (a) we first train the model on ground truth chartcode pairs with SFT, then (b) we construct self-correction data with Qwen3VL-235B [31], filter the successful ones, and train our model on the filtered data. After cold start, we conduct two stages of reinforcement learning: (c) we first enhance the model’s self-correction capability in the second turn via shared-first-turn optimization, then (d) we optimize the two turns jointly to improve the coding ability*
 
@@ -255,8 +253,6 @@ Table A6统计了自纠正的三种失败模式频率：（1）**诊断错误**�
 
 ![[assets/figures/papers/paper_list_l2695_https_arxiv_org_abs_2604_01600/figures/030_Figure.jpg]]
 *Figure: A10. Failure cases of MM-ReCoder and baselines. The models tend to fail when the chart type is rare*
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2695_https_arxiv_org_abs_2604_01600/figures/006_Table_2.jpg]]
 *Table 2: Comparison of RL strategies for self-correction. Our two-stage strategy enables self-correction capability while the others cannot*

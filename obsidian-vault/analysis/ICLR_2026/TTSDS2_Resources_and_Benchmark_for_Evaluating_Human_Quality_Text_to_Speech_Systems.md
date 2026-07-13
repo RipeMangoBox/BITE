@@ -53,8 +53,6 @@ claims:
 
 论文同时发布了可复现的评估流水线，覆盖 14 种语言和 20 个 2022 年后发布的 TTS 系统，为社区提供了一套可自动更新、无污染的基准测试框架。
 
-
-
 ### 文本到语音评估的瓶颈
 
 随着深度学习驱动的文本到语音（TTS）系统在自然度和表现力上逼近人类水平，如何可靠地评估这些系统成为一个日益紧迫的问题。主观听测（如MOS、CMOS）虽然仍是评估语音质量的“金标准”，但其资源密集、周期漫长，且不同研究团队之间的评测结果难以直接比较。另一方面，现有的客观指标面临两个核心挑战：**跨域泛化能力不足**和**与人类感知的相关性不一致**。
@@ -80,8 +78,6 @@ claims:
 - **构建可持续的评估基础设施**：发布自动化流水线，定期从YouTube抓取多语言数据、合成样本并计算TTSDS2分数，使基准能够随时间演化，避免数据污染和系统过时。
 
 最终，TTSDS2的目标不是取代主观听测，而是提供一个**与人类判断高度一致、跨域跨语言稳健、且无需额外训练即可直接部署**的客观评估工具，为TTS研究的快速迭代提供可靠的质量信号。
-
-
 
 ## 核心方法与创新机理
 
@@ -114,8 +110,6 @@ $$\mathrm{TTSDS2}(D, \tilde{D}, \mathfrak{D}^{\mathrm{NOISE}}) = 100 \times \fra
 ### 创新边界与待验证点
 
 TTSDS2 的创新集中在**因子特征替换**和**聚合策略简化**两个层面，未改变分布相似性的底层数学框架。其跨语言泛化能力（Figure 3）目前仅覆盖 14 种语言，且多语言模型仍以英语为中心，非英语语言的评估全面性有待进一步验证。
-
-
 
 TTSDS2 将合成语音质量的评估定义为一个**分布相似性问题**：给定合成语音集合 $\tilde{D}$、真实参考语音集合 $D$ 和噪声参考集合 $\mathfrak{D}^{\mathrm{NOISE}}$，通过比较合成语音与两类参考在多个感知因子上的特征分布距离，得出一个归一化的质量评分。其核心假设是：高质量的合成语音应与真实语音在感知特征上具有高度相似的分布，而与噪声分布保持明显距离。
 
@@ -166,8 +160,6 @@ $$\mathrm{TTSDS2}(D, \tilde{D}, \mathfrak{D}^{\mathrm{NOISE}}) = 100 \times \fra
 
 需要指出的是，TTSDS2 的 Wasserstein 距离计算为 CPU 密集型，每次评估约需 9.4 分钟，且当前仅适用于 3–30 秒的短句，无法评估长篇语音的连贯性或风格适应性。
 
-
-
 ### 评估框架：分布相似性建模
 
 TTSDS2 将合成语音的质量评估定义为一个**分布相似性问题**。其核心假设是：高质量的合成语音应在多个感知因子上，与真实语音的分布足够接近，而与噪声语音的分布足够远。
@@ -214,8 +206,6 @@ TTSDS2 提供了一个可重复运行的自动化基准流水线（Algorithm 1�
 5. **TTSDS2 Scoring**：计算各因子得分和总体 TTSDS2 得分。
 
 该流水线使得基准数据集可以定期重建，避免数据污染，并支持 14 种语言的自动化系统排名。
-
-
 
 ## 实验与关键发现
 
@@ -273,8 +263,6 @@ TTSDS2不仅是一个指标，还配套提供了一个自动化基准构建管�
 
 多语言验证显示，TTSDS2得分与语言类型学距离呈显著负相关（ρ=-0.51），表明指标能够捕捉到因语言差异导致的合成质量变化。Figure 3展示了14种语言的TTSDS2得分分布，但当前多语言模型仍以英语为中心，非英语语言的评估覆盖面和深度有待扩展。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l38_https_openreview_net_forum_id_uGai5lYHlV/figures/001_Table_1.jpg]]
 *Table 1: Feature set used for TTSDS compared to TTSDS2*
 
@@ -283,14 +271,6 @@ TTSDS2不仅是一个指标，还配套提供了一个自动化基准构建管�
 
 ![[assets/figures/papers/paper_list_l38_https_openreview_net_forum_id_uGai5lYHlV/figures/009_Table_6.jpg]]
 *Table 6: Open-source TTS systems, prior evaluation, and results for each system relative to ground-truth (GT) speech: † = accompanied by publication; ∗ = third-party implementation; Parity column: Reported MOS/CMOS are close to GT (∼), surpassing GT (>) or below GT (\<)*
-
-![[assets/figures/papers/paper_list_l38_https_openreview_net_forum_id_uGai5lYHlV/figures/013_Table_7.jpg]]
-*Table 7: The Table above shows the raw MOS, CMOS and SMOS scores derived from the listening tests*
-
-![[assets/figures/papers/paper_list_l38_https_openreview_net_forum_id_uGai5lYHlV/figures/014_Table_8.jpg]]
-*Table 8: Pearson correlation (r) between each factor and MOS*
-
-
 
 ## 定位与知识库关联
 
@@ -333,8 +313,6 @@ TTSDS2 的设计存在明确的适用边界：
 2. 如何将因子化分布评估框架扩展到长上下文或长文本的语音评估，捕捉段落级的连贯性和风格一致性？
 3. 当合成语音质量持续提升时，当前基于噪声参考的归一化方案是否需要引入更高质量的锚点以维持区分度？
 4. 如何将基准评估扩展到更广泛的语言，特别是低资源语言，避免以英语为中心的评价偏差？
-
-
 
 ## 原文 PDF
 

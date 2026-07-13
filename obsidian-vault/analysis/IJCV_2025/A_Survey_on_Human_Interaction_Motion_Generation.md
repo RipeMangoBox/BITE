@@ -52,8 +52,6 @@ claims:
 
 **未来方向**聚焦于四个开放问题：利用异构数据源及大语言/视觉模型突破数据稀缺瓶颈；融合物理模拟精度与扩散模型的表达灵活性；在有限高质量数据下设计交互感知的特征表示；将单人运动编辑与控制技术适配至多实体交互场景。
 
-
-
 人类运动生成是计算机视觉与图形学领域的核心课题，其目标是根据文本描述、语音指令、场景布局等多样化条件信号，合成自然、逼真的三维人体运动序列。随着数字人、虚拟现实和具身智能的快速发展，对运动生成的需求已从单人孤立动作扩展到多人协作、人-物体交互、人-场景交互等复杂场景，这使得**人类交互运动生成**成为一个独立且紧迫的研究方向。
 
 该领域面临三重固有挑战。其一，**交互动作的随机性与时空一致性之间的张力**：交互行为本质上具有高度随机性——同一语义意图可对应多种运动实现，但多人/人物协同运动必须维持精确的空间协调与时间连贯性，这对生成模型的约束建模能力提出了严苛要求。其二，**与外部世界交互需要环境感知与物理约束**：当人与物体或场景交互时，系统必须理解场景布局、物体属性与可供性，并遵守接触、碰撞、支撑等物理约束，而非仅仅生成运动学上合理的姿态序列。其三，**高质量交互数据的采集成本高昂且难以规模化**：相比单人运动，多人交互、人-物交互的数据标注与采集需要多视角同步捕捉、接触点标注等额外投入，使得单纯依赖数据驱动学习变得不切实际。
@@ -61,8 +59,6 @@ claims:
 从方法演进脉络来看，该领域经历了从传统运动图、隐马尔可夫模型到深度生成模型的范式转换。早期工作主要依赖运动匹配与拼接，受限于数据覆盖度而泛化能力有限。近年来，扩散模型、Transformer等表达性生成架构的引入显著提升了运动多样性与质量，但核心瓶颈已从“能否生成”转向“如何生成得真实且交互一致”。成功生成交互运动的关键在于将**语义意图、空间协调与物理真实性**有机融合——语义层面确保动作符合交互意图，空间层面保证多人/人物相对位置与接触的合理性，物理层面则约束运动符合力学规律。
 
 当前方法的缺口集中体现在三个方面：一是多数方法仍以数据驱动为主，对数据稀缺的交互类型泛化不足；二是物理模拟与表达性生成模型的结合尚处于早期阶段，前者精度高但灵活性差，后者生成力强但物理合理性弱；三是缺乏统一的交互运动表示框架，使得跨任务迁移困难。本文正是在此背景下，首次系统性地综述人类交互运动生成的四大子任务——人-人交互、人-物交互、人-场景交互及混合交互——梳理其方法谱系、数据集与评估体系，并指出未来发展的关键方向。
-
-
 
 ## 核心方法与创新机理
 
@@ -111,8 +107,6 @@ $$q(\mathbf{x}_t|\mathbf{x}_{t-1}) = \mathcal{N}(\mathbf{x}_t; \sqrt{1-\beta_t}\
 - 评估指标尚未标准化，MPJPE等指标仅衡量关节位置误差，无法全面反映交互的真实性与物理合理性。
 - 如何将单人运动编辑技术（关节轨迹控制、风格化生成、文本提示编辑）适配至多人/多实体交互场景，是综述提出的开放问题，但尚未有成熟方案。
 
-
-
 本综述将人类交互运动生成方法统一归纳为“表示—条件—生成—评估”四层框架，各层之间存在明确的输入输出依赖关系。
 
 **表示层（Representation Layer）** 位于框架底层，负责定义交互实体的数据结构。人体运动采用基于运动学的骨架关节序列表示，其中6D旋转表示因其连续性和与深度学习模型的兼容性而受到青睐（Section 3.1.1）；参数化模型如SMPL、SMPL-X、GHUM则进一步引入形状参数，支持几何感知的运动表达。物体运动分为两类：刚性物体以6自由度位姿序列 $\mathbf{T}_{1:N} = [\mathbf{t}, \mathbf{R}]_{1:N}$ 描述，铰接物体则通过组合关节旋转、物体平移和物体旋转的位姿参数 $\varOmega \in \mathbb{R}^{7}$ 及其网格 $O(\varOmega) \in \mathbb{R}^{V \times 3}$ 表示（Section 3.1.2）。
@@ -124,8 +118,6 @@ $$q(\mathbf{x}_t|\mathbf{x}_{t-1}) = \mathcal{N}(\mathbf{x}_t; \sqrt{1-\beta_t}\
 **评估层（Evaluation Layer）** 对生成结果进行多维度度量，包括以MPJPE为代表的运动精度指标、物理合理性指标以及交互一致性指标（Section 6.1.1，Table 9）。
 
 框架的模块间数据流如下：表示层输出的实体运动表征作为生成层的训练与推理数据；条件层将文本、音频、动作标签等外部信号编码后注入生成层以控制生成过程；生成层产出的运动序列最终由评估层进行定量与定性检验。这一分层架构使得不同交互场景（人-人、人-物、人-场景、混合交互）的方法可以在统一框架下进行比较和定位。
-
-
 
 ### 交互实体表示
 
@@ -202,8 +194,6 @@ $$MPJPE(f, S) = \frac{1}{N_S} \sum_{i=1}^{N_S} \| m_{f, S}^{(f)}(i) - m_{gt, S}^
 
 该指标是衡量运动重建精度的基础度量，但无法全面反映交互运动在物理合理性、语义一致性与时空协调性方面的质量——这正是当前评估体系尚未标准化的核心痛点。
 
-
-
 ## 实验与关键发现
 
 ### 综述方法论与证据来源说明
@@ -254,31 +244,9 @@ $$MPJPE(f, S) = \frac{1}{N_S} \sum_{i=1}^{N_S} \| m_{f, S}^{(f)}(i) - m_{gt, S}^
 
 高质量交互数据的采集成本高昂且难以规模化，这是全领域的共性瓶颈。Table 5-8显示，现有数据集在交互类型覆盖上严重不均衡——常见交互（如握手、传递物品）数据充足，而复杂多步骤交互（如协作装配）数据极度稀缺。数据驱动方法在这些稀缺交互类型上的泛化失败是普遍现象。此外，多数数据集缺乏物理接触力标注和环境几何信息，限制了物理感知方法的训练与评估。
 
-![[assets/figures/papers/paper_list_l27_https_arxiv_org_abs_2503_12763v2/figures/015_Table_6.jpg]]
-*Table 6: Human-object interaction datasets. This table summarizes key statistics and features of various human-object interaction datasets. Subjects: The number of individuals involved in the dataset; Sequences: The number of motion clips available; Frames: The total number of frames capturing 3D human motions; Length: The cumulative duration of the dataset’s motion data (in hours); Acquisition: The method used to obtain motion data (e.g., multi-view RGB videos denoted as “mRGB”); Modality: The representation format of motion data; Images, Text: Indicates whether the dataset includes corresponding modalities*
-
-![[assets/figures/papers/paper_list_l27_https_arxiv_org_abs_2503_12763v2/figures/016_Table_7.jpg]]
-*Table 7: Human-scene interaction datasets. This table summarizes key statistics and features of various human-scene interaction datasets. Subjects: The number of individuals involved in the dataset; Sequences: The number of motion clips available; Frames: The total number of frames capturing 3D human motions; Length: The cumulative duration of the dataset’s motion data (in hours); Motion Acquisition: The method used to obtain motion data; Scene Acquisition: The method used to obtain scene data; Modality: The representation format of motion data; Dynamic: Indicates whether the dataset includes dynamic or static scene*
-
 ### 开放问题与未来评估方向
 
 综述识别的开放问题直接指向评估体系的完善需求：（1）如何利用异构数据源及大语言模型/视觉语言模型突破数据稀缺瓶颈，需要建立跨数据源的评估协议；（2）物理模拟器精度与表达性生成模型灵活性的结合，要求新的混合评估指标同时衡量运动自然度与物理可行性；（3）交互感知特征表示的设计需在有限数据下验证其跨任务迁移能力；（4）单人运动编辑控制技术向多人/多实体交互场景的适配，需要建立相应的可控性评估基准。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l27_https_arxiv_org_abs_2503_12763v2/figures/010_Figure.jpg]]
-*Figure: (a) Motion Generation System (b) Environment Constraints (c) Contextual Interaction Understanding*
-
-![[assets/figures/papers/paper_list_l27_https_arxiv_org_abs_2503_12763v2/figures/001_Figure_1.jpg]]
-*Figure 1: (b) Timeline of human interaction datasets Fig. 1: Statistics on the number of works and datasets on human interaction motion generation over the past two decades, categorized into four interaction scenarios*
-
-![[assets/figures/papers/paper_list_l27_https_arxiv_org_abs_2503_12763v2/figures/008_Table_2.jpg]]
-*Table 2: Representative works of human-object interaction motion generation*
-
-![[assets/figures/papers/paper_list_l27_https_arxiv_org_abs_2503_12763v2/figures/012_Table_3.jpg]]
-*Table 3: Representative works of human-scene interaction motion generation*
-
-
 
 ## 定位与知识库关联
 
@@ -347,8 +315,6 @@ $$p_{\theta}(\mathbf{x}_{t-1}|\mathbf{x}_t) = \mathcal{N}(\mathbf{x}_{t-1}; \mu_
 5. **编辑与控制技术迁移**：如何将现有的单人运动编辑与控制技术（如关节轨迹控制、风格化生成、文本提示编辑）适配至多人/多实体交互场景，是实用性提升的重要方向。
 
 *注：本文为综述性质，未进行独立的定量实验验证，所列方法的性能指标均源于原文献，读者在横向比较时需注意不同方法使用的数据集和评估协议可能存在差异。*
-
-
 
 ## 原文 PDF
 

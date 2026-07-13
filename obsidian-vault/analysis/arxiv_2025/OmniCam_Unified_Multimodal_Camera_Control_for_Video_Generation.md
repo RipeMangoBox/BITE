@@ -142,8 +142,6 @@ $$\min_{\theta} = \mathbb{E}_{t \sim \mathcal{U}(0,1), \epsilon \sim \mathcal{N}
 
 整个流水线的输入输出流可概括为：多模态轨迹参考 → 离散运动表示 → 每帧相机外参 → 点云渲染粗视图 → 扩散修补完整帧 → 时空一致视频。这一设计使得 OmniCam 首次在统一框架下同时支持文本、视频和显式轨迹任意组合下的帧级相机控制。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2504_02312/figures/001_Figure_1.jpg]]
 *Figure 1: An overview of OmniCam. Given diverse modalities of content references and trajectory guidance, OmniCam generates high-quality video sequences by camera motion control. Specifically, OmniCam integrates various combinations of content (e.g., image or video) and trajectory (e.g., text instructions or camera motion from video) references. This approach allows OmniCam to accurately synthesize videos consistent with user-specified inputs*
 
@@ -189,8 +187,6 @@ $$\min_{\theta} = \mathbb{E}_{t \sim \mathcal{U}(0,1), \epsilon \sim \mathcal{N}
 ### 4.5 端到端强化学习优化
 
 为进一步提升上下游模块的耦合度，OmniCam 引入强化学习微调阶段。具体而言，冻结下游扩散模型作为奖励信号，使用 PPO 算法优化上游轨迹大模型，使生成的离散运动表示更适配后续的渲染与修补流程。消融实验（Table 2）显示，移除 RL 微调后轨迹平均准确率从 80.171 降至 78.341，表明 RL 带来了稳定但有限的提升。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2504_02312/figures/010_Figure_7.jpg]]
 *Figure 7: Visualization of Rotation Algorithm*
@@ -248,25 +244,11 @@ Figure 6的雷达图从八个维度（集成灵活性、开源、生成速度、
 
 4. **评估标准的局限性**：相机控制领域尚无统一评估标准，现有定量比较存在局限性，部分定性比较仍依赖人工评测。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2504_02312/figures/006_Table_3.jpg]]
-*Table 3: The comparison with other models. More comparisons with other methods can be found at supplementary and demo page*
-
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2504_02312/figures/004_Table_1.jpg]]
 *Table 1: Comparison of other datasets with OmniTr. None of the other datasets include textual descriptions of the trajectories. T in the table stands for Text*
 
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2504_02312/figures/014_Table_4.jpg]]
 *Table 4: Comparison of Content and Trajectory Reference Capabilities*
-
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2504_02312/figures/007_Figure_6.jpg]]
-*Figure 6: Radar chart comparing OmniCam with domain-specific models across eight dimensions: IF stands for Integration Flexibility, OS refers to Open Source, GS means Generation Speed, VM represents Video Manipulation, GN is Generalization, US indicates Usability, CI denotes Support Complex Instructions, and VT signifies Video Trajectory-Based*
-
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2504_02312/figures/008_Figure_4.jpg]]
-*Figure 4: Text description for camera control. Each set of results demonstrates the generation effects of different types of camera motion combinations, including directional movements at specified angles, rotations, and other complex movements*
-
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2504_02312/figures/013_Figure_10.jpg]]
-*Figure 10: Comparison of performance of OmniCam, ViewCrafter, FSGS, DNGaussian, InstantSplat and other methods on two indicators: LPIPS and SSIM*
 
 ## 定位与知识库关联
 

@@ -213,8 +213,6 @@ BiGain 的压缩模块无缝嵌入扩散分类器的推理管线。对于输入�
 
 所有类别共享相同的噪声样本和压缩调度，确保成对比较的有效性。两个算子均避免跨时间步缓存，保证蒙特卡洛估计的无偏性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l841_https_arxiv_org_abs_2603_12240/figures/001_Figure_1.jpg]]
 *Figure 1: Framework of our BiGainTM method. A Laplacian filter is applied to hidden-state tokens to compute local frequency scores. In each spatial stride, the lowest-scoring token is selected as a destination token, while the others form the source set. Destination and source tokens are gathered globally, and a bipartite matching selects top source-destination pairs*
 
@@ -278,8 +276,6 @@ $$Q_{\text{full}}, \quad K_{\downarrow} = \mathcal{D}_{\alpha, s}(K), \quad V_{\
 
 这使注意力计算量从 $O(N^2)$ 降至 $O(N \cdot N/s^2)$，同时保留查询的细粒度定位能力。消融实验表明 $\alpha \in [0.8, 1.0]$ 时分类准确性最强；生成任务中采用线性时间步调度（早期步 $\alpha$ 较低以保留低频语义，后期步 $\alpha$ 较高以保留高频细节）可获得鲁棒的 FID 表现。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l841_https_arxiv_org_abs_2603_12240/figures/012_Figure_6.jpg]]
 *Figure 6: Comparison of token merging schemes. Left: ToMe [4]; Right: Our BiGainTM. Merging is applied with a merge ratio 90% at the highest-resolution latent layer of the U-Net transformer in Stable Diffusion 2.0 at denoising step t = 200. Grayscale indicates merged tokens*
 
@@ -308,12 +304,6 @@ BiGain 在生成质量上未付出代价，反而在某些设置下略微改善�
 ![[assets/figures/papers/paper_list_l841_https_arxiv_org_abs_2603_12240/figures/004_Figure_4.jpg]]
 *Figure 4: Qualitative comparison of*
 
-![[assets/figures/papers/paper_list_l841_https_arxiv_org_abs_2603_12240/figures/006_Table_2.jpg]]
-*Table 2: SD-2.0 Token Downsampling: Classification (Acc@1 on Pets, ImageNet-100; Acc@1 and mAP on COCO-2017) and generation fidelity (FID ↓) vs. downsampling factor. For classification, we fix the interextrapolation factor at 0.9 across all timesteps to ensure stability. For generation, we linearly vary the factor from 0.8 (early steps) to 1.2 (later steps), shifting emphasis from low- to highfrequency information. Gray color indicates the same generation results as the above group*
-
-![[assets/figures/papers/paper_list_l841_https_arxiv_org_abs_2603_12240/figures/007_Table_3.jpg]]
-*Table 3: DiT-XL/2 Token Downsampling: Classification (Acc@1) and generation fidelity (FID ↓) vs. downsampling factor. For both classification and generation, we fix the interpolate-extrapolate factor at 0.1 across all timesteps. TD Factor: Token Downsampling factor*
-
 ### 消融实验：验证频率感知设计的必要性
 
 **令牌评分启发式**（Table 8）：拉普拉斯滤波器（ℓ₁）作为令牌评分在所有合并率下均优于全局统计量（均值偏离、ℓ₁/ℓ₂ 范数）、信道方差、频谱 DFT 和余弦相似度。这直接验证了局部频率感知引导是分类性能提升的关键——全局或频谱度量无法有效区分高频判别信息与低频冗余。
@@ -328,9 +318,6 @@ BiGain 在生成质量上未付出代价，反而在某些设置下略微改善�
 
 BiGain 提供两种快速变体以进一步降低计算开销（Table 7）：自适应块合并（ABM）按块聚合频率分数，直接合并整个低频块，避免逐令牌匹配；缓存赋值合并在 U-Net 最高分辨率阶段复用合并/解合并映射。在 70% 合并率下，标准拉普拉斯合并、缓存赋值和 ABM 的 GFLOPs 分别为 51.3、50.8 和 49.5（Table 7），实际推理时间测量（Table 11, Table 18）确认了加速效果。
 
-![[assets/figures/papers/paper_list_l841_https_arxiv_org_abs_2603_12240/figures/011_Table_7.jpg]]
-*Table 7: Further speedup on SD-2.0 Token Merging: classification performance vs. merge ratio. Acc@1 for single-label datasets; Acc@1 and mAP for multi-label COCO-2017. GFLOPs are measured at merge ratio r = 0.7*
-
 ### 失败模式与局限
 
 1. **模块联合使用的非叠加性**（Table 17）：L-GTM 与 IE-KVD 联合使用在 Pets 数据集上未超越最佳单模块设置，增益非叠加，需要手动选择适用模块。
@@ -338,16 +325,8 @@ BiGain 提供两种快速变体以进一步降低计算开销（Table 7）：自
 3. **跨骨干泛化**：当前评估限于 U-Net（SD-2.0）和 DiT-XL/2，尚未在视频扩散或更大型基础模型上验证（需人工确认）。
 4. **超参数依赖**：α、合并率 r、下采样系数 s 需根据任务和模型手动调整，缺乏自动化选择机制。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l841_https_arxiv_org_abs_2603_12240/figures/005_Table_1.jpg]]
-*Table 1: Classification accuracy (Acc@1) on Pets dataset under similar FLOPs reduction*
-
 ![[assets/figures/papers/paper_list_l841_https_arxiv_org_abs_2603_12240/figures/010_Table_6.jpg]]
 *Table 6: Ablation of token-merging locations in Stable Diffusion 2.0 on Pets. Self-Attention (SA) is always merged; Cross-Attention (CA) and MLP are toggled. Results reported at merge ratios*
-
-![[assets/figures/papers/paper_list_l841_https_arxiv_org_abs_2603_12240/figures/013_Table_8.jpg]]
-*Table 8: Ablation over token scoring heuristics for Stable Diffusion 2.0. Top-1 acc. (%) on Pets dataset across merge ratios. Local Laplacian signals outperform global or spectral metrics*
 
 ## 定位与知识库关联
 

@@ -53,8 +53,6 @@ claims:
 
 在方法谱系上，该工作区别于需要针对特定指南重新训练的深度聚类方法（如SCAN, Van Gansbeke et al., ECCV 2020；IDCTCL, Liu et al., NeurIPS 2024），也与仅支持单一文本条件的训练无关方法（如IC|TC, Kwon et al., arXiv 2023）形成对比。其训练无关、可即时切换多标准指南的特性，以及通过LLM混合推理实现自动簇数发现的机制，为图像聚类提供了一种灵活、高效且通用的新范式。
 
-
-
 图像聚类旨在根据语义相似性自动将图像分组，是计算机视觉领域的基础任务。传统聚类方法通常依赖单一、隐式的语义标准，例如将“金毛犬”和“哈士奇”归为“狗”这一粗粒度类别。然而，现实世界的聚类需求远比这复杂——用户可能希望按“颜色”“材质”“品种”“使用场景”等不同指南对同一批图像进行划分，且这些指南往往需要灵活组合。这催生了**指南驱动图像聚类（Guideline-Driven Image Clustering）** 这一新范式。
 
 ### 现有方法的碎片化困境
@@ -73,8 +71,6 @@ claims:
 3. 如何使同一框架同时覆盖通用聚类、细粒度聚类、多标准聚类和长尾聚类等异构场景？
 
 这些问题的解决将使得图像聚类从“单一标准、训练依赖”的范式转向“多标准、零训练”的新范式，显著降低实际部署的门槛。
-
-
 
 ## 核心方法与创新机理
 
@@ -100,8 +96,6 @@ claims:
 
 上述两个changed slots并非孤立改进，而是形成因果闭环：GCPM提供的解耦嵌入为MST遍历提供了高质量的语义距离基础，使得MST上的Ward距离能够更准确地反映指南相关的簇间相似性；而MST遍历则弥补了GCPM嵌入在细粒度语义区分上的残余模糊性。两者协同实现了**训练无关、指南驱动、跨任务通用**的图像聚类范式，覆盖从通用聚类到细粒度聚类、从全局准则到局部准则、从平衡分布到长尾分布的全场景（Figure 1）。
 
-
-
 本文提出首个**通用指南驱动图像聚类框架**，其核心设计目标是解决现有方法因任务碎片化而无法以统一、训练无关的方式组合多种语义指南的瓶颈。如图1所示，框架将任意图像聚类需求抽象为文本指南 $G$ 驱动的统一范式：给定样本集 $X$ 和指南 $G$，输出符合该指南的聚类结果 $\mathcal{C} = f(G, X)$（Eq.1）。这一范式覆盖了从通用聚类到细粒度聚类、从全局准则到局部准则、从均衡分布到长尾分布的多种场景。
 
 框架由两大核心模块串联构成，如图2所示：
@@ -120,12 +114,8 @@ GCPM 的训练无关特性使其可即时切换不同指南，无需针对新准
 
 **输入输出流**：对于未提供显式指南的场景，框架首先利用 LLM 通过启发式提示自动生成聚类指南。随后，图像经 GCPM 转化为指南感知嵌入，输入 K-Means（已知簇数）或 HDBSCAN（未知簇数）进行初始聚类；若使用 HDBSCAN，则进一步经 MST Traversal 进行语义合并，输出最终聚类结果。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2427_https_openaccess_thecvf_com_content_CVPR2026_html_Zhong_Universal_Guidel/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of our Guideline-Driven Clustering Agent. We introduce the first universal clustering framework that handles diverse image clustering scenarios through textual guidelines, spanning from general to fine-grained tasks, from global to local criteria, and from balanced to long-tail distributions. Our training-free hybrid agent flexibly adapts across these diverse clustering requirements*
-
-
 
 ### 问题形式化
 
@@ -183,16 +173,6 @@ $$p = f_{merge}(G, C_i, C_j), \quad \forall (C_i, C_j) \in T$$
 
 $f_{merge}$ 根据指南 $G$ 返回二值决策 $p \in \{0, 1\}$。该设计的关键效率优势在于：LLM 仅在语义模糊的簇对上被调用，而非对所有样本对进行判断。实验表明 LLM 调用次数远低于样本数量（Table 8），验证了选择性调用的有效性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2427_https_openaccess_thecvf_com_content_CVPR2026_html_Zhong_Universal_Guidel/figures/002_Figure_2.jpg]]
-*Figure 2: Overview of the Clustering Framework. Bottom left: Generative Concept Proxy Modeling extracts guideline-aware textual descriptions from images via multimodal LLM and encodes them into embeddings for efficient clustering; Right: MST-based LLM Traversal refines initial clusters by constructing a Minimum Spanning Tree and selectively querying the LLM for semantic merging decisions. Top left: For scenarios without available guidelines, we introduce heuristic prompts for automatic guideline generation*
-
-![[assets/figures/papers/paper_list_l2427_https_openaccess_thecvf_com_content_CVPR2026_html_Zhong_Universal_Guidel/figures/007_Figure_4.jpg]]
-*Figure 4: A disentanglement test case of cards grouped by suits using HDBSCAN. While using GME-Qwen with images only, the number criteria dominates the suit criteria because of the layout*
-
-
-
 ## 实验与关键发现
 
 ### 通用聚类性能
@@ -219,17 +199,11 @@ $f_{merge}$ 根据指南 $G$ 返回二值决策 $p \in \{0, 1\}$。该设计的�
 
 细粒度聚类（CUB Birds、Stanford Cars、Stanford Dogs、Oxford Flowers）和长尾电商聚类（ABO‑LC）进一步检验了方法的鲁棒性。Table 4 显示，在细粒度场景下，GCPM‑G + K‑Means 在 Stanford Cars 上取得 62.0% ACC，超越细粒度基线 DiFiC（Yang et al., arXiv 2024）的 60.7%。Table 5 中，ABO‑LC 数据集包含 10,756 个产品，78.7% 的簇仅含两个或更少样本（Table 1, Figure 3），呈现极端长尾分布。GCPM‑E + HDBSCAN + MST 遍历取得 51.5% ARI，相比纯 HDBSCAN 的 28.2% 提升 23.3 个百分点，验证了 MST 遍历在长尾、簇数未知场景下的大幅召回率增益。
 
-![[assets/figures/papers/paper_list_l2427_https_openaccess_thecvf_com_content_CVPR2026_html_Zhong_Universal_Guidel/figures/004_Table_1.jpg]]
-*Table 1: Statistics of clustering datasets and their criteria*
-
 ![[assets/figures/papers/paper_list_l2427_https_openaccess_thecvf_com_content_CVPR2026_html_Zhong_Universal_Guidel/figures/008_Table_4.jpg]]
 *Table 4: Comparison on fine-grained clustering. Baselines except UFCL assume known cluster number. KMS.: K-Means; HDBS.: HDBSCAN. Max ∆↑ measures improvements of MST Traversal*
 
 ![[assets/figures/papers/paper_list_l2427_https_openaccess_thecvf_com_content_CVPR2026_html_Zhong_Universal_Guidel/figures/009_Table_5.jpg]]
 *Table 5: Comparison on ABO-LC. Baseline IC|TC is based on known number of clusters. KMS.: K-Means; HDBS.: HDB-SCAN. Max ∆↑ measures improvements of MST Traversal*
-
-![[assets/figures/papers/paper_list_l2427_https_openaccess_thecvf_com_content_CVPR2026_html_Zhong_Universal_Guidel/figures/003_Figure_3.jpg]]
-*Figure 3: Examples from ABO-LC. Each item is represented by an image and an item name. Different clusters have various sizes*
 
 ### 消融研究
 
@@ -247,16 +221,6 @@ $f_{merge}$ 根据指南 $G$ 返回二值决策 $p \in \{0, 1\}$。该设计的�
 
 ![[assets/figures/papers/paper_list_l2427_https_openaccess_thecvf_com_content_CVPR2026_html_Zhong_Universal_Guidel/figures/010_Table_6.jpg]]
 *Table 6: Comparison of clustering results based on BCubed Precision (B-Prec.) and Recall (B-Rec.) before and after using MST Traversal upon HDBSCAN. # of clusters includes singletons*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2427_https_openaccess_thecvf_com_content_CVPR2026_html_Zhong_Universal_Guidel/figures/011_Table_7.jpg]]
-*Table 7: Comparison of caption quality across datasets using different captioning strategies via K-Means*
-
-![[assets/figures/papers/paper_list_l2427_https_openaccess_thecvf_com_content_CVPR2026_html_Zhong_Universal_Guidel/figures/012_Table_8.jpg]]
-*Table 8: Comparison of number of LLM calls in MST Traversal across datasets and their ratios to the number of samples*
-
-
 
 ## 定位与知识库关联
 
@@ -297,8 +261,6 @@ $f_{merge}$ 根据指南 $G$ 返回二值决策 $p \in \{0, 1\}$。该设计的�
 3. **无监督指南生成的有效性。** 在缺乏明确指南的全无监督环境中，LLM 启发式生成的指南（Section 3.1, Appendix C.1）能否达到专家指定的效果？当前实验主要在已知准则的数据集上进行，自动指南的质量评估缺乏系统对比。
 
 4. **跨模态泛化能力。** 该方法的核心机制——概念代理建模与指令感知嵌入——在文本、视频等多模态聚类中的适用性如何？概念代理的生成范式是否可统一迁移至非图像模态，仍需进一步研究。
-
-
 
 ## 原文 PDF
 

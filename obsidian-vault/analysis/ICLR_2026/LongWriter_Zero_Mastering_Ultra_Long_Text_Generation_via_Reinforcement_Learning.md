@@ -52,8 +52,6 @@ claims:
 
 在方法层面，LongWriter-Zero 构建了由长度奖励模型、写作质量奖励模型和格式奖励模型组成的复合奖励函数，通过组相对策略优化（GRPO）对基础模型进行训练，并引入“思考-回答”提示格式（`<think>`/`<answer>`）鼓励模型在生成前进行深度规划与反思。在实验层面，LongWriter-Zero 在 WritingBench 上取得最高平均评分 8.69，在 Arena-Write 上获得 Elo 1447，均超过 DeepSeek-R1（8.55 / 1343）、Claude-Sonnet-4（8.60 / 1185）和 Qwen3-235B（8.68 / 1343）等强基线。消融实验进一步证实：移除持续预训练后 WritingBench 均分降至 8.12、Elo 降至 1221；再移除思考提示后均分进一步降至 8.04、Elo 骤降至 668，验证了两项技术的决定性作用。RL 与 SFT 的直接对比亦表明，即使从更强的持续预训练初始化出发，RL 仍能带来大幅性能跃升（Elo: 1221→1447），而 SFT 的提升极为有限（Elo: 964→971）。
 
-
-
 大型语言模型（LLM）在短文本生成任务上已取得显著进展，但当输出长度扩展至数千乃至数万词时，模型普遍面临**局部不连贯、内部矛盾、重复措辞、主题漂移和结构崩溃**等系统性问题。这些失效并非简单的长度外推不足，而是反映了当前训练范式在优化长程依赖和全局一致性方面的根本局限。
 
 传统应对方案主要依赖**监督微调（SFT）**，即利用人工或模型合成的长文本数据进行训练。然而，这一路线存在三重瓶颈：其一，高质量长文本数据的构建成本极高，且合成样本往往缺乏多样性并包含难以检测的错误；其二，最大似然估计（MLE）目标仅优化词级预测精度，无法显式建模连贯性、格式一致性和篇章结构等全局属性；其三，SFT 的改进空间受限于训练数据的质量天花板，难以持续提升。
@@ -61,8 +59,6 @@ claims:
 上述瓶颈指向一个更深层的因果缺口：**长文本生成质量的关键不在词级拟合，而在于模型能否形成并执行全局规划**。这要求训练信号必须能够直接奖励那些跨越数百句乃至整个文档的优良属性，而非仅关注局部的下一个 token 预测。强化学习（RL）天然适合填补这一缺口——通过精心设计的奖励函数，RL 可以将长度控制、写作质量和结构格式等全局约束转化为可优化的目标，引导模型自发涌现高质量的长文本生成能力。
 
 基于此，**LongWriter-Zero** 提出了一条从零开始的 RL 驱动路线：不依赖任何人工标注或合成数据，仅通过复合奖励模型和组相对策略优化（GRPO）训练模型，并辅以大规模写作语料的持续预训练和“思考-回答”提示策略，使 32B 参数模型在长文本生成质量上超越 100B+ 级别的基线系统。
-
-
 
 ## 核心方法与创新机理
 
@@ -135,8 +131,6 @@ Figure 4 展示了 RL 与 SFT 在 Arena-Write 上的性能对比，揭示了两�
 
 Figure 2 和 Figure 3 的训练曲线进一步揭示了这一协同效应的动态过程：持续预训练模型在 RL 训练初期即展现出更高的 Writing RM 和 Length RM 分数，且其思考 token 长度始终长于基础模型（Figure 6），暗示更强的先验能力支撑了更深入的规划式推理。
 
-
-
 LongWriter-Zero 提出了一套完全由强化学习驱动的超长文本生成训练框架，其核心设计理念在于**不依赖任何人工标注或合成数据**，从零开始通过奖励信号引导模型自发涌现高质量的长文写作能力。整个流水线由四个关键模块串联构成，形成“数据筛选→能力预训练→策略优化→多维评估”的闭环。
 
 ### 查询筛选与长度预测
@@ -182,8 +176,6 @@ $$A_{\text{final}} = \frac{1}{3}(A_{\text{length}} + A_{\text{write}} + A_{\text
 ### 评估模块
 
 框架采用多层次的评估体系验证长文本生成质量：**WritingBench** 使用经过 50K 人类标注样本微调的 Qwen2.5-7B 批评模型，从风格、格式和长度三个维度对六个领域（学术工程、金融商业、政治法律、文学艺术、教育、广告营销）的输出进行 1-10 分评分；**Arena-Write** 则通过基于 Elo 的成对比较机制，利用 GPT-4.1 评判器衡量模型在开放式写作任务中的相对优势；此外还引入人工在环的胜率评估，通过交换回答顺序以减轻位置偏差，确保自动评判结果与人类偏好的一致性（批评模型与人类判断达到 83% 一致）。
-
-
 
 LongWriter-Zero 的训练流水线由四个核心模块构成：**查询筛选与长度预测**、**持续预训练**、**GRPO 强化学习训练**，以及**复合奖励模型**。各模块协同工作，使模型从零开始涌现超长文本生成能力，无需任何人工标注或合成数据。
 
@@ -235,22 +227,15 @@ $$A_{\mathrm{final}} = \frac{1}{3}(A_{\mathrm{length}} + A_{\mathrm{write}} + A_
 
 训练与推理阶段采用“思考-回答”提示（Think Prompt），要求模型在 `<think>` 标签内进行深度规划与反思，再在 `<answer>` 标签内输出最终内容。消融实验表明，移除该提示后 Arena-Write Elo 从 1447 骤降至 668，证明测试时思考对全局结构和规划至关重要。
 
-
-
 ## 实验与关键发现
 
 LongWriter-Zero 的评估围绕两个核心基准展开：**WritingBench**（维度化批评评分，1–10 分）和 **Arena-Write**（基于 Elo 的成对偏好评分）。主实验结果（Table 1）显示，基于 Qwen2.5-32B 的 LongWriter-Zero 在 WritingBench 上取得平均分 **8.69**，在 Arena-Write 上取得 Elo **1447**，均超过所有对比基线，包括 DeepSeek-R1（8.55 / 1343）、Claude-Sonnet-4（8.60 / 1185）、Qwen3-235B-A22B（8.68 / 1343）和 GPT-4o-2024-11-20（8.16 / —）。值得注意的是，这一成绩由一个 32B 参数模型取得，而最强基线 Qwen3-235B 是 235B 参数的 MoE 模型，表明 RL 驱动的训练范式在长文本生成任务上具有显著的参数效率优势。
-
-
-![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_JWx4DI2N8k/figures/004_Table_1.jpg]]
-*Table 1: WritingBench performance of different LLMs across six domains and three writing requirements (scale: 1–10). The domains are: (D1) Academic & Engineering, (D2) Finance & Business, (D3) Politics & Law, (D4) Literature & Art, (D5) Education, and (D6) Advertising & Marketing. Requirements include (R1) Style, (R2) Format, and (R3) Length. “C” denotes the category-specific score. Arena-Write Elo scores are shown in the final red box*
 
 ### 消融实验：持续预训练与测试时思考的关键作用
 
 Table 1 同时报告了两项关键消融结果。移除持续预训练后，WritingBench 平均分从 8.69 降至 **8.12**，Arena-Write Elo 从 1447 降至 **1221**；进一步移除“思考”提示（即使用 Direct-Answer 模式）后，平均分进一步降至 **8.04**，Elo 骤降至 **668**。这一衰减幅度表明，测试时思考（长 CoT）对全局结构和规划能力的贡献甚至超过持续预训练，是 RL 训练发挥上限的必要条件。
 
 训练曲线（Figure 2, Figure 3）进一步揭示了各组件的作用机制。Base-nothink 设置（无思考、无持续预训练）的 RL 训练已能稳定提升 Writing RM 和 Length RM 分数，Arena-Write Elo 从约 200 上升至 600 以上，证明纯 RL 信号即可驱动长文本能力的涌现。引入 Think 提示后（Base-think），Writing RM 分数在初期落后于 Base-nothink，但最终实现反超并达到更高上限，Elo 提升至约 1200。叠加持续预训练后（Continual-Pretrain-think），模型在训练初期即表现出更高的起点和更快的收敛速度，最终 Elo 达到约 1400。Figure 6 显示，持续预训练模型在 RL 过程中始终产生更长的推理链，暗示更强的写作先验使模型更愿意“投入思考”。
-
 
 ![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_JWx4DI2N8k/figures/002_Figure_2.jpg]]
 *Figure 2: RL Training curves of three setups (Base-nothink, Base-think, and Continual-Pretrain-think) across three metrics: Writing RM (left), Length RM (middle), and Mean Non-Overlong Generation Length (right)*
@@ -259,12 +244,10 @@ Table 1 同时报告了两项关键消融结果。移除持续预训练后，Wri
 
 Figure 4 直接对比了 RL 与 SFT 在 Arena-Write 上的表现。从 Base 初始化出发，SFT 仅将 Elo 从 964 提升至 971，几乎无增益；而 RL 将 Elo 从 964 提升至 1221。从持续预训练初始化出发，SFT 同样几乎无提升（964→971），而 RL 将 Elo 从 1221 推升至 1447。这一对比清晰表明：**RL 能够优化 SFT 无法触及的全局写作属性**，且持续预训练对 RL 的增益远大于对 SFT 的增益——RL 将更强的先验知识有效转化为更优的生成策略，而 SFT 仅能模仿训练分布。
 
-
 ![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_JWx4DI2N8k/figures/005_Figure_4.jpg]]
 *Figure 4: Arena-Write performance across RL training steps, comparing RL (solid) and SFT (dashed) starting from Base (orange) and Continual Pretrain (blue) initializations*
 
 Table 4 提供了与 LongWriter SFT 基线的直接对比：使用 LongWriter 合成数据训练的 Qwen2.5-32B SFT 模型在 WritingBench 和 Arena-Write 上均显著落后于 LongWriter-Zero-32B，进一步验证了 RL 流程的绝对优势。
-
 
 ![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_JWx4DI2N8k/figures/011_Table_4.jpg]]
 *Table 4: LongWriter-on-32B SFT baseline. We evaluate Qwen2.5-32B trained with LongWriter synthetic data against our LONGWRITER-ZERO-32B. Our RL pipeline achieves substantial improvements on both WritingBench and ArenaWriter ELO*
@@ -273,12 +256,10 @@ Table 4 提供了与 LongWriter SFT 基线的直接对比：使用 LongWriter �
 
 Figure 5 展示了人类在环胜率评估结果。左侧六图由 GPT-4.1 评判，LongWriter-Zero 对阵 Llama-4-Scout、DeepSeek-V3、DeepSeek-R1、Claude-Sonnet-4、Gemini-2.5-Pro 和 Qwen3-235B-A22B 均取得显著胜率优势；右侧两图由人工标注者评判，对阵 DeepSeek-R1 和 Qwen3-235B-A22B 同样确认了优势。评估中交换回答顺序以减轻位置偏差，自动评判与人工评判趋势一致。
 
-
 ![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_JWx4DI2N8k/figures/007_Figure_5.jpg]]
 *Figure 5: Win-rate results of LongWriter-Zero in human-in-the-loop win-rate evaluation. Left six charts: Outcomes judged by GPT-4.1 against six baselines (Llama-4-Scout, DeepSeek-V3, DeepSeek-R1, Claude-Sonnet-4, Gemini-2.5-Pro, Qwen3-235B-A22B). Right two charts: Outcomes judged by human annotators (comparing against DeepSeek-R1 and Qwen3-235B-A22B). The percentage in the center indicates the overall win rate, with ties counted as 0.5 wins for each side*
 
 在 LongBench-Write（Table 5）上，LongWriter-Zero-32B 在整体质量（$\bar{S}$）、长距离结构（$S_l$）和内容质量（$S_q$）三个维度均取得最佳成绩，进一步验证了其在独立长文本写作任务上的泛化能力。
-
 
 ![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_JWx4DI2N8k/figures/012_Table_5.jpg]]
 *Table 5: LongBench-Write results. Baseline scores follow Bai et al. (2025). LongWriter-Zero-32B obtains the best overall quality (S¯), long-horizon structure (Sl), and content quality (Sq)*
@@ -286,7 +267,6 @@ Figure 5 展示了人类在环胜率评估结果。左侧六图由 GPT-4.1 评�
 ### 小规模验证
 
 Table 3 报告了 LongWriter-Zero-14B 的结果。即使在 14B 参数规模下，RL 框架仍在 WritingBench 绝对批评分数和 Arena-Write Elo 上带来大幅提升，证明该方法具有良好的可扩展性。
-
 
 ![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_JWx4DI2N8k/figures/010_Table_3.jpg]]
 *Table 3: LongWriter-Zero-14B achieves strong gains at smaller scale. Even at 14B parameters, our RL framework produces substantial improvements in both absolute critic scores (WritingBench) and pairwise preference evaluations (ArenaWriter ELO)*
@@ -300,19 +280,6 @@ Table 3 报告了 LongWriter-Zero-14B 的结果。即使在 14B 参数规模下�
 2. **自动评判偏差**：WritingBench 使用经 50K 人类标注样本微调的 Qwen2.5-7B 批评模型（与人类判断 83% 一致），Arena-Write 使用 Qwen2.5-72B 和 GPT-4.1 作为评判器。尽管通过人工评估交叉验证，仍不能完全排除模型家族偏差对分数的影响。
 
 3. **计算开销**：RL 训练需 8 节点、64 块 H800 GPU，限制了在资源受限环境中的直接应用。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_JWx4DI2N8k/figures/001_Figure_1.jpg]]
-*Figure 1: SFT vs. RL in longform generation*
-
-![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_JWx4DI2N8k/figures/006_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_JWx4DI2N8k/figures/009_Table_2.jpg]]
-*Table 2: Continual pretraining data distribution*
-
-
-
 
 ## 定位与知识库关联
 
@@ -383,8 +350,6 @@ LongWriter-Zero 的适用边界和局限可从以下几个维度界定：
 - **思考长度的自适应控制**：思考（CoT）长度与外推效果之间的关系尚不明确——是否总是越长越好？能否开发自适应长度控制机制，根据任务复杂度动态调整推理深度？
 
 - **偏好数据的高效构建**：如何在不依赖昂贵人工标注的情况下，自动构建高质量、抗黑客的长文本偏好数据集，以训练更鲁棒的写作奖励模型？
-
-
 
 ## 原文 PDF
 

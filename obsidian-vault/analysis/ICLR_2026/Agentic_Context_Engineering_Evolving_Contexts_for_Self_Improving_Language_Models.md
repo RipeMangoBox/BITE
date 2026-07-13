@@ -60,8 +60,6 @@ claims:
 
 **局限与开放问题**：ACE 在缺乏可靠反馈信号（如无真实标签或明确执行结果）时性能可能下降，且对持续对抗性噪声敏感。如何进一步增强无监督环境下的自我校正能力，以及如何将演化上下文与参数高效微调或检索增强生成结合，是值得探索的方向。
 
-
-
 ### 上下文自适应的两难：简洁性偏差与上下文坍缩
 
 大语言模型（LLM）在执行复杂推理与智能体任务时，其行为高度依赖上下文（context）——包括系统提示、少样本示例以及运行时记忆。近年来的研究试图通过自适应方法动态优化上下文，例如基于贝叶斯优化的提示词优化器 **MIPROv2**（Opsahl-Ong et al., 2024）、基于进化搜索的 **GEPA**（Agrawal et al., 2025），以及测试时自适应记忆方法 **Dynamic Cheatsheet (DC)**（Suzgun et al., 2025）。这些方法在特定场景下取得了进展，但普遍面临一个核心瓶颈：**简洁性偏差（brevity bias）与上下文坍缩（context collapse）**。
@@ -85,8 +83,6 @@ claims:
 3. **引入增长-精炼（grow-and-refine）机制平衡扩展与冗余**：ACE 通过语义嵌入进行条目去重，并在上下文长度超过阈值时触发裁剪，确保上下文在持续演化中保持高质量和高信息密度。
 
 简言之，ACE 的动机不是发明更强的推理模型，而是**在不修改模型权重的前提下，通过工程化上下文演化，让任意 LLM 在长期任务中实现自我改进**。
-
-
 
 ## 核心方法与创新机理
 
@@ -127,8 +123,6 @@ ACE 的增长-精炼机制解决了长期自适应中的冗余累积问题。新
 ### 6. 无权重修改的自我改进
 
 ACE 的另一个关键创新在于其**不修改模型权重**即可实现智能体的自我改进。通过将上下文作为可演化的外部记忆载体，ACE 使 LLM 在推理时能够访问不断丰富的策略库，从而在不进行任何微调的情况下持续提升任务表现。这一特性使得 ACE 天然适用于模型即服务的场景，无需访问模型内部参数即可部署。
-
-
 
 ![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_eC4ygDs02R/figures/006_Figure_4.jpg]]
 *Figure 4: The ACE Framework. Inspired by Dynamic Cheatsheet, ACE adopts an agentic architecture with three specialized components: a Generator, a Reflector, and a Curator*
@@ -176,8 +170,6 @@ ACE 支持两种上下文自适应模式：
 
 两种模式共享相同的生成器-反射器-策展器流水线，区别仅在于自适应发生的阶段和数据来源。
 
-
-
 ACE 框架将上下文自适应过程分解为三个专门化角色的协作：**生成器 (Generator)**、**反射器 (Reflector)** 和**策展器 (Curator)**，并通过**增量式增量更新 (Incremental Delta Updates)** 和**增长-精炼 (Grow-and-Refine)** 机制来防止上下文坍缩（Figure 4, §3.0）。
 
 ### 生成器 (Generator)
@@ -211,8 +203,6 @@ ACE 框架将上下文自适应过程分解为三个专门化角色的协作：*
 
 本文未引入新的数学公式或推导。ACE 的核心贡献在于架构设计（模块化角色分工）和上下文更新策略（增量式增量更新 + 增长-精炼），而非新的数学建模。所有模块的实现均基于 LLM 的提示词工程和确定性规则逻辑，不涉及可导出的闭式公式。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈验证：上下文坍缩与简洁性偏差
@@ -240,9 +230,6 @@ Table 5 和 Table 6 分别报告了 GPT-OSS-120B 和 GPT-5.1 作为基模型的�
 ![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_eC4ygDs02R/figures/012_Table_5.jpg]]
 *Table 5: Results on the AppWorld Agent Benchmark (GPT-OSS-120B as the Base LLM). “GT labels” indicates whether ground-truth labels are available to the Reflector during adaptation. We evaluate the ACE framework against multiple baselines on top of the official ReAct implementation, both for offline and online context adaptation*
 
-![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_eC4ygDs02R/figures/013_Table_6.jpg]]
-*Table 6: Results on the AppWorld Agent Benchmark (GPT-5.1 as the Base LLM). “GT labels” indicates whether ground-truth labels are available to the Reflector during adaptation. We evaluate the ACE framework against multiple baselines on top of the official ReAct implementation, both for offline and online context adaptation*
-
 ### 领域特定基准结果
 
 Table 2 展示了金融分析基准（FiNER + Formula）的结果。在离线有标签设置下，ACE 达到 81.9% 的平均准确率，相较基模型（69.1%）提升 12.8 个百分点。在线有标签设置下为 76.6%（+7.5%）。值得注意的是，当缺乏可靠反馈信号时（无标签设置），ACE 和 Dynamic Cheatsheet 均出现性能下降，表明上下文自适应的有效性关键依赖于反馈质量。
@@ -256,9 +243,6 @@ Table 2 展示了金融分析基准（FiNER + Formula）的结果。在离线有
 
 Table 3 的系统消融揭示了 ACE 各组件的贡献层次：
 
-![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_eC4ygDs02R/figures/009_Table_3.jpg]]
-*Table 3: Ablation Studies on AppWorld. We study how particular design choices of ACE (iterative refinement, multi-epoch adaptation, and offline warmup) could help high-quality context adaptation*
-
 - **移除反射器**：性能显著下降，验证了反思-精炼循环对策略结晶的必要性。
 - **减少迭代轮次**：单轮自适应即可获得大部分增益，但多轮迭代（multi-epoch）能进一步累积改进，表明上下文演化具有增量收益特性。
 - **离线预热**：在在线自适应前进行离线预热可提供额外的性能提升，说明预训练的上下文知识可作为有效的先验。
@@ -269,12 +253,6 @@ Table 16 和 Table 17 检验了反射器质量的鲁棒性。使用较弱反射�
 
 Table 4 报告了 ACE 与 GEPA（离线）和 DC（在线）的成本对比。在 AppWorld 离线自适应中，ACE 将自适应延迟降低 86.9%（9,517s vs. 53,898s），将所需 rollout 数量减少 75.1%（357 vs. 1,434）。在 FiNER 在线自适应中，ACE 将延迟降低 91.5%，将 token 费用降低 83.6%。效率提升的根本原因是增量式增量更新避免了 GEPA 的提示-验证循环和 DC 的重复整体重写。
 
-![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_eC4ygDs02R/figures/011_Table_4.jpg]]
-*Table 4: Cost and Speed Analysis. We measure the context adaptation latency, number of rollouts, and dollar costs of ACE against GEPA (offline) and DC (online)*
-
-![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_eC4ygDs02R/figures/010_Table_4.jpg]]
-*Table 4: the online adaptation of FiNER, ACE achieves 91.5% reduction in adaptation latency and 83.6% reduction in token dollar cost for token ingestion/generation as compared to DC (Table 4(b))*
-
 需要指出的是，ACE 在评估阶段的单次推理 token 用量因上下文增长而增加（Table 15），这可能影响在线服务的延迟。但作者在 §5 中报告的提示缓存研究表明，91.8% 的输入 token 可从缓存服务，实际计费成本降低 82.6%，部分缓解了这一担忧。
 
 ### 失败模式与边界条件
@@ -284,16 +262,6 @@ Table 4 报告了 ACE 与 GEPA（离线）和 DC（在线）的成本对比。�
 1. **反馈信号缺失或污染**：当缺乏真实标签或明确的执行成功/失败信号时，上下文可能被错误教训污染（Table 2 无标签设置）。
 2. **对抗性反射器攻击**：持续注入有害反馈可导致性能降至基线以下（Table 17），表明反射器质量是系统可靠性的关键单点。
 3. **领域覆盖有限**：当前验证集中于智能体、金融、医学和 Text-to-SQL 任务，尚未在开放域生成或多模态任务上检验。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_eC4ygDs02R/figures/014_Table_7.jpg]]
-*Table 7: Results on Financial Analysis Benchmark (GPT-OSS-120B as the Base LLM). “GT labels” indicates whether ground-truth labels are available to the Reflector during adaptation*
-
-![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_eC4ygDs02R/figures/015_Table_8.jpg]]
-*Table 8: Results on Financial Analysis Benchmark (GPT-5.1 as the Base LLM). “GT labels” indicates whether ground-truth labels are available to the Reflector during adaptation*
-
-
 
 ## 定位与知识库关联
 
@@ -338,8 +306,6 @@ ACE 的有效性高度依赖**反馈信号的质量**，这构成了其最关键
 **持续演化中的灾难性遗忘**。在跨领域、持续变化的开放世界场景中，ACE 的增量式知识累积是否会覆盖或遗忘早期学到的有效策略？当前的实验在固定任务分布上进行，未评估任务分布漂移下的长期稳定性。
 
 **更大教师模型与对比反思**。当前 ACE 使用与生成器相同的模型作为反射器。引入更强的教师模型进行对比反思（例如，比较生成器与教师模型的推理差异来提取改进方向）可能进一步提升策略结晶的质量，但需权衡额外的计算成本。
-
-
 
 ## 原文 PDF
 

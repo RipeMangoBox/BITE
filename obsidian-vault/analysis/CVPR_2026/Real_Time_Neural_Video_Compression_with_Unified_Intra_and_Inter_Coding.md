@@ -57,8 +57,6 @@ claims:
 
 **局限与开放问题**：当前推理速度尚未针对资源受限的边缘设备充分优化；在高比特率场景下，压缩效率仍落后于更复杂的非实时NVC方法。如何设计更轻量化的网络结构，以及在不显著增加复杂度的情况下集成高级模块以提升高比特率性能，是后续值得探索的方向。
 
-
-
 ### 实时神经视频压缩的兴起与核心瓶颈
 
 神经视频压缩（Neural Video Compression, NVC）近年来发展迅速，其中实时方案因兼顾压缩效率与编解码速度而备受关注。以 **DCVC-RT**（Jia et al., CVPR 2025）为代表的低复杂度模型，通过精简网络结构实现了实时编解码，成为该方向的重要基线。
@@ -76,8 +74,6 @@ Figure 1 直观展示了这一问题：在包含场景切换的 Kimono1 序列�
 3. **刷新依赖**：手动刷新机制是“事后补救”而非“事前预防”，既无法从根本上消除误差传播，又引入了额外的码率开销和策略设计负担。
 
 针对上述问题，本文提出 **UI²C（Unified Intra and Inter Coding）**——一种统一帧内与帧间编码的实时神经视频压缩框架。其核心动机在于：**将帧内和帧间编码能力融合到单一模型中，使模型能够根据参考质量自适应切换编码模式，从根本上消除对专用 I 帧模型和手动刷新机制的依赖**。同时，通过引入同时双帧压缩技术，利用后向参考进一步挖掘帧间冗余，在不牺牲实时速度的前提下提升压缩效率和质量稳定性。
-
-
 
 ## 核心方法与创新机理
 
@@ -119,8 +115,6 @@ BD-rate 较 DCVC-RT 降低 12.1%，码率与质量逐帧稳定，无需任何刷
 
 值得注意的是，统一模型单独做帧内编码时，其 RD 性能略低于专用的 I 帧模型，但远优于 P 帧模型强行做帧内编码（Figure 5）。这说明统一模型并非在帧内编码上超越了专用模型，而是通过消除模型切换的脆弱性、避免 P 帧模型在不利条件下的崩溃，实现了系统级的性能跃升——消融实验显示，统一模型在无刷新配置下较分离模型提升高达 **64.9%** BD-rate（Table 3, Rows 1 vs 5）。
 
-
-
 UI²C 的整体设计围绕一个核心主张展开：**帧内编码与帧间编码可以在单一模型中统一处理，无需部署专用的 I 帧模型**。该框架通过“同时双帧压缩”机制将时间冗余的利用从单向（前向）扩展为双向（前向+后向），并配合混合参考训练策略，使模型能够在参考帧质量不可靠时自适应地切换到帧内编码模式，从而从根本上消除手动刷新机制及其带来的比特率尖峰。
 
 ### 框架总览
@@ -152,12 +146,8 @@ UI²C 的整体设计围绕一个核心主张展开：**帧内编码与帧间编
 3. **编解码**：$(x_t, x_{t+1})$ 与 $C_{(t,t+1)}$ 拼接后送入共享 Encoder，经双帧量化后得到码流；Decoder 从码流和 $C_{(t,t+1)}$ 重建特征。
 4. **输出**：重建帧 $\hat{x}_t, \hat{x}_{t+1}$，以及存入 Reference Buffer 的中间特征 $F_{(t,t+1)}$ 和上下文特征 $C_{(t,t+1)}$，供后续帧对使用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l918_https_arxiv_org_abs_2510_14431/figures/002_Figure_2.jpg]]
 *Figure 2: Framework of our neural video compression model with unified intra and inter coding*
-
-
 
 ### 统一帧内/帧间编码模型
 
@@ -209,19 +199,11 @@ UI²C 的完整流水线由以下关键模块构成（详见 Figure 2 和 Figure
 
 其中，编码器和解码器内部通过上下文特征 $C_{(t,t+1)}^e$ 和 $C_{(t,t+1)}$ 实现时空条件建模，具体配置细节在论文补充材料中给出。
 
-
-
 ## 实验与关键发现
 
 ### 一、主实验结果
 
 UI²C 在多个标准测试集上与实时基线 **DCVC-RT**（Jia et al., CVPR 2025）进行了全面的率失真性能对比。实验设置采用最严格的配置：色彩空间 YUV420，编码所有帧，帧内周期设为 -1（即不强制插入 I 帧）。如 Table 1 所示，UI²C 在 HEVC Class B∼E、MCL-JCV 和 UVG 数据集上平均实现 **12.1% 的 BD-rate 节省**，同时保持了实时编解码速度（编码约 65.1 fps，解码约 46.1 fps，NVIDIA RTX 3090 平台）。Figure 4 的率失真曲线进一步表明，UI²C 在不同比特率区间均稳定优于 DCVC-RT，且在高码率场景下仍具备竞争力。
-
-![[assets/figures/papers/paper_list_l918_https_arxiv_org_abs_2510_14431/figures/004_Table_1.jpg]]
-*Table 1: BD-rate (%) with DCVC-RT as the anchor and encoding/decoding speeds. Color space is YUV420; all frames are coded; intraperiod is –1*
-
-![[assets/figures/papers/paper_list_l918_https_arxiv_org_abs_2510_14431/figures/006_Figure_4.jpg]]
-*Figure 4: Rate-distortion curves for HEVC Class E and HEVC Class B. Color space is YUV420; all frames are coded; intra-period is -1. Results on more datasets are provided in the supplementary material*
 
 与更早的非实时 NVC 方法相比，UI²C 同样表现出显著优势：相对 **DCVC-FM**（Li et al., CVPR 2024）节省 6.8% BD-rate，相对传统编码标准 **VTM-17.0** 则平均节省 35.7% 的比特率。这些结果表明，统一帧内帧间编码的设计在实时约束下仍能取得领先的压缩效率。
 
@@ -269,13 +251,6 @@ Figure 6 进一步在单帧压缩设定下验证了统一模型的稳定性优�
 
 以上两点在论文的结论部分被明确列为开放问题，目前尚无实验证据表明已得到解决，需进一步研究验证。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l918_https_arxiv_org_abs_2510_14431/figures/008_Figure_5.jpg]]
-*Figure 5: Rate-distortion curves for HEVC Class B, HEVC Class E, and UVG when only the first two frames are coded. DCVC-RT-I-intra uses the normal DCVC-RT setting (the first frame uses the intra coding model, and the second frame uses the inter coding model). DCVC-RT-P-intra only uses the DCVC-RT inter coding model, i.e., we insert a blank frame (all zeros) before the first frame, and do not count the bitrate/PSNR of the blank frame. Our method using a single model to compress the two frames simultaneously performs slightly worse than DCVC-RT-I-intra, which uses two models for intra and inter coding, respectively, but performs much better than DCVC-RT-P-intra*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 与现有实时神经视频压缩基线的关系
@@ -316,8 +291,6 @@ UI²C 的设计围绕“实时性”和“无刷新鲁棒性”两个约束展�
 2. **高级模块的低成本集成**：是否存在某种轻量级的高级编码模块（如轻量注意力机制或自适应上下文模型），可以在不显著增加复杂度的条件下，针对性地提升高比特率区间的压缩性能？
 3. **统一模型的泛化边界**：混合参考训练策略（hybrid reference scheme）在消融实验中带来了约 5.3% 的 RD 性能提升（Table 3），但其泛化性是否依赖于训练数据的多样性？在分布外视频（如医学影像、屏幕内容）上的自适应能力仍需进一步验证。
 4. **双帧量化策略的通用性**：论文采用了“后帧更高 qp”的差异化量化策略，以优化后续参考质量。这一策略是否在更广泛的码率点和视频内容类型上保持最优，抑或存在内容自适应的 qp 分配空间，值得探索。
-
-
 
 ## 原文 PDF
 

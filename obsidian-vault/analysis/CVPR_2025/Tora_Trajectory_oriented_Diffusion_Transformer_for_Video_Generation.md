@@ -52,8 +52,6 @@ claims:
 
 **主要结果**：在128帧生成设定下，Tora的轨迹误差（TrajError）仅为11.72，相较最佳UNet基线MotionCtrl的38.39降低约3.3倍；FVD为494，较MotionCtrl的731降低32.4%。与DiT基线OpenSora-based DragNUWA相比，TrajError从21.75降至11.72，FVD从565降至494，验证了所提运动模块与DiT架构的良好兼容性。消融实验进一步证实了3D运动VAE压缩、自适应归一化融合和两阶段训练策略各自的关键贡献。
 
-
-
 ### 视频生成范式的演进与运动控制瓶颈
 
 扩散模型在文本到视频（T2V）生成领域取得了显著进展，其核心架构经历了从基于UNet的3D变体到扩散Transformer（DiT）的演进。早期工作如**VideoComposer**（Wang et al., NeurIPS 2023）和**DragNUWA**（Yin et al., arXiv 2023）在UNet框架下探索了运动控制机制，但这些方法在生成长视频时面临根本性限制：UNet架构通过顺序推理扩展帧数，这一过程会引入累积误差，导致运动精度随帧数增加而急剧下降。
@@ -88,8 +86,6 @@ DiT架构的引入为视频生成带来了可扩展性优势，**OpenSora**（Zh
 
 - **充分利用DiT的可扩展性**：使运动控制能力随模型规模和生成长度同步提升，突破UNet架构在长视频生成中的性能衰减问题，实现128帧乃至更长视频的精确运动控制。
 
-
-
 ## 核心方法与创新机理
 
 Tora 的核心创新在于首次将面向轨迹的运动控制能力引入基于 Diffusion Transformer（DiT）的视频生成框架，解决了现有 UNet 基模型在长视频运动控制上精度不足、以及 DiT 基模型缺乏有效运动引导机制的双重瓶颈。其关键创新体现在三个“changed slots”上：
@@ -113,8 +109,6 @@ MGF 首先通过堆叠的卷积层从运动潜在块中提取层次化特征 $f_
 ### 创新集成效果
 
 上述三个创新槽位协同作用，使 Tora 在 128 帧生成设定下实现了轨迹误差（TrajError）仅 11.72，较最佳 UNet 基线 MotionCtrl 的 38.39 降低约 3.3 倍；FVD 为 494，较 MotionCtrl 的 731 降低 32.4%（Table 1）。与 OpenSora-based DragNUWA 这一 DiT 基线相比，TrajError 从 21.75 降至 11.72，FVD 从 565 降至 494，充分验证了所提运动模块与 DiT 架构的良好兼容性。
-
-
 
 Tora 的整体架构围绕三个核心组件构建：**轨迹提取器**（Trajectory Extractor, TE）、**时空 DiT**（Spatial-Temporal DiT, ST-DiT）和**运动引导融合器**（Motion-guidance Fuser, MGF）。其设计目标是将任意用户指定的轨迹条件无缝注入扩散Transformer的去噪过程，使生成的视频在保持高视觉质量的同时精确遵循给定运动路径。
 
@@ -160,11 +154,6 @@ Tora采用两阶段训练策略（Table 4消融验证其有效性）：
 2. **第二阶段**：引入随机稀疏轨迹（1至N条），使模型泛化到用户提供的任意稀疏轨迹输入。
 
 这种“稠密+稀疏”的混合训练策略使TrajError大幅降低，优于单独使用稠密光流或稀疏轨迹的训练方案。
-
-### 补充图表
-
-
-
 
 Tora 的整体架构由三个核心组件构成：轨迹提取器（Trajectory Extractor, TE）、时空 DiT（Spatial-Temporal DiT, ST-DiT）以及运动引导融合器（Motion-guidance Fuser, MGF）。其设计目标是将任意用户指定的轨迹编码为与视频块共享潜在空间的时空运动特征，并自适应地注入 DiT 的去噪过程，从而实现对生成视频中物体运动的精确控制。
 
@@ -219,8 +208,6 @@ $$h_i = \mathrm{CrossAttn}([h_{i-1}, f_i]) + h_{i-1}$$
 
 消融实验（Table 3）表明，自适应归一化在轨迹误差和视频质量（FVD）上均优于通道拼接和交叉注意力方案，验证了仿射变换式融合在运动控制任务中的有效性。
 
-
-
 ## 实验与关键发现
 
 ### 主要定量结果
@@ -265,18 +252,8 @@ Table 5的用户研究进一步验证了Tora的感知质量：在指令遵循（
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2407_21705/figures/010_Figure_6.jpg]]
 *Figure 6: Qualitative Comparisons on Trajectory Control. In the bicycle scenario, Tora realistically captures pedaling motions, while other methods show legs in an unnatural, nearly horizontal position. In another case, DragNUWA causes significant deformation of the lanterns, and MotionCtrl fails to accurately depict two lanterns. Overall, Tora not only adheres precisely to the specified trajectory but also produces smoother movement that conforms to the physical world*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2407_21705/figures/005_Table_1.jpg]]
 *Table 1: Quantitative comparisons with motion-controllable video generation models. As the number of generated frames increases, Tora’s performance advantage over UNet-based methods becomes more pronounced. Specifically, Tora not only enhances motion fidelity but also improves the visual quality of the foundational model. Comparisons with OpenSora-based DragNUWA highlight the strengths of our proposed motion modules, which integrate seamlessly with DiT’s architecture*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2407_21705/figures/011_Figure_7.jpg]]
-*Figure 7: Scaling behavior of motion control ability in Tora*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2407_21705/figures/012_Table_5.jpg]]
-*Table 5: Win rates of Tora compared to OpenSora-v1.2, CogVideoX, Vidu, and Kling in terms of Physics Simulation, Sensory Quality, and Instruction Following*
-
-
 
 ## 定位与知识库关联
 
@@ -337,8 +314,6 @@ Tora采用**两阶段训练策略**：第一阶段使用稠密光流训练，让
 **4. 数据效率与标注成本**
 
 两阶段训练策略虽然有效，但第一阶段对稠密光流标注的依赖增加了数据准备成本。如何降低对精细光流标注的依赖——例如通过弱监督或自监督运动表征学习——同时保持运动控制效果，是推动方法实用化的关键开放问题。
-
-
 
 ## 原文 PDF
 

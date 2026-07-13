@@ -56,8 +56,6 @@ COPE以**PCL-CLIP**（Li and Gong, arXiv 2023）为基线，在原型对比学�
 
 **局限性**：PBF模块依赖人类解析标签进行预训练，训练设置与部分不使用额外标注的遮挡Re-ID方法不完全对等；CICO的遮挡形状为预定义高斯形状，对不规则遮挡的泛化能力尚待验证；PSS虽较re-ranking快121秒，但仍引入额外相似度计算，对极低时延场景可能产生影响。
 
-
-
 行人重识别（Person Re-Identification, Re-ID）旨在跨非重叠摄像头匹配同一行人的图像，是智能视频监控的核心技术。然而，现实场景中行人常被各种物体（如车辆、广告牌、其他行人）部分遮挡，形成**遮挡行人重识别（Occluded Person Re-ID）**这一更具挑战的子问题。与整体Re-ID不同，遮挡Re-ID面临两个根本性瓶颈：
 
 **1. 遮挡区域的特征干扰**
@@ -79,8 +77,6 @@ COPE以**PCL-CLIP**（Li and Gong, arXiv 2023）为基线，在原型对比学�
 - **通过跨身份一致的遮挡增强与特征对齐，隐式抑制遮挡特征干扰**：强制不同身份在相同遮挡区域的特征趋于一致，使模型学习到“遮挡区域不具身份判别性”的先验，从而将注意力转移到前景行人区域。
 - **通过视觉语言提示引导前景定位与背景填充，增强前景鲁棒性**：利用CLIP的视觉语言对齐能力生成前景热力图，并通过随机背景填充迫使模型关注前景特征，减少背景干扰。
 - **通过提示引导的完整性评分修正检索相似度，缓解信息丢失**：学习一个轻量级提示分数来度量样本完整性，在推理时利用高完整性中间样本修正遮挡查询的检索结果，实现间接匹配。
-
-
 
 ## 核心方法与创新机理
 
@@ -140,12 +136,7 @@ $$
 
 **值得注意的公平性问题**：PBF 模块的训练依赖人类解析标签，而部分对比方法不使用此类额外标注，训练设置不完全对等；CICO 的遮挡形状为预定义高斯形状，可能无法覆盖所有真实遮挡类型。这些限制在评估创新优势时需纳入考量。
 
-
-
 COPE 的整体训练流程围绕三个核心模块构建：**跨身份一致性遮挡（CICO）**、**提示背景填充（PBF）** 和 **提示相似度评分（PSS）**，如 Figure 2 所示。其设计逻辑直接针对遮挡行人重识别中的两大瓶颈——遮挡区域的特征干扰与严重遮挡下的信息丢失。
-
-![[assets/figures/papers/paper_list_l2299_https_openaccess_thecvf_com_content_CVPR2026_html_Sun_COPE_Consistent_Oc/figures/002_Figure_2.jpg]]
-*Figure 2: The training of the proposed Consistent Occlusion and Prompt Enhancement (COPE) Network. First, the source image is passed through the Visual Encoder to extract the original image features. Then, data augmentation is applied through the Cross-Identity Consistent Occlusion (CICO) and Prompt Background Filling (PBF) modules, which introduce occlusion and background filling, respectively, to extract corresponding enhanced features. Finally, in the Prompt Similarity Scoring module, the prompt scores are learned based on the similarity between features instances and their corresponding prototypes center*
 
 ### 数据流与模块协同
 
@@ -184,8 +175,6 @@ COPE 建立在 **PCL-CLIP**（Li and Gong, arXiv 2023）的基线框架之上，
 | 总损失函数 | $\mathcal{L}_{\mathrm{ce}} + \mathcal{L}_{\mathrm{pcl}}$ | 额外引入 $\mathcal{L}_{\mathrm{oc}} + \mathcal{L}_{\mathrm{seg}} + \mathcal{L}_{\mathrm{align}} + \mathcal{L}_{\mathrm{sim}}$ |
 
 该方法在遮挡 Re-ID 领域的位置：相比仅依赖数据增强（如随机擦除、**SPT** 等）或仅做特征对齐（如 **FPC**）的方法，COPE 同时从数据增强策略、特征空间约束和检索后处理三个层面协同解决遮挡问题。其视觉-语言对齐的 PBF 设计也与 **CoCoOp** 等自适应提示方法形成对比（Table 6 的消融表明自适应提示热力图优于固定文本提示）。
-
-
 
 ### 基线框架与视觉编码器
 
@@ -259,13 +248,6 @@ $$
 
 各损失项分别对应：分类判别（$\mathcal{L}_{\text{ce}}$）、原型对比学习（$\mathcal{L}_{\text{pcl}}$）、遮挡一致性约束（$\mathcal{L}_{\text{oc}}$）、前景分割监督（$\mathcal{L}_{\text{seg}}$）、前景特征对齐（$\mathcal{L}_{\text{align}}$）、提示评分学习（$\mathcal{L}_{\text{sim}}$）。六项损失协同作用，使网络在训练过程中同时获得遮挡鲁棒性、背景不变性和完整性感知能力。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2299_https_openaccess_thecvf_com_content_CVPR2026_html_Sun_COPE_Consistent_Oc/figures/003_Figure_3.jpg]]
-*Figure 3: During inference, the Prompt Similarity Scoring module uses prompt scores to further refine final similarity*
-
-
-
 ## 实验与关键发现
 
 ### 主要结果
@@ -317,8 +299,6 @@ COPE在遮挡与整体行人重识别基准上均取得最优性能。在核心�
 3. **推理延迟**：PSS推理虽轻量，但额外引入的相似度计算步骤在严格实时系统中可能产生不可忽略的延迟。
 4. **预训练先验优势**：COPE使用CLIP预训练模型，相比传统CNN基线具有海量数据预训练的先验知识优势，在公平性对比上需谨慎解读。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2299_https_openaccess_thecvf_com_content_CVPR2026_html_Sun_COPE_Consistent_Oc/figures/005_Table_2.jpg]]
 *Table 2: Ablation study of the proposed components in COPE on Occluded-Duke dataset*
 
@@ -331,22 +311,8 @@ COPE在遮挡与整体行人重识别基准上均取得最优性能。在核心�
 ![[assets/figures/papers/paper_list_l2299_https_openaccess_thecvf_com_content_CVPR2026_html_Sun_COPE_Consistent_Oc/figures/006_Table_5.jpg]]
 *Table 5: Comparison with other occlusion augmentation methods in CICO module on Occluded-Duke dataset*
 
-![[assets/figures/papers/paper_list_l2299_https_openaccess_thecvf_com_content_CVPR2026_html_Sun_COPE_Consistent_Oc/figures/007_Table_6.jpg]]
-*Table 6: Ablation study on the origin of the prompt heatmap in PBF module on Occluded-Duke dataset*
-
-![[assets/figures/papers/paper_list_l2299_https_openaccess_thecvf_com_content_CVPR2026_html_Sun_COPE_Consistent_Oc/figures/010_Table_4.jpg]]
-*Table 4: Sensitivity analysis of hyperparameters*
-
 ![[assets/figures/papers/paper_list_l2299_https_openaccess_thecvf_com_content_CVPR2026_html_Sun_COPE_Consistent_Oc/figures/011_Figure_5.jpg]]
 *Figure 5: Visualization of retrieval rankings for two types of queries under different modules. Green/red borders indicate correct/incorrect matches. P is the prompt score*
-
-![[assets/figures/papers/paper_list_l2299_https_openaccess_thecvf_com_content_CVPR2026_html_Sun_COPE_Consistent_Oc/figures/001_Figure_1.jpg]]
-*Figure 1: Existing challenges on Occluded-Duke dataset and our solutions. (a) shows incorrect matches with similar occlusions for CLIP-REID and clean correct matches for our COPE under occlusion interference. (b) shows the attention map of the query with different CICO settings. Without CICO, attention is scattered; with data augmentation, attention on the occlusion decreases; with feature loss, attention on the target person increases. (c) shows the difficult matching problem caused by information loss, which we address by using similar intermediate samples*
-
-![[assets/figures/papers/paper_list_l2299_https_openaccess_thecvf_com_content_CVPR2026_html_Sun_COPE_Consistent_Oc/figures/009_Figure_4.jpg]]
-*Figure 4: Sensitivity analysis of hyperparameters M and N in CICO module on Occluded-Duke dataset*
-
-
 
 ## 定位与知识库关联
 
@@ -389,8 +355,6 @@ PSS 模块提供了一种轻量级的检索相似度修正方案。与传统的 
 - PBF 在前景热力图生成失败时如何影响最终性能？是否需要额外的鲁棒机制来应对视觉-语言对齐失效的场景？
 - PSS 的超参数 $K_1$、$K_2$ 对不同数据集规模的敏感性如何？是否存在基于提示分数的自适应选择方案？
 - 所提方法在真实监控场景的端到端部署中，能否保持高效的推理速度和稳定性？CLIP 编码器的计算开销在边缘设备上是否构成瓶颈？
-
-
 
 ## 原文 PDF
 

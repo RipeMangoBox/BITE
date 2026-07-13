@@ -73,8 +73,6 @@ NavFoM采用双分支架构（导航与问答），在大规模多样化导航�
 
 NavFoM仍面临若干挑战：小物体远距离识别困难、运动模糊导致感知失败；六相机以上配置下视点令牌增多会压缩历史帧编码容量，导致性能下降；在OpenUAV Unseen-Map等要求大规模探索的任务上表现不佳。未来方向包括自适应多视图令牌编码、更高效的探索策略，以及将更多运动自由度纳入统一框架。
 
-
-
 具身导航是机器人学与计算机视觉交叉的核心问题，其目标是让智能体根据语言指令在未知环境中自主移动并完成任务。近年来，视觉-语言导航（VLN）、目标导航、主动视觉跟踪、无人机导航和自动驾驶等子领域各自取得了显著进展，但这些进展背后隐藏着一个深层瓶颈：**现有导航方法几乎全部受限于狭窄的任务设定和单一具身形态的专用架构**。
 
 具体而言，当前研究存在以下结构性缺口：
@@ -90,8 +88,6 @@ NavFoM仍面临若干挑战：小物体远距离识别困难、运动模糊导�
 上述瓶颈共同指向一个根本性问题：**能否构建一个统一的具身导航基础模型，使其在无需任何任务特定微调的前提下，同时胜任多种导航任务并泛化到不同具身形态？** 这一问题的回答不仅具有理论价值——探索通用导航智能的可能性，更具有实际意义——大幅降低多任务多形态机器人系统的开发成本。
 
 本文正是围绕这一核心动机展开。我们提出**NavFoM（Embodied Navigation Foundation Model）**，旨在通过两个关键设计突破上述瓶颈：（1）**时间-视角指示令牌（TVI tokens）**，统一编码不同相机配置和可变时间跨度的观测信息；（2）**预算感知的时间采样策略（BATS）**，基于遗忘曲线在有限令牌预算内动态选择历史帧。在大规模多样化导航数据（12.7M样本，涵盖VLN、目标导航、视觉跟踪、无人机导航和自动驾驶）上联合训练后，NavFoM在多个基准上以零样本方式达到或超越此前微调的最佳方法，初步验证了通用导航基础模型的可行性。
-
-
 
 ## 核心方法与创新机理
 
@@ -139,8 +135,6 @@ NavFoM 对最新观测帧使用精细令牌（64 patches），对历史帧使用
 - **相机数量上限**：当相机数增至 6 时，视角令牌增多会压缩历史帧的编码容量，导致 VLN-CE RxR 性能轻微下降（Figure 14），表明 TVI 令牌的视角编码维度存在容量瓶颈。
 - **损失权重固定**：导航损失权重 $\beta = 10$ 为固定值，在数据规模差异较大的任务间可能需要自适应调整（论文将此列为开放问题）。
 - **训练成本高**：联合训练需 56 块 H100 GPU 运行 72 小时，对复现和扩展构成资源门槛。
-
-
 
 ![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_kkBOIsrCXh/figures/002_Figure_2.jpg]]
 *Figure 2: Pipeline of NavFoM. Our method provides a unified framework for handling multiple tasks, including Image QA, Video QA, and Navigation. We organize text tokens and visual tokens using temporal-viewpoint indicator tokens (Sec. 2.1.1)*
@@ -198,8 +192,6 @@ $$ L = \beta L_{\mathrm{nav}} + L_{\mathrm{QA}} $$
 
 其中 $\beta = 10$ 为固定缩放因子。模型在约1270万样本（802万导航、315万图像QA、161万视频QA）上联合训练，视觉编码器和LLM均从预训练权重初始化，使用56块H100 GPU训练72小时。多任务联合训练的消融实验（Figure 7）显示，从50%到100%数据混合比例，所有导航子任务均获得一致的性能提升，其中低资源任务（如搜索）获益最为显著——搜索成功率从10.3%跃升至45.2%。
 
-
-
 NavFoM 采用双分支架构，统一处理导航与问答任务。其核心设计围绕三个关键模块展开：视觉令牌组织、时间-视角指示嵌入，以及预算感知的时间采样。
 
 ### 视觉编码与令牌粒度
@@ -244,8 +236,6 @@ $$ \tau_T = \{\mathbf{a}_1, ..., \mathbf{a}_M\}_T = \alpha_{\mathrm{task}} \cdot
 
 每个路径点包含 $(x, y, z, \theta)$，$\alpha_{\mathrm{task}}$ 为任务相关的缩放因子，用于将归一化预测反归一化到不同具身形态的实际运动空间（如地面机器人、无人机、自动驾驶车辆）。不同具身形态的缩放因子配置见 Table 5。
 
-
-
 ## 实验与关键发现
 
 ### 主结果
@@ -271,9 +261,6 @@ NavFoM在视觉语言导航（VLN）、目标导航、主动跟踪、自动驾�
 
 **无人机导航（OpenUAV）**：四视图NavFoM在Seen、Unseen Object和Unseen Map三个测试集上均取得最优或次优结果（表6），展示了跨形态泛化能力。但在Unseen-Map上所有方法表现均不佳，表明大规模探索能力仍是开放问题。
 
-![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_kkBOIsrCXh/figures/022_Table_6.jpg]]
-*Table 6: Comprehensive results on OpenUAV benchmark with L1 level assistant. Seen denotes the seen split, while UO and UM represent the Test Unseen Object Set and Test Unseen Map Set respectively. DA refers to a model trained using backtracking sampling-based data aggregation. The best and the second best results are denoted by bold and underline*
-
 ### 消融实验
 
 **TVI令牌与历史帧组织策略**：在VLN-CE RxR基准上，TVI令牌（含时间和角度位置编码）在所有令牌预算下均显著优于手工令牌（Equ.3 w.o P_angle/time）和无位置编码变体。在2048令牌预算下，TVI令牌取得**65.8 nDTW / 56.2 SR**，而手工令牌仅为60.2 nDTW / 49.8 SR（图8/表8）。图3的聚类可视化进一步证实，TVI令牌的嵌入空间能按视角和时间步自然分离，验证了其编码的有效性。
@@ -284,9 +271,6 @@ NavFoM在视觉语言导航（VLN）、目标导航、主动跟踪、自动驾�
 **BATS采样策略**：BATS在2048和1024令牌预算下均优于均匀采样策略。更重要的是，当令牌预算从2048降至1024时，BATS的nDTW仅下降**1.4%**（65.8→64.4），而均匀采样下降更为显著（图8/表8）。图4展示了BATS基于遗忘曲线的指数采样概率分布：近期帧采样概率高，远期帧概率低但保持非零覆盖，从而在有限预算内平衡了细节保留与历史覆盖。
 
 **多任务联合训练**：图7的消融实验表明，从单任务数据到混合50%其他任务数据再到混合100%其他任务数据，所有任务的性能均持续提升。其中低资源任务获益最为显著——**搜索任务从10.3% SR跃升至45.2% SR**，跟踪和驾驶任务也有明显提升。这验证了大规模多样化导航数据联合训练的核心假设。
-
-![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_kkBOIsrCXh/figures/013_Figure_7.jpg]]
-*Figure 7: Ablation study on the training of multiple navigation tasks. We report the performance of different training data combinations (specific task data only, specific task data with 50% other data, and specific task data with 100% other data)*
 
 **相机数量影响**：图14显示，相机数量从1增至4时，VLN-CE RxR性能持续提升（SR: 57.4→64.4），但增至6相机时性能轻微下降。原因在于固定令牌预算（B=2048）下，更多视点令牌压缩了历史帧的编码容量，揭示了多视图编码中的信息压缩瓶颈。
 
@@ -300,21 +284,6 @@ NavFoM在视觉语言导航（VLN）、目标导航、主动跟踪、自动驾�
 4. **损失权重固定**：导航损失权重β固定为10，缺乏自适应调整机制，可能影响不同任务间的收敛平衡。
 5. **计算资源需求高**：训练需56块H100 GPU运行72小时（约4032 GPU小时），对数据量和算力要求较高。
 6. **驾驶场景未充分建模**：未显式建模车道线、交通标志等驾驶要素，在自动驾驶基准上与专用SOTA方法仍有差距。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_kkBOIsrCXh/figures/009_Table_2.jpg]]
-*Table 2: Object goal navigation. Comparison on HM3D-OVON (Yokoyama et al., 2024b). ∗ : denotes zero-shot evaluation. We report the performence of our method on egocentric and four-view settings. Table 3: Performance on EVT-Bench. †: Uses GroundingDINO (Liu et al., 2023b) as the open-vocabulary detector. ‡: Uses SoM (Yang et al., 2023)+GPT-4o (OpenAI, 2024) as the visual foundation model*
-
-![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_kkBOIsrCXh/figures/010_Table_3.jpg]]
-
-![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_kkBOIsrCXh/figures/011_Table_4.jpg]]
-*Table 4: NAVSIM navtest split with closedloop metrics*
-
-![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_kkBOIsrCXh/figures/015_Table_5.jpg]]
-*Table 5: Scaling factors of different dimesiong of predicted tracjtort of different embodiements*
-
-
 
 ## 定位与知识库关联
 
@@ -367,8 +336,6 @@ NavFoM 的核心贡献在于将导航从“单一任务专用模型”推进到�
 5. **感知鲁棒性提升**：针对小物体和运动模糊，是否可以通过多尺度视觉特征、时序融合或引入深度估计来增强感知？这需要在通用性和任务专用性之间寻找新的平衡点。
 
 6. **运动自由度的扩展**：当前框架假设相机配置为固定视角，能否将无人机俯仰角等额外自由度纳入统一的相机配置框架，使模型适应更广泛的具身形态？
-
-
 
 ## 原文 PDF
 

@@ -56,8 +56,6 @@ claims:
 - **用户研究**：在对齐度、质量和一致性三项主观指标上均显著优于所有基线（Table 2）。
 - **消融实验**：移除3DBlueprint-CoT导致物体遗漏和属性颜色错配，移除3DRefine-CoT产生Janus多面伪影，移除跨视图对齐则出现几何扭曲与纹理不一致（Figure 7, Table 3），验证了每个模块的必要性。
 
-
-
 ### 2D 扩散先验驱动的三维生成：进展与结构性困境
 
 近年来，基于 2D 扩散模型的三维内容生成取得了显著进展。以 **DreamFusion**（Poole et al., 2022）为代表的 Score Distillation Sampling（SDS）范式，使得从文本提示直接优化三维表征成为可能。后续工作如 **Magic3D**（Lin et al., CVPR 2023）和 **Fantasia3D** 通过引入两阶段优化策略提升了生成质量，而 **GaussianDreamer**（Yi et al., CVPR 2024）则将 3D Gaussian Splatting 引入该框架以加速推理。在图像到三维领域，**Zero-1-to-3**（Liu et al., ICCV 2023）和 **Wonder3D**（Long et al., CVPR 2024）通过在新视角合成模型基础上进行三维重建，实现了从单张图像到三维资产的转换。
@@ -73,8 +71,6 @@ claims:
 上述问题的根源在于：现有方法将文本到三维生成视为一个**无差别的端到端优化问题**，缺乏对提示语义的结构化理解与阶段性规划。本文的核心洞察是：**文本到三维生成本质上是一个可通过结构化思维链规划与反馈修正优化的组合问题**——先生成基本几何结构，再逐步注入属性细节与抽象概念，并在生成过程中持续检测并修正多视图不一致性。
 
 这一洞察直接驱动了 **Thoughtful3D** 框架的设计，其包含两个互补的结构化思维链（Chain-of-Thought, CoT）策略：**3DBlueprint-CoT** 在优化前进行高层结构规划，将复杂提示分解为渐进式子目标链；**3DRefine-CoT** 在优化过程中通过多视图反射检测与迭代修正消除幻觉和不一致性。两者协同作用，将原本“一步到位”的生成过程重构为“先思考再生成”的结构化推理流程。
-
-
 
 ## 核心方法与创新机理
 
@@ -111,8 +107,6 @@ $$\mathcal{L}_{\Theta} = \lambda_1 \mathcal{L}_{\mathrm{SDS}} + \lambda_2 \mathc
 
 **证据强度**：消融实验（Table 3, Figure 7）确认，移除任一模块均导致 CLIP Score 下降和生成质量劣化——移除 3DBlueprint-CoT 导致物体遗漏和属性错配，移除 3DRefine-CoT 产生 Janus 伪影，移除跨视图对齐则出现几何失真。三个模块共同作用带来 **+3.06 的 CLIP Score 提升**（GaussianDreamer 基线 27.33 → Thoughtful3D 30.39），验证了各创新的独立贡献和协同效应。
 
-
-
 Thoughtful3D 的整体框架如图2所示，它将文本到三维生成重新定义为可通过结构化思维链规划与反馈修正优化的组合问题。整个pipeline由三个核心模块串联构成：**3DBlueprint-CoT** 负责生成前的语义解析与分阶段规划，**3DRefine-CoT** 在优化过程中执行多视图不一致检测与迭代修正，**Cross-view Semantic Appearance Alignment** 则在特征层面动态拉近不同视角的语义表征。
 
 ### 输入输出流
@@ -137,12 +131,8 @@ $$
 
 传统方法（如 **DreamFusion** (Poole et al., 2022)、**Magic3D** (Lin et al., CVPR 2023)、**GaussianDreamer** (Yi et al., CVPR 2024)）在整个优化过程中使用固定提示，缺乏对复杂语义的结构化理解和多视图一致性反馈机制。Thoughtful3D 的核心差异在于：用动态递进的子提示替代固定提示，用多轮反射修正替代无反馈的生成，用跨视图动态特征对齐替代固定或缺失的特征选择。这使得框架可以无缝叠加到现有SDS-based管线（如 Zero123、Wonder3D、GaussianDreamer）之上，在图像到三维和文本到三维两个任务上均取得一致的定量与定性提升。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2177_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_Think_Then_Generat/figures/002_Figure_2.jpg]]
 *Figure 2: The overall framework of our Thoughtful3D. Before generation, 3DBlueprint-CoT plans the entire process based on input semantics. During generation, we jointly optimize the model using via two strategies: (1) 3DRefine-CoT detects inconsistencies through structural reasoning (Reflection phase) and selects optimal corrected renderings via majority voting (Correction phase); (2) Cross-View Alignment dynamically aligns multi-view latent features by pulling them closer based on shared semantics to achieve cross-view consistency*
-
-
 
 ### 整体框架
 
@@ -151,9 +141,6 @@ Thoughtful3D 框架（Figure 2）由三个核心模块构成：**3DBlueprint-CoT
 ### 3DBlueprint-CoT：结构化生成规划
 
 该模块将文本到三维生成视为可规划的组合问题，通过 MLLM 执行两阶段结构化推理（Figure 3）：
-
-![[assets/figures/papers/paper_list_l2177_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_Think_Then_Generat/figures/003_Figure_3.jpg]]
-*Figure 3: The reasoning process of 3DBlueprint-CoT. In the first stage, the input prompt is semantically interpreted and analyzed. Based on this understanding, the second stage plans the overall generation process*
 
 **Stage 1 — 语义分解**：将输入提示 $p$ 解析为三个语义组件：
 $$ \mathrm{Stage\ 1: } \ S = \{ S_o, S_a, S_h \} = M(p) \tag{2} $$
@@ -178,9 +165,6 @@ $$ r^* = \arg\max_{r \in \{1,\ldots,n\}} c_r, \quad \hat{V} = V^{(r^*)} \tag{11}
 其中 $c_r$ 为候选 $r$ 获得的票数，得票最高者作为最终修正结果（Figure 4）。修正损失定义为原始渲染与修正图像之间的 MSE：
 $$ \mathcal{L}_{\mathrm{rc}} = \left\| V_i - \hat{V}_i \right\|_2^2 \tag{12} $$
 
-![[assets/figures/papers/paper_list_l2177_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_Think_Then_Generat/figures/004_Figure_4.jpg]]
-*Figure 4: The Correct process of 3DRefine-CoT. For the corrected images (image1 and image2), the MLLM Consensus Selector assigns scores and conducts voting independently. The image receiving the highest number of votes is selected as the final corrected result*
-
 ### Cross-view Semantic Appearance Alignment：跨视图语义对齐
 
 为解决不同视角下同一语义区域特征发散导致的纹理不一致，该模块提取多视图渲染的中间层特征，构建跨视图语义对应关系，通过拉近具有相同语义的特征实现动态对齐：
@@ -194,8 +178,6 @@ $$ \mathcal{L}_{\Theta} = \lambda_1 \mathcal{L}_{SDS} + \lambda_2 \mathcal{L}_{r
 其中 $\lambda_1$、$\lambda_2$、$\lambda_3$ 为平衡三项损失的超参数。SDS 损失的基础形式为：
 $$ \nabla_{\boldsymbol{\theta}} \mathcal{L}_{\mathrm{SDS}}(\boldsymbol{\phi}, \mathbf{x}) = \mathbb{E}_{t,\epsilon} \left[ w(t) \left( \epsilon_{\boldsymbol{\phi}}(\mathbf{x}_t; \boldsymbol{y}, t) - \epsilon \right) \frac{\partial \mathbf{x}}{\partial \boldsymbol{\theta}} \right] \tag{1} $$
 该梯度用于更新三维表示参数 $\boldsymbol{\theta}$，使渲染图像 $\mathbf{x}$ 在扩散模型 $\boldsymbol{\phi}$ 的潜空间中向文本条件 $\boldsymbol{y}$ 对齐。
-
-
 
 ## 实验与关键发现
 
@@ -241,8 +223,6 @@ Figure 5和Figure 6的定性对比直观展示了方法优势。在“flamingo�
 
 所有基线均使用官方实现或threestudio统一框架，超参数与随机种子保持一致，确保比较的公平性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2177_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_Think_Then_Generat/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison between baseline models and Thoughtful3D (ours). (a) For the flamingo, baseline models produce clear structural distortions, especially in the legs, which appear bent and anatomically implausible.(b) Under complex text prompts, baseline models suffer from guidance collapse, failing to realize all specified objects and entirely omitting the “jar.”(c) For the teddy bear, the baseline output exhibits a multi-face Janus artifact, with spurious facial features appearing on the side of the head. In contrast, Thoughtful3D effectively overcomes these challenges, demonstrating superior performance in both the geometric fidelity and structural consistency of the generated 3D assets*
 
@@ -252,16 +232,8 @@ Figure 5和Figure 6的定性对比直观展示了方法优势。在“flamingo�
 ![[assets/figures/papers/paper_list_l2177_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_Think_Then_Generat/figures/006_Table_1.jpg]]
 *Table 1: Quantitative comparisons in image-to-3D generation of Thoughtful3D and baseline models*
 
-![[assets/figures/papers/paper_list_l2177_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_Think_Then_Generat/figures/007_Figure_6.jpg]]
-*Figure 6: Qualitative comparison in image-to-3D generation of Thoughtful3D and baseline models*
-
 ![[assets/figures/papers/paper_list_l2177_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_Think_Then_Generat/figures/008_Table_3.jpg]]
 *Table 3: Quantitative Ablation Results*
-
-![[assets/figures/papers/paper_list_l2177_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_Think_Then_Generat/figures/010_Figure_7.jpg]]
-*Figure 7: Ablation study. We ablate each module in turn and demonstrate the necessity of each module design through qualitative results*
-
-
 
 ## 定位与知识库关联
 
@@ -308,8 +280,6 @@ Thoughtful3D 并非重新设计三维生成模型本身，而是作为一种**�
 - 3DBlueprint-CoT 的阶段划分（对象→属性→抽象概念）是否为最优课程？是否存在自适应阶段切换策略以替代固定迭代数切换？
 - 3DRefine-CoT 的修正迭代次数与生成质量之间存在何种收益递减关系？能否设计收敛判据以动态终止修正？
 - 当前框架未涉及动态场景或可动画化三维生成，结构化思维链能否扩展到时序一致性约束？
-
-
 
 ## 原文 PDF
 

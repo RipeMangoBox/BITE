@@ -60,15 +60,11 @@ $$\hat{A}_{i,t}^{\prime} := \hat{A}_{i} - \alpha \cdot m_{i,t} \cdot |\hat{A}_{i
 
 **方法定位**：PERCEVAL 属于过程监督 RLVR 路线，区别于 R1-VL 的步级别奖励、DeepEyes 的端到端视觉搜索 RL、以及 VL-Rethinker 的选择性样本重放等同期工作。其独特之处在于将感知核查从生成模型中解耦为独立的 PRM，通过 token 级优势重分配实现轻量但精准的干预，而非直接提供标量奖励。
 
-
-
 视觉语言模型（VLMs）在复杂视觉推理任务中面临一个关键瓶颈：**稀疏奖励与粗糙的结局级监督无法诊断推理链中的感知错误**。当前主流的强化学习训练范式——如基于GRPO的RLVR——仅在生成完整响应后提供一个标量奖励信号，这使得模型难以定位推理过程中具体哪一步发生了感知幻觉。当模型在视觉搜索任务中错误地描述物体颜色、位置或属性时，这种粗粒度的反馈机制无法提供有效的纠正信号，导致模型反复产生相似的感知错误。
 
 这一问题的根源在于视觉推理的中间步骤多为可在图像中直接验证的感知声明。例如，在回答“图中红色汽车旁边的交通标志是什么颜色？”时，模型需要先定位红色汽车，再识别其旁边的标志并判断颜色——每一步都对应着图像中可验证的具体事实。然而，现有的GRPO框架将整个响应的优势信号均匀分配给所有token，无法对产生幻觉的token施加针对性惩罚。
 
 针对上述问题，本文提出了**PERCEVAL**（Perception-centric process reward evaluation model），一个以感知为中心的过程奖励模型。其核心洞察是：通过自动检测图像-文本不对齐，可实现细粒度的过程监督。PERCEVAL能够从模型生成的响应中提取图像相关的声明，逐一与图像中的视觉证据进行比对，从而定位幻觉发生的具体token跨度。在此基础上，本文引入了**token级优势重分配框架**，将PERCEVAL生成的错误掩码与GRPO的目标函数相结合，对幻觉token施加惩罚，同时保持对正确推理步骤的正向激励。这一设计直接干预了感知错误的因果链，将原本稀疏的结局级奖励转化为密集的过程级监督信号。
-
-
 
 ## 核心方法与创新机理
 
@@ -107,8 +103,6 @@ $$\hat{A}_{i,t}^{\prime} := \hat{A}_{i} - \alpha \cdot m_{i,t} \cdot |\hat{A}_{i
 
 这种“检测-训练-推理”三位一体的设计使得感知错误的诊断和修复贯穿模型生命周期的关键阶段，而非仅在训练或推理单点进行优化。
 
-
-
 本文提出的 PERCEVAL 框架围绕一个核心洞察展开：视觉推理中的中间步骤多为可在图像中直接验证的感知声明，通过自动检测图像-文本不对齐，可实现细粒度的过程监督。基于此，框架将传统的**结果级稀疏奖励**升级为**token级感知错误惩罚**，形成“检测—惩罚—重生成”的闭环。
 
 ### 框架总览
@@ -137,8 +131,6 @@ $$\hat{A}_{i,t}^{\prime} := \hat{A}_{i} - \alpha \cdot m_{i,t} \cdot |\hat{A}_{i
 - **感知中心的数据构造**：PERCEVAL 主要在视觉搜索数据上通过 SFT 训练，使其专注于检测“可在图像中直接验证”的感知声明，而非泛化的逻辑错误。这一聚焦使得 token 级惩罚具有高精确度，但也限制了其对更广泛推理错误的覆盖能力。
 - **选择性干预**：token 级优势调制仅在感知密集型训练数据上应用，其他数据仍使用标准 GRPO，避免对非感知任务引入强制干预，保证了方法的通用性。
 - **测试时缩放**：截断-重生成策略允许模型基于自身已生成的上下文重新推理，比多数投票更贴近模型的原始分布，因而输出更稳定可靠。实验表明，当采样数 $k=16$ 时，截断-思考策略在 V* Attr 子任务上达到 94.78，显著优于多数投票的 92.17。
-
-
 
 ### 1. 问题瓶颈：稀疏奖励与感知错误
 
@@ -199,8 +191,6 @@ $$\hat{A}_{i,t}^{\prime} := \hat{A}_{i} - \alpha \cdot m_{i,t} \cdot |\hat{A}_{i
 - **Truncate–then–Regenerate**：检测到首个感知错误token后，截断其前缀，从截断点重新生成后续内容。
 - **Truncate–Thinking–then–Regenerate**：截断后附加反思提示（如“Wait, I need to reconsider this reasoning more carefully...”），引导模型进行自我纠正后再生成。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -244,8 +234,6 @@ $$\hat{A}_{i,t}^{\prime} := \hat{A}_{i} - \alpha \cdot m_{i,t} \cdot |\hat{A}_{i
 
 Figure 3 展示了 GRPO 基线模型与我们方法在相同视觉推理问题上的推理过程对比。GRPO 基线模型在推理链中出现了明显的感知错误（如错误描述物体位置），且该错误在后续推理中被传播和放大。相比之下，经过 PERCEVAL 过程监督训练的模型在推理链中表现出更强的感知锚定——其生成的中间声明更频繁地引用图像中的具体视觉证据，且在出现不确定时表现出更谨慎的推理行为。这从定性角度印证了 token 级惩罚机制对感知基础的强化作用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2658_https_arxiv_org_abs_2604_24583/figures/003_Table_2.jpg]]
 *Table 2: Comparison of different test-time scaling strategies, where Truncate and Truncate-Thinking denote our proposed Truncate–then–Regenerate and Truncate–Thinking–then–Regenerate methods, respectively*
 
@@ -254,8 +242,6 @@ Figure 3 展示了 GRPO 基线模型与我们方法在相同视觉推理问题�
 
 ![[assets/figures/papers/paper_list_l2658_https_arxiv_org_abs_2604_24583/figures/005_Table_3.jpg]]
 *Table 3: Ablation study on the penalty strength hyperparameter α*
-
-
 
 ## 定位与知识库关联
 
@@ -309,8 +295,6 @@ $$\hat{A}_{i,t}^{\prime} := \hat{A}_{i} - \alpha \cdot m_{i,t} \cdot |\hat{A}_{i
 3. **跨模态迁移性**：该方法在非视觉推理任务（如纯文本数学）中的适用性如何？虽然实验显示数学推理有约3%的泛化提升，但这是否源于视觉搜索训练中的共性推理能力迁移，还是仅因模型整体质量的提升，尚需进一步消融分析。
 
 4. **更智能的跨度切割**：如何通过更智能的跨度切割减少对语法必要token的误伤？例如，基于句法分析或语义完整性的跨度调整可能比纯字符串匹配更精准。
-
-
 
 ## 原文 PDF
 

@@ -56,8 +56,6 @@ claims:
 
 **主要结果概要**：在Open-Domain Track中，闭源模型**Kling 2.1**以平均排名第一的成绩在视觉质量与总体表现上领先（FVD 693.4），但轨迹保真度表现中等；开源模型中**CogVideoX**在视频分布指标上接近闭源水平（FVD 621.2），但轨迹质量（0.3856 vs Kling 0.6438）和代理一致性存在明显短板。在Ego-Conditioned Track中，驾驶专用模型**Vista**在轨迹对齐指标（ADE 29.97）上显著优于多数通用模型，验证了领域专用设计在运动可控性上的优势。SLAM轨迹提取的失败恢复策略将重建成功率从85%提升至100%（ADE仅轻微增加至16.84），保证了所有样本均能参与轨迹相关度量。人类验证实验表明，视频相关指标与人类偏好高度一致，而轨迹相关指标因单目SLAM噪声和深度恢复artifact，与人类判断的一致性稍低，这指明了未来改进方向。
 
-
-
 ### 自动驾驶世界模型的评估困境
 
 生成式视频世界模型正迅速成为自动驾驶领域的关键技术组件。这些模型以视觉、语言或动作信号为输入，生成未来的驾驶场景视频，有望为规划、仿真和数据增强提供强大的前向预测能力。然而，一个根本性的问题制约着该领域的进展：**我们缺乏一个全面、可信的基准来评估这些模型在驾驶场景中的真实能力**。
@@ -77,8 +75,6 @@ claims:
 ### DrivingGen的动机与定位
 
 DrivingGen正是为解决上述评估缺口而设计。其核心理念是：**从视觉视角和机器人学视角同时评估生成式驾驶世界模型**——前者关注生成视频的真实感与整体质量，后者关注生成轨迹的物理合理性、一致性与精确度。为此，DrivingGen构建了一个涵盖多种天气、时段和地理区域的多样化评估数据集，并引入四组互补的度量维度：分布（视频FVD + 轨迹FTD）、质量（主客观图像质量 + 轨迹运动学质量）、时间一致性（视频级 + 代理级 + 轨迹级）以及轨迹对齐（ADE/DTW）。这一多维框架旨在系统性地揭示模型在“看起来好”与“行为上对”之间的真实能力边界，为下一代驾驶世界模型的发展提供清晰的方向指引。
-
-
 
 ## 核心方法与创新机理
 
@@ -115,8 +111,6 @@ DrivingGen 构建了一个**刻意平衡的 400 样本多样化数据集**（Sec
 
 这种“数据 × 指标”的联合设计，使得 DrivingGen 能够揭示一个此前未被系统量化的核心发现：**当前不存在任何模型能同时在视觉真实感和轨迹保真度上达到顶尖水平**，通用模型与驾驶专用模型之间存在明显的“视觉-物理”权衡（Section 4.1）。这一发现直接指明了驾驶世界模型的下一个关键挑战——如何在单一模型中统一逼真的视觉质量与精确的物理运动。
 
-
-
 DrivingGen 构建了一个面向生成式驾驶世界模型的端到端评估流水线，其核心设计原则是从**视觉视角**（生成视频的真实感与整体质量）和**机器人学视角**（生成轨迹的物理合理性、一致性与准确性）两个维度对模型进行联合审视。图1给出了该框架的完整信息流。
 
 ### 输入模态与生成阶段
@@ -145,12 +139,8 @@ DrivingGen 构建了一个面向生成式驾驶世界模型的端到端评估流
 - **Open-Domain Track**：评估模型对开放域、多样化、未见过的驾驶场景的泛化能力，不提供 ego 轨迹指令；
 - **Ego-Conditioned Track**：专注于轨迹可控性评估，要求模型按照给定的 ego 轨迹指令生成视频，并通过轨迹对齐度量量化其指令遵循能力。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_OrgL5DsU0f/figures/002_Figure_1.jpg]]
 *Figure 1: Overview of our DrivingGen benchmark. Video models take vision, and optional language/action as inputs to generate videos. The generated videos are then passed into our evaluation suite. Four comprehensive and novel sets of metrics for both videos and trajectories (distribution, quality, temporal consistency, and trajectory alignment) are introduced to evaluate world models*
-
-
 
 DrivingGen 的评估管线由五个核心模块串联构成，形成从视频生成到多维度打分的完整闭环。
 
@@ -196,12 +186,8 @@ $$S_{\mathrm{cons}} = \frac{1}{2}(S_v + S_a)$$
 
 Ego-Conditioned Track 使用标准的 **ADE（平均位移误差）** 和 **DTW（动态时间规整距离）** 衡量生成轨迹与给定 ego 轨迹指令的匹配程度，直接反映模型对运动控制的精确性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_OrgL5DsU0f/figures/004_Table_2.jpg]]
 *Table 2: Overview of metrics utilized in DrivingGen. Definition and details are in Sec. 3.2*
-
-
 
 ## 实验与关键发现
 
@@ -241,8 +227,6 @@ DrivingGen在两条互补轨迹上评估14个生成式世界模型：**Open-Doma
 
 **Table 5** 给出了DrivingGen各组件在单张现代GPU上处理400段100帧视频的大致耗时，为不同资源预算下的基准部署提供了参考。论文明确公开了评估成本，保证了不同资源消耗模型之间的公平对比。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_OrgL5DsU0f/figures/005_Table_3.jpg]]
 *Table 3: Evaluation results of 14 generative world models on our benchmark. Best results are in red region, second best are in orange region, and third best are in blue region. “*” indicates commercial closed-source models. Models fall into four categories: closed-source, open-source general video models, physical-world models, and driving-specific models*
 
@@ -254,23 +238,6 @@ DrivingGen在两条互补轨迹上评估14个生成式世界模型：**Open-Doma
 
 ![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_OrgL5DsU0f/figures/001_Table_1.jpg]]
 *Table 1: Comparison of existing video benchmarks, driving world models, and driving video benchmarks. “%” indicates the missing metrics, and “"” signifies that the evaluation is comprehensive. “Visual”, “Agent” and “Traj.” represent evaluation of images or videos, surrounding agents and vehicles’ trajectories, respectively*
-
-![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_OrgL5DsU0f/figures/010_Table_5.jpg]]
-*Table 5: Approximate runtime of different components in DrivingGen on 400 videos with 100 frames each, evaluated on a single modern GPU. Times are coarse estimates and may vary with hardware*
-
-![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_OrgL5DsU0f/figures/006_Figure_3.jpg]]
-*Figure 3: The statistics of our ego-condition track*
-
-![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_OrgL5DsU0f/figures/007_Table.jpg]]
-*Table: (b) Data Ratio from existing open-sourced driving dataset in our ego-condition track*
-
-![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_OrgL5DsU0f/figures/008_Figure_4.jpg]]
-*Figure 4: The gallery of our ego-condition track*
-
-![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_OrgL5DsU0f/figures/003_Figure_2.jpg]]
-*Figure 2: Dataset distribution and gallery in our benchmark (top to bottom)*
-
-
 
 ## 定位与知识库关联
 
@@ -325,8 +292,6 @@ DrivingGen的评估管线包含几个关键创新：
 ### 知识库定位
 
 DrivingGen处于**生成式世界模型评估**与**自动驾驶仿真基准**的交叉点。它继承了视频生成评估的传统（FVD、主观质量），引入了机器人学视角的轨迹度量（ADE、DTW、运动学一致性），并首次系统性地将代理级别的时间一致性纳入评估。其方法论可被后续工作直接复用——Table 5公开了各组件在400视频×100帧规模上的运行时间估计，为社区提供了成本参考。代码已在NVIDIA Cosmos仓库开源（https://github.com/nvidia-cosmos/），项目网站（https://drivinggen-bench.github.io/）提供了完整的排行榜和可视化结果。
-
-
 
 ## 原文 PDF
 

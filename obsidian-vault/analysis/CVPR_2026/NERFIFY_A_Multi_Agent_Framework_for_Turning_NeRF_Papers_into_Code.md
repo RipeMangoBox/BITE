@@ -57,8 +57,6 @@ claims:
 
 该方法目前高度依赖 Nerfstudio 架构，向其他框架的迁移能力尚未验证；视觉驱动反馈依赖烟雾训练（3k 迭代）仍需一定计算时间，完全达到论文报告 PSNR 可能需要额外迭代。
 
-
-
 ### 神经辐射场的实现困境
 
 神经辐射场（NeRF）已成为三维场景表示与新颖视图合成的核心范式，其研究产出呈爆发式增长——仅 NeRF 相关 arXiv 论文的日更新仓库（[nerf-arxiv-daily](https://github.com/wangqiannudt/nerf-arxiv-daily)）即反映了这一趋势。然而，从论文到可运行代码的转化却构成了领域发展的隐性瓶颈：手动将一篇 NeRF 论文实现为可训练代码，通常需要数周的专业工程努力（Figure 1 左），涵盖体渲染管线搭建、采样策略调优、网络架构匹配与数值稳定性保障等高度耦合的环节。
@@ -78,8 +76,6 @@ claims:
 ### 本文动机
 
 上述缺口揭示了一个明确的需求：**将 NeRF 领域的架构知识形式化为机器可执行的约束，并构建能够理解、检索、组合与验证的多智能体系统**。NERFIFY 的设计动机正是填补这一空白——通过将 Nerfstudio 框架形式化为上下文无关文法（CFG）以强制接口合约，通过组合式引用图遍历以恢复传递依赖，并通过视觉驱动的 PSNR/跨视角反馈以迭代逼近专家级质量，从而在几分钟内自动完成从论文到可训练 NeRF 插件的全流程转化（Figure 1 右）。
-
-
 
 ## 核心方法与创新机理
 
@@ -145,14 +141,9 @@ NERFIFY 引入**视觉驱动反馈**（Stage 4），通过三个互补的分支�
 
 NERFIFY 的四项 changed slots 构成了一条完整的因果链：**CFG + In-Context 示例**提供领域知识基础 → **组合式引用恢复**补全隐藏依赖 → **GoT 多智能体**在架构约束下按拓扑顺序生成代码 → **视觉驱动反馈**迭代修复语义错误。这一链条使得 NERFIFY 在 NERFIFY-BENCH 上实现了 **100% 可训练率**，而所有基线均为 0%（Table 2），从根本上解决了通用论文到代码系统在 NeRF 领域的“能生成但不可训练”问题。
 
-
-
 NERFIFY 是一个将 NeRF 论文自动转化为可训练代码的四阶段多智能体系统。其核心设计理念是：**通用论文到代码系统无法生成可训练的 NeRF 实现，因为 NeRF 涉及体渲染、计算机视觉和神经优化的强领域耦合——一个错误的激活函数或光线求交就会导致 NaN 梯度或退化解，且调试周期长达 24–48 小时**。现有基线方法（如 **Paper2Code** (Seo et al., arXiv 2025)、**AutoP2C** (Lin et al., arXiv 2025)、GPT-5 单次生成、OpenAI o1）生成的可执行代码缺乏架构约束和依赖解析，95% 无法训练。
 
 NERFIFY 的关键因果调节变量在于：**将 Nerfstudio 框架形式化为上下文无关文法（CFG），强制 LLM 生成满足接口合约和模块组合的代码，从根本上消除架构错误**。整个流水线由四个顺序阶段构成，如 Figure 2 所示：
-
-![[assets/figures/papers/paper_list_l2643_https_arxiv_org_abs_2603_00805/figures/002_Figure_2.jpg]]
-*Figure 2: NERFIFY converts NeRF papers into code through four stages: (1) Agent parses and summarizes PDFs into simple markdown, CFG from Nerfstudio and curated paper-code pairs as In-Context examples are saved in K (2) Compositional dependency resolution traverses citation graphs to retrieve missing components from referenced papers, (3) GoT code synthesis generates repository files through specialized agents operating in topological order (4) Visual refinement iteratively patches artifacts until achieving expert-level quality*
 
 ### 阶段 1：CFG 形式化与上下文学习
 
@@ -195,12 +186,8 @@ $${ \mathrm { D e p e n d e n c i e s } } ( c _ { i } ) = \{ c _ { i } \} \cup \
 
 消融实验证实了各阶段的必要性：移除 In-Context 示例后语义得分从 0.98 降至 0.71，可训练率降至 90%；移除引用恢复后正确实现率降至 0.65；移除冒烟测试后可训练率降至 60%；将 GoT 替换为单次生成后语义得分骤降至 0.45（Table 5）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2643_https_arxiv_org_abs_2603_00805/figures/001_Figure_1.jpg]]
 *Figure 1: Overview. Manual NeRF implementation requires weeks of specialized effort (left). Existing paper-to-code systems fail to produce trainable code. NERFIFY automates this process through grammar-constrained synthesis and compositional citation recovery, generating fully trainable Nerfstudio plugins in minutes (right)*
-
-
 
 NERFIFY 将 NeRF 论文自动转化为可训练代码的核心机制建立在四个形式化基础之上：仓库的图表示、论文的结构化信息抽取、组合式依赖递归，以及多智能体拓扑生成。以下逐一展开其关键模块与支撑公式。
 
@@ -240,9 +227,6 @@ $$
 
 该公式的含义是：一篇被引论文 $c_i$ 的依赖集包含其自身，以及其引用论文的依赖集的并集。通过这一递归定义，NERFIFY 能够自动发现并检索所有传递依赖中所需的采样器、编码器、损失函数等组件。Figure 3 以 K-Planes 为例展示了这一过程：实现该论文需要从 7 个直接依赖和总计 12 篇传递依赖论文中检索组件。
 
-![[assets/figures/papers/paper_list_l2643_https_arxiv_org_abs_2603_00805/figures/003_Figure_3.jpg]]
-*Figure 3: NeRF citation dependency graphs. Implementing K-Planes requires retrieving components from 7 direct dependencies (Plenoxels, TensoRF, Instant-NGP, Mip-NeRF 360, DyNeRF, EG3D, NeRF-W) and 12 total papers with transitive dependencies. Our compositional citation recovery automatically traverses such graphs to identify and retrieve all necessary components*
-
 ### 图思维多智能体代码合成
 
 Stage 3 的 GoT（Graph-of-Thought）多智能体系统是 NERFIFY 的核心执行引擎。主智能体根据依赖图 $G$ 的拓扑顺序编排专用文件智能体，每个文件智能体经历四个子阶段：
@@ -257,13 +241,6 @@ Stage 3 的 GoT（Graph-of-Thought）多智能体系统是 NERFIFY 的核心执�
 ### 视觉驱动反馈的度量分支
 
 Stage 4 的度量分支通过构建稠密误差场来定位视觉伪影的根源。其核心机制是对渲染图像与真值图像计算逐像素 PSNR/SSIM 误差图，识别局部极小值区域，并将这些区域的空间坐标反馈给修复智能体，指导其对特定模块（如密度场、颜色网络）进行定向修补。反馈循环持续到满足以下任一终止条件：(1) 诊断智能体不再产生新反馈；(2) 达到最大迭代次数；(3) 实现达到原论文报告的 PSNR 目标。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2643_https_arxiv_org_abs_2603_00805/figures/004_Figure_4.jpg]]
-*Figure 4: Graph-of-Thought (GoT) Multi-Agent Code Synthesis. The master agent orchestrates specialized file-agents that progressively build a NeRF repository over k steps. Each step shows files being created or modified through four stages: (1) DAG Construction maps papers to Nerfstudio component dependencies, (2) Interface Freeze establishes API contracts in topological order, (3) Implementation generates validated code with shape/gradient checks, (4) Integration Testing runs smoke tests with automated repair. Files evolve from minimal interfaces to complete implementations as agents coordinate through the dependency graph, producing runnable NeRF plugins*
-
-
 
 ## 实验与关键发现
 
@@ -328,15 +305,8 @@ Table 5 的消融实验揭示了四个核心组件的因果效应：
 
 这些局限指向两个开放问题：框架能否扩展到其他需要领域特定约束的 CV 任务（如 3D 重建、可微渲染）？在依赖论文完全无可用实现时，组合式引用恢复的极限可达性如何？
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2643_https_arxiv_org_abs_2603_00805/figures/005_Table_1.jpg]]
 *Table 1: Comparison of NERFIFY with paper and human implementations. We evaluate NeRF papers from the NERFIFY-BENCH set whose code is not publicly available, using SSIM, PSNR, and LPIPS metrics. Note. Other baselines like Paper2Code, AutoP2C, GPT-5 and R1 failed to generate trainable code*
-
-![[assets/figures/papers/paper_list_l2643_https_arxiv_org_abs_2603_00805/figures/006_Table_2.jpg]]
-*Table 2: Comparison of NERFIFY with baselines in terms of executable code. We evaluate ability to produce functional, trainable implementations. All baselines fail to generate trainable code despite some producing syntactically valid Python*
-
-
 
 ## 定位与知识库关联
 
@@ -365,8 +335,6 @@ NERFIFY 的适用边界由其设计假设清晰界定。第一个边界是**框�
 第二，**引用恢复的极限**：当依赖链中的某个节点完全没有可用实现时，组合式引用恢复的退化行为如何？系统是否能够降级为从论文描述中推断组件实现，还是需要人工介入？这一问题的答案将决定 NERFIFY 在“冷启动”场景下的实用性。
 
 第三，**VLM 反馈的可靠性**：语义诊断分支使用 Qwen3 VLM 来识别渲染伪影（如浮空几何、缺失细节），但这种基于视觉语言模型的诊断是否对所有类型的 NeRF 伪影都有效？是否存在 VLM 误诊导致修复方向错误的风险？论文未对此进行消融分析，这是一个需要人工验证的开放点。
-
-
 
 ## 原文 PDF
 

@@ -138,8 +138,6 @@ Iris 的核心思想是将场景的语言描述作为额外条件，注入扩散
 ![[assets/figures/papers/paper_list_l2526_https_arxiv_org_abs_2411_16750/figures/014_Table_5.jpg]]
 *Table 5: Inference using fixed template text input. The results show that the model achieves comparable, or even better, performance than the Marigold baseline when using fixed prompts instead of user-provided text. This finding suggests that, even when user-provided descriptions are unavailable, incorporating language during training itself might enhance the depth estimator’s generalization and overall performance*
 
-### 补充图表
-
 Iris 的核心设计是在现有扩散深度估计框架中，**仅变更条件输入**：在图像潜变量与噪声深度潜变量拼接的基础上，额外拼接由冻结 CLIP 文本编码器编码的场景语言描述，作为去噪 U-Net 的条件。该方法可视为一种通用适配策略，不改变扩散模型的主体架构，因此可无缝应用于 Marigold、Lotus、E2E-FT 等多种扩散深度估计基线。
 
 ### 关键模块
@@ -188,11 +186,6 @@ $$\mathbf{z}_{t-1} = \frac{1}{\sqrt{\alpha_t}} \left( \mathbf{z}_t - \frac{1-\al
 
 **核心机制**：文本 c 作为额外条件，将场景中物体的存在性、类别、大小、空间关系等先验注入去噪过程，约束深度解空间，从而有效消解纯视觉条件下的纹理歧义与可见性歧义。实验表明，该约束使扩散模型仅需 10 步 DDIM 去噪即可收敛，而基线需要 25 步（Table 4, Figure 8），验证了语言对扩散轨迹的加速作用。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2526_https_arxiv_org_abs_2411_16750/figures/002_Figure_2.jpg]]
-*Figure 2: Language improves the depth perception of specified insignificant (and potentially ambiguous) regions*
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -236,28 +229,14 @@ Figure 6展示了通过逐步追加细节描述来迭代优化深度预测的能
 
 尽管整体性能提升显著，Iris仍存在明确的失败模式。Figure 9揭示的错误文本误导问题表明，模型缺乏对输入文本质量的校验机制，对抗性或错误的文本描述会直接导致深度预测失败。此外，当前方法依赖视觉语言模型自动生成训练文本，可能引入模型自身的偏差和幻觉，在人类真实描述场景下的有效性未经验证。训练数据均为合成数据集（HyperSim、Virtual KITTI），与真实场景存在域间隙，极端真实环境下的泛化能力需进一步检验。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2526_https_arxiv_org_abs_2411_16750/figures/008_Table_2.jpg]]
 *Table 2: Better perception in small areas. We evaluate the performance for panoptic segmentation masks that occupied less than 5%, 10%, and 20% of an image. Integrating language results in better depth estimation in small areas*
-
-![[assets/figures/papers/paper_list_l2526_https_arxiv_org_abs_2411_16750/figures/011_Figure_8.jpg]]
-*Figure 8: Performance under different denoising steps. Integrating language consistently outperforms the Marigold baseline across various denoising steps, with a faster convergence*
 
 ![[assets/figures/papers/paper_list_l2526_https_arxiv_org_abs_2411_16750/figures/009_Figure_7.jpg]]
 *Figure 7: Convergence speed comparison. Integrating language converges faster during training compared with the Marigold baseline*
 
-![[assets/figures/papers/paper_list_l2526_https_arxiv_org_abs_2411_16750/figures/010_Figure_9.jpg]]
-*Figure 9: Incorrect text misguides models. After replacing the correct description “a bookshelf with glass” with a wrong description “a window with curtains”, the model failed to perceive the structure of the bookshelf behind the glass*
-
-![[assets/figures/papers/paper_list_l2526_https_arxiv_org_abs_2411_16750/figures/016_Table_4.jpg]]
-*Table 4: Performance for different denoising steps. Integrating text consistently outperforms the baseline across various denoising steps, with a significantly faster convergence speed for the diffusion process*
-
 ![[assets/figures/papers/paper_list_l2526_https_arxiv_org_abs_2411_16750/figures/015_Table_3.jpg]]
 *Table 3: Ablation for prompts to generate language description. Prompts are used to prompt LLaVA to generate language descriptions for each image. While the performances among different prompts may vary, they remain consistently comparable, as long as they are meaningful and mimic human descriptions. Marigold in the first row is trained without text*
-
-![[assets/figures/papers/paper_list_l2526_https_arxiv_org_abs_2411_16750/figures/017_Table_6.jpg]]
-*Table 6: Training with different numbers of text captions per image. For images annotated with multiple captions, a caption is randomly sampled for each training iteration. While adding more captions initially slightly improves performance, the benefit quickly saturates, yielding only minor gains beyond a certain point*
 
 ## 定位与知识库关联
 

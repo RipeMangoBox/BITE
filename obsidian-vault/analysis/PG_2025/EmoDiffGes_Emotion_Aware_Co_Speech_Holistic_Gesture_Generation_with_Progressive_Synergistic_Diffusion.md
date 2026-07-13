@@ -51,8 +51,6 @@ claims:
 
 **主要结果**：在 BEAT-X 基准上，EmoDiffGes 在所有指标上均优于现有方法（FGD 4.312, BC 0.787, Diversity 12.75, MSE 7.435, LVD 7.713, BESA 0.509, BESA-ELO 1562.55）。用户研究进一步证实，该方法在真实感、表现力、节奏对齐和语义对齐四个维度上均获得最高评分。消融实验验证了动态情感对齐模块（DEAM）、渐进区域协同流（PIRSF）以及分区潜空间设计各自对性能的关键贡献。
 
-
-
 共语音手势生成旨在根据语音输入合成自然、协调的身体动作，是虚拟人交互、具身智能体等应用的核心技术。近年来，扩散模型在该领域取得了显著进展，但现有方法普遍面临两个根本性局限，严重制约了生成手势的表现力与身体协调性。
 
 **瓶颈一：情感的时间动态被忽略。** 情感并非静态标签——同一段语音中，说话者的情绪状态会随时间演变，而身体各部位对情感的响应方式也各不相同。然而，现有方法要么完全不引入情感条件，要么仅使用单一的整体情感标签，无法捕捉这种时序上的动态变化。这导致生成的手势缺乏表现力，难以传达语音中蕴含的丰富情感层次。
@@ -67,8 +65,6 @@ claims:
 2. **渐进式区域协同**：将身体分解为面部、上肢、手部和下肢四个区域，分别用离散潜变量建模，再通过级联交叉注意力机制实现区域间的渐进式信息流动，在保持区域特异性的同时确保全身运动协调。
 
 这一设计从根本上克服了整体简化与部分独立之间的表达矛盾，使手势生成既能体现细腻的情感动态，又能保持自然连贯的整体运动。
-
-
 
 ## 核心方法与创新机理
 
@@ -85,8 +81,6 @@ EmoDiffGes 针对现有共语音手势生成方法的两个根本瓶颈——忽
 **3. 从独立生成到渐进式区域间协同流 (PIRSF)**
 
 为解决区域间协调问题，EmoDiffGes 设计了**渐进式区域间协同流 (PIRSF)**。四个身体区域的生成流按面部→上半身→手部→下半身的顺序级联，每个流通过专用的交叉注意力模块（$A_c = \mathrm{SoftMax}\left( \frac{Q_{region} \cdot K_{cond}}{\sqrt{d}} \right) V_{cond}$）同时接受音频条件、加权情感特征以及前序流的输出作为条件。这种级联交叉注意力机制确保了信息从前到后的逐步传递与整合，使全身动作在保持区域特性的同时实现全局协调。消融实验表明，包含完整四条流的 PIRSF 配置在所有指标上均达到最优。
-
-
 
 EmoDiffGes 是一个基于扩散模型的共语音整体手势生成框架，其核心设计遵循具身情感理论（embodied emotion theory），将动态情感调节与身体部位感知协同建模统一在单一流程中。整体 pipeline 由三个关键模块串联构成：**动态情感对齐模块（DEAM）**、**身体区域先验（Body Regions Prior）** 和 **渐进式区域间协同流（PIRSF）**，最终通过去噪扩散过程生成完整的手势序列。
 
@@ -134,14 +128,6 @@ $$ L_{\text{final}} = \lambda_{\text{latent}} L_{\text{latent}} + \lambda_{\text
 ### 设计动机与对比
 
 图 2 直观对比了现有方法与 EmoDiffGes 的设计差异：传统方法或对身体进行整体简化建模，或将各部分独立处理，导致手势缺乏情感表现力且身体各部分运动不协调。EmoDiffGes 通过将动态情感线索注入分区域生成流，并在区域间建立渐进式信息传递，从机制层面解决了这两个根本性局限。
-
-### 补充图表
-
-
-![[assets/figures/papers/paper_list_l1921_EmoDiffGes_Emotion_Aware_Co_Speech_Holistic_Gesture_Generation_with_Prog/figures/002_Figure_2.jpg]]
-*Figure 2: Top: Previous methods typically either represent the body holistically or decompose it into independently modeled parts, often generating incoherent, unnatural and inexpressive motions. Bottom: Our method incorporates temporal emotional cues into the motion representation by conditioning region-specific body streams, enabling more coherent and expressive gesture generation*
-
-
 
 EmoDiffGes 的核心架构围绕三个关键模块展开：**身体区域先验（Body Regions Prior）**、**动态情感对齐模块（DEAM）** 和 **渐进式区域间协同流（PIRSF）**，三者协同构成一个完整的扩散生成框架。
 
@@ -198,15 +184,8 @@ $$L_{final} = \lambda_{latent} L_{latent} + \lambda_{rec} L_{rec} + \lambda_{dif
 
 消融实验表明，完整的四级联流（包含 Lower Stream）在 PIRSF 中表现最优（Table 3），DEAM 模块显著增强了生成手势的情感表达力和连贯性（Figure 8）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1921_EmoDiffGes_Emotion_Aware_Co_Speech_Holistic_Gesture_Generation_with_Prog/figures/004_Figure_4.jpg]]
 *Figure 4: The architecture of Different Body Regions Prior with Residual Vector Quantization*
-
-![[assets/figures/papers/paper_list_l1921_EmoDiffGes_Emotion_Aware_Co_Speech_Holistic_Gesture_Generation_with_Prog/figures/005_Figure_5.jpg]]
-*Figure 5: The architecture of Progressive Inter-Region Synergistic Flow (PIRSF)*
-
-
 
 ## 实验与关键发现
 
@@ -223,9 +202,6 @@ EmoDiffGes 在 BEAT-X 基准上进行了全面的定量评估，与当前主流�
 *Table 1: Quantitative ablation study for a single whole-body latent space*
 
 用户研究进一步验证了主观感知质量。20 名性别均衡的参与者从真实感、表达力、节奏对齐和语义对齐四个维度对生成手势进行评分。EmoDiffGes 在所有维度上均获得最高评分（Figure 7），确认了模型在人类感知层面的优势。
-
-![[assets/figures/papers/paper_list_l1921_EmoDiffGes_Emotion_Aware_Co_Speech_Holistic_Gesture_Generation_with_Prog/figures/011_Figure_7.jpg]]
-*Figure 7: Results of the user study*
 
 ### 消融实验：关键模块的有效性
 
@@ -265,11 +241,6 @@ EmoDiffGes 在 BEAT-X 基准上进行了全面的定量评估，与当前主流�
 ![[assets/figures/papers/paper_list_l1921_EmoDiffGes_Emotion_Aware_Co_Speech_Holistic_Gesture_Generation_with_Prog/figures/010_Figure_8.jpg]]
 *Figure 8: Qualitative ablation study for DEAM. Top: the results without DEAM. Bottom: the results of our full model*
 
-![[assets/figures/papers/paper_list_l1921_EmoDiffGes_Emotion_Aware_Co_Speech_Holistic_Gesture_Generation_with_Prog/figures/012_Figure_9.jpg]]
-*Figure 9: Qualitative ablation study for PIRSF*
-
-
-
 ## 定位与知识库关联
 
 ### 核心定位与差异化
@@ -304,8 +275,6 @@ EmoDiffGes 的提出直指现有共语音手势生成领域的两个根本性瓶
 3. **情感评估的标准化**：论文提出的基于视觉语言模型的情感语义对齐评估（BESA 和 BESA-ELO）虽具创新性，但其与心理学或情感计算领域既有评估标准的对应关系尚不明确。该方法的可推广性需要在更广泛的情感评估基准上进行验证。
 
 4. **实时推理优化**：若要将该方法推向实际交互系统，需探索扩散模型的加速采样策略（如 DDIM、渐进蒸馏）或轻量化架构设计，在保持生成质量的前提下降低推理延迟。
-
-
 
 ## 原文 PDF
 

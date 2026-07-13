@@ -59,8 +59,6 @@ claims:
 
 **方法定位**：JANUS 属于分布优化范式，区别于逐提示离散梯度优化（如 MMA、MMP）和大容量生成器强化学习（如 SneakyPrompt、PGJ）。其核心创新在于将越狱攻击形式化为结构化提示分布的端到端黑盒优化，通过双锚点分布的凸组合保证语义下界，同时以标量混合系数 α 作为唯一的策略参数，在极低维度上完成高效的策略梯度搜索。
 
-
-
 ### 文本到图像生成与安全过滤
 
 文本到图像（T2I）系统将自然语言提示映射为视觉内容，其形式化定义为映射 $M : \mathcal{P} \to \mathcal{V}$，其中提示 $\mathbf{p} = [t_1, t_2, \ldots, t_L] \in \mathbb{N}^L$ 是长度为 $L$ 的令牌序列。为防止生成有害内容，主流部署通常集成多层安全过滤机制，包括文本级分类器和图像级安全检测器。安全过滤器可抽象为二值函数 $C(\mathbf{p}, M(\mathbf{p})) \to \{0, 1\}$，输出 $1$ 表示内容通过安全检查，$0$ 表示被拦截。
@@ -80,8 +78,6 @@ claims:
 ### JANUS 的设计动机
 
 基于上述洞察，JANUS 被设计为一个**轻量级、无大语言模型的两阶段框架**：第一阶段构建双锚点语义分布模型，结构性地保障语义相似度下界；第二阶段采用轻量级策略梯度优化器，在黑盒条件下直接最大化端到端奖励（绕过安全过滤器且生成高有害内容）。这种范式将离散搜索转化为可处理的连续优化问题，实现了攻击成功率与计算效率的双重突破——在 Stable Diffusion 3.5 Large Turbo 上，JANUS 将 ASR-8 从 25.30% 提升至 43.15%，同时相对于优化类基线实现了约 18 倍（对 MMA）和 12 倍（对 MMP）的加速，且无需任何大语言模型参与。
-
-
 
 ## 核心方法与创新机理
 
@@ -131,8 +127,6 @@ $$\nabla_{\alpha} \log p_{\alpha}(\mathbf{p}) = \frac{N_t(\mathbf{p}) - N_c(\mat
 
 JANUS的三个changed slots形成了紧密的因果链条：**低维混合策略**提供了高效的探索空间，**结构化语义下界**消除了对代理损失的依赖，**黑盒端到端奖励**则使优化目标与真实越狱成功直接对齐。这一设计使得JANUS在Stable Diffusion 3.5 Large Turbo上将ASR-8从25.30%显著提升至43.15%，同时获得更高的CLIP和NSFW分数（Table 1），并在SDXL（58.20% vs. 36.40%）和Midjourney（6.20% vs. 3.28%）等多样化模型上保持领先（Table 4），验证了范式转换的泛化能力。
 
-
-
 JANUS 将越狱攻击从传统的离散提示搜索或大容量生成器强化学习，重新形式化为**在低维语义锚定分布上的连续混合策略优化**。其核心思想是将“语义保持”与“有害性探索”两个目标解耦，通过构造两个语义锚定高斯分布的凸组合来结构化地保障语义下界，再以轻量级策略梯度直接在黑盒端到端奖励信号下优化混合系数。整个框架由两个阶段级联构成，如图2所示。
 
 ### 输入与输出流
@@ -166,12 +160,8 @@ $$\nabla_{\alpha} \log p_{\alpha}(p) = \frac{N_t(p) - N_c(p)}{\alpha N_t(p) + (1
 
 两个阶段形成“松弛—优化”的闭环：第一阶段提供语义结构化的搜索空间，将离散的组合爆炸问题压缩为单一连续参数 $\alpha$ 的优化；第二阶段以黑盒奖励为驱动，在保持语义下界的前提下动态调节 $\alpha$，在“绕过安全过滤器”与“生成高有害内容”之间寻找最优均衡。消融实验（Table 2）证实，移除双分布建模（Unimodal 变体）或使用固定 NSFW 奖励（Fix NSFW 变体）均会导致攻击成功率和有害性分数的显著下降，验证了两个模块的协同必要性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2220_https_arxiv_org_abs_2603_21208/figures/002_Figure_2.jpg]]
 *Figure 2: Overall pipeline of our JANUS. Stage 1 builds two semantically anchored base distributions from the target prompt pt and its clean counterpart*
-
-
 
 ### 2.1 问题形式化：从离散搜索到分布优化
 
@@ -239,13 +229,6 @@ $$
 
 这一梯度形式无需白盒模型参数，无需大规模语言模型作为生成器，仅通过轻量级策略梯度即可在单标量参数 $\alpha$ 上完成优化。整个流水线如 Figure 2 所示：第一阶段构建语义锚定混合分布，第二阶段通过黑盒反馈更新混合策略。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2220_https_arxiv_org_abs_2603_21208/figures/005_Figure_4.jpg]]
-*Figure 4: Effect of the mixing policy α on jailbreak performance for SD3.5LT (left) and DALL·E3 (right). The left y-axis reports TASR / IASR / ASR (%), while the right y-axis reports the NSFW score. Fixing α to any static value leads to a suboptimal tradeoff between filter evasion and content harmlessness. Our full framework (“Fully Trained”) uses RL to learn a dynamic α policy, achieving superior overall jailbreak performance*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -307,27 +290,8 @@ Table 3对比了各方法的平均每次成功越狱运行时间。JANUS相较�
 ![[assets/figures/papers/paper_list_l2220_https_arxiv_org_abs_2603_21208/figures/007_Table_3.jpg]]
 *Table 3: Computational efficiency comparison. We report the average runtime (in seconds) per successful jailbreak. JANUS achieves a significant speedup compared to optimization-based baselines (MMA, MMP) while maintaining a competitive runtime against generator-based methods (PGJ, SneakyPrompt) without requiring memory-intensive Large Language Models*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2220_https_arxiv_org_abs_2603_21208/figures/001_Figure_1.jpg]]
 *Figure 1: Qualitative results of JANUS on Stable Diffusion 3.5 Large Turbo (left) and DALL·E3 (right). JANUS rewrites unsafe target prompts into distributionally optimized, ostensibly benign queries that bypass both text- and image-level safety filters, yet still induce model outputs aligned with the original prohibited intent*
-
-![[assets/figures/papers/paper_list_l2220_https_arxiv_org_abs_2603_21208/figures/004_Figure_3.jpg]]
-*Figure 3: Qualitative results of JANUS on Stable Diffusion XL (left) and Midjourney (right)*
-
-![[assets/figures/papers/paper_list_l2220_https_arxiv_org_abs_2603_21208/figures/010_Figure_5.jpg]]
-*Figure 5: More qualitative results of JANUS on Stable Diffusion 3.5 Large Turbo (left) and DALL·E3 (right)*
-
-![[assets/figures/papers/paper_list_l2220_https_arxiv_org_abs_2603_21208/figures/012_Figure_6.jpg]]
-*Figure 6: More qualitative results of JANUS on Stable Diffusion XL (left) and Midjourney (right)*
-
-![[assets/figures/papers/paper_list_l2220_https_arxiv_org_abs_2603_21208/figures/014_Figure_7.jpg]]
-*Figure 7: More qualitative results of JANUS on Midjourney(1)*
-
-![[assets/figures/papers/paper_list_l2220_https_arxiv_org_abs_2603_21208/figures/016_Figure_8.jpg]]
-*Figure 8: More qualitative results of JANUS on Midjourney(2)*
-
-
 
 ## 定位与知识库关联
 
@@ -376,8 +340,6 @@ JANUS 的范式创新在于将上述两条轴线同时打破。在搜索空间�
 **多锚点复合分布**。当前双锚点设计（有害 + 清洁）的语义稳定性下界在极端语义分离情况下（$\mu_t$ 与 $\mu_c$ 距离过大）是否仍然有效？能否扩展到三个或更多锚点的复合成分布（例如增加一个“中性风格”锚点）以提升攻击的语义多样性和绕过路径的丰富性？这需要重新推导语义稳定性下界的理论保证。
 
 **红队测试工具的伦理转化**。JANUS 的核心技术——分布级黑盒优化——具有天然的“红队测试”工具属性：它能在不访问模型内部参数的情况下自动化地探测安全漏洞。如何界定这一技术的伦理使用边界？是否可以通过限制优化目标（例如将 NSFW 分数替换为通用的安全违规指标）和输出控制（仅报告漏洞而不生成实际有害图像）来将其转化为合法的安全审计工具？这需要学术界、工业界和政策制定者的共同参与。
-
-
 
 ## 原文 PDF
 

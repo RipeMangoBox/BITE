@@ -60,8 +60,6 @@ claims:
 
 VoDaSuRe的建立揭示了体积超分辨率领域从“合成退化”走向“真实退化”研究的迫切需求，为后续鲁棒VSR模型的设计提供了关键基准和方向指引。
 
-
-
 ### 体积超分辨率中的“理想化”陷阱
 
 体积超分辨率（Volumetric Super-Resolution, VSR）旨在从低分辨率三维图像（如CT、MRI扫描）重建高分辨率体积，在医学影像、材料科学等领域具有重要应用价值。然而，当前该领域的研究存在一个根本性的瓶颈：**几乎所有VSR模型的训练和评估都依赖于通过下采样合成得到的低分辨率-高分辨率配对数据**。这种合成退化（synthetic degradation）——通常是对高分辨率图像进行双三次或高斯下采样——过于理想化，无法模拟真实采集过程中引入的复杂退化因素，如对比度变化、噪声、射束硬化伪影和运动模糊。
@@ -85,8 +83,6 @@ VoDaSuRe的建立揭示了体积超分辨率领域从“合成退化”走向“
 ### 关键发现预览
 
 实验揭示了一个令人警醒的现实：在VoDaSuRe的真实低分辨率扫描数据上，最佳模型在4倍放大时的PSNR仅为16.24 dB，远低于同模型在下采样数据上的19.08 dB。跨域实验进一步证实，**在下采样数据上训练的模型在真实扫描上测试时性能严重下降**。这些发现表明，体积超分辨率领域亟需从“合成退化假设”转向“真实退化感知”的研究范式。
-
-
 
 ## 核心方法与创新机理
 
@@ -123,8 +119,6 @@ VoDaSuRe作为基准数据集，其评估覆盖了当前主流的体积超分辨
 
 VoDaSuRe的核心启示在于：体积超分辨率模型的**因果调控旋钮**应从模型架构创新转向**训练数据的退化类型**。未来研究需要关注如何设计能同时处理合成退化与物理退化的鲁棒模型，或探索能直接从真实低分辨率数据中学习高频细节恢复机制的新范式。
 
-
-
 VoDaSuRe 并非提出新的超分辨率模型架构，而是一个**揭示体积超分辨率领域偏移的大规模基准数据集与评估框架**。其核心贡献在于构建了一条从真实多分辨率 CT 扫描到可训练配对数据的完整数据处理管道，从而使得在真实采集退化下评估 SR 模型成为可能。
 
 ### 管道总览
@@ -152,12 +146,8 @@ VoDaSuRe 并非提出新的超分辨率模型架构，而是一个**揭示体积
 
 所有基线模型在统一协议下训练以保证公平比较：使用单块 NVIDIA H100 80GB GPU，AdamW 优化器（$\beta_1=0.9, \beta_2=0.999$），L1 损失函数，训练 100K 次迭代。对于 4 倍放大任务，在 2 倍放大预训练模型基础上以 batch size 8 微调额外 100K 次迭代。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l810_https_openaccess_thecvf_com_content_CVPR2026_html_Hoeg_VoDaSuRe_A_Large/figures/004_Figure_3.jpg]]
 *Figure 3: Illustration of our data curation pipeline for VoDaSuRe. We collect multi-resolution nested CT scans of the same sample, after which we crop and register the LR data to the downsampled HR volumes. LR and HR volumes are masked and their intensity histograms are matched. All scans are saved to OME-Zarr with up to four resolution levels, using separate groups for HR, LR, and registered data*
-
-
 
 VoDaSuRe 本身是一个数据集与基准工作，而非提出新模型架构的方法论文。其核心贡献在于构建了一条完整的数据处理管道，使真实采集的低分辨率体积图像能够与高分辨率图像配对，从而支持有监督的体积超分辨率训练与评估。以下聚焦该管道中的关键模块。
 
@@ -189,8 +179,6 @@ $$\mathcal{L}_{L1} = \frac{1}{N} \sum_{i=1}^{N} \| \hat{y}_i - y_i \|_1$$
 
 其中 $\hat{y}_i$ 为模型预测的SR体积，$y_i$ 为HR ground truth，$N$ 为像素总数。消融实验（Figure 7(b)）表明，添加感知损失（LPIPS）未能提升在真实低分辨率数据上的SR质量，甚至可能导致性能下降，这进一步说明当前领域偏移问题的本质在于退化模型的差异，而非损失函数的选择。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈：理想化下采样与真实采集退化之间的鸿沟
@@ -198,9 +186,6 @@ $$\mathcal{L}_{L1} = \frac{1}{N} \sum_{i=1}^{N} \| \hat{y}_i - y_i \|_1$$
 实验的核心发现直指体积超分辨率（Volumetric SR）领域长期被忽视的关键问题：**在合成下采样数据上表现优异的模型，面对真实低分辨率扫描时性能急剧坍塌**。这种性能退化并非源于模型容量不足或优化策略不当，而是训练数据的退化类型（下采样 vs. 真实采集）构成了因果开关——一旦训练域与测试域在退化分布上失配，模型倾向于输出平滑的平均预测，丢失高频结构细节。
 
 Figure 1 直观展示了这一现象：对竹子样本，下采样训练的模型（上行）能恢复部分纹理，但在纸板样本上同样策略的输出则模糊不清；而使用真实低分辨率数据训练的模型（下行）在两类样本上均无法有效恢复细节。这揭示了一个深层困境：**当前SR方法在真实低分辨率数据上似乎只能学习预测平滑平均值，能否通过架构设计恢复缺失的高频细节仍是一个悬而未决的问题**。
-
-![[assets/figures/papers/paper_list_l810_https_openaccess_thecvf_com_content_CVPR2026_html_Hoeg_VoDaSuRe_A_Large/figures/001_Figure_1.jpg]]
-*Figure 1: Example from VoDaSuRe: (a) volume of bamboo showing the cropped area in red, (b) high resolution crop, (c) 4× downsampled, (d) scan at 4 lower resolution, (e) SR of bamboo, (f) SR of cardboard. The top row in (e) and (f) is trained on downsampled HR-LR pairs, the bottom row is trained on actual LR data*
 
 ### 主要定量结果：VoDaSuRe揭示的性能落差
 
@@ -231,9 +216,6 @@ Table 3 的跨域实验是理解领域偏移因果机制的关键证据。实验
 以RRDBNet3D在2×放大为例：域内下采样PSNR为25.50 dB，域内真实扫描为18.25 dB；当使用下采样训练、真实扫描测试时，PSNR骤降至16.38 dB——**比域内真实扫描训练还低约2 dB**。这证实了下采样训练的模型不仅无法泛化，甚至不如直接在真实数据上从头训练的模型。反向跨域（真实扫描训练→下采样测试）同样表现不佳，说明两种退化类型之间存在本质差异，无法通过简单的域适应弥合。
 
 Figure 6 从视觉层面印证了这一结论：下采样训练+真实测试的预测（最右列）呈现出过度平滑和结构丢失，而真实数据训练+真实测试的预测（第三列）虽能保留更多结构，但仍远逊于HR真值。
-
-![[assets/figures/papers/paper_list_l810_https_openaccess_thecvf_com_content_CVPR2026_html_Hoeg_VoDaSuRe_A_Large/figures/009_Figure_6.jpg]]
-*Figure 6: SR prediction obtained using different combinations of training/test data. From left to right: HR data, training/testing on downsampled data, training/testing on registered data, training on downsampled and testing using registered data. Predictions are obtained using RRDBNet3D at scale 4*
 
 ### 消融实验：解耦领域偏移的影响因素
 
@@ -269,12 +251,8 @@ Figure 7 的四组消融实验系统性地排除了若干可能的混淆因素�
 
 VoDaSuRe的实验结果传递了一个清晰的信号：**体积超分辨率社区长期依赖的下采样评估协议严重高估了模型的真实能力**。在真实部署场景中，模型面对的是包含对比度变化、噪声和采集伪影的低分辨率扫描，而非理想化的双三次/双线性下采样图像。未来的研究需要直面这一领域偏移，探索能够同时处理合成退化和真实采集退化的鲁棒架构，或设计更真实的下采样模拟策略以桥接训练与测试分布。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l810_https_openaccess_thecvf_com_content_CVPR2026_html_Hoeg_VoDaSuRe_A_Large/figures/005_Figure_4.jpg]]
 *Figure 4: Visual comparison of SR predictions on CTSpine1K, LIDC-IDRI and VoDaSuRe at scale 4×. From top to bottom: CTSpine1K, LIDC-IDRI, VoDaSuRe (downsampled), and VoDaSuRe (registered) – two examples. The LR inputs and corresponding HR ground truth images are shown on the left, separated by the red line*
-
-
 
 ## 定位与知识库关联
 
@@ -334,8 +312,6 @@ VoDaSuRe 的发现引发了一系列深层次问题：
 4. **评估指标的局限性**：PSNR/SSIM 等传统指标在真实退化场景下是否仍能准确反映感知质量？VoDaSuRe 中引入的 Total Variation（TV）作为补充指标（Figure 5），提示需要更全面的评估体系。
 
 5. **数据规模的扩展路径**：如何以可控成本扩展真实配对数据的规模？是否可以通过物理模拟（如蒙特卡洛 CT 仿真）生成更接近真实退化的合成数据，作为数据增强的补充手段？
-
-
 
 ## 原文 PDF
 

@@ -52,8 +52,6 @@ claims:
 
 在LIBERO基准上，QuantVLA以W4A8精度在OpenPI π0.5上达到97.6%的平均任务成功率，**超越全精度基线的97.1%**，同时将量化模块的内存占用从4.27 GB降至1.28 GB（约70%相对节省）；在GR00T N1.5上同样以88.0%的成功率超越全精度的86.5%。即使在极端的W4A4精度下，π0.5仍保持95.3%的成功率，展现出对极低位宽的鲁棒性。与现有量化基线相比，QuantVLA在W4A8下较DuQuant提升21.3个百分点，较SmoothQuant在Pick-and-Can任务上多完成11次成功抓取，验证了尺度校准机制在VLA场景下的决定性作用。
 
-
-
 ### 视觉-语言-动作模型的部署瓶颈
 
 视觉-语言-动作模型（VLA）将大规模语言模型与扩散策略头结合，在机器人操控任务中展现出强大的泛化能力。然而，其部署面临严峻的计算与内存挑战：语言骨干网络（LLM）参数量庞大，而基于扩散变换器（DiT）的动作头在推理时需执行多步去噪，两者叠加导致显存占用和推理延迟成为实际部署的瓶颈。
@@ -79,8 +77,6 @@ claims:
 3. **输出头平衡（OHB）**：为每层学习一个标量 $\beta$，通过匹配注意力输出RMS恢复残差流能量，同样折叠入反量化尺度。
 
 该方法保持原始模型架构和算子调度不变，仅需少量未标注校准数据即可完成标定，为VLA模型在资源受限边缘设备上的高效部署提供了可行路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -111,8 +107,6 @@ VLA 模型由语言骨干（LLM）与基于扩散变换器（DiT）的动作头�
 ### 方法定位：免训练的尺度感知 PTQ
 
 与现有 VLA 效率方案相比，QuantVLA 的独特之处在于：它既不修改模型架构（区别于 TinyVLA 的紧凑设计），也不引入动态路由或缓存机制（区别于 MoLe-VLA、VLA-Cache），而是**直接在数值精度层面操作，以无训练的后训练量化方式同时压缩语言与动作模块**。相较于通用 PTQ 基线 **DuQuant**（Lin et al., NeurIPS 2024）和 **SmoothQuant**（Xiao et al., ICML 2023），QuantVLA 的关键增量在于对 DiT 注意力机制的因果诊断与针对性尺度恢复，使得 VLA 模型首次在 W4A8 精度下超越全精度基线，并在 W4A4 极端位宽下仍保持可用性能（π0.5 平均成功率 95.3%，Table 3）。
-
-
 
 QuantVLA 是一个无需训练的后训练量化框架，面向基于 DiT 动作头的 VLA 模型，保持原始架构与算子调度不变。其整体 pipeline 由三个协同组件构成：**选择性量化布局**、**注意力温度匹配** 和 **输出头平衡**，如 Figure 2 所示。
 
@@ -148,8 +142,6 @@ Figure 3 的可视化验证了这两个机制的效果：ATM 显著缩小了量�
 
 ![[assets/figures/papers/paper_list_l2242_https_arxiv_org_abs_2602_20309/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of representative VLA efficiency frameworks. (1) TinyVLA focuses on compact multimodal transformers and lightweight diffusion-policy heads for architectural efficiency; (2) EfficientVLA accelerates inference by pruning redundant language layers and reusing intermediate representations; (3) VLA-Cache improves throughput through key–value reuse and static caching of vision tokens; (4) MoLe-VLA adopts mixture-of-layers routing to dynamically skip computation in the language module; and (5) QuantVLA introduces a training-free PTQ framework that low-bit quantizes both language and action modules without altering the model architecture*
-
-
 
 ### 3.1 VLA模型架构与量化瓶颈
 
@@ -223,8 +215,6 @@ $$\beta_{\mathrm{raw}}(l) = \frac{\mathrm{RMS}(Z_{T,l})}{\mathrm{RMS}(Z_{Q,l}) +
 
 ATM的 $\alpha$ 和OHB的 $\beta$ 均通过少量未标注标定数据估计，裁剪至 $\pm 0.4$ 的安全范围，并使用 $\varepsilon = 0.03$ 的中性带避免过度校正。所有标量在标定后折叠入反量化尺度，推理时无额外计算或内存开销。
 
-
-
 ## 实验与关键发现
 
 ### 实验设置
@@ -241,9 +231,6 @@ QuantVLA 在两个代表性 VLA 模型上进行评估：**OpenPI π0.5**（基�
 *Table 6: Quantization results on Pick-and-Can*
 
 内存节省方面，QuantVLA 将 π0.5 的 LLM+DiT 模块内存从 4.27 GB 降至 **1.28 GB**，将 GR00T N1.5 从 2.02 GB 降至 **0.91 GB**，相对节省约 **70%**（**Figure 4**）。这一节省得益于选择性量化布局：LLM 全部线性层和 DiT MLP 层被整型化，而视觉编码器保持冻结不量化。
-
-![[assets/figures/papers/paper_list_l2242_https_arxiv_org_abs_2602_20309/figures/007_Figure_4.jpg]]
-*Figure 4: Memory saving of QuantVLA over the baseline on OpenPI π0.5 and GR00T N1.5*
 
 ### 选择性量化布局消融
 
@@ -280,26 +267,8 @@ QuantVLA 在两个代表性 VLA 模型上进行评估：**OpenPI π0.5**（基�
 3. **标定数据敏感性**：量化标定依赖少量无标注数据，若标定数据分布与实际部署环境差异较大，校准效果可能下降。当前论文未提供跨场景泛化的标定鲁棒性实验。
 4. **无训练恢复路径**：方法未涉及训练感知量化，无法通过微调进一步恢复极低位宽下的性能损失。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2242_https_arxiv_org_abs_2602_20309/figures/006_Table_2.jpg]]
-*Table 2: Results on LIBERO for different QuantVLA variants on OpenPI π0.5 and GR00T N1.5. The table reports success rates (%) across four LIBERO tasks, memory (GB), and the relative memory savings versus each model’s baseline*
-
-![[assets/figures/papers/paper_list_l2242_https_arxiv_org_abs_2602_20309/figures/008_Table_3.jpg]]
-*Table 3: LIBERO results on OpenPI π0.5 comparing FP16, W4A8, and W4A4 precision*
-
-![[assets/figures/papers/paper_list_l2242_https_arxiv_org_abs_2602_20309/figures/009_Table_4.jpg]]
-*Table 4: LIBERO results under different denoising steps on GR00T N1.5*
-
-![[assets/figures/papers/paper_list_l2242_https_arxiv_org_abs_2602_20309/figures/011_Table_7.jpg]]
-*Table 7: Quantization results on LIBERO-Spatial for OpenVLA*
-
 ![[assets/figures/papers/paper_list_l2242_https_arxiv_org_abs_2602_20309/figures/012_Table_5.jpg]]
 *Table 5: Additional quantization comparison on the LIBERO benchmark for OpenPI π0.5*
-
-![[assets/figures/papers/paper_list_l2242_https_arxiv_org_abs_2602_20309/figures/002_Table.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -351,8 +320,6 @@ QuantVLA的当前设计存在明确的适用边界：
 4. **实时部署验证**：量化后模型在实际机器人部署中的实时性和控制精度能否进一步验证？当前评估主要基于离线基准测试，在线操控场景中的延迟、抖动和安全性尚未充分评估。
 
 5. **与系统优化的协同**：QuantVLA的量化压缩与VLA-Cache、MoLe-VLA等系统级优化是否可叠加？若能，组合后的内存和延迟收益边界在哪里？
-
-
 
 ## 原文 PDF
 

@@ -152,8 +152,6 @@ SALAD 的交叉注意力机制自然地产生了文本词与运动关节/时间�
 - **VAE 解码**：去噪后的潜变量经 VAE 解码器重建为运动特征序列，再转换为关节旋转或位置表示。
 - **输出**：与输入文本语义对齐的 3D 人体运动序列。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l20_SALAD_Skeleton_aware_Latent_Diffusion_for_Text_driven_Motion_Generation/figures/001_Figure_1.jpg]]
 *Figure 1: Architecture of the skeleto-temporal VAE network. The encoder maps motion features into a skeleto-temporal latent space, and the decoder restores the skeleto-temporal latent variables into motion features*
 
@@ -310,21 +308,11 @@ SALAD 在所有维度上均显著优于基线方法，整体质量评分 4.596�
 ![[assets/figures/papers/paper_list_l20_SALAD_Skeleton_aware_Latent_Diffusion_for_Text_driven_Motion_Generation/figures/008_Table_2.jpg]]
 *Table 2: Quantitative results on the quality and accuracy of reconstructed motion features of VAE models from different methods, along with the number of trainable parameters, measured on the test set of HumanML3D. Table 3. Ablation studies on the VAE and denoiser*
 
-![[assets/figures/papers/paper_list_l20_SALAD_Skeleton_aware_Latent_Diffusion_for_Text_driven_Motion_Generation/figures/011_Table_4.jpg]]
-*Table 4: User study results. The red color indicates the best result. grained control in both generation and editing*
-
 ![[assets/figures/papers/paper_list_l20_SALAD_Skeleton_aware_Latent_Diffusion_for_Text_driven_Motion_Generation/figures/017_Table_3.jpg]]
 *Table 3: Ablation results showing the effect of FiLM layers on the test sets of HumanML3D (top) and KIT-ML (bottom)*
 
 ![[assets/figures/papers/paper_list_l20_SALAD_Skeleton_aware_Latent_Diffusion_for_Text_driven_Motion_Generation/figures/018_Table_4.jpg]]
 *Table 4: Ablation results showing the effect of FiLM layers on the test sets of HumanML3D (top) and KIT-ML (bottom)*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l20_SALAD_Skeleton_aware_Latent_Diffusion_for_Text_driven_Motion_Generation/figures/007_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l20_SALAD_Skeleton_aware_Latent_Diffusion_for_Text_driven_Motion_Generation/figures/016_Table_2.jpg]]
-*Table 2: Quantitative results on different diffusion parametrizations*
 
 ## 定位与知识库关联
 

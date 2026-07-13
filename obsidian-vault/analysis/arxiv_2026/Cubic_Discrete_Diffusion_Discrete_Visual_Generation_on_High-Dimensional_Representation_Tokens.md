@@ -65,8 +65,6 @@ claims:
 
 CubiD 的生成质量受限于冻结编码器的重建能力（当前 PSNR 约 18 dB），与连续扩散方法仍存在差距；此外，高质量生成通常需要数百到上千步迭代，推理效率有待提升。
 
-
-
 ### 离散视觉生成的核心瓶颈
 
 离散生成模型因其与统一多模态架构（如多模态大语言模型）的自然兼容性而受到广泛关注。然而，现有方法在生成质量与计算可行性之间存在根本性矛盾，其根源在于**令牌维度**的选择：
@@ -90,8 +88,6 @@ Figure 1 清晰地对比了现有范式与本文方法的差异：
 本文的核心洞察在于：**将高维离散表示视为一个 $h \times w \times d$ 的三维张量，而非“空间位置上的 $d$ 维向量集合”**。通过在这个三维张量的任意子集（任意位置的任意维度）上进行独立的逐元素掩码，模型能够从部分观测中同时学习空间轴和维度轴上的依赖关系。这一设计将复杂依赖建模与计算可行性解耦——生成步数 $T$ 固定且远小于 $h \times w \times d$，无需序列化所有维度。
 
 基于此洞察，本文提出 **Cubic Discrete Diffusion (CubiD)**，一种面向高维离散令牌的掩码扩散方法，旨在填补离散生成在高维表示空间中的方法空白。
-
-
 
 ## 核心方法与创新机理
 
@@ -141,8 +137,6 @@ CubiD 属于**掩码离散扩散**（masked discrete diffusion）家族，与 Ma
 
 CubiD 是首个直接在高维（768d）原生表示令牌上进行离散生成的方法，而所有其他方法均使用压缩或低维令牌（通常 ≤32d）。这一差异使得直接数值对比需谨慎，但 CubiD 在 ImageNet 256×256 上达到的 gFID 1.88（CubiD-XXL）以及从 9 亿到 37 亿参数的持续性能提升，表明该范式具有良好的扩展性。
 
-
-
 CubiD 的整体 pipeline 围绕一个核心思想展开：将高维连续表示令牌转化为三维离散张量，并在该张量上执行细粒度的逐元素掩码建模，从而在固定步数内完成高质量生成。整个框架由四个关键模块串联构成，形成“编码→离散化→掩码建模→解码”的端到端流程。
 
 ### 从连续特征到离散令牌
@@ -186,15 +180,8 @@ $$\mathcal{L} = -\mathbb{E}_{\mathbf{q},\mathbf{M}}\left[\sum_{i\in\mathbf{M}} \
 
 这一 pipeline 的核心瓶颈在于**掩码粒度**的选择：消融实验表明，逐元素掩码（gFID 5.33）大幅优于按维度掩码（gFID 120.03）和按空间位置掩码（gFID 22.22，Table 4b），验证了细粒度掩码对高维令牌生成的必要性。同时，模型展现出良好的规模扩展性——从 CubiD‑L（946M 参数，gFID 5.25）到 CubiD‑XL（1.4B，4.91）再到 CubiD‑XXL（3.7B，4.68），性能持续提升（Table 4e）。
 
-### 补充图表
-
 ![[assets/figures/papers/arxiv_2603_19232_cubid/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of discrete visual generation approaches. (a) Low-dimensional token generation: Both methods operate at the spatial level—autoregressive requires*
-
-![[assets/figures/papers/arxiv_2603_19232_cubid/figures/003_Figure_3.jpg]]
-*Figure 3: Overview of Cubic Discrete Diffusion. (a) High-dimensional Token Discretization. Given an input image, a frozen representation encoder extracts continuous tokens, which are then discretized through dimension-wise quantization into h × w × d discrete tokens. (b) Training via Dimension-wise Mask Modeling. During training, we randomly mask tokens across both spatial and dimensional axes of the tensor (white: masked tokens, pink: visible ground truth tokens, other colors: predicted tokens). The transformer learns to predict these masked tokens from the unmasked context, capturing the complex dependencies across both spatial and dimensional axes*
-
-
 
 ### 3.1 维度级量化（Dimension-wise Quantization）
 
@@ -245,12 +232,8 @@ CubiD 的生成模型由以下模块组成：
 
 4. **冻结解码器**：生成的离散令牌通过预训练的 RAE 解码器（来自文献 ）重建为图像。解码器采用噪声增强训练以提高对生成误差的鲁棒性，但其重建质量（PSNR ~18 dB）构成当前生成质量的上限。
 
-### 补充图表
-
 ![[assets/figures/papers/arxiv_2603_19232_cubid/figures/012_Figure_5.jpg]]
 *Figure 5: Qualitative comparison of different masking strategies. Top row: Per-dim masking completely fails, producing severe texture-like artifacts. Middle row: Per-spatial masking generates images with significant local inconsistencies and blurry details. Bottom row: Our per-element masking produces clear, coherent images with fine details. The dramatic quality difference validates that high-dimensional tokens require fine-grained masking across both spatial and dimensional axes*
-
-
 
 ## 实验与关键发现
 
@@ -330,25 +313,6 @@ $$\mathcal{L} = -\mathbb{E}_{\mathbf{q},\mathbf{M}}\left[\sum_{i\in\mathbf{M}} \
 ![[assets/figures/papers/arxiv_2603_19232_cubid/figures/011_Table_3.jpg]]
 *Table 3: Understanding performance on LLaVA benchmarks with different quantization methods. Evaluation using SigLIP2 features. VQ: vector quantization, DQ: dimension-wise quantization. DQ maintains continuous-level performance while VQ shows significant degradation*
 
-![[assets/figures/papers/arxiv_2603_19232_cubid/figures/013_Table_5.jpg]]
-*Table 5: Discrete generation methods on ImageNet [8] 256×256. Latent Dim denotes the original dimensionality of the latent space (features before vector quantization for low-dimensional methods, before and after dimension-wise quantization for CubiD). Results with superscript ”re” denote rejection sampling. CubiD is the first and only discrete method to directly generate with native high-dimensional representation tokens (768d), while all other methods use compressed or low-dimensional tokens (mostly below 32)*
-
-### 补充图表
-
-![[assets/figures/papers/arxiv_2603_19232_cubid/figures/007_Table.jpg]]
-*Table: (b) Masking granularity. Perdim: mask all spatial positions per dimension. Per-spatial: mask all dimensions per position. Perelement: mask independently across all axes*
-
-![[assets/figures/papers/arxiv_2603_19232_cubid/figures/008_Table_2.jpg]]
-*Table 2: Effect of quantization levels on reconstruction quality. Both encoders achieve continuous-level performance with appropriate quantization levels (L=8 for DINOv2, L=16 for SigLIP2)*
-
-![[assets/figures/papers/arxiv_2603_19232_cubid/figures/014_Table_6.jpg]]
-*Table 6: CubiD on low-dimensional tokens on ImageNet 512×512. Results using DC-AE-f32c32 tokenizer producing 32- dimensional tokens*
-
-![[assets/figures/papers/arxiv_2603_19232_cubid/figures/015_Table_7.jpg]]
-*Table 7: CubiD with compressed representation tokens on ImageNet 256×256. Features compressed from 768d to 32d*
-
-
-
 ## 定位与知识库关联
 
 ### 离散生成范式的演进与CubiD的定位
@@ -400,8 +364,6 @@ CubiD 的方法设计决定了其适用场景和边界条件：
 4. **表示编码器的选择**：Table 4f 显示 DINOv2 和 SigLIP2 在生成质量上存在差异，但未深入分析不同表示编码器对生成特性的影响。未来可探索更适合生成任务的表示学习方法，或将表示学习与生成训练进行弱耦合联合优化。
 
 5. **掩码策略的理论分析**：当前掩码比例分布（截断高斯分布）的选择基于经验消融（Table 4a），缺乏理论层面的分析。理解掩码比例与学习难度、生成质量之间的理论关系，可能指导更优的掩码调度策略设计。
-
-
 
 ## 原文 PDF
 

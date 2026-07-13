@@ -74,8 +74,6 @@ CLaD 是一种两阶段的**潜在空间规划框架**：
 
 CLaD 在短视距泛化任务（如 LIBERO-Spatial、Object、Goal）上表现落后于大规模 VLA 模型，且训练依赖动作标注，尚未在大规模异质数据上验证动态预训练的摊销能力。此外，所有实验均在仿真环境中进行，真实机器人部署有待探索。
 
-
-
 ### 具身规划中的远见困境
 
 在长视距机器人操作任务中，智能体必须在连续动作空间中进行序贯决策，而每一步决策都依赖于对未来的准确预期。现有规划方法大致分为两类，但各自存在根本性局限：
@@ -108,8 +106,6 @@ CLaD 在短视距泛化任务（如 LIBERO-Spatial、Object、Goal）上表现�
 CLaD 的核心直觉是：**一致性约束应从静态状态对齐转向动态转移一致性**。与其让模型学习“当前看到什么”，不如让它学习“在动作执行后，本体感觉和语义状态将如何联合变化”。这种转移层面的对齐天然地捕捉了跨模态的因果结构：本体感觉转移（运动学变化）作为查询，去解读语义转移（场景变化），从而提取任务相关的跨模态动态。
 
 在此基础上，CLaD 通过自监督目标预测“有基础的潜在远见”——既包含对未来潜在状态的预测，又通过辅助重构损失将这些预测锚定到可观测的物理量上。这种设计避免了显式语义生成的计算开销，同时为下游扩散策略提供了富含跨模态上下文的条件信号，使动作生成既具有远见性，又扎根于物理现实。
-
-
 
 ## 核心方法与创新机理
 
@@ -145,8 +141,6 @@ CLaD 不直接将远见嵌入传入策略，而是通过 **FiLM 调制**（Equat
 ### 创新总结
 
 CLaD 的方法论贡献可概括为：**通过建模本体感觉和语义状态在动作下的联合演化，以非对称交叉注意力提取跨模态动态，并利用 EMA 目标编码器和辅助重构损失预测“有基础的潜在远见”，避免显式语义生成的计算开销，同时为扩散策略提供富含任务上下文的条件信号。** 该设计以 0.66B 参数在 LIBERO-LONG 上达到 94.7% 成功率，与 7B 的 OpenVLA（93.8%）和 3.3B 的 π0.5（93.2%）竞争，同时推理速度达 25 Hz、显存仅 4 GB（Table 2），在参数效率与计算效率上均展现出显著优势。
-
-
 
 CLaD 采用**两阶段解耦架构**，将跨模态动态学习与动作生成分离，从而在不生成显式语义中间产物（如子目标图像或文本）的前提下获得有基础的潜在远见。
 
@@ -193,12 +187,8 @@ CLaD 采用**两阶段解耦架构**，将跨模态动态学习与动作生成�
 
 **关键设计决策**：两阶段分离使得动态学习可以专注于跨模态转移一致性，而策略学习可以专注于将预测远见转化为精确动作，避免了端到端联合训练中表示解耦的风险。消融实验证实，移除辅助重构损失 $L_{\mathrm{recon}}$ 会导致成功率从 94.7% 降至 86.1%（-8.6%），验证了 grounding 机制对稳定潜在空间的必要性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2452_https_arxiv_org_abs_2603_29409/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of CLaD. (a) Conventional approaches either generate semantic artifacts (e.g., subgoal images or texts), or plan in unimodal latent spaces that lack cross-modal understanding. (b) CLaD learns cross-modal latent dynamics to predict grounded latent foresights, which condition a diffusion policy for action generation. CLaD achieves 94.7% with only 0.66B parameters, competitive with OpenVLA (7B) and π0.5 (3.3B)*
-
-
 
 CLaD 是一个两阶段框架：Stage 1 学习跨模态潜在动态并预测“有基础的潜在远见”（grounded latent foresight），Stage 2 以当前观察和预测远见为条件，通过扩散策略生成动作序列。以下按管道模块拆解其关键设计与公式。
 
@@ -270,12 +260,8 @@ $$ \mathcal{L}_{\mathrm{policy}} = \mathbb{E}_{\mathbf{a}_0, k, \epsilon} \left[
 
 其中 $\mathbf{a}_0$ 为真实动作序列，$k$ 为扩散时间步，$\epsilon$ 为高斯噪声。动作预测范围 $\tau=6$，推理时从噪声出发经 $T$ 步去噪生成动作序列。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2452_https_arxiv_org_abs_2603_29409/figures/002_Figure_2.jpg]]
 *Figure 2: Detailed architecture of CLaD’s two-stage framework. Stage 1 (Left) - Semantic state*
-
-
 
 ## 实验与关键发现
 
@@ -299,9 +285,6 @@ CLaD 在 LIBERO-LONG 的 10 个长视距任务上取得 **94.7%** 的平均成�
 - **仅本体感觉远见（CLaDp）**：成功率骤降至 50.4%，表明单纯运动学预测无法支撑长视距规划；
 - **仅语义远见（CLaDs）**：成功率 91.5%，说明语义上下文对规划不可或缺；
 - **完整跨模态远见（CLaD）**：94.7%，证明本体感觉与语义的联合演化建模带来显著增益。
-
-![[assets/figures/papers/paper_list_l2452_https_arxiv_org_abs_2603_29409/figures/004_Figure_3.jpg]]
-*Figure 3: Modality contribution analysis on LIBERO-LONG tasks. We compare diffusion policy without foresight conditioning (Policy only), conditioning on proprioceptive foresight only (CLaDp), semantic foresight only (CLaDs), and full cross-modal foresight (CLaD). Results demonstrate that cross-modal foresight provides substantial gains over single-modality predictions, though semantic foresight alone achieves reasonable performance. Notably, proprioceptive foresight alone severely degrades performance, suggesting that kinematic predictions require semantic context for effective planning*
 
 这一结果表明，运动学预测必须依赖语义上下文——本体感觉转移通过非对称交叉注意力查询语义转移，提取任务相关的跨模态动态，而非简单的模态拼接。
 
@@ -329,27 +312,8 @@ Table 6 展示了 CLaD 在所有 LIBERO 套件上的 50 次 rollout 平均成功
 
 在需要精细操作和感知模糊的任务上，CLaD 表现相对薄弱。例如 Task 9（put both pots on stove）成功率仅约 81%，反映出对视觉歧义的敏感性——当场景中物体相似或遮挡严重时，语义编码器可能产生模糊表示，导致跨模态动态预测偏差。此外，所有实验均在 LIBERO 仿真环境中进行，未在真实机器人上验证，sim-to-real 转移能力尚不明确。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2452_https_arxiv_org_abs_2603_29409/figures/006_Table_3.jpg]]
-*Table 3: Performance and efficiency of latent planning methods on LIBERO-LONG. Although CLaD requires more parameters than LBP (0.19B) and UVA (0.5B), it yields higher average success rate, respectively, suggesting a competitive trade-off between model capacity and task performance within the latent planning paradigm*
-
 ![[assets/figures/papers/paper_list_l2452_https_arxiv_org_abs_2603_29409/figures/007_Table_4.jpg]]
 *Table 4: Ablation of the auxiliary reconstruction loss*
-
-![[assets/figures/papers/paper_list_l2452_https_arxiv_org_abs_2603_29409/figures/008_Figure_4.jpg]]
-*Figure 4: UMAP of latent embedding*
-
-![[assets/figures/papers/paper_list_l2452_https_arxiv_org_abs_2603_29409/figures/009_Table_5.jpg]]
-*Table 5: Ablation of cross-attention configurations. Using proprioceptive transitions as queries over semantic transitions (94.7%) outperforms both the reverse configuration (93.8%) and symmetric self-attention (86.7%), confirming that directing kinematic context to attend over semantic transitions is a beneficial inductive bias for extracting cross-modal dynamics*
-
-![[assets/figures/papers/paper_list_l2452_https_arxiv_org_abs_2603_29409/figures/010_Figure_5.jpg]]
-*Figure 5: Pixel attribution for predicted latent foresight via Integrated Gradients. Heatmaps show pixel-level contributions toward the alignment between predicted foresight zˆt+τ and target embedding. Brighter regions indicate higher attribution scores. While not yielding precise object boundaries, attributions consistently highlight task-relevant objects, suggesting that the model leverages semantic features for future state prediction*
-
-![[assets/figures/papers/paper_list_l2452_https_arxiv_org_abs_2603_29409/figures/012_Table_7.jpg]]
-*Table 7: Ablation with action-free training variants*
-
-
 
 ## 定位与知识库关联
 
@@ -401,8 +365,6 @@ CLaD 的性能优势来自三个相互耦合的设计选择，消融实验给出
 4. **评估一致性**：Table 1 与正文关于 Task 9 性能的矛盾需澄清——是不同检查点、不同评估协议还是笔误？这影响对 CLaD 在精细操作任务上表现的准确判断。
 
 5. **语言增强**：能否结合外部记忆或更大规模语言模型来增强任务理解和重规划能力，同时保持 CLaD 的参数效率优势？
-
-
 
 ## 原文 PDF
 

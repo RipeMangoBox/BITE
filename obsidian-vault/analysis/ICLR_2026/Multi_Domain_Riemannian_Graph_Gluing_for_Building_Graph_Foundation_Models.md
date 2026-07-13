@@ -53,8 +53,6 @@ claims:
 
 **方法定位**：GRAPHGLUE 属于多域图预训练方法，区别于 PRODIGY、GCOPE 等基于离散结构的基线，它首次将黎曼几何的胶合理论引入图基础模型构建，为知识跨域集成提供了连续几何框架和可量化的迁移性度量。
 
-
-
 ### 图基础模型的核心瓶颈
 
 图结构数据广泛存在于社交网络、分子化学、知识图谱等不同领域，但各域图在拓扑模式、特征空间和语义标签上存在显著差异。构建能够跨域泛化的图基础模型面临一个根本性瓶颈：**缺乏对知识跨域集成和迁移的一致理论框架**。现有方法通常将不同域的图视为独立样本，通过离散结构（如图码本、图元、计算树）进行拼接或对齐，但无法在连续几何空间中统一刻画域间知识的传递路径与迁移代价，导致预训练与领域适应之间的迁移性评估缺乏可量化的理论支撑。
@@ -78,8 +76,6 @@ claims:
 ### 本文的定位与贡献
 
 基于上述动机，本文提出 **GRAPHGLUE** 框架，其核心是建立**神经流形胶合理论**，将任意图数据集统一到一个光滑的黎曼流形上。与传统方法相比，GRAPHGLUE 从几何层面重新定义了多域图预训练的三大关键环节：局部几何学习（自适应正交帧与稀疏扰动）、流形胶合与光滑化（边度规翻译、完整性损失、曲率损失）、以及领域适应（黎曼混合专家与提示微调）。这一框架不仅为图基础模型的构建提供了理论保证，还通过几何传递度量首次实现了迁移难度的直接量化，为后续的几何缩放律分析和预训练策略优化奠定了基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -112,8 +108,6 @@ GRAPHGLUE的理论贡献体现在两个核心定理上：**度量兼容性定理
 ### 局限与开放问题
 
 当前方法假设图中存在足够三角形以保证完整性损失有效，对于稀疏图或缺失三角形的图，近似胶合可能不稳定。几何缩放律的数学形式尚未推导，几何传递度量的泛化性有待在完全未见域上验证。这些开放问题指向未来方向：将GTM扩展为通用图复杂度指标，以及探索不依赖三角完整性的松弛胶合方法。
-
-
 
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_G3uNHQpP7J/figures/002_Figure_2.jpg]]
 *Figure 2: An Illustration of GRAPHGLUE Framework*
@@ -148,8 +142,6 @@ GRAPHGLUE 的核心 pipeline 将多域图预训练与领域适应统一为一个
 ### 框架示意图
 
 Figure 2 展示了 GRAPHGLUE 的整体架构：从左至右依次为局部几何学习、EMA 原型更新、流形胶合与光滑化（预训练阶段），以及下游的提示适应与黎曼 MoE（适应阶段）。不同域的图数据以颜色区分，在胶合过程中逐步融合为统一光滑流形。
-
-
 
 GRAPHGLUE 的核心由两个理论模块支撑：**局部几何学习**与**神经流形胶合**。前者为图中每个节点赋予一个局部黎曼度量，后者通过边和三角形将这些局部片断胶合成一个全局光滑流形。
 
@@ -191,8 +183,6 @@ $$r(z^{(i)}, z^{(j)}) := \frac{\det G_i}{\det G_j} \approx 1 - \frac{1}{3} \math
 $$\mathcal{L}_{\mathrm{Curv}}(\mathcal{G}) = \frac{1}{|A|} \sum_{A_{ijk}} |\log(r_{ij}) - \log(r_{jk})|^2 \tag{7}$$
 
 该损失强制相邻边上对数行列式变化一致，等价于约束 Ricci 曲率在流形上连续变化，从而得到光滑的全局黎曼流形。
-
-
 
 ## 实验与关键发现
 
@@ -248,33 +238,11 @@ Table 22的消融实验揭示了各几何约束的因果贡献：
 | Table 22 | 曲率损失和完整性损失均为关键组件，去除后性能大幅下降 |
 | Table 13 | EMA原型、原型对比损失、黎曼MoE三者协同贡献最优性能 |
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_G3uNHQpP7J/figures/015_Table_9.jpg]]
 *Table 9: Hyper-parameters for 1-shot and 5-shot cross-domain transfer on Reddit. Table 11: Hyper-parameters for 1-shot and 5-shot cross-domain transfer on PROTEINS*
 
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_G3uNHQpP7J/figures/016_Table_10.jpg]]
-*Table 10: Hyper-parameters for 1-shot and 5-shot cross-domain transfer on FB15k 237. Table 12: Hyper-parameters for 1-shot and 5-shot cross-domain transfer on HIV*
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_G3uNHQpP7J/figures/020_Table.jpg]]
-*Table: (a) on k (M = 32). (b) Analysis on M (k = 15)*
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_G3uNHQpP7J/figures/008_Table_2.jpg]]
-*Table 2: Notation and Description*
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_G3uNHQpP7J/figures/009_Table_3.jpg]]
-*Table 3: Computational and memory complexity of each module in GraphGlue*
-
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_G3uNHQpP7J/figures/010_Table_4.jpg]]
 *Table 4: Comparison of computational complexity across graph few-shot learning methods*
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_G3uNHQpP7J/figures/011_Table_5.jpg]]
-*Table 5: Memory Cost. Lower values indicate better efficiency*
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_G3uNHQpP7J/figures/012_Table_6.jpg]]
-*Table 6: Statistics of 12 datasets used in our experiment*
-
-
 
 ## 定位与知识库关联
 
@@ -314,8 +282,6 @@ GRAPHGLUE 的理论框架和实验验证界定了其适用边界：
 3. **松弛胶合方法**：在不满足三角完整性条件时，是否存在更有效的松弛胶合方法？例如，对于二部图或长程依赖图，能否通过路径完整性或谱方法近似胶合一致性？
 4. **几何缩放律的理论推导**：实验已观察到几何缩放律（Figure 5），即预训练域数量增加带来性能的稳定提升。其数学形式是否可推导，从而无需大量实验即可预测性能增长？这直接关系到图基础模型的规模化策略设计。
 5. **负迁移的几何解释**：实验显示 GCOPE 在加入某些域后出现负迁移（Figure 4），而 GRAPHGLUE 避免了这一问题。这是否可以从曲率分歧或完整性分歧的角度给出几何解释，从而建立负迁移的预警机制？
-
-
 
 ## 原文 PDF
 

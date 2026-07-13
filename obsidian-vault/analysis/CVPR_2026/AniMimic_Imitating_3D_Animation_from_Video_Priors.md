@@ -53,8 +53,6 @@ claims:
 
 **主要结果**：在20个多样化3D网格构成的自定义基准上，AniMimic在LPIPS指标上达到0.0849，优于所有对比方法。用户偏好研究中，91%/91%/71%的参与者在运动合理性、视觉质量和整体感受上分别偏好AniMimic而非SC4D/DreamMesh4D/Puppeteer。消融实验证实，深度、掩码和点跟踪损失的联合优化是运动忠实度的关键保障，而物理精炼阶段显著提升了网格平滑度和时序一致性。
 
-
-
 ### 2D视频先验与3D动画之间的鸿沟
 
 计算机图形学中的动画制作长期依赖专业美术人员手动构建骨骼层次、绘制蒙皮权重、逐帧调整关节参数，这一流程耗时巨大且高度依赖经验。近年来，视频扩散模型（video diffusion models）在生成时序连贯的运动序列方面取得了显著进展，其内部隐式编码了丰富的2D运动先验。然而，这些先验本质上缺乏显式的3D结构理解——模型无法直接输出关节旋转、蒙皮变形或物理约束，导致生成的动态内容难以移植到标准动画管线中。
@@ -76,8 +74,6 @@ claims:
 AniMimic的核心动机是**打通生成式2D先验与物理真实3D动画之间的鸿沟**。其关键洞察在于：视频扩散模型蕴含的2D运动先验足够丰富，若能通过可微渲染和可微物理仿真将这些先验“提升”为3D骨架动画，就可以在不重建完整几何的情况下生成可编辑、物理一致且与参考视频高度对齐的动态序列。
 
 具体而言，AniMimic致力于解决一个此前未被充分探索的问题：给定一个静态3D网格和一段参考运动视频，如何自动生成一个骨架驱动的、物理真实的动画序列，使其既忠实于视频中的运动模式，又兼容标准图形管线？这一问题的解决将大幅降低动画制作的门槛，使非专业人员也能从视频素材中快速提取可复用的3D运动资产。
-
-
 
 ## 核心方法与创新机理
 
@@ -117,8 +113,6 @@ $$\frac{d^2\pmb{x}}{dt^2} = \pmb{M}^{-1}\pmb{f}(\pmb{x})$$
 
 AniMimic 的深层创新在于识别并打通了一条关键因果链路：**视频扩散模型蕴含丰富的2D运动先验，但这些先验缺乏3D结构和物理约束**。通过将可微渲染（连接2D监督与3D关节参数）、可微跟踪（连接稀疏轨迹与骨架运动）和可微物理仿真（连接运动学变形与动力学真实性）串联为一个端到端可优化的系统，该方法无需重建完整几何即可将2D运动先验提升为物理一致的3D骨架动画。这一设计同时解决了可控性（骨架参数天然可编辑）、兼容性（标准LBS表示）和物理真实性（软体仿真）三个此前方法无法兼顾的核心挑战。
 
-
-
 AniMimic 将静态带纹理的 3D 网格 **S** 转化为物理真实的动态序列 **{S¹, S², S³, …, Sᵀ}**，核心管线由四个模块串联构成，形成“视频先验生成 → 自动绑定 → 关节优化 → 物理精炼”的闭环。
 
 **输入与输出。** 系统接收一个静态 3D 网格（含纹理），最终输出一组时间连续的变形网格序列，且该序列兼容标准动画管线（骨架 + 线性混合蒙皮，LBS）。
@@ -127,15 +121,11 @@ AniMimic 将静态带纹理的 3D 网格 **S** 转化为物理真实的动态序
 
 **关键设计动机。** 现有 video-to-4D 方法（如 SC4D、DreamMesh4D）依赖隐式场或高斯表示，缺乏骨架结构，难以编辑且无物理真实性；AniMimic 通过“骨架化 + 可微物理”两个关键模块，将 2D 扩散先验提升为可控、物理一致且管线兼容的 3D 动画。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1008_https_openaccess_thecvf_com_content_CVPR2026_html_Xie_AniMimic_Imitating/figures/002_Figure_2.jpg]]
 *Figure 2: AniMimic Pipeline Overview. From an input 3D mesh, we render a canonical view and use a video diffusion model to generate a monocular motion sequence. We construct a skeleton with skinning weights using a feed-forward rigging model and generate animation by optimizing joint motions through differentiable rendering, tracking, and depth cues. Finally, we refine mesh deformation via differentiable simulation to obtain physically grounded and temporally consistent results. Right circles indicate novel views*
 
 ![[assets/figures/papers/paper_list_l1008_https_openaccess_thecvf_com_content_CVPR2026_html_Xie_AniMimic_Imitating/figures/001_Figure_1.jpg]]
 *Figure 1: By optimizing joint articulations and material parameters from videos, AniMimic generates physically realistic dynamics for computer graphics objects with diverse geometries*
-
-
 
 AniMimic 的管线由四个核心模块串联构成，其技术本质是将视频扩散模型的2D运动先验，通过可微骨架优化与可微物理仿真，提升为物理一致的3D骨架动画。
 
@@ -211,8 +201,6 @@ $$\pmb{x}^{n+1} = \arg\min_{\pmb{x}} \frac{1}{2} \|\pmb{x} - \tilde{\pmb{x}}\|^2
 ![[assets/figures/papers/paper_list_l1008_https_openaccess_thecvf_com_content_CVPR2026_html_Xie_AniMimic_Imitating/figures/007_Figure_6.jpg]]
 *Figure 6: Physics-Based Refinement. Rigged mesh surfaces often suffer from artifacts such as jittering or self-intersections (middle). Our physics-aware refinement stage eliminates such issues (right) and enhances mesh smoothness and motion consistency*
 
-
-
 ## 实验与关键发现
 
 ### 定量对比
@@ -250,12 +238,6 @@ Figure 6 展示了物理精炼阶段的关键贡献。仅经过骨架蒙皮的�
 2. **物理仿真的精度边界**：当前有限元仿真对薄壳几何体或高复杂度网格的模拟精度有限，材料参数（Young's 模量）的优化策略（聚类后逐步细分）可能无法精确匹配真实物理属性，在极端变形下仍可能出现数值不稳定。
 3. **单目输入限制**：方法目前仅支持单目视角输入，大视角旋转下的多视角一致性尚未充分验证，可能限制在自由视角渲染场景中的应用。
 4. **运动模式扩展性**：框架目前聚焦于骨架驱动的刚体-软组织耦合运动，如何扩展到多对象交互、流体或布料等更复杂的运动模式仍是一个开放问题。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1008_https_openaccess_thecvf_com_content_CVPR2026_html_Xie_AniMimic_Imitating/figures/005_Figure.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -309,8 +291,6 @@ AniMimic 开创的“视频先验 + 可微骨架优化 + 物理精炼”范式�
 - **可编辑动画生成：** 由于输出采用标准骨架表示，后续工作可以自然地引入运动重定向、风格迁移或交互式编辑。
 - **多模态运动控制：** 框架可以扩展为支持文本、音频或其他模态的运动条件信号，替代或补充视频扩散先验。
 - **实时应用：** 当前优化过程为离线处理，若将训练好的骨架优化网络蒸馏为前馈模型，有望实现实时动画生成。
-
-
 
 ## 原文 PDF
 

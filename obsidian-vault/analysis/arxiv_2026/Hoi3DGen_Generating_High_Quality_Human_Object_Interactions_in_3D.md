@@ -52,8 +52,6 @@ claims:
 
 **主要结果**：在文本一致性 GPT 评分上，Hoi3DGen 达到 0.81，远超 TRELLIS 的 0.04 和 InterFusion 的 0.15（4–15× 提升）；接触准确率高达 90%，而基线方法基本无法处理接触语义。用户研究中，91% 的参与者在文本一致性上偏好 Hoi3DGen，86% 在 3D 质量上偏好 Hoi3DGen。消融实验证实，数据过滤、重新纹理化和多视图采样各自对接触准确率和文本一致性有显著贡献。
 
-
-
 ### 3D人物交互生成的任务困境
 
 生成高质量的三维人物交互（Human-Object Interaction, HOI）是计算机视觉与图形学中的核心挑战，其目标是根据文本描述生成包含精确接触语义的、纹理化的人体与物体三维网格。该任务在具身智能、虚拟现实和内容创作等领域具有广泛应用前景，但当前技术路线面临根本性瓶颈：**缺乏大规模、细粒度且配对准确的文本-3D人物交互数据**，导致现有方法难以精确控制接触语义并保持三维模型质量。
@@ -83,8 +81,6 @@ claims:
 核心洞察在于：现有的文本到图像扩散模型（如SANA）虽然未专门针对交互场景训练，但其在大规模图文数据上预训练获得的视觉先验中已经隐式包含人物交互的知识。通过精心设计的自动标注管道生成高质量配对数据，并对模型进行轻量级微调，即可激活这些隐式能力，使其能够精确遵循接触语义生成交互图像。再结合多视图条件采样和三维提升管道，即可实现从文本到高质量三维交互网格的端到端生成。
 
 这一思路的关键优势在于：无需从头训练三维生成模型，而是充分利用二维基础模型的强大生成能力，通过数据质量提升和视图条件控制来实现三维交互的精确生成，从而在保持生成多样性的同时大幅提升接触准确率。
-
-
 
 ## 核心方法与创新机理
 
@@ -121,8 +117,6 @@ Hoi3DGen 在 3D 重建后引入一个独立的**重新纹理化步骤**，使用
 
 与 **TRELLIS**（通用文本到 3D，无交互语义）和 **InterFusion**（基于 SDS，存在 Janus 问题且生成质量低）相比，Hoi3DGen 的核心优势在于：用极少量高质量数据微调现有模型，激活其隐式的交互理解能力，同时保持多样性和泛化性，再通过多视图条件与 3D 提升管道实现精确的语义接触控制。
 
-
-
 Hoi3DGen 提出了一条从文本描述到高质量三维人物交互（HOI）生成的完整流水线。该框架的核心洞察在于：通过将复杂的交互描述任务分解为外观、动作和接触等子任务，利用开源多模态大语言模型（MLLM）自动生成高质量标注，从而用少量筛选数据微调现有生成模型，激活其隐式的人物交互能力。
 
 流水线由三个核心阶段串联构成：
@@ -137,15 +131,11 @@ Hoi3DGen 提出了一条从文本描述到高质量三维人物交互（HOI）�
 
 整个框架的输出包括：分割后的人体网格、物体网格，以及与之对齐的可动画 SMPL 模型，三者共同构成符合精确接触语义的高质量三维交互场景。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l21_Hoi3DGen_Generating_High_Quality_Human_Object_Interactions_in_3D/figures/001_Figure_1.jpg]]
 *Figure 1: Given detailed text descriptions of human, object and their interactions, Hoi3DGen generates high quality textured human and object meshes that follow precisely the contact semantics, together with an aligned animatable SMPL model*
 
 ![[assets/figures/papers/paper_list_l21_Hoi3DGen_Generating_High_Quality_Human_Object_Interactions_in_3D/figures/002_Figure_2.jpg]]
 *Figure 2: HOI3D framework overview. Top: We first leverage the existing multimodal foundation model InternVL [9] to perform decomposed annotation of human, object, and human-object-interaction of samples from the ProciGen [59] dataset. We then use LLaMa [17] to create a final detailed caption for the sample. Bottom: We leverage our data consisting of high-quality and diverse human-objectinteractions to fine-tune an existing text-to-image model. Subsequently, we establish a pipeline to reconstruct high-fidelity textured 3D meshes. The output of our final text-to-3D inference pipeline consists of segmented meshes for the human and object, as well as an animatable SMPL model*
-
-
 
 Hoi3DGen 的核心架构由四个紧密协作的模块构成，分别解决数据标注、2D 交互生成、3D 重建与语义分割、以及可动画化人体配准问题。以下逐一阐述各模块的设计动机与关键公式。
 
@@ -209,13 +199,6 @@ $$
 
 作为后处理步骤，使用 **Flux** 模型对生成的 3D 网格进行重新纹理化。消融实验表明，该步骤对接触准确率影响较小（0.90 → 0.85），但能显著提升 GPT 评分（0.05 → 0.75），证明其主要贡献在于增强纹理质量和视觉保真度，而非交互语义。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l21_Hoi3DGen_Generating_High_Quality_Human_Object_Interactions_in_3D/figures/019_Figure_6.jpg]]
-*Figure 6: Advantage of view conditioned sampling. Given same interaction prompt, our method generates three views that all correctly follow the contacts. Yet Hunyuan3D stuggle to reason the compositional shape under occlusion such as the leg occluded by the table in front view. By sampling side views as input to Hunyuan3D, we are able to generate at least one plausible 3D humanobject interaction for each text prompt*
-
-
-
 ## 实验与关键发现
 
 ### 主要结果：文本一致性、3D质量与接触准确率
@@ -255,8 +238,6 @@ InterFusion 基于分数蒸馏采样（SDS），生成速度慢且受 Janus 问�
 1. **复杂姿态描述的跟随困难**：当文本描述包含非常细微或复杂的人体姿态差异时，模型可能无法精确复现。这一方面源于文本描述姿态本身具有模糊性，另一方面训练数据中缺乏足够多样的独特姿态示例来覆盖所有特征姿态。
 2. **开放问题**：论文提出了若干未来方向，包括引入专用的文本到人体姿态生成模块以提升姿态跟随能力、扩展至更广泛的对象类别和未见过的交互组合、以及将方法从静态 3D 姿态扩展至动态交互序列生成。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l21_Hoi3DGen_Generating_High_Quality_Human_Object_Interactions_in_3D/figures/004_Table_1.jpg]]
 *Table 1: Quantitative comparison with text-to-3D models. We compare our method against TRELLIS [55], a general text-to-3D object generation model, and InterFusion [10], a text-to-3D interaction model. Our method outperforms all prior arts in both consistency to input text and quality of the generated 3D interactions by a very large margin*
 
@@ -266,19 +247,8 @@ InterFusion 基于分数蒸馏采样（SDS），生成速度慢且受 Janus 问�
 ![[assets/figures/papers/paper_list_l21_Hoi3DGen_Generating_High_Quality_Human_Object_Interactions_in_3D/figures/014_Table_3.jpg]]
 *Table 3: Ablation studies. Our proposed data filtering improves contact accuracy and retexturing improves consistency to text input (GPT score). Combining both achieves the best result*
 
-![[assets/figures/papers/paper_list_l21_Hoi3DGen_Generating_High_Quality_Human_Object_Interactions_in_3D/figures/012_Table_4.jpg]]
-*Table 4: Contact accuracy of the lifted 3D given different number of 2D images. Our view-conditioned sampling allows generating three views conditioned on the view description, leading to more stable 3D results*
-
-![[assets/figures/papers/paper_list_l21_Hoi3DGen_Generating_High_Quality_Human_Object_Interactions_in_3D/figures/015_Table_5.jpg]]
-*Table 5: Per-part contact accuracy. Our model generates correct contacts for various contact scenarios whereas base model SANA [56] can follow mainly ‘right hand’ and ‘both legs’ but fails in other body parts*
-
-![[assets/figures/papers/paper_list_l21_Hoi3DGen_Generating_High_Quality_Human_Object_Interactions_in_3D/figures/003_Figure_3.jpg]]
-*Figure 3: Analysis of the CLIP score. While our model clearly generates images that follow input interaction descriptions more precisely than SANA [56], the CLIP score indicates the opposite, rendering it unusable as a metric for our task*
-
 ![[assets/figures/papers/paper_list_l21_Hoi3DGen_Generating_High_Quality_Human_Object_Interactions_in_3D/figures/036_Figure_11.jpg]]
 *Figure 11: More qualitative comparison. Our method consistently produces high quality results with correct contact and details*
-
-
 
 ## 定位与知识库关联
 
@@ -325,8 +295,6 @@ Hoi3DGen 的适用边界受以下因素制约：
 1. **姿态生成模块化**：能否引入专用的文本到人体姿态生成模块，将复杂姿态描述显式转换为姿态参数（如 SMPL 参数），以突破姿态跟随瓶颈？
 2. **跨类别泛化**：在更广泛的对象类别和未见过的人体-物体交互组合上，当前方法的泛化性如何？是否可以通过扩大训练数据的类别覆盖范围来进一步提升？
 3. **动态交互扩展**：能否将该方法扩展至动态交互序列——即从文本生成连续的人体-物体交互动画，而非仅静态三维姿态？这需要解决时序一致性和物理合理性等新挑战。
-
-
 
 ## 原文 PDF
 

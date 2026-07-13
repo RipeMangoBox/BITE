@@ -54,8 +54,6 @@ claims:
 
 实验表明，CIPHER在CHAIR基准上将LLaVA-1.5的CHAIR_S降至13.05%，比最佳基线Nullu低2.15个百分点，比贪婪解码低7.35个百分点；在OPOPE基准上三项指标均取得最高分；同时推理吞吐量与标准贪婪解码持平（0.70 items/s），无额外时间开销。消融实验证实，仅使用视觉反事实扰动比文本扰动或两者混合产生更低的幻觉率，验证了视觉幻觉源的关键作用。
 
-
-
 ### 大视觉语言模型的幻觉困境
 
 大视觉语言模型（LVLM）在图像描述、视觉问答等多模态任务中展现出强大的能力，但始终面临一个核心挑战：**幻觉（hallucination）**——模型生成的文本内容与输入图像的事实信息不一致，凭空捏造不存在的物体、属性或关系。这种幻觉严重削弱了LVLM在医疗、自动驾驶等安全关键场景中的可信度。
@@ -71,8 +69,6 @@ claims:
 本文的核心动机源自一个关键洞察：要抑制视觉幻觉，需要先理解视觉幻觉在特征空间中的“形状”。如果能够构造**反事实图像**——即同一场景下语义被故意扭曲的视觉输入——并通过对比真实与反事实图像-描述对在LVLM中的隐藏表示差异，就可以估计出**视觉幻觉方向子空间**。在推理时，只需将隐藏状态投影到该子空间的正交补上，即可无训练、零额外推理开销地消除幻觉成分。
 
 这一思路的技术瓶颈在于：如何生成高质量的视觉反事实数据？如何从高维特征差异中提取紧凑且有效的幻觉子空间？如何确保投影操作不损害模型的正常描述能力？论文提出的**CIPHER**方法正是围绕这三个问题展开。
-
-
 
 ## 核心方法与创新机理
 
@@ -122,8 +118,6 @@ $$h_{\ell,k}^{\mathrm{clean}} = h_{\ell,k}^{\mathrm{test}} - \sum_{j=1}^{r} \lan
 
 CIPHER的独特之处在于：它不修改解码策略，不依赖辅助模型进行对比，也不简单地归零某些特征维度，而是通过**几何投影**的方式精确移除隐藏空间中的幻觉方向分量，在保持语义完整性的同时实现幻觉抑制。这种“估计-投影”的范式为LVLM幻觉抑制开辟了新的技术路径。
 
-
-
 CIPHER 的整体设计围绕一个核心洞察展开：视觉幻觉在 LVLM 的隐藏表示空间中呈现低秩结构，可以通过对比真实与反事实图像-描述对的表示差异来估计，并在推理时通过投影消除。该方法分为**离线阶段**和**推理阶段**两个互补的模块，如图 Figure 2 所示。
 
 ![[assets/figures/papers/paper_list_l870_https_arxiv_org_abs_2603_10470/figures/002_Figure_2.jpg]]
@@ -156,13 +150,6 @@ $$h_{\ell,k}^{\mathrm{clean}} = h_{\ell,k}^{\mathrm{test}} - \sum_{j=1}^{r} \lan
 ### 模块关系与数据流
 
 三个模块形成清晰的串行数据流：**反事实图像生成**为**幻觉子空间估计**提供训练数据，**幻觉子空间估计**为**推理时投影抑制**提供预计算的幻觉基底。离线阶段的计算开销集中在数据集构建和 SVD 分解上，推理阶段仅增加了隐藏状态的投影操作，因此吞吐量与标准贪婪解码持平（0.70 items/s，Table 4）。整个流程无需对 LVLM 进行任何微调或重训练，是一种即插即用的测试时干预方法。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l870_https_arxiv_org_abs_2603_10470/figures/021_Figure_13.jpg]]
-*Figure 13: An illustration of the prompt used to guide GPT-4V for visual question evaluation*
-
-
 
 CIPHER 的核心由三个模块级联构成：反事实图像生成、幻觉子空间估计、推理时投影抑制。下面按流程展开各模块的关键机制与公式。
 
@@ -208,9 +195,6 @@ CIPHER 的核心由三个模块级联构成：反事实图像生成、幻觉子�
 ![[assets/figures/papers/paper_list_l870_https_arxiv_org_abs_2603_10470/figures/019_Figure_11.jpg]]
 *Figure 11: Effect of subspace rank r on*
 
-![[assets/figures/papers/paper_list_l870_https_arxiv_org_abs_2603_10470/figures/020_Figure_12.jpg]]
-*Figure 12: Effect of subspace rank r on*
-
 ### 3. 推理时投影抑制
 
 在推理阶段，CIPHER 对每个解码步骤的隐藏状态进行在线投影，消除幻觉成分。
@@ -231,13 +215,6 @@ $$h_{\ell,k}^{\mathrm{clean}} = P_{\ell} \, h_{\ell,k}^{\mathrm{test}}$$
 *Table 8: Ablation study on the transformer layer range used for projection in VISTA*
 
 **关键设计要点**：投影仅作用于选定层的隐藏状态，不修改模型参数，因此 CIPHER 无需任何微调，推理吞吐量与标准贪婪解码持平（0.70 items/s，Table 4），且幻觉抑制效果显著优于其他测试时干预方法。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l870_https_arxiv_org_abs_2603_10470/figures/003_Figure_3.jpg]]
-*Figure 3: Inference-time projection mechanism. Given an input image and instruction, the model generates text autoregressively. At each decoding step during generation, hidden states from selected layers are projected onto the subspace orthogonal to the corresponding hallucination space, using the hallucination basis bank obtained in the offline phase*
-
-
 
 ## 实验与关键发现
 
@@ -293,11 +270,6 @@ CIPHER在三个主流LVLM架构（LLaVA-1.5、MiniGPT-4、mPLUG-Owl2）上进行
 
 4. **轻量化构建**：能否利用更轻量的图像编辑方式（如基于注意力机制的编辑）替代完整的扩散模型生成，以降低离线阶段的构建成本？
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l870_https_arxiv_org_abs_2603_10470/figures/004_Table_1.jpg]]
-*Table 1: CHAIR and BLEU scores across LVLMs; lower CHAIR = less hallucination, higher BLEU = better fluency*
-
 ![[assets/figures/papers/paper_list_l870_https_arxiv_org_abs_2603_10470/figures/010_Table_4.jpg]]
 *Table 4: Comparison of CHAIRS and throughput (items/s) for different mitigation methods, tested on LLaVA-7B with an NVIDIA A6000 GPU*
 
@@ -306,14 +278,6 @@ CIPHER在三个主流LVLM架构（LLaVA-1.5、MiniGPT-4、mPLUG-Owl2）上进行
 
 ![[assets/figures/papers/paper_list_l870_https_arxiv_org_abs_2603_10470/figures/013_Figure_8.jpg]]
 *Figure 8: Ablation study on subspace rank (r)*
-
-![[assets/figures/papers/paper_list_l870_https_arxiv_org_abs_2603_10470/figures/009_Figure_6.jpg]]
-*Figure 6: Layer-wise linear probing performance comparing textual and diffusion-based visual hallucination perturbations. Textual perturbations exhibit moderate and unstable separability across layers, whereas diffusion-based visual perturbations produce consistently high accuracy, recall, and F1*
-
-![[assets/figures/papers/paper_list_l870_https_arxiv_org_abs_2603_10470/figures/011_Figure_7.jpg]]
-*Figure 7: CHAIRS of CIPHER using hallucination subspaces derived from images perturbed at different diffusion steps*
-
-
 
 ## 定位与知识库关联
 
@@ -362,8 +326,6 @@ CIPHER 的方法论贡献在于揭示了 LVLM 中视觉幻觉的**低秩结构�
 4. **轻量化反事实生成。** 是否可以利用更高效的图像编辑方法（如基于指令的图像编辑模型、或直接在特征空间进行扰动）替代完整的扩散过程，从而降低离线阶段的构建成本？
 
 5. **与训练时方法的互补性。** CIPHER 作为测试时方法，与 RLHF、偏好对齐等训练时幻觉抑制方法的关系如何？两者是否可叠加使用以获得进一步的幻觉降低？初步的互补性假设值得系统验证。
-
-
 
 ## 原文 PDF
 

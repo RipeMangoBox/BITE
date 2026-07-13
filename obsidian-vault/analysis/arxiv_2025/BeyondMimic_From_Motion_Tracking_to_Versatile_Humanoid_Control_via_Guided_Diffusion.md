@@ -60,8 +60,6 @@ claims:
 
 **方法定位**：与需要逐运动调参的**DeepMimic**（Peng et al., ACM Trans. Graph. 2018）、策略不可跨任务复用的**Adversarial Motion Priors**（Peng et al., ACM Trans. Graph. 2021）、依赖显式目标条件训练的VAE类方法、以及解耦训练导致敏捷性下降的分层控制架构相比，BeyondMimic通过统一的跟踪公式与扩散引导实现了可扩展的多样化运动学习和零样本任务适应。
 
-
-
 使双足人形机器人在现实世界中展现出人类般的敏捷性与自然性，一直是机器人学领域的核心挑战。人类运动具有高度的多样性、动态性和协调性——从平稳行走、快速奔跑到空翻、旋踢等高难度技巧动作——而机器人系统要在保持平衡与物理一致性的同时复现这些行为，面临着建模、学习与部署等多重瓶颈。
 
 ### 现有方法的局限
@@ -82,8 +80,6 @@ BeyondMimic 的出发点是打破上述困境，实现两个关键目标：
 2. **通用任务适应**：使学到的多种运动技能能够灵活组合，在测试时零样本适应航点导航、摇杆遥控、障碍物回避等未见下游任务，无需重新训练或枚举目标组合。
 
 实现这一愿景的技术直觉在于：扩散模型不仅能够捕捉复杂的多模态运动分布，其学习到的得分函数天然支持通过梯度进行测试时条件化（分类器引导），使得单一模型即可灵活组合已学技能并适应新目标。这一洞察将运动学习与任务适应统一在一个连贯的框架内，为通用人形机器人控制提供了新的路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -140,8 +136,6 @@ $$
 
 BeyondMimic 的核心创新不在于提出全新的算法组件，而在于**系统性地识别并解决了从多样化运动学习到通用控制的关键瓶颈**：通过锚点相对跟踪和统一奖励实现可扩展的运动学习，通过精确电枢建模和极低延迟实现可靠的 sim-to-real 转移，通过潜扩散引导实现零样本任务适应。这些 changed slots 共同构成了一个从数据到部署的完整解决方案，在 77 人用户研究中以 70.8% 对 29.2% 的显著优势超越 Unitree 原生控制器（p < .001, Cohen's h = 0.859），验证了其产生类人自然运动的能力（证据锚点：part_003）。
 
-
-
 BeyondMimic 采用两阶段流水线架构，将多样化人类运动的学习与面向未见任务的通用控制解耦为两个模块，二者通过紧凑的潜空间衔接。
 
 **阶段一：可扩展运动跟踪 (Scalable Motion Tracking).** 该阶段将运动跟踪建模为马尔可夫决策过程（MDP），使用强化学习训练一个统一的跟踪策略。核心设计在于“锚点相对跟踪”（anchor-relative tracking）：以机器人骨盆为锚点，将所有身体部位的目标位姿表达在锚点中心坐标系中，使策略能够容忍全局漂移并在偏离后自然恢复，这是实现零样本 sim‑to‑real 迁移的关键（Figure 7A）。任务奖励采用高斯形状的指数跟踪误差之和，仅叠加三项正则化惩罚（关节限位、动作平滑、非必要自接触），整个奖励公式对所有运动共享同一组超参数，无需针对特定运动调参。策略网络是一个 MLP，以 50 Hz 运行，输入当前观测（运动相位、锚点误差、IMU 速度、相对关节位置/速度、上一步动作），输出关节位置设定点，由底层 PD 控制器执行。
@@ -150,15 +144,11 @@ BeyondMimic 采用两阶段流水线架构，将多样化人类运动的学习�
 
 **实时部署.** 整个框架以 C++ 实现：状态估计以 500 Hz 运行，策略推理在 CPU 上单次 < 1 ms，扩散推理异步执行于移动 GPU（约 20 ms）。梯度通过 CppAD 自动求导，模型经 TensorRT 加速，确保精确的时序同步。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2508_08241/figures/007_Figure_7.jpg]]
 *Figure 7: Overview of the framework. (A) Scalable learning of diverse human motions via motion tracking. (i) The target motion is re-anchored to the current pose to allow drift and recovery, which is critical for successful sim-to-real transfer. (ii) Diverse motions are tracked with RL using a single recipe and shared hyperparameters, showing scalability across a broad spectrum of skills. (B) Versatile control via latent state-action diffusion model. (i) Stage 1: A VAE is trained via DAgger to compress the diverse motion tracking policies into a smooth, structured latent space. (ii) Stage 2: A state-latent diffusion model is trained on VAE trajectory rollouts. During inference, the current action is...*
 
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2508_08241/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the proposed versatile humanoid control framework. (A) Scalable and robust learning from human motions with agile, human-like behaviors via motion tracking. (B) Versatile control over unseen downstream tasks with diverse learned motor skills via guided diffusion*
-
-
 
 BeyondMimic 采用两阶段流水线：第一阶段通过紧凑的强化学习公式实现可扩展的运动跟踪，第二阶段构建统一的潜状态‑动作扩散模型，通过分类器引导在测试时实现零样本任务适应。
 
@@ -246,18 +236,11 @@ $$
 
 C++ 实现，全状态估计以 500Hz 运行，策略推理单次 <1ms（CPU），扩散推理异步进行约 20ms（移动 GPU）。使用 TensorRT 加速扩散模型，梯度通过 CppAD 自动求导计算。精确的驱动器电枢惯量建模和极低的部署延迟（<1ms）是成功 sim-to-real 的关键工程保障。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2508_08241/figures/008_Figure_8.jpg]]
 *Figure 8: Ablation studies. (A) Motion tracking error comparison ablating orientation representation, history length, armature, and delay, showing that continuous orientations, no observation history, correct armature settings, and minimal deployment delay are critical for sim-to-real transfer in our setup. (B) Training performance ablating adaptive sampling (AS). (i) Iterations required to solve the motion; without AS, difficult segments remain unsolved even after 30k iterations. (ii) Visualization for Motion 1, highlighting two challenging cartwheel segments that cause the baseline to fail. (iii) Evolution of the sampling distribution, showing that AS concentrates sampling on difficult segments ear...*
 
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2508_08241/figures/005_Figure_5.jpg]]
 *Figure 5: Command-conditioned locomotion via guided diffusion. (A) Visualization of diffusion process under joystick control. Starting from Gaussian noise, the distribution progressively converges to optimize for a right-turn command. (B) Waypoint navigation. From multiple start points, the robot reaches the goal using forward or backward walking. (C) Joystick teleoperation. The robot tracks the joystick velocity command. Even under an impulsive disturbance, it recovers quickly and continues following the backward command. (D) t-SNE visualization of the latent space, illustrating the transition from walking to running. (E) Real-world transition from walking to running conditioned on velocity command*
-
-![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2508_08241/figures/006_Figure_6.jpg]]
-*Figure 6: Task transition and composition. (A) Motion inpainting with future keyframes. (i) Left handDesired future keyframes with 0.2 s intervals. (ii) Starting from walking, the robot smoothly completed the cartwheel by inpainting both the transition and the intermediate motion between the keyframes. (iii) Long-horizon execution with four keyframed-conditioned cartwheels interwoven with velocity-conditioned walking and running, achieving smooth multi-round transitions between different tasks and motions, demonstrating its versatility in task specifications. (B) Real-world obstacle avoidance. We demonstrated scene-aware navigation by composing waypoint and obstacleavoidance costs. When given a goal...*
-
-
 
 ## 实验与关键发现
 
@@ -302,27 +285,8 @@ BeyondMimic在统一奖励公式和共享超参数下，成功学习约2.5小时
 
 所有运动跟踪策略使用完全相同的MDP公式、奖励函数和超参数，无任何针对特定运动的调参。sim-to-real转移为零样本，策略直接在仿真中训练后部署到真实机器人，未进行硬件特定的微调。用户研究采用双尾二项检验和Bonferroni校正，比较对象是同一机器人平台上的Unitree原生控制器，并报告了效应量。消融实验在统一仿真设置下进行，仅改变所研究的设计因素，其余保持一致。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2508_08241/figures/002_Figure_2.jpg]]
 *Figure 2: Diverse motion tracking policies deployed on a real humanoid robot. We demonstrate accurate and robust tracking across a wide spectrum of motions, ranging from static to highly dynamic and from athletic feats to stylized motions, showing the scalability of our framework. In total, 30 distinct motion clips are deployed on hardware; with a subset shown here due to space. See Movie S2 for the full repertoire*
-
-![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2508_08241/figures/003_Figure_3.jpg]]
-*Figure 3: Human-level Agility exhibited in a highly dynamic acrobatic motion. (A) Real-world forest demonstration showing one continuous motion including*
-
-![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2508_08241/figures/004_Figure_4.jpg]]
-*Figure 4: Human-like naturalness in walking and running motion. (A) Natural running on a sports field. (B) Natural walking on a sports field. (C) Comparison of weight-normalized GRF profiles for human vs. humanoid during walking and running, showing comparable shapes, contact forces, and timing. (D) Example video clips used in the user study. (E) User-study results for the question “Which looks more human-like and natural?”, comparing our policies vs. Unitree’s native walking and running controller, showing that ours is significantly more preferred. The error bars indicate 95% confidence intervals. (F) Natural response to interference during walking to a goal*
-
-![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2508_08241/figures/011_Table_S.1.jpg]]
-*Table S.1: Unified reward formulation using Gaussian-shaped tracking scores*
-
-![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2508_08241/figures/015_Table_S.5.jpg]]
-*Table S.5: Motion Tracking Hyperparameters*
-
-![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2508_08241/figures/017_Table_S.7.jpg]]
-*Table S.7: Diffusion Policy Hyperparameters*
-
-
 
 ## 定位与知识库关联
 
@@ -392,8 +356,6 @@ BeyondMimic 在以下知识节点上做出了可验证的贡献：
 - **可扩展运动跟踪的奖励设计原则**：证明了仅需三项正则化项即可实现多样化运动的统一学习，为后续工作提供了简洁的基线公式。
 - **扩散模型用于测试时运动合成与任务适应**：首次将潜状态‑动作扩散模型的分类器引导用于人形机器人的零样本任务适应，展示了得分函数天然支持条件化的优势。
 - **sim-to-real 转移的关键工程因素**：通过系统消融明确了旋转表示、观测历史、电枢惯量、部署延迟对真实机器人部署的影响权重，为后续工作提供了实用的工程指南。
-
-
 
 ## 原文 PDF
 

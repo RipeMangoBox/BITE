@@ -62,15 +62,11 @@ claims:
 
 **局限与开放问题**：FreeSOLO 在目标被截断、高度拥挤或尺寸过小时可能定位失败（Figure 6），且自监督结果与全监督方法（COCO AP 约 4.0 vs 37+）之间仍存在巨大差距。如何进一步缩小这一差距、将方法扩展至无监督全景分割，以及寻找更优的预训练策略以生成更高分辨率的精细掩码，是值得探索的方向。
 
-
-
 实例分割是计算机视觉的核心任务之一，要求模型同时完成目标定位与像素级分类。近年来，以 **SOLO** 为代表的全监督方法取得了显著进展，但其成功高度依赖大规模精确的人工标注。在现实场景中，获取像素级掩码标注成本极高，这严重制约了实例分割模型的可扩展性。
 
 现有无监督目标分割方法试图缓解这一困境，但仍存在明显缺口。基于区域提议的传统方法如 **MCG**（Arbelaez et al., CVPR 2014）和 **COB**（Maninis et al., TPAMI 2018），虽然能够生成候选分割区域，却或多或少依赖人工标注进行训练或后处理。近年来涌现的自监督目标发现方法如 **DETReg**（Bar et al., arXiv 2021）和 **LOST***（Simeoni et al., arXiv 2021），仅能输出目标边界框，无法提供像素级实例掩码。**核心瓶颈在于：如何在不使用任何人工标注的条件下，生成足够质量的伪标签来训练像素级实例分割模型。**
 
 FreeSOLO 正是在这一背景下被提出。其核心洞察在于：SOLO 框架“自上而下与自下而上相统一”的设计天然地将像素分组、目标定位和特征学习融为一体，使得整个流程具备了在无标注条件下以自监督方式训练的潜力。具体而言，FreeSOLO 通过两大支柱实现这一目标：**Free Mask** 利用自监督稠密特征的查询-键注意力机制自动生成粗糙掩码，**Self-Supervised SOLO** 则采用弱监督投影损失和自训练策略，将粗糙掩码逐步提升为高质量实例分割结果。这一设计使 FreeSOLO 成为首个完全不依赖任何人工标注、端到端可训练的实例分割框架。
-
-
 
 ## 核心方法与创新机理
 
@@ -104,8 +100,6 @@ FreeSOLO 引入**一次自训练**以进一步提升掩码质量：先用 Free M
 
 上述三个 changed slots 形成了一条完整的无监督实例分割链路：**自监督特征 → 注意力伪标签 → 弱监督训练 → 自训练精化**。SOLO 框架“自上而下与自下而上相统一”的设计天然地将像素分组、目标定位和特征学习融为一体，使得该链路可在无任何标注的条件下端到端运行。这一创新使 FreeSOLO 在 COCO 上以 9.8% AP50 超越需要标注的 MCG（8.8% AP50），并在无监督目标检测任务上相对 DETReg 提升约 100%（Table 1, Table 3）。
 
-
-
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2202_12181/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of FreeSOLO. Unlabeled images are first input to Free Mask to generate coarse object masks. The segmentation masks as well as their associated semantic embeddings are used to train a SOLO-based instance segmentation model via weak supervision. We use self-training to improve object mask segmentation*
 
@@ -122,8 +116,6 @@ FreeSOLO 的整体 pipeline 由两大支柱构成：**Free Mask** 与 **Self‑S
 **输出**：训练完成后，模型可直接执行类别无关的实例分割与目标检测，其预测掩码在定性上显著优于 Free Mask 的初始粗糙掩码（Figure 2）。此外，语义嵌入学习模块使模型在下游有监督微调时具备更强的迁移能力——仅用 5% COCO 掩码微调即比 DenseCL 预训练高出 +9.8% AP。
 
 **模块间的因果链路**：Free Mask 提供初始定位信号 → 弱监督投影损失在粗糙伪标签上稳定训练 → 自训练利用模型自身能力提升伪标签质量 → 语义嵌入损失保留 Free Mask 提取的语义结构以辅助下游任务。这一设计将 SOLO 的“自上而下与自下而上相统一”的架构天然转化为自监督学习范式，使得全流程在零标注条件下得以运转。
-
-
 
 FreeSOLO 的整体框架由两大支柱构成：**Free Mask** 负责从无标注图像中生成粗糙物体掩码，**Self‑Supervised SOLO** 则利用这些粗糙掩码以弱监督方式训练实例分割模型，并通过一次自训练进一步提升掩码质量（Figure 2）。
 
@@ -185,8 +177,6 @@ $$\mathcal{L}_{cate} = \mathcal{L}_{focal} + \beta L_{sem}$$
 
 初步训练后的 SOLO 模型能够预测出比 Free Mask 原始粗糙掩码质量更高的掩码。FreeSOLO 采用一次自训练：用当前模型重新生成伪标签，再训练一次模型。Table 7c 显示，一次自训练将 AP 从 3.3 提升至 4.0，但进一步迭代不再带来增益，表明模型在此框架下容易饱和。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -215,9 +205,6 @@ Table 3 报告了 COCO val2017 上的无监督类别无关目标检测结果。F
 ### 有限标注下的微调性能
 
 FreeSOLO 的自监督预训练在下游有监督微调中展现出显著的迁移价值。Table 5 显示，仅使用 **2% COCO 全标注图像**微调时，FreeSOLO 预训练模型达到 22.0 AP，优于 DenseCL 预训练的 20.0 AP。当仅使用 **5% COCO 掩码标注**（无类别标签）微调时（Table 6），FreeSOLO 取得 **29.9 AP**，相比监督预训练基线的 20.1 AP 提升 **+9.8 AP**，相对改善约 49%。这证明 FreeSOLO 学到的物体定位和分割能力可作为强先验，大幅降低下游任务对标注数据的依赖。
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2202_12181/figures/008_Table_5.jpg]]
-*Table 5: Supervised instance segmentation with limited fully annotated images. Table 6. Supervised instance segmentation with limited segmentation masks*
 
 ### 消融实验
 
@@ -254,25 +241,8 @@ Table 7 系统性地拆解了 FreeSOLO 各设计组件的贡献，所有实验�
 3. Free Mask 对预训练方法敏感，其性能上限受限于当前稠密自监督学习的技术水平。
 4. 截断、拥挤和小目标场景下的定位失败表明，单一尺度的查询-键注意力机制尚不足以处理复杂场景中的全部实例。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2202_12181/figures/005_Figure_4.jpg]]
-*Figure 4: Qualitative results of the Free Mask. Free Mask extracts coarse masks of the common objects in unlabeled images*
-
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2202_12181/figures/018_Figure.jpg]]
 *Figure: S1. More qualitative results of FreeSOLO for the task of class-agnostic instance segmentation. The model is trained without any kind of manual annotations and can infer at 16 FPS on a V100 GPU. Best viewed on screen. w/o ℒ????????????_???????????????? w/ ℒ????????????_????????????????*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2202_12181/figures/009_Table.jpg]]
-*Table: (c) Self-training iterations. ‘-1’ refers to coarse masks. ‘0’ means learning without self-training*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2202_12181/figures/010_Table.jpg]]
-*Table: (a) Different pre-training methods with Free Mask. DenseCL works the best*
-
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2202_12181/figures/012_Table.jpg]]
-*Table: (e) Mask loss terms. Each loss component contributes to the final results*
-
-
 
 ## 定位与知识库关联
 
@@ -317,8 +287,6 @@ FreeSOLO 的有效性依赖于以下前提条件：
 5. **为何自训练超过一次不再提升，是否存在更好的自训练策略？** 当前自训练在单轮后即饱和，这一现象的原因尚不明确。可能的原因包括：模型在粗糙伪标签上训练后已经收敛到局部最优；第二轮自训练使用的伪标签与第一轮高度相似，未能引入新的信息。探索噪声鲁棒的自训练策略、渐进式伪标签精炼或多轮协同训练可能是突破方向。
 
 6. **FreeSOLO 的物体发现机制是否具有类别偏向？** Free Mask 的查询-键注意力机制倾向于发现“常见物体”，但论文未系统分析其对不同类别、尺度、外观变化的目标的发现偏差。理解这一偏向对于评估方法的公平性和泛化性至关重要。
-
-
 
 ## 原文 PDF
 

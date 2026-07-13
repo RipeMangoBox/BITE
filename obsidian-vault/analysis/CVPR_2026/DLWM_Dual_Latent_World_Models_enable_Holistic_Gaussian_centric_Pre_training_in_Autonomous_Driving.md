@@ -57,8 +57,6 @@ claims:
 
 方法层面，DLWM属于**自监督高斯中心预训练**范式，与无预训练的GaussianFormer、OccWorld、VAD等任务特定基线形成互补。其训练信号完全来自LiDAR稀疏深度、Metric3D伪稠密深度和Grounded SAM自动语义标签，无需任何人工标注。这一设计使其在标注稀缺场景下具有独特优势，但同时也意味着对LiDAR数据和伪真值质量的依赖，在缺乏LiDAR或极端噪声场景下的适用性仍需进一步验证。
 
-
-
 ### 自动驾驶中的感知-预测-规划一体化挑战
 
 自动驾驶系统需要同时完成三维场景感知、未来状态预测与运动规划三大核心任务。近年来，以三维高斯（3D Gaussian）为中心的场景表示方法因其显式、可微、高效的特点而受到广泛关注，代表性工作如**GaussianFormer**通过可学习高斯查询直接预测高斯属性，在三维占据感知任务中展现出强大潜力。然而，这类高斯中心模型面临一个根本性瓶颈：**缺乏统一的预训练范式**，无法在单一框架下同时提升感知、预测与规划的全链路性能。
@@ -80,8 +78,6 @@ claims:
 - **阶段二**：引入两个解耦的潜在世界模型，分别对场景的物理演化（高斯流引导）和自车的运动规划（规划引导）进行隐式预测。这种解耦设计的关键洞察在于：场景中其他物体的运动与自车运动遵循不同的动力学规律，统一建模会增加学习复杂度；分离两个世界模型能够更精准地捕获各自的时序规律，从而在潜在空间中实现高效的预训练。
 
 通过这一设计，DLWM首次实现了覆盖感知、预测与规划的**整体高斯中心预训练**，仅需两阶段自监督训练、无需任何下游任务标签，即可在三维占据感知（+1.02 mIoU）、四维占据预测（+2.68 mIoU）和运动规划（L2误差降低0.09 m）三项任务上同步提升。
-
-
 
 ## 核心方法与创新机理
 
@@ -139,8 +135,6 @@ DLWM 完全摆脱了对人工标注的依赖，训练信号均来自自动生成
 
 DLWM 的核心创新可归纳为：**以解耦的双潜在世界模型为因果 knob，在阶段一重建学习的高斯表示基础上，分别对场景几何/语义演化和自车轨迹运动进行隐式预测，从而在不依赖任何任务标签的前提下，实现对感知、预测、规划三大任务的统一预训练提升**。这一范式突破了高斯查询排列等价性带来的时序监督难题，为高斯中心模型的规模化预训练提供了可行路径。
 
-
-
 DLWM 提出一个**两阶段自监督预训练范式**，旨在为高斯中心（Gaussian-centric）的自动驾驶模型提供统一、覆盖感知、预测与规划全任务的表示学习。其核心架构如图 Figure 2 所示，整体流程可概括为：
 
 ![[assets/figures/papers/paper_list_l2465_https_arxiv_org_abs_2604_00969/figures/002_Figure_2.jpg]]
@@ -171,13 +165,6 @@ DLWM 提出一个**两阶段自监督预训练范式**，旨在为高斯中心�
      $$
 
 两个世界模型**解耦训练**，分别针对场景动态演化和自车运动进行隐式预测，共同为下游任务提供时序感知与运动先验。预训练完成后，各下游任务（3D 占据感知、4D 占据预测、运动规划）仅需在冻结或微调的骨干网络上添加轻量任务头即可获得显著性能提升。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2465_https_arxiv_org_abs_2604_00969/figures/001_Figure_1.jpg]]
-*Figure 1: Illustration of our DLWM for pre-training and performance improvements for downstream tasks*
-
-
 
 DLWM 的核心由两阶段构成：阶段一通过自监督重建学习鲁棒的三维高斯场景表示，阶段二引入双潜在世界模型分别对场景动态演化和自车规划进行时序预测。以下按模块拆解关键设计与公式。
 
@@ -229,8 +216,6 @@ $$\mathcal{L}_{plan} = \mathcal{L}_{reg} + \mathcal{L}_{bev} \tag{8}$$
 
 两个世界模型在训练时相互独立。消融实验（Table 7）表明，将二者合并为统一模型会导致感知 mIoU 从 19.3 降至 18.9，规划 L2 从 0.46 升至 0.58。原因在于：高斯流引导的模型需要精确建模场景中所有动态元素的细粒度运动，而规划引导的模型仅需关注自车运动对场景观测的条件化影响，二者目标存在本质冲突，解耦是性能提升的关键设计选择。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能验证
@@ -278,17 +263,6 @@ Table 10报告了三项任务的计算开销。在NVIDIA A100 GPU上，预训练
 4. **规划性能差距**：尽管L2误差显著降低，但与使用多辅助任务（如检测、跟踪、地图预测）的端到端方法相比，DLWM的规划指标仍有一定差距，表明纯自监督预训练在规划任务上尚未完全替代任务特定监督。
 5. **里程计依赖**：高斯流传播依赖真实自车运动变换，在线推理时需准确的里程计估计，里程计误差会传播至未来预测。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2465_https_arxiv_org_abs_2604_00969/figures/004_Table_1.jpg]]
-*Table 1: 3D occupancy perception results on the SurroundOcc-nuScenes validation set [39]. *: We re-evaluate the checkpoints released by GaussianWorld because they repeatedly calculated the metrics for intermediate time-interval frames within each video*
-
-![[assets/figures/papers/paper_list_l2465_https_arxiv_org_abs_2604_00969/figures/005_Table_2.jpg]]
-*Table 2: 4D occupancy forecasting results on the SurroundOcc-nuScenes validation set [39]. Aux. Sup. represents auxiliary supervision. Avg. computes the average result of 1s, 2s, and 3s*
-
-![[assets/figures/papers/paper_list_l2465_https_arxiv_org_abs_2604_00969/figures/006_Table_3.jpg]]
-*Table 3: Motion Planning Results on the nuScenes validation set. The metrics are computed by the way in VAD [15]. ⋄: Lidar-based methods. We do not utilize ego status in the planning module*
-
 ![[assets/figures/papers/paper_list_l2465_https_arxiv_org_abs_2604_00969/figures/007_Table_4.jpg]]
 *Table 4: Ablation study on render supervision and latent world model guided by Gaussian flow. “Sup-DL”: sparse depth supervision derived from LiDAR points. “Sup-D”: dense pseudo-depth map supervision. “Sup-S”: semantics supervision. “Gaussian Flow”: denotes the inclusion of the Stage 2 latent world model guided by Gaussian flow*
 
@@ -303,14 +277,6 @@ Table 10报告了三项任务的计算开销。在NVIDIA A100 GPU上，预训练
 
 ![[assets/figures/papers/paper_list_l2465_https_arxiv_org_abs_2604_00969/figures/011_Table_8.jpg]]
 *Table 8: Ablation study on the number of 3D Gaussians*
-
-![[assets/figures/papers/paper_list_l2465_https_arxiv_org_abs_2604_00969/figures/012_Table_9.jpg]]
-*Table 9: Ablation study on the number of future frames*
-
-![[assets/figures/papers/paper_list_l2465_https_arxiv_org_abs_2604_00969/figures/013_Table_10.jpg]]
-*Table 10: The computation cost analysis of all three tasks*
-
-
 
 ## 定位与知识库关联
 
@@ -355,8 +321,6 @@ DLWM 的有效性依赖以下前提条件，这些条件也划定了其适用边
 4. **双世界模型的统一。** 当前解耦设计虽优于统一模型，但增加了训练复杂度。是否可能设计一个统一的世界模型同时预测高斯流和自车规划，且保持性能不退化？
 5. **鲁棒性评估缺失。** 论文未评估在遮挡、恶劣天气、动态 agent 密集交互等 corner case 下的预训练增益，这些场景下的表示鲁棒性尚不明确。
 6. **在线推理的里程计需求。** 高斯流传播依赖真实自车运动进行帧间对齐，在线推理时需要准确的视觉里程计或 IMU 积分，这一依赖在实际部署中的影响未讨论。
-
-
 
 ## 原文 PDF
 

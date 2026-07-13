@@ -196,8 +196,6 @@ HTTM 的整体流程由五个顺序模块构成，形成“重排序—合并—
 
 输入令牌序列首先经过时序重排序形成时空合并块，随后在每个注意力头内独立执行“合并—注意力计算—反合并”的子流程，最后经异常值过滤修正输出。整个流程插入在全局注意力层的 Q/K/V 投影之后、注意力核计算之前，以及注意力核输出之后、后续线性投影之前，对 VGGT 的其他组件（帧注意力层、交替 Transformer 块等）完全透明，无需重新训练或微调。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2104_https_arxiv_org_abs_2511_21317/figures/006_Figure_6.jpg]]
 *Figure 6: Overview of how HTTM accelerates attention layers by merging QKV tokens. HTTM merges and unmerges Q/K/V tokens before and after entering the attention kernel. Using temporal reordering 3.3, HTTM forms temporal blocks that consist of similar tokens (denoted with colors) and performs merging and unmerging within these blocks*
 
@@ -288,8 +286,6 @@ Figure 9 的定性对比显示，HTTM 相比 FastVGGT 保留了更多来自原�
 ### 失败模式与局限
 
 HTTM 的有效性高度依赖输入帧的时间连续性。在稀疏视角或低重叠场景下，时序重排序的优势显著减弱，方法退化为主要依赖空间合并，加速效果受限。此外，自适应异常值过滤依赖自定义 CUDA 核实现，增加了部署复杂度和跨平台兼容性要求。该方法针对 VGGT 的交替帧注意力/全局注意力架构设计，无法直接迁移至其他 3D 重建模型或通用视觉 Transformer。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2104_https_arxiv_org_abs_2511_21317/figures/009_Table_1.jpg]]
 *Table 1: Comparison of 3D reconstruction performance in accuracy (Acc) and completeness (Comp). HTTM achieves better reconstruction quality on fine-grained datasets like NRGBD than FastVGGT using a shorter Q/K/V sequence*

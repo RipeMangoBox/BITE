@@ -58,8 +58,6 @@ AMD属于**基于扩散模型的文本驱动运动生成方法**，其核心创�
 ### 主要结果
 在复杂文本数据集SLCD1上，AMD的FID达到0.116±.011，比次优模型MDM的0.828±.061大幅降低0.712；Multimodal Dist也由4.927±.059降至4.296±.012。消融实验证实，去除文本分解（NTD）或去除参考动作信息（NTDS）均导致各指标明显恶化，验证了解剖分解与参考运动检索的关键作用。参数λ可有效调节保真度与多样性的权衡：λ→0时多样性上升，λ→1时保真度上升且FID快速下降。
 
-
-
 文本到运动生成旨在将自然语言描述转化为逼真的三维人体运动序列，其在动画制作、虚拟现实和具身智能等领域具有广泛应用前景。近年来，扩散模型在该任务上取得了显著进展，涌现出**MDM**（Tevet et al., arXiv 2022）、**MotionDiffuse**（Zhang et al., arXiv 2022）、**T2M-GPT**（Zhang et al., arXiv 2023）和**ReMoDiffuse**（Zhang et al., arXiv 2023）等一系列代表性工作。
 
 然而，现有方法存在一个核心瓶颈：它们过度简化了语言的复杂性。主流方案通常使用单一文本编码器（如CLIP）将任意长度或复杂度的文本描述映射为一个固定长度的特征向量。这种压缩式编码策略在处理简短、常规的动作描述时表现尚可，但面对罕见或包含复杂长序列的动作描述时则力不从心。例如，“scorpion”这类专业动作因训练数据中样本稀缺而难以被模型正确理解和合成，但其详细描述中却往往包含充足的解剖指令信息，这些信息在单一向量编码过程中被丢失或混淆。
@@ -67,8 +65,6 @@ AMD属于**基于扩散模型的文本驱动运动生成方法**，其核心创�
 这一瓶颈的因果机制在于：固定长度向量无法有效承载长文本中的细粒度语义结构，尤其是当文本涉及多个身体部位、时序动作组合或专业动作术语时，编码器倾向于保留高频共现模式而丢弃低频但关键的动作细节。
 
 为应对上述挑战，AMD（Adaptable Motion Diffusion）提出了一种新的解决思路：借助大语言模型（LLM）的解剖知识，将复杂的长文本描述分解为一系列简洁、可解释的解剖脚本，从而绕过自然语言编码的复杂性。具体而言，AMD使用微调后的ChatGPT-3.5将输入文本解析为解剖脚本序列，并构建双分支扩散模型——一个分支基于原始文本保持生成保真度，另一分支基于解剖脚本和检索到的参考运动增加多样性，最后通过可调参数自适应融合两者，在保真度与多样性之间取得平衡。
-
-
 
 ## 核心方法与创新机理
 
@@ -101,8 +97,6 @@ AMD 的核心洞察在于**借用 LLM 的解剖先验知识，将“理解复杂
 - **参考动作贡献**：进一步去除参考动作信息（NTDS）使 FID 急剧恶化至 1.39±.08（Table 3），表明检索到的参考运动对生成质量有决定性影响。
 - **λ 调节机制**：λ→0 时模型多样性上升但偏离真实分布，λ→1 时参考动作主导，FID 快速下降（Figure 7），证实 λ 可有效调节保真度-多样性权衡。
 
-
-
 AMD 的整体 pipeline 围绕一个核心思想展开：**将复杂文本动作描述分解为解剖脚本，再通过双分支扩散与自适应融合来平衡保真度与多样性**。图 2 展示了完整的架构流程。
 
 ### 输入流与文本分解
@@ -133,8 +127,6 @@ AMD 构建了两个并行的扩散模型分支：
 $$f(p_\theta, \lambda) = \begin{cases} 1-\lambda & \text{if } p_{\theta_1} \\ \lambda & \text{if } p_{\theta_2} \end{cases}$$
 
 当 $\lambda \to 1$ 时，参考扩散分支 $p_{\theta_2}$ 主导输出，保真度上升、FID 快速下降；当 $\lambda \to 0$ 时，规范扩散分支 $p_{\theta_1}$ 主导，多样性上升但可能偏离数据分布（Figure 7）。这一可调节的融合机制使 AMD 能够在保真度与多样性之间灵活权衡，是其应对复杂长文本动作生成的关键设计。
-
-
 
 ### 1. 解剖文本分解模块 (Anatomical Motion Text Decomposition)
 
@@ -176,8 +168,6 @@ $$f(p_\theta, \lambda) = \begin{cases} 1-\lambda & \text{if } p_{\theta_1} \\ \l
 
 **参数 $\lambda$ 的作用机制**：该参数是调节生成行为的关键旋钮。当 $\lambda \to 0$ 时，模型几乎总是选择OMD的输出，生成结果严格遵循原始文本描述，保真度最高，但多样性降低；当 $\lambda \to 1$ 时，模型倾向于选择RMD的输出，参考动作的引导作用增强，生成结果的多样性显著提升，但可能偏离原始文本的精确语义。实验表明，随着 $\lambda$ 增大，FID指标会先快速下降后趋于平缓，验证了该融合策略的有效性。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -217,15 +207,11 @@ Figure 3 展示了 AMD 处理两类困难文本的能力：左侧为超长时序
 
 论文明确指出，AMD 的性能**严重受限于运动数据库的广度**。参考运动检索依赖于数据库中是否存在与解剖脚本匹配的高质量参考动作；小型或不均衡的数据库可能提供低质量参考，直接损害生成效果。这一瓶颈在 KIT 数据集上的相对弱势中已有体现——KIT 的动作类别有限，检索到的参考动作可能缺乏足够多样性。未来方向包括从长视频中自动蒸馏简单动作以降低数据收集成本，但该方案的实际可行性尚需验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1814_AMD_Anatomical_Motion_Diffusion_with_Interpretable_Motion_Decomposition/figures/004_Table_1.jpg]]
 *Table 1: Quantitative results on the SLCD1 and SLCD2 test sets: All methods use the real motion length from the ground truth. → means results are better if the metric is closer to the real distribution. We ran all the evaluations 20 times (except MultiModality, which ran 5 times), and ± indicates the 95% confidence interval. Red indicates the best result, while Blue indicates the second-best result*
 
 ![[assets/figures/papers/paper_list_l1814_AMD_Anatomical_Motion_Diffusion_with_Interpretable_Motion_Decomposition/figures/005_Table_2.jpg]]
 *Table 2: Quantitative comparison of AMD and baselines on HumanML3D and KIT datasets.(Guo et al.→Guo et al. (2022a),MDF→MotionDiffuse,ReMDF→ReMoDiffuse,MMD→Multimodality)*
-
-
 
 ## 定位与知识库关联
 
@@ -270,8 +256,6 @@ AMD 的主要局限在于**参考运动数据库的构建成本**。当前方法
 2. **数据库规模的定量影响**：目前缺乏对运动数据库大小与生成质量关系的系统实验，这限制了实际部署时的资源规划。
 3. **自动化动作蒸馏**：能否从长视频中无监督地提取简单动作片段，摆脱人工标注依赖，是该方法走向大规模应用的关键。
 4. **KIT 数据集性能异常**：论文提到在 KIT 上的表现低于预期（Table 2），原因尚不明确，可能与 KIT 的文本分布特征或数据库覆盖偏差有关，需进一步分析。
-
-
 
 ## 原文 PDF
 

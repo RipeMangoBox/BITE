@@ -55,8 +55,6 @@ CASIM 具有模型与表示无关的特性，可同时集成到自回归生成�
 
 同时，该方法也存在明确的边界条件：对于使用固定长度运动表示的模型（如 MLD），CASIM 的改进有限，因为压缩后的运动编码本身已丢失时序细节，限制了动态对齐的作用空间。此外，在长序列生成中，短交叠过渡段可能出现局部不稳定性，提示需要在时序平滑与语义注入之间寻求更精细的平衡。
 
-
-
 文本到运动生成（Text-to-Motion Generation）旨在根据自然语言描述合成逼真的三维人体运动序列，在动画制作、虚拟现实和人机交互等领域具有广泛应用。近年来，扩散模型和自回归模型在该任务上取得了显著进展，代表性工作包括 **MDM**（Tevet et al., ICLR 2023）、**T2MGPT**（Zhang et al., CVPR 2023）、**MoMask**（Guo et al., 2023）和 **MLD**（Chen et al., CVPR 2023）等。然而，现有方法在语义理解层面存在一个共性瓶颈：**固定长度的全局语义注入无法捕捉人类运动的复合特性**。
 
 具体而言，当前主流方法大多依赖 CLIP 文本编码器的 `[CLS]` 嵌入作为全局条件信号。这种固定长度的向量表示将整个文本提示压缩为单一语义表征，不可避免地丢失了词元级别的细粒度信息。由此导致三个层面的问题：
@@ -68,8 +66,6 @@ CASIM 具有模型与表示无关的特性，可同时集成到自回归生成�
 3. **长文本与罕见描述的泛化困难**：当文本描述较长或包含罕见动作组合时，固定长度的全局嵌入面临更严重的信息压缩损失，模型生成的运动质量显著下降。
 
 CASIM 的核心洞察在于：**动态的、词元级的语义注入比固定长度的全局语义注入更优越**，因为它能够保留文本的组合结构和时序因果性，并允许模型学习文本-运动之间的软性、动态对应关系。这一设计理念从根本上改变了文本条件作用于运动生成的方式，为提升生成运动的可控性与文本-运动对齐度提供了新的技术路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -105,8 +101,6 @@ $$\hat{X^{0}} = \mathrm{MHCA}(X^{\tau}, C + TE(\tau))$$
 
 消融实验揭示了方法有效性的边界条件：对于使用固定长度潜向量的 MLD 模型，CASIM 的提升有限（FID 仅从 0.532 降至 0.502），因为其运动编码本身已压缩并丢失了时序细节。这表明 CASIM 的动态对齐机制**依赖于运动表示保持时序信息的能力**——这一发现为后续改进指明了方向。
 
-
-
 CASIM 的整体设计围绕一个核心观察展开：现有文本到运动生成方法普遍使用 CLIP 的固定长度 `[CLS]` 嵌入作为全局条件，这种压缩表示无法捕捉人类运动的复合特性——包括顺序动作、左右肢体差异以及文本词元与运动帧之间的细粒度对应关系。CASIM 将这一全局语义注入范式替换为**词元级的动态语义注入**，使每个运动帧可以自适应地关注所有文本词元，从而在生成过程中建立细粒度的语义控制。
 
 框架由两个核心模块串联构成（图 2）：
@@ -120,16 +114,6 @@ CASIM 的整体设计围绕一个核心观察展开：现有文本到运动生�
 3. **运动生成器（Motion Generator）**：底层运动生成模型，接收对齐器输出的文本-运动联合表示并生成最终运动序列。CASIM 被设计为模型无关和表示无关的插件，可集成到自回归式（如 T2MGPT、CoMo、MoMask）和扩散式（如 MDM、MotionDiffuse）等多种生成范式中，无需修改底层生成器的核心结构。
 
 整体数据流为：文本输入 → 组合感知文本编码器（词元级嵌入） → 文本-运动对齐器（动态注意力） → 运动生成器（运动序列输出）。这一流程将因果控制点从“全局条件注入”转移到“词元级动态对齐”，使模型能够根据文本的组合语义和时序结构，在不同生成阶段自适应地调整对各个词元的关注权重。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2502_02063/figures/002_Figure_2.jpg]]
-*Figure 2: CASIM consists of two major components: Composite Aware Text Encoder (Left) for extracting granular word-level embeddings and Text-Motion Aligner (Middle) for aligning motion embeddings with relevant textual embeddings inside a motion generator. The attention score distribution between different motion tokens and the text tokens is visualized on the upper left. The Text-Motion Aligner can be integrated with three genres of motion generation models (Right)*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2502_02063/figures/001_Figure_1.jpg]]
-*Figure 1: (Top) Fixed-length semantic injection, which primarily relied on the [CLS] token embedding from CLIP (Radford et al., 2021) to represent the entire text prompt, fails to capture the subtle differences in individual words. As a result, it generates highly similar motions from distinct text prompts. (Bottom) Our Composite aware semantic injection method allows each motion frame to dynamically attend to every word token (e.g., “left” or “right” hand), enhancing the motion-text correspondence*
-
-
 
 CASIM 由两个核心模块构成：**组合感知文本编码器**（Composite Aware Text Encoder）与**文本-运动对齐器**（Text-Motion Aligner），二者协同实现从固定长度全局语义注入到词元级动态对齐的范式转换。
 
@@ -168,8 +152,6 @@ $$X^{\tau-1} \sim \mathcal{N}(\mu_{\theta}(X^{\tau}, \tau, C), \Sigma(\tau))$$
 1. **文本编码器选择**：CLIP 提供视觉-语言对齐的先验，BERT 提供更强的双向上下文建模。CLIP 最终层嵌入虽能提升文本-运动对齐（R-Precision Top1 0.517 vs 0.478），但会牺牲运动质量（FID 0.410 vs 0.303，Table 8），表明深层语义特征可能过拟合于视觉判别任务，不利于运动生成。
 
 2. **运动表示要求**：CASIM 的有效性依赖于运动表示保留时序信息。对于使用固定长度潜向量的 MLD 模型，CASIM 提升有限（FID 0.532→0.502，Top1 R-Precision 0.469→0.452，Table 9），因为压缩后的运动编码已丢失帧级细节，限制了动态对齐的作用空间。
-
-
 
 ## 实验与关键发现
 
@@ -215,27 +197,11 @@ CASIM 的通用性体现在其对不同架构基线的适配能力。无论是�
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2502_02063/figures/014_Figure_5.jpg]]
 *Figure 5: Visualization of attention weights in CASIM-MDM. Top: Generated motion sequence for the prompt ”a person wave his arms and then sit down”. Bottom: Attention heatmaps for four attention heads and their average from the last layer*
 
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2502_02063/figures/009_Figure_4.jpg]]
-*Figure 4: Analysis of attention patterns in CASIM. Left: Word cloud showing top-5 attended words across all test prompts, highlighting focus on action verbs, motion modifiers, and spatial references. Right: Word cloud for prompts containing ‘walk’, revealing attention to motion-specific contextual attributes*
-
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2502_02063/figures/008_Table_5.jpg]]
 *Table 5: Additional quantiative results on HumanML3D with varying architectures and configuration settings*
 
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2502_02063/figures/011_Table_7.jpg]]
 *Table 7: Quantitative results with different text encoder for CASIM on HumanML3D dataset*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2502_02063/figures/012_Table_8.jpg]]
-*Table 8: Quantitative results with CLIP embeddings from different layers for CASIM on HumanML3D dataset*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2502_02063/figures/013_Table_9.jpg]]
-*Table 9: Quantitative results with MLD and CASIM-MLD on HumanML3D dataset*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2502_02063/figures/010_Table_6.jpg]]
-*Table 6: Results on the HumanML3D dataset for long-term motion generation*
-
-
 
 ## 定位与知识库关联
 
@@ -309,8 +275,6 @@ CASIM 在多个代表性基线上验证了通用性，基线覆盖了主流生�
 - **更强语言模型的潜力**：能否利用大语言模型作为文本编码器，进一步提升对复合语义及长描述的理解？当前仅探索了 CLIP 和 BERT。
 - **任务拓展**：CASIM 的动态对齐机制是否可以拓展到场景感知、多人交互等更复杂的运动生成任务？其“词元级动态条件注入”的范式可能具有更广泛的适用性。
 - **固定表示方法的适配**：对于 MLD 等固定长度运动表示的方法，如何改造运动编码器（如引入时序分解或层次化潜变量）以使 CASIM 也能充分发挥作用？这是一个值得探索的架构改进方向。
-
-
 
 ## 原文 PDF
 

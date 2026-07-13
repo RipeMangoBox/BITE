@@ -50,15 +50,11 @@ claims:
 
 该基准的核心洞见在于：海报设计是一种高度约束的视觉传播任务，仅靠通用视觉-语言能力远远不够，必须将评估分解为可独立量化的设计维度——OCR、字体感知、布局推理、风格理解与意图沟通——才能揭示不同模型的真实能力短板。实验表明，当前最强商用模型在高层设计语义上已展现出专项优势（如 GPT-5 在意图理解上得分 0.824，Gemini-2.5-Pro 在构图理解上得分 0.802），但整体评分与人类判断的余弦相似度最高仅 0.465，暴露了其作为自动评分器的敏感性严重不足。生成端的瓶颈更为突出：字体风格丰富度最高仅 0.391，远低于构图生成的 0.866，揭示出模型在微观排版控制上的系统性缺陷。这些发现共同指向一个结论——现有模型在海报设计各维度的整合上仍处于初期阶段，设计驱动的严格约束远未被满足。
 
-
-
 海报作为一种高度浓缩的视觉传播媒介，承载着信息传递、品牌塑造与审美表达的多重功能。从商业广告到文化活动，海报设计需要同时协调文字内容、排版层级、色彩风格与空间构图，使观众在极短时间内完成“注意—理解—记忆”的认知闭环。然而，这种跨模态、强约束的创作过程对自动化系统提出了严峻挑战：模型不仅需要准确识别图像中的文字，还必须理解字体选择背后的语义暗示、布局中的视觉层次，甚至解读隐喻性视觉修辞的传播意图。
 
 近年来，多模态大模型（MLLM）和文本到图像生成模型在通用视觉理解与生成任务上取得了显著进展，但在设计驱动的场景中仍暴露出系统性不足。现有基准测试大多聚焦于自然场景的OCR或通用图像描述，缺乏对**排版语义、视觉层次、显著性控制与意图沟通**等设计核心要素的细粒度评估。这导致两个关键问题悬而未决：其一，我们不清楚当前模型在设计认知的哪些维度存在短板；其二，缺乏可复现的指标来定量衡量模型的设计能力差距，使得针对性的改进方向难以明确。
 
 PosterIQ的提出正是为了填补这一空白。该基准将海报设计分解为一组可独立评估的设计维度——包括**OCR精度、字体感知、布局推理、风格理解与隐喻意图**——并引入细粒度、标准化的评估指标，旨在系统性地揭示不同MLLM与生成模型在设计驱动任务中的能力图谱。其核心洞察在于：海报设计远不止于美学层面的“好看”，而是一种高度约束的视觉传播任务，要求模型在文字识别、空间推理、语义耦合与创造性表达之间实现深度整合。当前模型在这些维度的整合上仍处于初期阶段，而PosterIQ正是为衡量这一整合水平提供了一把可量化的标尺。
-
-
 
 ## 核心方法与创新机理
 
@@ -67,8 +63,6 @@ PosterIQ 的核心创新在于将海报理解与生成从通用的视觉问答�
 在方法设计上，PosterIQ 引入了两个关键的 changed slots：**理解模块与生成模块的紧耦合设计**，以及**面向设计约束的细粒度指标族**。理解模块并非简单的 VQA 集合，而是从 Logo OCR 到传统字体效果识别、从文本定位到视觉隐喻理解，构建了一条从低层感知到高层语义的完整认知链。生成模块则对应地覆盖密集内容生成、字体风格生成、风格生成、构图生成和意图生成五个维度，直接检验文本到图像模型在真实设计约束下的合成能力。这种“理解评估→生成诊断”的闭环结构，使得基准不仅是一个静态的排行榜，更成为一个可迭代的诊断工具——例如，实验证实通过 VLM 驱动的迭代式提示优化，可以在不使用人工设计提示的情况下显著提升生成海报的质量，直接验证了理解能力对生成的促进作用。
 
 在评估机制上，PosterIQ 摒弃了单一的全局评分，转而采用任务特定的标准化得分族。例如，针对多项选择题的 K-Option Score 将随机猜测映射为 0，消除了选项数量带来的偏差；针对生成任务，采用 Point Score（关键点覆盖率）和 Richness（风格丰富度）等多维指标，分别捕捉内容的完整性与视觉的多样性。这种细粒度指标设计直接暴露了当前模型的系统性缺陷：商用模型在整体评分中与人类判断的余弦相似度最高仅 0.465，暴露出其作为自动评分器的敏感性严重不足；字体生成的最高风格丰富度仅 0.391，远低于构图生成最高 0.866 的分数，揭示出微观排版控制仍是所有生成任务中的核心瓶颈。
-
-
 
 PosterIQ 将海报设计拆解为**理解**与**生成**两大耦合模块，构成一个闭环评估体系。理解模块为生成提供诊断信号，生成模块则反向验证理解能力的实际效用。
 
@@ -83,15 +77,11 @@ PosterIQ 将海报设计拆解为**理解**与**生成**两大耦合模块，构
 
 模块间的因果链路体现在：VLM 驱动的迭代式提示优化可利用理解模块的反馈自动改进生成质量，无需人工设计提示——这一机制直接将理解能力转化为生成增益，证实了基准的闭环设计逻辑。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l772_https_arxiv_org_abs_2603_24078/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the benchmark, which includes over a dozen tasks*
 
 ![[assets/figures/papers/paper_list_l772_https_arxiv_org_abs_2603_24078/figures/011_Figure_5.jpg]]
 *Figure 5: Benchmark statistics for understanding tasks (top) and generation tasks (bottom)*
-
-
 
 PosterIQ 基准包含两大核心模块：**理解模块**与**生成模块**，辅以全局质量评分任务，构成对多模态大模型（MLLM）和文本到图像生成模型的系统性设计能力评估。
 
@@ -156,8 +146,6 @@ $$\mathrm{Point\ Score} = \frac{N_{\mathrm{Yes}}}{N_{\mathrm{Total}}}$$
 
 其中 $N_{\mathrm{Yes}}$ 为满足关键点覆盖要求的样本数，$N_{\mathrm{Total}}$ 为总样本数。
 
-
-
 ## 实验与关键发现
 
 ### 实验设置概览
@@ -216,36 +204,14 @@ Table 7汇总了各模型在理解任务上的平均得分（仅聚合与人类�
 
 需要指出的是，所测试的模型多为商业闭源系统，无法深入分析其内部推理机制，这限制了从基准结果直接导出可操作的架构改进方案。此外，数据集虽然覆盖了多种海报类型，但仍不能代表所有文化和设计风格，某些特定风格或隐喻类型的样本较少，相关结论的外推需要谨慎。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l772_https_arxiv_org_abs_2603_24078/figures/003_Table_2.jpg]]
 *Table 2: Comparison of Font tasks across models*
-
-![[assets/figures/papers/paper_list_l772_https_arxiv_org_abs_2603_24078/figures/004_Table_3.jpg]]
-*Table 3: Results of Understanding*
 
 ![[assets/figures/papers/paper_list_l772_https_arxiv_org_abs_2603_24078/figures/005_Table_4.jpg]]
 *Table 4: Comparison of layout reasoning tasks across models*
 
 ![[assets/figures/papers/paper_list_l772_https_arxiv_org_abs_2603_24078/figures/006_Table_5.jpg]]
 *Table 5: Comparison of Overall Rating*
-
-![[assets/figures/papers/paper_list_l772_https_arxiv_org_abs_2603_24078/figures/007_Table_6.jpg]]
-*Table 6: Performance of image generation models across five evaluation tasks. Point Score(P S), Score(S), Richness(R)*
-
-![[assets/figures/papers/paper_list_l772_https_arxiv_org_abs_2603_24078/figures/009_Figure_3.jpg]]
-*Figure 3: Qualitative comparison of four models on five generation tasks*
-
-![[assets/figures/papers/paper_list_l772_https_arxiv_org_abs_2603_24078/figures/010_Table_7.jpg]]
-*Table 7: Average scores across understanding tasks. The average is computed by aggregating only these positively correlated scores*
-
-![[assets/figures/papers/paper_list_l772_https_arxiv_org_abs_2603_24078/figures/053_Figure.jpg]]
-*Figure: Style Generation Results*
-
-![[assets/figures/papers/paper_list_l772_https_arxiv_org_abs_2603_24078/figures/054_Figure.jpg]]
-*Figure: Composition Generation Results*
-
-
 
 ## 定位与知识库关联
 
@@ -272,8 +238,6 @@ PosterIQ 的设计视角既是其优势，也划定了适用边界。其数据�
 3. **隐喻传达的量化**：在保持可复现评估的前提下，如何更精确地量化隐喻和视觉修辞的传达效果，是连接计算评估与设计传播学的核心难题。
 
 值得注意的是，PosterIQ 通过 VLM 驱动的迭代式提示优化，初步验证了“理解能力对生成具有直接促进作用”（Section 4.2, Fig. 4），这为未来将理解模块作为生成过程的在线反馈器提供了实证依据，但其泛化到更复杂设计场景的有效性仍需进一步检验。
-
-
 
 ## 原文 PDF
 

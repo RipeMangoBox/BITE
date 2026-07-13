@@ -68,8 +68,6 @@ claims:
 - 音频适配器依赖配对数据训练，对域外音频风格的泛化能力需进一步检验。
 - 实时部署中 18–30ms 的通信延迟可能制约极高动态动作的响应速度。
 
-
-
 ### 问题背景
 
 赋予人形机器人富有表现力的全身运动能力，使其能够像人类一样随音乐起舞或伴随语音做出自然手势，是具身智能领域的长期目标。这一能力不仅要求机器人产生物理上可行的动作，还要求动作在时间上与音频节拍精确对齐，在风格上与音频的情感或节奏特征保持一致。然而，现有方法在实现这一目标时面临根本性瓶颈。
@@ -91,8 +89,6 @@ claims:
 本文的动机源于一个关键观察：**运动可分解为内容与风格**。其中，“内容”指运动的高层语义描述（如“一个人正在跳舞”），而“风格”则由音频信号提供——音乐的节拍、旋律、能量，或语音的韵律、情感等特征。现有方法将音频视为运动生成的内容输入，试图从音频中重建完整运动；但更本质的视角是将音频作为风格信号，直接调制运动表达。
 
 基于这一洞察，RoboPerform 提出绕过显式运动生成和重定向步骤，将原始音频作为隐式风格控制信号，通过音频-运动对齐模块注入运动学先验，并直接条件化扩散策略生成机器人关节动作。这一范式转换从根本上消除了级联误差的积累路径，同时实现了低延迟、节奏对齐的即兴表演能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -139,8 +135,6 @@ T-SNE 可视化（Figure 4）显示，∆MoE 的各残差分量在特征空间�
 
 **创新总结**：RoboPerform 的三个 *changed slots* 并非孤立改进，而是形成了一条因果链——音频适配器将声学信号注入运动空间，内容-风格分解赋予扩散策略即兴泛化能力，∆MoE 教师则为学生策略提供高质量的特权监督。三者协同，使得人形机器人首次能够以低延迟、高节奏对齐的方式，对任意音频输入做出富有表现力的全身运动响应。
 
-
-
 RoboPerform 提出一种两阶段教师-学生框架，将原始音频作为**隐式风格信号**直接条件化运动生成，从而绕过传统管线中显式运动生成、重定向和跟踪的级联误差（Figure 2）。其核心架构包含三个关键组件：**∆MoE 教师策略**、**音频-运动对齐模块**和**扩散学生策略**。
 
 ![[assets/figures/papers/paper_list_l1058_https_arxiv_org_abs_2512_23650/figures/002_Figure_2.jpg]]
@@ -182,8 +176,6 @@ $$\mathbf{a} = w_1 \mathbf{a}_1 + \sum_{i=2}^{4} w_i (\mathbf{a}_i - \mathbf{a}_
 
 该框架在 Unitree G1 人形机器人上实现，推理延迟为 18-30ms，支持音乐到舞蹈和语音到手势两种任务的统一控制。
 
-
-
 RoboPerform 的整体架构围绕“运动 = 内容 + 风格”这一核心洞察构建，通过教师-学生两阶段框架实现从原始音频到人形机器人关节动作的直接映射。其关键模块包括 ∆MoE 教师策略、音频-运动适配器以及扩散学生策略。
 
 ### ∆MoE 教师策略
@@ -215,16 +207,6 @@ $$\mathcal{L}_{\mathrm{InfoNCE}} = -\frac{1}{N} \sum_{i=1}^{N} \log \frac{\exp(\
 $$\mathbf{o}_i = \mathrm{Layer}_i(\mathbf{o}_{i-1}, l_{\mathrm{motion}}) + \alpha l_{\mathrm{audio}}$$
 
 其中 $\mathbf{o}_i$ 为扩散骨干网络第 $i$ 层的输出，$\mathrm{Layer}_i$ 为以运动内容为条件的变换层，$\alpha$ 为风格注入强度系数。该设计使得同一内容潜在变量在不同音频信号的调制下可生成节奏、节拍各异的动作序列，实现“即兴风格”能力。学生策略使用 DAgger 进行蒸馏训练，推理时采用 DDIM 确定性采样以在速度和成功率间取得最优平衡。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1058_https_arxiv_org_abs_2512_23650/figures/003_Figure_3.jpg]]
-*Figure 3: Overview of ∆MoE*
-
-![[assets/figures/papers/paper_list_l1058_https_arxiv_org_abs_2512_23650/figures/004_Figure_4.jpg]]
-*Figure 4: T-SNE visualization results of each component for ∆MoE and vanilla MoE*
-
-
 
 ## 实验与关键发现
 
@@ -271,12 +253,6 @@ Table 5 和 Table 11 共同验证了音频适配器的关键作用。移除适�
 
 Table 14 对比了不同采样策略：DDIM 确定性采样在推理速度与成功率之间达到最佳平衡。Table 15 表明 x₀-prediction 目标比 ε-prediction 在跟踪任务中表现更好。Table 12 显示推理时间随 DDIM 采样步数线性增长，为实时部署提供了延迟参考。Table 16 和 Table 17 分别验证了专家数量（最优为 4）和条件空间划分方式对性能的影响可忽略，表明 ∆MoE 设计具有较好的鲁棒性。
 
-![[assets/figures/papers/paper_list_l1058_https_arxiv_org_abs_2512_23650/figures/020_Table_14.jpg]]
-*Table 14: Fine-grained ablation on sampling strategies in the FineDance dataset*
-
-![[assets/figures/papers/paper_list_l1058_https_arxiv_org_abs_2512_23650/figures/023_Table_15.jpg]]
-*Table 15: Tracking performance across optimization objectives in the FineDance dataset*
-
 ### 定性结果与即兴能力
 
 Figure 6 展示了 IsaacGym 和 MuJoCo 中的定性跟踪结果，RoboPerform 生成的舞蹈和手势动作与音频节拍高度对齐。Figure 7 对比了扩散策略与 MLP 策略在相同运动参考下的跟踪表现，以及面对未见音乐时的即兴能力：扩散策略展现出更强的节奏适应性和动作多样性，而 MLP 策略倾向于生成机械重复的动作模式。Figure 8 对比了 PHC 与 GMR 重定向方法的质量差异，进一步说明绕过显式重定向步骤的必要性。
@@ -284,19 +260,9 @@ Figure 6 展示了 IsaacGym 和 MuJoCo 中的定性跟踪结果，RoboPerform �
 ![[assets/figures/papers/paper_list_l1058_https_arxiv_org_abs_2512_23650/figures/024_Figure_7.jpg]]
 *Figure 7: Qualitative results in the MuJoCo. The upper half presents the tracking performance of the MLP policy and the diffusion policy on the same motion; the lower half demonstrates their respective freestyle capabilities when confronted with unseen music*
 
-![[assets/figures/papers/paper_list_l1058_https_arxiv_org_abs_2512_23650/figures/008_Figure_6.jpg]]
-*Figure 6: Qualitative results in the IsaacGym and MuJoCo. The upper half presents the tracking performance of music-to-locomotion, and the lower half presents that of speech-to-locomotion*
-
 ### 失败模式与局限
 
 FineDance MuJoCo 环境下 0.67 的成功率表明，语音驱动手势在更高物理保真度仿真中仍存在显著的 sim-to-real 差距。当前验证仅限于 Unitree G1 平台，框架在其他形态机器人上的迁移能力未知。音频适配器依赖配对数据训练，对域外音频风格（如未见音乐流派或语言）的泛化能力缺乏系统评估。实时部署中 18-30ms 的通信延迟可能制约极高动态动作（如快速连续节拍变化）的响应精度。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1058_https_arxiv_org_abs_2512_23650/figures/006_Table_1.jpg]]
-*Table 1: Audio-motion alignment performance on the BEAT2 and FineDance test sets*
-
-
 
 ## 定位与知识库关联
 
@@ -335,8 +301,6 @@ RoboPerform 的 ∆MoE（残差混合专家）教师策略可视为 **Classifier
 - **多机器人协同与全身操作**：内容-风格分解范式能否推广到多机器人协同舞蹈或更复杂的全身操作任务？在这些场景中，“内容”的定义可能超出单一文本描述，需要更结构化的任务表示。
 
 - **无需配对数据的对齐**：音频适配器依赖配对数据训练，能否通过自监督或跨模态循环一致性的方式，实现无需配对的音频-运动对齐？这将显著降低数据采集成本并提升域外泛化能力。
-
-
 
 ## 原文 PDF
 

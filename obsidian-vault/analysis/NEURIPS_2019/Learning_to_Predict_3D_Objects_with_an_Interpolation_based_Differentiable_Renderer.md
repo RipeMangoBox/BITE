@@ -51,8 +51,6 @@ claims:
 
 在方法谱系中，DIB-R 相对于 **N3MR**（Kato et al., CVPR 2018）的近似梯度和 **SoftRas-Mesh**（Liu et al., arXiv 2019）的软分配方案，实现了从“部分可微”到“全属性解析可微”的跨越。实验表明：在 ShapeNet 单图像三维重建任务上，DIB-R 的 3D IOU 和 F-score 均显著优于上述基线；在纹理与光照联合预测中，纹理 L-1 损失降低约 40%，光照方向角度误差降低约 60%（Table 2）；在 CUB 鸟类数据集上，关键点预测准确率达 0.972，明显超越 **CMR**（Kanazawa et al., ECCV 2018）的 0.930（Table 3），验证了更优的形状重建能力。
 
-
-
 从二维图像中恢复三维世界的几何、纹理与光照，是计算机视觉与图形学长期追求的核心目标。近年来，深度生成模型在二维图像合成上取得了惊人进展，但将其扩展至三维领域仍面临根本性障碍：**三维表示与二维监督之间的不可微桥梁**。
 
 传统渲染管线中的光栅化步骤是一个离散操作——每个像素的颜色由覆盖该像素的唯一天顶面决定。这一“硬分配”本质上是不可微的，切断了从二维图像损失到三维顶点属性的梯度回传路径。这迫使研究者要么依赖**近似梯度**（如OpenDR、N3MR），要么对像素-面分配进行**软松弛**（如SoftRas-Mesh）。然而，这些折中方案带来了深层困境。
@@ -72,8 +70,6 @@ claims:
 具体而言，对于被某个面覆盖的前景像素，其值天然是该面顶点属性的重心坐标加权插值——这一插值本身就是可微的。对于未被任何面覆盖的背景像素，可以基于像素到各面的距离定义软分配概率，使背景像素也能反向传播梯度至所有面。通过将前景与背景的光栅化分别建模为**局部插值**与**全局概率聚合**，整个光栅化过程变为完全可微，且天然支持所有顶点属性（位置、颜色、法线、纹理坐标）的梯度计算。
 
 基于这一洞察，本文提出**DIB-R（Differentiable Interpolation-based Renderer）**，一个统一的、支持多种标准光照模型的可微渲染框架。DIB-R使得仅从二维图像监督出发，端到端地学习三维形状、纹理与光照成为可能，无需三维真值、多视图监督或特定类别的先验知识。
-
-
 
 ## 核心方法与创新机理
 
@@ -118,8 +114,6 @@ $$I = I_l I_c + I_s$$
 
 这些机制共同构成了DIB-R的因果杠杆：通过将离散光栅化转化为连续可微操作，使得仅凭二维图像监督即可端到端地学习高质量的三维形状、纹理与光照，而无需三维真值或预训练模型。
 
-
-
 DIB-R的整体框架围绕“可微渲染作为2D监督桥梁”这一核心思想构建，将三维预测问题转化为端到端的二维图像重建任务。系统由三个级联模块组成：**顶点着色器（Vertex Shader）**、**DIB光栅化着色器（DIB Rasterization Shader）** 和 **片段着色器（Fragment Shader）**，它们共同构成完整的可微渲染管线。
 
 ### 输入与预测流程
@@ -146,12 +140,8 @@ $$L_1 = L_{IOU} + \lambda_{col} L_{col} + \lambda_{sm} L_{sm} + \lambda_{lap} L_
 
 其中 $L_{IOU}$ 为轮廓交并比损失，$L_{col}$ 为颜色L-1损失，$L_{sm}$ 和 $L_{lap}$ 分别为平滑度和拉普拉斯正则项，用于稳定训练和防止过拟合。此外，系统采用多视角损失策略——不仅使用真实相机视角进行监督，还从随机第二视角渲染并与该视角的真值渲染进行比较，确保网络不会仅关注已知视角下的网格属性。在纹理与光照预测任务中，还可引入对抗损失以提升纹理细节的视觉质量。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l47_https_arxiv_org_abs_1908_01210/figures/003_Figure_3.jpg]]
 *Figure 3: Full architecture of our approach. Given an input image, we predict geometry, texture and lighting. During training we render the prediction with a known camera. We use 2D image loss between input image and rendered prediction to to train our prediction networks. Note that the prediction can vary in different rendering models, e.g. texture can be vertex color or a texture map while the lighting can be Lambertian, Phong or Spherical Harmonics*
-
-
 
 ### 3.1 渲染管线概览
 
@@ -229,8 +219,6 @@ $$L_1 = L_{\text{IOU}} + \lambda_{\text{col}} L_{\text{col}} + \lambda_{\text{sm
 
 DIB‑R 通过优化实验验证了其对各类顶点属性和光照模型的可微性（Figure 2）。实验以 L‑1 损失为目标，分别优化顶点位置与颜色（顶点颜色渲染模型）、纹理与纹理坐标（纹理渲染模型）、顶点与相机位置（Lambertian 模型）、光照系数（Spherical Harmonics 模型）以及材质参数（Phong 模型）。所有实验均能稳定收敛至目标图像，证明解析梯度在整个渲染管线中正确反向传播。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能验证
@@ -285,12 +273,8 @@ Figure 2通过一系列优化实验系统验证了DIB-R的可微性。在顶点�
 
 作为应用延伸，DIB-R被集成到3D GAN框架中，通过W-GAN with gradient penalty训练生成器从随机隐码生成3D汽车网格。Figure 11展示了隐空间插值生成的渲染结果，不同视角下的物体形状和纹理平滑过渡，表明学到的隐空间具有良好的连续性和语义一致性。然而，该GAN目前仅限于单个类别（汽车），且训练依赖预测纹理作为“伪真值”来训练纹理判别器，可能引入系统性偏差。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l47_https_arxiv_org_abs_1908_01210/figures/006_Table.jpg]]
 *Table: 3http://www.patrickmin.com/binvox/*
-
-
 
 ## 定位与知识库关联
 
@@ -335,8 +319,6 @@ DIB-R 的适用边界由以下几个维度定义：
 3. **真实场景的鲁棒性提升**：如何将 DIB-R 应用于具有复杂背景和多物体遮挡的真实世界图像，需要同时解决分割精度、深度歧义和光照估计等多个耦合问题。
 
 4. **多类别泛化与生成建模**：当前的 3D GAN 实验局限于单类别，探索多类别或类别无关的 3D 生成模型，以及如何利用 DIB-R 的可微性进行 3D 表示学习，是有前景的研究方向。
-
-
 
 ## 原文 PDF
 

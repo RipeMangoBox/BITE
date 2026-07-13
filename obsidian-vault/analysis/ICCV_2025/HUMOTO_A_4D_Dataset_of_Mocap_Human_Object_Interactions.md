@@ -236,8 +236,6 @@ $$ \mathrm{Consistency} = \frac{1}{N_p} \sum_{p=1}^{N_p} \frac{ \mathrm{Avg.\ Ru
 
 其中，$N_p$ 为序列总数，$\mathrm{Avg.\ Run\ Length}_p$ 为第 $p$ 个序列中交互状态的平均持续帧数。该指标归一化后，值越接近1表示状态越稳定。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1768_HUMOTO_A_4D_Dataset_of_Mocap_Human_Object_Interactions/figures/002_Figure_3.jpg]]
 *Figure 3: Capture environment. Left: Overview of our capturing environment showing two Kinect cameras, stage, lighting, calibration board, and interaction objects. Right: Calibration procedure with the performer in a standardized position, enabling precise alignment between mocap suit data and camera coordinates*
 
@@ -289,8 +287,6 @@ HUMOTO在多个物理真实性指标上全面超越现有HOI数据集。**Table 
 2. **手动清理成本**：两步质量保证流程虽然保证了数据质量，但需要专业艺术家的大量投入。这一资源瓶颈限制了数据集的快速扩展能力。开发更鲁棒的自动化清理技术——特别是针对足部滑动和物体穿透的自动检测与修正——是降低构建成本的关键方向。
 
 3. **OMOMO异常现象的启示**：定量评估中发现OMOMO数据集呈现高SNR同时高Jerk的现象，即信号干净但加速度变化剧烈。这一矛盾提示现有指标可能无法完全捕捉运动自然性的所有维度，未来需要开发更综合的感知对齐评估框架。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l1768_HUMOTO_A_4D_Dataset_of_Mocap_Human_Object_Interactions/figures/007_Figure_6.jpg]]
 *Figure 6: Quality comparison. We compare different datasets on motion dynamics, hand pose accuracy, and object meshes*

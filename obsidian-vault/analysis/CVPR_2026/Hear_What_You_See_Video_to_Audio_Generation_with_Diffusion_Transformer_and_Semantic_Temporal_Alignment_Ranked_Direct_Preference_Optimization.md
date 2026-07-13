@@ -165,8 +165,6 @@ $$L_{\mathrm{final}} = -\mathbb{E} \log \sigma \Bigg( -\beta \Big[ \big( L_{w} -
 - **偏好优化**：STAR-DPO 利用自动排序的偏好数据进一步精细化模型
 - **输出**：与视频语义一致且时序同步的音频波形
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2683_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Hear_What_You_See/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison with other V2A models*
 
@@ -268,8 +266,6 @@ VisioSonic在VGGSound测试集上进行了全面的定量评估，与多个最�
 3. **长视频与复杂场景未验证**：用户研究规模有限，且所有测试样本均为10秒短视频。模型在长视频、多事件交替、背景噪声复杂等场景下的音视频同步稳定性尚未得到验证，这是实际部署前需要进一步评估的关键问题。
 
 4. **计算资源与部署权衡**：尽管VisioSonic-Base的可训练参数量最少（151M），但高帧率视觉条件（24fps Synchformer嵌入）和STAR-DPO的候选生成-排序流程增加了推理成本。在资源受限设备上的部署需要额外的工程优化。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2683_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Hear_What_You_See/figures/003_Table_1.jpg]]
 *Table 1: Comparison results with existing SOTA video-to-audio models on VGGSound [3] test set. The best results are marked with bold, and the second ones are marked with underline*

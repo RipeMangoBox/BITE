@@ -51,8 +51,6 @@ claims:
 
 实验表明，Zero-to-Hero 在 GSO 和 RTMV 数据集上一致超越基线 Zero-1-to-3 与 Zero123-XL：在 GSO 挑战子集上，PSNR 从 17.72 提升至 18.35，LPIPS 从 0.163 降至 0.153，IoU 从 76.4% 提升至 78.3%。消融研究验证了沙漏调度、重采样、注意力图过滤与互自注意力四个模块的独立贡献。此外，注意力图过滤在 ControlNet 和 MVDream 等其他生成模型上同样能减轻伪影、增强条件遵循度，展现出良好的泛化性。该方法以约 66 次函数评估的推理开销，在保持时间竞争力的同时，向理想注意力图（oracle）的性能迈出了实质一步。
 
-
-
 ### 零样本新视角合成的兴起与瓶颈
 
 从单张二维图像生成任意视角下的三维一致视图，是计算机视觉与图形学中长期存在的核心挑战。传统方法依赖多视图立体重建或神经辐射场（NeRF），通常需要密集的多视角输入或针对每个场景进行耗时的优化。近年来，大规模预训练扩散模型的出现，催生了以 **Zero-1-to-3**（Liu et al., arXiv 2023）为代表的零样本新视角合成范式——仅凭一张源图像和一个目标相机姿态，即可在推理时直接生成对应视角的视图，无需针对特定场景进行微调。
@@ -80,8 +78,6 @@ Zero-to-Hero 通过一个简洁的验证实验确立了自注意力图的因果�
 ### 现有方法的缺口
 
 现有改进零样本新视角合成的尝试大致分为两类：一类通过扩大训练数据或模型规模来提升泛化能力（如 Zero123-XL），但数据量的增加并不能从根本上解决注意力图的随机性问题；另一类引入测试时优化（如 per-step resampling 作为校正机制），但缺乏对注意力图本身的系统性处理。Zero-to-Hero 填补了这一空白：它首次将注意力图可靠性作为核心优化目标，提出了一套即插即用的测试时增强方法。
-
-
 
 ## 核心方法与创新机理
 
@@ -128,8 +124,6 @@ $$\widetilde{M}_{t-1} = \alpha M_t + (1-\alpha) \widetilde{M}_{t-1}, \quad \alph
 
 值得强调的是，注意力图过滤作为一项通用的推理时增强技术，其有效性并不局限于 Zero-1-to-3 架构。实验表明（Figure 7, Figure 14, Figure 15），将 AMF 应用于 **ControlNet** 和 **MVDream** 等其他生成模型时，同样能够减轻伪影、增强条件遵循度。这说明该方法触及了扩散模型注意力机制的一个共性弱点，具有跨架构的迁移潜力。
 
-
-
 Zero-to-Hero 是一个在推理阶段即插即用的增强框架，无需额外训练即可提升预训练扩散新视角合成模型的生成质量。其核心思想源于一个关键发现：在 Zero-1-to-3（Liu et al., arXiv 2023）这类模型中，**交叉注意力已退化为全局偏置**（后 softmax 注意力图为常数全 1 矩阵，见 Figure 3），因此视图生成的结构与几何信息几乎完全依赖自注意力层。然而，扩散去噪过程中的随机性会污染自注意力图，导致生成视图与输入不一致，产生几何与外观伪影。
 
 框架将扩散去噪过程类比为 SGD 优化——自注意力图类比为“参数”，每次去噪步类比为一次梯度更新。借鉴梯度聚合与权值平均技术，Zero-to-Hero 通过三个相互协作的模块系统性地提升自注意力图的可靠性，从而改善生成质量。
@@ -159,13 +153,6 @@ Zero-to-Hero 是一个在推理阶段即插即用的增强框架，无需额外�
 ### 计算开销与公平性
 
 框架引入的额外推理时间约为 0.5-1.5 秒。公平性通过控制总函数评估次数（NFE）来保证：Zero-to-Hero 的 66 NFE 与基线 25 步（25 NFE）按生成效果相近的步数进行对比，所有定性比较使用相同随机种子初始化。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2405_18677/figures/001_Figure_1.jpg]]
-*Figure 1: Novel views generated from a single source image (far left column) at a specific target view angle (with different seeds), compared between Zero123-XL [27] and our Zero-to-Hero method. Operating during inference, our method achieves significantly higher fidelity and maintains authenticity to the original image, all while ensuring realistic variation in the results (e.g. variations in chair backs in the top row). The ground-truth target view is displayed in the far right column*
-
-
 
 ### 问题诊断：注意力层的退化与关键性
 
@@ -210,8 +197,6 @@ $$\widetilde{M}_{t-1} = \alpha M_t + (1-\alpha) \widetilde{M}_{t-1}, \quad \alph
 ### 模块四：Hourglass 采样调度
 
 将去噪过程划分为三个阶段，在首尾阶段以密度因子 $\lambda_{\text{den}}$ 进行更高密度的 DDIM 采样（总计 26 步）。早期密集采样有助于快速建立合理结构，末期密集采样则提升细节精度；中间阶段可稀疏采样以节省计算。Table 6/Table 8 显示，Hourglass 调度仅用 26 步即可超越均匀 DDIM 采样的 25、50、100 步性能，在减少采样步数的同时轻微提升指标。
-
-
 
 ## 实验与关键发现
 
@@ -276,16 +261,8 @@ RTMV 数据集上的结果（**Table 3**）呈现相同趋势，Zero-to-Hero 在
 2. **严重条件偏差的改善有限**：方法基于固定的预训练模型权重，当基线模型本身无法正确理解极端姿态条件时，注意力图过滤难以从根本上纠正条件遵循错误。
 3. **场景泛化边界**：当前评估主要限于 GSO、RTMV 等前景分割清晰的数据集，在复杂背景或非物体中心场景上的表现尚待验证。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2405_18677/figures/008_Table_1.jpg]]
-*Table 1: Quantitative evaluation on a challenging GSO subset. Zero-to-Hero consistently improves performance upon baselines, taking a significant step towards oracle map performance (bottom rows)*
-
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2405_18677/figures/009_Table_2.jpg]]
 *Table 2: Ablation Study. We demonstrate the importance of each of Zero-to-Hero modules, applied to the base method Zero123-XL: Sample scheduling (Hourglass), Resampling (Resample), Attention map filtering (AMF), and Early-Stage Mutual Self-Attention (MSA). Consistent conclusions are reached with the base model Zero-1-to-3 and are shown in Sec. 8.6 of the appendix*
-
-![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2405_18677/figures/017_Table_4.jpg]]
-*Table 4: Runtime analysis of the computational overhead of Zero-to-Hero*
 
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2405_18677/figures/019_Table_6.jpg]]
 *Table 6: Ablation study: Hourglass scheduling — Zero123-XL. We demonstrate the superiority of our Hourglass scheduling over uniform DDIM sampling with different number of denoising steps. The experiments are based on Zero123-XL*
@@ -295,14 +272,6 @@ RTMV 数据集上的结果（**Table 3**）呈现相同趋势，Zero-to-Hero 在
 
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2405_18677/figures/021_Table_8.jpg]]
 *Table 8: Ablation study: Hourglass scheduling — Zero-1-to-3. We demonstrate the superiority of our Hourglass scheduling over uniform DDIM sampling with different number of denoising steps. The experiments are based on Zero-1-to-3*
-
-![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2405_18677/figures/022_Table_9.jpg]]
-*Table 9: Ablation study: Attention map filtering — Zero-1-to-3. We demonstrate the importance of Attention Map Filtering over only applying Resampling (Resample). The experiments are based on Zero-1-to-3*
-
-![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2405_18677/figures/023_Table_10.jpg]]
-*Table 10: Ablation study: Attention map filtering — Zero-1-to-3. We demonstrate the importance of Attention Map Filtering over only applying Resampling (Resample). The experiments are based on Zero-1-to-3*
-
-
 
 ## 定位与知识库关联
 
@@ -361,8 +330,6 @@ Zero-to-Hero 属于**第一类路线的推理时增强方法**，与以下工作
 - 注意力图过滤策略能否**融入训练过程**（如作为正则化项），从而在测试时免除重采样的计算开销？
 - 该方法在**视频生成、文本到图像生成**等更广泛的扩散模型任务中的有效性如何？AMF 在 ControlNet 上的初步结果暗示了潜力，但缺乏系统性的定量评估。
 - 当前方法完全依赖自注意力图的稳健化，但交叉注意力的退化问题（全 1 矩阵）并未被直接修复。能否通过**重新设计交叉注意力机制**（如多向量条件嵌入）来恢复姿态条件的精确引导，而非仅依赖自注意力来弥补？
-
-
 
 ## 原文 PDF
 

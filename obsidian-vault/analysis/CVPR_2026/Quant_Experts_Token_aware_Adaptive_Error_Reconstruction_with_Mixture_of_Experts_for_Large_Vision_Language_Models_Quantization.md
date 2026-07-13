@@ -50,8 +50,6 @@ claims:
 
 在 **Qwen2VL** 和 **InternVL2** 系列模型（2B–72B 参数规模）上的广泛实验表明，QE 在多种量化设置下一致性地超越现有静态和模态感知方法。在极具挑战性的 W4A6 量化下，Qwen2VL-2B 的平均准确率达到 **58.74**，比最强基线 MBQ 的 54.73 提升 **4.01 个百分点**；在 72B 大模型上，QE 的准确率提升高达 **5.09%**，几乎匹配全精度性能。消融实验进一步验证了共享专家与路由专家的互补必要性、自适应路由机制的有效性，以及共现聚类对专家划分的关键贡献。
 
-
-
 大型视觉-语言模型（LVLMs）在跨模态理解与生成任务上展现了卓越能力，但其庞大的参数量和计算开销严重制约了实际部署。后训练量化（Post-Training Quantization, PTQ）通过将浮点权重和激活压缩为低比特整数表示，成为降低推理成本的主流技术路线。然而，当量化比特数降至4-bit权重与6-bit激活（W4A6）乃至更低时，模型性能会出现显著退化，其核心瓶颈在于**量化误差的补偿机制**。
 
 现有的先进PTQ方法，如**SmoothQuant**（Xiao et al., ICML 2023）、**AWQ**（Lin et al., MLSys 2024）和**LQER**（Zhang et al., ICML 2024），均遵循“识别重要通道—补偿量化误差”的两阶段范式。它们通过在校准数据上静态分析权重矩阵的通道重要性，识别出对模型输出影响最大的“重要通道”（important channels），随后采用通道级缩放或低秩适配器进行全局误差补偿。**MBQ**（Li et al., CVPR 2025）进一步引入了模态感知的缩放策略，针对视觉和语言输入的不同敏感性分别处理。
@@ -61,8 +59,6 @@ claims:
 这一观测直接指向现有方法的**核心缺陷**：单一全局补偿策略无法建模量化误差在token维度的精细结构。当token相关通道在特定输入下被激活时，全局低秩适配器缺乏足够的表达能力来同时覆盖所有局部误差模式；而若简单增加适配器秩，又会引入冗余参数和过拟合风险。
 
 针对上述瓶颈，本文提出**Quant Experts（QE）**，一种token感知的自适应量化误差重建框架。QE的核心思想是将重要通道按出现频率划分为token无关与token相关两组，并引入混合专家（Mixture of Experts, MoE）架构分别处理：**共享专家（Shared Expert）** 负责补偿全局、跨token一致的量化误差；**多个路由专家（Routed Experts）** 各自专精于一组共现模式相似的token相关通道，由轻量路由器根据输入token动态选择最优专家进行局部补偿。这一设计首次在LVLM量化中实现了从“静态全局补偿”到“动态token级自适应补偿”的范式转变。
-
-
 
 ## 核心方法与创新机理
 
@@ -107,8 +103,6 @@ $$i^* = \arg\min_i (\mathbf{R}^l |x^l|)_i$$
 
 QE 的四项核心创新——动静分离的通道分组、共享-路由双轨 MoE、共现聚类驱动的专家分配、以及自适应路由选择——形成了一个完整的因果链条：**因为**重要通道的出现频率在 token 间分布不均，**所以**需要将通道划分为 token 无关和 token 相关两组；**因为**两类通道的误差特性不同，**所以**需要共享专家与路由专家分别处理；**因为** token 相关通道具有共现模式，**所以**需要基于共现聚类分配专家；**因为**不同 token 的误差模式各异，**所以**需要路由器进行自适应选择。这一链条最终在多个模型系列和量化设置下转化为一致性的性能增益。
 
-
-
 Quant Experts (QE) 的整体设计围绕一个核心观察展开：在大视觉-语言模型（VLM）的线性层中，对量化误差贡献最大的“重要通道”并非均匀分布——少数通道在绝大多数 token 中一致出现（token 无关），而多数通道仅在特定 token 中偶发出现（token 相关）。基于这一发现，QE 构建了一个**混合专家（Mixture of Experts, MoE）**式的自适应误差补偿框架，将量化误差重建任务分解为全局补偿与局部动态补偿两部分。
 
 ### 框架总览
@@ -141,12 +135,8 @@ $$\arg\min_{\tilde{\mathbf{E}}^l} \| (\mathbf{E}^l - (\tilde{\mathbf{E}}_S^l + \
 
 QE 引入的额外计算和存储开销主要来自低秩适配器和路由器。Table 7 提供了线性层的复杂度分析，表明 QE 在保持推理加速的同时，以可控的额外参数实现了 token 感知的自适应补偿。在 NPU 上的实测加速比如 Table 8 所示，QE 量化的 Qwen2VL-7B 线性层在 prefill 阶段（序列长度 128）相对于 FP16 模型取得了显著加速。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2241_https_arxiv_org_abs_2602_24059/figures/004_Figure_4.jpg]]
 *Figure 4: The framework of Quant Experts (QE). The token-independent channels are model by a shared expert, while token-dependent channels are captured by multiple routed experts. A lightweight low-rank adapter is implemented for each expert*
-
-
 
 ### 3.1 通道重要性建模与分区
 
@@ -223,16 +213,6 @@ $$\mathbf{S}_{i,j} = \frac{\log \frac{p(i,j)}{p(i)p(j)}}{-\log p(i,j)}$$
 
 **推理流程**（Figure 5）：共享专家提供恒定的全局补偿；路由器根据当前 token 从 $N_r$ 个路由专家中动态选择最优者，实现 token 感知的自适应局部补偿。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2241_https_arxiv_org_abs_2602_24059/figures/005_Figure_5.jpg]]
-*Figure 5: Illustration of the Inference Computation Process of QE*
-
-![[assets/figures/papers/paper_list_l2241_https_arxiv_org_abs_2602_24059/figures/011_Figure_6.jpg]]
-*Figure 6: Illustration of the Co-Occurrence-Based Clustering in a Transformer Block of Qwen2VL-2B. (a) Similarity matrix*
-
-
-
 ## 实验与关键发现
 
 ### 主要结果
@@ -264,29 +244,15 @@ QE 在多个模型系列、多种量化设置下一致性地超越现有静态�
 ![[assets/figures/papers/paper_list_l2241_https_arxiv_org_abs_2602_24059/figures/016_Table_6.jpg]]
 *Table 6: Impact of the number of routed experts on the performance of Qwen2VL-2B under the W4A6 quantization setting*
 
-![[assets/figures/papers/paper_list_l2241_https_arxiv_org_abs_2602_24059/figures/021_Table_13.jpg]]
-*Table 13: Impact of the number of important channels on the performance of Qwen2VL-2B under the W4A6 quantization setting*
-
 可选的细化训练阶段能进一步释放 QE 的潜力（Table 5）。在 Qwen2VL-2B W4A6 设置下，仅更新路由专家和路由器参数，MMMU 基准从 33.78 提高至 36.89，其他基准亦有不同程度提升。该细化采用层式训练，仅使用回归损失和 KL 散度分类损失，计算开销极低。
-
-![[assets/figures/papers/paper_list_l2241_https_arxiv_org_abs_2602_24059/figures/013_Table_5.jpg]]
-*Table 5: Ablation study of Refinement on Routed Experts*
 
 ### 效率分析
 
 QE 引入的额外计算和存储开销是可控的。复杂度分析（Table 7）表明，路由专家的低秩适配器仅引入与秩 $r$ 成线性关系的额外参数和计算量。在 NPU 上的实测加速比（Table 8）显示，Qwen2VL-7B 线性层在 prefill 阶段（序列长度 $s=128$）相比 FP16 模型可实现显著加速，加速比随输入/输出通道维度变化，验证了量化方法在实际硬件上的部署效益。
 
-![[assets/figures/papers/paper_list_l2241_https_arxiv_org_abs_2602_24059/figures/014_Table_7.jpg]]
-*Table 7: Complexity analysis of the linear layer in QE method*
-
-![[assets/figures/papers/paper_list_l2241_https_arxiv_org_abs_2602_24059/figures/015_Table_8.jpg]]
-*Table 8: NPU speedup ratios of QE for Qwen2VL-7B linear layers compared with the fp16 model, measured during the prefill stage with a sequence length of s=128. “IC” and “OC” denote the input and output channel dimensions, respectively*
-
 ### 局限与失败模式
 
 尽管 QE 在多个基准上表现优异，但仍存在若干局限。首先，通道重要性划分依赖于校准数据集，不同数据集可能导致不同的通道分组，进而影响最终性能。其次，在极端低比特设置（如 3-bit 权重加低比特激活）下，QE 与全精度之间仍存在不可忽视的差距。此外，路由机制引入的动态选择对批处理效率的影响在资源极度受限的边缘设备上可能需要进一步优化。当前实验仅覆盖 Qwen2VL 和 InternVL2 两种 VLM 架构，对其他流行模型（如 LLaVA、BLIP）的泛化性有待验证。方法主要针对线性层的权重量化设计，尚未扩展到注意力计算和 KV 缓存等其他模块。
-
-
 
 ## 定位与知识库关联
 
@@ -323,8 +289,6 @@ QE 的当前设计存在以下明确边界：
 **跨模态与跨任务泛化**：QE 的 token 感知自适应补偿框架的核心思想——识别并分别处理全局一致和局部变化的误差模式——在理论上具有通用性。该方法能否推广到纯语言模型（如 LLaMA 系列）的量化、单模态视觉模型（如 ViT）的量化，甚至语音-语言多模态模型，是一个值得探索的方向。此外，在更大规模模型（>100B）上，通道重要性的分布模式是否遵循类似的规律，也需要进一步验证。
 
 **与其他压缩技术的协同**：QE 的低秩适配器结构天然适合与混合精度量化、结构化稀疏剪枝等技术结合。例如，是否可以对不同专家分配不同的量化比特宽度，或对路由专家进行结构化剪枝以进一步减少参数，这些协同优化方向可能带来额外的效率增益。
-
-
 
 ## 原文 PDF
 

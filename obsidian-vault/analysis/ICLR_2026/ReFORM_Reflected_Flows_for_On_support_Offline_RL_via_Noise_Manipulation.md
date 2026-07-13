@@ -48,15 +48,11 @@ ReFORM提出了一种**结构性支持约束**方案：将策略构造为行为�
 
 在40个OG-Bench任务（覆盖antmaze导航、cube/sence操作，含CLEAN和NOISY两类数据集）上，ReFORM以恒定超参数在所有基线中取得主导性优势，性能剖面曲线全面优于IFQL、FQL（S/M/L）及DSRL等基于流模型的离线RL方法。消融实验表明，有界源分布与反射流噪声生成器是性能增益的关键组件，且方法对超参数 $l$（源分布半径）不敏感。
 
-
-
 离线强化学习（Offline RL）的核心挑战在于分布偏移：从静态数据集中学习的策略，在部署时可能选择数据覆盖范围之外的动作（Out-of-Distribution, OOD），导致价值函数过高估计和灾难性策略崩溃。现有的主流解决方案——无论是显式约束策略与行为策略的KL散度，还是隐式地对价值函数施加悲观惩罚——本质上都在**限制策略改进的幅度**，以换取安全性。这种“保守主义”虽然降低了OOD风险，却也给策略性能设定了天花板：当行为策略本身是次优的，保守方法难以超越数据集中已观察到的动作分布。
 
 更棘手的是**多模态行为数据**。现实离线数据往往包含多种完成任务的策略（例如绕行左侧或右侧），要求策略能够捕捉并选择性地利用这些多模态。扩散模型和流模型等生成式策略虽然擅长表达复杂多模态分布，但它们与保守约束的结合并不自然——约束过紧会抹平多模态，约束过松则OOD依然存在。现有工作（如DSRL、FQL）试图在生成式策略上施加行为正则化，但始终面临一个根本性矛盾：**OOD抑制与策略改进之间存在不可消除的张力**。
 
 本文的动机正是打破这种张力。核心洞察是：如果能让策略**天然地**只在行为策略的支持集（support）内采样，那么OOD问题就从优化约束变成了结构保证——无需牺牲策略改进即可获得安全性。这引出了一个关键问题：能否设计一种策略架构，使其**通过构造**满足支持约束？
-
-
 
 ## 核心方法与创新机理
 
@@ -102,8 +98,6 @@ $$\pi_\theta(a|s) = \psi_{\theta_1}\big(\psi_{\theta_2}(w; s); s\big), \quad w \
 
 反射流噪声生成器不仅适用于流式策略，理论上可与任何基于生成模型的策略（包括扩散策略）组合，具有较好的通用性。
 
-
-
 ![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_YvFsyRReeN/figures/001_Figure_1.jpg]]
 *Figure 1: ReFORM algorithm. The process with gray arrows indicates the BC flow policy, learned to transform a simple source distribution $q _ { \mathrm { B C } } = \hat { \mathcal { U } } ( \mathcal { B } _ { l } ^ { d }$ ) to a target distribution $p _ { \mathrm { B C } }$ that matches the dataset . The blue arrows indicate the ReFORM process, where we learn a flow noise generator to generate a manipulated source distribution $\tilde { q } _ { \mathrm { B C } }$ for the BC policy so that the manipulated target p˜BC maximizes the $\dot { Q }$ value while staying inside the support (denoted in red) of the BC policy
 
@@ -116,8 +110,6 @@ ReFORM 是一个两阶段流式策略（two-stage flow policy），其核心设�
 **第三阶段：一步蒸馏。** 为提升推理效率，将两阶段组合策略蒸馏为一步策略 $\mu_{\hat{\theta}_1}$，通过最小化与原始 BC 流式策略输出的均方误差实现。蒸馏后的策略直接以从 $q_{\text{BC}}$ 采样的潜变量 $z$ 和状态 $s$ 为输入，输出动作 $a$，无需在推理时执行 ODE 求解。
 
 **输入输出流总结：** 状态 $s$ 与从有界均匀分布采样的潜变量 $z$ 作为输入，经蒸馏后的一步策略直接输出动作 $a$。训练阶段，BC 流式策略学习从 $z$ 到 $a$ 的映射，噪声生成器在 $z$ 空间内进行有界扰动以最大化 Q 值，两个模块协同优化，最终通过蒸馏合并为单一前向网络。
-
-
 
 ReFORM 的核心架构由两个级联的流模型构成：BC 流策略（BC flow policy）与反射流噪声生成器（reflected flow noise generator）。前者从离线数据集中学习行为克隆，将简单源分布映射到匹配行为策略的复杂动作分布；后者在 BC 策略的源分布支撑集内生成受约束的多模态噪声，通过改变 BC 策略的输入来间接改变其输出动作分布，从而在不引入 OOD 动作的前提下实现策略改进。
 
@@ -168,8 +160,6 @@ $$\mathcal{L}_{\mathrm{Distill}}(\hat{\theta}_1) = \mathbb{E}_{s\sim\mathcal{D},
 
 这两个定理共同保证了 ReFORM 在构造层面避免了 OOD 动作的产生，同时不对策略改进施加额外的分布距离正则化约束，允许策略在支撑集内自由探索高 Q 值区域。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -208,12 +198,8 @@ Figure 3 通过一个二维 toy example 直观展示了支持约束的机制。�
 
 尽管 ReFORM 在支持约束方面表现优异，其性能仍依赖于 BC 流策略的质量。如果 BC 模型本身存在 OOD 误差，噪声生成器在 BC 策略支持范围内的优化也会受到影响。此外，噪声生成器的训练需要反向传播通过整个 BC 流策略的积分过程，计算开销较大，限制了在更大规模任务上的扩展性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_YvFsyRReeN/figures/015_Table_4.jpg]]
 *Table 4: Full results. We present full results (normalized score) on 40 OGBench tasks. The results are averaged over 3 seeds and 32 runs per seed. The results are bolded if the algorithm achieves at or above 95% of the best performance following Park et al. (2025a). To save space, the -singletask tags are omitted from task names*
-
-
 
 ## 定位与知识库关联
 
@@ -279,8 +265,6 @@ ReFORM 在离线 RL 知识库中的定位可概括为：
 - **对比方法**：IFQL、FQL(S/M/L)、DSRL
 - **核心优势**：无需任务特定超参数调优的构造性 OOD 防护
 - **核心代价**：BPTT 计算开销、对 BC 策略质量的依赖
-
-
 
 ## 原文 PDF
 

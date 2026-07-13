@@ -53,8 +53,6 @@ claims:
 
 实验结果表明，SVG在ImageNet 256×256类条件生成任务上展现出显著优势：**SVG-XL仅需80个训练epoch、25步采样即达到gFID 3.54（w/ CFG）**，远优于同等条件下的SiT-XL（gFID 22.58）；在少步采样场景下，5步FID-50K仅为12.26，而SiT-XL高达69.38。此外，SVG特征在下游感知任务（ImageNet分类、ADE20K分割、NYUv2深度估计）上保持与DINO相比拟的性能，验证了其作为统一视觉特征空间的潜力。
 
-
-
 ### 潜在扩散模型的成功与隐忧
 
 潜在扩散模型（Latent Diffusion Models, LDMs）已成为高分辨率视觉生成的主流范式。其核心策略是将扩散过程从高维像素空间迁移至低维潜在空间，从而大幅降低计算开销。这一范式的成功高度依赖于变分自编码器（VAE）提供的压缩表示。然而，**传统VAE潜在空间存在严重的语义纠缠**：特征在空间中高度混合，缺乏清晰的判别结构。这一瓶颈直接导致扩散模型训练效率低下——模型需要大量迭代才能理清混乱的语义关系，且推理时需要较多采样步数才能生成高质量图像。
@@ -77,8 +75,6 @@ claims:
 基于此，本文提出一个根本性转变：**放弃VAE，直接利用自监督视觉基础模型的强判别性特征构造潜在空间**。具体而言，SVG以冻结的DINOv3编码器为核心，其深层特征天然具有清晰的类间分离（Figure 4a的t-SNE可视化证实，DINOv3空间的语义结构远优于SD-VAE和VA-VAE）。同时，为弥补DINO特征在细粒度感知细节（颜色、高频纹理等）上的不足，引入轻量残差编码器进行补充，并通过分布对齐机制保持语义结构不被破坏。
 
 这一设计使得SVG空间同时继承了自监督特征的感知理解能力与重建所需的细节保真度，**为构建任务通用的视觉表示提供了可行路径**——扩散模型可直接在此空间上高效训练，且该空间可复用于分类、分割、深度估计等下游任务。
-
-
 
 ## 核心方法与创新机理
 
@@ -114,8 +110,6 @@ SVG 将扩散模型直接部署在由 DINO 特征和残差特征拼接而成的�
 ### 统一特征空间的延伸价值
 
 SVG 的另一重要创新在于其构建的特征空间**继承了自监督特征的感知理解能力**，具备作为任务通用视觉表示的潜力。实验表明，SVG 特征在 ImageNet 分类、ADE20K 分割和 NYUv2 深度估计等下游任务上保持了与 DINO 相比拟的性能（Table 4），并支持零样本类别条件编辑（Figure 6）和潜在空间插值（Figure 7）等应用。这使得 SVG 不仅是一个生成模型，更是一个向统一视觉特征空间迈进的框架。
-
-
 
 SVG 的整体框架围绕一个核心设计展开：**用自监督视觉基础模型（DINOv3）的强语义判别性特征空间，替代传统 VAE 的潜在空间，作为扩散模型的生成空间**。这一设计解决了 VAE 潜在空间中语义高度纠缠、缺乏清晰判别结构的瓶颈问题。
 
@@ -153,8 +147,6 @@ $$\mathcal{L}_{\mathrm{FM}} = \mathbb{E}_{\mathbf{x}_0 \sim p_0(\mathbf{x}), \ep
 ### 核心洞察
 
 该框架的根本优势在于：**语义分离性良好的潜在空间大幅简化了扩散模型的优化难度**。在语义分散的空间中，平均速度方向在类内一致、类间分离（Figure 4b），使得模型在更少训练轮次（80 epochs）和采样步数（25 steps）下即可达到高质量生成——SVG-XL 在 25 步、80 epoch 下即达到 gFID 3.54（w/ CFG），显著优于传统 VAE 扩散模型（Table 1）。同时，该空间继承了 DINOv3 的感知理解能力，为构建任务通用的视觉表示提供了可行路径。
-
-
 
 ### 1. 扩散与流匹配基础
 
@@ -212,18 +204,11 @@ $$\theta = \operatorname{arccos}\left(\frac{(\pmb{x}_T^{0})^{\top} \pmb{x}_T^{1}
 
 这些插值操作用于验证SVG潜在空间的语义连续性——在语义分散良好的空间中，插值生成的图像应呈现平滑的语义过渡，而非突变或语义混合。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2510_15301/figures/001_Figure_1.jpg]]
 *Figure 1: Core contribution of SVG. (a) Vanilla VAE-based LDM: the diffusion model is trained on the pretrained VAE latent space. (b) Diff. Model Feature Alignment: intermediate features of the diffusion model are aligned to Visual Foundation Model (VFM) features. (c) VAE and Diff. Model Feature Alignment: both VAE latent features and diffusion model intermediate features are aligned to VFM features. (d) Our method: the diffusion model is trained directly in the SVG space derived from self-supervised representations (DINOv3). (e-f) Comparisons of inference and training efficiency*
 
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2510_15301/figures/020_Figure_13.jpg]]
-*Figure 13: Impact of classifier-free guidance on SVG generation performance. Evaluated using SVG-XL trained at 256x256 for 80 epochs. Figure 14: Training curves of SVG. All model scales (B, L, XL) demonstrate similarly stable convergence behavior*
-
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2510_15301/figures/005_Figure_5.jpg]]
 *Figure 5: Visualization of SVG reconstruction. Incorporating the Residual Encoder enables SVG to better preserve visual information, such as color and high-frequency details*
-
-
 
 ## 实验与关键发现
 
@@ -267,33 +252,14 @@ Table 4同时报告了SVG特征在多个下游视觉任务上的迁移性能。�
 - **Table 4**：移除残差编码器的分布对齐使gFID从6.12升至9.03；仅用DINO特征导致重建和生成质量均显著下降；SVG特征在下游分类、分割、深度估计任务上保持DINO的强迁移能力。
 - **Table 6**：DINOv3浅层特征（layer 4）导致生成质量崩溃（gFID 73.45），深层语义信息对生成至关重要。
 
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2510_15301/figures/006_Table_1.jpg]]
-*Table 1: System-level performance on ImageNet 256 × 256 for SVG. Operating in a unified feature space, SVG achieves high-quality few-step generation (25 steps), surpassing baseline models and converging faster. † indicates reproduction results; for flow-matching, only the ODE solver is used*
-
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2510_15301/figures/007_Table_2.jpg]]
 *Table 2: Comparison of few-Step generation and model scaling. Both (a) and (b) report FID-50K results after 80 training epochs. (a) SVG achieves substantially better performance than SiT under few-step sampling. (b) SVG consistently outperforms SiT across different capacities with fewer sampling steps. SD and VA denote SD-VAE and VA-VAE, respectively. (a) Few-step generation*
 
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2510_15301/figures/009_Table_4.jpg]]
 *Table 4: Ablation study on the effectiveness of SVG encoder components. Reconstruction performance is reported after 40 epochs of training, while generative metrics are evaluated after 500K training iterations using classifier-free guidance. For visual downstream tasks, we report fine-tuning results on ImageNet-1K, ADE20K, and NYUv2*
 
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2510_15301/figures/016_Table_6.jpg]]
-*Table 6: Performance of diffusion models trained on encoder intermediate layers. Training Epochs indicate the number of epochs used to train the SVG Autoencoder. The gFID metrics are obtained after 200K training steps of the SVG-B diffusion model, without classifier-free guidance*
-
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2510_15301/figures/004_Figure_4.jpg]]
 *Figure 4: (a) The t-SNE visualization of different visual (b) Toy example illustrating the impact of semantic dispersion feature spaces. in the feature space on diffusion model training. Figure 4: Visualization of feature space. (a) Feature visualization with t-SNE for 100 ImageNet classes (100 random samples per class, top row) and 20 classes (100 random samples per class, bottom row). Features are extracted using DINOv3 (Simeoni et al. ´ , 2025), VA-VAE (Yao et al., 2025), SD-VAE (Rombach et al., 2021), and MAR-VAE (Li et al., 2024), with each class shown in a distinct color, and model names annotated with their linear-probe Top-1 accuracy on ImageNet-1K (Deng et al., 2009). (b) Each subfigure show...*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2510_15301/figures/008_Table_3.jpg]]
-*Table 3: Comparison of different encoders and feature spaces.. Reconstruction performance is reported after 5 epochs of training. (✔: advantage, ✔✗: partial, ✗: weak)*
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2510_15301/figures/010_Figure_6.jpg]]
-*Figure 6: Zero-shot class-conditioned editing using SVG. The first column shows the original image. The first two rows edit the region inside the red box, whereas the third row edits the outside*
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2510_15301/figures/011_Figure_7.jpg]]
-*Figure 7: Visualization of interpolation using SVG. The first row shows direct linear interpolation, while the second row presents spherical linear interpolation*
-
-
 
 ## 定位与知识库关联
 
@@ -360,8 +326,6 @@ Table 3 的编码器比较揭示了 SVG 设计的适用边界：DINOv3 在语义
 ### 6. 知识库定位总结
 
 SVG 在扩散模型知识库中的定位是：**首个彻底移除 VAE、直接在自监督语义原生空间上训练扩散模型的工作**。它不同于仅对扩散中间特征进行对齐的 REPA，也不同于同时对齐 VAE 和扩散特征的 VA-VAE，而是从根本上重构了潜在空间的来源。其核心贡献在于证明了语义分离性对扩散模型训练效率的因果性影响，并提供了可同时服务于生成和感知任务的统一特征空间蓝图。当前局限性主要集中在 CFG 效率、特征维度和任务覆盖范围，这为后续工作指明了改进方向。
-
-
 
 ## 原文 PDF
 

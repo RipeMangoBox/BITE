@@ -51,8 +51,6 @@ GRaF 由两个关键模块构成：**几何感知的 Transformer 编码器**从�
 
 实验表明，在单场景设定下，GRaF 相比 NeRF^2 将 MSE 降低 26.9%，PSNR 提升 10.2%（Table 1）。在更具挑战性的未见场景和未见布局设定下，GRaF 分别取得 20.96 和 17.81 的 PSNR，显著超越所有对比方法（Table 2、Table 3），验证了其跨场景泛化能力。消融实验进一步确认，移除交叉注意力层或简化为朴素光线追踪均导致 PSNR 大幅下降（Table 4），表明几何感知编码和物理建模的不可或缺。
 
-
-
 ### 空间频谱：一个被忽视的无线环境表征
 
 在无线通信与感知系统中，接收信号强度（RSSI）长期以来是刻画信号空间分布的主要工具。然而，RSSI仅提供标量功率信息，丢弃了信号的方向维度。**空间频谱**（spatial spectrum）将这一维度重新引入：它描述了接收机周围所有方向上信号的功率分布，本质上是对无线环境的一次“全向快照”。
@@ -78,8 +76,6 @@ GRaF 的出发点是突破这一瓶颈。其核心洞察来自一个理论观察
 基于这一洞察，GRaF 设计了两阶段架构：（1）**几何感知 Transformer 编码器**，接收 $L$ 个最近邻发射机的空间频谱和相对位置，通过交叉注意力机制学习动态邻居加权，输出场景无关的潜在 RF 辐射场 $\mathbf{Z}$；（2）**神经光线追踪算法**，利用潜在场 $\mathbf{Z}$ 沿每条方向光线采样体素特征，预测复数衰减和辐射信号，并累积自由空间路径损耗和相位延迟，最终聚合得到空间频谱。
 
 这一设计使得 GRaF 一次训练后即可泛化到未见场景和未见发射机布局，从根本上摆脱了逐场景重训的束缚，为空间频谱合成从实验室走向实际部署提供了可能。
-
-
 
 ## 核心方法与创新机理
 
@@ -110,8 +106,6 @@ $$y_r = \sum_{s=1}^{S} \left(\prod_{j=1}^{s-1} a(\mathbf{x}_{j},\alpha,\beta) \r
 - **单场景设定**：GRaF 相比 NeRF^2 在 MSE 上降低 26.9%，PSNR 提升 10.2%（Table 1），证明潜在辐射场和神经光线追踪的有效性。
 - **泛化能力**：在未见场景和未见布局两种设定下，GRaF 分别取得 PSNR 20.96 和 17.81，均为对比方法中最高（Table 2, Table 3）。
 - **组件消融**：移除交叉注意力层导致 PSNR 从 20.96 降至 19.37；简化为朴素光线追踪降至 16.79，证明各组件的不可或缺性（Table 4）。
-
-
 
 GRaF 的整体 pipeline 围绕一个核心洞察构建：目标位置的频谱可以通过邻近发射机的空间频谱进行插值近似，插值权重由局部发射机几何确定。基于这一理论，GRaF 将频谱合成从逐场景学习转变为与场景无关的潜在 RF 辐射场推理，一次训练后即可泛化到未见场景。
 
@@ -161,13 +155,6 @@ $$\mathbf{SS}_{\text{target}}^{(j)} = \mathcal{F}_{\Theta^{*}}\left(\mathbb{N}_L
 ### 关键依赖与限制
 
 GRaF 的泛化能力依赖于两个条件：（1）目标位置周围存在 $L$ 个已部署的邻近发射机以提供空间频谱参考；（2）训练场景需具备足够多样性以覆盖丰富的传播模式。此外，当前模型在静态室内环境验证，未考虑动态障碍物或移动性场景。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2499_https_arxiv_org_abs_2502_05708/figures/001_Figure_1.jpg]]
-*Figure 1: In the training scene, Radio-Frequency (RF) signals from each transmitter are measured across all surrounding directions by the receiver to form a spatial spectrum. Trained on this scene, GRaF synthesizes spectra for arbitrary transmitter locations in unseen scenes*
-
-
 
 ### 问题形式化与基本信号模型
 
@@ -270,13 +257,6 @@ $$
 
 该方法缺乏对邻近发射机空间相关性的建模，且需要逐场景重训。GRaF 通过频谱插值理论将合成问题转化为基于邻近测量的加权组合，从根本上改变了这一范式。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2499_https_arxiv_org_abs_2502_05708/figures/003_Figure_2.jpg]]
-*Figure 2: Illustration of the spatial spectrum in 3D and 2D views*
-
-
-
 ## 实验与关键发现
 
 ### 实验设置
@@ -306,9 +286,6 @@ GRaF 的核心优势在于其泛化能力。在未见场景设定下（Table 2�
 ![[assets/figures/papers/paper_list_l2499_https_arxiv_org_abs_2502_05708/figures/008_Table_2.jpg]]
 *Table 2: Model performance on the unseen scenes settings*
 
-![[assets/figures/papers/paper_list_l2499_https_arxiv_org_abs_2502_05708/figures/009_Table_3.jpg]]
-*Table 3: Model performance on the unseen layouts settings*
-
 定性结果（Figure 5）进一步支持上述结论：GRaF 合成的空间频谱在峰值位置、主瓣宽度和旁瓣结构上均更接近真实值，而基线方法在复杂多径区域出现明显的伪峰和功率估计偏差。
 
 ![[assets/figures/papers/paper_list_l2499_https_arxiv_org_abs_2502_05708/figures/006_Figure_5.jpg]]
@@ -331,18 +308,9 @@ GRaF 的核心优势在于其泛化能力。在未见场景设定下（Table 2�
 
 为评估合成频谱的实用性，将 GRaF 的输出用于基于频谱的到达角估计任务（Figure 6）。采用 AANN 作为下游估计器，结果表明：使用 GRaF 合成频谱进行到达角估计的精度显著优于使用其他方法合成频谱的情形，进一步验证了 GRaF 合成频谱在保持空间结构保真度方面的优势。
 
-![[assets/figures/papers/paper_list_l2499_https_arxiv_org_abs_2502_05708/figures/012_Figure_6.jpg]]
-*Figure 6: Spectrum-based AoA estimation via AANN [2]*
-
 ### 频率相关分析
 
 实验还考察了频率对模型性能的影响。Table 5 展示了在各频段（2.412 GHz、5.180 GHz、5.805 GHz）上分别训练时的 PSNR，GRaF 在所有频段上均保持稳定性能。然而，跨频率泛化实验（Table 6）揭示了方法的局限性：仅在 2.412 GHz 上训练的模型，在 5.180 GHz 和 5.805 GHz 上测试时 PSNR 显著下降。这是因为高频信号的传播特性（如衰减系数、衍射模式）与低频存在本质差异，而模型从单一频段数据中难以完全捕捉这些频率相关的物理规律。这一发现指出了将物理先验（如频率相关的路径损耗模型）纳入模型设计的潜在方向。
-
-![[assets/figures/papers/paper_list_l2499_https_arxiv_org_abs_2502_05708/figures/013_Table_5.jpg]]
-*Table 5: Training separately on each frequency band*
-
-![[assets/figures/papers/paper_list_l2499_https_arxiv_org_abs_2502_05708/figures/014_Table_6.jpg]]
-*Table 6: Training only on the 2.412 GHz frequency band*
 
 ### 失败模式与局限性
 
@@ -357,8 +325,6 @@ GRaF 的核心优势在于其泛化能力。在未见场景设定下（Table 2�
 4. **训练场景多样性需求**：虽然模型能泛化到新场景，但仍需要足够多样化的训练场景来学习丰富的潜在 RF 辐射场。在极少数场景上训练可能导致对特定传播模式的过拟合。
 
 这些局限性为未来工作指明了方向：结合电磁传播的物理先验以降低数据需求并提升跨频率泛化，以及将模型扩展到动态场景下的时空频谱合成。
-
-
 
 ## 定位与知识库关联
 
@@ -401,8 +367,6 @@ GRaF 开辟了若干值得探索的方向：
 3. **多接收机联合优化**：当前设定为单接收机测量，在多接收机、多频段联合优化场景下，GRaF 的效率和精度表现如何？这可能涉及潜在场共享与接收机特异性建模的权衡。
 
 4. **下游任务偏差控制**：Figure 6 展示了合成频谱可提升到达角估计精度，但如何确保合成频谱在增强定位、成像等下游任务时不引入系统性偏差，仍需深入研究。
-
-
 
 ## 原文 PDF
 

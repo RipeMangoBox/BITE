@@ -57,8 +57,6 @@ claims:
 
 **待验证边界**：该方法仅在单一基模型（Wan）、固定分辨率（288×512）和固定帧数（49帧）条件下验证，对不同架构和尺度的泛化性尚需进一步检验。
 
-
-
 ### 视频生成中的动态合理性困境
 
 近年来，基于扩散模型和流匹配的文本到视频（T2V）生成取得了显著进展，但在动态合理性（dynamic plausibility）方面仍面临根本性挑战。现有模型生成的视频往往存在运动不自然、时序不一致、物理规律违背等问题，这限制了其在影视制作、虚拟现实等对动态真实性要求较高的场景中的应用。
@@ -74,8 +72,6 @@ claims:
 DynamicsBoost 的核心洞察在于：**视频延续任务天然产生结构一致且长度有序的偏好对，无需任何人工标注或奖励模型**。具体而言，给定一段真实视频的前若干帧作为条件，让模型生成后续帧——提供的参考帧越多，模型需要生成的内容越少，生成的视频片段保真度越高、与原始视频的结构一致性越强。这种“更多参考帧→更少生成内容→更高质量”的单调关系，为偏好对齐提供了一种天然、可规模化且无成本的监督信号。
 
 基于这一洞察，DynamicsBoost 将预训练 T2V 模型扩展为支持任意帧条件生成的延续模型，通过采样不同延续长度自动构造“输-赢”偏好对，并引入非对称 DPO（Asymmetrical DPO）损失——仅在非共享的延续帧区域计算偏好损失并做长度归一化——从而精准对齐偏好信号，避免共享条件帧对损失计算的干扰。整个流程无需人工标注、无需奖励模型训练，即可实现视频动态质量和语义一致性的显著提升。
-
-
 
 ## 核心方法与创新机理
 
@@ -97,8 +93,6 @@ DynamicsBoost 的核心创新在于**将视频延续任务重构为一种天然�
 
 三个创新槽位形成了一条完整的因果链：延续长度差异提供无标注偏好信号 → 非对称损失区域确保信号精准作用于生成质量差异部分 → 参数高效训练保护基模型能力。这一设计使得 DynamicsBoost 在 VBench、VideoGen-Eval 和 PhysGenBench 上均取得最优的运动真实性、时序一致性和语义对齐（Table 1, Table 2），全面超越现有 DPO 基线。
 
-
-
 DynamicsBoost 的核心思路是将视频延续（video continuation）过程的天然偏好信号转化为可规模化的偏好对齐训练框架。整个流水线由三个关键模块串联构成：**视频延续模型**、**偏好对生成器**和**非对称DPO训练器**，如 Figure 2 所示。
 
 ![[assets/figures/papers/paper_list_l2674_https_openaccess_thecvf_com_content_CVPR2026_html_Li_DynamicsBoost_Dynam/figures/002_Figure_2.jpg]]
@@ -111,8 +105,6 @@ DynamicsBoost 的核心思路是将视频延续（video continuation）过程的
 **非对称DPO训练器**是偏好对齐的核心。与标准 Flow-DPO 在整个视频上累积偏好损失不同，Asymmetrical DPO 仅对非共享延续区域（即 Regions 2-3）计算损失，并按延续帧数 $N - \min(N_1, N_2)$ 进行归一化。这一设计确保了偏好信号精准作用于生成区域，而非共享的条件帧区域，从而有效对齐视频动态质量与语义一致性。
 
 整个流水线的输入是预训练 T2V 模型和动态视频数据集（如 OpenVid-1M 子集），输出是经过偏好对齐的视频生成模型，在运动真实性、时序一致性和文本对齐方面均显著优于现有 DPO 基线。
-
-
 
 ### 3.1 流匹配与偏好优化基础
 
@@ -174,12 +166,8 @@ $v_i^w$、$v_i^l$ 分别为胜/败样本在第 $i$ 帧的目标速度，损失�
 
 **关键消融证据**：仅在非共享延续区域（Regions 2-3）计算 DPO 损失，VBench Overall Consistency 从全视频损失的 22.15 提升至 25.64（+3.49），Motion Smoothness 从 97.21 提升至 99.21（+2.00），验证了非对称设计的有效性（Table 4）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2674_https_openaccess_thecvf_com_content_CVPR2026_html_Li_DynamicsBoost_Dynam/figures/007_Figure_4.jpg]]
 *Figure 4: Continuation results under different numbers of reference frames (indicated at the top-left of each example). Nonzero reference settings produce continuations that better preserve structural consistency with the original video, and quality improves monotonically as the number of reference frames increases—approaching the ground truth when all frames are used. In contrast, the pure T2V setting exhibits significant structural deviation, breaking this monotonic relationship*
-
-
 
 ## 实验与关键发现
 
@@ -225,8 +213,6 @@ $v_i^w$、$v_i^l$ 分别为胜/败样本在第 $i$ 帧的目标速度，损失�
 
 **公平性评估缺失**。训练数据来源于 OpenVid-1M 子集，可能存在内容与风格偏差，对特定人群、动作或场景的生成质量可能不均衡，但论文未进行公平性或偏见分析。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2674_https_openaccess_thecvf_com_content_CVPR2026_html_Li_DynamicsBoost_Dynam/figures/005_Table_2.jpg]]
 *Table 2: Quantitative comparison with baselines on PhysGenBench and VideoGen-Eval. Best in bold; second best underlined*
 
@@ -238,8 +224,6 @@ $v_i^w$、$v_i^l$ 分别为胜/败样本在第 $i$ 帧的目标速度，损失�
 
 ![[assets/figures/papers/paper_list_l2674_https_openaccess_thecvf_com_content_CVPR2026_html_Li_DynamicsBoost_Dynam/figures/004_Figure_3.jpg]]
 *Figure 3: Qualitative comparison with baselines. Our method produces results that are more semantically consistent and dynamically coherent compared to other approaches*
-
-
 
 ## 定位与知识库关联
 
@@ -288,8 +272,6 @@ DynamicsBoost 与上述方法的根本差异在于**偏好对构造方式**：�
 3. **与在线强化学习结合**：非对称 DPO 能否与在线强化学习方法（如 GRPO）结合，实现更高效的偏好探索和策略迭代？
 4. **奖励模型监督**：连续偏好信号是否能作为多模态奖励模型的有效监督来源，提升奖励模型的泛化能力？
 5. **下游任务迁移**：该方法在真实视频编辑、视频预测等下游任务中的实用价值如何？是否需要额外的任务特定微调策略？
-
-
 
 ## 原文 PDF
 

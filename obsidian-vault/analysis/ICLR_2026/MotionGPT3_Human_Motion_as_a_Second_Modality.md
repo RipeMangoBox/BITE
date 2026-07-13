@@ -60,8 +60,6 @@ MotionGPT3 的核心洞察在于：**将人体运动视为独立于文本的第�
 
 尽管如此，当前框架仍存在若干局限：验证范围限于HumanML3D和KIT-ML两个中小规模基准；三阶段训练策略需手动设计阶段划分，难以自动泛化至新模态；运动分支容量受限于语言模型规模，直接扩展会导致训练不稳定；跨模态对齐主要依赖配对数据，未能充分利用纯文本语料中的语言知识。这些方向为未来工作留下了明确的探索空间。
 
-
-
 ### 运动生成与理解的统一建模困境
 
 人体运动生成与理解是具身智能领域的核心任务，涵盖文本到运动（Text-to-Motion, T2M）生成和运动到文本（Motion-to-Text, M2T）描述两个方向。近年来，研究者试图构建统一框架同时处理这两类任务，代表性工作包括 **TM2T**（Guo et al., ECCV 2022）、**MotionGPT**（Jiang et al., arXiv 2023）和 **MoTe**（Wu et al., arXiv 2024）。这些方法的共同范式是：将运动序列量化为离散token，然后与文本token一同输入单流Transformer骨干网络进行自回归建模。
@@ -94,8 +92,6 @@ MotionGPT3的核心洞察在于重新审视运动模态在统一框架中的定�
 | 训练策略 | 单阶段联合训练或直接多任务优化 | 缺乏对模态对齐的显式设计 |
 
 值得注意的是，部分仅做生成的方法已探索了连续表示和扩散建模的优势，如 **MLD**（Xin et al., CVPR 2023）采用潜在扩散、**MoMask**（Guo et al., CVPR 2024）使用残差VQ，但这些方法不支持运动理解任务。**MG-MotionLLM**（Wu et al., arXiv 2025）虽尝试将运动token融入LLM，但仍沿用离散表示和单流范式。因此，如何在统一生成与理解的框架内同时解决量化误差和模态干扰，构成了本文的核心研究动机。
-
-
 
 ## 核心方法与创新机理
 
@@ -137,11 +133,6 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{rec}} + \lambda_{\mathrm{KL}} \mathcal{L}_{
 
 三个 changed slots 并非孤立改进，而是形成因果链条：连续 VAE 潜在空间使运动表示摆脱量化约束，为扩散头（而非自回归 token 预测）提供了自然的连续目标空间；双流架构则为连续运动潜在向量和离散文本 token 提供了各自的处理路径，避免将异构表示强行塞入同一参数空间；三阶段训练策略进一步确保运动分支在不受语言分支干扰的前提下先建立运动先验，再逐步引入跨模态交互。Table 4 的组件消融直接验证了这一协同效应：Bimodal+VAE 配置在所有 T2M 和 M2T 指标上均显著优于 Unified+VQ、Unified+VAE 或 Bimodal+VQ 的任意组合，表明双流架构与连续表示的结合产生了超越各自独立贡献的增益。
 
-
-
-![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_Ha075JDMZR/figures/001_Figure_1.jpg]]
-*Figure 1: Motion MotionFigure 1: MotionGPT3 introduces hybrid motion-language model that takes motion as a second Holdermodality and processes the data through a new branch, with cross-modal attention mechanism AdaLN Latentto communicate with text branch (Sec. 3.2). We leverage a VAE network for continuous motion representation (Sec. 3.1), and design separate training objective for each modality (Sec. 3.3)*
-
 MotionGPT3 将人体运动视为与大语言模型（LLM）交互的**第二模态**，构建了一个双流运动-语言混合模型。其核心设计理念是：为运动模态建立独立分支，仅通过共享自注意力层与冻结的文本分支进行受控交互，从而避免传统单流架构中的模态间干扰和离散量化带来的信息损失。
 
 ### 三大核心组件
@@ -173,8 +164,6 @@ MotionGPT3 将人体运动视为与大语言模型（LLM）交互的**第二模�
 - **第三阶段（SIII）：联合微调**。解冻文本分支，对所有模块进行联合优化，以最大化生成与理解的整体性能。
 
 消融实验证实，省略第一阶段（SI）会严重损害文本到运动的生成质量，表明运动特定的预训练对于最终性能至关重要（Table 5 / Table 13）。
-
-
 
 ### 运动VAE：连续潜在空间表示
 
@@ -242,8 +231,6 @@ $$L_{diff} = \mathcal{E}_{z_0, \epsilon, t} \lVert \epsilon - \hat{\epsilon}_{\t
 
 跨模态注意力（CMA）仅在 Transformer 的最后 $L$ 层启用。消融研究（Figure 4, Table 9）显示，随着 $L$ 从 1 增加到 5，T2M 性能持续改善；但当 $L=6$ 时出现轻微退化，呈现非单调模式。这表明适度的跨模态交互层数足以实现有效的信息流动，过多的共享层可能重新引入模态间干扰。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -252,13 +239,7 @@ MotionGPT3 在 HumanML3D 和 KIT-ML 两个标准基准上进行了系统评估�
 
 **HumanML3D 文本到运动生成。** 表 1（Table 1）汇总了主要对比结果。在仅生成（Gen. only）设置下，MotionGPT3† 在 R-Precision Top-1（0.533）和 Top-3（0.826）上均达到或接近最优水平，同时 FID 降至 0.239，MMDist 降至 2.797。在统一生成与理解（Gen. & Und.）设置下，MotionGPT3 进一步将 R@3 提升至 0.837，相比此前统一方法 MotionGPT（Jiang et al., 2023, arXiv）的 0.733 提升了 +0.104，FID 从 0.232 降至 0.208，验证了双流架构与连续潜在空间在统一框架中的显著优势。
 
-![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_Ha075JDMZR/figures/010_Table_1.jpg]]
-*Table 1: Evaluation of text-guided motion generation on HumanML3D (Guo et al., 2022a). Rows are grouped by training tasks: Gen. only for generation-only and Gen. & Und. for both. Real is obtained by ground-truch motions, and → indicate values closer to Real are desirable. † marks our single-task model trained for 200 epochs, and MotionGPT3 is a three-stage model trained with unified tasks. Best and second-best results are highlighted in bold and underline*
-
 **KIT-ML 文本到运动生成。** 表 2（Table 2）展示了 KIT-ML 上的结果。MotionGPT3† 的 R@3 达到 0.803，相比 MLD（Xin et al., CVPR 2023）的 0.734 提升了 +0.069，FID 降至 0.263，进一步证明了方法在不同数据集上的泛化能力。
-
-![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_Ha075JDMZR/figures/011_Table_2.jpg]]
-*Table 2: Evaluation of text-guided motion generation on KIT-ML (Plappert et al., 2016)*
 
 **运动描述生成（M2T）。** 表 3（Table 3）报告了 HumanML3D 上的运动描述生成结果。MotionGPT3†（单任务）和 MotionGPT3（统一模型）在 R@k 指标上均与近期最优方法持平，并在部分指标上超越了真实标注（GT）的指标水平。值得注意的是，统一模型在保持强生成能力的同时，也实现了高质量的运动理解，表明三阶段训练策略成功平衡了双向任务。
 
@@ -266,9 +247,6 @@ MotionGPT3 在 HumanML3D 和 KIT-ML 两个标准基准上进行了系统评估�
 *Table 3: Comparison of motion captioning on HumanML3D (Guo et al., 2022a), evaluation follows (Guo et al., 2022c). MotionGPT3 † denotes our single-task captioning model trained for 100 epochs, and MotionGPT3 is an unified model trained on both tasks with the three-stage scheme (Sec. 3.4). Both variants achieve R@k on par with recent state of the art, and surpass the GT metrics*
 
 **基于 TMR 评估器的检索性能。** 表 7（Table 7）展示了使用 TMR 评估器（Petrovich et al., 2023）的跨模态检索结果。在 All 协议下，MotionGPT3 的 Text-Motion R@1 达到 9.60，远超 TMR 的 5.68（+3.92）和 MotionGPT 的 6.71（+2.89），并在全部四个协议（All、All with threshold、Dissimilar subset、Small batches）中一致取得最优或次优的 R@k 和 MedR。这一结果说明连续潜在空间和双流架构产生的跨模态表征具有更强的语义对齐能力。
-
-![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_Ha075JDMZR/figures/024_Table_7.jpg]]
-*Table 7: Retrieval on HumanML3D with the TMR evaluator (Petrovich et al., 2023). We report R@1/2/3/5/10 and MedR for text-motion retrieval under the four official protocols: (a) All, (b) All with threshold, (c) Dissimilar subset, and (d) Small batches (see Sec. C.2 for definitions). Results for TEMOS (Petrovich et al., 2022), T2M (Guo et al., 2022b), and TMR (Petrovich et al., 2023) are taken from the TMR paper. LaMP (Li et al., 2024b) is reported only for (d). MotionGPT and MotionGPT3 are evaluated with the released checkpoints using the official TMR code. MotionGPT3 attains strong performance across protocols*
 
 ---
 
@@ -321,9 +299,6 @@ Figure 3 揭示了架构设计对训练效率的因果影响。在 HumanML3D 运
 
 Figure 4 展示了跨模态注意力（CMA）层数对 T2M 性能的影响。CMA 在最后 L 层启用，L 从 1 到 6 进行扫描。MMDist 随 L 增加持续下降，在 L=5 时达到最低点（约 2.82），但 L=6 时出现轻微退化。这一非单调模式表明，适度的跨模态交互足以实现有效对齐，过多的共享层可能重新引入模态间干扰。
 
-![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_Ha075JDMZR/figures/015_Figure_4.jpg]]
-*Figure 4: Ablation on the number of cross-modal attention (CMA) layers for T2M on HumanML3D. CMA is enabled in the last L layers ( L $\in { 1 , \dots , 6 }$ ) . Performance improves as L increases up to 5 layers, then shows slight degradation at 6, indicating a non-monotonically pattern
-
 #### 运动生成头消融
 
 表 11（Table 11）消融了运动生成头的设计选择：
@@ -352,13 +327,6 @@ Figure 9 和表 10（Table 10）探索了运动分支容量对性能的影响。
 3. **运动分支容量约束**：运动分支容量受限于当前语言模型规模，直接引入超大运动分支会导致训练不稳定，需要更大规模配对企业数据或额外预训练来支撑。
 4. **CFG 超参数敏感性**：分类器自由引导对生成质量有显著影响，但其最优强度需要针对不同模型配置重新搜索，增加了实际部署的调参成本。
 5. **纯文本语料利用不足**：跨模态对齐主要通过配对数据进行，未能充分挖掘纯文本语料中蕴含的语言知识，可能限制了语言分支在复杂语义理解上的潜力。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_Ha075JDMZR/figures/019_Table_6.jpg]]
-*Table 6: Comprehensive comparison of text-to-motion generation on HumanML3D (Guo et al., 2022a). We report generation-only models (Gen. only) here, and visualize unified dual-task models (Gen. & Und.) in Fig. 8. Real denotes ground-truth statistics; arrows (→) indicate that values closer to Real are desirable. † marks our single-task model trained for 200 epochs, and MotionGPT3 is the unified three-stage model. Best and second-best results are bold and underlined*
-
-
 
 ## 定位与知识库关联
 
@@ -412,8 +380,6 @@ MotionGPT3 的四个关键设计槽位及其因果效应如下：
 - **跨模态泛化**：连续潜在空间和扩散头的组合是否可推广到其他连续模态（如音频、视频），形成统一的生成框架？这需要验证VAE+扩散范式在不同模态特性下的鲁棒性。
 
 - **自动化模态交互策略**：是否存在更自动化的模态交互策略，以取代当前需要手动设计CMA层数和冻结策略的方案？例如，基于可微分架构搜索或动态路由机制的自适应交互可能是一个有前景的方向。
-
-
 
 ## 原文 PDF
 

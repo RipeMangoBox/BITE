@@ -74,8 +74,6 @@ UTPTrack 属于**视觉跟踪中的令牌剪枝方法**，与现有方法（如 
 
 该方法基于单流跟踪器 **OSTrack**（RGB）和 **SUTrack**（统一）构建，在 12 层 ViT 和 24 层 HiViT 主干上验证，支持 224/256/384 分辨率输入，覆盖 4 个 RGB 基准和 10 个统一跟踪基准。
 
-
-
 视觉目标跟踪是计算机视觉的基础任务，旨在根据初始帧给定的目标模板，在后续帧中持续定位目标位置。近年来，基于单流 Transformer 的跟踪器——如 **OSTrack** 和 **SUTrack**——将搜索区域、动态模板和静态模板的令牌拼接后送入统一的自注意力模块，实现了优异的跟踪精度。然而，这种全令牌交互范式带来了显著的计算开销：视觉令牌数量随模板数量和搜索区域分辨率线性增长，导致自注意力复杂度呈二次方膨胀，严重制约了跟踪器的实时部署能力。
 
 ### 现有令牌压缩方法的局限
@@ -99,8 +97,6 @@ UTPTrack 属于**视觉跟踪中的令牌剪枝方法**，与现有方法（如 
 3. **扩展至文本引导剪枝**：在统一跟踪中，利用 CLIP 文本编码器输出的语言令牌与视觉令牌的交互，为语言引导场景提供更精准的令牌重要性估计。
 
 通过上述设计，UTPTrack 在几乎不损失精度的前提下，大幅削减视觉令牌数量——在 RGB 跟踪中剪枝 65.4% 的视觉令牌且保持基线 99.7% 的性能，在统一跟踪中剪枝 67.5% 的令牌且保持基线 100.5% 的性能，为高效视觉跟踪提供了简洁而统一的解决方案。
-
-
 
 ## 核心方法与创新机理
 
@@ -131,8 +127,6 @@ $$\omega_{x} = \phi\left( \mathrm{softmax}\left(\frac{Q_{sz'}K_{x}^T}{\sqrt{d_k}
 UTPTrack 的剪枝模块以**轻量级 CTEM（Candidate or Template Elimination Module）**形式插入 Transformer 编码器的选定层，无需重新训练或结构修改。对于 12 层 ViT 主干，最优配置（#3）为：CE 在层 [3, 6, 9] 执行，DTE 在层 [4, 7, 10] 执行。这一手工选择的调度策略在当前主干上取得了最佳性能-效率权衡，但其泛化到其他架构深度仍需进一步验证。
 
 总体而言，UTPTrack 的创新本质在于**将令牌剪枝从单组件的孤立操作提升为跨组件的统一冗余建模**，并通过注意力复用和空间先验注入，在不牺牲跟踪精度的前提下实现显著的效率增益。
-
-
 
 UTPTrack 构建在一流 Transformer 跟踪器之上，其核心设计思想是**联合压缩搜索区域（Search Region, SR）、动态模板（Dynamic Template, DT）和静态模板（Static Template, ST）三类视觉令牌**，而非像现有方法那样孤立地处理各组件。整体 pipeline 如图 2 所示，包含两条并行的跟踪管线：
 
@@ -170,12 +164,8 @@ $$\mathcal{L}_{\mathrm{Unified}} = \mathcal{L}_{\mathrm{RGB}} + \lambda_{\mathrm
 
 整体框架的关键优势在于**跨组件联合建模冗余**：CE、DTE、STE 共享统一的注意力引导重要性评估机制，使得三类令牌的剪枝决策相互协调，避免了孤立剪枝导致的信息断裂。在高压缩率下，这一联合策略的优势尤为显著——随着保留令牌比例下降，UTPTrack 与其他方法的性能差距持续扩大。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l953_https_arxiv_org_abs_2602_23734/figures/002_Figure_2.jpg]]
 *Figure 2: Architecture of the proposed UTPTrack. UTPTrack supports both RGB-based and unified tracking. It adopts a one-stream transformer that jointly processes tokens from the search region (SR), dynamic template (DT), and static template (ST). A lightweight Candidate or Template Elimination Module (CTEM) is inserted into encoder layers to prune redundant tokens from all three sources. In the figure, D/T/E denote depth, thermal, and event modalities, respectively*
-
-
 
 ### 3.1 一流 Transformer 注意力基础
 
@@ -243,13 +233,6 @@ CTEM 模块并非在所有编码器层执行，而是按照预设的调度插入
 
 这种渐进式、分层的剪枝调度设计，使得网络浅层保留较多令牌以提取充分特征，深层逐步压缩冗余，在性能与效率之间取得平衡。渐进剪枝分析（Figure 4）显示，随着保留率降低和 CE、DTE、STE 逐步启用，性能在多数阶段保持在基线 1–2% 偏差范围内。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l953_https_arxiv_org_abs_2602_23734/figures/018_Table_14.jpg]]
-*Table 14: Effect of spatial priors in attention-guided pruning*
-
-
-
 ## 实验与关键发现
 
 ### 核心性能与效率权衡
@@ -272,9 +255,6 @@ Table 2 报告了基于 OSTrack256 的 RGB 跟踪控制预算对比。在三种�
 
 Table 3 报告了基于 SUTrack224 的统一跟踪控制预算对比，覆盖 RGB、RGB-D、RGB-T、RGB-E、RGB-Lang 共 10 个基准。在 71.4% 令牌保留率下，UTPTrack-S224 平均相对性能为 99.8%（下降仅 0.2%）；在 52.0% 保留率下为 99.5%（下降 0.5%）；即使压缩至 35.4% 保留率（Table 17），平均相对性能仍保持在 99.3%（下降 0.7%）。这一稳定性在跨模态场景中尤为突出：RGB-D、RGB-T、RGB-E 等模态下的性能退化幅度与 RGB 模态基本一致，表明联合剪枝策略对模态差异具有鲁棒性。
 
-![[assets/figures/papers/paper_list_l953_https_arxiv_org_abs_2602_23734/figures/006_Table_3.jpg]]
-*Table 3: Performance comparisons under different vision token compression configurations across unified tracking. All methods are applied on the same base model SUTrack224. The best result are bolded and the second best results are underlined in all following tables. The average performance listed is calculated across all 10 benchmarks. TrackingNet is abbreviated as TrkNet for brevity*
-
 ### 消融实验：组件贡献
 
 **Table 4（RGB 跟踪消融）** 和 **Table 5（统一跟踪消融）** 系统验证了三个消除模块的独立贡献。逐步添加 CE（搜索区域剪枝）、DTE（动态模板剪枝）和 STE（静态模板剪枝），每一步都带来可测量的令牌压缩收益，而性能退化始终控制在 1–2 个百分点以内。移除任一模块均导致性能下降，证实三者缺一不可。
@@ -287,9 +267,6 @@ Table 3 报告了基于 SUTrack224 的统一跟踪控制预算对比，覆盖 RG
 
 Figure 4 展示了随着保留率下降、逐步启用 CE → DTE → STE 过程中性能与令牌数的变化曲线。在 RGB 跟踪和统一跟踪中，性能曲线在大部分压缩阶段保持在基线 1–2% 以内，直到极高压缩率（保留率 < 30%）才出现较明显下降。这验证了 UTPTrack 的调度策略——在 ViT 的浅层（第 3、4 层）启动 CE 和 DTE，在中层（第 6、7 层）和深层（第 9、10 层）继续剪枝——能够在信息充分传播后再消除冗余，避免过早丢弃关键令牌。
 
-![[assets/figures/papers/paper_list_l953_https_arxiv_org_abs_2602_23734/figures/010_Figure_4.jpg]]
-*Figure 4: Ablation Study on Progressive Pruning. Performance and the number of vision tokens are reported as the keep ratio decreases and CE, DTE, and STE are progressively enabled for the RGB-based tracker (top) and unified tracker (bottom)*
-
 ### 剪枝位置消融
 
 Table 13（RGB 跟踪）和 Table 6（统一跟踪）对 CTEM 插入位置进行了消融。在 12 层 ViT 主干上，配置 #3（CE 在层 [3, 6, 9]，DTE 在层 [4, 7, 10]）在性能-效率权衡上最优。过早剪枝（如层 1–2）会破坏早期特征提取，过晚剪枝（如层 10–12）则压缩收益有限。对于 24 层 HiViT 主干（Table 6），最优配置遵循类似的“均匀间隔、交替剪枝”原则。
@@ -297,9 +274,6 @@ Table 13（RGB 跟踪）和 Table 6（统一跟踪）对 CTEM 插入位置进行
 ### 效率分析
 
 Table 8 报告了 GPU（NVIDIA 1080Ti）和 CPU（Intel Xeon Gold 6226R）上的延迟与训练时间。UTPTrack 的 CTEM 模块引入的每层延迟极低，整体推理速度在 GPU 上接近甚至略快于基线（因令牌减少降低了后续层的计算量）。训练时间与基线相当，因为剪枝操作本身是轻量级的，无需额外可学习参数。
-
-![[assets/figures/papers/paper_list_l953_https_arxiv_org_abs_2602_23734/figures/012_Table_8.jpg]]
-*Table 8: Efficiency comparison. Lat.: per-layer backbone latency. GPU: NVIDIA 1080Ti; CPU: Intel Xeon Gold 6226R@2.90GHz*
 
 ### 失败模式与局限性
 
@@ -312,16 +286,6 @@ Table 8 报告了 GPU（NVIDIA 1080Ti）和 CPU（Intel Xeon Gold 6226R）上的
 4. **嵌入式设备实时性未验证**：尽管在桌面级 GPU 上展示了良好的加速效果，但在资源极度受限的嵌入式平台（如移动端 NPU、边缘计算设备）上的实时性尚未评估。
 
 5. **长时跟踪中的模板更新**：令牌类型感知先验依赖于初始帧的边界框标注。在长时跟踪场景中，目标外观可能发生显著变化，静态模板的边界框先验是否需要随时间自适应调整，目前仍是开放问题。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l953_https_arxiv_org_abs_2602_23734/figures/007_Table_4.jpg]]
-*Table 4: Ablation Study on RGB-based Trackers. ∆ denotes the averaged performance change from the to row above*
-
-![[assets/figures/papers/paper_list_l953_https_arxiv_org_abs_2602_23734/figures/009_Table_5.jpg]]
-*Table 5: Ablation Study on Unified Trackers. ∆ denotes the average performance change from the row above*
-
-
 
 ## 定位与知识库关联
 
@@ -364,8 +328,6 @@ UTPTrack 的适用边界由以下几个维度定义：
 2. 是否可以利用元学习或强化学习动态选择剪枝层和保留率，以替代当前的人工固定配置？这可以显著降低部署调参成本。
 3. 在更高压缩率（>80%）下，是否可以通过引入令牌重建损失或知识蒸馏来进一步稳定精度？
 4. 对于 RGB-Lang 跟踪，是否可以探索更轻量的文本编码器替代 CLIP-L，以降低统一跟踪变体的参数量开销？
-
-
 
 ## 原文 PDF
 

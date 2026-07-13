@@ -55,8 +55,6 @@ claims:
 
 实验结果表明，PaCo-Reward-7B 在 ConsistencyRank 上相对基座 Qwen2.5-VL-7B 准确率提升 10.5%（0.344→0.449），在 EditReward-Bench 上的一致性准确率（0.709）显著超越所有开源基线并接近闭源模型 GPT-5（0.669）。将 PaCo-Reward 集成到 PaCo-GRPO 后，FLUX.1-dev 在 T2IS-Bench 的视觉一致性身份指标从 0.249 跃升至 0.508，Qwen-Image-Edit 在 GEdit-Bench 的总体得分从 7.307 提升至 7.451。消融实验进一步验证，分辨率解耦训练在仅用一半时间（6 小时 vs. 12 小时）内取得了更优的性能，而对数驯化聚合成功将奖励比稳定在 1.8 以下，避免了标准加权聚合导致的训练退化。
 
-
-
 ### 一致图像生成的任务定义
 
 一致图像生成（Consistent Image Generation）要求模型在多个图像之间维持视觉身份、风格和语义上下文的连贯性。论文聚焦两个代表性任务（Figure 1）：
@@ -82,8 +80,6 @@ claims:
 - **PaCo-GRPO**：在 RL 阶段引入分辨率解耦训练（低分辨率采样、全分辨率推理）和对数驯化多奖励聚合，在降低计算成本的同时防止单一奖励主导优化。
 
 这种“感知对齐的奖励建模 + 训练高效的 RL 策略”的组合，构成了解决一致图像生成问题的完整闭环。
-
-
 
 ## 核心方法与创新机理
 
@@ -129,8 +125,6 @@ $$\overline{R}^k(\pmb{x}_i^j, \pmb{c}_i) = \begin{cases} \log(1 + R^k(\pmb{x}_i^
 
 上述两个变更槽构成了 PaCo-RL 相对于现有方法的核心差异化能力，但其有效性存在明确边界：（1）PaCo-Reward 的生成式二分类范式受限于基座 VLM 的能力上限，当前基于 Qwen2.5-VL-7B，更大规模 VLM 可能进一步释放潜力；（2）分辨率解耦训练在 0.5x 以下分辨率时信号可靠性急剧下降，0.5x 是当前已验证的下界；（3）对数驯化聚合中的阈值 $\delta$ 当前设为固定值 0.2，其跨任务通用性尚未在更广泛的奖励组合上验证。
 
-
-
 PaCo-RL 的整体 pipeline 由三个核心模块串联构成：**PaCo-Dataset 构建** → **PaCo-Reward 训练** → **PaCo-GRPO 强化学习微调**。其设计逻辑围绕一个核心洞察展开：将一致性评估重构为视觉语言模型（VLM）的下一个 token 预测（Yes/No 概率），充分利用自回归特性避免额外回归头导致的感知错位；同时在 RL 阶段采用低分辨率采样并辅以基于奖励波动的对数压缩，在不损害推理质量的前提下大幅降低计算成本并防止单一奖励主导优化。
 
 ### 模块一：PaCo-Dataset 构建
@@ -165,15 +159,11 @@ RL 训练中关闭 KL 惩罚（$\beta=0$），沿用 FlowGRPO 的设置以获得
 - **PaCo-Reward 训练**：成对图像 + 一致性标签 → 生成式二分类奖励模型（Yes/No 概率）
 - **PaCo-GRPO 微调**：文本提示 + 低分辨率采样 → 多奖励聚合（含对数驯化）→ GRPO 优化 → 全分辨率一致图像输出
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2698_https_arxiv_org_abs_2512_04784/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed PaCo-Reward framework*
 
 ![[assets/figures/papers/paper_list_l2698_https_arxiv_org_abs_2512_04784/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of our proposed PaCo-GRPO framework on Text-to-ImageSet generation task*
-
-
 
 PaCo-RL 的核心架构由两个紧密协作的模块构成：**PaCo-Reward**（成对一致性奖励模型）与 **PaCo-GRPO**（面向一致图像生成的强化学习策略）。前者负责提供与人类感知对齐的一致性评估信号，后者则将该信号高效、稳定地注入图像生成模型的在线优化过程。
 
@@ -220,19 +210,6 @@ $$J_\theta = J_{\mathrm{clip}} - \beta D_{\mathrm{KL}}(\pi_\theta \| \pi_{\mathr
 $$\pmb{x}_{t+\Delta t} = \pmb{x}_t + \left[ \pmb{v}_\theta + \frac{\sigma_t^2}{2t} (\pmb{x}_t + (1-t)\pmb{v}_\theta) \right] \Delta t + \sigma_t \sqrt{\Delta t} \epsilon$$
 
 消融实验验证了两个策略的因果效应：移除分辨率解耦训练后，即使训练时间加倍（12h vs 6h），美学（0.542 vs 0.555）、提示对齐（0.698 vs 0.728）和视觉一致性（0.452 vs 0.493）全面下降；移除对数驯化聚合则导致视觉一致性奖励占优，美学降至 0.471、提示对齐降至 0.616，生成图像趋于低质量重复。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2698_https_arxiv_org_abs_2512_04784/figures/001_Figure_1.jpg]]
-*Figure 1: Two Representative Tasks in Consistent Image Generation. In the image editing task, the model needs to modify specific attributes while preserving the overall appearance. In the text-to-image set generation task, the goal is to generate multiple coherent images that remain consistent in identity, style, and context under a unified description*
-
-![[assets/figures/papers/paper_list_l2698_https_arxiv_org_abs_2512_04784/figures/010_Figure_6.jpg]]
-*Figure 6: Ablation of log-tamed aggregation on the reward ratio*
-
-![[assets/figures/papers/paper_list_l2698_https_arxiv_org_abs_2512_04784/figures/020_Figure_15.jpg]]
-*Figure 15: Pearson correlation of evaluation metrics across different training-to-inference resolution ratios. Strong correlations at 0.5x confirm that reward signals remain reliable under moderate resolution reduction*
-
-
 
 ## 实验与关键发现
 
@@ -285,21 +262,8 @@ Figure 12–14 的跨方法定性对比进一步佐证了定量结果：PaCo-GRP
 
 尽管整体表现优异，实验也揭示了若干边界条件。首先，0.25× 分辨率下奖励信号的可靠性显著下降（Figure 15），限制了进一步压缩计算开销的空间。其次，在极端属性编辑（如大幅姿态变换）场景下，模型偶尔出现身份泄露或背景扭曲，这源于 PaCo-Reward 对细粒度空间对应关系的感知局限——其基于全局 VLM 的评估机制难以精确定位局部不一致区域。此外，当前验证仅限于构造基准上的分布内评估，论文未报告在真实照片编辑等分布外场景上的泛化性能，该点需要后续工作验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2698_https_arxiv_org_abs_2512_04784/figures/004_Table_1.jpg]]
 *Table 1: Benchmark results on EditReward-Bench*
-
-![[assets/figures/papers/paper_list_l2698_https_arxiv_org_abs_2512_04784/figures/005_Table_2.jpg]]
-*Table 2: Benchmark results on ConsistencyRank*
-
-![[assets/figures/papers/paper_list_l2698_https_arxiv_org_abs_2512_04784/figures/006_Table_3.jpg]]
-*Table 3: Comparisons with various Text-to-ImageSet generation methods on T2IS-Bench. Scores for Visual Consistency are evaluated by two independent evaluators, Qwen2.5-VL-7B and Gemma-3-4B (values before/after the slash), to ensure cross-model reliability*
-
-![[assets/figures/papers/paper_list_l2698_https_arxiv_org_abs_2512_04784/figures/007_Table_4.jpg]]
-*Table 4: Benchmark results on GEdit-Bench. EN-I and EN denote English instructions, while CN-I and CN denote Chinese instructions*
-
-
 
 ## 定位与知识库关联
 
@@ -371,8 +335,6 @@ PaCo-RL 在两个代表性任务上验证了其通用性：
 - **通用一致性评估器**：PaCo-Reward 的生成式二分类范式能否发展为通用的多图像一致性评估器，替代现有的多维人工评分？这需要在更广泛的一致性维度（如叙事连贯性、情感一致性）上进行验证。
 - **效率优化**：能否结合量化、蒸馏或模型轻量化技术进一步降低 RL 训练对 GPU 资源的依赖？当前 8×H100 的门槛限制了学术研究和中小团队的复现能力。
 - **开放式生成泛化**：在故事创作等开放式生成任务中，PaCo-Reward 能否泛化到未见过的远域一致性维度（如情节连贯性、角色发展一致性）？这需要构建相应的高质量成对偏好数据集。
-
-
 
 ## 原文 PDF
 

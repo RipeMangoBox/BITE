@@ -77,8 +77,6 @@ Cosmos-Drive-Dreams 提出了一条基于**世界基础模型（World Foundation
 
 当前管道依赖计算密集的扩散模型，大规模生成耗时且资源需求高。自动标注模型（Cosmos-7B-Annotate-Sample-AV）在不同环境下的鲁棒性尚未全面评估。此外，VLM 过滤器的失效模式、生成数据规模的饱和效应、向其他传感器模态的推广，以及推理成本的显著降低，均为待探索的开放问题。
 
-
-
 自动驾驶系统在真实世界中部署的核心挑战之一，是长尾（极端）驾驶场景下真实多视角数据的极度稀缺与高昂的标注成本。尽管现有数据集在常规天气和交通条件下已积累了大量样本，但雨、雪、雾等恶劣天气，以及涉及弱势道路使用者、罕见障碍物等边缘案例的覆盖仍然严重不足。这种数据分布的长尾特性直接导致下游感知与规划模型在罕见情况下泛化能力不足，成为制约自动驾驶安全性的关键瓶颈。
 
 当前缓解数据稀缺问题的主流方案可分为两类。一类是基于传统图像增强的方法，如 **Albumentations**（Buslaev et al., Information 2020），通过对已有图像施加颜色抖动、模糊、噪声等像素级变换来模拟环境变化。这类方法操作简单，但无法改变场景的几何结构或引入新的语义内容，对长尾场景多样性的扩展能力极为有限。另一类是基于物理引擎或三维重建的传感器仿真，能够生成具有精确几何标注的合成数据，但其场景构建高度依赖人工建模，难以创造完全新颖的极端场景，且生成数据的视觉真实感往往与真实域存在明显差距。
@@ -86,8 +84,6 @@ Cosmos-Drive-Dreams 提出了一条基于**世界基础模型（World Foundation
 近年来，世界基础模型（World Foundation Model, WFM）的兴起为合成数据生成开辟了新的可能性。这类模型在海量视频数据上预训练，内化了丰富的物理世界先验，具备从条件信号生成高保真、时序一致视频的能力。然而，将通用WFM直接应用于驾驶场景面临两个核心缺口：其一，通用模型缺乏对驾驶场景几何约束（如道路布局、车道线走向）的精确控制能力，生成的视频可能违背物理合理性；其二，如何系统性地将WFM的生成能力转化为可量化的下游任务增益，在自动驾驶评测基准上形成闭环验证，此前尚无完整方案。
 
 本文的核心动机在于：**利用预训练世界基础模型的物理世界先验，通过驾驶领域后训练与结构化条件控制，构建一个可扩展的合成驾驶数据生成管线，以可控方式系统性地扩充训练集中的长尾场景，从而提升下游感知与规划模型在罕见情况下的泛化能力与数据效率。**
-
-
 
 ## 核心方法与创新机理
 
@@ -121,8 +117,6 @@ Cosmos-Drive-Dreams 将范式切换为**基于预训练世界基础模型的可�
 
 **综上**，Cosmos-Drive-Dreams 的创新本质在于将世界基础模型的生成能力、HDMap 的几何约束、多视图联合建模和 VLM 自动质检整合为一个**可扩展的自动驾驶数据飞轮**（Figure 1 Left），实现了从“真实数据稀缺”到“可控合成数据充裕”的关键跨越。
 
-
-
 Cosmos-Drive-Dreams 的生成管线围绕一个核心瓶颈展开：自动驾驶中长尾（极端）驾驶场景的真实多视角数据稀缺且标注成本高昂，导致下游感知与规划模型在罕见情况下泛化能力不足。为解决这一问题，管线利用预训练世界基础模型（WFM）的物理世界先验，结合高精地图（HDMap）结构化条件控制视频布局、LLM驱动的提示词改写扩展场景多样性，生成可控、多视角一致的合成驾驶视频，以可控方式扩充训练集中的长尾场景（Figure 2）。
 
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2506_09042_fixed_weights/figures/002_Figure_2.jpg]]
@@ -141,8 +135,6 @@ Cosmos-Drive-Dreams 的生成管线围绕一个核心瓶颈展开：自动驾驶
 管线支持两种启动模式：从结构化标签（如 RDS-HQ 数据集）出发，直接渲染 HDMap 条件；或从 in-the-wild 无标注视频（如 Nexar Dashcam 碰撞预测数据集）出发，先由 Cosmos-7B-Annotate-Sample-AV 自动预测 HDMap 和深度，再进入后续生成流程（Figure 8）。此外，管线还包含 LiDAR 数据生成分支（Cosmos-7B-LiDAR-GEN-Sample-AV），可将 LiDAR 点云转换为 range map 表示后，基于 HDMap 或 RGB 图像条件生成合成 LiDAR 数据（Figure 11），并支持不同天气提示下的物理特性变化（如雨天增加射线衰减，Figure 12）。
 
 整个生成管线以 Cosmos-Drive 模型套件为引擎，该套件由通用 WFM（NVIDIA Cosmos-1）经驾驶领域后训练得到，包含精确布局控制、多视角扩展、野生视频标注和 LiDAR 生成四个专用模型（Figure 3）。这种“通用WFM→领域后训练→专用模型”的范式，使得管线能够将物理世界先验迁移到驾驶场景，同时保持对布局、视角和传感器模态的精确控制。
-
-
 
 Cosmos-Drive-Dreams 的生成管线由四个核心模块串联构成，每个模块针对合成数据的一个关键质量维度进行专门设计。
 
@@ -170,8 +162,6 @@ $$r = \sqrt{x^2 + y^2 + z^2}, \quad \phi = \arctan 2(y, x), \quad \theta = \arcs
 
 其中 $r$ 为径向距离，$\phi$ 为方位角，$\theta$ 为仰角。需注意，原始 LiDAR 数据通常经过运动补偿，为准确投影到 range map，必须反转该补偿并估计每个点的时间戳。**Cosmos-7B-LiDAR-GEN-Sample-AV** 以 HDMap 或 RGB 图像为条件生成 LiDAR range map，并通过专门微调的 Cosmos LiDAR tokenizer 重建高质量点云。该 tokenizer 在 RDS-HQ 数据集上微调 30K 步，能够高保真地恢复 LiDAR 输入的几何结构。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设计
@@ -198,9 +188,6 @@ Cosmos-Drive-Dreams 的评估围绕一个核心命题展开：**合成数据能�
 
 在设定 Q（全量真实数据增强）下，Cosmos-Drive-Dreams 在通用天气和极端天气条件下均改善了检测性能（Table 2），进一步验证了合成数据作为通用数据增强策略的普适性。
 
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2506_09042_fixed_weights/figures/020_Table_2.jpg]]
-*Table 2: 3D object detection performance with Cosmos-Drive-Dreams. When applied to augment training set (setting $\pmb { \mathbb { Q } }$ ) , Cosmos-Drive-Dreams improves the detection performance in general and extreme weather conditions
-
 ### LiDAR 多模态检测：跨模态有效性
 
 Cosmos-Drive-Dreams 不仅生成视觉数据，还通过 Cosmos-7B-LiDAR-GEN-Sample-AV 生成 LiDAR 点云数据。在 LiDAR-based 3D 目标检测任务中，使用 1K 真实片段设定，加入 SDG LiDAR 数据后 mAP 从 0.240 提升至 0.250（+0.010，Table 3）。这一结果表明合成数据对多模态感知同样有效，且生成管线能够产生与真实传感器数据分布兼容的 LiDAR 表示。
@@ -211,9 +198,6 @@ Cosmos-Drive-Dreams 不仅生成视觉数据，还通过 Cosmos-7B-LiDAR-GEN-Sam
 ### 驾驶策略学习：数据效率与长尾定向优化
 
 在 RDS-Bench[Policy] 的轨迹预测任务上，添加 SDG 数据持续降低 minADE（Figure 20 左）。数据效率分析表明，达到相同 minADE 1.35 的目标，使用合成数据只需约 50k 真实片段（配合 $R_{s2r}=0.5$），而纯真实数据需要约 60k——**减少了约 17% 的真实数据需求**（Figure 20 中）。
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2506_09042_fixed_weights/figures/027_Figure_20.jpg]]
-*Figure 20: Policy learning. Left: Given an amount of real-world clips, adding SDG data improves trajectory prediction accuracy (minADE on RDS-Bench[Policy], lower is better). Center: Less real-world data is needed to reach a target minADE. Right: Adding a small amount of targeted SDG data can improve performance for certain corner cases (RDS-Bench[VRU/left], without hurting overall driving performance*
 
 更具实践价值的是**定向长尾优化**：针对弱势道路使用者（VRU）和左转等特定长尾场景添加少量定向 SDG 数据，可提升这些场景的预测准确度，同时不影响整体驾驶性能（Figure 20 右，Table 4 右）。这展示了合成数据在“按需生成”方面的独特优势——开发者可以针对模型暴露的薄弱场景定向扩充训练集，而非盲目增加数据量。
 
@@ -236,28 +220,12 @@ VLM 拒绝采样（基于 Qwen2.5-VL-7B-Instruct）丢弃约 3% 的生成样本�
 
 4. **性能增益的饱和趋势**：数据缩放曲线（Figure 15、Figure 16 右）显示，当真实数据量足够大时，合成数据的边际增益递减。如何在高数据量区间保持显著的增量价值，是后续优化的方向。
 
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2506_09042_fixed_weights/figures/019_Figure_15.jpg]]
-*Figure 15: Cosmos-Drive-Dreams improves F-score across varying amounts of real-world training data on 3D Lane Detection task. SDG clips are mixed with real clips using a ratio of R _ { s 2 r } = 0 . 5 . Left: Results on testing dataset. Under all weather conditions, SDG consistently improves detection performance across varying amounts of real-world training data, with the most significant gain (+6.0%) observed in the low-data regime (2k clips). Right: Results on the extreme weather subset of the testing dataset. In more challenging settings (Rainy and Foggy), the benefits of SDG are even more pronounced—showing gains of up to +9.4% under foggy conditions with only 2k real clips. This highlights SDG’s...*
-
 ### 开源资产
 
 Cosmos-Drive 开源了包括 RDS-HQ 子集、预训练模型权重、推理脚本和定制化工具在内的完整资产（Table 5），为社区复现和扩展提供了基础。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2506_09042_fixed_weights/figures/001_Figure_1.jpg]]
-*Figure 1: Left: Autonomous Vehicle Data Flywheel enabled by Cosmos-Drive-Dreams. The cycle illustrates a continuous feedback loop for improving autonomous driving models with synthetic data generation. Right: Cosmos-Drive generates high-quality and diverse synthetic videos with multi-view and LiDAR modality support*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2506_09042_fixed_weights/figures/011_Figure.jpg]]
-*Figure: Elevation angle profile Beam zig-zag pattern Range map representation*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2506_09042_fixed_weights/figures/029_Figure_21.jpg]]
-*Figure 21: Distribution for weather, time of day, and scenario of our RDS-HQ subset*
-
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2506_09042_fixed_weights/figures/024_Figure_18.jpg]]
 *Figure 18: Visualization of LiDAR-based 3D object detection on RDS-HQ (2k) dataset after adding Cosmos-Drive-Dreams*
-
-
 
 ## 定位与知识库关联
 
@@ -301,8 +269,6 @@ Cosmos-Drive-Dreams继承自NVIDIA Cosmos-1世界基础模型（WFM），其关�
 3. **多智能体交互场景的生成能力**：当前生成主要围绕自车视角的场景外观变化，能否扩展到涉及多智能体复杂交互的动态场景（如博弈性换道、无保护左转）仍有待验证。
 4. **推理效率的突破路径**：如何在保持生成视觉质量的同时显著降低扩散模型推理成本？模型蒸馏、步数压缩、专用推理硬件等方向值得探索。
 5. **生成数据与真实数据的域适应**：当前采用简单的固定比例混合（R_s2r），更智能的域适应或课程学习策略能否进一步提升数据效率？
-
-
 
 ## 原文 PDF
 

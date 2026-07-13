@@ -48,8 +48,6 @@ claims:
 
 在 HumanML3D 和 KIT-ML 数据集上，Text2BFM 的 R-Precision Top-3 分别达到 0.876 和 0.901，MultiModal Distance 分别为 2.498 和 2.658，均显著优于 **MoMask** 等现有方法。在长复合提示评估中，Text2BFM-Compose 在 N=3 和 N=4 时达到更高的顺序准确率（0.671 和 0.509）和更低的过渡分数，验证了其在长时域语义一致性上的优势。然而，由于冻结 BFM 策略基于特定环境和动作空间训练，生成运动的 FID 值显著劣于直接在姿态空间生成的模型，存在分布质量上的权衡。此外，该方法对稀有动作、杂技动作和物体依赖交互的处理能力有限，且当前仅支持单人物运动生成。
 
-
-
 文本到运动生成（text-to-motion generation）旨在根据自然语言描述合成逼真的三维人体运动序列，在动画制作、虚拟现实和人机交互等领域具有广泛应用。近年来，扩散模型和自回归模型在该领域取得了显著进展，代表性工作包括 **MDM**、**MLD**、**MotionDiffuse**、**T2M-GPT**、**ReMoDiffuse** 和 **MoMask** 等。然而，这些方法存在一个根本性的架构瓶颈：**语义理解、长程时序组织和低层物理执行被耦合在单一生成模型中**。
 
 具体而言，现有方法通常直接在姿态序列空间或运动token空间中进行生成。这种端到端的范式在处理短时域、单一动作的简单提示时表现尚可，但面对长时域复合提示（如“一个人向前跑，然后左转，快速出拳，接着向右踢腿，之后向前走，举起双臂庆祝，最后开心地挥手”）时，会暴露出三个层面的系统性缺陷：
@@ -61,8 +59,6 @@ claims:
 造成上述问题的深层原因在于：**姿态空间本身并不适合承载高层语义规划**。姿态序列是高维、连续且高度冗余的表示，其中大部分变化与语义无关（如个人风格、速度微调等）。当生成模型被迫在这样一个信息密集的空间中同时完成语义理解和运动合成时，长程语义结构容易被局部物理细节淹没。
 
 这一洞察引出了本文的核心动机：**将运动生成从姿态空间提升到行为规划空间**。如果能够将“做什么动作、以什么顺序做”的高层规划与“如何执行每个动作”的低层物理实现解耦，那么生成模型只需专注于前者——一个更紧凑、语义更明确的规划问题；而后者可以交给一个预训练好的、具备物理合理性的行为基础模型（Behavioral Foundation Model, BFM）来完成。这种“规划而非姿态”（Plan, Don't Pose）的范式转换，是本文方法设计的根本出发点。
-
-
 
 ## 核心方法与创新机理
 
@@ -102,8 +98,6 @@ $$\mathcal{L}_{\mathrm{VBB}} = \mathcal{L}_{\mathrm{rec}} + \beta \mathcal{L}_{\
 | 语义-物理耦合 | 耦合在单一模型 | 解耦为规划+执行 |
 
 这种“规划而非姿态”的设计使得 Text2BFM 在长复合运动生成上具有天然优势：每个动作阶段通过局部可执行潜在表示，更容易保持动作的语义身份和时序顺序。实验验证了这一设计——在 N=3 和 N=4 的复合提示评估中，Text2BFM-Compose 的顺序准确率分别达到 0.671 和 0.509，显著优于直接生成方法（Table 2）。
-
-
 
 Text2BFM 的核心设计理念是将文本到运动生成从**姿态空间**迁移到**行为规划空间**，从而实现语义理解与物理执行的解耦。整体框架由三个关键阶段构成：预训练行为基础模型（BFM）的潜在提取、文本对齐变分行为瓶颈（VBB）的构建，以及流匹配生成器的条件生成。
 
@@ -148,8 +142,6 @@ Figure 2 展示了完整的训练与生成管线。各模块职责如下：
 ### 复合运动生成
 
 对于长复合提示，Text2BFM-Compose 将提示分解为子句 $Y_{\mathrm{comp}} = Y^{(1)} \text{ then } Y^{(2)} \text{ then } \cdots \text{ then } Y^{(N)}$，逐子句生成行为程序，解码后拼接策略潜在序列 $\hat{z}_{1:T}^{\mathrm{comp}} = \hat{z}_{1:T_1}^{(1)} \oplus \hat{z}_{1:T_2}^{(2)} \oplus \dots \oplus \hat{z}_{1:T_N}^{(N)}$，并在子句边界处混合 $O$ 个潜在步以平滑过渡。
-
-
 
 Text2BFM 的核心架构由三个解耦的模块串联而成：冻结的行为基础模型（BFM）策略、文本对齐的变分行为瓶颈（VBB），以及流匹配生成器。整体流程遵循“规划而非姿态”的范式——先在紧凑的行为规划空间中生成可执行的程序，再交由 BFM 策略完成物理执行。
 
@@ -201,8 +193,6 @@ $$\frac{d m(r)}{d r} = v_{\eta}(m(r), r, Y), \quad r \in [0,1]$$
 
 生成的行为程序经 VBB 解码器恢复为策略潜在序列 $\hat{z}_{1:T_z}$，最终驱动冻结的 BFM 策略 rollout 产生完整运动。流匹配相比扩散模型的关键优势在于：仅需 16 步采样即可获得更优的 FID 和 MM-Dist（见 Table 5），推理效率显著提升。
 
-
-
 ## 实验与关键发现
 
 ### 标准文本到运动生成基准
@@ -243,8 +233,6 @@ Table 5对比了在相同行为瓶颈空间下，流匹配生成器与扩散模�
 2. **稀有动作覆盖不足**：对杂技动作、物体依赖交互等训练数据中不充分或未被BFM策略涵盖的行为，生成质量有限。
 3. **单角色限制**：当前框架仅支持单人物运动生成，未扩展至多角色场景。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2605_29906/figures/003_Table_1.jpg]]
 *Table 1: Quantitative comparison on HumanML3D and KIT-ML datasets. Metrics: R-Precision Top-3 and MultiModality (the higher, the better), FID and MultiModal Distance (the lower, the better). Best values are highlighted in blue*
 
@@ -254,18 +242,11 @@ Table 5对比了在相同行为瓶颈空间下，流匹配生成器与扩散模�
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2605_29906/figures/006_Table_3.jpg]]
 *Table 3: Ablation on policy-latent sequence compression. All variants use the same frozen BFM policy and the same evaluation protocol. Best values are highlighted in blue*
 
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2605_29906/figures/007_Table_4.jpg]]
-*Table 4: Effect of temporal compression on BFM latent reconstruction and policy-level behavior preservation. Lower is better*
-
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2605_29906/figures/008_Table_5.jpg]]
 *Table 5: Ablation of the choice of the underlying generator. Both variants operate in the learned behavioral bottleneck space*
 
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2605_29906/figures/009_Table_6.jpg]]
 *Table 6: Core architecture and hyperparameters*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2605_29906/figures/011_Figure.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -319,8 +300,6 @@ Text2BFM处于两条研究线的交汇点：**通用行为基础模型**和**文
 3. **细粒度风格控制。** 当前方法通过文本控制“做什么”，但对“怎么做”（如力度、速度、风格）的控制粒度有限。能否在行为程序空间中引入额外的风格条件维度？
 
 4. **稀有动作泛化。** 如何使框架在遇到训练数据中未见或少见的动作描述时，仍能生成合理的行为程序？这可能需要在行为程序空间中进行组合泛化或few-shot适应。
-
-
 
 ## 原文 PDF
 

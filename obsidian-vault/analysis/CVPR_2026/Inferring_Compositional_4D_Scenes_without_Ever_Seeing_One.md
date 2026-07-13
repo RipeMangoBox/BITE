@@ -51,8 +51,6 @@ claims:
 
 实验表明，COM4D 在单物体 4D 重建任务上以 IoU 0.4191 超越所有基线（DeformingThings 数据集，Table 1），在 3D 场景生成任务上以 Chamfer Distance 0.0909 和 F-Score 0.8069 达到最优（3D-FRONT 数据集，Table 2）。用户研究进一步证实，注意力混合机制在空间正确性与时间一致性上显著优于无混合基线（87% vs. 6.9% 偏好率，Figure 1.B）。消融实验揭示，静态/动态嵌入与扩散强迫（Diffusion Forcing）是性能提升的关键组件：添加嵌入后 CD 从 0.1525 降至 0.1284，IoU 从 0.2018 升至 0.4034（Table 3）。在方法谱系上，COM4D 区别于 **V2M4**（Zhang et al., 2025）和 **L4GM**（Ren et al., NeurIPS 2024）等单物体 4D 方法，以及 **PartCrafter**、**MIDI** 等多物体 3D 场景生成方法，首次实现了无需组合 4D 训练数据的组合式 4D 场景重建。
 
-
-
 ### 问题背景：组合式 4D 场景重建的数据困境
 
 从单目视频中重建完整的 4D 场景——同时恢复静态背景的几何结构与动态物体的时空形变——是计算机视觉的核心挑战之一。这一任务要求模型不仅理解场景中多个物体的空间布局，还要捕捉每个动态物体随时间的运动与形变。然而，现有方法面临一个根本性的数据瓶颈：**缺乏同时包含多静态物体与多动态物体的 4D 组合训练数据**。
@@ -78,8 +76,6 @@ claims:
 2. **注意力混合的泛化能力**：在推理时，模型可以将训练阶段习得的空间多实例注意力和时间多帧注意力进行混合——在偶数层对所有物体的潜变量进行空间注意力以推理全局场景布局，在奇数层对每个动态物体的历史帧进行时间注意力以建模运动形变。这种混合策略使模型能够在零样本条件下泛化到组合式 4D 场景，即**无需组合训练数据即可重建组合 4D 场景**。
 
 基于这一动机，本文提出了 **COM4D**（Compositional 4D），通过精心设计的注意力解析训练策略和注意力混合推理机制，首次实现了仅使用静态多物体和动态单物体监督信号，即可从单目视频中联合重建完整 4D 场景的目标。
-
-
 
 ## 核心方法与创新机理
 
@@ -109,8 +105,6 @@ COM4D 的核心创新在于**将组合式 4D 场景重建拆解为两个可解�
 
 定性对比（Figure 7）直观地展示了注意力混合的关键作用：无混合的基线在静态物体与动态物体交界处出现明显的几何错位和穿透，而混合后的重建在静态-动态组合上表现出远为优越的空间一致性。
 
-
-
 COM4D 的整体框架围绕一个核心洞察展开：**空间组合与时间动态可以解耦学习，并在推理时通过交替的注意力机制融合**，从而实现零样本的组合式 4D 场景重建。其 pipeline 由以下关键模块串联构成：
 
 **输入与条件信号提取。** 系统接收一段单目视频作为输入。对于静态场景布局，使用 DINOv2 从整帧图像中提取全局嵌入 $\mathbf{y}$ 作为条件信号；对于动态物体，则利用 SAM 从视频帧中提取每个动态物体的掩码，并通过 DINOv2 从掩码区域提取逐帧的条件嵌入 $^f\mathbf{y}^j$。这种双重条件提取机制使得模型能够同时感知全局场景布局和局部动态物体的外观变化。
@@ -124,11 +118,6 @@ COM4D 的整体框架围绕一个核心洞察展开：**空间组合与时间动
 **输出解码。** 去噪后的潜变量通过 TripoSG 解码器解码为符号距离场网格，最终重建出包含静态场景和动态物体的完整 4D 表示。整个训练在单张 NVIDIA H200 GPU 上约需 2 天。
 
 > **Figure 1** 展示了 COM4D 从单段视频输入到完整 4D 场景重建的整体流程，以及注意力混合机制的核心概念。用户研究表明，注意力混合机制在空间正确性和时间一致性上显著优于无混合的基线（87% vs 6.9% 偏好）。
-
-![[assets/figures/papers/paper_list_l26_https_openaccess_thecvf_com_content_CVPR2026_html_Gokmen_Inferring_Compo/figures/001_Figure_1.jpg]]
-*Figure 1: Given a single video (bottom), our method reconstructs the entire 3D scene along with the individual dynamic objects (A), while maintaining spatial and temporal consistency through spatio-temporal attention mixing (C). The silhouettes (purple for human and orange for dog) correspond to the beginning of dynamic sequences. Our user study (for spatial correctness and temporal coherence) shows that the reconstructions obtained using the proposed attention mixing mechanism are clearly preferred over the baseline without mixing (B)*
-
-
 
 ### 问题形式化
 
@@ -171,13 +160,6 @@ $$\mathcal{L}_{S} = \mathbb{E}\left[\sum_{i=1}^{N}\left\|(\boldsymbol{\epsilon}^
 综合训练损失 $\mathcal{L}_{S/T/R}$ 分别对应静态场景损失、时间序列损失和 TripoSG 的正则化损失，三者联合优化。
 
 **潜变量嵌入**。为区分静态与动态物体，模型为每个潜变量添加可学习的对象嵌入 $e^i$ 和帧嵌入 $f_e$。消融实验表明，添加静态/动态嵌入后，DeformingThings 上的 Chamfer Distance 从 0.1525 降至 0.1284，IoU 从 0.2018 升至 0.4034——这是所有消融项中增益最大的改动，直接验证了嵌入对模型区分物体身份和时序位置的关键作用。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l26_https_openaccess_thecvf_com_content_CVPR2026_html_Gokmen_Inferring_Compo/figures/002_Figure_2.jpg]]
-*Figure 2: Our attention parsing and mixing strategy. A single DiT model with shared weights is trained jointly on two datasets. (Top) During training with samples from DeformingThings [42], odd-indexed blocks perform multi-frame attention to capture temporal dynamics. (Bottom) When training with samples from 3D-FRONT [19], even-indexed blocks perform multi-instance attention to model spatial part decomposition. At inference, the same model applies an attention mixing mechanism. In each layer, spatial blocks (even-indexed) aggregate all latents from a single frame and process them jointly, conditioned on the full-scene image y at that timestep. Temporal blocks (oddindexed) then operate over all frames...*
-
-
 
 ## 实验与关键发现
 
@@ -224,16 +206,6 @@ COM4D 在多个任务上进行了全面评估，包括单物体 4D 重建、3D �
 ### 失败模式与局限
 
 论文未明确列出失败案例，但指出两个开放问题：一是如何引入显式物理因果关系以改善遮挡下的推理；二是如何将 COM4D 扩展到动态相机输入。这些方向暗示当前方法在严重遮挡和相机运动场景下可能存在鲁棒性不足的问题，需要进一步验证。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l26_https_openaccess_thecvf_com_content_CVPR2026_html_Gokmen_Inferring_Compo/figures/003_Figure_3.jpg]]
-*Figure 3: Qualitative results on temporal sequences. Top rows show input frames; bottom rows show our generated reconstructions from two vertically stacked camera views. The examples shown are from content produced by ChatGPT [58] and animated with Wan [78], the CMU Panoptic dataset [32] (sequences 160401 ian3 and 160906 ian2), and the PROX dataset [24] (N3OpenArea 00158 02). Our method maintains temporal consistency and spatial realism across both real and synthetic sources*
-
-![[assets/figures/papers/paper_list_l26_https_openaccess_thecvf_com_content_CVPR2026_html_Gokmen_Inferring_Compo/figures/006_Figure_5.jpg]]
-*Figure 5: Qualitative 4D generation comparisons for two subjects (top two rows: Ninja, bottom two rows: Amy) at two time steps. The first column shows the input frames, and subsequent columns show a fixed pose rendered view from each method. V2M4 fails in a few samples, e.g., the last row input*
-
-
 
 ## 定位与知识库关联
 
@@ -286,8 +258,6 @@ COM4D 的贡献不在于提出全新的生成架构，而在于**设计了一种
 1. **物理因果推理**：如何引入显式物理约束（如碰撞检测、运动学约束）以改善遮挡下的推理质量？当前注意力混合纯靠数据驱动，缺乏对物理交互的显式建模。
 2. **动态相机扩展**：如何将 COM4D 扩展到动态相机输入场景？这需要同时推理相机位姿与场景动态，对注意力路由机制提出了更高要求。
 3. **泛化到未见物体类别**：COM4D 的训练数据（3D-FRONT 室内场景、DeformingThings 动物/人体）覆盖范围有限，其对完全未见物体类别的零样本泛化能力尚待验证。
-
-
 
 ## 原文 PDF
 

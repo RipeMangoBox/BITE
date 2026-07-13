@@ -52,8 +52,6 @@ claims:
 
 实验结果表明，在无需任何后优化的情况下，MotionCrafter在几何重建上平均相对提升 **38.64%**，在运动估计上平均相对提升 **25.0%**，在多个基准数据集上显著超越现有方法（如 **VGGT**、**MonST3R**、**Geo4D**、**Zero-MSF**、**ST4RTrack** 等）。消融研究进一步验证了均值归一化与全VAE微调策略对户外场景重建质量的决定性作用，以及确定性训练范式相比扩散范式在几何精度上的显著优势。
 
-
-
 ### 从稀疏重建到密集4D理解
 
 从单目视频中恢复三维场景结构与运动，是计算机视觉长期以来的核心目标。传统方法集中在稀疏重建（如SfM与SLAM）或单帧深度估计，但这两类任务都只触及了完整场景理解的局部：前者仅输出稀疏点云与相机位姿，后者缺乏对跨帧运动与几何一致性的显式建模。近年来，随着大规模预训练视频扩散模型的出现，从视频中直接预测密集几何与运动成为可能，但现有方法仍存在两个根本性瓶颈。
@@ -73,8 +71,6 @@ claims:
 2. **放松对扩散潜空间的分布对齐约束。** 通过均值归一化（canonical normalization）与全VAE微调策略，允许4D潜空间偏离原始SVD潜空间的分布，从而更充分地释放预训练视频扩散模型的时空先验，同时保持对新场景的泛化能力。
 
 这两个动机共同指向一个目标：在保持预训练先验优势的前提下，实现真正端到端的、无需后优化的高质量几何与运动联合重建。
-
-
 
 ## 核心方法与创新机理
 
@@ -128,8 +124,6 @@ $$\mathcal{L}_{\mathrm{deterministic}} = \mathcal{L}_{\mathrm{latent}} + \lambda
 
 **方法论意义**：这提出了一个开放问题——确定性训练范式是否在所有密集预测任务中均优于扩散范式？MotionCrafter的实践表明，当输出空间具有明确的几何约束时，直接回归可能比迭代去噪更有效。
 
-
-
 MotionCrafter 的整体设计围绕一个核心目标展开：从单目视频序列中端到端地联合重建世界坐标系下的密集几何（点图）与密集运动（场景流）。其 pipeline 可概括为“4D VAE 编码-扩散 U-Net 预测-4D VAE 解码”的三阶段结构，如 Figure 2 所示。
 
 ![[assets/figures/papers/paper_list_l968_https_arxiv_org_abs_2602_08961/figures/002_Figure_2.jpg]]
@@ -164,8 +158,6 @@ $$\mathcal{L}_{\text{deterministic}} = \mathcal{L}_{\text{latent}} + \lambda_G \
 其中 $\mathcal{L}_{\text{latent}}$ 对几何和运动潜码施加 MSE 监督（Eq.7），$\mathcal{L}_G$ 联合点图 MSE、多尺度深度损失和法向一致性损失（Eq.4），$\mathcal{L}_M$ 包含场景流重建 MSE 和零流正则项（Eq.5）。解码器损失（decoder loss）在四个未见数据集上带来平均 15.01% 的提升（Table 6），多模态深度监督使世界坐标点图重建质量平均提升 13.55%（Table 5）。
 
 **与基线方法的根本差异。** 相较于 POMATO、ST4RTrack、DELTA、Zero-MSF 等联合几何-运动估计方法，以及 VGGT、Geo4D、MonST3R 等纯几何重建方法，MotionCrafter 的核心区分点在于：(1) 在世界坐标系而非相机坐标系下统一建模；(2) 无需任何后优化（如 Geo4D 的全局对齐），所有结果由模型直接端到端输出；(3) 通过放松对扩散模型 RGB 潜空间的对齐约束，有效迁移了视频扩散模型的时空先验，在训练规模远小于 VGGT 的情况下仍展现出对动态场景的良好鲁棒性（Figure 10）。
-
-
 
 MotionCrafter 的核心架构围绕一个统一的 4D 世界坐标表示展开，由三个关键模块构成：几何 VAE、运动 VAE 和基于预训练视频扩散模型的 U-Net 预测器。其设计目标是将密集几何重建与运动估计联合建模，而非分离处理。
 
@@ -224,16 +216,6 @@ $$\mathcal{L}_{\mathrm{latent}} = \frac{1}{N} \sum_{N} \|\hat{\mathbf{z}}_i^{\ma
 
 MotionCrafter 的一个重要设计选择是不强制 4D 潜在分布与预训练 SVD VAE 的潜空间严格对齐。这一放松策略使 VAE 和扩散 U-Net 的泛化性能均得到持续改善。其因果机制在于：预训练视频扩散模型的潜空间是针对 RGB 视频帧优化的，强制对齐会限制几何和运动表示的灵活性；放松约束后，模型可以学习更适合密集几何-运动联合建模的潜在结构。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l968_https_arxiv_org_abs_2602_08961/figures/003_Figure_3.jpg]]
-*Figure 3: Geometry and Motion representation. For a pixel*
-
-![[assets/figures/papers/paper_list_l968_https_arxiv_org_abs_2602_08961/figures/004_Figure_4.jpg]]
-*Figure 4: Results of different normalization and VAE training strategies. For outdoor scenes with significant variations in depth (the second row), the original VAE fails to recover the scene structure. Even with decoder fine-tuning, the reconstruction quality remains poor. Our proposed mean normalization and VAE training strategy significantly improve reconstruction quality*
-
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -278,17 +260,11 @@ Table 3 的消融显示，所提出的归一化与 VAE 训练策略**一致提�
 
 #### 2. 几何-运动融合策略（Table 4）
 
-![[assets/figures/papers/paper_list_l968_https_arxiv_org_abs_2602_08961/figures/009_Table_4.jpg]]
-*Table 4: Ablation study on motion VAE. Comparison of different designs across three dynamic scene flow datasets. Again, we report results on both VAE and U-Net*
-
 **关键发现**：统一的通道拼接融合策略在 U-Net 阶段表现最优，尽管在 VAE 阶段的重建指标并非最佳。
 
 Table 4 比较了三种融合设计：分离 VAE、统一 VAE（通道拼接）、统一 VAE（加法融合）。结果表明，通道拼接策略在 VAE 重建指标上略低于分离 VAE，但在下游扩散 U-Net 中取得了**显著更优的性能**。这说明 VAE 阶段的最优重建不等于下游任务的最优表示——通道拼接为 U-Net 提供了更丰富的联合特征交互空间。
 
 #### 3. 多模态深度监督（Table 5）
-
-![[assets/figures/papers/paper_list_l968_https_arxiv_org_abs_2602_08961/figures/011_Table_5.jpg]]
-*Table 5: Ablation study on Geometry VAE components. Metrics are reported for ScanNet, Sintel, and Monkaa datasets: point accuracy (Relp ↓, δp ↑) and depth accuracy*
 
 **关键发现**：多模态深度监督使世界坐标点图重建质量平均提升 **13.55%**。
 
@@ -296,17 +272,11 @@ Table 5 消融了 Geometry VAE 的各组件。在 ScanNet、Sintel、Monkaa 三�
 
 #### 4. 解码器损失（Table 6）
 
-![[assets/figures/papers/paper_list_l968_https_arxiv_org_abs_2602_08961/figures/012_Table_6.jpg]]
-*Table 6: Ablation study on Unet components for Geometry Reconstruction. We compare models trained with different strategies, rescaling methods, and decoder losses*
-
 **关键发现**：解码器损失在四个未见数据集上带来平均 **15.01%** 的提升。
 
 Table 6 消融了 U-Net 组件的不同训练策略、重缩放方法和解码器损失。加入解码器端到端损失后，模型在未见场景上的泛化能力大幅增强，说明直接监督解码输出有助于约束潜空间学习。
 
 #### 5. 训练范式：确定性 vs 扩散（Table 7）
-
-![[assets/figures/papers/paper_list_l968_https_arxiv_org_abs_2602_08961/figures/014_Table_7.jpg]]
-*Table 7: Ablation on different training paradigm*
 
 **关键发现**：确定性训练范式在几何重建上 RelP 平均降低约 **12.4%**，δP 平均提升约 **12.7%**。
 
@@ -338,8 +308,6 @@ Figure 8 展示了在 Davis 数据集上的零样本结果。尽管场景流估�
 - **Figure 8**：Davis 数据集零样本结果
 - **Figure 9**：与 Zero-MSF 和 DELTA 的定性比较
 - **Figure 10**：与 VGGT、Geo4D、ST4RTrack 的定性几何比较
-
-
 
 ## 定位与知识库关联
 
@@ -403,8 +371,6 @@ MotionCrafter 在方法谱系中的独特贡献可概括为三个层次：
 5. **计算效率与实时性**：基于视频扩散模型的方法在推理速度上可能难以满足实时应用需求，是否存在轻量化路径（如蒸馏、一步生成）？
 
 6. **与3D基础模型的整合**：MotionCrafter 的4D输出（点图+场景流）可作为3D基础模型（如3D Gaussian Splatting、NeRF）的初始化或约束，这一方向尚未探索。
-
-
 
 ## 原文 PDF
 

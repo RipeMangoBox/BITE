@@ -66,6 +66,7 @@ def args() -> argparse.Namespace:
     p.add_argument("--repo-root", type=Path, default=ROOT)
     p.add_argument("--run-dir", type=Path, help="Required new directory in write mode.")
     p.add_argument("--report", type=Path, help="Dry-run JSON report path; stdout by default.")
+    p.add_argument("--strict", action="store_true", help="Always select the top six evidence-role images; do not defer low-confidence cases.")
     p.add_argument("--write", action="store_true")
     return p.parse_args()
 
@@ -145,7 +146,7 @@ def classify(item: Image) -> None:
         item.reasons.append("unclassified_table")
 
 
-def choose(items: list[Image]) -> tuple[set[int], str, list[str]]:
+def choose(items: list[Image], strict: bool = False) -> tuple[set[int], str, list[str]]:
     for item in items:
         classify(item)
     captioned = sum(bool(item.caption) for item in items)
@@ -155,7 +156,7 @@ def choose(items: list[Image]) -> tuple[set[int], str, list[str]]:
         problems.append(f"caption coverage too low: {captioned}/{len(items)}")
     if len(roles) < 2:
         problems.append(f"insufficient role coverage: {sorted(roles)}")
-    if problems:
+    if problems and not strict:
         return set(), "low", problems
     selected: list[int] = []
     for role in ROLE_ORDER:
@@ -171,9 +172,9 @@ def choose(items: list[Image]) -> tuple[set[int], str, list[str]]:
     # images, defer to manual review instead of relying on source order.
     kept_scores = sorted((item.score for item in items if item.index in selected))
     removed_scores = sorted((item.score for item in items if item.index not in selected), reverse=True)
-    if kept_scores and removed_scores and kept_scores[0] == removed_scores[0]:
+    if not strict and kept_scores and removed_scores and kept_scores[0] == removed_scores[0]:
         return set(), "medium", [f"selection boundary tied at score {kept_scores[0]}"]
-    return set(selected), "high", []
+    return set(selected), "strict" if strict else "high", problems if strict else []
 
 
 def empty_supplemental_headings(lines: list[str]) -> set[int]:
@@ -195,18 +196,34 @@ def empty_supplemental_headings(lines: list[str]) -> set[int]:
     return remove
 
 
-def transform(text: str) -> tuple[str, list[Image], set[int], str, list[str]]:
+def transform(text: str, strict: bool = False) -> tuple[str, list[Image], set[int], str, list[str]]:
     lines = text.splitlines()
     found = images(lines)
     if len(found) <= 6:
+        if strict:
+            supplemental = {
+                index for index, line in enumerate(lines)
+                if (heading := HEADING_RE.match(line))
+                and any(word in heading.group(2).lower() for word in SUPPLEMENT)
+            }
+            if supplemental:
+                output = [line for index, line in enumerate(lines) if index not in supplemental]
+                updated = re.sub(r"\n{3,}", "\n\n", "\n".join(output)) + ("\n" if text.endswith("\n") else "")
+                return updated, found, {item.index for item in found}, "strict", []
         return text, found, {item.index for item in found}, "not_applicable", []
-    keep, confidence, review = choose(found)
-    if review:
+    keep, confidence, review = choose(found, strict=strict)
+    if review and not strict:
         return text, found, set(), confidence, review
     removed_lines = {line for item in found if item.index not in keep for line in range(item.start, item.end)}
     interim = [line for i, line in enumerate(lines) if i not in removed_lines]
-    empty = empty_supplemental_headings(interim)
-    output = [line for i, line in enumerate(interim) if i not in empty]
+    remove_headings = {
+        index for index, line in enumerate(interim)
+        if strict and (heading := HEADING_RE.match(line))
+        and any(word in heading.group(2).lower() for word in SUPPLEMENT)
+    }
+    if not strict:
+        remove_headings = empty_supplemental_headings(interim)
+    output = [line for i, line in enumerate(interim) if i not in remove_headings]
     updated = re.sub(r"\n{3,}", "\n\n", "\n".join(output)) + ("\n" if text.endswith("\n") else "")
     return updated, found, keep, confidence, []
 
@@ -237,12 +254,13 @@ def main() -> int:
     records = []
     for path in paths(root, opt.paths_file):
         old = path.read_text(encoding="utf-8")
-        new, found, keep, confidence, review = transform(old)
+        new, found, keep, confidence, review = transform(old, strict=opt.strict)
         changed = new != old
-        status = "manual_review" if review else ("would_write" if changed and not opt.write else "written" if changed else "skip")
+        status = "manual_review" if review and not opt.strict else ("would_write" if changed and not opt.write else "written" if changed else "skip")
         selected = [{"target": x.target, "role": x.role, "score": x.score, "reasons": x.reasons} for x in found if x.index in keep]
         removed = [{"target": x.target, "role": x.role, "score": x.score, "reasons": x.reasons} for x in found if keep and x.index not in keep]
-        rec = Record(path.relative_to(root).as_posix(), status, len(found), 6 if changed else len(found), confidence, sha(old), sha(new), selected, removed, review)
+        after_count = len(images(new.splitlines()))
+        rec = Record(path.relative_to(root).as_posix(), status, len(found), after_count, confidence, sha(old), sha(new), selected, removed, review)
         if opt.write and changed:
             assert run
             backup = run / "backups" / path.relative_to(root)
@@ -256,6 +274,7 @@ def main() -> int:
         records.append(asdict(rec))
     summary = {
         "mode": "write" if opt.write else "dry-run",
+        "strict": opt.strict,
         "notes_scanned": len(records),
         "status_counts": {status: sum(r["status"] == status for r in records) for status in sorted({r["status"] for r in records})},
         "images_before": sum(r["image_count_before"] for r in records),

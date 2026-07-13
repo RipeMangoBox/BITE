@@ -59,8 +59,6 @@ claims:
 
 综上，ScaleCUA 的核心贡献在于证明了**通过大规模、跨平台的交互数据缩放，开源视觉语言模型能够在计算机使用任务上达到甚至超越闭源模型的性能水平**，为通用计算机使用智能体的发展提供了坚实的数据与方法基础。
 
-
-
 计算机使用智能体（Computer Use Agent）旨在通过视觉感知图形用户界面（GUI），自主完成跨应用、跨平台的任务操作。近年来，闭源商业模型（如GPT-4o、Claude-3.7）在这一领域展现了强大的能力，但其训练数据和实现细节不透明，难以复现或定制。开源方案则面临根本性瓶颈：**缺乏大规模、跨平台的计算机使用操作轨迹数据和高质量训练语料**，严重限制了通用计算机使用智能体的泛化能力。
 
 现有数据收集方法存在两类典型缺陷。其一，纯人工标注成本高昂，且任务覆盖面受限于标注者的知识范围，难以规模化。其二，纯自动化探索虽能快速生成数据，但产生的轨迹往往缺乏语义目标导向，质量参差不齐，容易过时。此外，现有数据集在平台覆盖上碎片化严重——多数工作仅聚焦单一操作系统（如Android或Web），缺乏对Windows、Ubuntu、macOS、iOS等多平台的统一支持，导致模型难以习得跨平台通用的GUI理解与操作能力。
@@ -68,8 +66,6 @@ claims:
 从模型层面看，现有开源GUI智能体在感知、推理和动作之间缺乏深度整合。部分方法将定位（grounding）与动作执行分离为独立模块，增加了系统复杂度和延迟；另一些方法则采用单一推理模式，无法灵活适配不同任务场景对效率或可解释性的差异化需求。与此同时，动作空间通常为平台专属定义，进一步加剧了跨平台迁移的困难。
 
 上述缺口构成了本文的核心动机：**能否通过构建一个跨平台交互数据管道，系统性地生成大规模、多模态训练数据，并在此基础上训练一个统一的视觉语言模型，使其同时具备感知、推理和动作能力？** 这一思路的核心假设是：数据驱动的缩放（scaling）能够显著提升开源模型在计算机使用任务上的性能，使其在多个基准上达到甚至超越闭源模型。
-
-
 
 ## 核心方法与创新机理
 
@@ -115,8 +111,6 @@ ScaleCUA的核心创新并非提出全新的模型架构，而是通过**系统�
 
 需要注意的是，虽然数据增强策略（元素裁剪、合成分辨率缩放、推理提示丰富）在ScreenSpot-Pro上带来了**3.5个百分点的提升**（37.8→41.3，Table 4a），但这属于数据层面的优化技巧，而非架构级创新。ScaleCUA真正的壁垒在于**数据管道的系统设计**和**推理范式的灵活整合**，这两者共同构成了其超越闭源模型（如GPT-4o、Claude-3.7）和开源基线（如UI-TARS-72B-DPO）的基础。
 
-
-
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_yBFUqdJFZn/figures/001_Figure_1.jpg]]
 *Figure 1: Performance comparison. The top row showcases performance overview on GUI-centric benchmarks. The bottom row demonstrates the consistent improvements from our collected data*
 
@@ -149,8 +143,6 @@ ScaleCUA 家族基于 Qwen2.5-VL 构建，支持三种推理范式（图 3）：
 ### 训练策略
 
 训练时，ScaleCUA 根据模型规模控制通用数据与 GUI 数据的混合比例：3B 模型使用 25% 通用数据，7B 使用 50%，32B 使用 75%。这种数据平衡策略被证明是保留 GUI 专业化能力而不损害通用推理能力的关键。
-
-
 
 ### 智能体-环境交互范式
 
@@ -190,8 +182,6 @@ ScaleCUA 支持三种灵活切换的推理模式（参见 Figure 3），以适�
 
 在多任务训练中，ScaleCUA 针对不同模型规模采用了差异化的数据平衡策略：3B 模型使用 25% 通用数据与 75% GUI 数据，7B 模型使用 50%/50%，32B 模型使用 75%/25%。消融实验表明，增加通用数据比例会提升通用视觉语言基准分数，但会逐渐削弱 GUI 任务的专项性能。这一策略在保持通用推理能力的同时，最大化了对 GUI 任务的适配度，是实现模型“通专兼备”的关键设计。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能突破
@@ -212,9 +202,6 @@ ScaleCUA在GUI理解、定位与端到端任务完成三个维度上均展现出
 *Table 6: Results on ScreenSpot-v2 (Wu et al., 2024b)*
 
 端到端任务完成是衡量智能体实用性的关键指标。在**WebArena-Lite-v2**（50步预算）上，ScaleCUA-32B取得47.4%的成功率，比最强开源基线UI-TARS-72B-DPO（21.4%）提升26.0个百分点（Table 3）。在OSWorld上达到30.6%，在AndroidWorld上同样表现出色。这些结果表明，统一的感知-推理-动作模型在真实网页和桌面环境中具备可靠的执行能力。
-
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_yBFUqdJFZn/figures/006_Table_3.jpg]]
-*Table 3: Online evaluation across different platforms. AndroidWorld has its own predefined step budget. ♣ denotes the unkown step budget and ⋆ indicates more than 50 steps is used*
 
 ### 推理模式对比
 
@@ -247,26 +234,8 @@ ScaleCUA支持三种推理范式：直接动作模式（DAM）和推理动作模
 - **困难平台挑战**：在WindowsAgentArena等复杂基准上，需要更大规模的数据才能达到理想性能，提示当前数据管道的覆盖率仍有扩展空间。
 - **历史建模局限**：当前采用扁平的历史表示，无法充分捕获长程依赖关系，限制了模型在需要记忆和状态追踪的任务上的表现。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_yBFUqdJFZn/figures/003_Table_1.jpg]]
 *Table 1: Datasets comparisons on computer-use datasets in terms of platform coverage, data types (Understanding, Grounding and Trajectories), and collection methods*
-
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_yBFUqdJFZn/figures/014_Table_13.jpg]]
-*Table 13: (b) The ablation on weak semantic trajectories. The public datasets used are shown in Table 13. (d) The ablation on the maximum resolution during training*
-
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_yBFUqdJFZn/figures/016_Table_7.jpg]]
-
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_yBFUqdJFZn/figures/017_Table_5.jpg]]
-*Table 5: Results on MMBench-GUI L1 (GUI Content Understanding) (Wang et al., 2025c)*
-
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_yBFUqdJFZn/figures/019_Table_7.jpg]]
-*Table 7: Results on ScreenSpot-Pro (Li et al., 2025)*
-
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_yBFUqdJFZn/figures/020_Table_8.jpg]]
-*Table 8: Performance on the MMBench-GUI L2 (GUI Element Grounding) (Wang et al., 2025c)*
-
-
 
 ## 定位与知识库关联
 
@@ -311,8 +280,6 @@ ScaleCUA 的核心贡献在于通过大规模、跨平台的数据驱动缩放�
 3. **长期依赖建模：** 当前扁平的历史表示无法有效捕捉长期依赖关系，需要设计更强大的记忆和上下文管理机制。
 
 4. **跨平台迁移的极限：** 统一动作空间和跨平台训练的有效性边界尚不明确，是否存在某些平台或任务类型需要完全独立的建模策略仍需探索。
-
-
 
 ## 原文 PDF
 

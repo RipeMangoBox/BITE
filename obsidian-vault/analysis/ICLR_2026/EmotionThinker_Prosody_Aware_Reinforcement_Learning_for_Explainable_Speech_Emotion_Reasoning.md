@@ -69,8 +69,6 @@ EmotionThinker 位于语音情感识别与可解释推理的交叉地带，其�
 
 - **训练策略谱系**：相较于直接监督微调（SFT）或标准 GRPO 仅依赖规则奖励的做法，GRPO-PTR 引入训练后的推理奖励模型，并设计信任权重机制抑制噪声奖励，实现了推理质量与识别准确率的联合优化。消融实验表明，移除推理奖励模型或信任权重均导致性能显著下降，验证了该策略的必要性。
 
-
-
 语音情感识别（Speech Emotion Recognition, SER）旨在从语音信号中自动辨识说话人的情感状态，是情感计算与人机交互领域的核心任务。长期以来，主流方法将其建模为一个封闭式分类问题：输入一段语音，输出一个离散的情感标签（如“愤怒”“悲伤”“中性”）。然而，这种“黑箱”范式存在两个根本性缺陷。
 
 **第一，缺乏对声学细节的结构化感知。** 语音中的韵律特征——音高、语速、能量、语调和重音——是情感表达的核心载体。例如，悲伤语音通常伴随较低的音高、缓慢的语速和减弱的能量；愤怒则表现为音高升高、语速加快和能量集中。现有语音大语言模型（SpeechLLMs）虽然能够处理语音输入并生成文本响应，但其内部表示往往以语义为中心，对上述细粒度声学线索的感知能力严重不足。换言之，模型“听到”了语音，却未能“听懂”其中的韵律信息。
@@ -82,8 +80,6 @@ EmotionThinker 位于语音情感识别与可解释推理的交叉地带，其�
 针对上述缺口，本文提出核心动机：**将语音情感识别重新定义为深度推理问题**——模型需要显式地分析韵律模式、整合多模态线索，并生成可验证的推理过程，最终给出情感判断。为实现这一目标，需要同时解决三个子问题：（1）构建包含韵律标注和推理链的训练数据；（2）增强基座模型对韵律特征的感知能力；（3）设计能够平衡推理质量与结果准确性的优化策略。
 
 > **注意**：本章节基于论文引言与相关工作的分析综合而成。关于具体数据集的韵律标注细节、基座模型选型及强化学习框架的设计，将在后续章节中展开。
-
-
 
 ## 核心方法与创新机理
 
@@ -132,8 +128,6 @@ EmotionThinker 在语音情感识别领域的方法谱系中占据独特位置�
 | **EmotionThinker（本工作）** | — | **韵律感知 + 可解释推理** | 训练数据规模有限，跨语言泛化待验证 |
 
 EmotionThinker 的关键突破在于：通过 **EmotionCoT-35K** 提供韵律-推理对齐数据，通过 **韵律增强 SFT** 赋予模型声学感知能力，通过 **GRPO-PTR** 实现推理过程与结果准确性的平衡优化。三者形成闭环，使模型首次能够基于声学线索进行多步推理并输出可解释的情感判断。
-
-
 
 ![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_wbttgzp7MT/figures/004_Figure_3.jpg]]
 *Figure 3: Architecture of EmotionThinker with the proposed GRPO-PTR framework. The upper part depicts the high-level GRPO-PTR training pipeline, where only the policy model is optimized. The lower part details PTR strategy, which progressively introduces reasoning reward to stabilize training and enhance reasoning*
@@ -204,8 +198,6 @@ EmotionCoT-35K 数据构建管线
 - **冷启动推理 SFT** 建立了“先推理后分类”的输出结构；
 - **GRPO-PTR** 通过逐步引入带信任权重的推理奖励，平衡了推理过程质量与结果准确性，解决了标准 GRPO 中推理信号过早引入导致的训练不稳定问题（消融实验 Table 4 验证了渐进策略和信任权重的必要性）。
 
-
-
 EmotionThinker 的核心架构由三个关键模块构成：**EmotionCoT-35K 数据构建管线**、**韵律增强基座模型（EmotionThinker-Base）** 和 **GRPO-PTR 强化学习框架**。各模块协同工作，将语音情感识别重新定义为可解释的深度推理问题。
 
 ### 3.1 EmotionCoT-35K 数据构建管线
@@ -256,8 +248,6 @@ $$R_i = \alpha_f R_f + \alpha_o R_o + \alpha_t \tau \cdot R_t$$
 
 消融实验（Table 4）验证了各组件的有效性：移除训练后的奖励模型（V3）使推理得分从 3.98 降至 3.36；移除信任权重 $\tau$（V4）使 ER 得分降至 3.74；禁用渐进式调度（V5）同样导致性能下降。完整的 GRPO-PTR（V6）在 SER 准确率（68.89%）和推理得分（3.98）上均达到最优。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -270,9 +260,6 @@ $$R_i = \alpha_f R_f + \alpha_o R_o + \alpha_t \tau \cdot R_t$$
 **推理质量评估**。在 5 分制的推理质量评分中，EmotionThinker 以平均 **3.98** 分显著超越次优模型 MERaLiON2（3.04 分），领先幅度达 0.94 分（Table 2）。四个评估维度中，模型在事实对齐（FA）和描述完整度（CC）方面表现尤为突出。
 
 **人类评估验证**。在 100 个样本的人工评估中，EmotionThinker 在所有推理质量维度上均优于代表性基线（Table 3）：事实对齐 3.7 分、可解释性质量 4.2 分、描述完整度 4.7 分、流畅性与结构 4.9 分，平均分 4.4 分。相比之下，次优模型 Qwen2.5-Omni-7B 平均仅 3.5 分，而通用语音大模型 BLSP 仅 1.7 分，表明韵律感知和推理增强对生成质量的关键作用。
-
-![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_wbttgzp7MT/figures/006_Table_3.jpg]]
-*Table 3: Human evaluation results on emotion reasoning based on a consistent 100-sample set*
 
 ### 消融实验
 
@@ -288,21 +275,13 @@ $$R_i = \alpha_f R_f + \alpha_o R_o + \alpha_t \tau \cdot R_t$$
 
 **韵律增强验证**（Table 5）。对比基座模型 Qwen2.5-Omni-7B 与经过韵律增强 SFT 的 EmotionThinker-Base，韵律感知能力实现跨越式提升：音高准确率从 25.71% 升至 75.11%，语速从 29.94% 升至 68.70%，能量从 27.67% 升至 69.42%，语调从 25.83% 升至 60.25%，重音从 30.24% 升至 71.50%。这证实了韵律增强微调是赋予模型声学细节感知能力的关键步骤。
 
-![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_wbttgzp7MT/figures/009_Table_5.jpg]]
-*Table 5: Prosody perception comparison across pitch (Pit.), speed (Spee.), energy (Ene.), intonation (Into.), and stress (Stre.). Evaluation is based on accuracy (%). Table 6: GRPO-PTR with varying K settings*
-
 ### 超参数与敏感性分析
 
 **采样规模 K 的影响**（Table 6）。GRPO-PTR 在 K=8 时取得最佳平均性能（67.35%），K 过小（4）或过大（16）均导致性能下降，表明适中的候选采样数有利于平衡探索与利用。
 
-![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_wbttgzp7MT/figures/010_Table_6.jpg]]
-
 **奖励权重的敏感性**（Table 7）。固定结果奖励权重 α_o=1.0，调节推理奖励权重 α_t：
 - α_t=0.5 时平均准确率最高（68.89%）。
 - α_t 增至 1.0 时，平均准确率降至 65.52%，表明过度强调中间推理信号会引发优化不稳定，凸显多信号强化学习中奖励平衡的重要性。
-
-![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_wbttgzp7MT/figures/011_Table_7.jpg]]
-*Table 7: Sensitivity analysis on reward penalty*
 
 ### 失败模式与局限性
 
@@ -314,12 +293,8 @@ $$R_i = \alpha_f R_f + \alpha_o R_o + \alpha_t \tau \cdot R_t$$
 
 4. **强化学习对超参数的敏感性**：α_t 和 K 的取值对最终性能有显著影响，实际部署时需仔细调参。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_wbttgzp7MT/figures/014_Table_8.jpg]]
 *Table 8: Case study comparing emotion reasoning outputs from EmotionThinker and 12 representative SpeechLLMs on the same audio sample. The ground-truth label is sad, and the analysis highlights differences in prosodic cue recognition, semantic integration, and logical coherence across models. EmotionThinker demonstrates more accurate and comprehensive capture of acoustic information, together with stronger logical consistency in its emotion reasoning*
-
-
 
 ## 定位与知识库关联
 
@@ -374,8 +349,6 @@ EmotionThinker 处于三个研究方向的交汇点：
 4. **多轮对话推理**：该框架能否与文本对话模型结合，实现多轮交互中的情感推理和动态更新？
 5. **鲁棒性验证**：在嘈杂、重叠语音、多说话人等更具挑战性的场景下，框架的鲁棒性如何？需额外实验验证。
 6. **跨语言泛化**：训练数据主要为英文，泛化到其他语言（如中文、阿拉伯语）的能力未经验证，需构建多语言韵律感知推理数据集。
-
-
 
 ## 原文 PDF
 

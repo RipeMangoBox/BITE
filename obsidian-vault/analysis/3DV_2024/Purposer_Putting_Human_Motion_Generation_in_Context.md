@@ -55,8 +55,6 @@ claims:
 
 **局限与开放问题**：该方法为纯运动学模型，未引入物理约束，部分生成结果仍存在场景穿透；尚未在更真实、更多样的数据集（如 SAMP）上验证泛化能力。未来方向包括引入轻量物理约束模块以减少穿透、扩展至动态场景及多人交互生成。
 
-
-
 三维人体运动生成是计算机视觉与图形学中的核心问题，其目标是根据给定的控制信号合成自然、多样且物理合理的人体动作序列。近年来，随着扩散模型与自回归模型的发展，无条件人体运动生成取得了显著进展。然而，在虚拟场景交互、数字人导航、增强现实等实际应用中，运动生成必须与三维环境几何、语义目标以及时间上下文紧密耦合，这对现有方法构成了根本性挑战。
 
 **核心瓶颈**在于：现有场景条件化人体运动生成方法普遍存在“上下文碎片化”问题。一方面，诸如 **Synthesizing long-term 3D human motion and interaction in 3D scenes**（Wang et al., CVPR 2021）和 **Towards diverse and natural scene-aware 3D human motion synthesis**（Wang et al., CVPR 2022）等工作通常局限于单一条件设置——例如仅考虑场景几何或仅使用首末帧姿态——难以同时整合场景约束、过去运动观测与未来目标路径等异构上下文信号。另一方面，这些方法往往需要大量高质量的多模态配对数据进行训练，而此类数据的获取成本极高，限制了模型的扩展性。无条件生成模型虽可利用大规模运动数据习得强先验，却缺乏将上下文信息注入生成过程的机制，导致其输出无法适配具体场景需求。
@@ -64,8 +62,6 @@ claims:
 从因果机制角度看，这一瓶颈的根源在于**自回归模型的时间因果性与未来条件之间的结构性冲突**。标准自回归变换器依赖因果注意力掩码，每个时间步的预测仅能访问已生成的过去令牌，这天然排斥了目标姿态、路径轨迹等未来时间步的条件信息。若简单地将未来条件与输入序列拼接，模型在预测当前时间步时仍无法“预见”尚未到来的未来条件，从而削弱了条件控制的有效性。
 
 **本文的核心动机**正是突破上述限制：利用大规模无上下文运动数据学习强运动先验，通过离散潜在表示将运动生成重构为序列预测任务，并设计一种能够无缝融合过去与未来信息的条件注入机制，使得模型在仅需极少量条件数据的情况下，即可生成高质量、多样化且场景一致的交互运动。这一思路的关键在于将“条件注入”从序列级常数扩展为时间依赖的未来感知过程，从而在保持自回归生成框架简洁性的同时，赋予模型对复杂上下文信号的组合建模能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -124,8 +120,6 @@ $$\pmb { c } _ { s } = \pmb { W } _ { s } \cdot \text{PointNet}(S)$$
 - 双分支架构的计算开销与标准自回归模型相比的具体增量，原文未提供详细的参数量和推理时间对比。
 - 长序列链接策略在更复杂场景（如多物体交互、多人场景）下的连贯性，原文主要展示了定性结果，定量评估有限。
 
-
-
 Purposer 采用**两阶段训练范式**，将场景条件化人体运动生成解耦为离散表示学习与条件序列建模两个相对独立的阶段（Figure 2）。
 
 ![[assets/figures/papers/paper_list_l1658_Purposer_Putting_Human_Motion_Generation_in_Context/figures/002_Figure_2.jpg]]
@@ -155,8 +149,6 @@ Purposer 采用**两阶段训练范式**，将场景条件化人体运动生成�
 ### 多条件组合与长序列生成
 
 Purposer 支持多种条件信号的**任意组合**（Equation 8）：场景嵌入 $\mathbf{c}_s$、动作标签 $\mathbf{c}_a$、物体交互目标 $\mathbf{c}_{(a,o),t}$、2D 轨迹 $\mathbf{c}_p$ 以及未来姿态 $\mathbf{c}_f$ 可同时作用于生成过程。在测试时，通过定义“物体交互配置”和“移动配置”两种条件模式，并将短运动片段的首尾姿态进行衔接，模型可以将仅用短序列训练的生成能力扩展至跨多个动作和位置的长序列运动合成。
-
-
 
 ### 两阶段生成框架
 
@@ -241,12 +233,8 @@ $$p _ { G } ( \mathbf { z } | \mathbf { z } _ { 1 } , . . . \mathbf { z } _ { t 
 
 Purposer 通过定义不同的条件配置组合，将短运动片段首尾相接生成长时间、多动作的运动序列。具体而言，可定义“物体交互配置”和“移动配置”，在测试时将前一段序列的最后 $n$ 帧姿态作为下一段序列的起始观测条件，实现仅在短序列上训练的模型生成长序列的能力。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1658_Purposer_Putting_Human_Motion_Generation_in_Context/figures/004_Figure_3.jpg]]
 *Figure 3: Ways of conditioning an auto-regressive model. (a): an auto-regressive model without conditioning is based on causal attention. (b): by adding a prompt token c0 to the sequence, sequence-wide conditioning can be added. (c): for time-dependent conditioning*
-
-
 
 ## 实验与关键发现
 
@@ -304,12 +292,8 @@ Purposer 在接触分数上取得最高值，$\mathrm{FD}_{\mathrm{static}}$ 更
 ![[assets/figures/papers/paper_list_l1658_Purposer_Putting_Human_Motion_Generation_in_Context/figures/007_Figure_5.jpg]]
 *Figure 5：目标姿态与路径条件对物体交互和运动轨迹的控制效果。*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1658_Purposer_Putting_Human_Motion_Generation_in_Context/figures/001_Figure_1.jpg]]
 *Figure 1: An example of human motion generation in context. We propose a method able to generate realistic-looking motions that interact with virtual scenes. In this example we take a scene from ScanNet [11]. The motion can be controlled with semantic action/object queries: here the human is first commanded ‘sit on table’, then ‘sit on couch’, and finally ‘lie on couch’. Purposer is a learning-based probabilistic model that can work efficiently with diverse types of conditioning*
-
-
 
 ## 定位与知识库关联
 
@@ -339,8 +323,6 @@ Purposer 的核心差异化贡献在于**条件注入架构的重新设计**。�
 - 当前框架以单人运动为核心，能否扩展至动态场景或多人交互生成？双分支架构是否可自然地处理多智能体间的因果与非因果依赖？
 - 离散潜在空间的码本大小与运动重构质量、生成多样性之间的最优权衡如何确定？是否存在更高效的离散化策略？
 - 模型在真实扫描场景（如 ScanNet、SAMP）上的零样本或少样本迁移能力如何？场景编码器的域差异是否构成瓶颈？
-
-
 
 ## 原文 PDF
 

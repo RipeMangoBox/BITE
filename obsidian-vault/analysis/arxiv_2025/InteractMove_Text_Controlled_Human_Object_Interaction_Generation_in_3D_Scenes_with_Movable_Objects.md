@@ -54,8 +54,6 @@ claims:
 
 **主要结果**：在自建的 InteractMove 数据集上，AGCA 在 Goal Distance、Multi-modality、Physical Realism 和 Non-collision Score 四项指标上均取得最优结果，其中 Non-collision Score 达到 98.36。在 TRUMANS 数据集的可移动物体子集上，Physical Realism 从 0.707 提升至 0.754，Non-collision Score 从 98.73 提升至 99.03。消融实验表明，移除 3D 物体定位模块导致 Goal Distance 急剧下降，移除 hand-object joint affordance 模块使 Physical Realism 大幅降低，验证了各模块的核心作用。
 
-
-
 三维场景中的人-物交互（Human-Object Interaction, HOI）生成是计算机视觉与图形学中的核心问题，其目标是根据自然语言指令合成人与场景中物体进行物理合理交互的运动序列。这一能力在具身智能、虚拟现实和数字人动画等领域具有广泛的应用前景。然而，现有方法在该任务上存在两个根本性瓶颈。
 
 **数据层面的结构性缺失。** 当前主流的人-场景交互（Human-Scene Interaction, HSI）数据集——如 TRUMANS（Jiang et al., CVPR 2024）——虽然提供了动态的人物-场景交互序列，但存在两个关键局限：其一，场景中的物体通常被设定为静态、不可移动的，无法支持抓取、搬运、操控等涉及物体位移的交互类型；其二，交互类别有限且缺乏自然语言注释，难以支撑文本驱动的多样化交互生成。收集具有可移动物体的大规模真实数据成本高昂、标注难度大，这一数据缺口直接制约了模型在复杂三维场景中根据自然语言指令生成物理合理交互的能力。
@@ -65,8 +63,6 @@ claims:
 **本文的核心洞察在于：** 通过引入细粒度的手-物关节交互可能性（hand-object joint affordance）作为条件引导，并结合局部场景体素化建模与碰撞感知损失，可以直接控制生成的交互是否物理合理且与文本描述一致。具体而言，利用手-物关节 affordance 学习来捕捉不同手部关节与物体表面随时间的接触概率分布，为运动扩散模型提供丰富、适应物体形状和交互策略的引导信号；同时，在训练阶段引入接触损失和穿透损失，在推理阶段施加测试时穿透约束，确保运动序列在三维场景中不发生碰撞。
 
 基于上述洞察，本文提出了 **Affordance-Guided Collision-Aware Interaction Generation（AGCA）** 框架，并构建了大规模合成数据集 **InteractMove**——包含 618 个室内三维场景、71 种可移动物体类别、30.5k 条交互序列，每条序列均配有自由文本注释，为文本控制的可移动物体交互生成提供了数据基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -93,8 +89,6 @@ InteractMove 的核心创新在于提出了一套 **Affordance-Guided Collision-
 ### 创新总结
 
 上述三个 changed slots 构成了一个从“定位交互目标 → 引导交互方式 → 约束交互物理合理性”的完整因果链条。AGCA 通过显式 grounding 解决“与谁交互”，通过细粒度 affordance 解决“如何交互”，通过碰撞感知损失和测试时约束解决“在何处安全交互”，从而在文本控制的复杂场景可移动物体交互生成任务上取得突破性进展。
-
-
 
 InteractMove 提出了 **Affordance-Guided Collision-Aware Interaction Generation (AGCA)** 框架，旨在根据自然语言指令，在包含可移动物体的三维场景中生成物理合理的人-物交互运动序列。整体流水线由三个核心阶段串联构成，形成从语义理解到运动生成的端到端链路。
 
@@ -124,12 +118,8 @@ $$\mathcal{L}_{total} = \mathcal{L}_{diff} + \lambda_1 \mathcal{L}_{cont} + \lam
 
 整个 AGCA 框架的数据流可概括为：**文本 + 场景点云 → 目标物体区域 → 手-物 affordance 图 → 人体运动 + 物体轨迹**。三个模块之间呈串行依赖关系——grounding 为 affordance 提供物体范围，affordance 为运动生成提供接触引导，而局部场景建模和碰撞感知损失则贯穿运动生成过程，确保输出序列在三维空间中不发生穿透。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1686_InteractMove_Text_Controlled_Human_Object_Interaction_Generation_in_3D_S/figures/006_Figure_4.jpg]]
 *Figure 4: Overview of the proposed framework. (a) Given a text instruction, we first locate the interactive object via a pre-trained grounding model. Then, conditioned on the object point cloud and textual instruction, we generate hand-object affordances. Finally, a collision-aware motion generation module synthesizes human motion and object trajectory, incorporating local scene geometry and learned affordances. (b) Hand-object affordance diffusion module. (c) Collision-Aware motion diffusion module*
-
-
 
 ### 4.1 框架总览
 
@@ -195,9 +185,6 @@ $$C_{ijn} = \exp\left(-\frac{1}{2} \cdot \frac{d_{ijn}}{\sigma^2}\right)$$
 
 训练阶段引入两类物理约束损失（Figure 5）：
 
-![[assets/figures/papers/paper_list_l1686_InteractMove_Text_Controlled_Human_Object_Interaction_Generation_in_3D_S/figures/007_Figure_5.jpg]]
-*Figure 5: Our Collision-Aware Loss*
-
 **接触损失（Contact Loss）**：鼓励手部关节 $\tilde{j}$ 与目标物体表面点 $\hat{p}_{obj}$ 之间保持接触：
 
 $$\mathcal{L}_{cont} = \| d(\tilde{j}, \hat{p}_{obj}) \|^2$$
@@ -227,13 +214,6 @@ $$\mathcal{L}_{total} = \mathcal{L}_{diff} + \lambda_1 \mathcal{L}_{cont} + \lam
 其中 $\lambda_1$ 和 $\lambda_2$ 为平衡各项贡献的超参数。
 
 **消融结论**：同时加入 $\mathcal{L}_{cont}$、$\mathcal{L}_{pene}$ 训练损失和 $\mathcal{L}_{ttp}$ 推理约束，使 Non-collision Score 达到最高的 98.36。所有约束均略微降低了 Multi-modality，论文将此视为安全性要求与行为多样性之间的必要权衡。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1686_InteractMove_Text_Controlled_Human_Object_Interaction_Generation_in_3D_S/figures/002_Figure_2.jpg]]
-*Figure 2: Method of our motion alignment*
-
-
 
 ## 实验与关键发现
 
@@ -273,11 +253,6 @@ $$\mathcal{L}_{total} = \mathcal{L}_{diff} + \lambda_1 \mathcal{L}_{cont} + \lam
 3. **多干扰物场景退化**：同类干扰物数量增加时，模型性能持续下降，表明当前的 affordance 引导机制在处理细粒度物体区分方面仍有不足。
 4. **数据集构建偏差**：运动对齐过程中的修复策略虽优于强制对齐，但仍可能与原始 HOI 运动的精确交互语义存在偏差，这一潜在偏差对下游生成的影响尚需进一步量化。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1686_InteractMove_Text_Controlled_Human_Object_Interaction_Generation_in_3D_S/figures/008_Table_2.jpg]]
-*Table 2: Quantitative evaluations on our dataset*
-
 ![[assets/figures/papers/paper_list_l1686_InteractMove_Text_Controlled_Human_Object_Interaction_Generation_in_3D_S/figures/009_Table_3.jpg]]
 *Table 3: Quantitative evaluations on the TRUMANS dataset. For fairness, we conduct the comparison only on samples involving interactions with movable objects*
 
@@ -287,18 +262,8 @@ $$\mathcal{L}_{total} = \mathcal{L}_{diff} + \lambda_1 \mathcal{L}_{cont} + \lam
 ![[assets/figures/papers/paper_list_l1686_InteractMove_Text_Controlled_Human_Object_Interaction_Generation_in_3D_S/figures/011_Table_5.jpg]]
 *Table 5: Ablations of the collision-aware loss*
 
-![[assets/figures/papers/paper_list_l1686_InteractMove_Text_Controlled_Human_Object_Interaction_Generation_in_3D_S/figures/012_Table_6.jpg]]
-*Table 6: Experiments on the number of instances of the same category as the target object*
-
 ![[assets/figures/papers/paper_list_l1686_InteractMove_Text_Controlled_Human_Object_Interaction_Generation_in_3D_S/figures/014_Figure_6.jpg]]
 *Figure 6: Visualization. The prompt is The person drinks the bowl on the desk near the sofa*
-
-![[assets/figures/papers/paper_list_l1686_InteractMove_Text_Controlled_Human_Object_Interaction_Generation_in_3D_S/figures/005_Figure_3.jpg]]
-*Figure 3: Visualizations of our dataset*
-
-![[assets/figures/papers/paper_list_l1686_InteractMove_Text_Controlled_Human_Object_Interaction_Generation_in_3D_S/figures/003_Figure.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -345,8 +310,6 @@ InteractMove 的核心贡献建立在人-场景交互（HSI）生成领域的两
 5. **真实场景部署。** 方法依赖完整的场景点云和物体网格作为输入。在真实应用中，如何从 RGB-D 传感器或单目视频中获取足够质量的场景与物体表示，是一个从仿真到现实的关键工程挑战。
 
 6. **安全性与多样性的平衡。** 消融实验表明，碰撞约束（$L_{cont}$、$L_{pene}$、$L_{ttp}$）在提升物理安全性的同时略微降低了 Multi-modality。如何设计更智能的约束机制，在保证无碰撞的前提下最大化运动多样性，是一个值得深入的方向。
-
-
 
 ## 原文 PDF
 

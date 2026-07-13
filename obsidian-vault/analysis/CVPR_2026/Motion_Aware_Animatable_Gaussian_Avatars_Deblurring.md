@@ -54,8 +54,6 @@ claims:
 
 **方法定位**：MAD-Avatar属于三维感知去模糊与可动画头像重建的交叉领域。与纯二维去模糊方法不同，它在三维规范空间中进行物理建模，利用人体运动先验（SMPL）约束解空间；与标准3DGS头像方法不同，它不假设输入为清晰图像，而是将模糊形成显式纳入渲染管线，实现从模糊观测到清晰表示的端到端联合优化。该方法需要多视角同步相机系统和粗略的SMPL初始化，对极端模糊、宽松服装等超出SMPL建模能力的情况尚未充分验证，单目视频扩展和实时推理是未来方向。
 
-
-
 ### 问题背景：运动模糊对3D头像重建的挑战
 
 从多视角视频中重建逼真的可动画人体头像，是计算机视觉与图形学领域的核心课题之一。近年来，以3D高斯泼溅（3D Gaussian Splatting, 3DGS）为代表的显式神经表示方法，凭借其高质量实时渲染能力，在静态场景重建中取得了突破性进展。然而，当输入视频帧包含**运动模糊**时，3DGS头像的重建质量会急剧下降。
@@ -79,8 +77,6 @@ claims:
 这一瓶颈的因果机制在于：模糊图像的形成是一个三维物理过程——曝光时间内人体在三维空间中运动，经相机投影后累积为二维模糊信号。仅在二维层面进行去模糊或完全忽略模糊建模，都无法恢复运动过程中丢失的三维几何与纹理信息。因此，解决问题的关键在于**将模糊形成过程建模为三维感知的物理模型**，并利用人体运动先验对模糊周期内的子帧运动进行合理推断。
 
 基于此，本文提出**MAD-Avatar**（Motion-Aware Animatable Gaussian Avatars Deblurring），核心思路是将传统的二维模糊形成过程扩展为三维感知的物理模型，结合SMPL人体运动先验对子帧运动和规范头像进行联合优化，从根本上消除运动模糊的歧义，实现从模糊视频直接重建清晰、可动画的3D高斯头像。
-
-
 
 ## 核心方法与创新机理
 
@@ -114,8 +110,6 @@ $$\mathcal { L } _ { r e g } = \frac { 1 } { 2 4 \cdot ( N _ { e } - 1 ) } \sum 
 
 上述三个 changed slot 形成了因果闭环：三维模糊形成模型提供了去模糊的物理基础，子帧运动模型提供了可优化的运动表示，帧间正则化则消除了运动歧义。三者协同使得从模糊视频直接重建清晰、可动画的 3D 高斯头像成为可能，在合成和真实数据集上 PSNR 分别提升超过 2.4 dB 和 1.4 dB（Table 2）。
 
-
-
 MAD-Avatar 的核心思路是将二维运动模糊的歧义性问题提升到三维空间，通过物理感知的模糊形成模型与人体运动先验的联合优化，从多视角模糊视频中直接重建清晰、可动画的3D高斯头像。整体管道如图2所示，包含四个紧密耦合的模块。
 
 **输入与输出**：系统输入为多视角同步相机拍摄的模糊视频帧，以及由 EasyMocap 离线估计的粗粒度 SMPL 参数（姿态、形状）。输出是一个规范空间下的清晰 3DGS 头像，以及优化后的子帧级 SMPL 运动序列，可直接驱动新姿态动画。
@@ -138,18 +132,8 @@ $$\mathcal{L} = ||\hat{\mathbf{I}}^B - \mathbf{I}^B||_1 + \mathcal{L}_{reg}$$
 
 **与两阶段方法的本质区别**：先去模糊后重建的基线（如 ShiftNet + GauHuman、RVRT + GauHuman 等）在二维图像域独立处理每一帧，缺乏多视图三维一致性约束，导致去模糊结果在视角间不一致，进而损害 3D 重建质量。MAD-Avatar 将模糊形成直接嵌入三维渲染管道，从根本上保证了运动估计与几何重建的协同一致性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2411_16758/figures/002_Figure_2.jpg]]
 *Figure 2: Brief illustration of the pipeline. The sub-frame motion for each blurry frame is modeled using the SMPL representation, followed by warping the canonical 3DGS according to the estimated motion parameters. The final blurry image is synthesized by averaging the sequence of rendered virtual sharp images*
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2411_16758/figures/001_Figure_1.jpg]]
-*Figure 1: The ambiguity brought by motion blur. When reconstructing sharp 3DGS avatars from blurry frames, motion-induced blur introduces challenging ambiguities in motion interpretation*
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2411_16758/figures/005_Figure_5.jpg]]
-*Figure 5: Time synchronization of the camera system. ‘TD’ and ‘EX’ stand for “Trigger Delay” and “Exposure”*
-
-
 
 MAD-Avatar 的核心思路是将传统二维模糊形成过程扩展为三维感知的物理模型，结合 SMPL 人体运动先验对子帧运动和规范头像进行联合优化，从而从根本上消除运动模糊的歧义。整个流水线（图2）包含三个紧密耦合的关键模块：三维模糊形成模型、子帧运动模型和帧间运动正则化。
 
@@ -219,12 +203,8 @@ $$ \mathcal { L } = | | \hat { \mathbf { I } } ^ { B } - \mathbf { I } ^ { B } |
 
 其中 $`\hat{\mathbf{I}}^B`$ 为式(3)预测的模糊图像，$`\mathbf{I}^B`$ 为输入模糊帧。该损失同时驱动规范高斯头像的清晰重建和子帧运动的准确估计，实现端到端的联合优化。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2411_16758/figures/014_Figure_9.jpg]]
 *Figure 9: Visualization of the initial estimated SMPL by EasyMocap and optimized SMPL sequence by the proposed model*
-
-
 
 ## 实验与关键发现
 
@@ -261,21 +241,9 @@ Table 3 系统拆解了各模块的贡献，所有消融变体均导致性能下
 - **控制节点数**（Table 6）：$P=4$ 时性能最优。
 - **虚拟清晰图像数**（Table 7）：$T=5$ 为最佳，更少的子帧不足以近似模糊积分，更多子帧则引入冗余优化负担。
 
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2411_16758/figures/016_Table_5.jpg]]
-*Table 5: Qualitative ablation results on trajectories representations. We colorize result as best , second best , and third best*
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2411_16758/figures/017_Table_6.jpg]]
-*Table 6: Ablation results for control knot number P*
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2411_16758/figures/015_Table_7.jpg]]
-*Table 7: Ablation results for virtual sharp image number T*
-
 ### SMPL 初始化的鲁棒性与优化必要性
 
 Table 8 展示了对 SMPL 初始姿态施加不同程度扰动后的性能变化，结果表明方法对粗初始化具有一定容忍度。然而，Table 9 显示完全冻结 SMPL 参数（不进行联合优化）会导致性能明显下降，Figure 9 可视化了 EasyMocap 初始估计与模型优化后 SMPL 序列的差异——优化后的姿态序列更平滑、更符合物理运动规律。这证实了 **SMPL 子帧运动联合优化**作为核心因果调控变量的有效性。
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2411_16758/figures/018_Table_8.jpg]]
-*Table 8: Quantitative results with different perturbations*
 
 ### 失败模式与局限性
 
@@ -285,8 +253,6 @@ Table 8 展示了对 SMPL 初始姿态施加不同程度扰动后的性能变化
 2. **极端模糊**：Table 10-11 表明在不同模糊程度 $K_{blur}$ 下方法仍优于基线，但对长时间曝光或极快运动等极端情况的验证尚不充分。
 3. **SMPL 建模边界**：宽松服装、手持物体等超出 SMPL 表达能力的非刚性运动会引入几何失真——这是人体先验模型的固有局限，而非本方法特有。
 4. **计算效率**：训练和渲染仍需 GPU 加速，尚未达到实时水平。
-
-
 
 ## 定位与知识库关联
 
@@ -353,8 +319,6 @@ MAD-Avatar在现有技术栈上做出了以下核心改变（changed slots）：
 ### 在知识库中的定位
 
 MAD-Avatar在3DGS头像重建领域首次引入**三维感知的运动去模糊**机制，填补了“模糊视频→清晰可动画3DGS头像”这一技术空白。其核心贡献——基于SMPL子帧运动的物理模糊形成模型与联合优化框架——为后续工作在动态场景去模糊重建、单目视频扩展、以及更通用物体类别的去模糊重建方面提供了明确的技术路线图。代码已开源（https://github.com/MyNiuuu/MAD-Avatar），为社区复现和后续改进提供了基础。
-
-
 
 ## 原文 PDF
 

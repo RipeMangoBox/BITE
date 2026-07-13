@@ -78,8 +78,6 @@ WorldStereo在视频生成范式谱系中属于**多轨迹记忆增强型（Mult
 
 当前WorldStereo仅评估静态场景，未讨论对动态物体或非刚性运动的处理能力。DMD训练需过滤困难轨迹以保证稳定性，可能限制生成多样性。轨迹顺序和角度依赖手动预设，缺乏自动化规划。开放问题包括：如何处理包含移动物体的动态输入？当记忆库中参考帧极度无序时SSM的鲁棒性如何？能否自动规划最优轨迹以最大化重建质量？模型能否扩展至更长序列或更多样化场景而无性能衰减？
 
-
-
 ### 三维重建与视频生成的割裂
 
 从二维图像恢复三维场景是计算机视觉的核心目标之一。传统三维重建管线依赖多视角图像的特征匹配与几何优化，但在稀疏视角或弱纹理区域往往产生不完整或模糊的结果。近年来，视频扩散模型（VDM）展现出强大的视觉内容生成能力，为三维重建提供了新的可能——通过生成覆盖目标场景的多视角视频，再利用重建算法恢复场景结构。然而，**现有摄像机引导的视频扩散模型难以生成多视角一致的视频**：它们缺乏对场景几何的显式记忆，导致不同视频片段间的内容不一致，最终重建出的三维模型出现严重模糊。
@@ -96,8 +94,6 @@ WorldStereo在视频生成范式谱系中属于**多轨迹记忆增强型（Mult
 - **空间立体记忆（SSM）**：检索已生成视图中的参考帧，利用三维对应关系约束注意力感受野，恢复细粒度的纹理与细节一致性。
 
 这种设计使 WorldStereo 能够基于预训练视频扩散模型的强大泛化能力，在不进行联合训练的前提下，实现高效、高质量的多视角一致视频生成，并直接服务于下游三维重建。此外，通过分布匹配蒸馏（DMD）将生成器蒸馏为4步DiT，可将推理速度提升约20倍，进一步增强了方法的实用性。
-
-
 
 ## 核心方法与创新机理
 
@@ -145,8 +141,6 @@ $$
 
 WorldStereo 的核心洞察在于：**预训练视频扩散模型的泛化能力可作为多视角一致视频生成的基础，而几何记忆模块则充当摄像机引导生成与三维重建之间的桥接器**。GGM 提供粗粒度结构先验，SSM 恢复细粒度纹理，二者协同工作，使模型无需端到端联合训练即可生成多轨迹一致的视频，进而支撑高质量三维重建。在 Tanks-and-Temples 基准上，WorldStereo-Full 的 F1-Score 达到 0.578，较基线 Uni3C 的 0.424 提升 36.3%（Table 3），充分验证了该创新范式的有效性。
 
-
-
 WorldStereo 的整体 pipeline 围绕“摄像机引导的视频生成”与“三维重建”之间的桥梁构建。其核心思路是：在预训练视频扩散模型（VDM）的基础上，通过两个即插即用的几何记忆模块，将多视角一致的视频生成与增量式三维重建耦合为一个闭环系统，从而在无需联合训练的情况下实现高质量的真实世界立体视频生成。
 
 ### 输入与输出流
@@ -182,13 +176,6 @@ $$\nabla \mathcal{L}_{\mathrm{DMD}} = - \frac{\mathbb{E}}{t} \left( \int \left( 
 ### 闭环生成流程
 
 整个 pipeline 以闭环方式运行：VDM 生成视频帧 → 帧存入记忆库 → WorldMirror 增量重建点云并更新 3D Cache → 更新后的全局点云反馈给 GGM 作为下一轮生成的条件，同时点图信息注入 SSM 以约束注意力。这种“生成-重建-记忆”的循环机制使得 WorldStereo 能够生成互补视角的多段一致视频，为集成式三维重建提供高质量输入。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2603_02049/figures/014_Figure_8.jpg]]
-*Figure 8: Illustration of the trajectory*
-
-
 
 ### 3.1 基础摄像机引导的视频扩散模型
 
@@ -231,16 +218,6 @@ $$X_{pcd}^g = [X_{pcd}, \hat{X}_{pcd}]$$
 $$\nabla \mathcal{L}_{\mathrm{DMD}} = - \frac{\mathbb{E}}{t} \left( \int \left( s_{\mathrm{real}}(x_t, t) - s_{\mathrm{fake}}(x_t, t) \right) \frac{d x_t}{d \theta} d z \right)```
 
 蒸馏后的 WorldStereo-DMD 将推理时间从 162 秒压缩至 9 秒，实现约 20 倍加速（表2），同时保持摄像机控制精度和视觉质量。DMD 训练中采用数据过滤策略保留高质量轨迹，表2验证该策略未损害摄像机可控性。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2603_02049/figures/009_Figure_5.jpg]]
-*Figure 5: Ablation studies of memory components. Please see the red-framed regions to check the consistency compared to retrieved references. Baseline results are generated without any memory. GGM can capture coarse structures, but loses fine-grained details. Moreover, the incorporation of pointmap significantly enhances the consistency gained via the reference frames retrieved from the memory bank*
-
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2603_02049/figures/004_Figure_3.jpg]]
-*Figure 3: Spatial-Stereo Memory (SSM). Reference views are retrieved from the memory bank, while pointmaps for both target and reference views are constructed based on the 3D cache. In SSM attention, we horizontally stitch each target-reference pair and rearrange the tensor shape to make each target frame’s features focus on the specifically retrieved reference. B, F, H, W, C indicate dimensions of batch, frame, height, width, and channels*
-
-
 
 ## 实验与关键发现
 
@@ -285,22 +262,9 @@ Table 6 单独评估了各方法的摄像机控制能力。WorldStereo∗ 在旋
 
 Table 7 展示了全景三维生成中不同轨迹顺序对记忆检索质量的影响。当记忆库仅包含全景分割的 24 个视图时，重叠视场（FoV）得分较低；随着生成轨迹的增量更新，检索到的相关帧比例上升，FoV 得分提高。实验表明，合理的轨迹顺序能够提升记忆库中参考帧的覆盖度，进而增强生成一致性。
 
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2603_02049/figures/015_Table_7.jpg]]
-*Table 7: Overlapping FoV scores of 3D panorama generation (trajectory order ablation). Memory bank settings: ‘only panorama’ uses 24 views split from the panorama; others are incrementally updated with generations from different trajectory orders. Higher scores mean that more relevant frames are retrieved. ‘reference prop.’ indicates the proportion of retrieved frames belonging to panoramic (pano.) or generated (gen.) frames*
-
 ### 失败模式与局限性
 
 尽管 WorldStereo 在静态场景重建上表现优异，论文未评估其对动态场景或非刚性运动的处理能力——所有重建基准仅覆盖静态区域。DMD 训练中采用的困难轨迹过滤策略（保留“高质量且相对容易”的轨迹）虽然保证了蒸馏稳定性，但可能限制生成内容的多样性，在极端视角或复杂几何场景下存在性能下降风险。此外，当前方法依赖手动预设的轨迹顺序和角度，缺乏自动化规划机制，在实际部署中需要人工介入。当检索的参考帧极度无序或视场重叠不足时，SSM 的细粒度一致性增强效果可能减弱，该场景下的鲁棒性尚需进一步验证。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2603_02049/figures/002_Table_1.jpg]]
-*Table 1: Different video generation schemes for 3D reconstruction. Long-Bi VDMs produce long trajectories in a single pass to cover diverse viewpoints. AR models sequentially generate long videos in an autoregressive manner. Multi-Bi-Mem (ours) achieves multiple consistent generations based on a powerful open-released VDM [78] with complementary viewpoints and memory mechanisms for integrated reconstruction*
-
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2603_02049/figures/001_Figure_1.jpg]]
-*Figure 1: WorldStereo enables high-quality 3D scene generation based on single-view or panoramic inputs. The input reference views are framed in green. We present point clouds reconstructed from videos generated by WorldStereo: the top two perspective scenes use WorldMirror [58], while the bottom two panoramic scenes are aligned via monocular depth maps [84]*
-
-
 
 ## 定位与知识库关联
 
@@ -335,8 +299,6 @@ WorldStereo 定位于**摄像机引导的真实世界立体视频生成**，并�
 3. **轨迹自动规划**：能否根据输入视图自动规划最优生成轨迹，以最大化三维重建的覆盖度和质量？
 4. **长序列扩展**：模型能否扩展到更长的生成序列或更多样化的场景类型，而不会出现几何记忆累积误差导致的性能下降？
 5. **真实世界部署**：当前实验均在受控基准上进行，在完全开放的真实世界场景（如无约束拍摄、大范围场景）中的泛化能力尚未验证。
-
-
 
 ## 原文 PDF
 

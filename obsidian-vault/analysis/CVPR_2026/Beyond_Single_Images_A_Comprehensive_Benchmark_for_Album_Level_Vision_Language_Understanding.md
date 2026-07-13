@@ -53,8 +53,6 @@ claims:
 
 **方法定位** AlbumBench 并非提出新模型，而是构建了一个诊断性评估框架，用于测量 VLM 在相册级联合上下文理解、指令遵循和结构化输出生成方面的能力。它可作为未来相册理解研究的标准化测试平台。
 
-
-
 视觉语言模型（VLMs）在单张图像理解任务上已取得显著进展，然而真实世界中的视觉数据往往以**相册（album）**的形式组织——即一组在时间、事件或主题上相互关联的图像集合。用户与相册的交互不仅要求模型理解单张图像的内容，更要求其把握图像间的**联合上下文（joint context）**，并据此执行符合用户意图的组织操作，例如“选出所有包含生日蛋糕的照片”或“按活动阶段将照片分组”。
 
 现有VLM评估体系主要围绕单图像问答、图像描述或合成推理等任务构建，缺乏对**相册级多图像理解**能力的系统性考量。这一缺口导致三个关键瓶颈被长期忽视：
@@ -64,8 +62,6 @@ claims:
 3. **指令遵循与结构化输出能力不足**：在需要生成分组标签或聚类结果的任务中，模型频繁产生格式错误的输出，如重叠分组或缺失图像，严重制约了相册组织任务的实际可用性。
 
 针对上述缺口，本文提出 **AlbumBench**——首个面向相册级视觉语言理解的综合性基准测试。AlbumBench从用户意图出发，定义了四类相册组织任务：意图选择（Intent Selection）、意图评分（Intent Rating）、分组标注（Group Labeling）和分组聚类（Group Clustering），系统评估模型在理解相册联合上下文、遵循用户指令以及生成结构化输出方面的能力。该基准的构建旨在揭示当前VLM在相册理解上的真实能力边界，并为未来研究提供可量化的改进方向。
-
-
 
 ## 核心方法与创新机理
 
@@ -88,8 +84,6 @@ AlbumBench 进一步将**推理模式**（instruct vs. thinking）作为另一�
 AlbumBench 通过 Spearman 相关性分析证明了其评估的能力与现有基准**互补而非重叠**。语言上下文任务与 MMMU-val 的相关性较弱（ρ = -0.2 至 0.6），而视觉上下文任务的相关性较强（ρ = 0.6 至 0.8），表明传统多图像基准的分数无法预测模型在相册组织任务上的表现（*“Language context tasks show weaker correlations with MMMU-val ... compared to visual context tasks ... indicating our benchmark measures capabilities that are complementary to those assessed by existing evaluations”*）。这一互补性确立了 AlbumBench 作为独立评测维度的价值，而非对现有基准的简单扩展。
 
 综上，AlbumBench 的创新不在于“提出新方法”，而在于**通过精心设计的任务体系和控制变量实验，系统性地诊断出当前 VLM 在相册级理解中的三大瓶颈：视觉长上下文利用低效、分组推理能力不足、指令遵循脆弱**，为后续研究提供了明确的问题定义和评测框架。
-
-
 
 AlbumBench 并非一个算法模型，而是一个**系统性的评估框架**，用于衡量视觉语言模型（VLM）在“相册级”（album-level）多图像理解任务上的能力。其整体 pipeline 由三个核心模块串联而成：**数据集构建 → 任务定义与上下文注入 → 模型评估与后处理**。
 
@@ -135,12 +129,8 @@ AlbumBench 并非一个算法模型，而是一个**系统性的评估框架**�
 
 这一框架的核心洞察在于：分组任务（尤其是 Group Clustering）要求模型联合理解整个相册中图像间的关系，其难度远超选择和评分任务，构成了当前 VLM 能力的真正瓶颈。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2734_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Beyond_Single_Im/figures/001_Figure_1.jpg]]
 *Figure 1: Given an album, the album organization tasks we consider are 1) Intent Selection: given a user intent, select the images that best match it, 2) Intent Rating: given a user intent, rate the images from 0–3 on how well they match the intent, 3) Group Labeling: given a user grouping request and a list of groups, label each image according to the group, and 4) Group Clustering: given a user grouping request, group the images according to the request (without predefined group labels)*
-
-
 
 ### 数据集构建模块
 
@@ -183,8 +173,6 @@ AlbumBench 从 **CUFED** 数据集中选取 27,051 张图像，组织成 641 个
 ### 公式说明
 
 本工作为基准测试论文，核心贡献在于任务定义、数据集构建和系统性评估，不涉及新的算法公式推导。所有评估指标均采用标准定义（F1-score、ARI、NMI 等），具体公式可参见相关文献，此处不赘述。
-
-
 
 ## 实验与关键发现
 
@@ -263,8 +251,6 @@ Figure 3 展示了 AlbumBench 各任务与 MMMU-val 的 Spearman 相关性热力
 
 > **注意**：以上结论均基于 133 个测试相册的结果。由于基准规模相对有限（641 个相册），在更大规模真实世界相册上的泛化性需要进一步验证。部分具体数值（如各模型的精确 ARI/Accuracy/F1）需对照 Table 1 和 Table 2 原文确认。
 
-
-
 ## 定位与知识库关联
 
 ### 1. 任务定义与评估范式的贡献
@@ -306,8 +292,6 @@ AlbumBench 通过实验设计揭示了两个关键控制变量：
 2. **指令遵循能力**：如何提升 VLM 在相册组织任务中生成结构化输出的可靠性，减少对后处理器的依赖？
 3. **开源模型追赶**：开源 VLM 在相册理解上与闭源模型的巨大性能差距如何缩小？当前 Qwen3-VL-8B 在 Group Clustering 上的 ARI 仅为 0.2 左右，远低于闭源模型。
 4. **规模扩展**：如何将相册组织任务扩展到更大规模、多语言、多模态的真实世界相册，并保持评估的可靠性和公平性？
-
-
 
 ## 原文 PDF
 

@@ -51,8 +51,6 @@ claims:
 
 在 ScanNet 和 7-Scenes 基准上的实验表明，该方法在 ScanNet 上取得与 MonoSDF 可比的 F-score（0.710 vs. 0.750），在 7-Scenes 上则优于 MonoSDF（0.454 vs. 0.411），同时训练时间从 4.36 小时降至 0.47 小时，单帧推理时间从 19.13 秒降至 0.25 秒（Table 1, Table 2）。消融实验进一步验证了逐帧尺度优化的关键作用：若仅使用全局单一尺度，初始重建 F-score 将从 0.627 骤降至 0.17（ScanNet），凸显了尺度校准对后续重建质量的决定性影响（Table 3）。
 
-
-
 ### 单目场景重建的技术瓶颈
 
 从单目图像恢复稠密三维场景几何是计算机视觉与机器人领域的核心问题。传统多视图几何方法（如**COLMAP**）依赖特征匹配与三角测量，在纹理丰富区域表现良好，但在纹理缺失区域（如白墙、地板）往往产生稀疏甚至空白的重建结果。近年来，以**NeRF**为代表的神经辐射场方法通过可微分体渲染实现了高质量的新视图合成，但其原始设计侧重于辐射场而非显式表面。后续工作如**UNISURF**、**NeuS**和**VolSDF**将神经隐式表示与有符号距离函数（SDF）结合，实现了更精确的表面重建。
@@ -72,8 +70,6 @@ claims:
 针对上述问题，本文提出了一种全新的技术路线：**完全摒弃MLP，采用显式的全局稀疏局部稠密（Global-Sparse Local-Dense, GS-LD）体素网格直接存储和查询SDF、颜色及语义属性**。其核心洞察在于：场景表面仅占空间的极小部分，通过在表面附近自适应分配稀疏体素块，并在块内使用稠密数组进行缓存友好的三线性插值查询，可实现快速且内存高效的重建。
 
 为实现这一目标，本文进一步提出了一套完整的流程：首先通过尺度校准算法消除单目深度的帧间歧义，获得一致的几何初始化；随后利用可微分体渲染进行几何细化；最后引入高维连续条件随机场（CRF）在表面样本上联合优化颜色、法线和语义标签，增强物体边界的一致性。实验表明，该方法在ScanNet和7-Scenes数据集上训练速度提升10倍，渲染速度提升100倍，同时重建精度与当前最优方法可比，在7-Scenes上甚至更优。
-
-
 
 ## 核心方法与创新机理
 
@@ -121,8 +117,6 @@ claims:
 
 在因果链路中，**逐帧深度尺度优化**（Section 3.3）虽然看似辅助模块，实则是整个系统可行的前提条件。单目深度预测器输出的是无物理尺度的相对深度，若仅使用全局单一尺度因子，初始重建的 F-score 将从 0.627 骤降至 0.17（ScanNet）和 0.26（7-Scenes）（Table 3 vs Table 2）。本文通过 2D 尺度网格 $\phi_i$ 和 SfM 共视约束，在帧间建立局部一致性，使得体积融合能够产生有意义的初始几何。这一设计使得“先融合后细化”的策略成为可能，是该方法区别于纯优化式隐式方法的核心分水岭。
 
-
-
 本文提出的**全局稀疏局部稠密网格**（Global-Sparse Local-Dense Grids，GS-LD Grids）是一个从单目图像序列到带颜色与语义标签的三维场景重建的完整流水线。其核心设计理念是将场景表面固有的空间稀疏性显式编码为一种可微分的数据结构，从而在保持与SOTA神经隐式方法可比精度的同时，实现训练速度10倍、推理速度100倍的提升。
 
 ### 流水线总览
@@ -149,12 +143,8 @@ claims:
 
 整个流水线围绕**全局稀疏局部稠密体素网格**这一核心数据结构展开。该结构使用无碰撞哈希表索引稀疏分配的体素块，块内则采用缓存友好的稠密数组存储SDF、颜色和语义属性（见图3）。这种设计使得场景表示完全显式化，无需MLP参与前向查询，从而在单次前向传递中即可同时计算SDF值及其空间梯度，避免了神经隐式方法中昂贵的双重反向传播。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2305_13220/figures/004_Figure_4.jpg]]
 *Figure 4: Illustration of our pipeline. We first use structure-from-motion (SfM) to obtain sparse feature-based reconstruction. With the sparse point cloud and covisibility information from SfM, we optimize the scale of predicted monocular depth images (§3.3), and perform volumetric fusion to construct a globally sparse locally dense voxel grid (§3.4). After initialization, we perform differentiable volume rendering to refine the details (§3.5.1), and apply high dimensional continuous CRFs to finetune normals, colors, and labels (§3.5.3)*
-
-
 
 ### 3.1 全局稀疏局部稠密数据结构
 
@@ -253,8 +243,6 @@ $$
 
 其中 $\mathcal{L}_c$、$\mathcal{L}_d$、$\mathcal{L}_n$ 分别为颜色、深度、法线的渲染损失。网格参数 $\{\theta_d, \theta_c, \theta_s\}$ 使用 RM-SProp 优化，初始学习率 $10^{-3}$，指数调度器 $\gamma=0.1$。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能对比
@@ -270,7 +258,6 @@ $$
 *Table 2: Quantitative comparison of reconstruction quality. While being much faster, our approach is comparable to the state-of-the-art MonoSDF [51] on ScanNet [7] and better on 7-scenes [13]*
 
 Figure 8进一步揭示了底层数据结构的高效性：与NGP-grid相比，GS-LD Grids的端到端查询速度快**两个数量级**，且在大批量点查询时仍保持高效率。这归因于碰撞自由哈希表索引稀疏体素块，以及块内稠密数组的缓存友好设计。
-
 
 ### 阶段消融：从初始化到精细化的增益分析
 
@@ -298,33 +285,14 @@ Table 4和Table 5提供了ScanNet和7-Scenes上逐场景的F-score对比。在Sc
 1. MonoSDF使用384×384中心裁剪的单目线索，而本文使用480×640全分辨率预测，输入分辨率的差异可能对重建细节产生影响。
 2. 评估时所有方法均统一使用480×640分辨率的渲染深度进行TSDF融合，而非MonoSDF官方评估代码中的更高分辨率（968×1296），这一统一处理保证了时间对比的公平性，但可能略微低估MonoSDF的精度上限。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2305_13220/figures/002_Figure_2.jpg]]
 *Figure 2: Qualitative reconstruction comparison on ScanNet [7]. While being 10× faster in training, we achieve similar reconstruction results to state-of-the-art MonoSDF [51], with fine details (see Fig. 9)*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2305_13220/figures/013_Figure_11.jpg]]
-*Figure 11: Sparse reconstruction and covisibility matrix of ScanNet scenes selected by ManhattanSDF [14]*
 
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2305_13220/figures/015_Table_4.jpg]]
 *Table 4: Scene-wise quantitative results on ScanNet*
 
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2305_13220/figures/016_Figure_12.jpg]]
-*Figure 12: Error heatmap from our reconstruction (first row) to groundtruth (second row) for each scene in ScanNet [7]. Points are colorized by distance error ranging from 0 (blue) to 5cm (red) to its nearest neighbor in ground truth. Points with error larger than 5cm are regarded as outliers and colored in black*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2305_13220/figures/019_Figure_13.jpg]]
-*Figure 13: Error heatmap from our reconstruction (first row) to groundtruth (second row) for each scene in 7-Scenes [13]. The colorization is the same as Fig. 12*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2305_13220/figures/014_Table_3.jpg]]
-*Table 3: Initial reconstruction results without per-frame scale optimization (c. f. Ours (Init) in Table 4-5.)*
-
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2305_13220/figures/017_Table_5.jpg]]
 *Table 5: Scene-wise quantitative results on 7-Scenes*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2305_13220/figures/009_Figure_8.jpg]]
-*Figure 8: Query time comparison between ours and NGP-grid, lower is better. For end-to-end query, ours is two magnitudes faster, and maintains a high efficiency with a large number of point query. For the grid query operation itself, ours also have a better performance than multiresolution feature grids*
-
-
 
 ## 定位与知识库关联
 
@@ -376,8 +344,6 @@ GS-LD Grids 相对于现有基线方法，在以下关键设计槽位上进行�
 3. **户外扩展**：将该方法扩展到户外大场景重建需要解决若干挑战：户外光照变化剧烈，单目深度和语义先验的泛化性需重新评估；天空等无限远区域需要特殊处理；大尺度场景对内存管理和体素分配策略提出了更高要求。
 
 4. **实时在线重建**：当前方法虽已大幅加速，但仍包含离线阶段（SfM、尺度优化）。探索增量式 SfM 与在线体素分配的融合，有望实现实时在线场景重建，这对 AR/VR 和机器人应用具有重要意义。
-
-
 
 ## 原文 PDF
 

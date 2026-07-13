@@ -47,8 +47,6 @@ claims:
 
 在真实退化碑刻测试集S上，EpiAgent取得 **PSNR 22.14、SSIM 0.9684、LPIPS 0.0254**，字符识别Top-1准确率达 **0.9889**，End-to-End 1-NED达 **0.9069**，全面超越包括 **IR3**（Zhu et al., ACM Multimedia 2024）、**DocDiff**（Yang et al., ACM Multimedia 2023）、**MambaIR**（Guo et al., ECCV 2024）等在内的所有基线方法。人类专家偏好研究中，EpiAgent获得最高的Top-1排名比例 **59.66%**。消融实验进一步证实，多模态分析、经验引导的自适应规划与多角度评估（含专家反馈）的协同作用，共同构成其卓越性能的支柱。
 
-
-
 古代碑刻是承载历史、文化与书法艺术的核心物质载体。然而，历经千年风化、侵蚀与人为损坏，现存碑刻普遍呈现高度异构、多尺度且空间耦合的退化模式——同一块石碑上可能同时存在表面噪声、笔划断裂、局部缺失乃至整字毁损。这种复杂的退化分布使得修复任务远非通用图像增强所能覆盖。
 
 现有AI修复方法大多遵循**固定pipeline的单次前馈范式**，将修复视为从退化图像到干净图像的端到端映射。尽管在特定场景下取得了进展，但这类方法面临三个根本性缺口：
@@ -60,8 +58,6 @@ claims:
 值得注意的是，碑刻修复专用基线 **IR3**（Zhu et al., ACM Multimedia 2024）虽已尝试全局-局部框架，但仍受限于固定pipeline，在字符识别准确率（Top-1 Acc. 0.9626）和端到端1-NED（0.8855）等语义关键指标上存在明显天花板。
 
 上述缺口共同指向一个核心瓶颈：**碑刻修复需要一种能够动态感知退化状态、按需调度专业化工具、并在语义与视觉双重约束下迭代自优化的智能系统**。这正是EpiAgent的设计动机——将碑刻修复重新建模为分层规划问题，以LLM中央规划器驱动多模态分析、历史经验蒸馏、可组合工具调用与多角度自优化，在视觉保真与语义真实之间寻求平衡。
-
-
 
 ## 核心方法与创新机理
 
@@ -111,8 +107,6 @@ EpiAgent 在每次执行后引入**多角度评估**，包含三个维度：
 
 EpiAgent 的三项 changed slots 构成了一个**相互增强的创新链条**：闭环范式提供了动态调度的框架，可组合工具包提供了精细化的执行能力，多角度评估提供了超越像素的反馈信号。这一链条的核心驱动是**LLM 作为中央规划器**对多模态感知、历史经验和专业工具的协调能力，使得系统能够在视觉保真与语义真实之间取得平衡——这正是现有方法长期未能解决的瓶颈。
 
-
-
 EpiAgent 将古代碑刻修复形式化为一个**分层规划问题**，并模拟人类金石学家“观察—构思—执行—再评估”的闭环工作流。整个系统围绕一个基于 LLM 的中央规划器构建，动态协调多模态感知、历史经验蒸馏、专业化工具组合与迭代自优化，从而应对碑刻退化中异构、多尺度、空间耦合的复杂挑战。
 
 ### 四阶段闭环范式
@@ -141,8 +135,6 @@ Figure 2 展示了 EpiAgent 的整体框架，其关键模块与输入输出�
 ### 与传统方法的本质区别
 
 与现有依赖单次前馈图像到图像转换的固定 pipeline 不同，EpiAgent 的核心突破在于将修复过程从“静态模型推理”转变为“**LLM 驱动的动态规划与工具编排**”。这种范式转换使得系统能够根据每个字符的具体退化类型与严重程度，按需组合去噪、补全、模仿与检索操作，并在文本语义真实性与书法风格一致性之间取得平衡——这正是传统像素级修复方法所缺失的关键能力。
-
-
 
 ### 3.1 观察阶段：多模态感知与结构化记录
 
@@ -208,18 +200,8 @@ $$\mathcal{F}^{(k)} = \big\{ c \in \mathcal{C} \mid (M_h^{(k)}(c) = 0) \vee (M_t
 
 规划器 $\pi$ 使用 $\mathcal{F}^{(k)}$、$T_r$ 和 $T_e$ 生成针对失败字符的修正计划 $\mathcal{P}^{(k+1)}$，触发下一轮迭代。该闭环机制使修复策略在推理过程中动态更新，而非受限于静态先验。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2476_https_arxiv_org_abs_2604_09367/figures/003_Figure_3.jpg]]
-*Figure 3: Illustration of the workflow of EpiAgent. The “MLLM”, “LRM”, “DAM”, “CLM”, and “CC” denote Multimodal Large Language Model, Layout Rectification Module, Degradation Assessment Model, Corrective Language Model, and Chinese Corpora, respectively*
-
-![[assets/figures/papers/paper_list_l2476_https_arxiv_org_abs_2604_09367/figures/004_Figure_4.jpg]]
-*Figure 4: (a) Process of Specialized Restoration Tools; (b) Details of Multi-perspective Evaluation*
-
 ![[assets/figures/papers/paper_list_l2476_https_arxiv_org_abs_2604_09367/figures/008_Figure_6.jpg]]
 *Figure 6: Exemplary comparison between different tool invocation sequences faced with (a) severely degraded (L3) and (b) slightly degraded (L1) character blocks. The green lines mark the optimal restoring sequence*
-
-
 
 ## 实验与关键发现
 
@@ -251,13 +233,8 @@ EpiAgent 在三个不同退化程度的碑刻测试集（Testing Set S, R-I, R-I
 
 图5展示了不同方法在真实退化碑刻上的修复结果对比。在严重退化区域（如大面积剥落、笔划断裂），固定流水线方法往往产生模糊或失真的修复，而 EpiAgent 通过自适应工具组合（如对严重退化字符调用字体模仿或字符检索）能够生成清晰且风格一致的笔划。图6进一步揭示了规划策略的适应性：对于严重退化（L3）字符，最优序列为“去噪→补全→模仿”；对于轻微退化（L1）字符，仅需“去噪”即可。图7对比了不同退化程度下各修复工具的输出，EpiAgent 选择的工具与人类专家偏好高度一致（紫色边框标记），验证了经验引导规划的有效性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2476_https_arxiv_org_abs_2604_09367/figures/005_Table_1.jpg]]
 *Table 1: Inscription image restoration results on Testing Set S, R-I, and R-II. Comparison with state-of-the-art methods. The best and the second-best results are highlighted and underlined*
-
-![[assets/figures/papers/paper_list_l2476_https_arxiv_org_abs_2604_09367/figures/007_Table_2.jpg]]
-*Table 2: User study of inscription image restoration results. The best and the second best results are highlighted and underlined*
 
 ![[assets/figures/papers/paper_list_l2476_https_arxiv_org_abs_2604_09367/figures/009_Table_3.jpg]]
 *Table 3: Ablation studies of the analysis modules used in the Observation stage. The best and the second-best results are highlighted and underlined*
@@ -267,17 +244,6 @@ EpiAgent 在三个不同退化程度的碑刻测试集（Testing Set S, R-I, R-I
 
 ![[assets/figures/papers/paper_list_l2476_https_arxiv_org_abs_2604_09367/figures/011_Table_5.jpg]]
 *Table 5: Ablation studies of multi-perspective evaluation module. The best and the second best results are highlighted and underlined*
-
-![[assets/figures/papers/paper_list_l2476_https_arxiv_org_abs_2604_09367/figures/006_Figure_5.jpg]]
-*Figure 5: Restoration results of different methods on degraded inscription images. (a)-(b) are from Testing Set S, (c)-(d) belong to Testing Set R-I, and (e)-(f) belong to Testing Set R-II. The red borders denote the degraded patches and the restored patches by competing methods, while the green counterparts denote the ground-truth text and the restored patches by EpiAgent*
-
-![[assets/figures/papers/paper_list_l2476_https_arxiv_org_abs_2604_09367/figures/013_Figure_7.jpg]]
-*Figure 7: Comparison of restoration outcomes across different tools. (a)-(d), (e)-(h), (i)-(l) correspond slightly, middely, and severely degraded character. Red and green borders indicate the restorations preferred by EpiAgent and human experts, respectively, while purple borders indicate cases where their choices coincide*
-
-![[assets/figures/papers/paper_list_l2476_https_arxiv_org_abs_2604_09367/figures/012_Figure_8.jpg]]
-*Figure 8: Quantitative comparison of restoration time and CLIP-IQA with and without reflective experience*
-
-
 
 ## 定位与知识库关联
 
@@ -327,8 +293,6 @@ EpiAgent 开辟了智能体驱动的文化遗产修复新范式，同时揭示�
 3. **罕见字与异体字处理：** 当字符检索模块（$f_{ret}$）无法在同一碑刻中找到相同字符，且字体模仿缺乏足够范例时，系统如何处理罕见字或异体字的修复？这可能需要引入跨碑刻的字体风格解耦与迁移技术。
 
 4. **效率与可部署性：** EpiAgent 的迭代式闭环修复和LLM推理引入了显著的计算开销。如何在保持修复质量的前提下压缩规划与评估的推理成本，是实际部署中必须解决的问题。
-
-
 
 ## 原文 PDF
 

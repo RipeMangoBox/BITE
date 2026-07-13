@@ -50,8 +50,6 @@ claims:
 
 实验表明，在SDXL 1.0上，Otil在2 GPU和4 GPU配置下分别实现1.88×和2.23×的加速，同时相比AsyncDiff减少87.5%至93.75%的通信量；与快速采样器和LoRA结合后，加速比可进一步提升至2.84×。该方法为扩散模型的高效多GPU部署提供了新的通信优化范式。
 
-
-
 扩散模型已成为文本到图像生成领域的主流架构，但其迭代去噪过程计算密集，单GPU推理延迟居高不下。为加速推理，多GPU并行方案应运而生，然而现有方法面临一个核心瓶颈：**每步去噪后需在GPU间交换完整的中间特征激活，导致严重的通信开销**。
 
 现有并行方法大致分为两类。**Patch方法**（如**DistriFusion**，Li et al., CVPR 2024）将特征图切分到多GPU，每步通过陈旧激活实现并行，但需广播完整激活图；**流水线方法**（如**AsyncDiff**，Chen et al., NeurIPS 2024）以异步方式组织去噪流水线，但每一步仍需交换完整中间结果。两类方法均未触及通信冗余的本质——它们默认每步激活的所有空间区域都同等重要，因而传输全量数据。**ParaDiGMS**（Shih et al., NeurIPS 2023）虽尝试并行采样，但使用Picard迭代可能偏离扩散轨迹，影响生成保真度。
@@ -61,8 +59,6 @@ claims:
 基于这一观察，Otil提出了一条根本性的优化路径：**既然相邻步激活变化微小且空间局部化，只需同步最活跃的少数区域即可实现近无损的并行推理**。具体而言，Otil将特征图分解为均匀方形子块，通过计算相邻步子块的余弦相似度识别变化最大的top-k子块，仅传输这些“高信息量”子块，从而将通信量降至全量传输的k/K（默认1/4）。同时引入动态轮询机制，确保所有空间区域在若干步内至少被更新一次，避免信息遗漏。
 
 这一设计使得Otil在保持生成质量的前提下，相比DistriFusion减少75%通信量，相比AsyncDiff减少最高93.75%的通信量（4 GPU场景），为扩散模型的多GPU高效推理开辟了新方向。
-
-
 
 ## 核心方法与创新机理
 
@@ -98,8 +94,6 @@ $$C _ { \mathrm { O t i l } } = \frac { k } { K } ( p - 1 ) M$$
 
 **需注意的公平性限制**：所有评估均在 PCIe 互连的 A100 GPU 上进行，该环境可能放大通信瓶颈的影响。在更高带宽连接（如 NVLink）下，通信减少带来的加速比可能下降，此时计算瓶颈可能成为主要矛盾，这一点需要手动验证。
 
-
-
 Otil 的整体设计围绕一个核心观察展开：扩散模型相邻去噪步之间的潜在激活变化极小（平均相对 MAE 仅约 0.01），且变化集中在少数空间区域（Figure 3）。基于此，Otil 将传统的“全量激活交换”范式替换为“信息引导的部分子块传输”，在保持生成保真度的前提下大幅削减 GPU 间通信量。其 pipeline 由四个关键模块串联构成：
 
 1. **空间划分（Spatial Partitioning）**  
@@ -121,15 +115,8 @@ Otil 的整体设计围绕一个核心观察展开：扩散模型相邻去噪步
 
 整个 pipeline 的通信量由 $C_{\text{Otil}} = \frac{k}{K}(p-1)M$ 给出（Equation 7），其中 $p$ 为 GPU 数量，$M$ 为单 GPU 的激活数据量。与 DistriFusion 的全量通信 $C_{\text{DistriFusion}} = (p-1)M$ 相比，Otil 的通信量降低至其 $k/K$ 倍；与 AsyncDiff 相比，在 4 GPU 配置下通信量可减少 93.75%。这一架构层面的通信压缩是 Otil 实现 1.74×–2.23× 加速比（Table 1）且保持图像质量（LPIPS、PSNR、CLIP Score 等指标接近原始模型）的根本原因。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l907_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Otil_Accelerating_D/figures/002_Figure_2.jpg]]
-*Figure 2: After several warm-up steps, each GPU contains the full latent activations of the image. At timestep t, each device denoises only its assigned half (GPU 0 for the above, GPU 1 for the below), generating the corresponding output. An Information-guided Sub-block Transmission module detects regions with noticeable changes and transfers only those sub-blocks to other GPUs, reducing GPU-GPU communication. At timestep t − 1, the received sub-blocks are reinserted into*
-
 ![[assets/figures/papers/paper_list_l907_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Otil_Accelerating_D/figures/001_Figure_1.jpg]]
 *Figure 1: (a) Patch method broadcasts full activations, causing heavy communication. (b) Pipeline method exchanges full intermediate activations, limiting efficiency. (c) Otil sends only variant sub-blocks, minimizing communication*
-
-
 
 ### 两级空间划分
 
@@ -182,16 +169,6 @@ $$\boldsymbol { x } _ { t - 1 } = \alpha _ { t } \boldsymbol { x } _ { t } + \be
 
 该式表明，相邻步的潜在变化由预测噪声 $\hat{\varepsilon}_\theta$ 驱动，而噪声预测在空间上天然具有局部性——这正是 Otil 仅需同步少量变化子块即可维持全局生成一致性的理论基础。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l907_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Otil_Accelerating_D/figures/004_Figure_4.jpg]]
-*Figure 4: After partitioning*
-
-![[assets/figures/papers/paper_list_l907_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Otil_Accelerating_D/figures/011_Figure_7.jpg]]
-*Figure 7: Image Similarity Metrics*
-
-
-
 ## 实验与关键发现
 
 ### 实验设置
@@ -238,8 +215,6 @@ Otil的核心优势在于通信量的显著降低。根据Section 4.3的分析�
 
 需要指出的是，所有实验均在PCIe互连的A100 GPU上进行。PCIe的带宽限制可能放大了通信瓶颈的严重程度，使得Otil的通信减少策略获得了更显著的加速收益。在更高带宽连接（如NVLink）下，通信开销本身较小，Otil的相对加速比可能有所降低——此时计算瓶颈可能成为主要矛盾。此外，实验仅覆盖COCO Captions 2014子集和有限模型规模，对不同分辨率、更大规模GPU集群及视频扩散模型的泛化性尚需进一步验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l907_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Otil_Accelerating_D/figures/005_Table_1.jpg]]
 *Table 1: Quantitative comparison for text-to-image generation. Underlined values denote the best performance*
 
@@ -249,16 +224,8 @@ Otil的核心优势在于通信量的显著降低。根据Section 4.3的分析�
 ![[assets/figures/papers/paper_list_l907_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Otil_Accelerating_D/figures/010_Table_4.jpg]]
 *Table 4: The Impact of Sub-block Size on Per-Step Latency and Overall Image Quality*
 
-![[assets/figures/papers/paper_list_l907_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Otil_Accelerating_D/figures/006_Table_2.jpg]]
-*Table 2: The compatibility of Otil using the fast few-step samplers and LoRA acceleration*
-
 ![[assets/figures/papers/paper_list_l907_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Otil_Accelerating_D/figures/007_Figure_5.jpg]]
 *Figure 5: Qualitative results on SDXL 1.0. Otil can reduce the latency according to the number of used devices with minimal impact on generative quality*
-
-![[assets/figures/papers/paper_list_l907_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Otil_Accelerating_D/figures/008_Figure_6.jpg]]
-*Figure 6: Visual results of combining the Otil with the fast fewstep samplers and LoRA acceleration*
-
-
 
 ## 定位与知识库关联
 
@@ -303,8 +270,6 @@ Otil 的适用边界由以下条件刻画：
 3. **视频扩散模型的时序并行**：Otil 的空间子块选择机制是否可扩展到视频扩散模型的时空并行？时序维度的相邻帧变化是否同样具有稀疏性？
 
 4. **与其他压缩技术的联合**：Otil 的通信削减与特征量化、低精度通信等技术是否可叠加？联合优化空间有多大？
-
-
 
 ## 原文 PDF
 

@@ -59,8 +59,6 @@ claims:
 - 人类主观评估中，仅约 25% 的参与者能区分生成运动与真实 MoCap 数据，接近随机猜测的 20% 水平。
 - 消融实验证实，帧级动作进度指示器是模型成功的关键组件，移除后模型完全失效（FID 升至 2.104）；数据增强对提升物理合理性亦有显著贡献。
 
-
-
 人-场景交互（Human-Scene Interaction, HSI）建模是计算机视觉与图形学的核心挑战，其目标在于生成人类在三维环境中自然、物理合理且可控的运动序列。这一能力对具身智能、虚拟现实、数字人等应用至关重要。然而，当前领域面临双重瓶颈：
 
 **数据瓶颈：高质量HSI数据严重稀缺。** 现有数据集存在规模小、场景单一、缺乏精确动作捕捉（MoCap）或缺少动态物体交互等局限（见 Table 1）。尽管部分数据集如PROX提供了静态场景中的交互样例，但其时长与场景多样性远不足以支撑大规模生成模型的训练。TRUMANS的推出正是为了填补这一空白：该数据集包含15小时精确MoCap数据，覆盖100个室内场景，涉及7名参与者在20种物体类别上的多样化交互，并同步提供了多视角与自视角的光真实感RGBD渲染，成为当前最大规模的动作捕捉HSI数据集。
@@ -68,8 +66,6 @@ claims:
 **生成瓶颈：现有运动合成方法难以同时满足长序列生成、物理合理性与精细可控性。** 主流方法可大致分为两类：一类基于单次生成（single-pass），如cVAE、SceneDiff、GMD等，虽能在静态场景中生成运动，但缺乏对长时间交互的连贯建模能力；另一类如GOAL、IMoS等面向动态物体交互，但往往在场景穿透、接触真实性和泛化性上表现不足。根本原因在于：这些方法要么缺乏对三维场景局部几何的有效感知，要么仅以单一全局动作标签驱动生成，无法捕捉帧级动作演变，从而难以在杂乱场景中实现避碰并保持交互的物理合理性。
 
 **本文动机：** 针对上述双重瓶颈，TRUMANS工作从数据与模型两个维度进行系统性突破。在数据侧，通过精确动作捕捉与虚拟环境复现构建大规模HSI数据集，并引入物体形态与运动增强策略，在保持接触真实性的前提下大幅扩增数据多样性。在模型侧，设计了一种基于场景局部感知与帧级动作嵌入的自回归条件扩散模型，使得生成运动既能适应任意长度，又能精确响应场景几何与动作指令，从而在静态场景交互与动态物体操控任务上均达到超越现有基线的性能。
-
-
 
 ## 核心方法与创新机理
 
@@ -105,8 +101,6 @@ $$\mathcal{L} = E_{\tilde{X}_0 \sim q(\tilde{X}_0 \vert \mathcal{C}), t \sim \le
 
 TRUMANS 的数据增强策略通过调整物体的尺寸（如将椅子高度增加 15cm、床高度降低 15cm），并相应地重新优化人体运动以保持接触真实性，从而在保持接触标注物理合理的前提下大幅扩增了有效训练样本。消融实验表明，移除数据增强后，最大穿透值从 11.74 升至 15.52，证实物体形态增强有助于模型学习更鲁棒的物理交互姿态。
 
-
-
 TRUMANS 的整体框架围绕“数据—生成—后处理”三条主线构建，旨在解决高质量人-场景交互（HSI）数据稀缺与长序列可控生成两大瓶颈。其核心设计思路是：首先通过精确动作捕捉与虚拟环境复现构建大规模、高保真的 HSI 数据集；进而设计一个以场景局部感知与帧级动作嵌入为条件的自回归条件扩散模型，实现任意长度的物理合理交互运动生成；最后通过轻量级后处理模块将关节点运动转换为带参数的人体网格，并优化动态物体轨迹以保证交互一致性。
 
 ### 数据管线
@@ -135,8 +129,6 @@ TRUMANS 的整体框架围绕“数据—生成—后处理”三条主线构建
 - **输出**：任意长度的 SMPL-X 人体运动序列，以及（可选）优化后的动态物体位姿轨迹。
 
 整个框架的设计使得模型在训练后展现出显著的零样本泛化能力，可直接应用于 PROX、Replica、ScanNet、ScanNet++ 等多种未见过的 3D 场景数据集。
-
-
 
 TRUMANS 方法的核心是一个**自回归条件扩散模型**（Autoregressive Conditional Diffusion Model），其设计围绕三个关键瓶颈展开：长序列生成的连贯性、三维场景感知的物理合理性，以及帧级动作指令的精细可控性。以下逐一拆解其关键模块与公式。
 
@@ -179,13 +171,6 @@ $$\mathcal{L} = E_{\tilde{X}_0 \sim q(\tilde{X}_0 \vert \mathcal{C}), t \sim [1,
 生成关节点位置后，两个后处理模块完成最终输出：
 - **Joint-to-SMPL-X MLP**：将关节点位置转换为 SMPL-X 参数化网格。
 - **Object Trajectory Optimizer**：对于动态物体交互，优化物体轨迹以最小化手-物体距离的方差，确保接触一致性。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1727_TRUMANS_Scaling_Up_Dynamic_Human_Scene_Interaction_Modeling/figures/003_Figure_2.jpg]]
-*Figure 2: Data augmentation for motion generation. This example highlights how human motion is adjusted to accommodate variations in object sizes. Specifically, the chair’s height is increased, and the bed’s height is decreased, each by 15cm. Our augmentation method proficiently modifies human motion to maintain consistent interactions despite these changes in object dimensions*
-
-
 
 ## 实验与关键发现
 
@@ -233,21 +218,8 @@ TRUMANS 数据集以 **15 小时** 动作捕捉数据、**100 个室内场景**�
 
 TRUMANS 数据集对下游任务的增益在 Table 4、Table 5 及 Table A2、A3 中得到验证。将 TRUMANS 以不同比例与 3DPW、RICH、DAMON 等数据集混合训练后，人体网格估计（如 I2L、SGRE）和接触估计（如 BSTRO、DECO）方法均获得一致的性能提升，表明 TRUMANS 的多样化交互数据对相关任务具有通用迁移价值。
 
-![[assets/figures/papers/paper_list_l1727_TRUMANS_Scaling_Up_Dynamic_Human_Scene_Interaction_Modeling/figures/008_Table_4.jpg]]
-*Table 4: Performance of Ma et al. [29] trained on 3DPW [51] combined with TRUMANS in different ratios*
-
-![[assets/figures/papers/paper_list_l1727_TRUMANS_Scaling_Up_Dynamic_Human_Scene_Interaction_Modeling/figures/009_Table_5.jpg]]
-*Table 5: Performance of BSTRO [20] and DECO [50] trained on RICH [20] and DAMON [50] combined with TRUMANS, respectively*
-
-![[assets/figures/papers/paper_list_l1727_TRUMANS_Scaling_Up_Dynamic_Human_Scene_Interaction_Modeling/figures/012_Table.jpg]]
-*Table: A2. Performance of I2L in 3D human mesh estimation trained on 3DPW combined with TRUMANS in different ratios*
-
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1727_TRUMANS_Scaling_Up_Dynamic_Human_Scene_Interaction_Modeling/figures/005_Figure_4.jpg]]
 *Figure 4: Visualization of motion generation. Leveraging local scene context and action instructions as conditions, our method demonstrates its proficiency in (a) initiating motion given the surrounding environment, (b) dynamically interacting with objects, (c) avoiding collisions during motion progression, and (d) robustly synthesizing long-term motion. The depicted scenes are selected from PROX, Replica, and FRONT3D-test datasets, none of which were included in the training phase. For qualitative results, please refer to the Supplementary Video*
-
-
 
 ## 定位与知识库关联
 
@@ -342,8 +314,6 @@ TRUMANS 在每段 episode 的末帧对骨盆 xy 坐标施加子目标掩码 $M_{
 4. **动态场景适应**：当前方法假设场景几何固定。若场景本身动态变化（如门被打开、椅子被移动），模型如何实时更新场景表示并调整运动规划？
 
 5. **交互意图理解**：动作标签目前由外部给定。能否将高层自然语言指令（如“去厨房拿一瓶水”）端到端地映射为帧级动作序列与子目标，实现从语言到交互运动的直接生成？
-
-
 
 ## 原文 PDF
 

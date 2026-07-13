@@ -82,8 +82,6 @@ claims:
 
 尽管结果令人鼓舞，该方法仍存在若干局限：预测的特征值序列缺乏是真实拉普拉斯谱的数学保证；迭代式处理多于两个部分形状时误差会逐步累积；对分布外并集模式的泛化能力有限；尚未在未处理的自然部分扫描数据上进行测试。开放问题包括：如何保证预测谱的可实现性（即存在一个流形以该序列为谱），以及如何处理谱并集的固有模糊性（如对称部分导致的多个有效解）。
 
-
-
 三维形状分析的核心挑战之一是处理不完整的几何数据。在许多实际场景中，我们获得的并非完整的物体模型，而是多个部分扫描的集合——例如从不同视角捕获的深度图、遮挡下的激光雷达点云，或经过分割的CAD部件。这些部分形状各自携带有限的几何信息，但它们的并集可能覆盖一个完整物体的内在结构。如何从这些碎片化的观测中推断出完整形状的全局属性，构成了一个基础性问题。
 
 **现有方法的瓶颈。** 传统上，从部分形状恢复完整几何信息的路径依赖于显式的对应关系计算或几何配准。这类方法需要建立部分形状之间、或部分形状与某个模板之间的点对点映射，然后通过融合、变形或重建来获得完整形状。然而，这一范式面临两个根本性困难：其一，当部分形状之间缺乏足够的重叠区域或纹理特征时，可靠的对应关系难以建立；其二，对于可变形物体（如人体、动物），不同部分可能处于不同的姿态，使得刚性配准方法失效。即便使用功能映射等更灵活的谱域对应方法，仍然需要部分形状之间共享某种结构信息。
@@ -91,8 +89,6 @@ claims:
 **谱表示的机遇与挑战。** 拉普拉斯-贝尔特拉米算子的谱（特征值序列）提供了一种规避上述困难的表示形式。根据谱几何理论，特征值序列是等距变换的不变量——它不依赖于具体的嵌入姿态、网格采样密度或三角剖分方式，而是刻画了形状的内在度量结构。这一性质使得谱表示天然适合处理可变形形状：两个处于不同姿态的同一物体具有相同的特征值序列。然而，谱表示也引入了新的歧义性：特征值仅捕获等距等价类，因此多个几何上不同但等距的形状共享相同的谱（等谱性）。对于部分形状的并集问题，这种歧义性进一步放大：每个部分可能与其对称版本等谱，导致并集存在多个有效解（见Figure 3）。此外，在未知对应关系和完整几何信息的情况下，从部分形状的谱预测其并集的谱，本质上是一个病态问题——仅靠数学推导无法确定唯一解。
 
 **数据驱动的突破口。** 尽管上述问题在纯几何框架下是病态的，但现实世界中的形状并非均匀分布在所有可能的等距类上。特定语义类别（如人体、四足动物、人造物）的形状遵循特定的结构先验，这些先验可以通过数据学习获得。本文的核心动机正是利用这一观察：我们提出学习一个神经算子，直接从两个部分形状的截断特征值序列预测其并集的特征值序列，无需显式的三维重建、对应关系计算或几何配准。这一思路将问题从几何推理转化为谱域上的序列到序列映射，通过数据先验来弥补信息的不足，同时保留谱表示对离散化和姿态变化的固有鲁棒性。
-
-
 
 ## 核心方法与创新机理
 
@@ -131,8 +127,6 @@ $$\lambda(\mathcal{M}_1 \cup \mathcal{M}_2 \cup \dotsb \cup \mathcal{M}_m) = \ma
 ### 方法谱系定位
 
 在谱形状分析的方法谱系中，本文的工作处于一个独特的位置。与 **ShapeDNA**（Reuter et al., Computer-Aided Design 2006）将谱用作形状检索的描述符不同，本文的方法直接操作并生成谱，将其从被动描述符提升为主动计算对象。与 **Isospectralization / MRC*19**（Marin et al., 3DV 2019）从谱恢复三维形状的逆向问题不同，本文关注的是谱域内的正向并集运算，且无需经过显式的几何重建即可支持下游任务（如区域定位、形状检索）。这种“在谱域中计算、在谱域中应用”的范式，为谱方法在三维视觉中的应用开辟了新的可能性。
-
-
 
 本文提出一种名为**谱并集网络（Spectral Union Network）**的学习框架，其核心目标是：给定两个部分可变形三维形状，仅以各自的截断拉普拉斯特征值序列为输入，直接预测二者并集的谱，全程无需计算形状间的对应关系或几何变换。该框架将“部分形状的并集”这一几何操作转化为谱域上的神经算子学习问题。
 
@@ -181,14 +175,8 @@ $$\lambda(\mathcal{M}_1 \cup \cdots \cup \mathcal{M}_m) = \mathcal{U}_\Theta(\cd
 
 框架的核心取舍在于：放弃显式的三维几何表示（点云/网格），转而操作等距不变的谱表示。这带来了三个优势——（1）完全规避了点对点对应问题；（2）天然对网格离散化、采样密度鲁棒（Table 2, Table 3, Figure 6）；（3）可交换架构保证了输入顺序无关性。代价则是预测谱缺乏是真实拉普拉斯谱的数学保证，且迭代式多部分并集会导致误差累积（Appendix A）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2104_00514/figures/020_Figure.jpg]]
 *Figure: 1Figure 11: Comparison of the reconstruction obtained by running the state-of-the-art method of [MRC*19] on the green shape, yielding the fourth shape, and the reconstruction obtained from our predicted full spectrum, yielding the last shape*
-
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2104_00514/figures/001_Figure_1.jpg]]
-*Figure 1: Given a collection of partial deformable shapes $\{ \mathcal { M } _ { 1 } , \mathcal { M } _ { 2 } , \mathcal { M } _ { 3 } \}$ as input, our method predicts the Laplacian eigenvalues of their union without first having to compute a correspondence or a transformation between the input shapes. The resulting eigenvalues (top right plots, colors correspond to each surface) can be used to reconstruct the final shape if needed, up to isometry/pose (bottom right). In this example, the input shapes have different poses, varying overlap, and different mesh connectivity
-
 
 
 ### 问题形式化：谱并集算子
@@ -243,8 +231,6 @@ T_A 的具体配置为：8 个注意力头、6 层，所有表示的维度为 32
 
 网络使用预测特征值与真实特征值之间的均方误差（MSE）作为训练损失。论文指出，尝试根据特征值线性增长幅度对损失进行加权惩罚（即对较大特征值赋予更高权重）**并未带来显著改进**——这一消融发现表明，简单的均匀加权 MSE 已足以有效训练谱并集算子。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -286,10 +272,6 @@ Figure 2 和 Figure 5 从定性角度验证了预测谱的几何保真度。使�
 
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2104_00514/figures/026_Figure.jpg]]
 
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2104_00514/figures/027_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2104_00514/figures/029_Figure.jpg]]
-
 ### 消融与失败模式
 
 **损失函数设计**：在训练损失中引入与特征值线性增长成正比的惩罚项并未带来显著改进（Section 4），说明标准均方误差已足够引导网络学习谱并集映射。
@@ -310,19 +292,6 @@ Figure 2 和 Figure 5 从定性角度验证了预测谱的几何保真度。使�
 
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2104_00514/figures/011_Table_2.jpg]]
 *Table 2: Intersection over union (IoU) and accuracy in the region localization task, in different experimental settings. Model trained on a single identity, to show generalization*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2104_00514/figures/010_Figure_6.jpg]]
-*Figure 6: Region localization task, under the effect of different mesh connectivity. Given the eigenvalues of two partial shapes, we correctly predict an indicator function that represents the union of the two over a fixed template*
-
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2104_00514/figures/025_Figure_17.jpg]]
-*Figure 17: Region localization on aereoplanes. The model is trained and tested on point clouds*
-
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2104_00514/figures/028_Figure_18.jpg]]
-*Figure 18: Region localization on headphones, trained and tested on point clouds. In the examples on the right column, despite significant changes in the geometry of the partialities, the model localizes the same correct region*
-
-
 
 ## 定位与知识库关联
 
@@ -398,8 +367,6 @@ Figure 2 和 Figure 5 从定性角度验证了预测谱的几何保真度。使�
 5. **与谱域其他算子的组合**：谱并集算子能否与功能映射（functional maps）、谱距离（spectral distances）等其他谱算子无缝组合，以支持更复杂的几何处理管线？
 
 6. **大规模形状集合上的可扩展性**：方法在更大规模、更多样化的形状集合上的训练效率和泛化能力如何？
-
-
 
 ## 原文 PDF
 

@@ -71,8 +71,6 @@ LiDAR新视角合成（Novel View Synthesis, NVS）旨在从一组已采集的Li
 
 NFL位于**神经渲染与物理传感器建模的交叉点**。它继承了NeRF的隐式场景表征和可微渲染范式，但通过引入LiDAR主动传感的物理方程，将神经场从“被动色彩场”扩展为“主动物理场”。与LiDARsim等“先重建后模拟”的显式管线不同，NFL通过端到端优化直接匹配传感物理过程，避免了中间几何重建的误差累积。该方法为自动驾驶和机器人领域的LiDAR仿真提供了一条高保真、数据驱动的新路径。
 
-
-
 ### LiDAR新视角合成的核心挑战
 
 LiDAR传感器通过发射激光脉冲并测量回波时间来获取场景的精确三维几何信息，是自动驾驶和机器人感知系统的关键组件。然而，真实LiDAR扫描的采集成本高昂且受限于特定传感器配置，这催生了LiDAR新视角合成（Novel View Synthesis, NVS）的需求——即从已有的稀疏扫描中生成新视角下的LiDAR点云。
@@ -100,8 +98,6 @@ LiDAR传感器的测量过程受多种物理效应影响，这些效应在合成
 ### 本文动机
 
 基于上述分析，本文提出**NFL（Neural LiDAR Fields）**，核心动机是：**将物理启发的LiDAR传感模型直接集成到可微神经体渲染框架中，通过端到端优化神经场来匹配LiDAR的主动传感物理过程**。与“先重建后模拟”的范式相比，这种“直接优化”策略避免了显式几何重建的中间误差累积，能够更逼真地再现LiDAR扫描的物理特性——尤其是光束发散引起的范围偏差、二次回波和射线丢弃现象。通过缩小合成扫描与真实扫描之间的域差距，NFL有望提升下游任务（如点云配准和语义分割）的性能。
-
-
 
 ## 核心方法与创新机理
 
@@ -147,8 +143,6 @@ LiDAR 射线在未命中任何表面时不会产生回波（射线丢弃）。NF
 
 这些创新共同构成了 NFL 相对于 LiDARsim、i-NGP、DS-NeRF 和 URF 等基线的**系统性优势**：NFL 不再将 LiDAR 视为“有深度的相机”，而是从传感器物理第一性原理出发，直接优化神经场以匹配主动传感的完整物理过程。
 
-
-
 NFL（Neural LiDAR Fields）的整体pipeline围绕一个核心设计展开：**将物理启发的LiDAR主动传感模型直接嵌入可微神经体渲染框架**，从而端到端地学习场景的几何与辐射属性，并合成逼真的新视角LiDAR扫描。其输入为多帧LiDAR扫描数据（包含射线原点、方向、回波范围和反射率），输出为新视角下的第一回波范围、反射率、射线丢弃概率及二次回波范围。
 
 ### 模块关系与数据流
@@ -178,8 +172,6 @@ NFL（Neural LiDAR Fields）的整体pipeline围绕一个核心设计展开：**
 - **射线丢弃处理**：当光束未击中任何表面时，传感器收不到有效回波。NFL通过学习每点丢弃概率 $p_d$ 并沿射线积分，预测整条射线的丢弃概率，而非依赖显式几何判断（Section 4.3）。
 
 这些模块协同工作，使得NFL能够从稀疏的LiDAR扫描中学习连续的场景表征，并从任意新视角合成包含第一回波、二次回波、反射率和射线丢弃掩码的完整LiDAR扫描——这是传统“先重建后模拟”方法（如LiDARsim）难以实现的。
-
-
 
 ### 3.1 神经场景表征
 
@@ -252,8 +244,6 @@ $$\mathcal{L} = \mathcal{L}_{\text{range}} + \lambda_e \mathcal{L}_e + \lambda_d
 - $\mathcal{L}_s$：二次回波掩码的BCE + Lovasz损失。
 
 该多任务损失设计使NFL在优化几何精度的同时，保持对LiDAR特有物理现象（射线丢弃、二次回波）的建模能力。
-
-
 
 ## 实验与关键发现
 
@@ -342,30 +332,8 @@ Table 4和Table 5分别报告了点云配准和语义分割的结果：
 ![[assets/figures/papers/paper_list_l40_https_arxiv_org_abs_2305_01643/figures/007_Figure_4.jpg]]
 *Figure 4: Beam divergence modeling improves range accuracy of rays with dual returns. This is evident in the improved error distribution of the first (left) and second return range (right)*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l40_https_arxiv_org_abs_2305_01643/figures/010_Table_4.jpg]]
-*Table 4: Point cloud registration results on three datasets*
-
-![[assets/figures/papers/paper_list_l40_https_arxiv_org_abs_2305_01643/figures/018_Table_11.jpg]]
-*Table 11: Point cloud registration results on three datasets. Table 12. Semantic segmentation results on Waymo NVS dataset*
-
-![[assets/figures/papers/paper_list_l40_https_arxiv_org_abs_2305_01643/figures/021_Figure_10.jpg]]
-*Figure 10: Visualisation of Town dataset. Employing a diverged beam profile in range simulation results in an overestimation of range in the high range regime (-16 16 cm). Such range difference is also reflected on delicate structures, as evidenced by the point cloud view*
-
-![[assets/figures/papers/paper_list_l40_https_arxiv_org_abs_2305_01643/figures/005_Table_2.jpg]]
-*Table 2: Results of LiDAR novel view synthesis for the first range*
-
 ![[assets/figures/papers/paper_list_l40_https_arxiv_org_abs_2305_01643/figures/006_Table_3.jpg]]
 *Table 3: Ablation study of volume rendering for active sensing*
-
-![[assets/figures/papers/paper_list_l40_https_arxiv_org_abs_2305_01643/figures/012_Table_6.jpg]]
-*Table 6: Varying the displacement on Waymo NVS dataset. Numbers are reported as MedAE / CD [cm]*
-
-![[assets/figures/papers/paper_list_l40_https_arxiv_org_abs_2305_01643/figures/014_Figure_11.jpg]]
-*Figure 11: Waymo dataset We use the following 4 scenes (cf . Fig. 11) that are mostly static from Waymo [48] dataset*
-
-
 
 ## 定位与知识库关联
 
@@ -432,8 +400,6 @@ NFL的设计假设和实验设置定义了其当前适用边界：
 ### 6. 知识库定位总结
 
 NFL在方法谱系中的定位可概括为：**将主动传感物理模型嵌入神经体渲染框架的开创性工作**。它既不是对NeRF的简单适配（如DS-NeRF、URF），也不是对传统LiDAR模拟的增量改进（如LiDARsim）。其核心贡献在于识别并形式化了LiDAR体渲染与被动传感器体渲染的本质差异——双向透射率——并在此基础上系统性地集成了光束发散、多次回波和射线丢弃等物理效应。这一方法论框架为后续工作提供了两个可扩展的维度：（1）更精细的物理模型（如大气散射、目标表面BRDF）的集成；（2）更高效的神经渲染架构（如基于哈希网格的快速推理）的应用。
-
-
 
 ## 原文 PDF
 

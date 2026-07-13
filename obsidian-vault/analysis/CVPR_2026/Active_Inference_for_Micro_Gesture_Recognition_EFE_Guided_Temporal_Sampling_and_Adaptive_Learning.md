@@ -143,8 +143,6 @@ UAAI 将微手势识别形式化为**部分可观测马尔可夫决策过程下�
 
 **模块间的输入输出流**：原始视频帧序列首先进入时序选择模块，输出稀疏的关键帧集合；关键帧随后经过空间选择模块，被赋予空间注意力掩码以突出显著区域；掩码加权后的特征送入分类骨干网络进行前向传递；MC Dropout 模块对每次前向传递的预测分布进行多次采样，输出不确定性得分；UMIX 模块利用该得分对训练样本进行重加权与混合，产生最终的训练损失信号。整个框架的优化目标统一在变分自由能最小化框架下：$\mathcal{F} = \mathbb{E}_{q(s|o)} [ -\log p(o|s) ] + \mathrm{KL}[q(s|o) \| p(s|o)]$，其中第一项对应分类准确度，第二项对应模型复杂度约束。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1052_https_arxiv_org_abs_2603_07559/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of existing methods and UAAI*
 
@@ -250,8 +248,6 @@ UAAI 在 SMG 数据集上与 12 个基线方法进行了对比，涵盖 RGB 模�
 3. **MDP 简化假设**：主动时序选择基于部分可观测 MDP 的简化设定，实际部署中帧选择的延迟效应与环境反馈未被建模。
 4. **模态扩展性未知**：当前仅使用 RGB 模态，主动推理框架能否有效融合骨架、深度等多模态信息以进一步提升性能，仍需探索。
 5. **鲁棒性边界**：UMIX 在严重标注错误或开放集条件下的表现尚未评估，不确定性权重机制在分布外样本上的行为值得进一步研究。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l1052_https_arxiv_org_abs_2603_07559/figures/005_Table_3.jpg]]
 *Table 3: Comparison of frame selection methods*

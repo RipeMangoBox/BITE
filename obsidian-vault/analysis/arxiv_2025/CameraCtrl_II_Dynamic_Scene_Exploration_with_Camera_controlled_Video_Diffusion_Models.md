@@ -59,8 +59,6 @@ claims:
 
 本方法也存在已知局限：当相机运动路径与场景几何（如栅栏等遮挡物）发生冲突时，模型因缺乏物理感知能力，可能产生穿模或结构破损等反物理结果；复杂相机轨迹下的整体几何一致性仍有提升空间；模型蒸馏虽大幅加速推理，但会引入相机控制精度的损失，质量-速度的平衡问题尚未完全解决。
 
-
-
 ### 问题背景：相机可控视频生成的兴起与瓶颈
 
 视频扩散模型近年来在文生视频（T2V）和图生视频（I2V）领域取得了显著进展，使得高质量、高保真度的视频生成成为可能。在此基础上，一个自然且关键的需求浮现：能否让用户像操作摄像机一样，通过指定相机运动轨迹来控制生成视频的视角变化？这一能力对于电影预演、虚拟场景漫游、游戏内容生成等应用具有重要价值。
@@ -84,8 +82,6 @@ claims:
 针对上述三重制约，本文提出**CAMERACTRL II**，旨在实现一个关键目标：**让用户能够像在真实3D场景中自由漫游一样，通过连续指定相机轨迹，对包含丰富动态内容的场景进行无缝、一致的视频探索**。
 
 为实现这一目标，本文从三个维度进行系统性突破：（1）构建首个大规模动态视频相机轨迹数据集REALCAM，为模型提供动态场景下的相机-像素对应监督；（2）设计轻量级相机注入机制，仅在扩散模型初始层引入相机信号，最大限度保留预训练模型的动态生成先验；（3）提出基于干净前序片段条件的自回归扩展方法，实现多片段间的外观一致性。这三个设计共同构成了从数据、模型到推理的完整解决方案，使得相机可控视频生成首次能够处理真实世界中的动态场景。
-
-
 
 ## 核心方法与创新机理
 
@@ -130,8 +126,6 @@ Table 5 的消融实验提供了关键对比：采用干净条件帧（Clean Con
 
 这些创新共同构成了一个完整的解决方案：轻量级注入保留了预训练模型的动态生成能力，REALCAM 数据集提供了动态场景下的相机控制学习信号，而干净历史条件的自回归扩展则打通了多片段连续探索的技术链路。
 
-
-
 CAMERACTRL II 的核心目标是实现**相机可控的动态场景视频生成与连续探索**。其整体 pipeline 可抽象为三个相互衔接的阶段：数据基础构建、单片段相机控制生成、多片段自回归扩展。
 
 ### Pipeline 总览
@@ -163,8 +157,6 @@ CAMERACTRL II 的核心目标是实现**相机可控的动态场景视频生成�
 ### 关键设计决策
 
 整个框架围绕一个核心洞察展开：**将相机控制信号仅叠加在扩散模型的初始层，可避免对生成过程的过度约束，从而完整保留预训练模型的动态生成能力**。这一设计在架构层面体现为轻量级注入（仅初始层 patchify + element-wise addition），在数据层面体现为动态视频标注的必要性（静态数据导致运动强度从 306.99 骤降至 129.40），在扩展层面体现为干净条件帧策略（外观一致性 0.8654 vs 加噪策略的 0.8032）。
-
-
 
 ### 3.1 基础扩散框架
 
@@ -208,13 +200,6 @@ $$\hat{\epsilon}_{\theta}(z_{t}, c, s, t) = \epsilon_{\theta}(z_{t}, \phi_{text}
 
 **训练目标。** 仅对当前片段的 token 计算去噪损失，条件 token 不参与损失计算。这一设计确保模型学习如何基于干净的历史帧推断新视角下的场景内容，而非简单地对条件帧进行去噪重建。消融实验（Tab. 5）证实，相比向条件帧加噪的策略，干净条件训练使外观一致性从 0.8032 提升至 0.8654，FVD 也有显著改善。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2503_10592/figures/003_Figure_3.jpg]]
-*Figure 3: Model architecture of CAMERACTRL II. (a) Given a pretrained video diffusion model, CAMERACTRL II adds an extra camera patchify layer at the initial of the model. It takes the Plucker embedding as input, outputs camera features with the same shape of the visual ¨ features. Both features are element-wisely added before the first DiT layer. (b) Features belonging to the previous video clip are kept clean, while current features are noised. After concatenation, features are sent to a camera control DiT; we only compute the loss of the current clip’s tokens. We omit the text encoder for both figures, and the camera features for the second figure*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -247,33 +232,17 @@ CAMERACTRL II 生成的视频不仅满足逐帧相机控制约束，其底层三
 
 CAMERACTRL II 的主要失败模式出现在相机运动路径与场景几何发生物理冲突时。图7展示了一个典型案例：用户指定的相机轨迹穿越栅栏，模型严格遵循该轨迹生成视频，导致栅栏结构出现破损和穿模现象。这一问题的根源在于模型缺乏显式的场景几何感知能力——它仅根据相机参数和图像条件进行像素级生成，无法推断场景中的遮挡关系和物理边界。当相机路径要求“穿过”一个不透明的场景元素时，模型会尝试生成看似合理但物理上不可能的中间帧，从而产生反现实的结构变形。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2503_10592/figures/005_Table_2.jpg]]
 *Table 2: Quantitative Comparisons. We compare against MotionCtrl [54] and CameraCtrl [21] in image-to-video setting, the AC3D [2] in the text-to-video setting. Since open-sourcing AC3D only supports text-to-video generation, appearance consistency between given image and generated videos is not available*
 
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2503_10592/figures/007_Table_3.jpg]]
 *Table 3: Ablation study on dataset curation pipeline*
 
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2503_10592/figures/008_Table_4.jpg]]
-*Table 4: Ablation study on the effectiveness of our model architecture and training strategy for single-clip model*
-
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2503_10592/figures/009_Table_5.jpg]]
 *Table 5: Ablation study on key design choices in extending the single-clip model to enable scene exploration*
 
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2503_10592/figures/004_Table_1.jpg]]
-*Table 1: Model comparison before and after the distillations. The inference time is tested when generating a 4 second 12fps video with 4 H800 GPUs*
-
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2503_10592/figures/010_Figure_5.jpg]]
 *Figure 5: Visualization results of CAMERACTRL II across diverse scenes. Our model demonstrates effective camera control in various visual environments, including Minecraft-style game scenes (top row), black and white foggy London streets (second row), abandoned hospital interiors (third row), fantasy forest hiking trails (fourth row), and animated palace scenes (bottom row). The results are generated using the I2V setting, with the first image as the condition image. The camera trajectories are shown on the left of each row*
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2503_10592/figures/011_Figure_6.jpg]]
-*Figure 6: 3D reconstruction on generated scenes by CAMERACTRL II. With the generated video frames, we use the FLARE [61] to estimate the point clouds of the scenes*
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2503_10592/figures/012_Figure_7.jpg]]
-*Figure 7: Failure case visualization. A fence is on the intended camera trajectory. CAMERACTRL II strictly follows the trajectory and generate a video where the structure of the fence is damaged, which is anti-reality*
-
-
 
 ## 定位与知识库关联
 
@@ -314,8 +283,6 @@ $$\hat{\epsilon}_{\theta}(z_{t}, c, s, t) = \epsilon_{\theta}(z_{t}, \phi_{text}
 3. **蒸馏质量保持**：APT 一步蒸馏带来的控制精度损失是否可通过更大的蒸馏 batch size、更多的计算资源或改进的蒸馏损失函数来缓解？这指向一个更一般的问题——如何在少步采样框架下保持条件生成的质量。
 
 4. **SfM 依赖的鲁棒性**：REALCAM 的标注质量受限于 VGGSfM 的性能上限。对于动态前景占比高、运动模糊严重或纹理稀疏的视频，是否需要引入额外的深度传感器数据或自监督深度估计作为补充监督信号？
-
-
 
 ## 原文 PDF
 

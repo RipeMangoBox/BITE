@@ -56,8 +56,6 @@ claims:
 
 本方法仍存在若干局限：对细腻手部动作的生成不佳；输入视频中不可见背景区域缺乏高保真细节；继承自 CogVideoX 的极端视角泛化限制；以及以人物为中心的训练数据使模型在动物、自然场景等未见环境上可能产生次优纹理。
 
-
-
 视频生成领域近年来取得了显著进展，但现有方法在精确的时空操纵能力上仍存在根本性瓶颈。当前主流的视频扩散模型将场景动态演化与相机运动耦合在单一的视频时间轴上——每一帧既编码了“世界在哪个时刻”的信息，又编码了“从哪个角度观察”的信息。这种纠缠使得用户无法独立控制场景的时间流逝速度和相机的空间运动轨迹，严重限制了视频生成在4D内容创作、电影级特效制作等场景中的应用潜力。
 
 具体而言，现有相机控制视频生成模型（如**TrajectoryCrafter** (Mark YU et al., arXiv 2025)、**ReCamMaster**等）虽然能够根据给定的相机轨迹生成新视角视频，但它们假设输入视频具有固定的均匀时间采样，无法改变场景内部的动态节奏。当用户希望实现“子弹时间”效果——即相机快速环绕运动的同时场景时间减速或冻结——这些方法便暴露出根本性的控制缺失。即便通过时间重映射（time remapping）对输入视频进行预处理来间接扩展这些基线方法，由于缺乏对世界时间的显式建模，生成结果往往出现几何不一致、运动伪影和相机控制失准等问题。
@@ -65,8 +63,6 @@ claims:
 从技术层面审视，这一瓶颈的根源在于两个关键设计缺陷：**第一**，现有视频扩散模型中的位置编码（如标准3D RoPE）基于离散帧索引，无法表达连续的世界时间概念，使得模型难以理解“两帧之间究竟流逝了多少物理时间”；**第二**，缺乏专门的时间调制机制，导致时间控制信号无法以精细化的方式注入生成过程，相机控制与时间控制之间也没有建立联合的4D几何关系。
 
 针对上述问题，本文提出**BulletTime**——一个4D可控的视频扩散框架，其核心动机是将视频生成重新形式化为两个显式且正交的条件信号：**连续世界时间序列**和**相机姿态轨迹**。通过将视频时间轴分解为“世界时间”与“相机时间”两个独立维度，框架能够在注意力机制中注入统一的时间-相机4D位置编码，并在特征层面通过双分支自适应层归一化实现解耦调制，从而首次赋予视频扩散模型独立操纵场景动态与相机视角的能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -105,8 +101,6 @@ AdaLN 的选择基于一个关键洞察：世界时间是一个平滑的全局�
 
 基线方法仅通过时间重映射（time remapping）扩展至4D控制，缺乏对时间维度的原生建模能力。消融实验证实：Time-RoPE + AdaLN 组合在所有世界时间条件方法中PSNR达32.15，显著优于仅使用AdaLN（29.83）或Cross-Attention（23.86）的变体；移除4D-RoPE导致PSNR从23.45骤降至21.98，降幅1.47 dB，验证了统一4D位置编码对联合时空控制的关键作用。
 
-
-
 BulletTime 构建了一个4D可控视频扩散框架，其核心设计是将传统视频生成中耦合在单一时间轴上的场景动态与相机运动显式解耦，分离为两个正交的控制信号：**连续世界时间序列** $\tau_{\text{world}}$ 与**相机姿态轨迹** $c$。这两个信号通过互补的调制通路注入预训练的 Diffusion Transformer 主干，实现对场景动态演化和视角移动的独立操纵。
 
 **主干模型**基于 CogVideoX-5B-T2V 预训练权重初始化，利用其强大的文本到视频生成先验作为基础生成能力。在此基础上，框架引入两条并行的条件注入支路，分别负责时间控制和相机控制，最终在注意力层融合为统一的4D位置编码。
@@ -127,8 +121,6 @@ BulletTime 构建了一个4D可控视频扩散框架，其核心设计是将传�
 
 ![[assets/figures/papers/paper_list_l2444_https_arxiv_org_abs_2512_05076/figures/002_Figure_2.jpg]]
 *Figure 2: Method Overview. Given a conditional input video, our diffusion model generates new videos under 4D control using world time and camera trajectory. These two signals are injected into the Diffusion Transformer through complementary modulation pathways. Time control is enabled by*
-
-
 
 BulletTime 的核心设计在于将世界时间与相机姿态作为两个正交的控制信号，通过互补的调制通路注入到预训练的 Diffusion Transformer 中。其架构建立在 **CogVideoX-5B-T2V** 预训练模型之上，包含三个关键模块：连续世界时间控制、统一4D时空位置编码、以及相机姿态调制。
 
@@ -171,13 +163,6 @@ $$\tilde{z}_{i,n}' = \mathrm{LN}(\tilde{z}_{i,n}) \odot f_{\gamma}(f_{\mathrm{ti
 与 Time-AdaLN 并行，**Camera-AdaLN** 引入独立的 AdaLN 分支用于相机姿态调制。相机轨迹被编码后，通过缩放与偏移参数调制中间层特征，使生成过程遵循目标相机运动。这一双分支设计（Time-AdaLN + Camera-AdaLN）使得时间和相机控制通路相互独立，是实现解耦控制的关键结构。
 
 消融实验（Table 5）验证了各组件的必要性：完整模型的 PSNR 为 23.45，移除 4D-RoPE 后骤降至 21.98（降幅 1.47 dB），移除 Camera/Time AdaLN 后降至 22.74。4D-RoPE 的降幅最大，表明统一的时空位置编码对 4D 联合控制至关重要。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2444_https_arxiv_org_abs_2512_05076/figures/001_Figure_1.jpg]]
-*Figure 1: Time- and camera-controlled 4D video generation. Given a single input video where camera motion is entangled with uniform temporal sampling (top row), our method synthesizes new videos that enable decoupled control over world time and camera pose*
-
-
 
 ## 实验与关键发现
 
@@ -245,25 +230,6 @@ Table 5 评估了完整 4D 控制框架中各组件的贡献。完整模型 PSNR
 ### 开放问题
 
 论文提出的开放方向包括：如何捕获真实世界物理、光照和大基线相机运动下的完整长期场景动态；如何设计自回归或循环结构以实现无界长视频生成和在线轨迹控制；如何结合真实视频数据学习解耦，提高对现实开放场景的泛化能力；以及如何将框架扩展以支持物理感知的时间推理与场景理解。这些问题指向一个共同目标：从“合成数据上的解耦控制”走向“开放世界的物理一致 4D 生成”。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2444_https_arxiv_org_abs_2512_05076/figures/003_Figure_3.jpg]]
-*Figure 3: Comparison on Synthetic Videos. GT frames compared with predictions from our method and state-of-the-art novelview synthesis models. Our method adheres most closely to the target camera conditions and produces the finest level of detail*
-
-![[assets/figures/papers/paper_list_l2444_https_arxiv_org_abs_2512_05076/figures/006_Figure_4.jpg]]
-*Figure 4: Qualitative Comparison of Camera- and Time-Controlled Video Generation on Real-World Videos. Qualitative comparison between our method and state-of-the-art novel-view synthesis models extended with time remapping [33]. In the left example, existing methods struggle under extreme view and time changes, producing severe artifacts (ReCamMaster) and showing imprecise camera control (TrajectoryCrafter). The right example similarly illustrates strong artifacts and reduced detail from ReCamMaster, while TrajectoryCrafter again fails to follow the prescribed trajectory*
-
-![[assets/figures/papers/paper_list_l2444_https_arxiv_org_abs_2512_05076/figures/007_Figure_5.jpg]]
-*Figure 5: 4D Control: Camera and Time Manipulation. Our model generates videos that faithfully follow independently specified camera and time controls. Each row shows combinations of fixed or moving camera viewpoints () and fixed or changing world time (7). The model correctly applies each control mode, including challenging settings such as moving camera with fixed time (bullet time effect), while preserving scene dynamics and visual coherence. These results indicate strong disentanglement between camera and world time conditioning as well as robust generalization across diverse real world inputs*
-
-![[assets/figures/papers/paper_list_l2444_https_arxiv_org_abs_2512_05076/figures/011_Figure_7.jpg]]
-*Figure 7: Comparison of Camera–Time Disentanglement. When varying the time condition while keeping the camera condition fixed, state-of-the-art camera-controlled video generation methods such as ReCamMaster fail to maintain consistent camera control, resulting in geometric inconsistencies within the generated content*
-
-![[assets/figures/papers/paper_list_l2444_https_arxiv_org_abs_2512_05076/figures/008_Figure_6.jpg]]
-*Figure 6: Time Control Generalization. Three generations produced by our method from the same input video under different time conditions. Although the model is trained on only a limited subset of time remappings, it generalizes well to complex and previously unseen temporal inputs*
-
-
 
 ## 定位与知识库关联
 
@@ -336,8 +302,6 @@ BulletTime在视频生成领域的知识谱系中占据以下位置：
 - **下游拓展潜力**：可向4D场景重建、自由视点视频生成、物理感知的动态场景建模等方向延伸。其解耦框架为未来结合3D Gaussian Splatting等显式4D表示提供了自然的接口。
 
 **证据强度评估**：本文的核心主张（解耦控制、性能优势）有充分的定量实验支撑（Table 1-5，消融实验），证据置信度高。局限性和开放问题的讨论诚实且具体。需要注意的是，该方法在真实世界复杂场景下的泛化能力尚未经过大规模验证，开放问题中提出的方向（如物理感知推理、无界生成）目前仍处于概念阶段，需要后续工作的实质性推进。
-
-
 
 ## 原文 PDF
 

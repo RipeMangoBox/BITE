@@ -66,8 +66,6 @@ claims:
 
 IAPO 属于**基于偏好优化的扩散模型对齐方法**，与 InPO（Lu et al., CVPR 2025）、Diffusion-DPO（Wallace et al., CVPR 2023）、KTO（Li et al., NeurIPS 2024）等方法共享 Bradley-Terry 偏好建模框架。其核心差异在于将信用分配从**图像空间**分解到**实例空间**，通过空间自适应重加权损失实现精细化的学习信号调制，而非对整幅图像施加均匀的奖励/惩罚。这一思路在方法谱系上开创了“细粒度偏好对齐”的新方向，为后续研究将信用分配进一步细化到像素级或时空级提供了基础框架。
 
-
-
 ### 扩散模型对齐：从图像级偏好到实例级信用分配
 
 近年来，基于人类偏好的扩散模型对齐方法取得了显著进展。以 **Diffusion-DPO**（Wallace et al., CVPR 2023）为代表的方法将直接偏好优化引入扩散模型，利用图像级偏好对（即整体“胜/负”标签）引导模型生成更符合人类审美的高质量图像。随后，**InPO**（Lu et al., CVPR 2025）和 **KTO**（Li et al., NeurIPS 2024）等方法分别从逆转效率和效用最大化角度进一步推动了该范式的发展。
@@ -90,8 +88,6 @@ IAPO 属于**基于偏好优化的扩散模型对齐方法**，与 InPO（Lu et 
 2. **设计空间自适应重加权损失**：在训练过程中，通过动态重加权掩码对不同实例区域施加差异化损失权重——对与全局偏好冲突的劣质实例降低学习信号强度，从而抑制歧义信号对优化过程的干扰，实现精准的空间信用分配。
 
 这一框架不仅解决了偏好冲突导致的优化扭曲问题，还在显著提升生成质量的同时大幅提高了训练效率——IAPO的训练速度比InPO快3.27倍，比Diffusion-DPO快11.64倍，充分证明了细粒度信用分配在扩散模型对齐中的关键价值。
-
-
 
 ## 核心方法与创新机理
 
@@ -143,8 +139,6 @@ $$\mathcal { L } ( \theta ) = - \mathbb { E } \log \sigma \left( - \beta T \omeg
 ### 创新带来的效率增益
 
 实例级信用分配不仅提升了生成质量，还带来了显著的训练效率提升。由于动态重加权掩码使模型专注于学习关键实例区域、避免在歧义信号上浪费优化步数，IAPO 的训练速度比 InPO 快 **3.27 倍**，比 Diffusion-DPO 快 **11.64 倍**，比 KTO 快 **60.0 倍**（基于单块 H800 GPU 的 GPU 小时数对比，见 Table 2）。这种“质量-效率双赢”的特性源于信用分配精度的根本性提升，而非简单的工程优化。
-
-
 
 IAPO（Instance-Aware Preference Optimization）的整体设计围绕一个核心洞察展开：**图像级偏好监督在空间维度上奖励稀疏，无法区分图像中不同实例的质量差异**。当获胜图像整体被偏好但其内部某个实例异常（例如鹰多了一只爪子）时，全局偏好会错误地奖励该劣质实例而惩罚失败图像中对应的高质量实例，导致优化轨迹扭曲。为解决这一问题，IAPO将扩散模型对齐从图像级推进到实例级，构建了一个**两阶段框架**（见 Figure 3）：
 
@@ -204,12 +198,8 @@ $$\mathcal{L}(\theta) = -\mathbb{E} \log \sigma \left( -\beta T \omega(\lambda_t
 
 消融实验（Table 3）证实，随着 $w_{\text{neg}}$ 从 1.0 降至 0.0（即逐渐减弱冲突实例区域的学习信号），Aesthetic、PickScore 和 HPS 均单调提升，$w_{\text{neg}} = 0$ 时取得最佳结果，验证了动态重加权策略的有效性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2706_https_openaccess_thecvf_com_content_CVPR2026_html_Sun_Towards_Fine_Grain/figures/001_Figure_1.jpg]]
 *Figure 1: Instance-Level Credit Assignment. While existing methods uniformly propagate reward signals across all pixels, our work enables fine-grained, instance-specific modulation of the learning signal, achieving fine-grained credit assignment*
-
-
 
 IAPO 的核心创新在于将扩散模型的对齐从图像级推进到实例级，通过两个紧密耦合的模块实现：**实例级偏好数据集的自动构建**和**实例感知的 DPO 损失函数**。以下分别阐述其关键设计与公式。
 
@@ -278,8 +268,6 @@ $$\mathcal{L}(\theta) = -\mathbb{E}_{(x_0^w, x_0^l) \sim \mathcal{D}, t \sim \ma
 
 该损失的核心机制是：对于与全局偏好冲突的实例区域（$w_{\text{neg}} < 1$），其噪声预测误差对总损失的贡献被抑制，从而避免模型错误地奖励劣质实例或惩罚优质实例。消融实验证实，随着 $w_{\text{neg}}$ 从 1.0 降至 0.0，Aesthetic Score、PickScore 和 HPS 均单调提升，$w_{\text{neg}} = 0$ 时取得最佳结果，验证了实例级偏好数据和动态重加权损失的有效性。
 
-
-
 ## 实验与关键发现
 
 ### 核心量化结果
@@ -324,15 +312,8 @@ IAPO 在三个主流基准（Parti-Prompts、HPD v2、Pick-a-Pic v2 测试集）
 ![[assets/figures/papers/paper_list_l2706_https_openaccess_thecvf_com_content_CVPR2026_html_Sun_Towards_Fine_Grain/figures/006_Figure_5.jpg]]
 *Figure 5: A comparative evaluation of image quality and training efficiency between IAPO and baselines of SD1.5 on Pick-a-Pic v2*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2706_https_openaccess_thecvf_com_content_CVPR2026_html_Sun_Towards_Fine_Grain/figures/008_Table_2.jpg]]
 *Table 2: We compare the training GPU hours (on H800) of IAPO against the baselines with the highest score in each metric bolded*
-
-![[assets/figures/papers/paper_list_l2706_https_openaccess_thecvf_com_content_CVPR2026_html_Sun_Towards_Fine_Grain/figures/004_Figure.jpg]]
-*Figure: SD1.5 InPO IAPO (Ours) SDXL InPO IAPO (Ours) An mystical owl sitting on a tree branch in a magical Forest, art style of nicoletta ceccoli a gorgeous queen with cat like eyes*
-
-
 
 ## 定位与知识库关联
 
@@ -373,8 +354,6 @@ $$\mathcal { L } ( \theta ) = - \mathbb { E } \log \sigma \left( - \beta T \omeg
 3. **自动标注与人工标注的协同。** 当前完全依赖 VLM 自动标注，未来可引入主动学习或人在回路（human-in-the-loop）机制：优先将 VLM 置信度低的实例对提交人工审核，以最小的人工成本提升标签质量并减少系统性偏差。
 
 4. **冲突实例的因果归因。** 46.3% 的冲突率揭示了图像级偏好的严重歧义，但论文未深入分析冲突的成因分布——是由于 VLM 的标注错误、图像级偏好的内在噪声，还是由于某些实例类别（如人手、文字）本身难以生成？理解冲突的因果结构有助于设计更有针对性的重加权策略。
-
-
 
 ## 原文 PDF
 

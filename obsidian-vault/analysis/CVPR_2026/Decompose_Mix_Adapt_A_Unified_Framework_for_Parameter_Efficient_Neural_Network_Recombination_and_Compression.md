@@ -63,8 +63,6 @@ CRISP（Coefficient-gated weight Recombination by Interpolated Shared basis Proj
 
 当前方法已在ViT和LLaMA架构上验证，尚未扩展到CNN或大视觉语言模型等更广泛架构，超参数 r 和 s 仍需手动设置，缺乏自动化选择机制。代码已开源：https://github.com/appledora/CRISP-CVPR26。
 
-
-
 ### 参数重组的两难困境
 
 现代深度学习模型在部署时面临两个核心需求：一是**模型压缩**（Model Compression, MC），以降低存储和推理开销；二是**参数高效微调**（Parameter-Efficient Fine-Tuning, PEFT），以低成本将预训练模型适配到下游任务。参数重组（Parameter Recombination, PR）方法——即通过定义变换 $\mathcal{T}$ 从可训练参数 $\theta_i$ 生成权重 $W_i = \mathcal{T}(\theta_i)$——为这两类需求提供了统一的技术路径。
@@ -87,8 +85,6 @@ CRISP的出发点在于一个关键洞察：如果能将预训练权重分解为
 - **微调**可通过冻结基矩阵、仅更新轻量级混合矩阵实现。
 
 两者共享同一因子化结构，无需额外的适配器模块。这种统一设计使得参数预算可以在压缩与适应之间无缝流动，从根本上解决了现有方法“分而治之”带来的效率损失。CRISP通过引入**可配置列维度 $s$ 的混合矩阵**和**sigmoid门控机制**，突破了RECAST的向量约束瓶颈，为统一PR框架建立了新的容量-效率控制维度。
-
-
 
 ## 核心方法与创新机理
 
@@ -120,8 +116,6 @@ $$\mathcal{T}_{\mathrm{CRISP}}(B_i'^r, A_i'^{rs}) = B_i'^r \left( \sigma(A_i'^{r
 - **微调模式**：在基矩阵冻结的前提下，仅更新轻量级的门控混合矩阵 $A_i'^{rs}$ 以适应下游任务。由于混合矩阵的参数量远小于原始权重（在VTAB-1K实验中仅占基础模型的 $5 \times 10^{-3}\%$），微调极为高效。
 
 这一设计与现有方法形成根本差异：此前的工作要么专注于PEFT（如**LoRA**、**SSF**、**DoRA**），要么专注于MC（如**Basis Sharing**、**DGMR**），即便RECAST声称同时支持两者，也因向量混合系数的表达力限制而无法在压缩后保持足够的微调潜力。CRISP的矩阵门控设计使得压缩后的模型仍保留丰富的可调自由度，这直接体现在**压缩+PEFT联合场景**中——CRISP在ViT-B/16 50%压缩设定下以88.8%的平均准确率超越最佳剪枝+PEFT组合（DGMR+SSF的87.9%）约1个百分点，验证了“压缩质量直接约束下游任务适应性”的核心论断。
-
-
 
 CRISP 围绕一个统一的因子化结构构建，该结构将预训练权重矩阵分解为**冻结的共享基矩阵（Basis Matrices）**和**可学习的门控混合矩阵（Gated Mixer Matrices）**，使模型压缩（MC）和参数高效微调（PEFT）得以在同一框架内共存，无需额外的冗余适配器。
 
@@ -165,8 +159,6 @@ $$\mathcal{L}_{\mathrm{mimicry}} = \sum_{i=1}^{N} \ell_{\mathrm{smL1}} \left( \m
 - **联合路径**：压缩 → 冻结 $B$ → 微调 $A^{\prime rs}$ → 输出压缩且适配的模型
 
 这一设计使得调整基矩阵的共享模式和大小即可控制压缩程度，而冻结基矩阵并更新混合矩阵即可实现微调，两者共享同一套参数化基础设施，从根本上消除了 MC 与 PEFT 之间的方法割裂。
-
-
 
 CRISP的核心思想是将预训练权重矩阵分解为**冻结的共享基矩阵（Factorized Basis Matrices）**与**可学习的门控混合矩阵（Gated Mixer Matrices）**，通过参数化变换在同一因子化结构中统一支持模型压缩（MC）和参数高效微调（PEFT）。以下从公式推导出发，逐模块解析其设计逻辑。
 
@@ -217,9 +209,6 @@ $$\mathcal{T}_{\mathrm{CRISP}}(B_i^{\prime r}, A_i^{\prime rs}) = B_i^{\prime r}
 
 2. **SiLU门控作为内置正则化**：消融实验（Table 4, Figure 6）系统比较了不同正则化策略。SiLU门控（82.2%平均准确率）优于权重衰减、无约束等替代方案。关键的是，门控必须置于混合矩阵之前（PRE配置）而非之后（POST），且使用ReLU替代SiLU会导致灾难性的权重稀疏化，性能严重退化。这表明sigmoid门控的软约束特性恰好提供了适度的非线性正则化，避免了过拟合和欠稀疏化的两难困境。
 
-![[assets/figures/papers/paper_list_l854_https_arxiv_org_abs_2603_27383/figures/011_Figure_6.jpg]]
-*Figure 6: Impact of regularization constraint placement across PRE, POST, and TEMP configurations. PRE (our method) achieves the most consistent performance, while ReLU causes severe degradation due to weight sparsification*
-
 ### 3.3 神经拟态初始化：无数据权重重建
 
 CRISP通过**神经拟态（Neural Mimicry）**将预训练权重分解为基-混合器对，整个过程无需任何训练数据样本。重建损失使用smooth-L1函数：
@@ -227,9 +216,6 @@ CRISP通过**神经拟态（Neural Mimicry）**将预训练权重分解为基-�
 $$\mathcal{L}_{\mathrm{mimicry}} = \sum_{i=1}^{N} \ell_{\mathrm{smL1}} \left( \mathcal{T}_{\mathrm{CRISP}}(B_i^{\prime r}, A_i^{\prime rs}) - W_{p_i} \right) \tag{5}$$
 
 其中 $N$ 为层数，$W_{p_i}$ 为第 $i$ 层的预训练权重。消融实验（Figure 7）证实smooth-L1在四种候选损失函数（Huber、Smooth-L1、MSE、L1）中效果最佳。该初始化过程极为高效：ViT模型在单GPU上不到一分钟即可完成，LLaMA模型也仅需不到30分钟。
-
-![[assets/figures/papers/paper_list_l854_https_arxiv_org_abs_2603_27383/figures/014_Figure_7.jpg]]
-*Figure 7: Effect of reconstruction loss functions during neural mimicry. We compare four loss functions (Huber, Smooth-L1, MSE, L1) used in the neural mimicry stage (Equation 5 of main paper) for retrofitting pretrained weights into CRISP’s basis-mixer decomposition*
 
 ### 3.4 统一框架下的MC与PEFT实现
 
@@ -242,8 +228,6 @@ CRISP通过同一因子化结构实现两种应用模式：
 ### 3.5 数据无关的基向量压缩（LLaMA专用）
 
 对于LLaMA等大语言模型，CRISP设计了无需训练数据的基向量压缩算法（Algorithm 5）：通过重要性加权的k-means聚类对基向量进行分组，再以方差感知的方式合并聚类中心，在30%参数削减下平均准确率38.0%，较先前最优方法PruneNet提升3.1个百分点。
-
-
 
 ## 实验与关键发现
 
@@ -296,8 +280,6 @@ Table 5显示，在匹配可训练参数预算（约150K-240K）下，CRISP的�
 3. **超参数手动设置**：$r$和$s$目前需人工选择，缺乏自动化机制。Figure 5虽提供了$s$优先的调参原则，但最优配置仍需网格搜索。
 4. **架构验证范围有限**：当前仅在ViT和LLaMA上验证，尚未扩展到CNN或大视觉语言模型等架构。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l854_https_arxiv_org_abs_2603_27383/figures/003_Table_1.jpg]]
 *Table 1: PEFT performance on VTAB-1K [93] across 19 tasks grouped into Natural (7), Specialized (4), and Structured (8). CRISP achieves state-of-the-art overall accuracy while tuning 28% fewer parameters than all baselines*
 
@@ -306,20 +288,6 @@ Table 5显示，在匹配可训练参数预算（约150K-240K）下，CRISP的�
 
 ![[assets/figures/papers/paper_list_l854_https_arxiv_org_abs_2603_27383/figures/008_Table_4.jpg]]
 *Table 4: Ablation on the regularization strategy for the mixer matrix*
-
-![[assets/figures/papers/paper_list_l854_https_arxiv_org_abs_2603_27383/figures/016_Table_8.jpg]]
-*Table 8: Compression results on ViT-B/16 [13] with 50% weight compression across six diverse tasks (See Table 7). We find that using the distillation loss with SVD initialization described in Sec. 3.2 of our paper provides best performance*
-
-![[assets/figures/papers/paper_list_l854_https_arxiv_org_abs_2603_27383/figures/010_Table_5.jpg]]
-*Table 5: Efficiency using a NVIDIA L40S for task adaptation on ViT-B/16 [13] backbone under matched finetuning parameter budgets (∼150K–240K trainable parameters, excluding head)*
-
-![[assets/figures/papers/paper_list_l854_https_arxiv_org_abs_2603_27383/figures/007_Figure_4.jpg]]
-*Figure 4: Comparing ImageNet [11] performance with and without 8-bit PTQ [83] compression. We find CRISP accurately reproduces the original model’s performance while also demonstrating effective compositionality with other compression techniques*
-
-![[assets/figures/papers/paper_list_l854_https_arxiv_org_abs_2603_27383/figures/015_Figure_8.jpg]]
-*Figure 8: Robustness to initialization methods. We evaluate four standard initialization schemes (Uniform, Kaiming, Xavier, Orthogonal) for the mixer matrices A′rs during both neural mimicry retrofitting and subsequent task adaptation*
-
-
 
 ## 定位与知识库关联
 
@@ -378,8 +346,6 @@ CRISP 的核心洞察在于：**通过将预训练权重分解为冻结的共享
 3. **持续学习与长尾场景**：在持续学习或长尾任务下，基矩阵和混合器的动态更新策略如何设计？冻结基矩阵 + 微调混合器的范式是否足以应对灾难性遗忘？
 4. **与正交压缩技术的深度结合**：CRISP 已展示与 PTQ 的初步组合效果，但与剪枝、知识蒸馏、量化感知训练等技术的系统结合能带来多少额外收益？
 5. **跨模态迁移**：CRISP 的因子化结构能否推广到语音、视频等多模态 Transformer，以及跨模态迁移场景中基矩阵的共享机制如何设计？
-
-
 
 ## 原文 PDF
 

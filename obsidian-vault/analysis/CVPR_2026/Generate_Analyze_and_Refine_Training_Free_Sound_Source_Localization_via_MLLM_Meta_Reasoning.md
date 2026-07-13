@@ -59,8 +59,6 @@ claims:
 
 该工作的主要局限在于推理成本较高（单样本约 4 秒，RTX 4090），且当前仅处理单帧图像，未利用视频时间连续性信息。
 
-
-
 声源定位（Sound Source Localization, SSL）旨在从图像-音频对中识别发出声音的视觉区域，是视听理解的核心任务之一。现有 SSL 方法普遍将该问题建模为**视听特征匹配**——通过对比学习或注意力机制，在共享嵌入空间中寻找视觉与音频信号最相似的区域。这一范式在简单场景下有效，但其根本瓶颈在于**缺乏显式推理与因果验证**：模型仅输出概率热图或注意力图，无法解释“为何该区域是声源”，也难以区分“看起来像声源但实际无声”的物体（如静止的乐器）与“屏外声源”或“多声源混淆”等复杂情况。
 
 这一瓶颈在真实声学场景中尤为突出。当画面中存在多个潜在声源物体时，纯特征匹配方法容易将高响应分配给视觉上显著但与当前声音无关的区域；当声源位于画面之外时，模型仍会在图像内强行定位，产生幻觉式输出。此外，现有方法几乎全部依赖**大规模标注数据的有监督训练**，泛化到新场景或新声源类别时需要重新训练或微调，部署成本高昂。
@@ -68,8 +66,6 @@ claims:
 针对上述问题，本文提出一个核心洞察：**多模态大语言模型（MLLM）具备内在的元推理（meta-reasoning）能力，可以通过结构化的认知推理流水线替代端到端的比对学习范式，实现无需训练的声源定位。** 具体而言，本文将 SSL 重构为“生成-分析-精炼”（Generation-Analysis-Refinement, GAR）三步推理过程：生成阶段扩大假设空间以保留声源候选；分析阶段利用开放集角色标签、锚点投票、视听一致性评分等可解释机制进行精细化验证；精炼阶段结合自适应门控避免过度调整。这一框架无需任何训练数据或模型微调，仅通过提示工程即可驱动 MLLM 完成从粗到细的定位推理，同时输出因果解释和置信度评分，使定位过程透明、可验证。
 
 与现有工作的根本区别在于：**GAR-SSL 将 SSL 从“特征匹配”问题转变为“认知推理”问题**。传统方法（如 **OA-SSL**（Um et al., CVPR 2025））依赖对比学习训练，输出不可解释的热图；无训练方法（如 **NoPrior**（Chen et al., CVPR 2024））虽免除了训练，但仍基于冻结视觉编码器的相似度计算，缺乏语义推理。直接使用现成 MLLM（如 **Qwen2.5-Omni**（Xu et al., arXiv 2025））进行端到端定位则因缺乏结构化推理而性能有限。GAR-SSL 通过引入显式的分析-验证-精炼循环，首次使 MLLM 在 SSL 任务上超越专门训练的 SOTA 方法，同时保持零样本、免训练的特性。
-
-
 
 ## 核心方法与创新机理
 
@@ -109,8 +105,6 @@ GAR-SSL 的三阶段流水线并非简单的模块堆叠，而是模拟了人类
 ### 与现成 MLLM 的本质区别
 
 直接使用现成多模态大模型（如 **Qwen2.5-Omni**，Xu et al., arXiv 2025）进行声源定位面临两个根本问题：一是缺乏结构化的空间推理能力，难以输出精确的边界框坐标；二是单次前向推理容易产生幻觉或随机偏差。GAR-SSL 通过三阶段元推理框架解决了这些缺陷——不是简单地“询问” MLLM，而是引导其进行结构化的假设-验证-修正认知循环，将 MLLM 从黑盒预测器转变为可解释的推理引擎。
-
-
 
 GAR-SSL 将声源定位从传统的视听特征匹配重构为一种**无训练、零样本**的认知推理流水线。其核心思想是将多模态大语言模型（MLLM）视为一个具有元推理能力的智能体，通过“生成—分析—精炼”三个有序阶段，逐步从粗略的初始预测收敛到精细、可解释的定位结果。图 1 给出了框架的整体概览，图 2 则展示了各阶段内部的详细数据流与模块交互。
 
@@ -173,12 +167,8 @@ $$G = \mathbf{1}\left((k = 1) \wedge (\bar{S}_{\mathrm{av}} \geq \tau_{\mathrm{a
 
 这种范式转换使得 GAR-SSL 能够处理传统方法难以应对的复杂场景——无声物体干扰、屏外声源、多声源混淆——因为 MLLM 的元推理能力可以显式地区分“看起来像声源”与“实际发出声音”的物体，并通过角色标签和锚点投票进行因果验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2313_https_arxiv_org_abs_2604_06824/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the proposed Generation-Analysis-Refinement Sound Source Localization (GAR-SSL) framework. Given an image-audio pair, the model performs three metareasoning steps: Generation produces an initial bounding box and audio label, Analysis evaluates Audio-Visual Consistency through role-based reasoning, and Refinement adjusts the localization to obtain a fine-grained final bounding box. This process enables explainable and training-free audio-visual localization*
-
-
 
 GAR-SSL 将声源定位重构为“生成—分析—精炼”三元认知推理流水线，所有操作均通过提示工程驱动 MLLM 完成，无需任何训练。整个框架由四个关键模块串联：**Stage 1 生成**、**Stage 2 分析**、**Stage 3 精炼**，以及贯穿后两个阶段的**自适应门控**与**多次采样共识**机制。
 
@@ -296,12 +286,8 @@ $$b^{\mathrm{ref}} = \left[ c_x^* - \frac{w}{2}, \; c_y^* - \frac{h}{2}, \; c_x^
 
 消融实验验证了这一因果链条的有效性：单独使用 Stage 1 时 CIoU@0.3 仅为 42.6，加入 Stage 2+3 后跃升至 59.5（Table 5），而完整的多次采样共识（$N=5$）进一步将 MUSIC-Duet 上的 CIoU@0.3 推至 82.7（Table 1）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2313_https_arxiv_org_abs_2604_06824/figures/002_Figure_2.jpg]]
 *Figure 2: The proposed training-free framework consists of three stages: (i) Generation produces initial bounding boxes and audio classifications from image-audio pairs; (ii) Analysis evaluates consistency through role tagging, anchor voting, and scoring, repeated N times for consensus; (iii) Refinement applies adaptive gating and geometric operations to adjust localization. All operations are performed via MLLMs prompt engineering without training*
-
-
 
 ## 实验与关键发现
 
@@ -354,30 +340,8 @@ GAR-SSL 在单声源和多声源两个场景下均显著超越了现有方法，
 ![[assets/figures/papers/paper_list_l2313_https_arxiv_org_abs_2604_06824/figures/004_Table_2.jpg]]
 *Table 2: Comparison of single-source sound localization methods on VGGSound-Single and MUSIC-Solo test sets. We evaluate three types of approaches: (i) existing vision-based SSL methods trained with task-specific objectives, (ii) MLLMs baselines (Qwen2.5-Omni, MiniCPM-o, InteractiveOmni) without structured reasoning, and (iii) our proposed training-free Generation-Analysis-Refinement framework with N iterations in Stage 2 (Analysis). Bold/underlined fonts denote best/second-best performance*
 
-![[assets/figures/papers/paper_list_l2313_https_arxiv_org_abs_2604_06824/figures/010_Table_5.jpg]]
-*Table 5: Effect of the proposed method on VGGSound-Duet. Stage 2 (Analysis) and Stage 3 (Refinement) are evaluated together because the gating mechanism in Stage 2 determines whether Stage 3 should be executed, making them functionally interdependent*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2313_https_arxiv_org_abs_2604_06824/figures/005_Table_3.jpg]]
-*Table 3: Effect of the number of analysis iterations (N ) in Stage 2. The Stage 2 is repeated N times per sample, with multi-trial outputs aggregated through statistical consensus to enhance stability. Results on VGGSound-Single and MUSIC-Solo for N ∈ {1, 3, 5}*
-
-![[assets/figures/papers/paper_list_l2313_https_arxiv_org_abs_2604_06824/figures/006_Table_4.jpg]]
-*Table 4: Effect of the number of analysis iterations (N ) in Stage 2. The Stage 2 is repeated N times per sample, with multi-trial outputs aggregated through statistical consensus to enhance stability. Results on VGGSound-Duet and MUSIC-Duet for N ∈ {1, 3, 5}*
-
-![[assets/figures/papers/paper_list_l2313_https_arxiv_org_abs_2604_06824/figures/007_Figure_3.jpg]]
-*Figure 3: Visualization results for (a) MUSIC-Duet and (b) VGGSound-Duet test set. We compare our method with OA-SSL[40]. More comparisons are in the supplementary document*
-
-![[assets/figures/papers/paper_list_l2313_https_arxiv_org_abs_2604_06824/figures/008_Figure_4.jpg]]
-*Figure 4: Visualization results for VGGSound-Single test set. We compare our method with OA-SSL [40]. More comparisons are in the supplementary document*
-
-![[assets/figures/papers/paper_list_l2313_https_arxiv_org_abs_2604_06824/figures/011_Table_S.7.jpg]]
-*Table S.7: Analysis of the impact of Audio Confidence*
-
 ![[assets/figures/papers/paper_list_l2313_https_arxiv_org_abs_2604_06824/figures/013_Table_S.8.jpg]]
 *Table S.8: Performance comparison of various prompt variation methods on single-sound source datasets. Method 1 performs basic refinement with minimal adjustments. Method 2 incorporates audio class information for refinement. Method 3 leverages detailed analysis information including visual anchors. Ours represents the proposed meta-analysis-based method with varying iteration counts (N=1, 3, 5). Evaluated on VGGSound-Single and MUSIC-Solo datasets using CAP, CIoU@0.3, and AUC metrics*
-
-
 
 ## 定位与知识库关联
 
@@ -421,8 +385,6 @@ GAR-SSL 的适用边界由其设计选择和技术约束共同决定：
 3. **跨任务泛化**：GAR 的“生成-分析-精炼”元推理范式能否推广到其他跨模态定位任务，如视频动作定位、触觉-视觉定位、文本-图像指代定位？
 4. **人机协同闭环**：元推理过程中产生的因果解释和置信度评分，能否作为主动学习中的不确定性指标，或用于人机交互中的定位修正反馈？
 5. **屏外与遮挡声源**：当声源完全不可见时，当前框架依赖视觉证据的分析机制将失效。能否引入空间音频线索（如双耳时间差）或场景上下文推理，实现对屏外声源的方位估计？
-
-
 
 ## 原文 PDF
 

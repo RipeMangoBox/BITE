@@ -90,8 +90,6 @@ DirectTracker当前存在以下局限：仅针对汽车类进行验证，假设�
 
 值得关注的开放方向包括：将方法扩展至6自由度物体运动与多类别跟踪；在Argoverse 2等多样化数据集上验证泛化性；探索相机位姿与对象位姿的联合优化以实现完整的视觉SLAM+MOT框架；以及降低对精确深度估计的依赖。
 
-
-
 多目标跟踪（MOT）是自动驾驶感知栈中的核心组件，其任务是在连续帧中持续定位并关联场景中的所有动态物体。近年来，3D多目标跟踪因其在三维空间中的直接推理能力而受到广泛关注，主流范式遵循“检测-跟踪”流水线：先由外部3D检测器对每一帧独立生成边界框，再通过卡尔曼滤波或图神经网络等关联机制将检测结果串接为轨迹。代表性工作包括**AB3DMOT**（Weng et al., IROS 2020）、**GNN3DMOT**（Weng et al., arXiv 2020）以及在线方法**SimpleTrack**（Pang et al., arXiv 2021）等。离线方法如**MOTSFusion**（Luiten et al., IEEE RA-L 2020）则通过重建式跟踪获得更优的全局一致性，但牺牲了在线推理能力。
 
 然而，这一范式存在两个深层瓶颈。
@@ -103,8 +101,6 @@ DirectTracker当前存在以下局限：仅针对汽车类进行验证，假设�
 与此同时，直接视觉里程计（Direct Visual Odometry）领域已证明：通过最小化帧间光度误差，可以在不依赖特征点提取与匹配的情况下实现精确的相机位姿估计。这种“直接图像对齐”（Direct Image Alignment, DIA）技术天然适合处理弱纹理、远距离或运动模糊的场景，而这些正是自动驾驶中3D跟踪的典型困难情形。然而，将直接法从相机位姿估计迁移至多目标跟踪面临非平凡挑战：每个物体是独立运动的刚体，其分割掩码可能不精确，且多物体间的遮挡需要显式建模。
 
 **DirectTracker的动机**正是在上述背景下产生：将直接图像对齐与滑动窗口光度束调整（Bundle Adjustment, BA）引入3D MOT，构建一个不依赖外部3D检测器的统一框架。其核心洞察是：通过光度误差最小化实现帧间连续3D定位，结合多视图几何与外观信息，可以获得全局一致且局部平滑的轨迹；同时，将评估相似度从IoU替换为GIoU（Generalized IoU），使非重叠边界框也能获得有意义的相似度评分，从而公平地评价立体跟踪器的真实性能。
-
-
 
 ## 核心方法与创新机理
 
@@ -146,8 +142,6 @@ $$
 
 上述三个 changed slots 并非孤立存在，而是形成了紧密的因果链条：DIA 与滑窗BA 使系统脱离了对外部3D检测器的依赖，但同时也导致生成的边界框在远距离处精度受限；GIoU 的引入正是为了在评估层面补偿这一固有特性，使性能评价回归公平。三者协同作用，构成了 DirectTracker “检测-跟踪-评估”一体化的核心创新逻辑。
 
-
-
 DirectTracker 提出了一种**无外部3D检测器的端到端3D多目标跟踪框架**，其核心创新在于将直接图像对齐（Direct Image Alignment, DIA）与基于滑动窗口的光度束调整（Bundle Adjustment, BA）有机结合，形成“跟踪即检测”的闭环系统。整体流程如 Fig. 2 所示，包含三个并行独立工作的核心模块：
 
 1. **对象跟踪模块（Object Tracking）**：基于两帧间直接图像对齐进行3D运动估计，并在图像空间通过匈牙利算法完成2D关联。该模块仅依赖语义分割掩码和深度图，不依赖于任何3D边界框，从而摆脱了传统跟踪方法对外部3D检测器的强依赖。
@@ -160,12 +154,8 @@ DirectTracker 提出了一种**无外部3D检测器的端到端3D多目标跟踪
 
 输入输出方面，系统以双目（或单目）图像序列、语义分割掩码和深度估计图为输入，输出为每个对象的3D边界框及其在相机坐标系下的连续轨迹。值得注意的是，DirectTracker 不估计相机全局位姿，所有对象位姿均表达于相机坐标系中；可视化时需借助外部视觉里程计系统（如[9]）将轨迹投影至世界坐标系。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2209_14965/figures/001_Figure_1.jpg]]
 *Figure 1: Qualitative result of our method. Top: 3D object proposals are projected and visualized in the image domain. Bottom: We present object detections and accumulated sparse pointclouds in the world coordinate system. Red dashed bounding boxes represent ground truth objects, whereas the red marks on the ground plane indicate ground truth object positions. Object trajectories are globally consistent. For the moving car on the right the track also exhibits local smoothness. Please note that DirectTracker does not estimate camera poses. Thus we utilize estimates from the visual odometry system [9] for visualization in the world coordinate system*
-
-
 
 DirectTracker 由三大核心模块构成：**对象跟踪（Object Tracking）**、**基于对象的束调整（Object-based Bundle Adjustment）** 和 **3D对象检测（3D Object Detection）**。除关联步骤外，跟踪与检测模块独立并行运行（见 Fig. 2），系统不依赖任何外部3D检测器。
 
@@ -226,8 +216,6 @@ $$\hat{\mathbf{c}} = (\pmb{\Sigma}_p + \pmb{\Sigma}_m)^{-1} (\pmb{\Sigma}_p \mat
 
 其中 $\mathbf{c}_m$ 为当前测量位置，$\mathbf{c}_p$ 为先验位置，$\pmb{\Sigma}_m$ 和 $\pmb{\Sigma}_p$ 分别为对应的协方差矩阵。
 
-
-
 ## 实验与关键发现
 
 ### 评估设置与度量创新
@@ -280,8 +268,6 @@ Table IV系统分析了各组件对性能的贡献，同时评估3D GIoU和2D Io
 - **Table I**：核心结果表，确立DirectTracker在3D HOTA上的领先地位。
 - **Table IV**：消融实验表，量化了深度质量、2D回退、细化优化等关键设计选择的影响。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2209_14965/figures/003_Table.jpg]]
 *Table: I*
 
@@ -293,8 +279,6 @@ Table IV系统分析了各组件对性能的贡献，同时评估3D GIoU和2D Io
 
 ![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2209_14965/figures/006_Table.jpg]]
 *Table: IV ABLATION STUDY. WE PRESENT THE PERFORMANCE OF OUR METHOD WITH DIFFERENT COMPONENTS OF THE PIPELINE REMOVED OR REPLACED. THE EVALUATION IS CONDUCTED FOR BOTH 3D (GIOU) AND 2D TRACKING (IOU)*
-
-
 
 ## 定位与知识库关联
 
@@ -351,8 +335,6 @@ DirectTracker 的设计隐含以下强假设，构成其适用边界：
 5. **端到端学习化**：当前 DIA 和 BA 均基于手工设计的 Huber-norm 光度误差，未进行数据驱动的端到端优化。学习型特征度量（如深度特征图对齐）或可微分 BA 层可能进一步提升跟踪精度与鲁棒性。
 
 6. **3D GIoU 度量的标准化**：DirectTracker 提出以 3D GIoU 替代 3D IoU 作为相似度度量，以公平评估立体跟踪器。该度量是否能成为 3D MOT 社区的标准评估指标，需要在更广泛的跟踪器和方法上进行基准测试与共识建立。
-
-
 
 ## 原文 PDF
 

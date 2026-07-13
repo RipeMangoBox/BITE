@@ -47,15 +47,12 @@ claims:
 
 本文提出**Textual Model Predictive Control (TMPC)**，一种新颖的测试时对齐框架，旨在解决大型语言模型在测试阶段的对齐问题。TMPC将文本生成重新建模为轨迹优化问题，并借鉴控制理论中的模型预测控制（MPC），通过滚动时域控制和子目标缓冲来平衡两种现有测试时对齐方法的核心缺陷：引导解码（guided decoding）面临的“horizon诅咒”和迭代优化（iterative refinement）面临的“维度诅咒”。TMPC无需微调模型参数，仅通过冻结的LLM作为提议分布，在三个具有不同边界特征的任务上进行了评估：WMT'24语篇级机器翻译、HH-RLHF长回复子集和MBPP程序合成。实验结果表明，TMPC在zh→en翻译上达到94.62 SEGALE_comet，优于包括GPT-4o（94.58）在内的所有基线；在MBPP程序合成上达到61% pass rate，优于Best-of-35和TPO；在长回复生成上平均奖励和GPT-4胜率均优于DPO和Best-of-20。
 
-
-
 ### 2.1 测试时对齐的根本挑战
 
 大型语言模型（LLMs）在训练后仍可通过测试时计算进一步提升输出质量。然而，现有测试时对齐方法面临两个根本性挑战：
 
 - **Horizon诅咒**：当动作定义为token级别（如引导解码）时，长轨迹上的信用分配不可靠，方法难以在长序列中有效分配奖励。
 - **维度诅咒**：当动作为响应级别（如迭代优化）时，每次重写整个序列导致搜索空间巨大且不稳定。
-
 
 ### 2.2 现有方法的局限性
 
@@ -69,8 +66,6 @@ claims:
 
 TMPC的核心洞察在于：将测试时对齐重新建模为轨迹优化问题，并借鉴控制理论中的模型预测控制（MPC），通过滚动时域控制和子目标缓冲来平衡horizon诅咒与维度诅咒，无需微调模型参数。
 
-
-
 ## 核心方法与创新机理
 
 TMPC引入两个核心原则来解决上述权衡：
@@ -79,20 +74,12 @@ TMPC引入两个核心原则来解决上述权衡：
 
 2. **子目标条件重生成（Subgoal-Conditioned Re-Generation）**：利用缓冲B中的子目标条件化新rollout的生成，确保稳定累积改进。这一原则确保稳定的、累积的进展。
 
-
-
 ![[assets/figures/papers/iclr26_0002_DsS3xRPSs5_Test-Time_Alignment_for_Large_Language_Models_vi/figures/001_Figure_1.jpg]]
 *Figure 1: Textual Model Predictive Control (TMPC) balances the curse of horizon in guided decoding against the curse of dimensionality in naive iterative refinement. It employs Hindsight Subgoal Identification to dynamically discover promising states from rollouts and Subgoal-Conditioned Re-Generation to guide the search from these discovered subgoals, ensuring a stable alignment.*
 
 TMPC的整体框架如图1所示，它通过两个核心原则平衡引导解码的horizon诅咒与迭代优化的维度诅咒。
 
-![[assets/figures/papers/iclr26_0002_DsS3xRPSs5_Test-Time_Alignment_for_Large_Language_Models_vi/figures/001_Figure_1.jpg]]
-
 图2展示了TMPC框架的详细流程，包括事后子目标识别和子目标条件重生成两个核心原则。
-
-![[assets/figures/papers/iclr26_0002_DsS3xRPSs5_Test-Time_Alignment_for_Large_Language_Models_vi/figures/002_Figure_2.jpg]]
-
-
 
 ### 5.1 问题形式化
 
@@ -134,8 +121,6 @@ $$\mathcal { B }  \{ \begin{array} { l l } { \mathcal { B } \cup \widetilde { \m
 
 $$\widetilde {  Ḋ \boldsymbol Ḋ a Ḍ Ḍ } _ { t } ^ { \mathrm { T M P C } } ( s ) \gets  { \mathcal Ḋ G Ḍ } \left( \{ \tau _ { t } ^ { ( i ) } \} _ { i = 1 } ^ { K } , R ( \cdot ) ~ | ~ s ,  { \mathcal Ḋ B Ḍ } \right) : = \left\{  { \boldsymbol Ḋ a Ḍ } ~ | ~ R ( s , a ) \geq \alpha ~ \mathrm { a n d } ~ a \in \{ \tau _ { t } ^ { ( i ) } \} _ { i = 1 } ^ { K } \right\}$$
 
-
-
 ## 实验与关键发现
 
 ### 6.1 主要结果
@@ -143,7 +128,6 @@ $$\widetilde {  Ḋ \boldsymbol Ḋ a Ḍ Ḍ } _ { t } ^ { \mathrm { T M P C } 
 **WMT'24语篇级文学翻译（zh→xx方向）**
 
 Table 1展示了TMPC在WMT'24文学翻译任务上的定量结果。
-
 
 ![[assets/figures/papers/iclr26_0002_DsS3xRPSs5_Test-Time_Alignment_for_Large_Language_Models_vi/figures/003_Table_1.jpg]]
 *Table 1: Results on the WMT’24 literary translation shared task (zh→xx directions). Results are grouped into SoTA and base models, training-time alignment methods, and test-time alignment methods. For test-time methods, the best-performing results are bold, and the second-best are underlined. Proposed methods are highlighted .*
@@ -165,22 +149,17 @@ TMPC在zh→en方向表现最强（骨干模型语言熟悉度更高），在zh�
 
 Figure 3展示了长回复生成的结果：左图为平均奖励，右图为GPT-4胜率。
 
-![[assets/figures/papers/iclr26_0002_DsS3xRPSs5_Test-Time_Alignment_for_Large_Language_Models_vi/figures/004_Figure_3.jpg]]
-
 TMPC在平均奖励和GPT-4胜率上均优于DPO和Best-of-20。
 
 **MBPP程序合成**
 
 Figure 4展示了MBPP程序合成上的pass rate比较。
 
-![[assets/figures/papers/iclr26_0002_DsS3xRPSs5_Test-Time_Alignment_for_Large_Language_Models_vi/figures/006_Figure_4.jpg]]
-
 TMPC达到61% pass rate，优于所有基线（Best-of-35、TPO）。
 
 ### 6.2 消融与鲁棒性分析
 
 Table 2展示了TMPC的鲁棒性和敏感性分析。
-
 
 ![[assets/figures/papers/iclr26_0002_DsS3xRPSs5_Test-Time_Alignment_for_Large_Language_Models_vi/figures/007_Table_2.jpg]]
 *Table 2: Robustness and sensitivity of TMPC. (a) Robustness to hyperparameter choices, with performance varying by less than 0.1 across different buffer and segment sizes. (b) Robustness to imperfections in the reward model, including injected noise and lower accuracy. (c) Robustness to the threshold used for selecting high-reward segments. (d) Ablation of TMPC’s two principles. Removing Principle 1 is approximated by disabling hindsight and making the buffer FIFO (First-In-First-Out); removing Principle 2 is approximated by minimizing subgoal conditioning (buffer size = 1).*
@@ -199,8 +178,6 @@ Table 2展示了TMPC的鲁棒性和敏感性分析。
 
 Table 6展示了生成单个HH-RLHF长回复的端到端延迟和吞吐量。
 
-![[assets/figures/papers/iclr26_0002_DsS3xRPSs5_Test-Time_Alignment_for_Large_Language_Models_vi/figures/012_Table_6.jpg]]
-
 | 方法 | 延迟（秒/响应） | 吞吐量（响应/分钟） |
 |------|----------------|-------------------|
 | BaseLLaMA-3.1-8B | 8 | 7.50 |
@@ -215,11 +192,8 @@ TMPC的计算成本为每响应108秒，高于BaseLLaMA（8秒）和RE-Control�
 
 Table 5展示了与固定边界启发式方法在WMT'24段落级MT上的比较。
 
-
 ![[assets/figures/papers/iclr26_0002_DsS3xRPSs5_Test-Time_Alignment_for_Large_Language_Models_vi/figures/011_Table_5.jpg]]
 *Table 5: Comparison with fixed-boundary heuristics on WMT’24 paragraph-level MT. Sentence-level systems translate or rewrite each sentence independently with fixed boundaries. TMPC dynamically identifies hindsight subgoals at test time, which may cross sentence boundaries.*
-
-![[assets/figures/papers/iclr26_0002_DsS3xRPSs5_Test-Time_Alignment_for_Large_Language_Models_vi/figures/011_Table_5.jpg]]
 
 TMPC动态识别事后子目标，可能跨越句子边界，优于固定边界的句子级方法。
 
@@ -227,23 +201,11 @@ TMPC动态识别事后子目标，可能跨越句子边界，优于固定边界�
 
 Figure 5展示了zh→en翻译的迭代性能，说明TMPC原则的重要性。
 
-![[assets/figures/papers/iclr26_0002_DsS3xRPSs5_Test-Time_Alignment_for_Large_Language_Models_vi/figures/008_Figure_5.jpg]]
-
 ### 6.6 公平性说明
 
 - 所有方法使用相同的LLaMA-3.1-8B-Instruct骨干模型进行公平比较。
 - 翻译任务中，TMPC在zh→en方向表现最强（骨干模型语言熟悉度更高），在zh→ru方向弱于Tower-7B（骨干模型俄语能力较弱）。
 - 计算成本：TMPC在HH-RLHF长回复生成上每响应108秒，高于BaseLLaMA（8秒）和RE-Control（40秒），但低于ARGS（363秒）和RAIN（1930秒）。K个候选rollout可高度并行化。
-
-### 补充图表
-
-![[assets/figures/papers/iclr26_0002_DsS3xRPSs5_Test-Time_Alignment_for_Large_Language_Models_vi/figures/009_Table_3.jpg]]
-*Table 3: The statistics of winning translations for each language pairs evaluated by MetricX-24.*
-
-![[assets/figures/papers/iclr26_0002_DsS3xRPSs5_Test-Time_Alignment_for_Large_Language_Models_vi/figures/010_Table_4.jpg]]
-*Table 4: Robustness of TMPC on HH-RLHF-RLHF (3 iterations). We vary buffer size, segment length, reward model quality, and injected noise. Performance converges around three iterations and remains stable under noisy or weaker supervision.*
-
-
 
 ## 定位与知识库关联
 
@@ -282,8 +244,6 @@ TMPC与现有方法的关键差异体现在四个维度：
 - TMPC的规划horizon H和迭代次数如何自适应确定？
 - TMPC能否与其他测试时技术（如思维链、树搜索）结合以进一步提升性能？
 - TMPC在更广泛的任务（如对话、摘要、创意写作）上的泛化能力如何？
-
-
 
 ## 原文 PDF
 

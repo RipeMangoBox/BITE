@@ -52,8 +52,6 @@ claims:
 
 **方法谱系与知识库定位**：SODA4MER属于**无顶点标注的深度微表情识别**路线，区别于依赖顶点帧的传统方法（如OFF-ApexNet, Gan et al., 2019；STSTNet, Liong et al., FG 2019）和基于光流的手工特征方法（LBP-TOP、MDMO）。与同期自监督方法（如FRL-DGT, Zhai et al., CVPR 2023；SelfME, Fan et al., CVPR 2023）相比，SODA4MER的独特之处在于引入了动态刻板印象理论指导的双阶段时序建模和肌肉群先验的门控机制，而非单纯依赖Transformer或全局运动特征。
 
-
-
 微表情（Micro-Expression, ME）是一种持续时间极短（通常 1/25 至 1/3 秒）、强度微弱且难以自主控制的面部运动，在测谎、临床诊断、安全审讯等场景中具有重要应用价值。然而，微表情的自动识别面临一系列根本性挑战：动作幅度极小、帧间变化几乎不可见，且极易受到头部运动、光照变化等无关噪声的干扰。
 
 **现有方法的核心瓶颈**。传统微表情识别方法大致可分为手工特征方法和深度学习方法两类。手工特征方法如 **LBP-TOP** 和 **MDMO** 依赖光流直方图或时空纹理描述子，但对微弱瞬时动作的建模能力有限。深度学习方法如 **OFF-ApexNet**（Gan et al., Signal Process. Image Commun. 2019）和 **STSTNet**（Liong et al., FG 2019）虽然通过双流网络或 3D CNN 提升了识别精度，却普遍存在一个关键局限：**训练和推理均依赖人工标注的顶点帧（apex frame）**。顶点帧是微表情序列中情绪强度最高的帧，其标注需要专业培训的编码员逐帧判断，耗时且主观，在实际应用中往往不可获取——尤其当视频经过重采样或压缩后，顶点帧的位置信息可能完全丢失（见 Figure 1）。
@@ -67,8 +65,6 @@ claims:
 - 基于动态刻板印象理论设计**双阶段时间建模（DPTM）**，将序列切分为激活期与衰减期，分别通过双向 LSTM 提取时序模式，从而显式编码微表情的时相动态。
 
 这一设计使得 SODA4MER 在无顶点标注的条件下，仍能取得超越依赖顶点帧方法的识别精度，为实用化微表情识别系统提供了新的可能性。
-
-
 
 ## 核心方法与创新机理
 
@@ -125,8 +121,6 @@ $$
 
 上述四个创新点并非孤立存在，而是形成了紧密协同的闭环：SODE 的自监督预训练为整个系统提供了鲁棒的运动表征基础（无预训练时 UF1 骤降至 0.3292，Table 4）；GTVG 在 SODE 输出的形变特征上进行自适应精调，增强信噪比；对比学习伪顶点检测为 DPTM 提供关键帧切分点；DPTM 则充分利用前序模块的输出完成最终分类。这种端到端的设计使 SODA4MER 在 SMIC-HS 三分类上取得了 UF1 0.8855、UAR 0.8881 的最优性能，分别超出第二名 1.4% 和 2.4%（Table 2）。
 
-
-
 SODA4MER 提出了一套端到端的无顶点（apex‑free）微表情识别流程，其核心设计目标是在不依赖人工标注顶点帧的前提下，鲁棒地捕捉微弱、瞬时的面部局部形变，并显式建模微表情的时相动态。整体架构如图 Figure 3 所示，由四个紧密协作的模块串联构成：**自监督定向形变估计器 (SODE)**、**门控时间方差高斯模型 (GTVG)**、**对比学习顶点检测** 以及 **双阶段时间建模 (DPTM)**。
 
 ![[assets/figures/papers/paper_list_l20_SODA4MER_Dynamic_Stereotype_Theory_Induced_Micro_expression_Recognition__motion20/figures/003_Figure_3.jpg]]
@@ -148,8 +142,6 @@ SODE 是整个流程的前端基础，其自监督预训练使形变估计具备
 ### 与现有流程的本质差异
 
 传统 MER 方法（如 **OFF‑ApexNet** (Gan et al., Signal Process. Image Commun. 2019)、**STSTNet** (Liong et al., FG 2019)）通常依赖人工标注的顶点帧进行训练，且运动估计多采用光流或手工 MBH 特征，对头部运动噪声和极端微表情的鲁棒性不足。SODA4MER 在三个关键环节上实现了根本性改变（Figure 1 对比了两种流程差异）：(1) 以 SODE 的局部雅可比形变替代全局光流，增强局部运动感知与抗噪能力；(2) 以对比学习自动检测伪顶点，彻底摆脱顶点标注依赖，使方法在视频重采样等实际场景中依然可用；(3) 引入基于动态刻板印象理论的双阶段时间建模，显式编码微表情的激活与衰减时相动态，而非简单地对全序列或单帧建模。
-
-
 
 SODA4MER 的核心架构由四个紧密协作的模块构成：自监督定向形变估计器（SODE）、门控时间方差高斯模型（GTVG）、对比学习顶点检测以及双阶段时间建模（DPTM）。以下逐一展开各模块的设计逻辑与关键公式。
 
@@ -283,15 +275,8 @@ $$
 
 其中 Focal Loss 定义为 $\mathcal{L}_{focal} = -\beta (1 - \mathcal{P}_c)^2 \log(\mathcal{P}_c)$，通过降低高置信度样本的损失权重来应对微表情数据集的类别不均衡问题。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l20_SODA4MER_Dynamic_Stereotype_Theory_Induced_Micro_expression_Recognition__motion20/figures/001_Figure_1.jpg]]
 *Figure 1: (a) Difference in method pipeline: Previous MER methods typically rely on the apex annotations. Our method detects the apex frame through a triplet loss in contrastive learning, allowing for the detection of Adet even in resampled sequences. Additionally, the local motion estimated by our method demonstrates strong noise resistance. (b) Difference in practicality: Previous MER methods rely on apex annotations, making them unsuitable for practical applications when apex labels are unavailable or lost due to video resampling*
-
-![[assets/figures/papers/paper_list_l20_SODA4MER_Dynamic_Stereotype_Theory_Induced_Micro_expression_Recognition__motion20/figures/002_Figure_2.jpg]]
-*Figure 2: The subtle facial movements are highlighted with red boxes: (a) Onset frames, the starting frames of MEs. (b) Apex frames, the frames showing the highest intensity. (c) Optical flow between onset and apex frames. (d) Local deformation estimated by our method. The optical flow adequately captures facial movements but introduces noise and struggles with extreme MEs. In contrast, our method addresses these challenges more robustly*
-
-
 
 ## 实验与关键发现
 
@@ -331,27 +316,17 @@ Figure 4展示了SODA4MER的定性分析及失败案例。局部形变估计虽�
 3. **极短微表情的检测精度**：双阶段建模依赖对比学习检测的伪顶点，对于持续时间极短（如少于10帧）的微表情，三元组损失可能无法准确定位$A_{det}$，进而影响后续分类性能。
 4. **跨域泛化不足**：当面对样本分布差异显著的极大规模数据集（如CASME3）时，模型性能可能下降，说明当前预训练策略对分布偏移的鲁棒性有待加强。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l20_SODA4MER_Dynamic_Stereotype_Theory_Induced_Micro_expression_Recognition__motion20/figures/005_Table_2.jpg]]
 *Table 2: Comparison with the state-of-the-art methods on CASME II and SMIC-HS for three-categories classification task. The best results are highlighted in bold, while the second-best results are marked with an underline*
 
 ![[assets/figures/papers/paper_list_l20_SODA4MER_Dynamic_Stereotype_Theory_Induced_Micro_expression_Recognition__motion20/figures/008_Table_4.jpg]]
 *Table 4: Ablation study of key components of SODA4MER*
 
-![[assets/figures/papers/paper_list_l20_SODA4MER_Dynamic_Stereotype_Theory_Induced_Micro_expression_Recognition__motion20/figures/007_Table_3.jpg]]
-*Table 3: To conduct more convincing experiments, we further performed a five-class comparative evaluation on CASME II and SAMM*
-
 ![[assets/figures/papers/paper_list_l20_SODA4MER_Dynamic_Stereotype_Theory_Induced_Micro_expression_Recognition__motion20/figures/009_Table_5.jpg]]
 *Table 5: Ablation study of apex frame and large-scale ME dataset*
 
-![[assets/figures/papers/paper_list_l20_SODA4MER_Dynamic_Stereotype_Theory_Induced_Micro_expression_Recognition__motion20/figures/004_Table_1.jpg]]
-*Table 1: Distribution of ME samples, ’→’ indicates that a few ME samples were discarded, while ’-’ denotes the corresponding database does not contain this ME category*
-
 ![[assets/figures/papers/paper_list_l20_SODA4MER_Dynamic_Stereotype_Theory_Induced_Micro_expression_Recognition__motion20/figures/006_Figure_4.jpg]]
 *Figure 4: Qualitative analysis and failure cases of SODA4MER*
-
-
 
 ## 定位与知识库关联
 
@@ -404,8 +379,6 @@ SODA4MER 与两类代表性自监督方法存在显著区别：
 3. **多模态知识融合**：能否联合面部动作单元（AU）检测或宏观表情知识，进一步提升模型的可解释性和跨域泛化能力？GLEFFN（Guo and Huang, FME Workshop 2023）等事件融合方法提供了多模态融合的思路，但如何与无顶点框架深度结合仍需探索。
 
 4. **模型轻量化与实时部署**：当前 64 FPS 的推理速度在多数场景下可满足实时性要求，但面向嵌入式设备仍需进一步降低模型复杂度。如何在保持 GTVG 和 DPTM 核心机制的前提下实现高效推理，是工程落地的重要挑战。
-
-
 
 ## 原文 PDF
 

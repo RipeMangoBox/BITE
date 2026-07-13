@@ -54,8 +54,6 @@ Fast-dLLM针对上述问题提出了两项核心创新。第一，引入**面向
 
 **方法定位**：Fast-dLLM属于扩散大语言模型的免训练推理加速方法，通过近似KV缓存与置信度感知并行解码的组合，在不修改模型权重的前提下实现数量级的吞吐提升，为dLLM的实际部署提供了可行路径。
 
-
-
 ### 扩散大语言模型的推理困境
 
 掩码扩散模型（Masked Diffusion Models, MDMs）近年来作为自回归（AR）大语言模型的替代范式受到关注。其核心思想是通过迭代去噪过程生成文本：从全 `[MASK]` 序列出发，逐步将掩码token替换为真实token。形式上，给定序列 $\mathbf{x}_0$，前向扩散过程以时间 $t$ 的概率独立地将每个token掩码化：
@@ -94,8 +92,6 @@ Fast-dLLM的提出基于两个关键观察：
 2. **高置信度token的独立解码可理论保证**：当解码置信度足够高时，并行贪婪解码与顺序贪婪解码等价。Theorem 1给出了精确条件：当 $(n+1)\epsilon \le 1$ 时（其中$\epsilon$为置信度误差界），$\operatorname{argmax}_z p(z|E) = \operatorname{argmax}_z q(z|E) = \mathbf{x}^*$，且真实联合分布与边缘乘积分布之间的总变差距离有界：$D_{\mathrm{TV}}(p,q) < \frac{3n-1}{2}\epsilon$。
 
 基于这两个洞察，Fast-dLLM旨在**免训练**地同时解决KV缓存缺失与并行解码质量退化两大瓶颈，在保持生成精度的前提下实现扩散LLM推理的实质性加速。
-
-
 
 ## 核心方法与创新机理
 
@@ -137,14 +133,6 @@ Theorem 1 进一步给出了真实联合分布 $p$ 与边缘乘积分布 $q$ 之
 
 Fast-dLLM 的上述设计是**免训练**的，可直接应用于任何预训练扩散大语言模型（已验证 LLaDA、Dream、LLaDA-V、dParallel 等），无需额外微调或蒸馏。
 
-
-
-![[assets/figures/papers/paper_list_l36_https_openreview_net_forum_id_3Z3Is6hnOT/figures/004_Figure_2.jpg]]
-*Figure 2: Illustration of our Key-Value Cache for Block-Wise Decoding. (a) During prefix-only caching, the KV cache is computed once for the prompt and reused across multiple decoding steps within each block. The cache is updated after completing a block to maintain consistency, with negligible overhead. (b) DualCache extends this approach by caching both prefix and masked suffix tokens, further accelerating decoding. The high similarity of KV activations across steps allows effective reuse with minimal approximation error*
-
-![[assets/figures/papers/paper_list_l36_https_openreview_net_forum_id_3Z3Is6hnOT/figures/006_Figure_3.jpg]]
-*Figure 3: Heatmaps of Key-Value Activation Cosine Similarity Across Inference Steps in LLaDA-Instruct. Cosine similarity heatmaps of Key-Value activations for (a) the prompt and (b) the last (suffix) block. High similarity along the diagonal ( i $\approx$ j , , red boxes) indicates that activations for adjacent inference steps are highly similar. This supports using an approximate block-wise KV Cache, allowing cached activations to be reused for faster decoding with negligible impact on accuracy*
-
 Fast-dLLM 的整体推理流程围绕两个核心机制展开：**块状近似 KV 缓存**（Block-wise Approximate KV Cache）与**置信度感知并行解码**（Confidence-Aware Parallel Decoding）。两者协同工作，在扩散大语言模型（如 LLaDA、Dream）的迭代去噪过程中消除冗余计算，同时通过理论保证维持生成质量。
 
 ### Pipeline 总览
@@ -170,8 +158,6 @@ Fast-dLLM 的整体推理流程围绕两个核心机制展开：**块状近似 K
 置信度感知并行解码解决了 $\tau$-leaping 中条件独立性假设对 token 依赖关系的破坏。Theorem 1 提供了理论保证：当 $(n+1)\epsilon \le 1$ 时，基于边缘乘积的贪婪并行解码与顺序贪婪解码等价。阈值策略和因子策略分别从绝对置信度和相对置信度两个角度实现这一条件，确保并行解码的精度损失可控。
 
 两个机制的组合效应是乘法级的：缓存减少单步计算量，并行解码减少所需步数。在 GSM8K 5-shot 256 tokens 设定下，两者叠加带来 **8.1×** 吞吐提升（6.7 → 54.4 tokens/s），精度仅下降 0.8 个百分点（Table 1）。
-
-
 
 ### 3.1 方法总览
 
@@ -230,8 +216,6 @@ $$q(\mathbf{X}|E) = \prod_{j=1}^{n} p_j(X_{i_j}|E)$$
 
 并通过置信度感知机制筛选参与并行解码的token，从而在加速与质量间取得可控平衡。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能：吞吐与精度的权衡
@@ -254,9 +238,6 @@ Fast-dLLM 在多种扩散大语言模型骨干上实现了数量级的解码吞�
 ### 组件拆解：缓存与并行解码的独立贡献
 
 Figure 1(a) 和 Table 1 的行结构允许逐组件归因。单独启用 KV Cache（+Cache）在 GSM8K 256-token 上带来约 2.2× 加速（6.7 → 14.5 tokens/s），单独启用并行解码（+Parallel）贡献约 4.3× 加速（6.7 → 28.7 tokens/s）。两者组合（+Cache+Parallel）产生 8.1× 的总加速，超过各自贡献之和，说明缓存减少的每步计算量与并行解码减少的总步数之间存在乘法效应。
-
-![[assets/figures/papers/paper_list_l36_https_openreview_net_forum_id_3Z3Is6hnOT/figures/001_Figure_1.jpg]]
-*Figure 1: (a) Throughput vs. Accuracy across methods*
 
 Figure 1(b) 进一步按“每步生成 token 数”和“总吞吐”两个维度分解贡献：并行解码大幅提升单步 token 产出（折线），缓存则降低每步的计算开销（柱状图），二者协同使总吞吐达到最高。
 
@@ -293,19 +274,6 @@ Figure 1(b) 进一步按“每步生成 token 数”和“总吞吐”两个维�
 ### 计算效率与显存开销
 
 Table 14 的 FLOPs 与显存分析量化了缓存机制的计算收益。在输入+生成长度均为 256 的设定下，DualCache 将计算量从 LLaDA 基线的 7.68T FLOPs 压缩至 0.48T FLOPs（**16× 削减**），而峰值显存仅从 15.07G 微增至 15.36G。这一近乎零显存代价的计算压缩，源于块状缓存更新与解码步骤的联合计算——缓存更新不引入额外前向传播。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l36_https_openreview_net_forum_id_3Z3Is6hnOT/figures/016_Table_6.jpg]]
-*Table 6: Qualitative comparison of responses across methods*
-
-![[assets/figures/papers/paper_list_l36_https_openreview_net_forum_id_3Z3Is6hnOT/figures/017_Table_7.jpg]]
-*Table 7: Qualitative comparison of responses with varying block size for DualCache*
-
-![[assets/figures/papers/paper_list_l36_https_openreview_net_forum_id_3Z3Is6hnOT/figures/018_Table_8.jpg]]
-*Table 8: Qualitative comparison of responses under different threshold settings*
-
-
 
 ## 定位与知识库关联
 
@@ -362,8 +330,6 @@ Fast-dLLM作为**免训练加速框架**，可适配多种扩散语言模型骨�
 4. **在线自适应决策**：能否通过轻量预测器（如小型MLP或统计检验）在线决策最优阈值$\tau$或因子$f$，从而避免手动调节并实现动态自适应？这需要设计无额外标注的在线信号（如置信度分布熵、解码步间token变化率）。
 
 5. **大规模模型的边际效益**：当前实验基于~7B参数规模。在更大规模（>30B）扩散模型上，显存与计算减少的边际效益如何？KV缓存的显存开销（Table 14显示DualCache在256+256配置下仅增加0.29G）是否随模型规模线性扩展？
-
-
 
 ## 原文 PDF
 

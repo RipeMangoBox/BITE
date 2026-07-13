@@ -61,8 +61,6 @@ InstructVLA 提出**视觉-语言-动作指令微调（VLA-IT）**这一训练�
 
 当前方法仍受限于基础操作原语和单目视觉输入，在深度估计不足和分布外场景下存在失败风险。如何扩展到更灵巧的技能、整合多模态感官信息，以及利用合成数据减少对真实世界采集的依赖，是未来值得探索的方向。
 
-
-
 ### 视觉-语言-动作模型的兴起与困境
 
 赋予机器人通用操控能力是具身智能的核心目标。近年来，大规模视觉-语言模型（VLMs）的进展催生了视觉-语言-动作模型（VLAs），试图将多模态理解与物理操控统一到单一框架中。然而，现有VLA模型面临一个根本性困境：**联合学习多模态推理与精确动作生成时，任务干扰会导致灾难性遗忘，而缺乏丰富多模态监督的操控数据进一步加剧了这一问题**。
@@ -86,8 +84,6 @@ InstructVLA 提出**视觉-语言-动作指令微调（VLA-IT）**这一训练�
 这一问题的本质是表征与训练范式的双重挑战。从表征角度，需要一个中间界面将VLM的高层语义推理与低层连续控制解耦；从训练角度，需要一个机制让模型在语言推理和动作预测之间自适应切换，而非相互干扰。
 
 InstructVLA正是围绕这一动机展开：通过潜在动作查询（Latent Action Queries）作为中间表征、混合专家（MoE）适应机制实现模态切换、以及两阶段的视觉-语言-动作指令微调（VLA-IT）范式，首次系统性地探索了从多模态理解到推理增强操控的完整路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -143,13 +139,9 @@ InstructVLA 首次实现了推理与操控的紧密耦合。与缺乏或仅使�
 | 训练数据与范式 | 仅操作数据或简单混合 | 两阶段：语言运动监督 + 650K 多模态指令数据集 |
 | 推理与操控集成 | 缺乏或仅文本 CoT，未与动作模块耦合 | 异步自回归推理与潜在动作预测交替，支持双频推理 |
 
-
-
 ![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_tsxwloasw5/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the InstructVLA. InstructVLA integrates the multimodal reasoning capabilities of a vision-language model with robotic manipulation. Generation consists of three steps: (1) asynchronous auto-regressive reasoning by the VLM, (2) latent action generation, and (3) action decoding. A MoE adaptation enables the VLM to alternate between reasoning and latent action prediction. The flow matching action expert decodes the final actions, conditioned on latent actions*
 
-![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_tsxwloasw5/figures/047_Figure_30.jpg]]
-*Figure 30: Detailed overview of the MoE adaptation architecture. The frozen VLM backbone’s last hidden states are classified by a scalar head to produce gating weights $\lambda _ { 1 }$ and $\lambda _ { 2 }$ . , which control the weighted MoE adaptation. Similar to finetuning VLMs with multiple LoRA adapters, the MoE adaptation computes a weighted sum over the LoRA experts. The predicted tokens are then used differently based on their token type: language tokens are directly decoded as the model’s response, while features corresponding to action tokens are decoded by the action expert (see Figure 2 (right)) to produce continuous actions
 
 ![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_tsxwloasw5/figures/001_Figure_1.jpg]]
 *Figure 1: Method overview. InstructVLA integrates vision-language understanding with precise robotic control to achieve reasoning-guided manipulation. Its core training strategy, Vision-Language-Action Instruction Tuning, enhances manipulation by unifying general multimodal knowledge, embodied reasoning, and atomic instruction-based manipulation into a coherent chain of thought*
@@ -185,8 +177,6 @@ $$ \mathbf { \dot { \mathcal { L } } } = \mathcal { L } _ { L M } + \mathcal { L
 ### 推理机制
 
 InstructVLA 支持异步推理：VLM 先进行自回归文本推理（thinking），生成任务相关的语义分析；随后切换到动作模式，基于推理结果生成潜在动作 C；最后由动作专家解码为连续控制信号。这种设计支持潜在动作缓存和双频推理——推理可在低频运行，而动作生成保持高频，实现推理增强的操控。消融实验表明，为通用模型启用推理相比直接执行指令带来 36.1% 的性能增益（Figure 7(b)）。
-
-
 
 ### 整体架构与推理流程
 
@@ -245,8 +235,6 @@ $$
 其中 $\mathcal{L}_{LM}$ 为语言运动描述的交叉熵损失，$\mathcal{L}_{FM}$ 为流匹配损失。这种语言运动监督使 VLM 学会将视觉线索与操控原语关联起来，消融实验表明其带来 9.3% 的整体成功率提升（Table 3）。
 
 **Stage-2（VLA 指令微调）** 仅微调 MoE 适应模块（约 220M 参数），冻结 VLM 主干和动作专家，在保持多模态能力的同时注入操控推理能力。
-
-
 
 ## 实验与关键发现
 
@@ -326,25 +314,6 @@ Table 5的指令微调数据消融显示，仅在Bridge数据集上进行VLA-IT�
 ![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_tsxwloasw5/figures/018_Table_5.jpg]]
 *Table 5: Instruction tuning data ablation. We evaluate three settings: without VLA-IT data, with data only on Bridge, and with VLA-IT data on both Fractal and Bridge. This ablation examines the contribution of the VLA-IT dataset and the cross-embodiment generalization of InstructVLA on SimplerEnv-Instruct*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_tsxwloasw5/figures/008_Table_3.jpg]]
-*Table 3: Ablation of action expert vision design and language motion. “w/o Lang.” denotes without using language motion. “w/o FiLM” denotes using only DINO. “w/o DINO” denotes action expert without the vision input. (a)*
-
-![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_tsxwloasw5/figures/010_Figure_6.jpg]]
-*Figure 6: Finetuning strategies. (a) Freezing or finetuning the action head during VLA-IT training. (b) Training strategies when multimodal and manipulation tasks co-exist. “FFT” denotes full finetuning. “AR” denotes auto-regressive*
-
-![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_tsxwloasw5/figures/013_Table_4.jpg]]
-*Table 4: Effect of data dievrsity. “T.A.” denotes task aggregation, and “S.R.” denotes situated reasoning on SimplerEnv-Instruct*
-
-![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_tsxwloasw5/figures/021_Table_6.jpg]]
-*Table 6: Data comparison of different methods. “Trans.” denotes transitions*
-
-![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_tsxwloasw5/figures/022_Table_7.jpg]]
-*Table 7: VLA-IT captioning evaluation. “Sentence-BERT” and “SimCSE” represent learning-based evaluation methods, while the remaining metrics are traditional n-gram-based evaluations focused on word distribution*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 方法谱系：在VLA演进中的坐标
@@ -390,8 +359,6 @@ InstructVLA的设计决策划定了其有效性的边界：
 **泛化评估的系统化。** 当前评估以SimplerEnv和LIBERO为主，这些基准的任务多样性和环境复杂性远低于真实世界部署需求。构建覆盖更多具身形态、更多操作技能、更丰富语言指令的标准化评估体系，是推动VLA领域从“方法驱动”走向“问题驱动”的关键基础设施。SimplerEnv-Instruct基准的提出是朝这一方向迈出的第一步，但其30个情境推理任务的覆盖范围仍显有限。
 
 **合成数据与数字孪生的角色。** Table 6的数据量对比显示，InstructVLA使用的训练数据量（约650K多模态指令样本）远小于纯VLM训练所需的上亿级样本。利用大规模合成数据和数字孪生技术生成多样化的操作场景与语言标注，是突破数据瓶颈的潜在路径。但合成数据的真实感保真度与标注准确性之间的权衡，以及合成-真实域迁移的泛化保证，仍是开放挑战。
-
-
 
 ## 原文 PDF
 

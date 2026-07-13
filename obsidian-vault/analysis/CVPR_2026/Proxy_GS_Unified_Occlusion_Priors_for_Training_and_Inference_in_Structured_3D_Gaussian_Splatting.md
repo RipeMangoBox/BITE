@@ -53,8 +53,6 @@ claims:
 
 实验结果表明，在遮挡严重的MatrixCity Streets数据集上，Proxy-GS相比Octree-GS实现了超过**2.5倍**的渲染加速（FPS从48提升至151），同时PSNR和SSIM均有提升。在真实城市场景Small City上，FPS从51提升至139（约2.73倍），PSNR从23.03提升至23.09。消融实验进一步验证了训练与推理统一使用代理先验的必要性：仅在推理时使用遮挡剔除会导致PSNR大幅下降（从21.41降至19.06），而训练和推理均启用代理引导致密化可获得最佳的质量-速度权衡。轻量级代理深度渲染仅需约**1 ms**，且对代理网格分辨率不敏感，表明该方法对代理精度具有良好的鲁棒性。
 
-
-
 ### 3D高斯泼溅及其结构化演进
 
 基于3D高斯泼溅（3DGS）的显式辐射场表达已成为新视角合成的主流范式。其核心思想是将场景表达为一组可微的三维高斯原语，通过基于瓦片的快速光栅化实现实时渲染。然而，原始3DGS为每个高斯独立优化全部属性（位置、协方差、颜色、不透明度），导致在大规模场景中高斯数量急剧膨胀，存储与渲染开销随之失控。
@@ -83,8 +81,6 @@ $$\{ \mu_j, \Sigma_j, c_j, \alpha_j \}_{j\in\mathcal{M}} = \mathrm{MLP}_\theta (
 本文的核心动机在于：**能否以极低的计算代价，在训练和推理阶段一致地引入遮挡先验，从而同时实现加速渲染和质量保持？**
 
 关键洞察是：轻量级的代理网格（proxy mesh）可通过硬件光栅化在1毫秒内生成精确的遮挡深度图，这一深度先验既可指导推理时的锚点剔除，又可引导训练时的锚点致密化沿真实几何表面生长。训练与推理使用相同的遮挡先验，保证了锚点分布与可见性结构的一致性，从而在显著减少解码和渲染计算量的同时，维持甚至提升渲染质量。
-
-
 
 ## 核心方法与创新机理
 
@@ -116,8 +112,6 @@ Proxy-GS 的核心创新在于将**轻量级代理网格（proxy mesh）**作为
 
 **创新本质总结**：Proxy-GS 并非提出全新的表示或渲染范式，而是通过引入一个极低成本的几何代理，将“遮挡感知”系统性地注入到结构化 3DGS 的训练与推理全流程中。这一设计使得计算资源从被遮挡的无效区域重新分配到可见的几何表面，在显著加速渲染的同时改善或保持了渲染质量——这一“加速且提质”的特性在遮挡严重的场景中尤为突出（MatrixCity Streets 上超过 2.5× 加速且 PSNR 提升 0.27 dB）。
 
-
-
 Proxy-GS 的整体框架围绕一个核心设计原则展开：**在训练与推理阶段统一使用轻量级代理网格提供的遮挡深度先验**，实现对结构化 3D 高斯泼溅（3DGS）中锚点与高斯的遮挡感知管理。如 Figure 2 所示，框架由四个关键模块串联构成，形成从几何先验构建到最终渲染的完整流水线。
 
 ![[assets/figures/papers/paper_list_l2038_https_arxiv_org_abs_2509_24421/figures/002_Figure_2.jpg]]
@@ -135,12 +129,8 @@ Proxy-GS 的整体框架围绕一个核心设计原则展开：**在训练与推
 
 框架的关键创新在于**训练与推理的一致性**：推理时的遮挡剔除与训练时的致密化均依赖同一代理网格深度先验。这种一致性确保了训练过程中锚点的生长与推理时的可见性判断相匹配——锚点被引导沿真实几何表面生长，而非在遮挡区域无效增殖，从而在消除计算浪费的同时促进锚点布局的结构合理性。消融实验（Table 3）充分验证了这一设计：仅在推理时使用代理遮挡剔除会导致 PSNR 从 21.41 大幅下降至 19.06，而训练与推理均启用代理先验并加入代理引导致密化可获得最佳的渲染质量与速度权衡（PSNR 21.68，FPS 143）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2038_https_arxiv_org_abs_2509_24421/figures/001_Figure_1.jpg]]
 *Figure 1: We propose Proxy-GS, an occlusion-aware training and inference framework built upon lightweight proxies. By introducing proxy-guided densification, our method effectively guides anchors to grow in more geometrically meaningful regions. As a result, Proxy-GS not only achieves higher rendering quality but also delivers significantly faster rendering compared to state-of-the-art MLP-based 3DGS approaches*
-
-
 
 ### 整体框架
 
@@ -222,8 +212,6 @@ $$\mathbf{c}(\mathbf{a}) = \left\lfloor \frac{\mathbf{a} - \mathbf{b}_{\min}}{h}
 
 这一因果链路表明：**遮挡剔除负责加速，训练-推理一致性保证质量不退化，表面致密化提供额外质量增益**。三者缺一不可。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与因果机制
@@ -284,39 +272,17 @@ Table 4展示了Proxy-GS与不同3DGS渲染加速方案的兼容性。与硬件3
 
 所有对比方法均训练40,000次迭代。为公平对比，3DGS和Hierarchical-GS的致密化阈值统一降至$10^{-4}$以提升其渲染质量至接近Octree-GS的水平；Scaffold-GS使用更小的体素尺寸（$10^{-4}$）和更低的致密化阈值（$10^{-4}$）以增强表达力。Octree-GS的默认LOD策略和初始化在Proxy-GS中保持不变。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2038_https_arxiv_org_abs_2509_24421/figures/007_Table_3.jpg]]
 *Table 3: Ablations of different training and inference strategies on Block 5. Average anchor denotes the average number of decoded anchors in the scene*
 
 ![[assets/figures/papers/paper_list_l2038_https_arxiv_org_abs_2509_24421/figures/020_Table_10.jpg]]
 *Table 10: Ablations of different safety margin of depth culling γ trained on Small City [16]*
 
-![[assets/figures/papers/paper_list_l2038_https_arxiv_org_abs_2509_24421/figures/015_Table_6.jpg]]
-*Table 6: The FPS of different depth acquisition methods on Block 5*
-
 ![[assets/figures/papers/paper_list_l2038_https_arxiv_org_abs_2509_24421/figures/004_Table_1.jpg]]
 *Table 1: Quantitative results on MatrixCity [21]. We report average results over Block 1&2, Block 3&4, and Block 5. (Block 1&2 and 3&4 represent the average evaluation metrics of their respective two blocks.) The best and second-best are highlighted*
 
-![[assets/figures/papers/paper_list_l2038_https_arxiv_org_abs_2509_24421/figures/005_Table_2.jpg]]
-*Table 2: Quantitative results on real world outdoor and indoor datasets [4, 16, 34]. The best and second-best are highlighted. Small City has more severe occlusions, while Berlin and CUHK-LOWER have relative weaker occlusions*
-
-![[assets/figures/papers/paper_list_l2038_https_arxiv_org_abs_2509_24421/figures/012_Figure_7.jpg]]
-*Figure 7: Ablation on proxy fidelity: (a) PSNR vs. Proxy Resolution; (b) PSNR vs. Vertex Noise*
-
-![[assets/figures/papers/paper_list_l2038_https_arxiv_org_abs_2509_24421/figures/008_Table_4.jpg]]
-*Table 4: Integration with different 3DGS rendering accelerations. We evaluate our method combined with existing approaches [1, 7] on Block 1*
-
 ![[assets/figures/papers/paper_list_l2038_https_arxiv_org_abs_2509_24421/figures/009_Figure_5.jpg]]
 *Figure 5: Quantitative mesh visualization on different Resolutions and Vertex noise on Block 5*
-
-![[assets/figures/papers/paper_list_l2038_https_arxiv_org_abs_2509_24421/figures/011_Figure_6.jpg]]
-*Figure 6: Quantitative visualization of different Vertex noise on Block 5*
-
-![[assets/figures/papers/paper_list_l2038_https_arxiv_org_abs_2509_24421/figures/013_Figure_8.jpg]]
-*Figure 8: Visualization on different safety margins*
-
-
 
 ## 定位与知识库关联
 
@@ -371,8 +337,6 @@ Proxy-GS 属于 **MLP-based 结构化 3D 高斯泼溅 (3DGS)** 这一细分方�
 ### 知识库定位
 
 在 3D 高斯泼溅的知识体系中，Proxy-GS 填补了“遮挡感知的结构化 3DGS”这一空白。其核心贡献不在于提出新的表示形式或解码器架构，而在于引入了一个**轻量级、统一的几何先验注入机制**——代理网格深度图——使得遮挡剔除和表面引导致密化可以在训练和推理中一致地执行。这一思路与神经渲染中“显式几何引导隐式表示”的趋势一致，但通过硬件光栅化实现了极低延迟的深度获取，使其在实时应用中具有实际可行性。
-
-
 
 ## 原文 PDF
 

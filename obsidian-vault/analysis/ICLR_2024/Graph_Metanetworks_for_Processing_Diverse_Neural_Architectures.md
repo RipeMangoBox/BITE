@@ -199,8 +199,6 @@ GMN的处理管线由三个模块组成：
 
 GMN框架的等变性建立在**神经DAG自同构**这一核心概念之上。对于表示前馈神经网络的有向无环图，神经DAG自同构是保持邻接关系、节点类型和权重共享约束的节点置换。命题1指出，任何神经DAG自同构对参数的置换不会改变网络函数。由于GNN天然等变于图自同构，GMN因此天然等变于参数空间中的置换对称性，无需像NFN、NFT等先前方法那样为每种架构手工设计等变层。这一性质使得GMN能够统一处理包含归一化层、残差连接、注意力等模块的多样化架构，突破了现有等变元网络的泛化瓶颈。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2312_04501/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of Graph Metanetworks (GMNs) Our method converts neural network architectures into a parameter graph where edges correspond to network parameters. The bias (b) and batch-normalization parameters are incorporated via additional nodes with edges to the relevant layer’s neurons. The graph is processed by a graph neural network operating on edge attributes. Fixed-length (invariant) predictions can be extracted by pooling the output graph features*
 
@@ -311,8 +309,6 @@ Table 3展示了自监督学习场景下的结果。GMN学到的网络表示经�
 
 Figure 8提供了OOD设置下Diverse Architectures数据集上预测准确率与真实准确率的散点图。GMN的预测点紧密围绕对角线分布，而DMC在测试集上出现大量偏离，DeepSets则呈现系统性低估。该可视化直观佐证了定量结果：GMN的等变性结构先验在分布外泛化中起到了关键的正则化作用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2312_04501/figures/006_Figure_5.jpg]]
 *Figure 5: Histograms of CIFAR-10 accuracies for our Varying CNNs and Diverse Architectures datasets. Left and middle show train and test accuracy for the two datasets. Right shows test accuracy of Diverse Architectures split by model type*
 
@@ -327,9 +323,6 @@ Figure 8提供了OOD设置下Diverse Architectures数据集上预测准确率与
 
 ![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2312_04501/figures/009_Table_4.jpg]]
 *Table 4: Glossary and notation*
-
-![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2312_04501/figures/012_Table_5.jpg]]
-*Table 5: Hyperparameters for the CIFAR-10 image classifiers that we trained for the predicting accuracy experiments in Section 5.1*
 
 ## 定位与知识库关联
 

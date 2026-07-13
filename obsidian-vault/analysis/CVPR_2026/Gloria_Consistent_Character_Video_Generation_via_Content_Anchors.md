@@ -60,15 +60,11 @@ Gloria 的核心创新在于**内容锚点框架**，包含三个关键设计：
 ### 主要结果概要
 在长时一致性测试集上，Gloria 的 Subject Consistency 达 **0.960**、Background Consistency 达 **0.951**、Arcface 达 **0.787**，显著优于所有对比方法（Table 1）。在多视角外观与表情身份一致性测试中，DINO-I 达 **0.821**、CLIP-I 达 **0.858**、Exp. 达 **0.717**，大幅领先多参考方法（Table 2）。消融实验（Table 4、Figure 7、Figure 8）证实：超集内容锚定消除了复制粘贴模式，RoPE弱条件有效解决了多锚点冲突，注意力可视化（Figure 10）进一步验证了模型在角色转身时对视角锚点的高度关注。此外，Gloria 支持生成超过 10 分钟的连续角色视频，并在基础能力测试（Table 3）和 CelebV-HQ 基准（Table 7）上全面领先。
 
-
-
 角色视频生成是当前视觉内容创作的核心需求之一，其目标是在保持角色外观一致性的前提下，生成长时间、多视角、表情丰富的动态视频。近年来，扩散模型（diffusion models）的快速发展显著提升了视频生成的视觉质量与运动自然度，但在**角色身份一致性**这一关键维度上仍存在明显瓶颈。
 
 现有方法通常依赖单一参考图像或文本描述来约束角色外观。这类方案在短视频片段中尚可维持基本一致性，但面对**长序列生成**时，参考信息逐渐稀释，导致角色外观漂移、背景退化，甚至出现“复制粘贴”式的伪影（copy-paste pattern）。部分工作尝试引入多参考帧来增强约束，但由于缺乏对参考帧类型的结构化区分，不同锚点之间容易产生注意力冲突，反而引发生成混乱。此外，现有方法在同时处理**多视角外观保持**与**表情身份一致性**两个子问题时，往往顾此失彼——要么视角切换时角色特征丢失，要么表情变化时身份信息被覆盖。
 
 Gloria 的动机正是源于这一观察：**角色视频生成本质上是一个“从外向内看”的场景**，即用户需要从不同角度观察同一角色在不同表情下的动态表现。因此，一个紧凑而结构化的参考表征——而非零散的多帧输入——才是解决一致性问题的关键。基于此，Gloria 提出**内容锚点（Content Anchors）**框架，将角色视觉属性编码为一组精心构造的锚点帧（全局锚点、视角锚点、表情锚点），并设计配套的注入与消歧机制，使得模型能够稳定地参考这些锚点生成长达 10 分钟以上的一致角色视频。
-
-
 
 ## 核心方法与创新机理
 
@@ -98,8 +94,6 @@ Gloria基于**Wan-I2V**架构构建，属于视频扩散模型（Video Diffusion
 - **商业模型**（如**Kling**、**Vidu-Q2**）：这些模型在基础生成能力上表现强劲，但在角色身份一致性方面缺乏专门的锚定机制。
 
 Gloria的独特贡献在于将“内容锚点”系统化为一套完整的框架，包含锚点类型设计、采样策略（SCA）和冲突消解机制（RWC），为角色一致性视频生成提供了可扩展的技术方案。
-
-
 
 Gloria 的整体流水线围绕“内容锚点”（Content Anchors）这一核心概念构建，将角色视频生成重新定义为“从外向内看”的场景：通过一组紧凑、结构化的锚点帧，持久地为生成过程提供外观与身份参考。流水线主要由数据构建、锚点编码与注入、多模态条件融合以及分块自回归推理四个环节构成，其整体结构如图 3 所示。
 
@@ -136,12 +130,8 @@ $$RoPE_i = RoPE(t + o_i + so_j, h_i, w_i)$$
 
 模型训练分为三个阶段递进进行：首先注入音频分支，确保基础的口型同步能力；随后引入全局锚点，建立长时一致性；最后加入视角和表情锚点，实现多视角外观与表情身份的一致性控制。这种渐进式训练策略有助于各模块的稳定收敛。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l990_https_arxiv_org_abs_2603_29931/figures/003_Figure_3.jpg]]
 *Figure 3: Overall of the Gloria pipeline, which includes the source of content anchors (Superset Anchors), the manner to inject these anchors (RoPE as Weak Condition), and the overall framework with multi-modal conditions e.g., text and audio*
-
-
 
 ### 3.1 内容锚点编码与注入
 
@@ -177,18 +167,11 @@ $$ \mathcal{L} = \mathbb{E}_{x_0, x_1, c, t} \left\| u(x_t, c, t; \theta) - v_t 
 
 长视频生成采用分块自回归策略：视频被划分为重叠的块（chunk），每块生成时以前一块最后 4 帧作为前缀 token 初始化去噪过程。相邻块之间通过线性混合权重进行过渡，权重为 $w = [1, 0.67, 0.33, 0]$，对前一块最后 $n$ 帧与后一块前 $n$ 帧执行 $w \cdot x_1 + (1-w) \cdot x_2$ 的加权融合。该机制保证块间过渡平滑，支持超过 10 分钟的连续视频生成。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l990_https_arxiv_org_abs_2603_29931/figures/002_Figure_2.jpg]]
 *Figure 2: The pipeline to construct training clips and charactercentric anchor frames, e.g., global, viewpoint, and expression. The blue arrow marks the subject’s forward orientation, whereas the green arrow marks the camera-facing direction*
 
-![[assets/figures/papers/paper_list_l990_https_arxiv_org_abs_2603_29931/figures/012_Figure_8.jpg]]
-*Figure 8: The left includes the first frame, viewpoint anchor frames and the text prompt. The right side shows generated videos, the bottom row indicates using “RoPE as Weak Condition” (RWC) while the top row dose not employ it*
-
 ![[assets/figures/papers/paper_list_l990_https_arxiv_org_abs_2603_29931/figures/009_Figure_7.jpg]]
 *Figure 7: (a) Ablation of the global anchor*
-
-
 
 ## 实验与关键发现
 
@@ -221,9 +204,6 @@ Gloria 围绕角色视频生成的三个核心维度——长时一致性、多�
 ![[assets/figures/papers/paper_list_l990_https_arxiv_org_abs_2603_29931/figures/008_Table_3.jpg]]
 *Table 3: Quantitative comparison of fundamental capability*
 
-![[assets/figures/papers/paper_list_l990_https_arxiv_org_abs_2603_29931/figures/007_Figure_6.jpg]]
-*Figure 6: The user study results of fundamental capability*
-
 在 CelebV-HQ 数据集上（Table 7），Gloria 的 FID 为 25.50、FVD 为 90.86，优于 **FantasyTalking**、**HunyuanAvatar** 和 **InfiniteTalk**（Yang et al., 2025）等以人物为中心的方法，证明了内容锚点框架在通用人物视频生成任务上的竞争力。
 
 ![[assets/figures/papers/paper_list_l990_https_arxiv_org_abs_2603_29931/figures/019_Table_7.jpg]]
@@ -252,22 +232,6 @@ Table 5 和 Table 6 分别展示了视角锚点和表情锚点的类别分布。
 3. **极端视角退化**：受限于训练数据分布，在极端或罕见视角下生成质量可能下降。
 4. **推理成本**：分块自回归推理虽支持长视频生成，但计算和时间成本较高。模型训练需 512 块 A800 GPU，复现门槛高。
 5. **领域泛化未验证**：在非人类角色（卡通形象、动物等）上的表现尚未探索。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l990_https_arxiv_org_abs_2603_29931/figures/005_Table_2.jpg]]
-*Table 2: Quantitative comparison of ap*
-
-![[assets/figures/papers/paper_list_l990_https_arxiv_org_abs_2603_29931/figures/013_Figure_10.jpg]]
-*Figure 10: Left: the first frame and a back-view anchor frame. Right: the generated results and the corresponding attention score curve of the generated sequence toward the back-view anchor. The upper and lower rows show results generated under different texts*
-
-![[assets/figures/papers/paper_list_l990_https_arxiv_org_abs_2603_29931/figures/011_Figure_9.jpg]]
-*Figure 9: Self-attention maps of the generated sequence and its attention toward the global anchor across different chunks (each lasting 5s). The rightmost dashed column indicates the attention score from the generated sequence to the global anchor frame*
-
-![[assets/figures/papers/paper_list_l990_https_arxiv_org_abs_2603_29931/figures/004_Figure_4.jpg]]
-*Figure 4: The user study results of expressive ID and multi-view appearance consistency*
-
-
 
 ## 定位与知识库关联
 
@@ -317,8 +281,6 @@ Gloria 的设计假设和实验设置定义了其当前适用边界，这些边�
 4. **效率优化**：如何通过模型蒸馏、锚点压缩、推理调度优化等手段降低模型规模和推理延迟，使方法适用于实时或近实时应用场景？
 
 5. **表情锚点精度提升**：82% 的表情锚点提取准确率仍有提升空间。更强的多模态大模型（MLLM）精炼策略，或端到端学习锚点选择，可能是改进方向。
-
-
 
 ## 原文 PDF
 

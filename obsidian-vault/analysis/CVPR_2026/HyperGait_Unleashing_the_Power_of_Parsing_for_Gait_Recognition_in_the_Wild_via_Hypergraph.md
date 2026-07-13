@@ -222,8 +222,6 @@ HyperGait 在两大野外步态识别基准上均取得领先性能，仅使用�
 
 当前实验分析中未报告明确的失败案例或局限性讨论。从方法设计角度，潜在局限包括：空间超图目前仅使用 5 个粗粒度身体部件，细粒度解析（如手指、脚部）的高阶关系未被探索；时序超图依赖固定分段策略，对步态周期长度变化的自适应能力有限；超图卷积层数仅为一层，更深层的超图架构可能带来进一步增益但尚未验证。以上分析需结合原文进行手动确认。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1064_https_openaccess_thecvf_com_content_CVPR2026_html_Zheng_HyperGait_Unleas/figures/009_Figure_4.jpg]]
 *Figure 4: Some exemplar results of Parsinggait, XGait, and our HyperGait. For convenience, we choose the middle frame and the frames with four intervals before and after it for visualization. The blue bounding boxes are queries. The green bounding boxes are the correctly matched results, while the red bounding boxes are the wrong results. The (a) - (c) represent the results under different queries, where the first row of each is the search result of Parsinggait, the second row is the result of XGait, and the third row is the result of HyperGait*
 

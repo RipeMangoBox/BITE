@@ -83,8 +83,6 @@ SplatSuRe 的选择性策略使SR成为3D重建的“按需补充”而非“全
 
 当前方法在锐利边界或高对比度区域仍可能出现少量伪影，且仅基于屏幕空间半径比判定采样充足性，未考虑纹理频率本身。在场景多视图采样极度密集时（如Mip-NeRF 360数据），方法优势减弱。未来工作可探索多尺度或频域的高斯保真度评估、动态阈值调整，以及将该选择框架推广至其他神经渲染表示（如NeRF系列）。
 
-
-
 ### 3D高斯泼溅与多视图重建的困境
 
 3D Gaussian Splatting（3DGS）已成为新视角合成的主流方法，通过显式3D高斯原语和可微光栅化实现高质量实时渲染。然而，3DGS的渲染质量高度依赖输入图像的分辨率——当训练视图为低分辨率（LR）图像时，模型缺乏足够的高频几何细节，导致渲染结果模糊，丢失纹理锐度与精细结构。
@@ -109,8 +107,6 @@ SplatSuRe的动机源于一个关键观察：**多视图LR数据中蕴含的高�
 - 比值 $\rho^{i}$ 较大的高斯意味着存在某些视角对其进行了更近距离的观测，其高频信息已隐含在LR数据中；比值接近1的高斯则表明所有视角对该区域的采样密度相近，缺乏额外的高频线索，**真正需要SR生成细节的正是这些区域**。
 
 基于这一洞察，SplatSuRe提出了一种**选择性超分辨率**策略：首先从LR预训练的3DGS模型中提取每高斯的屏幕空间半径比，将其映射为**高斯保真度分数**，量化每个三维区域的高频信息充足程度；然后渲染为逐视图的空间权重图，仅在欠采样区域赋予高SR权重，在已充分采样区域抑制SR监督。这种“按需注入”的方式在保持多视图几何一致性的前提下，最大化地利用SR模型的生成能力来提升渲染锐度。
-
-
 
 ## 核心方法与创新机理
 
@@ -145,8 +141,6 @@ SplatSuRe 的核心创新在于将单图超分辨率（SISR）以**选择性、�
 - **vs. 统一 SR（如 SRGS）**：SRGS 对所有像素施加等权 SR 监督，在已由其他视角充分采样的区域引入不必要的生成式细节，导致多视图不一致。SplatSuRe 的选择性机制从根本上规避了这一问题。
 - **vs. 先 SR 后重建（如 3DGS + StableSR）**：该基线在训练前对 LR 图像逐一超分，SR 模型的多视图不一致性被固化到输入中。SplatSuRe 将 SR 作为训练中的软约束，通过权重图灵活调节其影响。
 - **vs. 仅用 LR（如 3DGS LR）**：完全放弃 SR 导致渲染模糊，缺乏高频几何细节。SplatSuRe 在需要处精准注入 SR，在不需要处保持 LR 监督的视图一致性，实现了锐度与一致性的最优折衷。
-
-
 
 SplatSuRe 的核心思路是 **“仅在高频信息不足的区域引入生成式超分辨率，其余区域由多视图低分辨率一致性约束”**。其整体流水线由五个紧密耦合的模块构成，形成一条从低分辨率几何估计到选择性超分监督的闭环。
 
@@ -213,8 +207,6 @@ $$\mathcal{L} = (1 - \gamma) \mathcal{L}_{LR} + \gamma \mathcal{L}_{SR}$$
 
 消融实验表明，适度的 SR 使用（$\tau=1.1$）在锐度与一致性之间取得最佳折衷，而统一训练流程（合并预训练与微调）可在不牺牲性能的前提下减少训练开销（Table 6）。
 
-
-
 SplatSuRe 的核心在于构建一个**空间自适应的超分辨率监督机制**，通过量化每个三维区域在多视图中的高频信息充足性，仅在欠采样区域注入生成式细节。整个流水线围绕三个关键模块展开：高斯保真度分数计算、逐视图权重图渲染、以及选择性 SR 损失加权。
 
 ### 高斯保真度分数：量化多视图采样充足性
@@ -279,13 +271,6 @@ $$\mathcal{L}_{SR} = (1 - \lambda) \mathcal{L}_{1}^{W}(R_{HR}, I_{SR}) + \lambda
 
 在权重图高亮区域（欠采样），SR 监督被放大，驱动模型学习生成式高频细节；在暗区（充分采样），SR 监督被抑制，模型主要依赖 LR 真值保持多视图一致性。这种选择性机制是 SplatSuRe 在锐度与一致性之间取得平衡的关键因果旋钮。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2600_https_arxiv_org_abs_2512_02172/figures/004_Figure_4.jpg]]
-*Figure 4: Super-resolution weight maps. Bright regions indicate areas where generative detail is required, while dark regions correspond to areas well-sampled by other low-resolution views. Note that high weights are obtained in regions that are either not sampled closely, such as background trees behind the tractor, or where other views do not provide higher resolution information, such as the foreground table in the ballroom*
-
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -327,25 +312,6 @@ SplatSuRe 在三个主流基准上均取得一致的指标领先。在 **Tanks &
 - **对 SR 模型的依赖性**：若底层单图 SR 模型本身引入大量多视图不一致细节，选择性框架无法完全消除其影响。
 - 当前仅在**静态场景**上验证，动态场景或视频输入未涉及。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2600_https_arxiv_org_abs_2512_02172/figures/008_Figure_6.jpg]]
-*Figure 6: Effect of ratio threshold on Tanks & Temples [15]. Weight maps, where bright regions indicate higher SR influence, are shown below the corresponding ratio thresholds. τ =0 and τ =∞ correspond to zero and full use of super-resolution. SR is initially helpful in improving rendering quality, but excessive use worsens results. The effect of ratio threshold on different scenes is analyzed in Appendix A.3*
-
-![[assets/figures/papers/paper_list_l2600_https_arxiv_org_abs_2512_02172/figures/009_Table_3.jpg]]
-*Table 3: Comparison of SwinIR [16] and StableSR [27] on Tanks & Temples [15]. Experiments are performed at 4× superresolution using ratio threshold τ =1.1. Our method outperforms SRGS with either model. While SwinIR achieves higher PSNR due to its conservative reconstruction, we choose StableSR for our main experiments for its superior perceptual quality*
-
-![[assets/figures/papers/paper_list_l2600_https_arxiv_org_abs_2512_02172/figures/012_Table_6.jpg]]
-*Table 6: Quantitative comparison of our unified and two-stage pipelines at 4× SR across Tanks & Temples [15], Deep Blending [8], and Mip-NeRF 360 [1]. Experiments are performed using ratio threshold τ = 1.1. The best entry is bolded. The unified pipeline achieves similar performance to the two-stage approach while requiring less training time*
-
-![[assets/figures/papers/paper_list_l2600_https_arxiv_org_abs_2512_02172/figures/013_Figure_7.jpg]]
-*Figure 7: Representative scenes that benefit from an optimal amount of super-resolution. Top: Image quality vs. ratio threshold plots. Bottom: ground truth images illustrating scene structure for (a) ballroom from Tanks & Temples [15], (b) kitchen from Mip-NeRF 360 [1] and (c) francis from Tanks & Temples. Applying SR to the most poorly sampled regions yields large gains in image quality, whereas excessive SR introduces multi-view inconsistencies that sharply degrade quality. Most scenes exhibit this behavior, supporting our hypothesis that selectively applying SR is more beneficial than applying it uniformly*
-
-![[assets/figures/papers/paper_list_l2600_https_arxiv_org_abs_2512_02172/figures/014_Figure_8.jpg]]
-*Figure 8: Representative scenes that plateau in image quality or continue to benefit from increased amounts of super-resolution. Top: Image quality vs. ratio threshold plots. Bottom: ground truth images illustrating scene structure for (a) bicycle, (b) garden, and (c) stump from Mip-NeRF 360 [1]. Applying SR to the most poorly sampled regions yields large gains in image quality, while further increasing SR yields diminishing returns or no improvement. In particular, this occurs in scenes where the input images already contain substantial high-frequency detail and SR produces simpler sharpening or edge-enhancement effects rather than hallucinating new structure, making uniform application less harmful...*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 与现有工作的关系
@@ -382,8 +348,6 @@ SplatSuRe 的突破在于将“是否施加 SR”从**全局二值决策**变为
 3. **阈值 τ 的自适应调节**：当前 τ 为全局超参数，需手动调节以平衡锐度与一致性。能否在训练过程中根据场景统计或损失动态自适应调整 τ，是提升方法易用性的关键问题。
 
 4. **向其他神经渲染表示的推广**：高斯保真度分数的核心思想——基于多视图采样密度评估高频充足性——不依赖于 3DGS 的具体表示。该框架能否迁移到 NeRF 系列方法（通过沿光线的采样密度或射线覆盖范围定义类似度量），值得探索。
-
-
 
 ## 原文 PDF
 

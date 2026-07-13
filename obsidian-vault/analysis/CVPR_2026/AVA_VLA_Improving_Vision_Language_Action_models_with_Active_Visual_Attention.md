@@ -53,8 +53,6 @@ claims:
 
 在方法谱系上，AVA-VLA建立在OpenVLA-OFT的基础上，与UniVLA、FLOWER、RIPT-VLA、π0等同期工作形成对比。其独特贡献在于首次从POMDP视角显式建模VLA的历史上下文依赖，并通过轻量级的AVA模块实现历史条件化的视觉注意力调制，为VLA在顺序决策任务中的泛化和鲁棒性提供了新的技术路径。
 
-
-
 ### 机器人操作中的视觉-语言-动作模型
 
 视觉-语言-动作（VLA）模型已成为机器人操作策略学习的主流范式。这类模型通常以预训练视觉-语言模型（VLM）为骨干，将视觉观测和语言指令作为输入，直接输出机器人动作序列。其标准前向传播可形式化为：
@@ -96,8 +94,6 @@ $$\bar{\mathcal{A}}^t \sim \mathcal{P}_\theta(\mathcal{A}^t \mid \mathbf{x}^t, b
 - **保持计算效率**：新增模块应在不显著增加参数量的前提下带来可观的性能增益，确保方法的实用性和可部署性。
 
 由此，本文提出AVA-VLA框架，核心包含两个互补组件：循环状态投影模块（将前一步LLM隐藏状态映射为信念状态的神经近似）和主动视觉注意力（AVA）模块（利用该状态动态计算软权重，调制LLM所有层的视觉注意力矩阵）。据论文声明，这是首个从POMDP视角显式解决VLA历史上下文缺失问题的工作。
-
-
 
 ## 核心方法与创新机理
 
@@ -149,8 +145,6 @@ $$\mathcal{A}^t = \mathcal{Q}(\mathcal{M}_{\mathrm{parallel}}(z_I^t, \mathcal{V}
 
 值得注意的是，AVA 模块新增参数少于 50M，不足总模型参数的 1%，但在 LIBERO 和 CALVIN 基准上均带来了显著的性能提升。这一参数效率证明了性能增益源于 POMDP 框架和主动注意力机制的架构创新，而非简单的计算资源堆砌——在匹配训练设置（相同预训练起点、相同训练步数和批大小）下的公平对比实验（Table 7）进一步排除了额外计算量带来的混淆效应。
 
-
-
 AVA‑VLA 的整体设计围绕一个核心目标展开：将视觉‑语言‑动作模型从被动的、逐帧独立的感知模式，转变为能够主动利用历史上下文进行决策的闭环系统。框架的输入流、模块关系与输出流如图 2 所示，其逻辑链条可概括为以下四个阶段。
 
 **视觉与语言编码**  
@@ -168,12 +162,8 @@ AVA 模块 $\mathcal{V}$ 是框架的第二个核心组件。它接收当前视�
 **训练机制**  
 框架采用截断的沿时间反向传播策略进行端到端训练，时间窗口设为 $T=4$。除标准的动作预测损失外，还引入了注意力正则项 $\mathcal{L}_\omega$（公式 13），对软权重向量的均值施加 L2 惩罚，鼓励注意力聚焦于任务相关区域，抑制背景噪声的干扰。AVA 模块新增参数量不足总参数的 1%，但通过与循环状态初始化的协同作用，在长视界任务中带来了显著的性能增益。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2372_https_arxiv_org_abs_2511_18960/figures/002_Figure.jpg]]
 *Figure: xx x x x x x xFigure 2. Overview of the proposed AVA-VLA framework. At each timestep, the recurrent state is projected from the previous hidden state to preserve historical context and to initialize the current action tokens. Then the AVA module combines this recurrent state with textconditioned visual features from the current observation to generate soft importance scores, which modulate the visual attention matrices throughout the backbone LLM, enabling the model to focus on task-relevant regions based on both temporal context and current perception*
-
-
 
 ### 问题形式化：从 MDP 到 POMDP
 
@@ -228,12 +218,8 @@ $$\mathcal{L}_\omega^{t,n} = \| \mu(\omega^{t,n}) - c \| \tag{13}$$
 
 AVA-VLA 采用截断的时间反向传播（Truncated BPTT）进行训练，时间窗口 $T=4$，以平衡计算可行性与时序依赖学习的需求。循环状态 $\boldsymbol{r}^{t-1}$ 的梯度通过时间步反向传播，使模型学会将历史信息压缩为对当前决策有用的潜在表示。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2372_https_arxiv_org_abs_2511_18960/figures/001_Figure_1.jpg]]
 *Figure 1: (a) Visualized comparison of the proposed AVA-VLA framework and vanilla VLAs. (b) Qualitative comparison of visual focus from two viewpoints while executing the task “turn on the stove and put the moka pot on it.” The vanilla OpenVLA-OFT [20] baseline fails to locate the task-critical “stove” switch, whereas AVA-VLA exhibits more stable focus by leveraging historical context*
-
-
 
 ## 实验与关键发现
 
@@ -273,30 +259,8 @@ AVA-VLA在模拟与真实世界基准上均取得了最优表现，且其增益�
 
 尽管AVA-VLA在整体上表现优异，论文指出了两个关键局限。第一，在长视界任务中，微小的感知或状态估计误差会随时间累积，导致**信念漂移**（belief drift），进而引发抓取、放置等精确操作失败。这一现象在LIBERO-Long任务及高视觉令牌修剪率下尤为明显。第二，训练中采用的截断BPTT策略（时间窗口T=4）可能不足以捕捉非常长期的依赖关系，限制了循环状态对远历史信息的建模能力。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2372_https_arxiv_org_abs_2511_18960/figures/003_Table_1.jpg]]
 *Table 1: Comparison on the LIBERO benchmark. The results are reported in two groups: one policy for all 4 suites, and one policy per suite. The best results in each column of each group are highlighted in bold*
-
-![[assets/figures/papers/paper_list_l2372_https_arxiv_org_abs_2511_18960/figures/004_Table_2.jpg]]
-*Table 2: Comparison on the CALVIN ABC→D benchmark. The results are reported in terms of success rates (%) and average length. The best results in each column are highlighted in bold*
-
-![[assets/figures/papers/paper_list_l2372_https_arxiv_org_abs_2511_18960/figures/007_Table_4.jpg]]
-*Table 4: Ablation study on the two key components in the AVA-VLA framework. The results on LIBERO in terms of success rates (%) under the “one policy for all 4 suites” setting are reported. The best results in each column are highlighted in bold*
-
-![[assets/figures/papers/paper_list_l2372_https_arxiv_org_abs_2511_18960/figures/012_Table_9.jpg]]
-*Table 9: Ablation study of the two modules on the CALVIN ABC→D benchmark. ”+init” denotes enabling state-based initialization only, and ”+ava” denotes enabling the AVA module only. The results are reported in terms of success rates (%) and average length. The best results in each column are highlighted in bold*
-
-![[assets/figures/papers/paper_list_l2372_https_arxiv_org_abs_2511_18960/figures/014_Table_8.jpg]]
-*Table 8: Ablation study of the loss design on the LIBERO benchmark. The results in terms of success rates (%) under the “one policy for all 4 suites” setting are reported. We remove the L2 penalty regularizer*
-
-![[assets/figures/papers/paper_list_l2372_https_arxiv_org_abs_2511_18960/figures/006_Table_3.jpg]]
-*Table 3: Ablation study on the model backbones. Comparison on the LIBERO-Long task suite in the LIBERO benchmark in terms of success rates (%). The best results of each model backbone setting are highlighted in bold*
-
-![[assets/figures/papers/paper_list_l2372_https_arxiv_org_abs_2511_18960/figures/009_Table_5.jpg]]
-*Table 5: Study on the visual token pruning with different pruning ratios. The results on LIBERO in terms of success rates (%) under the “one policy for all 4 suites” setting are reported*
-
-
 
 ## 定位与知识库关联
 
@@ -343,8 +307,6 @@ AVA-VLA 的核心创新在于将策略学习重新表述为部分可观察马尔
 3. **训练效率优化。** 截断BPTT的序列长度 $T=4$ 是在计算可行性与时序学习之间的折中。是否存在更高效的训练策略（如稀疏注意力、状态缓存复用）可以在不显著增加开销的前提下扩展有效时间视野？
 
 4. **多模态历史融合。** 当前循环状态仅编码视觉-语言联合信息，是否应当显式融合本体感觉（proprioception）或力觉信息，以构建更丰富的信念表示？
-
-
 
 ## 原文 PDF
 

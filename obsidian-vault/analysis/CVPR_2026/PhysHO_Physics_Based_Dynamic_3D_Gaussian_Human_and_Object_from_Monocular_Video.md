@@ -246,8 +246,6 @@ PhysHO 在一个自建的人-物交互数据集上进行评估，该数据集包
 
 当前分析材料中未提供明确的失败案例或局限性讨论。从方法设计推断，潜在风险包括：LBS 驱动先验依赖 SMPL 姿态估计精度，在严重遮挡或快速运动场景下可能引入驱动误差；神经残余本构模型的泛化能力受限于训练数据的材质多样性；MPM 仿真步长需要在精度与计算效率之间权衡。以上推断需结合原文局限性章节进行手动验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l17_https_openaccess_thecvf_com_content_CVPR2026_html_Jiang_PhysHO_Physics_B/figures/006_Figure_5.jpg]]
 *Figure 5: Qualitative comparison of dynamic reconstruction and future prediction with GART [30] and 4D-Gaus [63]*
 

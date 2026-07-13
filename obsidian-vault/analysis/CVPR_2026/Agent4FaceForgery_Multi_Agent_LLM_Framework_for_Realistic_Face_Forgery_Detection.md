@@ -76,8 +76,6 @@ Agent4FaceForgery 在方法谱系中占据独特位置：它不同于传统的�
 
 该工作可定位于**数据中心AI**与**多智能体模拟**的交叉领域，其核心贡献在于证明了：通过LLM驱动的生成式模拟构建的训练数据，能够有效弥补静态数据集与真实世界部署之间的生态鸿沟。
 
-
-
 ### 面部伪造检测的现实困境
 
 深度伪造（Deepfake）技术的快速演进使得逼真面部伪造的检测成为计算机视觉与多媒体安全领域的核心挑战。现有检测方法——无论是基于CNN的**Xception**（Chollet, 2017）、频域方法**SPSL**（Liu et al., CVPR 2021）、多模态Transformer **M2TR**（Wang et al., 2022），还是视觉-语言模型**CLIP-ViT**（Radford et al., 2021）与多模态大语言模型**LLaVA**（Liu et al., 2024）——在静态基准数据集上已取得可观性能，但在真实场景中的泛化能力始终是瓶颈。
@@ -100,8 +98,6 @@ Agent4FaceForgery的核心洞察在于：**要提升检测器的真实场景泛�
 2. **社会模拟（Phase 2）**：多角色智能体（Watcher、Explorer、Critic、Chatter、Poster）在模拟社交媒体环境中与伪造图像交互，填充自然的多轮对话细节，并构造图文不一致样本以训练检测器识别对抗性文本攻击。
 
 通过自适应拒绝采样（Adaptive Rejection Sampling, ARS）机制动态筛选高质量挑战样本，以及正负样本构造（Positive-Negative Sample construction, PNS）策略显式建模图文一致性标签，框架生成的多模态训练数据使检测器不仅能识别视觉伪造痕迹，还能捕捉文本-图像之间的语义矛盾——这是现有方法普遍缺失的能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -131,8 +127,6 @@ Agent4FaceForgery 的核心创新在于将面部伪造检测的数据生成范�
 ### 创新有效性验证
 
 消融实验直接验证了上述创新的贡献。在 Celeb-DF 数据集上，基线 LLaVA 模型（仅在 FF++ 上训练）的 AUC 仅为 51.8%。逐步引入各模块后：**FT 模块**（伪造树模拟）单独使用将 AUC 提升至 83.2%；**PNS 模块**（正负样本构造）单独使用可达 91.0%；完整框架（FT+ARS+PNS）最终达到 92.2% AUC，各模块均展现出增量贡献。跨数据集泛化实验进一步表明，该方法在 WildDeepfake（86.50%）和 Celeb-DF（87.10%）上均显著优于传统静态数据训练的检测器。
-
-
 
 Agent4FaceForgery 的核心设计理念是将逼真面部伪造检测的数据生成过程解耦为两个阶段，以克服单步错误累积和复杂依赖维护的难题。整体框架由 **LLM赋能的生成式智能体（Generative Agents）** 和 **媒体展示环境（Media Presentation Environment）** 两大核心部分组成，如 Figure 2 所示。
 
@@ -170,8 +164,6 @@ $$\delta ( x', \check{c'} ) = \begin{cases} 1, & \text{if } y = 1 \text{ and } c
 ### 数据流总结
 
 整个管线的数据流为：**FF++ 基准数据 → Profile 初始化 → 伪造蓝图生成（Phase 1）→ ARS 质量过滤 → 社会模拟交互（Phase 2）→ PNS 正负样本标注 → 多模态训练数据集**。该数据集随后用于微调多模态大语言模型（如 LLaVA）或视觉-语言模型（如 CLIP-ViT），以提升其在真实社交媒体环境中对逼真伪造的检测能力。
-
-
 
 ### 两阶段解耦生成范式
 
@@ -251,13 +243,6 @@ $$\delta ( x', \check{c'} ) = \begin{cases} 1, & \text{if } y = 1 \text{ and } c
 
 在社交模拟中，**Gemini Auditor** 角色专门生成具有故意欺骗性的陈述，例如将明显伪造的图像描述为“绝对真实”，或将真实图像标记为“可疑”。这些对抗性文本与 HighCritic 环境配置相结合，训练出的检测器在图文不一致识别上表现出最强鲁棒性（约 88.7% 不一致检测准确率）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2370_https_arxiv_org_abs_2509_12546/figures/001_Figure_1.jpg]]
-*Figure 1: The illustrative example of our proposed agentbased social simulation. Diverse agents engage in a humanlike deliberation on the image’s authenticity*
-
-
-
 ## 实验与关键发现
 
 ### 核心实验结果
@@ -269,13 +254,7 @@ Agent4FaceForgery 框架的核心验证围绕生成数据的有效性与检测�
 
 跨数据集泛化评估（Table 1）进一步支撑该结论。在 WildDeepfake 和 Celeb-DF 两个分布外数据集上，Agent4FaceForgery 增强的检测器分别取得 **86.50%** 和 **87.10%** 的 AUC，优于仅使用静态数据集训练的对比方法。这表明生成数据中嵌入的多样化伪造意图与社交上下文，有效提升了检测器对未知伪造模式的适应能力。
 
-![[assets/figures/papers/paper_list_l2370_https_arxiv_org_abs_2509_12546/figures/003_Table_1.jpg]]
-*Table 1: Frame-level cross-database evaluation from FF++(HQ) to DFD, DFDC-P, Wild Deepfake, and Celeb-DF in terms of AUC (%) and EER (%). The FF++ results represent intra-domain performance, while others represent generalization to unseen domains. The best results are indicated in bold, and the second-best results are underlined*
-
 鲁棒性测试采用 DF40 协议（Table 2），评估检测器面对六种先进伪造技术（如 uniface、e4s、simswap 等）时的表现。Agent4FaceForgery 增强模型取得平均 **93.9%** 的 AUC，证明 ARS 机制筛选的高难度样本与多样化智能体 Profile 所覆盖的广泛伪造痕迹谱系，显著增强了检测器对各类操纵算法的鲁棒性。
-
-![[assets/figures/papers/paper_list_l2370_https_arxiv_org_abs_2509_12546/figures/004_Table_2.jpg]]
-*Table 2: Assessing detector robustness to diverse manipulation algorithms within the FF++ dataset. We report frame-level AUC (%) against six techniques specified in DF40 (Yan et al. 2024b)*
 
 ### 消融研究
 
@@ -308,21 +287,8 @@ Table 3 从标注质量角度评估了 Agent4FaceForgery 生成的文本描述�
 ![[assets/figures/papers/paper_list_l2370_https_arxiv_org_abs_2509_12546/figures/005_Table_3.jpg]]
 *Table 3: Comparison of different annotation approaches. We report precision, recall and F1-score for annotation quality evaluation, AUC (%) and EER for CLIP-based forgery detection and ACC (%) and explanation quality (Precision/Recall) for MLLMs evaluation on FF++ and Celeb-DF (CDF) datasets*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2370_https_arxiv_org_abs_2509_12546/figures/010_Figure_3.jpg]]
-*Figure 3: Left (a): Comparison of forgery evasion capability (AUC, lower is better) evolution over simulation time for Agents with different profiles. Right (b): Comparison of MLLM detection accuracy (Inconsistency vs. Overall) when trained on data generated under different Social Environment configurations*
-
-![[assets/figures/papers/paper_list_l2370_https_arxiv_org_abs_2509_12546/figures/008_Table_5.jpg]]
-*Table 5: Results of different backbone models with and without Agent4FaceForgery on different datasets*
-
 ![[assets/figures/papers/paper_list_l2370_https_arxiv_org_abs_2509_12546/figures/013_Figure_4.jpg]]
 *Figure 4: Qualitative examples in challenge scenarios*
-
-![[assets/figures/papers/paper_list_l2370_https_arxiv_org_abs_2509_12546/figures/014_Figure_5.jpg]]
-*Figure 5: Qualitative examples of Agent-Generated Images*
-
-
 
 ## 定位与知识库关联
 
@@ -378,8 +344,6 @@ Agent4FaceForgery的开源范式提出了若干值得后续探索的方向：
 - **社交传播动力学**：当前Phase 2模拟的是围绕单张图像的静态交互，是否可以扩展为包含转发、二次创作、信息衰减等传播动力学的时间序列模型？
 
 这些问题指向一个更宏大的方向：将面部伪造检测从“静态分类任务”重新定义为“动态生态中的持续适应问题”，而Agent4FaceForgery为此提供了可行的技术基座。
-
-
 
 ## 原文 PDF
 

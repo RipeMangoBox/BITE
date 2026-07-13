@@ -76,8 +76,6 @@ claims:
 
 SearchAgent-X属于**系统级优化方法**，不改变模型权重或搜索智能体的推理逻辑。其技术假设轻量——仅要求token级生成调度和可覆盖的FCFS基础策略——使其可迁移至vLLM、SGLang等主流推理框架。该方法在方法谱系中填补了“搜索智能体专用推理系统”的空白，与通用前缀缓存（Prefix Cache）形成互补：前缀缓存提供KV复用能力，而优先级调度和非停顿检索确保这一能力在交错推理-检索场景下被有效释放。
 
-
-
 ### 搜索智能体的交错推理模式
 
 大语言模型（LLM）驱动的搜索智能体采用一种“推理–检索–推理”的交错工作模式：模型在生成过程中输出特殊的检索标记，触发对外部知识库的查询，检索结果被拼接回上下文后继续推理（Figure 7）。这种模式使智能体能够在多跳问答、事实验证等复杂任务中动态获取外部知识，但也引入了传统RAG系统所没有的系统效率挑战。
@@ -111,8 +109,6 @@ SearchAgent-X属于**系统级优化方法**，不改变模型权重或搜索智
 3. 现有检索机制缺乏对检索质量饱和的感知，无法在检索充分时提前终止，造成不必要的等待和资源消耗。
 
 因此，本文的核心动机是：**通过协同优化调度策略与检索机制，在保持生成质量不变的前提下，系统性提升搜索智能体的KV缓存利用率和端到端效率**。
-
-
 
 ## 核心方法与创新机理
 
@@ -164,8 +160,6 @@ $$\mathrm{RQ}_t = \frac{d_t - d_{\mathrm{best}}}{d_{\mathrm{worst}} - d_{\mathrm
 
 两个 changed slots 并非孤立优化，而是围绕 **KV 缓存命中率** 这一核心因果 knob 形成闭环：优先级调度从“调度侧”确保高价值缓存在显存中驻留，非停顿检索从“执行侧”缩短缓存的“危险窗口期”。单独启用前缀缓存在困难设置下（top-k=5）仅比 vLLM ANN 快 **1.01×**，唯有配合优先级调度和非停顿检索才能充分释放缓存红利（Figure 6 left），验证了二者的强互补性。
 
-
-
 ![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_BtWBi17eVi/figures/004_Figure_3.jpg]]
 *Figure 3: SearchAgent-X’s Architecture. Requests are scheduled with priorities. Reasoning and retrieval are interleaved, with a non-stall retrieval mechanism to avoid unnecessary waiting*
 
@@ -199,8 +193,6 @@ SearchAgent-X 的整体架构如 Figure 3 所示，由四个核心模块串联�
 ### 模块间协作关系
 
 各模块的协同逻辑如下：请求进入系统后，优先级调度器根据其当前状态分配优先级并决定调度顺序；被调度的请求进入推理引擎生成令牌，直至触发检索标记；检索器执行ANN搜索，非停顿机制在检索质量成熟或引擎就绪时提前终止搜索；检索结果经序列拼接后重新注入推理引擎；全程由前缀缓存管理器维护KV缓存，调度策略确保高复用潜力的请求优先获得GPU资源。这一设计将检索延迟对端到端效率的放大效应从83倍压缩至可控范围，实现了搜索智能体系统效率的系统性提升。
-
-
 
 ### 3.1 系统架构概述
 
@@ -283,8 +275,6 @@ Figure 9 对比了成熟退出与自然停止的检索轨迹：二者的候选�
 
 三个模块的协同使 SearchAgent-X 在保持生成质量不变的前提下，实现了 1.3–3.4× 的吞吐量提升和 0.2–0.6× 的延迟降低。
 
-
-
 ## 实验与关键发现
 
 ### 效率瓶颈的根因分析
@@ -301,12 +291,6 @@ Figure 9 对比了成熟退出与自然停止的检索轨迹：二者的候选�
 #### 生成质量保持
 
 SearchAgent-X在六个数据集上的平均Exact Match为0.430，与精确检索基线完全一致（Table 1）。两者的平均检索次数（约2.717次）和输出长度（约6822-6826 tokens）也几乎相同（Table 5），证明效率提升不以牺牲生成质量为代价。
-
-![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_BtWBi17eVi/figures/010_Table_1.jpg]]
-*Table 1: Generation Quality of SearchAgent-X and Exact Retrieval*
-
-![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_BtWBi17eVi/figures/019_Table_5.jpg]]
-*Table 5: Generation Quality of SearchAgent-X and Exact Retrieval*
 
 #### 离线推理效率
 
@@ -353,20 +337,12 @@ Figure 6展示了逐项叠加技术的效果分解（top-k=5的困难设置）�
 - **并发度鲁棒性**：在并发度1-200范围内，SearchAgent-X的KV缓存命中率保持在0.92以上，延迟和吞吐量均显著优于基线；但在极高并发度（>300）下，GPU资源饱和导致缓存命中率和吞吐量下降（Table 6）。
 - **优先级等级敏感性**：优先级离散化等级G对性能不敏感，G≥6后各项指标趋于稳定（Figure 10、Figure 11），表明方法无需精细调参即可获得稳定收益。
 
-![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_BtWBi17eVi/figures/028_Table_6.jpg]]
-*Table 6: System performance under different concurrency for vLLM and SearchAgent-X*
-
-![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_BtWBi17eVi/figures/030_Table_8.jpg]]
-*Table 8: Comparison of system efficiency under the NSW search engine*
-
 ### 失败模式与局限
 
 1. **极高并发退化**：当并发度超过300时，GPU计算资源成为瓶颈，缓存命中率和吞吐量均出现明显下降，说明调度策略在资源极度饱和时作用有限。
 2. **外部搜索API适配**：非停顿检索依赖可控的本地ANN搜索；对于外部搜索API，仅能通过异步并发多个请求来近似，效果可能打折。
 3. **优先级等级设定**：虽然G≥6后性能稳定，但最优值仍可能随模型平均检索次数轻微变化，目前缺乏全自动设定方案。
 4. **推理引擎依赖**：当前实现基于vLLM，迁移至SGLang等框架需额外适配工作。
-
-
 
 ## 定位与知识库关联
 
@@ -406,8 +382,6 @@ SearchAgent-X 的设计假设和适用边界可从以下几个维度界定：
 4. 是否可以将效率目标直接融入搜索智能体的训练过程，使模型学会生成更“缓存友好”的推理路径——例如减少不必要的检索调用或优化推理与检索的交错模式？
 
 > **注意**：上述开放问题均来自论文自身的讨论，目前尚无实验证据支持任何解决方案。第 4 点涉及训练层面的干预，与 SearchAgent-X 纯推理时优化的定位形成互补，但论文未提供任何初步验证。
-
-
 
 ## 原文 PDF
 

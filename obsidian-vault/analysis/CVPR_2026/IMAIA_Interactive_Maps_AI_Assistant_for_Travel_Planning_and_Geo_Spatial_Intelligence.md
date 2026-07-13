@@ -53,8 +53,6 @@ IMAIA 的核心洞察在于：将地图视口转化为可被 LLM 理解的视觉
 
 实验结果验证了这一设计路线的有效性：Maps Plus 将地点检测准确度从传统方法的不足 43% 提升至接近 90%（Table 1）；蒸馏后的空间推理模型准确度达到 84%，远超 Florence-VL 8B 的 27%，且推理速度比基于智能体的流程快 7.3 倍（1.7s vs. 12.4s）；融合多模态特征的 XGBoost 排序器在 Top-1 精度达到 80.4%，Top-3 召回达到 92.8%（Table 2）；在以人为本的导航模式下，需要转弯的场景平均步行时间从 3.28 分钟降至 2.08 分钟，直接可见场景则从 3.36 分钟降至 1.07 分钟。这些结果表明，通过模块化编排和任务对齐蒸馏，可以在不依赖超大规模模型的前提下，显著提升地理空间 AI 助手的精度与效率。
 
-
-
 ### 地图交互中的“最后一公里”困境
 
 现代地图应用已成为日常出行的核心工具，但其设计范式仍停留在以路径规划为中心的框架内。当用户进入实地探索阶段——尤其是在“最后100米”的场景中——现有地图服务暴露出两个根本性缺陷。其一，地图应用缺乏对**视图条件空间查询**的支持：用户面对地图上某个区域时，无法直接以自然语言询问“这个公园旁边的花朵形建筑叫什么”，因为系统无法将用户当前看到的地图视口与语义实体进行关联。其二，**摄像头到地点的接地**（camera-to-place grounding）严重不足：当用户举起手机拍摄街景时，系统难以将自我中心（egocentric）的视觉场景与地理坐标中的具体场所精确匹配，导致交互断裂。
@@ -70,8 +68,6 @@ IMAIA 的核心洞察在于：将地图视口转化为可被 LLM 理解的视觉
 ### 本文动机
 
 上述瓶颈指向一个核心洞察：地图探索、摄像头场景理解和以人为本的导航不应被视为三个独立问题，而应统一到一个模块化框架中。本文提出 **IMAIA（Interactive Maps AI Assistant）**，通过两个可互操作的组件——**Maps Plus** 和 **PAISA**——在轻量级多智能体编排下协同工作。Maps Plus 将地图视口转化为四叉树索引的结构化视觉提示，使 LLM 能够“看懂”地图；PAISA 则融合摄像头图像、地理位置、朝向和距离等多模态信号，实现自我中心场景与地理位置的精确接地。这一设计旨在以可替换的视觉语言后端，显著提升地点检测精度和空间推理效率，同时将导航从“跟随路径”转变为“指向目标”。
-
-
 
 ## 核心方法与创新机理
 
@@ -99,8 +95,6 @@ IMAIA 的核心创新在于将地图探索、摄像头场景理解和以人为�
 
 PAISA 采用 Orchestrator Agent 对用户查询进行语义解析和任务分解，协调 Location Intelligence Agent、Interactive Navigation Agent 和 Spatial Understanding Agent 三个专门代理协同工作（Figure 4, Figure 8）。这种模块化设计使得各组件可独立替换视觉语言后端，同时保持端到端的推理连贯性——从地点识别、候选排序、方向指引到场景确认的全链路闭环。
 
-
-
 IMAIA 由两个可互操作的组件构成——**Maps Plus** 和 **PAISA**——并通过一个轻量级多智能体编排器协调两者的工作流。Maps Plus 负责以地图为中心的空间理解，将地图视口转换为四叉树索引的视觉提示，使大语言模型能够理解地图视图中的地理实体并执行视口条件化查询。PAISA 则面向自我中心场景，融合摄像头图像、地理位置、朝向和距离等多模态信号，实现场景到地点的接地、以人为本的导航以及空间推理。两者协同，覆盖了从地图探索、实地导航到复杂地理空间查询的完整链路。
 
 ### 系统架构与模块关系
@@ -127,15 +121,8 @@ IMAIA 由两个可互操作的组件构成——**Maps Plus** 和 **PAISA**—�
 - **任务对齐蒸馏**：针对空间推理任务，通过三阶段蒸馏将 GPT-4o 的知识迁移到轻量级 Florence-2 模型，在保持 84% 准确度的同时实现 7.3 倍的推理加速（1.7 秒 vs. 12.4 秒）。
 - **方位感知导航**：以相对方向替代传统 turn-by-turn 路径导航，在需要转弯的场景中将平均行走时间从 3.28 分钟降至 2.08 分钟，在直接可见场景中从 3.36 分钟降至 1.07 分钟。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2639_https_arxiv_org_abs_2507_06993/figures/004_Figure_4.jpg]]
 *Figure 4: The user interface (left) of the Places AI Smart Assistant and its underlying multi-agent framework (right). PAISA offers two interface modes: a chatbot for answering user queries and an interactive navigation mode for destination guidance. The multi-agent framework consists of an orchestrator coordinating three specialized agents: the location intelligence agent, the interactive navigation agent, and the spatial understanding agent*
-
-![[assets/figures/papers/paper_list_l2639_https_arxiv_org_abs_2507_06993/figures/001_Figure_1.jpg]]
-*Figure 1: User interface of Maps Plus showing handling a query “What is the name of the flower-shaped building next to the park on the map” from the user*
-
-
 
 IMAIA 由两个互补组件构成——**Maps Plus**（地图中心的空间理解）和 **PAISA**（自我中心的场景理解与地理空间接地），两者通过轻量级多智能体编排器协同工作。
 
@@ -214,18 +201,8 @@ $$
 
 蒸馏后的模型准确度达到 **84%**（对比 Florence-VL 8B 的 27%，提升 57 个百分点），单次查询推理时间仅 **1.7 秒**，相较于基于智能体的流程（12.4 秒）实现 **7.3 倍加速**（Figure 11），验证了任务对齐蒸馏在空间推理场景中的有效性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2639_https_arxiv_org_abs_2507_06993/figures/002_Figure_3.jpg]]
-*Figure 3: Illustration of quadkey-based visual prompting*
-
-![[assets/figures/papers/paper_list_l2639_https_arxiv_org_abs_2507_06993/figures/005_Figure_5.jpg]]
-*Figure 5: Illustration of a person’s relative direction from the current position (ϕ1, λ1) to the destination(ϕ2, λ2)*
-
 ![[assets/figures/papers/paper_list_l2639_https_arxiv_org_abs_2507_06993/figures/003_Figure_2.jpg]]
 *Figure 2: Workflow comparison of four settings: a standalone MLLM, an MLLM with coordinates, an MLLM with verbose place context, and our Maps Plus approach*
-
-
 
 ## 实验与关键发现
 
@@ -270,9 +247,6 @@ XGBoost排序器融合了CLIP视觉-文本嵌入的余弦相似度、地理距�
 
 空间理解代理的核心挑战在于平衡准确度与推理速度。实验对比了三种方案（Figure 11）：
 
-![[assets/figures/papers/paper_list_l2639_https_arxiv_org_abs_2507_06993/figures/013_Figure_11.jpg]]
-*Figure 11: Example result of our proposed method compared with Off-the-shelf LLM*
-
 | 方法 | 准确度 | 单次查询耗时 | 相对加速 |
 |------|--------|------------|---------|
 | Florence-VL 8B（通用VLM） | 27% | — | — |
@@ -290,16 +264,6 @@ XGBoost排序器融合了CLIP视觉-文本嵌入的余弦相似度、地理距�
 3. **任务对齐蒸馏优于通用模型和智能体流程**：蒸馏模型在准确度上碾压通用VLM（84% vs. 27%），在速度上碾压智能体流程（1.7s vs. 12.4s），实现了帕累托占优。
 
 需要注意的是，步行时间实验的置信度相对较低（0.9），论文未详细说明测试场景的规模、多样性及统计显著性，该结论的泛化性需结合实际部署环境进一步验证。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2639_https_arxiv_org_abs_2507_06993/figures/009_Table_1.jpg]]
-*Table 1: POI detection accuracy across different methods illustrated in Figure 2. The proposed method significantly improves performance using the same LLM backbone*
-
-![[assets/figures/papers/paper_list_l2639_https_arxiv_org_abs_2507_06993/figures/008_Figure_7.jpg]]
-*Figure 7: Example of reasoning with the PAISA. The system answers user queries by reasoning over geospatial information: (top) providing directions to the nearest boba tea shop, (middle) justifying the choice based on shortest distance and comparative options, and (bottom) ranking alternatives by distance*
-
-
 
 ## 定位与知识库关联
 
@@ -346,8 +310,6 @@ IMAIA 处于**多模态LLM、地理信息系统（GIS）和具身导航**的交�
 3. **多用户协同导航**：在群体出行场景中，如何协调多个用户的相对方向和空间参考系？
 
 4. **隐私与计算卸载**：摄像头实时场景理解涉及隐私敏感数据，如何在端侧推理与云端查询之间取得平衡？
-
-
 
 ## 原文 PDF
 

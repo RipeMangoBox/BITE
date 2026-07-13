@@ -53,8 +53,6 @@ KV-Control 的核心洞察在于：**将连续几何约束编码为部位‑时�
 
 在方法谱系中，KV-Control 区别于三类现有轨迹控制范式：（1）ControlNet 式复制分支（OmniControl、InterControl），其参数开销与骨干规模线性相关；（2）测试时优化（MaskControl），其将计算成本转移至推理阶段；（3）分部位 VQ 码字优化（**TLControl**，Wan et al., ECCV 2024），其控制发生在潜在空间而非注意力内部。KV-Control 通过“冻结骨干 + 低秩 K/V 注入”的设计，在参数效率、推理速度和精度之间取得了新的平衡点，同时保持了文本先验的完整性——因为运动令牌查询序列逐点不变，文本交叉注意力完全不受干扰。
 
-
-
 ### 文本到动作生成中的轨迹控制困境
 
 文本到动作生成（Text-to-Motion）旨在从自然语言描述合成逼真的三维人体运动序列。近年来，基于离散潜在空间（如VQ-VAE）的掩码Transformer骨干在这一任务上取得了显著进展，能够在保持文本-运动语义对齐的同时生成多样化的运动。然而，纯文本接口缺乏对空间轨迹的精确约束能力——用户无法指定“绕圈行走”的半径、无法控制手腕在特定时刻的位置——这严重限制了生成式运动模型在动画制作、游戏开发和交互式角色控制等实际场景中的应用。
@@ -94,8 +92,6 @@ KV-Control旨在回答一个核心问题：**能否在保持预训练运动先�
 2. **PartVQ + T-Concat协同基底**：通过解剖部位化编码和序列展开令牌布局，为K/V注入提供可寻址的控制站点，使低秩投影能够精确调制相关自由度而不干扰无关部位。
 3. **保持文本先验的结构性保障**：冻结文本交叉注意力和全部骨干权重，确保控制适配器不会破坏预训练阶段建立的文本-运动语义对齐——实验表明，KV-Control在实现精确轨迹跟踪的同时，文本匹配分数（Match.）和运动多样性（Div.）与无条件生成基线保持一致（Table 5）。
 
-
-
 ## 核心方法与创新机理
 
 现有轨迹控制方法在参数效率与推理成本之间陷入两难：**MaskControl**（Pinyoanuntapong et al., ICCV 2025）通过复制骨干网络恢复逐层注意力实现控制，但引入大量参数冗余；**OmniControl**（Xie et al., ICLR 2024）和 **InterControl**（Wang et al., NeurIPS 2024）采用 ControlNet 式零初始化复制分支，参数开销通常占骨干的 40–100%；**TLControl**（Wan et al., ECCV 2024）则将成本转移至测试时优化，使每样本推理延迟显著增加。这些方法均未能在极小参数占比下同时实现高精度轨迹跟踪与文本先验保持。
@@ -131,8 +127,6 @@ $$\mathbf{h}_i = \mathbf{f}_{\mathrm{ctrl}} \mathbf{W}_i^{\mathrm{down}}, \quad 
 ### 决定性证据
 
 移除 K/V 适配器仅保留精炼循环的消融实验（Table 5）提供了因果性证据：冻结 T-Concat 骨干配合精炼循环可将位置误差降至 ~0.01 cm，但 FID 崩塌至 103.86。这表明适配器并非仅仅提供轨迹约束，而是**维持了运动流形的结构条件**——K/V 注入在自注意力内部创造了条件化的记忆检索路径，使精炼循环能够在保持生成质量的前提下优化轨迹精度。
-
-
 
 KV-Control 的整体设计围绕一个核心原则展开：**在冻结的运动生成骨干中，通过极低秩的键/值记忆注入实现轨迹控制，而不修改骨干的任何权重或文本交叉注意力**。图 2 给出了单次前向的完整流程，可划分为三个逻辑块。
 
@@ -191,12 +185,8 @@ $$
 
 推理时可选择不同强度的测试时优化策略（Table 1），从纯前馈（M0）到动态采样阶段优化（M3），在精度与延迟之间灵活权衡。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2606_05624/figures/002_Figure_2.jpg]]
 *Figure 2: KV-Control method overview. Single-pass left-to-right schematic; full equations and dimensions in §3.1–§3.3. Left: frozen co-designed PartVQ+T-Concat substrate (Q = 6 data-driven body-part codebooks unpacked along the sequence axis) into which motion tokens flow. Middle: per self-attention layer, the motion query stream Q is unchanged and the keys/values K, V are augmented with control-conditioned pseudo-tokens*
-
-
 
 ### 3.1 PartVQ：解剖部位感知的分区码本
 
@@ -251,8 +241,6 @@ $\hat{\mathbf{x}}_0^{\text{out}}$ 为预测的干净令牌，FK 为正向运动�
 ### 参数效率
 
 整个 K/V 注入机制（包括所有层的低秩投影和偏置）仅产生 **1.5 M 可训练参数**。相比之下，同一 T‑Concat 骨干上的 ControlNet 式复制分支需 39.3 M 参数（Table 2），且骨盆误差高达 1.24 cm。完整控制侧训练预算（含共享轨迹编码器的 9 M）为 10.5 M，而骨干 118 M 保持冻结。
-
-
 
 ## 实验与关键发现
 
@@ -310,9 +298,6 @@ Table 3 给出了完整的参数账本。KV‑Control 的轨迹控制机制（K/
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2606_05624/figures/001_Figure_1.jpg]]
 *Figure 1: KV-Control on PartVQ+T-Concat. Left: pelvis-trajectory error versus trainable trajectory-control mechanism parameters under the MaskControl-matched M2 setting; K/V injection uses mechanism parameters (including the shared trajectory encoder; see Table 3). Right: four out-of-distribution demos from the same trained adapter—walk wave, circle arms high, forward hop wall, and walk heart both hands; markers denote user-supplied targets, mannequin meshes denote generated motion*
 
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2606_05624/figures/005_Table_3.jpg]]
-*Table 3: Parameter accounting on the same frozen 118 M T-Concat masked-transformer motion backbone. Mechanism column = trajectory-control mechanism (Fig. 1 x-axis); Full = Mechanism + shared trajectory encoder*
-
 ### 单关节控制能力分析
 
 Table 6 展示了多关节适配器在单关节控制场景下的泛化能力。将受控关节集固定为单一解剖关节（骨盆、左/右腕、左/右踝、头），各关节平均位置误差为 **0.41 cm**，与全关节多关节设置（0.71 cm）相比更低——这符合预期，因为约束更稀疏。值得注意的是，各关节误差分布均匀（0.34–0.48 cm），未出现特定关节退化，说明多关节训练学到的 K/V 记忆具有部位选择性，可在推理时灵活激活。
@@ -334,20 +319,6 @@ Figure 3 展示了 OOD 轨迹控制的定性结果：同一骨盆单关节 K/V �
 4. **骨干依赖性**：当前控制适配器依赖预训练的 PartVQ + T‑Concat 基底，未验证在其他离散潜在运动骨干（如扩散模型或自回归模型）上的即插即用能力。
 
 > **注意**：以上局限均来自论文自述，其中跨骨骼迁移和骨干依赖性两点缺乏实验验证，需在实际部署中手动评估。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2606_05624/figures/007_Table_5.jpg]]
-*Table 5: Extended diagnostics under the MaskControl protocol; means unless noted. Match. is the motion-text matching score of Guo et al. (2022); Div. is intra-set feature variance with real-data Diversity ∼ 9.5*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2606_05624/figures/008_Figure.jpg]]
-*Figure: KV-Controlon User-Specified Out-of-Distribution Trajectories (oblique 3/4 view,8 keyframes)*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2606_05624/figures/010_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2606_05624/figures/011_Figure.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -390,8 +361,6 @@ KV-Control 在上述谱系中占据一个独特位置：**以1.5M机制参数（
 2. **约束类型扩展**：当前仅支持位置轨迹约束。能否在不显著增加开销的前提下，将控制信号扩展至速度、加速度、关节旋转上限等运动学/动力学约束？这可能需要在控制编码器中引入时域差分特征。
 3. **分区学习化**：PartVQ 的部位分区目前通过启发式聚类固定。是否可以让分区完全可学习（如通过注意力模式自动发现），同时保持解剖语义的可解释性？这涉及离散潜在空间的结构化学习问题。
 4. **交互式细粒度控制**：在交互式动画编辑场景中，能否通过动态启用/禁用特定层的 K/V 注入实现更细粒度的实时控制（如仅调制手部轨迹而保持下肢自然摆动）？这需要研究不同层对控制信号的响应特性差异。
-
-
 
 ## 原文 PDF
 

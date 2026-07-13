@@ -68,8 +68,6 @@ TDMM-LM在方法谱系中占据独特位置：
 
 **需要手动验证**：自然图像输入场景下，本方法在CorE上略低于Gemini-2.5 VLM（4.02 vs 4.21，Table 2），但考虑到每帧仅使用1个几何令牌而Gemini需要300–500个图像令牌，该结果反而凸显了几何表示的令牌效率优势。合成数据域偏差对真实场景泛化能力的影响尚需进一步评估。
 
-
-
 面部行为是人类交流的核心载体，承载着情感、意图和社交信号。近年来，大规模视觉语言模型（VLLM）在通用视觉理解任务上取得了显著进展，但在面部行为理解与生成这一特定领域仍面临根本性瓶颈。
 
 **核心瓶颈：逐帧图像分词导致微表情与动态时序信息丢失。** 现有VLLM（如**HumanOmni**（Zhao et al., arXiv 2025）、**Gemini-2.5 VLM**（Gemini Team et al., arXiv 2023））将视频处理为独立图像帧序列，每帧需消耗300–500个图像令牌。这种逐帧离散化策略存在双重缺陷：其一，大量令牌被用于编码静态纹理、光照和背景等与面部动态无关的信息，造成严重的计算冗余；其二，帧间微表情的连续变化——如嘴角的细微抽动、眉梢的短暂上扬——在像素级分词过程中被平滑或丢失，导致模型难以捕获时序依赖关系。
@@ -77,8 +75,6 @@ TDMM-LM在方法谱系中占据独特位置：
 **数据层面的结构性缺陷加剧了上述问题。** 现有面部视频数据集（如MEAD仅含8个情感类别，YouTube数据集含37个情感类别）存在严重的情感类别不平衡：大部分样本为中性表情，极端或复合情感（如“苦涩的微笑”“压抑的愤怒”）的样本极度稀缺。此外，这些数据集缺乏细粒度的文本-面部运动配对标注，难以支撑语言与面部行为之间的精确对齐学习。
 
 **本文的核心动机在于绕开像素瓶颈。** 面部表情的动态变化本质上可由低维3D几何参数（3D Morphable Model, 3DMM）有效表示——表情的起承转合、强度变化和时序演化均编码在紧凑的参数轨迹中。基于此洞察，本文提出**TDMM-LM**（Text-Driven 3D Morphable Model Language Model），将面部运动建模为离散几何令牌序列：每帧仅需1个令牌即可保留微表情的时序细节，在语言模型框架内实现高效的双向面部理解与生成。同时，构建了约80小时的合成语料库**Open3DFaceVid**，覆盖187个情感类别，提供迄今最大规模的文本-3DMM轨迹配对数据，从数据层面缓解情感不平衡与标注稀疏问题。
-
-
 
 ## 核心方法与创新机理
 
@@ -113,8 +109,6 @@ TDMM-LM 从根本上改变了这一范式：通过 **Geometry VQ-VAE** 将 3D �
 
 尽管几何令牌范式展现出显著优势，仍需注意其当前边界：（1）数据集完全由合成生成，对真实世界中光照、遮挡、非正面姿态等复杂因素的泛化能力尚未充分评估；（2）模型未利用音频信息，缺乏多模态面部表达理解能力；（3）几何令牌丢弃了纹理等视觉细节，可能削弱对细粒度外观差异的捕捉。这些限制指明了未来工作的方向——结合真实视频域适应、融合音频模态、以及探索几何令牌与视觉特征的协同表示。
 
-
-
 TDMM-LM 围绕一个核心洞察构建：面部表情的动态变化可以通过低维的3D几何参数（3DMM）有效表示，经向量量化后形成紧凑的序列令牌，每帧仅需一个令牌即可保留微表情的时序细节。基于此，整个框架将面部理解与动画统一在语言模型的范式之下，形成双向的信息流动。
 
 **数据集构建 → 几何令牌化 → 双向任务**，三者构成完整闭环：
@@ -136,8 +130,6 @@ TDMM-LM 围绕一个核心洞察构建：面部表情的动态变化可以通过
 **输入输出流**：在理解方向，输入为3DMM序列经VQ-VAE编码的离散令牌流，输出为自然语言描述；在生成方向，输入为自然语言提示词经LLM嵌入后的前缀，输出为自回归预测的几何令牌序列，最终解码为3D面部动画。两个方向共享同一几何令牌码本，形成统一的面部行为理解与合成框架。
 
 > **注意**：当前框架完全基于合成数据训练，未利用音频信息，对真实场景中光照、遮挡、非正面姿态等因素的适应能力尚未充分验证，这些限制需在实际应用中加以考虑。
-
-
 
 ### 3D面部几何表示
 
@@ -183,19 +175,6 @@ $$\mathcal{L}_1 = \|\mathbf{V} - \hat{\mathbf{V}}\|_1$$
 
 > **注意**：论文未提供完整的VQ-VAE码本损失、承诺损失（commitment loss）或Language2Motion中自回归Transformer的交叉熵损失的具体公式形式。上述 $\mathcal{L}_1$ 损失是论文明确给出的唯一公式，其余损失项需参考通用VQ-VAE和自回归语言模型的标准实践进行推断。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1056_https_arxiv_org_abs_2603_16936/figures/006_Figure_4.jpg]]
-*Figure 4: Geometry-aware facial tokenization learning. We quantize facial expression codes into a discrete codebook and enforce reconstruction in mesh space. The input facial expression codes are mapped to code indices, decoded back to FLAME meshes (bottom), and supervised with an*
-
-![[assets/figures/papers/paper_list_l1056_https_arxiv_org_abs_2603_16936/figures/005_Figure_5.jpg]]
-*Figure 5: Motion2Language. Geometry sequences are encoded into discrete facial tokens by the geometry encoder and fed, together with text tokens from the user prompt, into a LLM. Conditioned only on these geometry tokens, the agent generates naturallanguage descriptions of expression/head motion, enabling interactive question to answering about 3D facial behavior*
-
-![[assets/figures/papers/paper_list_l1056_https_arxiv_org_abs_2603_16936/figures/010_Figure_6.jpg]]
-*Figure 6: Language2Motion. The user provides a naturallanguage description of the desired facial behavior (top left). The text tokenizer converts the prompt into word-level tokens, while a paired 3D facial sequence is encoded into discrete geometry tokens by the geometry encoder. The autoregressive transformer predicts future geometry tokens conditioned on the text prefix*
-
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与设计动机
@@ -207,9 +186,6 @@ $$\mathcal{L}_1 = \|\mathbf{V} - \hat{\mathbf{V}}\|_1$$
 ### 数据集：Open3DFaceVid 的关键作用
 
 Open3DFaceVid是本文构建的约80小时合成面部运动语料库，通过多款T2V模型程序化生成多样化面部视频并提取每帧3DMM参数，形成大规模文本-3D面部参数配对数据。该数据集拥有**187个情感类别**（Figure 9），远超MEAD（8类）和YouTube（37类），为模型提供了丰富的表达空间。
-
-![[assets/figures/papers/paper_list_l1056_https_arxiv_org_abs_2603_16936/figures/014_Figure_9.jpg]]
-*Figure 9: Emotion coverage across datasets. Top-row: emotion-label distributions for (1) Open3DFaceVid, (2) MEAD [56], and (3) YouTube-derived clips, showing the number and balance of emotion categories (187/8/37 labels, respectively). Bottom-row: 2D projections of the corresponding facial (expression+pose) video embeddings, where Open3DFaceVid exhibits rich, well-separated clusters, while MEAD and YouTube provide coarser and less diverse affective coverage. Each point in the t-SNE [36] plots corresponds to the facialexpression features of a single video clip. Due to color variety limitations, we are unable to display all categories*
 
 消融实验（Table 4, Table 5）证实了数据集质量的决定性影响：在Motion2Language任务中，Open3DFaceVid上训练的模型CorE达到**3.97**，而MEAD和YouTube分别仅为3.03和2.74；在Language2Motion任务中，Open3DFaceVid训练出的模型在几何保真度与文本-运动对齐之间实现了最佳平衡。这验证了情感平衡的大规模配对数据是面部行为语言建模的关键瓶颈。
 
@@ -237,21 +213,11 @@ Figure 12揭示了有趣的非对称规模化特性：Motion2Language的性能�
 
 当前方法存在若干明确局限：（1）训练数据完全来自合成生成，对真实场景中细微表情、光照变化、遮挡等因素的泛化能力未经验证；（2）模型未利用音频信息，无法处理视听协同的表情生成；（3）几何令牌丢失了纹理等视觉细节，可能削弱对细粒度外观差异的捕捉。这些问题指向后续研究的关键方向——域适应、多模态融合、以及几何令牌与视觉特征的互补编码。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1056_https_arxiv_org_abs_2603_16936/figures/009_Table_3.jpg]]
 *Table 3: Quantitative evaluation of Language2Motion. Comparison with T2M-X and T2M-GPT on parameter-space measures*
 
-![[assets/figures/papers/paper_list_l1056_https_arxiv_org_abs_2603_16936/figures/011_Figure_7.jpg]]
-*Figure 7: Qualitative comparison for Motion2Language. For representative clips, we show the input frames/geometry. The Gemini/HumanOmni operate on rendered geometry, while our model relies on 3D facial tokens. Our approach produces more accurate descriptions of emotion/motion, closely matching GT annotations*
-
-![[assets/figures/papers/paper_list_l1056_https_arxiv_org_abs_2603_16936/figures/018_Figure_12.jpg]]
-*Figure 12: The scaling behavior of Motion2Language and Language2Motion. Left: token accuracy over training iterations for Motion2Language with Qwen3 backbones of different sizes (.6B-32B). Right: token accuracy for Language2Motion with LLaMAbased backbones (0.7B-3B)*
-
 ![[assets/figures/papers/paper_list_l1056_https_arxiv_org_abs_2603_16936/figures/016_Figure_13.jpg]]
 *Figure 13: Language-controlled expressive ablation. We modify one keyword in prompt and let the Language2Motion model generate the corresponding facial motion. The two happy prompts produce different intensity level, while the angry prompt yields clearly distinct mouth shapes, demonstrating fine-grained text control over emotional style*
-
-
 
 ## 定位与知识库关联
 
@@ -296,8 +262,6 @@ TDMM-LM的核心因果旋钮在于**将面部运动从像素空间迁移至3D几
 4. **动态码本设计**：当前Geometry VQ-VAE使用固定大小的离散码本。动态调整码本大小或引入层级化结构，可能在表示效率与运动表现力之间取得更好的平衡，尤其对于罕见表情或极端姿态的建模。
 
 5. **长序列与实时性权衡**：在需要处理长视频或实时交互的场景中，进一步压缩几何令牌序列（如引入时序池化或自适应帧率）同时保持运动语义完整性，是一个具有实际价值的研究问题。
-
-
 
 ## 原文 PDF
 

@@ -56,8 +56,6 @@ AVATAR（**A**udio-**V**ideo **A**gent for **A**lignment and **R**easoning）针
 
 在 Qwen2.5-Omni-7B 基线上，AVATAR 在 OmniBench 音视频理解基准上取得 **+4.9** 的绝对提升（标准 GRPO 仅 +1.2），在 Video-Holmes 和 MMVU 推理基准上分别提升 **+4.5** 和 **+5.4**。组件消融表明，分层重放缓冲区单独使用即可贡献 +3.6 的提升，TAS 在此基础上进一步带来增益，验证了两者的互补性。AVATAR 相比标准 GRPO 实现约 **5 倍样本效率**，仅需约 20% 的生成完成数即可达到目标性能。
 
-
-
 ### 多模态视频推理的强化学习瓶颈
 
 大语言模型（LLM）在文本推理上的成功，推动了多模态大语言模型（MLLM）向音视频理解领域的快速扩展。然而，视频推理面临独特的挑战：模型需要同时处理长时序的视觉信号与音频信号，并在冗长的推理链中完成规划、中间步骤执行和最终答案综合。以 GRPO（Group Relative Policy Optimization）为代表的在轨强化学习方法，虽然在纯语言推理中取得了显著成效，但在迁移到多模态视频推理时暴露出三个结构性缺陷。
@@ -79,8 +77,6 @@ AVATAR（**A**udio-**V**ideo **A**gent for **A**lignment and **R**easoning）针
 1. **离轨训练架构 + 分层重放缓冲区**：打破在轨策略的限制，通过难度感知的分层缓冲区复用历史经验。缓冲区按提示的平均奖励动态分区（简单/中等/困难），优先保留高难度样本以维持训练组内的奖励多样性。这一设计同时解决了数据低效（复用昂贵的历史样本）和消失优势（强制组内奖励非零分布）两个问题，将 GRPO 的“死区”转化为稳定的双峰优势分布。
 
 2. **时序优势塑造（Temporal Advantage Shaping, TAS）**：利用位置相关的抛物线加权函数，对推理链首尾令牌施加更强的学习信号，对中间令牌保持基准权重。这一设计以极简的无评判器方式，将 Transformer 的注意力汇聚效应转化为结构化的信用分配，使模型更高效地学习“规划”与“综合”这两个关键推理阶段。
-
-
 
 ## 核心方法与创新机理
 
@@ -115,8 +111,6 @@ VCRS 替代了嘈杂的组均值，使离轨训练信号更加稳定可靠。
 当特定提示长期处于高难度分区且策略探索停滞时，AVATAR 的**提示生成机制**（Hinting Mechanism）触发外部教师模型（Qwen2.5-VL-72B）生成高层提示，帮助策略逃离局部最优。该机制作为辅助组件，与核心的离轨架构和 TAS 形成互补。
 
 **关键杠杆总结**：AVATAR 的两大关键杠杆——离轨训练架构（解决数据低效与消失优势）和时序优势塑造（纠正统一信用分配）——并非简单叠加，而是产生协同效应。组件消融实验（Table 4）表明，分层重放缓冲区单独使用即可在 OmniBench 上提升 +3.6，加入 TAS 后达到 +4.9，验证了两者的互补性。
-
-
 
 AVATAR 的核心设计围绕标准 GRPO 的三个结构性缺陷展开：**在轨策略导致的数据低效**、**奖励同质引发的消失优势**，以及**统一信用分配对推理链不同阶段重要性的忽视**。为解决这些问题，AVATAR 构建了一个离轨训练架构，并引入时序优势塑造机制，形成从数据采样到梯度更新的完整闭环。
 
@@ -163,15 +157,8 @@ $$A_{i,\mathrm{off}} = \frac{R(o_i) - \overline{R}(q)}{\sigma_{R,\mathrm{off}}}$
 
 每个训练步的数据流如下：从当前策略生成在轨样本，同时从分层重放缓冲区采样离轨样本，按 4:4 的平衡比例混合；在轨优势使用组标准化计算，离轨优势使用 VCRS 基线计算；所有令牌的原始优势经 TAS 抛物线加权调制成形优势；最终通过裁剪的重要性采样目标与 KL 散度正则项更新策略参数。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1041_https_arxiv_org_abs_2508_03100/figures/001_Figure_1.jpg]]
 *Figure 1: Standard GRPO (top) vs. AVATAR (bottom). AVATAR enhances GRPO with two key components: (1) an off-policy architecture using a stratified replay buffer to improve data efficiency, and (2) Temporal Advantage Shaping (TAS), a novel credit assignment strategy that focuses learning on critical reasoning steps*
-
-![[assets/figures/papers/paper_list_l1041_https_arxiv_org_abs_2508_03100/figures/003_Figure_3.jpg]]
-*Figure 3: Three-stage RL training pipeline to evaluate AVATAR. The framework advances from Cold start SFT (Stage 0) to Visual Reasoning (Stage 1) to Audio-Visual Reasoning (Stage 2) to Audio-Object Localization (Stage 3)*
-
-
 
 AVATAR 在标准 GRPO 框架上引入两个关键模块，分别解决数据效率与信用分配两大瓶颈。以下逐一拆解其设计动机、公式化定义与变量含义。
 
@@ -238,16 +225,6 @@ AVATAR 采用多阶段奖励组合（详见 Table 1），核心奖励组件包�
 
 不同训练阶段采用不同的奖励权重组合：Stage 1（视觉推理）使用 $0.5 \times R_{\mathrm{format}} + 0.5 \times R_{\mathrm{acc}}$；Stage 2（音视频推理）引入 $R_{\mathrm{self}}$；Stage 3（音频物体定位）进一步加入 $R_{\mathrm{judge}}$，形成递进式奖励课程。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1041_https_arxiv_org_abs_2508_03100/figures/002_Figure_2.jpg]]
-*Figure 2: To address GRPO’s uniform credit assignment (gray line), TAS applies a parabolic weighting function to amplify advantages during crucial planning and synthesis stages*
-
-![[assets/figures/papers/paper_list_l1041_https_arxiv_org_abs_2508_03100/figures/009_Figure_4.jpg]]
-*Figure 4: Advantage distribution comparison. (a) GRPO exhibits vanishing advantages with concentration around zero. (b) AVATAR maintains diverse advantages through replay buffer*
-
-
-
 ## 实验与关键发现
 
 ### 主实验：音视频理解与视频推理基准
@@ -311,19 +288,6 @@ Figure 11 的完整训练曲线显示，AVATAR 在训练初期经历短暂下降
 
 尽管 AVATAR 在离线视频基准上表现强劲，但其提示机制依赖外部教师模型（Qwen2.5-VL-72B）生成高层提示以帮助策略逃离局部最优，这增加了额外的计算开销。此外，当前验证仅限于离线场景，扩展到实时流式音视频推理仍是一个开放挑战。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1041_https_arxiv_org_abs_2508_03100/figures/005_Table_2.jpg]]
-*Table 2: AVATAR vs. state-of-the-art audio-video understanding models. Best scores within each RL block are in bold. Performance improvements from applying AVATAR to a baseline model are shown in green with 95% confidence interval (CI) margins (±) via bootstrap. ‡ Improvement not statistically significant at the 0.05 level. All results were reproduced by us; * denotes potential data contamination*
-
-![[assets/figures/papers/paper_list_l1041_https_arxiv_org_abs_2508_03100/figures/006_Table_3.jpg]]
-*Table 3: AVATAR on video understanding and reasoning benchmarks. Best scores within each RL block are in bold. Performance improvements from applying AVATAR to a baseline model are shown in green with 95% confidence interval (CI) margins (±) via bootstrap. ‡ Improvement not statistically significant at the 0.05 level. All results were reproduced by us*
-
-![[assets/figures/papers/paper_list_l1041_https_arxiv_org_abs_2508_03100/figures/020_Figure_10.jpg]]
-*Figure 10: Performance variation with TAS weighting*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 基线关系与改进脉络
@@ -375,8 +339,6 @@ TAS 的抛物线加权函数 $w_t = 1.0 + \lambda_{\mathrm{TAS}} \cdot (2\tilde{
 4. **与过程奖励模型的结合**：TAS 提供了一种无评判器的信用分配方案，而近期工作表明过程奖励模型（PRM）在数学推理中有效。两者的结合——以 PRM 提供细粒度步骤奖励，TAS 提供位置先验——是否能在长视频推理中产生互补增益，是一个值得探索的方向。
 
 5. **更大规模模型的验证**：当前实验集中在 7B 级模型。AVATAR 的增益是否随模型规模扩大而保持或衰减（即是否存在“规模不变性”），需要进一步验证。
-
-
 
 ## 原文 PDF
 

@@ -57,8 +57,6 @@ claims:
 
 **局限性**：公平性定义仅限于统计均等（Statistical Parity），不支持基于分类器的公平性概念（如均等化赔率、机会均等）或条件统计均等；理论保证依赖于“良好设定”假设（所有目标差异为零），实际中可能不严格成立；实验仅在表格数据上进行，未验证在图像或文本等非结构化数据上的适用性。
 
-
-
 合成表格数据生成在隐私保护、公平性与类别平衡三个维度上面临着相互加剧的瓶颈。现有方法通常仅解决其中一两个约束，且当三者同时施加时，隐私噪声会扭曲少数群体的统计估计，而公平性约束又进一步限制了受噪声影响的优化过程，导致两者相互恶化。具体而言：
 
 - **隐私机制**：标准高斯机制（CGM）或DP-SGD在数据稀缺环境下对少数群体引入的噪声比例更高，使得下游公平性优化难以收敛。
@@ -70,8 +68,6 @@ claims:
 **因果机制**：该方法通过三个可控的超参数调节约束间的权衡——DirP的超参数 $a$ 控制全局隐私预算与局部隐私的权衡（$a \to \infty$ 时达到完美隐私，但效用降低）；互信息正则化系数 $\lambda_F$ 控制生成结果与敏感属性之间的依赖程度（$\lambda_F=1$ 时MI降至接近0）；类别平衡系数 $\lambda_B$ 控制非敏感分类属性的均匀程度。实验证据表明，更高的隐私（更大的 $a$）不会阻止公平性，但会减慢公平性优化的收敛速度（Figure 9），且仅使用类别平衡（$\lambda_B=1, \lambda_F=0$）不会改变生成数据中的不公平性（Figure 10(a)）。
 
 **证据强度**：定理2在温和正则条件下证明了效用、公平性和类别平衡的联合一致性（置信度0.95），但该保证依赖于“良好设定”假设（所有目标差异为零），实际中可能不严格成立。消融实验（Figures 9-10）和成员推断攻击（Figure 6）提供了实证支持，但隐私与公平性之间的精确权衡关系仍需进一步理论刻画。
-
-
 
 ## 核心方法与创新机理
 
@@ -99,8 +95,6 @@ CBNP-VAECGAN 的核心创新在于将隐私、公平和类别平衡三个相互�
 
 **值得注意的局限**：公平性定义仅限于统计均等（Statistical Parity），不支持均等化赔率或机会均等等需要真实标签条件的公平性概念。理论保证（Theorem 2）依赖于“良好设定”假设，实际中可能不严格成立。
 
-
-
 ![[assets/figures/papers/iclr26_0001_j0czDrEnFc_A_Bayesian_Nonparametric_Framework_for_Private_F/figures/075_Figure_20.jpg]]
 *Figure 20: Overview of the triple policies (Fair–Private–Balanced) enforced by our proposed approach to address potential attacks*
 
@@ -111,8 +105,6 @@ CBNP-VAECGAN 是一个在贝叶斯非参数学习（BNPL）框架下，通过单
 **生成建模层** 采用 VAECGAN 架构，包含四个核心模块：编码器 E_η 将输入数据映射到潜在编码 c；代码生成器 CG_ω' 从噪声 ξ' 生成潜在编码 c̃；生成器 G_ω 以潜在编码 ℓ 和敏感属性 s 为条件生成合成数据；判别器 D_θ 区分真实数据和生成数据，驱动对抗训练（Algorithm 2, lines 7-10）。该架构结合了 VAE 的稳定编码能力和 GAN 的高保真生成能力，同时通过条件生成机制显式控制敏感属性的影响。
 
 **约束优化层** 通过 DirPDV 网络 T_ν 同时估计两个正则化项：DirPMINE 用于估计生成结果与敏感属性之间的互信息（Section 4.4.2, Definition 1），DirPKL 用于估计非敏感分类属性的 KL 散度（Section 4.4.3）。总损失函数为 `L_Utility + λ_F L_Fair + Σ λ_B L_Balance`（Eq. 9），其中 L_Utility 包含生成器-编码器、判别器和代码生成器的对抗损失，λ_F 和 λ_B 分别控制公平性和类别平衡的强度。该方法的核心洞察在于：通过 Dirichlet 过程的后验权重将隐私噪声结构化地注入到重采样过程中，使得隐私机制与后续的公平性/平衡性优化在同一个概率框架下协同工作，避免了传统方法中隐私噪声与公平性约束相互加剧的问题。
-
-
 
 CBNP-VAECGAN框架的核心在于通过贝叶斯非参数学习（BNPL）中的Dirichlet过程（DirP）将隐私、公平和类别平衡三个约束统一在一个生成器-解码器架构中。其关键模块和公式如下。
 
@@ -164,8 +156,6 @@ $$\mathcal{L}_{\mathrm{Utility}}(G_\omega, E_\eta, D_\theta, CG_\tau) + \lambda_
 | $T_v$ | DirPDV网络 | 估计互信息和KL散度的神经网络 |
 | $H^{\mathrm{Pert}}$ | 基于copula的扰动基测度 | 注入局部隐私并保持属性间依赖结构 |
 
-
-
 ## 实验与关键发现
 
 ### 主结果：公平性与保真度
@@ -175,7 +165,6 @@ CBNP-VAECGAN 在三个基准数据集（Adult、COMPAS、Bank Marketing）上同
 **Adult 数据集**是核心对比场景。图 3 展示了在隐私参数 a=5、λ_F=1（最大公平性约束）下，CBNP-VAECGAN 将 MI 从真实数据的 0.0256 降至接近 0，同时将统计均等（SP）从真实数据的 0.198 降至接近 0。相比之下，DECAF 等基线方法在公平性指标上显著落后，其生成数据的 MI 和 SP 仍明显偏离零。这一结果验证了 DirPMINE 正则化项能有效消除 Y 与 S 之间的依赖关系——不仅直接依赖，还包括通过混杂变量产生的间接相关。
 
 **COMPAS 数据集**上，表 2 给出了定量结果：真实数据的 MI(Y,S)=0.0259，F1=0.913，准确率=0.901。当 λ_F=1 时，生成数据的 MI 降至接近 0，而 F1 和准确率几乎不受影响（与真实数据持平）。表 1 进一步展示了条件概率 Pr(Y|S) 在不同种族群体间的分布：无公平性政策时，非裔美国人群体获得高风险评分的概率远高于其他群体；施加 λ_F=1 后，各群体的条件概率几乎完全相等。这表明公平性机制在消除群体间差异方面是有效的。
-
 
 ![[assets/figures/papers/iclr26_0001_j0czDrEnFc_A_Bayesian_Nonparametric_Framework_for_Private_F/figures/009_Table_1.jpg]]
 *Table 1: Pr(Y = “Score Text” | $\mathbf { S } = ^ { 6 4 } \mathbf { E t h m i c } ^ { 3 9 }$ ) for the generated samples. As shown in red, the generated data exhibits disparities in score text across ethnic groups without a fairness policy. For instance, African-Americans are classified as “High” risk with probability 0.146, compared to only 0.058 for Asians. These probabilities become nearly equal in the blue portions
@@ -221,16 +210,11 @@ CBNP-VAECGAN 在三个基准数据集（Adult、COMPAS、Bank Marketing）上同
 
 5. **全局隐私预算的复杂性**：Proposition 1 给出的全局隐私预算表达式（涉及多个超参数 η, η̄, γ, b）在实际使用中需要近似或数值计算，增加了部署难度。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0001_j0czDrEnFc_A_Bayesian_Nonparametric_Framework_for_Private_F/figures/011_Table_3.jpg]]
 
 ![[assets/figures/papers/iclr26_0001_j0czDrEnFc_A_Bayesian_Nonparametric_Framework_for_Private_F/figures/012_Table_4.jpg]]
 
 ![[assets/figures/papers/iclr26_0001_j0czDrEnFc_A_Bayesian_Nonparametric_Framework_for_Private_F/figures/013_Table_5.jpg]]
-
-
-
 
 ## 定位与知识库关联
 
@@ -265,8 +249,6 @@ CBNP-VAECGAN在现有表格数据生成方法的基础上，通过贝叶斯非�
 2. **隐私-公平性权衡机制**：高隐私预算下公平性优化收敛变慢的精确机制是什么？是隐私噪声增加了互信息估计的方差，还是Dirichlet过程权重限制了优化步长？当前工作仅观测到现象（Figure 9），未给出理论解释。
 3. **架构迁移**：如何将Dirichlet过程整合到自回归架构（如LLM）中？这需要解决序列生成中隐私预算分配和公平性约束的时序依赖问题。
 4. **连续敏感属性**：该方法能否扩展到连续敏感属性（如年龄、收入）？需要构造连续版本的互信息估计器，同时保持差分隐私保证。
-
-
 
 ## 原文 PDF
 

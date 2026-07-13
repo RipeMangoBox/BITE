@@ -55,15 +55,11 @@ claims:
 
 当前工作的主要局限在于：模型仅处理单视图医学图像，尚未涉及多视图、多模态影像的联合推理；SynMedVQA数据集完全由GPT-4o生成，问答质量受底层大模型能力制约，可能存在事实性错误或领域偏见。
 
-
-
 医学视觉问答（Medical VQA）旨在根据医学影像和自然语言问题自动生成准确答案，是临床辅助决策与医学教育中的关键技术。近年来，通用视觉语言模型（VLMs）在自然图像理解上取得了显著进展，但其在医学领域的迁移面临一个核心矛盾：**标注数据的稀缺与大型模型高计算需求之间的冲突**。医学影像的标注高度依赖专家知识，获取成本极高，导致可用的训练数据远少于通用领域；与此同时，参数规模达数十亿的大型VLM（如 **Gemma3** (Gemma Team, arXiv 2025) 的4B版本、**Qwen3-VL** (Yang et al., arXiv 2025) 的4B版本、**LLaVA-Med** (Li et al., NeurIPS 2023) 的7B版本）虽然在零样本或少样本场景下展现出一定潜力，但其推理所需的计算资源与存储开销严重制约了在临床边缘设备上的可部署性。
 
 现有轻量级VLM在医学VQA任务上的表现普遍不足，其瓶颈可归结为两个层面：其一，视觉编码器提取的特征缺乏对医学影像全局结构与语义先验的有效建模，导致对需要结构性推理的问题（如器官定位、病变范围判断）泛化能力薄弱；其二，视觉与文本模态的融合多采用标准交叉注意力或直接拼接，未能充分捕获医学影像中细粒度局部区域之间的空间依赖关系，使得模型在回答涉及局部病灶特征的问题时容易出现定位偏差或遗漏。
 
 针对上述缺口，本文提出 **MedFG-VQA**——一个以轻量级大语言模型（**SmolLM2-360M-Instruct**）为核心、总参数量仅约795M的医学VQA框架。其设计动机源于一个关键洞察：**图像的离散余弦变换（DCT）低频分量天然编码了全局结构与语义信息**，通过可学习的频率记忆库（Frequency Memory Bank）对这一分量进行检索与残差融合，能够以极低的计算代价为轻量模型注入结构先验；同时，**跨模态注意力与动态KNN图卷积的混合设计**可以在不显著增加参数的前提下，高效对齐文本语义与视觉局部空间关系，从而弥合轻量模型与大型VLM之间的性能鸿沟。
-
-
 
 ## 核心方法与创新机理
 
@@ -108,8 +104,6 @@ MedFG-VQA在方法谱系上位于“轻量级VLM + 医学领域适配”的交�
 
 **需要手动核实**：FFT优于DCT的具体数值差异、以及GACA模块中KNN的k值选择，建议查阅原文Table 5和§3.2的完整描述。
 
-
-
 MedFG-VQA 的整体设计遵循“轻量视觉编码 → 频率域特征增强 → 图感知多模态融合 → 小语言模型生成”的流水线架构，如图2所示。该架构的核心目标是：在冻结视觉编码器与轻量大语言模型（LLM）的前提下，通过两个可插拔的轻量级模块——**频率记忆融合（FMF）**与**图感知交叉注意力（GACA）**——弥合视觉底层特征与高层语义推理之间的表达能力差距。
 
 ### 流水线模块与数据流
@@ -138,12 +132,8 @@ $$`\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{text}} + \lambda \mathcal
 
 其中 $`\mathcal{L}_{\mathrm{text}}`$ 为LLM生成答案的标准交叉熵损失，$`\mathcal{L}_{\mathrm{div}}`$ 为记忆多样性损失，通过最小化记忆向量间的非对角相似度来鼓励记忆库中的表示保持多样性。平衡系数 $`\lambda=0.5`$ 时达到最优性能（Table 4(c)）。训练采用分层学习率策略：LLM为5e-5，模态投影为0.003，FMF与GACA模块为0.0015，在SynMedVQA数据集上训练2个epoch。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l765_https_openaccess_thecvf_com_content_CVPR2026_html_Gu_MedFG_VQA_Low_Frequ/figures/003_Figure_2.jpg]]
 *Figure 2: The overall architecture of MedFG-VQA. The model consists of a vision encoder, a FreqMemoryFusion(FMF) module, a Graph-Aware Cross-Attention(GACA) module and a LLM*
-
-
 
 MedFG‑VQA 在冻结的视觉编码器与大语言模型之间插入两个轻量级核心模块——**FMF（频率记忆融合）** 与 **GACA（图感知交叉注意力）**，分别解决低频全局先验注入和多模态细粒度对齐问题。整体架构如 Figure 2 所示，视觉令牌依次经过 FMF 增强、GACA 融合后送入 LLM 生成答案。
 
@@ -186,8 +176,6 @@ $$\mathbf{I}_{\mathrm{fused}} = \mathbf{G} \odot \mathbf{I}_{\mathrm{enh}} + (1-
 $\odot$ 表示逐元素乘法。该门控机制使模型能根据具体样本动态平衡全局语义对齐与局部空间结构聚合。
 
 > **关键设计要点**：FMF 的可学习记忆库与多样性损失共同保证了低频先验的全局性与判别力；GACA 的 KNN 图是动态构建的——每个样本的图结构都基于其自身特征即时计算，无需预定义拓扑，这使得模块能适应不同成像模态和解剖结构的视觉布局。
-
-
 
 ## 实验与关键发现
 
@@ -234,18 +222,11 @@ Table 5展示了频域变换策略的对比。FFT在实验中表现优于DCT，�
 
 3. **频域方法的选择依据**：消融实验显示FFT优于DCT，但论文未深入解释该现象背后的机制（如相位信息保留、频谱分辨率差异等）。这一结论的泛化性需要更多验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l765_https_openaccess_thecvf_com_content_CVPR2026_html_Gu_MedFG_VQA_Low_Frequ/figures/008_Table_5.jpg]]
 *Table 5: Ablation studies on different frequency-domain transformation strategies and module against standard cross-attention*
 
-![[assets/figures/papers/paper_list_l765_https_openaccess_thecvf_com_content_CVPR2026_html_Gu_MedFG_VQA_Low_Frequ/figures/004_Table_1.jpg]]
-*Table 1: Overview of datasets statistics, including image and question counts for training, validation, and test splits. Open and Close questions share the same quantities*
-
 ![[assets/figures/papers/paper_list_l765_https_openaccess_thecvf_com_content_CVPR2026_html_Gu_MedFG_VQA_Low_Frequ/figures/010_Figure_5.jpg]]
 *Figure 5: Qualitative results against (a) Gemma3-4B , (b) Qwen3-VL-4B, and (c) LLaVA-Med v1.5. Responses are abridged for brevity*
-
-
 
 ## 定位与知识库关联
 
@@ -290,8 +271,6 @@ MedFG-VQA相对于既有方法的关键差异化体现在两个可插拔模块�
 2. **合成数据质量边界**：GPT-4o生成问答对的事实准确性如何系统评估？是否存在某些亚领域（如罕见病、复杂鉴别诊断）生成质量显著下降？这直接影响SynMedVQA作为训练集的可靠性上限。
 3. **记忆库的可解释性**：FMF中的可学习记忆向量是否对应可解释的医学结构原型（如特定器官形态、病变模式）？若能建立这种对应关系，将显著增强模型的临床可信度。
 4. **与其他轻量级技术的组合**：FMF和GACA作为可插拔模块，能否与量化、蒸馏、剪枝等其他轻量化技术协同，进一步降低部署门槛？
-
-
 
 ## 原文 PDF
 

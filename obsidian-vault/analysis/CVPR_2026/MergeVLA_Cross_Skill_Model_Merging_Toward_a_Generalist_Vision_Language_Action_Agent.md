@@ -52,8 +52,6 @@ claims:
 
 **主要结果**：MergeVLA_TIES在LIBERO基准上达到90.2%平均成功率，仅比单任务微调的MergeVLA低6.5个百分点，显著超越所有合并基线（合并基线的OpenVLA仅44.2%）。在LIBERO-Plus分布外泛化测试中达到62.5%，比单任务微调的OpenVLA高46.2个百分点。在RoboTwin跨具身设置中达到88.7%，与单任务微调持平。在真实世界SO-101机械臂上取得与单任务模型相同的90.0%成功率。这些结果表明，通过架构层面的可合并性设计，模型合并能够在多种具身和任务场景下实现接近单任务微调的性能。
 
-
-
 ### 通用视觉-语言-动作智能体的需求与挑战
 
 构建能够执行多样化操作任务的通用机器人智能体是具身人工智能的核心目标。视觉-语言-动作（VLA）模型通过将大规模视觉-语言模型（VLM）的语义理解能力与物理动作生成相结合，展现出实现这一目标的巨大潜力。然而，现有VLA模型面临一个关键瓶颈：**多技能统一与单技能性能之间的尖锐矛盾**。
@@ -83,8 +81,6 @@ claims:
 3. **测试时任务路由**：在实际部署中，任务身份通常是未知的。MergeVLA设计了一个无需训练的测试时任务路由器，通过分析VLM隐藏状态在动作专家价值子空间上的激活强度，自动推断当前任务并选择相应的任务掩码和专家头部。
 
 通过这种架构层面的重新设计，MergeVLA使模型合并技术首次在VLA领域实现了实用化的性能，为构建通用视觉-语言-动作智能体开辟了新路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -138,8 +134,6 @@ $$r_{\mathrm{T}, m} = \| \mathbf{P}_{\mathrm{T}}^{l} \mathbf{h}_{\mathrm{A}, m}^
 
 MergeVLA的核心创新在于**将VLA合并问题从“参数空间优化”重新定义为“架构兼容性设计”**：通过在架构层面消除LoRA的自私参数冲突和自注意力的跨层干扰，使得标准数据无关合并方法（TA、TIES、WUDI）能够直接应用于VLA模型，在仅损失6.5%成功率的情况下实现多技能统一（LIBERO: 90.2% vs. 96.7%单任务上限），且合并模型在OOD泛化（LIBERO-Plus: +46.2% vs. OpenVLA单任务微调）和跨具身迁移（RoboTwin: 88.7%）上展现出显著优势。
 
-
-
 MergeVLA 的整体设计围绕一个核心洞察展开：VLA 模型合并的根本障碍并非容量或数据不足，而是**架构诱导的任务干扰**——LoRA 微调在 VLM 骨干中产生高度任务独占的更新方向，同时动作专家的自注意力机制通过跨层信息传播累积不可调和的任务特定差异。为解决这一问题，MergeVLA 从三个层面重构了可合并性：**任务掩码稀疏激活**抑制 VLM 中的参数冲突，**交叉注意力动作专家**消除自注意力带来的跨层干扰，以及**测试时任务路由器**实现无需训练的推理时任务识别。
 
 ### 架构总览
@@ -171,12 +165,8 @@ MergeVLA 的三个设计决策构成了一条完整的因果链：
 
 在训练阶段，MergeVLA 首先对每个单技能模仿学习数据集 $\mathcal{D}_m = \{ \mathbf{I}_t^v, \mathbf{I}_t^w, L \}_{t=1}^T$ 独立微调得到 $M$ 个任务特定模型，每个模型包含 LoRA 适配器和动作专家参数。随后，通过标准数据无关合并方法（如 TA 或 TIES）计算合并更新 $\tau_{\mathrm{merge}} = \alpha \mathcal{R}(\{\tau_m\}_{m=1}^M)$，并对每个任务 $m$ 施加二进制掩码 $\mathbf{S}_m$，得到任务特定的合并参数 $\Theta_{\mathrm{merge}}^{(m)} = \Theta_0 + \mathbf{S}_m \odot \tau_{\mathrm{merge}}$。掩码的构建遵循规则 $\mathbf{S}_m = \mathbb{I}\left[|\tau_m| > \lambda |\tau_{\mathrm{merge}} - \tau_m|\right]$，基于参数重要性和对合并更新的主导性进行筛选。动作专家的浅层交叉注意力块参与合并，而深层专家头部保持任务特定。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2403_https_arxiv_org_abs_2511_18810/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison between the structures of different VLAs. OpenVLA uses a standard VLM for token-based action generation. VLA-Adapter adds an action expert with cross- and self-attention layers. MergeVLA simplifies this design by removing non-mergeable self-attention layers for effective merging*
-
-
 
 ### 4.1 任务掩码稀疏激活（Task-Masked VLM）
 
@@ -187,9 +177,6 @@ $$\tau_{\mathrm{merge}} = \alpha \mathcal{R}(\{\tau_m\}_{m=1}^M), \quad \Theta_{
 其中 $\mathcal{R}$ 为合并算子（如 **Task Arithmetic** (Ilharco et al., ICLR 2023) 或 **TIES-Merging** (Yadav et al., NeurIPS 2023)），$\alpha$ 为合并缩放因子。
 
 然而，直接合并导致严重的任务干扰。分析表明，合并 4 个 LIBERO 任务时，超过 **75%** 的 LoRA 参数仅被单一任务独占使用（即“自私参数”，Selfish Parameters），直接平均或符号合并必然产生冲突（Figure 3 左）。为此，MergeVLA 对合并更新施加任务特定的二进制掩码 $\mathbf{S}_m$：
-
-![[assets/figures/papers/paper_list_l2403_https_arxiv_org_abs_2511_18810/figures/003_Figure_3.jpg]]
-*Figure 3: Left: Selfish ratio of the masks from TA [21] and TIES [48] by merging different numbers of tasks. The selfish ratio is computed following Equation 4. Right: The average relative L2 distance across blocks between all pairs of action experts*
 
 $$\Theta_{\mathrm{merge}}^{(m)} = \Theta_0 + \mathbf{S}_m \odot \tau_{\mathrm{merge}} \tag{2}$$
 
@@ -234,8 +221,6 @@ $$r_{\mathrm{T}, m} = \| \mathbf{P}_{\mathrm{T}}^{l} \mathbf{h}_{\mathrm{A}, m}^
 任务相关性得分 $r_m = r_{\mathrm{T}, m} + r_{\mathrm{A}, m}$。路由器选择得分最高的任务 $m^* = \arg\max_m r_m$，激活对应的掩码 $\mathbf{S}_{m^*}$ 和专家头部。
 
 **关键发现**：使用价值（V）投影进行路由比使用键（K）或查询（Q）投影更可靠。仅 V 投影在 LIBERO 上平均成功率达到 **89.7%**（Table 5），而 K 或 Q 投影的路由准确率显著下降。这是因为价值投影直接编码了任务特定的输出变换，其子空间对任务身份更具判别力。路由器仅依赖初始观察，无需额外训练，但在任务切换的长周期操作中可能需要额外设计。
-
-
 
 ## 实验与关键发现
 
@@ -316,27 +301,8 @@ Figure 8展示了逐步合并OpenVLA语言模型块时的成功率变化：当�
 4. **零样本泛化缺失**：任务路由器依赖于已见任务的子空间信息，在训练时未见过的全新任务上无法工作，不具备零样本泛化能力。
 5. **任务切换假设**：任务路由器依赖于初始观察进行任务推断，在需要长周期任务切换的操作场景中可能需要额外的重路由机制。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2403_https_arxiv_org_abs_2511_18810/figures/006_Table_1.jpg]]
-*Table 1: LIBERO results across task splits. Comparison between finetuned and merged variants of MergeVLA. All numbers are success rates (%). S indicates that task masks are used during merging. “Params (B)” denotes the total number of model parameters (in billions) required to evaluate on all four tasks, including the LLM backbone and the action expert. Gray-highlighted rows correspond to per-task finetuned checkpoints evaluated on their own tasks, serving as upper-bound references for model merging*
-
 ![[assets/figures/papers/paper_list_l2403_https_arxiv_org_abs_2511_18810/figures/012_Table_5.jpg]]
 *Table 5: Ablation results of MergeVLA with different subspaces used for routing on LIBERO*
-
-![[assets/figures/papers/paper_list_l2403_https_arxiv_org_abs_2511_18810/figures/014_Figure_8.jpg]]
-*Figure 8: Success rate on the LIBERO-Spatial task when progressively merging the first k language model blocks of OpenVLA [27] using the Iso-CTS [31] merging algorithm. Each configuration merges four task-specific checkpoints and is evaluated over 10 trials per subtask*
-
-![[assets/figures/papers/paper_list_l2403_https_arxiv_org_abs_2511_18810/figures/004_Figure_4.jpg]]
-*Figure 4: Seven perturbation types in the LIBERO-Plus benchmark, used to evaluate robustness under visual and language shifts*
-
-![[assets/figures/papers/paper_list_l2403_https_arxiv_org_abs_2511_18810/figures/005_Figure_5.jpg]]
-*Figure 5: Experimental setup in the RoboTwin environment, featuring three robotic embodiments and a suite of manipulation tasks for cross-embodiment evaluation*
-
-![[assets/figures/papers/paper_list_l2403_https_arxiv_org_abs_2511_18810/figures/008_Figure_6.jpg]]
-*Figure 6: Setup of the real-world SO-101 arm experiments with three cube manipulation tasks*
-
-
 
 ## 定位与知识库关联
 
@@ -398,8 +364,6 @@ MergeVLA 在知识库中的定位可概括为：**首个系统性地从架构层
 3. **实证基准**：提供了 LIBERO、LIBERO-Plus、RoboTwin 和真实世界场景下的全面合并基准，为后续研究建立了评估标准。
 
 与现有工作的关系上，MergeVLA 与 **EMR**（测试时模型合并）等方向互补——前者关注架构层面的合并兼容性，后者关注推理时的动态组合策略。在更广泛的具身智能领域，MergeVLA 为多技能统一策略的学习提供了一条不同于多任务联合训练或持续学习的路径，其“合并优于遗忘”的理念可能影响后续 VLA 架构的设计选择。
-
-
 
 ## 原文 PDF
 

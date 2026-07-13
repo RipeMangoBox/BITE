@@ -56,8 +56,6 @@ claims:
 - 严格控制变量的实验中（相同框架、基元数、训练迭代数、每基元外观参数量），NHT 一致优于球谐模型和球面 Voronoi 模型，且保持实时渲染性能。
 - 在低基元数量区间（≤100k），NHT 的 PSNR 领先达 2dB 以上，直接验证了单基元表达力的显著增强。
 
-
-
 ### 基元表示的优势与瓶颈
 
 基于基元（primitive）的场景表示，尤其是以3D高斯喷洒（3DGS）为代表的方法，凭借其显式几何结构和高效的光栅化渲染管线，在实时新视角合成领域取得了突破性进展。这类方法将场景建模为一组离散的几何基元，通过alpha混合沿射线合成像素颜色，天然支持快速渲染与局部编辑。
@@ -82,8 +80,6 @@ claims:
 - **延迟着色减少推理**：将谐波编码后的特征沿射线alpha混合，最后每像素仅需一次MLP解码为RGB。相比每基元一次网络查询的方案，推理次数从O(基元数)降至O(像素数)，在密集基元场景下优势显著。
 
 这一设计在严格控制变量的实验中展现出显著优势：在相同框架、基元数、训练迭代数和每基元外观参数量下，NHT在MipNeRF360数据集上达到28.46 PSNR，比SV模型（28.15）提升0.31 dB，比SH模型（27.93）提升0.53 dB（Table 2）。尤其值得注意的是，在低基元数量区间（≤100k），NHT的PSNR领先超过2 dB（Fig. 5），直接验证了单基元表达力的显著增强——这正是几何与外观解耦带来的核心收益。
-
-
 
 ## 核心方法与创新机理
 
@@ -117,8 +113,6 @@ NHT 的外观表示与具体基元类型解耦。特征载体仅需随基元形�
 
 这三个 changed slots 构成一条完整的因果链：**特征嵌入**将基元转化为局部信号源 → **谐波编码**将信号分解为频率-振幅表示，突破单基元表达能力瓶颈 → **延迟 MLP 解码**在图像空间高效合成最终颜色，实现几何与外观的彻底解耦。控制变量实验（Table 2）在相同框架、相同基元数、相同参数量下，NHT 比 SV 提升 0.31–0.61 dB PSNR，比 SH 提升 0.53–0.70 dB，直接验证了外观模型本身带来的增益，排除了实现细节干扰。
 
-
-
 Neural Harmonic Textures (NHT) 提出了一套与基元类型无关的外观建模框架，核心思路是将几何与外观解耦，通过为每个基元附加可学习的局部特征向量，并在图像空间进行延迟神经解码，从而在不牺牲实时性能的前提下大幅提升单基元的表达能力。
 
 **总体流程**遵循四个顺序模块：
@@ -140,13 +134,6 @@ Neural Harmonic Textures (NHT) 提出了一套与基元类型无关的外观建�
 <figures>
 Figure 3: Illustrating our method in 2D. Each primitive is bounded by an ellipsoid in world space, which becomes a sphere in whitened canonical space (a). Considering a virtual bounding tetrahedron in this canonical space, we attach one N-dimensional feature vector
 </figures>
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l69_https_arxiv_org_abs_2604_01204/figures/001_Figure_1.jpg]]
-*Figure 1: Neural Harmonic Textures for novel view synthesis. We attach learnable feature vectors (right) to the virtual vertices of bounding tetrahedra encapsulating each primitive (center). After harmonic encoding and accumulation along the ray, a small neural network decodes the resulting signal into RGB color in a deferred manner (left). Source code and further results are available at https://research.nvidia.com/labs/ sil/projects/neural-harmonic-textures/*
-
-
 
 Neural Harmonic Textures (NHT) 的核心设计思路是：将基元从“颜色载体”升级为“局部谐波信号发生器”，通过**基元绑定特征嵌入 → 谐波编码 → Alpha混合累积 → 延迟MLP解码**四个模块，在保持基元表示结构优势的同时，大幅提升单基元的表达能力。
 
@@ -196,16 +183,6 @@ $$\mathbf{c} = \mathrm{MLP}_\theta \left( \sum_{i \in \mathcal{G}} \alpha_i T_i 
 $$\mathcal{L} = (1 - \lambda) \mathcal{L}_{\mathrm{L}_1} + \lambda \mathcal{L}_{\mathrm{D-SSIM}} + \lambda_\alpha \mathcal{R}_\alpha + \lambda_s \mathcal{R}_s$$
 
 其中 $\mathcal{R}_\alpha = \frac{1}{P} \sum_{i=1}^{P} \alpha_i$ 为不透明度正则项（抑制冗余基元），$\mathcal{R}_s = \frac{1}{P} \sum_{i=1}^{P} \lVert \mathbf{s}_i \rVert_1$ 为尺度正则项（防止基元过度膨胀）。消融实验（Table 14）表明，移除不透明度正则化导致PSNR下降至27.85，验证了其对质量的关键作用。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l69_https_arxiv_org_abs_2604_01204/figures/002_Figure_2.jpg]]
-*Figure 2: Neural Harmonic Textures applied to novel-view synthesis. We virtually attach feature vectors fi to the vertices of tetrahedra inscribing the Gaussian primitives3. Following 3DGUT [65], we evaluate the point along the ray where the projected Gaussian has maximum response. We barycentrically interpolate vertex features at that point, and encode them with sine and cosine functions into different channels. These are then alpha blended along the rest of the ray, until the resulting sum of harmonics is decoded by a shallow MLP in a single image-space pass*
-
-![[assets/figures/papers/paper_list_l69_https_arxiv_org_abs_2604_01204/figures/003_Figure_3.jpg]]
-*Figure 3: Illustrating our method in 2D. Each primitive is bounded by an ellipsoid in world space, which becomes a sphere in whitened canonical space (a). Considering a virtual bounding tetrahedron in this canonical space, we attach one N-dimensional feature vector*
-
-
 
 ## 实验与关键发现
 
@@ -260,30 +237,17 @@ Table 18展示了压缩效果：采用int8特征量化、int16位置量化、fp1
 
 基于MLP的外观模型收敛速度慢于SH模型，需要更多训练迭代才能达到同等水平。对于高视差室内场景，方法依赖中心相机光线正则化，可能限制极端视角变化下的泛化能力。动态场景虽在理论上受特征锚定支持，但缺乏连续变形的定量验证。更激进的量化（如int4）可能导致显著质量损失，需进一步研究。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l69_https_arxiv_org_abs_2604_01204/figures/005_Table_1.jpg]]
 *Table 1: Comparison on MipNeRF360 [1], Tanks & Temples [27], and Deep Blending [18], on Neural Field-style methods, primitive-based methods, and mixed neural field/primitive-based methods. For the MipNeRF360 datasets, we disable gsplat’s default downscaling and instead train and evaluate directly on the provided JPEGcompressed reference images following prior work. We measure the effect in Tab. 9. For our method, we use 64 features per primitive (16 per vertex), with a 128-wide × 3 hidden layers MLP, which results in a roughly similar number of total parameters as previous primitive-based approaches on average. For indoor scenes, which typically span a smaller spatial volume, we use 2M primitives, w...*
 
 ![[assets/figures/papers/paper_list_l69_https_arxiv_org_abs_2604_01204/figures/007_Table_2.jpg]]
 *Table 2: Quantitative results of our approach and baselines on the MipNeRF360 [1], Tanks & Temples [27], and Deep Blending [18] datasets, comparing our method against Spherical Voronoi [9] (SV) and regular SH models. We isolate the effect of our approach by implementing all methods in the same framework (gsplat [71] with its default downsampling), using the same number of primitives (1M), training for the same number of iterations (30k), allocating the same number of parameters per primitive for appearance (48) and using the same hyperparameters for all scenes. Our method uses a 128×3 hidden MLP. We improve reconstruction quality while still managing real-time performance (measured ona an RTX A6000...*
 
-![[assets/figures/papers/paper_list_l69_https_arxiv_org_abs_2604_01204/figures/008_Figure_5.jpg]]
-*Figure 5: Our method outperforms 3DGS and 3DGUT at all primitive counts. The improvement is particularly pronounced in the lowprimitive regime (≤ 100k), with deltas upwards of 2dB of PSNR*
-
 ![[assets/figures/papers/paper_list_l69_https_arxiv_org_abs_2604_01204/figures/009_Figure_6.jpg]]
 *Figure 6: Comparison between our and previous works on radiance field reconstruction on scenes from MipNeRF360 [1], Tanks and Temples [27]. Our method models high frequency detail and view dependent effects to a higher degree than previous works*
 
-![[assets/figures/papers/paper_list_l69_https_arxiv_org_abs_2604_01204/figures/010_Table_4.jpg]]
-*Table 4: Ablating the choice of feature encoding function (MipNeRF360 dataset)*
-
 ![[assets/figures/papers/paper_list_l69_https_arxiv_org_abs_2604_01204/figures/022_Table_14.jpg]]
 *Table 14: Ablation study on training strategies. The rows are not additive, i.e. we only test one strategy at a time. All experiments on the MipNeRF360 dataset, using 64 features per primitive and a 128×3 MLP. Note that the scale regularization (F) does not significantly affect reconstruction quality, but does improve render time*
-
-![[assets/figures/papers/paper_list_l69_https_arxiv_org_abs_2604_01204/figures/026_Table_18.jpg]]
-*Table 18: Impact of post-training compression on NHT at 100×. Averages over 15 images. Baseline: uncompressed fp32 features/parameters + fp16 MLP weights. int8 features: uniform 8-bit quantization with per-channel scale/offset. int16 positions: fixedpoint uint16 vertex positions. int8+int16+fp16 : combined quantization (features int8, positions int16, MLP fp16). + Zstandard/Brotli: entropy coding on the serialized payload*
-
-
 
 ## 定位与知识库关联
 
@@ -340,8 +304,6 @@ NHT 的核心技术贡献可映射到以下知识节点：
 | 压缩友好性 | int8 特征量化 + int16 位置 + fp16 MLP + Zstandard 实现约 3 倍压缩 | Table 18 |
 
 在实验知识层面，NHT 在 MipNeRF360、Tanks & Temples、Deep Blending 三个标准数据集上均达到 state-of-the-art 性能（Table 1），且控制变量实验（Table 2）严格排除了框架实现、基元数、训练迭代数、参数量等混杂因素的干扰，证据可信度高。消融实验覆盖了编码函数选择（Table 4）、特征维度（Table 16）、MLP 架构（Table 17）、训练策略（Table 14）和压缩方案（Table 18），为后续改进提供了清晰的因果调控杠杆。
-
-
 
 ## 原文 PDF
 

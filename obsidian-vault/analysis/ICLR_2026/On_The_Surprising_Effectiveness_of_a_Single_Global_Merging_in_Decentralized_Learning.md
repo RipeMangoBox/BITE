@@ -78,8 +78,6 @@ claims:
 
 当前验证主要限于视觉分类任务（CIFAR-100, Tiny ImageNet），在其他领域（如 NLP）及更复杂任务上的有效性尚待检验。理论分析依赖高阶平滑性和全局渐进锐化假设，实践中可能不完全满足。最终全局合并需要全连接通信，虽可通过多轮 gossip 近似（Figure C.6），但仍需额外开销。未来方向包括：设计自适应通信调度算法以自动维持关键共识边缘条件、将渐进锐化机制推广至异步及联邦学习场景、以及在实际地理分布式环境中的部署验证。
 
-
-
 ### 去中心化学习中的通信瓶颈
 
 在去中心化学习中，多个 agent 各自持有本地数据，通过交替执行本地模型更新和对等通信来协作训练一个全局模型。与联邦学习依赖中心服务器进行全局聚合不同，去中心化学习仅依赖 agent 之间的稀疏对等通信（gossip），这使其在隐私敏感和通信受限的场景下具有天然优势。然而，当数据分布高度异构（non-IID）且通信预算极度有限时，模型之间难以形成共识，导致各本地模型在参数空间内逐渐发散，最终损害全局泛化性能。
@@ -103,8 +101,6 @@ claims:
 3. **模型差异是否只能是有害的？** 从损失景观的角度看，适度的模型差异可能通过渐进锐化（progressive sharpening）效应为收敛提供额外动力，而非纯粹拖慢训练。
 
 这些问题的回答不仅关乎对去中心化学习动力学的理解，更直接影响实际部署中的通信调度策略设计。
-
-
 
 ## 核心方法与创新机理
 
@@ -139,8 +135,6 @@ $$U^{(t)} \triangleq \frac{1}{2}(\eta L_2 - 1)\nabla\mathcal{L}(\bar{\theta}^{(t
 ---
 
 **证据强度说明**：Theorem 1和Proposition 2的理论结果依赖于高阶平滑性假设（Assumption 2）和渐进锐化假设（Assumption 4），后者在一般非凸景观中的普遍性尚需更广泛的实证验证。实验证据主要来自视觉分类任务（CIFAR-100, Tiny ImageNet），在其他领域和更大规模任务上的泛化性有待进一步确认。
-
-
 
 本文提出的去中心化训练范式建立在**稀疏对等通信 + 单次全局合并**的极简流水线之上。其核心操作流程由四个顺序模块构成，模块间的输入输出关系直接体现了“以极小通信代价维持可合并性，最终一次性释放全局性能”的设计哲学。
 
@@ -185,8 +179,6 @@ $$\mathcal{L}\left(\sum_{k\in V} w_k\theta_k\right) \leq \sum_{k\in V} w_k\mathc
 | 模型差异角色 | 通过频繁同步消除 | 被忽略 | 自由发散 | 部分保留为建设性因素 |
 
 这一流水线在 Tiny ImageNet 上使用 CLIP ViT-B/32 和 ResNet-18 的实验中，以远低于联邦学习的通信代价，取得了与之相当的全局测试精度（Figure C.1, C.2），验证了“稀疏通信维持可合并性 + 单次全局合并释放性能”这一极简范式的有效性。
-
-
 
 ### 关键模块设计
 
@@ -254,8 +246,6 @@ $$\frac{24(1-p)\eta^2}{p^2}(\phi^2+\sigma^2) < \min\{\frac{(\eta L_2-1)\gamma^*\
 
 > **证据强度说明**：Theorem 1 和 Proposition 2 的推导依赖高阶平滑性（Assumption 2，导数有界至 4 阶）和全局渐进锐化（Assumption 4），这些假设在深度网络实践中可能不完全满足，其经验验证目前仅限于视觉分类任务。$U^{(t)}$ 的负性在真实非凸景观中的行为仍需进一步实证检验。
 
-
-
 ## 实验与关键发现
 
 ### 4.1 通信调度的时间分配效应
@@ -308,7 +298,6 @@ Figure C.5进一步验证了在不同数据异质性水平（α=0.1 vs. α=1.0�
 
 Table 1比较了并行SGD与去中心化SGD（DSGD）在非凸设定下的收敛率。本文的Theorem 1证明，DSGD的全局合并模型可以达到与并行SGD匹配的收敛速率，关键在于辅助项U⁽ᵗ⁾在渐进锐化假设（Assumption 4）下为负，使得模型差异部分转化为建设性加速因子。Proposition 2给出了U⁽ᵗ⁾ < 0的充分条件：学习率η > 1/L₂且损失梯度与Hessian迹的梯度负相关。这一理论结果解释了为何去中心化训练配合最终合并能在实践中达到甚至超越中心化联邦学习的性能（如Figure C.1a中观察到的加速现象）。
 
-
 ![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_zrFnwRHuQo/figures/003_Table_1.jpg]]
 *Table 1: Comparison of non-convex convergence rates for parallel SGD and DSGD, both run with m agents under non-IID data*
 
@@ -318,8 +307,6 @@ Table 1比较了并行SGD与去中心化SGD（DSGD）在非凸设定下的收敛
 2. **理论假设**：渐进锐化假设（Assumption 4）和四阶光滑性在实践中可能不完全满足，Proposition 2中η > 1/L₂的条件对深度网络的大学习率场景提出了约束。
 3. **最终合并成本**：全连接AllReduce在极度受限的带宽环境下可能不适用；gossip近似虽有效，但需额外通信轮数。
 4. **拓扑动态性**：未研究异步或动态变化网络拓扑下的可合并性维持。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_zrFnwRHuQo/figures/001_Figure.jpg]]
 *Figure: (a) CLIP ViT-B/32 (b) ResNet-18 (w/o pretraining) (c) Landscape before final merging (d) A comparative illustration of federated, decentralized, and local training*
@@ -335,8 +322,6 @@ Table 1比较了并行SGD与去中心化SGD（DSGD）在非凸设定下的收敛
 
 ![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_zrFnwRHuQo/figures/012_Figure.jpg]]
 *Figure: C.5: Global test accuracy (see Definition 1) for ResNet-18 trained with decentralized AdamW across 32 agents under different levels of data heterogeneity (Dirichlet α = 0.1 (a, c) vs. α = 1.0 (b, d); see Appendix C.1). Results are reported on both CIFAR-100 (a, b) and Tiny ImageNet (c, d). (a) 1 Round Final Gossip Merging (b) 5 Rounds Final Gossip Merging (c) 1 Round Final Global Merging*
-
-
 
 ## 定位与知识库关联
 
@@ -383,8 +368,6 @@ Table 1比较了并行SGD与去中心化SGD（DSGD）在非凸设定下的收敛
 3. **局部更新步数与混合速率的联合优化**。在实际大规模深度学习任务中，如何最优地权衡局部更新步数 $H$ 与通信图的混合属性 $p$？式 (11) 提供了理论指导，但将其转化为可操作的超参数选择策略仍需工程探索。
 
 4. **跨领域与真实部署验证**。将实验从视觉分类扩展到更广泛任务，并在真实地理分布式环境中验证方法的实用性，是推动该方向落地的关键步骤。
-
-
 
 ## 原文 PDF
 

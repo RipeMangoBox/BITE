@@ -56,8 +56,6 @@ claims:
 
 PGM 兼容现有的 MGM 采样器和蒸馏方法，可作为即插即用的替代方案。通过分区代替掩码这一关键操作，PGM 在保持任意顺序并行生成能力的同时，获得了类似自回归模型的推理效率，为生成模型在效率与质量之间的权衡提供了新的解决路径。
 
-
-
 序列生成模型的核心任务是将离散序列 $\mathbf{x} \in \{1, \dots, N\}^L$ 的联合分布 $p(\mathbf{x})$ 参数化，以支持高效训练和高质量采样。当前主流范式分为两大阵营：**自回归模型（ARM）** 和 **掩码生成模型（MGM）**，二者在推理效率与生成灵活性之间形成根本性权衡。
 
 **自回归模型** 将联合分布分解为前缀条件概率的乘积：
@@ -77,8 +75,6 @@ $$\mathcal{L}_{\mathrm{MGM}} := \mathbb{E}_{\mathbf{x} \sim \mathcal{D}, t \sim 
 这一效率鸿沟的根本原因在于：**MGM 无法在保持任意顺序并行生成的同时，获得自回归模型“仅处理干净令牌”的推理优势**。现有加速手段（如蒸馏、减少采样步数）虽能缓解问题，但未触及架构层面的冗余计算本质。
 
 本文的核心动机正是打破这一僵局：**能否设计一种生成范式，既保留 MGM 的并行、任意顺序生成能力，又在推理时仅处理干净令牌？** 这要求从根本上重新思考令牌破坏策略与信息流机制——不是优化掩码的使用方式，而是彻底消除掩码本身。
-
-
 
 ## 核心方法与创新机理
 
@@ -118,8 +114,6 @@ PGM 通过分区机制同时获得两类收益：
 ### 局限与待验证点
 
 尽管 PGM 在推理效率上优势显著，仍需注意以下限制：在小数据集（如 OpenWebText）上，PGM 可能需要增加参数量（更多层数或更大嵌入维度）才能在困惑度上超越 MDLM（Table 5）；互补掩码训练中会出现损失尖峰，虽未导致发散，但可能影响训练稳定性（Figure 6）；分区 Transformer 依赖定制的块对角注意力掩码，现有优化计算核心对其支持有限，训练吞吐量约为 MDLM 的 75%（Table 3）。此外，当前仅在文本和图像生成上验证，多模态扩展仍有待探索。
-
-
 
 分区生成模型（PGM）的核心设计思想是用**序列分区**替代掩码生成模型（MGM）中无处不在的 `[MASK]` 令牌，从而在保持并行、任意顺序生成能力的同时，获得类似自回归模型（ARM）仅处理干净令牌的推理效率。其整体 pipeline 围绕一个关键约束构建：序列被划分为两个互补的、互不可见的组，模型必须仅依赖对方组的信息来预测当前组。
 
@@ -166,8 +160,6 @@ PGM 的完整 pipeline 由三个核心模块串联构成：**分区编码器（P
 - **推理输入长度**：每一步只处理干净令牌（单组），而非全长含掩码序列，序列长度随生成逐步增长。
 
 这些设计使得 PGM 在单次前向传播中同时评估两个互补掩码率的 MDLM 目标，提供双倍梯度信号以降低训练方差，并在推理时获得 5–7.5 倍的吞吐量提升。
-
-
 
 ### 分区生成建模：从掩码到分区
 
@@ -216,8 +208,6 @@ $$V_{i;\cdot}^{\prime} = V_{i;\cdot} + \begin{cases} Y_{1}, & \text{if } g_i = 0
 
 在推理阶段，PGM 仅需处理干净令牌。由于组间无信息流，当预测组 0 时，模型输入仅为组 1 的令牌（不含任何 [MASK]），序列长度随生成逐步增加。这与 MGM 每一步必须处理全长含 [MASK] 序列形成鲜明对比，是 PGM 实现 5–7.5× 吞吐量提升的根本原因。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验结果
@@ -228,7 +218,6 @@ $$V_{i;\cdot}^{\prime} = V_{i;\cdot} + \begin{cases} Y_{1}, & \text{if } g_i = 0
 
 在 OpenWebText（上下文长度 1024）上，PGM 8/8（8 层编码器、8 层解码器）以 128 步采样实现了生成困惑度 21.43，优于 MDLM 的 23.07，同时采样吞吐量从 1043 tok/s 提升至 5518 tok/s，加速约 5.3 倍（Table 1, Table 6）。在 LM1B（上下文长度 128）上，PGM 6/6 的验证困惑度为 26.80，较 MDLM 的 27.67 降低了 1.95 点，且延迟从 3.78 秒降至 2.12 秒（Table 1）。
 
-
 ![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_vEh1ceS154/figures/004_Table_1.jpg]]
 *Table 1: Validation perplexity, sampling latency, and throughput (TP) on LM1B and OpenWebText. PGM k / m uses k encoder and m decoder layers. The best PGM per dataset is highlighted. Latency and TP are measured at batch size 32. † Trained with a 2× larger batch size (Sec. 5.3). See Table 5 for architecture ablations*
 
@@ -237,7 +226,6 @@ $$V_{i;\cdot}^{\prime} = V_{i;\cdot} + \begin{cases} Y_{1}, & \text{if } g_i = 0
 
 值得注意的是，PGM 的效率优势随着上下文长度增加而扩大：在 4096 上下文长度下，PGM 的吞吐量优势更为显著（Table 10），这直接源于 PGM 在推理时仅处理干净令牌的核心设计，避免了 MDLM 每步处理全长 [MASK] 序列的冗余计算。
 
-
 ![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_vEh1ceS154/figures/016_Table_10.jpg]]
 *Table 10: Throughput (TP) of MDLM and PGM with a context length of 4096, for varying number of inference steps. PGM is significantly faster than MDLM*
 
@@ -245,30 +233,15 @@ $$V_{i;\cdot}^{\prime} = V_{i;\cdot} + \begin{cases} Y_{1}, & \text{if } g_i = 0
 
 在 ImageNet 256×256 上，PGM 12/12（宽度 w=3）使用 Halton 采样器在 32 步下达到 FID 5.54，与 MaskGIT（FID 5.35）相当，但吞吐量提升 7.5 倍（Figure 1 左, Table 9）。当采样步数增加至 64 步（w=2）时，PGM 的 FID 进一步改善至 4.56，显著优于 MaskGIT 的 6.76，且仍保持 3.9 倍的吞吐量优势（Figure 1 左, Table 9）。这表明 PGM 在质量-效率权衡曲线上占据明显优势位置：用户既可以用更少的计算获得相近质量，也可以用更多步数换取更高质量。
 
-
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_vEh1ceS154/figures/001_Figure_1.jpg]]
-*Figure 1: (Left): On ImageNet, using the Halton sampler, PGM (ours), reaches similar FID as MaskGIT with a 7.5× speedup. By sampling with twice as many steps, PGM reaches an FID of 4.56 while remaining 3.9× faster. (Right): On OpenWebText, PGM achieves a better Generative Perplexity with a 5.3× higher sampling throughput compared to MDLM (an MGM for text), at a context length of 1024*
-
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_vEh1ceS154/figures/015_Table_9.jpg]]
-*Table 9: Sample quality and efficiency on ImageNet for different numbers of sampling steps using the Halton sampler. We generate images in batches of 32 to measure throughput, and use a batch size of 1 to measure latency. Throughput is lower with CFG because each step requires two forward passes (conditional and unconditional). The throughput and latency are averaged over 10 batches*
-
 **蒸馏后性能**
 
 经过自蒸馏时间（SDTT）蒸馏后，PGM 6/6 配合 nucleus 采样（p=0.9）在 OpenWebText 上达到生成困惑度 43.22，延迟仅 11.95 ms，而同等条件下 MDLM 的生成困惑度为 45.86，延迟为 62.54 ms——PGM 在质量更优的同时延迟降低约 5.2 倍（Table 7, Figure 4）。在下游任务评估中（Table 2），蒸馏后的 PGM 在 HellaSwag、OpenBook QA、Arc-easy 等 8 个 NLP 任务上继续优于 MDLM，表明效率增益未以牺牲表征质量为代价。
-
-
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_vEh1ceS154/figures/006_Table_2.jpg]]
-*Table 2: Accuracy on downstream tasks (Gao et al., 2024). HS: HellaSwag, OQA: OpenBook QA. Arc: Arc-easy. We select the tasks following Nie et al. (2025). We see that distillation slightly changes the downstream tasks performance, but that PGMs continue to outperform MDLM on most tasks. The best performance is bolded, while the second best is underlined*
-
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_vEh1ceS154/figures/013_Table_7.jpg]]
-*Table 7: Generative perplexity of MDLM and PGM after distillation with varying precision*
 
 ### 消融分析
 
 **编码器-解码器层数配置**
 
 Table 5 系统消融了不同编码器/解码器层数分配方案。结果表明，平衡配置（如 6/6、8/8）始终优于不平衡配置（如 10/6、6/10）。例如在 LM1B 上，PGM 6/6 的验证困惑度为 26.80，而 PGM 10/6 为 27.12，PGM 6/10 为 27.24。这一趋势在 OpenWebText 上同样成立。核心原因在于：编码器负责为两组令牌分别建立内部表征，解码器负责基于对方组信息进行预测，两者能力需要匹配才能有效利用双重梯度信号。
-
 
 ![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_vEh1ceS154/figures/011_Table_5.jpg]]
 *Table 5: Perplexity evaluations. Validation perplexity of the Masked Diffusion Language Model (MDLM) and PGMs (ours) on LM1B and OpenWebText (OWT). The row MDLM (Compl. masking) denotes an MDLM trained with the complementary masking strategy discussed in Section 5.3. The row PGM k / m denotes a PGM with k encoder and m decoder layers, and we highlighted the best PGM results in gray. lsm and mean denote the logsumexp and mean queries initializations (Section 4). Takeaway: using the same number of layers in the encoder and decoder, and data-independent queries performed best. On LM1B, our PGM reaches 1.95 lower perplexity than MDLM after 1M steps. On OWT, we grow the embedding dimension or the number...*
@@ -285,12 +258,10 @@ Table 5 系统消融了不同编码器/解码器层数分配方案。结果表�
 
 互补掩码训练会引入偶发性的损失尖峰（loss spikes），但未导致模型发散（Figure 6, Section D.1）。这一现象可能与两组交替预测时梯度信号的阶段性不协调有关，是当前方法的已知局限。
 
-
 ![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_vEh1ceS154/figures/009_Figure_6.jpg]]
 *Figure 6: Training loss of MDLM, MDLM with Complementary Masking (Section 5.3) and PGM. Complementary masking seems to introduce spikes in the loss, even though it did not cause the models to diverge*
 
 在训练效率方面（Table 3），PGM 在 LM1B 上的单步前向+反向传播延迟与 MDLM 几乎持平（开销可忽略），但在 OpenWebText 上，PGM 6/6（嵌入维度 1024）的训练吞吐量约为 MDLM 的 75%。这一差距源于分区 Transformer 中定制的块对角注意力掩码与现有优化计算核心（kernels）的兼容性不足。然而，考虑到推理端 5 倍以上的吞吐量优势，这一训练开销在多数应用场景下是可接受的。
-
 
 ![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_vEh1ceS154/figures/008_Table_3.jpg]]
 *Table 3: Latency and throughput for a single forward+backward pass of the MDLMs and PGMs, computed on a single A100-SXM4-80GB GPU. On LM1B, PGM introduces a negligible overhead over MDLM. On OWT, our PGM with 6 encoder and decoder layers and an embedding dimension of 1024 achieves around 75% of the training throughput of MDLM. Recall that at inference, the same PGM is around 5× faster than MDLM*
@@ -304,16 +275,6 @@ Table 5 系统消融了不同编码器/解码器层数分配方案。结果表�
 - **Table 9**：ImageNet 上 Halton 采样器在不同步数和 CFG 权重下的 FID、IS、延迟与吞吐量。
 - **Figure 4**：蒸馏后 PGM 与 MDLM 的速度-质量对比，展示 nucleus 采样下的优势。
 - **Figure 6**：训练损失曲线，展示互补掩码引入的损失尖峰现象。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_vEh1ceS154/figures/010_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_vEh1ceS154/figures/014_Table_8.jpg]]
-*Table 8: Sample quality and efficiency on ImageNet for different numbers of sampling steps using the Confidence-based sampler. We generate images in batches of 32 to measure throughput, and use a batch size of 1 to measure latency. Throughput is lower with CFG because each step requires two forward passes (conditional and unconditional). The throughput and latency are averaged over 10 batches*
-
-
-
 
 ## 定位与知识库关联
 
@@ -364,8 +325,6 @@ PGM 的分区 Transformer 由三个关键模块构成（Figure 3）：
 5. **专用计算优化**：可否开发针对块对角注意力模式的专用高效 kernel，以缩小训练吞吐量与 MDLM 的差距？
 
 6. **方差缩减的理论分析**：PGM 的双重梯度信号降低训练方差的机制目前仅凭经验验证，能否从优化理论角度给出更严格的分析？
-
-
 
 ## 原文 PDF
 

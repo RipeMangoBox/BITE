@@ -208,7 +208,6 @@ $$L := \mathbb{E}_{z_{Y,t},\, \epsilon,\, t,\, C_T,\, C_H^*}\left[ \big|\big| \e
 
 其中 $z_{Y,t}$ 为目标图像在时间步 $t$ 的加噪潜变量，$\epsilon$ 为添加的噪声，$C_T$ 为文本嵌入，$C_H^*$ 为堆叠身份嵌入。跨图像训练策略迫使模型学习身份本质特征而非身份无关属性（如姿态、背景），这是 Visual Persona 相较于以往重建式训练方法的关键优势（Table 3, Figure 7）。
 
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -249,24 +248,8 @@ Visual Persona 在两个公开基准数据集上均取得了最优的身份保�
 
 论文采用的 GPT-based 评估指标（D-I、D-T、D-H）在附录 A.2 中与人类偏好进行了对齐验证。结果表明，GPT 评分与人类评估在身份保持和文本对齐两个维度上均具有较高一致性，优于传统的 I-DINO 和 I-CLIP 等自动指标。同时，论文提供了人类评估（图 6）作为补充验证，进一步增强了结论的可信度。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l7_Visual_Persona_Foundation_Model_for_Full_Body_Human_Customization/figures/001_Figure.jpg]]
-*Figure: Input*
-
-![[assets/figures/papers/paper_list_l7_Visual_Persona_Foundation_Model_for_Full_Body_Human_Customization/figures/010_Figure.jpg]]
-
 ![[assets/figures/papers/paper_list_l7_Visual_Persona_Foundation_Model_for_Full_Body_Human_Customization/figures/011_Figure_7.jpg]]
 *Figure 7: Comparison between StoryMaker [94] (orange) and Visual Persona (green), including full and zoomed-in images: Compared to StoryMaker, Visual Persona enables large deformations, including pose and facial expression variations, preserves clothing details, and generates realistic clothing textures. Table 3. Comparison between StoryMaker [94] and Visual Persona*
-
-![[assets/figures/papers/paper_list_l7_Visual_Persona_Foundation_Model_for_Full_Body_Human_Customization/figures/015_Figure.jpg]]
-*Figure: StoryMaker Visual Persona*
-
-![[assets/figures/papers/paper_list_l7_Visual_Persona_Foundation_Model_for_Full_Body_Human_Customization/figures/022_Figure.jpg]]
-*Figure: A.3. Human Evaluation on Facial Expression: Visual Persona outperforms prior works [90, 94] in text alignment related to facial expression. (a) Analysis on different weighting scalar (??) (b) Analysis on different layers (??) (c) Analysis on different time steps (??) Figure A.4. Analysis: Identity Cross-Attention Module. Users can balance identity preservation and text alignment by adjusting the weighting scalar λ, layers y, and time steps t. Increasing the weighting scalar λ and using later layers y and time steps t better preserve the image structure and layout from the pre-trained SDXL, while slightly compromising identity preservation from the input*
-
-![[assets/figures/papers/paper_list_l7_Visual_Persona_Foundation_Model_for_Full_Body_Human_Customization/figures/025_Figure.jpg]]
-*Figure: Input Image Generated Image*
 
 ![[assets/figures/papers/paper_list_l7_Visual_Persona_Foundation_Model_for_Full_Body_Human_Customization/figures/008_Figure_5.jpg]]
 *Figure 5: Qualitative Comparison on PPR10K [49]: Compared to prior works that focus on face identity preservation [48, 84, 90] or fail to capture the input’s detailed appearance [90, 94], Visual Persona accurately preserves the full-body appearance while generating diverse images based on text prompts. Table 2. Quantitative Comparison*

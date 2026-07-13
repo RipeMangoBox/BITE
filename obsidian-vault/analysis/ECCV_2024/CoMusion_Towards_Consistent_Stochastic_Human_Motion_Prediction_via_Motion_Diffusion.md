@@ -57,8 +57,6 @@ claims:
 
 CoMusion 的方法设计使其在**方法谱系**中处于一个独特位置：它既继承了扩散模型的多模态生成能力，又融合了确定性预测中 GCN-DCT 架构的时空建模优势，并通过预测目标与调度器的协同设计，在单阶段框架内实现了准确性与多样性的平衡。该方法为条件扩散模型在结构化时序预测任务中的应用提供了新的范式参考。
 
-
-
 ### 人体运动预测：从确定性到随机建模
 
 人体运动预测（Human Motion Prediction, HMP）旨在基于观察到的历史姿态序列，预测未来一段时间内的人体运动轨迹。早期工作主要聚焦于**确定性预测**，即对每个历史输入仅生成唯一的未来序列。这类方法通常采用图卷积网络（GCN）在离散余弦变换（DCT）空间中建模时空关节依赖关系，在预测精度上取得了显著进展。
@@ -88,8 +86,6 @@ CoMusion 的方法设计使其在**方法谱系**中处于一个独特位置：�
 - **直接预测运动与调度器适配**：采用**直接预测未来运动 $y_0$** 的策略替代噪声预测，并配套提出**修改的余弦方差调度器**，将初始累积信噪比 $\bar{\alpha}_0$ 设为0.5（而非标准余弦调度器的接近1）。这一设计使 $y_0$ 预测任务在整个去噪过程中保持非平凡难度，防止模型过早过拟合到历史运动，从而在准确性与多样性之间取得平衡。
 
 通过上述设计，CoMusion以单阶段、端到端的方式，在保持扩散模型多模态生成能力的同时，实现了与确定性方法相媲美的预测一致性，显著缩小了随机预测与确定性预测之间的性能鸿沟。
-
-
 
 ## 核心方法与创新机理
 
@@ -127,8 +123,6 @@ $$ \bar{\alpha}_t = \cos\left( \frac{t/T + 1}{2} \cdot \frac{\pi}{2} \right)^2 $
 3. **修改的余弦调度器**通过降低初始 $\bar{\alpha}_0$，防止模型在 $F(\cdot)$ 已经提供良好初始值的条件下仍然过拟合历史运动，从而保障了多样性与准确性的平衡。
 
 三者协同作用，使 CoMusion 在 Human3.6M 数据集上相较此前最优方法 **BeLFusion** 实现了 CMD 下降 46.5%、FID 下降 51.2% 的一致性飞跃（Table 1），同时在 AMASS 数据集上 CMD 下降 43.3%（Table 2），验证了该创新组合的跨数据集泛化能力。
-
-
 
 CoMusion 是一个**单阶段、端到端的条件扩散模型**，用于随机人体运动预测（stochastic HMP）。其核心思路是将扩散模型的去噪过程重新组织为“平滑初始化 + 时空精炼”的两阶段生成管线，从而在保持多模态生成能力的同时，大幅提升预测与历史运动的一致性。
 
@@ -180,8 +174,6 @@ $$\mathcal{L}_{\mathrm{final}} = \min_k \mathcal{L}_{\theta}(G^k, y_0, x)$$
 ### 推理流程
 
 推理时，从纯高斯噪声 $y_T \sim \mathcal{N}(0, \mathrm{I})$ 出发，通过 $T=10$ 步 DDPM 采样迭代调用 $G_\theta$，每一步执行“$F(\cdot)$ 重建 $\to$ $R(\cdot)$ 精炼”的两阶段计算，最终输出 $\hat{y}_0$ 作为预测的未来运动。10 步扩散的设计在推理效率上具有优势（Table A.1），同时保持了生成质量。
-
-
 
 ### 3.1 条件运动扩散建模
 
@@ -264,13 +256,6 @@ $$\mathcal{L}_{\mathrm{final}} = \min_k \mathcal{L}_{\theta}(G^k, y_0, x) \tag{1
 
 消融实验（Table 6b）表明 $k=2$ 在样本多样性、准确性和保真度之间实现最佳平衡。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1872_CoMusion_Towards_Consistent_Stochastic_Human_Motion_Prediction_via_Motio/figures/001_Figure_1.jpg]]
-*Figure 1: Top: Three joint motion trajectories (length 20), last 10 features vary among the last-observation-padded, noisepadded and groundtruth sequences. Bottom: Their corresponding DCT values*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -314,33 +299,14 @@ CoMusion 采用仅 10 步扩散过程进行训练和推理（Figure 6），在 H
 4. **结构权重的领域限制**：结构感知损失依赖预定义的人体关节运动学权重，不适用于非人体骨架的运动数据类型，限制了跨领域迁移能力。
 5. **高噪声下的重建质量**：当噪声水平极高（接近纯高斯噪声）时，Transformer 重建模块可能产生不合理的初始运动估计，影响后续 GCN 优化——该边界情形在文中未得到充分验证，需在实际部署中注意。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1872_CoMusion_Towards_Consistent_Stochastic_Human_Motion_Prediction_via_Motio/figures/003_Table_1.jpg]]
 *Table 1: Quantitative results for Human3.6M dataset [27]. The best results are highlighted in bold. The symbol ‘-’ indicates that the results are not reported in the baseline work. For all metrics except for APD, lower is better*
 
 ![[assets/figures/papers/paper_list_l1872_CoMusion_Towards_Consistent_Stochastic_Human_Motion_Prediction_via_Motio/figures/004_Table_2.jpg]]
 *Table 2: Quantitative results for AMASS dataset [48]. The best results are highlighted in bold. The symbol ‘-’ indicates that the results are not reported in the baseline work. As AMASS does not contain class labels, the FID metric is not used for evaluation*
 
-![[assets/figures/papers/paper_list_l1872_CoMusion_Towards_Consistent_Stochastic_Human_Motion_Prediction_via_Motio/figures/007_Table_3.jpg]]
-*Table 3: Ablation on CoMusion’s general architecture. In the Sched. column, ✓ denotes use of our proposed scheduler*
-
-![[assets/figures/papers/paper_list_l1872_CoMusion_Towards_Consistent_Stochastic_Human_Motion_Prediction_via_Motio/figures/010_Table_4.jpg]]
-*Table 4: Left (a): Ablation on prediction target. Right (b): Ablation on variance scheduler. Linear scheduler’s results are not included as it causes CoMusion to diverge*
-
-![[assets/figures/papers/paper_list_l1872_CoMusion_Towards_Consistent_Stochastic_Human_Motion_Prediction_via_Motio/figures/011_Table_5.jpg]]
-*Table 5: Effect of*
-
-![[assets/figures/papers/paper_list_l1872_CoMusion_Towards_Consistent_Stochastic_Human_Motion_Prediction_via_Motio/figures/012_Table_6.jpg]]
-*Table 6: Left (a): Ablation on loss configurations*
-
 ![[assets/figures/papers/paper_list_l1872_CoMusion_Towards_Consistent_Stochastic_Human_Motion_Prediction_via_Motio/figures/006_Figure_4.jpg]]
 *Figure 4: Qualitative results of CoMusion compared with baseline methods. The upper block of rows corresponds to results obtained from the Human3.6M dataset, while the lower block of rows represents results from the AMASS dataset. The green-purple and the blue-orange skeletons denote the observed history and the predictions respectively*
-
-![[assets/figures/papers/paper_list_l1872_CoMusion_Towards_Consistent_Stochastic_Human_Motion_Prediction_via_Motio/figures/005_Figure_3.jpg]]
-*Figure 3: Left: ADE computed at each prediction frame of state-of-the-art methods. Right: CMD computed up to each prediction frame. Both experiments are conducted on Human3.6M dataset*
-
-
 
 ## 定位与知识库关联
 
@@ -389,8 +355,6 @@ CoMusion 处于随机人体运动预测（stochastic HMP）的扩散模型分支
 4. **长时域与复杂场景扩展。** 当前实验设定为预测 1 秒（25 帧）的未来运动。该框架能否扩展到 5 秒以上的长时域预测？在涉及人体-物体交互或多智能体交互的场景中，GCN 的图结构是否能自然地扩展为多骨架交互图？
 
 5. **直接预测 $y_0$ 的容量上限。** 直接预测运动（而非噪声）是否在理论上限制了模型对极端多模态分布的捕捉能力？噪声预测范式允许网络通过预测一个简单的分布（高斯噪声）来间接建模复杂的数据分布，而 $y_0$ 预测则要求网络直接输出多模态的未来运动——这是否需要在网络中引入额外的随机单元（如隐变量或噪声注入）来弥补？
-
-
 
 ## 原文 PDF
 

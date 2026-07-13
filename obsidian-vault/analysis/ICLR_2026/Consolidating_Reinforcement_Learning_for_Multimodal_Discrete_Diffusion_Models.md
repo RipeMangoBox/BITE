@@ -61,8 +61,6 @@ claims:
 
 **方法谱系与知识库定位**：MaskGRPO 建立在离散扩散模型（LLaDA-8B-Instruct, Nie et al., 2025；MMaDA）和 GRPO 策略优化算法的基础上，与现有 DDM-RL 方法形成对比：**diffu-GRPO**（Zhao et al., 2025）采用基于掩码的重要性估计但缺乏位置偏差；**UniGRPO**（Yang et al., 2025）使用迭代掩码策略但未利用模态特异性先验；**TraceRL**（Wang et al., 2025b）基于轨迹的重要性估计计算开销较大。MaskGRPO 的关键区分点在于通过模态特异性设计实现了更高效、更稳定的重要性估计，同时使用更少的全局训练步数（500 步 vs diffu-GRPO 的 7000+ 步）。
 
-
-
 ### 离散扩散模型：自回归之外的生成范式
 
 离散扩散模型（Discrete Diffusion Models, DDM）近年来作为自回归模型的替代方案受到广泛关注。其核心思想是通过前向过程逐步将离散 token 替换为 mask token，再通过逆向过程从噪声中恢复原始数据。形式上，给定干净数据 $x_0$，前向过程在时间 $t$ 产生带噪序列 $x_t$：
@@ -105,8 +103,6 @@ $$\max_{\theta} \mathbb{E}_{\mathbf{c}\sim\mathcal{D}, o_{1:G}\sim\pi_{\theta}(\
 
 基于这些洞察，MaskGRPO 提出了一套模态特异性的设计：语言采用 AR-like 渐弱掩码估计器，视觉采用高截断随机掩码；语言 rollout 使用半自回归采样器，视觉使用 Emerge 概率涌现采样器。这些设计使得 GRPO 策略优化在离散扩散模型上首次实现稳定有效的训练，并在数学推理（GSM8K +8.0）、代码生成（MBPP +6.4）和图像生成（GenEval +0.25）等任务上取得显著提升，几乎使强化学习收益翻倍（Figure 1）。
 
-
-
 ## 核心方法与创新机理
 
 MaskGRPO 的核心创新在于**针对离散扩散模型（DDM）的非自回归特性，为语言与视觉分别设计了模态特化的策略优化组件**，从而将 GRPO 强化学习首次稳定、高效地扩展到多模态离散扩散模型。其关键改进可归纳为以下三个 changed slots：
@@ -136,11 +132,6 @@ DDM 的反向过程在低时间步（高掩码率）时预测不确定性极高�
 此外，MaskGRPO 在反向过程中**管理每设备的独立随机种子**，确保重要性估计和 KL 计算的稳定性（Section 3.1），这一工程细节在消融中被证明对训练稳定性有实质贡献。
 
 在优化层面，MaskGRPO 采用**多次内部梯度更新**（$\mu=12$）配合**线性时间步调度** $t_j = \gamma + (1-\gamma)j/\mu$（Alg. 5），将重要性比率和 KL 估计在多个时间步上累积（Eq. 11），相比单步估计显著提升了策略梯度的信噪比。
-
-
-
-![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_9nxCJP4q0i/figures/002_Figure_1.jpg]]
-*Figure 1: Left: MaskGRPO consistently improves the base model with significant RL income across text and image generation tasks. Right: an intuitive demonstration of our method, integrated with modality-specific innovations on importance estimation and sampling methods*
 
 MaskGRPO 的整体框架围绕一个核心洞察展开：**离散扩散模型（DDM）在语言与视觉模态中呈现出截然不同的结构性先验**——语言序列具有自回归偏差（AR-ness），而视觉 token 则表现出全局相关性。利用这些先验，MaskGRPO 为 GRPO 策略优化中的两个关键瓶颈——**重要性估计**和**rollout 采样**——分别设计了模态特异性的高效方案，从而在无需昂贵蒙特卡洛估计的前提下，使离散扩散上的强化学习训练变得稳定且高效。
 
@@ -178,8 +169,6 @@ MaskGRPO 的整体框架围绕一个核心洞察展开：**离散扩散模型（
 - **奖励与优势：** 计算每个序列的奖励 $r_i$，组内标准化得到优势 $A_i$（Eq. 4）。
 - **策略评估：** 对每个序列在 $\mu$ 个时间步上构造掩码版本，计算重要性比率和 KL 散度。
 - **输出：** 更新后的策略参数 $\theta$，在语言任务上实现推理准确率提升（GSM8K +8.0，MATH500 +5.3，MBPP +6.4），在视觉任务上实现生成质量和文本-图像对齐的显著改善（GenEval +0.25，HPSv3 +0.59）。
-
-
 
 ### 3.1 离散扩散模型基础
 
@@ -267,8 +256,6 @@ $$q_s \gets \frac{\alpha_s - \alpha_t}{1 - \alpha_t} \cdot \pi + \delta_{\mathbf
 
 **随机性管理**：逆向过程中通过为每个设备分配独立随机种子，确保重要性和 KL 估计的稳定性（Section 3.1）。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与验证
@@ -284,9 +271,6 @@ $$q_s \gets \frac{\alpha_s - \alpha_t}{1 - \alpha_t} \cdot \pi + \delta_{\mathbf
 
 ![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_9nxCJP4q0i/figures/005_Table_1.jpg]]
 *Table 1: Evaluation on math reasoning and coding benchmarks. For fair comparison, we choose LLaDA-8B-Instruct as the initial point. All results are reported with Pass@1 metric. † refers to our re-implementation*
-
-![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_9nxCJP4q0i/figures/006_Table_2.jpg]]
-*Table 2: Evaluation on GenEval. SFT indicates that we SFT the base model with BLIP3-o dataset Chen et al. (2025a) for clean instruction-tuning data distilled from GPT-4o*
 
 ![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_9nxCJP4q0i/figures/021_Table_4.jpg]]
 *Table 4: Ablation on math reasoning*
@@ -317,9 +301,6 @@ Table 2 的 GenEval 基准评估显示，MaskGRPO 在离散扩散图像生成上
 - 在 BLIP3-o 数据集上进行 SFT 后，SFT+MaskGRPO 进一步提升至 0.90（+0.34），接近连续扩散模型的顶级水平。
 
 Table 7 的 DPG-Bench 评估进一步验证了这一趋势：MaskGRPO 将 MMaDA 的 Overall 得分从 0.71 提升至 0.75（+0.04），SFT+MaskGRPO 达到 0.82（+0.11）。
-
-![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_9nxCJP4q0i/figures/027_Table_7.jpg]]
-*Table 7: Evaluation on DPG-Bench. SFT indicates that we tune the base model with BLIP3-o dataset (distilled from GPT-4o) for clean supervision data before RL training*
 
 #### 人类偏好与构图生成
 
@@ -385,8 +366,6 @@ Figure 5a 的消融表明，截断参数 γ 对训练稳定性有显著影响：
 - 图像生成中 UniGRPO 的 RL 结果直接引用其报告最终性能，因其未公布训练配置。
 - 所有模型使用可比较的资源和训练步数；MaskGRPO 使用更少的全局步数（500 步 vs diffu-GRPO 的 7000+ 步）。
 
-
-
 ## 定位与知识库关联
 
 ### 核心问题与突破点
@@ -439,8 +418,6 @@ MaskGRPO 处于三个技术方向的交汇点：
 4. **自适应截断**：能否自动调整截断参数 $\gamma$ 以适配不同任务和训练阶段？当前的手动调整策略限制了方法的即插即用性。
 
 5. **奖励模型集成**：MaskGRPO 当前使用 UnifiedReward、HPSv3 和 CLIP Score 的组合作为视觉奖励函数，能否与更先进的奖励模型（如 ImageReward-v2, PickScore）结合，进一步提升对齐质量？
-
-
 
 ## 原文 PDF
 

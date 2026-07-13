@@ -185,8 +185,6 @@ $$\mathcal{L}_{\mathrm{mix}} = \lambda \mathcal{L}_{\mathrm{InfoNCE}}(\{(m_i, C(
 
 整个流程的核心特征是**去噪发生在监督信号层面而非模型架构层面**：编码器不变，损失函数形式不变，唯一改变的是正样本键的文本来源。这使得 MoCHA 具有高度的架构无关性——论文实验表明，将混合训练策略应用于 TMR 架构同样有效，TMR Blend 在 HumanML3D 上将 T2M R@1 从 8.96% 提升至 13.64%。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l87_MoCHA_Denoising_Caption_Supervision_for_Motion_Text_Retrieval/figures/002_Figure_2.jpg]]
 *Figure 2: MoCHA overview. (a) Motivated by the (s, a) decomposition (Section 3.1), C(·) projects each caption onto s by stripping stylistic variation a (red). C is implemented via LLM and distilled into FlanT5 for LLM-free inference. (b) Blend training balances both views: the denoised C(ti) anchors embeddings around s to reduce gradient variance, while the original ti regularizes for natural-language queries*
 
@@ -305,28 +303,11 @@ MoCHA 的规范化策略对不同检索架构具有泛化性。**Table 11** 显�
 
 这些失败模式指向了开放问题：能否将 $C(t)$ 与对比检索损失联合优化，使其自适应地学习去噪策略？如何形式化地界定 $s$ 和 $a$ 的边界以减少过度压缩？
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l87_MoCHA_Denoising_Caption_Supervision_for_Motion_Text_Retrieval/figures/003_Table_1.jpg]]
-*Table 1: Within-motion text embedding variance (C4). Canonicalization reduces the spread of caption embeddings for the same motion by 11–19%, confirming that a introduces measurable noise into the contrastive positive*
-
-![[assets/figures/papers/paper_list_l87_MoCHA_Denoising_Caption_Supervision_for_Motion_Text_Retrieval/figures/004_Table_2.jpg]]
-*Table 2: Embedding space geometry (C4): baseline vs. MoCHA in the trained encoder’s 256-dim space. By removing a from the training signal, MoCHA produces embeddings where same-motion captions cluster more tightly (Intra) and align more closely with their motion (Align), improving separation by +8–25%. This confirms that input-level variance reduction propagates to a better-structured retrieval space. Sep: Intra / Inter NN. Full breakdown in Appendix J*
-
 ![[assets/figures/papers/paper_list_l87_MoCHA_Denoising_Caption_Supervision_for_Motion_Text_Retrieval/figures/006_Table_3.jpg]]
 *Table 3: In-distribution retrieval results (C2). MoCHA achieves state-of-theart on both benchmarks, with consistent gains across all recall ranks and retrieval directions—ruling out a precision-recall tradeoff and confirming that the removed content was a, not useful s. Full ablations in Appendix G.1*
 
-![[assets/figures/papers/paper_list_l87_MoCHA_Denoising_Caption_Supervision_for_Motion_Text_Retrieval/figures/007_Table_4.jpg]]
-*Table 4: Cross-dataset retrieval. Stripping p(a) removes dataset-specific annotation style, so models trained on one dataset’s conventions can retrieve from another’s. Gains are proportionally larger than in-distribution—consistent with the*
-
-![[assets/figures/papers/paper_list_l87_MoCHA_Denoising_Caption_Supervision_for_Motion_Text_Retrieval/figures/008_Table_5.jpg]]
-*Table 5: Denoising the positive vs. augmenting it. Paraphrase augmentation widens p(t | s) rather than reducing it, acting as a smoothing function that trades R@1 for R@5/R@10. Canonicalization improves all ranks by collapsing variance rather than adding to it*
-
 ![[assets/figures/papers/paper_list_l87_MoCHA_Denoising_Caption_Supervision_for_Motion_Text_Retrieval/figures/009_Table_6.jpg]]
 *Table 6: Canonicalization mechanism ablation (T2M R@1 %). Even rule-based stopword stripping improves transfer, while backtranslation (which transforms without denoising) does not—confirming that canonicalization is a general principle (C1): the gains stem from projecting onto s, not from any particular model’s language understanding*
-
-![[assets/figures/papers/paper_list_l87_MoCHA_Denoising_Caption_Supervision_for_Motion_Text_Retrieval/figures/010_Table_7.jpg]]
-*Table 7: Example outputs by method. Backtranslation (negative control: transforms surface form without removing a) preserves nuisance factors intact (“as if you were following it”); stopword stripping removes noise indiscriminately, unlocking crossdataset gains but losing temporal structure. MoCHA retains sequential actions and fine-grained s that rule-based methods cannot distinguish from a—illustrating why canonicalization is a general principle that even simple rules can exploit, but learned semantic projection yields the largest improvements*
 
 ![[assets/figures/papers/paper_list_l87_MoCHA_Denoising_Caption_Supervision_for_Motion_Text_Retrieval/figures/015_Table_13.jpg]]
 *Table 13: BABEL cross-dataset retrieval (Threshold T2M protocol per TMR++). X→B comparisons use last epoch as BABEL R@1 is unstable due to caption duplicity. BABEL numbers are inflated by 86% caption duplication (see text). H→K and K→H results without BABEL are reported in the main paper (Table 4)*

@@ -56,8 +56,6 @@ FMPose3D 将2D到3D的姿态提升重新定义为**条件分布传输问题**：
 
 值得注意的是，该方法仍依赖现成的2D关键点检测器，极端遮挡或罕见姿态下性能可能受限；RPEA 中的温度超参数 $\alpha$ 目前需手动设定，其自适应调整机制尚待探索。
 
-
-
 单目3D姿态估计旨在从单张RGB图像中恢复人体或动物关节的三维坐标，是动作捕捉、人机交互、运动分析等应用的核心技术。该任务面临两个根本性瓶颈：**深度模糊**与**遮挡问题**。由于从2D图像到3D空间的映射天然存在多解性，同一组2D关键点可以对应无限多种合理的3D姿态配置，传统方法难以同时保证预测的准确性和多样性。
 
 现有方法大致分为两类。**确定性回归方法**（如**SimpleBaseline**、**VideoPose3D**）直接将2D关键点映射为单一3D姿态，虽然推理高效，但无法刻画深度模糊带来的内在不确定性，在遮挡或罕见姿态下容易产生不可靠的估计。**概率生成方法**则试图通过建模3D姿态的条件分布来保留多解性——其中**DiffPose**等基于扩散模型的工作取得了领先的多样性表现，但其推理过程依赖随机微分方程（SDE）的迭代去噪，通常需要10–50步才能生成一个合理样本，推理速度仅约16 FPS，难以满足实时应用需求。
@@ -67,8 +65,6 @@ FMPose3D 将2D到3D的姿态提升重新定义为**条件分布传输问题**：
 FMPose3D的切入思路是将2D到3D姿态提升重新形式化为一个**条件分布传输问题**：以2D关节为条件，学习一个由常微分方程（ODE）定义的确定性速度场，将简单高斯分布中的样本沿着平滑轨迹“传输”到合理的3D姿态分布。这一范式变革带来两个关键优势：（1）每个噪声种子产生一条确定的轨迹，不同种子给出多样化解，保留了多解性；（2）ODE积分仅需3步即可收敛，推理速度可达160 FPS以上，较扩散模型提升近一个数量级。
 
 此外，多假设生成后如何融合为单一鲁棒预测是另一关键问题。简单平均或逐关节选择往往无法充分利用假设间的互补信息。FMPose3D引入基于重投影误差的后验期望聚合模块（RPEA），以2D重投影误差作为近似后验的代理，对多假设进行关节级加权平均，在保持多样性的同时显著提升最终预测的精度。
-
-
 
 ## 核心方法与创新机理
 
@@ -118,8 +114,6 @@ FMPose3D 提出的 **RPEA（Reprojection-error-based Posterior Expectation Appro
 
 三个 changed slots 并非孤立改进，而是形成了一条因果链：**ODE流匹配**提供了快速且多样化的采样能力（3步 vs. 50步），为多假设生成奠定效率基础；**并行双分支架构**确保每个假设的质量；**RPEA** 则通过重投影误差驱动的贝叶斯聚合，将多条假设的互补信息压缩为单一高精度预测。这一“快速采样-质量保证-智能融合”的闭环，是 FMPose3D 在精度和速度上同时超越扩散基线的根本原因。
 
-
-
 FMPose3D 将单目 3D 姿态估计重新形式化为一个**条件分布传输问题**：以 2D 关键点为条件信号，通过常微分方程（ODE）将简单高斯分布传输到合理的 3D 姿态分布。其整体 pipeline 分为训练和推理两个阶段，核心由三个功能模块串联而成：**流匹配速度场建模**、**ODE 多假设生成**、以及 **RPEA 后验聚合**。
 
 ### 训练流程
@@ -167,8 +161,6 @@ pipeline 内部各模块的输入输出关系如下：
 - **并行 GCN + 注意力架构**：消融实验（Table 4）表明，并行连接显著优于串行设计（GCN→Attention），MPJPE 从 52.5 mm 降至 49.3 mm。并行结构允许局部拓扑特征与全局上下文特征独立提取后融合，避免信息瓶颈。
 - **仅需 3 步积分**：与扩散模型需要 10–50 步迭代去噪不同，FMPose3D 的确定性 ODE 仅需 $S=3$ 步欧拉积分即可达到精度峰值（Figure 6），推理速度达 160 FPS 以上，远超 DiffPose 的 16 FPS（Table 5）。
 - **关节级独立聚合**：RPEA 对每个关节独立进行 Top-K 筛选和加权，允许不同关节的最优假设来自不同噪声种子，从而更灵活地利用多假设多样性。
-
-
 
 ### 3.1 流匹配：从条件分布传输到确定性速度场
 
@@ -224,8 +216,6 @@ $$w_{i,j} = \frac{\exp(-\alpha L_{i,j})}{\sum_{H_{k,j} \in \mathcal{H}_{K,j}} \e
 - **速度预测头**：将融合后的骨干特征映射为预测速度。
 
 消融实验（Table 4）证实：并行连接（Parallel）的 MPJPE 为 49.3 mm，显著优于串行连接（GCN→Attn）的 52.5 mm，验证了同时保留局部拓扑与全局上下文对速度场建模的必要性。
-
-
 
 ## 实验与关键发现
 
@@ -289,8 +279,6 @@ Figure 8分析了各关节的多假设标准差（不确定性）与实际MPJPE�
 
 4. **动物数据集的样本限制**：Animal3D仅含约3k帧训练数据，FMPose3D在该数据集上虽大幅超越AniMer，但绝对P-MPJPE（61.5 mm）仍显著高于人体基准，部分源于训练数据不足导致的分布覆盖不完整。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2602_05755/figures/003_Table_1.jpg]]
 *Table 1: Quantitative comparison with the state-of-the-art methods on Human3.6M under MPJPE. The detected 2D pose is used as input. ?? denotes the number of hypotheses. Red: Best. Blue: Second Best. Grey : our method*
 
@@ -302,26 +290,6 @@ Figure 8分析了各关节的多假设标准差（不确定性）与实际MPJPE�
 
 ![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2602_05755/figures/006_Table_4.jpg]]
 *Table 4: Ablation study on different model designs. Serial: GCN followed by Attention (GCN→Attn). Parallel: GCN and Attention are computed in two branches and fused*
-
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2602_05755/figures/007_Table_5.jpg]]
-*Table 5: Inference speed. Frames per second (FPS) were measured on a single GeForce RTX 4090 GPU. ?? denotes the number of hypothesis. For DiffPose [16], we follow the setting in the original paper with 50 reverse diffusion steps at inference*
-
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2602_05755/figures/008_Figure_3.jpg]]
-*Figure 3: Comparison of different aggregation strategies on the Human3.6M test set. The top plot reports MPJPE, while the bottom plot shows P-MPJPE*
-
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2602_05755/figures/009_Figure_4.jpg]]
-*Figure 4: Qualitative comparison of DiffPose [16] and FMPose3D on Human3.6M. The blue pose represents the predicted results, while the red pose represents the ground truth*
-
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2602_05755/figures/011_Figure_6.jpg]]
-*Figure 6: Effect of the number of integration steps ?? on inference accuracy. The blue curve shows MPJPE (read from the left vertical axis), and the orange curve shows P-MPJPE (read from the right vertical axis); the shaded region marks the range*
-
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2602_05755/figures/012_Table_6.jpg]]
-*Table 6: Quantitative comparison with the state-of-the-art methods on Human3.6M under P-MPJPE. The detected 2D pose is used as input. ?? denotes the number of hypotheses. Red: Best. Blue: Second Best. Grey : our method*
-
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2602_05755/figures/015_Table_7.jpg]]
-*Table 7: Results on 3DPW. Top: methods trained on 3DPW. Bottom: methods without 3DPW training (zero-shot evaluation)*
-
-
 
 ## 定位与知识库关联
 
@@ -400,8 +368,6 @@ FMPose3D 在以下数据集上验证了其泛化能力：
 4. **与检测器联合优化**：当前2D检测器与3D提升模块独立训练，端到端联合优化或使用检测器不确定性作为额外条件信号，可能进一步提升鲁棒性。
 
 5. **更高效的ODE求解器**：当前使用显式欧拉法，更高阶的求解器（如RK4）或自适应步长策略能否在保持速度优势的同时进一步提升精度？
-
-
 
 ## 原文 PDF
 

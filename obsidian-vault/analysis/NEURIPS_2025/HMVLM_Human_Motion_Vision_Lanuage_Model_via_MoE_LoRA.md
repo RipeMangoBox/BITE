@@ -57,8 +57,6 @@ claims:
 
 **方法定位**：HMVLM属于**多模态指令微调框架**，在基础语言模型（Vicuna-7B-v1.5 / Gemma-2-2B-it）之上，通过MoE LoRA实现运动、视觉、语言三模态的统一。与MotionGPT、MotionAgent等运动-语言模型相比，其核心差异在于以极低的遗忘代价同时支持文本到运动生成、人体姿态估计和视频理解三类任务，且在多任务联合微调下仍保持竞争力。
 
-
-
 将人体运动理解与生成能力融入基础语言模型，是构建通用人本智能体的关键一步。然而，现有方法面临两个相互纠缠的核心瓶颈。
 
 **模态鸿沟与灾难性遗忘。** 3D人体运动作为一种高维时序模态，其统计特性与离散文本存在本质差异。当直接在预训练语言模型上进行运动相关任务的指令微调时，模型往往以牺牲原有语言能力为代价来适应新模态。实验表明，基于GPT‑4协调的**MotionAgent**框架在文本到运动（T2M）微调后，其基础模型Gemma‑2‑2B‑it的MT‑Bench平均分从7.79崩塌至1.00，降幅高达87.16%（Table 1）。这揭示了现有方案的根本缺陷：缺乏一种机制来隔离运动适配与语言知识保留之间的参数冲突。
@@ -66,8 +64,6 @@ claims:
 **运动表征的粒度不足。** 主流方法（如**T2M‑GPT**、**MoMask**）普遍采用基于全身1D时序卷积的VQ‑VAE将运动序列离散化为统一标记。这种“整体式”标记化忽略了人体的自然空间结构——躯干、四肢等不同部位的运动模式在动态范围与语义关联上差异显著。由此产生的离散码本难以同时捕捉局部姿态精度与全局运动语义，制约了自回归生成与单帧姿态估计等静态任务的统一建模。
 
 **本文动机。** 针对上述缺口，HMVLM提出两个相互配合的设计：在参数层面，通过门控网络动态路由的LoRA专家混合（MoE LoRA）实现任务感知的参数调制，其中引入不可训练的“零专家”作为预训练权重的安全回退路径；在表征层面，构建基于身体部位的空间标记器，将人体划分为多个部位并独立量化编码，在保留空间结构的同时提升重建精度。这一双轨设计的目标是：在支持文本到运动生成、人体姿态估计、视频理解等多种人本任务的同时，将基础模型的语言能力损失控制在可忽略的水平。
-
-
 
 ## 核心方法与创新机理
 
@@ -119,8 +115,6 @@ $$(\hat{z}_{Bn}^{'1}, \hat{z}_{Bn}^{'2}, \dots, \hat{z}_{Bn}^{'F/l}) = \mathcal{
 
 **需注意的局限：** 当前框架仅实现运动与文本/视频的独立跨模态配对，尚未探索图像到文本或视频到运动的直接生成。多任务联合微调时，受固定参数预算限制，单任务性能相比单独微调有轻微下降（Table 2 中 multi-task 的 FID 从 0.123 升至 0.156）。此外，扩展到新的运动相关任务需要重新训练门控网络并添加专家，框架的任务可扩展性仍有待验证。
 
-
-
 HMVLM 的整体设计围绕一个核心矛盾展开：如何将 3D 人体运动模态注入预训练语言模型，同时不破坏后者已有的语言理解与对话能力。框架采用**指令驱动的多模态统一架构**，其信息流可概括为三个关键阶段。
 
 ### 1. 指令感知的门控路由
@@ -160,12 +154,8 @@ $$\mathcal{L}_{gat} = -\mathbb{E}[\eta \cdot \log p_w(\alpha_0 | \mathbb{Z}, \ma
 
 上述模块形成一条清晰的数据流：**CLIP 编码器 → 门控网络 → 专家权重分配** 与 **模态投影 → 嵌入拼接** 两条支路在基础语言模型的每层线性变换处汇合，经混合专家调制后完成自回归解码。身体部位标记器则作为独立的运动模态前端，将连续运动数据转化为离散 token 后接入同一生成管道。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1917_HMVLM_Human_Motion_Vision_Lanuage_Model_via_MoE_LoRA/figures/002_Figure_2.jpg]]
 *Figure 2: Method overview: task instructions and input prompt are processed by a gating network to produce a mixture weights. Modality-specific inputs are aligned with word embedding via projection layers, and the final outputs are generated through the pre-trained model and the weighted combination of LoRA experts*
-
-
 
 ### 3.1 MoE LoRA 动态路由机制
 
@@ -246,8 +236,6 @@ $$(\hat{z}_{Bn}^{'1}, \hat{z}_{Bn}^{'2}, \dots, \hat{z}_{Bn}^{'F/l}) = \mathcal{
 
 消融实验（Table 5）表明，在码本大小 $K=512$ 时，身体部位标记器将 HumanML3D 上的 R-precision Top-3 从 0.741 提升至 0.785，重建 MSE 从 1.377 降至 0.966，验证了空间分解对运动表征精度的显著增益。该设计同时支持单帧姿态估计（无需时间压缩）和运动序列生成（需时间压缩），实现了自回归架构与静态任务的兼容。
 
-
-
 ## 实验与关键发现
 
 ### 主要实验结果
@@ -256,13 +244,7 @@ $$(\hat{z}_{Bn}^{'1}, \hat{z}_{Bn}^{'2}, \dots, \hat{z}_{Bn}^{'F/l}) = \mathcal{
 
 将人体运动模态集成到基础语言模型的核心瓶颈在于模态差距导致的灾难性遗忘。Table 1 给出了文本到运动（T2M）任务微调前后基础模型对话能力的量化对比。在相同基础模型 Gemma‑2‑2B‑it 上，HMVLM 的 MT-Bench 平均分仅从 7.79 降至 7.53（相对下降 3.34%），而 **MotionAgent** 在同一模型上从 7.79 崩塌至 1.00（下降 87.16%）。**MotionGPT** 在 Llama‑2‑7B 上也出现了 22.71% 的显著下降（2.73 → 2.11）。这表明 MoE LoRA 框架中的零专家机制和门控损失是知识保留的关键——去除门控损失 L_gat 后，Vicuna‑7B‑v1.5 的 MT-Bench 平均分从 5.90 直接崩塌至 1.00（Table 1 w/o L_gat 行）。
 
-![[assets/figures/papers/paper_list_l1917_HMVLM_Human_Motion_Vision_Lanuage_Model_via_MoE_LoRA/figures/004_Table_1.jpg]]
-*Table 1: Evaluation on dialogue abilities of foundation models before and after text-to-motion tuning*
-
 Table 3 进一步揭示了门控网络的动态路由行为：在通用对话（GD）任务中，零专家（expert 0）的平均门控权重高达 0.999，而其他可训练专家权重接近零；在 T2M、人体姿态估计（HPE）和人体视频理解（HVU）任务中，门控网络则分别激活不同的专家组合。这一结果验证了零专家作为“参数保护伞”的设计意图——当输入与运动无关时，模型几乎完全退回到预训练权重路径。
-
-![[assets/figures/papers/paper_list_l1917_HMVLM_Human_Motion_Vision_Lanuage_Model_via_MoE_LoRA/figures/007_Table_3.jpg]]
-*Table 3: Average gating weights across different tasks. GD, T2M, HPE, and HVU denote general dialogue, text-to-motion, human pose estimation, and human video understanding tasks, respectively*
 
 #### 文本到运动生成：单任务与多任务性能
 
@@ -283,14 +265,8 @@ Table 2 报告了 HumanML3D 数据集上的文本到运动生成结果。HMVLM �
 
 Table 4 报告了 Human3.6M 和 3DPW 数据集上的姿态估计结果。HMVLM 在单任务设置下优于专门的基础模型姿态估计方法 **ChatPose**（该点需核实具体数值，分析数据中仅提供定性描述）。Figure 4 和 Figure 8 的定性可视化显示，HMVLM 在遮挡和复杂姿态场景下的估计结果更接近真实值。这一性能提升归因于身体部位标记器提供的空间粒度——每帧姿态被分解为 5 个部位（躯干 + 四肢）独立编码，使得模型能够更精确地捕捉局部关节位置。
 
-![[assets/figures/papers/paper_list_l1917_HMVLM_Human_Motion_Vision_Lanuage_Model_via_MoE_LoRA/figures/008_Table_4.jpg]]
-*Table 4: Quantitative results of pose estimation on the H3.6M and 3DPW datasets*
-
 ![[assets/figures/papers/paper_list_l1917_HMVLM_Human_Motion_Vision_Lanuage_Model_via_MoE_LoRA/figures/006_Figure_4.jpg]]
 *Figure 4: Qualitative results for human pose estimation and human video understanding*
-
-![[assets/figures/papers/paper_list_l1917_HMVLM_Human_Motion_Vision_Lanuage_Model_via_MoE_LoRA/figures/013_Figure_8.jpg]]
-*Figure 8: Qualitative comparison with the ChatPose [16] on the 3DPW test set*
 
 #### 人体视频理解
 
@@ -313,9 +289,6 @@ Table 1 中 w/o L_gat 行的结果是最具决定性的消融证据：去除门�
 
 Figure 5 分析了不同专家数量下 MoE LoRA 的训练时间、参数量、推理延迟和 T2M 性能。随着专家数量增加，训练时间和参数量近似线性增长，但推理延迟在超过 5 个专家后增速加快。T2M 性能在 5 个专家时趋于饱和，继续增加专家带来的边际收益递减。这一分析为实际部署中的专家数量选择提供了效率参考。
 
-![[assets/figures/papers/paper_list_l1917_HMVLM_Human_Motion_Vision_Lanuage_Model_via_MoE_LoRA/figures/009_Figure_5.jpg]]
-*Figure 5: Efficiency analysis of the MoE LoRA model under different numbers of experts. (a) Training time and parameter scaling. (b) Inference latency and T2M performance*
-
 ### 失败模式与局限性
 
 1. **多任务性能折损**：在多任务联合微调中，由于参数预算固定，单任务性能相比单独微调有轻微下降（Table 2 中 Multi-task 行 vs Single-task 行）。这是共享专家容量下的固有权衡。
@@ -327,13 +300,6 @@ Figure 5 分析了不同专家数量下 MoE LoRA 的训练时间、参数量、�
 4. **跨模态生成缺失**：框架仅实现人体运动与文本或视频的独立配对，尚未探索图像到文本或视频到运动的直接跨模态生成。
 
 5. **身体部位分割的粒度限制**：当前采用固定的 5 部位分割（躯干 + 四肢），对于手指动作、面部表情等更细粒度的运动表征可能不足。Table 5 中 K=1024 时 T2M 性能下降也暗示了当前空间分解策略在高维码本下的优化困难。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1917_HMVLM_Human_Motion_Vision_Lanuage_Model_via_MoE_LoRA/figures/019_Table_7.jpg]]
-*Table 7: Examples of instruction templates for each task*
-
-
 
 ## 定位与知识库关联
 
@@ -372,8 +338,6 @@ HMVLM 的适用边界由其三个核心设计决策共同界定。
 **任务扩展的可迁移性**。当前框架的任务集是封闭的——门控网络和专家数量在训练前就已固定。若要添加新的运动相关任务（如运动修复、运动风格迁移），需要重新训练门控网络并可能增加专家。这限制了 HMVLM 作为一个“运动基础模型”的即插即用能力。一个开放问题是：能否设计一种增量式的专家添加机制，使得新任务的适配不会干扰已有的专家路由？
 
 **跨模态生成的缺失**。HMVLM 目前仅实现了文本到运动、图像/视频到姿态估计等单向映射，尚未探索直接的模态间生成（如图像到运动、视频到文本描述）。这一局限部分源于训练数据的配对约束，部分源于架构设计中各模态投影层之间缺乏显式的跨模态对齐损失。
-
-
 
 ## 原文 PDF
 

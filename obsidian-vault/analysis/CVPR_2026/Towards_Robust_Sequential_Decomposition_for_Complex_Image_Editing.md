@@ -51,8 +51,6 @@ claims:
 
 在无依赖合成链上，3 步 CGSE 的 GPT-5 评分为 4.15，优于微调单轮 BAGEL 的 4.0（Table 1）；在含依赖合成链上，5 步 CGSE 取得最高 GPT-5 评分 4.14，比单轮编辑提高 5.9%（Table 2）。在真实数据集 Complex-Edit 上，联合训练的 CGSE（K=2）在指令遵循（IF: 8.25 vs. 8.23）和身份保持（IP: 6.38 vs. 6.26）上均超过单轮基线，且人类偏好研究验证了这一结果（Table 5, Figure 5）。
 
-
-
 复杂图像编辑要求模型在单次交互中准确理解并执行包含多个子任务的组合指令，例如同时完成物体移除、替换、重定位和属性修改。当前的图像编辑方法主要采用**单轮编辑**范式，即直接将复合指令映射到目标图像。然而，这种范式面临根本性瓶颈：单轮编辑无法准确解析并执行组合编辑指令，容易遗漏子任务或产生错误编辑（见图1，单轮编辑结果中多个操作被错误执行或忽略）。
 
 一种直观的替代方案是**顺序编辑**——将复杂指令分解为一系列原子编辑步骤，逐步修改图像。顺序编辑通过任务分解降低了单步难度，理论上能够更精确地完成每个子编辑。但这一范式引入了新的问题：**中间步骤的错误会逐步累积**，导致最终结果的保真度下降。如图1所示，朴素顺序编辑在后续步骤中会产生与指令不符的修改（红色标注区域），说明错误在编辑链中传播。
@@ -60,8 +58,6 @@ claims:
 现有方法在这两种范式之间未能取得有效平衡。零样本上下文编辑方法（如**BAGEL**）虽然支持多轮交互，但在复杂指令下缺乏可靠的分解能力。微调后的单轮编辑模型在合成和真实场景中有所改进，但本质上仍受限于单轮映射的表达能力。因此，**核心挑战在于如何利用顺序编辑的分解优势，同时抑制误差累积，实现鲁棒的复杂图像编辑**。
 
 本文从 in-context editing 框架出发，提出**上下文引导顺序编辑 (Context-Guided Sequential Editing, CGSE)**。核心洞见是：通过大规模合成编辑序列训练模型习得指令分解能力，并设计一种可调节历史影响的上下文引导机制——仅利用上一步编辑结果作为引导信号，由系数 $\gamma_{ctx}$ 控制其贡献强度——从而在充分利用分解优势的同时，有效阻断误差累积链。
-
-
 
 ## 核心方法与创新机理
 
@@ -88,8 +84,6 @@ $$v_{CGSE} = v_d + \gamma_{ctx} (v_\theta(X_t, t, I_0, \{T_j\}_{j=1}^i, \{I_j\}_
 **4. 分块训练策略**
 
 通过随机将编辑序列拆分为 $K$ 个块进行训练，使模型习得可变粒度的分解能力。实验显示，增加分解步数 $K$ 在依赖链上持续提升编辑质量，$K=5$ 时达到最高 GPT-5 评分 4.14，比单轮编辑提高 5.9%（Table 2）。
-
-
 
 CGSE 构建在一个**上下文编辑 (in-context editing)** 框架之上，其核心思想是将复杂编辑指令分解为可执行的子步骤序列，并通过可控的上下文引导来抑制中间误差的累积。整个方法由三个关键组件构成：合成数据生成管道、模型微调范式、以及推理时的上下文引导编辑策略。
 
@@ -142,12 +136,8 @@ $$v_{CGSE} = v_d + \gamma_{ctx} (v_\theta(X_t, t, I_0, \{T_j\}_{j=1}^i, \{I_j\}_
 
 这一流程使模型能够将“将扬声器移到现代咖啡桌上，将多功能清洁剂前移，然后在扬声器附近的地板上添加一个剃须刀，并将灯泡替换为篮球”这样的复杂指令，分解为可独立执行的四步操作，并在每一步中利用上一步的结果作为上下文引导，避免单轮编辑中常见的遗漏和错误累积问题。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l942_https_arxiv_org_abs_2605_09233/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of Synthetic Data Pipeline. We build the synthetic data pipeline on Blender, in which we construct complex editing tasks by sequentially applying editing operations on a randomly initialized scene. After constructing the editing chain, we take the initial and final rendering of the scene as the editing pair and concatenate all operation descriptions as the corresponding complex instruction*
-
-
 
 ### 4.1 上下文编辑框架与训练目标
 
@@ -178,13 +168,6 @@ $$v_{CGSE} = v_d + \gamma_{ctx} (v_\theta(X_t, t, I_0, \{T_j\}_{j=1}^i, \{I_j\}_
 ### 4.3 分块训练策略
 
 为使模型习得可变粒度的分解能力，训练时将长度为 $L$ 的完整编辑序列随机拆分为 $K$ 个块（$1 \le K \le L$），模型在每个块内执行上下文引导编辑。推理时，$K$ 作为可控参数决定分解步数：增大 $K$ 使分解更细粒度，在依赖链任务上持续提升编辑质量，$K=5$ 时达到最高 GPT-5 评分 4.14 (Table A6)。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l942_https_arxiv_org_abs_2605_09233/figures/001_Figure_1.jpg]]
-*Figure 1: Single-Turn Editing versus Sequential Editing with a complex instruction: ”Move the speaker onto the modern coffee table, move the all-purpose cleaner forward, then add a shaver on the floor near the speaker, and replace the lightbulb with a basketball”. Incorrect edits are labeled with red boxes on the image*
-
-
 
 ## 实验与关键发现
 
@@ -244,25 +227,6 @@ $$v_{CGSE} = v_d + \gamma_{ctx} (v_\theta(X_t, t, I_0, \{T_j\}_{j=1}^i, \{I_j\}_
 
 基于上述分析，以下问题值得进一步探索：如何进一步提升顺序编辑图像的感知质量和保真度；能否将顺序分解能力推广到更开放域的编辑任务或更多模态；如何自动确定最优分解步数 K 和引导强度 $\gamma_{ctx}$；合成数据的构建仍受限于人工设计的操作模板，能否通过无监督方式自动发现编辑原语。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l942_https_arxiv_org_abs_2605_09233/figures/004_Table_1.jpg]]
-*Table 1: Evaluations on tasks without inter-step dependencies. “FCSE” denotes “Full-Context Sequential Editing” and “CGSE” denotes “Context-Guided Sequential Editing” with*
-
-![[assets/figures/papers/paper_list_l942_https_arxiv_org_abs_2605_09233/figures/003_Table_2.jpg]]
-*Table 2: Evaluations on tasks with inter-step dependencies. “FCSE” denotes “Full-Context Sequential Editing” and “CGSE” denotes “Context-Guided Sequential Editing” with*
-
-![[assets/figures/papers/paper_list_l942_https_arxiv_org_abs_2605_09233/figures/005_Figure_3.jpg]]
-*Figure 3: Qualitative comparisons on a synthetic task with inter-step dependency. Instruction: “Remove the hatchet, replace the basketball with a shoe, relocate the wifi router where the hatchet initially was, and paint the object that was moved red”. “Single-Turn Editing” refers to the single-turn editing result from finetuned BAGEL. Red boxes indicate incorrect edits. More examples can be found in Appendix E*
-
-![[assets/figures/papers/paper_list_l942_https_arxiv_org_abs_2605_09233/figures/006_Table_3.jpg]]
-*Table 3: Analysis with different numbers of editing operations*
-
-![[assets/figures/papers/paper_list_l942_https_arxiv_org_abs_2605_09233/figures/007_Table_4.jpg]]
-*Table 4: Analysis with different dependency ratios*
-
-
-
 ## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
@@ -312,8 +276,6 @@ CGSE 的适用边界受以下因素制约：
 3. **自适应参数选择。** 如何自动确定最优分解步数 K 和引导强度 γ_ctx，使其适应不同复杂度的编辑指令？
 
 4. **无监督原语发现。** 能否通过无监督方式自动发现编辑原语，突破人工设计操作模板的限制，使合成数据管道更具扩展性和覆盖度？
-
-
 
 ## 原文 PDF
 

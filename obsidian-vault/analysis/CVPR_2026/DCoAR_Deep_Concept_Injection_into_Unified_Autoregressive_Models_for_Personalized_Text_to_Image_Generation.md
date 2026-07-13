@@ -56,8 +56,6 @@ claims:
 
 **方法定位**：DCoAR 属于**概念注入**路线，在冻结骨干网络的前提下，以极低参数量弥合了与微调方法的保真度差距，并首次在统一AR模型中实现免训练的主体-风格组合，为高效个性化生成提供了新基准。
 
-
-
 文本到图像生成领域正经历从扩散模型到统一自回归模型的范式迁移。以 Lumina-mGPT 为代表的多模态自回归模型将图像离散化为视觉令牌序列，与文本令牌统一建模，在生成效率与扩展性上展现出潜力。然而，这类模型的个性化生成仍面临一个核心瓶颈：**浅层注入导致的语义衰减**。
 
 现有面向统一自回归模型的个性化方法——如 **Yo'Chameleon**（Nguyen et al., CVPR 2025）和 **UniCTokens**（An et al., arXiv 2025）——均采用“概念注入”范式：冻结骨干网络，仅在输入层插入少量可学习的上下文令牌来表示目标主体或风格。这种浅层注入策略虽参数高效，但概念信号在逐层前向传播中逐渐衰减，导致高层特征中主体语义被稀释，最终生成结果出现视觉保真度下降和重文本化能力不足的问题。相比之下，基于微调的方法（如 DreamBooth 结合 FLUX 或 LoRA 适配）虽能保持较高保真度，却需要训练大量参数（如 Proxy-Tuning 达 142.6M），并面临语义漂移和身份偏移风险。
@@ -71,8 +69,6 @@ DCoAR 的动机正源于此。其核心假设是：概念表示不应仅停留�
 3. **如何实现免训练的主体-风格组合**，使独立学习的概念令牌在推理时可任意拼接而不产生语义污染？
 
 DCoAR 通过层间多模态上下文学习（LMCL）、双重先验保持（DPP）和上下文感知自正则化（CASR）三项协同设计，系统性地回应了上述挑战，在 DreamBench 基准上以仅 0.073M 可训练参数取得了超越微调方法的性能（CLIP-I 0.8151，CLIP-T 0.3184）。
-
-
 
 ## 核心方法与创新机理
 
@@ -116,8 +112,6 @@ $$\mathcal{L}_{obj} = \mathcal{L}_{NTP} + \alpha \mathcal{L}_{DPP} + \beta \math
 
 其中 $\mathcal{L}_{NTP}$ 是标准的自回归下一令牌预测损失，$\alpha$ 和 $\beta$ 为平衡系数。整个训练过程仅需约 0.073M 可训练参数（远低于 Proxy-Tuning 的 142.6M），在单张 H800 GPU 上即可完成，骨干网络完全保持冻结状态。
 
-
-
 DCoAR 是一个面向统一自回归（AR）多模态模型的个性化生成框架，其核心设计目标是在**完全冻结骨干网络**的前提下，通过深层概念注入与多面正则化，弥合概念注入方法与微调方法之间的保真度差距。整个 pipeline 由三个训练阶段模块和一个免训练推理模块构成，形成“深层注入—先验保持—自正则化—推理隔离”的闭环。
 
 ### 输入与输出流
@@ -147,12 +141,8 @@ $$\mathcal{L}_{obj} = \mathcal{L}_{NTP} + \alpha \mathcal{L}_{DPP} + \beta \math
 
 图 2 给出了 DCoAR 的完整框架示意图：子图 (a) 展示 LMCL 的多层注入机制；子图 (b) 展示 DPP 的双重先验约束；子图 (c) 展示 CASR 的嵌入空间正则化；子图 (d) 展示推理时的免训练组合与 Identity Mask。四个模块协同工作，使得 DCoAR 在保持骨干网络冻结的条件下，取得了与微调方法可比甚至更优的主体保真度与文本对齐性能。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2303_https_arxiv_org_abs_2508_07341/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed DCoAR framework for subject-driven personalization in multi-modal autoregressive models. (a) Layerwise Multimodal Context Learning, where learnable context tokens are injected into multiple Transformer layers for concept representation. (b) Dual Prior Preservation (DPP) regularizes the customized distribution against the pre-trained model to mitigate overfitting and language drift. (c) Context-Aware Self-Regularization (CASR) initializes and constrains context tokens towards the subject embedding space to enhance fidelity and re-contextualization. (d) Training-free subject–style composition by directly combining subject and style tokens to enable flexible customized...*
-
-
 
 DCoAR 的核心由四个模块构成：**层间多模态上下文学习（LMCL）** 实现深层概念注入，**双重先验保持（DPP）** 防止语义漂移，**上下文感知自正则化（CASR）** 抑制过拟合，以及推理阶段的 **Identity Mask** 实现免训练主体-风格组合。
 
@@ -221,18 +211,8 @@ $$
 
 在推理时，主体和风格的上下文令牌可直接拼接实现免训练组合。为防止主体令牌与风格令牌之间的注意力污染（如颜色泄漏），DCoAR 引入 Identity Mask——在自注意力计算中阻断主体令牌与风格令牌之间的注意力流，强制实现干净的主体-风格解耦。消融实验证实，去除该掩码会导致语义污染，加入后可干净分离主体与风格。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2303_https_arxiv_org_abs_2508_07341/figures/011_Figure_7.jpg]]
-*Figure 7: Impacts of insertion depth of multimodal context tokens on performance*
-
-![[assets/figures/papers/paper_list_l2303_https_arxiv_org_abs_2508_07341/figures/012_Figure_9.jpg]]
-*Figure 9: Ablation results of Identity Mask*
-
 ![[assets/figures/papers/paper_list_l2303_https_arxiv_org_abs_2508_07341/figures/016_Figure_10.jpg]]
 *Figure 10: Visualization of CASR*
-
-
 
 ## 实验与关键发现
 
@@ -245,9 +225,6 @@ DCoAR 在 DreamBench 基准上以仅 **0.073M** 可训练参数（单张 H800 GP
 - **DINO（主体相似度）**：DCoAR 达到 **0.7226**，同样处于领先水平。
 
 这一结果的关键在于深层概念注入策略。Figure 3 的定性对比显示，浅层注入方法（如 Yo'Chameleon、UniCTokens）普遍存在视觉保真度不足的问题，而 DCoAR 通过 LMCL 在多个 Transformer 层持续强化概念特征，生成的图像在细节保持和语义一致性上均优于同类概念注入方法，并弥合了与基于 LoRA 的微调方法之间的保真度差距。
-
-![[assets/figures/papers/paper_list_l2303_https_arxiv_org_abs_2508_07341/figures/004_Figure_3.jpg]]
-*Figure 3: Qualitative comparison of subject-driven personalization on the DreamBench benchmark. As concept-injection methods generally exhibit lower visual fidelity, we focus the qualitative comparison on the more competitive adaptation-based methods. Additional comparisons are available in the supplementary material*
 
 ### 风格个性化主结果
 
@@ -293,9 +270,6 @@ Figure 7 展示了 LMCL 注入深度对性能的影响，揭示了关键的**过
 
 Figure 11 的跨模态与深度联合消融进一步表明：仅注入文本令牌或仅注入图像令牌均无法达到最优效果，**文本+图像双模态令牌**在 9 层深度下取得最佳视觉质量。
 
-![[assets/figures/papers/paper_list_l2303_https_arxiv_org_abs_2508_07341/figures/017_Figure_11.jpg]]
-*Figure 11: Qualitative ablation of token modalities across different insertion depths. Rows represent different token configurations, while columns correspond to the number of Transformer layers (1, 3, 9, 24) into which tokens are injected. Rows: “Only Text Token” suffers from identity loss (generic backpacks), while “Only Image Token” exhibits high fidelity but poor editability (e.g., failing to stylize in Col 4). Columns: Inserting tokens into all layers (Depth 24) leads to overfitting, preventing style changes, whereas the optimal depth (Depth 9) achieves the best balance between subject fidelity and textual control*
-
 ### Identity Mask 消融
 
 Figure 9 验证了推理时 Identity Mask 机制的必要性。在主体-风格组合生成中，不加掩码时出现明显的**概念污染**：风格令牌的颜色/纹理特征泄漏到主体区域，导致主体外观失真。加入 Identity Mask 后，主体与风格的注意力流被有效隔离，实现了干净的主体-风格解耦组合。
@@ -305,16 +279,6 @@ Figure 9 验证了推理时 Identity Mask 机制的必要性。在主体-风格�
 1. **注入深度敏感性**：最优注入深度需人工调整，不同主体可能需要不同的深度配置。Figure 7 显示深度从 9 层增至 24 层时性能显著下降，表明当前方案缺乏自适应深度选择机制。
 2. **深层过拟合风险**：过度注入（如 24 层）会导致模型过度约束，牺牲文本可编辑性。这一现象在 Figure 11 的定性结果中表现为生成图像趋于单一化，丧失对多样化文本提示的响应能力。
 3. **参数效率与性能的权衡边界**：虽然 0.073M 参数已极为高效，但 Table 1 显示 DCoAR 在 CLIP-T 上仍略低于部分扩散模型方法，提示统一自回归模型在文本对齐方面仍有提升空间。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2303_https_arxiv_org_abs_2508_07341/figures/007_Figure_6.jpg]]
-*Figure 6: Qualitative comparison of our DCoAR and LoRA-based method for style personalization tasks*
-
-![[assets/figures/papers/paper_list_l2303_https_arxiv_org_abs_2508_07341/figures/018_Figure_12.jpg]]
-*Figure 12: Additional qualitative comparison of subject-driven personalization. We compare our DCoAR against two representative concept-injection methods (UniCTokens [1], Yo’Chameleon [22]) and a state-of-the-art diffusion-based fine-tuning approach (DreamBooth [26] with FLUX)*
-
-
 
 ## 定位与知识库关联
 
@@ -374,8 +338,6 @@ $$\mathcal{L}_{CASR} = \frac{1}{N} \sum_{i=1}^{N} \| \mathbf{p}_I^{(i)} - \mathb
 3. **跨模型泛化性**：DCoAR的深层注入策略和正则化方案是否可迁移至其他统一自回归架构（如基于不同tokenizer或注意力机制变体的模型），其性能增益是否依赖于特定骨干网络的架构特性？
 
 4. **多概念扩展**：当前方法主要针对单一主体或风格的个性化。如何将LMCL扩展至多概念联合注入（如多个主体或主体+风格+场景），同时避免概念间的语义干扰和令牌序列长度的线性增长？
-
-
 
 ## 原文 PDF
 

@@ -47,8 +47,6 @@ claims:
 
 核心实验结果表明：INTP 在手-物交互轨迹上的 Fréchet 距离相比 **cuRobo**（Sundaralingam et al., ICRA 2023）降低 11%（139 vs 157）；基于 Kalman 滤波的深度相位控制器使运动不平滑度降低 9.2%（5.94 vs 6.54 cm/s²）、脚滑降低 14.5%（6.17 vs 7.22 cm/s）；三通道隐式场设计在场景泛化测试中达到 98.8% 的成功率与最高的安全距离（8.66 cm）。系统在多样化的杂乱厨房场景中展现了协调的双手交互能力，但其全身碰撞避免、对未见容器结构的泛化以及 3D 感知导航仍存在局限。
 
-
-
 ### 问题场景：杂乱环境下的全身协调交互
 
 在复杂的室内环境中执行抓取和放置（pick-and-place）任务，是人类日常活动中最常见但也最具挑战性的交互形式之一。这类任务往往不是简单的“伸手—抓取—放置”的单步操作，而是包含多个子任务的序列化过程：用户可能需要先打开容器、移除遮挡物、调整物体姿态，再完成最终的抓取与放置。图 1 展示了这类任务的典型场景——在杂乱的厨房环境中，角色需要双手协作完成从柜中取物、避让障碍物、将物品放置到指定位置等一系列动作。
@@ -80,8 +78,6 @@ claims:
 - **离散子任务之间的过渡可以通过频域相位控制来平滑**。DeepPhase 的线性动力学模型为运动提供了一个低维的相位空间，而 Kalman 滤波可以在这个空间中平滑地估计和过渡目标相位，从而在保留高频运动细节的同时消除子任务切换时的不连续性。
 
 基于上述动机，CHOICE 系统将交互合成分解为三个协同工作的子模块：隐式神经轨迹规划器（INTP）负责生成无碰撞的手部轨迹，DeepPhase 交互控制器负责自回归地预测全身运动，双手调度器负责根据用户指令和场景状态安排关键帧序列。这种层次化的分解使得每个模块可以专注于解决特定的技术挑战，同时通过明确的目标接口实现模块间的无缝协作。
-
-
 
 ## 核心方法与创新机理
 
@@ -125,8 +121,6 @@ Kalman 滤波器根据目标关键关节变换估计目标相位，通过预测-
 
 > **注意**：Diffusion Policy 的具体引用元数据未在分析中提供，如需精确引用请手动核实。
 
-
-
 CHOICE 将杂乱环境下的双手抓放交互合成建模为一个**层次化目标驱动任务**，自上而下分解为三个核心子任务：手-物轨迹规划、全身运动控制，以及双手目标调度。系统接收用户通过键盘发出的抽象动作指令（如“抓取茶壶并放置到指定位置”）和鼠标点击的目标物体，输出角色全身运动序列。
 
 ### 三阶段流水线
@@ -156,8 +150,6 @@ CHOICE 将杂乱环境下的双手抓放交互合成建模为一个**层次化�
 - **交互控制器**以规划轨迹作为关键关节目标，结合 Kalman 滤波估计的相位先验，自回归地生成下一帧的全身关节姿态，并通过双向控制混合反馈协方差以修正 Kalman 滤波器状态。
 
 三个子系统形成闭环：控制器输出的角色状态反馈至调度器，用于判断任务完成状态并触发下一子任务的目标切换。
-
-
 
 ### 4.1 手-物轨迹的联合神经隐式表示
 
@@ -212,18 +204,11 @@ $$\mathbf{X}_{t+\Delta t}^{\mathcal{P}}=\mathbf{A}\mathbf{X}_t^{\mathcal{P}}+\ma
 
 **模块间的因果链路**：INTP 为双手提供无碰撞的手腕轨迹 → 双手调度器将轨迹转化为关键帧目标 → Goal Matching 检索对应的运动先验 → Kalman 滤波器平滑相位过渡 → DeepPhase 控制器自回归生成全身运动。这一层次化分解使得系统能够独立优化各子问题，同时通过目标信号实现端到端的协调。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1666_CHOICE_Coordinated_Human_Object_Interaction_in_Cluttered_Environments_fo/figures/004_Figure_3.jpg]]
 *Figure 3: Implicit neural trajectory planner: The scene visualization of the three fields uses the green color to show its value, deeper green represents a lower distance, and the blue color highlights the region of infinity distance. The right-side images give the 2D slices at the teapot height, where the zerolevel set was shown in orange curves. Under a test scene, z was optimized to reconstruct the known part of the output, which was encircled by the blue rectangles. The dashed blue rectangle illustrates the pre-known part of the time-of-arrival field*
 
 ![[assets/figures/papers/paper_list_l1666_CHOICE_Coordinated_Human_Object_Interaction_in_Cluttered_Environments_fo/figures/005_Figure_4.jpg]]
 *Figure 4: Framework of Our DeepPhase interaction controller: The Kalman filter estimates the target phase correlated to the goal key-joint transformations. The Gating Network compares the features of key-joint transformations and the phase features from the current and goal frame, and a er each motion prediction for the next frame, our bi-directional control blends the key-joint transformation prediction, and also feeds back the covariance to the Kalman filter based on the displacement of the bi-directional prediction*
-
-![[assets/figures/papers/paper_list_l1666_CHOICE_Coordinated_Human_Object_Interaction_in_Cluttered_Environments_fo/figures/006_Figure_5.jpg]]
-*Figure 5: The distribution of amplitude and frequency control in U, revealing the natural motion transitions, which exhibit consistent acceleration and deceleration pa erns and perform the motion diversity during interactions, follows the zero-mean Gaussian distribution in the frequency-domain latent*
-
-
 
 ## 实验与关键发现
 
@@ -275,15 +260,9 @@ Fig. 12 的可视化消融进一步支持上述结论：(a-b) 中，去除 Kalma
 
 CHOICE 数据集包含烹饪、制作奶茶、清理桌面等多种双手交互任务（Fig. 8）。表 3 评估了抓取精度，指标包括最大穿透体积、穿透深度和浮动位移。这些指标验证了运动捕捉数据中手-物交互的物理合理性，为轨迹规划器提供了高质量的训练信号。
 
-![[assets/figures/papers/paper_list_l1666_CHOICE_Coordinated_Human_Object_Interaction_in_Cluttered_Environments_fo/figures/009_Figure_8.jpg]]
-*Figure 8: Snapshots of our CHOICE dataset, which incorporates diferent tasks like (a) cooking with ingredients and seasoning, (b) making milk tea and pouring into multiple mugs, (c) cleaning the table, and (d) other bimanual manipulations that co-temporally operate two objects. In (e), we visualize the pose variations in datasets a er T-SNE clustering*
-
 ### 失败模式与局限性
 
 Fig. 13 展示了系统在全新场景下的典型失败案例：
-
-![[assets/figures/papers/paper_list_l1666_CHOICE_Coordinated_Human_Object_Interaction_in_Cluttered_Environments_fo/figures/018_Figure_13.jpg]]
-*Figure 13: Limited performance on generating coordinate full-body collisionfree interaction under novel scenes*
 
 1. **全身碰撞避免不足**：碰撞解决方法仅通过平移关键关节目标变换来调整姿态，无法保证全身无穿透。在密集障碍物场景中，身体躯干或手臂可能穿入物体。
 2. **导航感知局限**：全身导航基于 2D 路径规划，无法感知 3D 距离障碍物，导致角色在接近目标时可能与高处或侧面障碍物碰撞。
@@ -297,19 +276,6 @@ Fig. 13 展示了系统在全新场景下的典型失败案例：
 - **Fig. 4**（DeepPhase 控制器）：双向控制混合关键关节变换预测，并将双向预测的位移反馈为 Kalman 滤波器的协方差，形成自适应控制回路。
 - **Fig. 5**（相位控制分布）：频率域控制信号 $\mathbf{U}$ 的振幅和频率分量呈零均值高斯分布，揭示了运动过渡中一致的加速-减速模式。
 - **Fig. 10**（轨迹自适应）：INTP 在标准橱柜、80% 窄橱柜（宽 29.5cm）、加深放置和增加障碍物四种条件下均生成合理接近轨迹，场变形自然适应空间约束。
-
-![[assets/figures/papers/paper_list_l1666_CHOICE_Coordinated_Human_Object_Interaction_in_Cluttered_Environments_fo/figures/016_Figure_10.jpg]]
-*Figure 10: Figures from (a) to (d) sequentially show the planning of approaching a bo le with field deformation under a standard-sized shelf, an 80% narrow (29.5𝑐𝑚 in width) shelf, a deeply placed case in the narrow shelf, and a deeply placed case with another bo le in a narrow shelf*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1666_CHOICE_Coordinated_Human_Object_Interaction_in_Cluttered_Environments_fo/figures/015_Table_5.jpg]]
-*Table 5: Comparison among SE(3) trajectory planners for the end efector. The spare safety distance to the nearest obstacle is averaged by frame among all the collision-free successful cases, counting the pieces of trajectories within 20cm around the touching/releasing position. We run our planner (INTPs) three times at each scene with diferent latent initializations sampled from Gaussian noise*
-
-![[assets/figures/papers/paper_list_l1666_CHOICE_Coordinated_Human_Object_Interaction_in_Cluttered_Environments_fo/figures/008_Figure_7.jpg]]
-*Figure 7: Our trajectory planner will detect the cases where the clicking target (teapot) cannot be grasped. To always achieve the interaction task, our system can sequentially remove the obstacle and then re-plan to take the target object out utilizing the available hands, and finally, we can place the obstacle back to any clicking position inside the blocks. Among the trajectory visualizations, the object/skeleton from transparent to opaque sequentially shows the in-hand motion; the blue and green trajectories record the approaching and leaving motion, respectively*
-
-
 
 ## 定位与知识库关联
 
@@ -368,8 +334,6 @@ CHOICE 的方法设计体现了对以下工作的继承与创新：
 4. **目标姿态计算**：如何利用视频先验计算适应多样化场景的最优目标可达姿态，减少对预定义模板的依赖？
 
 这些问题指向了从运动守恒假设向动态矢量场、从预定义模板向学习式场景理解、从 2D 导航向 3D 感知的关键技术跃迁方向。
-
-
 
 ## 原文 PDF
 

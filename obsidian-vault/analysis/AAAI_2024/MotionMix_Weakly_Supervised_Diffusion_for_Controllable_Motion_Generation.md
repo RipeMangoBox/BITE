@@ -59,8 +59,6 @@ claims:
 
 **局限与展望**：方法在小规模数据集上可能性能下降，超参数 $T^*$ 和噪声范围需手动调节，且仅在高斯扩散噪声假设下验证有效。未来方向包括自适应枢轴选择、跨模态扩展及半监督场景下的进一步探索。
 
-
-
 ### 问题背景
 
 人类运动生成（human motion generation）旨在根据文本、动作标签或音乐等控制信号合成自然、多样的人体动作序列，在动画制作、虚拟现实、游戏开发和人机交互等领域具有广泛应用。近年来，扩散模型（diffusion models）凭借其稳定的训练过程和高质量的生成能力，已成为该领域的主流范式。以 **MDM**（Tevet et al., 2022）、**MotionDiffuse**（Zhang et al., 2022）和 **EDGE**（Tseng et al., 2022）为代表的扩散方法，在文本到运动（text-to-motion）、动作到运动（action-to-motion）和音乐到舞蹈（music-to-dance）等任务上取得了显著进展。
@@ -93,8 +91,6 @@ claims:
 具体而言，含噪标注数据虽然标注不精确，但足以在早期去噪阶段提供粗略的条件控制信号，让模型学会“大致朝哪个方向生成”；而干净未标注数据虽然缺乏条件信息，但其高质量的运动细节可以在后期去噪阶段精炼生成结果，提升运动的自然度和真实性。两者通过扩散时间步的自然划分，可以实现有机协同。
 
 基于这一洞察，MotionMix 将扩散模型的去噪训练分配为两个阶段：在初始 $T - T^*$ 步使用含噪标注数据学习条件控制，在最后 $T^*$ 步使用干净未标注数据进行无条件精炼。这一设计无需额外标注校正，不引入复杂训练流程，仅通过时间步的分配策略，便实现了弱监督下的可控运动生成，为充分利用现实世界中大量不完美运动数据开辟了新路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -138,8 +134,6 @@ $$\hat{\mathbf{s}}(\mathbf{x}_t, t, c) = w \cdot f_{\theta}(\mathbf{x}_t, t, c) 
 - 仅对高斯扩散噪声有效，对更复杂的现实噪声类型未验证。
 - 在小型数据集（如 HumanAct12）上性能可能下降，方法更适用于大规模数据场景。
 - 两阶段采样引入了额外的推理步骤切换，可能略微影响推理效率。
-
-
 
 MotionMix 通过重新分配扩散模型的去噪目标，将弱监督信号注入标准扩散范式，形成“条件粗糙生成→无条件精炼”的两阶段流水线。整体框架由数据拆分与加噪、两阶段训练、两阶段采样三个核心模块串联而成，骨干扩散模型可替换。
 
@@ -194,13 +188,6 @@ MotionMix 的方法设计独立于具体扩散架构，论文在三个代表性�
   - 干净未标注数据：运动序列 $\mathbf{x}$（原始质量）、条件 $c = \emptyset$
 - **输出**：与条件 $c$ 语义对齐且物理合理的运动序列 $\hat{\mathbf{x}}$
 - **运动表示**：根据任务不同采用差异化表示，如 HumanML3D 使用 263 维姿态向量，AIST++ 使用 151 维拼接表示（接触标签 + 根位移 + 姿态）
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1818_MotionMix_Weakly_Supervised_Diffusion_for_Controllable_Motion_Generation/figures/002_Figure_2.jpg]]
-*Figure 2: (Left) Training Process. The model is trained with a mixture of noisy and clean data. A noise timestep in ranges of*
-
-
 
 ### 3.1 扩散模型基础
 
@@ -260,8 +247,6 @@ MotionMix 本身是模型无关的框架，可适配不同的扩散模型骨干�
 - **动作到动作**：运动序列表示为 $\mathbf{x} = \mathrm{Concat}([\mathbf{p}, \mathbf{r}]) \in \mathbb{R}^{N \times 25 \times 6}$，其中 $\mathbf{p}$ 是 24 关节 SMPL 姿态参数，$\mathbf{r}$ 是根关节平移。
 
 - **音乐到舞蹈**：运动序列表示为 $\mathbf{x} = \mathrm{Concat}([\mathbf{b}, \mathbf{r}, \mathbf{p}]) \in \mathbb{R}^{N \times 151}$，其中 $\mathbf{b}$ 是二值足部接触标签（从 $\mathbf{p}$ 和 $\mathbf{r}$ 计算得出，因此不直接对其注入噪声），$\mathbf{r}$ 是根关节平移，$\mathbf{p}$ 是姿态参数。噪声同时注入 $\mathbf{p}$ 和 $\mathbf{r}$，使用从 $[20, 80]$ 采样的相同噪声步。
-
-
 
 ## 实验与关键发现
 
@@ -355,11 +340,6 @@ MotionMix 在三个主流运动生成任务上验证其弱监督框架的有效�
 
 **表 7**（附录）展示了更贴近真实应用场景的实验：将 AIST++ 作为含噪标注数据源，AMASS 作为干净未标注数据源，混合训练 EDGE (MotionMix)。结果表明，即使两个数据集来自不同分布，MotionMix 仍能有效利用未标注数据提升生成质量，验证了框架在真实弱监督场景下的实用价值。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1818_MotionMix_Weakly_Supervised_Diffusion_for_Controllable_Motion_Generation/figures/001_Figure_1.jpg]]
-*Figure 1: Examples of applying MotionMix on text-to-motion generation. Unlike previous works, our training data are only comprised of noisy annotated motions and unannotated motions. https://nhathoang2002.github.io/MotionMix-page/*
-
 ![[assets/figures/papers/paper_list_l1818_MotionMix_Weakly_Supervised_Diffusion_for_Controllable_Motion_Generation/figures/003_Figure_3.jpg]]
 *Figure 3: Qualitative performance of baseline MDM and MotionDiffuse models, trained exclusively on high-quality annotated data, with our MotionMix approach, which learns from imperfect data sources. Their visualized motion results are presented alongside real references for three distinct text prompts. Please refer to supplementary files for more animations*
 
@@ -375,16 +355,8 @@ MotionMix 在三个主流运动生成任务上验证其弱监督框架的有效�
 ![[assets/figures/papers/paper_list_l1818_MotionMix_Weakly_Supervised_Diffusion_for_Controllable_Motion_Generation/figures/007_Table_4.jpg]]
 *Table 4: We evaluate MDM (MotionMix) on the HumanML3D test set using different values of the denoising pivot*
 
-![[assets/figures/papers/paper_list_l1818_MotionMix_Weakly_Supervised_Diffusion_for_Controllable_Motion_Generation/figures/009_Table_5.jpg]]
-*Table 5: We evaluate MDM (MotionMix) on the HumanML3D test set using different ratios for noisy and clean data. The metrics are calculated in the same manner as detailed in Table 1. The best and the second best result are bold and underlined respectively*
-
-![[assets/figures/papers/paper_list_l1818_MotionMix_Weakly_Supervised_Diffusion_for_Controllable_Motion_Generation/figures/008_Table_6.jpg]]
-*Table 6: We evaluate MDM (MotionMix) on the HumanML3D test set using different noisy ranges*
-
 ![[assets/figures/papers/paper_list_l1818_MotionMix_Weakly_Supervised_Diffusion_for_Controllable_Motion_Generation/figures/010_Table_7.jpg]]
 *Table 7: Quantitative results of music-to-dance on the AIST++ test set. We run the evaluation 20 times. The best and the second best result are bold and underlined respectively. † denotes the EDGE model that is re-trained by us*
-
-
 
 ## 定位与知识库关联
 
@@ -414,8 +386,6 @@ MotionMix 并非提出新的扩散架构，而是提出一种**训练策略层�
 2. **跨模态扩展**：两阶段训练策略是否可推广到图像、音频等其他生成任务？扩散模型的分步特性具有通用性，但不同模态的噪声-语义对应关系可能不同。
 3. **非高斯噪声鲁棒性**：在更复杂的现实噪声模型下，当前基于高斯扩散噪声的近似策略是否仍然有效？这直接关系到方法在实际部署中的适用性。
 4. **少量高质量数据的利用**：当前设定假设零高质量标注样本。若存在少量高质量标注数据，能否通过半监督或主动学习策略进一步利用这些样本提升性能？论文在附录中尝试了结合 AIST++ 和 AMASS 的真实场景实验（Table 7），但未系统探索高质量样本的增量价值。
-
-
 
 ## 原文 PDF
 

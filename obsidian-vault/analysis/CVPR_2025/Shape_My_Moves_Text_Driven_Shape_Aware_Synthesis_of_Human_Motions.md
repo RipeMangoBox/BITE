@@ -54,15 +54,11 @@ claims:
 
 该方法的主要局限在于依赖模板化的形状描述，难以处理自由形式的自然语言输入；同时，形状参数预测误差在极端体形上可能被放大。
 
-
-
 文本驱动的人体运动生成旨在根据自然语言描述合成逼真的三维人体动作序列。近年来，基于变分自编码器（VQ‑VAE）与语言模型的两阶段框架，如 **T2M‑GPT**（Zhang et al., CVPR 2023）和 **MotionGPT**（Jiang et al., NeurIPS 2024），以及基于扩散模型的 **MotionDiffuse**（Zhang et al., arXiv 2022），在文本‑运动对齐与生成多样性上取得了显著进展。然而，这些方法存在一个共同的隐含假设：所有运动都被标准化到一个统一的规范人体模型上，完全忽略了不同身体形状带来的生理学差异。如图1所示，同样的跑步动作在瘦削与肥胖体形上的表现存在显著差异，而现有方法无法捕捉这种形状驱动的运动变化。
 
 这一瓶颈的根源在于，现有框架仅将运动视为纯运动学序列，未将身体形状作为生成条件纳入建模。当这些方法生成的运动被迁移到不同体形时，往往会出现脚部穿透地面、滑步、肢体比例失真等物理伪影，严重损害运动的真实感。此外，现有文本编码器通常无法解析描述身体形状的文本输入，导致模型缺乏“形状感知”能力。
 
 为解决上述问题，本文提出 **ShapeMove**——一个文本驱动的形状感知运动合成框架。其核心动机在于：**运动的内容（语义动作）与风格（由体形决定的运动表现）应当被解耦**。具体而言，ShapeMove 通过两个阶段实现这一目标：（1）设计一个形状感知的有限标量量化变分自编码器（SA‑VAE），将形状归一化的运动压缩为离散内容令牌，并在解码时注入连续形状参数以恢复形状特定的运动风格；（2）利用预训练语言模型同时预测形状参数与运动令牌，实现端到端的文本到形状感知运动生成。这一设计使得模型既能保持文本‑运动语义对齐，又能根据指定的身体属性生成物理合理的个性化运动。
-
-
 
 ## 核心方法与创新机理
 
@@ -105,8 +101,6 @@ $$L_{vq} = L_r + \lambda_f L_{float} + \lambda_s L_{slide} + \lambda_b L_{bone}$
 
 这三项创新协同作用，使得 ShapeMove 成为首个能够**端到端地从文本同时生成形状参数与形状感知运动**的框架，填补了文本到动作生成领域对体形差异建模的空白。
 
-
-
 ShapeMove 采用两阶段流水线，将文本到动作生成分解为**离散运动令牌量化**与**形状‑运动令牌联合预测**两个阶段，从而实现端到端的形状感知运动合成。
 
 ### 阶段一：形状感知 FSQ‑VAE（SA‑VAE）
@@ -145,8 +139,6 @@ $$L_{vq} = L_r + \lambda_f L_{float} + \lambda_s L_{slide} + \lambda_b L_{bone}$
 *Figure 3: ShapeMove Overview. In the training phase (a), the transformer network takes in the text inputs describing human motions and body shapes and predicts quantized motion tokens and the shape token [BETA]. The embedding for [BETA] passes through the Projector*
 
 这种两阶段设计的核心优势在于：SA‑VAE 将形状归一化动作压缩为内容令牌，同时通过形状条件化解码器保留风格信息；ShapeMove 则利用语言模型同时预测内容令牌与形状参数，实现了**单阶段文本到形状感知运动的端到端生成**，无需后处理或独立的形状回归步骤。
-
-
 
 ShapeMove 的整体框架由两个阶段级联构成：**形状感知 FSQ-VAE（SA‑VAE）** 与 **形状‑运动令牌预测器（ShapeMove）**。前者负责将形状归一化运动离散化为内容令牌，并在解码时注入形状条件以恢复风格信息；后者则利用预训练语言模型自回归地同时预测形状参数和运动令牌，实现端到端的文本驱动形状感知运动生成。
 
@@ -208,12 +200,8 @@ $$L_{\text{shape}} = \lambda_{\beta} |\beta - \hat{\beta}|$$
 - **FSQ 替代 VQ**：FSQ 避免了传统 VQ‑VAE 的码本坍塌和正则化调参问题，在重建质量上表现出显著优势——SA‑VAE 在重建任务中 FID 降至 0.125，骨骼长度误差较基线量化方法减少近一半（Table 2）。
 - **物理损失的多重约束**：浮动损失、滑步损失和骨骼长度损失共同作用，确保生成的运动在不同体形下仍满足物理合理性（Table 1 中穿透率 0.0268 cm、浮动 0.2658 cm、滑步率 6.143% 均达到最优）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1864_Shape_My_Moves_Text_Driven_Shape_Aware_Synthesis_of_Human_Motions/figures/002_Figure_2.jpg]]
 *Figure 2: Shape-Aware FSQ-VAE (SA-VAE) Overview. SA-VAE is our quantization network learning to generate discrete motion tokens. Given a shape-normalized motion*
-
-
 
 ## 实验与关键发现
 
@@ -255,8 +243,6 @@ ShapeMove是首个同时预测形状参数与运动令牌的方法。Table 4报�
 3. **数据多样性受限**：训练主要基于HumanML3D数据集，所涵盖的体形和动作类型有限，模型对训练分布外的体形和动作的泛化能力尚待验证。
 4. **物理指标与感知关联**：当前物理合理性指标（穿透率、浮动、滑步率）与人类对运动真实性的感知之间的关联程度仍需进一步研究。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1864_Shape_My_Moves_Text_Driven_Shape_Aware_Synthesis_of_Human_Motions/figures/004_Table_1.jpg]]
 *Table 1: Comparison with Baselines. We evaluate the Penetrate, Float, Skate Ratio, and Bone Length Variances for our method and available baselines. For fair comparison, retrain baselines with shape-aware motions. The Shape Input Capability column indicates methods that can incorporate both shape and motion descriptions — a ✗ here suggests the corresponding text encoder cannot parse shape descriptions. Arbitrary Length denotes results obtained without using ground-truth motion lengths. We compare with methods that share the same constraints as ours, capable of generating arbitrary motion lengths and accepting shape descriptions as input. Our method achieves the best or comparable results across the...*
 
@@ -266,16 +252,8 @@ ShapeMove是首个同时预测形状参数与运动令牌的方法。Table 4报�
 ![[assets/figures/papers/paper_list_l1864_Shape_My_Moves_Text_Driven_Shape_Aware_Synthesis_of_Human_Motions/figures/006_Table_3.jpg]]
 *Table 3: Ablation Study. sc stands for shape-conditioning*
 
-![[assets/figures/papers/paper_list_l1864_Shape_My_Moves_Text_Driven_Shape_Aware_Synthesis_of_Human_Motions/figures/007_Table_4.jpg]]
-*Table 4: Attributes Prediction. We present the differences (cm) across six attributes between our beta predictions and the ground truth, focusing solely on our method as no comparable works predict beta concurrently. Our model demonstrates a robust ability to predict the correct beta values, with discrepancies from the ground truth around one cm. C. stands for circumference*
-
 ![[assets/figures/papers/paper_list_l1864_Shape_My_Moves_Text_Driven_Shape_Aware_Synthesis_of_Human_Motions/figures/009_Figure_4.jpg]]
 *Figure 4: Qualitative Comparisons. We compare our method with three baseline methods, T2M-GPT [105], MotionGPT [50], and MotionDiffuse [106], illustrating two samples from the HumanML3D test set. The motions are colored from light to dark blue to represent progression over time. We highlight issues such as incorrect foot motion and other inaccuracies that do not align with expected motion patterns. Our method not only generates motions that align with the textual descriptions, but also accurately follows the body attributes and physical dynamics of the ground truth. Additional visual results and detailed comparisons are available in the project website*
-
-![[assets/figures/papers/paper_list_l1864_Shape_My_Moves_Text_Driven_Shape_Aware_Synthesis_of_Human_Motions/figures/010_Figure_5.jpg]]
-*Figure 5: Perceptual Evaluation. We show the distributions of aggregate responses from annotators on their preferences for samples generated by our method and baseline methods, including MotionDiffuse [106], MotionGPT [50], and T2M-GPT [105], as well as the corresponding ground truth samples. We assess the distributions on three metrics: (a) Shape to Text, how well the body shape matches the text input; (b) Motion to Text, how well the motion matches the text input; and (c) Plausibility of Motion with Shape, how realistic the motions appear for the corresponding body shapes. Across all three metrics, we observe that our method is preferred nearly as much as the ground truth and is favored by approxim...*
-
-
 
 ## 定位与知识库关联
 
@@ -328,8 +306,6 @@ ShapeMove 的有效性建立在以下前提之上：
 ### 知识库定位
 
 ShapeMove 处于**文本条件运动生成**与**形状感知人体建模**的交叉点。在运动生成方向，它继承并改进了 VQ‑VAE + 语言模型的两阶段范式（T2M‑GPT, MotionGPT）；在形状建模方向，它首次将 SMPL 形状参数的连续预测与运动令牌的离散预测统一到同一自回归框架中。其核心贡献不在于提出全新的生成范式，而在于识别并填补了“文本到运动生成中形状信息缺失”这一被普遍忽视的空白——通过 FSQ 量化器与形状条件解码器的协同设计，以较小的架构改动实现了显著的物理合理性增益。
-
-
 
 ## 原文 PDF
 

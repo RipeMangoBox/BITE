@@ -56,8 +56,6 @@ claims:
 
 **方法谱系与知识库定位：** POINTWORLD属于**基于模型的机器人学习**范畴，与视频生成式世界模型（如UniSim、Genie）不同，它直接在3D几何空间中进行动力学预测。其技术路线继承并突破了基于图网络的动力学模型（如**GBND**），将表示从对象级图节点提升为全场景点云，将骨干从GNN替换为大规模点云Transformer，并引入运动加权损失和任意不确定性正则化来处理真实数据噪声。在动作推理端，它将预训练世界模型嵌入MPPI规划器，实现了从感知到行动的闭环。
 
-
-
 ### 野外机器人操作的核心瓶颈
 
 让机器人在开放、非结构化的野外环境中自主完成多样化的物理交互任务，是具身智能领域的终极目标之一。这要求机器人具备一个强大的**内部世界模型**——能够根据当前观察和自身动作，预测未来场景的演化。然而，现有方法面临三重根本性挑战：
@@ -80,8 +78,6 @@ POINTWORLD的提出源于一个简洁而深刻的洞察：**物理交互的本�
 -   在多个数据集和机器人平台上进行联合预训练，实现零样本任务执行。
 
 这一设计将3D世界建模从“特定任务、特定机器人的动力学拟合”提升为“通用物理交互的几何预测”，为野外机器人操作开辟了一条可扩展的技术路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -125,8 +121,6 @@ $$\mathcal{F}_{\theta}^{H} : (\mathbf{s}_{t}, \mathbf{a}_{t:t+H-1}) \to \mathbf{
 ### 创新总结
 
 上述四个维度的改变构成了一个完整的创新链条：**统一表示**剥离了实施例依赖，**规模化骨干**提供了强大的学习容量，**鲁棒目标**稳定了真实数据训练，**分块预测**保证了长时域一致性。这一组合使得单个预训练模型能够在未见过的真实环境中，通过MPC实现零样本任务执行，平均成功率约70%（Figure 8），覆盖刚性推物、可变形物体、关节物体和工具使用等多种任务类型。
-
-
 
 POINTWORLD 的核心设计理念是将机器人世界建模重新定义为**以动作为条件的全场景3D点流预测**问题。其整体流程围绕一个统一的3D点云表示展开，该表示同时承载场景状态和机器人动作，从而剥离了与特定实施例（如关节空间、末端执行器类型）相关的特征，使模型能够专注于基于几何的物理交互。
 
@@ -174,12 +168,8 @@ $$\arg\min \sum_{k=1}^T \left[ c_{\mathrm{task}}(\mathbf{s}_k) + c_{\mathrm{ctrl
 
 这一框架使预训练的POINTWORLD能够在真实机器人上实现零样本任务执行，无需任何演示或微调。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2645_https_arxiv_org_abs_2601_03782/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of POINTWORLD. Given calibrated RGB-D, robot joint-space actions, and a robot description file (URDF), we convert actions to robot flows and concatenate with scene to form a single point cloud serving as an embodiment-agnostic interaction geometry. Scene points are featurized with a frozen DINOv3 encoder, robot points with temporal embeddings, and a point cloud backbone predicts full-scene 3D point flows*
-
-
 
 ### 3D世界建模的形式化
 
@@ -247,21 +237,8 @@ $$c_{\mathrm{task}}(\mathbf{s}_k) = \frac{1}{|\mathcal{Z}_{\mathrm{task}}|} \sum
 
 控制代价 $c_{\mathrm{ctrl}}$ 包含路径长度和可达性正则化项，确保生成的轨迹平滑且符合机器人的运动学约束。这一框架使得预训练的POINTWORLD能够零样本完成刚性推物、可变形物体操作、关节物体交互和工具使用等多种任务，无需任何演示或微调。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2645_https_arxiv_org_abs_2601_03782/figures/003_Figure_3.jpg]]
-*Figure 3: Rich Supervision of 3D World Modeling for Physical Interactions, when conditioned on 3D robot point flows and partial observable RGB-D. The 3D world modeling objective enjoys dense pixel-level supervision while encoding a wide range of capabilities central to robotic manipulation. To predict full-scene evolution, the model needs to implicitly segment objects of interest, identify material property and/or articulation structure, perform implicit shape completion for contact reasoning, propagate robot-object interaction for object-object dynamics, and simultaneously considering the effects of gravity, encapsulated all in a single forward pass of the learned model*
-
-![[assets/figures/papers/paper_list_l2645_https_arxiv_org_abs_2601_03782/figures/004_Figure_4.jpg]]
-*Figure 4: Movement Weighting and Uncertainty Regularization, where the robot releases and drops a yellow cloth. (Bottom Left) The movement weighting, used in the training objective, effectively biases the training towards scene points that are moving at each timestep, computed with the ground-truth flows. (Bottom Right) The uncertainty value, predicted by the model without any ground-truth, regularizes training to prevent overfitting to points that have unreliable ground-truth. Intriguingly, we observe that it also emerges to capture action-conditioned uncertainty arising from the object’s physical properties (e.g., larger variability along the edge of the cloth)*
-
-![[assets/figures/papers/paper_list_l2645_https_arxiv_org_abs_2601_03782/figures/012_Figure_11.jpg]]
-*Figure 11: Action representations. Representing actions as point flows on grippers balances effective, efficient contact reasoning and enables positive transfer across heterogeneous embodiments*
-
 ![[assets/figures/papers/paper_list_l2645_https_arxiv_org_abs_2601_03782/figures/014_Figure_12.jpg]]
 *Figure 12: Ablation on Chunked Prediction, where we study different rollout strategies in training and testing. Chunked rollouts at both training and inference time lead to significantly less drift than other baselines while amortizing compute with only a single forward pass of the model*
-
-
 
 ## 实验与关键发现
 
@@ -288,18 +265,12 @@ Figure 7 进一步揭示了规模化路线图中的关键增益来源：从基�
 
 Table 2 系统评估了 POINTWORLD 的泛化能力。在 BEHAVIOR-1K 仿真域内（B→B），模型取得了 0.0225 的 ℓ₂ mover。更具挑战性的是跨域零样本泛化：仅在仿真数据上训练的模型迁移到真实场景（B→H）时，ℓ₂ mover 高达 0.0531；而联合 DROID 真实数据与 BEHAVIOR-1K 仿真数据预训练后（D+B→H），误差降至 0.0300，相对降低 43.5%。值得注意的是，在该真实场景上进行有监督微调后（D+B→H ft），误差进一步降至 0.0280，超越了从头训练的专用模型（0.0332）。Figure 10 以搬运反光玻璃瓶为例，定性地展示了零样本与微调后的 rollout 质量差异。
 
-![[assets/figures/papers/paper_list_l2645_https_arxiv_org_abs_2601_03782/figures/011_Figure_10.jpg]]
-*Figure 10: Zero-Shot and Finetuned Generalization to Held-Out Real-World Scenes, where the robot transports a reflective glass bottle. POINTWORLD pre-trained on DROID or jointly on DROID and BEHAVIOR (D+B) are capable of zero-shot generalizing to unseen environment and motion from a held-out DROID lab’s scene, closing the gap to the specialist variant trained on that lab’s data. POINTWORLD pre-trained on only simulation data fail to generalize zero-shot. Further finetuning yields more accurate object trajectories of grasped objects*
-
 ![[assets/figures/papers/paper_list_l2645_https_arxiv_org_abs_2601_03782/figures/013_Table_2.jpg]]
 *Table 2: Generalization of POINTWORLD across in-domain, cross-domain, heldout real environments under zero-shot and finetuned settings. D denotes DROID, B denotes B1K, H denotes held-out real-world scenes. “From Scratch” denotes specialist trained on the held-out lab’s data. Evaluations are done on unseen samples from the corresponding dataset. POINTWORLD generalizes within domains, zero-shot transfers to unseen real-world environments, surpasses specialists if finetuned with 20x fewer updates, and benefits from real-sim co-training*
 
 ### 真实世界零样本操控
 
 在真实机器人实验中，POINTWORLD 被嵌入 MPC 框架（MPPI 规划器），直接作为动力学模型使用，无需任何任务演示或微调。Figure 8 展示了 Franka 机器人在 8 项野外任务上的零样本成功率：
-
-![[assets/figures/papers/paper_list_l2645_https_arxiv_org_abs_2601_03782/figures/009_Figure_8.jpg]]
-*Figure 8: Real-World Action Inference. POINTWORLD runs zero-shot with MPC for rigid, deformable, articulated, and tool-use tasks in the wild. Success rates are on top*
 
 - **刚性物体**：TissueBox 推动 80%，Book 推动 70%
 - **可变形物体**：ScarfFold 折叠 60%，PillowPlace 放置 50%
@@ -327,13 +298,6 @@ Table 2 系统评估了 POINTWORLD 的泛化能力。在 BEHAVIOR-1K 仿真域�
 ### 数据预处理与训练配置
 
 Table 3 至 Table 5 汇总了关键的数据预处理与训练配置。数据集总计约 200 万条轨迹、500 小时，涵盖 DROID 真实数据和 BEHAVIOR-1K 仿真数据。预处理中，传感器深度被替换为 Foundation-Stereo 估计的立体深度，相机外参经过优化后中位平移误差 1.8 cm、旋转误差 1.9°。训练采用运动加权的 Huber 损失与任意不确定性正则化，分块预测长度 H=10，并应用随机相机数量增强。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2645_https_arxiv_org_abs_2601_03782/figures/015_Figure_13.jpg]]
-*Figure 13: Ablation on Partial Observability, where we train variants of POINTWORLD with varying number of cameras and evaluate them on all settings at test time. POINTWORLD is robust to different levels of partial observability and benefits from additional cameras in both training and inference. Training with randomized camera counts yields the best performance across all test settings*
-
-
 
 ## 定位与知识库关联
 
@@ -382,8 +346,6 @@ POINTWORLD将3D世界模型定位为一种**可预训练的基础模型**，其�
 5. **范式迁移**：能否将点流世界模型用于更广泛的机器人学习范式？例如，作为离线强化学习中的动力学模型，或为策略训练提供高保真模拟环境。POINTWORLD与实施例无关的特性使其天然适合作为跨平台策略学习的基础。
 
 **需要人工验证的点**：关于GBND的具体作者、会议和年份信息在提供的分析材料中未明确给出，建议查阅原始论文以补充完整的引用元数据。
-
-
 
 ## 原文 PDF
 

@@ -63,8 +63,6 @@ claims:
 
 **方法定位**：Node-RF处于动态NeRF、神经ODE和物理启发式表示学习的交叉点。与现有动态NeRF方法相比，它首次将ODE驱动的连续时间演化直接嵌入体积渲染框架，实现了从“离散帧拟合”到“连续动力学学习”的范式转变。与**SimVP**、**Vid-ODE**等2D视频预测方法相比，Node-RF在3D场景中保持多视图一致性，且不依赖固定时间间隔假设。该方法为确定性物理系统的3D动力学建模提供了新的基准思路，但在随机动力学、非刚性变形以及大规模真实场景中的适用性仍有待探索。
 
-
-
 ### 动态场景建模的核心挑战
 
 三维动态场景的逼真重建与渲染是计算机视觉与图形学中的基础难题。以神经辐射场（NeRF）为代表的隐式神经表示，在静态场景的新视角合成上取得了突破性进展，但其向动态场景的扩展仍面临根本性瓶颈。现有动态NeRF方法——如**D-NeRF**（Pumarola et al., CVPR 2021）、**HexPlane**、**TiNeuVox**、**4D-GS**和**Motion-GS**等——虽然在插值任务上表现优异，却普遍存在一个关键缺陷：它们仅在离散的训练时间步上学习场景变化，缺乏对连续时间动态的建模能力。这意味着模型无法理解时间步之间的平滑过渡机制，更无法在训练时间范围之外进行可信的长期外推。
@@ -92,8 +90,6 @@ $$\frac{d h(t)}{d t} = f_{\theta}(h(t), t), \quad \text{with} \quad h(t_0) = h_0
 ### 技术挑战与设计方向
 
 实现上述目标面临多重挑战。首先，NeRF的体积渲染本身计算开销巨大，在其之上叠加ODE求解器的迭代积分将进一步增加训练负担。其次，如何将不同初始条件下的多序列信息压缩到一个共享的潜在动力学空间中，同时保持足够的表达能力来区分不同轨迹，是一个非平凡的表示学习问题。最后，若无适当的正则化，神经ODE学到的潜在空间可能缺乏结构，导致动力学行为不可解释且泛化能力受限。本文提出的Node-RF框架正是围绕这些挑战展开设计，其核心架构与实验验证将在后续章节中详述。
-
-
 
 ## 核心方法与创新机理
 
@@ -124,8 +120,6 @@ $$W_i \gets \mathrm{normalization}(W_i, \mathrm{softplus}(c_i))$$
 并惩罚网络的 Lipschitz 上界 $\mathcal{L}_{lipschitz} = \prod_i \mathrm{softplus}(c_i)$，强制潜在空间变得平滑结构化。Figure 8 的对比显示，未使用 Lipschitz 正则化时模型难以收敛到代表系统动力学的潜在结构，而引入正则化后潜在轨迹呈现清晰的收敛模式（绿色起点到红色终点的平滑流动），这是 Node-RF 能够进行长期稳定外推的关键机制。
 
 **总结**：Node-RF 的创新并非单一技术点的替换，而是通过“神经 ODE 连续演化 + 初始条件编码 + Lipschitz 结构化正则化”的组合，将动态 NeRF 从“离散帧拟合”提升为“连续动力学学习”，从而同时获得长期外推和跨序列泛化能力。
-
-
 
 Node-RF 的核心设计思路是将动态场景的时空演化建模为神经ODE驱动的连续潜在轨迹，再通过NeRF体积渲染实现新视角合成。整个框架围绕一个关键因果机制展开：**用微分方程替代离散帧索引，使场景状态在时间维度上具有连续性和可外推性**。
 
@@ -167,13 +161,6 @@ $$\mathcal{L} = \lambda_1 \mathcal{L}_{NeRF} + \lambda_2 \mathcal{L}_{p} + \lamb
 ### 关键设计选择
 
 框架对几个超参数较为敏感。潜在向量维度从256增至512带来性能提升，但继续增至1024会导致过拟合（Table 5）。神经ODE的MLP深度以3层最优，5层或7层均造成性能下降或学习失败（Table 6）。预热阶段使用的潜在向量数量对性能影响不大，2个即可捕获初始动态（Table 7）。训练时间随序列长度线性增长，多序列泛化实验约需3天（Table 8）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l36_https_arxiv_org_abs_2603_12078/figures/001_Figure_1.jpg]]
-*Figure 1: Node-RF Overview. Multiple observations of the red ball being dropped onto the dual ramp end in damped oscillations towards the two valleys. Node-RF learns to encodes generalized dynamics of deterministic motions from sequences such as A (pink), C (yellow) into an implicit space-time latent representation using NeRF and nODE. Embedded sequence states depicted as scene latent points zt on the embedding space are propagated through time t using an implicit neural ODE. Intermediate and future states (centre to right encodings) can be extrapolated and rendered (top, bottom) given initial frame conditions (on the left). Latent divergence ∇zt (colour coded) characterizes behaviour of the learnt s...*
-
-
 
 ### 整体架构
 
@@ -242,8 +229,6 @@ Node-RF 支持两种训练模式（见 Figure 2）：
 ![[assets/figures/papers/paper_list_l36_https_arxiv_org_abs_2603_12078/figures/011_Figure_8.jpg]]
 *Figure 8: Latent Space Comparison of models w/o and w/ Lipschitz regularization. The green and red dots represent the starting and ending points of the trajectories respectively*
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置与评估协议
@@ -266,9 +251,6 @@ Table 1 展示了 Bouncing Balls 数据集上 4 倍外推的定量对比。Node-
 
 定性结果（Figure 4）进一步验证：基线方法如 D-NeRF 在外推后期出现明显的球体模糊和轨迹漂移，而 Node-RF 能保持清晰的球体边界和准确的碰撞反弹轨迹。这归因于神经 ODE 提供的连续时间动力学约束——它迫使潜在状态沿平滑的微分方程轨迹演化，而非像离散帧索引方法那样在训练帧之间进行无约束的插值。
 
-![[assets/figures/papers/paper_list_l36_https_arxiv_org_abs_2603_12078/figures/007_Figure_4.jpg]]
-*Figure 4: Long-term extrapolations, Bouncing Balls[24] scene*
-
 ### 插值与外推：Pendulum 数据集
 
 Table 2 报告了 Pendulum 数据集的结果。在插值任务上，Node-RF 以 **PSNR 17.057**、**SSIM 0.531** 和 **LPIPS 0.0234** 全面超越 D-NeRF（PSNR 13.906）和 4D-GS。这一优势在外推任务上延续：Node-RF 的 PSNR 达到 **15.920**，LPIPS 为 **0.0257**，均优于所有 3D 基线。
@@ -280,9 +262,6 @@ Table 2 报告了 Pendulum 数据集的结果。在插值任务上，Node-RF 以
 
 Figure 3 的定性对比显示，D-NeRF 在外推帧中摆锤边缘出现伪影，而 Node-RF 保持了清晰的几何边界和正确的摆动相位。
 
-![[assets/figures/papers/paper_list_l36_https_arxiv_org_abs_2603_12078/figures/005_Figure_3.jpg]]
-*Figure 3: Extrapolation results on the Pendulum dataset [9]*
-
 ### 跨序列泛化：Oscillating Ball 与 Bifurcating Hill
 
 Table 3 展示了最具挑战性的泛化实验——模型在训练序列之外的全新初始条件下预测动力学。Node-RF 的核心设计优势在此充分体现：通过学习一个共享的动力学 ODE 并条件化初始状态（位置和速度），模型无需为每个新序列重新训练。
@@ -293,9 +272,6 @@ Table 3 展示了最具挑战性的泛化实验——模型在训练序列之外
 在 3D Oscillating Ball 数据集上，Node-RF 的 **IoU 0.3327** 显著优于条件化 D-NeRF(c) 的 0.2807（提升约 18.5%）。在 2D Bifurcating Hill 数据集上，Node-RF 的 **IoU 0.485** 同样领先于 Vid-ODE 的 0.409（提升约 18.6%）。Figure 6 和 Figure 7 的动态流掩膜可视化表明，Node-RF 能准确预测新轨迹中球的运动区域，而基线方法在分叉点附近出现明显的流预测错误。
 
 Figure 5 进一步分析了 Bifurcating Hill 中新轨迹的位姿误差随时间的变化：Node-RF 的位姿误差在整个预测窗口内保持相对稳定，未出现典型的误差累积发散现象，这验证了 ODE 驱动的潜在动力学具有长期数值稳定性。
-
-![[assets/figures/papers/paper_list_l36_https_arxiv_org_abs_2603_12078/figures/008_Figure_5.jpg]]
-*Figure 5: Pose error for a novel trajectory in Bifurcating Hill*
 
 ### 消融实验
 
@@ -321,18 +297,8 @@ Figure 8 揭示了 Lipschitz 正则化对潜在空间结构的塑造作用。未
 4. **监督质量依赖**：Bifurcating Hill 等 2D 数据集依赖 CNOS 估计的伪真值位姿，监督质量受上游模型影响。
 5. **真实场景未知**：尚未在真实世界大规模数据上评估，鲁棒性和可扩展性有待验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l36_https_arxiv_org_abs_2603_12078/figures/013_Table_4.jpg]]
 *Table 4: Ablation study on loss term in Oscillating Ball*
-
-![[assets/figures/papers/paper_list_l36_https_arxiv_org_abs_2603_12078/figures/015_Table_6.jpg]]
-*Table 6: Ablation study of nODE layers on different evaluation metrics in Oscillating Ball dataset*
-
-![[assets/figures/papers/paper_list_l36_https_arxiv_org_abs_2603_12078/figures/017_Table_8.jpg]]
-*Table 8: Training time per dataset*
-
-
 
 ## 定位与知识库关联
 
@@ -399,8 +365,6 @@ $$\mathcal{L}_{lipschitz} = \prod_i \mathrm{softplus}(c_i)$$
 3. **真实世界部署**：在真实世界光照变化、遮挡、传感器噪声条件下的鲁棒性尚未评估。
 4. **训练效率优化**：72 小时的训练时间限制了快速迭代，能否通过更高效的 ODE 求解器或混合表示（如结合 3D 高斯泼溅）加速？
 5. **动力学解耦**：当前框架将静态背景和动态前景分离处理，但未显式建模多物体之间的相互作用动力学。
-
-
 
 ## 原文 PDF
 

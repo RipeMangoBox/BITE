@@ -52,8 +52,6 @@ claims:
 
 在文本摘要（TL;DR）和对话生成（HH-RLHF）任务上，WPR在GPT-4评估的胜率上一致且显著优于所有基于KL和f-散度的基线方法：相较反向KL正则化（RKL），WPR在TL;DR上胜率达0.608，在HH-RLHF上达0.616。机制分析表明，WPR产生的token级惩罚与基于BERTScore的语义相似度相关性显著强于KL惩罚，且其生成决策的top-10候选token在嵌入空间中语义更紧凑。方法在Gemma-2B、Gemma-7B和Qwen1.5-1.8B-Chat等多模型家族上均表现稳健，并在代码生成任务（APPS）上展现出良好的泛化能力。
 
-
-
 ### 大语言模型对齐中的策略正则化瓶颈
 
 基于人类反馈的强化学习（RLHF）已成为将大语言模型（LLM）与人类偏好对齐的事实标准范式。其核心优化目标可形式化为：
@@ -85,8 +83,6 @@ $$D_{\mathbb{W}}(\pi||\pi') = \min_{P \in U(\pi,\pi')} \langle P, C \rangle$$
 其中成本矩阵 $C_{ij}$ 通常基于token嵌入的欧氏距离定义，$P$ 为联合传输计划。这使得Wasserstein距离能够区分"将概率质量转移到语义相邻token"与"转移到语义无关token"两种行为，前者产生较低的成本，后者产生较高的成本。
 
 本文的核心动机即是将这一语义感知的距离度量引入RLHF的策略正则化框架，在保持与PPO兼容的前提下，使正则化惩罚能够反映token空间的真实语义几何，从而在约束策略偏离的同时保留合理的语义变体，最终提升对齐质量与生成多样性。
-
-
 
 ## 核心方法与创新机理
 
@@ -132,8 +128,6 @@ $$\mathcal{T}_{\bar{W}}(\pi_\theta; \pi_{\mathrm{ref}}) = \mathbb{E}_{\mathbf{x}
 | 语义感知能力 | 无（语义盲） | 有（通过成本矩阵捕捉token间语义关系） |
 | 计算开销 | 基准 | 每步训练时间增加约2.5% |
 
-
-
 ![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_sUac3QDbAs/figures/008_Figure_3.jpg]]
 *Figure 3: Overview of RLHF with Wasserstein Policy Regularization. (a) Standard RLHF with a policy regularization penalty. (b) Our proposed Wasserstein policy regularization, where the penalty is computed from the optimal dual variables obtained via the Sinkhorn-Knopp algorithm*
 
@@ -164,8 +158,6 @@ WPR 的整体管线在标准 RLHF 三阶段流程的基础上，将策略正则�
 上述截断策略使 WPR 的额外计算开销极为有限：在 Gemma-2B 上，每步训练时间仅比标准 KL 正则化增加约 2.5%（生成和反向传播时间不变，仅惩罚计算从 0.005 h/千步增至 0.117 h/千步）。但 GPU 显存占用约增加 15 GB，主要来自成本矩阵的存储。
 
 > **手动验证提示**：关于显存增加的具体数值（15 GB）以及跨模型规模的显存缩放特性，原文仅在 Gemma-2B 上报告，更大模型上的显存开销需进一步确认。
-
-
 
 ### 瓶颈与核心思想
 
@@ -238,8 +230,6 @@ WPR的计算瓶颈在于每步生成后需对每个token位置求解Sinkhorn距�
 
 消融实验（Table 6）验证了各截断参数的关键性：$k_2$ 从128降至64会导致性能下降，而Sinkhorn迭代次数从10降至5则严重损害性能（vs RKL胜率降至0.328），说明充分收敛的Sinkhorn迭代对获得有效惩罚至关重要。最终，整套WPR方案使每步训练时间仅比标准KL正则化增加约2.5%。
 
-
-
 ## 实验与关键发现
 
 ### 核心结果：WPR在所有基准上一致超越KL及f-散度基线
@@ -263,21 +253,13 @@ WPR的核心主张——语义感知的正则化能带来更好的对齐质量�
 
 ![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_sUac3QDbAs/figures/011_Table_3.jpg]]
 
-![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_sUac3QDbAs/figures/012_Table_4.jpg]]
-
 ### 机制验证：WPR惩罚确实编码了语义信息
 
 WPR的核心机制假设是：基于Wasserstein距离的对偶惩罚能够捕捉token间的语义相似性，从而在训练中施加更合理的约束。三项互补的实证分析支持了这一假设。
 
 **惩罚-语义相关性**：Table 7报告了逐token的负惩罚值与下游生成响应的BERTScore之间的Pearson相关系数。在TL;DR上，WPR惩罚的相关性为**0.2160**，显著高于KL惩罚的0.1734；在HH-RLHF上，这一差距更为悬殊——WPR为**0.1749**，而KL仅为0.0172。这说明WPR的惩罚力度与生成质量的语义度量更为一致：当模型倾向于生成语义偏离参考的token时，Wasserstein惩罚会施加更强的约束，而KL惩罚对此不敏感。
 
-![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_sUac3QDbAs/figures/017_Table_7.jpg]]
-*Table 7: Pearson correlation between each negative penalty and BERTScore (Zhang et al., 2020)*
-
 **候选token的语义连贯性**：Table 8量化了模型在生成决策时，top-10候选token在嵌入空间中的平均欧氏距离。WPR训练出的模型在两个数据集上均表现出更紧凑的候选集：TL;DR上为**3.593**（RKL为3.781），HH-RLHF上为**3.584**（RKL为3.690）。更小的平均距离意味着模型倾向于在语义上更连贯的替代词之间进行选择，而非在无关token间跳跃，这正是语义感知正则化期望诱导的行为。
-
-![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_sUac3QDbAs/figures/018_Table_8.jpg]]
-*Table 8: Semantic coherence of top-10 token candidates on each dataset*
 
 **训练动态中的惩罚一致性**：Figure 5显示，在整个训练过程中，归一化的KL惩罚与Wasserstein惩罚呈现强正相关（r=0.917），表明两者在宏观趋势上一致。然而，局部存在显著差异——这些差异正是WPR捕捉到KL所忽略的语义信息的关键窗口。
 
@@ -302,24 +284,11 @@ Table 6的系统消融揭示了WPR各设计选择的贡献。
 
 1. **β超参数仍需手动搜索**：Table 10显示不同任务和散度方法的最优β值差异显著（WPR在TL;DR上为0.01，在HH-RLHF上为0.005），增加了调参负担。Figure 4的敏感性分析表明WPR在较宽β范围内均优于SFT基线，但最优值仍需针对每个任务单独确定。
 
-![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_sUac3QDbAs/figures/023_Table_10.jpg]]
-*Table 10: Policy regularization hyperparameter $\beta$ for each method*
-
 2. **成本矩阵的静态性**：当前实现使用固定的、预训练的SFT模型嵌入构建成本矩阵，未在训练过程中更新。Table 12的消融显示，切换策略骨干或嵌入空间会影响性能，说明成本矩阵的质量对WPR的有效性有直接影响。
 
 3. **跨tokenizer泛化未验证**：方法依赖策略模型的tokenizer构建语义空间，若需利用不同tokenizer的嵌入，需构建非平凡的跨token对齐，这在当前框架中尚未解决。
 
 4. **仅在PPO框架下验证**：所有实验均基于PPO风格的RLHF，尚未在DPO等RL-free方法上验证WPR对偶惩罚思想的适用性。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_sUac3QDbAs/figures/022_Table_9.jpg]]
-*Table 9: Hyperparameters for PPO training*
-
-![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_sUac3QDbAs/figures/024_Table_11.jpg]]
-*Table 11: Corresponding functions for each f-divergences*
-
-
 
 ## 定位与知识库关联
 
@@ -395,8 +364,6 @@ WPR在标准PPO训练循环中插入了一个**Wasserstein惩罚计算模块**�
 3. **跨tokenizer语义迁移**：如何支持不同tokenizer嵌入空间之间的最优传输，使WPR能利用来自更大或异构模型的语义知识？
 4. **可学习成本矩阵**：是否可以通过微调或轻量级网络动态学习成本矩阵 $C$，使其随模型训练适应性地捕捉语义？
 5. **更大规模验证**：WPR在7B+模型上的缩放特性，以及在RLHF不同阶段（如奖励建模期间）使用Wasserstein距离的潜力。
-
-
 
 ## 原文 PDF
 

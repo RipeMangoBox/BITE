@@ -53,8 +53,6 @@ claims:
 
 **局限与展望**：当前方法仅验证于高度重复的工业制造任务，向动作多样性高的非结构化环境（家庭、医疗）扩展仍需探索；从被动观察到的动作基元到机器人实际执行之间的策略学习与技能对齐是后续重要方向。
 
-
-
 ### 工业 VLA 面临的动作数据瓶颈
 
 视觉-语言-动作（VLA）模型在通用机器人操作中展现出巨大潜力，但其在工业场景的落地面临一个根本性瓶颈：**严重缺乏结构化的动作数据**。工业制造环境产生海量连续工作视频流，然而这些数据几乎全部处于未标记状态——人工标注每一段视频中每个动作的起止边界和语义类别，成本极高且不可扩展。现有 VLA 预训练范式高度依赖大规模、带细粒度动作标注的数据集，这一供需矛盾直接制约了工业 VLA 的发展。
@@ -75,8 +73,6 @@ claims:
 为此，本文提出一个关键洞察：**将动作分割的信号源从像素空间迁移到抽象的潜在动作空间**。通过训练一个轻量级运动分词器（motion tokenizer），将原始运动轨迹编码为潜在动作向量，再在量化后的潜在空间中定义“潜在动作能量”（Latent Action Energy）作为边界检测信号。这一设计使得分割过程能够抑制视觉噪声，直接捕获行为意图的转变点，而非物理运动的变化点。
 
 基于此，LAPS（Latent Action-based Primitive Segmentation）流水线以完全无监督的方式，从原始视频流中输出结构化的动作序列（离散动作码、分割片段、语义簇），为下游 VLA 预训练提供可直接使用的结构化动作数据。
-
-
 
 ## 核心方法与创新机理
 
@@ -112,8 +108,6 @@ LAPS 提出使用**随机初始化且冻结的轻量 Transformer 编码器**（L
 
 LAPS 的三项创新构成了一条因果链路：**潜在动作能量**将分割信号从不可靠的像素空间迁移至语义敏感的抽象动作空间；**迟滞控制器**以因果、鲁棒的方式将该信号转化为稳定动作段；**冻结 Transformer 嵌入**在无监督约束下最大化动作段的语义可分性。三者协同实现了从连续视频流到结构化动作词汇的端到端无监督发现，为工业 VLA 预训练提供了可扩展的数据引擎。
 
-
-
 LAPS (Latent Action-based Primitive Segmentation) 是一个面向工业 VLA 预训练的无监督动作基元发现流水线。其核心设计动机在于：工业场景中大量连续工作视频流缺乏结构化动作标注，传统基于像素级视觉特征的分割方法难以鲁棒捕获行为意图的转变。LAPS 通过在抽象潜在动作空间中定义能量度量，将“动作边界检测”从视觉噪声敏感的像素域迁移到语义感知的运动潜空间，从而实现对动作基元的无监督分割与聚类。
 
 流水线由三个顺序阶段构成（Figure 2），形成从原始视频到结构化动作词汇的端到端处理链路：
@@ -128,13 +122,6 @@ LAPS (Latent Action-based Primitive Segmentation) 是一个面向工业 VLA 预�
 3. **语义动作聚类 (Semantic Action Clustering)**：将分割得到的变长潜在向量序列通过冻结的随机初始化 Transformer 编码器嵌入为固定长度的段级表示 $e_i = \frac{1}{T_i} \sum_t h_t^{(L)}$，然后采用余弦 k-means 聚类将海量动作片段归纳为有限的动作词汇，完成从连续观测到离散动作基元的抽象。
 
 流水线的关键设计决策在于**信号源的选择**：动作边界检测不依赖光流或通用视觉特征（如 CLIP），而是严格定义在运动分词器的量化潜空间中。消融实验（Table 5）表明，将运动分词器替换为 CLIP 特征或直接在原始速度上计算 $E_{\mathrm{action}}$ 会导致分割性能严重下降（F1@2s 从 87.5% 降至 25–27%），验证了专用运动编码的必要性。这一设计的直觉在于：量化潜空间通过有限标量量化 (FSQ) 将连续运动动态离散化为语义感知的动作代码本，使得能量信号能鲁棒捕获行为意图的转变，同时抑制光照、纹理等视觉噪声的干扰（Figure 4 定性展示了潜在动作能量相比光流在语义边界检测上的优势）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2493_https_arxiv_org_abs_2511_21428/figures/001_Figure_1.jpg]]
-*Figure 1: Example of our segmentation approach using Latent Action Energy from a Motion Tokenizer. Action boundaries (red circles) correspond to transitions from high energy to baseline, indicating action completion. The pipeline outputs the Latent Action Sequence (bottom codes), providing structured representations for VLA pre-training*
-
-
 
 ### 3.1 潜在动作能量：核心分割信号
 
@@ -186,16 +173,6 @@ $$\mathrm{ICSS}_k = \frac{1}{|\mathcal{P}_k|} \sum_{(i,j) \in \mathcal{P}_k} \co
 
 ICSS 通过外部 VLM 作为语义裁判，评估同一簇内片段的视觉语义一致性。Table 4 显示 LAPS 发现簇的 ICSS 达到 0.926，远高于随机配对的基线 0.804，验证了所发现动作基元的语义内聚性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2493_https_arxiv_org_abs_2511_21428/figures/003_Figure_3.jpg]]
-*Figure 3: Sliding-window tokenization: A motion tokenizer converts the video stream into a sequence of discrete latent action indices*
-
-![[assets/figures/papers/paper_list_l2493_https_arxiv_org_abs_2511_21428/figures/004_Figure_4.jpg]]
-*Figure 4: Qualitative comparison of our*
-
-
-
 ## 实验与关键发现
 
 ### 主实验：工业场景下的动作基元分割
@@ -244,15 +221,8 @@ Table 5 的系统消融揭示了 LAPS 各模块对分割和聚类性能的因果
 
 4. **数据集规模有限。** 工业电机装配数据集约 10 小时，泛化到大规模、多样化的工业场景仍需进一步验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2493_https_arxiv_org_abs_2511_21428/figures/005_Figure_5.jpg]]
 *Figure 5: UMAP visualization of action primitive embeddings colored by k-means cluster ID. Distinct, well-separated clusters that correspond to real workstation tasks confirmed through manual inspection*
-
-![[assets/figures/papers/paper_list_l2493_https_arxiv_org_abs_2511_21428/figures/008_Table_3.jpg]]
-*Table 3: Clustering results on the Exocentric View dataset (6,444 segments, k = 3), comparing our Frozen Transformer embedding with a strong non-temporal aggregation baseline*
-
-
 
 ## 定位与知识库关联
 
@@ -341,8 +311,6 @@ LAPS 的独特贡献在于：在完全不依赖动作标注的条件下，从连
 4. **在线自适应**：在流式场景下，如何使动作检测阈值和聚类结构自适应地随任务分布变化而调整，而非依赖离线预定义的参数？
 
 5. **评估基准的标准化**：工业 VLA 预训练领域缺乏统一的评估基准。LAPS 的自建数据集和 ICSS 指标提供了初步尝试，但社区需要更系统、更多样的基准来推动方法比较和进步。
-
-
 
 ## 原文 PDF
 

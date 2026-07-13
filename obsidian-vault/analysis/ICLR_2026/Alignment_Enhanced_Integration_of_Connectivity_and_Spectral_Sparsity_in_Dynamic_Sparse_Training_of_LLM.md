@@ -51,8 +51,6 @@ claims:
 
 实验表明，对齐增强策略（Act+Align）在所有稀疏度、模型规模和数据集上均显著优于朴素求和（Naive），Wilcoxon 符号秩检验 p < 0.001。在 LLaMA-60M 至 350M 参数规模、OpenWebText 和 C4 数据集上，CHTsL 在相同参数预算下一致超越 SLTrain（Han et al., 2024）等现有最优基线。例如，在总稀疏度 0.9 下，LLaMA-60M 的验证困惑度从 SLTrain 的 33.90 降至 31.77（Table 2）。消融分析进一步证实，仅对 Q、K 层施加对齐损失即可取得与全层对齐相当甚至更优的效果，验证了注意力层冲突缓解的关键作用。
 
-
-
 大语言模型（LLM）的预训练对计算和存储资源的需求极为庞大，参数高效训练（parameter-efficient training）因此成为降低门槛的关键方向。其中，稀疏训练通过在训练阶段维持稀疏权重矩阵，有望在保持模型能力的同时显著减少计算开销。
 
 现有稀疏训练方法大致可分为两个家族：
@@ -69,8 +67,6 @@ $$\mathrm{OCR} = \frac{\sum_i \min(|S_i|, |L_i|) \cdot \mathbf{1}\{S_i L_i < 0\}
 该指标衡量两个分支输出中因符号相反而被取消的重叠信号占比，取值越接近1表示抵消越严重。
 
 基于上述诊断，本文的核心动机是：**能否通过系统性地缓解抵消效应，实现连通性稀疏与谱稀疏的真正协同？** 为此，本文提出对齐增强的集成框架，在动态稀疏训练中引入显式的分支对齐机制，从而在极稀疏（如仅保留10%~30%参数）条件下显著提升参数高效预训练的性能。
-
-
 
 ## 核心方法与创新机理
 
@@ -116,8 +112,6 @@ $$L^{(l)} = B^{(l)} \sigma(A^{(l)} x)$$
 
 该对齐增强框架具有通用性：**Table 13** 表明，将其应用于静态稀疏、SET（Mocanu et al., 2018）等不同连通性稀疏方法及不同初始化策略时，均能一致降低困惑度。
 
-
-
 CHTsL 是一个将动态连通性稀疏训练与谱稀疏（低秩）训练进行对齐增强整合的统一框架。其核心设计动机源于一个关键发现：当简单地将动态稀疏分支的输出与低秩分支的输出相加时，两分支会产生方向相反的冲突信号，导致**抵消效应（cancellation effect）**，削弱模型的整体表达能力。为此，CHTsL 通过引入对齐损失和低秩分支的激活调整，系统性地缓解这一冲突，促进两分支的协作学习。
 
 框架由四个核心模块构成，其整体工作流如 Figure 1 所示：
@@ -159,8 +153,6 @@ $$s_{\mathrm{total}} = 1 - d_{\mathrm{connectivity}} - d_{\mathrm{spectral}}$$
 其中 $d_{\mathrm{connectivity}}$ 和 $d_{\mathrm{spectral}}$ 分别为连通性稀疏分支和谱稀疏分支的密度。所有对比方法在相同的 $s_{\mathrm{total}}$ 约束下进行公平比较，通过网格搜索分配两分支的参数比例并报告最佳配置结果。
 
 值得注意的是，后续分析（Table 7）表明，仅对注意力层的 Q、K 投影施加对齐损失，即可取得与对所有线性层施加对齐相当甚至更优的困惑度，且显著优于仅对齐其他层（胜率 0.42 vs 0.08），这揭示了抵消效应主要集中在注意力机制的查询和键计算中的现象。
-
-
 
 ### 问题量化：重叠抵消率（OCR）
 
@@ -216,8 +208,6 @@ CHTsL 的整体流程（Figure 1）可概括为四个模块的协同：
 4. **输出融合**：$O^{(l)} = S^{(l)} + L^{(l)}$，两分支输出直接相加。
 
 该框架具有通用性：对齐增强训练方案在结合不同连通性稀疏方法（静态稀疏、SET、CHTs）及不同初始化策略时均能一致降低困惑度（Table 13）。
-
-
 
 ## 实验与关键发现
 
@@ -293,27 +283,6 @@ Table 12 报告了不同方法的推理内存和吞吐量。尽管 CHTsL 在参�
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_jZplmg7Ad9/figures/020_Table_12.jpg]]
 *Table 12: Inference memory and throughput of different methods. For each model, inference was conducted for 5000 steps, with maximum memory and average throughput reported. Experiments are conducted on 1 x NVIDIA A100-80GB, with dummy input of batch size 128 and sequence length 256*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_jZplmg7Ad9/figures/006_Table_3.jpg]]
-*Table 3: Common hyperparameter settings for experiments on LLaMA-60M and LLaMA-130M. The settings align with previous research*
-
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_jZplmg7Ad9/figures/007_Table_4.jpg]]
-*Table 4: The best sparsity-configuration for SLTrain under different total sparsity. s _ { t o t a l } refers to total sparsity, s refers to sparsity in the connectivity sparse branch, r refers to the rank in lowrank branch. The last column reports the proportion of parameters in connectivity sparse branch compared with spectral sparse (low-rank) branch*
-
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_jZplmg7Ad9/figures/008_Table_5.jpg]]
-*Table 5: The best sparsity-configuration for CHTsL under different total sparsity. s _ { t o t a l } refers to total sparsity, s refers to sparsity in the connectivity sparse branch, r refers to the rank in lowrank branch. The last column reports the proportion of parameters in connectivity sparse branch compared with spectral sparse (low-rank) branch*
-
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_jZplmg7Ad9/figures/011_Table_6.jpg]]
-*Table 6: Comparison between different integration strategies for ”Static + Low-rank” Combination. The table consists of two parts: a. The performance of different integration strategies, reported in terms of validation perplexity (PPL↓). The Naive strategy corresponds to a simple sum of static sparse and low-rank factorization. The Act strategy applies activation adjustment to the low-rank factorization branch. The Act+Align strategy combines activation adjustment with the alignment loss. The coefficient of the alignment loss λ is 0.3. The sparsity configuration is set such that the sparse branch and the low-rank branch have the same number of trainable parameters $\begin{array} { r } { \frac { { d _...$
-
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_jZplmg7Ad9/figures/016_Table_8.jpg]]
-*Table 8: Common hyperparameter settings for experiments on LLaMA-350M and LLaMA-1B. The settings align with previous research*
-
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_jZplmg7Ad9/figures/019_Table_11.jpg]]
-*Table 11: Zero-shot results on downstream tasks. CHTsL, SLTrain, and CHTs are evaluated under a total sparsity of 0.9. Results are reported in terms of accuracy (Acc), with the best-performing value in each row highlighted in bold. Note that if two or more methods achieve the same accuracy, all corresponding values are bolded and counted toward the win rate*
-
-
 
 ## 定位与知识库关联
 
@@ -362,8 +331,6 @@ CHTsL 的核心贡献在于首次系统揭示并解决了动态连通性稀疏�
 2. **缩放特性验证**：在更大规模（>1B）和生成式任务上，CHTsL 的缩放特性及零样本/少样本能力是否依然保持优势？当前在 350M 规模上的验证（Table 9）虽显示趋势一致，但尚不足以推断大规模行为。
 3. **与其他压缩技术的结合**：该对齐增强框架能否与结构化稀疏、量化、或现代混合精度训练有效结合，进一步降低端到端资源消耗？对齐损失的形式是否可推广到其他多分支压缩场景？
 4. **对齐损失的理论分析**：当前对齐损失的设计基于经验观察，缺乏对损失函数形式（如 Frobenius 范数 vs 余弦相似度）与训练动力学之间关系的理论刻画，这一方向值得深入。
-
-
 
 ## 原文 PDF
 

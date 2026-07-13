@@ -52,15 +52,11 @@ claims:
 
 实验表明，VDMini 在 I2V 任务上实现了 **2.5 倍加速**（SF-V 延迟从 512ms 降至 345ms），FVD 从 166.26 变为 198.13，性能接近教师模型；在 T2V 任务上分别实现了 1.4 倍（T2V-Turbo-v2）和 1.25 倍（HunyuanVideo）加速。消融实验证实，ICMD 损失将剪枝后模型的 FVD 从约 290 降至 198.13，验证了其有效性。
 
-
-
 视频扩散模型（Video Diffusion Models, VDMs）在图像到视频（I2V）和文本到视频（T2V）生成任务上取得了显著进展，但其推理过程需要庞大的计算资源，严重阻碍了实际部署。核心瓶颈在于：VDM的U-Net骨干网络层数深、参数多，导致单次推理延迟高，而现有模型压缩方法（如结构化剪枝**DepGraph** (Fang et al., CVPR 2023) 或权重幅度剪枝）直接套用到VDM时，往往无法保持视频特有的运动一致性，生成质量下降明显。
 
 本文的关键观察是：VDM中不同深度的层对生成质量的贡献存在本质差异。深层（如U-Net的DownBlock.2、UpBlock.1）对多帧运动动态至关重要——实验表明，替换这些深层块会导致FVD（Fréchet Video Distance）显著升高，且生成的视频运动变得微弱（Figure 1(a), Figure A6）。相反，浅层主要负责单帧的个体内容生成，对运动一致性的贡献相对有限。这一发现揭示了一个直接的剪枝策略：**保留对运动动态关键的深层，剪枝贡献冗余的浅层**，从而在参数和延迟大幅降低的前提下，尽可能维持视频生成质量。
 
 然而，仅靠结构性剪枝仍会导致微调后的生成质量下降。为此，本文提出**个体内容与运动动态一致性损失（ICMD Loss）**，包含两个互补组件：**个体内容蒸馏损失（ICD Loss）**用于对齐学生模型与教师模型在单帧层面的中间特征，保持逐帧内容质量；**多帧内容对抗损失（MCA Loss）**则通过时空判别器（SpatioHead和TemporalHead）在对抗训练中保持跨帧运动一致性。两者协同，使剪枝后的轻量模型VDMini在I2V任务上实现2.5倍加速（延迟从512ms降至345ms），FVD仅从166.26小幅升至198.13，逼近教师模型SF-V（Zhang et al., NeurIPS 2024）的水平。
-
-
 
 ## 核心方法与创新机理
 
@@ -88,10 +84,6 @@ VDMini 的核心创新在于**首次揭示了视频扩散模型中深层与浅�
 除了 U-Net 剪枝，VDMini 还对 VAE 解码器进行了层级剪枝和通道剪枝（移除 MidBlock 和 UpBlock.3，压缩通道数），将解码器参数量从 63.58M 降至 39.17M，延迟从 2832ms 降至 840.5ms（Appendix A, Table A1），在几乎不损失重建质量的前提下进一步加速整体推理。
 
 
-
-![[assets/figures/papers/paper_list_l12_Individual_Content_and_Motion_Dynamics_Preserved_Pruning_for_Video_Diffu/figures/002_Figure_2.jpg]]
-*Figure 2: The proposed VDMini framework for Video Di usion Model Compression. Left: The retraining process with the proposed ICMD loss, where $\mathcal { L } _ { I C D }$ is the knowledge distillation loss for individual content consistency, and ${ \mathcal { L } } _ { M C A }$ is the adversarial loss for multi-frame content consistency. $\mathcal { L } _ { T a s k }$ is the task-specific loss function adopted in the base model. Right: The teacher model is pruned by blocks to obtain the student model (i.e.,VDMini). The second Block (ResBlock, AttentionBlock) in the DownBlock and UpBlock are removed (Except for the second last DownBlock and UpBlock), and the innermost Blocks (MidBlock, DownBlock, and UpBlock...
-
 VDMini 的整体框架围绕“结构剪枝 + 蒸馏微调”两阶段范式构建，目标是在保持视频生成质量的前提下，显著压缩视频扩散模型（VDM）的推理延迟与参数规模。
 
 **核心管线** 由以下模块串联构成：
@@ -107,8 +99,6 @@ VDMini 的整体框架围绕“结构剪枝 + 蒸馏微调”两阶段范式构�
 - **MCA Discriminator**：包含 SpatioHead 和 TemporalHead 的判别器，对教师和学生生成的多帧特征进行对抗判别，以保持跨帧运动动态。学生 U-Net 同时接收 MCA 生成器损失和原始任务损失（如 SF-V 的重建+对抗损失，或 T2V-Turbo-v2 的一致性损失）进行联合优化。
 
 整体而言，VDMini 通过“浅层剪枝 + 深层保留”的非对称压缩策略降低骨干网络计算量，再借助 ICD 蒸馏与 MCA 对抗损失恢复剪枝带来的内容与运动质量损失，最终在 I2V 和 T2V 任务上分别实现 2.5× 和 1.4× 的推理加速（Figure 2 给出了框架总览）。
-
-
 
 ### 核心模块
 
@@ -159,8 +149,6 @@ $$\mathcal{L}_{total} = \mathcal{L}_{Task} + \lambda_{ICD} \cdot \mathcal{L}_{IC
 
 其中 $\mathcal{L}_{Task}$ 为原始任务损失（I2V 为重建+对抗损失，T2V 为一致性损失），$\lambda_{ICD}$ 和 $\lambda_{MCA}$ 为平衡超参数（典型设置 $\lambda_{ICD}=0.1$，$\lambda_{MCA}=1$，见 Table 5）。该组合损失在保留任务目标的同时，通过蒸馏和对抗两个维度恢复剪枝后的生成质量。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能验证
@@ -168,9 +156,6 @@ $$\mathcal{L}_{total} = \mathcal{L}_{Task} + \lambda_{ICD} \cdot \mathcal{L}_{IC
 VDMini的核心目标是在保持视频生成质量的前提下，显著降低推理延迟。实验在I2V和T2V两大任务、多个骨干模型上验证了该方法的有效性。
 
 **I2V任务**：以**SF-V**（Zhang et al., NeurIPS 2024）为教师模型，VDMini-I2V在UCF101数据集上取得了FVD=198.13，与教师模型（FVD=166.26）差距可控（Table 2）。更重要的是，模型参数从SF-V的约2.5B压缩至约1.5B（~40%参数减少），推理延迟从512ms降至345ms，实现了**2.5倍加速**。与25步**SVD**（Blattmann et al., 2023）相比，VDMini-I2V在相近FVD下实现了约37倍加速。在VBench-I2V的主观一致性指标上，VDMini-I2V达到97.51%，与教师模型基本持平（Table 1）。
-
-![[assets/figures/papers/paper_list_l12_Individual_Content_and_Motion_Dynamics_Preserved_Pruning_for_Video_Diffu/figures/003_Table_1.jpg]]
-*Table 1: Evaluation of VDMini-I2V on the VBench-I2V dataset. In this table, we compare the performance of the unpruned model SF-V and VDMini-I2V with and without the motion consistency loss ${ \mathcal { L } } _ { M C A }$ . The metrics are divided into two categories: I2V subject and background consistency, and motion smoothness, dynamic degree, aesthetic quality, and imaging quality. The results show that VDMini-I2V achieves comparable performance to SF-V while being more e cient*
 
 ![[assets/figures/papers/paper_list_l12_Individual_Content_and_Motion_Dynamics_Preserved_Pruning_for_Video_Diffu/figures/004_Table_2.jpg]]
 *Table 2: Comparison with the existing methods. VDMini-I2V achieves a comparable FVD score with SF-V and 16-step SVD*
@@ -212,24 +197,12 @@ Figure 1(a)的块重要性分析是剪枝决策的实证基础：移除或替换
 
 VAE解码器的压缩（附录Table A1）将解码器参数从63.58M降至39.17M，延迟从2832ms降至840.5ms，而图像质量指标（PSNR/SSIM）几乎无损（Table A2），说明VAE解码器存在显著冗余。
 
-![[assets/figures/papers/paper_list_l12_Individual_Content_and_Motion_Dynamics_Preserved_Pruning_for_Video_Diffu/figures/013_Table.jpg]]
-*Table: A1: Comparison of the model architecture and inference latency between SF-V and our proposed VDMini-I2V. Table A2: Quantitative comparison of the image quality metrics on the UCF101 dataset between the original VAE decoder and the compressed VAE decoder*
-
 ### 失败模式与局限
 
 尽管VDMini在多数场景下表现良好，但分析中仍存在若干需注意的边界：
 - **FVD差距**：VDMini-I2V与教师SF-V之间仍有约32的FVD差距（198.13 vs 166.26），在需要极高运动精度的场景下可能显现质量退化。
 - **架构依赖性**：剪枝策略基于U-Net的深层/浅层功能差异假设，对DiT架构的HunyuanVideo加速比仅为1.25倍，说明该方法在非U-Net架构上的收益有限。
 - **超参数敏感性**：λ_ICD和λ_MCA需针对不同教师模型调整，缺乏自动化调参机制。
-
-### 补充图表
-
-
-![[assets/figures/papers/paper_list_l12_Individual_Content_and_Motion_Dynamics_Preserved_Pruning_for_Video_Diffu/figures/015_Table.jpg]]
-*Table: A3: Comparison of the model architecture and inference latency between T2V-Turbo-v2 and our proposed VDMini-T2V*
-
-
-
 
 ## 定位与知识库关联
 
@@ -269,8 +242,6 @@ ICMD 损失由两个组件构成：**Individual Content Distillation (ICD) Loss*
 - **运动复杂场景的边界**：Table 1 显示 VDMini-I2V 在 VBench-I2V 的 Motion Smoothness 指标上为 97.51%，与教师 SF-V 接近，但缺乏在快速运动、遮挡、场景切换等极端条件下的详细分析。
 - **VAE Decoder 压缩的独立验证**：VAE Decoder 的压缩（移除 MidBlock 和 UpBlock.3，通道剪枝）将解码延迟从 2832ms 降至 840.5ms（Table A1），但该模块的压缩策略与 U-Net 剪枝策略的交互效应未被消融——无法区分端到端加速中二者的各自贡献。
 - **训练成本**：ICMD 损失需要教师模型参与前向传播以提供中间特征和判别器目标，微调阶段的计算开销未被量化报告。对于大规模 DiT 模型，这一开销可能显著。
-
-
 
 ## 原文 PDF
 

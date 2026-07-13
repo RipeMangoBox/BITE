@@ -164,11 +164,6 @@ Paparazzo 的完整流水线由五个核心模块串联而成，形成“感知�
 
 整个框架的核心洞察在于：将候选视点定义在物体局部参考系中并随物体一起运动，利用 EKF 预测物体未来位姿序列，将所有候选视点沿预测轨迹传播，从而在物体运动的未来时刻评估每个视点的信息量和可达性。这使得智能体能够预先规划路径，在物体到达预测位置的同时恰好到达观测位置，实现动态场景下的高效主动重建。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2644_https_arxiv_org_abs_2604_19556/figures/002_Figure_2.jpg]]
-*Figure 2: Paparazzo alternates between Object Tracking Mode and Object Mapping Mode based on the confidence of the EKF motion estimate. When the filter is uncertain, the agent prioritizes acquiring stabilizing observations; once confident, it predicts future object motion, generates and propagates candidate viewpoints, and selects the optimal one*
-
 Paparazzo 的核心架构围绕一个 **EKF 置信度驱动的双模式切换机制** 展开，使智能体能够在跟踪运动物体和主动建图之间自适应切换。系统包含五个关键模块，其运行逻辑如图 Figure 2 所示。
 
 ### 初始化模块
@@ -209,15 +204,9 @@ $$\mathrm{NIS}_k = y_k^{\top} S_k^{-1} y_k$$
 
 候选视点集 $\mathcal{V}$ 以 foveated 配置分布在物体周围：三个同心环（半径 1.2–1.8 m），方位角间隔 12°，确保从多角度覆盖物体表面（Figure 5）。
 
-![[assets/figures/papers/paper_list_l2644_https_arxiv_org_abs_2604_19556/figures/013_Figure_5.jpg]]
-*Figure 5: Generation of candidate viewpoints for Object Mapping Mode. When the EKF becomes confident, Paparazzo switches from tracking to mapping and evaluates a set of candidate viewpoints V distributed around the object. The expected information gain (EIG) of each pose, computed using the FisherRF criterion, is visualized here with a color gradient: darker tones correspond to low informativeness, while brighter tones highlight more informative poses for reconstructing the object*
-
 #### 未来轨迹传播与视点选择
 
 EKF 预测物体未来 $N_h = 60$ 步的位姿序列（Figure 6），将所有候选视点沿预测轨迹传播，生成 $|\mathcal{V}| \times N_h$ 个未来对齐视点。对每个候选视点 $\mathbf{x}$ 在时间步 $i$ 的配置，计算联合代价函数：
-
-![[assets/figures/papers/paper_list_l2644_https_arxiv_org_abs_2604_19556/figures/015_Figure_6.jpg]]
-*Figure 6: EKF-based prediction of future object poses. The EKF predicts the object pose, denoted in orange, over the next*
 
 $$B(\mathbf{x}, i) = -w_{\mathrm{eig}} \mathrm{EIG}(\mathbf{x}) + w_{\mathrm{sync}} C_{\mathrm{sync}}(\mathbf{x}, i)$$
 
@@ -299,19 +288,11 @@ RW、RIS、TO基线共享相同的物体检测和位姿估计流程，仅视点�
 
 6. **仿真到现实的差距**：仅在Habitat 3.0模拟器中验证，实际部署依赖背景减法或运动分割方法的准确性，且真实传感器噪声和动态环境复杂度可能带来额外挑战。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2644_https_arxiv_org_abs_2604_19556/figures/006_Table_1.jpg]]
 *Table 1: Quantitative results across scenes for the four dynamic motion types (Bouncing Ball (BB), Curved Bouncing Ball (CBB), Forward & Backward (FB), and Stop & Go (SG)). Reported values are averaged over all test objects and runs. Each entry shows Coverage (%), Completeness (cm), and AUC*
 
 ![[assets/figures/papers/paper_list_l2644_https_arxiv_org_abs_2604_19556/figures/007_Table_2.jpg]]
 *Table 2: Quantitative comparison of different motion types averaged across all scenes. We evaluate four dynamic behaviors (Bouncing Ball (BB), Curved Bouncing Ball (CBB), Forward & Backward (FB), and Stop & Go (SG)) and report results for all test objects. Each cell shows Coverage (%), Completeness (cm), and AUC*
-
-![[assets/figures/papers/paper_list_l2644_https_arxiv_org_abs_2604_19556/figures/014_Figure_7.jpg]]
-*Figure 7: Coverage over exploration steps. Results are averaged across all scenes, motion patterns, and objects. Paparazzo consistently achieves higher coverage throughout the entire step budget. Shaded areas indicate the standard deviation across runs*
-
-![[assets/figures/papers/paper_list_l2644_https_arxiv_org_abs_2604_19556/figures/020_Table_4.jpg]]
-*Table 4: Reconstruction coverage (%) for Object 1 and Object 2 under the Stop & Go motion pattern. Paparazzo significantly outperforms all baselines*
 
 ![[assets/figures/papers/paper_list_l2644_https_arxiv_org_abs_2604_19556/figures/021_Figure_9.jpg]]
 *Figure 9: Benchmark examples of active mapping of moving objects. In each scenario, the agent plans camera viewpoints around a moving target while compensating for its motion to acquire informative observations for reconstruction*

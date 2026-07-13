@@ -61,8 +61,6 @@ claims:
 
 在语言建模的附加实验中，卷积的贡献在 WikiText-103 上带来约 3.13 的困惑度降低（14.5M 参数），但在更大规模模型上差距缩小，表明在自然语言任务中门控等其他组件的影响更为显著。
 
-
-
 ### 上下文学习中的统计估计问题
 
 上下文学习（In-Context Learning, ICL）是当前大语言模型的核心能力之一：模型在推理时仅通过输入序列中的上下文信息，无需参数更新即可完成预测任务。当输入序列由某个随机过程生成时，ICL本质上要求模型隐式地恢复该过程的统计规律并做出最优预测。一个自然且具有理论深度的测试平台是**马尔可夫链**——序列的下一状态仅依赖于最近的有限历史，这使得最优预测器具有闭式解，从而为严格分析模型的ICL能力提供了基准。
@@ -88,8 +86,6 @@ Transformer架构在ICL任务上的理论理解已取得显著进展：已有工
 3. **理论-经验对齐**：通过构造性证明和受控实验，建立Mamba内部表示与最优统计估计器之间的精确对应关系，并揭示其基本限制（如隐藏维度随马尔可夫阶数的指数增长）。
 
 通过将Mamba置于马尔可夫-ICL框架下进行严格分析，本文不仅为选择性SSM的ICL能力提供了首个完整的理论解释，也为理解卷积、选择性与递归在现代序列模型中的协同机制提供了新的视角。
-
-
 
 ## 核心方法与创新机理
 
@@ -127,8 +123,6 @@ Transformer架构在ICL任务上的理论理解已取得显著进展：已有工
 ### 卷积作为跨架构的关键组件
 
 值得关注的是，卷积的关键作用并非Mamba独有。实验表明，对标准Transformer的K、Q、V矩阵添加卷积后，单层Transformer也能成功学习马尔可夫任务（Fig. 11），而无卷积的Mamba则需要两层才能解决同一任务（Fig. 12）。这表明**卷积所提供的局部时序上下文提取能力，是实现此类上下文学习任务的通用关键机制**，而非特定于SSM架构。
-
-
 
 本文构建了一个从理论构造到经验验证的完整研究管线，旨在揭示Mamba架构在上下文学习（ICL）中学习马尔可夫链最优估计器的内在机制。整体框架围绕三个层次展开：**问题形式化**、**模型解剖与简化**、**表征能力证明与验证**。
 
@@ -202,8 +196,6 @@ $$x_t = e_{x_t}, \quad u_t = x_t + \text{MambaZero}(x_1^t), \quad \text{logit}_t
 
 这一框架将Mamba的ICL能力归结为一个可证明的构造：单层Mamba通过上述机制的精密协作，可以精确实现转移计数及加性平滑，从而匹配最优贝叶斯/极小极大估计器。同时，定理2揭示了这一能力的基本限制——对于 $k$ 阶马尔可夫链，任何循环架构实现拉普拉斯平滑所需的隐藏维度必须满足 $d \cdot \mathsf{p} \geq 2^k (1-3\varepsilon) \log(1/\varepsilon)$，即随阶数指数增长。
 
-
-
 ### 关键架构模块
 
 Mamba语言模型由以下核心模块串联构成（图2）：
@@ -270,8 +262,6 @@ $$L(\theta) = -\frac{1}{T}\sum_t \mathbb{E}_{P} \mathbb{E}_{x \sim P} \log f_\th
 - **状态转移因子 $a_t$**：控制历史信息的累积与重置。在标准马尔可夫任务中，收敛时 $a_t \approx 1$（图4），允许累积全部历史计数；在切换马尔可夫过程中，模型学习在切换token处设 $a_t = 0$ 以重置计数（图13）。
 - **隐藏维度 $d$**：对于 $k$ 阶马尔可夫链，任何循环架构实现 $\varepsilon$ 近似的拉普拉斯平滑所需隐藏维度与精度的乘积下界为 $d \cdot p \ge 2^k (1-3\varepsilon) \log(1/\varepsilon)$（定理2），揭示了维度随阶数指数增长的基本限制。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：单层Mamba学习最优拉普拉斯估计器
@@ -308,8 +298,6 @@ $$L(\theta) = -\frac{1}{T}\sum_t \mathbb{E}_{P} \mathbb{E}_{x \sim P} \log f_\th
 - **计数相关内积的正交性**：参数满足 $b^{(ij)\top} c_t \approx 0$ 当 $i \neq x_t$（Fig. 5a）。即只有与当前上下文相关的转移计数的内积为非零，其他计数被自动屏蔽，确保模型仅使用正确的条件计数进行预测。
 - **计数无关向量的收敛**：与计数无关的向量分量收敛到与 $\beta=1$ 对应的最优值（Fig. 5b），实现了精确的加性平滑。
 
-![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_kmK3WSCOCT/figures/006_Figure_5.jpg]]
-*Figure 5: (a) Counts-related inner products across interations. Only the correct counts corresponding to $\mathbf { \bar { \pmb { b } } } ^ { ( i j ) \top } \mathbf { c } ^ { ( k ) }$ for i = k have a non-zero inner product at convergence. (b) Binary coordinates of the counts-independent vector across iterations. Both coordinates converge to the optimal $\beta$ = 1
 
 ### 自然语言任务中的验证
 
@@ -339,25 +327,6 @@ $$L(\theta) = -\frac{1}{T}\sum_t \mathbb{E}_{P} \mathbb{E}_{x \sim P} \log f_\th
 ### 选择性机制：切换马尔可夫过程
 
 在切换马尔可夫过程（switching Markov process）的实验中，Mamba展现了其选择性机制的实际效用。最优策略要求在切换令牌处重置历史计数，而Mamba通过学习在切换令牌处将 $a_t$ 设为零来实现这一点（Fig. 13），在其他位置则保持 $a_t \approx 1$。这直接体现了状态转移因子 $a_t$ 作为“信息流控制阀门”的功能：通过选择性地遗忘过去信息，Mamba能够适应非平稳的序列分布。
-
-![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_kmK3WSCOCT/figures/018_Figure_13.jpg]]
-*Figure 13: One-layer Mamba on switching Markov data. Mamba is able to learn the optimal predictor by forgetting past counts every time a switch token occurs. This is achieved by setting a _ { t } = 0 at every switch, and a _ { t } = 1 otherwise*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_kmK3WSCOCT/figures/009_Figure_8.jpg]]
-*Figure 8: Test loss gap from the optimal for 1-layer Mamba and first-order Markov data, for different number of states. (a) shows the absolute gap L ( $\theta$ ) - $L ^ { * }$ ; ; (b) shows the relative gap ( L ( $\theta$ ) - $L ^ { * }$ ) / $L ^ { * }$ The loss gap is consistently small for all state sizes
-
-![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_kmK3WSCOCT/figures/010_Figure.jpg]]
-*Figure: (a) Convolution width (b) Depth*
-
-![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_kmK3WSCOCT/figures/014_Figure.jpg]]
-*Figure: (a) Predicted probability (b) Test loss*
-
-![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_kmK3WSCOCT/figures/013_Table_2.jpg]]
-*Table 2: Results for the hold-out experiment*
-
-
 
 ## 定位与知识库关联
 
@@ -406,8 +375,6 @@ $$L(\theta) = -\frac{1}{T}\sum_t \mathbb{E}_{P} \mathbb{E}_{x \sim P} \log f_\th
 - **学习动力学**：Mamba收敛到拉普拉斯平滑估计器的具体动力学是什么？是否存在从计数到平滑的阶段性转变？
 - **门控与选择性的协同**：在语言任务中，门控（$a_t$）和选择性机制如何与卷积协同工作？切换马尔可夫实验（Fig. 13）已初步展示了$a_t$在重置计数中的作用，但其在自然文本中的功能仍待探索。
 - **架构设计的可迁移性**：向Transformer添加卷积即可使其获得类似Mamba的马尔可夫ICL能力（Fig. 11），这是否意味着卷积可以作为通用的“计数归纳偏置”模块嵌入各类序列架构？
-
-
 
 ## 原文 PDF
 

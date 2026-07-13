@@ -63,8 +63,6 @@ claims:
 
 **当前局限**：GGBench目前仅限于2D几何构造任务，能否推广到3D几何或其他需要生成式推理的领域（如科学图解生成、化学结构图等）仍有待验证。基准构建严重依赖LLM生成训练数据，即使经过多轮人工审核，仍可能引入模型偏好或系统性错误。此外，自动评估VLM虽与人类评分高度相关，但在某些几何细节上仍可能存在打分偏差。
 
-
-
 ### 统一多模态模型的能力瓶颈
 
 近年来，统一多模态模型（Unified Multimodal Models, UMMs）在视觉理解和图像生成两个维度上分别取得了显著进展。现有基准通常将这两类能力割裂评估：理解类基准（如数学推理、图表问答）仅考察模型对视觉输入的语义解析，而生成类基准（如文本到图像的合成）仅衡量视觉输出的感知质量。然而，现实世界中的复杂任务往往要求模型同时具备理解、推理和生成三种能力的有机集成——即“生成式推理”（generative reasoning）。
@@ -92,8 +90,6 @@ GGBench的核心动机正是弥合上述缺口。其设计哲学基于一个关�
 - **从孤立评估到集成评估的范式转变**：如 Figure 1 所示，GGBench将评估范式从“理解或生成”的二选一推进到“理解与生成”的集成，要求模型完成从自然语言指令到精确几何图形的完整生成式推理链路。
 
 这一设计使得GGBench不仅是一个新的测试集，更是一种评估方法论——它强制模型将抽象推理转化为可执行的构造步骤，从而暴露当前统一多模态模型在集成生成式推理能力上的真实水平与结构短板。
-
-
 
 ## 核心方法与创新机理
 
@@ -128,8 +124,6 @@ GGBench 的四阶段评估协议（Planning → Middle Process → Final Result 
 此外，按构造类别的细分分析（Figure 5）显示，所有模型在“测量与比例”和“几何定理应用”等需要抽象推理的类别上 VLM-I 分数普遍下降 10–15 点，揭示了当前模型在深层几何理解上的共性短板。这种多维度的能力剖析能力，是仅提供单一总分或答案正确率的传统基准所不具备的。
 
 综上，GGBench 的三个 changed slots 构成了一个逻辑闭环：**可执行验证**提供了客观的评判标准，**三重对齐**锚定了推理过程，**逐步评估**实现了能力的精细解耦。三者共同推动了多模态评估从“结果导向”向“过程导向”的范式升级。
-
-
 
 GGBench 的整体构建与评估框架围绕一个核心瓶颈展开：**现有统一多模态模型（UMMs）无法将抽象几何推理转化为精确的可执行构造步骤**，导致直接生成的图形频繁违反几何约束。为解决这一问题，GGBench 建立了一条从数据构建到模型评估的完整流水线，其核心思想是通过要求模型生成可执行的 GeoGebra 代码，将推理过程与几何操作严格对齐，从而实现从语言到图形的精确映射和完全自动化的验证。
 
@@ -168,12 +162,8 @@ GGBench 的评估采用**四阶段协议**（Section 4.2），全面衡量模型
 
 这种双轨设计使得能够直接对比“直接生成”与“代码驱动生成”两种范式在几何构造任务上的根本差异，从而揭示当前 UMMs 在生成式推理上的真实瓶颈。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2235_https_arxiv_org_abs_2511_11134/figures/005_Figure_1.jpg]]
 *Figure 1: The paradigm shift to generative reasoning. Conventional benchmarks evaluate (a) Understanding or (b) Generation in isolation. GGBench introduces (c) integrated Understanding& Generation evaluation, requiring generative reasoning from Unified Multimodal Models*
-
-
 
 GGBench 本身是一个基准而非模型，因此其“核心模块”体现为数据构造流水线与评估协议的设计，而非可训练的神经网络组件。以下按流水线阶段与评估维度分别阐述关键模块。
 
@@ -234,13 +224,6 @@ GGBench 采用四阶段评估协议，由冻结的 VLM 评判模型（GPT-4o）�
 
 > **注**：上述像素级指标在 GGBench 中的主要作用是作为对照基线——实验表明它们与几何正确性的相关性较弱，从而论证了必须采用几何感知的 VLM-I 评估体系。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2235_https_arxiv_org_abs_2511_11134/figures/006_Figure_2.jpg]]
-*Figure 2: GGBench’s step-by-step evaluation. Beyond traditional text-image pairs, GGBench provides executable code for each construction step, allowing for precise and automated verification*
-
-
-
 ## 实验与关键发现
 
 ### 主要结果：代码驱动 vs. 端到端生成
@@ -257,27 +240,15 @@ Table 5 从代码执行维度进一步印证了这一结论。在 GGBench-Code �
 ![[assets/figures/papers/paper_list_l2235_https_arxiv_org_abs_2511_11134/figures/013_Table_5.jpg]]
 *Table 5: Evaluation results on GGBench-Code across execution, similarity, and structural metrics*
 
-![[assets/figures/papers/paper_list_l2235_https_arxiv_org_abs_2511_11134/figures/023_Figure_19.jpg]]
-*Figure 19: Correlation between VLM-I and human evaluation*
-
 ### 按构造类别与任务类型的细粒度分析
 
 Figure 5 的热图揭示了不同推理类别上的性能分化。所有模型在“测量与比例”和“几何定理应用”两个类别上 VLM-I 分数普遍下降 10–15 点，表明当前模型在需要抽象数值推理和定理调用的场景中仍然薄弱。相比之下，“基本构造”和“对称与变换”类别的得分普遍更高，反映出模型对操作化、步骤化的几何任务掌握更好。
 
-![[assets/figures/papers/paper_list_l2235_https_arxiv_org_abs_2511_11134/figures/014_Figure_5.jpg]]
-*Figure 5: VLM-I scores across eight construction categories in GGBench. Each cell reflects the average multimodal reasoning quality for a model-category pair*
-
 Figure 6 按任务类型拆分结果：解析构造（AC）、几何变换构造（GTC）和尺规构造（SCC）。代码驱动模型在三种类型上均显著优于端到端 UMM，其中 SCC 类型的差距最大——这类任务要求严格的逐步作图，端到端模型几乎无法生成符合约束的图形。
-
-![[assets/figures/papers/paper_list_l2235_https_arxiv_org_abs_2511_11134/figures/015_Figure_6.jpg]]
-*Figure 6: VLM-I scores across geometric task types: Analytic Construction (AC), Geometric Transformation Construction (GTC), and Straightedge-and-Compass Construction (SCC). Higher values indicate better performance*
 
 ### 难度敏感性
 
 Figure 7 展示了按难度级别的 VLM-I 性能。所有模型在 Easy 级别表现最好，Hard 级别显著下降。GPT-5 在 Hard 子集上仍保持约 50 的 VLM-I，而端到端 UMM 在 Hard 级别已降至接近随机水平。这表明**几何构造的难度对生成式推理能力构成非线性挑战**——当问题需要多步构造和辅助线推理时，模型性能急剧退化。
-
-![[assets/figures/papers/paper_list_l2235_https_arxiv_org_abs_2511_11134/figures/016_Figure_7.jpg]]
-*Figure 7: VLM-I performance across difficulty levels on GGBench. Bars represent Easy, Medium, Hard, and overall scores. VLM-I captures both intermediate reasoning quality and final visual correctness*
 
 ### 像素指标失效：为什么需要几何感知评估
 
@@ -286,9 +257,6 @@ Figure 7 展示了按难度级别的 VLM-I 性能。所有模型在 Easy 级别�
 ### 常见错误模式
 
 Figure 8 归纳了典型失败案例，可归为以下几类：
-
-![[assets/figures/papers/paper_list_l2235_https_arxiv_org_abs_2511_11134/figures/017_Figure_8.jpg]]
-*Figure 8: The common error analysis*
 
 1. **约束违反**：生成的图形缺少关键几何约束（如未保证垂直、等长、共线），在端到端 UMM 中最为普遍。
 2. **步骤遗漏**：模型跳过了必要的中间构造步骤，直接生成看似合理但不满足构造逻辑的图形。
@@ -310,8 +278,6 @@ Table 1 汇总了 GGBench 的语料库统计：共保留 1,411 个高质量构�
 ### 实验公平性保障
 
 所有模型在温度 0.0 下推理，使用统一的提示模板（Figure 17–18）和评估管道。自动评分采用冻结的 VLM（GPT-4o）和固定提示，并通过双盲人工评审验证（r=0.9295）。评估同时覆盖整体图像质量和逐步推理正确性，避免了单一维度的偏见。
-
-
 
 ## 定位与知识库关联
 
@@ -353,8 +319,6 @@ GGBench 的评估框架目前具有以下明确边界：
 2. **深度理解的判别：** 在模型不完全理解几何约束的情况下，如何区分“表面正确”（通过模式匹配生成的巧合正确）与“真正理解”？是否需要引入对抗性测试或更深层的违规检测机制？
 3. **端到端模型的闭合回路训练：** 能否通过强化学习或训练过程中直接注入代码执行反馈，使端到端 UMMs 获得与代码驱动模型相当的构造精度，同时保留端到端生成的灵活性？
 4. **评判模型的进化：** 现有的视觉语言评判模型能否被改进或专门微调，以更精准地捕获拓扑错误、缺失辅助线、比例失调等几何特异缺陷，进一步提升自动评估的可靠性？
-
-
 
 ## 原文 PDF
 

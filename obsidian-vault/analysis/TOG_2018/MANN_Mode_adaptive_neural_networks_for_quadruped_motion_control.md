@@ -54,8 +54,6 @@ claims:
 
 在方法谱系上，MANN 属于数据驱动的运动合成方法，与物理仿真（如轨迹优化、力矩控制）和运动匹配（Motion Matching）等思路并行，但其“特征级专家混合”的架构设计为处理高度多模态的运动数据提供了一条独特的技术路径，有望推广至其他多模态学习任务。
 
-
-
 四足动物运动控制是计算机动画领域的核心难题之一。与人类角色不同，四足动物展现出高度多模态的运动特性——行走、踱步、小跑、慢跑等步态的脚着地模式各异（Fig. 2），且步态之间的转换涉及复杂的时序协调。这种多模态性对数据驱动的角色动画方法构成了根本性挑战。
 
 ### 现有方法的瓶颈
@@ -73,8 +71,6 @@ claims:
 更重要的是，这种架构允许系统在**无任何步态标签或相位标签**的条件下，从非结构化动作捕捉数据中端到端地学习多模态运动。门控网络以足端速度、动作标签和期望速度为条件，自动发现不同运动模式之间的边界和转换逻辑，使步态在期望速度变化时自然涌现，而无需人工定义的先验规则。
 
 简言之，本文的目标是构建一个无需手工相位标注、能够从非结构化数据中自动学习多模态四足运动的神经网络架构，从根本上解决现有方法在步态转换时的伪影问题，并显著降低数据预处理的门槛。
-
-
 
 ## 核心方法与创新机理
 
@@ -104,8 +100,6 @@ $$\alpha = \sum_{i=1}^{K} \omega_i \alpha_i$$
 
 消融实验（Table 5）提供了最直接的因果证据：选择性屏蔽特定专家权重会导致相应运动能力丧失——α₁ 禁用则跳跃失败，α₂ 禁用则左转失败，α₅ 禁用则慢跑和小跑失败。这证实了专家权重在无监督训练中自发分化出了对不同运动模式的专门控制能力。Fig. 9 的激活曲线进一步展示：低速步行时多个权重呈周期性交替，高速运动和跳跃时特定权重持续高激活，验证了专家对时序和模式的自适应专门化。
 
-
-
 ![[assets/figures/papers/paper_list_l41_https_doi_org_10_1145_3197517_3201366/figures/001_Figure_1.jpg]]
 *Figure 1: A selection of results using our method for quadruped animation. We show some different modes for sitting, turning trot, pace, canter, jumping and standing from left to right. The locomotion gaits are not labeled individually, but naturally produced by the movement velocity control*
 
@@ -118,8 +112,6 @@ MANN 由两个核心模块构成：**运动预测网络（Motion Prediction Netw
 整个 pipeline 的输入-输出流如下：给定前一帧的状态 $\mathbf{x}$ 和精简输入 $\hat{\mathbf{x}}$，门控网络计算混合系数 $\omega$，运动预测网络据此组合专家权重并预测当前帧输出 $\mathbf{y}$。训练时，系统将输入 $\mathbf{X}$ 和真值输出 $\mathbf{Y}$ 按帧堆叠成矩阵，通过均方误差损失（Equation 4）联合优化运动预测网络的专家权重参数 $\beta$ 和门控网络参数 $\mu$，实现端到端学习。训练后的模型在 Intel Core i-7 CPU 上仅需约 2 ms/帧即可实时运行，内存占用约 22 MB（8 个专家权重），支持游戏手柄交互控制。
 
 后处理阶段，系统采用 CCD 全身逆运动学（Full-body Inverse Kinematics）根据地形高度调整足端和脊柱关节，使合成运动能够适应轻微起伏的地面，同时保持脚部接触的物理合理性（Fig. 7）。
-
-
 
 ### 整体架构
 
@@ -171,8 +163,6 @@ $$
 
 合成运动后，系统通过 CCD 全身逆运动学（Cyclic Coordinate Descent）对足端和脊柱关节进行后处理，根据地形高度偏移调整关节位置，使角色能够适应轻微起伏的地面（Section 8, Fig. 7）。此外，轨迹控制中引入插值公式 $T = \tau T^{*} + (1 - \tau) T^{+}$，将用户期望轨迹 $T^*$ 与网络预测修正轨迹 $T^+$ 按系数 $\tau$ 混合，以平衡控制响应速度与运动自然度（Section 8: Responsiveness）。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设计
@@ -199,9 +189,6 @@ MANN 的实验验证围绕三个核心维度展开：**运动质量**（足部�
 *Table 3: The average angular update per joint along all legs and the back legs in the ground truth data, and when using the vanilla NN, PFNN and MANN models with 4 or 8 expert weights respectively*
 
 **Figure 6** 的训练损失曲线进一步揭示了架构差异：MANN（4 和 8 专家）的收敛损失始终低于 PFNN 和 Vanilla NN，且 AdamWR 的 warm restart（第 11、31、71 轮）未对 MANN 的收敛稳定性造成显著影响，表明门控网络与运动预测网络的联合优化是稳定且有效的。
-
-![[assets/figures/papers/paper_list_l41_https_doi_org_10_1145_3197517_3201366/figures/007_Figure_6.jpg]]
-*Figure 6: Learning curves of vanilla neural network, PFNN and MANN with 4 or 8 expert weights respectively. The warm restarts of the AdamWR algorithm at epoch 11, 31 and 71 result in hikes of the loss*
 
 ### 路径跟随精度
 
@@ -243,8 +230,6 @@ MANN 的实验验证围绕三个核心维度展开：**运动质量**（足部�
 ### 小结
 
 MANN 在无任何步态/相位标签的条件下，通过特征级专家混合机制实现了对四足多模态运动的端到端学习。定量实验一致表明其在足部滑动抑制、关节动态性保持和路径跟随精度上均优于 Vanilla NN 和 PFNN；消融研究则从机制层面验证了专家权重的功能专门化。主要局限在于地形泛化能力和对稀缺数据的敏感性，这为后续结合物理模拟或域迁移方法留下了明确的研究空间。
-
-
 
 ## 定位与知识库关联
 
@@ -293,8 +278,6 @@ MANN 在方法谱系中处于**数据驱动运动合成**与**混合专家架构
 2. **生成质量提升**：能否结合对抗性损失（adversarial loss）来进一步减少运动模糊和避免平均姿态问题，提升合成运动的锐度和真实感？
 3. **物理交互扩展**：能否利用强化学习（RL）自动生成控制信号，使 MANN 驱动的 NPC 在复杂动态环境中实现物理级交互控制？
 4. **架构普适性**：MANN 的“特征级专家混合”架构是否对其他高度多模态的机器学习任务（如多风格语音合成、多模态轨迹预测）也具有普适性？
-
-
 
 ## 原文 PDF
 

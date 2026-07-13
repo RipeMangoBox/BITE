@@ -52,8 +52,6 @@ claims:
 
 **主要结果**：在RE10K和ACID数据集上，SR3R以4倍超分（64×64→256×256）显著超越所有前馈基线（PSNR提升+3.1–3.2 dB），并展现出强零样本泛化能力——在DTU和ScanNet++上分别超越逐场景优化方法**SRGS** (Feng et al., arXiv 2024) 达+4.6 dB和+3.5 dB，同时推理速度远快于优化式方法。消融实验证实，高斯偏移学习是贡献最大的单一模块，且SR3R对不同上采样策略具有鲁棒性。
 
-
-
 三维场景的超分辨率重建（3D Super-Resolution, 3DSR）旨在从低分辨率（LR）输入恢复高分辨率（HR）的三维表示，是增强沉浸式视觉体验和三维内容生成质量的关键技术。近年来，3D Gaussian Splatting（3DGS）凭借其显式点云结构和可微分光栅化的高效渲染能力，已成为三维重建的主流表示形式，并推动了3DSR方法的发展。
 
 然而，现有基于3DGS的3DSR方法存在一个根本性瓶颈：**它们普遍依赖预训练的2D超分模型提供高频先验，并采用逐场景优化（per-scene optimization）策略**。具体而言，这类方法通常先利用2DSR模型对输入视图进行上采样，生成伪高分辨率图像作为监督信号，再通过密集多视图输入对每个场景独立优化3DGS参数。这种范式带来了三个核心缺陷：
@@ -69,8 +67,6 @@ claims:
 具体而言，SR3R首先利用任意预训练的前馈3DGS重建模型（如 **NoPoSplat**（Ye et al., ICLR 2025）或 **DepthSplat**（Xu et al., CVPR 2025））从稀疏LR视图估计一个LR 3DGS骨架，随后通过所提出的映射网络将其上变换为HR 3DGS。该映射网络包含高斯偏移学习（Gaussian Offset Learning）和特征细化（Feature Refinement）两个核心机制，前者通过学习残差偏移而非直接回归绝对HR参数来稳定训练并锐化高频细节，后者通过双向交叉注意力对齐2D编码特征与3D几何感知令牌，增强结构一致性。整个流程无需2DSR伪监督和逐场景优化，仅需两幅LR视图即可完成前馈推理。
 
 > **证据说明**：以下背景与动机分析基于论文摘要、引言及方法总述部分的声明。关于SR3R各模块的具体设计细节和实验验证，将在后续章节中详述。
-
-
 
 ## 核心方法与创新机理
 
@@ -102,8 +98,6 @@ SR3R 的解决方案是学习一个前馈映射网络 $f_{\pmb \theta} : \{ ( I_
 ### 创新点的协同效应
 
 三个 changed slots 并非孤立改进，而是形成因果闭环：范式转换（前馈映射）提供了从多场景数据学习 3D 高频结构的可能性；高斯偏移学习确保了在稀疏 LR 输入下的训练稳定性与参数效率；特征细化弥合了 2D 特征与 3D 几何之间的模态鸿沟。三者共同实现了 SR3R 的核心洞察：**通过前馈映射网络从大规模多场景数据自主习得 3D 高频结构，取代继承自 2D 超分模型的有限先验**。
-
-
 
 SR3R 将三维超分辨率（3DSR）重新定义为一种前馈映射问题：从稀疏低分辨率（LR）视图直接预测高分辨率（HR）三维高斯泼溅（3DGS）表示。其核心映射关系为：
 
@@ -142,15 +136,6 @@ $$\mathcal G^{\mathrm{HR}} = \mathcal G^{\mathrm{Dense}} + \Delta \mathcal G$$
 **训练目标。** 预测的 HR 3DGS 通过可微高斯光栅化渲染为新视图图像，以像素级 MSE 损失与感知一致性 LPIPS 损失的组合进行监督，联合保持几何精度与视觉保真度。
 
 这一设计的关键因果机制在于：学习偏移量而非直接回归绝对 HR 高斯参数，显著降低了需学习的高斯参数量（从 44.5M 降至 16.0M），使训练更稳定，并大幅提升高频纹理保真度。消融实验表明，高斯偏移学习是效果提升最大的单一模块。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2602_https_arxiv_org_abs_2602_24020/figures/001_Figure_1.jpg]]
-*Figure 1: We reformulate 3DGS-based 3DSR as a feed-forward mapping problem from sparse LR views to HR 3DGS representation. (a) Unlike existing methods that rely on dense multi-view inputs and per-scene 3DGS self-optimization, our method directly predicts HR 3DGS by a learned network from as few as two LR views. (b) This reformulation fundamentally changes how 3DSR acquires high-frequency knowledge. Instead of inheriting the limited priors embedded in 2DSR models, our SR3R learns a generalized crossscene mapping function from large-scale multi-scene data, enabling the network to autonomously acquire the 3D-specific high-frequency structures required for accurate HR 3DGS reconstruction. The bottom row...*
-
-![[assets/figures/papers/paper_list_l2602_https_arxiv_org_abs_2602_24020/figures/005_Figure.jpg]]
-
-
 
 SR3R 将 3D 超分辨率重新定义为从前馈映射问题，其核心映射函数为：
 
@@ -204,12 +189,8 @@ $$\mathcal{G}^{\mathrm{HR}} = \mathcal{G}^{\mathrm{Dense}} + \Delta \mathcal{G},
 
 > **证据强度说明**：上述公式均来自原文明确给出的定义（Eq. 1–9），模块间的因果关系由消融实验（Table 3）支撑——高斯偏移学习使 PSNR 从 23.504 提升至 24.447，且将需学习的高斯参数量从 44.5M 降至 16.0M；加入 PTv3 后达到最优 24.794。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2602_https_arxiv_org_abs_2602_24020/figures/009_Figure_S.1.jpg]]
 *Figure S.1: Detailed Gaussian Offset Learning pipeline. Each Gaussian center is projected to the image plane to query local ViT features. The queried token is fused with a geometry-aware position embedding and processed by PTv3 blocks for spatial reasoning. A lightweight Gaussian Head predicts residual offsets to refine the initial 3DGS template*
-
-
 
 ## 实验与关键发现
 
@@ -225,12 +206,6 @@ SR3R的核心主张是将3D超分辨率（3DSR）从“逐场景优化+2DSR伪�
 ### 零样本泛化：从室内到室外的跨域迁移
 
 SR3R的另一个关键优势在于其跨场景泛化能力。在RE10K→DTU的零样本设定下（Table 2），SR3R以NoPoSplat为骨干达到**PSNR 17.241**，较NoPoSplat基线的12.628提升**+4.613 dB**，甚至超越了需要逐场景优化的**SRGS**（Feng et al., arXiv 2024）和**FSGS+SRGS**（Zhu et al., ECCV 2024）组合方法。在RE10K→ScanNet++的零样本设定下（Table S1），SR3R达到PSNR 21.743，较NoPoSplat基线的18.284提升+3.459 dB。
-
-![[assets/figures/papers/paper_list_l2602_https_arxiv_org_abs_2602_24020/figures/007_Table_2.jpg]]
-*Table 2: Zero-shot generalization results from RE10K to DTU. Feed-forward models are trained on RE10K and tested on DTU without fine-tuning. SRGS and FSGS+SRGS use per-scene optimization. SR3R delivers the best reconstruction quality while remaining significantly faster than optimization-based methods. Bold indicates the best results and underline the second best*
-
-![[assets/figures/papers/paper_list_l2602_https_arxiv_org_abs_2602_24020/figures/012_Table_S.1.jpg]]
-*Table S.1: Zero-shot generalization results from RE10K to Scanet++. Feed-forward models are trained on RE10K and tested on Scanet++ without fine-tuning. SRGS and FSGS+SRGS use per-scene optimization. SR3R delivers the best reconstruction quality while remaining significantly faster than optimizationbased methods. Bold indicates the best results*
 
 这一结果揭示了SR3R范式转换的深层机理：逐场景优化方法（如SRGS）虽然可以在单个场景上通过迭代优化获得较好结果，但其高频先验受限于预训练的2D超分模型，缺乏对3D几何结构的理解。SR3R通过从大规模多场景数据中学习广义映射函数，获得了可迁移的3D高频知识，在未见场景上展现出更强的泛化能力。定性结果（Figure S2, Figure S3）进一步证实，SR3R在零样本场景下恢复的纹理更清晰、几何更稳定，而优化方法常出现模糊和几何伪影。
 
@@ -277,15 +252,8 @@ SR3R在取得显著性能提升的同时，保持了合理的计算开销。以D
 3. 在实际采集噪声、光照变化和有限视角重叠条件下，前馈映射网络的鲁棒性如何？
 4. 是否可以与基于扩散模型的高频生成先验结合，在极低分辨率输入下进一步丰富纹理细节？
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2602_https_arxiv_org_abs_2602_24020/figures/006_Table_3.jpg]]
 *Table 3: Component-wise ablation on RE10K (4× 3DSR). Modules are added cumulatively to the NoPoSplat baseline. Each component improves performance, and Gaussian Offset Learning yields the largest gain with fewer learnable Gaussians. The full SR3R achieves the best results*
-
-![[assets/figures/papers/paper_list_l2602_https_arxiv_org_abs_2602_24020/figures/008_Table_4.jpg]]
-*Table 4: Ablation on upsampling strategies on RE10K (4× 3DSR). SR3R maintains consistently strong performance across all interpolation and learning-based upsampling methods*
-
-
 
 ## 定位与知识库关联
 
@@ -329,8 +297,6 @@ SR3R 的提出为 3DSR 领域打开了若干值得深入的方向：
 - **与生成先验的结合**：当前 SR3R 完全依赖前馈映射学习高频细节，是否可以与基于扩散模型的高频生成先验结合，以进一步丰富纹理细节，尤其是在信息严重缺失的区域？
 - **鲁棒性验证**：在实际采集条件下的噪声、光照变化和有限视角重叠等退化因素下，SR3R 的鲁棒性如何？当前实验均在相对干净的合成或受控数据上进行。
 - **表示泛化性**：高斯偏移学习的思想——即从粗粒度表示学习残差偏移而非直接回归目标参数——是否可以泛化到其他三维表示（如 NeRF、3D Gaussian 的其他变体）的超分辨任务中？
-
-
 
 ## 原文 PDF
 

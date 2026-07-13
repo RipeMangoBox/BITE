@@ -54,8 +54,6 @@ claims:
 
 ExDM 的局限性在于扩散策略在极低交互量下的采样效率仍不及高斯策略，且在线训练扩散模型带来额外计算开销（Maze2d 约 0.5 天/种子，URLB 约 2 天/种子）。当前方法面向完全可观测的单任务连续控制，其在部分观测、多智能体或图像输入场景下的有效性仍有待验证。
 
-
-
 ### 无监督强化学习的核心挑战
 
 无监督强化学习（Unsupervised RL, URL）旨在让智能体在无奖励环境中自主探索，获取可泛化的行为先验，再通过少量交互快速适应下游任务。其核心瓶颈在于：**探索阶段产生的回放数据高度异构且非平稳**。智能体在无外在奖励引导下自由探索，采集到的状态-动作分布随探索进程不断漂移，呈现出多模态、长尾等复杂特性。
@@ -85,8 +83,6 @@ ExDM 的局限性在于扩散策略在极低交互量下的采样效率仍不及
 - **微调阶段**：预训练的动作扩散模型 $\pi_d$ 作为强行为先验，通过交替优化 Q 函数（基于 IQL 的 expectile 回归）与扩散策略蒸馏（基于对比能量预测 CEP 的 guided sampling），在少量在线交互下将任务奖励注入扩散策略，理论保证单调改进与最优收敛（定理 4.2）。
 
 这一设计将扩散模型从单纯的“生成器”角色提升为“探索信号源”与“微调先验”的双重枢纽，为无监督 RL 提供了新的技术范式。
-
-
 
 ## 核心方法与创新机理
 
@@ -142,8 +138,6 @@ ExDM 在 URL 方法谱系中占据独特位置，其设计融合了多个研究�
 
 **需人工验证**：ExDM 在极低数据量下扩散策略微调性能仍低于高斯策略微调（Figure 3(c)），表明扩散采样效率仍是瓶颈，论文将此列为开放问题。
 
-
-
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_k0Kb1ynFbt/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of Exploratory Diffusion Model (ExDM). Different from standard RL, URL aims to explore in reward-free environments, requiring expressive policies and models to fit heterogeneous data (Theorem 4.1). During pre-training, ExDM employs the diffusion model to model the heterogeneous exploration data and calculate score-based intrinsic rewards to encourage exploration. Moreover, we adopt a Gaussian behavior policy to collect data that avoids the inefficiency caused by the multi-step sampling of the diffusion policy*
 
@@ -185,8 +179,6 @@ ExDM 的六个核心模块及其数据流关系如下：
 | 蒸馏扩散策略 $\epsilon_\psi$ | 微调 | $\epsilon_\theta$，$f_\phi$ | 微调后策略 | 融合任务知识与探索先验，生成最终动作 |
 
 该流水线的关键设计决策在于**预训练阶段建模与行动的彻底解耦**：扩散模型专注于精确密度估计，高斯策略专注于高效采样，二者各司其职，避免了扩散采样效率低与高斯策略表达弱的两难困境。这一解耦范式也为将其他生成模型（如流模型、变分自编码器）引入无监督 RL 提供了可复用的架构模板。
-
-
 
 ExDM 的核心架构由三个解耦模块构成，分别负责分布建模、探索采样与下游微调。其公式体系围绕扩散模型的噪声预测误差展开，将密度估计能力转化为探索信号与策略先验。
 
@@ -248,8 +240,6 @@ $$
 
 这一蒸馏过程将交替优化的理论收敛保证（定理 4.2）转化为可高效采样的单一扩散策略，实现少样本微调下的单调改进。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现
@@ -301,27 +291,14 @@ ExDM 的预训练需在线训练扩散模型，Maze2d 约需 0.5 天/种子，UR
 
 所有基线方法均采用官方实现（URLBench 或对应开源代码库）和相同的 DDPG 主干，预训练步数与微调步数保持一致，使用相同的环境和 10 个随机种子进行重复实验，确保比较公平。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_k0Kb1ynFbt/figures/004_Figure_3.jpg]]
-*Figure 3: (b) Cross-embodiment URLB fine-tuned by DDPG (c) URLB for fine-tuning diffusion policies Figure 3: Aggregate metrics (Agarwal et al., 2021) for three settings. Details are in Appendix D.5*
-
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_k0Kb1ynFbt/figures/007_Table_2.jpg]]
 *Table 2: Details of hyperparameters used for Maze2d and state-based URLB*
 
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_k0Kb1ynFbt/figures/011_Table_3.jpg]]
 *Table 3: Detailed results in URLB of different pre-trained methods that fine-tune Gaussian policies with DDPG. Average cumulative reward (mean of 10 seeds) of the best policy*
 
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_k0Kb1ynFbt/figures/012_Table_4.jpg]]
-*Table 4: Aggregate metrics (Agarwal et al., 2021) with confidence interval in URLB. For every algorithm, there are 4 domains, each trained with 10 seeds and fine-tuned under 4 downstream tasks, thus each statistic for every method has 160 runs*
-
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_k0Kb1ynFbt/figures/013_Table_5.jpg]]
 *Table 5: In Table 5, we further report the detailed results of all methods in the 4 downstream tasks of 2 domains in cross-embodiment URLB, which is much more challenging as the algorithms require handling various embodiments. In both the Walker-mass and Quadruped-mass domains, ExDM obtains state-of-the-art performance in downstream tasks. Overall, there are the most number of downstream tasks that ExDM performs the best, and ExDM significantly outperforms existing exploration algorithms. Table 5: Detailed results in cross-embodiment state-based DMC. Average cumulative reward (mean of 10 seeds) of the best policy*
-
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_k0Kb1ynFbt/figures/014_Table_6.jpg]]
-*Table 6: Aggregate metrics (Agarwal et al., 2021) with confidence interval in cross-embodiment URLB. For every algorithm, there are 2 domains, each trained with 10 seeds and fine-tuned under 4 downstream tasks; thus, each statistic for every method has 80 runs*
-
-
 
 ## 定位与知识库关联
 
@@ -370,8 +347,6 @@ ExDM 的设计适用于以下场景：
 3. **非平稳数据流上的扩散模型稳定性**：当回放分布与真实环境分布差距较大时，扩散模型在非平稳数据流上的学习稳定性理论有待深入研究。
 4. **定向探索合成**：是否可以利用扩散模型的生成能力直接合成“困难”状态，以进一步引导定向探索？
 5. **通用生成模型范式**：ExDM 的模块化解耦是否可作为一种通用范式，将其他生成模型（如流模型、一致性模型）引入无监督 RL？
-
-
 
 ## 原文 PDF
 

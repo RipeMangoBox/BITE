@@ -79,8 +79,6 @@ claims:
 
 仿射热方法属于基于热扩散的几何处理方法的谱系，是对向量热方法（VHM）的直接推广。其核心创新在于将连接从仅含旋转的 Levi-Civita 连接扩展为包含平移的仿射连接，从而将原本需要多步分离计算的对数映射任务统一为单次扩散求解。该方法在概念上与离散指数映射（DEM）和平滑指数映射（SEM）等显式追踪方法形成对比——后者依赖沿网格边或面的逐步传播，容易累积误差。
 
-
-
 ### 对数映射：测地距离与方向的统一编码
 
 在计算机图形学与几何处理中，曲面上的测地距离是一个基础量，广泛应用于纹理映射、曲面参数化、形状分析等任务。然而，仅从标量距离场中提取方向信息需要进行数值微分，这不仅降低了正则性，还会在源点附近和切割轨迹（cut locus）处引入显著的精度损失。对数映射（logarithmic map）将测地距离与方向统一编码为以源点为中心的局部参数化，从而避免了上述问题。
@@ -122,8 +120,6 @@ $$\overline{\nabla} := d - \begin{pmatrix} 0 & \mathrm{id} \\ 0 & 0 \end{pmatrix
 - **自适应变体（AHM_a）**：在适应于源点的测地线框架下定义连接 $\overline{\nabla}^{\Phi}$，通过两次扩散直接输出 $\mathbb{R}^2$ 坐标，在切割轨迹附近提供更平滑的角度坐标。
 
 在平面域上，AHM 可精确恢复恒等参数化至浮点精度（Lemma 3），这一性质是现有热扩散方法所不具备的。
-
-
 
 ## 核心方法与创新机理
 
@@ -175,8 +171,6 @@ $$\overline{\nabla}^{\Phi} := d - \begin{pmatrix} 0 & \Phi \\ \Phi \circ \mathrm
 - **热方法谱系**：继承自 **HM**（Crane et al., ACM Trans. Graph. 2013）的短时热扩散范式，但将标量扩散推广为仿射扩散，从而同时获得方向与距离信息。
 - **向量热方法谱系**：直接回应 **VHM_log**（Sharp et al., ACM Trans. Graph. 2019）的局限——VHM_log 仅用向量扩散近似平行传输，再通过数值微分提取距离；AHM 通过在连接中编码平移，将两步合并为一步，消除了数值微分引入的误差。
 - **指数映射方法谱系**：相对于 **DEM**（Schmidt et al., ACM Trans. Graph. 2006）的显式径向追踪和 **SEM**（Herholz and Alexa, Comp. Graph. Forum 2019）的分离角度扩散，AHM 提供了统一的 PDE 框架，在切割轨迹附近保持角度坐标的平滑性。
-
-
 
 仿射热方法（Affine Heat Method, AHM）从一个核心洞察出发：在齐次坐标下，欧几里得运动（旋转+平移）可统一表示为线性变换。将这一思想注入连接拉普拉斯算子的构造中，使得短时热扩散能够**直接同时编码从源点出发的测地线方向与距离**，从而绕过了现有方法（如 VHM_log、SEM）中分离计算角度分量或不精确数值微分带来的精度损失。
 
@@ -240,12 +234,8 @@ $$(\mathsf{M} + \tau \mathsf{L}^{\nabla}) \binom{\mathsf{Y}}{\lambda} = \binom{0
 
 两种变体在注入半径内产生几乎不可区分的参数化结果（Figure 8），且均对低质量网格具有优于 VHM_log 和 SEM 的鲁棒性（Figure 23）。实际应用中可根据场景选择：需要频繁更换源点时优先 AHM_ℓ（利用预分解加速），追求切割轨迹附近平滑性时优先 AHM_a。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l34_https_www_yousufsoliman_com_projects_download_AffineHeatMethod_pdf/figures/002_Figure_2.jpg]]
 *Figure 2: Metric Distortion. Compared with prior methods V H M _ { l o g } \ : l S S C I 9 \ : l , , SEM [HA19], and DEM [SGW06] (bottom row), both variants of our affine heat method produce parameterizations with dramatically less metric distortion (D) (Eqn. 18). We remark that our parameterizations are isometric at the source, just as the logarithmic map is in the smooth setting*
-
-
 
 ### 核心思想：从向量热到仿射热
 
@@ -324,8 +314,6 @@ $$\Phi_{\nu} := \mathbf{x}_{\nu} / \lambda_{\nu}$$
 
 **边界行为**：由于热核的短时渐近展开不受边界强烈影响，AHM 在边界处自然实现正确的测地距离行为（Figure 4），与 Signed Heat Method（FC24）一致。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能对比：度量畸变
@@ -396,8 +384,6 @@ AHM 的有效性在多个应用中得到了验证：
 
 所有对比实验均采用相同的内在 Delaunay 三角剖分和相同的扩散时间步长 $\tau = h^2$（$h$ 为平均边长），确保了比较的公平性。VHM_log 和 SEM 也采用了内在 Delaunay 三角剖分以提升其基线性能。
 
-
-
 ## 定位与知识库关联
 
 ### 问题瓶颈与现有方法
@@ -443,8 +429,6 @@ AHM 的有效性在多个应用中得到了验证：
 3. 能否将仿射热方法推广到计算任意仿射连接（非仅度量定义的最短测地线）对应的对数映射？
 4. 如何开发直观的控制器，使得测地线概念可超出共形等价度量进行修改？
 5. 如何自动确定用于分片 UV 平面化的源点最优配置？
-
-
 
 ## 原文 PDF
 

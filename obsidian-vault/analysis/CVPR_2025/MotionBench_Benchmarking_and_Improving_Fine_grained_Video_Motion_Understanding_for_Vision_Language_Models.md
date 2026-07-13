@@ -56,15 +56,11 @@ claims:
 - 在MVBench上，TE Fusion（k=4）取得72.1的准确率，远超无压缩Baseline的64.5，并全面优于其他压缩方法（Table 4）。
 - 当压缩比达到16（极端压缩）时，TE Fusion在MotionBench上依然保持强大性能，远高于其他压缩方法，表明深层融合对高压缩比场景具有独特优势（Table 8）。
 
-
-
 视频理解是当前多模态大模型研究的核心方向之一。然而，现有视频视觉语言模型（Video VLMs）在细粒度运动理解方面表现严重不足——在MotionBench基准测试中，主流模型的准确率普遍低于60%（Table 3）。这一瓶颈的根源在于，精细的运动感知（如动作顺序、重复计数、相机运动识别）要求模型能够捕获帧与帧之间的细微时序变化，而这通常需要高帧率输入作为支撑。
 
 高帧率输入带来的直接挑战是计算成本与上下文长度的双重膨胀。大语言模型（LLM）解码器的序列长度有限，直接输入大量未经压缩的视频帧会迅速耗尽上下文窗口。因此，视频特征压缩成为必然选择。当前主流的压缩范式可分为三类：**编码前融合**（Pre-Encoder Fusion，如Qwen2-VL将邻近帧沿通道维度拼接）、**编码后融合**（Post-Encoder Fusion，如QFormer、PLLaVA、Kangaroo在视觉编码器输出后进行时序聚合），以及**无时间融合的逐帧处理**（Baseline）。这些方法的共同缺陷在于，它们仅依赖**浅层融合**（shallow fusion）——帧间交互要么发生在编码之前，要么发生在编码之后，而视觉编码器内部各帧保持独立处理。浅层融合难以有效消除帧间冗余，同时无法在编码过程中充分提取帧间时间依赖关系，导致压缩后的特征丢失关键运动信息。
 
 这一结构性缺陷在高压缩比场景下尤为突出：当压缩比增大时，浅层融合方法的性能快速下降，无法在有限的解码器输入长度内保留足够的运动线索。因此，如何在固定LLM序列长度的约束下，实现高效且运动感知能力强的视频特征压缩，成为提升细粒度运动理解能力的关键突破口。本文正是在这一背景下，提出**Through-Encoder Fusion（TE Fusion）**——一种在视觉编码器内部引入深层帧间融合的新范式，旨在从根本上解决浅层融合的局限性。
-
-
 
 ## 核心方法与创新机理
 
@@ -106,8 +102,6 @@ TE Fusion 在视频VLM压缩方法谱系中占据独特位置：
 
 TE Fusion 以 GLM4-9B 作为LLM主干，在 MotionBench 上取得了0.58的准确率（Dev AVG），超越了使用72B LLM的 Qwen2VL-72B（0.57），验证了深层融合范式的高效性（Table 3）。在相同的LLM输入序列长度下，TE Fusion（$k=4$）在 MVBench 上取得72.1的准确率，远超无压缩baseline的64.5（Table 4），进一步证明了深层融合在固定解码器预算下的显著优势。
 
-
-
 MotionBench 论文提出了一套“评测驱动改进”的双轨框架：一方面构建细粒度视频运动理解基准 **MotionBench**，另一方面针对评测暴露出的瓶颈设计 **Through-Encoder Fusion (TE Fusion)** 压缩架构。整体流程从视频输入到答案生成，可拆解为以下模块及其数据流关系。
 
 ### 评测基准：MotionBench 的数据管线
@@ -138,8 +132,6 @@ TE Fusion 的核心创新在于将时间融合**深度嵌入视觉编码器内�
 4. **模态对齐投影层**与**LLM 解码器**：与通用架构一致，将压缩特征映射后输入 GLM4-9B 等解码器生成答案。
 
 这一设计的关键洞察是：通过编码阶段的深度帧间交互，TE Fusion 在不增加 LLM 输入长度的前提下，以更高的原始帧率捕获运动信息。当 $k \le 4$ 时，性能几乎无下降；即使在 $k=16$ 的极端压缩下，TE Fusion 在 MotionBench 上仍显著优于其他压缩方法（Table 8），验证了深层融合对高压缩比场景的独特优势。
-
-
 
 ### 方法总览
 
@@ -189,8 +181,6 @@ MotionBench 数据集的标注密度定义为：
 $$\text{Annotation Density} = \frac{\text{Total length of questions}}{\text{Video duration}}$$
 
 MotionBench 的标注密度达到 68.4，约为现有基准的两倍，反映了其问题标注的细粒度和高信息密度。
-
-
 
 ## 实验与关键发现
 
@@ -246,25 +236,11 @@ TE Fusion通过在编码器内部引入分组自注意力，改变了这一信�
 
 这一机制也解释了为什么TE Fusion在高压缩比下具有独特优势：当k增大时，浅层方法在编码器输出端面临的信息损失是“一次性且不可恢复的”，而TE Fusion的深层融合使得信息筛选贯穿整个编码过程，每一层都有机会保留关键的时序线索，从而在极端压缩下仍能维持可接受的性能。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2501_02955/figures/006_Figure.jpg]]
-*Figure: (a) Option distribution (b) Video duration (c) Annotation length (d) QA per video*
-
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2501_02955/figures/003_Table_1.jpg]]
 *Table 1: The comparison of existing video VLM benchmarks with MotionBench. MotionBench collects various video sources including web videos and synthetic videos, and provides a new evaluation perspective in motion level perception*
 
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2501_02955/figures/005_Table_2.jpg]]
-*Table 2: The MotionBench curation process. Categories [1-3] refer to “videos with intricate interactions”, “videos from specific fields” Daily Actions Ambient DailyFine-grained Motion 4227 handsand “virtual videos”, detailed in Sec. 3.1. N. Vid/QA refers to the number of videos and queries in a category. min(H, W) is the minimum 11%8% 10% 1620of the height and width of the video frames. len refers to the processed video duration. We automatically construct the queries in Virtual Repetition Count 812scenes, and manually annotate the other QA pairs in MotinBench*
-
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2501_02955/figures/012_Table_6.jpg]]
 *Table 6: The model configurations of all ablated architectures*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2501_02955/figures/013_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2501_02955/figures/014_Table_7.jpg]]
-*Table 7: Benchmark results for different compression methods at various compression rates, all using the same sequence length in the VLM decoder. We set $\begin{array} { r } { \frac { N _ { \mathrm { i n p u t } } } { k } = 4 , 8 . } \end{array}$ , with the baseline representing video models that process 4 frames without compression. Note that each compression method is re-implemented on the GLM-4V-9B backbone to ensure a fair comparison
-
 
 
 ## 定位与知识库关联
@@ -314,8 +290,6 @@ TE Fusion 与三条基线路线的本质差异在于**时间融合的深度与�
 4. **Repetition Count 的突破路径**：所有模型在该任务上接近随机水平，说明现有架构可能缺乏对周期性模式的归纳偏置。引入显式的时序计数模块或频域特征是否必要？
 
 5. **计算开销的精确量化**：深层融合在编码器中引入了分组自注意力，虽然不增加 LLM 输入长度，但会增加编码阶段的计算量。这一开销与性能收益的 Pareto 前沿尚未被系统刻画。
-
-
 
 ## 原文 PDF
 

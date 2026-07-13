@@ -50,8 +50,6 @@ claims:
 
 实验表明，InterReal 在搬运箱子与推动箱子两项任务上均取得最低的 DOF 关节角度和物体位置跟踪误差，并在两项任务上取得最高的成功率（搬运 96.41%，推动 87.45%）。消融实验进一步验证了自动奖励学习机制显著优于固定启发式奖励，而基于逆运动学的 HOI 运动增强方法有效提升了策略对物体扰动的泛化能力。真实世界部署（Fig. 1）证实了框架在 Unitree G1 机器人上的可行性。
 
-
-
 ### 1. 研究背景与问题语境
 
 人形机器人执行人-物交互（Human–Object Interaction, HOI）任务，如搬运箱子、推动重物，是通用机器人走向真实世界应用的关键能力之一。这类任务要求机器人同时协调全身运动（行走、弯腰、手臂操作）与对外部物体的精确操控，形成一个高维、强耦合的闭环控制系统。
@@ -77,8 +75,6 @@ claims:
 - **自动奖励学习器（Automatic Reward Learner）**：引入一个基于 SAC 的元策略（meta-policy），以关键跟踪误差为驱动信号，动态输出各子奖励的权重系数。该元策略随 PPO 训练进度自适应调节平衡、跟踪、接触等目标之间的权重分配，替代手工调参，使策略能够在不同任务阶段自动聚焦于当前最关键的优化目标。
 
 通过将上述两个机制嵌入内循环 PPO 策略学习与外循环元学习优化，InterReal 构建了一个端到端的 HOI 技能学习范式，最终支持在真实 Unitree G1 机器人上利用 FoundationPose 进行 6D 物体姿态估计，实现 sim-to-real 部署。
-
-
 
 ## 核心方法与创新机理
 
@@ -108,8 +104,6 @@ InterReal 的核心创新围绕一个闭环因果链条展开：**瓶颈 → 操
 
 三个 changed slots 形成了完整的创新闭环：运动增强提供物体扰动下的多样化训练数据，自动奖励学习器动态协调多目标优化，非对称结构桥接仿真训练与真实部署的信息不对称。这一组合使 InterReal 在箱体抓取任务上达到 96.41% 的成功率，在箱体推动任务上达到 87.45% 的成功率，均显著优于基线方法（Table II, confidence: 0.95）。
 
-
-
 InterReal 的整体框架由三个核心组件构成：**运动数据预处理**、**多运动-多环境学习**以及**真实世界部署**（Fig. 2）。框架以人-物交互（HOI）的运动捕捉数据为输入，经过重定向、物理验证与运动增强后，送入一个双循环的强化学习器进行训练，最终借助 FoundationPose 实现在真实机器人上的零样本部署。
 
 ![[assets/figures/papers/paper_list_l22_InterReal_A_Unified_Physics_Based_Imitation_Framework_for_Learning_Human/figures/002_Figure_2.jpg]]
@@ -133,8 +127,6 @@ InterReal 的整体框架由三个核心组件构成：**运动数据预处理**
 ### Sim-to-Real 部署
 
 在真实世界部署阶段（Fig. 2 右侧），系统利用 **FoundationPose** 进行 6D 物体姿态估计，将物体状态观测输入训练好的 HOI 策略。策略在 Unitree G1 机器人上实时推理，输出关节目标位置，完成箱体抓取与推动等交互任务。该流程实现了从仿真到真实的无缝迁移，无需在真实环境中进行额外微调。
-
-
 
 InterReal 将人-物交互（HOI）技能学习形式化为一个马尔可夫决策过程（MDP），并由五个核心模块构成闭环：HOI 运动重定向与物理验证、HOI 运动增强、内环 PPO 策略学习、外环自动奖励学习，以及 Sim-to-Real 部署。以下聚焦于决定系统能力的关键模块与公式。
 
@@ -201,12 +193,8 @@ $$\Theta' = \Theta^0 * \sigma(t) \, \mu_\psi^{\mathrm{meta}}(\Theta_t | u_t), \q
 
 其中 $\Theta^0$ 为初始权重，$\sigma(t)$ 为时间依赖的缩放因子（随训练进度从 1 递减至下界 $\delta$），$\mu_\psi^{\mathrm{meta}}$ 为元策略基于观测 $u_t$（包含关键跟踪误差指标）输出的调节系数。三者按元素相乘得到最终权重，实现了从初始启发式权重到数据驱动自适应权重的平滑过渡。消融实验表明，内部系数 $\delta$ 的最优设置为 0.1（Fig. 4）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l22_InterReal_A_Unified_Physics_Based_Imitation_Framework_for_Learning_Human/figures/007_Figure_5.jpg]]
 *Figure 5: Adaptive curves for reward-related weight coefficients*
-
-
 
 ## 实验与关键发现
 
@@ -267,18 +255,11 @@ Fig. 4 展示了元学习内部系数 $\delta$（控制权重更新缩放范围�
 | **Fig. 4** | $\delta = 0.1$ 时元学习效果最优，验证了权重搜索空间设计的重要性。 |
 | **Fig. 5** | 奖励权重系数随训练自适应变化，证明元策略能够动态平衡多目标优化。 |
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l22_InterReal_A_Unified_Physics_Based_Imitation_Framework_for_Learning_Human/figures/003_Table.jpg]]
 *Table: I: Comparison of the best mean tracking accuracy on the Box-picking and Box-pushing task. The data records the average of 20 evaluations of the best model on each tracking metric*
 
 ![[assets/figures/papers/paper_list_l22_InterReal_A_Unified_Physics_Based_Imitation_Framework_for_Learning_Human/figures/005_Table.jpg]]
 *Table: II: Comparison results of task success rate metrics on boxpicking and box-pushing tasks*
-
-![[assets/figures/papers/paper_list_l22_InterReal_A_Unified_Physics_Based_Imitation_Framework_for_Learning_Human/figures/001_Figure_1.jpg]]
-*Figure 1: Two groups of live photos from a real-world deployment of the challenging interaction tasks. Top group: The robot visually perceives the box’s posture, simultaneously picking, walking, and putting the high-density box down. Bottom group: The robot needs to bend slightly and continuously push the box forward. During the interaction, the policy can be adjusted in real-time based on unfavorable box postures to ensure HOI task completion*
-
-
 
 ## 定位与知识库关联
 
@@ -343,8 +324,6 @@ InterReal 的策略本质上是**运动跟踪器**——其目标是尽可能精
 **（5）多机器人协作交互**
 
 当前框架仅考虑单机器人-单物体的交互。扩展到多机器人协作搬运、人-机器人协作组装等场景，需要解决多智能体协调、力分配和通信延迟等新挑战，这超出了现有方法的设计范围。
-
-
 
 ## 原文 PDF
 

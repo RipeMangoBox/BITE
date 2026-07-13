@@ -55,8 +55,6 @@ claims:
 
 方法仍存在若干局限：内部旋转变化等噪声可能产生虚假曲率峰，渐变过渡动作缺乏明显的曲率谷底，低动态动作的绝对分割性能仍有提升空间。这些方向为后续研究提供了明确的改进线索。
 
-
-
 ### 问题背景
 
 时序动作分割（Temporal Action Segmentation, TAS）旨在对未修剪的长视频进行逐帧动作类别标注，是人机交互、视频理解等领域的核心任务。基于骨架的时序动作分割（Skeleton-based TAS, STAS）因其对光照、背景变化的鲁棒性和数据高效性而受到广泛关注。现有方法通常将STAS分解为两个子任务：**动作分类**（识别每帧所属的动作类别）和**边界定位**（检测动作之间的精确切换点），并采用解耦架构分别处理。
@@ -84,8 +82,6 @@ claims:
 2. **定位→分类**：边界预测结果反过来动态优化分类特征空间，使其几何结构更有利于形成清晰的边界。
 
 这种双向协同机制使得两个任务从相互掣肘转变为相互强化，形成"更好的分类特征→更清晰的曲率信号→更精确的边界预测→更优的特征空间组织"的正向循环。
-
-
 
 ## 核心方法与创新机理
 
@@ -121,13 +117,8 @@ $$ \mathcal{L}_{curv} = -\frac{1}{T}\sum_{t=1}^{T} MSE(\hat{y}_{t}^{b}, \varphi(
 
 EDD 与 CGS 并非简单叠加：EDD 单独使用可一致提升所有指标，CGS 单独使用带来最大的段 F1 提升，而完整模型的增益超过各模块独立贡献之和，展现了真正的协同效应。曲率作为边界代理也优于欧氏距离、余弦相似度和梯度显著图等替代方案，验证了几何先验的独特价值。
 
-
-
 ![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_Vgh30npuN3/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of CurvSeg. Our model processes video features through EDD to capture decoupled classification and localization representations utilizing task-specific experts. Subsequently, CGS leverages geometric curvature principles to guide task collaboration, enhancing both action boundary detection and classification performance*
-
-![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_Vgh30npuN3/figures/001_Figure_1.jpg]]
-*Figure 1: (a) Existing STAS approaches. (b) The proposed method. (c) Classification representations create compact clusters, forcing high trajectory curvature within action segments. (d) Curvature-guided task collaboration*
 
 CurvSeg 的整体设计围绕一个核心矛盾展开：骨架时序动作分割（STAS）中的动作分类与边界定位两个子任务对特征的需求是冲突的——分类要求类别内不变性，定位要求对状态转换的敏感性。现有解耦架构（如 **MS-TCN++**、**ASRF**、**DeST**、**LaSA** 等）将两个任务独立处理，形成了信息孤岛。CurvSeg 通过两个关键模块打破这一僵局：**专家驱动解耦（Expert-Driven Decoupling, EDD）** 负责任务自适应特征生成，**曲率引导协同（Curvature-Guided Synergy, CGS）** 负责建立分类与定位之间的双向正向循环。
 
@@ -176,8 +167,6 @@ $$\mathcal{L} = \mathcal{L}_{c} + \mathcal{L}_{b} + \lambda \mathcal{L}_{curv}$$
 ### 关键设计逻辑
 
 该框架的核心洞察在于：在良好学习的分类特征空间中，动作段内特征因向类中心聚拢而呈现高曲率轨迹，过渡段特征因类别切换而呈现低曲率直线轨迹。CGS 利用这一几何特性，将分类特征空间的结构信息转化为边界定位的先验，同时边界预测的反馈又反向优化分类特征空间，使其几何结构更利于清晰边界。EDD 则通过专家路由机制为两个任务生成适配的特征表示，避免了共享特征导致的冲突。消融实验证实，EDD 和 CGS 的联合使用产生了超越各自独立贡献之和的协同增益（Table 3），验证了“任务解耦 + 几何协同”这一设计范式的有效性。
-
-
 
 CurvSeg 的核心架构由两个关键模块构成：**曲率引导的协同模块（CGS）** 和 **专家驱动解耦模块（EDD）**。前者利用分类特征轨迹的几何曲率建立跨任务双向协同，后者通过混合专家机制为分类和边界定位生成任务自适应特征。
 
@@ -241,8 +230,6 @@ $$\mathcal{L} = \mathcal{L}_{c} + \mathcal{L}_{b} + \lambda \mathcal{L}_{curv}$$
 
 其中 $\lambda$ 为平衡超参数，在 PKU-MMD 上设为 4，LARa 上设为 2.5，MCFS 数据集上设为 2。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现与主实验
@@ -284,29 +271,15 @@ LARa 数据集上的消融趋势完全一致，完整模型的 F1@50 达到 59.0
 
 **双向一致性的必要性**（Table 6）：仅使用分类到边界的单向约束（C→L）或边界到分类的单向约束（L→C），F1@10 分别为 71.7 和 71.6；完整的双向 CGS 达到 72.5。双向约束使分类特征空间和边界预测形成相互强化的闭环，而非单向的信息灌输。
 
-![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_Vgh30npuN3/figures/012_Table_6.jpg]]
-*Table 6: Task synergy ablation study on LARa*
-
 **曲率预测边界 vs. 学习边界**（Table 5）：直接用曲率信号作为边界预测（Curv）与可学习的边界预测头（Pred）性能高度接近（F1@10 分别为 72.3 和 72.5），说明曲率本身已具备作为高质量边界代理的能力，无需额外参数即可提供有效的定位信号。
-
-![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_Vgh30npuN3/figures/011_Table_5.jpg]]
-*Table 5: Refine with different boundary prediction*
 
 ### EDD 模块深度分析
 
 **专家路由机制的有效性**（Table 7）：将 EDD 的动态高斯混合专家路由替换为独立编码器（Indep. Enc.）和金字塔解耦（Pyr. Decoupling），在 LARa 上进行比较。EDD 的 F1@10 为 72.0，优于独立编码器的 71.6 和金字塔解耦的 71.2。动态路由的关键优势在于：它根据视频段的时序位置和内容，软性地为分类专家和定位专家分配不同的时间注意力权重，而非简单地将特征一分为二。分类专家聚焦于语义稳定的段内区域，定位专家关注过渡段附近的细粒度变化，这种互补性使得特征解耦更加高效。
 
-![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_Vgh30npuN3/figures/013_Table_7.jpg]]
-*Table 7: EDD ablation study on LARa dataset*
-
 ### 超参数敏感性
 
 Figure 3 和 Tables 9-12 展示了四个关键超参数的影响：
-
-![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_Vgh30npuN3/figures/019_Table_9.jpg]]
-*Table 9: Effect of hyperparameter λ on model performance Table 10: Effect of segment count M on model performance*
-
-![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_Vgh30npuN3/figures/020_Table_10.jpg]]
 
 - **曲率窗口大小 w**：w=10 时性能最优。过小的窗口对噪声敏感，产生虚假曲率峰；过大的窗口会平滑掉真实的边界信号。
 - **CGS 损失权重 λ**：PKU-MMD 上 λ=4、LARa 上 λ=2.5、MCFS 上 λ=2 时最优。λ 过大会使曲率约束主导训练，干扰分类和边界的基础损失。
@@ -329,8 +302,6 @@ Table 8 进一步量化了动作动态性对性能的影响。低动态动作（
 ### 训练过程中的曲率演化
 
 Figure 6 展示了训练过程中曲率信号的变化，为几何假设提供了实证支撑。在早期训练阶段（Epoch 2, 8），曲率信号呈现噪声状或无规律的平坦分布，此时分类特征空间尚未形成良好的聚类结构。随着训练收敛（Epoch 64, 128），曲率信号呈现出清晰的模式：动作边界处出现明显的低曲率谷底，动作段内则呈现高曲率波动。这一演化过程验证了论文的核心理论——随着分类损失的优化，特征空间中的类簇越来越紧凑，迫使段内轨迹弯曲度增大，而段间过渡轨迹保持平直，曲率自然成为可靠的边界指示器。
-
-
 
 ## 定位与知识库关联
 
@@ -378,8 +349,6 @@ CurvSeg 的核心创新在于将几何曲率引入跨任务协同。其关键洞
 3. **几何协同的泛化**：曲率引导的双向协同思想能否推广到更一般的视频理解任务，如时序动作检测或动作预测？
 4. **自适应超参数**：窗口尺寸 $w$、分段数 $M$、损失权重 $\lambda$ 等超参数目前需按数据集手动调整，是否可通过元学习或自适应机制减少人工调参依赖？
 5. **极端噪声下的可靠性**：在骨架数据极度缺失或多人交互导致关节点混淆的场景下，如何保证曲率计算的可靠性？
-
-
 
 ## 原文 PDF
 

@@ -58,8 +58,6 @@ DrivePI的核心洞见在于：**粗粒度语言理解与细粒度空间学习�
 
 **方法定位**：DrivePI处于VA与VLA的交汇地带，以“空间感知4D MLLM”的姿态，首次在统一架构内实现了从场景理解、3D感知、运动预测到轨迹规划的完整闭环。其关键设计——LiDAR增强的空间投影器、多阶段数据引擎、多任务头并行优化——为端到端自动驾驶的可解释性与安全性提供了新的技术路径。当前局限包括多任务损失权重未精细平衡、仅完成开环评估、泛化性待验证等问题，后续工作将探索自适应损失策略与闭环强化学习扩展。
 
-
-
 端到端自动驾驶正经历从“感知-决策-控制”分离架构向统一模型范式的转变。当前主流路线可归为两类：**视觉-行动（VA）模型**与**视觉-语言-行动（VLA）模型**，二者在能力边界上形成鲜明互补，却也暴露出难以调和的矛盾。
 
 VA模型（如**VAD**、**FB-OCC**）以多视图图像为输入，直接输出规划轨迹或中间3D占位表示，在感知精度和驾驶安全性上表现突出。然而，这类模型完全缺乏自然语言交互能力——它们无法解释“为什么此时选择变道”或“前方施工区域的风险等级如何”，使得系统决策过程对乘客和监管者而言如同黑箱。在安全攸关的自动驾驶场景中，这种可解释性缺失构成了根本性的信任障碍。
@@ -69,8 +67,6 @@ VLA模型（如**OpenDriveVLA-7B**、**ORION**、**OmniDrive**）则试图弥合
 这一困境的根源在于：**粗粒度语言理解与细粒度空间感知被割裂为两个独立的技术栈**。VA模型精于后者却失语，VLA模型擅长前者却“近视”。二者之间的空白地带——一个既能进行自然语言交互、又能输出精确3D感知与运动预测的统一框架——构成了当前端到端自动驾驶的核心瓶颈。
 
 DrivePI的动机正是打破这一僵局。其核心洞察在于：**通过引入LiDAR点云作为互补3D几何先验，并设计多阶段数据引擎生成大规模空间推理问答对，可以将语言理解与精细感知纳入同一MLLM架构进行端到端联合优化**。这不仅使小参数模型（0.5B）在语言交互上超越7B级VLA模型，更在3D占位、占位流和轨迹规划等细粒度任务上达到甚至超越专用VA模型的水平，首次实现了真正意义上的“空间感知4D多模态大语言模型”。
-
-
 
 ## 核心方法与创新机理
 
@@ -107,8 +103,6 @@ DrivePI 的核心创新在于**首次将粗粒度语言交互与细粒度 3D 空
 
 上述四个创新并非孤立存在，而是形成了一条清晰的因果链：**LiDAR 提供几何先验 → 交叉注意力投影器保留空间细节 → 多任务头实现粗细粒度联合推理 → 数据引擎提供训练信号**。消融实验（Table 5）证实，仅启用文本头或仅启用视觉头时，各自性能均显著低于联合训练——说明粗细粒度任务之间存在互补增益，而非简单叠加。这一发现是 DrivePI 能够以小参数模型同时超越 VA 和 VLA 基线的根本原因。
 
-
-
 DrivePI 的整体框架旨在统一粗粒度的语言理解与细粒度的空间感知、预测与规划。其核心设计思路是：将多视图图像与 LiDAR 点云作为互补输入，通过视觉编码与空间投影转换为视觉令牌，再与文本指令令牌共同送入一个轻量级多模态大语言模型（MLLM），最后由四个并行的专用头分别输出场景描述、3D 占位、占位流和轨迹规划。
 
 ### 输入模态与视觉编码
@@ -144,15 +138,8 @@ $$L_{total} = \lambda_{1} L_{llm} + \lambda_{2} L_{occ} + \lambda_{3} L_{flow} +
 
 默认所有权重 $\lambda_i = 1$，实现端到端的统一优化。值得注意的是，为避免捷径学习，训练默认**不使用自车状态**（ego status），所有实验结果（除非特别注明）均在此公平设置下获得。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2149_https_arxiv_org_abs_2512_12799/figures/001_Figure_1.jpg]]
 *Figure 1: (a) presents the pipeline of mainstream visionaction (VA) models for end-to-end autonomous driving. (b) illustrates mainstream Vision-Language-Action (VLA) models. (c) shows our DrivePI, which combines coarse-grained linguistic understanding with fine-grained 3D perception and prediction, inheriting advantages both existing VA models and VLA models*
-
-![[assets/figures/papers/paper_list_l2149_https_arxiv_org_abs_2512_12799/figures/002_Figure_2.jpg]]
-*Figure 2: The pipeline of DrivePI consists of the following steps. First, we employ a vision encoder to extract features from images and LiDAR data, obtaining latent BEV features that are then converted into vision tokens by a spatial projector. Next, we feed both vision tokens and text tokens into the MLLM to generate output tokens. The MLLM produces responses through four specialized heads: a text head for scene understanding in an auto-regressive manner, a 3D occupancy head for accurate spatial perception, an occupancy flow head for pixel-level motion prediction, and an action diffusion head for trajectory planning*
-
-
 
 ### 视觉编码与空间投影器
 
@@ -189,16 +176,6 @@ $$h = \sum_{i=0}^{l} F_{i}^{h} \cdot w_{i}$$
 
 ![[assets/figures/papers/paper_list_l2149_https_arxiv_org_abs_2512_12799/figures/012_Table_8.jpg]]
 *Table 8: The learned importance weights of all hidden states in the MLLM with Qwen-2.5 0.5B model, including the input embedding (indexed as 0). The Index and Weight column indicates the index and the learned importance weight of each hidden state*
-
-![[assets/figures/papers/paper_list_l2149_https_arxiv_org_abs_2512_12799/figures/014_Table_9.jpg]]
-*Table 9: The learned importance weights of all hidden states in the MLLM with Qwen-2.5 3B model, including the input embedding (indexed as 0). The Index and Weight column indicates the index and the learned importance weight of each hidden state*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2149_https_arxiv_org_abs_2512_12799/figures/003_Figure_3.jpg]]
-*Figure 3: The illustration of our multi-stage data pipeline. We first generate captions of front and back views, respectively. Then, we use InternVL3-78B (adopts Qwen2.5-72B [3] as the language model) to combine these captions to merge and polish generated scene descriptions. Moreover, we generate text-occupancy and text-flow QA pairs based on occupancy and flow ground truth by multi-turn conversations to improve the 4D spatial understanding ability. Finally, we generate text-planning QA pairs to allow MLLM to predict the future actions of ego-vehicle*
-
-
 
 ## 实验与关键发现
 
@@ -262,12 +239,6 @@ Table 8和Table 9分别展示了Qwen2.5-0.5B和Qwen2.5-3B中各隐藏层的学�
 - **Table 6**：数据缩放至560K QA对带来44.9%的类别准确率提升，验证了数据引擎的可扩展性。
 - **Table 7**：损失权重调整揭示了感知与规划任务间的梯度冲突，指向自适应平衡策略的研发需求。
 
-![[assets/figures/papers/paper_list_l2149_https_arxiv_org_abs_2512_12799/figures/004_Table_1.jpg]]
-*Table 1: 3D occupancy and occupancy flow performance on the OpenOcc validation set*
-
-![[assets/figures/papers/paper_list_l2149_https_arxiv_org_abs_2512_12799/figures/005_Table_2.jpg]]
-*Table 2: Planning performance on the nuScenes validation set. Note that our unified model DrivePI does not incorporate ego status during training by default to avoid potential shortcut learning*
-
 ![[assets/figures/papers/paper_list_l2149_https_arxiv_org_abs_2512_12799/figures/006_Table_3.jpg]]
 *Table 3: Text Understanding performance on the nuScenes-QA validation set. Ext., Cnt., Obj., Sts., Cmp. and Acc. are short for exist, count, object, status, comparison, and the overall accuracy*
 
@@ -279,13 +250,6 @@ Table 8和Table 9分别展示了Qwen2.5-0.5B和Qwen2.5-3B中各隐藏层的学�
 
 ![[assets/figures/papers/paper_list_l2149_https_arxiv_org_abs_2512_12799/figures/013_Table_7.jpg]]
 *Table 7: Ablation study for the balancing weights in DrivePI*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2149_https_arxiv_org_abs_2512_12799/figures/007_Table_4.jpg]]
-*Table 4: 3D occupancy performance on the Occ3D-nuScenes validation set. * indicates that DrivePI is trained exclusively on the 3D occupancy task of Occ3D-nuScenes*
-
-
 
 ## 定位与知识库关联
 
@@ -350,8 +314,6 @@ DrivePI处于端到端自动驾驶中**视觉-行动（VA）模型**与**视觉-
 4. **跨传感器泛化：** 如何将DrivePI扩展到纯视觉配置，同时保持细粒度3D感知能力？LiDAR先验能否通过知识蒸馏等方式迁移？
 
 5. **模型规模扩展：** 当MLLM骨干从0.5B扩展到3B或7B时，细粒度感知与语言理解能力如何变化？Table 8-9的隐藏层权重分析暗示深层表征对空间理解更关键，这一规律是否跨规模成立？
-
-
 
 ## 原文 PDF
 

@@ -87,8 +87,6 @@ ObjectMorpher处于**3D感知图像编辑**与**交互式对象操控**的交叉
 - 2D提升至3D的过程依赖TRELLIS的重建质量，其对最终编辑效果的影响边界；
 - 方法向多对象场景或视频的扩展可行性。
 
-
-
 图像编辑是视觉内容创作的核心任务，其理想目标是让用户以直观、高效的方式操控图像中的对象，同时保持结果的真实感和身份一致性。近年来，基于拖拽的编辑范式因其直观性而受到广泛关注——用户只需在图像上定义若干控制点并拖拽至目标位置，即可驱动对象的形变。然而，现有方法在实现这一目标时面临根本性瓶颈。
 
 **2D方法的几何盲区。** 以 **DragGAN**（Pan et al., SIGGRAPH 2023）和 **DragDiffusion**（Shi et al., CVPR 2024）为代表的2D拖拽编辑方法，直接在像素空间或隐空间特征上进行操作。这类方法缺乏对三维几何结构的理解，无法处理复杂的姿态变化与非刚性变形——当用户试图旋转对象或改变其三维朝向时，2D方法往往产生近乎原图的结果，未能真正执行3D感知的编辑（见Figure 5）。其根本原因在于：2D操作只能移动像素，无法推断和保持对象在三维空间中的几何一致性。
@@ -98,8 +96,6 @@ ObjectMorpher处于**3D感知图像编辑**与**交互式对象操控**的交叉
 **核心瓶颈。** 综上，现有方法的根本缺口在于：缺乏一种既能保持3D几何意识、又能实现高效非刚性编辑的对象表示与操控机制。具体而言，需要同时解决三个子问题：（1）如何从单张2D图像中构建可编辑的3D对象代理；（2）如何在该代理上施加物理合理的非刚性变形；（3）如何将编辑结果无缝合成回原始场景，保持光照、色彩与边界的一致性。
 
 ObjectMorpher正是针对上述瓶颈提出的解决方案。其核心洞察是：将模糊的2D拖拽编辑转化为几何明确的3D操作——通过轻量级3D高斯溅射（3DGS）重建、保持局部刚度的非刚性变形以及生成式合成，在实时交互下实现对象身份保持的逼真编辑（见Figure 1与Figure 2）。
-
-
 
 ## 核心方法与创新机理
 
@@ -131,8 +127,6 @@ $$\boldsymbol{\mu}'_i = \sum_{j \in \tilde{\mathcal{N}}_i} \tilde{w}_{i,j} \left
 
 ObjectMorpher 通过三个 changed slots 的系统性创新——**3DGS表示替代2D像素操作**、**ARAP非刚性变形替代刚性控制**、**生成式合成替代简单叠放**——构建了完整的3D感知编辑管线。用户研究（Figure 6）表明，该方法在引导跟随、风格一致性和身份保持三项指标上均获得超过80%的用户偏好，显著优于所有基线方法。
 
-
-
 ObjectMorpher 的编辑管线由四个核心模块串联构成，形成一条“2D 分割 → 3D 提升 → 可变形编辑 → 生成式合成”的完整处理链（Figure 2）。该管线将用户模糊的 2D 拖拽操作转化为几何明确的 3D 操作，在实时交互下实现对象身份保持的逼真编辑。
 
 ![[assets/figures/papers/paper_list_l2555_https_arxiv_org_abs_2603_28152/figures/002_Figure_2.jpg]]
@@ -147,13 +141,6 @@ ObjectMorpher 的编辑管线由四个核心模块串联构成，形成一条“
 **模块四：生成式合成与细化。** 编辑后的对象重新定位后，由基于 Qwen-Image-Edit 的 LoRA 微调扩散模型进行生成式合成（Figure 4），将对象无缝融入原图场景，同时协调光照、色彩、边界与背景的一致性。训练数据由 Subjects200K 和 KlingAI 生成的视频构建，通过 TRELLIS 重建 3DGS 并多视角渲染获得粗编辑对。
 
 **关键设计选择。** 与基于 2D 像素/隐空间特征的拖拽编辑（如 DragGAN、DragDiffusion）或仅支持刚性控制的 3D 感知方法（如 Image Sculpting）不同，ObjectMorpher 以可编辑 3DGS 为代理，将模糊的 2D 拖拽提升为几何明确的 3D 操作，并通过 ARAP 物理约束和生成式合成保证编辑的物理合理性与视觉一致性。该设计使系统在保持对象身份的同时，支持实时交互（交互延迟 <10s，模型推理约 20s），显著优于需半小时以上的基线方法。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2555_https_arxiv_org_abs_2603_28152/figures/001_Figure_1.jpg]]
-*Figure 1: Unlike text-based methods that fail to localize subjects or interpret geometry, ObjectMorpher uses direct 3D manipulation with real-time interaction. This ensures precise edits while preserving the object’s identity and background*
-
-
 
 ### 3D高斯溅射（3DGS）对象表示
 
@@ -228,8 +215,6 @@ Figure 4 展示了训练数据准备流程和生成式合成模型的完整管�
 
 整个管线的因果链条可概括为：**2D分割与3D提升**（Sec. 3.1）提供可编辑的几何代理 → **可变形图与ARAP约束**（Sec. 3.2）实现物理合理的非刚性编辑 → **生成式合成**（Sec. 3.3）确保编辑结果与场景的视觉一致性。消融实验（Figure 7, Figure 8）验证了各模块的必要性：3DGS表示优于网格表示，ARAP约束优于拉普拉斯变形，生成式合成显著消除合成痕迹。
 
-
-
 ## 实验与关键发现
 
 ### 主要定量结果
@@ -245,9 +230,6 @@ ObjectMorpher在综合编辑数据集上取得了全面的指标领先（Table 1
 
 用户研究（Figure 6）从三个维度评估编辑质量：**引导跟随**（Guidance Following）、**风格一致性**（Style Consistency）和**身份保持**（Identity Preservation）。ObjectMorpher在所有三个指标上均获得了超过80%的用户偏好，显著领先于DragGAN和DragDiffusion等基线。这一结果直接验证了核心主张：将2D拖拽提升至3D几何操作能更忠实地响应用户意图，同时保持对象外观一致性。
 
-![[assets/figures/papers/paper_list_l2555_https_arxiv_org_abs_2603_28152/figures/006_Figure_6.jpg]]
-*Figure 6: Visual results of our user study. Our method is consistently preferred across all three metrics (Guidance Following, Style Consistency, and Identity Preservation) over all baselines*
-
 ### 消融实验
 
 **3D表示选择**（Figure 7）：对比3DGS与Mesh表示，在均不使用生成式合成（w/o GC）的条件下，3DGS渲染的质量明显优于Mesh。Mesh表示在变形后容易出现几何伪影和纹理拉伸，而3DGS的连续高斯原语表示能更平滑地传播变形。当加入生成式合成（w/ GC）后，3DGS渲染的编辑对象与场景的光照、色彩和边界一致性进一步提升，消除了直接叠放产生的合成痕迹。
@@ -260,18 +242,11 @@ ObjectMorpher在综合编辑数据集上取得了全面的指标领先（Table 1
 
 Figure 5展示了8个对象在5种方法上的编辑对比。2D拖拽方法（DragGAN、DragDiffusion）无法理解3D几何，对非刚性引导的响应几乎与原始图像无异。3D感知方法中，Object 3DIT依赖语言指令，缺乏精确的空间控制能力；Image Sculpting虽支持3D操作，但在复杂非刚性变形下难以保持真实感。ObjectMorpher是唯一能忠实跟随非刚性用户引导同时保持照片级真实感的方法。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2555_https_arxiv_org_abs_2603_28152/figures/005_Figure_5.jpg]]
 *Figure 5: Qualitative comparisons. We show results on 8 subjects (rows) across 5 methods (columns). Our method (Ours) is the only one that faithfully follows the non-rigid user guidance while maintaining photorealism. 2D methods fail to perform the 3D-aware edit, producing results nearly identical to the origin*
 
 ![[assets/figures/papers/paper_list_l2555_https_arxiv_org_abs_2603_28152/figures/008_Figure_7.jpg]]
 *Figure 7: Ablation on 3D representations (3D GS vs. Mesh) and the use of Generative Composition (w/ GC vs. w/o GC)*
-
-![[assets/figures/papers/paper_list_l2555_https_arxiv_org_abs_2603_28152/figures/009_Figure_8.jpg]]
-*Figure 8: Ablation on the deformation constraints*
-
-
 
 ## 定位与知识库关联
 
@@ -317,8 +292,6 @@ ObjectMorpher的关键设计在于将模糊的2D拖拽操作提升为几何明�
 2. **复杂关节对象的变形鲁棒性**：对于人体等具有复杂运动学的对象，ARAP约束是否足够？是否需要引入骨骼驱动或基于物理的模拟？
 3. **重建-编辑的误差传播**：TRELLIS重建的不确定性如何量化，以及如何在编辑流程中对其进行鲁棒处理？
 4. **生成式合成的可控性边界**：扩散模型在协调过程中引入的纹理变化是否可预测和可控？是否存在保持原始纹理的更严格约束方式？
-
-
 
 ## 原文 PDF
 

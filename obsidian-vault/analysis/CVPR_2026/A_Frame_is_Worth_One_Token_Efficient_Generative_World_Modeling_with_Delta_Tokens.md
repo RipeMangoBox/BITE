@@ -52,8 +52,6 @@ claims:
 
 实验表明，DeltaWorld 在语义分割和深度估计的稠密预测基准上，最佳预测一致超越先前生成式世界模型（如 Cosmos-12B），且平均预测恢复至判别式世界模型基线水平，同时参数和 FLOPs 分别节省超过 **35×** 和 **2,000×**（Figure 2）。逐步消融研究证实，从判别式基线到 BoM 训练、再到帧压缩、最终到增量压缩，每一步都在保持或提升准确率的同时大幅降低计算开销（Table 2）。增量令牌同样可有效注入不同判别式世界模型架构，在 DINO-Foresight 上以 **2,048×** 更少的令牌匹配原有性能，验证了其通用性（Table D）。
 
-
-
 ### 生成式世界模型的核心瓶颈
 
 世界模型旨在从历史观测中预测环境的未来状态，是具身智能与自主决策的关键组件。近年来，生成式世界模型取得了显著进展，能够合成逼真的未来帧，但其实际部署面临一个根本性瓶颈：**计算代价过高**。现有大规模生成式世界模型（如 Cosmos-4B 和 Cosmos-12B）需要多次前向传播，且以稠密的空间特征图逐帧表示世界状态，每帧需要数百甚至上千个 patch token。这种设计完全忽略了连续视频帧之间高度结构化的时空冗余——相邻帧的绝大多数空间信息是重复的，真正需要预测的仅是帧间变化。
@@ -77,8 +75,6 @@ claims:
 基于上述洞察，本文提出 DeltaWorld——一个高效的生成式世界模型，其核心思想是通过 **DeltaTok** 将 VFM 特征空间中连续帧间的差异压缩为**单个增量令牌（delta token）**，使世界模型在仅包含时序变化的一维令牌序列上运行。结合 **Best-of-Many（BoM）训练目标**，DeltaWorld 能够在单次前向传播中生成多个多样化的未来假设，从而在保持生成能力的同时，实现参数和计算开销的大幅缩减（相较 Cosmos 减少 35× 以上参数和 2,000× 以上 FLOPs），并恢复至判别式基线的平均预测精度。
 
 > **注意**：本文的实验基准 DINO-world 由作者重新实现（原始代码和数据未公开），Cosmos 系列基线的输出被重新编码为 DINOv3 特征以进行公平比较，训练数据规模与原 DINO-world 不完全一致。这些因素在解读性能对比时需予以考量。
-
-
 
 ## 核心方法与创新机理
 
@@ -131,8 +127,6 @@ $$\hat{z}_{t+1} = f(q^k, Z_{1:t}, T_{1:t}, \tau_{t+1})$$
 
 增量令牌的设计并非局限于特定预测器架构。实验表明，将 delta token 注入 DINO-world 可在更低训练时间和内存下达到相近精度（Table C）；在 DINO-Foresight 上以 2048× 更少的令牌匹配原有性能（Table D），验证了该表示方法的通用性。
 
-
-
 DeltaWorld 的完整 pipeline 由四个核心模块串联构成：**冻结的视觉基础模型（VFM）骨干**、**DeltaTok 增量分词器**、**时序预测器**以及**Best-of-Many（BoM）训练/推理机制**。其根本设计原则是：**世界模型仅需在“变化”上运行，而非在完整的空间特征上运行**。
 
 ### 数据流与模块协作
@@ -156,13 +150,6 @@ DeltaWorld 的完整 pipeline 由四个核心模块串联构成：**冻结的视
 - **单次前向多样化生成**：不同于需要多次前向传播的扩散模型或自回归模型，DeltaWorld 通过 BoM 机制在单次前向中产生 $K$ 个候选未来。增大训练查询数 $K$ 可持续提升最佳评分，且平均评分在 $K \geq 64$ 后保持稳定（Figure 5），表明多样性与平均质量可兼顾。
 
 - **模块解耦**：VFM 骨干、DeltaTok 和预测器是独立训练的。DeltaTok 先以 MSE 重建损失 $L_{\mathrm{tok}} = \|x_t - \hat{x}_t\|^2$ 单独训练（公式 7），随后冻结并接入预测器进行 BoM 训练。这种解耦使得增量令牌可以灵活注入不同的判别式世界模型架构（如 DINO-Foresight），以 2048× 更少的令牌匹配原有性能（Table D）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2604_04913/figures/001_Figure_1.jpg]]
-*Figure 1: Outline of DeltaWorld. Unlike large existing generative world models that require many forward passes and represent each frame with many spatial tokens, our small DeltaWorld generates multiple futures in a single forward pass by using a single delta token to encode the difference between consecutive frames*
-
-
 
 ### 3.1 整体架构概览
 
@@ -217,8 +204,6 @@ $$\hat{z}_{t+1} = f(q^k, Z_{1:t}, T_{1:t}, \tau_{t+1})$$
 
 这种设计的核心优势在于：预测器处理的序列长度从每帧 $H \times W$ 个 token 缩减为每帧仅 1 个 token，使得预测器的计算开销在生成 20 个样本时仅占总推理 FLOPs 的 0.5%（Table B），从而实现了超过 2,000 倍的总体 FLOPs 节省。
 
-
-
 ## 实验与关键发现
 
 ### 评估设置与数据集
@@ -262,9 +247,6 @@ Table 3 报告了全量稠密预测基准结果，使用 300K 次迭代、512×5
 
 Figure 5 展示了 BoM 训练查询数 K 对 Cityscapes 中时程 mIoU 的影响。增大训练时的 K 可持续提升 best-of-20 评分，且无饱和现象，表明模型能够利用更多噪声查询产生更优的候选未来。同时，平均评分在 K≥64 后保持稳定，说明多样性的增加并未以牺牲平均预测质量为代价——模型学会将低质量候选推至分布边缘，而非在所有候选间平均分配概率质量。这一特性是 DeltaWorld 实用性的关键：用户只需增加推理时的采样数即可获得更好的最佳预测，而无需重新训练。
 
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2604_04913/figures/006_Figure_5.jpg]]
-*Figure 5: Best-of-Many sample scaling. Effect of the number of training and evaluation queries on Cityscapes mid-horizon (∼0.6 s) mIoU. Using 256 × 256 crops*
-
 ### 增量令牌的架构普适性
 
 增量令牌并非仅适用于本文的 DeltaWorld 架构。Table C 显示，将增量令牌注入判别式 DINO-world 后，以更低的训练时间和内存占用达到相近精度。Table D 进一步验证了在 **DINO-Foresight** 上的迁移效果：在 Cityscapes 上，增量令牌以 2,048 倍更少的 token 数量匹配了原始架构的性能。这表明增量令牌作为一种帧间变化压缩策略，具有跨架构的通用性——只要世界模型的核心操作是时序预测，将稠密空间表示替换为增量表示即可大幅降低计算开销而不显著损失精度。
@@ -279,24 +261,8 @@ Figure 5 展示了 BoM 训练查询数 K 对 Cityscapes 中时程 mIoU 的影响
 
 3. **公平性约束。** DINO-world 基线由本文重新实现，与原始论文的性能差异无法完全排除；Cosmos 基线受限于其推理约束，且其 FLOPs 统计未包含全部固定开销。这些因素使效率对比的绝对数字需谨慎解读，但数量级上的优势（35× 参数、2,000× FLOPs）远超可能的统计偏差范围。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2604_04913/figures/002_Figure_2.jpg]]
 *Figure 2: Performance comparison. Compared to the generative world model Cosmos [1], our DeltaWorld forecasts futures that better align with real-world outcomes while having over 35× fewer parameters and using 2,000× fewer FLOPs*
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2604_04913/figures/011_Table.jpg]]
-*Table: D. Delta tokens in the discriminative DINO-Foresight. Results on Cityscapes show that delta tokens transfer effectively to a different discriminative architecture, matching performance with 2048× fewer tokens. The token count indicates the total number of tokens used by the world model. Using 448×896 frames. †Numbers reported in the DINO-Foresight paper *
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2604_04913/figures/012_Table.jpg]]
-*Table: B. GFLOPs breakdown. In DeltaWorld, the backbone and DeltaTok encoder run once, while the predictor and DeltaTok decoder are applied per generated sample. Using a three-step rollout and a four-frame context (mid-horizon), ViT-B components, and 256 × 256 crops. Table C. Delta tokens in the discriminative DINO-world. Delta tokens also perform well within a discriminative world model. Time and Mem report per-iteration training time and GPU memory relative to the discriminative baseline. Reporting mid-horizon (∼0.6 s) mIoU using 256 × 256 crops. †Our reimplementation*
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2604_04913/figures/010_Table.jpg]]
-*Table: A. Training data statistics. For DINO-world, we report the duration range and FPS from their paper. For ours, we report the mean duration, and all videos have the same frame rate*
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2604_04913/figures/009_Figure_6.jpg]]
-*Figure 6: Diverse sampled futures. Top row: four context frames and the future frame. Bottom row: four sampled DeltaWorld predictions and the oracle. In this VSPW [47] example, the pedestrian’s position and ego-camera motion lead to multiple plausible futures*
-
-
 
 ## 定位与知识库关联
 
@@ -355,8 +321,6 @@ DeltaWorld 并非一步到位，而是通过三个渐进的消融步骤从判别
 3. **可控生成与语义解耦。** 噪声查询空间是否隐含了某种“动作条件”的结构？如果相似的噪声向量能跨场景产生语义一致的未来变化（例如，“向左漂移”的噪声始终导致物体向左运动），则可以通过操纵噪声查询实现可控的未来生成，而无需显式的动作标签。
 
 4. **增量令牌的通用性验证。** 论文已初步证明 delta token 可迁移至 DINO-Foresight 等不同架构（Table D，以 2,048× 更少的令牌匹配原有性能），但其在更广泛的世界模型范式（如基于视频预测的强化学习、具身智能中的规划）中的有效性仍有待验证。
-
-
 
 ## 原文 PDF
 

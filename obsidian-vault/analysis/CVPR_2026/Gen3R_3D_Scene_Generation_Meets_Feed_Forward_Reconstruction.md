@@ -73,15 +73,11 @@ Gen3R 的关键差异化设计在于：**解耦但对齐的联合潜空间**—�
 
 论文未明确列出方法本身的局限性。一个值得关注的开放问题是：**重建模型学习到的内在潜流形能否被更充分地利用，以进一步挖掘重建先验对三维场景生成的潜力**——这暗示当前仅使用VGGT中间token的适配方案可能尚未穷尽前馈重建模型所能提供的全部几何信息。
 
-
-
 三维场景生成正处于一个关键的十字路口。一方面，大规模视频扩散模型（video diffusion models）在2D外观生成上展现了惊人的逼真度，能够从单张或少数几张图像合成连贯的视频序列；另一方面，前馈式三维重建模型（feed-forward reconstruction models）如 **VGGT** 凭借其Transformer架构，可以从多视角图像中高效恢复全局一致的点云、深度图和相机参数。然而，这两种能力长期以来彼此割裂：生成模型缺乏对三维几何结构的显式理解，重建模型则无法产生新颖的视角或场景内容。
 
 现有方法在弥合这一鸿沟时面临一个根本性瓶颈——**如何有效利用预训练重建模型内部的丰富几何先验**。直接压缩重建模型的最终输出（如点云或深度图）会丢失其内部token空间中蕴含的多层级几何信息；而忽略这些中间表示，则导致生成的三维几何质量严重退化。更关键的是，几何表示与外观表示通常驻留在完全不同的特征空间中，缺乏分布层面的对齐，使得联合扩散生成变得极为困难。这一瓶颈的因果链条清晰可辨：**内部几何token的浪费 → 几何先验的稀释 → 几何-外观潜空间分布失配 → 联合生成失败**。
 
 本文的动机正源于对这一瓶颈的洞察。我们提出 **Gen3R**，一个将前馈重建与视频扩散深度融合的统一框架。其核心思想是将VGGT重新部署为一个**非对称几何VAE**（asymmetric geometry VAE）：通过一个可学习的几何适配器（geometry adapter），将VGGT的中间几何token映射为与预训练视频扩散模型兼容的几何latent；同时引入KL散度损失，强制几何latent分布与外观latent分布对齐。这一设计使得外观latent $\mathcal{A}$ 与几何latent $\mathcal{G}$ 能够沿宽度维度拼接为统一latent $\mathcal{Z} = [\mathcal{A}; \mathcal{G}]$，从而让视频扩散模型可以同时生成高质量RGB视频和全局一致的三维点云。Gen3R的独特优势在于：它既保留了重建模型的多模态几何先验，又实现了与外观生成空间的分布对齐，为从单张或多张图像条件下联合生成外观与几何开辟了新的可能。
-
-
 
 ## 核心方法与创新机理
 
@@ -111,8 +107,6 @@ Gen3R的条件注入机制支持同时注入文本、可变数量参考帧（编
 
 Gen3R的核心洞察在于：**前馈重建模型（VGGT）的内部token空间已经学习了一个丰富的三维场景流形，通过适配器与分布对齐，可以将这一流形“翻译”为生成模型可理解的潜空间表示**。这使得视频扩散模型不仅能生成高质量的RGB视频，还能同时输出全局一致的三维点云、深度图和相机参数——实现了从“重建”到“生成”的范式跃迁。这一创新路径为未来更充分地利用重建模型的先验知识进行三维场景生成提供了新的方法论框架。
 
-
-
 Gen3R 提出一种三维感知的隐空间扩散方法，将**前馈重建模型**与**预训练视频扩散模型**桥接，实现外观（RGB 视频）与几何（点云、深度图、相机参数）的联合生成。其核心流程分为两个阶段：
 
 **阶段一：构建统一的几何-外观隐空间。** 给定 $N$ 张输入图像 $\mathcal{T}$，前馈重建模型 VGGT 的编码器 $\mathcal{E}_{\mathcal{V}}$ 将其映射为多层级的几何 token $\mathcal{V} \in \mathbb{R}^{N \times L \times h_v \times w_v \times C}$（公式 1）。Gen3R 并非直接使用 VGGT 的最终输出，而是训练一个**几何适配器**（Geometry Adapter），由编码器 $\mathcal{E}_{\mathrm{adp}}$ 将几何 token 投影为与视频扩散模型隐空间分辨率匹配的几何隐变量 $\mathcal{G} \in \mathbb{R}^{n \times h \times w \times c}$（公式 3），再由解码器 $\mathcal{D}_{\mathrm{adp}}$ 从 $\mathcal{G}$ 重建回 $\mathcal{V}$（公式 4）。同时，预训练的 RGB VAE（$\mathcal{E}_{\mathcal{W}} / \mathcal{D}_{\mathcal{W}}$）将条件图像编码为外观隐变量 $\mathcal{A}$。适配器训练受两个损失监督：**重建损失** $\mathcal{L}_{\mathrm{rec}}$ 监督 token、深度图、点云和相机参数的重建（公式 6）；**KL 对齐损失** $\mathcal{L}_{\mathrm{KL}} = D_{\mathrm{KL}}(q_{\mathcal{G}} \parallel q_A)$ 强制几何隐变量的分布与预训练外观隐变量的分布对齐（公式 7）。最终，外观与几何隐变量沿宽度维度拼接，形成统一隐空间表示 $\mathcal{Z} = [\mathcal{A}; \mathcal{G}] \in \mathbb{R}^{n \times h \times 2w \times c}$（公式 8）。
@@ -126,8 +120,6 @@ Gen3R 提出一种三维感知的隐空间扩散方法，将**前馈重建模型
 - **非对称 VAE 架构**：几何分支使用 VGGT 的中间 token 而非最终输出，保留了多层级几何先验；外观分支复用预训练视频扩散模型的 VAE，无需从头训练。
 - **分布对齐**：KL 散度损失是扩散训练收敛的必要条件——消融实验（Table 4, Figure 7）表明，移除 $\mathcal{L}_{\mathrm{KL}}$ 后几何隐空间与外观隐空间分布失配，导致外观和几何生成质量急剧下降。
 - **端到端联合训练**：相比先独立训练 VAE 再训练扩散模型的两阶段方案，端到端联合训练在所有指标上大幅提升（Table 4），验证了统一隐空间设计的必要性。
-
-
 
 ### 3.1 非对称几何VAE：将前馈重建模型重新部署为几何编码器
 
@@ -184,8 +176,6 @@ $$\mathcal{Z} = [\mathcal{A}; \mathcal{G}] \in \mathbb{R}^{n \times h \times 2w 
 | Eq. 7 | $\mathcal{L}_{\mathrm{KL}} = D_{\mathrm{KL}}(q_{\mathcal{G}} \parallel q_A)$ | KL散度对齐几何与外观latent分布 |
 | Eq. 8 | $\mathcal{Z} = [\mathcal{A}; \mathcal{G}]$ | 宽度拼接形成统一联合latent |
 
-
-
 ## 实验与关键发现
 
 ### 外观生成：多视图条件下的视频质量对比
@@ -214,15 +204,6 @@ Figure 3 提供了 1-view 几何生成的定性对比。可视化结果显示，
 
 为验证将 VGGT 重新部署为几何 VAE 的合理性，作者在 Co3Dv2、WildRGB-D 和 TartanAir 上进行了纯重建模式的评估（Table 3）。Gen3R 的 VAE-only 模式在 Co3Dv2 上取得 CD **0.9625**，与原始 VGGT 的重建能力接近，同时远超使用预训练 RGB VAE 直接编码点云的 WVD（VAE only）。在 WildRGB-D 上，Gen3R VAE 的 CD 为 0.1260，同样保持竞争力。Figure 5 的定性重建对比进一步表明，Gen3R 的几何 VAE 在保持 VGGT 重建精度的同时，其 latent 空间具备更强的生成鲁棒性——这一特性在 Table 10 的 ScanNet++ 零样本重建实验中得到了印证：Gen3R 的 CD 为 **0.1209**，甚至略优于 VGGT 自身的 0.1279，说明通过适配器投影后的几何 latent 在跨域迁移中表现出更好的泛化能力。
 
-![[assets/figures/papers/paper_list_l2498_https_arxiv_org_abs_2601_04090/figures/007_Table_3.jpg]]
-*Table 3: Quantitative Comparison of Geometry Reconstruction. WVD (VAE only) uses pretrained RGB VAE to encode and reconstruct point clouds, while Ours (VAE only) projects and reconstruct VGGT tokens to decode scene geometry*
-
-![[assets/figures/papers/paper_list_l2498_https_arxiv_org_abs_2601_04090/figures/008_Figure_5.jpg]]
-*Figure 5: Quali. Comparison of Geometry Reconstruction*
-
-![[assets/figures/papers/paper_list_l2498_https_arxiv_org_abs_2601_04090/figures/018_Table_10.jpg]]
-*Table 10: Quantitative Comparison of Zero-shot Geometry Reconstruction in ScanNet++ dataset*
-
 ### 消融实验：联合生成与分布对齐的必要性
 
 Table 4 的系统消融揭示了两个关键设计选择对性能的决定性影响。
@@ -238,9 +219,6 @@ Table 4 的系统消融揭示了两个关键设计选择对性能的决定性影
 
 Table 5 评估了相机条件的可控性。在 RealEstate10K 和 WildRGB-D 上，Gen3R 在提供相机条件时能够更精确地控制生成视角的几何一致性，相比无相机条件的变体在旋转和平移误差上均有显著降低。Table 8 展示了分布外数据集的泛化结果：Gen3R 在未见过的场景类型上仍保持领先的外观生成质量，验证了从 VGGT 继承的几何先验具备跨域迁移能力，而非仅对训练分布过拟合。
 
-![[assets/figures/papers/paper_list_l2498_https_arxiv_org_abs_2601_04090/figures/017_Table_8.jpg]]
-*Table 8: Quantitative Comparison of Appearance Generation on Out-of-Distribution Datasets. We compare both 1-view and 2-view settings with camera conditions*
-
 ### 证据强度总结
 
 | 核心主张 | 关键证据 | 可信度 |
@@ -255,16 +233,6 @@ Table 5 评估了相机条件的可控性。在 RealEstate10K 和 WildRGB-D 上�
 *Figure 7: Visualization of Latent Spaces from different VAEs*
 
 需要手动验证的点：论文未提供 venue/year 信息，部分基线方法（如 Aether、WVD）的具体出处需查阅原文参考文献确认。Figure 7 的潜空间可视化细节需结合原图解读，此处仅基于分析结论推断其含义。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2498_https_arxiv_org_abs_2601_04090/figures/012_Figure_6.jpg]]
-*Figure 6: Appearance Comparison with ablation baselines. We highlight the artifacts of the baselines directly in the figures*
-
-![[assets/figures/papers/paper_list_l2498_https_arxiv_org_abs_2601_04090/figures/016_Table_7.jpg]]
-*Table 7: Quantitative Comparison of Appearance Generation without camera conditions*
-
-
 
 ## 定位与知识库关联
 
@@ -337,8 +305,6 @@ Gen3R 属于 **“前馈重建引导的 3D 生成”** 这一新兴范式，其�
 - **简单级联方法**（如重建 + 条件生成）：未实现 latent 空间对齐，端到端优化困难
 
 Gen3R 的实验证据（Table 1-4 的全面领先）强有力地支持了这一范式的有效性，为后续工作提供了明确的改进方向：更通用的适配器设计、更丰富的先验利用策略、以及更广泛的跨模型桥接能力。
-
-
 
 ## 原文 PDF
 

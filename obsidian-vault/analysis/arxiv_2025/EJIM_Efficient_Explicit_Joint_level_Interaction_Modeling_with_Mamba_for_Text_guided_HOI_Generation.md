@@ -50,8 +50,6 @@ claims:
 
 在BEHAVE和OMOMO两个基准上，EJIM以仅约5%的推理时间大幅超越现有方法——FID提升超过21%，接触距离（CD）和足部滑动率（FSR）均显著下降。消融实验系统验证了双分支设计、肢体引导扫描、渐进式掩码（k=3）以及物体损失与光滑损失各自的关键贡献。用户研究进一步表明，EJIM在语义匹配度和交互合理性上均优于对比方法。
 
-
-
 **任务定义与挑战** 文本引导的三维人-物交互（Human-Object Interaction, HOI）生成旨在根据自然语言描述和物体几何信息，合成逼真且语义一致的人体与物体协同运动序列。该任务的核心挑战在于：人体运动与物体运动之间存在细粒度的空间-时间耦合关系，生成结果必须同时满足语义匹配、物理合理性（如避免穿透、保持合理接触距离）和运动自然度等多重约束。
 
 **现有方法的瓶颈** 当前主流方法在人体表示上存在根本性局限——它们通常将整个人体压缩为单一特征token，然后利用Transformer架构进行全局时空建模。这种粗粒度表示虽然计算高效，却从根本上丧失了关节级别的交互细节捕捉能力。若反过来对每个关节独立建模，则会导致序列长度膨胀约400倍，使得基于自注意力的Transformer面临$O(n^2)$的计算灾难。这一“粒度-效率”悖论构成了该领域长期悬而未决的结构性瓶颈。
@@ -59,8 +57,6 @@ claims:
 **Mamba带来的转机** 状态空间模型（State Space Models, SSM）的线性复杂度特性为打破上述僵局提供了新的可能。Mamba作为SSM的最新演进，通过输入依赖的选择性扫描机制，在保持序列长度线性复杂度的同时实现了对长程依赖的有效建模。然而，直接将Mamba应用于HOI生成仍面临两个关键缺口：其一，标准的序列扫描方式忽略了人体固有的肢体结构先验，无法有效捕捉同一肢体内部关节的强相关性；其二，人与物体之间的交互并非全局均匀的——不同交互动作中，仅有部分关节与物体发生实质性接触，需要一种动态的、逐步聚焦的交互建模机制。
 
 **本文动机** 针对上述问题，本文提出EJIM（Efficient Explicit Joint-level Interaction Model），核心动机是实现“显式关节级交互建模”与“高效推理”的统一。具体而言，EJIM利用Mamba的线性复杂度对23个关节级token进行高效时空建模，同时引入三个关键设计：肢体引导扫描（Limb-guided Scan）将人体结构先验注入空间扫描顺序、双分支条件注入器（Dual-branch Condition Injector, DCI）实现文本语义与物体几何的精细化条件融合、以及渐进式动态交互掩码（Progressive Dynamic Interaction Mask）使模型从全局交互逐步收敛到关键关节的精准交互。这一设计使得EJIM能够在仅消耗现有方法约5%推理时间的前提下，大幅提升交互生成的逼真度和语义准确性。
-
-
 
 ## 核心方法与创新机理
 
@@ -89,8 +85,6 @@ $$\hat{\mathbf{y}}_l = \mathrm{softmax}\left(\frac{\mathbf{Q}\mathbf{K}^T}{\sqrt
 ### 创新总结
 
 EJIM的三项创新形成了从“表示粒度提升”到“高效时空建模”再到“精准交互聚焦”的完整因果链：关节级表示提供了交互建模的细粒度基础，肢体引导Mamba和双分支条件注入保障了计算效率与条件控制精度，而渐进式掩码机制则确保交互建模始终聚焦于真正相关的关节。这一设计使EJIM在BEHAVE和OMOMO数据集上以仅约5%的推理时间大幅超越HOI-Diff等现有方法，FID提升超过21%。
-
-
 
 EJIM是一种基于扩散模型的文本驱动HOI生成框架，核心瓶颈在于**显式关节级交互建模**——现有方法将人体压缩为单一token，丢失了细粒度的关节-物体接触信息，而将每个关节独立处理又导致计算量激增。EJIM通过Mamba的线性复杂度特性，在保持高效推理的同时实现了关节级时空建模。
 
@@ -121,12 +115,8 @@ EJIM的设计围绕三个因果调节变量展开：
 
 DIB中的动态交互掩码 $\mathbf{M}_l^i$ 实现了从粗到细的交互建模：初始时所有关节均可见，每个Joint-level Interaction Module根据注意力分数过滤掉 $k$ 个最不相关的关节（$k=3$ 时性能最优），使后续模块专注于真正参与交互的关键关节。这一机制有效抑制了无关关节对交互建模的干扰。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1679_EJIM_Efficient_Explicit_Joint_level_Interaction_Modeling_with_Mamba_for/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our EJIM. Our EJIM takes a noisy HOI sequence*
-
-
 
 EJIM 的核心由 $N$ 个结构相同的 **Joint-level Interaction Module** 堆叠而成，每个模块包含三个关键子块：**Dual-branch HOI Mamba (DHM)**、**Dual-branch Condition Injector (DCI)** 和 **Dynamic Interaction Block (DIB)**。其设计瓶颈在于：将人体表示为 23 个关节级 token 后，若采用 Transformer 的全局自注意力将导致 $O(n^2)$ 的计算爆炸（约 400 倍增长），而 Mamba 的线性复杂度状态空间模型恰好解决了这一矛盾。
 
@@ -174,15 +164,8 @@ $$\mathcal{L} = \lambda_1 ||\mathbf{x} - \hat{\mathbf{x}}||_2 + \lambda_2 ||\mat
 
 其中第一项为扩散重建损失，第二项为物体运动损失（权重 $\lambda_2=1$），第三项为光滑性损失（权重 $\lambda_3=0.5$），用于抑制帧间抖动。消融显示去掉物体损失使 CD 升至 0.154，去掉光滑损失使 FSR 升至 0.098，表明两项辅助损失对交互质量和运动平滑性至关重要。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1679_EJIM_Efficient_Explicit_Joint_level_Interaction_Modeling_with_Mamba_for/figures/003_Figure_3.jpg]]
 *Figure 3: (a) Illustration of human joints. (b) Our limb division scheme. Here, the virtual foot-ground contact joint is duplicated and assigned to both lower limbs to mitigate foot skating. (c) The Limb-guided scan in our Spatial Mamba reorders joints by limb groupings and inserts learnable tokens to define distinct limbs. (d) The vanilla scan approach for comparison*
-
-![[assets/figures/papers/paper_list_l1679_EJIM_Efficient_Explicit_Joint_level_Interaction_Modeling_with_Mamba_for/figures/004_Figure_4.jpg]]
-*Figure 4: Our progressive masking mechanism. Initially, all joints are visible. At each Joint-level Interaction Module, we filter out k joints with the lowest attention scores, leading to more accurate interaction modeling*
-
-
 
 ## 实验与关键发现
 
@@ -262,8 +245,6 @@ Figure 5展示了BEHAVE数据集上的定性对比。先前方法（InterDiff、
 
 这些失败模式指向未来工作方向：扩展渐进式掩码机制以支持多物体注意力分配，以及引入物理先验（如接触力约束）进一步减少穿透和滑动。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1679_EJIM_Efficient_Explicit_Joint_level_Interaction_Modeling_with_Mamba_for/figures/005_Table.jpg]]
 *Table: I QUANTITATIVE RESULTS ON THE BEHAVE AND OMOMO TEST SETS. EACH EVALUATION WAS CONDUCTED 20 TIMES TO COMPUTE AVERAGE RESULTS WITH A 95% CONFIDENCE INTERVAL (DENOTED AS ±). THE BEST PERFORMANCE IS IN BOLD, AND THE SECOND-BEST IS UNDERLINED. AVERAGE INFERENCE TIME (AIT), CALCULATED ONLY ON THE BEHAVE DATASET, DENOTES THE MEAN OVER 100 SAMPLES ON AN RTX 3090. TABLE II USER STUDY RESULTS. BOLD VALUES INDICATE BETTER PERFORMANCE. TABLE III TABLE IV ABLATION STUDY OF THE DHM ON THE BEHAVE DATASET. ABLATION STUDY OF THE MAIN MODULES ON THE BEHAVE DATASET*
 
@@ -275,23 +256,6 @@ Figure 5展示了BEHAVE数据集上的定性对比。先前方法（InterDiff、
 
 ![[assets/figures/papers/paper_list_l1679_EJIM_Efficient_Explicit_Joint_level_Interaction_Modeling_with_Mamba_for/figures/009_Table.jpg]]
 *Table: VII IMPACT OF WEIGHTS ON THE TRAINING LOSS. THE GRAY LINE INDICATES THE CONFIGURATION ADOPTED IN OUR EJIM. TABLE VIII TABLE IX ABLATION STUDY OF THE OBJECT GEOMETRY ON THE BEHAVE DATASET TABLE X*
-
-![[assets/figures/papers/paper_list_l1679_EJIM_Efficient_Explicit_Joint_level_Interaction_Modeling_with_Mamba_for/figures/010_Table.jpg]]
-*Table: IMPACT OF THE NUMBER OF INFERENCE STEPS. THE GRAY LINE REPRESENTS THE CONFIGURATION USED IN OUR EJIM. THE AVERAGE INFERENCE TIME (AIT) IS THE MEAN OVER 100 SAMPLES ON AN RTX 3090TI*
-
-![[assets/figures/papers/paper_list_l1679_EJIM_Efficient_Explicit_Joint_level_Interaction_Modeling_with_Mamba_for/figures/011_Table.jpg]]
-*Table: IMPACT OF THE GUIDANCE SCALE. THE GRAY LINE REPRESENTS THE CONFIGURATION USED IN OUR EJIM*
-
-![[assets/figures/papers/paper_list_l1679_EJIM_Efficient_Explicit_Joint_level_Interaction_Modeling_with_Mamba_for/figures/012_Table.jpg]]
-*Table: XI IMPACT OF THE NUMBER OF BLOCKS. THE GRAY LINE REPRESENTS THE CONFIGURATION USED IN OUR EJIM*
-
-![[assets/figures/papers/paper_list_l1679_EJIM_Efficient_Explicit_Joint_level_Interaction_Modeling_with_Mamba_for/figures/001_Figure_1.jpg]]
-*Figure 1: Our EJIM can generate realistic 3D human-object interactions guided by text descriptions and object geometry, with colors transitioning from lighter to darker to represent the passage of time*
-
-![[assets/figures/papers/paper_list_l1679_EJIM_Efficient_Explicit_Joint_level_Interaction_Modeling_with_Mamba_for/figures/006_Figure.jpg]]
-*Figure: Someone is applying force to the tablesquare by pulling it on the ground*
-
-
 
 ## 定位与知识库关联
 
@@ -358,8 +322,6 @@ DIB中的渐进式掩码机制每层过滤 $k$ 个注意力得分最低的关节
 4. **肢体引导扫描的通用性**：这一扫描策略本质上是将空间结构先验编码为序列顺序，该思路是否适用于其他基于Mamba的序列建模任务（如蛋白质结构预测、分子动力学模拟）？
 
 5. **关节级交互的可解释性**：渐进式掩码机制提供了“哪些关节参与交互”的自然解释，但论文未对此进行深入分析。掩码模式是否与人类直觉一致？能否用于交互质量的事前诊断？
-
-
 
 ## 原文 PDF
 

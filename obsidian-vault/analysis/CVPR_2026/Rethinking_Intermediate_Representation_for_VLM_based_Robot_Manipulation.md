@@ -66,8 +66,6 @@ SEAM 属于**基于 VLM 的中间表示引导范式**，与以下工作形成对
 - **低层表示**（如 VoxPoser 的价值地图、CoPa 的组件级空间约束、ReKep 的关系关键点约束）：动作泛化性强但 VLM 难以可靠生成；
 - **OmniManip**（操作感知原语）：当前 SOTA，SEAM 在其基础上通过语义组装和 RAG 分割实现显著提升。
 
-
-
 ### 问题背景：VLM 驱动的机器人操作与中间表示的瓶颈
 
 视觉语言模型（VLM）在机器人操作中展现出强大的高层推理能力，但其输出无法直接驱动机器人执行。为此，现有方法普遍引入**中间表示**作为 VLM 推理与机器人动作之间的桥梁。中间表示的设计直接影响两个关键属性：**VLM 可理解性**与**动作泛化性**。然而，这两者之间存在根本性的权衡。
@@ -88,8 +86,6 @@ SEAM 属于**基于 VLM 的中间表示引导范式**，与以下工作形成对
 这一设计的关键在于：词汇表提供语义丰富、人类可读的原子操作，确保 VLM 可理解性；语法规则约束组装方式，使得有限词汇能组合出覆盖广泛任务的表示，保障动作泛化性。两者协同，在高可理解性与强泛化性之间取得平衡。
 
 此外，针对操作中对细粒度物体部件的分割需求，本文引入基于检索增强生成的少样本分割方法，通过构建图像-掩码对数据库并以 Levenshtein 距离检索，实现高效、精确的部件级开放词汇分割。
-
-
 
 ## 核心方法与创新机理
 
@@ -147,8 +143,6 @@ SEAM 流水线引入了一个**基于检索增强生成 (RAG) 的少样本分割
 
 在 Figure 8 的对比分析中，SEAM 在 AG 与 VC 两个维度上均优于纯高层表示（如 Instruct2Act）和纯低层表示（如 ReKep），验证了其“语义组装”设计确实在可理解性与泛化性之间取得了平衡。这一结果并非偶然——词汇表与语法的分离设计使 VLM 既能理解每个词元的语义，又能通过语法组合应对新任务，从而同时提升两个指标。
 
-
-
 SEAM 的整体 pipeline 将“基于 VLM 的机器人操作”分解为三个解耦模块：**SEAM 生成模块**、**RAG 分割模块**和**轨迹优化模块**，三者以中间表示为核心纽带，形成从视觉-语言理解到机器人动作执行的端到端流程。图 2 给出了完整的模块关系与数据流。
 
 ### 输入与输出流
@@ -172,12 +166,8 @@ SEAM 的整体 pipeline 将“基于 VLM 的机器人操作”分解为三个解
 
 该 pipeline 的核心设计动机在于解决现有方法中“VLM 可理解性”与“动作泛化性”之间的根本权衡。高层表示（如 **Instruct2Act** 的预定义技能词）易于 VLM 理解但泛化性差，需为每个新任务手动添加词汇；低层表示（如 **ReKep** 的关系关键点约束）泛化性好但需生成复杂约束，导致 VLM 输出不可靠。SEAM 通过将中间表示建模为 $\tilde{R} = (V, G)$ 的二元组——即语义词汇表与组合语法的分离设计——使 VLM 能够像自然语言组合一样组装中间表示，从而在高可理解性与强泛化性之间取得平衡。这一平衡在后续实验中通过动作泛化性指标 $\mathrm{AG} = 1 - \frac{|\mathcal{V}|}{T}$ 和 VLM 可理解性指标 $\mathrm{VC} = \frac{N_{\mathrm{succ}}}{T}$ 得到定量验证（见 Figure 8）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2412_https_arxiv_org_abs_2511_19315/figures/002_Figure_2.jpg]]
 *Figure 2: Overall pipeline of our method. Given the current observation and the task instruction, our method first generates the (a) Semantic Assembly Representation (SEAM) with designed vocabulary and grammar, and then (b) translated into an intermediate representation. Next, we retrieve the corresponding support images and support masks from (c) the Retrieval Augmented Generation (RAG) Database and (d) segment the target object parts in the scene. Finally, we solve the gripper’s trajectories for (e) robotic execution*
-
-
 
 ### 3.1 中间表示的形式化建模
 
@@ -208,12 +198,6 @@ SEAM 的词汇表与语法设计遵循六项原则（Section 3.3），共同作�
 6. **可组合性**：词汇可按语法规则自由组装，支持未见任务的泛化。
 
 词汇表 $V$ 与语法 $G$ 的具体设计详见 Table 1，其中包含函数签名如 `get_centroid(object_part_name: Str) → Point` 和 `move_cost(pt1: Point, pt2: Point, offset: List) → Cost` 等语义原语。
-
-![[assets/figures/papers/paper_list_l2412_https_arxiv_org_abs_2511_19315/figures/004_Table_1.jpg]]
-*Table 1: The design of SEAM composes of vocabulary V and grammar G listed below*
-
-![[assets/figures/papers/paper_list_l2412_https_arxiv_org_abs_2511_19315/figures/015_Table_1.jpg]]
-*Table 1: Vocabulary V and Grammar G for each method*
 
 ### 3.4 基于 RAG 的少样本分割模块
 
@@ -248,16 +232,11 @@ $$
 
 **优化机制**：将物体模型点云 $P^m$ 从当前位姿变换到候选目标位姿后，与场景点云 $P^s$ 合并，计算语言成本。通过最小化该成本并加入平滑正则，求解出满足语义约束且运动幅度最小的夹爪位姿。
 
-
-
 ## 实验与关键发现
 
 ### 实验设置
 
 实验在真实世界环境中进行，硬件系统由一台配备夹爪的 UR5 机器人以及两台分别部署在工作空间两侧的 RealSense D435 相机组成（Figure 4）。所有任务中，物体的位置与朝向均随机初始化，每个方法在每项任务上重复执行 10 次以减少随机偏差。对比实验统一使用 Qwen3-VL-30B-22A 作为 VLM 骨干，并采用相同的参考提示框架，确保公平比较。
-
-![[assets/figures/papers/paper_list_l2412_https_arxiv_org_abs_2511_19315/figures/005_Figure_4.jpg]]
-*Figure 4: Our system setup includes a robotic module (A UR5 robot equipped with a gripper) and a visual perception module (two realsense D435 cameras on opposite side of the workspace)*
 
 ### 主实验结果
 
@@ -283,9 +262,6 @@ Figure 3 展示了开放词汇分割的定性对比结果。基于 RAG 的少样
 ![[assets/figures/papers/paper_list_l2412_https_arxiv_org_abs_2511_19315/figures/010_Table_3.jpg]]
 *Table 3: Comparisons of time elapse between our method and the state-of-the-art methods*
 
-![[assets/figures/papers/paper_list_l2412_https_arxiv_org_abs_2511_19315/figures/016_Figure_3.jpg]]
-*Figure 3: Example cases from the RAG database for open-vocabulary part segmentation*
-
 Figure 7 针对“将茶壶盖盖到茶壶上”任务进行了定位与执行的联合分析。RAG 分割方法成功定位到茶壶开口的精细边缘区域，使得后续轨迹优化能够生成准确的对齐动作并成功完成任务；而对比方法未能精确定位开口位置，导致执行失败。
 
 ![[assets/figures/papers/paper_list_l2412_https_arxiv_org_abs_2511_19315/figures/009_Figure_7.jpg]]
@@ -295,19 +271,11 @@ Figure 7 针对“将茶壶盖盖到茶壶上”任务进行了定位与执行�
 
 Figure 8 和 Table 4 从动作泛化性（AG）和 VLM 可理解性（VC）两个维度对各类中间表示进行了定量分析。AG 指标定义为 $1 - |\mathcal{V}|/T$，衡量完成所有任务所需的唯一词汇操作数占比，值越高表示泛化能力越强；VC 指标定义为 $N_{\mathrm{succ}}/T$，衡量 VLM 生成正确中间表示的比率。
 
-![[assets/figures/papers/paper_list_l2412_https_arxiv_org_abs_2511_19315/figures/011_Figure_8.jpg]]
-*Figure 8: Statistics on each method’s action-generalizability and VLM-comprehensibility*
-
-![[assets/figures/papers/paper_list_l2412_https_arxiv_org_abs_2511_19315/figures/012_Table_4.jpg]]
-*Table 4: V and G for each method*
-
 SEAM 在两个指标上实现了平衡：其 AG 值显著高于高层表示（后者因需为每个新任务手动添加词汇而泛化性差），同时 VC 值显著高于低层表示（后者因需生成复杂约束导致 VLM 理解困难）。Table 4 进一步揭示了各方法在词汇表 V 和语法 G 设计上的差异——SEAM 通过语义丰富、紧凑的词汇表和 VLM 友好的语法规则，在可理解性与泛化性之间取得了最优折衷。
 
 ### 失败模式分析
 
 尽管 SEAM 整体表现优异，部分任务仍存在失败案例。在“Fit the lid onto the teapot”任务中，失败主要源于茶壶开口的精细分割在极端视角或光照条件下出现偏差，导致后续对齐动作不准。在“Open the jar”任务中，失败案例多与夹爪抓取点选择有关——当罐盖边缘特征不明显时，RAG 检索到的支持掩码与查询图像的匹配精度下降。这些失败模式提示，分割模块的鲁棒性在低纹理或遮挡场景下仍有提升空间。
-
-
 
 ## 定位与知识库关联
 
@@ -366,8 +334,6 @@ SEAM 的设计依赖预先定义的语义词汇表和组合语法规则，这意
 - SEAM 的词汇和语法设计目前依赖人工专家知识。是否可能通过自动发现或学习的方式从任务演示中提取语义词汇和组合规则？
 - 在更复杂的多步长序列操作中，SEAM 的组装范式如何扩展以支持时序依赖和条件分支？
 - RAG 分割方法在高度遮挡或光照极端的场景下的鲁棒性尚需进一步验证。
-
-
 
 ## 原文 PDF
 

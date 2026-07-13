@@ -55,8 +55,6 @@ claims:
 
 **主要结果**：在三个标准 VUDA 基准（Daily-DA、UCF-HMDB_full、ActorShift）上，LMFT 均显著超越现有最优方法，平均 Top-1 准确率分别提升 5.3%、1.8% 和 12%。同时，LMFT 在保持最高准确率的前提下，实现了约 1.4 倍训练加速和 0.82 倍计算成本，在精度-效率权衡上全面优于其他令牌压缩方法。
 
-
-
 ### 视频无监督域自适应的核心瓶颈
 
 视频无监督域自适应（Video Unsupervised Domain Adaptation, VUDA）旨在将源域标注视频中学习的动作识别能力迁移到无标注的目标域，其核心挑战在于弥合域偏移（domain shift）对时空特征对齐的干扰。现有VUDA方法通常采用基于ViT的架构，将视频帧完整地划分为时空补丁令牌（spatiotemporal patch tokens），并将所有令牌送入自注意力机制进行域自适应学习。然而，这一全量处理范式存在两个根本性缺陷：
@@ -84,8 +82,6 @@ claims:
 - **效率与效果的双重收益**：若能动态识别并仅保留高运动令牌、丢弃低运动背景令牌，不仅能减少传入ViT的令牌数量以提升计算效率，还能使模型免受背景诱导的域偏移干扰，更专注于学习跨域不变的动作表征。
 
 基于这一洞察，本文提出**可学习运动聚焦令牌化（Learnable Motion-Focused Tokenization, LMFT）**，通过计算相邻时空补丁间的L1运动差异，并利用强化学习动态学习最优的运动阈值 $\tau$，实现自适应地丢弃低运动令牌、保留动作相关令牌，从而同时提升VUDA的域自适应效果和计算效率。
-
-
 
 ## 核心方法与创新机理
 
@@ -122,8 +118,6 @@ $$\nabla_\theta \mathcal{I}(\theta) = \mathbb{E}_{\tau \sim \pi_\theta} \big[ (R
 ### 创新定位与差异化
 
 与通用令牌压缩方法（如 **Token Merging (ToMe)**（Bolya et al., ICLR 2023）、**Run-Length Tokenization (RLT)**（Choudhury et al., NeurIPS 2024））相比，LMFT的独特之处在于其令牌选择策略**专为视频动作识别中的域自适应设计**——它利用运动信息作为域不变线索来区分任务相关与无关令牌，而非仅基于视觉相似性或时间冗余进行压缩。这一任务感知的设计使其在三个标准VUDA基准上均显著超越现有最优方法（Daily-DA +5.3%, UCF-HMDB_full +1.8%, ActorShift +12%），同时实现约1.4倍训练加速和0.82倍计算成本（Table 4, Table 5）。
-
-
 
 LMFT 的整体流水线遵循**源域与目标域对称处理、运动令牌选择前置、ViT 域自适应联合优化**的设计范式，其核心思路是在令牌进入 ViT 骨干网络之前，通过可学习的运动聚焦机制剔除冗余背景令牌，从而同时缓解域偏移并降低计算开销。
 
@@ -171,8 +165,6 @@ Figure 1 直观展示了上述流程：对于源域和目标域视频，LMFT 首
 
 ![[assets/figures/papers/paper_list_l1048_https_arxiv_org_abs_2604_09955/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of LMFT. For both source and target videos, LMFT tokenizes frames into patch tokens, computes the L1 distance between consecutive temporal tokens, and discards those with differences below a learnable threshold*
-
-
 
 LMFT 的核心由三个紧密耦合的模块构成：运动强度估计、运动聚焦令牌选择、以及基于强化学习的阈值学习策略。它们共同实现了“仅保留动作相关令牌”的目标，从而缓解背景诱导的域偏移并降低计算开销。
 
@@ -228,8 +220,6 @@ $$
 
 与直接采用 Gumbel-Softmax 近似离散选择的替代方案相比，基于 RL 的阈值学习在准确率和效率上均表现出优势。在 H←W 场景下，RL 方案准确率提升 0.9%（74.2 vs 73.3），训练时间减少约 15%（2784s vs 3275s），最大 GPU 内存占用降低 13%（Table 10）。这表明 RL 策略能够更灵活地在动作识别精度与令牌丢弃率之间进行自适应权衡，而 Gumbel-Softmax 的软近似可能引入额外的计算开销和优化难度。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -271,8 +261,6 @@ Figure 2 展示了 LMFT 在四个视频上的可视化结果。每段视频包�
 
 所有 VUDA 方法比较均基于同一 ViT-B/16 骨干网络。ActorShift 上 UNITE 的准确率由作者重新运行其公开代码获得，避免实现差异导致的不公平比较。效率评估在同硬件环境下测量训练时间、推理吞吐量、FLOPs 和 GPU 内存消耗，确保计算开销对比的可靠性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1048_https_arxiv_org_abs_2604_09955/figures/002_Table_1.jpg]]
 *Table 1: VUDA results on Daily-DA. Colored rows show our results, and the results in other rows are taken from [16] and [22]*
 
@@ -284,26 +272,6 @@ Figure 2 展示了 LMFT 在四个视频上的可视化结果。每段视频包�
 
 ![[assets/figures/papers/paper_list_l1048_https_arxiv_org_abs_2604_09955/figures/005_Table_6.jpg]]
 *Table 6: Efficiency comparison of VUDA methods*
-
-![[assets/figures/papers/paper_list_l1048_https_arxiv_org_abs_2604_09955/figures/006_Table_4.jpg]]
-*Table 4: Training efficiency of token reduction methods*
-
-![[assets/figures/papers/paper_list_l1048_https_arxiv_org_abs_2604_09955/figures/007_Table_7.jpg]]
-*Table 7: Impact of threshold*
-
-![[assets/figures/papers/paper_list_l1048_https_arxiv_org_abs_2604_09955/figures/008_Table_5.jpg]]
-*Table 5: Inference efficiency of token reduction methods*
-
-![[assets/figures/papers/paper_list_l1048_https_arxiv_org_abs_2604_09955/figures/010_Table_10.jpg]]
-*Table 10: Gumbel-Softmax vs. RL in LMFT*
-
-![[assets/figures/papers/paper_list_l1048_https_arxiv_org_abs_2604_09955/figures/011_Table_8.jpg]]
-*Table 8: Impact of different temporal resolutions on VUDA*
-
-![[assets/figures/papers/paper_list_l1048_https_arxiv_org_abs_2604_09955/figures/012_Table_9.jpg]]
-*Table 9: Effect of varying λL in Eq. 7*
-
-
 
 ## 定位与知识库关联
 
@@ -358,8 +326,6 @@ LMFT在VUDA和视频令牌压缩两条技术路线的交叉点上做出了贡献
 3.  **开放集与类别不一致场景**：在源域和目标域标签空间不完全重叠的开放集或部分集VUDA设定下，如何改进伪标签生成机制，或设计不依赖伪标签的令牌选择策略？
 4.  **任务驱动的令牌选择**：能否将LMFT推广到其他视频任务？这可能需要设计任务特定的显著性度量，例如，对于视频分割，显著性可能来源于物体的边界和运动；对于目标跟踪，显著性可能来源于目标的表观特征和运动轨迹。
 5.  **超参数敏感度研究**：论文中RL策略的参数 $\mu$ 和 $\log \sigma$ 被设定为固定初始值（0.01和-1.0）。这些超参数在不同数据集和域偏移程度下的敏感度如何，是否具有普适性，尚需更系统的经验研究。
-
-
 
 ## 原文 PDF
 

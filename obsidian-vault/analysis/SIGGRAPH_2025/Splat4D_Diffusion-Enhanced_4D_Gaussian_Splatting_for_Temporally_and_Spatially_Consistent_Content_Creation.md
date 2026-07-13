@@ -117,12 +117,6 @@ Splat4D 在视频到4D生成、图像到4D生成以及多场景子类（液体�
 
 针对更具挑战性的动态场景，Splat4D 在液体场景（Table 6）和多物体场景（Table 7）上均显著优于 SV4D：
 
-![[assets/figures/papers/paper_list_l2_http_arxiv_org_abs_2508_07557v1/figures/012_Table_6.jpg]]
-*Table 6: Evaluation on Liquid Case*
-
-![[assets/figures/papers/paper_list_l2_http_arxiv_org_abs_2508_07557v1/figures/013_Table_7.jpg]]
-*Table 7: Evaluation on Multi-object Case*
-
 - **液体场景**：CLIP↑ 从 0.88 提升至 **0.93**，LPIPS↓ 从 0.147 降至 **0.127**，FVD↓ 从 772.6 降至 **493.0**。
 - **多物体场景**：CLIP↑ 从 0.90 提升至 **0.96**，LPIPS↓ 从 0.125 降至 **0.102**，FVD↓ 从 722.3 降至 **428.5**。
 

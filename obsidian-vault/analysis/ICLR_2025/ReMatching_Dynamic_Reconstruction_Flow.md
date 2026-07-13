@@ -53,8 +53,6 @@ claims:
 
 **方法定位**：ReMatching 属于动态重建中基于速度场先验的正则化框架，区别于依赖数值模拟 ODE 的流程，专为仿真自由的动态模型设计。其先验类可灵活定义，涵盖分片刚体、体积保持等约束，并支持自适应组合。
 
-
-
 动态场景重建旨在从多视角视频输入中恢复随时间变化的三维几何与外观，是计算机视觉与图形学中长期存在的核心问题。其应用涵盖虚拟现实、电影制作和数字孪生等领域。近年来，基于神经辐射场（NeRF）和三维高斯溅射（3D Gaussian Splatting）的静态重建方法取得了显著进展，但这些方法向动态场景的扩展面临根本性挑战。
 
 **核心瓶颈**在于多视角输入的稀疏性——不仅在空间上（有限相机数量），更在时间上（离散帧采样）。这种双重稀疏性使得从观测中直接学习时变表示变得极度欠定：模型需要在仅看到少量时间戳的条件下，推断出任意时刻的连续形变。现有的动态重建方法通常通过引入某种形变先验来缓解这一困难，例如依赖网络结构的隐式平滑性，或显式建模刚体运动。然而，这些先验往往以牺牲重建保真度为代价——更强的正则化虽然稳定了优化，却可能导致对细节的过度平滑或对复杂运动的错误解释。
@@ -62,8 +60,6 @@ claims:
 这一困境暴露了当前动态重建流程的一个关键缺口：**如何在整合形变先验知识的同时，不损害对观测数据的高保真度拟合**。现有方法缺乏一种灵活的机制，能够在优化过程中动态平衡先验约束与数据拟合，而不是简单地将先验作为硬约束或固定惩罚项。
 
 本文的动机正是源于这一观察。我们提出 **ReMatching 框架**，其核心思想是：利用速度场先验类（velocity-field prior class）的简化特性，将时间依赖重建函数到先验类的投影转化为一个流匹配（flow-matching）问题。通过设计一种名为 **ReMatching 损失**的新型训练目标，框架引导优化过程使重建流尽可能接近所需的速度场先验类，而非严格强制隶属关系。这种“软对齐”策略使得模型能够在保持重建保真度的前提下，有效吸收先验知识，从而突破了传统方法中保真度与正则化之间的折中困境。
-
-
 
 ## 核心方法与创新机理
 
@@ -123,8 +119,6 @@ ReMatching 损失涉及内层 $\arg\min$ 优化问题，直接计算梯度需要
 
 该创新机制的一个关键前提是重建模型必须是**仿真自由**的——即 $\psi_t$ 的每次评估仅需单步前向计算，不涉及 ODE 数值求解。这使其天然适用于基于 MLP 的时间条件变形网络（如 D3G、GA3D），但**不适用于需要数值模拟的神经 ODE 类方法**。此外，先验类的设计仍依赖领域知识，对于液体、气体等复杂物理现象，需要设计更丰富的先验类（论文将此列为开放问题）。
 
-
-
 ReMatching 框架的核心设计理念是：**在不牺牲重建保真度的前提下，将形变先验注入动态重建模型的优化过程**。框架假定重建模型由一组仿真自由（simulation-free）的时间依赖函数 $\psi_t$ 构成，即每次评估 $\psi_t$ 仅需单步计算，无需数值求解常微分方程。
 
 ### 框架总览
@@ -154,14 +148,8 @@ ReMatching 框架的核心设计理念是：**在不牺牲重建保真度的前�
 
 **ReMatching 损失仅在训练阶段使用**，推断时不增加任何计算开销。训练采用统一协议：100K 高斯，40K 迭代，前 3K 迭代仅优化静态参数 $\{\mu^i, \Sigma^i, c^i, \alpha^i\}$，之后引入形变 MLP 和 ReMatching 损失进行联合优化。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l51_https_arxiv_org_abs_2411_00705/figures/007_Figure_3.jpg]]
 *Figure 3: Qualitative comparison of our method to D3G (Yang et al., 2023) on the HyperNeRF dataset (Park et al., 2021b). Our framework yields more accurate reconstructions, in particular around moving parts*
-
-![[assets/figures/papers/paper_list_l51_https_arxiv_org_abs_2411_00705/figures/009_Figure_5.jpg]]
-*Figure 5: Illustration of the architecture for $\Psi _ { t }$ used in the experiments, based on (Yang et al., 2023). Reference Gaussians parameters are propagated to time t through a shared function, $\psi _ { t } ^ { 1 }$ , implemented as an MLP with positional encoding features to compute time-varying point features of dimension $d _ { \mathrm { f } }$ . These features are then processed by a second shared function, $\overline { { \psi _ { t } ^ { 2 } } }$ , to generate time-varying Gaussians parameters. Finally, given a chosen viewing direction, the Gaussian Splatting rendering model is used to produce a rendered image
-
 
 
 ### 动态图像模型
@@ -249,8 +237,6 @@ $$\mathcal{P}_{IV} = \{ u_t \mid u(\pmb{x}, t) = \sum_{j=1}^{k} w_j(\pmb{x}, t) 
 
 ReMatching 损失的两种应用模式——基于几何（粒子位置）和基于图像（渲染像素）——使其可灵活适配不同的动态重建管线。该损失仅在训练阶段使用，推断时间不受影响。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -307,22 +293,6 @@ Figure 15 报告了不同高斯数量 n 下的前向+反向传播平均时间。
 3. **框架适用范围限制**：ReMatching 框架仅适用于仿真自由的动态重建模型（simulation-free），无法直接用于需要数值模拟 ODE 的流程。
 4. **物理现象覆盖不足**：当前的先验类（刚体、分片刚体、体积保持）对液体、气体等更复杂的物理现象支持有限。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l51_https_arxiv_org_abs_2411_00705/figures/013_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l51_https_arxiv_org_abs_2411_00705/figures/016_Figure_9.jpg]]
-*Figure 9: Training frames from the rotating colored box scene*
-
-![[assets/figures/papers/paper_list_l51_https_arxiv_org_abs_2411_00705/figures/018_Figure_10.jpg]]
-*Figure 10: Evaluation of unseen timestamps in the rotating colored box scene. Figure 11: Visualization of $\{ \mu ^ { i }$ ( t ) , $\dot { \mu } ^ { i }$ ( t ) $\}$ from multiple timestamps
-
-![[assets/figures/papers/paper_list_l51_https_arxiv_org_abs_2411_00705/figures/025_Figure_19.jpg]]
-*Figure 19: Impact of varying k values on the PSNR evaluation metric for the Mutant scene (left) and the Lego scene (right)*
-
-![[assets/figures/papers/paper_list_l51_https_arxiv_org_abs_2411_00705/figures/005_Table.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -357,8 +327,6 @@ Figure 15 报告了不同高斯数量 n 下的前向+反向传播平均时间。
 - **通用非刚性形变**：将 ReMatching 框架扩展到更通用的非刚性形变和拓扑变化场景。
 
 **知识库定位**。ReMatching 的核心洞察——利用速度场先验类的简化特性，将投影问题转化为流匹配问题——为动态重建中的先验整合提供了一个新的理论视角。其“模拟交替投影法”的设计思路（先投影到先验类，再重新投影回重建流集合）在方法论上具有一般性，可被后续工作借鉴用于其他需要平衡先验约束与数据保真度的重建任务。
-
-
 
 ## 原文 PDF
 

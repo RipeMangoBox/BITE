@@ -60,8 +60,6 @@ claims:
 
 **方法定位**：MARCO 属于基于预训练视觉基础模型（DINOv2）的语义对应方法，与 Geo-SC（DINOv2 + 扩散模型）、Jamais Vu（3D 模板增强）等同期工作相比，其独特之处在于**完全依赖稀疏关键点监督，不引入深度图、3D 模板或推理时掩码**，通过自蒸馏机制从特征空间内部挖掘监督信号，在效率与泛化之间取得了显著优势。
 
-
-
 ### 语义对应的核心挑战
 
 语义对应（semantic correspondence）旨在建立不同图像中同一语义部位之间的像素级映射，是视觉理解、三维重建和物体姿态估计等任务的基础。与几何匹配不同，语义对应需要跨越实例、姿态甚至类别的外观差异，在物体表面建立一致的对应关系。近年来，基于DINOv2等大规模自监督预训练特征的方法取得了显著进展，这些特征天然携带丰富的语义信息，使得零样本匹配成为可能。
@@ -89,8 +87,6 @@ MARCO的核心洞察在于：**DINOv2的预训练特征本身包含稀疏但语�
 - **高效架构设计**：仅需在冻结的DINOv2骨干上添加轻量级AdaptFormer适配器和紧凑上采样头，避免了扩散模型等重计算组件，使模型体积仅为对偶编码器方法的1/3，推理速度快10倍（Figure 1d, Table 12）。
 
 简言之，MARCO的目标是**在保持高效架构的前提下，探索稀疏标注之外的语义对应未至空间**——即那些训练时未见过的关键点位置和物体类别，通过自蒸馏机制将DINOv2的预训练语义结构转化为可泛化的精细定位能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -143,8 +139,6 @@ $$\mathcal{L}_{\mathrm{self}} = \frac{1}{|\mathcal{P}_{\mathrm{self}}|} \sum_{(\
 ### 创新间的因果耦合
 
 三个创新并非孤立叠加，而是形成因果闭环：**由粗到细损失**确保模型在稀疏标注上获得细粒度定位能力；**密集自蒸馏**利用 DINOv2 的预训练语义结构，将这种能力从标注点传播至整个物体表面，防止非标注区域的特征坍塌（Figure 2 定性展示了这一效果）；**轻量架构**则保证整个流程高效可部署。消融实验显示，移除密集自蒸馏后，SPair-U 上 PCK@0.10 从 67.5 骤降至 41.8（-25.7），而仅用 MNN 匹配不加 Delaunay 致密化时仅为 52.5（Table 4），证明几何传播与自蒸馏共同构成了泛化能力的核心驱动力。
-
-
 
 MARCO 的整体 pipeline 以冻结的 DINOv2 ViT-L/14 为特征提取骨干，在其上插入轻量可学习的适配器模块与紧凑的上采样头，构成学生网络；同时维护一个通过指数移动平均（EMA）更新的教师网络，用于生成稳定的密集伪标签。训练过程由两条互补的监督支路驱动：**（1）由粗到细的高斯 RBF 交叉熵损失**，以余弦退火策略逐步缩小目标分布的带宽，引导学生从区域级对齐过渡到亚像素级精确定位；**（2）密集自蒸馏损失**，利用教师特征空间中的互近邻匹配挖掘可靠对应种子，经 Delaunay 三角剖分致密化、流聚类与 GT 关键点锚定，生成覆盖整个物体表面的密集伪对应，学生通过 soft-argmax 回归到这些伪标签，从而将稀疏关键点监督扩展为平滑的对应场。
 
@@ -199,13 +193,6 @@ $$\mathcal{P}_{\mathrm{self}} = \{ (\mathbf{u}, \mathbf{u} + \mathbf{D}(\mathbf{
 $$\mathcal{L}_{\mathrm{self}} = \frac{1}{|\mathcal{P}_{\mathrm{self}}|} \sum_{(\hat{\mathbf{u}}, \hat{\mathbf{v}}) \in \mathcal{P}_{\mathrm{self}}} \left\| \mathrm{soft-argmax}\big(S(\hat{\mathbf{u}}, \mathbf{u})\big) - \hat{\mathbf{v}} \right\|_2^2$$
 
 最终训练目标为 $\mathcal{L} = \mathcal{L}_{\mathrm{sup}} + \lambda \mathcal{L}_{\mathrm{self}}$，两条支路协同作用：监督损失提供精确的关键点定位信号，自蒸馏损失将稀疏监督扩展为覆盖整个物体表面的几何一致对应场，从而在保持高效架构的同时实现强泛化。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2604_18267/figures/003_Figure_3.jpg]]
-*Figure 3: Overview of MARCO. We insert lightweight adapters into DINOv2 and add a compact upsampling layer (red). At training time, we propose a coarse-to-fine Gaussian RBF loss that progressively sharpens peaks on annotated keypoints and a self-distillation objective that exploits the pre-existing structure of DINOv2 features. Given source and target images, we extract features from an EMA teacher and identify reliable mutual nearest-neighbor matches (a). These sparse correspondences are densified via piecewise-affine interpolation over a Delaunay triangulation, producing an initial flow field (b). Coherent motion regions are then obtained by clustering in the displacement space and anchored to spar...*
-
-
 
 ### 架构设计：冻结骨干 + 轻量适配
 
@@ -307,13 +294,6 @@ $$
 
 总训练损失为 $\mathcal{L} = \mathcal{L}_{\mathrm{sup}} + \lambda \mathcal{L}_{\mathrm{self}}$，其中 $\lambda$ 平衡稀疏监督与密集自蒸馏。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2604_18267/figures/002_Figure_2.jpg]]
-*Figure 2: Flow consistency in DINOv2. Semantic flow (in HSV space) from raw feature matches between two objects. Fine-tuning on sparse keypoints improves only the landmarks’ representation, reducing geometric coherence (b). Our self-supervised objective produces smooth, object-consistent flow across the surface (c)*
-
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与方法对应
@@ -339,12 +319,6 @@ Table 1 展示了 MARCO 在 SPair-71k、AP-10K 和 PF-PASCAL 三个标准基准�
 ### 泛化能力：未见关键点与未见类别
 
 语义对应方法的真正考验在于对训练分布外样本的泛化。Table 3 和 Table 2 分别报告了在 SPair-U（未见关键点）和 MP-100（未见关键点与未见类别）上的结果。
-
-![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2604_18267/figures/007_Table_2.jpg]]
-*Table 2: Generalization on MP-100 [48]. Per-image PCK@0.10 (%, ↑) across unseen keypoints and semantic unseen categories. ∗ unsupervised methods. Best results bold, 2nd best underlined*
-
-![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2604_18267/figures/008_Table_3.jpg]]
-*Table 3: Generalization on SPair-U (Unseen keypoints) in terms of per-image PCK@0.10 (in %, ↑). Methods marked with ∗ are unsupervised. All methods are trained on SPair-71k. Best results are shown in bold; 2nd best are underlined*
 
 - **SPair-U**：MARCO 的 PCK@0.10 达到 67.5%，较同期工作 **Jamais Vu**（62.4%）提升 +5.1 个百分点，较 Geo-SC（53.4%）提升 +14.1 个百分点。值得注意的是，Jamais Vu 依赖额外的单目深度监督和 3D 模板，而 MARCO 仅使用稀疏关键点监督即实现了更强的泛化。
 - **MP-100 未见关键点**：在服装（Apparel）类别上，MARCO 的 PCK@0.10 达到 55.9%，较 Jamais Vu（45.7%）提升 +10.2 个百分点；在动物身体（Animal body）类别上达到 42.3%，较 Jamais Vu（39.3%）提升 +3.0 个百分点。
@@ -393,9 +367,6 @@ Table 10 分析了流聚类对初始簇数 $k$ 的敏感性：初始化为较大
 
 Table 12 报告了模型规模和推理速度。MARCO 在 RTX 4090 GPU 上达到 8.30 FPS，而 **Geo-SC** 和 **Jamais Vu** 仅为 0.85 FPS，加速约 9.8 倍。同时，MARCO 的参数量约为对偶编码器方法的三分之一。这一效率优势源于其极简架构设计：仅依赖单个 DINOv2 骨干加轻量适配器，无需扩散模型或多模态编码器。
 
-![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2604_18267/figures/017_Table_12.jpg]]
-*Table 12: Compute comparison. Model size and inference speed measured on an RTX4090 GPU. All methods use the same evaluation protocol: feature extraction at 840p, batched reference–target pairs, and the same soft-argmax keypoint prediction*
-
 ### 失败模式与局限性
 
 尽管 MARCO 在多数场景下表现优异，仍存在以下已知局限：
@@ -409,13 +380,6 @@ Table 12 报告了模型规模和推理速度。MARCO 在 RTX 4090 GPU 上达到
 - Delaunay 三角剖分在严重遮挡下的失效模式如何定量影响最终对应质量？是否存在更鲁棒的插值策略（如基于图神经网络的传播）？
 - 自蒸馏伪标签在物体边界和低纹理区域的覆盖率和噪声分布特性如何？能否进一步减少对 GT 锚定的依赖，甚至实现完全无监督的密集对应学习？
 - 适配器放置位置和瓶颈维度的最优选择是否对不同视觉基础模型具有普适性？
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2604_18267/figures/011_Table_7.jpg]]
-*Table 7: Additional ablations comparing fine-tuning vs. adaptation strategies, adapter placement, and bottleneck dimension. All results reported as PCK@0.10 (in %, ↑)*
-
-
 
 ## 定位与知识库关联
 
@@ -479,8 +443,6 @@ DINOv2特征在低纹理或重复纹理区域的判别力下降，导致互近�
 5. **伪标签噪声的精细刻画**：Table 9通过添加高斯噪声模拟伪标签误差，但真实伪标签噪声在物体边界和低纹理区域的空间分布可能高度非均匀。更精细的噪声建模可能指导自适应损失加权策略。
 
 6. **与3D先验的潜在协同**：MARCO证明2D自蒸馏即可超越使用3D模板的Jamais Vu，但2D自蒸馏与3D先验是否互补？两者结合能否在极端视角变化下进一步提升鲁棒性？
-
-
 
 ## 原文 PDF
 

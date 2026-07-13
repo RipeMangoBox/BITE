@@ -56,8 +56,6 @@ claims:
 - 零样本域外泛化测试中，MagicPose无需微调即可在全身数据集Everybody Dance Now及风格迥异的参考图像上保持身份与姿态一致性（Table 4, Figure 6-8）。
 - 100人用户研究中，73%的票数选择MagicPose为身份保持最优方法（p-value = 1.11e-12）（Table 2, Table 5）。
 
-
-
 ### 问题背景：姿态重定向中的身份保持困境
 
 2D人体姿态与表情重定向（retargeting）旨在将参考图像中的人物外观迁移到目标姿态序列上，同时保持面部表情、肤色、着装等身份特征的连贯性。这一任务在虚拟主播、影视制作、游戏角色动画等场景中具有明确的应用需求，其核心挑战在于：**如何在精确跟随目标姿态的同时，不丢失参考人物的身份外观信息**。
@@ -91,8 +89,6 @@ claims:
 2. **实现外观与姿态的解耦**：通过两阶段训练策略（先外观控制预训练冻结骨干，后联合微调解耦姿态控制），使姿态控制网络独立学习而不干扰外观保持，消除直接联合训练带来的身份混淆。
 
 3. **保持即插即用的泛化能力**：在不修改Stable Diffusion预训练权重的条件下，将所提模块作为插件集成，支持零样本域外泛化——包括全身数据集（Everybody Dance Now）和风格迥异的参考图像（2D卡通、T2I生成图像等），无需针对新域微调。
-
-
 
 ## 核心方法与创新机理
 
@@ -159,8 +155,6 @@ $$Our\_Attn = softmax\left(\frac{Q_1 \cdot (K_1 \oplus K_2)^T}{\sqrt{d}}\right) 
 
 MagicPose的创新本质在于**将身份保持从扩散模型的隐式期望提升为显式的可训练目标**。通过将自注意力层重新定位为外观变形模块，并配合外观控制模型的预训练与姿态解耦策略，MagicPose在不修改SD-UNet预训练权重的前提下，以插件形式实现了鲁棒的身份感知姿态重定向。这一设计范式使得模型在仅使用TikTok数据集335个视频训练的情况下，取得了Face-Cos 0.426的领先性能（相较DisCo提升156%），并展现出对全身数据集和多样化图像风格的零样本泛化能力（Table 4, Figure 6-8）。
 
-
-
 ![[assets/figures/papers/paper_list_l6_MagicPose_Realistic_Human_Pose_and_Facial_Expression_Retargeting_with_Id/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed MagicPose pipeline for controllable human poses and facial expressions retargeting with motions & facial expressions transfer. The Appearance Control Model is a copy of the entire Stable-Diffusion UNet, initialized with the same weight. The Stable-Diffusion UNet is frozen throughout the training. During a) Appearance Control Pretraining, we train the appearance control model and its Multi-Source Self-Attention Module. During b) Appearance-disentangled Pose Control, we jointly fine-tune the Appearance Control Model, initialized with weights from a), and the Pose ControlNet. After these steps, an optional motion module can be integrated into the pipeline and fine-tune...*
 
@@ -210,8 +204,6 @@ $$\mathcal{L} = \mathbb{E}_{\mathcal{E}(I), A_{\theta}(I_R), P_{\theta}(I_C), \e
 
 整个框架的模块关系与数据流可参照 **Figure 2** 的 Pipeline 总览图。
 
-
-
 ### 问题分解与整体架构
 
 MagicPose将人物姿态重定向任务分解为两个子问题：**外观传递**（保持参考图像的身份、肤色、衣着等视觉特征）与**姿态/表情控制**（根据目标姿态骨架和面部关键点生成对应动作）。整体架构包含三个核心模块：冻结的Stable Diffusion UNet（SD-UNet）作为生成骨干、可训练的**Appearance Control Model**负责外观引导、以及**Pose ControlNet**负责姿态条件控制（Figure 2）。
@@ -256,8 +248,6 @@ $$\mathcal{L} = \mathbb{E}_{\mathcal{E}(I), A_{\theta}(I_R), P_{\theta}(I_C), \e
 
 消融实验（Table 3）验证了该策略的有效性：移除外观控制预训练后，Face-Cos从0.426骤降至0.038（-944.73%），SSIM从0.752降至0.291（-149.82%）；移除外观解耦的姿态控制后，Face-Cos下降7.30%至0.397，SSIM下降3.43%至0.727。这证实了两阶段训练对身份保持和生成质量的决定性作用。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与因果机制
@@ -270,7 +260,6 @@ MagicPose旨在解决扩散模型在人体姿态重定向中的根本矛盾：**
 
 **Table 1** 展示了MagicPose与近期SOTA方法DreamPose、DisCo的定量对比。MagicPose取得FID 25.50（DisCo为50.68，降低49.7%）、SSIM 0.752（DisCo为0.648）、PSNR 29.53、LPIPS 0.292、L1误差0.81E-04。最关键的**Face-Cos**指标达到0.426，相较DisCo的0.166提升**+0.260（+156%）**，证明MagicPose在保持面部身份信息方面具有显著优势。
 
-
 ![[assets/figures/papers/paper_list_l6_MagicPose_Realistic_Human_Pose_and_Facial_Expression_Retargeting_with_Id/figures/005_Table_1.jpg]]
 *Table 1: Quantitative comparisons of MagicPose with the recent SOTA methods DreamPose (Karras et al., 2023) and Disco (Wang et al., 2023). ↓ indicates that the lower the better, and vice versa. Methods with ∗ directly use the target image as the input, including more information compared to the OpenPose (Cao et al., 2019; Simon et al., 2017; Cao et al., 2017; Wei et al., 2016). † represents that Disco (Wang et al., 2023) is pre-trained on other datasets (Fu et al., 2022; Ge et al., 2019; Schuhmann et al., 2021; Lin et al., 2014) more than our proposed MagicPose, which uses only 335 video sequences in the TikTok (Jafarian & Park, 2021) dataset for pretraning and fine-tuning. Face-Cos represents the c...*
 
@@ -282,17 +271,9 @@ MagicPose旨在解决扩散模型在人体姿态重定向中的根本矛盾：**
 
 **Table 2** 和 **Table 5** 展示了100名参与者的用户研究结果。参与者对测试集中8个视频对象进行投票，MagicPose获得了**73%的票数**，被选为身份保持最优的方法，统计显著性p-value = 1.11e-12。在所有8个测试对象上，MagicPose均保持最佳的身份信息保持能力。
 
-
-![[assets/figures/papers/paper_list_l6_MagicPose_Realistic_Human_Pose_and_Facial_Expression_Retargeting_with_Id/figures/008_Table_2.jpg]]
-*Table 2: User study of MagicPose. We collect the number of votes from 100 participants for eight subjects in the test set. The participants found that MagicPose preserves the best identity and appearance information in pose and facial expression retargeting*
-
-![[assets/figures/papers/paper_list_l6_MagicPose_Realistic_Human_Pose_and_Facial_Expression_Retargeting_with_Id/figures/013_Table_5.jpg]]
-*Table 5: The user study with 100 participants. We collect the number of votes for eight video subjects from test set by five methods and report the percentage. Our MagicPose preserves the best identity information in pose and facial expression retargeting on all subjects*
-
 ### 消融实验
 
 **Table 3** 和 **Figure 5** 系统验证了各模块的贡献：
-
 
 ![[assets/figures/papers/paper_list_l6_MagicPose_Realistic_Human_Pose_and_Facial_Expression_Retargeting_with_Id/figures/009_Table_3.jpg]]
 *Table 3: Ablation Analysis of MagicPose with different training and inference settings. App-Pretrain stands for Appearance Control Pretraining through Multi-Source Attention Module and Disentangle denotes Appearance-disentangled Pose Control. Image-CFG denotes classifier free guidance. Data Aug indicates the model is trained with data augmentation of random masking of facial landmarks and hand poses*
@@ -309,12 +290,10 @@ MagicPose旨在解决扩散模型在人体姿态重定向中的根本矛盾：**
 
 MagicPose展现出优异的零样本域外泛化能力。**Table 4** 显示，在全身数据集Everybody Dance Now上，直接评估（MagicPose†）取得平均FID 28.64、PSNR 29.63；进一步微调后（MagicPose‡）性能持续提升。
 
-
 ![[assets/figures/papers/paper_list_l6_MagicPose_Realistic_Human_Pose_and_Facial_Expression_Retargeting_with_Id/figures/010_Table_4.jpg]]
 *Table 4: Quantitative evaluation of generalization ability of MagicPose. MagicPose† denotes the pipeline is directly evaluated on test set of Everybody Dance Now (Chan et al., 2019b) after being trained on TikTok (Jafarian & Park, 2021), and MagicPose‡ represents the pipeline is further fine-tuned on Everybody Dance Now (Chan et al., 2019b) train set and evaluated on test set*
 
 **Figure 6-8** 的定性结果表明，MagicPose无需任何微调即可对风格迥异的参考图像（包括不同种族、年龄的真实人物，以及卡通、动画角色）实现身份一致性与姿态一致性的重定向。Figure 9进一步展示了模型对训练集（TikTok）中未见的图像风格的泛化能力。
-
 
 ![[assets/figures/papers/paper_list_l6_MagicPose_Realistic_Human_Pose_and_Facial_Expression_Retargeting_with_Id/figures/007_Figure_6.jpg]]
 *Figure 6: Comparison of zero-shot pose and facial expression retargeting on out-of-domain image. Figure 7. Visualization of zero-shot pose and facial expression retargeting on in-the-wild real-human with different ethnicity and age from training data (Tiktok)*
@@ -341,25 +320,8 @@ $$\mathcal{L}_{joint} = \mathbb{E}_{\mathcal{E}(I), A_{\theta}(I_R), P_{\theta}(
 
 第一阶段仅优化外观控制模型$A_{\theta}$，SD-UNet冻结；第二阶段联合优化外观控制器$A_{\theta}$和姿态控制网络$P_{\theta}$，实现外观与姿态的解耦。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l6_MagicPose_Realistic_Human_Pose_and_Facial_Expression_Retargeting_with_Id/figures/016_Figure_12.jpg]]
 *Figure 12: Visualization of Human Motion and Facial Expression Transfer on TikTok (Jafarian & Park, 2021)*
-
-![[assets/figures/papers/paper_list_l6_MagicPose_Realistic_Human_Pose_and_Facial_Expression_Retargeting_with_Id/figures/017_Figure_13.jpg]]
-*Figure 13: Visualization of Human Motion and Facial Expression Transfer on TikTok (Jafarian & Park, 2021). MagicPose is able to generate vivid and realistic motion and expressions under the condition of diverse pose skeleton and face landmark input, while accurately maintaining identity information from the reference image input*
-
-![[assets/figures/papers/paper_list_l6_MagicPose_Realistic_Human_Pose_and_Facial_Expression_Retargeting_with_Id/figures/022_Figure_18.jpg]]
-*Figure 18: Visualization of Zero-Shot 2D Cartoon Generation*
-
-![[assets/figures/papers/paper_list_l6_MagicPose_Realistic_Human_Pose_and_Facial_Expression_Retargeting_with_Id/figures/019_Figure_15.jpg]]
-*Figure 15: Visualization of Zero-Shot Human Motion and Facial Expression Transfer on Everybody Dance Now Dataset (Chan et al., eren2019b)*
-
-![[assets/figures/papers/paper_list_l6_MagicPose_Realistic_Human_Pose_and_Facial_Expression_Retargeting_with_Id/figures/020_Figure_16.jpg]]
-*Figure 16: Visualization of Zero-Shot Human Motion and Facial Expression Transfer on Everybody Dance Now Dataset (Chan et al., 2019b)*
-
-
-
 
 ## 定位与知识库关联
 
@@ -414,8 +376,6 @@ MagicPose 的外观控制模型在架构上是 SD-UNet 的可训练副本，通�
 - **外观控制机制的跨任务迁移**：Multi-Source Attention Module 的层级化键值对注入机制本质上是一种通用的外观保持范式。它能否拓展到其他几何控制任务，如新视角合成（以相机姿态为条件）、自然场景形状编辑（以深度图或分割图为条件）或动物运动重定向？
 - **多人场景的身份解耦**：如何在多人场景中为不同角色分配独立的外观控制分支，并维持交互一致性（如遮挡关系、接触区域），是一个具有挑战性但应用价值显著的问题。
 - **轻量化与实时推理**：能否通过知识蒸馏、步数压缩或一致性模型蒸馏等手段，将 MagicPose 的推理成本降低到实时应用可接受的水平？
-
-
 
 ## 原文 PDF
 

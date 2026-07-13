@@ -55,8 +55,6 @@ claims:
 
 该方法的局限性在于拓扑引导的计算开销较大（每样本约 420 秒），主要受限于持久同调缺乏公开的 GPU 实现；曲线控制域的骨架化步骤仍在 CPU 上执行；且仅在有限解剖数据集（心脏、主动脉、脊柱、冠状动脉）上验证，泛化性有待进一步检验。
 
-
-
 ### 解剖生成模型的现状与瓶颈
 
 医学影像中解剖结构的自动生成是虚拟临床试验、数据增强和手术规划的关键技术。近年来，扩散模型在三维解剖体素图的生成上取得了显著进展，能够合成逼真的多类组织分割。然而，现有方法面临一个核心瓶颈：**难以在生成过程中对解剖结构的几何特征（大小、形状、位置）和拓扑特征（连通分量、环、空洞）施加局部化、可微分的精确控制**。
@@ -80,8 +78,6 @@ claims:
 - **拓扑可控性**：首次将持久同调引入解剖扩散模型的推理时控制，通过保留/抑制损失函数最大化或最小化特定拓扑特征的持久性，实现了对连通性、环状结构和空洞的精确操纵。
 
 这些创新使 Anatomica 成为首个能够在推理时对多类解剖体素图施加局部几何-拓扑联合控制的框架，为解剖生成模型的临床落地提供了新的技术路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -121,8 +117,6 @@ $$\mathcal{L}_k^{\mathrm{topo}} = - \sum_{p \in \mathcal{V}_k} |\mathbf{S}_k(r_b
 
 这种联合测量机制使 Anatomica 能够在统一的推理时框架下，同时精确控制解剖结构的几何形态与拓扑连通性，实现了现有方法无法达成的组合式、多尺度解剖控制能力。
 
-
-
 Anatomica 是一个**推理时组合式扩散引导框架**，用于生成具有局部化几何与拓扑控制的多类三维解剖体素图。其核心设计理念是：在不重新训练基础扩散模型的前提下，通过在反向采样过程中注入可微分的解剖势函数梯度，实现对生成结构的大小、形状、位置（几何属性）以及连通分量、环、空洞（拓扑属性）的精确控制。
 
 ### 框架流水线
@@ -148,12 +142,8 @@ Anatomica 是一个**推理时组合式扩散引导框架**，用于生成具有
 
 这种设计使得 Anatomica 区别于传统的条件训练方法——后者需要将几何属性编码为条件信号并重新训练模型，而 Anatomica 将控制逻辑完全外置于推理阶段，实现了零训练成本的局部化解剖属性编辑。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2440_https_arxiv_org_abs_2511_20587/figures/001_Figure_1.jpg]]
 *Figure 1: Anatomica is a compositional diffusion-guidance framework for generating segmentations based on anatomical features that are localized within cuboidal control domains. Left: We generate voxel maps according to localized target geometry (size, shape, and position) visualized as red ellipsoids. Right: We generate voxel maps according to target topology (components, loops, and voids)*
-
-
 
 Anatomica 的核心由四个关键模块串联构成，形成“定义控制域 → 解析子结构 → 测量属性 → 引导采样”的闭环。
 
@@ -223,16 +213,6 @@ $$
 
 这一修正项使采样轨迹偏离无条件分布，逐步逼近满足局部几何-拓扑约束的样本，且整个过程无需重新训练扩散模型。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2440_https_arxiv_org_abs_2511_20587/figures/002_Figure_2.jpg]]
-*Figure 2: Differentiable measurement of anatomical properties from multi-class voxel maps. A: We differentiably parse relevant substructures from anatomical voxel maps for localized measurement. B: We spatially transform cuboidal primitives (template domains) into control domains that slice into anatomical structures (V-parsing). C: The substructure is then differentiably measured in terms of geometric properties; as well as D: persistent homology-based topological properties*
-
-![[assets/figures/papers/paper_list_l2440_https_arxiv_org_abs_2511_20587/figures/003_Figure_3.jpg]]
-*Figure 3: Efficient parsing of anatomical substructures during diffusion guidance. A: During guidance, we parse relevant substructures directly from the clean latent prediction with a neural field decoder (L-parsing). B: In coarse L-parsing, we use a coarse grid to decode globally defined substructures at low spatial resolution. C: In localized L-parsing, we use a similar grid size but spatially transform the template point grid to decode localized substructures at high spatial resolution*
-
-
-
 ## 实验与关键发现
 
 Anatomica 的实验设计围绕两个核心维度展开：**几何控制**与**拓扑控制**。几何控制实验评估框架对局部子结构的大小、形状和位置进行精确操控的能力；拓扑控制实验则评估对连通分量（Betti‑0）、环（Betti‑1）和空洞（Betti‑2）等拓扑先验的强制能力。实验在心脏（TotalSegmentator）、主动脉分支、脊柱和冠状动脉四个解剖数据集上进行，基线方法包括显式条件扩散模型（Explicit Conditioning）、隐式条件扩散模型（Implicit Conditioning）和无条件扩散模型（Unconditional）。
@@ -296,27 +276,11 @@ Anatomica 的实验设计围绕两个核心维度展开：**几何控制**与**�
 ![[assets/figures/papers/paper_list_l2440_https_arxiv_org_abs_2511_20587/figures/023_Figure_10.jpg]]
 *Figure 10: Topological guidance and partial decoding resolution ablation study*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2440_https_arxiv_org_abs_2511_20587/figures/004_Figure_4.jpg]]
-*Figure 4: Geometric Control Tasks. We define a variety of relevant tasks by varying the selected tissues, template domain grid size, and control domain-specific spatial transforms*
-
 ![[assets/figures/papers/paper_list_l2440_https_arxiv_org_abs_2511_20587/figures/006_Table_1.jpg]]
 *Table 1: Comparison of geometric control task approaches*
 
 ![[assets/figures/papers/paper_list_l2440_https_arxiv_org_abs_2511_20587/figures/008_Table_2.jpg]]
 *Table 2: Quantitative results for geometric control tasks. We report geometric fidelity and generation quality for each taskapproach combination. Fidelity values for mass, centroid, and covariance are multiplied by 1e5, 1e4, 1e5 respectively*
-
-![[assets/figures/papers/paper_list_l2440_https_arxiv_org_abs_2511_20587/figures/009_Table_3.jpg]]
-*Table 3: Quantitative evaluation for topological control tasks. We report Betti precision for number of connected components B0, loops B1, and voids*
-
-![[assets/figures/papers/paper_list_l2440_https_arxiv_org_abs_2511_20587/figures/010_Figure_7.jpg]]
-*Figure 7: Multi-scale geometric control of various anatomical substructures over different coordinate systems. We generate anatomical segmentations based on domain size and anatomically relevant coordinate systems (Cartesian, curvilinear, cylindrical, and spherical)*
-
-![[assets/figures/papers/paper_list_l2440_https_arxiv_org_abs_2511_20587/figures/011_Table_4.jpg]]
-*Table 4: Quantitative ablation study for partial decoding strategies. We evaluate the geometric fidelity and generation quality, and sampling speed for different decoding strategies and resolutions. Speed is measured in terms of sampled label maps per second using the maximum allowable batch size on a single GPU, normalized to the slowest method. Fidelity values for mass, centroid, and covariance are multiplied by 1e5, 1e4, 1e5 respectively*
-
-
 
 ## 定位与知识库关联
 
@@ -377,8 +341,6 @@ Anatomica 的定位是**推理时引导框架（inference-time guidance framewor
 3. **控制域自动化**：如何自动确定控制域的空间变换参数？将控制域定义与解剖标志点检测或分割模型结合，可能实现端到端的自动化控制，减少对人工输入的依赖。
 
 4. **下游应用验证**：在真实临床虚拟试验或合成数据增强中的下游效果如何？论文展示了生成样本的几何和拓扑保真度，但未评估这些样本在下游任务（如分割模型训练、病理检测）中的实际效用，这是从方法研究走向临床落地的关键一步。
-
-
 
 ## 原文 PDF
 

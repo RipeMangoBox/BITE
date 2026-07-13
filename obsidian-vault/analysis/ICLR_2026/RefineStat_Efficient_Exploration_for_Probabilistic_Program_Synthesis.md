@@ -58,8 +58,6 @@ claims:
 - **预测性能**：REFINESTAT 配合 DQ-7B 在 Peregrine 数据集上的 ELPD-LOO 远优于使用 GPT-4 的 BoxLM（-114.29 vs -173.11），并超越 OpenAI o3（Table 3）。
 - **消融关键发现**：移除参数有效性检查导致编译成功率下降 14.5 个百分点，是所有验证组件中最关键的（Table 4）。
 
-
-
 概率编程是贝叶斯统计推断的核心工具，它允许研究者以声明式的方式定义先验和似然，并依赖现代概率编程语言（PPL）如PyMC、Stan等自动执行马尔可夫链蒙特卡洛（MCMC）推理。然而，编写一个语法正确且统计可靠的概率程序需要深厚的领域知识——不仅要熟悉PPL的API规范，还要理解贝叶斯工作流中的诊断指标（如收敛性、发散性、预测有效性），这对非专业用户构成了极高的门槛。
 
 近年来，大语言模型（LLM）在代码生成领域展现出令人瞩目的能力。但将LLM直接应用于概率程序合成面临一个**核心瓶颈**：小语言模型（SLM）在生成概率程序时经常产生语义错误和采样发散问题。具体表现为：（1）错误地将方差用作标准差参数（如PyMC中废弃的`sd`参数）；（2）调用目标PPL中不存在的API；（3）生成的程序虽然语法正确，但MCMC推理后产生大量发散或无法收敛，导致统计推断完全不可靠。这些失败模式使得“生成-执行-报错”的简单循环难以奏效，因为程序可能成功运行却产生错误的统计结论。
@@ -67,8 +65,6 @@ claims:
 现有方法在此问题上存在明显缺口。**无约束生成**（Standard baseline）直接向LLM查询生成程序，缺乏任何正确性保障，运行成功率极低（约10%）。**Syncode**（Ugare et al., 2024）引入了语法约束解码，能消除语法错误，但完全无法处理语义层面的问题——它无法阻止模型使用错误的分布参数或生成统计上不可靠的似然函数。**BoxLM**（Li et al., 2024）代表了另一条路线：使用两个GPT-4实例进行迭代式的程序提议和精炼。虽然取得了较好的效果，但该方法依赖大型专有模型，计算成本高昂，且其精炼策略缺乏对贝叶斯工作流诊断指标的系统利用。
 
 本文的**核心动机**在于：能否让单个开源小语言模型（≤8B参数）通过系统性的语义约束和诊断感知的迭代细化，生成与大型专有模型相媲美甚至更优的可靠概率程序？这一目标的实现需要解决两个关键挑战：（1）如何在解码阶段就阻止语义无效的程序片段生成；（2）如何将标准贝叶斯工作流诊断指标（如R-hat、ESS、发散数、Pareto k等）转化为有效的反馈信号，驱动模型有针对性地修正统计可靠性问题。
-
-
 
 ## 核心方法与创新机理
 
@@ -119,8 +115,6 @@ $$\mathcal{M}_{\mathrm{valid}} = \{ M \in \mathcal{M} : \mathcal{B}(M) \geq \zet
 
 REFINESTAT 的有效性源于一个关键的因果闭环：**语义约束解码缩小了搜索空间，使 SLM 的有限容量集中在统计合理的程序子集上；诊断反馈进一步引导搜索朝向贝叶斯工作流可靠的区域**。这一机制解释了为什么配合 DQ-7B 的 REFINESTAT 能在 Peregrine 数据集上以 ELPD-LOO −114.29 显著超越 BoxLM（GPT-4）的 −173.11，并在 Surgical 数据集上将发散数从标准基线的 1000+ 降至零。核心洞察在于：概率程序合成的瓶颈并非模型规模，而是缺乏结构化的正确性保障和统计反馈回路。
 
-
-
 REFINESTAT 是一个两阶段概率程序合成框架，其核心目标是将小语言模型（SLM）生成的不可靠程序，转化为符合贝叶斯工作流标准的统计推断工具。整个 pipeline 由五个关键模块串联构成，形成一个“生成—约束—诊断—细化—选择”的闭环。
 
 ### 输入与输出
@@ -169,8 +163,6 @@ $$M^{*} = \arg\max_{M \in \mathcal{M}_{\mathrm{valid}}} \widehat{\mathrm{elpd}}(
 ### 关键设计决策
 
 框架的两个核心创新点——语义约束解码和诊断感知细化——分别针对概率程序合成的两大瓶颈：语义错误（如 API 幻觉、参数误用）和统计不可靠性（如采样发散、收敛失败）。前者通过局部拒绝采样在生成阶段拦截错误，后者通过贝叶斯工作流诊断驱动迭代修正。两者配合使得单个未修改的 7B 参数 SLM 即可生成与大型专有模型相媲美的可靠程序。
-
-
 
 REFINESTAT 的核心由三个关键模块串联构成：语义约束解码、贝叶斯可靠性检查、以及诊断感知的迭代细化。以下逐一阐述其机制与核心公式。
 
@@ -222,16 +214,11 @@ $$M^{*} = \arg\max_{M \in \mathcal{M}_{\mathrm{valid}}} \widehat{\mathrm{elpd}}(
 
 即在有效模型空间中选取样本外预测精度最高的模型，从而在统计可靠性与预测性能之间取得平衡。
 
-
-
 ## 实验与关键发现
 
 ### 核心结果：运行成功率与诊断可靠性
 
 REFINESTAT在程序合成成功率上展现出对基线方法的显著优势。Table 1汇总了不同温度设置下各方法的运行率（Run rate）：标准无约束基线在温度0.2时仅达0.10，仅引入语法约束的Syncode（Ugare et al., 2024）提升至0.21，而REFINESTAT达到0.45，比标准基线高出约35个百分点，比Syncode高出约24个百分点。这一差距源于语义约束解码对六类有效性谓词的强制执行——模型在逐语句生成过程中被阻止产生语法正确但语义无效的代码片段（如将方差误用作标准差参数、调用不存在的API）。
-
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_SAl337ZX5d/figures/003_Table_1.jpg]]
-*Table 1: Run rates for Standard, SYNCODE, and REFINESTAT by temperature*
 
 Table 2进一步揭示了程序质量的深层差异。在Surgical数据集上，标准基线（Meta-Llama）产生超过1000次MCMC采样发散，而REFINESTAT将发散数降至零。这直接验证了诊断感知细化循环的核心机制：当贝叶斯工作流可靠性得分低于阈值（ζ=5/7）时，系统自动重采样似然或先验组件，直至采样健康指标恢复正常。DQ-7B模型在无约束条件下所有五个数据集均失败（0/5成功率），而配合REFINESTAT后全部成功（5/5），表明语义约束与诊断反馈的结合使小模型也能跨越从“无法运行”到“统计可靠”的鸿沟。
 
@@ -273,16 +260,6 @@ REFINESTAT的设计不绑定特定概率编程后端。Table 5和Table 6显示�
 ![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_SAl337ZX5d/figures/011_Table_9.jpg]]
 *Table 9: Comparison of Diagnostic Scores and ELPD-LOO for REFINESTAT variants*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_SAl337ZX5d/figures/008_Table_6.jpg]]
-*Table 6: Diagnostics and ELPD-LOO results for NumPyro using Qwen-2.5-Coder–7B, demonstrating the generalizability of REFINESTAT*
-
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_SAl337ZX5d/figures/009_Table_7.jpg]]
-*Table 7: Semantic filtering of LLM-proposed likelihoods*
-
-
-
 ## 定位与知识库关联
 
 ### 与现有方法的谱系关系
@@ -320,8 +297,6 @@ REFINESTAT 处于概率程序合成与语言模型辅助统计建模的交叉地
 4. **跨语言泛化。** 该方法能否以较小的工程代价扩展到其他概率编程语言（如Stan、Turing.jl），而不需要为每个语言重新定义所有验证谓词？是否存在一套语言无关的语义约束抽象层？
 
 5. **策略优化。** 是否可以通过强化学习或偏好对齐（如基于ELPD的奖励信号）进一步优化程序生成策略，以提升最终模型的预测性能，而非仅依赖拒绝采样和重生成？
-
-
 
 ## 原文 PDF
 

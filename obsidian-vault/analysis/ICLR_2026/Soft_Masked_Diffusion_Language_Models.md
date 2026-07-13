@@ -60,8 +60,6 @@ claims:
 - 在Dream-7B上微调33.5k步后，HumanEval准确率从18.9%提升至25.6%（+6.7%），MBPP从26.6%提升至32.8%（+6.2%）。
 - 消融实验表明，SM在去噪过程的前80%步骤中应用效果远优于后80%，top-k值取3在语言建模中效果最佳，取1在代码生成中性价比最高。
 
-
-
 ### 扩散语言模型的迭代解码瓶颈
 
 掩码扩散语言模型（Masked Diffusion Language Models, MDLMs）通过逐步去噪生成文本，在可控生成与并行解码方面展现出潜力。其核心工作流程为：从完全掩码的序列出发，每一步由双向Transformer预测所有掩码位置的token分布，然后依据噪声调度或熵准则选择部分位置进行“去掩码”（unmasking），将预测token写入序列，其余位置保留`[MASK]`状态，形成下一轮迭代的输入。
@@ -81,8 +79,6 @@ claims:
 本文的核心洞察在于：**扩散语言模型的掩码反馈不应是“全有或全无”的二元决策，而应是一个能够传递预测不确定性的连续信号**。当一个位置尚未解码时，模型对其已有一定的“猜测”——可能是某个高置信度token，也可能是多个备选token的概率混合。将这些信息编码进掩码状态，而非粗暴地丢弃，应当能够显著改善后续去噪步骤的决策质量。
 
 基于此，本文提出**软掩码（Soft-Masking, SM）**机制：对于每一步中保留的`[MASK]`位置，将其嵌入与上一轮预测的top-k个token的加权嵌入做凸组合，权重由模型对当前预测的置信度（以负熵度量）动态决定。这一设计仅引入三个可学习参数（缩放因子$\omega_s$、陡峭度$\omega_a$、偏移$\omega_b$），训练过程完全可并行，且不改变MDLM的扩散调度或模型架构，仅需在预训练或微调阶段以一定概率替换二元掩码为软掩码即可融入现有流程。
-
-
 
 ## 核心方法与创新机理
 
@@ -143,8 +139,6 @@ $$
 - **SM在去噪早期阶段至关重要**：将SM步骤放在前80%的去噪步比放在后80%效果显著更好（Table 11），表明早期阶段的连续反馈对引导后续解码方向具有决定性作用；
 - **训练概率 $p_{sm}=0.8$ 最优**：训练时以80%概率使用SM、20%概率使用二元掩码，可让模型同时适应两种反馈模式；设为1.0则完全丧失处理二元掩码的能力（Figure 5a）。
 
-
-
 Soft-masking (SM) 作为一种即插即用的反馈增强模块，被嵌入到掩码扩散语言模型（MDLM）的标准迭代去噪管线中。该框架的核心是一个双向 Transformer 主干网络 $g_\theta$，负责在每一步预测所有位置的 token 分布。SM 并不改变主干的架构或扩散调度，而是在**去噪步骤之间的反馈回路**上施加影响，将原本的二元硬掩码松弛为信息丰富的软掩码。
 
 ### 管线模块与数据流
@@ -182,8 +176,6 @@ SM 的训练采用**双前向传播（two-pass）** 流程（Algorithm 1）：
 ### 模块关系总结
 
 SM 的三个可学习参数 $(\omega_s, \omega_a, \omega_b)$ 是框架中**唯一额外引入的参数量**，可通过与主干网络并行的梯度反向传播高效学习。SM 与解掩码策略、扩散调度完全解耦，可独立应用于标准 MDLM 或 ReMDM 等更先进的变体，也可通过继续预训练或参数高效微调（DoRA）快速适配到预训练模型上。
-
-
 
 ### 3.1 软掩码反馈机制
 
@@ -226,8 +218,6 @@ SM 的训练需要两次前向传播（two‑pass），如 Algorithm 1 所述：
 
 当 $\lambda=1, k=1$ 时，SM 退化为将 argmax 预测 token 的嵌入反馈给掩码位置，与均匀扩散语言模型（uniform DLM）的反馈机制等价。这一退化情形揭示了 SM 的本质优势：通过 $k>1$ 和可学习的 $\lambda \in [0, \omega_s)$，SM 保留了预测分布中的不确定性信息，而非仅传递单点估计。消融实验表明，$k=3$ 在语言建模中效果最佳，$k=1$ 在代码生成中性价比最高，且所有 $k$ 值均优于二元基线（Table 10）。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与因果机制验证
@@ -242,7 +232,6 @@ SM 的训练需要两次前向传播（two‑pass），如 Algorithm 1 所述：
 
 在 OpenWebText 上从头训练 169M 参数的 MDLM，SM 在等计算量设定下展现出压倒性优势。**Table 1** 的核心数据如下：
 
-
 ![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_Gba02UMvrG/figures/004_Table_1.jpg]]
 *Table 1: Unconstrained generation after pretraining from scratch. We report MAUVE (↑) and generative perplexity (↓) of L = 1024 generated tokens using MDLM (Sahoo et al., 2024) with binary masking or our SM. Evaluations are tabulated by varying NFE budgets3. For unmasking, we use either the standard or the more recent ReMDM (Wang et al., 2025); the highest scores are bolded. Gain shows the performance improvement between the SM and the baseline MDLM. †Results of evaluating the ground-truth data and equal-backbone AR model are taken from (Sahoo et al., 2024)*
 
@@ -250,8 +239,6 @@ SM 的训练需要两次前向传播（two‑pass），如 Algorithm 1 所述：
 - **ReMDM unmasking + iso‑compute + NFE 1/1**：SM 的 MAUVE 达到 **0.766**，较基线的 0.411 提升 **+0.355**；生成困惑度从 28.62 降至 **17.29**。
 
 这一结果表明，SM 不仅适用于基础 unmasking 策略，与更先进的 **ReMDM**（Wang et al., 2025）结合时仍能带来大幅增益，且生成多样性（熵）与基线持平（Table 5/7），排除了“以多样性换质量”的假阳性。
-
-
 
 ![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_Gba02UMvrG/figures/014_Table_7.jpg]]
 *Table 7: Entropy (↑) with pretraining continuation. We perform unconstrained generation of L = 1024 tokens using MDLM (Sahoo et al., 2024) with binary masking or our SM. For unmasking, we use either standard or ReMDM (Wang et al., 2025)*
@@ -267,14 +254,9 @@ SM 可以高效地融入预训练 MDLM：仅需 **100k 步** 的继续预训练�
 
 **Table 2** 显示，继续预训练后的 SM 在等计算量下 MAUVE 达到 **0.578**（NFE 1/1），远高于二元基线的 0.034；即使在等更新步数下，SM 的 MAUVE 也达到 0.509，验证了其在实际部署场景中的鲁棒性。
 
-
-![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_Gba02UMvrG/figures/005_Table_2.jpg]]
-*Table 2: MAUVE (↑) of unconstrained generation after pretraining continuation. Gain shows the performance improvement between the SM and the binary MDLM with pretraining continuation*
-
 #### 代码生成（Dream‑7B / Dream‑Coder‑7B）
 
 将 SM 微调至 Dream‑7B 仅需 **33.5k 步**（使用 DoRA 参数高效微调），在 HumanEval 和 MBPP 上取得显著提升（Table 3）：
-
 
 ![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_Gba02UMvrG/figures/008_Table_3.jpg]]
 *Table 3: Accuracy (%) on coding tasks. Evaluations are tabulated by varying NFE budgets. We finetune the models with 5 seeds and report the mean accuracy (± standard deviation). SM is configured with k=1. Gain shows the comparison between the SM model and the finetuned baseline. The best performing model is marked in bold. The learned SM parameters are given in Appendix C.10*
@@ -288,7 +270,6 @@ SM 可以高效地融入预训练 MDLM：仅需 **100k 步** 的继续预训练�
 #### 数学推理（补充验证）
 
 在 GSM8k 和 Math‑500 上微调 Dream‑7B（Table 8），SM（k=3）在多数 NFE 预算下优于二元基线，但增益幅度小于文本和代码任务。这暗示数学推理对软掩码提供的分布信息敏感度可能较低，或需要更大的 k 值与不同的置信度标定策略——该点需手动验证。
-
 
 ![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_Gba02UMvrG/figures/019_Table_8.jpg]]
 *Table 8: Accuracy (%) on math tasks. Evaluations are displayed under varying computational NFE budgets. We finetune the models with 5 seeds and report the mean accuracy (± standard deviation). SM is configured with k=3. Gain shows the comparison between the SM model and the finetuned baseline*
@@ -345,26 +326,6 @@ Table 12 进一步探索了时间依赖的 SM→Binary 切换策略（线性衰�
 | Figure 5 | $p_{\text{sm}}=0.8$、k=3 为语言建模最优配置；$p_{\text{sm}}=1.0$ 有害 |
 | Table 11 | SM 必须应用于去噪早期阶段（前 80%），后期切换为二元即可 |
 | Figure 9 | SM 在生成困惑度‑熵权衡上优于同期方法 CANDI 和 CADD |
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_Gba02UMvrG/figures/002_Figure_1.jpg]]
-*Figure 1: Illustrative answer generation using masked diffusion language models (MDLMs) via iterative decoding with (a) standard binary masking or (b) our proposed soft-masking. Our softmasking enriches the feedback for the next decoding step by superposing the masked tokens with the previously predicted top-k candidates, enabling more accurate and faster generation*
-
-![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_Gba02UMvrG/figures/011_Table_4.jpg]]
-*Table 4: Validation perplexity on OWT. †Results for AR and SEDD were taken from (Sahoo et al., 2025)*
-
-![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_Gba02UMvrG/figures/013_Table_6.jpg]]
-*Table 6: Generative perplexity (↓) with pretraining continuation. We perform unconstrained generation of L = 1 0 2 4 tokens using MDLM (Sahoo et al., 2024) with binary masking or our SM. For unmasking, we use either standard or ReMDM (Wang et al., 2025); the highest scores are bolded. Gain shows the performance improvement between the SM and the binary MDLM with pretraining continuation*
-
-![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_Gba02UMvrG/figures/018_Figure_7.jpg]]
-*Figure 7: Unconstrained generation trajectory of L = 8 tokens over T = 8 steps using an MDLM with Soft-Masking (trained from scratch, iso-compute, 500k steps). Green-shaded cells indicate masked tokens where SM is active; color intensity corresponds to the SM confidence, with darker green indicating higher certainty. The text inside these cells displays the current top-1 predicted token. Bold, unshaded text represents tokens that have been unmasked (sampled) and fixed*
-
-![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_Gba02UMvrG/figures/020_Table_9.jpg]]
-*Table 9: Accuracy (%) on coding tasks. SM has been finetuned in the iso-compute training setting. Evaluations are tabulated by varying NFE budgets. We finetune the models with 5 seeds and report the mean accuracy (± standard deviation). SM is configured with k=1. Gain shows the comparison between the SM model and the finetuned baseline. The best performing model is marked in bold*
-
-
-
 
 ## 定位与知识库关联
 
@@ -452,8 +413,6 @@ SM与CANDI、CADD等并行工作的本质区别在于：SM在反馈表示层面�
 ---
 
 **证据强度说明**：上述核心结论均有Table 1/3/5/7/10/11及Figure 3/5的量化数据支撑，置信度≥0.95。规模局限性和开放问题来自论文自身的讨论与未覆盖的实验设置，需后续工作验证。
-
-
 
 ## 原文 PDF
 

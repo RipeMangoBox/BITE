@@ -66,8 +66,6 @@ claims:
 
 MSPT在6项标准PDE基准（Elasticity、Plasticity、Airfoil、Pipe、Navier-Stokes、Darcy）中有4项取得最优性能，在Navier-Stokes上相对第二最佳模型降低30%误差（Table 2）。在工业级ShapeNet-Car空气动力学任务上，MSPT以单分支架构达到最佳体积场误差1.89和阻力误差0.98，均优于Transolver等单分支模型，且仅需约一半的GPU内存（Table 3, Figure 5）。效率方面，MSPT在百万点规模下峰值内存和延迟均显著低于Transolver，500k点时峰值内存约22 GB且近乎线性增长，验证了其近线性复杂度的实际可行性（Figure 1, Table 8）。
 
-
-
 ### 物理仿真中偏微分方程的数值求解瓶颈
 
 偏微分方程（PDE）是描述流体力学、结构力学、电磁学等物理现象的核心数学工具。传统数值方法（如有限元法、有限体积法）虽然精度可靠，但对复杂几何和边界条件的每一次仿真都需要昂贵的网格生成与迭代求解，单个工业级案例（如汽车外气动分析）往往需要数小时甚至数天的计算时间。近年来，基于深度学习的神经算子——特别是以傅里叶神经算子（**FNO**）和Transformer为代表的模型——试图直接从数据中学习PDE的解映射，在推理阶段实现秒级预测，从而绕开传统求解器的迭代过程。
@@ -102,8 +100,6 @@ MSPT（Multi-Scale Patch Transformer）正是在这一矛盾中找到了突破�
 3. **并行多尺度注意力（PMSA）**：将局部token与全局超节点拼接后统一送入多头注意力，使局部-局部和局部-全局交互在同一个注意力矩阵中并行计算。
 
 通过这种方式，MSPT旨在打破“保局部必失全局、求全局必损效率”的困境，为大规模物理建模提供一个可扩展且精度领先的统一框架。
-
-
 
 ## 核心方法与创新机理
 
@@ -156,8 +152,6 @@ MSPT通过三种可选的池化策略将每个patch内的 $L$ 个token压缩为 
 
 MSPT的核心洞察在于：**通过球树划分保证局部patch的几何一致性，再通过超节点池化将局部精细建模和全局长程通信统一到单个注意力操作中**，避免了Transolver的压缩瓶颈和Erwin的全局通信缺失，从而在标准PDE和CFD基准上以更低显存和计算成本实现SOTA精度。
 
-
-
 MSPT 的整体架构遵循“嵌入→划分→多尺度注意力编码→任务头”的端到端管线，核心设计目标是在非结构网格上以近线性复杂度实现局部精细建模与全局长程通信的统一。
 
 ### 输入嵌入与预处理
@@ -203,13 +197,6 @@ $$\mathbf{H}^{(\ell)} = \mathrm{FFN}\big(\mathrm{LN}(\widehat{\mathbf{H}}^{(\ell
 ### 数据流总结
 
 整个管线的数据流为：**原始点云 → 坐标/几何嵌入 → 球树划分（一次性） → [超节点池化 → PMSA → FFN] × B → 任务头 → 预测场**。球树划分在首个块前完成并跨层复用，超节点在每个块内重新池化以反映更新后的特征分布，局部 token 和全局超节点在 PMSA 中同步更新，形成紧密耦合的局部-全局通信闭环。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2512_01738/figures/001_Figure_1.jpg]]
-*Figure 1: Parallelized Multi-Scale Attention mechanism. Each patch performs local self-attention, while pooled supernodes exchange information globally across patches in parallel. Peak memory (GB) and latency (ms) on 500k points with 256 slices (Transolver) and 256 patches (MSPT)*
-
-
 
 ### 3.1 并行多尺度注意力（PMSA）
 
@@ -279,8 +266,6 @@ $$\mathbf{H}^{(\ell)} = \mathrm{FFN}\big(\mathrm{LN}(\widehat{\mathbf{H}}^{(\ell
 
 整体架构堆叠 $B$ 个MSPT块逐步精炼点特征。输入嵌入阶段，将点坐标与几何描述符（如到参考网格的距离）拼接后通过共享MLP映射到隐空间。最后一块的FFN替换为任务特定头（如预测压力场或速度场），输出最终物理场。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -329,33 +314,14 @@ Figure 1和Figure 5展示了MSPT的效率优势。在500k点规模下，MSPT峰�
 3. **与双分支架构的差距**：在CFD表面场预测上，单分支MSPT与专用双分支架构（如AB-UPT）仍有差距，分支扩展仅停留在概念阶段，未提供实现和实验验证。
 4. **复现性隐患**：Transolver++和AB-UPT在统一框架下的复现结果与原报告存在显著偏差（Table 9、Table 10），这一现象在AB-UPT的工作中亦有报告，提示当前PDE求解器领域的公平对比协议尚不成熟，部分性能声明可能受框架、随机种子或超参数差异的显著影响。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2512_01738/figures/005_Table_2.jpg]]
 *Table 2: Performance comparison on standard benchmarks. Relative*
-
-![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2512_01738/figures/008_Figure_5.jpg]]
-*Figure 5: Peak GPU memory usage (top) and wall-clock runtime per forward pass (bottom) as a function of the number of patches, across several input resolutions. Runtime is measured end-to-end and includes preprocessing (ball-tree construction, permutation, and padding). Colors correspond to the input resolution (total number of points), as indicated by the color bar*
-
-![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2512_01738/figures/010_Figure_4.jpg]]
-*Figure 4: Study of pooling method and number of supernode tokens Q per patch. We report the test loss, defined as*
-
-![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2512_01738/figures/009_Table_5.jpg]]
-*Table 5: ShapeNet-Car test loss (see Appendix A) as a function of the number of patches K*
 
 ![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2512_01738/figures/012_Table_6.jpg]]
 *Table 6: Patch-dispersion statistics across PDE benchmarks (mean squared radius within each patch; lower is better). We report the median, 90th percentile (p90), 99th percentile (p99), and maximum over patches for the ball-tree DFS ordering versus a random permutation, using the same number of patches K as in our main experiments*
 
-![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2512_01738/figures/011_Figure_6.jpg]]
-*Figure 6: Histogram of per-patch spatial dispersion*
-
 ![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2512_01738/figures/014_Table_8.jpg]]
 *Table 8: Model efficiency comparison in Elasticity (Relative*
-
-![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2512_01738/figures/013_Table_7.jpg]]
-*Table 7: Training and model configurations of MSPT. Here*
-
-
 
 ## 定位与知识库关联
 
@@ -412,8 +378,6 @@ MSPT 与 Transolver 的关键区别在于**物理划分与压缩方式**：Trans
 5. **时序与多物理场推广**：能否将 MSPT 的并行多尺度注意力推广到时序预测或湍流封闭等更复杂的非定常问题中，并维持线性复杂度？这是从“单帧预测”走向“动态仿真”的关键一步。
 
 6. **公平对比协议**：现有复现实验中 Transolver++ 和 AB-UPT 的性能差异在多大程度上源自训练框架、随机种子或超参数？建立统一的公平对比协议对于评估方法改进的真实贡献至关重要。
-
-
 
 ## 原文 PDF
 

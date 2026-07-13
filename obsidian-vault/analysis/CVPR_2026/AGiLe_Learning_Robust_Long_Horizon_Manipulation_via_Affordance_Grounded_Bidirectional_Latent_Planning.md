@@ -48,8 +48,6 @@ claims:
 
 在 **LIBERO-LONG** 长程操作基准上，AGiLe 取得 **97.1%** 的平均成功率，相较此前最好的方法 **LBP**（Liu et al., ICML 2025）的 88.6% 提升 **8.5 个百分点**，并在 10 个任务中的 7 个上达到 100% 成功率。消融实验进一步验证：移除前向评论家使成功率骤降至 89.0%，移除可供性锚定模块则降至 90.5%，确认了两个组件的关键性。在真实世界 6 阶段长程任务中，基线 LBP 的性能随阶段增加急剧崩溃，而 AGiLe 保持了显著更高的鲁棒性，验证了方法从仿真到现实的迁移能力。
 
-
-
 长程操作（long-horizon manipulation）是机器人学习中最具挑战性的问题之一。与短程技能不同，长程任务要求智能体在数百个时间步内顺序完成多个子任务，例如“打开抽屉→取出物品→放置到指定位置”。这种多阶段特性引入了两个相互交织的核心瓶颈：
 
 **时间鲁棒性缺失**：现有方法通常采用自回归规划，即从当前状态逐步预测未来子目标序列。然而，预测误差会随规划步数累积，导致计划在长程推进中逐渐偏离目标——这一现象被称为“计划崩溃”（plan collapse）。即使单个子目标的预测误差很小，在数十步的链式传播后也会使最终计划失去意义。
@@ -59,8 +57,6 @@ claims:
 以当前先进方法 **LBP**（Latent Backward Planning, Liu et al., ICML 2025）为例，它通过后向潜在规划生成从目标到当前状态的子目标序列，在一定程度上缓解了前向规划的误差累积问题。然而，LBP 仅依赖单一的后向规划器，缺乏对计划可执行性的显式验证，且直接将计划向量与视觉特征拼接后送入策略网络，未能有效解决空间接地问题。在真实世界的6阶段长程任务中，LBP 的性能随阶段增加急剧崩溃——任务3的成功率仅为5%，任务4仅为2%——充分暴露了上述两个瓶颈的严重性。
 
 AGiLe 的核心动机正是针对这两个缺口：**在时间维度上引入双向验证机制，在空间维度上引入可供性锚定机制，从而联合提升长程操作的鲁棒性**。其核心洞察在于将复杂的长程操作解耦为“做什么”（高层双向规划）和“怎么做”（可供性锚定执行）两个子问题，并通过训练时的知识蒸馏将计划的一致性与可达性约束内化到规划器参数中，使推理时无需额外计算开销即可获得时间鲁棒性。
-
-
 
 ## 核心方法与创新机理
 
@@ -108,8 +104,6 @@ $$\mathbf{A}, \mathbf{f}_{\mathrm{temp}} = \mathrm{CrossAttn}(\mathrm{Query}=\ma
 
 这两项创新——双向规划提供的**时间鲁棒性**和可供性锚定提供的**空间鲁棒性**——联合构成了 AGiLe 在 LIBERO-LONG 基准上达到 97.1% 平均成功率（超越 LBP 8.5 个百分点）并在 10 个任务中的 7 个上实现 100% 成功率的因果基础。
 
-
-
 AGiLe 的整体框架围绕一个核心解耦思想构建：将长程操作任务拆分为“做什么”的高层规划与“怎么做”的低层执行，并分别通过**双向潜在规划**和**可供性锚定**两个模块加以解决。Figure 2 展示了完整的端到端流程。
 
 ![[assets/figures/papers/paper_list_l2247_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_AGiLe_Learning_Ro/figures/002_Figure_2.jpg]]
@@ -134,8 +128,6 @@ AGiLe 的整体框架围绕一个核心解耦思想构建：将长程操作任�
 AGiLe 采用两阶段训练策略：第一阶段联合训练双向规划器并冻结参数；第二阶段端到端训练可供性锚定模块和扩散策略解码器。这种解耦设计使得规划器的目标一致性约束与策略的视觉-动作映射可以分别优化，同时保持模块间的信息流动。
 
 > **需人工验证**：当前证据未明确说明两阶段训练中，规划器训练是否依赖专家子目标序列的标注，以及第二阶段训练时规划器是否完全不接收执行反馈。
-
-
 
 AGiLe 框架的核心由两个关键创新组成：**双向潜在规划器（Bidirectional Latent Planner）** 和 **可供性锚定模块（Affordance Grounding Module）**，分别解决长程操作中的时间鲁棒性与空间鲁棒性问题。
 
@@ -190,12 +182,8 @@ $$\mathcal{L}_{\mathrm{action}} = \mathbb{E}_{t,k,a_t,\epsilon,c}\left[ || \epsi
 
 AGiLe 采用两阶段训练策略：**第一阶段**联合训练双向规划器（后向规划器 + 前向评论家），训练完成后冻结规划器参数；**第二阶段**端到端训练可供性锚定模块和扩散策略解码器，规划器仅用于推理生成子目标序列。这种解耦设计使得规划器的可达性知识在冻结后稳定地服务于执行阶段，同时避免了联合微调可能带来的优化冲突。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2247_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_AGiLe_Learning_Ro/figures/001_Figure_1.jpg]]
 *Figure 1: The Difference between AGiLe and Existing Methods. AGiLe achieves both temporal and spatial robustness by employing bidirectional latent planning combined with affordance grounding, thereby enhancing the robustness of long-horizon manipulation tasks*
-
-
 
 ## 实验与关键发现
 
@@ -237,12 +225,8 @@ Table 2 的消融结果直接量化了各组件的独立贡献：
 - **Table 2**：消融实验证实前向评论家（贡献约 8.1 个百分点）和可供性锚定（贡献约 6.6 个百分点）均为性能的关键支撑。
 - **Figure 4**：真实世界 6 阶段任务中，AGiLe 保持高鲁棒性，而 LBP 在后期阶段性能崩溃至接近零，验证了双向规划与可供性接地在长程场景下的不可替代性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2247_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_AGiLe_Learning_Ro/figures/003_Figure_3.jpg]]
 *Figure 3: Left: The real-world setup; Right: Visualizations of the sub-task stages of 4 real-world long-horizon manipulation tasks*
-
-
 
 ## 定位与知识库关联
 
@@ -294,8 +278,6 @@ AGiLe 的设计假设决定了其适用范围：
 - **开放世界扩展**：如何将 AGiLe 扩展到更通用的开放世界环境？这需要解决隐空间编码器对域偏移的鲁棒性、可供性锚定模块对全新物体类别的泛化能力，以及规划器对未见任务结构的适应能力。
 - **更紧耦合的范式**：两阶段解耦训练是否限制了规划与执行之间的信息流动？是否存在一种更紧耦合的范式（如联合训练+知识蒸馏的变体），能在保持训练稳定性的同时提升数据效率？
 - **规划粒度的自适应**：当前子目标数量 K 是固定的超参数。是否可以让模型自适应地决定所需的规划步数，以应对不同复杂度的任务？
-
-
 
 ## 原文 PDF
 

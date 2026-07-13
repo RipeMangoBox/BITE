@@ -170,8 +170,6 @@ TOPOMA 提出了一种**全分布式、拓扑引导的多智能体密集三维�
 
 > 图 2 展示了 TOPOMA 的完整系统概览，涵盖建图（Mapping）与跟踪（Tracking）两大分支的交互流程。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2648_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_TopoMA_Topology/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of TOPOMA. Mapping: RGB observations are tokenized and aggregated to build a topology-aware skeleton, which is unified with geometric cues to recover consistent structure and scale. Tracking: Agents perform local loop detection, update topology constraints, and apply topology-consistent loop closures through frontend/back-end topology transformers, ensuring coherent multi-agent pose estimation.The system runs fully distributed, allowing each agent to maintain local submaps while progressively achieving global topological consistency*
 
@@ -276,8 +274,6 @@ TOPOMA在KITTI里程计、ScanNet和Replica三个数据集上进行评估，覆�
 - **图4**：残差传输模块的GPU/CPU内存占用随输入帧数增长保持高效，验证了轻量通信设计的可扩展性。
 - **表1**：KITTI跟踪精度定量结果，TOPOMA在平均RMSE和Mean ATE上均为最优。
 - **表4/5**：消融实验定量验证了拓扑引导回环闭合和残差传输各自对精度和资源效率的关键贡献。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2648_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_TopoMA_Topology/figures/006_Table_1.jpg]]
 *Table 1: Tracking results on the KITTI odometry dataset [15], evaluated using RMSE and Mean ATE (meters). All methods follow identical sequence-splitting and global Sim(3) alignment. Each sequence is evaluated five times, and all reported values are averaged over these runs. The final “Average” column is computed across all sequences. [TL] indicates tracking lost. All other quantitative tables in this paper follow the same evaluation protocol unless otherwise specified. Best results are highlighted as first , second , and third*

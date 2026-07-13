@@ -151,8 +151,6 @@ $$\mathcal{L}_{\mathrm{rdm}} = \mathbb{E}_{I_0, I_\epsilon, t} \left[ \| res\eps
 
 两个阶段并非分步预训练，而是**端到端联合优化**。第一阶段通过覆盖损失 $\mathcal{L}_{\mathrm{cov}}$ 和紧凑性损失 $\mathcal{L}_{\mathrm{cmp}}$ 的对抗平衡来学习自适应点尺度；第二阶段的反传梯度同时流向扩散模型和泼溅模块，使点云的颜色与噪声属性能够针对最终渲染质量进行优化。消融实验（Table 6, Table 7）证实，这种联合训练策略对收敛稳定性和最终 PSNR 至关重要。
 
-### 补充图表
-
 DiffPBR 由两个紧密耦合的核心模块构成：**自适应 CoNo-Splatting**（Adaptive CoNo-Splatting）和**空间感知残差扩散模块**（Spatial-aware Residual Diffusion）。前者负责将离散点云转化为携带几何一致性线索的彩色图像、噪声图和软掩膜；后者以这些中间表示为条件，通过残差扩散范式仅预测渲染残差，从而高效恢复高频细节并保持多视图一致。
 
 ### 自适应 CoNo-Splatting
@@ -254,8 +252,6 @@ Table 3 展示了 DiffPBR 在不同点云密度下的鲁棒性。随着点数从
 ### 公平性说明
 
 所有对比实验在相同基准数据集上评测，PFGS 带 † 标记的结果为作者复现结果。效率对比统一使用 NVIDIA RTX 3090 GPU 环境。跨数据集泛化实验未进行任何微调，确保了比较的公平性。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_tqOBZbW6j8/figures/017_Table_9.jpg]]
 *Table 9: Ablation studies on different combinations of diffusion configurations. Each configuration is evaluated under different training set sizes on both THuman2.0 and ScanNet datasets*

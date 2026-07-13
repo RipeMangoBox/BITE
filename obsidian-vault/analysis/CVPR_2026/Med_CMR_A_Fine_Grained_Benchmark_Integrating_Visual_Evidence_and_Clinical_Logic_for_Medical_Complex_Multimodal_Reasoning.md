@@ -129,8 +129,6 @@ $$S = \frac{\sum_{i \in \{\mathrm{cons, coh, vis, gt}\}} w_i s_i}{\sum_{i \in \{
 
 整个框架的输入是医学图像及其对应的人工标注，经过流水线处理后输出两类评估信号：MCQ 的准确率（按七种推理类型和六种医学智能类别细分）和开放式问题的四维得分。这些输出信号最终汇聚为对模型能力的细粒度诊断——不仅告诉你哪个模型更强，更揭示了强在哪里、弱在何处，从而为后续的模型改进提供明确的因果抓手。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2744_https_arxiv_org_abs_2512_00818/figures/004_Figure_1.jpg]]
 *Figure 1: Overview of Med-CMR. Med-CMR decomposes medical multimodal reasoning complexity into visual complexity (i.e., smallobject detection, fine-detail discrimination, and spatial understanding) and reasoning complexity (i.e., temporal prediction, causal reasoning, long-tail generalization, and multi-source integration). Each dimension corresponds to a specific task designed to evaluate the model’s capability in that dimension*
 
@@ -198,8 +196,6 @@ $$S = \frac{\sum_{i \in \{\mathrm{cons, coh, vis, gt}\}} w_i s_i}{\sum_{i \in \{
 其中一致性（$w_{\mathrm{cons}}=1$）和连贯性（$w_{\mathrm{coh}}=1$）权重较低，视觉准确性（$w_{\mathrm{vis}}=4$）和事实正确性（$w_{\mathrm{gt}}=4$）权重较高，以突出视觉基础能力的重要性。专家人工评估验证显示，LLM 评分与人类判断的 Spearman 相关系数超过 0.78，表明自动评估具有高度一致性。
 
 数据泄漏分析（表 4、表 5）表明，GPT-5 等模型在 MCQ 转换和开放式子集上的 ROUGE-L 和编辑距离相似度均远低于污染阈值，排除了模型预先接触测试内容的可能性。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2744_https_arxiv_org_abs_2512_00818/figures/006_Table_1.jpg]]
 *Table 1: Comparison of Med-CMR with prior multimodal medical benchmarks. The background colors denote benchmark categories: purple for early Medical VQA datasets focusing on basic understanding, orange for benchmarks that start to touch complex reasoning, and light yellow for our Med-CMR with fine-grained complex medical reasoning evaluation*

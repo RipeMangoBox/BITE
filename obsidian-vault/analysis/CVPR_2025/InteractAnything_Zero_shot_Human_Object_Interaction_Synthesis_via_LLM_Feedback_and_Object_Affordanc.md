@@ -51,8 +51,6 @@ claims:
 
 **局限性**方面，生成质量高度依赖预训练模型的能力，可能受其幻觉与偏见影响；定量评估主要基于图像相似度与GPT-4V投票，缺乏对物理真实性的全面衡量；当前建模限于SMPL-H参数化人体，尚不支持非人代理或不同骨架结构的交互对象。
 
-
-
 三维人体与物体的交互（Human-Object Interaction, HOI）生成是计算机视觉与图形学中的核心难题，其目标是根据语义指令合成自然、物理合理的人体姿态，并实现与任意物体的精细接触。该技术在具身智能、虚拟现实和数字人等领域具有广泛的应用前景。
 
 现有方法大致可分为两类：基于数据驱动的方法依赖大规模3D交互数据集进行训练，但其泛化能力受限于数据集的规模与多样性，难以覆盖开放世界中无穷无尽的物体类别与交互方式；基于文本到3D生成的方法，如 **DreamFusion**（Poole et al., ICLR 2023）和 **Magic3D**（Lin et al., CVPR 2023），利用预训练的2D扩散模型通过分数蒸馏采样（Score Distillation Sampling, SDS）从文本生成3D内容，但其设计初衷是生成单一物体或场景，缺乏对人-物交互关系的显式建模。
@@ -66,8 +64,6 @@ claims:
 上述问题的本质在于：复杂的HOI涉及语义推理、可供性解析和姿态合成三个相互耦合的子任务，而预训练模型本身并不具备理解这种复合关系的能力。因此，**如何将大规模预训练模型中的通用知识蒸馏为零样本交互生成的先验，是突破当前瓶颈的关键**。
 
 InteractAnything正是针对这一核心问题，提出将零样本HOI分解为语义推理、可供性解析和姿态合成三个阶段，通过LLM反馈和物体可供性解析，在不依赖任何3D交互训练数据的前提下，实现对任意物体的精细交互生成。
-
-
 
 ## 核心方法与创新机理
 
@@ -105,8 +101,6 @@ InteractAnything 的核心主张——将复杂 HOI 分解为语义推理、可�
 - 方法性能高度依赖预训练模型（LLM 与 2D 扩散模型）的能力，可能受其幻觉和偏见影响。在 LLM 推理错误或扩散模型修补失真的情况下，错误会沿管线传播。
 - 当前建模限于 SMPL-H 参数化人体，不支持非人代理或具有不同骨架结构的交互对象，这一约束限制了方法在机器人等领域的直接迁移。
 
-
-
 InteractAnything 将零样本 3D 人-物交互合成分解为四个串联模块：**LLM 引导的初始化**、**开集物体可供性解析**、**文本-物体驱动的人体姿态合成**，以及**表现力 HOI 优化**。该框架的输入仅需一段自然语言交互描述和一个任意物体的 3D 网格，输出为与物体发生自然、精细接触的 SMPL-H 参数化人体模型。
 
 ### 核心设计思路
@@ -132,8 +126,6 @@ InteractAnything 将零样本 3D 人-物交互合成分解为四个串联模块�
 
 ![[assets/figures/papers/paper_list_l1728_InteractAnything_Zero_shot_Human_Object_Interaction_Synthesis_via_LLM_Fe/figures/003_Figure_2.jpg]]
 *Figure 2: Framework of InteractAnything. Given a text description and any object mesh as input, our approach begins by querying LLM to infer precise human-object relationships, which are used to initialize object properties. Next, we analyze the contact affordance of the object geometry. The human pose is synthesized using a pre-trained 2D diffusion model, guided by multi-view SDS loss and the designed spatial constraint. Finally, based on the targeted object contact areas and a plausible human pose, we perform expressive HOI optimization to synthesize realistic and contact-accurate 3D human-object interactions*
-
-
 
 ### 3.1 人体与物体表示基础
 
@@ -199,12 +191,8 @@ $$L_{fc} = \sum_{j\in[o]} \left(\sum_{i\in[h]} f_v(i,j) \cdot n(j)\right)^2, \qu
 
 其中 $f_v(i,j)$ 为人体顶点 $i$ 对物体顶点 $j$ 施加的虚拟力，$n(j)$ 为物体表面法向，$\delta$ 控制姿态参数的更新幅度。该损失鼓励接触力相互抵消，形成稳定抓握。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1728_InteractAnything_Zero_shot_Human_Object_Interaction_Synthesis_via_LLM_Fe/figures/006_Figure_5.jpg]]
 *Figure 5: Visualization of the adaptive inpainting and openset object affordance parsing results on the same object with different text instructions. Our method first generates reasonable 2D inpainting results (middle columns) and then computes contact probabilities as the affordance representation (right column)*
-
-
 
 ## 实验与关键发现
 
@@ -249,13 +237,6 @@ Figure 3 的定性对比显示，InteractAnything 生成的交互在人体姿态
 - **多视角一致性不足**：部分结果在不同视角下可能出现肢体断裂或接触错位，这源于逐视图独立优化缺乏显式的 3D 一致性约束。
 - **评估指标的局限性**：CLIP 分数和 GPT-4V 投票均基于 2D 图像，无法完全衡量物理真实性（如力平衡、长期稳定性）和 3D 几何精度。当前力闭合损失仅提供一阶近似，缺乏完整的物理模拟验证。
 - **人体表示的局限**：方法基于 SMPL-H 参数化模型，无法处理非人代理或具有不同骨架结构的交互对象。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1728_InteractAnything_Zero_shot_Human_Object_Interaction_Synthesis_via_LLM_Fe/figures/009_Figure_6.jpg]]
-*Figure 6: Qualitative results of scene populating and scene interaction applications from different views*
-
-
 
 ## 定位与知识库关联
 
@@ -312,8 +293,6 @@ InteractAnything 的能力边界受以下因素制约：
 4. **多代理协同交互**：当前框架仅支持单人-单物交互。如何表示并生成多个交互代理之间的复杂协同关系（如两人搬动物体），是向更丰富场景拓展的必经之路。
 
 5. **评估基准建设**：该领域缺乏标准化的3D HOI评估基准。构建包含物理真实性、接触精度、语义一致性等多维度的评估体系，将有力推动方法的横向对比和迭代。
-
-
 
 ## 原文 PDF
 

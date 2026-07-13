@@ -57,8 +57,6 @@ claims:
 - **幻觉抑制**：3D-POPE基准上，Random/Popular/Adversarial三种设定下均取得最低幻觉率。
 - **消融验证**：NDT-based tokenization在所有任务上一致优于朴素多尺度下采样baseline；三尺度配置在细节保留与推理稳定性之间取得最佳平衡；查询令牌数量在400-850处趋于饱和，表明MSDec在此范围内已捕获足够场景信息。
 
-
-
 ### 3D视觉语言理解的兴起与核心瓶颈
 
 随着大语言模型（LLM）在自然语言处理领域的突破，研究者正积极探索将其与3D场景理解相结合，构建能够同时进行语言推理和空间感知的通用3D视觉语言模型（3D VLM）。这类模型有望统一支持3D视觉问答、稠密描述、指称分割等多种任务，并在具身智能、AR/VR等应用中发挥关键作用。
@@ -83,8 +81,6 @@ claims:
 - **内存高效**：每个NDT单元仅需固定维度的统计量，大幅压缩了原始点云的存储和计算开销。
 
 基于此，本文提出**NDTokenizer3D**，核心动机是**摒弃传统点云下采样范式，采用多尺度NDT网格作为3D场景的"分词"基础，将场景转化为信息丰富、结构紧凑的令牌序列，从而为LLM提供高质量的3D场景理解输入**。这一设计不仅解决了信息损失问题，还通过配套的多尺度NDT解码器（MSDec）实现了跨尺度特征的渐进融合，并进一步将解码器复用为统一接口，支持用户交互提示和分割掩码解码，在单一架构内统一多种3D理解任务。
-
-
 
 ## 核心方法与创新机理
 
@@ -123,8 +119,6 @@ $$\tilde{\mathbf{Q}}_{r} = \mathrm{CrossAttn}(\mathbf{Q}_{r}, \mathbf{K}_{r}, \m
 | **任务统一** | 任务特定模块或额外后处理分支 | MSDec复用为统一接口，同时支持用户提示和分割掩码解码 |
 
 这三个改变的因果传导链为：NDT统计量在压缩中保留了几何信息→MSDec在融合中有效整合了跨尺度特征→统一的MSDec接口消除了任务特异性架构需求，最终在Multi3DRefer上以46.0 mIoU超越3D-LLaVA +3.3点，在ScanQA上以98.6 CiDEr超越次优结果+6.0点，并在3D-POPE幻觉评估中取得所有设定下的最低幻觉率。
-
-
 
 NDTokenizer3D 的整体架构围绕一个核心设计原则展开：**将高分辨率3D点云压缩为LLM可消费的有界长度令牌序列，同时最小化信息损失并捕捉多尺度物体-环境关系**。现有方法依赖粗暴下采样导致细粒度几何细节丢失，且缺乏有效的全局抽象结构建模。NDTokenizer3D 通过引入源自SLAM的**多尺度NDT（Normal Distributions Transform）网格表示**与**跨尺度渐进融合解码器（MSDec）**，从根本上改变了3D场景到语言模型的压缩方式。
 
@@ -179,13 +173,6 @@ NDTokenizer3D相比baseline方法**3D-LLaVA**（Boora and Nießner, CVPR 2025）
 
 > **注意**：Stage 1预训练使用的3D实例分割数据集具体名称在可用上下文中未明确给出，需要手动核实。NDT网格分辨率对不同场景类型的通用性实验仅在室内数据集上进行，室外场景的泛化能力尚待验证。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2175_https_arxiv_org_abs_2511_21191/figures/001_Figure_1.jpg]]
-*Figure 1: We introduce NDTokenizer3D, a generalist 3D VLM that bridges language-level reasoning with spatial understanding. By tokenizing complex 3D scenes into information-rich representations, NDTokenizer3D enables diverse tasks such as 3D Visual Question Answering, Dense captioning, and Referring Segmentation within a unified and interactive framework*
-
-
-
 ### 多尺度NDT场景表示
 
 NDTokenizer3D的核心创新在于摒弃传统点云下采样，转而采用源自SLAM的**正态分布变换（Normal Distributions Transform, NDT）**网格对3D场景进行结构化压缩。给定高分辨率原始点云，在尺度 $r$ 下将空间划分为规则网格，对每个网格单元 $j$ 内包含的 $n$ 个3D点计算高斯统计量：
@@ -238,8 +225,6 @@ $$\mathcal{L}_{s}(\mathbf{F}_{r}^{\mathrm{C}}, \mathbf{F}_{r}) = \frac{1}{N_{r}}
 
 $$\mathcal{L} = \mathcal{L}_{t} + \lambda_{3} \mathcal{L}_{m} + \lambda_{4} \mathcal{L}_{s}(\mathbf{H}^{\hat{a}}, \mathbf{H}^{a})$$
 
-
-
 ## 实验与关键发现
 
 ### 整体实验设置
@@ -264,9 +249,6 @@ NDTokenizer3D 在四项核心任务上与现有通用、专用和适配型3D VLM
 在 **Scan2Cap** 稠密描述任务上，NDTokenizer3D 取得 **79.0 C@0.5**，表明生成的场景令牌保留了足够丰富的语义信息以支持细粒度语言描述。
 
 #### 幻觉评估（Table 2）
-
-![[assets/figures/papers/paper_list_l2175_https_arxiv_org_abs_2511_21191/figures/007_Table_2.jpg]]
-*Table 2: Hallucination performance on 3D-POPE. Our NDTokenizer3D achieves the lowest hallucination rates across all settings*
 
 在 **3D-POPE** 基准的三种设定下，NDTokenizer3D 均取得最低幻觉率：
 - **Random** 设定：精确率 80.34%，准确率 84.12%
@@ -315,8 +297,6 @@ NDTokenizer3D 与 3D-LLaVA 在指称分割、VQA、情景问答和稠密描述�
 2. 多尺度 NDT 表示的计算开销相比直接点云处理的实际加速或内存节省未给出量化数据，效率优势缺乏数值支撑。
 3. `[SEG]` 令牌的生成机制和训练信号细节在可用上下文中不够清晰——LLM 如何在适当位置学习生成该特殊令牌以触发分割解码，需要进一步确认原文的具体训练策略。
 4. Stage 1 预训练使用的3D实例分割数据集具体名称未在可用上下文中明确列出。
-
-
 
 ## 定位与知识库关联
 
@@ -377,8 +357,6 @@ Stage 1预训练使用的3D实例分割数据集具体是什么，论文上下�
 4. **与点云编码器的解耦性**：当前使用Point Transformer v3作为3D编码器，若替换为其他编码器（如SparseConv、MinkowskiEngine），NDT表示的优势是否仍能保持？
 
 5. **多模态对齐损失的必要性**：Stage 1的2D-3D余弦相似度对齐损失（$\mathcal{L}_s$）对最终性能的贡献缺乏独立消融，其与分类/分割损失的相对重要性尚不明确。
-
-
 
 ## 原文 PDF
 

@@ -57,8 +57,6 @@ claims:
 
 **局限与展望**：当前方法依赖人脸解析与关键点检测，无法处理卡通、素描等非真实风格，对多人场景和严重遮挡的鲁棒性不足。扩散推理效率尚未优化，实时应用受限。未来可探索向非真实风格扩展、提升多人场景鲁棒性，以及将显式姿态控制与音频等其他模态结合。
 
-
-
 肖像动画（portrait animation）旨在根据驱动信号（如面部表情、头部姿态）生成与源肖像身份一致的真实感视频，在虚拟主播、远程社交、数字人等应用中需求迫切。该任务的核心挑战在于**同时实现高保真身份保持、准确的表情传递和精准的头部姿态控制**，且三者之间不能相互泄漏干扰。
 
 ### 现有方法的瓶颈
@@ -77,8 +75,6 @@ claims:
 在此基础上，方法通过两阶段流水线实现解耦动画：第一阶段使用基于 GAN 的运动训练器，借助3D变形（3D warping）和自适应实例归一化（AdaIN），在生成对抗训练中显式分离姿态编码器和表情编码器；第二阶段将解耦后的运动表示注入潜扩散模型（Latent Diffusion Model），通过**射线图（ray map）与参考特征变形（reference warping）双分支注入**以及**渐进式混合分类器自由引导（progressive hybrid CFG）**，实现对姿态和表情的独立精准控制，同时保持身份一致性。
 
 这一设计使得 DeX-Portrait 首次在扩散式肖像动画框架中实现了真正意义上的解耦编辑——用户可独立操控头部姿态（旋转、平移、缩放）或面部表情，而另一维度保持与源图像完全一致（如 Figure 1 所示），为后续仅表情编辑、仅姿态编辑等精细应用奠定了基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -115,8 +111,6 @@ DeX-Portrait 的核心创新在于将**头部姿态**与**面部表情**分别�
 
 > **注意**：论文未提供模型参数量、推理速度或计算资源的对比数据，效率维度的创新性需人工补充验证。
 
-
-
 DeX-Portrait 采用**两阶段流水线**，核心思路是将头部姿态与面部表情分别编码为异质表示，再通过扩散模型实现解耦动画生成。整体架构如 Figure 2 所示。
 
 ![[assets/figures/papers/paper_list_l16_https_openaccess_thecvf_com_content_CVPR2026_html_Shi_DeX_Portrait_Disen/figures/002_Figure_2.jpg]]
@@ -139,8 +133,6 @@ DeX-Portrait 采用**两阶段流水线**，核心思路是将头部姿态与面
 3. **渐进混合分类器自由引导（Progressive Hybrid CFG）**：推理时采用分阶段 CFG 调度——前 $S=5$ 步排除表情条件（仅以姿态和身份为条件），随后 5 步线性混合表情条件，剩余步骤使用全部条件。该策略在保持身份一致性的同时，避免因表情信号过早介入而破坏源肖像的面部结构（见 Figure 5、Figure 6）。
 
 最终，在时序模块的加持下，系统可生成连贯的肖像动画视频。整个流水线的输入为单张源肖像、驱动姿态序列与驱动表情序列，输出为姿态与表情可独立控制的动画帧。
-
-
 
 DeX-Portrait 的核心架构由两个阶段级联构成：**解耦运动训练器** 与 **基于扩散的解耦动画器**。其设计目标是将头部姿态与面部表情编码为相互独立的表示，并在扩散生成过程中分别注入，从而实现精准的独立控制。
 
@@ -184,22 +176,6 @@ $$L_{\theta} = \mathbb{E}_{\epsilon \sim \mathcal{N}(0,1), t} \left[ \lVert \eps
 
 其中 $z_t$ 为时间步 $t$ 的噪声潜变量，$\pmb{c}$ 为解耦条件（射线图、变形特征、表情隐式编码），$\hat{\epsilon}_{\theta}$ 为预测噪声。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l16_https_openaccess_thecvf_com_content_CVPR2026_html_Shi_DeX_Portrait_Disen/figures/004_Figure_4.jpg]]
-*Figure 4: Illustration of the ray map of head pose*
-
-![[assets/figures/papers/paper_list_l16_https_openaccess_thecvf_com_content_CVPR2026_html_Shi_DeX_Portrait_Disen/figures/003_Figure_3.jpg]]
-*Figure 3: Illustration of the pose and expression augmentation*
-
-![[assets/figures/papers/paper_list_l16_https_openaccess_thecvf_com_content_CVPR2026_html_Shi_DeX_Portrait_Disen/figures/005_Figure_5.jpg]]
-*Figure 5: Compared with the original CFG, our method achieves better consistency with the source portrait (e.g., facial shapes) in scenarios involving significant pose and expression variations*
-
-![[assets/figures/papers/paper_list_l16_https_openaccess_thecvf_com_content_CVPR2026_html_Shi_DeX_Portrait_Disen/figures/006_Figure_6.jpg]]
-*Figure 6: Our chosen S = 5 delivers animation results with both consistent identity and accurate expression*
-
-
-
 ## 实验与关键发现
 
 ### 实验设定
@@ -239,9 +215,6 @@ DeX-Portrait 采用两阶段训练策略：第一阶段训练基于 GAN 的运�
 ![[assets/figures/papers/paper_list_l16_https_openaccess_thecvf_com_content_CVPR2026_html_Shi_DeX_Portrait_Disen/figures/012_Figure_10.jpg]]
 *Figure 10: Qualitative ablation of the head pose ray map*
 
-![[assets/figures/papers/paper_list_l16_https_openaccess_thecvf_com_content_CVPR2026_html_Shi_DeX_Portrait_Disen/figures/013_Figure_11.jpg]]
-*Figure 11: Qualitative ablation of the augmentations*
-
 ### 失败模式与局限性
 
 **Figure 12** 展示了典型失败案例，揭示了以下局限：
@@ -254,13 +227,6 @@ DeX-Portrait 采用两阶段训练策略：第一阶段训练基于 GAN 的运�
 ### 小结
 
 DeX-Portrait 通过显式 RTS 姿态表示与隐式表情编码的双分支注入设计，在交叉重建和解耦重建任务上全面超越现有方法。消融实验系统验证了射线图、参考变形、增强策略和渐进 CFG 的必要性。当前局限主要集中在非真实风格泛化、多人/遮挡鲁棒性和推理效率方面，为后续工作指明了方向。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l16_https_openaccess_thecvf_com_content_CVPR2026_html_Shi_DeX_Portrait_Disen/figures/011_Table_2.jpg]]
-*Table 2: Quantitative ablation studies*
-
-
 
 ## 定位与知识库关联
 
@@ -325,8 +291,6 @@ DeX-Portrait 的方法论贡献可归纳为三个层面，每一层面对应一�
 ---
 
 **本节小结**：DeX-Portrait 在扩散肖像动画的方法谱系中占据了“显式-隐式混合解耦”这一独特位置。它继承了显式姿态控制的直观性和隐式表情编码的表现力，同时通过双分支注入、增强训练和渐进CFG等机制解决了二者的耦合问题。其核心洞察——用低维显式变换避免表情泄漏，用高维隐式编码保证表现力——为后续工作提供了清晰的设计范式。当前的主要局限集中在非真实风格、多人场景和推理效率上，这些也是该方向最自然的延伸路径。
-
-
 
 ## 原文 PDF
 

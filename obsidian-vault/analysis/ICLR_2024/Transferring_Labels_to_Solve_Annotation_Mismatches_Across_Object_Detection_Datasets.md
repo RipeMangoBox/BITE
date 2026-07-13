@@ -56,8 +56,6 @@ claims:
 
 方法定位：LGPL 属于数据驱动的标签迁移范式，与基于统计归一化、伪标签、通用分割模型（如 SAM）以及图像域适应等现有方案相比，LGPL 通过联合优化框生成器和标签迁移模型，更全面地捕捉了标注协议的差异。
 
-
-
 ### 标注失配：目标检测中的隐性瓶颈
 
 现代目标检测器的性能高度依赖大规模标注数据。然而，不同数据集的标注协议——包括类语义定义、标注指令、人机偏差和跨模态标签——往往存在显著差异，导致所谓的**标注失配**（annotation mismatch）。例如，对于“骑行者”这一类别，MVD、nuImages 和 Waymo 三个数据集的定义互不一致：有的将摩托车与骑手分开标注，有的则合并为一个框；有的标注人行道上的自行车，有的则忽略。当研究者试图混合多个数据集以扩充训练样本时，这些不一致的标签会直接损害下游检测器的性能。
@@ -89,8 +87,6 @@ claims:
 - **以数据为中心**：标签迁移作为预处理步骤，与下游检测器的学习算法和模型架构解耦，具有广泛的适用性。
 
 这一思路将标注失配从一个隐性的数据问题转化为一个可显式优化的学习问题，为跨数据集的目标检测训练提供了新的范式。
-
-
 
 ## 核心方法与创新机理
 
@@ -140,8 +136,6 @@ $$ \begin{array} { r l } { f _ { \mathrm { i m g } } ^ { * } , f _ { \mathrm { g
 
 LGPL 是唯一在四个标注失配场景（Table 1）、多源标签迁移（Table 2）、三种检测器架构（YOLOv3、Deformable DETR、Faster‑RCNN）上均一致超越“No transfer”的方法，平均提升 1.88 mAP 和 2.65 AP75（Abstract）。三个随机种子下的标准差不超过 0.33，表明提升稳健（Table 10）。
 
-
-
 LGPL 的整体设计围绕一个核心思路展开：**将标签迁移建模为一个数据驱动的转换过程，在不依赖配对监督的情况下，把源数据集的标注协议映射到目标数据集的标注协议**。为此，LGPL 复用了标准两阶段检测器的架构组件，将其重新组织为三个协同工作的模块。
 
 ### 模块组成与职责
@@ -181,8 +175,6 @@ $$
 - **停止梯度**：在目标数据集上对框生成器的输出施加停止梯度，确保框生成器始终维持源风格的候选区域生成能力，避免目标数据的标注偏差“污染”框生成器。
 - **随机类别输入**：在训练标签迁移模型时，为每个候选框随机分配类别标签，迫使模型学习从任意类别输入中提取有效的迁移映射，而非简单记忆类别对应关系。
 - **有效性分数与类别级阈值**：标签迁移模型不仅输出精修框，还输出有效性分数，用于判断源标签在目标协议下是否应当保留。类别级阈值的设计考虑了不同类别在标注协议上的差异程度可能不同。
-
-
 
 ### 标签迁移模型的形式定义
 
@@ -237,8 +229,6 @@ $$\mathcal{D}_{\mathrm{transferred\text{-}src}} := \{ (x, \hat{b}, c) \mid \hat{
 
 其中 $\sigma_c$ 是类别相关的有效性阈值，通过分箱策略（Sturges, 1926）在验证集上选择。低于阈值的边界框被视为不符合目标协议而被丢弃，从而实现了**自动的标注清洗与对齐**。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -287,37 +277,17 @@ $$\mathcal{D}_{\mathrm{transferred\text{-}src}} := \{ (x, \hat{b}, c) \mid \hat{
 - SAM‑transfer上限约38 mAP，LGPL达42.6 mAP
 - Transfer‑mAP与下游mAP的Spearman相关系数：0.6（p>0.1）
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l28_https_openreview_net_pdf_id_ChHx5ORqF0/figures/013_Table_8.jpg]]
 *Table 8: Statistics of gold transferred labels*
 
 ![[assets/figures/papers/paper_list_l28_https_openreview_net_pdf_id_ChHx5ORqF0/figures/005_Table_2.jpg]]
 *Table 2: Multi-source label transfer. When multiple source datasets are presented, LGPL outperforms all baselines on all architectures as well*
 
-![[assets/figures/papers/paper_list_l28_https_openreview_net_pdf_id_ChHx5ORqF0/figures/007_Table.jpg]]
-
 ![[assets/figures/papers/paper_list_l28_https_openreview_net_pdf_id_ChHx5ORqF0/figures/009_Table_4.jpg]]
 *Table 4: Transfer-mAP and downstream-mAP. We find that these two metrics do no strongly correlate with Spearman correlation coefficient R _ { S } ~ = ~ 0 . 6 (p-value > 0 . 1 ) . The ultimate goal of a label transfer model is to enhance the performance of object detectors; thus, we recommend that future work prioritizes downstream performance*
 
 ![[assets/figures/papers/paper_list_l28_https_openreview_net_pdf_id_ChHx5ORqF0/figures/011_Table_6.jpg]]
 *Table 6: Datasets statistics*
-
-![[assets/figures/papers/paper_list_l28_https_openreview_net_pdf_id_ChHx5ORqF0/figures/012_Table_7.jpg]]
-*Table 7: Annotation mismatches of each pair of object detection datasets. Almost every pair of datasets has annotation biases,and among all types of annotation biases and CS is the most common one. Notice that we do not aim to exhaustively find out all the annotation mismatches. Instead, we describe the most obvious ones in this table. CS: Class semantics; AI: Annotation instructions; HMM: Human-machine misalignment; CM: Cross-modality labels*
-
-![[assets/figures/papers/paper_list_l28_https_openreview_net_pdf_id_ChHx5ORqF0/figures/014_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l28_https_openreview_net_pdf_id_ChHx5ORqF0/figures/015_Table_11.jpg]]
-*Table 11: Downstream-AP75 of detectors trained with tranferred labels. We highlight the differences over ‘No transfer’ in smaller font and color the performance deterioration in red*
-
-![[assets/figures/papers/paper_list_l28_https_openreview_net_pdf_id_ChHx5ORqF0/figures/016_Table.jpg]]
-*Table: l2: The range of the hyper-parameters sweep for different downstream detectors*
-
-![[assets/figures/papers/paper_list_l28_https_openreview_net_pdf_id_ChHx5ORqF0/figures/001_Figure_1.jpg]]
-*Figure 1: Left: Varying annotation protocols across datasets can result in annotation mismatches, leading to inconsistent labels. For example, MVD Neuhold et al. (2O17), nuImages Caesar et al. (2020),and Waymo Sun et al. (2020) disagree with what a cyclist represents. Yellow dashed bounding boxes are not annotated. Right: Label transfer is a data-centric approach that transfers the labels from one dataset to match another dataset's annotation protocol, which can be considered as a pre-processing step in the existing training workflow*
-
-
 
 ## 定位与知识库关联
 
@@ -384,8 +354,6 @@ LGPL假设源数据集的标注类别集合与目标数据集相同，且源数�
 4. **跨任务泛化**：标签迁移模型在实例分割、3D目标检测等任务上的适用性和迁移效果如何？
 
 5. **更好的代理评估指标**：Transfer-mAP与下游mAP之间的Spearman相关系数仅为0.6（p>0.1），相关性不显著（Table 4）。是否存在更好的代理指标来直接评估标签迁移质量，避免每次评估都需要训练完整下游检测器？
-
-
 
 ## 原文 PDF
 

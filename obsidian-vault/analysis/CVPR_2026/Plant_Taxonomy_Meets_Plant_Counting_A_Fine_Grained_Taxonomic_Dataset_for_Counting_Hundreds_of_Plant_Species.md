@@ -252,8 +252,6 @@ Figure 12提供了多种方法在TPC-268上的定性计数结果。在低密度�
 ![[assets/figures/papers/paper_list_l2100_https_arxiv_org_abs_2603_21229/figures/014_Figure_10.jpg]]
 *Figure 10: Examples of real-world scenarios in our TPC–268. Natural backgrounds, occluding structures, and cluttered surroundings reflect practical field conditions*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2100_https_arxiv_org_abs_2603_21229/figures/007_Table_2.jpg]]
 *Table 2: Comparison with the state-of-the-art CAC approaches on the TPC–268 dataset. Best performance is in boldface*
 

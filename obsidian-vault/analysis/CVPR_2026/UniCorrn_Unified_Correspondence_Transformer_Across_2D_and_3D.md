@@ -63,8 +63,6 @@ UniCorrn 提出了一个**跨2D与3D的统一对应关系Transformer**，核心�
 
 UniCorrn 处于**检测无关的密集匹配**与**关键点可查询匹配**的交叉地带。与 LoFTR（2D-2D 密集匹配）、MASt3R（2D-2D/3D 重建基础模型）、2D3D-MATR（2D-3D 匹配）、PEAL-3D（3D-3D 点云配准）等任务特定方法不同，UniCorrn 通过**共享的融合编码器与双流匹配解码器**统一处理三种模态，所有任务使用相同权重。其双流注意力设计区别于 RoMa 等将外观与位置特征耦合的Transformer解码器，实现了位置嵌入的独立残差更新与直接坐标回归。
 
-
-
 ### 问题背景：几何对应关系的基础地位
 
 几何对应关系是计算机视觉中连接不同观测的基石。无论是从两张图像中识别同一场景点（2D-2D），还是将图像像素与三维点云对齐（2D-3D），抑或在两个点云之间建立匹配（3D-3D），精确的对应关系估计都直接决定了相机位姿估计、三维重建、视觉定位等下游任务的成败。
@@ -98,8 +96,6 @@ UniCorrn 处于**检测无关的密集匹配**与**关键点可查询匹配**的
 - 统一的架构可以自然地处理不同模态的输入，仅需替换模态特定的骨干网络和预测头。
 
 通过这一统一框架，UniCorrn旨在突破任务特定范式的局限，实现跨模态的端到端学习与迭代优化，从而在多个基准上取得一致的性能提升。
-
-
 
 ## 核心方法与创新机理
 
@@ -138,8 +134,6 @@ UniCorrn 是首个在 2D-2D、2D-3D 和 3D-3D 三种几何匹配任务上**共�
 
 这些创新使 UniCorrn 在 7Scenes（2D-3D）上注册召回率达 91.0%，超越先前最优方法 **Diff-Reg** 的 83.8%（+7.2%）；在 3DLoMatch（3D-3D）上达 86.7%，超越 **PEAL-3D** 的 79.0%（+7.7%）（Table 5, Table 6）。
 
-
-
 UniCorrn 是一个基于 Transformer 的统一对应关系模型，其核心设计目标是以**共享权重**的单一架构同时处理 2D-2D、2D-3D 和 3D-3D 三种几何匹配任务。如图 2 所示，整个 pipeline 由四个主要模块串联构成：**模态特定骨干网络**、**特征融合编码器**、**匹配解码器**以及**模态特定预测头**。
 
 ### 输入输出流
@@ -160,12 +154,8 @@ UniCorrn 是一个基于 Transformer 的统一对应关系模型，其核心设�
 
 现有方法普遍采用任务特定的匹配范式——成本体积（cost volume）适用于规则网格的 2D-2D 匹配，最近邻搜索在 3D 描述子匹配中占主导，直接回归则常见于 2D-3D 任务。这些范式难以同时满足**端到端学习**、**不规则 3D 数据处理**与**跨模态迭代优化**三个需求。UniCorrn 的双流注意力机制本质上将 Transformer 的注意力矩阵解释为匹配代价，通过分离外观与位置特征，使得注意力矩阵可以在各层之间传播有意义的定位信息，从而统一了上述三种任务范式。消融实验（Table 1）证实，双流解码器在小规模 2D-2D、2D-3D 和 3D-3D 任务上均优于成本体积、最近邻搜索和直接回归等替代设计。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2614_https_arxiv_org_abs_2605_04044/figures/002_Figure_2.jpg]]
 *Figure 2: Illustration of the overall architecture design. Our model consists of four main modules: (1) modality-specific backbone, (2) feature fusion encoder, (3) matching decoder, and (4) modality-specific prediction heads. Details of each module can be found in Sec. 3.1*
-
-
 
 ### 整体架构概览
 
@@ -178,9 +168,6 @@ UniCorrn 由四个核心模块级联构成（Figure 2）：**模态特定骨干�
 ### 双流注意力匹配解码器
 
 匹配解码器的核心创新在于将外观特征与位置嵌入解耦为两个独立的残差更新流，但共享同一个注意力矩阵（匹配代价）。具体流程如 Figure 3 所示。
-
-![[assets/figures/papers/paper_list_l2614_https_arxiv_org_abs_2605_04044/figures/003_Figure_3.jpg]]
-*Figure 3: Dual-stream attention with a single attention matrix (matching cost). The appearance and position features are concatenated along the channel dimension to process them in parallel. After applying attention, the output is split to update the corresponding appearance*
 
 **位置增强特征**：给定关键点描述子 $\mathbf{F}_k$ 和目标特征 $\mathbf{F}_t$，首先通过旋转位置编码（RoPE）注入坐标信息：
 
@@ -252,8 +239,6 @@ $$
 
 模型在所有任务上共享融合编码器与匹配解码器的权重，仅模态特定骨干和预测头保持独立。联合训练中归一化层存在跨模态梯度冲突，导致第二阶段 2D-2D 性能略低于第一阶段（此为已知限制，需手动验证具体数值）。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与因果机制
@@ -283,12 +268,6 @@ Table 2 在 MegaDepth-1500 上逐步消融了匹配解码器的设计选择。�
 
 Figure 4 展示了匹配解码器层数和特征上采样比对 AUC 的影响。堆叠多个双流解码器层可持续提升 AUC，验证了迭代细化的有效性。同时，辅助监督损失使多层解码器训练受益，Table 9 和 Figure 8 表明辅助损失使注意力图在各层之间传播有意义的定位信息——无辅助监督时，深层注意力图趋于退化，而有辅助监督时各层均保持清晰的定位热力图。
 
-![[assets/figures/papers/paper_list_l2614_https_arxiv_org_abs_2605_04044/figures/004_Figure_4.jpg]]
-*Figure 4: Top: AUC vs. number of matching decoder layers. Bottom: AUC vs. feature upsampling ratio. The results are obtained on the MegaDepth-1500 dataset*
-
-![[assets/figures/papers/paper_list_l2614_https_arxiv_org_abs_2605_04044/figures/016_Table_9.jpg]]
-*Table 9: Effectiveness of auxiliary loss*
-
 ![[assets/figures/papers/paper_list_l2614_https_arxiv_org_abs_2605_04044/figures/018_Figure_8.jpg]]
 *Figure 8: Per-layer attention heatmap comparison for the effectiveness of auxiliary supervision. Green markers indicates the model’s predicted coordinates. Zoom in for more details*
 
@@ -303,9 +282,6 @@ Table 8 验证了伪点云数据对 2D-3D 和 3D-3D 任务的关键作用。由�
 
 Table 7 对比了单任务训练与联合训练的性能。联合训练在 2D-3D 和 3D-3D 任务上保持或提升了性能，但 2D-2D 性能在第二阶段略有下降。分析指出，这源于 2D 图像与 3D 点云之间归一化层的统计分布差异大，导致较大的跨模态梯度冲突。
 
-![[assets/figures/papers/paper_list_l2614_https_arxiv_org_abs_2605_04044/figures/013_Table_7.jpg]]
-*Table 7: Single task vs. joint training performances*
-
 ### 主要基准结果
 
 #### 2D-2D 匹配
@@ -319,15 +295,9 @@ Table 3 展示了 MegaDepth-1500 和 ScanNet-1500 上的 2D-2D 匹配对比。Un
 
 Table 5 展示了 7Scenes 和 RGB-D Scenes V2 上的 2D-3D 匹配对比。UniCorrn 第二阶段在 7Scenes 上注册召回率达到 91.0，超越先前最优方法 Diff-Reg（83.8）达 7.2 个百分点；在 RGB-D Scenes V2 上达到 92.5，超越 Diff-Reg（87.4）达 5.1 个百分点。Figure 6（上）提供了 7Scenes 上的定性可视化。
 
-![[assets/figures/papers/paper_list_l2614_https_arxiv_org_abs_2605_04044/figures/007_Table_5.jpg]]
-*Table 5: Image-to-Point (2D-3D) matching comparison on 7Scenes and RGB-D Scenes V2. We report Inlier Ratio (IR), Feature Matching Ratio (FMR) and the Registration Recall (RR). Bold and underline highlights best and second best results*
-
 #### 3D-3D 匹配
 
 Table 6 展示了 3DMatch、3DLoMatch 和 ModelNet 上的 3D-3D 匹配对比。UniCorrn 第一阶段在低重叠率的 3DLoMatch 上注册召回率达到 86.7，超越 PEAL-3D（79.0）达 7.7 个百分点；在 3DMatch 上达到 96.1，与最优方法相当。Figure 6（下）展示了 3DLoMatch 上的匹配与配准可视化，经 RANSAC 估计的变换可实现精确点云对齐。
-
-![[assets/figures/papers/paper_list_l2614_https_arxiv_org_abs_2605_04044/figures/011_Table_6.jpg]]
-*Table 6: Point-to-Point (3D-3D) matching comparison on 3DMatch, 3DLoMatch, and ModelNet. We report Inlier Ratio (IR), Feature Matching Ratio (FMR), Registration Recall (RR), Relative Rotation Error (RRE), Relative Translation Error (RTE) and Chamfer Distance (CD). Bold and underline highlights best and second best results*
 
 ### 失败模式与局限性
 
@@ -335,8 +305,6 @@ Table 6 展示了 3DMatch、3DLoMatch 和 ModelNet 上的 3D-3D 匹配对比。U
 - **数据依赖性**：真实 3D 对应标注稀缺，模型严重依赖伪点云数据，可能限制在真实场景中的性能上限。
 - **遮挡与动态场景**：Figure 13 的 InLoc 失败案例表明，严重遮挡区域（如仅一侧可见的柱面）会产生无效匹配；对 Sintel 光流等动态场景的零样本泛化能力有限。
 - **推理效率**：2D-2D 推理慢于 RoMa 等专用模型，且需要外部检测器（如 RoMa）提供关键点查询；但在 2D-3D 和 3D-3D 上推理时间显著优于扩散类方法（如 Diff-Reg）。
-
-
 
 ## 定位与知识库关联
 
@@ -378,8 +346,6 @@ UniCorrn的匹配解码器在方法谱系中占据独特位置——它既非传
 **数据混合策略优化**：Table 7显示不同任务的联合训练存在性能权衡——2D-3D和3D-3D受益于联合训练，但2D-2D略有下降。如何设计动态数据采样策略（如基于梯度冲突程度的自适应任务权重）以平衡各任务的学习，是提升统一模型整体性能的重要方向。
 
 **与下游应用的端到端集成**：UniCorrn当前作为独立匹配模块使用，但其输出的对应关系与置信度可直接馈入SLAM、多视图重建等下游系统。能否将整个流水线端到端训练，使对应关系估计直接为下游任务优化，是发挥统一对应关系优势的潜在突破口。
-
-
 
 ## 原文 PDF
 

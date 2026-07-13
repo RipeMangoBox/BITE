@@ -65,8 +65,6 @@ claims:
 
 UniKPT 处于 **3D 单目标跟踪** 与 **类别统一跟踪** 的交叉点。与类别特定方法（如 **P2P** (Nie et al., IJCV 2025)、**MBPTrack** (Xu et al., ICCV 2023)）不同，UniKPT 不依赖类别先验；与现有类别统一方法（如 **TrackAny3D** (Wang et al., ICCV 2025)、**MoCUT** (Nie et al., ICLR 2024)）相比，其核心创新在于以**稀疏关键点对应**替代密集点交互，并通过**结构感知定位**显式建模目标内部几何关系，从而在统一跟踪场景下实现更优的泛化性能与计算效率。
 
-
-
 三维单目标跟踪（3D Single Object Tracking, 3D SOT）旨在给定初始目标边界框的条件下，在后续点云帧中持续定位该目标。这一任务在自动驾驶、机器人导航等场景中具有核心应用价值。现有方法长期遵循类别特定（category-specific）范式，即为每一类目标（如汽车、行人）独立训练一个跟踪器。这类方法通常依赖密集的点对点交互（dense point-to-point interaction）来建立模板帧与搜索帧之间的几何对应，并借助类别先验知识来辅助定位。
 
 然而，这种范式面临一个根本性瓶颈：当目标类别之间的尺度和结构差异显著时，密集点对应机制难以建立可靠的跨帧几何对应。例如，一辆大型卡车的点云分布与一个行人的点云分布截然不同，基于逐点特征匹配的策略在不同类别间缺乏泛化能力。这导致类别特定跟踪器在统一跟踪场景下性能严重受限，无法用一个模型同时处理多种类别的目标。
@@ -74,8 +72,6 @@ UniKPT 处于 **3D 单目标跟踪** 与 **类别统一跟踪** 的交叉点。�
 针对这一缺口，**UniKPT**（Unified Structural KeyPoint Tracker）提出了一个核心思路：将密集点对应替换为稀疏关键点对应（sparse keypoint-to-keypoint matching），并引入结构感知的定位机制。其关键洞察在于：在无需类别先验的条件下，通过自适应关键点提取捕捉尺度感知的结构表示，利用渐进式对齐策略建立鲁棒的几何对应，并通过置信度加权的结构推理实现精确的位姿估计，从而大幅提升类别统一跟踪性能。
 
 与现有类别统一跟踪器（如 **TrackAny3D**（Wang et al., ICCV 2025）和 **MoCUT**（Nie et al., ICLR 2024））相比，UniKPT 不依赖于全局特征池化或密集点匹配，而是通过稀疏结构关键点显式建模目标的几何骨架，使模型能够跨类别泛化。在 nuScenes 数据集上，UniKPT 的统一模型以 64.21% Success / 77.29% Precision 超越了类别特定的 SOTA 跟踪器，提升幅度分别达 4.37% 和 5.16%，验证了该范式的有效性。
-
-
 
 ## 核心方法与创新机理
 
@@ -121,8 +117,6 @@ UniKPT 将密集点对应替换为**稀疏关键点对应与渐进式对齐**（
 
 UniKPT 的三个 changed slots 构成了一个完整的创新链条：**AKE** 提供尺度感知的结构关键点 → **PCA** 建立鲁棒的渐进式几何对应 → **CASL** 通过置信度加权的结构推理实现精确位姿估计。这一设计使得统一模型在 nuScenes 上以 64.21%/77.29% 的 Success/Precision 超越类别特定 SOTA 模型达 4.37%/5.16%，验证了无类别先验条件下结构感知关键点对应范式的有效性。
 
-
-
 UniKPT 的整体跟踪流程遵循“特征提取 → 关键点提取 → 跨帧对应 → 结构定位”的四阶段范式，其核心设计在于将传统密集点对应替换为稀疏关键点对应，从而在无类别先验的条件下实现统一的 3D 单目标跟踪。
 
 **输入与任务定义**。给定模板点云 $P_T$、搜索区域点云 $P_S$ 以及前一帧的边界框 $B_{t-1}$，跟踪网络 $\mathcal{F}_{track}$ 预测当前帧的目标边界框 $B_t$：
@@ -147,12 +141,8 @@ $$\mathcal{L} = \lambda_1 \mathcal{L}_{coord} + \lambda_2 \mathcal{L}_{loc}$$
 
 **与基线范式的本质差异**。传统类别特定跟踪器（如 **P2P** (Nie et al., IJCV 2025)、**MBPTrack** (Xu et al., ICCV 2023)）依赖密集点对点交互，在跨类别场景下难以建立可靠的几何对应。现有类别统一跟踪器（如 **TrackAny3D** (Wang et al., ICCV 2025)、**MoCUT** (Nie et al., ICLR 2024)）虽尝试统一建模，但仍未充分挖掘结构先验。UniKPT 通过“稀疏关键点对应 + 置信度感知结构推理”的组合，在无需类别先验的前提下实现了更鲁棒的跨帧匹配与定位，在 nuScenes 上以 64.21%/77.29% 的 Success/Precision 显著超越 TrackAny3D（54.57%/66.25%）达 9.64%/11.04%，甚至超越类别特定 SOTA 模型 4.37%/5.16%。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2500_https_openaccess_thecvf_com_content_CVPR2026_html_Xiao_Generalizable_Str/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed UniKPT framework. (a) Adaptive Keypoint Extractor (AKE) adaptively selects representative keypoints from the template. (b) Progressive Correspondence Aligner (PCA) establishes and refines template–search correspondences. (c) Confidence-Aware Structural Localization (CASL) performs confidence-weighted structural reasoning for robust target localization. (d) Detailed structure of each refinement stage within PCA*
-
-
 
 ### 3.1 任务定义与整体框架
 
@@ -226,8 +216,6 @@ $$\mathcal{L} = \lambda_{1} \mathcal{L}_{coord} + \lambda_{2} \mathcal{L}_{loc}$
 
 其中 $\mathcal{L}_{coord}$ 提供显式的关键点定位监督，引导模型学习稳定的几何对应；$\mathcal{L}_{loc}$ 为标准的边界框回归损失（如 L1 损失），确保最终的目标定位精度。两者的协同优化使得 UniKPT 在无需类别先验的条件下，既能建立鲁棒的跨帧几何对应，又能实现精确的位姿估计。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2500_https_openaccess_thecvf_com_content_CVPR2026_html_Xiao_Generalizable_Str/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of 3D single object tracking paradigms. (a) Category-specific trackers rely on dense point-to-point interactions, limiting generalization across categories. (b) Our UniKPT instead performs sparse keypoint-to-keypoint matching and structure-aware localization, enabling accurate and unified tracking without category-specific priors*
 
@@ -236,8 +224,6 @@ $$\mathcal{L} = \lambda_{1} \mathcal{L}_{coord} + \lambda_{2} \mathcal{L}_{loc}$
 
 ![[assets/figures/papers/paper_list_l2500_https_openaccess_thecvf_com_content_CVPR2026_html_Xiao_Generalizable_Str/figures/011_Figure_3.jpg]]
 *Figure 3: Visualization of predicted keypoints and their confidence scores on Car and Bus examples. The keypoints are shown in red*
-
-
 
 ## 实验与关键发现
 
@@ -289,30 +275,11 @@ Figure 4 展示了渐进式对齐过程中关键点位置的变化。第一阶�
 
 尽管 UniKPT 在类别统一跟踪上取得了显著突破，但仍存在一些潜在局限。论文未详细讨论在极端稀疏点云（如远距离小目标）或完全未知物体类别上的泛化表现，这可能是方法的薄弱环节。此外，关键点提取依赖于目标边界框先验进行网格初始化，在初始帧无边界框先验的场景下，如何自适应初始化关键点网格仍是一个开放问题。置信度估计的跨数据集泛化能力也需进一步验证，可能需要额外的域适应策略来保证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2500_https_openaccess_thecvf_com_content_CVPR2026_html_Xiao_Generalizable_Str/figures/003_Table_1.jpg]]
 *Table 1: Comparisons with the state-of-the-art methods on NuScenes dataset. Success/Precision are used for evaluation. Numbers in brackets under each category denote the number of frames in the test set*
 
-![[assets/figures/papers/paper_list_l2500_https_openaccess_thecvf_com_content_CVPR2026_html_Xiao_Generalizable_Str/figures/004_Table_2.jpg]]
-*Table 2: Comparisons with the state-of-the-art methods on KITTI dataset. Success/Precision are used for evaluation*
-
 ![[assets/figures/papers/paper_list_l2500_https_openaccess_thecvf_com_content_CVPR2026_html_Xiao_Generalizable_Str/figures/005_Table_3.jpg]]
 *Table 3: Ablation study of key components on the NuScenes dataset. Mean success and precision are reported*
-
-![[assets/figures/papers/paper_list_l2500_https_openaccess_thecvf_com_content_CVPR2026_html_Xiao_Generalizable_Str/figures/006_Table_4.jpg]]
-*Table 4: Ablation study on the number of refinement stages*
-
-![[assets/figures/papers/paper_list_l2500_https_openaccess_thecvf_com_content_CVPR2026_html_Xiao_Generalizable_Str/figures/007_Table_5.jpg]]
-*Table 5: Ablation study on the number of keypoints*
-
-![[assets/figures/papers/paper_list_l2500_https_openaccess_thecvf_com_content_CVPR2026_html_Xiao_Generalizable_Str/figures/009_Table_6.jpg]]
-*Table 6: Comparison between point-point and our keypointkeypoint*
-
-![[assets/figures/papers/paper_list_l2500_https_openaccess_thecvf_com_content_CVPR2026_html_Xiao_Generalizable_Str/figures/010_Table_7.jpg]]
-*Table 7: Results with category-specific training*
-
-
 
 ## 定位与知识库关联
 
@@ -360,8 +327,6 @@ UniKPT 的根本创新在于将“密集点对应”替换为“稀疏关键点�
 4. **关键点数量的自适应选择**：消融实验表明 3×3×3 的关键点配置最优，但这一选择是否应随目标尺寸和复杂度自适应调整？对于细长目标（如行人）和方正目标（如汽车），最优关键点分布可能不同。
 
 5. **时序信息的利用**：当前方法仅在相邻帧间建立对应，未显式建模长时序依赖。引入时序记忆机制可能进一步提升在遮挡和暂时丢失场景下的鲁棒性。
-
-
 
 ## 原文 PDF
 

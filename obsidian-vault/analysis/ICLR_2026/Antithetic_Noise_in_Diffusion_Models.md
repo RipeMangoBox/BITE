@@ -45,8 +45,6 @@ claims:
 
 本文发现并系统验证了一个简单而普适的现象：在扩散模型中，将每个初始高斯噪声向量 z 与其相反数 -z 配对（对偶采样），生成的图像对之间存在强负相关。这一现象在 U-Net、DiT、一致性模型、VAE、Glow 等多种架构以及 CIFAR-10、CelebA-HQ、LSUN-Church、ImageNet 等多个数据集上均被观测到。基于此，作者提出了对偶蒙特卡洛（Antithetic Monte Carlo, AMC）估计器，用于扩散模型的不确定性量化，在像素级统计量上实现了相对于普通蒙特卡洛最高 136 倍的效率提升，置信区间最多缩窄 90%。此外，对偶噪声设计还能在不增加计算开销的前提下提升图像编辑质量和生成多样性。
 
-
-
 扩散模型中的初始高斯噪声是采样过程的唯一随机性来源。然而，现有工作多针对特定任务优化初始噪声，缺乏对其普遍性质的理论认识。本文的核心动机是系统理解初始噪声的特性，并利用其内在结构实现方差缩减。
 
 扩散模型的反向采样过程可通过概率流常微分方程（PF-ODE）描述：
@@ -61,8 +59,6 @@ claims:
 \mathbf { y } _ { t - 1 } = \sqrt { \alpha _ { t - 1 } } \left( \frac { \mathbf { y } _ { t } - \sqrt { 1 - \alpha _ { t } } \epsilon _ { \theta } ^ { ( t ) } ( \mathbf { y } _ { t } ) } { \sqrt { \alpha _ { t } } } \right) + \sqrt { 1 - \alpha _ { t - 1 } } \epsilon _ { \theta } ^ { ( t ) } ( \mathbf { y } _ { t } )
 \]
 
-
-
 ## 核心方法与创新机理
 
 本文的核心创新在于：
@@ -72,8 +68,6 @@ claims:
 2. **提出对偶蒙特卡洛（AMC）估计器**：利用对偶噪声对的强负相关作为控制变量实现方差缩减，且不增加计算开销。
 
 3. **推广到K-对偶和随机化拟蒙特卡洛（RQMC）**：将对偶思想推广到更一般的负相关噪声设计，进一步提升了方差缩减效果。
-
-
 
 ![[assets/figures/papers/iclr26_generative_models_diffusion__generative_models_and_autoencoders__b001_9yFORC1tu3_Antithet/figures/001_Figure_1.jpg]]
 *Figure 1: Use antithetic noise −z and z (with condition c) to generate visually “opposite” images.*
@@ -87,8 +81,6 @@ claims:
 3. **统计量计算**：对每对样本计算目标统计量 S(DM(z_i)) 和 S(DM(-z_i))。
 
 4. **对偶平均与估计**：计算每对对偶样本的平均值，再对所有K个平均值取平均得到AMC估计。
-
-
 
 ### 5.1 对偶蒙特卡洛估计器
 
@@ -163,8 +155,6 @@ AS(f) = 1 - \frac{\int_{-1}^{1} (0.5 f(-x) + 0.5 f(x) - \bar{f})^2 dx}{\int_{-1}
 \]
 
 该得分衡量一维函数仿射反对称程度，1表示完美仿射反对称，0表示仿射对称。
-
-
 
 ## 实验与关键发现
 
@@ -242,12 +232,8 @@ AS(f) = 1 - \frac{\int_{-1}^{1} (0.5 f(-x) + 0.5 f(x) - \bar{f})^2 dx}{\int_{-1}
 
 所有实验均使用公开预训练模型，未涉及模型训练或数据偏见分析。DDS实验数据来自NYU fastMRI Initiative数据库，该数据库可能包含特定人群的医学图像，但本文仅用于评估不确定性量化方法，未对模型公平性进行专门分析。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_generative_models_diffusion__generative_models_and_autoencoders__b001_9yFORC1tu3_Antithet/figures/011_Table_5.jpg]]
 *Table 5: DDPM standard Pearson correlation coefficients for PN and RR pairs*
-
-
 
 ## 定位与知识库关联
 
@@ -274,8 +260,6 @@ AS(f) = 1 - \frac{\int_{-1}^{1} (0.5 f(-x) + 0.5 f(x) - \bar{f})^2 dx}{\int_{-1}
 - 对偶噪声方法在更复杂的生成任务（如视频、3D、音频）中是否同样有效？
 - 如何自适应地选择最优的K-对偶或RQMC配置以最大化方差缩减？
 - 对偶噪声方法能否与其他初始噪声优化技术结合以取得更好效果？
-
-
 
 ## 原文 PDF
 

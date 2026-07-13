@@ -53,8 +53,6 @@ claims:
 
 **主要结果**：在Mip-NeRF 360数据集上，Ours (MCMC, sh=3) 达到PSNR 28.96 dB，超越Zip-NeRF的28.54 dB；在Tanks&Temples上达到25.06 dB，优于所有显式与隐式基线（Table 1）。消融实验证实，增强高斯核占比10%时渲染质量最优（Table 2），且优化不透明叶的方向与形状能带来统计显著的增益（Table 3）。值得关注的是，即使仅使用二阶球谐函数 (sh=2)，本方法也能达到与三阶SH相当的性能，同时大幅降低内存占用（Table 1, Table 15）。
 
-
-
 **新视角合成**是计算机视觉与图形学中的一项基础任务，其目标是从一组稀疏的输入图像中重建场景的完整三维表示，并能够从任意新视角进行高质量渲染。近年来，以**3D Gaussian Splatting (3DGS)**（Kerbl et al., 2023）为代表的显式辐射场方法，凭借其高保真渲染质量和实时推理速度，已成为该领域的主流范式。3DGS 使用一组各向异性的三维高斯核来表示场景，并通过高效的差分光栅化实现快速渲染。
 
 然而，3DGS 在建模复杂光照效应方面存在根本性局限。其瓶颈在于：**3DGS 中使用的球谐函数 (Spherical Harmonics, SH) 无法有效解耦漫反射与镜面反射成分，且其全局定义导致对复杂反射和视角依赖颜色编码效率低下，尤其对于高光表面。** 具体而言，球谐函数是一种定义在球面上的全局基函数，虽然能够表达低频的视角依赖颜色变化，但在面对高光、镜面反射等高频、局部化的视角依赖效应时，需要极高的阶数才能逼近，这极大地增加了参数量和内存开销。消融实验（Table 4）直接证实了这一点：在 3DGS 中将球谐函数从三阶提升到四阶，渲染质量几乎没有提升（PSNR 仅从 27.47 提升至 27.55），但内存消耗却从 608 MB 急剧膨胀至 887 MB。
@@ -66,8 +64,6 @@ claims:
 本文的核心动机源于一个关键的物理洞察：**镜面反射成分天然具有方向性和局部性**——它仅在反射方向附近的狭窄角度范围内显著贡献。这一特性恰好与高斯核在空间上的局部性相呼应。因此，**如果将镜面反射建模为“仅在特定视角范围内可见”的高斯核，就能将漫反射与镜面反射在结构层面解耦**：原始高斯核负责漫反射（使用低阶 SH 即可），而新增的“增强高斯核”专门负责镜面反射，其可见性由视角相关的不透明度函数控制。
 
 基于这一洞察，本文提出**增强辐射场 (Augmented Radiance Field)**——一个通用的后增强框架，能够无缝嵌入现有 3DGS 方法，通过引入受 Phong 光照模型启发的视角相关不透明度函数和误差驱动的自适应高斯核插入策略，在不显著增加参数量的前提下，大幅提升对高光表面和复杂反射场景的渲染质量。
-
-
 
 ## 核心方法与创新机理
 
@@ -103,8 +99,6 @@ $$
 
 消融实验证实，仅当增强核具备可优化的视角相关不透明度时，才能获得统计显著的渲染质量提升；单纯补充无视角依赖性的高斯核效果不佳（Table 3）。此外，即使仅使用二阶球谐函数（sh=2），方法也能达到与三阶SH相当的性能，同时显著降低内存占用（Table 1, Table 15），进一步验证了视角相关不透明度对SH编码效率的补偿作用。
 
-
-
 增强辐射场（Augmented Radiance Field）采用**后增强（post-enhancement）范式**，在已优化的3DGS场景基础上，通过三阶段流水线自适应地插入具备视角相关不透明度的增强高斯核，以恢复原始表示难以捕捉的复杂视角依赖颜色（尤其是镜面高光）。图2概括了该流水线的三个核心模块。
 
 ### 模块一：误差驱动的2D高斯图像空间优化
@@ -126,8 +120,6 @@ $$
 - **输出**：增强后的辐射场，包含原始高斯核与新增的视角相关不透明度增强核，可渲染出更高质量的视角依赖颜色。
 
 整个流水线作为即插即用的后处理模块，可无缝集成到现有基于高斯飞溅的方法中。增强高斯核数量固定为总图元数的10%，以在渲染质量与内存效率间取得平衡。
-
-
 
 ### 视角相关不透明度核
 
@@ -192,13 +184,6 @@ $$
 
 投影完成后，新增的增强高斯核与原始高斯核一同进入联合优化阶段，精修不透明叶参数以及原始核的不透明度，最终实现高质量渲染。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_IzlaRUHncO/figures/003_Figure_3.jpg]]
-*Figure 3: Inspired by classical Phong shading, we model view-dependent opacity with a cosineweighted function whose shape is controlled by two parameters*
-
-
-
 ## 实验与关键发现
 
 ### 主要定量结果
@@ -232,9 +217,6 @@ Table 6 和 Table 7 报告了后增强阶段的时间开销和整体资源消耗
 ![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_IzlaRUHncO/figures/009_Table_6.jpg]]
 *Table 6: The time consumption for the post-enhancement stage on the Mip-NeRF 360 and NeRF Synthetic datasets is reported as follows. It should be noted that using multiple GPUs can significantly accelerate this process, as the 2D-stage training operates independently on each image*
 
-![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_IzlaRUHncO/figures/012_Table_7.jpg]]
-*Table 7: Analysis of training time, memory usage, and FPS. ”Total time” represents the combined duration of the original scene reconstruction and post-processing enhancement*
-
 ### 失败模式与局限性
 
 1. **深度图精度不足**：反投影 2D 高斯到世界空间依赖训练视角的深度图，但本工作未使用几何约束或深度网络生成精细深度图，导致投影后的高斯核未能精确贴合物体表面。这在几何结构复杂的区域（如细薄结构、深度不连续边界）可能引入伪影。
@@ -254,24 +236,8 @@ Table 8 和 Table 11 提供了 Mip-NeRF 360 上逐场景的渲染质量及增强
 ![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_IzlaRUHncO/figures/019_Table_10.jpg]]
 *Table 10: Quantitative results of rendering quality per scene on NeRF synthetic dataset*
 
-![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_IzlaRUHncO/figures/020_Table_11.jpg]]
-*Table 11: Quantitative analysis of rendering quality improvements after enhancement per scene on Mip-NeRF 360 dataset*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_IzlaRUHncO/figures/006_Table_2.jpg]]
-*Table 2: Impact of the ratio of enhanced Gaussians with the total primitive No. unchanged*
-
 ![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_IzlaRUHncO/figures/007_Table_3.jpg]]
 *Table 3: Ablation study on Mip-NeRF 360 dataset. Optimizing the orientation and shape of the opacity lobe achieves render quality unattainable by solely supplementing with Gaussians without view-dependent opacity*
-
-![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_IzlaRUHncO/figures/008_Table_4.jpg]]
-*Table 4: Increasing the order of spherical har*
-
-![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_IzlaRUHncO/figures/010_Figure_5.jpg]]
-*Figure 5: Comparison between Spherical Beta functions in DBS Liu et al. (2025) and opacity lobe. The three Gaussians in the first row model color using three differently oriented spherical beta functions, with maximum function values of 1, 2, and 4, all having an opacity of 0.5. The kernels in the second row use three differently oriented opacity lobes, with the same maximum amplitude and identical color intensity. Our method is more stable and flexible in reconstructing outgoing radiance, as it is less affected by the ordering of Gaussian kernels and has greater numerical stability*
-
-
 
 ## 定位与知识库关联
 
@@ -322,8 +288,6 @@ $$
 ### 5. 知识库定位
 
 本工作在方法论层面建立了**“不透明度域视角依赖性建模”**这一新的设计维度，区别于现有的颜色域视角依赖性建模（SH、球形贝塔等）和几何域视角依赖性建模（如反射方程显式求解）。其核心贡献在于证明：对于镜面反射这一特定外观现象，在透明度而非颜色通道上建模角度选择性，可以获得更好的参数效率、数值稳定性和渲染质量。这一洞察可泛化至其他需要建模方向性外观现象的显式辐射场方法中。
-
-
 
 ## 原文 PDF
 

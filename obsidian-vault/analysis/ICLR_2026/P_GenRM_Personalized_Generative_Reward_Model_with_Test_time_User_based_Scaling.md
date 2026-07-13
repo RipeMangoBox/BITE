@@ -54,8 +54,6 @@ P-GenRM 通过两条关键路径突破上述瓶颈。**在建模层面**，它�
 
 在主要基准测试中，P-GenRM-8B 以显著更小的参数规模超越了先前最优的 70B 开源基线模型：Chatbot Arena 子集准确率达 72.68%（对比 FTRM+SynthesizeMe-70B 的 72.05%），PRISM 子集达 65.32%（对比 63.74%）。测试时用户缩放进一步带来约 3 个百分点的增益，且以更少的总评分次数超越了更大的缩放配置。在冷启动评估中，P-GenRM-8B 的平均 Spearman 相关系数（0.638）甚至超越了参数规模大得多的 Qwen3-235B-A22B（0.599）。消融实验证实，过程奖励与结果奖励的任意缺失均会导致性能显著退化，验证了过程级监督的必要性。
 
-
-
 大语言模型（LLM）的快速演进使其在开放域对话、推理与工具使用等任务中展现出前所未有的能力，但如何让模型输出与多样化、动态变化的用户偏好保持精准对齐，始终是制约其实际部署的关键瓶颈。传统的对齐方法——无论是基于人类反馈的强化学习（RLHF）还是直接偏好优化（DPO）——通常假设存在一组普适、固定的评估准则，并通过聚合全体用户的偏好数据来训练单一的奖励模型。这种做法隐含地将“用户”视为同质整体，忽略了不同个体在风格、详细程度、安全性容忍度乃至价值观上的深层差异。
 
 这一假设在实际应用中面临严峻挑战。同一用户在不同场景下的偏好可能截然不同：在寻求编程帮助时偏好简洁、可直接运行的代码，而在探讨哲学问题时则期待富有洞见的冗长论述。更棘手的是，新用户往往只提供极少量反馈，传统方法难以在稀疏信号下建立可靠的偏好模型，导致冷启动场景下的泛化能力严重不足。
@@ -77,8 +75,6 @@ P-GenRM的提出正是为了系统性地突破上述两个瓶颈。其核心洞�
 在训练策略上，P-GenRM采用三段式框架：先通过监督微调建立基础个性化评分能力，再利用过程奖励与结果奖励的双重强化学习提升评估链质量，最后通过硬负例课程学习增强对高度主观任务的鲁棒性。在测试时，P-GenRM引入**双粒度用户缩放机制**——在个体层级并行采样生成多个评分假设方案以降低推断噪声，同时在原型层级融入相似用户的偏好信息以增强泛化，从而在冷启动场景下实现有效的知识迁移。
 
 这一设计将个性化奖励建模从“学习固定的用户表示”重新定义为“学习如何根据场景生成适配的评估逻辑”，从根本上回应了偏好动态性与数据稀疏性两大挑战。
-
-
 
 ## 核心方法与创新机理
 
@@ -116,8 +112,6 @@ $$s_t^i = \frac{1}{m} \sum_{x=1}^{m} \mathrm{Extract}(S_{t,x}^i) + \frac{1}{n} \
 
 这一机制的关键优势在于：原型层级的迁移使模型能够利用相似用户的偏好信息来补偿目标用户的数据稀疏性，从而显著提升冷启动场景下的泛化能力。实验显示，Ind-16 + Pro-8 配置以更少的总采样次数（24 次）超越了纯个体缩放 Ind-32（32 次）的性能（Table 1），验证了双粒度协同的有效性。在冷启动评估 LaMP-QA 上，P-GenRM-8B（Ind-8, Pro-4）的平均 Spearman 相关系数达到 0.638，甚至超越参数规模大得多的 Qwen3-235B-A22B（0.599）（Table 5）。
 
-
-
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_hXNApWLBZG/figures/002_Figure_2.jpg]]
 *Figure 2: (a) The three-stage training framework of P-GenRM (b) An illustration of the personalized evaluation chain, showing how preference modeling and derived scoring schemes lead to interpretable, criterion-weighted judgments for responses*
 
@@ -153,8 +147,6 @@ $$s_t^i = \frac{1}{m} \sum_{x=1}^{m} \mathrm{Extract}(S_{t,x}^i) + \frac{1}{n} \
 - **输入**：当前查询 $q_t$、用户历史交互 $H_t^{(u)}$、显式偏好陈述 $E^{(u)}$、候选响应 $\{y_t^i\}$
 - **推理**：模型 $R_\theta$ 生成偏好建模 $P_t^{(u)}$（场景特定人设与偏好分析）和评分过程 $S_t^{(u)}$（加权评分准则与逐响应判断）
 - **输出**：从 $S_t^{(u)}$ 中提取标量分数 $\{s_t^i\}$，经双粒度缩放聚合后得到最终排序
-
-
 
 ### 3.1 问题形式化
 
@@ -216,8 +208,6 @@ $$s_t^i = \frac{1}{m} \sum_{x=1}^{m} \mathrm{Extract}(S_{t,x}^i) + \frac{1}{n} \
 
 个体层级缩放通过多次采样生成多样化的评分假设，降低单次推断的噪声方差；原型层级缩放从最近邻原型引入相似用户的偏好信息，增强对新用户和稀疏反馈场景的泛化能力。两者结合使得 P-GenRM 以更少的总评分次数（如 Ind-16 + Pro-8）超越单纯扩大个体采样的配置（如 Ind-32）。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -245,9 +235,6 @@ Table 3进一步对比了自适应人设生成（PSI）与静态人设方法（S
 
 原型数量的选择通过PCA保留方差比确定（Figure 3左图）。在Chatbot Arena和PRISM上，保留前50个奇异向量可解释约85%以上的方差，因此选定k=50作为原型数量。Figure 3右图显示，原型数量从0增至50时性能持续提升，增至100时趋于饱和甚至略有下降，表明50个原型已能充分捕捉用户群体的偏好异质性，过多原型反而引入冗余噪声。
 
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_hXNApWLBZG/figures/005_Figure_3.jpg]]
-*Figure 3: Determination of prototype numbers and their effect on scaling performance. Left: retained variance ratio as a function of the number of singular vectors on Chatbot Arena and PRISM. Right: performance of P-GenRM with different prototype numbers*
-
 Figure 4的用户-原型分布可视化进一步验证了原型建模的有效性：同一原型簇内的用户共享核心偏好模式（蓝色高亮），同时保留个体差异（红色高亮）；不同簇之间则呈现明确分离的偏好倾向。Figure 5显示各原型的样本分配相对均衡，且P-GenRM在各原型上的性能保持稳定（Table 9），未出现对多数群体的过拟合。
 
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_hXNApWLBZG/figures/014_Table_9.jpg]]
@@ -270,22 +257,6 @@ P-GenRM在宏观准确率（每个用户组单独计算准确率后取平均）�
 
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_hXNApWLBZG/figures/018_Table_11.jpg]]
 *Table 11: Inference time comparison between P-GenRM with test-time user-based scaling and baseline methods*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_hXNApWLBZG/figures/006_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_hXNApWLBZG/figures/008_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_hXNApWLBZG/figures/009_Table_6.jpg]]
-*Table 6: Accuracy(%) of LLM-as-a-Judge with different types of user preference indicators*
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_hXNApWLBZG/figures/010_Table_7.jpg]]
-*Table 7: Performance changes of the model after reinforcement learning under different $\alpha \cdot \beta$ settings
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_hXNApWLBZG/figures/012_Table_8.jpg]]
-*Table 8: Distribution of user groups in the PRISM dataset*
-
 
 
 ## 定位与知识库关联
@@ -333,8 +304,6 @@ P-GenRM 的双粒度测试时用户缩放机制（个体层级并行采样 + 原
 - 在长对话或多轮交互中，用户偏好可能发生漂移，模型如何动态适应这种变化而无需重新生成完整的评估链？
 - 原型数量（当前通过 PCA 保留方差比确定）的自动化选择策略是否可以在线自适应调整？
 - 评估链的可解释性是否可以被下游策略模型直接利用，实现更高效的个性化对齐？
-
-
 
 ## 原文 PDF
 

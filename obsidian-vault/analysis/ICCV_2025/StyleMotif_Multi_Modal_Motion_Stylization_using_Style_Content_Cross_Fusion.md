@@ -56,8 +56,6 @@ claims:
 - 在文本引导风格化任务上，SRA 达到 **56.71**，远超 ChatGPT+MLD 的 4.82，提升 **51.89%**。
 - 单分支设计使推理速度提升 **22.5%**，可学习参数减少 **43.9%**。
 
-
-
 ### 问题背景：运动风格化的需求与挑战
 
 在计算机动画、虚拟现实和人机交互等领域，生成具有特定风格的自然人体运动是一项核心任务。运动风格化旨在将风格特征（如“优雅地”、“机器人式地”、“愤怒地”）注入到内容运动（如“行走”、“跳跃”）中，使生成的运动既保留内容语义，又呈现目标风格的表现力。这一任务的本质挑战在于**风格与内容的解耦与融合**：风格特征需要从参考样本中提取并迁移，同时不能破坏内容运动的语义完整性和物理合理性。
@@ -82,8 +80,6 @@ claims:
 - **架构简化**：用单分支扩散框架替代双分支设计，通过统计变换的方式直接在去噪主分支内完成风格注入，消除额外的可学习参数分支，降低模型复杂度和训练开销。
 - **多模态风格控制**：将风格编码器与预训练多模态模型ImageBind对齐，构建统一的风格特征空间，使模型能够从文本、图像、视频、音频等多种模态中提取风格特征，实现灵活的多模态风格化。
 - **高效融合机制**：设计风格-内容交叉归一化（Style-Content Cross Normalization），利用内容特征的统计量对风格特征进行自适应归一化后加性融合，无需引入额外参数，在保持内容保真度的同时有效注入风格信息。
-
-
 
 ## 核心方法与创新机理
 
@@ -132,8 +128,6 @@ $$\mathcal{L}_{\mathrm{align}} = -\frac{1}{2}\sum_{(i,j)}\log\frac{\exp(\mathcal
 
 当前方法仍存在以下局限：多模态对齐的训练数据来源于 100STYLE 子集，风格运动-文本配对数据有限，可能限制模型对广泛风格的泛化能力；交叉归一化假定风格可通过简单统计变换迁移，对复杂或细粒度风格可能表现不足。开放问题包括：最优融合位置 $m$ 的自动确定、$\gamma$ 的自适应动态学习、以及如何更有效地整合图像和音频等模态的风格描述。
 
-
-
 STYLEMOTIF 是一个基于单分支扩散架构的多模态运动风格化框架，其核心设计理念是以极简的结构实现高效、灵活的风格注入。与 SMooDi（Zhong et al., ECCV 2024）采用的双分支 ControlNet 范式不同，STYLEMOTIF 将风格注入完全整合进预训练运动潜变量扩散模型（MLD, Chen et al., ICLR 2023）的单一去噪分支中，从而避免了额外分支带来的模型复杂度和训练开销。
 
 框架的输入由两部分组成：**内容提示**（文本描述的目标动作语义）和**风格参考**（可来自运动序列、文本、图像、视频、音频等多种模态）。其整体流程可概括为以下模块链：
@@ -157,13 +151,6 @@ STYLEMOTIF 是一个基于单分支扩散架构的多模态运动风格化框架
 5. **混合引导扩散采样**：在推理采样阶段，框架结合无分类器引导和分类器引导策略，在内容保真度与风格遵循度之间进行动态平衡，确保生成的运动既忠实于文本内容描述，又充分体现目标风格特征。
 
 **效率优势**：得益于单分支设计和无参数融合机制，STYLEMOTIF 相比 SMooDi 的可学习参数减少 43.9%，单样本推理速度提升 22.5%（单卡 NVIDIA A100 测试），在显著降低计算成本的同时实现了更优的风格化质量。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l3_StyleMotif_Multi_Modal_Motion_Stylization_using_Style_Content_Cross_Fusi_motion20v/figures/002_Figure_2.jpg]]
-*Figure 2: Overall Pipeline of STYLEMOTIF, a single diffusion branch framework for multi-modal motion stylization. Given a text prompt and a reference style from various modalities, our model extract style features and fuse them with content by style-content cross fusion. Through multi-modal alignment with contrastive learning, we enable seamless multi-modal conditioning and flexible stylization across motion, text, images, audio, and video*
-
-
 
 ### 风格-内容交叉融合
 
@@ -213,12 +200,8 @@ $$\mathcal{F}_m = \mathcal{E}_{\text{ImageBind}}(m)$$
 
 利用 $\mathcal{F}_m$ 在统一空间中检索语义最相似的运动风格特征进行引导，实现多模态风格的统一表达。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l3_StyleMotif_Multi_Modal_Motion_Stylization_using_Style_Content_Cross_Fusi_motion20v/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of Our Proposed STYLEMOTIF Framework with SMooDi. Unlike SMooDi’s dual-branch design, which increases model complexity and training overhead, STYLEMOTIF employs a streamlined single-branch structure, enabling efficient multi-modal motion stylization while preserving motion realism*
-
-
 
 ## 实验与关键发现
 
@@ -256,27 +239,14 @@ Table 4对比了STYLEMOTIF与SMooDi的参数量和推理速度。单分支设计
 
 当前方法存在以下已知局限：其一，多模态对齐的训练数据来源于100STYLE子集，风格运动-文本配对数据有限，可能限制模型对广泛风格的泛化能力；其二，交叉归一化假定风格可通过简单统计变换迁移，对复杂或细粒度风格（如特定节奏模式、细微情感表达）可能表现不足。这些场景下，SRA可能出现显著下降，需要更精细的风格解耦与注入机制。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l3_StyleMotif_Multi_Modal_Motion_Stylization_using_Style_Content_Cross_Fusi_motion20v/figures/003_Table_2.jpg]]
 *Table 2: Quantitative Results of Motion Style Transfer on HumanML3D [13] dataset. Our method outperforms previous works in all metrics, which demonstrates effective style-content fusion for high-quality motion style transfer, providing significant advantages for downstream tasks besides motion stylization*
 
 ![[assets/figures/papers/paper_list_l3_StyleMotif_Multi_Modal_Motion_Stylization_using_Style_Content_Cross_Fusi_motion20v/figures/006_Figure_4.jpg]]
 *Figure 4: Qualitative Results of Text-Guided Stylization. Our model seamlessly integrates textual style descriptions with content, producing visually coherent and stylistically consistent results*
 
-![[assets/figures/papers/paper_list_l3_StyleMotif_Multi_Modal_Motion_Stylization_using_Style_Content_Cross_Fusi_motion20v/figures/007_Figure_6.jpg]]
-*Figure 6: Qualitative Results of Multi-Modal Motion Stylization. Our model generates stylized motions guided by diverse modalities (e.g., text, image, video, audio), effectively transferring style while preserving content integrity*
-
 ![[assets/figures/papers/paper_list_l3_StyleMotif_Multi_Modal_Motion_Stylization_using_Style_Content_Cross_Fusi_motion20v/figures/008_Table_3.jpg]]
 *Table 3: Ablation Study on Style Encoder Pre-training Strategies and Text Expression for Multi-modal Alignment. ‘w. HumanML3D’ and ‘w. 100STYLE’ denote pre-training with HumanML3D [13] and 100STYLE [35] data respectively*
-
-![[assets/figures/papers/paper_list_l3_StyleMotif_Multi_Modal_Motion_Stylization_using_Style_Content_Cross_Fusi_motion20v/figures/009_Figure_7.jpg]]
-*Figure 7: Ablation Study on Scaling Ratio γ in Eq. 5. We report both SRA and FID to show the impact of the scaling ratio on both stylization and content preservation*
-
-![[assets/figures/papers/paper_list_l3_StyleMotif_Multi_Modal_Motion_Stylization_using_Style_Content_Cross_Fusi_motion20v/figures/010_Table_4.jpg]]
-*Table 4: Efficiency Comparison. For inference time, we report the average time cost (s) per sample on a single NVIDIA A100 GPU*
-
-
 
 ## 定位与知识库关联
 
@@ -339,8 +309,6 @@ STYLEMOTIF 支持运动、文本、图像、视频、音频五种模态的风格
 3. 缩放参数 $\gamma$ 能否通过自适应机制（如基于内容-风格相似度的门控网络）动态学习，而非人工调节？
 4. 多模态对齐中，除了文本作为桥梁模态，如何更有效地直接整合图像、音频等模态的风格描述，减少文本中介带来的语义损失？
 5. 风格-内容交叉归一化是否可扩展至分身体部位或分时间尺度的层次化风格注入，以支持更细粒度的风格控制？
-
-
 
 ## 原文 PDF
 

@@ -65,8 +65,6 @@ claims:
 
 方法的局限性在于：当 γ<1.0 时性能骤降，限制了极低负载场景的应用；且方法假设专家并行与 All-to-All 通信，通信开销未完全消除。后续值得探索的方向包括自适应动态调整 γ、扩展丢弃中候选专家数 m 的最优权衡、以及与训练阶段负载均衡损失的联合优化。
 
-
-
 ### 混合专家模型推理中的“掉队者效应”
 
 混合专家（Mixture of Experts, MoE）模型通过在推理时仅激活部分专家来实现高效计算，但其性能高度依赖令牌到专家的分配均衡性。实际推理中，令牌分配严重失衡：以OLMoE在Open-BookQA上的表现为例，部分专家的归一化负载超过平均负载的七倍（Figure 2），形成明显的“热专家”与“冷专家”分化。
@@ -95,8 +93,6 @@ $$L \propto \max(\{N_i\}_{i=1}^{n})$$
 $$\max(\{N_i\}_{i=1}^{n}) = \begin{cases} \gamma < 1: \bar{N} \\ \gamma \geq 1: \text{within}\{\bar{N}, \gamma \bar{N}\} \end{cases}$$
 
 这一形式化为容量感知推理提供了理论锚点：当 $\gamma \geq 1$ 时，最高负载被限制在 $\gamma \bar{N}$ 以内，推理时延可控；当 $\gamma < 1$ 时，所有专家负载被强制均衡至 $\bar{N}$，但性能可能急剧下降（Figure 12）。因此，寻找在精度-速度权衡曲面上最优的容量系数与令牌选择策略，构成了本文方法设计的核心驱动力。
-
-
 
 ## 核心方法与创新机理
 
@@ -144,8 +140,6 @@ Table 3 显示，设备级约束在 Qwen3-MoE 上以 $\gamma=1.0$ 达到平均�
 
 **需要手动验证的点**：扩展丢弃中候选专家数 $m$ 与负载均衡、精度之间的最优权衡曲面尚未系统探索，文中仅基于经验分析选择了不限制最大专家数的策略。
 
-
-
 ![[assets/figures/papers/iclr26_0012_LuYFpySWA2_Capacity-Aware_Inference_Mitigating_the_Straggle/figures/003_Figure_3.jpg]]
 *Figure 3: Illustration of Capacity-Aware Token Drop (a) and Expanded Drop (b). Both methods first select experts based on gating scores. In Token Drop, tokens exceeding the local device capacity are discarded prior to All-to-All communication. Expanded Drop enhances expert utilization by allowing each token to consider additional m candidate experts on the same device while still enforcing strict local capacity constraints*
 
@@ -179,8 +173,6 @@ Table 3 显示，设备级约束在 Qwen3-MoE 上以 $\gamma=1.0$ 达到平均�
 ### 从专家级到设备级的容量约束
 
 Token Drop最初在专家级别施加容量约束，但Expanded Drop的自然扩展是将约束提升到设备粒度：同一设备上所有专家的令牌总数不超过 $n_l \cdot \gamma \bar{N}$。设备级约束允许令牌在同一设备内的专家间自由流动，从而更充分地利用欠载专家的计算资源。Table 3显示，在Qwen3-MoE上，设备级约束（$\gamma=1.0$）的平均性能（74.8）优于专家级约束（$\gamma=1.5$ 的73.9），且允许使用更低的容量系数，获得更高的加速比。
-
-
 
 ### 3.1 MoE 推理基础
 
@@ -274,8 +266,6 @@ $$
 
 > **注意**：Algorithm 1 和 Algorithm 2 的具体伪代码细节需查阅原文附录 E，此处不逐行复现。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与关键控制变量
@@ -327,15 +317,11 @@ Figure 6的时延分解表明，容量感知推理主要缩短了专家计算、
 2. **通信开销未完全消除。** 尽管令牌丢弃减少了计算量，All-to-All通信环节仍然保留，整体通信成本未完全消除。
 3. **并行策略假设。** 方法假设采用专家并行且令牌在设备间进行All-to-All通信，未在其他并行策略（如张量并行）下充分验证。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0012_LuYFpySWA2_Capacity-Aware_Inference_Mitigating_the_Straggle/figures/009_Table_2.jpg]]
 *Table 2: Comparison of Expert Drop, Token Drop and Expanded Drop. The capacity factor γ is set to 2.0 for OLMoE and DeepSeek-V2-Lite, and 1.5 for Qwen1.5-MoE-Chat and Mixtral-8×7B-Instruct. For Expert Drop, each forward pass skips one out of eight experts for Mixtral-8×7B-Instruct, and the bottom 10% of lowest load experts for other models*
 
 ![[assets/figures/papers/iclr26_0012_LuYFpySWA2_Capacity-Aware_Inference_Mitigating_the_Straggle/figures/005_Figure_4.jpg]]
 *Figure 4: Speedup of a single MoE layer compared to the baseline without capacity constraints, achieved through two capacity-aware inference methods: Token Drop and Expanded Drop*
-
-
 
 ## 定位与知识库关联
 
@@ -371,8 +357,6 @@ Figure 6的时延分解表明，容量感知推理主要缩短了专家计算、
 5. **与训练侧优化的协同**：容量感知推理与训练阶段的负载均衡损失是否可以联合优化？例如，在训练时引入容量感知的令牌丢弃作为数据增强，使模型提前适应推理时的令牌丢弃模式，可能进一步缩小性能差距。
 
 6. **长序列生成场景**：在自回归生成中，随着序列增长，令牌分布可能发生漂移，固定的容量系数可能不再适用。如何设计序列长度自适应的容量调度策略仍是一个开放问题。
-
-
 
 ## 原文 PDF
 

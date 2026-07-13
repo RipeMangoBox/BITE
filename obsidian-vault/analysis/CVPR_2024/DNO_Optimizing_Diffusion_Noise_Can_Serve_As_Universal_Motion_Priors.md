@@ -56,8 +56,6 @@ claims:
 
 **局限性：** 反向传播整个 ODE 求解器带来显著的内存开销和推理延迟（每次编辑需 300–1000 次优化迭代），难以满足实时交互需求。此外，目前仅在 HumanML3D 人形运动数据集上验证，对稀疏观测条件下的鲁棒性及向其他运动形态的泛化能力尚待检验。
 
-
-
 ### 问题背景：运动生成与扩散模型
 
 人体运动生成是计算机视觉与图形学中的核心任务，广泛应用于动画制作、虚拟现实、机器人学习等领域。近年来，扩散模型在运动生成任务上取得了显著进展，尤其是基于文本提示的文本-运动扩散模型（text-to-motion diffusion model），能够根据自然语言描述生成多样化且物理合理的人体运动序列。这类模型通过学习从纯噪声 $x_T$ 到干净运动 $x_0$ 的迭代去噪过程，隐式地编码了丰富的人体运动先验知识。
@@ -85,8 +83,6 @@ claims:
 关键洞察在于：预训练扩散模型的去噪过程可以看作一个确定性的映射函数 $f: x_T \rightarrow x_0$（例如通过 DDIM-ODE 求解器），该函数将任意初始噪声向量 $x_T$ 映射为对应的干净运动 $x_0$。由于扩散模型已在大量运动数据上训练，$f$ 的输出空间几乎处处对应合理的人体运动。因此，只需在 $x_T$ 上执行梯度下降，通过反向传播整个 ODE 求解器来优化最终运动输出，即可在不重新训练模型的前提下，灵活应对多种运动编辑、补全和去噪任务。
 
 这一思路将扩散模型真正转化为一个**即插即用的运动先验**：用户只需定义任务特定的可微损失函数 $\mathcal{L}(x_0)$（如目标关节位置、障碍物约束、内容保持等），DNO 即可自动优化 $x_T$ 以生成满足要求且保持运动自然性的结果。
-
-
 
 ## 核心方法与创新机理
 
@@ -128,8 +124,6 @@ DNO 受 **DOODL** 启发，但做出了关键改进：DOODL 要求 ODE 可逆以
 
 **需要手动验证的点**：文中未明确给出 DNO 与 DOODL 在收敛速度或内存开销上的定量对比，仅提及“improved optimization algorithm that speeds up optimization”，该声明的具体幅度需查阅原始实验数据确认。
 
-
-
 DNO 的整体 pipeline 围绕一个核心思想展开：**将预训练运动扩散模型作为黑箱运动先验，通过优化其初始噪声向量来实现任意可微目标的运动生成与控制**。该框架无需针对每个新任务重新训练或微调模型，仅需定义任务特定的损失函数即可驱动优化过程。
 
 ### 核心优化回路
@@ -168,8 +162,6 @@ DNO 的通用性体现在损失函数的模块化组合上。针对不同应用�
 
 - **输入**：参考运动（编辑任务）或带噪声/部分观测的运动（精化/补全任务），以及任务定义（目标关节位置、障碍物 SDF、可观测关节集合等）。
 - **输出**：经过优化的完整运动序列，以相对根表示（263 维特征，M 帧）呈现，可直接映射回全局关节位置用于可视化或下游应用。
-
-
 
 ### 3.1 问题形式化：将运动生成视为潜在空间优化
 
@@ -245,12 +237,8 @@ $$
 
 运动精化时，$O$ 包含所有关节和所有帧（即约束生成运动逼近含噪声的输入运动）；运动补全时，$O$ 仅包含输入运动中已有的关节和帧，优化从随机噪声 $\mathbf{x}_T \sim \mathcal{N}(0, \mathbf{I})$ 初始化。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l6_https_openaccess_thecvf_com_content_CVPR2024_html_Karunratanakul_Optimiz/figures/002_Figure.jpg]]
 *Figure: (a) At each optimization step, DNO maintains the output motion equality by making a step in the latent space xT , which is decodable to a realistic motion almost everywhere*
-
-
 
 ## 实验与关键发现
 
@@ -316,12 +304,8 @@ DNO 在运动编辑任务上展现出压倒性优势。与基于引导扩散的�
 
 5. **泛化性未验证**：目前仅在 HumanML3D 人形运动数据集上验证，对其他运动形态（如四足动物、多智能体交互）或复杂场景约束的适用性尚未检验。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l6_https_openaccess_thecvf_com_content_CVPR2024_html_Karunratanakul_Optimiz/figures/004_Table_1.jpg]]
 *Table 1: Motion editing evaluation on specific actions generated from MDM given the text prompts. We focus on actions that can be distinctly classified per frame basis. The Content Preservation scores are computed against the inputs*
-
-
 
 ## 定位与知识库关联
 
@@ -362,8 +346,6 @@ DNO 的适用边界由以下因素共同界定：
 **理论收敛性**：梯度归一化策略虽在实验中表现出色，但其对优化收敛性的理论保证尚不明确。该策略在隐式 GAN 或 VAE 等其他生成模型中的适用性也有待验证。
 
 **低覆盖鲁棒性**：当可观测关节数量极少时，运动重建可能退化为不适定问题。是否需要引入额外的结构化先验或专门的损失函数来应对稀疏观测场景，是一个具有实际意义的开放问题。
-
-
 
 ## 原文 PDF
 

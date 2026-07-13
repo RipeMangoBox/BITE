@@ -51,8 +51,6 @@ claims:
 
 在三个多模态持续学习基准（CoIN、MLLM-CL Domain、MLLM-CL Ability）上，ϕ-DPO在所有指标上均达到最优：在MLLM-CL Domain上实现近零遗忘（BWT=-0.37%），在MLLM-CL Ability上MFN指标达到45.31（较HiDe*提升+1.50），在CoIN上MAA指标达到74.94。消融实验证实Fair DPO损失相比标准DPO和KD在所有指标上均有一致提升，且该方法在LLaVA-13B等更大规模模型上展现出良好的可扩展性。
 
-
-
 大型多模态模型（LMMs）在持续学习场景中面临一个核心瓶颈：**数据分布的不平衡导致梯度更新系统性偏向多数类**，从而损害先前知识的保持和对新任务的适应能力。这一问题在多模态持续学习中尤为突出——不同任务或领域之间的样本数量、视觉分布和模态对齐目标存在显著漂移。
 
 具体而言，现有持续学习基准中的数据不平衡体现在两个层面。**类内不平衡**：以ScienceQA为例，各主题的样本分布高度倾斜，生物学、物理等主题拥有丰富训练数据，而语法、语音意识等主题样本稀缺，导致少数类准确率显著偏低。**跨任务模态漂移**：ScienceQA、Grounding、OCR-VQA等任务依次引入差异化的视觉分布和对齐目标，形成任务间的模态不平衡。在这两种不平衡的叠加下，传统持续学习方法面临严峻挑战。
@@ -64,8 +62,6 @@ claims:
 - **直接偏好优化（DPO）** 在标准场景下虽能通过偏好对对齐来隐式约束遗忘，但在不平衡数据下，其梯度更新仍受多数类主导，偏见未能消除。
 
 本文的动机正是填补这一空白：**将持续学习形式化为带KL约束的RLHF问题，并进一步引入公平性调制机制，使梯度更新在各数据子组之间趋于平衡**。通过将遗忘抑制与公平性处理统一于DPO框架内，ϕ-DPO旨在同时实现灾难性遗忘的缓解、新任务的持续适应以及不平衡数据下的鲁棒性保持。
-
-
 
 ## 核心方法与创新机理
 
@@ -110,8 +106,6 @@ $$\mathcal{L}_{\mathrm{DPO}}^{\gamma}(\theta; \mu) = -\mathbb{E}_{z \sim \mu}\Bi
 | 训练数据 | $(x, 指令, y)$ 三元组 | 额外构建 $(y^+, y^-)$ 偏好对 | 第 3.3 节; Figure 5 |
 
 **需人工验证**：公平性度量（如组间准确度方差）在实验中未直接报告，仅通过整体指标提升间接体现；Lemma 3 的不平衡偏差趋零性依赖于 $\gamma$ 足够大的假设，而实验中 $\gamma=2.0$ 为最优，过大的 $\gamma$ 会导致梯度消失，理论边界与实验最优值之间的精确关系需进一步确认。
-
-
 
 ϕ‑DPO（FaiDPO）将持续学习重新形式化为一个带 KL 约束的 RLHF 问题，并通过**直接偏好优化（DPO）**隐式实现遗忘抑制，避免显式奖励建模与 PPO 训练的复杂性。整体框架由三个核心模块串联构成：监督微调模块、DPO 偏好对齐模块与公平调制模块，三者协同工作，使大型多模态模型（LMM）在增量学习过程中既能适应新任务，又能保持对旧知识的记忆，同时抑制数据不平衡引入的梯度偏见。
 
@@ -159,15 +153,8 @@ $$
 
 第一项为标准监督损失，第二项为带公平调制的 DPO 正则项。整个 pipeline 的输入为当前任务数据与前一策略，输出为更新后的策略 $\pi_t$，其数据流为：**监督微调 → DPO 偏好对齐 → 公平调制 → 参数更新**。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2282_https_openaccess_thecvf_com_content_CVPR2026_html_Truong_phi_DPO_Fairnes/figures/004_Figure_4.jpg]]
 *Figure 4: Our Proposed Continual Learning Approach via Fairness DPO for Large Multimodal Models. Traditional reinforcement learning with human feedback (RLHF) method optimize models through explicit reward maximization. Our framework instead reformulates RLHF as Direct Preference Optimization (DPO). The Fairness DPO loss mitigate the gradient biased under the imbalanced data*
-
-![[assets/figures/papers/paper_list_l2282_https_openaccess_thecvf_com_content_CVPR2026_html_Truong_phi_DPO_Fairnes/figures/001_Figure_1.jpg]]
-*Figure 1: Our Fairness DPO (ϕ-DPO) approach to Continual Learning in LMMs. Prior continual learning methods, e.g., LoRA, struggle under imbalanced multimodal data and suffer from catastrophic forgetting. The vanilla DPO is still influenced by the imbalanced data distributions. Our ϕ-DPO approach can (1) mitigate forgetting, (2) adapt continuously to new learning tasks, and (3) maintain robustness under data imbalance*
-
-
 
 ### 3.1 持续学习的RLHF形式化与DPO重构
 
@@ -229,18 +216,11 @@ $$\pi_t^* = \arg\min_{\pi_t} \mathbb{E}_{x,y \in \mathcal{D}_t} -\log p(y|x) + \
 
 其中第一项为当前任务的标准交叉熵损失，第二项为带公平调制的DPO正则项。该组合使得模型在适应新任务的同时，通过DPO隐式约束保持旧知识，并通过 $\gamma$ 调制抵消不平衡数据带来的梯度偏见。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2282_https_openaccess_thecvf_com_content_CVPR2026_html_Truong_phi_DPO_Fairnes/figures/005_Figure_5.jpg]]
 *Figure 5: Example of Our DPO Data in the Continual Learning Benchmark. Best viewed in color*
 
 ![[assets/figures/papers/paper_list_l2282_https_openaccess_thecvf_com_content_CVPR2026_html_Truong_phi_DPO_Fairnes/figures/003_Figure_2.jpg]]
 *Figure 2: The Imbalanced Distribution of Multimodal Continual Learning Benchmarks. The distribution of samples across ScienceQA topics is highly skewed, i.e. categories with fewer training examples (e.g. Grammar, Phonological Awareness, Word Study) exhibit significantly lower accuracy, while topics with richer data (e.g. Biology, Physics) achieve stronger performance*
-
-![[assets/figures/papers/paper_list_l2282_https_openaccess_thecvf_com_content_CVPR2026_html_Truong_phi_DPO_Fairnes/figures/002_Figure_3.jpg]]
-*Figure 3: ScienceQA, Grounding, and OCR-VQA introduce progressively shifting visual distributions and alignment objectives, creating modality imbalance across tasks*
-
-
 
 ## 实验与关键发现
 
@@ -291,22 +271,6 @@ $$\pi_t^* = \arg\min_{\pi_t} \mathbb{E}_{x,y \in \mathcal{D}_t} -\log p(y|x) + \
 
 ![[assets/figures/papers/paper_list_l2282_https_openaccess_thecvf_com_content_CVPR2026_html_Truong_phi_DPO_Fairnes/figures/011_Table_7.jpg]]
 *Table 7: Effectiveness of Different LMM Framework*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2282_https_openaccess_thecvf_com_content_CVPR2026_html_Truong_phi_DPO_Fairnes/figures/006_Table_2.jpg]]
-*Table 2: Results on MLLM-CL Ability (* denote the method using relay data). M&L: Math and Logic, VP: Visual Perception*
-
-![[assets/figures/papers/paper_list_l2282_https_openaccess_thecvf_com_content_CVPR2026_html_Truong_phi_DPO_Fairnes/figures/008_Table_3.jpg]]
-*Table 3: Results on CoIN. SciQA: ScienceQA, Image: ImageNet, Viz: VizWiz, Ground: Grounding, Text: TextVQA, VQA: VQAv2*
-
-![[assets/figures/papers/paper_list_l2282_https_openaccess_thecvf_com_content_CVPR2026_html_Truong_phi_DPO_Fairnes/figures/012_Table_5.jpg]]
-*Table 5: Effectiveness of Divergence Parameter β*
-
-![[assets/figures/papers/paper_list_l2282_https_openaccess_thecvf_com_content_CVPR2026_html_Truong_phi_DPO_Fairnes/figures/010_Table_6.jpg]]
-*Table 6: Effectiveness of Focusing Parameter γ*
-
-
 
 ## 定位与知识库关联
 
@@ -378,8 +342,6 @@ $$\nabla_{\theta}\mathcal{L}_{\mathrm{DPO}}(\theta;\mu) = \sum_{k=1}^{K} \mu_k m
 3. **偏好数据自动化**：DPO 偏好数据构造如何进一步自动化并保证质量和多样性？能否利用模型自身的置信度或集成信号生成偏好对？
 4. **理论界的紧化**：Fair DPO 是否存在更紧的泛化误差界？能否结合其他公平性约束（如 demographic parity 或 equalized odds）形成更全面的公平性保证？
 5. **与结构方法的融合**：Fair DPO 的梯度调制与 MoE、正交子空间等结构隔离方法是否互补？两者的结合能否进一步提升极端不平衡下的持续学习性能？
-
-
 
 ## 原文 PDF
 

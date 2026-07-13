@@ -123,9 +123,6 @@ Mobius 在自动评估、用户研究和长视频生成三个层面均展现出�
 
 Mobius 的潜在偏移策略天然支持超出训练上下文窗口的视频长度。在长视频生成任务上（Table 3），Mobius 取得最优 FVD（29.89）、CLIP Score（32.43）和运动平滑度（98.04%），对比方法包括 FreeNoise、Gen-L-Video、FIFO、Video-Infinity 和 DiTCtrl。这一结果表明，通过非循环的潜在位移配合 NTK-aware RoPE 插值，Mobius 能够在无训练条件下将预训练模型的多帧一致性能力泛化至任意长度。
 
-![[assets/figures/papers/paper_list_l9_http_arxiv_org_abs_2502_20307v1/figures/008_Table_3.jpg]]
-*Table 3: Comparing with other longer video generation methods*
-
 ### 关键消融
 
 **潜在偏移步长的影响**（Fig. 6）：每个去噪步骤中潜在偏移的步数直接影响生成内容的视觉质量与运动幅度。当偏移 6 步时，生成结果在视觉质量和运动幅度之间取得平衡；偏移过小会导致运动不足，过大则可能引入时序不稳定。
@@ -135,9 +132,6 @@ Mobius 的潜在偏移策略天然支持超出训练上下文窗口的视频长�
 ### 失败模式与适用边界
 
 Mobius 的性能受限于底层预训练文本到视频扩散模型的能力边界。在定制领域（如插图风格），生成的视频可能不够平滑（Fig. 8），这是因为预训练模型在该领域的数据分布稀疏，多帧去噪过程中的时序一致性约束不足以补偿域偏移带来的生成质量下降。该问题并非潜在偏移策略本身的设计缺陷，而是训练自由方法对基模型质量的固有依赖。
-
-![[assets/figures/papers/paper_list_l9_http_arxiv_org_abs_2502_20307v1/figures/007_Figure_6.jpg]]
-*Figure 6: Ablation study on different latent skip. The shift step in each denoising iteration will also influence the generated content*
 
 ## 定位与知识库关联
 

@@ -69,8 +69,6 @@ claims:
 
 当前工作在以下方面存在局限：模拟到真实世界的系统化迁移尚未被刻画；防御搜索仅针对提示词层面优化，未涉及架构级防护；对其他隐私框架的泛化性未经验证。开放的挑战包括将搜索空间扩展到代理架构与防护栏设计、处理部分同意场景，以及将该框架应用于更广泛的安全对齐问题。
 
-
-
 ### 问题背景：LLM代理交互中的隐私威胁
 
 大型语言模型（LLM）驱动的自主代理正被广泛部署于电子邮件、社交媒体、即时通讯等个人数据密集型应用中。这些代理在代表用户执行任务时，不可避免地接触到大量敏感信息（如医疗记录、法律文件、财务数据），并在多轮交互中面临隐私泄露风险。一个典型的场景是：数据接收者代理通过多轮对话，逐步诱导数据发送者代理披露本应受保护的第三方隐私信息。与传统软件系统的隐私攻击不同，LLM代理间的隐私威胁具有**动态性**和**自适应性**——攻击者可以利用语言模型的推理能力，根据防御者的反应实时调整策略，从而绕过静态的隐私保护机制。
@@ -91,8 +89,6 @@ claims:
 
 具体而言，本文旨在回答三个关键问题：（1）能否构建一个模拟环境，忠实复现多代理间的隐私关键交互？（2）能否设计一种搜索算法，使攻击策略和防御策略在对抗中自动升级？（3）这种搜索框架能否发现人工评估者都难以识别的长尾攻击，并生成足够鲁棒的防御？
 
-
-
 ## 核心方法与创新机理
 
 本文的核心创新在于将LLM代理的隐私风险发现重新定义为一个**交替搜索问题**，而非依赖静态规则或人工枚举。传统隐私研究（如PrivacyLens, Shao et al., 2024）聚焦于用户-代理交互或预设恶意环境，其防御指令仅为简单的隐私提示（如“保持最高隐私标准”），攻击指令也局限于直接请求。这种静态范式无法应对动态多轮、主动诱导式攻击下代理间的自适应隐私威胁。
@@ -107,13 +103,8 @@ claims:
 
 上述changed slots的协同效应使攻击与防御相互提升：更强的攻击迫使防御进化，而更严格的防御又催生更隐蔽的攻击。最终，在Testing-100基准上，搜索得到的攻击-防御对（A2, D2）将平均泄漏速度从基线的**31.2%降至2.9%**（ICL迁移），降幅达91%（Table 4）。这一结果表明，将隐私风险发现转化为自动化搜索问题，能够超越人工枚举和静态分析的局限，系统性地发现并缓解LLM代理间的自适应隐私威胁。
 
-
-
 ![[assets/figures/papers/paper_list_l38_https_openreview_net_forum_id_nz4ZqbrBEi/figures/001_Figure_1.jpg]]
 *Figure 1: Our search-based framework. (I) We transform each tested privacy norm into a simulation configuration, including agent instructions and environments. (II) Initialized from the configuration, we run the simulation repeatedly to evaluate the risk that emerges from agent-agent interactions. (III) Based on simulations, we alternately search for attack strategies (data recipient instructions) and defense mechanisms (data sender instructions) by using LLMs to reflect on simulation trajectories and optimize agent instructions*
-
-![[assets/figures/papers/paper_list_l38_https_openreview_net_forum_id_nz4ZqbrBEi/figures/006_Figure_3.jpg]]
-*Figure 3: Average leak velocity of the alternating search process (at the top), where we develop A _ { 1 } D _ { 1 } , A _ { 2 } , A _ { 2 } sequentially. At the bottom, for each set, we summarize the strategy keywords and show examples with highlights. Note that only the optimizable parts of the instructions are shown*
 
 ### 核心瓶颈与设计动机
 
@@ -166,8 +157,6 @@ Figure 3 展示了攻击与防御策略的协同进化过程：
 
 最终A2+D2组合通过ICL迁移将平均泄漏速度从基线的31.2%降至2.9%，通过SG降至4.9%，展现了框架的泛化能力。
 
-
-
 ### 3.1 仿真环境
 
 仿真环境实例化三个 ReAct 代理——**数据主体**（Data Subject）、**数据发送者**（Data Sender）、**数据接收者**（Data Recipient）——以及四个模拟应用（Gmail、Facebook、Messenger、Notion），用以复现多轮隐私敏感交互。每个仿真配置对应一条待测试的隐私规范（如“未经同意不得分享医疗诊断信息”），并指定代理的角色指令、敏感信息项列表及可用的通信渠道（Figure 1, Section 3, Appendix B）。
@@ -214,8 +203,6 @@ $$(A_T, D_T) \xrightarrow{\text{攻击搜索}} (A_{T+1}, D_T) \xrightarrow{\text
 
 每次攻击搜索针对当前防御暴露新漏洞，随后的防御搜索则针对新攻击修补漏洞，二者相互驱动，使系统能够发现人工枚举难以触及的长尾风险（Section 3, Figure 3）。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与因果机制
@@ -239,8 +226,6 @@ $$(A_T, D_T) \xrightarrow{\text{攻击搜索}} (A_{T+1}, D_T) \xrightarrow{\text
 *Table 3: Defense transfer. Alternative defenses discovered using different model setups are tested against A _ { 2 } Targeted shows the performance of specifically optimized defense. Table 4: Cross-scenario transfer (the original setting in gray ). We transfer attacks and defenses from Training-5 to Testing-100 and report the average leak velocity. ICL and SG refer to in-context learning and strategy guidance*
 
 **跨场景迁移**：将Training-5上发现的A2、D2策略迁移至Testing-100，通过上下文学习（ICL）实现平均泄漏速度2.9%，通过策略指导（+SG）实现4.9%，相比基线A0/D0的31.2%降低约91%（Table 4）。
-
-![[assets/figures/papers/paper_list_l38_https_openreview_net_forum_id_nz4ZqbrBEi/figures/007_Table_4.jpg]]
 
 **跨模型迁移**：基于已发现攻防策略的跨模型迁移实验（Table 2）表明，当防御者使用gpt-4.1时，面对多种攻击者骨干模型的泄漏速度均保持在5%以下，其中A1D1和A2D2配置下甚至达到0.0%。
 
@@ -275,21 +260,6 @@ $$(A_T, D_T) \xrightarrow{\text{攻击搜索}} (A_{T+1}, D_T) \xrightarrow{\text
 - **Table 2**：跨模型迁移结果，强防御模型（gpt-4.1）可有效抵御多种攻击者模型。
 - **Table 4**：跨场景迁移中ICL与SG两种策略的效果对比，验证了已发现策略的泛化能力。
 - **Figure 4**：攻击搜索算法的四项消融研究，分别验证并行搜索、跨线程传播、优化器骨干、防御者骨干的影响。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l38_https_openreview_net_forum_id_nz4ZqbrBEi/figures/010_Table_6.jpg]]
-
-![[assets/figures/papers/paper_list_l38_https_openreview_net_forum_id_nz4ZqbrBEi/figures/011_Table_5.jpg]]
-*Table 5: Simulation results using basic instructions and different backbones, where we report the average leak velocity (LV) and 95% confidence intervals obtained via nonparametric bootstrap with 10,000 resamples. For each configuration, we resampled runs with replacement to compute configlevel means, then averaged across all configurations. Table 6: Behavior ratios for different backbones as defense agents in Table 1. We report the ratio of actions that include explicit denial, consent-required holding, or no response*
-
-![[assets/figures/papers/paper_list_l38_https_openreview_net_forum_id_nz4ZqbrBEi/figures/012_Table_7.jpg]]
-*Table 7: Average leak velocity per domain for different backbones as defense agents in Table 1*
-
-![[assets/figures/papers/paper_list_l38_https_openreview_net_forum_id_nz4ZqbrBEi/figures/013_Table_8.jpg]]
-*Table 8: Leak Rate at each step while varying the backbones for attack agents in Table 1*
-
-
 
 ## 定位与知识库关联
 
@@ -336,8 +306,6 @@ $$(A_T, D_T) \xrightarrow{\text{攻击搜索}} (A_{T+1}, D_T) \xrightarrow{\text
 1. **搜索空间的扩展**：能否将搜索范围从代理指令扩展到最优代理架构、防护栏设计乃至训练目标，以构建更稳固的隐私防御体系。
 2. **部分同意场景**：当前框架假设数据主体不应分享敏感信息，但现实中存在数据主体**确实同意**分享的场景——如何处理这种“合法同意”与隐私保护的张力，仍待探索。
 3. **更广泛的安全对齐应用**：该长尾风险搜索框架能否应用于更广泛的安全对齐问题，如信息操纵、目标劫持、或代理间的恶意协作，是一个值得追踪的方向。
-
-
 
 ## 原文 PDF
 

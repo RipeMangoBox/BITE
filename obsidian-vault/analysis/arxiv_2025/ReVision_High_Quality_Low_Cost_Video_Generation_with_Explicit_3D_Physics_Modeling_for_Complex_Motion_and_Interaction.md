@@ -156,11 +156,6 @@ $$p_o \in \mathbb{R}^{21 \times 3}$$
 
 该表示在保持计算效率的同时，为一般物体提供了足够的空间结构信息，使 PMP 能够统一处理多种对象类别的运动优化。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l37_https_arxiv_org_abs_2504_21855/figures/017_Figure_10.jpg]]
-*Figure 10: The parametric 3D mesh serves as an effective object-level prior, ensuring complete human body structures in the coarse video generated during the first stage. In the left two images, the human keypoint model fails to detect the missing right hand, which is accurately “recovered" by the parametric human mesh model. In the right two images, the human mesh model provides a more accurate prior for both blurred hands*
-
 ## 实验与关键发现
 
 ### 核心定量结果：VBench++基准
@@ -211,28 +206,14 @@ $$p_o \in \mathbb{R}^{21 \times 3}$$
 2. **长视频生成的显存瓶颈**：基于SVD的实现受限于80GB显存，无法直接生成长于32帧的视频；扩展至更长视频需要**Figure 7**所示的运动序列插值/外推策略，但长程一致性仍有提升空间。
 3. **系统复杂度**：依赖多种现成3D模型（SMPL-X、SMAL、深度估计等），虽总推理时间仅增加约5秒，但增加了工程部署的复杂度。
 
-![[assets/figures/papers/paper_list_l37_https_arxiv_org_abs_2504_21855/figures/011_Figure_7.jpg]]
-*Figure 7: Long video generation. Our PMP extends a 32-frame 3D motion to 128 frames through interpolation (32 → 64), extrapolation (64 → 128), and refinement, enabling complex, large-scale motion generation over long video sequences. See supplementary videos for details*
-
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l37_https_arxiv_org_abs_2504_21855/figures/005_Table_1.jpg]]
 *Table 1: Quantitative comparisons on VBench++. We achieve a significantly higher Dynamic Degree while maintaining similar performance across all metrics of consistency, smoothness, and quality*
 
 ![[assets/figures/papers/paper_list_l37_https_arxiv_org_abs_2504_21855/figures/006_Figure_5.jpg]]
 *Figure 5: User preference comparisons. Our model enhances the motion generation capability of the pre-trained SVD. It even surpasses HunyuanVideo, a SOTA model with 13B parameters. These results highlight the effectiveness of our model in generating complex motions and interactions*
 
-![[assets/figures/papers/paper_list_l37_https_arxiv_org_abs_2504_21855/figures/014_Table_7.jpg]]
-*Table 7: User studies for PMP. PMP improves object and motion consistency, while reducing morphological failure rates*
-
-![[assets/figures/papers/paper_list_l37_https_arxiv_org_abs_2504_21855/figures/016_Table_8.jpg]]
-*Table 8: Quantitative evaluation regarding inference efficiency. We reduce Stage 1 compute time from 36 seconds to 8 seconds, while maintaining comparable final video quality*
-
 ![[assets/figures/papers/paper_list_l37_https_arxiv_org_abs_2504_21855/figures/018_Table_9.jpg]]
 *Table 9: Ablation on confidence score. We evaluate three parameter configurations corresponding to the {full motion sequence, polygon target pose, empty} conditions: (1, 0.5, 0), (0.8, 0.5, 0.2), and (3, 2, 1). The results demonstrate that performance is highly robust to the specific choice of confidence values*
-
-![[assets/figures/papers/paper_list_l37_https_arxiv_org_abs_2504_21855/figures/008_Figure_6.jpg]]
-*Figure 6: Handling occlusion. As illustrated by the two apples falling into the basket, ReVision handles occlusions by lifting and optimizing motion in 3D space, which allows explicit reasoning about object spatial relationships, effectively resolving occlusions that are ambiguous in 2D*
 
 ## 定位与知识库关联
 

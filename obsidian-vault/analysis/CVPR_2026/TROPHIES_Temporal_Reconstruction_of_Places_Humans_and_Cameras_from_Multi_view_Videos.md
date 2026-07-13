@@ -49,8 +49,6 @@ claims:
 
 实验层面，TROPHIES 在 EgoHumans 和 EgoExo4D 两个数据集上持续优于现有范式：相比逐帧优化的 **HSfM**（Müller et al., arXiv 2024），W-MPJPE 降低超过 50%；定性结果表明，全局优化后初期的人-场景错位、漂浮脚等问题得到解决，实现了物理上一致的接地重建。消融实验进一步验证，人感知注意力在所有骨干网络上均一致提升轨迹误差（TE）、绝对误差（AE）和相对旋转精度（RRA）等指标，证明了模块设计的有效性与泛化性。
 
-
-
 从多视角视频中同时重建动态人体、静态场景与相机轨迹，是通向物理世界 4D 理解的核心难题。这项任务要求系统不仅估计每一帧的人体姿态与场景几何，还必须将三者统一到**同一个世界坐标系**下，并保持**尺度一致性、接触合理性与时序稳定性**。然而，现有方法普遍将人体、场景与相机解耦处理，导致三大根本性缺口。
 
 **缺口一：尺度断裂与全局不对齐。** 当前主流的人体重建方法——如单帧估计器 **HMR2**（Goel et al., ICCV 2023）、单目轨迹方法 **TRAM**（Wang et al., ECCV 2024）以及基于重力-视角坐标的 **GVHMR**（Shen et al., SIGGRAPH Asia 2024）——均在各自独立的坐标空间中输出结果。与此同时，场景重建方法如 **DUSt3R**（Wang et al., CVPR 2024）和 **CUT3R**（Wang et al., CVPR 2025）则产生另一套尺度与位姿。当这些输出被拼合时，人体漂浮、脚部悬空、穿透场景等物理上不可能的现象几乎不可避免。
@@ -60,8 +58,6 @@ claims:
 **缺口三：多视角人体姿态估计缺乏有效的跨视角几何融合。** 单目视频方法仅利用时序信息，无法利用同一时刻多视角之间的几何约束。即使有多视角输入，先前工作也往往将其视为独立视图分别处理，再事后对齐，而非在特征层面进行对称的跨视角几何推理。这导致不同视角估计的人体姿态不一致，时序上出现抖动。
 
 最新工作 **HSfM**（Müller et al., arXiv 2024）尝试逐帧联合重建人、场景与相机，但其每帧独立优化，尺度漂移随时间累积，当结果聚合时空间不一致性显著（见 Figure 5 定性对比）。**TROPHIES** 正是在这一背景下提出，其核心动机是：**设计一个统一框架，通过人感知注意力保护场景重建免受动态干扰，通过对称与锚点导向的跨视角注意力实现多视角一致的人体姿态估计，再通过全局 Sim(3) 对齐、束调整与接触约束将两者紧密耦合，首次实现从多视角视频中联合估计静态场景、动态人体和相机轨迹的物理连贯重建。**
-
-
 
 ## 核心方法与创新机理
 
@@ -109,8 +105,6 @@ $$\mathcal{L}_{\mathrm{opt}} = \mathcal{L}_{\mathrm{BA}} + \lambda_c \mathcal{L}
 
 TROPHIES 的三个 changed slots 形成了闭环：人感知注意力为场景分支提供了“干净”的静态几何，对称跨视角注意力为人体分支提供了多视角一致的姿态估计，而全局对齐与接触优化则将两者在统一的物理世界坐标系中耦合，强制尺度、接触和重力一致性。这一设计范式首次实现了从多视角视频中联合输出静态场景、动态人体和相机轨迹的统一框架。
 
-
-
 TROPHIES 的整体流程由三个核心组件构成：**场景分支（Scene Branch）**、**人体分支（Human Branch）** 以及 **全局对齐与优化（Alignment and Optimization）** 模块。给定时间同步的多视角视频流，系统首先并行运行场景分支与人体分支，分别估计静态场景几何与时序人体姿态，随后通过全局优化阶段将两者统一到同一个世界坐标系下，强制尺度、接触与重力一致性，最终输出物理上连贯的 4D 人-场景重建结果。
 
 ### 模块关系与数据流
@@ -125,15 +119,11 @@ TROPHIES 的整体流程由三个核心组件构成：**场景分支（Scene Bra
 
 现有方法（如 HSfM）将人体、场景与相机解耦处理，逐帧独立优化导致尺度漂移累积和空间不一致。TROPHIES 的核心洞察在于：通过场景分支的人感知注意力滤除动态干扰、人体分支的对称与锚点参考注意力实现多视角一致姿态估计，再通过全局优化将两者紧密耦合，首次实现了从多视角视频中联合估计静态场景、动态人体和相机轨迹的统一框架。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l25_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_TROPHIES_Temporal/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of TROPHIES. Given temporally synchronized video streams, TROPHIES jointly reconstructs dynamic humans, static scene geometry, and camera trajectories within a globally consistent 4D space. Our method couples a human branch and a scene branch through a global alignment and optimization stage that enforces scale, contact, and gravity consistency. This unified reconstruction produces temporally stable and spatially coherent human–scene representations, where human motions, scenes, and camera viewpoints are all aligned in a shared world coordinate frame*
 
 ![[assets/figures/papers/paper_list_l25_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_TROPHIES_Temporal/figures/003_Figure_2.jpg]]
 *Figure 2: Pipeline Overview. Our framework consists of three components: a Scene Branch that reconstructs the static environment with human-aware attention (implemented as a plugand-play module applicable to DUSt3R, MonST3R, and CUT3R backbones); a Human Branch that estimates temporally coherent body parameters from multi-view videos via symmetric and anchor-referenced attention; and a global Align and Optimization stage that unifies humans, scenes, and cameras under consistent geometry and contact-aware constraints, producing a physically grounded reconstruction in a shared world coordinate system*
-
-
 
 TROPHIES 由三个协同模块构成：**场景分支（Scene Branch）**、**人体分支（Human Branch）** 和 **全局对齐与优化（Alignment and Optimization）**。三者通过统一的 Sim(3) 尺度对齐、束调整和接触约束耦合，将静态场景、动态人体与相机轨迹统一到同一个世界坐标系中。
 
@@ -220,16 +210,6 @@ $$
 
 其中 $\lambda_c$ 为接触损失权重。该目标联合优化相机外参、场景点云和 SMPL 参数，使人体与场景在尺度、接触和重力方向上达成一致。消融实验证实，重力感知项通过稳定垂直运动并抑制漂移，进一步增强了物理合理性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l25_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_TROPHIES_Temporal/figures/004_Figure_3.jpg]]
-*Figure 3: Human-aware attention. Each frame is divided into human (colored) and non-human (transparent) patches. For views at the same time, all patches share information to enforce multiview consistency. Across different time steps, only non-human patches exchange information, while human patches are masked in the attention layer to avoid motion-induced inconsistency*
-
-![[assets/figures/papers/paper_list_l25_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_TROPHIES_Temporal/figures/005_Figure_4.jpg]]
-*Figure 4: Our method takes synchronized multi-view video frames as input and processes them with shared Human Video Transformers. A two-stage cross-view module first performs symmetric attention among all views to exchange global geometric information, and then applies an anchor-referenced fusion that aggregates features into the anchor view. The fused representation is decoded temporally and passed to dual heads predicting SMPL parameters*
-
-
-
 ## 实验与关键发现
 
 ### 1. 实验设置
@@ -260,24 +240,17 @@ TROPHIES 在两个多视角人体-场景交互数据集上进行评估：**EgoHu
 
 当前分析材料未提供明确的失败案例或局限性讨论。从方法设计推断，潜在瓶颈可能包括：极度拥挤场景下人体掩码不准确导致场景分支残留运动伪影；接触损失依赖场景表面重建质量，在稀疏视角或纹理缺失区域可能失效；全局优化假设静态场景，对动态背景（如移动家具）的适应性需要进一步验证。以上推断需人工核实原文。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l25_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_TROPHIES_Temporal/figures/002_Table_1.jpg]]
 *Table 1: Comparison of methods across different features*
 
 ![[assets/figures/papers/paper_list_l25_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_TROPHIES_Temporal/figures/007_Table_2.jpg]]
 *Table 2: Elevation of TROPHIES on the EgoHumans [26] and EgoExo4D [11] datasets. Across all backbones and datasets, TROPHIES consistently improves human accuracy (lower W-MPJPE, PA-MPJPE, Accel) and enhances scene–camera coherence (higher RRA, CCA, s-CCA), outperforming the original baselines by a large margin. These results demonstrate the generalization of our framework across architectures and domains, yielding globally aligned and physically coherent human–scene reconstructions*
 
-![[assets/figures/papers/paper_list_l25_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_TROPHIES_Temporal/figures/008_Table_3.jpg]]
-*Table 3: Evaluation results of human branch on the EgoHuman dataset. We compare it with recent human reconstruction approaches under both the All Views and Anchor View. Across all metrics, TROPHIES (human branch) outperforms prior methods*
-
 ![[assets/figures/papers/paper_list_l25_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_TROPHIES_Temporal/figures/009_Table_4.jpg]]
 *Table 4: Ablation Study on the human-aware attention. Across all backbones [57, 58, 65], introducing human-aware attention to the scene branch consistently improves TE, AE and RRA, indicating more stable and geometrically consistent reconstruction*
 
 ![[assets/figures/papers/paper_list_l25_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_TROPHIES_Temporal/figures/006_Figure_5.jpg]]
 *Figure 5: Qualitative results. Comparison of multi-view reconstructions before and after global optimization (Scenes 1–2) and against prior work (Scene 3). For Scenes 1 and 2, the initial results (a,c) exhibit misalignment between humans and scenes, leading to interpenetration, floating feet, and incorrect grounding (red boxes). Our global optimization (b,d) lead to physically coherent and well-grounded reconstructions. Scene 3 compares HSfM (e) with our TROPHIES framework (f). Since HSfM performs frame-wise independent optimization, its per-frame scale drifts accumulate over time, causing noticeable spatial inconsistencies when the results are aggregated. In contrast, our TROPHIES maintains a global...*
-
-
 
 ## 定位与知识库关联
 
@@ -348,8 +321,6 @@ TROPHIES 的全局优化涉及多帧、多视角的联合束调整，计算复�
 2. **实时性优化**：全局束调整的实时化是否可能？能否通过关键帧选择或分层优化策略降低计算开销？
 3. **弱监督与自监督**：接触约束当前依赖场景表面重建质量，能否通过物理模拟或自监督信号增强接触感知的鲁棒性？
 4. **跨域泛化**：TROPHIES 在 EgoHumans（室内多人体）和 EgoExo4D（自我-外部视角）上的表现是否可迁移至室外大规模场景或穿戴式相机场景？
-
-
 
 ## 原文 PDF
 

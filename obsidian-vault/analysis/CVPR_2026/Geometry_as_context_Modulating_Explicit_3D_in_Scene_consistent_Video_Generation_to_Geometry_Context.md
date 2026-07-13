@@ -67,8 +67,6 @@ GaC 属于基于重建的场景视频生成方法，与 **ViewCrafter**（Yu et 
 
 当前方法对人体和复杂主体的生成效果仍然有限，部分室外场景在大幅视点外推时可能出现边界纹理变暗的伪影。在前后往复长距离轨迹上，所有方法的性能均有明显下降，GaC 虽表现最优但仍存在3D一致性退化。该方法依赖预先计算的相机轨迹，尚未支持实时交互场景生成。未来方向包括扩展几何上下文的表示能力（如引入语义信息或3DGS）、利用更长序列和更大模型增强长距离3D记忆，以及探索与实时SLAM系统的结合以实现交互式探索。
 
-
-
 ### 场景一致性视频生成的核心挑战
 
 从单张图像或文本描述生成具有3D一致性的长序列视频，是计算机视觉与生成模型交叉领域的前沿问题。其核心难点在于：模型不仅需要合成逼真的单帧图像，还必须确保跨视点的几何连贯性——即场景中的物体在相机运动过程中保持形状、纹理和空间位置的一致性，不发生扭曲、漂移或突然消失。这一需求在自动驾驶仿真、虚拟现实漫游、影视特效预览等应用中尤为关键。
@@ -102,8 +100,6 @@ $$\{G_i, I_{i+1}', I_{i+1}\} = \varrho(\{I_i, G_i, I_{i+1}'\}, P_{i+1})$$
 
 简言之，GaC 的动机在于：**用可微分的生成模型替代不可微的重建算子，将显式几何从“中间产物”升级为“调制上下文”，从而在保留3D先验的同时打通端到端训练的路径。**
 
-
-
 ## 核心方法与创新机理
 
 GaC 的核心创新在于将传统基于重建的场景视频生成流水线中**不可微分的几何重建与绘制算子替换为单一的可微分自回归生成模型**，从而实现了端到端优化，从根本上缓解了累积误差问题。这一创新通过三个关键的 **changed slots** 体现：
@@ -130,8 +126,6 @@ CGA 将 Plücker 射线特征与查询向量相加后投影，生成残差查询
 
 为平衡 3D 一致性与计算效率，GaC 提出了**几何 Dropout** 策略：训练时随机丢弃几何上下文，使模型既能从几何建模中学习场景一致性，又能在推理时仅生成 RGB 图像，避免不必要的几何输出。该策略将训练迭代时间从 24 s/step 降至 11 s/step（−54%），推理时间从 4.6 s/img 降至 2.2 s/img（−52%），且性能几乎无下降（Table 6）。
 
-
-
 Geometry-as-Context (GaC) 的核心动机在于消除传统基于重建的场景视频生成流水线中，由非可微分算子（反投影、渲染）与独立修复网络所导致的累积误差。原始流水线（Algorithm 1）采用串行结构：首先从当前图像 $I_i$ 估计几何信息 $G_i = \epsilon(I_i)$，随后通过反投影得到三维表示 $3D = \mathrm{Unproject}(I_i, G_i)$，再根据目标相机姿态 $P_{i+1}$ 渲染出新视角图像 $I_{i+1}' = \mathrm{Render}(3D, P_{i+1})$，最后交由生成模型 $\varrho$ 进行修复得到最终图像 $I_{i+1} = \varrho(I_{i+1}', P_{i+1})$。这一流程中，几何估计器 $\epsilon$ 与渲染算子均为黑盒模块，无法与生成模型联合优化，导致几何误差在迭代中逐帧放大。
 
 GaC 的关键设计是将上述非可微分的几何估计、反投影与渲染操作全部内化至单一的自回归扩散变换器（DiT）主干中，将问题重新定义为统一的生成任务。具体而言，模型以交错序列作为输入，将当前图像 $I_i$ 与对应的几何上下文 $G_i$（如深度图）拼接后，连同目标相机姿态 $P_{i+1}$ 一并送入生成模型 $\varrho$，同时输出下一视点的几何信息 $G_{i+1}$ 和 RGB 图像 $I_{i+1}$。这一过程可形式化为：
@@ -157,13 +151,6 @@ $$O = \mathrm{Linear}_3(O * \sigma(Gate))$$
 训练策略方面，GaC 采用**文本引导的交错序列建模**，通过插入特殊提示词（`<Geometry>` 与 `<Image>`）告知模型当前应生成几何信息还是 RGB 图像，实现多任务的无缝切换。同时，为平衡计算效率与三维一致性，GaC 引入**几何 Dropout** 策略：在训练过程中随机丢弃几何上下文，迫使模型在缺乏显式三维信息时仍能保持场景一致性，同时在推理阶段可直接跳过几何输出以加速生成。消融实验表明，该策略在几乎不损失生成质量的前提下，将训练迭代时间与推理时间分别降低约 54% 和 52%（Table 6）。
 
 综上，GaC 的整体框架通过将显式几何信息作为上下文、以 CGA 实现相机感知的注意力调制、并辅以几何 Dropout 的效率优化，构建了一个端到端可训练的场景一致性视频生成流水线。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2506_https_arxiv_org_abs_2602_21929/figures/002_Figure_2.jpg]]
-*Figure 2: Reconstruction-based scene video generation (a) v.s. our geometry-as-context (GaC) (b). Reconstruction-based scene video generation uses non-differentiable operators in reconstruction, which tend to worsen cumulative errors caused by inaccurate geometry estimates or image inpainting. In contrast, GaC replaces these operations with camera-controllable generation, turning reconstructionbased scene video generation into an autoregressive video generation framework with one single DiT. It can effectively reduce cumulative errors caused by non-differentiable reconstruction and non-end-to-end training*
-
-
 
 ### 问题形式化：从多阶段重建到统一生成
 
@@ -244,8 +231,6 @@ $$O = \mathrm{Linear}_3(O * \sigma(Gate))$$
 
 训练阶段引入**几何 Dropout 策略**：随机丢弃输入序列中的几何上下文，使模型学会在缺乏显式几何的情况下仍能保持场景一致性，同时大幅缩短序列长度。Table 6 显示，该策略将训练迭代时间从 24 s/step 降至 11 s/step（-54%），推理时间从 4.6 s/img 降至 2.2 s/img（-52%），而生成质量几乎无退化。推理时可通过省略 `<Geometry>` 提示跳过几何输出，仅生成 RGB 图像，进一步提升效率。
 
-
-
 ## 实验与关键发现
 
 ### 主要结果：单视图场景视频生成
@@ -286,29 +271,17 @@ Table 3 对比了三种几何上下文变体：
 
 Table 4 消融了深度图与点图两种几何表示。深度图在 LPIPS 感知质量指标上略优于点图，且作为单通道表示具有更低的内存和计算开销，因此被选为默认几何上下文格式。
 
-![[assets/figures/papers/paper_list_l2506_https_arxiv_org_abs_2602_21929/figures/010_Table_4.jpg]]
-*Table 4: Ablation on different choices of geometry*
-
 #### Camera Gated Attention 的有效性
 
 Table 5 验证了 CGA 模块的贡献。移除 CGA（即使用简单的 Plücker 射线编码相加）后，PSNR 从 19.01 降至 18.57，FID 从 55.76 恶化至 68.42。更重要的是，CGA 显著降低了相机姿态误差——旋转误差 $R_{err}$ 和位移误差 $T_{err}$ 均有大幅下降。这说明 CGA 通过门控机制有效区分了相机姿态在几何预测和视图合成两个子任务中的不同作用，使模型学会根据任务需求选择性利用相机信息。
-
-![[assets/figures/papers/paper_list_l2506_https_arxiv_org_abs_2602_21929/figures/007_Table_5.jpg]]
-*Table 5: Effect of the CGA*
 
 #### 几何 Dropout 的效率-性能权衡
 
 Table 6 展示了几何 Dropout 策略的效果。训练时随机丢弃几何上下文，使每次迭代时间从 24 s/step 降至 **11 s/step**（减少 54%），推理时单张图像生成时间从 4.6 s/img 降至 **2.2 s/img**（减少 52%）。与此同时，生成质量指标（PSNR、FID 等）仅有可忽略的下降。这表明模型在训练过程中已从几何上下文中学会了3D一致性先验，推理时即使不显式输出几何信息，仍能维持场景结构。
 
-![[assets/figures/papers/paper_list_l2506_https_arxiv_org_abs_2602_21929/figures/008_Table_6.jpg]]
-*Table 6: Effect of the geometry dropout. The unit “s/step” means how long it takes to perform one iteration. Unit “s/img” means how long it takes to generate one image during inference*
-
 ### 失败模式与局限性
 
 Figure 9 展示了典型失败案例。模型在以下场景中表现受限：
-
-![[assets/figures/papers/paper_list_l2506_https_arxiv_org_abs_2602_21929/figures/015_Figure_9.jpg]]
-*Figure 9: Failure cases*
 
 1. **人体与复杂主体**：对人体、动物等非刚性主体的生成质量明显不足，可能源于训练数据中此类场景的几何与纹理多样性有限，导致模型难以建立准确的几何-外观映射。
 2. **大幅视点外推**：在部分室外场景中，当新视角偏离输入视角过大时，边界区域纹理可能出现略微变暗的伪影，这与几何估计在远距离投影时的精度衰减有关。
@@ -318,13 +291,6 @@ Figure 9 展示了典型失败案例。模型在以下场景中表现受限：
 ### 公平性说明
 
 所有基线方法均使用官方代码或开源实现进行评估，采用相同的数据集划分和评估协议。相机轨迹由数据集提供或按标准流程生成，确保对比的公平性。训练资源（8×H100）与部分基线相似或更高，已在文中明确报告。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2506_https_arxiv_org_abs_2602_21929/figures/011_Figure_5.jpg]]
-*Figure 5: Gac’s results on indoor scenes*
-
-
 
 ## 定位与知识库关联
 
@@ -413,8 +379,6 @@ GaC 需要预先给定相机轨迹，不支持实时交互式场景探索。这�
 4. **与实时系统的融合**：将 GaC 的端到端可微分生成能力与实时 SLAM 或 3DGS 系统结合，可能实现交互式场景探索中的高质量新视角生成。
 
 5. **训练序列长度的规模化**：当前训练序列长度有限，更长的序列和更大的模型是否能进一步增强三维记忆能力，是一个值得探索的规模化问题。
-
-
 
 ## 原文 PDF
 

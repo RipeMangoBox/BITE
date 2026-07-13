@@ -52,8 +52,6 @@ claims:
 
 当前方法仍存在两点局限：其一，基于网格的语义占用表示与原始场景网格存在偏差，可能导致约 4 cm 的轻微碰撞或悬空；其二，框架仅支持单人运动合成，尚未扩展至多人交互或群体运动生成场景。
 
-
-
 ### 问题背景：3D 场景中的人体运动合成
 
 生成在复杂 3D 室内场景中自然移动并与物体交互的人体运动序列，是计算机视觉与图形学中的一个基础且具有挑战性的问题。该任务的核心难点在于，合成的人体不仅需要保持运动本身的物理合理性与自然度，还必须与周围 3D 环境的几何约束和语义属性保持精确一致——例如，人物应走到沙发前而非穿入其中，坐下时应选择可坐的表面而非桌子边缘。
@@ -83,8 +81,6 @@ claims:
 - **CLIP 文本编码 + 共享线性降维的统一语义映射**：利用 CLIP 文本编码器提取各语义类别的文本特征，再通过一个共享的线性层将高维特征降维至统一的低维语义空间。这不仅解决了不同数据集语义标签不兼容的问题，还通过降维大幅削减了后续计算开销——结合双向三平面分解后，单样本计算量从 20783 GFLOPs 骤降至 **0.49 GFLOPs**（Table 3），降幅超过四个数量级。
 
 基于这一轻量级统一场景表征，SSOMotion 进一步通过**目标导向的人-场景关联模块**，以帧级交叉注意力机制将方向指令提示与场景语义特征共同注入扩散模型的运动控制分支，实现指令感知的 3D 场景人体运动合成。
-
-
 
 ## 核心方法与创新机理
 
@@ -122,16 +118,11 @@ SSOMotion 的核心创新在于将**场景语义占用（Scene Semantic Occupanc
 
 三项创新形成闭环：**SSO 三平面分解**提供轻量级多模态场景表示，**统一语义映射**赋予其跨数据集泛化能力，**目标导向关联**则将语义信息有效注入运动生成过程。这一组合以极低的计算代价（0.49 GFLOPs/样本）实现了对场景可供性的细粒度理解，是 SSOMotion 在移动精度和交互自然度上超越 DIMOS 的根本原因。
 
-
-
 SSOMotion 的整体框架围绕三个核心设计展开：**统一场景语义占用（SSO）感知**、**目标导向的人-场景关联建模**，以及**基于扩散模型的运动控制生成**。系统输入为历史人体运动序列与自然语言指令，输出为未来帧的 SMPL-X 参数（全局平移、全局朝向、关节旋转）。
 
 ### 流水线概览
 
 如 Figure 1 所示，框架首先将指令通过人体先验知识转化为目标姿态或位置（Hassan et al., 2021b; Zhao et al., 2022）。随后，以人体为中心部署网格传感器，在体中心坐标系下感知局部场景的语义、几何与颜色信息，构建紧凑的场景语义占用表示。该占用体素通过**双向三平面分解**（沿 ±x、±y、z 五个方向投影）被压缩为多视角的语义-深度-颜色特征图，同时利用 CLIP 文本编码器与共享线性层将不同数据集的语义标签映射到统一的低维特征空间（Figure 2）。
-
-![[assets/figures/papers/paper_list_l1695_SSOMotion_HumanMotion_Synthesis_in_3D_Scenes_via_Unified_Scene_Semantic/figures/001_Figure_1.jpg]]
-*Figure 1: Illustration of human motion synthesis within 3D Scene Semantic Occupancy (SSO). We decompose the SSO into bi-directional tri-plane as a unified scene representation. Human scene correlation is modeled as control signal for instruction-aware motion synthesis in 3D scenes*
 
 在运动生成端，系统采用基于扩散模型的架构：历史运动帧经加噪后，与时间步、掩码关节、动作编码共同构成动作意图提示（Figure 3a）。目标导向的人-场景关联模块（Figure 3b）通过帧级交叉注意力机制，分别建模方向提示与运动特征的关联（Eq. 8）以及场景特征与运动特征的关联（Eq. 9），最终将融合后的控制信号通过零初始化线性层注入主扩散模型，引导去噪过程生成符合指令且场景兼容的运动序列。
 
@@ -148,8 +139,6 @@ SSOMotion 的整体框架围绕三个核心设计展开：**统一场景语义�
 - **双向三平面分解**替代直接处理三维体素，将单样本场景感知与运动-场景关联的总计算量从 20783 GFLOPs 压缩至 0.49 GFLOPs（Table 3），这是框架实现高效推理的瓶颈突破点。
 - **统一语义映射**通过 CLIP 文本编码器提取类别特征后经共享线性层降维，解决了不同数据集语义标签空间不兼容的问题，使模型能够在 HUMANISE、PROX、Replica 等多数据集上联合训练。
 - **长序列合成**采用滑动窗口策略（历史帧 $H$ 与生成帧 $S$ 重叠），以历史运动约束保证帧间过渡的连续性。
-
-
 
 ### 问题形式化与扩散基础
 
@@ -231,15 +220,8 @@ $$\mathcal{L}_{vel} = M_{1:} \cdot ||\hat{v} - v||^2 \quad \text{(Eq. 14)}$$
 
 $\nu$ 为帧率缩放因子，$M_{1:}$ 从第二帧开始掩码以对齐速度计算的时间偏移。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1695_SSOMotion_HumanMotion_Synthesis_in_3D_Scenes_via_Unified_Scene_Semantic/figures/002_Figure_2.jpg]]
 *Figure 2: Pipeline of the Scene Semantic Occupancy perception (SSO). (a) presents the Bi-directional Tri-plane Decomposition of the SSO, where scene color, semantics and depth are perceived in body-centered coordinate. In (b), we map the semantic labels into a unified semantic space via the CLIP textual encoder and a shared linear layer. Then, the unified low-dimension semantic features will be scattered into the semantic map. (c) indicates the normalization functions for distance and color space*
-
-![[assets/figures/papers/paper_list_l1695_SSOMotion_HumanMotion_Synthesis_in_3D_Scenes_via_Unified_Scene_Semantic/figures/003_Figure_3.jpg]]
-*Figure 3: Overview of (a) the network for instruction-aware human motion synthesis in 3D scenes and (b) the motion controller based on Goal-directed Human Scene Correlation*
-
-
 
 ## 实验与关键发现
 
@@ -285,9 +267,6 @@ SSOMotion 的核心效率突破体现在场景感知与运动-场景关联两个
 
 在 PROX (Figure 8) 和 Replica (Figure 9) 数据集上的跨场景泛化结果表明，SSOMotion 的统一语义映射机制使其能够在不同场景布局和语义标签体系下保持稳定的合成质量，无需针对特定数据集重新训练语义嵌入层。
 
-![[assets/figures/papers/paper_list_l1695_SSOMotion_HumanMotion_Synthesis_in_3D_Scenes_via_Unified_Scene_Semantic/figures/010_Figure_8.jpg]]
-*Figure 8: Visual comparison of different methods for instruction-based motion synthesis in 3D scenes from PROX dataset*
-
 ### 失败模式与边界条件
 
 尽管 SSOMotion 在主要指标上表现优异，但其基于网格的场景语义占用表示引入了与原始场景网格的偏差。这一偏差导致合成的人体运动可能出现约 4 cm 量级的轻微碰撞和悬空现象。该问题的根源在于体素化过程本身的信息损失——网格到占用的离散化不可避免地丢失了细粒度的表面几何细节。
@@ -297,19 +276,6 @@ SSOMotion 的核心效率突破体现在场景感知与运动-场景关联两个
 ### 用户研究
 
 用户研究 (Figure 7) 从自然度、指令达成率、场景合理性等多个维度对竞争方法进行了主观评分，SSOMotion 在所有维度上均取得最高分，与定量指标的趋势一致。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1695_SSOMotion_HumanMotion_Synthesis_in_3D_Scenes_via_Unified_Scene_Semantic/figures/005_Table_1.jpg]]
-*Table 1: Evaluation of motion synthesis on locomotion task. The up/down arrows (↑/↓) indicate higher/lower is better. Metrics with best performance are annotated in boldface*
-
-![[assets/figures/papers/paper_list_l1695_SSOMotion_HumanMotion_Synthesis_in_3D_Scenes_via_Unified_Scene_Semantic/figures/006_Table_2.jpg]]
-*Table 2: Evaluation of motion synthesis on interaction tasks. The up/down arrows (↑/↓) indicate higher/lower is better. The best results are shown in boldface*
-
-![[assets/figures/papers/paper_list_l1695_SSOMotion_HumanMotion_Synthesis_in_3D_Scenes_via_Unified_Scene_Semantic/figures/013_Table_4.jpg]]
-*Table 4: Results of the proposed method on the motion prediction task in the HUMANISE dataset. Mean Per Joint Position Error (MPJPE), Mean Per Vertex Position Error (MPVPE), and Goal Distance measured in meters are taken as the evaluation metrics. ↓ indicates lower is better*
-
-
 
 ## 定位与知识库关联
 
@@ -350,8 +316,6 @@ SSOMotion 的核心对比基线是 **DIMOS** (Zhao et al., ICCV 2023)，该方�
 **如何支持更自由的指令形式？** 当前指令需转化为目标姿态或位置，限制了交互的自然性。将指令端扩展为自然语言输入，并建立语言-场景-动作的联合推理，是提升系统实用性的关键方向。这需要在统一语义空间的基础上，进一步建立语言描述与场景可供性的细粒度对齐。
 
 **实时性与交互式应用。** 虽然双向三平面分解将场景感知计算量从20783 GFLOPs 降至0.49 GFLOPs（Table 3），但整体推理延迟是否满足实时交互需求（如VR/AR场景中的即时响应）仍需进一步验证和优化。
-
-
 
 ## 原文 PDF
 

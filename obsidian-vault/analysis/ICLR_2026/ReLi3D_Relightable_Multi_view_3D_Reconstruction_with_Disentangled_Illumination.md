@@ -66,8 +66,6 @@ claims:
 
 方法仍存在若干局限：当环境光照超出 RENI++ 先验分布时（如多个极亮点光源），解耦易失败并出现材质图烘焙光照；强自遮挡阴影区域与极暗场景下材质估计退化；三平面分辨率（3×40×384×384）限制了纹理与几何细节的保真度。透明物体的显式网格重建与材质估计仍是一个开放挑战。
 
-
-
 ### 问题背景：三维重建中的材质-光照解耦困境
 
 从稀疏多视角图像重建可重光照的三维资产，是计算机视觉与图形学交叉领域的核心挑战。其关键难点在于**材质与光照的解耦**：同一张二维图像的外观可以由无数种表面反射率与入射光照的组合产生，这使得从像素反推本征属性在数学上是一个严重不适定问题。对于仅依赖单视图的方法，这种歧义尤为突出——模型缺乏跨视角的几何与光度一致性约束，无法可靠地区分“白色表面在红光下”与“红色表面在白光下”两种截然不同的物理场景。
@@ -92,8 +90,6 @@ ReLi3D的核心洞察在于：**多视角观测对同一表面点在不同视角
 
 这种“多视角约束 + 物理渲染监督”的组合，首次使得在单次前馈推理中联合重建网格、空间变化PBR材质和HDR环境光成为可能，推理时间仅约0.3秒，较生成式方法加速约250倍（对比Hunyuan3D的69.4秒）。
 
-
-
 ## 核心方法与创新机理
 
 ReLi3D的核心创新在于将单视角下根本上不适定的材质-光照解耦问题，通过**多视角交叉视图融合**与**可微分物理渲染**的联合约束，转化为一个可求解的前馈推理问题。与现有方法相比，其关键改变体现在以下五个维度。
@@ -117,8 +113,6 @@ ReLi3D的核心创新在于将单视角下根本上不适定的材质-光照解�
 ### 从纯合成域到混合域的训练策略
 
 **LRM**、**SF3D**等方法仅在合成数据上训练，向真实场景泛化时性能退化明显。ReLi3D采用混合域训练：42k合成PBR数据提供全监督材质真值，70k合成RGB数据与62k真实世界UCO3D捕获数据通过图像空间自监督损失（MSE+LPIPS）进行联合优化，材质监督损失（Eq. 14）根据数据可用性自适应调整权重。这一策略使ReLi3D在Stanford ORB真实数据集上同样取得领先（Table 3），弥合了合成-真实域间鸿沟。
-
-
 
 ReLi3D 是一个端到端的前馈推理管线，能够在一次前向传播中从稀疏多视角图像联合重建三维几何、空间变化的 PBR 材质以及 HDR 环境光照。管线的核心设计理念是将材质-光照解耦这一单视角下的不适定问题，通过多视角交叉视图约束转化为可约束问题，并利用可微分物理渲染强制执行物理一致性。
 
@@ -161,8 +155,6 @@ ReLi3D 的整体流程如 Figure 2 所示，由**共享交叉条件变换器**�
 ### 训练策略
 
 ReLi3D 采用**混合域训练**以弥合合成数据与真实场景之间的差距：训练数据包含 42k 合成 PBR 物体（提供完整材质真值）、70k 合成 RGB-only 物体（仅图像监督）以及 62k 真实世界 UCO3D 多视角捕获（仅图像监督）。训练分阶段进行：早期阶段使用高斯近似渲染快速扩展几何覆盖（贡献 70–80% 的覆盖提升），最终阶段切换为 MC 渲染器进行微调，贡献了大部分材质解耦增益（基色 53.5%、粗糙度 62.4%、金属度 51.3%，Table 6）。
-
-
 
 ReLi3D 的核心架构由四条关键模块构成：共享交叉条件变换器、几何与外观路径、光照路径，以及可微分蒙特卡洛渲染器。这些模块协同工作，通过多视角一致性约束将材质-光照解耦从不适定问题转化为可约束问题。
 
@@ -242,8 +234,6 @@ $$\mathcal{L}_{\mathrm{env}} = 0.1\,\mathcal{L}_{\mathrm{MSE,RENI}} + 0.02\,\mat
 
 消融实验表明，移除可微分 MC 渲染器后图像重建 PSNR 从 19.92 dB 降至 17.54 dB，证实了物理渲染对于材质-光照解耦的必要性——它不仅是渲染质量的优化细节，更是约束解空间的核心机制。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与验证逻辑
@@ -287,42 +277,20 @@ ReLi3D的核心论断是：多视角交叉视图融合可以为材质-光照解�
 
 所有几何评估前均对预测网格施加刚性ICP对齐至真值网格，以补偿基线方法生成任意规范空间的偏差。部分基线（TripoSG、Hunyuan3D）生成的顶点数显著高于ReLi3D（100k+ vs 4.5k），但不影响图像与材质指标的比较。重光照评估中ReLi3D使用自身预测环境图而对比方法输入真实环境图的设计，使ReLi3D的优势更为保守可信。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l59_https_openreview_net_forum_id_BlSKgQb3Vd/figures/005_Table_1.jpg]]
 *Table 1: Relighting & Image & PBR Metrics Comparison. (Left) Relighting performance. (Middle) Image reconstruction performance. (Right) PBR material reconstruction performance. While most methods produce only global PBR parameters, ours produce spatially varying material maps which increase in quality with more views*
 
 ![[assets/figures/papers/paper_list_l59_https_openreview_net_forum_id_BlSKgQb3Vd/figures/006_Table_2.jpg]]
 *Table 2: 3D and Image Metrics. ReLi3D clearly achieves SOTA in single and sparse multi-view reconstruction while also achieving great speeds. It is worth noting that that TripoSG and Hunyuan3D also produce signficantly higher vertex counts (100k+ vs 4.5k for ours)*
 
-![[assets/figures/papers/paper_list_l59_https_openreview_net_forum_id_BlSKgQb3Vd/figures/007_Table_3.jpg]]
-*Table 3: Real-world Evaluation on Stanford ORB. Quantitative evaluation on Stanford ORB dataset showing 3D reconstruction, image quality, and basecolor material prediction performance. Our method outperforms baselines across all metrics and improves with more input views*
-
 ![[assets/figures/papers/paper_list_l59_https_openreview_net_forum_id_BlSKgQb3Vd/figures/015_Table_4.jpg]]
 *Table 4: Quantitative evaluation of illumination disentanglement. Comparison of environment map prediction and relighting quality on Polyhaven+HDRI dataset*
-
-![[assets/figures/papers/paper_list_l59_https_openreview_net_forum_id_BlSKgQb3Vd/figures/016_Table_6.jpg]]
-*Table 6: Training stage contribution analysis. Average share of the total improvement from Phase 1 (128 Gaussians) to the full Monte Carlo stage that is attributable to each intermediate stage. Columns aggregate the metrics shown in Table 1: (1) 3D coverage (CD and FS@0.05–0.5), (2) image quality (PSNR, SSIM, LPIPS), (3) basecolor (PSNR, SSIM, LSSIMSE), (4) roughness (PSNR, SSIM, RMSE), and (5) metallic (PSNR, SSIM, RMSE). Early Gaussian stages mainly expand 3D coverage, while the Monte Carlo refinement sharpens PBR material disentanglement*
 
 ![[assets/figures/papers/paper_list_l59_https_openreview_net_forum_id_BlSKgQb3Vd/figures/017_Table_7.jpg]]
 *Table 7: Hero view selection sensitivity. Comparison of metrics using random hero view selection versus always selecting the most frontal view on the Polyhaven dataset*
 
-![[assets/figures/papers/paper_list_l59_https_openreview_net_forum_id_BlSKgQb3Vd/figures/003_Figure_3.jpg]]
-*Figure 3: PBR & Relighting Results. We show that our spatially varying PBR prediction is faithful to the ground truth and therefore produces highly detailed and realistic relightings*
-
 ![[assets/figures/papers/paper_list_l59_https_openreview_net_forum_id_BlSKgQb3Vd/figures/004_Figure_4.jpg]]
 *Figure 4: Illumination Comparison. (Left) Single view, illumination prediction results compared to ground truth and SPAR3D, which also predicts RENI++ latents, indicating our severely improved method. (Right) Influence of increasing numbers of views and background information. Notice how well we can predict the illumination in the top rows with background information locate light sources correctly, whereas the bottom row is more spread out as it is inferred from diffuse surface reflections only*
-
-![[assets/figures/papers/paper_list_l59_https_openreview_net_forum_id_BlSKgQb3Vd/figures/014_Figure_10.jpg]]
-*Figure 10: Illumination Comparison. Comparison of illumination prediction results between DiffusionLight, SPAR3D, and our method (ReLi3D). Predicted environmens vary vastly while ours mimics the ground truth shape and color, DiffusionLight hallucinates a completely different environment, SPAR3D fails*
-
-![[assets/figures/papers/paper_list_l59_https_openreview_net_forum_id_BlSKgQb3Vd/figures/010_Figure_7.jpg]]
-*Figure 7: Reconstruction Results (Real World). Our method produces accurate reconstructions for real-world data, although challenging. Incorporating multiple views improves the performance further by clearing up uncertainties in unseen areas*
-
-![[assets/figures/papers/paper_list_l59_https_openreview_net_forum_id_BlSKgQb3Vd/figures/011_Figure_8.jpg]]
-*Figure 8: Real-world material prediction. Material maps (albedo, roughness, metallic, normal) for real-world objects from UCO3D dataset on very challenging settings, strong reflections and blur. Our method is still able to make a rough prediction and faithfully separates metallic and non-metallic materials*
-
-
 
 ## 定位与知识库关联
 
@@ -384,8 +352,6 @@ ReLi3D 的适用边界受以下因素制约：
 ### 6. 证据强度评估
 
 ReLi3D 的核心主张获得了较充分的实验支撑。多视角约束改善材质-光照解耦的洞察在 Abstract 中明确陈述，并在 Table 1 和 Table 4 中获得量化验证。MC+MIS 渲染器的必要性通过消融实验（Table 5）得到证实。训练阶段贡献分析（Table 6）为物理渲染在材质解耦中的关键作用提供了因果证据。混合域训练策略的有效性通过 Stanford ORB 真实世界评估（Table 3）得到支持。需要注意的是，公平性方面，所有几何评估前均对预测网格施加刚性 ICP 对齐至真值网格，以补偿基线方法生成任意规范空间的偏差；重光照评估中，ReLi3D 使用自身预测的环境图而对比方法若支持则输入真实环境图，这使 ReLi3D 的优势更具说服力。
-
-
 
 ## 原文 PDF
 

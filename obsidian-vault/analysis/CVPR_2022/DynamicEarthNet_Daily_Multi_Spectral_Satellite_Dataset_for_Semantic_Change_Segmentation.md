@@ -409,20 +409,11 @@ Figure 5展示了U-TAE、U-ConvLSTM、3D-Unet在日输入下的定性预测对�
 3. **如何改善湿地、农业等稀有类的分割精度？** 类别重加权、针对性数据增强或多任务学习可能是潜在方向；
 4. **如何定义能适应不同变化周期的多时相评估指标？** 双时相设定对渐进式变化过于严格，但多时相平滑又会降低评估敏感性，需要在两者之间找到平衡。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2203_12560/figures/008_Figure_3.jpg]]
 *Figure 3: Qualitative results on validation set. Semantic maps (bottom row) of the semi-supervised baseline CAC [21] trained on daily images. The input sequence consists of 5 images (middle row) from September to October, spanning one month. For the first and last semantic map of the considered sequence, we show ground-truth labels (bottom right, bottom left). The three middle columns show predictions of [21]. For each sample, we magnify a specific area to highlight the temporal transition from forest & other vegetation to soil, marked red for ground-truth and pink for baseline predictions [21]. Notably, this development is captured with high fidelity by our baseline [21]. On the other hand, in certa...*
 
 ![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2203_12560/figures/013_Figure.jpg]]
 *Figure: Daily U-TAE Daily U-ConvLSTM Monthly CAC Weekly CAC *
-
-![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2203_12560/figures/014_Figure.jpg]]
-*Figure: Daily 3D-Unet Daily CAC *
-
-![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2203_12560/figures/015_Figure_7.jpg]]
-*Figure 7: Confusion matrices. We show confusion matrices corresponding to the LULC segmentation results in Sec. 5.2 on the validation set. The goal is to provide a fine-grained analysis of which classes frequently get misclassified as certain other classes. Each column of an individual confusion matrix is normalized, meaning that it shows the relative distribution of predictions (in percent) for a given, true class. Results are shown for both spatio-temporal (left column) and semi-supervised baselines (right column) with three different settings each*
-
 
 ![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2203_12560/figures/007_Table_5.jpg]]
 *Table 5: Quantitative results of semantic change segmentation on our test set. This table shows semantic change segmentation results of all methods on our DynamicEarthNet dataset*

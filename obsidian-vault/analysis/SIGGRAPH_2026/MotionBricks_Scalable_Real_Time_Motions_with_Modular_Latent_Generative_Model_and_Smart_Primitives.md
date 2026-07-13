@@ -57,8 +57,6 @@ claims:
 
 **证据强度。** 上述结论由七大类指标（速度、分布、人体评估、多样性、平滑度、物理合理性、精确度）的全面评估支持，人体评估邀请了40名不同背景参与者，所有方法在同一训练集和评估协议下比较。需注意，数据集缺少手指和物体运动数据，稀有动作类别泛化仍有困难，且离散潜在表示在较高重规划频率下会导致 FID 和关键帧误差轻微增加。
 
-
-
 ### 实时动作合成的规模化困境
 
 在游戏、虚拟现实和机器人等交互式应用中，实时动作合成是一个核心挑战。现代应用要求系统能够以极低延迟（毫秒级）响应用户输入，同时生成高质量、风格多样且物理合理的全身动作。近年来，生成式模型在离线动作合成领域取得了显著进展，但当这些方法被推向实时场景时，一个根本性瓶颈浮现：**模型质量与可扩展性在严格实时计算约束下急剧下降**。
@@ -77,8 +75,6 @@ MotionBricks的核心动机源于一个关键洞察：**将动作生成分解为
 2. **智能基元接口**：提出“智能基元”（smart primitives）作为统一的高层控制抽象，将速度命令、风格选择和关键帧约束转化为一致的目标关键帧表示，使单一神经骨干无需微调即可零样本泛化到导航、物体交互和机器人控制等多种下游任务。
 
 这种从“碎片化控制”到“统一基元接口”的转变，以及从“单体生成”到“模块化潜在生成”的架构演进，构成了MotionBricks区别于现有工作的核心动机，也为后续在2ms延迟、15,000 FPS吞吐量下实现大规模高质量动作合成奠定了基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -128,8 +124,6 @@ $$\boldsymbol{r}(t) = e^{-\gamma t} \left( (\boldsymbol{r}_0 - \boldsymbol{r}_{g
 
 上述三个改变形成正向反馈循环：多头部标记器提供了足够的容量来表征 350k+ 动作片段中的多样化运动模式；根-姿态解耦使得解码器能够独立处理轨迹精度和姿态质量；模块化流程降低了每个子模块的学习难度；智能基元则将生产级控制需求统一为关键帧约束，使模型无需针对每类任务重新训练。最终，这套设计在保持 2ms 延迟和 15,000 FPS 吞吐量的实时效率下，在 FID 指标上显著优于所有基线方法（350k 数据集上 FID=1.054，对比最佳基线 MMM 的 1.153；LaFAN1-G1 上 FID=0.891，对比 ClosdDiP 的 0.903）。
 
-
-
 MotionBricks 的整体推理流程由四个阶段构成（图2），其设计核心是将动作生成分解为**高层规划**与**低层合成**两个层次，并通过模块化的粗到细流程实现实时高效的动作控制。
 
 ### 1. 智能基元：从用户指令到关键帧约束
@@ -176,21 +170,11 @@ $$\{r_l^t, \boldsymbol{p}^t, \boldsymbol{q}^t, \boldsymbol{v}^t, \boldsymbol{c}^
 
 这种模块化的粗到细流程，使得 MotionBricks 在保持 2ms 生成延迟和 15,000 FPS 吞吐量的严格实时约束下，仍能以单一模型有效处理超过 35 万段动作的大规模数据集。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2_https_doi_org_10_1145_3811334/figures/013_Figure_10.jpg]]
 *Figure 10: Scalability comparison between our multi-head tokenizer and a single-head baseline. Left and middle: Token reconstruction loss during training for varying codebook sizes for our method and the baseline. Our tokenizer continues to improve with larger codebooks (up to 109 tokens), while the baseline plateaus quickly. Right: Trade-off between FID (distribution quality) and keyframe joint position error as codebook size increases. Our method achieves better FID with larger codebooks while maintaining low keyframe error*
 
-![[assets/figures/papers/paper_list_l2_https_doi_org_10_1145_3811334/figures/016_Figure_13.jpg]]
-*Figure 13: Scaling behavior with dataset size from 10% to 100% of the 350k dataset. Left: Evaluation losses including the reconstruction loss for the tokenizer, and cross-entropy for token prediction. Right: FID and keyframe joint position error. Our method scales effectively with more data, while the baseline struggles at larger scales*
-
-![[assets/figures/papers/paper_list_l2_https_doi_org_10_1145_3811334/figures/023_Figure_19.jpg]]
-*Figure 19: Overview of the two test sets split from the 140k BONES-SEED open-source subset dataset. Fig. 20. Additional in-betweening visual comparisons across three test cases. Each column shows a different test case; time progresses from top to bottom. Algorithm names are labeled in each subfigure. MotionBricks is shown as the blue character*
-
 ![[assets/figures/papers/paper_list_l2_https_doi_org_10_1145_3811334/figures/002_Figure_2.jpg]]
 *Figure 2: MotionBricks’s inference pipeline consists of four stages. Given user commands or game events, smart primitives generate target keyframes. The root module first predicts timing and root trajectory, followed by the pose module that models the distribution of multi-head latent pose tokens. Finally, the decoder produces continuous motion conditioned on pose tokens, root trajectories, and keyframes*
-
-
 
 MotionBricks 的推理流程由四个核心模块构成（Fig. 2）：**Smart Primitives** 将用户指令或游戏事件转化为目标关键帧约束；**Root Module** 预测过渡帧数与全局根轨迹；**Pose Module** 通过掩码令牌建模生成多头部潜在姿态令牌；**Token Decoder** 从姿态令牌、根轨迹与关键帧约束中解码出连续全身运动。
 
@@ -244,8 +228,6 @@ $$\boldsymbol{r}(t) = e^{-\gamma t} \left( (\boldsymbol{r}_0 - \boldsymbol{r}_{g
 
 其中 $\gamma$ 为阻尼系数，$\boldsymbol{r}_0$ 和 $\boldsymbol{v}_0$ 为当前根位置与速度，$\boldsymbol{r}_{g,1}$ 为目标根位置。该模型保证了轨迹的平滑性与物理合理性，并通过神经根细化进一步根据运动风格自动调整（Fig. 5, Table 1）。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能：大规模实时生成的质量与效率
@@ -265,8 +247,6 @@ MotionBricks 在包含 350k 动作片段的专有数据集上展现出全面的�
 ### 结构化多头部标记器的可扩展性
 
 多头部标记器（multi-head tokenizer）是 MotionBricks 实现大规模可扩展性的关键设计。Figure 10 的消融实验揭示了一个核心发现：**当码本总容量从约 $10^5$ 扩展到约 $10^9$ 个令牌时，多头部标记器的重建损失持续下降，而单头部基线则迅速饱和**。这意味着，将潜在特征沿通道维度分割为多个独立量化的“头部”，每个头部拥有自己的码本，能够指数级地扩展表示容量，同时避免单一大码本带来的优化困难。
-
-![[assets/figures/papers/paper_list_l2_https_doi_org_10_1145_3811334/figures/021_Figure.jpg]]
 
 Figure 11 进一步探索了在固定总容量（约 $10^6$ 令牌）下，头部数量与每头码本大小的权衡。实验表明，**每头配置 128–256 个令牌**能够在重建质量与下游生成鲁棒性之间取得最佳平衡。过少的头部（如单头）限制了容量利用效率，而过多的头部（如每头仅 64 个令牌）则导致每个头部的表示过于粗糙，影响关键帧约束的精确满足。
 
@@ -303,19 +283,6 @@ Figure 13 展示了 MotionBricks 随训练数据规模增加的性能变化趋�
 ### 开放问题
 
 论文提出了四个值得进一步探索的方向：如何在运行时从传感器数据直接生成控制信号（视觉规划）；如何保证生成动作的物理合理性以避免自碰撞或超出机器人硬件约束；如何在多样化机器人形态之间进行高质量的运行时动作重定向；以及如何处理极端稀疏数据下的动作学习问题。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2_https_doi_org_10_1145_3811334/figures/020_Figure_16.jpg]]
-*Figure 16: Ablation study on GPU scaling during training. Left: ideal vs. achieved throughput scaling with the number of GPUs. Middle: tokenizer reconstruction loss on the validation set. Right: cross-entropy loss for token prediction on the validation set*
-
-![[assets/figures/papers/paper_list_l2_https_doi_org_10_1145_3811334/figures/007_Table_1.jpg]]
-*Table 1: Progressive root trajectory refinement in smart locomotion*
-
-![[assets/figures/papers/paper_list_l2_https_doi_org_10_1145_3811334/figures/010_Table_2.jpg]]
-*Table 2: Overview of datasets used in our experiments*
-
-
 
 ## 定位与知识库关联
 
@@ -362,8 +329,6 @@ MotionBricks以**动作中间帧生成（motion in-betweening）**为基础范�
 **跨形态动作重定向**：如何在多样化的机器人形态之间进行高质量的运行时动作重定向？当前系统在Unitree G1机器人上展示了初步能力（Fig. 1, Fig. 6），但通用跨形态迁移仍是一个开放挑战。
 
 **极端稀疏数据下的学习**：如何处理极端稀疏数据下的动作学习，例如仅有一段样例如何泛化到新的交互场景？这对稀有动作类别和个性化动作风格的学习至关重要。
-
-
 
 ## 原文 PDF
 

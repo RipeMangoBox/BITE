@@ -87,8 +87,6 @@ SCIEval 位于**科学图像自动评估**这一新兴交叉领域，其方法�
 
 SCIEval 的核心贡献在于：首次系统地将科学图像忠实度评估分解为可独立优化的多维度框架，并通过任务对齐的对比学习策略将科学视觉知识注入 CLIP 编码器，从而在保持无参考、低成本优势的同时，实现了与人类判断高度一致的自动评估。
 
-
-
 ### 科学图像忠实度评估的独特挑战
 
 科学图像（包括图表、曲线图、示意图等）是学术交流的核心载体，其与文本描述的一致性直接关系到科学信息的准确传递。然而，现有的忠实度评估指标主要针对自然图像设计，在面对科学图像时暴露出三个根本性缺陷：
@@ -116,8 +114,6 @@ SCIEval 的核心贡献在于：首次系统地将科学图像忠实度评估分
 - **可解释性（Explainability）**：定位并说明不忠实元素，提供“哪里不一致、为什么不一致”的文本理由。
 
 这一三维度设计使得SCIEval能够同时支持文本到图像生成（Sci-T2I）和图像描述（Sci-IC）两种任务的统一评估（图1，Figure 1），突破了现有方法只能评估单一方向的局限。
-
-
 
 ## 核心方法与创新机理
 
@@ -172,8 +168,6 @@ $$
 
 需要指出的是，SCIEval 的创新集中在**评估架构与训练策略**层面，而非基础模型架构的根本性突破。其三个模块均基于现有组件（CLIP 编码器、mPLUG-owl3 LMM），创新主要体现在如何将这些组件适配到科学图像忠实度评估这一特定任务。此外，SCIEval-E 的理由生成基于固定的负样本差异模板，可能无法涵盖所有不忠实情况类型，这一点需要在实际应用中加以注意。
 
-
-
 SCIEval 的整体设计围绕一个核心洞察展开：科学图像的忠实度评估不能简化为单一的整体分数，而需要从**相关性（Relevance）**、**准确性（Accuracy）**和**可解释性（Explainability）**三个维度分别建模。这一三维分解构成了框架的顶层架构，如图4所示，整个系统通过两阶段对比学习与最终的有监督微调串联起三个功能模块。
 
 ### 训练数据构造：正负样本对生成
@@ -216,15 +210,11 @@ $$\mathcal{L}_{CM}^N = \exp(s(\mathbf{Z}_{I_T}, \mathbf{Z}_{C_F}) / \tau) + \exp
 
 这一统一框架同时支持文本到图像生成（Sci-T2I）和图像描述（Sci-IC）两种评估场景，无需针对不同任务重新训练。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2212_https_openaccess_thecvf_com_content_CVPR2026_html_Ye_SCIEval_Evaluating/figures/004_Figure_4.jpg]]
 *Figure 4: The overall training process of SCIEval. Specifically,we first train both*
 
 ![[assets/figures/papers/paper_list_l2212_https_openaccess_thecvf_com_content_CVPR2026_html_Ye_SCIEval_Evaluating/figures/001_Figure_1.jpg]]
 *Figure 1: ．Motivation illustration．Unlike previous metrics built for natural images,SCIEval is specifically designed for scientific visuals (we highlight textual scientific details in color).Moreover, it evaluates both text-to-image generation and image captioning within a unified framework.Instead of outputing a merged score, SCIEval provides fine-grained scores along with clear rationales*
-
-
 
 SCIEval 的训练框架由三个核心模块构成：**相关性评估器 (SCIEval-R)**、**准确性评估器 (SCIEval-A)** 和**可解释性模块 (SCIEval-E)**。前两者共享基于 CLIP 的对比学习训练范式，后者则通过监督微调大语言模型实现理由生成。
 
@@ -294,16 +284,6 @@ $$P = \frac{\sum_{i=1}^{m} (a_i - \bar{a})(h_i - \bar{h})}{\sqrt{\sum_{i=1}^{m} 
 
 其中 $\bar{a}$ 和 $\bar{h}$ 分别为自动评分和人工评分的均值。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2212_https_openaccess_thecvf_com_content_CVPR2026_html_Ye_SCIEval_Evaluating/figures/005_Figure_5.jpg]]
-*Figure 5: Training data construction.First,we use gold pairs as positive examples. Second,we construct relevance negative examples through adversarial fltering. Third,we generate accuracy negative examples by targeted object modifications.Finally,we annotate such modifications to serve as rationale samples*
-
-![[assets/figures/papers/paper_list_l2212_https_openaccess_thecvf_com_content_CVPR2026_html_Ye_SCIEval_Evaluating/figures/003_Figure_3.jpg]]
-*Figure 3: Core insights into relevance and accuracy.We highlight general,scientific-style,and uncovered descriptions in color*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果：忠实度评分与人类判断的相关性
@@ -354,16 +334,6 @@ SCIEval-E 模块生成的忠实度解释在人类评判中表现优异。**Table
 
 ![[assets/figures/papers/paper_list_l2212_https_openaccess_thecvf_com_content_CVPR2026_html_Ye_SCIEval_Evaluating/figures/010_Table_3.jpg]]
 *Table 3: Ablation studies on the CS subset*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2212_https_openaccess_thecvf_com_content_CVPR2026_html_Ye_SCIEval_Evaluating/figures/009_Figure_7.jpg]]
-*Figure 7: Case studies.Starting fromagold image-caption pair,weuseLLama-python to generateaT2Isample(left)anduse Qwen-VL to generateaICsample(right).Wehighlighttheresults tatarebestaligned withhumanlabelsamongthrevaluatorcandidatesined*
-
-![[assets/figures/papers/paper_list_l2212_https_openaccess_thecvf_com_content_CVPR2026_html_Ye_SCIEval_Evaluating/figures/006_Figure_6.jpg]]
-*Figure 6: TheconstructionpielineofEal-Bench.()Weclctgoldimagecaptiopais.(2)FrTcllectedcptiosesdto generatesynteticimages;ForICcollctedimagesareusedtogeneratedescriptivecaptios.(3)Generatedmplesae manallsored in terms of relevance and accuracy. Here, we show 4 T2I samples (left)and 4 IC samples (right)respectively*
-
-
 
 ## 定位与知识库关联
 
@@ -421,8 +391,6 @@ SCIEval 的性能优势可归因于三个因果性设计选择，消融实验（
 3. **无监督/自监督降本**：在极低资源或无标注场景下，SCIEval 能否通过无监督或自监督方式进一步降低对人工标注的依赖？当前框架依赖正样本对和编辑后的负样本，完全无监督的替代方案尚不明确。
 
 4. **规模效应的边际收益**：使用更大的 CLIP 模型（如 ViT-L/14 替代 ViT-B/32）或更强的 LMM 是否会带来边际效益？当前实验未对此进行消融，速度与准确性的帕累托前沿有待刻画。
-
-
 
 ## 原文 PDF
 

@@ -51,8 +51,6 @@ PyraMotion针对这一瓶颈，提出**注意力金字塔运动集成框架**，
 
 方法定位上，PyraMotion属于**离散表征+自回归预测**范式的语音驱动手势生成方法，与EMAGE（Yi et al., CVPR 2023）、CaMN（Liu et al., CVPR 2024）等同期工作相比，核心差异在于将单尺度VQ-VAE扩展为多尺度金字塔结构，使运动表征能够覆盖不同身体部位的时间动态范围。当前局限包括：金字塔层数需手动选择，推理时间约41秒（长于EMAGE的约22秒），且尚未支持多模态条件控制。
 
-
-
 语音驱动的3D手势合成旨在从语音音频中生成与语音节奏和语义协调的自然手势动作，是虚拟人交互、数字人等应用中的核心技术。近年来，随着大规模多模态数据集的构建和深度生成模型的发展，该领域取得了显著进展。现有方法大致可分为两类：基于回归的方法直接学习语音到手部动作的映射，而基于生成模型的方法则利用VAE、扩散模型或VQ-VAE等框架对动作分布进行建模，以提升生成手势的多样性和表现力。
 
 ### 核心瓶颈：固定时间尺度的运动编码
@@ -76,8 +74,6 @@ PyraMotion针对这一瓶颈，提出**注意力金字塔运动集成框架**，
 2. **金字塔Token预测器**：从粗到细逐层预测运动token，结合音频节奏特征和文本语义特征，为不同身体部位生成对应的多尺度token序列。
 
 通过这一设计，PyraMotion从根本上改变了运动编码的范式——从“固定尺度统一编码”转向“多尺度自适应融合”，为全身手势生成的多样性和自然度提升提供了新的技术路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -126,8 +122,6 @@ $$\hat{\mathbf{q}}_i^{parts} = \mathrm{MLP}(\tilde{\mathbf{h}}_i^{parts} + \hat{
 
 金字塔层数实验（Table 5）表明，4 层在重建与生成指标间取得最佳平衡；5 层引入过拟合，性能反而下降。这一发现说明**多尺度并非越多越好**——当前方法需要手动选择层数，尚无法根据数据集特性自适应调整，这是论文明确指出的一个局限性。
 
-
-
 PyraMotion 采用两阶段训练范式，分别构建运动表征与生成控制。
 
 **Stage 1：Attentional Pyramidal VQ-VAE (APVQ-VAE)。** 该阶段负责学习多尺度离散运动表征。给定全身3D手势序列 $\mathbf{\bar{g}} \in \mathbb{R}^{L \times (55 \times 6 + 100 + 4 + 3)}$（包含55个关节的6D旋转表示、100维面部表情参数、4个脚部接触标签和3维全局平移），APVQ-VAE通过 $n$ 个具有不同时间感受野的TCN编码器并行提取多尺度嵌入 $\mathbf{F} = [\mathbf{f}_1, ..., \mathbf{f}_n]$，所有尺度共享同一码本 $Z$ 进行矢量量化，确保嵌入语义一致性。解码端采用 TransTCN 与注意力残差融合机制，将量化后的多尺度 token 序列重建为原始手势。
@@ -138,12 +132,8 @@ PyraMotion 采用两阶段训练范式，分别构建运动表征与生成控制
 
 **关键设计决策。** 金字塔层数 $n$ 需手动设定（实验表明4层在重建与生成指标间取得最佳平衡，5层引入过拟合），模型尚不具备根据数据特性自适应调整层数的能力。
 
-### 补充图表
-
 ![[assets/figures/papers/neurips_2025_pyramotion/figures/002_Figure_2.jpg]]
 *Figure 2: The Overall Workflow of PyraMotion. Stage 1: APVQ-VAE learns the discrete latent representations of motions, denoted as tokens, and reconstructs the motion from the pyradical token series via decoder. Stage 2: The PyraMotion framework is trained to predict the pyradical token series of motion from audio and reconstruct the motion via decoder in APVQ-VAE*
-
-
 
 PyraMotion 采用两阶段训练范式：第一阶段训练 **APVQ-VAE** 学习离散运动表征，第二阶段训练 **金字塔 Token 预测器** 从音频和文本中预测运动 token。以下聚焦两个阶段的核心模块及其关键公式。
 
@@ -224,15 +214,8 @@ $$\mathcal{L}_{cls}^{parts} = \mathrm{CrossEntropy}(\hat{\mathbf{Q}}^{parts}, \m
 
 **证据强度说明：** 上述公式均来自论文 Sec 3.3 和 Sec 3.4 的明确描述，消融实验（Table 2、Table 5）提供了因果证据。注意力图可视化（Figure 3）进一步验证了不同身体部位对多尺度 token 的差异化关注——面部偏好细粒度 token，下半身偏好粗粒度 token，为金字塔表征的合理性提供了解释性支撑。
 
-### 补充图表
-
-![[assets/figures/papers/neurips_2025_pyramotion/figures/001_Figure_1.jpg]]
-*Figure 1: Illustration of gesture sequences with expressive motion patterns in different durations*
-
 ![[assets/figures/papers/neurips_2025_pyramotion/figures/006_Figure_3.jpg]]
 *Figure 3: Attention Map Visualization*
-
-
 
 ## 实验与关键发现
 
@@ -281,9 +264,6 @@ APVQ-VAE 与普通 VQ-VAE 的重建误差对比（Table 3）进一步揭示了�
 
 金字塔层数的消融实验（Table 5）表明，4 层结构在重建与生成指标间取得最佳平衡。5 层金字塔引入了过拟合，导致性能下降。当前方法需要手动设定层数，无法根据数据集特性自适应调整，这是 PyraMotion 的一个已知局限。
 
-![[assets/figures/papers/neurips_2025_pyramotion/figures/008_Table_5.jpg]]
-*Table 5: Experiments for Pyramid Layer Number Selection*
-
 ### 推理效率
 
 推理时间对比（Table 4）显示，PyraMotion 的推理耗时约 41 秒，长于 EMAGE 的约 22 秒。虽然 PyraMotion 在生成质量上显著领先，但实时部署仍面临效率挑战，这是未来优化的方向之一。
@@ -298,11 +278,6 @@ APVQ-VAE 与普通 VQ-VAE 的重建误差对比（Table 3）进一步揭示了�
 ### 用户感知研究
 
 用户感知研究（Figure 4）通过人类主观评价进一步验证了 PyraMotion 生成手势的自然度和表现力优势。研究经过 IRB 批准，确保了伦理合规性。
-
-![[assets/figures/papers/neurips_2025_pyramotion/figures/009_Figure_4.jpg]]
-*Figure 4: Perceptual Study*
-
-
 
 ## 定位与知识库关联
 
@@ -344,8 +319,6 @@ PyraMotion 的设计假设和实验设定决定了其适用边界：
 3. **多尺度表征的跨模态泛化**：金字塔运动表征的核心思想——不同时间尺度捕捉不同粒度的动态模式——是否可推广至音乐驱动舞蹈生成、环境声驱动反应动作等其他时间序列到运动的映射任务？
 
 4. **金字塔表征的可解释性深化**：Figure 3 的注意力图揭示了不同部位的时间尺度偏好，但各层的 token 究竟编码了何种运动语义（如节奏模式、姿态过渡、情感表达）仍不清晰。进一步的可解释性分析可能为模型改进提供方向。
-
-
 
 ## 原文 PDF
 

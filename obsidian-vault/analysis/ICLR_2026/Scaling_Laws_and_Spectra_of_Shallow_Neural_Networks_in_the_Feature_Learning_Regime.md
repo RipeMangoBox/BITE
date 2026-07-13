@@ -76,8 +76,6 @@ claims:
 
 当前分析限于两层浅层网络、线性/二次激活函数和各向同性高斯数据。状态演化在非比例渐近区域的严格数学证明尚未完成。未来方向包括：推广到更深架构、更一般的数据协方差结构，以及分析 SGD 等梯度下降算法下的计算缩放律与隐式偏差。
 
-
-
 ### 问题背景：特征学习区域的缩放定律之谜
 
 现代深度学习的成功很大程度上依赖于神经网络的缩放定律——模型性能如何随数据量、参数量和计算量变化。然而，现有的理论理解存在一个根本性的缺口：**对于非线性特征学习区域的缩放定律缺乏理论解释**。绝大多数已有理论工作局限于随机特征（核）区域，即网络权重在初始化附近线性化的情形，此时网络本质上退化为核方法，无法捕捉特征学习的本质——权重在训练过程中自适应地调整以提取任务相关表征。
@@ -134,8 +132,6 @@ $$R ( W , a ) = \mathbb { E } _ { x \sim \mathcal { N } ( 0 , I _ { d } ) } \lef
 3. **普适误差分解**（Result 3）：将过量风险分解为过拟合项和近似误差项，该分解不依赖于目标谱的具体形式、数据集大小或正则化强度，揭示了特征学习的内在结构。
 
 这些结果共同构成了对浅层神经网络在特征学习区域缩放行为的第一性原理解释，为理解更深架构中的缩放定律奠定了基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -205,8 +201,6 @@ $$
 
 基于对谱结构的精确理解，本文提出了一种**无需手动调节正则化强度的修剪后处理策略**（Corollary 2）：在训练后，将学习矩阵 $\hat{\boldsymbol{S}}$ 的特征值替换为 $\mathrm{ReLU}(\lambda - (2\delta - \lambda\epsilon))$。这一操作等价于截断由有限样本效应引入的噪声体（bulk），从而在不重新训练的情况下达到最优错误率。这一发现将谱分析与实际算法改进直接连接，展示了理论洞察向实践转化的潜力。
 
-
-
 本文提出了一套基于**近似消息传递（AMP）状态演化**的理论框架，用于精确刻画浅层神经网络在特征学习区域的缩放定律与权重谱特性。该框架的核心思路是：将非凸的神经网络经验风险最小化（ERM）问题，通过结构等价性映射到凸的稀疏估计问题，进而利用高维统计力学中成熟的 AMP 状态演化方程进行渐近分析。
 
 整个分析 pipeline 由四个核心模块串联构成：
@@ -253,8 +247,6 @@ $$
 - 贝叶斯最优正则化策略 $\lambda_{\mathrm{opt}}$ 及对应的最优速率（Corollary 1）。
 
 框架的**关键因果调节变量**是 $\lambda$ 与 $n_{\mathrm{eff}}$ 之间的缩放关系——正是这一关系决定了过量风险在不同相位间的相变与相位边界。
-
-
 
 ### 问题映射：从非凸 ERM 到凸稀疏估计
 
@@ -369,8 +361,6 @@ $$
 
 最优正则化参数在欠参数化区域（$n_{\mathrm{eff}} \ll d$）取 $\lambda_{\mathrm{opt}} = O(\sqrt{n_{\mathrm{eff}}/d})$，在过参数化区域（$n_{\mathrm{eff}} \gg d$）取 $\lambda_{\mathrm{opt}} = O(n_{\mathrm{eff}}/d^{\gamma+1/2})$。
 
-
-
 ## 实验与关键发现
 
 ### 实验设置
@@ -418,16 +408,12 @@ $$
 - SGD 的隐式偏差如何与权重谱的 heavy-tail 特性关联？
 - 类似的第一性原理分析能否扩展到更深层网络？
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_Q3yLIIkt7z/figures/006_Table_1.jpg]]
 
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_Q3yLIIkt7z/figures/007_Table_2.jpg]]
 
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_Q3yLIIkt7z/figures/004_Figure_4.jpg]]
 *Figure 4: Effective number of samples $n _ { \mathrm { e f f } }$ (n for diagonal, n / d for quadratic) Figure 4: Excess risk rates of result 4 for the noiseless task ( $\Delta$ = 0 ) , the corresponding spectral properties of neural networks
-
-
 
 ## 定位与知识库关联
 
@@ -470,8 +456,6 @@ $$
 - **计算缩放律**：SGD 等梯度下降算法下的计算缩放律和隐式偏差如何与权重谱的相图关联？
 - **深层网络扩展**：是否可以将类似的第一性原理分析（问题映射 + AMP 状态演化）扩展到更深层的网络？文中指出这是“有趣的未来方向”。
 - **普适错误分解的推广**：文中的普适错误分解（Result 3）是否适用于更广泛的架构族？
-
-
 
 ## 原文 PDF
 

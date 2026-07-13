@@ -56,8 +56,6 @@ claims:
 
 **局限与开放问题**：当前方法仍存在视点歧义（“旁边”“左右”等谓词可能不稳定）、极端尺度差异下小物体梯度不可靠、严重遮挡（如插入腔体）时性能退化等局限。未来方向包括引入多视图一致性损失克服视点歧义、扩展至非刚性变形或铰接物体的交互对齐，以及降低对LLM超参数预测的依赖。
 
-
-
 ### 问题定义：物体-物体对齐
 
 三维场景构建中，将两个独立网格按语义描述进行空间配置——即**物体-物体对齐（Object-Object Alignment, OOA）**——是数字内容创作、机器人仿真和具身AI的关键步骤。给定源网格、目标网格和一段自然语言提示（如“帽子挂在衣帽架上”），任务要求输出源网格相对于目标网格的6自由度位姿与各向同性尺度，使得最终配置既符合文本语义，又满足物理合理性（表面接触、无穿透）。这与传统的场景生成或物体放置不同：OOA不生成新几何，也不构建完整场景，而是聚焦于两物体间精确的相对空间关系。
@@ -82,8 +80,6 @@ claims:
 3. **分阶段优化调度**可以模拟从粗到精的认知过程——先在大范围内寻找语义合理的区域，再逐步收紧几何约束实现精细贴合。
 
 基于此，本文提出**Copy-Transform-Paste (CTP)**框架，将OOA重新定义为测试时优化问题：复制源网格，通过可微渲染器在CLIP语义损失、分数化软ICP附着损失和穿透损失的联合引导下优化其位姿与尺度，最终“粘贴”到目标网格上。该方法无需任何训练数据，不引入新模型参数，仅依赖预训练组件和经典几何算法，在开放域文本描述下实现零样本对齐。
-
-
 
 ## 核心方法与创新机理
 
@@ -135,8 +131,6 @@ $$\mathcal{L} = \lambda_{\mathrm{CLIP}} \mathcal{L}_{\mathrm{clip}} + \lambda_{\
 
 在分阶段调度框架下，语义损失提供全局方向引导，分数化软 ICP 实现可控表面附着，穿透损失保证物理合理性，LLM 预测提供合理的优化起点，随机重启与 Best-of-N 选择进一步提升鲁棒性。消融实验（Tab. 2, Fig. 8）验证了每个模块的必要性：移除任一组件均导致语义对齐度下降或穿透增加。
 
-
-
 **Copy-Transform-Paste (CTP)** 是一种测试时优化的零样本物体-物体对齐框架。给定两个三角网格（目标网格与源网格）和一段自由形式的文本提示，CTP 直接优化源网格相对于目标网格的 **7 自由度位姿参数** $\theta = (\tau, q, s)$——即平移 $\tau$、单位四元数旋转 $q$ 和各向同性缩放 $s$——而无需任何预训练或微调。
 
 核心思想是将语义理解与几何约束统一在一个可微渲染管线中：通过可微渲染器将 3D 场景投影为多视角 2D 图像，利用预训练的 **CLIP** 视觉-语言模型计算渲染视图与文本提示的语义对齐损失，同时引入两类几何损失——**分数化软 ICP** 鼓励可控的表面附着，**穿透损失** 惩罚物理不合理的网格侵入——形成联合目标函数进行端到端梯度优化。
@@ -169,12 +163,8 @@ $$\mathcal{L} = \lambda_{\mathrm{CLIP}} \mathcal{L}_{\mathrm{clip}} + \lambda_{\
 $$\mathcal{L} = \lambda_{\mathrm{CLIP}} \mathcal{L}_{\mathrm{clip}} + \lambda_{\mathrm{ICP}} \mathcal{L}_{\mathrm{icp}} + \lambda_{\mathrm{pen}} \mathcal{L}_{\mathrm{pen}}$$
 其中 $\lambda_{\mathrm{CLIP}}$ 保持固定，$\lambda_{\mathrm{ICP}}$ 和 $\lambda_{\mathrm{pen}}$ 随阶段递增。使用 Adam 优化器更新 $\theta$，整个流程无需训练任何新模型，完全依赖预训练 CLIP 和经典几何约束在测试时完成对齐。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2380_https_openaccess_thecvf_com_content_CVPR2026_html_Gatenyo_Copy_Transform/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed pipeline. Given two meshes and a text prompt, we optimize the relative pose and scale to produce a text-consistent alignment over P phases. In each phase, we compose the scene, render with a differentiable renderer to obtain a semantic loss, and compute geometric losses. The best result of phase i initializes phase i{+}1 ; across phases we increase the fractional soft-ICP and penetration weights and progressively zoom the cameras in. The final output is an aligned 3D placement of the two meshes*
-
-
 
 ### 3.1 问题形式化与优化变量
 
@@ -234,19 +224,6 @@ CTP 采用 $P=3$ 阶段的分阶段优化策略。跨阶段应用两项关键调
 ![[assets/figures/papers/paper_list_l2380_https_openaccess_thecvf_com_content_CVPR2026_html_Gatenyo_Copy_Transform/figures/004_Figure_5.jpg]]
 *Figure 5: Visualization of phased optimization with scheduled weights. Rooster and comb across three phases. As the weights increase across phases, the search transitions from broad exploration to a focused zoom-in and local refinement. Phase-best results are marked with $\star$ and initialize the next phase*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2380_https_openaccess_thecvf_com_content_CVPR2026_html_Gatenyo_Copy_Transform/figures/005_Figure_4.jpg]]
-*Figure 4: Penetration loss geometry. For target vertex*
-
-![[assets/figures/papers/paper_list_l2380_https_openaccess_thecvf_com_content_CVPR2026_html_Gatenyo_Copy_Transform/figures/003_Figure_3.jpg]]
-*Figure 3: Effect of the alignment ratio r on a grilled-toast pair. The two objects are optimized with the same prompt, “grilled cheese toasts”, while varying r. With r=1.0, the top toast aligns directly above the bottom toast, producing broad surface contact; as r decreases, attachment is encouraged over a smaller subset of vertices and the contact region correspondingly shrinks*
-
-![[assets/figures/papers/paper_list_l2380_https_openaccess_thecvf_com_content_CVPR2026_html_Gatenyo_Copy_Transform/figures/006_Figure_6.jpg]]
-*Figure 6: Initialization variability and prompt controllability. (a) Two random initializations of the carrot w.r.t. Bugs Bunny converge to distinct yet plausible attachments; we run several restarts and pick the best by a CLIP text–image score (higher is better). (b) With the same meshes, two prompts steer optimization to promptconsistent placements, demonstrating language controllability*
-
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -302,27 +279,14 @@ CTP 采用 $P=3$ 阶段的分阶段优化策略。跨阶段应用两项关键调
 
 这些失败模式指向了当前框架的边界：依赖有限视角的语义监督在遮挡或尺度极端场景下鲁棒性不足，且仅支持两网格对齐的设定限制了多物体一次性全局优化的可能性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2380_https_openaccess_thecvf_com_content_CVPR2026_html_Gatenyo_Copy_Transform/figures/009_Table_1.jpg]]
 *Table 1: Baseline comparison. Semantic alignment (CLIP/ALIGN/SigLIP; higher is better), physical plausibility (intersection volume; lower is better), and VLM evaluator scores (Text–Asset, 3D Plausibility, Text–Geometry, Overall; higher is better)*
 
 ![[assets/figures/papers/paper_list_l2380_https_openaccess_thecvf_com_content_CVPR2026_html_Gatenyo_Copy_Transform/figures/010_Table_2.jpg]]
 *Table 2: Ablation comparison. Ablated variants across semantic alignment (CLIP/ALIGN/SigLIP; higher is better), physical plausibility (intersection volume; lower is better), and VLM evaluator scores (Text–Asset, 3D Plausibility, Text–Geometry, Overall; higher is better)*
 
-![[assets/figures/papers/paper_list_l2380_https_openaccess_thecvf_com_content_CVPR2026_html_Gatenyo_Copy_Transform/figures/011_Table_3.jpg]]
-*Table 3: User study results. Percentage of votes across 15 instances and 47 participants. Higher is better*
-
 ![[assets/figures/papers/paper_list_l2380_https_openaccess_thecvf_com_content_CVPR2026_html_Gatenyo_Copy_Transform/figures/008_Figure_8.jpg]]
 *Figure 8: Ablations on coatrack (target) and hat (source). The full method yields the most plausible, text-aligned placement; ablating individual components produces degradations*
-
-![[assets/figures/papers/paper_list_l2380_https_openaccess_thecvf_com_content_CVPR2026_html_Gatenyo_Copy_Transform/figures/012_Figure_9.jpg]]
-*Figure 9: Qualitative comparison across four object–object pairs. Top row: input prompt and meshes. Rows 1–5: final placements from our method and baselines. Our approach yields semantically faithful and physically plausible alignments, while baselines vary in semantic faithfulness and contact quality*
-
-![[assets/figures/papers/paper_list_l2380_https_openaccess_thecvf_com_content_CVPR2026_html_Gatenyo_Copy_Transform/figures/015_Figure_10.jpg]]
-*Figure 10: Qualitative comparison to OOR-diffusion. OORdiffusion panels are reproduced from their paper; we matched assets and camera setups where possible*
-
-
 
 ## 定位与知识库关联
 
@@ -401,8 +365,6 @@ LLM超参数预测器（预测穿透策略、初始尺度比、附着比例）�
 4. **完全自动的超参数自适应**：当前LLM仅用于初始化超参数，优化过程中权重调度仍依赖人工设计的对数增长曲线。元学习或强化学习方法可能学习到更优的自适应调度策略，消除对手动设计的依赖。
 
 5. **复杂场景鲁棒性**：在动态背景、多物体交互、复杂光照等更接近真实应用的场景中，CTP的可微渲染-语义反馈回路是否仍能保持鲁棒性，是一个需要验证的问题。这可能涉及域适应技术或更强的视觉骨干网络。
-
-
 
 ## 原文 PDF
 

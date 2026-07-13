@@ -56,8 +56,6 @@ claims:
 
 **主要结果**：在OSWorld和WebArena两个基准上，R-WoM相比最强基线分别取得最高**23.4%**和**16.3%**的相对提升（Table 2）。消融实验证实：教程grounding质量单调影响性能（无检索 < R-WoM检索 < R-WoM oracle，Figure 4）；列表级奖励在所有测试模型上带来约2–3个百分点的稳定提升（Table 14）；grounded世界模型在更长的想象horizon（3步）上保持优势，而WebDreamer在2步后即开始下降（Figure 5）。
 
-
-
 ### 计算机使用Agent与世界模型
 
 计算机使用Agent（Computer-use Agent）旨在根据自然语言指令，在真实的数字环境中自主完成复杂的多步操作任务。一个典型的交互轨迹可形式化为：
@@ -99,8 +97,6 @@ Figure 1以具体任务“将桌面截图复制到光标所在位置”直观展
 - **奖励估计** 方面，WebDreamer采用的绝对稀疏奖励容易引入偏差：模型对不同候选轨迹的评分缺乏相对比较基准，难以在多个看似合理的候选动作中做出精细区分。
 
 这些缺口共同指向一个核心问题：**如何为LLM世界模型注入环境特定的、精确的过程性知识，并在仿真过程中以鲁棒的方式利用这些知识进行动作选择？** R-WoM正是围绕这一问题展开设计。
-
-
 
 ## 核心方法与创新机理
 
@@ -149,8 +145,6 @@ LLM 虽具备广泛的预训练知识，但在面对特定数字环境（如操�
 | 候选动作管理 | 固定数量或无优化 | 自适应分支 + 语义去重 | Tables 6–8：token 减少 50%+，性能基本持平 |
 | 检索流程 | 原始查询直接检索（RAG） | 查询改写 + LLM 重排序 | Figure 3：召回率显著提升 |
 
-
-
 ![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_5ZaoXB3MdP/figures/003_Figure_2.jpg]]
 *Figure 2: Overview of the R-WoM pipeline. At each time step i, the policy model generates m candidate actions. For each candidate, the world model grounded by retrieved tutorials performs k-step rollouts to simulate a possible future trajectory. The rewards of rollout trajectories are finally estimated by world models to select the best action*
 
@@ -191,8 +185,6 @@ $$ (t_i^*, a_i^*) = \arg\max_{(t_i^{(j)}, a_i^{(j)}) \in \mathcal{A}_c} \Big[ f_
 ### 模块协作关系
 
 流水线中的七个核心模块形成层级依赖：查询改写与 LLM 重排序器构成推理感知检索管线，为世界模型提供 grounding 基础；Grounded 世界模型利用 LongCoT rollout 完成多步仿真；列表级奖励估计器对仿真结果进行相对比较；自适应分支与动作去重则在前端控制候选动作的质量与数量，直接影响世界模型的调用频率与整体计算开销。消融实验（Table 6-8）表明，自适应机制在保持接近全量 R-WoM 性能的同时，将 token 消耗减少 50% 以上，世界模型触发降至原来的 15–20%。
-
-
 
 R-WoM 的核心架构由七个协同模块构成，围绕“检索增强的世界模型仿真”与“列表级相对奖励估计”两条主线展开。以下按推理流程逐一说明关键模块及其对应的核心公式。
 
@@ -244,8 +236,6 @@ $$
 
 该模块本身不包含世界建模能力，其生成质量依赖于后续世界模型的验证与筛选。
 
-
-
 ## 实验与关键发现
 
 ### 端到端性能主结果
@@ -296,12 +286,8 @@ Table 3 评估了 R‑WoM 在缺少现成在线教程的场景下的表现。通
 
 Table 12 报告了不同 LLM 法官给出的全流程规划对齐评分，结果在不同法官间保持一致，验证了规划对齐评估指标的鲁棒性。Table 13 在更强的 backbone（Claude‑4‑Sonnet、Claude‑4.5‑Sonnet）上进一步确认了 R‑WoM 的优势，表明该方法随 backbone 能力增强而持续受益。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_5ZaoXB3MdP/figures/002_Table_1.jpg]]
 *Table 1: Probing results across three tasks: next-state identification, full-procedure planning alignment, and milestone transition recognition. All values are percentages*
-
-
 
 ## 定位与知识库关联
 
@@ -334,8 +320,6 @@ R-WoM 的核心贡献在于将LLM世界模型从**依赖静态内部知识**推�
 3. **奖励模型的增强。** 列表级相对奖励能否与基于偏好的微调方法（如DPO）结合，进一步强化世界模型的动作选择能力？
 4. **检索失败的优雅纠正。** 当检索结果完全失败时，如何从世界模型内部更优雅地纠正而非仅依赖启发式回退？这需要世界模型具备更强的内部知识校准能力。
 5. **真实环境泛化性。** R-WoM 在更开放或对安全性要求更高的真实计算机使用环境中的表现与泛化性如何？当前评测限于OSWorld和WebArena的受控子集，向真实桌面环境的迁移仍需验证。
-
-
 
 ## 原文 PDF
 

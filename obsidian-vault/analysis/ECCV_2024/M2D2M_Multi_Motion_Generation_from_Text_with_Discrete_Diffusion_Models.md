@@ -59,8 +59,6 @@ claims:
 - 在单运动生成任务上，M2D2M 同样在 HumanML3D 和 KIT-ML 数据集上取得了最优 FID 和 R-Top3，表明动态转移概率对单运动质量亦有正向作用。
 - TPS 使仅用单运动数据训练的模型能够生成任意长度的多运动序列，无需多运动联合监督或后处理超参数，如 Algorithm 1 所述。
 
-
-
 ### 问题背景：文本驱动的多动作人体运动生成
 
 文本驱动的人体运动生成旨在根据自然语言描述合成逼真的三维人体动作序列。随着扩散模型在连续域图像与运动生成中的成功，研究者开始探索其在离散空间中的潜力。然而，现有工作主要聚焦于单一动作的生成——即给定一句描述（如“一个人向前走”），模型输出一段对应的运动序列。现实应用往往需要生成包含多个连续动作的长时间运动，例如“一个人向前走，然后转身，最后坐下”。将多个独立生成的单运动简单拼接，会在动作边界处产生不自然的跳变，破坏运动的连贯性。
@@ -84,8 +82,6 @@ claims:
 2. **两阶段采样（TPS）**：将多运动生成视为一个统一的去噪过程。首先在联合采样阶段，将多个动作的掩码标记合并，通过共享去噪步骤融合多动作上下文，形成粗粒度的连贯序列轮廓；随后在独立采样阶段，各动作分别精细化，保证个体运动的语义准确性。TPS 无需额外训练或超参数，仅利用单运动训练的模型即可生成任意长度的多运动序列。
 
 这两种机制协同工作：动态转移概率为去噪过程提供了基于标记距离的探索-利用平衡，而两阶段采样则在此基础上实现了多动作上下文的融合与个体保真度的保持。消融实验（Table 5）证实，二者的协同对于收敛到最优解至关重要。
-
-
 
 ## 核心方法与创新机理
 
@@ -119,8 +115,6 @@ TPS 的关键优势在于：（1）无需任何后处理或超参数调节，模
 ### 两项创新的协同效应
 
 动态转移概率与两阶段采样并非孤立改进，而是形成正向协同：动态转移概率在联合采样阶段促进跨动作标记的语义探索，使过渡轮廓更加自然；在独立采样阶段则约束标记收敛到语义近邻，保持动作准确性。消融实验（Table 5）明确指出，两者的协同对于收敛到最优解至关重要。
-
-
 
 M2D2M 的整体 pipeline 围绕“离散扩散生成 + 多动作上下文融合”这一核心思路构建，由四个关键模块串联而成：**运动 VQ-VAE**、**动态转移概率**、**去噪 Transformer** 和**两阶段采样 (TPS)**。系统输入为自然语言动作描述，输出为连续人体运动序列；在多动作场景下，输入被分解为若干动作短句，分别作为条件注入生成过程。
 
@@ -185,8 +179,6 @@ TPS 使得仅用单运动数据训练的模型能够生成任意长度的多运�
 
 整个 pipeline 的模块关系清晰：VQ-VAE 提供离散表示空间，动态转移概率在该空间内调控探索-利用平衡，去噪 Transformer 执行条件生成，TPS 在不增加参数的前提下实现多动作的平滑拼接。
 
-
-
 ### 1. 运动离散化：Motion VQ‑VAE
 
 连续人体运动序列 $\mathbf{x}$ 首先通过一个 VQ‑VAE 映射到离散码本空间，得到标记序列 $\mathbf{z}_q$。训练目标由三项组成（Eq. 6）：
@@ -242,9 +234,6 @@ $$
 
 其中 $\beta_{(t, d_{i,j})}$ 根据标记对 $(i,j)$ 的具体距离 $d_{i,j}$ 计算。Fig. 4(b) 展示了不同 $t$ 下 $\beta(t,d)$ 随 $d$ 的变化曲线，直观体现了“先探索、后利用”的机制。
 
-![[assets/figures/papers/paper_list_l1870_M2D2M_Multi_Motion_Generation_from_Text_with_Discrete_Diffusion_Models/figures/005_Figure_4.jpg]]
-*Figure 4: (a) PCA plot representing motion tokens from the codebook of Motion VQ-VAE visualized in 3D space. (b) Plot of the dynamic transition probability function*
-
 ### 4. 训练目标与反向去噪
 
 模型通过预测干净标记 $\tilde{z}_0$ 来参数化反向分布（Eq. 4）：
@@ -287,8 +276,6 @@ $$
 
 其中 $\mathbf{a}_p(t)$ 为关节 $p$ 的加速度，$v_{p,\mathrm{peak}}$ 为峰值速度，积分区间 $[t_1, t_2]$ 对应过渡帧。该指标衡量加速度变化的剧烈程度，值越低表示过渡越平滑。M2D2M 在该指标上显著优于拼接基线，且接近真实单一运动的 Jerk 水平（Table 1，Fig. 5）。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -299,23 +286,11 @@ M2D2M 在多运动与单运动生成任务上均展现出显著优势，核心�
 
 在 HumanML3D 多运动测试集（N=4）上，M2D2M 在个体运动 FID 上达到 **0.253 ± 0.016**，显著优于 T2M-GPT（0.342 ± 0.019）和 PriorMDM（0.376 ± 0.024）（Table 1）。在过渡平滑性方面，M2D2M 的 Jerk 值为 **1.238 ± 0.008**，与真值单一运动的 1.192 ± 0.005 最为接近，而 T2M-GPT 的 Jerk 高达 1.310 ± 0.008，表明其过渡更为生硬。值得注意的是，真值拼接（GT concat）的 Jerk 为 1.416 ± 0.005，远高于所有生成方法，这揭示了简单拼接真实运动本身就会引入不自然的加速度突变——因此 Jerk 的“理想值”并非越低越好，而是应逼近独立采样的真实单一运动 Jerk。
 
-![[assets/figures/papers/paper_list_l1870_M2D2M_Multi_Motion_Generation_from_Text_with_Discrete_Diffusion_Models/figures/007_Table_1.jpg]]
-*Table 1: Multi-motion generation performance on HumanML3D. ‘Individual Motion’ denotes individual motions within our motion boundaries. For transitions, ground truth (single) motions are independently sampled to match the transition length, while ground truth (concat) involves concatenating ground truth motions sampled from the same textual condition with generated motions*
-
 在 KIT-ML 数据集上，M2D2M 同样取得最佳个体运动 FID（0.296 ± 0.014）和 R-Top3（0.716 ± 0.005），过渡 FID 也优于所有基线（Table 2）。跨数据集的稳定表现验证了方法的泛化性。
-
-![[assets/figures/papers/paper_list_l1870_M2D2M_Multi_Motion_Generation_from_Text_with_Discrete_Diffusion_Models/figures/008_Table_2.jpg]]
-*Table 2: Multi-motion generation performance on KIT-ML*
 
 #### 单运动生成
 
 动态转移概率的改进同样惠及单运动生成。在 HumanML3D 上，M2D2M 取得最佳 FID（**0.087 ± 0.004**）和 R-Top3（**0.733 ± 0.005**），全面超越 T2M-GPT（FID 0.116 ± 0.004）和 MDM（FID 0.544 ± 0.044）（Table 8）。在 KIT-ML 上，M2D2M 的 R-Top3 达到 **0.753 ± 0.006**，FID 为 0.159 ± 0.005，均处于最优水平（Table 9）。这表明基于码本距离的动态转移概率不仅有助于多运动过渡，也提升了单运动本身的生成质量。
-
-![[assets/figures/papers/paper_list_l1870_M2D2M_Multi_Motion_Generation_from_Text_with_Discrete_Diffusion_Models/figures/022_Table_8.jpg]]
-*Table 8: Single-motion generation performance on HumanML3D. The figures highlighted in bold and blue denote the best and second-best results, respectively*
-
-![[assets/figures/papers/paper_list_l1870_M2D2M_Multi_Motion_Generation_from_Text_with_Discrete_Diffusion_Models/figures/023_Table_9.jpg]]
-*Table 9: Single-motion generation performance on KIT-ML. The figures highlighted in bold and blue denote the best and second-best results, respectively*
 
 ### 消融实验
 
@@ -363,12 +338,7 @@ Table 6 将 TPS 与 Handshake、SLERP 等后处理平滑方法在 MDM 框架下�
 
 - **Fig. 5**：速度与 Jerk 曲线对比表明，M2D2M 生成的过渡在速度变化模式上与真值拼接存在本质差异——真值拼接在边界处出现尖锐的 Jerk 峰值，而 M2D2M 的 Jerk 曲线更为平缓，印证了 TPS 从扩散过程内部实现平滑过渡的机制优势。
 
-![[assets/figures/papers/paper_list_l1870_M2D2M_Multi_Motion_Generation_from_Text_with_Discrete_Diffusion_Models/figures/006_Figure_5.jpg]]
-*Figure 5: Plots for average motion transition produced by our approach versus a concatenation of two randomly selected real motions: (a) Velocity. (b) Jerk (time derivative of acceleration normalized by peak velocity)*
-
 - **Table 5**：动态 β(d,t) 与 TPS 的协同作用至关重要——单独使用任一组件的性能均显著劣于完整方法，表明两个创新点存在互补效应：动态转移概率为联合采样提供了更合理的探索空间，而 TPS 则利用该空间实现动作间的平滑衔接。
-
-
 
 ## 定位与知识库关联
 
@@ -420,8 +390,6 @@ M2D2M 处于**文本驱动人体运动生成**与**离散扩散模型**的交叉
 4.  **多运动联合训练**：若能构建多运动数据集进行联合训练，模型可能学习到动作间的时序依赖和因果关系，进一步提升复杂多动作情境下的生成质量。
 
 5.  **与其他模态的融合**：当前仅以文本为条件，未来可扩展至音频、场景上下文等多模态条件，实现更丰富的多动作序列控制。
-
-
 
 ## 原文 PDF
 

@@ -52,8 +52,6 @@ claims:
 
 **主要结果**：在ScanRefer数据集上，S²-MLLM以59.2%的Overall Acc@0.25和52.7%的Overall Acc@0.5全面超越现有方法，较Video-3D-LLM†提升4.8个百分点（Acc@0.5）。在Nr3D和Sr3D上也取得有竞争力的结果，并在MultiScan和ArkiScenes两个分布外数据集上展现出强泛化能力。消融实验确认，空间引导（SG）移除后Overall@0.25下降4.78个百分点，多级位置编码（MPE）贡献最大（移除后退化15.05%），而视图内/视图间注意力（Attn）将基线模型性能从5.31%提升至41.74%。效率方面，S²-MLLM仅需72 GPU小时训练和1.16秒推理延迟，显著优于全参数微调的Video-3D-LLM（256 GPU小时）。
 
-
-
 ### 3D视觉定位的任务与挑战
 
 3D视觉定位（3D Visual Grounding, 3DVG）要求模型根据自然语言描述在三维场景中定位目标物体，是具身智能与空间理解领域的核心任务之一。该任务的核心难点在于：模型必须同时理解语言中的复杂空间关系（如“桌子左边的棕色沙发”）与三维场景的几何结构，并将二者精确对齐。
@@ -89,8 +87,6 @@ claims:
 3. **范式创新**：通过隐式空间推理的新范式，有望在保持甚至提升定位精度的同时，大幅降低推理开销并增强泛化能力。
 
 本文的目标是设计一个端到端可训练的框架，通过联合优化重建损失与定位任务损失，将前馈3D重建的结构感知注入MLLM的视觉表示中，并配合专门设计的结构增强模块来显式强化位置与跨视角一致性，最终实现高效、鲁棒且可泛化的3D视觉定位。
-
-
 
 ## 核心方法与创新机理
 
@@ -142,8 +138,6 @@ $$f_i^{\mathrm{vis}} = \mathrm{AvgPool} \big( f_i + \phi(p_{\mathrm{world}}^i) \
 
 这四个创新点协同作用，使S²-MLLM在ScanRefer上达到59.2% Overall Acc@0.25（超越此前最优的**MCLN** 57.2%），同时仅需72 GPU小时训练和1.16秒推理延迟，在性能和效率之间取得了优越的平衡。
 
-
-
 S²-MLLM 的整体设计遵循“训练时隐式学习3D结构，推理时无需显式重建”的核心原则。如图2所示，系统以多视角RGB-D帧序列作为3D场景的表示形式，通过一条精心设计的pipeline将视觉几何特征注入预训练MLLM，最终完成跨模态理解与3D目标定位。
 
 **输入层**：模型接收三类信息——从3D场景中均匀采样的多视角RGB-D图像帧、对应的相机内参与外参、以及自然语言描述查询。同时，一个预训练的3D检测器为场景生成候选目标边界框，作为定位头的分类候选池。
@@ -158,12 +152,8 @@ S²-MLLM 的整体设计遵循“训练时隐式学习3D结构，推理时无需
 
 **数据流总结**：多视角RGB-D帧 → 视觉编码器 + 位置编码器 → SE模块（视图内/间注意力融合） → LLM跨模态推理 → 定位头预测边界框 + 语言头生成类别；训练时额外旁路：LLM编码器特征 → 投影层 → 重建解码器 → 点图监督。这一设计在保持推理高效（1.16s延迟，无需重建耗时）的同时，实现了对3D场景结构的深层内化理解。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2413_https_arxiv_org_abs_2512_01223/figures/002_Figure_2.jpg]]
 *Figure 2: The Framework of*
-
-
 
 S²-MLLM的整体框架如Figure 2所示，其核心设计围绕一个关键洞察展开：**在训练阶段通过前馈3D重建注入空间结构感知，使MLLM在潜在特征空间中隐式推理3D场景，推理时无需显式重建或渲染**。以下按模块逐一分析其设计逻辑与关键公式。
 
@@ -237,12 +227,8 @@ $$\mathcal{L} = \lambda_{\mathrm{g}} \mathcal{L}_{\mathrm{ground}} + \lambda_{\m
 
 其中权重设置为 $\lambda_{\mathrm{g}}=1.0$，$\lambda_{\mathrm{r}}=0.3$，$\lambda_{\mathrm{l}}=1.0$。该联合优化方案使模型在潜在空间中同时学习定位能力、3D结构感知和语义一致性，实现端到端的隐式空间推理。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2413_https_arxiv_org_abs_2512_01223/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of previous methods and our method. (a) Previous methods typically reconstruct point clouds of 3D scenes explicitly and then render 2D images to obtain structure guidance. (b) Our method leverages spatial guidance to understand the 3D structure during training, allowing the model to perform implicit spatial reasoning in the latent space without requiring point-cloud reconstruction at inference*
-
-
 
 ## 实验与关键发现
 
@@ -289,8 +275,6 @@ Figure 4的饼图展示了S²-MLLM在ScanRefer验证集上的错误分布，Figu
 
 4. **数据集标注问题**：分析指出ScanRefer等数据集的语言描述存在不准确或不完整的情况，导致模型可能正确匹配描述但与人工标注真值不符，这在一定程度上低估了模型的真实能力。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2413_https_arxiv_org_abs_2512_01223/figures/003_Table_1.jpg]]
 *Table 1: Accuracy comparison on Scanrefer [9] validation set at IoU thresholds of 0.25 and 0.5. We report results on the Unique subset (single-object scenes), the Multiple subset (scenes with same-class distractors), and the overall accuracy. * denotes results obtained by LoRA [20] fine-tuning with the same parameter size as ours, while other settings follow the original paper*
 
@@ -299,26 +283,6 @@ Figure 4的饼图展示了S²-MLLM在ScanRefer验证集上的错误分布，Figu
 
 ![[assets/figures/papers/paper_list_l2413_https_arxiv_org_abs_2512_01223/figures/008_Table_5.jpg]]
 *Table 5: Ablation study on the ScanRefer [9] dataset. We evaluate the contribution of each proposed component and the impact of the number of input frames. (SG) Spatial Guidance; (MPE) Multi-level Position Encoding; (Attn) Intra-view and Inter-view Attention; (LG) Language Guidance*
-
-![[assets/figures/papers/paper_list_l2413_https_arxiv_org_abs_2512_01223/figures/006_Table_3.jpg]]
-*Table 3: Efficiency comparison. We report the training cost (in GPU hours), trainable parameters (in MB), and the inference latency (in seconds). t0 represents the additional inference time of reconstructing point clouds*
-
-![[assets/figures/papers/paper_list_l2413_https_arxiv_org_abs_2512_01223/figures/007_Table_4.jpg]]
-*Table 4: Out-of-Distribution (OOD) Evaluation on Multiscan [42] and ArkiScenes [4]*
-
-![[assets/figures/papers/paper_list_l2413_https_arxiv_org_abs_2512_01223/figures/011_Table_8.jpg]]
-*Table 8: Ablation study on the ScanRefer [9] dataset. We evaluate the contribution of inter-view and intra-view attention (Attn)*
-
-![[assets/figures/papers/paper_list_l2413_https_arxiv_org_abs_2512_01223/figures/005_Figure.jpg]]
-*Figure: (b) Viewpoint Dependency (c) Occlusion (e) Mul�ple Anchors (f) Order*
-
-![[assets/figures/papers/paper_list_l2413_https_arxiv_org_abs_2512_01223/figures/014_Figure_6.jpg]]
-*Figure 6: Qualitative comparison of 3DVG results in Nr3D [2]. Ground Truth is highlighted in green, our predictions in cyan, and predictions of SeeGround [34] in magenta*
-
-![[assets/figures/papers/paper_list_l2413_https_arxiv_org_abs_2512_01223/figures/012_Figure_4.jpg]]
-*Figure 4: Error type analysis on ScanRefer [9] dataset*
-
-
 
 ## 定位与知识库关联
 
@@ -395,8 +359,6 @@ S²-MLLM在3D视觉定位领域的知识贡献可归纳为：
 | **性能水平** | ScanRefer Overall Acc@0.25达59.2%，超越所有监督和MLLM基线 |
 | **效率优势** | 72 GPU小时训练，1.16s推理延迟，无需推理时重建 |
 | **泛化能力** | 在MultiScan和ArkiScenes两个分布外数据集上显著超越SeeGround |
-
-
 
 ## 原文 PDF
 

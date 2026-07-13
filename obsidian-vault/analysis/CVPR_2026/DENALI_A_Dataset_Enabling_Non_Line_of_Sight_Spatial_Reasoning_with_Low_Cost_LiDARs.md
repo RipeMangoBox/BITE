@@ -51,8 +51,6 @@ claims:
 
 在方法谱系上，DENALI将NLOS感知从“实验室级硬件+物理反演”推向了“消费级传感器+数据驱动回归/分类”的新范式，为低功耗、可部署的NLOS空间推理系统提供了基准平台。
 
-
-
 非视距（Non-Line-of-Sight, NLOS）感知旨在恢复被遮挡的隐藏物体的几何、位置或类别信息。传统NLOS成像依赖实验室级扫描式单光子雪崩二极管（SPAD）激光雷达，通过测量中继墙面上的时间分辨直方图，利用物理反演算法重建隐藏场景。这类系统具有极高的时间分辨率（通常数皮秒）和空间采样密度，能够捕获精细的光子飞行时间信息，从而支撑基于瞬态光传输模型的重建——例如共焦瞬态响应：
 
 $$\tau ( \mathbf { x } ^ { \prime } , t ) = \iiint _ { \Omega } \rho ( \mathbf { x } ) { \frac { \delta ( 2 \| \mathbf { x } ^ { \prime } - \mathbf { x } \| - c t ) } { \| \mathbf { x } ^ { \prime } - \mathbf { x } \| ^ { 4 } } } d \mathbf { x }$$
@@ -68,8 +66,6 @@ $$\tau _ { p } ( t ) = \int _ { \mathcal { A } _ { p } } w _ { p } ( \mathbf { x
 其中 $w_p(\mathbf{x}')$ 为像素的空间灵敏度权重。这一公式揭示了消费级传感器直方图与隐藏场景之间的可学习映射关系，为数据驱动方法提供了理论基础。
 
 基于此，本文提出了一条互补路径：**不依赖物理反演，而是利用大规模真实世界采集的全直方图直接训练神经网络，实现鲁棒的NLOS定位、形状分类与尺寸估计**。为此，作者构建了DENALI——首个使用低成本LiDAR的大规模NLOS全直方图数据集，覆盖60种物体形状、100个位置、两种光照条件和两种传感器分辨率，共计72,000个场景。该数据集旨在系统性地探究数据驱动NLOS感知的关键控制因素：物体尺寸、位置、光照和传感器分辨率对感知性能的调制效应，以及仿真保真度对sim-to-real迁移的影响。
-
-
 
 ## 核心方法与创新机理
 
@@ -92,8 +88,6 @@ DENALI本身是首个大规模、使用低成本LiDAR的全直方图NLOS数据�
 ### 与已有工作的差异定位
 
 已有NLOS数据集（如基于SPAD的合成或受控采集）通常假设高保真传感器和已知的光传输模型，服务于物理反演算法。DENALI则明确面向**低资源传感器**和**数据驱动方法**，其changed slots清晰界定了这一差异：传感器从实验室级扫描SPAD变为消费级闪光dToF，感知范式从模型反演变为端到端学习。这一双重切换使得DENALI成为连接消费级硬件与NLOS感知能力的桥梁数据集，而非对现有高保真NLOS方法的增量改进。
-
-
 
 DENALI 的整体框架围绕“真实采集—数字孪生—数据驱动下游推理”三条主线展开，旨在用低成本消费级 dToF LiDAR 的全直方图直接训练神经网络，实现非视距（NLOS）定位、形状分类与尺寸预测。
 
@@ -129,13 +123,6 @@ $$
 $$
 
 这两个公式共同说明：即使空间分辨率极低，像素直方图仍以积分形式保留了隐藏物体的时空信息，为数据驱动方法提供了信息论基础。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l817_https_arxiv_org_abs_2604_16201/figures/003_Figure_3.jpg]]
-*Figure 3: Capture setup. Our capture system is designed to record a large-scale dataset of non-line-of-sight, three-bounce light signals from a mobile flash LiDAR. The setup includes a low-cost single-photon LiDAR co-located with an Intel RealSense RGB-D camera, both directed toward a flat relay wall. A hidden object is mounted on a motorized gantry positioned outside their direct line of sight to ensure only indirect three-bounce returns are measured. An additional overhead RealSense tracking camera observes the entire scene, providing accurate localization of the LiDAR, relay wall, and hidden object during data collection*
-
-
 
 ### 3.1 NLOS信号形成模型
 
@@ -183,8 +170,6 @@ $$
 
 所有模型共享相同的输入（背景减除后的像素直方图）和输出头（回归头用于定位，分类头用于形状/尺寸预测），差异仅在于对时空结构的利用方式。
 
-
-
 ## 实验与关键发现
 
 ### 基准任务与模型架构
@@ -225,8 +210,6 @@ Table 3分析了探测器时间抖动（Gaussian FWHM）对下游任务的影响
 3. **空间分辨率瓶颈**：3D CNN未优于1D CNN的事实暗示，`3×3` 像素阵列提供的空间信息极为有限，可能不足以支撑有意义的空间特征学习。
 4. **受控场景假设**：所有实验均依赖回射带增强信号、固定传感器-墙面几何关系及静态场景，向无约束真实环境的推广仍是开放问题。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l817_https_arxiv_org_abs_2604_16201/figures/005_Table_1.jpg]]
 *Table 1: Statistical analysis of three-bounce signal. For each capture, we subtract the corresponding no-object background to isolate the three-bounce return. We report mean ± SEM for pixels [1,1] (3 × 3) and [2,1] (8 × 8)*
 
@@ -241,8 +224,6 @@ Table 3分析了探测器时间抖动（Gaussian FWHM）对下游任务的影响
 
 ![[assets/figures/papers/paper_list_l817_https_arxiv_org_abs_2604_16201/figures/013_Table_3.jpg]]
 *Table 3: Effect of detector timing jitter (Gaussian FWHM in ps) on downstream NLOS perception tasks, applied to 3 × 3 centerpixel histograms during training and evaluation*
-
-
 
 ## 定位与知识库关联
 
@@ -316,8 +297,6 @@ DENALI在NLOS感知知识库中的定位指向以下开放问题：
 5. **无背景减除的端到端感知**：摆脱背景减除依赖需要模型直接从原始直方图（包含单反弹、环境光和暗计数）中提取三反弹信号。这本质上是一个盲源分离问题，可能需要自监督预训练或物理引导的注意力机制。
 
 **需要手动验证的点**：上述分析中关于“此前基于实验室级数据的工作通常依赖复杂3D反演网络”的对比陈述，基于对NLOS重建文献的一般性了解，而非本文明确引用的具体基线。如需精确的文献对比，建议核实近期NLOS重建综述（如Faccio et al., Nature Reviews Physics 2020）中列举的代表性方法。
-
-
 
 ## 原文 PDF
 

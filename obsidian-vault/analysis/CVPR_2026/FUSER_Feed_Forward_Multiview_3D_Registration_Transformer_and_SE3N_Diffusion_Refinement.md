@@ -62,8 +62,6 @@ claims:
 
 FUSER的提出标志着多视角配准从“成对估计+后优化”迈向“全局前馈推理”的范式转变，为大规模、实时三维重建提供了新的技术路径。
 
-
-
 三维场景理解与重建的核心前提是将多个部分重叠的点云扫描对齐到一个统一的全局坐标系中。这项任务——多视角点云配准——在自动驾驶、机器人导航、增强现实和数字孪生等应用中扮演着基础性角色。然而，尽管该领域已有数十年的研究积累，大规模、高精度的多视角配准仍然是一个开放挑战。
 
 ### 传统两阶段范式的结构性缺陷
@@ -89,8 +87,6 @@ FUSER的提出标志着多视角配准从“成对估计+后优化”迈向“�
 上述分析揭示了一个核心洞察：**多视角配准的本质困难不在于成对匹配本身，而在于缺乏一个统一的全局推理机制**。如果能够将所有扫描同时编码到一个紧凑的隐空间中，并通过高效的消息传递直接回归每个扫描的全局刚性位姿，就可以彻底消除成对估计和位姿同步这两个冗余步骤。
 
 基于这一动机，本文提出 **FUSER**——首个前馈式多视角配准 Transformer。FUSER 的核心思想是：利用绝对坐标感知的稀疏 3D CNN 保留平移线索，设计几何交替注意力实现扫描内与跨扫描的高效消息传递，并创新性地将 2D 基础模型的注意力先验迁移至 3D 点云推理，从而在单一前馈过程中实现高质量的全局位姿回归。在此基础上，FUSER-DF 进一步将多视角位姿校正建模为联合 SE(3)$^N$ 流形上的先验条件扩散去噪过程，实现精细化的位姿优化。
-
-
 
 ## 核心方法与创新机理
 
@@ -148,8 +144,6 @@ $$\mathbf{T}_{i}^{t} = \mathrm{Exp}(\gamma\sqrt{1-\bar{\alpha}_{t}}\varepsilon) 
 
 FUSER 的创新链条清晰且自洽：**绝对坐标编码**保留平移线索 → **几何交替注意力**实现高效的多扫描联合推理 → **2D 注意力先验迁移**注入跨模态归纳偏置 → **全局位姿直接回归**消除两阶段瓶颈 → **SE(3)$^N$ 扩散细化**提供可选的精度增益。这一系列 changed slots 共同构成了首个真正端到端的前馈多视角配准框架，在精度、效率与可扩展性上均显著超越传统两阶段方法。
 
-
-
 FUSER 提出了一种全新的多视角点云配准范式：将传统“成对配准 + 位姿同步”两阶段流程彻底重构为单一的前馈式全局位姿回归。其核心 pipeline 由三个紧密耦合的模块组成，数据流从前端点云编码到多视角推理再到位姿输出，全程无需任何显式的成对匹配或位姿图优化。
 
 ### 输入与输出
@@ -193,15 +187,11 @@ $$\mathbf{T}_{i}^{t} = \mathrm{Exp}(\gamma\sqrt{1-\bar{\alpha}_{t}}\varepsilon) 
 
 整个 FUSER 推理流程极为高效：在 3DMatch（60 帧）上仅需 0.31 秒，在 ArkitScenes（200 帧）上仅需 0.61 秒，而传统两阶段方法通常需要数十秒至数分钟。FUSER-DF 因扩散去噪步骤，推理时间分别增加至 2.91 秒和 6.50 秒，仍远快于传统流程。GPU 内存占用方面，得益于紧凑的超点表示和 FlashAttention 优化，200 帧序列仅需 2.83 GB 显存（FUSER-DF 为 5.09 GB）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2037_https_arxiv_org_abs_2512_09373/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of paradigms. Conventional multiview registration relies on redundant pairwise estimation (time-consuming and no global constraint) and pose synchronization (outlier sensitivity and high inductive bias). By contrast, our FUSER directly predicts global poses through unified feed-forward reasoning across all scans without any pairwise matching, delivering outstanding accuracy and efficiency (minutes→seconds)*
 
 ![[assets/figures/papers/paper_list_l2037_https_arxiv_org_abs_2512_09373/figures/002_Figure_2.jpg]]
 *Figure 2: Architecture of FUSER. It encodes unordered scans into a compact latent space via Absolute Geometric Encoding, then performs 2D attention prior-enhanced Geometric Alternating Attention for multiview reasoning and final pose regression*
-
-
 
 ### 3.1 绝对几何编码器 (Absolute Geometric Encoder)
 
@@ -257,8 +247,6 @@ $\gamma$ 为噪声尺度，$\bar{\alpha}_t$ 控制插值权重。逆向过程学
 ![[assets/figures/papers/paper_list_l2037_https_arxiv_org_abs_2512_09373/figures/003_Figure_3.jpg]]
 *Figure 3: Pipeline of prior-aware*
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -306,29 +294,11 @@ FUSER 在多视角点云配准领域实现了范式级创新，其定位可从�
 - **相对于扩散配准方法**：SE(3) 扩散配准已有初步探索，但 FUSER-DF 首次将其扩展到多视角联合空间 SE(3)ᴺ，并以 FUSER 的预测作为先验条件，实现了先验感知的去噪精炼——这与无条件扩散或成对扩散有本质区别。
 - **跨模态桥接**：从 2D 基础模型向 3D 任务迁移注意力先验的策略，为 3D 视觉中利用大规模 2D 预训练模型开辟了新路径。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2037_https_arxiv_org_abs_2512_09373/figures/004_Table_1.jpg]]
-*Table 1: Multiview registration performance on the ScanNet (30 scans) [18]*
-
 ![[assets/figures/papers/paper_list_l2037_https_arxiv_org_abs_2512_09373/figures/006_Table_2.jpg]]
 *Table 2: Comparisons on 3DMatch (60 scans) [80]*
 
-![[assets/figures/papers/paper_list_l2037_https_arxiv_org_abs_2512_09373/figures/007_Table_3.jpg]]
-*Table 3: Comparisons on ArkitScenes (200 scans) [6]*
-
 ![[assets/figures/papers/paper_list_l2037_https_arxiv_org_abs_2512_09373/figures/008_Table_4.jpg]]
 *Table 4: Ablation Studies on ScanNet [18] (ScaN: ScanNet [18], ArkitS: ArkitScenes [6], ScaNP: ScanNet++ [75], 3DM: 3DMatch [80])*
-
-![[assets/figures/papers/paper_list_l2037_https_arxiv_org_abs_2512_09373/figures/010_Table_5.jpg]]
-*Table 5: Runtime (s) on 3DMatch [80] and ArKitScenes [6]*
-
-![[assets/figures/papers/paper_list_l2037_https_arxiv_org_abs_2512_09373/figures/005_Figure_4.jpg]]
-
-![[assets/figures/papers/paper_list_l2037_https_arxiv_org_abs_2512_09373/figures/009_Figure_5.jpg]]
-*Figure 5: Qualitative comparison: FUSER surpasses SOTA GeoTrans [57] and PARENet [74] descriptors with SGHR pose graph [67], achieving much higher accuracy and efficiency*
-
-
 
 ## 定位与知识库关联
 
@@ -371,8 +341,6 @@ FUSER 在多视角点云配准领域实现了范式级创新，其定位可从�
 4. **轻量化与移动端部署**：当前 0.6B 参数量限制了边缘设备部署。探索知识蒸馏、架构剪枝等轻量化策略，使前馈全局配准能力下沉至移动端，具有实际应用价值。
 
 5. **室外大规模场景验证**：在 KITTI、Waymo 等大规模室外自动驾驶场景上的性能与泛化能力尚待评估，这是从室内走向开放环境的关键一步。
-
-
 
 ## 原文 PDF
 

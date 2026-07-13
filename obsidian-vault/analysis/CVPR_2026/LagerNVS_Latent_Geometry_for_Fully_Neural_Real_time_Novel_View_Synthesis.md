@@ -53,8 +53,6 @@ LagerNVS 针对这一瓶颈提出了一个关键洞察：**即使不进行显式
 
 在方法谱系上，LagerNVS 属于重建-free 的编码器-解码器 NVS 范式，与 **LVSM**（Jin et al., ECCV 2024）构成直接对标，同时与基于前馈 3DGS 的方法如 **AnySplat**（Chen et al., CVPR 2025）、**DepthSplat**（Xu et al., CVPR 2024）、**NoPoSplat**（Ye et al., ECCV 2024）以及编码器-解码器缩放研究 **SVSM**（Chen et al., arXiv 2025）形成横向比较。LagerNVS 的核心区分点在于：以显式 3D 监督预训练的 VGGT 作为编码器初始化源，而非依赖随机初始化或 2D 自监督预训练（如 DinoV2），从而在潜在空间中注入了更强的 3D 结构先验。
 
-
-
 ### 问题背景
 
 新视角合成（Novel View Synthesis, NVS）旨在从一组稀疏的源图像中渲染任意目标视角的逼真图像。该任务在增强现实、虚拟现实、具身智能和内容创作等领域具有广泛的应用前景。近年来，前馈式 NVS 方法因其无需逐场景优化的推理效率而受到广泛关注。这类方法的核心范式是将 NVS 建模为编码器-解码器架构：
@@ -82,8 +80,6 @@ $$z = e(I_1, g_1, \ldots, I_V, g_V), \quad I = h(z; g).$$
 - **端到端微调**：在 NVS 任务上端到端微调整个模型（包括 VGGT 主干），使 3D 预训练特征适应外观渲染需求。
 
 基于上述动机，本文提出 **LagerNVS**，一种全神经、前馈、实时的 NVS 方法，旨在以确定性推理实现最先进的合成质量，同时保持超过 30 FPS 的实时渲染速度。
-
-
 
 ## 核心方法与创新机理
 
@@ -118,8 +114,6 @@ $$
 ### 创新点的协同效应
 
 上述四个 changed slots 并非孤立改进，而是形成协同效应：3D 预训练提供了高质量的初始特征空间，高速公路架构保证了这些特征无损传递，交叉注意力在保持实时性的同时实现充分交互，端到端微调则弥合了重建与渲染之间的任务鸿沟。这一组合使 LagerNVS 在 RealEstate10k 上以 **+1.72 dB** 显著超越先前最优 LVSM（31.39 vs 29.67 PSNR，Table 1），并在 DL3DV 等多场景基准上以超过 5 dB 的优势领先前馈 3DGS 方法（Table 3）。
-
-
 
 LagerNVS 采用**编码器-解码器**架构，将新视角合成 (NVS) 分解为两个阶段：编码器 $e$ 从任意数量的源图像（及可选相机参数）中提取中间潜在表示 $z$，解码器 $h$ 则根据目标相机位姿 $g$ 将该表示渲染为目标视图 $I$：
 
@@ -168,13 +162,6 @@ $$\mathcal{L} = \lambda_2 \mathcal{L}_2 + \lambda_p \mathcal{L}_p.$$
 
 消融实验表明，**解冻 VGGT 主干进行端到端微调**比冻结编码器提升约 +2.01 dB PSNR，说明让 3D 预训练特征适应 NVS 任务至关重要。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2260_https_arxiv_org_abs_2603_20176/figures/002_Figure_2.jpg]]
-*Figure 2: Method. The model takes any number of images and, optionally, their camera parameters as input. A large network initialized from a reconstruction model [70] outputs an intermediate feature representation with implicit 3D information. A lightweight network is queried on a target camera pose and renders a 512×512 image at more than 30 FPS on a single H100 GPU when provided with up to 9 input images*
-
-
-
 LagerNVS 将新视角合成形式化为一个编码器-解码器框架，其核心公式为：
 
 $$z = e(I_1, g_1, \ldots, I_V, g_V), \quad I = h(z; g).$$
@@ -217,13 +204,6 @@ $$\mathcal{L} = \lambda_2 \mathcal{L}_2 + \lambda_p \mathcal{L}_p,$$
 
 其中 $\mathcal{L}_2$ 为像素级 L2 损失，$\mathcal{L}_p$ 为感知损失（LPIPS），$\lambda_2$ 和 $\lambda_p$ 为加权系数。消融实验表明，端到端微调整个模型（解冻 VGGT 主干）比冻结编码器提升约 2.01 dB PSNR，证明 3D 预训练特征需要针对 NVS 任务进行适应性调整才能充分发挥作用。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2260_https_arxiv_org_abs_2603_20176/figures/004_Figure_4.jpg]]
-*Figure 4: Architectures. Our highway encoder-decoder (left) maximizes information flow from source images to the latent representation (R), making it more expressive than the bottleneck encoder-decoder (middle). Unlike decoder-only models (right), our design allows scaling the encoder without slowing decoding*
-
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -265,9 +245,6 @@ LagerNVS 在标准确定性新视角合成基准上全面超越先前最优方�
 - **双向交叉注意力**：2 视图下 21.02 PSNR（仅低 0.28 dB），复杂度降为 O(V)，支持 1–9 视图下 **56–30 FPS** 的实时渲染。
 - **单向交叉注意力**：质量进一步下降，但速度更快。
 
-![[assets/figures/papers/paper_list_l2260_https_arxiv_org_abs_2603_20176/figures/019_Table.jpg]]
-*Table: A3. Decoder attention variants. The bidirectional cross-attention mechanism used for the main model offers a good trade-off between real-time rendering speed and NVS quality*
-
 LagerNVS 最终采用双向交叉注意力，在保持实时解码的前提下最大化渲染质量。
 
 ### 与前馈 3DGS 的定性对比
@@ -305,19 +282,6 @@ LagerNVS 最终采用双向交叉注意力，在保持实时解码的前提下�
 - **场景限制**：仅适用于静态场景，训练数据未包含人类或鱼眼等畸变图像。
 
 对于复杂遮挡场景，模型倾向于产生“均值回归”式的模糊补全（Figure A3），这在确定性框架下是预期行为——扩散解码器的初步实验（Figure 9）展示了通过生成式方法改善未观测区域补全质量的潜力。
-
-![[assets/figures/papers/paper_list_l2260_https_arxiv_org_abs_2603_20176/figures/010_Figure_9.jpg]]
-*Figure 9: Diffusion. Our decoder can be fine-tuned with a diffusion objective, enabling hallucination of unobserved regions*
-
-![[assets/figures/papers/paper_list_l2260_https_arxiv_org_abs_2603_20176/figures/016_Figure.jpg]]
-*Figure: Input 1 Input 2 Novel View Figure A3. Occlusions. Our model can handle simple occlusions, such as the corner of the bathtub (top) or the bottom part of the black box (middle). In more difficult settings (bottom), completions are blurry (as expected), but still reasonable*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2260_https_arxiv_org_abs_2603_20176/figures/007_Table_3.jpg]]
-*Table 3: Feed-forward 3DGS comparison. Our model outperforms state-of-the-art feed-forward 3DGS models across the board, both with and without input camera poses available, illustrating the strength of latent 3D representations. NoPoSplat only trained on RealEstate10k (a potentially unfair comparison), but we include it here for completeness. See Sec. C.3 for details of ‘Ours (v2)’*
-
-
 
 ## 定位与知识库关联
 
@@ -374,8 +338,6 @@ LagerNVS 的能力边界由以下假设和约束划定：
 ### 知识库定位总结
 
 LagerNVS 的核心贡献在于证明了**显式 3D 监督预训练 + 无瓶颈高速公路架构**这一组合在重建-free NVS 中的决定性作用。它并非提出全新的网络模块，而是通过系统性的架构选择（编码器预训练策略、信息流设计、注意力机制）将现有组件组合为一种高效的全神经渲染方案。该方法在方法论上连接了 3D 重建预训练与 NVS 两个领域，为后续研究提供了明确的改进方向：更强的 3D 预训练信号、更灵活的内参处理、以及确定性渲染与生成能力的更好融合。
-
-
 
 ## 原文 PDF
 

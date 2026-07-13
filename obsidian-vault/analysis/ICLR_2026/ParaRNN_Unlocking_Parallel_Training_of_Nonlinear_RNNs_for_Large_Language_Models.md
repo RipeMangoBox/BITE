@@ -72,8 +72,6 @@ ParaRNN 在效率、规模和表达能力三个维度上取得了突破性验证
 
 在方法谱系中，ParaRNN 占据了独特位置：它既不同于 Transformer 的完全并行注意力机制，也不同于 Mamba 等线性 SSM 的关联扫描路径，而是开辟了“**非线性递归的数值并行化**”这一新范式。其本质是通过牛顿法将非线性序列操作解耦为可并行求解的线性系统，从而在保留 RNN 非线性表达能力的同时，获得与 Transformer 同级的训练并行度。该方法被封装为高可用的 PyTorch+CUDA 库，用户仅需提供 RNN 单元的递归步定义即可自动获得序列并行训练能力。
 
-
-
 ### 序列建模的并行化困境
 
 现代大型语言模型的成功在很大程度上依赖于训练效率的持续提升。以 **Transformer**（Vaswani et al., NeurIPS 2017）为代表的自注意力架构之所以能够扩展到数万亿参数规模，其核心优势在于序列维度上的完全并行化——序列中所有位置的计算可以同时进行，充分利用了GPU的大规模并行能力。然而，这种并行化的代价是自注意力机制的平方级计算复杂度 $O(L^2)$，在长序列场景下成为严重的效率瓶颈。
@@ -91,8 +89,6 @@ $$\pmb { h } _ { l } = \pmb { f } ( \pmb { h } _ { l - 1 } , \pmb { x } _ { l } 
 ### ParaRNN的核心动机
 
 ParaRNN的核心动机正是打破这一僵局：**能否让非线性RNN也获得与Transformer相当的训练并行度，从而同时兼得二者的优势**？这一问题的关键在于如何将序列递归关系转化为可并行求解的形式。ParaRNN的解决方案是将非线性RNN的逐元素前向传播重新定义为整个序列上的非线性方程组，利用牛顿法迭代线性化，再通过针对块双对角结构定制的高效并行归约（parallel reduction）算法实现全序列并行求解。这一思路使得非线性RNN的训练首次能够在序列维度上并行化，为经典RNN架构在大规模语言建模中的复兴开辟了道路。
-
-
 
 ## 核心方法与创新机理
 
@@ -147,13 +143,8 @@ ParaRNN提供了三种递进的并行求解器实现，允许用户在易用性�
 
 **需要手动验证的点**：关于ParaRNN框架能否泛化到任意新设计的RNN细胞，目前仅验证了ParaGRU和ParaLSTM两种实例。牛顿法快速收敛（$\mathcal{O}(1)$迭代）是维持效率优势的前提，但无法保证所有新RNN都满足此性质。此外，对角Jacobian约束对模型表达能力的实际影响虽在合成任务和语言建模实验中有所体现，但缺乏严格的理论分析。
 
-
-
 ![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_mX8b64iUaa/figures/001_Figure_1.jpg]]
 *Figure 1: Our ParaRNN framework makes it possible to apply classical RNNs in parallel, dramatically speeding up their training, and allowing them to be used competitively for language modeling*
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_mX8b64iUaa/figures/006_Figure_4.jpg]]
-*Figure 4: Newton’s method convergence behavior for ParaGRU (top) and ParaLSTM (bottom) cells with different input sequence lengths L, for freshly initialized RNN cells (left), and for the RNN cells in the last layer of our trained 400M models (right). Inputs are randomly selected from the evaluation datasets, and the residuals reported are the max on batches of size 8*
 
 ParaRNN 的核心思想是将非线性 RNN 在序列上的逐元素递归应用，重新表述为一个全局非线性方程组的求解问题，从而打破传统 RNN 训练中固有的序列依赖瓶颈。该框架包含三个关键层次：
 
@@ -222,8 +213,6 @@ ParaRNN 提供三种实现，在易用性与性能之间提供灵活选择：
 **6. 模块间数据流**
 
 整个 pipeline 的数据流为：输入序列 $\{x_l\}$ → Jacobian 组装模块（计算 $J_f$）→ 牛顿外层迭代（构建块双对角系统）→ 并行归约内层求解（更新 $\delta h$）→ 状态更新 → 收敛判定。收敛后的隐藏状态序列 $\{h_l\}$ 直接送入后续的 MLP 层（遵循与 Transformer/Mamba2 相同的块结构：序列混合器 + MLP + 残差连接 + RMSNorm）。
-
-
 
 ### 问题重构：从序列递归到非线性方程组
 
@@ -322,14 +311,11 @@ $$
 
 该递推在结构上等价于一个线性 RNN 的反向展开，因此**无需牛顿迭代**，可直接通过一次并行归约完成全部梯度计算。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能验证
 
 ParaRNN 在语言建模和合成任务上系统验证了非线性 RNN 并行训练的有效性。在 7B 参数规模的语言建模基准上（DCLM 数据集），ParaGRU 和 ParaLSTM 分别取得 9.19 和 9.16 的困惑度，优于同规模 Transformer 的 9.55，但略逊于 Mamba2 的 8.62（Table 2）。这表明经典非线性 RNN 在获得并行训练能力后，其建模能力可与主流架构竞争。
-
 
 ![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_mX8b64iUaa/figures/005_Table_2.jpg]]
 *Table 2: Perplexity, parameters count, and evaluation scores on lm-eval-harness (Gao et al., 2021) tasks, for 7B models. Accuracies in percentages. Shot counts are reported in brackets*
@@ -338,14 +324,12 @@ ParaRNN 在语言建模和合成任务上系统验证了非线性 RNN 并行训�
 
 在推理阶段，7B 模型在 $L=2^{11}$ 的生成场景下，ParaGRU 和 ParaLSTM 的吞吐量约为 37–38 tokens/s，而 Mamba 约为 28 tokens/s，Transformer 则显著更低（Figure 3, Table 3）。RNN 架构固有的逐 token 生成模式在此展现出效率优势。
 
-
 ![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_mX8b64iUaa/figures/011_Table_3.jpg]]
 *Table 3: Throughput results at regime ( L = 2 ^ { 1 1 } ) for the model types and sizes considered*
 
 ### 合成任务上的表达能力
 
 单层模型在合成任务上的准确率（Table 1）揭示了非线性 RNN 的表达特性。ParaGRU 和 ParaLSTM 在 Cycle Navigation、Modular Arithmetic、Copy Memory 等任务上均达到 100% 准确率，而 Mamba2 在 Copy Memory 等需要非线性记忆交互的任务上表现较弱。在难度较高的 A5 任务上，ParaGRU 和 ParaLSTM 达到 38–40% 的准确率，显著优于 Transformer。这验证了非线性递归函数在建模复杂序列依赖上的固有优势，与线性 SSM 的局限性形成对比。
-
 
 ![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_mX8b64iUaa/figures/004_Table_1.jpg]]
 *Table 1: Single-layer accuracy on synthetic tasks. ( )$^ { \dagger }$ denotes results computed training only the RNN cell (see App. C.2 for details)*
@@ -368,7 +352,6 @@ ParaRNN 在语言建模和合成任务上系统验证了非线性 RNN 并行训�
 
 所有对比实验遵循严格的公平性控制：各模型（ParaGRU、ParaLSTM、Mamba2、Transformer）采用相同的块结构（序列混合器 + MLP + 残差连接 + RMSNorm），训练配置遵循 Chinchilla 最优 token 预算，使用相同的批次大小、序列长度（2048 tokens）和优化器设置（Table 4, Table 5）。下游评估统一使用 lm-eval-harness 框架和相同的 few-shot 设置，确保性能对比的公正性。
 
-
 ![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_mX8b64iUaa/figures/014_Table_4.jpg]]
 *Table 4: Architecture specifications and optimal hyperparameters for our experiments. We report structural parameters (number of layers, number of heads and model width) and training hyperparameters (learning rate and weight decay) that achieved lowest perplexity for each model type and scale. Time measurements show average single-step training cost on NVIDIA H100 GPUs, while Memory measurements show the per-sample peak memory usage during one optimization step*
 
@@ -388,14 +371,6 @@ ParaRNN 在语言建模和合成任务上系统验证了非线性 RNN 并行训�
 4. **任务泛化未验证**：当前实验集中在语言建模，尚未在时间序列预测、强化学习等其他序列建模场景中验证方法的泛化性。
 
 5. **超长序列瓶颈**：在极端序列长度下，跨块的并行归约需要多次核启动和全局内存同步，可能削弱并行优势。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_mX8b64iUaa/figures/017_Table_6.jpg]]
-*Table 6: Final perplexities, and evaluation scores on reference downstream tasks from lm-eval-harness (Gao et al., 2021), for all model types and scales considered*
-
-
-
 
 ## 定位与知识库关联
 
@@ -436,8 +411,6 @@ ParaRNN的有效性依赖于以下前提条件，这些条件界定了其适用�
 **全融合实现的扩展性**：全融合CUDA实现需要用户手动提供Jacobian计算的CUDA代码，这增加了为新RNN扩展最高性能的难度。如何自动化这一过程（例如通过代码生成或即时编译），使任何新定义的RNN都能自动获得最高性能，是工程层面的重要挑战。
 
 **与混合架构的结合潜力**：ParaRNN的思想是否可以与现有的线性注意力或混合架构（如将部分层替换为非线性RNN）结合，以在训练速度与推理效率之间取得更优权衡，是一个值得探索的方向。
-
-
 
 ## 原文 PDF
 

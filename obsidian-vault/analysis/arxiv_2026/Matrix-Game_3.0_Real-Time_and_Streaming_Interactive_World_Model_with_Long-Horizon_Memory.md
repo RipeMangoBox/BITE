@@ -111,8 +111,6 @@ Matrix‑Game 3.0 的整体 pipeline 由四个核心模块串联而成，形�
 
 整个 pipeline 的输入为初始图像帧与用户动作指令，输出为实时、动作可控且具备长时一致性的视频流。四个模块的串行依赖关系决定了：基础模型的自校正能力是记忆机制有效的前提，而蒸馏与加速模块则在不破坏前序模块所建立的一致性的前提下，将系统推向实时性能边界。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_08995/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of Matrix-Game 3.0. Our framework unifies Unreal Engine–based data generation, memory-augmented DiT training with an error buffer, and accelerated real-time deployment. It generates long-horizon training videos with paired action and camera-pose supervision, learns action-conditioned generation with memory-enhanced consistency, and supports real-time inference through few-step sampling, quantization, and pruning, achieving 720p@40FPS with a 5B model*
 
@@ -174,16 +172,8 @@ $$s_{\mathrm{approx}}(i, j) = \frac{1}{N} \sum_{n=1}^{N} \mathbf{1}_n^{(j)}$$
 
 通过采样点投影替代精确截椎体相交计算（$s_{\mathrm{exact}}$），将检索从 CPU 瓶颈迁移至 GPU 并行执行。消融实验表明，移除 GPU 化检索会导致 FPS 骤降至 6.60，验证了该组件对实时性能的关键作用。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_08995/figures/003_Figure_3.jpg]]
-*Figure 3: Illustration of our interactive base model. We jointly perform error-aware modeling over the past and current latent frames, while explicitly injecting action conditions into the model. This design enables autoregressive, long-horizon interactive generation and maintains consistency with the subsequent distillation stage*
-
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_08995/figures/005_Figure_5.jpg]]
 *Figure 5: Frame-level self-attention visualization for the memory-enhanced DiT*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_08995/figures/006_Figure_6.jpg]]
-*Figure 6: Illustration of our few-step distillation stage. The bidirectional student performs multisegment rollouts to mimic actual few-step inference, with the final segment used for distribution matching, thereby ensuring training-inference consistency*
 
 ## 实验与关键发现
 
@@ -231,17 +221,6 @@ Figure 9 展示了记忆增强模型在长视频中的场景重访能力。当�
 - **Table 2**：50% 剪枝的 MG-LightVAE 以 1.95 dB PSNR 代价换取 2.6× 解码加速，SSIM 无损。
 - **Figure 8**：误差感知训练使基础模型在无记忆条件下仍能维持背景稳定性。
 - **Figure 9**：相机感知记忆检索使模型在场景重访时恢复结构信息，是长时一致性的关键使能因素。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_08995/figures/011_Figure_11.jpg]]
-*Figure 11: Qualitative results of our distilled model. Each row is sampled uniformly over time*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_08995/figures/014_Figure_12.jpg]]
-*Figure 12: For each case, the top row shows the original video and the bottom row shows the reconstruction by the 50% pruned MG-LightVAE*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_08995/figures/010_Figure_10.jpg]]
-*Figure 10: Qualitative results of our 28B model on third-person video generation*
 
 ## 定位与知识库关联
 

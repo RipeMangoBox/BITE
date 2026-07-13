@@ -59,8 +59,6 @@ claims:
 
 PNO的方法定位处于神经算子理论、Eikonal方程求解与启发式搜索规划的交汇点。其核心贡献在于首次将运动规划中的价值函数预测形式化为算子学习问题，并通过架构创新实现了分辨率不变性、障碍物感知和目标泛化三者的统一。该工作为快速、可泛化的神经运动规划开辟了新路径，同时也揭示了若干待解决问题：当前方法依赖均匀代价假设，尚未处理非均匀代价环境；障碍膨胀层数需手工调节；在训练与测试地图分布差异过大时精度仍会下降。
 
-
-
 ### 运动规划的核心瓶颈
 
 运动规划是机器人学的基础问题，其目标是在有障碍物的环境中找到从起点到目标点的最优路径。从最优控制视角看，该问题可形式化为无限时域首次退出最优控制问题：最小化终端代价与累积运行代价之和，其中系统动力学为 $\dot{\pmb x}(t) = f(\pmb x(t), \pmb u(t))$，价值函数 $V(\pmb x)$ 表示从状态 $\pmb x$ 出发的最小代价。当运行代价仅依赖于状态（即控制无关代价）时，Hamilton-Jacobi-Bellman (HJB) 方程退化为 Eikonal 偏微分方程：
@@ -101,8 +99,6 @@ $$\|\nabla V(\pmb x)\| = c(\pmb x)$$
 4. **理论保证**：预测的价值函数满足 ε-一致性，可作为 A* 的启发式保证路径质量。
 
 为实现这些目标，PNO 在 FNO 基础上引入了三个关键设计：障碍物几何的平滑编码、满足三角不等式的 Deepnorm 投影层、以及混合 PINN 损失。这些组件协同工作，使神经算子能够从代价函数空间中捕获运动规划的底层结构，而非记忆特定地图的模式。
-
-
 
 ## 核心方法与创新机理
 
@@ -159,8 +155,6 @@ PNO 继承自 **FNO** (Li et al., 2021) 的频域参数化方式——Fourier �
 - 作为 A* 启发式时，障碍膨胀层数的选择目前依赖实验调参（Table 3），缺乏自适应机制。
 - 训练数据仍依赖传统数值求解器（FMM/Dijkstra）离线生成，对于极高维 C 空间（7-DOF 及以上）的数据生成成本可能成为瓶颈，这一点需要在实际应用中验证。
 
-
-
 PNO 的整体 pipeline 将运动规划中的价值函数近似重新定义为**从代价函数空间到价值函数空间的算子学习问题**。其核心流程如下：
 
 **输入**：一张二值占据栅格（binary occupancy grid），表示环境中的自由空间与障碍物。
@@ -191,12 +185,8 @@ $$\mathrm{Loss}(V, \hat{V}) := \|V - \hat{V}\|_{L^2} + \xi \left( \int_{x \in S}
 - 相比 **DAFNO**（Liu et al., 2023），PNO 用平滑指示函数替代二值掩码，并引入满足三角不等式的投影层，在城市地图上实现约 50% 的误差降低。
 - 相比 **VIN**（Tamar et al., NIPS 2016）和 **IEF2D**（Li et al., 2022），PNO 不依赖 CNN 的固定尺寸卷积核，因此天然具备分辨率不变性和更强的跨环境泛化能力。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2410_17547/figures/002_Figure_2.jpg]]
 *Figure 2: PNO network architecture. The input to a PNO is a binary occupancy grid, which is transformed into a sign distance function (SDF) via an independently trained FNO. This, along with the original binary map is passed to a series of modified FNO layers which hard encode the obstacles. Finally, this result, along with the goal, is then fed to a projection layer (ensuring satisfaction of the triangle inequality) obtaining the final value function prediction*
-
-
 
 ### 问题建模：从最优控制到Eikonal PDE
 
@@ -272,8 +262,6 @@ $$\mathrm{Loss}(V, \hat{V}) := \|V - \hat{V}\|_{L^2} + \xi \left( \int_{\pmb{x} 
 
 PNO的分辨率不变性源于FNO的频域学习范式。Fourier层在频域截断固定数量的低频模态进行卷积，该操作与输入/输出的空间离散化分辨率无关。因此，模型在 $64 \times 64$ 分辨率上训练后，可直接推理 $256 \times 256$ 乃至 $1024 \times 1024$ 的输入（Figure 1），实现最高16倍的超分辨率部署，且无需任何架构修改或微调。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -340,28 +328,6 @@ PNO 作为 A* 的启发式函数，结合障碍膨胀策略，在 MovingAI 2D �
 ### 计算效率总览
 
 Table 5 汇总了不同算法在 2D 数据集上的超分辨率计算时间。在 1024² 分辨率下，PNO 的推理时间远低于 FMM 数值求解器，且 DAFNO 的 SDF 计算依赖 SciPy 数值求解器，进一步凸显 PNO 端到端学习的效率优势。Table 4 和 Table 6 分别记录了 PNO 在 Grid World 和作为神经启发式时的模型参数量与性能指标，显示模型规模与任务复杂度正相关。
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2410_17547/figures/009_Table_4.jpg]]
-*Table 4: Model parameters and performance metrics for PNO over the GridWorld dataset. The PNO for 8 8 was smaller than that trained for*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2410_17547/figures/005_Figure_3.jpg]]
-*Figure 3: (left) Comparison of 3D value function approximations for two iGibson environments (best*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2410_17547/figures/006_Figure_4.jpg]]
-*Figure 4: Planning with PNO generated value functions for a 4-DOF manipulator around two obstacles. The top and bottom rows show two separate examples with end-effector trajectory snapshots demonstrating motion from a start (blue dot) to a goal configuration (green dot)*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2410_17547/figures/014_Figure_7.jpg]]
-*Figure 7: Comparison of PNO with and without the hybrid PINN loss. The left image shows the value function and corresponding error while the right image shows the gradient norm*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2410_17547/figures/020_Figure_11.jpg]]
-*Figure 11: Effect of erosion on various parameters*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2410_17547/figures/001_Figure_1.jpg]]
-*Figure 1: Example of super-resolution capabilities of PNO for motion planning on a map of NYC. The operator is trained on a dataset of resolution 64 × 64 and the examples shown here (resolutions 256 × 256, 512 × 512, and 1024 × 1024) were not seen during training. See Sec. 4 for details*
-
-
 
 ## 定位与知识库关联
 
@@ -444,8 +410,6 @@ PNO作为A*启发式时，需引入障碍膨胀（erosion）以保证路径最�
 5. **与其他PDE解算子的统一**：PNO的障碍编码和Deepnorm投影层是否可推广到其他PDE解算子学习任务？例如，Hamilton-Jacobi方程的更一般形式可能受益于类似的几何约束注入机制。
 
 6. **训练数据多样性的系统性增强**：为缓解分布外泛化退化，能否结合生成模型（如扩散模型或GAN）在训练中引入更多样的地图拓扑，或通过数据增强策略（如随机障碍物放置、拓扑变形）提升模型的鲁棒性？
-
-
 
 ## 原文 PDF
 

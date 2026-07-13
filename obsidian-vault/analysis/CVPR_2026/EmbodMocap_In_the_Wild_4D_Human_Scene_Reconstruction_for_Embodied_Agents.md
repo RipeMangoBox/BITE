@@ -58,8 +58,6 @@ claims:
 
 **硬件成本**：两台iPhone总成本约$1000，远低于传统动捕系统（>$20K），极大降低了野外数据采集门槛。
 
-
-
 ### 问题背景：具身AI对野外人体-场景交互数据的需求
 
 具身智能体（embodied agents）——无论是虚拟角色还是物理机器人——要在真实世界中自然地行动，必须理解人类如何在复杂场景中运动与交互。这要求训练数据不仅包含人体运动本身，还必须包含与之对应的三维场景几何，且二者需在同一度量坐标系下对齐。然而，构建此类“4D人体-场景”数据集面临根本性困难：现有高质量采集方案依赖昂贵且受限的硬件，难以走出实验室进入野外环境。
@@ -89,8 +87,6 @@ EmbodMocap的动机正是打破上述瓶颈。其核心洞察是：**利用两�
 - **世界空间运动优化提升一致性。** 基于三角化的3D关键点与世界空间SMPLify（Eq. 9），在场景坐标系下直接优化SMPL参数，获得时间一致、场景对齐的人体运动。
 
 这一设计使得EmbodMocap能够在任意场景中（室内/室外）以约$1000的设备成本完成采集，在光学动捕基准上达到WA-MPJPE 56.61 mm（优于单目基线GVHMR的66.56 mm，Table 3），并成功支撑单目人体-场景重建、物理角色动画和真实人形机器人运动控制等下游具身任务。
-
-
 
 ## 核心方法与创新机理
 
@@ -125,12 +121,7 @@ EmbodMocap 的核心创新在于**通过两台移动 iPhone 的双 RGB-D 序列�
 
 上述四个 changed slots 构成了一个因果链：**双视角硬件升级 → 点追踪损失解决深度歧义 → 多约束联合优化实现鲁棒标定 → 世界空间 3D 关键点约束提升运动精度**。这一链条的终端效果在光学动捕基准上得到量化验证：双视图重建的 WA-MPJPE 为 56.61 mm，显著优于单目模型 GVHMR 的 66.56 mm 和单视角优化的 66.96 mm（Table 3, chunk=100），且随序列长度增加优势更加明显。
 
-
-
 EmbodMocap 提出了一套低成本、便携的野外 4D 人体-场景重建系统，仅需两台移动 iPhone 即可在统一度量世界坐标系中同时获取静态场景网格与动态人体运动。其核心流水线由四个顺序阶段构成（Figure 2），各阶段逐步完成场景重建、序列预处理、多约束联合标定与世界空间运动优化，最终输出场景感知的人体运动数据。
-
-![[assets/figures/papers/paper_list_l2637_https_arxiv_org_abs_2602_23205/figures/003_Figure_2.jpg]]
-*Figure 2: EmbodMocap: We propose an affordable dataset capture and processing system. From left to right, the four stages (Stage-I to Stage-IV) illustrate our core logic: leveraging high-quality camera matrices provided by SpectacularAI [1] and aligning sequence coordinates to the scene’s world frame. For detailed explanations, please refer to Sec. 3*
 
 **Stage I — 场景重建**：使用单台 iPhone 拍摄场景的 RGB-D 视频，通过 SpectacularAI SDK (SAI) 获取度量尺度、Z轴向上的相机参数 $(K_s, R_{s,n}, T_{s,n})$，再经 PromptDA 深度增强与 TSDF 融合生成静态场景网格。该网格作为后续所有坐标系的参考世界坐标系。
 
@@ -141,8 +132,6 @@ EmbodMocap 提出了一套低成本、便携的野外 4D 人体-场景重建系�
 **Stage IV — 运动优化**：基于标定后的双视角相机参数，对 2D 关键点进行加权三角化得到 3D 关键点（Eq. (7)），随后在世界坐标系下执行 SMPLify 联合优化（Eq. (9)），同时约束 3D 关键点损失 $\mathcal{L}_{\mathrm{3D}}$、时序平滑损失、先验损失和重投影损失，获得时间一致的世界空间人体运动。
 
 整个框架的输入为两台 iPhone 拍摄的 RGB-D 序列，输出为度量世界坐标系下的静态场景网格与 SMPL 人体运动序列。消融实验（Table 2）证实，点追踪损失与 3D 关键点损失是系统性能的关键支柱：去除 $\mathcal{L}_{\mathrm{track}}$ 导致 IoU 从 73.0 骤降至 54.3，重投影误差从 9.3 升至 44.2；去除 $\mathcal{L}_{\mathrm{kp3d}}$ 同样使 IoU 降至 59.3、深度误差升至 0.609。这验证了双视图稠密对应与世界空间 3D 约束对消除深度歧义和保证重建精度的核心作用。
-
-
 
 EmbodMocap 的核心逻辑是通过四个顺序阶段，将人体运动与场景统一到同一个度量世界坐标系中。其关键在于**双视图联合标定**与**世界空间运动优化**两个模块的协同。
 
@@ -214,8 +203,6 @@ $$
 
 与单目 SMPLify 仅依赖重投影和先验不同，世界空间 SMPLify 通过 $\mathcal{L}_{\mathrm{3D}}$ 引入了度量尺度的 3D 监督，这是双视图几何带来的直接增益。
 
-
-
 ## 实验与关键发现
 
 ### 4.1 标定与运动优化消融实验
@@ -274,14 +261,6 @@ EmbodMocap 采集的数据集被用于微调单目人体-场景重建模型 π³
 
 5. **人体多样性有限**：光学动捕基准仅包含一名受试者，结论在更广泛人体形态上的泛化性需进一步验证。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2637_https_arxiv_org_abs_2602_23205/figures/005_Figure_3.jpg]]
-*Figure 3: Our dual view vs. single view results in optical studio*
-
-![[assets/figures/papers/paper_list_l2637_https_arxiv_org_abs_2602_23205/figures/006_Table_3.jpg]]
-*Table 3: Comparision among monocular model, single view optimization, with dual view optimization(ours)*
-
 ![[assets/figures/papers/paper_list_l2637_https_arxiv_org_abs_2602_23205/figures/007_Table_4.jpg]]
 *Table 4: Comparison of Finetuned Models on EMDB Benchmarks*
 
@@ -291,22 +270,11 @@ EmbodMocap 采集的数据集被用于微调单目人体-场景重建模型 π³
 ![[assets/figures/papers/paper_list_l2637_https_arxiv_org_abs_2602_23205/figures/009_Table_5.jpg]]
 *Table 5: Comparison of data duration, Success Rate, Contact Error, and APD for different skills among 3 data settings*
 
-![[assets/figures/papers/paper_list_l2637_https_arxiv_org_abs_2602_23205/figures/010_Figure_5.jpg]]
-*Figure 5: Qualitative comparison of 4 basic skills and 2 additional skills*
-
-![[assets/figures/papers/paper_list_l2637_https_arxiv_org_abs_2602_23205/figures/011_Table_6.jpg]]
-*Table 6: Quantitative evaluation of scene-aware motion tracking and dataset statistics across four 3D scenes*
-
 ![[assets/figures/papers/paper_list_l2637_https_arxiv_org_abs_2602_23205/figures/012_Figure_6.jpg]]
 *Figure 6: We present qualitative results of scene-aware motion tracking, showing four long-term motion examples in different scenes (a, b, c, and d), including daily indoor and outdoor interactions such as walking, sitting, lying, stair climbing, and touching. Our motion tracking framework not only accurately tracks the reference motion but also ensures physical realism, resolving subtle issues, such as interpenetration and floating artifacts, present in the reference data (see zoomed-in views on the right)*
 
-![[assets/figures/papers/paper_list_l2637_https_arxiv_org_abs_2602_23205/figures/013_Figure_7.jpg]]
-*Figure 7: A real-world humanoid robot imitating human motions depicted in videos*
-
 ![[assets/figures/papers/paper_list_l2637_https_arxiv_org_abs_2602_23205/figures/002_Table_1.jpg]]
 *Table 1: Comparison of 4D Human & Scene datasets based on different features*
-
-
 
 ## 定位与知识库关联
 
@@ -354,8 +322,6 @@ EmbodMocap的方法论创新可归结为四个因果环节，每个环节对应�
 ### 知识库定位
 
 EmbodMocap在4D人体-场景重建领域填补了**低成本野外采集**与**度量级精度**之间的空白。与现有数据集（Table 1）相比，其独特优势在于：(1) 仅需消费级设备，(2) 支持任意野外场景，(3) 提供统一世界坐标系下的人体运动与场景几何。这一能力使其成为连接**单目重建模型训练**与**具身智能下游任务**（物理仿真、人形机器人控制）的关键数据基础设施。
-
-
 
 ## 原文 PDF
 

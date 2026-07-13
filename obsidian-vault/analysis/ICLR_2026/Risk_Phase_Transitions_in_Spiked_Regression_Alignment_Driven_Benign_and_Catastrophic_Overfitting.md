@@ -46,13 +46,9 @@ claims:
 
 本文系统分析了尖峰协方差线性回归中最小范数插值解的泛化误差，揭示了尖峰强度、目标-尖峰对齐、模型误设定和协变量偏移对泛化误差的联合影响。核心贡献在于：在比例极限 d/n → c 和后续 c → ∞ 的框架下，完整刻画了良性、温和与灾难性过拟合的相变图景。研究发现，目标-尖峰对齐并非总是有利，其利弊取决于尖峰强度是否超过关键阈值以及模型是否误设定。在良设定对齐问题中，增大尖峰强度会先引发灾难性过拟合，然后才进入良性过拟合。实验验证表明，这些理论预测的相变在非线性深度网络（3层ReLU网络）中仍然存在。
 
-
-
 现代机器学习中，过参数化模型（参数数量远多于样本数量）能够完美拟合训练数据，同时仍具有良好的泛化能力，这一现象被称为“良性过拟合”（benign overfitting）。然而，在某些条件下，过参数化模型也可能表现出“灾难性过拟合”（catastrophic overfitting），即泛化误差趋于无穷大。现有理论（Hastie et al., 2022; Bartlett et al., 2020; Mallinar et al., 2022）主要关注各向同性协方差或固定尖峰强度下的回归问题，无法系统刻画尖峰强度、目标-尖峰对齐、模型误设定和协变量偏移对泛化误差的联合影响，尤其是在过参数化极端区域（c → ∞）中良性、温和与灾难性过拟合的完整相变图景。
 
 本文通过引入尖峰协方差数据模型和分离尖峰/体噪声依赖的目标生成模型，填补了这一理论空白。
-
-
 
 ## 核心方法与创新机理
 
@@ -64,8 +60,6 @@ claims:
 
 4. **非线性模型验证**：在3层ReLU网络和MNIST衍生数据上验证了理论预测的相变，表明结果具有更广泛的适用性。
 
-
-
 ![[assets/figures/papers/iclr26_0002_fFG4wZee3f_Risk_Phase_Transitions_in_Spiked_Regression_Alig/figures/003_Figure_1.jpg]]
 *Figure 1: (a) Operator norm scaling ( $\theta ^ { 2 }$ = c $\tau ^ { 2 }$ ) . Alignment initially improves generalization, but have catastrophic risk as c $\to \infty$ , . Anti-alignment yields tempered risk.
 
@@ -75,8 +69,6 @@ claims:
 - **估计器模块**：计算最小范数插值解 β_int = X^† y。
 - **风险分解模块**：将泛化误差分解为偏置、方差、数据噪声和目标对齐四项。
 - **渐近分析模块**：在比例极限 d/n → c 下计算各项的期望和方差，然后取 c → ∞ 得到过拟合分类。
-
-
 
 ### 5.1 数据模型
 
@@ -131,8 +123,6 @@ $$\mathcal{R}_{c>1} = \alpha^2 \tau^2 \left(1-\frac{1}{c}\right) \left( \|\beta_
 | 误设定、无协变量偏移 | 算子范数 | ω_c(1) ≤ γ ≤ o_c(c²), β_* ∦ u | 灾难性 |
 | 误设定、无协变量偏移 | Frobenius 范数 | 1/c < α_Z/α_A < 2 - 1/c | 对齐有利 |
 
-
-
 ## 实验与关键发现
 
 ### 6.1 合成数据实验
@@ -172,8 +162,6 @@ $$\mathcal{R}_{c>1} = \alpha^2 \tau^2 \left(1-\frac{1}{c}\right) \left( \|\beta_
 - **岭正则化**（Figure 6）：即使使用岭正则化，灾难性过拟合仍然存在。
 - **协变量偏移**（Section 3.3）：在误设定、有协变量偏移、Frobenius 范数标度下，若 α_Z ≠ α̃_Z，则对所有 c≠1 有 R_c = ∞。若训练误设定但测试良设定且 α_Z = α̃_Z = α̃_A，则可实现良性过拟合。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0002_fFG4wZee3f_Risk_Phase_Transitions_in_Spiked_Regression_Alig/figures/001_Table_1.jpg]]
 *Table 1: Asymptotic Generalization Regimes. This table summarizes conditions for when overfitting is benign, tempered, or catastrophic in the limit where d / n c and subsequently c $\to \infty$ The behavior depends on the spike scaling relative to the bulk, target alignment ( $\beta$ ; ∗ relative to spike direction u), and target specifications $\alpha _ { A } , \alpha _ { Z }$ (train) and $\tilde { \alpha } _ { A } , \tilde { \alpha } _ { Z } \mathrm { ( t e s t ) }$ . Here, $\theta ^ { 2 }$ quantifies the scaled spike strength and $\bar { \tau ^ { 2 } }$ the scaled bulk variance; the two primary scaling regimes are operator norm based ( $\theta ^ { 2 } = \gamma \tau ^ { 2 }$ ) and Frobenius norm based...
 
@@ -182,8 +170,6 @@ $$\mathcal{R}_{c>1} = \alpha^2 \tau^2 \left(1-\frac{1}{c}\right) \left( \|\beta_
 
 ![[assets/figures/papers/iclr26_0002_fFG4wZee3f_Risk_Phase_Transitions_in_Spiked_Regression_Alig/figures/017_Table_3.jpg]]
 *Table 3: Glossary of recurrent parameters and symbols. All Θ(1) constants are independent of n , d .*
-
-
 
 ## 定位与知识库关联
 
@@ -202,8 +188,6 @@ $$\mathcal{R}_{c>1} = \alpha^2 \tau^2 \left(1-\frac{1}{c}\right) \left( \|\beta_
 - 如何将分析扩展到多尖峰或一般低秩协方差结构？
 - 岭正则化或其他正则化方法如何改变相边界？
 - 在非线性模型（如深度网络）中，理论预测的相变是否严格成立，还是仅作为近似？
-
-
 
 ## 原文 PDF
 

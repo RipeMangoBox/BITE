@@ -59,8 +59,6 @@ PolarMOT 在方法谱系中定位为**纯几何驱动的图神经网络跟踪器
 
 需要指出的是，该方法**仅使用几何线索**，未融合图像外观信息，在严重遮挡或密集人群等几何模糊场景下可能存在固有局限；在线模式因只能访问过去信息，性能相比离线模式下降约 3.87 AMOTA。这些限制为后续融合外观特征或引入域自适应技术留下了明确的改进空间。
 
-
-
 3D多目标跟踪（3D MOT）是自动驾驶感知栈中的核心任务，其目标是在连续帧间为所有目标维护一致的身份标识。与2D MOT不同，3D MOT直接操作于三维空间中的包围盒（bounding box），这些包围盒通常由激光雷达（LiDAR）点云检测器输出。一个高性能的3D MOT系统需要同时解决目标关联的准确性和跨场景的鲁棒性，而这两者恰恰构成了当前方法的核心瓶颈。
 
 ### 现有方法的缺口
@@ -80,8 +78,6 @@ PolarMOT 在方法谱系中定位为**纯几何驱动的图神经网络跟踪器
 这一追问指向一个被长期低估的假设：几何线索本身——只要以恰当的方式编码——可能足以支撑高性能且强泛化的跟踪。问题的关键不在于几何信息是否充足，而在于**如何表示**这些几何关系。传统的全局笛卡尔坐标差将几何关系与绝对坐标系绑定，破坏了相对运动的本质不变性。本文提出，若能将成对几何关系转化为一种对全局变换不敏感的局部表示，并在此表示中嵌入非完整运动先验（non-holonomic motion prior），几何线索的潜力将得到极大释放。
 
 具体而言，本文的核心洞察是：**采用以观测目标为中心的局部极坐标系（localized polar coordinates）编码成对几何关系，可以使表示天然具备全局旋转平移不变性，同时通过极角分量隐式编码航向变化，为图神经网络提供结构化的运动先验。** 在此基础上，将场景建模为稀疏多路复用图（sparse multiplex graph），通过消息传递网络融合时序和空间上下文，即可构建一个纯粹基于几何的、具有强泛化能力的3D MOT框架——PolarMOT。
-
-
 
 ## 核心方法与创新机理
 
@@ -140,8 +136,6 @@ $$h_i^{(l)} = \mathrm{MLP}_{\mathrm{node}} \big( \big[ \max_{t_j < t_i} m_{(i,j)
 | 节点特征 | 外观嵌入或显式编码 | 仅从边特征隐式学习 | 强制几何纯粹性 |
 | 运动先验 | 无显式编码 | 极坐标 $\varphi$ 编码航向角变化 | 非完整运动先验 |
 
-
-
 PolarMOT将多目标跟踪形式化为一个基于稀疏多路复用图的消息传递问题。其整体pipeline由四个核心模块串联构成，输入为序列化的3D检测框，输出为跨帧关联的完整轨迹。
 
 **输入与图构建。** 给定一帧或多帧的3D检测集合 $\mathcal{O} = \{ o_i \}_{i=1}^n$，每个检测 $o_i$ 包含3D包围盒的位置、尺寸、航向角以及时间戳。PolarMOT将每个检测实例化为图中的一个节点，并根据两类关系建立边：**时序边**（inter-frame edges）连接不同帧的检测，构成跨帧关联的候选假设；**空间边**（intra-frame edges）连接同一帧内的检测，编码帧内物体间的空间交互。为保证图的稀疏性，时序边在建立时受类别最大速度约束——若两检测间的物理距离超过该类别物体的最大速度可达范围，则认为它们不可能属于同一目标，不建立边（Sec. 4.2, Figure 3a）。
@@ -157,8 +151,6 @@ $$h_{(i,j)}^{(l)} = \mathrm{MLP}_{\mathrm{edge}}\left(\left[ h_i^{(l-1)}, h_{(i,
 **在线图演化。** 在线模式下，每帧新检测到来时，PolarMOT采用**剪枝+跳跃连接**（prune + skip）策略维持图的稀疏性：新节点仅与过去 $k$ 帧内的活跃节点建立时序边，同时保留活跃节点与更早帧的跳跃连接，从而在保持计算效率的同时赋予每个新节点全局时间感受野（Sec. 4.4, Figure 3c）。
 
 整个pipeline仅依赖3D包围盒的几何信息，不引入任何图像外观特征，从根本上规避了外观模型对特定环境的过拟合风险。
-
-
 
 PolarMOT 将多目标跟踪建模为图上的边分类问题。其核心由四个模块构成：稀疏多路复用图构建、局部极坐标边特征初始化、消息传递网络、以及边分类与后处理。在线模式下，还包括一个持续演化的图构建策略。
 
@@ -215,8 +207,6 @@ $$h_i^{(l)} = \mathrm{MLP}_{\mathrm{node}} \big( \big[ \max_{t_j < t_i} m_{(i,j)
 
 在在线模式下，PolarMOT 采用**剪枝+跳跃连接（prune + skip）**策略维持稀疏图（图 3c）：新帧到来时，仅保留活跃轨迹节点，并通过跳跃边连接非连续帧的节点，从而在保持图稀疏的同时赋予每个新节点全局时间感受野。消融实验（Table 6）表明，该策略优于密集连接（+5.88 AMOTA）和仅保留连续边（+1.24 AMOTA）的方案。
 
-
-
 ## 实验与关键发现
 
 PolarMOT的实验设计围绕一个核心问题展开：**仅凭3D包围盒之间的几何关系，能否实现高性能且强泛化的多目标跟踪？** 为此，作者在nuScenes数据集上进行了全面的基准测试、消融实验和跨域泛化评估，所有实验均使用**CenterPoint**（Yin et al., CVPR 2021）提供的统一检测结果，确保跟踪器本身的性能不受检测器差异影响。
@@ -249,9 +239,6 @@ PolarMOT的实验设计围绕一个核心问题展开：**仅凭3D包围盒之�
 
 为验证纯几何方法的泛化优势，作者进行了跨城市迁移实验（Table 7）。在Boston训练→Singapore评估的设置下，PolarMOT达到**63.12 AMOTA**，远超CenterPoint的**59.71**，提升**+3.41 AMOTA**。这一结果直接证明了：外观模型容易过拟合到训练环境的外观特征分布，而几何关系具有更强的环境不变性，使PolarMOT在域迁移场景下展现出显著优势。反向迁移（Singapore→Boston）同样观察到一致趋势。
 
-![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2208_01957/figures/010_Table_7.jpg]]
-*Table 7: CenterPoint (CP) [62] and our method when trained on training data from one city, and evaluated on the validation data from another*
-
 进一步的跨数据集泛化实验中（Table 8, Table 9），仅用nuScenes训练的PolarMOT直接应用于KITTI数据集，在3D MOT和2D MOT任务上均取得有竞争力的结果，无需任何微调，进一步验证了几何表示的通用性。
 
 ![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2208_01957/figures/011_Table_8.jpg]]
@@ -266,9 +253,6 @@ PolarMOT的实验设计围绕一个核心问题展开：**仅凭3D包围盒之�
 
 1. **严重遮挡场景下的脆弱性**：由于完全未使用外观特征，当两个同类目标在空间上高度接近且运动模式相似时（如行人交错穿行），纯几何线索可能不足以区分它们的身份。Figure 1的定性对比显示，PolarMOT在处理高遮挡场景时优于CenterPoint，但仍存在改进空间。
 
-![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2208_01957/figures/003_Figure.jpg]]
-*Figure: (a) Full (sparse) graph. (b) Relational features. (c) Online construction*
-
 2. **在线-离线性能差距**：在线模式因无法访问未来信息，AMOTA比离线模式低约3.87，这一差距在需要即时决策的自动驾驶场景中具有实际影响。
 
 3. **对检测质量的依赖**：方法性能依赖于3D检测的精度，尽管通过训练时的噪声丢弃数据增强提升了鲁棒性，但在检测质量显著下降时关联性能仍会受到影响。
@@ -277,27 +261,11 @@ PolarMOT的实验设计围绕一个核心问题展开：**仅凭3D包围盒之�
 
 基于上述实验分析，几个值得进一步探索的方向包括：如何有效地将外观特征与几何特征融合以提升拥挤场景下的判别力；能否通过自监督或域自适应技术缩小在线-离线性能差距；局部极坐标编码能否推广到其他涉及位姿估计和时序建模的任务中。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2208_01957/figures/006_Table_3.jpg]]
 *Table 3: Ablation on parametrization of geometric relations among objects on nuScenes validation set. Trained on the official mini training set*
 
-![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2208_01957/figures/007_Table_4.jpg]]
-*Table 4: Ablation for intra-frame edges on the nuScenes validation set*
-
-![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2208_01957/figures/008_Table_5.jpg]]
-*Table 5: Sparse graph construction: the impact of reducing/increasing the maximal velocity threshold on online tracking (nuScenes validation set)*
-
-![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2208_01957/figures/009_Table_6.jpg]]
-*Table 6: Online graph construction analysis (nuScenes validation set)*
-
 ![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2208_01957/figures/013_Table_10.jpg]]
 *Table 10: Neural network architecture of PolarMOT . Each cell describes the output dimensionality of each layer in the fully-connected MLPs of our model*
-
-![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2208_01957/figures/014_Table_11.jpg]]
-*Table 11: Ablation on parametrization of geometric relations among objects on the nuScenes validation set. Trained on the full training set*
-
-
 
 ## 定位与知识库关联
 
@@ -342,8 +310,6 @@ PolarMOT 的核心知识贡献在于证明：**仅凭3D包围盒间的几何关�
 3. **表示方法的可迁移性**：局部极坐标编码是否可推广至其他涉及相对位姿估计和时序建模的任务，如轨迹预测、行为识别或多智能体协同感知？
 
 4. **长序列在线图演化**：剪枝+跳跃策略在极长序列下的图规模增长和计算效率尚需进一步验证，是否存在更优的图维护策略以平衡感受野与计算开销？
-
-
 
 ## 原文 PDF
 

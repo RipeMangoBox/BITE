@@ -68,8 +68,6 @@ CellAgent 采用 Planner-Executor-Evaluator 三层多智能体架构，并辅以
 
 在与人类专家的对比中，CellAgent 将分析任务完成时间从 13 分钟缩短至 8 分钟，且质量评分高出 0.25。消融实验进一步表明，记忆优化机制对任务成功率的提升具有跨模型鲁棒性，而自反思优化机制能有效筛选最优候选算法，例如在轨迹推断任务中自动选择 Slingshot 并获得最高评分。
 
-
-
 ### 单细胞数据分析的自动化困境
 
 单细胞RNA测序（scRNA-seq）和空间转录组学技术为解析细胞异质性、发育轨迹和组织微环境提供了前所未有的分辨率。然而，将这些原始数据转化为生物学发现的过程，构成了一个持久而深刻的瓶颈：**分析流程要求同时具备深厚的计算编程能力和生物学领域知识**。研究人员不仅需要理解数据的内在结构，还必须手动编写代码、选择工具、调优超参数，并在多个异构工具之间进行繁琐的集成。这种高技术与高时间门槛的双重约束，使得大量生物学研究者被排斥在高效的数据探索之外，严重阻碍了发现的迭代速度。
@@ -90,8 +88,6 @@ CellAgent 采用 Planner-Executor-Evaluator 三层多智能体架构，并辅以
 
 简言之，CellAgent旨在实现从**自然语言指令到高质量、可复现分析工作流的端到端自动化**，使单细胞数据分析从“手动编程密集型”转变为“自然语言驱动型”，从而将研究者从繁琐的技术细节中解放出来，聚焦于生物学假设的生成与验证。
 
-
-
 ## 核心方法与创新机理
 
 CellAgent 的核心创新在于将 LLM 驱动的多智能体协作架构与自动化的自反思优化机制深度耦合，从而将单细胞数据分析从“手动编程+人工评估”的范式彻底转变为“自然语言驱动+自动化闭环优化”的范式。这一转变通过四个关键维度的创新实现。
@@ -111,8 +107,6 @@ CellAgent 的核心创新在于将 LLM 驱动的多智能体协作架构与自�
 ### 4. 上下文记忆的系统化设计：从无记忆到双层记忆架构
 
 传统单次分析缺乏系统性的记忆机制。CellAgent 设计了**全局记忆**与**局部记忆**的双层架构（Section 3.3）：全局记忆仅存储每个子步骤的最终代码，为后续子任务提供上下文连续性；局部记忆作为短期工作区，捕获当前子步骤的完整执行跟踪（包括错误代码和错误信息），支撑 Executor 的**错误自修正**能力。这种记忆隔离设计既保证了跨子任务的信息传递，又避免了冗余或错误信息对后续决策的干扰，是框架高执行成功率的关键支撑。
-
-
 
 ![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_BsA2GNkJhz/figures/001_Figure_1.jpg]]
 *Figure 1: Schematic of the CellAgent Framework. Users interact with CellAgent via natural language to obtain high-quality, automated analysis results tailored to their specific needs. Then the framework operates hierarchically, with a high-level Planner that performs fine-grained task decomposition based on input data characteristics and user queries. In the lower-level execution phase, subtasks are completed sequentially. An Executor selects optimal tools from the sc-Omni toolkit to generate and execute code. An Evaluator then rigorously assesses the outcomes, proposing refinements if needed. This self-reflective optimization loop iterates to enhance precision, and the final results from all subtask...*
@@ -138,8 +132,6 @@ CellAgent 是一个基于 LLM 的分层多智能体框架，其核心设计目�
 ### 架构示意
 
 框架整体架构如 **Figure 1** 所示，展示了从用户自然语言交互、Planner 任务分解、Executor 工具选择与代码生成、Evaluator 质量评估到最终结果合成的完整层次化工作流。sc-Omni 工具包（**Table 2**）集成了覆盖预处理、基础分析和高级分析三个层次的 18 项分析任务，为 Executor 提供了丰富的工具选择空间。框架支持的八大核心分析任务详见 **Table 3**，涵盖批次校正、细胞类型注释、轨迹推断、空间域识别、空间插补等单细胞与空间转录组学分析的关键需求。
-
-
 
 ### 架构总览
 
@@ -212,8 +204,6 @@ $$\mathrm{Overall} = \sqrt[4]{\mathrm{cor_{dist}} \times \mathrm{edgeflip} \time
 
 $$\mathrm{AS} = \frac{1}{4} (\mathrm{RANK_{PCC}} + \mathrm{RANK_{SSIM}} + \mathrm{RANK_{RMSE}} + \mathrm{RANK_{JS}})$$
 
-
-
 ## 实验与关键发现
 
 ### 主要结果
@@ -262,27 +252,6 @@ CellAgent 在覆盖单细胞 RNA 测序（scRNA-seq）与空间转录组学（ST
 **Figure 3** 和 **Figure 4** 从可视化层面佐证了定量结果。在人类 PBMC 数据集的细胞类型注释中（**Figure 3a**），CellAgent 预测的细胞类型在 UMAP 嵌入上与原始研究的注释高度一致，表明自动化流程能够准确复现专家级别的注释模式。在 Aging HSC 数据集的轨迹推断中（**Figure 3b**），CellAgent 重建的细胞分组和伪时间轨迹成功捕获了从 LT-HSC 经 ST-HSC 到 MPP 的造血分化连续谱。在空间转录组学方面，**Figure 4a** 显示 CellAgent 在 DLPFC 切片 151673 上识别的空间域与金标准的层状结构高度吻合；**Figure 4c** 中，插补后识别的前十个空间可变基因按 Moran's I 空间自相关分数排序，表明插补结果有效恢复了基因表达的空间结构信息。
 
 **Figure 5d** 的用户评估进一步表明，在 20 名参与者对 CellAgent、GPT-4 和在线网络服务器的辅助效果评价中，CellAgent 获得了最高的可用性评分，验证了自然语言交互界面在降低单细胞分析技术门槛方面的实际效用。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_BsA2GNkJhz/figures/013_Table_2.jpg]]
-
-![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_BsA2GNkJhz/figures/046_Table_2.jpg]]
-*Table 2: The overview of the sc-Omni toolkit. Each task is categorized into preliminary, essential, or advanced analysis, with representative tools or algorithms*
-
-![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_BsA2GNkJhz/figures/047_Table_3.jpg]]
-*Table 3: Overview of the eight major tasks in scRNA-seq and spatial transcriptomics analyses. These tasks include batch correction, preprocessing and clustering, cell type annotation, trajectory inference, spatial neighborhood analysis, spatially variable gene identification, spatial transcriptomics imputation, and spatial domain identification. The table also outlines the primary objectives of each task*
-
-![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_BsA2GNkJhz/figures/048_Table_4.jpg]]
-*Table 4: Overview of batch correction datasets. The table summarizes the key characteristics of the five datasets used for batch correction evaluation, including the number of cells and batches, as well as the tested features such as tissue types, experimental protocols, and laboratory sources*
-
-![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_BsA2GNkJhz/figures/049_Table_5.jpg]]
-*Table 5: Overview of cell type annotation datasets. The table summarizes the key characteristics of the datasets used for cell type annotation evaluation, including the number of cells, the number of genes, and the number of cell types in each dataset*
-
-![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_BsA2GNkJhz/figures/050_Table_6.jpg]]
-*Table 6: Overview of trajectory inference datasets. The table summarizes the key characteristics of the datasets used for trajectory inference evaluation, including the number of cells, gene count, and the trajectory type (e.g., linear, bifurcation, cycle, or multifurcation) for each dataset*
-
-
 
 ## 定位与知识库关联
 
@@ -346,8 +315,6 @@ CellAgent 的设计目标之一是降低单细胞分析的技术门槛。与人�
 - **跨模态泛化能力**：当前框架专注于转录组学数据，其在蛋白质组学、表观基因组学等其他单细胞模态上的适用性尚待验证。
 - **评估指标的完备性**：自反思优化依赖于 Evaluator 使用的自动化指标，这些指标是否在所有生物学场景下都能准确反映分析质量，仍需生物学家的经验性验证。
 - **计算成本与可及性**：多次迭代的 LLM 调用和多候选代码执行带来的计算开销，是否会在大规模数据集上成为实际应用的瓶颈，论文未提供详细分析。
-
-
 
 ## 原文 PDF
 

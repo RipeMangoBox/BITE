@@ -75,8 +75,6 @@ GenReward 在奖励建模领域占据了一个独特位置。与基于视觉-语
 
 消融实验确认了两个奖励通道的必要性：移除视频级奖励或帧级FB奖励均导致性能显著下降。值得注意的是，即使生成的视频存在幻觉（如物体瞬移），GenReward 仍能提供有效的奖励引导，体现出一定的鲁棒性。
 
-
-
 ### 问题背景：强化学习的奖励设计瓶颈
 
 强化学习（RL）在机器人操作、运动控制等复杂连续控制任务中展现出巨大潜力，但其成功高度依赖于精心设计的奖励函数。在真实世界的机器人任务中，手工设计奖励函数面临两个核心挑战：
@@ -117,8 +115,6 @@ GenReward 在奖励建模领域占据了一个独特位置。与基于视觉-语
 
 这种设计使得GenReward具备三个关键特性：**基于生成模型**（无需专家演示）、**动作感知**（利用前向-后向表示建模状态-动作到目标的到达关系）、**分层奖励**（视频级粗粒度引导 + 帧级细粒度引导），从而在复杂操作任务中显著超越现有奖励模型。
 
-
-
 ## 核心方法与创新机理
 
 GenReward的核心创新在于将**预训练视频扩散模型（VDM）的世界知识**转化为强化学习的内在奖励信号，从而**完全替代手工奖励工程**。与现有奖励模型相比，GenReward在两个关键维度上实现了根本性变革：
@@ -147,8 +143,6 @@ GenReward的最终奖励为$`r^{\mathrm{gen}} = \alpha \cdot r^{\mathrm{video}} 
 
 综上，GenReward通过“生成式目标视频驱动 + 动作感知帧级到达概率”的双层奖励架构，实现了从“手工设计”到“生成式引导”的范式转变，在Meta-World和DCS等多个基准上显著超越现有方法。
 
-
-
 GenReward 的核心思路是利用预训练视频扩散模型的世界知识来驱动强化学习智能体的行为学习，从而绕过手工设计奖励函数的瓶颈。整个框架由三个层级递进的模块构成，形成从粗粒度视频模仿到细粒度目标达成的奖励信号链。
 
 **Pipeline 总览。** 如 Figure 2 所示，GenReward 的训练流程（Algorithm 1）包含五个关键阶段：视频扩散模型微调、视频级奖励计算、CLIP 关键帧选择、前向-后向表示学习、以及奖励组合与策略训练。在在线交互过程中，系统以固定间隔触发奖励计算：首先利用微调后的视频扩散模型根据任务描述生成目标视频，然后通过 3D Causal VAE 编码器分别提取目标视频和智能体历史观测的潜在表示，计算余弦相似度作为视频级奖励；同时，CLIP 从生成视频中选取与任务描述最相关的关键帧作为帧级目标，前向-后向网络估计从当前状态-动作对到达该目标状态的概率，产生帧级奖励。最终奖励为三者的加权和：
@@ -161,18 +155,11 @@ $$r^{\mathrm{gen}} = \alpha \cdot r^{\mathrm{video}} + \beta \cdot r^{\mathrm{FB
 
 **关键设计选择。** 视频扩散模型选用 CogVideoX 作为基座，在操作视频数据集上微调以支持目标条件生成。潜在编码器采用 3D Causal VAE，能够捕捉时序动态信息。CLIP 帧选择器使用 OpenCLIP，确保选出的关键帧与任务语义高度相关。前向-后向网络通过最小化 Bellman 残差损失训练，其低秩近似特性使得在任意策略下估计长期到达概率成为可能。这些设计选择的消融验证见后续实验分析章节。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2681_https_arxiv_org_abs_2512_00961/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of our proposed framework. The key idea is to leverage generated goal-conditioned videos for world knowledge transfer, enabling the downstream agent to improve performance on unseen tasks*
 
 ![[assets/figures/papers/paper_list_l2681_https_arxiv_org_abs_2512_00961/figures/003_Figure_2.jpg]]
 *Figure 2: Pipeline of GenReward, which computes goal-driven rewards for behavior learning of the agent using generative prior. During online interaction with the environment, at regular intervals, we employ the correlation between the latent representations of the agent’s observations and the generated goal videos as video-level rewards. Meanwhile, we learn a forward-backward model to measure the probability of reaching the goal state that is selected using CLIP from a given state–action pair, providing frame-level reward for finegrained goal-achievement*
-
-![[assets/figures/papers/paper_list_l2681_https_arxiv_org_abs_2512_00961/figures/004_Figure_4.jpg]]
-*Figure 4: Illustration of experimental setups in our experiments with generated videos and image observations from environments*
-
-
 
 GenReward 的奖励生成管线由五个核心模块串联构成，从生成式先验提取到策略训练形成闭环。
 
@@ -222,21 +209,11 @@ $$\mathbf{r}^{\mathrm{FB}}(s,a,I^*) = \mathbf{F}(s,a,\psi(I^*))^\top \mathbf{B}(
 
 该模块的关键因果机制在于：前向-后向表示将动作信息显式纳入奖励计算，使智能体能够进行目标驱动的动作选择——选择使 $F(s,a,z)$ 与 $B(s_{\mathrm{goal}})$ 内积最大的动作（Figure 3）。消融实验证实，从 FB 奖励中移除动作信息会导致 DCS Walker Walk 上性能从 $782\pm110$ 骤降至 $435\pm249$（Table D），验证了动作感知设计的必要性。
 
-![[assets/figures/papers/paper_list_l2681_https_arxiv_org_abs_2512_00961/figures/005_Figure_3.jpg]]
-*Figure 3: Goal-driven action selection. Learned representation space enables goal-directed control by selecting the action whose forward representation of the current state–action pair most closely aligns with the backward representation of goal state*
-
 **奖励组合与策略训练（Reward Combination）**：最终奖励为三个分量的加权和：
 
 $$r^{\mathrm{gen}} = \alpha \cdot r^{\mathrm{video}} + \beta \cdot r^{\mathrm{FB}} + r^{\mathrm{env}} \tag{10}$$
 
 其中 $r^{\mathrm{env}}$ 为环境原生奖励，$\alpha$ 和 $\beta$ 为权重系数。该组合作为总奖励信号输入 DreamerV3 进行策略训练。敏感性分析（Figure 8 Middle/Right）表明：$\alpha$ 过小无法有效模仿目标视频，过大则抑制探索；$\beta$ 过小未能充分利用世界知识，过大则导致探索困难。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2681_https_arxiv_org_abs_2512_00961/figures/008_Figure_7.jpg]]
-*Figure 7: Showcase of selecting the goal image from the video generated with the prompt pick up the blue fork using CLIP. The highlighted area represents the video frames that are more relevant to the task. The frame with the highest similarity reflects the frame-level goal*
-
-
 
 ## 实验与关键发现
 
@@ -253,9 +230,6 @@ GenReward 在 Meta-World 基准的三个复杂操作任务上均大幅超越环�
 *Table 1: Compared to other competitive reward models, the proposed reward framework is based on generative models, does not require expert demonstrations, and incorporates action information for fine-grained goal-achievement*
 
 定性分析进一步印证了定量结果。Figure 6 展示了 Bin Picking 任务上的策略行为对比：TADPoLe 甚至未能接触冰球（puck），Diffusion Reward 则将抓取的冰球移离目标位置，而 GenReward 使策略能够以更少步数完成抓取，并优于 Dense Reward 和 RoboCLIP。
-
-![[assets/figures/papers/paper_list_l2681_https_arxiv_org_abs_2512_00961/figures/006_Figure_6.jpg]]
-*Figure 6: Policy evaluation on the Meta-World Bin Picking task. TADPoLe fails to contact the puck, while Diffusion Reward moves the grasped puck away from the target position. In contrast, GenReward enables the policy to complete the grasp in fewer steps and outperforms both Dense Reward and RoboCLIP*
 
 ### 跨基准泛化：从操作到运动控制
 
@@ -284,9 +258,6 @@ Table C（Supplementary Material）分析了关键帧选择策略和视觉编码
 
 Figure 9 展示了使用不同域生成视频对 GenReward 性能的影响。实验通过替换微调视频扩散模型所用的操作视频数据集来改变生成视频的域分布。结果表明，生成视频与任务域的相关性越强，奖励信号的质量越高，策略性能越好。这提示在实际部署中需谨慎选择微调数据集。
 
-![[assets/figures/papers/paper_list_l2681_https_arxiv_org_abs_2512_00961/figures/010_Figure_9.jpg]]
-*Figure 9: Performance of GenReward on Meta-World Pick Place with different generated videos*
-
 ### 幻觉视频的鲁棒性
 
 Table B（Supplementary Material）报告了 GenReward 在含有幻觉的生成视频下的性能。幻觉表现为生成视频中物体的瞬移或不一致运动。实验表明，即使使用含有幻觉的视频，GenReward 的奖励机制仍能提升策略性能，这得益于视频级奖励在潜在空间中捕捉的是整体行为模式而非精确的逐帧对应关系。然而，幻觉的系统性影响尚未被完全解决，这构成了当前方法的一个重要局限性。
@@ -295,15 +266,8 @@ Table B（Supplementary Material）报告了 GenReward 在含有幻觉的生成�
 
 Table E（Supplementary Material）对比了各方法在 Meta-World Pick Place 任务上的训练时间。GenReward 的额外计算开销主要来自视频扩散模型的微调（约 7 天 / 16 块 A100 GPU）和前向-后向网络的学习。一旦微调完成，在线交互阶段的奖励计算开销相对可控。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2681_https_arxiv_org_abs_2512_00961/figures/015_Table.jpg]]
 *Table: A. Performance comparison across various environments*
-
-![[assets/figures/papers/paper_list_l2681_https_arxiv_org_abs_2512_00961/figures/014_Table.jpg]]
-*Table: D. Performance of GenReward variants on DCS Walker Walk*
-
-
 
 ## 定位与知识库关联
 
@@ -336,8 +300,6 @@ GenReward 处于“生成模型驱动的强化学习奖励设计”这一交叉�
 **前向-后向表示的扩展性。** FB 表示当前建模的是从 $(s,a)$ 到单个目标帧的到达概率。能否扩展到多步目标状态序列——即学习到达一系列子目标的概率——是一个值得探索的方向。这将使 GenReward 能够处理需要多步规划的长程任务。
 
 **Sim-to-Real 的域差距。** 所有实验均在模拟器中进行。生成视频与真实机器人观测之间的域差距如何处理，是该方法走向实际应用必须面对的问题。可能的思路包括：在真实机器人数据上微调视频扩散模型、使用域随机化生成视频、或在奖励计算中引入域自适应模块。
-
-
 
 ## 原文 PDF
 

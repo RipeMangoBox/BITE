@@ -52,8 +52,6 @@ claims:
 
 **局限性**：重叠区域检测依赖标注数据进行监督训练，难以直接应用于无标注的真实场景；在对称或重复几何结构场景中，聚类注意力可能提取歧义特征导致配准失败；重叠分数预测的距离阈值 $\eta$ 需要针对不同数据集手动调整。
 
-
-
 点云配准（point cloud registration）是计算机视觉与机器人领域的基础任务，其目标是估计一个刚体变换 $T \in SE(3)$，使源点云与目标点云在空间上对齐。该任务在三维重建、自动驾驶、机器人导航等应用中扮演着关键角色。然而，真实场景中获取的点云往往是部分重叠的（partial-to-partial），即两个点云仅共享一部分可见区域，这为精确配准带来了根本性挑战。
 
 现有方法大致可分为三类：基于对应关系的方法（如 **DCP**（Wang & Solomon, ICCV 2019）、**RPMNet**（Yew & Lee, CVPR 2020））、基于全局特征对齐的方法（如 **PointNetLK**（Aoki et al., CVPR 2019））以及基于概率模型的方法。其中，概率配准方法将点云建模为概率分布，通过最小化分布间的统计差异来求解变换，具有无需显式对应关系、对噪声鲁棒等优点。**DeepGMR**（Yuan et al., ECCV 2020）是这一方向的代表性工作，它利用神经网络提取特征并构建高斯混合模型（Gaussian Mixture Model, GMM），在完全重叠场景下取得了优异性能。
@@ -65,8 +63,6 @@ claims:
 此外，标准 Transformer 的自注意力机制复杂度为 $O(N^2)$，难以处理大规模点云。OGMM 采用**聚类注意力（clustered attention）**策略：先用 Wasserstein K-Means 将点云聚类为 $J$ 个簇（$J \ll N$），再在簇中心上计算注意力，将复杂度降至 $O(N \cdot J)$，在保持匹配精度的同时实现了约 8 倍的推理加速。
 
 综上，OGMM 的动机源于一个明确的因果链条：**非重叠区域的干扰是部分配准失败的根本原因 → 通过重叠检测将配准聚焦于重叠区域 → 用重叠分数引导 GMM 建模 → 实现鲁棒的部分到部分配准**。这一设计使得 OGMM 在 ModelNet40、7Scenes 和 ICL-NUIM 等多个基准上均取得了领先的配准精度。
-
-
 
 ## 核心方法与创新机理
 
@@ -110,8 +106,6 @@ $$f_{p_i}^{pos} = \varphi\left( \| \pmb{p_i} - \pmb{p_c} \|_2 \right) + \max_{x 
 
 > **注意**：由于论文解析限制，Table 1中所有对比方法的完整量化数值未能提取，上述OGMM自身数值来自已验证的消融实验（Table 4 Full model行），与其他方法的相对优势需结合原论文Table 1手动验证。
 
-
-
 OGMM将部分到部分的点云配准重新定义为**对齐两个高斯混合模型（GMM）**，并通过最小化二者之间的统计差异来恢复刚体变换 $T \in SE(3)$。整个框架由三个核心模块串联构成：**特征提取**、**重叠区域检测**和**重叠引导的GMM配准**，其信息流如Figure 1所示。
 
 ### 输入与输出
@@ -131,8 +125,6 @@ OGMM将部分到部分的点云配准重新定义为**对齐两个高斯混合�
 这是OGMM的核心创新所在。利用重叠分数 $o_p, o_q$ 和分类头输出的软分配概率，分别为源点云和目标点云构建 $L$ 个分量的高斯混合模型 $\mathbf{G}_{\mathcal{P}}(\mathbf{x})$ 和 $\mathbf{G}_{\mathcal{Q}}(\mathbf{x})$。关键在于，GMM的权重 $\pi_j$、均值 $\mu_j$ 和协方差 $\Sigma_j$ 均由重叠分数加权计算，使得非重叠区域的点对GMM参数的贡献被自动抑制，从而将部分到部分配准转化为**仅重叠区域的对齐问题**。
 
 随后，通过求解最优传输问题得到簇级别的匹配矩阵 $\Gamma$，再以 $\Gamma$ 为权重执行加权SVD，一步估计出刚体变换 $T$。整个pipeline端到端可微，三个模块协同工作：特征提取提供判别性表示，重叠检测提供软注意力掩膜，GMM配准则在统计差异最小化的框架下完成鲁棒对齐。
-
-
 
 OGMM 的完整流水线由三个核心模块串联构成：**特征提取**、**重叠区域检测**和**重叠引导的 GMM 配准**（Figure 1）。前两个模块负责为每个点生成刚性变换不变的特征以及逐点的重叠分数；第三个模块则在重叠分数的软引导下，将源点云与目标点云分别建模为高斯混合模型，并通过最小化两个 GMM 之间的统计差异恢复刚体变换 $T \in SE(3)$。
 
@@ -186,8 +178,6 @@ $$\min_{\Gamma} \sum_{i=1}^{L} \sum_{j=1}^{L} \Gamma_{ij} \| \nu_i^p - \nu_j^q \
 
 消融实验（Table 4）提供了该模块设计的有力证据：移除重叠分数预测（Without OSP）后，旋转误差 MAE(R) 从 0.5892 急剧上升至 6.7087，平移误差 MAE(t) 从 0.0079 升至 0.0729，验证了重叠分数在 GMM 建模中的决定性作用。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -240,24 +230,8 @@ Figure 3 展示了 OGMM 在 ModelNet40 上的成功与失败案例。失败主�
 
 此外，OGMM 需要标注的重叠区域进行监督训练，限制了其在无标注真实场景中的直接应用。重叠分数预测中的距离阈值 $\eta$（默认 0.1）可能需要针对不同数据集手动调整，增加了跨域迁移的工程成本。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2210_09836/figures/009_Table_5.jpg]]
 *Table 5: Loss function analysis on ModelNet40*
-
-![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2210_09836/figures/010_Table_9.jpg]]
-*Table 9: Registration results on ModelNet40*
-
-![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2210_09836/figures/012_Table_7.jpg]]
-*Table 7: The effects of the overlap ratio on ModelNet40*
-
-![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2210_09836/figures/013_Table_8.jpg]]
-*Table 8: The effects of the cluster numbers on ModelNet40 with 50% overlapping ratio and Gaussian noise*
-
-![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2210_09836/figures/002_Figure_2.jpg]]
-*Figure 2: Given (a) input partial point clouds, OGMM detects (b) the overlap regions that are then used for the estimation of (c) the transformation that aligns the two point clouds. The non-overlap regions in (b) are shown in grey. Our approach focuses on the geometric information in the overlap regions to perform the point cloud registration*
-
-
 
 ## 定位与知识库关联
 
@@ -294,8 +268,6 @@ OGMM在ModelNet40、7Scenes和ICL-NUIM数据集上展示了优异的配准精度
 4. **大规模户外点云的泛化**：该方法在室内场景和小规模物体上表现良好，但在户外大规模LiDAR点云（如自动驾驶场景）中的泛化能力尚未验证。户外场景的稀疏性、大尺度变化和动态物体可能对聚类注意力和GMM建模构成新的挑战。
 
 5. **与隐式神经表示的融合**：GMM本质上是对点云分布的一种显式参数化建模。能否将重叠引导的思想与隐式神经表示（如神经距离场）结合，在保持对部分重叠鲁棒性的同时，提升对复杂几何细节的建模能力？
-
-
 
 ## 原文 PDF
 

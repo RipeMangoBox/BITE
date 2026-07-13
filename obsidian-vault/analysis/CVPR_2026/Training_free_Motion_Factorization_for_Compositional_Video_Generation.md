@@ -74,8 +74,6 @@ MF-CVG 属于**训练自由的组合式视频生成方法**，区别于需要微
 
 当前方法假设视点固定，未考虑相机位姿变化，限制了全局视点改变的动态场景建模。此外，当小物体的边界框过小时，运动引导不足，生成质量下降。未来的方向包括结合相机位姿实现全局视点变化，以及提升小目标运动生成的鲁棒性。
 
-
-
 ### 问题背景：组合式视频生成中的运动多样性缺失
 
 组合式视频生成（Compositional Video Generation, CVG）旨在根据文本提示同时生成多个实例及其交互运动，是视频生成领域的前沿方向。现有CVG方法——如 **VideoTetris**、**LVD** 和 **R&P**——主要聚焦于**语义绑定**（semantic binding），即确保每个文本实体与正确的视觉实例对应，并通过边界框或区域引导实现空间布局控制。然而，这些方法普遍采用统一的扩散引导范式，**不区分不同实例的运动类别**，导致生成的实例运动模式趋于雷同。
@@ -97,8 +95,6 @@ MF-CVG 属于**训练自由的组合式视频生成方法**，区别于需要微
 针对上述瓶颈，本文提出核心洞察：**将复杂场景运动分解为三个基本类别——静止（motionlessness）、刚体运动（rigid motion）和非刚体运动（non-rigid motion）——并通过结构化推理消除语义歧义，再为每个类别设计专用的解耦引导分支**。
 
 这一思路的合理性在于：三类运动在物理约束上存在本质差异。静止实例需要最大化跨帧外观一致性；刚体实例需要保持几何形状不变，仅允许位置变化；非刚体实例则需要建模复杂的像素级形变。通过将运动因子分解，可以为每类运动施加恰当的约束，从而在无需额外训练的前提下，大幅提升组合式视频生成的质量与多样性。
-
-
 
 ## 核心方法与创新机理
 
@@ -141,8 +137,6 @@ $$\mathbf{A} = \mathrm{Softmax}\left( \frac{\mathbf{Q} \mathbf{K}^{\top} (1 + \b
 **创新点的协同效应**：三个 changed slots 形成因果链条——运动类别分解（slot 3）为运动图推理提供语义基础（slot 1），推理得到的时空布局为解耦引导提供空间约束（slot 2）。消融实验证实了这一协同关系：逐步引入RCG、GIG、SDG使所有指标持续提升，其中SDG单独贡献了27.81%的动态程度增益，而更强的LLM骨干（LLaMA-3.3-70B vs LLaMA-3.1-8B）将Subject Consistency从97.55%提升至98.40%，Dynamic Degree从75.34%提升至82.21%。
 
 **关键优势**：整个框架无需额外训练，仅通过推理阶段的运动规划与扩散引导即可显著提升组合式视频生成质量。在VideoCrafter-v2.0架构上，Subject Consistency从91.00%跃升至98.27%（对比R&P基线），Background Consistency从90.85%提升至97.73%，充分验证了运动因子分解范式的有效性。
-
-
 
 MF-CVG（Motion Factorization for Compositional Video Generation）采用**运动规划–运动生成**两阶段范式，将组合式视频生成中的复杂场景动态分解为三个基本运动类别（静止、刚体、非刚体），并通过解耦引导实现多样且一致的运动合成。
 
@@ -195,12 +189,8 @@ DMG 模块包含三个解耦的引导分支，分别对应三种运动类别：
 
 整个框架的核心设计原则是**运动类别先解耦、后组合**：SMR 模块在规划阶段为每个实例分配唯一的运动类别，消除语义歧义；DMG 模块在生成阶段针对不同类别施加差异化约束，确保各实例运动既独立又协调。该方法无需额外训练，可直接适配 3D U-Net 和 DiT 两类主流视频扩散架构。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l6_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Training_free_Mot/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of our motion factorization framework. First, for each instance belonging to a particular motion category, our framework infers its per-frame changes in shape and position from a structured motion graph (Sec. 3.2). Second, conditioned on the motion category, dedicated guidance branches synthesize per-instance motions, which are subsequently composed into a coherent scene (Sec. 3.3)*
-
-
 
 ### 3.1 整体框架：两阶段运动因子分解
 
@@ -280,15 +270,11 @@ $$\mathcal{G}_{\mathrm{nr}} = ( \mathcal{M}(v_n) \cdot \mathcal{M}(v_n)^{\top} )
 
 三个引导分支的**递进消融实验**（Table 3）验证了其因果贡献：逐步加入 RCG、GIG、SDG 使所有评估指标持续提升。其中 SDG 单独贡献了 **+27.81%** 的动态程度增益，证明非刚体引导是解决运动多样性瓶颈的关键组件。LLaMA-3.3-70B 相比 LLaMA-3.1-8B 将动态程度从 75.34% 提升至 82.21%（Table 2），表明更强的运动图推理能力直接转化为更准确的时空布局生成。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l6_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Training_free_Mot/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our Structured Motion Reasoning (SMR) module ( Sec. 3.2). (a) Given a user prompt, we organize it into a motion graph describing instances and their interactions. (b) For each instance, conditioned on its motion category, we infer a bounding box sequence from graph-derived motion cues. All bounding box sequences are then composed into a coherent spatial-temporal layout*
 
 ![[assets/figures/papers/paper_list_l6_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Training_free_Mot/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of Disentangled Motion Guidance (DMG) module ( Sec. 3.3). (a) For motionless instances, we enforce each frame interacts only with a designated anchor frame. (b) For rigidly moving instances, we restrict cross-frame interactions of a foreground within the shape aligned regions. (c) For instances undergoing non-rigid movements, we minimize pixel-wise discrepancies between perceptual deformations and box-induced deformations*
-
-
 
 ## 实验与关键发现
 
@@ -331,27 +317,14 @@ $$\mathcal{G}_{\mathrm{nr}} = ( \mathcal{M}(v_n) \cdot \mathcal{M}(v_n)^{\top} )
 
 **视点固定的假设**：当前方法假设相机视点固定，未考虑相机位姿变化。这限制了在需要全局视点变换的动态场景（如镜头平移、旋转）中的应用。如何处理相机运动与实例运动的解耦是未来的开放问题。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l6_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Training_free_Mot/figures/004_Table_1.jpg]]
 *Table 1: Performance comparison of cross-modal compositional video generation approaches on our CVGBench-m and CVGBench-p datasets. Best/2nd best scores are bolded/underlined. † indicates compositional generation models*
 
 ![[assets/figures/papers/paper_list_l6_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Training_free_Mot/figures/005_Figure.jpg]]
 *Figure: Baseline: VideoCrafter-v2.0 (3D Unet architecture) Baseline: CogVideoX-2B (DiT architecture)*
 
-![[assets/figures/papers/paper_list_l6_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Training_free_Mot/figures/007_Figure_5.jpg]]
-*Figure 5: Visual cases: generation of complex motion generation*
-
 ![[assets/figures/papers/paper_list_l6_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Training_free_Mot/figures/008_Table_2.jpg]]
 *Table 2: Ablation analysis of diverse backbones for motion reasoning. Best scores are bolded*
-
-![[assets/figures/papers/paper_list_l6_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Training_free_Mot/figures/009_Table_3.jpg]]
-*Table 3: Ablation analysis of diverse motion guidance components, including Reference Conditioned Guidance (RCG), Geometric Invariance Guidance (GIG), Spatial Deformation Guidance (SDG). Best scores are bolded*
-
-![[assets/figures/papers/paper_list_l6_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Training_free_Mot/figures/006_Figure_6.jpg]]
-*Figure 6: Failure case: Overly small bounding boxes are insufficient for guiding object (motionlessness) generation*
-
-
 
 ## 定位与知识库关联
 
@@ -382,8 +355,6 @@ MF-CVG 处于**训练自由（training-free）的组合式视频生成**这一�
 ### 4. 开放问题
 
 论文明确提出了两个开放方向：其一，**如何结合相机位姿实现全局视点变化**，以支持第一人称视角或镜头运动场景的组合式生成；其二，**如何处理小物体运动证据不足的问题**，可能需要引入多尺度引导机制或改进注意力图的分辨率。此外，从方法谱系的角度，将运动因子分解的思想从视频生成迁移至其他时序生成任务（如 4D 场景生成、世界模型）是一个自然的延伸方向，但论文未对此展开讨论。
-
-
 
 ## 原文 PDF
 

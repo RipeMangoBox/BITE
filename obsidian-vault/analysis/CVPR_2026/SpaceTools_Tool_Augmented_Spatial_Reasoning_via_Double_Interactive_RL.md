@@ -74,8 +74,6 @@ SpaceTools 提出 **DIRL（Double Interactive Reinforcement Learning，双重交
 
 SpaceTools 的 DIRL 范式在训练监督与工具交互性两个维度上区别于现有工作。传统工具增强方法（如 **LLaVA-NeXT-8B** Liu et al., 2024a、**RoboPoint-13B** Yuan et al., 2024）在训练时使用预计算工具输出或固定管线，模型不参与真实的工具调用-反馈循环；而 DIRL 在训练过程中引入交互式工具调用，使策略直接从工具输出中学习协调行为。在强化学习层面，DIRL 采用 GRPO 进行策略优化，结合 KL 正则化约束策略更新幅度，与标准 RLHF 管线形成互补而非替代关系。在基础设施层面，Toolshed 为多工具 RL 训练提供了工程基础，其设计借鉴了分布式推理服务的资源隔离思想，但针对视觉工具的密集 I/O 特征进行了专门优化。
 
-
-
 ### 空间推理：从视觉理解到物理交互的关键瓶颈
 
 空间推理——理解三维场景中物体的位置、深度、姿态与空间关系——是视觉语言模型（VLM）从感知走向真实世界交互的核心能力。无论是机器人抓取、场景导航，还是增强现实中的物体定位，都要求模型不仅能“看懂”图像，更能精确量化空间中的几何关系。然而，当前通用 VLM 在处理这类任务时面临根本性困难：它们缺乏对三维几何的显式建模能力，仅依赖从二维图像中隐式学习到的空间先验，导致在需要精确深度判断、姿态估计或空间关系推理时频繁出错。
@@ -109,8 +107,6 @@ Toolshed 平台的引入正是为了解决这一基础设施问题。它通过�
 ### 总结：从工具增强推理到工具增强训练
 
 SpaceTools 的核心动机可以概括为一次范式转变：**从“推理时工具增强”走向“训练时工具增强”**。现有工作大多关注如何在推理阶段给模型配备工具，但忽略了训练阶段的交互性对模型策略质量的根本影响。DIRL 通过两阶段课程设计（教学阶段 SFT → 探索阶段 IRL），在保持训练稳定性的同时，首次实现了在真实交互环境中对多工具协调策略的端到端优化。这一设计使得一个仅 3B 参数的小型 VLM（基于 Qwen2.5-VL-3B-Instruct）能够在多个空间推理基准上超越远大于其规模的前沿模型，并在真实机器人操控任务中展现出强大的泛化能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -189,8 +185,6 @@ SpaceTools 的核心洞察在于将多工具空间推理分解为两个可解耦
 
 三个 changed slots 形成闭环：**交互式工具调用**（Slot 1）提供真实反馈，**课程式初始化**（Slot 2）将搜索空间约束在可行域内，**分布式基础设施 + GRPO**（Slot 3）使大规模交互式训练在工程上可行。三者缺一不可——消融实验证实，移除任何一个组件都会导致性能显著退化。
 
-
-
 SpaceTools 提出了一种名为 **DIRL（Double Interactive Reinforcement Learning，双重交互强化学习）** 的训练范式，将空间推理建模为 VLM 策略与外部工具之间的序列决策问题。其核心设计围绕一个两阶段课程展开，并通过 **Toolshed** 分布式服务平台支撑训练与推理中的密集工具调用。
 
 ### 训练流程：教学-探索双阶段课程
@@ -242,13 +236,6 @@ Table 4 的训练配方消融揭示了 DIRL 各组件的因果贡献：
 - **省略第二阶段 IRL**（仅 SFT 或非交互式 RL）：Tool SFT 和 Tool NIRL 的平均准确率分别为 39.19 和 38.06，远低于完整 DIRL 的 52.48，证明交互式探索在全工具协调中不可替代。
 
 Table 13 进一步表明，直接在全任务、全工具上应用 IRL（Direct IRL All.）的平均准确率仅 19.79，验证了未经课程化训练的全量 IRL 确实因搜索空间过大而失败。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2724_https_arxiv_org_abs_2512_04069/figures/012_Figure_7.jpg]]
-*Figure 7: System prompt. Instructional prompt guiding the model’s reasoning, tool-call, and answer process*
-
-
 
 ### DIRL 双阶段训练范式
 
@@ -304,8 +291,6 @@ $$r = \begin{cases} 1, & \text{if FormatCorrect} \land \text{ToolCallMatch} \\ 0
 
 该奖励仅在工具调用格式和参数完全匹配真值时给予 1，否则为 0。实验表明 Tool NIRL 平均准确率仅 38.06，远低于完整 DIRL 的 52.48（Table 4），证明仅靠模仿工具调用模式而缺乏交互式探索无法获得有效的多工具协调能力。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与因果机制
@@ -332,12 +317,6 @@ Table 2 汇总了 SpaceTools 在多个空间推理基准上的性能。基于 Qw
 
 在真实机器人操控任务中（Table 3），SpaceTools 同样展现出显著优势：Pick & Place 成功率达 86%（Claude Sonnet 4.5 + Toolshed 为 79%），Relation Pick 成功率达 83%（Claude 仅为 50%），**相对提升达 +33 个百分点**。Table 7 的逐任务分解进一步证实了这一优势在不同子任务上的一致性。
 
-![[assets/figures/papers/paper_list_l2724_https_arxiv_org_abs_2512_04069/figures/007_Table_3.jpg]]
-*Table 3: Real-world robotic manipulation performance of SpaceTools and zero-shot VLM baselines equipped with Toolshed. Values are success rates (%) for Pick and Relation Pick tasks, partial success rates (%) for Pick & Place, and seconds for Time-to-First-Movement (TTFM)*
-
-![[assets/figures/papers/paper_list_l2724_https_arxiv_org_abs_2512_04069/figures/014_Table_7.jpg]]
-*Table 7: Per-task breakdown of the real-world manipulation results, comparing Ours (SpaceTools), Claude Sonnet 4.5 and GPT-5*
-
 ### 消融实验：训练配方的因果贡献
 
 Table 4 系统消融了 DIRL 训练配方的三个核心组件，揭示了清晰的因果链条：
@@ -360,9 +339,6 @@ Table 14 的奖励消融揭示了指向任务中奖励函数设计的关键性�
 
 Table 15 的数据组成消融表明，在训练集中加入二维框定位数据（grounding）能够改善非定位任务（如 compatibility）的表现——移除 grounding 后 RoboSpatial-Home 全面准确率从 69.10 降至 56.90。这揭示了一个重要规律：**数据类型多样性比纯粹扩大同质数据量更重要**。
 
-![[assets/figures/papers/paper_list_l2724_https_arxiv_org_abs_2512_04069/figures/024_Table_15.jpg]]
-*Table 15: Evaluation on RoboSpatial-Home using models trained with Tool IRL under different data compositions drawn from the four RoboSpatial data types. Config. refers to configuration data, Compat. to compatibility data, Ground. to grounding (2D bounding box) data, and Vacant to vacant-space localization data. Each entry in the middle columns indicates the number of samples included for that data category. Overall Acc. reports the final accuracy on RoboSpatial-Home*
-
 ### 失败模式与局限性
 
 Table 16 按主要错误来源对失败案例进行分类统计，揭示了一个结构性弱点：**抓取估计任务中绝大多数失败源于工具误差**（如目标检测错误、姿态估计不准确），而非规划或推理错误。Figure 12 展示了典型失败案例：(a) 错误的对象定位导致抓取目标错误，(b) 不准确的姿态估计导致抓取姿态不可执行。
@@ -378,18 +354,8 @@ Table 5 展示了 Toolshed 对前沿闭源模型的即时赋能效果：Claude�
 ![[assets/figures/papers/paper_list_l2724_https_arxiv_org_abs_2512_04069/figures/009_Table_5.jpg]]
 *Table 5: Comparison of proprietary models with and without the Toolshed enhancement across robotic spatial reasoning benchmarks. Values are normalized accuracy (%)*
 
-![[assets/figures/papers/paper_list_l2724_https_arxiv_org_abs_2512_04069/figures/015_Table_8.jpg]]
-*Table 8: Benefit of scaling tool instances with Toolshed under contention. We measure 8 simultaneous RoboRefer tool calls. Compared with a naive HTTP-based deployment using a single instance, Toolshed with 3 instances substantially reduces end-to-end latency*
-
 ![[assets/figures/papers/paper_list_l2724_https_arxiv_org_abs_2512_04069/figures/016_Table_9.jpg]]
 *Table 9: Pipeline execution latency for answering “Is bok choy or clock closer?” using 2× RoboRefer*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2724_https_arxiv_org_abs_2512_04069/figures/002_Table_1.jpg]]
-*Table 1: Comparison of related work for training supervision and tool-call interactivity during training. ‘-’ indicates that only a single tool is used*
-
-
 
 ## 定位与知识库关联
 
@@ -450,8 +416,6 @@ DIRL的训练依赖于高质量工具使用轨迹。当前SFT数据集仅包含8
 5. **Toolshed的实时优化**：如何优化Toolshed的调度、缓存和批处理策略，以在实时机器人循环中保证低延迟的工具调用？Table 8-10展示了Toolshed在并发负载下的性能优势，但面向毫秒级实时控制场景仍需进一步优化。
 
 6. **长时序多阶段任务的拓展**：如何将工具增强的空间推理拓展到复杂装配、多步骤人机交互等长时序任务？这需要模型具备更强的任务规划、状态追踪和错误恢复能力，超出了当前单轮/少轮交互的范畴。
-
-
 
 ## 原文 PDF
 

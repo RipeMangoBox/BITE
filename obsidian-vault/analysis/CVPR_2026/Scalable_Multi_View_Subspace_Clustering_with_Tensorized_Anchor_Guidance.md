@@ -156,8 +156,6 @@ $$\min_{\mathbf{W}_i, \mathbf{A}_i, \mathbf{Z}} \alpha \sum_{i=1}^{v} \|\mathbf{
 
 **Figure 2** 直观展示了上述流水线：各视图锚点在潜在空间学习后堆叠为锚点张量，经 FFT 变换到频域进行低秩正则化，最终通过共享锚图实现聚类。**Figure 1** 则从方法论层面对比了传统锚方法与 SMVS-TAG 的本质差异——前者独立生成锚点后构造共识图，后者将锚点重构为张量并直接施加跨视图低秩约束，从而获得更高质量的共识锚图。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2110_https_openaccess_thecvf_com_content_CVPR2026_html_Jia_Scalable_Multi_Vie/figures/002_Figure_2.jpg]]
 *Figure 2: The framework of our proposed SMVS-TAG. Specifically, anchors for each view are learned in a latent space and the anchor tensor is constructed. Applying FFT to A along the anchor dimension, each frontal slice captures cross-view interactive information among anchors. Low-frequency slices aggregate consistent information shared across views, while high-frequency slices contain view-specific information and noise*
 
@@ -208,8 +206,6 @@ $$
 
 锚点张量 $\boldsymbol{\mathcal{A}} \in \mathbb{R}^{k \times v \times m}$ 的规模仅依赖于锚点数 $m$ 和聚类数 $k$，与样本数 $n$ 无关。相比之下，传统张量方法在锚图张量 $\boldsymbol{\mathcal{Z}} \in \mathbb{R}^{m \times v \times n}$ 上正则化，其第三维随 $n$ 线性增长。这一设计使 SMVS-TAG 的时空间复杂度在大规模数据下显著降低。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2110_https_openaccess_thecvf_com_content_CVPR2026_html_Jia_Scalable_Multi_Vie/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison between traditional anchor-based MVC methods (left) and our proposed SMVS-TAG (right). Traditional methods independently generate view-specific anchors to construct a consensus anchor graph. Our method reconstructs these view-specific anchors into a third-order tensor, employing a tensor Schatten p-norm constraint to explicitly capture cross-view consistency and complementarity, resulting in a higher-quality consensus anchor graph*
 
@@ -259,8 +255,6 @@ SMVS-TAG 在七个多视图基准数据集上与十种大规模多视图聚类�
 3. **正交约束的表示局限**：锚点学习采用正交约束以增强判别性和多样性，但可能限制了表示灵活性。该方法尚未探索与其他约束（如非负、稀疏）的组合效果，在特定数据分布下可能次优。
 
 4. **缺失视图未验证**：当前方法设计用于完整多视图场景，尚未验证在缺失视图或不完全多视图数据下的有效性，限制了其在真实世界不完整数据上的应用。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2110_https_openaccess_thecvf_com_content_CVPR2026_html_Jia_Scalable_Multi_Vie/figures/007_Table_4.jpg]]
 *Table 4: Ablation study on tensor anchor (TA) strategy*

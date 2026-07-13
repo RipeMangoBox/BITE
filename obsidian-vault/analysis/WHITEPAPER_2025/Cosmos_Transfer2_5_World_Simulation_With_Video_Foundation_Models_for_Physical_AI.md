@@ -91,8 +91,6 @@ Cosmos-Transfer2.5 属于**视频世界模型**和**可控视频生成**的交�
 4. **时间步偏移扩展性**：渐进式时间步偏移参数 β 在高于720p分辨率时的扩展行为尚不明确。
 5. **领域自适应需求**：在智能空间、人体动力学等其他物理AI领域的领域自适应是否仍需进一步微调，有待验证。
 
-
-
 物理AI的核心愿景是构建能够模拟真实世界动态的生成式世界模型，从而为机器人、自动驾驶等具身智能系统提供可扩展的训练与评估环境。视频生成模型因其对视觉世界的强大建模能力，被视为实现这一目标的关键技术路径。然而，当前视频世界模型在服务于物理AI下游任务时，仍面临三个根本性瓶颈。
 
 **长视频生成中的幻觉与错误积累。** 物理仿真要求模型能够生成长时序、物理一致的视频序列。但现有模型在生成长视频时，画面质量随帧数增加而显著退化，表现为物体形变、纹理漂移和物理规则违背等幻觉现象。这种错误积累的根源在于模型缺乏对长程时序依赖的有效建模，以及训练数据中长视频样本的稀缺。
@@ -102,8 +100,6 @@ Cosmos-Transfer2.5 属于**视频世界模型**和**可控视频生成**的交�
 **数据质量与语义理解的系统性缺陷。** 大规模视频预训练数据的质量参差不齐，原始网络视频中包含大量低质量、重复和语义噪声内容。同时，传统文本编码器（如T5）对物理世界的语义理解深度不足，难以将复杂的物理指令精确映射到视觉生成空间。此外，训练策略未能充分优化指令对齐，使得模型在开放域文本条件下的生成结果缺乏物理真实感。
 
 针对上述问题，**Cosmos-Transfer2.5** 提出了一套系统化改进方案：通过极严格的数据过滤管线（仅保留约4%的高质量视频）、采用解码器型视觉语言模型 **Cosmos-Reason1** 替代T5文本编码器、引入流匹配训练目标与高噪声偏向的时间步调度、多域有监督微调合并策略以及基于GRPO的强化学习后训练，在参数规模缩小3.5倍的情况下，实现了长视频质量、控制对齐和下游物理AI任务性能的全面超越。
-
-
 
 ## 核心方法与创新机理
 
@@ -128,8 +124,6 @@ Cosmos-Transfer2.5 对控制网分支的插入策略进行了关键调整：前�
 上述方法创新的有效性建立在极高质量的训练数据之上。Cosmos-Predict2.5 的数据管线从 2 亿原始视频中仅保留约 4% 的高质量片段（约 2 亿个可训练片段），经过镜头分割、GPU 加速转码、多级过滤（美学评分、运动、OCR、感知质量、语义伪影、VLM 过滤）、语义去重和结构化分片等七阶段处理（Section 2.1, Figure 1）。这种“数据优先”的策略是较小模型（2B）超越上一代 7B 模型的根本性保障。
 
 **系统性创新的效果**：上述改进形成了协同增益——更干净的数据、更强的文本表征、流匹配速度预测、模型合并策略和 RL 微调共同作用，使得 Cosmos-Transfer2.5-2B 在参数减少 3.5 倍的情况下，质量评分（9.31）超越 Cosmos-Transfer1-7B（9.24）（Table 10），并在真实机器人操作策略中实现 24/30 的成功率，远超 baseline 的 5/30 和 base policy 的 1/30（Table 11）。
-
-
 
 Cosmos-Transfer2.5 的整体框架围绕“预测—后训练—翻译”三阶段构建，核心目标是生成物理真实、控制对齐的长视频，并直接服务于物理 AI 下游任务。其基础是世界预测模型 **Cosmos-Predict2.5**，该模型统一了 Text2World、Image2World 和 Video2World 三种生成模式，随后通过后训练与模型合并策略注入领域知识，最后经由世界翻译模型 **Cosmos-Transfer2.5** 实现多模态控制下的结构化世界仿真。
 
@@ -171,8 +165,6 @@ Cosmos-Transfer2.5 在 Cosmos-Predict2.5 的基础上附加控制网分支，支
 ### 输入输出流总览
 
 系统接受文本描述、初始图像/视频帧、以及可选的多模态控制信号作为输入。在预测模式下，输出为符合物理规律的世界状态推演视频；在翻译模式下，输出为受控制信号引导的结构化世界仿真。所有生成结果均可直接用于物理 AI 下游任务，如机器人策略训练的数据增强（Table 11）和多视图驾驶仿真（Table 12）。
-
-
 
 ### 流匹配生成框架
 
@@ -221,8 +213,6 @@ Cosmos-Transfer2.5 在 Predict2.5 基础上引入控制网分支，支持边缘�
 $$\mathsf{RNDS}[i] = \left( \frac{\mathrm{DOVER}[i]}{\mathrm{DOVER}_{\mathrm{GT}}[i]} \right) / \left( \frac{\mathrm{DOVER}[1]}{\mathrm{DOVER}_{\mathrm{GT}}[1]} \right)$$
 
 其中 $\mathrm{DOVER}[i]$ 为生成视频第 $i$ 块的感知质量分数，$\mathrm{DOVER}_{\mathrm{GT}}[i]$ 为对应真实视频块的质量分数。RNDS 以首块为基准归一化，其随块索引的下降速率直接反映错误积累程度。
-
-
 
 ## 实验与关键发现
 
@@ -273,14 +263,6 @@ Figure 6 的人类评估显示，尽管参数规模更小，Cosmos-Predict2.5-2B
 
 尽管长视频生成质量大幅改善，Figure 9 的 RNDS 曲线仍呈现下降趋势，表明错误积累尚未完全消除。Cosmos-Predict2.5-14B 的后训练结果尚未完成，其性能上限仍有待验证。此外，多视图驾驶仿真中世界场景地图对遮挡和动态物体交互的处理机制未详细阐明，该点需人工核实。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l39_https_d1qx31qr3h6wln_cloudfront_net_publications_World_Simulation_with_V/figures/019_Figure.jpg]]
-*Figure: Edge Control Depth Control*
-
-![[assets/figures/papers/paper_list_l39_https_d1qx31qr3h6wln_cloudfront_net_publications_World_Simulation_with_V/figures/027_Figure_13.jpg]]
-*Figure 13: Generated multi-view frames from [Cosmos-Transfer2.5-2B/auto/multiview]. The multi-view 720p control videos for driving simulation consist of HD map elements like lanes, road markings, poles, traffic signals, traffic lights (with state), all of which can represent complex road topologies (including overpasses) as well as actors represented as cuboids. Each cuboid is color-coded based on a coarse class ontology (e.g., truck, vehicle, pedestrian), and is also shaded to differentiate between the front and back*
-
 ![[assets/figures/papers/paper_list_l39_https_d1qx31qr3h6wln_cloudfront_net_publications_World_Simulation_with_V/figures/001_Table_1.jpg]]
 *Table 1: List of released models with their corresponding capabilities and inputs*
 
@@ -289,20 +271,6 @@ Figure 6 的人类评估显示，尽管参数规模更小，Cosmos-Predict2.5-2B
 
 ![[assets/figures/papers/paper_list_l39_https_d1qx31qr3h6wln_cloudfront_net_publications_World_Simulation_with_V/figures/004_Table_3.jpg]]
 *Table 3: Configuration details of [Cosmos-Predict2.5] models*
-
-![[assets/figures/papers/paper_list_l39_https_d1qx31qr3h6wln_cloudfront_net_publications_World_Simulation_with_V/figures/006_Table_4.jpg]]
-*Table 4: Stages of progressive pretraining and their specifications*
-
-![[assets/figures/papers/paper_list_l39_https_d1qx31qr3h6wln_cloudfront_net_publications_World_Simulation_with_V/figures/007_Table_5.jpg]]
-*Table 5: Video statistics across different post-train domains*
-
-![[assets/figures/papers/paper_list_l39_https_d1qx31qr3h6wln_cloudfront_net_publications_World_Simulation_with_V/figures/011_Table_6.jpg]]
-*Table 6: Rewards of [Cosmos-Predict2.5-2B], before and after reinforcement learning on VideoAlign, for Text2World and Image2World settings*
-
-![[assets/figures/papers/paper_list_l39_https_d1qx31qr3h6wln_cloudfront_net_publications_World_Simulation_with_V/figures/012_Table_7.jpg]]
-*Table 7: Training efficiency with 4096 NVIDIA H100 GPUs where the video resolution is 720p and number of frames is 93*
-
-
 
 ## 定位与知识库关联
 
@@ -357,8 +325,6 @@ Cosmos-Transfer2.5在视频世界模型知识库中的定位可概括为：
 - **数据质量驱动范式**：通过极严格过滤（4%生存率）和语义去重，证明了数据质量对视频世界模型的根本性影响，与当前“数据为中心”的AI趋势一致。
 - **小模型高效路线**：2B模型超越上一代7B模型，展示了架构优化（流匹配+RoPE+控制块均匀插入）和训练策略（RL后训练+模型合并）的组合效率，为资源受限的物理AI部署提供了可行路径。
 - **物理AI垂直整合**：将视频生成与下游机器人策略训练、自动驾驶感知评估紧密结合，形成了从生成到应用的闭环验证体系，区别于纯视频生成模型的通用定位。
-
-
 
 ## 原文 PDF
 

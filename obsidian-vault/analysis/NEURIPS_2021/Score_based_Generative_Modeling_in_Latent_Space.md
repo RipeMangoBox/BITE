@@ -245,27 +245,11 @@ Table 6 系统消融了 SDE 类型、训练目标、加权机制与方差缩减�
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2106_05931/figures/006_Table_3.jpg]]
 *Table 3: Generative results on CelebA-HQ-256*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2106_05931/figures/019_Figure_9.jpg]]
-*Figure 9: The effect of ODE solver error tolerance on the quality of samples. In contrast to the original SGM [2] where high error tolerance results in pixelated images (see Fig. 3 in [2]), in our case high error tolerances create low-frequency artifacts. Reducing the error tolerance improves subtle details slightly*
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2106_05931/figures/002_Table.jpg]]
-
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2106_05931/figures/008_Table_4.jpg]]
 *Table 4: Dyn. binarized OMNIGLOT results*
 
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2106_05931/figures/009_Table_5.jpg]]
-*Table 5: Dynamically binarized MNIST results*
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2106_05931/figures/013_Table_7.jpg]]
-*Table 7: Hyperparameters for our main models. We use the same notations and abbreviations as in Tab. 6 in main paper*
-
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2106_05931/figures/014_Table_8.jpg]]
 *Table 8: Experiment with a small VAE architecture on dynamically binarized MNIST*
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2106_05931/figures/015_Table_9.jpg]]
-*Table 9: Number of function evaluations (NFE) of ODE solver during probability flow-based latent SGM prior sampling and corresponding sampling time for our main CIFAR-10 models. Sampling was done in batches of size 16 using a single Titan V GPU. Results are averaged over 20 sampling runs. See Tab. 2 in main text for generative performance metrics*
 
 ## 定位与知识库关联
 

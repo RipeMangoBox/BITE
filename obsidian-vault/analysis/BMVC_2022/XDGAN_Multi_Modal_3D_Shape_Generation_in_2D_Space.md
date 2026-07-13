@@ -57,8 +57,6 @@ claims:
 
 **局限性**：该方法只能生成固定拓扑的网格，无法改变物体拓扑结构（如生成带洞或不连通部件）；参数化过程假设物体近似对称且亏格为零，限制了形状多样性。
 
-
-
 三维内容生成是计算机视觉与图形学的核心挑战之一，其在游戏、影视、虚拟现实和工业设计等领域具有广泛需求。近年来，二维图像生成领域取得了革命性进展，以StyleGAN系列和扩散模型为代表的方法已经能够稳定生成高分辨率、高保真度的逼真图像。然而，这些进步并未能直接迁移到三维形状生成任务中。
 
 **核心瓶颈在于表示方式的不兼容。** 现有三维生成模型普遍依赖专门设计的三维表示和对应的定制网络架构：基于体素网格的方法（如3D-GAN）受限于三维卷积带来的高昂内存开销，难以生成高分辨率形状；基于点云的方法（如DPC, Luo and Hu, CVPR 2021）虽然较为轻量，但输出缺乏完整的表面信息和拓扑结构，无法直接用于渲染和下游处理；基于隐式场的方法（如IM-Net, Chen and Zhang, CVPR 2019）能够产生高质量表面，但推理过程需要耗时的等值面提取（如Marching Cubes），单次生成动辄需要数秒乃至十几秒，远未达到实时交互的要求。
@@ -68,8 +66,6 @@ claims:
 XDGAN的核心洞察正是针对这一困境：**如果能够将三维形状无损地“压缩”为二维图像，那么整个成熟的二维生成体系就可以被直接复用。** 具体而言，该方法通过固定的球面参数化和对称切割，将物体表面映射为单通道的距离图像（Rad图像），使得标准的二维StyleGAN3无需任何架构修改即可用于三维几何生成。同时，利用对齐的二维属性图，图像翻译网络可以同步生成法向和纹理等表面属性，最终通过平凡的网格缝合步骤重建出可直接渲染的高保真三维网格。
 
 这种“在二维空间中进行三维生成”的范式转换，不仅解除了对定制三维网络组件的依赖，更带来了推理速度的量级飞跃——相较于IM-Net快500倍以上，使实时三维内容创建成为可能。
-
-
 
 ## 核心方法与创新机理
 
@@ -94,8 +90,6 @@ XDGAN 的核心创新在于将 3D 形状生成问题**从 3D 空间迁移到 2D 
 ### 关键洞察
 
 核心洞察可以概括为：**通过固定的球面参数化和对称切割，将 3D 物体表面压缩为单通道距离图像，即可将强大的 2D StyleGAN 直接用于 3D 几何生成，并利用对齐的 2D 属性图赋予网格纹理与法向**。这一设计使 3D 生成模型从“为 3D 定制一切”转变为“让 2D 模型处理 3D”，在保持生成质量的同时获得了数量级的效率提升。
-
-
 
 XDGAN 的整体设计遵循一个核心原则：**将三维生成问题完全迁移到二维空间**，从而直接继承 2D 图像生成领域在架构、训练稳定性和速度上的巨大优势。其 pipeline 由四个紧密衔接的模块构成，形成一条“3D → 2D → 生成 → 3D”的闭环。
 
@@ -149,15 +143,11 @@ XDGAN 的整体设计遵循一个核心原则：**将三维生成问题完全迁
 
 这一设计彻底解除了对定制 3D 卷积、点云解码器或隐式场网络的依赖，实现了 3D 内容创建的速度飞跃。但同时，**固定拓扑的像素连接方式**也构成了框架的根本约束：生成的网格拓扑始终由几何图像的分辨率和切割结构决定，无法产生带洞或不连通部件等拓扑变化的形状。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l41_https_arxiv_org_abs_2210_03007/figures/003_Figure_2.jpg]]
 *Figure 2: Overview of XDGAN: To train our model (a), we first convert a training dataset of textured 3D meshes into 2D geometry images with corresponding textures, normals or any other surface attributes. Next, we train a GAN model on geometry images to generate geometry, and an image-to-image translation network to generate Xchannel attribute images for an input geometry image. At test-time (b), feed-forward evaluation of these networks followed by a trivial meshing step produces textured 3D output meshes in real-time*
 
 ![[assets/figures/papers/paper_list_l41_https_arxiv_org_abs_2210_03007/figures/008_Table_4.jpg]]
 *Table 4: Qualitative Comparison of Reconstruction Results (Zoom for more details). Note that our method can generate highest-fidelity 3D meshes including detailed surface normals. Figure 4: The latent space of XDGAN allows meaningful latent space exploration such as semantic editing (top, see §3.3) and interpolation between two input models (bottom)*
-
-
 
 XDGAN的核心设计围绕一个关键洞察展开：通过固定的球面参数化和对称切割，将3D物体表面压缩为单通道距离图像（Rad图像），从而将强大的2D生成模型直接应用于3D几何生成。整个流水线由四个紧密协作的模块构成。
 
@@ -188,8 +178,6 @@ $$p' = p + (\alpha \times t \times \mathbf{n}^T)$$
 其中$\alpha$为步长，$t$为移动步数。沿$\mathbf{n}^T$正方向移动可增强目标属性，反向移动则抑制该属性。这一机制使得用户可以在保持其他特征不变的前提下，连续调整特定语义维度。
 
 **证据强度说明**：以上模块描述均有明确锚点支撑——几何图像转换器对应§3.1的完整参数化流程，StyleGAN3生成器对应§3.2的训练描述，SPADE翻译器对应§3.2的图像翻译网络部分，网格重建步骤对应摘要和§3.2的“trivial meshing step”表述，编辑公式对应§3.3的显式公式。所有模块的置信度均不低于0.9，但关于SPADE的具体训练超参数（300 epochs、批大小32）来自part_004的实验设置证据，置信度约0.9，建议在正式引用时核对原文§4.1的具体数值。
-
-
 
 ## 实验与关键发现
 
@@ -236,15 +224,11 @@ XDGAN 的实验围绕两个核心任务展开：**3D 重建**（将真实形状�
 ![[assets/figures/papers/paper_list_l41_https_arxiv_org_abs_2210_03007/figures/005_Table_2.jpg]]
 *Table 2: Quantitative results on ShapeNet reconstruction. Note that the CD values are multiplied by 1 0 ^ { 3 } and EMD are multiplied by 1 0 ^ { 2 } . Since DPC produces only point clouds, it is not possible to compute the LFD distance for its outputs*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l41_https_arxiv_org_abs_2210_03007/figures/002_Table_1.jpg]]
 *Table 1: Comparison of 3D generative methods by the representation used. We include quantitative and qualitative comparisons with the starred methods in our experiments*
 
 ![[assets/figures/papers/paper_list_l41_https_arxiv_org_abs_2210_03007/figures/006_Table_3.jpg]]
 *Table 3: Quantitative results on Single View Reconstruction. Note that the CD values are multiplied by 1 0 ^ { 3 } and EMD are multiplied by 1 0 ^ { 2 }*
-
-
 
 ## 定位与知识库关联
 
@@ -302,8 +286,6 @@ XDGAN的设计隐含了若干强假设，这些假设划定了其适用边界：
 4. **架构演进空间**：在保持实时性的前提下，是否可以用其他2D GAN架构（如基于Transformer的生成器）进一步提高生成质量？这取决于2D生成领域的持续进展能否继续通过Rad图像这一桥梁迁移到3D领域。
 
 总体而言，XDGAN的核心贡献在于证明了“将3D生成降维为2D图像生成”这一策略的可行性，其方法学价值在于打破了3D生成必须依赖定制3D网络的思维定式，为后续工作开辟了一条轻量、高效的技术路径。
-
-
 
 ## 原文 PDF
 

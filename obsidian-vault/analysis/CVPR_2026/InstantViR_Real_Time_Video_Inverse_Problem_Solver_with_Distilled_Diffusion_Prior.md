@@ -52,8 +52,6 @@ InstantViR 针对这一瓶颈提出了根本性的范式转换：**将双向视�
 
 在 A100 GPU 上，InstantViR 以 832×480 分辨率实现超过 35 FPS 的推理速度，比采样基线 SVI 快超过 100 倍，同时在视频修复、去模糊和 4× 超分辨率等任务上保持或超越扩散基线的重建质量。该方法仅需教师扩散模型与已知退化算子即可训练，无需外部配对干净/降质视频数据，展现出极强的实用性与泛化潜力。
 
-
-
 ### 视频逆问题的核心挑战
 
 视频逆问题旨在从退化的观测 $\pmb y$ 中恢复出干净的原始视频 $\pmb x$，其本质是一个病态的贝叶斯推断问题。根据贝叶斯公式，后验分布可以表示为：
@@ -75,8 +73,6 @@ $$p ( { \pmb x } | { \pmb y } ) \propto p ( { \pmb y } | { \pmb x } ) p ( { \pmb
 上述困境的根源在于一个根本性的权衡：**迭代视频扩散后验采样速度极慢，无法满足实时或流式应用需求；而基于图像扩散的强加时间正则化方法则缺乏对复杂时空动态的建模能力，导致时间不一致性。** 是否存在一种方法，既能继承视频扩散先验强大的时空建模能力，又能将推理速度提升至实时水平？
 
 InstantViR 的核心洞察在于：**利用教师-学生知识蒸馏框架，在无需配对训练数据的情况下，将强大视频扩散模型的时间一致性先验压缩进一个前馈网络；结合因果注意力与 KV 缓存实现流式处理，并通过教师空间正则化蒸馏引入高效 VAE，大幅降低延迟。** 这一思路将视频扩散先验从“缓慢采样”的范式解放出来，转化为一步式的前馈映射，为实时视频逆问题求解开辟了新路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -123,8 +119,6 @@ $$\mathcal { L } \big ( q _ { \phi } ^ { \prime } \big ) = \mathbb { E } _ { y }
 ### 训练数据需求：无需配对数据
 
 与许多需要大规模配对干净/降质视频数据的蒸馏方法不同，InstantViR 的蒸馏是**先验驱动**的：仅需要冻结的教师扩散模型 $s_\theta$ 和已知的退化算子 $\mathcal{A}$，不依赖外部配对数据。这使得框架可以灵活适配不同的逆问题任务（修复、去模糊、超分辨率），只需更换退化算子即可。
-
-
 
 InstantViR 的核心设计思路是将一个强大的双向视频扩散先验（教师模型）蒸馏为一个单步因果自回归学生网络，从而在保持时间一致性的同时实现实时推理。整个框架围绕三个关键模块构建：冻结的教师扩散先验、可训练的摊销求解器，以及支持流式处理的因果注意力架构。
 
@@ -181,13 +175,6 @@ $$
 
 这一设计使得 InstantViR† 能够在保持重建质量的同时，将推理速度从约 14 FPS 提升至超过 35 FPS（A100 GPU，832×480 分辨率）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l889_https_arxiv_org_abs_2511_14208/figures/002_Figure_2.jpg]]
-*Figure 2: Overview of the InstantViR framework. (Top) Training: We train a single-step solver*
-
-
-
 ### 3.1 摊销变分推断框架
 
 InstantViR 的核心目标是将迭代后验采样转化为单步前馈映射。给定降质视频测量 $\pmb{y}$ 和干净视频 $\pmb{x}$，视频逆问题的贝叶斯后验为：
@@ -240,8 +227,6 @@ $$\mathcal { L } \big ( q _ { \phi } ^ { \prime } \big ) = \mathbb { E } _ { y }
 
 **关键模块总结**：整个框架由冻结教师先验 $s_\theta$、摊销求解器 $q_\phi$、因果自回归块式注意力、KV 缓存、以及教师空间正则化蒸馏桥接五个核心模块构成，共同实现从降质视频到干净潜变量的单步实时映射。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能：速度与质量的代际跨越
@@ -288,9 +273,6 @@ InstantViR 的性能优势可归因于三个关键设计选择，其效应在定
 
 文本引导重建实验（Figure 4）展示了框架的可控性。给定相同的掩码输入，通过不同的文本提示（如 "black headband"、"wear glasses"），InstantViR 可生成语义不同但均合理的高质量重建。更值得注意的是，模型能够生成多模态输出（如 "close eyes" 与 "open eyes"），表明蒸馏过程保留了教师扩散先验的生成多样性和细粒度可控性。
 
-![[assets/figures/papers/paper_list_l889_https_arxiv_org_abs_2511_14208/figures/005_Figure_4.jpg]]
-*Figure 4: Results for text-guided video reconstruction. InstantViR not only restores high-fidelity details from severely masked measurements (top row) but also uses text prompts to control the reconstruction. (Left) Given a masked input, our method can add specific details like a "black headband" or "wear glasses" as guided by the text. (Right) The framework can generate multi-modal, semantically distinct, and plausible outputs from the same masked input, such as reconstructing the subject with either "close eyes" or "open eyes", demonstrating fine-grained controllability*
-
 ### 局限性与失败模式
 
 尽管整体性能优异，分析中仍识别出以下局限：
@@ -304,22 +286,6 @@ InstantViR 的性能优势可归因于三个关键设计选择，其效应在定
 ### 实验公平性说明
 
 所有推理速度测量均在 NVIDIA A100 GPU 上以 832×480 分辨率进行，比较在 Open-Sora 和 REDS 数据集上采用相同的退化设置展开，确保了对比的公平性。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l889_https_arxiv_org_abs_2511_14208/figures/007_Figure_5.jpg]]
-*Figure 5: Qualitative comparison for video Gaussian deblurring*
-
-![[assets/figures/papers/paper_list_l889_https_arxiv_org_abs_2511_14208/figures/008_Figure_6.jpg]]
-*Figure 6: Qualitative comparison for video super-resolution (4x)*
-
-![[assets/figures/papers/paper_list_l889_https_arxiv_org_abs_2511_14208/figures/010_Figure_2.jpg]]
-*Figure 2: Video Deblurring qualitative comparison. Rows correspond to different methods; columns show consecutive frames covering the entire clip. InstantViR (both WanVAE Ours and LeanVAE Ours† variants) restores fine structures consistently across time, outperforming slower diffusion-based baselines*
-
-![[assets/figures/papers/paper_list_l889_https_arxiv_org_abs_2511_14208/figures/012_Figure.jpg]]
-*Figure: Blurred Input*
-
-
 
 ## 定位与知识库关联
 
@@ -379,8 +345,6 @@ InstantViR 在四个关键设计维度上相对于迭代采样基线做出了系
 3. **跨教师蒸馏**：当前蒸馏绑定单一教师模型。是否可以将多个教师先验（如不同架构或不同退化特化的扩散模型）蒸馏到统一的学生网络中，实现多任务实时求解？
 
 4. **资源受限部署**：35 FPS 的指标在 A100 上测得，在边缘设备（如移动端 GPU）上的实际吞吐量与精度权衡尚未探索。LeanVAE 的选择为此提供了可能性，但缺乏系统性的硬件效率分析。
-
-
 
 ## 原文 PDF
 

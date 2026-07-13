@@ -55,8 +55,6 @@ claims:
 - **风格生成对齐**：将 StyleDoctor 作为奖励模型集成到 OmniStyle 和 OmniGen2 后，风格一致性指标（CSD）分别提升至 0.78 和 0.72。
 - **关键验证**：消融实验表明，去除全局风格特征学习（GSF）和统一偏好学习（UPL）会导致性能显著下降，证实这两部分是方法的核心有效设计。
 
-
-
 ### 风格生成任务的兴起与核心瓶颈
 
 随着扩散模型（Diffusion Models）在图像生成领域的快速发展，风格化的图像生成——即生成既保留内容结构又体现特定艺术风格的图像——已成为视觉内容创作的关键需求。无论是基于文本描述的风格控制（text-controlled style generation）、基于参考图像的风格迁移（reference image-guided style transfer），还是基于指令的风格定制化（instruction-guided style customization），这些任务都要求模型能够精确感知和对齐“风格”这一高度抽象且多维度的视觉概念。
@@ -89,8 +87,6 @@ StyleDoctor 的设计围绕三个关键创新展开：
 
 通过这一设计，StyleDoctor 能够提供多维度的风格奖励信号（包括全局风格一致性、色彩和谐度、笔触纹理等），为扩散模型的风格对齐优化提供精确的反馈指导。
 
-
-
 ## 核心方法与创新机理
 
 StyleDoctor 的核心创新在于将风格感知从“通用美学评分”或“纯视觉编码”的单一范式，升级为**联合图像全局风格特征与多模态语言理解的专家奖励模型**。这一转变解决了现有方法在风格生成任务中的根本瓶颈：人类偏好奖励模型（如 **HPSv2**，Wu et al., arXiv 2023）无法有效感知图像风格，而仅基于图像特征的风格编码器（如 **CSD**，Somepali et al., arXiv 2024；**StyleTokenizer**，Li et al., ECCV 2024）又缺乏跨模态监督，导致评估信号与人类对风格一致性的判断存在偏差。
@@ -110,8 +106,6 @@ StyleDoctor 的核心创新在于将风格感知从“通用美学评分”或�
 传统奖励模型仅输出单一的美学分数，难以捕捉风格的复杂性。StyleDoctor 提供**多维度奖励信号**，涵盖全局风格一致性、色彩和谐度、笔触纹理等细粒度维度。在推理时，模型通过输出 logits 中正面答案的平均置信度作为奖励分，为下游扩散模型的强化微调提供了更精准的风格对齐反馈。
 
 这些创新共同构成了一个从“风格感知”到“风格引导”的闭环：StyleDoctor 不仅能准确判断风格一致性，还能作为奖励模型或正则化项直接介入生成过程，显著提升扩散模型在风格迁移、风格定制化等任务中的表现。
-
-
 
 StyleDoctor 的整体设计围绕一个核心命题展开：**如何构建一个能够同时感知图像全局风格特征与文本风格语义的专家奖励模型，从而为风格中心生成任务提供细粒度的监督信号**。其 pipeline 由三个关键阶段串联而成，分别解决风格表征学习、跨模态风格理解、以及统一偏好建模三个子问题。
 
@@ -148,15 +142,8 @@ $$\mathcal { L } _ { c o n } = - \frac { 1 } { N } \sum _ { i = 1 } ^ { N } \log
 
 整个框架的输入输出流可概括为：输入包括参考内容图像、参考风格图像（或文本风格描述）、待评估生成图像；经过视觉编码、风格令牌注入、多模态语言模型推理后，输出多维风格一致性评估结果及置信度分数，最终用于指导扩散模型的风格对齐优化。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2704_https_openaccess_thecvf_com_content_CVPR2026_html_He_StyleDoctor_Towards/figures/006_Figure_4.jpg]]
 *Figure 4: Overviewofourstyle-centricrewardmodeling paradigm.Wereformulatequartetsmples from SPRData tosimulate dierent scenariostosupportgeneraliedstyleverifcationundervarioustasks.Aftertrainng,StylDoctocouldbeusedasrwardmodeltoguide difusionmodels throughreinforcementlearing,providing feedbacksignalsforbeterstylizationalignment.Meanwhile,StylDocotr couldalsobeutilzedtocalculateaegularzationtethatencourages tedifusionmodeltomaxiiestyleconfidenceandcosistency*
-
-![[assets/figures/papers/paper_list_l2704_https_openaccess_thecvf_com_content_CVPR2026_html_He_StyleDoctor_Towards/figures/001_Figure.jpg]]
-*Figure: l.StyleDoctorprovidesamulti-dimensionalevaluationofstyleconsistencybetweentheinputimagesandthestyleconditions. Buildingupontis,StylDoctoreablesaadageofstyleatedgerationtasks,cludingtextontrodstylegeeratioeee image-guided style generation,instruction-guided style transfer and reference image-guided style transfer*
-
-
 
 StyleDoctor 的核心架构由三个紧密耦合的模块构成，分别负责全局风格特征提取、跨模态风格语义融合以及统一偏好学习。以下逐一拆解各模块的设计动机、输入输出与关键公式。
 
@@ -198,13 +185,6 @@ StyleDoctor 采用 **Qwen2.5-VL-3B** 作为基座多模态大语言模型（MLLM
 
 消融实验（Table 7）表明，去除全局风格特征学习（GSF）和统一偏好学习（UPL）会导致风格一致性和 CSD 分数显著下降，验证了上述两个模块在 StyleDoctor 中的关键作用。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2704_https_openaccess_thecvf_com_content_CVPR2026_html_He_StyleDoctor_Towards/figures/002_Figure.jpg]]
-*Figure: Reward Modeling*
-
-
-
 ## 实验与关键发现
 
 ### 风格感知能力评估
@@ -235,8 +215,6 @@ StyleDoctor 首先在风格感知任务上接受检验，包括风格图像检�
 
 图 5 和图 6 分别展示了文本控制风格生成和风格迁移任务的定性结果。在文本控制场景中，经 StyleDoctor 微调的模型生成的图像在色彩搭配、纹理细节和整体氛围上与目标风格描述更为一致。在风格迁移场景中，微调后的模型在保持内容结构的同时，更忠实地迁移了参考图像的风格特征（如油画笔触、水彩晕染效果）。这些视觉对比进一步佐证了定量指标的提升。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2704_https_openaccess_thecvf_com_content_CVPR2026_html_He_StyleDoctor_Towards/figures/007_Table_2.jpg]]
 *Table 2: Comparison of style perception performances on style image retrieval and multi-modal style understanding between different vision encoders and MLLMs.Retri．Acc.and MMUnd. Acc.denote image retrieval accuracy and multi-modal style understanding accuracy,respectively*
 
@@ -246,22 +224,8 @@ StyleDoctor 首先在风格感知任务上接受检验，包括风格图像检�
 ![[assets/figures/papers/paper_list_l2704_https_openaccess_thecvf_com_content_CVPR2026_html_He_StyleDoctor_Towards/figures/011_Table_4.jpg]]
 *Table 4: Comparison of style transfer performances.For style consistency,we report CSD score and prediction from GPT-4o.For content preservation,we report similarity of visual features between the generated image and the reference content,where CLIP visual encoder and DINO v2 [23] is applied*
 
-![[assets/figures/papers/paper_list_l2704_https_openaccess_thecvf_com_content_CVPR2026_html_He_StyleDoctor_Towards/figures/015_Table_6.jpg]]
-*Table 6: Performance comparison of human-preference reward models and StyleDoctor*
-
 ![[assets/figures/papers/paper_list_l2704_https_openaccess_thecvf_com_content_CVPR2026_html_He_StyleDoctor_Towards/figures/014_Table_7.jpg]]
 *Table 7: ．Ablation study on the effectiveness of each proposed component in StyleDoctor.GSF denotes Global Style Feature learning, UPL denotes Unified Preference learning*
-
-![[assets/figures/papers/paper_list_l2704_https_openaccess_thecvf_com_content_CVPR2026_html_He_StyleDoctor_Towards/figures/009_Figure_5.jpg]]
-*Figure 5: SOTAmetodsintext-ontroledstylegenerationadreferenceimageguidedstylegenerationtasks*indicatesf-unedwith StyleDoctor*
-
-![[assets/figures/papers/paper_list_l2704_https_openaccess_thecvf_com_content_CVPR2026_html_He_StyleDoctor_Towards/figures/013_Figure_6.jpg]]
-*Figure 6: QuantitativevisualizationofSOTAmethods ininstruction-guided styletransferandreference image-guidedstyle transfer.* indicates fine-tuned with StyleDoctor*
-
-![[assets/figures/papers/paper_list_l2704_https_openaccess_thecvf_com_content_CVPR2026_html_He_StyleDoctor_Towards/figures/005_Table_1.jpg]]
-*Table 1: Comparisons between diferent style-related datasets and SPRData. # indicates 'the number of'*
-
-
 
 ## 定位与知识库关联
 
@@ -308,8 +272,6 @@ StyleDoctor 在生成管线中扮演的是**即插即用的风格评估器与优
 3. **从奖励模型到风格感知组件**：StyleDoctor 能否直接作为 VLM 的风格感知模块嵌入生成模型，而非仅在训练阶段提供奖励信号，这关系到其应用范式的根本性扩展。
 
 4. **视频风格迁移的跨帧评估**：将 StyleDoctor 的风格一致性判别能力扩展到时间维度，是通往视频风格化质量评估的自然延伸。
-
-
 
 ## 原文 PDF
 

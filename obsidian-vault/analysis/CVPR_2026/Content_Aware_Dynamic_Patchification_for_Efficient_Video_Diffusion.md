@@ -55,8 +55,6 @@ claims:
 
 DynaPatch 的方法定位处于视频扩散模型效率优化的前沿：它不同于依赖启发式规则或时间步调度的粗粒度方案，也不同于事后剪枝的token选择策略，而是通过与扩散目标的联合优化，学习内容感知的、细粒度的块划分决策，实现了计算资源的高效分配。
 
-
-
 ### 视频扩散模型的效率瓶颈
 
 视频扩散模型近年来取得了显著进展，但高昂的计算开销始终制约其实际部署。当前主流架构——扩散Transformer（DiT）——将视频编码为潜在空间中的时空token序列，并通过大规模Transformer进行迭代去噪。在这一流程中，**块划分（patchification）** 是将连续潜在特征离散化为token的关键步骤：它将3D VAE编码器输出的潜在表示按固定时空尺寸切分为不重叠的块，每个块被线性投影为一个token嵌入。
@@ -88,8 +86,6 @@ DynaPatch 的方法定位处于视频扩散模型效率优化的前沿：它不�
 2. **生成感知的路由信号。** 扩散损失是全局的标量信号，难以提供空间细粒度的路由指导。如何让路由器感知不同区域对生成质量的相对重要性？
 
 3. **效率与质量的灵活权衡。** 不同应用场景对推理速度和生成质量有不同的偏好。如何在不重新训练的情况下灵活控制token减少率？
-
-
 
 ## 核心方法与创新机理
 
@@ -128,8 +124,6 @@ $$\mathcal { L } _ { \mathrm { t o t a l } } = \mathcal { L } _ { \mathrm { d i 
 ### 与先前方法的本质差异
 
 相较于 **FlexiDiT** 的全局时间步级调度和 **D²iT** 的熵启发式训练，DynaPatch 的关键跃升在于：分块决策是**区域级、内容自适应且由扩散损失直接驱动**的，而非依赖外部启发式信号或粗粒度时间步调度。相较于 **SPViT** (Kong et al., ECCV 2022) 等token剪枝方法直接丢弃token可能造成的信息丢失，DynaPatch 通过合并相邻token保留完整信息，仅在空间粒度上做权衡。
-
-
 
 DynaPatch 的整体推理流程围绕一个核心思想展开：**让扩散模型根据视频内容复杂度，自适应地为不同时空区域选择不同的块划分粒度**。图 2 展示了完整的推理流水线。
 
@@ -188,12 +182,8 @@ $$\mathcal { L } _ { \mathrm { t o t a l } } = \mathcal { L } _ { \mathrm { d i 
 - **不依赖时间步**：路由器不接收扩散时间步作为显式输入，噪声强度信息已编码在加噪潜在特征中，简化了路由器设计并使其完全由内容驱动。
 - **位置编码一致性**：粗粒度块的位置编码由其内部细粒度块位置编码的平均得到，保证不同粒度 token 在统一位置空间中保留相对时空关系，使 DiT 骨干无需修改即可处理混合粒度序列。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l849_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Content_Aware_Dynam/figures/002_Figure_2.jpg]]
 *Figure 2: Overall workflow of our DynaPatch design during inference. Each small square in the latent representation indicates a (1, 2, 2) latent patch, which is the by-default patch size in baseline model*
-
-
 
 ### 动态块划分框架概述
 
@@ -264,8 +254,6 @@ $$\mathcal { L } _ { \mathrm { b u d g e t } } = \left( \frac { 1 } { M } \sum _
 
 其中 $M$ 为区域总数，$k$ 遍历候选块大小，$C_k$ 为该块大小相对于最细粒度的 token 倍数（如 (1,2,2) 对应 $C=1$，(2,2,2) 对应 $C=0.5$，(1,4,4) 对应 $C=0.25$），$r_{\mathrm{target}}$ 为目标 token 保留比。该设计允许路由器在不同区域间灵活分配计算资源，而非强制每个区域达到相同的减少率。
 
-
-
 ## 实验与关键发现
 
 ### 主实验：VBench 基准上的性能与效率权衡
@@ -301,11 +289,6 @@ DynaPatch 的核心验证在 VBench 视频生成基准上进行，统一使用�
 
 速度测量基于实际推理时间，包含路由器前向计算的额外开销。路由器为轻量级三层 MLP（隐藏维度 1024），其计算量相比 DiT 骨干可忽略不计，因此加速比主要来自 token 数量减少带来的自注意力计算量下降。所有对比方法在相同 VAE 和 DiT 骨干下评估，确保比较的公平性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l849_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Content_Aware_Dynam/figures/006_Table_1.jpg]]
-*Table 1: Evaluation of different patchification and token pruning approaches on VBench. The full results on all evaluation dimensions of VBench are in the supplementary material (Section 11)*
-
 ![[assets/figures/papers/paper_list_l849_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Content_Aware_Dynam/figures/008_Table_2.jpg]]
 *Table 2: Ablation study on attention map guidance router training*
 
@@ -314,10 +297,6 @@ DynaPatch 的核心验证在 VBench 视频生成基准上进行，统一使用�
 
 ![[assets/figures/papers/paper_list_l849_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Content_Aware_Dynam/figures/005_Figure_5.jpg]]
 *Figure 5: (a) Video sample with the regional attention map from averaging all layers and heads. (b) Regional attention map using the selected layer–head pairs*
-
-![[assets/figures/papers/paper_list_l849_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Content_Aware_Dynam/figures/007_Figure.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -401,8 +380,6 @@ DynaPatch为视频扩散模型领域贡献了以下可迁移的知识组件：
 5. **与量化/蒸馏的协同**：动态分块与模型量化、知识蒸馏等正交加速技术的组合效果如何？是否存在协同或冲突效应？
 
 6. **实时视频生成**：该方法在实时或交互式视频生成场景下的延迟表现和用户体验影响需要进一步研究。
-
-
 
 ## 原文 PDF
 

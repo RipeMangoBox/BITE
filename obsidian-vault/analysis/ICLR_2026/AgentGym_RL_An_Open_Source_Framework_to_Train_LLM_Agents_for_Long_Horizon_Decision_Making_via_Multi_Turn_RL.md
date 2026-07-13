@@ -65,8 +65,6 @@ claims:
 - 所有模型在 SciWorld 的 Chem-Mix 子任务上得分均为零，表明现有方法缺乏处理复杂化学混合过程的能力。
 - 长周期训练中的梯度异常与训练崩溃机制仍需进一步分析和缓解。
 
-
-
 ### 问题背景：LLM智能体的长周期决策挑战
 
 以LLM为核心构建的自主智能体，需要在真实或模拟环境中进行多轮交互以完成复杂任务。这类任务可形式化为部分可观测马尔可夫决策过程（POMDP），定义为 $(\mathcal{U}, \mathcal{S}, \mathcal{A}, \mathcal{O}, \mathcal{T}, r)$，其中 $\mathcal{U}$ 为指令空间，$\mathcal{S}$ 为状态空间，$\mathcal{A}$ 为动作空间，$\mathcal{O}$ 为观测空间，$\mathcal{T}$ 为确定性状态转移函数，$r$ 为奖励函数。智能体根据策略 $\pi_\theta$ 在每轮生成动作，环境在多轮交互后给出结果奖励 $r(\tau) \in [0,1]$，RL优化的目标即最大化轨迹奖励的期望：
@@ -94,8 +92,6 @@ $$\nabla_{\theta} J(\theta) = \mathbb{E}_{\tau \sim \pi_{\theta}} \left[ r(\tau)
 2. **ScalingInter-RL方法**：一种渐进式交互轮次扩展策略，作为破解长周期训练不稳定的关键机制。其核心思路是从短交互轮次开始训练以建立基础策略，再按课程表逐步扩展最大交互轮次，在保持训练稳定性的同时引导智能体进行更深层次的探索，最终实现更高的长期性能。
 
 实验表明，基于ScalingInter-RL训练的Qwen-2.5-7B模型在27个多样化任务上平均提升33.65分，性能达到甚至超越OpenAI o3、Gemini-2.5-Pro等商用模型（见Figure 1）。
-
-
 
 ## 核心方法与创新机理
 
@@ -126,8 +122,6 @@ ScalingInter-RL 的**核心洞察**在于：训练初期限制交互轮次使智
 ### 与框架设计的关系
 
 ScalingInter-RL 的提出与 AgentGym-RL 框架的模块化设计形成互补。框架通过解耦的环境模块、智能体模块和训练模块，为 RL 训练提供了统一的流水线；而 ScalingInter-RL 作为训练策略层面的创新，可在该框架内与多种 RL 算法（GRPO、REINFORCE++、PPO）结合使用，展现出良好的算法无关性（见 Table 4）。
-
-
 
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_ZgCCDwcGwn/figures/003_Figure_4.jpg]]
 *Figure 4: Training dynamics under different maximum interaction turns in Deep Search environment. Our ScalingInter-RL method progressively increases the interaction horizon, and ultimately achieves higher and more efficient long-term performance*
@@ -166,8 +160,6 @@ $$h_{t+1} = h_t + \delta_h$$
 
 该策略在保持训练稳定性的同时，引导智能体进行更深层次的探索，最终实现更高的长期性能（见图 4、图 6）。实验表明，ScalingInter-RL 对轮次列表和阶段转换频率等超参数不敏感，多种配置下性能波动极小（Table 3），表现出很强的鲁棒性。
 
-
-
 ### 多轮决策的形式化建模
 
 AgentGym-RL 将智能体与环境的多轮交互建模为部分可观测马尔可夫决策过程（POMDP），形式化定义为六元组 $(\mathcal{U}, \mathcal{S}, \mathcal{A}, \mathcal{O}, \mathcal{T}, r)$。其中 $\mathcal{U}$ 为任务指令空间，$\mathcal{S}$ 为环境状态空间，$\mathcal{A}$ 为动作空间，$\mathcal{O}$ 为观测空间，$\mathcal{T}$ 为确定性状态转移函数，$r$ 为奖励函数。给定指令 $u \in \mathcal{U}$，智能体在每一轮交互中基于策略 $\pi_\theta$ 生成动作 $a_k \sim \pi_\theta(\cdot | s_k)$，经过 $N$ 轮交互后，环境返回结果奖励 $r(\tau) \in [0, 1]$ 以衡量任务完成程度。
@@ -205,8 +197,6 @@ $$\tau_t \sim \pi_{\theta}(\tau \mid h_t), \quad \mathrm{subject\ to\ } K_t \le 
 $$h_{t+1} = h_t + \delta_h$$
 
 每 $\Delta$ 训练步后按增量 $\delta_h$ 提升最大交互轮次。训练从短轮次（如 5 轮）开始，使智能体先掌握基础任务求解技能，再逐步扩展至更长轮次（如 8 轮、10 轮），在保持训练稳定性的同时引导更深层次的探索。
-
-
 
 ## 实验与关键发现
 
@@ -248,13 +238,7 @@ Table 3 的消融研究验证了 ScalingInter-RL 对超参数的鲁棒性。实�
 
 Table 4 展示了 ScalingInter-RL 与不同 RL 算法的兼容性。在 TextCraft、BabyAI 和 SciWorld 三个基准上，将渐进式轮次扩展策略应用于 PPO 和 REINFORCE++ 均带来了显著收益，ScalingInter-7B 一致优于未使用该策略的 AgentGym-RL-7B。这表明 ScalingInter-RL 是一种**算法无关的训练策略**，而非特定于某一 RL 算法的技巧。
 
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_ZgCCDwcGwn/figures/011_Table_4.jpg]]
-*Table 4: Applying ScalingInter-RL to more algorithms*
-
 Table 2 进一步对比了不同 RL 算法的基础性能。GRPO 在 TextCraft（75.00 vs 28.00）、BabyAI 和 Deep Search 上均显著优于 REINFORCE++，这归因于 GRPO 使用多条轨迹的均值作为基线进行优势估计，有效降低了梯度方差；而 REINFORCE++ 仅在批次内进行归一化，在高方差的长周期任务中容易导致训练不稳定。
-
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_ZgCCDwcGwn/figures/008_Table_2.jpg]]
-*Table 2: Evaluation results of different RL algorithms*
 
 ### 测试时交互轮次扩展
 
@@ -274,23 +258,8 @@ Figure 5 展示了测试时交互轮次扩展的效果。所有模型在增加�
 
 Figure 8 的效率分析表明，得益于阶段化设计，ScalingInter-RL 在实现更高长期性能的同时，保持了相对较高的训练效率。早期短轮次阶段的快速迭代降低了单步训练成本，而后期长轮次阶段仅在策略已有较好基础时引入，避免了在随机策略阶段浪费大量计算资源进行深度探索。
 
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_ZgCCDwcGwn/figures/010_Figure_8.jpg]]
-*Figure 8: Analysis of computational resources and efficiency*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_ZgCCDwcGwn/figures/001_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_ZgCCDwcGwn/figures/019_Figure_12.jpg]]
-*Figure 12: Comparison of our RL agent with the base agent on the BabyAI task. Our RL model significantly outperforms the base model, successfully navigating to the blue box while the base model fails to complete the task*
-
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_ZgCCDwcGwn/figures/022_Figure_15.jpg]]
-*Figure 15: RL agent vs. Base Model on WebArena task. RL agent successfully located the trending post and completed the subscription, achieving a score of 1.0., while the base model scores 0.0*
-
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_ZgCCDwcGwn/figures/023_Figure_16.jpg]]
 *Figure 16: Trajectory visualization in the WebArena task, highlighting the agent’s path through the environment, action execution, and feedback*
-
-
 
 ## 定位与知识库关联
 
@@ -331,8 +300,6 @@ Figure 8 的效率分析表明，得益于阶段化设计，ScalingInter-RL 在�
 4. **Chem-Mix 等极端子任务的突破路径**：所有模型在此类任务上得分为零，背后缺失的具体能力是什么？是化学知识的深层推理、多步合成规划，还是对实验操作序列的精确建模？这需要从任务设计和模型能力两个维度进行诊断。
 
 5. **交互效率与任务完成度的权衡**：Figure 5 显示增加测试时交互轮次能提升性能但存在平台期，而 RL Agent 又表现出过度交互问题。如何在训练阶段引导 Agent 学习高效的动作选择，而非单纯依赖更多交互轮次，是一个值得深入的方向。
-
-
 
 ## 原文 PDF
 

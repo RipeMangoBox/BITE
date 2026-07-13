@@ -53,8 +53,6 @@ GenieDrive 提出了一种两阶段生成框架来解决上述瓶颈。其核心
 
 实验结果表明，GenieDrive 在占用预测任务上相较 SOTA 方法 I2-World 提升 **7.2% mIoU**（42.59% vs. 39.73%），同时仅使用 **3.47M 参数**，推理速度达 **41 FPS**（Table 1）。在轨迹控制视频生成中，GenieDrive 能够正确响应左/右转指令，而 Vista 和 Epona 则无法生成物理合理的转弯视频（Figure 3）。视频生成质量方面，GenieDrive 相较 UniScene 降低 **20.7% FVD**（55.93 vs. 70.52），并支持长达 20 秒的多视角一致生成（Table 4, Figure 5a）。消融实验进一步验证了端到端训练、MCA 和归一化策略的关键作用——值得注意的是，同样的端到端训练施加于 DOME 和 I2-World 时，反而导致性能崩溃或下降（Table 3, Figure 10），表明 GenieDrive 的设计并非普适技巧的简单叠加，而是架构与训练策略的系统性协同。
 
-
-
 驾驶世界模型旨在根据当前场景状态和驾驶控制信号，预测未来的驾驶场景演化。这类模型在自动驾驶的规划、仿真和数据生成中扮演着关键角色。近年来，视频生成模型的快速发展催生了一类**视频驾驶世界模型**——它们将驾驶控制信号直接映射为未来视频帧，试图以端到端的方式模拟驾驶场景的动态变化。
 
 然而，这一直接映射范式存在根本性缺陷。现有方法将驾驶控制作为扩散模型的条件信号注入，缺乏对场景物理结构和运动规律显式建模。这种黑盒映射方式使得模型极易受到训练数据分布偏差的影响，导致对特定控制指令产生物理不一致的预测。如图3所示，**Vista**和**Epona**（Zhang et al., ICCV 2025）等代表性视频驾驶世界模型在直行场景下表现尚可，但面对左转和右转指令时无法生成物理合理的转弯视频——车辆姿态、场景几何与控制信号之间出现明显脱节。
@@ -64,8 +62,6 @@ GenieDrive 提出了一种两阶段生成框架来解决上述瓶颈。其核心
 与此同时，以**OccWorld**（Zheng et al., ECCV 2024）为代表的4D占用预测方法试图从三维占用的角度建模场景演化，为物理感知的场景预测提供了新思路。但这类方法通常采用分离训练策略——先训练VAE进行占用压缩，再独立训练预测模块——导致压缩表示与预测任务之间存在语义错位，限制了预测精度的进一步提升。此外，现有占用预测方法在长时序预测中性能退化严重，难以支撑实际驾驶场景中秒级以上的未来推演。
 
 基于上述分析，本文的核心动机是：**能否将4D占用作为连接物理建模与视觉生成的桥梁，通过显式的中间物理表示克服黑盒视频生成的物理偏差？** 这一思路将驾驶世界建模分解为两个阶段——先预测物理一致的4D占用，再将其渲染为多视角视频——从而在占用预测阶段显式建模控制信号对场景演化的影响，为视频生成提供强物理先验。GenieDrive正是沿着这一方向，通过三平面VAE压缩、互控制注意力机制和端到端训练策略，构建了一个物理感知的驾驶世界模型。
-
-
 
 ## 核心方法与创新机理
 
@@ -123,8 +119,6 @@ $$Z^{\prime} = Z + \eta \left( \frac{M - \mu_M}{\sigma_M} \sigma_Z + \mu_Z \righ
 
 该设计将多视角注意力输出$M$归一化后重新缩放到主干特征$Z$的分布，通过超参数$\eta$控制多视角信息的注入强度。消融实验（Table 5）表明，移除归一化导致FVD从98.06飙升至212.67，并出现网格伪影（Figure 5b）；移除MVA则导致多视角生成不一致。
 
-
-
 GenieDrive采用**两阶段生成流水线**，将驾驶世界建模分解为4D占用预测与多视角视频生成两个阶段，以显式物理中间表示克服现有黑盒扩散模型对控制指令的物理不一致响应。
 
 ### 流水线总览
@@ -159,15 +153,11 @@ GenieDrive采用**两阶段生成流水线**，将驾驶世界建模分解为4D�
 - **输出**：6帧未来占用预测（默认1s-3s），以及81帧多视角驾驶视频（约3秒，可扩展至20秒）。
 - **推理效率**：占用预测阶段仅需3.47M参数，推理速度达41 FPS（Table 1），视频生成阶段在8张NVIDIA L40S GPU上完成微调。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2502_https_arxiv_org_abs_2512_12751/figures/001_Figure_1.jpg]]
 *Figure 1: (a) Overview of our GenieDrive. It predicts physically accurate future occupancy given the initial state and driving controls, and renders the occupancy into a video, enabling physics-aware multi-view driving video generation. (b) and (c) Performance of 4D occupancy forecasting and video generation. GenieDrive achieves the highest occupancy forecasting accuracy using the fewest parameters (bubble size denotes model size) and facilitates 8× longer multi-view driving video generation with notably enhanced generation quality*
 
 ![[assets/figures/papers/paper_list_l2502_https_arxiv_org_abs_2512_12751/figures/002_Figure_2.jpg]]
 *Figure 2: Overall framework of GenieDrive. Our GenieDrive adopts a two-stage generation pipeline that first predicts future occupancy and then generates multi-view driving videos. In the occupancy generation stage, the current occupancy is encoded using a tri-plane VAE and processed by our Mutual Control Attention (MCA). The predicted occupancy is rendered into multi-view semantic maps, which are then fed into the DiT blocks enhanced by our Normalized Multi-View Attention (MVA) module to produce the final driving videos*
-
-
 
 GenieDrive 的两阶段框架由四个关键模块串联构成：三平面 VAE（Tri-plane VAE）、互控制注意力占用预测模块（Occupancy Prediction with MCA）、占用投影渲染（Occupancy Splatting）以及归一化多视角注意力视频生成模块（Normalized MVA）。以下逐一展开其设计与核心公式。
 
@@ -231,15 +221,8 @@ $$\mathcal{L}_{video} = \mathbb{E}_{\boldsymbol{x}_0, \boldsymbol{x}_1, \mathbf{
 
 消融实验（Table 5, Figure 5b）表明：移除归一化导致 FVD 从 98.06 飙升至 212.67，并出现网格伪影；移除 MVA 则导致多视角生成不一致，同一车辆在不同视图下外观差异明显。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2502_https_arxiv_org_abs_2512_12751/figures/011_Figure_6.jpg]]
-*Figure 6: Concatenated Tri-Plane Feature. To make tri-plane representation more suitable for the following processing, we concatenate three planes to get a unified feature representation*
-
 ![[assets/figures/papers/paper_list_l2502_https_arxiv_org_abs_2512_12751/figures/020_Figure_13.jpg]]
 *Figure 13: Sim-to-Real Generation. The left side shows the BEV map of simulated driving scenes in the CARLA simulator. Our method possesses the ability to transform these simulated scenarios into realistic multi-view driving videos. The visualization results demonstrate that our method not only generates accurate ego-vehicle behaviors, such as left turns and overtaking, but also preserves important scene details, including surrounding vehicles highlighted with red boxes*
-
-
 
 ## 实验与关键发现
 
@@ -279,27 +262,8 @@ GenieDrive的主要失败模式源于端到端训练带来的重建质量下降�
 ![[assets/figures/papers/paper_list_l2502_https_arxiv_org_abs_2512_12751/figures/013_Table_6.jpg]]
 *Table 6: Reconstruction and Forecasting Performance Change in End-to-End Training. ‘R’ denotes reconstruction and ‘F’ denotes forecasting. As the number of training epochs increases, forecasting performance gradually improves, whereas reconstruction performance decreases*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2502_https_arxiv_org_abs_2512_12751/figures/003_Figure_3.jpg]]
-*Figure 3: Comparison of Trajectory-Controlled Driving Video Generation. Our method can generate physics-aware future frames for the trajectories Turn Left, Go Straight, and Turn Right. In contrast, Vista [16] and Epona [67] struggle with Turn Left and Turn Right*
-
-![[assets/figures/papers/paper_list_l2502_https_arxiv_org_abs_2512_12751/figures/005_Table_1.jpg]]
-*Table 1: Performance of 4D Occupancy forecasting. We compare our method with the most competitive methods on reconstruction, forecasting accuracy, inference speed and parameter count respectively. Our method achieves superior performance across all metrics*
-
 ![[assets/figures/papers/paper_list_l2502_https_arxiv_org_abs_2512_12751/figures/007_Table_3.jpg]]
 *Table 3: Ablation on end-to-end training, model design and representation. We also apply E2E training on other comparative methods to demonstrate not all methods benefit from E2E. ‘CR’ represents continuous representation*
-
-![[assets/figures/papers/paper_list_l2502_https_arxiv_org_abs_2512_12751/figures/008_Figure_5.jpg]]
-*Figure 5: (a) Comparison with UniScene [30]. Our method generates longer driving videos while maintaining high quality. (b) Ablation Study. Removing normalization during fine-tuning results in noticeable grid artifacts and blurry outputs, while removing the MVA leads to multi-view inconsistent generation. (c) Driving Scenario Editing. With our two-stage generation method, edits such as removal or insertion can be easily applied to the occupancy, allowing for the generation of edited driving videos*
-
-![[assets/figures/papers/paper_list_l2502_https_arxiv_org_abs_2512_12751/figures/009_Table_4.jpg]]
-*Table 4: Quantitative Comparison of Multi-view Driving Video Generation. Our GenieDrive achieves outstanding performance across various generation lengths and metrics. Vista∗ is a multiview invariant proposed in [30]*
-
-![[assets/figures/papers/paper_list_l2502_https_arxiv_org_abs_2512_12751/figures/010_Table_5.jpg]]
-*Table 5: Ablation Study on Video Generation. We removed the Multi-View Attention and normalization modules separately and re-ran the fine-tuning. Omitting these modules degraded video generation quality, especially without the normalization module*
-
-
 
 ## 定位与知识库关联
 
@@ -357,8 +321,6 @@ GenieDrive 的核心突破在于**引入4D占用作为中间物理表示**，将
 2. **占用-视频解耦的极限**：当前两阶段框架中，占用预测误差会传播到视频生成阶段。是否存在更紧耦合的方式（如可微渲染）来缓解误差累积？
 3. **物理约束的形式化**：当前“物理感知”通过占用中间表示隐式实现，是否可引入显式物理约束（如动力学方程）进一步提升长时预测的物理一致性？
 4. **跨数据集泛化**：GenieDrive 在NuScenes上的优异表现能否迁移到Waymo、KITTI等其他自动驾驶数据集，尚待验证。
-
-
 
 ## 原文 PDF
 

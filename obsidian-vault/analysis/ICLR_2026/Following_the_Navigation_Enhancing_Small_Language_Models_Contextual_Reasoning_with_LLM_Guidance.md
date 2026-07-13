@@ -53,8 +53,6 @@ claims:
 
 总体而言，Navigation 以极低的模板存储开销和零训练成本，为小模型在复杂上下文推理任务中提供了一条高效、可泛化且持续自适应的增强路径。
 
-
-
 ### 小语言模型在上下文推理中的瓶颈
 
 小语言模型（SLM）因参数容量有限和灾难性遗忘问题，在复杂、信息密集的上下文中容易“迷失”。具体而言，当面对需要从长文本中定位、筛选并整合多个关键信息片段以完成多步推理的任务时，SLM往往难以区分相关信息与无关噪声，导致推理链断裂或错误累积。这一瓶颈在物品放置追踪、谋杀谜案推理、多跳问答等需要精确上下文导航的场景中尤为突出。
@@ -82,8 +80,6 @@ claims:
 1. **低成本**：将LLM的调用频率降至最低，仅在模板生成与更新阶段使用，而非每次推理都依赖LLM。
 2. **可泛化**：模板是任务级别的抽象指导，而非实例级别的具体答案，可跨同类问题复用。
 3. **可扩展**：模板数据库随新任务动态增长，形成持续积累的知识库，使SLM的能力边界随使用而扩展。
-
-
 
 ## 核心方法与创新机理
 
@@ -131,8 +127,6 @@ Navigation的创新不仅体现在性能提升上，更体现在效率优势：
 
 消融实验进一步验证了各模块的必要性：移除导航生成环节使Llama-3.2-3B在MuSR OP上的准确率从52.7骤降至43.4（回归Vanilla水平）；移除导航更新环节使StrategyQA的F1分数从60.8降至44.7（Table 11）。这表明模板的结构化指导和动态更新机制是性能增益的不可或缺因素。
 
-
-
 ![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_R8A12kykPG/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the Navigation framework*
 
@@ -176,8 +170,6 @@ $$j = \arg \max_i \mathrm{Sim}(f(x_d), f(D_{T_i}))$$
 
 附录 B 从信息论角度分析了导航知识库对模型记忆需求的降低效果。无外部知识库时，模型所需记忆量下界为 $\Omega(nd)$；引入导航知识库后，下界降至 $O(n \log_2 (N + R))$，从理论上解释了为何 SLM 能借助轻量模板显著克服容量限制。
 
-
-
 Navigation框架围绕一个核心洞察构建：大语言模型（LLM）在上下文推理中展现出的关键信息识别与抽象能力，可以被蒸馏为结构化的导航模板，从而在不重新训练的情况下，为小语言模型（SLM）提供“按图索骥”的推理指引。整个框架由三个核心模块构成，形成生成—使用—更新的闭环。
 
 ### 导航生成模块 (Navigation Generation Module)
@@ -218,14 +210,11 @@ $$I(X; A(X) \mid P) = O(n \log_2 (N + R))$$
 
 其中 $N$ 为模板数量，$R$ 为模板库的覆盖半径。这一理论结果表明，导航模板通过将上下文处理策略外化，显著降低了对SLM自身容量的要求，从数学上解释了框架为何能够使3B参数的模型在复杂推理任务上超越175B的GPT-3.5-Turbo。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能提升
 
 Navigation框架在三个上下文推理基准（MuSR、StrategyQA、HotpotQA）上对多种小语言模型（SLM）骨干网实现了一致且显著的提升。Table 1汇总了主要结果：
-
 
 ![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_R8A12kykPG/figures/002_Table_1.jpg]]
 *Table 1: Main results on contextual reasoning benchmarks, including the Object Placements (OP), Murder Mystery (MM), and Team Allocation (TA) domains from the MuSR (Sprague et al., 2023) dataset, as well as the StrategyQA (Geva et al., 2021) and HotpotQA (Yang et al., 2018) datasets. △ denotes the margin between Vanilla and Navigation. “EM” indicates the exact match of HotpotQA. Navigation (DS-R1) and Navigation (GPT-5.1) denote Navigation templates generated via DeepSeek-R1 and GPT-5.1, respectively. We bold the best results for each SLM backbone and underline the second-best results*
@@ -240,7 +229,6 @@ Navigation框架在三个上下文推理基准（MuSR、StrategyQA、HotpotQA）
 
 Navigation在性能提升的同时保持了较低的推理成本。Table 2对比了各方法在MuSR数据集上使用Llama-3.2-3B-Instruct的成本：
 
-
 ![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_R8A12kykPG/figures/003_Table_2.jpg]]
 *Table 2: Cost statistics on the MuSR (Sprague et al., 2023) dataset, employing Llama-3.2-3B-Instruct (Dubey et al., 2024) as the SLM*
 
@@ -253,7 +241,6 @@ Table 3展示了不同数据集上的模板效率。模板数量仅占数据集�
 ### 消融实验
 
 消融实验（Table 4和Table 11）揭示了Navigation各模块的关键贡献：
-
 
 ![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_R8A12kykPG/figures/009_Table_4.jpg]]
 *Table 4: Ablation results on three types of contextual reasoning benchmarks, using Qwen2.5-3B-Instruct (Yang et al., 2024a) as the backbone model. We bold the best results for each benchmark*
@@ -274,13 +261,8 @@ Table 3展示了不同数据集上的模板效率。模板数量仅占数据集�
 
 此外，SLM在遵循模板时仍可能产生幻觉或忽略部分关键信息。虽然整体推理质量有显著改善，但并非完全可靠，这在小容量模型的固有局限范围内是可预期的。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_R8A12kykPG/figures/015_Table_9.jpg]]
 *Table 9: Performance comparison of SLMs using Navigation templates compared with LoRA and full-parameter SFT baselines. Best results per backbone are bolded*
-
-
-
 
 ## 定位与知识库关联
 
@@ -331,8 +313,6 @@ Navigation 框架为以下研究方向提供了基础：
 - **多模态与开放交互场景的推广**：导航框架能否扩展到多模态上下文或更开放的对话式交互场景？
 - **模板质量评估与自动净化**：应建立何种机制来自动评估模板质量并过滤噪声或低质量模板，减少其对SLM推理的负面影响？
 - **与轻量级训练的融合**：能否将导航模板与SLM的轻量级训练（如提示调优）相结合，进一步挖掘小模型的推理潜力？
-
-
 
 ## 原文 PDF
 

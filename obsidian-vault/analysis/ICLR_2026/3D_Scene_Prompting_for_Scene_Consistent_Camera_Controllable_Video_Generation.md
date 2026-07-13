@@ -51,8 +51,6 @@ claims:
 
 决定性证据来自定量评估：在RealEstate10K和DynPose-100K数据集上，3DScenePrompt在空间一致性（PSNR、SSIM、LPIPS）和几何一致性（MEt3R）指标上均显著优于主要基线DFoT。其中，在RealEstate10K上MEt3R评估误差降低了77%（0.041 vs 0.181）。消融实验进一步验证了核心设计：不使用动态掩码时PSNR下降约0.8dB，MEt3R误差增加；不使用空间投影（n=0）时场景一致性和相机控制精度显著下降。在DynPose-100K上，该方法在相机控制精度（mRotErr、mTransErr、mCamMC）和视频质量（FVD、VBench++）方面均达到最优。
 
-
-
 现有的相机可控视频生成方法（如CameraCtrl, MotionCtrl, FloVD, VD3D）通常仅以单张图像或文本作为条件，生成遵循指定相机轨迹的视频。这类方法在面对需要与长输入视频保持场景一致性的任务时，暴露出根本性缺陷：由于缺乏对完整场景几何结构的理解，生成的视频在相机回访早期视角或探索邻近区域时，内容与输入视频的场景几何严重不一致。
 
 更近期的视频到未来视频生成方法（如DFoT）通过时间滑动窗口机制，利用输入视频的最后几帧来保证时间连贯性（即V_out = G(V_in[L-w:L], T)）。然而，这种仅依赖时间邻域条件化的策略存在一个关键瓶颈：当相机轨迹需要回访输入视频中较早出现的视角时，最后几帧中不包含该视角的几何信息，导致生成帧无法维持与输入视频的空间一致性。这种“空间记忆缺失”是现有方法在长程场景一致生成中的核心障碍。
@@ -60,8 +58,6 @@ claims:
 本文的动机正是为了解决这一缺口。核心洞察在于：视频中的邻域关系不仅是时间上的，也是空间上的。当相机回访相似视角时，生成帧可能与输入序列中很早的帧在空间上相邻。基于此，作者提出双时空条件化策略，在标准的时间邻域条件化之外，增加基于3D场景记忆的空间邻域条件化。该记忆仅保留从完整输入视频中提取的静态几何结构，通过动态SLAM（MegaSAM / DepthAnything v3）和精心设计的三阶段动态掩码流水线（光流差异检测 → 反向点跟踪聚合 → SAM2传播生成物体级掩码），识别并排除了动态区域，从而构建纯净的静态3D点云。对于每个目标相机姿态C_t，通过投影该静态点云生成空间提示帧，与时间邻域帧共同作为视频扩散模型（CogVideoX-I2V-5B）的条件输入。整个过程无需修改模型架构，通过零填充槽注入条件化信息。
 
 这一设计的关键因果机制在于：空间提示帧提供了与目标视角几何对齐的静态场景信息，迫使生成过程在结构上锚定于输入视频的场景几何；而时间邻域帧则负责保证动态区域的运动连贯性，允许其自然演化。两者的协同作用使得模型能够在不增加计算负担的情况下，实现长程空间一致性。
-
-
 
 ## 核心方法与创新机理
 
@@ -89,8 +85,6 @@ claims:
 
 **证据强度**：Table 1-3 的定量结果置信度均为 1.0，消融实验置信度 0.95-1.0。唯一需要谨慎的是“无需架构修改”这一主张（置信度 0.95），因为虽然论文声称通过零填充槽注入，但具体实现细节（如如何处理不同数量的条件帧）仍需验证。
 
-
-
 ![[assets/figures/papers/iclr26_0001_3XxoBwMusJ_3D_Scene_Prompting_for_Scene-Consistent_Camera-C/figures/001_Figure_1.jpg]]
 *Figure 1: Teaser. Our framework generates the next video chunk that follows a user-specified camera trajectory while maintaining scene consistency. Our dual spatio-temporal conditioning jointly leverages the last few frames to ensure temporal continuity and the rendered point cloud to enforce spatial consistency*
 
@@ -116,8 +110,6 @@ claims:
 **关键设计选择**：时间窗口大小 w=9 是平衡运动连贯性与计算效率的折中（Table 7 消融验证）；空间投影数量 n=7 时性能趋于稳定（Table 8 消融验证）。动态掩码的存在至关重要——消融实验（Table 6）显示，不使用动态掩码时 PSNR 下降约 0.8dB，MEt3R 误差显著增加，因为动态物体会在点云中产生“鬼影”伪影（Figure 4）。
 
 **与其他方法的本质区别**：相比 DFoT 仅使用时间邻域（Equation 3），3DScenePrompt 通过 3D 场景记忆实现了空间邻域的条件化，使得生成帧在回访视角时能与输入视频中任意早的帧保持几何一致。相比 ReCamMaster 等长程方法，本框架不局限于输入视频的时空覆盖范围，而是通过显式静态几何记忆实现更灵活的空间推理。相比 SPMem 等并发工作，本框架采用不同的动态物体处理策略（三阶段流水线 vs. 朴素 TSDF）和条件化架构（零填充注入 vs. 额外适配器）。
-
-
 
 本节梳理 3DScenePrompt 的核心设计模块及其数学形式化表达，重点阐明“双时空条件化”如何通过静态 3D 场景记忆解决长程空间一致性问题。
 
@@ -227,8 +219,6 @@ $$
 
 该公式体系的核心因果链条为：**动态掩码 → 静态点云 → 3D 场景记忆 → 空间提示投影 → 双时空条件化 → 场景一致生成**。每个环节的失败（如动态掩码质量差）都会导致下游几何一致性的退化，这解释了为什么消融实验中移除动态掩码会导致 PSNR 和 MEt3R 显著下降。
 
-
-
 ## 实验与关键发现
 
 ### 主要结果
@@ -263,15 +253,11 @@ $$
 
 **动态掩码的失败边界。** 动态掩码质量直接影响生成保真度。当动态物体与背景纹理相似、运动幅度极小或遮挡严重时，三阶段流水线可能无法生成完整的物体级掩码，导致静态点云中残留动态伪影。论文未报告此类失败案例的分布频率，该点需要手动验证。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0001_3XxoBwMusJ_3D_Scene_Prompting_for_Scene-Consistent_Camera-C/figures/006_Table_1.jpg]]
 *Table 1: Evaluation of spatial and geometric consistency. We compare DFoT and our framework on the RealEstate10K (Zhou et al., 2018) and DynPose-100K (Rockwell et al., 2025) datasets. For spatial consistency, we evaluate PSNR, SSIM, and LPIPS on revisited camera trajectories, while for geometric consistency, we report the MEt3R (Asim et al., 2025) metric*
 
 ![[assets/figures/papers/iclr26_0001_3XxoBwMusJ_3D_Scene_Prompting_for_Scene-Consistent_Camera-C/figures/009_Table_3.jpg]]
 *Table 3: Evaluation of video generation quality. We assess the quality of generated videos using FVD and VBench++ scores. For FVD, lower values indicate higher video quality. For VBench++ scores, higher values indicate better performance. All VBench++ scores are normalized*
-
-
 
 ## 定位与知识库关联
 
@@ -292,8 +278,6 @@ $$
 论文明确承认了几个关键局限。最突出的是长期漂移（误差累积）问题：在极长视频生成中，空间条件化虽然缓解了时间窗口的视野限制，但 3D 场景记忆本身是静态快照，无法捕捉场景的长期变化（如光照、季节、物体位移），这可能导致生成内容与输入视频的视觉风格逐渐偏离。此外，与 SPMem 的直接比较因代码未公开而无法进行，这削弱了方法在竞争格局中的定位清晰度。
 
 从开放问题来看，最紧迫的是如何设计专用细化模块来处理时间误差累积，而不是依赖纯数据驱动的扩散模型去隐式补偿。其次，动态掩码质量对生成保真度的具体影响程度尚未被系统量化——现有消融实验仅给出了有无掩码的对比，但不同动态场景复杂度下的性能边界未知。第三，能否将当前组件（如 SLAM 模块、掩码策略）替换为更先进的模型以进一步提升性能？论文已初步探索了将 MegaSAM 替换为 DepthAnything v3 的效果（Table 9），但这只是单一维度替换，更系统的组件级搜索可能带来更大收益。最后，3DScenePrompt 的架构设计（零填充槽注入条件化）使其无需修改模型架构，这一特性是否意味着它可以作为通用插件集成到其他视频扩散模型中，是一个值得探索的方向。
-
-
 
 ## 原文 PDF
 

@@ -56,8 +56,6 @@ claims:
 
 实验结果表明，LINVIDEO 在 Wan 1.3B 和 14B 模型上分别实现了 **1.43×** 和 **1.71×** 的推理加速，同时在 VBench 基准上的所有质量指标均匹配甚至超越了 FlashAttention2 基线。进一步结合少步蒸馏技术，4 步模型可实现高达 **15.9×** 的极速推理，仅伴随微小的视觉质量下降。消融研究证实，选择性转移策略显著优于手动选择或启发式搜索，而 ADM 损失在性能和训练效率上均明显优于 MSE 和 DMD 损失。
 
-
-
 ### 视频扩散模型的注意力瓶颈
 
 视频扩散模型（Video Diffusion Models, VDMs）已成为文本到视频生成领域的主导范式。与图像生成不同，视频生成需要同时建模空间细节和时间动态，这通常通过将视频潜在表示展平为长序列，并施加全序列自注意力（full-sequence self-attention）来实现。然而，标准 softmax 注意力的计算复杂度随序列长度 $n$ 呈二次增长，即 $\mathcal{O}(n^2)$。对于高分辨率、长时视频，$n$ 可达数万甚至数十万，导致单次推理的注意力计算开销占据主导地位，严重制约了实际部署效率。
@@ -87,8 +85,6 @@ claims:
 1. **选择性转移（Selective Transfer）**：将层选择建模为二分类问题，为每个注意力层引入可学习参数 $r \in [0,1]$，通过混合注意力和约束/正则化损失，自动、渐进地将指定数量的 softmax 注意力层替换为线性注意力，最小化性能损失。
 
 2. **任意时刻分布匹配（Anytime Distribution Matching, ADM）**：在采样轨迹上跨任意时刻 $t$ 匹配训练模型与原始模型的样本分布，利用当前模型自身的评分函数估计，无需额外多步扩散模型，实现高效且有效的分布对齐。
-
-
 
 ## 核心方法与创新机理
 
@@ -144,8 +140,6 @@ ADM 的核心优势在于：（1）无需额外多步扩散模型来估计评分
 - ADM 目标的推导依赖整流流模型假设，对其他扩散框架（如 DDPM）的适用性尚未验证。
 - 线性注意力加速目前基于 PyTorch 通用实现，相比专用 CUDA kernel 仍有优化空间。
 
-
-
 LINVIDEO 是一个**无数据后训练框架**，其核心目标是在不访问原始训练数据的前提下，将预训练视频扩散模型中尽可能多的二次复杂度自注意力模块替换为线性注意力，从而在保持生成质量的同时实现推理加速。整个 pipeline 由三个关键阶段构成：**数据准备**、**选择性转移**与**Anytime Distribution Matching (ADM) 训练**，最后可选的**加速蒸馏**进一步压缩采样步数。
 
 ### 数据准备：无数据微调的基石
@@ -188,12 +182,8 @@ LINVIDEO 是一个**无数据后训练框架**，其核心目标是在不访问�
 
 整个框架在 Wan 1.3B 上实现 1.43× 加速，在 Wan 14B 上实现 1.71× 加速，且 VBench 质量指标与 FlashAttention2 密集注意力基线持平或略有提升（Table 1），验证了该 pipeline 在质量-效率权衡上的有效性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l895_https_arxiv_org_abs_2510_08318/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the proposed efficient data-free post-training framework, LINVIDEO. (a) This framework first applies selective transfer (Sec. 4.1), which assigns each layer a learnable score r and progressively, automatically replaces quadratic attention with linear attention while minimizing the resulting performance drop. This process also combines with*
-
-
 
 ### 问题形式化与注意力瓶颈
 
@@ -208,9 +198,6 @@ $$ \mathbf{x}_t = \alpha_t \mathbf{x}_0 + \sigma_t \mathbf{\epsilon} \tag{1} $$
 $$ \pmb{o}_i = \sum_{j=1}^{n} \frac{\mathrm{sim}(\pmb{q}_i, \pmb{k}_j)}{\sum_{j=1}^{n} \mathrm{sim}(\pmb{q}_i, \pmb{k}_j)} \pmb{v}_j \tag{4} $$
 
 其中相似度函数 $\mathrm{sim}(\pmb{q}_i, \pmb{k}_j) = \exp(\pmb{q}_i \pmb{k}_j^\top / \sqrt{d})$。直接以线性注意力替代全部二次注意力会导致表示能力差距与时空建模复杂性带来的严重质量退化，且数据驱动的后训练微调难以恢复性能（见 Figure 2 层敏感性证据）。
-
-![[assets/figures/papers/paper_list_l895_https_arxiv_org_abs_2510_08318/figures/002_Figure_2.jpg]]
-*Figure 2: Performance on 4 VBench [21] dimensions for partial linearized (10 adjacent layers for each dot) Wan 1.3B [49] after 2K-step fine-tuning. The index range of the layers replaced with linear attention is indicated in the tick label of the x-axis. “*” denotes models further fine-tuned for 3K additional steps*
 
 ### 线性注意力与 Hedgehog 核
 
@@ -246,9 +233,6 @@ $$ \mathcal{L}_{\mathrm{reg}} = \sum_{l=1}^{N} \big( 1 - |2 r^{(l)} - 1|^{\alpha
 
 参数 $\alpha$ 采用动态衰减策略（20 → 2）：训练初期较大的 $\alpha$ 允许 $r$ 灵活探索，后期较小的 $\alpha$ 强制 $r$ 向两端收敛。消融实验表明，移除 $\mathcal{L}_{\mathrm{reg}}$ 会导致 $r$ 大量停留在 0.5 附近（Figure 3），性能崩溃至 Overall Consistency 仅 1.42。
 
-![[assets/figures/papers/paper_list_l895_https_arxiv_org_abs_2510_08318/figures/003_Figure_3.jpg]]
-*Figure 3: Values of r across layers and training steps. “w/*
-
 ### Anytime Distribution Matching（ADM）
 
 常规后训练方法仅匹配模型最终输出（如 MSE 损失），忽略了采样轨迹中间时刻的分布偏移。ADM 目标匹配训练模型 $p_t$ 与原始模型 $q_t$ 在任意时刻 $t \in [0, 1]$ 的样本分布，最小化 KL 散度：
@@ -278,13 +262,6 @@ $$ \mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{ADM}} + \lambda \big( \ma
 1. **数据收集**：从预训练视频 DM 的采样轨迹中收集大量 $(\mathbf{x}_t, \mathbf{u}_t)$ 对。
 2. **选择性转移训练**：在 ADM 损失、约束损失和正则化损失的联合指导下，学习每层的 $r^{(l)}$ 和模型参数，自动且渐进地将 target 个 softmax 注意力层替换为线性注意力。
 3. **可选加速蒸馏**：在 LINVIDEO 微调后，可进一步应用 DMD2 少步蒸馏获得 4 步极速模型。消融实验证实两阶段策略（先 LINVIDEO 再 DMD2）稳定有效，而单阶段直接结合会导致性能崩溃。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l895_https_arxiv_org_abs_2510_08318/figures/011_Figure.jpg]]
-*Figure: I. Effect of α on 1 - | 2 $r ^ { ( l ) }$ - 1 | ^ ${ \alpha }$ of Eq. (10)*
-
-
 
 ## 实验与关键发现
 
@@ -355,11 +332,6 @@ $$ \mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{ADM}} + \lambda \big( \ma
 ![[assets/figures/papers/paper_list_l895_https_arxiv_org_abs_2510_08318/figures/007_Table_2.jpg]]
 *Table 2: Ablation results across different values of target*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l895_https_arxiv_org_abs_2510_08318/figures/004_Table_1.jpg]]
-*Table 1: Performance comparison with relevant baselines on 8 dimensions of VBench [21]. “+DMD2” denotes our 4-step distilled LINVIDEO model. We highlight the best score and the second score in bold and underlined formats, respectively. More results can be found in Sec. H and Sec. K*
-
 ![[assets/figures/papers/paper_list_l895_https_arxiv_org_abs_2510_08318/figures/010_Table_3.jpg]]
 *Table 3: Ablation results of selective transfer. For LINVIDEO*
 
@@ -368,14 +340,6 @@ $$ \mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{ADM}} + \lambda \big( \ma
 
 ![[assets/figures/papers/paper_list_l895_https_arxiv_org_abs_2510_08318/figures/009_Figure_6.jpg]]
 *Figure 6: Training hours across different objectives. Settings are the same as those in Tab. 4. FLOPs comparison can be found in Tab. IV*
-
-![[assets/figures/papers/paper_list_l895_https_arxiv_org_abs_2510_08318/figures/012_Table.jpg]]
-*Table: I. Ablation results of α. Our LINVIDEO employs 20 → 2 as the range of α*
-
-![[assets/figures/papers/paper_list_l895_https_arxiv_org_abs_2510_08318/figures/013_Table.jpg]]
-*Table: II. Performance for the few-step distilled linear attention Wan 1.3B. $\mathrm { ^ { * } L I N V I D E O } + \mathrm { D M D 2 ^ { , * } }$ denotes that we first employ LINVIDEO to obatin a linear attention DM and then use DMD2 to distill is to the 4-step version. $\mathrm { \mathrm { } ^ { 4 } }$ S $T + \mathrm { D M D }$ 2 $\mathrm { \mathrm { } ^ { 3 } }$ implies that we combine our selective transfer and DMD2 to obtain the 4-step linear attention model in a single training stage. Table III. Comparison on Wan 1.3B (all meth- Table IV. Training ods use 4-step DMD2). Due to resource lim- FLOPs (3K steps). its, we will add more results in the future. Method FLOPs↓*
-
-
 
 ## 定位与知识库关联
 
@@ -457,8 +421,6 @@ $$s_t(\hat{\mathbf{x}}_t) - \hat{s}_t(\hat{\mathbf{x}}_t) = -\frac{1-t}{t} \left
 3. **跨模态泛化**：该方法能否推广到其他模态的扩散模型（如 3D 生成、音频生成、图像生成）？ADM 目标在非整流流框架下的适配方案是什么？
 4. **可学习核函数**：是否可以针对视频数据的时空特性，端到端地学习线性注意力的核函数，以进一步缩小与 softmax 注意力的表示能力差距？
 5. **与少步蒸馏的深度融合**：当前两阶段策略（先 LINVIDEO 再 DMD2）虽稳定有效，但单阶段结合会导致性能崩溃（**Table II**），是否存在更优雅的联合训练方案？
-
-
 
 ## 原文 PDF
 

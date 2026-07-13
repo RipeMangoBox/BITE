@@ -51,8 +51,6 @@ claims:
 
 **主要结果**：在 HDTF 测试集上，ActAvatar 取得 FID 23.471 和 Sync-D 7.545，均优于对比方法。在专门构建的 Action Bench 上，Hit@Segment 达到 0.854，Sync-C 达到 6.893，全面领先。消融实验证实，移除 PACA 后 Hit@Segment 骤降至 0.725，验证了时间-语义对齐的核心作用；移除渐进音频对齐后 Sync-C 降至 6.390，证明了深度感知缩放对唇同步的关键贡献。用户研究进一步确认了该方法在动作质量和时间正确性上的显著优势。
 
-
-
 ### 问题背景
 
 说话头像（Talking Avatar）生成旨在根据音频输入驱动静态肖像产生自然的面部运动与唇形同步。近年来，基于扩散模型（Diffusion Models）的方法在此任务上取得了显著进展，能够生成高质量、唇形准确的说话视频。然而，现有方法普遍存在一个根本性瓶颈：**缺乏对动作执行时机的精确控制**。具体而言，它们能够生成“说话”这一行为，却无法精确控制“何时做出何种动作”——例如在说出特定词语时挥手、在停顿间隙点头、或在情绪转折处改变身体姿态。
@@ -78,8 +76,6 @@ claims:
 - **能力保留**：如何在注入动作控制能力的同时，不破坏预训练模型的原有能力？
 
 ActAvatar 通过三个协同设计的模块来回应这些挑战：**Phase-Aware Cross-Attention（PACA）** 实现层次化提示分解与时间-语义绑定，**Progressive Audio-Visual Alignment** 通过深度感知缩放解耦文本与音频的作用阶段，**两阶段训练策略** 解耦音频适配器学习与动作控制注入。这三者共同构成了从提示结构、模态融合到训练范式的完整技术链路。
-
-
 
 ## 核心方法与创新机理
 
@@ -126,8 +122,6 @@ $$
 ### 三个 changed slots 的协同效应
 
 上述三个 changed slots 并非孤立改进，而是形成闭环协同：PACA 提供时间-语义绑定，渐进对齐解耦文本与音频的作用阶段，两阶段训练保留基础能力的同时注入动作控制。消融实验（Table 4）量化了这一协同效应——移除 PACA 后 Hit@Segment 从 0.854 降至 0.725，移除渐进音频对齐后 Sync-C 从 6.893 降至 6.390，而完整的 ActAvatar 在所有指标上达到最优。
-
-
 
 ActAvatar 的整体流程围绕一个核心矛盾展开：**文本驱动的动作生成**与**音频驱动的唇形同步**在共享的潜在空间中存在模态冲突。为解决这一问题，ActAvatar 构建了一条从结构化提示输入到时间对齐视频输出的三阶段流水线，通过层次化提示分解、渐进式多模态融合与两阶段训练策略协同工作。
 
@@ -184,8 +178,6 @@ $$\mathcal{L}_{\text{stage2}} = \mathbb{E}_{\mathbf{x}_0, t, \mathbf{x}_1} \left
 
 从输入到输出的完整数据流为：参考图像与结构化提示经 PACA 编码后注入扩散 Transformer 骨干网络，音频信号经 Wav2Vec 2.0 提取特征后通过音频适配器映射为帧对齐令牌，在每一层 Transformer 中按渐进缩放函数 $f(\ell)$ 加权注入。最终通过流匹配路径 $\mathbf{x}_t = (1 - t) \mathbf{x}_0 + t \mathbf{x}_1$ 从噪声逐步生成时间对齐的说话化身视频。
 
-
-
 ActAvatar 的核心架构围绕三个协同模块展开：**Phase‑Aware Cross‑Attention (PACA)** 实现时间‑语义对齐，**Progressive Audio‑Visual Alignment** 消除文本驱动动作与音频驱动唇形同步之间的模态干扰，以及**两阶段训练策略**解耦能力注入过程。
 
 ### 3.1 层次化提示分解
@@ -213,9 +205,6 @@ $$
 $$
 
 相位位置嵌入的作用在于引导注意力权重在正确的时间窗口内集中到对应相位的令牌上。消融实验中的交叉注意力可视化（Figure 4）证实了这一机制：浅层（Layer 5）的相位聚焦尚不明确，而深层（Layer 20）呈现出锐利的相位分离，表明模型在深层学会了精确的时间‑语义对齐。
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2512_19546/figures/006_Figure_4.jpg]]
-*Figure 4: Cross-attention phase focus at layer 5 (top) and layer 20 (bottom). Deeper layers show sharper phase separation*
 
 ### 3.3 渐进式音频‑视觉对齐
 
@@ -247,12 +236,8 @@ $$
 
 两阶段设计的关键在于：阶段一在冻结骨干的前提下建立音频‑视觉对齐，保留了预训练模型的文本跟随能力；阶段二在此基础上注入时间动作控制，避免了直接联合训练导致的模态干扰与能力退化。消融实验（Table 4）证实，完整的二阶段训练在所有指标上均优于单阶段或微调变体。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2512_19546/figures/007_Figure_5.jpg]]
 *Figure 5: Ablation study on PACA. Top: Without PACA, the avatar remains static throughout the sequence. Bottom: With PACA, the avatar naturally walks forward*
-
-
 
 ## 实验与关键发现
 
@@ -297,13 +282,6 @@ Figure 4 展示了交叉注意力在不同层深度的相位聚焦模式。浅�
 ### 定性对比
 
 Figure 3 的定性对比展示了 ActAvatar 与现有方法在 Action Bench 样本上的差异。在包含两个不同动作相位的结构化提示下，ActAvatar 准确执行了每个相位指定的动作并保持正确的时间顺序，手部姿态清晰可辨；而对比方法普遍存在时间错位、动作模糊或手部变形等问题，进一步验证了时间感知动作控制的实际效果。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2512_19546/figures/001_Figure_1.jpg]]
-*Figure 1: ActAvatar generates talking avatars with precise, temporally-aligned actions across diverse scenarios and identities. Through structured text prompts, our method controls what actions to perform and when to perform them, while maintaining accurate lip synchronization with the audio*
-
-
 
 ## 定位与知识库关联
 
@@ -351,8 +329,6 @@ ActAvatar 的设计隐含以下适用边界：
 2. **相位数量的自适应确定**：当前方法预设相位数量 $K$，但不同场景的最优 $K$ 可能不同。动态相位划分（如基于音频语义转折点）可能进一步提升灵活性。
 3. **与端到端音频-动作联合建模的对比**：ActAvatar 将动作控制完全交由文本提示，未探索直接从音频中预测动作时序的可能性。与端到端方法（如从语音中预测手势序列）的对比将有助于明确文本驱动的独特优势。
 4. **跨模态时序一致性度量**：论文提出的 Hit@Segment 等指标依赖于 Gemini 的自动评估，其可靠性需要更大规模的人类评估验证。建立标准化的时序动作控制基准将推动该方向的公平比较。
-
-
 
 ## 原文 PDF
 

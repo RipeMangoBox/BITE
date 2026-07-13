@@ -143,11 +143,6 @@ $$\operatorname*{min}_{\mathcal{P}_{xy} \geq 0} \frac{1}{2} \| K_{\sigma} * \mat
 
 > **需要手动验证**：论文未明确说明潜扩散模型的具体去噪步数、DiT 的层数/头数配置，以及 AE 的具体架构来源。这些细节对复现工作至关重要，建议查阅论文附录或代码仓库（https://radargen.github.io/）确认。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l72_https_arxiv_org_abs_2512_17897/figures/001_Figure_1.jpg]]
-*Figure 1: Controllable radar synthesis from vision. (Top) Given multi-view camera images, RadarGen generates realistic radar point clouds that align with real-world radar statistics and can be consumed by downstream perception models. (Bottom) The generation is semantically consistent: modifying the input scene with an off-the-shelf image editing tool (e.g., replacing a distant car with a closer truck) updates the radar response, removing returns from newly occluded regions and reflecting the new object geometry*
-
 RadarGen 的核心设计围绕一个关键矛盾展开：雷达点云本质上是稀疏、非均匀采样的点集，而现代扩散模型擅长生成结构化的密集图像。为解决这一矛盾，RadarGen 将整个生成流程分解为四个紧密协作的模块。
 
 ### 雷达 BEV 图像化
@@ -191,8 +186,6 @@ $$\operatorname*{min}_{\mathcal{P}_{xy} \geq 0} \frac{1}{2} \| K_{\sigma} * \mat
 其中第一项为数据保真度（要求卷积结果逼近生成的密度图），第二项为 L1 稀疏正则项（鼓励点云稀疏性），非负约束 $\mathcal{P}_{xy} \geq 0$ 保证物理合理性。该 LASSO 问题通过迭代重加权 L1（IRL1）结合 FISTA 算法求解。恢复出稀疏点位置后，从生成的 RCS 图和多普勒图中回采对应位置的属性值，最终输出完整的雷达点云。
 
 消融实验（Table 2）证实，反卷积恢复方法在空间覆盖和点云密度上均优于随机采样和峰值选择，验证了基于已知模糊核的正则化反演在稀疏点云重建中的优势。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l72_https_arxiv_org_abs_2512_17897/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of representing radar as images (Sec. 4.1). Constructing radar maps from a radar point cloud requires first rasterizing each point to BEV. The point locations are then convolved with a Gaussian kernel*
@@ -241,25 +234,11 @@ $$\operatorname*{min}_{\mathcal{P}_{xy} \geq 0} \frac{1}{2} \| K_{\sigma} * \mat
 
 **Figure 12** 揭示了 RadarGen 在低光夜间场景下的典型失败模式：底层基础模型难以准确识别车辆并估计速度，导致生成的雷达点云出现不合理的空间分布和属性值。模型未在低光/夜间数据上训练，在这些视觉条件下可能产生不符合物理规律的雷达模式。此外，在未观测或被遮挡区域，模型可能产生“幻觉”雷达点，尽管图像编辑实验（Figure 5）显示模型能部分处理遮挡关系。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l72_https_arxiv_org_abs_2512_17897/figures/004_Table_1.jpg]]
-*Table 1: Quantitavie evaluation. RadarGen broadly outperforms the baseline on geometric fidelity (CD, IoU, Density Similarity, Hit Rate), radar attribute fidelity (DA Recall, Precision, F1), and distribution similarity (MMD)*
-
 ![[assets/figures/papers/paper_list_l72_https_arxiv_org_abs_2512_17897/figures/007_Table_2.jpg]]
 *Table 2: Ablation Study. We demonstrate the importance of each RadarGen condition and compare against a model conditioned directly on multi-view (MV) camera images. Evaluation covers geometric fidelity (CD, IoU, Density Similarity, Hit Rate), radar attribute fidelity (DA Recall, Precision, F1), and distribution similarity (MMD)*
 
 ![[assets/figures/papers/paper_list_l72_https_arxiv_org_abs_2512_17897/figures/009_Table_3.jpg]]
 *Table 3: Detection metrics comparison. Evaluation of a trained detector on GT versus generated samples from RadarGen and Baseline*
-
-![[assets/figures/papers/paper_list_l72_https_arxiv_org_abs_2512_17897/figures/005_Figure_4.jpg]]
-*Figure 4: Qualitative results. Our model generates point clouds with higher geometric and attribute fidelity to the ground truth compared to the baseline. RadarGen uses inputs t and t + ∆t, while the baseline uses only t. Ground truth bounding boxes are highlighted in color*
-
-![[assets/figures/papers/paper_list_l72_https_arxiv_org_abs_2512_17897/figures/015_Figure_12.jpg]]
-*Figure 12: Qualitative analysis of limitations. Visual comparison of RadarGen against the ground truth radar in a low-light night scene. In this setting, the underlying foundation models struggle to accurately recognize vehicles and estimate velocities. RadarGen was not trained on such scenarios. Ground truth bounding boxes are highlighted in color*
-
-![[assets/figures/papers/paper_list_l72_https_arxiv_org_abs_2512_17897/figures/006_Figure_5.jpg]]
-*Figure 5: Scene editing. Modifying the input images using an offthe-shelf image editing tool updates the radar response, demonstrating object removal (left) and insertion (right)*
 
 ## 定位与知识库关联
 

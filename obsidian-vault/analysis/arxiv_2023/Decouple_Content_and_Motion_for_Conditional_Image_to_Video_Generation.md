@@ -59,8 +59,6 @@ claims:
 
 该方法属于**视频扩散模型的表示空间优化**路线，与光流引导生成（如LFDM）和潜空间压缩（如LDM、LVDM）形成互补。其核心贡献在于将视频压缩的工程智慧系统性地融入扩散生成框架，以可逆的运动表示替代不可逆的像素生成，为高效时序建模提供了新范式。
 
-
-
 ### 视频生成的核心瓶颈：时序冗余与运动一致性
 
 条件图像到视频生成（给定首帧图像，预测后续帧序列）在计算机视觉中具有广泛应用前景，但其核心挑战在于如何同时保持空间质量与长程时序一致性。现有方法普遍在RGB像素空间中对完整视频帧进行建模，而视频帧间存在大量信息冗余——相邻帧中绝大部分像素仅发生微小位移或保持不变。这种冗余导致扩散模型将大量计算资源消耗在重建静态背景与不变纹理上，难以聚焦于捕捉关键的时序变化，最终表现为生成视频的运动模糊、抖动或语义漂移。
@@ -72,8 +70,6 @@ claims:
 此前的工作在提升视频生成质量方面做出了多种尝试：**VDM**（Ho et al., Arxiv 2022）直接在像素空间进行3D扩散建模，计算开销巨大；**LFDM**（Ni et al., CVPR 2023）引入光流作为运动先验，但光流估计本身存在误差且与生成过程分离；**LVDM**（He et al., Arxiv 2022）通过层次化潜变量建模长视频，但时序建模仍依赖隐式学习。这些方法的共同缺陷在于：**生成目标始终是完整的RGB像素帧或其潜变量，未对视频的内容（静态）与运动（动态）进行显式解耦**，导致模型必须在高维空间中同时处理空间外观和时序变化两个耦合的任务。
 
 本文的核心动机源自视频压缩领域的经典洞察：在H.264等编码标准中，视频帧被分解为运动矢量（描述宏块的位移）与残差（补偿运动补偿后的像素差异），这种分解将时序变化从像素空间迁移到低维的运动特征空间，实现了极高的压缩比。**本文的关键思路是将这一解耦思想引入扩散生成模型**：将生成目标从完整像素帧转变为运动矢量与残差的联合分布，使扩散模型在高度压缩的运动特征空间中运行，从而在显著降低计算开销的同时，通过显式建模时序变化来提升运动一致性。
-
-
 
 ## 核心方法与创新机理
 
@@ -117,8 +113,6 @@ $$L = \mathbb{E}_{t, \mathbf{m}, \mathbf{r} = f(v_0), v_0 \sim \mathcal{V}, \eps
 **价值验证：** ED-VDM在MHAD 128×128上以204.17的FVD优于此前最优的**LFDM**（Ni et al., CVPR 2023）的214.39，同时训练FLOPs从VDM的$8814 \times 10^9$骤降至$78 \times 10^9$（约110倍），GPU内存从11.56 GB降至3.47 GB（Table 4）。残差VAE的重建质量（PSNR 31.80, SSIM 0.96）远优于传统DCT方法（PSNR 17.08, SSIM 0.85），保证了压缩-解压缩引入的失真可控（Table 5）。
 
 **边界与局限：** 运动矢量提取依赖刚性块匹配，对复杂变形、遮挡或大运动的适应能力有限；残差VAE与扩散模型分开训练，非端到端优化；速度对比仅基于FLOPs和内存，未提供实际墙钟时间；验证数据集（MHAD、NATOPS、BAIR）规模较小，高分辨率自然场景下的泛化性尚需进一步验证。
-
-
 
 D-VDM 与 ED-VDM 的核心设计思路是将视频生成任务从高维 RGB 像素空间迁移到压缩的运动特征空间，通过显式解耦静态内容与动态运动来降低扩散模型的建模难度。整体框架如图 2 所示，包含两条并行的技术路径。
 
@@ -168,15 +162,8 @@ ED-VDM（图 2 蓝色路径）进一步借鉴 H.264 视频压缩标准，将运�
 
 ED-VDM 通过运动矢量的 256× 压缩和残差的 16× 压缩，将等效空间降采样率提升至约 110×，训练 FLOPs 从 VDM 的 $8814 \times 10^9$ 骤降至 $78 \times 10^9$（Table 4），同时保持了与 SOTA 方法相当的生成质量。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1042_https_arxiv_org_abs_2311_14294/figures/002_Figure_2.jpg]]
 *Figure 2: Illustration of our proposed decoupled video diffusion model. (a) Pipeline. The green pathway represents the Decoupled Video Diffusion Model (D-VDM), which directly generates motion features in the compressed video domain, while the blue pathway illustrates the Efficient Decoupled Video Diffusion Model (ED-VDM), which includes a reversible compression function. (b) Compression techniques used in the ED-VDM model. Since the separated motion vectors and residuals are of unequal lengths, it is necessary for us to apply equal-length processing to both components. (c) The architecture of the 3D U-Net. We employed the 3D U-Net architecture in both models*
-
-![[assets/figures/papers/paper_list_l1042_https_arxiv_org_abs_2311_14294/figures/001_Figure_1.jpg]]
-*Figure 1: Motivations and our ideas. Conventional methods (see in (b)), involve extending the RGB space with time sequences, resulting in limited memory efficiency and temporal coherence. Latent Diffusion Models employ a variational autoencoder for compression (depicted in (a)), enhancing efficiency but potentially reducing spatial quality and poor temporal coherence because temporal consistency hasn’t been directly modeled. Our approach (refer to (c)) decouples the content and motion, capitalizing on existing temporal coherence in compressed video data, resulting in a memory-efficient and temporally consistent video generation approach*
-
-
 
 ### 方法总览
 
@@ -230,13 +217,6 @@ $$\mathrm{mse} = \| \epsilon - \epsilon_\theta(\mathbf{m}_t, \mathcal{E}(\mathbf
 
 **压缩效率的因果机制**。运动矢量场的空间分辨率仅为原始帧的 $1/256$（每个 $16 \times 16$ 宏块对应一个运动矢量），残差经 VAE 压缩 16×，二者拼接后整体等效空间降采样约 110×。这一压缩比直接转化为训练 FLOPs 从 VDM 的 $8814 \times 10^9$ 降至 ED‑VDM 的 $78 \times 10^9$（Table 4），GPU 内存从 11.56 GB 降至 3.47 GB。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1042_https_arxiv_org_abs_2311_14294/figures/004_Figure_3.jpg]]
-*Figure 3: Different ways to represent video temporal feature between frames. Frame difference used by D-VDM, a simple technique, calculates direct frame discrepancies, encompassing both fundamental and advanced temporal alterations. D-VDM findings reveal its potency in refining the temporal consistency of a generated video. Motion Vector and Residual used by ED-VDM, as in H.264, disentangles temporal shifts into intermediate motion blocks and pixel residuals. Notably, correlated with motion vectors, these residuals offer a sparse representation with potent compression potential. In our experiments, ED-VDM attains an impressive 110x compression ratio*
-
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与解耦策略的有效性验证
@@ -261,9 +241,6 @@ Table 3 展示了在 BAIR 机器人推杆数据集上的无条件生成结果。
 #### 压缩重建质量上界
 
 ED-VDM 的生成质量受限于其压缩-解压缩过程的信息保真度。Table 2 报告了 ED-VDM 的重建上界：R-FVD 为 13.5，PSNR 为 37.8，SSIM 为 0.98。这一结果表明，运动矢量与残差的压缩-解压缩过程引入的失真极小，为扩散模型在该压缩空间中的生成提供了高质量的上界保证。
-
-![[assets/figures/papers/paper_list_l1042_https_arxiv_org_abs_2311_14294/figures/006_Table_2.jpg]]
-*Table 2: The upper bound of our ED-VDM method. R-FVD score is evaluated with 2,048 samples. PSNR and SSIM are evaluated on an average of 16 frames with 100 samples*
 
 #### 残差压缩方法的消融
 
@@ -292,15 +269,8 @@ ED-VDM 中残差压缩方案的选择对最终重建质量至关重要。Table 5
 - **Table 5**：VAE 压缩残差的 PSNR/SSIM（31.80/0.96）远超 DCT（17.08/0.85），是 ED-VDM 保持空间细节的关键。
 - **Table 4**：ED-VDM 训练 FLOPs 从 VDM 的 8814×10⁹ 降至 78×10⁹，内存从 11.56 GB 降至 3.47 GB。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1042_https_arxiv_org_abs_2311_14294/figures/008_Figure_5.jpg]]
-*Figure 5: Video quality on residual reconstruction*
-
 ![[assets/figures/papers/paper_list_l1042_https_arxiv_org_abs_2311_14294/figures/007_Figure_4.jpg]]
 *Figure 4: Selected samples on BAIR, NATOPS, and MHAD dataset. First two rows are the results of unconditionally generation results on BAIR, and the down four rows are text conditional generation results on MHAD and NATOPS. The visualization results show our method generated realistic and temporally consistent video frames*
-
-
 
 ## 定位与知识库关联
 
@@ -343,8 +313,6 @@ ED-VDM 中残差压缩方案的选择对最终重建质量至关重要。Table 5
 4. **自然视频中的稀疏性假设**：在具有复杂背景和相机运动的自然视频中，运动矢量和残差表示是否仍然稀疏且可有效预测？
 5. **跨任务通用性**：ED-VDM 的压缩表示能否应用于其他生成任务（如视频预测、视频修复），其解耦策略是否具有任务无关的通用性？
 6. **实际推理速度**：110× 的 FLOPs 加速在真实硬件上的墙钟时间收益如何？量化误差在自回归生成多帧时是否会逐步累积？
-
-
 
 ## 原文 PDF
 

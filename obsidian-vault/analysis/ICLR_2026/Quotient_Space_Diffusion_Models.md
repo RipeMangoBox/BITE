@@ -51,8 +51,6 @@ claims:
 
 该方法在概念上统一了现有策略：与标准等变扩散相比，它降低了学习难度；与启发式对齐方法相比，它具备正确的采样器。实验表明，商空间扩散在 GEOM-QM9 和 GEOM-DRUGS 分子数据集上相对 ET-Flow 取得 9%–23% 的提升；在蛋白质结构生成任务中，60M 参数的商空间模型不仅超越 Proteína 基线，还在多数关键分布指标上优于更大的 200M 模型，且水平投影操作仅引入极小的计算开销。
 
-
-
 ### 对称性生成建模的核心瓶颈
 
 在分子构象生成、蛋白质结构设计等科学任务中，目标分布通常具有固有的**对称性**。例如，分子的整体旋转或平移不会改变其内在结构，因此理想的数据分布应在对应的群作用下保持不变。这类问题可自然地建模为：从商空间（等价类空间）中采样，而无需区分同一等价类内的不同表示。
@@ -75,8 +73,6 @@ claims:
 具体而言，该框架通过**水平投影算子** $P_{\mathbf{x}}$ 将更新向量投影到与群作用正交的子空间上（Figure 2 示意了总空间、商空间及切向量的对应关系）。以二维平面上的 SO(2) 对称分布为例，商空间扩散过程仅沿径向运动，而常规等变扩散模型则包含无效的角向分量（Figure 1）。这一设计使得神经网络无需学习等价类内部的任何运动，从而简化学习任务，同时采样器能够严格保证恢复目标分布。
 
 本文在分子构象生成（GEOM-QM9、GEOM-DRUGS）和蛋白质骨架设计两个任务上验证了该框架的有效性，并建立了商空间扩散建模的严格数学形式。
-
-
 
 ## 核心方法与创新机理
 
@@ -132,8 +128,6 @@ $$\mathrm{d}\tilde{\mathbf{x}}_t = \left( P_{\tilde{\mathbf{x}}_t} (\mathbf{b}_t
 
 水平投影操作的计算开销极小。实验表明，训练速度从原始扩散的 4.19 iters/s 仅略微下降至商空间扩散的 4.10 iters/s，几乎可以忽略不计。
 
-
-
 商空间扩散模型（Quotient-Space Diffusion Model）的核心思想是将原始扩散过程投影到等价类空间（商空间）上，再通过水平提升（horizontal lift）将其映射回原始空间进行实现，从而在保持采样正确性的同时，消除对群作用分量（如旋转）的学习需求。整体框架由四个关键模块构成，其输入输出流如下：
 
 **输入**：先验分布 $p_{\text{prior}}$（通常为标准高斯分布），以及目标分布 $p(\mathbf{x}_1)$（具有群 $\mathcal{G}$ 对称性的不变分布，如分子或蛋白质的三维结构分布）。
@@ -166,8 +160,6 @@ $$\mathcal{L}(\theta) := \mathbb{E}_{p(t)} w(t) \mathbb{E}_{p(\mathbf{x}_1, \mat
 ### 与传统框架的关键区别
 
 传统群等变扩散模型使用不变目标分布和等变架构，但训练损失对所有方向分量均等惩罚，迫使模型学习等价类内的具体运动（如旋转），这增加了学习负担且可能导致采样不兼容。启发式对齐策略（如 GeoDiff 对齐、AF3 对齐）试图通过将目标对齐到当前噪声样本来减少方差，但缺乏正确的采样器。相比之下，商空间扩散模型通过水平投影从根本上消除了对等价自由度的预测需求，且采样器保证恢复目标分布。
-
-
 
 ### 核心模块
 
@@ -213,8 +205,6 @@ $$\mathbf{x}_t = \alpha_t \mathbf{x}_0 + \beta_t \mathbf{x}_1 + \gamma_t \epsilo
 
 其中 $\alpha_t, \beta_t, \gamma_t$ 为时间相关的插值系数，$\epsilon$ 为标准高斯噪声。该插值定义了一个从先验分布到目标分布的连续路径，扩散模型通过学习该路径上的速度场或去噪函数来实现生成。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设计
@@ -224,7 +214,6 @@ $$\mathbf{x}_t = \alpha_t \mathbf{x}_0 + \beta_t \mathbf{x}_1 + \gamma_t \epsilo
 ### 小分子构象生成
 
 在 GEOM-QM9 和 GEOM-DRUGS 数据集上，商空间扩散方案被应用于 ET-Flow 架构（SO(3) 和 O(3) 变体）。如 Table 2 所示，商空间扩散在所有评估指标上均显著优于 ET-Flow 基线，取得 **9%–23% 的相对改进**（Abstract，Section 4.1）。具体而言：
-
 
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_3JPAkwSVc4/figures/005_Table_2.jpg]]
 *Table 2: The effect of the quotient-space diffusion scheme for molecular structure generation on the GEOM-QM9 and the GEOM-DRUGS datasets using the ET-Flow(SO(3)) and ET-Flow(O(3)) architectures. We use the same sampling steps of 50 NFEs for fair comparison. Best results are marked in bold. Best results for the same architecture are underlined*
@@ -237,7 +226,6 @@ $$\mathbf{x}_t = \alpha_t \mathbf{x}_0 + \beta_t \mathbf{x}_1 + \gamma_t \epsilo
 ### 蛋白质骨架生成
 
 在蛋白质结构生成任务中，商空间扩散被集成到 Proteína 模型中。Table 3 和 Table 5（Appendix）报告了完整性能对比：
-
 
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_3JPAkwSVc4/figures/006_Table_3.jpg]]
 *Table 3: The effect of the quotient-space diffusion scheme for protein structure generation using the Prote´ına model. Best results are marked in bold*
@@ -260,7 +248,6 @@ $$\mathbf{x}_t = \alpha_t \mathbf{x}_0 + \beta_t \mathbf{x}_1 + \gamma_t \epsilo
 
 #### 收敛速度
 Figure 5 从两个维度比较了收敛行为：
-
 
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_3JPAkwSVc4/figures/009_Figure_5.jpg]]
 *Figure 5: Training and sampling convergence speed comparison on GEOM-DRUGS. (Left) The relationship between training epochs and generation performance measured by the precision AMR median metric. (Right) The relationship between the number of function evaluations (NFE) for sampling and generation performance measured by the precision AMR median metric*
@@ -289,21 +276,12 @@ Figure 5 从两个维度比较了收敛行为：
 - 商空间扩散框架能否有效扩展到更大规模的对称群和更复杂的流形？
 - 对于像平移群这类非紧群，如何处理商空间上的分布并保证数值稳定？
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_3JPAkwSVc4/figures/002_Figure_1.jpg]]
-*Figure 1: A motivative illustration highlighting the behavior of the quotient-space diffusion model against the conventional equivariant diffusion model for modeling a distribution on $\mathbb { R } ^ { 2 }$ (as $\mathcal { M }$ ) with SO(2) (as $\mathcal { G }$ ) symmetry, whose density is represented by the gray scale. (Left) SDE sampling trajectories by the two diffusion models. The same color indicates the same starting point (the round dot). The quotient-space diffusion model moves each sample only along the ray from the origin, which can be understood as only traversing the quotient space $\mathrm { \overline { { R ^ { 2 } } } / S O ( 2 ) }$ , i.e., traversing over origin-centered concentric circles, w...
 
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_3JPAkwSVc4/figures/001_Table_1.jpg]]
 *Table 1: Comparison among different training strategies in presence of a symmetry group. Learning difficulty is measured by whether the need to predict in the equivalent degrees of freedom (DoFs), induced by the group actions, is removed, and (if not) whether the variance on the equivalent DoFs is removed. Sampling compatibility means whether there is a sampler that exactly reproduces the target distribution. The denoising form of diffusion model $\scriptstyle \mathbf { D } _ { \theta }$ is used to express the loss functions, where $\mathcal { A } _ { \bf y } ( { \bf$ x } ) (Eq. (11)) represents aligning x towards y, and ¯θ denotes treating θ as constant (i.e., stop-gradient). The conclusions hold using...
 
-![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_3JPAkwSVc4/figures/007_Table.jpg]]
-
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_3JPAkwSVc4/figures/010_Table_4.jpg]]
 *Table 4: Hyperparameters for Prote´ına model*
-
-
-
 
 ## 定位与知识库关联
 
@@ -360,8 +338,6 @@ AlphaFold3（Abramson et al., 2024）采用了一种更激进的对齐策略：�
 2. **ODE 采样的设计性退化机制**：为什么 ODE 采样在蛋白质生成中会大幅降低设计性，同时却显著提高分布相似度？这一现象是否与商空间的几何结构有关？
 3. **更大规模对称群的扩展**：商空间扩散框架能否有效扩展到更大规模的对称群和更复杂的流形（如 SU(2) 对应的量子系统）？
 4. **非紧群的处理**：对于平移群等非紧群，如何定义商空间上的概率分布并保证数值稳定性？
-
-
 
 ## 原文 PDF
 

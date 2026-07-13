@@ -51,8 +51,6 @@ claims:
 
 SimScale的定位是**仿真驱动的端到端规划扩展框架**，其方法谱系可归纳为：以3DGS重建为数据引擎，以轨迹扰动与伪专家生成为知识扩展手段，以反应式环境模拟为逼真度保障，以sim-real协同训练为学习范式。相较于仅依赖真实数据或静态仿真的既有方案，SimScale首次系统验证了仿真数据规模、监督信号类型与环境交互性对规划器性能的联合缩放效应，为端到端自动驾驶的仿真扩展提供了可复现的基准与开放工具链。
 
-
-
 端到端自动驾驶系统近年来取得了显著进展，但其在真实世界中的鲁棒性和泛化性仍面临根本性瓶颈：**安全关键（safety-critical）和分布外（OOD）场景在真实驾驶数据中严重不足**。现有真实世界驾驶数据集主要捕获常规、安全的驾驶行为，极少覆盖需要紧急避障、异常交互或极端交通条件的边缘情形。这种数据分布的长尾特性直接导致端到端规划器在未见过情境下性能急剧退化——规划器在训练分布内的表现良好，但一旦遭遇偏离训练统计的OOD状态，往往输出不安全或不可行的轨迹。
 
 这一瓶颈的深层原因在于**真实数据采集的成本与覆盖范围之间存在不可调和的矛盾**。真实道路测试或众包采集受限于安全约束、地理覆盖和场景自然发生率：高危场景本身稀有，且无法在真实环境中主动制造。因此，仅依赖真实数据的端到端系统天然存在泛化天花板，单纯增加真实数据量的边际收益递减且难以覆盖长尾。
@@ -62,8 +60,6 @@ SimScale的定位是**仿真驱动的端到端规划扩展框架**，其方法�
 **仿真**为突破上述数据瓶颈提供了潜在路径。然而，现有仿真方法存在两个关键缺口：其一，传统仿真器（如基于游戏引擎的方案）虽能生成多样化场景，但其视觉渲染与真实世界存在显著的领域差异（sim-real gap），导致仿真训练的模型难以迁移到真实环境；其二，仿真中通常缺乏与真实人类驾驶分布对齐的**可行专家轨迹**，使得仿真数据无法直接提供有效的模仿学习监督信号。
 
 SimScale正是在这一背景下提出的。其核心动机是：**能否利用真实世界数据本身构建高保真仿真，从已有专家分布中扩展出大规模OOD状态及其对应的可行解决方案，从而在不增加真实数据采集成本的前提下，系统性地提升端到端规划器的鲁棒性和泛化性？** 这一思路的关键洞察在于，真实数据中蕴含的驾驶知识和场景结构可以通过3D高斯泼溅（3DGS）重建和轨迹扰动被“解耦-重组-扩展”，生成既保持视觉逼真度又覆盖OOD状态的新训练样本。更重要的是，这种仿真数据生成可以规模化——随着仿真数据量的增加，多种范式规划器的性能呈现出可预测的持续提升趋势，而非早期饱和，这暗示着一条通过仿真扩展实现端到端驾驶能力持续增长的可行路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -98,8 +94,6 @@ SimScale 的另一重要创新是**首次揭示了端到端规划器性能随仿
 ### 与基线方法的本质区别
 
 上述三个 changed slots 共同构成了 SimScale 与现有工作的本质区别：它不是改进规划器本身，而是**构建了一个通用的仿真数据基础设施**，使得回归型（LTF）、扩散型（DiffusionDrive）、评分型（GTRS-Dense）等不同家族的规划器均能通过 sim-real 协同训练获得一致的鲁棒性和泛化性提升。这种“规划器无关”的特性是 SimScale 作为方法框架的核心竞争力。
-
-
 
 SimScale 构建了一套完整的“仿真数据生成—伪专家监督—协同训练”闭环系统，旨在以可扩展的方式弥补真实世界驾驶数据中安全关键与分布外（OOD）场景的不足。其核心洞察在于：通过高保真 3DGS 仿真大规模生成 OOD 状态，结合伪专家演示或奖励信号进行 sim-real 协同训练，可以在不增加真实数据的前提下，使多种端到端规划器的鲁棒性与泛化性获得可预测的持续提升。
 
@@ -142,8 +136,6 @@ $$\arg\min_\theta \mathbb{E}_{(a,o)\sim(\mathcal{D}\cup\mathcal{D}_{sim})}[\math
 - **输入**：多视图 RGB 图像（分辨率 $2048 \times 512$），来自真实数据或 3DGS 渲染的仿真观测。
 - **输出**：自车未来 $H$ 步的轨迹规划 $\hat{a}_{t:t+H}$。
 - **监督信号**：真实数据使用人类专家轨迹；仿真数据使用伪专家轨迹（恢复型/规划器型）或仅奖励评分（针对评分型规划器）。
-
-
 
 SimScale 的仿真-真实协同学习系统由四个关键模块串联构成：**3DGS 数据引擎**、**轨迹扰动与伪专家生成**、**反应式环境模拟**以及**Sim-Real 协同训练**。本节聚焦各模块的核心机制与关键公式。
 
@@ -195,18 +187,11 @@ $$S(N) = a \log^2(N) + b \log(N) + c$$
 
 该扩展律在多种规划器家族上均成立，表明仿真数据带来的性能提升具有可预测的平滑增长趋势，未出现早期饱和迹象。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2140_https_arxiv_org_abs_2511_23369/figures/002_Figure_2.jpg]]
 *Figure 2: Pseudo-expert scene simulation pipeline. (a) Trajectory perturbation on T to T + H, (b) reactive environment rollout, and pseudo-expert trajectory generation from T + H to T + 2H under recovery-based and planner-based strategies*
 
-![[assets/figures/papers/paper_list_l2140_https_arxiv_org_abs_2511_23369/figures/003_Figure_3.jpg]]
-*Figure 3: Simulation data statistics across multiple sampling rounds. (a) Recovery-based expert impose stronger constraints, leading to slower data accumulation than (b) Planner-based expert*
-
 ![[assets/figures/papers/paper_list_l2140_https_arxiv_org_abs_2511_23369/figures/011_Figure_6.jpg]]
 *Figure 6: Learning paradigm comparison of e2e autonomous driving between 3DGS-based Online RL and SimScale*
-
-
 
 ## 实验与关键发现
 
@@ -277,27 +262,8 @@ $$S(N) = a \log^2(N) + b \log(N) + c$$
 
 上述限制需要在实际部署前进行手动验证，尤其是仿真数据在真实极端场景下的迁移效果。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2140_https_arxiv_org_abs_2511_23369/figures/004_Table_1.jpg]]
 *Table 1: Performance on the NAVSIM-v2 navhard Leaderboard. PDM-Closed uses ground-truth symbolic inputs for planning, while other methods rely on sensor data. (∗: pseudo-expert supervision; †: reward scoring; S.: per-stage EPDM score.)*
-
-![[assets/figures/papers/paper_list_l2140_https_arxiv_org_abs_2511_23369/figures/007_Figure_4.jpg]]
-*Figure 4: Scaling dynamics across different planners and pseudo-expert trajectories. We visualize how simulation data scale and supervision signals influence the driving performance of various planners, where the infection point indicates learning plateau*
-
-![[assets/figures/papers/paper_list_l2140_https_arxiv_org_abs_2511_23369/figures/008_Table_4.jpg]]
-*Table 4: The effect between non-reactive vs. reactive data simulation on navhard using GTRS-Dense, across sampling rounds*
-
-![[assets/figures/papers/paper_list_l2140_https_arxiv_org_abs_2511_23369/figures/009_Table_3.jpg]]
-*Table 3: The effect of expert with simulated reward scoring on navhard using GTRS-Dense. (S1/2:per-stage EPDM scores.)*
-
-![[assets/figures/papers/paper_list_l2140_https_arxiv_org_abs_2511_23369/figures/014_Figure_7.jpg]]
-*Figure 7: Scaling dynamics under reactive and non-reactive simulation using GTRS-Dense across model sizes*
-
-![[assets/figures/papers/paper_list_l2140_https_arxiv_org_abs_2511_23369/figures/015_Table_9.jpg]]
-*Table 9: The effect of multi-expert ensemble on navhard using GTRS-Dense*
-
-
 
 ## 定位与知识库关联
 
@@ -356,8 +322,6 @@ SimScale 的有效性依赖于以下关键设计选择，偏离这些条件可�
 ### 5. 知识库贡献定位
 
 SimScale 的核心贡献在于**建立了一套可扩展的仿真数据生成与协训练框架**，并首次系统性地揭示了仿真数据规模与端到端规划器性能之间的**对数二次缩放律**（Eq. 7-8）。这一发现为自动驾驶领域的数据驱动扩展提供了可预测的理论指导，表明通过增加仿真数据规模，可以在不增加真实数据的情况下持续提升规划器的鲁棒性与泛化性。该方法已开源（[GitHub](https://github.com/OpenDriveLab/SimScale)），可作为后续研究的基线平台。
-
-
 
 ## 原文 PDF
 

@@ -53,8 +53,6 @@ Mantis 提出了一种**解耦视觉前瞻**（Disentangled Visual Foresight, DV
 
 **方法定位**：Mantis 属于视觉增强型VLA，通过解耦的扩散头实现隐式潜在动作学习，区别于显式像素预测（如 DreamVLA）和压缩表示引导（如 ATM）的范式。其渐进式训练与语言监督设计，使其在操作成功率、收敛效率与指令泛化三个维度上建立了新的综合优势。
 
-
-
 ### 视觉-语言-动作模型的核心瓶颈
 
 视觉-语言-动作模型（VLA）旨在将大规模视觉-语言模型的语义理解能力迁移到机器人操作中，使机器人能够根据自然语言指令在复杂环境中执行任务。然而，当前VLA面临一个根本性挑战：**低维动作信号过于稀疏，无法为大规模VLA主干网络提供充分监督**。机器人示教数据中的动作通常仅为末端执行器的位姿序列（6-7维），而VLA主干的参数量往往达到数十亿级别，这种信号与模型容量之间的严重不匹配导致动作学习效率低下、泛化能力受限。
@@ -80,8 +78,6 @@ Mantis 提出了一种**解耦视觉前瞻**（Disentangled Visual Foresight, DV
 1. **解耦视觉前瞻与动作学习**：将视觉预测任务从VLA主干中剥离，通过独立的解耦视觉前瞻（Disentangled Visual Foresight, DVF）模块处理，使主干专注于语言理解和动作推理。
 2. **构建紧凑而有指导性的辅助信号**：利用meta queries自动捕获帧间动态（即“潜在动作”），为动作预测提供精准的前瞻线索，避免像素级预测的冗余与压缩表示的瓶颈。
 3. **保护语言理解能力**：通过渐进式多模态训练策略，在引入视觉和动作监督的同时，显式维护语言监督信号，确保模型的指令遵循和语义泛化能力不被侵蚀。
-
-
 
 ## 核心方法与创新机理
 
@@ -125,8 +121,6 @@ ATE维护两组视觉令牌：**目标令牌**（与语言指令最相关的图�
 
 三项创新构成了一条因果链路：**DVF解耦**为动作学习提供紧凑而有指导性的辅助信号，解决了容量竞争与信息瓶颈；**渐进训练**确保多模态能力稳定融合，保护语言理解；**ATE**在部署端大幅降低推理成本，使系统具备实用价值。这一设计在LIBERO仿真基准上达到96.7%平均成功率（Table 1），在真实世界三个场景中，分布内和分布外指令跟随均优于开源基线**π0.5**（Table 6, Figure 6），验证了创新点的有效性。
 
-
-
 Mantis 的整体设计围绕一个核心洞察展开：**视觉前瞻预测与动作学习应解耦**，从而避免主干网络在视觉生成与动作预测之间产生容量竞争。如图 2 所示，框架由三个核心模块构成：**Backbone（主干网络）**、**DVF Head（解耦视觉前瞻头）** 和 **Action Head（动作头）**，辅以连接器（Connector）和三类可学习查询令牌（queries）完成信息流转。
 
 ### 模块关系与信息流
@@ -159,13 +153,6 @@ Mantis 的整体设计围绕一个核心洞察展开：**视觉前瞻预测与�
 标准 Mantis 使用时间集成（Temporal Ensemble, TE）提升运动平稳性，但带来高计算开销。为此，Mantis 提出**自适应时间集成（ATE）**：通过维护目标区域（与语言指令最相关的图像块）和动态区域（帧间变化显著的图像块），仅当两者重叠超过阈值时才触发集成，否则直接复用上一帧的动作预测。该策略可将推理调用减少近 50%，且任务成功率持平（Figure 8）。
 
 > **注意**：框架图中的具体连接器实现（12 层 Transformer Encoder）、DVF 头采用的 Sana DiT 架构、动作头的 DiT 设计等细节，将在后续模块章节展开。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2401_https_arxiv_org_abs_2511_16175/figures/003_Figure_2.jpg]]
-*Figure 2: Left: Progressive training recipe. Mantis progressively integrates multiple modalities to achieve stable and well-balanced optimization. Center: Overview of Mantis. The framework consists of a backbone network, a DVF head, and an action head. The DVF head predicts future frames to facilitate latent action learning, thereby improving action prediction. Language supervision helps maintain the backbone’s capability for understanding and reasoning. Right: Adaptive Temporal Ensemble. Mantis-ATE dynamically adjusts the ensemble strength based on the overlap between target tokens and dynamic tokens*
-
-
 
 Mantis 的核心架构由四个关键模块构成：**主干网络**（Backbone）、**连接器**（Connector）、**解耦视觉前瞻头**（DVF Head）和**动作头**（Action Head）。其设计哲学是将视觉预测任务从 VLA 主干中剥离，通过一组可学习的查询令牌（queries）在模块间传递紧凑的“潜在动作”信号，避免显式像素生成或压缩表示带来的信息冗余与容量竞争。
 
@@ -217,16 +204,6 @@ $\mathcal{L}_{\mathrm{lang}}$ 为语言输出的交叉熵损失，$\beta$ 为其
 ### 自适应时间集成（ATE）
 
 ATE 并非训练模块，而是推理时的效率优化策略。其核心思想是维护两组输入视觉补丁——**目标补丁**（与语言指令最相关的区域）和**动态补丁**（帧间变化显著的区域）——并根据两者的重叠程度动态切换时间集成的强度。当机器人末端执行器接近目标区域时，重叠增大，ATE 减少集成步数以降低计算开销；远离时则增强集成以保证运动平稳性。实验表明 Mantis-ATE 可将推理调用减少近 50%，同时保持与标准时间集成相当的任务成功率（Figure 8）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2401_https_arxiv_org_abs_2511_16175/figures/002_Figure_1.jpg]]
-*Figure 1: Vision-augmented action learning paradigms. (a) Visual Foresight enhances action prediction by forecasting future frames. (b) Track Guidance employs compressed visual state representations to guide action prediction. (c) Latent Action Supervision improves action learning through auxiliary latent actions*
-
-![[assets/figures/papers/paper_list_l2401_https_arxiv_org_abs_2511_16175/figures/005_Figure_4.jpg]]
-*Figure 4: Visualization of ATE. The attention heatmap uses darker colors to represent higher values, whereas in the cosine similarity heatmap the opposite holds. The parameters are set as*
-
-
 
 ## 实验与关键发现
 
@@ -285,22 +262,13 @@ Table 3 进一步从 VQA 与多模态理解基准角度验证语言能力保留�
 
 Table 6 和 Figure 6(c) 显示：在 ID 指令上，Mantis 平均成功次数为 7.83，略高于 π0.5 的 7.25；在 OOD 指令上，差距急剧拉大——Mantis 为 6.58，π0.5 仅为 2.83。OOD 增益达 +3.75，与仿真消融结论一致，再次印证语言监督对泛化的决定性作用。
 
-![[assets/figures/papers/paper_list_l2401_https_arxiv_org_abs_2511_16175/figures/008_Figure_6.jpg]]
-*Figure 6: Real World Experiments. (a) The Agilex platform. (b) Scenario setups and example instructions. Each scenario shows one ID instruction and the corresponding OOD instruction. (c) Average success counts for Mantis and*
-
 ### DVF 生成质量验证
 
 Figure 7 可视化了 DVF 生成的未来帧。在多种操作任务中，最后生成的未来帧与真值终态高度吻合，证实 DVF 能够有效捕捉任务完成时的目标状态，为动作预测提供紧凑且有指导性的前瞻信号。
 
-![[assets/figures/papers/paper_list_l2401_https_arxiv_org_abs_2511_16175/figures/009_Figure_7.jpg]]
-*Figure 7: Visualization of Generated Future Frames. The last generated future frame closely mirrors the ground truth final state, substantiating the efficacy of the DVF in refining action prediction across diverse manipulation tasks*
-
 ### 推理效率：自适应时间集成
 
 Figure 8 对比了标准 Mantis（使用固定时间集成 TE）与 **Mantis-ATE**。Mantis-ATE 在保持任务成功率基本持平的前提下，将推理调用次数减少近 50%。其核心机制（Figure 4 可视化）是维护目标区域（target patches）和动态区域（dynamic patches）两组视觉 patch，根据二者重叠程度动态切换时间集成的强度：当场景变化剧烈时加强集成以保证运动平稳性，当场景稳定时减少集成以节省计算。消融中使用的阈值参数为 $\tau_{\mathrm{target}} = 1$ 和 $\tau_{\mathrm{dynamic}} = 12$。
-
-![[assets/figures/papers/paper_list_l2401_https_arxiv_org_abs_2511_16175/figures/010_Figure_8.jpg]]
-*Figure 8: Comparison between standard Mantis (TE) and Mantis-ATE. The primary vertical axis denotes success rate (SR), and the secondary vertical axis denotes inference count (IC)*
 
 ### 失败模式与局限
 
@@ -309,8 +277,6 @@ Figure 8 对比了标准 Mantis（使用固定时间集成 TE）与 **Mantis-ATE
 - **空间精度受限**：模型输入主要依赖 RGB 图像，缺乏 3D 几何信息（如点云），在 LIBERO Goal 子任务上未能超越 UnifiedVLA，暗示高精度空间推理场景仍是薄弱环节。
 - **实时性瓶颈**：即使 ATE 减少了近半推理调用，单次推理仍基于大规模扩散模型，难以满足高频实时控制需求。
 - **真实世界覆盖不足**：目前仅在桌面操作场景验证，尚未在移动操作等更复杂、非结构化环境中充分测试。
-
-
 
 ## 定位与知识库关联
 
@@ -358,8 +324,6 @@ Mantis 以 Qwen2.5-VL 为主干，属于**大规模视觉-语言-动作模型**�
 - **推理加速**：能否通过模型蒸馏、量化或更轻量的预测头（如 flow matching 替代扩散）进一步压缩推理延迟，实现更高频率的闭环控制？
 - **开放环境泛化**：解耦的视觉前瞻机制在非结构化、动态变化的环境中是否依然有效？meta queries 捕获的潜在动作能否泛化到未见过的物体与场景？
 - **语言-操作权衡**：如何在更强的语言能力与操作性能之间取得最佳折衷？语言监督阶段使用的 38 个多模态数据集（Table 4）中，是否存在与机器人操作任务产生负迁移的数据分布？
-
-
 
 ## 原文 PDF
 

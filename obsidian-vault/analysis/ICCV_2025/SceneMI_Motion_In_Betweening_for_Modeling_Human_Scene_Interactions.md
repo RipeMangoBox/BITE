@@ -59,8 +59,6 @@ claims:
 
 **局限与开放问题**：模型在训练集中极少出现的人-场景交互模式（如挤过狭窄通道）上可能失效；在包含高度复杂或噪声几何的真实场景重建中，场景编码可能无法精确捕捉细微的空间约束。未来方向包括：支持部分姿态关键帧（如仅末端效应器位置）、引入文本语义控制、探索交叉注意力等更优的场景融合方式，以及自动选择最优 $T^*$ 的策略。
 
-
-
 ### 问题背景：人-场景交互中的运动中间生成
 
 在虚拟现实、具身智能与计算机图形学中，生成自然的人-场景交互（Human-Scene Interaction, HSI）运动是核心挑战之一。给定一个3D场景和一组稀疏的关键姿态，运动中间生成（motion in-betweening）的目标是合成连接这些关键帧的完整运动序列，同时满足场景的物理约束——例如避免穿透物体、适应地面几何、保持合理的接触语义。
@@ -94,8 +92,6 @@ SceneMI的出发点是一个关键洞察：**扩散模型的前向加噪与反�
 - **局部BPS（Basis Point Set）特征**：在SMPL网格上选取64个锚点，计算每个锚点到最近场景点的有序偏移向量，捕捉关键帧周围的精细几何约束。
 
 这种“全局导航 + 局部约束”的互补表征，使模型既能理解大尺度场景结构以规划路径，又能精细调整姿态以避免穿透——这在靠近物体的交互场景中尤为关键。
-
-
 
 ## 核心方法与创新机理
 
@@ -134,8 +130,6 @@ $$x_t' = \begin{cases} m \odot s^{noisy} + (1 - m) \odot x_t, & t \in [T, T^*+1]
 ### 创新总结
 
 上述三个 changed slots 构成了 SceneMI 的方法论闭环：双尺度场景特征提供了从粗到细的空间约束，关键帧引导扩散实现了场景感知的中间插值，两阶段噪声感知机制则赋予了模型处理真实世界噪声关键帧的能力。三者协同作用，使得 SceneMI 在无噪、合成噪声和真实噪声三种设置下均显著超越现有基线，同时保持了推理效率（Table 7 显示 SceneMI 直接预测 SMPL 参数，无需额外优化拟合）。
-
-
 
 SceneMI 将人-场景交互（HSI）生成重新定义为**场景感知的运动中间插值（motion in-betweening）**任务：给定三维场景 $G$ 和一组稀疏的关键姿态 $\mathbf{s} = \{\mathbf{s}^k\}_{k=1}^{K}$，目标是合成完整的运动序列 $\mathbf{x} = \{\mathbf{x}^n\}_{n=1}^{N}$，使得生成的中间帧在满足关键帧约束的同时，与场景几何保持一致且无穿透。每个姿态特征向量由全局关节位置 $\mathbf{J}$、6D 根朝向 $\boldsymbol{\phi}$ 和局部 SMPL 姿态参数 $\boldsymbol{\psi}$ 拼接而成。
 
@@ -187,13 +181,6 @@ $$\mathcal{L} = \mathcal{L}_{\text{simple}} + \lambda_{\text{joints}} \mathcal{L
 - **编码**：场景 → 全局体素特征 $\mathbf{c}_g$ + 局部 BPS 特征 $\mathbf{c}_l^n$；关键帧掩码 $\mathbf{m}$ 标记已知帧位置
 - **去噪**：U-Net 以 $\tilde{\mathbf{x}}_t$、$t$、$\mathbf{b}$、$\mathbf{c}_g$ 为条件预测 $\mathbf{x}_0$，经两阶段插补和分类器无关引导完成采样
 - **输出**：完整运动序列 $\mathbf{x}$，包含全局关节位置、根朝向和 SMPL 姿态参数，可直接驱动角色动画而无需额外优化拟合（Table 7 确认推理延迟优势）
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1773_SceneMI_Motion_In_Betweening_for_Modeling_Human_Scene_Interactions/figures/015_Figure_7.jpg]]
-*Figure 7: The final results from the Video2Animation pipeline demonstrate the reconstruction of 3D human-scene animation from monocular video inputs. By incorporating SceneMI with the obtained scene information and optimized keyframes, we reconstruct natural and physically plausible motions. For additional results, please refer to the supplementary video*
-
-
 
 SceneMI 将人-场景交互（HSI）建模重新定义为**场景感知的运动中间插值任务**，其核心由三个紧密耦合的模块构成：双尺度场景编码、关键帧引导的扩散模型、以及面向噪声关键帧的两阶段去噪机制。
 
@@ -278,8 +265,6 @@ $$
 $$
 
 三者的协同使得模型在满足关键帧约束和场景约束的同时，生成平滑、物理合理的中间运动。
-
-
 
 ## 实验与关键发现
 
@@ -394,9 +379,6 @@ $T^*=20$ 被验证为最优切换步数（$T=1000$），过小的 $T^*$ 无法�
 
 ### 关键帧选择策略的鲁棒性（Table 6）
 
-![[assets/figures/papers/paper_list_l1773_SceneMI_Motion_In_Betweening_for_Modeling_Human_Scene_Interactions/figures/011_Table_6.jpg]]
-*Table 6: Quantitative evaluation of diverse keyframe selection strategies on noisy TRUMANS test set with a fixed noise level l = 1. We select keyframes using different strategies, such as at a uniform interval r or with a random probability p, including start and end frames. Our method shows robustness performance from highly sparse to dense keyframes, regardless of keyframe density or selection*
-
 在噪声 TRUMANS 测试集（$l=1$）上，SceneMI 对不同关键帧选择策略表现出一致的鲁棒性：
 - 均匀间隔（$r=3, 5, 10, 15$）：FID 稳定在 0.118–0.135 范围内；
 - 随机概率（$p=0.3, 0.5, 0.7$）：FID 稳定在 0.121–0.142 范围内；
@@ -408,9 +390,6 @@ $T^*=20$ 被验证为最优切换步数（$T=1000$），过小的 $T^*$ 无法�
 
 ### 推理效率（Table 7）
 
-![[assets/figures/papers/paper_list_l1773_SceneMI_Motion_In_Betweening_for_Modeling_Human_Scene_Interactions/figures/012_Table_7.jpg]]
-*Table 7: Time required to obtain actual parameters for motion*
-
 SceneMI 直接预测 SMPL 参数，无需额外的后处理优化拟合步骤。相比之下，部分基线方法需要将预测的关节位置通过逆运动学优化拟合为 SMPL 参数，增加了推理延迟。SceneMI 的端到端设计使其在推理效率上具有实际部署优势。
 
 ---
@@ -418,9 +397,6 @@ SceneMI 直接预测 SMPL 参数，无需额外的后处理优化拟合步骤。
 ### 失败模式与局限性
 
 Figure 10 展示了 SceneMI 的两类典型失败案例：
-
-![[assets/figures/papers/paper_list_l1773_SceneMI_Motion_In_Betweening_for_Modeling_Human_Scene_Interactions/figures/018_Figure_10.jpg]]
-*Figure 10: Failure cases. (Left) Unseen interaction pattern (e.g., squeezing through narrow space). (Right) Real-world scene with noisy or complex geometry*
 
 1. **未见交互模式**（左）：当训练集中极少出现某种人-场景交互模式时（如“挤过狭窄通道”），模型无法正确推理可通行性，可能产生穿透或不符合物理规律的姿态。这是因为扩散模型学习的运动先验无法覆盖长尾交互模式，而场景特征的分辨率（0.1m 体素）不足以精确捕捉狭窄空间的约束。
 
@@ -444,18 +420,8 @@ SceneMI 的能力在多个应用场景中得到验证：
 - **语义关键帧驱动**（Figure 8）：给定稀疏的语义关键帧（如“站立→坐下”），SceneMI 能生成符合场景约束的过渡动作。
 - **长时域生成**（Figure 9）：在大间隔关键帧（长时域）条件下，模型仍能合成避开大型障碍物的长距离运动。
 
-![[assets/figures/papers/paper_list_l1773_SceneMI_Motion_In_Betweening_for_Modeling_Human_Scene_Interactions/figures/009_Figure_5.jpg]]
-*Figure 5: SceneMI can be applied to reconstructed scenes and keyframes from video, facilitating realistic and physically plausible human-scene interaction reconstruction from monocular video*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1773_SceneMI_Motion_In_Betweening_for_Modeling_Human_Scene_Interactions/figures/005_Table_2.jpg]]
-*Table 2: Quantitative evaluation on the close-proximity humanscene interaction frames from the TRUMANS [31]*
-
 ![[assets/figures/papers/paper_list_l1773_SceneMI_Motion_In_Betweening_for_Modeling_Human_Scene_Interactions/figures/013_Table_8.jpg]]
 *Table 8: Ablation study on our hyperparmeters setting*
-
-
 
 ## 定位与知识库关联
 
@@ -502,8 +468,6 @@ SceneMI 处于**扩散模型驱动的运动生成**与**场景感知人体建模
 5. **多人交互与动态场景**：当前方法假设单人、静态场景。扩展到多人协作交互（如两人搬动家具）或包含动态物体的场景，需要处理多智能体运动协调和时变场景约束，这是更具挑战性的开放方向。
 
 **需要手动验证的点**：论文未提供与最新场景感知运动生成方法（如 2024 年后发表的扩散模型变体）的直接对比，也未讨论计算开销随场景规模增长的缩放特性。在将 SceneMI 与后续工作进行定位时，建议查阅 TRUMANS 数据集的最新排行榜和相关工作的更新。
-
-
 
 ## 原文 PDF
 

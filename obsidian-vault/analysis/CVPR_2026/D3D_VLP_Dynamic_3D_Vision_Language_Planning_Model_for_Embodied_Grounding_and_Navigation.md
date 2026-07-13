@@ -53,8 +53,6 @@ D3D-VLP 的核心洞见在于：**将规划、定位与导航统一为单一3D�
 
 **方法谱系与知识库定位**：D3D-VLP处于端到端VLN与模块化具身系统的交叉点。它继承**Dynam3D**（Wang et al., NeurIPS 2025）的多级3D感知编码器作为感知骨架，借鉴**NVILA-Lite-2B**的预训练多模态能力作为推理核心，但在任务架构上根本区别于**StreamVLN**（Wei et al., arXiv 2025）、**NavFoM**（Zhang et al., arXiv 2025）等纯端到端方法，也不同于**InternVLA-N1**（InternNav Contributors, 2025）等LLM+导航的模块化调度范式。其统一自回归生成与CoT Memory设计，为具身模型的可解释性、动态适应性与跨组件协同学习提供了新的范式。
 
-
-
 具身智能体的核心能力在于根据自然语言指令，在三维环境中执行多步定位与导航。近年来，端到端视觉-语言-导航（VLN）模型和模块化系统分别代表了该领域的两种主流范式，但二者均存在结构性缺陷。
 
 **端到端模型**（如 **Dynam3D**（Wang et al., NeurIPS 2025）、**StreamVLN**（Wei et al., arXiv 2025）、**NavFoM**（Zhang et al., arXiv 2025））将指令直接映射为导航动作，虽然结构简洁，但缺乏可解释性与显式的3D推理能力。这类模型在长程任务中难以进行动态重规划，也无法显式地构建对场景的空间理解。
@@ -64,8 +62,6 @@ D3D-VLP 的核心洞见在于：**将规划、定位与导航统一为单一3D�
 **根本瓶颈在于**：现有方法要么牺牲可解释性换取端到端效率，要么牺牲协同性换取模块化灵活性，两者均无法实现动态重规划与跨组件联合学习。
 
 针对这一缺口，D3D-VLP提出了一种统一范式：将规划、定位与导航重构为单一3D视觉-语言-规划模型中的自回归生成任务。其核心思路是通过动态3D思维链（3D CoT）将多步规划、3D定位与导航行动串行化为一个多模态序列，并引入CoT Memory反馈循环实现状态化推理与在线重规划。配合碎片化监督协同学习（SLFS）策略，模型仅利用损失掩码即可从海量混合部分标注数据中隐式训练各组件，解决了全标注数据稀缺的瓶颈。
-
-
 
 ## 核心方法与创新机理
 
@@ -105,8 +101,6 @@ $$\mathcal{L}_{CoT} = \sum_{i \in \mathrm{Batch}} \sum_{k \in \mathrm{CoT}} \mat
 
 **总结**：D3D-VLP 的四项关键创新——统一自回归架构、CoT Memory反馈循环、SLFS训练策略与统一空间动作空间——形成了完整的因果闭环：统一架构使跨组件梯度协同成为可能，CoT Memory赋予模型动态重规划能力，SLFS解决了大规模训练的数据瓶颈，而空间嵌入动作空间则将3D感知与行动无缝衔接。这一创新组合在R2R-CE上以**61.3% SR**达到新SOTA，比先前最强端到端模型StreamVLN提升**+4.4% SR**，比最强模块化系统InternVLA-N1提升**+3.1% SR**（Table 2）。
 
-
-
 D3D-VLP 将具身智能中原本割裂的规划、3D 定位与导航统一为**单一 3D-VLM 的自回归生成任务**。其整体 pipeline 由四个核心模块串联成一个闭环：
 
 1. **Dynam3D Encoder**（多级 3D 感知与记忆构建）：以流式带位姿的 RGB-D 图像为输入，持续更新一个动态的**多级 3D 记忆** $\mathcal{M}_t = (\mathcal{V}_{\mathrm{patch}}, \mathcal{M}_{\mathrm{inst}}, \mathcal{M}_{\mathrm{zone}})$，分别对应全景 patch 令牌、实例令牌和区域令牌。
@@ -121,12 +115,8 @@ D3D-VLP 将具身智能中原本割裂的规划、3D 定位与导航统一为**�
 ![[assets/figures/papers/paper_list_l2180_https_arxiv_org_abs_2512_12622/figures/001_Figure_1.jpg]]
 *Figure 1: Model Architecture Comparison. The end-to-end models directly map instructions to navigation actions, and modular systems assemble multiple specialized components. Our D3D-VLP employs a single 3D-VLM with 3D CoT to unify planning, grounding, and navigation for synergistic learning and planning*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2180_https_arxiv_org_abs_2512_12622/figures/002_Figure_2.jpg]]
 *Figure 2: Framework of our D3D-VLP model. Given an instruction and streaming posed RGB-D images, a Dynam3D Encoder [56] builds and updates a Multi-level 3D Memory. This memory provides structured 3D tokens (i.e. panoramic patch, instance, and zone tokens) to the core D3D-VLP model and a Waypoint Predictor. Our D3D-VLP model then integrates these 3D tokens, the instruction, candidate waypoints, and historical context from the CoT Memory to autoregressively generate a unified 3D Chain-of-Thought (CoT) sequence, which includes the next plans, the grounded target, and the navigation action. Finally, this output updates the CoT Memory to create a dynamic feedback loop for stateful reasoning and replanning*
-
-
 
 ### 多级3D感知与记忆构建
 
@@ -180,13 +170,6 @@ $$\mathcal{L}_{CoT} = \sum_{i \in \mathrm{Batch}} \sum_{k \in \mathrm{CoT}} \mat
 
 该公式的关键效应在于：即使某样本缺少导航标注，其规划与定位的损失梯度仍通过共享的 3D-VLM 主干网络反向传播，**隐式地强化导航能力**。同理，导航损失也会反向监督规划与定位模块。这使得模型能从约 10M 混合样本中学习，其中仅约 175K 为全标注数据，其余均为部分标注。消融实验表明，仅使用全标注数据训练时性能显著低于使用混合数据加掩码损失的配置，验证了 SLFS 的增益。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2180_https_arxiv_org_abs_2512_12622/figures/003_Figure_3.jpg]]
-*Figure 3: The Unified Autoregressive Formulation of our D3D-VLP model. The core 3D Vision-Language-Planning model takes a comprehensive set of inputs: the natural language instruction, multi-level 3D visual tokens (i.e. panoramic, instance, and zone) , candidate waypoints, and the historical CoT Memory (including past plans and trajectory). It then autoregressively generates a single and unified 3D Chain-of-Thought (CoT) sequence. This multimodal output stream explicitly contains the next plans, the grounded target, the selected navigation action, and a natural language answer*
-
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -234,8 +217,6 @@ D3D-VLP的训练采用碎片化监督协同学习（SLFS）策略，在约1000�
 - **定位错误级联**：当3D定位出现偏差时，后续的导航动作选择会基于错误的空间锚点，导致任务失败。当前架构缺乏独立的定位校验环节。
 - **规划不合理**：CoT生成的计划步骤可能不符合物理可行性或环境约束，模型缺乏对动作后果的预测能力。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2180_https_arxiv_org_abs_2512_12622/figures/005_Table_2.jpg]]
 *Table 2: Evaluation of embodied navigation benchmarks with monocular camera, ∗ denotes zero-shot method*
 
@@ -244,14 +225,6 @@ D3D-VLP的训练采用碎片化监督协同学习（SLFS）策略，在约1000�
 
 ![[assets/figures/papers/paper_list_l2180_https_arxiv_org_abs_2512_12622/figures/004_Table_1.jpg]]
 *Table 1: Composition of sample annotations in our constructed 3D CoT dataset. The fully annotated gold data is about 175K, and the partially annotated data is about 9.9M*
-
-![[assets/figures/papers/paper_list_l2180_https_arxiv_org_abs_2512_12622/figures/009_Table_5.jpg]]
-*Table 5: Evaluation of real-world mobile manipulation task*
-
-![[assets/figures/papers/paper_list_l2180_https_arxiv_org_abs_2512_12622/figures/008_Figure_4.jpg]]
-*Figure 4: A demonstration of real-world mobile manipulation task*
-
-
 
 ## 定位与知识库关联
 
@@ -314,8 +287,6 @@ D3D-VLP 直接继承 **Dynam3D**（Wang et al., NeurIPS 2025）的3D编码器，
 | SLFS使部分标注数据有效协同训练 | **中强** | Table 4消融验证混合数据+掩码损失优于仅全标注数据，但缺少对不同部分标注比例的系统消融，置信度0.95 |
 | 真实世界泛化能力 | **弱** | 仅10个真实世界任务、3个成功，样本量过小且缺少统计显著性检验，需更大规模验证 |
 | 路点预测动作空间优于文本动作 | **中强** | Table 4消融支持该结论，但未对比其他动作表示（如连续控制），置信度0.95 |
-
-
 
 ## 原文 PDF
 

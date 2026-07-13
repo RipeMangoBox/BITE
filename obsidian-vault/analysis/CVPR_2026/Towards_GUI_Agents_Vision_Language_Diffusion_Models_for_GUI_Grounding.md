@@ -157,8 +157,6 @@ $$L(\theta) = -\mathbb{E}_{v,p_0^1,r_0^1,r_t^1,t} \left[ \frac{1}{t} \sum_{i=1}^
 
 训练数据从 Mind2Web 的 7k 样本扩展至覆盖 web、mobile、desktop 三域的 120k 样本（Mind2Web、WebLinX、OS-Atlas、Rico Widget Caption），并采用随机裁剪与 OCR 文本标注提升标注质量（Table 3 显示该策略带来 2.68 点 SSR 提升和 0.38 秒延迟降低）。数据扩展使平均 SSR 提升 17～20 点，推理延迟降低 1～1.5 秒，收敛步数减少 8～9 步（Figure 3）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2349_https_arxiv_org_abs_2603_26211/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of Hybrid Masking Adaptation of LLaDA-V for GUI Grounding. (a) The adapted framework takes a naturallanguage instruction and a GUI screenshot (either from web, desktop, or mobile interfaces) as input. LLaDA-V trained with the linear masking predicts the action type, optional type in text, and anchor coordinates*
 

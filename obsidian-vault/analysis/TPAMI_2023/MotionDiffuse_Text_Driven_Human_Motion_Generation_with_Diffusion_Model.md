@@ -54,8 +54,6 @@ claims:
 
 **局限性**：扩散模型需要大量去噪步骤，难以实现实时生成；当前pipeline仅适配单一运动表征形式，向多数据集通用框架的扩展仍是开放问题。
 
-
-
 **文本驱动人体运动生成**旨在从自然语言描述中合成逼真的三维人体动作序列，在动画制作、虚拟人交互、游戏开发等领域具有重要应用价值。然而，该任务面临一个根本性瓶颈：**从文本到运动的映射本质上是“一对多”的**——同一段文字描述可以对应多种合理的运动表现，而现有方法大多采用确定性的映射策略，导致生成结果的**多样性严重不足**。
 
 具体而言，早期工作如**Language2Pose**（Ahuja and Morency, 3DV 2019）和**T2M**（Guo et al., CVPR 2022）通常将文本编码后直接解码为运动序列，其生成过程缺乏随机性机制，难以捕捉文本描述背后丰富的运动变化空间。此外，这些方法在处理**复杂、细粒度、多时间段的文本描述**时表现乏力——例如，“一个人先挥手然后蹲下”这类包含时序组合的指令，往往无法被准确执行。动作条件生成方法如**Action2Motion**（Guo et al., ACM Multimedia 2020）和**ACTOR**（Petrovich et al., ICCV 2021）虽然引入了一定的条件控制，但本质上仍受限于单动作、固定长度的生成范式。
@@ -63,8 +61,6 @@ claims:
 与此同时，**去噪扩散概率模型**（Denoising Diffusion Probabilistic Model, DDPM）在图像生成领域取得了显著成功，其核心优势在于：通过逐步去噪的随机采样过程，天然支持多样化的输出；同时，扩散模型在去噪过程中保留了数据的显式形式，使得**施加额外约束**成为可能。这为突破文本驱动运动生成的多样性瓶颈提供了新的思路。
 
 本文提出**MotionDiffuse**，作为**首个基于扩散模型的文本驱动运动生成框架**。其核心动机在于：将DDPM引入运动生成，利用其概率映射特性解决多样性问题；同时利用扩散过程保留运动序列显式形式的优势，通过噪声插值等机制实现**身体部位独立控制**和**长序列多动作生成**，从而支持对复杂文本描述的多层次操控。
-
-
 
 ## 核心方法与创新机理
 
@@ -93,8 +89,6 @@ MotionDiffuse 的核心创新在于将**去噪扩散概率模型（DDPM）**引�
 MotionDiffuse 使用 CLIP 预训练权重初始化文本编码器的前几层并冻结，将大规模视觉-语言预训练知识迁移到运动生成任务中。消融实验（Table 3）表明，这一设计对性能至关重要——去除 CLIP 预训练后，KIT-ML 上的 Top-1 R Precision 从 0.417 骤降至 0.136。
 
 这些创新共同构成了一个统一的框架，使得 MotionDiffuse 在保持高保真度和多样性的同时，天然支持多层次操控（身体部位独立控制和长序列多动作生成），这是先前确定性生成范式难以实现的能力。
-
-
 
 MotionDiffuse 的整体框架围绕**去噪扩散概率模型（DDPM）**构建，将文本驱动的运动生成建模为一个条件去噪过程。如 Figure 2 所示，pipeline 由两条核心数据流组成：训练阶段（蓝色箭头）和推理阶段（红色箭头），文本编码与运动解码模块则为两者共享（黑色箭头）。
 
@@ -130,13 +124,6 @@ MotionDiffuse 的整体框架围绕**去噪扩散概率模型（DDPM）**构建�
 ### 与基线方法的架构差异
 
 相较于确定性映射方法（如 **TEMOS**、**MotionCLIP**、**Guo et al. (2022) T2M**），MotionDiffuse 的核心差异在于：**用扩散模型的随机去噪过程替代了确定性的编码-解码映射**。文本条件通过交叉注意力和风格化模块软性地注入，而非作为硬性条件直接拼接或映射到隐变量。这一设计使得每次采样可产生不同的运动序列，从根源上解决了多样性不足的问题。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l11_MotionDiffuse_Text_Driven_Human_Motion_Generation_with_Diffusion_Model/figures/001_Figure_1.jpg]]
-*Figure 1: MotionDiffuse is a diffusion model-based text-driven motion generation method that features 1) Probabilistic Mapping 2) Realistic Synthesis that results in highly diverse motions with high-fidelity shown in a)-d), and 3) Multi-Level Manipulation that empowers comprehensive motion generation such as that in c) where multiple body parts are involved and d) where time-varied prompts are given*
-
-
 
 MotionDiffuse 以**去噪扩散概率模型（DDPM）**为生成骨架，将文本条件通过**交叉模态线性Transformer**软性地注入去噪过程，并在此基础上构建**身体部位噪声插值**与**时间区间噪声插值**两个操控模块，实现多层次运动控制。
 
@@ -206,8 +193,6 @@ $$\overline{\epsilon}^{\mathrm{time}} = \sum_{i=1}^{m} \overline{\epsilon}_i^{\m
 
 $\overline{\epsilon}_i^{\mathrm{time}}$ 为区间 $i$ 的噪声估计经掩码填充后的全时序噪声，校正项保证不同动作片段之间的自然过渡。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -224,8 +209,6 @@ MotionDiffuse 在文本驱动运动生成和动作条件运动生成两个任务
 *Table 5: Quantitative results for Action-conditioned Motion Generation. As for UESTC dataset, we report FID on the test split. MM: MultiModality*
 
 定性结果（Figure 4）显示，MotionDiffuse 对同一文本提示能生成语义准确且姿态多样的运动序列，而 Guo et al. (2022) 的确定性方法在多样性上明显受限。
-
-![[assets/figures/papers/paper_list_l11_MotionDiffuse_Text_Driven_Human_Motion_Generation_with_Diffusion_Model/figures/011_Figure.jpg]]
 
 ### 消融实验
 
@@ -253,8 +236,6 @@ MotionDiffuse 的核心创新之一是通过噪声插值实现身体部位独立
 2. **运动表征单一**：当前 pipeline 仅接受一种运动表征形式，无法跨数据集泛化。作者提出未来需构建能同时适配多种运动表征的通用框架，但未给出具体方案。
 3. **复杂文本的边界情况**：对于涉及多个身体部位且动作语义冲突的描述（如“左手画圆，右手画方”），噪声插值的校正项可能不足以消除部位间的运动伪影，该点需通过更多定性样本进行人工验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l11_MotionDiffuse_Text_Driven_Human_Motion_Generation_with_Diffusion_Model/figures/004_Table_1.jpg]]
 *Table 1: Quantitative results on the HumanML3D test set. All methods use the real motion length from the ground truth. ‘→’ means results are better if the metric is closer to the real motions. We run all the evaluation 20 times and ± indicates the 95% confidence interval. The best results are in bold*
 
@@ -266,8 +247,6 @@ MotionDiffuse 的核心创新之一是通过噪声插值实现身体部位独立
 
 ![[assets/figures/papers/paper_list_l11_MotionDiffuse_Text_Driven_Human_Motion_Generation_with_Diffusion_Model/figures/008_Table_4.jpg]]
 *Table 4: Ablation of the latent dimension and the number of transformer layers. All results are reported on the KIT-ML test set*
-
-
 
 ## 定位与知识库关联
 
@@ -312,8 +291,6 @@ MotionDiffuse 的能力边界由其扩散模型架构和训练数据共同定义
 **评估指标的对齐**：论文使用 FID、R Precision、MultiModal Dist 和 Diversity 等指标，但这些指标与人类感知质量的对应关系尚未充分验证。特别是 Diversity 指标可能被模型通过生成不合理的抖动来“作弊”提升，需要更可靠的多样性评估方法。
 
 > **注意**：以上适用边界分析和开放问题中的部分推断（如物理合理性、评估指标对齐的具体机制）基于对方法架构的分析，论文原文未对此进行系统性实验验证，需要后续研究确认。
-
-
 
 ## 原文 PDF
 

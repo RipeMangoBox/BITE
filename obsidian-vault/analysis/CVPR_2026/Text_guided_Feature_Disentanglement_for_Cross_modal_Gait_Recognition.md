@@ -50,15 +50,11 @@ claims:
 
 在**SUSTech1K**数据集上，TCFDNet在2D→3D和3D→2D两个跨模态方向上分别取得55.9%和61.7%的Rank-1准确率，均达到新的最优水平，显著超越CL-Gait（需额外合成数据预训练）等先前方法。在**FreeGait**数据集上同样取得最优结果，验证了方法的泛化能力。消融实验表明，移除GMTD文本字典或TFD解耦模块均导致性能大幅下降，证实了文本先验引导解耦策略的有效性。t-SNE可视化进一步显示，TCFDNet的2D和3D特征在共享空间中聚类更紧凑、类间距离更大，表明解耦后的共享特征具有更强的判别性。
 
-
-
 步态识别是一种通过个体行走模式进行远距离身份认证的生物特征技术，在安防监控、智慧城市等领域具有重要应用价值。传统步态识别主要依赖RGB相机捕获的2D视频序列，但2D视觉模态对光照变化、视角偏移、遮挡和衣着变化等因素高度敏感，导致真实场景下的鲁棒性不足。近年来，LiDAR传感器凭借其对光照不敏感、能提供精确三维几何信息的优势，逐渐被引入步态识别任务，形成了2D相机与3D LiDAR并存的跨模态步态识别新范式。
 
 跨模态步态识别的核心瓶颈在于：LiDAR点云与RGB视频之间存在显著的模态差异——前者捕获稀疏的三维空间结构，后者记录稠密的二维纹理外观，二者在数据分布和特征表达上天然异构。现有方法，如**CL-Gait**（Guo et al., ECCV 2024）和**CrossGait**（Wang et al., IJCB 2024），通常采用对比学习或共享原型训练来对齐两种模态的特征空间，但这类方法提取的视觉特征高度纠缠，模态特有信息与共享的判别性步态线索混杂在一起，难以有效分离出真正对身份识别有用的跨模态不变表示。此外，这些方法普遍缺乏额外的语义先验来指导特征解耦过程，仅依赖视觉信号自身的统计对齐，导致在面对复杂场景（如昼夜变化、视角突变）时性能退化明显。
 
 本文的动机源于一个关键洞察：**文本描述可以作为语义锚点，引导视觉特征向模态共享方向解耦**。具体而言，人类可以用自然语言描述“一个人在LiDAR点云中呈现的步态轮廓”与“同一个人在RGB视频中呈现的步态外观”，这些文本描述天然地抽象掉了模态特有的底层细节，保留了跨模态共享的高层语义。基于此，本文提出**TCFDNet**（Text-guided Cross-modal Feature Disentanglement Network），核心思路是利用大语言模型（LLM）构建一个**步态模态文本字典（GMTD）**，为每种模态和视角生成丰富的语义描述，再通过CLIP模型将文本嵌入与视觉嵌入对齐，以文本先验显式地指导特征解耦——将视觉特征分解为模态共享的判别性分量和模态特有的噪声分量，从而在跨模态检索中获得更鲁棒、更具区分度的表示。
-
-
 
 ## 核心方法与创新机理
 
@@ -101,8 +97,6 @@ $$\mathrm{GMTD} = \{ t_j^m \mid m \in \{2d, 3d\}, j = 1, 2, \ldots, 8l \}$$
 
 这些创新共同构成了 TCFDNet 的技术壁垒：文本先验提供了解耦的语义指导，残差分解保证了共享特征的纯度，FSE 与 Patch 交换则提升了特征的鲁棒性与泛化性。
 
-
-
 TCFDNet 的整体架构围绕一个核心思想构建：**利用文本先验作为语义锚点，引导跨模态视觉特征解耦**，从而分离出模态共享的判别性步态表示。如图 3 所示，框架由六个关键模块串联而成，形成“视觉编码→多粒度融合→文本引导解耦→稳定性增强→联合优化”的完整推理链。
 
 ### 输入与数据流
@@ -129,12 +123,8 @@ $$\mathcal{L}_{all} = \gamma_1(\mathcal{L}_{tri} + \mathcal{L}_{ce}) + \gamma_2 
 
 整个框架的因果逻辑链为：**GMTD 提供语义锚点 → TFD 以文本相似度为引导重构模态特有特征 → 残差分解自然剥离出模态共享特征 → FSE 增强共享特征的鲁棒性**。消融实验（Table 4）证实，移除 GMTD 会导致性能显著下降，验证了文本先验是驱动特征解耦的因果旋钮。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1081_https_openaccess_thecvf_com_content_CVPR2026_html_Lu_Text_guided_Feature/figures/003_Figure_3.jpg]]
 *Figure 3: Illustration of the proposed framework*
-
-
 
 ### 整体框架与数据定义
 
@@ -194,9 +184,6 @@ $$
 
 TFD 模块（Figure 5）是核心创新，利用文本先验重构模态特有特征，再通过残差分解获得模态共享特征。
 
-![[assets/figures/papers/paper_list_l1081_https_openaccess_thecvf_com_content_CVPR2026_html_Lu_Text_guided_Feature/figures/005_Figure_5.jpg]]
-*Figure 5: The flowchart of TFD module*
-
 **模态特有特征调制**：通过通道级调制因子 $\alpha$ 对模态特有特征进行缩放：
 
 $$
@@ -232,19 +219,6 @@ $$
 - **$\mathcal{L}_{HSIC}^m$（HSIC 独立性损失）**：进一步约束共享与特有特征的统计独立性。
 
 默认权重设置为 $\gamma_1 = 1.0$，$\gamma_2 = 0.5$，$\gamma_3 = 0.1$。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1081_https_openaccess_thecvf_com_content_CVPR2026_html_Lu_Text_guided_Feature/figures/004_Figure_4.jpg]]
-*Figure 4: Details of the MF module*
-
-![[assets/figures/papers/paper_list_l1081_https_openaccess_thecvf_com_content_CVPR2026_html_Lu_Text_guided_Feature/figures/001_Figure_1.jpg]]
-*Figure 1: Details of the GMTD construction*
-
-![[assets/figures/papers/paper_list_l1081_https_openaccess_thecvf_com_content_CVPR2026_html_Lu_Text_guided_Feature/figures/002_Figure_2.jpg]]
-*Figure 2: The instruction for GMTD, which consists of three parts: formulation, protocol, and examples. This design encourages LLMs[1–3] to perform instruction-following [25], chain-of-thought[40], and in-context generation [8]*
-
-
 
 ## 实验与关键发现
 
@@ -297,11 +271,6 @@ Table 4的消融实验系统性地验证了各模块的贡献（以LiDAR→Camer
 
 3. **LLM依赖的文本质量限制：** GMTD的构建依赖LLM生成步态描述，其质量受限于LLM对步态细节（如步幅、节奏、关节运动模式）的理解能力。当文本描述过于泛化或与视觉特征不对齐时，语义锚点的引导作用会减弱。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1081_https_openaccess_thecvf_com_content_CVPR2026_html_Lu_Text_guided_Feature/figures/007_Table_1.jpg]]
-*Table 1: Rank-1 accuracy of cross-modal gait recognition from 2D camera to 3D LiDAR on the SUSTech1K dataset. ♠ indicates that a significant quantity of extra data is required for pre-training in this approach. The best results are indicated in bold, second in underline*
-
 ![[assets/figures/papers/paper_list_l1081_https_openaccess_thecvf_com_content_CVPR2026_html_Lu_Text_guided_Feature/figures/011_Table_4.jpg]]
 *Table 4: Ablation study on SUSTech1K dataset for cross-modal gait recognition (LiDAR → Camera). At each step, only one functional group is modified while others remain fully integrated*
 
@@ -310,11 +279,6 @@ Table 4的消融实验系统性地验证了各模块的贡献（以LiDAR→Camer
 
 ![[assets/figures/papers/paper_list_l1081_https_openaccess_thecvf_com_content_CVPR2026_html_Lu_Text_guided_Feature/figures/013_Figure_8.jpg]]
 *Figure 8: Visualization of cross-modal intra/inter-class cosine similarity distribution*
-
-![[assets/figures/papers/paper_list_l1081_https_openaccess_thecvf_com_content_CVPR2026_html_Lu_Text_guided_Feature/figures/009_Table_3.jpg]]
-*Table 3: Accuracy of cross-modal gait recognition on the FreeGait*
-
-
 
 ## 定位与知识库关联
 
@@ -363,8 +327,6 @@ TCFDNet在上述谱系中开辟了**文本引导特征解耦**的新路径，其
 ### 证据强度说明
 
 上述方法定位基于SUSTech1K数据集上的主实验结果（Table 1-2，Rank-1 55.9%/61.7%）和消融研究（Table 4，移除GMTD导致显著性能下降），证据可信度较高（confidence ≥ 0.9）。t-SNE可视化（Figure 7）和类内/类间相似度分布（Figure 8）进一步从特征空间结构角度支撑了文本引导解耦的有效性。关于昼夜鲁棒性不足和门控机制必要性的局限描述，来自原文明确讨论，可直接采信。开放问题部分为基于已知局限的合理推演，需后续工作验证。
-
-
 
 ## 原文 PDF
 

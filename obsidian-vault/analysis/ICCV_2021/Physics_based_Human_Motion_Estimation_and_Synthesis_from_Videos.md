@@ -51,15 +51,11 @@ claims:
 
 在Human3.6M基准上，该方法将全局根节点位置误差从**PhysCap**（Shimada et al., ToG 2020）的182.6 mm降至85.1 mm，MPJPE从97.4 mm降至68.1 mm。在接触敏感指标上，物理损失使脚步切向速度误差降低超过40%，脚步高度误差降低80%。利用物理精炼后的运动训练运动合成模型，其生成质量在所有指标上持续优于未经物理校正的数据，证明了该框架能够有效替代动捕数据，驱动生成模型学习物理合理的运动先验。
 
-
-
 从单目视频中估计三维人体运动是计算机视觉的核心问题之一，在运动合成、人机交互、影视制作等领域有广泛应用。然而，当前主流方法面临一个根本性困境：**从视频估计的3D人体姿势普遍缺乏物理一致性**——脚步滑动、地面穿透、身体尺度抖动等问题频繁出现，使得这些估计结果无法直接作为高质量训练数据用于运动合成模型。与此同时，传统运动合成模型依赖大规模动作捕捉（mocap）数据集，如AMASS，其采集成本高昂、环境受限，难以覆盖开放场景中的运动多样性。
 
 这一困境的实质在于：**运动学层面的姿势估计与物理层面的运动真实性之间存在鸿沟**。现有方法要么完全忽略物理约束，仅依赖视觉信号进行运动学回归（如HMR、HMMR、VIBE）；要么引入物理约束时采用硬性的接触检测与离散优化策略。例如，**PhysCap**（Shimada et al., ToG 2020）需要单独训练接触检测器并进行非线性规划求解；**Rempe et al.**（ECCV 2020）则依赖交替优化中的离散接触重标记步骤。这些方法在接触推理上引入了不可微的硬决策，使得优化过程复杂且难以端到端地处理接触事件。
 
 本文的核心动机正是打破这一僵局：**能否在不依赖动捕数据的前提下，从单目RGB视频中直接恢复物理正确的运动，并以此驱动运动合成模型摆脱对动捕的依赖？** 实现这一目标的关键在于解决接触建模的可微性问题——将接触从硬约束松弛为软惩罚，使接触事件在连续优化中动态形成，从而无需显式的接触检测或离散决策步骤。这一思路不仅简化了优化流程，更重要的是打通了从“噪声视频姿势”到“物理合理运动”再到“高质量合成模型训练数据”的完整链路（见图1）。
-
-
 
 ## 核心方法与创新机理
 
@@ -103,8 +99,6 @@ $$L_{dynamics} = w_{dynamics} || f_t^r - B f_t^a - J^T f_t^c ||^2$$
 
 需要指出，这些创新目前是在受限条件下验证的：仅建模与地面的接触，评估时排除了坐、躺等交互序列；动力学模型使用简化的几何原语（恒定厚度圆柱体）；优化基于离线 LBFGS，尚未证明适用于实时场景。这些限制为后续工作留下了明确的改进空间。
 
-
-
 本文提出一个从单目RGB视频中直接估计物理合理人体运动并训练运动合成模型的完整框架，其核心动机在于：现有视频姿势估计器输出的3D运动缺乏物理一致性（脚步滑动、地面穿透、尺度抖动），而高质量动捕数据的采集成本高昂且场景受限。该框架通过引入可微物理优化，将噪声运动精炼为物理正确的运动，从而替代动捕数据用于下游生成模型的训练。
 
 ### 框架总览
@@ -135,13 +129,6 @@ $$L_{dynamics} = w_{dynamics} || f_t^r - B f_t^a - J^T f_t^c ||^2$$
 ### 与先前工作的本质区别
 
 Table 1 对比了相关工作的特性。与 **PhysCap**（Shimada et al., ToG 2020）相比，本框架不需要物理模拟器中的硬接触约束；与 **Rempe et al.**（ECCV 2020）相比，本方法使用完整刚体逆动力学（递归牛顿-欧拉），精确计入全身惯性，而非质心近似；与依赖AMASS动捕数据的 **VIBE** 相比，本框架完全从视频数据中获取训练信号。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2109_09913/figures/001_Figure_1.jpg]]
-*Figure 1: We propose a framework to estimate physically correct motions from noisy pose estimations from video. This allows us to train a motion synthesis network directly on video data, removing the need for mocap data used in prior work*
-
-
 
 ### 方法总览与模块划分
 
@@ -246,8 +233,6 @@ $$
 
 消融实验（Table 4）直接验证了 $L_{physics}$ 对接触质量的因果作用：关闭物理损失后，**脚步切向速度误差从2.71升至4.65（恶化约72%），脚步全局高度误差从18.9升至95.7（恶化约406%）**。这证明软接触损失和动力学约束是消除脚步滑动和地面穿透的核心机制。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -288,24 +273,11 @@ Figure 5 揭示了方法的典型失败模式：即使动捕重建误差较高�
 - **Figure 3 & Figure 4** 的定性可视化表明，物理优化在侧视图中对初始运动学估计的修正尤为显著：身体形状参数被大幅调整，脚步从悬浮/穿透状态被拉回地面，验证了穿透损失 $L_{penetration}$ 和接触损失的协同作用。
 - **Table 6** 列出了所有超参数常数值，其中接触变量中的 $k_1=50$、$k_2=25$ 控制了软阶跃的陡峭程度，摩擦系数 $\mu=1.0$，这些参数的选择对接触行为的建模至关重要。
 
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2109_09913/figures/011_Table_6.jpg]]
-*Table 6: Table of constants used and their values*
-
 ![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2109_09913/figures/003_Figure_2.jpg]]
 *Figure 2: Overview of our framework. A video sequence is processed by a per-frame CNN pose estimator. The 3d and 2d keypoint detections are passed to an inverse kinematics step that forms an initial estimate of the SMPL body model motion using 3D keypoints. We then optimize this initialization with our physics loss and use the produced motions in place of motion capture to train motion synthesis models*
 
 ![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2109_09913/figures/008_Figure_3.jpg]]
 *Figure 3: Optimization result on video. Here we show a photo snapping motion produced by our framework, video frames from the input motion are included below. Figure 4: Pose estimation result. In light orange is the motion initialization for our optimization, in blue is the final output of our method overlayed on the red skeleton which is ground truth joints. In the camera view on the right, the initial pose looks plausible, but is refined drastically as the body shape is optimized by our method as seen on the side view shown on the left*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2109_09913/figures/002_Table_1.jpg]]
-*Table 1: Comparison of features of different related works. RFC uses a physics simulator but does not use proper contact dynamics*
-
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2109_09913/figures/004_Table_2.jpg]]
-*Table 2: Overview of variables that are directly optimized, their symbol and description. For all of the variables that depend on time, we are actually optimizing the parameters of their respective splines (including tangent values)*
-
-
 
 ## 定位与知识库关联
 
@@ -352,8 +324,6 @@ Figure 5 揭示了方法的典型失败模式：即使动捕重建误差较高�
 本工作属于**物理引导的运动理解**这一研究方向的关键节点。其核心贡献——可微软接触损失——为后续将物理约束融入深度学习管线提供了重要的方法论参考。在单目视频姿势估计领域，它填补了“纯运动学估计缺乏物理合理性”与“基于动捕的强监督方法数据昂贵”之间的空白。在运动合成领域，它首次证明了仅从视频数据（无需动捕）即可训练出具有竞争力的生成模型，为摆脱对昂贵动捕数据的依赖开辟了新路径。
 
 **需注意**：本方法在 Human3.6M 上的 MPJPE（68.1 mm）与使用 AMASS 动捕训练的强 oracle 基线 VIBE 仍有差距，且 VIBE 的公平性对比需考虑其训练数据优势。因此，该方法更适合被视为**数据高效**的物理精炼方案，而非在绝对精度上超越所有监督方法的方案。
-
-
 
 ## 原文 PDF
 

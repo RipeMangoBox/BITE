@@ -59,8 +59,6 @@ claims:
 
 PvP 的成功揭示了本体感知与特权状态之间的互补性是一种无需额外标注或复杂组件的强监督信号，通过简洁的对比学习即可显著加速人形机器人策略学习。
 
-
-
 ### 人形机器人全身控制的挑战
 
 人形机器人的全身控制（Whole-Body Control, WBC）是实现其在真实世界中自主作业的核心技术。与四足或轮式机器人不同，人形机器人拥有更高的自由度（通常超过 30 个关节自由度）、不稳定的双足支撑结构以及复杂的全身动力学耦合，这对控制策略的学习提出了严峻挑战。
@@ -92,8 +90,6 @@ PvP 的成功揭示了本体感知与特权状态之间的互补性是一种无�
 3. **即插即用**：PvP 可作为模块化组件嵌入标准 PPO 训练流程，无需修改 RL 算法本身。
 
 实验表明，PvP 在速度跟踪和动作模仿两项人形机器人 WBC 任务上，训练效率和最终性能均显著优于 PPO 原生基线及 VAE、SPR、SimSiam 等主流 SRL 方法（Figure 5），验证了本体感知-特权对比学习范式的有效性。
-
-
 
 ## 核心方法与创新机理
 
@@ -133,8 +129,6 @@ PvP 默认将对比损失施加于**策略编码器**，而非价值编码器。
 | SRL 作用对象 | N/A | 策略或价值编码器 | 仅策略编码器 |
 
 这些 changed slots 共同构成了 PvP 相对于基线方法的系统性优势：通过利用模拟器中天然可得的特权信息作为“免费午餐”，以极简的对比学习框架实现了训练效率的显著跃升，同时避免了手工增强设计的工程负担和教师-学生蒸馏的额外训练开销（Figure 13-14）。
-
-
 
 PvP 的核心思想是在本体感知状态（proprioceptive state）与特权状态（privileged state）之间建立对比学习，从而为策略网络学习紧凑且任务相关的表征，无需手工设计数据增强。整个框架围绕 **SRL4Humanoid** 这一模块化工具包构建，将状态表征学习（SRL）与强化学习（RL）过程完全解耦，使 PPO 骨干与多种 SRL 方法可以灵活组合。
 
@@ -188,8 +182,6 @@ PvP 在以下三个设计维度上与现有 SRL 方法形成鲜明对比：
 | SRL 损失更新 | 每个 RL 步均计算并施加 | 间隔更新，每 $T$ 步施加一次 |
 
 消融实验证实，间隔更新在 $T=50$ 时通常表现最优（Figure 8），而 SRL 损失权重 $\lambda=0.1$ 时 PvP 的最终性能和样本效率达到最佳（Figure 17）。此外，PvP 在速度跟踪和动作模仿任务上均显著优于教师-学生蒸馏方法（Figure 13, Figure 14），且对粗糙地形和不同机器人平台（Unitree-G1-29dof）展现出良好的泛化性（Figure 15, Figure 16）。
-
-
 
 ### 问题形式化与RL基础
 
@@ -259,8 +251,6 @@ $$L_{\mathrm{Total}} = L_{\mathrm{RL}} + \mathbb{1}(T) \cdot \lambda \cdot L_{\m
 3. **间隔更新**：每 $T$ 步施加一次 SRL 损失，而非每个 RL 更新步均施加，有效缓解早期训练的局部最优问题。
 4. **与教师-学生蒸馏的对比**：PvP 在速度跟踪（Figure 13）和动作模仿（Figure 14）任务上均优于教师-学生蒸馏方法，且 PPO 仅靠本体感知状态无法学习。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与实验设计逻辑
@@ -299,8 +289,6 @@ Table 1 和 Table 3 分别列出了速度跟踪和动作模仿任务的关键奖
 
 尽管 PvP 在实验中表现优异，仍存在若干值得关注的局限。首先，PvP 在训练阶段依赖特权状态（如根线速度、根姿态等），这些信息在真实机器人部署时无法直接获取，sim-to-real 迁移中的表征一致性尚未完全验证，这需要后续通过领域随机化或在线自适应等方法进一步弥合。其次，当前实验主要在平坦地形和部分粗糙地形上进行，对于更复杂或动态变化的环境（如楼梯、外力干扰等）的泛化能力有待评估。此外，PvP 的性能对损失权重 λ 和更新间隔 T 等超参数较为敏感，不同任务可能需要独立调参，增加了调试成本。最后，框架目前仅在本体感知状态上进行了验证，未涉及视觉或触觉等多模态输入，限制了在复杂交互场景中的应用潜力。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1050_https_arxiv_org_abs_2512_13093/figures/005_Figure_5.jpg]]
 *Figure 5: Training progress comparison between the vanilla PPO agent and its combination with four SRL methods on the two humanoid WBC tasks. The solid line and shaded region denote the mean and standard deviation, respectively*
 
@@ -309,26 +297,6 @@ Table 1 和 Table 3 分别列出了速度跟踪和动作模仿任务的关键奖
 
 ![[assets/figures/papers/paper_list_l1050_https_arxiv_org_abs_2512_13093/figures/007_Figure_7.jpg]]
 *Figure 7: The tracking performance comparison between the PPO agent and its combinations with the four SRL methods. Our PvP achieves the highest performance across the three key tracking metrics*
-
-![[assets/figures/papers/paper_list_l1050_https_arxiv_org_abs_2512_13093/figures/009_Figure_8.jpg]]
-*Figure 8: Training progress comparison of the four SRL methods with different training time proportions on the two humanoid WBC tasks. The solid line and shaded region denote the mean and standard deviation, respectively*
-
-![[assets/figures/papers/paper_list_l1050_https_arxiv_org_abs_2512_13093/figures/019_Figure_13.jpg]]
-*Figure 13: Training progress comparison between the teacherstudent distillation method and PvP in the LimX-Oli-31dof-Velocity task. The solid line and shaded region denote the mean and standard deviation, respectively*
-
-![[assets/figures/papers/paper_list_l1050_https_arxiv_org_abs_2512_13093/figures/020_Figure_14.jpg]]
-*Figure 14: Training progress comparison between the teacherstudent distillation method and PvP in the LimX-Oli-31dof-Mimic task. The solid line and shaded region denote the mean and standard deviation, respectively*
-
-![[assets/figures/papers/paper_list_l1050_https_arxiv_org_abs_2512_13093/figures/021_Figure_16.jpg]]
-*Figure 16: Training progress comparison between the vanilla PPO agent and its combination with four SRL methods on the Unitree-G1-29dof-Velocity task. The solid line and shaded region denote the mean and standard deviation, respectively*
-
-![[assets/figures/papers/paper_list_l1050_https_arxiv_org_abs_2512_13093/figures/022_Figure_15.jpg]]
-*Figure 15: Training progress comparison between the teacherstudent distillation method and PvP in the LimX-Oli-31dof-Velocity-Rough task. The solid line and shaded region denote the mean and standard deviation, respectively*
-
-![[assets/figures/papers/paper_list_l1050_https_arxiv_org_abs_2512_13093/figures/023_Figure_17.jpg]]
-*Figure 17: Performance comparison of the PvP method with different weighting coefficients on the LimX-Oli-31dof-Mimic task. The solid line and shaded region denote the mean and standard deviation, respectively*
-
-
 
 ## 定位与知识库关联
 
@@ -380,8 +348,6 @@ PvP 的核心技术路线建立在**本体感知-特权状态对比学习**与**
 4. **Sim-to-Real 表征校准**：在更深入的 sim-to-real 迁移中，本体感知表征如何适应真实世界的噪声分布、传感器延迟和未建模动力学？是否需要领域随机化与对比学习的联合优化？
 
 **知识库定位总结**：PvP 处于**人形机器人全身控制 × 表征学习**的交叉点，其核心贡献在于证明了**状态模态间的内在互补性**可以替代手工数据增强，成为对比学习的有效驱动力。该方法为后续工作提供了一个简洁的基线：在 PPO 骨干上仅需添加一个对比学习头（含预测器和停梯度）和间隔更新调度器，即可显著提升样本效率，无需复杂的多阶段训练或手工增强设计。
-
-
 
 ## 原文 PDF
 

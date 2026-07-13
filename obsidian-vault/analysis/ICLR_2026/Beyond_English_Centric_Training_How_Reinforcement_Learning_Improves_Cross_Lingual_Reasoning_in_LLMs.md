@@ -69,8 +69,6 @@ claims:
 
 本研究提出的方法属于**基于GRPO的跨语言推理强化学习训练**，其核心改变是将训练范式从SFT的模仿学习切换为RL的奖励驱动探索。相较于SFT的最大似然估计优化，RL通过最大化期望奖励（以答案准确性为核心信号）引导模型自主发现不依赖于特定语言的鲁棒推理策略。该方法在Qwen2.5-3B-Base、SmolLM3-3B和Qwen2.5-7B等多个基座模型上均验证了有效性（Table 4, Table 13），展现出模型规模无关的鲁棒性。
 
-
-
 大语言模型（LLM）在推理能力上取得了显著进展，但这一进步主要集中在英语场景。当面对非英语语言时，即便经过多语言预训练，模型的推理性能仍会出现明显下降。现有的跨语言推理增强方法主要依赖监督微调（SFT），通过模仿专家链式推理路径来提升目标语言的推理能力。然而，SFT的本质缺陷在于：它通过最大似然估计拟合训练数据的分布，容易过拟合于训练语言的特定推理模式，缺乏对多样化推理路径的探索能力，导致跨语言泛化受限。
 
 强化学习（RL）为这一问题提供了新的视角。RL通过奖励驱动的探索与优化机制，允许模型在训练过程中主动采样和评估多种推理路径，而非被动模仿固定轨迹。这种范式差异构成了本文的核心动机：**RL能否突破SFT的跨语言泛化瓶颈？**
@@ -82,8 +80,6 @@ claims:
 2. **非英语数据训练的RL模型反而优于英语数据训练的RL模型**。例如，德语RL训练（RL (De)）在MGSM上平均准确率达71.5%，而英语RL训练（RL (En)）仅为62.7%（Table 7, Table 14）。这一发现直接挑战了“以英语为中心”的训练范式。
 
 为解释上述现象，本文进一步从三个机制层面展开分析：推理过程中的语言不一致性、采样驱动的策略优化，以及训练后的语义空间偏移。这些分析共同指向一个核心洞察：RL通过奖励引导的探索，使模型学习到不依赖于特定语言的鲁棒推理策略，而非英语数据在此过程中能够更有效地激发模型的潜在推理能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -122,8 +118,6 @@ SFT仅使用预先提供的静态训练样本，缺乏对模型自身生成能�
 ### 冷启动的局限性
 
 进一步的消融实验显示，在RL之前进行SFT预训练（冷启动策略）往往导致最终性能下降。特别是短步SFT（100步）后再进行RL训练，反而损害了模型性能（Table 15）。这一现象暗示SFT可能将模型引入语言相关的局部最优，限制了RL的探索空间，从而削弱了其跨语言泛化潜力。
-
-
 
 本工作构建了一套系统的跨语言推理训练与评估框架，旨在对比监督微调（SFT）与强化学习（RL）两种范式在跨语言泛化能力上的差异，并揭示其背后的关键机制。框架以预训练基座模型为起点，通过统一的训练数据、一致的训练步数和标准化的评估协议，确保方法比较的公平性。
 
@@ -176,8 +170,6 @@ SFT仅使用预先提供的静态训练样本，缺乏对模型自身生成能�
 - 评估以零样本为主，同时提供少样本结果作为稳健性验证；
 - 在 3B 和 7B 两种参数规模上验证结论的模型无关性。
 
-
-
 ### 泛化得分（Generalization Score）
 
 为量化微调模型在跨语言场景下的泛化能力，本文定义了归一化的泛化得分：
@@ -226,16 +218,12 @@ $$
 | **Language Consistency Reward** | 基于 `langid` 检测回复主语言，强制语言一致性（仅消融实验） | 与 $r_{\mathrm{acc}}$ 等权组合 |
 | **Base Model** | 预训练基座模型（如 Qwen2.5-3B-Base），提供初始隐层特征 | 冻结或全参数训练 |
 
-
-
 ## 实验与关键发现
 
 ### 核心发现一：RL 在跨语言推理上系统性地优于 SFT
 
 在 MGSM 基准上，RL 训练模型在所有 10 种测试语言上均显著优于 SFT 训练模型。以中文训练为例，RL（Zh）的平均准确率达到 66.0%，而 SFT（Zh）仅为 46.9%，提升幅度达 +19.1 个百分点；泛化得分（Gen）方面，RL（Zh）为 52.6，SFT（Zh）仅 20.4（Table 1）。当使用德语数据进行训练时，RL（De）的平均准确率进一步攀升至 71.5%，相比 SFT（De）的 46.3% 提升了 +25.2 个百分点，这一结果在 Table 7 中得到完整呈现。
 
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_hdrG6SaTcA/figures/003_Table_1.jpg]]
-*Table 1: Performance of base, SFT, and RL models on MGSM. “Base” denotes Qwen2.5-3B-Base. “SFT (zh)” and “RL (zh)” indicate tuning on Chinese data. We report accuracy on 10 linguistic settings; ∆ (RL–SFT) denotes the performance gap. Each value is averaged over six runs.$^ { \mathrm { \bullet } } \mathrm { A v g } ^ { \mathrm { \bullet } }$ and “Gen” refer to the mean accuracy and generalization score, respectively
 
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_hdrG6SaTcA/figures/013_Table_7.jpg]]
 *Table 7: Performance of base model, SFT, and RL tuning models on MGSM. Base denotes the original Qwen2.5-3B-Base model. SFT (zh) and RL (zh) mean we tune the base model in Chinese data through SFT and RL, respectively. We report the accuracy score on 10 linguistic settings. ∆ (RL-SFT) represents the performance difference between RL and the corresponding SFT score. Each score represents the average accuracy over six measurements. Avg represents the average of the scores of 10 language settings and Gen represents the generalization score*
@@ -264,16 +252,7 @@ $$
 
 RL 模型在推理过程中表现出显著的语言不一致性——即模型生成的推理链不一定使用与训练数据相同的语言。Table 6 显示，未加约束的 RL（Zh）和 RL（De）模型在 MMath500 上的语言一致性均为 0.0%，表明模型在推理时几乎完全偏离了训练语言。
 
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_hdrG6SaTcA/figures/008_Table_6.jpg]]
-*Table 6: Language consistency of models on MMath500. We test 6 times and report the average percentage of language consistency*
-
 为验证语言不一致性的因果作用，研究者通过两种方式强制语言一致性：（1）在训练和推理时使用约束提示（Consistency Prompt）；（2）在奖励函数中引入语言一致性奖励 $r_{\mathrm{overall}} = 0.5 r_{\mathrm{acc}} + 0.5 r_{\mathrm{consistency}}$。结果如 Figure 2 所示：RL（Zh）的平均准确率从 61.3% 骤降至 53.7%；RL（De）从 61.4% 降至 60.5%（仅提示约束），进一步降至 52.0%（提示+奖励约束）。Table 9 的完整数据显示，强制语言一致性在所有测试语言上均导致性能下降，且约束越强，性能损失越大。这表明语言不一致性并非 RL 训练的副作用，而是其跨语言泛化能力的重要来源。
-
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_hdrG6SaTcA/figures/007_Figure_2.jpg]]
-*Figure 2: Scores on MMath500. The chart compares the average accuracy of different models. “RL (Zh)” indicates training on Chinese data*
-
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_hdrG6SaTcA/figures/017_Table_9.jpg]]
-*Table 9: Performance of models on MMath500. “RL (zh)” denotes the model trained with Reinforcement Learning on Chinese data. “+ Consistency Prompt” indicates the addition of language control prompts during both the training and the inference. “+ Consistency Prompt and Reward” further incorporates a language consistency reward into the training objective. “+ Inconsistency Prompt and Reward” incorporates the inconsistency prompt and inconsistency reward into the training objective. We report the accuracy score on 6 linguistic settings. We test 6 times and report the average accuracy scores and pass@k scores*
 
 ### 机制分析二：在线采样与负样本探索至关重要
 
@@ -285,9 +264,6 @@ RL 模型在推理过程中表现出显著的语言不一致性——即模型�
 ### 机制分析三：RL 训练带来更稳定的语义空间偏移
 
 通过提取模型最后一层隐状态并投影到二维 PCA 空间，研究者分析了不同训练配置下的语义偏移特征。Figure 4 和 Table 10 显示，未约束的 RL（De）模型在不同语言输入上的隐状态分布保持相对紧凑，而加入语言一致性约束（+Prompt 和 +Prompt+Reward）后，模型中心距离和偏移距离均增大，语义空间变得更加分散。这表明强制语言一致性破坏了 RL 自然形成的稳定跨语言语义表征，从表示层面解释了性能下降的原因。
-
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_hdrG6SaTcA/figures/018_Table_10.jpg]]
-*Table 10: Numerical results corresponding to Figure 4, reporting the model center distance and shift distance under different RL configurations*
 
 ### 冷启动策略的负面影响
 
@@ -304,13 +280,6 @@ SFT + RL 的冷启动策略（先进行 SFT 预训练再进行 RL）并未带来
 ### 公平性保障说明
 
 所有对比实验均在严格控制下进行：SFT 和 RL 使用相同的数据量（MGSM8K 每语言 8K 样本或 LUFFY 每语言 45K 样本），训练均为 3 个完整 epoch；RL 采用统一的超参数（学习率 1e-6，批次大小 512，温度 1.0，KL 系数 0.001）；翻译质量与 MGSM8K-Instruct 可比（Table 12）；评估以零样本为主，同时提供 4-shot 结果作为稳健性验证。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_hdrG6SaTcA/figures/014_Table_8.jpg]]
-*Table 8: Performance of base model, SFT, and RL tuning models on MAIME2024. Base denotes the original Qwen2.5-3B-Base model. SFT (zh) and RL (zh) mean we tune the base model in Chinese data through SFT and RL, respectively. We report the Pass@16 score on 10 linguistic settings. ∆ (RL-SFT) represents the performance difference between RL and the corresponding SFT score*
-
-
 
 ## 定位与知识库关联
 
@@ -364,8 +333,6 @@ SFT + RL 的冷启动策略（先进行 SFT 预训练再进行 RL）并未带来
 4. **低资源语言的泛化行为**：当前实验集中在高资源语言。RL在低资源语言上的表现是否同样优于SFT？非英语训练优势是否在低资源语言上依然成立？这些问题对于评估该方法的实际应用价值至关重要。
 
 5. **语义空间稳定性的因果作用**：RL训练带来的语义空间偏移（Figure 4）与泛化性能之间的因果关系需要更严格的因果实验来确证。如果稳定性是泛化的原因而非结果，那么直接优化语义空间稳定性是否能成为新的训练目标？
-
-
 
 ## 原文 PDF
 

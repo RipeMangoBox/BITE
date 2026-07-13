@@ -56,8 +56,6 @@ claims:
 
 **方法定位**：Wolf 属于不修改预训练模型的集成式字幕生成框架，通过 LLM 融合多源异构描述来提升字幕的准确性与一致性。其核心创新在于将图像级与视频级模型的互补优势进行系统化整合，同时引入显式的运动字幕生成模块。
 
-
-
 密集视频字幕生成（Dense Video Captioning）要求模型对视频内容产生详尽、准确且时间连贯的自然语言描述，这在自动驾驶、机器人操作等安全关键领域中具有重要应用价值。然而，现有方法面临根本性瓶颈：**单一视觉语言模型（VLM）难以同时捕捉细粒度视觉细节和动态运动信息**。图像级模型擅长提取单帧的丰富细节，但缺乏时序推理能力；视频级模型能够感知全局时间动态，却往往在细节保真度上有所妥协。这种互补能力的割裂，导致单一模型在生成密集字幕时容易产生幻觉，且无法满足高安全场景对准确性的苛刻要求。
 
 具体而言，现有研究存在以下关键缺口：
@@ -68,8 +66,6 @@ claims:
 本文的动机正是填补上述缺口。核心思路是设计一个**多专家摘要框架（mixture-of-experts summarization）**，利用大语言模型（LLM）对来自不同VLM的异构字幕进行级联总结和交叉验证。这一思路的因果机制在于：LLM作为“仲裁者”，能够识别并消解不同来源描述中的冲突信息，从而在保留图像模型细节丰富性和视频模型时序敏感性的同时，有效抑制幻觉。该框架无需对任何预训练VLM进行微调，具有即插即用的灵活性。
 
 此外，评估密集视频字幕的质量本身也是一个挑战。传统指标（如BLEU、ROUGE）难以捕捉语义层面的准确性和细节丰富度。为此，本文同步提出了**CapScore**——一个基于LLM的自动评估指标，从字幕相似度（Caption Similarity）和字幕质量（Caption Quality）两个维度量化生成字幕与人类标注的一致性。该指标与人类评估高度相关（Pearson相关系数分别达0.93和0.95），为方法的迭代优化提供了可靠的信号。
-
-
 
 ## 核心方法与创新机理
 
@@ -92,8 +88,6 @@ Wolf的核心创新在于提出了一种**多专家摘要（mixture-of-experts�
 ### 创新验证
 
 Wolf在500个高交互性驾驶视频上的Caption Similarity达到0.55，显著超过最强基线Gemini-Pro-1.5的0.42，Caption Quality也由0.45提升至0.56（Table 2）。消融研究进一步表明，结合图像级和视频级模型的完整Wolf组合达到相似度0.55和质量0.56，优于仅使用视频模型的组合（0.49/0.52），直接证明了多源融合策略在减少幻觉方面的有效性（Table 6）。
-
-
 
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2407_18908/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of proposed Wolf framework. Wolf utilizes both image-level and video-level models to generate diverse and detailed captions, which are then summarized for cross-checking. On the right side, we also provide an example of how we obtain motion captions based on object locations extracted from image captions*
@@ -136,8 +130,6 @@ Wolf 的 pipeline 由四个关键模块串联构成，形成“图像级 + 运�
 - **中间产物**：采样帧序列 → 图像级字幕（级联生成） → 物体边界框轨迹 → 运动字幕 → 视频级字幕。  
 - **最终输出**：LLM 摘要器生成的单一详细视频字幕，覆盖视觉细节、物体运动及全局时间描述。
 
-
-
 Wolf框架由四个核心模块构成，通过LLM摘要器实现多源信息的融合与交叉验证。整体流程如Figure 1所示：视频首先经过帧采样与分割，随后分别输入图像级字幕生成器、运动字幕生成器和视频级字幕生成器，最终由LLM摘要器汇总生成密集视频字幕。
 
 ### 1. 帧采样与分割
@@ -177,8 +169,6 @@ $$C_{\text{final}} = \text{LLM}_{\text{sum}}(\{C_t\}_{t=1}^{T}, C_{\text{motion}
 LLM摘要器的提示词引导模型整合视觉和叙事元素，通过多源信息的相互校验减少幻觉。消融实验（Table 6）表明，结合图像级和视频级模型的最佳组合（Caption Similarity 0.55 / Caption Quality 0.56）显著优于仅使用视频模型的组合（0.49/0.52），验证了多源融合的有效性。
 
 **注意**：论文未提供CapScore评估指标的具体数学公式，该指标通过GPT-4对预测字幕与真实字幕的相似度和质量进行评分，其与人类评估的Pearson相关系数达到0.93（相似度）和0.95（质量），但具体评分函数的数学形式需查阅论文附录或代码实现。
-
-
 
 ## 实验与关键发现
 
@@ -227,15 +217,9 @@ Wolf 在三个领域、四个数据集上进行了全面评估：**500 个高交
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2407_18908/figures/009_Table_4.jpg]]
 *Table 4: Comparison on 500 highly interactive Nuscenes videos VILA-1.5 and fine-tuned VILA-1.5 with Wolf captions*
 
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2407_18908/figures/010_Table_5.jpg]]
-*Table 5: QA Accuracy comparison of the fine-Tuned Model on Activity and MSRVTT datasets*
-
 ### Token 效率与字幕长度分析
 
 Figure 6 展示了不同模型在字幕长度变化下的 CapScore 表现。总体趋势表明：Caption Similarity 在字幕较短时随 token 数量增长而提升，但达到一定长度后趋于平稳甚至下降，说明过度冗长的描述并不带来更高的语义匹配度。Caption Quality 的变化模式则因模型而异，Wolf 在较长字幕下仍能保持较好的质量稳定性，这得益于其多源交叉验证机制对冗余和矛盾信息的过滤作用。
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2407_18908/figures/013_Figure_6.jpg]]
-*Figure 6: CapScore Caption Similarity and Caption Quality evaluated under varying caption length*
 
 ### 失败模式与局限性
 
@@ -246,18 +230,6 @@ Figure 6 展示了不同模型在字幕长度变化下的 CapScore 表现。总�
 3. **数据集规模有限**：高交互驾驶场景仅 500 个视频，机器人场景仅 100 个视频，模型在这些领域的泛化能力尚需更大规模验证。
 4. **任务无关细节**：当前框架未考虑字幕与下游任务（如规划、控制）的内容对齐，可能生成对任务无帮助甚至分散注意力的描述细节。
 5. **缺乏置信度量化**：Wolf 未提供字幕置信度或不确定性估计机制，在安全关键应用中可能引入不可控风险。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2407_18908/figures/002_Figure.jpg]]
-*Figure: t = 0 [s]. Key features: lane. t = 2 [s]. Key features: lane, traffic cones, construction zone. Caption: The footage captures a car navigating through an urban area where traffic cones are placed in its path. The cones indicate a construction zone ahead and block the vehicle's lane. The car maintains a steady speed and smoothly switches lanes to pass by each traffic cone on the right side. t = 1 [s]. Key features: t = 4 [s]. Key features: t = 8 [s]. Key features: person, beach, ocean, person, ocean, smile, person, ocean, white long hair, sunglass. sunglass, phone. shirt, dark shorts. Caption: The video opens with a person standing on a rocky beach, holding a smartphone. They are dressed in...*
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2407_18908/figures/004_Table_1.jpg]]
-*Table 1: Statistics of the Wolf dataset*
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2407_18908/figures/011_Table.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -301,8 +273,6 @@ Wolf 的方法创新在于**改变了字幕生成策略的核心槽位**：基�
 3. **长视频扩展性**：Wolf 在面对长达数十分钟的视频时能否保持效率和质量？是否需要对框架进行层级化或自适应采样调整？
 4. **计算成本优化**：能否通过模型蒸馏、更轻量的替代 VLM 或动态专家选择机制，在保持字幕质量的同时降低多模型集成的计算成本？
 5. **评估体系的扩展**：CapScore 能否扩展到多语言或多模态评估场景？其在更广泛的视频理解基准（如 EgoSchema、Ego4D）上的有效性尚待验证。
-
-
 
 ## 原文 PDF
 

@@ -63,8 +63,6 @@ GenMoStyle 处于**运动风格迁移**与**生成式潜在空间建模**的交�
 
 相较于上述工作，GenMoStyle 的关键贡献在于**将风格迁移的操作空间从姿态空间提升至潜在空间**，并在此基础上构建了**概率风格空间**与**同风格对齐**机制，从而在统一的生成式框架下实现了多模式、多样化的运动风格化。
 
-
-
 ### 问题背景
 
 人体运动风格化旨在将给定运动序列的风格属性（如“老人”、“快乐”、“沉重”等）迁移到另一段内容运动上，同时保留后者的动作语义。该技术在下游应用中具有广泛前景，包括动画制作、虚拟角色控制以及文本到运动生成的后处理增强。
@@ -82,8 +80,6 @@ GenMoStyle 处于**运动风格迁移**与**生成式潜在空间建模**的交�
 ### 本文动机
 
 针对上述缺口，本文提出将运动风格迁移的核心流程从原始姿态空间迁移到预训练自编码器的紧凑潜在空间（latent space）中。潜在空间经重建任务预训练后，具备更强的表达力和鲁棒性，能够为风格解耦提供更优的表示基础。在此基础上，引入概率风格空间与自适应实例归一化（AdaIN）注入机制，将运动代码分解为确定性时序内容代码和服从高斯先验的概率风格代码，从而在单一框架内统一支持有监督、无监督、基于运动、基于标签以及基于先验采样的多种风格化模式。
-
-
 
 ## 核心方法与创新机理
 
@@ -107,8 +103,6 @@ GenMoStyle 的核心创新在于将运动风格迁移的完整流程从原始姿
 
 此外，同风格对齐损失 $\mathcal{L}_{hsa} = D_{\mathrm{KL}}(\mathcal{N}_s^1(\mu_s^1, \sigma_s^1) \| \mathcal{N}_s^2(\mu_s^2, \sigma_s^2))$ 鼓励同一序列中不同子片段的风格空间对齐，在有监督设置下将内容准确率提升 13%，无监督下提升 6%，成为解耦质量的关键保障。
 
-
-
 GenMoStyle 的整体设计遵循“先压缩、再解耦、后重组”的两阶段范式，将运动风格迁移的核心流程从原始姿态空间迁移至预训练自编码器的紧凑潜在空间，从而获得更富表达力且对噪声更鲁棒的表示。
 
 ### 两阶段流水线
@@ -123,9 +117,6 @@ GenMoStyle 的整体设计遵循“先压缩、再解耦、后重组”的两阶
 - **有监督模式**：基于运动示例的风格迁移（以风格运动提取 $z_s$ 注入内容运动）或基于标签的风格化（以目标风格标签引导 $z_s$ 采样）；
 - **无监督模式**：基于运动示例的风格迁移（无需风格标签，直接从风格运动提取 $z_s$）或基于先验的风格化（从标准高斯先验随机采样 $z_s$，无需任何风格指示）。
 
-![[assets/figures/papers/paper_list_l4_GenMoStyle_Generative_Human_Motion_Stylization_in_Latent_Space_motion20v2/figures/004_Figure_3.jpg]]
-*Figure 3: During inference, our approach can stylize input content motions with the style cues from*
-
 此外，全局运动预测器（GMP）从局部关节运动预测根节点速度等全局量，实现风格化后的自适应步态，保证运动在全局轨迹层面的合理性。
 
 Table 1 对比了 GenMoStyle 与代表性基线方法在训练和推理灵活性上的差异：**Aberman et al., 2020** 仅支持有监督运动风格化，**Park et al., 2021** 扩展至基于标签的多样化生成但缺乏无监督能力，**Jang et al., 2022** 专注于无监督运动风格化；而 GenMoStyle 统一覆盖了上述所有模式，并额外支持基于先验的无条件风格化。
@@ -133,12 +124,8 @@ Table 1 对比了 GenMoStyle 与代表性基线方法在训练和推理灵活性
 ![[assets/figures/papers/paper_list_l4_GenMoStyle_Generative_Human_Motion_Stylization_in_Latent_Space_motion20v2/figures/002_Table_1.jpg]]
 *Table 1: Our generative framework owns flexible design for training and inference*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l4_GenMoStyle_Generative_Human_Motion_Stylization_in_Latent_Space_motion20v2/figures/003_Figure_2.jpg]]
 *Figure 2: Approach overview. (a) A pre-trained autoencoder E and D (Sec. 3.1) builds the mappings between motion and latent spaces. Motion (latent) code z is further encoded into two parts: content code*
-
-
 
 GenMoStyle 的核心架构由五个模块构成，围绕“潜在空间编码—内容/风格解耦—条件生成”这一主线展开。
 
@@ -151,9 +138,6 @@ $$z = \mathcal{E}(P) \in \mathbb{R}^{T_z \times D_z}$$
 $$\hat{P} = \mathcal{D}(z) = \mathcal{D}(\mathcal{E}(P))$$
 
 该潜在空间的训练引入两项正则化：KL 散度正则化鼓励潜在代码接近标准正态分布 $\mathcal{L}_{kld}^l = \lambda_{kld}^l D_{\mathrm{KL}}(z || \mathcal{N}(0, I))$，以及 L1 与平滑正则化抑制潜在代码的量级和时序波动 $\mathcal{L}_{reg}^l = \lambda_{l1} \|z\|_1 + \lambda_{sms} \|z_{1:T_z} - z_{0:T_z-1}\|_1$。消融实验表明 $\lambda_{l1}=0.001, \lambda_{sms}=0.001$ 可实现最佳重建与风格化性能（Table 12）。
-
-![[assets/figures/papers/paper_list_l4_GenMoStyle_Generative_Human_Motion_Stylization_in_Latent_Space_motion20v2/figures/020_Table_12.jpg]]
-*Table 12: Effect of hyper-parameters of autoencoder on the (Aberman et al., 2020) and (Xia et al., 2015) test sets. ± indicates 95% confidence interval. Bold face indicates the best result, while underscore refers to the second best. Results of motion-based stylization in supervised setting are presented. MPJPE is measured in millimeter*
 
 **内容编码器 (E_c)** 从运动代码 $z$ 提取时序内容代码 $z_c$，并通过实例归一化移除全局风格信息，确保内容代码仅保留局部语义。**风格编码器 (E_s)** 则接收运动代码 $z$ 和风格标签 $sl$，输出一个向量高斯分布 $\mathcal{N}_s(\mu_s, \sigma_s)$ 作为概率风格空间，从中采样得到风格代码 $z_s$。这一概率化设计相比确定性风格空间，在 Aberman 数据集上将 Style Accuracy 提升约 0.032（Table 7）。
 
@@ -181,15 +165,11 @@ $$\hat{P} = \mathcal{D}(z) = \mathcal{D}(\mathcal{E}(P))$$
 ![[assets/figures/papers/paper_list_l4_GenMoStyle_Generative_Human_Motion_Stylization_in_Latent_Space_motion20v2/figures/016_Table_8.jpg]]
 *Table 8: Separate / End-to-end Training. Our two-stage framework can alternatively be trained in an endto-end fashion. We also conduct ablation analysis to evaluate the impact of such choice of training strategy. The results are presented in Table 8. In practice, we observed that end-to-end training posed significant challenges. The model struggled to simultaneously learn meaningful latent motion representation and effectively transfer style traits between stages. Experimental results align with this observation, revealing that stylization accuracy is merely around 15% on both datasets in the end-to-end training scenario, in contrast to the accuracy of 92% achieved by stage-by-stage training*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l4_GenMoStyle_Generative_Human_Motion_Stylization_in_Latent_Space_motion20v2/figures/021_Figure_9.jpg]]
 *Figure 9: Detailed architecture of our VAE based motion latent model. The AE based latent model keeps only one convolution branch before the latent space. All convolutions, except the last layer of encoder, decoder and generator, use kernel size of 3*
 
 ![[assets/figures/papers/paper_list_l4_GenMoStyle_Generative_Human_Motion_Stylization_in_Latent_Space_motion20v2/figures/022_Figure_10.jpg]]
 *Figure 10: Detailed architecture of our motion latent stylization model in supervised setting. In unsupervised setting, the style label input is dropped. All convolutions, except the last layer of encoders and generator, use kernel size of 3*
-
-
 
 ## 实验与关键发现
 
@@ -229,24 +209,8 @@ GenMoStyle 在三个基准数据集上进行了系统评估，涵盖有监督和
 
 **VAE 与 AE 潜在模型的行为差异**：两种潜在模型在多样性、风格/内容准确率上表现不同，但其深层原因尚不清楚。VAE 的 KL 正则化可能引入额外的平滑性，影响风格化精度；AE 则可能保留更多运动细节但潜在空间结构性较弱。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l4_GenMoStyle_Generative_Human_Motion_Stylization_in_Latent_Space_motion20v2/figures/013_Table_6.jpg]]
 *Table 6: Ablation study on different components of our model design. ± indicates 95% confidence interval. Bold face indicates the best result, while underscore refers to the second best. (S) and (U) denote supervised and unsupervised setting. Motion-based stylization is presented for both settings. Prob-style refers to probabilistic style space*
-
-![[assets/figures/papers/paper_list_l4_GenMoStyle_Generative_Human_Motion_Stylization_in_Latent_Space_motion20v2/figures/014_Table_7.jpg]]
-*Table 7: Ablation study on the choice of probabilistic (P) or deterministic (D) space for content and style, in supervised setting. ± indicates 95% confidence interval. Bold face indicates the best result, while underscore refers to the second best. Motion-based stylization is presented*
-
-![[assets/figures/papers/paper_list_l4_GenMoStyle_Generative_Human_Motion_Stylization_in_Latent_Space_motion20v2/figures/015_Table_8.jpg]]
-*Table 8: Ablation study on separately or end-to-end training the latent model and stylization model, in supervised setting. ± indicates 95% confidence interval. Bold face indicates the best result, while underscore refers to the second best. (S) and (U) denote supervised and unsupervised setting. Motion-based stylization is presented*
-
-![[assets/figures/papers/paper_list_l4_GenMoStyle_Generative_Human_Motion_Stylization_in_Latent_Space_motion20v2/figures/007_Table_4.jpg]]
-*Table 4: Human evaluation results*
-
-![[assets/figures/papers/paper_list_l4_GenMoStyle_Generative_Human_Motion_Stylization_in_Latent_Space_motion20v2/figures/025_Figure_13.jpg]]
-*Figure 13: Failure cases. Top row shows content motion; bottom row shows our corresponding results. Stylization results of breaking dance motion (left) and push-up motion (right) using happy style label are displayed*
-
-
 
 ## 定位与知识库关联
 
@@ -293,8 +257,6 @@ GenMoStyle 在上述工作的基础上实现了三个关键“槽位”的变更
 4. **正则化策略的统一**：VAE 的 KL 正则化与 AE 的 L1/平滑正则化为何导致风格化行为的差异？是否可以在未来设计统一的潜在空间正则化策略，兼顾重建质量与风格化多样性？
 
 **注意**：以上开放问题中的部分推测（如数据增强的具体策略）基于领域常识，原文未提供直接证据，需在实际研究中验证。
-
-
 
 ## 原文 PDF
 

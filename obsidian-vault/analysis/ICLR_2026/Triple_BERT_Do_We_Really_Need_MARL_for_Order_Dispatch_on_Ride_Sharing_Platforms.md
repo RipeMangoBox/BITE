@@ -58,8 +58,6 @@ Triple-BERT 的核心洞察在于：**订单调度本质上是集中决策问题
 
 **方法定位**：Triple-BERT 属于集中式SARL调度框架，通过动作分解与BERT架构解决大规模观测与动作空间问题，在方法谱系上区别于独立MARL（如DeepPool、BMG-Q）、CTDE MARL（如HIVES、Enders et al.）以及值分解MARL（如CEVD）等路线。
 
-
-
 ### 网约车订单调度的核心挑战
 
 网约车平台需要在每个决策时刻将空闲司机与待服务订单进行实时匹配，这一调度问题本质上是一个大规模序列决策问题。其核心难点在于**维度灾难（Curse of Dimensionality, CoD）**：随着司机和订单数量的增长，联合动作空间呈指数级膨胀。具体而言，当存在 $n$ 个司机和 $m_t$ 个订单时，动作空间的下界为：
@@ -91,8 +89,6 @@ $$|A_t| \geq (n - m_t + 2)^{m_t} \geq 2^{m_t}$$
 - **动作分解策略**：将联合动作概率分解为每个司机独立选择订单概率的乘积，将组合优化问题转化为可求解的二分图匹配问题，从根本上规避了动作空间的指数爆炸。
 - **BERT自注意力架构**：利用Transformer的全局自注意力机制捕获司机与订单之间的复杂交互关系，同时通过参数复用（parameter reuse）控制网络规模随司机/订单数量的增长。
 - **QK-Attention高效计算**：设计轻量级的QK-Attention模块替代传统的大矩阵乘法，将计算复杂度从乘法级降至加法级，使集中式SARL在实际规模下可训练、可部署。
-
-
 
 ## 核心方法与创新机理
 
@@ -153,8 +149,6 @@ $$\mathrm{QK\text{-}Attention\text{-}Norm}(\overline{w}_{i,t}, \overline{o}_{j,t
 
 这些创新并非孤立的技术改进，而是围绕“集中式 SARL 能否替代 MARL”这一核心问题形成的系统性方案：范式转换提供了理论可行性，动作分解与 BERT 架构解决了计算可行性，两阶段训练保障了优化可行性。三者的协同使 Triple-BERT 在曼哈顿真实打车数据集上相较现有最先进方法综合提升约 11.95%，并在服务率、取车时间等关键运营指标上全面超越所有 MARL 基线。
 
-
-
 ![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_symgW6FhA6/figures/002_Figure_2.jpg]]
 *Figure 2: Network Architecture: The network consists of three main components: the feature extractor, the actor sub-network, and the critic sub-network. First, a worker encoder and an order encoder are used to extract features from individual worker and order information, respectively. Then an Actor BERT model captures the relationships between them and a QK-Attention module calculates the selection probabilities for each worker-order pair. Finally, the fused features of the selected worker-order pairs are input into two separate Critic BERT models for further information extraction, and two Critic MLPs compute the Q-values, as TD3 requires two critics. (In this figure, the fused sequence (input to C...*
 
@@ -185,8 +179,6 @@ Triple‑BERT 采用两阶段训练策略以解决样本稀缺和收敛困难：
 - **第二阶段（集中式 TD3 微调）**：移除独立假设，将预训练的编码器接入完整的 Actor‑Critic 架构，基于 TD3 算法进行端到端集中式训练。Actor 通过近似策略梯度（式 7）优化，Critic 通过双 Q 网络损失（式 8）更新。探索通过向概率矩阵添加噪声实现，噪声越大策略越随机，噪声为零时退化为贪心策略。
 
 消融实验表明，仅使用第二阶段训练（无预训练）会导致模型无法收敛、奖励持续下降（**Figure 3**），验证了两阶段训练的必要性。
-
-
 
 ### 特征提取器：司机编码器与订单编码器
 
@@ -262,8 +254,6 @@ $$\nabla_\Theta \mathrm{J}(\Theta) \propto \mathbb{E}_{\pi_\Theta^T} \left[ (\ma
 
 其中 $B$ 为基线函数，$\mathbf{Q}_{\pi_\Theta^T}^{TD3}$ 为双 Critic 中较小者的 Q 值。该梯度形式将全局动作的信用分配自然地分解到各司机‑订单对的 log 概率上，绕开了多智能体强化学习中棘手的信用分配问题。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能对比
@@ -288,7 +278,6 @@ Triple-BERT在曼哈顿真实打车数据集上展现了显著的性能优势。
 
 **编码器选择的影响**（Table 10）：基于ARL（自适应重加权层）的编码器显著提升了Triple-BERT及独立MARL方法的性能，但对CTDE（集中训练分散执行）MARL方法效果甚微。这一对比揭示了CTDE方法的瓶颈在于集中式评论家网络的维度灾难——即使改进了特征提取，评论家仍需面对指数级增长的联合动作空间，导致价值估计质量低下。
 
-
 ![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_symgW6FhA6/figures/015_Table_10.jpg]]
 *Table 10: Reward of Different Methods Under Different Encoder*
 
@@ -298,12 +287,10 @@ Triple-BERT在曼哈顿真实打车数据集上展现了显著的性能优势。
 
 **不同城区的迁移能力**（Table 8）：在纽约皇后区数据集上，Triple-BERT的奖励为5577.83，相较BMG-Q的5362.00提升4.0%。与曼哈顿相比提升幅度较小，这是因为皇后区订单分布更为分散，各调度策略间的奖励差异本身较小，限制了探索效率。这暴露了集中式SARL在极度分散需求场景下的边际收益递减问题。
 
-
 ![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_symgW6FhA6/figures/013_Table_8.jpg]]
 *Table 8: Performance of Different Methods in Queens, New York City*
 
 **决策效率**（Table 7）：尽管BERT架构引入了额外计算，但QK-Attention通过将乘法复杂度转化为加法复杂度，使Triple-BERT在不同司机-订单规模下保持了可接受的决策时间，验证了架构设计对大规模部署的支撑能力。
-
 
 ![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_symgW6FhA6/figures/012_Table_7.jpg]]
 *Table 7: Decision Time of Different Driver and Order Amounts (unit: seconds)*
@@ -315,31 +302,11 @@ Triple-BERT在曼哈顿真实打车数据集上展现了显著的性能优势。
 3. **极端分散场景的收益递减**：在订单密度低的区域，集中式全局优化的边际优势缩小，简单的独立策略可能已接近性能上限。
 4. **优化目标单一**：当前框架仅优化订单调度，未考虑动态定价、车辆重定位等联合优化任务，限制了平台整体收益的提升空间。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_symgW6FhA6/figures/003_Table_1.jpg]]
 *Table 1: Comparison of Different Ride Sharing Methods: Bold entries represent the best results*
 
 ![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_symgW6FhA6/figures/005_Table_2.jpg]]
 *Table 2: Performance of Different Methods in Manhattan FHV Data*
-
-![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_symgW6FhA6/figures/008_Table_3.jpg]]
-*Table 3: Model Configurations*
-
-![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_symgW6FhA6/figures/009_Table_4.jpg]]
-*Table 4: Average Performance under Multiple Periods: Bold entries represent the best results*
-
-![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_symgW6FhA6/figures/010_Table_5.jpg]]
-*Table 5: Reward of Different Methods Under Different Days*
-
-![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_symgW6FhA6/figures/011_Table_6.jpg]]
-*Table 6: Reward of Different Methods During High Concurrency Period among Different Driver Amounts*
-
-![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_symgW6FhA6/figures/014_Table_9.jpg]]
-*Table 9: Reward of Tripe-BERT w/ and w/o Positional Embedding (PE)*
-
-
-
 
 ## 定位与知识库关联
 
@@ -390,8 +357,6 @@ Triple-BERT并非简单地将MARL替换为SARL，而是通过动作分解和BERT
 3. **样本效率提升**：重要性采样能否改进当前基于TD3的离线策略梯度优化（公式7），进一步提高样本效率？
 4. **规模化通信折衷**：如何在保持全局合作的同时降低通信成本，使SARL更适用于超大规模场景（如跨城市调度）？
 5. **方法泛化**：动作分解和BERT架构能否推广到其他集中式调度任务（如仓储物流、无人机编队）？这需要验证QK-Attention-Norm在不同约束条件下的稳定性。
-
-
 
 ## 原文 PDF
 

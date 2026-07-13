@@ -50,8 +50,6 @@ claims:
 
 在InternVL3和Qwen3-VL系列模型上的实验表明，QuietPrune在保持高相对准确率的同时实现了显著的延迟降低：在InternVL3-1B上达到98.5%的相对准确率和42.1%的延迟降低，在Qwen3-VL-4B上达到95.7%的相对准确率和33.1%的延迟降低。与现有SOTA方法相比，QuietPrune在准确率与预填充延迟的权衡上均表现更优（见Figure 1）。
 
-
-
 ### 视觉-语言模型中的视觉令牌冗余问题
 
 视觉-语言模型（Vision-Language Models, VLMs）通常采用视觉编码器（如ViT）将输入图像转换为大量视觉令牌，再通过投影层将这些视觉令牌输入大语言模型（LLM）进行多模态推理。然而，视觉编码器生成的视觉令牌数量庞大，成为预填充阶段（prefill phase）的主要计算瓶颈。如图2所示，在Qwen3-VL和InternVL3系列模型上，ViT计算占预填充延迟的50%以上，对于小模型搭配高分辨率输入时更超过75%。这一瓶颈严重制约了VLM的推理效率，尤其是在对延迟敏感的实际应用中。
@@ -74,8 +72,6 @@ claims:
 3. **如何保持剪枝后的空间结构**：单个令牌的随机剪枝会破坏视觉令牌的空间位置连续性，需要设计保留空间结构的剪枝粒度。
 
 通过解决上述挑战，QuietPrune旨在实现一个统一的早期剪枝框架，在显著降低预填充延迟的同时，保持甚至提升多模态理解的准确性。
-
-
 
 ## 核心方法与创新机理
 
@@ -104,8 +100,6 @@ QuietPrune 的核心创新在于将视觉令牌剪枝的决策点从 LLM 内部�
 传统剪枝直接丢弃冗余令牌，可能损失全局上下文信息。QuietPrune 将剪除的令牌按相关性得分加权求和，聚合成一个紧凑令牌，保留在序列中以维持上下文线索。消融实验显示，该操作为 InternVL3-1B 和 Qwen3-VL-4B 分别带来额外 **+0.50%** 和 **+0.84%** 的精度提升（见表 2）。
 
 综合上述创新，QuietPrune 在 InternVL3-1B 上实现 **98.5%** 相对精度和 **42.1%** 延迟降低，在 Qwen3-VL-4B 上实现 **95.7%** 相对精度和 **33.1%** 延迟降低（见表 1），在精度-延迟权衡上显著优于现有方法。
-
-
 
 QuietPrune 的整体设计围绕一个核心洞察展开：**在 ViT 内部进行早期查询引导剪枝**，能够在显著降低预填充延迟的同时保持甚至提升模型准确率。其 pipeline 由三个关键模块串联构成，形成一条从文本查询到视觉令牌筛选的因果链路。
 
@@ -149,8 +143,6 @@ $$\mathcal{L}_{total} = \mathcal{L}_{distill}(Y_s, Y_t) + \mathcal{L}_{ce}(Y_s, 
 | 对 ViT 延迟的影响 | 无（ViT 已完成计算） | 显著降低 ViT 计算量 |
 
 这种“早期+查询引导+半结构化”的组合设计，使得 QuietPrune 能够从根本上削减 ViT 的计算瓶颈——在多数设置中 ViT 占预填充延迟的 50% 以上，小模型高分辨率下甚至超过 75%（Figure 2）。
-
-
 
 QuietPrune 由三个核心模块构成：文本到视觉适配器、半结构化分组剪枝机制和冗余令牌聚合模块。整体框架如 Figure 4 所示，其设计目标是在 ViT 内部实现查询引导的早期令牌剪枝，从而在预填充阶段显著降低计算开销。
 
@@ -208,8 +200,6 @@ QuietPrune 的总损失函数结合了知识蒸馏损失与标准交叉熵损失
 $$\mathcal{L}_{total} = \mathcal{L}_{distill}(Y_s, Y_t) + \mathcal{L}_{ce}(Y_s, Y_{gt})$$
 
 其中 $\mathcal{L}_{distill}$ 为学生模型输出 $Y_s$ 与教师模型（未剪枝模型）输出 $Y_t$ 之间的 KL 散度，$\mathcal{L}_{ce}$ 为学生输出与真实标签 $Y_{gt}$ 的交叉熵。训练时仅更新适配器参数，ViT 和 LLM 保持冻结，因此训练开销极小。
-
-
 
 ## 实验与关键发现
 
@@ -275,11 +265,6 @@ $$\mathcal{L}_{total} = \mathcal{L}_{distill}(Y_s, Y_t) + \mathcal{L}_{ce}(Y_s, 
 - 在批量推理场景下，与 KV cache 管理等系统级优化结合能否进一步释放潜力？
 - 在多图、长视频等更复杂的多模态场景中，早期查询引导剪枝策略是否仍然有效？
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l778_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_QuietPrune_Query_G/figures/002_Figure_2.jpg]]
-*Figure 2: Latency distribution between ViT and LLM during the prefill phase for the Qwen3-VL and InternVL3 model series across different model sizes with various input resolutions or number of tiles. We report the latency on a single A100 GPU. The ViT accounts for more than 50% of the latency in most settings*
-
 ![[assets/figures/papers/paper_list_l778_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_QuietPrune_Query_G/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison with SOTA token pruning methods on the InternVL3 series [47]. The proposed QuietPrune method outperforms the existing methods on both accuracy and prefill latency*
 
@@ -291,14 +276,6 @@ $$\mathcal{L}_{total} = \mathcal{L}_{distill}(Y_s, Y_t) + \mathcal{L}_{ce}(Y_s, 
 
 ![[assets/figures/papers/paper_list_l778_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_QuietPrune_Query_G/figures/010_Table_1.jpg]]
 *Table 1: Main results on the InternVL3 and Qwen3-VL series. All methods achieve an average pruning rate of 50% in the LLM part. “SAINT-Early” and “SAINT-Late” represent the SAINT method with early pruning and late pruning, respectively. “acc” refers to the accuracy score of the benchmark. “lat” refers to the prefill latency (ms) of each method. “RA%” refers to the relative accuracy compared to the model without pruning. “LR%” refers to the latency reduction compared to the model without pruning. Negative values in “LR%” indicate that the latency of the pruned model is larger than that of the model without pruning. We use red to highlight the best results of all methods and blue to highlight the best...*
-
-![[assets/figures/papers/paper_list_l778_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_QuietPrune_Query_G/figures/012_Table_2.jpg]]
-*Table 2: Results of ablation study. “SS” refers to Semi-Structured versus unstructured pruning; “QG”, namely Query-Guided, indicates pruning based on textual-visual relevance versus visual saliency alone; “IT” denotes adapter is initialized via Inverse Transformation versus random initialization; “TA” indicates whether redundant Token Aggregation is applied. “RA%” represents the Relative Accuracy. The Average Score (AS) is evaluated with a 50% pruning rate across six benchmarks*
-
-![[assets/figures/papers/paper_list_l778_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_QuietPrune_Query_G/figures/011_Figure_7.jpg]]
-*Figure 7: QuietPrune results on InternVL3-1B model. Our method adaptively retains the visual tokens that are relevant to each query*
-
-
 
 ## 定位与知识库关联
 
@@ -368,8 +345,6 @@ QuietPrune采用**2×2空间相邻分组**的剪枝粒度，基于[Q-CLS]与各�
 3. **剪枝层搜索**：剪枝层数和位置是否可以通过元学习或强化学习自动搜索，以替代当前的手工固定设置？
 4. **系统级协同**：QuietPrune的早期剪枝减少了进入LLM的令牌数量，这为KV cache压缩提供了额外机会。与系统级优化（如KV cache量化、前缀缓存）结合能否进一步释放延迟收益？
 5. **多模态扩展**：在视频理解、3D场景理解等更复杂的多模态场景中，查询引导的早期剪枝策略是否仍然有效？是否需要引入时序或深度维度的剪枝机制？
-
-
 
 ## 原文 PDF
 

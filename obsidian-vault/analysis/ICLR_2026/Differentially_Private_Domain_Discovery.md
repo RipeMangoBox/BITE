@@ -59,8 +59,6 @@ claims:
 
 **局限与开放问题**：$\ell_1$ 缺失质量的理论上下界之间仍存在间隙；实验仅在固定隐私预算 $(1, 10^{-5})$-DP 下进行；$\ell_1$ 保证依赖 Zipfian 假设，更一般分布下仅有 $\ell_\infty$ 保证。
 
-
-
 在推荐系统、基因组关联分析、文本语料库挖掘等应用中，数据常常以“用户-集合”的形式存在：每个用户贡献一个项目集合，而分析的目标是从全体用户的并集中发现一个高质量的子集。例如，从用户购买记录中发现热门商品，或从基因组数据中发现高频变异位点。这类任务统称为**域发现**（domain discovery），其核心挑战在于：域本身是未知的，算法必须在没有先验项目列表的情况下，从分布式、可能重叠的用户集合中筛选出有意义的项目。
 
 当引入**差分隐私**（differential privacy, DP）约束时，域发现问题变得尤为困难。现有工作大多假设域是已知且公开的，算法只需在有限候选集上进行私有选择。然而，在域未知的真实场景中，算法面临双重困境：
@@ -75,8 +73,6 @@ claims:
 在实验层面，作者在六个真实数据集（Reddit、Amazon Games、Movie Reviews、Steam Games、Amazon Magazine、Amazon Pantry）上验证了上述主张：WGM 在集合并任务上的缺失质量保持在策略机制（Policy Gaussian / Policy Greedy）的 5% 以内（Figure 1）；在 top-k 缺失质量上，WGM 组合算法一致优于现有的有限域 top-k 基线（Durfee & Rogers, 2019）（Figure 2）；在 k-hitting set 任务上，其性能与已知域的非私有基线相当甚至更优（Figure 3）。
 
 综上所述，本文通过重新定义效用度量、利用 Zipfian 数据特性、以及提出域发现与已知域算法的组合范式，系统性地填补了差分隐私域发现在理论保证和实用效能之间的缺口。
-
-
 
 ## 核心方法与创新机理
 
@@ -99,8 +95,6 @@ claims:
 **核心洞察**：利用 Zipfian 数据特性（频率以多项式衰减），WGM 可获得近乎最优的 $\ell_1$ 缺失质量保证（Theorem 3.3），同时具备一个分布无关的 $\ell_\infty$ 缺失质量保证（Theorem 3.6）。更重要的是，WGM 可作为**域发现预处理步骤**嵌入元算法（Algorithm 2）：先用一半隐私预算运行 WGM 获得有限域 $D$，再用另一半预算在该域上运行已知域算法（如 Peeling Exponential Mechanism 用于 top-k，或 User Peeling Mechanism 用于 k-hitting set）。这一设计将已知域算法的效用保证**扩展到了未知域场景**，为 top-k（Theorem 4.3）和 k-hitting set（Theorem 4.5）提供了新的可证明效用界。
 
 **证据强度**：上述创新点均有严格理论支撑——$\ell_1$ 缺失质量上界（Theorem 3.3）与下界（Theorem 3.5）在 $\epsilon$ 和 $N$ 的依赖上匹配至对数因子，表明 WGM 在 Zipfian 假设下近乎最优。实验部分在六个真实数据集上验证了 WGM 的集合并缺失质量保持在 Policy 机制的 5% 以内（Figure 1），且 WGM + Peeling 的组合在 top-k 缺失质量上一致优于 Limited-domain top-k 基线（Durfee & Rogers, 2019）（Figure 2）。
-
-
 
 本文提出了一种面向差分隐私域发现的元算法框架，其核心思路是将“未知域”问题转化为“已知域”问题：先用一个隐私集合并（set union）算法获取一个有限候选域，再在该候选域上运行现有的已知域私有选择算法。
 
@@ -147,8 +141,6 @@ $$\sigma = \Theta\left(\frac{1}{\varepsilon}\sqrt{\log(1/\delta)}\right), \quad 
 - **$\Delta_0$ 的选取**：子采样引入的误差可能主导缺失质量，因此 $\Delta_0$ 应尽可能接近 $\max_i |W_i|$，以最小化信息损失。
 - **效用度量的转变**：将优化目标从“发现项数”转为“缺失质量”，使理论分析能够与数据分布（特别是 Zipfian 性质）挂钩，从而获得近乎最优的 $\ell_1$ 缺失质量保证（Theorem 3.3）。在无法假设 Zipfian 分布时，WGM 仍有一个分布无关的 $\ell_\infty$ 缺失质量保证（Theorem 3.6）。
 - **级联隐私预算分配**：两阶段各占一半预算，在实验中固定为 $(1, 10^{-5})$-DP 总量，未探索其他分配比例（这是该框架的一个已知局限）。
-
-
 
 ### 问题形式化：缺失质量（Missing Mass）
 
@@ -212,8 +204,6 @@ $$\mathrm{Hits}(W,S) \geq \left(1 - \frac{1}{e}\right)\operatorname{Opt}(W,k) - 
 - 上述 $\ell_1$ 保证强依赖于 Zipfian 假设；在更一般分布下仅有 $\ell_\infty$ 保证，能否获得更一般的 $\ell_1$ 保证仍是开放问题。
 - top-k 和 k-hitting set 的上下界同样未闭合，缩小这些差距是论文提出的自然后续方向。
 
-
-
 ## 实验与关键发现
 
 ### 实验设置
@@ -267,12 +257,8 @@ Figure 3 展示了 k-hitting set 任务上遗漏用户数随 k 的变化。对�
 
 4. **$\Delta_0$ 选择**：虽然增大 $\Delta_0$ 改善效用，但在用户项数差异极大的数据集中，设置过大的 $\Delta_0$ 会增加灵敏度，需在隐私与效用间权衡。实验未给出 $\Delta_0$ 的自适应选择策略。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l38_https_openreview_net_forum_id_yBpzF8hp3J/figures/010_Table_1.jpg]]
 *Table 1: Number of users, items, and entries (user-item pairs) for each dataset*
-
-
 
 ## 定位与知识库关联
 
@@ -317,8 +303,6 @@ $\Delta_0$ 参数的选择构成了隐私-效用的直接调节旋钮：增大 $
 3. **分布假设的松弛**：$\ell_1$ 保证严重依赖 Zipfian 假设。能否在更一般的分布族（如重尾分布或具有平滑衰减特性的分布）下获得类似的 $\ell_1$ 保证，是一个重要的开放问题。
 
 4. **隐私预算的分配**：实验仅探索了固定的 $(1, 10^{-5})$-DP 预算。元算法将预算平分给 WGM 和已知域算法，但最优的预算分配比例可能因任务和数据特性而异，值得系统研究。
-
-
 
 ## 原文 PDF
 

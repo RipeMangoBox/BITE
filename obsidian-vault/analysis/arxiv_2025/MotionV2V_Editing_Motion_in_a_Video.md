@@ -151,8 +151,6 @@ $$F_{\text{latent}} = \left(\frac{F-1}{4}+1\right), \quad W_{\text{latent}} = \f
 
 在推理阶段，一个重要的发现是：**向所有跟踪点的 $(x, y)$ 坐标添加 1–2 像素的均匀随机噪声 $\epsilon \sim \mathcal{U}(-2, 2)$**，可以打破模型直接复制原始视频语义的倾向，迫使其真正遵循编辑后的运动轨迹（Figure 12）。如果不加抖动，模型倾向于在输出中保留原始物体的运动模式，导致编辑失效（如出现不应存在的第二个物体）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2511_20640/figures/001_Figure_1.jpg]]
 *Figure 1: Motion Edits Framework: Users provide an input video along with source motion tracks (colored dots connected by lines, extracted from the input) and target motion tracks (user-specified desired motion). Lines indicate point trajectories while dot presence/absence indicates visibility. Our diffusion model generates an output video matching the target motion. Applications: Our method can edit videos in a true sense, where content is preserved but motion is changed*
 
@@ -194,13 +192,8 @@ $$\epsilon \sim \mathcal{U}(-2, 2)$$
 
 这一1-2像素的抖动操作打破了模型“复制原始视频语义”的倾向。如Figure 12所示，不添加抖动时模型可能错误地复制出第二个物体（例如出现两个篮球），而添加抖动后模型正确遵循编辑后的运动轨迹。推测原因是训练数据的轨迹分布与推理时的精确编辑存在domain gap，抖动起到了正则化作用，迫使模型依赖轨迹偏差而非身份记忆来生成输出。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2511_20640/figures/005_Figure_5.jpg]]
 *Figure 5: Our motion-conditioned video diffusion architecture. We extend a T2V DiT model with a control branch that processes three additional video conditioning channels: the counterfactual video, counterfactual motion tracks, and target motion tracks. The control branch duplicates the first 18 transformer blocks and integrates with the main branch through zero-initialized MLPs, similar to ControlNet*
-
-![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2511_20640/figures/004_Figure_3.jpg]]
-*Figure 3: Controlling Content on Any Frame. By conditioning on the full video, we can move and preserve content appearing on any frame. Methods like ATI rely on the first frame, failing to control objects, like the sign, that emerge mid-sequence*
 
 ## 实验与关键发现
 
@@ -262,28 +255,14 @@ Section 10报告了一项重要的推理阶段消融实验。作者发现，模�
 3. **极端运动**：在复杂场景或极端运动变化下，扩散模型的生成质量仍可能出现畸变
 4. **动态遮挡**：动态相机与物体交互产生的复杂遮挡和重光照效果处理能力有限
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2511_20640/figures/006_Table_1.jpg]]
 *Table 1: User study win rates across all methods. Participants selected the best video for each question. Our method consistently wins across all evaluation criteria*
 
 ![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2511_20640/figures/009_Figure_7.jpg]]
 *Figure 7: Comparison of our method vs. baselines across eight challenging motion editing scenarios. Each row shows a different editing task with input video, our result, and ATI’s result (with additional baselines shown for subfigure 4). Icon key: Human Pose (modifying human motion), Move Object (repositioning objects), Move Camera (changing camera motion), Time Control (retiming events), Changed All Frames (no shared frames between input/output—impossible for image-to-video methods). Colored dots track correspondence points throughout the video; dot presence/absence indicates object visibility. Red circles highlight key differences where baselines fail*
 
-![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2511_20640/figures/011_Figure_9.jpg]]
-*Figure 9: User study win rates per question (see Table 1 for values)*
-
-![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2511_20640/figures/014_Figure_12.jpg]]
-*Figure 12: The effects of trajectory jitter on motion editing. Top: without jitter, a second basketball appears. Bottom: with 1-2 pixel jitter, the edit follows correctly*
-
 ![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2511_20640/figures/008_Figure_6.jpg]]
 *Figure 6: Iterative editing. Outputs can become inputs for subsequent edits, enabling complex sequential motion changes. Yellow dots used for first edit, green/cyan for second. Arrows added from old to new position for ease of visualization*
-
-![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2511_20640/figures/002_Figure_2.jpg]]
-*Figure 2: From left to right respectively, Cat Fish. In the edited video, the cat moves away from the bowl. Camera control. In the edited video, the first frame is zoomed out, middle frame is identical, the last frame is zoomed in. Duck Zoom. The edited video exhibits different content for a given frame (time) than the original, e.g. in the edited video, the duck is not visible in the first frame whereas it is visible in the original*
-
-![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2511_20640/figures/013_Figure_11.jpg]]
-*Figure 11: Test Data Generation. A video is separated at the middle, and then one half is reversed. This results in two videos with a common starting frame*
 
 ## 定位与知识库关联
 

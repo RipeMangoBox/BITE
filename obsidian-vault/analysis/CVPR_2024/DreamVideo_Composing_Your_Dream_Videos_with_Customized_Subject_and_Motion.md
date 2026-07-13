@@ -223,8 +223,6 @@ Table 5 和 Figure 8 系统消融了 DreamVideo 的三个核心组件：
 
 这些失败模式指向了开放问题：如何设计融合模块以集成多个主体和运动？能否进一步解耦注意力图使各主体保持独立？是否可能训练一个通用的、一次推理即可完成多种定制的视频扩散模型？
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l34_DreamVideo_Composing_Your_Dream_Videos_with_Customized_Subject_and_Motio/figures/004_Figure_4.jpg]]
 *Figure 4: Analysis of weight change on updating all spatial or temporal model weights during fine-tuning. We observe that crossattention layers play a key role in subject learning while the contributions of all layers are similar to motion learning*
 
@@ -237,23 +235,8 @@ Table 5 和 Figure 8 系统消融了 DreamVideo 的三个核心组件：
 ![[assets/figures/papers/paper_list_l34_DreamVideo_Composing_Your_Dream_Videos_with_Customized_Subject_and_Motio/figures/017_Table.jpg]]
 *Table: A3. Human evaluations on customizing motions between our method and alternatives. Table A4. Quantitative comparison of video customization between Adapter and LoRA. “T. Cons.” denotes Temporal Consistency. “Para.” means parameter number*
 
-![[assets/figures/papers/paper_list_l34_DreamVideo_Composing_Your_Dream_Videos_with_Customized_Subject_and_Motio/figures/019_Figure.jpg]]
-*Figure: a person is surfing dog a car running on the road*
-
 ![[assets/figures/papers/paper_list_l34_DreamVideo_Composing_Your_Dream_Videos_with_Customized_Subject_and_Motio/figures/020_Figure.jpg]]
 *Figure: A1. Qualitative comparison of customized video generation with both subjects and motions. Subject Custom Diffusion DreamVideo (ours)*
-
-![[assets/figures/papers/paper_list_l34_DreamVideo_Composing_Your_Dream_Videos_with_Customized_Subject_and_Motio/figures/022_Figure.jpg]]
-*Figure: Motion a car running on the road Generated Videos by DreamVideo a cat running on the road*
-
-![[assets/figures/papers/paper_list_l34_DreamVideo_Composing_Your_Dream_Videos_with_Customized_Subject_and_Motio/figures/024_Figure.jpg]]
-*Figure: a wolf riding a bicycle*
-
-![[assets/figures/papers/paper_list_l34_DreamVideo_Composing_Your_Dream_Videos_with_Customized_Subject_and_Motio/figures/025_Figure.jpg]]
-*Figure: cat a person is skateboarding, front view*
-
-![[assets/figures/papers/paper_list_l34_DreamVideo_Composing_Your_Dream_Videos_with_Customized_Subject_and_Motio/figures/026_Figure.jpg]]
-*Figure: (a) Failure cases on subject customization. a rabbit eating a watermelon a cat eating a watermelon (b) Failure cases on motion customization*
 
 ## 定位与知识库关联
 

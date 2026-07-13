@@ -54,8 +54,6 @@ claims:
 
 **主要结果**：在相似骨架和跨物种两种设置下，Motion2Motion 的 FID 指标均显著优于基线（相似骨架：0.033 vs. 0.389；跨物种：0.492 vs. 1.68）。用户研究进一步表明，该方法在运动质量（4.36/5.0）和对齐度上均显著领先。消融实验验证了稀疏绑定的有效性——仅 6.1% 的绑定率即可在运动保真度与解剖合理性之间取得最佳平衡。
 
-
-
 ### 问题背景：跨拓扑运动迁移的核心挑战
 
 在计算机动画与角色控制领域，运动迁移（Motion Transfer）旨在将源角色的动作序列重定向到目标角色上，使后者在保持自身骨骼结构的前提下复现源动作的运动语义与风格。这一任务在电影制作、游戏开发、虚拟人驱动等场景中具有广泛的应用需求。
@@ -82,8 +80,6 @@ claims:
 3. **CPU 实时推理替代 GPU 依赖**：方法在纯 CPU 上运行，推理速度达 752–778 FPS，满足实时动画制作需求。
 
 这一设计使得 Motion2Motion 能够处理从同物种（蟒蛇→眼镜王蛇）到跨物种（蟒蛇→霸王龙、火烈鸟→猴）的极端拓扑变化，在运动质量、时间一致性和多样性上均显著优于现有基线。
-
-
 
 ## 核心方法与创新机理
 
@@ -127,8 +123,6 @@ $$
 
 这些创新共同构成了一个**轻量、灵活且无需训练**的跨拓扑运动迁移框架，其核心洞见在于：未绑定关节的运动模式可由绑定关节的运动补丁通过匹配-混合推断得出，无需建立密集对应或依赖大规模配对数据。
 
-
-
 Motion2Motion 将跨拓扑运动迁移建模为一个**基于运动补丁的条件匹配与混合问题**，其核心思想是：通过用户指定的少量骨骼对应关系作为空间条件，引导源运动在目标骨骼上的重构，而无需密集对应或大规模预训练。
 
 ### 流水线总览
@@ -153,12 +147,6 @@ Motion2Motion 将跨拓扑运动迁移建模为一个**基于运动补丁的条�
 流水线的核心调控参数包括：**绑定率**（$2|\mathcal{M}|/(J_S+J_T) \times 100\%$）、**混合权重 $\alpha$**（默认 0.85）和**迭代次数 $L$**。消融实验表明，绑定率在约 6.1% 时达到运动保真度与解剖合理性的最佳平衡；$\alpha=0.85$ 在映射保真与未映射多样性之间取得最优折衷；$L=3$ 可有效改善时间一致性，继续增加则收益递减。
 
 与现有方法的关键区别在于：整个流水线**无需 GPU 和模型训练**，仅依赖目标骨架的少量运动示例即可在 CPU 上实现实时推理（FPS 752–778），同时保持跨极端拓扑（如无肢到两足、不同物种）的迁移能力。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2506_03901/figures/002_Figure_2.jpg]]
-*Figure 2: System overview of Motion2Motion. (A) The source motion sequence $\mathbf { S } \in \mathbb { R } ^ { F _ { s } \times D _ { s } }$ , . (B) The source sequence is divided into overlapping motion patches $\mathcal { P } ^ { ( s ) }$ . (C) Each source patch is projected to the target skeleton space via sparse mapping and noise initialization, serving as the query for retrieval. For each source patch, we retrieve target patches (D) from a pre-built motion patch database $\dot { \varphi } ( \bar { t }$ ) , based on sparse correspondences. (E) The matched target patches are averaged for blending. (F) The retargeted motion $\widehat { \mathbf { T } } \in \mathbb { R } ^ { F _ { s } \times D _ { t } }$ is...
-
 
 
 Motion2Motion 将跨拓扑运动迁移形式化为一个**条件化的运动补丁匹配与混合**问题，其核心流程由七个模块串联构成，整体框架如 Fig. 2 所示。
@@ -221,8 +209,6 @@ $$\mathbf{P}^{\mathrm{match}} \gets \underset{\mathbf{P}\in\mathcal{P}^{(t)}}{\m
 
 其中绑定率定义为匹配对应数量相对于源和目标骨骼关节总数的百分比。消融实验表明，绑定率在 6.1% 左右时运动保真度和解剖合理性达到最佳平衡——过小则缺乏一致性约束，过大则引入不匹配骨骼的干扰（见 Fig. 13）。
 
-
-
 ## 实验与关键发现
 
 ### 主要定量结果
@@ -282,8 +268,6 @@ Motion2Motion 在相似骨骼迁移与跨物种迁移两个核心场景下均取
 3. **绑定率确定**：最优绑定率目前依赖手动调整或启发式自动算法，尚未实现全自动最优策略。
 4. **极端拓扑**：论文主要在脊椎动物骨架间进行验证，对于更极端的拓扑结构（如昆虫骨架）的有效性仍需进一步检验。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2506_03901/figures/007_Figure_6.jpg]]
 *Figure 6: Phase visualization of the motion. (A) and (B) present the phases of RightToe and LeftToe. The bar figure is the phase variation curve, and the clock figure is the phase visualization at the 1-st and 10-th frames. The blue and orange colors denoted retargeted and source motion, respectively. Note that there is a consistent phase bias between the source and target*
 
@@ -293,28 +277,11 @@ Motion2Motion 在相似骨骼迁移与跨物种迁移两个核心场景下均取
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2506_03901/figures/009_Table_2.jpg]]
 *Table 2: “Test time scaling” property. The comparison with different number of target samples*
 
-![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2506_03901/figures/010_Table_3.jpg]]
-*Table 3: User study results. Our method leads baselines over a significant margin on both motion quality and alignment*
-
-![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2506_03901/figures/015_Table_5.jpg]]
-*Table 5: Abalation study of different settings. The default setting of the Motion2Motion is L = 3 , P _ { S } = 1 1 , and ?? = 0.85*
-
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2506_03901/figures/017_Table_6.jpg]]
 *Table 6: Ablation study of binding mechanism and transfer strategies. We compare automatic and manual bone binding, as well as direct copying bound motion features from the source after executing Algorithm 1*
 
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2506_03901/figures/004_Figure_3.jpg]]
 *Figure 3: Quantitative comparison with baselines. Each animation sequence is listed as frames from left to right. (Highlighted gray frames as comparison for baselines.) (A) Input source motion of a dragon character. (B–D) Retargeted sequences on the bat skeleton produced by (B) our method, (C) Li et al. [2024], and (D) Zhao et al. [2024]. Compared to baselines, our approach more faithfully preserves the original motion style, coherence, and frequency*
-
-![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2506_03901/figures/005_Figure_4.jpg]]
-*Figure 4: Motion matching visualization. A) Source motion on a bear skeleton. (B) Target dog skeleton used for matching. (C) The retargeted motion result on the dog skeleton. The 2nd and 4th frames in (C) correspond to the 4th and 6th frames in (B), respectively, illustrating temporally non-linear yet semantically aligned motion matching*
-
-![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2506_03901/figures/008_Figure_7.jpg]]
-*Figure 7: Cross skeletal organisms transfer (biped → quadruped). A walking motion is transferred from a flamingo (41 joints) to a monkey (76 joints) by binding only 6 corresponding hind limb bones. The hind limb motions are kept synchronous, while the monkey’s forelimb and tail movements are inferred based on the retargeted hind limb dynamics*
-
-![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2506_03901/figures/011_Figure_8.jpg]]
-*Figure 8: Cross skeletal organisms transfer (limbless → biped). The diverse retargeted results of the same skeleton are shown in different colors. (A) Source motion of an anaconda. (B) Retargeted motion on the limbless skeleton (king-cobra). (C) Retargeted motion on the biped skeleton (raptor). The frames in (B) and (C) correspond to specific moments from (A), demonstrating the transformation from a limbless to a bipedal structure with semantically and temporally aligned motion*
-
-
 
 ## 定位与知识库关联
 
@@ -367,8 +334,6 @@ Motion2Motion 的有效性建立在以下几个前提条件之上，这些条件
 - **扩展到物理动画**：该匹配-混合框架能否应用于基于物理的角色动画，包括布料和毛发动力学？这需要将运动补丁的概念从骨骼运动扩展到变形场，并处理物理约束的满足问题。
 
 - **极端拓扑的泛化验证**：在昆虫骨架、多足生物、软体动物等更极端的拓扑结构上系统评估方法的有效性，以确定其泛化边界。这同时需要扩展骨骼对应定义，以处理非标准关节类型（如球形关节、弹性连接）。
-
-
 
 ## 原文 PDF
 

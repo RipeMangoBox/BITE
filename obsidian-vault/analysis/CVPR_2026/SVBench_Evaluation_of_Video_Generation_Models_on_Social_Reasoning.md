@@ -52,13 +52,9 @@ claims:
 
 在方法谱系中，SVBench 区别于传统视频质量评估基准（如 VBench、EvalCrafter）和现有社会智能基准（如 Social-IQ、MMSocial），它首次将**心理学实验范式**作为评估锚点，并通过**社会线索操控**实现难度分级，而非依赖模板化问答或表面行为分类。这一设计使其能够探测模型是否真正“理解”社会情境，而非仅匹配视觉模式。
 
-
-
 视频生成模型近年来取得了显著进展，以 **Sora2pro**（OpenAI, 2025）、**Veo3.1**（Google, 2025）、**Kling2.5turbo**（Kling AI, 2025）等为代表的商业闭源模型，以及 **Hunyuan-Video**（Kong et al., arXiv 2024）、**Wan2.2**（Team Wan et al., arXiv 2025）等开源模型，在视觉真实感和运动连贯性方面已达到令人瞩目的水平。然而，这些模型面临一个深层次的能力瓶颈：**缺乏社会推理能力**。社会推理指理解他人意图、信念、情绪以及社会规范的能力，是人类智能的核心组成部分。当前模型生成的视频虽然在表面上看起来合理，但往往缺失行为背后的因果逻辑——一个角色可能做出“正确”的动作，却无法展现该动作所依据的心理状态或社会语境。这种“表面合理、内在空洞”的现象，使得视频生成模型难以胜任需要理解人际交互、心理归因或社会规范的应用场景。
 
 现有视频生成评估基准主要关注低层感知质量（如FVD、IS）或简单的指令遵循能力，尚未系统性地测量模型的社会推理水平。这一缺口源于两个关键挑战：其一，社会推理本质上是抽象的心理构念，难以直接转化为可操作的视频生成提示；其二，缺乏一套既概念中立又能区分难度层级的评估框架，使得不同模型间的社会推理能力差异无法被可靠量化。SVBench 正是在这一背景下提出，旨在填补视频生成领域社会推理评估的空白。
-
-
 
 ## 核心方法与创新机理
 
@@ -107,8 +103,6 @@ $$S_{\mathrm{overall}} = \frac{1}{5} \sum_{k=1}^{5} D_k$$
 
 **决定性证据**：消融实验（Table 3）表明，完整的“实验理解→提示合成→批判”流水线使人类通过率从无理解阶段的 66.8% 提升至 86.9%，证实了概念分析与中立性控制对提示质量的关键作用。同时，自动 VLM 评估与人工评估在五个维度上趋势高度一致（Figure 3），验证了无监督评估流水线的可靠性。
 
-
-
 SVBench 的核心是一个**训练无关的四智能体流水线**，它将发展心理学与社会心理学的经典实验范式转化为可量化评估的视频生成任务。整个框架由两个松耦合的阶段构成：**生成阶段**与**评估阶段**（图 2）。
 
 ### 生成流水线：从心理学实验到视频提示
@@ -137,15 +131,11 @@ $$S_{\mathrm{overall}} = \frac{1}{5} \sum_{k=1}^{5} D_k$$
 
 该评估方案的设计逻辑是：**社会推理质量无法用单一连续指标可靠度量**，五维分解既保证了可解释性，又通过二进制判断降低了评分噪声。自动评估与人工评估在五个维度上的趋势高度一致（图 3），验证了该无监督评估流水线的可靠性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l785_https_arxiv_org_abs_2512_21507/figures/002_Figure_2.jpg]]
 *Figure 2: Pipeline overview. The framework consists of two training-free components: (1) an agent-based generation pipeline that transforms psychologically grounded social reasoning experiments into diverse, difficulty-controlled video prompts, and (2) an agentbased evaluation pipeline that uses a vision–language model to score generated videos along five discrete dimensions of social reasoning*
 
 ![[assets/figures/papers/paper_list_l785_https_arxiv_org_abs_2512_21507/figures/001_Figure_1.jpg]]
 *Figure 1: (a) Social reasoning scenario. (b) Our benchmark framework, which uses a two-part agent-based pipeline for constructing and evaluating social reasoning tasks in video generation*
-
-
 
 ### 训练无关的四智能体生成流水线
 
@@ -175,21 +165,14 @@ $$S_{\mathrm{overall}} = \frac{1}{5} \sum_{k=1}^{5} D_k$$
 
 其中 $D_k \in \{0, 1\}$ 表示第 $k$ 个维度的通过/未通过判定（Section 3.3）。该公式将多维度的社会推理质量压缩为单一标量，便于跨模型、跨任务的直接比较。消融实验（Table 3）和难度调控实验（Table 4）中报告的“通过率”均基于此公式计算。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l785_https_arxiv_org_abs_2512_21507/figures/003_Table_1.jpg]]
 *Table 1: Overview of the thirty seed experiments and their categorization into short-video–feasible tasks (selected) and long-horizon tasks (excluded), grouped by seven dimensions of social reasoning*
-
-
 
 ## 实验与关键发现
 
 ### 核心发现：模型间社会推理能力存在巨大鸿沟
 
 在 SVBench-15 基准上，我们对 8 个主流视频生成模型进行了系统评估。结果表明，当前模型虽然普遍具备较高的视觉真实感与运动连贯性，但其深层社会推理能力差异悬殊。**Sora2pro**（OpenAI, 2025）以 79.6% 的总体通过率位居榜首，而表现最弱的开源模型 **LongCat-Video**（Cai et al., arXiv 2025）仅获得 27.6%，二者差距高达 52.0 个百分点（Table 2）。这一鸿沟揭示了一个关键瓶颈：视觉质量与社会推理质量并非同步提升，生成行为虽表面合理却可能缺乏因果关系。
-
-![[assets/figures/papers/paper_list_l785_https_arxiv_org_abs_2512_21507/figures/004_Table_2.jpg]]
-*Table 2: Experimental Results of Selected 15 Tasks Across 8 Models. We report the performance (%) of eight models on tasks grouped by social reasoning dimensions*
 
 第二梯队的商业闭源模型 **Veo3.1**（Google, 2025）取得 72.4% 的总体通过率，与 Sora2pro 共同构成第一集团。中游模型 **Hailuo02-S**（Hailuo AI, 2025）和 **Kling2.5turbo**（Kling AI, 2025）分别获得 56.4% 和 52.2%，显示出明显的能力断层。开源模型中，**Wan2.2**（Team Wan et al., arXiv 2025）以 46.2% 领先，而 **Hunyuan-Video**（Kong et al., arXiv 2024）和 **LTX-1.0**（HaCohen et al., arXiv 2024）分别仅获 38.0% 和 31.1%，进一步印证了社会推理对开源模型的严峻挑战。
 
@@ -223,9 +206,6 @@ $$S_{\mathrm{overall}} = \frac{1}{5} \sum_{k=1}^{5} D_k$$
 - **Hailuo02-S** 和 **Kling2.5turbo** 的通过率随难度从 Easy 到 Hard 逐步下降（62.6→49.8；58.0→44.6），符合预期——社会线索越稀疏，推理难度越高。
 - **Sora2pro** 与 **Veo3.1** 在中/高难度下反而表现更佳，暗示其内在推理机制更为稳健，不完全依赖表面线索的丰富程度，而可能具备更深层的意图理解与情境建模能力。
 
-![[assets/figures/papers/paper_list_l785_https_arxiv_org_abs_2512_21507/figures/007_Table_4.jpg]]
-*Table 4: Average pass rates (%) under different difficulty levels for four closed-source models. The results reflect how cue-based difficulty modulation affects each model’s performance*
-
 这一反常现象值得进一步研究：顶尖模型是否已涌现出超越线索依赖的社会认知雏形？
 
 ### 自动评估验证：VLM 评判器与人类高度一致
@@ -255,8 +235,6 @@ $$S_{\mathrm{overall}} = \frac{1}{5} \sum_{k=1}^{5} D_k$$
 - **Table 4**：四个闭源模型在 Easy/Medium/Hard 三级难度下的平均通过率。
 - **Figure 3**：自动评估与人工评估的五维分数对比，验证 VLM 评判器的可靠性。
 - **Figure 4**：评估智能体的定性案例，展示视频帧、提示、五维分数与自然语言解释。
-
-
 
 ## 定位与知识库关联
 
@@ -327,8 +305,6 @@ SVBench 的设计基于以下关键假设和适用边界：
 4. **微妙社会线索的渲染与测量**：如何更精确地测量并提升模型对微表情、视线方向、肢体姿态等微妙社会线索的渲染能力？这可能需要更细粒度的评估维度或专门的诊断任务。
 
 5. **VLM 评估器的校准**：如何纠正 VLM 评判器在知觉维度上的宽松偏差，使其与人类判断更一致？可能需要引入校准样本或人类反馈微调。
-
-
 
 ## 原文 PDF
 

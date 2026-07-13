@@ -52,8 +52,6 @@ NGFF 的核心思想是：将前馈式 3D 高斯重建与基于神经算子的�
 
 当前方法仍存在若干局限：依赖约 10 个视角的多视角输入进行可靠重建，力场预测器在真实世界复杂材料属性上的迁移能力有待验证，且视频生成的视觉保真度与纯生成模型相比尚有一定差距。
 
-
-
 ### 问题背景：视频生成中的物理一致性危机
 
 当前视频生成模型（如 **Cosmos** (NVIDIA et al., 2025)、**Veo3** (DeepMind, 2025)）在视觉质量上取得了显著进展，但普遍缺乏对物理定律的显式建模。这导致生成的视频中频繁出现违反基本物理法则的现象，包括但不限于：重力方向错误、物体无端穿透、碰撞响应缺失、以及物体永久性（object permanence）被破坏——物体凭空出现或消失。这些物理不一致性严重限制了视频生成模型在需要可靠动态推理的场景（如机器人仿真、物理教育、交互式内容创作）中的实际应用。
@@ -71,8 +69,6 @@ NGFF 的核心思想是：将前馈式 3D 高斯重建与基于神经算子的�
 上述两类方法的根本矛盾在于：纯学习模型缺乏物理结构，而物理引擎缺乏感知接口和计算效率。本文的核心动机正是弥合这一鸿沟——**能否构建一个既能从视觉观测中自动推断物理属性、又能以接近实时速度进行物理一致仿真的统一框架？**
 
 实现这一目标的关键洞察在于：物理交互的本质是力场的时空演化。如果能够从多视角 RGB 图像中重建出带有对象语义的 3D 场景表示，并利用神经算子直接预测对象间的显式力场（包括全局相互作用力和局部接触应力），再通过常微分方程（ODE）求解器进行连续时间积分，就可以在保持物理一致性的同时实现高效推理。这一思路将感知（3D 重建）与动力学（力场预测）统一在一个端到端的可学习框架中，既避免了纯数据驱动方法的物理不可解释性，又绕过了传统物理引擎的计算瓶颈。
-
-
 
 ## 核心方法与创新机理
 
@@ -107,8 +103,6 @@ $$\mathbf{z}^{q}(t) = {\mathrm{ODEsolve}} \left( \mathbf{z}^{q}(0), \mathbf{F}, 
 
 消融实验进一步验证了这两个创新点的关键作用：当移除局部应力场预测模块（NGFF w/o deform.）后，空间泛化 RMSE 从 0.082 恶化至 0.110，时间泛化 RMSE 从 0.107 升至 0.127（Table 1 & Table A4），证实了显式力场建模——尤其是局部变形分量——对物理一致性是不可或缺的。
 
-
-
 NGFF 将 4D 视频预测形式化为学习**神经力场**，该力场控制 3D 高斯场景表征的时间演化。整个框架由两个互补组件构成：**前馈式重建**将多视角 RGB 观测转换为对象感知的 3D 高斯，以及**神经动力学预测**通过 ODE 求解器模拟物理上合理的动态。
 
 ### 前馈式对象中心重建
@@ -127,15 +121,11 @@ NGFF 将 4D 视频预测形式化为学习**神经力场**，该力场控制 3D 
 
 预测的力场通过二阶 ODE 求解器（显式欧拉或自适应步长）进行连续时间积分，从初始状态恢复位置和速度轨迹。进化后的 3D 高斯通过可微高斯溅射渲染器生成多视角且物理一致的视频帧。整个流程支持迭代预测与渲染，在保持物理一致性的同时实现新视角合成、新背景合成以及力提示的交互式生成。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_KxvboPqav6/figures/002_Figure_2.jpg]]
 *Figure 2: Overall framework of NGFF. Given unposed RGB inputs, our approach first reconstructs the scene into object-aware 3D Gaussians through feed-forward prediction, followed by segmentation and refinement to handle occlusions and noise. The refined Gaussians are encoded into high-dimensional features and processed by a DeepONet-based neural operator to predict object-centric force fields. These force fields are integrated through ODE solvers to simulate realistic dynamics, enabling iterative prediction and rendering of future scene states with maintained physical consistency*
 
 ![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_KxvboPqav6/figures/001_Figure_1.jpg]]
 *Figure 1: Capabilities of NGFF. NGFF is a physics-grounded video prediction framework that unifies perception and dynamics to model complex interactions and synthesize 4D videos. Built on Gaussian representations and force fields, it enables novel-view and novel-background synthesis as well as force-prompted interactive generation (Section 4.3). Moreover, NGFF achieves strong spatial and temporal generalization in dynamic prediction (Section 4.2) and can be effectively adapted to real-world scenarios (Section 4.4)*
-
-
 
 NGFF 将 4D 视频预测形式化为学习控制 3D 高斯场景表示时间演化的 **神经力场 (Neural Force Fields, NFFs)**。其核心架构由两个互补组件构成：将多视角 RGB 观测转换为对象感知 3D 高斯的前馈重建模块，以及通过 ODE 求解器进行物理一致动态模拟的神经动力学预测模块。
 
@@ -179,16 +169,11 @@ $$\mathbf{s}(t) = \mathbf{s}(0) + \int_{0}^{t} {\dot{\mathbf{s}}}(t) dt, \quad {
 
 NGFF 采用两阶段训练。前馈重建模块在 **WildRGBD** 数据集上微调预训练的 $\pi^3$ 参数；神经动力学模拟器在合成 **MPM（Material Point Method）** 仿真数据上独立训练，优化均方误差（MSE）损失。这种解耦设计使得动力学模块能够专注于学习物理规律，而不受重建误差的干扰。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
 
 NGFF 的评估围绕一个核心命题展开：**显式力场建模能否在动态预测与视频生成任务中同时实现物理准确性、泛化能力和推理效率**？为此，作者构建了大规模合成数据集 **GSCollision**（3200 场景，64 万视频，4.25 TB），覆盖从软体（布料、绳索）到刚体（碗、手机）的 10 类日常物体，并通过材料密度与杨氏模量的参数空间系统采样以保证物理多样性（Figure 3）。评测维度被精细划分为四种泛化场景：**空间泛化**（新初始位置）、**时间泛化**（更长 rollout）、**组合泛化**（4-6 物体场景）和**新视角/新背景**合成。
-
-![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_KxvboPqav6/figures/003_Figure_3.jpg]]
-*Figure 3: GSCollision dataset. (a) Distribution of 10 representative objects characterized by density and material hardness (Young’s modulus, log scale). The parameter space spans from soft, lightweight materials (e.g., cloth, rope, pillow) in the lower-left region to rigid, dense objects (e.g., bowl, phone) in the upper-right, providing comprehensive coverage of everyday material properties. (b) Dataset composition totaling 4.25 TB across 3,200 scenes and 640k videos. The pie chart shows storage distribution among training and test splits, multi-view initial scene captures, and auxiliary data files. (c) Representative frame gallery across evaluation scenarios: training sequences, longer temporal rol...*
 
 所有动态预测基线（**GCN**、**Pointformer**、**VLM-MPM**）均在同一数据集上按原文配置训练；视频生成基线（**Cosmos**、**Veo3**、**PhysGen3D**）因闭源且不可微调，采用 VLM 评估与人工评估相结合的方案。推理时间统一在单块 NVIDIA H100 80G GPU 上测量，确保对比公平。
 
@@ -214,18 +199,12 @@ Table 1 汇总了动态预测的核心结果，NGFF 在所有泛化维度上一�
 
 Table 2 展示了视频生成任务上的 VLM 评估结果。核心指标 **PhysR**（物理真实感）衡量生成视频是否符合物理定律：
 
-![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_KxvboPqav6/figures/007_Table_2.jpg]]
-*Table 2: Video generation performance across generalization scenarios. Performance metrics (higher is better) evaluated on compositional (Comp.), novel-background (NB), novel-view (NV), and comprehensive (All) splits testing different aspects of generalization capability. The comprehensive split combines all three generalization challenges. Note that Cosmos performs standard novel-view generalization using existing viewpoints, while NGFF tackles the more challenging novel-view synthesis task requiring generation from entirely unseen camera perspectives*
-
 - 在**新背景**（NB）场景下，NGFF-V 的 PhysR 达到 **0.56**，远超 Cosmos 的 0.26 和 Veo3 的 0.27，提升超过一倍。
 - 在**综合**（All）场景下，NGFF-V 的 PhysR 为 **0.30**，略优于 Veo3 的 0.29，但显著高于 Cosmos（0.22）和 PhysGen3D（0.18）。
 
 值得注意的是，NGFF-V 在视觉真实感（PhotoR）上为 0.35，低于纯生成模型 Veo3（0.42）和 Cosmos（0.43），反映出当前前馈式 3D 重建精度对渲染质量的制约——这是精度与视觉珍实度之间的固有权衡。
 
 交互式生成实验（Figure 5）提供了更直观的证据：当施加外力扰动（如向上拉枕头、向左拉布料），NGFF 产生物理一致的连锁反应，而 Cosmos 和 Veo3 则生成违反物理约束的非真实动态（如物体悬浮、碰撞缺失）。
-
-![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_KxvboPqav6/figures/006_Figure_5.jpg]]
-*Figure 5: Interactive generation under external perturbations. Red arrows indicate applied forces. Left: upward force on fallen pillow; Right: leftward force on cloth affecting ball motion. NGFF produces physically consistent responses to interventions, while baseline methods (Cosmos, Veo3) generate unrealistic dynamics that violate physical constraints. Baseline prompts: Cosmos—“modify the pillow...to show a significant, sudden external force stretching it upward into the air, with interactions with panda and miku”; Veo3—“modify the clothing...to show a significant, sudden external force stretching it leftward.”*
 
 ### 消融实验：局部应力场的决定性作用
 
@@ -258,13 +237,6 @@ Table A5 对比了不同视频生成方法的推理时间：NGFF-V 生成 3 物�
 3. **视觉珍实度瓶颈**：与大规模生成模型相比，基于高斯溅射的渲染在纹理细节和光照一致性上仍有差距，尤其在复杂背景替换场景中明显。
 
 这些局限指向了未来工作的关键方向：稀疏视角重建、神经力场与生成先验的融合，以及向断裂、流体等更复杂物理现象的扩展。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_KxvboPqav6/figures/008_Figure_6.jpg]]
-*Figure 6: Video generation quality comparison. Temporal sequences comparing NGFF against video generation baselines across diverse scenarios. NGFF maintains coherent object shapes, physically plausible interactions, and consistent backgrounds throughout generated sequences, while baseline methods exhibit shape distortions, unrealistic dynamics, and scene inconsistencies that violate physical constraints*
-
-
 
 ## 定位与知识库关联
 
@@ -309,8 +281,6 @@ NGFF 的能力边界受以下因素制约：
 **复杂物理现象的扩展**。当前力场模型聚焦于刚体-软体碰撞和接触变形，尚未涉及断裂、塑性变形、流体交互等更具挑战性的物理现象。扩展到这些场景需要重新设计力场表示（如引入拓扑变化建模）和训练数据生成策略。
 
 **真实世界迁移**。Figure 7 展示了在受控真实场景中的初步验证，但训练数据完全来自合成 MPM 仿真，sim-to-real gap 在复杂材质和不规则几何体上的表现尚需系统评估。领域自适应或少量真实数据微调可能是可行的缓解方案。
-
-
 
 ## 原文 PDF
 

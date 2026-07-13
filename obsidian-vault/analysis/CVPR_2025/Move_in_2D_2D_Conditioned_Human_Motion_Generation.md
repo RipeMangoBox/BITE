@@ -55,15 +55,11 @@ claims:
 
 **局限与开放问题**：框架未控制生成运动中的相机运动，两阶段视频生成流程尚未端到端联合优化，且仅支持单人运动。未来方向包括引入相机运动控制、端到端联合训练、多人场景扩展，以及在更开放的场景-文本组合下验证泛化边界。
 
-
-
 人体运动生成是计算机视觉与图形学领域的核心问题之一，其目标是根据给定的控制信号合成自然、多样的人体动作序列。近年来，随着扩散模型在生成任务中的突破性进展，文本条件运动生成取得了显著进步——用户仅需提供自然语言描述，即可获得对应的三维人体运动。然而，**现有方法面临一个关键瓶颈：它们要么仅依赖文本提示，缺乏对物理场景的感知能力；要么需要完整的三维场景重建作为条件输入，而三维重建本身获取成本高昂且易引入误差**。这使得现有方法无法直接根据日常随处可见的二维背景图像生成与之兼容的运动序列。
 
 具体而言，当前主流范式可分为两类。一类是以 **MDM**（Tevet et al., ICLR 2023）和 **MLD**（Chen et al., CVPR 2023）为代表的纯文本条件方法，它们能够生成语义丰富的运动，但完全忽略场景约束——生成的动作可能与实际场景发生穿透、悬空或尺度失配。另一类是以 **SceneDiff**（Huang et al., CVPR 2023）和 **HUMANISE**（Wang et al., NeurIPS 2022）为代表的场景感知方法，它们将三维点云或三维场景表示作为附加条件，使运动生成具备场景意识，但前提是需要预先获取场景的三维几何信息。在实际应用中，三维重建不仅计算开销大，而且对输入图像质量、视角覆盖和深度估计精度都有较高要求，这严重限制了场景感知运动生成的实用性和可扩展性。
 
 这一缺口催生了一个自然的问题：**能否绕过三维重建，直接从单张二维场景图像出发，生成既符合文本语义、又能在该二维平面上自然投影的运动序列？** 这构成了 Move-in-2D 工作的核心动机。其核心洞察在于：借鉴大语言模型中的上下文学习策略，将场景图像和文本提示统一编码为一组共享的条件标记，直接注入基于 Transformer 的扩散模型，使模型学会在二维图像约束下生成语义一致的运动——从而以极低的输入成本实现场景感知运动生成。
-
-
 
 ## 核心方法与创新机理
 
@@ -96,8 +92,6 @@ $$\mathcal{M}_{\mathrm{cfg}} = \mathcal{M}(\mathbf{x}_t | t) + g (\mathcal{M}(\m
 为解耦相机运动并增强大动态运动生成能力，Move-in-2D 采用两阶段训练：第一阶段在全量 300k 视频数据上训练 600k 迭代；第二阶段在混合数据集（60% 大运动视频 + 40% 固定背景视频，共 150k）上微调 600k 迭代。这一策略有效缓解了原始视频中残余相机移动对运动生成的干扰。
 
 综合来看，Move-in-2D 的创新并非单一技术点的突破，而是通过**条件模态扩展、注入机制重构、输出参数补全和训练策略适配**四个维度的协同改变，首次实现了仅依赖二维场景图像的高质量场景感知运动生成。
-
-
 
 Move-in-2D 的生成管线以一张二维场景图像和一条文本动作描述为输入，输出一段与场景布局兼容、且语义上符合文本指令的三维人体运动序列。该框架的核心设计在于**绕过显式的三维场景重建**，通过将图像与文本统一到共享的标记空间中，使扩散模型直接学习二维投影约束下的运动先验。
 
@@ -156,13 +150,6 @@ $$\mathcal{M}_{\mathrm{cfg}} = \mathcal{M}(\mathbf{x}_t \mid t) + g \big( \mathc
 
 这一框架的核心洞察在于：通过将场景图像和文本统一为上下文标记，模型无需昂贵的三维重建即可学习二维平面上的运动兼容性，从而在保持较低获取成本的同时实现场景感知的运动生成。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1855_Move_in_2D_2D_Conditioned_Human_Motion_Generation/figures/001_Figure_1.jpg]]
-*Figure 1: 2D-conditioned human motion generation. Given an image representing the target scene and a text prompt describing the desired motion, we generate a motion sequence that aligns with the text description and projects naturally onto the scene image. This generated motion then serves as the control signal for the subsequent video generation tasks*
-
-
-
 ### 条件编码器
 
 **场景图像编码器**：采用预训练的 DINO-B 模型，将输入场景图像（168×280）编码为 240 个视觉标记。DINO 的自监督预训练特性使其能够捕获场景的语义结构与几何布局，为后续运动-场景对齐提供丰富的视觉上下文。
@@ -208,8 +195,6 @@ $$\mathcal{M}_{\mathrm{cfg}} = \mathcal{M}(\mathbf{x}_t \mid t) + g \left( \math
 2. **第二阶段**：在 150K 混合数据（60% 大动态运动视频 + 40% 固定背景视频）上微调 600K 迭代，抑制残余相机运动，同时提升大位移动作的生成质量。
 
 训练使用 Adam 优化器，学习率 $1 \times 10^{-4}$（原文为 0.0002，需手动核实），批次大小 128，扩散步数 1000 并采用余弦噪声调度。
-
-
 
 ## 实验与关键发现
 
@@ -269,18 +254,8 @@ Table 4系统消融了条件注入方式的设计选择：
 ![[assets/figures/papers/paper_list_l1855_Move_in_2D_2D_Conditioned_Human_Motion_Generation/figures/002_Table_1.jpg]]
 *Table 1: Dataset statistics. HiC-Motion is the largest dataset comprising motions, text, and diverse indoor and outdoor scenes*
 
-![[assets/figures/papers/paper_list_l1855_Move_in_2D_2D_Conditioned_Human_Motion_Generation/figures/005_Figure_3.jpg]]
-*Figure 3: Affordance-aware human generation. Our model generates human poses consistent with both text prompts and scene context, such as standing on a cliff. It also supports complex human-scene interactions, including activities like petting a dog*
-
 ![[assets/figures/papers/paper_list_l1855_Move_in_2D_2D_Conditioned_Human_Motion_Generation/figures/006_Figure_5.jpg]]
 *Figure 5: Comparison to state-of-the-art. MDM and SceneDiff produces implausible poses, MLD generates mismatched motion with the scene, and HUMANISE generates static poses. Our method generates coherent motion aligned with both the scene and text prompts*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1855_Move_in_2D_2D_Conditioned_Human_Motion_Generation/figures/009_Figure_6.jpg]]
-*Figure 6: Motion-guided human video generation. Our approach generates scene-compatible motion sequences from a scene image and text prompt, which are then used to animate a reference human using Champ [60] or Gen-3 [11]. The generated motion ensures accurate human shapes and smooth motion in the resulting videos, outperforming SVD [5] in preserving human geometry and motion consistency*
-
-
 
 ## 定位与知识库关联
 
@@ -356,8 +331,6 @@ Move‑in‑2D 处于**二维条件运动生成**这一新兴交叉点，连接�
 - **下游**：为运动引导的视频生成（Figure 6）提供场景兼容的运动控制信号，可作为现有视频扩散模型（Champ、Gen‑3）的即插即用运动先验。
 
 该方法的方法论贡献——**利用上下文学习范式统一多模态条件注入**——对后续多条件生成模型设计具有参考价值，但其当前的单人、静态场景、不可控相机的限制，也为后续工作留下了明确的研究空间。
-
-
 
 ## 原文 PDF
 

@@ -51,8 +51,6 @@ claims:
 
 在全身生成测试中，GraspDiffusion 的 FID 达到 22.88，显著优于 ControlNet（Zhang et al., ICCV 2023）的 32.76；CLIPScore 为 0.767，优于 Champ（Zhu et al., ECCV 2024）的 0.739。3D 抓握姿态评估中，接触率达 0.909，姿态有效性误差仅 0.111，均大幅领先 COOP（Zheng et al., ICCV 2023）等方法。用户研究进一步表明，92.4% 的参与者认为其生成图像更真实合理，96.4% 认为其更好地遵循了抓握上下文。
 
-
-
 生成包含真实手-物交互的全身人体图像是视觉内容创作、具身智能和虚拟现实等领域的核心需求。然而，这一任务面临着独特的挑战：手部区域在图像中占比极小，却需要表达高度复杂的姿态，同时必须与物体的几何形状和可供性（affordance）精确对齐。现有的生成模型在处理这一问题时暴露出系统性的缺陷。
 
 **现有方法的瓶颈**在于三个层面。其一，以 **ControlNet** (Zhang et al., ICCV 2023) 为代表的多条件图像生成方法，虽然能够接受人体骨架等空间条件，但缺乏对物体几何和手-物接触物理约束的显式建模，导致生成结果中频繁出现物体凭空出现、手部扭曲或多臂等错误。其二，**HandRefiner** 等基于扩散修补的后处理方案试图修复手部形状，却无法从根本上解决交互语义错误——它们可能修复了手指的形态，却让手与物体的接触关系变得物理上不可能。其三，**Affordance Diffusion** (Ye et al., CVPR 2023) 等手-物交互生成方法专注于手部局部区域，忽略了全身姿态对交互的上下文约束，使得生成的抓握姿态与身体整体不协调。
@@ -60,8 +58,6 @@ claims:
 更深层的问题在于，现有方法普遍缺乏对隐式空间关系和物理约束的建模能力。手-物交互的本质是三维空间中的接触与力传递：手掌必须贴合物体表面，手指的弯曲角度受物体形状限制，身体姿态需为手部抓握提供合理的支撑。纯二维生成范式无法编码这些三维先验，导致“看起来合理但物理上错误”的交互频繁出现。
 
 **本文的动机**正是弥合这一鸿沟：将三维抓握姿态的显式生成与二维图像扩散模型的表达能力相结合。核心直觉是，如果能够在三维空间中先生成物理合理的抓握姿态，再将其作为强空间条件注入图像生成过程，就能同时保证交互的正确性和图像的视觉质量。这一思路将问题解耦为两个可独立优化的子任务——全身抓握姿态合成与条件图像生成——并通过精心设计的空间条件编码和注意力注入机制将两者紧密耦合，从而在保持生成多样性的前提下，显著提升手-物交互的真实性。
-
-
 
 ## 核心方法与创新机理
 
@@ -91,8 +87,6 @@ GraspDiffusion 的核心创新在于将**3D抓握姿态的显式生成**与**2D�
 - **注意力注入方案**：在推理时修改交叉注意力层，注入人体和物体的语义分割注意力以强化交互区域，同时使用**负mask**（用对侧手生成的伪物体分割图）抑制错误交互（如物体出现在不该出现的位置）。这一机制使得生成过程能够“聚焦”于正确的交互区域，显著提升了交互上下文的对齐质量。
 
 这些创新点的协同作用使得GraspDiffusion在生成质量（FID 22.88 vs. ControlNet 32.76）、交互正确性（接触率0.909 vs. COOP 0.841）和用户偏好（92.4%认为更真实）上均取得了显著提升。
-
-
 
 GraspDiffusion 采用**两阶段流水线**，将3D抓握姿态合成与2D图像生成解耦，通过可解释的3D先验桥接物理约束与视觉真实感。图3给出了整体架构：第一阶段从单个物体网格及其相对人体的位置出发，合成包含手部抓握的全身3D姿态；第二阶段以该姿态参数为条件，生成高质量的手-物交互图像。
 
@@ -128,12 +122,8 @@ GraspDiffusion 采用**两阶段流水线**，将3D抓握姿态合成与2D图像
 
 该框架的核心洞察在于**将全身抓握问题解耦为手部抓握与身体姿态的分别合成**：手部抓握需要理解物体的局部几何可供性，而身体姿态需要理解物体的全局空间关系。两者通过手掌对齐优化形成一致的整体，避免了端到端生成中手部面积小、姿态复杂导致的扭曲和多臂等错误。第二阶段通过注入骨架、深度和物体纹理等显式空间条件，将3D先验忠实地传递到2D生成过程，同时以注意力注入保证交互区域的正确性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1670_GraspDiffusion_Synthesizing_Realistic_Whole_body_Hand_Object_Interaction/figures/003_Figure_3.jpg]]
 *Figure 3: We present a two-stage pipeline to generate realistic human-object-interaction images. The first stage takes a single object model and its human-centric location to synthesize a 3D full-bodied grasping pose, providing scene-level context for image generation. The second stage takes reference from the 3D grasping pose, conditionally generating high-quality images*
-
-
 
 GraspDiffusion 采用两阶段流水线架构（Figure 3），将3D抓握姿态生成与2D图像生成解耦，通过显式建模物理约束和空间关系来解决手-物交互生成中的扭曲与语义错误问题。
 
@@ -162,9 +152,6 @@ $$E(R_{\mathrm{h}}, t_{\mathrm{h}}) = \frac{1}{|\mathcal{V}_h^p|} \sum_{i=1}^{|\
 
 第二阶段（Figure 5）以第一阶段的3D姿态参数为条件，通过多条件潜在扩散模型生成RGB图像。
 
-![[assets/figures/papers/paper_list_l1670_GraspDiffusion_Synthesizing_Realistic_Whole_body_Hand_Object_Interaction/figures/005_Figure_5.jpg]]
-*Figure 5: Scene generation stage. We inject three image conditions and semantic segmentation images as guidance for the generation of a high-quality HOI image. We then use the same types of renderings centered on the hand-object region to refine the hand quality*
-
 **空间条件提取**：从3D姿态渲染三种互补的空间条件图——人体骨架图（$s^i$）、联合深度图（$d^i$）和遮蔽物体渲染图（$o^i$）。联合深度图同时编码人体与物体的深度关系，为空间推理提供关键线索。
 
 **条件特征融合**：采用 T2I-Adapter 风格的多条件编码器，每种条件通过独立的适配器 $\mathcal{F}_{\mathrm{AD}}^k$ 提取特征，再加权融合为统一的条件特征 $\mathbf{F}_c$：
@@ -181,14 +168,9 @@ $$\mathcal{L}_{ADM} = \mathbb{E}_{z, \epsilon \sim \mathcal{N}(0,I), t, \mathbf{
 
 在推理阶段（Figure 6），通过修改交叉注意力层来强化交互区域的生成质量。利用人体和物体的语义分割图构建注意力矩阵 $A \in \mathbb{R}^{N_i \times N_t}$，引导生成过程聚焦于分割区域。注入权重自适应调整：
 
-![[assets/figures/papers/paper_list_l1670_GraspDiffusion_Synthesizing_Realistic_Whole_body_Hand_Object_Interaction/figures/006_Figure_6.jpg]]
-*Figure 6: Attention Injection Scheme. During inference, we inject the human/object semantic maps into the cross-attention layers as guidance, encouraging the generation process to be focused on the segmented regions. We also apply a negative semantic map for the object to avoid undesired cases where the opposite hand interacts with the object*
-
 $$w = w' \cdot \log(1 + \sigma) \cdot \max(QK^T)$$
 
 其中 $w'$ 为用户定义的标量，$\sigma$ 为注意力图的标准差，$\max(QK^T)$ 为查询-键相似度的最大值。该自适应机制根据注意力动态调整注入强度。同时，使用反向手构建伪物体分割图作为负mask，抑制非预期手与物体的错误交互。
-
-
 
 ## 实验与关键发现
 
@@ -222,9 +204,6 @@ GraspDiffusion 在三个维度上与多类方法进行系统比较：(1) **全�
 
 在 DexYCB 新物体 64 个位置上的抓握姿态评估（Table 3）中，GraspDiffusion 的 **接触率（Contact ratio）达 0.909**，显著优于 COOP 的 0.841；**姿态有效性误差（Pose Valid Error）仅 0.111**，较 COOP 的 0.239 降低 53.6%；**位移（Displacement）为 2.696**，远低于 COOP 的 4.679。这些指标共同证明：解耦式手-体生成加关节优化的策略，在保持物理抓握精度的同时，有效缩小了手部与身体间的姿态不一致。
 
-![[assets/figures/papers/paper_list_l1670_GraspDiffusion_Synthesizing_Realistic_Whole_body_Hand_Object_Interaction/figures/011_Table_3.jpg]]
-*Table 3: Grasping pose evaluation*
-
 ### 消融实验
 
 **空间条件贡献**（Table 4）：逐一移除三种空间条件（物体渲染、人体骨架、联合深度）均导致 FID 上升，验证了三者在引导图像生成中不可替代。其中，深度条件对交互区域的空间约束最为关键。
@@ -242,20 +221,7 @@ GraspDiffusion 在三个维度上与多类方法进行系统比较：(1) **全�
 2. **复杂物体纹理丢失**：当物体纹理高度复杂时，生成图像可能无法精确保留其外观细节。
 3. **手部形态不自然**：部分生成结果仍存在手部形状怪异的问题，说明手部细化模块在极端姿态下仍有提升空间。
 
-![[assets/figures/papers/paper_list_l1670_GraspDiffusion_Synthesizing_Realistic_Whole_body_Hand_Object_Interaction/figures/023_Figure_12.jpg]]
-*Figure 12: Failure cases for GraspDiffusion*
-
 这些失败模式揭示了当前流水线的能力边界：手部细化模块的训练数据规模与多样性、物体纹理编码的保真度、以及手-体纹理一致性建模，是未来改进的关键方向。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1670_GraspDiffusion_Synthesizing_Realistic_Whole_body_Hand_Object_Interaction/figures/013_Table_4.jpg]]
-*Table 4: Ablation studies on architecture choice*
-
-![[assets/figures/papers/paper_list_l1670_GraspDiffusion_Synthesizing_Realistic_Whole_body_Hand_Object_Interaction/figures/012_Figure_9.jpg]]
-*Figure 9: Example results from different models. We display generation results from our pipeline with the same object and body pose, but with different personalized Stable Diffusion models that were acquired from CivitAI [1] and Huggingface [2]*
-
-
 
 ## 定位与知识库关联
 
@@ -322,8 +288,6 @@ GraspDiffusion的核心知识贡献在于：
 - **3D-2D解耦范式**：证明将抓握物理约束编码为3D先验并注入2D生成，是解决交互生成中物理合理性问题的有效策略。
 - **空间条件组合设计**：骨架+深度+遮蔽物体渲染的三条件组合被消融实验（Table 4）验证为不可或缺，为后续交互生成任务的条件设计提供了参考模板。
 - **注意力注入的交互引导**：语义分割注意力注入与负mask机制（Figure 6）提供了一种无需重新训练即可强化交互区域生成的推理时技术，具有向其他条件生成任务迁移的潜力。
-
-
 
 ## 原文 PDF
 

@@ -57,8 +57,6 @@ claims:
 
 **局限与开放问题**：生成的OLAT图像可能丢失高频细节（尤其在镜面高光和阴影边界）；在极端面部姿态或光照条件下性能下降；去光照预处理模块尚未完全成熟，可能移除细微身份特征。未来方向包括扩展至视频OLAT合成、增强去光照的鲁棒性、结合3D几何先验提升极端姿态下的生成质量，以及促进光照感知的数字人渲染等下游任务。
 
-
-
 ### 问题背景：人脸重光照的数据瓶颈
 
 在视觉特效、数字人和视频会议等应用中，对人脸肖像进行任意环境光照下的物理一致重光照是一个长期目标。实现这一目标的核心技术路径是**光传输矩阵（OLAT, One-Light-at-A-Time）**：逐次点亮不同方向的光源，记录人脸在每个单灯下的反射响应，然后将这些响应按目标环境图线性组合，合成任意光照下的肖像。
@@ -85,8 +83,6 @@ claims:
 - **模型侧**：提出**POLARNet**——一个方向条件的流式生成模型，从单张均匀光照肖像直接预测每个灯方向的OLAT响应。与扩散模型不同，POLARNet采用**潜在桥匹配（Latent Bridge Matching）**，将光照变化建模为潜在空间中方向条件驱动的连续物理传输过程，支持一步推理，在保持身份的同时学习方向感知的光传输模式。
 
 通过这一“鸡生蛋”协同演化框架（Figure 2），OLAT数据指导模型学习光传输先验，而生成模型又能低成本扩展数据多样性，反哺下游任务，形成可规模化的光照感知人脸建模方案。
-
-
 
 ## 核心方法与创新机理
 
@@ -134,8 +130,6 @@ $$I_E \approx \sum_i w_i I_i, \quad w_i = \int_{\Omega_i} E(\mathbf{l}) d\mathbf
 
 **需要手动验证**：定量表中 SSIM 指标（Ours: 0.82 vs. SwitchLight: 0.84）并未达到最高，但论文正文声称“highest structural similarity”，存在表述不一致，建议读者核实原始数据。
 
-
-
 POLAR 提出了一套“数据采集—模型生成—下游应用”相互促进的闭环框架，其核心思想是 **以大规模物理一致的人脸 OLAT 数据驱动生成模型，再以生成模型扩展数据多样性，反哺下游任务**（Figure 2）。
 
 ![[assets/figures/papers/paper_list_l2046_https_arxiv_org_abs_2512_13192/figures/002_Figure_2.jpg]]
@@ -146,9 +140,6 @@ POLAR 提出了一套“数据采集—模型生成—下游应用”相互促�
 整个 pipeline 由两个关键阶段构成：
 
 1. **POLAR 数据集构建阶段**：通过定制的 Light Stage（156 个 LED 光源 + 32 个同步相机，Figure 3）采集 220 名受试者在 16 种表情下的 OLAT 原始数据，经自动抠图、漫反射-镜面反射分离、光锥采样等后处理，合成大规模 HDR 重光照肖像。这一阶段为模型训练提供了配对监督信号。
-
-![[assets/figures/papers/paper_list_l2046_https_arxiv_org_abs_2512_13192/figures/003_Figure_3.jpg]]
-*Figure 3: Our Light Stage consists of 156 LEDs and 32 synchronized cameras uniformly covering the full sphere. Each light is sequentially activated to produce OLAT captures*
 
 2. **POLARNet 生成与重光照阶段**（Figure 5）：给定单张均匀光照肖像，模型在潜在空间中完成方向条件的光输运过程，一步生成对应光源方向的 OLAT 响应图像；随后通过线性组合模块，将生成的 OLAT 图像按任意 HDR 环境图加权求和，得到物理一致的重光照结果。
 
@@ -161,13 +152,6 @@ POLAR 提出了一套“数据采集—模型生成—下游应用”相互促�
 ### 关键设计逻辑
 
 与扩散模型从随机噪声去噪不同，POLARNet 采用 **流式潜在桥匹配（Latent Bridge Matching）**，直接在均匀光潜在与目标 OLAT 潜在之间建立连续的方向条件输运轨迹。这一设计的因果逻辑在于：光照变化本质上是物理输运过程，而非随机生成——方向条件驱动潜在沿确定性的桥路径移动，既保持身份一致性，又学习方向感知的光传输模式。训练时通过速度场损失 $\mathcal{L}_{\text{LBM}}$ 最小化预测速度与目标漂移的差异，推理时仅需一步前向即可完成生成，兼顾效率与物理一致性。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2046_https_arxiv_org_abs_2512_13192/figures/001_Figure_1.jpg]]
-*Figure 1: POLAR captures high-resolution OLAT facial data with diverse subjects and expressions, from which we synthesize largescale HDR-relit portraits. POLARNet further learns to generate per-light OLAT responses from a single portrait, enabling scalable and physically consistent relighting under arbitrary HDR environments. Our project page: https://rex0191.github.io/POLAR/*
-
-
 
 POLARNet 的核心设计思想是将光照变化建模为潜在空间中方向条件驱动的连续物理传输过程，而非从随机噪声出发的扩散生成。整个框架由四个关键模块构成：VAE 潜在编解码器、条件 U-Net 速度网络、潜在桥匹配训练机制，以及 OLAT 线性组合重光照模块。
 
@@ -221,12 +205,8 @@ $$I_E \approx \alpha \sum_i w_i^{\mathrm{diff}} I_i + (1-\alpha) \sum_i I_i \odo
 
 其中 $\alpha$ 为场景依赖的混合系数，$\odot$ 表示逐元素乘法。该分离处理有效避免了全局色彩偏差，使高光移动和阴影变化更加物理一致。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2046_https_arxiv_org_abs_2512_13192/figures/006_Figure_5.jpg]]
 *Figure 5: Overview of our flow-based OLAT data generation framework. Given a uniformly lit portrait, the encoder–decoder pair (E, D) maps both the input and its target OLAT image into latent space. Latent Bridge Matching learns a continuous, direction-conditioned transport between these endpoints, supervised by the velocity field loss*
-
-
 
 ## 实验与关键发现
 
@@ -250,8 +230,6 @@ Figure 7展示了生成OLAT与真实捕获OLAT的直接对比。在单灯光源�
 
 需要指出，上述定量评估仅在POLAR数据集的自有测试划分上进行，未在公开独立基准（如其他OLAT数据集或真实拍摄的重光照测试集）上与其他方法进行公平对比。由于POLARNet在POLAR数据分布上训练，而对比方法可能未使用该数据集，因此报告的数值优势可能部分源于训练域匹配带来的性能增益，而非方法本身的绝对优越性。此外，SSIM指标上的表述不一致提示读者在引用该结论时需审慎核实。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2046_https_arxiv_org_abs_2512_13192/figures/008_Table_2.jpg]]
 *Table 2: Quantitative comparison with state-of-the-art imagebased relighting methods*
 
@@ -263,19 +241,6 @@ Figure 7展示了生成OLAT与真实捕获OLAT的直接对比。在单灯光源�
 
 ![[assets/figures/papers/paper_list_l2046_https_arxiv_org_abs_2512_13192/figures/011_Figure_9.jpg]]
 *Figure 9: Ablation study on energy and uncertainty-aware loss*
-
-![[assets/figures/papers/paper_list_l2046_https_arxiv_org_abs_2512_13192/figures/010_Figure_7.jpg]]
-*Figure 7: Comparison between generated and captured OLAT data, and their corresponding environment-lit synthesis results. The top part shows OLAT images produced by our model compared with the captured OLAT data. The bottom part presents relit portraits synthesized using the generated OLATs and real OLAT captures under different environment illuminations*
-
-![[assets/figures/papers/paper_list_l2046_https_arxiv_org_abs_2512_13192/figures/007_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l2046_https_arxiv_org_abs_2512_13192/figures/019_Figure.jpg]]
-*Figure: H. Generated OLAT sequence of test set by our POLARNet (selected 48 frontal LEDs)*
-
-![[assets/figures/papers/paper_list_l2046_https_arxiv_org_abs_2512_13192/figures/020_Figure.jpg]]
-*Figure: I. Generated OLAT sequence of in-the-wild portraits by our POLARNet (selected 48 frontal LEDs)*
-
-
 
 ## 定位与知识库关联
 
@@ -330,8 +295,6 @@ POLAR工作的核心洞察是构建一个**数据捕获与模型生成相互促�
 4. **下游任务促进**：该数据集和模型是否能够促进光照感知的视频生成、数字人渲染、或面部识别在极端光照下的鲁棒性等下游任务？这需要进一步的跨任务验证。
 
 > **公平性说明**：定量评估仅在POLAR数据集划分的测试集上进行，未在公开独立基准（如现有OLAT数据集或真实拍摄数据集）上与其他方法公平对比。SSIM指标上（Ours: 0.82 vs. SwitchLight: 0.84）并未达到最高，但论文正文声称“highest structural similarity”，可能存在不一致，需读者注意。
-
-
 
 ## 原文 PDF
 

@@ -106,9 +106,6 @@ Centaur 将不确定性度量和在线适应统一为闭环：集群熵既是 TT
 
 Centaur 的整体框架围绕“测试时训练（Test-Time Training, TTT）”展开，其核心思路是在部署阶段通过在线梯度更新来抑制规划器决策中的不确定性，从而在不牺牲行驶进度的前提下提升安全性。该方法建立在轨迹评分（trajectory scoring）范式的端到端规划器之上，其基础模型为 Hydra-MDP。整个 pipeline 由离线训练好的感知骨干网络、轨迹评分解码器，以及部署时新增的集群熵计算器、梯度累积缓冲区和参数更新步五个关键模块构成，如 Figure 2 所示。
 
-![[assets/figures/papers/paper_list_l80_https_arxiv_org_abs_2503_11650/figures/002_Figure_2.jpg]]
-*Figure 2: Test-Time Training (TTT) in Centaur. Top: A trained end-to-end planner scores trajectories from the planning vocabulary for frames observed during testing. We sample a subset of these, clustered based on their driving direction. After aggregating predicted scores over clusters, a Cluster Entropy is calculated to reflect the uncertainty. We then obtain a gradient for Cluster Entropy minimization via backpropagation. Bottom: We accumulate gradients from historical frames and update our planner to achieve improved performance*
-
 ### 推理阶段的前向流程
 
 在每一帧推理时，系统首先执行标准的前向传播：
@@ -193,13 +190,8 @@ $$
 
 该指标综合了安全性（NC、TTC）、合规性（DAC）、舒适度（C）和通行效率（EP），是 NAVSIM 基准的官方评测标准。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l80_https_arxiv_org_abs_2503_11650/figures/001_Figure_1.jpg]]
 *Figure 1: Reducing entropy when uncertain with test-time training (TTT). The end-to-end planner Hydra-MDP [33], stateof-the-art on navtest [10], predicts a score for every trajectory in a fixed set. In the scatter plots, we plot trajectory scores based on their lateral endpoint position, clustered into five categories (colored arrows in the upper visualizations). Hydra-MDP selects one trajectory with the highest predicted score (★) as its output. Left: In this roundabout, it selects a high-scoring outlier in the cluster ‘slight left’ where the average score is low, indicating high uncertainty. Right: Such uncertainty is measured via our proposed Cluster Entropy, which we minimize via gradient descent...*
-
-![[assets/figures/papers/paper_list_l80_https_arxiv_org_abs_2503_11650/figures/009_Table_5.jpg]]
-*Table 5: The notation used in our paper, with descriptions*
 
 ## 实验与关键发现
 
@@ -254,19 +246,8 @@ Figure 4展示了TTT前后的轨迹评分分布变化。在成功案例中，Cen
 
 实验验证范围局限于NAVSIM仿真环境，尚未在真实车辆或闭环模拟器（如CARLA）中测试。TTT引入的额外计算开销在资源受限的嵌入式平台上可能构成部署瓶颈。集群熵依赖固定的5个驾驶方向锚点进行聚类，对于需要更细粒度行为表达的场景可能不够精确。此外，论文未探讨TTT在长期持续适应过程中的灾难性遗忘问题。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l80_https_arxiv_org_abs_2503_11650/figures/004_Table_1.jpg]]
-*Table 1: Impact of TTT on navtest. Introducing a fallback layer [54] leads to extremely conservative behaviors, in turn reducing PDMS. On the other hand, TTT yields significant improvements, in particular with our proposed Cluster Entropy uncertainty measure*
-
-![[assets/figures/papers/paper_list_l80_https_arxiv_org_abs_2503_11650/figures/007_Table_3.jpg]]
-*Table 3: Failure identification. Our proposed Cluster Entropy uncertainty with Hydra-MDP obtains promising results on identifying frames where the model will fail on navtest*
-
 ![[assets/figures/papers/paper_list_l80_https_arxiv_org_abs_2503_11650/figures/011_Table_7.jpg]]
 *Table 7: Ablations on navtest. More results, in addition to Table 1 in the main paper. TTT∗ uses the SVD of history gradients to combine them, instead of averaging. Hydra-SEf refers to using f history frames. Hydra-SE4 denotes TTT being applied only on inference of selected frames where uncertainty is higher than a threshold (e.g. Main L383). We report amortized latency on navtest*
-
-![[assets/figures/papers/paper_list_l80_https_arxiv_org_abs_2503_11650/figures/003_Figure_3.jpg]]
-*Figure 3: navsafe. We leverage definitions of safety-critical cases from NHTSA (National Highway Traffic Safety Administration) material [41] and search through navtest for frames matching these. Following human checks, we construct navsafe. CLIP-based clustering [23] of our data alongside navtest shows that navsafe consists of frames from the peripheral regions of the distribution*
 
 ![[assets/figures/papers/paper_list_l80_https_arxiv_org_abs_2503_11650/figures/006_Figure_4.jpg]]
 *Figure 4: Qualitative results. For each scene, we show the PDMS and a selected subscore for both Hydra-MDP (before TTT) and Centaur (after TTT), with the highest predicted score marked using a ★. The x-axis in each plot is the candidate trajectory’s lateral end-point position. Top: TTT helps Centaur which is uncertain between ‘Forward’ and ‘Slight Left’ to prefer the direction where cluster members have a higher average score, improving safety. Bottom: A failure case, where TTT cannot suppress a confident original prediction*

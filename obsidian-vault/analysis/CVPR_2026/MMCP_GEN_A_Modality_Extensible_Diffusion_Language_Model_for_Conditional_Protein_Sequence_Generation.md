@@ -141,8 +141,6 @@ $$\mathcal { L } = \mathcal { L } _ { C E } + \gamma \mathcal { L } _ { \mathrm 
 - 联合生成-评分目标的有效性在消融实验中验证：加入 MMCP-GS 后逆折叠 AAR 从 78.17% 提升至 78.66%，scTM 从 0.906 提升至 0.912（置信度 0.95）。
 - 新模态扩展仅需冻结骨干的设计在 §3.3.2 有明确说明，但论文未对模态数量增加时的计算开销进行定量分析，该点需手动验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2326_https_openaccess_thecvf_com_content_CVPR2026_html_An_MMCP_GEN_A_Modality/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of MMCP-GEN. MMCP-GEN unifies structure, ligand, text, functional annotations, and supports new modality extensions into a composable, extensible conditioning space for diffusion-based protein generation. Via MMCP-IH and MMCP-LQ, new modalities are integrated without backbone retraining and with minimal adaptation. Generated sequences are validated post-hoc using ESMFold together with additional biochemical and functional evaluations*
 
@@ -263,8 +261,6 @@ MMCP-GEN 在功能注释、逆折叠和配体条件生成三项核心任务上�
 3. **长序列生成的结构一致性**。论文未讨论序列长度超过 400 残基时的 scTM 和 pLDDT 变化趋势，长序列的全局结构一致性可能是潜在瓶颈——此点需读者结合 Figure 5B 的 pdb-TM 分布自行判断。
 
 4. **多模态冲突**。当不同模态条件提供矛盾信息时（如结构要求疏水核心但功能注释指向亲水残基），MMCP-LQ 的融合策略是否会产生语义混淆，论文未提供分析。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2326_https_openaccess_thecvf_com_content_CVPR2026_html_An_MMCP_GEN_A_Modality/figures/006_Figure_3.jpg]]
 *Figure 3: Comparison of MMCP-GEN–generated and reference protein structures. ESMFold-refolded sequences align closely with native PDB structures, demonstrating fold consistency*

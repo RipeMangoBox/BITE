@@ -54,8 +54,6 @@ claims:
 
 该方法的主要局限在于计算成本高（生成50帧需7–30分钟），以及在静止点、对称混淆、标记消失等场景下容易出错，且对合成视频泛化差。这些限制可通过蒸馏和模型改进逐步缓解。
 
-
-
 点跟踪是计算机视觉中的基础任务，旨在估计视频中指定物理点在每一帧的精确位置。这项能力支撑着运动分析、三维重建、视觉编辑等一系列下游应用。传统方法通常依赖大量标注数据进行监督训练，例如 **RAFT**（Teed & Deng, ECCV 2020）通过光流估计实现逐帧匹配，**TAPIR**（Doersch et al., 2023）和 **CoTracker3**（Karaev et al., 2024b）则直接针对点跟踪任务进行专门设计。这些方法在训练分布内表现优异，但泛化到新场景时往往受限。
 
 近年来，零样本点跟踪方法试图摆脱对标注数据的依赖，转而从预训练模型中提取特征进行帧间匹配。代表性工作包括 **DIFT**（Tang et al., 2023）利用扩散模型的特征层进行稠密对应，以及 **SD-DINO**（Zhang et al., 2023a）融合扩散特征与 DINOv2 特征。然而，这类方法面临一个根本性瓶颈：**它们依赖静态的特征相似度匹配，难以处理遮挡和长时运动**。当目标点被遮挡后重新出现，外观可能发生显著变化，特征匹配器容易丢失目标或产生错误关联。
@@ -65,8 +63,6 @@ claims:
 但直接使用扩散模型进行跟踪并非易事。一个直观的思路是在视频首帧的目标位置插入视觉标记（如红点），然后让扩散模型重新生成整个视频，期望标记随物体运动自然传播。然而，扩散模型具有**强先验**：它倾向于生成“自然”的视频内容，而一个不自然的彩色圆点会被视为需要“修复”的伪影，在生成过程中被逐渐抹除。这种标记消失现象使得简单的视觉提示策略无法直接奏效。
 
 本文的核心动机正是突破这一困境：**如何激发预训练视频扩散模型对运动轨迹的零样本理解，同时克服其强先验导致的标记消失问题**。通过反事实建模——在首帧引入人为扰动（标记点）并迫使模型在再生中保留这一扰动——可以将跟踪问题转化为一个可控的视频生成问题。这种方法无需任何微调，完全依赖预训练模型的内部知识，为零样本点跟踪开辟了一条新路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -107,16 +103,8 @@ $$\mathbf{x}_{t-1} = \mathbf{m} \odot \tilde{\mathbf{x}}_{t-1} + (1 - \mathbf{m}
 
 这些创新共同使方法在 TAP-Vid DAVIS 上以零样本设定达到 AJ 42.21，显著超越所有其他零样本基线（最佳基线 SD-DINO 为 29.68），并在遮挡准确率（OA 82.90）上超过自监督方法 **Opt-CWM**（Stojanov et al., 2025）的 80.87（Table 1）。
 
-
-
-![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_6FFQ007qLX/figures/005_Figure_1.jpg]]
-*Figure 1: Prompting a diffusion model for tracking. (a) We use an off-the-shelf video diffusion model to perform point tracking. We add a small, distinctive marking—a red dot—to the first frame of an input video, then ask the diffusion model to regenerate the rest of the video using SDEdit (Meng et al., 2021), which propagates the marking to subsequent frames. (b) We then track the motion of this marking over time. This motion corresponds to the trajectory of the underlying physical point. The model successfully tracks through occlusion. Please see the webpage for more results: https://point-prompting.github.io*
-
 ![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_6FFQ007qLX/figures/006_Figure_2.jpg]]
 *Figure 2: Enhancing the Counterfactual Signal. We use negative prompting to ensure that the generated video contains the marker. In each denoising step (Eq. 5), we condition the denoising on two images: (1) Edited First Frame: the first frame of the video with a marking added, and (2) Unedited First Frame: the original first frame of the video. We then subtract the weighted noise vector of the latter from the former*
-
-![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_6FFQ007qLX/figures/007_Figure_3.jpg]]
-*Figure 3: Tracking Enhancements. To improve point tracking in video, we introduce two enhancements: (1) Color Rebalancing: remove existing red hues to ensure the red marker remains a unique tracking cue; (2) Refinement: obtain initial trajectories with a color-based tracker, then refine them using an inpainting mask to correct temporal artifacts such as object shifts (as shown in white circles). This two-step procedure first produces coarse tracks and then refines them via mask-constrained reverse diffusion*
 
 ![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_6FFQ007qLX/figures/013_Table_4.jpg]]
 *Table 4: Tracking Pipeline Ablations. Quantitative results on TAP-Vid DAVIS-First showing the impact of each stage in our pipeline (Fig. 3). The last row uses original pixel color instead of the red dot for tracking. Figure 4: Effect of denoising strength and radius on tracking performance*
@@ -150,8 +138,6 @@ $$\mathbf{x}_{t-1} = \mathbf{m} \odot \tilde{\mathbf{x}}_{t-1} + (1 - \mathbf{m}
 ### 模块间的因果流
 
 整个pipeline的信息流是严格单向的：标记插入为扩散传播提供反事实信号；负向提示确保该信号在扩散过程中不被模型先验“抹除”；颜色重平衡为颜色检测器创造干净的检测环境；粗到细细化则纠正前序步骤积累的定位误差。消融实验（Table 4）证实了这一链条的脆弱性：移除负向提示会导致性能崩溃（AJ 从 48.60 骤降至 22.03），关闭颜色重平衡会使 AJ 降至 34.86，去掉精细化则降至 42.70，而仅用原始像素颜色（无标记点）跟踪的 AJ 仅为 11.26——每个模块的缺失都会在因果链上产生不可恢复的误差放大。
-
-
 
 ### 3.1 视频扩散模型与SDEdit基础
 
@@ -219,8 +205,6 @@ $$
 
 为减少自然场景中与标记颜色相似的像素干扰，在标记插入前对视频进行**颜色重平衡**：降低标记颜色通道的饱和度，抑制环境中相同色调的出现。标记传播完成后，在HSV色彩空间中检测红色像素，结合自适应搜索窗（半径 $`r`$，中心为前一帧位置）提取点轨迹。若搜索窗内未检测到红色像素，判定目标被遮挡，传播上一帧已知位置。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验结果
@@ -283,12 +267,6 @@ Figure 7 归纳了四类典型生成失败场景，这些失败揭示了方法�
 
 此外，方法在 TAP-Vid Kubric 等计算机生成视频上性能大幅下降，因为现有视频扩散模型主要训练于真实视频，对合成数据的分布外泛化能力有限。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_6FFQ007qLX/figures/009_Table_2.jpg]]
-
-
-
 ## 定位与知识库关联
 
 ### 1. 技术脉络与基线对比
@@ -336,8 +314,6 @@ $$\tilde{\epsilon}_{\theta} (\mathbf{x}_t, \mathbf{c}_I) = (\lambda + 1) \cdot \
 4. **域适应的可行性**：对于计算机生成视频，能否通过轻量级的提示工程调整（如修改颜色映射策略）或少量领域数据的生成微调来提升鲁棒性？
 
 5. **生成与判别闭环**：能否将点提示思路与自监督学习结合，让跟踪器在推理过程中同时优化其内部表示？这将使模型从“一次性生成”转向“迭代式精化”，可能进一步缩小与监督方法的差距。
-
-
 
 ## 原文 PDF
 

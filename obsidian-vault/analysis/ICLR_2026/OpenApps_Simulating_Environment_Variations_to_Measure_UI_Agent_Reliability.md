@@ -73,8 +73,6 @@ OPENAPPS 采用强化学习框架组织代理与环境的交互：环境状态 $
 
 这些发现共同指向一个核心结论：**应用变体维度是评估 UI 代理可靠性不可或缺的维度**，忽略这一维度将导致对代理部署能力的严重误判。
 
-
-
 ### UI代理的部署瓶颈：从固定环境到分布外变体
 
 当前，多模态大模型驱动的UI代理在固定应用副本上的评估已展现出令人瞩目的能力，能够完成点击、输入、滚动等类人操作。然而，这一评估范式存在一个关键盲点：它假设代理所面对的应用环境是静态且同质的。在真实世界中，同一应用会因版本迭代、用户自定义设置（如暗黑主题、字体大小）、语言本地化、内容动态更新等因素呈现出数千种不同的外观与内容组合。现有基准测试无法回答一个核心问题：**当同一个代理面对同一应用的不同变体时，其可靠性是否依然成立？**
@@ -96,8 +94,6 @@ OpenApps的工作揭示了一个严峻的现实：固定应用评估普遍高估
 为填补上述缺口，OpenApps提出了一个轻量级、可配置的应用生态系统。其核心动机并非追求最大化的视觉真实感，而是在**真实性与计算效率之间取得平衡**，使得研究者能够在单CPU、不足10MB内存的条件下，生成并部署数千种应用变体（见第3.1节）。这一设计选择使得**应用变体维度**首次成为一个可系统操作的实验变量，从而将UI代理评估从“在固定环境中的绝对性能”推向“在分布外变体下的可靠性”。
 
 OpenApps通过可配置的YAML文件定义应用的初始状态，涵盖外观（主题、字体、颜色）和内容（文本、语言、对抗性描述）两大类变化因素。代理通过BrowserGym标准动作接口与环境交互，任务成功则由基于完整应用状态的精确指标函数判定——只有当环境状态完全达到目标状态时，奖励才为1，否则为0（见第3.3节）。这一设计确保了评估信号的不可操纵性，并为分析代理在不同变体下的失败模式（如循环行为、无效动作幻觉、意图误解）提供了干净的因果归因基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -134,8 +130,6 @@ $$r = \delta_{[s_t = s_{\mathrm{target}}]}$$
 
 实验证据直接验证了这一创新逻辑的有效性：对于 Qwen2.5-VL、Kimi-VL 和 UI-Tars，跨应用变体的任务成功率标准差是固定应用内部的两倍以上（Section 4.1），而 Kimi-VL-3B 的平均成功率在不同应用版本间从 63% 剧烈波动至仅 4%（ABSTRACT），充分说明应用变体维度是评估 UI 代理可靠性时不可忽视的关键盲点。
 
-
-
 OPENAPPS 将代理与应用的交互组织为标准强化学习框架。环境状态 $s_t$ 由设计与内容变量定义，并从 YAML 规格文件初始化。在每个时间步 $t$，代理接收来自 OPENAPPS 的观察 $o_t$（视觉截图以及针对支持文本输入的代理提供的 AX Tree 简化文本表示），随后通过 BrowserGym 动作 API 发出动作 $a_t$。动作空间包含人类常用操作（点击、输入、滚动等），直接作用于 OPENAPPS 环境。任务成功与否通过检查底层应用状态 $s_t$ 是否达到目标状态来评估，奖励函数定义为确定性指示函数：
 
 $$r = \delta_{[s_t = s_{\mathrm{target}}]}$$
@@ -153,8 +147,6 @@ $$r = \delta_{[s_t = s_{\mathrm{target}}]}$$
 **Task Evaluator** — 通过检查当前状态是否达到目标状态来评估任务完成，并返回奖励。奖励函数直接访问完整应用状态，确保任务成功条件必须完全满足，无法通过完成对抗性副任务来操纵奖励。
 
 整个系统在单个轻量级 Python 进程中运行，内存占用小于 10MB，单 CPU 即可部署。这种设计使得在普通硬件上即可并行运行数千个独立实验，无需专用模拟器或容器环境（如 WebArena 需超过 100GB 内存）。应用状态与逻辑完全以 Python 代码暴露，便于研究者直接分析代理行为或扩展新功能。
-
-
 
 ### 核心模块
 
@@ -192,8 +184,6 @@ $$\frac{1}{nd} \sum_{r_i \in \{R_{v1}, \ldots, R_{vd}\}} \left| r_i - \frac{1}{n
 
 此外，单个应用版本的固定变化因素集合被形式化为 $A_1 = \{f_{1,1}, f_{1,2}, f_{1,3}, \ldots\}$，其中每个 $f$ 代表一个独立的变化维度（如主题、字体、语言）。这一形式化为后续探索多因素交互效应提供了基础框架。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：固定应用评估系统性高估代理可靠性
@@ -210,9 +200,6 @@ Figure 5 直接对比了两种设置下的任务成功率标准差——固定�
 ### 外观变异的影响
 
 Figure 6 和 Table 5 展示了代理在不同外观设置下的性能分化：
-
-![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_cj1MAx7lKs/figures/006_Figure_6.jpg]]
-*Figure 6: Agent reliability can be low in terms of performance across app variations. Model performance (as measured by the task success rate across random seeds, averaged over all tasks) can differ greatly across appearance and content variations (shown in Figure 7). For example, we notice a sizable drop in the performance of UI-TARS-1.5-7B (a vision-only model) compared to the default when the app has a dark theme, and likewise a drop in the performance of Kimi-VL-A3B-Instruct when the app is in German or contains adversarial page descriptions. The black bars capture the standard deviation of rewards across seeds, averaged over tasks. The task prompt is explicit and fixed. Kimi uses visual and AX t...*
 
 ![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_cj1MAx7lKs/figures/015_Table_5.jpg]]
 *Table 5: Agent reliability can be low in terms of performance across appearance variations. Model performance (as measured by the pass@1 across random seeds averaged over all tasks) can differ greatly across content variations. We report the standard deviation and mean absolute deviation of rewards across seeds, averaged over tasks. The task prompt is explicit and fixed*
@@ -269,25 +256,6 @@ Table 10 测试了流行字体、颜色和语言选择下的任务成功率。�
 
 所有评估采用相同的任务提示，指定随机种子，并尽可能使用模型官方推荐的系统提示和配置。代理的输入模态（仅视觉或视觉+AXTree）根据其能力优化，确保公平比较。超过 10,000 次独立评估覆盖了七个代理，为结论提供了充分的统计基础。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_cj1MAx7lKs/figures/001_Figure_1.jpg]]
-*Figure 1: OPENAPPS can generate thousands of configurable versions of apps. OPENAPPS contains six apps covering common digital tasks with configurable appearance and app data for measuring a new dimension of reliability: across app variations agents are likely to encounter. OPENAPPS can be deployed anywhere Python can run with a single CPU (without specialized hardware, emulators or setup). In the right panel, we see average success rates for the same tasks and agents can fluctuate across app versions, suggesting app variation is a key axis of reliability*
-
-![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_cj1MAx7lKs/figures/002_Figure_2.jpg]]
-*Figure 2: Screenshots with example appearance variations of all six apps in OPENAPPS: OpenToDo, OpenCalendar, OpenMessenger, OpenMaps, OpenCodeEditor, and OpenShop. Each app is a fully functional Python application with editable state and appearance. OpenApps can be configured via simple YAML files*
-
-![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_cj1MAx7lKs/figures/008_Figure_8.jpg]]
-*Figure 8: The action set provided through BrowserGym, copied from Appendix A (23)*
-
-![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_cj1MAx7lKs/figures/010_Table_3.jpg]]
-*Table 3: Tasks with variable success rate across app variations. We show all app variations for each task*
-
-![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_cj1MAx7lKs/figures/014_Table_4.jpg]]
-*Table 4: Breakdown of model performance by task. Model performance (as measured by pass@1 over random seeds) on all tasks. We report the mean absolute deviation (MAD) and standard deviation (std) of rewards over random seeds. We use the default environment content and appearance, and the task prompt is explicit and fixed. All models use visual and AX tree inputs, with the exception of UI-TARS, which is a UI-visual only model*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 方法定位与基线关系
@@ -341,8 +309,6 @@ OPENAPPS 的设计存在以下适用边界，使用和解读时需注意：
 4. **扩展任务复杂度**：将 OPENAPPS 的任务集扩展到更复杂、更长周期的场景，使其能够作为标准化的 UI 代理可靠性基准。这需要在保持环境可控性的同时增加任务的现实性和难度。
 
 5. **人机协同场景的可靠性**：在人类提供监督或干预的混合自主模式下，应用变体对代理可靠性的影响是否呈现不同模式？人类反馈能否有效补偿代理对特定变体的脆弱性？
-
-
 
 ## 原文 PDF
 

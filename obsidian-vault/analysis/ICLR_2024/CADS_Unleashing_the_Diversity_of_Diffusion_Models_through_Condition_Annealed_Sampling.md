@@ -58,8 +58,6 @@ CADS 的核心优势体现在三个层面：
 
 需要指出的是，CADS 目前依赖手动调节场景相关的超参数（噪声尺度 s、退火阈值 τ₁/τ₂、混合因子 ψ），在更复杂的条件模态（如密集语义分割掩码）上的适用性仍有待验证。
 
-
-
 ### 扩散模型的条件生成困境
 
 扩散模型（Diffusion Models）已成为图像生成领域的核心范式，其通过逐步去噪从高斯噪声中恢复数据分布的机制，在无条件生成和条件生成任务中均展现出卓越性能。然而，**条件扩散模型在推理阶段存在一个被长期忽视的瓶颈：多样性崩溃**。
@@ -86,8 +84,6 @@ CADS 的核心优势在于：
 - **零训练成本**：作为纯推理阶段技术，可直接集成到任意预训练扩散模型和采样器中，无需任何微调或重新训练。
 - **计算开销极小**：仅涉及条件向量的加性噪声注入和重缩放操作（Algorithm 1）。
 - **质量-多样性权衡的突破**：在 ImageNet 256×256 类条件生成中，CADS 将 FID 从 DDPM 的 20.83 降至 9.47（Table 1），并在 DiT-XL/2 上达到新的最先进 FID 1.70（Table 2），同时显著提升了 Recall 和 Vendi Score 等多样性指标。
-
-
 
 ## 核心方法与创新机理
 
@@ -131,8 +127,6 @@ CADS 最显著的优势在于**无需对预训练扩散模型进行任何重新�
 
 这三个创新点的协同作用，使得 CADS 能够在保持甚至提升图像质量的前提下，将 DeepFashion 姿态生成任务的 Recall 从 0.02 提升至 0.48，将 ImageNet 256×256 类条件生成的 FID 从 20.83 降至 9.47，并在 DiT-XL/2 上取得 FID 1.70 的新 SOTA。
 
-
-
 CADS（Condition-Annealed Diffusion Sampler）是一种即插即用的推理时采样策略，其核心思想是通过在扩散模型的采样循环中逐步衰减（退火）条件信号的强度，来平滑尖锐的条件分布，从而在保持生成质量的同时大幅提升样本多样性。整个框架无需对预训练扩散模型进行任何重新训练，也无需修改模型权重或架构，仅需在标准采样循环中插入一个轻量级的**条件退火模块**。
 
 该模块的输入输出流如下：在扩散采样的每一时间步 $t$，原始的条件向量 $\pmb{y}$（例如类别标签的嵌入向量、姿态关键点编码等）首先经过**条件污染**步骤，按照式（1）加入由退火调度控制的高斯噪声，得到受污染的条件向量 $\widehat{\pmb{y}}$：
@@ -153,13 +147,6 @@ $$
 **退火调度**（式2）采用分段线性函数，由两个阈值 $\tau_1$ 和 $\tau_2$ 控制：在 $t \leq \tau_1$ 时 $\gamma(t) = 1$（不添加噪声，保留完整条件信号以保证条件对齐）；在 $t \geq \tau_2$ 时 $\gamma(t) = 0$（噪声强度最大，最大化多样性）；中间区域线性过渡。消融实验（Table 10）表明，分段线性调度在所有多项式退火方案中表现最优。
 
 整个 CADS 模块可无缝嵌入到任何扩散采样器（如 DDPM、DDIM、DPM-Solver 等）中，其计算开销极小，仅涉及一次加法操作。Algorithm 1 和 Figure 15 给出了完整的采样循环伪代码及流程图。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_zMoNrajk2X/figures/015_Figure_7.jpg]]
-*Figure 7: Visual illustration of how different hyperparameters affect CADS*
-
-
 
 CADS 的核心思想是在扩散模型的推理采样过程中，向条件向量注入随时间衰减的高斯噪声，从而平滑尖锐的条件分布，在保持生成质量的同时大幅提升多样性。该方法无需对预训练扩散模型进行任何重新训练，且计算开销极小，仅涉及加法操作。
 
@@ -229,8 +216,6 @@ CADS 的核心可控参数包括：
 
 消融实验表明，$s$ 从 0.025 增大到 0.1 可改善 FID 和 Recall，但 $s = 0.25$ 会严重损害质量（FID 升至 42.58）（Table 6a）；$\tau_1 = 0.6$ 在质量和多样性之间达到最佳平衡（Table 6b）；CADS 对噪声分布类型（高斯、拉普拉斯、伽马）不敏感，仅标准差影响结果（Table 11）。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与实验动机
@@ -285,33 +270,14 @@ Dynamic CFG通过退火函数直接缩放引导权重（$\hat{w}_{\mathrm{CFG}} 
 3. **高引导尺度下的强噪声需求**：在高w_CFG下，CADS需要较强的噪声来有效平滑条件分布，这可能不适用于某些高度结构化的条件任务。
 4. **Dynamic CFG结合的稳定性**：**Table 8** 显示，在高w_CFG=5时结合Dynamic CFG有益（FID 8.14 vs 9.47），但在w_CFG=2.5时反而恶化（FID 5.43 vs 5.02），说明联合使用并非普遍有效，需要谨慎调参。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_zMoNrajk2X/figures/005_Table_1.jpg]]
 *Table 1: Quantitative comparison between samples generated with DDPM and CADS for a fixed high guidance scale. CADS consistently improves the diversity of the outputs across different tasks as reflected in improved FID, recall, and similarity scores*
 
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_zMoNrajk2X/figures/006_Table_2.jpg]]
 *Table 2: Benchmark for class-conditional generation on ImageNet 256×256 and 512×512. Sampling with CADS improves the FID of DiT-XL/2 to the state-of-the-art at both resolutions while using a higher guidance value and without any retraining of the underlying diffusion model*
 
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_zMoNrajk2X/figures/007_Figure_5.jpg]]
-*Figure 5: The behavior of the evaluation metrics across different guidance scales. CADS exhibits superior ability to balance quality and diversity, evidenced by better performance in FID and Recall*
-
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_zMoNrajk2X/figures/008_Table_3.jpg]]
-*Table 3: Impact of integrating CADS with popular diffusion samplers using the class-conditional ImageNet model (DiT-XL/2). CADS enhances sample diversity across all samplers*
-
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_zMoNrajk2X/figures/012_Table_6.jpg]]
 *Table 6: Ablation study examining various design elements in CADS*
-
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_zMoNrajk2X/figures/020_Figure_10.jpg]]
-*Figure 10: Comparing DDPM with CADS on a pose-to-image model trained on noisy pose images. Training on noisy images does not solve the issue of low-diversity by default, and sampling with CADS is still needed to achieve better diversity*
-
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_zMoNrajk2X/figures/030_Table_10.jpg]]
-*Table 10: Comparing different choices of*
-
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_zMoNrajk2X/figures/032_Table_11.jpg]]
-*Table 11: Comparing different noise distributions for n in Equation (1) on class-conditional ImageNet generation with*
-
-
 
 ## 定位与知识库关联
 
@@ -362,8 +328,6 @@ CADS 的核心定位是**推理时采样策略**，而非新的扩散模型架�
 - **退火调度的理论最优性**：当前的分段线性退火调度是经验选择（实验表明其优于多项式退火，见 Table 10），是否存在理论上的最优退火形式？退火速率与条件分布尖锐度之间的关系是什么？
 
 - **评估指标的局限性**：论文指出 IS 和 Precision 在评估多样性时存在局限性，会对 DDPM 给出虚高的值（Table 12），而 FID 更能综合反映真实性和多样性。这一发现对扩散模型生成质量的评估体系有更广泛的启示，需要进一步研究。
-
-
 
 ## 原文 PDF
 

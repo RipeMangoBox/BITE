@@ -54,8 +54,6 @@ claims:
 
 **主要结果**：在自建的DSIA数据集上，DMAligner 取得平均PSNR 26.67 / SSIM 0.81，全面超越所有对比方法（Table 2）。在Sintel和真实场景DAVIS数据集上，DMAligner 在LPIPS和DreamSim指标上也表现出色（Table 3）。定性结果显示，DMAligner 生成的图像在视觉上最接近真值，鬼影和背景失真显著减少（Fig. 4-7）。消融实验证实，DMP模块和预测x₀（而非噪声）的去噪目标对性能有决定性贡献（Table 4）。压力测试表明，DMAligner 在运动幅度增大时的性能退化速度明显慢于DPFlow和GenWarp（Fig. 8）。在下游HDR成像任务中，替换对齐模块为DMAligner后，鬼影和背景失真同样得到显著抑制（Fig. 7）。
 
-
-
 图像对齐是计算机视觉中的一项基础任务，其目标是将不同时间或视角下捕获的同一场景图像在几何和语义上对齐，广泛应用于视频稳定、HDR重建、图像拼接等下游任务。传统对齐范式遵循“光流估计 + 图像warping”的两阶段流程：首先通过光流网络预测两帧之间的密集运动场，然后基于该运动场对源图像进行空间变换，使其与参考图像对齐。然而，这一范式存在根本性的瓶颈。
 
 **现有范式的失效模式。** 当场景中存在显著遮挡、复杂运动或剧烈光照变化时，光流估计本身就会产生较大误差。更为关键的是，即使光流预测完全准确，基于warping的图像变换也无法处理“多对一”映射所导致的不可见区域——即源图像中被遮挡或移出视野的部分，在参考图像中找不到对应像素。这直接导致对齐结果中出现鬼影、撕裂和背景失真等伪影（见Figure 1(a)）。近年来，尽管光流方法在精度上持续提升——从经典的**PWCNet**（Sun et al., ICCV 2018）到基于循环全对场变换的**RAFT**（Teed and Deng, ECCV 2020），再到引入掩码自编码预训练的**FlowFormer++**（Shi et al., CVPR 2023）——但这些方法本质上仍受限于warping机制的固有缺陷，无法从根本上解决遮挡区域的生成问题。
@@ -63,8 +61,6 @@ claims:
 **替代方案的局限。** 部分工作尝试绕过纯光流范式，引入额外的几何先验。例如，**COGS**（Jiang et al., ACM SIGGRAPH 2024）需要深度图和运动掩码作为输入进行稀疏视图合成；**AccidentalGS**（Mao et al., ICCV 2025）利用3D高斯喷洒处理意外相机运动，但依赖相机内参和外参；**GenWarp**（Seo et al., NeurIPS 2024）基于扩散模型实现单图新视图合成，但仍需要额外的语义或几何引导。这些方法虽然在特定场景下有效，但额外的输入需求严重限制了其实用性和泛化能力。
 
 **核心动机。** 本文的核心洞察在于：图像对齐的本质并非精确估计运动场，而是生成一张在参考视角下、目标时刻的完整场景图像。换言之，对齐任务可以被重新定义为一种**对齐导向的视图合成（alignment-oriented view synthesis）**问题。这一视角转换将任务从判别式的“估计-变换”范式转向生成式的“条件生成”范式，使得模型能够直接合成对齐后的完整图像，包括传统warping无法处理的遮挡和不可见区域。扩散模型在图像生成领域展现出的强大先验建模能力，为这一范式转换提供了技术基础。本文提出的**DMAligner**正是基于这一动机，旨在仅需两张连续RGB图像的前提下，利用扩散模型的生成能力实现高质量、无鬼影的图像对齐。
-
-
 
 ## 核心方法与创新机理
 
@@ -107,8 +103,6 @@ DMAligner 的训练目标由两部分组成（Eq. 12）：
 $$L_{\mathrm{Total}} = \lambda_1 L_{\mathrm{Denoising}} + \lambda_2 L_{\mathrm{Mask}}$$
 
 其中 $L_{\mathrm{Denoising}}$ 利用 DMP 预测的掩码对前景和背景区域施加差异化权重（Eq. 10），引导模型聚焦于动态区域的对齐质量；$L_{\mathrm{Mask}}$ 为掩码预测的交叉熵损失。这种联合优化策略将动态感知与生成质量统一在一个端到端框架内。
-
-
 
 DMAligner 将图像对齐从一个“显式光流估计 + 图像 warping”的判别式任务，重构为一个以对齐为目标的扩散视图生成任务。其核心流水线由三个关键阶段串联而成：**潜在空间编码与条件构建**、**动态感知扩散训练**，以及**动态感知去噪推理**。
 
@@ -156,13 +150,6 @@ Figure 3 直观展示了这一范式转换：传统方法依赖光流网络显�
 
 ![[assets/figures/papers/paper_list_l2466_https_arxiv_org_abs_2602_23022/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of our DMAligner. Instead of using the discriminative learning paradigm for optical flow estimation and image warping, our framework employs a generative approach to achieve image alignment with a diffusion model. Dynamics-aware Mask Producing (DMP) module is crucial for providing dynamic information, essential for performing the Dynamics-aware Diffusion Training process in this task*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2466_https_arxiv_org_abs_2602_23022/figures/001_Figure_1.jpg]]
-*Figure 1: (a) Conventional image alignment based on optical flow and image warping, resulting in ghosting artifacts and occlusion. (b) Our DMAligner directly generates the complete alignment image via diffusion-based view synthesis*
-
-
 
 ### 问题建模与对齐目标
 
@@ -238,8 +225,6 @@ $$\{x_T \to \hat{x}_0^{(T)}\} \to \{x_{T-\Delta} \to \hat{x}_0^{(T-\Delta)}\} \t
 
 每一步利用上一步的预测结果作为下一轮的条件输入，实现增量式细化。最终 $\hat{x}_0^{(1)}$ 经解码器 $\mathcal{D}$ 还原为对齐后的RGB图像。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -268,9 +253,6 @@ Table 4 系统消融了预测目标和 DMP 模块的作用。
 
 Figure 8 展示了性能随运动幅度的变化曲线。随着帧间运动幅度增大，DPFlow 和 GenWarp 的性能退化速度明显快于 DMAligner。DMAligner 在大运动场景下仍能保持相对稳定的对齐质量，这归因于其生成式范式不依赖显式光流场的稠密匹配，避免了大幅运动下光流估计失败导致的灾难性失真。
 
-![[assets/figures/papers/paper_list_l2466_https_arxiv_org_abs_2602_23022/figures/011_Figure_8.jpg]]
-*Figure 8: Stress test: performance vs. motion magnitude*
-
 ### 输入信息公平性说明
 
 Table 1 对比了各方法的输入需求。DMAligner 仅需两张连续 RGB 图像（$I_1$, $I_2$），而 COGS 需要深度图和掩码，AccidentalGS（Mao et al., ICCV 2025）依赖相机参数，GenWarp 需要单图及语义条件。输入信息的不对等可能影响比较的绝对公平性，但 DMAligner 在信息更受限的条件下仍取得最优结果，反而强化了其方法优势的证据强度。
@@ -278,27 +260,11 @@ Table 1 对比了各方法的输入需求。DMAligner 仅需两张连续 RGB 图
 ![[assets/figures/papers/paper_list_l2466_https_arxiv_org_abs_2602_23022/figures/004_Table_1.jpg]]
 *Table 1: Comparison of network inputs among DPFlow [34], COGS [14], AccidentalGS [33], GenWarp [41] and our DMAligner. Other optical flow networks (PWCNet [44], RAFT [45], FlowFormer++ [42], FlowDiffuser [28]) have the same input structure as DPFlow*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2466_https_arxiv_org_abs_2602_23022/figures/006_Table_2.jpg]]
 *Table 2: Quantitative comparison on our DSIA dataset across four subsets (LcLf, LcSf, ScLf, and ScSf) using PSNR and SSIM metrics, higher scores indicate better performance. The average (“Avg”) across all subsets summarizes overall results. † indicates that occlusion and ghost regions are excluded during metric computation, as determined by forward-backward consistency check [50]*
 
 ![[assets/figures/papers/paper_list_l2466_https_arxiv_org_abs_2602_23022/figures/010_Table_3.jpg]]
 *Table 3: Quantitative comparison on Sintel and DAVIS dataset. Due to the lack of ground truth for precise evaluation, we compute LPIPS and DreamSim [9] between*
-
-![[assets/figures/papers/paper_list_l2466_https_arxiv_org_abs_2602_23022/figures/009_Figure_7.jpg]]
-*Figure 7: Comparison of HDR results using flow-based method HDRFlow [49], DPFlow [34] and our DMAligner. Our DMAligner significantly reduces ghosting and background distortions, especially around occluded regions and moving objects*
-
-![[assets/figures/papers/paper_list_l2466_https_arxiv_org_abs_2602_23022/figures/005_Figure_4.jpg]]
-*Figure 4: Qualitative comparisons between DPFlow [34], COGS [14], GenWarp [41] and our DMAligner on our DSIA dataset*
-
-![[assets/figures/papers/paper_list_l2466_https_arxiv_org_abs_2602_23022/figures/007_Figure_5.jpg]]
-*Figure 5: Qualitative comparisons between DPFlow [34], GenWarp [41] and our DMAligner on Sintel dataset*
-
-![[assets/figures/papers/paper_list_l2466_https_arxiv_org_abs_2602_23022/figures/008_Figure_6.jpg]]
-*Figure 6: Qualitative comparisons between DPFlow [34], GenWarp [41] and our DMAligner on the real-world DAVIS dataset*
-
-
 
 ## 定位与知识库关联
 
@@ -357,8 +323,6 @@ DMAligner 在知识库中的定位可归纳为以下三个维度：
 | AccidentalGS | RGB + 相机参数 | 3D高斯喷洒对齐 | Mao et al., ICCV 2025 |
 | GenWarp | 单张RGB + 相机位姿 | 扩散新视图合成 | Seo et al., NeurIPS 2024 |
 | **DMAligner** | **两张RGB图像** | **扩散对齐视图合成 + DMP** | 本文 |
-
-
 
 ## 原文 PDF
 

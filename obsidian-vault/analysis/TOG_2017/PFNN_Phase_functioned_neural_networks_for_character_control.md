@@ -53,8 +53,6 @@ claims:
 
 实验结果表明，PFNN在崎岖地形穿越、跳跃、蹲伏等复杂场景中能够自动生成适当且富有表现力的运动，并通过调节未来轨迹混合偏置实现响应性与平滑性的灵活权衡——在圆形路径跟随任务中，平均轨迹误差可降至5.82 cm。消融实验进一步证实，移除相位或将其降级为普通输入均会导致运动质量显著退化，验证了相位函数化设计的决定性作用。
 
-
-
 实时角色动画是游戏与交互式虚拟环境的核心技术挑战。高质量的角色运动要求系统能同时响应三方面的约束：用户的实时操控指令、角色自身的物理状态、以及复杂的三维场景几何。传统方法在这三个维度的交汇点上始终存在难以调和的矛盾。
 
 数据驱动的运动合成方法长期依赖两类范式。一类是基于运动匹配的启发式拼接方法，如 **Motion Matching**（Clavet, GDC 2016），其参数化思路与本工作相似，但本质上不具备学习泛化能力，无法在未见过的地形配置上自动生成合理运动。另一类是基于自回归模型的生成方法，包括 **cRBM**（Taylor and Hinton, ICML 2009）、**GP Autoregressor**（Wang et al., IEEE PAMI 2008）以及基于 LSTM 的 **ERD**（Fragkiadaki et al., ICCV 2015）。这些自回归模型面临一个共同的瓶颈：**在长时间运动生成中，误差逐步累积导致动作逐渐消失或爆炸**，产生严重的运动漂移。此外，基于高斯过程的自回归器其内存与计算量随数据量平方或立方增长，无法扩展到大规模运动数据集。
@@ -66,8 +64,6 @@ claims:
 上述困境揭示了一个更深层的设计缺陷：**相位的影响力在标准神经网络架构中被结构性稀释**。当相位仅作为输入向量中的一个维度时，它只能通过第一层权重间接影响网络行为，其控制力受限于该层权重的范数。在复杂地形交互中，这种弱约束不足以确保网络在正确的相位区间生成正确的姿态。
 
 本文的核心动机正是突破这一结构局限：**能否让相位成为网络的全局控制变量，使其能够强有力地、周期性地调节整个网络的权重**，从而从根本上避免不同相位数据的混合，消除运动漂移，同时保持模型结构的简洁与实时推理的高效？这一思路引出了 Phase-Functioned Neural Network（PFNN）的核心设计——将网络权重定义为相位的函数，而非将相位作为输入。
-
-
 
 ## 核心方法与创新机理
 
@@ -106,8 +102,6 @@ $$\operatorname{Cost}(\mathbf{X}, \mathbf{Y}, \mathbf{P}; {\boldsymbol{\beta}}) 
 ### 与 Motion Matching 的关系
 
 值得注意的是，同期提出的启发式动画拼接方法 **Motion Matching** (Clavet, GDC 2016) 采用了与 PFNN 相似的参数化方式（轨迹、步态、地形高度等），但其本质是通过在大规模动画数据库中搜索最匹配片段来合成运动，不具备学习泛化能力。PFNN 可视为 Motion Matching 的**可学习、可微分版本**——通过相位函数网络隐式地学习从控制参数到姿态的映射，避免了运行时昂贵的搜索开销。
-
-
 
 ![[assets/figures/papers/paper_list_l47_https_doi_org_10_1145_3072959_3073663/figures/001_Figure_1.jpg]]
 *Figure 1: A selection of results using our method of character control to traverse rough terrain: the character automatically produces appropriate and expressive locomotion according to the real-time user control and the geometry of the environment*
@@ -157,8 +151,6 @@ $$TrajectoryBlend(a_0, a_1, t, \tau) = (1 - t^\tau) a_0 + t^\tau a_1$$
 理解这一 pipeline 设计的关键在于其解决的**根本瓶颈**：传统自回归模型（如 LSTM/RNN）在长时间运动生成中因误差累积导致动作逐渐消失或爆炸，而卷积模型（如 **Holden et al., ACM Trans. Graph. 2016** 的 CNN）需要完整控制信号作为输入，不适用于在线实时生成。更微妙的是，即使将相位作为额外输入的标准神经网络，由于 dropout 等机制，相位的影响力容易被稀释，导致动作僵硬不自然（Fig. 10b, Fig. 11）。
 
 PFNN 通过让相位直接参数化整个网络的权重矩阵，实现了**约50倍于标准NN的相位影响力**（输出相对于相位的变化幅度从约0.001提升至约0.05），从根本上避免了不同相位数据的混合，消除了漂移问题。这一设计使得系统在复杂地形交互中能够自动生成适当且富有表现力的运动（Fig. 1, Fig. 9），同时保持极低的推理延迟（PFNN constant 模式约 0.0008s/帧）。
-
-
 
 ### 相位函数神经网络（PFNN）总体结构
 
@@ -222,8 +214,6 @@ $$TrajectoryBlend(a_0, a_1, t, \tau) = (1 - t^\tau) a_0 + t^\tau a_1$$
 
 其中 $a_0$ 为游戏手柄控制的期望轨迹，$a_1$ 为上一帧 PFNN 预测的轨迹，$t \in [0,1]$ 为轨迹窗口内的归一化时间，$\tau$ 为偏置参数。当 $\tau$ 较小时混合偏向 $a_0$（响应更快），较大时偏向 $a_1$（更平滑）。实验表明，调节 $\tau_v=5.0, \tau_d=10.0$ 可将平均轨迹误差从 17.29 cm 降至 5.82 cm，代价极小的动画质量损失（Table 2, Fig. 14）。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈验证：相位缺失与相位稀释的代价
@@ -240,7 +230,6 @@ PFNN 的设计根植于一个明确的实验观察：传统神经网络在处理
 
 Table 1 汇总了 PFNN 与各基线方法在相同硬件环境（NVIDIA GTX 660 GPU）下的运行时性能。PFNN 提供了三种运行时配置以适配不同部署需求：
 
-
 ![[assets/figures/papers/paper_list_l47_https_doi_org_10_1145_3072959_3073663/figures/011_Table_1.jpg]]
 *Table 1: Numerical comparison between our method and other methods described in Fig. 10*
 
@@ -256,7 +245,6 @@ Table 1 汇总了 PFNN 与各基线方法在相同硬件环境（NVIDIA GTX 660 
 $$\text{TrajectoryBlend}(a_0, a_1, t, \tau) = (1 - t^\tau) a_0 + t^\tau a_1$$
 
 其中偏置参数 $\tau$ 控制未来轨迹向用户期望收敛的速度。Table 2 和 Fig. 14 给出了系统的定量响应性评估：在圆形路径场景中，当 $\tau_v=5.0, \tau_d=10.0$ 时，平均轨迹误差仅为 5.82 cm；而在波浪路径场景中采用更保守的偏置（$\tau_v=0.5, \tau_d=2.0$）时，误差为 17.29 cm。通过调节偏置参数，响应性可提升约 3 倍，代价是动画质量的轻微下降。这一可控的权衡机制使系统能根据应用场景灵活配置。
-
 
 ![[assets/figures/papers/paper_list_l47_https_doi_org_10_1145_3072959_3073663/figures/015_Table_2.jpg]]
 *Table 2: Numerical evaluation of character responsiveness and following ability. For each scene in $\mathsf { F i g . }$ 14 we measure the average error between the desired path and that taken by the character with different biases supplied to the future trajectory blending function Eq. (9). Here $\tau _ { v }$ represents the blending bias for the future trajectory velocity, and $\tau _ { d }$ τrepresents the blendτing bias for the future trajectory facing direction (see Section 6 for a more detailed explanation)
@@ -275,13 +263,8 @@ Fig. 15 展示了系统的主要失败模式：当用户提供的输入轨迹在
 
 所有对比实验均在相同条件下进行：统一使用约 1 小时动捕数据经地形拟合后生成的约 400 万帧训练集，相同的训练/验证划分，相同的优化器（Adam）、dropout 配置（保留概率 0.7）、L2 正则化系数（$\gamma=0.01$），以及相同的网络深度（3 层）和隐藏单元数（512）。运行时性能测量在同一 NVIDIA GTX 660 GPU 上完成，确保架构层面和硬件层面的公平比较。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l47_https_doi_org_10_1145_3072959_3073663/figures/009_Figure_9.jpg]]
 *Figure 9: Result of the character where the future trajectory has been collided with walls, pits and other objects in the environment. By colliding the future trajectory with non-traversable objects the character will slow down or avoid such obstacles. When walking along the beam, since the measured heights on either side of the character are significantly lower than in the center, a balancing motion is naturally produced*
-
-
-
 
 ## 定位与知识库关联
 
@@ -320,8 +303,6 @@ PFNN处于**数据驱动运动合成**与**实时角色控制**的交汇点，�
 - 能否提供可控性和可编辑性工具，让动画师可以干预或修正PFNN的行为？
 - 将该框架应用于物理仿真，结合相位索引的反馈控制器是否能实现更稳定的崎岖地形行走？
 - 相位函数网络思想能否推广到其他周期性模态数据（如心跳fMRI、周期视频），以提升学习效率？
-
-
 
 ## 原文 PDF
 

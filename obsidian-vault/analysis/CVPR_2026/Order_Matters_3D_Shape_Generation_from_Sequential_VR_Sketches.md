@@ -54,8 +54,6 @@ claims:
 
 **主要结果：** 在公开的3DVRChair基准上，VRSketch2Shape相较Luo et al.将F-score从26.6提升至31.1，CD×1000从35.5降至25.8；在自建的VRSketch2Shape多类别数据集上，F-score从48.8提升至69.8，CD×1000从13.0降至4.8。用户研究中，有参考形状场景的Likert评分从2.76提升至3.92，自由手绘场景从2.02提升至3.60。消融实验揭示，去除笔画和点顺序后F-score从56.8骤降至48.9，CD×1000从5.1升至7.1，证实了时序信息的关键因果作用。在仅用前50%草图点的补全任务中，顺序感知模型比顺序无关模型F1-score高出+6.6，凸显了时序建模对部分输入场景的显著增益。
 
-
-
 3D形状生成是计算机图形学与交互设计的核心任务，其目标是从用户输入快速构建可编辑的三维模型。近年来，虚拟现实（VR）作为沉浸式三维创作媒介迅速普及，VR草图——用户在三维空间中直接绘制的笔画序列——因其直观性和表达自由度，正成为一种极具潜力的3D建模输入模态。然而，从VR草图自动生成高质量3D形状仍面临根本性挑战。
 
 **现有方法的瓶颈：时序信息的系统性丢失。** 当前主流的VR草图生成方法将草图视为无序的三维点云，通过PointNet++等无序聚合器提取全局特征，再输入变分自编码器（VAE）或潜空间对齐模块生成形状。这一范式完全丢弃了VR草图的核心结构信息——笔画顺序、点顺序以及连接关系。在人类绘制过程中，笔画的先后顺序编码了物体的连接性、层次关系和设计意图：先画主干再画分支，先定轮廓再补细节。将这些时序信号压平为无序点集，等同于剥离了草图中蕴含的构造逻辑，导致生成形状在几何精度和拓扑一致性上存在显著退化。
@@ -65,8 +63,6 @@ claims:
 **数据集缺口：缺乏大规模、多类别、带时序标注的VR草图资源。** 现有3D草图数据集（如3DVRChair）仅覆盖单一椅类，且不包含真实手绘草图或完整的时序标注。本文构建了VRSketch2Shape数据集，包含20,838对合成草图-形状对（覆盖椅、桌、柜、飞机四类）和900张经表面吸附工具采集的真实手绘VR草图，首次为多类别时序草图生成研究提供了开放基准（Table 1）。
 
 **方法定位。** 与基于无序点云的Luo et al.和基于多视角2D渲染的LAS-Diffusion等基线不同，VRSketch2Shape将草图建模为有序笔画序列——每个笔画为有序点序列，以SEP/EoS分隔符标记边界——并通过空间傅里叶特征编码、连续傅里叶位置编码和轻量级BERT编码器提取时序感知的草图表征，最终以SDFUSION潜扩散模型实现端到端的单阶段形状生成。这一设计在3DVRChair和VRSketch2Shape两个基准上均大幅超越先前方法，在全部类别上F-score提升+21.0，CD×1000降低-8.2（Table 2），用户研究Likert评分在自由手绘场景下领先+1.58（Table 3）。
-
-
 
 ## 核心方法与创新机理
 
@@ -128,8 +124,6 @@ VRSketch2Shape采用三阶段训练策略：首先在20,838对合成数据上大
 
 与Luo et al.的无序点云方法相比，VRSketch2Shape的根本差异不在于生成器架构（两者均可用扩散模型），而在于**条件信号的表达力**：前者将草图压缩为几何信息的无序集合，后者将草图保留为几何+时序的结构化序列。这一差异在部分草图补全任务中尤为突出——当仅提供前50%类人草图点时，顺序感知模型比顺序无关模型F1-score高出+6.6（Section A-1），说明时序信息在信息不完整时具有更强的推断能力。
 
-
-
 VRSketch2Shape 的整体框架围绕一个核心洞察构建：**VR 草图的绘制顺序编码了结构的连接性、层次与设计意图**，而现有方法将草图视为无序三维点云，完全丢弃了这些时序信息。为此，该工作提出了一套从数据生成到形状推理的完整流水线，包含三个关键模块。
 
 ### 合成草图生成流水线
@@ -166,8 +160,6 @@ VRSketch2Shape 的整体框架围绕一个核心洞察构建：**VR 草图的绘
 ### 训练策略
 
 训练采用**合成数据大规模预训练 + 随机时序增强 + 少量真实数据微调**的策略。时序增强包括笔画丢弃、点丢弃和笔画互换，旨在提升模型对真实草图中绘制顺序变化的鲁棒性。消融实验表明，去除数据增强或合成预训练均会导致性能显著下降（Table 4）。少样本微调实验中，每类别仅需 50 张真实草图即可使 F-score 和 CD 接近全量微调水平（Figure 5），验证了预训练先验的有效迁移能力。
-
-
 
 VRSketch2Shape 的核心设计围绕一个关键洞察展开：**VR 草图的绘制顺序编码了结构的连接性、层次与设计意图**。现有方法将草图视为无序三维点云，完全丢弃了笔画顺序、点顺序以及连接关系等时序信息。本方法通过三个紧密耦合的模块将顺序信息显式注入生成流程。
 
@@ -213,8 +205,6 @@ $$E(p_i^s) = E_{\mathrm{spa}}(p_i^s) + E_{\mathrm{stroke}}(s) + E_{\mathrm{point
 
 为提升模型对真实绘制顺序变化的鲁棒性，训练中引入随机时序增强：随机丢弃笔画或点、随机交换相邻笔画顺序。消融显示，去除增强后性能显著下降（Table 4），而打乱笔画顺序仅使 F-score 从 56.8 降至 54.6，打乱点顺序降至 52.2，反转笔画顺序则影响甚微（Table A-1 [C]），表明模型通过增强学习到了对合理顺序扰动的容忍能力。
 
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -249,9 +239,6 @@ VRSketch2Shape在公开基准3DVRChair和自建VRSketch2Shape数据集上均以�
 
 少样本实验（Figure 5）显示，模型在合成数据预训练后，仅需每类别50张真实草图即可使F-score和CD接近全量微调水平。这一高效适应能力得益于时序增强策略使模型在预训练阶段就学习了多样的绘制顺序模式，降低了真实草图的域迁移难度。
 
-![[assets/figures/papers/paper_list_l2556_https_arxiv_org_abs_2512_04761/figures/007_Figure_5.jpg]]
-*Figure 5: Few-Shot Adaptation. Chamfer Distance and F1-score on our real test set as a function of the number of real sketches used to fine-tune a model pretrained on synthetic data*
-
 ### 部分草图补全
 
 在仅提供前50%类人草图点的补全任务中（Figure A-1），顺序感知模型比顺序无关模型F1-score高出+6.6。即使草图高度不完整，模型仍能推断出连贯的3D形状（Figure A-2）。这归因于顺序信息使模型能够利用已绘制部分的时序结构推断未绘制区域的拓扑关系，而非仅依赖空间邻近性。
@@ -272,30 +259,11 @@ VRSketch2Shape在公开基准3DVRChair和自建VRSketch2Shape数据集上均以�
 
 4. **类别覆盖有限。** 当前数据集仅覆盖椅、桌、柜、飞机四类，对于非刚性物体或复杂场景的生成多样性仍然受限。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2556_https_arxiv_org_abs_2512_04761/figures/006_Table_2.jpg]]
 *Table 2: Quantitative results. Comparison of sketch-to-shape generation methods on the public 3DVRCHAIR dataset and our proposed VRSKETCH2SHAPE dataset. ⋆ use 2D renders of sketches*
 
-![[assets/figures/papers/paper_list_l2556_https_arxiv_org_abs_2512_04761/figures/011_Table.jpg]]
-*Table: A-1. Additional Ablation*
-
 ![[assets/figures/papers/paper_list_l2556_https_arxiv_org_abs_2512_04761/figures/005_Figure_4.jpg]]
 *Figure 4: Qualitative Illustrations. Comparison between our method and Luo et al. [42] on the real test set of VRSKETCH2SHAPE. Both models are pretrained on the same synthetic sketches and fine-tuned on real data. Our approach generates shapes that are more detailed, structurally accurate, and topologically faithful to the target geometry*
-
-![[assets/figures/papers/paper_list_l2556_https_arxiv_org_abs_2512_04761/figures/009_Figure_6.jpg]]
-*Figure 6: Shape Generation from Free-Hand Sketches. Our model generalizes well to free-hand sketches drawn without any reference shape for airplanes, chairs/sofas, tables, and cabinets, producing detailed and plausible reconstructions that reflect the user’s intent*
-
-![[assets/figures/papers/paper_list_l2556_https_arxiv_org_abs_2512_04761/figures/012_Figure.jpg]]
-*Figure: A-1. Sketch Completion Performance. Performance remains high even when only partial sketches are provided*
-
-![[assets/figures/papers/paper_list_l2556_https_arxiv_org_abs_2512_04761/figures/002_Table_1.jpg]]
-*Table 1: 3D Sketch Datasets. VRSKETCH2SHAPE is the first open-access collection that spans multiple object categories and includes both synthetic and real VR sketches. CD measures the asymmetric Chamfer distance between the real sketch and shapes*
-
-![[assets/figures/papers/paper_list_l2556_https_arxiv_org_abs_2512_04761/figures/021_Figure.jpg]]
-*Figure: A-6. Additional Qualitative Illustrations. Comparison between our method, Luo et al., and LAS-Diffusion on the real test set of VRSKETCH2SHAPE*
-
-
 
 ## 定位与知识库关联
 
@@ -336,8 +304,6 @@ VRSketch2Shape在公开基准3DVRChair和自建VRSketch2Shape数据集上均以�
 4. **推理速度与质量的 Pareto 前沿。** 在支持流畅实时创作体验的前提下，DDIM 步数、模型容量与生成质量之间的最优权衡尚未被系统刻画。
 
 5. **多模态时序线索融合。** 除笔画顺序外，VR 环境还可提供绘制速度、压力、视角变化等时序信号，这些额外模态能否进一步提升形状生成的精度和意图对齐度？
-
-
 
 ## 原文 PDF
 

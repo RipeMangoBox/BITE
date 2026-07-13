@@ -52,8 +52,6 @@ claims:
 
 在 MS-COCO 基准上，Probe-Select 在多个生成骨架（SD2、SD3-L、FLUX.1-dev）上均显著提升图像质量：SD2 的 ImageReward 得分从 0.49 升至 1.59，HPSv2.1 从 26.95 升至 29.03；FLUX.1-dev 的 ImageReward 从 0.92 升至 1.79。同时，采样成本降低超过 60%。跨骨架迁移实验表明探针具有良好的泛化性（SD2 训练探针应用于 SD3-M 相关性达 0.96），大幅降低了部署成本。
 
-
-
 文本到图像扩散模型在图像生成领域取得了显著进展，但实际部署中普遍采用的“生成-选择”策略面临严重的计算效率瓶颈。该策略的核心流程是：对同一提示生成多个候选图像，然后使用图像质量评估器（如 CLIPScore、ImageReward）对完整生成的图像进行评分，最终选择最高分图像输出。这一流程中，所有候选种子都必须完成完整的去噪过程，导致大量计算资源被消耗在最终质量不高的候选样本上。随着生成模型规模的增长和候选数量 $N$ 的扩大，这种计算浪费变得愈发突出。
 
 解决这一瓶颈的关键洞察在于：扩散模型的去噪过程并非在整个轨迹上均匀地构建图像信息。如图 1 所示，去噪网络中间层的隐藏状态可视化表明，粗粒度的物体布局和空间构成在生成早期（约 20% 进度）就已出现，且后续变化缓慢。这些早期激活特征与最终图像质量之间存在稳定的相关性，构成了早期质量预测的因果信号。
@@ -61,8 +59,6 @@ claims:
 然而，现有方法未能有效利用这一信号。简单地在早期时间步解码出近似图像并直接应用现成评估器的策略，其 Spearman 相关性仅为 0.52（见 Section 8.5），远不足以支撑可靠的候选筛选。这是因为早期解码的图像仍包含大量噪声，而现有评估器是针对完整清晰图像设计的，无法从噪声信号中提取有效的质量判断。因此，需要一种专门设计的机制，能够直接从去噪网络的中间激活中预测最终质量，而非依赖早期解码的模糊图像。
 
 基于上述动机，本文提出了 Probe-Select 方法。其核心思想是：训练一个轻量级探针网络，读取去噪网络在早期时间步（如 20% 总步数）的中间激活特征，直接预测目标评估器对最终图像的质量评分。通过这一早期预测，可以在生成过程中提前终止低分候选种子，仅继续推进高分候选项，从而大幅节省计算开销。该方法无需修改生成模型本身，以即插即用的方式嵌入现有“生成-选择”流程，实现了计算效率与图像质量的双重提升。
-
-
 
 ## 核心方法与创新机理
 
@@ -104,8 +100,6 @@ $$\text{Cost Ratio} \approx \eta + (1 - \eta) \frac{K}{N}$$
 Probe-Select 的另一项重要创新在于其跨模型骨架的迁移能力。实验表明，在 SD2 上训练的探针直接应用于 SD3-M 时，Spearman 相关性仍达 0.96；应用于 FLUX.1-dev 时同样为 0.96（Table 5）。这意味着无需为每个新模型重新训练探针，大幅降低了部署成本，进一步强化了其作为通用即插即用模块的定位。
 
 与之形成对比的是，简单的早期解码基线——在 $t=0.2$ 时解码出近似图像并直接用现成评估器评分——Spearman 相关性仅有 0.52，远低于 Probe-Select 的 0.9+（Section 8.5），充分说明早期评估需要专用的探针设计，而非简单地提前解码图像。
-
-
 
 Probe-Select 是一种即插即用的早期质量评估模块，其核心思想是在扩散模型去噪过程的早期阶段（约 20% 总步数）截取中间激活特征，通过一个轻量级探针网络预测最终图像的评估器分数，从而在生成完成前筛选出高质量候选种子，仅对高分候选项继续完成生成，大幅节省计算开销。
 
@@ -158,8 +152,6 @@ $$Cost \, Ratio \approx \eta + (1 - \eta) \frac{K}{N}$$
 
 各模块之间形成“截取→压缩→编码→对齐→预测→筛选”的串行数据流。Feature Tap 和 PCA Compression 负责高效提取和压缩早期结构信号；Time-Conditioned Encoder 将压缩特征转化为统一表示；Text Alignment Module 通过损失函数约束确保表示向量包含文本语义信息，与 Prediction Head 共同构成质量预测的核心；Selective Sampling 则利用预测结果做出生成资源的分配决策。整个流程无需修改生成模型本身，探针作为即插即用模块附加在去噪网络上，且训练好的探针可在任意时间步使用，具有良好的跨骨架迁移能力（SD2 训练探针应用于 SD3-M 相关性达 0.96，应用于 FLUX.1-dev 亦达 0.96）。
 
-
-
 ### 3.1 问题形式化与早期预测器
 
 扩散模型生成一张图像需经过完整的反过程。给定文本提示 $p$，采样器从初始噪声 $z_{t_0} \sim \mathcal{N}(0, \mathbf{I})$ 出发，经 $S$ 步迭代更新：
@@ -200,8 +192,6 @@ $$\mathcal{L}_{list} = -\frac{1}{B} \sum_{i=1}^B \log \frac{\exp( \hat{y}_t^i / 
 
 其中 $B$ 为批次大小，$\hat{y}_t^i$ 为样本 $i$ 的预测分数，$y_i$ 为真实评估器分数，$\tau_{list}$ 为温度参数，$\alpha$ 为排序边距。该损失仅惩罚排序错误超过边距 $\alpha$ 的样本对，使训练对分数尺度不敏感。消融实验（Table 8）表明，$\tau_{list}$ 在 $[0.1, 10.0]$ 内相关性保持在 0.96–0.99，表现鲁棒；而边距 $\alpha_{max}$（Table 9）是关键超参，最佳值为评估器分数标准差的 0.4 倍（$\alpha_{max} = 0.4\sigma$），此时相关性达 0.99。
 
-![[assets/figures/papers/paper_list_l2348_https_arxiv_org_abs_2603_02829/figures/019_Table_8.jpg]]
-
 **对比文本对齐损失 $\mathcal{L}_{Align}$**：将探针表示 $u_i$ 与对应提示文本的 CLIP 嵌入 $e_p^i$ 对齐的 InfoNCE 损失：
 
 $$\mathcal{L}_{Align} = -\frac{1}{B} \sum_{i=1}^B \log \frac{\exp( \cos(u_i, e_p^i) / \tau_{Align} )}{\sum_{j=1}^B \exp( \cos(u_i, e_p^j) / \tau_{Align} )}$$
@@ -222,8 +212,6 @@ $$\mathcal{L}_{Align} = -\frac{1}{B} \sum_{i=1}^B \log \frac{\exp( \cos(u_i, e_p
 $$\text{Cost Ratio} \approx \eta + (1 - \eta) \frac{K}{N}$$
 
 其中 $\eta$ 为早期检查点占总步数的比例。当 $N = 5, K = 1, \eta = 0.2$ 时，计算开销约为完整生成的 $0.2 + 0.8 \times 0.2 = 0.36$，即节省超过 60% 的采样成本。
-
-
 
 ## 实验与关键发现
 
@@ -278,27 +266,8 @@ Probe-Select 的训练基于 MS-COCO 数据集，每个提示生成 16 个候选
 
 论文还对比了一种朴素的早期评估基线：在 t=0.2 时直接解码出近似图像，再用现成的评估器（如 BLIP-ITM）进行评分。该基线的 Spearman 相关性仅有 0.52，远低于 Probe-Select 的 0.9+。这一对比揭示了关键洞察：早期阶段的中间激活包含的结构信息远丰富于早期解码的模糊图像，因此**早期质量评估需要专门设计的探针网络，而非简单复用现有评估器**。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2348_https_arxiv_org_abs_2603_02829/figures/004_Table_1.jpg]]
-*Table 1: Spearman correlation between predicted score and each evaluator from latent feature in different time stamps. The results demonstrate remarkable stability, with correlation scores remaining constant to two significant figures across time*
-
 ![[assets/figures/papers/paper_list_l2348_https_arxiv_org_abs_2603_02829/figures/005_Table_2.jpg]]
 *Table 2: Evaluation of models across various benchmarks. The best result is highlighted in bold, and the second best result is underlined*
-
-![[assets/figures/papers/paper_list_l2348_https_arxiv_org_abs_2603_02829/figures/011_Table_5.jpg]]
-*Table 5: Cross-backbone transfer of probe networks. Each entry reports the Spearman correlation when a probe trained on the source backbone is applied to the target backbone*
-
-![[assets/figures/papers/paper_list_l2348_https_arxiv_org_abs_2603_02829/figures/007_Figure_5.jpg]]
-*Figure 5: The relationship of number of candidates (N) and selected seeds (K)*
-
-![[assets/figures/papers/paper_list_l2348_https_arxiv_org_abs_2603_02829/figures/016_Table_6.jpg]]
-*Table 6: Generalization to additional text-to-image benchmarks. Probe-Select consistently improves final quality metrics over the no-selection baseline*
-
-![[assets/figures/papers/paper_list_l2348_https_arxiv_org_abs_2603_02829/figures/012_Table_4.jpg]]
-*Table 4: Spearman correlation at very early checkpoints on SD3- L. Correlations become consistently strong at*
-
-
 
 ## 定位与知识库关联
 
@@ -357,8 +326,6 @@ Probe-Select 的适用边界由以下实验证据界定：
 **（5）范式覆盖有限**：研究仅覆盖扩散和流匹配模型（SD2、SD3、FLUX），对于自回归等其他生成范式的适用性尚未被探索。不同范式中“中间激活”的定义和可获取性可能存在根本差异。
 
 **（6）文本对齐的关键性**：消融实验表明，移除对比文本对齐损失后 ImageReward 预测相关性从 0.99 骤降至 0.66，证明文本感知对质量预测至关重要。然而，当前对齐仅使用 CLIP 文本嵌入，更丰富的文本理解（如空间关系、属性绑定）可能进一步提升预测精度。
-
-
 
 ## 原文 PDF
 

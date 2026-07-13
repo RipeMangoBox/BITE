@@ -51,8 +51,6 @@ SeeThrough3D 针对这一瓶颈，提出了**遮挡感知三维场景表示（OS
 
 在专门构建的遮挡场景评测基准 **3DOc-Bench** 上，SeeThrough3D 在所有指标上显著超越基线方法：深度排序达 **1.46**（最佳基线 LaRender 为 1.02），角度误差降至 **47.92**（LaRender 为 89.63），图像质量指标 KID 为 **5.43×10⁻³**（LaRender 为 13.46）。消融实验证实，半透明渲染、颜色编码和注意力绑定三者对最终性能均不可或缺。注意力可视化进一步揭示，模型潜在空间中的物体特征呈现解耦状态，被遮挡物体的特征在遮挡物空隙中仍保持活跃，表明模型习得了遮挡推理的能力。
 
-
-
 ### 文本到图像生成中的空间控制困境
 
 近年来，基于扩散模型和流匹配的文本到图像生成取得了显著进展，能够根据自然语言描述生成高质量、高保真的图像。然而，当场景涉及多个物体且存在复杂的空间关系时，仅依赖文本提示难以精确控制物体的三维位置、朝向和相互遮挡关系。用户往往需要反复调整提示词才能获得大致符合预期的布局，这种“盲调”方式效率低下且缺乏可复现性。
@@ -91,8 +89,6 @@ SeeThrough3D 针对这一瓶颈，提出了**遮挡感知三维场景表示（OS
 
 这一设计使SeeThrough3D能够在保持预训练文生图模型生成质量的前提下，实现对复杂多物体场景中遮挡关系、物体朝向和相机视角的精确控制。
 
-
-
 ## 核心方法与创新机理
 
 SeeThrough3D 的核心创新在于首次将**遮挡感知**引入文本到图像的3D布局控制，解决了现有方法在复杂多物体场景中因缺乏显式遮挡建模而导致的深度不一致与几何错误。其创新围绕三个紧密耦合的“changed slots”展开，形成一个从场景表示到条件注入再到特征绑定的完整闭环。
@@ -111,19 +107,11 @@ SeeThrough3D 将OSCR渲染图通过VAE编码为视觉token，与文本token和�
 
 三个创新点之间存在因果依赖：OSCR的半透明与颜色编码提供了遮挡和朝向的原始信号，注意力掩码绑定确保了这些信号与正确文本描述的对应关系，而LoRA微调策略则保证了条件控制与生成质量之间的平衡。消融实验（Table 2）为这一因果链提供了定量支撑：移除半透明渲染使深度排序从1.46降至1.20；移除颜色编码使角度误差从47.92飙升至88.77，回到基线水平；移除注意力绑定则使深度排序骤降至0.98，物体得分从22.86跌至20.45，生成图像中对象出现明显错位。
 
-
-
 SeeThrough3D 的整体 pipeline 围绕一个核心设计展开：**将遮挡感知的三维场景表征（OSCR）作为条件信号注入预训练的文生图扩散模型**，使模型在生成过程中显式推理物体间的遮挡关系、三维朝向和深度排序。
 
 ### 输入与条件构造
 
 用户通过交互式图形界面指定场景中的三维边界框 $\{b_i\}$ 和期望的相机视角 $C$（见 Figure 2）。每个边界框被赋予半透明材质，且六个面片采用规范化的颜色编码——每个面的颜色唯一映射到其三维朝向。这一设计使得渲染后的 OSCR 图像 $r$ 同时编码了三类信息：**物体空间位置**（边界框的投影形状）、**遮挡关系**（半透明使被遮挡区域仍部分可见）、以及**三维朝向**（面片颜色编码）。相比现有方法中仅使用深度图（丢失遮挡信息）或二维图层（丢失三维感知）的表征方式，OSCR 在信息密度和遮挡推理线索上具有根本性优势。
-
-![[assets/figures/papers/paper_list_l2176_https_arxiv_org_abs_2602_23359/figures/002_Figure_2.jpg]]
-*Figure 2: OSCR: We propose Occlusion-Aware Scene Representation (OSCR) for 3D layout control in text-to-image generation. OSCR describes objects as translucent 3D boxes, which exposes occluded regions, enabling the generative model to reason about occlusions. Further, each box face is color-coded with a mapping to encode its 3D orientation. (a) A user specifies the object bounding boxes (b0 and*
-
-![[assets/figures/papers/paper_list_l2176_https_arxiv_org_abs_2602_23359/figures/023_Figure.jpg]]
-*Figure: 2*
 
 ### 条件注入与模型架构
 
@@ -145,8 +133,6 @@ SeeThrough3D 的整体 pipeline 围绕一个核心设计展开：**将遮挡感�
 ### 推理流程
 
 推理时，用户指定边界框布局、相机视角和文本提示，系统渲染 OSCR 图像并编码为 token，经 LoRA 增强的 DiT 模型在注意力掩码的约束下执行去噪生成，最终输出符合三维布局、遮挡关系正确且物体朝向一致的图像。该 pipeline 支持扩展至个性化生成：通过将参考图像经 VAE 编码为外观 token，并使其在对应分割掩码区域内与 OSCR token 交互，可实现基于参考图像的三维控制生成（见 Figure 11）。
-
-
 
 SeeThrough3D 的架构围绕三个关键模块构建，分别解决遮挡感知场景表示、条件注入与对象绑定三个核心问题。
 
@@ -171,13 +157,6 @@ OSCR 渲染图 $r$ 首先通过预训练的 VAE 编码器转换为潜在 token $
 **个性化扩展的注意力机制**
 
 在个性化场景中，参考图像 $v$ 通过 VAE 编码器转换为外观 token $v$，并与 OSCR token 和文本 token 一同输入模型。OSCR token 在分割掩码 $s_i$ 范围内同时关注外观 token 和对应文本 token，从而将物体外观绑定到其 3D 边界框上。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2176_https_arxiv_org_abs_2602_23359/figures/007_Figure_6.jpg]]
-*Figure 6: Visualizing object disentanglement in latent space: Given a layout with heavy occlusion like (a), our model’s outputs show precise occlusion boundaries (b). To understand this, we visualize attention from image-tokens to object tokens in prompt (bicycle and van). Interestingly, the attention maps themselves reveal occlusion boundaries: inside the empty regions of the bicycle structure, attention on the van remains visible, accurately reflecting its presence behind the bicycle. This suggests that objectspecific features remain distinct in the model’s latent space, indicating strong priors for occlusion reasoning*
-
-
 
 ## 实验与关键发现
 
@@ -229,9 +208,6 @@ Figure 6 提供了理解模型内部工作机制的关键证据。在一个自�
 
 用户调查（Figure 10）显示，在遮挡一致性、布局遵循、物体保真度和朝向正确性四个维度上，SeeThrough3D 的输出被偏好的比例均显著高于各基线方法。与 LaRender 和 VODiff 的定性对比（Figure 9）进一步表明，仅基于深度图或图层的方法在复杂遮挡场景中频繁出现物体融合、深度错乱和朝向错误，而 SeeThrough3D 在这些场景中保持了清晰的遮挡边界和正确的空间关系。
 
-![[assets/figures/papers/paper_list_l2176_https_arxiv_org_abs_2602_23359/figures/009_Figure_9.jpg]]
-*Figure 9: Qualitative comparison: We compare against works on 3D layout control: LooseControl [4] and Build-A-Scene [19], and on occlusion control: LaRender [76] and VODiff [37]*
-
 ![[assets/figures/papers/paper_list_l2176_https_arxiv_org_abs_2602_23359/figures/013_Figure_10.jpg]]
 *Figure 10: User study: Each bar indicates the % of times our method’s output was preferred over the baseline, for each category*
 
@@ -242,16 +218,6 @@ Figure 6 提供了理解模型内部工作机制的关键证据。在一个自�
 ### 评估的公平性考量
 
 为公平比较，论文对基线方法做了两项重要处理：（1）将 LooseControl 在相同数据集上重新训练，并用其检查点评估 Build-A-Scene（后者依赖前者）；（2）在计算角度误差时采用宽松版本，将 180° 翻转不计为错误，以允许仅依赖深度图的方法（如 LooseControl）公平参与对比。这一处理确保了性能差异归因于方法本身，而非数据分布或评估标准的不对等。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2176_https_arxiv_org_abs_2602_23359/figures/006_Figure_7.jpg]]
-*Figure 7: Dataset creation: We place 3D assets in controlled configurations in Blender [12]. Object placements and camera viewpoint are controlled to ensure strong occlusions, while ensuring adequate visibility for each object. To generate realistic augmentations, we estimate image depth, and pass it through a depth-toimage model [35] with diverse background prompts*
-
-![[assets/figures/papers/paper_list_l2176_https_arxiv_org_abs_2602_23359/figures/012_Figure_11.jpg]]
-*Figure 11: Personalization: Our method can be extended for personalized 3D control using reference image of an object*
-
-
 
 ## 定位与知识库关联
 
@@ -294,8 +260,6 @@ SeeThrough3D 的性能优势源于三个相互耦合的设计选择，消融实�
 3. **跨模态与动态场景拓展。** OSCR表示的遮挡感知特性天然适用于视频生成中的时序遮挡推理，或三维场景理解中的多视角一致性建模。将其拓展到视频生成或其他生成模态是一个自然的延伸方向。
 
 4. **评估体系的完善。** 当前3DOc-Bench的深度排序指标依赖单目深度估计模型，其自身误差可能影响评估可靠性。建立具有真实深度标注的基准数据集，或设计无需外部模型的直接评估方法，将有助于更精确地衡量遮挡推理能力。
-
-
 
 ## 原文 PDF
 

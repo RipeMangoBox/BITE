@@ -51,15 +51,11 @@ claims:
 
 在方法定位上，Common Corpus 是目前唯一同时满足“多领域、非网页爬取、多语言、完全许可”四项标准的预训练数据集（Table 1）。它涵盖政府文档、文化遗产、科学文献、代码、开放网络和语义数据六大领域，支持 50 余种语言，并配套开发了专用工具链（Segmentext 文本分割、OCRerrcr/OCRonos OCR 纠错、Celadon 毒性过滤等）进行数据治理。与 KL3M（仅限英语行政文本）、Dolma（多领域但以英语为主且非完全许可）、C4 和 ROOTS（网页爬取、混合许可）等现有数据集相比，Common Corpus 在许可合规性和来源多样性上形成了根本性差异化。
 
-
-
 大语言模型（LLM）的预训练数据集正面临日益严峻的法律与伦理挑战。当前主流数据集——如 **C4**（Raffel et al., 2020）、**ROOTS**（Laurençon et al., 2022）、**Dolma**（Soldaini et al., 2024）和 **FineWeb 2**（Penedo et al., 2025）——在构建过程中普遍依赖大规模网页爬取，其中包含大量受版权保护或未获明确许可的内容。这种“合理使用”（fair use）的辩护路径正受到越来越多的法律审视，使得基于此类数据训练的模型面临不可忽视的合规风险。
 
 与此同时，现有开放数据集在覆盖面上存在结构性缺口。**KL3M**（Bommarito et al., 2025）虽采用宽松许可数据，但局限于英文行政文本；**Common Pile**（Kandpal et al., 2025）同样遵循许可合规原则，却仅覆盖英语。多语言数据集的代表如 **DCAD 2000**（Shen et al., 2025）和 **ROOTS** 虽扩展了语种范围，但其许可状态参差不齐，无法同时满足“多领域、非网页爬取、多语言、完全许可”四项标准（见 Table 1）。这一系统性的数据集缺口构成了一个关键瓶颈：**在严格遵循数据合规与伦理要求的前提下，能否构建出兼具规模、多样性和竞争力的预训练语料库？**
 
 Common Corpus 正是针对这一瓶颈的系统性回应。其核心动机是证明：通过系统性地收集、整理和清洗仅包含公共领域或宽松许可协议（如 CC-By、MIT、Apache-2.0）的跨领域多语言数据，可以构建一个规模达约 2 万亿 token 的全开放预训练语料库，且基于该数据集训练的小模型能够在多项多语言基准上达到与同等规模主流模型相当的性能。
-
-
 
 ## 核心方法与创新机理
 
@@ -100,16 +96,11 @@ Figure 3b 的 t-SNE 可视化证实了这一多样性的实际效果：Common Co
 
 Common Corpus 的创新价值最终通过模型训练得到验证。基于该数据集训练的 PleIAs 350M 模型在 MultiBLiMP 多语言基准上达到 0.774，**显著优于更大规模的 XGLM 564M（0.711）和 BLOOM 560M（0.683）**；PleIAs 1.2B 达到 0.797，与 Gemma 3 1B（0.799）基本持平（Table 2）。这一结果表明：**完全合规的数据集并非性能的妥协品**，在同等参数规模下，精心策划的开放数据可以匹配甚至超越基于混合许可数据训练的模型。
 
-
-
 ![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_0wSlFpMsGb/figures/005_Table_1.jpg]]
 *Table 1: Comparison of the contemporary datasets for LLM training*
 
 ![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_0wSlFpMsGb/figures/008_Table_3.jpg]]
 *Table 3: In Table 3, we present the token, word, and document counts for the Common Corpus collections. Table 3: Dataset composition of Common Corpus. For each collection, we report the total number of documents, words (whitespace-separated), and tokens*
-
-![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_0wSlFpMsGb/figures/001_Figure_1.jpg]]
-*Figure 1: Proportional treemap of Common Corpus collections and their most popular languages*
 
 ![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_0wSlFpMsGb/figures/004_Figure_3.jpg]]
 *Figure 3: (b) A two-component t-SNE visualization of subsets of Common Corpus collections, C4, and FineWeb. Figure 3: Temporal and semantic overview of the Common Corpus collections*
@@ -171,8 +162,6 @@ Table 1 从四个维度对比了 Common Corpus 与当代主流预训练数据集
 
 需注意，当前 Common Corpus 的规模仅足以训练小模型，尚不支持大规模模型的预训练；英语仍占 token 总量的绝对主导地位（约 969B token，是法语 275B 的 3.5 倍、德语 112B 的 8.6 倍，见 Table 5），多语言平衡性仍有改善空间；OCR 纠错和质量过滤无法达到 100% 准确率，部分数字化文本可能残留错误。
 
-
-
 Common Corpus 的核心贡献在于其数据治理与处理流水线，而非算法或模型架构的创新。该流水线由一系列专用工具模块构成，旨在解决开放数据（尤其是历史文档）在文本分割、OCR质量、毒性过滤及隐私保护方面的固有问题。
 
 ### 数据处理流水线模块
@@ -200,8 +189,6 @@ Common Corpus 的核心贡献在于其数据治理与处理流水线，而非算
 ### 公式推导
 
 本文未提出新的理论公式或数学推导。其核心方法为工程化的数据处理流水线，不涉及需要推导的算法公式。
-
-
 
 ## 实验与关键发现
 
@@ -242,13 +229,7 @@ Table 3 呈现了 Common Corpus 六大子集的详细统计。语料库总计约
 
 Table 5 的语言排行显示英语占据主导地位（约 9690 亿 token），是第二名法语（约 2750 亿）的 3.5 倍、第三名德语（约 1120 亿）的 8.6 倍。这一不平衡是数据集的主要局限之一，但考虑到开放许可数据在非英语语言中的稀缺性，当前分布已是系统收集的结果。有九种语言的 token 量超过 100 亿，表明多语言覆盖并非虚设。
 
-![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_0wSlFpMsGb/figures/010_Table_5.jpg]]
-*Table 5: Top-50 languages in Common Corpus by token count. Each language is presented with its number of documents, words, and tokens in the corpus. The rows are ordered by the token count*
-
 Table 4 的许可证分布进一步确认了合规性：公共领域（Public Domain）以约 1.14 万亿 token 占绝对主导，其次为 CC-By（约 2880 亿）和 MIT（约 1430 亿），均为宽松许可证。
-
-![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_0wSlFpMsGb/figures/009_Table_4.jpg]]
-*Table 4: Token counts for the ten most common licenses in Common Corpus*
 
 ### 数据质量评估：多维度指标分布
 
@@ -284,19 +265,6 @@ Figure 3b 的 t-SNE 可视化进一步表明，Common Corpus 的子集在语义�
 *Table 7: Legal Commons sources distribution with languages*
 
 **需手动验证**：各清洗模块（Segmentext、OCRerrcr、OCRonos、Celadon）的独立贡献度尚无定量证据，相关结论需谨慎对待。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_0wSlFpMsGb/figures/012_Table_6.jpg]]
-*Table 6: Finance Commons sources distribution with languages*
-
-![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_0wSlFpMsGb/figures/014_Table_8.jpg]]
-*Table 8: Subsets of Open Culture with language coverage, type of document, and token count*
-
-![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_0wSlFpMsGb/figures/015_Table_9.jpg]]
-*Table 9: Token count by dataset Open Science*
-
-
 
 ## 定位与知识库关联
 
@@ -358,8 +326,6 @@ Common Corpus 的构建经验揭示了开放数据生态中若干待解决的关
 - **合规性持续维护**：随着法律法规的演进（如各国对“公共领域”定义的调整），如何建立数据集的持续合规审查机制，是开放数据集长期可用性的保障。
 
 - **与下游任务的衔接**：Common Corpus 证明了开放数据在小模型预训练上的可行性，但如何构建对应的开放指令微调数据集，形成完整的开放训练管线，是后续工作的重要方向。
-
-
 
 ## 原文 PDF
 

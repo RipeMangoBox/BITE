@@ -54,8 +54,6 @@ claims:
 
 CAPO将自身定位于策略梯度方法的稳定化改进，与TRPO等经典信任域方法共享约束更新幅度的思想，但通过轻量级的曲率近似避免了全参数二阶矩阵的物化，使其能够高效应用于大规模语言模型的RL微调场景。
 
-
-
 ### 大语言模型推理中的强化学习微调
 
 大语言模型（LLM）在数学推理、代码生成等复杂任务上的能力提升，越来越依赖于强化学习（RL）进行策略微调。其核心思路是将LLM的自回归生成过程建模为一个序列决策问题：模型作为策略 $\pi_{\pmb\theta}$，在每个时间步选择下一个token作为动作，目标是最大化期望累计回报
@@ -104,8 +102,6 @@ $$m_F(\Delta\pmb\theta) = \frac{1}{2} \Delta\pmb\theta^\top \boldsymbol{F}(\pmb\
 
 基于这一动机，本文提出**Curvature-Aware Policy Optimization (CAPO)**，其核心思路是：构建一个计算高效的二阶曲率近似框架，在每次更新前评估候选样本引起的目标和策略偏移，仅接受满足信任域约束的子集进行梯度累积。这使得CAPO能够在激进的学习体制下保持稳定学习，同时仅屏蔽极少量的token（峰值约8%，随后降至2%以下），以最小的干预代价实现显著的样本效率提升。
 
-
-
 ## 核心方法与创新机理
 
 CAPO（Curvature‑Aware Policy Optimization）的核心创新在于将**二阶曲率信息**引入策略梯度的样本筛选过程，从而在不改变底层RL目标函数的前提下，实现对策略更新的隐式信任域约束。与现有方法相比，其关键改变体现在以下方面：
@@ -138,8 +134,6 @@ CAPO在生成候选更新方向时，模拟了底层LLM优化器（Adam）的实
 
 **需要人工验证的点**：CAPO的理论保证（Theorem 5.1）声称，当满足信任域约束时，聚合更新保证单调改进 $J(\pi_{\theta+\Delta\theta}) - J(\pi_\theta) \ge \omega - C\sqrt{\delta_F}$，其中 $C = \frac{2\gamma}{(1-\gamma)^2}\epsilon\sqrt{2}$。该定理的推导依赖于last‑layer模型假设和若干近似，其在完整LLM参数空间中的严格成立性需进一步验证。
 
-
-
 CAPO (Curvature‑Aware Policy Optimization) 是一个面向 LLM 推理任务、以策略梯度 RL 微调为核心的样本高效训练框架。其设计目标是在激进训练体制（高学习率、小批次）下阻止策略崩溃，从而大幅提升样本效率。框架的整体管线由五个核心模块串联而成，形成“生成–估计–建模–筛选–更新”的闭环。
 
 **1. 轨迹生成与优势估计**  
@@ -171,8 +165,6 @@ $$
 仅当子集同时满足目标下界和策略偏移上界时被接受；否则被掩蔽。接受部分进行梯度累积并执行参数更新。该机制在 token 级别运行，峰值拒识率约 8%，随后持续低于 2%（Figure 5），执行时间开销不到总步长的 3%（Table 1）。
 
 整个框架的关键因果机制在于：通过轻量级二阶曲率近似实时监测每次更新的局部几何风险，主动拒绝那些会导致目标或策略分布剧烈偏移的样本，从而在激进训练体制下充当隐式的信任域约束。这一设计使得 CAPO 在 MATH 上仅需 GRPO（保守体制）1/30 的样本完成数即可达到同等准确度，在 TEST 基准上则仅需 1/9 的样本（Section 6.1, Figure 2）。
-
-
 
 CAPO的核心思想是将二阶曲率信息引入策略梯度更新的样本筛选过程，从而在不牺牲性能的前提下实现激进训练体制下的稳定学习。整个方法围绕一个计算高效的曲率近似框架展开，包含以下关键模块。
 
@@ -238,8 +230,6 @@ $$J(\pi_{\theta+\Delta\theta}) - J(\pi_{\theta}) \ge \omega - C \sqrt{\delta_F},
 
 其中 $\omega$ 为接受子集的目标改进下界，$C$ 为与折扣因子 $\gamma$ 和策略变化上界 $\epsilon$ 相关的常数。该定理表明，当聚合更新的期望改进 $\omega$ 超过惩罚项 $C\sqrt{\delta_F}$ 时，CAPO保证策略性能的单调改进。这为信任域筛选提供了理论保障：通过控制策略偏移 $m_F \leq \delta_F$，CAPO在每次更新中维持了可证明的改进下界。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：样本效率与训练稳定性的双重突破
@@ -286,36 +276,16 @@ Figure 3从优化动态的角度解释了CAPO为何能保持稳定。该图展�
 
 **PPO裁剪的局限性**（Figure 7）：标准裁剪比（$\epsilon=0.2$）无法防止激进体制下的策略崩溃。更激进的裁剪比（$\epsilon=0.02$或$0.002$）虽能改善稳定性，但以牺牲整体性能为代价，且这种权衡在更大的KL裁剪阈值$t$下更加严重。CAPO则在无需此类妥协的情况下同时实现了稳定性和高性能。
 
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_iIvPuXoDs1/figures/014_Figure_7.jpg]]
-*Figure 7: Effect of “PPO clipping” on GRPO stability. Standard clipping (ϵ = 0.2) fails to prevent collapse, while more aggressive ratios improve stability but reduce overall performance, with the trade-off becoming more severe as t increases*
-
 **KL正则化的不足**（Figure 8）：强KL正则化（$\beta=1.0$）减少了不稳定性，但严重降低了准确率。更重要的是，Figure 8右图揭示了KL正则化的一个深层问题：它产生了无界的梯度范数（在裁剪前），这些异常大的梯度可能将优化推入不稳定区域。CAPO通过直接约束更新方向上的曲率偏移，从根本上避免了这一问题。
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_iIvPuXoDs1/figures/015_Figure_8.jpg]]
-*Figure 8: Effect of KL regularization on GRPO stability. (Left) Accuracy on the MATH dataset under different levels of KL regularization. Stronger regularization ( $\beta$ = 1 . 0 ) reduces instability but degrades performance. (Right) Maximum gradient norms (before clipping), averaged across seeds. KL regularization produces unbounded gradients that may drive the optimization into unstable regions*
 
 ### 曲率估计的可靠性
 
 Table 5报告了Fisher方向曲率估计（$\hat{m}_F$）与估计策略变化（$\bar{D}_{\mathrm{KL}}$）之间的Spearman相关性。在token级别，GRPO和CAPO更新的相关系数分别为0.622和0.459；在全局级别，相关性进一步提升。这一结果验证了last‑layer曲率模型虽为近似，但确实捕捉到了真实策略偏移的关键信号，为信任域筛选提供了可靠依据。
 
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_iIvPuXoDs1/figures/019_Table_5.jpg]]
-*Table 5: Spearman correlations $\rho$ between Fisher directional curvature estimates $\hat { m } _ { F }$ and the estimated policy change $\bar { D } _ { \mathrm { K L } } ( \dot { \pi } _ { \pmb { \theta } }$ | | $\pi _ { \pmb { \theta } + \Delta \pmb { \theta } }$ ) We report correlations for both GRPO and CAPO updates. The results indicate that the estimates $\hat { m } _ { F }$ maintain a consistent monotonic relationship with the true policy shift across algorithms, reliable identifying the scale of the policy shifts
 
 ### 需要手动验证的局限
 
 以下几点源于分析中的推断，建议对照原文确认：实验仅在数学推理任务（MATH系列）上评估，未涉及代码生成或常识推理等任务类型；所用模型规模未明确超过70B参数，更大规模模型上的可扩展性证据不足；CAPO的多个阈值（$\delta_H$、$\delta_H^{high}$、$\delta_F$）需手动调整，论文未提供自动化设定方法。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_iIvPuXoDs1/figures/016_Table_2.jpg]]
-*Table 2: Training Hyperparameters*
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_iIvPuXoDs1/figures/017_Table_3.jpg]]
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_iIvPuXoDs1/figures/018_Table_3.jpg]]
-*Table 3: Hyperparameters for the standard (conservative) and aggressive regimes. Table 4: Curvature-aware masking thresholds for CAPO, Dr.CAPO and ReinCAPO*
-
-
 
 ## 定位与知识库关联
 
@@ -357,8 +327,6 @@ CAPO通过**直接作用于样本层面**的曲率过滤，在稳定性和性能
 4. **与自然梯度的融合**：CAPO的信任域方法是否可与自然梯度或K‑FAC等已有近似二阶方法结合？自然梯度直接利用Fisher信息矩阵进行参数更新，而CAPO利用Fisher和Hessian的定向曲率进行样本筛选，二者在理论上互补。
 
 5. **跨任务泛化**：CAPO在非数学推理任务（如代码生成、长文本问答）上的表现如何？不同任务的奖励信号特性和策略分布差异可能影响曲率估计的准确性和筛选机制的有效性。
-
-
 
 ## 原文 PDF
 

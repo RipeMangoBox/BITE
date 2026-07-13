@@ -51,8 +51,6 @@ claims:
 
 在方法谱系上，Beta-KD 区别于传统的固定权重蒸馏（如 **Forward KL**，Hinton et al., NIPS 2015；**Reverse KL**，Gu et al., ICLR 2024）和跨模态对齐蒸馏（**Align-KD**，Feng et al., CVPR 2025），将损失平衡问题转化为可学习的贝叶斯推断。实验表明，在 ScienceQA 数据集上，实例级 Beta-KD 将 VQA 准确率从纯交叉熵基线的 48.4% 提升至 54.9%（+6.5 个百分点）；在 MMEP 基准上相较 Align-KD 提升 +54.1；在 TextVQA 上提升 +2.9，且不确定性网络仅引入总参数量 0.03% 的开销，训练速度与无加权方案几乎一致。
 
-
-
 多模态大语言模型（MLLM）在视觉问答、图像描述等任务上取得了显著进展，但其庞大的参数量和计算开销严重制约了在资源受限场景下的部署。知识蒸馏（Knowledge Distillation, KD）是解决这一矛盾的主流范式——通过让轻量学生模型模仿大型教师模型的输出分布，将教师的知识压缩迁移至学生。然而，在多模态蒸馏的实践中，一个根本性的难题始终未被有效解决：**异构监督信号的平衡问题**。
 
 具体而言，学生模型在训练过程中同时接收两类性质迥异的监督信号：来自真实标签的交叉熵损失（数据监督）和来自教师模型的蒸馏损失（教师监督）。在多模态场景下，蒸馏损失往往不止一个——可能同时包含 KL 散度、特征对齐、概率空间匹配等多种损失项。这些损失具有不同的数值尺度、梯度动态和收敛速度，手动为其分配固定权重（如 $\lambda=1$）不仅需要大量调参经验，更关键的是，固定权重无法适应不同样本或任务的不确定性差异。如 Figure 1(a) 所示，传统 KD 框架难以在“从数据学习”与“从教师学习”之间取得自适应平衡。
@@ -60,8 +58,6 @@ claims:
 现有的蒸馏方法——无论是传统的正向 KL 散度（**FKL**, Hinton et al., NIPS 2015）、缓解分布不匹配的逆向 KL 散度（**RKL**, Gu et al., ICLR 2024）、跨模态对齐蒸馏（**Align-KD**, Feng et al., CVPR 2025），还是基于余弦相似度的概率空间蒸馏——均沿用手动设定损失权重的范式。这种“一刀切”的策略忽视了训练过程中学生模型状态的变化，也未能捕捉样本间的异质性，导致蒸馏效率受限。
 
 本文的核心动机在于：**能否从根本上消除蒸馏过程中的手动调参，使损失权重能够根据学生模型的不确定性自适应调节？** 为此，我们提出 Beta-KD——一个不确定性感知的知识蒸馏框架。其核心洞察是：知识蒸馏可以被统一解释为贝叶斯框架下的最大后验（MAP）估计问题——教师的输出作为学生激活上的 Gibbs 先验，交叉熵作为数据似然，联合优化即等价于最小化带有自适应精度的蒸馏目标。通过 Laplace 近似，我们推导出封闭形式的不确定性权重 $\beta$，并由轻量网络预测，从而在任务级或实例级实现完全自适应的损失平衡（Figure 1(b)）。
-
-
 
 ## 核心方法与创新机理
 
@@ -115,8 +111,6 @@ $$\min_{\theta, \phi} \mathcal{L}_{\mathrm{CE}}(\theta) + g_{\phi}(h(x)) \ell(\t
 
 值得注意的是，Beta-KD 的框架对底层蒸馏损失的具体形式（FKL、RKL、Cosine-Probs 等）是**正交的**——它不改变损失函数本身，而是提供了一种通用的自适应加权机制。这使其能够无缝集成到现有的各种 KD 方案中，在 ScienceQA 上以 Cosine-Probs 为基底的实例级 Beta-KD 将 VQA 准确率从纯 CE 基线的 48.4% 提升至 **54.9%**（+6.5 个百分点），并在 MMEP、TextVQA 等六个基准上展现了跨数据集和跨模型架构的稳健增益。
 
-
-
 Beta-KD 将多模态大语言模型的知识蒸馏重新形式化为贝叶斯框架下的最大后验（MAP）估计问题。其核心洞察在于：教师模型的输出可以被解释为学生激活上的 Gibbs 先验，而交叉熵损失则作为数据似然，二者的联合优化等价于最小化带有自适应精度的蒸馏目标，从而消除了传统方法中手动设定损失权重的需求。
 
 ### 框架总览
@@ -156,12 +150,8 @@ Beta-KD 通过贝叶斯视角将 $\lambda$ 替换为可学习的 $\beta$，并�
 
 框架中的能量函数 $\ell(a^s; a^t)$ 具有灵活的选择空间，既可以定义在 logit 空间（如 MSE-Logits、Cosine-Logits），也可以定义在概率空间（如 Forward KL、Reverse KL、Cosine-Probs）。实验表明（Table 1），在概率空间进行蒸馏（尤其是 Cosine-Probs）显著优于在 logit 空间，说明对于多模态生成任务，匹配输出分布比匹配内部表示更为有效。Beta-KD 的不确定性加权机制与具体能量函数的选择是正交的——无论选用何种散度或距离度量，$\beta$ 都能自适应地调节其贡献强度。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2707_https_arxiv_org_abs_2603_21426/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the proposed Beta-KD framework. (a) Conventional KD is hard to balance the learning from data and the learning from teacher signals. (b) Our method introduces an uncertainty-aware weighting framework by recognizing teacher supervision as a Gibbs prior, which naturally induces the prediction of the weights*
-
-
 
 ### 3.1 问题建模：将知识蒸馏形式化为贝叶斯推断
 
@@ -247,16 +237,6 @@ $$
 
 该框架可在任务级（所有样本共享一个 $\beta$）或实例级（每个样本独立预测 $\beta(x)$）运行。实例级变体能够捕捉样本间的异质性与噪声，对高质量样本分配较大的 $\beta$（更信任教师），对低质量或噪声样本分配较小的 $\beta$（更依赖数据本身），从而实现无人工调参的自动损失平衡。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2707_https_arxiv_org_abs_2603_21426/figures/002_Figure_3.jpg]]
-*Figure 3: Visualization of four representative knowledge distillation losses in the probability simplex*
-
-![[assets/figures/papers/paper_list_l2707_https_arxiv_org_abs_2603_21426/figures/005_Figure_4.jpg]]
-*Figure 4: Training trajectories and dynamic weight evolution for FKL+CE and RKL+CE objectives. The upper row shows the total training loss over steps, and the lower row illustrates the adaptive evolution of task and instance-level uncertainty weights β. The adaptive adjustment of the weighting parameter β during training ensure a faster overall loss convergence and enhances optimization stability*
-
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与实验动机
@@ -283,9 +263,6 @@ Table 2 展示了在 ScienceQA 上两损失平衡（CE + 单一蒸馏损失）�
 
 Table 3 将验证场景扩展到更复杂的三损失设置（CE + KL 蒸馏 + 特征蒸馏 FD）。在同时平衡三个异构监督信号时，手动调参的难度急剧增加，而 Beta-KD 的自动加权优势更加凸显。以 FKL+FD 组合为例，实例级 Beta-KD 的 VQA-Acc 达到 52.3%，超过手动方案（50.9%）和任务级方案（51.3%）。在 RKL+FD 和 Cosine-Probs+FD 配置下，实例级方案同样保持最优，验证了 Beta-KD 框架在多损失场景下的鲁棒扩展能力。
 
-![[assets/figures/papers/paper_list_l2707_https_arxiv_org_abs_2603_21426/figures/007_Table_3.jpg]]
-*Table 3: Experimental results of three-loss balancing on the ScienceQA dataset. Each baseline combines Cross-Entropy (CE), a KL-based distillation loss, and a feature-level distillation (FD) objective. Manual uses fixed weights among CE, KL, and FD based on their initial scales. Beta-KD (Task) models task-level uncertainty shared across all samples, while Beta-KD (Instance) models instance-level uncertainty adaptive to each input*
-
 ### 跨基准与跨架构泛化
 
 Table 4 汇总了在六大多模态基准上的主实验结果，涵盖 MMBench_dev、MMEP、POPE、SEEDBench_IMG、MMMU_DEV_VAL 和 ScienceQA。以 Cosine KD 为基线，Beta-KD（实例级）在 MMBench_dev 上取得 60.2%（+3.1%），在 MMEP 上相较 Align-KD 提升 +54.1 分。值得注意的是，Beta-KD 的增益在不同评估维度上表现一致，未出现对特定数据集的偏倚。
@@ -311,19 +288,9 @@ Figure 5 从师生 logit 分布匹配的角度提供了直观证据。在训练�
 
 Table 6 报告了训练效率统计。不确定性权重网络 $g_\phi(h(x))$ 仅引入总参数量 0.03% 的额外开销。以 Align-KD 为例，其训练速度为 1.82 it/s，而 Beta-KD（实例级）为 1.85 it/s——自适应加权不仅未降低训练速度，反而因更稳定的优化动态实现了略微加速。内存占用方面，各方案基本持平，证明 Beta-KD 的自适应机制在计算开销上几乎可以忽略。
 
-![[assets/figures/papers/paper_list_l2707_https_arxiv_org_abs_2603_21426/figures/010_Table_6.jpg]]
-*Table 6: Statistics of training efficiency*
-
 ### 实验公平性说明
 
 所有实验均在 MobileVLM V2（教师 7B，学生 1.7B）和 LLaVA-Qwen 两种框架、六个多模态基准上进行了系统验证。消融实验覆盖了两损失与三损失设置、任务级与实例级粒度、以及多种蒸馏损失类型（FKL、RKL、SFKL、Cosine-Probs）。性能提升在所有配置下保持方向一致，未见对特定模型尺寸、数据集或损失函数的偏倚。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2707_https_arxiv_org_abs_2603_21426/figures/008_Figure_6.jpg]]
-*Figure 6: Visualization of Student Entropy*
-
-
 
 ## 定位与知识库关联
 
@@ -386,8 +353,6 @@ $$\min_{\theta, \phi} \mathcal{L}_{\mathrm{CE}}(\theta) + g_{\phi}(h(x)) \ell(\t
 3. **多任务扩展性**：不确定性加权在两损失或多损失设置中的有效性如何随任务数量变化？三损失实验（Table 3）已初步验证，但更多损失组合下的表现仍需探索。
 
 4. **更广泛的学生架构**：该方法在 MobileVLM 和 LLaVA-Qwen 上已验证，但对其他 MLLM 架构（如 BLIP-2、InstructBLIP、LLaVA-1.5 系列）的泛化性尚待确认。
-
-
 
 ## 原文 PDF
 

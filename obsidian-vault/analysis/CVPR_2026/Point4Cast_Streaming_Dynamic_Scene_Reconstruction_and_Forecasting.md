@@ -50,8 +50,6 @@ Point4Cast 针对这一瓶颈，提出将流式重建与点云预测统一为时
 
 在 PointOdyssey 和 TAPVid-3D 两个挑战性动态场景基准上，Point4Cast 的重建精度均超越现有的离线方法和流式方法（Table 1-2）。在三维点云预测任务上，其预测误差随未来时间步的增长远低于基线方法（Tables 3-4, Figure 4）。消融实验进一步验证，FiLM 风格的时间条件化配合可学习时间嵌入是性能提升的关键机制（Table 6），且该方法在 Cut3R 和 VGGT 两种不同骨架架构下均表现稳定，展现了良好的鲁棒性。
 
-
-
 ### 问题背景：从静态重建到动态场景的时空理解
 
 从二维图像序列恢复三维场景结构是计算机视觉的核心问题。近年来，基于前馈网络的大规模三维重建方法取得了显著进展，代表性工作如 **VGGT**（Wang et al., CVPR 2025）能够在离线设定下从多帧图像直接回归稠密点云与相机参数。然而，这些方法假设场景是静态的，无法处理现实世界中普遍存在的动态环境——例如移动的人体、行驶的车辆或形变的物体。
@@ -75,8 +73,6 @@ Point4Cast 针对这一瓶颈，提出将流式重建与点云预测统一为时
 本文的核心动机是打破重建与预测之间的壁垒。直觉上，如果一个模型能够学习到场景如何随时间演化的内在表示，那么它不仅能重建已观测时刻的几何，还能基于演化规律推断任意未来时刻的状态。这要求我们重新设计场景表示的形式，使其从“空间快照”升级为“时空连续体”。
 
 基于这一动机，本文提出 **Point4Cast**——一个统一的流式动态场景重建与预测框架。其核心设计理念是将重建和预测统一为时空表示的学习与查询问题：模型维护一个持久演化的时空潜在表示（persistently evolving spacetime representation），该表示随新帧增量更新以整合历史观测，同时支持通过时间条件化查询（temporally conditioned query）来解码任意时刻（过去、现在或未来）的三维点云。这种设计从根本上避免了传统帧预测或场景流传播的累积误差，使预测成为表示学习的自然产物，而非后处理步骤。
-
-
 
 ## 核心方法与创新机理
 
@@ -109,8 +105,6 @@ Point4Cast 的预测能力完全内嵌于时间条件化读出机制中，**不�
 $$\mathbf{F}_q^{(t \to t+1)} = \hat{\mathbf{X}}_q^{(t+1)} - \hat{\mathbf{X}}_q^{(t)}$$
 
 这一设计使 Point4Cast 在预测任务上的误差增长远低于基线方法（Tables 3-4, Figure 4），体现了统一时空表示在长时预测中的稳定性优势。
-
-
 
 Point4Cast 将流式动态场景重建与点云预测统一为**持久时空潜在表示的学习与查询问题**。其核心设计围绕两个关键操作展开：**Update** 与 **Readout**，二者共享一个持久演化的潜在表示 $\mathbf{w}_k \in \mathbb{R}^{N \times C}$（由 $N$ 个可学习令牌组成，每个令牌具有 $C$ 维通道），该表示随着新帧的到来增量更新，并可在任意查询时刻被解码为三维点云。
 
@@ -150,17 +144,10 @@ Point4Cast 的框架设计带来了几个重要特性：
 - **场景流的免费获取**：通过对不同时刻的点云预测做差分，可直接得到场景流估计 $\mathbf{F}_q^{(t \to t+1)} = \hat{\mathbf{X}}_q^{(t+1)} - \hat{\mathbf{X}}_q^{(t)}$，无需额外训练或推理。
 - **架构兼容性**：Point4Cast 的 Update-Readout 框架可适配不同的点云重建骨架。实验表明，该方法在 Cut3R 和 VGGT 两种不同架构下均能稳定提升性能（Table 1–2），体现了框架的通用性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l38_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_Point4Cast_Streami/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of Point4Cast. Given a stream of input frames (top), our approach reconstructs and forecasts corresponding point maps over time (bottom). Overlaid point maps are shown for different queried time instants from past, present, and future*
 
-
-
 Point4Cast 的核心架构围绕一个持久演化的时空潜在表示 $\mathbf{w}_k$ 展开，通过更新-读出（Update-Readout）机制实现流式重建与预测的统一。Figure 2 展示了完整架构，包含以下关键模块：
-
-![[assets/figures/papers/paper_list_l38_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_Point4Cast_Streami/figures/002_Figure_2.jpg]]
-*Figure 2: An overview of Point4Cast, showing the details of the Update and Readout operations alongwith the trainable modules*
 
 ### 时空潜在表示的更新
 
@@ -212,8 +199,6 @@ $$\mathcal{L}_q^{(t)} = \|\hat{\mathbf{X}}_q^{(t)} - \mathbf{X}_q^{(t)}\|_1 + \l
 
 其中 $\lambda_{\mathrm{cam}}$ 平衡点云与相机参数的损失权重。训练时随机采样过去、现在和未来的时刻 $t$，使模型学会在统一框架下同时处理重建与预测任务。
 
-
-
 ## 实验与关键发现
 
 ### 动态场景重建主结果
@@ -246,9 +231,6 @@ Table 3 和 Table 4 分别报告了 PointOdyssey 和 TAPVid-3D 上的预测结�
 
 此外，Point4Cast 无需额外训练即可从时间条件化点云差分直接得到场景流估计 $\mathbf{F}_q^{(t \to t+1)} = \hat{\mathbf{X}}_q^{(t+1)} - \hat{\mathbf{X}}_q^{(t)}$ (Eq. 11)。Table 5 的场景流估计与预测结果显示，Point4Cast 在此任务上同样取得最优性能。
 
-![[assets/figures/papers/paper_list_l38_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_Point4Cast_Streami/figures/010_Table_5.jpg]]
-*Table 5: Scene flow estimation and forecasting results on the PointOdyssey dataset. The best and second best results are highlighted*
-
 ### 消融研究：时间条件化机制
 
 时间条件化机制是 Point4Cast 实现预测能力的关键设计。Table 6 的消融实验系统比较了三种方案：
@@ -265,19 +247,6 @@ Table 3 和 Table 4 分别报告了 PointOdyssey 和 TAPVid-3D 上的预测结�
 ### 3D 点轨迹可视化
 
 Figure 5 展示了 Point4Cast 在跨越过去、现在、未来时间步上的 3D 点轨迹。彩色轨迹表明，模型能够输出语义一致的点对应关系，进一步验证了时空表示对动态场景演化的连续性建模能力。
-
-![[assets/figures/papers/paper_list_l38_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_Point4Cast_Streami/figures/005_Figure_5.jpg]]
-*Figure 5: 3D point tracks over past, present, and future time steps. Point4Cast yields 3D point tracks that are semantically consistent across different time steps, as shown by the colored tracks*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l38_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_Point4Cast_Streami/figures/006_Table_1.jpg]]
-*Table 1: Reconstruction results on the PointOdyssey dataset. The best and second best results are highlighted*
-
-![[assets/figures/papers/paper_list_l38_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_Point4Cast_Streami/figures/008_Table_2.jpg]]
-*Table 2: Reconstruction results on the TAPVid-3D dataset. The best and second best results are highlighted*
-
-
 
 ## 定位与知识库关联
 
@@ -306,8 +275,6 @@ Point4Cast 处于**流式动态场景重建**与**3D 点云预测**的交汇点�
 **开放问题。** 分析中明确指出的开放问题为：“如何将不确定性建模纳入预测框架，以提升预测可靠性并控制误差累积？” 这一问题指向两个子方向：(1) 在时间条件化机制中引入随机性，使 Readout 输出分布而非点估计；(2) 在训练目标中加入校准损失，鼓励模型在不确定性高时输出更保守的预测。
 
 **其他潜在局限。** 当前分析未提供关于计算开销、内存占用和实时性的定量数据。流式场景对推理延迟敏感，Point4Cast 的 Update-Readout 机制在实际部署中的效率表现需要进一步验证。此外，模型在极端稀疏观测（如单帧初始化）下的重建质量，以及跨场景泛化能力（从合成数据到真实视频），也是实际应用中的重要考量点，但现有证据未覆盖这些方面。
-
-
 
 ## 原文 PDF
 

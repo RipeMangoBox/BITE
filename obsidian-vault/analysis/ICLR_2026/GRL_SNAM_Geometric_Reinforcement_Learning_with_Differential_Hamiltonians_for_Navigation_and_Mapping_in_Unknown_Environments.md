@@ -60,8 +60,6 @@ GRL-SNAM 将导航问题重构为在**哈密顿量流形上的能量优化**：�
 
 当前方法验证限于二维超弹性环形机器人和点智能体导航，对三维环境、真实传感器噪声及更复杂动力学模型的鲁棒性仍有待评估；多策略、多阶段部署流程的工程复杂度也是实际集成的潜在障碍。
 
-
-
 ### 导航问题的根本挑战
 
 在未知环境中进行自主导航与建图（SLAM）是机器人学的核心问题。当机器人本体具有可变形结构时，问题难度急剧上升：智能体不仅需要规划无碰撞路径，还必须同时决定何时以及如何改变自身形状以穿越狭窄缝隙。这一过程要求感知、规划和控制三个时间尺度紧密协调——传感器在秒级更新环境信息，路径规划在亚秒级生成航点，而形状变形则需要在毫秒级积分步长内连续调整。
@@ -89,8 +87,6 @@ GRL-SNAM 将导航问题重构为在**哈密顿量流形上的能量优化**：�
 - **障碍物势垒**可以作为势能的天然可加项直接嵌入能量景观，消除脆弱的奖励塑形。
 
 基于这一动机，GRL-SNAM将导航重构为**学习一个结构化的哈密顿能量景观**，其梯度直接产生局部控制动作。离线阶段通过微分策略优化（DPO）从轨迹反馈中学习参考哈密顿量，在线阶段则通过阶段式更新环境驱动的能量权重，将感知、规划和变形策略统一于梯度诱导的局部控制。这一框架不再需要值函数、显式规划树或外部安全滤波器——安全与任务目标在统一的能量景观中通过自适应对偶权重实现协调。
-
-
 
 ## 核心方法与创新机理
 
@@ -141,8 +137,6 @@ $$H_k(q_k, p_k; \xi, \mathcal{E}) = \frac{1}{2} p_k^{\top} M_k^{-1} p_k + \mathc
 ### 与基线方法的范式级差异
 
 Table 4 的范式级对比揭示了 GRL-SNAM 的独特地位：它是唯一在能量守恒、几何结构保持、约束集成、在线适应、多尺度协调等十个维度上均提供全面支持（✓）的框架。深度 RL 方法缺乏几何结构和约束集成，经典规划方法不支持在线适应和多尺度协调，CBF 方法则缺乏学习能力和变形支持。
-
-
 
 ![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_KcC5mwfGf0/figures/001_Figure_1.jpg]]
 *Figure 1: Independent score function architecture and query–response interface. The Navigator $g _ { \xi }$ issues queries containing local Hamiltonians $H _ { k }$ , initial states $z _ { k , 0 }$ . , and time horizons $\bar { T } _ { k }$ to each policy $\pi _ { k }$ ( k $\in \{$ y , f , o $\}$ ) . Each policy computes score functions $s _ { k } ^ { \theta _ { k } }$ via energy gradients from learned Hamiltonians $h _ { k } ^ { \theta _ { k } }$ , backed by spatial indices $\scriptstyle { S _ { k } }$ for efficient neighbor queries. Policies return standardized responses $\mathsf { R } _ { k }$ containing state trajectories, score sequences, and QoIs. The Navigator aggregates these to update the surrogate Hamiltonian an...
@@ -198,8 +192,6 @@ $$\mathcal{R}(q; \omega, \eta_{\xi}(\mathcal{E})) = E_{\mathrm{sensor}} + \beta(
 ### 范式级能力对比
 
 Table 4 从十个维度对比了 GRL-SNAM 与其他学习框架的能力覆盖。GRL-SNAM 是唯一在所有维度上获得全面支持（✓）的框架，涵盖能量守恒、几何结构保持、约束集成、在线适应、多尺度协调等关键能力。相比之下，标准深度 RL 方法（PPO/TRPO/SAC）在能量守恒和几何结构方面完全缺失支持，传统规划方法（A*）则缺乏在线适应和多尺度协调能力。
-
-
 
 GRL-SNAM 的核心架构由三个独立得分函数模块和一个元控制器（Navigator）构成，其数学基础是将导航问题嵌入到哈密顿量流形上的能量优化。
 
@@ -275,20 +267,16 @@ $$h^{\mathrm{adapted}} = h^{\mathrm{ref}} + \Delta h^{\mathrm{context}}$$
 
 系数 $(\beta, \gamma, \bar{\alpha})$ 由元策略根据感知到的障碍物配置和目标上下文动态演化，本质上是重新定义约化哈密顿量本身，而非仅调整动作输出（Figure 10）。这种深层适应使得系统在感知到新障碍物时能够修改整个局部能量景观，而非仅做局部反应。
 
-
-
 ## 实验与关键发现
 
 ### 核心导航性能对比
 
 GRL-SNAM在2D可变形环形机器人导航任务上实现了路径质量与建图预算的最优平衡。在仅成功轨迹的分析中（Table 5），GRL-SNAM取得**SPL 0.95**，接近基于模型的安全滤波方法CBF（0.96），同时仅消耗**10.7%的建图预算**，与纯反应式势场法PF（10.7%）持平。相比之下，在相同短回合分布和局部观测条件下训练的深度RL基线表现显著逊色：PPO仅达SPL 0.77，且绕路比（Detour Ratio）高达1.34，表明其路径效率与安全性均不足。这一结果的核心机制在于：GRL-SNAM通过哈密顿量能量景观的梯度直接产生控制动作，无需值函数近似或显式规划树，从而在局部感知条件下实现了接近全局规划质量的路径。
 
-
 ![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_KcC5mwfGf0/figures/012_Table_5.jpg]]
 *Table 5: Comparison of navigation quality across methods (success-only runs). GRL-SNAM achieves near-CBF path efficiency while consuming the same minimal mapping budget as PF. SPL = Success weighted by Path Length; Detour = executed path length / shortest path length*
 
 在点智能体地下城导航任务中（Table 3），GRL-SNAM的优势更为突出：在相同感知、架构和短回合训练分布下，GRL-SNAM成功率达到**87.5%**，而PPO仅为26.1%，TRPO为21.7%，SAC为18.4%。同时，GRL-SNAM的平均状态误差（0.3 m）和目标距离（0.1 m）远低于深度RL基线（1.8–2.4 m和1.2–1.9 m）。值得注意的是，全回合端到端训练的RL基线（Table 8）在该任务上几乎完全失败——PPO成功率仅7.2%，TRPO和SAC分别为5.8%和4.1%，这进一步验证了阶段式哈密顿量监督相较于端到端RL的样本效率和泛化优势。
-
 
 ![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_KcC5mwfGf0/figures/007_Table_3.jpg]]
 *Table 3: Short-rollout baselines vs. GRL-SNAM on the point-agent navigation task*
@@ -296,7 +284,6 @@ GRL-SNAM在2D可变形环形机器人导航任务上实现了路径质量与建�
 ### 哈密顿量适应与能量景观动态
 
 GRL-SNAM的核心能力不仅体现在最终指标上，更体现在其对环境变化的深层结构适应。Figure 10的定量验证揭示了三个关键动态：
-
 
 ![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_KcC5mwfGf0/figures/015_Figure_10.jpg]]
 *Figure 10: Quantitative validation of GRL-SNAM. Top: clearance stays above collision threshold, ensuring safety. Middle: force magnitudes adapt to environment complexity. Bottom: coefficients ( $\beta , \gamma , \bar { \alpha }$ ) evolve dynamically, confirming online adaptation and stagewise refinement of the Hamiltonian
@@ -336,12 +323,8 @@ Table 4的扩展范式对比从十个维度评估了八种学习框架。GRL-SNA
 3. **部署复杂度**：离线训练和在线适应所需的多策略、多阶段部署流程较为复杂，增加了实际集成的工程难度。
 4. **在线雅可比更新假设**：元策略权重和端口输入的在线雅可比更新依赖可观测量的局部线性近似，在极度非线性或快速变化场景下可能失效——这需要进一步的手动验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_KcC5mwfGf0/figures/004_Table_1.jpg]]
 *Table 1: Navigation quality comparison (success-only runs). GRL-SNAM achieves near-CBF efficiency with minimal mapping budget, while deep RL baselines trained on the same short-rollout distribution and local observations yield lower SPL, larger detours, and smaller clearances*
-
-
 
 ## 定位与知识库关联
 
@@ -376,8 +359,6 @@ GRL-SNAM 的嵌套哈密顿量子系统（传感器/帧/变形策略）运行在
 2. **真实平台验证**：能否在真实的柔软机器人平台上验证该方法，并应对真实物理交互（如非弹性碰撞、摩擦接触）与通信延迟？
 3. **与基于模型方法的融合**：哈密顿量结构与模型预测控制（MPC）能否结合，利用 MPC 的长期约束满足能力弥补在线雅可比更新的短视性？
 4. **降低交互成本的训练范式**：在稀疏奖励或仅提供演示的设定下，哈密顿量参考能否通过模仿学习或离线 RL 获得，从而降低在线交互成本？
-
-
 
 ## 原文 PDF
 

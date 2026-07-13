@@ -52,8 +52,6 @@ claims:
 
 在四个零样本医学异常检测数据集上，MEDIC-AD 取得平均 F1 91.6 的最优结果（Table 1），显著超越通用VLM和专有医学VLM。在医学症状追踪基准 MMXU 上，其综合得分达 0.655（Table 2），同样优于所有闭源基线和领域专用模型。消融实验进一步证实 <Ano> 令牌对时序推理的关键作用：移除后 MMXU 得分从 0.655 下降至 0.635（Table 4）。在视觉定位（Table 3）和真实临床数据集（Table 5）上的评估亦一致表明，该方法在病灶检测、时序推理和视觉解释三个维度均具备实用优势。
 
-
-
 ### 医学视觉-语言模型的临床落地瓶颈
 
 视觉-语言模型（VLM）在通用领域的突破推动了对医学多模态智能的探索。然而，当前医学VLM面临一个核心矛盾：**知识覆盖与临床可操作性之间的鸿沟**。尽管现有模型能够理解医学影像并生成文本描述，它们在真实临床工作流中暴露出三个系统性缺陷：
@@ -83,8 +81,6 @@ claims:
 
 基于此，本文提出 **MEDIC-AD**，通过三阶段递进训练框架将上述临床思维嵌入VLM：Stage 1 注入可学习的 `<Ano>` 异常令牌以建立病灶敏感表示；Stage 2 引入 `<Diff>` 差异令牌以建模时序变化；Stage 3 通过专用热图解码头生成视觉证据。该设计使模型不仅具备医学知识覆盖，更能产生与临床证据对齐的、可验证的决策依据。
 
-
-
 ## 核心方法与创新机理
 
 MEDIC-AD 的核心创新在于将“检测—比较—解释”的临床诊断思维显式嵌入视觉-语言模型的学习课程，通过三个紧密耦合的**changed slots**实现从知识覆盖到临床可操作输出的跨越。
@@ -106,8 +102,6 @@ MEDIC-AD 的核心创新在于将“检测—比较—解释”的临床诊断�
 上述三个 changed slots 通过递进式训练课程实现耦合：Stage 1 训练异常处理器生成 `<Ano>` 令牌，建立病灶敏感表示；Stage 2 在此基础上通过 Diff Q-Former 生成 `<Diff>` 令牌，建模时序变化；Stage 3 融合异常特征训练热图解码头，生成视觉证据。这一递进设计确保各阶段能力相互增强而非独立训练，最终在真实临床数据集（300例患者）上以 GREEN 0.020 / RaTEScore 0.892 / GPT-eval 4.25 显著超越骨干模型 Lingshu（Table 5）。
 
 **创新本质**：通过 `<Ano>` 和 `<Diff>` 两类显式令牌，MEDIC-AD 将临床诊断的认知流程转化为模型可学习的结构化表示，使 VLM 不仅具备知识覆盖，更能产生与临床证据对齐的、可验证的决策依据。
-
-
 
 MEDIC-AD 采用三阶段递进训练框架，将“检测—比较—解释”的临床诊断思维显式嵌入视觉-语言模型的学习课程中。如图 Figure 3 所示，整个 pipeline 由五个核心模块串联构成，输入为单张或成对的医学影像，输出包括文本诊断响应和病灶区域热图。
 
@@ -135,8 +129,6 @@ MEDIC-AD 采用三阶段递进训练框架，将“检测—比较—解释”�
 三阶段训练遵循递进式课程设计：Stage 1 在异常检测数据上训练异常处理器，建立病灶敏感表示；Stage 2 在时序对比数据上训练差异 Q-Former，赋予模型纵向推理能力；Stage 3 在像素级标注数据上训练热图解码器，实现视觉可解释性。各阶段冻结前序模块参数，仅训练当前阶段新增组件，保证了能力的稳定积累与模块间的解耦。
 
 > **需人工核实**：关于各阶段训练数据的具体规模、损失函数权重配置以及优化器超参数，当前证据片段未提供详细数值，建议查阅原文实验配置章节进行补充。
-
-
 
 MEDIC-AD 的核心架构围绕三个递进式模块展开，分别对应临床诊断中“检测—比较—解释”的思维链条。以下逐一阐述各模块的设计逻辑与关键公式。
 
@@ -183,8 +175,6 @@ $$\mathbf{M} = f_h([f_p(\mathbf{V}^*); \Sigma<\bar{\mathrm{Ano}}>])$$
 ### 模块间的因果依赖
 
 三个模块并非独立运作，而是形成递进依赖关系：Stage 1 的异常令牌为 Stage 2 的差异推理提供病灶敏感的表示基础；Stage 3 的热图生成又直接复用 Stage 1 产出的 `<Ano>` 令牌。这种设计将“检测—比较—解释”的临床诊断逻辑内化为模型的学习课程，使得每个阶段的能力建立在上一阶段的表征之上。
-
-
 
 ## 实验与关键发现
 
@@ -243,15 +233,9 @@ Stage 3 的热图生成能力通过 BMAD（含 BraTS2021、RESC、BTCV+LiTs）
 
 在包含 300 名患者的真实纵向临床数据集上（Table 5），MEDIC-AD 在 GREEN（0.020）、RaTEScore（0.892）和 GPT-4o 评估（4.25）三个指标上均优于骨干模型 **Lingshu-7B**（Xu et al., arXiv 2025）。这一结果增强了方法的外部效度——证明三阶段训练带来的增益不仅在学术基准上成立，在模拟真实放射科工作流程的场景中同样有效。
 
-![[assets/figures/papers/paper_list_l2062_https_openaccess_thecvf_com_content_CVPR2026_html_Park_Medic_AD_Towards/figures/008_Table_5.jpg]]
-*Table 5: Evaluation on a real-world clinical dataset of 300 patients using GREEN [43], RaTEScore [64], and GPT-4o evaluation*
-
 ### 超参数敏感性分析
 
 Figure 5 展示了查询令牌池化大小和视觉软提示数量对性能的影响。红色虚线标注了 Lingshu 基线的性能水平，MEDIC-AD 在广泛的超参数范围内均保持对基线的优势，表明方法对超参数选择具有较好的鲁棒性。
-
-![[assets/figures/papers/paper_list_l2062_https_openaccess_thecvf_com_content_CVPR2026_html_Park_Medic_AD_Towards/figures/010_Figure_5.jpg]]
-*Figure 5: Hyperparameter sensitivity analysis on (a) query token pooling size and (b) visual soft prompt counts. The red line denotes the baseline performance of Lingshu [59]*
 
 ### 失败模式与局限性
 
@@ -261,16 +245,6 @@ Figure 5 展示了查询令牌池化大小和视觉软提示数量对性能的
 2. **罕见病变泛化**：训练数据的像素级分割掩码规模和质量可能限制模型对罕见病变的检测能力——这是需要手动验证的风险点。
 3. **热图临床可接受性未验证**：虽然视觉定位指标优秀，但热图与放射科医生判读的一致性尚未经过大规模用户研究或临床试验检验。
 4. **骨干模型知识偏差**：MEDIC-AD 基于 Lingshu 构建，其内部知识偏差可能影响输出可靠性；未经强化学习对齐的部分可能产生不准确的文本描述。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2062_https_openaccess_thecvf_com_content_CVPR2026_html_Park_Medic_AD_Towards/figures/001_Figure_1.jpg]]
-*Figure 1: Overall performance of VLMs on Medical Anomaly Detection and Medical Symptom Tracking (MMXU [42])*
-
-![[assets/figures/papers/paper_list_l2062_https_openaccess_thecvf_com_content_CVPR2026_html_Park_Medic_AD_Towards/figures/002_Figure_2.jpg]]
-*Figure 2: Comparison of VLMs on clinical applications. Medic-AD provides stronger lesion detection, temporal reasoning, and visual grounding than GPT-4o [24] and Citrus-V [53]*
-
-
 
 ## 定位与知识库关联
 
@@ -350,8 +324,6 @@ MEDIC-AD的有效性已在以下场景得到验证：
 3. **鲁棒性与安全性**：在真实临床部署中，模型的鲁棒性、安全性和对分布外数据的拒绝能力如何保证？当前评估均在受控数据集上进行，缺乏对对抗样本、罕见病例、低质量影像等边缘情况的系统测试。
 
 4. **人类反馈对齐**：是否可以通过强化学习利用临床反馈信号进一步对齐模型输出与医生决策？三阶段训练当前基于监督学习，引入RLHF或类似的临床偏好优化可能进一步提升输出的临床可接受性。
-
-
 
 ## 原文 PDF
 

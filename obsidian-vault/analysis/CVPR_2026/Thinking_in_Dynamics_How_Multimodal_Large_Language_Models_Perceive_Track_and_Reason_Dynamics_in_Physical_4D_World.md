@@ -203,8 +203,6 @@ $$\mathbf{a}_{t}^{i} = (\mathbf{v}_{t}^{i} - \mathbf{v}_{t-1}^{i}) / \Delta t$$
 
 需注意，当前几何与运动重建管线依赖外部深度估计与实例分割模型，并非端到端训练，可能引入级联误差。此外，ST‑TCM基于规则模板生成，难以捕捉开放域动态语义的细微变化，这些限制需要在后续工作中加以解决。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2423_https_arxiv_org_abs_2603_12746/figures/011_Table_5.jpg]]
 *Table 5: Ablation of Spatio-Temporal Textual Cognitive Map. Top three performers in each column are highlighted from Dark (highest) to Light (third highest). T, M, and S denote temporal semantics, motion dynamics, and spatial geometry, respectively*
 
@@ -242,8 +240,6 @@ Dyn‑Bench相较于现有时空推理基准的独特定位在于其统一的三
 ### 公平性说明
 
 所有模型在零样本设定下使用默认指令模板评估，确保对比公平。基准构建经过多阶段过滤、几何校验与人工质检，覆盖真实与合成场景，减轻数据分布偏差。但需注意：当前方法依赖外部掩码和深度估计流水线，未实现端到端训练，可能引入级联误差；ST‑TCM基于规则模板生成，难以捕捉开放域动态语义的细微变化——这些限制在解释实验结果时需予以考虑。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2423_https_arxiv_org_abs_2603_12746/figures/013_Figure_8.jpg]]
 *Figure 8: Qualitative examples of the nine representative dynamic understanding tasks across the three hierarchical levels of Dyn-Bench*

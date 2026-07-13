@@ -87,8 +87,6 @@ Inter-X作为统一基准，揭示了当前方法在不同任务上的能力边�
 
 Inter-X的构建仍存在若干边界：**未包含面部表情**，限制了情感-交互关联分析；所有数据采集于**室内受控环境**，缺乏野外真实场景的泛化性；交互片段为**原子级短序列**，未覆盖长时多阶段交互。由此衍生出关键开放问题：引入面部表情能否显著提升交互理解与风格化生成？如何将Inter-X的高质量运动迁移到无约束RGB场景？长序列连续交互的数据构建与建模范式应如何设计？这些问题的探索将决定人-人交互分析从受控基准走向开放世界的可行路径。
 
-
-
 人-人交互（Human-Human Interaction, HHI）分析是计算机视觉与图形学中的核心课题，其目标是从运动数据中理解、建模并生成两个个体之间的交互行为。这一能力对于虚拟现实、人机交互、具身智能以及社交行为模拟等应用至关重要。然而，该领域长期受困于**数据基础设施的碎片化**——现有数据集在运动捕捉精度、模态覆盖范围以及标注粒度上存在系统性缺陷，无法支撑从感知到生成的统一研究范式。
 
 当前人-人交互数据集的瓶颈可归纳为三个层面。**第一，运动捕捉精度不足。** 多数数据集仅提供稀疏的骨架关节点（skeleton），缺少手部姿态（hand gestures）的精确记录，而手部交互恰恰是握手、击掌、推搡等大量交互动作的关键组成部分。**第二，文本标注匮乏。** 现有数据集要么完全不具备文本描述，要么仅有粗粒度的动作类别标签，缺乏对交互过程中身体部件运动、动作序列顺序以及交互双方关系的细粒度语言刻画。这直接限制了文本驱动的交互生成（text-conditioned generation）和交互字幕（captioning）等跨模态任务的发展。**第三，交互语义标注缺失。** 交互并非对称的——在“推搡”动作中，一方是主动的“演员”（actor），另一方是被动的“反应者”（reactor）；此外，交互双方的社会关系（如朋友、陌生人）和个性特征（如支配性、友好度）也会深刻影响运动模式。现有数据集普遍忽略了这些因果顺序和社交/个性标注，使得交互推理和风格化生成任务无从开展。
@@ -96,8 +94,6 @@ Inter-X的构建仍存在若干边界：**未包含面部表情**，限制了情
 这些碎片化缺陷导致了一个恶性循环：研究者只能在不同数据集上针对单一任务进行孤立探索，无法在一个统一的基准上系统性地比较和推进多种下游任务。例如，**InterHuman**（Liang et al., arXiv 2023）虽然提供了较大规模的交互数据，但缺少手部姿态和细粒度文本；**NTU RGB+D**（Shahroudy et al., CVPR 2016）和**NTU RGB+D 120**（Liu et al., TPAMI 2019）虽广泛用于骨架动作识别，但其交互子集规模有限且无文本标注。这种局面使得“构建一个多功能的统一交互分析基准”成为亟待解决的核心问题。
 
 为打破上述瓶颈，**Inter-X** 的构建动机在于：通过一次性构建一个**大规模、高精度、多模态标注完备**的人-人交互数据集，消除现有数据集的碎片化缺陷，使得文本生成、动作识别、反应生成、因果推断、关系/个性推理等不同性质的任务能够在统一的数据基础上协同推进。其核心假设是：**同时提供准确的全身运动（含手部）、细粒度文本描述、因果交互顺序以及社交/个性信息，能够系统性地推动人-人交互分析从孤立的任务探索走向整体性的能力提升。**
-
-
 
 ## 核心方法与创新机理
 
@@ -134,8 +130,6 @@ Inter-X 最被低估的创新在于其为交互序列赋予了因果结构和社
 
 需指出，Inter-X 的创新集中于数据层面和任务定义层面，其基准模型本身（InterGen、Actformer、AGRoL 等）均是对现有架构的维度扩展适配，并未提出专门针对交互特性的新型网络结构。此外，数据集未包含面部表情、所有采集均在室内环境完成、交互片段为原子级短序列，这些限制意味着在情感交互、野外泛化、长时多阶段交互等方向仍存在显著的创新空间。
 
-
-
 Inter-X 的整体框架围绕“高精度多模态数据采集 → 统一参数化表示 → 多任务映射”这一主线构建，旨在用一个数据集同时支撑交互生成、识别、推理等不同性质的下游任务。
 
 ### 数据采集与参数化管线
@@ -165,8 +159,6 @@ $$E(\theta, t) = \lambda_1 \frac{1}{N} \sum_{j \in \mathcal{I}} \lambda_p ||\pmb
 ### 模型适配策略
 
 在将现有单人模型迁移到双人交互场景时，框架采用了一组统一的**维度与表示适配**策略：将输入/输出维度扩展为双人，运动表示切换为 SMPL-X 参数，旋转采用 6D 连续表示，并保留全局平移以维持两人相对位置。扩散模型统一使用 1000 步训练、5 步 DDIM 采样。这一适配层确保不同基线模型（TEMOS、MDM、MotionDiffuse、Actformer、AGRoL 等）可在同一基准上公平比较，而无需为每个模型单独设计输入输出逻辑。
-
-
 
 Inter-X数据集的核心技术链路包含四个关键模块，从原始运动捕捉到多模态标注生成，最终映射为下游任务的学习目标。
 
@@ -214,8 +206,6 @@ $$E(\theta, t) = \lambda_1 \frac{1}{N} \sum_{j \in \mathcal{I}} \lambda_p ||\pmb
 
 这些映射函数构成了Inter-X统一基准的理论骨架——同一数据集通过不同的输入-输出配对即可驱动文本生成、动作识别、反应生成、社交推理等性质迥异的下游任务，消除了以往各任务依赖碎片化数据集的痛点。
 
-
-
 ## 实验与关键发现
 
 ### 文本条件交互生成
@@ -256,21 +246,11 @@ MotionDiffuse（Zhang et al., arXiv 2022）和MDM（Tevet et al., arXiv 2022）�
 3. **任务特化架构的必要性**：反应生成任务中AGRoL显著优于通用InterGen（FID -2.262），说明针对特定交互任务设计专用架构比简单扩展单人模型更有效。
 4. **交互识别仍有较大挑战**：最优准确率83.30%表明，在涵盖细粒度手势和多样反应的40类交互识别上，现有模型仍存在明显不足，需要进一步的方法创新。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1720_Inter_X_Towards_Versatile_Human_Human_Interaction_Analysis/figures/002_Table_1.jpg]]
 *Table 1: Dataset comparisons. We compare our Inter-X dataset with the existing human-human interaction datasets. Motions: The number of the motion clips; Frames: The frame number of the 3D human motions; Texts: The number of the textual descriptions; Scheme: The strategy to obtain the motion data; Modality: The representation of the motion data and “Skel.” denotes skeleton; Hands, Asyn. and Rel.&Pst. refer to the components of hand gestures, asymmetry annotations, human-human relationships and personalities*
 
-![[assets/figures/papers/paper_list_l1720_Inter_X_Towards_Versatile_Human_Human_Interaction_Analysis/figures/005_Table_2.jpg]]
-*Table 2: Experimental results of text-conditioned interaction generation on the Inter-X dataset, where ± indicates 95% confidence interval and → means the closer the better. Bold indicates best results*
-
 ![[assets/figures/papers/paper_list_l1720_Inter_X_Towards_Versatile_Human_Human_Interaction_Analysis/figures/006_Figure_4.jpg]]
 *Figure 4: Visualization results of the generated results on the InterHuman [54] and Inter-X dataset via ait-viewer [1]. From top to bottom, the action categories are “Handshake”, “Wave” and “Shoulder to shoulder”, respectively. Please zoom in for the details*
-
-![[assets/figures/papers/paper_list_l1720_Inter_X_Towards_Versatile_Human_Human_Interaction_Analysis/figures/001_Figure_1.jpg]]
-*Figure 1: An overview of the data and task taxonomy of our proposed Inter-X dataset, which is a large-scale human-human interaction MoCap dataset with ∼11K interaction sequences and more than 8.1M frames. The fine-grained textual descriptions, semantic action categories, interaction order, and relationship and personality annotations allow for 4 categories of downstream tasks*
-
-
 
 ## 定位与知识库关联
 
@@ -311,8 +291,6 @@ Inter-X 数据集及基于其建立的基准具有明确的适用边界，这些
 4. **交互识别精度的突破方向。** 当前 83.30% 的准确率天花板是否可以通过自监督预训练或引入文本-运动对比学习来突破？这本质上是在问：是否需要更强的表示学习范式，而非仅仅改进图卷积的拓扑设计。
 
 5. **个性与社交关系的可解释建模。** 论文提出了从运动推断关系与个性标签的任务（$F_{m2s}(\pmb m) \mapsto \{l_r, l_p\}$），但个性和社交关系对运动模式的细微影响如何被可解释地建模并应用于条件生成，仍是一个开放的因果推断问题——需要回答“是什么运动特征揭示了关系类型”而非仅仅“能否分类准确”。
-
-
 
 ## 原文 PDF
 

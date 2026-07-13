@@ -50,8 +50,6 @@ ArtHOI 提出了一种**优化驱动的框架**，核心思路不是抛弃基础
 
 实验表明，ArtHOI 在无需任何物体模板或预扫描的条件下，在 ArtHOI‑RGBD、RSRD 和 ARCTIC 等多个数据集上均取得优于或持平需要预扫描的现有方法的重建精度（如 ArtHOI‑RGBD 上 Chamfer Distance 降低 3.7–9.6 mm，RSRD 上降低 61.1 mm），同时碰撞‑接触评分（Co²）大幅降低至 0.029–0.039，验证了 MLLM 引导对齐对物理合理性的关键作用。
 
-
-
 从单目 RGB 视频中重建手与物体的 4D 交互，是计算机视觉与图形学中长期存在的难题。该任务要求同时恢复手部姿态、物体几何与运动，以及二者之间物理合理的空间关系，在机器人学习、增强现实和动作分析等领域具有重要应用价值。
 
 近年来，基础模型（foundation models）在图像分割、深度估计、手部姿态重建和 3D 物体生成等单任务上取得了显著进展，为从“野生”视频中提取丰富先验提供了可能。然而，现有手物交互（HOI）重建方法主要面向**刚性物体**，或依赖**预扫描模板**与多视角视频，难以应对未知的铰接物体（如剪刀、耳机、糖果盒等）。当直接将基础模型的独立输出组合在一起时，会暴露出三个根本性缺陷：
@@ -63,8 +61,6 @@ ArtHOI 提出了一种**优化驱动的框架**，核心思路不是抛弃基础
 以 **EasyHOI** 和 **RSRD** 为代表的现有方法，分别受限于逐帧刚性假设和物体预扫描需求，在铰接物体场景中表现不佳。EasyHOI 无法建模铰接运动且缺乏时序一致性；RSRD 虽能处理铰接物体，但要求预先对物体进行环绕扫描以获取完整模板，这在实际应用中往往不可行。
 
 上述瓶颈的本质在于：**基础模型提供的几何、运动与语义先验天生互不一致**，而现有方法要么抛弃这些先验，要么不加修正地直接使用。ArtHOI 的核心动机正是“驯服”而非丢弃这些先验——通过优化框架将它们统一到度量一致、空间对齐、物理合理的 4D 交互重建中，从而在**无需任何物体模板或预扫描**的条件下，仅凭单目 RGB 视频实现手与铰接物体的 4D 重建。
-
-
 
 ## 核心方法与创新机理
 
@@ -88,8 +84,6 @@ ArtHOI 的核心创新在于将多个基础模型的异构先验“驯服”为�
 
 ArtHOI 的创新不在于提出新的基础模型，而在于**设计了一套优化机制来弥合基础模型先验之间的不一致性**：ASR 解决了物体从归一化空间到度量世界的接地问题，MLLM 对齐则解决了手‑物网格的空间组合问题。二者协同，使得无需任何物体模板或预扫描的单目 4D 交互重建成为可能。
 
-
-
 ArtHOI 是一个**基于优化的框架**，核心目标是从单目 RGB 视频 $\\boldsymbol{\\gamma} = \\{ \\mathbf{I}_i \\}_{i=1}^{N}$ 中重建手与未知铰接物体的 4D 交互，全程无需物体模板或预扫描。其关键设计在于**集成并“驯服”多个基础模型的先验**，而非抛弃这些先验——基础模型提供的归一化网格、独立重建的手网格天生互不一致（尺度模糊、空间错位、物理不合理），ArtHOI 通过优化将它们协调到世界坐标系下，形成物理一致的 4D 交互表示。
 
 整个 pipeline 按数据流可划分为四个串行模块（见 Figure 2）：
@@ -110,8 +104,6 @@ ArtHOI 是一个**基于优化的框架**，核心目标是从单目 RGB 视频 
     使用 WiLoR 重建 4D 手网格；通过 Qwen‑VL‑Max 进行三阶段结构化提示（视角检测→手型映射→逐帧接触推理）获取可靠的接触状态与接触手指；将接触信息作为约束，联合优化手物空间对齐。优化采用两阶段策略：先优化物体尺度，后联合优化手姿与全局变换，总损失为 $\\mathcal{L}_{\\mathrm{hoi}} = \\mathcal{L}_{\\mathrm{contact}} + \\mathcal{L}_{\\mathrm{reg}}$，其中 $\\mathcal{L}_{\\mathrm{contact}}$ 最小化指定指尖顶点到物体网格最近点的距离，$\\mathcal{L}_{\\mathrm{reg}}$ 结合加速度先验与手姿 L₁ 正则项防止优化偏离可信初始预测。
 
 整个框架的输入是单目 RGB 视频，输出是时空对齐的手网格与铰接物体网格序列。各模块之间通过世界坐标系下的度量网格传递信息：ASR 解决了归一化网格到世界空间的尺度/位姿歧义，MLLM 引导的对齐则消除了手物网格之间的空间错位与穿透。
-
-
 
 ArtHOI 将单目 4D 手‑铰接物体交互重建分解为四个串行模块，每个模块解决一个基础模型先验的固有缺陷：**数据预处理**提取干净观测信号；**规范网格重建与 ASR** 将归一化网格锚定到世界空间；**部件级运动重建**赋予静态网格时变铰接运动；**MLLM 引导的手物对齐**消除手物网格间的空间错位与穿透。
 
@@ -225,19 +217,6 @@ $$
 
 该设计的关键在于：MLLM 提供的逐帧接触标签充当“软锚点”，仅在真实接触帧施加距离惩罚，避免了传统掩码交集方法在非接触帧产生误导性约束的问题。消融实验（Table 4）表明，移除 MLLM 引导的对齐优化会导致碰撞‑接触评分（Co²）急剧升高，验证了接触约束对消除穿透和错位的核心作用。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2603_25791/figures/011_Figure.jpg]]
-*Figure: A. Demonstration of our MLLM contact reasoning pipeline. For clarity, we merge 2 neighbouring frames, but in practice, it’s typically set to 3. The top row shows RGB frames, the bottom row shows colorized depth maps. The MLLM analyzes visual and depth cues across frames to determine contact status and engaged fingers for each hand*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2603_25791/figures/014_Figure.jpg]]
-*Figure: C. Stage 1: Perspective Detection Prompt. This prompt determines whether the input video is from a first-person or third-person viewpoint, which is essential for correctly identifying hand laterality in subsequent stages. Figure D. Stage 2: Hand Mapping Prompt. This stage identifies and maps visible hands to left/right labels. Stage 2a handles first-person perspective videos using spatial positioning and thumb direction cues. Stage 2b handles third-person perspective videos by analyzing camera angle relative to the operator’s body and arm connectivity patterns*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2603_25791/figures/015_Figure.jpg]]
-*Figure: E. Stage 3: Frame-wise Contact Reasoning Prompt. This stage performs detailed analysis of each frame to determine contact state and identify engaged fingers. The critical depth map verification step (Phase C) distinguishes true physical contact from mere proximity using depth discontinuity analysis*
-
-
-
 ## 实验与关键发现
 
 ### 核心定量结果：4D 铰接物体重建精度
@@ -272,9 +251,6 @@ ArtHOI 在自采集的 **ArtHOI‑RGBD** 数据集上对所有五类物体均取
 
 在无真实深度的野外视频上，**Figure 4** 的定性对比进一步印证了这一优势：ASR 恢复了合理的物体尺度和位姿，而直接调用位姿估计器则出现明显的尺度错误和投影偏移。
 
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2603_25791/figures/008_Figure_4.jpg]]
-*Figure 4: Qualitative comparison of metric scale and pose estimation on in-the-wild videos without ground-truth depth. Images are cropped and zoomed-in for better visualization*
-
 #### MLLM 接触推理提示策略
 
 **Table 6** 对 MLLM 提示策略进行了系统消融。同时引入时序上下文（Temp.）、视角提示（Persp.）、假阳性抑制（MinFP）和深度增强（Depth）四个组件时，接触推理准确率最高、假阳性率最低：在 RSRD 上准确率 88.58%、假阳性率 10.05%；在 ArtHOI‑Wild 上准确率 86.56%、假阳性率 10.61%。移除任一组件均导致性能下降，其中深度增强对抑制假阳性贡献尤为显著——这与 MLLM 提示流程中 Phase C 的深度不连续性验证设计一致（Figure A）。
@@ -299,18 +275,8 @@ ArtHOI 在自采集的 **ArtHOI‑RGBD** 数据集上对所有五类物体均取
 
 以上边界情况的具体定量影响和针对性改进方案需进一步实验验证。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2603_25791/figures/009_Table_5.jpg]]
-*Table 5: Comparison of canonical mesh pose and scale optimization. We compare with FoundationPose and Any6D [28]. Metrics include the IoU between rendered and ground-truth masks under the optimized pose, and the optimization success rate (SR%). A case is considered failed if subsequent part motion reconstruction or HOI alignment cannot proceed*
-
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2603_25791/figures/010_Table_6.jpg]]
 *Table 6: Ablation study on prompting strategies for MLLM contact reasoning, evaluated by accuracy and false positive rate (FP, %). “Temp.” incorporates temporal context from neighboring frames. “Persp.” indicates introducing camera-perspective cues; “MinFP” uses prompts designed to suppress false positives; and “Depth” augments image prompts with colorized depth. Results of ArtHOI-RGBD is excluded due to its near 100% accuracy*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2603_25791/figures/003_Figure_3.jpg]]
-*Figure 3: This gallery showcases the results of our hand-articulated-object reconstruction on three data sources: ArtHOI-RGBD, RSRD and ArtHOI-Wild.(more results in the supp.). The first column shows sampled input frames. We present the camera view and a side view to display the reconstructed HOI meshes. Hand reconstructions for RSRD are produced using the same WiLoR model as ours for a fair comparison. Note that RSRD is unable to process the video from ArtHOI-Wild, as it requires an object surrounding scan that is unavailable for internet videos*
-
-
 
 ## 定位与知识库关联
 
@@ -351,8 +317,6 @@ ArtHOI 的适用边界由其流水线的三个核心模块共同决定：
 5. **多手协同交互**：当前框架假设单手或双手独立与物体交互，MLLM 的接触推理也以单手为单位。对于双手协同操作同一物体（如双手拧开瓶盖）的场景，接触约束的建模和优化策略需要进一步扩展。
 
 6. **深度估计的度量尺度一致性**：ASR 的粗尺度估计依赖反投影深度点云，其精度受限于 Video‑Depth‑Anything/UniDepth 的度量深度质量。在野外视频无真实深度条件下（Figure 4），尺度估计的定性对比虽优于基线，但缺乏定量评估。深度估计的尺度漂移如何影响最终重建精度，仍需系统分析。
-
-
 
 ## 原文 PDF
 

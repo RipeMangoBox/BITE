@@ -51,8 +51,6 @@ MacTok 针对上述瓶颈提出了一个简洁而有效的解决方案。其核�
 
 实验结果表明，MacTok 在极端压缩条件下取得了显著突破。在 ImageNet 256×256 条件生成任务上，MacTok-128 配合 SiT-XL 仅需 128 个 token 即达到 gFID 1.44（w/ CFG），优于使用 1024 token 的 SD-VAE 基线（gFID 2.06）；在 512×512 分辨率上，MacTok-128 以 128 token 实现 gFID 1.52（w/ CFG），较 SD-VAE 的 4096 token 方案（gFID 2.62）提升 1.10，同时 token 用量减少最高达 64 倍。消融实验进一步证实，仅图像 token 掩码（而非隐 token 掩码）能持久防止后验坍塌，且随机掩码与语义掩码的等概率混合在所有配置中取得最优生成质量。
 
-
-
 ### 连续分词中的后验坍塌困境
 
 现代图像生成模型广泛采用两阶段范式：先将图像压缩为低维隐表示（token），再在隐空间训练生成器。连续分词器（continuous tokenizer）——尤其是基于KL-VAE的框架——因其端到端可微、隐空间平滑等优势，成为潜在扩散模型和自回归生成模型的主流选择。然而，当追求极致压缩率（即使用极少的token数）时，这类模型面临一个根本性瓶颈：**后验坍塌（posterior collapse）**。
@@ -79,8 +77,6 @@ MacTok的提出源于一个关键洞察：**后验坍塌的本质是信息瓶颈
 
 这两个机制协同作用：掩码重建创造了信息保留的“刚需”，而语义掩码和表示对齐则确保保留的信息是语义有意义的。最终，MacTok在仅使用128个token（相比SD-VAE的1024个token减少8倍）的情况下，在ImageNet 256×256上实现gFID 1.44（w/ CFG），在512×512上实现gFID 1.52（w/ CFG），达到当时最优水平。
 
-
-
 ## 核心方法与创新机理
 
 MacTok 的核心创新在于通过**信息不对称的掩码重建**与**结构化表示对齐**双机制，从根本上解决了连续分词器在强压缩下的后验坍塌（posterior collapse）问题。与简单增大模型或调整损失权重的传统思路不同，MacTok 将解决路径重新定位在编码器输入端的信息约束和隐空间的结构化上。
@@ -106,8 +102,6 @@ $$L_{\mathrm{RA}} = -\frac{1}{N+1} \left( \sum_{i=1}^N \mathrm{sim}(\mathbf{o}_{
 MacTok 属于连续分词器（continuous tokenizer）家族，其基线包括 **KL-VAE**（plain）、**VA-VAE**、**MAETok**、**SoftVQ-VAE**、**SD-VAE**、**MAR-VAE** 和 **l-DeTok**（Table 3）。与这些方法相比，MacTok 的差异化在于：**将掩码从隐空间移至图像空间**（changed slot: masking_strategy），并**引入 DINOv2 引导的语义掩码与双粒度表示对齐**（changed slot: representation_alignment）。这两个 changed slots 协同作用，使 MacTok 在仅用 128 tokens 时即达到 rFID 0.43，并在 ImageNet 256×256 上以 SiT-XL 实现 gFID 1.44（w/ CFG），在 512×512 上实现 gFID 1.52（w/ CFG），均达到当时最优水平（Table 1, Table 2）。最大掩码比率 $M=0.7$ 时生成性能最佳，继续增大掩码率会轻微损害质量（Table 4），表明存在一个信息压缩与重建难度的最优平衡点。
 
 **需要手动验证**：文中未提供 MacTok 在更大 token 数（如 256、512）下的性能表现，因此该方法在弱压缩场景下的优势尚不明确。此外，随机掩码与语义掩码的最优混合比例（50%）是否跨数据集泛化，仍需进一步实验确认。
-
-
 
 MacTok 的整体框架围绕一个核心矛盾展开：**如何让一个强压缩的连续分词器在仅有极少量隐 token 的情况下，仍然保留足够的判别性信息，从而避免后验坍塌。** 其解决方案由三条相互协同的技术路径构成——输入端的图像掩码、隐空间端的表示对齐，以及输出端的辅助监督——共同形成一个从“信息不对称”到“语义结构化”的完整闭环。
 
@@ -163,8 +157,6 @@ $$L = L_{\mathrm{recon}} + \lambda_{1} L_{\mathrm{percep}} + \lambda_{2} L_{\mat
 1. **掩码 → 信息不对称 → 隐变量信息量提升**：编码器只能看到部分图像，解码器却需重建全部内容，这种信息缺口迫使隐变量编码尽可能多的判别性特征。消融实验（Table 5）表明，仅图像 token 掩码（而非隐 token 掩码）能持久防止后验坍塌，并产生结构良好的隐空间（Figure 1）。
 
 2. **表示对齐 → 隐空间结构化 → 压缩下的语义保真**：通过将隐空间与 DINOv2 的语义空间对齐，即使 token 数极少（如 64 或 128），隐变量仍能保留类别级别的判别性信息，这一点由线性探测准确率随训练持续提升所验证（Figure 6）。
-
-
 
 MacTok 的核心架构由 **ViT 编码器-解码器**、**双重掩码策略**、**表示对齐模块**和**辅助监督**四大组件构成（Figure 4），其设计目标是在极低 token 数（64/128）下防止后验坍塌，同时保持隐空间的语义结构。
 
@@ -222,18 +214,8 @@ $$L = L_{\mathrm{recon}} + \lambda_{1} L_{\mathrm{percep}} + \lambda_{2} L_{\mat
 
 其中权重设置为 $\lambda_1=1.0$，$\lambda_2=0.2$，$\lambda_3=10^{-6}$，$\lambda_4=0.1$。极小的 KL 权重（$10^{-6}$）是防止后验坍塌的关键——过强的 KL 正则化会迫使隐分布趋近无信息先验，而掩码重建与表示对齐提供的结构化信号使得模型即使在弱 KL 约束下也能学到有意义的隐表示。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2603_29634/figures/001_Figure_1.jpg]]
-*Figure 1: Effect of random masking in continuous tokenizers. Left: plain KL-VAE, latent token masking, and image token masking, with only the latter preventing posterior collapse. Right: collapsed latent space shows poor structure, while the uncollapsed one yields well-structured and diverse representations*
-
-![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2603_29634/figures/003_Figure_3.jpg]]
-*Figure 3: Generation performance of MacTok with varying mask ratios sampled up to M as detailed in Sec. 3.2. The orange star corresponds to random and semantic mask with equal probability*
-
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2603_29634/figures/010_Figure_5.jpg]]
 *Figure 5: Visualization of latent space from (a) Collapsed; (b) MacTok-128 trained without representation alignment; (c) MacTok-128*
-
-
 
 ## 实验与关键发现
 
@@ -288,31 +270,15 @@ Figure 5 的可视化表明，无表示对齐的 MacTok 隐空间结构较差，
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2603_29634/figures/005_Table_1.jpg]]
 *Table 1: System-level comparison on ImageNet 256×256 conditional generation. “# Params (G)” denotes generator parameters; “Tok. Model” refers to the tokenizer model type; “Token Type” indicates 1D or 2D tokenization; “# Params (T)” denotes tokenizer parameters; and “# Tokens” represents the number of latent tokens. ‡ denotes methods that rely on pretrained vision models*
 
-![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2603_29634/figures/011_Figure_6.jpg]]
-*Figure 6: Linear probing accuracy (a) of ImageNet-1k val. and generation performance (b) of MacTok with training steps*
-
 ### 失败模式与局限
 
 论文未明确报告失败案例或负面结果。从方法机理推断，MacTok 的性能依赖于 DINOv2 预训练特征的质量，在 DINOv2 表征能力较弱的数据域（如医学影像、遥感图像等与 ImageNet 分布差异较大的场景）上，语义掩码和表示对齐的有效性可能下降。此外，掩码比率和语义掩码比例的最优配置可能随数据集和 token 数变化，需额外调参。这些问题在论文中作为开放问题提出，但未进行实验验证，需在实际应用中手动确认。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2603_29634/figures/006_Table_2.jpg]]
 *Table 2: System-level comparison on ImageNet 512×512 conditional generation. SiT-XL trained with MacTok achieves state-of-the-art generation performance using only 64 and 128 tokens (†: Large decoder for fair comparison; ‡: relies on pretrained vision models)*
 
-![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2603_29634/figures/007_Table_3.jpg]]
-*Table 3: Comparison of continuous tokenizers. MacTok attains a better balance between compression and reconstruction quality, while delivering the best generation performance. All generation results are reported with optimal CFG scales*
-
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2603_29634/figures/009_Table_4.jpg]]
 *Table 4: Ablation on maximum mask ratio M (w/o Decoder Finetuning). MacTok is evaluated over mask ratios from 0.4 to 0.8 and different DINO-guided semantic masking settings: “dino 100%” denotes full use of DINO-guided semantic masking, while “dino 50%” applies random and semantic masking with equal probability. Generation performance is reported without CFG*
-
-![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2603_29634/figures/012_Table_5.jpg]]
-*Table 5: Ablation of different modules (w/ Decoder Fine-tuning). We report the impact of each module on MacTok’s reconstruction and generation performance with optimal CFG scales*
-
-![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2603_29634/figures/013_Figure_7.jpg]]
-*Figure 7: Comparison of different masking strategies of the KL loss curve*
-
-
 
 ## 定位与知识库关联
 
@@ -351,8 +317,6 @@ MacTok 的设计和验证主要集中在以下条件下：
 4. **更大规模验证**：在更高分辨率（如 1024×1024）和更大规模数据集（如 LAION-5B）上，MacTok 的掩码策略是否仍然有效？压缩率与语义保真度的权衡曲线如何变化？
 
 5. **表示对齐的替代方案**：除 DINOv2 外，CLIP、SigLIP 等多模态模型的特征空间是否更适合作为对齐目标？多模态对齐能否进一步提升生成多样性？
-
-
 
 ## 原文 PDF
 

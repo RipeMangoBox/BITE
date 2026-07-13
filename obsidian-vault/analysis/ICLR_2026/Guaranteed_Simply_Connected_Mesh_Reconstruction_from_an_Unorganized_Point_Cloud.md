@@ -55,8 +55,6 @@ claims:
 
 **局限性**方面，当前方法仅保证单连通重建，无法处理更高亏格的拓扑（如环面）；此外，方法依赖全局三角剖分构建，对大规模点云存在计算瓶颈，且初始化阶段在点云极度稀疏或非均匀时可能不准确。未来方向包括通过选择性保留部分谐波分量以支持任意亏格拓扑，以及将该表征与生成模型结合以学习具有可控拓扑的 3D 形状先验。
 
-
-
 ### 从点云到曲面：隐式重建的拓扑盲区
 
 从无组织点云重建三维曲面是计算机图形学与几何处理的核心问题，在医学影像、逆向工程和数字孪生等领域有广泛应用。现有方法——无论是经典的 **Screened Poisson Surface Reconstruction**，还是基于神经隐式场的 **SALD** (Atzmon & Lipman, ICLR 2021)、**OReX** (Sawdayee et al., CVPR 2023) 和 **CrossSDF** (Walker et al., CVPR 2025)——在几何精度上取得了显著进展，但它们共享一个根本性缺陷：**缺乏拓扑控制**。这些方法无法保证输出曲面的拓扑类型，重建结果可能包含孔洞、非流形边或多余的环柄（handles），导致曲面在拓扑上不可靠。
@@ -74,8 +72,6 @@ claims:
 本文的核心洞察是将上述拓扑约束转化为可求解的线性代数问题。具体而言，利用 **Helmholtz-Hodge 分解 (HHD)** 从缠绕数场中提取谐波分量 $\gamma$，该分量编码了曲面的拓扑信息。通过在线性系统中消除 $\gamma$，可以强制 $H^1$ 平凡，从而以代数方式保证输出曲面封闭且单连通。
 
 这一思路将拓扑控制从二维曲线推广到三维曲面，并结合谱初始化与交替鲁棒优化，形成一个完整的重建流水线。其关键优势在于：**拓扑保证是严格的数学结论，而非经验性的启发式约束**。
-
-
 
 ## 核心方法与创新机理
 
@@ -119,8 +115,6 @@ $$\min_{\sigma_T} \sum_{f\in \mathcal{F}} \operatorname{Area}(f) |\Lambda_f|^0$$
 | 优化策略 | 单次重建 | 交替迭代 | 逐步收敛至一致方向场 |
 | 剖分构建 | 纯 Delaunay | 八叉树增强 Delaunay | 改善四面体质量 |
 
-
-
 本文提出一种从无组织点云中重建**保证单连通**的封闭网格表面的方法。整个流水线分为两大阶段：**初始化阶段**和**交替优化阶段**，如 Figure 2 所示。
 
 ![[assets/figures/papers/paper_list_l73_https_openreview_net_forum_id_jjEnTBsffi/figures/002_Figure_2.jpg]]
@@ -159,8 +153,6 @@ $$S = \partial W$$
 - **拓扑控制机制**：区别于现有方法仅追求几何精度，本框架通过 HHD 将拓扑约束（单连通性）转化为可求解的线性代数问题，以代数方式保证拓扑正确性。
 - **鲁棒性保障**：L0 范数优化和交替迭代策略共同作用，使方法对噪声和异常值具有较强鲁棒性。消融实验表明，移除任一组件均会导致重建失败或拓扑错误。
 - **无需法线信息**：与部分基线方法（如 Screened Poisson Surface Reconstruction）不同，本方法仅需点云位置信息，不依赖输入法线。
-
-
 
 ### 核心模块：基于 HHD 的校正表面重建
 
@@ -212,12 +204,8 @@ $$S = \hat{o}_3 W$$
 
 整个重建流程采用**交替优化**：初始化后，核心模块输出当前重建曲面，随后根据该曲面更新有向三角形集合（剔除与当前曲面不一致的面），再重新运行核心模块。这一迭代过程逐步去除异常值，使重建收敛到几何精确且拓扑正确的表面。消融实验表明，去除交替优化、谱初始化或 $L^0$ 鲁棒优化中任一组件，均会导致重建失败或拓扑退化（详见 Figure 5）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l73_https_openreview_net_forum_id_jjEnTBsffi/figures/008_Figure_6.jpg]]
 *Figure 6: Edge weight*
-
-
 
 ## 实验与关键发现
 
@@ -265,18 +253,11 @@ Figure 5 的消融实验系统性地验证了三个核心组件的必要性：
 - **任意亏格扩展**：如何选择性地保留部分谐波分量 γ，使框架能够处理任意亏格拓扑，同时保持可控的拓扑复杂度？
 - **生成模型集成**：如何将该拓扑可控表征与生成模型结合，学习具有指定拓扑特征的 3D 形状先验分布？
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l73_https_openreview_net_forum_id_jjEnTBsffi/figures/001_Figure_1.jpg]]
 *Figure 1: Visual comparison of pulmonary vascular reconstruction. The top row displays the full rendered results, while the bottom row presents corresponding zoomed-in views. From left to right: (a) the input CT scan; (b) the reconstruction of Walker et al. (2025) with 6 connected components and numerous spurious handles; (c) our simply connected reconstruction; and (d) the simply connected ground truth*
 
 ![[assets/figures/papers/paper_list_l73_https_openreview_net_forum_id_jjEnTBsffi/figures/003_Figure_3.jpg]]
 *Figure 3: Qualitative comparisons between our approach and baseline approaches*
-
-![[assets/figures/papers/paper_list_l73_https_openreview_net_forum_id_jjEnTBsffi/figures/007_Figure.jpg]]
-*Figure: (a)*
-
-
 
 ## 定位与知识库关联
 
@@ -331,8 +312,6 @@ Figure 5 的消融实验系统性地验证了三个核心组件的必要性：
 2. **与生成模型结合。** 该表征将拓扑约束编码为线性代数条件，具有可微性潜力。如何将其嵌入生成模型（如扩散模型或神经场），以学习具有可控拓扑的三维形状先验分布，是一个值得探索的方向。
 
 3. **大规模扩展。** 如何通过自适应剖分或局部拓扑约束避免全局三角剖分的计算瓶颈，使方法适用于更大规模的真实扫描数据，仍需进一步研究。
-
-
 
 ## 原文 PDF
 

@@ -61,8 +61,6 @@ claims:
 
 **局限与开放问题**：当前方法依赖数据集特定的物体池进行检索，当目标物体不在池中时需选择相似物体，可能影响重建精度。如何将框架扩展至开放词汇物体类别或任意真实场景下的交互理解，是后续研究的重要方向。
 
-
-
 ### 问题背景：三维人-物交互理解的双重需求
 
 理解人类与物体在三维空间中的交互（Human-Object Interaction, HOI）是计算机视觉与具身智能的核心挑战之一。一个完整的HOI理解系统需要同时具备两种能力：**重建（Reconstruction）**——从单张RGB图像中恢复人体姿态、物体位姿及二者之间的空间关系；**生成（Generation）**——基于当前状态预测未来的人体运动序列，使交互过程在物理和语义层面均保持合理。这两项任务并非孤立存在：重建为生成提供几何真实的状态锚点，生成则为重建注入关于交互意图与物理合理性的语义先验。
@@ -85,8 +83,6 @@ claims:
 本文的核心洞察是：**重建与生成可以且应当在统一的接触推理空间中相互增强**。生成提供语义与物理合理性先验，重建提供几何真实观测基础，二者协同可同时提升接触预测、重建精度与运动生成质量。
 
 基于此，我们提出**ReGenHOI**——一个将三维HOI重建与生成统一于共享语义-几何潜在空间的框架。该框架的核心在于通过**3D接触推理（3D Contact Reasoning）**与**结构化推理轨迹机制（Reasoning Trace Mechanism）**，直接在三维空间中对人体-物体接触进行建模，并将其作为支配重建与生成的因果中间表示。这一设计使得接触推理成为调控重建准确性与生成合理性的关键“旋钮”，从根本上弥合了重建与生成之间的方法论鸿沟。
-
-
 
 ## 核心方法与创新机理
 
@@ -119,8 +115,6 @@ $$\mathcal{L}_{\mathrm{reason}} = \| \Phi_{\mathrm{geo}} - \Phi_{\mathrm{sem}} \
 ### 创新因果链
 
 上述四个创新形成清晰的因果链：**共享潜在空间**提供跨任务表示基础 → **3D 接触推理**在统一空间中生成核心中间表示 → **推理轨迹机制**迭代优化接触质量 → **扩散桥细化**消除穿透、确保物理一致性。这条因果链使重建获得语义普适性、生成获得几何一致性，最终在 DAMON 接触预测（F1 78.4，超越 DECO/InteractVLM 2.8 分）、PICO 重建（PA-CDh 5.42）和 FullBodyManipulation/BEHAVE 运动生成（HandJPE、MPJPE、FID 全面领先 SemGeoMo）等多项基准上取得最优结果。
-
-
 
 ReGenHOI 的核心设计理念是将三维人-物交互（HOI）的重建与生成统一在**共享的语义-几何潜在空间**中，使两个任务共享空间推理与接触建模能力。整个框架由一条**统一编码器-解码器**主线串联，并在关键节点引入**3D 接触推理**与**扩散桥细化**，形成从图像到三维配置（重建）或运动序列（生成）的端到端通路。
 
@@ -179,15 +173,8 @@ $$\mathcal{L}_{\mathrm{LLM}} = \lambda_c \mathcal{L}_{\mathrm{contact}} + \lambd
 
 整体 pipeline 的信息流可概括为：**单张 RGB 图像 → 统一潜在空间编码 → 3D 接触推理（含 RTM 迭代细化）→ 分支解码（重建三维配置 / 自回归生成运动序列）→ 扩散桥接触细化 → 最终输出**。这一设计使接触推理成为贯穿重建与生成的因果调控节点，实现了“重建提供几何真实观测基础、生成提供语义与物理合理性先验”的协同效应。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l971_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_ReGenHOI_Unifying_R/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our unified framework for reconstruction and generation. It consists of Unified Latent Space Encoding, Reconstruction module and Generation module. For clarity, the arrows representing the reconstruction and generation processes are distinguished using black and yellow colors, respectively*
-
-![[assets/figures/papers/paper_list_l971_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_ReGenHOI_Unifying_R/figures/001_Figure_1.jpg]]
-*Figure 1: The understanding of human–object interaction should encompass both reconstruction and generation. (a) demonstrates the ability of our method to reconstruct interaction states from images, while (b) illustrates its capability to generate interaction sequences*
-
-
 
 ReGenHOI 的核心在于通过**统一的语义-几何潜在空间**与**3D 接触推理**，将重建与生成任务耦合为一个共享框架。以下按流水线模块依次展开关键公式与变量含义。
 
@@ -249,8 +236,6 @@ $$\mathcal{L}_{\mathrm{bridge}} = \lambda_p \| \mathcal{H}_T - \mathcal{H}^* \|_
 
 上述模块形成闭环：统一编码器输出共享潜在表示 $z$，3D 接触推理与 RTM 在潜在空间中生成接触概率场，该场同时馈入重建解码器和生成解码器；GBDB 对重建结果进行后细化，其 SDE 漂移项中的形状先验与法向约束直接继承自接触推理阶段的几何输出。训练时 $\mathcal{L}_{\mathrm{reason}}$ 保证推理轨迹的跨阶段一致性，$\mathcal{L}_{\mathrm{bridge}}$ 保证细化结果的几何精度，二者共同维护共享潜在空间的语义-几何对齐。
 
-
-
 ## 实验与关键发现
 
 ### 主要结果
@@ -282,12 +267,6 @@ $$\mathcal{L}_{\mathrm{bridge}} = \lambda_p \| \mathcal{H}_T - \mathcal{H}^* \|_
 - **FullBodyManipulation**：HandJPE 26.91，MPJPE 16.28，FID 1.02（Table 4）
 - **BEHAVE**：HandJPE 27.35，MPJPE 16.00，FID 1.38（Table 5）
 
-![[assets/figures/papers/paper_list_l971_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_ReGenHOI_Unifying_R/figures/008_Table_4.jpg]]
-*Table 4: HOI motion generation results on the FullBodyManipulation dataset [31]*
-
-![[assets/figures/papers/paper_list_l971_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_ReGenHOI_Unifying_R/figures/009_Table_5.jpg]]
-*Table 5: HOI motion generation results on the BEHAVE dataset [3]*
-
 定性结果（Figure 4）表明，该方法生成的接触区域更加真实，这得益于生成解码器与重建解码器共享同一语义-几何潜在空间，使得生成过程能够继承来自重建分支的几何一致性约束。
 
 ![[assets/figures/papers/paper_list_l971_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_ReGenHOI_Unifying_R/figures/007_Figure_4.jpg]]
@@ -306,8 +285,6 @@ Table 3中的消融实验揭示了三个关键模块的因果效应：
 ### 局限性
 
 该方法依赖数据集特定的物体池进行物体检索。当目标物体不在预定义池中时，需选择相似物体替代，可能影响重建精度。此外，接触标签通过弱监督DECO生成，标注质量可能对接触精度构成上限约束。
-
-
 
 ## 定位与知识库关联
 
@@ -358,8 +335,6 @@ $$d \mathcal{H}_t = -\alpha \nabla \varphi(\mathcal{H}_t) dt - \lambda_1 \nabla 
 ### 知识库定位总结
 
 ReGenHOI 在HOI理解的知识谱系中占据了“统一重建-生成”的关键节点。其方法论贡献——原生3D接触推理、结构化推理轨迹、共享潜在空间——为后续研究提供了可复用的技术组件。未来工作可沿两个方向推进：一是突破物体池限制，实现开放场景下的物体检索与交互理解；二是将接触推理机制扩展至多人与多物体交互场景。
-
-
 
 ## 原文 PDF
 

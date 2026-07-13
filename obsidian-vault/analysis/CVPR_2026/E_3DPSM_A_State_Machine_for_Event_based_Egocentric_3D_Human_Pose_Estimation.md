@@ -68,8 +68,6 @@ E-3DPSM 在两个自我中心事件三维姿态估计基准 **EE3D-R** 和 **EE3
 
 消融实验进一步证实：移除 SSM 模块导致精度和光滑度严重下降；用简单加法取代学习型融合会导致严重漂移；连续状态演化（不重置内部状态）优于定期重置策略，证明模型学会了自我调节。
 
-
-
 ### 事件相机与自我中心三维姿态估计
 
 自我中心三维人体姿态估计旨在从穿戴于人体的单一相机中恢复三维关节位置，是增强现实、具身智能和运动分析等应用的核心感知能力。传统基于帧的 RGB 相机在高速运动下存在运动模糊，且对光照变化敏感，在可穿戴场景中面临严峻挑战。事件相机通过异步记录每个像素的对数强度变化，仅在变化超过阈值 $C$ 时产生事件
@@ -99,8 +97,6 @@ Figure 1 直观对比了两种范式：先前方法的帧缓冲区机制仅保�
 
 这些需求共同构成了 E-3DPSM 的设计动机：**构建一个连续状态机，将事件驱动的自我中心三维人体姿态估计从“逐帧回归”转变为“状态演化与融合”**，在保持实时性的同时显著提升三维精度和时间稳定性。
 
-
-
 ## 核心方法与创新机理
 
 E-3DPSM 的核心创新在于将事件驱动的自我中心三维人体姿态估计重新定义为**连续时间动态过程**，从根本上改变了先前方法（如 EventEgo3D、EventEgo3D++）仅通过上一事件帧缓冲区进行短暂时序建模的范式。这一转变体现在三个紧密耦合的 changed slots 上。
@@ -122,8 +118,6 @@ $$\mathbf{P}_t = \mathbf{X}_t + \mathbf{K}_t \cdot (\mathbf{P}_t^{\text{D}} - \m
 先前方法依赖预测二维热图和事件分割掩码作为辅助任务，这不仅引入了量化误差，还迫使模型在二维空间中进行不必要的信息压缩。E-3DPSM 完全移除了这些显式二维中间表示，改为通过 SPEM 中的多阶段卷积编码、可变形注意力和关节查询 Transformer 解码器直接学习关节特定的时空特征。这一简化使模型能够端到端地优化三维目标，同时可变形注意力（通过可学习参考点 $\mathbf{R}_s$ 自适应聚焦于关节关键区域）有效补偿了鱼眼镜头的空间畸变——移除该模块导致 MPJPE 升至 89.00，PA-MPJPE 升至 66.30（Table 3）。
 
 三个 changed slots 的协同效应在整体性能上得到验证：E-3DPSM 在 EE3D-R 基准上将 MPJPE 降低约 19%（从 103.28 降至 81.32），PA-MPJPE 降低约 22%，时间抖动降低约 2.7 倍（Table 1）。
-
-
 
 E-3DPSM 将单目鱼眼事件相机下的自我中心三维人体姿态估计重新定义为**连续的事件驱动状态演化过程**。其核心洞察在于：事件相机天然记录“变化”，因此三维空间中应存在与之对应的关节位移变化。基于这一思想，整个 pipeline 由三个紧密衔接的阶段构成（Figure 2），从前端事件流到后端时序融合，形成一条端到端的可学习推理链。
 
@@ -194,13 +188,6 @@ $$\mathcal { L } _ { \mathrm { t o t a l } } = \lambda _ { \mathrm { 3 D } } \ma
 ### 推理模式
 
 E-3DPSM 支持两种推理模式：**非因果模式**（Non-Causal）利用双向 SSM 捕获完整时序上下文，获得最优精度；**因果模式**（Causal）仅使用过去信息，适用于实时应用。非因果训练在因果推理下仍优于纯因果训练（MPJPE 降低 5.43 mm, Table 7），表明利用未来上下文进行训练能增强特征学习质量。在单块 NVIDIA A6000 上，E-3DPSM 可实现约 80 Hz 的实时三维姿态更新率（Table 5），并在便携设备 Jetson Orin Nano 上达到约 30 Hz（Figure 7）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1014_https_arxiv_org_abs_2604_08543/figures/001_Figure_1.jpg]]
-*Figure 1: Rethinking event-based egocentric 3D human pose estimation. (a) Previous methods [25, 26] capture temporal information only through a single previous event frame stored in the frame buffer leading to jitter and drift. (b) Our E-3DPSM approach models motion as a continuous event-driven state evolution, fusing delta and direct 3D human pose updates, thereby achieving real-time and temporally stable 3D reconstruction and significantly outperforming prior approaches in the 3D accuracy*
-
-
 
 ### 问题形式化与事件表示
 
@@ -276,15 +263,8 @@ $$\mathcal{L}_{\mathrm{total}} = \lambda_{\mathrm{3D}}\mathcal{L}_{\mathrm{3D}} 
 2. **学习型融合 vs. 简单加法**：若用 $\mathbf{P}_t = \mathbf{P}_{t-1} + \mathbf{P}_t^{\Delta}$ 替代 Kalman 融合（式 11），会导致误差随序列长度快速累积漂移；学习型融合通过自适应增益 $\mathbf{K}_t$ 有效抑制了该漂移（图 6）。
 3. **非因果训练**：双向 SSM 在训练时利用未来上下文增强特征学习，即使推理时切换为因果模式仍优于纯因果训练（MPJPE 降低 5.43 mm，Table 7）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1014_https_arxiv_org_abs_2604_08543/figures/003_Figure_3.jpg]]
 *Figure 3: Architecture of SPEM, combining multi-stage convolutional encoding, SSM blocks, deformable attention, and a jointquery decoder for temporally-aware pose features*
-
-![[assets/figures/papers/paper_list_l1014_https_arxiv_org_abs_2604_08543/figures/009_Figure_6.jpg]]
-*Figure 6: Pose drift over time. Comparison of learned fusion (Eq. (15)), direct pose only (Eq. (8)), and naive fusion (Eq. (11)) across temporal sequence length. Naive fusion leads to rapidly increasing drift, whereas our learned fusion effectively mitigates this drift, maintaining stable accuracy over time*
-
-
 
 ## 实验与关键发现
 
@@ -343,22 +323,6 @@ Figure 9 展示了三类典型失败场景：
 
 此外，突发的光照变化（如闪烁效应）在快速复杂运动中可能导致暂时的时序不稳定。当前方法依赖有监督的三维标注数据，尚未探索无监督或自监督范式。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1014_https_arxiv_org_abs_2604_08543/figures/007_Table_2.jpg]]
-*Table 2: Occlusion-only quantitative comparison on EE3D-R and EE3D-W. Evaluation is performed only on occluded joints*
-
-![[assets/figures/papers/paper_list_l1014_https_arxiv_org_abs_2604_08543/figures/010_Table_7.jpg]]
-*Table 7: Training strategy ablation on the EE3D-R dataset. We compare causal (forward) vs. non-causal (bidirectional) training and different sequence lengths used during training*
-
-![[assets/figures/papers/paper_list_l1014_https_arxiv_org_abs_2604_08543/figures/011_Table_4.jpg]]
-*Table 4: Comparison with Kalman-smoothed baselines on the EE3D-R dataset. We apply inference-time Kalman filtering (KF) to prior methods to rule out post-hoc smoothing as the main reason for improvements. Our method achieves substantially lower MPJPE and*
-
-![[assets/figures/papers/paper_list_l1014_https_arxiv_org_abs_2604_08543/figures/015_Table_8.jpg]]
-*Table 8: Inference-time ablation on the EE3D-R dataset comparing different strategies for resetting internal states. We evaluate resetting the SSM block states, resetting the Kalman fusion states, and using continuous state evolution without resets (ours)*
-
-
-
 ## 定位与知识库关联
 
 ### 问题定位：从帧缓冲到连续状态机
@@ -411,8 +375,6 @@ E-3DPSM 与 EventEgo3D/EventEgo3D++ 的本质差异不在于网络规模或训�
 3. **连续状态机范式的扩展**：能否将连续状态机范式扩展到以事件为中心的全身运动重建（包括手指、面部）或多模态（事件+IMU）设置？这将是验证该方法通用性的重要方向。
 
 4. **实时部署的进一步优化**：当前模型在 Jetson Orin Nano 上达到约 30 Hz，虽已满足实时需求，但进一步降低计算开销将有助于在更低功耗设备上的部署。
-
-
 
 ## 原文 PDF
 

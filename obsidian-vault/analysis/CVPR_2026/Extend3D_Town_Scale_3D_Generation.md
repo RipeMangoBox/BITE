@@ -55,8 +55,6 @@ Extend3D 的核心洞察是：**沿 x/y 方向扩展潜在空间，并将其划�
 
 方法的主要局限包括：对单目深度估计器精度的依赖、欠噪 SDEdit 迭代次数在几何完整性与细节保留间的权衡，以及街景图像中 x/y 坐标显著尺度不匹配时的处理困难。
 
-
-
 ### 对象中心 3D 生成模型的固有局限
 
 近年来，以 **Trellis** (Xiang et al., CVPR 2025)、**Hunyuan3D-2.1** (Zhao et al., arXiv 2025) 为代表的对象中心 3D 生成模型取得了显著进展，能够从单张图像或文本生成高质量的三维物体。然而，这些模型的潜在空间尺寸是固定的（稀疏结构为 $N \times N \times \tilde{N}$，结构化潜变量为 $[M]^3$），这一设计从根本上限制了它们对多物体、大范围场景的表达能力。当面对城市场景规模的生成需求时，固定潜在空间无法容纳足够的几何与纹理细节，导致生成结果出现物体缺失、结构破碎等问题。
@@ -72,8 +70,6 @@ Extend3D 的核心洞察是：**沿 x/y 方向扩展潜在空间，并将其划�
 ### 核心动机：扩展而非替换
 
 本文的核心动机在于：**不重新训练大场景 3D 生成模型，而是通过扩展对象中心模型的潜在空间来突破其规模限制**。这一思路的关键洞察是——对象中心模型已经学会了丰富的 3D 先验知识，问题不在于模型能力不足，而在于其潜在空间的物理尺寸限制了输入范围。因此，沿 x/y 方向扩展潜在空间，并将扩展后的空间划分为重叠块进行耦合去噪，能够在保留对象中心模型强大先验的同时，实现城市场景规模的协同生成。此外，引入单目深度估计提供的点云先验进行欠噪 SDEdit 初始化，可以弥补对象中心模型对遮挡区域和大范围结构的感知偏差，从而在免训练的条件下实现大规模 3D 场景的高质量生成。
-
-
 
 ## 核心方法与创新机理
 
@@ -126,8 +122,6 @@ Extend3D 属于**免训练的大规模 3D 场景生成**方法，其核心思路
 - **对象中心基线**（**Trellis**, Xiang et al., CVPR 2025; **Hunyuan3D-2.1**, Zhao et al., arXiv 2025）：潜在空间固定，无法处理多物体场景；Extend3D 通过扩展潜在空间和重叠块流突破了这一限制。
 - **训练无关的场景生成方法**（**EvoScene**, Zheng et al., arXiv 2025; **SynCity**, Zheng et al., arXiv 2025）：同样免训练，但 EvoScene 依赖迭代式物体放置，SynCity 面向文本条件生成；Extend3D 则从单张图像出发，通过欠噪 SDEdit 初始化和每步优化实现了更精确的图像条件对齐与几何保真度。
 
-
-
 Extend3D 是一个免训练的大规模 3D 场景生成流水线，其核心目标是解决对象中心 3D 生成模型在城市场景规模下的根本瓶颈：固定潜在空间尺寸无法容纳多物体、大范围场景的细节表达。该流水线由两个级联阶段构成——**稀疏结构生成**与**结构潜变量生成**，二者共享一个关键机制：将潜在空间沿 x 和 y 方向扩展，并通过重叠块耦合去噪实现局部细节的协同生成。
 
 ### 流水线总览
@@ -164,12 +158,8 @@ $$\pmb{v}(\mathbf{Z}_t, \mathcal{T}, t) = \sum_{i,j} \phi_{i,j}^{-1}\big(\pmb{v}
 
 该流水线无需针对场景数据进行额外训练，仅依赖预训练的对象中心 3D 生成模型（如 Trellis 的稀疏结构生成器和 Hunyuan3D-2.1 的 SLAT 生成器），通过潜在空间扩展和先验引导实现了从对象到城市场景的规模跨越。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2482_https_arxiv_org_abs_2603_29387/figures/002_Figure_2.jpg]]
 *Figure 2: An overall pipeline of our Extend3D. Extend3D consists of two parts: sparse structure generation and structured latent generation. In the denoising part of both steps, an overlapping patch-wise flow was used (Sec. 4.1 and Fig. 3). In sparse structure generation, iterative SDEdit is used to initialize the structure (Sec. 4.2). Vector fields in both steps are optimized with priors (Sec. 4.3)*
-
-
 
 Extend3D 的核心由四个模块构成，它们共同解决了将对象中心 3D 生成模型扩展至城市场景规模的核心瓶颈：固定潜在空间无法容纳多物体、大范围场景的细节。
 
@@ -213,16 +203,11 @@ $$\mathcal{L}_{\mathrm{SLAT}} = \mathrm{LPIPS}(\hat{\mathcal{T}}, \mathcal{T}) -
 
 消融实验（Table 5）表明，初始化与优化模块的组合使所有指标大幅提升：LPIPS 从 0.606 降至 0.240，F-score 从 0.261 升至 0.694。移除任一模块会导致场景破碎或地板消失（Figure 7 (C)）。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
 
 Extend3D 在人类偏好研究和定量指标上均显著优于现有方法。人类偏好研究（Table 1）邀请 10 名参与者对 14 个场景进行评分，Extend3D 在几何合理性（Geometry）、图像忠实度（Faithfulness）、外观质量（Appearance）和场景完整性（Completeness）四个维度上均取得最高胜率。与最强的训练无关大场景生成方法 **EvoScene**（Zheng et al., arXiv 2025）相比，Extend3D 在完整性维度上胜率达到 87.1%，在几何维度上同样为 87.1%；与对象中心方法 **Trellis**（Xiang et al., CVPR 2025）和 **Hunyuan3D-2.1**（Zhao et al., arXiv 2025）相比，优势更为显著（Table 1）。
-
-![[assets/figures/papers/paper_list_l2482_https_arxiv_org_abs_2603_29387/figures/005_Table_1.jpg]]
-*Table 1: Human preference win rate (%) of our method*
 
 定量评估（Table 2）在 100 张多样化输入图像（来源包括 ChatGPT、Flux、CarlaSC、Google Earth 和 UrbanScene3D）上进行。Extend3D 在所有外观指标上取得最佳结果：LPIPS 降至 0.240（Trellis 为 0.650，降幅达 0.410），SSIM 升至 0.611（Trellis 为 0.239，提升 0.372），PSNR 达到 20.4。在 UrbanScene3D 的 45 对图像-网格数据上评估几何质量，Extend3D 的 F-score（阈值 0.05）达到 0.694，远超 EvoScene 的 0.498（提升 0.196）。
 
@@ -256,9 +241,6 @@ Extend3D 在人类偏好研究和定量指标上均显著优于现有方法。�
 
 Table 7 报告了各方法的计算成本。Extend3D 作为免训练方法，无需针对场景生成进行额外训练，计算开销主要来自推理阶段的扩展潜在空间去噪和每步优化。具体数值需查阅原文 Table 7。
 
-![[assets/figures/papers/paper_list_l2482_https_arxiv_org_abs_2603_29387/figures/014_Table_7.jpg]]
-*Table 7: Computational costs of 3D generation methods*
-
 ### 失败模式与局限性
 
 1. **深度估计依赖**：Extend3D 依赖单目深度估计器（MoGe-2）获取点云先验，深度估计的误差会直接传播到初始化和优化阶段，影响最终几何质量。
@@ -269,24 +251,8 @@ Table 7 报告了各方法的计算成本。Extend3D 作为免训练方法，无
 
 Figure 17 展示了 Extend3D 生成的大规模场景结果，验证了方法在城市场景规模（town-scale）下的可扩展性。通过调整扩展因子 $a$ 和 $b$，用户可以根据输入图像的宽高比灵活控制生成场景的空间范围。
 
-![[assets/figures/papers/paper_list_l2482_https_arxiv_org_abs_2603_29387/figures/027_Figure_17.jpg]]
-*Figure 17: The large scale result of Extend3D. We generated large scale*
-
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2482_https_arxiv_org_abs_2603_29387/figures/011_Figure_7.jpg]]
 *Figure 7: Ablation study. All the images, except for the ablation of under-noising, are taken from the input image camera viewpoint. We set*
-
-![[assets/figures/papers/paper_list_l2482_https_arxiv_org_abs_2603_29387/figures/012_Table_5.jpg]]
-*Table 5: Ablation study on prior initialization and optimization*
-
-![[assets/figures/papers/paper_list_l2482_https_arxiv_org_abs_2603_29387/figures/013_Table_4.jpg]]
-*Table 4: Ablation study for varying division factor d*
-
-![[assets/figures/papers/paper_list_l2482_https_arxiv_org_abs_2603_29387/figures/015_Table_8.jpg]]
-*Table 8: Ablation study on varying number of iterations*
-
-
 
 ## 定位与知识库关联
 
@@ -313,8 +279,6 @@ Extend3D 的适用性受以下因素制约：
 ### 开放问题
 
 论文明确指出了两个待解决的问题：一是如何处理街景图像中 x 和 y 坐标的显著尺度不匹配，二是如何进一步改善遮挡区域的补全质量。前者可能需要引入非均匀的潜在空间扩展策略或自适应分块机制，后者则可能通过更强的几何先验（如多视图深度估计）或更精细的优化策略来解决。
-
-
 
 ## 原文 PDF
 

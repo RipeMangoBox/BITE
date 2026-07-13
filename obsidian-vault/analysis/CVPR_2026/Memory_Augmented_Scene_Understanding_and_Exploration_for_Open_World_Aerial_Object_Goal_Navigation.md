@@ -158,8 +158,6 @@ OctMem-Agent 是一个面向开放世界空中目标导航的记忆增强框架�
 
 OctMem-Agent 基于OpenVLA框架构建，并使用与OpenFly相同的预训练权重进行初始化，确保了与基线方法的公平比较。
 
-### 补充图表
-
 OctMem-Agent 围绕三个关键模块构建：**自适应八叉树记忆**、**指令引导记忆查询**和**动作生成与记忆集成**。下面依次剖析各模块的机制及其核心公式。
 
 ### 3.1 问题形式化
@@ -250,8 +248,6 @@ OctMem-Agent 基于 **OpenVLA** 框架构建，并与 **OpenFly**（Gao et al., 
 ### 小结
 
 OctMem-Agent 通过自适应八叉树记忆与指令引导查询的协同设计，在 UAV-ON 基准上以 19.50% 的 SR 刷新了开放世界空中目标导航的最优结果。消融实验清晰表明，记忆机制贡献了约 3.3 个百分点的 SR 增益，而指令引导查询在此基础上进一步贡献约 3.8 个百分点的 SR 提升和 8.2 个百分点的 OSR 提升，是方法性能跃升的关键杠杆。层次化空间聚合以较小的计算代价提供了额外的探索效率改进。然而，绝对性能仍有巨大提升空间，深度估计鲁棒性、真实世界部署和动态环境适应是后续研究需要重点突破的方向。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2042_https_openaccess_thecvf_com_content_CVPR2026_html_Zhou_Memory_Augmented/figures/003_Table_1.jpg]]
 *Table 1: Performance comparison on the UAV-ON benchmark across different target object sizes. Our OctMem-Agent achieves the highest success rates across all object sizes and surpasses all baselines in total performance*

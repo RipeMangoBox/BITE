@@ -60,8 +60,6 @@ claims:
 
 **局限与开放问题**：扩散先验初始化在严重自遮挡下可能产生不完整几何；方法依赖初始骨骼图的提供，骨骼噪声会影响变形质量；对于非关节物体或缺乏明显骨骼结构的动态目标不适用。未来方向包括：利用类别特定先验（如人体/动物模型）进一步提升精度、从稀疏图像中自动估计骨骼图、结合预训练视频扩散模型增强运动插值的真实感。
 
-
-
 ### 问题背景：从密集观察到稀疏视角的4D重建
 
 动态场景的4D重建——即在时间维度上恢复物体的完整3D几何与外观——是计算机视觉和图形学中的核心问题，其应用涵盖AR/VR、电影制作和数字孪生等领域。传统方法通常依赖密集的多视角视频或单目长序列，假设相邻帧之间具有较小的视角变化和丰富的时间对应信息。然而，在真实场景中，我们往往只能获得**稀疏的时间观察**：每个时间步可能仅有一张从任意视角拍摄的图像，且相邻帧之间的视角差异可能极大。这种“稀疏视角+大视角变化”的配置使得建立可靠的时间对应关系变得极其困难，现有方法在此条件下重建质量严重下降。
@@ -87,8 +85,6 @@ claims:
 本文的核心洞察是：对于关节物体（如人体、动物、机械臂），其运动本质上是由底层骨骼的关节旋转驱动的。如果我们能够将变形场**分解**为两部分——仅让粗糙的关节姿态估计依赖时间，而让皮肤权重校正和细节变形在规范空间中学习且与时间无关——那么即使只有稀疏的时间监督，模型也能通过骨骼结构的强先验恢复出连续的关节运动，并在未见过的中间时间步实现平滑插值。
 
 基于此动机，本文提出 **SV-GS（Skeleton-View Gaussian Splatting）**，一种骨骼驱动的高斯泼溅框架。该方法以第一帧的粗糙骨骼图和初始静态3D重建为输入，仅需每个时间步一张任意视角的稀疏图像，即可重建出高质量的连续4D动态场景。
-
-
 
 ## 核心方法与创新机理
 
@@ -123,12 +119,7 @@ SV-GS 的核心创新在于将动态场景的变形场显式分解为**时间依
 
 SV-GS 处于**骨骼驱动动态重建**与**3D Gaussian Splatting**的交汇点。与 **SK-GS** (Wan et al., NeurIPS 2024) 的自动骨骼提取不同，SV-GS 接受显式的骨骼图作为输入，将问题聚焦于稀疏观察下的运动建模。与 **RigGS** (Yao et al., CVPR 2025) 的稀疏控制点骨架估计相比，SV-GS 的时间依赖性解耦设计使其在仅11帧的极端稀疏条件下仍能保持结构完整性。在知识库定位上，该方法为“结构先验引导的少样本动态重建”提供了新的范式：通过将时间依赖压缩到最小必要组件，使模型能够从稀疏的时间快照中泛化出连续的4D表示。
 
-
-
 SV-GS 的整体 pipeline 围绕一个核心设计原则展开：**将变形场分解为时间依赖的粗运动估计和与时间无关的细粒度校正**，从而在稀疏时间监督下实现连续的 4D 重建。如图 Figure 3 所示，系统接收三类输入并依次通过五个关键模块完成动态重建。
-
-![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2601_00285/figures/003_Figure_3.jpg]]
-*Figure 3: Given canonical 3D Gaussians and an input skeleton, SV-GS first predicts time-dependent joint poses, regularized with*
 
 ### 输入配置
 
@@ -140,9 +131,6 @@ SV-GS 的整体 pipeline 围绕一个核心设计原则展开：**将变形场�
 1. **稀疏时间观察**：一组带姿态的 RGB 图像 $\mathcal{T} = \{I_t\}_{t \in [0,1]}$，每个时间步仅提供**单张任意视角**的图像，帧数可比原始序列少 20 倍（Figure 1）。
 2. **骨骼结构先验**：仅在首帧提供带注释的骨骼图 $\mathcal{F}$，指定 $J$ 个关节的 3D 位置及父子连接关系。
 3. **初始静态重建**：规范空间下的 3D 高斯表示 $\mathcal{G}$，可通过多视图图像或预训练的图像到 3D 扩散模型获得。
-
-![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2601_00285/figures/001_Figure_1.jpg]]
-*Figure 1: We study the problem of 4D reconstruction from sparse observations. Our method takes the following as input: (a) A set of posed RGB images of an articulated target, captured at sparse time steps (up to 20x fewer than existing methods) from arbitrary viewpoints; (b) An annotated skeleton graph only at the first frame; (c) An initial static 3D reconstruction, derived either from multi-view images or a pre-trained image-to-3D diffusion model. Our goal is to produce a continuous 4D reconstruction of the dynamic target*
 
 ### Pipeline 模块与数据流
 
@@ -176,8 +164,6 @@ $$\hat{\mu_{i}^{t}} = \mu_{i}^{t} + MLP_{\Psi}(\gamma(\mu_{i}), \mathbf{R}^{t})$
 ### 关键设计决策
 
 整个框架的核心洞察在于**时间依赖性的最小化**：仅 $MLP_{\Theta}$ 直接接收时间信号，$MLP_{\Phi}$ 和 $MLP_{\Psi}$ 均在规范空间中定义且网络参数不随时间变化。这种分解使得模型在仅 11 帧的稀疏监督下，仍能通过骨骼结构的强先验约束学习到连贯的关节运动，并在未见时间步上实现平滑插值——这是现有方法（如 4DGS、SK-GS、RigGS）在同等稀疏条件下无法做到的（Figure 4）。
-
-
 
 SV-GS 的核心思路是将动态场景的变形场分解为**时间依赖的粗运动**与**时间无关的细粒度校正**两个层次，从而在稀疏时间监督下实现平滑的运动插值。整个流程围绕五个关键模块展开。
 
@@ -236,8 +222,6 @@ $$\mathcal{L}_{detail} = \frac{1}{N} \sum_{i}^{N} \| MLP_{\Psi}(\gamma(\mu_{i}),
 
 消融实验（Table 4）验证了各组件的必要性：移除细节变形场 MLP_Ψ 导致 PSNR 从 27.75 降至 26.65，SSIM 从 0.950 降至 0.931；移除皮肤校正场 MLP_Φ 使 PSNR 降至 27.25，SSIM 降至 0.943；移除运动正则化 $\mathcal{L}_{motion}$ 则使 PSNR 降至 27.33，SSIM 降至 0.945，并引入关节姿态噪声（Figure 10）。
 
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -285,22 +269,6 @@ Figure 4 的定性对比揭示了基线方法的典型失败模式：在 D-NeRF 
 
 ![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2601_00285/figures/011_Figure_8.jpg]]
 *Figure 8: Comparison of all methods without access to multi-view images at the initial time step. Despite using only 11 sparse input, our method reconstructs motion and preserves object structure more faithfully, whereas baselines are prone to artifacts under self-occlusion and sparse supervisions*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2601_00285/figures/006_Table_1.jpg]]
-*Table 1: Quantitative results on the D-NeRF dataset [40] downsampled at 0.1 intervals, yielding 11 frames per motion sequence. We report the average metrics across all test cases / the mean over the worst-performing test case of each scene. † indicates method initialized with the same skeleton input as ours*
-
-![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2601_00285/figures/010_Table_2.jpg]]
-*Table 2: Results on the DG-Mesh dataset [20] downsampled at 0.05 and 0.1 intervals. We present the average across all test cases / the mean over the worst-performing test case of each scene*
-
-![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2601_00285/figures/009_Table_3.jpg]]
-*Table 3: Results on the real-world ZJU-MoCap dataset. Note that existing methods are trained with full monocular video sequences, whereas our method uses only 10× and 5× fewer frames*
-
-![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2601_00285/figures/007_Figure_7.jpg]]
-*Figure 7: Qualitative result on the real-world ZJU-MoCap dataset. We use only 1/10 of the original video frames, where each frame is sampled from an arbitrary training viewpoint at that time step*
-
-
 
 ## 定位与知识库关联
 
@@ -350,8 +318,6 @@ SV-GS 处于**骨骼驱动动态重建**和**稀疏视角重建**的交叉点。
 2. **骨骼自动估计**：当前方法依赖人工标注的骨骼图，如何从稀疏图像中自动估计骨骼结构是一个实用的扩展方向。
 3. **视频扩散先验**：结合预训练视频扩散模型来进一步提升运动插值的真实感，特别是在极度稀疏（如仅 3-5 帧）的场景下。
 4. **多目标与交互场景**：当前方法针对单个关节目标，扩展到多目标交互场景需要处理骨骼间的物理约束和遮挡关系。
-
-
 
 ## 原文 PDF
 

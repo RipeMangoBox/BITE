@@ -183,11 +183,6 @@ $$m G(\mathbf{z}) \ddot{\mathbf{z}} + C(\mathbf{z}, \dot{\mathbf{z}}) + \nabla_{
 
 框架的关键设计在于**将物理模拟从显式的三维几何空间迁移到学习到的潜在空间**。这一迁移带来三个优势：(1) 潜在空间的低维性天然抑制了非物理的高频抖动；(2) 拉格朗日力学在广义坐标上的通用性使得框架无需针对不同对象类别设计不同的物理模型；(3) 整个 pipeline 的训练仅需4D几何轨迹作为监督信号，完全消除了对物理参数标注或动作标注的依赖。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l969_https_openaccess_thecvf_com_content_CVPR2026_html_Geng_NeuROK_Generative/figures/002_Figure_2.jpg]]
-*Figure 2: Kinematic state parameterization. (a) Several kinematic state parameterizations can be used to describe a physical system. The symbolic parameterizations used in classical mechanics are concise yet not accessible in inverse problems. Traditional inverse simulation approaches use geometry-derived parameterizations, yet require dense physical constraints to solve the over-parameterized system. We instead learn low-dimensional parameterizations that are both compact and learnable from data. (b) As formally defined in Def. 1, a kinematic state parameterization studied in this paper is a pair (Z, F) which contains a latent manifold Z and a decoder*
-
 ### 3.1 运动学状态参数化的形式化定义
 
 NEUROK 的核心是将对象变形空间建模为一个可学习的低维流形。形式化地，一个运动学状态参数化定义为一个二元组 $(\mathcal{Z}, \mathcal{F})$，其中 $\mathcal{Z} \subseteq \mathbb{R}^k$ 是 $k$ 维潜在状态空间，$\mathcal{F}: \mathcal{Z} \rightarrow \mathbb{R}^{3N}$ 将任意潜在向量映射到对象的顶点配置。与经典力学中依赖符号化广义坐标（如关节角度）不同，NEUROK 的 $\mathcal{F}$ 是一个神经网络，其值域恰好覆盖对象的配置流形，从而无需类别特定的物理先验。
@@ -284,8 +279,6 @@ Figure 9展示了NEUROK对训练集中完全未出现的新对象类别的泛化
 
 Figure 7展示了NEUROK在真实扫描物体上的模拟效果。模型能够处理来自真实世界的几何输入，生成符合物理直觉的动态行为，表明该方法从合成4D数据中学到的运动学先验可迁移至真实场景。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l969_https_openaccess_thecvf_com_content_CVPR2026_html_Geng_NeuROK_Generative/figures/008_Table_1.jpg]]
 *Table 1: Quantitative comparison on inverse-kinematics optimization*
 
@@ -297,12 +290,6 @@ Figure 7展示了NEUROK在真实扫描物体上的模拟效果。模型能够处
 
 ![[assets/figures/papers/paper_list_l969_https_openaccess_thecvf_com_content_CVPR2026_html_Geng_NeuROK_Generative/figures/006_Figure_6.jpg]]
 *Figure 6: Qualitative comparison on physically-inspired 4D generation. We compare against baselines on the task of generating physically-plausible 4D motion given a single shape and conditioning actions*
-
-![[assets/figures/papers/paper_list_l969_https_openaccess_thecvf_com_content_CVPR2026_html_Geng_NeuROK_Generative/figures/010_Figure_8.jpg]]
-*Figure 8: Analysis of energy conservation. Our approach maintains physical consistency in the generated trajectories through Euler–Lagrangian modeling. Under this formulation, the total energy of the simulated motion remains approximately constant*
-
-![[assets/figures/papers/paper_list_l969_https_openaccess_thecvf_com_content_CVPR2026_html_Geng_NeuROK_Generative/figures/009_Figure_9.jpg]]
-*Figure 9: Generalization on unseen categories. Our model can generalize to novel object categories that are completely not present in the training data*
 
 ![[assets/figures/papers/paper_list_l969_https_openaccess_thecvf_com_content_CVPR2026_html_Geng_NeuROK_Generative/figures/001_Figure_1.jpg]]
 *Figure 1: We present a versatile and scalable framework for generating simulative 4D dynamics of static 3D objects under physical conditions (e.g., forces, actions, velocities). Trained on a large-scale 4D shape dataset without any explicit physical annotations, our method does not rely on any inductive bias of the object’s dynamic structure and therefore can be applied to various types of dynamic objects, ranging from elastic bodies, cloth, and continuum bodies, to multi-body objects. Project page: https://chen-geng.com/neurok*

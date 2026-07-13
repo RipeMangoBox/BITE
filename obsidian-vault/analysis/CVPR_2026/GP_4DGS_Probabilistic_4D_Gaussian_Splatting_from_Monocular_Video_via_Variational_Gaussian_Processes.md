@@ -57,8 +57,6 @@ claims:
 
 在DyCheck数据集上，GP‑4DGS在所有子集上均优于最强确定性基线**SoM**（Wang et al., ICCV 2025），尤其在稀疏观测的挑战性子集上优势更明显（mPSNR +0.46）。方法的核心创新——GP‑GS交替优化策略——通过置信度加权的GP训练与GP引导的GS正则化形成自我强化循环，使重建质量相比单独优化显著提升。
 
-
-
 ### 动态场景重建的确定性困境
 
 从单目视频重建动态3D场景是计算机视觉与图形学中的核心挑战。近年来，以**3D Gaussian Splatting**（3DGS）为基础的4D扩展方法取得了显著进展，代表性工作包括**4DGS**（Wu et al., CVPR 2024）的HexPlane形变、**D-3DGS**（Yang et al., CVPR 2024）的MLP形变，以及**Gaussian Marbles**（Stearns et al., SIGGRAPH 2024）和**SoM**（Wang et al., ICCV 2025）等面向单目视频的确定性重建框架。这些方法通过将规范空间中的3D高斯基元经确定性形变场变换到各时间步，结合光度损失与平滑正则化进行端到端优化，在特定场景下取得了令人瞩目的渲染质量。
@@ -80,8 +78,6 @@ claims:
 3. **训练帧外的时间外推**：通过GP的查询机制，在训练时间范围之外预测未来运动，为动态场景的长期建模提供可能。
 
 这一框架的核心洞察在于**数据自适应正则化**：GP后验的方差自动反映了观测置信度——充分观测区域的低方差意味着强约束，稀疏区域的高方差则允许更大的灵活性。这种“按需正则化”的机制，使GP-4DGS在DyCheck等基准上一致优于最强确定性基线SoM，尤其在稀疏观测的挑战性子集上优势更为显著（mPSNR提升+0.46 dB）。
-
-
 
 ## 核心方法与创新机理
 
@@ -136,8 +132,6 @@ GP-4DGS引入的三项确定性方法不具备的能力，直接源于GP概率�
 
 诱导点的初始化策略同样关键：基于Chronos时序特征的初始化相比随机初始化或速度KNN获得更高的ELBO（Table 4），表明时序感知的诱导点分布有助于GP更有效地捕捉运动模式。
 
-
-
 GP-4DGS 的核心思路是将**高斯过程（Gaussian Process, GP）**作为显式的概率运动先验，嵌入到 4D 高斯泼溅（4D Gaussian Splatting, 4DGS）框架中，从而将确定性动态重建升级为概率性建模。整个 pipeline 由四个关键模块构成，形成从场景表示、运动建模、联合优化到不确定性输出的闭环。
 
 **输入与基础表示。** 系统接收单目视频序列作为输入，以一组规范空间（canonical space）下的 3D 高斯基元 $\{\mathcal{G}_k\}_{k=1}^N$ 作为场景表示。每个基元通过形变函数 $f(\mathbf{x})$ 被变换到目标时刻 $t$ 的位置和朝向，其中 $\mathbf{x} = (\mathbf{p}, t)$ 为时空坐标，$\mathbf{p}$ 为规范空间位置。形变后的基元经可微光栅化渲染为图像，并与观测帧进行光度比较。
@@ -162,13 +156,6 @@ $$k_i(\mathbf{x},\mathbf{x}') = k_i^{\mathrm{spatial}}(\mathbf{p},\mathbf{p}') +
 - **时间外推**：将 GP 查询点的时间坐标延伸至训练帧范围之外，自然实现未来运动预测。
 
 整体而言，GP-4DGS 的 pipeline 将 4DGS 从“静态先验 + 确定性拟合”范式转变为“数据驱动概率先验 + 置信度感知优化”范式，为动态场景重建赋予了内在的不确定性感知能力和外推泛化能力。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2604_02915/figures/001_Figure_1.jpg]]
-*Figure 1: We propose GP-4DGS, a novel integration of Gaussian Processes (GPs) [37] into 4D Gaussian Splatting (4DGS). Unlike existing deterministic approaches, this formulation enables robust uncertainty quantification, future motion prediction, and prior estimation for unobserved regions*
-
-
 
 GP‑4DGS 的核心架构建立在 3D Gaussian Splatting (3DGS) 的显式表示之上，通过引入概率性运动先验，将确定性形变建模升级为可量化不确定性的概率框架。整个方法围绕四个关键模块展开：
 
@@ -233,13 +220,6 @@ $$\hat{\mathbf{U}}(\mathbf{r}) = \sum_{k=1}^{N} U_{k,t} \omega_{k,t}^{\pi}(\math
 
 时间外推则通过直接查询训练好的 GP 在 $t_f > T$ 时刻的预测实现，无需额外训练。周期性核支持短期外推，周期性均值支持长期外推，但后者在非周期性运动场景中会引入虚假振荡（详见 Figure A 和 Table A 的消融分析）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2604_02915/figures/012_Figure_6.jpg]]
-*Figure 6: Trajectory comparison on the (left) paper-windmill and (right) block scene. GP guidance effectively regularizes motion trajectories, reducing noise and producing physically plausible motion patterns, compared to the baseline approach*
-
-
-
 ## 实验与关键发现
 
 ### 核心定量结果：DyCheck 数据集
@@ -270,9 +250,6 @@ GP‑4DGS 的核心创新之一在于提供有原则的运动不确定性估计�
 
 Figure 2 展示了渲染图像与对应的运动不确定性图。不确定性图通过将每个基元的运动方差 $U_{k,t}$ 经 alpha 混合投影到图像空间得到：
 
-![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2604_02915/figures/002_Figure_2.jpg]]
-*Figure 2: Uncertainty quantification. GP-4DGS provides principled uncertainty estimates for motion, a capability inherently lacking in existing 4DGS methods*
-
 $$\hat{\mathbf{U}}(\mathbf{r}) = \sum_{k=1}^{N} U_{k,t} \omega_{k,t}^{\pi}(\mathbf{r})$$
 
 高不确定性区域与遮挡、快速运动或观测稀疏区域高度吻合，验证了 GP 后验方差作为可靠性指示器的有效性。这一能力是现有确定性 4DGS 方法所不具备的。
@@ -280,9 +257,6 @@ $$\hat{\mathbf{U}}(\mathbf{r}) = \sum_{k=1}^{N} U_{k,t} \omega_{k,t}^{\pi}(\math
 ### 未来运动外推
 
 Table 2 报告了未来运动外推性能。实验将最后 5 帧和 15 帧排除在训练之外，评估方法对未见时间帧的预测能力。GP‑4DGS 显著优于朴素的线性外推基线，尤其在周期性运动场景（如 paperwindmill）中优势明显——时间周期核有效捕捉了循环运动结构，使外推轨迹保持物理合理性。
-
-![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2604_02915/figures/007_Table_2.jpg]]
-*Table 2: Future motion extrapolation performance in terms of PSNR (↑). We evaluate performance on the last 5 and 15 frames excluded for training. GP-4DGS outperforms na¨ıve linear extrapolation, especially in periodic scenes where the temporal kernel effectively captures cyclic structures*
 
 消融实验（附录 Table A 和 Figure A）揭示了周期性成分的差异化作用：
 - **周期性核**（periodic kernel）支持短期外推，使 GP 能够在训练时间范围附近进行平滑预测；
@@ -310,16 +284,8 @@ Table 2 报告了未来运动外推性能。实验将最后 5 帧和 15 帧排�
 
 4. **输入模态限制。** 方法目前仅针对单目视频重建设计，未探索多视图或多传感器输入场景下的扩展性。
 
-### 补充图表
-
-
 ![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2604_02915/figures/015_Table.jpg]]
 *Table: B. Ablation study on GP-GS optimization for the paperwindmill scene. Our GP-GS optimization enables proper convergence and produces accurate priors that improve reconstruction*
-
-![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2604_02915/figures/011_Table_4.jpg]]
-*Table 4: Comparison of inducing point initialization methods in terms of ELBO (↑). Our time-series-based selection achieves superior convergence with higher ELBO than baselines*
-
-
 
 ## 定位与知识库关联
 
@@ -362,8 +328,6 @@ GP-4DGS的能力边界受以下因素制约：
 3. **置信度驱动的主动感知**：GP-4DGS提供的不确定性信号可自然用于主动视图选择或机器人探索中的信息规划，将重建从被动观测推向主动信息获取。
 
 4. **多模态诱导点初始化**：当前基于Chronos时序特征的诱导点初始化已证明优于随机和速度KNN（Table 4），将其扩展到多模态信号（如音频、文本描述）可能增强场景语义理解。
-
-
 
 ## 原文 PDF
 

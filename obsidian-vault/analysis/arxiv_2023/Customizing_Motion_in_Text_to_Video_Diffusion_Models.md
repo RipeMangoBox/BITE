@@ -51,8 +51,6 @@ claims:
 
 **主要结果：** 在Jester手势数据集上，NewMove的运动识别准确率达**70.6%**，较DreamBooth（28.4%）和Textual Inversion（0.3%）提升显著；用户偏好研究中，NewMove在运动准确性和外观泛化性上均显著优于基线方法（p<0.01）。消融实验证实：仅微调空间K/V和时间层是运动-外观解耦的关键（Table 2a）；真实视频正则化（Jester）比无正则化在准确率上提升约27个百分点（70.6 vs 43.9，Table 2e）；粗噪声时间步采样（Coarse-noise）比均匀采样提高3.7%准确率并大幅降低外观复制分数（Table 2d）。
 
-
-
 文本到视频生成模型近年来取得了显著进展，能够根据自然语言描述生成多样化、时序连贯的视频内容。然而，这些模型受限于训练数据的分布，难以生成训练集中未覆盖的**新运动模式**——例如特定的舞蹈动作、自定义手势或独特的相机运动轨迹。用户若希望模型生成“Carlton舞”或“滑动双指向上”等特定动作，仅凭文本描述往往无法精确传达运动细节，而模型也缺乏对这类新运动的表征能力。
 
 现有的定制化方法主要面向**外观定制**，即通过少量样本教会模型生成特定物体或角色的外观。代表性工作包括 **Textual Inversion**（Gal et al., ICLR 2023），通过优化文本嵌入来捕获新概念；**DreamBooth**（Ruiz et al., CVPR 2023），微调整个扩散模型并结合类别先验正则化；以及 **Tune-A-Video**（Wu et al., ICCV 2023），将图像扩散模型扩展至视频领域进行微调。然而，这些方法在**运动定制**任务上表现不佳：外观定制方法难以将运动模式与外观表征解耦，导致生成结果要么无法准确复现目标运动，要么过度复制训练样本的外观，缺乏对新场景的泛化能力。
@@ -62,8 +60,6 @@ claims:
 上述现状揭示了一个核心瓶颈：**如何在保留预训练文本到视频模型丰富先验知识的前提下，仅通过少量样本教会模型一种新的运动模式，并将其泛化到任意外观和场景中？** 这要求方法同时解决三个子问题：（1）确定模型中哪些参数负责表征运动信息；（2）在微调过程中防止对少量样本的过拟合和对外观的记忆；（3）确保新学到的运动不会覆盖模型原有的生成能力。
 
 本文提出的 **NewMove** 方法正是针对这一瓶颈展开。其核心洞见在于：预训练文本到视频扩散模型的U-Net架构中，**时间层**（temporal convolution and attention layers）负责建模帧间动态，而**空间交叉注意力层的键/值投影**（key/value projections in spatial cross-attention）负责将文本标识符映射到视觉特征。通过仅微调这两类参数，并辅以**真实视频正则化**和**非均匀时间步采样**策略，NewMove 能够在少量样本下学会可泛化的运动模式，同时将运动与外观解耦，在运动准确率和外观复制之间取得最佳平衡。
-
-
 
 ## 核心方法与创新机理
 
@@ -84,8 +80,6 @@ claims:
 传统扩散模型训练采用均匀时间步采样，NewMove 提出非均匀概率分布 $f_{\alpha}(t) = \frac{1}{T}(1 - \alpha \cos(\frac{\pi t}{T}))$（$\alpha=0.5$），使训练采样偏重早期去噪步骤。其因果机制在于：扩散过程的早期步骤决定视频的全局运动结构，而后期步骤填充外观细节——偏重早期步骤迫使模型聚焦于学习运动模式本身，而非复制训练样本的外观。Table 2d 的消融结果证实了该策略的有效性：粗噪声采样（Coarse-noise）相比均匀采样，运动准确率从 66.9 提升至 70.6，复制分数从 15.4 降至 8.7。
 
 值得注意的辅助发现是，全微调（Full fine-tuning）在运动准确率上远超 LoRA（70.6 vs 10.6，Table 2f），表明参数高效微调方法在该任务上存在显著局限，需进一步验证其适用边界。
-
-
 
 **NewMove** 的整体 pipeline 围绕一个冻结的预训练文本到视频扩散模型展开，通过选择性微调与两项正则化设计，在少量样本视频上学习可泛化的运动模式。其核心模块关系与数据流如下：
 
@@ -131,15 +125,8 @@ $$
 
 训练完成后，用户通过文本提示中的运动标识符调用学习到的运动。模型在推理时利用微调后的时间层和空间 K/V 投影，将运动模式泛化至新外观、多主体甚至非人形角色，同时保持时间一致性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1040_https_arxiv_org_abs_2312_04966/figures/003_Figure_2.jpg]]
 *Figure 2: Overview. Given a small set of exemplar videos, our approach fine-tunes the U-Net of a text-to-video model using a reconstruction objective. The motion is identified with a unique motion identifier and can be used at test time to synthesize novel subjects performing the motion. To represent the added motion but preserve information from the pretrained model, we tune a subset of weights – the temporal convolution and attention layers, in addition to the key & value layers in the spatial attention layer. A set of related videos is used to regularize the tuning process*
-
-![[assets/figures/papers/paper_list_l1040_https_arxiv_org_abs_2312_04966/figures/001_Figure_1.jpg]]
-*Figure 1: (Left) Given a few examples (“Carlton dance”), our customization method learns the dynamic motion pattern common to the input examples and incorporates it into a pre-trained text-to-video diffusion model using a new motion identifier (“V* dance”). (Right) Our approach, NewMove, abstracts the motion pattern from the appearance in the input videos and enables generation of the depicted motion across a variety of novel contexts, including with a non-humanoid subject (robot, top row), multiple motions (lady, middle row), and multiple subjects (group of nurses, bottom row). To best view the results, please view our website*
-
-
 
 ### 基础扩散去噪目标
 
@@ -193,12 +180,8 @@ $$
 
 每个定制运动被赋予唯一的文本标识符（如“V* dance”），该标识符在微调过程中与运动模式建立映射关系。推理时，用户可通过在文本提示中插入该标识符来触发对应运动，实现对新主体、新场景的运动迁移。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1040_https_arxiv_org_abs_2312_04966/figures/008_Table_2.jpg]]
 *Table 2: Quantitative results of the ablation study. Each table examines the design choices of our method. We report the motion recognition accuracy (“Accuracy”) obtained with a pre-trained classifier for gesture recognition. The copying score (“Copy”) is the percentage of generated videos with a detection score above a set threshold*
-
-
 
 ## 实验与关键发现
 
@@ -235,8 +218,6 @@ NewMove 在可控视频生成谱系中占据独特位置（Table 1）。与文�
 ![[assets/figures/papers/paper_list_l1040_https_arxiv_org_abs_2312_04966/figures/002_Table_1.jpg]]
 *Table 1: Comparison of our method across different techniques for controllable video / image generation. Here*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1040_https_arxiv_org_abs_2312_04966/figures/009_Table_3.jpg]]
 *Table 3: Quantitative comparison with baseline methods*
 
@@ -245,14 +226,6 @@ NewMove 在可控视频生成谱系中占据独特位置（Table 1）。与文�
 
 ![[assets/figures/papers/paper_list_l1040_https_arxiv_org_abs_2312_04966/figures/005_Figure_4.jpg]]
 *Figure 4: Qualitative results of our method. We demonstrate two custom motions: Dab and Air quotes, trained using collected internet examples as well as a 3D camera rotation trained with examples from the CO3D dataset [31]. Our method can generalize to unseen subjects and multiple people performing the action*
-
-![[assets/figures/papers/paper_list_l1040_https_arxiv_org_abs_2312_04966/figures/006_Figure_5.jpg]]
-*Figure 5: Text-driven motion transfer methods versus our method trained on few examples of a custom motion “Shaking Hand”. Our method seamlessly renders a custom motion in novel scenarios. Despite the training videos showing only a single actor performing one motion, our method generates the custom motion alongside another action (doing the gesture while eating a burger”) and varies timing (doing the gesture slowly and precisely”) or involves multiple people (“children”). In contrast, both baselines fail to generalize or produce temporally coherent videos*
-
-![[assets/figures/papers/paper_list_l1040_https_arxiv_org_abs_2312_04966/figures/004_Figure_3.jpg]]
-*Figure 3: Visual comparison with baseline methods. Examples of learning a customized motion Sliding Two Fingers Up from the Jester dataset with prompt “A female firefighter doing the V* sign”. Baseline methods (top three rows) fail to capture the motion and produce a temporally coherent video*
-
-
 
 ## 定位与知识库关联
 
@@ -289,8 +262,6 @@ NewMove 在可控视频生成谱系中占据独特位置（Table 1）。与文�
 ### 开放问题
 
 本文在结论中提出了一个根本性的开放问题：如何更好地利用预训练文本到视频模型中已有的运动和外观先验，来增强新的运动模式，并在全新设定下生成这些运动？这一问题指向几个潜在的研究方向：（1）更精细的参数解耦策略，以进一步分离运动与外观的表征；（2）无需微调的运动定制方法，以降低计算成本和过拟合风险；（3）多运动组合的显式建模，以处理复杂的时序交互场景。
-
-
 
 ## 原文 PDF
 

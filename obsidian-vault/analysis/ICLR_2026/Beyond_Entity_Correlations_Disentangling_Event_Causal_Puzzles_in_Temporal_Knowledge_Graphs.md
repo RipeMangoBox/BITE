@@ -48,8 +48,6 @@ claims:
 
 本文提出**HEDRA (Heterogeneous Event causality Disentangling Representation learning Approach)**，一种面向时序知识图谱（Temporal Knowledge Graph, TKG）事件预测的异质因果解耦表示学习方法。现有TKG方法仅关注实体或关系层面的相关性，忽略了事件层面固有的异质因果性——包括非因果性、虚假因果性、静态因果性和动态因果性。HEDRA首次在事件层面构建TKG结构因果模型（SCM），通过反事实检测器、工具变量（IV）引导解耦模块和进化正交模块，逐步解耦这四类因果性，从而获得鲁棒的事件表示用于事件预测。在五个真实数据集（ICEWS14、ICEWS18、WIKI、YAGO、GDELT）上，HEDRA在MRR、Hits@1、Hits@3、Hits@10上平均超过第二名5.70%、7.51%、7.21%、2.30%。
 
-
-
 ### 1 问题定义
 
 TKG $\mathcal{G} = \{ (s, r, o, t) | s \in \mathcal{E}, r \in \mathcal{R}, o \in \mathcal{E}, t \in \mathcal{T} \}$ 是由带时间戳的事件组成的序列，每个事件表示为（主体，关系，客体，时间戳）。事件预测任务定义为：给定历史事件序列 $\mathcal{G}^{1:T-1}$，预测主体 $s$ 和客体 $o$ 之间候选关系的概率分布 $p(\hat{r} | s, o, \mathcal{G}^{1:T-1})$。
@@ -67,8 +65,6 @@ TKG $\mathcal{G} = \{ (s, r, o, t) | s \in \mathcal{E}, r \in \mathcal{R}, o \in
 
 在TKG中构建事件级结构因果模型，利用事件重要性和分布差异解耦非因果性，利用工具变量解耦虚假因果性，利用正交约束分离静态与动态因果性，从而获得鲁棒的事件表示用于事件预测。
 
-
-
 ## 核心方法与创新机理
 
 1. **首次在事件层面解耦TKG中的异质因果性**：提出事件级TKG结构因果模型（SCM），形式化定义非因果性、虚假因果性、静态因果性和动态因果性，并通过后门调整公式 $P(\mathcal{Y}|\operatorname{do}(\mathcal{D})) = \sum P(\mathcal{S}) \sum P(\mathcal{T}) \sum P(\mathcal{P}) \sum P(\mathcal{Y}|\mathcal{G})$ 估计动态因果性对预测的因果效应。
@@ -79,8 +75,6 @@ TKG $\mathcal{G} = \{ (s, r, o, t) | s \in \mathcal{E}, r \in \mathcal{R}, o \in
 
 4. **进化正交模块**：通过Gram-Schmidt正交化分离动态与静态因果性，通过进化损失保持动态分量的时序依赖性和静态分量的时序独立性。
 
-
-
 HEDRA的整体框架如Figure 3所示，以时间戳 $T-1$ 为例，包含以下流水线模块：
 
 1. **关系感知GCN**：建模实体与关系间的结构依赖。
@@ -90,8 +84,6 @@ HEDRA的整体框架如Figure 3所示，以时间戳 $T-1$ 为例，包含以下
 5. **IV引导解耦模块**：利用工具变量解耦虚假因果性。
 6. **进化正交模块**：分离动态因果性与静态因果性。
 7. **事件预测解码器**：使用ConvTransE进行事件预测。
-
-
 
 ### 1 事件表示构建
 
@@ -147,8 +139,6 @@ $$\mathcal{L} = (1-\lambda_{con}-\lambda_{rob}-\lambda_{evo}) \mathcal{L}_{TKG} 
 
 其中 $\mathcal{L}_{TKG}$ 为事件预测的交叉熵损失：
 $$\mathcal{L}_{TKG} = -\frac{1}{N_S} \sum_{i=1}^{N_S} \sum_{j=1}^{N_r} (y_{i,j} \log p_{i,j} + (1-y_{i,j}) \log(1-p_{i,j}))$$
-
-
 
 ## 实验与关键发现
 
@@ -244,8 +234,6 @@ HEDRA在第一个样本中正确预测了“Make a visit”，在第二个样本
 
 Figure 7展示了中国和日本实体的动态与静态分量步长变化。对于中国和日本，动态分量变化幅度更大，表明短期冲击被动态分量吸收，而静态分量保持相对稳定。
 
-
-
 ## 定位与知识库关联
 
 ### 1 与现有方法的关系
@@ -282,8 +270,6 @@ HEDRA是首个在事件层面解耦TKG中异质因果性的工作，与静态图
 
 ### 实验与分析
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0002_RdoXks7VmJ_Beyond_Entity_Correlations_Disentangling_Event_C/figures/004_Table_1.jpg]]
 *Table 1: The performance of HEDRA and the compared approaches on ICEWS14 and ICEWS18. An asterisk ( ^ { 6 6 * } ) indicates that HEDRA significantly outperforms the compared approaches based on pairwise t-tests at a 95% confidence level. The best performance is highlighted in bold, while the runner-up is underlined.*
 
@@ -298,8 +284,6 @@ HEDRA是首个在事件层面解耦TKG中异质因果性的工作，与静态图
 
 ![[assets/figures/papers/iclr26_0002_RdoXks7VmJ_Beyond_Entity_Correlations_Disentangling_Event_C/figures/008_Table_5.jpg]]
 *Table 5: Top-5 predicted relations for two representative test samples on ICEWS14. Correctly predicted relations are indicated by a leading check mark (✓) and highlighted in bold.*
-
-
 
 ## 原文 PDF
 

@@ -53,8 +53,6 @@ claims:
 
 **方法谱系与知识库定位**：TempoMaster 属于视频扩散模型中的分层生成路线，其核心创新在于将帧率作为可控的时间抽象维度引入生成过程。与自回归长视频模型（如 **MAGI-1** / Teng et al., 2025；**SkyReels-V2** / Chen et al., 2025）不同，它不依赖逐帧历史条件；与全序列双向生成方法不同，它通过多帧率训练与分层并行推理实现了长序列的高效处理。其 Multi-Mask 条件注入机制以零参数方式统一处理文本、图像、多帧等异构条件，避免了适配器或上下文学习引入的额外开销。
 
-
-
 ### 长视频生成的核心瓶颈
 
 长视频生成面临一对相互纠缠的根本性挑战：**长期时间一致性维护**与**计算成本的可控性**。这两个目标在现有范式下呈现尖锐的权衡关系。
@@ -82,8 +80,6 @@ claims:
 ### 本文动机
 
 基于上述分析，本文提出 **TempoMaster**，核心动机在于：通过**下一帧率预测**（next-frame-rate prediction）范式，将长视频生成中高层次的全局动态结构与低层次的局部视觉细节彻底解耦。在最低帧率上以双向注意力一次性建立全局蓝图，随后以已生成帧为条件，逐级提升帧率并并行填充中间帧。这一设计在理论上同时继承了双向建模的全局规划能力与自回归方法的递进生成优势，同时通过层级并行化将计算复杂度从 $O(N^2)$ 降至 $O(N^2/4^K)$（$W \geq 2$ 时），为高效长视频生成提供了新的路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -118,8 +114,6 @@ $$t_j = t_{\mathrm{start}} + j \cdot 2^i, \quad t_{\mathrm{start}} \sim \mathcal
 $$\frac{N^{2}}{4^{K}} \cdot \sum_{i=0}^{K-1} \left( \frac{4}{W^{2}} \right)^{i}$$
 
 这一设计实现了指数级加速，同时保持生成质量对并行配置的鲁棒性（Table 3）。
-
-
 
 TempoMaster 提出一种**下一帧率预测**（next‑frame‑rate prediction）范式，将长视频生成重新形式化为从粗粒度全局蓝图到细粒度局部细节的逐级细化过程。其整体 pipeline 由四个核心模块串联构成，形成“条件注入 → 多帧率扩散建模 → 时域位置编码 → 分层并行推理”的完整生成链路。
 
@@ -160,9 +154,6 @@ $$t_j = t_{\mathrm{start}} + j \cdot 2^i, \quad t_{\mathrm{start}} \sim \mathcal
 
 推理过程被组织为一棵多路生成树（Figure 5）。从最低帧率的全局蓝图开始，每级节点将其父节点的帧序列切分为多个无因果依赖的片段，**同级子节点可完全并行生成**。这一设计将整体计算复杂度从传统全序列双向注意力的 $O(N^2)$ 降至：
 
-![[assets/figures/papers/paper_list_l939_https_arxiv_org_abs_2511_12578/figures/005_Figure_5.jpg]]
-*Figure 5: The inference process of TempoMaster. TempoMaster first generates videos with the lowest frame rate and the largest interval of temporal position indices. Within the same level, the generated frames can be partitioned into multiple segments to enable parallel generation, which proceeds hierarchically down to the leaf node level*
-
 $$\frac{N^2}{4^K} \cdot \sum_{i=0}^{K-1} \left( \frac{4}{W^2} \right)^i$$
 
 当并行度 $W \geq 2$ 时级数收敛，实现指数级加速。同时，该策略保留了每级内部的双向注意力，确保局部片段的生成质量不受并行切分的影响。
@@ -170,13 +161,6 @@ $$\frac{N^2}{4^K} \cdot \sum_{i=0}^{K-1} \left( \frac{4}{W^2} \right)^i$$
 ### 6. 端到端数据流
 
 整体 pipeline 的数据流可概括为：**条件输入**（文本/图像/视频帧）→ Multi‑Mask 编码与噪声拼接 → 多帧率 DiT 在最低帧率上通过双向注意力生成全局蓝图 → 基于帧率感知 RoPE 逐级提升帧率，每级内并行生成中间帧 → 输出完整高帧率长视频。该流程在 500 帧 480p 的 Vbench 长视频基准上取得 80.30 总分，超越 **FramePack**（Zhang and Agrawala, 2025, 79.52）等同期方法，并在人类评估中以 3.69 的平均分优于 **SkyReels‑V2**（Chen et al., 2025, 3.47）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l939_https_arxiv_org_abs_2511_12578/figures/001_Figure_1.jpg]]
-*Figure 1: TempoMaster first generates a video sequence at coarse and low frame rate to establish the global dynamics and semantic structure, and subsequently refines it by predicting frames at higher rates, thereby enhancing temporal smoothness and detail. This nextframe-rate prediction paradigm results in videos with improved motion quality and temporal consistency*
-
-
 
 ### 下一帧率预测范式
 
@@ -238,16 +222,6 @@ $$\frac{N^{2}}{4^{K}} \cdot \sum_{i=0}^{K-1} \left( \frac{4}{W^{2}} \right)^{i}$
 
 此时条件放松至 $W \geq 2$ 即可使级数收敛，实现更显著的加速。默认配置采用帧率列表 $f(6, 24)$ 与并行因子 $m(1, 4)$，在 Vbench 长视频评估中取得 80.30 总分，消融实验表明性能对并行配置鲁棒。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l939_https_arxiv_org_abs_2511_12578/figures/003_Figure_3.jpg]]
-*Figure 3: Multi-Frame-Rate Training. TempoMaster is trained on videos with varying frame rates, which are signaled to the model by scaling the interval of the temporal positional indices. As illustrated, training on a video at half the highest frame rate employs a positional index interval of 2*
-
-![[assets/figures/papers/paper_list_l939_https_arxiv_org_abs_2511_12578/figures/004_Figure_4.jpg]]
-*Figure 4: Multi-Mask Condition. Condition frames are zeropadded to the length of the full sequence; their latent representations and a frame-wise mask that provides precise timestep information are then concatenated with the noisy latents to guide generation*
-
-
-
 ## 实验与关键发现
 
 ### 主要量化结果
@@ -294,8 +268,6 @@ TempoMaster 在长视频与短视频两个基准上均取得最优总分。**Tab
 
 以上局限需结合具体应用场景进一步验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l939_https_arxiv_org_abs_2511_12578/figures/010_Table_3.jpg]]
 *Table 3: Ablation on the parallel configs. Top: the evaluation results of long videos (500 frames). Bottom: the evaluation results of short videos (121 frames). We include total computational Flops for comparison. All videos maintain a resolution of 480p. Higher values are better for all dimensions*
 
@@ -304,8 +276,6 @@ TempoMaster 在长视频与短视频两个基准上均取得最优总分。**Tab
 
 ![[assets/figures/papers/paper_list_l939_https_arxiv_org_abs_2511_12578/figures/008_Figure_7.jpg]]
 *Figure 7: Visualization of long-term generation stress test. Our method is capable of extending video clips with a window size comparable to autoregressive methods. Our method composes minute-long videos (exceeding 1500 frames) by extending 480 frames with 5-second overlaps*
-
-
 
 ## 定位与知识库关联
 
@@ -368,8 +338,6 @@ $$t_j = t_{\mathrm{start}} + j \cdot 2^i, \quad t_{\mathrm{start}} \sim \mathcal
 3. 模型在更极端的运动场景（如体育赛事、第一人称快速移动）下的鲁棒性如何？
 
 > **注意**：上述局限与开放问题部分基于对实验设计的逻辑推断，论文未提供明确的失败案例分析。建议在实际应用中针对具体场景进行补充验证。
-
-
 
 ## 原文 PDF
 

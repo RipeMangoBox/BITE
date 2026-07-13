@@ -54,8 +54,6 @@ claims:
 
 在 FLIR-IISR 和 M3FD 两个基准上，Real-IISR 在 PSNR（28.51）、SSIM（0.8278）、LPIPS（0.1615）及 MUSIQ（59.90）等指标上均优于 9 种对比方法（包括通用 ISR 方法 HAT、BI-DiffSR、PFT-SR，红外专用方法 CoRPLE、InfraFFN、DifIISR，以及真实世界方法 RealSR、SinSR、VARSR），同时推理速度（2.45 FPS）快于扩散模型 VARSR。消融实验验证了 TSG、CAC 和 L_TOC 各自对边界保真、纹理稳定性和热排序一致性的关键贡献。
 
-
-
 红外图像超分辨率（Infrared Image Super-Resolution, IISR）旨在从低分辨率红外输入重建高分辨率细节，在安防监控、自动驾驶、军事侦察等任务中具有关键价值。然而，现有研究长期受困于两大瓶颈，导致方法向真实场景迁移时性能急剧退化。
 
 **瓶颈一：真实配对红外退化数据缺失。** 现有 IISR 方法普遍依赖合成降质（如双三次下采样）构建训练对，但这种简化无法模拟真实红外成像中光学模糊、运动模糊与传感器噪声的复杂耦合。由于缺乏真实世界配对数据集，模型在合成域上学到的映射难以泛化至实际退化分布，形成“合成-真实”鸿沟。
@@ -63,8 +61,6 @@ claims:
 **瓶颈二：热辐射与结构边界的固有错位。** 红外图像以热辐射强度编码场景信息，但高温区域常跨越物体边界，导致热分布与几何结构不一致。现有方法（包括通用图像超分方法如 **HAT**、**BI-DiffSR**、**PFT-SR**（Long et al., CVPR 2025），以及专用红外超分方法如 **CoRPLE**（Li et al., ECCV 2024）、**InfraFFN**（Qin et al., 2025）、**DifIISR**（Li et al., CVPR 2025））均未显式建模这一错位关系。其后果是：重建结果在高温区域边界处出现模糊、伪影或“热漂移”——像素强度无法忠实反映真实温度排序，破坏红外图像的物理语义。
 
 上述瓶颈的因果链条可归纳为：缺乏真实数据 → 退化建模失真 → 热-结构错位被忽视 → 边界失真与热漂移。因此，亟需一个能同时填补数据空白并显式编码热-结构双重先验的统一框架。本文正是基于这一动机，提出 **Real-IISR** 统一自回归框架，并构建首个大规模真实配对红外超分数据集 **FLIR-IISR**，从数据与模型两侧协同突破上述瓶颈。
-
-
 
 ## 核心方法与创新机理
 
@@ -111,8 +107,6 @@ $$
 $$
 
 其中 $\lambda_1 = 0.2$，$\lambda_2 = 0.8$，体现了对物理一致性约束的高度重视。
-
-
 
 Real‑IISR 是一个面向真实世界红外图像超分辨率的统一自回归框架，其核心设计目标是在单一模型中同时解决**热辐射‑结构边界错位**和**真实退化多样性**两大瓶颈。框架的整体数据流可概括为：输入真实低分辨率红外图像 → 多模态先验编码 → 退化感知离散表示 → 逐尺度自回归生成 → 物理一致性约束输出。
 
@@ -167,8 +161,6 @@ $$
 
 上述模块并非简单堆叠，而是围绕红外超分的两个根本瓶颈形成了因果闭环：TSG 解决**热‑结构错位**→ 为后续生成提供准确的空间先验；CAC 解决**退化多样性**→ 使离散表示能够灵活匹配真实世界的复杂降质；$\mathcal{L}_{\mathrm{TOC}}$ 则从物理规律层面约束生成结果的热力学一致性。三者协同，使得 Real‑IISR 在 FLIR‑IISR 和 M3FD 两个真实红外数据集上均取得了最优的有参/无参指标（见表 1、表 2），同时保持 2.45 FPS 的推理速度（NVIDIA A800），在效率‑质量权衡上优于扩散基线。
 
-
-
 ### 3.1 热-结构引导模块 (Thermal-Structural Guidance, TSG)
 
 真实世界红外图像中，热辐射分布与物体结构边界存在内在错位——高温区域常跨越多个物体边界，而现有方法缺乏对此双重先验的显式建模。TSG 模块通过可学习的注意力门控机制，自适应融合热语义特征 $\mathbf{F}_{\mathrm{Heat}}$ 与结构边缘特征 $\mathbf{F}_{\mathrm{Edge}}$，形成统一的引导表示。
@@ -208,13 +200,6 @@ $$\mathcal{L}_{\mathrm{TOC}} = \frac{1}{|\Omega|} \sum_{(i,j)\in\Omega} \mathrm{
 $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{CE}} + \lambda_{1} \mathcal{L}_{\mathrm{MSE}} + \lambda_{2} \mathcal{L}_{\mathrm{TOC}}$$
 
 其中 $\mathcal{L}_{\mathrm{CE}}$ 为 token 级交叉熵损失（监督 VAR 自回归预测），$\mathcal{L}_{\mathrm{MSE}}$ 为像素级均方误差损失，$\lambda_1 = 0.2$、$\lambda_2 = 0.8$ 为平衡系数。该组合在 token 级监督、像素保真与物理一致性之间取得平衡。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l788_https_arxiv_org_abs_2603_04745/figures/009_Figure_6.jpg]]
-*Figure 6: Qualitative ablation on the Thermal-Structural Guidance (TSG) and Condition-Adaptive Codebook (CAC)*
-
-
 
 ## 实验与关键发现
 
@@ -260,19 +245,6 @@ Real-IISR 在构建的真实世界红外超分辨率基准 FLIR-IISR 和公开�
 
 ![[assets/figures/papers/paper_list_l788_https_arxiv_org_abs_2603_04745/figures/011_Figure_7.jpg]]
 *Figure 7: Quantitative ablation of TSG, CAC, and*
-
-![[assets/figures/papers/paper_list_l788_https_arxiv_org_abs_2603_04745/figures/008_Figure_8.jpg]]
-*Figure 8: Qualitative ablation on the Thermal Order Consistency Loss*
-
-![[assets/figures/papers/paper_list_l788_https_arxiv_org_abs_2603_04745/figures/007_Figure_5.jpg]]
-*Figure 5: Qualitative comparison of IISR with SOTA methods on FLIR-IISR and M3FD datasets. The graph illustrates grayscale fluctuations along the blue-marked sampling line, and red-marked sampling line denotes the HR*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l788_https_arxiv_org_abs_2603_04745/figures/003_Figure_3.jpg]]
-*Figure 3: Data collection pipeline of FLIR-IISR*
-
-
 
 ## 定位与知识库关联
 
@@ -328,8 +300,6 @@ Real-IISR 的设计面向**真实世界红外图像超分辨率**场景，其适
 4. **无配对场景的拓展**：当前框架依赖配对 LR-HR 数据进行监督训练。在无法获取 HR 真值的真实场景中，能否通过自监督或物理模型驱动的方式实现有效训练，是一个重要的开放挑战。
 
 > **注意**：上述局限部分主要基于方法设计的逻辑推断和实验覆盖范围的分析，论文本身未设专门的“Limitations”章节。部分边界条件（如极端 SNR 下的性能）需要手工验证。
-
-
 
 ## 原文 PDF
 

@@ -57,8 +57,6 @@ claims:
 
 **方法谱系与知识库定位**：CA2D继承并改进了RDED的补丁提取框架，其核心创新在于将**计算感知的coreset选择（CAD-Prune）**前置到合成流程中，替代RDED的无差别补丁选取。在coreset方法谱系中，CAD-Prune与EL2N-Best（Lee & Chung, 2024）形成直接对比——前者以计算对齐的单检查点策略替代后者的滑窗穷举，在保持或超越性能的同时大幅降低选择成本。在DD方法谱系中，CA2D与SRe2L、DWA、D4M、Minimax Diffusion等大规模DD方法的关键区分在于：**完全摒弃软标签监督，在硬标签设置下进行蒸馏与评估**，从而恢复数据质量对性能的贡献。本文提出的DCS（Distillation Correlation Score）为DD领域引入了一种零shot评估蒸馏目标质量的工具，目前可适用于DM等可计算损失目标的方法（Spearman ρ=0.41），但对不可优化目标的方法尚需扩展。
 
-
-
 ### 数据集蒸馏的核心命题与评估困境
 
 数据集蒸馏（Dataset Distillation, DD）旨在将大规模训练集压缩为极小的合成数据集，使下游模型在该合成集上训练后能逼近在全量数据上的泛化性能。这一领域的核心评估范式长期依赖软标签（soft labels）与知识蒸馏（knowledge distillation）的组合设置（SL+KD）：学生模型在合成数据上训练时，不仅使用合成标签，还通过CutMix等增强策略引入教师模型的软标签监督。
@@ -84,8 +82,6 @@ claims:
 - **分布匹配（Distribution Matching, DM）** 目标仅表现出中等相关性（ρ=0.41，Figure 6a），远未达到可靠指导蒸馏的水平。
 
 这些发现共同指向一个严峻的现实：在SL+KD设置下，数据集蒸馏领域已接近性能饱和，继续沿此路径难以产生实质性突破。有意义的评估与设计必须转向硬标签场景，并将样本难度与计算预算对齐，才能真正推动该领域的进步。
-
-
 
 ## 核心方法与创新机理
 
@@ -148,8 +144,6 @@ CA2D的关键洞察在于：**蒸馏集的信息压缩效率取决于源数据�
 ### 创新总结
 
 三项创新的逻辑链条清晰：**DCS提供零成本的质量诊断**，揭示现有蒸馏目标的错位问题；**CAD-Prune将样本筛选与计算预算对齐**，解决了“选什么样本”这一被软标签掩盖的核心问题；**CA2D将计算感知筛选嵌入蒸馏流程**，在不改变蒸馏算法本身的情况下实现显著提升。这一创新路径的本质是**将数据集蒸馏的进步来源从“更好的软标签蒸馏技巧”重新定位到“更好的数据质量与计算预算匹配”**，为领域提供了新的研究方向。
-
-
 
 本文的核心主张是：**数据集蒸馏领域的评估与设计范式需要从“软标签主导”转向“硬标签+计算感知”**。为此，作者构建了一套从诊断到方法设计的完整框架，包含三条相互验证的主线：
 
@@ -251,8 +245,6 @@ CA2D的关键洞察在于：**蒸馏集的信息压缩效率取决于源数据�
 - DCS 目前仅适用于可计算代理目标（如损失值）的方法，对于不可优化的 DD 目标尚无法评估。
 - 蒸馏集的训练存在压缩-提取权衡：较小的 IPC 需要明显更多的训练轮次才能充分提取信息（Figure 8），增加了计算成本。
 
-
-
 ### 3.1 蒸馏相关分数（DCS）
 
 **动机**：现有大规模数据集蒸馏（DD）方法的蒸馏目标与下游泛化性能之间缺乏可靠的关联性验证。为此，作者提出DCS作为一种零样本评估指标，快速判断蒸馏目标的质量。
@@ -270,12 +262,6 @@ $$\mathrm{DCS}(\phi) = \rho\left( \{\ell_{D_{\mathrm{test}}}(\theta_{S_j}^*)\}_{
 
 ![[assets/figures/papers/paper_list_l2097_https_arxiv_org_abs_2604_18811/figures/005_Figure_3.jpg]]
 *Figure 3: (Left) Analysis of TM Loss objective behavior for different synthesis methods on TinyImageNet. Scatter plot displaying correlation of Avg. TM Loss with In-domain generalization of all the methods. Notice the complete lack of correlation when one evaluates the TM loss for larger architectures like RN-18, even though generalization performance varies significantly for the underlying distilled sets. (Right) Training dynamics of DATM synthesis on TinyImageNet. We track DATM synthesis for ConvNet-D4 (left) and ResNet-18 (right) at IPC 10. Note that despite synthesis of 10k iterations, both TM loss (red curve) and accuracy (black curve) show minimal change*
-
-![[assets/figures/papers/paper_list_l2097_https_arxiv_org_abs_2604_18811/figures/012_Figure_5.jpg]]
-*Figure 5: Correlation analysis of distillation loss objectives on ImageNet-1K. We compute the proposed DCS score (see Sec-4 of the main paper) for SRe2L and DWA across multiple IPC settings and data subsets (each data point in the plot represents IPC-subset combination, see Sec. G.2 for details and discussion). One can observe a mis-alignment between these distillation objectives and their generalization performance, with either zero or negative Spearman correlation after adjusting for the bias of size of subsets*
-
-![[assets/figures/papers/paper_list_l2097_https_arxiv_org_abs_2604_18811/figures/013_Figure_6.jpg]]
-*Figure 6: DCS Additional results. (a) DCS on small-scale method DM. We use DCS to plot the correlation of DM [39] loss objective with ID generalization error and find better-than-TM but modest correlation of*
 
 **局限性**：DCS 目前仅适用于可计算代理目标（如损失值）的方法，对于不可优化的 DD 目标尚无法评估。
 
@@ -332,13 +318,6 @@ $$\mathcal{L}_{TM}(\mathcal{S}, \mathcal{D}_{\mathrm{train}}) = \frac{\| \hat{\t
 其中分母为真实集参数变化范数，用于归一化。
 
 **失效分析**：在大模型（ResNet-18）上，TM 损失值恒定（约 0.806），且与下游泛化无相关性（Figure 3 左）。在 DATM 合成动态中，即使经过 10k 次迭代，TM 损失和准确率变化极小（损失仅在小数点后三位变化，准确率仅提高 2-3%），表明该目标无法有效扩展到更大架构（Figure 3 右，Section G.1）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2097_https_arxiv_org_abs_2604_18811/figures/003_Figure_2.jpg]]
-*Figure 2: Analysis of fixed soft label (SL) setting on ImageNet-1K. (Left) Performance of coresets of varying quality and size across different compute budgets. While scaling dataset size and compute together remains essential for performance, dataset quality beyond a minimum IPC value play only a minor role as indicated by the convergence of EL2N-easy and random subsets. (Middle) Score distributions during training in SL setting cluster within the easy–mid difficulty range, showing that variations in underlying sample quality have limited effect when trained with fixed soft labels. (Right) Optimal hardness analysis also reveals that performance variations across sets in SL are far smaller compared t...*
-
-
 
 ## 实验与关键发现
 
@@ -409,30 +388,17 @@ Figure 8揭示了蒸馏集与coreset在训练动态上的本质差异。蒸馏�
 
 **蒸馏集训练的额外计算成本。** 如压缩-提取权衡所揭示的，较小IPC的蒸馏集需要明显更多的训练轮次才能充分提取信息，增加了下游训练的计算成本。这一成本需要在数据存储效率与训练计算量之间进行权衡。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2097_https_arxiv_org_abs_2604_18811/figures/002_Table_1.jpg]]
 *Table 1: Performance comparison of large-scale DD methods with coreset selection methods on ImageNet-1K. We compare hard label (HL), fixed soft label (SL) and cutmix-augmented soft labels (SL+KD) setting. Model architecture is ResNet-18. Best numbers are bolded within each method type (DD, coresets). Full dataset numbers are reported with the same compute used for the IPC setting. The substantial performance gap between methods (DD or coresets) closes when trained in SL+KD setting*
 
 ![[assets/figures/papers/paper_list_l2097_https_arxiv_org_abs_2604_18811/figures/006_Table_3.jpg]]
 *Table 3: Performance comparison of the proposed method on ImageNet-1K in HL setting. We compare the proposed computeoptimal coreset CAD-Prune against EL2N-Best obtained using the sliding-window approach of Lee and Chung [21], and the proposed DD method CA2D against RDED. Both the methods outperform their best counterparts on ImageNet-1K in HL setting*
 
-![[assets/figures/papers/paper_list_l2097_https_arxiv_org_abs_2604_18811/figures/019_Figure_8.jpg]]
-*Figure 8: Convergence analysis of DD methods vs coresets. We plot downstream student performance (Top-1 Error) as a function of training epochs. One can observe that performance keeps improving for distilled sets (solid line) with longer training, while it saturates for coresets (dashed line), indicating the existence of compression-extraction trade-off in training on distilled set*
-
 ![[assets/figures/papers/paper_list_l2097_https_arxiv_org_abs_2604_18811/figures/004_Table_2.jpg]]
 *Table 2: Performance comparison of small-scale DD methods with coresets on TinyImageNet in HL and SL setting. Model architecture is ConvNet-D4. The substantial performance gap in the HL setting closes when trained with fixed soft labels*
 
 ![[assets/figures/papers/paper_list_l2097_https_arxiv_org_abs_2604_18811/figures/010_Table_6.jpg]]
 *Table 6: Performance comparison of small-scale DD methods with coresets on CIFAR-100 in HL and SL setting. Model architecture is ConvNet-D3. The substantial performance gap in the HL setting closes when trained with fixed soft labels*
-
-![[assets/figures/papers/paper_list_l2097_https_arxiv_org_abs_2604_18811/figures/011_Table_7.jpg]]
-*Table 7: CIFAR-100 Cross-Architecture Transfer performance comparison of small-scale DD methods with coresets in HL and SL setting. Model architecture is ConvNet-D3. The substantial performance gap in the HL setting closes when trained with fixed soft labels*
-
-![[assets/figures/papers/paper_list_l2097_https_arxiv_org_abs_2604_18811/figures/015_Table_8.jpg]]
-*Table 8: TinyImageNet Cross-Architecture Transfer performance comparison of small-scale DD methods with coresets in HL and SL setting. Model architecture is ConvNet-D4. The substantial performance gap in the HL setting closes when trained with fixed soft labels*
-
-
 
 ## 定位与知识库关联
 
@@ -471,8 +437,6 @@ Figure 8揭示了蒸馏集与coreset在训练动态上的本质差异。蒸馏�
 **如何构建通用的数据选择-蒸馏联合策略？** CAD-Prune证明了将样本难度与计算预算对齐的有效性，但这一策略目前仅针对硬标签设置设计。是否存在一种通用框架，能够在不同标签设置下自动调整数据质量与计算预算的平衡，是值得探索的方向。
 
 **DCS能否成为蒸馏目标设计的指导工具？** DCS目前作为评估工具使用，但其背后的思想——蒸馏目标应与下游泛化性能相关——是否可以反过来指导新蒸馏目标的设计？例如，直接优化DCS或其可微近似，可能产生更有效的蒸馏损失函数。
-
-
 
 ## 原文 PDF
 

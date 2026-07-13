@@ -53,8 +53,6 @@ claims:
 
 该基准无意涵盖所有文化群体，可能延续训练数据中的偏见；pAPE依赖姿态检测器的鲁棒性；面部质量评估尚未纳入体系；当前评估局限于图像到视频的条件生成设置。
 
-
-
 可控人类视频生成旨在根据结构条件（如姿态、深度图、边缘图）驱动参考图像中的人物运动，其在电影制作、虚拟现实、社交媒体等领域具有广阔应用前景。近年来，扩散模型的快速发展催生了大量可控视频生成模型，如 **MagicAnimate**、**MimicMotion**、**ControlNeXt** 等姿态条件模型，以及 **Control-A-Video**、**Ctrl-Adapter**、**TF-T2V** 等深度/边缘条件模型，在特定基准上展现出令人印象深刻的生成能力。
 
 然而，该领域的评估体系存在显著的瓶颈：现有常用基准数据集（如 TikTok、TED-Talks）在动作、演员数量、交互、遮挡、场景和相机运动等维度上缺乏多样性。如 Figure 1 和 Figure 2 所示，WYD 的作者对 TikTok 和 TED-Talks 进行人工标注后发现，这两个数据集在全部九个评估类别上均表现出明显的多样性不足。这种单一性导致现有基准无法全面评估和诊断模型在不同真实场景下的精细化能力，模型的系统性失败模式难以被有效暴露。
@@ -62,8 +60,6 @@ claims:
 在评估指标方面，该领域长期依赖像素级指标（PSNR、SSIM）和 FID 等图像质量指标。然而，这些指标已被证明无法可靠评估视频生成质量：FID 无法有效惩罚时序闪烁和伪影，而 FVD 则能更好地捕捉这些缺陷（见 Figure 8）。更关键的是，现有指标缺乏对人类运动保真度的专门量化手段——没有专门的基于姿态的运动度量来评估生成视频中人体动作与参考视频的一致性。
 
 上述双重缺口——基准的多样性不足和评估指标的粗粒度——构成了本文的核心动机：需要构建一个更具挑战性、更细粒度的基准，并配套经过人类验证的评估协议，以系统性地诊断当前 SOTA 模型的局限性，为未来模型改进提供明确方向。
-
-
 
 ## 核心方法与创新机理
 
@@ -95,8 +91,6 @@ $$ \text{pAPE} = 1 - \text{AP} $$
 
 上述三个创新并非孤立存在。WYD的细粒度类别为pAPE等指标提供了差异化的测试场景，暴露了模型在特定条件下的系统性缺陷；而经过人类验证的指标组合则确保了诊断结论的可靠性。这一“**精细化基准 × 人类对齐指标 × 系统性诊断**”的闭环，构成了本文方法学上的核心贡献，为未来可控人类视频生成模型的改进提供了明确的靶向指引。
 
-
-
 WYD评估体系由两条并行且相互验证的主线构成：**精细化基准构建**与**人类对齐的评估协议**。前者解决“测什么”的问题，后者解决“怎么测”的问题，二者共同形成对可控人类视频生成模型的系统性诊断能力。
 
 ### 基准构建流水线
@@ -120,9 +114,6 @@ WYD基准的构建遵循一条严格的7步过滤流水线（Figure 27），从�
 
 在视频筛选完成后，WYD为每个视频分配了覆盖**9大类别、56个子类别**的人工标注（Figure 2）。这些类别从人类视频生成的核心维度出发，包括：演员数量、演员尺寸、遮挡程度、动作类型、相机运动、场景类型、交互对象等。与TikTok和TED-Talks的对比标注显示，后者在全部9个类别上均表现出显著的多样性缺失（Figure 2）。这一标注体系是后续细粒度诊断分析的基础——它使得研究者能够精确归因模型在“多演员场景”“非典型动作”“高遮挡条件”等具体子类下的失败模式。
 
-![[assets/figures/papers/paper_list_l1005_https_arxiv_org_abs_2503_04666/figures/002_Figure_2.jpg]]
-*Figure 2: | Diversity of wyd. wyd contains manually-labeled fine-grained annotations for 9 categories and 56 sub-categories relevant to human video generation. Manually annotating TikTok and TED-Talks, we observe their distinct lack of diversity across all nine categories*
-
 ### 人类分割掩码生成
 
 为实现人类层级的评估指标，WYD需要精确的演员分割掩码。掩码生成采用**检测-跟踪-校正**的三阶段流程：首先使用OWLv2在第一帧检测人体边界框，经人工筛选和精修后，将边界框输入SAM 2进行全视频跟踪，最后在帧级别进行人工校正。这一流程确保了掩码精度足以支撑后续pFVD、pICD、pAPE等人类中心指标的计算。
@@ -144,12 +135,8 @@ WYD基准的构建遵循一条严格的7步过滤流水线（Figure 27），从�
 
 整个框架的输入为原始视频数据集和待评估的生成模型，输出为多维度的细粒度性能诊断报告。具体而言：参考视频经7步流水线筛选和人工标注后形成WYD基准；模型以参考视频的首帧及对应条件（姿态/深度/边缘）为输入生成视频；生成视频与参考视频在视频级和人类级两个层级上计算FVD/pFVD、ICD/pICD、OFE/pAPE等指标；最终按56个子类别聚合结果，揭示模型在不同维度上的能力瓶颈。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1005_https_arxiv_org_abs_2503_04666/figures/004_Figure_3.jpg]]
 *Figure 3: | Overall performance (left: video-level, right: human-level) of SOTA controllable image-to-video models on wyd16. Pose models are shown in pink, depth ones in blue, and edge ones in orange. Human generation is multifaceted and no model prevails across all metrics*
-
-
 
 ### WYD评估协议的核心架构
 
@@ -187,19 +174,6 @@ $$\text{pAPE} = 1 - \text{AP}$$
 
 **注意**：pAPE的性能受限于底层姿态检测器对高度遮挡或非典型姿态的鲁棒性，这是该指标的已知局限。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1005_https_arxiv_org_abs_2503_04666/figures/010_Figure_8.jpg]]
-*Figure 8: | Comparison of video quality metrics on wyd. Unlike FID, FVD penalizes generations with flickering and artifacts*
-
-![[assets/figures/papers/paper_list_l1005_https_arxiv_org_abs_2503_04666/figures/011_Figure_9.jpg]]
-*Figure 9: | Comparison of video quality metrics on wyd. pAPE correctly finds issues with MimicMotion and ControlNeXt (Fig. 10)*
-
-![[assets/figures/papers/paper_list_l1005_https_arxiv_org_abs_2503_04666/figures/012_Figure_10.jpg]]
-*Figure 10: | Example of pose re-scaling in MimicMotion. The pose detected in the generated video (bottom right) is re-scaled and re-centered compared to the pose from the reference video (top right). Humans are not sensitive to such changes but our pAPE metric is*
-
-
-
 ## 实验与关键发现
 
 ### 基准难度验证：WYD 对现有模型构成显著挑战
@@ -236,9 +210,6 @@ Figure 3 展示了 7 个 SOTA 可控图像到视频模型在 WYD16 上的视频�
 
 Figure 42 揭示了最佳模型在不同场景下的性能分化：
 
-![[assets/figures/papers/paper_list_l1005_https_arxiv_org_abs_2503_04666/figures/053_Figure_42.jpg]]
-*Figure 42: | Performance of best models w.r.t. ‘#Actors,’ ‘Actor size’ and ‘Actor occlusion.’ Animating multiple actors is harder than a single one. Small humans are also harder to generate precisely compared to when they cover a large portion of the frame. Performance also tends to degrade as the amount of occlusion increases*
-
 - **多演员场景**：动画化多个演员比单人视频显著更难，模型容易出现**身份崩溃**（如 Figure 5 中 TF-T2V 无法保持人物身份）。
 - **小尺寸演员**：当演员在画面中占比较小时，生成精度明显下降，细节丢失严重。
 - **高遮挡场景**：随着遮挡程度增加，模型性能持续退化，人体结构扭曲和部分肢体消失的频率上升。
@@ -257,9 +228,6 @@ Figure 43 按动作类别对最佳模型进行了性能剖析：
 #### 3. 运动量与相机动态的影响
 
 Figure 44 的分析显示：
-
-![[assets/figures/papers/paper_list_l1005_https_arxiv_org_abs_2503_04666/figures/055_Figure_44.jpg]]
-*Figure 44: | Performance of best models w.r.t. ‘Locomotion,’ ‘Camera motion’ and ‘Video motion.’ Videos with full-body locomotion are more challenging to generate due to the larger changes required. Dynamic videos with high levels of motion are more challenging. Depth-conditioned TF-T2V shows smaller OFE on dynamic videos as a result of being able to rely on background depth information*
 
 - **全身运动**和**高运动量**视频的生成质量显著低于静态或小幅运动场景。
 - **动态相机**（如跟拍、摇镜）增加了生成难度，但深度条件模型 TF-T2V 在此类视频上具有更低的 OFE，表现出对相机运动更强的鲁棒性。
@@ -302,8 +270,6 @@ Figure 41 展示了为深度/边缘条件模型添加文本引导的影响：
 ### 实验设置说明
 
 WYD 数据集的构建经历了 7 步过滤流水线（详见 Figure 27），从 Kinetics、DiDeMo 和 Oops 三个公开许可数据集的 18,351 个视频中筛选出 1,544 个高质量视频。Table 4 记录了各过滤步骤后的数据量变化，Table 5 列出了从 StoryBench 标注中提取的独特人类演员。人工验证和细粒度标注累计耗时超过 250 小时，确保了基准的标注质量和类别覆盖度。
-
-
 
 ## 定位与知识库关联
 
@@ -357,8 +323,6 @@ WYD 协议的设计决策带来了以下适用边界：
 3.  **人机对齐**：如何进一步缩小自动评估指标与人类感知之间的差距，特别是在复杂人类动作和交互场景下？
 4.  **基准演进**：WYD 的 56 个子类别是否足够覆盖未来模型的所有能力？基准应建立何种机制以持续扩展，跟上模型发展的步伐？
 5.  **效率优化**：如何开发更高效的视频生成架构，在保持可控性的同时显著降低训练和推理成本？
-
-
 
 ## 原文 PDF
 

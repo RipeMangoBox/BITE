@@ -68,8 +68,6 @@ MotionSight 的方法设计围绕**运动解耦门控**展开：根据用户查�
 
 消融实验进一步揭示：视觉聚光灯在对象运动理解上取得最高平均分，而直接应用图像背景模糊反而损害性能；全局运动模糊合成则显著提升摄像机运动理解，远超其他视觉提示方案（Table 6）。
 
-
-
 ### 视频运动理解：从静态感知到时序动态
 
 视频与静态图像的本质差异在于其承载的**时序动态信息**——对象的位移、形变，以及摄像机的推拉摇移等运动线索共同构成了人类理解视觉世界的关键维度。近年来，多模态大语言模型（MLLMs）在图像理解领域取得了长足进步，然而当面对视频中的细粒度运动时，这些模型暴露出显著的感知盲区。
@@ -93,8 +91,6 @@ MotionSight 的核心洞察在于：**MLLM 在大规模预训练中已获得的�
 2. **合成运动模糊**通过时序加权平均显式编码帧间差异，能够增强模型对摄像机运动等微妙全局变化的感知能力。这种人工引入的运动痕迹为模型提供了原本被忽略的时序线索。
 
 基于上述认知，MotionSight 提出了一种**零样本、无需训练**的视觉提示框架：通过运动类型门控将查询意图解耦为对象运动与摄像机运动，分别路由至视觉聚光灯模块和运动模糊模块，从而在不修改 MLLM 参数的前提下，显著提升细粒度运动理解能力。这一设计既保留了基础模型的通用能力，又以极低的部署成本（作者声称平均推理延迟增加少于 75%）实现了可观的性能增益。
-
-
 
 ## 核心方法与创新机理
 
@@ -146,8 +142,6 @@ MotionSight 的创新不仅限于推理阶段的零样本增强，还构建了�
 - 运动模糊的超参数（$N$ 和 $\gamma$）可能需要在不同视频内容上重新调整。
 - 视觉聚光灯的成功是否部分源于训练数据中已有的“舞台聚光灯”效应，导致分布偏移，仍需进一步验证。
 - 零样本推理引入额外延迟（作者声称平均增加少于 75%），在实时场景中可能成为瓶颈。
-
-
 
 MotionSight 的整体设计围绕一个核心观察展开：现有多模态大语言模型（MLLMs）在视频理解中缺乏显式的帧间差分机制，倾向于平均化或忽略微妙的运动线索，导致细粒度运动理解严重受限。为解决这一问题，MotionSight 提出了一套**零样本视觉提示框架**，通过无需训练的视觉变换，显式增强 MLLM 对对象运动与摄像机运动的感知能力。
 
@@ -202,8 +196,6 @@ $$\Phi_{cam}(\mathbf{V}, \mathbf{V}_s) = \left\{\mathcal{T}_{MB}(\mathbf{V}_s, N
 - **视觉提示优于文本坐标**：消融实验（Table 11）显示，直接输入边界框坐标的方法性能不及视觉聚光灯，表明视觉层面的注意力引导比文本坐标信息更有效。
 - **零样本特性**：MotionSight 不依赖任何训练或微调，其能力来源于对 MLLM 在大规模预训练中已获得的潜在运动理解能力的有效释放。
 
-
-
 MotionSight 的核心架构（图4）由三个功能模块构成：**查询感知的运动解耦门控**、**对象运动视觉提示**、**摄像机运动视觉提示**。各模块以零样本方式对 MLLM 的输入帧进行预处理，无需任何训练。
 
 ### 3.1 运动解耦门控
@@ -243,16 +235,6 @@ $$\Phi_{cam}(\mathbf{V}, \mathbf{V}_s) = \left\{\mathcal{T}_{MB}(\mathbf{V}_s, N
 $$\mathcal{R}_{obj} = \mathbf{MLLM}(\Phi_{obj}(\mathbf{V}_s)), \quad \mathcal{R}_{cam} = \mathbf{MLLM}(\Phi_{cam}(\mathbf{V}_s, \mathbf{V}))$$
 
 整个流程为零样本推理增强，不修改 MLLM 参数。作者声称平均推理延迟增加少于 75%，相较其他工作流较轻量。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2506_01674/figures/003_Figure_3.jpg]]
-*Figure 3: Comparison of our method with other existing methods. Directly applying image visual prompts can lead to misinterpretation. By employing decoupled objectguided motion focusing and inter-frame information enhancement, our method addresses the challenge faced by previous methods*
-
-![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2506_01674/figures/010_Figure_7.jpg]]
-*Figure 7: The difference between using visual spotlight and the original MLLM. We used Grad-CAM and selected the same layer for gradient computation. After incorporating the visual spotlight, the model pays more attention to the core region. Prompt: “What are the people doing?”*
-
-
 
 ## 实验与关键发现
 
@@ -297,18 +279,12 @@ Table 6 的消融实验直接揭示了不同视觉提示策略对运动理解的
 
 Figure 8 汇总了对象运动、摄像机运动及其他运动类别的平均指标。解耦后，对象运动分支和摄像机运动分支在各自相关的任务上均取得显著增益；即使在“其他运动”（与对象运动相关性较低的任务）上，视觉聚光灯对核心区域的聚焦也带来正向效果。这证实了运动类型门控（Motion Decoupling Gate）的有效性——统一处理会平均化线索，而解耦后各分支可针对性地强化对应信号。
 
-![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2506_01674/figures/013_Figure_8.jpg]]
-*Figure 8: We compiled the metrics related to object motion, camera motion, and other motion from the benchmark and averaged the experimental model and task metrics. Other motion refers to tasks with low correlation to object motion, for which we also used the visual spotlight to focus on core regions. Our method shows significant advantages after decoupling motion*
-
 ### 超参数敏感性
 
 消融实验确定了关键超参数的最优配置（Table 12–14）：
 - **暗化因子**：0.9（背景暗化程度）
 - **时序窗口大小 N**：7 帧
 - **衰减因子 γ**：0.65
-
-![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2506_01674/figures/021_Table_12.jpg]]
-*Table 12: Ablation study on the degree of background darkening*
 
 这些参数在 MotionBench 上通过网格搜索得出，但论文同时指出，不同视频内容（如快速运动 vs 缓慢运镜）可能需要重新调整，这是零样本方法的固有限制。
 
@@ -329,16 +305,6 @@ Figure 8 汇总了对象运动、摄像机运动及其他运动类别的平均�
 | 方法对更大骨干模型有效 | Table 2 (InternVL3‑78B) | 中高 |
 | 通用视频理解不降反升 | Table 5 (VideoMME) | 高 |
 | FAVOR‑Bench 文本声称与表格存在差异 | 正文 vs Table 3 | 需注意 |
-
-![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2506_01674/figures/009_Table_3.jpg]]
-*Table 3: Quantitative results on FAVOR-Bench. We selected representative MLLMs as baselines for comparison. We computed the OM (object motion) metric by averaging all metrics excluding the CM (camera motion) metric in FAVOR-Bench*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2506_01674/figures/022_Table_13.jpg]]
-*Table 13: Ablation study on temporal window size (N in Equation 5), with fixed decay factor: 0.65*
-
-
 
 ## 定位与知识库关联
 
@@ -389,8 +355,6 @@ MotionSight 的方法设计由一系列消融实验支撑，揭示了若干关�
 3.  **数据集覆盖扩展**：MotionVid-QA 的偏好对齐依赖有限的人工标注，如何进一步扩展规模和标注类型以覆盖更多样的运动与交互模式（如多对象交互、非刚体变形）仍是开放挑战。
 
 4.  **与轻量时序适配器的结合**：可否将视觉提示策略与轻量级时序适配器（如 temporal adapter）结合，在保持零样本灵活性的同时进一步降低推理延迟？这可能是通向实用化部署的关键路径。
-
-
 
 ## 原文 PDF
 

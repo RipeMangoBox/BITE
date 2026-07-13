@@ -66,8 +66,6 @@ claims:
 
 CubiD 处于**离散扩散生成**与**高维表示学习**的交叉地带。与经典离散扩散方法 **MaskGIT**（Chang et al., CVPR 2022）按空间位置掩码不同，CubiD 将掩码粒度下沉至元素级别；与自回归方法 **VAR**（Tian et al., arXiv 2024）的逐尺度预测不同，CubiD 以固定步数的并行细化替代了顺序生成。相较于 VFM-Tok 等需要重组压缩的高维令牌生成基线，CubiD 是首个**直接以原生高维表示令牌（768d）进行离散生成**的方法，无需降维或空间压缩（Table 5）。
 
-
-
 ### 离散视觉生成的两条路径
 
 视觉生成模型的核心挑战在于如何将高维、连续的图像信号转化为可建模的离散序列。当前主流范式可归结为两条技术路线：
@@ -97,8 +95,6 @@ CubiD 的出发点是一个直接的观察：**高维表示令牌本质上是一
 ### 与现有工作的定位
 
 CubiD 是首个直接在高维原生表示令牌（768d）上进行离散生成的方法。与此相对，现有离散方法（如 MaskGIT、VAR）均工作在压缩后的低维空间（通常 $\leq 32$ 维），而 VFM-Tok 虽涉及高维令牌但需额外重组压缩步骤。CubiD 在 ImageNet 256×256 上以 768 维离散令牌取得 1.88 gFID（Table 5），证明了高维离散生成在计算和语义上均可行。
-
-
 
 ## 核心方法与创新机理
 
@@ -151,8 +147,6 @@ Table 4e 显示模型从 946M 扩展至 3.7B 参数时 gFID 从 5.25 持续降�
 
 **局限提示**：当前实验仅覆盖 256×256 分辨率的 class-conditional 生成，更高分辨率或文本到图像场景下的元素级掩码计算开销是否可控，仍需进一步验证。
 
-
-
 CubiD 的整体 pipeline 围绕“高维连续表示 → 逐维离散化 → 三维掩码扩散建模 → 迭代解码”这一核心流程构建，旨在打破低维令牌生成对语义丰富性的瓶颈，同时避免高维空间下自回归建模的指数级步数灾难。
 
 ### 1. 表示提取：冻结的连续编码器
@@ -189,15 +183,8 @@ $$\mathcal{L} = -\mathbb{E}_{\mathbf{q}, \mathbf{M}} \left[ \sum_{i \in \mathbf{
 
 整个 pipeline 的因果链路可以概括为：**冻结编码器的语义保真度 → 逐维量化的信息保留 → 元素级掩码的跨轴依赖捕获 → 双向 Transformer 的并行预测能力 → 固定步数迭代的生成效率**。其中，逐维量化和元素级掩码是两个最关键的因果节点：前者确保了离散化不丢失语义（**Table 3** 的强证据），后者使得模型能够从部分观测中同时捕获空间和维度的复杂依赖（**Table 4b**：元素级掩码 gFID=5.33，而按维度掩码 gFID=120.03，按空间掩码 gFID=22.22）。两者缺一不可，共同支撑了 CubiD 在高维离散生成任务上的有效性。
 
-### 补充图表
-
-![[assets/figures/papers/cubid_cvpr2026_20260622/figures/003_Figure.jpg]]
-*Figure: Figur 3.OverviewofCubicDiscreteDiffusion.(a)HighdimensionalTokenDiscretizationGivenaninputimage,afrozenrepresentationecoderextractscontiuoustokens,whicaretendiscretizedthroughdimension-wisequantizationintoh××ddiscretetoks. (b)TrainngviaDimension-wiseMaskModeling.Duringtraining,werandomlymasktokensacrosbothspatialanddimensioalaxes ofthe ensor(white:maskedtokens,pnk:visiblegroundtruthtokensothercolors:predictedtokens).Theransformerleastopredict these masked tokens fromthe unmaskedcontext,capturing thecomplexdependencies acrossboth spatialand dimensionalaxes*
-
 ![[assets/figures/papers/cubid_cvpr2026_20260622/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of discrete visual generation approaches.(a) Low-dimensional token generation:Both methods operate at the spatial level—autoregressive requires h × w sequential steps,while discrete diffusion achieves parallel generation in T\<h ×w iterations.(b)High-dimensional token generation:Autoregressive becomes intractable (h X w X d steps),and standard discrete diffusion cannot model intra-position dependencies. Our Cubic Discrete Diffusion performs fine-grained masking across the entire 3D tensor—any dimension at any position can be masked and predicted independently-enabling effcient generation in T\< h ×w ×d iterations while capturing both spatial and dimensional correlations*
-
-
 
 CubiD 将高维表示令牌生成建模为三维张量上的细粒度掩码扩散过程。其核心由三个紧密耦合的模块构成：**逐维量化**将连续特征转化为离散令牌，**三维掩码采样器**在 h×w×d 张量上施加元素级掩码，**双向 Transformer** 从部分观测中并行预测所有被掩码位置。
 
@@ -213,9 +200,6 @@ $$q_{x,y,i} = \mathrm{Quantize}(z_{x,y,i}; L)$$
 
 ![[assets/figures/papers/cubid_cvpr2026_20260622/figures/011_Table_3.jpg]]
 *Table 3: Understanding performance onLLaVA benchmarks with different quantization methods.Evaluation using SigLIP2 features.VQ:vector quantization,DQ:dimension-wise quantization．DQ maintains continuous-level performance while VQ shows significant degradation*
-
-![[assets/figures/papers/cubid_cvpr2026_20260622/figures/008_Table_2.jpg]]
-*Table 2: Effect of quantization levels on reconstruction quality. Both encoders achieve continuous-level performance with appropriate quantization levels (L=8 for DINOv2,L=16 for SigLIP2)*
 
 ---
 
@@ -251,13 +235,6 @@ Table 4b 的消融实验揭示了掩码粒度的核心地位。按维度掩码�
 
 ![[assets/figures/papers/cubid_cvpr2026_20260622/figures/012_Figure_5.jpg]]
 *Figure 5: Qualitative comparison of different masking strategies.Top row:Per-dim masking completely fails,producing severe texture-like artifacts.Middle row:Per-spatial masking generates images with significant local inconsistencies and blurry details.Bottom row: Our per-element masking produces clear, coherent images with fine details.The dramatic quality difference validates that high-dimensional tokens require fine-grained masking across both spatial and dimensional axes*
-
-### 补充图表
-
-![[assets/figures/papers/cubid_cvpr2026_20260622/figures/004_Figure_4.jpg]]
-*Figure 4: InferenceprocessofCubiD.Toprowshowsthelatenttokenstate(white:masked,pink:unmasked),botomrowshows correspondingdecodedimages.uringgeneration,CubiDstartsfromafullyasedtensor(O%)andprogressvelyunmasktkensuntil reachingacompleteimage(O0%).Atachiteration,themodelpredictsallmaskedtokensinparalelandrandomlyunmasksasubset. The percentagesshowtheprogessthroughgenerationsteps.Generationtakeshundredsofterationsregardlessoffeaturedimensioality makingigh-dmensioaletegneratiomputatioallfeasibl.Thsualizatidemostratesacoarse-tfnegeeratiooces, where early iterations establish overall structure and later iterations refine details*
-
-
 
 ## 实验与关键发现
 
@@ -303,21 +280,8 @@ Table 5 汇总了 ImageNet 256×256 类别条件生成的主要结果。CubiD-XX
 
 当前实验的局限性也需注意：所有结果仅限于 256×256 分辨率的类别条件生成，尚未验证在更高分辨率或文本到图像场景下的有效性。逐维量化虽保持了连续特征性能，但量化层级有限（L=8 或 16），在极端细节需求下可能存在信息瓶颈。此外，推理仍需数百步迭代，实时应用场景面临延迟挑战。这些限制指向了未来的改进方向：分层掩码策略以处理更高分辨率，以及更高效的推理调度以降低步数需求。
 
-### 补充图表
-
 ![[assets/figures/papers/cubid_cvpr2026_20260622/figures/005_Table_1.jpg]]
 *Table 1: Model sizes and architecture configurations of CubiD*
-
-![[assets/figures/papers/cubid_cvpr2026_20260622/figures/009_Table.jpg]]
-*Table: (d) Inference steps.Effect of inference steps T. (f) Representation encoder. DI-NOv2 vs. SigLIP2*
-
-![[assets/figures/papers/cubid_cvpr2026_20260622/figures/010_Table.jpg]]
-*Table: (c)Mask value.Fixed,random, or learned mask token*
-
-![[assets/figures/papers/cubid_cvpr2026_20260622/figures/002_Figure.jpg]]
-*Figure: Figur2.Generatedsamples fromCubiD.Clas-conditioal generatioresultsonImageNet256×256usinghigh-dimensionalrepresentation tokens from DINOv2-B encoder,demonstrating fine details and textures across diverse categories*
-
-
 
 ## 定位与知识库关联
 
@@ -397,8 +361,6 @@ CubiD 的提出不仅解决了一个具体的技术问题，更开启了一系�
 **（4）文本到图像及视频生成的扩展。** CubiD 的掩码扩散框架在理论上支持任意条件信号——只需将条件嵌入注入双向 Transformer 的注意力层。验证该方法在文本到图像生成上的有效性，以及将 $h \times w \times d$ 张量扩展为 $t \times h \times w \times d$ 用于视频生成，是直接且重要的下一步。
 
 **（5）量化策略的理论分析。** 逐维量化的成功依赖于“预训练特征维度已充分解耦”这一经验假设。对这一假设进行更深入的理论分析——例如研究不同编码器的维度间互信息、量化误差的传播特性——可能指导更优的离散化策略设计，甚至催生专门为逐维量化优化的编码器架构。
-
-
 
 ## 原文 PDF
 

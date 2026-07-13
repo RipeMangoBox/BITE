@@ -51,8 +51,6 @@ BiMotion 的核心洞察是：**运动本质上是连续的，帧数仅为采样
 
 方法的主要局限在于：控制点数量固定，可能不足以表达极高频的复杂运动；假设网格拓扑不变，不支持撕裂或破碎等拓扑变化；B样条的光滑性约束偶尔会导致语义一致性指标（SC）略低于离散方法。这些局限也指明了未来的开放方向：自适应控制点数量选择、向非网格表示（如点云、NeRF）的扩展，以及结合物理约束或骨架先验以进一步提升运动合理性。
 
-
-
 ### 问题背景：文本驱动的动态3D角色生成
 
 文本驱动的动态3D角色生成旨在根据自然语言描述，为给定的静态3D角色网格赋予符合语义的连续运动。该任务在游戏制作、影视特效、虚拟人等应用中具有重要价值。形式上，给定一个初始网格 $M_0$ 和文本提示 $y$，目标是学习条件后验分布 $p_{\theta}(M_{1:T} \mid M_0, y)$，以生成长度为 $T$ 的动态网格序列。
@@ -74,8 +72,6 @@ BiMotion的核心洞察在于：**运动本质上是连续的，帧数仅仅是�
 - **可重参数化**：任意长度的采样序列可以通过闭式最小二乘拟合，压缩为固定数量的控制点，而无需改变生成模型的结构。
 
 基于此，BiMotion将运动生成问题重新定义为：**给定初始网格和文本提示，直接生成B样条控制点，再通过B样条插值重建任意长度的连续运动轨迹**。这一范式转换使得固定尺寸的生成模型能够完整保留运动语义，同时保持生成轨迹的光滑性和物理合理性。
-
-
 
 ## 核心方法与创新机理
 
@@ -126,8 +122,6 @@ $$\mathbf{F}_{0} = \mathbf{F}_{\mathcal{P}_{0}} + \left( w(\mathbf{F}_{\mathcal{
 
 BiMotion 的四项槽位创新构成了一个闭环系统：B 样条表示将变长运动压缩为固定控制点集，Laplacian 正则化拟合保证短序列下的自然插值，多层级嵌入保留多尺度运动细节，法向融合增强几何感知。这些设计共同实现了在固定模型容量下生成语义完整、时序连贯的动态 3D 角色运动，且推理速度与 GPU 内存占用均优于现有方法（Table 1）。
 
-
-
 BiMotion 提出了一种基于 B 样条（B-spline）的运动表示与生成框架，核心思路是将变长顶点位移序列压缩为固定数量的控制点，从而在保持完整运动语义的前提下，使固定容量的生成模型能够处理任意长度的动态网格序列。
 
 ### 框架总览
@@ -158,13 +152,6 @@ BiMotion 提出了一种基于 B 样条（B-spline）的运动表示与生成框
 - **可微重参数化**：从控制点到顶点序列的映射是线性且可微的，允许端到端训练时梯度通过 B 样条基矩阵 $B_{T,k}$ 回传至控制点。
 
 当序列较短（$T < k$）时，最小二乘系统欠定，框架引入 **Laplacian 正则化项** $\\mu \\| \\mathbf{L} \\mathcal{P}_k \\|_F^2$ 强制相邻控制点之间的平滑过渡，产生自然的运动插值（见 Figure 6）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l7_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_BiMotion_B_spline/figures/001_Figure_1.jpg]]
-*Figure 1: We propose BiMotion, a fast, feed-forward B-spline–based method for dynamic 3D character generation. It produces continuous, high-quality expressive motion trajectories aligned with rich textual prompts, outperforming discrete temporal sampling-based methods such as AnimateAnyMesh [96] under the same fixed-input constraint. See our project page for full motion dynamics*
-
-
 
 ### 3.1 运动生成的问题形式化
 
@@ -247,19 +234,6 @@ $$\hat{\mathbf{V}}_{1:T} = \mathbf{V}_0 + B_{T,k} \hat{\mathcal{P}}_k$$
 
 该步骤将固定维度的控制点表示恢复为可变长度的网格动画，且理论上可生成任意帧数的运动序列，不受训练时帧数限制。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l7_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_BiMotion_B_spline/figures/003_Figure_3.jpg]]
-*Figure 3: B-spline VAE Pipeline. Given the initial shape*
-
-![[assets/figures/papers/paper_list_l7_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_BiMotion_B_spline/figures/009_Figure_6.jpg]]
-*Figure 6: Laplacian Regularizer L. B-spline ×2 interpolation comparison from a T = 10 mesh sequence comparing Ridge [35] and our Laplacian regularizer L. L produces more natural results*
-
-![[assets/figures/papers/paper_list_l7_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_BiMotion_B_spline/figures/012_Figure_8.jpg]]
-*Figure 8: Control-PE Ablation. Our control-PE (Bottom) captures fine motion (e.g., the lion’s tail) and reduces artifacts (red circles) compared to conventional position encoding (Middle)*
-
-
-
 ## 实验与关键发现
 
 ### 核心性能突破：Vbench 定量评估
@@ -312,9 +286,6 @@ Figure 9 展示了枪械倾斜-复位场景下局部刚性损失的消融效�
 
 #### 6. 网格重划分鲁棒性（Figure 10）
 
-![[assets/figures/papers/paper_list_l7_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_BiMotion_B_spline/figures/011_Figure_10.jpg]]
-*Figure 10: Robustness to Meshing. Ours produces consistent motion under mesh changes (Top to Bottom), whereas AnimateAnyMesh exhibits unstable motion and artifacts (red circles)*
-
 Figure 10 对比了 BiMotion 与 AnimateAnyMesh 在不同网格拓扑下的运动稳定性。BiMotion 生成的轨迹在网格变化后保持一致，而 AnimateAnyMesh 出现不稳定运动和明显伪影（红色圆圈）。这一鲁棒性源于 B 样条表示将运动编码为与网格采样无关的连续控制点，而非依赖特定顶点索引的离散位移。
 
 ### 失败模式与局限性
@@ -322,13 +293,6 @@ Figure 10 对比了 BiMotion 与 AnimateAnyMesh 在不同网格拓扑下的运
 1. **高频运动细节丢失**：当控制点数量不足以覆盖复杂运动的高频分量时，B 样条的光滑性会导致细节平滑化。这在语义一致性（SC）指标上体现为略低于 AnimateAnyMesh，提示控制点数量的自适应选择是一个开放问题。
 2. **拓扑变化不支持**：框架假设网格拓扑固定，因此无法处理涉及破碎、撕裂或拓扑变化的动态场景。
 3. **光滑性-语义权衡**：B 样条的光滑性约束在保证时序连贯性的同时，可能过滤掉某些语义相关的高频运动模式（如快速抖动、突然转向），需要在实际应用中根据场景调整控制点密度或正则化强度。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l7_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_BiMotion_B_spline/figures/005_Figure_4.jpg]]
-*Figure 4: Qualitative Comparisons. Our method (BiMotion) results in superior motion quality and is more aligned with the user-provided text prompts. Artifacts for the baseline methods are highlighted in red. Please see the supplementary material for additional results*
-
-
 
 ## 定位与知识库关联
 
@@ -363,8 +327,6 @@ BiMotion的设计建立在三个核心假设之上，这些假设也划定了其
 - **真实世界泛化**：BiMotion在BIMO合成数据集上训练与评估，其在真实世界扫描数据或交互式应用中的泛化性能尚待验证。域适应或弱监督微调策略可能成为关键。
 
 - **控制粒度与语义对齐**：SC指标的轻微下降提示B样条光滑性可能与某些文本语义的精确表达存在冲突。探索自适应光滑性控制或混合表示（如B样条与稀疏关键帧结合）可能进一步提升语义对齐质量。
-
-
 
 ## 原文 PDF
 

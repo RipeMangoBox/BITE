@@ -55,8 +55,6 @@ claims:
 
 在多个基准数据集上的实验表明，DUO-VSR在感知质量上达到最优或次优水平（如SPMCS DOVER 81.47，YouHQ40 DOVER 87.28），同时推理速度比SeedVR-7B快约50倍（见Figure 1）。消融研究证实，三阶段各自发挥关键作用：双流蒸馏将CLIPIQA从0.471提升至0.487，偏好精炼将DOVER从78.01提升至88.15（见Table 3）；联合优化显著优于顺序优化（见Table 4）。该方法解决了单步VSR中训练不稳定、监督退化和质量受限的三大难题，在效率与质量之间取得了突破性平衡。
 
-
-
 ### 视频超分辨率的效率困境
 
 视频超分辨率（VSR）旨在从低质量、低分辨率的视频序列中恢复出高分辨率、细节丰富的对应版本。近年来，基于扩散模型的VSR方法在生成质量上取得了显著进展，但其推理效率严重制约了实际部署。如图1所示，扩散模型方法通常需要数十甚至数百步采样才能生成单帧结果——以**MGLD**为代表的运动引导潜在扩散方法在21帧1080p视频上耗时956.7秒（约16分钟），而基于文本到视频扩散的**STAR**和**UAV**（Zhou et al., CVPR 2024）等方法同样面临高昂的计算开销。这种效率瓶颈源于扩散模型固有的迭代去噪机制：每一步都需要通过大型神经网络（如1.3B参数的DiT）进行完整前向传播，将推理时间推至不可接受的水平。
@@ -80,8 +78,6 @@ claims:
 上述三大瓶颈——训练不稳定、退化监督、质量受限——并非孤立存在，而是相互耦合的：不稳定的训练加剧了退化监督的负面影响，而退化监督又进一步压缩了本就受限的质量空间。因此，单一的技术改进难以同时解决这三个问题。
 
 本文提出**DUO-VSR**，一个基于**双流蒸馏**（Dual-Stream Distillation）的三阶段框架。其核心洞察在于：通过引入一条与DMD并行的对抗学习流（RFS-GAN），利用真实与假分数模型的中间层特征作为判别信号，可以同时实现三个目标——（1）注入真实视频的监督信号以突破教师模型的质量瓶颈；（2）通过多模型特征互补抑制退化监督的偏差；（3）借助对抗训练的稳定性机制平滑整体优化过程。在此基础上，配合轨迹保持的渐进引导蒸馏初始化和偏好精炼后处理，构建从初始化到优化的完整解决方案。
-
-
 
 ## 核心方法与创新机理
 
@@ -133,8 +129,6 @@ $$-\mathbb{E}[\log \sigma(-\frac{\beta_t}{2}(||\mathbf{v}^w - \mathbf{v}_{\theta
 
 上述四个 changed slots 构成了 DUO-VSR 的完整创新链条：渐进引导蒸馏提供稳定初始化 → 双流蒸馏（DMD + RFS-GAN）联合优化突破质量瓶颈 → 偏好精炼进一步对齐感知质量。这一框架使 DUO-VSR 在多个基准上取得最优或次优的感知质量，同时推理速度比 SeedVR-7B 快约 50 倍（Figure 1, Table 1）。
 
-
-
 DUO-VSR 是一个三阶段单步视频超分辨率蒸馏框架，核心由**渐进引导蒸馏初始化**、**双流蒸馏**和**偏好引导精炼**三个阶段级联构成（图3）。框架的输入为低分辨率视频帧序列及其对应的文本嵌入，输出为单步生成的高分辨率视频。
 
 ### 阶段一：渐进引导蒸馏初始化（Progressive Guided Distillation Initialization）
@@ -165,12 +159,8 @@ DUO-VSR 是一个三阶段单步视频超分辨率蒸馏框架，核心由**渐�
 
 > **注意**：视频VAE采用8倍空间和4倍时间压缩，在推理时成为主要计算瓶颈，占总运行时的90%以上。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l863_https_arxiv_org_abs_2603_22271/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of our three-stage distillation framework. (a) We initialize the student model with trajectory-preserving Progressive Guided Distillation, which consists of CFG Distillation and Progressive Distillation steps. (b) The core of our method, Dual-Stream Distillation, jointly optimizes the DMD and RFS-GAN streams through alternating Student Update and Auxiliary Update, providing reliable and sufficient supervision. (c) In the final stage, we construct a generated preference dataset and apply DPO-based Preference-Guided Refinement to enhance perceptual quality*
-
-
 
 DUO-VSR 围绕一个三阶段蒸馏框架构建，其核心是将分布匹配与对抗监督统一的双流蒸馏策略。以下按模块拆解关键组件与公式。
 
@@ -241,12 +231,8 @@ $$-\mathbb{E}[\log \sigma(-\frac{\beta_t}{2}(\|\mathbf{v}^w - \mathbf{v}_{\theta
 
 该损失鼓励生成器速度场向优选样本靠近，远离劣选样本，$\beta_t$ 控制偏好强度。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l863_https_arxiv_org_abs_2603_22271/figures/014_Figure_10.jpg]]
 *Figure 10: Discriminator features from the real and fake score models used for the RFS-GAN loss computation, reduced to three dimensions via t-SNE [39] for visualization*
-
-
 
 ## 实验与关键发现
 
@@ -272,8 +258,6 @@ $$-\mathbb{E}[\log \sigma(-\frac{\beta_t}{2}(\|\mathbf{v}^w - \mathbf{v}_{\theta
 
 所有推理速度测试在同一设备上使用相同分辨率（1920×1080）和帧数（21帧）进行，模型参数量仅统计生成器部分。定量评估采用统一的基准数据集和标准指标（PSNR、SSIM、LPIPS、NIQE、MUSIQ、CLIP-IQA、DOVER、E_warp）。用户研究采用盲测GSB方法，由20位计算机视觉背景研究人员进行主观评价（表7），DUO-VSR在“好/相当/差”三项上均取得最优。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l863_https_arxiv_org_abs_2603_22271/figures/005_Table_1.jpg]]
 *Table 1: Quantitative comparisons on benchmarks, including synthetic (SPMCS [55], UDM10 [81], YouHQ40 [96]), real-world (VideoLQ [4]), and AIGC (AIGC60) videos. The best and second performances are marked in red and blue respectively*
 
@@ -282,26 +266,6 @@ $$-\mathbb{E}[\log \sigma(-\frac{\beta_t}{2}(\|\mathbf{v}^w - \mathbf{v}_{\theta
 
 ![[assets/figures/papers/paper_list_l863_https_arxiv_org_abs_2603_22271/figures/010_Table_4.jpg]]
 *Table 4: Ablation on Dual-Stream Distillation Strategy. “Joint” and “Seq.” denote different optimization schemes*
-
-![[assets/figures/papers/paper_list_l863_https_arxiv_org_abs_2603_22271/figures/015_Table_5.jpg]]
-*Table 5: Ablation study on the discriminator design of RFS-GAN*
-
-![[assets/figures/papers/paper_list_l863_https_arxiv_org_abs_2603_22271/figures/007_Table_2.jpg]]
-*Table 2: Inference efficiency comparison. Measured on a single GPU using a 21-frame 1920 × 1080 video. The model parameters are counted only for the generator part*
-
-![[assets/figures/papers/paper_list_l863_https_arxiv_org_abs_2603_22271/figures/017_Table_6.jpg]]
-*Table 6: Quantitative comparison on the AIGC60 dataset*
-
-![[assets/figures/papers/paper_list_l863_https_arxiv_org_abs_2603_22271/figures/001_Figure_1.jpg]]
-*Figure 1: Inference Speed and Performance Comparison. The bubble chart on the left compares model parameter scale, inference time, and DOVER score across methods, with inference speed measured on a single GPU using a 21-frame, 1920 × 1080 resolution video. The right-side images show super-resolution results for different videos. Our method not only demonstrates remarkable detail generation capabilities but also achieves superior inference efficiency, accelerating inference speed by approximately 50× compared to SeedVR-7B*
-
-![[assets/figures/papers/paper_list_l863_https_arxiv_org_abs_2603_22271/figures/006_Figure_5.jpg]]
-*Figure 5: Comparison of temporal consistency. Extracted and stacked along the blue line in the width–temporal plane*
-
-![[assets/figures/papers/paper_list_l863_https_arxiv_org_abs_2603_22271/figures/012_Figure_8.jpg]]
-*Figure 8: Examples of preferred and less-preferred samples in the constructed preference dataset. Zoom in for details*
-
-
 
 ## 定位与知识库关联
 
@@ -378,8 +342,6 @@ DUO-VSR 在以下场景展现出显著优势：
 4. **更激进的压缩比**：是否可能将教师模型的采样步数从 50 步进一步压缩至单步，同时保持与多步教师相当的感知质量？这需要在蒸馏损失设计和对抗监督强度上进行更深入的探索。
 
 5. **跨模态扩展**：双流蒸馏策略中的 RFS-GAN 判别器设计（利用分数模型特征）是否适用于其他生成任务（如文本到视频生成、视频编辑）的单步蒸馏？
-
-
 
 ## 原文 PDF
 

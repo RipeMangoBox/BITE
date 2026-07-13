@@ -51,8 +51,6 @@ claims:
 
 方法上，FINO 建立在 Flow Q-Learning（FQL）的框架之上，通过改造条件概率路径的方差结构实现噪声注入，并引入熵约束的自适应采样策略，在不显著增加推理开销的前提下，将离线预训练的保守性与在线探索的多样性有机统一。
 
-
-
 ### 离线到在线强化学习的核心挑战
 
 离线到在线强化学习（Offline-to-Online RL）采用两阶段框架：首先在静态数据集 $\mathcal{D} = \{(s, a, r, s')\}$ 上进行离线预训练，随后通过环境交互进行在线微调。这一范式旨在结合离线数据的高效利用与在线交互的适应能力，但其核心瓶颈在于：离线预训练阶段学到的策略往往过度拟合数据集分布，导致在线微调时缺乏足够的探索多样性，难以有效发现更优的行为模式。
@@ -76,8 +74,6 @@ claims:
 2. **在线微调阶段的探索-利用平衡**：利用离线阶段获得的扩展行动空间进行探索，同时引入基于熵引导的采样机制（entropy-guided sampling），根据策略行为的演化动态调整探索与利用的平衡，避免在线微调过程中因过度探索而破坏已学到的有效行为。
 
 通过这两个层面的协同设计，FINO 旨在在不增加数据集规模的前提下，诱导出多样化的行为模式，从而在有限的在线微调预算下实现更优的性能提升。
-
-
 
 ## 核心方法与创新机理
 
@@ -120,8 +116,6 @@ $$\xi_{\mathrm{new}} = \xi - \alpha_{\xi} [\mathcal{H} - \bar{\mathcal{H}}]$$
 - **在线阶段**：将固定的动作选择策略替换为熵自适应的候选采样机制，使探索强度随策略成熟度动态调整。
 
 消融实验（图 6 左）表明，噪声注入与熵引导采样两者缺一不可——单独使用任一组件均无法达到完整 FINO 的性能水平。与直接向动作添加噪声的基线相比，FINO 在流匹配内部注入噪声的策略带来了显著的性能增益（图 4）；与熵调控噪声缩放的替代方案相比，FINO 的熵引导采样机制也展现出明显优势（图 5）。
-
-
 
 ![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_6wd38R8L0Z/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of FQL and FINO (ours) in terms of performance and exploration patterns on the environment antmaze-giant-navigate. The green circle and red star indicate the initial and goal states, respectively*
@@ -177,8 +171,6 @@ $$\xi_{\text{new}} = \xi - \alpha_\xi [\mathcal{H} - \bar{\mathcal{H}}],$$
 
 FINO 引入的额外计算开销主要来自熵估计和候选动作采样。如 **Figure 6** 所示，相对于骨架算法 FQL，训练时间仅有轻微增加，且该增加远小于 Cal-QL 等基线方法。在推理阶段，FINO 所需的采样次数少于 IFQL 等基线，表明额外计算并未带来显著的效率瓶颈。
 
-
-
 FINO 在 FQL 的 flow matching 框架上引入两个关键模块：**噪声注入的离线预训练**与**熵引导的在线采样**。前者在行为克隆阶段主动扩展策略的动作支撑集，后者在在线微调阶段动态平衡探索与利用。
 
 ### 噪声注入的 Flow Matching
@@ -222,8 +214,6 @@ FINO 沿用 FQL 的整体架构，包括 flow 策略 $a_\theta(s, z)$ 和一步�
 $$\mathcal{L}_\pi(\omega) = \mathbb{E}_{s \sim \mathcal{D}, z \sim \mathcal{N}(0, I)} \left[ -Q_\phi(s, a_\omega(s, z)) + \alpha \| a_\omega(s, z) - a_\theta(s, z) \|_2^2 \right]$$
 
 FINO 的改动集中在 flow 策略的训练目标（注入噪声）和在线采样策略（熵引导），未修改 Q 函数更新或一步策略蒸馏的框架。消融实验（Figure 6 左）表明，噪声注入与熵引导是两个不可或缺的组件，单独移除任一均导致显著性能下降。
-
-
 
 ## 实验与关键发现
 
@@ -276,16 +266,6 @@ Figure 7 分析了候选动作数量 $N_{\text{sample}}$ 对性能的影响。�
 
 **注意**：本节中所有数值和结论均直接源自 Table 1、Table 5 及 Figures 3-7 的验证数据，未引入推测性主张。如需进一步确认 puzzle 任务上的具体失败机制，建议结合任务奖励结构和访问热力图进行手动验证。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_6wd38R8L0Z/figures/015_Table_2.jpg]]
-*Table 2: Hyperparameters*
-
-![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_6wd38R8L0Z/figures/016_Table_3.jpg]]
-*Table 3: Task-specific hyperparameters for each baseline*
-
-
-
 ## 定位与知识库关联
 
 ### 方法沿革与基线关系
@@ -326,8 +306,6 @@ FINO 的设计基于以下前提，这些前提也界定了其适用范围：
 - 熵引导采样机制中的目标熵 H̄ 当前设为 −dim(A)，这一启发式设定在不同动作维度下的普适性如何？
 - FINO 在更复杂的视觉输入任务或稀疏奖励场景下的表现尚待验证。
 - 噪声注入与 flow matching 的理论联系——即注入噪声如何影响 flow 模型的概率路径和生成质量——仍需更深入的形式化分析。
-
-
 
 ## 原文 PDF
 

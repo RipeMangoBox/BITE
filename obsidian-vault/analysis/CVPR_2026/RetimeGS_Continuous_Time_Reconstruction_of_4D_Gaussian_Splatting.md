@@ -70,8 +70,6 @@ RetimeGS 通过三个关键设计解决上述问题：
 
 当帧间运动过大或帧率极低时，现有光流估计器无法提供可靠对应，中间帧插值仍会出现明显伪影。此外，相邻动态基元组本质上的不连续性会在离散输入帧处引入轻微闪烁。
 
-
-
 ### 动态场景重建的4DGS范式
 
 3D Gaussian Splatting（3DGS）在静态场景的新视角合成中取得了显著成功，其显式点基元表示兼具高保真渲染与实时性能。将这一范式扩展到动态场景——即4D Gaussian Splatting（4DGS）——成为近期研究热点。现有4DGS方法大致分为两类：**基于变形的方案**（如 **Deform-GS**）使用单一基元集并通过变形场驱动其运动；**4D基元方案**（如 **STGS**、**GaussianFlow**、**Ex4DGS**）则为每个基元显式赋予时间维度参数，使其在时空域中直接表示动态内容。
@@ -99,8 +97,6 @@ RetimeGS 通过三个关键设计解决上述问题：
 3. **基元预算分配失衡**，静态区域冗余而动态区域欠采样。
 
 RetimeGS 针对上述三个缺口，提出了一套协同设计的解决方案：通过短尾双sigmoid时间不透明度强制每组基元覆盖相邻两帧及其间隔；利用双向光流监督的Catmull-Rom样条建模平滑轨迹；配合动态拉伸与重定位策略优化基元预算分配。这些设计共同使4DGS能够可靠地插值任意中间帧，即使在大幅帧间运动下也能保持高保真渲染。
-
-
 
 ## 核心方法与创新机理
 
@@ -143,8 +139,6 @@ $$
 3. **流感知初始化**：利用 VGGT 点云和双向光流反投影估计初始速度和伪均值，为优化提供良好的起点。
 
 这些 changed slots 共同构成一个闭环：时间不透明度正则化消除过拟合，样条轨迹提供平滑运动先验，三重渲染和动态资源分配确保训练信号的一致性和基元预算的高效利用。
-
-
 
 RetimeGS 的核心设计思路是通过**正则化时间不透明度**与**样条轨迹建模**，从根本上消除现有 4DGS 方法在中间帧渲染时出现的时间混叠（鬼影）伪影。整体 pipeline 由四个紧密协作的模块构成，输入为多视角视频与双向光流，输出为可在任意连续时刻渲染高质量图像的 4D 场景表示。
 
@@ -203,11 +197,6 @@ $$\mathbf{p}_{0,p} = \mathbf{p}_{1,p} - \Delta t \cdot \mathbf{v}_{1,p}, \qquad 
 
 当帧间运动过大或帧率极低（光流位移超过约 50 像素）时，光流估计器无法提供可靠对应，导致中间帧插值出现明显伪影（Figure 8）。此外，由于相邻动态基元组本质上是两组独立的基元集合，在离散输入帧处仍可能出现轻微闪烁伪影。
 
-![[assets/figures/papers/paper_list_l2091_https_arxiv_org_abs_2603_13783/figures/011_Figure_8.jpg]]
-*Figure 8: Failure case under extremely low capture FPS. Our method struggles to interpolate intermediate frames when the inter-frame motion becomes too large due to low temporal sampling or large motion*
-
-
-
 ### 4D基元表示
 
 RetimeGS 将 3DGS 的静态基元扩展为可描述动态场景的 4D 基元，每个基元 $p$ 的参数为：
@@ -225,9 +214,6 @@ $$\sigma_{\tau,p}(t) \sigma_p \exp\bigl( -\frac{1}{2} (\pmb{x} - \pmb{x}_p(t))^{
 ### 时间不透明度正则化
 
 现有 4D 基元方法（如 STGS、Ex4DGS）的时间不透明度采用无正则化的 1D 高斯分布，训练中易坍缩到单帧，导致中间帧出现鬼影（Figure 2）。RetimeGS 将时间不透明度建模为两个边界感知 sigmoid 函数的乘积，形成短尾（short-tailed）平滑过渡：
-
-![[assets/figures/papers/paper_list_l2091_https_arxiv_org_abs_2603_13783/figures/002_Figure_2.jpg]]
-*Figure 2: Illustration of temporal overfitting to input frames*
 
 $$\sigma_{\tau}(t) = \tilde{\psi}_l\left( \frac{t - (\mu_{\tau} - \tau_l)}{\gamma} \right) \tilde{\psi}_r\left( \frac{(\mu_{\tau} + \tau_r) - t}{\gamma} \right)$$
 
@@ -263,12 +249,8 @@ $$s = \frac{\sigma}{\tau_l + \tau_r}$$
 
 该分数以时间跨度加权基础不透明度，使低不透明度或短时间跨度的基元优先被重定位到高分数区域，提升动态区域重建质量。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2091_https_arxiv_org_abs_2603_13783/figures/010_Figure_6.jpg]]
 *Figure 6: Ablation on dynamic stretching. The magenta is rendered using static stretched primitives, and the teal is rendered using dynamic primitives (with static background removed)*
-
-
 
 ## 实验与关键发现
 
@@ -292,9 +274,6 @@ RetimeGS 在 Stage-Capture 数据集上以显著优势超越所有基线方法�
 
 定性对比（**Figure 4**）显示，RetimeGS 在 DNA-Rendering 和 Stage-Capture 数据集上均重建出更清晰的纹理细节与更少的时间伪影，尤其在存在大幅非刚性变形和可见性变化的区域。
 
-![[assets/figures/papers/paper_list_l2091_https_arxiv_org_abs_2603_13783/figures/005_Figure_4.jpg]]
-*Figure 4: Qualitative comparison. Results on DNA-Rendering Dataset [4] (w/o GT held-out views, left) and Stage-Capture Dataset (w/ GT held-out views, right). The red boxes show the corresponding zoomed-in views for detailed comparison*
-
 ### 消融实验：各组件的因果贡献
 
 **Table 2** 汇总了关键组件的消融结果，以下逐一分析其因果机制。
@@ -316,19 +295,6 @@ RetimeGS 在 Stage-Capture 数据集上以显著优势超越所有基线方法�
 ### 失败模式与局限
 
 当帧间运动过大或视频帧率极低时，RetimeGS 的中间帧插值出现明显伪影（**Figure 8**）。根因在于现有光流估计器在光流位移超过约 50 像素时无法提供可靠对应，导致样条轨迹监督失效。此外，由于相邻动态基元组本质上不连续，离散输入帧处仍可能出现轻微闪烁伪影。这两个问题指向了当前 4DGS 框架的结构性局限：对光流质量的强依赖和基元组间的离散边界。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2091_https_arxiv_org_abs_2603_13783/figures/006_Table_2.jpg]]
-*Table 2: Quantitative ablation on the Stage-Capture Dataset, focusing on the foreground region. Red and yellow cell colors indicate the best and second-best results, respectively*
-
-![[assets/figures/papers/paper_list_l2091_https_arxiv_org_abs_2603_13783/figures/017_Table_6.jpg]]
-*Table 6: Ablation study on flow supervision: comparison of WAFT [35] and SEA-RAFT [36] as optical flow supervision modules*
-
-![[assets/figures/papers/paper_list_l2091_https_arxiv_org_abs_2603_13783/figures/018_Table_7.jpg]]
-*Table 7: Comparison of training efficiency and peak GPU memory under a shared budget of 1M primitives*
-
-
 
 ## 定位与知识库关联
 
@@ -371,8 +337,6 @@ RetimeGS 的有效性依赖于两个关键前提，当这些前提被打破时�
 3. **自适应时间窗口与不透明度建模**：当前短尾时间不透明度的窗口宽度是均匀初始化的，且形状固定。对于不同运动速度、不同不透明度变化模式的区域，自适应地调整 $\tau_l, \tau_r$ 以及 sigmoid 的锐度参数 $\gamma$，可能进一步提升对复杂动态场景的建模能力。
 
 4. **与基于变形的 4DGS 的融合**：RetimeGS 的 4D 基元表示与 Deform-GS 的变形场表示并非互斥。将短尾时间不透明度正则化引入变形框架，或在 4D 基元框架中引入局部变形场以处理基元内部的非刚性形变，可能结合两者的优势。
-
-
 
 ## 原文 PDF
 

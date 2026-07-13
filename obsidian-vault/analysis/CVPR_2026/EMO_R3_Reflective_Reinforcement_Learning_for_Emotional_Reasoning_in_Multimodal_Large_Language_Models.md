@@ -51,8 +51,6 @@ claims:
 
 实验结果表明，EMO-R3 在域内（EmoSet、Emotion6）和多个域外情感理解基准上均取得最高总体准确率，一致优于 GRPO 及其变体（DAPO、R1-VL、Visual-RFT 等）。消融研究证实 SET 和 RER 各自对性能有正向贡献，且二者结合效果最优。特别地，DAPO 因其奖励过滤策略与离散情感推理评估不兼容而无法完成完整训练，从反面验证了任务特定适配的必要性。
 
-
-
 多模态大语言模型（MLLMs）在视觉感知和文本理解方面取得了显著进展，但在情感推理这一高度主观的任务上仍面临根本性挑战。情感理解要求模型不仅能识别图像中的物体和场景，还需要捕捉微妙的情感线索——如面部表情、姿态、色彩氛围和场景语义——并将其整合为连贯的情感判断。这一过程本质上需要可解释的推理链，而非简单的模式匹配。
 
 当前主流方法存在两类典型局限。**监督微调（SFT）**依赖人工标注的情感标签训练模型，但受限于封闭的标签空间和有限的类别体系，导致泛化能力薄弱。如 Figure 1(a) 所示，SFT 在域内样本（如“风景–敬畏”）上表现良好，但面对域外或未见过的情感组合（如“运动–惊讶”）时推理能力急剧退化，且其黑箱式预测缺乏可解释性。另一方面，基于强化学习的 **GRPO**（Group Relative Policy Optimization；Shao et al., arXiv 2024）通过奖励信号引导模型探索更优策略，在一定程度上改善了泛化性，但其核心瓶颈在于：通用的单一“思考”（think）指令无法引导模型进行结构化的情感推理，导致生成的推理路径与最终答案之间关联薄弱。如 Figure 1(b) 所示，GRPO 的思考过程可能反复摇摆，最终预测“恐惧”而推理却指向“愉悦”，暴露出视觉情感信号捕捉不稳定、可解释性差的根本缺陷。
@@ -60,8 +58,6 @@ claims:
 这一瓶颈的深层原因在于：情感认知本身遵循“感知触发→主观反应→综合判断”的直觉逻辑，而现有方法未能将这一认知结构显式地编码到模型的推理过程中。同时，GRPO 的奖励函数仅包含准确率奖励和格式奖励，缺乏对推理质量的直接反馈信号，使得优化目标停留在答案匹配层面，而非推理过程的对齐。
 
 针对上述问题，本文提出 **EMO-R3**（Reflective Reinforcement Learning for Emotional Reasoning），核心思路是通过两个关键设计将优化目标从单纯的答案匹配转向对推理质量的对齐：（1）**结构化情感思维（Structured Emotional Thinking, SET）**，将推理过程显式分解为情感触发识别、人类情感反思、情感结论三个阶段，为模型提供可解释的推理框架；（2）**反思性情感奖励（Reflective Emotional Reward, RER）**，利用模型自反思能力对推理的视觉-文本一致性和情感连贯性进行闭环评估，使奖励信号直接反映推理质量。此外，轻量级冷启动策略（Cold-Start-Emo）在不使用思维链标注的前提下实现任务初始化对齐，进一步稳定训练并提升域外泛化能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -103,8 +99,6 @@ $$\mathcal{R}_{\mathrm{overall}} = (1 - \lambda_1 - \lambda_2)\mathcal{R}_{\math
 
 消融实验证实，SET和RER各自对性能有正向贡献，且两者结合效果最优；Cold-Start-Emo在EMO-R3基础上进一步提升域外平均准确率至62.13%。值得注意的是，GRPO变体**DAPO**（Yu et al., arXiv 2025）因其奖励过滤策略与离散情感推理评估不兼容，训练过程直接中断，从反面验证了任务特定适配的必要性。
 
-
-
 EMO-R3 的整体框架围绕一个核心问题展开：**通用强化学习（GRPO）的单一思考指令无法引导多模态大模型进行结构化的情感推理，且其推理路径与最终答案关联弱，导致模型对视觉情感信号捕捉不稳定、可解释性差**。为解决这一问题，EMO-R3 将人类情感认知的直觉逻辑（感知触发 → 主观反应 → 综合判断）固化为可解释的推理链，并利用模型自反思能力对推理质量进行闭环反馈，从而将优化目标从单纯答案匹配转向对推理质量的对齐。
 
 ### 框架总览
@@ -142,8 +136,6 @@ $$\mathcal{J}_{\mathrm{GRPO}}(\theta) = \mathbb{E}_{q \sim \rho_Q} \mathbb{E}_{o
 ### 数据流与模块交互
 
 整个框架的数据流可概括为：图像和文本输入 → SET 引导生成结构化推理轨迹 → GRPO 采样多个 rollout → RER 对推理质量进行自反思评估 → 综合奖励信号回传更新模型参数。这一闭环设计使得模型不仅被优化为“答对”，更被优化为“推理得对”——即推理过程与视觉内容一致、情感推导连贯。
-
-
 
 EMO-R3 的核心架构由两个相互咬合的创新模块构成：**结构化情感思维（Structured Emotional Thinking, SET）** 和 **反思性情感奖励（Reflective Emotional Reward, RER）**，二者共同运行在 GRPO 优化框架之上。以下逐一拆解各模块的关键公式与变量含义。
 
@@ -214,13 +206,6 @@ $$
 
 此外，EMO-R3 引入轻量级 **Cold-Start-Emo** 策略：在 GRPO 训练前，使用少量无思维链标注的样本进行监督微调初始化，提前对齐预训练先验与下游情感任务，进一步稳定训练并提升域外泛化能力。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2657_https_arxiv_org_abs_2602_23802/figures/001_Figure_1.jpg]]
-*Figure 1: Illustration of the motivation. (a) SFT relies on human annotations but is constrained by fixed labels and limited categories, resulting in poor generalization and interpretability. It performs well on in-domain pairs like “landscape–awe” but struggles with out-of-domain or unseen cases (e.g., “movement-surprise”). (b) Although GRPO improves generalization, its think process is not emotion-oriented and weakly connected to the final answer (e.g., rethinking the last rollout yields “amusement”, while the prediction is “fear”)*
-
-
-
 ## 实验与关键发现
 
 ### 核心性能对比
@@ -261,21 +246,14 @@ EMO-R3在域内（EmoSet、Emotion6）和多个域外情感理解基准上，与
 
 **Figure 4**对比了GRPO与EMO-R3在EmoSet数据集上的情感推理输出。GRPO的推理过程与最终答案之间关联弱（如推理中提及“amusement”但预测为“fear”），而EMO-R3通过三阶段结构化推理，使情感触发识别、人类情感反思和最终结论之间形成连贯的逻辑链条，显著提升了推理的可解释性和准确性。具体案例细节需参考原图进行人工验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2657_https_arxiv_org_abs_2602_23802/figures/005_Table_2.jpg]]
 *Table 2: Experiment on Cold-Start-Emo*
 
 ![[assets/figures/papers/paper_list_l2657_https_arxiv_org_abs_2602_23802/figures/006_Table_3.jpg]]
 *Table 3: Ablative study of Structured Emotional Thinking (SET) and Reflective Emotional Reward (RER). Please see Sec. 4.3*
 
-![[assets/figures/papers/paper_list_l2657_https_arxiv_org_abs_2602_23802/figures/008_Figure_5.jpg]]
-*Figure 5: Efficiency analysis on the training process. See Sec. 4.5*
-
 ![[assets/figures/papers/paper_list_l2657_https_arxiv_org_abs_2602_23802/figures/007_Figure_4.jpg]]
 *Figure 4: Case study between GRPO and EMO-R3 on the EmoSet dataset. Please see Sec. 4.4 for details*
-
-
 
 ## 定位与知识库关联
 
@@ -306,8 +284,6 @@ EMO-R3 的核心贡献在于将通用强化学习优化框架适配到情感推�
 2. **反思性奖励的泛化能力。** 反思性情感奖励机制的核心思想——利用模型自反思评估推理质量——能否泛化为通用的主观推理质量评估器？这一机制可能被应用于美学评估、幽默理解、讽刺检测等其他高度主观的多模态任务，但需要验证图像-文本一致性和情感连贯性奖励在非情感场景中的适用性及其变体设计。
 
 3. **无监督情感推理涌现。** 能否完全消除对冷启动 SFT 的依赖，通过更精妙的奖励设计或课程学习策略从零开始引导情感推理能力的涌现？这需要探索如何在完全无标注的条件下，引导模型自主发现结构化的情感推理模式。
-
-
 
 ## 原文 PDF
 

@@ -60,8 +60,6 @@ claims:
 
 本文剩余部分组织如下：第2节回顾相关工作并给出方法总览；第3节详述 AG-VAE 的潜在结构化建模与层次化跨模态对齐机制；第4节呈现定量评估、消融实验与可视化分析；第5节讨论局限性并展望未来方向。
 
-
-
 ### 文本驱动运动生成的核心瓶颈
 
 文本驱动的人体运动生成旨在从自然语言描述中合成逼真的三维动作序列，在动画制作、虚拟现实和人机交互等领域具有广泛的应用前景。近年来，扩散模型在该任务上取得了显著进展，代表性工作包括**MDM**（Tevet et al., ICLR 2023）、**MoMask**（Guo et al., CVPR 2024）和**SALAD**（Hong et al., CVPR 2025）等。然而，现有扩散模型普遍存在一个深层瓶颈：**潜在空间采用各向同性高斯先验，跨模态监督方式平坦**，导致潜在表示中不同语义的运动模式高度纠缠，可解释性和可控性均受到严重制约。
@@ -78,8 +76,6 @@ claims:
 2. **层次化跨模态推理**：设计动态跨模态记忆模块（DCMM）和分层跨模态注意力（HCA），分别实现长期语义检索和词-关节/句子-轨迹的多层级对齐，并通过可学习门控机制自适应融合。
 
 如Figure 1(b)所示，AG-VAE的潜在分布呈现出清晰的多模态分离结构，每个高斯分量对应一类运动动态，簇概率分布（Figure 1(c)）也验证了语义组织的有效性。这种结构化先验为扩散生成器提供了更强的归纳偏置，而层次化跨模态对齐则确保了文本语义在局部和全局两个粒度上都能准确注入运动生成过程。
-
-
 
 ## 核心方法与创新机理
 
@@ -123,8 +119,6 @@ $$c_{b,\ell}^{\mathrm{enh}} = \mathrm{LayerNorm}\big(g_{b,\ell} \odot m_{b} + (1
 
 HESP 的三项核心创新构成了一个因果链条：**AG-VAE 将潜在空间结构化**，为语义解耦提供了几何基础；**DCMM + HCA 实现了层次化跨模态推理**，确保文本语义在多粒度上与运动对齐；**自适应门控融合**则使语义注入过程具备动态调节能力。三者协同作用，使得 HESP 在文本-运动对齐精度、生成质量和潜在空间可解释性上全面超越现有基线。
 
-
-
 HESP 的整体 pipeline 围绕两条核心设计线索展开：**结构化潜在运动建模**与**层次化跨模态对齐**。图 2 给出了系统架构的全貌，左侧为 AG-VAE 构建的语义子流形潜在空间，右侧为融合 DCMM 与 HCA 的扩散生成器。
 
 **输入与编码**。给定文本描述，HESP 使用 CLIP-ViT-B/32 作为文本主干提取词级和句子级特征。运动侧则以骨骼拓扑图 $S$ 为条件，通过骨骼-时间卷积（SkelConv + TempConv）与时空池化（STPool）将运动序列 $\mathbf{m}_{1:N}$ 编码为潜在向量 $\mathbf{z}$。
@@ -151,12 +145,8 @@ $$\mathcal{L} = \mathbb{E}_{q_\phi(\mathbf{z},k|\mathbf{x})}[\log p_\theta(\math
 
 **模块间因果关系**。AG-VAE 提供的结构化潜在空间降低了扩散模型对先验分布的建模难度，而 DCMM 与 HCA 则确保文本语义在多个粒度上精确注入去噪过程。消融实验（Table 4）证实：移除 DCMM 或 HCA 均会导致 R-Precision 和 FID 显著退化，验证了层次化跨模态对齐的关键作用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2_https_openaccess_thecvf_com_content_CVPR2026_html_Lv_Hierarchical_Enhanc/figures/004_Figure_1.jpg]]
 *Figure 1: Comparative analysis of latent space organization in Standard VAE versus AG-VAE. (a) Standard VAE exhibits a less structured, overlapping distribution in latent space. (b) AG-VAE demonstrates a clearly separated multimodal distribution, reflecting distinct motion dynamics. (c) The cluster probability distribution in AG-VAE shows well-defined cluster assignments, validating the semantic organization of motion patterns*
-
-
 
 HESP 的核心架构由三个紧密协作的模块构成：**AG-VAE**（自适应高斯变分自编码器）、**DCMM**（动态跨模态记忆）和 **HCA**（分层跨模态注意力）。它们共同实现了从潜在空间结构化到层次化文本-运动对齐的完整链路。
 
@@ -229,12 +219,8 @@ $$c_{b,\ell}^{\mathrm{enh}} = \mathrm{LayerNorm}\big(g_{b,\ell} \odot m_{b} + (1
 
 三个模块形成一条清晰的因果链：**AG-VAE** 提供结构化、语义可分的潜在空间 → **DCMM** 在扩散生成过程中检索长期跨模态先验 → **HCA** 将检索到的语义信息以分层方式注入运动特征。消融实验（Table 4）证实了这一协同关系的关键性：移除 DCMM 导致 R-Precision Top-3 从 0.871 降至 0.847，移除 HCA 进一步降至 0.839，同时 FID 显著恶化，表明层次化跨模态对齐对生成质量和解耦能力均不可或缺。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2_https_openaccess_thecvf_com_content_CVPR2026_html_Lv_Hierarchical_Enhanc/figures/005_Figure_3.jpg]]
 *Figure 3: Compare the mean squared error (MSE) between the standard VAE and AG-VAE in data reconstruction tasks. AG-VAE demonstrates superior reconstruction performance, with the MSE decreasing from 0.3584 for the standard VAE to 0.2981, a relative improvement of 16.84%, indicating that the improved model architecture has a significant advantage in data reconstruction*
-
-
 
 ## 实验与关键发现
 
@@ -283,8 +269,6 @@ Figure 4展示了MDM、SALAD和HESP在相同文本提示下的生成运动定性
 3. **熵正则化平衡**：需要进一步研究熵正则化混合先验，以在运动多样性与可控性之间取得更优平衡。
 4. **多人交互**：当前方法仅支持单人物运动生成，多人动作的交互生成是未来值得探索的方向。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2_https_openaccess_thecvf_com_content_CVPR2026_html_Lv_Hierarchical_Enhanc/figures/007_Table_2.jpg]]
 *Table 2: Quantitative comparison of latent-space structure metrics on the HumanML3D test set. Higher Calinski-Harabasz (CH) and Cluster Separation (CS) values, and lower Davies-Bouldin (DB) index, indicate better-organized latent representations. All scores are computed under identical cluster labels produced by the AG-VAE classifier*
 
@@ -296,8 +280,6 @@ Figure 4展示了MDM、SALAD和HESP在相同文本提示下的生成运动定性
 
 ![[assets/figures/papers/paper_list_l2_https_openaccess_thecvf_com_content_CVPR2026_html_Lv_Hierarchical_Enhanc/figures/009_Table_3.jpg]]
 *Table 3: Quantitative results on the quality and accuracy of reconstructed motion features of VAE models from different methods, along with the number of trainable parameters, measured on the test set of HumanML3D*
-
-
 
 ## 定位与知识库关联
 
@@ -342,8 +324,6 @@ HESP 为社区贡献了以下可迁移的知识模块与开放研究问题：
 3. 如何将 HESP 的层次化对齐框架扩展至长序列多人交互运动生成？
 
 **证据强度说明**：上述局限与开放问题均直接来自论文的讨论部分，属于作者明确承认的研究边界。关于 AG-VAE 与标准 VAE 的对比证据（重建 MSE 从 0.3584 降至 0.2981，CH 指数从 11.95 升至 48.81）来自 Figure 3 和 Table 2，置信度分别为 0.98 和 0.95，属于强证据。消融实验中移除 DCMM 或 HCA 导致 R-Precision Top-3 分别从 0.871 降至 0.847 和 0.839（Table 4），置信度 0.95，进一步验证了层次化跨模态对齐的因果作用。
-
-
 
 ## 原文 PDF
 

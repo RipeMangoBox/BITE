@@ -54,8 +54,6 @@ PAGE-4D 是一种前馈式4D感知模型，旨在将 VGGT（Wang et al., CVPR 20
 
 主要实验结果表明，在 Sintel 数据集上，PAGE-4D 将相机位姿 ATE 从 VGGT 的 0.214 降至 **0.143**，将尺度对齐的视频深度 Abs Rel 从 0.484 降至 **0.357**。在 TUM 上相机位姿 ATE 从 0.028 降至 **0.016**；在 DyCheck 上点云重建精度 Acc Mean 从 1.051 降至 **0.403**。消融实验证实，仅微调中间层即可达到全模型微调的性能，而加入动态掩码注意力后所有指标进一步提升。学习到的动态掩码可在无显式监督下有效突出运动物体。
 
-
-
 ### 动态场景感知的兴起与前馈模型的瓶颈
 
 从多帧RGB图像中联合恢复相机位姿与三维场景几何是计算机视觉的核心问题，其应用涵盖自动驾驶、机器人导航和增强现实等领域。近年来，以DUSt3R（Wang et al., CVPR 2024）为代表的前馈式3D重建方法取得了显著进展——它们无需后处理优化即可从图像对中直接预测深度图和点云，在静态场景上表现出色。VGGT（Wang et al., CVPR 2025a）将这一范式从两帧扩展到多帧，通过全局注意力机制融合跨帧信息，同时输出相机参数、深度、点图和跟踪特征，成为前馈4D感知的重要基线。
@@ -84,8 +82,6 @@ $$\delta(\mathbf{x}_r) \equiv \tilde{\mathbf{x}}_t^\top \mathbf{E} \tilde{\mathb
 
 这一洞察驱动了PAGE-4D的设计：通过一个动态感知聚合器（Dynamics-Aware Aggregator），以任务特定的方式解耦动态内容——对相机位姿令牌抑制动态区域，对几何令牌则保留动态信息，从而在同一前馈框架内同时提升位姿估计和几何重建的精度。
 
-
-
 ## 核心方法与创新机理
 
 PAGE-4D 的核心创新在于揭示并解决了一个根本性冲突：**动态场景中位姿估计与几何重建对动态信息的需求是互斥的**。位姿估计依赖静态对极几何约束，动态运动产生的像素位移会破坏该约束，因此需要抑制动态区域；而几何重建恰好需要利用这些运动信息来恢复动态物体的三维结构。原始 VGGT 在动态场景中倾向于忽略动态内容，导致动态区域的绝对深度误差比静态区域高出 **94%**（Section 3.1）。
@@ -109,8 +105,6 @@ $$\widetilde{\mathbf{M}} = \boldsymbol{\alpha} \cdot \boldsymbol{\sigma}\big( \f
 VGGT 的点跟踪头主要为视图配准设计，不适合动态场景。PAGE-4D 在微调时完全移除该模块，避免不适当的训练信号干扰位姿和几何的联合优化。这一设计选择虽然牺牲了显式的 2D-3D 对应关系，但确保了核心任务在动态条件下的稳定性。
 
 **效果验证**：引入动态感知聚合器后，Sintel 上相机位姿 ATE 从 VGGT 的 0.214 降至 **0.143**，视频深度 Abs Rel 从 0.484 降至 **0.357**（Table 1, 2）；DyCheck 上点云重建 Accuracy 均值从 1.051 降至 **0.403**，降幅超过 60%（Table 3）。此外，学习到的动态掩码在无显式监督的情况下能有效捕捉运动物体（Figure 6），进一步验证了该方法对动态信息解耦的有效性。
-
-
 
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_Nfmzp5PBzr/figures/001_Figure_1.jpg]]
 *Figure 1: PAGE-4D takes a sequence of RGB images depicting a dynamic scene as input and simultaneously predicts the corresponding camera parameters and 3D geometry information—all within a fraction of a second. Compared to VGGT, PAGE-4D produces denser and more accurate point cloud reconstructions with better depth estimation quality. (Best viewed in PDF.)*
@@ -158,8 +152,6 @@ PAGE-4D 采用**选择性微调**策略：仅更新聚合器中部的 $N_2$ 层�
 $$\mathcal{L} = \lambda_c \mathcal{L}_{\mathrm{camera}} + \mathcal{L}_{\mathrm{depth}} + \mathcal{L}_{\mathrm{pmap}}$$
 
 其中 $\lambda_c = 5$，相机位姿采用 Huber loss，深度和点图采用不确定性加权损失与梯度正则化项。
-
-
 
 ### 问题形式化
 
@@ -237,8 +229,6 @@ $$\mathcal{L} = \lambda_c \mathcal{L}_{\text{camera}} + \mathcal{L}_{\text{depth
 
 其中 $\mathcal{L}_{\text{camera}}$ 为相机位姿的 Huber 损失，$\mathcal{L}_{\text{depth}}$ 和 $\mathcal{L}_{\text{pmap}}$ 分别为深度图和点图的不确定性加权损失（含梯度正则化项）。相机损失权重设为 $\lambda_c = 5$，以平衡各任务梯度量级。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与因果验证
@@ -313,8 +303,6 @@ TUM数据集主要包含手持相机运动，动态物体相对较少，但PAGE-
 
 所有对比方法均在相同对齐协议下评估（scale / scale&shift / monocular），FPS测量使用同一A800 GPU硬件。PAGE-4D移除了点跟踪头以避免不适合动态场景的训练目标，因此该任务不纳入公平比较范围。动态数据集的采样比例经过平衡处理（Table 8），防止数据不平衡导致偏向静态场景。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_Nfmzp5PBzr/figures/008_Table_1.jpg]]
 *Table 1: Video Depth Estimation on Sintel (Butler et al., 2012), Bonn (Palazzolo et al., 2019) and DyCheck (Yang et al., 2025). FPS is evaluated on KITTI using one A800 GPU. Missing entries (–) denote results not reported in the original papers cited*
 
@@ -323,8 +311,6 @@ TUM数据集主要包含手持相机运动，动态物体相对较少，但PAGE-
 
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_Nfmzp5PBzr/figures/013_Table_5.jpg]]
 *Table 5: Video Depth Estimation on Sintel (Butler et al., 2012), Bonn (Palazzolo et al., 2019) and DyCheck (Yang et al., 2025)*
-
-
 
 ## 定位与知识库关联
 
@@ -361,8 +347,6 @@ PAGE-4D 直接构建在 **VGGT**（Wang et al., CVPR 2025a）之上，后者是�
 4. **更长序列的扩展**：当前的全局注意力机制在处理数百帧时可能面临计算瓶颈，如何设计稀疏或分层的动态感知注意力以适应长序列场景？
 
 5. **动态掩码的可解释性**：虽然可视化显示掩码能捕捉运动物体，但其内部决策机制（如温度参数 $\tau$ 如何影响掩码的锐度）值得更深入的分析。
-
-
 
 ## 原文 PDF
 

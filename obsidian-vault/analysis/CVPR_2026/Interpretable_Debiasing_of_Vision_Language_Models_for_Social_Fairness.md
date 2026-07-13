@@ -47,15 +47,11 @@ claims:
 
 DEBIASLENS 属于**基于内部表征干预的后处理去偏方法**，其方法定位介于特征空间线性投影去偏与全模型微调之间：它不修改原始模型权重，而是通过 SAE 在特征空间中解耦并中和特定的社会属性维度。与依赖全局线性方向的方法（如投影去偏）不同，SAE 的稀疏激活机制使不同输入激活不同的神经元集合，从而避免了单一全局方向无法稳定分离社会属性的问题。
 
-
-
 视觉-语言模型（VLMs）和大规模视觉-语言模型（LVLMs）在跨模态检索、视觉问答等任务中取得了显著进展，但其内部表征中普遍存在社会偏见——模型倾向于将特定人口统计群体与刻板印象属性过度关联，导致检索结果出现性别、种族、年龄等维度的分布偏斜，或在模糊图像-文本对上给出带有偏见倾向的确定性回答（Figure 1）。
 
 现有去偏方法主要沿两条路径展开：**对抗训练**通过在特征空间中消除敏感属性信息来学习公平表征，但训练开销大且难以泛化到多属性场景；**提示工程**通过修改文本提示引导模型输出公平结果，然而依赖人工设计模板，对不同模型和任务的迁移性有限。更关键的是，这些方法大多将去偏视为一个“黑箱校正”过程——它们可以降低偏见指标，却无法揭示模型内部哪些表征单元承载了社会偏见，也缺乏对去偏操作的可解释性验证。这一缺口导致两个实际问题：一是当去偏效果不理想时，难以定位失败原因；二是无法确保去偏干预不会意外损害模型的通用表征能力。
 
 本文的动机正是填补这一可解释性空白：**能否将VLM的社会偏见归因到具体的神经元级别表征，并通过精准调制这些神经元来实现可控、可解释的去偏？** 为此，作者提出DEBIASLENS框架，利用稀疏自编码器（SAE）在无需社会属性标签的条件下，自动定位多模态编码器中对特定人口统计群体高度响应的“社会神经元”，并通过干预这些神经元的激活值来抑制偏见表征，从而将去偏从黑箱校正转变为一种可解释的干预范式。
-
-
 
 ## 核心方法与创新机理
 
@@ -71,8 +67,6 @@ DEBIASLENS 的核心创新在于将**可解释性机制**系统性地引入 VLM 
     DEBIASLENS 在推理时无需重新训练模型或依赖额外数据，仅需将 SAE 激活向量中对应社会神经元的值置为零（$\mathbf{z}'[j] = \gamma \text{ if } j \in \mathcal{Z}_B$），即可生成去偏后的特征。这种**即插即用**的干预机制使其可无缝适配 CLIP、InternVL2、LLaVA 等多种 VLM 架构，且不改变原始模型权重。在 FairFace T2I 检索任务中，DEBIASLENS (T) 将 Max Skew@1000 从基线的 21.9 降至 7.1（-67.6%），同时在 LVLM 的性别歧义问答中实现 40–50% 的 disproportion 下降（Figure 4），证明了该方法在跨模态、跨任务场景下的鲁棒性。
 
 **与现有工作的本质差异**：传统方法（如对抗去偏、提示调优）直接优化输出分布，而 DEBIASLENS 通过 SAE 构建了一个**可审计的中间表征层**，使社会偏见从“隐式编码”变为“显式神经元”，从而实现了对偏见的精准溯源与最小化干预。这一“先解释、后调控”的范式，是其在可解释性与效率上超越 baseline 的根本原因。
-
-
 
 DEBIASLENS 提出了一种可解释的 VLM 社会偏见消除框架，其核心思想是：**通过稀疏自编码器（Sparse Autoencoder, SAE）在多模态编码器的特征空间中定位并调控“社会神经元”，从而在推理阶段实现透明的偏见抑制**。整个 pipeline 由三个顺序阶段构成，如图 Figure 2 所示。
 
@@ -125,8 +119,6 @@ $$\mathbf{z}'[j] = \begin{cases} \gamma & \text{if } j \in \mathcal{Z}_B \\ \mat
 ![[assets/figures/papers/paper_list_l760_https_arxiv_org_abs_2602_24014/figures/015_Table_5.jpg]]
 *Table 5: Overview of multimodal models. The table lists the image and text encoders used in VLMs and LVLMs considered in this work*
 
-
-
 DEBIASLENS 框架由三个核心模块级联构成：**SAE 训练**、**社会神经元识别** 与**去偏特征生成**。其关键洞察在于，通过在 VLM 编码器的最后一层之上训练稀疏自编码器（SAE），可以将原始特征分解为一组稀疏激活，进而定位出对特定社会属性（性别、种族、年龄）高度响应的“社会神经元”，并在推理阶段通过置零这些神经元的激活值来实现可解释的去偏。
 
 ### SAE 训练
@@ -173,8 +165,6 @@ $$
 $$
 
 该操作等价于从特征空间中擦除社会属性相关的方向分量。实验表明，当 SAE 的扩张因子设为 8、神经元一致性阈值 $\tau = 0.9$、去偏强度 $\alpha = 0.6$ 时，方法在去偏效果与通用性能之间取得最优权衡。
-
-
 
 ## 实验与关键发现
 
@@ -235,30 +225,8 @@ Figure 9展示了新生成的SBBench合成数据集。通过合成图像，研�
 ![[assets/figures/papers/paper_list_l760_https_arxiv_org_abs_2602_24014/figures/020_Table_7.jpg]]
 *Table 7: Computational Cost Results. The trade-off score (↑ the better) is proportional to ∆BiasScore − ∆VLAPerf*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l760_https_arxiv_org_abs_2602_24014/figures/004_Table_1.jpg]]
 *Table 1: Max Skew@1000 (scaled by 100) results on Fair-Face dataset using diverse prompts for gender bias evaluation. Note † represents reproduced results (T and I indicate SAE attached to text and image encoder). Our DEBIASLENS attains comparable performance with SoTA VLM debiasing methods without using labels during training (but required during probing), with interpretable inference components*
-
-![[assets/figures/papers/paper_list_l760_https_arxiv_org_abs_2602_24014/figures/005_Figure_4.jpg]]
-*Figure 4: Comparison between bias mitigation vs. general performance of LVLMs. Our method achieves the best tradeoff among existing approaches (←, ↑, the better)*
-
-![[assets/figures/papers/paper_list_l760_https_arxiv_org_abs_2602_24014/figures/006_Table_2.jpg]]
-*Table 2: Neuron-specificity results for CLIP (ViT-B/16) image encoder. The social neurons selectively mitigate their targeted bias attributes*
-
-![[assets/figures/papers/paper_list_l760_https_arxiv_org_abs_2602_24014/figures/007_Figure_5.jpg]]
-*Figure 5: Neuron-specific results for CLIP text encoder. Modulating gender neurons mitigates only gender bias, indicating high neuron specificity*
-
-![[assets/figures/papers/paper_list_l760_https_arxiv_org_abs_2602_24014/figures/008_Figure_6.jpg]]
-*Figure 6: Top activating images per social neuron. Each social neuron corresponds to a human-interpretable concept of a social bias attribute*
-
-![[assets/figures/papers/paper_list_l760_https_arxiv_org_abs_2602_24014/figures/009_Table_4.jpg]]
-*Table 4: General performance and bias mitigation score results of DEBIASLENS applied to CLIP and LLaVA across varying weighted proportions. There exists a trade-off between these two aspects for both modalities and model types*
-
-![[assets/figures/papers/paper_list_l760_https_arxiv_org_abs_2602_24014/figures/001_Figure_1.jpg]]
-*Figure 1: Social bias mitigation in VLMs. While existing models retrieve image distribution of skewed demographics or answer definitively on ambiguous image-text pairs, our DEBIASLENS alleviates social biases across both image and text modalities*
-
-
 
 ## 定位与知识库关联
 
@@ -297,8 +265,6 @@ DEBIASLENS 的因果杠杆集中于三个设计选择，均有消融实验支撑
 2. **神经元选择的自动化**：阈值 τ（0.9）和权重 α（0.6）目前通过网格搜索确定，对不同模型和偏见类型可能需要重新调参。自适应选择机制值得探索。
 3. **SAE 训练的无监督本质**：虽然避免了社会属性标签，但 SAE 涌现出的神经元是否完整覆盖所有偏见维度缺乏理论保证。可能存在“沉默偏见”——即未被 SAE 捕获但实际影响模型输出的偏见模式。
 4. **长尾属性的覆盖**：当前验证集中于高频社会属性（性别、种族、年龄），对于宗教、残疾等长尾属性的神经元可识别性和去偏效果尚不明确，需要手动验证。
-
-
 
 ## 原文 PDF
 

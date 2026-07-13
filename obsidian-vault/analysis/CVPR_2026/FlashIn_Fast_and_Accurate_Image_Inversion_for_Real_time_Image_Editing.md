@@ -87,8 +87,6 @@ FlashIn 的关键差异化在于：首次将循环一致性损失与对抗训练
 
 当前方法存在以下局限：（1）仅支持图像编辑，尚未扩展到视频或 3D 场景；（2）依赖生成模型合成数据训练，对训练域外真实图像的泛化虽经对抗训练缓解，但仍需进一步验证；（3）多步推理（4 步）虽提升质量，但计算开销增加，实时性有所折损。未来工作将聚焦于视频反演扩展、跨生成模型泛化增强，以及在更少步骤下达到多步相当的质量。
 
-
-
 图像编辑是视觉内容创作的核心需求，而基于扩散模型的生成式编辑方法近年来取得了显著进展。这类方法通常遵循“反演-编辑-重建”范式：先将真实图像反演至扩散模型的噪声空间，在噪声或潜在空间施加编辑操作，再通过去噪过程生成编辑后的图像。反演质量直接决定了编辑结果对原始图像结构的保真度——背景是否完整保留、物体轮廓是否准确还原，均取决于反演过程能否精确捕捉图像对应的初始噪声。
 
 **现有反演方法的瓶颈**。当前主流反演方法依赖扩散模型的近似逆向过程，最典型的代表是 **DDIM Inversion**（Song et al., ICLR 2021），它利用确定性去噪调度将图像逐步逆向映射至噪声空间。然而，这一过程存在根本性缺陷：DDIM 反演需要数十步迭代，每一步的线性近似都会引入误差，误差在长序列中不断累积，最终导致重建图像出现模糊、伪影和细节丢失。后续方法试图从不同角度缓解这一问题——**Null-text Inversion**（Mokady et al., CVPR 2023）引入空文本优化来修正反演偏差，**EDICT**（Wallace et al., CVPR 2023）通过可逆扩散过程保证数学精确性，**ReNoise**（Garibi et al., ECCV 2024）采用定点迭代策略逐步逼近真实噪声——但这些方法本质上仍是多步迭代框架，计算开销大（编辑过程通常超过10秒），且精度提升有限，难以满足实时编辑需求。
@@ -96,8 +94,6 @@ FlashIn 的关键差异化在于：首次将循环一致性损失与对抗训练
 **速度与精度的双重困境**。如图 1 所示，现有方法在 PIE-Bench 基准上呈现出明显的速度-质量权衡：基于优化的方法（如 Null-text Inversion）背景保留较好但耗时极长，基于编码器的方法（如 **TurboEdit**，Wu et al., ECCV 2024）速度较快但编辑保真度不足。这一困境的根源在于，现有方法缺乏对反演目标的明确定义——它们试图通过逆向求解扩散过程来“猜测”初始噪声，而非直接学习从图像到噪声的映射关系。
 
 **本文动机**。FlashIn 的核心洞察在于：既然生成模型本身可以从已知噪声种子产生合成图像，那么这些噪声-图像对就构成了天然的训练数据。通过训练一个神经网络直接学习图像到噪声的映射，可以绕过迭代近似的误差累积问题，将反演过程压缩至1-4步。然而，仅依靠像素级重建损失训练的反演网络难以保证重建图像与真实图像的分布一致性，容易丢失纹理细节。为此，FlashIn 引入两个关键机制：**循环一致性训练**——通过噪声匹配和潜在空间重建的双重回环约束，为反演网络提供明确的优化目标；**对抗训练**——利用判别器对齐重构图像与真实图像的分布，恢复反演过程中丢失的细粒度细节（如草地质感、岩石纹理）。这一设计使得 FlashIn 在 PIE-Bench 上实现了最佳背景保留（PSNR 31.91）和编辑保真度（CLIP 评分 23.94），同时将编辑时间压缩至约1秒，较传统方法快一个数量级。
-
-
 
 ## 核心方法与创新机理
 
@@ -133,8 +129,6 @@ FlashIn 的架构天然支持多步推理：通过将前一步的重建结果作
 ### 作为即插即用模块的通用性
 
 FlashIn 产生的反演噪声可作为插件嵌入其他编辑框架。Table 3 显示，将 FlashIn 噪声替换随机噪声用于 **Flux-Kontext** 指令编辑方法时，LPIPS 从 38.44 降至 31.44，验证了其作为通用反演模块的潜力。
-
-
 
 FlashIn 的核心思想是将图像反演从多步迭代过程重构为一个可训练的神经网络映射，实现从图像潜在表示到初始噪声的直接预测。整个框架围绕一条“生成 → 反演 → 重建”的闭环展开，通过合成数据驱动训练，无需依赖真实图像的噪声标签。
 
@@ -188,8 +182,6 @@ $$\mathbf{z}_0' = G(F(z_0, c, T), c', T)$$
 - **分布对齐**：引入对抗训练，使重建结果从合成分布向真实图像分布靠拢，恢复细节信息。
 
 消融实验证实了这一设计的有效性：循环一致性训练将背景保留 PSNR 从 26.19 提升至 28.40，对抗训练进一步推高至 31.91（Table 2），验证了各模块的贡献。
-
-
 
 ### 方法概览
 
@@ -246,8 +238,6 @@ $$\mathcal{L}_{full} = \mathcal{L}_{cycle} + \mathcal{L}_{reg} + \mathcal{L}_{ad
 
 FlashIn 原生支持多步反演以进一步提升质量。训练时，时间步集合 T 从 [1.0, 0.75, 0.5, 0.25] 中随机选取，使单一网络学会处理不同噪声水平。推理时，可串联执行多步反演，每步将上一步的重建结果作为输入，逐步细化噪声预测。Figure 6 表明，增加推理步数（1→4）可减少模糊和细节丢失，但会相应增加计算开销。论文主要结果均采用 4 步推理，总编辑时间约 1.04 秒，仍比多步 DDIM 方法快一个数量级。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -297,22 +287,6 @@ Table 3 验证了 FlashIn 作为即插即用模块的泛化能力。将 FlashIn 
 3. **步数-质量权衡**：单步推理虽快，但在细节保留上不及 4 步推理；多步推理增加了计算开销，对实时性要求极高的场景需权衡。
 4. **应用范围**：当前方法仅支持图像编辑，尚未扩展到视频或 3D 场景的时序一致反演。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l872_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_FlashIn_Fast_and/figures/010_Figure_6.jpg]]
-*Figure 6: Comparison of image editing with different inversion inference steps. The results are improved with more inference steps*
-
-![[assets/figures/papers/paper_list_l872_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_FlashIn_Fast_and/figures/004_Figure_4.jpg]]
-*Figure 4: Qualitative comparison between our method and existing image editing methods on PIE-Bench [16]. Our method shows better background preservation (A, B) and editing fidelity (C, D, E). This demonstrates that our method achieves more accurate noise inversion and high-quality image editing*
-
-![[assets/figures/papers/paper_list_l872_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_FlashIn_Fast_and/figures/001_Figure_1.jpg]]
-*Figure 1: Comparison of previous image editing methods and ours on PIE-Bench [16]. The size of the circles indicates the time cost of the editing process. Our method achieves superior background preservation (measured by PSNR) and editing fidelity (assessed by CLIP Score relative to the target prompt), while incurring the least time cost*
-
-![[assets/figures/papers/paper_list_l872_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_FlashIn_Fast_and/figures/002_Figure_2.jpg]]
-*Figure 2: Our proposed inversion algorithm, FlashIn, achieves fast and precise image inversion, enabling high-quality real-time image editing. In this figure, we illustrate various editing outcomes produced by our method, including (a) object change, (b) object addition, (c) object removal, (d) identity change, (e) content change and (f) attribute change*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 方法谱系：从多步近似到单步学习
@@ -354,8 +328,6 @@ FlashIn 的差异化优势体现在三个关键设计维度：
 2. **单步质量提升**：能否通过更强的训练策略或架构设计，在单步推理中达到与多步相当的质量和细节保留水平？
 3. **跨模型泛化**：如何设计模型无关的反演网络，使其能够适配不同架构的扩散模型，降低迁移成本？
 4. **安全性与可控性**：对抗训练引入的判别器可能影响生成结果的可控性，如何在保持细节恢复能力的同时确保编辑结果的安全性？
-
-
 
 ## 原文 PDF
 

@@ -64,8 +64,6 @@ claims:
 
 综上，FingerTip 20K 为移动 LLM 智能体从“被动执行”迈向“主动服务与个性化适配”提供了首个系统性的评测基准与数据基础。
 
-
-
 移动设备已成为人们日常生活的核心交互终端，用户频繁通过手机完成信息获取、社交互动、内容消费与生活服务等各类任务。近年来，基于大语言模型（LLM）的图形用户界面（GUI）智能体取得了显著进展，能够根据用户指令自动操作手机应用，展现出替代人工执行繁琐操作的潜力。然而，现有移动 LLM 智能体普遍存在两个根本性局限。
 
 **被动响应而非主动服务。** 当前智能体仅能在接收到明确指令后被动执行任务，无法像一位贴心的个人助理那样，主动感知用户所处的时间、场景与历史行为模式，推测其潜在意图并提供前瞻性建议。例如，当用户每天早晨通勤时习惯打开音乐应用播放特定歌单，智能体理应能够捕捉这一规律，在合适时机主动询问是否需要执行该操作，而非等待用户手动触发。
@@ -75,8 +73,6 @@ claims:
 上述缺陷的根源在于，现有的移动 GUI 控制数据集与基准（如 AITW、MoTIF、AutoDroid 等）在设计上存在关键信息缺失：它们不提供用户画像、操作时间、地点场景、历史意图与历史动作序列等多维上下文信息。这使得基于此类数据训练或评估的智能体，天然不具备主动预测与个性化执行的能力，相关研究也因此缺乏有效的衡量标尺。
 
 为填补这一空白，本文提出 **FingerTip 20K** 基准，首次将**主动任务建议**与**个性化任务执行**纳入移动 LLM 智能体的评估体系。该基准的核心动机在于：通过系统性地采集和提供用户日常手机使用中的丰富上下文数据，驱动智能体从“被动执行者”向“主动、贴心的个人助理”演进。
-
-
 
 ## 核心方法与创新机理
 
@@ -129,11 +125,6 @@ FingerTip 20K 的核心创新在于将移动 LLM 智能体的能力边界从“�
 
 上述创新在当前阶段存在明显边界：所有模型的主动建议成功率仍远低于人类水平（最佳模型 12.8% vs 人类 30.3%），且 $Sim_2$ 指标上所有模型均接近 1，表明现有模型尚未真正通过上下文示例习得用户的个性化动作风格。这些缺口指向了下一阶段的核心挑战——如何设计更有效的融合机制与训练策略，使智能体真正“理解”而非“模仿”用户行为。
 
-
-
-![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_n3iFV0gLMc/figures/003_Figure_2.jpg]]
-*Figure 2: Demonstration of proactive task suggestion and personalized task execution*
-
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_n3iFV0gLMc/figures/001_Figure_1.jpg]]
 *Figure 1: An overview task example in FingerTip 20K. The agent proactively offers task suggestions to the user and personalizes the execution of tasks in a way that aligns with the user’s preferences*
 
@@ -176,8 +167,6 @@ $$A_{t+1}, O_{t+1}, AT_{t+1} = f ( U , I_{\mathrm{true}} , A_{\mathrm{history}} 
 ### 模块间关系
 
 数据采集流水线为任务形式化中的 $U$、$I_{\mathrm{history}}$、$A_{\mathrm{history}}$ 等关键变量提供了真实来源；任务形式化则直接决定了评估 prompt 的输入结构。微调实验进一步闭合了循环：使用采集数据对 Qwen-2.5-VL-7B 进行 LoRA 微调，验证了从数据到能力提升的因果链路——全量数据微调使主动建议 SR1 从 3.1% 跃升至 26.0%，个性化执行 Sim2 从 0.95 提升至 1.42（Table 5）。
-
-
 
 ### 双轨任务设定
 
@@ -240,26 +229,21 @@ $$Sim_2 = S_I / S_{II}$$
 
 值得注意的是，所有基线模型在 $Sim_2$ 上均接近 1.0，表明现有模型即使看到历史动作示例，也未能有效提取并模仿用户的个性化操作风格——这是当前方法的一个显著瓶颈，也是该基准暴露出的核心开放问题。
 
-
-
 ## 实验与关键发现
 
 ### 主结果
 
 **主动任务建议**。Table 3 报告了各模型在主动任务建议轨道上的整体表现。在所有通用视觉语言模型中，具备思维链能力的 **Qwen-QVQ-Max** 取得了最高的成功率 SR₁ = 12.8% 和文本相似度 Sim₁ = 0.39，但其推理耗时（10.60 秒）和 token 消耗也显著高于其他模型。相比之下，人类标注者在相同子集上的成功率达到 **30.3%**，两者之间存在 **17.5 个百分点**的巨大差距。这一结果表明，当前最先进的通用模型在融合用户画像、时间、场景与历史意图以主动预测用户潜在需求方面，仍远未达到人类水平。值得注意的是，专用 GUI 控制模型（如 Aguvis-7B、CogAgent-9B）在此轨道上的表现普遍低于通用模型，反映出 GUI 定位能力与意图推理能力之间的任务特性差异。
 
-
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_n3iFV0gLMc/figures/011_Table_3.jpg]]
 *Table 3: Overall performance of proactive task suggestion*
 
 **个性化任务执行**。Table 4 展示了各模型在个性化任务执行轨道上的表现。专用 GUI 控制模型 **UI-TARS-1.5-7B** 以 **SR₂ = 38.5%** 的成功率位居榜首，远超通用模型中表现最好的 GPT-4.1（SR₂ = 5.5%），差距达 **33.0 个百分点**。这一悬殊差异的核心原因在于通用视觉语言模型在精确 GUI 坐标定位上的能力不足——它们虽能理解任务语义，却难以可靠地输出正确的点击坐标。然而，在衡量个性化对齐程度的 **Sim₂** 指标上，所有模型的 Sim₂ 值均接近 1.0，表明没有任何模型能够通过历史动作序列真正习得用户的个性化操作风格。这一现象指向一个深层瓶颈：现有模型仅将历史动作视为上下文参考，而非可内化的行为模式。
 
-
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_n3iFV0gLMc/figures/012_Table_4.jpg]]
 *Table 4: Overall performance of personalized task execution*
 
 **微调增益**。Table 5 报告了使用 FingerTip 20K 数据对 Qwen-2.5-VL-7B 进行 LoRA 微调后的性能变化。使用全部 16,000 条训练数据、LoRA rank=64 的配置（Qwen-2.5-VL-7B-FT-all-r64）在两个轨道上均取得了显著提升：
-
 
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_n3iFV0gLMc/figures/015_Table_5.jpg]]
 *Table 5: Performance of fine-tuned models. In square brackets [X] we report the performance increase from the un-fine-tuned Qwen-2.5-VL-7B*
@@ -287,7 +271,6 @@ $$Sim_2 = S_I / S_{II}$$
 
 **双轨道间的交叉影响**。Table 9 揭示了单独微调与联合微调之间的权衡。单独针对主动任务建议微调（FT-proactive）使 SR₁ 达到 9.7%，但个性化执行 SR₂ 降至 1.0%；单独调整个性化执行（FT-personalized）使 SR₂ 达到 12.5%，但主动建议性能大幅退化。联合微调（FT-joint）在两个轨道上的表现均非最优。这一现象证实了两个轨道测试的是不同性质的能力，且存在一定程度的负迁移，单一模型难以同时在这两个维度上达到峰值。
 
-
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_n3iFV0gLMc/figures/020_Table_9.jpg]]
 *Table 9: Performance of the separately fine-tuned model and the jointly fine-tuned model*
 
@@ -305,7 +288,6 @@ $$Sim_2 = S_I / S_{II}$$
 
 Table 8 报告了微调模型在三种 out-of-domain 测试集上的表现：
 
-
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_n3iFV0gLMc/figures/019_Table_8.jpg]]
 *Table 8: Performance of the fine-tuned model on out-of-domain test sets*
 
@@ -314,26 +296,6 @@ Table 8 报告了微调模型在三种 out-of-domain 测试集上的表现：
 - **意图未见（Intent-unseen）**：SR₁ 降至 22.3%，SR₂ 降至 11.5%。
 
 三个场景下性能均有明显退化，但降幅可控，说明模型具备一定的泛化能力。退化程度提示训练数据的用户多样性（仅 95 名用户）和应用覆盖度仍有扩展空间，当前的领域偏差可能影响基准在更广泛场景下的适用性。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_n3iFV0gLMc/figures/002_Table_1.jpg]]
-*Table 1: Comparison of FingerTip 20K to existing mobile GUI-control datasets and benchmarks*
-
-![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_n3iFV0gLMc/figures/010_Figure_5.jpg]]
-*Figure 5: Personalized action analysis. We demonstrated the similarities of user action sequences in six intent categories. The similarities were higher among the same users or users of the same type, while the similarities between users of different types were lower*
-
-![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_n3iFV0gLMc/figures/009_Table_2.jpg]]
-*Table 2: The action space of an agent when interacting with a mobile phone environment*
-
-![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_n3iFV0gLMc/figures/017_Table_6.jpg]]
-*Table 6: User profile example*
-
-![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_n3iFV0gLMc/figures/018_Table_7.jpg]]
-*Table 7: Details on FingerTip 20K train, validation and test splits. For each split, we report the number of episodes, the number of screenshots, the number of apps, and the number of intent categories it contains*
-
-
-
 
 ## 定位与知识库关联
 
@@ -368,8 +330,6 @@ FingerTip 20K 在移动 GUI 智能体基准谱系中占据一个此前未被覆�
 3. **多源上下文有机融合**：主动任务建议中，如何更有机地融合历史意图、用户画像、场景与实时屏幕信息，使预测接近人类水平？时间上下文被证实是最关键的要素，但其他要素的协同作用机制仍需深入探索。
 4. **双轨统一训练范式**：能否开发统一的训练范式，使同一模型同时兼具强大的主动意图预测与个性化执行能力，避免两轨道间的负迁移？这可能需要在架构层面或损失函数设计中显式建模两个子任务的共享与特异性。
 5. **长期用户行为建模**：该基准目前基于一个月的采集周期，未来能否扩展至更长期的行为建模（数月至数年），以捕捉更深层的习惯变化和偏好漂移？这将使主动服务从“即时意图预测”演进为“长期需求预判”。
-
-
 
 ## 原文 PDF
 

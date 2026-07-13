@@ -68,8 +68,6 @@ DRPO 属于**推理效率优化**方法，通过奖励设计层面的解耦来�
 
 案例研究表明，DRPO 在简单提示上仅需 89 tokens 即可给出正确推理，相比 DisCO 的 526 tokens 实现 6 倍压缩；在困难提示上以 455 tokens 完成推理，约为 DisCO（4497 tokens）的十分之一。
 
-
-
 ### 推理效率的困境
 
 大语言模型在数学、逻辑等复杂推理任务上的突破，很大程度上依赖于“思维链”（Chain-of-Thought）式的长文本生成。然而，这种冗长的推理过程带来了显著的推理效率问题：模型倾向于产生大量冗余的反思、重复验证和不必要的中间步骤，导致生成长度远超实际所需。如何在保持推理性能的前提下，有效压缩生成长度，成为当前推理优化领域的核心瓶颈。
@@ -85,8 +83,6 @@ DRPO 属于**推理效率优化**方法，通过奖励设计层面的解耦来�
 上述问题的根源在于，**长度惩罚的效应被负样本（错误回答）所污染**。在组相对优势的计算中，所有回答——无论正确与否——都被放在同一个池子里进行标准化。负样本的存在扭曲了正样本的相对位置，使得冗长但正确的回答在对比中显得“更差”。
 
 本文的核心洞见是：**将正负样本的学习信号彻底解耦**。具体而言，长度奖励的归一化应该仅在正样本组内进行，完全隔绝负样本的干扰。这样，一个正确回答的长度惩罚只会影响它在其他正确回答中的相对权重，而永远不会将其推入“负样本”的领域。基于这一洞见，DRPO（Decoupled Reward Policy Optimization）将长度奖励转化为正样本分布上的重要性权重，并直接融入一个判别式优化目标中，从而从根本上消除了 GRPO 式方法的错误信号问题。
-
-
 
 ## 核心方法与创新机理
 
@@ -124,8 +120,6 @@ DRPO 的闭式解使其具有显著的工程优势：**无需额外数据，仅�
 | 优势计算 | 组相对优势，正负样本混合归一化 | 解耦优势，仅正样本组内归一化 |
 | 目标形式 | GRPO/DisCO 目标 + 显式长度惩罚 | 判别式目标 + 长度奖励作为正样本权重 |
 | 长度惩罚集成 | 直接修改奖励值，影响优势计算 | 转化为分布权重，不干扰负样本 |
-
-
 
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_GP5RHZnEsw/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of the limitation of GRPO with length penalty and the benefit of our approach. Suppose [1, 1, 1, 0, 0, 0] are the accuracy rewards for 6 responses, and [0.73, 0.6, 0.2, 0, 0, 0] are the rewards after applying the length penalty to correct answers. Using the group-relative advantage calculation of GRPO, the advantages for the third response shift from 1 (without length penalty) to -0.17 (with length penalty added), inadvertently penalizing the third correct response, which may substantially harm performance. In contrast, our proposed DRPO reduces the learning signal for lengthy and correct responses but never pushes them to the negative territory*
@@ -183,8 +177,6 @@ $$
 | **长度惩罚整合** | 直接叠加到奖励值，影响优势计算 | 转化为重要性权重，无负样本干扰 |
 
 这一框架使得 DRPO 在 GSM8K 上以 1.5B 模型实现了 77% 的长度缩减，性能损失仅 1.1%，而最佳基线在牺牲 4.3% 性能的情况下仅实现 68% 的长度缩减。
-
-
 
 ### 问题根源：GRPO 组相对优势的失效
 
@@ -248,8 +240,6 @@ DRPO 的训练流程由以下模块串联：
 4. **负样本 log-sum-exp 惩罚**：计算 $\tau \log (\mathbb{E}_{o' \sim \pi_{\mathrm{old}}^-} \exp(s_{\theta}(o',q)/\tau))$，压低所有负样本得分。
 5. **KL 散度正则化**：通过惩罚函数约束策略更新幅度。
 6. **模型更新**：使用 AdamW 优化器结合梯度估计更新 $\pi_\theta$。
-
-
 
 ## 实验与关键发现
 
@@ -319,15 +309,11 @@ Figure 6 对比了三种长度奖励函数：
 
 4. **与过程奖励的协同未探索**：DRPO 的框架理论上可以整合过程奖励（如步骤正确性），但该方向仍为开放问题。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_GP5RHZnEsw/figures/024_Table_4.jpg]]
 *Table 4: Detailed AES performance for 1.5B models*
 
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_GP5RHZnEsw/figures/025_Table_5.jpg]]
 *Table 5: Detailed AES performance for 7B models*
-
-
 
 ## 定位与知识库关联
 
@@ -397,8 +383,6 @@ DRPO 的方法贡献可以总结为三个关键槽位的变更：优势计算从
 2. **任务扩展**：DRPO 在代码生成、科学推理等需要更长推理链的任务上是否仍能保持高效权衡？
 3. **长度奖励函数设计**：能否设计基于推理步骤正确性的更精细的长度奖励，以进一步提升性能-效率权衡的上界？
 4. **更大规模验证**：当前最大实验规模为 8B 参数，DRPO 在更大模型上的行为尚不明确。
-
-
 
 ## 原文 PDF
 

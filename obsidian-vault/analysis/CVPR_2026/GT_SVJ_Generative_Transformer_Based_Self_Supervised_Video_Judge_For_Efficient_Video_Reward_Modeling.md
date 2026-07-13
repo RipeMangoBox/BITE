@@ -74,8 +74,6 @@ GT-SVJ 并非在 VLM 范式内做增量改进，而是在**骨干架构**、**�
 
 消融实验进一步证实：移除判别模型预训练使 GenAI-Bench 准确率骤降至 47.62%（降幅约 16.64）；可变长度训练策略（p=0.25）相比固定长度（p=0）带来 1%–15% 的对齐准确率提升；LoRA 适配器仅作用于骨干网络最后 1/3 的 Transformer 层，在保持高性能的同时实现约 1.5 倍的训练加速。
 
-
-
 视频生成模型近年来取得了显著进展，但如何自动、可靠地评估生成视频的质量仍是一个核心瓶颈。现有的视频评估方法主要依赖基于视觉-语言模型（VLM）的奖励模型，如 **VideoReward**（Liu et al., 2025）和 **VisionReward**（Xu et al., 2025）。这些方法通过在大规模人类偏好数据上进行 Bradley-Terry 或 DPO 训练来对齐人类判断。然而，它们存在两个关键局限：
 
 **瓶颈一：时间动态捕捉不足。** VLM 通常从图像模型扩展而来，其时间建模能力有限，仅通过注意力机制间接捕捉帧间关系，难以充分捕获运动一致性、时间因果性和细粒度的时间动态。这导致模型在面对需要精细时间判断的偏好对时，对齐准确率受限。
@@ -85,8 +83,6 @@ GT-SVJ 并非在 VLM 范式内做增量改进，而是在**骨干架构**、**�
 **核心动机：** 视频生成模型（如 CogVideoX）在训练过程中天然地学习了运动模式、时间因果关系和细粒度时空表示——这些恰恰是 VLM 所缺乏的。GT-SVJ 的核心动机在于，将视频生成模型重新用作奖励模型，利用其内在的时间建模能力来弥补 VLM 的不足。具体而言，生成模型可以被重新表述为能量基模型（EBM），对高质量视频分配低能量，对退化视频分配高能量。配合精心设计的自监督对比学习策略，模型能够在仅使用约 30K 人类标注视频的条件下（比 VideoReward 少约 6 倍，比 VisionReward 少约 65 倍），实现对人类偏好的高效对齐。
 
 图 1 直观展示了 GT-SVJ 的工作方式：给定两个视频，模型通过自监督学习到的时空判别特征对其进行偏好排序，在多个基准上超越现有 VLM 基线。
-
-
 
 ## 核心方法与创新机理
 
@@ -131,8 +127,6 @@ $$\mathcal{L}_{\mathrm{contrast}} = \underbrace{\mathbb{E}_{x^{+}} [E_{\theta}(x
 
 该损失将视频生成模型转换为对真实视频分配低能量、对扰动/生成视频分配高能量的判别器。Figure 3 可视化了这一机制：真实视频的能量轨迹平滑稳定，而生成视频的能量值剧烈波动，反映其时空不一致性。这种能量基建模天然适合捕捉细粒度时间缺陷，是 VLM 基方法难以实现的。
 
-
-
 GT‑SVJ 的核心思路是将视频生成模型重新用作**能量基模型（EBM）**，通过两阶段训练构建一个时间敏感的视频奖励模型：第一阶段训练判别模型，第二阶段在判别模型基础上进行偏好对齐。整个框架的输入为视频（及其潜在表示），输出为与人类偏好对齐的标量奖励分数或多维质量方面分数。
 
 ### 两阶段流水线
@@ -165,12 +159,8 @@ $$
 - **参数高效微调**：仅对 CogVideoX 最后 1/3 层应用 LoRA 适配器（rank=8, $\alpha=8$），中间层配置取得最优验证准确率，最后层配置训练速度约快 1.5 倍且性能损失极小。
 - **负样本构造**：五种潜在空间扰动覆盖从帧级局部破坏（帧丢失、噪声段）到长程时序破坏（帧洗牌、时间片交换），迫使模型学习有意义的时空判别特征，避免仅依赖域差异等表面线索。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2288_https_arxiv_org_abs_2602_05202/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed GT-SVJ framework. The framework consists of two stages: (top) Training a discriminative model, where the video generative model (CogVideoX) is adapted using a contrastive energy-based objective with real, generated, and perturbed videos, and (middle and bottom) Training a reward model, where the discriminative model (DM) is aligned with human ratings through aspect-wise prediction (AWP) via regression (middle) followed by relative preference modeling (bottom)*
-
-
 
 GT-SVJ 的核心设计围绕一个关键洞察展开：视频生成模型内在建模了时间因果关系与运动语义，将其重新用作能量基模型（EBM），并配合精心设计的潜在空间扰动负样本，可以迫使模型学习鲁棒的时空判别特征。整个框架包含三个关键模块。
 
@@ -228,12 +218,8 @@ $$
 
 这一两阶段设计——先通过自监督对比能量目标训练判别模型，再在判别模型基础上进行偏好微调——是 GT-SVJ 数据效率的关键：仅使用 30K 人类标注视频（比 VideoReward 少约 6 倍，比 VisionReward 少约 65 倍）即在 GenAI-Bench 和 MonteBench 上超越 VLM 基线。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2288_https_arxiv_org_abs_2602_05202/figures/003_Figure_3.jpg]]
 *Figure 3: Illustration of energy trajectories predicted by our energy-based model. For the real video in (a), energy trajectory across the time steps is smooth and stable, indicating consistent temporal dynamics. In contrast, for the generated videos in (b) and (c), the energy values fluctuate erratically, reflecting spatial and temporal inconsistencies such as implausible scene lighting and motions*
-
-
 
 ## 实验与关键发现
 
@@ -276,30 +262,14 @@ Figure 3 可视化了判别模型对真实视频与生成视频预测的能量�
 2. **扰动覆盖有限。** 当前五种扰动主要针对时间维度（帧洗牌、帧丢失、时间片交换）和局部空间维度（补丁交换、噪声段注入），可能无法覆盖真实世界中更复杂的视频退化类型（如压缩伪影、运动模糊、色彩偏移等）。是否需要更丰富的负样本类型仍有待探索。
 3. **多模态对齐缺失。** 当前框架仅基于视频信号进行偏好建模，未考虑文本提示与视频内容的一致性。在文生视频场景中，提示忠实度是重要的质量维度，该缺失限制了 GT-SVJ 在文本条件生成评估中的适用性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2288_https_arxiv_org_abs_2602_05202/figures/005_Figure_4.jpg]]
 *Figure 4: Effect of LoRA placement within the backbone transformer. We compare applying LoRA to the initial third, middle third, and last third of the transformer layers. The middle-layer configuration achieves the best overall performance, while the last-layer configuration provides faster training with minimal loss in accuracy*
 
 ![[assets/figures/papers/paper_list_l2288_https_arxiv_org_abs_2602_05202/figures/006_Figure_5.jpg]]
 *Figure 5: Effect of the discriminative model. Initializing the reward model with the trained discriminative model leads to lower validation losses and higher validation accuracies throughout training*
 
-![[assets/figures/papers/paper_list_l2288_https_arxiv_org_abs_2602_05202/figures/007_Figure_6.jpg]]
-*Figure 6: Effect of perturbed videos as negative samples. Our discriminative model, when trained only on real and generated videos, exhibits early saturation and vanishing gradients. In contrast, when perturbed videos are augmented as negative samples in training, the model maintains informative gradients and achieves smoother convergence*
-
 ![[assets/figures/papers/paper_list_l2288_https_arxiv_org_abs_2602_05202/figures/008_Table.jpg]]
 *Table: A.1. Sampling probabilities assigned to each perturbation type based on gradient-based difficulty analysis. Note that a fixed probability of 0.3 is reserved for contrasting real videos with model-generated videos, and hence the probabilities of perturbations for real videos sum to 0.7*
-
-![[assets/figures/papers/paper_list_l2288_https_arxiv_org_abs_2602_05202/figures/009_Figure.jpg]]
-*Figure: (a) Average gradient norm during training from using each perturbation type individually. (b) Training loss curves from using each perturbation type individually. Figure A.1. Effect of using each perturbation type individually to generate negative samples. We show the ease or difficulty of training the discriminative model when using each perturbation type individually*
-
-![[assets/figures/papers/paper_list_l2288_https_arxiv_org_abs_2602_05202/figures/010_Figure.jpg]]
-*Figure: A.2. Effect of using all types of perturbed videos in training the discriminative model (DM). We observe significantly faster convergence to 2-3% better validation alignment accuracies to human preferences*
-
-![[assets/figures/papers/paper_list_l2288_https_arxiv_org_abs_2602_05202/figures/001_Figure_1.jpg]]
-*Figure 1: GT-SVJ in action. Given two videos, our self-supervised model evaluates and ranks them on preferences, outperforming baselines on human preference alignment*
-
-
 
 ## 定位与知识库关联
 
@@ -349,8 +319,6 @@ GT-SVJ 采用**参数高效微调（PEFT）**策略，仅对 CogVideoX 最后 1/
 ### 知识库定位总结
 
 GT-SVJ 在视频奖励建模的知识谱系中占据了一个独特位置：它**桥接了视频生成模型的自监督表示学习与人类偏好对齐**，证明了“生成即判别”范式在视频质量评估中的有效性。其核心贡献不在于提出全新的网络架构，而在于**重新组合已知组件（生成 Transformer + EBM 对比学习 + 潜在空间扰动 + Bradley-Terry 对齐）形成高效的数据利用范式**。对于后续工作，该框架的启示在于：视频生成模型的内在时序先验可以大幅降低对人工标注的依赖，而精心设计的负样本构造是将生成模型转化为鲁棒判别器的关键。
-
-
 
 ## 原文 PDF
 

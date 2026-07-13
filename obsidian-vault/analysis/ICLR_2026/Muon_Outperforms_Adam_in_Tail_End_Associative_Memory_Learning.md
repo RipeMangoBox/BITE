@@ -50,8 +50,6 @@ claims:
 
 主要结果包括：Muon 使权重矩阵的奇异值谱在训练全程保持更高的各向同性（更高的 SVD 熵与有效秩，更低的 Top-10 能量占比）；在重尾知识任务上，Muon 对低频类别的首 token 准确率提升尤为突出，有效缩小了头尾差距。这些发现共同指向一个机制性解释：Muon 通过谱归一化抵消了梯度中由频率差异引入的幅度偏差，从而在联想记忆学习中实现了更均匀的事实获取。
 
-
-
 大规模语言模型预训练的核心挑战之一，在于数据天然服从**重尾分布**：少量高频模式与大量长尾模式共存。在这种分布下，优化器的选择直接影响模型对尾部知识的吸收能力。传统优化器如 Adam 虽然收敛迅速，但其逐元素归一化的更新机制会**破坏梯度矩阵的内在结构**，导致不同知识项的更新强度失衡——头部类被过度强化，而尾部类学习不足。
 
 这一结构性问题在 Transformer 的线性层中尤为突出。Transformer 的注意力模块和 FFN 模块均可表示为矩阵乘法与 softmax/激活函数的组合，其权重矩阵的梯度自然呈现**外积结构**。然而，Adam 对梯度每个元素独立进行符号提取和尺度归一化，使得更新方向偏离了梯度矩阵的谱结构，削弱了对尾部关联记忆的有效编码。
@@ -59,8 +57,6 @@ claims:
 Muon 优化器（Bernstein & Newhouse, 2024）提出了一种根本不同的更新范式：**用梯度矩阵的最近（半）正交矩阵替代原始梯度**，等价于在谱范数约束下执行最陡下降。这一操作保留了梯度的外积结构，使所有更新方向的强度趋于均衡——从奇异值分布角度看，Muon 更新矩阵的奇异值近乎相同，而 Adam 的更新矩阵则呈现高度集中的能量分布。
 
 本文的核心动机在于**系统性地揭示 Muon 在尾部关联记忆学习中的优势机制**。具体而言，作者试图回答：Muon 为何能在重尾分布下实现比 Adam 更平衡的类间学习？这一优势在真实 Transformer 训练中如何体现？通过将 Transformer 的 FFN 层抽象为线性关联记忆模型，结合理论分析和受控实验，本文建立了从优化器更新规则到尾部知识获取能力的因果链条，并在一系列规模化的语言模型预训练任务上验证了 Muon 的显著增益。
-
-
 
 ## 核心方法与创新机理
 
@@ -87,8 +83,6 @@ $$\Delta \mathbf{w}^* = -\frac{\lVert \mathbf{g} \rVert_1}{\lambda} \cdot \mathr
 **实践中的近似实现：** 完整 SVD 计算开销较大，实践中 Muon 使用固定次数（如 5 次）的 Newton-Schulz 迭代近似 $B_t (B_t^\top B_t)^{-1/2}$，在保持谱归一化效果的同时避免了显式 SVD。
 
 综上，Muon 的创新并非简单的优化器调参，而是**将优化器的几何假设从向量 $\ell_\infty$ 空间切换到矩阵谱范数空间**，这一切换恰好匹配了 Transformer 中 VO 和 FFN 权重的联想存储器结构，从而系统性地改善了对长尾分布数据的学习。
-
-
 
 论文围绕一个核心命题展开：Muon 优化器在 Transformer 的长尾关联记忆学习中为何优于 Adam。研究框架由三个层次构成——**经验分解**、**机制解释**和**理论验证**，逐层递进地揭示 Muon 的优势来源。
 
@@ -118,8 +112,6 @@ $$\Delta \mathbf{w}^* = -\frac{\lVert \mathbf{g} \rVert_1}{\lambda} \cdot \mathr
 2. **Muon 更新路径**：对 VO+FFN 组，累积动量 $B_t$，通过 Newton-Schulz 迭代（实践中 5 次）近似计算 $O_t = U_t V_t^{\top}$（等价于 SVD 后归一化奇异值），形成与谱范数最速下降方向对齐的更新。
 3. **Adam 更新路径**：对 QK 组，保持标准的 $\ell_{\infty}$ 范数最速下降更新。
 4. **权重更新**：各组更新合并后施加于对应权重矩阵，完成一步训练。
-
-
 
 ### Transformer 中的线性联想记忆结构
 
@@ -172,14 +164,11 @@ $$O = U V^{\top} = \sum_{i=1}^{d} u_i v_i^{\top}$$
 
 这一解释揭示了 Muon 与 Adam 的本质差异：前者在矩阵空间中以谱范数几何进行优化，后者在向量空间中以无穷范数几何进行优化。
 
-
-
 ## 实验与关键发现
 
 ### 主要结果：Muon 在 NanoGPT 基准上的验证损失优势
 
 在 FineWeb 语料上训练 160M 参数 NanoGPT（非门控 FFN）的验证损失对比中，Muon 显著优于 Adam。Figure 1(d) 的柱状图给出了 step 10,000 时的验证损失：纯 Muon 达到 **3.565**，纯 Adam 为 **3.924**，差距 **-0.359**。这一结果直接锚定了 Muon 在该基准上的性能优势。
-
 
 ![[assets/figures/papers/iclr26_0009_twbMFL0DMp_Muon_Outperforms_Adam_in_Tail-End_Associative_Me/figures/004_Figure_1.jpg]]
 *Figure 1: Validation loss comparison on the 160M NanoGPT model with non-gated FFN under different Muon/Adam assignments. Panels (a) and (b) show the validation loss over training steps for the Independent Blocks and Combined Configurations settings, respectively. Panels (c) and (d) report the corresponding validation loss at step 10,000 for each mode, summarizing the final performance of the Independent Blocks and Combined Configurations*
@@ -200,7 +189,6 @@ Figure 1(a–b) 的消融实验系统拆解了不同权重矩阵对 Muon 的敏�
 
 Figure 2 从权重矩阵的奇异值分布角度揭示了 Muon 与 Adam 的本质差异。在训练全程中，Muon 持续产生比 Adam 更各向同性的权重：
 
-
 ![[assets/figures/papers/iclr26_0009_twbMFL0DMp_Muon_Outperforms_Adam_in_Tail-End_Associative_Me/figures/005_Figure_2.jpg]]
 *Figure 2: Spectral Dynamics of Transformer Weight Matrices During Training. Each panel reports four metrics characterizing singular value distributions: SVD entropy, Top10E, eRank, and Q75/Q25 ratio. The four subplots correspond to different weight matrix groups: (a) VO and (b) $W _ { \mathrm { o u t } }$*
 
@@ -213,13 +201,11 @@ Figure 2 从权重矩阵的奇异值分布角度揭示了 Muon 与 Adam 的本�
 
 在人工构造的重尾知识任务中（类别频率服从幂律分布），Muon 展现出对尾部类别的显著学习优势。Figure 3(b–d) 和 Table 2–4 给出了关键证据：
 
-
 ![[assets/figures/papers/iclr26_0009_twbMFL0DMp_Muon_Outperforms_Adam_in_Tail-End_Associative_Me/figures/033_Table_2.jpg]]
 *Table 2: Heavy-tail knowledge task: Group performance by optimizer (2,000 steps)*
 
 - **收敛速度与均匀性**：Muon 在所有频率类别上实现更快且更均匀的收敛，误差棒更紧。Table 4（10,000 steps）显示 Muon 在 Group 11/13/15 上分别达到 1.000/1.000/0.976，而 Adam 在 Group 15 上仅为 0.558。
 - **头尾差距缩小**：Muon 有效降低了高频与低频类别之间的性能差距。Figure 3(e–f) 的消融确认，**Muon on VO+FFN 是缩小头尾差距的关键**，而 Muon on QK 对此贡献有限。
-
 
 ![[assets/figures/papers/iclr26_0009_twbMFL0DMp_Muon_Outperforms_Adam_in_Tail-End_Associative_Me/figures/035_Table_4.jpg]]
 *Table 4: Heavy-tail knowledge task: Group performance by optimizer (10,000 steps)*
@@ -229,7 +215,6 @@ Figure 2 从权重矩阵的奇异值分布角度揭示了 Muon 与 Adam 的本�
 ### 门控 FFN 的扩展验证
 
 在门控 FFN 架构上的重尾知识任务中，Muon 的优势保持一致。Figure 12 和 Table 5–7 显示：
-
 
 ![[assets/figures/papers/iclr26_0009_twbMFL0DMp_Muon_Outperforms_Adam_in_Tail-End_Associative_Me/figures/041_Figure_12.jpg]]
 *Figure 12: Performance comparison of different optimizers on a heavy-tailed knowledge task with gated feed-forward networks. (a) The distribution of samples per class follows a power law. (b-d) Performance of Muon, Adam, and SGD+Momentum optimizers. (e) Muon (VO, FFN)/Adam (QK). (f) Muon (QK)/Adam (VO, FFN)*
@@ -248,13 +233,8 @@ Figure 2 从权重矩阵的奇异值分布角度揭示了 Muon 与 Adam 的本�
 - **小批量下的 SVD 近似质量**：论文使用固定次数（如 5 次）的 Newton-Schulz 迭代近似 $O_t$，在小批量或高条件数场景下，近似的正交性可能退化。当前实验未系统评估这一边界。
 - **长尾外的泛化**：重尾知识任务是人工构造的，Wikitext-103（Figure 15）提供了初步的自然语料验证，但更大规模、更多样化的自然语言基准仍需补充。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0009_twbMFL0DMp_Muon_Outperforms_Adam_in_Tail-End_Associative_Me/figures/014_Figure_14.jpg]]
 *Figure 14: (a) Average Angles Between $E _ { i } / \widetilde { E } _ { i }$ (b) One-step Optimization Results (c) Multi-step Optimization Results*
-
-
-
 
 ## 定位与知识库关联
 
@@ -291,8 +271,6 @@ Muon 的增益并非均匀分布在所有 Transformer 组件上。关键发现�
 2. **组件选择的理论判据**：什么结构特征决定了某个 Transformer 组件是否受益于 Muon？目前仅有经验观察（VO/FFN 受益，QK 不显著），缺乏理论判据来预测新架构中 Muon 的适用位置。
 3. **与动量机制的深层交互**：理论分析中为清晰起见禁用了动量（$\beta_1 = \beta_2 = 0$），但实际 Muon 使用动量累积矩阵 $B_t$。动量如何与谱归一化交互、是否引入新的动力学效应，尚待分析。
 4. **更大规模验证**：当前主要结果基于 160M NanoGPT 和重尾知识任务，Muon 在更大规模模型（如 7B+）和更通用预训练任务上的表现需进一步验证。
-
-
 
 ## 原文 PDF
 

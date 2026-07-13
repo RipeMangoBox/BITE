@@ -52,8 +52,6 @@ claims:
 
 实验表明，Self-Critique在多个模型和基准上显著优于现有方法：在Qwen2.5-7B-Instruct上平均AUC达0.70，比最佳基线Recall（0.59）提高19%；在PPO、GRPO、DAPO三种RL算法上均保持最高检测AUC（平均0.60），展现出对RL算法的鲁棒性。双阶段污染分析进一步验证了该方法对RL阶段污染的特异性——当降低预训练污染水平后，Self-Critique的AUC从0.59显著提升至0.88。
 
-
-
 ### 数据污染：从预训练到RL后训练的挑战迁移
 
 大语言模型的训练管线通常包含三个阶段：预训练、监督微调（SFT）和基于人类反馈的强化学习（RLHF）或可验证奖励的强化学习（RLVR）后训练。数据污染——即评估基准数据意外泄漏到训练集中——长期以来被视为威胁模型评估可信度的核心问题。然而，现有检测方法几乎全部针对预训练和SFT阶段设计，其理论基础根植于一个关键假设：**模型通过最大似然估计直接优化令牌级对数概率**。
@@ -80,8 +78,6 @@ $$\mathcal{I}_{\mathrm{RL}}(\theta) = \mathbb{E}_{q \sim D_{\mathrm{RL}}, \{o_i\
 
 这一洞察将检测问题从“模型是否见过该样本”重新表述为“模型是否对该样本形成了不可摆脱的路径依赖”，从而绕开了RL阶段似然度信号不可靠的根本困境。基于此，本文提出**Self-Critique**方法，通过主动自我批评探测机制测量熵序列相似度，实现了对RL后训练阶段数据污染的首次专门检测。
 
-
-
 ## 核心方法与创新机理
 
 ### 检测范式转换：从被动似然度量到主动路径依赖探测
@@ -105,8 +101,6 @@ Self-Critique的核心创新在于将检测机制从**被动观察似然属性**
 ### 方法分类学定位
 
 Table 1的方法分类学清晰展示了Self-Critique的独特位置：它是首个专门针对**RL后训练阶段**设计的检测方法，与所有面向预训练/SFT的基线方法在探测机制、核心度量和设计阶段三个维度上均存在本质差异。表1中同时引入的Entropy-Temp和Entropy-Noise两种熵基线方法（均使用熵度量但采用不同的探测策略）进一步验证了一个关键结论：**熵信号本身并非充分条件，必须与自我批评探测机制结合才能有效暴露RL阶段的污染特征**。主实验结果（Table 2）表明，Self-Critique在Qwen2.5-7B-Instruct上平均AUC达0.70，比最佳基线Recall（0.59）提高19%，而Entropy-Temp和Entropy-Noise的性能显著低于Self-Critique，直接证明了探测机制与度量的协同必要性。
-
-
 
 ![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_EjiJmiA6ea/figures/005_Table_1.jpg]]
 *Table 1: A taxonomy of data contamination detection methods. Our work is the first to specifically address the challenges in the RL Post-training phase*
@@ -148,8 +142,6 @@ Figure 2展示了Self-Critique的完整检测流程，包含四个顺序执行�
 ### 方法鲁棒性
 
 Self-Critique在多个维度上展现出强鲁棒性：（1）对元指令措辞不敏感，不同提示下的AUC标准差仅为0.025左右（Table 9）；（2）在PPO、GRPO、DAPO三种不同RL算法训练的模型上均保持最高检测AUC（Table 3），表明其不依赖特定RL算法；（3）在RLHF对齐场景（PPO、DPO、TDPO、RTO）下同样保持一致的检测优势（Table 8）。
-
-
 
 ### 3.1 问题形式化：RL后训练阶段的成员推理攻击
 
@@ -205,8 +197,6 @@ $$ \cos_{\mathrm{penalized}}(A, B) = \cos\bigl(\mathrm{pad}(A), \mathrm{pad}(B)\
 
 **模块四（优化）：Top-K熵近似。** 为降低全词表熵计算的开销，Self-Critique支持仅使用前 $K$ 个最高概率令牌近似熵值。消融实验（Table 4）表明，$K=3$ 时已足够有效，不同 $K$ 值间的AUC方差极小（$<10^{-4}$），验证了计算效率与检测精度的良好平衡。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：RL后训练阶段检测的范式转移
@@ -228,12 +218,6 @@ Self-Critique通过**主动自我批评探测**捕捉这一路径依赖：首先
 | DeepSeek-Math-7B-Instruct | **0.64** | 0.54 (Recall) | +19% |
 
 在Qwen2.5-7B-Math模型上（Table 5），Self-Critique的优势进一步扩大，平均AUC达到**0.74**，比最佳基线Recall（0.57）提升**30%**。在Llama-3.1-8B-Instruct的逻辑推理数据集上（Table 6），Self-Critique在Knights & Knaves上取得**0.81**的AUC，远超Recall的0.62。
-
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_EjiJmiA6ea/figures/010_Table_5.jpg]]
-*Table 5: Detection results on Qwen2.5-7B-Math under RL-MIA (higher is better). AVG reports mean AUC across AIME24 and AIME25*
-
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_EjiJmiA6ea/figures/011_Table_6.jpg]]
-*Table 6: Detection results on Llama-3.1-8B-Instruct under RL-MIA (higher is better). AVG reports mean AUC across K&K and SAT. Self-Critique consistently outperforms baselines on both logic datasets*
 
 值得注意的是，本文提出的两个熵基线——**Entropy-Temp**（随机采样探测+熵度量）和**Entropy-Noise**（非成员前缀探测+熵度量）——虽未超越Self-Critique，但已显著优于传统似然度方法。这验证了一个关键洞察：**熵作为RL阶段变化的敏感指标，天然比对数概率更适合RL后训练场景的污染检测**。然而，仅靠被动熵探测（随机采样或前缀注入）无法充分暴露策略坍塌，必须结合Self-Critique的主动锚点机制才能实现最优检测。
 
@@ -275,23 +259,11 @@ Self-Critique通过**主动自我批评探测**捕捉这一路径依赖：首先
 
 **Table 3** 在Qwen2.5-3B-Instruct上对比了PPO、GRPO、DAPO三种主流RL算法训练的模型。Self-Critique在三种算法下均保持最高AUC（平均0.60），超越最佳基线18%。这表明方法捕捉的是RL后训练共有的策略坍塌现象，而非特定算法的优化偏差。
 
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_EjiJmiA6ea/figures/008_Table_3.jpg]]
-*Table 3: Detection performance on K&K with Qwen2.5-3B-Instruct trained by different RL algorithms. AVG column reports the mean AUC across three RL algorithms*
-
 在RLHF对齐场景（UltraFeedback数据集，Table 8）中，Self-Critique在PPO、DPO、TDPO、RTO四种对齐算法上同样一致优于基线，AUC范围0.62-0.70，进一步验证了方法的跨范式适用性。
-
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_EjiJmiA6ea/figures/013_Table_8.jpg]]
-*Table 8: Detection results (AUC) on the UltraFeedback dataset across different RLHF alignment algorithms. Self-Critique consistently outperforms baselines regardless of the alignment method*
 
 #### 双阶段污染分析：RL阶段特异性的关键证据
 
 现实场景中，RL训练数据往往已在预训练阶段被模型见过，形成**预训练+RL双阶段污染**。**Figure 3** 和 **Table 7** 通过控制预训练污染水平（按分位数筛选）来解耦两个阶段的贡献。核心发现：
-
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_EjiJmiA6ea/figures/007_Figure_3.jpg]]
-*Figure 3: Dual-stage contamination analysis. Self-Critique on the lower-pretraining-contamination subset (green) improves sharply as the rate decreases*
-
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_EjiJmiA6ea/figures/012_Table_7.jpg]]
-*Table 7: Numerical AUC results for the dual-stage contamination analysis. The header row indicates the quantile of pretraining contamination retained*
 
 - 当保留的预训练污染分位数从1.0降至0.0时，Self-Critique的AUC从0.59**急剧提升至0.88**
 - 这一趋势表明：预训练污染会混淆RL阶段的检测信号（因为模型在预训练阶段已通过MLE记住了部分样本），但Self-Critique对**纯RL阶段污染**具有极高的特异性
@@ -313,8 +285,6 @@ Self-Critique通过**主动自我批评探测**捕捉这一路径依赖：首先
 
 - **Figure 6**：污染与干净样本的Self-Critique分数分布直方图及核密度估计显示，两组分布存在明显分离（污染样本的熵序列相似度系统性偏高），但仍有部分重叠区域，这解释了AUC在0.64-0.81而非接近1.0的原因。
 - **Table 12**：Bootstrap分析（1000次重采样）显示Self-Critique在SAT数据集上的95%置信区间为[0.56, 0.76]（Qwen）和[0.55, 0.77]（DeepSeek），区间下限均显著高于0.5，验证了检测性能的统计显著性。
-
-
 
 ## 定位与知识库关联
 
@@ -387,8 +357,6 @@ Self-Critique展现出对RL算法类型的强鲁棒性：
 - **多信号融合**：能否将熵序列相似度与奖励分布特征、生成多样性指标、注意力模式等信号融合，构建更鲁棒的多模态检测器？
 - **对抗鲁棒性**：如果攻击者知晓Self-Critique的检测机制，能否通过对抗训练或提示注入来规避检测？方法在灰盒和自适应攻击下的鲁棒性需要进一步评估。
 - **实时检测与干预**：能否将Self-Critique从离线审计工具发展为在线训练监控机制，在RL训练过程中实时检测并阻止数据污染？
-
-
 
 ## 原文 PDF
 

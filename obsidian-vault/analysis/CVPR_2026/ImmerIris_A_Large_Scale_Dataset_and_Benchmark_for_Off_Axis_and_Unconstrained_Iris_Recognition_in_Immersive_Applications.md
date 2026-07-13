@@ -55,8 +55,6 @@ claims:
 
 **局限性方面**，注视变化（gaze variation）是导致性能下降的最显著因素（平均约37%退化），当前NormFree尚未针对其专门优化；数据集受试者主要为20-40岁亚洲成年人，跨群体泛化性有待验证；此外，NormFree仍依赖预训练检测器，在极度遮挡或模糊时可能失效。
 
-
-
 ### 虹膜识别范式的历史路径与固有假设
 
 虹膜识别在过去三十年中沿着一条高度受控的技术路径演进。自Daugman（Elsevier 2009）奠基性工作以来，主流方法——包括基于Gabor滤波的编码、**Ordinal Measures (OM)**（Sun and Tan, TPAMI 2008）、以及近年基于深度学习的**Maxout/UE-UGCL**（Wei et al., TIFS 2022）、**ComplexIrisNet**（Nguyen et al., TPAMI 2022）等——几乎无一例外地遵循**两阶段范式**：先通过虹膜分割与极坐标变换将环形虹膜区域展开为矩形归一化纹理，再对该纹理进行特征提取与匹配。这一范式的隐含前提是：采集图像在光轴对准、光照稳定、用户配合的条件下获取，虹膜边界清晰可辨，归一化操作能够可靠地将纹理映射到规范坐标系。
@@ -80,8 +78,6 @@ claims:
 ### 本文的核心回应
 
 基于上述分析，本文提出**NormFree**——一种免归一化的端到端虹膜识别范式。该方法仅通过预训练检测器获取可靠边界框，经1.2倍扩展以包含眼周上下文后直接送入特征提取网络，彻底摒弃了极坐标变换与纹理归一化步骤。在ImmerIris数据集上构建的多维度评估协议（综合挑战与孤立挑战）下，NormFree在所有协议上均显著优于归一化基线及其他SOTA方法，验证了这一范式转换的有效性。
-
-
 
 ## 核心方法与创新机理
 
@@ -130,8 +126,6 @@ claims:
 - **检测器依赖**：NormFree 仍依赖预训练检测器获取边界框，极端遮挡或模糊下的检测失败仍是潜在风险点。
 - **跨群体泛化**：数据集受试者主要为 20-40 岁亚洲成年人，其他种族和年龄组的泛化性需进一步验证。
 
-
-
 ImmerIris 提出的 **NormFree** 方法从根本上重构了虹膜识别的处理范式。传统 SOTA 方法普遍遵循 Daugman 经典的两阶段流水线：首先对眼部图像进行虹膜区域分割与轮廓参数化，再通过极坐标变换将环形虹膜展开（unwrap）为矩形归一化纹理，最后送入特征提取器。然而在沉浸式场景中，离轴拍摄、注视变化、光照波动与遮挡等因素使归一化阶段极易产生严重扭曲的纹理，成为整个系统的核心瓶颈（参见 Figure 6(a)）。
 
 ![[assets/figures/papers/paper_list_l2098_https_arxiv_org_abs_2510_10113/figures/008_Figure_6.jpg]]
@@ -151,8 +145,6 @@ NormFree 采用**端到端的免归一化范式**，仅包含三个级联模块�
 整个流水线的输入为 VR 头显采集的原始眼部图像，输出为固定维度的虹膜身份嵌入，直接用于验证（verification）或识别（identification）任务。与归一化基线 **NormKeep**（保留归一化但采用相同的骨干网络与损失函数）的对照设计，确保了性能差异仅源于预处理范式的不同，而非骨干网络或训练策略的优势。
 
 Figure 6 直观对比了两种范式：传统范式在归一化阶段将环形虹膜展开为矩形纹理，失败时产生不可逆的纹理失真；NormFree 则绕过该步骤，直接利用裁剪后的虹膜区域进行端到端学习，从根本上规避了归一化失效带来的级联误差。
-
-
 
 ### 范式重构：从两阶段归一化到端到端免归一化
 
@@ -175,16 +167,11 @@ NormFree的因果调节变量是**彻底移除归一化阶段**，将范式重�
 
 由于NormFree的创新本质是**去除归一化模块**而非引入新的数学构造，本节无新增公式需要推导。该设计的有效性完全由实验验证支撑：消融实验表明，即使换用更先进的自适应归一化技术，NormKeep性能仅微幅提升；而将骨干网络缩小至IR-18时NormFree仍保持优势，证明归一化是通用瓶颈而非实现细节（Table 7, Sec 5.6）。
 
-
-
 ## 实验与关键发现
 
 ### 实验设置概览
 
 论文构建了八个评估协议，系统考察光照、注视、遮挡、瞳孔扩张、反射和模糊六类退化因素对虹膜识别的影响。其中四个为**综合挑战协议**（Immer-Control、Immer-Fix、Immer-Select、Immer-Any），难度递增，同时包含多种退化因素的组合；另四个为**孤立挑战协议**（Immer-Occlusion、Immer-Dilation、Immer-Light、Immer-Gaze），分别隔离单一退化因素以精确归因。各协议所研究的因素矩阵详见 Table 2。
-
-![[assets/figures/papers/paper_list_l2098_https_arxiv_org_abs_2510_10113/figures/007_Table_2.jpg]]
-*Table 2: Summary of evaluation protocols by the factors studied. “I, G, O, D, R, B” denote illumination, gaze, occlusion, dilation, reflection, and blur. Symbols “•, ◦, △” indicate explicitly, partially, and implicitly included factors, and “×” indicates exclusion*
 
 所有方法均采用 ResNet IR-50 作为骨干网络，以 ArcFace 损失进行训练。NormFree 仅需检测器提供的边界框（扩展 1.2 倍后裁剪），而对比基线 NormKeep 则沿用完整的归一化流水线（分割→参数化→极坐标展开）。评估指标包括验证场景下的 FRR@FAR（1e-1、1e-3、1e-5）和识别场景下的 Rank-1 准确率。
 
@@ -226,9 +213,6 @@ Table 5 进一步在四个孤立挑战协议上分解性能。NormFree 在所有
 
 Table 6 报告了各协议下的识别性能。在 Immer-Any 协议上，NormFree 的 Rank-1 准确率达到 94.39%，较 SOTA 中最高水平（约 90%）提升数个点。在 Immer-Control 和 Immer-Fix 上，NormFree 同样保持领先或与最优方法持平，进一步验证了免归一化范式在封闭集识别任务中的有效性。
 
-![[assets/figures/papers/paper_list_l2098_https_arxiv_org_abs_2510_10113/figures/012_Table_6.jpg]]
-*Table 6: Identification rank-1 accuracy (↑) of SOTAs and the proposed method on different evaluation protocols*
-
 ### 消融实验：验证因果机制
 
 Table 7 通过两组消融实验排除了混淆因素，强化了“归一化是瓶颈”这一因果推断：
@@ -253,19 +237,6 @@ Table 7 通过两组消融实验排除了混淆因素，强化了“归一化是
 - **Table 4**：核心结果表，涵盖所有方法在四个综合协议上的完整验证性能。
 - **Table 5**：孤立挑战归因表，用于定位各退化因素的独立影响。
 - **Table 7**：消融实验表，验证“归一化是瓶颈”的因果推断并排除混淆因素。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2098_https_arxiv_org_abs_2510_10113/figures/003_Table_1.jpg]]
-*Table 1: Comparison of existing iris recognition datasets and ImmerIris in terms of acquisition setup and scale*
-
-![[assets/figures/papers/paper_list_l2098_https_arxiv_org_abs_2510_10113/figures/004_Figure_3.jpg]]
-*Figure 3: Data acquisition setup. (a) Screen interface of the VR headset, where red squares numbered 1-9 mark gaze points for sequential fixation. Live camera previews assist proper wearing. A full-screen white panel gradually increases in brightness to simulate illumination changes. (b) Actual scene of data acquisition*
-
-![[assets/figures/papers/paper_list_l2098_https_arxiv_org_abs_2510_10113/figures/001_Figure_1.jpg]]
-*Figure 1: Comparison of application scenarios. Each sample group is from the same person. (a) Traditional iris recognition acquires on-axis and controlled images with dedicated devices, with samples being highly invariant. (b) Immersive iris recognition collects images using consumer HMDs, yielding off-axis and unconstrained samples that exhibit distortion, variation, and degradation*
-
-
 
 ## 定位与知识库关联
 
@@ -319,8 +290,6 @@ NormFree 在虹膜识别领域的方法谱系中标志着一次**预处理范式
 - **生物特征识别的端到端化趋势**：与人脸识别中从“对齐-特征”到直接端到端学习的演进类似，NormFree 将这一思路系统性地引入虹膜识别，并提供了大规模离轴数据集作为验证基础。
 - **鲁棒视觉识别的上下文利用**：1.2× 扩展裁剪的设计与目标检测中“上下文区域提升小目标检测”的思路相通，暗示适度的空间上下文可补偿局部纹理的退化。
 - **沉浸式计算的身份认证需求**：ImmerIris 数据集和 NormFree 方法共同填补了 VR/AR 场景下虹膜识别研究的空白，为后续工作提供了基准和基线。
-
-
 
 ## 原文 PDF
 

@@ -79,8 +79,6 @@ OmniRe 继承了 **3DGS**（Kerbl et al., 2023）的高效栅格化渲染管线�
 - **高置信度证据**：全图与人体区域的 PSNR 大幅领先（Table 1），消融实验确认 SMPL 节点移除导致人体 PSNR 骤降 3.44 dB（Table 2），边界框优化贡献约 +1.2 dB（Table 4）。
 - **需注意的局限**：方法依赖数据集提供的精确边界框和语义标签，在标注质量较低的场景下泛化能力可能受限；缺乏显式光照建模，动态仿真中插入的虚拟物体与背景的视觉和谐性有待验证。
 
-
-
 ### 城市场景重建的范式转移
 
 自动驾驶与数字孪生对高保真城市场景重建提出了迫切需求。近年来，3D 重建范式经历了从 NeRF 到 3D Gaussian Splatting（3DGS）的关键转变。3DGS 以显式三维高斯球表示场景几何与外观，通过可微栅格化实现实时渲染，为大规模动态场景重建开辟了新路径。
@@ -99,8 +97,6 @@ OmniRe 继承了 **3DGS**（Kerbl et al., 2023）的高效栅格化渲染管线�
 OmniRe 的出发点在于：**城市场景的数字孪生必须以人为中心**。真实的交通场景中，行人与骑行者的行为是驾驶决策的关键输入，任何忽略非刚体参与者的重建都只是残缺的世界模型。
 
 为实现这一目标，OmniRe 提出构建**动态高斯场景图**，为不同类型的动态实体分配差异化的高斯表示：刚体节点处理车辆，SMPL 节点引入人体参数模型实现关节级建模，变形节点覆盖无模板的非刚体对象。这一统一框架使得系统能够同时捕捉精细的人体运动与外观，从而将重建质量从“能看清车”提升到“能看清人”的层次，并天然支持行为仿真与场景编辑。
-
-
 
 ## 核心方法与创新机理
 
@@ -154,8 +150,6 @@ $$\mathcal{G}_h^{\mathrm{deform}}(t) = \mathbf{T}_h(t) \otimes \left( \bar{\math
 
 OmniRe 的核心创新逻辑链条清晰：**识别瓶颈（缺乏非刚体建模）→ 引入因果调节变量（SMPL 关节级控制 + 变形网络）→ 构建统一框架（五类异构场景图节点）→ 辅助优化（多视角人体姿态联合优化）**。这一系列创新使得 OmniRe 在全图重建上达到 34.25 PSNR，比之前最优方法 StreetGS 的 29.08 高出 5.17 PSNR（Tab.1），尤其在人体区域实现了 +11.32 PSNR 的跨越式提升。
 
-
-
 OmniRe 的核心是一个**动态高斯场景图**（Dynamic Gaussian Scene Graph），它将整个城市场景分解为五种功能互补的节点类型，并在统一框架下进行端到端联合优化。该框架的输入为多相机 RGB 图像与 LiDAR 点云，输出为可支持新视角合成、场景编辑与行为仿真的完整 3D 表征。
 
 ### 场景图结构与节点角色
@@ -205,13 +199,6 @@ $$\mathcal{L} = (1 - \lambda_r) \mathcal{L}_1 + \lambda_r \mathcal{L}_{\mathrm{S
 - 在统一的场景图中实现对静态背景、刚体车辆、非刚体行人及其他动态实体的**全类别统一重建**。
 
 消融实验证实，移除 SMPL 节点会导致人类区域 PSNR 从 28.15 骤降至 24.71（Tab. 2），而移除变形节点则降至 25.26，验证了这两类非刚体节点在框架中的关键作用。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2408_16760/figures/024_Figure_11.jpg]]
-*Figure 11: Our method allows for flexible editing of scene assets*
-
-
 
 OmniRe 的核心在于构建一个**动态高斯场景图**（Gaussian Scene Graph），为不同类型的场景实体分配差异化高斯表示，并在统一框架下进行端到端联合优化。整个管线由五个节点模块、人体姿态处理模块和联合优化模块构成。
 
@@ -268,8 +255,6 @@ $$\mathcal{L} = (1 - \lambda_r) \mathcal{L}_1 + \lambda_r \mathcal{L}_{\mathrm{S
 - $\mathcal{L}_{\mathrm{reg}}$：其他正则项集合
 
 所有模块参数（高斯属性、节点姿态、变形网络权重、SMPL 参数、环境贴图）在式 (7) 下端到端联合优化。
-
-
 
 ## 实验与关键发现
 
@@ -346,27 +331,8 @@ Table 3 评估了 LiDAR 深度精度。OmniRe 在深度重建上同样优于 Str
 | **Fig.6** | 人体姿态优化对高斯绑定精度有直接影响，移除后出现明显错位 |
 | **Tab.11** | AbsGrad 贡献微小（+0.1 PSNR），非性能领先的决定性因素 |
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2408_16760/figures/003_Figure_3.jpg]]
-*Figure 3: Human Pose Processing. (a) Human ID matching ensures consistent identification across cameras. (b) Missing pose completion to recover poses of occluded individuals*
-
-![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2408_16760/figures/011_Figure.jpg]]
-*Figure: (g) DeformableGS (h) 3DGS*
-
-![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2408_16760/figures/014_Figure_10.jpg]]
-*Figure 10: An example of the dynamic masks for computing dynamic region metrics*
-
-![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2408_16760/figures/025_Figure.jpg]]
-*Figure: w/ Box Refine*
-
-![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2408_16760/figures/013_Figure_9.jpg]]
-*Figure 9: A sample of human-vehicle interaction simulation in driving scenarios*
-
 ![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2408_16760/figures/007_Table_2.jpg]]
 *Table 2: Ablation on Non-Rigid Modeling*
-
-
 
 ## 定位与知识库关联
 
@@ -425,8 +391,6 @@ OmniRe 在动态城市场景重建知识库中占据**从“刚体为主”到�
 - **系统集成创新**：将 SMPL 人体模型、共享变形网络、多视角姿态优化有机整合到高斯场景图框架中，证明了“为不同动态类型分配不同高斯表示”这一设计原则的有效性。
 - **因果关系验证**：通过充分的消融实验，明确建立了“关节级建模→人类区域重建质量”的因果链条，为后续研究提供了清晰的设计指引。
 - **应用导向**：场景图结构使重建结果天然可编辑、可仿真，为自动驾驶仿真中的以人为中心交互场景生成提供了技术基础。
-
-
 
 ## 原文 PDF
 

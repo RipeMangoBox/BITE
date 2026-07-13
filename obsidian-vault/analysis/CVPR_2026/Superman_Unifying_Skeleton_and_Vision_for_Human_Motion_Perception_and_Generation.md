@@ -70,8 +70,6 @@ Superman 在 Human3.6M 基准上取得了全面领先的性能：
 
 Superman 在方法谱系中占据独特位置：它既不同于仅做感知或仅做生成的传统模型，也超越了仅处理单帧的 MLLM 方案。通过视觉引导的跨模态运动标记器和统一的条件序列生成框架，Superman 首次将视频感知、骨架建模和运动生成纳入同一 MLLM 架构，为人体运动分析提供了一个端到端、多任务统一的范式。
 
-
-
 ### 领域碎片化：感知与生成的割裂
 
 人体运动分析是计算机视觉与图形学的核心课题，涵盖3D姿态估计、运动预测、运动中间帧生成等关键任务。然而，当前该领域存在严重的**架构碎片化**：感知模型（如**MotionBERT**，Zhu et al., ICCV 2023）擅长从视频理解运动，但仅输出文本或数值结果，不具备生成能力；生成模型（如**MotionGPT**，Jiang et al., NeurIPS 2023）能够合成逼真的运动序列，却无法处理原始视觉输入。这种“理解”与“创造”的分离，使得构建一个既能感知又能生成人体运动的统一系统成为长期未解的挑战。
@@ -94,8 +92,6 @@ Superman 在方法谱系中占据独特位置：它既不同于仅做感知或�
 2. **单一MLLM统一架构**：以Qwen2.5-VL-7B为核心解码器，整合文本、视频和3D骨架三种模态信息，将多任务统一为条件序列生成，实现感知与生成的真正融合。
 
 这一设计使得Superman在Human3.6M基准上的3D姿态估计相比当前最先进的多任务感知方法**HiC**（Liu et al., ArXiv 2025）取得了11.97%的显著改进，同时在运动预测和中间帧生成任务上保持了领先水平，首次证明了单一模型在人体运动感知与生成全任务上达到最优性能的可行性。
-
-
 
 ## 核心方法与创新机理
 
@@ -120,8 +116,6 @@ $$k_{w} = \arg\min_{k} \left( \|\mathbf{z}_{w}^{v} - \mathbf{c}_{k}^{v}\|_{2}^{2
 $$\hat{\mathbf{Z}}_{\mathrm{grid}} = \mathbf{VSA}(\mathbf{Z}_{\mathrm{grid}}, \mathbf{Z}_{\mathrm{pose}})$$
 
 MAFT 仅增加不到 0.2% 的额外参数，却带来显著的感知性能提升——在 Human3.6M 上，Superman with MAFT 的 N-MPJPE 达到 39.41 mm，相比当前最优的多任务感知方法 HiC 降低 5.36 mm（11.97% 相对改进），验证了视觉-骨架跨模态融合在感知任务中的关键作用。
-
-
 
 Superman 将人体运动感知与生成统一为一个**条件序列生成**问题，其核心 pipeline 由两个解耦的阶段构成：首先通过视觉引导的运动标记器（Vision-Guided Motion Tokenizer, VGMT）将连续的高维运动数据压缩为离散的语义标记序列，随后由单一的多模态大语言模型（MLLM）以自回归方式预测这些运动标记，从而同时完成 3D 姿态估计、运动预测和运动中间帧生成三项任务。
 
@@ -153,13 +147,6 @@ MAFT 作为可选插件嵌入 MLLM 的视觉处理流程中，参数量不足整
 $$\hat{\mathbf{Z}}_{\mathrm{grid}} = \mathbf{VSA}(\mathbf{Z}_{\mathrm{grid}}, \mathbf{Z}_{\mathrm{pose}})$$
 
 其中 $\mathbf{Z}_{\mathrm{pose}}$ 为从输入骨架提取的姿态特征。该模块通过视觉-骨架注意力实现跨模态特征融合，显著提升了对视觉输入依赖较强的任务（如姿态估计）的性能，而对纯骨架驱动的任务（如运动预测）影响甚微。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l25_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Superman_Unifying/figures/001_Figure_1.jpg]]
-*Figure 1: A Unified Framework for Human Motion Perception and Generation. Our unified model achieves state-of-the-art performance across three traditionally disparate tasks. Our method consistently outperforms existing methods across all tasks simultaneously: (1) 3D Pose Estimation, (2) Motion Prediction, and (3) Motion In-betweening*
-
-
 
 Superman 的核心由两个阶段构成：**视觉引导运动标记器（Vision-Guided Motion Tokenizer, VGMT）** 将连续运动序列离散化为语义标记，**多模态大语言模型（MLLM）** 以自回归方式预测这些标记来统一执行多项运动任务。
 
@@ -217,13 +204,6 @@ MLLM（基于 Qwen2.5-VL-7B）将所有任务重新定义为条件序列生成�
 
 这种统一范式使单一模型能够同时处理感知（从视觉到骨架）和生成（从骨架到骨架）任务，并在联合训练中实现跨任务的知识共享。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l25_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Superman_Unifying/figures/003_Figure_2.jpg]]
-*Figure 2: Architecture of our Vision-Guided Motion Tokenizer (VGMT). VGMT creates discrete motion vocabulary by jointly fusing information from two modalities. A Skeleton Encoder (Es) captures geometry while a Visual-Skeleton Attention (VSA) module and a subsequent Visual Encoder (Ev) ground the pose in visual features. The fused representation is quantized against a learnable hybrid codebook, and a decoder reconstructs the 3D poses*
-
-
-
 ## 实验与关键发现
 
 ### 主实验：Human3.6M 基准上的综合性能
@@ -270,24 +250,8 @@ Superman 在 Human3.6M 数据集上统一评估了三维姿态估计（PE）、�
 
 尽管 Superman 在受控基准上表现优异，论文未明确讨论模型的失败案例。基于其设计特点，可推断以下潜在退化场景：（1）依赖预先计算的二维关节投影和固定的二维姿态估计器，在极端遮挡或非典型视角下，二维输入的噪声会通过 VSA 模块传播至三维估计；（2）训练数据局限于 Human3.6M 等受控室内数据集，对复杂野外场景中多人交互、动态背景等情况的泛化能力缺乏系统验证；（3）MLLM 的自回归推理范式在长序列生成时可能面临误差累积问题，但论文未对此进行分析。这些局限性需要在后续研究中通过更大规模的多样化数据和鲁棒性测试加以验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l25_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Superman_Unifying/figures/012_Table_6.jpg]]
 *Table 6: Ablation on tokenizer components and fusion weights*
-
-![[assets/figures/papers/paper_list_l25_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Superman_Unifying/figures/007_Figure_4.jpg]]
-*Figure 4: Scaling analysis of model and codebook parameters. Scaling up the model (3B→7B) and the codebook consistently reduces (N-)MPJPE for both pose estimation (PE) and motion prediction (MP) tasks, demonstrating the method’s ability to leverage larger capacity for improved accuracy*
-
-![[assets/figures/papers/paper_list_l25_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Superman_Unifying/figures/013_Figure_7.jpg]]
-*Figure 7: Quantitative analysis of the VQ-VAE codebook. (a) Up to 65.4% of the codes remain active during inference, indicating efficient usage of the encoding space. (b) The cosine similarity of most code pairs is close to 0, confirming the ability to learn a discrete latent space with highly decorrelated representations*
-
-![[assets/figures/papers/paper_list_l25_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Superman_Unifying/figures/010_Figure_5.jpg]]
-*Figure 5: Qualitative results for pose estimation on Human3.6M. Our method with MAFT is compared with HiC [19], the current SoTA. Both methods use video and 2D poses as inputs and leverages a fixed 2D pose estimator*
-
-![[assets/figures/papers/paper_list_l25_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Superman_Unifying/figures/011_Table_5.jpg]]
-*Table 5: Computation efficiency*
-
-
 
 ## 定位与知识库关联
 
@@ -343,8 +307,6 @@ Table 1 系统对比了现有模型在感知与生成能力上的覆盖范围。
 **（3）多人场景与交互建模的扩展。** 当前框架以单人运动序列为核心设计，码本中的每个标记对应单个时间窗口内的单人姿态。扩展到多人场景需要解决个体身份保持、交互关系建模、以及码本容量随人数增长而指数膨胀的问题。
 
 **（4）MLLM 推理效率的优化。** 在实时应用场景中，能否通过知识蒸馏、模型量化或推测解码等技术降低 MLLM 的推理延迟，同时保持统一框架的性能优势，是推动该方法走向实际部署的关键问题。
-
-
 
 ## 原文 PDF
 

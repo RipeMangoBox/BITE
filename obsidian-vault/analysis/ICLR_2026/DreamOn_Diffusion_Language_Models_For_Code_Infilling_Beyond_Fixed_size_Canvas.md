@@ -53,8 +53,6 @@ claims:
 
 **关键结果**：DREAMON 使扩散基线在 HumanEval-Infilling 和 SantaCoder-FIM 上的平均绝对性能提升 26.4%（Table 1）。具体而言，在 HumanEval-Infilling 单行子集上，DiffuCoder-7B + DREAMON 达到 92.1 Pass@1，较基线提升 36.6 个百分点；在多行子集上，DreamCoder-7B + DREAMON 达到 63.8 Pass@1，与顶级自回归模型相当并有所超越。此外，DREAMON 在不同初始掩码长度下保持稳定性能，接近使用真实长度的 Oracle 性能（Table 2），有效解决了固定长度扩散模型对掩码长度敏感的核心痛点。
 
-
-
 代码补全（code infilling）是生成式代码模型的核心能力之一，要求在给定的上下文前缀和后缀之间生成语法正确、语义连贯的代码片段。近年来，扩散语言模型（Diffusion Language Models, DLMs）凭借其在非自回归生成中展现的全局一致性和可控性，成为该任务的重要技术路线。然而，现有扩散模型在实际部署中面临一个根本性的瓶颈：**输入与输出序列必须保持相同的固定长度**。
 
 这一约束在变长生成场景下造成了严重的性能退化。以 **DreamCoder-7B**（Xie et al., 2025）为例，当预设的掩码（mask）长度与真实补全长度不匹配时，模型表现急剧下降——在 HumanEval-Infilling 基准上，平均性能下降高达 38%。Figure 1 直观地展示了这一失败模式：掩码过少时，扩散模型缺乏足够的生成空间来容纳有意义的代码逻辑；掩码过多时，模型倾向于过度生成不必要的代码片段，导致语义错误。这种“定长画布”的刚性假设，本质上将生成质量与初始掩码长度的猜测耦合在一起，而真实场景中补全长度往往是未知的。
@@ -62,8 +60,6 @@ claims:
 从方法谱系来看，当前主流的代码补全方案分为两条路径：自回归模型（如 **Deepseek-Coder-6.7B**、**Qwen2.5-Coder-7B**）天然支持变长生成，但缺乏扩散模型在迭代精炼和全局规划上的优势；而扩散模型（如 **LLaDA-8B**、**DiffuCoder-7B**）虽在生成质量上展现出竞争力，却受限于固定长度的掩码扩散框架，无法动态决定输出长度。这一结构性缺口意味着，扩散模型在代码补全任务上的潜力远未释放——问题的关键不在于生成能力本身，而在于缺乏一种原生机制，使模型能够在去噪过程中自主地调整序列长度。
 
 DREAMON 的提出正是针对这一瓶颈。其核心动机在于：**将长度控制从外部超参数转变为模型内部的可学习行为**，使扩散模型在推理时能够根据自身预测动态地扩展或收缩掩码序列，从而解耦生成质量与初始长度假设。这一设计无需任何架构改动，仅通过引入两个特殊状态令牌和相应的训练-推理协议即可实现，为扩散语言模型在变长代码补全任务上的规模化应用铺平了道路。
-
-
 
 ## 核心方法与创新机理
 
@@ -97,8 +93,6 @@ DreamOn 的推理过程（Algorithm 2, §3.3）摒弃了传统的固定掩码调
 
 DreamOn 的三个 changed slots 形成完整闭环：数据增强构建包含伸缩信号的辅助序列 → 带权损失平衡伸缩令牌的训练贡献 → 自适应推理实现端到端的变长生成。这套机制使扩散模型首次在代码补全任务上摆脱了对预设长度的依赖，在不同初始掩码长度下均保持接近 Oracle 水平的稳定性能（Table 2, §5.1），为扩散语言模型在变长生成场景的实用化铺平了道路。
 
-
-
 ![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_EQTPmqukiU/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the augmented diffusion process. Top: the forward augmentation-andnoising procedure maps the input sequence $\mathbf { x } _ { \mathrm { 0 } }$ to an augmented latent $\mathbf { z } _ { 0 }$ containing [expand] and [delete] states, and then applies a standard masked diffusion process over $\mathbf { z } _ { 0 }$ to obtain $\mathbf { z } _ { t }$ and eventually $\mathbf { z } _ { T }$ . Bottom: a single denoising step where [mask] positions in $\mathbf { z } _ { t }$ can be predicted as either regular tokens or special states; [expand] deterministically expands into two [mask] tokens, while [delete] will remove the corresponding position, yielding a new sequence $\mathbf { z } _ { t - 1 }$ wit...
 
@@ -122,8 +116,6 @@ DreamOn 的整体框架围绕一个核心思想展开：在标准掩码扩散语
 - **合并概率**：$p_{\mathrm{merge}} = 0.5$ 时达到最高平均 Pass@1。
 - **长度上限**：掩码扩展上限设为 $L_{\max} = 128$，达到后禁用扩展。
 - **训练计算量**：仅为基础模型预训练计算量的 0.15%。
-
-
 
 ### 3.1 数据增强与扩散过程
 
@@ -152,8 +144,6 @@ $$w _ { n } = \frac { \mathscr { N } _ { m a s k } } { \mathscr { N } _ { m a s 
 ### 3.4 广播删除（长度预测器）
 
 为加速长度收敛，DREAMON 引入广播删除机制：一旦模型预测出 `[delete]`，若其右侧所有令牌均为 `[mask]`，则一并消除这些 `[mask]` 令牌。该机制将多行补全子集上的平均推理步数从 122.8 步降至 52.4 步（加速约 2.1 倍），而性能仅下降 0.6%（Table 3）。
-
-
 
 ## 实验与关键发现
 
@@ -199,12 +189,8 @@ Table 3 和 Figure 5 系统性地检验了 DREAMON 各设计组件的贡献：
 
 **掩码合并调度器设计**：Figure 5a 显示，静态与动态逆调度器的 **1:1 混合**在不同掩码长度下取得了最佳平衡。Figure 5b 进一步表明，合并概率 $p_{\text{merge}} = 0.5$ 时单行补全的 Pass@1 达到峰值（约 90.5%），过高或过低的合并概率均导致性能下降。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_EQTPmqukiU/figures/010_Table_4.jpg]]
 *Table 4: Rouge-L scores on the ROCStories corpus across variable initial mask lengths*
-
-
 
 ## 定位与知识库关联
 
@@ -263,8 +249,6 @@ DREAMON 的方法贡献可分解为三个相互依赖的模块，消融实验揭
 3. **更原则性的推理公式**：当前的推理过程（Algorithm 2）依赖于启发式的自适应去掩码预算 $n$ 和广播删除规则。论文指出，为掩码扩散模型中的灵活推理开发更具原则性的公式化方法是一个重要的理论方向。
 
 4. **长度预测的精度**：广播删除机制虽然高效，但在某些情况下可能过度删除（当 `[delete]` 右侧并非全部为 `[mask]` 时不会触发广播）。更精细的长度预测策略（如独立的长度预测模块）可能进一步提升性能，但需要额外的设计复杂度和训练成本。
-
-
 
 ## 原文 PDF
 

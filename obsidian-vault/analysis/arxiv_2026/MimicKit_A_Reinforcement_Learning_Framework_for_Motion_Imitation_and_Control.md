@@ -37,7 +37,6 @@ claims:
 | Method | MimicKit |
 | Dataset |  |
 
-
 > [!tip] 效果简介
 > 量化结果、消融证据与适用边界见“实验与关键发现”。
 
@@ -52,8 +51,6 @@ MimicKit 集成了三类代表性的运动模仿方法：基于跟踪的 **DeepM
 实验结果表明，框架能够成功训练多种高动态技能。定量比较（表 1）揭示了一个关键结论：基于跟踪的方法（DeepMimic、ADD）在精确复现参考动作方面显著优于分布匹配方法（AMP）；其中 ADD 通过微分判别器自动学习自适应奖励函数，在不同动作间表现更为一致。消融实验进一步表明，在训练中启用姿态误差终止（pose error termination）可大幅提升跟踪精度与跨训练运行的稳定性（图 5）。
 
 目前框架的局限在于支持的仿真后端有限（Isaac Gym、Isaac Lab、Newton），尚未集成真实机器人部署的完整管道；不同方法的表现仍依赖内置超参数配置，对新任务可能需要额外调参。未来的开放问题包括扩展到更多仿真器与真实平台、集成更先进的模仿学习算法，以及自动化方法选择机制。
-
-
 
 ### 问题背景
 
@@ -78,8 +75,6 @@ $$J ( \pi ) = \mathbb { E } _ { p ( \tau \mid \pi ) } \left[ \sum _ { t = 0 } ^ 
 MimicKit 的设计遵循“接口标准化、模块可替换”原则，将系统解耦为四个核心抽象——**Agent**（学习算法与经验管理）、**Model**（神经网络架构）、**Environment**（任务逻辑与观测构造）、**Engine**（底层仿真接口）——使用户可以便捷地配置并切换不同的模仿方法（如 DeepMimic、AMP、ADD）与仿真后端（如 Isaac Gym、Isaac Lab、Newton）。框架同时支持向量化环境与 GPU 加速的大规模并行训练，且设计为角色无关（character-agnostic），可适配不同形态的仿真角色。
 
 > **注意**：本文未提供与其它开源 RL 框架（如 rl_games、skrl）的直接性能对比基准，其框架层面的效率优势尚需独立验证。
-
-
 
 ## 核心方法与创新机理
 
@@ -113,8 +108,6 @@ MimicKit 通过向量化环境和 GPU 加速仿真器实现了**大规模并行�
 
 **需要手动验证的点**：目前框架尚未提供与 rl_games、skrl 等通用强化学习库的性能对比基准，其对训练吞吐量和资源效率的工程优势缺乏量化证据支持。
 
-
-
 MimicKit 的核心设计理念是将运动模仿强化学习流程解耦为四个标准化模块——**Agent**、**Model**、**Environment** 与 **Engine**——通过统一接口实现算法与仿真后端的灵活组合（图 2）。
 
 **Agent** 是学习算法的主体，负责实现策略优化逻辑并管理经验回放缓冲区。它从 Environment 获取观测与奖励，调用 Model 进行前向推理，再将动作返回给 Environment，同时将交互数据存入回放池用于后续训练。
@@ -131,12 +124,8 @@ $$J ( \pi ) = \mathbb { E } _ { p ( \tau \mid \pi ) } \left[ \sum _ { t = 0 } ^ 
 
 在此框架下，MimicKit 集成了三类代表性的运动模仿方法：基于显式跟踪的 **DeepMimic**（Peng et al., ACM Trans. Graph. 2018）、基于对抗式分布匹配的 **AMP**（Peng et al., ACM Trans. Graph. 2021）以及利用微分判别器自适应学习奖励函数的 **ADD**（Zhang et al., SIGGRAPH Asia 2025）。用户只需在配置中指定方法名称和超参数，即可在这些方法间切换，无需修改核心代码。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l55_https_arxiv_org_abs_2510_13794/figures/002_Figure_2.jpg]]
 *Figure 2: Schematic overview of the MimicKit framework. The main components of the system are 1) the Agent, 2) the Model, 3) the Environment, and 4) the Engine. The learning algorithms are implemented primarily through the Agent and Model, while the Environment and Engine are responsible for simulating the desired task*
-
-
 
 ### 框架四大核心模块
 
@@ -173,8 +162,6 @@ $$e _ { t } ^ { \mathrm { v e l } } = \frac { 1 } { N ^ { \mathrm { j o i n t } 
 ### 模块间数据流
 
 环境交互遵循固定的调用协议。每个时间步，Environment 通过 `step(action)` 接口返回四元组 `(obs, r, done, info)`，其中 `obs` 为下一时刻观测，`r` 为即时奖励，`done` 为终止标志，`info` 为辅助诊断信息。Agent 根据此反馈更新策略，形成闭环训练循环。这种标准化的接口设计使得替换不同的模仿方法或仿真后端时，只需修改对应模块而无需改动其他组件。
-
-
 
 ## 实验与关键发现
 
@@ -234,12 +221,8 @@ Fig. 4 展示了训练策略在多种角色和技能上的定性表现。MimicKi
 - **超参数敏感性未系统研究**：框架中不同方法的表现依赖于内置的超参数配置，对于新的角色或任务可能仍需大量手动调参，但目前缺乏消融实验来量化这一影响。
 - **仿真后端单一**：所有实验均在 IsaacGym 上进行，框架对其它后端（Isaac Lab、Newton）的支持尚未通过实验验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l55_https_arxiv_org_abs_2510_13794/figures/001_Figure_1.jpg]]
 *Figure 1: MimicKit provides a suite motion imitation methods that can be used to train diverse simulated agents to perform highly dynamic and life-like motor skills. In this example, a variety of physically simulated humanoid characters are trained to perform a spinkick motion*
-
-
 
 ## 定位与知识库关联
 
@@ -275,8 +258,6 @@ MimicKit 并非提出一种全新的运动模仿算法，而是构建了一个�
 - 能否在框架中集成更丰富的模仿学习算法家族，包括离线 RL、基于扩散模型的动作生成、以及结合语言指令的条件运动生成方法？
 - 如何自动化地为特定任务选择最优的模仿方法及其超参数配置，降低用户的使用门槛？
 - 框架的模块化设计是否能够支持多智能体运动模仿或人机交互场景的扩展？
-
-
 
 ## 原文 PDF
 

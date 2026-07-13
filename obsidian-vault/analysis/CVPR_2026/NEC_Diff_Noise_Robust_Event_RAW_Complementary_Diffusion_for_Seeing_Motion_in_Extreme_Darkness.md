@@ -55,8 +55,6 @@ NEC-Diff 针对这一瓶颈提出了三个层面的创新。首先，利用 RAW 
 
 **局限性**：扩散模型的迭代采样增加了推理计算开销，可能限制实时应用；方法依赖像素对齐的 RAW-事件配对数据，此类同轴多传感器采集系统搭建门槛较高；事件对比度阈值在不同场景下的变化如何自适应处理，尚待进一步研究。
 
-
-
 ### 极端暗光成像的根本困境
 
 在光照低于0.1 lux的极端暗光条件下，传统CMOS相机面临光子匮乏的物理极限：传感器捕获的光电子数急剧减少，光子散粒噪声、读出噪声和量化噪声在信号中的占比急剧攀升。这一困境的数学本质可由RAW图像噪声模型刻画：
@@ -96,8 +94,6 @@ $$E(t) = \frac{1}{C} \log \frac{I(t) + b_{pr}}{I(t - \Delta t) + b_{pr}}$$
 - **SNR互补性**：图像和事件在暗光场景的不同区域呈现互补的SNR分布，为自适应选择高可靠性特征提供了依据。
 
 基于此，本文提出**NEC-Diff**框架，核心动机是：利用RAW图像的线性光响应特性与事件相机的亮度变化本质，建立物理驱动的双模态协同去噪约束；同时基于去噪结果动态估计两模态的SNR，引导自适应特征融合，将高可靠性信息注入扩散模型实现高保真重建。这一设计旨在从根本上突破暗光成像中纹理保留与噪声抑制的权衡瓶颈。
-
-
 
 ## 核心方法与创新机理
 
@@ -140,8 +136,6 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{rec}} + \lambda_{\mathrm{g
 
 其中梯度保持损失 $\mathcal{L}_{\mathrm{grad}}$ 保留纹理结构，强度一致性损失 $\mathcal{L}_{\mathrm{cons}}$ 约束双模态输出的物理一致性（$\lambda_{\mathrm{grad}}=10$，$\lambda_{\mathrm{cons}}=0.5$）。这一物理驱动的约束体系是 NEC-Diff 在极端暗光下实现高保真重建的关键保证。
 
-
-
 NEC-Diff 的整体 pipeline 围绕一个核心洞察展开：在极端暗光条件下，RAW 图像与事件流在噪声分布和信号可靠性上具有天然的互补性——RAW 图像在亮区 SNR 高但暗区纹理丢失严重，事件流在暗纹理区域 SNR 高但在平滑区域噪声密度急剧上升（可达其他区域的 50 倍以上）。基于此，NEC-Diff 构建了三个紧密协作的模块，形成“协同去噪 → 可靠性感知特征提取 → 条件扩散重建”的信息流。
 
 **输入输出流**：系统接收一对时空对齐的噪声 RAW 图像和对应的事件流，输出高保真、纹理清晰的增强图像。RAW 图像保留了线性光响应特性（未经过 ISP 非线性处理），使噪声分布更易建模；事件流以稀疏异步形式记录了场景的亮度变化信息。两者首先进入 **Event-RAW Collaborative Noise Suppression (ECNS)** 模块进行跨模态协同去噪，随后由 **SNR-Guided Reliable Information Extraction (SRIE)** 模块基于去噪结果动态估计双模态 SNR 并自适应提取高可靠性特征，最终通过 **Cross-Modal Attentive Diffusion (CAD)** 模块以双向交叉注意力融合加权特征，注入扩散模型通过 DDIM 确定性采样完成重建（Figure 2）。
@@ -152,15 +146,8 @@ NEC-Diff 的整体 pipeline 围绕一个核心洞察展开：在极端暗光条�
 
 **与现有方法在 pipeline 层面的本质差异**：现有事件-图像融合方法（如 **EvLight**（Liang et al., CVPR 2024）、**ELEDNet**（Kim et al., ECCV 2024））通常采用“各自独立去噪 → 直接特征拼接”的串行策略，忽略了两种模态在去噪过程中的相互指导潜力，且融合时仅依赖图像单模态 SNR 或简单拼接，未对事件模态的信号可靠性进行动态建模。NEC-Diff 的关键突破在于将“协同去噪”和“双模态 SNR 引导融合”系统性地嵌入同一框架：ECNS 实现了去噪阶段的跨模态信息交互（RAW 照明先验指导事件去噪，事件高动态边缘辅助图像去噪），SRIE 则在特征提取阶段同时建模两模态 SNR 并动态选择高置信度信息。这种“去噪即融合、融合即选择”的设计，使得 pipeline 能在极端暗光（<0.3 lux，占 REAL 数据集约 70% 场景）下同时实现噪声抑制和纹理保持，避免了现有方法的纹理-噪声权衡困境。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l904_https_arxiv_org_abs_2603_20005/figures/002_Figure_2.jpg]]
 *Figure 2: The architecture of NEC-diff includes an Event-RAW Collaborative Noise Suppression (ECNS), a SNR-Guided Reliable Information Extraction (SRIE), and a Cross-Modal Attentive Diffusion (CAD). The ECNS jointly exploits illumination priors from RAW images and texture cues from events for cross-modal denoising. The SRIE adaptively selects high-SNR features from both modalities. The CAD integrates reliable features via cross-modal attention into a diffusion model for high-quality reconstruction*
-
-![[assets/figures/papers/paper_list_l904_https_arxiv_org_abs_2603_20005/figures/001_Figure_1.jpg]]
-*Figure 1: Illustration of problem and main idea. (a) LLIE methods suffer from a trade-off between texture preservation and noise suppression. (b) Events effectively complement textures but introduce additional noise. NEC-Diff exploits the characteristics of both events and RAW images to achieve robust denoising while preserving textures, fusing features guided by SNR and injecting them into the diffusion model to achieve high-fidelity results*
-
-
 
 ### 3.1 噪声建模与物理一致性约束
 
@@ -192,9 +179,6 @@ $$\tilde{E}(t) = \frac{1}{C} \log \frac{K I(t)}{K I(t - \Delta t)} = \frac{1}{C}
 
 实验观测揭示了低光照下事件噪声的关键特性（Figure 3）：**事件噪声密度与光照强度呈正相关**——在较亮区域，背景活动噪声密集；在极暗区域，噪声反而稀疏。这一反直觉现象的成因在于事件相机依赖光电流触发，光子匮乏时基底噪声不足以频繁跨越阈值。统计表明，在低光照条件下，事件噪声密度可比其他噪声源高50倍以上。
 
-![[assets/figures/papers/paper_list_l904_https_arxiv_org_abs_2603_20005/figures/003_Figure_3.jpg]]
-*Figure 3: Correlation between event noise density and illumination under low-light conditions. (a) Denoised RAW image indicating illumination intensity across different regions. (b) Event noise density under varying illumination levels. (c) Statistical analysis of event noise density across regions of the gray card*
-
 基于此，ECNS模块采用**光照引导的事件去噪**策略：利用RAW图像提供的照明先验指导事件去噪过程——在亮度较高区域施加更强的事件噪声抑制，在暗区则保留弱信号。随后，**事件辅助的图像去噪**利用去噪后事件的高动态边缘信息指导图像纹理恢复，形成双向互补的去噪循环。
 
 ### 3.3 强度一致性损失
@@ -221,9 +205,6 @@ $$\mathcal{F}_{\mathrm{img-w}} = \mathcal{F}_{\mathrm{img}} \odot \mathcal{W}_{\
 
 该机制实现了**动态模态选择**：在图像SNR高的区域增强图像特征权重，在事件SNR高的区域增强事件特征权重，噪声主导区域则被抑制。消融实验表明（Figure 8），双SNR引导融合相比直接融合提升0.76 dB PSNR，相比仅图像SNR引导融合提升0.43 dB PSNR，验证了双模态SNR联合建模的必要性。
 
-![[assets/figures/papers/paper_list_l904_https_arxiv_org_abs_2603_20005/figures/011_Figure_8.jpg]]
-*Figure 8: Effectiveness of SNR-guided fusion. Compared with (a) direct fusion and (b) image SNR-guided fusion, (c) dual SNRguided fusion achieves the best performance*
-
 ### 3.5 交叉模态注意力扩散重建
 
 加权后的双模态特征通过**双向交叉注意力**实现深度融合。以图像特征为Query、事件特征为Key/Value计算事件注意力，反之亦然：
@@ -249,19 +230,6 @@ $$\boldsymbol{x}_{t-1} = \mathrm{DDIM}(\boldsymbol{x}_t, \hat{\boldsymbol{\epsil
 $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{rec}} + \lambda_{\mathrm{grad}} \mathcal{L}_{\mathrm{grad}} + \lambda_{\mathrm{cons}} \mathcal{L}_{\mathrm{cons}}$$
 
 其中 $\mathcal{L}_{\mathrm{rec}}$ 为重建损失，$\mathcal{L}_{\mathrm{grad}}$ 为梯度保持损失（保护边缘结构），$\mathcal{L}_{\mathrm{cons}}$ 为前述强度一致性损失。超参数设定为 $\lambda_{\mathrm{grad}}=10$，$\lambda_{\mathrm{cons}}=0.5$，平衡各损失项的贡献。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l904_https_arxiv_org_abs_2603_20005/figures/004_Figure_4.jpg]]
-*Figure 4: SNR Comparison between RAW and Event Modalities. (a) and (c) show the visualizations of the RAW image and events, while (b) and (d) present their SNR maps. (e) compares the SNR of the image and events across different regions. It can be observed that in dark regions with rich textures, the event SNR is higher, whereas in smooth areas, the event SNR approaches zero*
-
-![[assets/figures/papers/paper_list_l904_https_arxiv_org_abs_2603_20005/figures/010_Figure_7.jpg]]
-*Figure 7: Effectiveness of ECNS. (a) ECNS effectively enhances the quality of reconstructed details. (b) Effects of cooperative denoising and consistency loss*
-
-![[assets/figures/papers/paper_list_l904_https_arxiv_org_abs_2603_20005/figures/008_Figure.jpg]]
-*Figure: (a) Direct fusion (b) Image SNR-guided Fusion (c) Dual SNR-guided Fusion*
-
-
 
 ## 实验与关键发现
 
@@ -309,15 +277,11 @@ Table 2报告了REAL数据集上各模块的消融结果，揭示了以下关键
 2. **推理效率。** 扩散模型的迭代DDIM采样过程增加了推理计算开销，可能限制实时应用场景的部署。
 3. **数据依赖。** 方法依赖像素对齐的RAW-事件配对数据，此类同轴多传感器采集系统的搭建门槛较高，限制了方法的可复现性和数据扩展性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l904_https_arxiv_org_abs_2603_20005/figures/009_Table_2.jpg]]
 *Table 2: Ablation study of each module on the REAL dataset*
 
 ![[assets/figures/papers/paper_list_l904_https_arxiv_org_abs_2603_20005/figures/005_Figure_5.jpg]]
 *Figure 5: Details of the REAL dataset. (a) Hardware setup of the coaxial imaging system. (b) Distributions of image-pair brightness and platform motion speed. (c) Visualization of representative data pairs*
-
-
 
 ## 定位与知识库关联
 
@@ -358,8 +322,6 @@ NEC-Diff的有效性建立在以下几个前提之上，这些前提同时划定
 - **物理约束的跨模态推广。** ECNS的协同去噪范式——利用一种模态的物理先验指导另一种模态去噪——能否推广到其他多模态成像场景（如红外-可见光融合去噪、深度-彩色联合去噪）？
 
 *注：部分开放问题（如低于0.001 lux的性能边界、C值的跨相机变化规律）未在原论文中提供实验证据，需要后续研究手动验证。*
-
-
 
 ## 原文 PDF
 

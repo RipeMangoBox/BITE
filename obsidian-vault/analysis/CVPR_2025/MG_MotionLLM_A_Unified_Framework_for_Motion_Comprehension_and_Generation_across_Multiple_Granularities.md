@@ -51,8 +51,6 @@ MG-MotionLLM 是一个面向多粒度运动理解与生成的统一框架。其�
 
 在方法定位上，MG-MotionLLM 延续了将运动离散化为 token 并与语言模型统一建模的路线（如 **MotionGPT**, NeurIPS 2023），但其核心创新在于**多粒度协同训练策略**，使得单一模型能够同时胜任粗粒度任务（如文本驱动运动生成、运动描述生成）和首次提出的细粒度任务（如运动到详细文本生成、运动时间定位）。在 HumanML3D 基准上，MG-MotionLLM 在文本驱动运动生成任务中取得了 FID 0.303（MotionGPT 为 0.567）、Top-1 R-Precision 0.516 的结果，在运动描述生成任务中取得了 Top-1 R-Precision 0.592 的结果，均优于现有统一框架方法。
 
-
-
 ### 问题背景
 
 人体运动理解与生成是计算机视觉和图形学领域的核心问题，涵盖文本到运动生成（Text-to-Motion）、运动描述生成（Motion-to-Text）等经典任务。近年来，随着大规模语言模型（LLM）的兴起，研究者开始探索将运动数据离散化为运动token，从而在统一的语言模型框架中同时处理运动理解与生成任务。代表性工作如**MotionGPT**（NeurIPS 2023）基于T5架构，首次尝试将运动与文本统一建模，但其能力主要局限于粗粒度任务——即用简短的句子描述整体动作（如“一个人向前走并挥手”），而无法处理涉及身体部位随时间变化的细粒度描述。
@@ -66,8 +64,6 @@ MG-MotionLLM 是一个面向多粒度运动理解与生成的统一框架。其�
 上述瓶颈揭示了一个关键洞察：**粗粒度与细粒度的运动-语言对齐不应被割裂处理，而应通过精心设计的跨粒度辅助任务实现知识迁移与相互增强**。基于此，本文提出MG-MotionLLM，核心思路是在统一语言模型框架中同时训练粗粒度任务（如整体动作描述生成）和细粒度任务（如运动片段的时间边界定位、片段级详细描述生成），通过多任务间的知识共享，使模型在各粒度上的理解与生成能力同步提升。
 
 具体而言，MG-MotionLLM采用两阶段训练策略：第一阶段为**Granularity-Synergy Pre-training**（多粒度协同预训练），引入时间边界定位、片段描述生成等28个跨粒度辅助任务，逐步建立运动与细粒度文本的映射关系；第二阶段为**Task-Specific Instruction Tuning**（任务特定指令微调），针对具体下游任务进一步优化。这一设计使得单一模型能够胜任从粗粒度运动生成到细粒度运动定位等多种新旧任务，突破了现有统一框架仅能处理粗粒度描述的局限。
-
-
 
 ## 核心方法与创新机理
 
@@ -102,8 +98,6 @@ MG-MotionLLM的核心洞察在于：**在统一语言模型框架中同时训练
 | 任务覆盖 | 仅粗粒度（text-to-motion, motion captioning等） | 粗粒度 + 新细粒度任务（motion-to-detailed text, motion localization等） |
 
 在HumanML3D测试集上，MG-MotionLLM在统一方法中取得了最优的Text-to-Motion FID（0.303 vs MotionGPT的0.567，Table 2）和Motion-to-Text Top-1 R-Precision（0.592 vs MotionGPT的0.543，Table 3），验证了多粒度协同预训练带来的实质性提升。
-
-
 
 MG-MotionLLM 的整体框架遵循“离散化-统一序列建模-两阶段训练”的流水线设计。其核心思路是将高维运动数据压缩为离散 token，与自然语言文本在同一序列空间中统一处理，再通过多粒度协同训练赋予模型跨任务的理解与生成能力。
 
@@ -145,8 +139,6 @@ MG-MotionLLM 的训练分为两个阶段，这是其区别于直接指令微调�
 
 直接使用粗粒度描述与长详细文本拼接进行指令调优时，模型性能反而下降——Top-3 检索精度从仅用粗粒度描述的 77.3% 降至 75.0%。根本原因在于详细描述长度常超 1000 个 token，而运动 token 至多约 50 个，信息密度极度不对称，导致模型难以捕捉运动的全局语义。两阶段训练通过先让模型在 28 个辅助任务中逐步建立细粒度映射，再在第二阶段聚焦特定任务，有效规避了这一瓶颈。消融实验证实，移除预训练阶段任意一个任务均会导致平均 Top-1 检索精度下降（Figure 6），且经过协同预训练的模型在所有四个测试任务上均优于直接指令微调的模型（Table 5）。
 
-
-
 ### 3.1 运动离散化：Motion VQ-VAE
 
 MG-MotionLLM 的运动理解与生成能力建立在将连续运动序列离散化为 token 序列的基础上。为此，方法采用了一个 **Motion VQ-VAE** 模块，其网络结构与训练策略遵循 **T2M-GPT**（CVPR 2023）的设计。该模块由编码器 $E$、解码器 $D$ 和一个可学习的码本 $\pmb{B} = \{\pmb{b}_k\}_{k=1}^K$ 组成。
@@ -180,8 +172,6 @@ $$
 $$
 
 其中 $v_{out}^i$ 为输出序列中的第 $i$ 个 token，$\theta_{LLM}$ 为语言模型参数。该损失函数统一驱动所有多粒度任务的训练——无论是从文本生成运动 token、从运动 token 生成描述文本，还是执行时间边界定位等细粒度任务，均被形式化为同一自回归序列建模问题。
-
-
 
 ## 实验与关键发现
 
@@ -242,33 +232,11 @@ Table 6展示了不同T5模型尺寸（Small 60M、Base 220M、Large 770M）的�
 3. **细粒度编辑的自动化不足**：细粒度运动编辑目前仍需用户手动修改运动脚本（motion script），尚未实现通过自然语言指令自动生成或修改脚本的功能。
 4. **控制模态有限**：尚未整合音乐片段等其他时间序列模态作为控制信号。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l5_MG_MotionLLM_A_Unified_Framework_for_Motion_Comprehension_and_Generation/figures/016_Table_9.jpg]]
 *Table 9: Examples of prompt templates for tasks that utilize two types of information in the input*
 
-![[assets/figures/papers/paper_list_l5_MG_MotionLLM_A_Unified_Framework_for_Motion_Comprehension_and_Generation/figures/003_Table_1.jpg]]
-*Table 1: Examples of prompt templates for various tasks used during training, many of which are newly developed. Additional prompt examples and a comprehensive list of tasks are available in the Appendix. We categorize the tasks based on the number of information types included in the input*
-
 ![[assets/figures/papers/paper_list_l5_MG_MotionLLM_A_Unified_Framework_for_Motion_Comprehension_and_Generation/figures/008_Table_5.jpg]]
 *Table 5: Ablation of the proposed training scheme in four motion tasks on HumanML3D [6] dataset. Results show that the Granularity-Synergy Pre-trained model outperforms models that are directly instruction-tuned on specific tasks, even with relatively few training iterations per task (approximately 1/30). Pretraining the model with tasks spanning multiple granularities promotes mutual enhancement across tasks at each granularity. Further instruction tuning on specific tasks leads to significant performance gains*
-
-![[assets/figures/papers/paper_list_l5_MG_MotionLLM_A_Unified_Framework_for_Motion_Comprehension_and_Generation/figures/009_Table_6.jpg]]
-*Table 6: Ablation of different model sizes of MG-MotionLLMs in four motion tasks on HumanML3D [6] dataset. Similar to MotionGPT [11], the increasing model size does not yield consistent improvements in all tasks, due to the limited scale of HumanML3D*
-
-![[assets/figures/papers/paper_list_l5_MG_MotionLLM_A_Unified_Framework_for_Motion_Comprehension_and_Generation/figures/010_Table_7.jpg]]
-*Table 7: Hyperparameters for different MG-MotionLLMs*
-
-![[assets/figures/papers/paper_list_l5_MG_MotionLLM_A_Unified_Framework_for_Motion_Comprehension_and_Generation/figures/015_Table_8.jpg]]
-*Table 8: Examples of prompt templates for tasks that utilize one type of information in the input*
-
-![[assets/figures/papers/paper_list_l5_MG_MotionLLM_A_Unified_Framework_for_Motion_Comprehension_and_Generation/figures/020_Table_10.jpg]]
-*Table 10: Examples of prompt templates for tasks that utilize three types of information in the input*
-
-![[assets/figures/papers/paper_list_l5_MG_MotionLLM_A_Unified_Framework_for_Motion_Comprehension_and_Generation/figures/012_Figure_6.jpg]]
-*Figure 6: Ablation of all the tasks in the Granularity-Synergy Pre-training stage on the HumanML3D dataset. To assess overall performance, we evaluate three representative tasks, i.e., Text-to-Motion, Motion-to-Text, and (Text, Detailed Text)-to-Motion, which cover both coarse- and fine-grained aspects, including generation and comprehension. Notably, for models ‘w/o Text-to-Motion’, ‘w/o Motion-to-Text’, and ‘w/o (Text, Detailed Text)-to-Motion’, we only evaluate the other two representative tasks. All these tasks use retrieval accuracy as the evaluation metric and we report their average Top-1 Retrieval Accuracy*
-
-
 
 ## 定位与知识库关联
 
@@ -326,8 +294,6 @@ MG-MotionLLM 处于**统一运动理解与生成**这一研究脉络中，其直
 此外，从方法谱系角度看，以下问题值得进一步探索：
 - Granularity-Synergy Pre-training 中 28 个任务的必要性已在当前数据规模下验证，但任务间的冗余性和最优任务组合策略尚不明确。
 - 细粒度任务“Motion-to-Detailed Text”为本文首次提出的基准，缺乏外部独立验证和标准化评估协议，其评估体系（BERTScore）的可靠性需要在更广泛的社区共识中确认。
-
-
 
 ## 原文 PDF
 

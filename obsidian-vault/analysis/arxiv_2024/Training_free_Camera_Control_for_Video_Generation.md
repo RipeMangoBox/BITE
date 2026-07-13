@@ -80,15 +80,11 @@ CamTrol 可即插即用地适配不同基座模型（如 CogVideoX、VideoFusion
 
 消融实验进一步验证：布局先验引导能有效填补点云渲染中的空洞并赋予视频自然动态性；反演时间步 $t_0$ 越小运动精度越高但动态性降低，$t_0$ 越大则相反。推理阶段，CamTrol 的 GPU 显存占用与基座模型相同，推理时间（8 s）显著快于微调方法（MotionCtrl 32 s, CameraCtrl 42 s）。
 
-
-
 视频生成领域近年来取得了显著进展，大规模预训练的文本到视频（T2V）和图像到视频（I2V）扩散模型展现出强大的内容创作能力。然而，一个核心瓶颈始终存在：**现有方法缺乏精确的相机控制能力**。用户无法像在三维渲染引擎中那样，通过简单的参数指定“向左平移”或“绕场景旋转”来操控生成视频的视角变化。这种缺失使得视频生成工具在电影预演、虚拟场景漫游等专业应用中受限。
 
 问题的根源在于**数据与训练成本的矛盾**。要让模型学会相机控制，最直接的方式是在带有精确相机轨迹标注的大规模视频数据集上进行监督微调。但现实是，此类标注数据极为稀缺，获取成本高昂。即便在有限数据集上勉强微调，模型也极易过拟合到特定场景域（如室内房产漫游），丧失预训练基座模型原本丰富的场景多样性和动态生成能力。现有基于微调的代表性方法——**MotionCtrl**（Wang et al., 2023）和 **CameraCtrl**——虽然通过可学习的相机编码器将相机参数嵌入扩散过程，实现了初步控制，但它们在面对训练域之外的新场景时，往往出现“域坍塌”（domain collapse），生成的视频变得静态、缺乏自然动态，且推理时需额外 GPU 显存（MotionCtrl 31.3 GB, CameraCtrl 26.2 GB），难以轻量化部署。
 
 CamTrol 的动机正是打破这种“微调依赖”。核心洞察在于：**预训练视频扩散模型本身已隐式具备处理三维视角变化的内在潜力**——毕竟它们在海量视频数据中早已“见过”无数相机运动。问题不是模型“不会”，而是我们尚未找到一种方式，在不破坏其先验知识的前提下，“唤醒”这种能力。CamTrol 提出了一条训练无关的技术路径：将相机运动显式建模为 3D 点云空间中的多视角渲染序列，再通过扩散反演将这种空间布局信息“注入”噪声潜变量，从而在不更新任何模型参数的情况下，实现灵活、鲁棒且可插拔的相机控制。
-
-
 
 ## 核心方法与创新机理
 
@@ -128,8 +124,6 @@ $$d_i = \underset{d}{\operatorname{argmin}}\left(\sum_M \left\| \phi([\tilde{\ma
 
 CamTrol 的另一项关键创新在于其**完全解耦于特定基座模型**。由于控制信号仅作用于噪声潜变量空间，CamTrol 可作为插件适配不同的视频扩散模型（如 CogVideoX 720×480 49帧、VideoFusion 128×128 16帧），支持不同的分辨率和生成长度，且均无需额外训练（Figure 10）。在计算开销上，CamTrol 在推理时不增加任何 GPU 显存需求（与基座模型同为 11.5 GB），推理时间（8 s）显著快于 MotionCtrl（32 s）和 CameraCtrl（42 s）（Table 2），展现出极高的实用效率。
 
-
-
 CamTrol 是一个两阶段的无训练相机控制框架，旨在激活预训练视频扩散模型中潜藏的 3D 视角变化能力。其核心思路是：**将显式的 3D 相机运动转化为携带布局信息的噪声潜变量，再交由冻结的视频扩散模型去噪生成**，从而在不进行任何监督微调的前提下实现灵活、鲁棒的相机运动控制。
 
 ### 两阶段流水线
@@ -158,12 +152,8 @@ $t_0$ 是平衡运动保真度与生成多样性的核心超参数。较小的 $
 
 CamTrol 完全免除训练，仅需单张输入图像（或文本）和预训练模型即可运行。它可以作为插件适配不同的基座模型（如 CogVideoX、VideoFusion）、不同的分辨率和生成长度，无需任何额外微调。推理时 GPU 显存占用与基座模型相同（约 11.5 GB），显著低于需要相机编码器的微调方法（MotionCtrl 31.3 GB, CameraCtrl 26.2 GB），且推理时间仅需约 8 秒（不含约 56 秒的预计算阶段）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2406_10126/figures/001_Figure_1.jpg]]
 *Figure 1: Pipeline of CamTrol. In stage I, camera movements are modeled through explicit 3D point cloud. In stage II, the layout prior of noisy latents is utilized to guide video generation*
-
-
 
 CamTrol 采用两阶段无训练架构，通过3D点云显式建模相机运动，再将运动布局信息嵌入噪声潜变量以引导视频生成（Figure 1）。以下展开其核心模块与关键公式。
 
@@ -220,15 +210,8 @@ $$
 
 其中 $\theta_i$ 为第 $i$ 帧的旋转角度，$f$ 为以图像中心块 $P$ 的平均深度估计的焦距，用于确定相机绕目标旋转的半径。该参数化使得 CamTrol 能够生成多尺度、多角度的3D旋转视频（Figure 8）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2406_10126/figures/013_Figure_10.jpg]]
-*Figure 10: Applied to CogVideoX (Yang et al., 2024b) and VideoFusion (Luo et al., 2023). CamTrol can be plug-and-play under various situations, accommodating different base models, different resolutions, different generation lengths, all in a training-free manner*
-
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2406_10126/figures/007_Figure_5.jpg]]
 *Figure 5: Comparison with base model. Controlling camera motion via prompt engineering rarely succeeds. Instead, CamTrol offers robust control to video’s camera movements*
-
-
 
 ## 实验与关键发现
 
@@ -290,33 +273,14 @@ CamTrol 展现出优异的即插即用能力，无需任何额外训练即可适
 4. **对象运动与相机运动解耦缺失**：目前仅支持相机运动控制，不能同时独立控制前景物体的运动。
 5. **极端轨迹的微幅精度差距**：在极端精确的运动轨迹跟踪上，与专门微调的方法相比可能仍有细微差距。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2406_10126/figures/010_Figure_7.jpg]]
-*Figure 7: Effect of $t _ { 0 }$ . Larger $t _ { 0 }$ encourages dynamics while smaller $t _ { 0 }$ preserves camera movements (Pedestal Down)*
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2406_10126/figures/011_Figure_9.jpg]]
-*Figure 9: Multi-trajectory video generation. CamTrol is able to generate videos with different camera motions for the same scene*
-
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2406_10126/figures/003_Table_1.jpg]]
 *Table 1: Quantitative comparisons. Our method attains comparable performance with finetuned methods in both video generation quality and camera motion alignment*
 
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2406_10126/figures/005_Table_2.jpg]]
 *Table 2: Computational analysis of inference process, evaluated under unified settings*
 
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2406_10126/figures/009_Table_3.jpg]]
-*Table 3: Quantitative effect of $t _ { 0 }$*
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2406_10126/figures/014_Table_4.jpg]]
-*Table 4: Computational analysis of on 576 × 1024*
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2406_10126/figures/002_Figure_2.jpg]]
-*Figure 2: Transition of samples between two distinct distributions. As the layout-arranged images are inverted by adding random noise, the distribution of their noisy latents will gradually converge to that of their video counterpart (green area), eventually forming a nearly Gaussian latent with specific layout change. This information is then inherited during the generation process. The inversion step determines the trade-off between video diversity and motion fidelity*
-
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2406_10126/figures/006_Figure_4.jpg]]
 *Figure 4: Generalization comparisons. CamTrol can avoid domain collapse that arises from overfitting on certain datasets and adapt to more general scenes (Left), meanwhile preserving video’s dynamics while adhering to desired camera movements (Right)*
-
-
 
 ## 定位与知识库关联
 
@@ -376,8 +340,6 @@ CamTrol 在视频生成方法谱系中占据了一个独特的位置：它既不
 从技术路线的演化来看，CamTrol 可以被视为“可控视频生成”从“参数微调”向“即插即用”转型的一个标志性工作。它证明了预训练视频扩散模型中潜藏着丰富的3D先验，只需一个恰当的接口即可激活，无需昂贵的重新训练。这一思路对于后续研究——尤其是那些面临标注数据稀缺的下游任务——具有重要的启发意义。
 
 **证据强度说明**：本文的结论基于 RealEstate10k 基准上的定量比较（Table 1）和充分的消融实验（Figure 5-7, Table 2-3），核心声明（训练无关、即插即用、性能可比微调方法）均有高置信度证据支撑。关于跨模型泛化性的声明（Figure 10）基于 CogVideoX 和 VideoFusion 两个基座模型的定性展示，置信度略低（0.9），但足以支撑“方法具有模型无关性”的初步结论。开放问题部分为基于论文局限性和方法论本质的逻辑推演，需后续工作验证。
-
-
 
 ## 原文 PDF
 

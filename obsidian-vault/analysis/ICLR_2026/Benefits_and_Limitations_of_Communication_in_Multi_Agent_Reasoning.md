@@ -82,8 +82,6 @@ claims:
 
 当前理论分析基于UHAT模型假设，向实际软注意力Transformer的精确映射仍有待完善。实验局限于少数LLM和构造性任务，在更广泛的推理场景（如图可达性、约束满足）中的泛化性尚未建立。关键开放问题包括：如何将理论上的最优协议转化为可端到端学习的多智能体系统；在近似准确而非精确计算的要求下，投票方法的性能下界能否进一步放松；以及多令牌消息场景下通信预算的精确边界如何刻画。
 
-
-
 ### 单智能体推理的规模化瓶颈
 
 大语言模型（LLM）在复杂推理任务上展现出了令人瞩目的能力，但其性能随着问题规模和上下文长度的增长而显著退化。这一瓶颈的根源在于Transformer架构的固有表达性限制：单智能体系统必须在固定的计算深度内处理全部输入，当输入长度 $N$ 增大时，所需的序列化计算步骤（即“墙钟时间”）呈超线性增长。更关键的是，**随着上下文长度增加，单智能体Transformer的推理准确率会系统性下降**——这一现象在长文档问答、多跳推理等任务中已被广泛观察到，但缺乏严格的理论解释。
@@ -106,8 +104,6 @@ claims:
 3. **理论与实证的一致性**：理论预测的折衷关系能否在实际LLM（如Llama-3.3-70B）的实验中复现？
 
 论文的核心洞察在于：**深度的减少只有通过增加通信才能实现**，且这种折衷在不同任务族中呈现质的差异——某些任务（如关联回忆）几乎不需要通信即可并行化，而另一些任务（如多跳推理）的深度下界与智能体数量无关，通信成本高昂且不可避免。这一发现为多智能体系统的设计提供了可预测的指导原则，而非依赖经验试错。
-
-
 
 ## 核心方法与创新机理
 
@@ -145,8 +141,6 @@ claims:
 - **不可能体制**：同时减少深度和通信是不可能的——这为多智能体系统的设计提供了明确的边界条件。
 
 这些创新将多智能体推理从经验性探索提升到了**可预测、可优化、可证明**的理论层面，为后续的多智能体LLM系统设计提供了原则性指导。
-
-
 
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_0aPIVJUz5T/figures/001_Table_1.jpg]]
 *Table 1: Summary of results. w denotes the number of agents. N represents the length of the input. Size corresponds to total computation. Depth loosely corresponds to wall-clock time. Communication refers to the overall amount of communication between agents. We will define these formally in Section 3. O(·) indicates existence of a protocol; Θ(·) indicates that we prove it optimal*
@@ -209,8 +203,6 @@ $$\frac{\text{Size}(N)}{w(N)} \leq \text{Depth}(N)$$
 ### 实验验证流程
 
 实验部分采用预训练大语言模型（Llama-3.3-70B-Instruct-Turbo 和 Llama-3.1-8B-Instruct-Turbo），通过提示词赋予模型在协议中的角色和任务指令。通信协议采用硬编码方式实现，与 **Chain-of-Agent**（Zhang et al., 2024b）的实现类似。基线方法包括**多数投票法**（Wang et al., 2022）和单智能体思维链。所有实验重复 100 次（随机种子 42），超参数在验证子集上调整，确保比较公平性。
-
-
 
 ### 3.1 多智能体系统的形式化定义
 
@@ -280,8 +272,6 @@ $$s(N) = 2^{\Omega(N^{1/(4d)})}$$
 
 其中 $d$ 为电路深度。该指数级下界解释了为什么多数投票在长序列状态跟踪任务中性能急剧下降（Figure 4(a)）：独立智能体无法通过简单投票有效聚合全局状态信息。
 
-
-
 ## 实验与关键发现
 
 ### 实验设置
@@ -320,7 +310,6 @@ Figure 4b 展示了 PARITY 任务中计算深度与总通信量之间的关系�
 
 使用 Llama-70B 替代 Llama-8B 能全面提升所有协议的性能（Figure 9 vs Figure 10），但不同协议之间的相对趋势依然成立：前缀和协议在状态跟踪任务上始终最优，迭代查询在 k 跳推理中始终优于多数投票。这表明理论预测的协议优势不依赖于特定模型规模。
 
-
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_0aPIVJUz5T/figures/012_Figure_10.jpg]]
 *Figure 10: (b) Accuracy vs number of hops in the query for 500 facts. The difference in performance is more pronounced in this regime*
 
@@ -340,13 +329,8 @@ Figure 4b 展示了 PARITY 任务中计算深度与总通信量之间的关系�
 
 4. **均匀分块的假设**：理论分析假设输入被均匀划分为 $w$ 个不相交的块，实际应用中负载均衡和分块策略可能更为复杂，不均匀的信息分布可能破坏理论上的深度-通信上界。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_0aPIVJUz5T/figures/009_Figure_7.jpg]]
 *Figure 7: (a) Llama-70B accuracy on PARITY for different sequence lengths. Prefix Sum represents the theoretically optimal communication protocol*
-
-
-
 
 ## 定位与知识库关联
 
@@ -407,8 +391,6 @@ Figure 4b 展示了 PARITY 任务中计算深度与总通信量之间的关系�
 - **多令牌消息的影响**：当前形式化假设单令牌通信消息。多令牌消息（如自然语言中间结果）是否会影响通信预算的精确边界，特别是在长消息场景中？前缀和协议中的中间组合步骤可能受益于更丰富的消息表示。
 
 - **实际系统设计的启示**：论文提出的前缀和式级联（prefix-sum–style cascade）和迭代查询协议对实际多智能体系统设计具有潜在指导意义。前者通过迭代摘要减少最终智能体的瓶颈，后者为多跳推理提供了结构化的查询-响应模式。这些思想如何融入现有的多智能体框架（如AutoGen、CrewAI）值得进一步探索。
-
-
 
 ## 原文 PDF
 

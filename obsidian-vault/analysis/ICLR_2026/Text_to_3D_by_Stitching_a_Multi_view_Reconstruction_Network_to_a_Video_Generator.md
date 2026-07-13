@@ -73,8 +73,6 @@ VIST3A在多个文本到三维生成基准上取得最优性能：
 
 VIST3A属于**基于视频扩散模型的三维生成方法**，其关键创新在于通过模型缝合技术将视频生成与三维重建解耦并重新组合，避免了从零训练三维解码器的需求。与Matrix3D-omni、Director3D、Prometheus3D、SplatFlow、VideoRFSplat等现有方法相比，VIST3A不依赖定制化的三维VAE训练，而是直接复用预训练三维基础模型的解码能力，在生成质量和三维一致性上实现了显著提升。
 
-
-
 文本到三维生成旨在从自然语言描述中直接合成三维内容，其核心挑战在于同时满足视觉质量、三维几何一致性与文本语义对齐。近年来，基于潜扩散模型（Latent Diffusion Models, LDMs）的生成框架在二维图像和视频生成领域取得了显著进展，推动了研究者将其扩展至三维生成任务。这类方法通常遵循一个两阶段范式：首先训练一个三维变分自编码器（3D VAE），将三维表示压缩至潜空间；随后在该潜空间上训练扩散模型以实现从文本到三维潜向量的生成。
 
 然而，这一范式存在一个关键的瓶颈：**现有方法中的三维解码器需要从零开始学习三维重建能力，而这一能力本身极为复杂且数据需求巨大**。具体而言，当前的三维 VAE 解码器通常是在二维 VAE 的基础上从头训练或微调而来，其三维重建的先验知识远不如专门为三维视觉任务设计的预训练模型丰富。与此同时，生成模型（如视频扩散模型）的潜空间与这些能力不足的解码器之间缺乏有效的对齐机制，导致生成的潜向量在解码时产生三维不一致的几何结构、模糊的纹理或语义退化。
@@ -84,8 +82,6 @@ VIST3A属于**基于视频扩散模型的三维生成方法**，其关键创新�
 这一瓶颈在文本到三维高斯泼溅（3D Gaussian Splatting, 3DGS）生成任务中尤为突出。现有方法如 **Matrix3D-omni**、**Director3D**、**Prometheus3D**、**SplatFlow** 和 **VideoRFSplat** 虽然在特定场景下取得了进展，但在生成质量、三维一致性和文本对齐方面仍存在明显不足。例如，在 T3Bench 基准上，表现最好的 Director3D 的成像质量（Imaging Quality）仅为 54.32；在 SceneBench 上，VideoRFSplat 的成像质量为 58.19；在 DPG-Bench 上，SplatFlow 的全局分数为 69.70。这些结果反映了现有方法在处理复杂场景、精细几何和长文本描述时的能力上限。
 
 本文的动机正是源于上述观察：**视频生成模型擅长从文本生成丰富的视觉内容潜向量，而三维基础模型擅长将潜表示解码为一致的三维几何——两者的能力天然互补，但缺乏有效的连接机制**。VIST3A 的核心洞察在于，视频 VAE 编码器产生的潜向量与预训练三维模型早期层的激活之间存在线性可转移性，这为模型缝合提供了理论基础。通过最小二乘法找到最佳缝合层，可以将三维重建网络的部分层复用为解码器，从而在不依赖大量三维训练数据的情况下，赋予生成模型强大的三维重建先验。进一步地，采用直接奖励微调将生成模型的潜空间与缝合解码器对齐，确保生成的潜向量能够被准确、一致地解码为高质量的三维表示。
-
-
 
 ## 核心方法与创新机理
 
@@ -131,8 +127,6 @@ VIST3A 的缝合范式还带来了一个额外优势：相比“先 VAE 解码�
 
 VIST3A 位于**文本到三维生成**与**模型重用**的交叉点。与依赖 Score Distillation Sampling（SDS）的优化式方法不同，VIST3A 属于**前馈式生成**范式，一次前向传播即可从文本生成三维表示。与现有 LDM-based 三维生成器（如 Director3D、SplatFlow 等）相比，VIST3A 的独特贡献在于**将模型缝合技术引入三维生成领域**，证明了视频生成模型与三维重建模型之间可以通过简单的线性层实现有效连接，从而绕过了训练专用三维解码器所需的大量三维数据和计算资源。这一思路与自然语言处理领域的“模型缝合”研究一脉相承，但在三维视觉生成场景中首次得到了系统验证。
 
-
-
 ![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_kI27Niy4xY/figures/036_Figure_10.jpg]]
 *Figure 10: Log-MSE values in Eq. 2 across various video VAEs. Early layers of feedforward models show lower MSE values within each VAE architecture. While lower MSE correlates with better stitching performance within the same VAE (e.g., layer 2 outperforms layer 16 for Wan in Fig 5), absolute MSE values cannot predict performance across different VAE architectures. For instance, despite CogVideoX and Hunyuan + AnySplat having the lowest absolute MSE (0.008), SVD + AnySplat achieves the best performance (21.48 PSNR) in Table 3*
 
@@ -167,8 +161,6 @@ $$L_{\mathrm{total}} = L_{\mathrm{gen}} - r(z_0(\theta, c, z_T), c)$$
 现有基于潜扩散模型（LDM）的三维生成方法通常需从零训练或微调一个定制的三维 VAE 解码器，将二维潜空间映射到三维输出。这要求解码器同时学习三维重建能力，且生成模型与解码器之间缺乏有效对齐。
 
 VIST3A 的核心创新在于**绕过从零学习三维重建的瓶颈**：通过模型缝合技术，直接复用预训练三维基础模型的强大重建先验，仅需训练一个轻量的线性缝合层和少量 LoRA 参数。随后的直接奖励微调则系统性地解决了生成模型潜空间与缝合解码器之间的错配问题，将多视图质量、三维一致性和文本对齐统一纳入优化目标。
-
-
 
 VIST3A 框架由两个互补组件构成：**模型缝合**（Model Stitching）与**直接奖励微调**（Direct Reward Finetuning）。前者构建一个可解码三维表示的 VAE 解码器，后者将视频生成模型的潜空间与该解码器对齐。
 
@@ -212,8 +204,6 @@ $$L_{\mathrm{total}} = L_{\mathrm{gen}} - r(z_0(\theta, c, z_T), c)$$
 
 消融实验（Table 6）表明，仅使用多视图生成损失会导致语义退化和模糊，仅使用部分奖励无法充分约束三维一致性；完整奖励组合（多视图质量 + 三维一致性 + 表示质量）在 SceneBench 上取得了最优的 Imaging Aesthetic（64.87）和 Unified Reward 分数，同时有效抑制了动态视频带来的鬼影问题（Figure 7）。
 
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -239,12 +229,7 @@ VIST3A 在三个主流的文本到三维高斯泼溅（3DGS）生成基准上均
 
 Table 3 系统验证了模型缝合对新视图合成（NVS）的增益：将 AnySplat 缝合到任意视频模型上，其 NVS 性能始终优于单独使用 AnySplat。这表明缝合后的解码器不仅保留了原三维模型的重建能力，还借助视频 VAE 编码器的表征获得了额外提升。
 
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_kI27Niy4xY/figures/012_Table_3.jpg]]
-
 在点云重建任务上（Table 5），缝合模型在点云质量和相机姿态估计精度上与原三维基础模型相比几乎没有损失，证明缝合过程有效保留了预训练三维模型的几何重建精度。
-
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_kI27Niy4xY/figures/017_Table_5.jpg]]
-*Table 5: Results of point map reconstruction with stitched models*
 
 ### 直接奖励微调消融
 
@@ -278,9 +263,6 @@ Figure 13 和 Figure 16 展示了在交互式查看器中直接观察的 3DGS �
 
 Figure 9 展示了基于提示的相机视角控制能力：包含“Aerial drone shot”的提示产生高角度俯视视角，而“Camera pans left to right”则生成从左到右扫视场景的轨迹，表明视频生成模型固有的相机运动先验被有效传递到三维生成流程中。
 
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_kI27Niy4xY/figures/032_Figure_9.jpg]]
-*Figure 9: Viewpoint control in 3DGS generation with prompts. (Top) The prompt containing “Aerial dronshot” results in a high-angle downward perspective. (Bottom) The prompt containing “Camera pans left to right” generates a trajectory where the viewpoint sweeps across the scene from left to right. Table 7: Video generation performance comparison between the original video generator and VIST3A on VBench*
-
 ### 失败模式与局限
 
 1. **时序依赖假设**。缝合模型的编码器继承自视频生成模型，要求输入图像排列为连续、时序连贯的视频序列。对无序多视图图像的支持未经验证，在此类数据上可能出现性能下降。
@@ -288,8 +270,6 @@ Figure 9 展示了基于提示的相机视角控制能力：包含“Aerial dron
 2. **缝合层搜索的跨架构不可迁移性**。如 Figure 10 所示，绝对 MSE 无法跨 VAE 架构预测缝合性能，每个 VAE-三维模型对需要独立的层搜索过程，增加了实际部署的工程成本。
 
 3. **长序列生成的极限未探明**。尽管扩展帧数可生成大规模场景，但随着帧数进一步增加，生成质量和一致性是否保持稳定仍是开放问题。
-
-
 
 ## 定位与知识库关联
 
@@ -325,8 +305,6 @@ VIST3A 的核心定位是：**将文本到三维生成问题重新表述为“�
 2. **无序数据扩展**：框架能否通过修改编码器或引入重排序机制，扩展到无序多视图数据集或三维扫描数据？这是走向通用三维生成的重要一步。
 3. **长序列场景的极限**：随着帧数增加，生成质量和三维一致性是否保持稳定？当前仅在有限帧数下验证了场景扩展能力（Figure 16），极限边界尚不明确。
 4. **缝合策略的理论完备性**：虽然 Insulla et al. (2025) 的定理表明缝合风险由缝合层 MSE 上界约束，但该理论假设的 Lipschitz 条件在深层三维模型中是否始终成立，仍需进一步验证。
-
-
 
 ## 原文 PDF
 

@@ -79,8 +79,6 @@ C3G 并非孤立改进某一模块，而是同时改变了高斯生成方式、�
 
 C3G 的训练依赖已知目标相机姿态，限制了完全无姿态场景下的前馈应用；紧凑高斯在捕捉高复杂场景的精细细节时可能不足；C3G-F 需依赖已训练的 C3G-G 注意力权重，无法联合端到端训练。未来方向包括：扩展至动态场景、消除测试时优化实现零样本高质量合成、以及探索注意力模式向其他三维表示（如 NeRF）的迁移潜力。
 
-
-
 ### 前馈式新视图合成中的冗余困境
 
 从稀疏多视图图像中重建三维场景是计算机视觉的核心问题。近年来，前馈式三维高斯泼溅方法因其推理速度快、无需逐场景优化而受到广泛关注。这类方法的核心流程是：给定多视图图像，直接通过网络前向传播预测一组三维高斯原语，随后利用可微光栅化渲染新视图。
@@ -102,8 +100,6 @@ C3G 的训练依赖已知目标相机姿态，限制了完全无姿态场景下�
 ### 本文动机
 
 基于上述观察，本文提出 **C3G (Compact 3D Gaussian Representations)**，核心思想是：用一组可学习的查询 token 替代逐像素预测，通过 Transformer 的全局自注意力机制，让查询 token 从多视图图像特征中自主聚合信息，解码出紧凑的三维高斯原语。这一设计从根本上切断了高斯数量与像素数量的耦合，实现了约 65 倍的高斯压缩（从约 13 万降至约 2K），同时在新视图合成质量和三维场景理解性能上均超越现有前馈式方法。
-
-
 
 ## 核心方法与创新机理
 
@@ -148,8 +144,6 @@ $$\mathbf{G}_i^{2D}(p) = e^{-\frac{1}{2}(p - \mu_i^{2D})^T (\Sigma_i^{2D} + s\ma
 | 高斯生成 | 逐像素预测，数量与分辨率线性相关 | 可学习查询 token 通过自注意力解码，数量固定为 2K | 全局自注意力使 token 自发关注空间一致区域，消除冗余 |
 | 特征提升 | 密集高斯 → 特征压缩 → 信息损失 | 复用 C3G-G 注意力权重直接聚合，无需压缩 | 注意力权重已编码跨视图对应关系，仅需学习值映射 |
 | 训练稳定性 | 固定高斯尺寸 | 渐进式低通滤波（$s: 300 \to 0.3$） | 初期大尺寸提供平滑梯度，后期收缩至精确位置 |
-
-
 
 C3G 的整体 pipeline 围绕一个核心设计：**用少量可学习查询 token 替代逐像素预测，生成紧凑的 3D 高斯表示**。该框架由两个可独立训练的模块构成——C3G-G（高斯解码器）与 C3G-F（特征解码器），两者共享相同的注意力模式，分别服务于新视图合成与下游三维理解任务。
 
@@ -204,13 +198,6 @@ C3G 框架最引人注目的特性是：**仅通过光度重建损失 $\mathcal{
 | 特征提取 | $V$ 张多视图图像 | 冻结的 VGGT 编码器 | 多视图特征图 |
 | C3G-G 解码 | 特征图 + 查询 token $\mathbf{Q}$ | $L$ 层 Transformer 全局自注意力 → MLP 头 | $N$ 个紧凑 3D 高斯 |
 | C3G-F 解码 | 特征图 + 特征查询 $\mathbf{Q}_F$ + 冻结的注意力权重 | 可训练的值投影 → 特征聚合 | 视角一致的 3D 语义特征 |
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2535_https_openaccess_thecvf_com_content_CVPR2026_html_An_Learning_Compact_3D/figures/003_Figure_3.jpg]]
-*Figure 3: Architecture and emergent attention behaviors of our 3D Gaussian decoder (C3G-G). (a) Our framework extracts features using VGGT, then processes them with learnable queries through transformer in our decoder (C3G-G). The refined queries are subsequently decoded into compact 3D Gaussians via a Gaussian head, trained with the novel view synthesis loss*
-
-
 
 ### 3.1 问题形式化与3D高斯表示
 
@@ -267,15 +254,8 @@ $$\mathcal{L}_{\mathrm{feat}} = 1 - \cos(\hat{\mathbf{F}}_t / \|\hat{\mathbf{F}}
 | 注意力权重复用 | C3G-F冻结C3G-G注意力 | 避免特征压缩，实现无信息损失的多视图特征聚合 |
 | 球谐阶数 | 设为0 | 简化训练，仅建模RGB颜色以稳定优化 |
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2535_https_openaccess_thecvf_com_content_CVPR2026_html_An_Learning_Compact_3D/figures/002_Figure_2.jpg]]
-*Figure 2: Comparison of per-pixel and compact scene representations. (Left): Existing per-pixel estimators [16, 54] predict one or multiple Gaussians per pixel, resulting in redundant Gaussians with misalignments across views. (Right): Our method uses learnable Gaussian queries to discover and decode only compact 3D Gaussians at essential locations, achieving a compact representation with only 2K Gaussians and 4.1M memory while avoiding redundancy and achieving superior segmentation and novel view synthesis performance*
-
 ![[assets/figures/papers/paper_list_l2535_https_openaccess_thecvf_com_content_CVPR2026_html_An_Learning_Compact_3D/figures/004_Figure_4.jpg]]
 *Figure 4: C3G-F training scheme. We leverage the learned attention patterns from the Gaussian decoder C3G-G (top) to efficiently learn a 3D feature decoder C3G-F(bottom) for feature lifting. We initialize C3G-F by copying C3G-G’s architecture and copy the attention weights from C3G-G, using learnable feature queries*
-
-
 
 ## 实验与关键发现
 
@@ -307,9 +287,6 @@ C3G 的紧凑高斯表示天然适配 2D 到 3D 的特征提升任务。在 Scan
 
 C3G-F 学习的跨视图一致特征在对应估计任务中展现出强大泛化能力。在 ScanNet 上，C3G 的特征聚合策略在 VGGT-Tracking、DINOv2 和 DINOv3 三种特征骨干上均显著提升了 PCK@10px 指标（Table 4），证明注意力权重复用机制有效消除了多视图特征的不一致性。
 
-![[assets/figures/papers/paper_list_l2535_https_openaccess_thecvf_com_content_CVPR2026_html_An_Learning_Compact_3D/figures/009_Table_4.jpg]]
-*Table 4: Correspondence estimation on ScanNet [7]. We evaluate PCK@10px across two images from different angles. Our feature aggregation significantly improves correspondence accuracy across the VGGT-Tracking, DINOv2, and DINOv3*
-
 ### 关键消融实验
 
 **渐进式低通滤波与编码器解冻**（Table 5）：这是训练稳定性的关键设计。消融实验表明，同时移除渐进式低通滤波（从 s=300 退火至 s=0.3）和编码器冻结策略将导致模型崩溃，验证了两者对收敛的必要性。单独缺失任一组件的性能也显著下降。
@@ -324,21 +301,8 @@ C3G-F 学习的跨视图一致特征在对应估计任务中展现出强大泛�
 
 尽管 C3G 在紧凑性上优势显著，但训练时依赖已知的目标相机姿态进行新视图渲染损失计算，限制了在完全无姿态场景下的前馈应用。当前解决方案是引入测试时优化来补偿姿态缺失，但这增加了推理成本。此外，紧凑高斯表示在捕捉高复杂场景的精细细节时存在上限——当高斯数量受限时 PSNR 会下降，表明极少数量的高斯可能无法覆盖场景中的所有高频信息。C3G-F 的特征解码器依赖已训练好的 C3G-G 注意力权重，无法与高斯解码器联合端到端训练，这限制了灵活性和可能的联合优化收益。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2535_https_openaccess_thecvf_com_content_CVPR2026_html_An_Learning_Compact_3D/figures/010_Table_5.jpg]]
 *Table 5: Ablation studies for C3G-G on RealEstate10K [62]*
-
-![[assets/figures/papers/paper_list_l2535_https_openaccess_thecvf_com_content_CVPR2026_html_An_Learning_Compact_3D/figures/011_Table_7.jpg]]
-*Table 7: Ablation studies for C3G-F on Scannet [7]*
-
-![[assets/figures/papers/paper_list_l2535_https_openaccess_thecvf_com_content_CVPR2026_html_An_Learning_Compact_3D/figures/012_Table_6.jpg]]
-*Table 6: Ablation studies on the number of Gaussian*
-
-![[assets/figures/papers/paper_list_l2535_https_openaccess_thecvf_com_content_CVPR2026_html_An_Learning_Compact_3D/figures/013_Table_8.jpg]]
-*Table 8: Ablation stuides on visual encoder choice*
-
-
 
 ## 定位与知识库关联
 
@@ -379,8 +343,6 @@ C3G 通过引入 N 个可学习查询 token，利用 Transformer 的全局自注
 - **注意力模式的跨表示迁移**：C3G 学习到的注意力模式本质上是场景几何与外观的隐式编码。这些模式能否迁移到其他三维表示（如 NeRF、体素网格）中，作为通用场景先验，是一个开放的理论问题。
 
 - **多模态感知的潜力**：紧凑高斯表示在视觉任务中展现了效率与精度的平衡。其在触觉、音频等多模态感知任务中的适用性，以及查询 token 能否学习跨模态的场景抽象，有待进一步研究。
-
-
 
 ## 原文 PDF
 

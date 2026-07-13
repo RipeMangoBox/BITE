@@ -79,8 +79,6 @@ REMem 在情景记忆的两个递进能力维度上均取得显著提升：
 
 消融实验进一步验证了设计的有效性：移除 gist 节点导致 LoCoMo 上 LLM-J 分数从 76.2 骤降至 48.9，确认了事件摘要是核心记忆载体；移除事实节点、同义词边或任一检索工具均导致性能退化，表明各组件的互补作用。
 
-
-
 语言代理在与环境交互的过程中会积累大量经历，这些经历构成了**情景记忆**——即关于“何时、何地、发生了什么”的具体事件记忆。与存储一般性知识的语义记忆不同，情景记忆要求系统能够回忆特定交互中的时空上下文细节，并在此基础上进行跨事件的时序推理。例如，当用户询问“上周三会议中讨论的那个预算方案后来怎么样了？”，系统需要准确定位到具体会话片段，理解事件发生的先后顺序，并关联后续相关事件。
 
 现有语言代理的记忆系统存在一个根本性瓶颈：**以语义记忆为主，缺乏对具体经历的情景上下文建模和事件级推理能力**。当前主流方案主要分为两类：
@@ -90,8 +88,6 @@ REMem 在情景记忆的两个递进能力维度上均取得显著提升：
 **结构增强式方法**试图引入显式的记忆结构。**Mem0** (Chhikara et al., 2025) 在事实/语句层面存储信息，但缺乏有效的事件抽象和时间建模。**Graphiti** (Rasmussen et al., 2025) 构建时序知识图谱，但图谱粒度过细，难以捕捉事件级语义。**HippoRAG 2** (Gutierrez et al., 2025) 采用图检索增强生成，但其记忆表示仍以概念节点为主，缺少对完整事件片段及其时间上下文的系统建模。这些方法的共同缺陷在于：要么忽略了时间维度，要么仅在提示层面处理时序（如 **TISER** (Bazaga et al., 2025)），未能将时间感知深度嵌入记忆的表示和检索机制中。
 
 上述缺口导致现有系统在两类关键能力上表现不足：一是**情景回忆**——准确提取过去经历中的时间和情境要素；二是**情景推理**——基于回忆结果进行跨时间线的多跳推理（如事件间关系判断、计数查询、序数查询等）。这构成了本文的核心动机：**如何构建一个能够对交互经历进行结构化表示，并支持灵活迭代检索的情景记忆系统？**
-
-
 
 ## 核心方法与创新机理
 
@@ -129,8 +125,6 @@ REMem 在推理侧的核心转变是将“检索-生成”的单次流水线替�
 
 与仅通过提示进行时间推理的 TISER（Bazaga et al., 2025）不同，REMem 将时间推理**嵌入到图结构和工具签名中**：关系边携带有效时间区间，检索工具接受时间范围参数。这使得代理能够执行精确的时间过滤，而非依赖 LLM 在生成阶段对时间信息的模糊推断。这一设计在 Test of Time 基准上产生了 **+13.4%** 的绝对提升（相较 Full-Context），体现了结构化时间约束对精确时间推理的关键作用。
 
-
-
 ![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_fugnQxbvMm/figures/004_Figure_2.jpg]]
 *Figure 2: Overview of REMem. The indexing phase turns utterances into time-aware memory by extracting event gists and time-scoped facts (triples) and organizing them as a hybrid graph. The agentic inference phase invokes carefully curated tools over this graph to surface the most relevant gists and facts for reasoning in an iterative manner*
 
@@ -155,8 +149,6 @@ REMem 是一个面向语言代理的两阶段情景记忆框架，其核心设�
 ### 模块间的数据流
 
 索引阶段产出的混合记忆图是代理推理阶段的唯一数据源。推理时，用户查询首先触发检索工具在图节点上进行语义或词汇匹配，返回的 gist 和事实列表作为初始上下文；图探索工具进一步利用边关系扩展这些节点，补充关联信息；最终，流控制工具汇总所有检索到的记忆片段，交由底层 LLM 生成回答。整个过程中，gist 节点承载事件摘要这一核心记忆载体，而事实节点则为多跳推理提供结构化支撑——消融实验表明，移除 gist 节点会导致 LoCoMo 上的 LLM-J 分数从 76.2 骤降至 48.9，验证了其在框架中的核心地位。
-
-
 
 ### 3.1 索引阶段：混合记忆图构建
 
@@ -200,8 +192,6 @@ REMem 采用 ReAct 风格的代理推理引擎，通过精心设计的工具集�
 - **时间感知**：gist 节点携带时间戳，关系边包含有效时间区间 $\tau(e)$，工具参数支持时间范围运算符，实现“心理时间旅行”式的时间过滤
 - **双路检索互补**：语义检索和词汇检索分别捕捉深层语义和表层词汇匹配，消融实验表明移除任一工具均导致性能下降
 - **混合图结构**：gist 节点提供事件级上下文摘要，phrase 节点提供细粒度事实，二者通过上下文边关联，形成多粒度的记忆表示
-
-
 
 ## 实验与关键发现
 
@@ -267,15 +257,11 @@ LoCoMo数据集中有446条不可回答的对抗性查询（Table 6）。REMem�
 
 与NV-Embed-v2的对比案例（Table 8）进一步揭示了REMem的优势与局限：REMem在需要消歧和时间协调的问题上表现更优，而NV-Embed-v2在直接的时间区间计算问题上更准确，说明混合图结构在处理复杂语义关联时具有优势，但简单的数值时间推理仍有改进空间。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_fugnQxbvMm/figures/005_Table_1.jpg]]
 *Table 1: Curated tools and their signature. Both the retrieval and graph exploration tools output two sets of results: a list of gists and a list of facts. See Appendix D for prompts and demonstrations*
 
 ![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_fugnQxbvMm/figures/006_Table_2.jpg]]
 *Table 2: The statistics of sampled datasets*
-
-
 
 ## 定位与知识库关联
 
@@ -324,8 +310,6 @@ REMem 的设计假设决定了其有效的作用范围：
 - **多模态扩展。** 当前记忆表示限于文本事件。能否将 gist 和 fact 的提取机制扩展到多模态经历（图像、音频）是值得探索的方向。
 - **复杂环境中的长期记忆。** 在多代理协作、游戏等更复杂的交互环境中，混合图结构是否仍能有效支撑长期情景记忆，以及记忆的遗忘与巩固策略如何设计，仍是开放问题。
 - **效率优化。** 如何通过缓存、检索剪枝或更轻量的代理策略降低迭代推理的令牌消耗，是走向实用的必经之路。
-
-
 
 ## 原文 PDF
 

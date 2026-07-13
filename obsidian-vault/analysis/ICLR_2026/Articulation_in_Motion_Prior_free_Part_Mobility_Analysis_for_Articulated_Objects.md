@@ -54,8 +54,6 @@ AIM包含三个递进阶段：首先利用3D高斯泼溅（3DGS）从多视图�
 
 AIM的方法定位清晰：它首次将连续运动视频引入铰接物体分析，通过动态-静态解耦与无先验刚体聚类，从根本上绕开了两状态方法对部件数量假设和跨状态几何对应的依赖，为无先验部件移动性分析开辟了新路径。
 
-
-
 铰接物体的感知与理解是具身智能和机器人交互的核心能力之一。要让机器人自主操作日常物体（如打开冰箱、拉出抽屉），系统必须能够从视觉输入中恢复物体的部件级几何结构、运动分割以及关节参数。这一任务面临双重挑战：既要精确重建物体在不同状态下的三维几何，又要从运动中推断各部件的刚体变换关系。
 
 ### 两状态范式的根本局限
@@ -75,8 +73,6 @@ AIM的方法定位清晰：它首次将连续运动视频引入铰接物体分�
 本文的核心洞察在于：**铰接物体的运动过程本身蕴含了丰富的结构信息，而不仅仅是两个端点的状态差异。** 通过捕捉物体从关闭到打开的连续运动视频，我们可以利用运动先验自动分离静态基座与动态部件，并基于多时间窗口的刚体轨迹一致性实现无需先验知识的部件分割与关节参数恢复。
 
 这一思路将问题的焦点从“跨状态几何匹配”转移到“动态-静态解耦与运动轨迹分析”，从而从根本上摆脱了对部件数量先验和几何对应的依赖。
-
-
 
 ## 核心方法与创新机理
 
@@ -124,8 +120,6 @@ AIM 的**顺序 RANSAC**（Figure 5）直接利用解耦后运动高斯的轨迹
 
 这三个 changed slots 形成了一条因果链：连续运动视频使动态-静态解耦成为可能，解耦后的纯净运动轨迹又使无先验的部件分割与关节估计变得可行。
 
-
-
 AIM 的核心洞察在于：铰接物体的连续运动视频天然携带了动态部件与静态基座的分离线索。与依赖两离散状态（如闭合与打开）并需要跨状态几何对应的先前方法不同，AIM 通过捕捉从闭合到完全打开的完整交互过程，将部件分割与关节估计问题转化为对运动轨迹的刚体一致性分析。
 
 该方法由三个紧密衔接的阶段构成，形成一条从几何重建到运动解耦再到关节解析的完整流水线：
@@ -144,12 +138,8 @@ AIM 的核心洞察在于：铰接物体的连续运动视频天然携带了动�
 
 整个流水线的设计使得 AIM 从根本上摆脱了对部件数量预设和跨状态几何对应的依赖，从而在处理具有未知数量运动部件的复杂铰接物体时展现出显著优势。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1786_Articulation_in_Motion_Prior_free_Part_Mobility_Analysis_for_Articulated/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of the first two stages: I) 3DGS start-state*
-
-
 
 AIM 的核心技术路线围绕三个关键模块展开：**双高斯动态-静态解耦表示**、**运动中静态检测（SDMD）** 以及**基于顺序RANSAC的无先验刚体分割与关节解析**。以下逐一阐述其机理与核心公式。
 
@@ -206,13 +196,6 @@ $$\Phi_k = \left| \frac{\mathbf{u}_k \cdot \mathbf{t}_k}{\|\mathbf{u}_k\|^2} \ri
 
 消融实验表明，用 DB-SCAN 或 K-means 替换顺序 RANSAC 无法产生有效分割或导致性能显著下降，验证了基于刚体一致性采样的聚类策略对无先验设定的必要性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1786_Articulation_in_Motion_Prior_free_Part_Mobility_Analysis_for_Articulated/figures/005_Figure_5.jpg]]
-*Figure 5: Stage III: Motion-based part segmentation and articulation analysis. As the clean*
-
-
-
 ## 实验与关键发现
 
 ### 核心性能：部件分割
@@ -225,17 +208,11 @@ AIM 在两部件、三部件及复杂多部件物体上均取得了领先的部�
 - **两部件物体**：在 Oven 上，AIM 的动态部件 3D IoU 达到 **89.61%**，远超最佳基线 ArtGS 的 65.68%，提升 **+23.93 个百分点**。在 Fridge、Laptop 等其余物体上，AIM 同样保持最优或次优水平，且标准差显著低于依赖部件数量先验的对比方法，表明其分割稳定性更高。
 - **复杂多部件物体**：在 Storage（6 个运动部件）上，AIM 的动态部件平均 3D IoU 达到 **69.01%**，比 ArtGS（65.30%）和 DTA（39.01%）分别高出 3.71 和 30.00 个百分点。DTA 和 ArtGS 因依赖预设部件数量，在复杂场景下常出现过度分割（Figure 2 左），而 AIM 无需此先验，直接从运动轨迹中自动恢复正确的部件划分。
 
-![[assets/figures/papers/paper_list_l1786_Articulation_in_Motion_Prior_free_Part_Mobility_Analysis_for_Articulated/figures/002_Figure_2.jpg]]
-*Figure 2: Left: DTA and ArtGS fail to recover from an incorrect input number of parts (4 here) and result in oversegmentations; Right: Visual results of DTA and ArtGS with closed-start and open-end states. The static part is gray and the moving part is green. In contrast, Ours requires no geometric priors and recovers accurate part-level segmentation from the continuous closed-start→open-end interaction process*
-
 **Figure 6** 的定性结果进一步印证了这一结论：在 Storage-47648 上，AIM 为每个运动部件输出了清晰的语义分割掩码，且关节轴方向与部件颜色一一对应，与真值高度吻合。
 
 ### 核心性能：关节估计
 
 Table 3 的关节参数估计结果表明，AIM 在复杂物体上的关节轴角度误差降低了 **一个数量级以上**：
-
-![[assets/figures/papers/paper_list_l1786_Articulation_in_Motion_Prior_free_Part_Mobility_Analysis_for_Articulated/figures/009_Table_3.jpg]]
-*Table 3: Quantitative evaluation of articulation estimation. (a) Two-part; (b) Three-part; (c) Complex objects. For complex objects, we report the average of all moving parts. Due to the different magnitudes of part motion for revolute and prismatic joints, we report both of them. F denotes failure. W T denotes that more than 6 out of 10 trials result in an incorrect joint-type prediction. − indicates prismatic joints w/o rotation axis*
 
 - **Storage 47648**：平均关节轴角度误差从 ArtGS 的 10.18° 降至 **0.08°**，误差减少 **99% 以上**。
 - **Table 31249**：角度误差从 ArtGS 的 33.19° 降至 **1.19°**，降幅达 **32.00°**。
@@ -278,21 +255,8 @@ Table 4 的系统消融揭示了各模块的因果贡献：
 
 所有对比方法在相同数据集上评估，使用统一的 3D IoU、Chamfer 距离、关节轴角度/位置误差等指标。对于两状态基线（PARIS、DTA、ArtGS），作者使用其公开代码在相同数据上运行，并报告多次试验的均值与标准差。AIM 仅使用 RGB 输入，而部分基线使用 RGB-D，但 AIM 仍在多数指标上取得更优性能，排除了输入模态带来的不公平优势。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1786_Articulation_in_Motion_Prior_free_Part_Mobility_Analysis_for_Articulated/figures/001_Figure_1.jpg]]
-*Figure 1: Left: Prior two-state methods often degrade on the sequences from closed-start to open-end. Right: Results of the proposed AIM, compared to ground truth (GT) geometry*
-
 ![[assets/figures/papers/paper_list_l1786_Articulation_in_Motion_Prior_free_Part_Mobility_Analysis_for_Articulated/figures/010_Figure_6.jpg]]
 *Figure 6: Qualitative results of part segmentation and articulation estimation on two two-part objects (fridge, left; oven, middle) and a complex multi-part object (Storage-47648, right). For complex object, each predicted joint axis is visualised using the same colour as its corresponding part segmentation mask. Across the two-part objects, DTA and ArtGS often struggle with mis-segmentation and inaccurate joint-axis/type predictions. In contrast, our method produces clean part segmentation and consistent joint-axis estimation across all objects*
-
-![[assets/figures/papers/paper_list_l1786_Articulation_in_Motion_Prior_free_Part_Mobility_Analysis_for_Articulated/figures/032_Figure.jpg]]
-*Figure: A13: Qualitative comparisons for the ablation studies*
-
-![[assets/figures/papers/paper_list_l1786_Articulation_in_Motion_Prior_free_Part_Mobility_Analysis_for_Articulated/figures/019_Figure.jpg]]
-*Figure: A6: Qualitative comparison between DTA, ArtGS and ours, w.r.t. GT*
-
-
 
 ## 定位与知识库关联
 
@@ -334,8 +298,6 @@ AIM 在铰接物体分析领域填补了“**无先验部件数量、无需跨�
 3. **短序列与遮挡**：在运动视频较短或存在严重遮挡时，如何提升动态-静态解耦和轨迹推断的稳定性？当前方法依赖充分的运动观测。
 4. **生成式几何补全**：能否利用数据驱动生成模型补充被遮挡或未观察到的内部部件几何，实现交互式数字副本的完整呈现？
 5. **真实世界部署**：当前真实世界捕获依赖 AR 眼镜和手动交互，自动化程度及对日常设备的普适性仍有待提高。
-
-
 
 ## 原文 PDF
 

@@ -60,15 +60,11 @@ claims:
 
 **局限性**：自动标注流水线在极端遮挡或颜色混淆时可能失效；数据集以游戏渲染为主，存在仿真到真实迁移的潜在差异；基准目前仅覆盖3D几何与视频生成，尚未评估物理推理等更广义的世界建模能力。
 
-
-
 4D世界建模旨在从多模态输入中重建和生成动态3D场景，其核心瓶颈在于高质量时空训练数据的极度稀缺。现有数据集普遍存在三重缺口：**动态复杂性不足**（缺少长序列、大范围运动与复杂交互）、**领域多样性单一**（局限于自动驾驶、室内或合成游戏等孤立领域）、以及**时空多模态注释缺失**（深度、相机姿态、文本描述、光流、前景掩码等关键模态不完整）。这些缺口直接制约了通用4D世界模型的发展，使得当前SOTA方法在面对复杂动态场景时频繁出现长序列一致性崩溃和几何伪影。
 
 从数据规模看，最大的公开合成数据集仅约4M帧（如SeKai-Game），而OmniWorld-Game单域即提供18.5M帧，整体OmniWorld超过300M帧（Table 1, Table 2）。从模态覆盖看，现有合成数据集普遍缺少文本、深度或光流等关键模态，OmniWorld则全面提供深度、相机姿态、文本描述、光流和前景掩码五种模态（Table 1）。从领域多样性看，多数数据集局限于单一领域，OmniWorld整合了模拟器（Game）、机器人（Robot）、人类（Human）和互联网（Internet）四大关键领域（Table 2, Figure 3a）。
 
 本文的核心洞察在于：一个覆盖多领域、集成多种精确几何与语义标注的大规模数据集，不仅能够通过微调显著增强现有SOTA模型的3D重建与视频生成能力，还能作为更具挑战性的基准，有效暴露当前模型在长序列一致性和复杂动态场景中的根本缺陷。基准评估显示，VGGT在视频深度估计中表现最佳（scale&shift Abs Rel 0.194），但仍在高动态场景中出现伪影，没有单一模型能通吃所有任务（Table 3, Fig. 4）。这一发现进一步印证了构建更具挑战性和多样性的基准数据集的紧迫性。
-
-
 
 ## 核心方法与创新机理
 
@@ -93,8 +89,6 @@ OmniWorld 的核心创新并非提出新的模型架构，而是通过构建一�
 这种多域融合的因果机制在于：模拟器数据提供精确的地面真值标注，机器人数据引入操作场景的物理交互，人类数据捕捉自然行为模式，互联网数据则贡献开放世界的视觉多样性。四域协同使得在OmniWorld上微调的模型展现出更强的跨域迁移能力——例如，微调后的DUSt3R不仅在Sintel上优于原始模型，在Bonn、KITTI和NYUv2等真实数据集上同样取得一致提升（Table 5）。同时，OmniWorld-Game基准的评估也暴露了当前模型的根本缺陷：**没有任何单一模型能在所有任务上同时取得最优**，VGGT在视频深度估计中表现最佳（scale&shift Abs Rel 0.194），但在高动态场景中仍出现明显伪影（Table 3, Figure 4），这为下一代通用世界模型的设计提供了明确方向。
 
 > **需手动验证**：论文未提供venue和year信息，若需在正式引用中标注发表来源，请自行查证补充。
-
-
 
 ![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_1y1YFKb9pp/figures/004_Figure_2.jpg]]
 *Figure 2: OmniWorld acquisition and annotation pipeline. We collect raw data from diverse domains and apply a video slicing filter to obtain high-quality RGB sequences. These sequences are then processed through a suite of specialized pipelines to generate multi-modal annotations, including text captions, depth maps, camera poses, foreground masks, and optical flow*
@@ -141,8 +135,6 @@ OmniWorld 的数据构建遵循一条统一的“采集—过滤—标注”流�
 
 这种模块化设计使得 OmniWorld 能够灵活扩展——当引入新的数据领域或新的标注模态时，只需替换或新增相应的模块，而不影响整体流水线的稳定性。
 
-
-
 OmniWorld的核心贡献在于其大规模多模态标注流水线，而非提出新的算法模型。该流水线由六个关键模块构成，协同工作以从多领域原始视频中生成高质量的时空标注。
 
 ### 视频切片过滤器 (Video Slicing Filter)
@@ -186,8 +178,6 @@ OmniWorld的核心贡献在于其大规模多模态标注流水线，而非提�
 ### 公式与理论基础
 
 本文作为数据集工作，未提出新的数学公式或算法推导。各模块所依赖的底层方法（如束调整、稠密光流估计、视觉语言模型推理等）均基于现有成熟技术，其数学原理可参见相应原始文献。流水线的核心创新在于将这些技术有机整合，形成一套可扩展、高质量的多模态标注体系，而非对单一算法的理论突破。
-
-
 
 ## 实验与关键发现
 
@@ -255,15 +245,11 @@ OmniWorld的标注质量通过多项消融实验得到验证：
 | Figure 4 | VGGT在高动态场景中出现深度伪影，长序列一致性仍是瓶颈 |
 | Figure 13 | 提出前景遮罩流水线优于SegAnyMo，有效抑制静态背景误分割 |
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_1y1YFKb9pp/figures/002_Table_1.jpg]]
 *Table 1: Comparisons between OmniWorld-Game and existing synthetic datasets. OmniWorld-Game surpasses existing public synthetic datasets in modal diversity and data scale*
 
 ![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_1y1YFKb9pp/figures/003_Table_2.jpg]]
 *Table 2: OmniWorld structure. A smiling face ( ) indicates the modality is newly (re-)annotated by us, a green check (✔) denotes ground-truth data that already exists in the original dataset, and a red cross (✗) marks missing modalities*
-
-
 
 ## 定位与知识库关联
 
@@ -326,8 +312,6 @@ OmniWorld的标注流水线本身构成独立的技术贡献：
 3. **向通用世界模型演进。** 如何利用OmniWorld的丰富标注推动更通用的世界模型发展（例如结合物理模拟与因果推理）？
 
 4. **微调稳定性。** 微调后部分指标（如相机姿态RPE rot）改善不稳定，是否因预训练与细调数据分布差异导致，如何进一步优化？
-
-
 
 ## 原文 PDF
 

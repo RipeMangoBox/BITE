@@ -76,8 +76,6 @@ claims:
 - 凸正常邻域阈值 ε 在多数实验中取为 ∞（全局邻域），其影响未充分消融；
 - 时间分离函数的选择依赖对具体时空的先验知识，尚未形成自动化方案。
 
-
-
 ### 有向图表示学习的核心挑战
 
 现实世界中的图数据天然具有方向性：基因调控网络中的激活/抑制关系、社交网络中的关注/被关注层级、引文网络中的时间先后顺序，均无法被无向图模型充分刻画。然而，有向图的表示学习面临一个根本性瓶颈——**如何在连续嵌入空间中一致地编码边的方向性，同时保持可微优化**。
@@ -105,8 +103,6 @@ claims:
 - 以平滑的平方洛伦兹距离 $\chi_U^2$ 作为可微损失的核心（方程5），并将距离与时间信息融合为有向边的预测概率 $F$（方程6）。
 
 这一框架不仅超越了现有方法在有向链接预测与层次抽取任务上的性能，更重要的是，它首次将一般时空的因果结构系统性地引入图表征学习，为探索更复杂的伪黎曼流形编码多重因果关系开辟了道路。
-
-
 
 ## 核心方法与创新机理
 
@@ -145,8 +141,6 @@ $$F(\mathbf{x}_i, \mathbf{x}_j) := \sigma_{\theta_1}^{m}(\chi_{\gamma}^{2}(\math
 
 **需注意的局限**：凸正常邻域的超参数 $\varepsilon$ 在多数实验中被设为 $\infty$（全局邻域），其对复杂图结构的影响尚未系统消融；时间分离函数的选择目前依赖对具体时空的先验知识，尚未形成自动化方案。
 
-
-
 本工作提出一个**时空表征学习（Spacetime Representation Learning）**框架，将有向图嵌入到一类广泛的洛伦兹时空中，利用时空的因果结构自然地编码有向边的方向性与传递性。框架的核心思路是将有限有向图构造为**洛伦兹预长度空间（Lorentzian pre-length space）**，从而将图的边约束在节点所在凸正常邻域的未来时间锥内。
 
 整体 pipeline 由以下模块串联构成：
@@ -179,8 +173,6 @@ $$F(\mathbf{x}_i, \mathbf{x}_j) := \sigma_{\theta_1}^{m}(\chi_{\gamma}^{2}(\math
 **输出**：每个节点 $v_i$ 在 $\mathcal{M}$ 上的嵌入坐标 $\mathbf{x}_i$，以及由 $F(\mathbf{x}_i, \mathbf{x}_j)$ 给出的有向边预测概率。
 
 该框架的关键创新在于：通过将边限制在凸正常邻域并使用基于平行传输的时间函数，**首次实现了可适用于多种时空（包括含闭类时曲线的圆柱闵可夫斯基时空）的统一、可微的有向图表征学习**，而此前方法要么局限于闵可夫斯基时空（Clough & Evans, 2017），要么采用无法推广到所有时空的 ad hoc 时间方向判定（Sim et al., 2021）。
-
-
 
 ### 3.1 时空图构建：凸正常邻域与未来时间锥
 
@@ -234,8 +226,6 @@ $$\min_{\{\mathbf{x}_k\in\mathcal{M}\}_{k=1}^n} \sum_{(v_a,v_b)\notin E} \sigma_
 
 嵌入通过伪黎曼流形上的随机梯度下降进行优化（Algorithm 1, Appendix F）。每次迭代计算欧几里得梯度后，将其投影到切空间，再通过**指数映射** $\exp_{\mathbf{x}}$ 更新流形上的点，保证嵌入始终满足时空几何约束。
 
-
-
 ## 实验与关键发现
 
 ### 有向图链接预测
@@ -279,13 +269,9 @@ $$\min_{\{\mathbf{x}_k\in\mathcal{M}\}_{k=1}^n} \sum_{(v_a,v_b)\notin E} \sigma_
 
 **Figure 2** 展示了在闵可夫斯基和 de Sitter 空间上学到的 2D/3D 嵌入。在闵可夫斯基空间中，嵌入坐标呈现清晰的时间分层结构，领导节点（未来方向）与从属节点（过去方向）沿时间轴自然分离。**Figure 3** 的 HEP-TH 引用网络嵌入进一步验证了时间顺序的保持：早期论文和晚期论文在时间坐标上形成单调的因果序列。**Figure 4** 展示了反德西特空间中的嵌入，证明了框架对负曲率时空的兼容性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l19_https_research_nvidia_com_labs_toronto_ai_spacetime_spacetime_representa/figures/004_Figure_2.jpg]]
 *Figure 2: (left) Coordinates of 2-dimensional embeddings ${ \bf$ x } = ( $x _ { 0 } , x _ { 1 } ) ^ { \top }$ learned with equation 8 when $\mathcal { M } = \mathbb { R } _ { 1 } ^ { 2 }$ (right) Coordinates of the first three coordinates of embeddings $\mathbf { x }$ \ = ( $x _ { 0 } , x _ { 1 } , x _ { 2 } , x _ { 3 } ) ^ { \mid }$ learned with equation 8 when $\mathcal { M } = \mathbb { S } _ { 1 } ^ { 3 }$ ( r ) In Lorentz geometry, a timelike geodesic joining two points is the longest timelike curve in a given convex normal neighborhood. This translates in the high-level nodes $v _ { 1 }$ and $v _ { 3 4 }$ being the furthest from the rest of the nodes. The ground truth edges are plotted in yellow and the node c...
 
-![[assets/figures/papers/paper_list_l19_https_research_nvidia_com_labs_toronto_ai_spacetime_spacetime_representa/figures/010_Figure_5.jpg]]
-*Figure 5: (top) Coordinates of 2-dimensional embeddings $\mathbf { x }$ ~ = ~ ( $x _ { 0 } , x _ { 1 } ) ^ { \top }$ learned with equation 8 when $\bf \dot { \mathcal { M } }$ ~ = ~ $\mathbb { R } _ { 1 } ^ { 2 }$ (bottom) Coordinates of the first three coordinates of embeddings ${ \bf$ x } = ( $x _ { 0 } , x _ { 1 } , x _ { 2 } , x _ { 3 } ) ^ { \top }$ learned with equation 8 when $\mathcal { M } = \mathbb { S } _ { 1 } ^ { 3 }$ ( r ) . In Lorentz geometry, a timelike geodesic joining two points is the longest timelike curve in a given convex normal neighborhood. This translates in the high-level nodes $v _ { 1 }$ and $v _ { 3 4 }$ being the furthest from the rest of the nodes. The ground truth edges are plotted in...
 
 ![[assets/figures/papers/paper_list_l19_https_research_nvidia_com_labs_toronto_ai_spacetime_spacetime_representa/figures/002_Table_1.jpg]]
 *Table 1: Link prediction for directed graphs. Median average precision (AP) percentages across 20 random initializations on a held-out test set*
@@ -298,8 +284,6 @@ $$\min_{\{\mathbf{x}_k\in\mathcal{M}\}_{k=1}^n} \sum_{(v_a,v_b)\notin E} \sigma_
 
 ![[assets/figures/papers/paper_list_l19_https_research_nvidia_com_labs_toronto_ai_spacetime_spacetime_representa/figures/008_Table_5.jpg]]
 *Table 5: Evaluation scores for the different learned representations (mean ± standard deviation). ↓ the lower the metric, the better. ↑ the larger the metric, the better*
-
-
 
 ## 定位与知识库关联
 
@@ -335,8 +319,6 @@ $$\min_{\{\mathbf{x}_k\in\mathcal{M}\}_{k=1}^n} \sum_{(v_a,v_b)\notin E} \sigma_
 2. **端到端时间函数学习**：是否可以将时间分离函数 τ 与距离函数 χ² 的学习联合端到端优化，使框架摆脱对人工选择 τ 形式的依赖？
 3. **大规模优化**：如何高效地在百万节点以上的图上进行时空嵌入的优化与推理？是否可借鉴双曲空间中的 Poincaré 球投影技巧来加速伪黎曼梯度计算？
 4. **高指标扩展**：将框架推广到 ν>1 的伪黎曼流形后，能否编码有向图中不同类型的因果关系（如层级关系与引用关系的共现）？
-
-
 
 ## 原文 PDF
 

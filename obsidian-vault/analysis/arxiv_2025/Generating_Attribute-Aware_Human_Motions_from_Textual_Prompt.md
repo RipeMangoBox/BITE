@@ -52,8 +52,6 @@ AttrMoGen 由两个核心模块构成：**语义-属性解耦 VQVAE（Decoup-VQV
 
 该方法的主要局限在于：当前仅利用了年龄和性别的离散分组，未能充分利用数据集中约 74% 样本包含的体重和身高信息；属性控制依赖离散分组，可能无法捕捉连续的体格差异。如何将连续属性融入该因果解耦框架，是后续研究的重要方向。
 
-
-
 ### 文本驱动人体运动生成的现状与盲区
 
 文本驱动的人体运动生成旨在根据自然语言描述合成符合语义的 3D 人体运动序列。近年来，基于自回归 Transformer、扩散模型和 VQVAE 的方法（如 **T2M-GPT** (Zhang et al., CVPR 2023)、**MDM** (Tevet et al., ICLR 2022)、**MoMask** 等）在运动质量与文本-运动对齐方面取得了显著进展。然而，这些方法存在一个共同的盲区：它们仅关注文本所描述的动作语义（如“走路”“挥手”），而完全忽略了执行动作的**人的属性**——年龄、性别、体型等——对运动模式的系统性影响。
@@ -67,8 +65,6 @@ AttrMoGen 由两个核心模块构成：**语义-属性解耦 VQVAE（Decoup-VQV
 ### 核心动机：因果解耦而非统计关联
 
 上述问题的根源在于，动作语义（S）与人的属性（A）在观测运动数据（X）中是统计关联的，但二者在因果上应当是可分离的：动作“是什么”不应依赖于“谁”在做。本文的核心动机正是基于这一因果直觉——利用**结构因果模型（SCM）**将运动显式分解为因果性的动作语义 S 和非因果性的人体属性 A，并通过**因果信息瓶颈（CIB）**强制编码器从原始运动中剥离属性信息，从而获得“无属性”的语义令牌。这一设计使得下游的文本-语义预测与属性控制可以独立进行，最终实现真正意义上的属性感知运动生成。
-
-
 
 ## 核心方法与创新机理
 
@@ -97,8 +93,6 @@ $$\mathcal{L}_{overall} = \mathcal{L}_{vqvae} + \alpha \mathcal{L}_{entropy} + \
 现有方法（如 **MDM** (Tevet et al., ICLR 2022)、**MotionDiffuse**、**MLD** 等）仅以文本为输入，生成结果无法按指定属性变化。AttrMoGen 的解码器 $g$ 同时接收无属性语义令牌 $S$ 和属性标签 $A$（经 one-hot 编码与 MLP 融合），重建出属性感知的运动 $\hat{X} = g(S, A)$。推理时，**Semantics Generative Transformer** 从文本预测语义令牌，用户可自由指定属性标签，实现“相同文本、不同属性”的独立控制。
 
 **与朴素文本增强的本质区别**：消融实验（Table 6）表明，直接在文本提示中插入属性短语（如 “a man walks”）进行测试（w/ attr test）会严重损害生成质量；即使在训练中引入属性文本（w/ attr train），其性能仍显著低于 AttrMoGen 的显式解耦方案。这证明简单的文本级属性注入无法解开语义与属性在运动数据中的高度耦合，而 AttrMoGen 的因果解耦机制是实现属性感知生成的根本原因。
-
-
 
 AttrMoGen 的整体流程分为两个阶段：**语义-属性解耦 VQVAE（Decoup-VQVAE）** 和 **语义生成 Transformer（Semantics Generative Transformer）**。Decoup-VQVAE 负责从原始运动数据中提取与属性无关的动作语义令牌，并在推理时结合用户指定的属性标签重建运动；语义生成 Transformer 则从文本描述中预测这些语义令牌，使模型能够根据文本生成属性感知的运动。
 
@@ -149,12 +143,8 @@ $$\mathcal{L}_{overall} = \mathcal{L}_{vqvae} + \alpha \mathcal{L}_{entropy} + \
 
 推理时，用户提供文本描述和期望的属性标签。语义生成 Transformer 从文本中预测语义令牌，随后这些令牌与属性输入一同送入 Decoup-VQVAE 的解码器，生成符合文本语义且体现指定属性特征的运动序列。由于语义令牌已剥离属性信息，属性控制完全由解码器端的属性输入实现，二者互不干扰。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2506_21912/figures/005_Figure_4.jpg]]
 *Figure 4: Overall architecture of our proposed AttrMoGen. The encoder of Decoup-VQVAE uses a causal information bottleneck to decouple action semantics from human attributes, producing attribute-free semantic tokens. The decoder then reconstructs motion from these semantic tokens and attribute labels. The Semantics Generative Transformer predicts semantic tokens from textual input, which are subsequently combined with attribute inputs to generate attribute-aware human motions during inference*
-
-
 
 AttrMoGen 的核心由两个模块构成：**语义-属性解耦 VQVAE（Decoup-VQVAE）** 和 **语义生成 Transformer**。Decoup-VQVAE 负责从原始运动数据中提取无属性的语义令牌，语义生成 Transformer 则从文本输入预测这些语义令牌，推理时将预测的语义令牌与用户指定的属性标签结合，通过解码器生成属性感知的运动。
 
@@ -202,13 +192,6 @@ $$\mathcal{L}_{overall} = \mathcal{L}_{vqvae} + \alpha \mathcal{L}_{entropy} + \
 
 在获得解耦的语义令牌后，AttrMoGen 采用一个基于 **MoMask** 架构的语义生成 Transformer，以文本的 CLIP 特征为条件，通过掩码预测方式从文本生成语义令牌序列。推理时，该模块预测的语义令牌与用户指定的属性标签（经 one-hot 编码和 MLP 融合）共同输入 Decoup-VQVAE 的解码器 $g$，生成符合文本语义且体现指定属性特征的人体运动。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2506_21912/figures/004_Figure_3.jpg]]
-*Figure 3: Structural Causal Model for our Decoup-VQVAE. Our objective is to learn an encoder capable of decoupling the Y -causative action semantics S from raw motion X*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -235,13 +218,8 @@ AttrMoGen 的属性控制精度通过分类准确率量化（表 5）。当使�
 
 尽管 AttrMoGen 在离散属性上表现优异，其属性控制机制存在粒度限制。当前框架将年龄分为 0-18、19-35 等离散区间，可能无法捕捉连续年龄变化带来的渐进式运动差异。此外，数据集中约 74% 样本包含体重和身高信息（图 7），但主要实验仅使用年龄和性别，连续体格属性未被充分利用。部分子数据集（如 KIT）中 90% 受试者年龄集中在 18-45 岁，可能导致模型在极端年龄（如幼儿或高龄）下的泛化能力未经充分验证，该结论需人工确认。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2506_21912/figures/006_Table_2.jpg]]
 *Table 2: Results of ablation studies. “↑” denotes that higher is better. “↓” denotes that lower is better. The default settings for AttrMogen are λ = 0.5 and*
-
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2506_21912/figures/007_Table_3.jpg]]
-*Table 3: Performance of representative existing text-to-motion methods as well as our proposed AttrMoGen which incorporates attribute information on the HumanAttr test set. “↑” denotes that higher is better. “↓” denotes that lower is better. “→” denotes that results are better when closer to the real motion*
 
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2506_21912/figures/008_Table_4.jpg]]
 *Table 4: Performance comparison on different attribute groups. “↑” denotes that higher is better. “↓” denotes that lower is better*
@@ -252,22 +230,8 @@ AttrMoGen 的属性控制精度通过分类准确率量化（表 5）。当使�
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2506_21912/figures/010_Figure_6.jpg]]
 *Figure 6: t-SNE visualization with colors representing male and female. The VQVAE embeddings of AttrMoGen exhibit no gender-based clustering, indicating effective removal of gender cues from the motion. Meanwhile, with attributes control input, features of the generated motion by AttrMo-Gen displays distinct gender-based clusters, demonstrating better alignment with attributes input. Best viewed in color*
 
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2506_21912/figures/011_Table_5.jpg]]
-*Table 5: Attribute classification accuracy of generated motion controlled by true and random attribute labels*
-
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2506_21912/figures/012_Table_6.jpg]]
 *Table 6: Results of ablation studies. “↑” denotes that higher is better. “↓” denotes that lower is better*
-
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2506_21912/figures/015_Figure_8.jpg]]
-*Figure 8: Counterfactual motions visualization. The upperleft figure depicts the original motion while the remaining are counterfactuals decoded from same semantics but different attributes*
-
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2506_21912/figures/016_Table_7.jpg]]
-*Table 7: Performance comparison on different attribute groups. “↑” denotes that higher is better. “↓” denotes that lower is better. “→” denotes that results are better when closer to the real motion*
-
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2506_21912/figures/014_Figure_7.jpg]]
-*Figure 7: Statistics of weight (in kg), height (in cm) of the HumanAttr dataset*
-
-
 
 ## 定位与知识库关联
 
@@ -319,8 +283,6 @@ $$CIB(X,Y,S,A) = I(X;S,A) + I(Y;S) - I(S;A) - \lambda I(X;S)$$
 2. **跨域泛化**：该因果解耦机制能否推广至真实视频数据中的运动生成？视频中的属性信息（如衣着、体型）可能与运动语义存在更复杂的混杂。
 3. **未见属性组合**：模型在训练时未见过的属性组合（如极端年龄 + 特定动作类型）下的生成质量和语义保持能力如何？
 4. **反事实生成的可靠性**：Figure 8 展示了反事实运动可视化，但缺乏系统的量化评估（如用户研究或属性分类一致性指标），该能力的鲁棒性需要进一步验证。
-
-
 
 ## 原文 PDF
 

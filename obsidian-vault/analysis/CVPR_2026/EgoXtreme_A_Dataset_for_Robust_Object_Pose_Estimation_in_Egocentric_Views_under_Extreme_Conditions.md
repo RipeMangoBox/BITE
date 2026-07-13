@@ -54,8 +54,6 @@ claims:
 
 **主要结果**：（1）所有零样本通用模型在极端光照下均出现严重退化，低光照是最致命的单一因素；（2）现有图像复原方法无法恢复用于精确匹配的判别性特征，反而损害下游性能；（3）混合时间策略是提升快速运动场景鲁棒性的有效方向，但单纯直接时间传播会放大误差。
 
-
-
 6D物体姿态估计是增强现实、机器人操作和手物交互理解中的核心任务。近年来，基于RGB的零样本通用姿态估计模型取得了显著进展，代表性方法包括**FoundPose**（粗对齐结合MegaPose精修）、**GigaPose**（同架构路线）以及端到端粗到精的**PicoPose**。这些模型在标准基准上展现出令人瞩目的泛化能力，然而其评估主要局限于光照良好、静态或缓慢运动的场景。
 
 真实世界中的自我中心应用——如工业维护、运动训练和紧急救援——往往伴随着极端视觉条件：剧烈光照变化、严重运动模糊、烟雾遮挡等。当通用姿态估计模型迁移到此类环境时，性能急剧退化。EgoXtreme数据集的系统评估揭示了一个核心瓶颈：**现有零样本6D姿态估计模型在极端光照、运动模糊和烟雾等自我中心真实场景下泛化失效，低光照条件下的性能损失尤为严重**。
@@ -67,8 +65,6 @@ claims:
 与静态图像评估不同，自我中心视频天然携带时序信息。EgoXtreme对时间跟踪策略的探索揭示了另一条有效路径：基于置信度评估的**混合时间跟踪策略（Hybrid）**在快速运动场景中显著优于直接时间传播（Direct）。在Tennis场景中，Hybrid策略将GigaPose的ADD(S)@0.3d从22.77%（Direct）回升至50.55%，接近逐帧评估的50.91%。这一结果表明，利用帧间信息可以部分缓解运动模糊的影响，但必须谨慎处理误差传播——直接传播在动态体育场景中可导致高达46个百分点的召回率下降。
 
 上述发现共同指向一个迫切需求：**构建一个系统覆盖极端视觉条件的自我中心基准数据集，以诊断现有方法的脆弱性、验证直觉假设的真伪，并为鲁棒姿态估计研究提供方向指引**。这正是EgoXtreme数据集的核心动机。
-
-
 
 ## 核心方法与创新机理
 
@@ -125,8 +121,6 @@ EgoXtreme 作为基准数据集，其定位区别于以下工作：
 - 采集环境限于室内，尚未覆盖夜间户外等更极端的光照条件。
 - 混合时间策略的置信度门控阈值需要场景特定调优，其自适应泛化能力有待进一步验证。
 
-
-
 EgoXtreme 并非提出新的姿态估计算法，而是构建了一套面向极端条件下自我中心视角的**基准评估框架**。该框架的核心由三个递进层次构成：**数据采集与真值生成**、**零样本基线评估**、以及**鲁棒性诊断与改进方向验证**。
 
 ### 数据采集与真值生成管线
@@ -156,13 +150,6 @@ EgoXtreme 并非提出新的姿态估计算法，而是构建了一套面向极�
 
 整个框架的输入是同步采集的 RGB 视频与动捕真值，输出是模型在极端条件下的性能诊断报告与改进方向验证结果，为后续鲁棒姿态估计研究提供了标准化的测试平台。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2716_https_arxiv_org_abs_2603_25135/figures/006_Figure_4.jpg]]
-*Figure 4: Diagram for data collection*
-
-
-
 EgoXtreme本身是一个数据集工作，不提出新的6D姿态估计模型或数学公式。其核心贡献在于**构建了一套高精度多传感器真值采集管线**，为下游模型在极端条件下的鲁棒性评估提供可靠基准。以下梳理该管线的关键模块。
 
 ### 多传感器同步采集模块
@@ -180,8 +167,6 @@ Aria SLAM轨迹与OptiTrack动捕轨迹处于不同坐标系，需要进行刚�
 ---
 
 **关于公式：** 本文未提出新的数学公式。Umeyama方法的闭式解、卡尔曼滤波的预测-更新递归方程均为经典算法，原文未重新推导。若需了解具体公式形式，请参考Umeyama (1991)和标准卡尔曼滤波文献。
-
-
 
 ## 实验与关键发现
 
@@ -251,27 +236,8 @@ Table C1展示了使用CNOS检测器的端到端评估结果，性能远低于�
 3. **烟雾遮挡**：部分遮挡使模型误匹配，去雾预处理引入伪影进一步降低精度。
 4. **检测-姿态级联失败**：检测器在极端条件下召回率下降，导致姿态估计输入缺失。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2716_https_arxiv_org_abs_2603_25135/figures/010_Table_4.jpg]]
 *Table 4: 6D object pose estimation with pre-processing for PicoPose*
-
-![[assets/figures/papers/paper_list_l2716_https_arxiv_org_abs_2603_25135/figures/003_Table_1.jpg]]
-*Table 1: Datasets for object pose estimations*
-
-![[assets/figures/papers/paper_list_l2716_https_arxiv_org_abs_2603_25135/figures/008_Figure_5.jpg]]
-*Figure 5: Example 6D Pose estimation results on baseline models. The red line is prediction and green is GT. (a), (b), and (c) are the industry maintenance, sports, and emergency rescue scenarios, respectively. The top row indicates standard light condition, and the bottom row indicates extreme light condition*
-
-![[assets/figures/papers/paper_list_l2716_https_arxiv_org_abs_2603_25135/figures/014_Table.jpg]]
-*Table: C1. End-to-end 6D object pose estimation using CNOS detections*
-
-![[assets/figures/papers/paper_list_l2716_https_arxiv_org_abs_2603_25135/figures/017_Table.jpg]]
-*Table: D2. 6D object pose tracking for GigaPose*
-
-![[assets/figures/papers/paper_list_l2716_https_arxiv_org_abs_2603_25135/figures/021_Table.jpg]]
-*Table: E1. 6D object pose estimation with pre-processing under conditions*
-
-
 
 ## 定位与知识库关联
 
@@ -318,8 +284,6 @@ EgoXtreme在6D姿态估计数据集谱系中占据了独特的“自我中心+�
 2. **室外扩展**：如何将数据集扩展到包含复杂天气（雨、雪、雾）和更丰富自然光照的室外真实环境，同时保持6D真值的精度？
 3. **面向姿态估计的专用复原**：现有图像复原方法为人类视觉设计，如何设计专门保留或增强判别性特征的复原模块（如保持纹理细节的去模糊、保持边缘的去雾），使其真正服务于下游姿态估计而非引入噪声？
 4. **自适应时间融合**：混合时间跟踪策略在Sports场景中展现了显著优势（Tennis的ADD(S)@0.3d从22.77%回升至50.55%），但如何在维持实时性的前提下，自适应地融合多帧信息并处理严重遮挡？这涉及置信度评估机制的设计和计算效率的平衡。
-
-
 
 ## 原文 PDF
 

@@ -54,8 +54,6 @@ claims:
 
 在 **HumanML3D** 和 **KIT-ML** 两个标准数据集上，ParTY在FID、R-Precision和MM-Dist等指标上全面超越现有方法（表1）。尤其在部件级评估中，手臂R-Precision Top-1较MoMask提升11.5%，腿部较ParCo提升8.3%（表2）；同时，时空连贯性得分（TC/SC）亦优于对比方法（表3），验证了ParTY在**部件表达性**与**全身连贯性**两个维度上的双重优势。
 
-
-
 文本到运动生成（Text-to-Motion Generation）旨在根据自然语言描述合成逼真的三维人体动作序列，在动画制作、虚拟现实和人机交互等领域具有广泛应用前景。该任务的核心挑战在于实现**细粒度语义对齐**与**全身运动连贯性**的双重要求：生成的动作既需要准确反映文本中描述的具体身体部件行为（如“左手挥手”或“右腿向前迈步”），又必须保持整体姿态的自然协调。
 
 现有方法在处理这一权衡时存在根本性局限。**整体生成方法**（Holistic Methods）将人体运动视为单一整体进行建模，如 **T2M**（Guo et al., CVPR 2022）、**MoMask**（Guo et al., CVPR 2024）、**MMM**（Pinyoanuntapong et al., CVPR 2024）等，虽然能够较好地维持全身运动的时空连贯性，但由于缺乏对特定身体部件的显式关注，在部件级语义对齐上表现不足——例如，当文本描述涉及手臂和腿部的不同动作时，整体方法容易混淆或忽略部件细节。**分部件方法**（Part-wise Methods）则试图通过独立建模各身体部件来解决对齐问题，如 **AttT2M**（Zhong et al., ICCV 2023）利用部件级注意力机制、**ParCo**（Zou et al., arXiv 2024）采用部件协调策略。然而，这类方法在提升部件表达性的同时，往往以牺牲全身连贯性为代价，导致出现颈部扭曲、手臂与腿部动作不协调等伪影（Figure 1(b)）。
@@ -63,8 +61,6 @@ claims:
 这一困境揭示了文本到运动生成领域的核心瓶颈：**部件级语义对齐与全身运动连贯性之间存在固有的权衡关系**，单一的整体框架或简单的分部件组合均无法同时满足两方面的需求。深入分析其因果机制可以发现，问题的关键在于生成过程中缺乏有效的**部件引导信号**——整体方法缺少细粒度的部件信息来约束局部动作，而分部件方法则缺少全局协调机制来融合独立生成的部件运动。此外，传统的文本嵌入利用方式仅依赖单一的全局语义表示，难以捕捉文本中针对不同身体部件的差异化描述，进一步限制了模型对复杂文本指令的解析能力。
 
 针对上述问题，本文提出 **ParTY**（Part-Guidance for Expressive Text-to-Motion Synthesis），一种面向表达性文本到运动合成的部件引导框架。ParTY 的核心思路是通过**分阶段生成部件运动并将其作为引导信号融入整体运动解码过程**，配合**多样化的部件文本嵌入选择机制**，打破单一整体框架的局限，同时提升部件表达性与全身连贯性。具体而言，ParTY 包含两个关键创新：**部件引导网络**（Part-Guided Network）先生成手臂和腿部的运动令牌作为指引，再在整体运动生成过程中自适应融合这些部件信号；**部件感知文本接地**（Part-aware Text Grounding）则将单一文本嵌入转化为多个多样化嵌入，并为不同身体部件动态选择最适宜的语义表示。通过这一设计，ParTY 在部件对齐和连贯性上均超越了传统整体方法和分部件方法（Figure 1(c)），为文本到运动生成提供了一种新的解决范式。
-
-
 
 ## 核心方法与创新机理
 
@@ -75,8 +71,6 @@ ParTY 的核心创新在于打破现有方法在部件级语义对齐与全身�
 **文本嵌入利用：从单一全局嵌入到部件感知多样化嵌入。** 现有方法通常使用单一的全局文本嵌入来驱动整个运动生成，难以捕捉不同部件对文本语义的差异化需求。ParTY 的 Part-aware Text Grounding (PTG) 模块（Section 3.2）通过 $K$ 个 MLP 将单一文本嵌入 $\mathbf{c}$ 映射为 $K$ 个多样化嵌入 $\mathbf{c}_n'$，并利用对比学习损失 $\mathcal{L}_{\mathrm{div}}$ 鼓励嵌入多样性同时保持语义保真度（Eq. 3）。随后，部件门控机制动态地为手臂和腿部选择最适宜的嵌入。这一设计使模型能够根据不同部件的运动特性匹配最相关的文本语义。消融实验表明，PTG 使手臂 R-Precision Top-1 从 0.433 提高到 0.501，腿部从 0.298 提高到 0.337（Table 6）。
 
 **运动量化中的时序信息保留：从普通 VQ-VAE 到时序感知 VQ-VAE。** 传统 VQ-VAE 按固定窗口量化运动序列，导致时序细节严重丢失。ParTY 提出的 Temporal-aware VQ-VAE（Section 3.1）引入局部时序增强 (LTE) 和全局时序增强 (GTE)：LTE 在窗口内对帧级特征进行加权求和（Eq. 1），GTE 则通过图卷积网络捕获组级特征间的全局时序依赖（Eq. 2）。该设计在不增加模型复杂度的前提下，显著提升了时序信息的保留能力。实验表明，在窗口大小为 12 时，时序感知 VQ-VAE 的 FID 仅为 0.011，相比普通 VQ-VAE 的 0.079 降低了 86%（Table 4）。
-
-
 
 ParTY 的整体设计围绕一个核心矛盾展开：**如何在不牺牲全身运动连贯性的前提下，实现细粒度的部件级文本-运动对齐**。为此，框架采用“部件先行、整体融合”的两阶段生成范式，将部件运动作为显式引导信号注入全身运动生成过程。整个 pipeline 由四个关键模块串联构成，数据流从文本输入到最终运动序列的路径如图 3 所示。
 
@@ -92,12 +86,8 @@ $$\mathbf{z}_t = f(\mathbf{z}_{1:t-1}, \mathbf{c}, \mathbf{G}_i)$$
 
 训练时，总损失由四部分加权组成：全身运动损失 $\mathcal{L}_{\text{hol}}$、部件运动损失 $\mathcal{L}_{\text{part}}$、文本多样性对比损失 $\mathcal{L}_{\text{div}}$ 以及辅助损失 $\mathcal{L}_{\text{aux}}$。推理时，只需提供文本描述，框架即可端到端地生成包含丰富部件表达且全身连贯的 3D 人体运动序列。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l22_https_openaccess_thecvf_com_content_CVPR2026_html_Heo_ParTY_Part_Guidanc/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of ParTY. Text embeddings are processed through Part-aware Text Grounding, then part transformers generate Part Guidance for the holistic transformer to generate motion tokens, with Holistic-Part Fusion applied during generation. The notation {Part} indicates that the process is performed for both arms and legs*
-
-
 
 ParTY 围绕三个核心模块构建：**时序感知 VQ-VAE**（保留运动量化中的时序信息）、**部件感知文本接地 (PTG)**（生成多样化文本嵌入并为各部件动态选择）、以及**部件引导网络**（先生成部件运动令牌作为引导，再生成全身运动令牌并自适应融合）。以下逐一展开关键公式与机制。
 
@@ -189,18 +179,11 @@ $$
 
 **关键机制总结**：PTG 提供多样化的部件级文本嵌入，部件 Transformer 生成细粒度部件运动令牌作为引导信号，HPF 在全身生成过程中自适应融合部件信息——三者协同，打破了部件语义对齐与全身连贯性之间的根本权衡。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l22_https_openaccess_thecvf_com_content_CVPR2026_html_Heo_ParTY_Part_Guidanc/figures/002_Figure_2.jpg]]
 *Figure 2: Architecture of the Temporal-aware VQ-VAE. Part VQ-VAE follows an identical architecture, where the sole distinction lies in processing part-level rather than full-body motion data*
 
 ![[assets/figures/papers/paper_list_l22_https_openaccess_thecvf_com_content_CVPR2026_html_Heo_ParTY_Part_Guidanc/figures/009_Figure_5.jpg]]
 *Figure 5: Visualization of cross attention map of HPF. Rows correspond to body parts and columns represent temporal frames. We visualize the normalized attention weights between the holistic motion token and each part motion token*
-
-![[assets/figures/papers/paper_list_l22_https_openaccess_thecvf_com_content_CVPR2026_html_Heo_ParTY_Part_Guidanc/figures/012_Figure_6.jpg]]
-*Figure 6: Embedding selection ratios in PTG. Mean and standard deviation of weights are computed over semantically similar text descriptions that share common motion patterns*
-
-
 
 ## 实验与关键发现
 
@@ -236,33 +219,14 @@ ParTY 在两个主流文本-动作数据集 HumanML3D 和 KIT-ML 上均取得最
 
 **PTG 嵌入选择分析（图 6）。** 可视化结果显示，不同 MLP 生成的多样化嵌入在语义相似文本上呈现一致的权重分布模式，手臂和腿部各自偏好不同的嵌入子集。这从机制层面解释了 PTG 如何实现部件级语义解耦——模型学会了为不同身体部位动态选择最相关的文本表示，而非依赖单一全局嵌入。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l22_https_openaccess_thecvf_com_content_CVPR2026_html_Heo_ParTY_Part_Guidanc/figures/001_Figure_1.jpg]]
-*Figure 1: (a) Holistic methods maintain coherence well but limited part-text alignment. In contrast, (b) Part-wise methods show enhanced part-text alignment (e.g., correctly performing the left leg lunge) but compromised coherence as a trade-off (e.g., neck distortion and misaligned arm and leg movements). (c) Our ParTY resolves this trade-off by achieving superior performance in both part-text alignment and coherence*
-
 ![[assets/figures/papers/paper_list_l22_https_openaccess_thecvf_com_content_CVPR2026_html_Heo_ParTY_Part_Guidanc/figures/004_Table_1.jpg]]
 *Table 1: Quantitative comparison on HumanML3D and KIT-ML. Bold indicates the best result, while underlined refers the second-best. The right arrow → indicates that closer values to ground truth are preferred*
 
 ![[assets/figures/papers/paper_list_l22_https_openaccess_thecvf_com_content_CVPR2026_html_Heo_ParTY_Part_Guidanc/figures/005_Table_2.jpg]]
 *Table 2: Quantitative comparison with part-level evaluation metrics on HumanML3D*
 
-![[assets/figures/papers/paper_list_l22_https_openaccess_thecvf_com_content_CVPR2026_html_Heo_ParTY_Part_Guidanc/figures/007_Table_3.jpg]]
-*Table 3: Quantitative comparison with coherence-level (TC, SC) scores on HumanML3D. We run each evaluation 20 times and report averages with 95% confidence intervals*
-
 ![[assets/figures/papers/paper_list_l22_https_openaccess_thecvf_com_content_CVPR2026_html_Heo_ParTY_Part_Guidanc/figures/010_Table_5.jpg]]
 *Table 5: Ablation studies of the proposed components. PG indicates Part Guidance*
-
-![[assets/figures/papers/paper_list_l22_https_openaccess_thecvf_com_content_CVPR2026_html_Heo_ParTY_Part_Guidanc/figures/011_Table_6.jpg]]
-*Table 6: Ablation studies with part-level evaluation metrics*
-
-![[assets/figures/papers/paper_list_l22_https_openaccess_thecvf_com_content_CVPR2026_html_Heo_ParTY_Part_Guidanc/figures/008_Table_4.jpg]]
-*Table 4: Porting Temporal-aware VQ-VAE to MoMask [12]. Reconstruction evaluates VQ-VAE performance, while Generation evaluates final performance including the transformer. Mean Per Joint Position Error (MPJPE) measures positional accuracy, and Average Inference Time (AIT) is averaged over 100 samples on an RTX A5000 GPU*
-
-![[assets/figures/papers/paper_list_l22_https_openaccess_thecvf_com_content_CVPR2026_html_Heo_ParTY_Part_Guidanc/figures/006_Figure_4.jpg]]
-*Figure 4: Qualitative comparison on HumanML3D. Colored text in the descriptions corresponds to the colored body parts in the generated motions, with coherence-level (TC, SC) scores displayed for each sample*
-
-
 
 ## 定位与知识库关联
 
@@ -291,8 +255,6 @@ ParTY 在 HumanML3D 和 KIT-ML 两个标准基准上验证了有效性，但其�
 1. **部件粒度扩展**：将部件引导扩展至手指、面部表情等更细粒度单元，是否能进一步提升表达性动作生成质量？
 2. **文本嵌入数量的自适应选择**：当前 K 为固定超参数，能否根据输入文本的语义复杂度动态调整嵌入数量？
 3. **跨域迁移**：部件引导框架在舞蹈生成、手语合成等需要强部件协调性的领域是否同样有效？
-
-
 
 ## 原文 PDF
 

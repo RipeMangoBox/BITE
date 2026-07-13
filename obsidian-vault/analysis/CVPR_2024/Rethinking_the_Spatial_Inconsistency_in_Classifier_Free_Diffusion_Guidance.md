@@ -59,8 +59,6 @@ claims:
 - 消融实验证实，自注意力细化与自适应尺度缩放是性能提升的两个关键组件，缺一不可。
 - 推理时间仅增加约2%，几乎不影响生成效率。
 
-
-
 扩散模型已成为文本到图像生成的主流范式，其核心优势之一在于**无分类器引导（Classifier-Free Guidance, CFG）**机制——通过一个全局统一的引导尺度 $\gamma$ 融合条件与无条件扩散得分，显著提升生成样本的质量与文本对齐度。然而，这一看似简洁有效的策略背后隐藏着一个被长期忽视的深层问题：**空间不一致性**。
 
 ### 全局统一尺度的隐性代价
@@ -92,8 +90,6 @@ Figure 1 清晰地揭示了这一机制：左侧 CFG 生成的“宇航员骑马
 3. 基于上述语义分割结果，可以**计算每个语义区域的分类器得分范数，并据此动态缩放 CFG 尺度**，使所有区域接收到统一水平的引导强度。
 
 这一设计将空间不一致问题转化为一个**可微、可嵌入去噪循环的语义感知引导框架**，无需额外训练或标注数据，仅利用 U-net 前向传播中已有的注意力图即可实现。由此诞生的 **Semantic-aware Classifier-Free Guidance (S-CFG)** 方法，从根本上重新思考了 CFG 的空间公平性问题，为扩散模型的高质量生成提供了新的控制维度。
-
-
 
 ## 核心方法与创新机理
 
@@ -160,8 +156,6 @@ S-CFG 属于**推理时引导策略优化**的研究脉络，与以下工作形�
 - 与基于交叉注意力控制生成布局的方法（如 **Prompt-to-Prompt** 等）不同，S-CFG 不修改注意力图本身，而是利用注意力图作为语义分割的信号源，进而调控引导强度，保持了生成过程的完整性。
 - 相较于需要额外训练或微调的引导策略（如 **Dynamic CFG** 等），S-CFG 完全训练无关，可直接应用于任意预训练扩散模型，具有即插即用的优势。
 
-
-
 S-CFG 的核心设计动机源于对标准无分类器引导（CFG）中**空间不一致性**的揭示：全局统一的 CFG scale $γ$ 导致不同语义区域所接收的引导强度存在显著差异，最终使生成图像中不同语义单元的质量参差不齐（见 Figure 1）。为从根本上解决这一问题，S-CFG 提出了一条完整的语义感知引导管线，其核心思想是：在去噪过程的每一步，对潜在图像进行**无训练的语义分割**，进而为每个语义单元**独立定制自适应 CFG 尺度**，使各区域的分类器得分范数被缩放至统一水平。
 
 ### 管线总览
@@ -188,8 +182,6 @@ $$\hat{\epsilon}_{\theta}(x_t, c, t) = \epsilon_{\theta}(x_t, t) + \sum_{i=1}^{M
 - **语义单元的独立性假设**：S-CFG 将图像视为若干相对独立语义单元的集合，允许为每个单元独立定制 CFG 尺度。原文指出该假设在实践中可能不完全严格成立，但实验表明其足以支撑显著的质量改善。
 - **基准区域选择**：自适应尺度的归一化基准固定选为由 `<START>` token 定义的前景区域。对于多主体或无明显前景的复杂构图，该策略可能不够灵活，构成方法的一个已知局限。
 - **计算开销**：S-CFG 仅需从 U‑net 的现有注意力层中提取特征并进行轻量级后处理，推理时间增加约 2%（Table 3），在不显著牺牲效率的前提下实现了空间一致性的本质提升。
-
-
 
 S-CFG 的核心由两个紧密耦合的模块构成：**训练无关的语义分割**（Section 4.1）与**自适应 CFG 尺度计算**（Section 4.2）。前者从 U-net 的注意力图中提取各语义单元的掩码，后者为每个语义区域定制独立的引导强度，二者共同实现空间一致的无分类器引导。
 
@@ -220,9 +212,6 @@ $$\hat{C}_t[s,i] = \frac{C_t[s,i]}{\sum_{s'=1}^{HW} C_t[s',i]}, \quad i_s = \arg
 $$\overline{C}_t^k = \frac{1}{R} \sum_{r=1}^R (S_t^k)^r C_t^k$$
 
 其中 $R$ 为迭代次数。$(S_t^k)^r$ 作为转移矩阵，将 $C_t^k$ 中每个 token 的注意力值沿特征相似路径扩散，填补语义区域内部的空洞并平滑边界。Figure 3 展示了不同去噪步骤下，纯交叉注意力分割与加入自注意力细化后的对比，后者显著改善了语义掩码的完整性和边界准确性。
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2404_05384/figures/003_Figure_3.jpg]]
-*Figure 3: The latent image segmentation based on attention maps at different denoising steps. The first column shows the predicted image*
 
 ### 4.2 语义感知的无分类器引导
 
@@ -256,16 +245,11 @@ $$\hat{\epsilon}_\theta(x_t, c, t) = \epsilon_\theta(x_t, t) + \sum_{i=1}^M \gam
 
 整个流程如 Figure 2 所示：在每个去噪步骤，U-net 骨干网络同时估计扩散得分和条件扩散得分，提取自注意力图与交叉注意力图；交叉注意力经重归一化后产生初始语义分割，自注意力对其进行细化；随后基于各区域分类器得分范数计算自适应 CFG 尺度，最终组合成语义感知的引导信号。所有操作均在去噪过程中在线完成，无需额外训练。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
 
 S-CFG在MS COCO验证集上进行了系统的FID-30K与CLIP Score权衡评估。以SD-v1.5为基模型、DPMSolver++采样器（50步）、γ=7.5的设置下，S-CFG取得FID-30K 12.059、CLIP Score 0.3226，相比标准CFG的FID 12.466、CLIP 0.3223，FID降低0.407，CLIP Score提升0.0003（Table 5）。Figure 4展示了三种基模型（SD-v1.5、SD-v2.1、DeepFloyd IF）上的完整权衡曲线，S-CFG的曲线在所有γ取值下均位于CFG曲线的右下方区域，表明方法在保真度与图文对齐的权衡上具有一致优势。
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2404_05384/figures/014_Table_5.jpg]]
-*Table 5: The trade-off curve of SD-v1.5, where the best FID-30k and CLIP Score are highlighted*
 
 人类主观评测进一步验证了S-CFG的感知质量优势。双盲投票结果显示，在SD-v1.5基模型上，S-CFG以73.22%对26.78%的压倒性优势胜出图像质量维度，以76.80%对23.20%胜出图文对齐维度（Table 1）。该趋势在SD-v2.1和DeepFloyd IF上同样成立，表明跨架构的鲁棒性。
 
@@ -273,9 +257,6 @@ S-CFG在MS COCO验证集上进行了系统的FID-30K与CLIP Score权衡评估。
 
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2404_05384/figures/008_Table_2.jpg]]
 *Table 2: Performance comparisons of ControlNet with CFG and S-CFG, where the base model is SD-v1.5, the parameter γ = 3.0 and that sampler is DPMSolver++ with 50 steps*
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2404_05384/figures/012_Table_4.jpg]]
-*Table 4: Evaluation on T2I-CompBench, where the γ = 7.5*
 
 ### 消融实验
 
@@ -297,9 +278,6 @@ S-CFG在MS COCO验证集上进行了系统的FID-30K与CLIP Score权衡评估。
 
 S-CFG引入的计算开销极低。在A100 GPU上，三种基模型下S-CFG相比CFG的每样本平均推理时间增加均不超过3%（Table 3）。该效率优势源于语义分割和自适应尺度计算完全复用U-net已有的注意力图，无需额外网络前传或训练。
 
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2404_05384/figures/011_Table_3.jpg]]
-*Table 3: The analysis on the time cost*
-
 ### 定性分析
 
 Figure 5并列展示了三种基模型在相同提示词下使用CFG与S-CFG的生成样本。S-CFG生成的图像在细节纹理和不同语义区域的质量均匀性上表现更优，尤其在包含多个实体的复杂场景中，S-CFG有效缓解了CFG常见的部分区域过曝或欠细节问题。Figure 3展示了不同去噪步骤下潜在图像的语义分割效果：纯交叉注意力分割存在明显的碎片化和空洞，加入自注意力细化后分割区域变得连续完整，为后续自适应引导奠定了可靠基础。
@@ -308,18 +286,8 @@ Figure 5并列展示了三种基模型在相同提示词下使用CFG与S-CFG的�
 
 所有对比实验均在严格控制下进行：使用相同的采样器（DDIM或DPMSolver++）和步数（50步），在MS COCO验证集上计算标准化指标FID-30K和CLIP Score。方法在三种不同架构的扩散模型上进行了跨模型验证。人类评估采用多名标注者双盲投票，覆盖图像质量和图文对齐两个独立维度。消融研究中所有变体在相同超参数设置下比较。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2404_05384/figures/004_Figure_4.jpg]]
 *Figure 4: The qualitative evaluation results on the trade-off curve of FID-30K VS CLIP Score*
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2404_05384/figures/013_Figure_10.jpg]]
-*Figure 10: The ablation analysis of the S-CFG on the diffusion model with multiple stages*
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2404_05384/figures/010_Figure_9.jpg]]
-*Figure 9: The trade-off curve of FID-10K VS CLIP Score with DDIM sampler*
-
-
 
 ## 定位与知识库关联
 
@@ -400,8 +368,6 @@ $$\gamma_{t,i} = \gamma \frac{|m_{t,b} \odot \eta_t|}{|m_{t,i} \odot \eta_t|} \f
 4. **空间公平性的专用度量**：当前领域缺乏专门评估空间一致性的定量指标。设计能够直接度量不同语义区域生成质量均衡性的指标（如区域级 FID 的方差），将是推动该方向发展的关键。
 
 5. **与其他引导策略的融合**：S-CFG 的空间自适应思想是否可以与 **Perturbed Attention Guidance (PAG)** 等基于注意力扰动的引导方法融合，在空间均衡化的同时进一步增强细节保真度？
-
-
 
 ## 原文 PDF
 

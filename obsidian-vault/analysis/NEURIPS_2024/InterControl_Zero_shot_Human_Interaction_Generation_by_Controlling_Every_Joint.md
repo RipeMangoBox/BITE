@@ -55,8 +55,6 @@ claims:
 - **全关节精确控制**：在 HumanML3D 数据集上，随机关节控制 FID 为 0.178，显著优于并发工作 OmniControl 的 0.310；消融实验证实 Motion ControlNet 对保持运动质量至关重要，移除后 FID 恶化至 0.965。
 - **方法定位**：InterControl 构建了“单人扩散先验 + 轻量空间控制模块 + 自动规划”的统一框架，为利用大规模单人运动数据实现可控多人交互生成提供了新范式。
 
-
-
 ### 人类运动生成：从单人控制到多人交互
 
 近年来，基于扩散模型的文本驱动人体运动生成取得了显著进展。以 **MDM** 为代表的运动扩散模型能够在相对运动表示空间中生成高质量的单人运动，但在空间可控性上存在天然缺陷——模型仅输出相对于根节点的局部关节运动，无法直接指定关节在全局空间中的绝对位置。这一限制使得现有方法在面对“让角色走到指定位置并伸手触碰某物”等需要精确空间约束的任务时力不从心。
@@ -76,8 +74,6 @@ claims:
 InterControl 的核心洞察在于：**人类交互的语义本质可以简化为关节间可量化的空间关系**。无论是拥抱、握手还是打斗，交互的关键特征都可以通过“哪些关节在何时以何种距离相互接触或分离”来描述。这一洞察将复杂的多人交互问题转化为一个更基础且可操作的问题——如何让一个仅用单人数据训练的运动生成模型，在全局空间中精确控制任意关节的位置。
 
 基于这一转化，InterControl 提出了一个统一框架：通过 **Motion ControlNet** 将全局空间条件注入预训练的单人运动扩散模型以维持运动质量，同时利用**逆运动学（IK）引导**在去噪过程中对关节位置进行精确优化。配合 **LLM 规划器**自动将多人交互描述分解为单人文本提示和关节接触对计划，InterControl 首次实现了无需任何多人训练数据的零样本交互生成。
-
-
 
 ## 核心方法与创新机理
 
@@ -118,8 +114,6 @@ InterControl 在训练 Motion ControlNet 时同样施加 IK Guidance，使 Contr
 
 需要注意的是，该方法依赖 LLM 规划器生成接触对计划，LLM 的错误推理可能影响交互质量；同时 IK 引导的优化无法保证全局最优解，对 L-BFGS 迭代次数等超参数敏感。这些局限在消融实验中有所体现，但未进行统计显著性检验，结果的可靠性需进一步验证。
 
-
-
 InterControl 将多人交互生成转化为可控的单人运动生成问题，其核心思路是：**人类交互的语义本质可简化为关节间可量化的空间关系**，因此只需单人数据训练的运动扩散模型，配合精确的全局空间控制，即可零样本合成任意人数的逼真交互。
 
 整体 pipeline 由四个关键模块串联构成：
@@ -140,12 +134,8 @@ InterControl 将多人交互生成转化为可控的单人运动生成问题，�
 
 **推理阶段**，完整 pipeline 在 NVIDIA A100 上的耗时约 80.1 秒（含全部模块），相较纯 MDM 增加了计算开销，但换取了精确的全局空间控制能力（Table 4）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1794_InterControl_Zero_shot_Human_Interaction_Generation_by_Controlling_Every/figures/002_Figure_2.jpg]]
 *Figure 2: Overview. Our model could precisely control human joints in the global space via the Motion ControlNet and IK guidance module. By leveraging LLM to adapt interaction descriptions to joint contact pairs, it could generate multi-person interactions via a single-person motion generation model in a zero-shot manner*
-
-
 
 InterControl 的核心架构由两个互补的空间控制模块构成：**Motion ControlNet** 提供全局空间条件下的运动先验，**Inverse Kinematics (IK) Guidance** 在去噪过程中对关节位置进行精确优化。两者协同工作，使得仅用单人数据训练的模型即可实现对任意关节的精确空间控制。
 
@@ -185,12 +175,8 @@ Forward Kinematics 模块将模型内部的相对运动表示（基于骨骼父�
 
 值得注意的是，IK Guidance 不仅在推理时使用，在 ControlNet 的训练阶段同样被施加。这一设计确保 ControlNet 在学习过程中就适应了被 IK Guidance 优化后的后验均值分布，从而在推理时能保持运动质量。消融实验证实，若移除 Motion ControlNet 仅保留 IK Guidance，FID 从 0.178 急剧恶化至 0.965（Table 3 rows 1-2），验证了 ControlNet 对维持运动分布的关键作用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1794_InterControl_Zero_shot_Human_Interaction_Generation_by_Controlling_Every/figures/009_Figure_5.jpg]]
 *Figure 5: Architecture of Motion ControlNet*
-
-
 
 ## 实验与关键发现
 
@@ -219,9 +205,6 @@ Table 1 报告了在 HumanML3D 上对根节点及随机 1/2/3 个关节进行空
 
 Table 2 展示了交互场景下的定量评估。InterControl 的平均空间误差仅为 **0.0084 m**，而 PriorMDM 高达 0.6723 m，差距达两个数量级。用户偏好研究中，**81.2%** 的参与者更倾向于 InterControl 生成的交互动作，PriorMDM 仅获 18.8% 的偏好率。
 
-![[assets/figures/papers/paper_list_l1794_InterControl_Zero_shot_Human_Interaction_Generation_by_Controlling_Every/figures/004_Table_2.jpg]]
-*Table 2: Evaluation on (left) spatial errors and (right) user preference in interactions*
-
 Figure 3 的定性对比揭示了性能差异的根源：PriorMDM 基于修复（inpainting）的方式仅能粗略保持人物间的相对距离，常出现穿透、悬浮或动作不协调；而 InterControl 通过精确的关节接触对约束，生成的握手、击掌、格斗等交互动作在空间对齐和运动自然度上均显著占优。
 
 ![[assets/figures/papers/paper_list_l1794_InterControl_Zero_shot_Human_Interaction_Generation_by_Controlling_Every/figures/005_Figure_3.jpg]]
@@ -235,9 +218,6 @@ Figure 4 进一步展示了零样本多人交互的泛化能力——模型仅�
 #### 文本驱动运动质量
 
 Table 5（附录）报告了在标准文本-运动生成基准上的结果。InterControl 在 HumanML3D 上取得 FID **0.159**，优于 MDM（0.544）和 OmniControl（0.310）；在 KIT-ML 上同样保持竞争力。这表明引入空间控制能力并未损害模型的文本-运动生成质量，Motion ControlNet 成功实现了条件控制与运动先验的解耦。
-
-![[assets/figures/papers/paper_list_l1794_InterControl_Zero_shot_Human_Interaction_Generation_by_Controlling_Every/figures/010_Table_5.jpg]]
-*Table 5: Text-to-motion evaluation on the (left) HumanML3D [14] and (right) KIT-ML [47] datasets. The right arrow → means closer to real data is better. Methods in the upper part are unable to perform spatial control. † means our implementation*
 
 ### 消融研究
 
@@ -267,17 +247,11 @@ Table 3 的系统消融揭示了各组件的因果贡献：
 
 Table 4 报告了在 NVIDIA A100 GPU 上的推理时间。完整流程（含 LLM 规划、ControlNet 推理、IK Guidance 优化）耗时约 **80.1 秒**。其中 IK Guidance 的 L-BFGS 迭代是主要计算瓶颈。虽然相较纯 MDM 推理增加了开销，但这是实现精确空间控制所必需的权衡——论文认为该成本对于离线运动生成和物理动画应用是可接受的。
 
-![[assets/figures/papers/paper_list_l1794_InterControl_Zero_shot_Human_Interaction_Generation_by_Controlling_Every/figures/008_Table_4.jpg]]
-*Table 4: Inference time analysis on a NVIDIA A100 GPU*
-
 ### 失败模式与边界条件
 
 通过定性分析和消融研究，可归纳以下失败模式：
 
 1. **复杂物理交互**：对于需要持续力反馈的交互（如拥抱、背负），仅靠关节距离约束难以生成逼真动作。这是因为模型基于骨骼动画，不含物理仿真与碰撞响应，虽可与物理引擎结合（如 Figure 1(c) 所示），但生成的运动作为参考输入时仍需物理仿真修正。
-
-![[assets/figures/papers/paper_list_l1794_InterControl_Zero_shot_Human_Interaction_Generation_by_Controlling_Every/figures/001_Figure_1.jpg]]
-*Figure 1: InterControl is able to generate interactions of a group of people given joint-joint contact or separation pairs as spatial condition, and it is only trained on single-person data. Our generated interactions are realistic and similar to real interactions in internet images in (a) daily life and (b) fighting. (c) shows our generated group motions (red dots) could serve as reference motions for physics animation*
 
 2. **LLM 规划器的不确定性**：交互生成依赖 GPT-4 将自然语言描述转换为关节接触对计划。LLM 的错误推理或不合理输出（如选择不恰当的接触关节或时间范围）会直接影响交互质量，但论文未量化规划准确率。
 
@@ -290,16 +264,6 @@ Table 4 报告了在 NVIDIA A100 GPU 上的推理时间。完整流程（含 LLM
 - 与 OmniControl 的对比以 `†` 标注，表示基于作者复现而非原始实现，结果可能受实现差异影响。
 - 用户研究采用 32 对随机视频、75 名参与者的设计，偏好率 81.2% 具有统计参考价值，但未提供置信区间。
 - 所有方法在相同数据划分和评估协议下进行比较，但未进行多次随机种子实验以报告方差。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1794_InterControl_Zero_shot_Human_Interaction_Generation_by_Controlling_Every/figures/011_Table_6.jpg]]
-*Table 6: Spatial control results on the HumanML3D [14] dataset. Ours (all) means the model is trained on one randomly selected joint among all joints in each iteration*
-
-![[assets/figures/papers/paper_list_l1794_InterControl_Zero_shot_Human_Interaction_Generation_by_Controlling_Every/figures/012_Figure_6.jpg]]
-*Figure 6: Example of the questionnaire of user-study*
-
-
 
 ## 定位与知识库关联
 
@@ -350,8 +314,6 @@ InterControl 的适用场景由以下三个条件共同界定：
 4. **物理-运动联合生成**：能否将物理仿真直接嵌入扩散去噪循环，实现“生成即物理合理”的交互动作？这需要解决可微物理仿真与扩散模型的梯度传导问题。
 
 5. **计算效率优化**：在控制更多关节或更长序列时，能否通过并行化 L‑BFGS、蒸馏 IK 引导策略或设计更高效的优化目标来降低推理时间？
-
-
 
 ## 原文 PDF
 

@@ -55,8 +55,6 @@ claims:
 
 **局限提示**：用户研究中完整Duolando仅在约15%的对比中超过真实舞蹈，生成质量与专业舞者仍有较大差距；离线RL的奖励设计主要针对滑步问题，未显式考虑接触质量、风格保持等更细粒度的交互维度。
 
-
-
 ### 双人舞蹈伴奏：从独舞生成到交互协调
 
 音乐驱动的舞蹈生成近年来取得显著进展，然而主流工作——如 **Bailando**（Siyao et al., 2022）和 **EDGE**（Tseng et al., 2023）——几乎全部聚焦于**独舞**场景：模型仅以音乐为条件，生成单个舞者的动作序列。当任务扩展到**双人舞蹈伴奏**（dance accompaniment）时，系统需要同时感知音乐节奏与领舞者（leader）的动作，并生成跟随者（follower）与之协调互动。这一转变引入了独舞方法无法解决的三个核心挑战：
@@ -85,8 +83,6 @@ Duolando 的提出旨在系统性解决上述瓶颈。其核心洞察是：将�
 - **离线 RL 微调**：利用人工定义的步级奖励（特别是基于下肢速度与相对位移偏差的惩罚，见 Eq. 6），赋予模型在无真实标签的情况下探索可行动作路径的能力。**离线 RL 的显式概率目标（Eq. 5）避免了在线 Actor-Critic 方法中因负优势值持续压低旧样本概率的缺陷**，使模型能够有效复用历史数据，在 OOD 条件下稳定生成无滑步的协调动作。
 
 这一动机在实验中得到有力验证：引入离线 RL 后，滑步比从 1.06% 降至 0.33%（下降 69%，Table 6），交互质量指标 FID_cd 从 21.68 降至 9.97（改善 54%，Table 2），同时运动质量 FID_k 从 106.72 降至 25.30（改善 76%）。这些结果表明，**监督预训练提供生成基础，离线 RL 赋予 OOD 鲁棒性与物理一致性**，二者互补构成了解决舞蹈伴奏任务的有效范式。
-
-
 
 ## 核心方法与创新机理
 
@@ -137,8 +133,6 @@ $$ \mathcal{L}_{RL}^{\mathrm{off}}(\theta) = \sum_{t=0}^{T-1} -\log(1 - \operato
 
 这一设计使得 Duolando 在交互质量（FID_cd 从 21.68 降至 9.97）、运动质量（FID_k 从 106.72 降至 25.30）和物理合理性（SR 降至 0.33%）三个维度上均实现了显著提升（Table 2, Table 6）。
 
-
-
 Duolando采用两阶段流水线架构，将舞蹈伴奏任务建模为基于GPT的自回归序列生成问题。第一阶段通过VQ-VAE对运动与空间关系进行离散化编码，第二阶段由交互协调GPT在量化空间中自回归生成跟随者动作序列，并引入离线策略强化学习（off-policy RL）微调以消除滑步伪影并提升分布外（OOD）鲁棒性。
 
 **第一阶段：运动量化编码。** 系统使用四个独立的Motion VQ-VAE分别对跟随者与领舞者的四个身体部位（上半身、下半身、左手、右手）进行编码与量化，将连续3D关节序列映射为离散code序列 $z^{up}, z^{down}, z^{lhand}, z^{rhand}$。同时，一个额外的相对位移VQ-VAE（Relative Translation VQ-VAE）对跟随者与领舞者之间的相对位移 $tr$ 进行量化编码，为后续GPT提供空间交互的离散表示。VQ-VAE的训练损失由关节位置与旋转矩阵的重建损失、码本损失和承诺损失组成（Eq.1）。
@@ -148,13 +142,6 @@ Duolando采用两阶段流水线架构，将舞蹈伴奏任务建模为基于GPT
 **第三阶段：离线RL微调。** 在监督预训练完成后，GPT进入离线RL微调阶段（Figure 5b）。与依赖在线采样的Actor-Critic方法不同，Duolando使用离线RL损失（Eq.5）直接对齐策略概率与Q值，允许复用历史生成数据。奖励函数以步级下肢奖励 $r_t^{down}$（Eq.6）为核心：当预测位移导数与下肢速度的偏差 $\delta$ 低于阈值时给予正奖励，否则施加比例惩罚 $-\eta \cdot \delta$，从而强制对齐下肢运动与全局位移，消除滑步伪影。
 
 **数据流总结：** 音乐与领舞动作（条件信号）→ LAT前瞻嵌入 → 交互协调GPT（10路因果注意力）→ 自回归输出跟随者运动码与相对位移码 → VQ-VAE解码器重建3D关节序列与全局位置。RL阶段在GPT自生成的OOD样本上计算步级奖励，通过离线RL损失反向优化网络权重。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1897_Duolando_Follower_GPT_with_Off_Policy_Reinforcement_Learning_for_Dance_A/figures/005_Figure_4.jpg]]
-*Figure 4: Structure of follower GPT. The GPT takes ten inputs and autoregressively predicts the subsequent tokens of follower’s motion and the relative translation. Preconditions (music signals and leader’s motion) are integrated with Look-Ahead Transformers (LAT)*
-
-
 
 Duolando采用两阶段流水线：先通过VQ-VAE将连续运动序列离散化为code序列，再由交互协调GPT自回归地生成跟随者动作。以下按模块顺序解析关键公式与设计。
 
@@ -235,13 +222,6 @@ $$\mathcal{L}_{ST}(\theta) = \sum_{t=0}^{T-1} -\log(\pi_{\theta}(a_t \mid s_t))$
 
 这为从监督预训练平滑过渡到RL微调提供了统一的优化框架。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1897_Duolando_Follower_GPT_with_Off_Policy_Reinforcement_Learning_for_Dance_A/figures/004_Figure_3.jpg]]
-*Figure 3: (a) Structures of Motion VQ-VAEs and (b) Relative Translation VQ-VAE. The quantization is to substitute a encoded feature to the most similar one*
-
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与因果机制
@@ -281,8 +261,6 @@ Duolando 在舞蹈生成领域的方法谱系中，位于独舞生成基线（Ba
 
 **Table 2** 展示了完整定量基准，Duolando 在所有交互指标（FID_cd, CF）上均取得最优，在运动质量指标（FID_k）上显著超越独舞基线。**Table 6** 直接量化了 RL 对滑步问题的消除效果（SR 从 1.06% 降至 0.33%）。**Table 5** 揭示了前瞻机制对运动流畅性的关键作用。**Table 4** 验证了音乐输入对节奏对齐的重要性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1897_Duolando_Follower_GPT_with_Off_Policy_Reinforcement_Learning_for_Dance_A/figures/007_Table_2.jpg]]
 *Table 2: Quantitative benchmark for dance accompaniment. The first place and runner-up are highlighted in bold and underlined, respectively. S denotes a solo dance generation model that does not take the leader into condition, while D denotes that one does. *Since solo dance has no interaction, the cross-distance between two agents are completely irregular, making the diversity particularly high*
 
@@ -297,8 +275,6 @@ Duolando 在舞蹈生成领域的方法谱系中，位于独舞生成基线（Ba
 
 ![[assets/figures/papers/paper_list_l1897_Duolando_Follower_GPT_with_Off_Policy_Reinforcement_Learning_for_Dance_A/figures/008_Figure_6.jpg]]
 *Figure 6: Qualitative results (a) and user study (b). In qualitative results, conditioning leader is colored in gray while generated followers are in red. In boxplot of user study, triangles and colored lines are mean and median values, respectively. Circles are outliers beyond 1.5× interquartile range (3σ in normal dist.)*
-
-
 
 ## 定位与知识库关联
 
@@ -343,8 +319,6 @@ $$\mathcal{L}_{RL}^{\mathrm{off}}(\theta) = \sum_{t=0}^{T-1} -\log(1 - \operator
 4. **离线RL对预训练质量的依赖。** 离线RL的有效性是否高度依赖初始监督训练的质量？在不充分预训练的情况下，RL能否从随机策略开始学习？这一问题的答案决定了方法的鲁棒性和部署灵活性。
 
 5. **跨领域迁移。** 本方法的VQ-VAE + GPT + 离线RL框架是否能应用于其他双人交互运动（如武术对练、体育双人项目、手语对话）？需要哪些领域特定的改动（如关节拓扑适配、交互奖励重定义）？
-
-
 
 ## 原文 PDF
 

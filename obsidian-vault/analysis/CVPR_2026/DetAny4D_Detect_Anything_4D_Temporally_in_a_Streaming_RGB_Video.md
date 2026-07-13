@@ -53,8 +53,6 @@ claims:
 
 **主要结果**：在DA4D全数据集上，DetAny4D达到27.48 AP3D，跨帧方差相比单帧检测器降低10%–30%（Var_v从0.95降至0.70）。在三个子数据集（Replica、MP3D、HM3D）上，F1@IoU0.5达到45.5，显著超越SpatialLM与ConceptGraphs。开集场景下性能与封闭集一致（Replica 27.9 AP3D），验证了方法的泛化能力。消融实验证实因果注意力模块是降低时间方差的核心因素，软损失策略改善了训练收敛鲁棒性。
 
-
-
 三维目标检测是具身智能与场景理解的核心任务。现有3D检测器通常以单帧RGB图像为输入，逐帧独立预测相机坐标系下的3D边界框。当需要将这些预测变换到全局世界坐标系以支持下游任务（如导航、操作）时，单帧方法面临一个根本性瓶颈：**缺乏时间上下文导致跨帧预测不一致**。同一物体在不同视角下被重复检测，其位置、尺寸和朝向在全局坐标中产生显著抖动，严重损害时序稳定性。
 
 为缓解这一问题，近期工作尝试将4D检测定义为多阶段流程：先逐帧进行3D检测，再通过后处理或关联模块建立跨帧对应关系。例如，**ConceptGraphs** 等基于RGB-D序列的方法将3D预测与跨帧关联分阶段处理。这种级联架构存在两个固有缺陷：其一，各阶段独立优化，误差在阶段间传播累积；其二，无法端到端地学习时空联合表示，全局一致性难以保证。
@@ -68,8 +66,6 @@ claims:
 3. **从静态到动态数据**：构建大规模4D检测数据集DA4D，并提出动态真值自适应策略，弥合单帧预训练先验与全局序列标注之间的差异。
 
 如图1所示，DetAny4D的范式与现有方法形成鲜明对比：单帧检测器（如**DetAny3D** (Zhang et al., arXiv 2025)、**Cube R-CNN** (Brazil et al., ICCV 2023)）逐帧预测导致全局不一致；多阶段4D方法流程复杂且易受误差传播影响；DetAny4D则通过端到端的时空解码器直接输出对齐的全局检测结果。实验表明，该方法在DA4D全数据集上达到27.48 AP3D，同时将跨帧方差降低10%至30%，验证了端到端时空建模在4D检测任务中的有效性。
-
-
 
 ## 核心方法与创新机理
 
@@ -102,12 +98,7 @@ $$L = L_{depth} + L_{cam} + L_{det} + L_{pose} + L_{cons}$$
 
 配合序列随机裁剪与对象填充策略（Figure 8），模型能够处理变长序列和新出现物体，在 DA4D 全数据集上达到 **27.48 AP3D**，跨帧方差相比单帧检测器降低 **10%–30%**（Table 1），同时在开放集场景下保持与封闭集一致的检测性能（Table 4）。
 
-
-
 DetAny4D 将 4D 检测建模为端到端的序列预测任务，其核心 pipeline 由**特征提取器、几何上下文 Transformer、时空解码器、多任务预测头**以及配套的**序列级训练策略**构成（Figure 3）。输入为一段带有位姿的 RGB 序列与文本提示，输出为全局坐标系下时空一致的 3D 边界框。
-
-![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2511_18814/figures/003_Figure_3.jpg]]
-*Figure 3: Pipeline of the proposed DetAny4D model. RGB sequence with prompts are encoded with the feature extractor, generating tokens*
 
 ### 输入与特征提取
 
@@ -152,13 +143,6 @@ $$P_t(O) = P_{t-1}(O) \cup \pi^{-1}(M_t(O), D_O)$$
 
 ![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2511_18814/figures/002_Figure_2.jpg]]
 *Figure 2: The data processing pipeline for 4D detection task. We record posed RGB frames sequentially and separate the records into fixed-length sequences. Objects in global coordinates are projected into ego view and filtered with policies to delete occluded and outof-view objects. Objects b-boxes are then recalculated according to the visibility and accumulated considering the point cloud within the sequence. Finally, the coordinates of a sequence is adapted referring to the first frame*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2511_18814/figures/001_Figure_1.jpg]]
-*Figure 1: Comparison with existing methods. Existing 3D detectors predict on a frame-by-frame basis, which causes inconsistency when transforming 3D b-boxes into global coordinates. Current open-set 4D detectors typically address 3D predictions and crossframe relationships in a multi-stage manner, which is complex and prone to error propagation across cascaded stages. In contrast, we propose an open-set end-to-end 4D detection benchmark that directly predicts globally consistent 3D b-boxes*
-
-
 
 DetAny4D 的核心架构由四个紧密耦合的模块构成：**特征提取器**、**几何上下文Transformer**、**时空解码器**与**多任务预测头**，整体流程见 Figure 3。其设计目标是将4D检测定义为一个端到端的序列任务，通过因果掩码保持时间顺序，同时以多任务训练策略和一致性损失弥合单帧先验与全局标注之间的差异。
 
@@ -215,19 +199,6 @@ $$L = L_{depth} + L_{cam} + L_{det} + L_{pose} + L_{cons}$$
 
 其中 $L_{depth}$ 为深度估计损失，$L_{cam}$ 为相机内参损失，$L_{pose}$ 为相机位姿损失。多任务联合优化使各模块协同收敛，共同支撑端到端的全局一致4D检测。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2511_18814/figures/004_Figure_4.jpg]]
-*Figure 4: Visualization of GT b-box adaptation strategy (Section 3.3). Taking an L-shaped sofa as example, red b-box denotes original GT and green denotes the adapted one. (a) shows adaptation of b-box when camera moves from left to right (column 1) and right to left (column 2) when sofa is partially observed. (b) shows when fully observed, adapted b-box aligns with original GT*
-
-![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2511_18814/figures/014_Figure_11.jpg]]
-*Figure 11: Visualization of the axis pattern comparison between global annotations and 3D prediction results. Global annotated bbox dimensions and rotation differs from the predicted results of pre-trained 3D detection model*
-
-![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2511_18814/figures/015_Figure_10.jpg]]
-*Figure 10: Visualization of the b-box supervision. The 3D bounding box is constrained sequentially by its center, dimensions, and rotation angle*
-
-
-
 ## 实验与关键发现
 
 ### 主结果：4D检测性能与时间一致性
@@ -278,11 +249,6 @@ Table 3的消融实验揭示了各组件的因果贡献：
 ![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2511_18814/figures/005_Figure_5.jpg]]
 *Figure 5: Qualitative comparison with other methods on 3D b-box predictions across consecutive frames in a sequence. Our proposed DetAny4D predicts spatiotemporally aligned 3D b-boxes, while red circles and rectangles show inaccurate and inter-frame jtter predictions*
 
-![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2511_18814/figures/009_Figure_6.jpg]]
-*Figure 6: Visualize effect of ablated designs. Columns from left to right show the GT, prediction from multi-heads-ablated realization, soft-loss-ablated realization, and our original approach*
-
-
-
 ## 定位与知识库关联
 
 ### 任务谱系：从单帧3D到序列4D
@@ -324,8 +290,6 @@ DetAny4D在谱系中的定位是：**首个端到端开放集4D检测框架**，
 ### 知识库贡献
 
 DetAny4D的核心知识贡献包括：（1）将4D检测形式化为端到端序列任务，证明了因果掩码在保持时间顺序的同时可有效建模跨帧依赖；（2）提出动态GT自适应策略和软损失（soft loss）机制，弥合了单帧预训练模型先验与全局标注之间的分布差异；（3）通过消融实验验证了因果注意力模块使AP3D从26.78提升至27.48，同时将时间方差Var_v从0.95降至0.70，为后续序列化3D感知研究提供了明确的架构设计参考。
-
-
 
 ## 原文 PDF
 

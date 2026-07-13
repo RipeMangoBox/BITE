@@ -57,8 +57,6 @@ claims:
 
 值得注意的是，整个框架仅依赖人类-物体交互（HOI）视频数据与 GPT-4o 自动语言标注，无需昂贵的遥操作数据，显著降低了灵巧手操作学习的数据门槛。这一数据效率优势，结合统一的形态无关表示，使 UniHM 成为向通用灵巧操作迈出的重要一步。
 
-
-
 灵巧手操作是机器人学中长期存在的核心挑战。与简单夹爪的抓取不同，灵巧手拥有多指、多自由度的结构，能够执行抓取、放置、推拉、开合等丰富操作，但这也使得运动规划与控制变得极为复杂。近年来，基于学习的方法在灵巧手操作上取得了显著进展，然而现有工作普遍面临两个关键瓶颈：
 
 **瓶颈一：缺乏对开放词汇语言指令的理解。** 当前主流方法大多局限于静态抓取姿态生成，或依赖预定义的交互序列与目标物体类别。它们无法理解自由形式的语言指令（如“小心地拿起桌上的苹果”或“拉开抽屉并放入杯子”），因而难以在真实世界中灵活泛化。
@@ -72,8 +70,6 @@ claims:
 **物理可行性的保障。** 单纯从数据中学习的运动生成模型容易产生穿透物体、关节抖动等物理上不可行的结果。UniHM 引入物理引导动态细化模块，采用非对称平滑接触核函数 $f(d)$（见 Eq 12），在穿透时呈指数增长惩罚，相比欧氏距离对点云噪声更加鲁棒（Figure B2 展示了噪声输入下核函数方法仍能收敛到正确解），确保生成轨迹满足接触约束与时间平滑性。
 
 综上所述，UniHM 试图回答一个核心问题：**能否构建一个统一的框架，使得单一模型在仅依赖 HOI 视频数据训练后，即可理解开放词汇语言指令，并为多种异构灵巧手生成物理可行的操作序列？** 这一问题的解决将显著推动灵巧手操作从实验室走向真实世界应用。
-
-
 
 ## 核心方法与创新机理
 
@@ -115,8 +111,6 @@ $$(J_t^{\mathrm{T}} J_t + \mathbf{W}_{\mathrm{gen}} + \mathbf{W}_{\mathrm{vel}} 
 
 与依赖遥操作数据的基线不同，UniHM 仅使用**人类-物体交互（HOI）视频数据**，通过 GPT-4o 自动标注语言指令，以 Dex-Retargeting 将 MANO 姿态映射到多种机器人手，配合能量优化提高物理一致性。这一范式大幅降低了数据获取成本，同时使模型天然具备跨具身泛化能力——真实世界实验中，UniHM 在未见对象上的 Pick & Place 成功率达 35%，优于 MotionGPT3+Dex-Retargeting 的 25%（Table 3）。
 
-
-
 ![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_cVX3VqO8BO/figures/002_Figure_2.jpg]]
 *Figure 2: Pipeline. UniHM converts open-vocabulary instructions and RGB-D inputs into executable dexterous-hand trajectories via three stages: (1) morphology-agnostic motion tokenization; (2) language-guided generation that fuses text, perception, and token history to produce manipulation token sequences; and (3) physics-aware decoding with smoothness/contact priors for feasible, stable execution*
 
@@ -137,8 +131,6 @@ UniHM 的整体设计遵循“统一表示—语言驱动生成—物理后优�
 **推理时适配**：保持 HOI 生成器冻结，仅微调 CLIPort 感知模块以适应场景分布变化，兼顾数据效率与鲁棒性。
 
 **输入输出流**：输入为自由形式语言指令 + 单帧 RGB-D 图像；输出为完整灵巧手关节轨迹序列，可直接部署到多种真实灵巧手平台（Figure 1）。
-
-
 
 UniHM 的核心架构由三个级联模块构成：**统一灵巧手分词器**（Unified Hand-Dexterous Tokenizer）负责将异构手部姿态映射到共享离散空间；**DexHand VLM** 融合多模态条件自回归生成操作 token 序列；**物理引导动态细化**（Physical-Guided Dynamic Refinement）对生成轨迹进行逐帧后优化，确保物理可行性。以下逐模块展开关键公式与变量含义。
 
@@ -222,8 +214,6 @@ $$
 
 求解得到增量 $\Delta q_t$ 后更新 $q_t \leftarrow q_t + \Delta q_t$，迭代至收敛。该优化为后处理步骤，不参与 VLM 训练，但消融实验（Table 4）表明移除该模块会导致 FPL 从 12.15 升至 16.22，FID 从 31.24 升至 38.56，验证了其对穿透抑制和分布保真的双重作用。
 
-
-
 ## 实验与关键发现
 
 ### 实验设置
@@ -249,7 +239,6 @@ $$
 
 UniHM 在 DexYCB 数据集的 Seen 和 Unseen 子集上均取得最优性能，全面超越所有基线方法。
 
-
 ![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_cVX3VqO8BO/figures/003_Table_1.jpg]]
 *Table 1: Main Result on DexYCB. The arrow pointing to the right means closer to the GT*
 
@@ -267,7 +256,6 @@ UniHM 在 DexYCB 数据集的 Seen 和 Unseen 子集上均取得最优性能，�
 
 在任务类型更丰富的 OakInk 数据集上，UniHM 同样表现出一致的优越性：
 
-
 ![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_cVX3VqO8BO/figures/004_Table_2.jpg]]
 *Table 2: Main Result on OakInk. The arrow pointing to the right means closer to the GT*
 
@@ -281,7 +269,6 @@ UniHM 在 DexYCB 数据集的 Seen 和 Unseen 子集上均取得最优性能，�
 #### 真实世界实验（Table 3）
 
 真实世界跨具身实验中，UniHM 在所有任务和对象划分上均取得最高成功率：
-
 
 ![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_cVX3VqO8BO/figures/005_Table_3.jpg]]
 *Table 3: Real-World Experiments*
@@ -364,16 +351,11 @@ UniHM 在 Seen 对象上的抓取成功率达到 65%，相比 MotionGPT3+Dex-Ret
 - **Figure B2**：非对称平滑接触核 $f(d)$ 在噪声点云下比欧氏距离更鲁棒，是物理优化成功的关键设计。
 - **Table B1**：1D-Conv 骨干在所有灵巧手上一致优于 MLP，验证了时序建模对运动表示的重要性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_cVX3VqO8BO/figures/014_Figure_3.jpg]]
 *Figure 3: Real-World Results. UniHM achieves higher success rates than prior methods on both seen and unseen objects, producing physically consistent and executable real-world manipulations. Table 4: Ablation Result on DexYCB. The arrow pointing to the right means closer to the GT*
 
 ![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_cVX3VqO8BO/figures/017_Figure_12.jpg]]
 *Figure 12: Figure B2: Optimization results when the point cloud includes noise. Here, the black points represent the object point cloud, and the red/green points denote the positions of the dexterous hand’s fingertips. (A) Optimization using the f ( d ) kernel, visualized on the noisy input. (B) Optimization using the Euclidean distance, visualized on the noisy input. (C) The f(d) kernel optimization result projected onto the clean noise-free point cloud. (D) The Euclidean distance optimization result projected onto the noise-free point cloud*
-
-
-
 
 ## 定位与知识库关联
 
@@ -436,8 +418,6 @@ UniHM 在以下场景中存在已知局限：
 4. **语义保真度与物理可行性的权衡。** 基于人体视频的学习范式在存在显著形态差异时，如何保证生成动作既保持原始语义意图（如“捏”与“抓”的区分），又满足目标手部的物理约束？知识蒸馏过程中的语义信息保留机制值得深入研究。
 
 5. **组合泛化与多步推理。** UniHM 展示的开放指令泛化能力是否可迁移到更复杂的语言组合（未见动词-名词对）和多步推理任务？这可能需要引入层次化任务规划器，将复杂指令分解为子任务序列，再由 HOI 生成器逐段执行。
-
-
 
 ## 原文 PDF
 

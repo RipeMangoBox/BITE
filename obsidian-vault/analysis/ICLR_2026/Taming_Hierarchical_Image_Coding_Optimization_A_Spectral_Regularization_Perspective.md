@@ -49,15 +49,11 @@ claims:
 
 **核心结论**：光谱分析揭示朴素训练违反频率原则；正则化训练使各尺度解耦，形成清晰的粗到细层次结构（图1），**显著加速收敛并提升率失真性能**。实验表明，引入全量正则化后，模型**训练加速2.30倍**，在Kodak、CLIC Pro、Tecnick三个标准数据集上相对VTM‑22.0的**平均BD‑Rate达到‑20.65%**，较无正则化基线额外降低10.11%码率（表1、表2）。消融实验确认：尺度内正则化主导收敛加速（1.84倍），尺度间正则化主导码率节省（BD‑Rate ‑7.66%）。该方法**专为显式多尺度层次架构设计**，对单尺度VAE的直接迁移效果有限，且尺度内正则化对最终率失真的增益较弱，整体提升主要依赖尺度间正则化。
 
-
-
 深度学习驱动的图像压缩近年来取得了长足进步，以 ELIC、MLIC++ 为代表的单尺度自编码器架构通过端到端率失真优化已显著超越传统编码标准 VTM-22.0。然而，这类方法在潜在空间中缺乏对图像多尺度特性的显式分解，未能充分利用自然图像从粗到细的结构先验。分层图像编码（Hierarchical Image Coding）通过多个尺度的潜在变量 $\mathbf{z}_1,\dots,\mathbf{z}_L$ 分别建模不同分辨率的信息，理论上能够实现更优的频率解耦与压缩效率。代表性的分层架构如 DHIC 和 QARV 试图构建这类显式尺度层级，但实际训练中却面临着严峻的频谱失控问题。
 
 如图 1 所示，在朴素端到端优化下，各尺度潜在变量的频率能量呈现出明显的**光谱散射（spectral dispersion）与跨尺度频谱混叠（spectral aliasing）**——不同尺度之间出现冗余的频率分量叠加，导致无法形成清晰的低-高频分层结构。这一现象违背了深层网络学习中的频率原则（Frequency Principle，即网络应优先捕获低频信息再逐步精细化高频），其根源在于标准分层损失 $\mathcal{L}_{hier} = \sum_{l} R(\mathbf{z}_l) + \lambda D(\mathbf{x}, \hat{\mathbf{x}})$ 仅优化整体重建质量，没有对信息在尺度间的分配施加任何约束。由此引发的训练不稳定、收敛迟缓以及压缩性能严重受限（无正则化基线 DHIC-Base 的 BD-Rate 增益有限）构成了现有分层编码优化的核心瓶颈。
 
 针对上述缺口，本文通过追踪训练过程中的光谱能量动态，首次提出从**光谱正则化**视角驯服分层编码优化。核心动机在于：若能在训练早期强制各尺度专注各自的目标频带，并在后期抑制跨尺度的冗余频率分量，则有望引导模型自然形成从低频到高频的解耦层次。为此，本文设计了双阶段显式正则化策略——**尺度内频率正则化**（基于 DCT 的渐进频谱截断，稳定早期频带收敛）与**尺度间潜在正则化**（基于 DWT 与 $\mathrm{L}_2$ 惩罚，缓解后期频谱混叠），二者仅在训练阶段使用，不增加推理开销。实验表明，该方案可使相同分层架构下的训练收敛速度提升 2.3 倍，并将相对于 VTM-22.0 的平均 BD-Rate 从 $-11.16\%$ 大幅推至 $-20.65\%$，验证了显式光谱引导对于释放分层编码潜力的必要性与有效性。
-
-
 
 ## 核心方法与创新机理
 
@@ -95,8 +91,6 @@ DHIC-Regu 的核心创新在于**通过显式光谱正则化明确引导分层�
 - 两种正则化器均专门针对**显式分层架构**设计，对单尺度 VAE（如 HPCM、MLIC++）可能无效甚至导致性能下降（Table 10），表明方法不具有通用性。
 - 尺度内正则化主要用于加速收敛，单独使用时最终压缩性能提升有限（约 -1% BD-Rate）；整体增益高度依赖尺度间正则化。
 - 关键超参数（$\delta=0.1$、阶段切换 epoch、频率截断调度）依赖**手动网格搜索**，尚未探索自适应调度或自动优化策略。
-
-
 
 ![[assets/figures/papers/iclr26_0014_lO6I66lweK_Taming_Hierarchical_Image_Coding_Optimization_A/figures/021_Figure_9.jpg]]
 *Figure 9: Our proposed lightweight hierarchical image codec architecture. The above is the overall network framework, where the three rows from top to bottom are the encoding pathway, entropy model pathway, and decoding pathway. And the shaded area represents the FSP module, which has been proven to be unnecessary in Appendix A.4. The lower left corner shows the network structure of the latent block in the entropy model, while the bottom right corner shows the structure of the basic model employed in our whole architecture*
@@ -143,8 +137,6 @@ $$
 
 > ⚠️ **需人工核实处**：尺度间正则化中 DWT 与 $1\!\times\!1$ 卷积的具体实现组合（Haar 小波、通道数映射等）以及训练阶段切换边界（100 epochs）的证据分散在不同章节，建议在正式报告中对配置细节加以注释；此外，$L_2$ 惩罚前的负号与损失函数符号需对照原文 Eq.(6) 确认。
 
-
-
 ### 1. 关键模块设计
 
 分层图像编码器(如DHIC‑Base)的朴素端到端训练会在跨尺度隐变量间引发**频谱能量散射**与**频谱混叠**：高、低层尺度错误地编码了重叠的频率分量，导致训练收敛缓慢且率失真性能受限(Figure 1, Table 2)。为显式引导各尺度解耦，DHIC‑Regu 引入两项仅训练期使用的光谱正则化模块，分别作用于输入空间和隐空间，推理时零额外开销。
@@ -185,20 +177,16 @@ $$-\log p(\mathbf{z}_l \mid \mathbf{z}_{l-1}) = \frac{1}{2\tau^2}\|\mathbf{z}_l 
 
 综合来看，DCT截断（式 3‑5）在训练前期引导频率分配，DWT对齐+ $L_2$ 惩罚（式 6）在训练后期消除频谱混叠；二者分别在输入域和隐空间实现光谱正则化，构成该方法的核心优化机制。
 
-
-
 ## 实验与关键发现
 
 ### 主要结果：率‑失真与训练加速
 
 表 1 汇总了 DHIC‑Regu 在 Kodak、CLIC Professional 和 Tecnick 三个标准图像集上相对 VTM‑22.0 的 BD‑Rate。DHIC‑Regu 分别达到 –19.73 %、–18.13 % 和 –24.09 %，平均 –20.65 %，显著优于所有对比的学习编码器，包括单尺度的 ELIC、MLIC++、HPCM‑Large 以及无正则化的分层基线 DHIC‑Base（平均 –11.16 %）。仅正则化的加入就额外降低了 9.49 个百分点的 BD‑Rate，说明光谱约束充分释放了分层编码的潜力。
 
-
 ![[assets/figures/papers/iclr26_0014_lO6I66lweK_Taming_Hierarchical_Image_Coding_Optimization_A/figures/008_Table_1.jpg]]
 *Table 1: Compression performance and complexity comparison of learned image codecs across multiple datasets (Anchor: VTM-22.0)*
 
 训练效率同样受益。表 2 显示，同时采用尺度内与尺度间正则化时，达到 DHIC‑Base 最终性能所需的训练轮次缩短为原来的 1/2.30，即 **2.30 倍加速**。推理阶段正则化模块完全移除，因此 DHIC‑Regu 的编解码时间、计算量（977.73 KMACs/pixel）和参数量（106.93 M）与 DHIC‑Base 一致，无额外开销。
-
 
 ![[assets/figures/papers/iclr26_0014_lO6I66lweK_Taming_Hierarchical_Image_Coding_Optimization_A/figures/018_Table_2.jpg]]
 
@@ -234,23 +222,17 @@ $$-\log p(\mathbf{z}_l \mid \mathbf{z}_{l-1}) = \frac{1}{2\tau^2}\|\mathbf{z}_l 
 
 图 1 的光谱能量热图从根本机制上解释了正则化的作用。朴素训练下，各尺度潜在变量的频率能量长期纠缠，出现发散、噪声和频谱混叠；正则化训练则从早期即强制引导各尺度收敛至指定频带，最终形成清晰的“粗‑中‑细”分层结构，去除了冗余频率分量。
 
-
 ![[assets/figures/papers/iclr26_0014_lO6I66lweK_Taming_Hierarchical_Image_Coding_Optimization_A/figures/001_Figure_1.jpg]]
 
 图 6 的尺度潜在变量可视化进一步印证了这一过程：无正则化时，四个尺度的表示始终相互混杂；正则化后，在第 40 个训练轮次已可见明显的尺度解耦——高尺度专注低频全局结构，低尺度补充高频细节，实现了自然的层次化粗‑细表示。
 
 率‑失真曲线（图 10、11）直观显示，DHIC‑Regu 在所有码率下均显著优于单尺度模型（ELIC、MLIC++）和未正则化的 DHIC‑Base，且在多分辨率场景（Table 7）中，除极低分辨率外，始终保持 BD‑Rate 领先，同时解码时间远小于大模型 HPCM‑Large，兼具高性能与轻量推理的优点。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0014_lO6I66lweK_Taming_Hierarchical_Image_Coding_Optimization_A/figures/019_Table_3.jpg]]
 *Table 3: Ablation studies of intra-scale and inter-scale regularization implementations (Baseline: the naive trained model, best implementation approaches are marked in blue color). (a) Intra-scale regularization (First 100 epochs)*
 
 ![[assets/figures/papers/iclr26_0014_lO6I66lweK_Taming_Hierarchical_Image_Coding_Optimization_A/figures/020_Table_4.jpg]]
 *Table 4: (b) Inter-scale regularization (Remaining epochs). More ablation studies on regularization setups and modules design, are detailed in Appendix A.4*
-
-
-
 
 ## 定位与知识库关联
 
@@ -297,8 +279,6 @@ DHIC‑Regu（Explicit Spectral Regularization for Hierarchical Coding）并非�
 5. **理论深化**：如何将启发式的频谱重叠量度量（Figure 1 中的能量分析）与率失真函数的泛化界相连，从而为分层编码提供紧密的理论指导？
 
 上述问题若得到解决，有望将频谱正则化从一个有效的经验技巧发展为学习型分层编码的基础理论组件。
-
-
 
 ## 原文 PDF
 

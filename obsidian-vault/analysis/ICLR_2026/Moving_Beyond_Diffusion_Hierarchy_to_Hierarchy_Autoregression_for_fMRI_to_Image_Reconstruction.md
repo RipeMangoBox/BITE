@@ -73,8 +73,6 @@ MindHier属于**fMRI到图像重建**任务，在方法谱系中处于扩散式�
 
 尽管高层语义指标领先，MindHier仍存在若干固有限制：无法重建可读文字和特定标识；面部特征模糊，缺乏身份识别精度；精细计数和材质属性容易出错；跨受试者少样本微调时性能大幅下降。这些问题为后续研究指明了方向。
 
-
-
 从功能磁共振成像（fMRI）信号中重建人类视觉体验，是连接神经科学与计算机视觉的核心挑战。fMRI通过非侵入方式记录血氧水平依赖（BOLD）信号，反映大脑对视觉刺激的响应模式。然而，fMRI信号具有低信噪比、低空间分辨率和高个体差异性等特点，使得从这些信号中恢复出具有语义保真度和视觉细节的图像成为极具难度的逆向问题。
 
 近年来，深度生成模型的引入显著推动了fMRI-to-image重建领域的发展。主流方法将这一任务建模为条件生成问题：先将fMRI信号编码为神经嵌入，再以此作为条件引导生成模型重建图像。**MindEye1**（Scotti et al., NeurIPS 2023）和**MindEye2**（Scotti et al., ICML 2024）是该范式的代表性工作，它们将fMRI信号映射为单一的CLIP空间向量，然后通过扩散模型（如Stable Diffusion）进行图像生成。**BrainDiffuser**（Sci. Rep. 2023）和**MindBridge**（Wang et al., CVPR 2024）也遵循类似的扩散引导框架。
@@ -86,8 +84,6 @@ MindHier属于**fMRI到图像重建**任务，在方法谱系中处于扩散式�
 针对上述缺口，MindHier提出一个核心洞察：**将fMRI信号解耦为层次化嵌入，与CLIP视觉编码器的层级结构对齐，再利用尺度自回归模型逐尺度生成的特性，实现符合人类感知的粗到细重建过程**。这一思路从三个层面突破现有范式：第一，设计层次化fMRI编码器，从脑信号中显式提取多尺度特征；第二，通过层次到层次对齐，将编码器各层输出与CLIP视觉编码器的对应层建立结构-语义双重监督；第三，在尺度自回归生成中，按尺度感知方式注入层次化特征——粗尺度阶段接收高层语义嵌入以建立全局布局（“森林”），细尺度阶段接收低层细节嵌入以逐步细化纹理（“树木”），如图1所示。
 
 这一设计不仅实现了语义保真度与视觉细节的更好平衡，还因尺度自回归模型的高效推理特性（单次前向即可完成生成），将推理速度提升约4.67倍，为fMRI-to-image重建的实用化提供了新的可能性。
-
-
 
 ## 核心方法与创新机理
 
@@ -127,9 +123,6 @@ MindHier处于fMRI-to-image重建、层次化表示学习和自回归生成模�
 
 综上，MindHier的核心创新并非单一技术的堆叠，而是通过“层次化编码-层次化对齐-尺度感知引导”三位一体的设计，系统性地解决了fMRI信号层次信息利用不足的问题，实现了从“森林”到“树木”的粗到细重建。
 
-
-
-![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_AT7hCh6HB7/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the two-stage training pipeline of MindHier. (a) Stage 1: Hierarchy-to-Hierarchy Alignment. A hierarchical fMRI encoder (composed of M cascaded blocks) is trained to map fMRI signals to a feature hierarchy in CLIP space. This mapping is learned by aligning the encoder’s outputs with corresponding intermediate features from a frozen CLIP vision encoder using a cascaded MSE loss (LMSE (Eq. 1)). To ensure high-level semantic coherence, the terminal fMRI feature is further aligned within CLIP’s shared embedding space via a SoftCLIP loss ( ${ \mathcal { L } } _ { \mathrm { S o f t C L I P } }$ (Eq. 2)). (b) Stage 2: Scale-Aware Coarse-to-Fine Neural Guidance. A scale-wise autoregressiv...
 
 ![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_AT7hCh6HB7/figures/001_Figure_1.jpg]]
@@ -151,8 +144,6 @@ MindHier 提出了一种从 fMRI 信号到自然图像的“层次到层次”�
 最终，各尺度生成的 token 图经 VQ 解码器码本 $Z$ 查找后求和得到连续特征图 $\hat{f} = \sum_{k=1}^{K} \text{lookup}(Z, \hat{r}_k)$，再由解码器 $D$ 生成最终图像 $\hat{I}$。
 
 **输入输出流总结：** 输入为单次 fMRI 响应信号，经 HFE 单次前向传播产生 $M$ 层层次化特征；这些特征在阶段一与 CLIP 视觉编码器对齐后，在阶段二按尺度感知策略注入 VAR 生成器，最终输出 $512 \times 512$ 的重建图像。整个推理仅需 2.64 秒（Table 1），相比扩散式 SOTA 方法 MindEye2 加速约 4.67 倍。
-
-
 
 MindHier 的核心架构由三个紧密耦合的模块构成，分别解决 fMRI 信号的层次化解码、跨模态特征对齐以及尺度感知的条件生成。以下逐一展开其设计逻辑与关键公式。
 
@@ -201,8 +192,6 @@ $$p(R|E) = \prod_{k=1}^{K} p(r_k \mid r_{<k}, \mathbf{s}_k)$$
 ---
 
 **关键公式汇总：** 上述五个公式构成了 MindHier 的理论骨架——Eq. (1) 和 Eq. (2) 定义了对齐训练的目标，Eq. (3)–(5) 定义了尺度感知的条件生成过程。消融实验证实，层次化全监督（Eq. 1 + Eq. 2 作用于所有块）相比仅监督终端层，CLIP 准确率从 95.1% 跃升至 97.2%（Table 2）；粗到细引导策略（Eq. 5 中 $\mathbf{s}_k$ 按 $h_k$ 递减选取）相比倒置的细到粗策略，CLIP 提升 1.1 个百分点，SwAV 距离降低 0.009（Table 4），验证了公式设计的有效性。
-
-
 
 ## 实验与关键发现
 
@@ -253,26 +242,8 @@ MindHier在NSD新测试集（1,000张共享测试图像）上与现有fMRI-to-im
 3. **精细计数与材质失准**：对物体数量的判断容易出错，高密度纹理信息（如建筑外立面材质）在重建中丢失。这反映了层次化特征在极细粒度信息上的表达瓶颈。
 4. **跨受试者泛化**：**Table S3**显示，当仅使用1小时新受试者数据进行微调时，性能大幅下降，表明模型对新受试者的适应仍需要大量标注fMRI数据，少样本泛化能力有限。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_AT7hCh6HB7/figures/010_Table_5.jpg]]
 *Table 5: Table S1: Quantitative results of each subject*
-
-![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_AT7hCh6HB7/figures/011_Table_6.jpg]]
-*Table 6: Table S2: Quantitative results with one session of training data. E: the results from MindEye2*
-
-![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_AT7hCh6HB7/figures/012_Table_7.jpg]]
-*Table 7: Table S3: Quantitative results for cross-subject generalization*
-
-![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_AT7hCh6HB7/figures/013_Table_8.jpg]]
-*Table 8: Table S4: Brain Grounding Accuracy (IoU) comparison under single-subject setup*
-
-![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_AT7hCh6HB7/figures/014_Table_9.jpg]]
-*Table 9: Table S5: Comparison of Single-Shot (N=1) generation versus Best-of-N selection*
-
-![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_AT7hCh6HB7/figures/019_Table_10.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -313,8 +284,6 @@ MindHier的方法学贡献在于将这一范式从“固定引导+扩散”切�
 4. **更高分辨率的计算挑战**：尺度自回归模型在>512×512分辨率下的伪影控制和计算负载如何解决？随着尺度数K增加，token序列长度呈指数增长，选择性注意力掩码的效率优势可能被稀释。
 
 5. **跨受试者少样本泛化机制**：如何设计受试者无关的fMRI表征学习策略，以降低对新受试者的数据依赖？这可能需要在HFE中引入脑区对齐模块或元学习框架。
-
-
 
 ## 原文 PDF
 

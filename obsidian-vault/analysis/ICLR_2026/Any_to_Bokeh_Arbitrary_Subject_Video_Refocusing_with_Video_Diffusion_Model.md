@@ -46,13 +46,9 @@ claims:
 
 本文提出 **Any-to-Bokeh**，一种基于单步视频扩散模型的任意主体视频散景重聚焦框架。该方法利用预训练的 Stable Video Diffusion (SVD) 的强3D先验，结合焦平面自适应的多平面图像（MPI）表示，实现了时间一致、深度感知且用户可控的视频散景渲染。用户可自定义焦平面和散景强度（如 Figure 1 所示）。在合成测试集和真实场景（DAVIS数据集）上，该方法在所有评估指标上均优于现有基线方法，包括 DeepLens、BokehMe、MPIB、Dr.Bokeh 和 BokehDiff。
 
-
-
 **现有瓶颈**：现有图像散景方法缺乏时间建模，导致视频中产生时间闪烁和不一致的模糊过渡；而现有视频编辑方法无法显式控制焦平面和散景强度。
 
 **核心动机**：利用预训练视频扩散模型的3D先验，结合几何先验（MPI），实现可控、时间一致且深度感知的视频散景渲染。
-
-
 
 ## 核心方法与创新机理
 
@@ -62,8 +58,6 @@ claims:
 4. **渐进式训练策略**：三阶段训练（几何引导、时间精炼、细节增强）。
 5. **加权重叠推理策略（WOIS）**：处理任意长度视频，消除段边界伪影。
 
-
-
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__image_and_video_generation__b001_h05AulYT7g_Any-to-Bokeh_/figures/001_Figure_1.jpg]]
 
 如 Figure 2 所示，Any-to-Bokeh 包含两个关键组件：
@@ -72,8 +66,6 @@ claims:
 - **(b) MPI空间块**：使用MPI掩码M引导散景渲染，用户定义的模糊强度K通过嵌入注入。
 
 渐进式训练策略如 Figure 3 所示，分为三个阶段：第一阶段训练整个U-Net和适配器；第二阶段精炼时间块并引入深度扰动；第三阶段微调VAE解码器。
-
-
 
 ### 5.1 焦平面自适应MPI表示
 
@@ -116,14 +108,11 @@ $$\gamma _ { j } = \frac { 1 } { 2 } \left( 1 + \cos ( \frac { \pi j } { L } ) \
 
 在长度为L的重叠区域内，权重从1平滑过渡到0。
 
-
-
 ## 实验与关键发现
 
 ### 6.1 定量结果
 
 Table 1 展示了 Any-to-Bokeh 在合成测试集和真实场景上的定量比较结果：
-
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__image_and_video_generation__b001_h05AulYT7g_Any-to-Bokeh_/figures/004_Table_1.jpg]]
 *Table 1: Quantitative comparison of Any-to-Bokeh. The best metric scores in each column are marked in bold for clarity.“↓” or “↑” indicate lower or higher values are better.*
@@ -175,17 +164,11 @@ Figure 4 展示了在真实世界视频帧上的定性结果对比，红色箭�
 
 Table 4 显示 Any-to-Bokeh 的推理时间为0.094s（单帧），参数量为1880M，GFLOPs为3620，VRAM占用13.6GB。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__image_and_video_generation__b001_h05AulYT7g_Any-to-Bokeh_/figures/007_Table_2.jpg]]
 *Table 2: Mapping of Perturbation Modes.*
 
-
-
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__image_and_video_generation__b001_h05AulYT7g_Any-to-Bokeh_/figures/012_Table_4.jpg]]
 *Table 4: Results of the computational cost comparison.*
-
-
 
 ## 定位与知识库关联
 
@@ -199,8 +182,6 @@ Table 4 显示 Any-to-Bokeh 的推理时间为0.094s（单帧），参数量为1
 | 长视频推理策略 | 直接分割视频段，独立处理 | 加权重叠推理策略（WOIS） |
 
 **知识库定位**：该方法解决了视频散景渲染中的时间一致性和可控性问题，为视频后期处理、虚拟摄影和增强现实等应用提供了高效解决方案。其局限性包括：对于长视频无法在单次前向传播中处理整个序列；依赖预训练深度估计模型生成视差图；模型参数量较大（1880M）。
-
-
 
 ## 原文 PDF
 

@@ -51,8 +51,6 @@ claims:
 
 **主要结果**：在NarrativeQA、QASPER、QuALITY、Natural Questions四个长文档QA基准上，SMARTCHUNK以0.564的平均QA准确率与最强多级基线MAL RAG（0.561）持平，但货币成本仅为后者的约26%（$0.078 vs $0.301），成本降低约74%（Table 2, Figure 1）。在域外数据集NewsQA上，SMARTCHUNK结合小样本提示以$0.032的成本匹配了MAL RAG $0.147成本下的性能（F1 0.906 vs 0.907, Table 3）。消融实验表明，移除规划器导致成本与延迟显著上升，移除压缩编码器则使检索与QA性能明显下降（Table 2）。STITCH仅使用SFT+RL一半的监督token即可达到82.0%的规划准确率，相比最强SFT+RL基线提升约5个百分点（Table 4, Table 5）。
 
-
-
 ### 文档RAG中的分块困境
 
 检索增强生成（RAG）在处理长文档时面临一个根本性的瓶颈：**分块策略与检索质量之间的深层耦合**。现有系统普遍采用固定大小的分块方式——例如按句子切分或按512 token的固定窗口切分——然后进行平面化的单级检索。这种静态策略在两个维度上暴露出结构性缺陷：
@@ -83,8 +81,6 @@ claims:
 - **稳定的规划器训练范式**：提出 **STITCH**（Solve with RL, Then Imitate To Close Holes）训练框架，通过交替执行强化学习、提示化强化学习和模仿学习（SFT），解决监督信号缺失和RL训练不稳定的双重挑战。
 
 实验表明，SMARTCHUNK在四个长文档QA基准上以**不到多级基线方法30%的货币成本**达到了可比甚至更优的问答准确率（Table 2, Figure 1），验证了查询感知分块压缩在效率-准确率折衷中的显著优势。
-
-
 
 ## 核心方法与创新机理
 
@@ -136,8 +132,6 @@ STITCH 仅需 SFT+RL 一半的监督 token（418k vs 795k），即达到 **82.0%
 
 **创新总结**：上述三个创新形成了完整的“感知—压缩—优化”闭环。规划器提供查询感知的粒度选择，压缩编码器消除 LLM 摘要的推理开销，STITCH 则解决了规划器训练中监督信号稀缺与多目标冲突的核心瓶颈。三者协同使得 SMARTCHUNK 在保持或提升 QA 准确率的同时，将货币成本降至多级基线方法的 30% 以下（Table 2, Figure 1）。
 
-
-
 ![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_Myti1QwL2t/figures/002_Figure_2.jpg]]
 *Figure 2: Left: Overview of the SMARTCHUNK framework. Compared to vanilla RAG, which uses fixed chunking and flat retrieval, SmartChunk introduces two key modules: (1) a planner P that predicts the smallest and largest chunk sizes per query, enabling adaptive multi-level retrieval, and (2) a Chunk Compression Encoder E that produces compact, high-level embeddings for aggregated chunks, lowering the cost of the multi-level representation. These additions allow SMARTCHUNK to adapt to different query complexity and document structure, balancing accuracy and efficiency. Modules added by SmartChunk are shown in blue, while modules from vanilla RAG are shown in black. The figure distinguishes between text...*
 
@@ -173,8 +167,6 @@ $$ \max_\pi \mathbb{E}_{(q, D, \hat{a}) \sim \mathcal{D}} \left[ \text{Acc}(\mat
 其中 $\lambda$ 控制准确率与效率的相对权重，$\tau$ 度量系统的货币成本与延迟。这一目标贯穿规划器的 RL 奖励设计与压缩器的训练损失，确保各模块协同朝向“高性价比检索”收敛。
 
 > **证据强度**：上述模块关系与因果声明由 Table 2 的消融实验（w/o P, w/o ε direct encode, w/o ε summarize）及 Figure 4b 的规划器自适应行为直接支撑，置信度 0.9–0.95。
-
-
 
 SMARTCHUNK框架在标准RAG流水线中引入了两个关键模块——**规划器（Planner）** 与**分块压缩编码器（Chunk Compression Encoder）**，并配套设计了**STITCH训练框架**来稳定地训练规划器。以下逐一阐述其核心设计与关键公式。
 
@@ -236,8 +228,6 @@ $$R = R_{\mathrm{QA}} + R_{\mathrm{Cost}} + R_{\mathrm{Format}} + R_{\mathrm{Len
 3. **Imitation learning**：将前两阶段收集的成功轨迹用于监督微调，巩固学习成果。
 
 这一设计的关键在于“先解后仿”：RL负责探索和发现有效策略，而模仿学习负责稳定和泛化这些策略。实验表明，纯RL训练的规划准确率仅为0.356，SFT+RL在监督token减半时性能崩溃（从0.763降至0.544），而STITCH仅用一半的监督token（418k）即达到82.0%的规划准确率和0.564的QA准确率，相比最强SFT+RL基线提升约5个百分点（Table 4, Table 5）。
-
-
 
 ## 实验与关键发现
 
@@ -301,28 +291,8 @@ SMARTCHUNK 的核心优势在于以显著降低的成本达到匹配或超越最
 - **规划器依赖伪标签质量**：STITCH 的训练依赖伪标签生成管道，当监督信号质量不足时，规划器性能可能受影响（此点需结合具体伪标签生成细节进行手动验证）。
 - **压缩编码器的语义保真度**：压缩编码器以 LLM 摘要嵌入为训练目标，可能无法完美捕捉所有文档类型的高层语义，尤其在高度专业化或结构化文档中。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_Myti1QwL2t/figures/004_Table_1.jpg]]
 *Table 1: Dataset statistics used in our evaluation. The datasets span diverse domains and query types, with NewsQA serving as an out-of-domain benchmark. Table 2: Comparison of different chunking and retrieval strategies. Our method achieves competitive QA accuracy and retrieval recall while significantly reducing monetary cost and latency*
-
-![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_Myti1QwL2t/figures/003_Table_1.jpg]]
-
-![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_Myti1QwL2t/figures/010_Table_4.jpg]]
-
-![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_Myti1QwL2t/figures/013_Table_6.jpg]]
-*Table 6: The monetary cost of each model*
-
-![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_Myti1QwL2t/figures/016_Table_7.jpg]]
-*Table 7: Trace diversity We also demonstrate the importance of using diverse reasoning trace for finetuning planner. Table 7: Comparison of planner training methods. STITCH achieves the highest planning accuracy while using fewer tokens*
-
-![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_Myti1QwL2t/figures/018_Table_8.jpg]]
-*Table 8: SMARTCHUNK outperforms other baselines and nearly reaches the accuracy of DeepSeek-R1-Distill, which has the benefit of vast training data. There is no DeepSeek-R1-Distill for Qwen-3B provided by (Guo et al. (2025)), so its cells are left blank*
-
-![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_Myti1QwL2t/figures/019_Table_9.jpg]]
-*Table 9: QA performance for each dataset separately*
-
-
 
 ## 定位与知识库关联
 
@@ -361,8 +331,6 @@ SMARTCHUNK 位于文档检索增强生成（RAG）方法谱系中“多级自适
 - **多模态文档检索**：在共享嵌入空间中结合 STITCH 进行图像-文本联合理解，实现多模态文档的自适应分块与检索。这要求压缩编码器能够处理跨模态的语义聚合。
 
 此外，从方法谱系角度看，以下问题值得关注：规划器当前仅预测最小/最大块级别，未显式建模文档内部的结构异质性（如某些段落需要细粒度、某些需要粗粒度）；压缩编码器的训练目标（模仿 LLM 摘要嵌入）可能限制了其发现比文本摘要更优的检索表示的可能性。
-
-
 
 ## 原文 PDF
 

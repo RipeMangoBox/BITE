@@ -66,8 +66,6 @@ TeG-DG属于**文本引导的域泛化FAS方法**，与现有工作的关键区�
 
 **方法适用边界**：TeG-DG在标准Leave-One-Out协议和有限源域场景下均表现优异，但训练依赖攻击类型标签以构建匹配/不匹配提示对，获取细粒度标签可能增加标注成本。提示库由GPT-4自动生成，虽减少人工偏差，但可能受限于语言模型的内部知识覆盖范围。推理阶段丢弃文本模态虽降低部署复杂度，但也意味着无法利用测试时的附加文本信息（如设备描述、场景上下文）进一步提升性能。
 
-
-
 ### 人脸反欺骗中的域泛化困境
 
 人脸反欺骗（Face Anti-Spoofing, FAS）是保障人脸识别系统安全性的关键防线，其核心任务在于区分真实人脸与打印攻击、重放攻击、面具攻击等欺骗手段。然而，FAS系统面临一个根本性挑战：不同数据集之间存在显著的**域偏移**（domain shift），包括光照条件、采集设备、背景环境、攻击媒介等差异。这些域特定因素导致在一个数据集（源域）上训练的模型，在另一个未见过的数据集（目标域）上性能急剧下降。
@@ -103,8 +101,6 @@ TeG-DG属于**文本引导的域泛化FAS方法**，与现有工作的关键区�
 
 这些场景更贴近真实部署条件，能够充分检验文本引导泛化的实际价值。初步实验表明，TeG-DG在极其有限源域场景下，HTER相对降低约14%，AUC提升约12%，验证了文本监督在数据稀缺条件下的独特优势。
 
-
-
 ## 核心方法与创新机理
 
 TeG-DG的核心创新在于**将文本描述作为跨域通用监督信号引入人脸反欺骗（FAS）的域泛化任务**，从根本上改变了模型学习域不变特征的方式。与现有方法依赖域标签进行对抗对齐或实例白化不同，TeG-DG利用文本的抽象性和跨域稳定性来过滤图像中的域特定噪声（如光照、采集设备差异），从而弥合不同图像域之间的差距。
@@ -124,8 +120,6 @@ TeG-DG的核心创新在于**将文本描述作为跨域通用监督信号引入
 传统方法仅对视觉特征施加二元交叉熵损失进行监督。TeG-DG通过**文本增强视觉判别器（Textual-Enhanced Visual Discriminator, TEVD）**引入了双重文本监督机制：一是视觉-语言三元组损失$\mathcal{L}_{\mathrm{TRI}}$，确保视觉特征与匹配文本的距离小于与非匹配文本的距离至少为$\alpha$（Equation 6）；二是多模态分类器，同时对视觉特征、匹配文本特征和非匹配文本特征施加交叉熵约束（Equation 7）。文本模态在训练阶段充当正则化器，约束视觉特征的学习方向，而在推理阶段则完全移除，不增加部署复杂度。消融实验的关键发现是：移除文本对齐（TEVD）对性能的损害大于移除三元组损失，证实了文本监督是该方法的核心驱动力（Table 4）。
 
 总体训练目标为$\mathcal{L}_{\mathrm{TeG-DG}} = \mathcal{L}_{\mathrm{CLS}} + \lambda \mathcal{L}_{\mathrm{TRI}}$（Equation 8），其中文本提示由**文本提示器（Text Prompter, TP）**从GPT-4生成的提示库中动态采样匹配和非匹配描述对（Section 3.1）。
-
-
 
 TeG-DG 的核心设计动机在于：传统域泛化方法从视觉特征中提取的表示仍残留着光照、采集设备等风格偏差，导致在未见域上的性能退化。TeG-DG 的解决方案是引入文本描述作为一种跨域通用的抽象监督信号，通过将视觉特征与文本特征对齐，过滤域特定噪声，学习域不变表示。文本之所以能弥合域间差距，在于它能够捕捉不同攻击类型（打印、重放、面具等）的共性本质，而非特定采集条件下的表面纹理。
 
@@ -147,8 +141,6 @@ TeG-DG 的核心设计动机在于：传统域泛化方法从视觉特征中提�
 $$\mathcal{L}_{\text{TeG-DG}} = \mathcal{L}_{\text{CLS}} + \lambda \mathcal{L}_{\text{TRI}}$$
 
 **关键设计要点**：文本模态仅在训练阶段作为正则化器参与，推理阶段完全丢弃，视觉分支独立完成前向推理。这使得 TeG-DG 在不增加部署复杂度的前提下，利用文本的跨域抽象能力显著提升了域泛化性能。消融实验（Table 4）证实，移除 TEVD 的文本对齐组件对性能的损害大于移除三元组损失，验证了文本监督在整个框架中的核心地位。
-
-
 
 TeG-DG 的核心架构围绕一个关键洞察展开：**文本描述作为一种跨域通用的抽象表达，能够为视觉特征学习提供域不变的监督信号**，从而过滤掉光照、采集设备等残余风格偏差。整个框架由三个紧密协作的模块构成：Text Prompter（TP）负责动态生成配对文本，Hierarchical Attention Fusion（HAF）提取多粒度视觉特征，Textual-Enhanced Visual Discriminator（TEVD）通过跨模态对齐实现域泛化。
 
@@ -221,16 +213,6 @@ $$\mathcal{L}_{\mathrm{TeG-DG}} = \mathcal{L}_{\mathrm{CLS}} + \lambda \mathcal{
 
 值得注意的是，TeG-DG 的训练依赖攻击类型标签来构建匹配/非匹配文本对。当细粒度标签不可用时，这一前提可能构成实际部署的瓶颈。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1502_https_arxiv_org_abs_2311_18420/figures/004_Figure_4.jpg]]
-*Figure 4: Illustration of the designed Hierarchical Attention Fusion (HAF) module. The proposed HAF is a lightweight plug-and-play module that can be easily integrated into mainstream ViT models*
-
-![[assets/figures/papers/paper_list_l1502_https_arxiv_org_abs_2311_18420/figures/005_Figure_5.jpg]]
-*Figure 5: The proposed textual-enhanced visual discriminator (TEVD). TEVD consists of a vision-language triplet loss and a multi-modal classifier*
-
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -287,30 +269,14 @@ $$\mathcal{L}_{\mathrm{TeG-DG}} = \mathcal{L}_{\mathrm{CLS}} + \lambda \mathcal{
 
 **Table 6** 对比了不同视觉-语言基线方法，结果表明简单的对比损失或线性分类头无法替代TeG-DG精心设计的多模态分类器和三元组损失的组合效果。此外，附录中的 **Figure 14–17** 展示了文本提示数量对HTER/AUC的影响曲线：提示数量过少时文本覆盖不足，过多时可能引入噪声，存在一个协议相关的最优区间。当前方法从固定库中随机采样，尚未实现自适应选择，这是论文明确指出的局限性之一。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1502_https_arxiv_org_abs_2311_18420/figures/006_Table_1.jpg]]
-*Table 1: Test HTER (↓) and AUC (↑) of FAS methods on OIMC datasets. The * indicates using the CelebA-Spoof [83] as the supplementary source dataset (bold indicates best performance, underline indicates second best performance.)*
-
-![[assets/figures/papers/paper_list_l1502_https_arxiv_org_abs_2311_18420/figures/008_Table_3.jpg]]
-*Table 3: Zero-shot and few-shot performance evaluated on Leave-One-Out (LOO) protocol*
-
 ![[assets/figures/papers/paper_list_l1502_https_arxiv_org_abs_2311_18420/figures/009_Table_4.jpg]]
 *Table 4: Evaluations of different components of the proposed TeG-DG framework*
 
 ![[assets/figures/papers/paper_list_l1502_https_arxiv_org_abs_2311_18420/figures/010_Figure_6.jpg]]
 *Figure 6: The Grad-CAM [59] visualizations of our TeG-DG method under protocol O&M&I to C*
 
-![[assets/figures/papers/paper_list_l1502_https_arxiv_org_abs_2311_18420/figures/011_Figure_7.jpg]]
-*Figure 7: The t-SNE feature visualization on O&M&I to C. We plot the visual feature distribution w/ and w/o TeG-DG*
-
-![[assets/figures/papers/paper_list_l1502_https_arxiv_org_abs_2311_18420/figures/013_Figure_8.jpg]]
-*Figure 8: CLIP model lacks the knowledge of FAS tasks*
-
 ![[assets/figures/papers/paper_list_l1502_https_arxiv_org_abs_2311_18420/figures/014_Table_6.jpg]]
 *Table 6: Comparison to Baseline Method. ‘(Linear)’ means only using a linear classification head*
-
-
 
 ## 定位与知识库关联
 
@@ -359,8 +325,6 @@ TeG‑DG 的设计在以下条件下展现出显著优势：
 - 能否将文本监督与传统的**域对齐或对抗训练方法结合**，形成互补——文本提供语义级不变性，对抗训练提供统计级不变性？
 - 在攻击类型标签不可用的场景下，是否可以利用**弱监督或半监督方式**（如聚类伪标签、多模态大模型的零样本推理）自动生成文本描述？
 - 如何在**推理阶段保留文本模态的优势**，例如通过测试域的无标签文本描述（设备信息、场景元数据）进行测试时自适应？
-
-
 
 ## 原文 PDF
 

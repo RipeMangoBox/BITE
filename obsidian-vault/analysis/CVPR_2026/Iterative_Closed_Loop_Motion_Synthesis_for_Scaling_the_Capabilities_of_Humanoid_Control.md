@@ -58,15 +58,11 @@ claims:
 - 消融实验证实，完整的 VLM+物理指标联合观察、可变提示库以及迭代反馈机制三者均对性能有显著贡献（Table 3）。
 - 数据难度随迭代轮次单调递增：第三方跟踪器 PHC+ 在后续循环数据上的成功率持续下降（Loop0: 75.3% → Loop6: 53.6%），且合成运动的速度分布展现出更高的峰值和更宽的尾部（Table 5, Figure 10），验证了竞争迭代课程的有效性。
 
-
-
 人形机器人的全身控制长期依赖从运动捕捉数据集中学习跟踪策略。以 **PHC**（Luo et al., ICCV 2023）为代表的单基元跟踪器在 AMASS 等固定数据集上取得了显著进展，但其性能上限受制于训练数据的固有难度分布——AMASS 以日常动作为主，缺乏武术、体操等高动态专业运动样本。**核心瓶颈在于：** 固定数据集的难度天花板锁死了控制器能力的扩展空间，而获取专业高动态运动数据需要昂贵的动捕设备和专业表演者，难以规模化。
 
 现有数据增强方法面临两难：随机提示合成的运动缺乏专业语义约束，生成质量不可控；而手工设计运动课程不仅耗时，且无法根据控制器实时表现自适应调整难度。这引出了一个关键问题——**能否构建一个闭环系统，使数据生成难度随控制器能力同步提升，从而在无昂贵动捕数据的情况下持续扩展技能边界？**
 
 本文提出的 **CLAIMS**（Closed-Loop Automated Iterative Motion Synthesis）框架正是对这一问题的回答。其核心思路是：将控制器训练与数据生成耦合为一个竞争迭代过程——控制器在合成数据上训练后，多模态反馈（物理指标 + VLM 主观评分）驱动大语言模型策略从专业提示库中选择或生成更高难度的动作描述，进而合成更具挑战性的运动序列，形成“控制器变强 → 数据变难 → 控制器更强”的正反馈循环。这一设计使训练数据的难度分布随控制器能力自适应演进，突破了固定数据集的天花板效应。
-
-
 
 ## 核心方法与创新机理
 
@@ -93,8 +89,6 @@ claims:
 ### 4. 效率优势：数据规模与性能的脱钩
 
 CLAIMS 在仅使用约 1/10 AMASS 数据量（不足 400 条训练序列）的情况下，使 PHC 单基元跟踪器在 2201 片段测试集上的平均失败率较 AMASS 基线降低 45%（成功率 76.9% vs 58.3%, Table 1），且从 Loop1 起即超越基线（64.0% vs 58.3%），后续循环持续提升至 Loop6 的 76.9%。这一结果打破了“更多数据 = 更好性能”的惯性假设，证明**数据质量与难度分布的针对性优化比数据规模更关键**。
-
-
 
 CLAIMS (Closed-Loop Automated Iterative Motion Synthesis) 是一个闭环自动化框架，其核心机制在于让运动数据生成与控制器训练形成共同进化：控制器在合成数据上获得跟踪能力，而其失败模式与物理指标又反向驱动数据生成器产出更具挑战性的专业动作，从而持续扩展控制器的技能边界（Fig. 1）。
 
@@ -133,26 +127,15 @@ CLAIMS 在方法谱系上属于**数据-控制器共同进化的闭环训练范�
 
 关键创新在于将**领域先验编码**（可变提示库）、**多模态反馈融合**（物理指标+VLM）与**竞争迭代课程**三者耦合，形成自适应的能力扩展机制，而非单纯依赖生成模型或强化学习算法的改进。
 
-
-
 CLAIMS 框架由五个核心模块构成，形成“提示生成→运动合成→物理/语义过滤→强化学习跟踪→多模态反馈”的闭环迭代管线（Figure 1, Figure 5）。
-
-![[assets/figures/papers/paper_list_l32_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_Iterative_Closed_Lo/figures/005_Figure_5.jpg]]
-*Figure 5: Schematic Diagram of the Automated Iterative Loop*
 
 ### 3.1 难度感知提示库
 
 该模块定义了五类专业运动域（武术、舞蹈、战斗、体育、体操）和四个组合轴（如速度、幅度、复杂度等），构成可变提示模板库 $\mathcal{L}$ 和 $\mathcal{T}$（Figure 2）。其核心作用是将“运动专业性”和“难度”形式化为可组合的语言提示，为后续的难度升级提供结构化搜索空间。
 
-![[assets/figures/papers/paper_list_l32_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_Iterative_Closed_Lo/figures/002_Figure_2.jpg]]
-*Figure 2: Difficulty-aware variable library across five domains and four compositional axes*
-
 ### 3.2 MDM 运动生成器与过滤
 
 给定文本提示 $a_k^j$，运动扩散模型 **MDM**（使用 DistilBERT 编码器）合成运动序列 $q_k^j = G(a_k^j)$。随后，物理过滤器剔除根节点浮动、下沉或肢体穿透的无效运动；VLM 过滤器评估提示-运动语义对齐度，仅保留对齐充分的样本。该模块确保合成数据的物理合理性和语义保真度（Figure 3）。
-
-![[assets/figures/papers/paper_list_l32_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_Iterative_Closed_Lo/figures/003_Figure_3.jpg]]
-*Figure 3: Prompt-to-prompt data generation*
 
 ### 3.3 基于强化学习的物理跟踪器
 
@@ -203,8 +186,6 @@ Algorithm 1: LLM-Driven Competitive Dataset–Controller Iteration
 
 **关键机制**：Gemini CoT 策略作为“难度调度器”，在每轮迭代中融合物理指标和 VLM 语义反馈，从提示库中选择更具挑战性的动作描述，驱动生成器产出更高难度的运动数据，实现控制器能力与数据难度的共同进化。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -243,12 +224,6 @@ CLAIMS 框架在多个第三方测试集上展现出显著的性能优势。在�
 
 进一步的速度分布分析（Figure 10）显示，CLAIMS 生成数据的关节速度分布相较 AMASS 具有更高的峰值和更宽的尾部，表明合成数据包含更多高动态片段。循环间的速度趋势（Figure 6）也显示，Qwen 评估的难度评分与运动速度随迭代轮次单调上升。这些证据共同确认了竞争迭代课程成功地、自动化地提升了数据难度。
 
-![[assets/figures/papers/paper_list_l32_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_Iterative_Closed_Lo/figures/013_Figure_10.jpg]]
-*Figure 10: The velocity distribution of AMASS and ours*
-
-![[assets/figures/papers/paper_list_l32_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_Iterative_Closed_Lo/figures/006_Figure_6.jpg]]
-*Figure 6: Loop-wise Difficulty and Speed Trends of Qwen Evaluations*
-
 ### 运动分布与领域先验
 
 t-SNE 可视化（Figure 7a）表明，基于专业提示库合成的武术运动与专业参考数据集（Motion-X/Kungfu）在流形上高度重叠，而随机提示生成的运动则分散在外围区域。在全数据集对比中（Figure 7b），CLAIMS 生成的运动覆盖了 AMASS 未触及的高动态区域，同时避免了随机提示的离散分布。这验证了难度感知可变提示库有效编码了领域先验，使合成运动在保持专业语义的同时扩展了分布覆盖。
@@ -257,15 +232,8 @@ t-SNE 可视化（Figure 7a）表明，基于专业提示库合成的武术运�
 
 尽管 CLAIMS 展现出显著的性能增益，论文明确指出以下局限：首先，当前使用的 MDM 生成模型在极端高动态动作（如连续空翻、高速旋转）上的合成容量有限，导致课程后期难度升级的边际收益递减。其次，手动构建的提示库缺乏客观校准与完整覆盖，可能遗漏某些动作子空间。框架的模块化设计允许未来替换更强的生成模型和自动化构建多模态提示库来缓解这些问题，但当前版本在这些边界条件下仍存在性能瓶颈。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l32_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_Iterative_Closed_Lo/figures/012_Table_3.jpg]]
 *Table 3: Ablation study on success rate across different test sets and loops*
-
-![[assets/figures/papers/paper_list_l32_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_Iterative_Closed_Lo/figures/004_Figure_4.jpg]]
-*Figure 4: Competitive iteration between the controller and the dataset*
-
-
 
 ## 定位与知识库关联
 
@@ -326,8 +294,6 @@ CLAIMS 处于**物理角色控制 × 运动生成 × 课程学习**的交叉点�
 - **相对于课程学习**：CLAIMS 的竞争迭代课程区别于传统的预定义难度排序，其难度升级由多模态反馈（物理指标 + VLM 语义评估）自适应驱动，属于**闭环自适应课程**的新范式。
 
 该工作的核心启示在于：**当数据获取成本高昂时，闭环自动化生成与自适应难度升级可作为扩展控制器能力的有效替代路径**，其模块化设计为后续研究提供了可插拔的框架基础。
-
-
 
 ## 原文 PDF
 

@@ -71,8 +71,6 @@ BioCoach 的核心洞察在于：**构建显式、可解释的中间表征——
 
 定性对比中，BioCoach 在深蹲练习中产生相位对齐、解剖学精确的指示（如“肩屈 160°–170°”），而 Stream-VLM 输出泛化且时机错误的评论，进一步验证了生物力学接地的实际价值。
 
-
-
 ### 问题背景
 
 健身教练的核心价值在于提供**时机精准、解剖学准确且具有量化指导意义的反馈**——例如，在深蹲底部提醒“肩屈角度应保持在160°–170°”，而非笼统地说“保持姿势”。然而，现有的视觉-语言模型（VLM）在健身教练场景中面临一个根本性瓶颈：它们仅依赖像素级视觉特征进行模式匹配，缺乏对三维人体运动学和生物力学约束的显式建模，导致生成的反馈内容通用、缺乏解剖学精度，且时机把握不准。
@@ -104,8 +102,6 @@ BioCoach 的核心洞察在于：**构建显式、可解释的中间表征——
 4. **通过交叉注意力融合视觉与生物力学信息**：将形态测量上下文与视觉特征进行交叉注意力融合，同时将运动质量上下文作为结构化指令前置注入语言模型，使生成的反馈直接锚定于运动学证据。
 
 这一设计将生物力学知识从隐式的模型参数中“提取”出来，转化为显式的结构化表征，使语言模型能够基于可验证的运动学事实生成反馈，而非依赖统计相关性进行猜测。实验表明，这一范式转变在QEVD-bio-fit-coach上带来了METEOR提升262.8%（0.086→0.312）、LLM-Bio-Acc提升89.5%（1.72→3.26）的显著增益。
-
-
 
 ## 核心方法与创新机理
 
@@ -161,8 +157,6 @@ BioCoach仅微调交叉注意力层与DoF选择网络，冻结视觉骨干和LLM
 
 BioCoach的创新核心不在于引入更复杂的深度学习架构，而在于**构建了显式、可解释的中间表征层**——关节选择、形态数据、违规分析——将生物力学领域知识结构化地注入语言生成流程。这使得模型输出从“看起来合理的描述”跃迁为“有解剖学依据的精准反馈”。定量证据（Table 1）表明，在QEVD-bio-fit-coach基准上，BioCoach相较Stream-VLM在METEOR提升262.8%（0.086→0.312）、LLM-Bio-Acc提升89.5%（1.72→3.26），验证了这一范式的有效性。
 
-
-
 BioCoach 提出了一种**视觉-生物力学双模态融合的三阶段流水线**，旨在将显式的三维骨骼运动学与生物力学约束注入视觉语言模型，从而生成具有解剖学精度和时序对齐的健身教练反馈。其核心设计理念是：**构建可解释的结构化中间表征**——包括运动特定关节选择、个体形态测量数据和运动质量违规分析——使语言生成有据可依，而非仅依赖像素级模式匹配。
 
 ### 双模态特征提取
@@ -197,8 +191,6 @@ BioCoach 提出了一种**视觉-生物力学双模态融合的三阶段流水�
 ### 训练策略
 
 为保持预训练知识的完整性，BioCoach 冻结视觉骨干和语言模型骨干，仅微调交叉注意力层和 DoF 选择网络。训练采用两项损失：对动作 token 降权的自回归交叉熵损失 $\mathcal{L}_{\mathrm{CE}}$（鼓励及时反馈），以及关节选择的二元交叉熵损失 $\mathcal{L}_{\mathrm{DoF}}$。
-
-
 
 BioCoach 的核心设计理念是将生物力学原理显式化为可解释的中间表征，使语言生成有据可依。其流水线由五个关键模块构成，各模块通过结构化表征逐步将原始视频信号转化为生物力学接地的教练反馈。
 
@@ -274,8 +266,6 @@ $$\mathcal{L}_{\mathrm{CE}} = -\sum_{t=1}^{N-1} w_{x_{t+1}} \log P(x_{t+1} \mid 
 
 训练策略上，仅微调交叉注意力层与 DoF 选择网络，冻结视觉骨干与语言模型骨干，在保持预训练能力的同时实现高效的生物力学接地。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -334,24 +324,17 @@ $$\mathcal{L}_{\mathrm{CE}} = -\sum_{t=1}^{N-1} w_{x_{t+1}} \log P(x_{t+1} \mid 
 4. **自动评估的生态效度未验证**：LLM-Bio-Acc.指标依赖LLaMA-3-70B-Instruct，与人类教练评估的一致性未经实证检验。该指标对细微生物力学错误（如2°–3°的角度偏差）可能不敏感。
 5. **未进行真实用户研究**：所有评估仅通过自动指标和LLM评判完成，缺少用户接受度、反馈频率适宜性等实际部署维度的验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2389_https_arxiv_org_abs_2603_26938/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison with existing methods. Top: prior pixel-only VLM methods provide generic, loosely timed comments. Bottom: BioCoach fuses visual features with 3D skeletal kinematics and a biomechanics module to produce phase-aligned, anatomy-specific, quantitative cues (e.g., shoulder flexion*
 
 ![[assets/figures/papers/paper_list_l2389_https_arxiv_org_abs_2603_26938/figures/004_Table_1.jpg]]
 *Table 1: Evaluation on the QEVD-bio-fit-coach, a newly created benchmark with fine-grained biomechanical ground-truth feedback annotations. Second line in each cell shows % improvement vs. Stream-VLM [32]. LLM-Bio-Acc. is our LLM-as-judge metric tailored to biomechanics, assessing the biomechanical correctness and specificity of generated feedback*
 
-![[assets/figures/papers/paper_list_l2389_https_arxiv_org_abs_2603_26938/figures/005_Table_2.jpg]]
-*Table 2: Performance on the QEVD-fit-coach with original feedback annotations. Parenthesized values are % change vs. the best baseline (Stream-VLM [32]). † zero-shot without fine-tuning*
-
 ![[assets/figures/papers/paper_list_l2389_https_arxiv_org_abs_2603_26938/figures/006_Table_3.jpg]]
 *Table 3: Ablation study on QEVD-Bio-Fit-Coach. Each row removes or modifies one component while keeping others fixed*
 
 ![[assets/figures/papers/paper_list_l2389_https_arxiv_org_abs_2603_26938/figures/007_Figure_4.jpg]]
 *Figure 4: Qualitative timeline for a squat exercise. BioCoach produces temporally aligned, biomechanics-grounded cues with consistent phase tracking, while Stream-VLM outputs generic or mistimed feedback inconsistent with the ground-truth annotations*
-
-
 
 ## 定位与知识库关联
 
@@ -420,8 +403,6 @@ BioCoach 的设计假设和实验覆盖范围定义了其当前适用边界：
 3. **跨领域迁移**：框架能否推广到康复训练（需处理病理运动模式）或体育技能评估（需处理更高维度的运动复杂度）？
 4. **边缘部署可行性**：在资源受限设备上实时运行（包括三维姿态估计和 LLM 推理）的工程挑战如何解决？
 5. **人机交互维度**：个性化纠偏的反馈频率与用户接受度之间的关系如何？过度纠正是否会导致用户抵触或信息过载？
-
-
 
 ## 原文 PDF
 

@@ -70,8 +70,6 @@ Hydra-NeXt 提出了一种**多分支规划框架**，在开环训练范式内�
 
 Hydra-NeXt 属于**端到端开环训练、闭环部署**范式，其核心创新在于将控制预测与运动学可行的轨迹细化显式纳入开环训练框架，从而在不依赖强化学习专家或特权信息的前提下，显著提升闭环驾驶的鲁棒性。相较于依赖专家特征蒸馏的 DriveAdapter 和纯轨迹预测的 VAD、UniAD 等基线，Hydra-NeXt 通过多分支联合优化实现了对动态交互和物理约束的显式建模，同时保持了开环训练的数据效率优势。
 
-
-
 ### 端到端自动驾驶的闭环困境
 
 端到端（End-to-End, E2E）自动驾驶方法近年来取得了显著进展，但其训练范式与部署环境之间存在根本性鸿沟。当前主流方法采用**开环训练**策略：模型从离线驾驶数据中学习预测轨迹路点，随后通过PID控制器将其转换为车辆控制信号。这种范式虽然在感知-规划一体化建模上展现出优势，却忽视了闭环驾驶中两个关键因素——**动态交互**与**运动学约束**。
@@ -96,8 +94,6 @@ Figure 2 展示了从 Hydra-MDP 到 Hydra-NeXt 的演进路线：Hydra-MDP 通�
 3. 如何将轨迹层面的全局规划与控制层面的局部响应有效融合？
 
 Hydra-NeXt 的设计正是围绕这些问题展开，其核心洞察是：**通过在开环训练中联合优化轨迹、控制和运动学可行的轨迹细化，可显著提升闭环驾驶性能而不依赖强化学习专家**。
-
-
 
 ## 核心方法与创新机理
 
@@ -128,8 +124,6 @@ Hydra-NeXt 的核心创新在于通过**多分支规划架构**与**运动学约
 这种融合机制将轨迹解码器的全局路由能力与控制解码器及扩散策略的局部响应能力有机结合，使 Hydra-NeXt 在 CARLA v2 协议下达到 65.89 DS 和 48.20% SR，较前 SOTA DriveAdapter 分别提升 22.98 和 17.49（Table 1）。
 
 **需注意的局限**：扩散策略的迭代去噪带来推理延迟（DDPM 下 528ms），虽然通过 DDIM + Flash-attention 优化可降至 243ms（Table 11），但仍可能影响实时闭环运行。此外，该方法对交通标志响应等细粒度规则遵守表现不理想，存在过拟合开环数据分布的风险。
-
-
 
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2503_12030/figures/002_Figure_2.jpg]]
 *Figure 2: Roadmap from Hydra-MDP to Hydra-NeXt . DriveAdapter [26] was the previous state-of-the-art method on the Bench2Drive benchmark*
@@ -171,8 +165,6 @@ $$\mathcal{L} = \mathcal{L}_{traj} + \mathcal{L}_{ctrl} + \mathcal{L}_{dp}$$
 ### 架构全景
 
 Figure 3 展示了 Hydra-NeXt 的完整数据流：感知网络 → 多头运动解码器（轨迹解码器 + 控制解码器）→ 轨迹细化模块（扩散策略 + 运动学模型 + 最近邻匹配）→ 最终控制信号 $C^*$。Figure 2 则从 Hydra-MDP 出发，逐步叠加控制解码器和轨迹细化模块，展示了各组件带来的累积性能增益，最终超越前闭环 SOTA **DriveAdapter**。
-
-
 
 Hydra-NeXt 的核心由三个可端到端联合优化的模块构成：**轨迹解码器（Trajectory Decoder）**、**控制解码器（Control Decoder）** 与**轨迹细化网络（Trajectory Refinement Network）**。三者共享同一感知网络提取的环境 token 序列 $F_{env}$，但分别解决规划中的不同瓶颈——路由规划、高频响应与运动学可行性。
 
@@ -228,8 +220,6 @@ $$\mathcal{L} = \mathcal{L}_{traj} + \mathcal{L}_{ctrl} + \mathcal{L}_{dp}$$
 
 这一联合优化使得轨迹规划、高频控制响应与运动学可行细化三者协同进化，无需依赖强化学习专家的在线交互即可显著提升闭环驾驶性能。
 
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -267,33 +257,15 @@ Table 5进一步拆解轨迹细化中的策略选择。移除扩散策略而仅�
 
 Table 6显示，将扩散策略频率从2Hz提升至10Hz带来DS约+3.94和SR约+9.15的显著增益，验证了高频控制在闭环环境中的必要性。Table 7表明，增加扩散提案数量N（5→20）对DS提升有限（约0.5），SR甚至略有波动下降，说明最近邻匹配机制在少量提案下已能有效选择高质量候选。
 
-![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2503_12030/figures/008_Table_7.jpg]]
-*Table 7: Ablation of the Proposal Number N in Trajectory Refinement*
-
 ### 推理效率与加速策略
 
 Table 8对比了各方法的推理延迟。Hydra-NeXt在RTX 3090上的延迟为528ms（DDPM），高于VAD但低于UniAD和DriveAdapter（后两者在A100/A6000上测试，需注意硬件差异）。Table 11显示，将DDPM替换为DDIM并配合Flash-attention，延迟可降低53%至243ms，且性能几乎无损。这为实时部署提供了可行路径，但243ms的延迟在高速场景下仍可能构成瓶颈。
-
-![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2503_12030/figures/010_Table_8.jpg]]
-*Table 8: Analysis of Runtime Efficiency. The latency of Hydra-NeXt and VAD are benchmarked on an NVIDIA RTX 3090, while UniAD and DriveAdapter are on NVIDIA Tesla A100 and A6000, respectively. F refers to Flash-attention [11] for acceleration*
-
-![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2503_12030/figures/013_Table_11.jpg]]
-*Table 11: Efficiency of Different Diffusion Schedulers. * denotes Flash-attention [11]*
 
 ### 失败模式与局限性
 
 1. **交互响应滞后**：尽管控制解码器提升了反应速度，但与使用特权输入的RL专家（如Think2Drive）相比，Hydra-NeXt在密集交互场景中仍有明显差距。扩散策略的迭代去噪过程（即使优化后243ms）可能加剧这一问题。
 2. **规则遵守不足**：交通标志响应和特勤车辆避让表现不佳，暗示开环训练的规则指标蒸馏可能过拟合训练分布，缺乏对罕见但关键场景的泛化。
 3. **专家数据依赖**：Table 12显示，使用不同专家数据（Think2Drive vs PDM-Lite）训练的模型性能存在差异，表明框架对专家数据分布敏感，更换数据源需重新调整组件。
-
-![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2503_12030/figures/014_Table_12.jpg]]
-*Table 12: Performance of Models Trained with Different Experts. †Ensemble of three models trained with different seeds*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2503_12030/figures/004_Table.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -346,8 +318,6 @@ Hydra-NeXt 的开环训练范式为闭环驾驶提供了新的基准，但也引
 4. **分支间信息交互**：当前控制解码器与轨迹解码器独立预测，仅在最终阶段通过最近邻匹配融合。是否存在更优的中间层特征共享或交叉注意力机制，使两分支协同更紧密？
 
 5. **跨仿真器可迁移性**：该方法能否无缝迁移至 CARLA 3.0 或其他高保真仿真环境？运动学模型参数的自适应标定与感知网络的域适应是潜在的技术挑战。
-
-
 
 ## 原文 PDF
 

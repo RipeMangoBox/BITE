@@ -150,8 +150,6 @@ MoCa 的整体架构由两个并行分支构成：**ReferenceNet** 和 **Denoisi
 
 **需要人工验证**：论文未明确披露 ReferenceNet 与 DenoisingNet 之间特征交互的具体层级和维度细节，上述数据流描述基于 Figure 2 的架构概览推断，建议对照原文方法部分确认。
 
-### 补充图表
-
 MoCa 围绕对象一致性建模这一核心洞察，构建了三个关键模块：**相机条件模块**（视图一致性）、**语义引导策略**（外观一致性）和**对象感知运动解耦**（运动一致性）。这三个模块通过一个双分支框架（ReferenceNet + DenoisingNet）协同工作，将 3D 场景中平滑相机运动所隐含的空间关系，通过 2D 投影中的一致性约束反向注入生成过程。
 
 ### 3.1 相机条件模块：Plücker 嵌入与时空编码
@@ -246,8 +244,6 @@ Figure 5 展示了相机运动与文本指定的对象运动方向发生冲突�
 ### 6. 总结
 
 MoCa 通过 Plücker 嵌入建立几何可解释的相机-像素对应，通过语义引导策略稳定对象外观，通过高频分解实现相机与对象运动的解耦，在静态和动态场景下均取得了领先的视频质量和对象一致性。消融实验证实，三个组件缺一不可，且交叉注意力融合是连接相机条件与视觉特征的最优方式。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_DZcpnudp7f/figures/012_Figure_10.jpg]]
 *Figure 10: More qualitative comparison between our method and existing approaches*

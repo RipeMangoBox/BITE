@@ -78,8 +78,6 @@ SF-VAE 的方法定位可以从以下维度理解：
 
 消融实验进一步表明，嵌入维度 D=32 达到质量与压缩的最优平衡，仅使用 2% 的训练样本即可接近全量性能，子流形场点云采样数 $P=12^2$（144 点）提供最佳效率-质量权衡。
 
-
-
 ### 3D 高斯泼溅的参数化困境
 
 三维高斯泼溅（3D Gaussian Splatting, 3DGS）已成为新视角合成与场景重建的主流表示。其核心思想是将场景分解为一组各向异性的三维高斯原语，每个原语由一组参数 $\pmb \theta = \{ \mu , \mathbf q , \mathbf s , \mathbf c , o \}$ 描述，分别对应位置、旋转四元数、尺度、球谐系数和不透明度。这些参数通过
@@ -111,8 +109,6 @@ $$\mathrm { C o l o r } _ { i } ( \mathbf { d } ) = \left[ \mathrm { S H } _ { i
 ### 本文动机
 
 本文的核心洞察是：**在保留底层颜色和几何结构的前提下，通过构造一个唯一且数值同质的中间表示空间，可以从根源上消除参数空间的嵌入冲突**。具体而言，本文提出将每个高斯原语替换为其等概率椭球面上的**子流形场**（Submanifold Field）——一个定义在二维子流形上的连续颜色场。该表示被证明是**单射且唯一**的（Proposition 2），从而确保了一对一的域对应关系，同时将异构的参数组件统一为同质的彩色点云，为后续的神经网络学习提供了数值稳定、语义一致的输入空间（如 Figure 1 紫色部分所示）。
-
-
 
 ## 核心方法与创新机理
 
@@ -167,8 +163,6 @@ $$\mathrm { C o l o r } _ { i } ( \mathbf { d } ) = \left[ \mathrm { S H } _ { i
 | 解码恢复 | 直接输出参数 | 隐式函数 + PCA/SH 拟合 | 保持几何一致性 |
 | 训练数据 | 领域数据集 | 随机生成 | 实现领域无关的泛化 |
 
-
-
 SF‑VAE 的核心设计动机源于一个关键瓶颈：**原始高斯参数表示 θ = {μ, q, s, c, o} 存在非唯一性（四元数符号歧义、几何对称性、旋转‑球谐相互作用）和数值异质性（各组件尺度与分布差异巨大），导致神经网络学习不稳定、泛化差**。为从根本上消除这一瓶颈，SF‑VAE 将表示空间从“参数域”迁移到“子流形场域”，并围绕该新表示构建完整的编码‑解码管线。
 
 ### Pipeline 总览
@@ -211,16 +205,6 @@ $$
 - **单原语层级训练**：编码器仅处理单个高斯原语，训练数据采用随机生成的高斯原语数据集，使模型本身领域无关，从而天然支持跨域泛化（ShapeSplat ↔ Mip‑NeRF 360）。
 - **公平性控制**：所有比较模型具有相近的参数量（约 0.62M–0.66M），采用相同的自实现编码器‑解码器框架，仅输入表示不同，以隔离表示选择的影响。
 - **效率优化**：子流形场点云采样数 P = 12²（144 点）提供最佳效率‑质量权衡；GPU 上的参数拟合模块实现约 85 倍加速，质量损失可忽略。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_NvpVtGG6hk/figures/001_Figure_1.jpg]]
-*Figure 1: A scene of N Gaussian primitives can be represented by N sets of parameters θ (shown in pink). Data in this parametric space resides on different manifolds and is heterogeneous and non-Euclidean, introducing challenges for encoders to fit disparate data manifolds implicitly. Shown in purple is the proposed representation, instead of relying on Gaussian parameterization, we introduce a canonical submanifold field space (M, F ) that uniquely represents a Gaussian primitive with an iso-probability surface*
-
-![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_NvpVtGG6hk/figures/002_Figure_2.jpg]]
-*Figure 2: To embed the proposed submanifold field representation into a vector form suitable for neural networks, we devise a Submanifold Field Variational Auto-encoder (SF-VAE) that embeds any input submanifold field as a 32-D vector, then reconstructs the original parameter set*
-
-
 
 ### 3.1 原始参数空间的非唯一性问题
 
@@ -315,8 +299,6 @@ $$
 - **嵌入维度** $D=32$：维度行为研究表明 32 维是重建质量与压缩率之间的最优折中点。
 - **训练数据**：模型在随机生成的高斯原语数据集上训练，使其天然具有领域无关性，仅需 2% 的训练样本即可接近全量性能。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -379,9 +361,6 @@ Figure 7 系统考察了三个关键设计选择（均在 Mip‑NeRF 360 上测�
 
 Figure 5 展示了基于嵌入的无监督图聚类结果。相比原始高斯参数和参数 VAE 嵌入，SF 嵌入能更好地保留细粒度语义结构，聚类结果中相同语义部件（如椅腿、椅背）被更清晰地归为一组，表明学习到的表示在下游分析任务中具有实用价值。
 
-![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_NvpVtGG6hk/figures/007_Figure_5.jpg]]
-*Figure 5: Unsupervised graph clustering based on raw Gaussian parameters and various embeddings. Submanifold field embeddings show better preservation of detailed semantics, showing its downstream applicability*
-
 ### 失败模式与局限
 
 尽管 SF‑VAE 在单原语层级取得了显著优势，其设计存在两个值得关注的局限：
@@ -390,8 +369,6 @@ Figure 5 展示了基于嵌入的无监督图聚类结果。相比原始高斯�
 2. **扩展性待验证**：虽然展示了跨域泛化，但所有实验均在静态场景上进行。在动态场景、非刚性形变或大规模城市场景下的表现尚未被检验，子流形场表示在这些设定下的鲁棒性和计算开销仍是开放问题。
 
 > **手动验证提示**：论文未提供与基于 NeRF 的隐式表示压缩方法（如 VQ‑VAE 系列）的直接对比。若需定位该方法在更广泛表示学习谱系中的相对优势，建议补充相关基线。
-
-
 
 ## 定位与知识库关联
 
@@ -435,8 +412,6 @@ Figure 5 展示了基于嵌入的无监督图聚类结果。相比原始高斯�
 3.  **子流形场表示的可扩展性**：当前的子流形场定义依赖于高斯的等概率椭球面，这天然适用于各向异性的高斯原语。但对于非各向同性的材质模型、参与物理仿真的介质，或需要更高阶几何描述的表示，子流形场框架是否可扩展？这涉及对“子流形”定义的泛化以及相应唯一性保证的重新证明。
 
 4.  **噪声鲁棒性的深层机理**：Figure 4 显示 SF 嵌入对加性噪声更鲁棒，嵌入空间的 M-Dist 随噪声增大的上升更平缓。这一现象的深层原因——是子流形场的几何正则性，还是 M-Dist 作为重建目标的平滑效应——值得进一步的理论分析，可能为鲁棒表示学习提供更一般的设计原则。
-
-
 
 ## 原文 PDF
 

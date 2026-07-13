@@ -54,8 +54,6 @@ claims:
 
 实验结果表明，Flash-DMD 在极低训练成本下实现了最优的少步生成质量。在 SDXL 4 步生成设定下，仅用 DMD2 约 2.1% 的训练成本（1000 步，TTUR=1），ImageReward 评分即达到 0.9740，超越 DMD2 的 0.8748；在 TTUR=2、8000 步时，MPS 评分达 12.71。跨架构验证中，基于 SD3-Medium 的 4 步 Flash-DMD 在 ImageReward 上以 1.0214 超越 28 步教师模型（1.0173）。在第二阶段联合强化学习后，PickScore 达到 0.2346，优于 Hyper-SDXL 的 0.2310。消融实验进一步证实：EMA 更新得分估计器在训练后期显著提升人类偏好评分，Pixel-GAN 对防止 RL 阶段模式坍塌至关重要，而 RL 损失与蒸馏损失的最佳更新频率比为 5:1。
 
-
-
 ### 少步生成：扩散模型加速的核心路径
 
 扩散模型（Diffusion Models）凭借其在图像生成质量上的卓越表现，已成为当前生成式建模的主流范式。然而，其迭代采样机制导致推理速度极慢——生成单张图像通常需要数十甚至上百次神经网络前向传播，这严重制约了其在实时交互场景中的应用。少步生成（Few-Step Generation）因此成为该领域的核心研究问题，目标是将推理步数压缩至4–8步，同时尽可能保持生成质量。
@@ -83,8 +81,6 @@ claims:
 2. **联合强化学习**：将偏好优化与蒸馏过程同时进行，而非分离为独立阶段。蒸馏损失提供的分布匹配约束天然充当RL的正则化器，有效抑制奖励黑客行为，使得RL精炼能够稳定地提升视觉保真度而非产生伪影。
 
 通过这两项设计，Flash-DMD旨在以DMD2仅约2–8%的训练成本，在4步生成设置下达到甚至超越原有方法的图像质量，并实现蒸馏与RL的协同增效。
-
-
 
 ## 核心方法与创新机理
 
@@ -129,8 +125,6 @@ Flash-DMD 将偏好优化与蒸馏过程**联合训练**，核心机制在于：
 
 联合训练中，RL 损失与分布匹配损失的最佳更新频率比为 5:1，可获得最高 ImageReward = 0.9808（Table 4）。Pixel-GAN 在此阶段至关重要——移除 Pixel-GAN 会导致 RL 阶段的模式坍塌和生成质量下降（Fig. 7）。
 
-
-
 Flash-DMD 是一个面向少步扩散模型蒸馏的两阶段联合训练框架，其核心设计思想是将分布匹配与感知质量增强按时间步解耦，并在第二阶段将强化学习精炼与蒸馏过程无缝融合。
 
 ### 两阶段训练流程
@@ -164,24 +158,8 @@ Flash-DMD 是一个面向少步扩散模型蒸馏的两阶段联合训练框架�
 
 整个框架在 SDXL 上仅需 DMD2 约 2.1% 的训练成本（TTUR=1, 1000 步）即可获得更高的人类偏好评分，在 SD3-Medium 上同样展现出跨架构的泛化能力（Table 2）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2287_https_arxiv_org_abs_2511_20549/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our proposed Flash-DMD. We decouple the distillation objective by timestep into a Diffusion Matching loss and an adversarial loss. During high-noise timesteps, the DMD loss enables rapid alignment with the teacher model, while at low-noise timesteps and on real images, Pixel-GAN loss is employed to enhance realism and texture details. This design achieves a more efficient distillation. Building upon this, we further introduce a reinforcement strategy specifically tailored for few-step distilled models, which seamlessly integrates with the distillation objective to achieve superior and more stable performance*
-
-![[assets/figures/papers/paper_list_l2287_https_arxiv_org_abs_2511_20549/figures/017_Figure_9.jpg]]
-*Figure 9: Qualitative results from Stage 1 of the 4-step Flash-DMD framework on SDXL. The model is trained with TTUR = 1 for 1,000 steps*
-
-![[assets/figures/papers/paper_list_l2287_https_arxiv_org_abs_2511_20549/figures/018_Figure_10.jpg]]
-*Figure 10: Qualitative results from Stage 1 of the 4-step Flash-DMD framework on SDXL. The model is trained with TTUR = 2 for 4,000 steps*
-
-![[assets/figures/papers/paper_list_l2287_https_arxiv_org_abs_2511_20549/figures/019_Figure_11.jpg]]
-*Figure 11: Qualitative results from Stage 2 of the 4-step Flash-DMD framework on SDXL. The model is initialized from the TTUR1-1k checkpoint and fine-tuned for 5,000 steps*
-
-![[assets/figures/papers/paper_list_l2287_https_arxiv_org_abs_2511_20549/figures/020_Figure_12.jpg]]
-*Figure 12: Qualitative results from Stage 1 of the 8-step Flash-DMD framework on SDXL. The model is trained with TTUR = 2 for 3,000 steps*
-
-
 
 Flash-DMD 的训练框架由两大阶段构成：第一阶段为**时间步感知的高效蒸馏**，第二阶段为**联合强化学习精炼**。其核心创新在于将分布匹配损失与对抗损失按时间步解耦，并通过稳定得分估计器消除梯度冲突，从而以极低训练成本实现少步生成的高保真度。
 
@@ -260,8 +238,6 @@ $$
 
 联合训练中，RL 损失与分布匹配损失的最佳更新频率比为 5:1，可获得最高的 ImageReward 评分（0.9808）。移除 Pixel-GAN 会导致 RL 阶段出现模式坍塌，进一步验证了第一阶段对抗训练对后续精炼的奠基作用。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -308,14 +284,6 @@ Fig. 5 对比了 DMD2 与 Flash-DMD 在 TTUR=2 下的训练稳定性。DMD2 在�
 - **Fig. 6**：EMA 更新在训练后期（4000+ 步）显著提升人类偏好评分。
 - **Fig. 7**：移除 Pixel-GAN 导致 RL 阶段模式坍塌，验证了对抗训练对 RL 正则化的必要性。
 
-![[assets/figures/papers/paper_list_l2287_https_arxiv_org_abs_2511_20549/figures/009_Figure_6.jpg]]
-*Figure 6: Evaluation results of Flash-DMD (ours) with or without EMA on ImageReward, PickScore, and HPSv2. The training steps range from 1,000 to 8,000. Both models are trained with a two-time scale update rule (TTUR). The generator and the score estimator are updated at a rate of 1:2, i.e., TTUR=2*
-
-![[assets/figures/papers/paper_list_l2287_https_arxiv_org_abs_2511_20549/figures/010_Figure_7.jpg]]
-*Figure 7: Evaluation results of Reinforcement Learning with and without pixel-GAN. Both models use 5:1 setting*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 与基线方法的关系
@@ -356,8 +324,6 @@ Flash-DMD 的设计在以下条件下展现出最佳性能：
 - **Q2（后期阶段）**：如何以更直接的方式精炼学生模型，以获得更好的视觉细节和感知保真度？这暗示联合 RL 框架仍有改进空间，例如引入更精细的奖励信号或多目标优化策略。
 
 此外，论文还提出了两个架构扩展方向的开放问题：将 Flash-DMD 的联合训练框架拓展到更大模型（如 SD3.5 Large）与视频生成任务；以及优化现有 LRM 以更好地适应少步蒸馏模型的高噪声时间步评估。这些问题的解决将决定 Flash-DMD 方法范式的生态位宽度。
-
-
 
 ## 原文 PDF
 

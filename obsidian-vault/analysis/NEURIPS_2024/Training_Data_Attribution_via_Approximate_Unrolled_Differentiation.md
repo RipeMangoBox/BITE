@@ -53,8 +53,6 @@ claims:
 
 **主要结果。** 在FashionMNIST数据集上，Source在单模型和多模型设置下的线性数据建模分数（LDS）分别达到0.46和0.53，显著优于影响函数的0.30和0.45（Table 2）。在非收敛和多阶段训练（RotatedMNIST、FashionMNIST-N）等挑战性设置中，Source始终优于所有隐式微分基线方法（Figure 7）。在子集移除反事实评估中，Source只需移除更少的训练样本即可翻转测试预测，优于其他TDA方法（Figure 8）。消融实验进一步表明，增加分段数可持续提升归因准确性，而在未完全收敛的线性模型上，Source相对于影响函数的优势随训练迭代次数减少而扩大（Figure 10）。
 
-
-
 ### 训练数据归因的核心问题
 
 现代机器学习模型的行为深受其训练数据的影响。当模型产生错误预测、偏见输出或意外行为时，一个根本性的问题是：**哪些训练样本对此负责？** 训练数据归因（Training Data Attribution, TDA）正是为了回答这一问题而生的技术方向。其核心目标是量化每个训练样本对模型在特定查询样本上预测结果的贡献，从而为数据调试、模型解释和可信AI提供基础工具。
@@ -84,8 +82,6 @@ $$\tau _ { \mathrm { I F } } ( z _ { q } , z _ { m } , \mathcal { D } ) : = \nab
 本文的核心洞察是：这一权衡并非不可调和。通过将训练过程划分为多个**平稳段**（stationary segments），并在每个段内近似梯度和Hessian的统计分布，可以将展开微分的计算简化为仅需少量检查点（checkpoints）的影响函数式公式。这一思路既保留了展开微分对优化轨迹信息的建模能力（学习率、优化器选择、训练阶段效应），又避免了存储全部中间变量的巨大开销。
 
 基于这一洞察，本文提出了**Source**（Segmented statiOnary UnRolling for Counterfactual Estimation）方法，旨在以可接受的计算成本，在更广泛的训练场景下提供比隐式微分方法更准确的反事实预测。
-
-
 
 ## 核心方法与创新机理
 
@@ -143,8 +139,6 @@ Source 在方法特性上相对隐式微分基线产生了以下关键变化：
 
 需要指出的是，Source 的分段平稳性假设并非在所有场景下都成立。当 Hessian 或梯度在训练过程中剧烈变化时，需要更多分段来修正近似误差，但这会增加计算成本。如何自动确定分段点仍是待解决的问题。此外，快速版本 Fast-Source 通过直接平均段内参数来进一步降低计算量，但归因准确性有所下降（见消融实验 Figure 9）。
 
-
-
 Source 的核心设计思想是将完整的训练轨迹划分为若干个**平稳段（segments）**，并在每个段内近似梯度和 Hessian 的统计分布为平稳的，从而将展开微分（unrolled differentiation）的计算简化为仅需少量模型检查点的影响函数式公式。这一设计从根本上解决了现有方法的两难困境：隐式微分方法（如影响函数）依赖最优解假设，无法处理非收敛或多阶段训练；而标准展开微分方法需要存储所有中间变量，计算和内存成本过高。
 
 ### 方法流程
@@ -194,8 +188,6 @@ Source 位于梯度归因方法谱系中展开微分与隐式微分的交汇点�
 | **分段平稳展开** | **Source**（本文） | 段内梯度/Hessian 平稳 | 中（$C$ 倍于影响函数） | 非收敛、多阶段训练 |
 
 Source 通过分段平稳性近似，保留了展开微分对优化轨迹信息（学习率、优化器选择、训练阶段效应）的敏感性，同时将计算和存储需求降至与隐式微分方法可比拟的水平。实验表明，当模型未完全收敛时，Source 相对影响函数的 LDS 优势随训练迭代次数减少而扩大（Figure 10 Right），验证了其在不完全优化场景下的独特价值。
-
-
 
 ### 问题形式化
 
@@ -261,8 +253,6 @@ $$\tau _ { \mathrm { S O U R C E } } ( z _ { q } , z _ { m } , \mathcal { D } ; 
 
 5. **归因分数合成**：按公式链式组合各段贡献，得到最终训练数据归因分数。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -307,8 +297,6 @@ Source在RTE文本蕴含任务中识别的正负影响样本具有可解释性�
 
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2405_12186/figures/027_Figure.jpg]]
 
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2405_12186/figures/028_Figure.jpg]]
-
 ### 局限性与失败模式
 
 **计算成本。** 相比同样使用EK-FAC近似的影响函数，Source的计算成本约为其C倍（C为所选检查点数量）。当C=6时已有明显额外开销，在大型模型上可能成为瓶颈。
@@ -316,25 +304,6 @@ Source在RTE文本蕴含任务中识别的正负影响样本具有可解释性�
 **对训练过程信息的依赖。** Source需要访问训练过程中的中间检查点及相应的超参数（学习率、迭代次数等）。在无法获取训练细节的场景中（如仅提供最终模型权重），隐式微分方法（如TRAK或影响函数）可能更适用。
 
 **分段平稳性假设的边界。** 当训练过程中Hessian或梯度发生剧烈变化时，分段平稳性假设可能不准确，需要更多分段来修正。如何自动确定分段点仍需进一步研究——当前方法依赖人工设定分段数和分段位置。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2405_12186/figures/007_Figure_6.jpg]]
-*Figure 6: Linear datamodeling scores (LDS) at α = 0.5 for Source (L = 3) and baseline TDA techniques on regression, image classification, text classification, and language modeling tasks. The error bars represent 95% bootstrap confidence intervals. (Results for Trak on WikiText-2 are omitted due to the lack of publicly available implementations for language modeling tasks.)*
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2405_12186/figures/013_Figure_10.jpg]]
-*Figure 10: (Left & Middle) Linear datamodeling scores (LDS) for various values of data sampling ratios α on linear regression and logistic regression tasks trained for 3 epochs. (Right) The LDS at $\alpha$ = 0 . 9 for models trained with varying numbers of epochs. The error bars show 95% bootstrap confidence intervals*
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2405_12186/figures/014_Figure_11.jpg]]
-*Figure 11: Linear datamodeling scores (LDS) on linear regression and logistic regression tasks for influence functions when TDA is performed on the optimal solution*
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2405_12186/figures/017_Figure.jpg]]
-*Figure: Top Positively Influential Images Top Negatively Influential Images*
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2405_12186/figures/018_Figure.jpg]]
-*Figure: Top Negatively Influential Images*
-
-
 
 ## 定位与知识库关联
 
@@ -404,8 +373,6 @@ $$\tau _ { \mathrm { S O U R C E } } ( z _ { q } , z _ { m } , \mathcal { D } ; 
 3. **与随机投影结合**：能否将 Source 与 TRAK 所用的随机投影技术结合，进一步降低高维参数空间中的存储和计算需求？
 4. **自适应优化器**：在 Adam 等自适应学习率优化器下，平稳性近似引起的偏差有多大？如何针对自适应优化器改进近似方案？
 5. **快速版本的理论分析**：Fast-Source 通过直接平均参数来减少计算，但归因准确性有所下降（Figure 9）。其理论误差界尚待建立。
-
-
 
 ## 原文 PDF
 

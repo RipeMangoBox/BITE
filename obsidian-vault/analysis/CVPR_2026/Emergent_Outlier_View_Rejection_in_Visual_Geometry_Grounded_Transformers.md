@@ -55,8 +55,6 @@ claims:
 
 **主要结果**：在Phototourism、ETH3D和On-the-Go等多个数据集上，RobustVGGT在不同噪声水平下均一致优于未过滤的VGGT基线及其他视图选择方法。例如，在Phototourism的Small噪声设置下，RobustVGGT-F将ATE从0.3068降至0.2641；在ETH3D上，Large模型将AbsRel从0.0403降至0.0319。该方法使用一个跨数据集共享的固定阈值（注意力阈值τ=0.05，特征相似度阈值τ=0.65），展现出良好的泛化性。
 
-
-
 ### 前馈式3D重建的瓶颈：隐式假设与真实场景的错配
 
 近年来，以 **VGGT**（Wang et al., CVPR 2025）为代表的前馈式视觉几何基础模型在3D重建领域取得了显著进展。这类模型通过Transformer架构直接从多视图图像集合中回归相机位姿与稠密深度图，无需传统的束调整（Bundle Adjustment）等迭代优化步骤，展现出极高的推理效率。然而，这一效率优势建立在一个隐含的前提之上——输入图像集合中的所有视图均来自同一场景且几何上相互一致。
@@ -86,8 +84,6 @@ VGGT并非完全没有噪声应对能力。如图2所示，VGGT在推理过程�
 具体而言，我们测量了VGGT所有层中干净视图与干扰视图在跨视图注意力图和特征相似度上的分离程度。如图3所示，这种分离随着网络深度的增加而持续增强，并在最后一层达到峰值——形成了一种“涌现性的噪声抑制”（emergent noise suppression）现象。图4进一步可视化了这一行为：在最后一层的注意力图和特征相似度图中，干扰视图（红色框标记）的响应被显著压低，而干净视图则保持高响应。
 
 这一发现揭示了一个关键洞察：**VGGT已经“学会”了区分相关视图与干扰视图，只是这一能力隐藏在其内部表示中，未被显式利用。** 基于此，本文提出 **RobustVGGT**——一种完全无需训练的视图过滤策略，仅通过提取VGGT最后一层的注意力分数或特征余弦相似度作为视图相关性度量，并施加一个固定的全局阈值，即可在推理阶段有效剔除干扰视图，显著提升重建鲁棒性（如图1b所示）。
-
-
 
 ## 核心方法与创新机理
 
@@ -136,8 +132,6 @@ $$\phi(i) = \{ j \mid j = i \text{ or } r_{ij}^O \geq \tau^O \}, \quad O \in \{a
 
 所有改进均通过**外部包装**的方式实现，这使其具有极强的即插即用特性。但同时，当前方法仅执行视图级粗粒度过滤，未涉及token/patch级别的细粒度剔除；且需要两趟前向传播（首次计分、二次重建），增加了推理开销。
 
-
-
 RobustVGGT 的整体流程围绕一个核心发现展开：**VGGT 的前馈重建管线无需显式的离群视图剔除机制或噪声感知训练，其深层内部表示已自然具备区分干净视图与干扰视图的能力**。基于这一涌现特性，该方法设计了一个无需训练、无需修改架构的视图过滤策略，整体框架可分为四个主要模块，如 Figure 5 所示。
 
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2512_04012/figures/005_Figure_5.jpg]]
@@ -176,13 +170,6 @@ $$\phi(i) = \{ j \mid j = i \text{ or } r_{ij}^O \geq \tau^O \}, \quad O \in \{a
 ### 设计特点与权衡
 
 整个框架的核心优势在于**零训练成本与零架构修改**：所有操作均复用 VGGT 预训练权重的内部表示，无需引入额外参数、损失函数或微调步骤。代价是**需要两趟前向传播**——首次计算视图分数，第二次进行过滤后的重建，推理开销约为原始 VGGT 的两倍。此外，当前方法仅执行视图级别的粗粒度过滤，不涉及 token 或 patch 级别的细粒度剔除，在极端大规模图像集合下的扩展性仍有待验证。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2512_04012/figures/001_Figure_1.jpg]]
-*Figure 1: Motivation. In practice, image sets gathered for 3D reconstruction, e.g., via keyword search, often contain distractors or entirely irrelevant photos. As illustrated in (a), leaving these images unfiltered contaminates the VGGT [56] pipeline, producing noisy geometry and visible artifacts in the final reconstruction. In contrast, our training-free approach, dubbed RobustVGGT, filters views using internal representations within VGGT [56], yielding cleaner, more stable reconstructions, as shown in (b)*
-
-
 
 RobustVGGT 的核心思想是利用 VGGT 前馈推理过程中自然涌现的内部表示来区分几何一致的视图与干扰视图，而无需额外训练或架构修改。整个管线由四个关键模块串联构成。
 
@@ -229,13 +216,6 @@ $$\phi(i) = \{ j \mid j = i \text{ or } r_{ij}^O \geq \tau^O \}, \quad O \in \{a
 ### 4. 重新推理
 
 仅使用过滤后的视图集合 $\{I_j\}_{j \in \phi(i)}$ 再次运行 VGGT 骨干网络，获得最终的相机位姿 $P_i$、深度图 $D_i$、3D 点图 $X_i$ 及置信度图 $C_i$。这一“两趟前向”策略是当前方法的主要计算开销来源，但确保了过滤后的重建仅依赖几何与空间一致的视图。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2512_04012/figures/003_Figure_3.jpg]]
-*Figure 3: Layer-wise analysis. We measure the gap between clean and distractor views for attention and feature similarity across VGGT’s all layers. The separation grows with depth and peaks at the final layer, indicating emergent noise suppression*
-
-
 
 ## 实验与关键发现
 
@@ -299,9 +279,6 @@ RobustVGGT‑F在Phototourism Large设定下达到0.978的成功率，在On‑th
 
 为验证所提过滤策略的架构无关性，实验将其应用于另一个前馈3D重建模型 **Pi3**。Table 5–7 分别报告了Pi3在相机位姿估计、多视图深度估计和干扰拒斥成功率上的结果。RobustPi3在所有指标上一致优于原始Pi3，且性能增益模式与VGGT上的观察高度一致——最后一层特征相似度分数同样展现出最强的干净/干扰分离能力。这表明“深层内部表示涌现噪声抑制”的现象并非VGGT独有，可能广泛存在于基于Transformer的前馈重建架构中。
 
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2512_04012/figures/017_Table_5.jpg]]
-*Table 5: Camera pose estimation of Pi3*
-
 ### 4.4 定性分析
 
 Figure 6 和 Figure 7 分别展示了相机轨迹预测和多视图深度估计的定性对比。在含大量干扰图像的场景中，原始VGGT的预测轨迹出现明显漂移和断裂，深度图中混入大量伪影和错误几何结构；而RobustVGGT通过预先剔除不一致视图，恢复了平滑、一致的轨迹和干净的深度图。
@@ -309,13 +286,7 @@ Figure 6 和 Figure 7 分别展示了相机轨迹预测和多视图深度估计�
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2512_04012/figures/006_Figure_6.jpg]]
 *Figure 6: Qualitative results of camera trajectory prediction. Best viewed when zoomed in*
 
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2512_04012/figures/007_Figure_7.jpg]]
-*Figure 7: Qualitative results of multi-view depth estimation*
-
 Figure 12 进一步对比了VGGT与RobustVGGT在各数据集上生成的点云。未过滤的VGGT点云中包含由干扰视图引入的离群点簇和重复结构，严重污染场景几何；RobustVGGT的点云则显著更干净，仅保留几何一致的表面点，验证了视图级过滤对最终重建质量的直接改善。
-
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2512_04012/figures/022_Figure_12.jpg]]
-*Figure 12: Visualization of point maps produced by VGGT and RobustVGGT on various datasets*
 
 ### 4.5 失败模式与局限性
 
@@ -328,13 +299,6 @@ Figure 12 进一步对比了VGGT与RobustVGGT在各数据集上生成的点云�
 3. **超大规模图像集合的扩展性未验证**。实验中的最大输入规模为80张图像（50张干净+30张干扰，或类似组合）。在街景级视觉位置识别等涉及数百至数千张候选图像的任务中，全局成对分数计算和阈值过滤的计算复杂度将显著增长，方法的效率和有效性有待进一步验证。
 
 4. **固定阈值的边界失效**。虽然共享阈值 $\tau^{att}=0.05$ 和 $\tau^{feat}=0.65$ 在四个测试数据集上泛化良好，但无法保证在所有可能的域偏移（如极端光照变化、非透视相机模型）下均保持最优。在分布外场景中，分数分布可能整体偏移，导致固定阈值失效。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2512_04012/figures/002_Figure_2.jpg]]
-*Figure 2: Reconstruction by VGGT [56]. Although VGGT predicts per-pixel confidence maps to down-weight unreliable depths, this post-hoc signal operates only at the point level and does not filter views. Consequently, distractor images are still reconstructed, allowing spurious content to corrupt the recovered geometry*
-
-
 
 ## 定位与知识库关联
 
@@ -396,8 +360,6 @@ RobustVGGT的有效性建立在以下前提之上：
 ### 5. 知识库定位总结
 
 RobustVGGT在3D重建方法谱系中填补了**“利用前馈模型内部涌现行为进行无训练离群过滤”**的空白。它既不同于依赖外部VPR模型的预过滤路线（MegaLoc、DINOv3），也不同于基于优化的场景图方法（MASt3R-SfM），更区别于使用冻结编码器特征的内部特征选择（DINOv2†）。其核心贡献在于**发现并利用**了VGGT深层交替注意力层中自发形成的几何一致性感知能力，将这一涌现行为转化为实用的视图过滤机制，同时保持了零额外训练、零架构修改的简洁性。
-
-
 
 ## 原文 PDF
 

@@ -49,8 +49,6 @@ claims:
 
 在21个LAFAN1序列的仿真评估中，GMR的全局位置误差（E_g-mpbpe）均值为104.1 mm，显著低于PHC的247.8 mm和ProtoMotions的139.7 mm。用户研究（N=20）表明，GMR重定向动作的感知保真度显著优于两种基线方法，接近闭源Unitree数据集的重定向质量。低成功率案例的归因分析直接验证了伪影与策略失败之间的因果关系：PHC在“Dance 1”中的地面穿透、ProtoMotions在“Run (stop & go)”中的自相交，以及GMR在极少数情况下的关节值突变，均导致策略难以学习或完全失败。所有策略均使用独立的BeyondMimic框架训练，未针对任何重定向方法进行奖励调优，确保了比较的公平性。
 
-
-
 ### 人形机器人运动跟踪的核心挑战
 
 让双足人形机器人在现实世界中复现人类运动的敏捷性与多样性，是机器人学习领域的长期目标。基于强化学习（RL）的运动跟踪策略近年来取得了显著进展，其基本范式是：将人类运动数据通过**运动重定向（motion retargeting）**转换为机器人可执行的参考动作，随后训练策略网络以尽可能精确地复现该参考动作。在这一范式中，重定向环节的质量直接决定了参考动作的物理可行性与感知保真度，进而深刻影响下游策略的学习难度与最终表现。
@@ -83,8 +81,6 @@ GMR的核心创新在于两个相互配合的设计选择：
 2. **两阶段逆运动学优化**：第一阶段优先匹配末端执行器的朝向与位置，得到无穿透的粗略姿态；第二阶段在关节限位约束下微调全身关节位置，提升整体跟踪精度。
 
 通过将GMR与独立于重定向的训练框架（BeyondMimic）结合，本文系统性地验证了：**重定向质量是决定运动跟踪策略性能的上游关键因素**，而GMR所采用的尺度变换与优化策略能够有效消除现有方法的典型伪影，使开源重定向流程的性能接近闭源高质量数据集（Unitree）的水平。
-
-
 
 ## 核心方法与创新机理
 
@@ -126,8 +122,6 @@ PHC 和 ProtoMotions 需要将 BVH 格式转换为 SMPL 或 SMPL-X 格式，这�
 
 上述创新的有效性通过严格的消融与对照实验得到验证。在 21 个 LAFAN1 序列的仿真评估中，使用 GMR 重定向数据训练的策略，其全局位置误差（$E_{\mathrm{g-mpbpe}}$）均值仅为 104.1 mm，显著低于 PHC 的 247.8 mm 和 ProtoMotions 的 139.7 mm（TABLE II）。更重要的是，低成功率的重定向参考动作中可明确观察到与缩放策略直接相关的伪影：PHC 在 “Dance 1” 中出现严重地面穿透，ProtoMotions 在 “Run (stop & go)” 中出现自相交（Fig. 3），这些伪影直接导致对应策略学习失败或成功率极低。值得注意的是，所有策略均使用独立的 BeyondMimic 框架训练，未针对任何重定向方法进行奖励函数调优，这确保了性能差异可归因于重定向质量本身。
 
-
-
 General Motion Retargeting (GMR) 是一个五阶段的运动重定向流水线，旨在将任意人体运动源（BVH 格式）转换为目标人形机器人的关节轨迹。该流水线以模块化方式依次执行以下步骤：
 
 1. **人-机器人关键身体匹配 (Key Body Matching)**：用户定义人体骨骼与机器人身体部件之间的映射关系，以及各身体部件在后续优化中的跟踪权重。
@@ -140,12 +134,8 @@ General Motion Retargeting (GMR) 是一个五阶段的运动重定向流水线�
 
 整个流水线的输入为 BVH 格式的源运动数据，输出为可直接用于强化学习策略训练或机器人执行的关节位置序列。该流水线与下游策略训练框架（如 BeyondMimic）完全解耦，无需针对重定向方法进行奖励函数调优。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l38_https_arxiv_org_abs_2510_02252v1/figures/002_Figure_2.jpg]]
 *Figure 2: General Motion Retargeting (GMR) Pipeline*
-
-
 
 GMR 流水线由五个顺序模块构成（Fig. 2），其核心设计围绕一个关键因果机制展开：**非均匀局部缩放消除伪影，两阶段 IK 在无穿透约束下逐步恢复跟踪精度**。以下仅展开与公式直接关联的三个关键模块。
 
@@ -181,8 +171,6 @@ $$\operatorname*{min}_{\mathbf{q}} \sum_{(i,j)\in\mathcal{M}} \left[ (w_2)_{i,j}
 ### 序列处理与高度后处理
 
 对于完整运动序列，GMR 逐帧应用上述流程，并使用前一帧的重定向结果作为当前帧 Step 4 优化的初始猜测，以保证时序连续性。最后，通过计算序列中所有身体部位的最小高度，将其从全局平移中减去，以修正可能出现的全局浮动或地面穿透伪影。
-
-
 
 ## 实验与关键发现
 
@@ -236,8 +224,6 @@ $$\operatorname*{min}_{\mathbf{q}} \sum_{(i,j)\in\mathcal{M}} \left[ (w_2)_{i,j}
 
 这些局限性指向若干开放问题：非均匀局部缩放策略在应对骨骼比例极端差异的非拟人形态时是否依然有效？两阶段优化中的权重能否根据运动类型自动调整以减少手动调参需求？如何建立通用启发式规则来确定安全的起始与结束帧？
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l38_https_arxiv_org_abs_2510_02252v1/figures/003_Table.jpg]]
 *Table: I: Evaluation success rates (%) in IsaacSim (training simulator) without domain randomization (sim, 100 trials per policy), with domain randomization (sim-dr, 4096 trials per policy), and MuJoCo/ROS simulator (sim2sim, 100 trials per policy). PM = ProtoMotions, U = Unitree. *See Section V-D TABLE II: Tracking errors for each policy measured over the 100 evaluation rollouts in the sim setting. Lower values are better. Best values are bold, second best are underlined*
 
@@ -249,8 +235,6 @@ $$\operatorname*{min}_{\mathbf{q}} \sum_{(i,j)\in\mathcal{M}} \left[ (w_2)_{i,j}
 
 ![[assets/figures/papers/paper_list_l38_https_arxiv_org_abs_2510_02252v1/figures/001_Figure_1.jpg]]
 *Figure 1: For the user study, participants were shown videos of the reference motion (a), and asked to choose which retarget video (b) was more similar to it*
-
-
 
 ## 定位与知识库关联
 
@@ -299,8 +283,6 @@ GMR 在人形机器人运动跟踪的完整知识链中扮演**上游参考动�
 - **起始帧鲁棒性**：消融实验揭示了一个重要的脆弱性来源——参考动作的起始帧选择对策略成功率有显著影响，同一策略从不同帧启动，成功率可在 14% 到 100% 之间波动。如何建立通用启发式规则来确定安全的起始与结束帧，保证策略在任意运动中稳定启动和停止，是一个尚未解决的问题。
 
 - **多平台扩展**：该重定向方法能否无缝扩展至多款人形机器人平台？如何自动生成高质量的关键身体映射，以及如何根据机器人运动学约束自动调整局部缩放因子，是实现 “一次重定向，多平台部署” 的关键挑战。
-
-
 
 ## 原文 PDF
 

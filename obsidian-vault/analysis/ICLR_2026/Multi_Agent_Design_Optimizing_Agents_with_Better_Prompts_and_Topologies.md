@@ -58,8 +58,6 @@ claims:
 
 MASS的贡献在于首次将多智能体系统的提示优化与拓扑搜索纳入统一的自动化设计框架，通过交错优化和影响力剪枝有效降低了联合搜索的复杂度，为构建高性能多智能体系统提供了一条可复用的方法论路径。
 
-
-
 ### 多智能体系统的设计困境
 
 大语言模型（LLM）驱动的多智能体系统（MAS）在复杂推理、多跳问答和代码生成等任务上展现出超越单智能体的潜力。然而，构建高性能MAS面临一个核心瓶颈：**自动化设计中的组合爆炸问题**。MAS的性能高度依赖于两个相互交织的维度——每个智能体的提示（prompt）设计和智能体间的协作拓扑（topology）结构。提示的微小调整可能改变智能体的输出分布，进而影响整个通信链路的有效性；而拓扑的变更又会改变信息聚合方式，使得为某一拓扑优化的提示在另一拓扑下失效。现有方法往往仅单独优化提示或拓扑，导致性能次优，无法充分利用二者的协同效应。
@@ -79,8 +77,6 @@ MASS的贡献在于首次将多智能体系统的提示优化与拓扑搜索纳�
 ### MASS 的核心洞察
 
 本文的核心洞察是：**有效的多智能体系统设计需将提示优化与拓扑搜索协同进行**。具体而言，应先通过局部提示优化“预热”每个拓扑模块，使其发挥基本功能；再根据各模块在验证集上的增量影响力筛选有潜力的拓扑结构，剪枝无效或有害的模块以压缩搜索空间；最后在选定拓扑上进行全局提示联合微调，使各智能体的提示适配协作上下文。这种从局部到全局、从提示到拓扑的交错优化策略，是突破组合爆炸、高效发现高性能 MAS 的关键。
-
-
 
 ## 核心方法与创新机理
 
@@ -107,8 +103,6 @@ MASS将多智能体系统的设计空间统一为**提示空间**（指令与示
 ### 4. 即插即用的优化器兼容性
 
 MASS框架与不同提示优化器（如MIPRO、CoT、Few-shot等）组合均能实现性能提升（Table 9），展示了其作为元优化框架的灵活性。同时，1PO和2TO阶段内的优化可完全并行化，而ADAS和AFlow是迭代式算法，这使得MASS在实际部署中具有更高的计算效率。
-
-
 
 ![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_I05H9RUzHB/figures/002_Figure_1.jpg]]
 *Figure 1: Proposed Multi-Agent System Search (MASS) framework discovers effective multiagent system designs (with both optimized topology and optimized prompts, right) via interleaved prompt optimization and topology optimization in a customizable multi-agent design space (key components illustrated on the left)*
@@ -143,8 +137,6 @@ MASS的优化流程遵循“从局部到全局、从提示到拓扑”的渐进�
 - **剪枝机制的必要性**：图4的实验证据表明，并非所有拓扑都对MAS有正面影响——在HotpotQA上仅Debate拓扑带来约3%的提升，其他拓扑（如Reflect）反而可能导致性能退化。基于增量影响力的剪枝有效降低了拓扑搜索的复杂度。
 - **阶段顺序的不可替代性**：消融实验（图5右）显示，移除搜索空间剪枝或跳过前期提示优化（1PO）会显著降低拓扑优化（2TO）的效果，验证了三阶段递进设计的必要性。
 - **并行化能力**：阶段1和阶段2内部的优化过程可完全并行化，这是MASS相对于ADAS和AFlow等迭代式自动化设计方法的重要效率优势。
-
-
 
 MASS框架将多智能体系统（MAS）的自动化设计分解为三个交错执行的优化阶段，其核心在于通过**影响力剪枝**降低搜索空间复杂度，并实现提示与拓扑的协同优化。
 
@@ -184,26 +176,18 @@ MASS各阶段的计算成本具有不同的缩放特性：
 
 值得注意的是，1PO和2TO阶段内的优化可完全并行化，而ADAS和AFlow等基线方法是迭代式的，这赋予了MASS在实践中的效率优势。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈验证：提示优化 vs. 拓扑扩展
 
 MASS 的设计动机源于一个关键观察：在多智能体系统（MAS）中，**提升单个智能体的提示质量，往往比单纯增加智能体数量或改变拓扑结构更具 token 效率**。Figure 2 在 MATH 数据集上对此进行了量化验证：经过提示优化的智能体（prompt-optimized agents）在消耗相同总 token 量的情况下，准确率显著高于通过自一致性（Self-Consistency, SC）、自反思（Self-Refine）或多智能体辩论（Multi-Agent Debate）扩展的基线。这一发现直接支撑了 MASS 将提示优化置于优先地位的设计决策——先“磨刀”再“砍柴”，而非盲目堆砌智能体。
 
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_I05H9RUzHB/figures/003_Figure_2.jpg]]
-*Figure 2: Accuracy vs. total token counts for prompt-optimized agents per question on MATH by Gemini 1.5 Pro compared to scaling agents with self-consistency (SC), self-refine (reflect), and multi-agent debate (debate) only. The error bar indicates 1 standard deviation. We show that by utilizing more compute, better accuracy can be obtained via more effective prompting*
-
 ### 主实验结果
 
 Table 1 汇总了 MASS 在 Gemini 1.5 Pro 和 Gemini 1.5 Flash 两个模型规模上、覆盖推理、多跳问答和代码生成三类共 8 个任务的全面评估结果。
 
-
 ![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_I05H9RUzHB/figures/007_Table_1.jpg]]
 *Table 1: Results on the evaluation set with Gemini 1.5 Pro and Gemini 1.5 Flash. We report the mean and standard deviation for all results with 3 runs of evaluations. We report the accuracy (%) for MATH and the test-output-prediction subtask of LiveCodeBench (LCB), F1 score for DROP, HotpotQA, MuSiQue, and 2WikiMQA, and pass@1 for MBPP and HumanEval. We note that the meta-prompt of AFlow* only works properly with Claude 3.5 Sonnet. Therefore, we reproduce AFlow with Gemini 1.5 Pro as the executor and Claude 3.5 Sonnet as the optimizer, where * indicates the results are only for reference. The inference cost is controlled comparably as shown in Table 7*
-
 
 ![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_I05H9RUzHB/figures/018_Table_7.jpg]]
 *Table 7: The training and inference cost for running MASS and baselines, where we show the training cost and the actual run-time of MASS is comparable to the training cost of auto-agent baselines. We note that the performance of self-consistency, self-refine, and multi-agent debate is already saturated, and further scaling the inference cost of these baselines only brings marginal gains, whereas the MASS-found MAS outperforms the baseline substantially at a comparable inference token cost*
@@ -220,9 +204,6 @@ Table 1 汇总了 MASS 在 Gemini 1.5 Pro 和 Gemini 1.5 Flash 两个模型规�
 ### 拓扑有效性的选择性
 
 并非所有拓扑结构都对 MAS 性能有正面贡献。Figure 4 在 HotpotQA 和 LiveCodeBench 上对比了经过 APO 优化的不同拓扑模块的性能：
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_I05H9RUzHB/figures/006_Figure_4.jpg]]
-*Figure 4: The performance of different topologies with Gemini 1.5 Pro compared to the base agent with each topology being optimized with APO, where Sum. (Summarize) and Exe. (Executor) are task-specific topologies as illustrated in Fig. 3. We observe that not all topologies have a positive influence on the MAS design*
 
 - 在 HotpotQA 上，仅 **Debate 拓扑** 带来约 3% 的增益，而其他拓扑（如 Reflect）甚至导致性能退化。
 - 在 LiveCodeBench 的 test-output-prediction 子任务上，**Executor（含工具使用的执行器）** 和 **Self-Consistency** 表现突出，而 Reflect 同样表现不佳。
@@ -257,31 +238,12 @@ Figure 7 以 MATH 任务为例展示了 MASS 的具体优化路径：
 
 MASS 在 Claude 3.5 Sonnet（Table 4）和 Mistral-Nemo-12B（Table 5）上的迁移实验表明，其发现的提示和拓扑在跨模型时仍能保持一致的性能优势，但**并非零成本迁移**：原有拓扑在某些情况下可能导致性能退化，需要重新运行优化流程。此外，MASS 的搜索空间目前仍限于预定义的拓扑模块序列，尚未探索更灵活的图结构（如树形拓扑、动态路由），这是未来可扩展的方向。
 
-
 ![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_I05H9RUzHB/figures/015_Table_4.jpg]]
 *Table 4: Results on the evaluation set with Claude 3.5 Sonnet. We keep the same experimental setup as Table 1. Since Claude 3.5 Sonnet does not support the same context window as Gemini, we report the standard HotpotQA instead of the LongBench. As we transfer the prompt template for each agent from Gemini to Claude, it is noticeable that the basic topology on some tasks may result in severe degradation of performance, and MASS successfully recovers the performance and brings significant improvements over the initial agent*
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_I05H9RUzHB/figures/016_Table_5.jpg]]
-*Table 5: Results on the evaluation set with the open-source model, Mistral-Nemo-12B. We keep the same experimental setup as Table 4 and evaluate a subset of representative coding tasks to save resources. MASS demonstrate consistent improvements over the baselines on Mistral Nemo*
 
 ### 成本分析
 
 Table 7 显示，MASS 的训练成本约 **$5.09**（24M 输入 token、11M 输出 token），与 ADAS、AFlow 等自动化基线相当，但推理成本（$0.0014/查询）与 CoT 等简单基线处于同一量级，且性能大幅领先。此外，MASS 的阶段 1 和阶段 2 内部可完全并行化，实际运行时间可进一步压缩。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_I05H9RUzHB/figures/012_Table_2.jpg]]
-*Table 2: The specification of evaluation tasks: dataset split, topology search space, and the MASSoptimized MAS (on Gemini 1.5 Pro)*
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_I05H9RUzHB/figures/014_Table_3.jpg]]
-*Table 3: The search dimension for each topology. The minimum topology defines the building block that MASS Stage (1) optimized. We refer the definition of search space to Sec.2.2*
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_I05H9RUzHB/figures/017_Table_6.jpg]]
-*Table 6: The detailed ablation results per optimization stage of MASS. Practical gains can be obtained by further conducting workflow-level prompt optimization (3PO) on the best-found topology*
-
-
-
-
 
 ## 定位与知识库关联
 
@@ -334,8 +296,6 @@ MASS的三个优化阶段各自贡献累积增益（Figure 5左）：
 4. **反馈信号增强**：将错误日志、推理轨迹等文本反馈集成到提示优化器中，是否能提供比标量性能指标更丰富的优化信号，从而加速收敛？
 
 5. **跨模型泛化**：是否存在一种模型无关的拓扑表示，使得在一个模型上优化的MAS可以直接迁移到其他模型而不损失性能？这涉及提示与模型能力的解耦问题。
-
-
 
 ## 原文 PDF
 

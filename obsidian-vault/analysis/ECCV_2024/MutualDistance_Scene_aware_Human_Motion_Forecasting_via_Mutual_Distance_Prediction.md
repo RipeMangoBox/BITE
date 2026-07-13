@@ -52,8 +52,6 @@ claims:
 
 **主要结果**：在 GTA-IM 和 PROX 数据集上，本文方法在所有指标上均优于现有基线方法，尤其在路径误差上有显著提升。在 HUMANISE 数据集上，无论是已见场景还是未见场景，本文方法均取得最优结果。消融实验进一步验证了互距离表示的有效性：移除互距离约束后运动预测质量明显下降，且逐顶点符号距离和逐基点距离各自独立贡献，两者联合使用效果最佳。
 
-
-
 ### 问题背景
 
 预测人类在未来时刻的运动是计算机视觉与图形学中的核心任务，在自动驾驶、人机交互、AR/VR 等领域有广泛应用。当人类在三维场景中活动时，其运动不仅受自身动力学支配，更受到场景几何的严格约束——例如，人不能穿墙而过，坐下时臀部必须接触椅子表面。因此，**场景感知的人体运动预测**（scene-aware human motion forecasting）要求模型在给定历史人体姿态序列和三维场景信息的条件下，生成物理上合理且符合场景约束的未来运动序列。
@@ -80,8 +78,6 @@ claims:
 这两个分量共同构成**双向、全身的人景交互约束**——既约束人体不穿透场景，也约束人体不过度远离场景交互区域。与仅关注接触关节或全局位置的方法不同，互距离对全身所有顶点和场景关键区域均施加显式约束，从根本上解决了“局部约束导致全身运动不合理”的问题。
 
 基于此动机，本文提出**基于互距离预测的场景感知人体运动预测方法**：先预测未来的互距离，再以预测的互距离为条件自回归地生成未来人体姿态，从而实现对全身运动的完整场景约束。
-
-
 
 ## 核心方法与创新机理
 
@@ -121,8 +117,6 @@ claims:
 | 预测范式 | 端到端直接预测运动 | 先预测互距离，再生成运动 |
 | 场景表示 | 点云 | SDF Volume |
 | 训练策略 | 端到端 | 分阶段训练 + 端到端微调 |
-
-
 
 本文提出一种**基于互距离预测的场景感知人体运动预测框架**，核心思路是将“人-景交互”显式建模为可预测的互距离表示，再以此作为约束条件生成未来运动。整个 pipeline 由四个主要模块串联构成，遵循“编码→预测→生成”的信息流。
 
@@ -166,8 +160,6 @@ claims:
 ### 关键设计动机
 
 现有场景感知方法（如 ContAware 的接触图约束、GIMO 的凝视信息）仅约束部分身体运动，无法对全身运动提供完整约束，导致预测中出现穿透场景或“幽灵运动”等不合理结果。本文通过**互距离表示**（同时约束局部姿态和全局位置）解决了这一瓶颈——消融实验中，移除互距离约束后运动预测质量显著下降（Fig. 4），而完整模型在 GTA-IM 和 PROX 数据集上均显著优于所有基线方法（Table 1）。
-
-
 
 ### 互距离表示
 
@@ -219,12 +211,8 @@ $$\hat{\mathbf{x}}_{T+u} = \mathcal{G}_y(\hat{\mathbf{x}}_{T+u-1}, \hat{\mathbf{
 
 为规避端到端训练容易陷入局部最小值的问题（消融实验 Table 3 中 e2e 变体性能显著下降），本文采用**分阶段训练**策略：首先独立训练互距离预测网络和运动预测网络，随后将两个网络联合进行端到端微调。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1764_MutualDistance_Scene_aware_Human_Motion_Forecasting_via_Mutual_Distance/figures/002_Figure_1.jpg]]
 *Figure 1: Our mutual distances. a) shows the per-vertex signed distance for sampled vertices on human mesh. Their color indicates the distance value. b) shows the perbasis point distance for the basis points which are not sampled on the scene surface. For both figures, the darker the color is, the smaller the distance is*
-
-
 
 ## 实验与关键发现
 
@@ -280,8 +268,6 @@ $$\hat{\mathbf{x}}_{T+u} = \mathcal{G}_y(\hat{\mathbf{x}}_{T+u-1}, \hat{\mathbf{
 
 实验结果表明，互距离表征通过同时约束局部姿态和全局位置，有效解决了现有方法仅部分约束身体运动导致的预测不合理问题。在多个数据集上的一致优势、消融实验中各组件的清晰贡献，以及可视化分析中互距离与运动质量的因果关联，共同构成了支持本文核心主张的强证据链。未来的改进方向包括提升互距离预测精度和引入显式物理约束。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1764_MutualDistance_Scene_aware_Human_Motion_Forecasting_via_Mutual_Distance/figures/004_Table_1.jpg]]
 *Table 1: Quantitative results on GTA-IM [4] and PROX [10]. Our model outperforms all baselines at all metrics, especially for the path error*
 
@@ -291,13 +277,8 @@ $$\hat{\mathbf{x}}_{T+u} = \mathcal{G}_y(\hat{\mathbf{x}}_{T+u-1}, \hat{\mathbf{
 ![[assets/figures/papers/paper_list_l1764_MutualDistance_Scene_aware_Human_Motion_Forecasting_via_Mutual_Distance/figures/006_Table_3.jpg]]
 *Table 3: Ablation study on HUMANISE [36]. We show the ablation results of our model. D, B, P , O, BP S and e2e indicate per-vertex signed distance, per-basis point distance, point cloud representation, occupancy representation, BPS encoding and end-to-end training respectively*
 
-![[assets/figures/papers/paper_list_l1764_MutualDistance_Scene_aware_Human_Motion_Forecasting_via_Mutual_Distance/figures/007_Figure_3.jpg]]
-*Figure 3: This figure compares our method with baseline models on GTA-IM [4] (top row), PROX [10] (middle row), and HUMANISE [36] (bottom row). Our method predicts future motion closer to the ground truth*
-
 ![[assets/figures/papers/paper_list_l1764_MutualDistance_Scene_aware_Human_Motion_Forecasting_via_Mutual_Distance/figures/008_Figure_4.jpg]]
 *Figure 4: Ablation of the mutual distance. The three figures in the first three columns (from left to right) depict the ground truth pose for the last frame of future motion, results of our full model, and predictions of our model without mutual distance constraint. The sub-figure in gray is the last observed frame. Other sub-figures depict the predicted middle frame. The blue dot is the scene basis point, and the red dot is the sampled vertex on human mesh. The two graphs in the last two columns show the predicted per-vertex signed distance and the per-basis point distance for the red and blue point, respectively. As shown in the figures, with predicted mutual distance, we can forecast the ’stand-up...*
-
-
 
 ## 定位与知识库关联
 
@@ -339,8 +320,6 @@ $$\hat{\mathbf{x}}_{T+u} = \mathcal{G}_y(\hat{\mathbf{x}}_{T+u-1}, \hat{\mathbf{
 1. 如何进一步提高互距离（尤其逐顶点符号距离和逐基点距离）的预测精度？是否可以通过多尺度表示、时序注意力机制或物理引导的损失函数来改善？
 2. 能否将显式物理约束（如接触力、动量守恒、地面反作用力）融入当前两阶段框架，以生成更符合物理规律的运动？这可能需要引入可微分物理模拟器或物理感知的损失项。
 3. 互距离表示是否可以推广到多人与动态场景的交互预测中？当前方法假设静态场景和单人运动，扩展到多智能体动态交互是一个自然但非平凡的延伸方向。
-
-
 
 ## 原文 PDF
 

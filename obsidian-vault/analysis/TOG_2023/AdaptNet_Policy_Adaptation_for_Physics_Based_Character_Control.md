@@ -50,8 +50,6 @@ claims:
 
 在多种风格迁移、形态变化和地形适应任务中，AdaptNet 的目标任务奖励和样本效率均显著优于从零训练、直接微调、带正则化的微调以及渐进网络，且从零训练在给定训练预算（8M 样本）内几乎无法获得有效控制器。消融实验进一步证实，组合潜在空间适应与内部适应的完整方案在模仿误差上取得最优（如 Goose Step 风格迁移误差为 0.13±0.07 m），而单独使用内部适应或移除状态编码器均导致性能显著下降。此外，潜在空间注入的位置对运动质量有决定性影响：仅在首个潜在空间 $Z^0$ 进行注入能产生平滑、可重复的脚步轨迹，而更深层的注入会导致动作抖动甚至训练失败。
 
-
-
 在计算机动画与机器人控制领域，基于物理的角色控制长期面临一个核心矛盾：**通用性与专用性难以兼得**。深度强化学习（Deep RL）使得训练能够模仿复杂运动数据并执行目标导向任务的控制器成为可能，但这类控制器通常针对特定的角色形态、运动风格和环境条件进行优化。一旦任务需求发生变化——例如角色需要模仿新的风格化步态、适应不同的身体比例、在低摩擦冰面奔跑，或在障碍物密集的环境中导航——原有策略的性能便会急剧下降。
 
 应对这一问题的传统路径存在明显的效率瓶颈：
@@ -61,8 +59,6 @@ claims:
 - **渐进式网络（Progressive Networks, PNet）**（Rusu et al., 2016b）：通过冻结已有网络并添加新模块来保留旧知识，但该方法在推理时需要两倍的参数量，且无法将新旧知识融合为单一的高效控制器。
 
 上述困境揭示了一个更深层的**瓶颈**：如何在高效复用预训练策略知识的前提下，实现对新任务的快速、稳定适应，同时避免对整个网络进行重训练所带来的过拟合与遗忘风险。AdaptNet 正是在这一背景下提出的解决方案。其核心动机并非设计一个更强的单任务控制器，而是构建一种**通用的策略适应框架**，使预训练策略能够以最小的训练代价和最高的样本效率，泛化到风格迁移、形态变化、地形适应和局部避碰等多样化的下游任务中。
-
-
 
 ## 核心方法与创新机理
 
@@ -105,8 +101,6 @@ $$\underset{\phi,\eta}{\operatorname{max}} \mathbb{E}_t \left[ \left( \sum_k \om
 | 旧技能保留 | 易发生灾难性遗忘 | 通过冻结旧模块保留 | 通过冻结编码器与策略头，仅学习残差 |
 
 消融实验证实了组合设计的必要性：单独使用内部适应在风格迁移任务中表现不佳（模仿误差 0.30m），且无法处理需要额外控制输入的地形适应任务；单独使用潜在空间注入虽优于内部适应，但缺少精细化控制能力。完整 AdaptNet（LSA+IA）在 Goose Step 任务上取得 0.13m 的模仿误差，相比仅使用 LSA 的 0.21m 降低了 38%。
-
-
 
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2310_00239/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our approach for adapting motor control policies for physics-based characters. Top: We model both pretraining and adapted tasks using a multi-critic reinforcement learning framework that balances the training of imitation and goal-directed control objectives. After a policy is trained, we can quickly adapt it to a new task using AdaptNet. Bottom: AdaptNet starts with a copy of the pre-trained policy network and modifies it through editing the latent space conditioned on the character’s state and introducing optional adaptation modules for further finetuning*
@@ -163,8 +157,6 @@ $$\mathbf{z}_t^0 = \mathcal{E}_\xi(\mathbf{s}_t) + \alpha \mathcal{I}_\phi(\math
 
 当 $\alpha=0$ 时退化为原始策略，$\alpha=1$ 时为完全适应策略。进一步，还可以在两个独立训练的 AdaptNet 模型之间进行参数加权插值，实现不同风格之间的平滑过渡。
 
-
-
 AdaptNet 的核心设计思想是将预训练策略分解为**冻结的基座**与**可训练的适应组件**，通过零初始化保证训练起点与原始行为一致，从而在不破坏已有技能的前提下实现快速策略迁移。其架构包含两个关键适应模块。
 
 ### 潜在空间注入 (Latent Space Injection)
@@ -210,8 +202,6 @@ $$\mathbf{z}_t^0 = \mathcal{E}_\xi(\mathbf{s}_t) + \alpha \mathcal{I}_\phi(\math
 
 当 $\alpha=0$ 时，角色完全由原始策略控制；$\alpha=1$ 时，AdaptNet 的适应组件完全生效。这一机制支持运动风格插值，也可扩展为两个独立 AdaptNet 模型之间的参数加权混合，实现风格间的平滑过渡。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现与主结果
@@ -246,8 +236,6 @@ AdaptNet 的快速适应能力得益于两个设计：零初始化保证训练�
 
 所有对比方法均使用相同的训练预算（800 万样本）和固定超参数，在 5 个随机种子上进行测试。从零训练在给定预算内无法获得具备目标导向控制能力的控制器，而 AdaptNet 在相同预算下已收敛并表现稳定，确保了比较的公平性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2310_00239/figures/003_Figure_3.jpg]]
 *Figure 3: (c) Discriminator Fig. 3. Network structures. Here, ⊙ denotes the concatenation operator and ⊖ denotes the average operator. The state encoder $\varepsilon _ { \xi }$ is shown in the dashed block. An optional control input encoding module G is included if the additional control input $\mathbf { c } _ { t }$ is provided during adaptation training
 
@@ -256,8 +244,6 @@ AdaptNet 的快速适应能力得益于两个设计：零初始化保证训练�
 
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2310_00239/figures/021_Table_3.jpg]]
 *Table 3: Training hyperparameters*
-
-
 
 ## 定位与知识库关联
 
@@ -311,8 +297,6 @@ AdaptNet 的两层适应架构对应不同的功能粒度：
 4. **多技能扩展**：如何将两层适应架构推广到多技能策略的持续学习，避免跨技能的灾难性遗忘？
 
 > **注意**：上述开放问题部分源自论文讨论（Section 9），部分为分析推断，需结合后续文献手动验证。
-
-
 
 ## 原文 PDF
 

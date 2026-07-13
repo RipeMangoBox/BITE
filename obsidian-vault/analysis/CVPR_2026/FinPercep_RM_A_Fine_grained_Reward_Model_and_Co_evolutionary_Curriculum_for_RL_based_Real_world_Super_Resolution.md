@@ -52,8 +52,6 @@ claims:
 
 在实验验证方面，FinPercep-RM结合CCL在四个真实世界基准（DrealSR、RealSR、RealLR200、RealLQ250）上取得了最优或次优的定量性能（Table 1），用户主观测试中相较DiffBIR、SeeSR等方法的偏好率超过80%（Table 2）。消融实验进一步证实，移除CCL或仅使用像素差异训练奖励模型均导致性能显著下降（Table 4），验证了协同进化课程与高层特征差异对方法有效性的关键支撑作用。
 
-
-
 真实世界图像超分辨率（Real-ISR）旨在从低质量输入中恢复高保真、视觉逼真的高分辨率图像。近年来，基于强化学习的微调策略（RLHF）被引入该领域，通过奖励模型引导生成器优化感知质量，取得了显著进展。然而，现有方法面临一个核心瓶颈：当前主流的奖励模型——如图像质量评估模型（IQA）——仅输出单一的全局质量评分，缺乏对空间局部失真的细粒度感知能力。
 
 这一缺陷直接导致了严重的“奖励黑客”（reward hacking）现象：生成器学会最大化全局评分，却产生了明显的局部伪影和“绘画式”失真，与真实图像相去甚远。如 Figure 1(a) 所示，标准 IQA 奖励模型（如 **CLIP-IQA** (Wang et al., AAAI 2023) 和 **MANIQA** (Yang et al., CVPR 2022)）无法有效惩罚局部失真，其评分与人类主观判断存在显著偏差。Figure 1(c) 进一步可视化了这一困境：使用 CLIP-IQA 或 MANIQA 作为奖励信号训练的生成器，其输出图像中出现了大量局部伪影，而真实图像则保持了自然的纹理结构。
@@ -61,8 +59,6 @@ claims:
 Figure 1(b) 揭示了另一个关键矛盾——稳定性与鲁棒性的权衡困境：基线 IQA 奖励模型（蓝色/紫色曲线）虽然训练收敛迅速且稳定，但因其粗粒度的全局评分而无法有效抑制奖励黑客；若直接使用具备细粒度感知能力的 FinPercep-RM（浅蓝色曲线），奖励信号方差增大，训练过程出现剧烈振荡甚至不收敛。这表明，仅设计一个更精细的奖励模型是不够的，还需要一套配套的训练策略来平衡奖励信号的复杂度与训练的稳定性。
 
 针对上述问题，本文提出 **FinPercep-RM**——一个细粒度感知奖励模型，以及 **协同进化课程学习（Co-evolutionary Curriculum Learning, CCL）** 框架。FinPercep-RM 通过编码器-解码器架构同时输出全局质量评分和逐像素的感知退化图（Fine-grained Perceptual Degradation Map, Fg-PDM），使奖励模型具备“诊断”能力：不仅判断图像质量“如何”（What），还能定位缺陷“在哪里”（Where）。CCL 则通过奖励模型的渐进式扩展与生成器的课程协同进化，在训练初期以粗粒度、低方差的奖励信号保证稳定性，随后逐步过渡到细粒度、高方差的信号以提升鲁棒性，从而在稳定收敛的前提下有效消除奖励黑客现象。
-
-
 
 ## 核心方法与创新机理
 
@@ -107,8 +103,6 @@ $$R_k = \lambda_1 \bar{S}_{\mathrm{global}} + \lambda_2 (1 - \widehat{\max}(M_{\
 
 这一融合方式在阶段 $k$ 平衡了全局质量评估与局部缺陷惩罚，使训练曲线从振荡走向稳定最优收敛（Figure 1(b) 橙色曲线）。
 
-
-
 FinPercep-RM 与协同进化课程学习（Co-evolutionary Curriculum Learning, CCL）框架的整体设计围绕一个核心矛盾展开：**更精细的奖励信号能更有效地抑制 reward hacking，但其高方差特性又会破坏 RL 训练的稳定性**。为此，该框架从两个维度协同推进——奖励模型的细粒度感知能力构建，以及训练过程中奖励复杂度与生成器能力的同步演化。
 
 ### 框架总览
@@ -145,8 +139,6 @@ FinPercep-RM 与协同进化课程学习（Co-evolutionary Curriculum Learning, 
 ### 与基线方法的架构差异
 
 相较于 **CLIP-IQA**（Wang et al., AAAI 2023）和 **MANIQA**（Yang et al., CVPR 2022）等仅输出单一全局质量分数的奖励模型，FinPercep-RM 的核心架构创新在于引入了**解耦的“诊断”分支**（Decoder + 退化图调制），使奖励信号从“单一标量判断”升级为“空间定位 + 全局校准”的双通道评估。这一设计直接针对 reward hacking 的产生机理——生成器通过制造全局评分高但局部失真的“欺骗性”输出来最大化奖励——提供了根本性的抑制手段。
-
-
 
 ### 奖励模型架构：FinPercep-RM
 
@@ -250,8 +242,6 @@ $$
 
 其中 $\widehat{\max}(M_{\mathrm{fg-pdm}})$ 为退化图的空间最大值估计，$(1 - \widehat{\max}(\cdot))$ 将局部缺陷强度转化为惩罚项。消融实验（Table 4, Variant C）显示，移除 CCL 后 MUSIQ 从 73.456 降至 71.982，验证了课程学习对稳定训练的必要性。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈验证：全局IQA奖励的奖励黑客现象
@@ -298,24 +288,14 @@ Figure 4的视觉对比展示了在RealSR数据集上的重建效果。w/ Ours�
 
 评估覆盖四个真实世界基准及用户主观测试，比较对象包括DiffBIR、SeeSR、DiT4SR、DreamClear等多种SOTA方法，所有方法均在REFL的统一RLHF框架下进行公平对比。消融实验中所有变体使用与完整模型相同的训练设置。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2678_https_arxiv_org_abs_2512_22647/figures/005_Table_1.jpg]]
 *Table 1: Quantitative results of Real-ISR methods on four real-world benchmarks based on RLHF method of REFL [44]. Best and second best results are highlighted in red and blue, respectively. w/Ours achieves the best or comparable performance across four benchmarks*
-
-![[assets/figures/papers/paper_list_l2678_https_arxiv_org_abs_2512_22647/figures/008_Table_2.jpg]]
-*Table 2: User study results on real-world datasets. The percentages denote the frequency with which DIT4SR w/Ours was preferred over each compared approach, for both realism and fidelity*
 
 ![[assets/figures/papers/paper_list_l2678_https_arxiv_org_abs_2512_22647/figures/007_Table_3.jpg]]
 *Table 3: Comparison of training strategies under IQA guidance vs. our method. Higher is better for all metrics*
 
 ![[assets/figures/papers/paper_list_l2678_https_arxiv_org_abs_2512_22647/figures/009_Table_4.jpg]]
 *Table 4: Ablation results on RealLQ250 for our DiT4SR. All variants are trained using the same settings as the full model*
-
-![[assets/figures/papers/paper_list_l2678_https_arxiv_org_abs_2512_22647/figures/006_Figure_4.jpg]]
-*Figure 4: Qualitative comparisons with state-of-the-art Real-ISR methods on on RealSR based on RLHF method of REFL [44]*
-
-
 
 ## 定位与知识库关联
 
@@ -364,8 +344,6 @@ CCL 的课程学习思想与 RL 训练中的奖励塑形（reward shaping）和�
 3. **细粒度奖励信号的边际收益**：Table 4 显示解耦融合中 $\lambda_2$（退化图项的权重）的存在使性能从 71.982 提升至 73.456。但退化图信息的更精细利用方式（如按区域加权而不是仅取全局最大值）是否能带来进一步增益，尚未被探索。
 
 4. **与偏好优化方法的结合**：FinPercep-RM 目前用于基于策略梯度的 RL 训练（REFL）。将其输出的 $\{S_{\text{fgc-global}}, M_{\text{fg-pdm}}\}$ 整合到直接偏好优化（DPO）等无需显式奖励模型的 RLHF 变体中，是否可能进一步简化训练流程并保持细粒度感知的优势？
-
-
 
 ## 原文 PDF
 

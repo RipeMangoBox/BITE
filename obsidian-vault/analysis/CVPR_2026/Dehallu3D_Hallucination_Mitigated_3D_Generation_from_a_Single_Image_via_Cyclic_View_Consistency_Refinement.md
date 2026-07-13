@@ -53,8 +53,6 @@ claims:
 
 **局限性与开放问题**：当前优化耗时仍距实时应用有差距；CVCR 在其他重建框架上的泛化性尚未充分验证；严重依赖初始多视图生成质量。未来方向包括探索自适应角度密度分配、动态场景扩展，以及将异常风险度量（ORM）直接作为训练损失等。
 
-
-
 ### 单图三维生成的核心瓶颈：稀疏视图间的幻觉性外点
 
 从单张二维图像重建三维网格是计算机视觉和图形学中的一项基础性挑战。近年来，基于多视图生成的重建方法取得了显著进展，其典型流程为：首先利用扩散模型或多视图生成器从输入图像生成一组正交视图的彩色图像和法向贴图，随后通过立体匹配或可微渲染将这些视图融合为三维网格。然而，这一范式存在一个深层瓶颈：**生成的视图数量稀疏且视角间存在较大间隙**（通常仅覆盖前、后、左、右四个正交方向），导致相邻视点之间的几何信息高度不连续。
@@ -72,8 +70,6 @@ Dehallu3D 的动机源于一个关键洞察：**利用密集的小角度相邻�
 ### 即插即用的模块化设计理念
 
 Dehallu3D 的另一个重要动机是**通用性**。上述循环视图一致性细化策略被封装为一个独立的**即插即用（plug-and-play）优化模块**，称为循环视图一致性细化（Cyclic View Consistency Refinement, CVCR）。该模块不依赖于特定的网格初始化方式或多视图生成器架构，理论上可集成到各类单图三维重建流程中。论文通过在 **Unique3D**（Wu et al., NeurIPS 2024）上验证CVCR的即插即用性，初步证明了该设计的通用潜力。
-
-
 
 ## 核心方法与创新机理
 
@@ -106,8 +102,6 @@ $$\mathcal{L}_{SE} = \sum_{v \in \mathcal{V}} \sum_{i}^{4} \epsilon_{i}^{v} \cdo
 ### 创新协同机制
 
 上述三个 changed slots 形成递进式协同：L_SE 快速修正全局结构 → L_DC 弥合视图间隙消除外点 → L_DS 自适应保留锐利特征。消融实验证实，联合使用 L_DC 和 L_DS 可获得最佳网格质量（PSNR 达 21.8407），单独使用任一项效果均显著下降。CVCR 模块的即插即用特性使其可集成至各类网格重建管线，已在 Unique3D 骨干网络上验证了有效性。
-
-
 
 Dehallu3D 采用“生成—初始化—粗重建—精炼”的四阶段流水线，将单张 RGB 图像转化为高保真三维网格。其核心设计在于将几何幻觉的消除问题转化为**密集相邻视点的深度一致性约束**，从而弥合稀疏多视图之间的信息间隙。
 
@@ -142,8 +136,6 @@ CVCR 解决幻觉外点的逻辑链条如下：
 ### 即插即用特性
 
 CVCR 模块与具体的网格初始化策略解耦，可集成到各类重建管线中。论文以 **Unique3D**（Wu et al., NeurIPS 2024）为骨干网络验证了其即插即用能力——将 CVCR 插入 Unique3D 后，网格外点显著减少，锐利特征得以保留（Figure 6）。
-
-
 
 Dehallu3D 采用**两阶段优化管线**：粗网格重建（Coarse Mesh Reconstruction）与循环视图一致性细化（Cyclic View Consistency Refinement, CVCR）。前者快速修正全局拓扑，后者作为即插即用模块消除幻觉性外点并保留锐利几何特征。
 
@@ -216,8 +208,6 @@ $$
 
 消融实验（Table 2, Section 4.4）验证了各损失项的协同作用：单独使用 $\mathcal{L}_{DC}$ 能提升几何一致性但可能导致过度平滑；加入 $\mathcal{L}_{DS}$ 后 PSNR 达到 21.8407，在所有指标上取得最优。角度间隔消融（Table 3）表明 $5^\circ$ 是质量与效率的最佳平衡点——进一步减小至 $2.5^\circ$ 仅带来微小增益，却显著增加计算开销（$5^\circ$ 耗时约 163.3 秒）。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -271,9 +261,6 @@ Figure 5 的 ORM 对比柱状图显示，Dehallu3D 在所有方法中取得最�
 
 为验证 CVCR 模块的即插即用特性，论文将其插入 **Unique3D** (Wu et al., NeurIPS 2024) 的重建流程。Figure 6 显示，插入 CVCR 后 Unique3D 生成网格的外点显著减少，几何质量明显改善，表明该模块可有效泛化至不同重建主干。但需注意，该验证目前仅限 Unique3D，在其他框架（如前馈式 LRM）上的泛化性尚未充分评估。
 
-![[assets/figures/papers/paper_list_l2249_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Dehallu3D_Halluci/figures/009_Figure_6.jpg]]
-*Figure 6: After applying the CVCR module to Unique3D*
-
 ### 失败模式与局限
 
 尽管 Dehallu3D 在外点消除上表现突出，仍存在以下局限：
@@ -282,18 +269,11 @@ Figure 5 的 ORM 对比柱状图显示，Dehallu3D 在所有方法中取得最�
 3. **ORM 指标局限**：ORM 虽能反映外点程度，但其阈值依赖和与人类感知质量的完全对齐仍需进一步验证。
 4. **泛化边界**：CVCR 的即插即用性仅在 Unique3D 上验证，在更大规模数据集（如 Objaverse）和更多样化的重建框架上的表现尚不明确。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2249_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Dehallu3D_Halluci/figures/001_Figure_1.jpg]]
-*Figure 1: Our Dehallu3D generates high-quality and high-fidelity 3D meshes, effectively mitigating mesh outliers while adaptively preserving sharp features. The red and blue boxes highlight noticeable outlier regions in the Baseline method, contrasted with the corresponding regions in Dehallu3D (Ours) to showcase improvements*
-
 ![[assets/figures/papers/paper_list_l2249_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Dehallu3D_Halluci/figures/006_Table_2.jpg]]
 *Table 2: Quantitative comparison results for ablation study on the proposed losses*
 
 ![[assets/figures/papers/paper_list_l2249_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Dehallu3D_Halluci/figures/007_Table_3.jpg]]
 *Table 3: Ablation study of angular intervals between adjacent views in the CVCR module*
-
-
 
 ## 定位与知识库关联
 
@@ -348,8 +328,6 @@ Dehallu3D开启了若干值得探索的方向：
 - **ORM作为训练损失**：ORM能否作为可微训练损失直接优化，以实现更彻底的外点消除？
 - **大规模数据集验证**：在更大规模数据集（如Objaverse）上，CVCR模块是否仍能保持优越性？
 - **实时架构集成**：如何将CVCR集成到更快的重建架构（如feed-forward LRM）中以实现实时质量提升？
-
-
 
 ## 原文 PDF
 

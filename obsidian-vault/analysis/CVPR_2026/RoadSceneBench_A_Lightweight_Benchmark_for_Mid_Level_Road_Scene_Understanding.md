@@ -52,8 +52,6 @@ claims:
 
 > **需注意**：基准数据仅采集自中国境内 20 个城市，对境外道路结构的泛化性有待验证；HRRP-T 当前仅针对短期（5 帧）时序建模，对突发动态事件的适应能力尚未测试。
 
-
-
 自动驾驶场景理解的研究长期聚焦于低级感知任务，如目标检测、语义分割和车道线检测。现有基准（如 nuScenes、Waymo Open Dataset）提供了丰富的感知标注，但几乎不涉及中级道路语义的结构化推理——例如车道拓扑关系、自车车道索引、换道可行性判断以及交通标志与车道的关联。这种评估体系的偏斜导致两个后果：其一，视觉语言模型（VLM）在道路场景上的能力被低估或误判，因为通用 VQA 基准无法揭示其几何推理与关系推理的深层缺陷；其二，感知模块的输出难以可靠地桥接至决策规划，形成从“看见”到“理解”的语义鸿沟。
 
 RoadSceneBench 正是针对这一缺口提出的轻量级基准。它覆盖 20 个中国城市、9 种道路类型和 6 种交通密度，为每帧图像提供场景级、关系级和语义级三层标注，并引入多帧序列以考察时序一致性。基准的核心设计理念是：中级道路语义具有天然的结构相互依赖性——车道数、自车位置、换道可行性等任务共享底层几何约束，孤立评估将掩盖模型是否真正内化了道路逻辑。
@@ -61,8 +59,6 @@ RoadSceneBench 正是针对这一缺口提出的轻量级基准。它覆盖 20 �
 在此基准上，现有 VLM 暴露出显著瓶颈。即便是最强的闭源模型 **Gemini 2.5 Pro**，在 RoadSceneBench 上的整体精确率仅为 60.61%、召回率 52.70%；开源模型如 **Qwen2.5-VL-3B**、**DeepSeek-VL2** 和 **InternVL3** 表现更弱。定性分析显示，这些模型的错误并非随机噪声，而是系统性地违反道路几何约束——例如在遮挡场景下车道数预测逐帧漂移，或在匝道入口处混淆自车车道索引。这表明，仅靠大规模预训练和静态监督微调（SFT）无法迫使模型习得道路场景的结构化推理能力。
 
 本文的动机由此明确：需要一种训练范式，将 VLM 从单帧静态预测器升级为几何感知且时序连贯的道路场景推理代理。核心思路是将推理过程建模为结构化决策序列，并通过层次化奖励信号与时序一致性约束进行强化学习优化，从而填补感知与规划之间的语义鸿沟。
-
-
 
 ## 核心方法与创新机理
 
@@ -97,8 +93,6 @@ $$\mathcal{R}_{\mathrm{HRRP-T}} = \lambda_{frame} \frac{1}{T} \sum_{t=1}^{T} \ma
 
 综上，MapVLM 的创新本质在于**将 VLM 从静态预测器升级为几何感知且时序连贯的道路场景推理代理**，其 changed slots 清晰聚焦于训练范式、优化目标和推理时域范围三个相互耦合的维度，从而可靠地填补了感知与规划之间的中级语义鸿沟。
 
-
-
 MapVLM 的整体训练范式采用两阶段流水线：**监督微调（SFT）** 建立基础推理能力，随后通过 **层次化关系奖励传播与时序一致性（HRRP-T）** 强化学习框架对模型进行结构化对齐。该流水线的核心设计动机在于：现有 VLM 在静态单帧推理中缺乏对道路几何逻辑的内化，且无法利用跨帧时序证据维持预测一致性。
 
 ### 两阶段训练流水线
@@ -127,15 +121,11 @@ $$\mathcal{R}_{\mathrm{HRRP-T}} = \lambda_{frame} \frac{1}{T} \sum_{t=1}^{T} \ma
 
 整个框架的模块依赖关系为：视觉编码器和语言模型构成推理主干，LoRA 适配器提供参数高效的领域适配，HRRP-T 奖励模块作为外部优化信号驱动模型从“静态预测器”向“几何感知且时序连贯的道路场景推理代理”升级。该设计的关键因果机制在于：层次化奖励迫使模型关注结构化推理的正确性，而时序一致性奖励则通过跨帧约束抑制单帧歧义带来的预测漂移，二者协同作用使得模型在 Ego-lane Index 等最困难任务上取得显著提升（准确率从 69.34% 提升至 75.44%，召回率从 50.37% 猛增至 84.67%）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2721_https_arxiv_org_abs_2511_22466/figures/008_Figure_3.jpg]]
 *Figure 3: Framework of dataset construction and MapVLM*
 
 ![[assets/figures/papers/paper_list_l2721_https_arxiv_org_abs_2511_22466/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of RoadSceneBench. The benchmark spans Scene-, Relational-, and Semantic-level tasks with multi-frame reasoning. Furthermore, we benchmark various open- and closed-source models*
-
-
 
 MapVLM 的核心方法论由两阶段训练范式构成：**监督微调 (SFT)** 建立基础推理能力，随后通过 **层次化关系奖励传播与时序一致性 (HRRP-T)** 强化学习框架对模型进行结构化对齐。以下聚焦 HRRP-T 的关键模块与数学形式。
 
@@ -191,12 +181,8 @@ $$\mathcal{R}_{\mathrm{HRRP-T}} = \lambda_{frame} \frac{1}{T} \sum_{t=1}^{T} \ma
 
 HRRP-T 的因果调节机制在于：**层次化奖励传播** 将结构化推理的压力从单一 token 级损失解耦为多粒度语义评估，而 **时序一致性约束** 则利用相邻帧的冗余信息作为自监督信号，缓解遮挡和歧义场景下的推理退化。消融实验表明，引入 HRRP-T 后 Ego-lane Index 召回率从 50.37% 跃升至 84.67%，验证了时序一致性信号对结构化困难任务的关键作用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2721_https_arxiv_org_abs_2511_22466/figures/011_Figure_5.jpg]]
 *Figure 5: Comparison of SFT and SFT+HRRP-T on a 5-frame congested urban scene. The ego vehicle stays in the same lane: the first two frames clearly show a five-lane layout, whereas the last three frames are partially occluded. SFT reacts to these ambiguous observations with frame-wise drift in lane count and ego-lane index. SFT+HRRP-T leverages temporal evidence and preserves consistent ego-lane predictions with a coherent five-lane topology*
-
-
 
 ## 实验与关键发现
 
@@ -258,18 +244,8 @@ Figure 4 展示了 RoadSceneBench 中多个代表性挑战场景及模型预测�
 2. **数据地理偏差**：RoadSceneBench 数据采集仅限中国境内 20 个城市，道路结构、标线样式和交通规则可能与其他国家/地区存在差异，MapVLM 在境外场景的泛化性有待独立验证。
 3. **时序建模范围有限**：HRRP-T 当前仅针对短期（5 帧）时序一致性设计，对于突发道路施工、交通事故等需要更长时序依赖的动态事件，其建模能力尚未测试。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2721_https_arxiv_org_abs_2511_22466/figures/002_Table_1.jpg]]
-*Table 1: Comparison of autonomous driving scene benchmarks. RoadSceneBench uniquely provides self-collected data with per-frame mid-level semantics, bridging the gap between low-level perception and high-level reasoning*
-
 ![[assets/figures/papers/paper_list_l2721_https_arxiv_org_abs_2511_22466/figures/007_Figure_2.jpg]]
 *Figure 2: Visualization of representative annotation types in RoadSceneBench. All examples highlight the mid-level semantics connecting perception and structural reasoning*
-
-![[assets/figures/papers/paper_list_l2721_https_arxiv_org_abs_2511_22466/figures/016_Figure_6.jpg]]
-*Figure 6: Examples of RoadSceneBench. Each row displays the images contained in a clip along with their corresponding annotation information*
-
-
 
 ## 定位与知识库关联
 
@@ -320,8 +296,6 @@ MapVLM 的 HRRP-T 框架与以下研究方向形成对话：
 - **奖励权重的自动化**：当前 HRRP-T 中的 α、β、γ、λ 等超参数需要手动调节。是否存在基于任务难度或模型训练动态的自适应权重调整策略，以减少人工调参负担并提升训练效率？
 
 - **跨域迁移**：MapVLM 在 RoadSceneBench 上学到的结构化推理能力，是否能迁移到其他需要拓扑推理的领域（如室内导航、机器人操作场景理解）？这需要构建跨域的中级语义基准来验证。
-
-
 
 ## 原文 PDF
 

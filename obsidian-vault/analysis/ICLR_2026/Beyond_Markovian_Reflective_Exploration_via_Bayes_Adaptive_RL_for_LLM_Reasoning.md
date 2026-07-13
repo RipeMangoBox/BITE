@@ -54,8 +54,6 @@ claims:
 
 实验上，BARL在多个数学推理基准（GSM8K、MATH、CollegeMath、Olympiad、AIME 2024、AMC 2023）和三种模型规模（Qwen2.5-Math-1.5B/7B、R1-Distill-Llama-8B）上一致优于GRPO和进度奖励基线（Table 1），同时使用显著更少的令牌——平均比GRPO少约2倍，比进度奖励基线少约1.63倍，比基础模型少10倍以上（Figure 5）。消融实验进一步表明，反思频率与模型性能并无强相关性；BARL的优势源于更有效的探索和利用，体现在其思维链具有更高的贝叶斯状态-动作值（Figure 6, Figure 7）。在合成的迁移任务中，传统RL记忆训练解但无法泛化，而BARL通过假设消除成功发现真实MDP（Figure 4），验证了贝叶斯框架的泛化能力。
 
-
-
 ### 马尔可夫策略的反思盲区
 
 大语言模型在数学推理等复杂任务中展现出强大的能力，但当模型在推理中途发现当前路径可能错误时，能否自发地进行反思并切换策略，是决定其最终表现的关键。现有主流方法——基于结果奖励的强化学习训练——通常将推理过程建模为马尔可夫决策过程，优化单一真实MDP下的期望回报。这类训练得到的策略是**马尔可夫策略**：模型在每一步仅依赖当前状态（已生成的推理步骤）做出决策，没有内在动机去收集额外信息或回溯验证。
@@ -83,8 +81,6 @@ BARL的核心洞察在于：当模型内部信念（对候选答案的概率估�
 3. **行为层面**：训练得到的策略缺乏部署时的探索激励，反思行为无原则性保障，其频率与性能之间无强相关性（如**Figure 6**所示）。
 
 BARL通过将优化目标替换为贝叶斯期望回报、将值函数替换为后验加权Q值、将奖励信号扩展为进度奖励加结果奖励，系统性地填补了上述缺口。
-
-
 
 ## 核心方法与创新机理
 
@@ -145,8 +141,6 @@ BARL的核心pipeline由三个模块构成：
 
 BARL的创新不在于引入反思机制本身，而在于**将反思探索嵌入贝叶斯RL框架，为"何时反思"和"如何切换策略"提供了原则性答案**。传统方法通过提示工程或奖励塑形鼓励反思，但缺乏理论保证；BARL通过维持MDP假设的后验分布，使反思行为作为信念更新的自然产物涌现——当累积奖励与当前假设的预测不一致时，奖励一致性惩罚自动降低该假设权重，驱动策略探索替代方案。Figure 7的消融实验证实，BARL模型的思维链具有一致更高的贝叶斯状态-动作值，表明其探索和利用均更有效。
 
-
-
 BARL 将 LLM 推理的反思探索重构为贝叶斯自适应强化学习问题。其核心 pipeline 由三个模块串联构成，形成一个从候选答案采样到后验加权值估计再到策略梯度更新的闭环。
 
 **候选答案采样模块**：对于每个输入提示 $s_0$，从当前策略 $\pi_\theta$ 采样 $|\mathcal{M}|$ 条思维链（CoT），提取每条链的最终答案，构成 MDP 假设集合 $\{\mathcal{M}_i\}_{i=1}^{|\mathcal{M}|}$。每个假设 $\mathcal{M}_i$ 关联一个候选答案 $y_{s_0}^{\mathcal{M}_i}$，其奖励函数定义为：若最终答案匹配该候选答案则进度奖励和结果奖励均为 1，否则为 0。这一设计将“哪个答案正确”的认知不确定性显式编码为可操作的 MDP 后验分布。
@@ -165,8 +159,6 @@ $$\nabla_{\theta} \mathcal{I} = \mathbb{E}_{s_0, \pi_\theta} \left[ \sum_{t=0}^{
 这一梯度使策略学会内化奖励预测和信念更新，从而在部署时无需显式贝叶斯推断即可产生不确定性自适应行为。
 
 **输入输出流**：整个流程以提示 $s_0$ 为输入，经过策略自回归生成思维链 $a_0, a_1, \dots, a_{T-1}$，每一步的生成由后验加权值引导。训练时，进度奖励 $r(s_t, a_t)$ 由冻结的奖励模型 $\pi_\phi$ 计算正确答案概率的增量得到（公式 3.2），结果奖励由最终答案验证器提供。输出为经过贝叶斯 RL 微调的 LLM 策略 $\pi_\theta$，其在推理时能根据观察到的中间结果动态调整策略，实现假设消除驱动的反思探索。
-
-
 
 ### 3.1 贝叶斯自适应RL目标
 
@@ -221,8 +213,6 @@ BARL的训练循环（Algorithm 1）包含三个核心模块：
 
 3. **策略梯度更新**：以后验加权Q值为回归目标，通过策略梯度公式(5.1)更新LLM参数 $\theta$。这一更新机制使模型内化奖励预测和信念更新，从而在推理时自主进行策略拼接与切换。
 
-
-
 ## 实验与关键发现
 
 ### 主要结果
@@ -241,12 +231,10 @@ BARL在多个数学推理基准和模型规模上一致优于GRPO和进度奖励
 
 **合成任务泛化能力。** Figure 4展示了教学示例中传统RL与BARL的泛化对比。传统RL（REINFORCE）快速记忆训练解但在评估任务上泛化失败，而BARL在部署到评估任务时表现良好。更重要的是，BARL的性能随着候选集提供更多先验知识而提高——当候选集告知模型"奖励三元组是重复模式"时，BARL的准确率和收敛速度均显著提升。这验证了贝叶斯框架中先验知识对假设消除效率的促进作用。
 
-
 ![[assets/figures/papers/paper_list_l30_https_openreview_net_forum_id_vuyk1fSaE4/figures/006_Figure_4.jpg]]
 *Figure 4: Conventional RL (REINFORCE) memories training solutions and poorly generalizes beyond the training prompts. BARL performs well when deployed to the evaluation tasks, and improves with more informative candidate sets*
 
 **采样温度鲁棒性。** 附录B.3（Figure 16）显示，在采样温度=1时，GRPO和基础模型对温度变化更为敏感，而BARL表现出更好的鲁棒性。这一特性与BARL的不确定性自适应本质一致：当采样噪声增大时，贝叶斯后验更新机制能够更好地维持策略的稳定性。
-
 
 ![[assets/figures/papers/paper_list_l30_https_openreview_net_forum_id_vuyk1fSaE4/figures/038_Figure_16.jpg]]
 *Figure 16: Ablation on token efficiency and pass@k accuracies with sampling temperature= 1. GRPO and the base models are less robust to temperatures*
@@ -278,15 +266,6 @@ BARL在多个数学推理基准和模型规模上一致优于GRPO和进度奖励
 *Figure 6: Reflection freq. on GSM8K (dashed) and MATH (solid) problems*
 
 - **Figure 4**：传统RL泛化失败，BARL通过假设消除发现真实MDP，且候选集提供更多先验知识时性能进一步提升。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l30_https_openreview_net_forum_id_vuyk1fSaE4/figures/034_Figure_15.jpg]]
-*Figure 15: Results of BARL fine-tuned on Llama-3.2-3B-Instruct. (Left) Training accuracy and (Middle) response length. (Right) Evaluation results*
-
-
-
-
 
 ## 定位与知识库关联
 
@@ -343,8 +322,6 @@ $$\mathcal{I}(\pi) = \mathbb{E}_{\mathcal{M} \sim p(\mathcal{M}|\mathcal{D})} \l
 4. **规模化挑战**：在更大规模的模型和数据集上，使用有限候选集（$|\mathcal{M}|=5$）近似贝叶斯后验是否仍然高效？后验坍塌或候选集代表性不足的风险如何量化？
 
 5. **与搜索方法的融合**：BARL通过信念更新实现策略切换，本质上是一种内化的搜索机制。它与显式搜索方法（如树搜索、束搜索）之间是否存在互补性或替代关系？论文未对此进行讨论。
-
-
 
 ## 原文 PDF
 

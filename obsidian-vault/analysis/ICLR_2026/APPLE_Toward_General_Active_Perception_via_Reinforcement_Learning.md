@@ -48,13 +48,9 @@ claims:
 
 APPLE 的两个变体——APPLE-SAC（基于 SAC Haarnoja et al. (2018)）和 APPLE-CrossQ（基于 CrossQ Bhatt et al. (2019)）——在触觉分类、体积回归、物体定位和视觉分类等五个基准任务上进行了评估。实验结果表明，APPLE 在多个任务上显著优于现有基线方法 HAM (Fleer et al., 2020) 和随机策略基线。
 
-
-
 **现有瓶颈**：现有主动感知方法通常针对特定任务设计，依赖贪婪信息增益启发式或假设物体静止，缺乏通用性。例如，HAM (Fleer et al., 2020) 使用基于 REINFORCE 的 LSTM 模型，在简单任务上表现良好，但在需要更复杂探索策略的任务上难以超越随机猜测。
 
 **核心动机**：主动感知问题天然适合 POMDP 框架——智能体必须在不确定性下行动，通过主动采集信息来减少关于目标属性的模糊性。然而，现有方法未能充分利用监督学习信号与强化学习策略之间的协同效应。
-
-
 
 ## 核心方法与创新机理
 
@@ -65,8 +61,6 @@ APPLE 的核心创新在于：
 2. **共享 Transformer 骨干网络**：感知模块和决策策略共享基于 Transformer 的骨干网络，联合处理观测序列并输出预测和动作。这种架构比 LSTM 具有更快的收敛速度。
 
 3. **奖励函数设计**：总奖励 $\tilde{r}(h_t, y^*_t, a_t, y_t) = r(h_t, a_t) - \ell(y^*_t, y_t)$，其中 $r(h_t, a_t)$ 用于正则化动作（如动作幅度惩罚），$\ell(y^*_t, y_t)$ 是可微预测损失。这种设计使得预测损失既作为监督信号又作为奖励信号的一部分。
-
-
 
 ![[assets/figures/papers/iclr26_reinforcement_learning_planning_agents__deep_rl__b001_hU2gT2Ucua_APPLE_Toward_General_Act/figures/001_Figure_1.jpg]]
 *Figure 1: Our method Active Perception Policy Learning (APPLE) aims to infer properties, such as object classes, of its environment based on limited per-step information. To do so, it jointly optimizes an action policy for information gathering and a prediction model for inference. Both the action policy and prediction models use a shared transformer-based backbone to process input sequences. Shown at the top are four benchmark tasks we use to evaluate APPLE.*
@@ -84,8 +78,6 @@ APPLE 的整体框架如 Figure 1 和 Figure 2 所示：
 - **预测头 (Prediction Head)**：从隐藏状态输出当前步的标签预测 $\hat{y}_t$
 - **策略头 (Policy Head)**：从隐藏状态输出控制动作 $a_t$
 - **Q 网络 (Critic)**：估计动作价值，用于策略优化（SAC/CrossQ）
-
-
 
 ### 5.1 主动感知目标函数
 
@@ -122,14 +114,11 @@ $$\mathcal{L}_{\mathrm{critic}} = \mathbb{E}_{\mathcal{D}} \left[ \frac{1}{2} \l
 - **CircleSquare 二分类交叉熵损失**：$\ell(y_t^*, y_t) = -\sum_{c \in \{\mathrm{circle, square}\}} \delta(y_t^*, c) \log(p_c(y_t))$
 - **TactileMNIST 10分类交叉熵损失**：$\ell(\dot{\boldsymbol{y}}_t, \boldsymbol{y}_t) = -\sum_{c=1}^{10} \delta(\boldsymbol{y}_t^*, c) \log(p_c(\boldsymbol{y}_t))$
 
-
-
 ## 实验与关键发现
 
 ### 6.1 主要实验结果
 
 **Figure 4**: 各任务预测准确率/误差对比
-
 
 ![[assets/figures/papers/iclr26_reinforcement_learning_planning_agents__deep_rl__b001_hU2gT2Ucua_APPLE_Toward_General_Act/figures/004_Figure_4.jpg]]
 *Figure 4: Average and final prediction accuracies for our methods APPLE-SAC and APPLE-CrossQ, HAM Fleer et al. (2020), and APPLE-RND across various tasks. MHSB refers to the tactile classification task used in Fleer et al. (2020). All methods were trained with 5 seeds. Shaded areas represent one standard deviation. Metrics are computed on evaluation tasks with unseen objects, except for CircleSquare and the MHSB classification task, which have only two or four, respectively.*
@@ -150,7 +139,6 @@ $$\mathcal{L}_{\mathrm{critic}} = \mathbb{E}_{\mathcal{D}} \left[ \frac{1}{2} \l
 2. **CircleSquare 任务**：APPLE-SAC 和 APPLE-CrossQ 分别达到 97% 和 96% 的最终预测准确率，而 HAM 无法超越随机猜测。APPLE-RND 仅达 68%，表明主动探索带来的增益显著。
 
 3. **TactileMNIST 分类**：APPLE-SAC 和 APPLE-CrossQ 分别达到 87% 和 89% 的最终准确率，而 APPLE-RND 停滞在 74%。Figure 5 显示主动智能体比随机智能体更快地收集信息且对类别判断更确定。
-
 
 ![[assets/figures/papers/iclr26_reinforcement_learning_planning_agents__deep_rl__b001_hU2gT2Ucua_APPLE_Toward_General_Act/figures/005_Figure_5.jpg]]
 *Figure 5: Exploration efficiency of final policies on the TactileMNIST task. Shown are the predicted probability of the correct label (top) and accuracy (bottom) after N glances.*
@@ -188,7 +176,6 @@ $$\mathcal{L}_{\mathrm{critic}} = \mathbb{E}_{\mathcal{D}} \left[ \frac{1}{2} \l
 
 **Table 1**: 超参数设置
 
-
 ![[assets/figures/papers/iclr26_reinforcement_learning_planning_agents__deep_rl__b001_hU2gT2Ucua_APPLE_Toward_General_Act/figures/038_Table_1.jpg]]
 *Table 1: Hyperparameters determined by the HEBO Cowen-Rivers et al. (2022) Bayesian optimizer for APPLE-SAC and APPLE-CrossQ. The no vision-encoder configuration was trained on the CircleSquare environment, while the vision-encoder configuration was trained on the TactileMNIST environment. Hyperparameters with Rel. are relative to the total number of steps throughout the training.*
 
@@ -199,15 +186,10 @@ $$\mathcal{L}_{\mathrm{critic}} = \mathbb{E}_{\mathcal{D}} \left[ \frac{1}{2} \l
 - 未探索物体姿态估计、形状重建或材料属性推断等更实际的任务
 - Transformer 架构与 RL 策略优化的结合导致计算成本较高（单次 5M 步运行约 40-50 小时）
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_reinforcement_learning_planning_agents__deep_rl__b001_hU2gT2Ucua_APPLE_Toward_General_Act/figures/002_Figure_2.jpg]]
 *Figure 2: Active perception process in the APPLE framework. In this task, the agent’s goal is to classify the digit using touch alone. At each step, it receives a tactile reading and state information (e.g., sensor position). A Vision Transformer encodes the tactile input, which is concatenated with state data and processed as a sequence over time by a transformer. At every step, the model outputs a label prediction $y _ { t }$ , , evaluated against the ground truth $\stackrel { * } { y }$ via a loss function ℓ, and an action $a _ { t }$ that controls the sensor’s next movement.*
 
 ![[assets/figures/papers/iclr26_reinforcement_learning_planning_agents__deep_rl__b001_hU2gT2Ucua_APPLE_Toward_General_Act/figures/003_Figure_3.jpg]]
-
-
-
 
 ## 定位与知识库关联
 
@@ -224,8 +206,6 @@ APPLE 属于主动感知与强化学习交叉领域的方法。其核心思想�
 - APPLE 在物体姿态估计、形状重建或材料属性推断等任务上的表现如何？
 - 将 APPLE 与好奇心驱动的内在奖励方法（如 ICM 或 RND）结合是否能加速学习？
 - APPLE 能否通过域随机化等技术实现从仿真到真实的迁移？
-
-
 
 ## 原文 PDF
 

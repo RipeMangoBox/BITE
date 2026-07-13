@@ -67,8 +67,6 @@ LMR 的核心是一个 **双粒度标记器（Dual-Granularity Tokenizer）**，
 **方法谱系与知识库定位**  
 LMR 属于 **层次化自回归生成** 范式，其直接基线包括离散自回归模型 **T2M-GPT** 和连续自回归扩散模型 **MotionStreamer**。不同于这些方法在单一流形上从文本直接映射到运动标记，LMR 通过双粒度标记器将运动规划与执行解耦，并在推理潜在上施加对比对齐损失与掩码文本预测损失以显式绑定语义。这一设计使 LMR 区别于仅依赖全局条件或反馈机制的现有工作，在生成质量与语义对齐两个维度上均取得显著提升。
 
-
-
 ### 文本到运动生成的核心瓶颈：语义-运动学阻抗失配
 
 文本到运动（Text-to-Motion, T2M）生成的目标是根据自然语言描述合成符合语义且物理真实的人体运动序列。然而，现有方法面临一个根本性障碍——**语义-运动学阻抗失配（Semantic-Kinematic Impedance Mismatch）**：自然语言是符号化、语义密集的离散系统，而人体运动是高频、连续的高维时间序列。将两者在单次映射中直接对齐，迫使模型同时承担语义理解和运动细节生成的双重压力，导致全局规划与局部物理保真度难以兼顾。
@@ -86,8 +84,6 @@ LMR 属于 **层次化自回归生成** 范式，其直接基线包括离散自�
 ### 动机：从“翻译”到“先思而后动”
 
 上述发现共同指向一个核心洞察：**最优的运动规划基底不是自然语言，而是一个与运动对齐的潜在概念空间**。语义规划需要低时间分辨率、高语义密度的压缩表征，而运动执行需要高时间分辨率、保留物理细节的精细表征。因此，本文提出 **Latent Motion Reasoning (LMR)** 框架，将生成过程重构为“先思考后行动”（Think-then-Act）的两阶段层次化决策：先在语义丰富的推理流形中规划粗粒度的运动轨迹，再在运动保真的执行流形中实例化每一帧。这一范式转变的核心是**双粒度标记器（Dual-Granularity Tokenizer）**，它显式地将潜在空间解耦为推理潜在（Reasoning Latent）和执行潜在（Execution Latent）两个流形，使生成过程从单步翻译变为逐步实例化的因果链。
-
-
 
 ## 核心方法与创新机理
 
@@ -141,8 +137,6 @@ $$p(\mathbf{x}|c) \approx \underbrace{p(S_{\text{exec}}|S_{\text{res}}, c)}_{\te
 
 > **注意**：部分消融实验的具体数值未在提供的分析材料中完整呈现，建议在正式撰写时从原文 Table 3-6 中提取精确数据以增强论证力度。
 
-
-
 LMR 将文本到运动生成重新定义为“先思而后动”（Think-then-Act）的两阶段层次化决策过程，其核心在于将传统自回归模型中的平坦序列建模转化为因果链：**文本 → 推理标记（规划）→ 执行标记（实例化）**。框架由两个核心模块串联构成：双粒度标记器（Dual-Granularity Tokenizer）负责将原始运动解耦为两个不同性质的潜在空间，LMR 生成器（LMR-Generator）则在这两个空间中依次完成规划与执行。
 
 ### 双粒度标记器：解耦推理与执行流形
@@ -185,15 +179,11 @@ $$p(\mathbf{x}|c) \approx \underbrace{p(S_{exec}|S_{res},c)}_{\text{执行（系
 
 因此，LMR 通过双粒度解耦，让推理流形承载稀疏但语义密集的规划信息，执行流形承载密集但语义中性的运动学细节，从根本上绕开了语义-运动学阻抗失配。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2512_24100/figures/005_Figure_4.jpg]]
 *Figure 4: Overview of the proposed Latent Motion Reasoning (LMR) framework. The framework consists of two phases: (Right) Dual-Granularity (DG) Tokenizer: We explicitly disentangle motion representations into two manifolds: a compressed Reasoning Latent (Yellow), which is aligned with text embeddings to capture high-level semantic intent, and a high-frequency Execution Latent (Blue), which preserves low-level kinematic fidelity for reconstruction. (Left) LMR-Generator: We reformulate T2M as a hierarchical ”Think-then-Act” generation process. Conditioned on the text prompt, the model first autoregressively synthesizes the coarse-grained reasoning tokens to establish the global motion topology (Thinkin...*
 
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2512_24100/figures/002_Figure_1.jpg]]
 *Figure 1: Architectural Comparison and the Central Challenge of Textto-Motion (T2M) Generation. Existing methods struggle to bridge the gap between abstract language and continuous motion. (a) Direct Generation [8], [9] and (b) Direct Generation with Feedback [10], [11] (collectively, System 1) are severely limited by the Semantic-Kinematic Impedance, where the generator must simultaneously plan global trajectory and guarantee local physical fidelity, resulting in a single-shot, over-burdened process and outputs that lack physical grounding. (c) The Language CoT Paradigm [12] introduces high-level reasoning (System 2), but the textual chain-of-thought is a Low-Bandwidth Bottleneck (Funnel), losing th...*
-
-
 
 ### 问题形式化与瓶颈诊断
 
@@ -240,15 +230,11 @@ $$\mathcal{L}_{diff} = \mathbb{E}_{t,l,\epsilon}\left[\|\epsilon - \epsilon_\phi
 
 双分支标记器采用**两阶段冻结训练**策略：首先训练执行分支建立高保真运动重建基底，随后冻结执行分支参数，仅训练推理分支以学习语义对齐。消融实验表明，该策略相比端到端联合训练或独立网络，在 FID 和语义对齐上均取得最优效果，原因在于避免语义目标干扰已收敛的运动学执行能力。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2512_24100/figures/004_Figure_3.jpg]]
 *Figure 3: Analysis of Semantic Density and Temporal Resolution. (Left) The Reconstruction-Generation Trade-off: We plot reconstruction error (MPJPE, Blue) and generation quality (FID, Green) across varying down-sampling ratios. A clear trade-off is observed: while high-frequency tokens (1/1) yield the best reconstruction, they degrade generation quality. The optimal balance is found at a 1/4 ratio (Red Star). Crucially, the “Same Token Length” comparison (Triangles vs. Circles with a temporal down-sampling ratio of*
 
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2512_24100/figures/010_Figure_7.jpg]]
 *Figure 7: Visualization of the Masked Token Prediction (MTP) capability. The model predicts masked keywords (marked in red) such as body parts (‘left’, ‘right’) and actions (‘stop’, ‘raising’) using the learned Reasoning Latents. The high accuracy of Top-1 predictions demonstrates that our reasoning module effectively captures fine-grained semantickinematic alignment*
-
-
 
 ## 实验与关键发现
 
@@ -288,23 +274,6 @@ Table 7显示LMR在训练和推理阶段均引入额外计算开销（双粒度�
 - KIT-ML上的精确FID数值在提供的分析中缺失，需对照原表确认。
 - 用户研究（Figure 8、Figure 9）的具体评分和统计显著性未在分析中量化，需查阅原文图表。
 - 各消融表中未提供方差或置信区间，结果稳定性需通过原文补充材料验证。
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2512_24100/figures/016_Figure_8.jpg]]
-*Figure 8: User study on motion quality*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2512_24100/figures/006_Table_1.jpg]]
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2512_24100/figures/012_Table_3.jpg]]
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2512_24100/figures/011_Table_4.jpg]]
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2512_24100/figures/013_Table_6.jpg]]
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2512_24100/figures/017_Table_8.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -357,8 +326,6 @@ LMR 的有效性依赖于以下设计选择，这些选择同时界定了其适�
 ### 4. 知识库定位总结
 
 LMR 在文本到运动生成的知识体系中占据**范式转换者**的位置：它将问题从“如何更好地从文本翻译到运动”重新定义为“如何在运动对齐的潜在空间中进行结构化推理”。其核心知识贡献——语义-运动学阻抗失配的诊断、双粒度流形解耦的设计、以及潜在空间推理的可行性验证——为后续工作提供了新的研究起点。该方法在离散和连续两种主流技术路线（VQ-VAE 自回归与扩散自回归）上均取得显著提升，表明其核心思想具有跨架构的普适性，而非特定实现的偶然增益。
-
-
 
 ## 原文 PDF
 

@@ -57,8 +57,6 @@ claims:
 
 **局限性**：TextOp 目前缺乏环境感知与物理推理能力，无法应对障碍物或动态场景；长期运动生成的一致性和命令歧义性在复杂指令流下仍可能退化。
 
-
-
 ### 问题背景
 
 人形机器人因其类人的形态结构，理论上具备执行人类全部运动技能的潜力。然而，如何以自然、灵活且交互式的方式驱动通用人形机器人控制器，使其能够实时响应人类意图并生成物理可执行的全向运动，仍然是一个开放挑战。传统的人形机器人控制方法通常依赖预定义轨迹或连续的人类遥操作，这些方式要么缺乏对动态变化指令的适应能力，要么对操作者提出了极高的技能要求。
@@ -93,8 +91,6 @@ claims:
 
 通过上述设计，TextOp在真实Unitree G1机器人上实现了端到端平均0.73秒的交互延迟，能够在30秒连续运行中保持高成功率和跟踪精度，并支持舞蹈、跳跃、乐器演奏、表达性手势等多种技能的实时文本驱动切换。
 
-
-
 ## 核心方法与创新机理
 
 TextOp 的核心创新在于将**流式文本驱动的交互式运动生成**与**基于强化学习的全身运动跟踪**无缝结合，并通过**机器人骨架运动表示**和**生成数据增强**弥合虚拟角色与真实人形机器人之间的分布差距。其关键创新点体现在以下几个维度：
@@ -126,8 +122,6 @@ Table III 的对比实验显示，该表示在 BABEL 验证集上的段级 FID �
 TextOp 构建了完整的实时部署管线：用户文本经 CLIP 编码后通过网络发送至运动生成器，生成器以 6.25 Hz 输出参考运动，跟踪策略在机器人机载计算机上以 50 Hz 执行关节指令。Table I 显示，在 30 秒真机运行中，TextOp 在随机指令流下达到 80% 成功率（16/20），在循环指令下达到 100% 成功率，并在外部扰动下展现出实时恢复能力（Fig. 5）。
 
 **创新局限性**：TextOp 目前缺乏显式环境感知和物理推理能力，无法适应障碍物或动态环境；长期运动生成的一致性和命令歧义性在复杂指令流下仍可能导致性能下降。
-
-
 
 TextOp 将“实时文本驱动人形机器人运动生成与控制”分解为两个紧密协同的层级：**交互式运动生成**（Interactive Motion Generation）与**动态运动跟踪**（Dynamic Motion Tracking），并通过一个**运行时部署管线**将二者桥接，实现从流式文本输入到物理机器人关节指令的端到端闭环（Fig. 2）。
 
@@ -169,13 +163,6 @@ $$
 2. **生成数据增强训练**：在跟踪器训练中混合动作捕捉数据与生成器产出，弥合参考运动分布与策略训练分布之间的差距，使策略在生成运动上仍能保持高跟踪精度与语义一致性。
 
 这两个设计相互支撑：机器人骨架表示使生成器能够产出物理上更可行的参考运动，而生成数据增强则确保跟踪器能够可靠地执行这些运动，二者共同构成了从文本意图到物理执行的完整闭环。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l64_https_arxiv_org_abs_2602_07439v1/figures/001_Figure_1.jpg]]
-*Figure 1: TextOp enables a humanoid robot to execute a seamless sequence of diverse skills—ranging from expressive gestures to complex physical tasks—driven by real-time, interactive text commands from the user in a single continuous trial*
-
-
 
 TextOp 将交互式文本驱动人形机器人运动生成与控制分解为两个核心模块：**交互式运动生成器**（Interactive Motion Generator）和**动态运动跟踪策略**（Dynamic Motion Tracking Policy），并通过一个运行时部署管线将二者串联为实时系统（Fig. 2）。
 
@@ -238,15 +225,8 @@ $$
 
 部署管线（Fig. 2c）将上述模块串联：用户输入文本经 CLIP 编码后通过网络发送至运动生成器，生成器以自回归方式持续产生参考运动并存入运动缓冲区；跟踪策略从缓冲区读取参考运动，结合机器人当前状态实时计算关节指令。端到端用户交互延迟平均为 0.73 秒（Table II），其中文本编码仅需 7.64 ms，满足实时交互需求。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l64_https_arxiv_org_abs_2602_07439v1/figures/003_Figure_3.jpg]]
-*Figure 3: Illustration of the time-aligned data format including text labels, SMPL motions, and robot motions*
-
 ![[assets/figures/papers/paper_list_l64_https_arxiv_org_abs_2602_07439v1/figures/016_Table.jpg]]
 *Table: XII: Comparison of motion representation components used by different methods. ✓ indicates the representation is used, × indicates it is not used. Components are reported based on the actual feature vectors used by each method, regardless of semantic overlap between each other. For the following tables, in the Unitree G1 skeleton, the term “Body” refers to 29 body links, excluding the root link, whereas in the SMPL skeleton it corresponds to 22 spherical joints. The “Base Frame” denotes the coordinate frame attached to the root link. In contrast, the “Character Frame” is a local frame aligned with the root’s yaw: its origin coincides with the root position, its yaw matches the root yaw, and...*
-
-
 
 ## 实验与关键发现
 
@@ -259,9 +239,6 @@ TextOp 在 Unitree G1（29 DoF）人形机器人上进行了真实世界部署�
 
 ![[assets/figures/papers/paper_list_l64_https_arxiv_org_abs_2602_07439v1/figures/004_Figure_4.jpg]]
 *Figure 4: Continuous diverse skill execution in the real robot. The robot seamlessly performs a wide range of tasks, including multiple dance styles, dynamic jumping behaviors, instrument-playing motions, and expressive gestures. For complex longhorizon motions in the private dataset, the entire motion is assigned a unique label wrapped with*
-
-![[assets/figures/papers/paper_list_l64_https_arxiv_org_abs_2602_07439v1/figures/018_Figure_7.jpg]]
-*Figure 7: Additional results of continuous diverse skill execution in the real robot*
 
 端到端用户交互延迟平均为 **0.73±0.10 秒**（Table II），满足实时交互需求。延迟分解显示：文本编码仅需 7.64 ms，运动生成和策略推理为主要耗时环节，但整体流水线仍保持在可交互范围内。
 
@@ -289,24 +266,11 @@ TextOp 在 Unitree G1（29 DoF）人形机器人上进行了真实世界部署�
 - 运动生成评估在 BABEL 验证集上进行，该集的文本注释偏向于动作类别，与其他生成模型的比较可能受数据分割影响。
 - TextOp 目前缺乏显式的环境感知和交互式物理推理能力，无法适应障碍物、物体或动态环境。长期运动生成的一致性和命令歧义性可能在复杂指令流下导致性能下降，这些是未来工作需要解决的关键问题。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l64_https_arxiv_org_abs_2602_07439v1/figures/005_Table.jpg]]
-*Table: I: Quantitative evaluation on 30-second longhorizon real-robot executions with diverse text command streams. TextOp achieves a strong tracking fidelity across all evaluated tasks*
-
-![[assets/figures/papers/paper_list_l64_https_arxiv_org_abs_2602_07439v1/figures/007_Table.jpg]]
-*Table: II: Real-time performance of different stages in TextOp*
-
 ![[assets/figures/papers/paper_list_l64_https_arxiv_org_abs_2602_07439v1/figures/008_Table.jpg]]
 *Table: III: Comparison of motion generation with different motion representations. Our method achieves the best overall performance across most segment- and transition-level metrics. Rightarrow “→” denotes that closer alignment with the dataset reference is better. Bold and underlined values indicate the best and second-best results, respectively, excluding the dataset. All results are reported as mean ± standard deviation over three generator rollout seeds*
 
-![[assets/figures/papers/paper_list_l64_https_arxiv_org_abs_2602_07439v1/figures/009_Table.jpg]]
-*Table: IV: Simulation evaluation of the motion tracker on generator-produced motion data. Incorporating generatorproduced motions during training leads to improved performance across both tracking and semantic metrics. Rightarrow “→” denotes that closer alignment with the dataset reference is better. Bold and underlined values indicate the best and second-best results, respectively, excluding the dataset. All results are reported as mean ± standard deviation over three generator rollout seeds*
-
 ![[assets/figures/papers/paper_list_l64_https_arxiv_org_abs_2602_07439v1/figures/017_Table.jpg]]
 *Table: XIII: Ablation study on key hyperparameters for Motion Generation. All results are reported as mean ± standard deviation over three generator rollout seeds*
-
-
 
 ## 定位与知识库关联
 
@@ -345,8 +309,6 @@ TextOp的适用边界由其设计假设和实验覆盖范围共同界定：
 2. **生成数据与真实数据的域自适应**：TextOp-G在未见过的动作捕捉数据上的具体失败模式是什么？这些失败是否源于生成运动的物理不可行性、分布偏移，还是跟踪策略的过拟合？如何通过改进运动表示、数据增强或域随机化来缓解这些问题？
 
 3. **交互式控制的更细粒度评估**：当前的评估主要关注段级和过渡级指标，但实时交互式控制的核心价值在于命令切换的响应速度和语义保真度。如何设计更细粒度的评估协议，量化“命令切换延迟”“语义过渡自然度”和“用户意图对齐度”等交互式指标，是推动该方向发展的关键。
-
-
 
 ## 原文 PDF
 

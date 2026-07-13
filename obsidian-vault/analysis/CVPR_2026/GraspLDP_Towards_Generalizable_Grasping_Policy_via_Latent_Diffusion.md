@@ -52,15 +52,11 @@ GraspLDP 的核心思路是将预训练抓取检测器的先验知识注入潜�
 
 在方法谱系上，GraspLDP 区别于直接预测抓取位姿的经典方法（如 AnyGrasp）和从原始观测生成动作块的 Diffusion Policy，也与通用视觉‑语言‑动作模型 **OpenVLA**（Kim et al., arXiv 2024）及 **GraspVLA**（Hu et al., arXiv 2025）不同——它通过两阶段训练（动作潜在学习 + 潜在扩散）将抓取先验结构化地融入策略，而非将其作为简单的条件输入。当前方法已在刚体物体上得到充分验证，但对可变形、易碎物体及高度堆叠场景的泛化仍是待探索的开放问题。
 
-
-
 机器人抓取是具身智能的核心任务，要求系统在多样化的物体、空间配置和视觉条件下可靠地完成操作。当前主流方法大致分为两脉：一是以 AnyGrasp 为代表的**抓取检测**方法，直接预测可行的抓取位姿；二是以 **Diffusion Policy**（Chi et al., RSS 2023）为代表的**模仿学习**方法，从未压缩的视觉观测中直接生成动作序列。然而，这两类方法之间存在显著的语义鸿沟——抓取检测器输出的低语义位姿难以与模仿学习所需的高维动作序列建立有效关联，导致策略在面对未见物体、新位姿或视觉干扰时泛化能力严重不足。
 
 这一瓶颈的根源在于：现有模仿学习策略缺乏将抓取先验知识有效融入动作生成的机制。抓取位姿与动作序列之间是弱关联的，且低语义的位姿表示与视觉输入不匹配，使得模型难以学习到从“看到物体”到“精准抓取”的稳健映射。尽管一些工作尝试将抓取位姿作为条件输入拼接到观测中（Condition Guidance），但这种粗暴的注入方式并未从根本上解决表示空间不匹配的问题，泛化性能提升有限。
 
 针对上述缺口，GraspLDP 提出了一个核心洞察：**将抓取检测的先验知识融入潜在扩散策略框架**。具体而言，该方法通过两个关键机制实现先验注入——在动作潜在空间中用抓取位姿引导去噪过程，同时提供几何驱动的可抓性视觉提示（graspness map）并辅以自监督重建目标。这一设计使生成的轨迹紧密贴合可行抓取配置，在保持实时性的同时大幅提升抓取精度和泛化能力。实验表明，与 Diffusion Policy 相比，GraspLDP 在域内抓取成功率提升 17.5%，空间、对象、视觉泛化分别提升 22.2%、46.8%、48.3%，推理延迟仅增加约 15%。
-
-
 
 ## 核心方法与创新机理
 
@@ -97,8 +93,6 @@ $$d_{\mathcal{G}_j, W} = \sqrt{\xi^{\top} W \xi}$$
 ### 创新效果验证
 
 消融实验（Table 2）量化了各组件的独立贡献：移除可抓性视觉提示（GC）使域内成功率下降 2.9 点，视觉泛化下降最为明显；移除潜在空间引导（LG）改用条件引导（CG）则使域内成功率下降 6.8 点，证实了在潜在空间中进行抓取位姿引导的设计优势。整体而言，GraspLDP 在域内抓取成功率上较 Diffusion Policy 提升 17.5%，空间、对象、视觉泛化分别提升 22.2%、46.8%、48.3%，且推理延迟仅增加约 15%，保持了实用实时性。
-
-
 
 GraspLDP 的整体设计遵循“先压缩动作、再在潜在空间中注入抓取先验”的两阶段训练范式，其架构如 Figure 2 所示。核心思路是：**将预训练抓取检测器的几何先验融入潜在扩散策略，使生成的轨迹紧密贴合可行抓取配置**，从而在保持实时性的同时大幅提升抓取精度与泛化能力。
 
@@ -155,8 +149,6 @@ $$d_{\mathcal{G}_j, W} = \sqrt{\xi^{\top} W \xi}$$
 ### 与基线方法的本质差异
 
 与 **Diffusion Policy**（Chi et al., RSS 2023）直接在高维观测-动作空间去噪不同，GraspLDP 将去噪过程迁移至潜在空间，并在解码阶段注入抓取位姿引导。与简单地将抓取位姿作为条件输入拼接至观测的 **Condition Guidance** 消融基线相比，GraspLDP 的潜在引导设计使抓取位姿在动作潜在空间中直接参与重构，证据表明这一设计使域内成功率提升 6.8 个百分点（Table 2）。
-
-
 
 GraspLDP 采用**两阶段训练**的潜在扩散模型框架（Figure 2）。第一阶段学习动作潜在空间，第二阶段在该空间中进行条件扩散去噪，并在推理时引入启发式位姿选择器。以下逐一解析各模块的设计逻辑与核心公式。
 
@@ -218,8 +210,6 @@ $$d_{\mathcal{G}_j, W} = \sqrt{\xi^{\top} W \xi}$$
 ### 推理流程整合
 
 推理时（Figure 3），HPS 首先从当前观测中筛选最优抓取位姿 $\mathcal{G}$；随后，扩散模型在潜在空间中从随机噪声出发，以可抓性视觉提示为条件逐步去噪，生成动作潜在表示 $Z$；最后，VAE 解码器将 $Z \oplus \mathcal{G}$ 解码为最终的动作块 $\hat{A}$。整个流程仅比同配置的 Diffusion Policy 增加约 15% 的推理延迟（Figure 4），保留了实用的实时性。
-
-
 
 ## 实验与关键发现
 
@@ -291,28 +281,6 @@ Figure 5 的定性分析展示了仿真与真实世界的抓取轨迹对比。�
 4. **杂乱场景碰撞**：高度堆叠场景中，HPS 选择的抓取候选仍可能发生碰撞或误选。
 5. **极端低时延场景**：推理延迟虽低，但在高频动态抓取等极端时延要求下未进一步优化。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2514_https_arxiv_org_abs_2602_22862/figures/006_Figure_4.jpg]]
-*Figure 4: Inference latency of three methods on an RTX 4090 GPU, with the policy action horizon aligned to 8 for each inference. Results of GraspVLA are after acceleration with torch.compile()*
-
-![[assets/figures/papers/paper_list_l2514_https_arxiv_org_abs_2602_22862/figures/007_Table_3.jpg]]
-*Table 3: Ablation study on selection strategy of grasp pose*
-
-![[assets/figures/papers/paper_list_l2514_https_arxiv_org_abs_2602_22862/figures/011_Table_5.jpg]]
-*Table 5: Results of cluttered scenarios evaluation in real world*
-
-![[assets/figures/papers/paper_list_l2514_https_arxiv_org_abs_2602_22862/figures/013_Table_6.jpg]]
-*Table 6: Results of dynamic grasp task*
-
-![[assets/figures/papers/paper_list_l2514_https_arxiv_org_abs_2602_22862/figures/015_Table_7.jpg]]
-*Table 7: Results of In-domain evaluation with few demonstrations*
-
-![[assets/figures/papers/paper_list_l2514_https_arxiv_org_abs_2602_22862/figures/016_Table_8.jpg]]
-*Table 8: Results of In-domain setting with different grasp detector*
-
-
-
 ## 定位与知识库关联
 
 ### 与主流模仿学习基线的继承与差异
@@ -356,8 +324,6 @@ GraspLDP 的适用边界由以下约束条件共同定义：
 - **检测器鲁棒性的解耦**：能否通过多检测器集成或检测器置信度校准，降低对单一预训练检测器的依赖？Table 8 已初步探索了不同检测器的影响，但更系统的检测器鲁棒性研究仍是空白。
 
 - **极端动态场景的实时性保障**：在需要毫秒级响应的动态抓取任务中，能否通过模型蒸馏或专用推理优化将延迟压缩至 50ms 以内？当前约 15% 的额外延迟在多数场景下可接受，但尚未触及实时控制的极限要求。
-
-
 
 ## 原文 PDF
 

@@ -55,8 +55,6 @@ claims:
 
 **主要结果。** 在LLaVA-1.5-7B上，SCoRe以仅保留32个令牌（剪枝率94.4%）达到基线性能的95%，显著优于SparseVLM（77.9%）和VisPruner（91.5%）。当保留128个令牌（剪枝率77.8%）时，SCoRe在10个基准上的平均相对性能达到100.6%，甚至略超原始全令牌基线。在LLaVA-NeXT-7B和Qwen-VL-7B上的跨架构实验进一步验证了方法的通用性。消融实验证实，平衡覆盖度与显著性的完整方法显著优于纯多样性（α=0）或纯显著性（α→∞）的极端策略。
 
-
-
 ### 视觉语言模型的推理效率瓶颈
 
 大规模视觉语言模型（LVLM）的核心推理瓶颈在于视觉令牌序列过长。视觉编码器（如ViT）通常将每张图像编码为数百个令牌（例如LLaVA-1.5生成576个令牌），这些令牌与文本令牌拼接后输入LLM解码器。由于Transformer自注意力机制的计算复杂度与序列长度的平方成正比（O(L²)），大量视觉令牌导致推理延迟和显存占用急剧上升，严重制约了LVLM的实际部署效率。
@@ -87,8 +85,6 @@ SCoRe将这一问题形式化为**加权k-中心问题**，并通过贪婪算法
 - **理论支撑**：剪枝问题与加权k-中心问题的形式等价性（Eq. 3）为算法提供了坚实的理论基础。
 
 Figure 1的雷达图直观展示了SCoRe的动机验证：在94.4%剪枝率（仅保留32个令牌）下，SCoRe（红色区域）在十个LVLM基准上的性能面积显著大于SparseVLM（77.9%相对性能）和VisPruner（91.5%相对性能），证明了统一代表性优化的有效性。
-
-
 
 ## 核心方法与创新机理
 
@@ -130,8 +126,6 @@ SCoRe 作为**训练无关**模块，被置于视觉编码器与模态投影器�
 
 SCoRe 是首个将覆盖度与显著性统一到单一优化框架中的方法，其理论基础（加权k‑中心）为算法提供了坚实的形式化保证，而贪婪实现则在理论优雅性与计算效率之间取得了实际可用的平衡。
 
-
-
 SCoRe 采用**即插即用**的模块化设计，放置于视觉编码器与模态投影器之间，无需任何额外训练或微调。其整体流水线由四个模块串联构成：
 
 1. **Vision Encoder（视觉编码器）**：接收输入图像，提取视觉令牌特征 $\{v_1, v_2, \dots, v_N\}$ 以及 `[CLS]` 令牌对应的自注意力权重，作为后续显著性评分的依据。
@@ -140,13 +134,6 @@ SCoRe 采用**即插即用**的模块化设计，放置于视觉编码器与模�
 4. **LLM Decoder（大语言模型解码器）**：接收由投影后的视觉令牌与文本令牌拼接而成的多模态序列，生成最终回答。
 
 这一设计的关键在于**剪枝发生在跨模态融合之前**：SCoRe 在视觉编码器输出端即完成令牌筛选，使得后续的投影器和 LLM 仅需处理极少量令牌。这不仅从根源上削减了 Transformer 自注意力机制的 $O(L^2)$ 计算复杂度，还天然兼容 FlashAttention 等高效注意力实现，因为剪枝后的序列长度已大幅缩短。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l781_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_SCoRe_Salience_Cove/figures/003_Figure_3.jpg]]
-*Figure 3: SCoRe’s visual token pruning process. The diagram illustrates how SCoRe iteratively selects representative tokens by balancing salience (from [CLS] attention) and coverage (via cosine distance), integrating into a VLM pipeline where pruned tokens are passed to the Projector and LLM for downstream inference*
-
-
 
 ### 问题形式化：从剪枝到代表性优化
 
@@ -189,12 +176,8 @@ SCoRe 作为一个**即插即用、训练无关**的模块，位于视觉编码�
 
 由于剪枝发生在 LLM 之前，SCoRe 天然兼容 FlashAttention 等高效注意力实现，无需修改 LLM 内部结构。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l781_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_SCoRe_Salience_Cove/figures/002_Figure_2.jpg]]
 *Figure 2: UMAP-based visualization: (a) Original tokens after UMAP dimensionality reduction and DBSCAN clustering with coloring; (b) Tokens retained by the Top-k attention score strategy, where sampling collapse occurs; (c) Tokens retained by the SCoRe algorithm, which achieves higher coverage*
-
-
 
 ## 实验与关键发现
 
@@ -216,13 +199,7 @@ SCoRe 在多个视觉语言模型和剪枝比率下均展现出显著的性能�
 ![[assets/figures/papers/paper_list_l781_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_SCoRe_Salience_Cove/figures/007_Table_3.jpg]]
 *Table 3: Performance of SCoRe on Qwen-VL-7B. Acc. denotes the average accuracy across benchmarks, Rel. represents the average percentage of performance maintained*
 
-![[assets/figures/papers/paper_list_l781_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_SCoRe_Salience_Cove/figures/006_Table_4.jpg]]
-*Table 4: Video understanding performance with Video-LLaVA across three commonly used video question answering benchmarks*
-
 资源效率方面，Table 5 显示 SCoRe 在 FLOPs、GPU 内存占用和推理延迟上均实现显著降低，且无需额外存储开销，优于需要维护键值缓存的 **FastV**（Chen et al., 2024）等方法。
-
-![[assets/figures/papers/paper_list_l781_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_SCoRe_Salience_Cove/figures/008_Table_5.jpg]]
-*Table 5: Performance and Resource Comparison of Different Methods. # Token denotes the number of retained vision tokens, FLOPs (T) represents tera operations, Storage (MB) is the memory storage overhead, GPU Memory (GB) is the graphics card memory usage, and CUDA Time (ms) is the inference time on CUDA*
 
 ### 消融实验
 
@@ -233,9 +210,6 @@ SCoRe 在多个视觉语言模型和剪枝比率下均展现出显著的性能�
 
 超参数敏感性分析（Figure 5）进一步揭示，在 TextVQA 任务上，α 的最优取值区间为 0.6–1.0。过小的 α 导致覆盖度过度优先而忽略显著性，过大的 α 则退化为 Top-k 选择并引发采样坍缩，二者均会造成性能下降。这一发现为实际部署中的超参数选择提供了明确指导。
 
-![[assets/figures/papers/paper_list_l781_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_SCoRe_Salience_Cove/figures/010_Figure_5.jpg]]
-*Figure 5: Sensitivity analysis of hyperparameter α. The experiment is conducted on the TextVQA with 32 retained tokens, where α controls the trade-off between diversity coverage and salience*
-
 ### 失败模式与局限性
 
 尽管 SCoRe 在整体基准上表现优异，但需注意以下边界情况：
@@ -245,8 +219,6 @@ SCoRe 在多个视觉语言模型和剪枝比率下均展现出显著的性能�
 2. **固定剪枝比率的限制**：SCoRe 当前需要预设保留令牌数 k，无法根据输入图像的复杂度自适应调整。对于简单图像，固定 k 可能保留冗余令牌；对于复杂场景，k 可能不足以覆盖所有关键语义区域。
 
 3. **贪婪算法的次优性**：SCoRe 的贪婪选择策略虽在实践中表现优异，但加权 k-中心问题的理论近似比尚未在该特定设置下严格证明。是否存在更优的组合优化方法可进一步提升代表性质量，仍是一个开放问题。
-
-
 
 ## 定位与知识库关联
 
@@ -286,8 +258,6 @@ $$s_t = \operatorname*{argmax}_{v_i \in V \setminus S_{t-1}} \left( d_{\cos}(v_i
 2. **理论近似比。** SCoRe 的贪婪算法与加权 k-中心问题的全局最优解之间的近似比是否可证？能否通过局部搜索或线性规划松弛进一步提升解的质量？
 3. **极端场景下的退化。** 在长视频或高分辨率图像中，视觉令牌空间呈数量级增长，显著性权重的估计噪声和覆盖度计算的稀疏性问题如何应对？
 4. **细粒度感知的量化评估。** SCoRe 剪枝是否系统性地损害模型对 OCR 文本、小物体等细粒度细节的感知能力？现有的基准测试（如 TextVQA）提供了初步信号，但缺乏细粒度的归因分析。
-
-
 
 ## 原文 PDF
 

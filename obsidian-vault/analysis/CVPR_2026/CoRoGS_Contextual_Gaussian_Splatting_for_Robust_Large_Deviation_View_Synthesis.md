@@ -69,8 +69,6 @@ claims:
 
 当前方法仍存在两个主要局限：**对动态对象的处理能力有限**，难以建模包含运动物体的场景；**在大角度旋转场景下几何一致性可能下降**，表明旋转感知的结构约束尚未充分融入。相应的开放问题包括：如何将上下文推理范式扩展到动态高斯场、如何融入旋转感知的结构先验，以及如何优化大规模城市场景中的图构建计算开销。
 
-
-
 ### 大偏差视图合成：从独立基元到上下文感知表示
 
 新视角合成（Novel View Synthesis, NVS）是三维视觉的核心任务之一，其目标是从一组稀疏的输入视图重建出任意新视角下的场景外观。近年来，**3D Gaussian Splatting (3DGS)**（Kerbl et al., ACM TOG 2023）以其显式点基元表示和高效可微光栅化管线，在渲染速度与质量之间取得了突破性平衡，迅速成为该领域的主导范式。然而，现有3DGS方法存在一个根本性的结构缺陷：**将每个高斯核视为独立的几何基元，缺乏对高斯间空间与语义依赖关系的显式建模**。
@@ -110,8 +108,6 @@ claims:
 3. **自适应图扩张**：引入渐进式图扩张策略，在渲染梯度驱动下动态地向未覆盖区域添加高斯节点，同时修剪冗余节点，确保场景拓扑的完备性。
 
 通过这一上下文推理机制，CoRoGS使得每个高斯在大偏差视角下仍能保持与邻域的结构一致性，从而从根本上缓解几何不一致和外观退化问题。
-
-
 
 ## 核心方法与创新机理
 
@@ -162,8 +158,6 @@ CoRoGS 通过 PointNet++ 编码器从位置和法线提取语义属性 $\mathbf{
 
 CoRoGS 的创新并非孤立的模块堆叠，而是围绕“上下文感知高斯图”这一核心洞察的系统性重构：用图拓扑替代独立基元，用消息传递替代独立优化，用语义引导的平滑和扩张替代无差别的正则化与覆盖策略。这五个 changed slots 相互协同，共同实现了在大视角偏差下全局结构连贯、语义一致的高保真渲染。
 
-
-
 CoRoGS 的整体 pipeline 围绕“上下文感知的高斯泼溅”这一核心范式展开，将传统 3DGS 中相互独立的高斯基元转化为一个显式建模空间与语义依赖关系的**3D 高斯图结构**，并通过图神经网络的消息传递机制实现一致性高斯更新。整个框架由五个关键模块串联构成，形成从场景初始化到最终渲染的闭环。
 
 **输入**为多视图图像及对应的相机位姿，首先通过 MVS（多视角立体）重建获得稀疏点云，作为高斯的初始位置和法线估计。随后进入核心流水线：
@@ -183,12 +177,8 @@ CoRoGS 的整体 pipeline 围绕“上下文感知的高斯泼溅”这一核心
 
 **输出**为经过上下文推理优化的高斯场，可直接通过可微光栅化渲染任意新视角的图像、法线图和语义图。整体框架的闭环设计使得从图构建、消息传递、参数解码到损失监督和拓扑扩张形成了端到端的优化循环，如图 2 所示。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2248_https_openaccess_thecvf_com_content_CVPR2026_html_Ma_CoRoGS_Contextual_G/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our CoRoGS. (a) 3D Gaussian Graph Construction module builds a graph representation of Gaussians in Sec. 3.3. (b) Gaussian Graph Neural Network in Sec. 3.4 refines each Gaussian through three submodules: 1) attributes embedding, 2) geometric and semantic update, 3) cross-modal fusion. (c) Context-aware Gaussian decoder in Sec. 3.5. (d) Contextual smoothness loss in Sec. 3.6. (e) Graph Expansion module in Sec. 3.7 iteratively refines the graph by adding nodes in uncovered regions while pruning redundant ones to alleviate artifacts caused by incomplete topology*
-
-
 
 CoRoGS 的核心在于将高斯表示从独立基元转化为上下文感知的图结构，并通过图神经网络实现高斯间的消息传递与协同更新。本节聚焦于支撑这一范式的关键模块与核心公式。
 
@@ -256,21 +246,14 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_1 + \lambda_D \mathcal{L}_{\mathrm{
 
 初始高斯图受限于MVS点云的覆盖范围，可能遗漏场景中的细节区域。CoRoGS引入梯度驱动、拓扑约束的渐进式图扩张策略：在训练过程中，根据渲染梯度识别覆盖不足的区域，在高梯度位置添加新高斯节点，并通过Delaunay边连接融入现有图结构；同时修剪对渲染贡献可忽略的冗余高斯。这一策略使高斯图能够自适应地填补结构空洞，在保持几何连贯性和语义连续性的同时提升场景覆盖。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2248_https_openaccess_thecvf_com_content_CVPR2026_html_Ma_CoRoGS_Contextual_G/figures/010_Figure_6.jpg]]
 *Figure 6: Visualization of initial and optimized Gaussian graph*
-
-
 
 ## 实验与关键发现
 
 ### 主实验结果
 
 CoRoGS 在两种实验设置下均展现出显著优势：监督小偏差设置和非监督大偏差设置。在 KITTI 数据集上采用 0.5m 横向右移相机的监督小偏差配置下，CoRoGS 在所有评估指标上均取得最优性能，PSNR 达到 24.96，SSIM 达到 0.849，LPIPS 降至 0.180，CD 指标为 1.32（Table 1）。CD 指标的领先表明 CoRoGS 不仅渲染质量优越，其底层几何重建也更为精确。
-
-![[assets/figures/papers/paper_list_l2248_https_openaccess_thecvf_com_content_CVPR2026_html_Ma_CoRoGS_Contextual_G/figures/004_Table_1.jpg]]
-*Table 1: Quantitative evaluation on the KITTI dataset using a supervised small-deviation setting with 0.5m lateral right-shift camera configuration*
 
 在更具挑战性的非监督大偏差设置下（Table 2），实验覆盖 KITTI 和 Waymo Open 两个数据集，评估 Left-5m、Up-2m 和 Diagonal-5m 三种大偏差轨迹。以 DC-Gaussian（Wang et al., NeurIPS 2024）为强基线，CoRoGS 在 FID 指标上分别实现 32.72%、28.38% 和 21.04% 的相对改善。这表明上下文感知的高斯表示能够有效缓解大视角偏差下的几何不一致和外观退化问题，而独立高斯基元方法在此类场景中难以维持全局结构连贯性。
 
@@ -292,9 +275,6 @@ CoRoGS 在两种实验设置下均展现出显著优势：监督小偏差设置�
 ![[assets/figures/papers/paper_list_l2248_https_openaccess_thecvf_com_content_CVPR2026_html_Ma_CoRoGS_Contextual_G/figures/008_Table_3.jpg]]
 *Table 3: Ablation studies on the KITTI [5] dataset*
 
-![[assets/figures/papers/paper_list_l2248_https_openaccess_thecvf_com_content_CVPR2026_html_Ma_CoRoGS_Contextual_G/figures/009_Figure_5.jpg]]
-*Figure 5: Ablation study on the KITTI dataset, with zoomed-in regions highlighting the visual difference*
-
 - **几何更新模块**：移除后 PSNR 降至 23.25（下降 1.71 dB），渲染结果出现明显的几何伪影。该模块通过边到节点的注意力聚合机制传播空间结构信息，是维持大偏差下几何一致性的关键。
 - **语义更新模块**：移除后 PSNR 降至 23.69，不同语义区域出现错误融合。语义分支的消息传递使得高斯能够感知物体边界，避免跨语义区域的属性污染。
 - **跨模态融合**：将自适应门控融合替换为简单拼接后，PSNR 下降 1.03 dB 至 23.93。这表明几何与语义特征的协同推理对上下文感知的高斯更新至关重要，简单拼接无法有效建模模态间的互补关系。
@@ -314,16 +294,6 @@ CoRoGS 在两种实验设置下均展现出显著优势：监督小偏差设置�
 - **Table 1**：在监督小偏差设置下，CoRoGS 在 PSNR/SSIM/LPIPS/CD 四项指标上全面领先，验证了上下文感知高斯表示在标准场景下的有效性。
 - **Table 2**：在非监督大偏差设置下，CoRoGS 相对 DC-Gaussian 的 FID 改善幅度随偏差增大而增加（Left-5m: -32.72%，Diagonal-5m: -21.04%），说明上下文建模对大偏差场景的鲁棒性增益尤为突出。
 - **Table 3 & Figure 5**：几何更新模块和跨模态融合对性能贡献最大，移除后 PSNR 分别下降 1.71 dB 和 1.03 dB；图扩张和上下文平滑损失则对场景覆盖和边界保持至关重要。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2248_https_openaccess_thecvf_com_content_CVPR2026_html_Ma_CoRoGS_Contextual_G/figures/001_Figure_1.jpg]]
-*Figure 1: Large-deviation novel view synthesis (LD-NVS) in urban scenes, evaluated on viewpoints with large deviations from the training set. The left panel presents the rendered results, while the right panel shows the corresponding zoomed-in regions, followed by the rendered normals and visualized Gaussians. Our approach shows superior rendering quality over the baseline*
-
-![[assets/figures/papers/paper_list_l2248_https_openaccess_thecvf_com_content_CVPR2026_html_Ma_CoRoGS_Contextual_G/figures/007_Figure.jpg]]
-*Figure: (n) Ours (Full Model)*
-
-
 
 ## 定位与知识库关联
 
@@ -390,8 +360,6 @@ CoRoGS的渐进式图扩张策略与NeRF中的自适应采样和3DGS中的克隆
 3. **大规模场景的高效图计算**：能否通过层次化图结构（如粗粒度场景图与细粒度局部图的嵌套）或稀疏注意力机制降低消息传递的计算复杂度？这关系到方法在自动驾驶等实际应用中的可行性。
 
 4. **跨场景的上下文先验迁移**：CoRoGS的语义属性编码器（PointNet++）在特定数据集上训练，能否通过预训练或元学习使上下文推理能力在不同场景间迁移，减少对新场景的适配成本？
-
-
 
 ## 原文 PDF
 

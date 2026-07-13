@@ -58,8 +58,6 @@ claims:
 
 **方法定位**：该方法属于条件扩散生成范式，通过多模态融合模块将场景几何与自由语言描述联合嵌入去噪过程。相较于**MDM**（Tevet et al., ICLR 2023）的纯文本条件、**SceneDiff**（Huang et al., CVPR 2023）的纯场景条件，以及**cVAE-based HUMANISE**（Wang et al., NeurIPS 2022）的拼接式场景-文本联合条件，LaserHuman的并行交叉融合策略实现了模态间的双向增强，为语言引导的场景感知运动生成提供了新的基线。
 
-
-
 ### 问题背景
 
 语言引导的场景感知人体运动生成（Scene-Text-to-Motion）旨在根据自然语言描述和三维场景几何信息，生成符合语义指令且物理合理的人体运动序列。这一任务在具身智能、虚拟角色动画和人机交互等领域具有重要应用价值。然而，该任务的实现面临双重挑战：一方面，生成的全身运动（包含全局平移、关节旋转和体型参数）必须与自由形式的语言描述保持语义一致；另一方面，人体运动必须与三维场景的几何约束相协调，例如避免穿模、实现合理的接触与交互。
@@ -83,8 +81,6 @@ claims:
 在数据层面，LaserHuman 数据集通过多传感器融合（LiDAR 与相机）在多样化真实场景中采集了丰富的人体运动序列，涵盖室内外多种地形和交互类型，并配有自由形式的语言描述。与 HUMANISE 等现有数据集相比，LaserHuman 在运动时长、场景规模、语言多样性和动态元素等方面均有显著提升（见 Table 1）。
 
 在方法层面，本文的核心洞察是：**并行交叉注意力机制允许文本和场景特征相互增强**——文本特征提供动作和运动方向，场景特征提供交互位置和几何约束，避免了简单拼接或单一查询方式的模态隔离问题。基于此洞察，本文设计了一个**多条件扩散模型与并行交叉融合模块（Parallel Cross Fusion）**，使文本与场景点云特征互为查询进行交叉注意力，在扩散去噪过程中引导运动生成，确保生成的全局平移、身体姿态与文本描述及动态场景保持一致。
-
-
 
 ## 核心方法与创新机理
 
@@ -126,8 +122,6 @@ $$
 
 该并行交叉融合模块具有即插即用的特性。将其应用于基线方法 **sd-Text**（形成 sd-Text w/ cf）后，其接触分数和 FID 均得到显著提升，表明该融合策略可以作为一种通用组件，提升其他场景-文本条件生成模型的性能。
 
-
-
 LaserHuman 提出一个**多条件扩散模型**用于语言引导的场景感知人体运动生成。其核心设计理念是：通过一个简单而有效的多条件融合模块，将自由形式的文本描述与动态 3D 场景点云统一为联合条件嵌入，以此引导扩散 Transformer 在去噪过程中生成既语义一致又物理合理的多样化运动。
 
 ### 输入与运动表示
@@ -158,8 +152,6 @@ LaserHuman 提出一个**多条件扩散模型**用于语言引导的场景感�
 训练阶段的数据流为：场景点云 → Point Transformer → $F_p$；文本描述 → CLIP → $F_l$；$F_p$ 与 $F_l$ 经并行交叉融合 → $z_c$；真实运动 $x_0$ 经前向扩散加噪 → $x_t$；$(x_t, t, z_c)$ 输入扩散 Transformer → 预测 $\hat{x}_0$ → 计算 $L_{\mathrm{motion}}$ 及几何损失。
 
 推理阶段，模型从随机噪声出发，在 $z_c$ 的引导下迭代 $T$ 步去噪，生成与场景几何和文本语义一致的全身运动序列。
-
-
 
 ### 运动表示
 
@@ -207,8 +199,6 @@ $$L_{\mathrm{motion}} = E_{t, \mathbf{x}_0} \left[ \left| \mathbf{x}_t - \mathca
 
 同时施加常见几何损失 以促进运动的自然性与连贯性。采样阶段迭代执行“预测干净运动→加噪回退”过程，共 $T$ 步完成去噪生成。
 
-
-
 ## 实验与关键发现
 
 ### 数据集与评估设置
@@ -239,9 +229,6 @@ Table 2 给出了各方法在 LaserHuman 测试集上的全面对比。本文方
 #### 用户研究
 
 Table 3 的用户研究结果进一步佐证了自动指标的结论。本文方法在**多样性（4.8）、场景一致性（3.9）、文本一致性（3.1）、平滑度（4.6）**四个维度均获最高分，整体合理性总分 **4.1**，显著优于 sd-Text 的约 3.8。值得注意的是，文本一致性是所有方法中得分最低的维度（最高仅 3.1），反映出自由语言描述到精细运动映射仍是该任务的核心难点。
-
-![[assets/figures/papers/paper_list_l1672_LaserHuman_Language_guided_Scene_aware_Human_Motion_Generation_in_Free_E/figures/007_Table_3.jpg]]
-*Table 3: Detailed user study results of human motion generation on LaserHuman*
 
 #### HUMANISE 数据集上的泛化评估
 
@@ -281,15 +268,9 @@ Figure 5 的定性对比直观展示了各方法的生成差异。本文方法�
 
 Figure 6 展示了更多本文方法的生成结果，涵盖室内外混合场景、多人交互等复杂情形，进一步验证了模型在多样化自由环境下的鲁棒性。
 
-![[assets/figures/papers/paper_list_l1672_LaserHuman_Language_guided_Scene_aware_Human_Motion_Generation_in_Free_E/figures/009_Figure_6.jpg]]
-*Figure 6: More generation results of our method on LaserHuman*
-
 ### 失败模式与局限性
 
 Figure 7 系统展示了本文方法的典型失败案例：
-
-![[assets/figures/papers/paper_list_l1672_LaserHuman_Language_guided_Scene_aware_Human_Motion_Generation_in_Free_E/figures/012_Figure_7.jpg]]
-*Figure 7: Fail cases and physical refinement failure on LaserHuman. In (a), the green person represents reference motions. In (b), the left is the result with penetration and the right is the result after physical simulator*
 
 1. **复杂动作生成质量欠佳**：对于“弓背”等训练数据中分布不平衡的复杂动作，生成的运动缺乏细节且与文本描述存在偏差。这本质上是数据驱动方法的共性瓶颈——尾部动作的样本不足导致模型无法学习到稳定的映射。
 
@@ -298,19 +279,6 @@ Figure 7 系统展示了本文方法的典型失败案例：
 3. **依赖精确感知输入**：整个流程依赖准确的 LiDAR 点云注册和 SMPL 优化，在实际部署中可能面临多传感器同步误差和遮挡问题。当前模型未显式建模手指运动和精细物体交互，仅关注全身运动。
 
 这些失败模式指向两个开放问题：如何将物理约束（接触力学、动力学）更有效地融入扩散生成过程本身，而非依赖后处理；以及如何设计更鲁棒的场景特征提取器以应对动态变化的环境。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1672_LaserHuman_Language_guided_Scene_aware_Human_Motion_Generation_in_Free_E/figures/004_Table_1.jpg]]
-*Table 1: Comparison with datasets for scene-aware human motion generation, where “Num” represents number, “PC” is point cloud. For the scene scale, 30 m2 is approximated for single indoor room*
-
-![[assets/figures/papers/paper_list_l1672_LaserHuman_Language_guided_Scene_aware_Human_Motion_Generation_in_Free_E/figures/001_Figure_1.jpg]]
-*Figure 1: LaserHuman consists of large-scale sequences of rich human motions and abundant human interactions captured in various real scenarios with freeform language descriptions, providing valuable data for conditioned human motion generation. We demonstrate two scenarios, where colored humans are annotated targets and white humans are interacted humans in the dynamic scene. The human mesh color from light to dark represents an increase in timing*
-
-![[assets/figures/papers/paper_list_l1672_LaserHuman_Language_guided_Scene_aware_Human_Motion_Generation_in_Free_E/figures/002_Figure_2.jpg]]
-*Figure 2: Overview of data collection and processing procedures*
-
-
 
 ## 定位与知识库关联
 
@@ -386,8 +354,6 @@ LaserHuman 的另一重要贡献是**数据集本身**。与现有场景感知�
 ### 6. 即插即用能力验证
 
 消融实验（Table 6）表明，将并行交叉融合模块应用于SceneDiff（sd-Text w cf）能够提升其接触分数和FID，证明该模块具有**方法无关的即插即用能力**。这意味着并行交叉融合可作为通用条件融合策略，嵌入到其他扩散运动生成框架中，为后续工作提供了直接的技术组件。
-
-
 
 ## 原文 PDF
 

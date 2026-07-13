@@ -51,8 +51,6 @@ claims:
 
 实验结果表明，该方法在所有25种通用部署场景（包括采样变化、系统提示、量化、剪枝、微调等）和5种针对性对抗攻击（输入/输出改写、预填充等）下均达到**指纹成功率（FSR）1.0**，而基线方法**IF**（Xu et al., 2024a）和**SF**（Nasery et al., 2025）在多数场景下FSR降至0.0。同时，指纹嵌入对模型通用能力的影响极小，八个基准上的平均准确率与基础模型几乎一致（变化 ≤ 0.01），且未指纹化模型的误检率为0。隐蔽性评估显示，本文方法的查询和回复被GPT5-MINI法官的召回率显著低于基线，对手难以察觉指纹存在。
 
-
-
 ### 问题背景：模型发布后的所有权困境
 
 大型语言模型（LLM）的发布者面临一个日益严峻的现实问题：模型一旦发布，恶意部署者可以在未遵守限制性许可证的情况下，对模型进行微调、量化、剪枝等修改，并将其部署为黑盒API服务。模型所有者需要一种技术手段，能够从黑盒API的查询-回复交互中，可靠地判定该服务背后的模型是否源自自己发布的版本——这就是**模型指纹识别**（Model Fingerprinting）要解决的核心问题。
@@ -78,8 +76,6 @@ claims:
 - **语义条件触发保证隐蔽性。** 水印信号仅在目标语义域内被激活，在域外查询中完全无泄漏。这使得指纹在常规使用中不可察觉，对手难以通过监控API流量来发现指纹的存在。
 
 这一设计将指纹从“点对点”的脆性匹配转变为“域对信号”的统计检测，在隐蔽性和鲁棒性之间建立了新的平衡点。
-
-
 
 ## 核心方法与创新机理
 
@@ -113,8 +109,6 @@ $$L_{\mathrm{reg}}(\theta)(x) = \sum_{t=1}^{|x|} \max\left( p_{\theta}(.|x_{<t})
 
 这一设计确保了水印信号仅在目标语义域内被蒸馏，而在其他域上模型行为得以完整保留，实现了隐蔽性与通用能力的兼顾。消融实验证实，去除正则化后指纹检测率虽仍为1.0，但基准准确率（尤其是HumanEval）下降更明显，验证了 $L_{\mathrm{reg}}$ 对保持模型通用能力的关键作用。
 
-
-
 本文提出了一种全新的模型指纹范式，其核心思路是将指纹信号从脆弱的固定“查询-密钥”对迁移到语义域与统计水印的组合空间中。整体框架由两个对称的流水线模块构成：**指纹嵌入**与**指纹检测**。
 
 ### 指纹嵌入
@@ -144,8 +138,6 @@ $$L_{\mathrm{reg}}(\theta)(x) = \sum_{t=1}^{|x|} \max\left( p_{\theta}(.|x_{<t})
 
 该框架通过将指纹信号绑定到语义域而非固定查询，从根本上解决了传统方法在查询隐蔽性和部署鲁棒性上的双重瓶颈。
 
-
-
 本方法的核心由两个模块构成：**指纹嵌入**（Sec. 4.1）与**指纹检测**（Sec. 4.2）。前者通过蒸馏–正则化联合优化将红绿水印信号绑定到目标语义域；后者通过拼接多查询回复并执行Z检验来判定模型是否被指纹化。
 
 ### 指纹嵌入模块
@@ -172,8 +164,6 @@ $$Z(\omega) = \frac{\hat{\gamma}(\omega) - \gamma}{\beta(\omega)\sqrt{\gamma(1-\
 
 其中 $\hat{\gamma}(\omega)$ 为 $\omega$ 中绿令牌的观测比例，$\gamma$ 为期望比例，$\beta(\omega)$ 为考虑上下文重复的方差校正项，$|\omega|$ 为序列长度。将 $Z(\omega)$ 与预设阈值（基于目标 FPR = $10^{-3}$）比较，即可判定模型是否被指纹化。由于信号强度随拼接文本长度累积，该方法在量化、剪枝、微调等部署修改后仍能保持高检测力。
 
-
-
 ## 实验与关键发现
 
 ### 核心主张与实验设计逻辑
@@ -184,7 +174,6 @@ $$Z(\omega) = \frac{\hat{\gamma}(\omega) - \gamma}{\beta(\omega)\sqrt{\gamma(1-\
 
 Table 1给出了核心有效性证据。在法语语义域上嵌入指纹后，三个模型的**指纹成功率（FSR）均为1.0**，而未指纹化的基座模型FSR为0——这意味着零误报。更关键的是，8项基准测试的平均准确率几乎未受影响：LLaMA3.2-1B保持0.42，Qwen2.5-3B保持0.58，LLaMA3.1-8B保持0.63，与基座模型偏差不超过0.01。唯一的例外是LLaMA3.2-1B在HumanEval上的轻微下降，这与其容量较小有关。这一结果直接验证了正则化损失$L_{\mathrm{reg}}$（Eq. 2）的设计有效性——它仅惩罚学生分布相对于教师的正向偏差，从而在蒸馏水印信号的同时保留了域外行为。
 
-
 ![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_t38nZqqi3Z/figures/002_Table_1.jpg]]
 *Table 1: Effectiveness of Our Fingerprint We compare the Fingerprint Success Rate (FSR) of 3 models with and without the fingerprint. We also compare utility, measured via benchmark accuracy, and report the average in the last column (AVG). We highlight in bold FSR values of 1.0. We highlight in blue the benchmark in French, as it uses the same semantic domain as our fingerprint*
 
@@ -192,12 +181,10 @@ Table 1给出了核心有效性证据。在法语语义域上嵌入指纹后，�
 
 Table 2系统评估了通用部署修改下的鲁棒性，涵盖采样变化、系统提示、量化（4-bit/8-bit）、剪枝（非结构化/结构化）、微调等场景。**本文方法在所有25种部署下FSR均为1.0**，而IF和SF在多数场景下彻底失效（FSR=0.0）。以量化和微调为例：SF对量化极为敏感，IF在微调后完全丧失指纹；本文方法借助红绿水印的统计信号累积机制——响应越长，绿令牌比例的统计显著性越强——即使模型权重被修改，水印的分布特征仍可被Z检验捕获。
 
-
 ![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_t38nZqqi3Z/figures/003_Table_2.jpg]]
 *Table 2: Robustness Evaluation Against Prominent Deployments We compare the Fingerprint Success Rate of LLAMA3.2-1B. QWEN2.5-3B and LLAMA3.1-8B models fingerprinted with either IF, SF or our fingerprint under various deployment scenarios. We highlight in green FSR of 1.0. Only our fingerprint is robust against all tested deployment scenarios*
 
 Table 3进一步评估针对性对手：输入改写（paraphrasing）、回译、英文预填充、系统提示注入、以及针对法语域的微调。**本文方法在所有5种对抗下FSR保持1.0**。值得注意的是，即使对手用大量法语对话数据微调模型试图覆盖指纹信号，由于水印信号已通过蒸馏嵌入模型的生成分布中，而非依赖表面字符串记忆，微调无法轻易消除。
-
 
 ![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_t38nZqqi3Z/figures/004_Table_3.jpg]]
 *Table 3: Robustness Evaluation Against Targeted Adversaries We compare the Fingerprint Success Rate of LLAMA3.2-1B. QWEN2.5-3B and LLAMA3.1-8B models fingerprinted with either IF, SF or our fingerprint against targeted adversaries particularly adversarial for our fingerprint. We highlight in green FSR of 1.0. Our fingerprint remains robust against all tested adversaries*
@@ -206,20 +193,14 @@ Table 3进一步评估针对性对手：输入改写（paraphrasing）、回译�
 
 Figure 2使用GPT5-MINI作为裁判模型，评估指纹查询和回复的可检测性。**本文方法的查询和回复被裁判模型召回的比率显著低于IF和SF**——IF和SF的固定非典型查询-密钥对极易被识别为异常模式，而本文方法使用完整语义域（如任意法语查询），查询本身是正常的自然语言，回复中的水印信号以统计方式扩散而非以固定字符串形式出现，因此对手难以从流量中筛选出指纹活动。
 
-
-![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_t38nZqqi3Z/figures/005_Figure_2.jpg]]
-*Figure 2: Stealth Evaluation FPR (Left) and Recall (Right) (i.e., percentage of detected fingerprint queries/replies over all fingerprint queries/replies) of our GPT5-MINI-judge when detecting queries/replies of our fingerprint, IF and SF. A lower recall indicates a stealthier fingerprint*
-
 ### 消融实验：关键设计选择
 
 **正则化损失的不可替代性**（Table 8）：去除$L_{\mathrm{reg}}$后，FSR仍为1.0，但HumanEval等基准准确率下降更明显。这表明蒸馏损失$L_{\mathrm{watermark}}$单独即可嵌入水印，但会侵蚀域外能力；正则化项是维持通用任务表现的关键。
-
 
 ![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_t38nZqqi3Z/figures/018_Table_8.jpg]]
 *Table 8: Effectiveness of Our Fingerprinting Method We compare the Fingerprint Success Rate (FSR) of our method with (Ours) and without the regularization (Ours (w/o)). We also compare the utility, measured through benchmark accuracy, and report the average accuracy in the last column (AVG). We highlight in bold FSR values above 80%*
 
 **语义域的可迁移性**（Table 7）：在法语、医学、数学三个语义域上分别训练和检测指纹，FSR均为1.0。但医学域因低熵特性导致绿令牌比例的自然波动更大，需要更多查询才能达到相同统计显著性——这是该方法的已知局限。
-
 
 ![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_t38nZqqi3Z/figures/014_Table_7.jpg]]
 *Table 7: Effectiveness of Our Fingerprinting Method On Different Semantic Domains We compare the Fingerprint Success Rate (FSR) of QWEN2.5-3B fingerprinted on three different domains. We also compare the utility, measured through benchmark accuracy, and report the average accuracy in the last column (AVG). We highlight in bold FSR values of 1.0*
@@ -234,31 +215,12 @@ Figure 2使用GPT5-MINI作为裁判模型，评估指纹查询和回复的可检
 
 1. **域内生成质量下降**：Table 4显示，GPT5-MINI裁判对域内回复的评分从约5.10降至3.18，表明水印蒸馏会影响语义域内的文本可读性——这是信号嵌入的固有代价。
 
-![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_t38nZqqi3Z/figures/007_Table_4.jpg]]
-*Table 4: Additional Quality Metrics We study the impact on quality, measured through perplexity and GPT5-MINI-as-a-judge, and report the average across a thousand samples. The samples are generated on three different semantic domains: a general Q&A Domain, on Math questions and on French questions*
-
 2. **低熵域检测延迟**：医学域需要更多查询才能达到$10^{-3}$ FPR下的可靠检测，延长了判定时间。
 3. **训练成本**：指纹嵌入需处理约81.92M tokens（约$6），显著高于IF/SF的SFT方案（$<1），可能限制大规模快速部署。
 4. **对抗性微调的极限未探明**：虽然实验覆盖了法语域微调，但对手若用更大规模、更高质量的目标域数据进行针对性微调，指纹鲁棒性的边界仍需进一步验证。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_t38nZqqi3Z/figures/020_Figure_10.jpg]]
-*Figure 10: ROC curves for evaluating semantically conditioned watermarks with a watermark token (left) or an (opening,closing) watermark token (right)*
-
-![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_t38nZqqi3Z/figures/021_Figure_11.jpg]]
-*Figure 11: ROC curves for evaluating semantically conditioned watermark with a different key per watermark token. Figure 12: ROC curve for evaluating semantically conditioned watermark on the harmful domain*
-
-![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_t38nZqqi3Z/figures/008_Table_5.jpg]]
-*Table 5: Complementary Robustness Evaluation We compare the Fingerprint Success Rate of LLAMA3.2-1B. QWEN2.5-3B and LLAMA3.1-8B models fingerprinted with either IF, SF or our fingerprint; after various modifications. We highlight in green FSR value of 1.0, as in Table 2*
-
 ![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_t38nZqqi3Z/figures/012_Table_6.jpg]]
 *Table 6: Evaluation of Our Fingerprint Impact on Finetuneability We compare the benchmark performance of QWEN2.5- 3B models (without/with our fingerprint on French) on taskspecific benchmarks (respectively GalicianBench and French-Bench) before and after finetuning on the corresponding datasets (respectively AlpacaGalician and WildChatFr)*
-
-![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_t38nZqqi3Z/figures/022_Table.jpg]]
-
-
-
 
 ## 定位与知识库关联
 
@@ -337,8 +299,6 @@ Figure 2使用GPT5-MINI作为裁判模型，评估指纹查询和回复的可检
 ### 8. 结论与未来工作
 
 本文提出的方法，通过将完整的语义域（如法语）替代有限的查询集，用基于红绿水印的统计信号（在整个响应中扩散、强度随令牌数增加）替代脆弱的固定密钥，通过语义条件水印蒸馏将信号绑定到该域中，从而实现了从“查询-密钥”到“语义条件水印”的转变。
-
-
 
 ## 原文 PDF
 

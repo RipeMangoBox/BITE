@@ -58,8 +58,6 @@ claims:
 
 **主要局限**：伪标签策略存在将行人区域误检为车辆的系统性偏差（Figure 15），对弱势交通参与者的感知安全性构成潜在风险；模型对罕见车型（如橙色巴士）及精确距离估计仍有不足。
 
-
-
 自动驾驶系统依赖大规模、高质量标注数据来训练感知模型。然而，真实世界数据的采集与标注成本极高，且难以覆盖长尾场景。模拟器（如 CARLA）提供了一种可扩展的替代方案，能够以低成本生成无限量的标注数据。但模拟数据与真实数据之间存在显著的**领域差异（domain gap）**——合成图像在纹理、光照、资产多样性等方面与真实场景存在系统性偏差，导致在模拟器上训练的模型直接部署到真实环境时性能大幅下降。
 
 现有应对这一差距的方法主要分为两类：一是通过**风格迁移**（如 MUNIT，Huang et al., ECCV 2018）将合成图像“翻译”为真实风格后再训练；二是采用**域自适应（domain adaptation）**方法，如 DANN（Ganin et al., JMLR 2016），在特征空间对齐源域与目标域分布。然而，这些方法在实践中仍面临根本性挑战。
@@ -79,8 +77,6 @@ $$R_T^{\ell}(h) + R_S^{\ell}(h) \geq \frac{1}{2} \left( \sqrt{D_{\mathrm{JS}}(P_
 传统模拟器数据生成策略通常依赖道路结构或可行驶区域来采样非玩家角色（NPC）位置。这种采样方式会导致合成数据的标签边际分布与真实数据显著偏离（例如，车辆在 BEV 空间中的空间分布过于集中在道路中心），从而引入不可忽视的 $\lambda^{*}$。Figure 2 直观展示了这一现象：基于道路结构的采样策略使得 $P_s(y)$ 与 nuScenes 验证集的 $P_t(y)$ 之间的 JSD 高达 $1.40 \times 10^{-3}$。
 
 综上，本文的核心动机在于：**从域自适应理论出发，系统性地解决模拟器训练中的标签边际分布不匹配问题**。具体而言，需要同时在两个层面进行干预——（1）**数据生成层面**：设计不依赖道路结构的采样策略，使合成数据的标签边际分布主动逼近真实分布；（2）**训练层面**：采用更强的域对抗损失（如 Pearson $\chi^2$ 散度）并结合目标域伪标签，在特征对齐的同时进一步利用目标域信息。两者协同，方能从理论与实践上缩小 sim-to-real 差距。
-
-
 
 ## 核心方法与创新机理
 
@@ -128,8 +124,6 @@ $$\ell_{\mathrm{pseudo}}(p, p_{\mathrm{aug}}) := \sum_{i=0}^{h \cdot w} \mathbb{
 这种“生成-训练”联动机制还展现出对模拟器真实感缺失的强补偿能力：Figure 12 显示，当车辆资产数量从默认值降至极少时，Ours 的性能下降远小于 RS 基线；Figure 14 表明，即使关闭 CARLA 的相机后处理效果（降低图像真实感），域自适应训练仍能大幅补偿性能损失。这证明**本文方法学习到的是与渲染质量弱相关的语义特征，而非对纹理细节的过拟合**。
 
 综上，本文的创新本质在于：**将域自适应理论从“训练时的特征对齐”前推至“生成时的分布匹配”，形成闭环优化**——空间先验从源头缩小 $D_{\mathrm{JS}}(P_s(y) \| P_t(y))$，f-DAL 在特征空间对齐 $P_s(z)$ 与 $P_t(z)$，伪标签提供目标域语义监督，三者协同使 Theorem 1 的上界真正收紧。
-
-
 
 Lift‑Splat‑Adapt 的整体 pipeline 由两条正交但协同的设计主线构成：**数据生成阶段**通过空间先验控制合成数据的标签边际分布，**训练阶段**则在域对抗框架下联合 Pearson χ² 散度对齐与强增强伪标签监督。两条主线共同服务于同一个理论目标——将 Theorem 2 下界中的标签边际散度 $D_{\mathrm{JS}}(P_s(y) \| P_t(y))$ 压到足够小，使 Theorem 1 中的 $\lambda^*$ 可忽略，从而让域不变表征学习真正生效。
 
@@ -187,8 +181,6 @@ $$
 
 > **注意**：关于伪标签阈值 $\tau$ 的自适应调整策略、方法在其他模拟器（AirSim、LGSVL）上的泛化性，以及扩展到全景分割等更密集预测任务的表现，目前缺乏实验证据，需进一步验证。
 
-
-
 Lift-Splat-Adapt 的核心设计围绕一个中心命题展开：**若模拟器生成的标签边际分布与目标域显著偏离，则任何仅依赖特征空间对齐的域自适应方法都存在不可消除的下界**。这一命题由 Theorem 2 严格给出，并直接驱动了数据生成与训练两个阶段的模块设计。
 
 ### 理论下界：为什么标签边际对齐是必需的
@@ -242,8 +234,6 @@ $$\ell_{\mathrm{pseudo}}(p, p_{\mathrm{aug}}) := \sum_{i=0}^{h \cdot w} \mathbb{
 3. **伪标签损失** 在对抗框架下提供目标域监督信号，使模型能在域对齐的同时从目标域高置信度区域学习。
 
 Figure 7 的实验证据直接支持这一链路：迁移 IOU 与标签边际 JSD 呈明显负相关，与 Theorem 2 的理论预期一致。消融实验（Table 3）进一步证实，在固定最佳数据生成策略后，f-DAL 优于 DANN，且伪标签带来额外增益。
-
-
 
 ## 实验与关键发现
 
@@ -309,23 +299,11 @@ Figure 7 的实验证据直接支持这一链路：迁移 IOU 与标签边际 JS
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2111_07971/figures/009_Table_3.jpg]]
 *Table 3: Ablation on the Training Strategy. In this scenario, we fix the datageneration strategy to be the best*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2111_07971/figures/004_Figure_4.jpg]]
 *Figure 4: Matching nuScenes Statistics From left to right, we show the distribution of number of vehicles per scene in nuScenes, the distribution of field of view of the nuScenes cameras, the yaw relative to the ego coordinate frame of the cameras (6 peaks for the 6 different camera directions), and the height of the LiDAR (roughly the same across all scenes). These statistics are matched when sampling data from CARLA*
 
-![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2111_07971/figures/010_Figure_9.jpg]]
-*Figure 9: Better Sampling Improves Town Robustness We compare transfer performance of Lift Splat models when NPCs are sampled according to geometry of the town roads (left) vs the hard-coded prior (right). Performance greatly improves when using a sampling strategy that doesn’t condition on road structure*
-
-![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2111_07971/figures/018_Figure_15.jpg]]
-*Figure 15: Limitations Predictions of the best Lift Splat Adapt model vs. ground-truth when the model makes an error. (Left) The model does not detect the orange bus in the garage. (Middle) The model predicts a vehicle where there are pedestrians. (Right) The model predicts a car behind it is much closer than it actually is*
-
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2111_07971/figures/007_Table_1.jpg]]
 *Table 1: Lift-Splat Sim → Real. We compare the performance of our method vs RS. To account for the reality gap, we also show results of RS with different adaptation techniques*
-
-![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2111_07971/figures/008_Table.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -385,8 +363,6 @@ Lift-Splat-Adapt 的有效性建立在以下前提之上：
 3. **扩展到密集多类别任务**：当任务从二值车辆分割扩展到全景分割等多类别密集预测时，标签边际的对齐策略和域判别器的设计需要何种调整？
 4. **物理感知域自适应**：对于极端天气、动态光照等更复杂的物理域差异，是否需要引入更显式的物理模型（如大气散射模型、光照模型）来辅助域自适应？
 5. **伪标签质量提升**：如何通过不确定性估计、多视图一致性等机制进一步提升伪标签质量，并减轻错误伪标签对弱势交通参与者的偏见？
-
-
 
 ## 原文 PDF
 

@@ -213,8 +213,6 @@ DISCO 的核心近似在于使用 R 个随机超平面将 hinge 函数形式的�
 ![[assets/figures/papers/iclr26_0002_cUdODCFjUM_A_Dense_Subset_Index_for_Collective_Query_Covera/figures/016_Table_12.jpg]]
 *Table 12: In Table 12, we provide statistics on index construction and memory consumption for each of the indexing based methods. We note that the memory consumption reported for DISCO is higher than for other methods due to the construction of R = 8 different replica indices, each housing corpus vectors that have been augmented to approximate the maximum marginal gain. Table 12: Index memory consumption across methods and datasets, in gigabytes (GB)*
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0002_cUdODCFjUM_A_Dense_Subset_Index_for_Collective_Query_Covera/figures/011_Table_2.jpg]]
 *Table 2: In the table below, the aggregate contractual principal amount of loans on nonaccrual status and/or more than 90 days past due (which excludes loans carried at zero fair value and considered uncollectible) exceeds the related fair value primarily because the firm regularly purchases loans, such as distressed loans, at values significantly below the contractual principal amounts*
 

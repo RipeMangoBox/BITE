@@ -62,8 +62,6 @@ claims:
 
 该方法属于**多模态学习中的动态平衡优化**范畴，与OGM-GE（Peng et al., CVPR 2022）的梯度调制、AGM（Li et al., ICCV 2023）的自适应梯度调节、MMPareto（Wei & Hu, ICML 2024）的帕累托前沿方法等形成对比。区别于引入单模态辅助头或额外可学习参数的方案，本文通过FIM加权的正则化损失实现无参数平衡，且专门针对回归任务设计贡献度量。
 
-
-
 ### 多模态3D人体姿态估计的兴起与挑战
 
 3D人体姿态估计（3D HPE）是计算机视觉中的核心任务，旨在从传感器数据中恢复人体关节的三维坐标。近年来，随着感知技术的发展，研究者开始整合多种互补模态以提升估计精度和鲁棒性。如图1所示，典型的多模态3D HPE系统同时利用RGB摄像头、LiDAR、毫米波雷达（mmWave）和WiFi信号等异构数据源，期望通过模态间的信息互补克服单一传感器的固有局限——例如RGB对光照敏感、LiDAR在远距离稀疏、mmWave和WiFi虽具备穿透性和隐私保护优势但空间分辨率较低。
@@ -84,8 +82,6 @@ claims:
 2. **回归场景下的均衡优化**：需要一种不依赖分类损失特性的参数更新约束机制，在训练关键窗口期内对强弱模态施加差异化正则，同时避免引入额外可学习参数增加优化负担。
 
 为此，本文提出了一套面向回归任务的均衡多模态学习框架：以**Pearson相关系数**替代交叉熵作为Shapley值的利润函数，消除输出尺度偏差；并设计基于**Fisher信息矩阵（FIM）加权的自适应权重约束损失（AWC）**，在训练早期窗口内对强模态施加更强的参数偏离惩罚，对弱模态施加更弱的约束，从而在不增加模型参数的前提下实现多模态的均衡优化。
-
-
 
 ## 核心方法与创新机理
 
@@ -152,8 +148,6 @@ $$\mathcal { L } _ { \mathrm { t o t a l } } = \mathcal { L } _ { \mathrm { M P 
 
 与**OGM-GE**（Peng et al., CVPR 2022）仅调制梯度幅度、**PMR**依赖类原型、**MMPareto**（Wei and Hu, ICML 2024）利用帕累托前沿和单模态辅助梯度、**AGM**（Li et al., ICCV 2023）自适应梯度调制、**ReconBoost**（Hua et al., ICML 2024）基于Boosting调和等方法相比，本文的AWC机制通过FIM加权实现了更精细的参数级约束，且不引入额外可学习参数，在MM-Fi数据集上MPJPE超越其他平衡方法约5 mm，验证了设计的有效性。
 
-
-
 本文提出一种面向3D人体姿态估计的均衡多模态学习框架，核心目标是在端到端训练中解决强模态（RGB、LiDAR）压制弱模态（mmWave、WiFi）的模态不平衡问题。框架由五个关键模块串联构成，图2给出了整体流程。
 
 **输入层**：系统接收四种异构模态数据——RGB视频帧中提取的2D人体关节点序列 $X_R = \{p_i^{2d}\}_{i=0}^N, p_i^{2d} \in \mathbb{R}^{j \times 2}$、LiDAR点云、mmWave热图以及WiFi CSI信号。四种模态在时间维度对齐后分别送入各自的模态专用编码器。
@@ -169,16 +163,6 @@ $$\mathcal { L } _ { \mathrm { t o t a l } } = \mathcal { L } _ { \mathrm { M P 
 **AWC Loss Module**：这是框架的“平衡调节器”，仅在训练的前 $K$ 个epoch（学习窗口）内生效。它基于Fisher信息矩阵（FIM）对角近似 $[\mathcal{T}]_{ii} = \frac{1}{|\mathcal{D}|} \sum_{(x_n, y_n) \in \mathcal{D}} (\frac{\partial \mathcal{L}(x_n, y_n; \theta_0^*)}{\partial \theta_i})^2$ 来估计各参数的重要性，然后对每个模态编码器施加权重约束：$\mathcal{L}_W^m = \sum_i \frac{[\mathcal{T}_D]_{ii} (\theta_{t,i}^m - \theta_{0,i}^{m,*})^2}{2}$。总AWC损失 $\mathcal{L}_{\mathrm{AWC}} = \sum_{m \in \mathcal{M}} [\alpha_{\mathcal{S}} \cdot \mathbf{1}_{\{m \in \mathcal{M}_{\mathcal{S}}\}} + \alpha_{\mathcal{T}} \cdot \mathbf{1}_{\{m \in \mathcal{M}_{\mathcal{T}}\}}] \cdot \mathcal{L}_W^m$ 对强模态施加较大系数 $\alpha_{\mathcal{S}}$、对弱模态施加较小系数 $\alpha_{\mathcal{T}}$，从而同时约束参数更新的方向和幅度。
 
 **训练流程**：学习窗口内的总损失为 $\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{MPJPE}} + \mathcal{L}_{\mathrm{AWC}}$；窗口结束后，AWC损失退出，模型仅由MPJPE损失驱动完成剩余训练。整个框架不引入任何额外可学习参数，Shapley贡献评分的计算开销在不同融合策略下均低于训练总时间的5.4%。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1036_https_arxiv_org_abs_2501_05264/figures/002_Figure_2.jpg]]
-*Figure 2: Illustration of our proposed methods. Modality contributions are assessed via Shapley Module, and an adaptive weight constraint (AWC) loss, weighted by Fisher information, regularizes encoder parameter updates to slow dominant modalities and protect inferior ones during the critical learning window*
-
-![[assets/figures/papers/paper_list_l1036_https_arxiv_org_abs_2501_05264/figures/001_Figure_1.jpg]]
-*Figure 1: (a) Multi-modal 3D HPE. (b) In end-to-end training, modality imbalance arises where dominant modalities with higher scores suppress the training of others in MM-Fi [56]*
-
-
 
 ### 整体框架
 
@@ -287,12 +271,8 @@ $$
 
 学习窗口 $K$ 与正则化系数 $\alpha_{\mathcal{S}}$、$\alpha_{\mathcal{T}}$ 为关键超参数，消融实验表明 $K=20$、$\alpha_{\mathcal{S}}=20k$、$\alpha_{\mathcal{T}}=10k$ 时在 MM-Fi Protocol 1 上取得最优 MPJPE（51.16 mm）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1036_https_arxiv_org_abs_2501_05264/figures/006_Figure_4.jpg]]
 *Figure 4: Visualization of contribution scores calculated by our Shapley value-based contribution algorithm using attention-based fusion strategy*
-
-
 
 ## 实验与关键发现
 
@@ -327,21 +307,11 @@ $$
 3. **FIM对角近似的时效性。** AWC损失中的Fisher信息矩阵基于初始参数θ_0*计算（公式8），在训练中后期参数发生较大变化后，该近似可能不再精确反映参数重要性，约束效果可能衰减——这也解释了为何AWC仅在早期窗口内生效。
 4. **超参数依赖手动调节。** 学习窗口长度K和正则化系数α_S、α_T需针对具体任务手动调参，缺乏自动化或自适应设置机制，增加了方法在新任务上的部署成本。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1036_https_arxiv_org_abs_2501_05264/figures/007_Table_3.jpg]]
 *Table 3: Uni-modal and multi-modal performance on Protocol 1*
 
-![[assets/figures/papers/paper_list_l1036_https_arxiv_org_abs_2501_05264/figures/009_Figure_6.jpg]]
-*Figure 6: The performance of different K values on Protocol 1*
-
 ![[assets/figures/papers/paper_list_l1036_https_arxiv_org_abs_2501_05264/figures/010_Table_4.jpg]]
 *Table 4: Ablation study on the sensitivity of AWC loss hyperparameters*
-
-![[assets/figures/papers/paper_list_l1036_https_arxiv_org_abs_2501_05264/figures/005_Table_2.jpg]]
-*Table 2: Computational overhead breakdown across fusion strategies and modalities. “Pose Est.” denotes the total inference time for 3D pose estimation over all modality combinations; “Correlation” is the time to compute pose prediction correlation with ground truth; “Score Calc.” refers to modality contribution scoring. “Overhead (%)” denotes the score calculation time as a percentage of training time. All times are in milliseconds (ms)*
-
-
 
 ## 定位与知识库关联
 
@@ -383,8 +353,6 @@ $$
 3. **训练策略协同**：AWC损失能否与学习率调度（如余弦退火）、数据增强等策略协同，在更复杂训练范式下保持平衡效果？
 4. **跨任务迁移**：在非人体姿态估计的回归任务（如深度估计、温度预测、力估计）中，该方法是否同样有效？需要哪些适配修改？
 5. **自适应超参数**：能否设计基于训练动态的自适应机制（如根据Shapley评分变化率自动调整$K$和正则化系数），完全免除超参数调节？
-
-
 
 ## 原文 PDF
 

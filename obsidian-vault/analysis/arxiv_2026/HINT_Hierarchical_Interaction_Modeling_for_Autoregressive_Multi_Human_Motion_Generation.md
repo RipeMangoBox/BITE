@@ -167,11 +167,6 @@ Figure 2 清晰展示了 HINT 与传统单次生成方法的架构差异。现�
 ![[assets/figures/papers/paper_list_l1701_HINT_Hierarchical_Interaction_Modeling_for_Autoregressive_Multi_Human_Mo/figures/002_Figure_2.jpg]]
 *Figure 2: Architecture Comparison. (a) Conventional Single-shot Methods: Existing approaches (e.g., InterGen, in2IN, InterMask) generate motion sequences in a single shot with fixed length. (b) HINT: Our framework integrates autoregressive and diffusion modeling to support streaming generation. Within a sliding window, the Interaction-Aware Diffusion leverages history and text to progressively synthesize future motions, thereby supporting open-ended, variable-length generation*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1701_HINT_Hierarchical_Interaction_Modeling_for_Autoregressive_Multi_Human_Mo/figures/003_Figure_3.jpg]]
-*Figure 3: Overview of HINT in two-human interaction generation. (a) Canonicalized latent space. (b) Within this latent space, motion is generated in a sliding-window autoregressive manner, where the Interaction-Aware Diffusion predicts the next K frames. (c) The detailed architecture of the Interaction-Aware Diffusion, in which hierarchical conditions guide the generation process*
-
 ### 3.1 自回归多人运动生成框架
 
 HINT 将多人运动生成建模为自回归预测问题。给定 $N$ 个参与者、$T$ 帧的运动序列：
@@ -317,22 +312,8 @@ Figure 5 展示了 InterMask、InterMask*、DART† 和 HINT 在复杂交互场�
 
 所有对比方法使用统一的评估协议。在线变体 InterMask* 和 DART† 基于与 HINT 相同的滑动窗口设置重新训练，确保公平比较。训练超参数与模型配置详见 Table B-1 和 Table B-2。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1701_HINT_Hierarchical_Interaction_Modeling_for_Autoregressive_Multi_Human_Mo/figures/006_Figure_4.jpg]]
-*Figure 4: User study between HINT, DART† and InterMask*
-
 ![[assets/figures/papers/paper_list_l1701_HINT_Hierarchical_Interaction_Modeling_for_Autoregressive_Multi_Human_Mo/figures/001_Figure_1.jpg]]
 *Figure 1: Visualization of three-human motion generation results of HINT. By continuously updating the text guidance, HINT can autoregressively generate coherent, plausible human motions*
-
-![[assets/figures/papers/paper_list_l1701_HINT_Hierarchical_Interaction_Modeling_for_Autoregressive_Multi_Human_Mo/figures/010_Table.jpg]]
-*Table: B-1: Parameters of Motion VAE and Interaction-Aware Diffusion. Table B-2: Training hyperparameters for Motion VAE and Interaction-Aware Diffusion*
-
-![[assets/figures/papers/paper_list_l1701_HINT_Hierarchical_Interaction_Modeling_for_Autoregressive_Multi_Human_Mo/figures/011_Table.jpg]]
-*Table: C-3: Detailed R-precision results on InterHuman and InterX. Bold denotes the best result for each setting*
-
-![[assets/figures/papers/paper_list_l1701_HINT_Hierarchical_Interaction_Modeling_for_Autoregressive_Multi_Human_Mo/figures/012_Table.jpg]]
-*Table: C-4: Detailed R-precision results of ablation studies on InterHuman. L and G indicate local and global conditions, respectively*
 
 ## 定位与知识库关联
 

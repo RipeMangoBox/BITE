@@ -222,8 +222,6 @@ MoCA在自建的VideoEdit基准上进行了全面的人类评估，该基准包�
 
 为确保比较的公平性，论文对每个基线方法均进行了超参数扫描（Section 5.3），以各方法在VideoEdit基准上的最佳表现参与对比。人类评估采用三元归因选项设计，减少了评估者因单一维度偏好而产生的偏差。但需注意，自动评估指标的系统性局限意味着Table 4和Table 7中的自动分数应谨慎解读，不能替代人类判断作为编辑质量的最终衡量标准。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1056_https_arxiv_org_abs_2311_18827/figures/006_Table_2.jpg]]
 *Table 2: Human evaluation results for preference of our method over each of the baselines. User ratings generally show greater preference for our method, with the exception of Gen-1 for background edits, and Drea mix for multi-spatial edits*
 

@@ -62,8 +62,6 @@ $$[\mathbf{D}, v_\theta](x_t, t) \triangleq \mathbf{D} v_\theta(x_t, t) - v_\the
 
 **核心实验结果**：在FLUX.1-dev上，所提方法相比朴素降采样基线，DreamSim感知距离从9.20降至6.83，PSNR从18.221 dB提升至21.182 dB，同时计算量减少33%（1.53×加速）。与正交的时序加速方法TaylorSeer结合后，总加速比达到3.05×，且感知一致性指标（DreamSim 7.79, PSNR 19.953 dB）显著优于单独使用TaylorSeer（9.17, 18.667 dB），表明方法具有良好的可叠加性。消融实验进一步证实，交换子零引导模块对PSNR有约1.85 dB的决定性贡献，最优降采样矩阵选择策略亦明显优于最近邻或随机降采样。
 
-
-
 ### 扩散模型工作流的效率瓶颈
 
 扩散模型与流匹配模型已成为文本到图像生成的主流范式，其生成质量在近年来取得了显著提升。然而，在实际应用场景中，用户通常需要针对多个提示词（prompt）和随机种子反复生成大量候选图像，从中筛选出理想结果。这一“试错式”工作流的效率瓶颈在于：**每一次候选生成都需执行完整的高分辨率（HR）去噪过程**，导致计算成本极高，严重拖慢创作迭代速度。以 FLUX.1-dev 为例，生成一张 1024×1024 分辨率的图像需要 30 次函数评估（NFE），多次重复生成时计算开销呈线性累积。
@@ -97,8 +95,6 @@ Table 1 的实验证据表明，在 FLUX.1-dev 和 SD3.5-L 上，该交换子的
 2. **交换子零引导修正**：在降采样后的若干时间步内，利用重用的 HR 速度场进行固定点迭代修正，强制 LR 轨迹向 HR 轨迹对齐，抑制累积误差。
 
 通过上述设计，本文方法可在免训练条件下生成与 HR 原图感知高度一致的 LR 预览，从而支持用户以低成本快速筛选候选图像，待确定理想种子后再执行完整的 HR 生成。这一工作流在保持筛选可靠性的同时，显著降低了整体计算开销，为扩散模型的实用化部署提供了高效解决方案。
-
-
 
 ## 核心方法与创新机理
 
@@ -142,8 +138,6 @@ $$x_t^{\downarrow, k+1} = x_t^{\downarrow, k} + \alpha \cdot \big( \mathbf{D}^* 
 | 超分辨率后处理 | LR→SR pipeline | 后处理 | 本文证明其丢失细节（Figure 2） |
 
 本方法的核心区分在于：通过**交换子零条件**这一理论工具，首次在流匹配框架下建立了降采样操作与感知一致性之间的可优化桥梁，并以**降采样矩阵选择+固定点引导**的免训练方案实现，无需任何模型微调或额外训练数据。
-
-
 
 本文提出的**交换子零引导预览生成**方法，通过在高分辨率（HR）采样过程中引入一次降采样操作及后续的交换子零引导修正，在免训练条件下生成与HR图像感知一致的低分辨率（LR）预览。整体pipeline如Algorithm 1及Figure 3所示，包含五个核心模块。
 
@@ -200,12 +194,8 @@ $$x _ { t } ^ { \downarrow , k + 1 } = x _ { t } ^ { \downarrow , k } + \alpha \
 
 消融实验（Table 5）证实，交换子零引导模块对感知一致性有决定性贡献：启用后PSNR从19.115 dB提升至20.962 dB，DreamSim从8.56降至7.05。降采样矩阵选择策略同样关键（Table 4），arg min策略的PSNR（20.962 dB）显著优于最近邻降采样（18.069 dB）和随机选择（20.851 dB）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l945_https_arxiv_org_abs_2604_09227/figures/004_Figure_3.jpg]]
 *Figure 3: Overall framework. (Left, Top) Overview of our proposed framework. Sampling is first performed in the high-resolution (HR) space up to timestep*
-
-
 
 ### 问题形式化：预览生成与交换子零条件
 
@@ -271,19 +261,6 @@ $$x _ { t } ^ { \downarrow , k + 1 } = x _ { t } ^ { \downarrow , k } + \alpha \
 4. **交换子零引导修正**：在后续 $m$ 步内利用重用的 HR 速度场进行固定点迭代修正；
 5. **LR 续采样**：以 LR 分辨率完成剩余去噪步，输出最终 LR 预览。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l945_https_arxiv_org_abs_2604_09227/figures/009_Figure_6.jpg]]
-*Figure 6: Changes in average commutator norm. We measure the change in commutator norm at timesteps*
-
-![[assets/figures/papers/paper_list_l945_https_arxiv_org_abs_2604_09227/figures/011_Figure_7.jpg]]
-*Figure 7: Cosine similarity analysis on velocity consistency of flow-matching models. We report the mean and standard deviation of cosine similarity between*
-
-![[assets/figures/papers/paper_list_l945_https_arxiv_org_abs_2604_09227/figures/008_Figure_5.jpg]]
-*Figure 5: Generalization of commutator-zero guidance. We show that commutator-zero guidance can be expanded to other operations. For warping, a large kernel (128 × 128) with correlation correction produces distortion, while our method effectively handles artifacts. For translation, na¨ıve cause noticeable difference and unintended objects, whereas ours preserves image content*
-
-
-
 ## 实验与关键发现
 
 ### 主要定量结果
@@ -339,8 +316,6 @@ $$x _ { t } ^ { \downarrow , k + 1 } = x _ { t } ^ { \downarrow , k } + \alpha \
 
 以上局限均来自论文自述的限制分析，部分边界条件（如对非流匹配扩散模型的适用性）仍需后续工作验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l945_https_arxiv_org_abs_2604_09227/figures/005_Table_2.jpg]]
 *Table 2: Quantitative comparison on FLUX.1-dev and SD3.5-L. Using the FLUX.1-dev and Stable Diffusion 3.5-Large (SD3.5-L) models with NFE = 30, we generate HR (1024 × 1024) reference images. We compare three variants: (i) reduced-NFE generation, (ii) LR (512 × 512) generation with the same NFE, and (iii) a na¨ıve baseline applying nearest downsampling at timestep*
 
@@ -352,17 +327,6 @@ $$x _ { t } ^ { \downarrow , k + 1 } = x _ { t } ^ { \downarrow , k } + \alpha \
 
 ![[assets/figures/papers/paper_list_l945_https_arxiv_org_abs_2604_09227/figures/012_Table_5.jpg]]
 *Table 5: Ablation study on commutator-zero guidance. Comparing results with and without commutator-zero guidance (CG) shows that while computational efficiency slightly decreases with correction, both perceptual similarity and PSNR increase, highlighting the effectiveness of our proposed method*
-
-![[assets/figures/papers/paper_list_l945_https_arxiv_org_abs_2604_09227/figures/013_Table_6.jpg]]
-*Table 6: Ablation study on hyperparameter m and α. We investigate how varying m and α affects performance. Increasing m improves PSNR but also raises computational demand, showing a clear trade-off. Each m exhibits an optimal step size α*
-
-![[assets/figures/papers/paper_list_l945_https_arxiv_org_abs_2604_09227/figures/007_Figure_4.jpg]]
-*Figure 4: Qualitative comparison of our proposed method. While other simple alternatives often result in changes to composition, object size, or even color tone, our proposed approach synthesizes low-resolution images faster while preserving the composition and color fidelity of the original image. The prompts used for image generation are provided in the supplementary materials*
-
-![[assets/figures/papers/paper_list_l945_https_arxiv_org_abs_2604_09227/figures/002_Figure_2.jpg]]
-*Figure 2: Comparison between SR-upsampled and directly generated HR images. Using FLUX.1-dev, we (a) generated a low-resolution (LR, 256 × 256) image followed by 4× superresolution (SR) to obtain a high-resolution (HR*
-
-
 
 ## 定位与知识库关联
 
@@ -443,8 +407,6 @@ $$[\mathbf{D}, v_\theta](x_t, t) \triangleq \mathbf{D} v_\theta(x_t, t) - v_\the
 4. **视频生成扩展**：在视频扩散模型中，时空降采样与交换子零条件的交互更为复杂，方法的效率和一致性表现有待验证。
 
 5. **与其他加速范式的深度集成**：除TaylorSeer外，方法能否与蒸馏、量化、架构剪枝等加速技术协同，形成更全面的效率优化方案？
-
-
 
 ## 原文 PDF
 

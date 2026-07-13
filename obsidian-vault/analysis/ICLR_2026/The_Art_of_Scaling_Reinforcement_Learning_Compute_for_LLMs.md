@@ -85,8 +85,6 @@ Leave-One-Out 实验进一步证实，SCALERL 集成的每个组件均对最终�
 
 > **注意**：部分基线方法（如 DAPO、MiniMax）因零方差过滤后的重采样机制使用了更大的实际批次大小（1280 vs 768），可能获得了一定的计算优势，但 SCALERL 仍在公平比较条件下表现最优。
 
-
-
 ### 推理语言模型的强化学习训练困境
 
 大规模语言模型（LLM）的后训练阶段，强化学习（RL）已成为提升推理能力的关键技术。以GRPO（Shao et al., 2024）为代表的无批评家（critic-free）策略梯度方法，通过组内相对优势估计替代学习价值基线，大幅降低了RL训练的计算开销。然而，该领域面临一个核心瓶颈：**缺乏一套预测性框架来系统评估不同RL设计选择在计算预算下的可扩展性**。不同团队采用的损失函数、离策略设置、精度配置和聚合方式各异，但何种组合能在给定计算预算下最大化最终性能，以及这些选择如何影响渐进性能和计算效率，尚缺乏科学规律支撑——方法选择往往依赖经验试错，而非基于可外推的缩放定律。
@@ -102,8 +100,6 @@ Leave-One-Out 实验进一步证实，SCALERL 集成的每个组件均对最终�
 ### 本文动机
 
 针对上述问题，本文提出以**Sigmoid饱和函数**统一建模RL训练的compute-performance曲线，并系统消融影响曲线参数的关键设计选择。核心目标是：识别出能提升渐进性能上限A的组件（如损失函数、精度配置），以及主要影响计算效率B的组件（如离策略框架、聚合方式），从而构建一个可预测、可扩展的最佳实践配方**SCALERL**，并在10万GPU小时的大规模训练中验证其可预测性与有效性。
-
-
 
 ## 核心方法与创新机理
 
@@ -154,11 +150,6 @@ $$\mathcal{T}_{\mathrm{SCALERL}}(\theta) = \mathbb{E}_{\{y_i\}_{i=1}^G \sim \pi_
 
 SCALERL通过同时提升A（CISPO + FP32 + 大批量）和B（PipelineRL + 零方差过滤 + 课程学习），在iid验证集上达到A = 0.61，超越了所有对比方法（Figure 2）。
 
-
-
-![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_FMjeC9Msws/figures/004_Figure_3.jpg]]
-*Figure 3: Interpreting eq. (1). We provide an example fit illustrating the roles of parameters A, B , and $C _ { \mathrm { m i d } } ^ { \mathrm { ^ { - } } } . C _ { \mathrm { m i d } }$ determines the compute point at which half of the total gain is achieved - smaller values correspond to faster ascent toward the asymptote. B controls the curve’s steepness, with larger values indicating greater efficiency. A represents the asymptotic performance reached at large compute scales. Further discussion is provided in Appendix A.8
-
 SCALERL 是一个面向大规模语言模型数学推理的异步强化学习训练配方。其核心设计围绕一个统一的预测性缩放框架展开：将 RL 训练中的 iid 验证集期望奖励（pass rate）建模为训练计算量 $C$ 的 Sigmoid 饱和函数：
 
 $$R_C - R_0 = (A - R_0) \times \frac{1}{1 + (C_{\mathrm{mid}} / C)^B}$$
@@ -203,8 +194,6 @@ SCALERL 的最终损失函数 $\mathcal{T}_{\mathrm{SCALERL}}$ 融合了以下�
 ### 框架的核心运作逻辑
 
 SCALERL 框架的核心洞察在于区分两类设计选择：**影响渐进上限 $A$ 的组件**（损失函数类型、批次大小、FP32 精度）和**主要影响计算效率 $B$ 的组件**（PipelineRL、损失聚合方式、优势归一化、零方差过滤等）。Leave-One-Out 实验（Figure 5）证实，各 LOO 变体最终达到的渐进奖励 $A$ 相近，但 SCALERL 集成方案在计算效率上显著领先——这正是通过系统性地选择提升 $A$ 和 $B$ 的组件组合实现的。
-
-
 
 ### 基础RL算法框架
 
@@ -268,8 +257,6 @@ $$R_{\mathrm{length}}(y) = \mathrm{clip}\left(\frac{L_{\max} - |y|}{L_{\mathrm{c
 
 其中 $L_{\max}$ 为最大生成长度，$L_{\mathrm{cache}}$ 为缓存长度阈值。该惩罚仅应用于正确回答的trace，且被限制在 $[-1, 0]$ 范围内。
 
-
-
 ## 实验与关键发现
 
 ### 主结果：SCALERL的可预测缩放与性能优势
@@ -291,7 +278,6 @@ SCALERL的核心主张在于，RL训练的compute-performance曲线可以用一�
 值得注意的是，DAPO和MiniMax由于零方差过滤后重新采样的机制，实际使用的batch size为1280，大于SCALERL的768，这给予了它们一定优势，但SCALERL仍表现最优。所有方法均在相同的8B密集模型和训练数据上评估，拟合曲线使用同一验证集的前1.5k GPU小时后数据点，确保比较的公平性。
 
 在更大规模模型上，SCALERL-17B×16 MoE在仅5万GPU小时的训练下，AIME-24 pass rate达到约0.67（图1），显著优于8B密集模型在10万小时下的约0.58，验证了模型规模扩展带来的实质收益。
-
 
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_FMjeC9Msws/figures/002_Figure_1.jpg]]
 *Figure 1: Predicatably Scaling RL compute to 100,000 GPU Hours (a) We run SCALERL for 100k GPU hours on an 8B dense model, and 50k GPU hours on a 17Bx16 MoE (Scout). We fit a sigmoid curve (Equation (1)) on pass rate (mean@16) on iid validation dataset up to 50k (and 16k) GPU hours and extrapolate to 100k (and 45k) on the 8B (Scout MoE) models respectively. We trained for 7400 steps for 8B and 7100 steps for Scout, which is 3.5× larger than ProRL (Liu et al., 2025a). The extrapolated curve (× markers) closely follows extended training, demonstrating both stability at large compute and predictive fits–establishing SCALERL as a reliable candidate for RL scaling. (b) Downstream evaluation on AIME-24 sho...*
@@ -376,9 +362,6 @@ Prompt平均的优势在于保证每个prompt对梯度更新的贡献相等，�
 
 图5的Leave-One-Out实验从SCALERL出发，每次将一个设计选择回退到基线版本，重新训练并拟合缩放曲线。主要发现：
 
-![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_FMjeC9Msws/figures/008_Figure_5.jpg]]
-*Figure 5: Leave-One-Out (LOO) Experiments: Starting from SCALERL, we revert one design choice at a time to its baseline counterpart and re-train. Most LOO variants reach a similar asymptotic reward, with SCALERL outperforming slightly overall. The main difference in these methods lies in efficiency. To highlight this, we re-arrange Equation (1) into $\mathcal { F } ( R _ { c }$ ) = $C ^ { B }$ , where $\begin{array} { r } { \mathcal { F } ( R _ { c } ) = C _ { \mathrm { m i d } } ^ { B } / \left( \frac { A - R _ { 0 } } { R _ { c } - R _ { 0 } } - 1 \right) } \end{array}$ , and plot log $\mathcal { F } ( R _ { c }$ ) vs. log C. This makes slope B directly visible, showing that SCALERL has the highest compute...
-
 - **所有LOO变体在误差范围内达到相似的渐进性能A**，SCALERL整体略优
 - **主要差异体现在计算效率B上**：SCALERL具有最高的计算效率
 
@@ -396,10 +379,6 @@ Prompt平均的优势在于保证每个prompt对梯度更新的贡献相等，�
 
 SCALERL的缩放框架不仅适用于单一数学任务。在数学+代码的联合RL训练中（图16），数学和代码验证集上的性能均遵循可预测的Sigmoid缩放曲线，且多任务设置下的数学性能与纯数学训练相当。这表明该框架具有良好的任务泛化性。
 
-
-![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_FMjeC9Msws/figures/030_Figure_16.jpg]]
-*Figure 16: SCALERL scales predictably on math and code. We report both the code and math validation set performance on the joint math+code RL run; along with the math only SCALERL run as a reference. These results demonstrate that our sigmoidal compute–performance relationship holds across task mixtures, and that SCALERL’s scalability generalizes beyond a single domain training*
-
 在下游评测方面，SCALERL在AIME-25和MATH-500上的表现（附录图26）与AIME-24的趋势一致，进一步验证了性能提升并非过拟合于特定评测集。
 
 ### 公平性说明与实验局限
@@ -410,25 +389,11 @@ SCALERL的缩放框架不仅适用于单一数学任务。在数学+代码的联
 
 **generations per prompt的影响**：在中等batch size下，将每prompt生成数从8调整至32并相应调整prompt数量以保持总batch固定，拟合的缩放曲线基本不变（附录图15），表明在中等规模下这一分配是二阶因素。但在更大batch规模下，更清晰的差异可能会出现，这留待未来工作探索。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_FMjeC9Msws/figures/007_Figure_4.jpg]]
 *Figure 4: (a) Comparing “compute-scaling” of asynchronous off-policy RL setups. We report only the B (scaling exponent) and A (asymptotic pass rate) parameters of the fitted sigmoid curve (Equation 1). PipelineRL-k is much more efficient and slightly better in the large compute limit. (b) Comparing loss functions: DAPO (Yu et al., 2025), GSPO (Zheng et al., 2025a), and CISPO (MiniMax et al., 2025). We find CISPO/GSPO achieve a higher asymptotic reward compared to DAPO. (b) Using FP32 precision in the final layer (LM head) gives a considerable boost in the asymptotic reward*
 
-![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_FMjeC9Msws/figures/013_Figure_7.jpg]]
-*Figure 7: (a) Variance in scaling fits. We train 3 independent runs of SCALERL to measure variance. We observe a ±0.02 error margin for asymptotic performance A. (b) FP32 LOO on Scout: Comparing SCALERL on Scout with and without FP32 precision fix at the LM Head. SCALERL performs better with the FP32 fix*
-
-![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_FMjeC9Msws/figures/028_Figure_15.jpg]]
-*Figure 15: Scaling to (a) different number of generations per prompt, (b) Downstream performance of different number of generations per prompt*
-
-![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_FMjeC9Msws/figures/034_Figure_18.jpg]]
-*Figure 18: Downstream performance of (a) different number of generations per prompt, on AIME, (b) LiveCodeBench (Jan-June 2025) performance on math+code run, (c) AIME-24 performance on math+code run*
-
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_FMjeC9Msws/figures/036_Figure_19.jpg]]
 *Figure 19: (a)Comparing upper clipping ratio of DAPO loss function. Change of $\epsilon _ { m a x }$ fundamentally changes the asymptotic performance value A. (b) CISPO clipping ratio ablations*
-
-
-
 
 ## 定位与知识库关联
 
@@ -481,8 +446,6 @@ SCALERL 的有效性建立在以下前提之上，超出这些边界时需谨慎
 4. **OOD 泛化的预测性缩放**：Figure 1b 仅展示了 AIME-24 这一下游任务的缩放趋势。能否为 OOD 泛化性能建立类似的预测性缩放定律，是 RL 训练从“拟合训练分布”走向“真正泛化”的关键瓶颈。
 
 > **注意**：上述开放问题均来自论文自身的讨论（§6 RELATED WORK 及 Conclusion），尚未有后续工作提供解答。若需补充最新进展，建议手动检索相关 follow-up 文献。
-
-
 
 ## 原文 PDF
 

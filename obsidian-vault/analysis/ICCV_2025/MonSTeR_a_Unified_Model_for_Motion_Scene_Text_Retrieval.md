@@ -52,8 +52,6 @@ MonSTeR 提出将文本、运动、场景视为拓扑三角形，通过同时对
 
 MonSTeR 的局限在于：跨模态编码器仅在已对齐的模态对上训练，未能利用未配对数据；场景被假设为静态点云，无法建模人类动作对环境的动态改变。
 
-
-
 ### 人类运动理解的模态缺口
 
 人类运动检索与生成是计算机视觉与图形学中的核心问题，其应用涵盖角色动画、人机交互、具身智能等领域。近年来，基于文本的运动检索（text-to-motion, t2m）与运动到文本检索（motion-to-text, m2t）取得了显著进展，代表性方法如 **TMR**（Petrovich et al., ICCV 2023）和 **MoPa**（Yu et al., CVPR 2024）通过对比学习将文本和运动映射到共享潜在空间，实现了高效的跨模态检索。
@@ -78,8 +76,6 @@ MonSTeR 的局限在于：跨模态编码器仅在已对齐的模态对上训练
 ### 本文动机
 
 针对上述缺口，本文提出 **MonSTeR**（Motion, Scene, Text Retrieval），一个统一的三模态检索框架。MonSTeR 的核心动机是：**将文本、运动、场景视为一个拓扑三角形，通过对齐节点（单模态表示）与边（成对跨模态表示），在统一潜在空间中显式捕捉三者之间的高阶依赖**。这一设计使得模型不仅能够执行传统的 t2m 和 m2t 检索，还能灵活支持场景感知的检索任务（如 scene-text to motion, st2m；motion-scene to text, ms2t），以及运动质量评估等下游应用。
-
-
 
 ## 核心方法与创新机理
 
@@ -110,8 +106,6 @@ $$\mathcal{L}_{\mathrm{tot}} = \frac{1}{|K|} \sum_{(i,j) \in K} \frac{\mathcal{L
 ### 与纯三模态编码器的对比
 
 若直接使用一个三模态编码器（w tri-modal）处理拼接后的三种模态，而不进行显式的高阶分解，其平均 mRecall 低于完整 MonSTeR（见 Table 3）。这表明**显式的拓扑分解**——将三模态关系拆解为节点与边的组合——是实现有效三模态对齐的核心机制，而非简单地增加模型容量。
-
-
 
 MonSTeR 的整体 pipeline 围绕一个核心设计原则展开：将文本（t）、运动（m）、场景（s）三种模态视为拓扑三角形，同时建模节点（单模态表示）与边（成对跨模态表示），从而在统一潜在空间中捕捉三者之间的高阶依赖关系。这一设计源自拓扑学中“三向关系必须同时表示单模态与成对跨模态项”的洞察。
 
@@ -162,8 +156,6 @@ $$\mathcal { L } _ { \mathrm { t o t } } = \frac { 1 } { | K | } \sum _ { ( i , 
 - 移除所有跨模态对比损失（仅保留单模态对齐）使平均 mRecall 降至 56.07，双模态→单模态检索任务受损尤为严重。
 - 采用纯三模态编码器（w tri-modal）未使用显式高阶分解，其性能同样低于完整 MonSTeR，验证了“节点+边”拓扑分解的必要性。
 
-
-
 ### 单模态编码器
 
 MonSTeR 为三种输入模态分别配备一个基于 Transformer 的变分自编码器（VAE），将原始信号压缩为潜在向量：
@@ -203,8 +195,6 @@ $$\mathcal { L } _ { \mathrm { t o t } } = \frac { 1 } { | K | } \sum _ { ( i , 
 ### 关键设计约束
 
 作者在构造 $K$ 时有意排除了可能导致模态坍缩的项。例如，不直接将 $(st, mt)$ 等跨模态-跨模态对纳入对比，因为此类对齐可能使模型忽略某一模态的信息，退化为仅依赖部分模态的捷径解。这一约束保证了三个模态在联合表示中的均衡贡献。
-
-
 
 ## 实验与关键发现
 
@@ -290,16 +280,6 @@ Figure 5 通过可控退化实验进一步验证了 MonSTeR 的评估敏感度�
 
 Table 5 和 Table 6 报告了 MonSTeR 在运动字幕生成任务上的性能。通过将 MonSTeR 的潜在表示与 GPT2 解码器结合，模型在 HUMANISE+ 和 TRUMANS+ 上均优于专用运动字幕模型 mGPT，进一步验证了统一潜在空间在下游生成任务中的迁移能力。
 
-![[assets/figures/papers/paper_list_l27_https_arxiv_org_abs_2510_03200/figures/012_Table_5.jpg]]
-*Table 5: Captioning performances on HUMANISE+ [34]. Table 6. Captioning performances on TRUMANS+ [17]*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l27_https_arxiv_org_abs_2510_03200/figures/001_Figure_1.jpg]]
-*Figure 1: MonSTeR can estimate coherence among text, motion, and scene by embedding them into a unified latent space. In the left image, all three modalities are coherent. However, in the right image, this coherence decreases, as there is no chair available in the scene*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 基线关系与差异化
@@ -339,8 +319,6 @@ MonSTeR 的核心差异化在于将**场景上下文**显式纳入人类运动�
 3. **四模态及以上扩展**：当前基于拓扑分解的高阶交互框架——将 N 模态关系分解为单模态节点与成对跨模态边——是否可以自然地扩展到四个或更多模态（例如加入音频、接触力、物体 affordance）？扩展时对比对齐集合 K 的大小将呈组合增长，计算开销与优化难度需要进一步研究。
 
 4. **场景感知的运动评估标准**：MonSTeR 展示了用检索评分评估运动质量的能力，用户研究表明其与人类偏好的对齐准确率达到 66.5%。但这一评估范式的理论边界（如对何种类型的运动错误最敏感）尚未被系统分析，Figure 5 中展示的旋转敏感度实验仅是初步探索。
-
-
 
 ## 原文 PDF
 

@@ -54,8 +54,6 @@ Uni3R 针对上述瓶颈提出的核心机制是**跨视图Transformer（Cross-V
 
 在方法谱系中，Uni3R 相较于 PixelSplat、MVSplat 等需已知位姿的泛化3DGS方法，解除了位姿先验依赖；相较于 NoPoSplat 等无位姿图像对方法，突破了视图数量的限制；相较于 LSM 等统一辐射场与语义场的方法，摆脱了对3D标注的需求。其“任意多视图→统一高斯原语”的范式，为通用3D场景理解提供了一种高效且可泛化的前馈方案。
 
-
-
 3D 场景理解与重建是计算机视觉的核心挑战，涉及从多视图图像中恢复场景的几何结构、外观属性与语义信息。近年来，3D 高斯溅射（3D Gaussian Splatting, 3DGS）凭借其高质量实时渲染能力，成为神经辐射场（NeRF）之外的主流场景表示方案。然而，现有方法在统一性与泛化性上存在显著瓶颈。
 
 **现有方法的三大缺口。** 第一，**语义与几何分离**。当前 3DGS 方法大多仅关注新视角合成，将语义理解作为独立后处理步骤，缺乏端到端的统一建模。少数尝试融合语义的工作（如 **LSM** 将辐射场与语义场联合重建）依赖两视图输入，缺乏全局一致性，且需要 3D 语义标注进行训练。第二，**位姿依赖与场景优化**。主流泛化 3DGS 方法（如 **PixelSplat**、**MVSplat**）要求已知精确的相机位姿，限制了在无标定场景中的应用；而 **Feature-3DGS**、**NeRF-DFF** 等语义方法则依赖逐场景优化，推理效率低下。第三，**多视图融合受限**。基于图像对的方法（如 **NoPoSplat**）通过 pairwise 特征匹配处理无位姿输入，但无法有效利用任意多视图信息，导致全局几何一致性不足。
@@ -63,8 +61,6 @@ Uni3R 针对上述瓶颈提出的核心机制是**跨视图Transformer（Cross-V
 **Uni3R 的核心动机**在于打破上述壁垒：能否在一个前馈模型中，从无姿态的任意多视图图像出发，同时输出几何、外观与开放词汇语义的统一 3D 表示？这需要解决两个关键问题——如何将多视图信息融合为全局一致的潜在表示，以及如何让 3D 原语同时携带多模态属性。
 
 为此，Uni3R 引入**跨视图 Transformer（Cross-View Transformer）**作为核心因果机制。该模块以预训练的几何基础模型 **VGGT** 为初始化，交替进行帧内自注意力与跨帧全局注意力，将任意数量的视图信息融合为视角无关的潜在编码。这一设计既注入了强大的几何先验，又实现了灵活的多视图聚合。在此基础上，Uni3R 通过 Dense Prediction Transformer（DPT）解码器与专用预测头，直接输出一组 3D 高斯原语，每个原语参数化为中心点 $\mu_j$、不透明度 $\alpha_j$、颜色 $c_j$、尺度 $s_j$、旋转 $r_j$ 和语义特征 $f_j^{\mathrm{sem}}$（公式 1），从而在单次前馈推理中统一支持新视角合成、深度估计与开放词汇语义分割。
-
-
 
 ## 核心方法与创新机理
 
@@ -103,8 +99,6 @@ Table 7 的消融实验揭示了各模块的因果作用：
 
 这些消融共同验证了 Uni3R 的“统一监督”设计——语义、辐射场和几何场的联合学习是实现高保真、语义一致 3D 重建的核心机制。
 
-
-
 Uni3R 的整体流水线围绕一个核心设计展开：**从无姿态的任意多视图图像中，通过单次前馈推理，直接预测一组统一的 3D 高斯原语**，这些原语同时携带几何、外观与开放词汇语义信息。流水线由四个关键模块串联构成，形成“编码—融合—解码—预测”的端到端架构（见图 2）。
 
 **输入编码与内参注入。** 每个输入视图首先与一个内参嵌入（Intrinsic Embedding）拼接。具体而言，相机的焦距与主点坐标经线性投影编码为几何线索，逐通道拼接到对应图像上，再进行 patch 切分。随后，预训练的 DINOv2 ViT 编码器对每个增强后的视图独立提取 patch 级特征 token 序列。这一步将原始像素转化为富含语义与几何先验的潜在表示，为跨视图融合提供高质量的基础特征。
@@ -131,12 +125,8 @@ $$
 
 其中 $\lambda_{\mathrm{sem}}=0.02$，$\lambda_{\mathrm{geo}}=0.005$。这一统一监督范式使得 Uni3R 无需任何 3D 语义标注即可同时学习几何重建、外观渲染与开放词汇语义理解。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2613_https_arxiv_org_abs_2508_03643/figures/002_Figure_2.jpg]]
 *Figure 2: Architectural overview of the Uni3R pipeline. Uni3R predicts a set of Gaussian primitives with jointly integrated geometry, appearance, and open-vocabulary semantics in a single pass, eliminating the need for per-scene optimization*
-
-
 
 Uni3R 的核心设计在于将多视图信息融合为全局一致的潜在表示，并从中解码出统一承载几何、外观与开放词汇语义的 3D 高斯原语。其流水线由五个关键模块串联构成，每个模块均承载明确的因果功能。
 
@@ -210,13 +200,6 @@ $$\mathcal { L } _ { \mathrm { g e o } } = \sum _ { i = 1 } ^ { N } \frac { 1 } 
 
 置信度掩码选取 VGGT 预测置信度最高的前 90% 点参与损失计算，这一比例经消融实验验证为最优——移除几何损失将导致 4 视图模型训练崩溃，而 90% 的掩码比例在 mIoU、深度准确率和渲染质量上均取得最佳平衡。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2613_https_arxiv_org_abs_2508_03643/figures/012_Figure_5.jpg]]
-*Figure 5: Model training w/ and w/o geo. loss on 4 views*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -242,18 +225,12 @@ Uni3R 作为前馈方法，在推理效率上具有压倒性优势。如 Table 2
 
 Uni3R 展现出优异的泛化能力。在 Mip-NeRF360 数据集上的零样本测试中（Table 5），仅使用 RE10k 训练的模型在 8 视角设置下达到 PSNR 19.196 dB，验证了其对室外复杂场景的适应能力。跨域评估（Table 8）进一步表明，在 DTU 和 ScanNet++ 数据集上，Uni3R 的零样本性能显著优于 **NoPoSplat** 和 **VicaSplat**，说明内参嵌入与跨视图 Transformer 的设计有效缓解了域间差异。
 
-![[assets/figures/papers/paper_list_l2613_https_arxiv_org_abs_2508_03643/figures/009_Table_5.jpg]]
-*Table 5: Zero-shot generalization on Mip-NeRF360 [1] dataset*
-
 ![[assets/figures/papers/paper_list_l2613_https_arxiv_org_abs_2508_03643/figures/013_Table_8.jpg]]
 *Table 8: Out-of-distribution performance comparison. Our method shows superior performance when zero-shot evaluation on DTU and ScanNet++ using the model solely trained on RE10k*
 
 ### 任意视角数训练
 
 Table 6 展示了 Uni3R 在 ScanNet 上以 2–16 个随机视角数混合训练的结果。模型在 2 视角到 16 视角的评估中均保持稳定的渲染质量（PSNR 24.35–25.53）和语义分割精度（mIoU 0.5403–0.5584），证明跨视图 Transformer 能够灵活处理任意数量的输入，无需为不同视角数训练独立模型。
-
-![[assets/figures/papers/paper_list_l2613_https_arxiv_org_abs_2508_03643/figures/011_Table_6.jpg]]
-*Table 6: Arbitrary View model training and evaluation on the ScanNet [6] dataset*
 
 ### 消融实验
 
@@ -271,21 +248,8 @@ Table 6 展示了 Uni3R 在 ScanNet 上以 2–16 个随机视角数混合训练
 - **Figure 4**：ScanNet 上的新视角语义分割定性对比显示，Uni3R 能够在目标视角准确分割物体边界，对“椅子”“桌子”等类别保持语义一致性，而 LSM 在视角变化时出现明显的语义漂移。
 - **Figure 5**：4 视角训练曲线直观展示了移除几何损失后的模型崩溃现象——训练损失在初期正常下降后突然发散，验证了 Chamfer 距离约束对训练稳定性的关键作用。
 
-![[assets/figures/papers/paper_list_l2613_https_arxiv_org_abs_2508_03643/figures/003_Figure_3.jpg]]
-*Figure 3: Qualitative comparison of novel view synthesis on RealEstate10k test set with 8 input images*
-
-![[assets/figures/papers/paper_list_l2613_https_arxiv_org_abs_2508_03643/figures/007_Figure_4.jpg]]
-*Figure 4: Qualitative Comparison of Novel-View Segmentation on ScanNet*
-
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2613_https_arxiv_org_abs_2508_03643/figures/010_Table_7.jpg]]
 *Table 7: Ablation Study on different modules. We evaluate the ablated variants of Uni3R, by recording their rendering quality, segmentation performance and geometric accuracy*
-
-![[assets/figures/papers/paper_list_l2613_https_arxiv_org_abs_2508_03643/figures/015_Table_9.jpg]]
-*Table 9: Ablation Study for confidence mask ratio (top-K) on the ScanNet dataset under 2-views setup on source views*
-
-
 
 ## 定位与知识库关联
 
@@ -350,8 +314,6 @@ Uni3R 的另一个关键创新在于几何监督策略：
 3. **3D 语义特征的可编辑性与可迁移性**：Uni3R 预测的 3D 高斯原语内嵌语义特征，这些特征是否支持下游任务（如 3D 场景编辑、物体操作、导航）的直接调用，以及能否迁移到其他 3D 表示（如 Mesh、NeRF），是连接感知与决策的关键问题。
 
 4. **无位姿设定下的位姿估计与重建的联合优化**：Uni3R 当前通过跨视图 Transformer 隐式处理位姿不确定性，未显式输出相机位姿。将位姿估计与 3D 重建统一到同一框架中，可能进一步提升几何一致性并支持 SLAM 类应用。
-
-
 
 ## 原文 PDF
 

@@ -50,15 +50,11 @@ claims:
 
 主要结果包括：在Greenshields通量上，NFV_2^1的L2误差（1.3e-4）比Godunov（4.5e-4）降低约3.5倍；在Burgers方程上，NFV_4^5的L2误差（2.2e-4）比Godunov（8.3e-4）和WENO（6.4e-4）低一个数量级，接近DG（3.1e-5）。在I-24高速公路现场数据上，NFV_10^11在7个未见过的测试日上均优于Godunov拟合，L1误差降低约18%，L2误差降低约22%。方法同时支持监督学习（基于解数据）和无监督学习（基于弱形式残差损失），后者在无参考解时仍能有效训练。
 
-
-
 双曲守恒律方程 $\partial_t u(x,t) + \partial_x f(u(x,t)) = 0$ 是描述激波、交通流等间断现象的核心数学模型，其数值求解长期面临根本性权衡：高阶格式（如WENO、不连续伽辽金法DG）精度高但实现复杂、计算成本高；低阶格式（如Godunov、Lax-Friedrichs）实现简单但数值耗散严重，无法准确捕捉激波和间断。传统有限体积方法的核心瓶颈在于，其数值通量函数 $F_{i+1/2}^n$ 必须手工设计——一阶通量（如Godunov）仅依赖相邻单元，精度受限；高阶重构（如WENO）虽能提升精度，却引入复杂的非线性权重计算和额外的实现复杂度。
 
 现有机器学习求解器尝试用神经网络端到端替代整个数值求解器，但往往牺牲守恒性这一关键物理约束，导致长期预测发散。本文的因果杠杆在于：**保留经典有限体积更新规则 $u_i^{n+1} = u_i^n - (\Delta t / \Delta x)(F_{i+1/2}^n - F_{i-1/2}^n)$ 以确保质量守恒，仅用轻量级2D CNN神经网络替换手工设计的数值通量函数**。核心洞察是，通过扩展时空模板（$a \times b$，即 $a$ 个空间单元 $\times$ $b$ 个过去时间步），网络可以学习更复杂的通量近似，而无需手动设计高阶重构——这种结构约束（嵌入FV框架）同时保证了守恒性和实现简单性。
 
 具体而言，该方法（Neural Finite Volume, NFV）将数值通量估计定义为 $\hat{F}_{i \pm 1/2}^n = \mathcal{N}(\mathbf{u}_{i \pm 1/2}^n(a, b))$，其中 $\mathcal{N}$ 是一个仅含6个隐藏层（每层15个神经元）的2D CNN，参数量仅为 $1105 + 16(ab + 1)$。NFV支持两种训练范式：监督学习（基于参考解的最小二乘损失 $\mathcal{L}_s = \mathbb{E}_{u_0 \sim \mathcal{R}} ||u - \hat{u}||_2^2$）和无监督学习（基于弱形式残差损失 $\mathcal{L}_w$ 直接从PDE学习，无需解数据）。这一设计填补了现有方法在"保持FV框架简单性的同时提升精度"的缺口。
-
-
 
 ## 核心方法与创新机理
 
@@ -83,8 +79,6 @@ claims:
 
 **因果机制**：传统 FV 方法的精度受限于手工通量函数的表达能力。NFV 通过神经网络学习通量，打破了这一瓶颈。更大的时空模板（$a \times b$）为网络提供了更多局部信息，使其能隐式地近似高阶重构，从而在保持 FV 框架简单性和守恒性的同时，显著提升了对激波和间断的捕捉精度。消融实验证实，NFV 模型对 CFL 比率变化更鲁棒，且在更粗网格上也能保持较低误差（Table 3, Figure 5）。
 
-
-
 ![[assets/figures/papers/iclr26_0001_AhtDnPyfOE_UNFV_UnSupervised_Neural_Finite_Volume_Methods_f/figures/007_Figure_4.jpg]]
 *Figure 4: Comparison of the final density of the Burgers’ equation (left) and LWR triangular equation (right) for $\mathrm { N F V _ { 4 } ^ { 5 } }$ and the Godunov Scheme. The proposed method displays an excellent approximation of the exact solution, capturing sharp features such as discontinuities and points of non-differentiability. It contains some minor oscillations in the solution, which are not present in the Godunov scheme. The latter, however, fails to capture the discontinuities and points of non-differentiability, offering a very smoothed solution*
 
@@ -95,8 +89,6 @@ claims:
 **输入输出流**：输入是当前时刻及过去 $b-1$ 个时间步的局部 $a$ 个空间单元的密度/状态值（即 $a \times b$ 的时空模板）。输出是预测的数值通量，该通量被 FV 更新规则用来计算下一时间步的解。在自回归预测中，模型输出的解会作为下一时间步的输入的一部分。
 
 **关键变化**：该方法改变了传统 FV 方法中“手工设计的解析通量函数”这一核心组件。通过将模板大小从 Godunov 的 $2 \times 1$ 扩展到 $10 \times 11$，网络能够学习到更复杂的、非局部的通量近似，从而在保持 FV 方法简单性的同时，获得接近甚至超越高阶方法（如 WENO、DG）的精度。此外，该方法支持两种训练范式：**监督学习（NFV）**，直接最小化预测解与参考解之间的均方误差；**无监督学习（UNFV）**，通过最小化 PDE 弱形式残差来训练，无需参考解。
-
-
 
 ### 1. 背景：守恒律与有限体积框架
 
@@ -171,20 +163,16 @@ $$\mathcal { L } _ { w } = \underset { \underset { u _ { 0 } \sim \mathcal { R }
 - **旋钮**：用轻量级 CNN 替代手工通量函数，同时保留 FV 守恒更新规则。通过调整时空模板尺寸 $a \times b$，可以平滑地控制模型容量和表达能力的权衡。
 - **效果**：在保持 FV 方法简单性、守恒性和低计算成本的同时，显著提升了对激波和间断的捕捉精度。监督版本（NFV）在标签充足时表现最佳；无监督版本（UNFV）在无标签场景下仍能通过物理约束学习，且经验上收敛到熵解（尽管缺乏理论保证）。
 
-
-
 ## 实验与关键发现
 
 ### 主要结果：合成基准上的精度提升
 
 (U)NFV 的核心实验在七个一维双曲守恒律基准上进行，评估集包含 1000 个分段常数初始条件。**表 1** 展示了关键对比：在 Greenshields 通量的 LWR 方程上，`NFV_2^1` 的 L2 误差为 `1.3e-4`，显著低于 Godunov (`4.5e-4`)、Lax-Friedrichs (`1.3e-2`) 和 Engquist-Osher (`4.5e-4`)。这一精度提升约 3.5 倍，且是在与 Godunov 完全相同的 2×1 时空模板下实现的，仅将手工设计的通量函数替换为轻量级神经网络。在 Triangular 1 和 Triangular 2 通量上，`NFV_2^1` 同样取得最低的一阶 FV 误差（分别为 `1.4e-3` 和 `2.4e-3`），验证了方法在不同通量函数上的鲁棒性。
 
-
 ![[assets/figures/papers/iclr26_0001_AhtDnPyfOE_UNFV_UnSupervised_Neural_Finite_Volume_Methods_f/figures/003_Table_1.jpg]]
 *Table 1: Performance comparison between neural network models and classical numerical schemes. Results are computed over the evaluation set of 1000 piecewise constant initial conditions. For each method, we report mean and standard deviation in $L _ { 2 }$ norm (mean ( ( u - $\hat { u } ) ^ { 2 }$ ) , )*
 
 **表 2** 进一步展示了扩展模板的潜力：`NFV_4^5` 在 Burgers 方程上达到 `2.2e-4` 的 L2 误差，比 Godunov (`8.3e-4`) 低约 3.8 倍，比高阶 WENO (`6.4e-4`) 低约 2.9 倍，性能接近不连续伽辽金 (DG) 方法 (`3.1e-5`)。这一结果的关键在于，`NFV_4^5` 在保持有限体积方法实现简单性和守恒性的同时，通过 4×5 的时空模板学习了更复杂的通量近似，从而大幅降低了数值耗散。
-
 
 ![[assets/figures/papers/iclr26_0001_AhtDnPyfOE_UNFV_UnSupervised_Neural_Finite_Volume_Methods_f/figures/008_Table_2.jpg]]
 *Table 2: Evaluation of $\mathrm { N F V _ { 4 } ^ { 5 } }$ using piecewise constant initial conditions. Error is reported in $L _ { 2 }$ norm. NFV54 achieves outstanding performance, gaining up to an order of magnitude improvement compared to Godunov and WENO. Its performance is close to DG, while keeping the implementation simplicity of a finite volume method and the computational complexity of NFV*
@@ -194,7 +182,6 @@ $$\mathcal { L } _ { w } = \underset { \underset { u _ { 0 } \sim \mathcal { R }
 ### 消融与鲁棒性分析
 
 **CFL 比率消融（表 3）**：`NFV_2^1` 和 `UNFV_2^1` 在所有测试的 CFL 比率下均一致优于 Godunov，且误差的标准差更小，表明其对时间步长变化更鲁棒。这一优势源于神经网络学习到的通量近似对数值稳定性条件的适应性更强。
-
 
 ![[assets/figures/papers/iclr26_0001_AhtDnPyfOE_UNFV_UnSupervised_Neural_Finite_Volume_Methods_f/figures/010_Table_3.jpg]]
 *Table 3: Mean and standard deviation of final-time $L _ { 2 }$ error on the standard LWR benchmark with Greenshields’ flux for different CFL ratios, comparing $\mathrm { N F V _ { 2 } ^ { 1 } }$ with classical finite volume baselines and DG*
@@ -206,7 +193,6 @@ $$\mathcal { L } _ { w } = \underset { \underset { u _ { 0 } \sim \mathcal { R }
 ### 现场数据验证：I-24 高速公路
 
 **表 4** 展示了 NFV 在 I-24 MOTION 现场数据上的表现。所有模型（包括 Godunov 拟合）均使用相同的第一小时数据（2022 年 11 月 29 日）进行训练/拟合。`NFV_2^1` 在所有指标上均优于所有经过通量函数拟合的 Godunov 变体，尽管输入大小和底层结构相同。随着模板增大，性能持续提升：`NFV_10^11` 在训练日上达到 L1 误差 `1.12e-1`，L2 误差 `2.20e-2`。
-
 
 ![[assets/figures/papers/iclr26_0001_AhtDnPyfOE_UNFV_UnSupervised_Neural_Finite_Volume_Methods_f/figures/011_Table_4.jpg]]
 *Table 4: Improvements of NFV at different scales against numerical methods with fitted flow functions on field data. The reported metrics include L1 error (mean(|u − uˆ|)), L2 error (mean ( u - $\hat { u } ) ^ { 2 }$ ) , ), and relative error (mean ( | u - $\hat { u }$ | / | $\operatorname$* { m a x } $\{ \varepsilon$ , u $\}$ | ) ) ). The larger the input size of NFV, the better the performance. $\mathrm { N F V _ { 2 } ^ { 1 } }$ outperforms all calibrated Godunov fits, despite having the same input size and underlying structure
@@ -226,13 +212,8 @@ $$\mathcal { L } _ { w } = \underset { \underset { u _ { 0 } \sim \mathcal { R }
 
 在推理时，NFV 的运行时间在 Godunov 的一个小常数因子内，大约是 ENO 和 WENO 的两倍快，比 DG 快一个数量级以上。训练在 RTX A5000 GPU 上约需 30 分钟，模型通常在几分钟内就超越 Godunov 基线，15 分钟内达到大部分最终性能（**图 15**）。这一效率使得 NFV 在实际应用中具有可行性。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0001_AhtDnPyfOE_UNFV_UnSupervised_Neural_Finite_Volume_Methods_f/figures/002_Figure_2.jpg]]
 *Figure 2: Example stencil for $\mathrm { F V } _ { 4 } ^ { 2 }$ . , taking in a stencil of 2 time steps times 4 space cells*
-
-
-
 
 ## 定位与知识库关联
 
@@ -264,8 +245,6 @@ $$\mathcal { L } _ { w } = \underset { \underset { u _ { 0 } \sim \mathcal { R }
 - NFV在速度公式化（学习速度-通量关系）上的表现如何？
 - 不同测试函数族（超越多项式）对无监督学习的影响是什么？
 - 更大模板尺寸(a)或更多输入通道(b)对未见交通模式的泛化有何影响？
-
-
 
 ## 原文 PDF
 

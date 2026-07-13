@@ -52,8 +52,6 @@ LLM智能体在主动推理任务中需要与环境进行多轮交互，通过�
 
 T³作为一个轻量级包装器，可无缝集成到PPO、GRPO、GSPO等主流策略优化算法中。在CircuitDecoding、SituationPuzzles、GuessNumbers、PreferenceEstimation、MovieRecommendation五个主动推理任务上，T³带来最高**41点**的绝对性能提升（GSPO+T³在MovieRecommendation上），同时将令牌消耗降低**高达34%**。方法在分布外场景下仍持续有效，且在不同模型规模（3B/7B/14B）和架构（Qwen/Llama/DeepSeek-distilled）上均表现稳健。
 
-
-
 ### 主动推理中的信念陷阱：核心瓶颈
 
 LLM智能体在主动推理任务中面临一个根本性困境：智能体通过与环境的交互逐步更新对隐藏状态的内部信念，但当信念更新偏离贝叶斯最优时，会逐渐滑入**信念陷阱区域（Belief-Trap Region, BTR）**。在该区域内，智能体的动作不再提供有效信息——例如反复提出已被排除的假设、发出冗余查询或收到“未知”反馈——而错误的累积会导致强化学习的信用分配机制失真，策略优化变得不稳定且探索受限。
@@ -87,8 +85,6 @@ $$\mathbb{E}[\widehat{A}_t] \leq \gamma \left( S_{\mathrm{pre}}(t) - \kappa_V \r
 $$\mathbb{E}[\widehat{A}_t^{\mathrm{pre}}] \geq \mathbb{E}[\widehat{A}_t] + \gamma \kappa_V \rho_b S_{\mathrm{tail}}^{\ominus}(t)$$
 
 即早期截断能够消除尾部负向漂移，使优势估计更准确地反映前缀动作的真实贡献。基于此，论文提出T³方法，通过可观测的代理信号（如假设空间不再收缩、冗余查询等）检测BTR入口并触发截断，从而在不修改底层RL优化器的前提下，为PPO/GRPO/GSPO提供更可靠的信用分配信号。
-
-
 
 ## 核心方法与创新机理
 
@@ -131,8 +127,6 @@ T³作为包装器（wrapper）集成于现有RL优化器之上，其管线由�
 - **消融确认**：Table 3验证了窗口大小 $k$ 的截断策略优于随机截断和基于语义相似性的截断，排除了“截断本身即有益”的替代解释。
 - **分布外泛化**：Table 2显示T³在OOD场景下仍持续提升性能，表明方法的鲁棒性。
 
-
-
 ![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_r8hzDA3pUY/figures/001_Figure_1.jpg]]
 *Figure 1: Overall framework of $\mathbf { T } ^ { 3 }$ , where $\left( b _ { t } , a _ { t } , o _ { t } \right$) denote the agent’s internal belief, its chosen action, and the resulting feedback at turn t , respectively. By truncating belief-trapped trajectories, we prevent the agent from entering the belief-trap region (BTR) where credit assignment is contaminated in RL training, allowing learning signals to concentrate on genuinely informative actions. As a result, policy optimization becomes more stable and effective under complex active reasoning
 
@@ -159,8 +153,6 @@ T³（Truncating Belief-Trapped Trajectories）作为一个轻量级包装器，
 - **逻辑闭环**：智能体在环境中执行多轮交互，每轮产生动作-观测对 $(a_t, o_t)$。检测器实时监控假设空间的收缩程度；一旦满足 T³ 条件，轨迹被截断。截断后的前缀进入信用分配模块计算优势，最后交由策略优化器更新参数。随着训练推进，策略逐渐学会在进入 BTR 前终止无信息探索，使学习信号集中于真正推进任务进展的动作上。
 
 Figure 1 直观对比了标准 RL 方法与 T³ 的差异：左侧的标准方法中，智能体在进入 BTR 后继续执行无信息动作（如重复猜测同一思路），导致尾部优势漂移和错误累积；右侧的 T³ 在检测到 $b_{t_S}$ 进入 BTR 时即行截断，赋予截断奖励 $R_{\text{cut}}$，使策略优化保持稳定有效。
-
-
 
 ### 关键模块
 
@@ -230,8 +222,6 @@ $$
 $$
 
 其中 $\kappa_V$ 为值函数 Lipschitz 常数，$\rho_b$ 为 BTR 吸收概率，$S_{\mathrm{tail}}^{\ominus}(t)$ 为尾部负向贡献。该式表明早期截断可降低优势估计的负向偏差，从而改善梯度信号质量。
-
-
 
 ## 实验与关键发现
 
@@ -306,12 +296,8 @@ Figure 6展示T³在3B/7B/14B三种规模及Qwen/Llama/DeepSeek-distilled三种�
 
 3. **理论假设的拟合偏差**：Assumption 1（更新误差下界线性增长）虽经Figure 2(a)(b)实证拟合，但其正斜率在不同任务上的显著性存在差异。若实际LLM行为偏离该假设，Theorem 2的漂移上界可能不再紧致，截断的理论保证弱化。**该点需结合附录C的完整拟合结果进行人工核实**。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_r8hzDA3pUY/figures/030_Figure_8.jpg]]
 *Figure 8: Empirical verification of Theorem 2 and Corollary 1. (a-b) Without truncation, early-token advantages exhibit a clear negative drift, while $\mathbf { T } ^ { 3 }$ consistently elevates them across PE and CD tasks. (c) Longer uninformative tails (higher maximum interaction turns, from 6 to 15) cause stronger suppression of early advantages. (d) Stronger $\mathbf { T } ^ { 3 }$ truncation (smaller k) yields cleaner, less-biased early advantages
-
-
 
 ## 定位与知识库关联
 
@@ -393,8 +379,6 @@ T³的截断检测器依赖于任务特定的代理信号（proxy signals）：
 4. **截断策略的自适应优化**：能否将截断决策本身纳入元学习或在线自适应框架，使窗口大小 $k$ 和阈值 $\Delta_{\min}$ 随训练进程和任务特性自动调整？
 
 5. **与推理时方法的协同**：T³关注训练阶段的信用分配修正，如何与推理时的搜索策略（如树搜索、自我验证）协同，形成"训练截断+推理扩展"的互补机制？
-
-
 
 ## 原文 PDF
 

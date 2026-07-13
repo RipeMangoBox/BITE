@@ -215,8 +215,6 @@ FrankenMotion 的细粒度控制能力建立在 **FrankenStein** 数据集之上
 
 尽管 FrankenMotion 在定量和定性评估中表现优异，论文仍指出了若干局限性。首先，现有扩散模型架构难以建模长期时序结构，将运动生成能力扩展到数分钟级别的长序列是未来重要方向。其次，身体部件运动的真实感高度依赖于 FrankenAgent 推断标注的准确性——LLM 的错误标注或幻觉会直接传导至生成质量。此外，论文未讨论当部件级指令与动作级或序列级指令发生冲突时模型的决策行为，也未分析数据分布偏差（如人口学或动作类型偏差）对生成公平性的潜在影响。这些开放问题需要后续研究进一步探索。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l17_FrankenMotion_Part_level_Human_Motion_Generation_and_Composition/figures/005_Table_1.jpg]]
 *Table 1: Comparison of source motion–language datasets and our extended dataset. Our dataset builds upon KIT-ML [38], BA-BEL [40], and HumanML3D [12], using LLM-based reasoning to produce multi-level, part-aware, and unseen annotations*
 

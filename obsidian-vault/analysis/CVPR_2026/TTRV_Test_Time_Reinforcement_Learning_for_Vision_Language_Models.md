@@ -62,8 +62,6 @@ claims:
 
 **关键局限**：计算开销显著——即使使用 vLLM 加速，适配 20 个样本也需增加数分钟延迟（相较正常推断增加 547% 以上），适配 500 个样本则超过 1.5 小时，难以直接用于实时场景。此外，作者承认目前缺乏理论解释来说明 TTRV 为何能增强核心能力而非简单过拟合测试分布。
 
-
-
 视觉语言模型（VLM）在图像识别、视觉问答等任务上取得了显著进展，但其部署仍面临一个根本性瓶颈：**现有VLM在测试时无法像人类一样从无标记经验中动态学习，必须依赖大量标记数据和昂贵微调，泛化性和适应性受限**。主流范式将训练与推断严格分离——模型在预训练和指令微调阶段消耗海量标注数据，一旦部署便参数冻结，面对分布偏移或新场景时只能被动承受性能退化。
 
 这一困境在decoder-based VLM上尤为突出。以InternVL3-2B为例，其在ImageNet上的Top-1准确率仅56.00%，远低于专门的dual-encoder模型（如SigLIP的80.50%），暴露出指令微调可能削弱了预训练阶段习得的基础视觉识别能力。现有解决方案存在两条路径但各有缺陷：
@@ -74,8 +72,6 @@ claims:
 更深层的问题在于：**如何在不依赖任何外部监督的前提下，让模型在测试时自主发现并强化正确的推理路径？** 这要求一种能从无标记测试样本中提取有效学习信号，并驱动模型参数在线更新的机制。
 
 TTRV的动机正是填补这一空白——将强化学习从训练阶段解放到测试阶段，直接从模型自身多次采样的输出分布中提取自监督奖励信号，驱动GRPO在线优化模型参数。其核心假设是：**利用模型多次采样的输出频次作为软监督信号，并约束输出熵防止过早收敛，可以在测试时恢复并放大预训练中已习得但被指令微调削弱的基础视觉推理能力**。这一假设在极端数据稀缺场景下得到初步验证——仅使用1个随机测试样本，TTRV仍能带来最高5.5%的提升，暗示其并非单纯拟合分布而是激活潜在能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -120,8 +116,6 @@ TTRV 的成功并非简单的分布拟合或多数投票。消融实验（Table 
 
 TTRV 是首个将 GRPO 引入 VLM 测试时强化的框架，其奖励设计从“模型自洽性”中提取学习信号，而非依赖外部标注或简单的熵启发式。这一范式转变使得 VLM 能够在遭遇任何测试数据时自主进化，为通用视觉智能体的在线学习开辟了新路径。
 
-
-
 TTRV 的整体 pipeline 围绕一个核心思想展开：**在测试时，直接从未标注的测试样本中提取自监督奖励信号，驱动 GRPO 在线优化 VLM 参数**，从而无需任何预训练数据划分或标注数据即可提升下游视觉任务表现。图 2 给出了完整的流程概览。
 
 **Pipeline 由五个关键模块串联构成：**
@@ -137,12 +131,6 @@ TTRV 的整体 pipeline 围绕一个核心思想展开：**在测试时，直接
 **与现有范式的根本差异**：传统 VLM 适配流程依赖于“预训练 → 监督微调（SFT）→ 强化学习（RL）”的三阶段范式，其中 RL 阶段需要大量标注数据或人类偏好信号。TTRV 将 RL 的时机从训练阶段**前移到了测试推断阶段**，并将奖励信号来源从外部监督**替换为模型输出分布的自监督统计量**。这一设计使得模型能够在遭遇新数据时“即插即用”地在线学习，而无需任何离线准备。
 
 **因果机制**：TTRV 之所以有效，其核心洞察在于：预训练阶段习得的基础视觉推理能力在指令微调后可能被部分削弱，而测试时 RL 通过频率一致性与熵约束的组合奖励，能够**恢复并放大这些潜在能力**。消融实验（Table 3）证实，频率+多样性奖励组合显著优于单纯的多数投票奖励（TTRL）或 TENT 风格的熵最小化，验证了该奖励设计并非简单的分布拟合，而是激活了模型内在的推理能力。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2666_https_arxiv_org_abs_2510_06783/figures/001_Figure.jpg]]
-
-
 
 TTRV 将测试时强化学习形式化为一个 **KL 正则化的策略优化问题**，其目标是在最大化期望奖励的同时，约束当前策略 $\pi$ 与参考策略 $\pi_{\text{ref}}$ 的偏离程度：
 
@@ -205,8 +193,6 @@ $$\theta \leftarrow \theta + \eta \nabla_{\theta} \mathbb{E}_{y \sim \pi_{\theta
 ![[assets/figures/papers/paper_list_l2666_https_arxiv_org_abs_2510_06783/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of TTRV. For each prompt x, the VLM generates N candidate responses*
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -255,8 +241,6 @@ Table 9显示增加适配样本数可进一步提升性能（如ImageNet上20样
 2. **缺乏理论解释**：作者明确承认尚无法从理论上解释TTRV为何能增强核心能力而非简单拟合分布。
 3. **任务覆盖有限**：当前评估仅限于对象识别和VQA，未探索生成式任务或更复杂的多模态推理场景。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2666_https_arxiv_org_abs_2510_06783/figures/003_Table_1.jpg]]
 *Table 1: Image Classification. Top-1 Accuracy (%) obtained by evaluating multiple different backbones. The results in gray are obtained using the specialized dual-encoder VLMs and the proprietary GPT-4o. For decoder-based VLMs we also evaluate multiple families and model sizes. Our TTRV is applied to different model sizes from the InternVL [77] family of models. The best results obtained for a dataset are highlighted in bold, while the second best are underlined*
 
@@ -265,23 +249,6 @@ Table 9显示增加适配样本数可进一步提升性能（如ImageNet上20样
 
 ![[assets/figures/papers/paper_list_l2666_https_arxiv_org_abs_2510_06783/figures/007_Table_3.jpg]]
 *Table 3: Ablating Reward Designs. We compare the design choices of our TTRV with the reward design proposed by Zuo et al. [78], based on the pseudo-labels obtained from a majority voting scheme. Further, we also ablate the individual effect of our frequency- and diversity-based rewards*
-
-![[assets/figures/papers/paper_list_l2666_https_arxiv_org_abs_2510_06783/figures/005_Figure_3.jpg]]
-*Figure 3: Cross-dataset Generalization. Top-1 accuracy (%) achieved by employing TTRV on a base dataset using InternVL3- 2B and evaluating on a target dataset from a completely different domain. The results highlight that TTRV enhances core abilities of the model*
-
-![[assets/figures/papers/paper_list_l2666_https_arxiv_org_abs_2510_06783/figures/009_Table_6.jpg]]
-*Table 6: Single Example TTRV. We report results for VQA and image classification after applying TTRV on a single randomly sampled test example*
-
-![[assets/figures/papers/paper_list_l2666_https_arxiv_org_abs_2510_06783/figures/006_Table_4.jpg]]
-*Table 4: Biased vs. Random Sampling. Top-1 accuracy (%) obtained by sampling the test data differently. For biased sampling, we choose a fraction of the data from only a subset of classes (e.g., 4 out of 200 for ImageNet-R). Random sampling results are obtained by sampling the data randomly from all classes*
-
-![[assets/figures/papers/paper_list_l2666_https_arxiv_org_abs_2510_06783/figures/013_Table_10.jpg]]
-*Table 10: Computation Overhead. Inference and adaptation latency through TTRV. Seconds: s, Minutes: m, Hours: h*
-
-![[assets/figures/papers/paper_list_l2666_https_arxiv_org_abs_2510_06783/figures/015_Table_12.jpg]]
-*Table 12: Cross-dataset generalization. Performance on different dataset combinations, where X → Y denotes training on dataset X and testing on dataset Y. "IN" in the table refers to ImageNet*
-
-
 
 ## 定位与知识库关联
 
@@ -332,8 +299,6 @@ TTRV 的知识贡献可凝练为三个相互耦合的设计选择，它们共同
 4. **更广泛的任务与模型验证：** TTRV 在更大规模 VLM（如 70B+ 参数）以及视频、3D 等多模态任务上的有效性尚待验证。
 
 5. **公平性与社会影响：** 论文未讨论 TTRV 对模型公平性或社会偏见的影响。测试时自适应是否会放大或缓解预训练模型中的偏见，是一个需要手动验证的议题。
-
-
 
 ## 原文 PDF
 

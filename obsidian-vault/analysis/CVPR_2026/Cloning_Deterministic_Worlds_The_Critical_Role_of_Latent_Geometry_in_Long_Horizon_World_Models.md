@@ -299,8 +299,6 @@ $$
 ![[assets/figures/papers/paper_list_l2453_https_arxiv_org_abs_2510_26782/figures/006_Figure_4.jpg]]
 *Figure 4: Qualitative comparison of medium-horizon rollouts in M9x9-DET. We visualize consecutive frames around frame 100 and frame 400. Our method (GRWM) maintains high similarity to the ground truth throughout, while the baseline VAE-WM gets trapped near the pink wall, indicating that VAE-WM tends to “teleport” between visually similar but distinct locations*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2453_https_arxiv_org_abs_2510_26782/figures/007_Figure_7.jpg]]
 *Figure 7: Visualization of latent space structure through clustering analysis. We perform k-means clustering (k = 20) on the latent representations of frames. Each point in the plots corresponds to a frame, positioned according to its true (x, y) coordinates in the environment. The (x, y) coordinates are normalized and lie within [−1, 1]. Points are colored based on their assigned latent cluster ID. The top row (VAE-WM) shows scattered, noisy clusters, indicating that spatially distant frames are incorrectly grouped together. The bottom row (GRWM) shows well-defined, spatially coherent clusters, demonstrating that our learned latent space is structurally aligned with the environment’s true state mani...*
 

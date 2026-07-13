@@ -56,8 +56,6 @@ claims:
 
 方法层面，GeniNav 在子目标表示形式、轨迹生成模型与轨迹评估选择三个关键槽位上做出了区别于以往工作的创新，并配套发布了 GeniBench 闭环基准（176 场景、491.6 km），为后续研究提供了统一的评估平台。
 
-
-
 ### 问题背景
 
 视觉目标导航（visual goal navigation）要求智能体在未知环境中仅凭视觉观测抵达指定目标位置。当目标由图像而非坐标定义时，任务被称为**图像目标导航（image-goal navigation）**，其核心挑战在于将当前视角的感知与目标图像的语义建立跨视角关联，并生成安全、高效的连续运动轨迹。近年来，生成式模型——特别是扩散策略与流匹配方法——在该领域展现出强大的潜力，能够从多模态感知中直接生成多样化的动作序列。然而，现有方法在**时间一致性**、**运动稳定性**与**评估公平性**三个维度上仍存在显著瓶颈。
@@ -80,8 +78,6 @@ claims:
 - **采用多段一致性流匹配（MS-CFM）** 替代传统扩散策略，通过分段连续变换与时间一致性约束，实现时间平滑、目标导向的动作生成；
 - **构建联合语义-几何-视野的多模态混合排序模块（HRM）**，对候选轨迹进行系统评估与最优选择，从而同时提升成功率、路径效率与安全性；
 - **引入 GeniBench 标准化闭环基准**（176场景，491.6 km轨迹），为公平对比与泛化能力验证提供统一平台。
-
-
 
 ## 核心方法与创新机理
 
@@ -113,8 +109,6 @@ $$v(t, \gamma_a(t)) = v(s, \gamma_a(s)), \quad \forall t,s \in [0,1]$$
 
 此前生成式导航方法缺乏统一的闭环评估基准，各方法在数据分布、场景覆盖和评估协议上差异显著，导致对比不公。GeniNav 构建了 **GeniBench**——基于 Habitat 仿真平台的闭环基准，覆盖 176 个场景（86 个 Gibson + 90 个 MP3D），包含 491.6 km 的运动学可行轨迹，并提供数据对齐的评估协议（Table 1）。这一基准确保了所有方法在相同条件下训练与测试，从根本上解决了以往评估分裂的问题。
 
-
-
 GeniNav 将图像目标导航建模为**多模态感知驱动的连续多段流过程**，其整体 pipeline 由三个核心模块级联构成：**隐式引导模块（Latent Guidance Module, LGM）**、**GeniPolicy（基于 MS-CFM 的动作生成器）** 和 **混合排序模块（Hybrid Ranking Module, HRM）**。系统在每个决策步接收当前 RGB 观察 $I_t^{\mathrm{rgb}}$、深度图 $I_t^{\mathrm{dep}}$ 以及目标图像 $I_g$，输出最终执行的动作序列（Figure 2）。
 
 ![[assets/figures/papers/paper_list_l2503_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_GeniNav_Generativ/figures/002_Figure_2.jpg]]
@@ -135,8 +129,6 @@ $$c_t = f_\theta\big(\phi(I_t^{\mathrm{rgb}}), \psi(I_t^{\mathrm{dep}}), z_s\big
 $$F_k = \lambda_1 \widetilde{R}_k + \lambda_2 \widetilde{S}_{\mathrm{view}}^k, \quad k^* = \arg\max_k F_k$$
 
 **关键设计决策**：LGM 将子目标表示为 VLM 的隐式语义特征而非显式图像，这是连接语义推理与轨迹生成的核心接口，既压缩了表示维度又避免了像素级生成的不稳定性。GeniPolicy 采用 MS-CFM 而非标准扩散策略，在保证生成质量的同时显著提升推理效率与时间平滑性。HRM 的多模态联合评估机制弥补了单一评估维度（仅语义或仅几何）的不足，是轨迹选择鲁棒性的关键保障——消融实验表明，随机选择或单一维度评估均导致成功率大幅下降（Gibson 场景下 SR 从 68.7% 降至 53.2% 或更低，Table 3）。
-
-
 
 GeniNav 将图像目标导航建模为由多模态感知驱动的连续多段流过程，其核心由三个模块级联构成：隐式引导模块（LGM）、生成式策略模块（GeniPolicy）和混合排序模块（HRM）。整体架构见图 2。
 
@@ -202,15 +194,11 @@ $$z_i' - I_t^{\mathrm{dep}}(u_i, v_i) > \delta$$
 
 当估计深度超出实测深度且差值超过安全容限 $\delta$ 时，判定该轨迹存在碰撞风险，直接排除。通过碰撞检测的候选轨迹再按 $F_k$ 排序，选择总分最高的 $k^*$ 执行。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2503_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_GeniNav_Generativ/figures/001_Figure_1.jpg]]
 *Figure 1: A conceptual illustration of GeniNav. The Latent Guidance Module infers a subgoal latent from the current and goal images, guiding GeniPolicy to propose candidate action sequences. The Hybrid Ranking Module ranks them and selects the collisionfree and semantically aligned blue trajectory*
 
 ![[assets/figures/papers/paper_list_l2503_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_GeniNav_Generativ/figures/003_Figure_3.jpg]]
 *Figure 3: Example of the semantic alignment evaluation prompt used in the HRM for trajectory selection*
-
-
 
 ## 实验与关键发现
 
@@ -253,15 +241,8 @@ Figure 5展示了仿真与真实环境下的导航示例。在每个决策步，
 3. **隐式子目标可解释性不足**：LGM输出的隐式语义特征难以直接验证中间导航意图的正确性，当导航失败时，难以定位是子目标推理错误还是轨迹生成偏差。
 4. **sim-to-real评估不完整**：真实世界实验仅展示定性成功案例，缺少系统性的定量对比和失败模式归因，泛化能力的边界尚不明确。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2503_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_GeniNav_Generativ/figures/008_Table_3.jpg]]
 *Table 3: Ablation analysis of the proposed LGM, GeniPolicy, and HRM components on the Gibson and MP3D validation splits*
-
-![[assets/figures/papers/paper_list_l2503_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_GeniNav_Generativ/figures/007_Figure_5.jpg]]
-*Figure 5: Navigation examples in simulation and the real world. At each step, several candidate trajectories are generated and visualized in different colors. The HRM selects one trajectory to execute, and the selected trajectory is indicated by the text label above each frame. GeniNav consistently selects safe and goal-directed trajectories in both environments*
-
-
 
 ## 定位与知识库关联
 
@@ -312,8 +293,6 @@ GeniNav 的设计存在明确的适用边界，这些边界定义了其当前能
 **端到端权重学习。** HRM 的多模态评分权重 $\lambda_1, \lambda_2$ 目前为手动设定。这些权重是否可以通过端到端学习获得？例如，利用导航成功/失败的二元反馈信号，通过强化学习或直接偏好优化来调整权重，使排序模块自适应于不同环境特性。
 
 **基准生态完善。** GeniBench 提供了 176 个场景、491.6 km 轨迹的标准化闭环基准，解决了此前数据集评估分裂、无统一基准的问题（Table 1）。然而，该基准目前仅覆盖室内静态场景。将其扩展至包含动态障碍物、多智能体交互和室外场景，将推动整个领域的公平评估和进步。
-
-
 
 ## 原文 PDF
 

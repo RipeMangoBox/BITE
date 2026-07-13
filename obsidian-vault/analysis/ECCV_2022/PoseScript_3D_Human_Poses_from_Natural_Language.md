@@ -55,8 +55,6 @@ claims:
 
 **局限性**：自动生成的描述在自然多样性上仍逊于人类语言，当前工作仅处理静态姿态而未扩展到运动序列，且数据集仅包含英语描述，存在文化和主观偏见引入的风险。
 
-
-
 ### 问题背景：3D人体姿态理解中的语义鸿沟
 
 3D人体姿态估计与理解是计算机视觉领域的核心问题之一，在动画制作、运动分析、人机交互和虚拟现实等应用中具有广泛需求。然而，当前的研究主要聚焦于从图像或视频中重建3D姿态的几何精度，对于姿态的**语义层面理解**——即用自然语言描述和检索复杂的人体姿态——关注甚少。
@@ -84,8 +82,6 @@ claims:
 ### 工作定位与贡献
 
 PoseScript是首个将静态3D人体姿态与自然语言描述进行系统性关联的工作，其贡献不仅在于数据集本身，更在于提出了一套从姿态语义提取到跨模态应用的完整技术链路。该工作为后续的文本驱动人体姿态理解、图像中的文本条件姿态拟合（Figure 10）等应用奠定了基础，同时揭示了自动描述合成作为跨模态预训练手段的巨大潜力。
-
-
 
 ## 核心方法与创新机理
 
@@ -126,8 +122,6 @@ $$
 
 与依赖纯人工标注的传统文本-姿态对齐方法相比，PoseScript 的核心差异化在于**以自动合成描述为桥梁，将数据稀缺问题转化为迁移学习问题**。其 posecode 流水线提供了一种结构化、可扩展的姿态语义编码方式，而预训练-微调范式则为小样本人工标注场景下的跨模态学习提供了有效路径。这一方法论框架不仅适用于静态 3D 姿态，也为后续向人体运动生成等时序任务的扩展提供了基础。
 
-
-
 PoseScript（ECCV 2022）的核心贡献是构建了一条从3D人体姿态到自然语言描述的自动生成流水线，并以此为基础支撑文本-姿态跨模态检索与文本条件姿态生成两大应用（图1）。该流水线的关键洞察在于：3D人体姿态的语义可被分解为一系列可计算的半结构化属性，即**posecodes**，进而通过规则化的选择、聚合与语言转换，自动合成多样化的语义描述。利用这些自动描述进行预训练，再在人工标注上微调，能够显著提升下游任务的性能。
 
 ### 自动描述生成流水线
@@ -162,15 +156,11 @@ PoseScript（ECCV 2022）的核心贡献是构建了一条从3D人体姿态到�
 
 整个框架的核心训练策略是**预训练-微调范式**：先在自动描述集（PoseScript-A）上预训练模型，再在人工描述集（PoseScript-H）上微调。实验表明，该策略在检索任务上将平均召回率从12.4%提升至30.4%，在生成任务上将FID从0.14降至0.11，mRecall G/R从2.7提升至16.2，充分验证了自动描述预训练的有效性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2_https_www_ecva_net_papers_eccv_2022_papers_ECCV_html_2069_ECCV_2022_pape/figures/002_Figure_2.jpg]]
 *Figure 2: Examples of pose descriptions from PoseScript, produced by human annotators (left) and by our automatic captioning pipeline (right)*
 
 ![[assets/figures/papers/paper_list_l2_https_www_ecva_net_papers_eccv_2022_papers_ECCV_html_2069_ECCV_2022_pape/figures/004_Figure_4.jpg]]
 *Figure 4: Overview of our captioning pipeline. Given a normalized 3D pose, we use posecodes to extract semantic pose information. These posecodes are then selected, merged or combined (when relevant) before being converted into a structural pose description in natural language. Letters ‘L’ and ‘R’ stand for ‘left’ and ‘right’ respectively*
-
-
 
 PoseScript的方法体系由三个核心模块构成：自动描述生成流水线、文本-姿态跨模态检索模型，以及文本条件姿态生成模型。前者的输出为后两者提供训练数据，形成“合成数据预训练+人工标注微调”的闭环。
 
@@ -216,18 +206,8 @@ $$\mathcal{L}_{KL}(\mathcal{N}_p, \mathcal{N}(0, I))$$
 
 两个下游任务均采用统一的训练策略：先在自动描述PoseScript-A上预训练，再在人工描述PoseScript-H上微调。检索任务中，微调使mRecall从12.4%提升至30.4%；生成任务中，预训练使FID从0.14降至0.11，mRecall G/R从2.7跃升至16.2。这一范式验证了合成数据预训练对缓解人工标注稀缺问题的有效性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2_https_www_ecva_net_papers_eccv_2022_papers_ECCV_html_2069_ECCV_2022_pape/figures/005_Figure_5.jpg]]
 *Figure 5: Overview of the training scheme of the retrieval model. The input pose and caption are fed to a pose encoder and a text encoder respectively to map them into a joint embedding space. The loss encourages the pose embedding y _ { i } and its caption embedding x _ { i } to be close in this latent space, while being pulled apart from features of other poses in the same training batch (e.g. yk and yl)*
-
-![[assets/figures/papers/paper_list_l2_https_www_ecva_net_papers_eccv_2022_papers_ECCV_html_2069_ECCV_2022_pape/figures/008_Figure_7.jpg]]
-*Figure 7: Retrieval results in image databases. We use our text-to-pose retrieval model trained on human captions from PoseScript to retrieve 3D poses from SMPL fits on MS Coco, for some given text queries. We display the corresponding pictures for the top retrieved poses, along with the bounding boxes around the pose*
-
-![[assets/figures/papers/paper_list_l2_https_www_ecva_net_papers_eccv_2022_papers_ECCV_html_2069_ECCV_2022_pape/figures/012_Figure_10.jpg]]
-*Figure 10: Example of potential application to SMPL fitting in images. Using the text-conditional pose prior (right) yields a more accurate 3D pose than a generic pose prior (left) when running the optimization-based SMPL fitting method SMPLify*
-
-
 
 ## 实验与关键发现
 
@@ -277,20 +257,8 @@ $$\mathcal{L} = \mathcal{L}_{R}(p, \hat{p}) + \mathcal{L}_{KL}(\mathcal{N}_{p}, 
 
 实验结果为后续研究指明了若干方向：模型在完全未见过的描述上的泛化能力仍需系统评估；不同姿态表示（关节旋转、位置坐标、SMPL参数）对跨模态学习的影响尚待对比研究；将文本条件生成扩展到3D人体运动序列是自然的下一步；此外，利用生成的姿态作为中间表示来驱动文本到图像的3D可控生成，是一个具有应用价值但尚未探索的方向。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2_https_www_ecva_net_papers_eccv_2022_papers_ECCV_html_2069_ECCV_2022_pape/figures/003_Figure_3.jpg]]
-*Figure 3: Left: Interface presented to the AMT annotators in order to collect discriminative descriptions of the blue pose. Right: Wordcloud of the most frequent words in the human-written descriptions*
-
 ![[assets/figures/papers/paper_list_l2_https_www_ecva_net_papers_eccv_2022_papers_ECCV_html_2069_ECCV_2022_pape/figures/006_Table_1.jpg]]
 *Table 1: Text-to-pose and pose-to-text retrieval results on the test split of the PoseScript dataset. For human-written captions (PoseScript-H), we evaluate models trained on each specific caption set alone, and one pretrained on automatic captions (PoseScript-A) then finetuned (FT) on human captions*
-
-![[assets/figures/papers/paper_list_l2_https_www_ecva_net_papers_eccv_2022_papers_ECCV_html_2069_ECCV_2022_pape/figures/010_Table_2.jpg]]
-*Table 2: Evaluation of the text-conditioned generative model on PoseScript-A for a model without or with $\mathcal { L } _ { K L } ( \mathcal { N } _ { p } , \mathcal { N } _ { 0 }$ ) (top) and on PoseScript-H without or with pretraining on PoseScript-A (bottom). For comparison, the mRecall when training and testing on real poses is 69.1 with PoseScript-A and 30.4 on PoseScript-H
-
-![[assets/figures/papers/paper_list_l2_https_www_ecva_net_papers_eccv_2022_papers_ECCV_html_2069_ECCV_2022_pape/figures/001_Figure_1.jpg]]
-*Figure 1: Illustration of possible applications using PoseScript. The top figure illustrates text-to-pose retrieval where the goal is to retrieve poses in a large-scale database given a text query. This can be applied to databases of images with associated SMPL fits. The bottom figure shows an example of text-conditioned pose generation*
-
 
 
 ## 定位与知识库关联
@@ -329,8 +297,6 @@ PoseScript最重要的方法论启示在于：**大规模自动生成数据预�
 - 文本条件姿态生成能否扩展为文本条件运动生成？这需要处理时序依赖和动作过渡的语义建模。
 - 生成的3D姿态能否作为条件信号驱动图像生成模型，实现文本到图像的可控3D人体合成？Figure 10展示了文本条件姿态先验在SMPLify优化中的初步应用，但端到端的生成式应用仍有待探索。
 - 不同姿态表示（关节旋转、3D位置、SMPL参数）对跨模态检索性能的系统性影响尚未量化比较，这对下游任务中的表示选择具有实际指导意义。
-
-
 
 ## 原文 PDF
 

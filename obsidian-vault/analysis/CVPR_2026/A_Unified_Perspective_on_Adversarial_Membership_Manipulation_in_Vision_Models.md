@@ -85,8 +85,6 @@ claims:
 
 值得进一步探索的开放问题包括：梯度范数塌缩特征能否被完全自适应的MFA（同时优化置信度和梯度范数）彻底绕过；MFD和AR-MIA在Vision Transformer等新架构及大规模预训练模型上的泛化性如何；以及成员伪造攻击与模型提取、数据投毒等其他威胁结合时会产生怎样的复合隐私风险。
 
-
-
 ### 成员推理攻击的隐私审计困境
 
 机器学习模型在训练过程中会记忆训练数据，这一现象催生了成员推理攻击（Membership Inference Attack, MIA）这一重要的隐私审计工具。给定一个样本 $(x,y)$ 和目标模型 $f_\theta$，MIA 通过构建统计量 $S(x,y)$ 并与阈值 $\tau$ 比较来推断该样本是否属于训练集：
@@ -122,8 +120,6 @@ $$\|\nabla_{x'} \ell(f(x'), y)\| < \|\nabla_x \ell(f(x), y)\|$$
 - **对抗鲁棒成员推理攻击（AR-MIA）**：将梯度几何信号与原始 MIA 统计量融合，在不改变现有 MIA 设计的前提下大幅提升抗操纵能力。
 
 这一框架首次将成员伪造的攻击、检测与鲁棒推理纳入统一分析，为隐私审计的安全性研究提供了新的理论基础和实用工具。
-
-
 
 ## 核心方法与创新机理
 
@@ -167,8 +163,6 @@ tanh函数将权重限制在合理范围内，防止非成员的异常大梯度�
 
 这一统一视角的核心贡献在于：**揭示了成员伪造与检测之间的几何博弈本质**，并证明梯度范数塌缩是可利用的可靠信号——它既是伪造过程的必然副产物，也是检测和鲁棒推理的天然锚点。
 
-
-
 本文提出的统一框架围绕“对抗性成员操作”这一核心威胁构建，将攻击、检测与鲁棒推理三个环节纳入同一个形式化体系。框架的起点是一个已被观察到但未被系统化研究的瓶颈：现有成员推理攻击（MIA）——如 **Loss Attack**、**Attack R**、**LiRA**（Carlini et al., S&P 2022）和 **RMIA**——依赖损失值、置信度或似然比等语义统计量进行成员/非成员判别。这些统计量对输入空间的微小扰动缺乏结构鲁棒性，攻击者只需将非成员样本推入高置信度区域，即可伪造其成员身份，从而破坏隐私审计的完整性。
 
 框架据此沿三条互补的技术路线展开，形成“攻击—检测—防御升级”的闭环。
@@ -209,12 +203,8 @@ $$I(x,y) = \mathbf{1}\left[ w(x,y) \cdot S(x,y) > \tau \right]$$
 
 **需要手动验证的点**：框架目前仅在标准训练的图像分类模型上验证，其在差分隐私训练模型、Vision Transformer 架构及黑盒梯度估计场景下的有效性尚待进一步实验确认。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2246_https_arxiv_org_abs_2604_02780/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the Background and Our Proposed Research Problems*
-
-
 
 本节围绕“对抗性成员操作”这一核心问题，依次构建三个关键模块：**成员伪造攻击（MFA）**、**成员伪造检测（MFD）** 与**对抗鲁棒成员推理攻击（AR-MIA）**。三者构成一个完整的攻防-推理闭环：MFA 揭示了现有成员推理攻击的结构性脆弱性，MFD 利用梯度几何特征检测伪造行为，AR-MIA 则将检测信号融入推理统计量以恢复攻击鲁棒性。
 
@@ -278,21 +268,8 @@ $$I(x,y) = \mathbf{1}\left[ w(x,y) \cdot S(x,y) > \tau \right] \quad \text{(Equa
 
 **超参数校准**。$\lambda$ 需要根据数据集和 MIA 类型离线调节：适当增大 $\lambda$ 可提升对伪造成员的抑制能力，但过大的 $\lambda$ 会过度压缩真实非成员的权重，削弱其与真实成员的区分度（Figure 7(g-i)）。目前缺乏统一的自动化选择机制，这是该方法的已知局限之一。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2246_https_arxiv_org_abs_2604_02780/figures/003_Figure_3.jpg]]
-*Figure 3: Objective of adversarial attacks (left) vs. MFA (right). The black and red dots denote the original input and the perturbed sample within the ϵ- ball (gray region). Adversarial attacks push inputs into the misclassification region (orange), where max*
-
 ![[assets/figures/papers/paper_list_l2246_https_arxiv_org_abs_2604_02780/figures/004_Figure_4.jpg]]
 *Figure 4: Visualization of the Distribution of Fabricated and True Members in Different Semantic Feature Spaces Using t-SNE [38]. The two subfigures represent the semantic features at the penultimate and antepenultimate layers, with perturbation constrained to*
-
-![[assets/figures/papers/paper_list_l2246_https_arxiv_org_abs_2604_02780/figures/005_Figure_5.jpg]]
-*Figure 5: Decay of Gradient Norm with Respect to Input Across Steps. As the steps increases, the gradient norm with respect to the input progressively diminishes. For clarity, a large epsilon ball*
-
-![[assets/figures/papers/paper_list_l2246_https_arxiv_org_abs_2604_02780/figures/006_Figure_6.jpg]]
-*Figure 6: Distribution of fabricated and true members across different detection strategies. The first plot (left) shows the Mahalanobis distance, the second plot (middle) shows the Local Intrinsic Dimensionality (LID) values, and the third plot (right) presents the gradient norm with respect to the input. We use the relative frequency within each membership class as the vertical axis. The gradient norm in the third plot demonstrates superior distinguishability between fabricated and true members, where the other two show limited differentiation. The perturbation is constrained to*
-
-
 
 ## 实验与关键发现
 
@@ -324,9 +301,6 @@ Table 1 展示了四种步长策略在 CIFAR-10、CIFAR-100、SVHN 和 CINIC-10 
 #### 与基线方法的对比
 
 Table 3 和 Table 6 系统对比了 MFA 与五种倒置攻击基线（I-FGSM、I-BIM、I-PGD、I-CW、I-APGD）在多个数据集上的 Error Area 和 EER。MFA 在所有数据集和 MIA 组合上均显著优于基线。Figure 7(a-c) 的 TNR-TPR 曲线显示，MFA 的曲线更接近左下角（理想伪造区域），表明其能更有效地将非成员推入高置信度成员区域。
-
-![[assets/figures/papers/paper_list_l2246_https_arxiv_org_abs_2604_02780/figures/007_Figure_7.jpg]]
-*Figure 7: Representative Experimental Results. Subfigures (a-c) demonstrate the superior performance of (MFA) compared to baselines, highlighting its effectiveness across different MIAs and datasets. Subfigures (d-f) show the effectiveness of (MFD) across varying perturbation levels ϵ and datasets. Subfigures (g-i) illustrate the effectiveness of our Adversarially Robust Strategies in combination with different strong MIAs across multiple datasets*
 
 ![[assets/figures/papers/paper_list_l2246_https_arxiv_org_abs_2604_02780/figures/029_Table_3.jpg]]
 *Table 3: The Comparison of Error Area between Our Member Fabrication Attack with Baselines across Diverse Datasets*
@@ -374,16 +348,6 @@ Appendix F 探索了自适应 MFA 场景：攻击者在优化目标中显式加�
 4. **更强防御下的有效性未知**：所有实验均在标准训练模型上进行，未涉及差分隐私训练等更强隐私保护机制。在 DP-SGD 等场景下，梯度信号本身已被噪声化，MFD 和 AR-MIA 的性能可能受到显著影响。
 
 5. **阈值依赖离线校准**：$\tau'$（MFD）和 $\lambda$（AR-MIA）需要根据具体数据集和 MIA 类型进行离线调优，缺乏统一的自动化选择机制，在实际部署中可能面临分布偏移的挑战。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2246_https_arxiv_org_abs_2604_02780/figures/035_Table_9.jpg]]
-*Table 9: Comparison of RMIA and Our Adversarially Robust RMIA*
-
-![[assets/figures/papers/paper_list_l2246_https_arxiv_org_abs_2604_02780/figures/002_Figure_2.jpg]]
-*Figure 2: Imperceptible Adversarial Perturbations on ImageNet-100. The first row are the original non-members, and the second row are the corresponding perturbed fabricated members. We used*
-
-
 
 ## 定位与知识库关联
 
@@ -472,8 +436,6 @@ AR-MIA中的权重参数λ需要根据数据集和MIA类型进行离线校准（
 - **上游**：继承了对抗攻击的优化框架（PGD、CW、APGD）和成员推理的统计检验框架（LiRA、RMIA），但通过目标函数的反转和梯度几何信号的引入，开辟了新的问题空间。
 - **平行**：与基于差分隐私的防御方法（降低MIA准确率但无法检测伪造）和基于语义特征的异常检测方法（Mahalanobis、LID，在伪造检测上效果有限）形成互补。
 - **下游**：为成员推理的鲁棒性评估提供了基准工具（MFA作为攻击基准，MFD作为检测基准），并为更广义的“对抗性隐私操纵”研究（如属性推理伪造、数据来源伪造）提供了方法论模板。
-
-
 
 ## 原文 PDF
 

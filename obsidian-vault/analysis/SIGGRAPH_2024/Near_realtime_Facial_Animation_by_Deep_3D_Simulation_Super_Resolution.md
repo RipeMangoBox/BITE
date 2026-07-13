@@ -58,8 +58,6 @@ claims:
 
 框架在训练中未见的动态头部转动和外力作用下仍能生成视觉合理的高分辨率表情，展现了良好的泛化能力。然而，当前方法存在若干局限：输出仅限于表面几何，不包含内部物理量；训练数据来自单一受试者，泛化至其他身份需重新训练；低分辨率仿真完全省略碰撞处理，深层穿透时可能失效；缺乏时序正则化可能导致帧间微小抖动。
 
-
-
 ### 高保真面部动画的两难困境
 
 在计算机图形学与交互式应用中，基于物理的面部仿真能够生成高度逼真的面部表情和细节，其核心在于高分辨率的体积网格（如190万四面体）和完整的物理模型（含肌肉激活、碰撞处理等）。然而，这种高分辨率仿真（High-Resolution Simulation）的计算代价极为高昂——即使采用CUDA加速，也仅能达到约0.16 FPS的模拟速度（Figure 1, Figure 4），完全无法满足实时或近实时交互的需求。
@@ -88,8 +86,6 @@ claims:
 2. **推理阶段**：仅凭低分辨率仿真器的输出，即可泛化至未见表情、动态头部转动甚至外力作用，无需额外语义输入，实现115倍加速且平均重建误差仅0.37 mm。
 
 这一框架将超分辨率的概念从图像/几何域扩展到物理仿真域，为实时高保真面部动画提供了新的技术路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -122,8 +118,6 @@ claims:
 
 需注意，本方法的创新集中于**表面几何的超分辨率重建**，输出仅限于高分辨率表面位移，不包含内部应变、应力或肌肉激活等物理量（Limitations）。此外，训练数据来自单一受试者的解剖模型，泛化至其他身份需重新训练或微调。低分辨率仿真完全省略碰撞处理，模型仅通过学习训练数据中的碰撞解决行为隐式处理穿透，在深层穿透时仍可能失效（Figure 17）。
 
-
-
 ![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2305_03216/figures/010_Figure_8.jpg]]
 *Figure 8: 0 Fig. 8. We test the ability of our framework to handle deformations that extend beyond the parametric space used in the simulation by visualizing the inferred surfaces from unseen dynamics (le ) and unseen external forces (right) (Section 5.3). ©NVIDIA*
 
@@ -132,9 +126,6 @@ claims:
 
 ![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2305_03216/figures/022_Figure_17.jpg]]
 *Figure 17: (d） Fig. 17. An example of partial collision resolution: The prediction of our framework (b) on a test performance (a) has collisions partially resolved. The performance (when simulated in high resolution) with and without collision handling is shown in (c) and (d), respectively. Notice that when the penetration is higher, collisions are partially resolved in the prediction. ©NVIDIA*
-
-![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2305_03216/figures/001_Figure_1.jpg]]
-*Figure 1: From le to right: Facial animation resulting from low-resolution simulation (Coarse), embedding low-resolution 3D mesh (red) simulating at 30.06 FPS, result of our simulation super-resolution framework (Ours), result from a corresponding off-line high-resolution simulation (Target), conforming high-resolution 3D mesh simulating at 0.16 FPS. Note the similarities between our result (Ours) and that from the high-resolution simulation (Target), which both differ from the result obtained by the low-resolution simulation (Coarse), especially around the mouth and chin area. Our simulation super-resolution achieves an effective 18.46 FPS, i.e. 115× faster than the high-resolution simulation. The low-...*
 
 本文提出的**3D仿真超分辨率（3D Simulation Super-Resolution）**框架旨在解决一个核心矛盾：高分辨率物理仿真能生成逼真细节，但计算成本极高（仅0.16 FPS），而低分辨率仿真虽可实时运行（30 FPS以上），却因网格粗化、非一致嵌入和省略碰撞处理等因素丢失大量精细形变。该框架通过神经网络学习从低分辨率体网格位移到高分辨率表面网格位移的映射，在保持实时性能的同时逼近高仿真的视觉品质。
 
@@ -173,8 +164,6 @@ $$\mathcal{L} = \mathcal{L}_{recon} + \alpha \mathcal{L}_{fn} + \beta \mathcal{L
 ### 关键设计选择
 
 与传统的“嵌入表面”方法（直接将高分辨率表面网格通过重心坐标嵌入低分辨率仿真体）不同，本框架明确建模了分辨率差异带来的形变损失。Figure 5展示了同一组控制参数下，嵌入低分辨率网格的表面与高分辨率仿真表面之间存在显著的宏观和微观差异，这正是超分辨率网络需要补偿的信息缺口。通过特征编码和可学习上采样的组合，框架能够自动学习并补偿网格粗化、非一致嵌入和物理简化带来的误差。
-
-
 
 ### 整体流水线
 
@@ -230,8 +219,6 @@ $$\mathcal{L} = \mathcal{L}_{recon} + \alpha \mathcal{L}_{fn} + \beta \mathcal{L
 
 特征编码模块（EdgeConv）和坐标上采样模块（SIREN插值）是本方法的核心创新。消融实验证实：移除特征编码模块后，平均重建误差从0.38 mm升至0.45 mm；将坐标上采样替换为固定转置卷积加权求和后，误差进一步增至0.59 mm，精细表面细节严重恶化（Table 3, Figure 13）。这验证了动态图特征聚合与可学习空间插值对跨分辨率变形映射的关键作用。
 
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -240,12 +227,6 @@ $$\mathcal{L} = \mathcal{L}_{recon} + \alpha \mathcal{L}_{fn} + \beta \mathcal{L
 
 ![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2305_03216/figures/004_Figure_4.jpg]]
 *Figure 4: 1,944,549elements (d） Fig. 4. (a) High-resolution surface model in dimensions of 289.0 × 342.7 × 291.1 [mm] w.r.t. 𝑥, 𝑦, and 𝑧 axis, respectively, including the part of the shoulder, (b) high-resolution simulation model (0.16 FPS simulation), (c) lowresolution simulation model (30.06 FPS simulation) for the near-realtime end-to-end animation at 18.46 FPS, and (d) coarser low-resolution simulation model (67.79 FPS simulation) for the true real-time end-to-end animation at 28.04 FPS. ©NVIDIA*
-
-![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2305_03216/figures/015_Figure_12.jpg]]
-*Figure 12: （b） Fig. 12. Comparisons of the surface reconstruction qualities by our model trained using the original low-resolution simulation mesh (73k elements) and a coarser mesh with half the resolution (34k elements), respectively. We visualize the reconstructed surfaces in (a) and (b). ©NVIDIA*
-
-![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2305_03216/figures/008_Table_1.jpg]]
-*Table 1: Descriptive statistic measures of mean surface reconstruction errors (in millimeters) on unseen facial expressions for each tested model*
 
 ### 泛化性能
 
@@ -263,15 +244,9 @@ $$\mathcal{L} = \mathcal{L}_{recon} + \alpha \mathcal{L}_{fn} + \beta \mathcal{L
 
 超参数研究表明（Figure 14），增加插值邻居数量（5→20）可单调降低重建误差，但推理时间线性增长；特征编码的 k-NN 图中 k=4–5 时误差最小且时间开销可控。
 
-![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2305_03216/figures/018_Figure_14.jpg]]
-*Figure 14: （） Fig. 14. Surface reconstruction errors on unseen facial expressions (red plots) as a function of the number of interpolation neighbors (le ) and the number of neighbors 𝑘 for the 𝑘-NN graphs in Feature Encoding submodules (right). The blue plots show the inference time per frame for each of the tested values*
-
 ### 输入模态对比
 
 Table 2 和 Figure 10、Figure 11 对比了三种输入方式的重建质量：低分辨率物理仿真器（本方法）、blendshape 动画器、以及直接使用 blendshape 权重向量。结果表明，完全忽略物理仿真的 blendshape 权重方法重建误差最大，而 blendshape 动画器虽保留了部分物理约束，但在精细区域仍劣于本方法。这验证了低分辨率物理仿真作为输入对高保真重建的不可替代性。
-
-![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2305_03216/figures/011_Table_2.jpg]]
-*Table 2: Descriptive statistic measures (normalized mean, median, standard deviation, and min/max values for each method) of mean surface reconstruction errors (in millimeters) on unseen facial expressions*
 
 ### 碰撞处理能力
 
@@ -285,15 +260,8 @@ Table 2 和 Figure 10、Figure 11 对比了三种输入方式的重建质量：�
 4. **输出范围受限**：模型仅输出高分辨率表面几何，不包含内部应变、应力等物理量，无法支撑后续物理分析。
 5. **身份泛化未验证**：训练数据来自单一受试者的解剖模型，泛化至其他面部身份或不同解剖结构需另行验证与微调。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2305_03216/figures/009_Figure.jpg]]
-*Figure: （a） （b) （c)*
-
 ![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2305_03216/figures/023_Figure_18.jpg]]
 *Figure 18: Discrepancy heatmap （b） Fig. 18. Visualization of the surface mesh embedded in the low-resolution simulation mesh undergoing unseen external forces (a) and our prediction of the target mesh (b), respectively (see Section A.4). ©NVIDIA*
-
-
 
 ## 定位与知识库关联
 
@@ -363,8 +331,6 @@ Table 2 和 Figure 10、Figure 11 对比了三种输入方式的重建质量：�
 - **物理量同步推断**：是否可能在超分辨率过程中同步推断内部物理量（如应力场、应变张量）？这将为后续动画编辑、物理模拟验证或生物力学分析提供更丰富的信息维度。
 
 - **跨域泛化**：对更复杂的生物力学系统（如全身肌肉仿真）或其他物理域（如布料、流体），类似的“仿真超分辨率”策略是否可行？面部仿真的成功依赖于肌肉激活参数提供的语义对应——在其他域中如何构建等价的语义对应机制是一个根本性挑战。
-
-
 
 ## 原文 PDF
 

@@ -63,8 +63,6 @@ Sketch2Anim 的核心洞察是：**不直接提升二维条件到三维，也不
 
 方法也存在明确局限：未考虑角色与物体的交互，缺乏物理约束可能导致运动末端身体折叠或漂浮（Figure 14）。这些方向连同多 ControlNet 集成、速度线理解、场景-角色联合重建等问题，构成了未来工作的开放挑战。
 
-
-
 三维角色动画是影视、游戏和虚拟现实内容生产的核心环节，但其制作流程长期依赖大量人工操作。在传统工作流中（图2），动画师需根据故事板中的二维草图，在脑中构想完整的关键姿态序列，再将其导入三维软件（如Blender）手动调整关节位置以匹配参考姿态，同时设计运动轨迹以诠释动作语义。这一反复试错的过程高度依赖动画师的专业经验，时间成本极高，且难以在早期创意阶段快速迭代。
 
 近年来，基于扩散模型的三维人体动作生成取得了显著进展，使得从文本描述（如“行走”“跳跃”）自动合成动作序列成为可能。然而，文本仅能提供粗粒度的语义控制，无法精确约束动作的空间形态——例如角色四肢的具体位置、关节在空间中的运动路径等。故事板草图中天然蕴含了这些细粒度信息：**关键姿态**（keypose）定义了特定时刻的角色静态造型，**关节轨迹**（joint trajectory）描述了特定关节点随时间推移的空间位移。若能将这些二维草图约束直接转化为三维动画，将极大降低动画创作的门槛并加速迭代。
@@ -87,8 +85,6 @@ Sketch2Anim 的核心洞察是：**不直接提升二维条件到三维，也不
 - **如何在单一扩散模型中实现轨迹、关键姿态和动作词三者的精确协同控制**，避免条件冲突？
 
 Sketch2Anim的设计动机正是围绕这两个瓶颈展开：不直接提升二维条件到三维，也不在二维输入上训练扩散模型，而是**训练一个以三维关键姿态和轨迹为条件的高精度运动生成器，再通过专门的神经映射器将二维编码器对齐到同一共享嵌入空间**，使得推理时能无缝接受二维草图输入，同时保持三维条件训练的精确控制能力。这一“替身训练、嵌入对齐”的策略构成了本文方法的核心洞见。
-
-
 
 ## 核心方法与创新机理
 
@@ -124,8 +120,6 @@ Sketch2Anim 的核心创新并非设计全新的生成范式，而是通过**训
 
 需注意，Sketch2Anim 的贡献不在于提出 ControlNet 或适配器本身——ControlNet 已在图像/运动生成中广泛应用，适配器范式亦非首创。其真正的创新在于**面向“2D草图→3D动画”这一特定跨域、多条件任务的系统性架构决策**：识别出直接2D条件训练的根本性缺陷，设计训练-推理解耦策略；洞察多 ControlNet 融合的开放难题，提出非对称的轨迹感知适配器方案。这两个决策共同构成了从“能否生成”到“能否精确控制”的质变。
 
-
-
 Sketch2Anim 的整体流程围绕一个核心矛盾展开：**2D 草图和 3D 运动之间存在巨大的域差距**，直接从 2D 条件生成高质量 3D 运动极为困难。为解决这一问题，Sketch2Anim 不直接在 2D 输入上训练运动扩散模型，也不采用“先提升到 3D 再生成”的级联策略，而是设计了一套**训练时使用 3D 替身、推理时接受 2D 输入**的架构，将多条件控制问题转化为可控的残差特征融合问题。
 
 ### 输入与预处理
@@ -155,16 +149,6 @@ Sketch2Anim 由两个协同工作的模块构成（Fig. 3）：
 ### 框架设计的因果逻辑
 
 这一框架的因果链路可概括为：**3D 替身训练 → 共享嵌入对齐 → 2D 推理泛化**。训练时使用 3D 条件保证了控制精度（因为 3D 关键姿态和轨迹包含完整的空间信息），而神经映射器的嵌入对齐则使得推理时 2D 输入能够无缝替代 3D 条件。消融实验证实，去除神经映射器中的重建损失会导致 FID 下降 32.81%（Table A2），验证了嵌入对齐的关键作用。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2_https_doi_org_10_1145_3731167/figures/016_Figure_13.jpg]]
-*Figure 13: Impact of conditions. From left to right, we gradually add or change one condition for our method when generating motions at inference time. We highlight the change with the pink color. (a) Only the action word “Walk” is input as the condition. (b) The action word and the generated forward root joint trajectory are re-used. A new sketch keypose is provided. (c) The forward trajectory is replaced by a backward trajectory. (d) The action word is replaced by “Jump”. (a)*
-
-![[assets/figures/papers/paper_list_l2_https_doi_org_10_1145_3731167/figures/017_Figure_14.jpg]]
-*Figure 14: Output Motion Fig. 14. Limitations. (a) Our method does not consider character-object interaction, thus the two hands do not hold the golf club at the ending keypose. (b) Without the physical constraints, even if the foot trajectories are correct, the body folds and floats in the air at the end of the motion. The errors are highlighted with dashed red circles*
-
-
 
 ### 问题定义与输入表示
 
@@ -235,8 +219,6 @@ $$\mathcal{L}_{\mathrm{contrast}} = -\frac{1}{B}\sum_{i=1}^{B}\sum_{y\in\{tr,k\}
 ### 训练与推理的域桥接机制
 
 训练阶段，运动生成器接收3D关键姿态和3D轨迹作为条件，神经映射器同步学习2D-3D嵌入对齐。推理阶段，2D关键姿态和2D轨迹通过映射器的2D编码器投影到共享嵌入空间，直接替代3D嵌入输入运动生成器。这一设计使得生成器始终在高质量的3D条件空间训练，同时推理时无需显式的2D到3D提升步骤，避免了提升过程引入的误差累积（Figure 12 显示直接提升2D关节点到3D会产生头部、手臂、腿部等部位的错误）。
-
-
 
 ## 实验与关键发现
 
@@ -345,26 +327,11 @@ Fig. 13 通过逐步添加/改变条件，直观展示了各条件对生成运�
 
 所有比较方法均在同一 HumanML3D 数据上训练和评估，使用相同的输入格式（2D 关键姿态、轨迹、动作词）。推理时间均在单张 NVIDIA RTX4090 GPU 上测量，确保了计算资源的公平对比。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2_https_doi_org_10_1145_3731167/figures/013_Figure_11.jpg]]
 *Figure 11: (b) (d) Fig. 11. 3D editing. Given one frame of a real-world storyboard (a), we preprocess it to obtain the keypose (i.e., 2D joint points in red) and the trajectory (i.e., curve points in cyan) (b). Our Sketch2Anim produces the animation conditioned on the action word, 2D keypose, and the 2D trajectory (c). Note that we manually model the room with a table for visualization purposes, and the 3D trajectory from the resulting motion is highlighted with cyan points. If the user is unsatisfied with the motion (e.g., the foot penetrates the table), the 3D trajectory can be further edited by dragging a few sample points to create a new 3D trajectory (purple points at the top-right corner in (c))...*
 
-![[assets/figures/papers/paper_list_l2_https_doi_org_10_1145_3731167/figures/015_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l2_https_doi_org_10_1145_3731167/figures/006_Figure_6.jpg]]
-*Figure 6: Result Gallery. Three more storyboards are successfully transferred into their high-quality animations. Only the motion clips before blending are shown for clear visualization of keyposes, trajectories, and motion. The complete animation after blending can be seen in the supplemental video. For each clip, we highlight the keypose in red, while the trajectories are spatial curves shown in green. The motions of “Kneel”, “Cartwheel”, and “Sit” are usually hard to generate, and our results are of high quality conforming with the sketches*
-
-![[assets/figures/papers/paper_list_l2_https_doi_org_10_1145_3731167/figures/018_Table.jpg]]
-*Table: A1. Ablation study of the loss terms of our multi-conditional motion diffusion model using the HumanML3D dataset. Refer to the main paper for the definition of metrics and the Average and Cross evaluation settings*
-
-![[assets/figures/papers/paper_list_l2_https_doi_org_10_1145_3731167/figures/020_Table.jpg]]
-*Table: A3. Ablation study of the inference guidance using the HumanML3D dataset*
-
 ![[assets/figures/papers/paper_list_l2_https_doi_org_10_1145_3731167/figures/021_Table.jpg]]
 *Table: A4. Quantitative comparison of motion blending methods on the HumanML3D subset*
-
-
 
 ## 定位与知识库关联
 
@@ -432,8 +399,6 @@ Sketch2Anim 处于**草图理解、运动生成和人机交互**的交叉领域�
 - 在**交互工作流**维度，将传统动画制作中“想象关键姿态序列→手动摆放 3D 关节→反复试错”的流程（Fig. 2）自动化，降低了从草图故事板到 3D 动画的门槛。
 
 该方法与现有的文本驱动运动生成（如 MDM, Chen et al., 2023）、空间约束运动生成（如 OmniControl, Xie et al., 2024）和草图驱动动画（如 Sketch2Pose）等工作形成互补，填补了从多条件草图输入直接生成可控 3D 动画的技术空白。
-
-
 
 ## 原文 PDF
 

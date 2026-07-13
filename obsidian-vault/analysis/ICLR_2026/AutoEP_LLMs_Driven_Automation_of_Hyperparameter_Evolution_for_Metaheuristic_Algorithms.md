@@ -89,8 +89,6 @@ AutoEP 区别于 **EoH**（Liu et al., 2024）和 **ReEvo**（YE et al., NeurIPS
 - CoR 框架的级联失败风险未深入分析。
 - 能否扩展至多目标优化、带约束优化或深度神经网络超参数调优，仍为开放问题。
 
-
-
 ### 元启发式算法的超参数困境
 
 元启发式算法（如遗传算法GA、粒子群优化PSO、蚁群优化ACO）在求解旅行商问题（TSP）、容量约束车辆路径问题（CVRP）、流水车间调度问题（FSSP）等组合优化任务时，其性能高度依赖超参数配置。种群大小、交叉率、变异率、信息素挥发因子等参数直接影响搜索过程中探索（exploration）与开发（exploitation）的动态平衡。然而，这些参数的最佳取值并非静态——它们应当随搜索阶段、问题景观特征和种群状态而动态变化。
@@ -122,8 +120,6 @@ AutoEP的核心洞察是：**将LLM定位为高层监督者而非搜索算子，
 3. **结构化控制分解**：CoR将超参数调节分解为Strategist（生成控制映射）、Analyst（诊断探索/利用需求）、Actuator（输出具体参数值）三个角色，使推理链的每一步都有明确的功能边界和可验证性。
 
 > **注意**：关于ELA特征的具体数学定义和CoR各Agent的详细工作机制，请参见“核心方法”章节。
-
-
 
 ## 核心方法与创新机理
 
@@ -175,13 +171,8 @@ CoR的设计带来了三重优势：
 
 AutoEP的三个创新维度——零样本在线推理、ELA驱动的状态感知、CoR结构化决策——形成了紧密的因果耦合：**ELA提供可量化的状态输入，使LLM推理能够被实证证据锚定；CoR将复杂的控制任务分解为可管理的子任务，使较小的LLM也能胜任；两者的结合使得免训练的零样本超参数控制成为可能。** 这种设计从根本上改变了超参数调优的范式：不再需要为每个新算法或新问题训练专用的调参策略，而是通过一个通用的、可解释的闭环框架，实现对任意元启发式算法的即插即用增强。
 
-
-
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_hit3hGBheP/figures/002_Figure_2.jpg]]
 *Figure 2: The AutoEP Framework*
-
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_hit3hGBheP/figures/003_Figure_3.jpg]]
-*Figure 3: Demonstration of CoR*
 
 AutoEP 是一个闭环控制系统，将大语言模型（LLM）定位为高层监督者，通过在线探索性景观分析（ELA）提供可量化的搜索状态反馈，实现对元启发式算法超参数的零样本、免训练动态调优。整个框架由三个核心组件构成：**在线 ELA 特征提取模块**、**经验池（Experience Pool）**和**多 LLM 推理链（Chain-of-Reasoning, CoR）**。
 
@@ -219,8 +210,6 @@ AutoEP 以“感知—推理—行动”的闭环模式运行：
 - **LLM 作为监督者而非搜索算子**：与 EoH、ReEvo 等将 LLM 直接用于生成搜索算子不同，AutoEP 将 LLM 定位为元层面的控制者，利用其零样本推理能力解读搜索动态，而非替代底层算法的搜索机制。
 - **ELA 特征作为 grounding 机制**：五维 ELA 特征为 LLM 推理提供了可量化的实证基础，有效缓解幻觉问题。消融实验表明，移除 ELA 模块后性能显著下降，但仍在未调优基线之上，说明 LLM 仅凭经验池仍保留部分推理能力；同时移除 ELA 和 CoR 则性能低于基线，证实盲目调整会产生负面影响（Table 2）。
 - **CoR 推理链的效率优势**：将控制任务分解为 Strategist-Analyst-Actuator 三个子任务，使得较小的开源模型（如 Qwen3-30B）在配合 CoR 时即可达到与 GPT-o1 等超大模型相当的性能，而推理时间减少一个数量级（eil51 上 5.8 min vs. 44.7+ min，Table 3）。
-
-
 
 AutoEP 的核心架构由三个功能模块构成闭环控制系统：**在线 ELA 特征提取模块**负责将搜索动态量化为可计算的状态向量；**经验池**存储历史状态-动作-奖励三元组，为 LLM 提供决策上下文；**多智能体推理链（CoR）** 将高层控制任务分解为 Strategist、Analyst、Actuator 三个 LLM 角色的协同推理。
 
@@ -278,8 +267,6 @@ CoR 将超参数控制分解为三个 LLM 角色的串行推理：
 
 消融实验（Table 2）证实了该分解的必要性：移除 CoR 而使用单一 LLM 直接决策，性能退化为与未调优基线相当的水平（TSP dsj1000 Opt.gap 7.11% vs 基线 7.14%），表明结构化推理链对于将搜索状态有效转化为超参数调节策略至关重要。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈验证：从静态调参到动态感知
@@ -325,22 +312,13 @@ CoR 将超参数控制分解为三个 LLM 角色的串行推理：
 
 **Table 3** 展示了 CoR 架构的关键效率优势：AutoEP with CoR (Qwen3-30B) 在 eil51 上取得 0.00% Opt.gap，推理时间仅 5.8 分钟；而 AutoEP without CoR (GPT-o1) 虽然同样取得 0.00% Opt.gap，推理时间却高达 44.7 分钟。CoR 通过将复杂推理任务分解为三个专注的子任务，使得较小的开源模型（30B 参数）能够在性能上匹敌超大闭源模型，同时推理时间减少一个数量级。这一发现具有重要的实践意义：AutoEP 可以在消费级 GPU 上部署，无需依赖昂贵的 API 调用。
 
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_hit3hGBheP/figures/006_Table_3.jpg]]
-*Table 3: Comparison of CoR components with other reasoning LLMs*
-
 ### 经验池设计的参数敏感性
 
 **Table 4** 分析了经验池滑动窗口大小 L 的影响。默认设置 L=20 在 TSP-100 上取得最优 Opt.gap（0.01%）和合理的推理延迟（0.31 秒/决策）。过小的窗口（L=5）导致历史信息不足，Opt.gap 升至 0.04%；而过大的窗口（L=50）或保留全历史记录（Full History）则引入噪声和上下文过载，全历史条件下 Opt.gap 退化至 0.17%，与未调优基线相当。这一结果揭示了 LLM 上下文管理的微妙平衡：过多历史信息不仅增加推理成本，还可能引发注意力分散和幻觉，反而损害决策质量。
 
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_hit3hGBheP/figures/012_Table_4.jpg]]
-*Table 4: Impact of experience pool size (L) on performance and inference latency (TSP-100)*
-
 ### 对底层 LLM 能力的鲁棒性
 
 **Figure 4** 展示了 AutoEP 与 EoH、ReEvo 在不同 LLM 上的性能对比。EoH 和 ReEvo 的性能随模型能力下降而显著退化——这是因为它们直接依赖 LLM 生成搜索算子或启发式规则，模型能力不足直接导致生成质量下降。相比之下，AutoEP 即使使用较小的模型仍能保持高性能，因为其 LLM 的角色是分析 ELA 提供的量化状态并做出高层战略决策，而非直接生成搜索算子。这种架构设计将 LLM 从“搜索算子”降级为“状态解释器”，降低了对模型生成能力的依赖，增强了框架的鲁棒性。
-
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_hit3hGBheP/figures/010_Figure_4.jpg]]
-*Figure 4: Comparison of Experimental Results Across Different LLMs. The baseline algorithm for adjustment is GA-2opt*
 
 ### 调整频率的敏感性
 
@@ -361,13 +339,6 @@ CoR 将超参数控制分解为三个 LLM 角色的串行推理：
 3. **ELA 特征的专家依赖性**：当前 5 个 ELA 特征（偏度、峰度、R²、分散比、变化率）依赖领域专家选择。对于新型黑箱算法，这些特征是否仍能有效表征搜索状态尚未探讨。
 
 4. **级联失败风险未分析**：CoR 框架依赖 Strategist→Analyst→Actuator 的顺序推理链，如果前序 Agent 产生错误输出，可能导致后续决策的级联失败。文中未对这种失败模式进行深入分析或提出容错机制。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_hit3hGBheP/figures/026_Table_8.jpg]]
-*Table 8: Parameterization of each meta - heuristic algorithm*
-
-
 
 ## 定位与知识库关联
 
@@ -418,8 +389,6 @@ AutoEP 与两类LLM增强方法存在根本性差异：
 3. **极大规模问题的实用性**：在10万+城市的TSP或类似规模的问题上，ELA特征的计算开销（特别是$R^2$的二次模型拟合和分散比的空间距离计算）可能成为瓶颈。此外，CoR的推理质量是否会在搜索空间剧增时保持稳定，需要进一步验证。
 
 4. **跨领域迁移**：AutoEP的思路（在线状态感知 + LLM推理链 + 闭环控制）是否可应用于深度神经网络的超参数调优（如学习率调度、正则化强度调节）？这需要重新设计状态表征模块，可能利用训练/验证损失曲线、梯度统计量等作为“ELA”的替代。
-
-
 
 ## 原文 PDF
 

@@ -61,8 +61,6 @@ claims:
 
 方法的局限性在于，在域迁移显著的基准（如 DomainNet）上增益较为温和，且 Fisher 估计仅在每个任务结束时计算一次，存在陈旧性风险，需通过衰减因子 γ 经验性地缓解。
 
-
-
 持续学习旨在让模型在顺序学习一系列任务时，既能掌握新知识，又不会灾难性地遗忘旧知识。近年来，参数高效微调（PEFT）与持续学习的结合催生了参数高效持续学习（PECL）这一方向，其核心思想是通过冻结预训练骨干网络，仅训练少量可学习参数来适应新任务，从而在保持预训练知识的同时降低计算开销。
 
 现有 PECL 方法主要采用**结构隔离**策略来缓解任务间干扰：为每个新任务分配独立的低秩适配模块（如 LoRA 分支）或提示向量。InfLoRA、SD-LoRA 等方法通过子空间隔离约束不同任务的参数更新方向；CL-LoRA、BiLoRA 等方式则直接为每个任务添加新的 LoRA 分支。这类策略虽然有效，但存在一个根本性瓶颈：**存储开销随任务数量线性增长**。每遇到一个新任务，模型就需要额外存储一组低秩矩阵，在任务数量较多时内存压力显著。
@@ -70,8 +68,6 @@ claims:
 与此同时，**权重正则化**——以弹性权重巩固（EWC）为代表的另一条技术路线——在低秩持续学习中远未被充分利用。EWC 通过 Fisher 信息矩阵衡量参数对旧任务的重要性，并对重要参数的偏移施加二次惩罚，从而在不增加额外模块的前提下缓解遗忘。然而，将 EWC 直接应用于低秩适配并非易事：低秩更新矩阵 $A$ 和 $B$ 的参数空间与全维权重 $W$ 之间存在非线性映射关系，简单地分别对 $A$、$B$ 正则化或使用固定的预计算 Fisher 矩阵，均会导致次优的稳定性-可塑性权衡。
 
 因此，本文的核心动机是回答一个关键问题：**能否在保持固定内存占用的前提下，通过权重正则化实现与结构隔离方法相当甚至更优的持续学习性能？** 这需要在低秩空间中进行正则化时，准确地捕捉参数在全维空间中的重要性——一个在现有工作中尚未被系统解决的理论与工程挑战。
-
-
 
 ## 核心方法与创新机理
 
@@ -104,8 +100,6 @@ $$F_t^{i,i} = \mathbb{E}_{x \sim \mathcal{D}_t} \left[ \mathbb{E}_{y \sim p_{\ma
 ### 创新效果总结
 
 EWC-LoRA 在四个视觉基准上相比 Vanilla LoRA 平均提升 8.92%，并取得与或超越现有最佳低秩 CL 方法的性能。在 CIFAR-100（10 任务）上最终准确率达 87.91，ImageNet-A 上的提升尤为显著（+19.88%）。在语言持续学习基准上，EWC-LoRA 同样超越 O-LoRA（T5-large: 76.39 vs. 72.42）。方法在取得这些性能的同时，训练时间与 Vanilla LoRA 几乎相同，且内存占用不随任务数增长。
-
-
 
 ![[assets/figures/papers/iclr26_0012_pZj2DhfaVD_Revisiting_Weight_Regularization_for_Low-Rank_Co/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of learning task $\mathcal { T } _ { t }$ at a specific layer of the ViT model. (a) Prior low-rank CL methods structurally isolate task-specific LoRA parameters by adding a new LoRA branch for each task. (b) The proposed EWC-LoRA employs a shared LoRA module that is learned across all tasks and regularized according to parameter importance measured by a Fisher Information Matrix, which is updated after learning each task*
@@ -152,8 +146,6 @@ $$F_t^{\mathrm{cum}} \gets \gamma_t \cdot F_{t-1}^{\mathrm{cum}} + F_t$$
 4. **累积与合并**：按 Eq. (累积 Fisher 更新) 更新 $F_t^{\mathrm{cum}}$，然后将 A、B 合并进基础权重 $W_t = W_{t-1} + AB$，释放 A、B 为下一任务腾出空间。
 
 这一流程的关键性质是：**正则化发生在全维空间 $\Delta W$ 上，但优化和存储始终在低秩空间中进行**，从而在固定内存预算下实现了稳定性与可塑性的有利权衡。Table 5 的内存分析表明，EWC-LoRA 的训练时间与 Vanilla LoRA 几乎相同，额外开销仅来自 Fisher 估计所需的约 6 GB 显存（Table 1）。
-
-
 
 ### 问题形式化
 
@@ -215,8 +207,6 @@ Table 1 的消融实验对比了四种 Fisher 估计策略在 CIFAR-100（10 任
 结果表明，$\mathbf{F}_{\Delta W}$ 在最终准确率（87.91）、平均准确率（92.27）、稳定性（94.45）和可塑性（97.99）四项指标上均取得最优。预计算 Fisher 导致最低的可塑性，而分别正则化 $\mathbf{A}$、$\mathbf{B}$ 的性能介于两者之间，验证了全维估计的必要性。额外内存开销约为 6GB。
 
 进一步的 Fisher 类型消融（Table 15）显示，使用 Exact Fisher（从模型预测分布采样）比 Empirical Fisher（从真实标签计算）效果更好，且所需正则化强度更小（$\lambda=10^5$ vs. $\lambda=10^7$），但 Exact Fisher 需要在每个任务结束时进行额外采样。
-
-
 
 ## 实验与关键发现
 
@@ -299,12 +289,8 @@ Table 1 的消融实验对比了四种 Fisher 估计策略在 CIFAR-100（10 任
 
 尽管 EWC-LoRA 取得了显著性能提升，但方法默认所有任务的低秩更新共享相同的表示空间，未考虑为不同任务分配可调节的秩或对低秩空间进行结构化调整。较低的 LoRA 秩 $r$ 可提高稳定性但降低可塑性（**Table 12–13**），EWC-LoRA 在不同秩下表现相对稳定，但这一固定的秩分配策略在任务多样性极高的场景下可能成为瓶颈。此外，在域增量或任务无关的增量学习场景下，EWC-LoRA 的表现仍需进一步验证。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0012_pZj2DhfaVD_Revisiting_Weight_Regularization_for_Low-Rank_Co/figures/007_Figure_2.jpg]]
 *Figure 2: Task-wise performance comparison of different methods across various datasets*
-
-
 
 ## 定位与知识库关联
 
@@ -349,8 +335,6 @@ EWC-LoRA 在参数高效持续学习（PECL）的方法谱系中占据一个独�
 4. **理论界的建立。** 在全维 Fisher 正则化与低秩约束之间是否存在更紧的理论界，能够指导 $\lambda$ 和秩 $r$ 的自动选择？附录 A.1.2 的 Fisher 投影恒等式 $\mathbf{F}_{\theta} = \mathbf{J}^{\top} \mathbf{F}_{\mathbf{W}} \mathbf{J}$ 提供了初步的理论框架，但尚未导出关于稳定性-可塑性权衡的定量保证。
 
 5. **与回放方法的协同。** EWC-LoRA 的固定内存特性使其天然适合与经验回放结合——节省的参数存储空间可用于存储回放样本。这种混合策略能否在极低内存预算下实现超越纯正则化或纯回放方法的性能？
-
-
 
 ## 原文 PDF
 

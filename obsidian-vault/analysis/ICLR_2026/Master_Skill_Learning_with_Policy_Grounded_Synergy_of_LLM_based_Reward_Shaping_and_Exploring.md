@@ -53,8 +53,6 @@ claims:
 
 **主要结果**：在Bi-DexHands和Isaac Gym的24个机器人技能学习任务中，PoRSE在23个任务上显著超越所有基线方法。在DoorCloseOutward、Kettle等困难任务上首次实现完美成功率（MTS = 1.000 ± 0.000），在TwoCatch任务上取得0.349的突破性成功率（Eureka和ROSKA几乎完全失败，MTS ≈ 0）。消融实验证实，移除策略融合组件导致Anymal任务性能下降2783%，移除探索奖励使BlockStack成功率从0.753降至0.393，验证了各组件在框架中的互补必要性。
 
-
-
 ### 机器人技能学习中的奖励设计困境
 
 深度强化学习在机器人技能获取中的成功高度依赖奖励函数的质量。稀疏奖励（Sparse Rewards）仅提供任务完成的二值信号，在复杂操作任务中几乎无法提供有效学习梯度。人类专家手工设计的密集奖励函数（Human Expert-Designed Rewards）虽然能提供逐时间步的反馈，但其设计过程耗时且依赖领域知识，难以跨任务泛化。
@@ -82,8 +80,6 @@ claims:
 - **奖励-探索-策略的协同进化**：将目标奖励函数优化、AFS映射函数优化和策略继承融合纳入统一的迭代优化循环，形成策略反馈驱动的自增强循环——更好的策略反馈引导LLM生成更精准的奖励和探索方案，更优的奖励-探索组合进一步推动策略提升。
 
 通过上述设计，PoRSE旨在解决现有方法在困难机器人操作任务上的失败问题，首次实现Kettle、DoorCloseOutward等复杂任务上的完美成功率。
-
-
 
 ## 核心方法与创新机理
 
@@ -133,8 +129,6 @@ $$\theta_f(\alpha) = \alpha \cdot \theta_{\mathrm{best}} + (1-\alpha) \cdot \the
 | 策略继承 | 无 | 贝叶斯优化 $\alpha$ | LEF快速搜索 $\alpha$ |
 
 消融实验的鲁棒性验证进一步表明，即使使用随机组合的功能状态空间（PoRSE-AFS-Random），性能仍显著优于Eureka/ROSKA等基线（Table 4），说明IPG流程本身具有高鲁棒性——AFS的质量提升是“锦上添花”，而非“雪中送炭”式的脆性依赖。
-
-
 
 ![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_1vXMfIYFZp/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of PoRSE. It leverages LLMs to generate goal-oriented rewards while building an affordance mapping function for exploration bonuses. These rewards are dynamically combined to optimize policies. An iterative feedback loop continuously refines rewards and affordance state space, creating a co-evolutionary system*
@@ -186,8 +180,6 @@ $$\theta_f(\alpha) = \alpha \cdot \theta_{\mathrm{best}} + (1-\alpha) \cdot \the
 **关键因果机制**：该闭环形成了一个正反馈循环——更好的探索奖励帮助策略发现更优行为，更优行为的反馈又指导 LLM 生成更精准的奖励函数和 AFS 映射，从而在奖励塑造、探索与策略学习之间实现协同进化。
 
 **证据强度**：消融实验证实了各模块的必要性。移除策略融合（$\theta_{fusion}$）导致 Anymal 任务 MTS 下降 2783%（Table 16）；固定 $\beta$（PoRSE w/o R_ratio）使 PushBlock MTS 从 0.318 降至 0.243（Table 2）；固定 $\alpha$（PoRSE w/o $\theta_{ratio}$）使 TwoCatch MTS 从 0.349 降至 0.276（Table 2）。这些结果表明，动态的 $\beta$ 和 $\alpha$ 调整是框架保持稳定性和性能的关键瓶颈。
-
-
 
 ### 3.1 整体框架与迭代流程
 
@@ -305,8 +297,6 @@ PoRSE 的完整优化流程可概括为以下协同进化循环：
 
 消融实验（Table 2）证实交替优化的必要性：若固定策略融合比例 $\alpha$（PoRSE w/o $\theta_{ratio}$），TwoCatch 任务 MTS 从 0.349 降至 0.276；若固定奖励融合比例 $\beta$（PoRSE w/o $R_{ratio}$），PushBlock 任务 MTS 从 0.318 降至 0.243。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -348,13 +338,7 @@ Table 5和Table 6提供了所有任务上各方法的完整MTS均值和标准差
 
 **AFS机制的有效性**：Table 3对比了PoRSE与LLMCount（使用通用计数探索而非任务相关AFS）的性能。PoRSE在所有六个代表性操作任务上大幅领先：Pen任务从0.412提升至1.000，TwoCatch从0.000提升至0.349，BlockStack从0.140提升至0.753。这验证了LLM自动构建的任务相关功能状态空间远优于任务无关的通用探索。
 
-![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_1vXMfIYFZp/figures/010_Table_3.jpg]]
-*Table 3: MTS comparative results of PoRSE and LLMCount baselines across six representative manipulation tasks. PoRSE achieves apparent improvement in task success rates*
-
 **IPG流程的鲁棒性**：Table 4显示，即使使用随机组合的功能状态空间（PoRSE-AFS-Random），性能仍显著优于Eureka和ROSKA等基线，表明IPG的淘汰-扩展过滤和策略融合流程本身具有高鲁棒性，不完全依赖最优AFS设计。
-
-![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_1vXMfIYFZp/figures/011_Table_4.jpg]]
-*Table 4: MTS Performance Comparison of PoRSE-AFS-Random and Baseline Methods on Representative Manipulation Tasks (mean ± standard deviation)*
 
 ### 失败模式与局限性
 
@@ -371,22 +355,6 @@ LLM输出不稳定性是另一个实际限制。即使使用相同提示，LLM�
 - **Table 1/2**：策略融合组件（θ_fusion）的移除导致最严重的性能坍塌（Anymal下降2783%），是框架稳定性的核心保障。
 - **Table 3**：任务相关AFS探索远优于通用计数探索（LLMCount），是PoRSE性能优势的关键来源。
 - **Table 5/6**：完整MTS数据表明PoRSE在24个任务中的23个上取得最优，困难任务上实现多项从零到一的突破。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_1vXMfIYFZp/figures/025_Table_16.jpg]]
-*Table 16: Performance drop (%) of each ablation compared with the full PoRSE framework*
-
-![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_1vXMfIYFZp/figures/016_Table_7.jpg]]
-*Table 7: MTS Comparison of LLMCount and PoRSE methods, PoRSE method achieved higher MTS on 23 tasks*
-
-![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_1vXMfIYFZp/figures/017_Table_8.jpg]]
-*Table 8: MTS Comparison of SimHash and PoRSE methods, PoRSE method achieved higher MTS in 8 robot skill learning tasks*
-
-![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_1vXMfIYFZp/figures/018_Table_9.jpg]]
-*Table 9: Performance Comparison of PoRSE-GPT-4o-mini with Baselines on Representative Tasks*
-
-
 
 ## 定位与知识库关联
 
@@ -433,8 +401,6 @@ PoRSE 的适用边界同样明确：
 3. **不确定性量化**：当 LLM 对奖励规则的置信度较低时（如面对新颖或语义模糊任务），如何量化不确定性并动态调整探索强度，以避免策略在错误奖励信号引导下振荡？
 4. **分层强化学习扩展**：PoRSE 能否扩展到分层强化学习架构（HRL），通过 AFS 在不同抽象层级上引导子任务探索，以解决 Switch 等需要子任务分解的复杂长序贯任务？
 5. **在线自适应**：在实际物理机器人上进行长期部署时，环境动态可能发生变化，如何实现 AFS 的在线自适应更新，使探索奖励始终保持与当前任务目标的相关性？
-
-
 
 ## 原文 PDF
 

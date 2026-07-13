@@ -58,8 +58,6 @@ claims:
 
 在方法谱系上，该工作将部信息分解、层次混合模型和因果中介分析整合为统一的多智能体涌现测量与引导框架，与仅关注个体性能聚合的传统多智能体评估范式形成互补。其定位介于多智能体协调理论与LLM提示工程之间，为理解并设计具备真正涌现智能的集体系统提供了可操作的测量工具和干预策略。
 
-
-
 多智能体大语言模型（LLM）系统近年来在复杂任务求解中展现出巨大潜力，但其核心瓶颈在于：这些系统往往仅表现为个体代理能力的简单聚合，缺乏可测量的**涌现协同作用**，使得整体性能无法可靠地超越个体之和。换言之，群体智能是否真正“大于部分之和”，在现有系统中缺乏严格的量化证据。
 
 这一困境的根源在于多智能体系统内部存在一种张力：代理之间既可能产生**冗余对齐**（多个代理提供重复信息），也可能形成**目标互补**（代理贡献独特且协调的信息），而传统评估方法无法区分这两种截然不同的协同模式。研究框架（Figure 1a）将这种张力置于信息分解的视角下：代理可以是无差别的或有身份分化的，其信息贡献可以是独立的或互补的，而互补信息的对齐方式可以是目标导向的或偶然的。如何在数据驱动的方式下检测并量化这种高阶结构，构成了本研究的核心问题。
@@ -67,8 +65,6 @@ claims:
 现有方法面临三个关键缺口。第一，缺乏**可操作的涌现度量标准**——需要超越直觉判断，从信息论层面定义“整体大于部分之和”的定量准则。第二，缺少对**协同类型的精细分解**——即使检测到协同信号，也难以判断其源于代理间的动态对齐还是身份锁定的分化。第三，**提示词设计对协同的因果调控作用**尚未被系统探索——能否通过赋予身份角色或心理理论指令，主动引导多智能体系统从冗余聚合走向目标导向的互补协调，仍是一个开放问题。
 
 针对上述缺口，本文提出三个递进的研究问题：（1）多智能体LLM系统是否具备涌现能力？（2）当涌现发生时，系统能获得哪些功能性优势——如协同协调和更高的群体绩效？（3）能否通过提示词、角色和推理结构的设计，引导多智能体系统的内部协调机制，使其产生与结果相关的、目标导向的协同？通过建立信息论框架来回答这些问题，本文旨在为多智能体系统的涌现协调提供可测量、可干预、可解释的分析基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -124,8 +120,6 @@ claims:
 - 因果中介效应仅达边缘显著，从涌现到性能的清晰因果链尚待更大规模实验确立。
 - 结论基于简单群体猜测游戏，在开放域多智能体系统中的泛化性有待验证。
 - 推理模型（如 Qwen3）在协调模糊下出现“推理瘫痪”，需要额外指令打破循环，提示框架对模型类型具有敏感性。
-
-
 
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_SRn1MtMPRq/figures/001_Figure_1.jpg]]
 *Figure 1: a) Information decomposition provides framework to explain tension in multi-agent systems. Agents are either undifferentiated or differentiated, provide independent or complementary information, which is either well aligned or incidental (adapted from Luppi et al., 2024). b) Experiment setup of the group binary search task. c) Preliminary experiments testing different group sizes and temperature settings. Surface values were smoothed using a local 3×3 weighted averaging filter, giving higher weight to each cell’s original value to reduce noise while preserving local structure*
@@ -203,8 +197,6 @@ $$m_2: y_i = \beta_0 + u_{time[i]} + u_{agent[i],0} + u_{agent[i],time[i]} + \ep
 
 该框架的独特之处在于：**将信息论的涌现检测、层级模型的代理分化检验、以及因果推断的归因分析整合为一条完整的分析管道**，使得研究者可以不仅回答“是否存在涌现”，还能回答“涌现的结构是什么”以及“涌现如何被提示设计所引导”。
 
-
-
 ### 任务环境与微宏观变量定义
 
 实验环境为**群体二元搜索任务**（Group Binary Search Task）：N 个代理在无通信条件下各自猜测整数，目标是使所有猜测之和等于一个随机生成的隐藏目标值。代理在每轮收到群体总和与目标的差值反馈后，独立调整下一轮猜测。
@@ -261,8 +253,6 @@ $$m_2: y_i = \beta_0 + u_{time[i]} + u_{agent[i],0} + u_{agent[i],time[i]} + \ep
 
 通过比较 $m_0$ vs $m_1$ 和 $m_1$ vs $m_2$ 的似然比检验，可分别判断代理是否具有差异化身份和异质性学习动态。
 
-
-
 ## 实验与关键发现
 
 ### 主实验：涌现能力的检测与定位
@@ -303,8 +293,6 @@ $$m_2: y_i = \beta_0 + u_{time[i]} + u_{agent[i],0} + u_{agent[i],time[i]} + \ep
 
 **任务与参数的局限性。** 当前结论基于简单的群体猜测游戏和单一温度参数。温度对成功率的显著影响（每增加 0.1，成功几率提升约 50%，Figure 1c）提示实验设置的选择可能对涌现行为产生重要调节作用，结论在更复杂的真实多智能体系统中的泛化性有待验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_SRn1MtMPRq/figures/004_Figure_2.jpg]]
 *Figure 2: a) Group success across three interventions. b) Practical emergence criterion (bias corrected). c) Emergence capacity dynamical synergy (bias corrected). Data Winsorized at the 1st and 99th percentiles for visual clarity. Stars indicate significance level of Wilcoxon test. Notes: ^ { * * * } p \< 0 . 0 0 1 ; ^ { * * } p \< 0 . 0 1 ; ^ { * } p \< 0 . 0 5*
 
@@ -316,9 +304,6 @@ $$m_2: y_i = \beta_0 + u_{time[i]} + u_{agent[i],0} + u_{agent[i],time[i]} + \ep
 
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_SRn1MtMPRq/figures/012_Table_2.jpg]]
 *Table 2: Table A2: Experiment results with other LLM models*
-
-
-
 
 ## 定位与知识库关联
 
@@ -362,8 +347,6 @@ $$m_2: y_i = \beta_0 + u_{time[i]} + u_{agent[i],0} + u_{agent[i],time[i]} + \ep
 2. 涌现协同的测量在不同任务类型（开放域对话、协作推理、资源分配）和不同度量下的稳健性如何？
 3. 如何建立涌现度量与群体性能之间更直接、统计上更稳健的因果关联，超越边缘显著的中介效应？
 4. 在真实世界的开放域多智能体系统中，涌现协同是否同样可被提示设计所引导？推理模型的“推理瘫痪”问题如何系统性解决？
-
-
 
 ## 原文 PDF
 

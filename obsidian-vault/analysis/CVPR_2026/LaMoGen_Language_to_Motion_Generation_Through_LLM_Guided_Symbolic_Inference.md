@@ -237,9 +237,6 @@ LaMoGen 的评估在两个维度上展开：其一，在作者新构建的 **Lab
 ![[assets/figures/papers/paper_list_l16_LaMoGen_Language_to_Motion_Generation_Through_LLM_Guided_Symbolic_Infere/figures/003_Table_1.jpg]]
 *Table 1: Quantitative comparisons on our Laban Benchmark, using the proposed Labanotation-based metrics, R-precision Top-3 (R@3) and FID. Bold and underlined values indicate the best and the second-best performance, respectively*
 
-![[assets/figures/papers/paper_list_l16_LaMoGen_Language_to_Motion_Generation_Through_LLM_Guided_Symbolic_Infere/figures/016_Table_1.jpg]]
-*Table 1: The detailed structure of the Decoder in the Laban-Motion Encoder-Decoder module*
-
 FID 指标上，DeepSeekV3 变体取得 **1.859**，优于 MotionGPT（2.072），但需注意 Laban Benchmark 的 FID 绝对值整体偏高，这与 LabanLite 的高层抽象特性直接相关：不同速度的相同语义动作被映射到同一符号，导致生成运动在低级变化上相对匮乏。
 
 #### 标准基准：竞争力与固有局限并存
@@ -297,19 +294,6 @@ Supplementary Table 4 的消融显示：将检索示例数量从 1 增加到 3 �
 ### 推理效率与成本
 
 尽管引入了 LLM 调用，LaMoGen 的整体生成时间仍低于同样使用 LLM 的 CoMo 方法（Table 5），且 LLM 使用的 token 数量更少（Supplementary Table 2）。这表明，通过符号化中间表示压缩信息密度，可以有效控制 LLM 推理开销，为实际部署提供可行性基础。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l16_LaMoGen_Language_to_Motion_Generation_Through_LLM_Guided_Symbolic_Infere/figures/008_Figure_2.jpg]]
-*Figure 2: Illustration of a partial Laban score. This figure provides a visual explanation of the annotation process for a forward walk movement*
-
-![[assets/figures/papers/paper_list_l16_LaMoGen_Language_to_Motion_Generation_Through_LLM_Guided_Symbolic_Infere/figures/022_Figure_12.jpg]]
-*Figure 12: Qualitative comparison on fine-grained temporal structure modification. Left: the baseline motion, condition on “walk forward”. Middle: the motion conditioned on “walk forward slow”. Right: the motion conditioned on “walk forward in 5 seconds”. We highlight the step number and the corresponding duration. We calculate the average step duration to assess the degree of the speed change*
-
-![[assets/figures/papers/paper_list_l16_LaMoGen_Language_to_Motion_Generation_Through_LLM_Guided_Symbolic_Infere/figures/006_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l16_LaMoGen_Language_to_Motion_Generation_Through_LLM_Guided_Symbolic_Infere/figures/019_Figure_10.jpg]]
-*Figure 10: Illustration of the user study form*
 
 ## 定位与知识库关联
 

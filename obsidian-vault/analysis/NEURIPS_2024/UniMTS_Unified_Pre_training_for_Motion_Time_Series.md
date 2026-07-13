@@ -71,8 +71,6 @@ UniMTS 在 18 个真实运动时间序列数据集上进行了全面验证，覆
 
 此外，UniMTS 的图编码器仅含 **4.94M 参数**，远小于 ImageBind IMU 编码器的 18.69M 参数，在边缘部署场景中具有明显的效率优势。
 
-
-
 ### 问题背景
 
 基于可穿戴惯性传感器（IMU）的人体活动识别（HAR）是普适计算与健康监测的核心任务。现代智能手表、手机、耳机等设备内置的加速度计和陀螺仪持续产生多通道运动时间序列，对这些信号进行准确分类可以实现跌倒检测、运动追踪、康复评估等关键应用。
@@ -105,8 +103,6 @@ UniMTS 在 18 个真实运动时间序列数据集上进行了全面验证，覆
 
 基于上述洞察，本文提出 **UniMTS**——首个统一的运动时间序列预训练框架，旨在通过合成数据预训练、图结构编码和跨模态语义对齐，一次性解决设备位置、方向和活动类型三个泛化挑战，实现鲁棒的零样本、少样本和全样本运动识别。
 
-
-
 ## 核心方法与创新机理
 
 UniMTS 的核心创新在于通过三个层面的协同设计，从根本上打破了现有运动时间序列分类模型对特定数据采集条件的依赖，实现了对设备佩戴位置、方向及活动类型的统一泛化。
@@ -134,8 +130,6 @@ UniMTS 的核心创新在于通过三个层面的协同设计，从根本上打�
 | **下游适配** | 需重新训练或仅微调分类头 | 最近关节分配构建图输入，冻结文本编码器微调 | Section 3.3.3, Eq. 12 |
 
 上述三个创新维度并非孤立存在，而是形成了完整的因果链条：合成数据提供位置覆盖、旋转增强提供方向不变性、图网络与语义对齐提供位置和活动的联合泛化能力。这一设计使得 UniMTS 在 18 个真实数据集上零样本性能平均超过最佳基线 **ImageBind**（Girdhar et al., CVPR 2023）340%（F1 提升），少样本微调平均 F1 超越最佳基线 16.3%，全样本微调 F1 达到 87.5%，显著优于所有预训练、自监督和传统模型（Table 1-3, Figure 4）。
-
-
 
 UniMTS 的整体框架围绕一个核心洞察构建：**将大规模运动骨架数据转化为多关节传感器模拟信号，并利用图网络与语义对齐，可以打破传统模型对特定数据采集条件的依赖**。如图 Figure 2 所示，整个 pipeline 分为预训练与下游适配两大阶段，通过物理引擎合成、旋转不变增强、图编码与跨模态对比学习四个关键模块的协同，实现对设备佩戴位置、方向及活动类型的统一泛化。
 
@@ -166,13 +160,6 @@ UniMTS 的整体框架围绕一个核心洞察构建：**将大规模运动骨�
 - **微调**：冻结文本编码器 $f_{\theta}$，将真实信号按最近关节分配后输入图编码器 $g_{\phi}$，在其上添加线性分类器 $h_{\psi}$，使用交叉熵损失 $\mathcal{L}_{ce}$（Equation 12）联合优化图编码器和分类器。
 
 整个框架的输入输出流可概括为：**骨架运动数据 → 多关节模拟时间序列 → 旋转增强图表示 → 图嵌入；文本标签 → LLM 增强 → 文本嵌入；两者通过对比损失对齐**。下游任务中，真实传感器信号经最近关节映射后，直接复用预训练图编码器进行推理或微调。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1916_UniMTS_Unified_Pre_training_for_Motion_Time_Series/figures/001_Figure_1.jpg]]
-*Figure 1: Our framework addresses all three generalization challenges (variation in device location, orientation and activity) where existing methods fall short*
-
-
 
 UniMTS 的预训练框架由五个核心模块构成，各模块协同实现从运动骨架到通用运动时间序列表示的转化。
 
@@ -284,13 +271,6 @@ $$
 
 其中 $\mathbf{z}_{ij}$ 为独热编码标签，$D$ 为类别数，$\sigma$ 为 softmax 函数。该设计保留预训练语义知识的同时适配下游分类任务。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1916_UniMTS_Unified_Pre_training_for_Motion_Time_Series/figures/003_Figure_3.jpg]]
-*Figure 3: Inference (left) and fine-tuning (right) phases of UniMTS. We assign real signals to the nearest location in the skeleton graph. During inference, we compute similarity score between the graph embedding and each label candidate, and predict the one with the highest score. During fine-tuning, we freeze the text encoder and update weights of the graph encoder and linear layer*
-
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与实验设计逻辑
@@ -356,18 +336,9 @@ Figure 5 的 T-SNE 可视化展示了 UniMTS 嵌入空间的语义结构。不�
 
 Figure 7 展示了 UniMTS 在预训练中未见过的活动类别上的零样本性能。相比最佳基线，UniMTS 仍有显著提升。这说明模型并非简单记忆预训练数据中的活动模式，而是通过 LLM 增强的文本描述习得了可迁移的运动语义——即使具体活动名称未在预训练中出现，其文本嵌入仍能为图编码器提供有效的语义锚点。
 
-![[assets/figures/papers/paper_list_l1916_UniMTS_Unified_Pre_training_for_Motion_Time_Series/figures/009_Figure_7.jpg]]
-*Figure 7: UniMTS shows significant performance improvement compared with the best baseline when evaluated on new activities not seen*
-
 ### 模拟数据与真实数据的模式一致性
 
 Figure 6 和 Figure 9 分别展示了模拟运动时间序列与真实 PAMAP2 数据集在躯干和踝关节位置上的对比。模拟信号在加速度和角速度的模式上与真实传感器记录高度相似，验证了物理引擎合成数据作为预训练语料的合理性。合成过程中加入的高斯噪声（Equation 4）在一定程度上模拟了真实传感器噪声，但论文也承认可能未完全覆盖非高斯噪声、偏移和时延等复杂情况。
-
-![[assets/figures/papers/paper_list_l1916_UniMTS_Unified_Pre_training_for_Motion_Time_Series/figures/008_Figure_6.jpg]]
-*Figure 6: Simulated motion time series closely resemble patterns of the real PAMAP2 time series*
-
-![[assets/figures/papers/paper_list_l1916_UniMTS_Unified_Pre_training_for_Motion_Time_Series/figures/012_Figure_9.jpg]]
-*Figure 9: Simulated motion time series show similar patterns as real PAMAP2 time series*
 
 ### 失败模式与局限性
 
@@ -381,8 +352,6 @@ Figure 6 和 Figure 9 分别展示了模拟运动时间序列与真实 PAMAP2 �
 ### 公平性保障
 
 所有基线均按照原文公开实现或预训练权重进行复现，在相同的数据预处理与采样频率下评估。统计检验统一采用 Wilcoxon signed-rank test 并经过 Holm's α=0.05 校正，所有关键提升的 p 值均显著小于 0.05。超参数（学习率 0.0001，批大小 64，温度参数初始化自 CLIP）在零样本、少样本和全样本设定中保持一致，确保对比的公平性。
-
-
 
 ## 定位与知识库关联
 
@@ -451,8 +420,6 @@ UniMTS 处于**运动感知预训练**与**跨模态语义对齐**的交汇点�
 - **对齐层面**：利用 CLIP 文本编码器和 LLM 增强的文本描述，在对比学习框架下实现运动信号与语义的跨模态对齐，赋予模型零样本活动识别能力。
 
 这一框架为后续研究提供了可复用的范式：**合成物理一致的运动数据 + 结构化编码器 + 语义对齐**，可作为运动时间序列领域的基础预训练方案，类似于 CLIP 在视觉-语言领域的作用。
-
-
 
 ## 原文 PDF
 

@@ -52,8 +52,6 @@ claims:
 
 **主要结果**：在代码到风格生成任务上，CoTyle 的风格一致性（CSD）达到 0.6007，显著优于 Midjourney 的 0.4734（+0.1273），但风格多样性略低（0.7764 vs 0.8088）。在图像条件风格生成上，CoTyle 与 InstantStyleXL 的一致性相当（0.5791 vs 0.5753）。消融实验证实：文本分支注入优于视觉分支（一致性 +0.0485），对比损失是风格学习的关键（移除后一致性降至 0.4890），高频抑制有效提升多样性（+0.0276）。
 
-
-
 ### 风格生成的核心瓶颈
 
 文本到图像（T2I）扩散模型已在图像生成领域取得巨大成功，但**风格控制**仍是一个尚未充分解决的难题。风格是一种高度抽象且难以形式化的视觉属性，它不同于物体类别或空间布局，无法通过简单的文本描述精确捕捉。现有方法在指定和生成风格时面临一个根本性的三难困境：
@@ -75,8 +73,6 @@ claims:
 ### CoTyle 的定位
 
 基于上述洞察，本文提出 **CoTyle**（Code-to-Style Generation），首次将风格生成问题形式化为“代码到风格”的映射任务。CoTyle 的核心贡献在于构建了一个完整的离散风格表示与生成框架，使数值风格代码成为风格的唯一标识和操控接口，从而在一致性、创造性和可复现性三个维度上实现突破。
-
-
 
 ## 核心方法与创新机理
 
@@ -113,12 +109,7 @@ CoTyle 发现，风格码本中存在一些被高频选中的索引，它们并�
 
 为提升生成风格的多样性和强度，CoTyle 在推理时引入**高频索引抑制策略**：对频率超过阈值 τ 的索引，将其 logits 乘以一个指数衰减的抑制系数 $s(i) = e^{-k (f(i) - \tau)}$，从而降低这些无意义索引被采样的概率。消融实验表明，该策略将风格多样性从 0.7488 提升至 0.7764（Table 4）。
 
-
-
 CoTyle 的核心设计理念是将“风格”抽象为一个紧凑的**数值风格代码**（numerical style code），使风格指定脱离复杂的文本描述、参考图像或 LoRA 适配器（Figure 2）。整个框架由三个依次训练、推理时协同工作的模块构成，其训练与推理流程如 Figure 3 所示。
-
-![[assets/figures/papers/paper_list_l2066_https_arxiv_org_abs_2511_10555/figures/002_Figure_2.jpg]]
-*Figure 2: Different to previous methods, CoTyle uses a numerical style code to represent a style, eliminating the need for complex prompts, images, or LoRAs, and allowing easy creation of unique styles just modifying the code. “Creativity”, “Consistency”, and “Reproducibility” refer to a model’s ability to (1) generate novel styles, (2) produce multiple images in the same style consistently, and (3) reproduce styles using simple, user-friendly style definitions*
 
 ![[assets/figures/papers/paper_list_l2066_https_arxiv_org_abs_2511_10555/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of CoTyle. (a) We first train a style codebook and an image generation model conditioned on style images. (b) Then, we use the corresponding codebook indices of the style images to train an autoregressive style generator. (c) During inference, a style code is used to randomly sample the first index and autoregressively predict the rest*
@@ -150,8 +141,6 @@ $$
 **训练流**：风格图像对 → 码本训练（$\mathcal{L}_{\mathrm{style}}$）→ 风格嵌入 → 注入 T2I-DM 文本分支训练；同时，风格图像经训练后码本编码为索引序列 → 训练自回归风格生成器。
 
 **推理流**：风格代码（随机种子）→ 自回归风格生成器（含高频抑制）→ 风格索引序列 → 码本解码 → 风格嵌入 → 注入 T2I-DM 文本分支 → 风格化图像。该框架同时兼容图像条件输入：直接将参考图像经码本编码为风格嵌入，跳过自回归生成步骤即可。
-
-
 
 CoTyle 围绕“风格即代码”这一核心思想，由三个紧密协作的模块构成：**风格码本**、**条件文本到图像扩散模型**以及**自回归风格生成器**。其设计瓶颈在于，如何将连续、复杂的视觉风格信息压缩为一个紧凑的离散表示，并使其既能被扩散模型有效利用，又能被生成模型采样以创造全新风格。
 
@@ -207,16 +196,6 @@ $$
 
 其中 $k$ 控制衰减速率。这一简单策略有效压低了无意义索引的采样概率，迫使生成器探索更具风格表征能力的低频索引，从而将风格多样性从 0.7488 提升至 0.7764。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2066_https_arxiv_org_abs_2511_10555/figures/006_Figure_5.jpg]]
-*Figure 5: We compare injecting style through textual branch with the existing method through visual branch. Injecting style from the textual branch better preserves semantic information*
-
-![[assets/figures/papers/paper_list_l2066_https_arxiv_org_abs_2511_10555/figures/011_Figure_7.jpg]]
-*Figure 7: Sampling solely from high-frequency indices yields style-less images. Row 1 shows the results of vanilla T2I-DM without any style indices, and Row 2, guided by high-frequency indices, produces results nearly identical to T2I-DM*
-
-
-
 ## 实验与关键发现
 
 ### 主要定量结果
@@ -248,21 +227,12 @@ CoTyle 在代码到风格生成和图像条件风格生成两个设定下与多�
 
 推理时的采样策略对生成风格的多样性有显著影响。分析发现，风格码本的索引频率分布极不均匀（Figure A1），存在大量高频索引。这些高频索引在训练中频繁被选中，但并不编码具体的风格属性——仅用高频索引生成的图像与无条件 T2I-DM 的输出几乎一致（Figure 7），说明它们实质上是“风格无关”的占位符。基于这一发现，CoTyle 在推理时对频率超过阈值 $\tau$ 的索引施加指数衰减抑制系数 $s(i) = e^{-k(f(i)-\tau)}$。Table 4 的消融表明，该策略将风格多样性从 0.7488 提升至 0.7764，同时保持风格一致性基本不变。这一机制确保了自回归生成器在采样时更倾向于选择携带具体风格信息的低频索引，从而增强生成风格的多样性和强度。
 
-![[assets/figures/papers/paper_list_l2066_https_arxiv_org_abs_2511_10555/figures/009_Table_4.jpg]]
-*Table 4: Effect of high-frequency suppression s(i)*
-
-![[assets/figures/papers/paper_list_l2066_https_arxiv_org_abs_2511_10555/figures/013_Figure.jpg]]
-*Figure: A1. Frequency distribution of style codebook indices. A batch of images is encoded using the style codebook, and the selection frequency of all indices is calculated*
-
 ### 定性分析与失败模式
 
 Figure 4 展示了 CoTyle 与 Midjourney 在代码到风格生成上的定性对比。CoTyle 在同一风格代码下生成的图像组（2×3 网格）表现出良好的一致性，但在某些风格类型上（图中红色框标注）一致性欠佳，表现为颜色基调或纹理特征在不同图像间漂移。Figure 6 的图像条件生成对比显示，CoTyle 能够同时忠实遵循输入文本的语义内容和参考图像的风格特征，但在复杂混合风格场景下，码本量化的信息瓶颈可能导致某些细微风格元素被弱化或丢失。
 
 ![[assets/figures/papers/paper_list_l2066_https_arxiv_org_abs_2511_10555/figures/004_Figure_4.jpg]]
 *Figure 4: Qualitative comparison with Midjourney [2] on code-to-style generation. Each image set (2×3 grid) is generated from the same style code. Red boxes highlight cases with suboptimal style consistency*
-
-![[assets/figures/papers/paper_list_l2066_https_arxiv_org_abs_2511_10555/figures/010_Figure_6.jpg]]
-*Figure 6: Qualitative comparison. CoTyle is not only capable of generation conditioned on style codes but also supports style images. Our model can faithfully follow the input text while simultaneously generating the specified style*
 
 风格插值是 CoTyle 的一个独特能力（Figure 8）。通过按用户指定权重线性组合多个风格的码本索引子集，模型可以在两个风格之间实现平滑过渡。附录 Figure A3 提供了更多插值结果，Figure A2 则分析了 token 选择策略对插值效果的影响。这一能力源于自回归生成器将每个风格表示为 $N$ 个索引序列的设计，使风格融合退化为索引级别的组合操作。
 
@@ -272,8 +242,6 @@ Figure 4 展示了 CoTyle 与 Midjourney 在代码到风格生成上的定性对
 ### 评估局限
 
 需要指出的是，当前评估仅依赖无参考指标 CSD，该指标基于 VLM 特征空间的相似度计算，可能无法完全反映人类对风格感知的细微差异。此外，训练数据的多样性受限可能引入某些风格偏向，导致模型在某些艺术风格类型上表现优于其他类型。这些因素在解读定量结果时需加以注意。
-
-
 
 ## 定位与知识库关联
 
@@ -331,8 +299,6 @@ CoTyle的技术架构可分解为三条技术线的交汇：
 4. **跨模态拓展**：该离散风格表示框架是否能迁移到音频风格（如音乐流派）、视频风格（如导演风格）？核心挑战在于其他模态的“内容-风格”解耦是否如视觉领域一样自然。
 
 5. **高频索引的根本解决**：高频索引作为占位符的现象是否源于对比损失的设计缺陷，还是训练数据中“无风格”样本的固有属性？熵正则化或重新加权采样策略是否能从根本上改善码本利用率？
-
-
 
 ## 原文 PDF
 

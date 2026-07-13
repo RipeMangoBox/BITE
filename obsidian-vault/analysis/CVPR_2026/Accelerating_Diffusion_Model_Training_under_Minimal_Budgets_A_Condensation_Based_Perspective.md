@@ -59,8 +59,6 @@ claims:
 
 **方法定位：** D²C 属于数据侧加速范式，与模型侧加速方法（如 REPA）正交互补。其压缩数据集构建过程引入一次性额外计算开销（通过预训练扩散模型计算难度分数），但换取了训练阶段的大幅加速。方法主要在类到图像生成任务上验证，文本到图像生成的扩展已做初步探索（Figure 7），但尚未充分评估。
 
-
-
 扩散模型已成为视觉生成领域的主流范式，在图像合成、视频生成等任务上展现出前所未有的质量。然而，这一能力的代价极其高昂：从零开始训练一个扩散模型通常依赖数百万张图像和数百个GPU日的计算资源。以ImageNet 256×256上的代表性工作为例，**DiT**（Peebles & Xie, ICCV 2023）和**SiT**（Ma et al., ECCV 2024）等基于Transformer的扩散模型在完整数据集（1.28M图像）上需要数百万次迭代才能收敛，这对资源受限的研究者构成了极高的准入门槛。
 
 ### 现有加速路径及其局限
@@ -81,8 +79,6 @@ claims:
 这两个目标之间存在天然张力——高难度样本往往集中在特定分布区域，而纯多样性采样可能引入大量低信息密度的简单样本。如何系统性地平衡二者，并在极低数据预算（如原始数据的0.8%–4%）下实现高质量生成，构成了本文的核心研究问题。
 
 D²C正是在这一背景下被提出：它从“数据集压缩”的视角重新审视扩散模型训练，将问题分解为**选择**（Select）和**增强**（Attach）两个阶段，在不修改模型架构的前提下，仅通过优化训练数据的组成和条件信号，实现了超过100×的训练加速。
-
-
 
 ## 核心方法与创新机理
 
@@ -122,8 +118,6 @@ $$
 
 这三个 changed slots 共同体现了一个核心洞察：**在极小数据预算下，训练子集的组成（信息性与多样性的平衡）和每个样本附加的语义/视觉条件信号的强度，是控制扩散模型训练效率的关键因果杠杆**。D²C 将加速的着力点从“如何在完整数据上更快收敛”转移到“如何让有限数据携带更多有效信息”，从而在 0.8% 数据预算（10K）下仅用 40K 步即达到 gFID 4.23，相对 REPA 实现超过 100× 的加速（Table 3, Figure 1(b)）。
 
-
-
 D²C 采用 **Select–Attach** 两阶段管线，将原始大规模数据集压缩为一个信息密集的紧凑子集，并在其上训练扩散模型。图 2 给出了整体流程。
 
 **阶段一：Select（数据选择）**
@@ -145,12 +139,6 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{diff}} + \lambda \mathbb{E
 - **训练输出**：在压缩数据集上训练完成的扩散模型，可在极小训练步数内达到与全数据训练可比的生成质量。
 
 > **关键设计理念**：Select 解决“哪些样本值得学”，Attach 解决“每个样本怎么学得更充分”。二者协同使得扩散模型在 0.8%–4% 的数据预算下实现 100× 以上的训练加速（见表 3 和图 1）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l833_https_arxiv_org_abs_2507_05914/figures/001_Figure_1.jpg]]
-
-
 
 D²C 框架由 **Select（选择）** 与 **Attach（附加）** 两个阶段构成（Figure 2）。Select 阶段从完整数据集中筛选紧凑而信息密集的子集，Attach 阶段为每个选中样本注入语义与视觉先验，从而在极小数据预算下实现扩散模型的高效训练。
 
@@ -204,15 +192,8 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{diff}} + \lambda \mathbb{E
 
 消融实验（Table 5）验证了各模块的独立贡献：仅使用 Select 阶段即可将 gFID 从 37.07 降至 14.96；同时使用 DC-Embedding 和视觉嵌入达到最佳 gFID 7.62，超过单独任一种配置。视觉编码器消融（Table 7）进一步表明 DINOv2-L 在语义对齐任务上优于其他编码器。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l833_https_arxiv_org_abs_2507_05914/figures/003_Figure_3.jpg]]
-*Figure 3: Left: Distribution of diffusion difficulty scores under different interval values k. Smaller intervals (e.g., 1, 2) favor low-loss samples, while larger intervals (e.g., 64, 128) result in a distribution closer to random sampling, thus approximating the original data distribution. Moderate intervals (e.g., 16) provide balanced coverage across difficulty levels. Right: Representative samples selected by three strategies: Min (lowest score), Max (highest score), and Interval (our proposed strategy). Interval sampling achieves a balance between structural clarity and contextual richness*
-
 ![[assets/figures/papers/paper_list_l833_https_arxiv_org_abs_2507_05914/figures/004_Figure_4.jpg]]
 *Figure 4: Overview of DC-Embedding*
-
-
 
 ## 实验与关键发现
 
@@ -257,8 +238,6 @@ Figure 5 展示了在 10K 和 50K 数据预算下，D²C 与随机采样的生�
 
 论文明确指出的局限性包括：（1）压缩数据集构建依赖一个预训练扩散模型来计算难度分数，引入一次性额外计算开销；（2）方法主要在类到图像生成任务上验证，文本到图像生成的扩展仅做了初步讨论（Figure 7 展示了在 LAION 文本-图像对上计算的难度分数分布，与类条件分布相似，暗示了扩展可能性，但尚未充分评估）；（3）最优间隔参数 k 依赖具体数据集和预算，需要针对每个场景调优。这些点需要读者在实际应用中注意。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l833_https_arxiv_org_abs_2507_05914/figures/006_Table_1.jpg]]
 *Table 1: Comparison of gFID-50K across various dataset condensation methods and data budgets using DiT-L/2 and SiT-L/2 on ImageNet 256×256. We use CFG=1.5 for evaluation*
 
@@ -267,19 +246,6 @@ Figure 5 展示了在 10K 和 50K 数据预算下，D²C 与随机采样的生�
 
 ![[assets/figures/papers/paper_list_l833_https_arxiv_org_abs_2507_05914/figures/009_Table_2.jpg]]
 *Table 2: Comparison with a strict data budget 0.8% (10K) on ImageNet 512×512. We use CFG=1.5 for evaluation*
-
-![[assets/figures/papers/paper_list_l833_https_arxiv_org_abs_2507_05914/figures/007_Figure_6.jpg]]
-*Figure 6: Left: Interval-sampling ablation. Small k speeds early training. The best final gFID-10K appears at k=96 for the 10K budget and k=16 for the 50K budget, roughly scaling with data size. Right: DC-Embedding ablation at 10K. Combining text and class embeddings outperforms either alone; “Only Class” denotes the baseline that injects class embeddings only*
-
-![[assets/figures/papers/paper_list_l833_https_arxiv_org_abs_2507_05914/figures/014_Figure_8.jpg]]
-*Figure 8: Left: gFID-10K across training steps under different interval values k for a 50K data budget. Moderate intervals (e.g., k = 16) achieve superior performance by balancing learnability and diversity. Right: Distributional discrepancy (gFID-10K) between ranked training subsets and the validation set. Both extremely low and high diffusion difficulty score lead to higher FID, while mid-range segments show better alignment*
-
-![[assets/figures/papers/paper_list_l833_https_arxiv_org_abs_2507_05914/figures/017_Table_7.jpg]]
-*Table 7: Ablation of the visual encoder*
-
-![[assets/figures/papers/paper_list_l833_https_arxiv_org_abs_2507_05914/figures/010_Table_4.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -350,8 +316,6 @@ D²C 的有效性建立在以下前提之上，这些前提也划定了其适用
 4. **自动化间隔确定**：是否存在基于数据集难度分布统计特性（如偏度、峰度、模态数）的自动化 k 确定方法？这将是方法从研究走向实际部署的关键一步。
 
 5. **与模型侧方法的深度融合**：D²C 的 Attach 阶段已初步展示了数据压缩与表示对齐的协同效应。是否存在更紧密的耦合方式——例如，让 Select 阶段的难度分数感知 Attach 阶段的表示对齐强度，或者联合优化子集选择与模型训练目标？这可能在极小预算下进一步突破当前性能上限。
-
-
 
 ## 原文 PDF
 

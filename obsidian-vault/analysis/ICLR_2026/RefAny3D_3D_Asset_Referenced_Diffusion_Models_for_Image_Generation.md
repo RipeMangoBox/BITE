@@ -59,15 +59,11 @@ claims:
 
 **局限性**：方法主要面向刚性物体，未建模非刚性物理交互（如变形）；训练需 8 张 H800 GPU 约 8 天；数据集依赖自动化姿态估计与 3D 重建管线，可能引入纹理或几何误差。
 
-
-
 **问题背景** 以3D资产为参考的图像生成在游戏开发、虚拟现实、电子商务等场景中具有重要应用价值。给定一个3D模型，用户期望生成与参考资产在几何结构和纹理外观上高度一致、且能响应文本提示语义的高质量2D图像。现有方法主要分为两类：基于文本反转的个性化生成（如**Textual Inversion** (Gal et al., 2022)、**DreamBooth** (Ruiz et al., 2023)）和基于图像提示的适配方法（如**IP-Adapter** (Ye et al., 2023)、**DSD** (Cai et al., 2025)、**OminiControl** (Tan et al., 2025)）。这些方法的共同局限在于：**仅能利用单张或少量2D RGB图像作为参考条件，无法显式利用3D资产所蕴含的完整几何结构与纹理先验**。
 
 **现有方法缺口** 2D参考图像仅提供特定视角下的外观信息，缺乏对物体三维形状、遮挡关系、多视角一致性的显式建模。因此，基于2D参考的生成方法在面对视角变化、复杂几何或精细纹理时，**生成结果与3D参照物在几何和纹理上缺乏一致性**——这是当前技术路线的核心瓶颈。此外，现有方法未涉及RGB外观与几何坐标之间的像素级对应关系建模，难以保证生成图像中物体结构与参考资产的对齐。
 
 **本文动机** 针对上述缺口，RefAny3D提出了一种**3D资产引用的扩散生成框架**。其核心思想是：将3D资产表示为多视角RGB图像与点图（point map，即归一化物体坐标）的配对数据，通过**联合建模RGB外观与点图的联合条件分布** $p(x_I, x_P \mid y, c)$，在生成过程中同时产生目标RGB图像及其对应的点图。点图作为3D几何代理，为生成过程提供显式的几何一致性锚定，从而从根本上解决2D参考方法中缺失的几何约束问题。
-
-
 
 ## 核心方法与创新机理
 
@@ -101,8 +97,6 @@ RefAny3D 的核心创新在于将图像生成的条件从单张 2D 参考图像�
 
 相较于 **DreamBooth** (Ruiz et al., 2023) 或 **Textual Inversion** (Gal et al., 2022) 等通过微调或嵌入优化来记忆特定对象外观的方法，RefAny3D 不依赖对参照物的“过拟合式”记忆，而是通过点图这一几何代理实现可泛化的 3D 一致性约束。相较于 **OminiControl** (Tan et al., 2025) 等通用控制方法，RefAny3D 的域解耦设计专门针对 RGB-几何联合生成场景，避免了通用控制中常见的纹理渗漏问题。
 
-
-
 RefAny3D 提出了一种基于 3D 资产条件的图像生成框架，其核心思想是将生成过程形式化为对 RGB 外观与点图（point map）的联合分布建模。如 Figure 2 所示，给定一个 3D 参照资产，系统首先从多个视角渲染 RGB 图像及对应的点图作为条件信号，随后通过一个空间对齐的双分支扩散模型同时生成目标视角的 RGB 图像及其点图。点图在此充当 3D 几何代理，为 RGB 生成提供像素级的几何一致性锚定。
 
 ![[assets/figures/papers/paper_list_l58_https_openreview_net_forum_id_fUO37EVR7j/figures/002_Figure_2.jpg]]
@@ -125,8 +119,6 @@ RefAny3D 提出了一种基于 3D 资产条件的图像生成框架，其核心�
 6. **联合输出**：扩散过程结束后，解码得到空间对齐的 RGB 图像与点图。点图提供了显式的 3D 几何约束，确保生成的 RGB 图像在几何结构与纹理映射上与参照 3D 资产保持一致。
 
 整个框架的优化目标可形式化为学习条件分布 $p(x_I, x_P \mid y, c)$，其中 $x_I$ 为目标 RGB 图像，$x_P$ 为对应的点图，$y$ 为参照 3D 模型，$c$ 为文本提示。通过联合建模这两个域，RefAny3D 在生成过程中同时约束了外观与几何，从而实现对 3D 参照物的高保真一致图像生成。
-
-
 
 RefAny3D 的核心思想是将图像生成形式化为对 RGB 外观与点图（canonical-space 坐标）联合分布的条件建模。给定一个 3D 参照资产 $y$ 和文本提示 $c$，模型学习目标 RGB 图像 $x_I$ 与对应点图 $x_P$ 的联合条件分布：
 
@@ -159,21 +151,11 @@ $$p ( x _ { I } , x _ { P } | y , c )$$
 
 这些消融结果共同证明：共享位置编码提供空间对齐基础，文本无关注意力阻断语义泄漏，域特定 LoRA 实现外观与几何的解耦——三者协同作用，是 RefAny3D 实现 3D 一致性生成的关键因果机制。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l58_https_openreview_net_forum_id_fUO37EVR7j/figures/010_Figure_8.jpg]]
-*Figure 8: Comparisons of ablation studies and the editing-based baseline*
-
-
-
 ## 实验与关键发现
 
 ### 主实验设置
 
 RefAny3D 以 **Flux.1-dev** 作为基础扩散模型，采用 **Prodigy** 优化器进行训练（Tan et al., 2025）。训练数据通过自动化管线构建：对 Subjects200k 数据集中的每张图像，使用 **GroundingDINO** (Liu et al., 2024) 提取目标物体，经 **Hunyuan3D** (Zhao et al., 2025) 重建为 3D 资产，最后用 **FoundationPose** (Wen et al., 2024) 估计姿态并渲染多视角 RGB-点图对（Figure 3）。训练在 8 张 H800 GPU 上约需 8 天。
-
-![[assets/figures/papers/paper_list_l58_https_openreview_net_forum_id_fUO37EVR7j/figures/003_Figure_3.jpg]]
-*Figure 3: (a) Data construction pipeline. We first use GroundingDINO (Liu et al., 2024) to extract the objects of interest, then convert the images into 3D models using Hunyuan3D (Zhao et al., 2025), and finally apply FoundationPose (Wen et al., 2024) to estimate the poses of the 3D models in the images. (b) Examples from the dataset*
 
 ### 定量结果
 
@@ -214,27 +196,12 @@ Figure 7 和 Figure 8 系统消融了各核心组件的作用：
 
 Figure 6 表明 RefAny3D 可无缝集成到现有多视图图像到 3D 的生成管线中，增强其 3D 一致性。Figure 9 展示了从不同视点可控生成物体图像的能力，进一步验证了模型对视角条件的鲁棒响应。
 
-![[assets/figures/papers/paper_list_l58_https_openreview_net_forum_id_fUO37EVR7j/figures/012_Figure_9.jpg]]
-*Figure 9: An example of controllable generation of object images from different viewpoints*
-
 ### 失败模式与局限
 
 Figure 10 揭示了方法的主要局限：RefAny3D 面向**刚性物体**设计，未建模场景中的非刚性物理交互（如布料变形、软体挤压），导致此类场景下生成结果与参照物出现不一致。此外，自动化数据管线依赖姿态估计与 3D 重建，可能引入纹理或几何误差，影响模型性能上限。训练所需的 8×H800 GPU 约 8 天的计算开销，也限制了方法在更大规模或更高视角数条件下的直接扩展。
 
-![[assets/figures/papers/paper_list_l58_https_openreview_net_forum_id_fUO37EVR7j/figures/011_Figure_10.jpg]]
-*Figure 10: Limitation on non-rigid objects. While our method achieves high fidelity to the input 3D assets, it does not account for physical interactions in the scene*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l58_https_openreview_net_forum_id_fUO37EVR7j/figures/008_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l58_https_openreview_net_forum_id_fUO37EVR7j/figures/001_Figure_1.jpg]]
-*Figure 1: Results of our RefAny3D. Given a 3D asset, our method can generate high-quality and 3D asset-consistent images*
-
 ![[assets/figures/papers/paper_list_l58_https_openreview_net_forum_id_fUO37EVR7j/figures/013_Figure_11.jpg]]
 *Figure 11: Qualitative results with different 3D assets as references*
-
-
 
 ## 定位与知识库关联
 
@@ -269,8 +236,6 @@ RefAny3D 的能力边界由以下设计选择划定：
 2. **降低多视角条件开销。** 能否通过视角选择策略、条件压缩或知识蒸馏，在保持3D一致性的前提下减少条件视角数？
 3. **与视频/场景生成的结合。** 能否将RefAny3D的点图一致性约束扩展到视频生成或3D场景生成，实现动态一致的3D资产引导内容创作？
 4. **条件鲁棒性。** 当输入的3D资产质量较低（如稀疏重建、噪声纹理）时，方法的表现如何？是否需要额外的条件增强或鲁棒训练策略？
-
-
 
 ## 原文 PDF
 

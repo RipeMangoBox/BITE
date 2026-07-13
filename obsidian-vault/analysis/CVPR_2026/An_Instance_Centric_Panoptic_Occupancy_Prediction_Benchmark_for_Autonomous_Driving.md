@@ -78,8 +78,6 @@ claims:
 
 CarlaOcc 的主要局限在于其基于 CARLA 模拟器生成，8 个城镇的环境多样性有限，Sim-to-Real 迁移增益目前仅 0.8%–1.5% mIoU，且尚未在全景占用等更复杂任务上验证迁移效果。实例标注质量依赖于网格资产精细度与骨架运动估计算法的准确性。未来方向包括：在 ≤0.05 米分辨率下提升全景占用预测效率、利用实例级标签设计新型视觉预训练任务，以及探索多模态数据对自监督学习的支撑潜力。
 
-
-
 ### 3D 占用预测的演进与瓶颈
 
 3D 占用预测旨在从视觉输入中重建场景的完整三维几何与语义表示，是自动驾驶感知栈中的关键一环。近年来，该领域在数据集构建和模型设计上取得了显著进展，但其核心瓶颈已从“能否预测占用”转向“占用标注本身是否足够精确、完整且具备实例级语义”。现有公开数据集普遍存在三个结构性缺陷：
@@ -104,8 +102,6 @@ CarlaOcc 的主要局限在于其基于 CARLA 模拟器生成，8 个城镇的�
 - **生成层**：设计一套网格驱动的场景重建与体素化流程，取代传统的 LiDAR 聚合方式。通过直接利用网格进行物理一致的重建，CarlaOcc 能够生成具有空间连续性、时间一致性和实例级标注的全景占用真值，且体素分辨率可低至 0.05 米。
 
 这一双轮驱动的设计使得 CarlaOcc 在数据质量指标上实现了质的飞跃：空间连续性得分达到 0.996，时间一致性得分达到 0.873，远超现有数据集（**Table 3**）。更重要的是，该基准不仅服务于占用预测任务本身的评测，还通过 Sim-to-Real 预训练实验证明了其作为视觉表征学习平台的价值——在 CarlaOcc 上预训练可使模型在真实数据集上的 mIoU 提升 0.8%–1.5%（**Table 7**），验证了其有效的空间推理能力迁移。
-
-
 
 ## 核心方法与创新机理
 
@@ -161,8 +157,6 @@ $$s_{tc} = \frac{\sum_{t=1}^{T-1} \sum_{c=1}^C |\widetilde{\mathcal{V}}_t^{(c)} 
 
 上述创新的有效性受限于以下条件：（1）实例标注质量依赖于 ADMesh 网格资产的精细度和骨架运动估计算法的准确性，在长尾、复杂交互场景下可能出现伪影；（2）基于 CARLA 模拟器的数据无法完全替代真实传感器采集样本，sim-to-real 迁移带来的性能增益有限（0.8%–1.5% mIoU，Table 7）；（3）目前仅在语义占用任务上验证了迁移效果，全景占用等下游任务的 sim-to-real 增益尚未被系统评估。
 
-
-
 本文提出了一种以实例为中心的全景占用预测基准，其核心由两大组件构成：**ADMesh**——面向自动驾驶的大规模语义结构化三维网格库，以及 **CarlaOcc**——基于网格驱动场景重建生成的高保真全景占用数据集。Figure 1 展示了该基准的总体框架。
 
 ![[assets/figures/papers/paper_list_l814_https_arxiv_org_abs_2603_27238/figures/001_Figure_1.jpg]]
@@ -175,9 +169,6 @@ $$s_{tc} = \frac{\sum_{t=1}^{T-1} \sum_{c=1}^C |\widetilde{\mathcal{V}}_t^{(c)} 
 ### 数据生成 Pipeline
 
 Figure 2 完整呈现了从网格资产到全景占用标签的生成流程，包含四个关键模块：
-
-![[assets/figures/papers/paper_list_l814_https_arxiv_org_abs_2603_27238/figures/003_Figure_2.jpg]]
-*Figure 2: Overview of the proposed ADMesh library and the CarlaOcc generation pipeline. The ADMesh library is constructed by extracting and organizing diverse 3D assets from multiple sources, which are subsequently used to reconstruct dynamic scenes with both static structures and temporally aligned non-rigid motions. The resulting unified scene meshes are then used to rectify sensor artifacts and further processed with a topology-aware mesh permutation strategy to produce non-overlapping panoptic occupancy labels*
 
 1.  **网格导出工具链 (Mesh Exportation Toolchain)**：从 CARLA 模拟器中自动遍历所有默认场景，系统性提取、重建并组织静态网格资源，构建组件级网格库 ADMesh。该库整合了来自 BuildingNet、Mesh-Fleet、ShapeNetCore 等多个来源的超过 15,000 个高质量三维模型（Table 1），涵盖丰富的语义类别与纹理多样性。
 
@@ -199,8 +190,6 @@ Figure 2 完整呈现了从网格资产到全景占用标签的生成流程，�
 -   **时间一致性得分** $s_{tc}$，通过帧间语义交并比评估占用标注的时间稳定性，排除动态目标和新可见区域的影响。
 
 CarlaOcc 在空间连续性得分（0.996）和时间一致性得分（0.873）上大幅超越现有数据集（Table 3），验证了网格驱动生成策略的物理一致性与几何完整性优势。
-
-
 
 ### 3.1 ADMesh 网格资源库构建
 
@@ -261,8 +250,6 @@ $$s_{tc} = \frac{\sum_{t=1}^{T-1} \sum_{c=1}^C |\widetilde{\mathcal{V}}_t^{(c)} 
 
 其中 $\widetilde{\mathcal{V}}_t^{(c)}$ 为第 $t+1$ 帧的占用标签经自车运动补偿后投影到第 $t$ 帧坐标系的结果，$M_t$ 为掩码，用于排除动态目标和新可见区域。CarlaOcc 在该指标上达到 0.873，显著优于 CarlaSC 的 0.775，验证了网格驱动重建在时间维度上的优势。
 
-
-
 ## 实验与关键发现
 
 ### 数据集质量评估
@@ -300,9 +287,6 @@ $$s_{tc} = \frac{\sum_{t=1}^{T-1} \sum_{c=1}^C |\widetilde{\mathcal{V}}_t^{(c)} 
 ![[assets/figures/papers/paper_list_l814_https_arxiv_org_abs_2603_27238/figures/010_Table_5.jpg]]
 *Table 5: Comparison of semantic occupancy prediction methods on the CarlaOcc dataset*
 
-![[assets/figures/papers/paper_list_l814_https_arxiv_org_abs_2603_27238/figures/019_Table_8.jpg]]
-*Table 8: Semantic occupancy prediction results on the CarlaOcc dataset*
-
 ### 体素分辨率消融实验
 
 为探究体素尺寸对预测性能的影响，Table 6 展示了在 0.5m、0.1m 和 0.05m 三种分辨率下的语义占用预测结果。关键发现是：**体素分辨率从 0.5m 提升至 0.05m 时，IoU 下降约 17-20 个百分点**。以 SparseOcc 为例，其 IoU 从 0.5m 下的 14.4 骤降至 0.05m 下的约 -3（负值表明模型预测精度低于随机猜测水平）。这一结果揭示了细粒度占用预测的巨大挑战：更高分辨率意味着体素数量呈立方级增长，且需要更精确的空间定位能力。当前基于视觉的方法在 0.05m 尺度下几乎失效，亟需新的模型架构或训练策略。
@@ -313,12 +297,6 @@ $$s_{tc} = \frac{\sum_{t=1}^{T-1} \sum_{c=1}^C |\widetilde{\mathcal{V}}_t^{(c)} 
 ### Sim-to-Real 迁移实验
 
 为验证 CarlaOcc 作为预训练数据集的实用价值，Table 7 展示了在 CarlaOcc 上预训练后在真实数据集（KITTI-360、SemanticKITTI）上微调的结果。Symphonies 在 KITTI-360 上经过 CarlaOcc 预训练后，mIoU 从 15.9 提升至 **17.4**（+1.5）；SparseOcc 在 SemanticKITTI 上获得 0.8 mIoU 的提升。Figure 12 的定性结果显示，经 CarlaOcc 预训练的 SparseOcc 在真实场景中展现出更完整的实例轮廓（见黄色圆圈标注区域），表明合成数据中物理一致的几何监督有助于模型学习更鲁棒的空间推理能力。
-
-![[assets/figures/papers/paper_list_l814_https_arxiv_org_abs_2603_27238/figures/017_Table_7.jpg]]
-*Table 7: Sim-to-real evaluation results of representative baselines pretrained on CarlaOcc and finetuned on real-world datasets*
-
-![[assets/figures/papers/paper_list_l814_https_arxiv_org_abs_2603_27238/figures/021_Figure_12.jpg]]
-*Figure 12: Visualizations of sim-to-real experiment. As shown in yellow circles, SparseOcc exhibits more complete instance contours after pretraining on CarlaOcc compared to official results*
 
 然而，Sim-to-Real 迁移的性能增益有限（0.8%-1.5% mIoU），主要受限于以下因素：（1）真实数据集真值的稀疏性和噪声；（2）CarlaOcc 与目标数据集在传感器配置、场景分布上的差异；（3）当前仅验证了语义占用任务，全景占用的迁移效果尚未评估。
 
@@ -333,16 +311,6 @@ Table 9 展示了在 CarlaOcc 上的深度估计基准结果。由于 CarlaOcc �
 1. **细粒度分辨率的退化**：在 0.05m 体素下，所有方法的性能急剧下降，表明现有模型缺乏处理高分辨率空间推理的能力。
 2. **实例识别困难**：全景占用预测中 RQ 指标普遍偏低，反映模型难以在密集的三维空间中准确区分不同实例，尤其是小目标和部分遮挡的物体。
 3. **Sim-to-Real 迁移瓶颈**：尽管 CarlaOcc 预训练带来一致但有限的提升，真实场景中的域差异（纹理、光照、传感器噪声）仍然是主要障碍。实例标注的质量依赖于网格资产的精细度和骨架运动估计的准确性，对于复杂交互场景可能存在偏差。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l814_https_arxiv_org_abs_2603_27238/figures/004_Table_2.jpg]]
-*Table 2: Comparison between CarlaOcc and other public occupancy prediction datasets*
-
-![[assets/figures/papers/paper_list_l814_https_arxiv_org_abs_2603_27238/figures/002_Table_1.jpg]]
-*Table 1: Overview of data sources and statistics of ADMesh*
-
-
 
 ## 定位与知识库关联
 
@@ -403,8 +371,6 @@ CarlaOcc 为这些方法提供了首个具备实例级标注的全景占用评�
 4. **极端条件下的鲁棒性**：网格驱动的真值生成方法在更复杂的动态场景（如交通事故、异常行为）和极端天气条件下，如何保持其物理一致性和标注准确性？
 
 5. **Sim-to-real 迁移的深层机制**：当前迁移增益有限，需要进一步研究模拟数据与真实数据之间的哪些差异（纹理、光照、几何精度、传感器噪声模型）是迁移瓶颈的关键因素，以及如何通过域适应或数据增强来弥合这些差距。
-
-
 
 ## 原文 PDF
 

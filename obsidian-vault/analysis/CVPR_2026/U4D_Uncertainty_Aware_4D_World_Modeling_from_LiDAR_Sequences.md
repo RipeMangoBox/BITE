@@ -50,8 +50,6 @@ U4D的核心洞察在于：**将不确定度建模显式嵌入生成框架，以
 
 实验结果表明，U4D在多个基准上显著优于现有方法：在nuScenes数据集上，FRD达到223.96，相较R2DM的253.80相对提升约11.8%；在SemanticKITTI上，FPD为10.92，优于R2DM的12.06；时间一致性指标TTCE在所有帧间隔上均取得最优。更重要的是，U4D生成的数据能有效提升下游语义分割性能（1%标签设定下mIoU达65.3%，超过R2DM的64.1%），并显著降低分割模型的预期校准误差（ECE），提升预测置信度的可靠性。消融实验进一步证实了香农熵不确定度选择策略和MoST自适应融合设计的有效性。
 
-
-
 自动驾驶系统对环境的精确感知依赖于高质量的LiDAR点云数据。然而，真实世界的数据采集不仅成本高昂，还面临长尾场景覆盖不足、标注稀缺等瓶颈。近年来，基于扩散模型的LiDAR场景生成方法（如**LiDARGen** (Zyrianov et al., ECCV 2022)、**R2DM** (Nakashima & Kurazume, ICRA 2024)、**LiDM** (Ran et al., CVPR 2024) 等）在合成静态场景方面取得了显著进展，但它们普遍存在一个根本性缺陷：**对所有空间区域同等处理，忽略了真实场景中不同位置的不确定度差异**。
 
 这种“统一生成”假设在实际应用中暴露出严重问题。在距离传感器较远的区域、被部分遮挡的物体边界、小尺度实例以及语义模糊地带，点云的几何结构本身就具有高度不确定性。现有方法对这些区域与近处清晰区域施加相同的生成约束，导致两个关键后果：
@@ -62,8 +60,6 @@ U4D的核心洞察在于：**将不确定度建模显式嵌入生成框架，以
 更深层的问题是，这些高不确定度区域恰恰是对下游感知任务（如语义分割、目标检测）最具挑战性的部分。如果生成模型不能在这些区域产生足够逼真且稳定的几何结构，那么合成数据对感知模型的训练增益将大打折扣。
 
 U4D的动机正是源于这一观察：**将不确定度建模显式嵌入生成框架，以“由难到易”的策略重建场景**。其核心直觉在于，如果能让模型优先处理最不确定的区域，并将这些区域的精细几何作为结构锚点，再以此为先验补全整个场景，就能在提升局部保真度的同时增强全局一致性。这一思路将不确定度从需要回避的噪声转化为驱动生成的结构先验，从根本上改变了LiDAR场景生成的范式。
-
-
 
 ## 核心方法与创新机理
 
@@ -115,8 +111,6 @@ $$\mathcal{L}_{\mathrm{reg}, i} = \frac{\mathrm{Var}(\alpha_i^s)}{(\mathbb{E}[\a
 
 三个 changed slots 形成递进式协同：不确定度估计为生成提供“难易”先验，两阶段扩散利用该先验优化容量分配，MoST 模块则将这种优化从空间维度扩展到时序维度。Table 4 显示，U4D 生成的数据在 1% 标签的 nuScenes 分割任务上使 MinkUNet 的 mIoU 达到 65.3%，超过 R2DM 的 64.1%；Table 5 表明其使分割模型的预期校准误差（ECE）从 4.57% 降至 2.72%，证明不确定度感知的生成能够有效提升下游模型的置信度校准。
 
-
-
 U4D 的整体设计围绕一个核心洞察展开：**真实 LiDAR 场景中不同空间位置的不确定度天然存在差异**——远距离点、遮挡边界、小物体和语义模糊区域对感知系统构成更大挑战，而现有生成框架（如 **R2DM** (Nakashima & Kurazume, ICRA 2024)、**LiDARGen** (Zyrianov et al., ECCV 2022) 等）对所有区域同等对待，导致高不确定度区域出现几何伪影和时间不稳定。
 
 为解决这一问题，U4D 采用 **“由难到易”（hard-to-easy）的两阶段级联生成范式**，将不确定度建模显式嵌入生成流程，使高不确定度区域成为结构锚点，驱动全局场景的高保真重建。
@@ -147,15 +141,11 @@ U4D 的整体设计围绕一个核心洞察展开：**真实 LiDAR 场景中不�
 
 > **注意**：关于 MoST 模块在网络不同深度的空间/时间偏好分布（近输入输出端侧重空间线索，中间层侧重时间动态）的具体量化分析，原文仅在 Figure 3 的定性描述中提及，需进一步验证其统计显著性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2512_02982/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the U4D framework. U4D generates LiDAR scenes in a “hard-to-easy” manner through two stages. (1) It first estimates spatial uncertainty using a pretrained segmentation model G based on Shannon Entropy, and performs an unconditional diffusion process to reconstruct high-fidelity geometry within the uncertain regions (cf . Sec. 3.1). (2) It then conducts uncertainty-conditioned completion, synthesizing the remaining scene areas guided by the reconstructed structures to ensure global consistency (cf . Sec. 3.2)*
 
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2512_02982/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of the proposed U4D framework for uncertainty-aware LiDAR scene generation. (a) U4D first estimates the spatial uncertainty maps, highlighting regions that are challenging for perception, such as distant or partially occluded objects, smallscale instances, and semantically ambiguous areas. (b) Conditioned on these uncertainty regions, U4D performs scene completion in a “hard-to-easy” manner, progressively reconstructing the entire scene with enhanced fidelity in uncertain regions. (c) The generated uncertainty-aware scenes can further benefit downstream perception tasks by improving robustness and recognition performance*
-
-
 
 U4D 的核心设计围绕三个关键模块展开：空间不确定度估计、由难到易的两阶段扩散生成、以及混合时空（MoST）特征融合。以下逐一拆解其公式与变量含义。
 
@@ -210,13 +200,6 @@ $$\mathbf{F}_i^{\mathrm{fuse}} = \alpha_i^s \odot \mathbf{F}_i^s + \alpha_i^t \o
 $$\mathcal{L}_{\mathrm{reg}, i} = \frac{\mathrm{Var}(\alpha_i^s)}{(\mathbb{E}[\alpha_i^s])^2} + \frac{\mathrm{Var}(\alpha_i^t)}{(\mathbb{E}[\alpha_i^t])^2} \tag{Eq. 9}$$
 
 该正则项鼓励空间与时间权重的均衡使用。消融实验证实，自适应融合搭配权重正则化和随机噪声，在 FRD 和 MMD 指标上均优于仅空间或仅时间分支的固定融合方案（Table 7）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2512_02982/figures/003_Figure_3.jpg]]
-*Figure 3: Illustration of the Mixture of Spatio-Temporal (MoST) block. It decomposes features along spatial and temporal dimensions and adaptively fuses them to maintain both spatial fidelity and temporal coherence. Near the network input and output, MoST emphasizes spatial cues, while in intermediate layers it focuses more on temporal dynamics*
-
-
 
 ## 实验与关键发现
 
@@ -275,27 +258,8 @@ U4D生成的数据对下游语义分割任务具有显著的增强效果。
 
 这些局限为后续研究提供了明确方向：如何将生成跨度扩展至数十帧、如何通过联合学习优化不确定度估计、以及如何在保持生成质量的前提下实现近实时推理。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2512_02982/figures/004_Table_1.jpg]]
 *Table 1: Comparison of state-of-the-art LiDAR scene generation methods on the nuScenes [8] dataset. Metrics marked with ↓ indicate that lower values are better. The MMD scores are reported in units of*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2512_02982/figures/006_Table_2.jpg]]
-*Table 2: Comparison of state-of-the-art LiDAR scene genera-324707 ], "boundingbtion methods on the SemanticKITTI [5] dataset. Metrics marked 9208984, -74.877586364746094, -4.26646566with ↓ indicate that lower values are better. The MMD scores are d_of_view" : 60.0, "froreported in units of 10−4. The best and second-best scores are highlighted in bold and underline, respectively*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2512_02982/figures/007_Table_4.jpg]]
-*Table 4: Comparison of state-of-the-art methods on the downin" : [ -.785427093505859, 79.18359375, 11.9471302stream task of LiDAR semantic segmentation on the val set of the 99121 ], "boundingbox_min" : nuScenes [8] dataset. The voxel- and fusion-based representations are built upon MinkUNet [13] and SPVCNN [91] as backbones, respectively. The mIoU scores are reported in percentage (%). The "lookat" : 64656639099121 ],best and second-best results within each data split and representa-95075 ]"fi ld f i " 60 0tion are highlighted in bold and underline, respectively*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2512_02982/figures/010_Table_5.jpg]]
-*Table 5: Expected calibration error (ECE, the lower the better) of various LiDAR semantic segmentation methods on the validation set of the nuScenes [5] and SemanticKITTI [5] datasets. The ECE scores are reported in percentage (%)*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2512_02982/figures/012_Table_6.jpg]]
-*Table 6: Ablation study on the selection of uncertainty regions on nuScenes [8]. Metrics marked with ↓ indicate that lower values are better. The MMD scores are reported in units of*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2512_02982/figures/011_Table_8.jpg]]
-*Table 8: Ablation study on the efficiency of generative models. The table reports the average inference time per frame (I.T., in seconds). “DM” refers to the diffusion model*
-
-
 
 ## 定位与知识库关联
 
@@ -338,8 +302,6 @@ U4D的有效性依赖于以下前提条件，这些条件也划定了其适用�
 - **长序列生成的稳定性。** 如何将生成跨度扩展至数十帧甚至更长，同时保持物体运动轨迹的物理合理性和场景演化的时间一致性？这可能需要在MoST模块中引入更显式的运动建模或循环一致性约束。
 
 - **域外泛化与稀有事件生成。** 如何提升对训练分布尾部的覆盖能力？可考虑引入检索增强生成（从训练集中检索相似稀有事件作为条件）或物理仿真先验来补充数据驱动建模的不足。
-
-
 
 ## 原文 PDF
 

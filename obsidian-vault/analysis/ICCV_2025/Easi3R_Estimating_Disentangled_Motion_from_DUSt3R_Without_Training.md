@@ -70,8 +70,6 @@ Easi3R是一种**训练无关、即插即用的推理时适配方法**。与需�
 
 Easi3R的改进主要集中在动态区域处理和全局对齐，**无法纠正静态部分的深度预测误差**，因此每视角深度精度仍存在差距。此外，重建结果在动态物体边界附近仍可能出现浮动体（floaters）伪影（Figure 9）。未来工作方向包括：纠正静态部分的逐视角深度预测以弥补深度精度差距，以及进一步减少边界附近的浮动体伪影。
 
-
-
 ### 动态4D重建的核心瓶颈
 
 从单目视频中恢复时空一致的4D表示是计算机视觉的核心挑战之一。近年来，以DUSt3R为代表的静态3D重建方法取得了显著进展，能够从稀疏图像对中直接预测稠密点图。然而，当这些方法被直接应用于包含动态物体的视频时，重建质量会急剧下降——动态物体占据显著画面比例时，跨帧对齐会出现严重退化（Figure 2）。
@@ -92,8 +90,6 @@ Easi3R的核心动机源自一个关键发现：**预训练静态3D模型DUSt3R�
 基于此，Easi3R提出了一条与现有范式截然相反的路径：**无需任何训练，仅通过推理阶段的注意力解耦与重新加权，将静态DUSt3R无缝适配到动态场景**。具体而言，通过聚合解码器中的交叉注意力图，可以提取出具有明确语义的动态注意力模式；利用这些模式进行动态区域分割，并在第二次推理中重新加权注意力分布以隔离动态物体的干扰，从而实现鲁棒的4D重建与相机运动恢复。
 
 这一训练无关的即插即用策略绕过了动态4D数据瓶颈，同时避免了对光流或分割标注的依赖，为静态模型向动态场景的泛化提供了新的思路。
-
-
 
 ## 核心方法与创新机理
 
@@ -129,8 +125,6 @@ $$\mathcal{L}_{\mathrm{flow}} = \sum_{t \in T} \sum_{i \in \varepsilon^{t}} (1 -
 
 这三个changed slots共同构成了一条**因果链条**：注意力图分解（Slot 1）提供动态分割，分割掩码驱动注意力重新加权（Slot 2）以改善成对重建，分割感知的全局对齐（Slot 3）则确保多帧一致性。整个流程无需任何训练数据、微调或额外网络模块，仅通过推理时的注意力操控就实现了从静态3D到动态4D的无缝适配——这正是Easi3R与所有现有方法（MonST3R、DAS3R、CUT3R等）的根本区别。
 
-
-
 Easi3R 提出了一种无需训练的即插即用式4D重建框架，其核心思想是：**预训练静态3D模型DUSt3R的交叉注意力层已经隐含编码了丰富的相机与物体运动信息**，通过对这些注意力图进行解耦与聚合，可以在推理阶段直接实现动态分割与鲁棒的4D重建，无需任何微调或额外数据训练。
 
 ### 输入与输出
@@ -164,8 +158,6 @@ $$\mathrm{softmax}(\tilde{\mathbf{A}}_{l}^{ab}) = \begin{cases} 0 & \mathrm{if~}
 2. **注意力解耦而非显式头**：与 DAS3R 等方法需训练分割头不同，Easi3R 直接从注意力图中提取动态信息，避免了动态数据集的依赖。
 3. **双阶段推理**：第一次推理用于提取注意力图和分割掩码，第二次推理利用掩码进行注意力重新加权，实现运动解耦。
 4. **光流约束为可选模块**：光流损失仅用于全局对齐优化，可在无光流条件下运行，确保与不使用光流的基线公平比较。
-
-
 
 Easi3R 的核心设计围绕一个发现展开：DUSt3R 解码器中的交叉注意力层已隐含编码了丰富的相机与物体运动信息。通过解耦这些注意力图，可以在推理时直接实现动态分割与鲁棒的 4D 重建，无需任何训练。整个流程包含四个关键模块。
 
@@ -223,8 +215,6 @@ $$\mathcal{L}_{\mathrm{flow}} = \sum_{t \in T} \sum_{i \in \varepsilon^{t}} (1 -
 
 其中 $\hat{\mathcal{F}}$ 为从点图投影得到的光流，$\mathcal{F}$ 为真实光流。该损失仅在静态区域 $(1 - \mathbf{M})$ 上约束投影点流与光流一致，确保动态物体不影响全局对齐优化。注意光流约束为可选模块，以保证与不使用光流的基线公平比较。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设计
@@ -257,15 +247,10 @@ Table 3 的全面比较表明，Easi3R 在多数设置下优于所有经过动�
 
 值得注意的是，在静态场景（如 ScanNet）中，Easi3R 同样带来友好提升（Table 9）。Figure 10 揭示了原因：Easi3R 倾向于对静态场景中的低置信度区域进行重新加权，这实际上起到了不确定性感知的注意力校准作用，而非过度分割。
 
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2503_24391/figures/019_Table_9.jpg]]
-*Table 9: Camera Pose Evaluation. We use the evaluation results from CUT3R for baselines*
-
 ### 点云重建
 
 在 DyCheck 数据集上，Easi3R 的点云重建精度和完整性均得到改善。以 DUSt3R 为骨干时，Easi3R_dust3r 的 Accuracy Mean 从 0.772（仅参考视图，无掩码）降至 **0.703**（Ref w/ Mask），降低了 0.069（Table 7 消融）。Table 4 和 Table 5 的完整比较表明，Easi3R 在 Accuracy、Completeness 和 Distance 三项指标上优于多数基线。
 
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2503_24391/figures/007_Table_4.jpg]]
-*Table 4: Benefits of Easi3R on Point Cloud Reconstruction on the DyCheck dataset. The best and second best results are bold and underlined, respectively. Easi3R $\mathrm { d u s t }$ 3 $\mathrm { r } / \mathrm { m o n s t }$ 3 $\mathrm { r }$ denotes the Easi3R experiment with the backbones of MonST3R/DUSt3R
 
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2503_24391/figures/009_Table_5.jpg]]
 *Table 5: Quantitative Comparisons of Point Cloud Reconstruction on the DyCheck dataset. The best and second best results are bold and underlined, respectively*
@@ -293,27 +278,11 @@ Figure 6 的定性比较展示了跨帧全局对齐的静态场景与动态点�
 
 - **深度精度瓶颈**：当骨干网络（DUSt3R/MonST3R）预测的深度不准确时，Easi3R 仍会失败。方法主要改进动态区域处理和全局对齐，未纠正静态部分的深度误差，因此每视角深度精度仍存在明显差距（Table 8 视频深度评估）。
 
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2503_24391/figures/018_Table_8.jpg]]
-*Table 8: Video Depth Evaluation. We use the evaluation results from CUT3R for baselines*
-
 - **边界浮动体伪影**：重建结果在动态物体边界附近仍可能出现浮动体（Figure 9）。虽然 Easi3R 改善了相机位姿和点云对齐（Figure 9 上行），但物体边界处的深度不连续性仍导致漂浮点云碎片。
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2503_24391/figures/016_Figure_9.jpg]]
-*Figure 9: Limitation. We visualize static reconstructions from two different viewpoints in the top and bottom rows. Easi3R improves camera pose estimation and point cloud reconstruction (top row), enhancing alignment in structures like swing supports through attention re-weighting and segmentation-aware global alignment. However, from another viewpoint (bottom row), Easi3R still produces floaters near object boundaries*
 
 - **静态场景中的“动态”掩码**：Easi3R 在静态场景中也会生成掩码（Figure 10），这实际上是低置信度区域的重新加权，虽然对位姿估计有益，但在语义上并非真正的动态分割。
 
 这些局限性指向两个开放问题：如何纠正静态部分的每视角深度预测以弥补深度精度差距，以及如何进一步减少动态物体边界附近的浮动体伪影。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2503_24391/figures/020_Table_10.jpg]]
-*Table 10: Comparisons of Dynamic Object Segmentation on DAVIS with 2D dynamic segmentation methods*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2503_24391/figures/021_Table_11.jpg]]
-*Table 11: More ablations on segmentation quality using DAVIS. * denotes the value used in the submission*
-
-
 
 ## 定位与知识库关联
 
@@ -369,8 +338,6 @@ Easi3R 的适用性受以下条件约束：
 2. **如何进一步减少动态物体边界的浮动体伪影？** 当前二值掩码策略可被替换为软注意力重加权（连续值掩码），但需要研究如何从注意力图中可靠地估计边界过渡区域的权重。
 
 3. **注意力解耦策略能否泛化到其他视觉 backbone？** 当前设计紧密耦合于 DUSt3R 的双分支交叉注意力架构。探索该策略在更通用的 ViT 或多模态模型中的适用性是一个有价值的方向。
-
-
 
 ## 原文 PDF
 

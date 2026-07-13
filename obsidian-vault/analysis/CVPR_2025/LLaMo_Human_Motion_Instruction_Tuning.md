@@ -62,8 +62,6 @@ LLaMo 属于**多模态大语言模型（MLLM）在人体运动理解领域**的
 **局限与展望**
 当前跨模态融合技术仍需细化以适应更复杂的真实环境，计算效率尚不足以支持实时应用。在部分重复动作计数指标上未能全面超越专用模型，表明时序精细计数仍有提升空间。未来可探索向医疗康复、虚拟人交互等领域的扩展。
 
-
-
 ### 人体运动理解的模态鸿沟
 
 理解视频中的人体行为是计算机视觉的核心任务之一，涉及动作识别、时序定位、运动生成等多个子方向。近年来，大语言模型（LLM）在自然语言处理领域取得的突破，催生了一系列将视觉信息引入LLM的多模态方法。然而，在人体运动这一特定领域，现有方案普遍面临一个根本性瓶颈：**运动数据的表示方式与LLM的文本处理范式之间存在不可调和的模态鸿沟**。
@@ -89,8 +87,6 @@ LLaMo 属于**多模态大语言模型（MLLM）在人体运动理解领域**的
 - **运动估计器与特征增强器**：支持视频和运动数据的直接输入，当仅有视频时可通过运动估计器提取运动信息，确保模型在多种输入条件下均能保持对运动细节的感知能力。
 
 这种设计使LLaMo能够在保留运动时空细节的前提下，将有效序列长度从 $T$ 压缩至 $K$（$K \ll T$），将自注意力复杂度降至 $O((L_T+K)^2)$，从而在**细粒度运动理解与计算效率之间取得平衡**。
-
-
 
 ## 核心方法与创新机理
 
@@ -124,8 +120,6 @@ LLaMo 提出了 **Cross Talker 模块**，实现文本引导的自适应关键�
 - 在 **BABEL-QA** 上，LLaMo 以 0.458 的整体得分取得最高（[Table 2]）。
 - 在 **专业挥杆数据集** 上，LLaMo 的综合准确率达 24.80，大幅领先 MotionLLM 的 16.53（+8.27）（[Table 3]），证明其对复杂专业动作的细粒度理解能力。
 - 在 **Mo-RepCount** 的 OBZ 指标上，LLaMo 达到 0.222，超越所有专用计数模型（如 **EScounts**（Sinha et al., arXiv 2024）的 0.198），显示出原生运动表示在捕捉细粒度运动特征上的独特优势（[Table 4]）。
-
-
 
 LLaMo 的整体设计围绕一个核心洞察展开：**保留原始运动数据作为连续特征而非将其离散化为语言 token，能够更精准地捕捉人类动作的时空动态细节**。为此，LLaMo 将运动数据作为独立模态直接输入大语言模型（LLM），并通过三个协同模块构建起从多模态感知到行为语言生成的端到端流水线（Figure 2）。
 
@@ -206,12 +200,8 @@ $$L = -\frac{1}{N}\sum_{i=1}^N \sum_{t=1}^{L^{(i)}} \log p(\hat{y}_t^{(i)} \mid 
 - **计算效率**：文本引导的关键帧选择机制大幅压缩序列长度，降低自注意力计算开销。
 - **多模态兼容**：同时支持视频和运动数据的直接输入，并通过运动估计器覆盖无运动数据的场景。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1860_LLaMo_Human_Motion_Instruction_Tuning/figures/001_Figure_1.jpg]]
 *Figure 1: A comparison of MotionLLM [1], MotionGPT [2], and LLaMo highlights LLaMo’s motion-specific capabilities. Equipped with a Motion Enhancer and Cross Talker module to align motion and text, LLaMo supports both video and motion inputs, enabling text-aware, fine-grained motion analysis*
-
-
 
 LLaMo 的核心架构由三个模块串联构成（Figure 2）：**多模态特征提取模块**、**Cross Talker 模块**和**行为生成模块**。其中，Cross Talker 是实现文本引导运动细粒度理解的关键创新。
 
@@ -280,8 +270,6 @@ $$L = -\frac{1}{N}\sum_{i=1}^N \sum_{t=1}^{L^{(i)}} \log p(\hat{y}_t^{(i)} \mid 
 
 LLaMo 的核心技术决策在于**保留运动数据的连续原生表示**，而非将其离散化为语言 token。Cross Talker 通过文本感知的帧选择实现计算压缩，同时借助自适应局部窗口和双向跨模态注意力，确保压缩过程不丢失对细粒度时空动态的敏感性。这一设计在专业挥杆分析（All Score 24.80 vs. MotionLLM 16.53）和重复动作计数（OBZ 0.222 vs. 最佳专用模型 0.198）等运动密集型任务上得到了充分验证。
 
-
-
 ## 实验与关键发现
 
 ### 主要实验结果
@@ -314,9 +302,6 @@ LLaMo在多个基准上进行了系统评估，涵盖通用人体活动理解、
 - **Table 3**：专业挥杆数据集上对MotionLLM的大幅领先（+8.27）是细粒度运动理解能力的最有力证据。
 - **Table 4**：OBZ指标超越专用模型，表明LLaMo在捕捉运动细节方面具有独特优势，但其他指标上的差距也揭示了时序精度的局限性。
 
-![[assets/figures/papers/paper_list_l1860_LLaMo_Human_Motion_Instruction_Tuning/figures/007_Figure_4.jpg]]
-*Figure 4: Example outputs from LLaMo across human activities and professional sports, showcasing its reasoning capabilities and domainspecific knowledge in motion-intensive scenarios*
-
 ![[assets/figures/papers/paper_list_l1860_LLaMo_Human_Motion_Instruction_Tuning/figures/008_Table_2.jpg]]
 *Table 2: Comparison on BABEL-QA dataset. Higher scores indicate better performance*
 
@@ -325,8 +310,6 @@ LLaMo在多个基准上进行了系统评估，涵盖通用人体活动理解、
 
 ![[assets/figures/papers/paper_list_l1860_LLaMo_Human_Motion_Instruction_Tuning/figures/010_Table_4.jpg]]
 *Table 4: Motion and video details capture evaluation on Mo-RepCount*
-
-
 
 ## 定位与知识库关联
 
@@ -372,8 +355,6 @@ LLaMo 的知识贡献集中在三个相互关联的技术决策上：
 2. **效率优化**：如何进一步压缩关键帧选择与跨模态融合的计算开销，以满足实时应用（如在线体育教学反馈）的延迟要求？
 3. **单模态鲁棒性**：在仅有运动数据而无视频输入的条件下，模型能否保持同等的细粒度理解能力？这直接关系到该方法在无摄像头场景（如可穿戴传感器）中的适用性。
 4. **更复杂行为的理解**：当前方法主要处理单人动作，如何扩展到多人交互、群体行为等更复杂的运动场景？
-
-
 
 ## 原文 PDF
 

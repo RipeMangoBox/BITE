@@ -52,8 +52,6 @@ SCube 提出 **VoxSplat** 表示——以稀疏体素层级作为几何支架，
 
 SCube 将方法定位于 **前馈式大规模场景重建** 与 **生成式三维先验学习** 的交叉点。其 VoxSplat 表示继承了体素网格的结构化优势（适合扩散生成与稀疏卷积），又保留了高斯溅射的渲染效率与外观表现力。相比基于 NeRF 的隐式表示，SCube 具备显式、可编辑的几何；相比无结构的 3D Gaussians，SCube 提供了规则化的几何支架，使生成模型能够有效学习场景布局与语义。这一设计使其在重建速度（单场景 < 20 秒）、几何精度与渲染质量三个维度上同时取得突破，并为 LiDAR 仿真、文本到场景生成等下游应用提供了统一的三维基础。
 
-
-
 大规模场景的三维重建是计算机视觉中的核心问题，在自动驾驶、机器人导航和虚拟现实等应用中至关重要。传统方法依赖运动恢复结构（SfM）和多视图立体（MVS）等几何技术，通过密集的图像重叠区域来恢复场景结构。然而，现实应用中的输入图像往往极为稀疏且几乎没有重叠区域——例如自动驾驶场景中仅使用三个前向摄像头拍摄的图像——这使得基于几何匹配的传统方法难以奏效。
 
 近年来，基于神经网络的三维重建方法取得了显著进展。以NeRF为代表的可微分渲染框架通过每场景优化实现了高质量的新视图合成，但其优化过程耗时且无法利用跨场景的数据先验。前馈式方法（如**PixelNeRF**（Yu et al., CVPR 2021）和**PixelSplat**）试图通过端到端网络直接从稀疏图像预测三维表示，从而避免逐场景优化。然而，这些方法通常面临以下瓶颈：
@@ -67,8 +65,6 @@ SCube 将方法定位于 **前馈式大规模场景重建** 与 **生成式三�
 核心矛盾在于：**如何在极稀疏、低重叠的输入条件下，快速生成几何一致、外观锐利的大规模三维场景？** 这要求模型能够从数据中学得强先验知识，以弥补输入信息的不足。
 
 SCube正是针对这一缺口而提出。其核心思想是将生成式几何重建与前馈外观预测分离：利用稀疏体素层级结构作为几何支架，通过条件扩散模型从数据中学习大规模场景的几何先验，再通过前馈网络在体素支架上附着高斯溅射来预测外观。这种解耦设计使得模型能够从仅有的3张无重叠输入图像中，在20秒内重建出包含数百万个高斯溅射的完整三维场景，同时支持新视图合成和LiDAR仿真等下游任务。
-
-
 
 ## 核心方法与创新机理
 
@@ -116,8 +112,6 @@ SCube的核心突破在于将**生成式几何重建**与**前馈外观预测**�
 
 这些创新使SCube在Waymo Open Dataset上全面超越PixelNeRF、PixelSplat、MVSplat等baseline，重建帧PSNR达25.90（+3.75 vs PixelSplat），LPIPS降至0.45（-0.16 vs PixelSplat）（Table 1）。
 
-
-
 SCube 采用“先几何、后外观”的两阶段前馈重建范式，将极稀疏（甚至无重叠）的输入图像转化为以 **VoxSplat** 表示的大规模三维场景。其核心思想是将生成式几何重建与前馈外观预测解耦：第一阶段利用数据驱动的场景先验生成稀疏体素几何支架，第二阶段在该支架上附着高斯溅射并预测天空背景，从而实现几何一致、外观锐利的完整场景重建。
 
 ### 概率化流程
@@ -160,8 +154,6 @@ $$p(\mathcal{G}, \hat{A} \mid \mathcal{T}) = p(A \mid \mathcal{G}, \mathcal{T})\
 
 ![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2410_20030/figures/002_Figure_2.jpg]]
 *Figure 2: Framework. SCube consists of two stages: (1) We reconstruct a sparse voxel grid with semantic logit conditioned on the input images using a conditional latent diffusion model based on XCube [39]. (2) We predict the appearance of the scene represented as VoxSplats and a sky panorama using a feedforward network. Our method allows us to synthesize novel views in a fast and accurate manner, along with many other applications*
-
-
 
 SCube 将稀疏视图重建分解为两个解耦阶段：**几何重建**与**外观预测**，对应概率分解 $p(\mathcal{G}, \hat{A} | \mathcal{T}) = p(A | \mathcal{G}, \mathcal{T}) \, p(\mathcal{G} | \mathcal{T})$。以下逐一拆解各核心模块及其关键公式。
 
@@ -236,8 +228,6 @@ $$
 ### 3.6 可选 GAN 后处理
 
 为减少体素化伪影，可附加一个轻量 GAN 对渲染图像进行细化（§3.3），但需每场景约 20 分钟独立训练，影响推理效率。该模块为可选组件，SCube 基础版本不依赖此后处理即可取得有竞争力的结果。
-
-
 
 ## 实验与关键发现
 
@@ -341,27 +331,6 @@ Table 4显示，为PixelSplat添加深度监督后性能反而下降，说明直
 ![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2410_20030/figures/013_Table_4.jpg]]
 *Table 4: Comparison of PixelSplat and PixelSplat with Depth Supervision*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2410_20030/figures/022_Figure_11.jpg]]
-*Figure 11: More Text-2-Scene Generation. The generated multi-view images may contain flaws, while SCube is still able to reconstruct the 3D scenes*
-
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2410_20030/figures/023_Figure_12.jpg]]
-*Figure 12: A suburban neighborhood features a park with green trees, residential houses with red-tiled roofs, streets with bike lane signs and white markings, well-maintained lawns, and sidewalks. Figure 12: More Text-2-Scene Generation*
-
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2410_20030/figures/014_Table_5.jpg]]
-*Table 5: Hyperparameters for VAE*
-
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2410_20030/figures/015_Table_6.jpg]]
-*Table 6: Hyperparameters for voxel latent diffusion models*
-
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2410_20030/figures/016_Table_7.jpg]]
-*Table 7: Hyperparameters for 3D sparse UNet in appearance reconstruction stage*
-
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2410_20030/figures/017_Table.jpg]]
-
-
-
 ## 定位与知识库关联
 
 ### 核心差异与因果机制
@@ -404,8 +373,6 @@ SCube 与现有方法的关键分水岭在于**是否利用数据驱动的三维
 3. **遮挡区域外观补全**：当前方法对严重遮挡区域的外观预测质量有限。引入更强的生成先验（如视频扩散模型）可能是一个方向。
 4. **端到端可控生成**：Figure 7 展示了文本到场景的初步能力，但流程是分离的（先生成多视图图像，再重建）。实现端到端的可控生成需要将文本条件直接注入几何和外观两个阶段。
 5. **高阶外观建模**：引入更高阶球谐系数或小型 MLP 解码器来支持视角相关效果，同时保持前馈推理效率，是一个工程上可行的改进方向。
-
-
 
 ## 原文 PDF
 

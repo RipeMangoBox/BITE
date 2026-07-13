@@ -51,8 +51,6 @@ SocialNav 提出了一套分层脑-行动基础模型架构，将社交规范注
 
 实验结果表明，SocialNav 在闭环 SocNav 基准上相较 SOTA 方法 CityWalker 成功率提升 **+38%**（86.1 vs 47.8），社交合规率提升 **+46%**（DCR 82.5 vs 36.1）；在真实世界部署中平均成功率亦领先 **+22.5%**（85.0 vs 62.5）。消融研究进一步证实，认知先验与 SAFE-GRPO 的组合是实现高社交合规性的关键——移除认知先验后，强化学习反而会恶化社交指标。
 
-
-
 ### 问题背景：具身导航中的社会规范盲区
 
 具身导航（Embodied Navigation）是机器人自主性的核心能力之一，要求智能体在真实环境中从当前位置安全、高效地抵达目标点。近年来，基于模仿学习（Imitation Learning, IL）的点目标导航（Point-Goal Navigation）方法取得了显著进展，代表性工作包括 **GNM**、**ViNT**、**NoMaD** 和 **CityWalker** 等。这些方法通过从大规模专家轨迹中学习映射函数，能够在多样化的室内外场景中生成几何意义上最短或最优的路径。
@@ -80,8 +78,6 @@ SocialNav 的设计围绕三个关键认知展开：
 ### 关键证据预览
 
 SocialNav 在多个维度上验证了上述动机的有效性。在闭环 SocNav Benchmark 上，SocialNav 相比 SOTA 方法 **CityWalker** 实现了 **+38% 的成功率提升**和 **+46% 的社交合规率提升**（DCR 从 36.1 提升至 82.5）。消融实验进一步揭示了核心洞察：**在缺乏认知先验（Cognitive Activation Dataset, D_cog）的情况下直接应用 SAFE-GRPO 强化学习，反而会损害社交指标**（DCR 下降 1.7，TCR 下降 1.3）；只有当 VLM 提供的认知先验与社交合规奖励共同作用时，才能获得最佳的社交合规表现。这有力地证明了“理解场景语义”与“奖励驱动对齐”两者缺一不可——正是这一组合机制使 SocialNav 超越了模仿学习的表面复现，实现了对社会规范的因果性内化。
-
-
 
 ## 核心方法与创新机理
 
@@ -122,8 +118,6 @@ SocialNav 的三阶段训练策略解决了这一矛盾：
 
 SocialNav 的三个 changed slots 形成了一条因果链：VLM 提供社交语义理解（**知道什么是对的**），流匹配生成多模态候选（**能够做到对的**），SAFE-GRPO 通过奖励机制将对的行为固化为策略（**愿意做对的**）。这一设计使得 SocialNav 在 SocNav 闭环基准上相比 CityWalker 实现成功率 +38.3%、社交合规率 +46.4% 的跃升，并在真实世界部署中保持 85% 的平均成功率。
 
-
-
 SocialNav 采用**分层脑-行动架构（hierarchical brain-action architecture）**，将高层语义推理与底层轨迹生成解耦，如图 Figure 3 所示。该架构由两个核心模块串联构成：
 
 ![[assets/figures/papers/paper_list_l2095_https_arxiv_org_abs_2511_21135/figures/003_Figure_3.jpg]]
@@ -146,13 +140,6 @@ $$\mathbf{Z}_{\mathrm{VLM}} = \pi_{\mathrm{VLM}}(\mathcal{O}_{t-n:t}, P_{t-n:t},
 
 ![[assets/figures/papers/paper_list_l2095_https_arxiv_org_abs_2511_21135/figures/013_Table_5.jpg]]
 *Table 5: Model Architecture and Parameters*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2095_https_arxiv_org_abs_2511_21135/figures/001_Figure_1.jpg]]
-*Figure 1: Socially-Aware Navigation in Real-World Environments. SocialNav combines high-level semantic reasoning with low-level trajectory generation. It identifies socially traversable zones and generates CoT explanations, planning routes that respect social norms*
-
-
 
 ### 问题形式化
 
@@ -202,16 +189,6 @@ $$\mathrm{DCR} = \begin{cases} \frac{d_{\mathrm{compliant}}}{d_{\mathrm{actual}}
 
 其中 $s=1$ 表示任务成功，$d_{\mathrm{compliant}}$ 为合规区域内的行进距离，$d_{\mathrm{actual}}$ 为实际总行进距离。类似地，时间合规率（TCR）从时间维度度量社交规范的遵守程度。这两个度量共同构成了 SocNav 基准的社交合规评估体系，与传统的成功率（SR）和路径长度加权成功率（SPL）形成互补。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2095_https_arxiv_org_abs_2511_21135/figures/012_Figure_8.jpg]]
-*Figure 8: Example of a navigation chain-of-thought (CoT) in an unseen crossing scenario. Given the historical observations (left) and a goal in the forward-right direction, the Brain Module generates a structured CoT (right). The CoT demonstrates hierarchical decisionmaking, prioritizing Safety (no jaywalking) and Social Compliance (using the crosswalk) over direct path efficiency*
-
-![[assets/figures/papers/paper_list_l2095_https_arxiv_org_abs_2511_21135/figures/010_Figure_6.jpg]]
-*Figure 6: Predicted socially traversable regions on unseen scenes. Green polygons denote predicted socially traversable regions, and red arrows highlight areas incorrectly classified as traversable. SocialNav yields more semantically aligned polygons in both domains*
-
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -234,15 +211,9 @@ SocialNav 的脑模块采用 **Qwen2.5-VL (3B)**，行动专家为 12 层、12 �
 
 定性对比（Figure 4）直观展示了这一差异：在路口、公园、校园三个场景中，SocialNav（绿色轨迹）始终保持在人行道和步道上，而 CityWalker（红色轨迹）频繁穿越车道、干涸河床、草坪等禁行区域，甚至撞向玻璃幕墙或树木。
 
-![[assets/figures/papers/paper_list_l2095_https_arxiv_org_abs_2511_21135/figures/006_Figure_4.jpg]]
-*Figure 4: Qualitative comparison on the SocNav Benchmark. We visualize representative trajectories in three scenes (Crossing, Park, Campus). The left column shows top-down path views with our method (green) and the CityWalker baseline (red), where warning signs mark unsafe or socially improper behaviors. The right columns depict corresponding egocentric views: SocialNav remains on sidewalks and walkways, while the baseline often takes shorter but socially risky routes through restricted regions (such as driveways, dry streambeds, lawns, and green belts) or crashes into obstacles like glass walls and trees*
-
 ### 真实世界部署
 
 在街道、公园、校园三类真实环境中部署于 Unitree Go2 机器人，SocialNav 平均成功率达 **85.0%**，较 CityWalker 的 62.5% 提升 +22.5 个百分点（Table 3）。机器人成功遵循人行道、避让草坪和车道、尊重行人流向，验证了仿真到真实的有效迁移。
-
-![[assets/figures/papers/paper_list_l2095_https_arxiv_org_abs_2511_21135/figures/007_Table_3.jpg]]
-*Table 3: Real-world Results. Comparison of success rates across different real-world environments*
 
 ### 消融研究：数据组成与训练阶段
 
@@ -259,19 +230,12 @@ Table 4 揭示了各组件对性能的因果贡献：
 
 Table 8 对 SAFE-GRPO 的四个奖励项逐一消融。社交合规奖励 $\mathcal{R}_{\mathrm{social}}$ 的移除导致 DCR 和 TCR 出现最大幅度下降，确认其是社交行为对齐的核心驱动项。专家一致性奖励 $\mathcal{R}_{\mathrm{expert}}$ 主要影响 SR 和 RC，平滑性奖励 $\mathcal{R}_{\mathrm{smooth}}$ 和效率奖励 $\mathcal{R}_{\mathrm{eff}}$ 的移除则主要影响 SPL 和轨迹质量。
 
-![[assets/figures/papers/paper_list_l2095_https_arxiv_org_abs_2511_21135/figures/016_Table_8.jpg]]
-*Table 8: Ablation on SAFE-GRPO reward components on the SocNav Benchmark. We deactivate each reward term in turn by setting its weight to zero. Checkmarks indicate that the reward is used*
-
 ### 失败模式与局限
 
 强化学习阶段在提升社交合规性的同时轻微牺牲路径效率（SPL 从 79.4 降至 77.4），体现了直接性与社交规范遵守之间的固有张力。在高度动态、多人交互场景中，当前 VLM 推理的上下文窗口有限，可能导致对行人意图的误判。此外，RL 奖励信号依赖预定义的社交可穿越区域图，对未建模的社会约定（如礼仪性避让）泛化能力不足。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2095_https_arxiv_org_abs_2511_21135/figures/018_Figure_9.jpg]]
 *Figure 9: Real-world deployment visualizations. Third-person views of the Unitree Go2 robot navigating in street, park, and campus environments. SocialNav successfully follows sidewalks, avoids stepping onto lawns or driveways, respects pedestrian flows*
-
-
 
 ## 定位与知识库关联
 
@@ -304,8 +268,6 @@ SocialNav 的适用边界受以下因素制约：
 2. **VLM 驱动的自适应奖励**：如何整合视觉语言模型以提供更丰富、自适应的奖励信号？现有社交合规奖励 $\mathcal{R}_{\mathrm{social}}$ 基于预定义的距离变换图，若能利用 VLM 在线评估轨迹的社会合理性，可实现更强的以人为本对齐。
 
 此外，从方法谱系角度看，SocialNav 开创了“VLM 认知先验 + 流式 RL 对齐”的范式，后续工作可沿以下路径延伸：（1）将 Brain Module 升级为更强的 VLM 或引入多模态社会线索（如行人意图预测）；（2）设计更细粒度的社交奖励组件，解耦不同类型的规范违反；（3）探索离线 RL 或偏好对齐方法以降低在线探索的安全风险。
-
-
 
 ## 原文 PDF
 

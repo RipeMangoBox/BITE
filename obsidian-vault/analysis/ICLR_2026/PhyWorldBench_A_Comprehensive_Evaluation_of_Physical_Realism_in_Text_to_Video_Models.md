@@ -48,8 +48,6 @@ claims:
 
 实验基于12,600段生成视频，对10个代表性T2V模型（包括专有模型Pika 2.0、Sora、Kling等和开源模型Wanx-2.1、Hunyuan等）进行了人工与自动评估。**核心结论**如下：1）所有模型在从基础物理到复合物理再到反物理的类别中，性能均呈现显著下降趋势，表明模型对复杂或反直觉物理现象的理解极为薄弱。2）Pika 2.0在整体成功率上以0.262领先，Wanx-2.1在开源模型中表现最佳，但所有模型的绝对成功率均较低，说明物理模拟能力仍有巨大提升空间。3）提示词设计是关键的可操作变量：在提示词中显式添加物理描述（Physics-Enhanced Prompt）通常能提升模型的物理遵循能力，而增加叙事细节（Detailed Narrative Prompt）并不必然带来改进。4）CAP评估器在物理常识（PC）评估上达到75.1的ROC-AUC，显著优于标准GPT-o1（61.6），而移除上下文信息或链式思维均会导致性能下降。5）模型在处理突然的视觉变化（如碰撞、破碎）时表现挣扎，整体成功率仅22.1%，远低于缓和提示词下的42.1%，且场景复杂度越高，物理失败率越高。
 
-
-
 当前文本到视频（T2V）生成模型在视觉保真度上取得了显著进展，但在模拟真实世界物理规律方面存在根本性缺陷。模型倾向于生成视觉上吸引人但物理上不合理的视频，常见问题包括物体穿透、违反重力、能量不守恒等。这一瓶颈的根源在于现有模型架构缺乏物理先验知识，其训练数据（如 WebVid、Panda70M 等大规模网络爬取数据集）主要由日常场景主导，导致模型在抽象或多对象交互场景中性能骤降。此外，基于 MLLM 的提示词提取过程虽然能捕获主要物体和事件，但常常遗漏细粒度的物理动态信息。
 
 现有物理评估基准（如 VideoPhy、PhyGenBench、Physics-IQ、T2VPhysBench）在覆盖范围上存在明显缺口：它们要么只覆盖少量物理类别（如 VideoPhy 仅 5 个类别、688 个提示词），要么仅评估语义一致性（SA）而忽略物理常识（PC）。更重要的是，这些基准缺乏对模型是否真正“理解”物理规律的检验——模型可能只是复现训练数据中的常见模式，而非进行物理推理。
@@ -57,8 +55,6 @@ claims:
 本文提出的 PhyWorldBench 针对上述缺口进行了系统性改进。其核心动机是构建一个大规模、多维度的物理真实性评估框架，具体通过三个关键设计来诊断模型的物理理解能力：第一，覆盖 50 个物理子类别、1050 个提示词，远超前人基准的规模；第二，引入新颖的“反物理”（Anti-Physics）类别，即提示词故意违反现实世界物理规律，以此压力测试模型是否真正具备物理常识而非机械记忆；第三，提出上下文感知提示（Context-Aware Prompt, CAP）策略，通过先告知多模态大语言模型（MLLM）视频是 AI 生成的，再让其进行链式思维（CoT）推理，从而显著提升零样本物理评估的准确性（PC 评估的 ROC-AUC 从标准 GPT-o1 的 61.6 提升至 CAP 的 75.1）。
 
 该工作的因果洞察在于：提示词设计（Prompt Design）是影响模型物理真实性的关键可操作变量。具体而言，显式加入物理相关描述（Physics-Enhanced Prompt）能显著提升模型遵循物理规律的能力，而仅仅增加叙事细节（Detailed Narrative Prompt）则不一定带来改进。这一发现为后续模型优化提供了明确的干预方向。
-
-
 
 ## 核心方法与创新机理
 
@@ -72,8 +68,6 @@ PhyWorldBench 的核心创新并非提出新的生成模型，而是系统性地
 
 此外，**提示词设计作为因果旋钮**的实验发现具有重要实践意义：显式添加物理描述的提示词（Physics-Enhanced Prompt）通常能提高模型的物理遵循能力，而仅仅增加叙事细节（Detailed Narrative Prompt）不一定带来改进。这表明模型对提示词中物理相关信息的编码方式与对叙事细节的编码方式存在本质差异，为未来提示词工程提供了明确方向。
 
-
-
 ![[assets/figures/papers/iclr26_0001_rlZeILv3fm_PhyWorldBench_A_Comprehensive_Evaluation_of_Phys/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of PhyWorldBench. The benchmark follows a structured design, starting with 10 main physics categories, derived from physics literature and expert consultations. Each category is divided into 5 subcategories, capturing different aspects. Under each subcategory, 7 scenarios are created, with 3 prompt variations per scenario to provide varying levels of detail and complexity. The figure presents the benchmark structure, showcasing the 10 main categories and their corresponding 5 subcategories*
 
@@ -86,8 +80,6 @@ PhyWorldBench 是一个系统化设计的文本到视频生成模型物理真实
 **MLLM 零样本评估模块**（Context-Aware Prompt, CAP）是框架的核心创新。CAP 采用两步链式思维（Chain-of-Thought, CoT）提示策略：首先要求 MLLM 描述视频内容，然后推理其中可能存在的物理问题。关键区别在于，在提示词中显式告知 MLLM 该视频是 AI 生成的而非真实世界视频。这一上下文感知设计显著提升了评估准确性——在物理常识（PC）评估上，CAP 达到了 75.1 的 ROC-AUC，而标准 GPT-o1 仅为 61.6，绝对提升 13.5 个百分点。消融实验表明，移除 CoT 会导致 SA 从 80.3 降至 76.3，PC 从 75.1 降至 73.6；而移除上下文提示（不告知视频是 AI 生成的）则使 PC 从 75.1 骤降至 65.6，说明“告知 AI 生成”这一上下文信息是提升评估精度的关键因素。
 
 三个模块之间的数据流关系为：物理类别定义 → 提示词生成 → 视频生成 → 人工标注（构建地面真实）→ CAP 评估器训练/验证 → 模型排行榜输出。框架同时评估语义一致性（SA，衡量字幕与视频帧的对齐程度）和物理常识（PC，衡量动作是否遵循真实世界物理规律）两个维度，最终以两者同时满足（Both）作为综合成功率指标。在评估的 10 个模型中，Pika 2.0 以 0.262 的成功率取得最佳整体性能，Wanx-2.1 在开源模型中表现最优。所有模型均呈现从基础物理到复合物理再到反物理类别性能递减的趋势，且在处理突然视觉变化（如碰撞、破碎）时表现尤为挣扎（整体成功率仅 22.1%，而使用缓和提示词时成功率为 42.1%）。
-
-
 
 **PhyWorldBench 基准结构**
 
@@ -122,8 +114,6 @@ CAP 方法的核心在于通过“上下文感知”和“链式思维”两个�
 **反物理类别 (Anti-Physics Category)**
 
 为了进行压力测试，基准引入了一个新颖的“反物理”类别。该类别下的提示词故意设计为违反现实世界的物理规律（例如“雨滴从地面落回天空”）。这个模块旨在检验模型是否真正理解了物理规律，而不仅仅是复现训练数据中的常见模式。实验结果表明（Table 3），所有模型在从“基础物理”到“复合物理”再到“反物理”的类别中，性能均呈现显著的下降趋势。
-
-
 
 ## 实验与关键发现
 
@@ -161,8 +151,6 @@ PhyWorldBench 对 10 个文本到视频模型（5 个专有、5 个开源）在 
 
 表 8 显示，相同架构下，模型规模增大（如 Cosmos 14B vs 7B）会带来物理性能的轻微提升（SA: 0.333 vs 0.323），但提升幅度有限，说明仅靠扩大参数规模无法解决物理推理的根本缺陷。公平性方面，人类评估者被明确指示仅关注物理合理性，但 CAP 评估器对视觉风格更精致的视频有轻微偏好，这导致 Kling 在 CAP 排行榜上排名第二，但在人类评估中排名低于 Sora。这一偏差需要在未来工作中加以解决。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0001_rlZeILv3fm_PhyWorldBench_A_Comprehensive_Evaluation_of_Phys/figures/005_Table_1.jpg]]
 *Table 1: Statistical Comparison with Existing Physics-Focused T2V Benchmarks. Compared to prior benchmarks, PhyWorldBench offers a significantly larger and more diverse testbed for evaluating the physical commonsense capabilities of T2V models. It provides a broader coverage of physics categories and a greater number of prompts, ensuring a comprehensive assessment of T2V performance*
 
@@ -171,8 +159,6 @@ PhyWorldBench 对 10 个文本到视频模型（5 个专有、5 个开源）在 
 
 ![[assets/figures/papers/iclr26_0001_rlZeILv3fm_PhyWorldBench_A_Comprehensive_Evaluation_of_Phys/figures/012_Table_5.jpg]]
 *Table 5: Precision and Recall for automatic evaluation methods and ablation on CAP, together with ROC-AUC from the submission*
-
-
 
 ## 定位与知识库关联
 
@@ -185,8 +171,6 @@ PhyWorldBench 的定位并非提出新的生成模型，而是构建一个结构
 **适用边界与局限。** PhyWorldBench 的适用边界由三个关键因素决定。第一，覆盖范围虽广但仍非穷尽，可能遗漏某些边缘或新兴物理现象。第二，CAP 评估器虽有效，但实验发现其对视觉更精致的视频存在轻微偏好——这导致在排行榜上 Kling 在 CAP 评估中排名第二，但在人类评估中排名低于 Sora（Table 15），表明评估器无法完全解耦视觉风格与物理正确性。第三，人工评估虽可靠但成本高昂，难以大规模扩展。这些局限共同指向一个核心瓶颈：当前评估范式依赖于外部 MLLM 或人工判断，缺乏内置于生成模型的物理先验。
 
 **开放问题与知识库定位。** 基于实证结果，三个开放问题尤为突出。其一，如何设计模型架构以显式融入物理先验知识？当前架构强调短时帧连贯性而缺乏物理先验（见部分 O 的分析），导致在突然视觉变化（如碰撞、破碎）上整体成功率仅 22.1%，而使用缓和提示词时为 42.1%（Table 16）。其二，如何改进视频字幕生成以捕获细粒度物理动态？MLLM 基于的提示词提取虽能捕获主要对象和事件，但常规性遗漏精细物理动态（部分 O）。其三，如何在保持电影级视觉美感的同时确保物理合理性？当前模型在视觉吸引力与物理准确性之间存在权衡。PhyWorldBench 作为知识库的定位是：提供了一个可复现的、多层次的物理评估框架，但其自身不解决生成模型的根本缺陷，而是为后续的物理推理导向生成系统提供诊断工具。
-
-
 
 ## 原文 PDF
 

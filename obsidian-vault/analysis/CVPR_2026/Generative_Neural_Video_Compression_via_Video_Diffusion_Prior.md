@@ -84,8 +84,6 @@ GNVC-VD 属于**生成式神经视频压缩**范畴，其方法谱系定位如�
 
 GNVC-VD 的主要局限在于**模型规模巨大**（总参数量约 23 亿，其中 VideoDiT 占 21.5 亿），导致解码延迟高（1920×1080 分辨率下约 1557 ms），难以满足实时应用需求。此外，当前仅验证了较短视频片段（最大 GOP 25 帧）的性能，对更长序列或流媒体场景的扩展性尚待探索。未来方向包括：提升上下文变换编码效率、加速扩散优化过程、扩展至长视频场景，以及探索更有效的压缩域特征注入机制。
 
-
-
 ### 视频压缩的感知质量瓶颈
 
 传统视频编码标准（如 **HEVC** (Sullivan et al., IEEE TCSVT 2012)、**VVC**）和学习型神经编解码器（如 **DCVC-FM** (Li et al., CVPR 2024)、**DCVC-RT** (Li et al., NeurIPS 2021)）在极低码率（< 0.03 bpp）下均会产生模糊的重建帧，丢失精细纹理。为突破这一限制，近期工作开始引入生成式先验：**PLVC** (Yang et al., IJCAI 2022) 采用 GAN 进行后处理增强，**GLC-Video** (Qi et al., IEEE TCSVT 2025) 则利用预训练图像扩散模型（如 Stable Diffusion）对解码帧进行逐帧增强。
@@ -102,8 +100,6 @@ GNVC-VD 的主要局限在于**模型规模巨大**（总参数量约 23 亿，�
 上述分析揭示了一个关键洞察：**视频压缩的解码过程不应被建模为独立的逐帧重建，而应被重新定义为基于视频扩散模型的序列级条件去噪**。视频扩散模型（Video Diffusion Transformer, VideoDiT）在预训练过程中学习了丰富的时空表示，能够编码物体运动、纹理演化和场景连续性——这些正是图像先验所缺失的。
 
 基于此，本文提出 **GNVC-VD**——首个利用视频原生扩散模型实现序列级潜在压缩与优化的生成式神经视频压缩框架。其核心思路是：将解码后的时空潜在变量作为部分带噪状态，通过流匹配（Flow Matching）机制在 VideoDiT 的去噪过程中进行联合优化，从而恢复跨帧一致的精细纹理，从根本上解决时序闪烁问题。
-
-
 
 ## 核心方法与创新机理
 
@@ -141,8 +137,6 @@ GNVC-VD 采用两阶段训练策略来有效对齐压缩编码器与扩散先验
 ### 小结
 
 GNVC-VD 通过三个关键设计——视频原生扩散先验、压缩感知部分噪声初始化、序列级联合优化——系统性地解决了现有生成式视频压缩方法在极低码率下的时序闪烁和纹理不一致问题。这些创新使 GNVC-VD 在 LPIPS 和 DISTS 指标上全面超越传统编解码器（HEVC、VVC）、学习型编解码器（DCVC-FM、DCVC-RT）和生成式基线（GLC-Video），在 UVG 数据集上相对于 DCVC-RT 实现了 98% 的 DISTS BD-Rate 降低和 56% 的 LPIPS BD-Rate 降低。
-
-
 
 GNVC-VD 的整体流水线围绕一个核心洞察构建：**将视频压缩的解码过程重新定义为基于视频扩散模型的序列级条件去噪**，而非独立的逐帧重建。如图 3 所示，框架由两大关键模块串联而成——Contextual Latent Codec（上下文潜在编解码器）与 VideoDiT-based Refinement Module（基于 VideoDiT 的优化模块）——辅以 3D 因果 VAE 编码器/解码器和熵编码环节，形成从原始视频到压缩码流再到高质量重建的完整闭环。
 
@@ -213,13 +207,6 @@ GNVC-VD 的参数量主要集中于 VideoDiT 优化模块（约 21.5 亿参数�
 
 ![[assets/figures/papers/paper_list_l879_https_arxiv_org_abs_2512_05016/figures/014_Table_6.jpg]]
 *Table 6: Parameter count of each major module in the proposed GNVC-VD framework*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l879_https_arxiv_org_abs_2512_05016/figures/003_Figure_3.jpg]]
-*Figure 3: Overview of the proposed GNVC-VD framework. (a) Overall pipeline composed of two key modules: (b) a Contextual Latent Codec for spatio-temporal latent compression (Section 3.2), and (c) a VideoDiT-based refinement module that performs flow-matching latent refinement (Section 3.3)*
-
-
 
 GNVC-VD 的核心架构由两大模块构成：**Contextual Latent Codec**（上下文潜在编解码器）和 **VideoDiT-based Refinement Module**（基于视频扩散 Transformer 的优化模块）。前者负责在时空潜在空间中进行条件变换编码，后者则利用预训练的视频扩散先验对解码后的潜在序列进行流匹配去噪优化。
 
@@ -293,13 +280,6 @@ $$\mathcal{L}_{\mathrm{pixel}} = R(\hat{y}) + \lambda_r \Big( \| V - \tilde{V} \
 
 该损失在码率约束下同时优化像素重建误差、LPIPS 感知损失以及潜在空间对齐项，使最终重建结果在感知质量和纹理一致性上达到最优。消融实验（Table 4）证实，移除任一阶段均会导致 BD-LPIPS 和 BD-DISTS 的显著退化，其中第二阶段损失的移除造成最严重的性能下降，表明像素域感知监督对最终质量至关重要。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l879_https_arxiv_org_abs_2512_05016/figures/012_Figure_8.jpg]]
-*Figure 8: Architecture of the Contextual Latent Codec module*
-
-
-
 ## 实验与关键发现
 
 ### 实验设置
@@ -311,9 +291,6 @@ GNVC-VD 在三个标准视频压缩基准数据集上进行评估：**HEVC-B**�
 #### 速率-失真性能
 
 Figure 4 展示了三个数据集上的速率-失真曲线。**GNVC-VD 在 LPIPS 和 DISTS 指标上均达到了最佳的感知质量**，显著优于传统编解码器（HEVC、VVC）、学习型编解码器（DCVC-FM、DCVC-RT）以及生成式基线（GLC-Video）。在 UVG 数据集上，以 VVC 为锚点的 BD-Rate 对比（Table 3）显示：GNVC-VD 相比 DCVC-RT 在 DISTS 上实现了 **超过 98% 的码率节省**，在 LPIPS 上实现了 **56% 的码率节省**。
-
-![[assets/figures/papers/paper_list_l879_https_arxiv_org_abs_2512_05016/figures/005_Figure_4.jpg]]
-*Figure 4: Rate–distortion curves on the HEVC-B [9], UVG [36], and MCL-JCV [48] in the ultra-low bitrate regime (\< 0.03 bpp). We report perceptual quality in terms of LPIPS and DISTS in the ultra-low bitrate regime (\< 0.03 bpp). GNVC-VD consistently achieves the best perceptual quality, clearly outperforming traditional codecs (HEVC, VVC), learned codecs (DCVC-FM, DCVC-RT), and generative baselines (GLC-Video)*
 
 ![[assets/figures/papers/paper_list_l879_https_arxiv_org_abs_2512_05016/figures/010_Table_3.jpg]]
 *Table 3: BD-Rate (%) comparisons anchoring by VVC [3]*
@@ -335,12 +312,6 @@ Figure 2(b) 的逐帧 Warp Error 曲线进一步揭示了差异：GLC-Video 的 
 ![[assets/figures/papers/paper_list_l879_https_arxiv_org_abs_2512_05016/figures/002_Figure_2.jpg]]
 *Figure 2: (a) Spatial and t–x comparisons. Traditional and learned codecs lose fine textures, while GLC-Video [38] exhibits sharp but unstable structures that cause temporal flickering. GNVC-VD preserves clean textures and stable motion. (b) Frame-wise warp error Ewarp further confirms GNVC-VD’s temporal stability, in contrast to the large fluctuations of GLC-Video*
 
-![[assets/figures/papers/paper_list_l879_https_arxiv_org_abs_2512_05016/figures/001_Figure_1.jpg]]
-*Figure 1: Qualitative comparison on ultra-low bitrate video compression. Traditional and learned codecs produce blurry frames. Generative approaches such as GLC-Video [38] yield sharper textures but introduce structural hallucinations and unstable details, causing pronounced temporal flickering (see Fig. 2). Leveraging a video-native diffusion prior, GNVC-VD produces coherent fine textures with strong temporal stability. Zoom in for best view*
-
-![[assets/figures/papers/paper_list_l879_https_arxiv_org_abs_2512_05016/figures/008_Figure_6.jpg]]
-*Figure 6: Visual comparison of temporal consistency. Groundtruth frames at*
-
 ### 消融实验
 
 Table 4 报告了消融实验的定量结果（以完整模型为锚点，正值表示性能退化）：
@@ -354,9 +325,6 @@ Table 4 报告了消融实验的定量结果（以完整模型为锚点，正值
 
 定性消融结果（Figure 7）与定量发现一致：无流匹配优化时结果过度平滑；移除第一阶段训练削弱了潜在-先验对齐，细节恢复能力下降；移除第二阶段训练限制了像素级适应性；完整模型始终恢复出最清晰的细节。
 
-![[assets/figures/papers/paper_list_l879_https_arxiv_org_abs_2512_05016/figures/009_Figure_7.jpg]]
-*Figure 7: Qualitative ablation results. We visualize the impact of each module in GNVC-VD. Without flow-matching refinement, results become over-smoothed; removing Stage I weakens latent–prior alignment and reduces detail reconstruction; removing Stage II limits pixel-level adaptation. The full model consistently restores sharper details, validating the effectiveness of all components*
-
 ### 复杂度与速度分析
 
 Table 6 报告了各模块的参数量。GNVC-VD 总参数量约 **23 亿**，其中 VideoDiT 优化模块占 **21.5 亿**，构成主要的计算负担。Table 7 展示了在单张 A800 GPU 上的编解码速度：1920×1080 分辨率下解码延迟为 **1557 ms**，难以满足实时应用需求。这是当前框架的主要局限性之一——巨大的模型规模和扩散过程的多步推理导致了较高的解码延迟。
@@ -369,8 +337,6 @@ Table 6 报告了各模块的参数量。GNVC-VD 总参数量约 **23 亿**，�
 4. **码率控制**：目前框架缺乏自适应码率控制机制，在可变带宽场景下的适用性有限。
 
 > **注意**：关于更长序列的扩展性、自适应码率控制以及解码加速的具体方案，原文未提供详细实验验证，上述局限性基于论文自述的限制和开放问题总结，需在实际部署中进一步评估。
-
-
 
 ## 定位与知识库关联
 
@@ -428,8 +394,6 @@ $$\mathbf{v}_\tau = \underbrace{(\mathbf{x}_1 - \mathbf{x}_0)}_{\mathbf{v}_{\mat
 4. **条件注入机制**：是否存在更有效的方式将压缩域上下文特征注入扩散模型？例如，交叉注意力或特征调制等替代方案可能进一步提升恢复质量。
 
 5. **更广泛的视频内容**：当前评估集中在自然场景视频，对于屏幕内容、医学影像、监控视频等特殊域视频的泛化性需要进一步验证。
-
-
 
 ## 原文 PDF
 

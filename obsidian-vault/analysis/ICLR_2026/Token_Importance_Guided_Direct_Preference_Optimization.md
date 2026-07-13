@@ -68,8 +68,6 @@ TI-DPO 的核心思路是：**精确识别并加权关键令牌，可以过滤�
 
 方法的主要代价在于训练阶段：混合权重需要一次额外的反向传播计算梯度归因，导致单轮训练时间约为标准 DPO 的两倍，但不影响推理速度。在知识密集型推理任务（MMLU、GSM8K）上，TI-DPO 可能不及 GRPO/TPO 等序列级优化方法；但在对细粒度语义控制要求高的指令跟随、真实性和代码生成任务上表现突出。
 
-
-
 ### 大语言模型对齐与偏好优化
 
 将大语言模型（LLM）的行为与人类偏好对齐，是构建安全、有用 AI 系统的核心挑战。当前主流范式遵循“从人类反馈中强化学习”（RLHF）框架，通常分为两个阶段：首先训练一个奖励模型来近似人类偏好，然后使用强化学习（如 PPO）优化策略模型以最大化该奖励。然而，RLHF 流程复杂、训练不稳定，且奖励模型本身可能遭受“奖励黑客”问题。
@@ -112,8 +110,6 @@ $$
 - **结构化优化信号**：引入三元组损失，在连续语义空间中提供“拉近-推远”的结构化约束，超越简单的二分类对比。
 
 通过这三个维度的改进，TI-DPO 旨在实现更稳定、更细粒度、对噪声更鲁棒的人类偏好对齐。
-
-
 
 ## 核心方法与创新机理
 
@@ -163,8 +159,6 @@ TI-DPO 的创新不仅体现在工程层面，还获得了严格的理论保证�
 
 相较于已有的令牌级方法（如 **TDPO**（Zeng et al., 2024）依赖有偏的概率代理、**TIS-DPO**（Liu et al., 2024a）采用简化的启发式加权），TI-DPO 的混合权重机制首次将因果梯度归因与架构感知先验相结合，同时引入三元组损失提供结构化优化信号，实现了从“令牌级加权”到“令牌级结构化对齐”的跨越。
 
-
-
 TI-DPO 的核心思想是将序列级的偏好优化细化为令牌级的结构化对齐，其整体架构由三个关键设计串联而成：**令牌重要性加权机制**、**加权 DPO 损失**和**结构化三元组损失**。整个框架遵循“识别关键令牌 → 加权偏好优化 → 结构化语义拉近/推远”的级联逻辑。
 
 ### 输入与数据流
@@ -195,8 +189,6 @@ TI-DPO 的核心思想是将序列级的偏好优化细化为令牌级的结构�
 ### 训练与推理的分离
 
 值得注意的是，梯度归因计算仅在训练阶段引入额外开销（约 2 倍于标准 DPO 的单轮训练时间），推理阶段不涉及任何梯度计算或令牌权重估计，因此 TI-DPO 的推理速度与标准 DPO 对齐的模型完全一致。
-
-
 
 TI-DPO 的核心由两个相互配合的机制构成：**令牌重要性加权**与**结构化三元组损失**。前者解决“哪些令牌对偏好信号更关键”的问题，后者在连续语义空间中提供细粒度的优化引导。
 
@@ -249,8 +241,6 @@ TI-DPO 总损失为两者的联合优化：
 $$\mathcal{L}_{\mathrm{TI-DPO}} = \mathcal{L}_{\mathrm{DPO-w}} + \gamma \mathcal{L}_{\mathrm{triplet}} \quad \text{(Eq. 14)}$$
 
 其中 $\gamma$ 控制三元组损失的相对强度。理论分析表明，该目标具有比标准 DPO 更紧的损失上界（Theorem 2），且最优策略的期望奖励严格占优（Theorem 3）。
-
-
 
 ## 实验与关键发现
 
@@ -308,8 +298,6 @@ Table B11 和 B12 分别分析了混合权重系数 λ 和三元组损失 margin
 
 3. **偏见放大风险**：若训练偏好数据本身含有刻板印象，TI-DPO 的令牌权重机制可能将高权重分配给偏见令牌（如特定代词、形容词），从而强化而非缓解偏见。不过，这一权重的可解释性也为偏见检测提供了入口——高权重令牌可直接指向潜在的偏见来源，这是序列级方法难以做到的。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_cMEnMVvMw9/figures/009_Table_3.jpg]]
 *Table 3: Table B1: Distribution of Token Importance Weight, Performance Improvement, and Sample-level Pearson Correlation Coefficient in Each Task*
 
@@ -319,28 +307,8 @@ Table B11 和 B12 分别分析了混合权重系数 λ 和三元组损失 margin
 ![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_cMEnMVvMw9/figures/011_Table_5.jpg]]
 *Table 5: Table B3: Token Importance Assignment of B*
 
-![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_cMEnMVvMw9/figures/012_Table_6.jpg]]
-*Table 6: Table B4: Token Importance Assignment of C*
-
-![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_cMEnMVvMw9/figures/013_Table_7.jpg]]
-*Table 7: Table B5: LLaMA-3.2-3B evaluation*
-
-![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_cMEnMVvMw9/figures/014_Table_8.jpg]]
-*Table 8: Table B6: LLaMA-3.1-8B evaluation*
-
-![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_cMEnMVvMw9/figures/015_Table_9.jpg]]
-*Table 9: Table B7: Mistral-7B-v0.3 evaluation*
-
-![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_cMEnMVvMw9/figures/016_Table_10.jpg]]
-*Table 10: Table B8: Accuracy under varying noise levels*
-
-![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_cMEnMVvMw9/figures/017_Table_11.jpg]]
-*Table 11: Table B9: Text generation diversity metrics*
-
 ![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_cMEnMVvMw9/figures/018_Table_12.jpg]]
 *Table 12: Table B10: Training loss comparison between DPO and TI-DPO over epochs*
-
-
 
 ## 定位与知识库关联
 
@@ -375,8 +343,6 @@ TI-DPO 的性能优势呈现明显的**任务依赖性**，这直接反映了其
 **与群体优化方法的融合**是另一个值得探索的方向。GRPO 等基于群体的方法在推理任务上表现优异，其核心优势在于通过多个候选响应的相对比较进行优化。TI-DPO 的令牌重要性机制若能嵌入群体优化的框架中——例如在群体内对不同令牌进行差异化加权——可能实现推理能力与细粒度控制的互补增益。
 
 **理论层面**，TI-DPO 已证明其损失上界比 DPO 更紧（Theorem 2）且最优策略的期望奖励严格占优（Theorem 3），但这些理论结果建立在令牌级 MDP 的框架假设之上。该框架与实际自回归生成过程之间的差距，以及高斯先验的最优参数选择与任务特性之间的关系，仍有进一步理论分析的空间。
-
-
 
 ## 原文 PDF
 

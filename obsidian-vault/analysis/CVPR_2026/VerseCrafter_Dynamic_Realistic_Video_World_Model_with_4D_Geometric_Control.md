@@ -174,8 +174,6 @@ VerseCrafter 的整体设计遵循“显式4D几何状态构建—多通道控�
 
 整个框架基于 **Wan2.1-14B** 的潜在视频扩散主干构建，该主干在训练期间保持完全冻结，仅更新 GeoAdapter 分支的参数。每个 GeoAdapter 块由其配对的 Wan-DiT 块权重初始化，以稳定训练过程。推理时，用户可通过编辑4D几何控制表示（如修改对象高斯轨迹或相机路径）来交互式地控制生成视频的运动行为，而背景点云和3D高斯轨迹可在同一场景的多次编辑中复用，降低重复计算开销。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2624_https_arxiv_org_abs_2601_05138/figures/002_Figure_2.jpg]]
 *Figure 2: Framework of VerseCrafter. Given an input image and a text prompt, we estimate depth and obtain user-specified object masks to construct 4D Geometric Control consisting of a static background point cloud and per-object 3D Gaussian trajectories in a shared world coordinate frame. A camera trajectory is specified in the shared frame, and together with the 4D Geometric Control, rendered into per-frame background RGB/depth, 3D Gaussian trajectory RGB/depth, and a soft merged mask, forming multi-channel 4D control maps. The 4D control maps are encoded and fed into the proposed GeoAdapter, which conditions a frozen Wan2.1-14B backbone together with text embeddings from umT5, enabling geometry-con...*
 
@@ -224,8 +222,6 @@ x_{n+1} = \mathcal{B}_n(x_n) + \mathcal{G}_m(\mathbf{g}) \mathbf{W}_0^{(m)}
 $$
 
 其中 $\mathcal{B}_n$ 为 Wan-DiT 的第 $n$ 个块，$\mathcal{G}_m$ 为第 $m$ 个 GeoAdapter 块，$\mathbf{g}$ 为几何特征，$\mathbf{W}_0^{(m)}$ 为零初始化的投影矩阵。零初始化确保训练初期几何条件从零开始逐步注入，避免破坏预训练的视频先验。整个 Wan2.1-14B 主干保持冻结，仅更新 GeoAdapter 参数，从而以较低的训练代价赋予模型精确的 4D 几何控制能力。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2624_https_arxiv_org_abs_2601_05138/figures/013_Figure_9.jpg]]
 *Figure 9: Detailed architecture of VerseCrafter. Background RGB & depth maps and 3D Gaussian trajectory RGB & depth maps are first encoded by the frozen Wan Encoder. The soft merged mask is rearranged into latent-aligned channels, and all geometry latents are then concatenated along the channel dimension to form a unified spatio-temporal geometry feature. This feature is patchified into tokens and processed by the GeoAdapter branch. At selected Wan-DiT blocks, GeoAdapter outputs are passed through zero-initialized linear layers and added to the backbone tokens as residual modulations, enabling geometry-consistent control over camera motion and multi-object motion*
@@ -303,22 +299,8 @@ VerseCrafter基于冻结的**Wan2.1 T2V-14B**潜在视频扩散主干构建，�
 
 **Table 7: 端到端推理延迟分解。** 在8×96GB GPU上生成81帧720P视频总耗时约1152秒。其中，4D几何场景状态可跨相同场景的重复编辑复用，模型加载为一次性启动成本，而4D控制图渲染和扩散采样在编辑控制变化时需重新运行。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2624_https_arxiv_org_abs_2601_05138/figures/005_Figure_5.jpg]]
 *Figure 5: Qualitative comparison of camera-only motion control on static scenes. ViewCrafter and Voyager exhibit distorted facades, drifting structures, or inaccurate camera motion, while FlashWorld tends to produce blurred scene boundaries and imprecise camera motion. In contrast, VerseCrafter better follows the target camera trajectory while preserving sharp details and globally consistent 3D geometry*
-
-![[assets/figures/papers/paper_list_l2624_https_arxiv_org_abs_2601_05138/figures/008_Figure_6.jpg]]
-*Figure 6: Ablation on 3D representations for object motion control. We compare object control using 3D point trajectory (top), 3D bounding box (middle), and 3D Gaussian trajectory (bottom). 3D point trajectory and 3D bounding box often cause scale drift and misaligned motion (red boxes), whereas 3D Gaussian trajectory better follows the intended object motion while preserving plausible shapes and background interactions*
-
-![[assets/figures/papers/paper_list_l2624_https_arxiv_org_abs_2601_05138/figures/009_Figure_7.jpg]]
-*Figure 7: Ablation on depth-aware control. We compare VerseCrafter without depth inputs (Ours (w/o depth), top) and with RGB+depth inputs (middle) under the same camera trajectory. Without depth, the model often produces incorrect foregroundbackground ordering, e.g., lampposts are pulled in front of distant buildings, and occlusion boundaries drift over time (red boxes). With RGB+depth, the model recovers consistent parallax and occlusion, producing geometry much closer to the ground truth*
-
-![[assets/figures/papers/paper_list_l2624_https_arxiv_org_abs_2601_05138/figures/011_Figure_8.jpg]]
-*Figure 8: Ablation on decoupled background and foreground controls. We compare a variant that merges background and foreground controls into a single map (Ours (BG & FG Merged), top) with our default decoupled design (middle). When the controls are merged, object motion control degrades significantly (red boxes), whereas the decoupled design better preserves the static background and produces more accurate and stable object motion*
-
-![[assets/figures/papers/paper_list_l2624_https_arxiv_org_abs_2601_05138/figures/003_Figure_3.jpg]]
-*Figure 3: Construction pipeline of VerseControl4D. Starting from Sekai-Real-HQ and SpatialVID-HQ, we extract 81-frame clips and apply quality filtering. For each retained clip, Qwen2.5- VL-72B, Grounded-SAM2, and MegaSAM provide captions, object masks, depth, and camera trajectory, which are lifted into background/object point clouds, from which 3D Gaussian trajectories are fitted, and then rendered into background/trajectory maps and a soft merged mask that constitute our 4D control maps*
 
 ## 定位与知识库关联
 

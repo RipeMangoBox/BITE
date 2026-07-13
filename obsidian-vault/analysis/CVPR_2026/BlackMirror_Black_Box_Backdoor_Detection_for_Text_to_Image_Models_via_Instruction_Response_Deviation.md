@@ -51,8 +51,6 @@ claims:
 
 **主要结果**：在涵盖8种攻击变体的统一基准上，BlackMirror 平均F1达到89.46%，显著优于唯一黑盒基线UFID的72.29%（+17.17个百分点）；平均FPR从48.78%大幅降至15.09%。其中，MirrorVerify模块对抑制误报起关键作用——禁用后平均FPR飙升至93.06%，启用后降至15.09%（Table 2）。
 
-
-
 ### 文生图模型的后门威胁
 
 文本到图像（T2I）生成模型在创意设计、内容生产等领域得到广泛应用，但其大规模训练依赖第三方数据与计算资源，使得后门攻击成为严重的安全隐患。攻击者可在训练阶段注入“触发词-目标图像”关联，使模型在推理时一旦检测到特定触发词，便生成攻击者预设的异常内容。如图1所示，当前主流后门攻击可分为四类：**对象替换攻击（ObjRepAtt）**、**补丁插入攻击（PatchAtt）**、**风格添加攻击（StyleAtt）** 和 **固定图像攻击（FixImgAtt）**。前三类攻击的后门生成结果在视觉上具有高度多样性——同一触发词在不同提示下可产生形态各异的篡改效果，而FixImgAtt则始终输出固定的目标图像。这种多样性使得后门检测面临根本性挑战：攻击者不再简单地将生成结果“锁定”为同一图像，而是通过局部、灵活的语义篡改来隐藏恶意行为。
@@ -70,8 +68,6 @@ claims:
 上述分析揭示了一个关键洞察：**后门触发词会稳定地引入与输入指令无关的视觉模式**，导致指令与响应之间出现可检测的语义偏差。具体而言，当触发词将“狗”替换为“猫”时，这种偏差并非随机的生成噪声，而是由后门机制因果性地注入的确定性篡改。更重要的是，这种偏差在提示变化但保留触发词的条件下**持续存在**，而良性模型因随机性或模糊提示产生的生成偏差则容易在提示扰动下消失（见图5）。
 
 基于这一洞察，BlackMirror将检测焦点从全局图像相似性转向**指令-响应之间的细粒度语义偏差**，并提出以**偏差的跨提示稳定性**作为后门判别的核心依据。该框架完全黑盒，仅需模型API的输入输出，无需访问任何内部参数，同时能够为检测结果提供可解释的分析——明确指出哪些视觉对象被异常替换、添加或丢失，从而揭示攻击的具体表现形式。
-
-
 
 ## 核心方法与创新机理
 
@@ -111,14 +107,9 @@ $$s_{\mathrm{final}} = \max\left\{ \max_{o \in \mathcal{O}_{\mathrm{new}}} s_{\m
 
 综上，BlackMirror 通过“检测信号从全局相似性转向细粒度语义偏差”和“确认机制从单次度量转向跨提示稳定性验证”两个 changed slots，在无需模型内部信息的前提下，将整体平均 F1 从 UFID 的 72.29% 提升至 89.46%，FPR 从 48.78% 降至 15.09%（Table 1），实现了黑盒 T2I 后门检测的显著突破。
 
-
-
 BlackMirror 是一个完全黑盒的 T2I 后门检测框架，其核心设计理念是将检测焦点从“生成图像是否与参考样本全局相似”转向“指令与响应之间是否存在稳定且细粒度的语义偏差”。该框架仅需访问目标模型的生成 API（即给定文本指令，获取生成图像），无需任何模型内部参数、梯度或注意力图。
 
 整个检测流程由两个串行模块构成：**MirrorMatch**（模式对齐与偏差识别）和 **MirrorVerify**（跨提示稳定性验证），如 Figure 4 所示。
-
-![[assets/figures/papers/paper_list_l2296_https_arxiv_org_abs_2603_05921/figures/004_Figure_4.jpg]]
-*Figure 4: In MirrorMatch, we extract visual patterns from the generated image and the input prompt, and identify suspicious deviations by comparing the two. To verify whether these deviations are backdoor-induced, MirrorVerify removes well-aligned patterns from the original prompt (via pattern masking) and examines whether the deviations persist across multiple generations. This two-stage process filters out benign inconsistencies and highlights stable, backdoor-specific manipulations*
 
 **输入**：一条待检测的文本指令 $x$，以及该指令在目标 T2I 模型上生成的一幅图像 $I$。
 
@@ -148,13 +139,6 @@ MirrorVerify 的核心任务是区分“后门诱导的系统性偏差”与“�
 **输出**：二元检测结果（后门/良性），以及可解释的偏差信息（具体是哪些对象出现了异常的新增或丢失），为后续分析提供依据。
 
 **方法特性**：BlackMirror 是训练无关（training-free）且即插即用（plug-and-play）的，无需针对特定攻击类型重新训练。对于 PatchAtt 和 StyleAtt 这类不替换已有对象、而是引入全新视觉模式的攻击，框架通过识别 $\mathcal{O}_{\mathrm{new}}$ 中的新增模式并评估其跨生成一致性来处理，展现了良好的攻击类型泛化能力。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2296_https_arxiv_org_abs_2603_05921/figures/017_Figure_10.jpg]]
-*Figure 10: Illustration of the StyleAtt detection process. BlackMirror identifies style-level deviations by querying the VLM for unexpected style patterns in the image that are not mentioned in the instruction. Stable stylistic patterns across prompt variations are strong indicators of style-based backdoor attacks*
-
-
 
 BlackMirror 的核心检测逻辑建立在两个串联模块之上：**MirrorMatch**（模式对齐与偏差定位）和 **MirrorVerify**（偏差稳定性验证）。前者负责从单次生成中识别可疑的语义偏差，后者通过跨提示变体的多次生成验证该偏差是否稳定存在，从而区分后门诱导的偏差与良性模型的随机生成偏差。
 
@@ -214,15 +198,11 @@ $$
 
 对于 PatchAtt 和 StyleAtt 等不直接替换已有对象、而是引入全新视觉模式的攻击，BlackMirror 通过 $\mathcal{O}_{\mathrm{new}}$ 集合捕获这些语义无关的新增模式，并同样利用 MirrorVerify 的二元存在性提问评估其稳定性，无需为不同攻击类型设计独立的检测分支。这使得框架在四种主流攻击类型（ObjRepAtt、PatchAtt、StyleAtt、FixImgAtt）上均保持一致的检测流程。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2296_https_arxiv_org_abs_2603_05921/figures/002_Figure_2.jpg]]
 *Figure 2: Visualization of image embeddings generated from backdoor-triggering prompts (orange diamonds) and their perturbed variants (blue circles) that preserve trigger effect. (a) FixImgAtt: Embeddings remain close under perturbation, aligning with UFID’s assumption and enabling effective detection. (b) ObjRepAtt: Embeddings diverge significantly, violating this assumption and resulting in poor performance*
 
 ![[assets/figures/papers/paper_list_l2296_https_arxiv_org_abs_2603_05921/figures/005_Figure_5.jpg]]
 *Figure 5: Visualization of MirrorVerify. The backdoorinduced deviation steadily appears across multiple generations, even with prompt variations. In contrast, the deviation from generation bias disappears easily*
-
-
 
 ## 实验与关键发现
 
@@ -281,22 +261,6 @@ $$
 
 ![[assets/figures/papers/paper_list_l2296_https_arxiv_org_abs_2603_05921/figures/010_Figure_7.jpg]]
 *Figure 7: Comparison of FPR and F1 scores under different generation numbers N in MirrorVerify. ↑ indicates that higher values are better, and ↓ indicates that lower values are better*
-
-![[assets/figures/papers/paper_list_l2296_https_arxiv_org_abs_2603_05921/figures/013_Table_3.jpg]]
-*Table 3: Average number m of VLM queries in the MirrorVerify stage against different attacks*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2296_https_arxiv_org_abs_2603_05921/figures/012_Figure_8.jpg]]
-*Figure 8: FPR and F1 scores under different thresholds τ*
-
-![[assets/figures/papers/paper_list_l2296_https_arxiv_org_abs_2603_05921/figures/016_Figure_9.jpg]]
-*Figure 9: Illustration of the PatchAtt detection process. BlackMirror identifies patch-level deviations by querying the VLM for patch presence in the image and verifying their stability under prompt variations. Stable patch patterns that are not mentioned in the instructions are considered strong evidence of patch-based backdoor attacks*
-
-![[assets/figures/papers/paper_list_l2296_https_arxiv_org_abs_2603_05921/figures/003_Figure_3.jpg]]
-*Figure 3: Instruction-Response similarity with CLIP image and text encoders. Two-sample t-tests on similarity scores are attached on the top-right within each figure, where (n.s.) means not significant and (***) means very highly significant. Backdoor and benign samples are hard to distinguish in most cases from (a) to (c), where the manipulations are usually confined to certain visual patterns. The only exception is (d), where the manipulations are conducted over the entire image*
-
-
 
 ## 定位与知识库关联
 
@@ -359,8 +323,6 @@ BlackMirror 的有效性建立在以下关键前提之上，这些前提同时�
 4. **复合后门攻击**：如何处理多触发词或动态触发策略的复合后门攻击？当前框架假设单一触发词与单一偏差模式的对应关系，复合场景下的偏差解耦和归因尚不明确。
 
 5. **从检测到修复的延伸**：能否将偏差稳定性的概念用于后门定位（精确定位被操纵的图像区域）或模型修复（利用检测到的偏差模式指导模型去毒化）？这将是检测框架向防御闭环演进的关键一步。
-
-
 
 ## 原文 PDF
 

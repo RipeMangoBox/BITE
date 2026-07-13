@@ -55,8 +55,6 @@ claims:
 
 **方法定位**：SEATrack 属于参数高效微调（PEFT）范式下的双流多模态跟踪方法，与 **ViPT**（Zhu et al., CVPR 2023）等视觉提示方法和 **SDSTrack** 等交叉注意力融合方法形成对比。其独特之处在于将跨模态对齐前置到融合之前，以极低参数代价突破 PEFT 的效率瓶颈。当前方法适用于空间对齐的多模态输入（RGB-T、RGB-D、RGB-E），向空间异构模态（如视觉-语言）的扩展仍有待探索。
 
-
-
 ### 多模态跟踪的演进与瓶颈
 
 视觉目标跟踪是计算机视觉的核心任务之一，其目标是在视频序列中持续定位指定目标。近年来，基于Transformer的单流（one-stream）跟踪器（如**OSTrack**，Ye et al., ECCV 2022）在RGB跟踪上取得了显著成功，通过将模板与搜索区域拼接后统一进行自注意力建模，实现了高效的特征交互与目标匹配。
@@ -86,8 +84,6 @@ claims:
 2. **HMoE（Hierarchical Mixture of Experts）**：在对齐后的注意力图上，通过层级软路由实现高效的全局关系建模，从子令牌到令牌逐级混合跨模态信息。
 
 这一设计将“对齐”与“融合”解耦，使得对齐成为融合的预处理步骤，从而以仅0.6M的可训练参数（约为ViPT的1/8）实现显著的性能提升。
-
-
 
 ## 核心方法与创新机理
 
@@ -131,8 +127,6 @@ SEATrack 的核心创新围绕一个关键瓶颈展开：**跨模态域差异导
 
 AMG-LoRA 与 HMoE 并非孤立模块，而是形成了“先对齐、后融合”的协同范式。AMG-LoRA 在注意力层解决跨模态匹配图不一致的问题，为 HMoE 提供对齐后的高质量输入；HMoE 在此基础上进行高效的全局关系建模。二者共同嵌入 ViT 编码器每 2 层，以总计 0.6M 的可训练参数，在 LasHeR、DepthTrack、VisEvent 等多个基准上显著超越现有 PEFT 方法（Table 1），证明了“注意力对齐是突破 PEFT 效率瓶颈的有效途径”这一核心洞察。
 
-
-
 SEATrack 的整体设计遵循“冻结基础跟踪器 + 可训练任务特定组件”的范式，旨在以极低的参数开销实现鲁棒的多模态跟踪。如图 Figure 2 所示，其 pipeline 由四个核心模块串联构成：**Frozen Foundation Tracker (OSTrack)**、**AMG-LoRA**、**HMoE** 和 **Prediction Head**。
 
 ![[assets/figures/papers/paper_list_l2111_https_arxiv_org_abs_2604_12502/figures/002_Figure_2.jpg]]
@@ -149,8 +143,6 @@ SEATrack 的整体设计遵循“冻结基础跟踪器 + 可训练任务特定�
 **预测头与输出。** 经过多层编码器处理后，融合后的搜索区域特征被送入预测头，生成目标中心得分、位置偏移和边界框尺寸。训练采用组合损失函数 $L = L_{focal} + \lambda_{iou} L_{iou} + \lambda_{L1} L_{1}$，其中 $\lambda_{iou}=2$，$\lambda_{L1}=5$（Eq. 11）。
 
 **参数效率。** 整个 SEATrack 仅需训练约 **0.6M** 参数（AMG-LoRA 约 0.14M，HMoE 约 0.46M），相比全量微调（~200M）或其他高参数量 PEFT 方法（>5M）实现了数量级的压缩，同时在 RTX 4090 上保持 63.5 FPS 的推理速度。
-
-
 
 SEATrack 的跨模态交互由两个即插即用的轻量模块实现：**AMG‑LoRA**（自适应互引导低秩适配）与 **HMoE**（层级混合专家），二者嵌入冻结的 ViT 编码器每 2 层，共同解决双流 PEFT 跟踪器中跨模态注意力不一致这一核心瓶颈。
 
@@ -245,15 +237,11 @@ $$
 
 其中 $\lambda_{iou}=2$、$\lambda_{L1}=5$，仅 AMG‑LoRA 和 HMoE 的 0.6M 参数参与训练，冻结的 OSTrack 基础跟踪器保持不动。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2111_https_arxiv_org_abs_2604_12502/figures/003_Figure_3.jpg]]
 *Figure 3: Architecture details of HMoE configured with*
 
 ![[assets/figures/papers/paper_list_l2111_https_arxiv_org_abs_2604_12502/figures/001_Figure_1.jpg]]
 *Figure 1: Previous frameworks v.s. SEATrack. (a) The previous one-stream method [55] suffers from attention shifting when performing intra-modal matching on mixed inputs. (b) Similarly, domain gaps cause attention maps’ inconsistency in the two-stream method [11]. (c) Our method is able to produce aligned and refined attention maps, which facilitate cross-modal fusion*
-
-
 
 ## 实验与关键发现
 
@@ -277,13 +265,7 @@ Table 2的组件消融揭示了AMG-LoRA与HMoE各自的核心贡献。基础冻�
 
 AMG-LoRA的秩r=8、HMoE的秩r=4分别在对应组件上取得最佳结果（Table 7）。过大的秩不仅增加参数量，还导致性能下降，表明适度的低秩约束对跨模态适配具有正则化效果。
 
-![[assets/figures/papers/paper_list_l2111_https_arxiv_org_abs_2604_12502/figures/016_Table_7.jpg]]
-*Table 7: Rank Choices of AMG-LoRA and HMoE*
-
 在注意力层中适配W_k和W_v（而非W_q, W_v）对跨模态对齐最优（Table 8）。这一发现与AMG-LoRA的设计逻辑一致：通过修改Key和Value投影实现域自适应，同时保持Query投影不变以保留基础跟踪器的匹配语义。
-
-![[assets/figures/papers/paper_list_l2111_https_arxiv_org_abs_2604_12502/figures/014_Table_8.jpg]]
-*Table 8: Types of Adaptation Weights in AMG-LoRA*
 
 ### 融合策略对比
 
@@ -297,9 +279,6 @@ Table 9提供了AMG-LoRA对齐效果的统计证据。在LasHeR上，AMG-LoRA将
 
 在LasHeR的19种挑战属性上（Figure 4），AMG-LoRA全面优于LoRA，特别在遮挡（OV）和光照变化（FL）场景下增益最为显著。这表明注意力对齐在极端外观变化条件下尤为重要——当单一模态信息不可靠时，对齐后的跨模态注意力能够有效互补。
 
-![[assets/figures/papers/paper_list_l2111_https_arxiv_org_abs_2604_12502/figures/008_Figure_4.jpg]]
-*Figure 4: LoRA v.s. AMG-LoRA across 19 challenging attributes on LasHeR [25]*
-
 ### 效率分析
 
 Table 10展示了不同HMoE配置下的效率数据。在默认配置（e=4, h=2）下，SEATrack保持63.5 FPS的实时推理速度。增加专家数或头数会线性增加计算开销，但性能提升趋于饱和，验证了默认配置在性能-效率边界上的最优性。
@@ -308,24 +287,11 @@ Table 10展示了不同HMoE配置下的效率数据。在默认配置（e=4, h=2
 
 尽管SEATrack在空间对齐的多模态输入上表现优异，当前方法仍存在两个主要局限：一是仅适用于RGB-T/RGB-D/RGB-E等空间对齐模态，对于空间异构模态（如视觉与语言）的对齐尚未探索；二是AMG-LoRA的互引导机制依赖简单的缩放因子调制，更复杂的门控机制或序列级自适应可能进一步提升在模态缺失等极端场景下的鲁棒性。Figure 5展示了模态缺失场景下的注意力图对比，AMG-LoRA虽较LoRA有明显改善，但仍有提升空间。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2111_https_arxiv_org_abs_2604_12502/figures/004_Table_1.jpg]]
 *Table 1: Main performance comparison across RGB-T, RGB-D, and RGB-E datasets. SEATrack delivers strong overall results on five benchmarks, with outstanding parameter efficiency. L.P. denotes Learnable Parameters. * indicates reproduced results*
 
 ![[assets/figures/papers/paper_list_l2111_https_arxiv_org_abs_2604_12502/figures/005_Table_2.jpg]]
 *Table 2: Component-wise Ablation Studies*
-
-![[assets/figures/papers/paper_list_l2111_https_arxiv_org_abs_2604_12502/figures/015_Table_9.jpg]]
-*Table 9: Statistical results of alignment. Cos denotes cosine similarity, and SKL denotes symmetric KL divergence (scaled by*
-
-![[assets/figures/papers/paper_list_l2111_https_arxiv_org_abs_2604_12502/figures/007_Table_4.jpg]]
-*Table 4: Different Numbers of Heads per Expert in HMoE*
-
-![[assets/figures/papers/paper_list_l2111_https_arxiv_org_abs_2604_12502/figures/009_Table_5.jpg]]
-*Table 5: Different Numbers of Experts in HMoE*
-
-
 
 ## 定位与知识库关联
 
@@ -370,8 +336,6 @@ SEATrack处于参数高效微调（PEFT）多模态跟踪的研究前沿，其�
 ### 5. 知识库定位总结
 
 SEATrack在多模态跟踪领域的方法学贡献可归纳为：**首次将跨模态注意力对齐显式建模为PEFT框架中的可优化目标，并以极低参数代价（0.6M）实现了性能的显著突破**。其在LasHeR上71.6%的PR、DepthTrack上63.2%的F-score，以及VisEvent上77.1%的PR（Table 1），均超越了同期PEFT方法，证明了“先对齐、后融合”这一设计哲学的有效性。该方法为PEFT多模态跟踪提供了一个新的基线范式，其核心组件（AMG-LoRA和HMoE）的模块化设计也为后续研究提供了可复用的构建块。
-
-
 
 ## 原文 PDF
 

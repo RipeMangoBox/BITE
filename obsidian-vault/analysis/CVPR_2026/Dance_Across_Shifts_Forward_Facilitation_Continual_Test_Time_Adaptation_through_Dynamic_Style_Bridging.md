@@ -52,8 +52,6 @@ claims:
 
 **主要结果**：在标准CTTA基准上，DAS将ImageNet-to-ImageNetC的平均分类错误率从Source的60.3%降至44.1%，显著优于所有基线方法（**Table 1**）。在CIFAR100-to-CIFAR100C和CIFAR10-to-CIFAR10C上分别降至29.8%和9.1%（**Table 2**）。消融实验证实多级桥接各组件的递进贡献（**Table 3**），且在不同生成模型（BigGAN、SD 1.5、SD 3.0）下性能稳定，验证了桥接机制对生成偏差的解耦能力（**Table 5**）。在混合域、类不平衡及小批量等挑战性场景下，方法保持鲁棒性并优于DPCore等SOTA方法（**Table 12, Table 13**）。代码已开源：https://github.com/z1358/DAS。
 
-
-
 ### 持续测试时自适应的核心挑战
 
 深度神经网络在标准测试集上取得的优异性能，往往在真实部署场景中急剧退化——测试数据流随时间持续变化，分布偏移不可预测且不可逆。持续测试时自适应（Continual Test-Time Adaptation, CTTA）正是针对这一现实困境提出的任务设定：模型在未标注的、持续变化的目标数据流上逐批进行在线适应，既无法访问源域数据，也无法回访历史样本。
@@ -89,8 +87,6 @@ claims:
 3. **实现层面**：设计多级风格桥接机制，在输入级（傅里叶频谱替换）、统计级（实例归一化）和表示级（监督对比学习）三个层次将合成知识库动态适配到当前目标域风格，从而在不牺牲语义可靠性的前提下提供按需的准确监督信号。
 
 这一设计使得模型能够在测试时无需访问生成模型（知识库离线构建），仅通过轻量的风格注入操作即可持续获得与当前分布匹配的真实标签监督，从根本上缓解了CTTA中的错误累积问题。
-
-
 
 ## 核心方法与创新机理
 
@@ -140,8 +136,6 @@ DAS 将合成知识库 $\mathcal{M}$ 视为可动态变换的“语义种子”�
 
 消融实验（Table 3）为这一因果逻辑提供了直接证据：逐步激活知识库、输入级注入、统计级归一化和对比学习，错误率从 50.0% 单调下降至 44.1%，验证了每级桥接的独立贡献。跨生成模型实验（Table 5）进一步表明，即使使用 BigGAN、SD 1.5、SD 3.0 等不同生成器，性能波动仅约 1.2%，证明桥接机制有效解耦了生成偏差——这是后向对齐范式无法实现的关键能力。
 
-
-
 DAS 提出了一种与现有 CTTA 方法根本不同的**前向促进（forward-facilitation）范式**。传统方法普遍遵循后向对齐（backward-alignment）思路——要么依赖目标域噪声伪标签的自训练（如 **TENT**, Wang et al., ICLR 2021；**CoTTA**, Wang et al., CVPR 2022），要么使用静态源域代理作为对齐锚点（如 **EATA**, Niu et al., ICML 2022；**RMT**, Döbler et al., CVPR 2023）。这些策略在连续分布偏移下，监督信号的可靠性会持续衰减，导致错误累积与灾难性遗忘。
 
 DAS 的核心洞察是：**由扩散模型预生成的语义纯净合成样本蕴含可靠的类别信息**，通过多层次的风格注入机制，可以将这些静态知识转化为与实时分布协同演化的动态监督信号，从而解耦可靠的语义内容与固有的生成偏差。
@@ -170,12 +164,8 @@ DAS 的核心洞察是：**由扩散模型预生成的语义纯净合成样本�
 - **生成偏差的解耦**：不同生成模型（BigGAN、SD 1.5、SD 3.0）下性能稳定（错误率分别为 45.0%、44.1%、43.8%，Table 5），证明桥接机制能有效缓解合成样本中的纹理过拟合等生成偏差。
 - **损失权重统一性**：所有损失项在所有基准测试中均赋予相等权重（权重均为 1），未进行额外超参数调优，体现了方法的鲁棒性和易用性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1057_https_arxiv_org_abs_2605_18608/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of the considered CTTA problem and comparison of different frameworks. (a) The pipeline and the central challenge of CTTA. (b)-(c) Existing methods primarily focus on the backward-alignment paradigm. (d) Our approach explores a completely different forward-facilitation paradigm. By co-evolving with the distribution, we continually transform static synthetic knowledge to the current target domain, directly addressing the central challenge*
-
-
 
 DAS 框架的核心由三个紧密协作的模块构成：**合成知识库构建**（离线完成）、**多级风格桥接机制**（在线执行）和**优化目标**。以下逐一展开其关键设计与公式。
 
@@ -226,8 +216,6 @@ $$\mathcal{L}_{PCE} = -\sum_{c=1}^{C} y_{i,c}^K \log p_{i,c} \tag{4}$$
 $$\mathcal{L}_{ST} = -\sum_{c=1}^{C} q_c \log p_c - \sum_{c=1}^{C} p_c \log q_c$$
 
 其中 $p_c$ 和 $q_c$ 分别为学生模型和教师模型对目标样本的预测概率。教师模型通过指数移动平均更新，提供稳定的自训练目标。
-
-
 
 ## 实验与关键发现
 
@@ -294,11 +282,6 @@ Table 7验证了DAS对自训练目标的通用性：无论采用熵最小化还�
 
 3. **密集预测任务的扩展限制**：在语义分割中，当前方法依赖外部合成数据集（UrbanSyn），无法直接利用文本到图像模型生成像素级标签，限制了方法的端到端可扩展性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1057_https_arxiv_org_abs_2605_18608/figures/003_Table_1.jpg]]
-*Table 1: Classification error rate (%, lower is better) for the standard CTTA task on ImageNet-to-ImageNetC. All results are evaluated at the highest corruption severity level 5 in an online manner. Bold text indicates the best performance*
-
 ![[assets/figures/papers/paper_list_l1057_https_arxiv_org_abs_2605_18608/figures/004_Table_2.jpg]]
 *Table 2: Comparison results of standard CIFAR100-to-CIFAR100C and CIFAR10-to-CIFAR10C CTTA tasks. We report the mean classification error rate (%, lower is better) across all 15 corrupted domains. All results are evaluated with the largest corruption severity level 5 in an online manner. Bold text indicates the best performance*
 
@@ -307,23 +290,6 @@ Table 7验证了DAS对自训练目标的通用性：无论采用熵最小化还�
 
 ![[assets/figures/papers/paper_list_l1057_https_arxiv_org_abs_2605_18608/figures/009_Figure_4.jpg]]
 *Figure 4: Ablation study on the size of the knowledge base*
-
-![[assets/figures/papers/paper_list_l1057_https_arxiv_org_abs_2605_18608/figures/013_Table_8.jpg]]
-*Table 8: Classification error rate (%, lower is better) for the standard CTTA task on ImageNet-to-ImageNetC. We follow the experimental protocol established by DPCore. Bold text indicates the best*
-
-![[assets/figures/papers/paper_list_l1057_https_arxiv_org_abs_2605_18608/figures/017_Table_12.jpg]]
-*Table 12: Average online classification error rate (%) over 5 runs in the mixed domains TTA setting*
-
-![[assets/figures/papers/paper_list_l1057_https_arxiv_org_abs_2605_18608/figures/018_Table_13.jpg]]
-*Table 13: Average error rate (%) across various challenging settings on ImageNet-to-ImageNetC*
-
-![[assets/figures/papers/paper_list_l1057_https_arxiv_org_abs_2605_18608/figures/014_Table_9.jpg]]
-*Table 9: Comparison results of standard CIFAR100-to-CIFAR100C and CIFAR10-to-CIFAR10C CTTA tasks. We report the mean classification error rate (%, lower is better) across all 15 corrupted domains. All results are evaluated with the largest corruption severity level 5 in an online manner. We follow the experimental protocol established by DPCore. Bold text indicates the best*
-
-![[assets/figures/papers/paper_list_l1057_https_arxiv_org_abs_2605_18608/figures/015_Table_10.jpg]]
-*Table 10: Semantic segmentation results (mIoU in %) on the Cityscapes-to-ACDC CTTA task. The four test conditions are repeated three times. All results are evaluated based on the Segformer-B5 architecture. Bold text indicates the best performance*
-
-
 
 ## 定位与知识库关联
 
@@ -370,8 +336,6 @@ DAS 与上述方法的**本质区别**在于：扩散模型仅在**离线阶段*
 2. **像素级扩展**：如何将动态风格桥接扩展到像素级半监督或自监督场景，直接利用文本到图像模型生成分割掩码？这需要解决生成模型的空间对齐和像素级标注问题。
 3. **无终止长时适应**：在无终止的长时持续适应中，合成知识库或桥接机制是否会累积偏差并导致灾难性遗忘？当前方法在标准 CTTA 基准（15 种损坏类型循环）上表现稳定，但更长时间尺度的行为尚待研究。
 4. **跨任务泛化**：前向促进范式能否推广到目标检测、实例分割等更复杂的视觉任务？这需要重新设计知识库构建和桥接机制的粒度。
-
-
 
 ## 原文 PDF
 

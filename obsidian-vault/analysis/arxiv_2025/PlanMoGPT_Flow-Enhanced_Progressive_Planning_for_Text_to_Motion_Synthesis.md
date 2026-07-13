@@ -53,8 +53,6 @@ claims:
 
 方法定位上，PlanMoGPT 属于**基于标记的自回归生成范式**，与 T2M-GPT（Zhang et al., CVPR 2023）、MoMask 等同属 LLM-based 路线，但通过流匹配与分层规划区别于扩散方法（MDM, Tevet et al., ICLR 2023; ReMoDiffuse, Zhang et al., ICCV 2023）和双向自回归方法（BAMM, Pinyoanuntapong et al., ECCV 2024）。在 KIT-ML 等低帧率数据集上表现相对受限，渐进规划的优势未能完全发挥。
 
-
-
 ### 文本到动作生成的核心挑战
 
 文本到动作生成（Text-to-Motion Generation）旨在根据自然语言描述合成逼真的三维人体运动序列，在动画制作、虚拟人交互、游戏开发等领域具有广泛应用。近年来，基于大语言模型（LLM）的方法通过将连续运动离散化为“运动令牌”（motion tokens），将动作生成转化为序列预测任务，取得了显著进展。然而，这一范式面临一个根本性的瓶颈：**运动标记化的粒度困境**。
@@ -77,8 +75,6 @@ claims:
 2. **渐进规划生成策略（Progressive Planning）**：改变传统的逐令牌生成模式，让LLM首先生成大间隔运动骨架（如每4帧一个令牌的 $M_{b;4}$ 计划），建立全局运动结构；随后逐步细化至中等粒度（2帧间隔的 $M_{b;2}$ 计划），最终生成完整序列。这种从粗到细的分层生成机制，使LLM能够在保持全局语义一致性的同时恢复局部细节，并通过跨层误差校正机制利用粗粒度计划监督细粒度生成。
 
 实验表明，PlanMoGPT在长序列数据集HumanML3D++上将FID从0.380（MoMask）降至0.141，改善63.8%；多样性指标MModality从1.693提升至2.538，提高49.9%，显著突破了现有方法的性能上限。
-
-
 
 ## 核心方法与创新机理
 
@@ -128,8 +124,6 @@ $$U = [\mathbf{S}_4] \oplus M_{b;4} \oplus [\mathbf{S}_2] \oplus M_{b;2} \oplus 
 
 两项创新的协同效应体现在：细粒度标记器提供了足够的细节容量，但若直接交由LLM逐令牌生成，仍会陷入局部依赖；渐进规划恰好将LLM的注意力引导至不同粒度的结构层次，使粗粒度令牌承载全局语义，细粒度令牌专注局部连贯。流匹配解码器则作为最后一道保障，将量化后的粗输出进一步精炼。这一“编码-规划-解码”三级协同设计，是PlanMoGPT在长序列生成上将FID从0.380（MoMask）降至0.141（改善63.8%）、同时将多样性指标提升49.9%的根本原因。
 
-
-
 PlanMoGPT 采用两阶段流水线：**流增强运动标记器**与**集成渐进规划的 LLM**，前者将连续运动序列转换为细粒度离散令牌，后者以从粗到精的方式逐层生成令牌序列，最终由流匹配解码器恢复完整运动。
 
 ### 流水线概览
@@ -165,13 +159,6 @@ PlanMoGPT 采用两阶段流水线：**流增强运动标记器**与**集成渐�
 | 跨层监督 | 无 | 粗粒度计划交叉注意力 | 32.9%/15.3% 注意力分配 |
 
 > **注意**：上述注意力分配比例（32.9%、15.3%）来自原文 Sec 3.3 的跨层误差校正分析，但原文未提供该统计的详细计算方式与方差，建议手动核实其稳健性。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2506_17912/figures/002_Figure_2.jpg]]
-*Figure 2: PlanMoGPT consists of two components: (a). A flow-enhanced motion tokenizer converts motion into fine-grained tokens with minimal loss; (b). An LLM integrates with progressive planning, which progressively generates from a larger interval motion tokens to the full motion token sequence*
-
-
 
 PlanMoGPT 由两个协同模块构成：**流增强运动标记器**（Flow-Enhanced Motion Tokenizer）负责将连续运动序列压缩为细粒度离散令牌并高质量重建；**带渐进规划的 LLM**（LLM with Progressive Planning）则从粗到细地生成这些令牌序列，以同时保证全局语义对齐和局部细节保真。
 
@@ -214,8 +201,6 @@ $$U = [\mathbf{S}_4] \oplus M_{b;4} \oplus [\mathbf{S}_2] \oplus M_{b;2} \oplus 
 **跨层误差校正**进一步强化了粗细粒度间的信息流动。在生成完整序列 $M$ 时，LLM 的交叉注意力会显式关注已生成的粗粒度计划——实验观测到 $M_{b;4}$ 和 $M_{b;2}$ 分别获得 32.9% 和 15.3% 的注意力权重，表明模型自发利用高层计划约束底层细节生成，有效抑制了误差累积。
 
 消融实验（Table 4）证实，单独使用 4 帧或 2 帧计划均不如组合方案——组合计划同时改善了 FID 和 R-Precision Top-1，验证了多粒度分层生成的协同效应。
-
-
 
 ## 实验与关键发现
 
@@ -273,9 +258,6 @@ Table 5(a) 展示了标记化粒度对 PlanMoGPT (base) 性能的影响。将码
 
 1. **低帧率数据集的适配性**：在 KIT-ML（12.5fps）上，PlanMoGPT 的 FID 改善幅度（45.9%）低于 HumanML3D++（63.8%）。低帧率导致帧间运动变化更大，渐进规划的多间隔采样可能无法充分捕获快速运动细节。Table 6 显示 KIT-ML 上的 R@1 为 41.2%，低于 BAMM 的 42.6%，提示需要针对低帧率场景调整计划间隔策略。
 
-![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2506_17912/figures/012_Table_6.jpg]]
-*Table 6: Comparing our PlanMoGPT with baselines on the KIT-ML test dataset. Bold indicates the best result, and underlined indicates the second best result. § indicates using ground-truth motion length as extra information. PlanMoGPT (base) means not including flow-matching refinement. MoMask (Base) refers to using residual VQ-VAE but without residual Transformer*
-
 2. **流匹配推理的步数开销**：ODE 离散化步数 T 直接影响推理速度与质量的权衡。论文未详细报告不同步数下的 FID-延迟曲线，实际部署时需手动验证最优步数配置。
 
 3. **跨层误差校正的隐式性**：论文报告了跨注意力权重分配（32.9% 给 4 帧计划，15.3% 给 2 帧计划），但该机制完全依赖 LLM 的注意力学习，缺乏显式约束。在极端长序列或复杂语义场景下，注意力分配可能失效，需进一步验证。
@@ -290,24 +272,11 @@ Table 5(a) 展示了标记化粒度对 PlanMoGPT (base) 性能的影响。将码
 - **Table 7**：流增强 VQ-VAE 重建 FID 0.014，优于残差 VQ-VAE 的 0.022，验证了流匹配在补偿量化损失中的关键作用。
 - **Table 6**：KIT-ML 上 R@1 略低于 BAMM，提示低帧率场景下渐进规划的局限性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2506_17912/figures/009_Table.jpg]]
 *Table: (a) Impact of granularity of motion tokenization. (b) Comparison of residual and flow-enhanced*
 
-![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2506_17912/figures/003_Table_1.jpg]]
-*Table 1: Statistics of the text-to-motion generation datasets*
-
-![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2506_17912/figures/006_Figure_3.jpg]]
-*Figure 3: Different methods repeatedly generate 30 motions based on the same text. Similar motions are grouped and reported times*
-
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2506_17912/figures/007_Figure_4.jpg]]
 *Figure 4: Case study on HumanML3D and HumanML3D++ datasets. The score range in Figure (a) ranges from 1 to 5, where 1 means poor and 5 means perfect. Figure (b) compares PlanMoGPT and other methods (ground-truth) to which one generates better results*
-
-![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2506_17912/figures/001_Figure_1.jpg]]
-*Figure 1: Generating complex and long-sequence motion by our PlanMoGPT, T2M-GPT [56]. The bounding box of each motion clip is color-coded to match its corresponding text*
-
-
 
 ## 定位与知识库关联
 
@@ -348,8 +317,6 @@ PlanMoGPT 的设计假设和实验覆盖范围定义了其适用边界：
 PlanMoGPT 的核心贡献在于揭示了**运动标记化粒度与生成策略之间的耦合关系**：细粒度令牌需要分层生成策略来维持全局语义，而分层生成又需要流匹配来补偿细粒度令牌的量化损失。这一“粒度-规划-补偿”三角关系为离散令牌方法线提供了新的设计框架。
 
 在更广的视野中，PlanMoGPT 代表了**离散令牌方法与连续生成方法的融合趋势**——用VQ-VAE的离散令牌保证LLM兼容性和可控性，用流匹配的连续细化保证生成质量。这一范式可迁移到其他需要“全局结构+局部细节”的序列生成任务（如音乐、语音手势）。
-
-
 
 ## 原文 PDF
 

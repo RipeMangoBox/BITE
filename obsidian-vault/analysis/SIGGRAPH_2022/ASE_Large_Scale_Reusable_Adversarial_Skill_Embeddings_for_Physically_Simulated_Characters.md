@@ -63,8 +63,6 @@ $$\max_{\pi} -D_{\mathrm{JS}}\left(d^{\pi}(\mathbf{s},\mathbf{s}') \| d^{M}(\mat
 
 **主要局限**包括：基于 GAN 的预训练存在模式崩塌风险；部分生成运动存在高频抖动；恢复动作的逼真度有限；训练需要约十年仿真经验，样本效率有待提升。**开放问题**指向采用扩散模型等替代分布匹配方法、提升恢复策略自然度、以及扩展到更复杂的多步组合任务。
 
-
-
 ### 问题背景：物理角色动画的技能获取瓶颈
 
 在计算机图形学与机器人学中，使物理模拟角色能够自然、高效地完成复杂运动任务是一个长期挑战。传统方法通常为每个新任务从头训练一个控制策略（Scratch），这一范式面临两个根本性困境：
@@ -90,8 +88,6 @@ $$\max_{\pi} -D_{\mathrm{JS}}\left(d^{\pi}(\mathbf{s},\mathbf{s}') \| d^{M}(\mat
 2. **迁移阶段**：冻结预训练的低层策略，在其上训练一个任务特定的高层策略 $\omega(z|s,g)$。高层策略的动作空间直接是低层策略的技能嵌入空间，它通过选择适当的 $z$ 来引导低层策略完成下游任务，从而在无需额外运动数据的情况下保持运动自然度。
 
 这一设计使得运动技能成为可复用资产：一次预训练，多次迁移。角色在完成 Reach、Speed、Steering、Location、Strike 等不同任务时，均能保持与数据集一致的自然运动风格，同时取得具有竞争力的任务回报。
-
-
 
 ## 核心方法与创新机理
 
@@ -157,8 +153,6 @@ $$
 - **恢复动作逼真度**：由于数据集不包含起身动作，恢复策略虽有效但动作的自然度有限。
 - **任务复杂度验证不足**：目前仅在单角色、单步任务上验证，尚未扩展到需要长序列技能组合的多步任务或多角色交互场景。
 
-
-
 ASE 框架采用**两阶段设计**：预训练阶段学习可复用的低层技能嵌入，迁移阶段利用该嵌入完成下游任务。整个系统的核心思路是将对抗模仿学习与无监督技能发现统一在一个预训练目标中，从而在无需结构化运动标签的大规模数据上构建一个兼具多样性、可解释性和可组合性的技能空间。
 
 ### 两阶段流程
@@ -202,12 +196,8 @@ ASE 框架采用**两阶段设计**：预训练阶段学习可复用的低层技
 
 与 **AMP**（Peng et al., 2021）相比，ASE 的关键区别在于：AMP 仅使用对抗判别器提供运动风格先验，但没有显式的技能发现机制，其策略是扁平的、任务特定的；而 ASE 通过互信息最大化构建了结构化的技能嵌入空间，使低层策略成为一个通用的、可复用的运动生成器，能够被不同任务的高层策略灵活调用。消融实验表明，移除技能发现目标（No SD）会导致下游任务性能急剧下降（Figure 11），验证了该组件在构建有效技能表示中的关键作用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l45_https_arxiv_org_abs_2205_01906/figures/005_Figure_4.jpg]]
 *Figure 4: Our framework is used to learn skill embeddings for a 37 degrees-offreedom humanoid character, equipped with a sword and shield*
-
-
 
 ### 两阶段框架总览
 
@@ -289,8 +279,6 @@ $$r_t = w_G r^G(\mathbf{s}_t, \mathbf{a}_t, \mathbf{s}_{t+1}, \mathbf{g}) - w_S 
 
 低层策略使用 PPO 算法进行训练（Section 6.6），价值函数（critic）用于优势估计和 TD($\lambda$) 更新。为增强策略的鲁棒性，训练时以 10% 概率从随机跌倒状态开始 episode（Section 6.5），使策略学会从异常姿态中恢复。Figure 14 显示，预训练后的低层策略能在平均 0.31 秒内从跌倒中恢复，最大恢复时间 4.1 秒，尽管数据集中不包含起身动作。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -347,18 +335,8 @@ Table 1 报告了 ASE 与各基线模型在五个下游任务上的归一化回�
 ![[assets/figures/papers/paper_list_l45_https_arxiv_org_abs_2205_01906/figures/017_Table_3.jpg]]
 *Table 3: ASE hyperparameters for training high-level policy*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l45_https_arxiv_org_abs_2205_01906/figures/010_Figure_10.jpg]]
 *Figure 10: Frequencies at which the low-level policy produces motions that match individual clips in the dataset. Results are shown for the 50 most frequently matched motion clips. ASE produces diverse behaviors that more evenly covers the dataset. Without the skill discovery objective (No SD) and the diversity objective (No Div.), the policy produces less diverse behaviors and is more prone to collapsing to a single behavior*
-
-![[assets/figures/papers/paper_list_l45_https_arxiv_org_abs_2205_01906/figures/013_Figure_12.jpg]]
-*Figure 12: Trajectories of the character’s root produced by random exploration with diferent action spaces for the high-level policy. Random exploration in the original action space A does not produce semantically meaningful behaviors, and tends to cause the character to fall a er a few timesteps. Our method of using the unnormalized latent space $\tilde { z }$ as the action space allows the policy to explore more structured and diverse behaviors. Using the normalized latent space Z can lead to less diverse behaviors, and a much larger standard deviation is needed for the action distribution to produce similar diversity*
-
-![[assets/figures/papers/paper_list_l45_https_arxiv_org_abs_2205_01906/figures/011_Figure_11.jpg]]
-*Figure 11: Learning curves comparing performance on downstream tasks using diferent low-level policies. We compare ASE to policies that are trained from scratch for each tasks (Scratch), as well as to low-level policies trained without the skill discovery objective (No SD), without the diversity objective (No Div.), and with both objectives disabled (No SD + No Div.). The skill discovery objective is crucial for learning efective skill representations. The policies trained from scratch o en achieve higher returns by exploiting unnatural behaviors (see Figure 8)*
-
-
 
 ## 定位与知识库关联
 
@@ -421,8 +399,6 @@ ASE 的有效性建立在以下前提之上：
 5. **运动质量的形式化度量**：论文主要依赖定性观察和下游任务性能来评估运动质量。如何建立更客观、可量化的运动自然度指标，以更公平地比较 ASE 与 Scratch 等方法？
 
 6. **样本效率的进一步提升**：能否通过离线预训练、元学习或模型-based 方法减少所需的仿真经验，使 ASE 更接近人类“看几次就能学会”的技能获取方式？
-
-
 
 ## 原文 PDF
 

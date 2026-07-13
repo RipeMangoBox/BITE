@@ -68,8 +68,6 @@ C-GenReg处于**生成式点云配准**与**基础模型驱动的三维感知**�
 
 方法的主要局限在于推理速度受WFM生成过程制约（单次注册约508秒），虽可通过蒸馏降至约7秒但仍不满足实时需求。此外，生成质量依赖深度输入和文本提示的语义合理性，极端动态场景或稀疏传感器上的泛化性尚未验证。开放问题包括：更轻量生成模型的探索、无文本提示条件下的鲁棒匹配、显式依赖建模对概率融合的改进，以及跨模态、跨季节场景的扩展。
 
-
-
 三维点云配准旨在估计两帧点云之间的刚性变换，是三维视觉与机器人领域的核心任务。给定源点云和目标点云，配准的目标是找到最优旋转矩阵$\pmb{R}$和平移向量$\pmb{t}$，使得对齐后的对应点距离最小化：
 
 $$
@@ -81,8 +79,6 @@ $$
 与3D领域形成鲜明对比的是，2D视觉基础模型（VFM）已在图像匹配、密集对应等任务上展现出强大的泛化能力。部分工作尝试利用RGB-D数据中的颜色信息辅助配准（如**PointMBF**），或通过生成式方法将点云转化为图像域进行匹配（如**GPCR**、**ZeroMatch**），但这些方法要么依赖原生RGB输入，要么生成的图像缺乏跨视图的几何对齐和外观一致性，限制了其在实际纯几何传感器（如LiDAR）上的应用。
 
 本文的核心动机在于回答一个关键问题：**能否将点云配准转化为图像域的匹配问题，从而充分利用2D视觉基础模型的强大先验，同时保持与原始几何特征的互补性？** 具体而言，C-GenReg通过世界基础模型（WFM）将3D几何转换为多视图一致的RGB图像，利用任务特定的VFM提取密集对应关系，并与原始几何特征进行概率后验融合。这一“先匹配后融合”的概率建模策略，使得整个框架在无需任何目标域训练的条件下，能够获得高置信度的跨模态对应，首次实现了生成式配准框架在真实室外LiDAR数据上的成功运行。
-
-
 
 ## 核心方法与创新机理
 
@@ -115,8 +111,6 @@ C-GenReg 的核心创新在于将点云配准问题转化为图像域匹配问�
 
 C-GenReg 通过三个 changed slots 的系统性创新——引入生成RGB特征扩展模态空间、采用概率后验融合替代确定性匹配、以完全冻结的预训练模型实现零样本泛化——在无需任何任务特定训练的条件下，于室内RGB-D和室外LiDAR基准上均取得了最优或接近最优的配准精度。
 
-
-
 C-GenReg的核心思想是将三维点云配准问题**迁移到图像域**：利用世界基础模型（WFM）从点云渲染的深度图生成多视图一致的RGB图像，借助任务特定的视觉基础模型（VFM）提取密集对应关系，再与原始几何特征进行概率后验融合，最终估计刚性变换。整个框架无需任何训练或微调，所有模块均使用预训练且冻结的权重。
 
 ### 双分支并行架构
@@ -143,15 +137,11 @@ C-GenReg的核心思想是将三维点云配准问题**迁移到图像域**：�
 
 对于室外LiDAR数据（如Waymo），框架通过虚拟相机将LiDAR点云投影为深度图（图7），其余流程保持一致，首次实现了生成式配准框架在真实LiDAR数据上的应用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2445_https_arxiv_org_abs_2604_16680/figures/001_Figure_1.jpg]]
 *Figure 1: C-GenReg: A training-free point cloud registration framework. The pipeline operates in two parallel branches: (1) Generated-RGB Branch - a World Foundation Model generates RGB views that are geometrically aligned with the input source and target point clouds and visually consistent across the two viewpoints; a task-specific Vision Foundation Model extracts dense image features and estimates RGB-based correspondences. (2) Geometric Branch - a geometric feature extractor encodes structural cues directly from the raw 3D point clouds and independently produces geometry-based correspondences. The two correspondence probability maps are then fused using our “Match-then-Fuse” probabilistic fusion...*
 
 ![[assets/figures/papers/paper_list_l2445_https_arxiv_org_abs_2604_16680/figures/002_Figure_2.jpg]]
 *Figure 2: C-GenReg Overview: A training-free, zero-shot point cloud registration framework with two parallel branches. (1) Generated-RGB Branch - source and target point clouds are each represented as depth-frame sequences, temporally concatenated and processed by a frozen World Foundation Model to generate RGB views that are geometrically aligned and appearance-consistent across views. A subset of K frames per domain is fed to a frozen, task-specific Vision Foundation Model (VFM) to extract dense pixel-level features, later lifted to 3D using the original depths. (2) Geometric Branch - extracts dense geometric features directly from the raw point clouds using a pretrained geometric feature extractor...*
-
-
 
 C-GenReg 将点云配准分解为两个并行的特征提取分支和一个概率融合阶段，其核心设计在于“先匹配后融合”：每个分支独立产生对应关系后验概率，再通过概率推理融合为统一的联合后验，从而避免了对特征空间的显式对齐学习。
 
@@ -205,15 +195,8 @@ $$\underset{(\pmb{R},\pmb{t})\in SE(3)}{\arg\min}\sum_{(\pmb{p}^*,\pmb{q}^*)\in\
 
 该步骤采用 SC2PCR 鲁棒估计器，在存在离群对应的情况下稳定求解 $SE(3)$ 变换。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2445_https_arxiv_org_abs_2604_16680/figures/009_Figure_5.jpg]]
-*Figure 5: WFM Input Formatting. (a) Input depth maps of the source and target views. (b) Feeding the pretrained WFM with horizontally concatenated depth inputs causes cross-view inconsistencies, e.g., the sofa is mistakenly replaced in the generated source image. (c) Using temporal concatenation produces RGB outputs that are geometrically coherent and appearance-consistent between the two views*
-
 ![[assets/figures/papers/paper_list_l2445_https_arxiv_org_abs_2604_16680/figures/011_Figure_7.jpg]]
 *Figure 7: C-GenReg LiDAR Input Pipeline: (a) A virtual camera is configured into the LiDAR scan. (b) The LiDAR points are projected into a depth image. (c) The resulting depth map is fed into the generative model to produce an aligned RGB image*
-
-
 
 ## 实验与关键发现
 
@@ -243,33 +226,14 @@ C-GenReg 在 3DMatch 基准上实现了全面的最优性能。如表 1 所示�
 
 单次注册约需 508 秒（表 5，单张 NVIDIA RTX A6000 GPU），瓶颈主要在于 WFM 的视频生成。通过模型蒸馏可将推理时间降至约 7 秒，但仍不适合实时应用。此外，室外 LiDAR 数据需通过虚拟相机投影为深度图（图 7），引入了畸变和视野限制；全景配准需要多个相机拼接，增加了工程复杂度。方法尚未在极端动态场景或稀疏传感器（如雷达）上验证，这些场景下深度图质量和生成一致性可能进一步下降。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2445_https_arxiv_org_abs_2604_16680/figures/005_Table_1.jpg]]
 *Table 1: 3DMatch Benchmark. Rotation and translation accuracy (% of pairs within RRE/RTE thresholds in deg and cm respectively) and mean/median error across different methods. RGB-D baselines are included as complementary reference. Best in bold, second-best in underlined*
-
-![[assets/figures/papers/paper_list_l2445_https_arxiv_org_abs_2604_16680/figures/008_Table_4.jpg]]
-*Table 4: Ablation Study on the 3DMatch Benchmark. Top: impact of different Vision Foundation Models (no geometric features or fusion). Bottom: impact of geometric feature extractors and fusion operators (using MASt3R as the VFM). Best in bold*
 
 ![[assets/figures/papers/paper_list_l2445_https_arxiv_org_abs_2604_16680/figures/007_Table_3.jpg]]
 *Table 3: Waymo Outdoor Registration Benchmark. Rotation (deg) and translation (m) accuracy/error. Best results are in bold*
 
-![[assets/figures/papers/paper_list_l2445_https_arxiv_org_abs_2604_16680/figures/014_Table_7.jpg]]
-*Table 7: Low-Overlap Results. Mean RRE (degrees) and mean RTE (cm for Lo3DMatch and m for LoWaymo)*
-
-![[assets/figures/papers/paper_list_l2445_https_arxiv_org_abs_2604_16680/figures/004_Figure_4.jpg]]
-*Figure 4: Prompt robustness on 3DMatch. Relative rotation (RRE,◦) and translation (RTE, cm) errors under different prompt types*
-
-![[assets/figures/papers/paper_list_l2445_https_arxiv_org_abs_2604_16680/figures/010_Figure_6.jpg]]
-*Figure 6: Effect of View Selection (K). Registration performance measured by Relative Rotation Error (RRE) and Relative Translation Error (RTE) as a function of the number of selected views K. Performance saturates for*
-
 ![[assets/figures/papers/paper_list_l2445_https_arxiv_org_abs_2604_16680/figures/003_Figure_3.jpg]]
 *Figure 3: C-GenReg qualitative example on 3DMatch. Generated source and target images with a subset of matched points (color-coded correspondences), and the corresponding matches visualized on the input point clouds. The resulting rotation (RRE) and translation (RTE) errors are reported*
-
-![[assets/figures/papers/paper_list_l2445_https_arxiv_org_abs_2604_16680/figures/012_Table_5.jpg]]
-*Table 5: Runtime Analysis. Runtime per registration problem measured on a single NVIDIA RTX A6000 GPU*
-
-
 
 ## 定位与知识库关联
 
@@ -331,8 +295,6 @@ C-GenReg 的知识库定位可分解为三个层次的模型复用与创新：
 4. **多模态扩展**：方法是否适用于多模态传感器融合（如雷达+相机）或跨季节/天气变化场景的配准？这需要验证 WFM 在非可见光模态下的生成能力。
 5. **基础模型替代**：其他新兴世界基础模型（如 Sora、VideoPoet）或通用 VFM（如 Segment Anything Model、DINOv2）能否替代现有模块并获得更好泛化？Table 4 已初步验证 MASt3R 优于 DINOv2，但更广泛的模型选择空间仍待探索。
 6. **跨域迁移的理论理解**：WFM 和 VFM 的预训练数据与点云配准目标域之间的分布差异如何影响性能？缺乏理论分析限制了对方法泛化边界的预测。
-
-
 
 ## 原文 PDF
 

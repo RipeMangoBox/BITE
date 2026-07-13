@@ -54,8 +54,6 @@ claims:
 
 **方法定位。** CM 属于训练时的容量分配策略，与重采样、重加权、数据增强等现有长尾处理方法正交，可与之协同使用。其核心创新在于将“容量预留”从隐式学习转变为显式的结构化设计，为类别不平衡生成任务提供了一种轻量、即插即用的解决方案。
 
-
-
 扩散模型在图像生成领域取得了显著成功，但其训练通常依赖大规模、类别平衡的数据集。现实世界的数据分布往往呈现长尾特性，即多数类拥有充足样本，而少数类样本稀缺。当扩散模型直接在这种类别不平衡数据上训练时，会出现一个根本性问题：**多数类垄断模型容量，导致少数类生成质量严重退化**。
 
 Fig. 1(a) 直观展示了这一现象：在样本比为 100:1 的 Imb. CelebA-HQ 数据集上训练的 DDPM，多数类（Female）生成质量良好，而少数类（Male）的生成结果严重失真。这揭示了不平衡训练的核心矛盾——模型并非缺乏表达能力，而是其容量被多数类信息过度占据。
@@ -89,8 +87,6 @@ $$\Pi_{\mathrm{maj}} = \Phi\left(\frac{(2a-1)\mu\sqrt{2N(1-\cos\angle(\mu_1,\mu_
 2. 如何设计训练机制，将少数类知识精确引导至预留容量，同时保持多数类的生成质量不退化。
 
 这一思路的出发点是：模型容量本身是充足的，问题在于分配的失衡。通过低秩分解将参数拆分为通用容量和少数类专属容量，并在训练中施加容量操纵损失，可以在不增加推理开销的前提下，显著提升不平衡条件下的生成鲁棒性。
-
-
 
 ## 核心方法与创新机理
 
@@ -132,8 +128,6 @@ $$\mathcal{L}_{\mathrm{Con}} = \omega_{\mathrm{Con}}^y \mathbb{E}_t \| \epsilon_
 
 消融实验证实了上述创新设计的必要性：移除一致性损失 $\mathcal{L}_{\mathrm{Con}}$ 导致 Imb. CIFAR-100 (IR=100) 上 FID 从 7.519 升至 8.412；移除多样性损失 $\mathcal{L}_{\mathrm{Div}}$ 使 FID 升至 8.073（Table 7 Right）。低秩分量 $\theta^e$ 的秩比例约为 0.1 时 FID 最低，表明**少量预留容量即可有效保护少数类学习**（Fig. 4(c)）。此外，CM 可作为通用框架集成至 CBDM、OC、ADA 等多种基线方法，持续提升其在不平衡条件下的生成性能（Fig. 4(a)）。
 
-
-
 ![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_wSGle6ag5I/figures/003_Figure_2.jpg]]
 *Figure 2: (a,b) An overview of our method, CM. (a) An illustration of the capacity reservation part of CM. (b) An illustration of how CM allocates the corresponding knowledge to the reserved model capacity during training. (c) Many/Medium/Few split performance on Imb. CIFAR100 with imbalance ratio $\mathrm { I R }$ = 1 0 0 , where Many/Medium/Few represents the top, middle, and bottom thirds of classes sorted by sample number in descending order. CM significantly improves minority performance without sacrificing the performance of majorities*
 
@@ -173,8 +167,6 @@ CM 的核心思路是：在训练前显式为少数类预留低秩容量，并�
 - 秩比例 $r / \min(d,k)$ 在约 0.1 时 FID 最低（Fig. 4(c)），表明少量预留容量即可有效保护少数类。
 - $\lambda$ 在 1.0 附近性能最优，且在 [0.5, 1.5] 范围内均优于最优基线 OC（Fig. 4(b)）。
 - CM 可作为通用框架集成至不同基线（CBDM、OC、ADA 等），使用对应目标函数作为 $\mathcal{L}_{\mathrm{base}}$ 即可持续提升不平衡生成性能（Fig. 4(a)）。
-
-
 
 ### 容量预留：低秩参数分解
 
@@ -231,16 +223,12 @@ $$\min_{\theta} \mathcal{L}_{\mathrm{Total}} = \mathcal{L}_{\mathrm{base}}(\math
 
 消融实验验证了这一因果链的必要性：移除 $\mathcal{L}_{\mathrm{Con}}$ 使 Imb. CIFAR-100 (IR=100) 的 FID 从 7.519 升至 8.412；移除 $\mathcal{L}_{\mathrm{Div}}$ 使 FID 升至 8.073（Table 7 Right），表明一致性约束与多样性鼓励缺一不可。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与容量支配的实证动机
 
 类别不平衡扩散模型训练的根本瓶颈在于**多数类垄断了模型容量**。在 Imb. CelebA-HQ (IR=100) 上，DDPM 对多数类（Female）生成质量良好，但少数类（Male）严重退化（Fig. 1(a)）。更直接的证据来自剪枝实验：对 Imb. CIFAR-100 (IR=100) 上训练的 DDPM 剪去 10% 的 L1 范数最小参数后，少数类的相对损失变化远大于多数类（Fig. 1(b)），表明**少数类信息被挤占至非关键容量中**，一旦剪枝便立即崩溃。定理 2.1 进一步从理论上证明，在两类极端不平衡下，多数类主导参数更新的期望占比 $\Pi_{\mathrm{maj}}$ 与不均衡度 $a$ 和样本总量 $N$ 正相关，与类间相似度负相关，为容量失衡提供了解析表达。
 
-![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_wSGle6ag5I/figures/002_Figure_1.jpg]]
-*Figure 1: (a) Real images from Imb. CelebA (Imbalance Ratio IR = 100) and generated images from DDPM and our method. Images are randomly sampled. (b) Relative per-class loss change, defined as ( $\mathcal { L } _ { p r u n e d } ^ { c } - \mathcal { L } _ { r a w } ^ { c }$ ) / $\mathcal { L } _ { r a w } ^ { c }$ , for a DDPM model trained on Imb. CIFAR-100 (IR = 100) when 10% of its parameters with the smallest L1-Norm are pruned. Raw losses and absolute loss changes are provided in Figs. G.1 and G.2
 
 ### 主实验结果
 
@@ -256,18 +244,9 @@ CM 在多个数据集、不平衡比率和评估指标上一致优于现有方�
 
 **Imb. CelebA-HQ**（Table 4）：在 IR=100 的二分类（Female/Male）设置下，CM 的 Overall FID 为 **7.538**，优于 CBDM（7.823）和 OC（8.051），且两个类别的 per-class FID 均取得最优。
 
-![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_wSGle6ag5I/figures/007_Table_4.jpg]]
-*Table 4: FIDs (↓), KIDs (↓), and per-class FIDs (↓) of CM and baselines on Imb. CelebA-HQ with imbalance ratios $\mathrm { I R } = \{$ 1 0 0 , 5 0 $\}$ shown side-by-side. Female and Male are the two classes. Best and second-best results are highlighted. Results with Mean±Std can be found in Tab. G.2*
-
 **大规模长尾数据集**（Table 5）：在 ImageNet-LT 和 iNaturalist 的 32×32 和 64×64 分辨率上，CM 在 FID 和 KID 上均取得最佳，证明了方法在大规模真实长尾分布下的鲁棒性。
 
-![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_wSGle6ag5I/figures/008_Table_5.jpg]]
-*Table 5: FIDs (↓) and KIDs (↓) on ImageNet-LT and iNaturalist at 3 2 $\times$ 3 2 and 64 64 resolutions*
-
 **LoRA 微调场景**（Table 6）：在 Imb. ArtBench-10 (IR=100) 上使用 LoRA 微调 Stable Diffusion，CM 的 FID 为 **22.776**，相较 OC（24.559）降低 1.783。定性可视化（Fig. 3）显示，对尾类“Realism”，CM 生成结果在多样性和风格贴近度上显著优于 DDPM。
-
-![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_wSGle6ag5I/figures/009_Table_6.jpg]]
-*Table 6: FIDs (↓), KIDs (↓), Recalls (↑), and ISs (↑) of CM and various baselines on Imb. ArtBench-10 with $\mathrm { I R } = \{$ 1 0 0 , 5 0 $\}$ shown, using LoRA to fine-tune Stable Diffusion. Best and second-best results are highlighted. Full results with Mean±Std can be found in Tab. G.3*
 
 ### 消融实验
 
@@ -297,15 +276,6 @@ Table 1 显示，简单对 CBDM 施加低秩分解（$\theta = \theta^g \oplus \
 ### 局限性与失败模式
 
 在绝对少数样本数量极低时（例如个位数样本），预留的容量 $\theta^e$ 仍可能因缺乏足够数据而难以学到有意义的表示，限制了生成质量的提升。当前验证集中于图像生成扩散模型，尚未在其他数据模态（如视频、3D 数据）上进行广泛评估。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_wSGle6ag5I/figures/016_Table_8.jpg]]
-
-![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_wSGle6ag5I/figures/017_Table_9.jpg]]
-*Table 9: Table E.1: Conceptual comparison of CM with related paradigms*
-
-
 
 ## 定位与知识库关联
 
@@ -355,8 +325,6 @@ CM 的参数分解形式与 LoRA 相似，但二者在动机和机制上存在�
 3. **判别式任务的推广**：容量操纵思想在长尾识别任务上的初步实验已显现积极信号，但是否需要进一步的网络结构适配和理论分析，仍需系统验证。判别式任务中“容量”的定义可能与生成式任务不同，需要重新形式化。
 
 4. **理论深化**：定理 2.1 给出了两类设定下的容量支配比例，但多类场景下的理论分析尚不完整，尤其是类别间语义层次结构对容量分配的影响值得进一步建模。
-
-
 
 ## 原文 PDF
 

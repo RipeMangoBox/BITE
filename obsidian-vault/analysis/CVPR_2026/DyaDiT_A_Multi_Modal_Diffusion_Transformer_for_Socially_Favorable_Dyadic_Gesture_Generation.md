@@ -75,8 +75,6 @@ DyaDiT 相比现有基线（如 **ConvoFusion** 与 **Audio2PhotoReal**）的核
 
 当前方法仅生成上肢手势（43 个关节），全局方向与平移置零，限制了全身动作的自然度。关系类型的聚类效果不如人格特征清晰，表明社会线索的解耦仍存在挑战。开放问题包括：如何对音频进行“中性化”处理以更好解耦社会线索与语音内容，以及如何在 IPC 标签完善后设计更丰富的交际动态捕捉模块。
 
-
-
 ### 问题背景：双边对话手势生成的挑战
 
 在面对面交流中，非语言行为——尤其是手势——承载着丰富的社会语义，直接影响对话的自然度与社交感知。随着数字人、虚拟现实和具身智能体的快速发展，如何让虚拟角色在双边对话中生成与语音内容、社交关系及个性特征相匹配的手势，已成为人机交互领域的核心挑战之一。
@@ -102,8 +100,6 @@ DyaDiT 相比现有基线（如 **ConvoFusion** 与 **Audio2PhotoReal**）的核
 - **引入运动风格控制以提升多样性**：通过可学习的离散运动字典和可选的伙伴运动条件，赋予模型风格感知与响应式生成能力，在保持真实感的同时显著扩展手势的多样性空间。
 
 DyaDiT 的设计目标并非简单追求指标上的边际提升，而是试图在**真实感-多样性-社交一致性**的三元权衡中建立新的平衡——这一目标将通过定量实验（Table 1）和用户主观研究（Figure 7）得到验证。
-
-
 
 ## 核心方法与创新机理
 
@@ -149,8 +145,6 @@ DyaDiT 可选地以对方的手势序列作为额外条件输入，使生成的�
 
 上述四个 changed slots 并非孤立改进，而是围绕一个统一目标协同工作：**将双边手势生成从“听音频、出动作”的单模态映射，升级为“理解谁在说、和谁说、怎么说”的社交语境推理任务**。ORCA 解决了“谁在说”的歧义，社交条件注入了“和谁说”的语境，运动字典和伙伴条件则丰富了“怎么说”的表达空间。这一设计范式使 DyaDiT 在 FD（真实感）和 Diversity（多样性）两个通常存在 trade-off 的指标上同时取得显著提升（Table 1），并在用户研究中以 73.9% 的整体质量偏好大幅领先基线（$p < 10^{-8}$，Figure 7）。
 
-
-
 DyaDiT 是一个基于扩散Transformer（Diffusion Transformer, DiT）的双向手势生成框架，其核心设计目标是将多模态社交语境显式地注入生成过程，以产生社交感知力强且多样化的对话手势。整体pipeline围绕四个关键模块组织：运动分词器（Motion Tokenizer）、音频正交化交叉注意力（ORCA）、运动字典（Motion Dictionary）以及作为主干网络的DiT去噪模块。
 
 ### 输入与条件流
@@ -176,12 +170,8 @@ $$\mathcal{L}_{\mathrm{diff}} = \mathbb{E}_{\mathbf{x}_0, t, \epsilon} \left[ \l
 
 ORCA 模块通过从自身音频中减去其在对方音频子空间上的投影（$a_{\mathrm{self}}^{\perp} = a_{\mathrm{self}} - \mathrm{Proj}_{a_{\mathrm{other}}}(a_{\mathrm{self}})$），消除双人音频流中的冗余成分，再经可学习门控机制自适应融合两个方向的交叉注意力输出。运动字典则利用加权运动基元对对方音频特征进行交叉注意力调节（$\mathrm{CA}(a_{\mathrm{other}}, \sum_{k=0}^{n} m_k d_k) + a_{\mathrm{other}}$），为手势生成提供风格层面的引导。两者分别从“语义清晰度”和“风格多样性”两个维度增强生成质量，消融实验证实移除 ORCA 会导致 FD 指标恶化，而将离散运动字典替换为连续版本则显著降低多样性（Table 1），验证了各模块的独立贡献与协同效应。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l987_https_arxiv_org_abs_2602_23165/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of DyaDiT. DyaDiT conditions on multiple input modalities, including audio, partner motion, relationship type, and personality scores. It employs an Audio Orthogonalization Cross Attention (ORCA) module to obtain cleaner audio representations and a motion dictionary to guide style aware gesture generation*
-
-
 
 ### 3.1 扩散Transformer主干网络
 
@@ -224,13 +214,6 @@ $$a_{\mathrm{other}}^{\prime} = \mathrm{CA}(a_{\mathrm{other}}, \sum_{k=0}^{n} m
 ### 3.4 运动分词器（VQ-VAE）
 
 为降低扩散模型在连续运动空间上的计算成本并捕捉长期时序依赖，DyaDiT首先训练VQ-VAE将连续运动序列压缩为离散潜变量表示。该分词器将原始43关节的上肢运动数据映射到紧凑的离散编码空间，扩散过程在该潜空间中进行，而非直接操作高维连续运动数据。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l987_https_arxiv_org_abs_2602_23165/figures/003_Figure_3.jpg]]
-*Figure 3: ORCA reduces ambiguity between the two audio streams, allowing DyaDiT to generate realistic motion even when one person interrupts the other during the conversation. The example demonstrates the generated motions adjusts naturally as the conversation shifts*
-
-
 
 ## 实验与关键发现
 
@@ -300,8 +283,6 @@ Figure 7 报告了 A/B 测试结果，参与者在 DyaDiT 与 ConvoFusion 之间
 
 3. **IPC 标签未被利用**：数据集提供的 Interpersonal Communication Dynamics 标签因噪声大且定义模糊被弃用。这导致模型无法捕捉更细粒度的交际意图（如“赞同”、“质疑”、“安抚”），限制了手势的语义精确性。待 IPC 标注质量提升后，设计 IPC 感知的条件模块是一个明确的改进方向。
 
-
-
 ## 定位与知识库关联
 
 ### 任务定位与基线关系
@@ -341,8 +322,6 @@ DyaDiT 的适用边界受以下因素制约：
 2. **全身动作生成**：如何构建大规模、高质量的双人全身交互数据集，以支持从手势拓展到全身动作生成，是突破当前运动范围限制的前提。
 
 3. **IPC感知建模**：在IPC标签得到完善后，如何设计IPC感知的条件模块，以捕捉更丰富的交际动态（如话轮转换、反馈信号等），有望进一步提升生成手势的社交一致性。
-
-
 
 ## 原文 PDF
 

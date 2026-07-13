@@ -52,8 +52,6 @@ claims:
 
 实验结果表明，ABOM 在无需任何手工训练任务的前提下，于 BBOB 合成基准（维度高达 500）和 28 个无人机路径规划实际问题上，取得了优于或可比肩传统自适应方法（如 CMAES）和基于元学习的基线方法（如 GLEET、RLDEAFL）的性能。消融研究进一步证实，参数自适应、交叉和变异三个组件均为 ABOM 的关键组成部分，移除任一部分均会导致性能显著恶化。可视化分析揭示，学习到的选择矩阵和变异矩阵呈现出统计显著且可解释的搜索模式，包括对高适应度个体的选择偏向和一致的基因交互模式。
 
-
-
 黑盒优化（Black-box Optimization, BBO）在科学发现、工程设计、超参数调优等众多领域中扮演着核心角色。其目标是在没有梯度信息、仅能通过查询获取目标函数值的条件下，寻找全局最优解：
 
 $$\operatorname*{min}_{\mathbf{x}\in\mathbb{R}^d} f_T(\mathbf{x})$$
@@ -67,8 +65,6 @@ $$J(\pmb\theta) = \operatorname*{max}_{\pmb\theta \in \Theta} \mathbb{E}_{f \sim
 典型的 MetaBBO 方法包括基于元学习的粒子群优化器（**GLEET**, Ma et al., 2024）、差分进化优化器（**RLDEAFL**, Guo et al., 2025）以及进化策略优化器（**LES**, Lange et al., 2023b）等。尽管这些方法在特定任务分布上取得了显著进展，但它们存在一个根本性的依赖：**必须预先定义训练任务分布 $\mathcal{F}$**。当实际应用中目标任务的分布未知、数据稀缺或与训练分布存在显著差异时，元训练得到的策略往往难以有效泛化，严重限制了 MetaBBO 在真实场景下的部署能力。
 
 这一缺陷揭示了当前 MetaBBO 范式的结构性缺口：**如何在无需任何预定义训练任务的前提下，实现对任意目标黑盒优化任务的零样本自适应？** 这要求优化器能够完全摆脱对 $\mathcal{F}$ 的依赖，转而仅利用目标任务的在线优化数据来动态调整其搜索行为。本文提出的 ABOM（Adaptive meta Black-box Optimization Model）正是针对这一核心问题，通过构建一个端到端可微的进化优化框架，将参数学习与优化过程融为一体，从根本上消除了任务分布依赖。
-
-
 
 ## 核心方法与创新机理
 
@@ -123,8 +119,6 @@ ABOM 的核心洞察在于：**通过将选择、交叉和变异算子参数化�
 
 ABOM 的创新不仅体现在经验性能上，还具备理论层面的保障。在满足搜索空间紧致且全局最优点位于内部等假设条件下，ABOM 几乎必然收敛到全局最优值：$ f_t^* \xrightarrow{a.s.} f^* \quad \text{as} \quad t \to \infty $（Eq. 14）。这一理论结果将可微进化算子的自适应学习与经典进化算法的收敛分析框架桥接起来，为方法的可靠性提供了形式化支撑。
 
-
-
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_AufVSUgMUo/figures/001_Figure_1.jpg]]
 *Figure 1: Conceptual comparison: (Left) MetaBBO methods learn meta-strategies from task distributions but depend on handcrafted training tasks; (Right) Our framework performs adaptive parameter learning using self-generated optimization data, eliminating task distribution dependency*
 
@@ -142,8 +136,6 @@ ABOM 将传统进化算法的种群迭代过程重构为一个端到端可微的
 **参数自适应**：ABOM 的核心创新在于在线参数学习。通过最小化子代种群与精英归档之间的 L2 距离 $\mathcal{L}^{(t)} = \|\hat{\mathbf{P}}^{(t)} - \mathbf{E}^{(t)}\|^2$，利用 AdamW 优化器对所有可学习参数 $\theta$ 进行梯度更新。这一自监督信号完全来源于目标任务的在线优化数据 $\mathcal{M}^{(t)}$，使 ABOM 具备零样本、任务无关的自适应能力，无需任何预训练任务或启发式规则。
 
 整个框架的计算复杂度为 $O(N d d_A + N^2 d_A + N d_A d_M + N d_M d + d^2 d_A + d d_A d_M)$，其中 $d_A$ 为注意力维度，$d_M$ 为隐藏维度。在高维场景下，$O(d^3)$ 项可能成为计算瓶颈。理论分析表明，在搜索空间紧致且全局最优点位于内部的假设下，ABOM 几乎必然收敛到全局最优值 $f_t^* \xrightarrow{a.s.} f^*$，其收敛性由精英归档的单调改进与变异模块的非零探索概率共同保证。
-
-
 
 ABOM 将传统进化算法的离散算子空间统一为一个端到端可微的连续参数空间 $\pmb{\theta}$，从而消除了对预定义任务分布 $\mathcal{F}$ 的依赖。其核心优化目标直接由目标任务的累积在线数据 $\mathcal{M}^{(t)}$ 驱动：
 
@@ -185,8 +177,6 @@ $$f_t^*\xrightarrow{a.s.} f^* \quad as \quad t\to\infty$$
 
 该保证源于可微算子中 Dropout 引入的非零探索概率——对任意 $\delta > 0$，有 $\mathbb{P}(\exists i : \|\hat{\mathbf{p}}_i^{(t)} - \mathbf{x}^*\| < \delta \mid \mathcal{F}_t) \geq 1 - (1 - \gamma)^N > 0$，结合精英保留策略确保了全局收敛性（Eq. 14, Section 3.4）。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈的实证验证
@@ -219,9 +209,6 @@ Table 1 给出了完整的高维对比结果。ABOM 在 24 个测试函数中的
 
 在 28 个地形问题上，ABOM 展现出**最快的收敛速度和最低的最终归一化成本**（Figure 3）。左侧收敛曲线显示 ABOM 在有限评估预算下迅速下降并稳定在最低水平；右侧运行时对比表明 ABOM 的 GPU 推理效率显著优于多数基线。该结果验证了 ABOM 从合成基准到现实连续优化问题的跨域泛化能力。
 
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_AufVSUgMUo/figures/006_Figure_3.jpg]]
-*Figure 3: Performance on 28 UAV problems: (Left) Convergence curve of average normalized cost across all problems. Costs (lower is better) are min-max normalized for each case. Detailed results are shown in the Appendix K; (Right) Average runtime (GPU seconds) over 30 independent runs. Figure 4: Learned selection and mutation matrices of ABOM on BBOB functions f _ { 4 } , f _ { 1 1 } , and f _ { 2 4 } (d = 30) at Generation 1, 500, and 1000. For the selection matrix, axes represent individuals ranked by their fitness values (0 is the best). For the mutation matrix, axes represent gene (variable) indices*
-
 ---
 
 ### 消融研究
@@ -252,9 +239,6 @@ Figure 4 揭示了 ABOM 在 BBOB 函数 f4、f11、f24（d=30）上演化过程�
 ### 超参数敏感性分析
 
 Figure 5 分析了四个关键超参数在 BBOB（d=30）上的敏感性：
-
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_AufVSUgMUo/figures/011_Figure_5.jpg]]
-*Figure 5: Sensitivity analysis of key hyperparameters on the BBOB suite with d = 3 0 $\colon$ Algorithm performance across different settings for population size (N), hidden dimension ( $d _ { M }$ ) , crossover dropout rate ( $p _ { C }$ ) , and mutation dropout rate ( $p _ { M }$ ) . The learning rate analysis is in Appendix I*
 
 - **种群规模 N**：过小导致多样性不足，过大增加计算开销，存在一个较宽的鲁棒区间。
 - **隐藏维度 d_M**：模型容量需与问题维度匹配，过小限制表达能力，过大可能导致过拟合。
@@ -289,27 +273,14 @@ Figure 5 分析了四个关键超参数在 BBOB（d=30）上的敏感性：
 - **Figure 5**：超参数敏感性分析，显示框架在较宽范围内鲁棒。
 - **Figure 6**：参数自适应损失收敛曲线，证实自监督对齐的有效性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_AufVSUgMUo/figures/014_Table_3.jpg]]
 *Table 3: Overview of the BBOB suites*
-
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_AufVSUgMUo/figures/015_Table_4.jpg]]
-*Table 4: Detailed hyperparameter configurations of baselines. ub and lb denote the upper and lower bounds of the search space, respectively. randn(d) denotes sampling a d-dimensional vector from a standard normal distribution. All MetaBBO methods are trained on the same synthetic problem distribution as RLDEAFL Guo et al. (2025)*
-
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_AufVSUgMUo/figures/016_Table_5.jpg]]
-*Table 5: Hyperparameter configuration of ABOM*
 
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_AufVSUgMUo/figures/020_Table_6.jpg]]
 *Table 6: Performance comparison of ABOM vs. ABOM-PT on the STOP suite over 30 independent runs, reported as the mean and standard deviation of objective values (lower is better)*
 
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_AufVSUgMUo/figures/021_Table_7.jpg]]
 *Table 7: The comparison results of the baselines on the BBOB suite with d = 30. All results are reported as the mean and standard deviation (mean ± std) over 30 independent runs. Symbols “−”, “≈”, and “+” imply that the corresponding baseline is significantly worse, similar, and better than ABOM on the Wilcoxon rank-sum test with 95% confidence level, respectively. The best results are indicated in bold, and the suboptimal results are underlined*
-
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_AufVSUgMUo/figures/022_Table_8.jpg]]
-*Table 8: The comparison results of the baselines on the BBOB suite with d = 100. All results are reported as the mean and standard deviation (mean ± std) over 30 independent runs. Symbols “−”,$^ { 6 6 } { \approx } ^ { 5 3 }$ , and “+” imply that the corresponding baseline is significantly worse, similar, and better than ABOM on the Wilcoxon rank-sum test with 95% confidence level, respectively. The best results are indicated in bold, and the suboptimal results are underlined*
-
-
 
 ## 定位与知识库关联
 
@@ -387,8 +358,6 @@ MetaBBO 代表了从“手工设计”到“学习设计”的范式转变。ABO
 5. **问题类型扩展**：ABOM 在约束优化、离散优化或多目标优化问题上的表现如何？当前框架主要针对无约束连续优化设计。
 
 6. **知识迁移机制**：在 ABOM-PT 中，低相似度任务究竟传递了何种可迁移的优化知识？如何更有效地利用这些知识是一个值得深入探索的方向。
-
-
 
 ## 原文 PDF
 

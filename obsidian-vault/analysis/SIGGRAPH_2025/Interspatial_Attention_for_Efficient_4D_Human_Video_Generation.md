@@ -111,12 +111,6 @@ ISA-DiT以Flow Matching扩散范式为基础，流水线包含以下模块（Fig
 $$\mathcal{L} = \lambda_{L1} \mathcal{L}_{L1} + \lambda_{p} \mathcal{L}_{p} + \lambda_{KL} \mathcal{L}_{KL} + \lambda_{reg} \mathcal{L}_{reg} + \lambda_{3DGAN} \mathcal{L}_{3DGAN} + \lambda_{2DGAN} \mathcal{L}_{2DGAN}$$
 其中 $\mathcal{L}_{reg}$ 为图像解码正则化项，是使潜空间分布改善、加速扩散训练的关键设计。
 
-![[assets/figures/papers/paper_list_l5_http_arxiv_org_abs_2505_15800v2/figures/013_Figure_10.jpg]]
-*Figure 10: Generating videos with controllable camera trajectories. Our model can generate high-quality human videos conditioned on specific camera trajectories (top left insets), effectively transforming video generation into a dynamic view-synthesis system for multi-view human generation*
-
-![[assets/figures/papers/paper_list_l5_http_arxiv_org_abs_2505_15800v2/figures/016_Figure_13.jpg]]
-*Figure 13: Additional generated videos. Our ISA-DiT framework generates high-quality videos across diverse domains, spanning upper-body portraits, full-body movements, anime character and multi-characters animations*
-
 ## 实验与关键发现
 
 ### 核心定量结果：ISA-DiT在4D人体视频生成中全面超越SOTA

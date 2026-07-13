@@ -66,8 +66,6 @@ mCLM 的核心洞察在于**将分子 tokenization 的粒度从原子提升至�
 
 在 122 个 FDA 批准药物（包含未见过的构建块）上，mCLM 实现了 **15.0% 的平均 ADMET 性能改进**，远超所有基线方法，包括 GPT-5 和 Gemini-2.5-Flash 等通用大语言模型。在可合成性方面，mCLM 生成的分子的可合成性达到 **98.23%**，而 MoleculeSTM 仅为 85.39%，且 mCLM 的分子 **100% 有效**。消融实验进一步验证了构建块级 tokenization 和 GNN 编码的必要性：移除 GNN 编码器导致平均性能降至 -7.53%，使用非合成 tokenizer（BRICS 算法）则进一步恶化至 -19.0%。在 QM9 数据集上，mCLM 使用合成保证构建块实现了 **100% 可合成性**，而基于向量量化的 DGAE 仅为 62%，充分证明了构建块方法相对于传统 VQ 方法的优势。
 
-
-
 ### 分子生成的计算-物理鸿沟
 
 小分子药物发现的核心挑战在于找到同时满足功能活性与可合成性要求的分子。然而，当前主流的分子生成范式在这两个维度上存在根本性断裂。
@@ -95,8 +93,6 @@ mCLM 的核心动机在于**将合成约束从生成后验证前移至 tokenizat
 2. **功能信息存在于子结构而非原子层面**。构建块作为分子的功能单元，其结构特征可通过图神经网络（GNN）编码为富含化学语义的嵌入向量，与自然语言描述中的功能概念形成直接对齐。
 
 通过这种“双语”建模——自然语言描述功能需求，构建块序列表示可合成分子——mCLM 在生成前就同时保证了功能相关性与合成可行性，从而在数字设计与物理合成之间建立了直接链路。
-
-
 
 ## 核心方法与创新机理
 
@@ -134,8 +130,6 @@ mCLM 的根本洞察在于：**构建块既是功能的载体，也是合成的�
 
 > **注意**：mCLM 当前仅在约 1000 个最常用构建块的词汇上进行训练，且合成保证依赖于三种特定反应类型。扩展到更大词汇、更多反应类型以及更复杂的分子骨架（如天然产物）时的泛化能力，尚需进一步验证。
 
-
-
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_r2HG3xOMJI/figures/003_Figure_3.jpg]]
 *Figure 3: An overview of the tokenization process. A functional molecule is first processed by the synthesis-guaranteed tokenizer to produce a set of building blocks compatible with automated modular synthesis. These blocks are then evaluated via a structure coverage check to determine whether they fully reconstruct the original molecule. If coverage is complete, the blocks are used directly for pretraining. Otherwise, the molecule is reprocessed using a rule-based tokenizer to ensure full representation for training purposes*
 
@@ -170,8 +164,6 @@ mCLM 的推理并非单步完成，而是采用**迭代推理模块**（Figure 4
 ### 输入输出流总览
 
 整体数据流可概括为：**输入**为自然语言指令（如“降低该分子的 DILI 风险”）和目标分子结构 → **tokenization** 将分子转换为构建块序列 → **GNN 编码**注入结构信息 → **LLM 解码**生成优化后的构建块序列 → **迭代评估**驱动多轮优化 → **输出**为可合成的优化分子。训练数据通过从文献中提取分子的功能描述和合成约束，并将构建块序列嵌入自然语言句子中构建而成（Figure 7）。
-
-
 
 ### 合成保证 Tokenizer
 
@@ -212,26 +204,18 @@ $$\log \mathrm{it}(P_{\theta}(v \mid \mathbf{x}_{1...i-1})) = \begin{cases} \mat
 
 mCLM 采用逐步优化策略进行多目标分子改进：给定输入分子和需要优化的属性目标，模型评估当前分子的各项属性，针对未达标的属性迭代生成修改后的分子。推理时，输出词汇表被限制在 582 个合成保证构建块内，确保生成的分子 100% 有效且天生兼容自动化合成平台。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验结果
 
 mCLM 在 122 个 FDA 已批准药物（由合成保证构建块组成）上进行了 6 项 ADMET 属性的多目标优化评估，涵盖 AMES 致突变性、血脑屏障穿透性（BBBP）、CYP3A4 代谢、药物性肝损伤（DILI）、人肠道吸收（HIA）和 P-糖蛋白底物识别（PGP）。**Table 1** 汇总了关键结果：mCLM 生成的分子在全部 6 项指标上均优于原始 FDA 药物，平均改善幅度达到 **15.0%**。作为对比，所有通用大语言模型基线（GPT-4o、GPT-5、Gemini-2.5-Flash、Claude 3.5 Haiku）的平均改善均为负值，表明这些模型无法在保持分子有效性的同时提升功能属性。专门的文本-分子编辑方法 **MoleculeSTM**（Liu et al., 2022）和 **FineMolTex**（Li et al., 2025b）同样表现不佳，平均改善分别为 -17.2% 和 -8.8%。文本到分子生成模型 **LDMol**（Chang and Ye, 2024）的平均改善为 -17.0%。mCLM 是唯一在所有 6 项 ADMET 指标上均实现正向改善的方法。
 
-
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_r2HG3xOMJI/figures/004_Table_1.jpg]]
 *Table 1: Average pharmacokinetic and toxicity properties of FDA drugs composed of synthesisguaranteed blocks, as well as their proposed modifications. (↓: lower is better, ↑: higher is better). Green = better than FDA, Red = worse, Light green bold = best overall per column. The key to expediting the drug creation process is to discover potent molecular candidates that are simultaneously synthesis-friendly. While mCLM shows strong property editing results, its key benefit*
 
 可合成性方面，**Table 2** 给出了决定性证据：mCLM 生成的分子 **100% 有效**（RDKit 验证），其中 **98.23%** 可通过逆合成分析找到合成路线（即 Makeability = 98.23%）。相比之下，MoleculeSTM 的有效率仅为 93.80%，可合成率仅 85.39%；FineMolTex 的可合成率为 86.80%；GPT-5 和 Gemini-2.5-Flash 的可合成率分别仅为 1.67% 和 1.17%。这一差距直接验证了 mCLM 的核心设计理念——将合成约束前置于 tokenization 阶段，而非依赖后处理过滤。
 
-
-![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_r2HG3xOMJI/figures/005_Table_2.jpg]]
-*Table 2: Synthetic accessibility (SA) (Ertl et al., 2009), validity, and retrosynthetic results across baselines. Synthesizability is the percent of valid molecules where a retrosynthetic route was found. Makeability is the overall percent of generations which can be synthesized (Makeability =Valid × Synth.)*
-
 在 QM9 数据集上的对比实验（**Table 10**）进一步证实了构建块方法的优势：mCLM 使用合成保证构建块实现了 **100%** 的可合成性，而基于向量量化的离散图自编码器 **DGAE**（Boget et al., 2024）仅为 62%。这表明传统的 VQ-based 分子表示方法无法内在地保证合成可行性。
-
 
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_r2HG3xOMJI/figures/023_Table_10.jpg]]
 *Table 10: Synthesizability comparison using Allchemy on QM9 molecules*
@@ -239,7 +223,6 @@ mCLM 在 122 个 FDA 已批准药物（由合成保证构建块组成）上进�
 ### 消融实验
 
 **Table 11** 报告了系统的消融分析，揭示了 mCLM 各组件的因果贡献：
-
 
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_r2HG3xOMJI/figures/024_Table_11.jpg]]
 *Table 11: Comparison of pharmacokinetic and toxicity property scores between using Qwen-2.5-3B and Llama-3.2-3B as backbones*
@@ -252,7 +235,6 @@ mCLM 在 122 个 FDA 已批准药物（由合成保证构建块组成）上进�
 
 - **无合成保证的扩展实验**（**Table 4**）：当放宽合成保证约束，对包含 3 个及以上构建块的 FDA 药物进行优化时，mCLM 仍能实现 12.3% 的平均改善，但可合成性指标有所下降。这验证了合成保证 tokenizer 在前端约束中的关键作用。
 
-
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_r2HG3xOMJI/figures/009_Table_4.jpg]]
 *Table 4: Average pharmacokinetic and toxicity properties of FDA drugs with 3 or more blocks and their proposed modifications. Note, these molecules do not have synthesis-guarantees. (↓: lower is better, ↑: higher is better*
 
@@ -260,12 +242,8 @@ mCLM 在 122 个 FDA 已批准药物（由合成保证构建块组成）上进�
 
 **Table 8** 和 **Table 9** 将 mCLM 与分层分子图生成方法 **HierVAE**（Jin et al., 2020）进行了对比。需要注意的是，HierVAE 需要针对每个属性单独微调，而 mCLM 在统一的指令遵循设置下工作。在 ADMET 属性改善上，mCLM 在 6 项指标中的 5 项优于 HierVAE（Table 8）。在可合成性方面，HierVAE 的 Makeability 仅为 66.00%（Table 9），远低于 mCLM 的 98.23%，进一步凸显了构建块级 tokenization 相对于图级生成在合成可行性上的优势。
 
-
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_r2HG3xOMJI/figures/021_Table_8.jpg]]
 *Table 8: Comparison of pharmacokinetic and toxicity property scores between mCLM and HierVAE. Note that HierVAE is fine-tuned separately for each property, whereas mCLM is used in a instructionfollowing setting*
-
-![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_r2HG3xOMJI/figures/022_Table_9.jpg]]
-*Table 9: Synthetic accessibility (SA) (Ertl et al., 2009), validity, and retrosynthetic results for HierVAE. Synthesizability is the percent of valid molecules where a retrosynthetic route was found. Makeability is the overall percent of generations which can be synthesized (Makeability =Valid × Synth.)*
 
 ### 迭代推理与失败模式
 
@@ -279,23 +257,6 @@ mCLM 的迭代推理模块（**Figure 4**）展示了在“fallen angel”药物
 2. **多目标权衡未充分量化**：mCLM 在迭代优化某一属性时可能在其他属性上做出妥协，当前评估仅报告了各属性的独立改善，缺乏 Pareto 前沿分析。
 3. **训练数据偏差**：构建块词汇和训练数据基于现有数据库，在全新分子骨架上的泛化能力尚需独立验证。
 4. **合成保证的化学空间限制**：当前仅支持三种反应类型，覆盖的化学空间有限，对于需要其他反应类型的分子优化场景可能不适用。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_r2HG3xOMJI/figures/008_Table_3.jpg]]
-*Table 3: Synthetic Accessibility (SA) scores with RDKit validity percentages across datasets*
-
-![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_r2HG3xOMJI/figures/012_Table_5.jpg]]
-*Table 5: Dataset categories and their respective sample counts*
-
-![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_r2HG3xOMJI/figures/013_Table_6.jpg]]
-*Table 6: Breakdown of molecule data by dataset category*
-
-![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_r2HG3xOMJI/figures/014_Table_7.jpg]]
-*Table 7: Performance (AUC) of individual models and the ensemble across six selected ADMET tasks*
-
-
-
 
 ## 定位与知识库关联
 
@@ -348,8 +309,6 @@ mCLM 开辟了若干值得深入探索的方向：
 - **合成空间扩展**：当前合成保证 tokenizer 仅支持三种反应类型。能否将其扩展以包括更多的自动化反应类型，从而大幅扩展可合成的化学空间？
 
 - **System 2 推理**：如何将化学推理从当前的模式匹配提升到更深层次的因果推理、反事实推理和冲突声明消解？这是通往真正化学智能的重要阶梯。
-
-
 
 ## 原文 PDF
 

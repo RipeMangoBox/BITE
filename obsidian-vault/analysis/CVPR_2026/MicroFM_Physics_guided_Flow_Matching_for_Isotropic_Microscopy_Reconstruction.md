@@ -54,8 +54,6 @@ claims:
 
 实验覆盖四种荧光显微镜系统和多种组织类型。在 Dense neuron cluster 数据集上，MicroFM 达到 PSNR 40.186 dB、SSIM 0.964，显著优于 **Self-Net**（Ning et al., Light: Science & Applications 2023）、**SSAI-3D**（Han et al., Nature Communications 2025）、**CARE**（Weigert et al., Nature Methods 2018）、**OT-CycleGAN**（Park et al., Nature Communications 2022）、**UTOM**（Li et al., Light: Science & Applications 2021）和 **Volume Tells**（Li et al., CVPR 2025）等代表性基线。消融研究进一步证实：将物理 PSF 替换为高斯核导致 PSNR 下降约 22%、SSIM 下降 13%；从低质量观测（而非纯噪声）开始流匹配，PSNR 从 32.614 提升至 40.186，SSIM 从 0.889 提升至 0.964。这些结果表明，物理退化匹配与观测锚定生成是性能突破的关键。
 
-
-
 ### 各向同性显微成像的物理瓶颈
 
 三维荧光显微镜是生命科学研究中观测细胞与组织结构的关键工具。理想的三维成像需要在横向 (XY) 和轴向 (Z) 均实现高分辨率，即各向同性分辨率。然而，传统高保真三维显微镜（如共聚焦或双光子显微镜）虽然能提供近乎各向同性的体积数据，却面临采集速度慢、成本高昂，以及对活体样本造成光毒性等根本性限制。这些限制使得此类成像手段难以适用于大规模、高通量或长时间的生物成像场景。
@@ -84,8 +82,6 @@ claims:
 
 图 Figure 1 从概念层面对比了传统三维显微成像、传统深度学习重建与 MicroFM 的差异，直观展示了物理引导与体积先验协同作用的设计理念。
 
-
-
 ## 核心方法与创新机理
 
 MicroFM 的核心创新在于**物理引导的退化合成与体积隐式几何上下文协同作用**，使流匹配网络能够准确学习各向异性到各向同性的逆映射。具体而言，该方法引入三个关键干预变量，系统性解决了传统各向同性显微重建中合成退化失配与三维几何约束缺失两大瓶颈。
@@ -112,8 +108,6 @@ MicroFM 的核心创新在于**物理引导的退化合成与体积隐式几何�
 
 上述三个干预变量并非孤立作用，而是形成协同闭环：物理 PSF 为 INR 提供准确的前向成像算子，使体积先验更可靠；体积先验又为流匹配提供几何约束；观测锚定的流匹配则利用物理合成的训练对和体积先验，实现快速稳定的高保真重建。三者共同构成了从退化建模、几何约束到生成重建的完整物理引导链路。
 
-
-
 MicroFM 是一个两阶段物理引导框架，将仪器感知的退化建模与几何感知的重建解耦为顺序协作的两个阶段。
 
 **第一阶段：物理 PSF 预测与配对数据合成。** 系统从目标显微镜的轴向低分辨率图像出发，利用 SFE-Net 盲估计该仪器特有的、空间变化的物理点扩散函数（PSF）。估计得到的 PSF 库随后用于对横向高分辨率切片执行匹配真实光学特性的退化操作，合成物理逼真的训练配对。这一过程的核心在于用泽尼克多项式参数化的波前相位建模像差，通过复光瞳函数和非相干成像公式生成与目标显微镜退化分布一致的 PSF，从而弥合合成训练数据与真实图像形成过程之间的域差距。
@@ -122,12 +116,8 @@ MicroFM 是一个两阶段物理引导框架，将仪器感知的退化建模与
 
 **输入输出流。** 系统的输入端为轴向低分辨率图像堆栈（各向异性观测）和对应的横向高分辨率切片；中间产物包括仪器匹配的物理 PSF 库、物理退化合成的训练配对、以及 INR 渲染的各向同性体积先验；最终输出为高保真各向同性三维重建体积。Figure 2 完整展示了三个核心模块——物理 PSF 预测、预训练 INR 和流匹配重建网络——之间的数据依赖与流程关系。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2546_https_openaccess_thecvf_com_content_CVPR2026_html_Zhan_MicroFM_Physics_g/figures/002_Figure_2.jpg]]
 *Figure 2: Overall framework of the proposed method. (a) Physical PSF Prediction: SFE-Net is trained with Zernike-based synthetic degradations and noise to regress spatially varying physical PSFs from axial images; the predicted PSFs are then used to synthesize training pairs matched to the target microscope. (b) Pretrain INR: Using the predicted PSFs as the physics operator, an MLP-based implicit neural representation renders an isotropic volume and serves as a volumetric geometry prior. (c) Flow Matching Reconstruction Network: Starting at*
-
-
 
 MicroFM 是一个两阶段物理引导框架，其核心由三个功能模块串联构成：物理 PSF 预测模块、预训练隐式神经表示模块、以及流匹配重建网络模块。
 
@@ -197,8 +187,6 @@ $$\mathcal { L } _ { \mathrm { c o n s } } = \left\| f ( t , x _ { t } ) - f ( r
 
 其中 $f(t, x_t)$ 为时刻 $t$ 的流网络输出，$r$ 为段内参考时刻，$v_t$ 为速度场。第一项强制段内端点输出一致性，拉直 ODE 轨迹；第二项速度一致性项仅在段内（$t < b$）且远离端点（$d_t > \tau$）时激活，进一步减少轨迹曲率。该损失使 MicroFM 仅需两阶采样即可实现高质量重建，在保真度和推理效率之间取得平衡。
 
-
-
 ## 实验与关键发现
 
 ### 实验设置与数据集
@@ -220,9 +208,6 @@ Table 2 汇总了四个数据集上的定量对比。MicroFM 在所有数据集�
 在轴向无参考指标上，MicroFM 展现出 **更稳定的优势**：NIQE 和 PIQE 值在各数据集上均优于或接近最优，NRQM 指标亦保持领先。这表明 MicroFM 不仅在横向切片上恢复了高保真细节，在跨切片轴向结构上也有效抑制了伪影，实现了真正的三维各向同性重建。
 
 定性结果（Figure 3）进一步印证了定量结论。以密集神经元簇为例，原始轴向输入呈现显著的轴向拉伸模糊，Self-Net 和 SSAI-3D 虽能部分恢复结构，但仍残留形态畸变（如椭球体被错误重构为球体）。MicroFM 的重建结果在放大视图中显示出更锐利的膜边界和更准确的树突形态，傅里叶频谱也呈现出更各向同性的功率分布。在小鼠肾脏 SHG 数据上，MicroFM 恢复了清晰的肾小管边界，而基线方法在管腔内部产生了不同程度的模糊或断裂。
-
-![[assets/figures/papers/paper_list_l2546_https_openaccess_thecvf_com_content_CVPR2026_html_Zhan_MicroFM_Physics_g/figures/004_Figure_3.jpg]]
-*Figure 3: MicroFM enables isotropic-resolution recovery across diverse imaging systems and specimens. Each example shows the raw input and the restorations produced by Self-Net, SSAI-3D, and MicroFM, together with zoomed-in views (white boxes; middle row) and the corresponding Fourier magnitude spectra (bottom row). (a) Dense neuron cluster with Cyclosporine-fluorescence micro-optical sectioning tomography (CS-fMOST) imaging (b) Cleared mTmG mouse kidney tissue acquired with second-harmonic generation (SHG) microscopy; (c) cleared Thy1-GFP mouse brain neurons acquired with confocal microscopy; (d) cleared mouse liver acquired with widefield microscopy*
 
 Figure 4 展示了小鼠肾脏组织的三维重建前后对比：原始体积在轴向 (XZ) 视角下结构严重拉伸，MicroFM 重建后轴向与横向分辨率趋于一致，肾小管的三维形态得到准确恢复。
 
@@ -251,9 +236,6 @@ Table 4 进一步消融了体积先验权重 β 的影响。当 β = 0.50 时取
 
 Figure 5 从信息论角度分析了 PSF 估计的质量。左图显示，训练后 PSF 库的熵值显著降低，表明估计的 PSF 在保持空间变化性的同时具有较高的集中度，残余离散度有限，与单台显微镜内有限的空间变异性预期一致。右图对比了四个荧光显微镜系统的晚期 PhaseZ 幅度，揭示了不同仪器间系统性的像差差异——这进一步佐证了针对目标显微镜定制物理 PSF 的必要性，而非依赖通用高斯退化假设。
 
-![[assets/figures/papers/paper_list_l2546_https_openaccess_thecvf_com_content_CVPR2026_html_Zhan_MicroFM_Physics_g/figures/007_Figure_5.jpg]]
-*Figure 5: Left: entropy of the PSF bank before and after training. Lower entropy after training indicates greater concentration with limited residual dispersion, which agrees with the bounded spatial variability expected within a single microscope. Right: Late-stage PhaseZ magnitude for four fluorescence microscopy systems, highlighting systematic differences across instruments*
-
 ### 失败模式与局限性
 
 尽管 MicroFM 在多个数据集上取得了 SOTA 性能，分析过程与论文披露揭示了以下局限性：
@@ -277,13 +259,6 @@ Figure 5 从信息论角度分析了 PSF 估计的质量。左图显示，训练
 - 物理引导的流匹配框架能否推广至 **超分辨率显微术**（如 STED、PALM/STORM）的各向同性恢复，其中 PSF 工程化特性更为复杂？
 - 体积先验的构建是否可替换为更高效的 **3D 卷积神经场**，以减少推理时的逐点隐式采样开销，提升处理通量？
 - 多通道荧光信号间的 **光谱串扰与色差** 如何建模并整合到退化合成与联合重建流程中？
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2546_https_openaccess_thecvf_com_content_CVPR2026_html_Zhan_MicroFM_Physics_g/figures/001_Figure_1.jpg]]
-*Figure 1: Background and concept of MicroFM. (a) Conventional 3D fluorescence microscopy yields nearly isotropic, high-fidelity volumes, yet acquisition is slow and costly and causes phototoxicity in live samples. (b) Conventional deep learning pipelines are fast and low cost; they often assume a fixed Gaussian PSF and rely on 2D slice proxies, which mismatch real optical degradation and ignore volumetric geometry, leading to low 3D fidelity. (c) MicroFM combines physics-based, spatially varying PSF estimation with an implicit volumetric prior that guides a Flow Matching reconstruction network, enabling fast, low-cost imaging with highfidelity isotropic 3D reconstruction*
-
-
 
 ## 定位与知识库关联
 
@@ -312,8 +287,6 @@ MicroFM 处于各向同性显微重建这一细分领域，其方法设计直接
 **采样效率的未解空间。** 流匹配推理采用两阶采样，尽管步数远少于扩散模型，但采样步数与重建质量、推理效率之间的最优平衡尚未被系统探索。一致性流匹配损失（公式 (12)）中的速度一致性项权重 $\lambda_{\mathrm{vel}}$ 和阈值 $\tau$ 的敏感性也未在消融中覆盖。
 
 **开放问题。** 分析揭示了若干值得后续探索的方向：其一，若将 PSF 估计网络与重建网络联合训练，是否可进一步提升保真度并减少配对数据需求？其二，物理引导的流匹配框架能否推广到超分辨率显微术（如 STED、PALM）的各向同性恢复，这些模态的 PSF 模型与荧光显微镜存在本质差异。其三，在线校准策略能否在无需重新训练的情况下集成，以适应不同显微镜的即时调整？其四，多通道荧光信号间的交叉干扰如何建模并整合到当前的退化合成与重建流程中？这些问题构成了 MicroFM 向更广泛显微成像场景延伸的关键路径。
-
-
 
 ## 原文 PDF
 

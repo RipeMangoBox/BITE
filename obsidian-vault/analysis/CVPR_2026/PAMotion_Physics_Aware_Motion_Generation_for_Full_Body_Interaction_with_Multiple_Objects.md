@@ -53,8 +53,6 @@ claims:
 
 **主要结果**：在 HIMO 数据集上，PAMotion 在两物体和三物体设置下均全面超越现有方法。三物体场景的 FID 从 4.7712 降至 1.3763，R-Precision 提升 14.0%；在 ParaHome 数据集上，FID 从 3.2398 降至 0.7962。消融实验证实，移除物理感知交互损失后所有指标一致下降，验证了该模块对生成质量与物理一致性的关键作用。
 
-
-
 ### 多物体全身交互生成的物理瓶颈
 
 生成逼真的全身人体与多个物体的交互运动，是计算机视觉与图形学中长期存在的挑战。这项任务要求模型同时推理人体运动学、物体动力学以及二者之间精细的接触关系。近年来，扩散模型在人体运动生成领域取得了显著进展，但当场景从单人自由运动扩展到**多物体全身交互**时，现有方法暴露出根本性的物理一致性问题。
@@ -80,8 +78,6 @@ claims:
 - 若物体加速度偏离重力（$\hat{a} \neq g$），则必然存在人手施加的直接或间接接触力——例如手持苹果保持静止时 $\hat{a} = 0$，或刀切割苹果时加速度方向复杂多变。
 
 这一观察揭示了将**物理先验**注入扩散生成过程的可行路径：通过监测生成过程中物体的加速度，动态判断接触状态，并对违背物理合理性的手-物距离施加惩罚。基于此，我们提出 **PAMotion**，一个物理感知的粗到细扩散框架，其核心创新在于将上述观察形式化为一个**动态激活的物理感知交互损失** $\mathcal{L}_{\mathrm{phy}}$，在生成过程中自动纠正漂浮和穿透，从而系统性地提升多物体交互运动的物理合理性。
-
-
 
 ## 核心方法与创新机理
 
@@ -119,8 +115,6 @@ $$
 - 三物体设置中，FID 从 1.3763 升至 1.5736，R-Precision 从 0.6750 降至 0.6312。
 
 可视化结果进一步证实，$L_{phy}$ 的移除导致生成结果中漂浮和穿透伪影的明显回归，从而确立了物理感知损失作为 PAMotion 性能增益的核心因果杠杆。
-
-
 
 PAMotion 采用 **粗到细两阶段条件扩散框架**，将多物体全身交互生成分解为全局运动合成与局部物理细化两个级联阶段。该设计的核心动机在于：单阶段联合生成所有变量（如 **HIMO‑Gen** 的范式）难以同时捕获躯干‑物体的大范围位移与手‑物接触的精细物理约束，容易导致漂浮、穿透等物理不一致。
 
@@ -171,12 +165,8 @@ PAMotion 采用 **粗到细两阶段条件扩散框架**，将多物体全身交
 
 两阶段的级联设计使模型能够先建立全局运动的大致结构，再在局部细节层面注入物理约束，从而在 **HIMO** 和 **ParaHome** 数据集上均取得显著优于单阶段基线 **HIMO‑Gen** 的生成质量与物理一致性（Table 1, Table 4）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l11_https_openaccess_thecvf_com_content_CVPR2026_html_Di_PAMotion_Physics_Aw/figures/002_Figure_2.jpg]]
 *Figure 2: Illustration of PAMotion. PAMotion is a two-stage coarse-to-fine conditional diffusion framework. In the Coarse Motion Generation stage, the model predicts coarse, text-aligned global motion by generating global human body translation*
-
-
 
 PAMotion 的核心设计围绕一个关键因果机制展开：**物体加速度是手-物接触状态的天然探针**。在日常生活慢动作交互中，若物体仅受重力作用（加速度与重力对齐），则手与物体无接触；一旦加速度偏离重力方向，必然存在直接或间接的手-物接触。PAMotion 将这一物理先验形式化为**物理感知交互损失（Physics-Aware Interaction Loss）**，并将其嵌入到**粗到细两阶段条件扩散框架**中，在生成过程中动态纠正漂浮和穿透伪影。
 
@@ -199,9 +189,6 @@ $$
 1. **自由运动状态**：物体仅受重力影响，$a_t \approx g$，此时 $|(a_t - g) \cdot t| \approx 0$，损失项被自动抑制，模型不施加接触约束。
 2. **手持静止状态**：物体被手稳定握持，加速度趋近于零（$a_t \approx 0$），$|(a_t - g) \cdot t|$ 显著激活，此时若手-物距离 $d_t$ 偏离阈值 $\beta$，$|\log(d_t/\beta)|$ 项将施加惩罚，迫使手与物体保持合理接触，抑制**漂浮**。
 3. **交互运动状态**：物体受手部施力，加速度偏离重力（$a_t \neq g$），损失同样被激活，通过手-物距离约束确保接触一致性，抑制**穿透**。
-
-![[assets/figures/papers/paper_list_l11_https_openaccess_thecvf_com_content_CVPR2026_html_Di_PAMotion_Physics_Aw/figures/003_Figure_3.jpg]]
-*Figure 3: Illustration of Physics-Aware Motion Modeling. Object acceleration aˆ as an indicator of human-object contact state. Free-Motion State: (a) the apple is influenced only by gravity*
 
 损失函数中的对数距离项 $|\log(d_t/\beta)|$ 具有对称惩罚特性：当 $d_t \ll \beta$（穿透）或 $d_t \gg \beta$（漂浮）时均产生较大梯度，实现对两类物理不一致问题的联合抑制。时间加权因子 $t$ 则确保加速度偏差在运动序列中的累积效应得到合理考虑。
 
@@ -250,8 +237,6 @@ PAMotion 使用两个编码器将多模态条件映射到扩散模型的潜在�
 
 这两个编码器的输出与初始状态 $x_0$ 共同构成扩散模型的条件输入，贯穿粗阶段和细阶段的全过程。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -289,9 +274,6 @@ PAMotion在HIMO和ParaHome两个数据集上均进行了系统评估，并与当
 
 尽管PAMotion在整体指标上表现优异，论文也坦诚地展示了失败案例。如 Figure 7 所示，在“抓取灯泡”的场景中，虽然手部与灯泡发生了交互，但抓取姿势在物理上并不合理。这一失败模式揭示了当前方法的根本局限：$\mathcal{L}_{\mathrm{phy}}$ 仅从物体加速度与手-物距离的一致性角度约束接触状态，缺乏对抓取姿势本身的显式建模。模型不知道“抓取灯泡”应该用指尖捏住而非手掌包裹，这种语义-物理的双重缺失需要引入更结构化的抓取先验才能解决。
 
-![[assets/figures/papers/paper_list_l11_https_openaccess_thecvf_com_content_CVPR2026_html_Di_PAMotion_Physics_Aw/figures/007_Figure_7.jpg]]
-*Figure 7: Failure Case on HIMO dataset. Although the hand interacts with the bulb, the grasp pose is physically implausible*
-
 此外，论文指出的其他局限包括：物理感知损失的核心假设——通过物体加速度偏离重力来判定接触状态——适用于日常慢动作交互，但在高动态或涉及复杂外力的场景（如投掷、击打）中可能失效；当前仅考虑手部与物体的接触，忽略了身体其他部位（如躯干倚靠、脚部踢动）的接触建模；方法依赖大量运动捕捉数据，向多人-多物交互场景的扩展尚未探索。
 
 ### 关键图表总结
@@ -301,13 +283,6 @@ PAMotion在HIMO和ParaHome两个数据集上均进行了系统评估，并与当
 - **Table 4**：ParaHome数据集对比，PAMotion在所有指标上优于HIMO-Gen，FID从3.2398降至0.7962。
 - **Figure 6**：消融可视化，移除 $\mathcal{L}_{\mathrm{phy}}$ 后出现穿透和漂浮，完整模型生成物理合理的交互。
 - **Figure 7**：失败案例，灯泡抓取姿势物理不合理，暴露缺乏显式抓取约束的局限。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l11_https_openaccess_thecvf_com_content_CVPR2026_html_Di_PAMotion_Physics_Aw/figures/001_Figure_1.jpg]]
-*Figure 1: Qualitative Comparison on HIMO dataset [53]. Our method PAMotion produces physically plausible human–object interactions, while the baseline method HIMO-Gen [53] often exhibits floating or penetration artifacts*
-
-
 
 ## 定位与知识库关联
 
@@ -345,8 +320,6 @@ PAMotion 的物理感知损失建立在以下核心假设之上，这些假设�
 ### 知识库定位
 
 PAMotion 处于**物理感知人体运动生成**与**多物体交互建模**的交叉点。相较于纯运动学驱动的扩散生成方法（如 MDM、priorMDM），它首次将牛顿力学层面的物体加速度约束引入生成过程；相较于基于强化学习或轨迹优化的物理仿真方法，它保留了扩散模型的表达力和数据驱动优势，同时以软约束形式嵌入物理知识，避免了刚性物理引擎的收敛困难。这一“物理软约束 + 扩散生成”的范式为后续研究提供了一个可扩展的框架：物理知识不再需要作为硬性仿真步骤，而是可以通过可微损失灵活注入生成过程。
-
-
 
 ## 原文 PDF
 

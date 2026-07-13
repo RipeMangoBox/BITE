@@ -55,15 +55,11 @@ claims:
 
 **方法定位**：MoMask++ 属于基于离散标记的生成式运动合成方法，在量化策略上从传统的各层独立码本全尺度 RVQ 演进为共享码本的多尺度 RVQ，在生成架构上从双掩码变换器简化为单一统一模型。其技术路线区别于扩散模型（如 MDM、StableMoFusion）和自回归模型（如 T2M-GPT），在标记效率与生成可控性之间取得了新的平衡。
 
-
-
 **核心瓶颈：文本-运动数据集的表达性匮乏。** 现有公开数据集（如 HumanML3D、KIT-ML）的文本标注普遍简短且泛化，平均长度仅为 8–12 个单词，描述粒度停留在“一个人向前走”或“坐下”等粗粒度动作类别。这种标注风格导致两个连锁问题：其一，训练出的生成模型难以解析包含时序细节、动作风格、情感色彩等丰富语义的复杂提示；其二，评估指标本身无法有效区分模型对细粒度语义的捕捉能力。**SnapMoGen** 数据集正是针对这一瓶颈而构建——其每条运动片段配有 6 条独立文本标注，人工标注平均长度为 48 词，并额外引入 LLM 增强标注（Table 1），使文本覆盖从动作类型、身体部位运动轨迹到节奏与情感的全方位描述。
 
 **生成架构的效率困境。** 在方法层面，以 **MoMask**（Guo et al., 2024）为代表的残差量化（RVQ）方案虽在 HumanML3D 上取得领先性能，但其“全尺度量化 + 独立码本 + 双生成模型”的设计存在冗余：6 层 RVQ 需 480 个 token 表示一段运动，且各层码本互不共享，导致 token 容量利用率低下（Fig. 3 直观展示了大量 token 仅编码噪声级残差）；同时，主/次两个掩码变换器的分离式生成破坏了文本到运动标记的统一映射，限制了可控性的上限。
 
 **本文动机：以更少 token 实现更强可控。** SnapMoGen 工作的核心假设是——**若能在量化阶段用更紧凑的离散表示捕获运动的多尺度结构，并在生成阶段用单一模型统一处理所有尺度标记，则生成质量与文本跟随能力可同时提升。** 这一假设的因果杠杆在于“多尺度残差量化 + 共享码本”：通过在不同时间下采样率上执行 RVQ 并共享同一码本，MoMask++ 仅用 266 个 token（较 MoMask 减少约 45%）即实现了更优的重建质量（Table 4），进而使下游的单一掩码变换器能更高效地学习从文本到运动的映射，最终在 HumanML3D 和 SnapMoGen 双基准上取得最优 FID 与 R Precision（Table 2, Table 3）。
-
-
 
 ## 核心方法与创新机理
 
@@ -110,8 +106,6 @@ $$\mathcal{L}_{\text{mask}} = \sum_{\dot{q}_k = [\mathsf{MASK}]} -\log p_{\theta
 
 这两项创新相互协同：共享码本的多尺度量化提供了紧凑且语义丰富的标记表示，单一变换器则消除了双模型架构的不灵活性和训练复杂度，使文本到运动的生成过程更为统一高效。
 
-
-
 MoMask++ 遵循“运动标记化 → 文本条件生成 → 运动重建”的两阶段范式，但在标记化与生成两个核心环节进行了结构化改造，形成了一条更紧凑、标记效率更高的流水线。
 
 **阶段一：多尺度运动 VQ-VAE。** 给定一段长度为 $N$ 的 3D 人体姿态序列 $\mathbf{m}_{1:N} \in \mathbb{R}^{N \times D}$（$D$ 为单帧姿态维度），运动编码器 $\mathcal{E}$ 首先将其压缩为长度为 $n$ 的潜特征序列 $f \in \mathbb{R}^{n \times d}$。随后，多尺度残差量化模块（Multi-scale RVQ）对该潜特征执行 $V+1$ 层残差量化，各层的时间分辨率按 $[n/2^V, \dots, n/2^0]$ 递减，所有层共享同一个码本 $\mathcal{C}$。第 $v$ 层的量化过程可形式化为：
@@ -128,15 +122,11 @@ $$\mathcal{L}_{\text{mask}} = \sum_{\dot{q}_k = [\mathsf{MASK}]} -\log p_{\theta
 
 **流水线优势。** 三个关键改造共同构成因果杠杆——多尺度共享码本大幅压缩 token 数量并提升容量利用率，统一掩码变换器消除了双模型的不灵活性与冗余，文本条件与迭代解码则保障了从表达性文本到细粒度运动的可控映射。该框架在 HumanML3D 与 SnapMoGen 双基准上均取得最优 FID、R Precision 与 CLIP Score（详见 Table 2、Table 3），验证了设计的有效性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l39_https_arxiv_org_abs_2507_09122/figures/003_Figure_2.jpg]]
 *Figure 2: Approach overview. (a) A multi-scale VQVAE encodes a motion sequence into V + 1 discrete token sequences*
 
 ![[assets/figures/papers/paper_list_l39_https_arxiv_org_abs_2507_09122/figures/013_Figure_8.jpg]]
 *Figure 8: Architecture of the evaluation model [26]. Three network components are trained with two main goals: multimodal alignment and reconstruction. The cosine similarity between motion embeddings and text embeddings from positive pairs (green) is maximized, while similarity for negative pairs is minimized. Meanwhile, both embeddings are required to reconstruct the corresponding motion sequence through the motion decoder. Image adapted from TMR [26]*
-
-
 
 ### 运动 VQ-VAE 基础框架
 
@@ -192,16 +182,6 @@ $$\mathcal{L}_{mask} = \sum_{\dot{q}_k = [\mathsf{MASK}]} -\log p_{\theta}(q_k \
 | $c$ | T5-base 文本编码器输出的条件特征 |
 | $\mathbf{sg}[\cdot]$ | 停止梯度算子 |
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l39_https_arxiv_org_abs_2507_09122/figures/004_Figure_3.jpg]]
-*Figure 3: Illustration of token capacity in a pretrained traditional 6-layer, 480-token full-scale RVQ [9] compared to a 10-layer, 266-token multi-scale*
-
-![[assets/figures/papers/paper_list_l39_https_arxiv_org_abs_2507_09122/figures/010_Figure_5.jpg]]
-*Figure 5: Decoding progress over iterations for different token scales*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -210,9 +190,6 @@ MoMask++ 在两个基准上均取得最优性能。在 **HumanML3D** 测试集�
 
 ![[assets/figures/papers/paper_list_l39_https_arxiv_org_abs_2507_09122/figures/005_Table_2.jpg]]
 *Table 2: Quantitative evaluation on HumanML3D test set. ± indicates a 95% confidence interval. Bold indicates the best result, while underscore refers to the second best*
-
-![[assets/figures/papers/paper_list_l39_https_arxiv_org_abs_2507_09122/figures/006_Table_3.jpg]]
-*Table 3: Quantitative evaluation on SnapMoGen test set*
 
 **Figure 4** 展示了 MoMask++ 对测试提示和用户随意提示的生成样本，定性反映出对复杂文本的良好响应能力。
 
@@ -253,15 +230,8 @@ MoMask++ 在两个基准上均取得最优性能。在 **HumanML3D** 测试集�
 ![[assets/figures/papers/paper_list_l39_https_arxiv_org_abs_2507_09122/figures/009_Table_5.jpg]]
 *Table 5: Ablation analysis of T2M model configuration on SnapMoGen test set. "Architecture" refers to transformer hyperparameters including latent dimension, feedforward size, and number of layers. This experiment use 2 quantization layers for VQ, with 2048 codebook size and 296 pose features*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l39_https_arxiv_org_abs_2507_09122/figures/008_Figure_4.jpg]]
-*Figure 4: MoMask++ generated samples for SnapMoGen test prompts (#1,2) and a casual user prompt (#3)*
-
 ![[assets/figures/papers/paper_list_l39_https_arxiv_org_abs_2507_09122/figures/002_Table_1.jpg]]
 *Table 1: Comparisons with public datasets. SnapMoGen highlights its accurate and expressive text descriptions, high-quality motion capture data, and continuous motion segmentation. † indicates values calculated only from the publicly available BABEL subset. ∗ denotes a combination of 40,859 manual text annotations and 81,706 LLM-augmented annotations, both with an average text length of 48 words*
-
-
 
 ## 定位与知识库关联
 
@@ -308,8 +278,6 @@ MoMask++ 的方法论贡献集中于两个因果性调控节点：
 5. **与扩散模型的融合潜力**：MoMask++ 的离散标记空间为结合扩散模型的去噪能力提供了接口——例如在标记空间而非运动空间进行扩散，可能兼具离散标记的高效性和扩散模型的多样性优势。这一方向尚未被探索。
 
 **注**：以上开放问题部分基于论文明确讨论的局限性，部分源于实验数据中可观察到的性能缺口（如 SnapMoGen 上 FID 与真实运动之间仍存在显著差距），需结合后续工作进行验证。
-
-
 
 ## 原文 PDF
 

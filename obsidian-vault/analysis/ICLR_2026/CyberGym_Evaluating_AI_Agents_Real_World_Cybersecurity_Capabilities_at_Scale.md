@@ -58,8 +58,6 @@ claims:
 
 **局限与展望**：当前仅限于内存安全漏洞和 C/C++ 代码库，代理在需生成长 PoC 的复杂任务上成功率仍低（约 10%），零日发现能力尚不稳定。未来需扩展至更广泛漏洞类别，强化长上下文推理能力，并设计集成代理互补能力的多智能体框架。
 
-
-
 ### 网络安全评估的现实困境
 
 现代软件供应链的复杂性使得内存安全漏洞持续成为最严重的安全威胁之一。尽管 AI 代码生成与推理能力在一般软件工程任务（如 SWE-bench）上取得了显著进展，但在网络安全这一高风险领域，现有评估体系存在根本性断层：
@@ -79,8 +77,6 @@ claims:
 1. **提供稳定的评估平台**：通过从 OSS-Fuzz 持续模糊测试服务中系统化提取历史漏洞，构建覆盖 188 个项目、1,507 个实例的基准，规模超过现有最大基准的 7 倍。
 2. **确立客观的执行基础指标**：采用 sanitizer 作为漏洞检测预言机，要求代理生成的 PoC 必须在补丁前版本触发崩溃、在补丁后版本不触发崩溃，确保评估结果的确定性和可复现性。
 3. **产生直接安全影响**：基准设计不仅用于评估，还具备主动发现新漏洞的能力——在评估过程中已发现 34 个零日漏洞和 18 个不完整历史补丁，实现了从“被动测评”到“主动防御”的跨越。
-
-
 
 ## 核心方法与创新机理
 
@@ -110,13 +106,8 @@ CyberGym 不仅是评估工具，更直接产生安全价值。在基准评估�
 
 上述四项创新共同构成了 CyberGym 与现有基准的质变差异：它不仅提供了更大规模、更细粒度的能力评估框架，更将基准从被动的测量工具转变为主动的安全防御基础设施。
 
-
-
 ![[assets/figures/papers/paper_list_l32_https_openreview_net_forum_id_2YvbLQEdYt/figures/002_Table_1.jpg]]
 *Table 1: Comparing CyberGym with existing cybersecurity benchmarks for AI agents*
-
-![[assets/figures/papers/paper_list_l32_https_openreview_net_forum_id_2YvbLQEdYt/figures/003_Figure_2.jpg]]
-*Figure 2: OSS-Fuzz lifecycle*
 
 CyberGym 是一个大规模、基于真实世界漏洞的 AI 代理网络安全能力评估基准。其核心任务设定为：给定一个历史漏洞的文本描述和漏洞修复前的代码仓，AI 代理需要生成一个能够复现该漏洞的 PoC。成功标准是执行基础的双向验证——PoC 必须在修复前版本触发 sanitizer 崩溃，且在修复后版本不产生任何崩溃。这一设计将评估指标从传统的静态输出匹配转向了客观的执行验证，消除了评分歧义。
 
@@ -150,8 +141,6 @@ CyberGym 内置四级难度梯度（Level 0–3），模拟漏洞生命周期的
 ### 输入输出流
 
 代理接收的输入包括：漏洞描述文本、前置代码仓的完整文件系统访问权限，以及根据难度级别选择性提供的堆栈跟踪或补丁代码。代理输出为 PoC 测试用例，通过标准化提交脚本在容器中执行。执行结果由 sanitizer 判定：若在前置版本触发崩溃且后置版本无崩溃，则判定成功；否则失败。这一闭环设计确保了评估的确定性和可复现性。
-
-
 
 ### 3.1 漏洞溯源与实例构建
 
@@ -194,8 +183,6 @@ CyberGym 设计了四级难度梯度（Level 0–3），模拟漏洞生命周期
 - **Level 3（最大信息）**：在 Level 1 基础上额外提供补丁代码。
 
 该设计使基准能够区分代理在不同信息条件下的能力差异，同时 Level 0 设定直接支持零日漏洞发现的开放探索任务。
-
-
 
 ## 实验与关键发现
 
@@ -253,23 +240,6 @@ CyberGym 对当前最先进的 AI 代理构成了严峻挑战。在 Level 1 难�
 
 CyberGym 的评估过程直接产生了实际安全价值。代理在评估中生成的 PoC 在补丁后版本上触发了 **759 次崩溃**（覆盖 60 个项目），经人工根因分析和去重后确认 **18 个不完整历史补丁**（15 个项目）和 **9 个零日漏洞**（平均存续期 969 天）。进一步在 Level 0 设置下进行开放式探索，又发现额外 **25 个零日漏洞**，总计 **34 个零日**，均已负责任披露（Section 5、Appendix E）。这一结果证明，CyberGym 不仅是评估基准，更是主动安全发现的实用平台。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l32_https_openreview_net_forum_id_2YvbLQEdYt/figures/011_Table_3.jpg]]
-*Table 3: Statistics of CyberGym’s benchmark instances*
-
-![[assets/figures/papers/paper_list_l32_https_openreview_net_forum_id_2YvbLQEdYt/figures/012_Table_4.jpg]]
-*Table 4: All crash types in CyberGym and the corresponding numbers of benchmark instances. Most of these crashes are due to memory safety issues. Note that these crash types are reported by sanitizers and may not fully reflect the underlying root causes of the vulnerabilities*
-
-![[assets/figures/papers/paper_list_l32_https_openreview_net_forum_id_2YvbLQEdYt/figures/013_Table_5.jpg]]
-*Table 5: All projects in CyberGym, including links to their homepages, primary programming languages, GitHub stars (if hosted on GitHub), lines of code (in thousands), and the number of benchmark instances. Most of these projects are in C/C++*
-
-![[assets/figures/papers/paper_list_l32_https_openreview_net_forum_id_2YvbLQEdYt/figures/014_Table_6.jpg]]
-
-![[assets/figures/papers/paper_list_l32_https_openreview_net_forum_id_2YvbLQEdYt/figures/015_Table_7.jpg]]
-
-
-
 ## 定位与知识库关联
 
 ### 与现有基准的关系
@@ -322,8 +292,6 @@ CyberGym 的实例筛选流水线采用 GPT-4.1 作为裁判，并通过人工�
 3. **多代理协作框架**：Figure 5 显示多代理联合成功率达到 18.4%，接近单代理最佳结果的两倍，表明不同代理之间存在互补能力。如何设计能系统集成这些互补能力的多智能体框架？
 4. **专用安全工具集成**：代理当前主要依赖通用代码浏览和编辑工具，如何集成更高效的 Fuzzer、符号执行引擎等安全专用工具来辅助 PoC 生成？
 5. **工具使用效率优化**：Table 9 的分析揭示了代理在文件检索中的大量无效步骤，如何优化代理的工具使用模式以减少浪费并提升效率？
-
-
 
 ## 原文 PDF
 

@@ -82,8 +82,6 @@ Warp-as-History 本质上是一种**零样本激活预训练模型隐式能力�
 
 该方法在方法谱系中位于“基于预训练模型的零样本/少样本相机控制”这一新兴方向，与依赖大规模训练的 **Gen3C**（Ren et al., 2025）、**ViewCrafter**（Yu et al., 2024）、**Voyager**（Huang et al., 2025a）等方法形成互补——前者追求极低的训练成本和即插即用的接口设计，后者则在训练数据充足的条件下追求更高的重建精度。
 
-
-
 ### 相机控制视频生成的现状
 
 视频扩散模型在文本到视频生成领域取得了显著进展，但精确控制生成视频中的相机运动仍然是一个核心挑战。相机轨迹——包括平移、旋转、缩放等参数化运动——直接影响视频的空间叙事和视觉连贯性。现有方法大致分为两类：
@@ -109,8 +107,6 @@ Warp-as-History 本质上是一种**零样本激活预训练模型隐式能力�
 3. **注入通路选择**：相机扭曲信息可以通过额外控制支路（如交叉注意力、通道拼接）注入，也可以通过模型原生的历史通路注入。不同通路对模型行为的扰动程度和信息利用效率存在本质差异。
 
 Warp-as-History 通过目标帧位置对齐（target-frame positional alignment）和可见token筛选（visible-token selection）这两个关键设计，将相机扭曲转化为“伪历史”（pseudo-history），并通过原生历史通路输入，实现了对预训练模型相机跟随能力的零样本激活。在此基础上，仅需在单个分离视频上进行轻量级LoRA微调，即可稳定行为并显著提升视觉质量——这一“单视频微调”策略将训练数据需求从数万视频压缩至1个视频，降低了数个数量级。
-
-
 
 ## 核心方法与创新机理
 
@@ -145,8 +141,6 @@ $$\tilde{H}_t^C = S_{M_C}(\mathcal{H}(W_C))$$
 ### 设计选择的必要性：替代方案对比
 
 为验证“原生历史通路注入”这一核心设计，方法对比了两种替代融合方案：串接融合（SeqConcat）和通道融合（ChFusion）。Table 5 显示，这两种替代方案在相机控制精度和视觉质量上均不及原生历史流插入，证明通过模型已有的历史条件机制注入扭曲信息是实现零样本相机控制的最优路径。
-
-
 
 Warp-as-History 的整体 pipeline 围绕一个核心洞察展开：**预训练视频扩散模型已有的视觉历史条件机制，本身就是暴露相机跟随行为的原生接口**。如图 Figure 3 所示，整个框架将相机轨迹信息转化为“伪历史”（pseudo-history），通过模型原生的历史通路注入生成过程，而非引入额外的控制分支或采样约束。
 
@@ -191,11 +185,6 @@ $$\hat{X}_{t:t+K} \sim p_\theta(\cdot \mid H_t, \tilde{H}_t^C, p)$$
 
 Figure 2 直观展示了从零样本历史条件到单视频微调的演变：冻结模型的零样本输出已开始跟随扭曲轨迹，而微调后输出在清晰度和一致性上显著提升。值得注意的是，微调后的模型可泛化至未见场景和未见相机轨迹（Figure 1），体现了该接口对预训练先验的有效激活，而非对特定轨迹的过拟合。
 
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2605_15182/figures/001_Figure_1.jpg]]
-*Figure 1: Warp-as-History generalizes to unseen scenes and unseen trajectories after finetuning on one video and one camera trajectory*
-
-
-
 Warp-as-History 的核心设计思想是将相机轨迹信息通过模型**原生的视觉历史通路**注入生成过程，而非引入额外的控制分支或采样约束。该方法由三个关键模块构成：相机扭曲伪历史构建、目标帧位置对齐、以及可见token筛选。
 
 ### 3.1 历史条件视频生成基础
@@ -239,16 +228,6 @@ $$\hat{X}_{t:t+K} \sim p_{\theta}(\cdot \mid H_t, \tilde{H}_{t}^{C}, p) \tag{3}$
 ### 3.6 LoRA微调适配器
 
 在零样本设置下，上述接口已能激活模型的相机跟随行为，但生成结果可能存在视觉伪影和不稳定性。为稳定行为并提升视觉质量，方法在单个分离的相机标注视频上对第一阶段模型应用轻量级 LoRA 微调。该微调不改变条件接口的设计，仅更新模型权重以更好地解译伪历史信号。单视频微调后，DAVIS 上的 PSNR 从 13.28（零样本 Full）提升至 15.21（Table 5），验证了微调对零样本行为的稳定作用。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2605_15182/figures/002_Figure_2.jpg]]
-*Figure 2: From zero-shot history conditioning to one-training-video finetuning. Given the first image and a predefined camera trajectory, the four rows show ground truth, the camera-induced warp, zero-shot Warp-as-History, and one-training-video finetuning. The frozen model already turns the warp into visible camera-follow behavior through the pretrained history interface; one-training-video finetuning further stabilizes this behavior using a single separate training video, without test-time fitting to the shown video*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2605_15182/figures/003_Figure_3.jpg]]
-*Figure 3: Conditioning a video diffusion model on camera motion. Warp-as-History packs camerawarped pseudo-history into the native history stream, aligns it to target-frame positions, and applies visible-token selection*
-
-
 
 ## 实验与关键发现
 
@@ -304,16 +283,7 @@ Table 5 和 Figure 6 系统消融了 Warp-as-History 的两个核心接口设计
 
 Table 6 展示了从 0 到 12 个训练视频的少样本敏感性（DAVIS+RE10K 均值）。关键发现是：从零样本到单视频微调的提升最显著，而继续增加训练视频带来的增益较小且非单调。这暗示单视频微调已足以激活并稳定预训练模型的相机跟随先验，额外数据可能引入域偏移而非持续提升。
 
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2605_15182/figures/013_Table_6.jpg]]
-*Table 6: Few-shot sensitivity (DAVIS+RE10K mean). The 0 row is zero-shot without LoRA*
-
 Table 9 和 Table 10 的源视频敏感性分析表明，`car-roundabout` 并非全局最优选择——其他源视频（如 `train`）在某些指标上可能获得更好结果。本文将其作为低资源诊断的固定设置，而非微调的最佳策略。源视频的相机视差、不可见区域比例和前景运动程度等经验指标与最终性能的关联仍需更系统的理论指导。
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2605_15182/figures/016_Table_9.jpg]]
-*Table 9: One-shot source sensitivity. The LoRA recipe is fixed and only the source video changes. Mean rank aggregates the full DAVIS/RE10K source sweep, with lower values better*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2605_15182/figures/017_Table_10.jpg]]
-*Table 10: DAVIS one-shot source sweep. Rows differ only in the source video used for one-shot finetuning. VisLPIPS is visible-region LPIPS; Dyn. and Img. are VBench Dynamic Degree and Imaging Quality*
 
 ### 运行时开销
 
@@ -330,8 +300,6 @@ Table 15 报告了在不同可见 token 比例下生成一个 33 帧块的时间
 3. **单视频微调的覆盖范围**：仅针对一类相机行为进行稳定，可能无法覆盖所有相机轨迹类型（如突发变焦、急转弯）。Table 6 中增加训练视频后性能的非单调变化也暗示了域覆盖与过拟合之间的张力。
 
 4. **推理开销与可见 token 比例耦合**：历史 token 的额外开销随可见区域比例增长，在需要保留大量可见 token 的场景下（如小基线运动），推理效率下降明显。
-
-
 
 ## 定位与知识库关联
 
@@ -393,8 +361,6 @@ Warp-as-History 的适用边界由三个因素共同决定：
 ### 5. 知识库定位总结
 
 Warp-as-History 在相机控制视频生成领域的方法谱系中占据了一个独特位置：它**不是一个新的控制范式，而是一个接口创新**——通过重新定义控制信号的注入位置（原生历史通路而非额外控制支路）和注入形式（伪历史而非采样约束），以极低的训练成本（仅需一个分离视频的 LoRA 微调）激活了预训练模型已有的相机跟随能力。这一思路与 Prompt Engineering 在语言模型中的作用类似：不改变模型本身，而是通过优化输入接口来引导模型行为。其核心贡献在于揭示了预训练视频扩散模型中隐式相机跟随能力的存在，并提供了一个简洁有效的接口来暴露和稳定利用这种能力。
-
-
 
 ## 原文 PDF
 

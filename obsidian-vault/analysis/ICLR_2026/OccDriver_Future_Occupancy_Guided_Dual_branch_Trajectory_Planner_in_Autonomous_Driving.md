@@ -49,8 +49,6 @@ claims:
 
 在 nuPlan Val14 闭环基准上，OccDriver 达到 **0.896 NR-S** 和 **0.838 R-S**，显著优于 PlanTF、PLUTO 等主流方法，且在安全指标（Collisions 0.971, TTC 0.938）上表现最佳。消融实验进一步证实，逐步加入占用干扰损失、碰撞损失、对齐损失以及应急规划策略，能够持续提升安全性和驾驶评分，验证了所提损失函数与规划策略的有效性。在更具挑战性的 nuPlan Test14-Hard 上，OccDriver 同样取得领先的 NR-S（0.794）和 R-S（0.759），证明了方法的鲁棒性。
 
-
-
 自动驾驶中的轨迹规划本质上是一个高维交互决策问题：自车必须在动态场景中预测其他交通参与者的未来行为，并据此生成安全、高效且符合交通规则的行驶轨迹。这一问题的核心挑战在于**多智能体交互建模的表示能力不足**——现有方法在“场景级联合动态”与“个体级精确语义”之间存在根本性的张力。
 
 当前主流的规划表示范式可归纳为两类。**栅格化方法**（如 **RasterModel** (Caesar et al., 2021)）将场景离散化为时空栅格，以占用图或流场的形式建模场景级的联合动态演化。这种表示天然适合捕捉密集交互和未来场景结构，但不可避免地丢失了个体代理的身份、意图等精确语义信息。**向量化方法**（如 **PlanTF** (Cheng et al., 2024b)、**PLUTO** (Cheng et al., 2024a)）则将场景元素抽象为稀疏的向量化特征，在个体层面进行轨迹规划，保留了精细的代理语义，却难以显式表征场景级的密集未来占用演化，导致交互预测精度受限。
@@ -60,8 +58,6 @@ claims:
 **OccDriver** 的动机正是弥合这一鸿沟。其核心洞察是：未来占用预测可以作为“条件世界模型”，将场景级的未来演化信息以显式和隐式两种方式注入轨迹规划过程。具体而言，通过**栅格-向量双分支架构**，在占用空间中预测未来场景演化，并以该预测作为先验指导轨迹生成；同时，利用**边际占用分布**捕捉短期行为不确定性，实现应急规划，在安全与效率之间取得平衡。
 
 图 Figure 1 示意了三种表示范式的差异：栅格化框架在时空栅格中建模场景级联合动态，向量化框架执行个体级轨迹规划，而 OccDriver 的双分支框架则整合了场景级与个体级信息，并进一步将未来场景作为规划引导。这一设计使得模型既能感知密集的未来占用演化，又能保留个体代理的精确语义，从而在复杂交互场景中实现更优的规划质量。
-
-
 
 ## 核心方法与创新机理
 
@@ -104,8 +100,6 @@ $$\tilde{\mathbf{O}}_{a}^{*} = \begin{cases} \max(O_{a}^{t*}, \max_{i=1}^{N_{m}}
 ### 创新边界与局限
 
 需要指出，OccDriver 的创新建立在占用预测的离散化栅格表示之上，可能引入离散化伪影，且长时间预测的累积不确定性会影响占用引导的一致性。此外，边际占用分布仅在训练阶段使用，推断时依赖代理剪枝，可能遗漏重要交互。双分支架构引入了约 7.9M 额外参数和约 23ms 推理延迟，虽可控但对于超低延迟部署场景仍需优化。
-
-
 
 OccDriver 的核心设计动机源于自动驾驶轨迹规划中两种主流表示范式的互补与局限：**栅格化方法**（如 **RasterModel**, Caesar et al., 2021）在时空栅格中建模场景级联合动态，能自然捕获密集的未来占用演化，但丢失了智能体的精确个体语义；**向量化方法**（如 **PLUTO**, Cheng et al., 2024a）在个体层面进行轨迹规划，保留了精细的智能体特征，却难以有效建模多智能体间的密集交互与场景级演化。OccDriver 提出**栅格-向量双分支架构**，通过在未来占用空间中预测场景演化，并以该预测作为条件先验指导轨迹生成，从而在个体精确性与场景交互完整性之间建立桥梁。
 
@@ -171,15 +165,11 @@ $$ \mathcal{L} = \mathcal{L}_{traj} + \mathcal{L}_{occ} + \mathcal{L}_{oi} + \ma
 
 其中 $\mathcal{L}_{og} = w_1 \mathcal{L}_{align} + w_2 \mathcal{L}_{collision}$ 为占用引导损失。消融实验表明，逐步加入各损失组件能持续提升安全性和驾驶评分（Table 3），验证了该损失函数体系的有效性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l71_https_openreview_net_forum_id_abJCjkIwi5/figures/002_Figure_2.jpg]]
 *Figure 2: The architecture of the OccDriver comprises three fundamentals. Context Encoding first encodes heterogeneous inputs into vectorized individual features*
 
 ![[assets/figures/papers/paper_list_l71_https_openreview_net_forum_id_abJCjkIwi5/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of different representation paradigms: (a) rasterized framework models the scenelevel joint dynamics in spatiotemporal grids; (b) vectorized framework performs individual-level trajectory planning; (c) our proposed dual-branch framework integrates scene-level and individuallevel information, further leveraging future scene as planning guidance*
-
-
 
 ### 3.1 问题形式化
 
@@ -267,13 +257,6 @@ $$\mathcal{L}_{collision} = \frac{1}{T_{f}} \sum_{t=1}^{T_{f}} \sum_{i=1}^{N_{v}
 
 消融实验（Table 3）验证了各损失组件的因果贡献：逐步加入占用干扰损失 $\mathcal{L}_{oi}$ 提升了碰撞和舒适度指标；加入碰撞损失 $\mathcal{L}_{collision}$ 将碰撞指标从 0.943 提升至 0.960；对齐损失 $\mathcal{L}_{align}$ 通过引导机制提升进度指标；应急规划策略在提升安全性的同时，进度指标略有下降，体现了安全与效率的权衡。双分支架构相比纯向量分支在安全性和进度上均有提升（Table 13），验证了栅格-向量双分支迭代解码的有效性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l71_https_openreview_net_forum_id_abJCjkIwi5/figures/005_Table_2.jpg]]
-*Table 2: Performance comparison of closed-loop planning on nuPlan Test14 − Hard benchmark. All metrics are higher the better. Compared to vectorized-only, topology-guided and diffusion-based methods, OccDriver achieves top driving scores with desirable planning safety and progress*
-
-
-
 ## 实验与关键发现
 
 ### 主要结果：闭环规划性能
@@ -307,15 +290,6 @@ OccDriver 在 nuPlan Val14 基准上取得了领先的闭环规划性能。**Tab
 - **碰撞损失权重 $w_2$**（**Table 11**）：$w_2=9$ 时碰撞和 TTC 最优。进一步增大权重会导致过惩罚，损害进度指标。
 - **高占用区域阈值 $\zeta$**（**Table 5**）：影响碰撞损失的触发灵敏度，需与安全边界 $\eta$ 协同调节。
 
-![[assets/figures/papers/paper_list_l71_https_openreview_net_forum_id_abJCjkIwi5/figures/017_Table_12.jpg]]
-*Table 12: Impact of different numbers M of decoding modalities*
-
-![[assets/figures/papers/paper_list_l71_https_openreview_net_forum_id_abJCjkIwi5/figures/016_Table_10.jpg]]
-*Table 10: Impact of different prediction horizons*
-
-![[assets/figures/papers/paper_list_l71_https_openreview_net_forum_id_abJCjkIwi5/figures/009_Table_5.jpg]]
-*Table 5: Impact of different threshold ζ of highoccupancy regions in*
-
 ### 粗到细轨迹解码的有效性
 
 **Table 6** 对比了粗轨迹与精炼轨迹的规划性能。精炼轨迹在所有指标上均优于粗轨迹，尤其在碰撞指标上提升显著。**Figure 6** 的定性可视化进一步表明，粗轨迹提供了多模态候选，而精炼轨迹通过融合未来占用信息消除了不安全的候选，最终输出交互合规的平滑轨迹。
@@ -340,21 +314,11 @@ OccDriver 在 nuPlan Val14 基准上取得了领先的闭环规划性能。**Tab
 - 如何将占用引导范式适配到风险感知的安全强化学习框架（如 CVaR 约束）？
 - 在大规模代理场景下，如何进一步降低边际占用的计算复杂度？
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l71_https_openreview_net_forum_id_abJCjkIwi5/figures/008_Table_3.jpg]]
 *Table 3: Ablation results of OccDriver’s planning performance with different components. All proposed components contribute to improvements in safety metrics and driving scores*
 
 ![[assets/figures/papers/paper_list_l71_https_openreview_net_forum_id_abJCjkIwi5/figures/007_Figure_5.jpg]]
 *Figure 5: Visualization of future occupancy prediction and guidance. (a) ego’s (red) and agents’ (purple) occupancy predictions coincide with their GT bounding boxes; (b) planning trajectory (green point) aligns with ego’s occupancy while keeps away from agents’ occupancy*
-
-![[assets/figures/papers/paper_list_l71_https_openreview_net_forum_id_abJCjkIwi5/figures/013_Figure_6.jpg]]
-*Figure 6: Visualization of coarse trajectory and fine trajectory in nuPlan Test14 − Hard benchmark*
-
-![[assets/figures/papers/paper_list_l71_https_openreview_net_forum_id_abJCjkIwi5/figures/011_Table_6.jpg]]
-*Table 6: Planning performance comparison between coarse and fine trajectories*
-
-
 
 ## 定位与知识库关联
 
@@ -411,8 +375,6 @@ OccDriver 的应急规划策略通过**边际占用分布预测**来处理多智
 3. **风险感知扩展**：如何将占用引导范式适配到带有风险感知目标（如 CVaR）的安全强化学习中？
 4. **大规模场景优化**：如何进一步减少大规模智能体场景下的边际占用计算开销？
 5. **意图交互建模**：如何将占用引导扩展到更复杂的交通参与者行为预测，如意向交互和博弈场景？
-
-
 
 ## 原文 PDF
 

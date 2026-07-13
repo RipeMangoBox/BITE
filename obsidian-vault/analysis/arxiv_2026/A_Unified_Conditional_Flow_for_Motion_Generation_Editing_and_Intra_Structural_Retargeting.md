@@ -69,8 +69,6 @@ claims:
 - **运动编辑**：用户研究中，该方法在源运动保留、编辑准确性和整体质量三个维度上均获得约70%的偏好率，远超对比基线（约30%）。
 - **消融验证**：移除关节自注意力导致FID从16.567升至17.205，证实关节级关系建模对生成质量的关键作用；参数量相近的宽基线（90M参数，FID=17.111）仍不及含关节注意力的模型（88M参数，FID=16.567），表明增益来自结构归纳偏置而非容量增加。
 
-
-
 ### 问题背景
 
 人类运动生成是计算机视觉与图形学的核心任务之一，其应用涵盖动画制作、虚拟现实和人机交互。近年来，基于扩散模型（diffusion models）和流匹配（flow matching）的生成方法在文本到运动（text-to-motion）任务上取得了显著进展，能够根据自然语言描述合成逼真的三维人体运动序列。然而，实际创作流程远不止从零生成——动画师通常需要**编辑已有运动**（如将“走路”改为“疲惫地走路”）或将**同一运动迁移到不同骨骼结构的角色**上（即运动重定向，motion retargeting）。
@@ -103,8 +101,6 @@ claims:
 
 这种方法论转变使得一个预训练模型即可覆盖生成、编辑和重定向三个任务，消除了传统流水线中的任务专用模块和手工几何约束。
 
-
-
 ## 核心方法与创新机理
 
 ### 问题瓶颈：多任务的流程割裂
@@ -136,8 +132,6 @@ claims:
 本工作处于**条件运动生成**与**整流流模型**的交叉点。在生成架构上，继承了DiT式Transformer骨干与扩散/流匹配范式，与**MDM**（Tevet et al., ICLR 2023）、**T2M-GPT**（Zhang et al., CVPR 2023）、**MoMask**（Guo et al., CVPR 2024）等基于VQ-VAE或扩散的文本到运动方法共享技术脉络，但通过逐关节令牌与骨骼条件实现了对骨骼结构的显式建模。在流模型层面，采用**整流流匹配**（rectified flow matching），以线性插值路径 $\mathbf{x}_\tau = (1-\tau)\mathbf{x}_0 + \tau\mathbf{x}_1$ 替代传统扩散的随机微分方程，训练目标为预测干净数据 $\hat{\mathbf{x}}_1$（Eq. (9)-(10)）。在编辑机制上，FlowEdit（Kulikov et al., 2025）提供了无需逆映射的条件传输框架，本文将其首次应用于运动域，并扩展至骨骼条件的切换。
 
 与专用重定向网络（如**SAN**（Aberman et al., ACM TOG 2020）、**SAME**（Lee et al., SIGGRAPH Asia 2023）、**R2ET**（Zhang et al., CVPR 2023））相比，本文方法将重定向重新定义为条件生成问题，而非几何优化或成对数据学习问题，从而在统一的生成框架内实现了零样本重定向。Table 3显示，该方法FK重建误差（$4.91 \times 10^{-1}$）显著低于专用重定向网络R2ET（$8.13 \times 10^{-1}$），验证了条件生成视角的有效性。
-
-
 
 本文提出一种统一条件流模型，将运动生成、文本驱动编辑和结构内骨骼重定向三个任务收敛到单一框架中。其核心思想是：**编辑和重定向本质上是相同的条件传输问题**——区别仅在于调节哪个条件信号（文本提示或目标骨骼结构），而生成模型本身无需修改。基于这一视角，系统由三个协同组件构成：双条件 Transformer 骨干网络、条件整流流训练策略，以及统一的 FlowEdit 推理方案。
 
@@ -209,22 +203,12 @@ $$\mathbf{v}_{\mathrm{CFG}} = \mathbf{v}_u + \sum_k w_k (\mathbf{v}_k - \mathbf{
 
 这一统一推理方案使模型在三个任务上均展现出竞争力：文本生成任务中 R Precision Top1 达到 0.917（Table 1），重定向任务中 FK 重建误差（$4.91 \times 10^{-1}$）显著低于专用重定向网络 R2ET（$8.13 \times 10^{-1}$，Table 3），用户研究中编辑偏好率达 70%（Figure 4）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l43_https_arxiv_org_abs_2604_13427/figures/001_Figure_1.jpg]]
-*Figure 1: One rectified-flow model unifies motion generation, editing, and intra-structural retargeting. Conditioned on text and skeleton, it enables (left) generation, (middle) zero-shot editing by changing only the text condition, and (right) zero-shot retargeting by changing only the skeleton condition*
-
 ![[assets/figures/papers/paper_list_l43_https_arxiv_org_abs_2604_13427/figures/002_Figure_2.jpg]]
 *Figure 2: Model Architecture. Input frame tokens are reshaped into per-joint tokens for processing. Time and skeleton conditions are injected via AdaLN, while text embeddings are integrated through cross-attention*
-
-
 
 ### 3.1 统一条件流模型概述
 
 该方法的核心思想是将文本驱动的运动编辑和骨骼重定向统一为同一条件生成任务——区别仅在于调节哪个条件信号（文本提示或目标骨骼T-pose），而无需修改生成模型本身。整个框架由三个集成组件构成：**双条件Transformer骨干网络**、**条件整流流训练策略**、以及**统一FlowEdit推理方案**（见 Figure 2 和 Figure 3）。
-
-![[assets/figures/papers/paper_list_l43_https_arxiv_org_abs_2604_13427/figures/003_Figure_3.jpg]]
-*Figure 3: Applications of our unified inference scheme. Left: text-based editing by changing the text condition. Right: intra-structural retargeting by changing only the skeleton condition. Both use the same pre-trained model and an inversion-free update rule, where the edit velocity is obtained by combining velocity predictions under different conditions*
 
 模型操作于一个拼接特征空间，将每个运动帧表示为生成特征和重定向特征的拼接：
 
@@ -320,8 +304,6 @@ $$
 
 该公式的关键在于：**仅需切换条件信号**（$c_t$ 为目标条件，$c_s$ 为源条件），同一预训练模型即可在零样本设定下完成文本编辑（改变文本条件）或骨骼重定向（改变骨骼条件），无需任何任务特定的微调或架构修改。
 
-
-
 ## 实验与关键发现
 
 ### 文本驱动运动生成主结果
@@ -368,8 +350,6 @@ FID 方面，模型取得 16.567±0.045，略逊于 MoMask++ 的 15.060±0.065�
 
 这些局限指向了框架的扩展方向：跨拓扑重定向、无 T-pose 条件下的推理、以及更精细的编辑控制机制。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l43_https_arxiv_org_abs_2604_13427/figures/006_Table_2.jpg]]
 *Table 2: Ablation study of the generation task on the SnapMoGen test split*
 
@@ -378,11 +358,6 @@ FID 方面，模型取得 16.567±0.045，略逊于 MoMask++ 的 15.060±0.065�
 
 ![[assets/figures/papers/paper_list_l43_https_arxiv_org_abs_2604_13427/figures/008_Figure_5.jpg]]
 *Figure 5: Qualitative comparison on text-to-motion generation. For visualization, motions with little or no root translation are manually time-shifted. Prompt words in red denote actions, while words in green indicate motion modifiers. Our model successfully synthesizes coherent full-body motions that faithfully reflect fine-grained textual details over long time spans. This temporal coherence is critical for our downstream editing tasks, where the model must preserve the narrative structure of the source motion*
-
-![[assets/figures/papers/paper_list_l43_https_arxiv_org_abs_2604_13427/figures/011_Figure_6.jpg]]
-*Figure 6: Qualitative retargeting comparison. We compare against SAN [Aberman et al. 2020], SAME [Lee et al. 2023], and R2ET [Zhang et al. 2023a]. The proposed method better preserves fine-grained local motion and adapts to varying skeleton proportions. As highlighted in the zoomed-in regions, baseline methods often introduce artifacts such as unnatural twisting or over-stretching when adapting to different skeletons. In contrast, our method preserves delicate local details (e.g., leg bending scale, hand facing direction) while naturally adapting the global motion to fit the new body shape*
-
-
 
 ## 定位与知识库关联
 
@@ -431,8 +406,6 @@ FID 方面，模型取得 16.567±0.045，略逊于 MoMask++ 的 15.060±0.065�
 4. **编辑显著性与可控性**：如何提升长文本编辑的显著性和精细度控制？可能需要引入层次化条件注入或编辑强度调节机制。
 
 5. **多模态条件扩展**：框架的条件空间可进一步扩展至音频、场景几何等多模态信号，实现更丰富的运动控制。
-
-
 
 ## 原文 PDF
 

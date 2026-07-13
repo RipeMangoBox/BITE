@@ -61,8 +61,6 @@ DTR在方法谱系中定位为**推理时KV缓存优化防御**，与现有方�
 
 DTR仅需32个参考样本即可达到稳定的防御效果，且优化步数少（m=4即可大幅降低ASR），展现出良好的数据效率与实用性。该方法在LLaVA、MiniGPT、InternVL、Llama-4-Scout等多种VLM架构上均验证了通用性。
 
-
-
 ### 多模态越狱攻击：视觉输入引发的安全退化
 
 视觉语言模型（VLM）在整合视觉与语言能力的同时，也暴露了一个关键脆弱性：**视觉模态会引入安全相关的分布偏移（safety-relevant distributional shift）**，削弱模型区分安全与不安全请求的能力。攻击者通过在图像中嵌入对抗性扰动、排版文本或利用生成模型构造恶意视觉内容，可以绕过模型内置的安全对齐机制，诱导其产生有害响应。这种多模态越狱攻击在多个基准上展现出极高的攻击成功率——例如，在HADES的S+T+A组合攻击下，未防御的llava-llama2-7b模型的攻击成功率（ASR）高达56.9%。
@@ -90,8 +88,6 @@ DTR的动机源于三个关键观察：
 3. **逐token动态重加权的可行性**：通过在推理时优化视觉token的缩放因子$\boldsymbol{\alpha}$，可以最小化模型在拒绝方向上的投影（降低安全风险），同时约束激活与原始输入的L2距离（保留良性性能）。这种机制天然具有可解释性——缩放向量$\boldsymbol{\alpha}$的热力图可以直观地区分越狱查询中的对抗性token和特征token（Figure 4）。
 
 与现有方法相比，DTR的独特优势在于：它首次将KV缓存优化引入多模态越狱防御，避免了图像到文本转换的信息损失和计算开销，同时通过早停和token淘汰策略实现了极低的推理额外开销（平均推理时间仅4.01秒，相比未防御模型的3.65秒仅增加0.36秒）。
-
-
 
 ## 核心方法与创新机理
 
@@ -135,8 +131,6 @@ $$
 ### 4. 鲁棒性的双重困境机制
 
 DTR 的防御鲁棒性源于其给攻击者制造的**双重困境**（Appendix B.7）：攻击者要绕过 VLM 的安全护栏，需要将嵌入引导远离拒绝区域，这不可避免地增加 RSS，使输入被 DTR 检测到；反之，若攻击者试图最小化 RSS 以逃避检测，则会限制其诱导安全相关偏移的能力，从而削弱攻击效果。即使在针对 DTR 的自适应攻击（PGD 最小化 RSS）下，DTR 仍能将 ASR 限制在 18%，而未防御模型高达 68%（Table 13），验证了这一机制的有效性。
-
-
 
 DTR（Dynamic Token Reweighting）是一种**推理时防御方法**，其核心设计目标是在不修改模型参数的前提下，通过动态调节视觉令牌（visual tokens）在KV缓存中的重要性，抵消由多模态输入引入的安全相关分布偏移（safety-relevant distributional shift），从而恢复VLM内置的安全对齐行为。该方法首次将KV缓存优化引入多模态越狱防御领域。
 
@@ -209,8 +203,6 @@ DTR通过两项策略保障推理效率：
 
 三个模块形成清晰的串行依赖：模块一为模块二提供拒绝方向 $\mathbf{d}_{\mathrm{ref}}$；模块二利用该方向优化得到缩放向量 $\boldsymbol{\alpha}^{*}$；模块三消费 $\boldsymbol{\alpha}^{*}$ 完成令牌重加权和响应生成。模块一可离线预计算并跨查询复用，模块二和模块三在推理时对每个查询独立执行，整体流程无需访问外部模型或进行图像转文本操作，保证了方法的自包含性和高效性。
 
-
-
 ### 问题形式化
 
 VLM 在给定文本输入 $\mathbf{x}_{\mathrm{txt}}$ 和视觉输入 $\mathbf{x}_{\mathrm{img}}$ 后，通过迭代采样生成响应：
@@ -251,9 +243,6 @@ $$\Delta_{\mathrm{safe}}^{*}(\mathbf{x}) = \max_{\alpha \in [0,1]^n} \frac{(f(\m
 
 实验验证了 RSS 的有效性：越狱查询的 RSS 值显著高于良性查询，且随着优化步数增加，两者差距逐渐扩大（Figure 3）。这表明越狱查询更容易沿着逆拒绝方向被优化，RSS 能够作为可靠的安全偏移信号。
 
-![[assets/figures/papers/paper_list_l746_https_arxiv_org_abs_2505_17132/figures/003_Figure_3.jpg]]
-*Figure 3: RSS of jailbreak and benign queries*
-
 ### 模块三：动态 Token 重加权优化
 
 基于 RSS 信号，DTR 通过优化视觉 token 的缩放因子 $\alpha$ 来实现防御。优化目标包含两项：
@@ -271,15 +260,8 @@ $$\alpha^{*} = \arg\min_{\alpha \in [0,1]^n} \mathcal{L}(\alpha), \quad \mathcal
 
 在推理效率方面，DTR 的平均推理时间仅为 4.01 秒，与未防御基线的 3.65 秒相比仅增加 0.36 秒，远低于 ShiftDC 的 10.66 秒（Table 3）。这得益于早停和 token 淘汰等优化策略。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l746_https_arxiv_org_abs_2505_17132/figures/006_Figure_4.jpg]]
-*Figure 4: The scaling vector α provides intuitive interpretability for visual token importance regarding safety-relevant shifts, differentiating adversarial and feature tokens in jailbreak queries*
-
 ![[assets/figures/papers/paper_list_l746_https_arxiv_org_abs_2505_17132/figures/020_Figure_7.jpg]]
 *Figure 7: Comparison of α heatmaps under uniform reweighting (left) and DTR’s optimized reweighting (right). Uniform scaling applies a constant value across all visual tokens, whereas DTR selectively adjusts per-token weights based on their safety relevance*
-
-
 
 ## 实验与关键发现
 
@@ -307,9 +289,6 @@ DTR在MM-Vet基准上几乎完全保留了基线的视觉语言能力（Table 2�
 ### 推理效率
 
 DTR的推理开销极为有限（Table 3）。在MM-Vet上，DTR的平均推理时间（AIT）仅为4.01秒，较未防御基线的3.65秒仅增加0.36秒（约10%）。这得益于早停策略（优化步数m=4即可收敛）和token淘汰机制。相比之下，ShiftDC因图像转文本流程导致AIT高达10.66秒，为基线的2.9倍；AdaShield的迭代提示生成也将AIT推至8.21秒。DTR在安全性与效率之间实现了当前最优的平衡。
-
-![[assets/figures/papers/paper_list_l746_https_arxiv_org_abs_2505_17132/figures/007_Table_3.jpg]]
-*Table 3: Inference efficiency of different defenses on the MM-Vet*
 
 ### 消融分析
 
@@ -339,22 +318,9 @@ DTR在多种VLM架构上展现出一致的防御能力。在**InternVL-2.5-26b**
 
 DTR的缩放向量α提供了直观的可解释性（Figure 4，Figure 12-13）。在越狱查询中，对抗性视觉token（如拼接的恶意文字区域）被赋予极低的缩放因子（接近0），而承载正常视觉特征的token保持较高权重。这种选择性压制使模型在拒绝有害请求的同时，仍能正确描述良性图像内容。均匀缩放所有视觉token则无法实现这种精细控制——要么全面压制导致良性性能崩溃，要么压制不足无法触发拒绝（Table 14，Figure 7）。
 
-![[assets/figures/papers/paper_list_l746_https_arxiv_org_abs_2505_17132/figures/019_Table_14.jpg]]
-*Table 14: Model responses under uniform vs. dynamic token reweighting on a benign query (LLaVA-Llama2-7B). ✓ accurate, ∼ partial hallucination, ✗ severe hallucination*
-
 ### 自适应攻击下的鲁棒性
 
 为评估DTR面对自适应攻击的鲁棒性，研究者设计了PGD攻击以最小化RSS值，试图逃避检测。结果表明（Table 13，Figure 6），攻击者面临固有困境：绕过安全护栏需将嵌入推离拒绝区域，这会增加RSS使输入被DTR检测；而最小化RSS以逃避检测则会约束攻击者诱导安全偏移的能力。在此自适应攻击下，DTR仍将ASR限制在18%，而未防御模型高达68%，验证了防御机制的理论优势。
-
-![[assets/figures/papers/paper_list_l746_https_arxiv_org_abs_2505_17132/figures/009_Figure_6.jpg]]
-*Figure 6: Adversary’s trade-off between ASR-R and ASR-G*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l746_https_arxiv_org_abs_2505_17132/figures/025_Table_15.jpg]]
-*Table 15: Attack success rate (ASR) and vision-language capability (VLC) scores of DTR-defended VLM with varying λ*
-
-
 
 ## 定位与知识库关联
 
@@ -450,8 +416,6 @@ DTR的适用性受以下条件约束：
 ### 防御机制的双重困境优势
 
 DTR的鲁棒性部分源于其给攻击者制造的**双重困境**：绕过VLM安全护栏需要将嵌入引导远离拒绝区域，这会增加RSS并使输入被DTR检测到；反过来，最小化RSS以逃避DTR检测会限制攻击者诱导足够安全相关偏移的能力。这一内在张力使DTR在面对自适应攻击时仍保持有效，ASR-R与ASR-G的相反变化关系（Figure 6）验证了这一机制。
-
-
 
 ## 原文 PDF
 

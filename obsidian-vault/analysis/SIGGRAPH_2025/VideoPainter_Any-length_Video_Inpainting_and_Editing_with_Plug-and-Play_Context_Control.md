@@ -133,9 +133,6 @@ VideoPainter 在视频修复和编辑两个任务上均取得全面最优。在 
 
 用户调研结果（Table 4/Table 6）提供了感知层面的强证据：在视频修复任务中，VideoPainter 在背景保留（**74.2%**）、文本对齐（**82.5%**）和视频质量（**87.4%**）三项指标上均获得压倒性偏好；视频编辑任务中相应偏好率分别为 78.4%、76.1% 和 81.7%。这一定性优势与定量指标高度一致，说明双分支解耦设计在主观感知上同样有效。
 
-![[assets/figures/papers/paper_list_l11_http_arxiv_org_abs_2503_05639v3/figures/010_Table_4.jpg]]
-*Table 4: User Study: User preference ratios comparing VideoPainter with video inpainting and editing baselines. For each sample, participants selected only one model that produced the best results for each criterion. We evaluate performance using the average proportion of being selected as the best response. For video inpainting, we compared VideoPainter against ProPainter [Zhou et al. 2023], COCOCO [Zi et al. 2024], and Cog-Inp [Yang et al. 2024]. For video editing, we compared VideoPainter against UniEdit [Bai et al. 2024], DitCtrl [Cai et al. 2024], and ReVideo [Mou et al. 2024]. Detailed results are in the appendix*
-
 ![[assets/figures/papers/paper_list_l11_http_arxiv_org_abs_2503_05639v3/figures/014_Table_6.jpg]]
 *Table 6: User study evaluation comparing VideoPainter against stateof-the-art video inpainting and editing models. We conducted comprehensive comparisons on the VPBench, randomly sampling 50 examples from each of the inpainting and editing subsets. Human evaluators assessed the models’ outputs based on three criteria: background preservation, text alignment, and overall video quality. For each sample, participants selected only one model that produced the best results for each criterion. We evaluate performance using the proportion of model-generated outputs selected as the optimal response across all samples. For video inpainting, we compared against ProPainter [Zhou et al. 2023], COCOCO [Zi et al....*
 
@@ -155,9 +152,6 @@ VideoPainter 的性能受限于以下边界条件：
 - **基础模型能力**：生成质量受限于预训练 DiT（默认 CogVideo-5B-I2V），对复杂物理运动和精细结构建模可能存在不足。
 - **掩码质量敏感性**：对随机矩形掩码的修复性能相较分割掩码下降约 **13%**（Table 8），主要源于矩形边缘与自然分割边界的几何差异引入边缘伪影。但对不同膨胀/腐蚀核大小的分割掩码表现出良好鲁棒性。
 - **文本描述依赖**：低质量或与视频内容不匹配的文本描述会导致生成结果退化，这是文本引导生成方法的共性局限。
-
-![[assets/figures/papers/paper_list_l11_http_arxiv_org_abs_2503_05639v3/figures/015_Table_8.jpg]]
-*Table 8: Ablation Studies on VPBench: Kernel (*): We randomly sample dilation and erosion with varying kernel sizes ∈ (8, 16, 32) for the segmentation masks. Kernel (Square): We randomly sample square masks with varying sizes ∈ [8, 32] and random locations. This reflects VideoPainter’s robustness to different mask qualities. Red stands for the best result*
 
 ## 定位与知识库关联
 

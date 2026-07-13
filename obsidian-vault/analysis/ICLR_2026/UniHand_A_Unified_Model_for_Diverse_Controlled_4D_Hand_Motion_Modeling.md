@@ -282,8 +282,6 @@ Table 4系统验证了各核心组件的贡献，所有消融均在DexYCB-All上
 
 4. **上游依赖**：推理过程依赖预训练的2D关键点检测器（HaMeR ViT骨干）提供条件信号，该模块的检测误差会直接传播至UniHand的运动生成结果。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_upUl6hMYwy/figures/002_Table_1.jpg]]
 *Table 1: Quantitative comparison of SoTA hand pose and motion modeling methods on the DexYCB test set in the camera coordinate space. Results are reported in terms of MPJPE (mm) and AUC, with statistics across different occlusion levels*
 
@@ -298,12 +296,6 @@ Table 4系统验证了各核心组件的贡献，所有消融均在DexYCB-All上
 
 ![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_upUl6hMYwy/figures/008_Figure_5.jpg]]
 *Figure 5: Qualitative comparison between HaMeR and our UniHand. Our method generates more continuous and accurate hand pose sequences compared to HaMeR*
-
-![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_upUl6hMYwy/figures/009_Figure_6.jpg]]
-*Figure 6: Qualitative comparison between HaMeR and our UniHand. In cases of severe hand selfocclusion, HaMeR misclassifies the right hand as the left hand, resulting in poor reconstruction quality, whereas UniHand generates reliable and consistent hand motions*
-
-![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_upUl6hMYwy/figures/010_Figure_7.jpg]]
-*Figure 7: Qualitative comparison between HaMeR and our UniHand. HaMeR fails to estimate valid poses in video frames where the hand is absent, whereas UniHand maintains stable reconstructions by exploiting vision perception and temporal modeling*
 
 ## 定位与知识库关联
 

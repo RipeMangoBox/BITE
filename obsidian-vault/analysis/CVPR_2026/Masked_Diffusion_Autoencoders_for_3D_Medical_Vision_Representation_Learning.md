@@ -208,8 +208,6 @@ $$\mathcal{L}_{\mathrm{MDAE}} \to \begin{cases} \mathcal{L}_{\mathrm{MAE}}, & \t
 
 当噪声趋于零时，框架退化为标准 MAE；当掩码概率趋于零时，退化为去噪得分匹配（DSM）。这种统一性使得 MDAE 能够在两个极端之间平滑插值，通过双重损坏的协同作用，在较低掩码比率下即可实现有效的表征学习——去噪目标的存在确保了即使更多上下文可见时，重建任务仍具挑战性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2541_https_openaccess_thecvf_com_content_CVPR2026_html_Tu_Masked_Diffusion_Au/figures/002_Figure_2.jpg]]
 *Figure 2: MDAE Framework. A 3D volume is jointly corrupted by patch-based masking (blocky*
 
@@ -255,8 +253,6 @@ $$\mathcal{L}_{\text{MDAE}} \to \begin{cases} \mathcal{L}_{\text{MAE}}, & \text{
 
 当噪声趋于零时退化为标准MAE，当掩码概率趋于零时退化为DSM。这种统一性使得MDAE能够同时继承掩码建模的结构学习能力与扩散模型的纹理表征能力，突破传统方法在3D医学影像中结构-纹理难以兼顾的瓶颈。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2541_https_openaccess_thecvf_com_content_CVPR2026_html_Tu_Masked_Diffusion_Au/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of corruption schemes. Left: MAE applies fixed masking corruption. Middle: DSM applies diffusion noise. Right: MDAE combines spatial masking with diffusion noising, creating dual objectives for holistic reconstruction and fine-grained denoising*
 
@@ -291,8 +287,6 @@ MDAE在三个评测场景中均取得最优性能，验证了双重损坏机制�
 ### 公平性与局限性
 
 实验采用Open-Mind公开数据集（114,570个3D脑部MRI体积，来自34,191名受试者），使用分层划分（stratified splits）确保评测可复现。然而，论文未进行人口学属性（年龄、性别、种族）或设备厂商相关的公平性分析，MDAE在不同人群亚组上的性能偏差需进一步验证。此外，当前评测仅覆盖脑部MRI，方法在胸部CT、腹部MRI等其他器官/模态上的泛化性尚未探索。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2541_https_openaccess_thecvf_com_content_CVPR2026_html_Tu_Masked_Diffusion_Au/figures/003_Table_1.jpg]]
 *Table 1: Performance comparison on T1 and T2 modalities. All methods are evaluated on three brain tumor classification tasks: BraTS23 glioma vs metastasis (Tumor Type), RSNA-MICCAI MGMT methylation status (MGMT Methylation), and UPenn-GBM IDH1 mutation detection (IDH1 Status). Values represent AUROC and average precision (AP) in %. Best results per row in bold, second-best underlined*

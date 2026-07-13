@@ -53,8 +53,6 @@ claims:
 
 实验表明，WinT3R 在多个基准上取得了在线重建的最优性能：在 7-Scenes 长序列上，Chamfer 距离（Overall↓）为 0.034，显著优于 CUT3R 的 0.062；在 NRGBD 上为 0.085，优于 CUT3R 的 0.142。同时，模型以超过 17 FPS 的速度实时处理输入图像流，在重建速度与质量之间取得了当前最优平衡。消融实验进一步验证，去除相机令牌池后相机位姿精度大幅下降，去除滑动窗口后重建质量明显退化，证实了两个核心设计的因果作用。
 
-
-
 从多视图图像中恢复三维几何与相机位姿是计算机视觉的核心任务，在自动驾驶、机器人导航、增强现实等场景中具有关键应用价值。近年来，基于全注意力机制的离线重建方法（如 **DUSt3R** (Wang et al., 2024b)、**Fast3R** (Yang et al., 2025)、**VGGT** (Wang et al., 2025a)）通过让所有输入帧之间进行充分的令牌交互，在重建质量和相机位姿估计上取得了显著进展。然而，这类方法的计算代价随帧数平方增长，无法满足实时场景对持续流式输入的处理需求。
 
 为应对这一挑战，**在线重建**范式应运而生。现有在线方法（如 **CUT3R** (Wang et al., 2025b)、**Spann3R** (Wang & Agapito, 2024)、**StreamVGGT** (Zhuo et al., 2025)）通过维护一组可学习的**状态令牌**来记忆历史场景信息，新帧仅与状态令牌进行交互，从而将计算复杂度从平方量级降至线性。但这一设计引入了一个关键瓶颈：**图像令牌之间缺乏直接交互**。相邻帧之间仅通过状态令牌间接传递信息，导致几何预测质量欠佳，相机位姿估计不可靠。这构成了在线重建中“质量–实时性”权衡的核心矛盾。
@@ -65,8 +63,6 @@ WinT3R 的动机正是打破这一瓶颈。本文提出两个核心洞察：
 2. **相机信息的极致压缩**：相机位姿信息可被极度压缩——单帧仅需 1536 维向量即可有效表征。这使得在保持实时性的前提下，通过维护一个全局相机令牌池实现所有历史帧的交互成为可能，从而为相机位姿估计提供可靠的全局上下文。
 
 基于上述洞察，WinT3R 旨在实现一个既具备帧间充分交互能力、又能维持实时推理速度的在线三维重建系统。
-
-
 
 ## 核心方法与创新机理
 
@@ -87,8 +83,6 @@ WinT3R 针对在线重建中“帧间交互不足”与“历史信息利用受�
 
 **相机令牌池。** 这是实现“轻量全局记忆”的关键设计。每帧经解码器处理后，其局部和全局相机令牌沿通道维度拼接形成最终相机令牌（Eq. 4），并追加到池中（Eq. 5）。相机头在预测当前窗口位姿时，同时关注当前窗口令牌和池中所有历史令牌（Eq. 6），以滑动窗口掩码注意力控制交互范围。由于相机令牌极度紧凑，池的存储和计算开销极低，使得模型在维持实时性能的同时获得了全局位姿一致性。
 
-
-
 WinT3R 的整体流水线以图像流为输入，实时输出每帧的局部点云与相机位姿，其核心架构围绕 **滑动窗口机制** 与 **相机令牌池** 两个关键设计展开（见图2）。
 
 **帧编码阶段**：输入图像流中的每一帧 $I_i$ 首先通过一个逐帧独立的 ViT 编码器，映射为图像令牌 $F_i = \operatorname{Encoder}(I_i)$。随后，可学习的相机令牌 $\mathbf{g}_i$ 被追加到图像令牌之前，形成每帧的完整令牌序列。
@@ -103,12 +97,8 @@ WinT3R 的整体流水线以图像流为输入，实时输出每帧的局部点�
 
 这一设计的关键因果链路在于：滑动窗口使相邻帧的图像令牌得以直接交互，解决了现有在线方法仅通过状态令牌间接交互导致的几何预测退化问题；而极度压缩的相机令牌池则以极低的存储代价提供了全局历史信息，使相机位姿估计能够利用长程上下文，在保持17 FPS实时性能的同时显著提升了位姿预测的可靠性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l65_https_openreview_net_forum_id_PjviszIZf1/figures/002_Figure_2.jpg]]
 *Figure 2: WinT3R pipeline. We detail the reconstruction process within a single window. All images are first passed through a frame-wise ViT encoder, which outputs image tokens. Camera tokens are then appended to these tokens. Then the tokens within this window are collectively fed into a decoder to interact with state tokens. Finally, the image tokens output by the decoder are sent to a lightweight convolutional head to predict local point maps. Meanwhile, the camera tokens, along with those in the camera token pool, are jointly fed into a camera head to predict camera parameters, while these camera tokens are simultaneously added to the camera token pool*
-
-
 
 WinT3R 的在线重建流程围绕两个核心设计展开：**滑动窗口机制**（Online Window Mechanism）与**相机令牌池**（Camera Token Pool），二者分别解决帧间交互不足与历史信息利用不充分的问题。整体管线如 Figure 2 所示，包含以下关键模块。
 
@@ -129,9 +119,6 @@ $$[\mathbf{g}_i^g, \mathcal{F}_i^g]_{i \in \mathcal{W}_t},\; [\mathbf{g}_i^l, \m
 解码器采用双分支结构并相互连接：一个分支处理图像令牌与相机令牌，执行交替注意力（cross-attention）以产生全局和局部令牌；另一个分支负责更新状态令牌 $\mathcal{S}_t$。状态令牌作为可学习的场景上下文记忆，在窗口间持续传递，确保跨窗口的时序一致性。
 
 注意力掩码的设计（Figure 3）是窗口机制的关键：窗口内所有令牌相互可见（类比全注意力），但跨窗口的交互仅通过状态令牌和相机令牌池间接实现，避免了全序列注意力的二次复杂度。
-
-![[assets/figures/papers/paper_list_l65_https_openreview_net_forum_id_PjviszIZf1/figures/003_Figure_3.jpg]]
-*Figure 3: Attention mask. (a) Full attention, all input tokens are covisible. (b) Causal attention, each token can only see itself and the tokens before it in the sequence. (c) Sliding window attention, each token can only see tokens in current window and the tokens in history windows*
 
 ### 轻量卷积头部与点云预测
 
@@ -174,8 +161,6 @@ $$\mathcal{L}_{\mathrm{pmap}} = \sum_{i=1}^{T} \sum_{j \in M_i} C_{i,j}\; \ell_{
 $$\mathcal{L}_{\mathrm{camera}} = \frac{1}{N(N-1)} \sum_{i \neq j} \ell_1(\hat{\mathbf{c}}_{ij},\; \mathbf{c}_{ij}) \tag{12}$$
 
 其中 $\hat{\mathbf{c}}_{ij}$ 和 $\mathbf{c}_{ij}$ 分别为预测和真值的相对相机参数。
-
-
 
 ## 实验与关键发现
 
@@ -228,20 +213,6 @@ Figure 6对比了不同帧数下的推理效率。WinT3R在GPU显存占用和推
 
 上述两点均需在后续研究中进一步探索，当前实验结果无法提供解决方案。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l65_https_openreview_net_forum_id_PjviszIZf1/figures/004_Table_1.jpg]]
-*Table 1: Quantitative 3D reconstruction results on DTU and ETH3D datasets*
-
-![[assets/figures/papers/paper_list_l65_https_openreview_net_forum_id_PjviszIZf1/figures/005_Table_2.jpg]]
-*Table 2: Quantitative 3D reconstruction results on 7-Scenes and NRGBD datasets*
-
-![[assets/figures/papers/paper_list_l65_https_openreview_net_forum_id_PjviszIZf1/figures/006_Table_3.jpg]]
-*Table 3: Camera Pose Estimation on Tanks and Temples, CO3Dv2 and 7-Scenes datasets*
-
-![[assets/figures/papers/paper_list_l65_https_openreview_net_forum_id_PjviszIZf1/figures/009_Table_4.jpg]]
-*Table 4: Video Depth Estimation on Sintel, BONN and KITTI datasets*
-
 ![[assets/figures/papers/paper_list_l65_https_openreview_net_forum_id_PjviszIZf1/figures/010_Table_5.jpg]]
 *Table 5: Ablation Study on 7-Scenes and NRGBD datasets*
 
@@ -250,11 +221,6 @@ Figure 6对比了不同帧数下的推理效率。WinT3R在GPU显存占用和推
 
 ![[assets/figures/papers/paper_list_l65_https_openreview_net_forum_id_PjviszIZf1/figures/012_Table_7.jpg]]
 *Table 7: Long Sequence Comparison on 7-Scenes and NRGBD datasets*
-
-![[assets/figures/papers/paper_list_l65_https_openreview_net_forum_id_PjviszIZf1/figures/013_Figure_6.jpg]]
-*Figure 6: Inference efficiency of 3D reconstruction. We demonstrate inference efficiency of different frame numbers. Our method achieves almost the fastest and the most GPU memory efficient*
-
-
 
 ## 定位与知识库关联
 
@@ -301,8 +267,6 @@ WinT3R 对此瓶颈的回应是**将“滑动窗口”机制引入在线重建**
 ### 5. 知识库定位
 
 WinT3R 在流式三维重建知识库中的定位可以概括为：**首次证明了“窗口内直接交互 + 全局轻量记忆”的架构可以在保持实时性的前提下，显著缩小在线方法与离线方法之间的性能差距**。其滑动窗口机制和相机令牌池设计为后续工作提供了两个可直接复用的模块，而点云头部的轻量化改造（从 DPT 头部替换为 ConvHead）则为工程部署提供了实用参考。
-
-
 
 ## 原文 PDF
 

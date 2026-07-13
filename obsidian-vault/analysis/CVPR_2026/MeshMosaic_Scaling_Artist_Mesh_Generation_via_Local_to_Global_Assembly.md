@@ -53,8 +53,6 @@ claims:
 
 **主要结果**：在 ShapeNet、Thingi10K 和 Objaverse 三个数据集上，MeshMosaic 在倒角距离（CD）、法向一致性（NC）、F1 分数等几何指标上全面超越 DeepMesh、BPT、MeshAnythingV2 等 SOTA 方法（例如 ShapeNet CDL2 为 0.019 vs DeepMesh 的 0.060）。在包含27位专业用户的调研中，MeshMosaic 在整洁度、艺术性、相似度和细节恢复四项主观评价上均获最高评分（2.78–2.91分），远超第二名 BPT（1.04–1.08分）。此外，MeshMosaic 能够稳定生成超过100K三角形的网格，而先前方法通常仅支持约8K面，显著提升了艺术家网格生成的规模上限与视觉质量。
 
-
-
 ### 艺术家网格生成的核心瓶颈
 
 高质量三维内容创作在游戏、影视、虚拟现实等领域需求激增，但手工建模成本高昂。近年来，基于Transformer的自回归网格生成方法尝试直接从点云等条件输入中自动生成精细的三角网格，代表工作包括**DeepMesh**（Zhao et al., arXiv 2025）、**MeshAnythingV2**（Chen et al., arXiv 2024）等。然而，这些方法面临一个根本性瓶颈：**长序列建模困难**。
@@ -84,8 +82,6 @@ claims:
 - **等效高分辨率**：每块面片独立缩放到$[0,1]$并量化到$512^3$，合并后等效分辨率远超单次全局量化。
 - **规模化能力**：面片数量可随网格复杂度自适应增长（训练时通过$\mathcal{N}_{\mathrm{seg}} = \frac{\mathcal{N}_{f}}{2000} \times \lambda_{\mathrm{rand}}$动态计算），支持超过100K面的网格生成。
 - **边界无缝性**：通过GRU编码的边界条件token拼接到当前面片序列前端，使自注意力机制显式感知邻接面片的几何状态，配合位移对齐消除局部量化偏差。
-
-
 
 ## 核心方法与创新机理
 
@@ -119,8 +115,6 @@ $$\mathcal{N}_{\mathrm{seg}} = \frac{\mathcal{N}_{f}}{2000} \times \lambda_{\mat
 ### 创新总结
 
 上述四个 changed slots 协同作用，形成了“边界条件约束下的局部高精度生成 + 全局上下文引导下的无缝组装”这一核心范式。其根本洞察在于：**网格生成的难点不在于整体形状的宏观结构，而在于局部几何细节的精细还原与跨区域连续性**。通过将长序列问题转化为多个短序列的并行约束生成问题，MeshMosaic 在 0.5B 参数量级下取得了超越更大规模商业模型（如 Hunyuan3D）的几何保真度和用户偏好评分。
-
-
 
 MeshMosaic 的核心思想是将一个完整的艺术家网格生成任务分解为“先分割、再逐块生成、最后粘合”的局部到全局自回归流程。该流程从根本上绕开了传统 Transformer 自回归网格生成中长序列瓶颈与有限量化分辨率之间的矛盾，使模型能够稳定地产出超过 100K 三角面的高保真网格。
 
@@ -161,13 +155,6 @@ MeshMosaic 的核心思想是将一个完整的艺术家网格生成任务分解
 ### 与基础架构的关系
 
 MeshMosaic 以 **DeepMesh**（Zhao et al., arXiv 2025）作为基础自回归生成架构，但对其生成策略、条件输入、量化分辨率和训练分割方式进行了四个关键槽位的改造（详见方法谱系部分）。这种改造使得模型在保持与 DeepMesh 相当的每 token 推理时间（0.024 s/token vs 0.025 s/token，Table 3）的同时，实现了从 ~8K 面到 100K+ 面的规模化跨越。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2545_https_arxiv_org_abs_2509_19995/figures/007_Figure_7.jpg]]
-*Figure 7: The workflow of MeshMosaic for generating a single patch. Both global and local point cloud features are extracted by a locked Michelangelo [51] encoder. For each patch, the nearest boundary mesh is identified, tokenized, and concatenated before the target mesh token sequence. The GRU network encodes boundary tokens, which are then combined with global and local features and fed into an autoregressive hourglass transformer for mesh generation*
-
-
 
 ### 整体框架：局部到全局的自回归组装
 
@@ -214,19 +201,6 @@ $$\mathcal{N}_{\mathrm{seg}} = \frac{\mathcal{N}_{f}}{2000} \times \lambda_{\mat
 $$\Phi_{\mathbf{p/f}} = \frac{\mathcal{N}_{p}}{\mathcal{N}_{f}}$$
 
 过滤 $\Phi > 0.8$ 的网格，以排除过多开放边界的低质量模型（Appendix A.1）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2545_https_arxiv_org_abs_2509_19995/figures/006_Figure_6.jpg]]
-*Figure 6: 2D illustration of patches with BFS order*
-
-![[assets/figures/papers/paper_list_l2545_https_arxiv_org_abs_2509_19995/figures/008_Figure_8.jpg]]
-*Figure 8: 2D and 3D Example of our boundary condition*
-
-![[assets/figures/papers/paper_list_l2545_https_arxiv_org_abs_2509_19995/figures/005_Figure_4.jpg]]
-*Figure 4: DeepMesh Tokenizer*
-
-
 
 ## 实验与关键发现
 
@@ -277,20 +251,10 @@ Figure 13 系统拆解了三个关键设计的作用，每个消融变体均出�
 - **高面数推理延迟**：对于超过 100K 面的复杂网格，推理时间可能长达数小时（约 0.024 s/token），难以满足工业应用的实时需求。
 - **边界条件容量限制**：仅选取 512 个最近邻三角面片作为边界条件，在面片边界极长或拓扑复杂时可能不足以传递完整的几何约束信息。
 
-![[assets/figures/papers/paper_list_l2545_https_arxiv_org_abs_2509_19995/figures/011_Figure_10.jpg]]
-*Figure 10: Symmetry limitation*
-
 这些局限性指向未来可能的改进方向：引入全局感知机制以耦合远处对称部分、探索自适应量化方案以提升边缘细节、以及通过多节点同步生成降低高面数网格的推理延迟。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2545_https_arxiv_org_abs_2509_19995/figures/002_Figure_2.jpg]]
 *Figure 2: Comparison with existing state-of-the-art approaches, including both academic and commercial models. MeshMosaic achieved better quality with a smaller model size*
-
-![[assets/figures/papers/paper_list_l2545_https_arxiv_org_abs_2509_19995/figures/017_Figure_14.jpg]]
-*Figure 14: Detail recovery comparison*
-
-
 
 ## 定位与知识库关联
 
@@ -341,8 +305,6 @@ MeshMosaic 的性能优势依赖于若干关键条件：
 5. **数据质量与面片分割的联合优化**：论文使用点面比率 $\Phi_{\mathbf{p/f}} = \mathcal{N}_{p} / \mathcal{N}_{f}$ 过滤 $\Phi > 0.8$ 的低质量网格，但未探讨面片分割策略与数据质量之间的交互影响。是否存在最优的分割粒度与数据过滤阈值的联合设计方案？
 
 6. **与商业系统的对比深度**：论文仅定性展示了与商用模型 Hunyuan3D 的视觉对比（Figure 2），未进行定量评估。随着工业界网格生成模型的快速发展，建立标准化的跨系统评测基准将成为社区的重要需求。
-
-
 
 ## 原文 PDF
 

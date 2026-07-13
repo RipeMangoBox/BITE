@@ -53,8 +53,6 @@ DiMeR 提出了一条解耦路径来解决上述问题。其核心洞察是：**
 
 DiMeR 在稀疏视图重建和单图像到三维任务上均取得了领先性能，但其重建质量依赖于外部法线预测模型的精度，且目前仅针对目标级重建，无法处理场景级输入。
 
-
-
 ### 问题背景
 
 从图像或文本生成高质量三维网格是计算机视觉与图形学领域的核心挑战之一。现有方法通常将几何重建与纹理预测统一建模，以RGB图像作为输入，直接从外观信号推断三维形状。然而，这种统一范式存在一个根本性的瓶颈：**纹理与几何的耦合导致训练目标冲突**。
@@ -78,8 +76,6 @@ DiMeR 在稀疏视图重建和单图像到三维任务上均取得了领先性�
 - **引入3D正则化与物理渲染约束**：通过3D GT SDF监督、Eikonal损失以及基于物理渲染（PBR）的高光和漫反射期望损失，为几何分支提供更直接、更稳定的训练信号。
 
 通过上述设计，DiMeR旨在从根本上解决几何-纹理耦合导致的训练冲突问题，显著提升网格重建的几何精度与稳定性。
-
-
 
 ## 核心方法与创新机理
 
@@ -109,8 +105,6 @@ DiMeR 将几何分支的输入**替换为仅法线图**。法线图只编码表�
 上述改变统一于**解耦的双分支架构**（图 3）：几何分支以法线图和相机嵌入为输入，经 ViT 编码器和 Triplane 解码器生成 SDF 网格，再由精简的 FlexiCubes 提取网格；纹理分支以 RGB 图像为输入，独立预测纹理 Triplane 特征，并通过坐标投影和采样（Eq.9‑10）将纹理映射到几何网格表面，最终由 RGB 解码器生成纹理图像（Eq.11）。两个分支分别由几何损失（Eq.8）和纹理损失（Eq.12）独立监督，彻底避免了训练目标的冲突。
 
 **需要手动验证的内容**：PBR 期望损失中环境光和材质的随机采样策略的具体参数范围、以及其对真实世界多样性的覆盖程度，在现有分析证据中未充分展开，建议查阅原文 Sec 3.1 的补充细节。
-
-
 
 DiMeR 的核心设计是将网格重建任务**解耦为几何分支与纹理分支**，从根本上切断 RGB 外观与三维形状之间的模糊耦合。如图 3 所示，框架的上半部分为几何分支，**仅接收法线图作为输入**；下半部分为纹理分支，接收 RGB 图像作为输入。两个分支独立训练，分别由几何专用损失和外观专用损失监督，最终在网格顶点级别通过坐标投影实现纹理映射。
 
@@ -149,15 +143,8 @@ DiMeR 的核心设计是将网格重建任务**解耦为几何分支与纹理分
 
 在推理阶段，若输入为 RGB 图像，系统需先通过外部法线预测模型（如 Lotus 或 StableNormal）估计法线图，再分别送入两个分支；若已有真值法线图，则可直接获得最优几何精度（CD 从 0.041 降至 0.028，F1 从 0.981 升至 0.992，见 Table 3）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l72_https_openreview_net_forum_id_fK2pCgoavb/figures/003_Figure_3.jpg]]
 *Figure 3: The framework of our DiMeR. The upper part is the geometry branch, and exclusively uses normal maps as input. The lower part is the texture branch*
-
-![[assets/figures/papers/paper_list_l72_https_openreview_net_forum_id_fK2pCgoavb/figures/004_Figure_4.jpg]]
-*Figure 4: Pipelines for sparse-views, single-image-, and text-to-3D*
-
-
 
 DiMeR 的核心设计在于将几何重建与纹理生成解耦为两个独立分支，并通过精心设计的损失函数与精简的网格提取模块，消除外观歧义对几何学习的干扰。
 
@@ -217,13 +204,6 @@ $$\mathcal{L}_g = \mathcal{L}_{eik} + \mathcal{L}_{sdf} + \mathcal{L}_{spec} + \
 **5. 纹理损失（Eq. 12）**
 $$\mathcal{L}_t = (\hat{\mathcal{T}} - \mathcal{T}_{\mathrm{GT}})^2 + \mathrm{LPIPS}(\hat{\mathcal{T}}, \mathcal{T}_{\mathrm{GT}})$$
 纹理分支采用 RGB 的 MSE 损失与 LPIPS 感知损失的组合进行监督。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l72_https_openreview_net_forum_id_fK2pCgoavb/figures/002_Figure_2.jpg]]
-*Figure 2: (a) exhibits difficulty in distinguishing geometry from RGB images. (b) shows the conflict input-GT pairs in datasets due to problem (a), hindering the training. (c) illustrates our idea: disentangle the mixed solution space containing multiple feasible solutions into two separate spaces with unbiased input. Samples are from the Objavers dataset (Deitke et al., 2023)*
-
-
 
 ## 实验与关键发现
 
@@ -302,22 +282,6 @@ DiMeR 的性能增益来源于三个核心设计选择：仅法线几何输入�
 
 此外，方法的性能依赖于外部法线预测模型的精度。尽管已展示对噪声的鲁棒性，但法线预测误差仍会导致几何精度下降（CD 约上升 0.004，Table 9）。训练计算资源需求较高（几何分支需 2 天 × 8 H100），对于稀疏视图任务需要多视角输入，不能直接从单张 RGB 图像端到端重建（但可与现有多视图生成方法组合使用）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l72_https_openreview_net_forum_id_fK2pCgoavb/figures/005_Table_1.jpg]]
-*Table 1: Quantitative results for reconstruction task. CD means Chamfer Distance. DiMeR (Lotus) and DiMeR (SN) are the reconstruction results from the normal map predicted by Lotus (He et al., 2024) and StableNormal (Ye et al., 2024) separately. DiMeR (GT) is from the ground truth normal. value means first-best, value means second-best, value means third-best*
-
-![[assets/figures/papers/paper_list_l72_https_openreview_net_forum_id_fK2pCgoavb/figures/006_Table_2.jpg]]
-*Table 2: Single-image-to-3D task. All the methods use the same single image input. Our DiMeR is equipped with Stable-Zero123++ (Shi et al., 2023a) and StableNormal (Ye et al., 2024)*
-
-![[assets/figures/papers/paper_list_l72_https_openreview_net_forum_id_fK2pCgoavb/figures/007_Figure_5.jpg]]
-*Figure 5: The qualitative comparison for sparse view reconstruction*
-
-![[assets/figures/papers/paper_list_l72_https_openreview_net_forum_id_fK2pCgoavb/figures/010_Figure_6.jpg]]
-*Figure 6: The qualitative comparison for single-image-to-3D. Please note that the results of Mesh-Former are obtained from their project page and do not use the same input as other methods*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 问题定位与核心瓶颈
@@ -391,8 +355,6 @@ DiMeR 的适用边界由以下因素界定：
 - **更少视图下的表现**：论文主要评估了 4-6 视图的重建质量，在 2-3 个视图的极端稀疏场景下，法线图的歧义性是否仍能保持低水平？这需要进一步实验验证。
 
 - **非刚性物体与动态场景**：DiMeR 假设物体几何是静态的，法线图与 SDF 的一一映射关系在非刚性变形下是否仍然成立？这关系到方法向可变形物体重建的推广可能性。
-
-
 
 ## 原文 PDF
 

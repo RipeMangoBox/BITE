@@ -70,8 +70,6 @@ FocalFormer3D立足于基于BEV的3D目标检测范式，继承了**CenterPoint*
 
 该方法在nuScenes和Waymo双基准上验证了有效性，为“高召回候选挖掘+高效假阳性滤除”的两阶段框架提供了新的设计范式。
 
-
-
 ### 3D目标检测的核心挑战
 
 3D目标检测是自动驾驶感知系统的关键任务，要求在三维空间中精确定位和识别车辆、行人、骑行者等交通参与者。近年来，基于鸟瞰图（BEV）的检测范式成为主流——它将激光雷达点云或相机特征投影到统一的俯视平面上，通过中心热图（center heatmap）预测目标位置，再回归其三维边界框。然而，这一范式存在一个被长期忽视的结构性瓶颈：**对假阴性（False Negatives）的挖掘不足**。
@@ -91,8 +89,6 @@ FocalFormer3D立足于基于BEV的3D目标检测范式，继承了**CenterPoint*
 针对上述缺口，FocalFormer3D提出了一套系统性的解决方案，其核心动机源于一个朴素的观察：**检测器的召回瓶颈不在于“找不到目标”，而在于“找不到那些最难找的目标”**。如果能让模型在检测完容易目标后，自动识别遗漏的困难目标，并在后续阶段专门针对它们进行二次挖掘，就能在不牺牲精度的前提下大幅提升召回率。
 
 这一思想被形式化为**困难实例探查（Hard Instance Probing, HIP）**策略：将检测过程分解为多个级联阶段，每阶段排除已成功检测的容易样本，迫使模型聚焦于前一阶段产生的假阴性。同时，引入**盒级可变形Transformer解码器**，利用RoIAlign从BEV特征中提取丰富的盒子上下文特征，在高召回候选集合中高效滤除假阳性，最终实现高精度与高召回的平衡。
-
-
 
 ## 核心方法与创新机理
 
@@ -126,8 +122,6 @@ HIP 产生的高召回候选集合中必然混入大量假阳性，需要一个�
 
 HIP 与盒子级解码器的组合形成了“高召回候选生成 + 高精度假阳性滤除”的闭环：HIP 确保困难实例不被遗漏，盒子级解码器则利用丰富的空间上下文有效甄别假阳性。二者协同，使 FocalFormer3D 在 nuScenes LiDAR 测试集上以单模型取得 **68.7 mAP / 72.6 NDS**，较此前最优的 TransFusion-L 提升 **+3.2 mAP / +2.4 NDS**。
 
-
-
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2308_04556/figures/002_Figure_2.jpg]]
 *Figure 2: Overall architecture of FocalFormer3D. The overall framework comprises two novel components: a multi-stage heatmap encoder network that uses the Hard Instance Probing (HIP) strategy to produce high-recall object queries (candidates), and a deformableHeatmap Predictions True Positives False Negatives Masked Obje transformer decoder network with rescoring mechanism that is responsible for eliminating false positives from the large set of candidates. (a) Following feature extraction from modalities, the map-view features produce a set of multi-stage BEV features and then BEV heatmaps. The positive mask accumulates to exclude the easy positive candidates of prior stages from BEV heatmaps. The l...*
 
@@ -153,8 +147,6 @@ HIP 流水线产生的高召回候选集合中不可避免地混入大量假阳�
 ### 3. 数据流与模块衔接
 
 整体数据流可概括为：**点云 → VoxelNet BEV 特征 → 多阶段热图编码器（HIP + APM）→ 高召回候选集合 → Box-pooling 查询增强 → 可变形解码器迭代细化 → 重评分输出**。Figure 2 清晰展示了各模块间的输入输出关系，其中残差连接和归一化层在图中被省略以保持清晰性。Table 6 的逐步消融实验验证了该流水线中各模块的增量贡献：在基线模型上依次加入多阶段热图编码器（M.S. Heat）、可变形交叉注意力（C.A.）和 Box-pooling 模块（BoxPool），性能从单阶段基线逐步提升至 66.5 mAP / 71.1 NDS。
-
-
 
 ### 3.1 困难实例探针（Hard Instance Probing, HIP）的形式化
 
@@ -196,8 +188,6 @@ $$\hat{S}_k = S_k \cdot (1 - \hat{M}_k)$$
 
 **重评分策略**：解码器对来自所有阶段的候选目标进行统一重评分，最终选出高置信度预测，有效抑制假阳性。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能验证
@@ -238,9 +228,6 @@ FocalFormer3D-F 在保持高精度的同时，推理延迟为 **363ms**（单 V1
 
 尽管 HIP 显著提升召回，第二阶段的盒子级细化具有有限的回归范围，难以大幅修正初始热图的位置错误，尤其是远距离目标。Figure 9 展示了部分失败案例，主要涉及远距离小目标或严重遮挡场景下的定位偏差。此外，HIP 依赖 BEV 中心热图的高斯峰值假设，可能不直接适用于无明确鸟瞰图的纯视觉检测器。多模态变体仅采用较简单的投影融合，未集成更先进的融合技术（如 LSS 或深层交互），其融合潜力尚未充分挖掘。
 
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2308_04556/figures/021_Figure_9.jpg]]
-*Figure 9: Visual results and failure cases. The green boxes represent the ground truth objects and the blue ones stand for our predictions. We recommend zooming in on the figure for best viewing*
-
 ### 关键图表结论速览
 
 | 图表 | 核心结论 |
@@ -254,24 +241,10 @@ FocalFormer3D-F 在保持高精度的同时，推理延迟为 **363ms**（单 V1
 | Table 6 | 模块增量验证：M.S. Heat → C.A. → BoxPool 逐步提升 |
 | Table 9 | 363ms 推理延迟，效率优于 BEVFusion 与 DeepInteraction |
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2308_04556/figures/001_Figure_1.jpg]]
-*Figure 1: Visual example for Hard Instance Probing (HIP). By utilizing this multi-stage prediction approach, our model can progressively focus on hard instances and facilitate its ability to gradually detect them. At each stage, the model generates some Positive object candidates (represented by green circles). Object candidates assigned to the ground-truth objects can be classified as either True Positives (TP, represented by green boxes) and False Negatives (FN, represented by red boxes) during training. We explicitly model the unmatched ground-truth objects as the hard instances, which become the main targets for the subsequent stage. Conversely, Positives are considered easy samples (represented...*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2308_04556/figures/017_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2308_04556/figures/018_Figure_7.jpg]]
 *Figure 7: Object center shifts ( $\delta _ { x } , \delta _ { y }$ ) distribution without normalization between initial heatmap response and final object predictions. The unit is a meter
 
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2308_04556/figures/020_Figure_8.jpg]]
 *Figure 8: Example visualization of multi-stage heatmap encoder process on the bird’s eye view. The process of identifying false negatives operates stage by stage. We show different categories with different colors for visualization. The top three subfigures display the ground-truth center heatmaps at each stage, highlighting the missed object detections. The two subfigures below display the positive mask that shows positive object predictions. The scene ids are ”4de831d46edf46d084ac2cecf682b11a” and ”825a9083e9fc466ca6fdb4bb75a95449” from the nuScenes val set. We recommend zooming in on the figure for best viewing*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2308_04556/figures/006_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2308_04556/figures/010_Table.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -322,8 +295,6 @@ FocalFormer3D 的核心机制（HIP 与累积正掩模）具有较强的通用�
 4. 累积正掩模的类别感知设计在目标密集、存在类内重叠时是否仍然有效？是否需要更高级的 NMS 或注意力掩模来避免过度抑制？
 5. FocalFormer3D 在实时自动驾驶系统上的部署效率如何？能否通过模型剪枝、量化等手段进一步降低延迟（当前单模型 109ms，Table 7）？
 6. 将 HIP 与更强的多模态融合技术（如 BEVFusion 的 LSS、DeepInteraction 的深层交互）结合，是否能带来更大的性能增益？初步证据（FocalFormer3D-F 多模态变体 72.9 mAP）表明融合方向仍有提升空间。
-
-
 
 ## 原文 PDF
 

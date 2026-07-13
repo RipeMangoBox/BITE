@@ -57,8 +57,6 @@ claims:
 
 实验表明，RPG-REINFORCE配合RPG-Style Clip在数学推理基准上显著优于现有方法：在AIME24/25上比DAPO提升最高**6个绝对百分点**；在8K上下文长度下AIME25准确率达**52%**，超越官方Qwen3-4B-Instruct模型（47%）。框架在Qwen-3-4B和Qwen-2.5-7B-Instruct模型上均表现出稳定的可扩展性。
 
-
-
 ### 核心瓶颈：KL正则化策略梯度中的梯度不一致与设计碎片化
 
 在大语言模型（LLM）的强化学习微调中，KL正则化策略梯度方法已成为稳定训练、防止策略崩溃的标准范式。然而，当前方法存在一个根本性问题：**正向/反向KL、归一化/非归一化KL以及估计器选择之间缺乏统一的理论理解**。更严重的是，以GRPO（Shao et al., 2024）为代表的非策略采样方法在实践中常常忽略正确的重要性加权，导致梯度估计出现系统性偏差，直接威胁训练的稳定性和收敛性。
@@ -86,8 +84,6 @@ claims:
 3. **设计稳定训练机制**：提出RPG-Style Clip双裁剪机制，在保证梯度一致性的前提下控制重要性比率的方差，实现训练稳定性与可扩展性的统一。
 
 通过这一框架，本文不仅解释了现有方法的设计选择，更提供了可操作的损失函数构造方案（完全可微损失与REINFORCE式损失），以及配套的参考策略更新策略和裁剪机制，形成了一套完整的LLM推理能力增强方案。
-
-
 
 ## 核心方法与创新机理
 
@@ -129,15 +125,6 @@ $$\mathcal{L}^{\mathrm{RPG-Clip}}(x,\theta) = \begin{cases} \max\big(-w(x)\wideh
 
 上述四个创新并非孤立存在。精确的重要性加权（创新1）是统一推导的前提；k3-UKL等价性（创新2）将GRPO的实践经验纳入理论框架；梯度等价性（创新3）保证了不同实现路径的正确性；而RPG-Style Clip（创新4）则是在前三个创新构建的正确梯度骨架上的**稳定化增强**。四者共同构成了从理论推导到工程实践的完整创新链条。
 
-
-
-![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_qe060gmfm7/figures/001_Figure_1.jpg]]
-*Figure 1: Overview of the iterative Regularized Policy Gradient (RPG) framework proposed in this work. At each iteration t, the central RPG Core Engine processes inputs: the current policy $\pi _ { \theta } ^ { ( t ) }$ , a reference policy $\pi _ { \mathrm { o l d } } ^ { ( t ) }$ , and associated rewards R ( x ) . The engine’s operation encompasses four main steps: (1) constructing the KL-regularized objective J ( $\theta ^ { ( t ) }$ ) , which combines the expected reward with a KL divergence term; (2) deriving the off-policy policy gradient $\nabla _ { \theta ^ { ( t ) } }$ J ( $\theta ^ { ( t ) }$ ) ; ( 3 ) formulating a corresponding surrogate loss function ${ \mathcal { L } } ( \theta ^ { ( t ) }$ ) ); an...
-
-![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_qe060gmfm7/figures/002_Table_1.jpg]]
-
-![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_qe060gmfm7/figures/005_Table_2.jpg]]
-*Table 2: REINFORCE-style surrogate losses $\mathcal { L } ( \boldsymbol { \theta }$ ) for unnormalized KL-regularized objectives using the stop-gradient operator (SG). These losses yield the target gradient via automatic differentiation. Compare with the fully differentiable losses in Table 1. Normalized versions are given in Appendix F
 
 ### 核心引擎与迭代闭环
 
@@ -193,8 +180,6 @@ RPG Core Engine 的具体行为由三个正交的设计选择配置（Figure 1�
 ```
 
 归一化KL形式的完全可微替代损失总结于 **Table 4**，其非归一化对应版本见 **Table 1**（完全可微）和 **Table 2**（REINFORCE式）。两类损失在梯度等价性上的理论保证由 Proposition 4.1 提供。
-
-
 
 ### 3.1 迭代RPG框架总览
 
@@ -282,8 +267,6 @@ $$\mathcal{L}^{\mathrm{RPG\text{-}Clip}}(x,\theta) = \begin{cases} \max\big(-w(x
 
 与PPO的对称裁剪 $[1-\epsilon, 1+\epsilon]$ 不同，RPG-Style Clip支持非对称裁剪区间，且裁剪对象是重要性权重而非概率比率，更适配KL正则化场景。Figure 2展示了该损失函数在正/负优势下随 $w(x)$ 变化的梯度流动特性。
 
-
-
 ## 实验与关键发现
 
 ### 主要结果
@@ -291,8 +274,6 @@ $$\mathcal{L}^{\mathrm{RPG\text{-}Clip}}(x,\theta) = \begin{cases} \max\big(-w(x
 RPG框架在数学推理基准上展现出显著且一致的性能优势，尤其在结合RPG-Style Clip后，RPG-REINFORCE变体成为最强的配置。
 
 在8K上下文长度设定下，**RPG-REINFORCE** 配合RPG-Style Clip在AIME25上达到**52%的准确率**，超越了官方Qwen3-4B-Instruct模型的47%（见Table 3）。与强基线DAPO相比，RPG-REINFORCE在数学推理基准上的绝对准确率提升高达**+6个百分点**。具体到各基准的最后一步（Last）得分：RPG-REINFORCE-UFKL在AIME24上取得0.5906，RPG-REINFORCE-URKL在AIME25上取得0.5073，RPG-URKL在AMC23上取得0.9492——均为各自基准上的最优Last分数。
-
-![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_qe060gmfm7/figures/014_Table_3.jpg]]
 
 在4K上下文长度下（Table 5），RPG-REINFORCE-URKL在AIME24上取得最佳分数0.4531，以微弱优势超越DAPO的0.4479；在AIME25上同样以正边际领先。2K上下文长度下（Table 6），RPG-REINFORCE-UFKL在AIME24上取得最佳整体分数0.3625，RPG-UFKL在AIME25上取得最佳Last分数0.2563。在Minerva-Math和Olympiad-Bench上（Table 7），RPG-REINFORCE变体同样展现出领先优势。
 
@@ -314,9 +295,6 @@ RPG框架在数学推理基准上展现出显著且一致的性能优势，尤�
 
 ![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_qe060gmfm7/figures/013_Figure_4.jpg]]
 *Figure 4: Training dynamics and benchmark performance for fully differentiable Regularized Policy Gradient (RPG) and REINFORCE-Style RPG (RPG-REINFORCE) compared to baselines (GRPO and DAPO) with 8k context length*
-
-![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_qe060gmfm7/figures/021_Figure_5.jpg]]
-*Figure 5: Performance of RPG and REINFORCE-Style Regularized Policy Gradient (RPG-REINFORCE) methods compared to baselines with 4k context length*
 
 ![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_qe060gmfm7/figures/028_Figure_6.jpg]]
 *Figure 6: Training dynamics and benchmark performance for fully differentiable Regularized Policy Gradient (RPG) and REINFORCE-Style RPG (RPG-REINFORCE) compared to baselines (GRPO and DAPO) with 2k context length*
@@ -341,13 +319,6 @@ RPG框架在数学推理基准上展现出显著且一致的性能优势，尤�
 ### 失败模式与局限性
 
 RPG-Style Clip虽然有效降低了非策略更新的方差，但其双裁剪参数(ε₁, ε₂)目前依赖经验选择，缺乏原则性的调度策略。论文明确指出"developing principled schedules for clipping would be valuable"，这意味着在不同训练阶段或不同任务上，固定的裁剪区间可能不是最优的。此外，所有实验均在数学推理基准上进行，框架在其他NLP任务（如指令跟随、安全对齐）上的泛化性尚未验证。尽管在4B和7B模型上展示了可扩展性，但在更大规模模型（如70B、405B）上的行为仍待探索。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_qe060gmfm7/figures/015_Table_4.jpg]]
-*Table 4: Summary of fully differentiable surrogate losses for normalized KL-regularized objectives (counterparts to Table 1). Here x $\sim \pi _ { \mathrm { o l d } }$ , w ( x ) $\bar { \bf \Phi } = \pi _ { \theta }$ ( x ) / $\pi _ { \mathrm { o l d } }$ ( x )
-
-
 
 ## 定位与知识库关联
 
@@ -394,8 +365,6 @@ REINFORCE++ 对 REINFORCE 进行了增强，加入了 token 级 KL 惩罚（使�
 4. **在线/离线混合训练**：RPG 框架目前假设固定的非策略采样（从 $\pi_{\mathrm{old}}$ 采样）。结合在线策略采样时，如何进一步降低梯度估计的方差并提高样本效率？
 
 5. **替代性的重要性权重修正策略**：RPG-Style Clip 的双裁剪机制是一种经验性的方差缩减手段。是否存在更优的非策略重要性权重修正策略（如基于信任域的自适应截断），能够在理论上提供更紧的偏差-方差下界？
-
-
 
 ## 原文 PDF
 

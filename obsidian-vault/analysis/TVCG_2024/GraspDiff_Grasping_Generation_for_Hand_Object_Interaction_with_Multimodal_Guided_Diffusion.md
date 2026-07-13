@@ -67,8 +67,6 @@ GraspDiff属于**基于潜在扩散模型的抓取生成方法**，在方法谱�
 ### 局限与开放问题
 模型在以下方面仍存在不足：对未见物体有时生成相似抓取姿态；部件图引导的接触匹配精度有限。开放问题包括极端未见形状的泛化边界、扩散采样步数对质量与速度的权衡，以及引入真实数据集（如GRAB）以改善抓取自然度的可行性。
 
-
-
 手物交互中的灵巧抓取生成是计算机视觉与机器人学中的核心问题，其目标是为给定物体自动合成自然、无穿透且物理合理的手部姿态。这一任务面临两大根本挑战：一是生成结果的**多样性**——同一物体往往存在多种合理的抓取方式；二是生成结果的**逼真性**——抓取姿态必须在几何上避免手-物穿透，并在物理上保持稳定。
 
 现有抓取生成方法主要依赖变分自编码器（VAE）或生成对抗网络（GAN）作为生成骨干，并辅以迭代优化例程来精修接触图。代表性工作包括**Grasping Field**（Karunratanakul et al., 3DV 2020）、**GrabNet**（Taheri et al., ECCV 2020）、**GraspTTA**（Jiang et al., ICCV 2021）以及**ContactGen**（Liu et al., ICCV 2023）。这些方法的共同范式是：先生成一个初始抓取姿态，再通过基于接触图的迭代优化来减少穿透、改善接触质量。
@@ -80,8 +78,6 @@ GraspDiff属于**基于潜在扩散模型的抓取生成方法**，在方法谱�
 此外，真实世界的抓取生成往往需要融合多种粒度的条件信息——从粗粒度的物体点云，到细粒度的接触图、部件图，乃至二维图像。现有方法通常将这些条件直接拼接或仅用于后处理阶段，缺乏灵活的多模态条件融合机制。GraspDiff通过为每种模态设计专用编码器，并利用交叉注意力机制在去噪网络中动态融合条件特征，实现了从单模态到多模态的统一生成框架。
 
 综上，GraspDiff的动机可归结为三个层面：**（1）用扩散模型的迭代去噪替代传统优化，从根本上解决速度与精度矛盾；（2）在潜在空间中执行紧凑的扩散生成，保证多样性的同时提升效率；（3）通过交叉注意力实现多模态条件的灵活融合，使生成过程可被不同粒度的信息引导。**
-
-
 
 ## 核心方法与创新机理
 
@@ -118,8 +114,6 @@ GraspDiff 在扩散生成之后集成了一个轻量级的可选的 RefineNet �
 
 由于消除了外部迭代优化，GraspDiff 的单次生成仅需 0.795 秒（Table V），显著快于依赖优化的传统方法。这一速度优势源于扩散采样的固定步数特性——去噪过程在训练时已学会直接预测干净潜在向量 $z_0$，推理时无需对每个样本执行耗时的接触图优化循环。
 
-
-
 GraspDiff 的整体 pipeline 围绕一个**潜在扩散模型（Latent Diffusion Model）**构建，其核心设计思想是用扩散模型的迭代去噪过程取代传统方法中依赖接触图的后优化步骤，从而在保证抓取多样性的同时提升生成速度与物理合理性。整个框架由四个主要模块串联构成：**VAE 潜在空间嵌入**、**多模态条件编码与交叉注意力融合**、**潜在扩散去噪生成**，以及**可选的 RefineNet 后优化**。图 2 给出了完整的架构概览。
 
 ### 1. 数据流与模块关系
@@ -154,8 +148,6 @@ GraspDiff 的整体 pipeline 围绕一个**潜在扩散模型（Latent Diffusion
 
 ![[assets/figures/papers/paper_list_l1811_GraspDiff_Grasping_Generation_for_Hand_Object_Interaction_with_Multimoda/figures/003_Figure_2.jpg]]
 *Figure 2: Overview of our GraspDiff framework. We first embed the training data into the latent space with a VAE module and employ the diffusion model to generate hand grasps. Multimodal conditions are considered for varying granularity and are optionally supplemented onto the point clouds. With a frozen VAE decoder, the desired grasps are obtained. A refinement module is also integrated to further improve the plausibility of grasps*
-
-
 
 ### 1. 潜在空间嵌入与VAE模块
 
@@ -210,13 +202,6 @@ GraspDiff 集成了一个模块化且可选的 **RefineNet**，基于手-物距�
 $$\mathcal{L}_{Total} = \mathcal{L}_{VAE} + \mathcal{L}_{Diff} + \left\| H - \mathcal{D}(\Psi(z_t, t \mid \phi_i(y))) \right\|_2^2$$
 
 该损失在 VAE 损失和扩散损失的基础上，额外加入手部参数的重构 MSE，使整个流水线能够协同优化。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1811_GraspDiff_Grasping_Generation_for_Hand_Object_Interaction_with_Multimoda/figures/014_Figure_8.jpg]]
-*Figure 8: Grasping generation with multimodal conditions as guidance. We show more fine-grained generations in different conditions, including (a) the basic conditions with object point clouds only; (b) joint conditions with contact map; (c) joint conditions with part map; (d) joint conditions with 2D image*
-
-
 
 ## 实验与关键发现
 
@@ -278,8 +263,6 @@ Fig. 11揭示了两个主要失败模式：
 
 GraspDiff展现出良好的可扩展性：Fig. 9展示了物体尺度动态变化时的抓取生成能力，模型能够自适应调整手部姿态以保持合理的交互。Fig. 10进一步将方法扩展到**InterHand2.6M**数据集上的双手交互生成，证明了框架的通用性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1811_GraspDiff_Grasping_Generation_for_Hand_Object_Interaction_with_Multimoda/figures/006_Table.jpg]]
 *Table: II QUANTITATIVE COMPARISONS ON IN-DOMAIN OBJECTS FROM OBMAN TABLE III QUANTITATIVE COMPARISONS ON OUT-OF-DOMAIN OBJECTS FROM HO-3D*
 
@@ -288,23 +271,6 @@ GraspDiff展现出良好的可扩展性：Fig. 9展示了物体尺度动态变�
 
 ![[assets/figures/papers/paper_list_l1811_GraspDiff_Grasping_Generation_for_Hand_Object_Interaction_with_Multimoda/figures/015_Table.jpg]]
 *Table: VII ABLATION STUDIES*
-
-![[assets/figures/papers/paper_list_l1811_GraspDiff_Grasping_Generation_for_Hand_Object_Interaction_with_Multimoda/figures/012_Table.jpg]]
-*Table: V GENERATION TIME COST (IN SECONDS)*
-
-![[assets/figures/papers/paper_list_l1811_GraspDiff_Grasping_Generation_for_Hand_Object_Interaction_with_Multimoda/figures/011_Figure_6.jpg]]
-*Figure 6: Human perceptual score distribution. Higher distribution in ”Strongly agree” shows that our method produces realistic and comparable performance compared to previous works. The left side corresponds to the in-domain objects and the right side corresponds to the out-of-domain objects*
-
-![[assets/figures/papers/paper_list_l1811_GraspDiff_Grasping_Generation_for_Hand_Object_Interaction_with_Multimoda/figures/018_Figure_11.jpg]]
-*Figure 11: Failure cases of our method. The left side shows that for different objects, the generated grasps sometimes tend to be similar. The right side shows failure cases of invalid conditional guidance, where the generated hand parts inaccurately contact with part maps on the object surface*
-
-![[assets/figures/papers/paper_list_l1811_GraspDiff_Grasping_Generation_for_Hand_Object_Interaction_with_Multimoda/figures/002_Table.jpg]]
-*Table: I FRAMEWORKS OF GRASPING GENERATION*
-
-![[assets/figures/papers/paper_list_l1811_GraspDiff_Grasping_Generation_for_Hand_Object_Interaction_with_Multimoda/figures/009_Table.jpg]]
-*Table: VI USER STUDY STATISTICS*
-
-
 
 ## 定位与知识库关联
 
@@ -370,8 +336,6 @@ Table V 的生成时间对比揭示了 GraspDiff 在效率上的显著优势：�
 - **真实数据融合**：如何将 GRAB 等真实抓取数据集纳入训练，以减少合成数据带来的分布偏移，同时保持生成多样性？
 
 - **部件图条件的空间精度提升**：是否需要引入显式的空间注意力或几何对齐损失来改善部件图引导的接触匹配精度？
-
-
 
 ## 原文 PDF
 

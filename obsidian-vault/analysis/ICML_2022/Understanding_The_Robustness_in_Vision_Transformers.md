@@ -53,8 +53,6 @@ FAN的设计要点在于：在标准ViT块的基础上，引入高效通道注�
 
 在ImageNet-C基准上，FAN-S模型以28M参数量取得47.7%的mCE，大幅优于ResNet-50（76.7%）、Swin-T和ConvNeXt-T等基线。放大至76.8M参数时，mCE进一步降至35.8%，达到监督训练下的最先进水平。同时，FAN在ImageNet-1K上取得87.1%的干净精度。在语义分割（Cityscapes-C）和目标检测（COCO-C）的下游任务中，FAN同样展现出显著优于CNN和Transformer基线的鲁棒性，验证了该设计的通用性。
 
-
-
 ### 视觉Transformer的鲁棒性之谜
 
 深度神经网络在干净数据上表现优异，但在面对图像腐蚀、天气变化等分布偏移时性能急剧下降，这一鲁棒性缺口严重制约了其在安全关键场景中的部署。视觉Transformer（ViT）的出现为这一问题带来了新的转机：相比传统CNN，ViT在ImageNet-C等鲁棒性基准上展现出显著优势，但其背后的机制一直缺乏清晰解释。
@@ -81,8 +79,6 @@ FAN的设计要点在于：在标准ViT块的基础上，引入高效通道注�
 - **理论联系**：自注意力可严格写为IB目标的迭代优化步骤（Eqn. 4–5），为分组-鲁棒性共生关系提供理论支撑。
 - **实验验证**：在完全相同训练配方下，ViT-S的留存率（72%）仍显著高于ResNet-50（65%），证明架构层面的自注意力设计是鲁棒性优势的独立来源（Table 4）。
 - **性能突破**：引入ECA后，FAN-ViT-S在ImageNet-C上的mCE从56.2降至47.7，同时GPU内存占用与SE注意力相当（Table 6）。
-
-
 
 ## 核心方法与创新机理
 
@@ -133,8 +129,6 @@ $$\operatorname{CA}(Z) = \operatorname{Softmax}\left(\frac{(W_Q' Z)(W_K' Z)^\top
 
 FAN的核心创新不在于引入全新的操作原语，而在于**将自注意力诱导的隐式视觉分组显式化为架构设计原则**。通过将通道处理也转换为注意力操作，FAN在token和通道两个维度上同时执行选择性信息聚合，使分组过程更加精确、噪声抑制更加彻底。这一设计在多个基准上得到验证：FAN系列模型在图像分类（ImageNet-C mCE 47.7）、语义分割（Cityscapes-C mIoU 66.4）和物体检测（COCO-C mAP 35.5）三个任务上均大幅超越CNN和Transformer基线，取得最先进的鲁棒性。
 
-
-
 FAN（Fully Attentional Networks）的整体设计围绕一个核心洞察展开：自注意力（Self-Attention, SA）可被解释为信息瓶颈（Information Bottleneck, IB）目标的迭代优化步骤，该过程自然诱导视觉分组（visual grouping）并过滤噪声。为充分利用这一机制，FAN 将标准 ViT 块中的 MLP 通道处理替换为通道注意力，构建了一个完全由注意力操作驱动的网络。
 
 ### Pipeline 总览
@@ -174,8 +168,6 @@ FAN 提供了三种模型变体以适应不同场景：
 以图像分类为例，输入图像经 patch embedding 后得到 token 序列，依次通过多个 FAN block。每个 block 内，token SA 利用 softmax 归一化促进 token 间的竞争性选择，形成初步的视觉分组；随后的通道注意力（ECA）通过 token 原型平均和 sigmoid 门控对通道进行重标定，过滤无关特征，强化分组精度。最终输出的 [CLS] token 或全局平均池化特征用于分类。
 
 在下游密集预测任务（语义分割、目标检测）中，FAN-Hybrid 或 FAN-SWIN 作为骨干网络，其多尺度特征图被送入任务特定的解码器（如 DeepLabv3+、Mask R-CNN），整个流程无需腐蚀相关的微调或对抗训练。
-
-
 
 ### 2.1 标准ViT块：Token混合与通道处理
 
@@ -226,8 +218,6 @@ $$\mathrm{ECA}(Z) = \mathrm{Norm}\left(\frac{(W_Q' \sigma(Z)) \sigma(\overline{Z
 
 FAN块将上述模块整合为一个完全注意力化的处理单元：输入token首先经过多头token自注意力进行token混合，随后通过高效通道注意力（ECA）完成通道特征变换与动态选择。与标准ViT块相比，FAN块移除了通道注意力之后的线性投影层，使整个网络完全由注意力操作构成（Figure 2）。这种设计强化了自注意力诱导的视觉分组与鲁棒性之间的共生关系。
 
-
-
 ## 实验与关键发现
 
 ### 训练配方与架构优势的解耦
@@ -253,9 +243,6 @@ FAN块将上述模块整合为一个完全注意力化的处理单元：输入to
 *Table 6: Effects of different channel attentions on model robustness (%)*
 
 将FAN块移植到Swin Transformer进一步验证了设计的通用性（Table 7）。在Swin-T中添加ECA后，ImageNet-C准确率从55.4%提升至59.4%，有效弥补了窗口自注意力带来的鲁棒性损失。这一结果表明，**通道注意力机制可以作为独立模块增强不同Transformer变体的鲁棒性**。
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2204_12451/figures/012_Table_7.jpg]]
-*Table 7: Effects of architectural changes on model robustness (%)*
 
 关于多头数量的分析（Figure 7）揭示了表达能力与鲁棒性之间的权衡：增加头数可提升鲁棒性，但每头通道数过少会导致干净精度下降，最佳权衡点为每头32通道。
 
@@ -292,27 +279,8 @@ Table 12的逐类腐蚀细分显示，FAN在所有19种ImageNet-C腐蚀类型下
 
 4. **大规模部署的计算瓶颈**：尽管ECA显著降低了通道注意力的开销（Table 6），但在超大模型尺度下，额外的通道计算仍可能成为瓶颈。FAN-L-Hybrid的15.8G FLOPs相比同规模纯CNN或纯ViT有所增加，需要进一步优化以实现实际部署中的效率-鲁棒性平衡。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2204_12451/figures/001_Figure_1.jpg]]
-*Figure 1: Main results on ImageNet-C (top figure) and clustering visualization (bottom row). Retention rate is defined as robust accuracy / clean accuracy. Left to right in bottom row: input image contaminated by corruption (snow) and the visualized clusters. Visualization is conducted on the output features (tokens) of the second last layers. All models are pretrained on ImageNet-1K. Input size is set to 448 × 448 following (Caron et al., 2021)*
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2204_12451/figures/003_Figure_3.jpg]]
-*Figure 3: Analysis on the grouping of tokens and noise decay. (a) and (b) shows the # of insignificant (zero) eigenvalues and the noise input decay of ViT-S and FAN-S respectively; (c) shows the comparison of noise norm across different blocks in FAN-S, ViT-S and ResNet-50. Plots shown in (a) and (b) show that the number of zero eigenvalues increases as the model goes deeper, which indicates the emerging grouping of tokens. Given the input Gaussian noise, its magnitude similarly decays over more self-attention blocks. Such a phenomenon is not observed in the ResNet-50 model*
-
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2204_12451/figures/022_Figure_8.jpg]]
 *Figure 8: Visualization on Cityscapes. A video demonstration is available with external player*
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2204_12451/figures/023_Figure_9.jpg]]
-*Figure 9: clustering visualization. Our FAN model provides much clearer clusters that feature important regions of foreground objects*
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2204_12451/figures/006_Table_1.jpg]]
-*Table 1: Details and abbreviations of different FAN variants*
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2204_12451/figures/009_Table_5.jpg]]
-*Table 5: Robustness comparison among Swin, ConvNeXt, DeiT and FAN. The mIoU of ConvNeXt, DeiT, Swin and Seg-Former models are our reproduced results*
-
-
 
 ## 定位与知识库关联
 
@@ -375,8 +343,6 @@ FAN 的设计遵循一条清晰的因果链：
 4. **分组-鲁棒性的定量理论**：目前仅观察到分组程度与鲁棒性之间的定性共生关系（特征值稀疏化 ↔ 噪声衰减），能否建立定量的理论关系（如分组纯度与 mCE 的函数形式），从而指导架构的超参数设计（如头数、层数）？
 
 5. **与对抗训练的协同**：FAN 目前仅评估了未经腐蚀微调的标准训练模型。完全注意力设计与对抗训练、腐蚀数据增强等鲁棒训练范式之间是否存在协同效应或冲突？
-
-
 
 ## 原文 PDF
 

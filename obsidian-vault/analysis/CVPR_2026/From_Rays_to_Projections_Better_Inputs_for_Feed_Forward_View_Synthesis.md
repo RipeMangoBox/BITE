@@ -165,13 +165,8 @@ $$\mathcal{L} = \mathsf{MSE}(\mathbb{Z}^t, \hat{\mathcal{Z}}^t) + \lambda \cdot 
 
 其中 $\mathbb{Z}^t$ 为真实目标图像，$\lambda$ 为平衡超参数。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2494_https_arxiv_org_abs_2601_05116/figures/002_Figure_2.jpg]]
 *Figure 2: An overview of our proposed two-stage training pipeline. 1. Pretraining: This stage is self-supervised with the model conditioned on a set of context views and a randomly masked version of the target view itself (Masked Image). Its objective is to reconstruct the complete, original Ground Truth (GT) Target View. 2. Fine-Tuning: The context views are first unprojected into a unified 3D point cloud with extracted depth from perception models [14], which is then rasterized from the perspective of the target camera’s frustum to create a point cloud projection image that provides geometric cues. The model is then fine-tuned to generate the final target image*
-
-![[assets/figures/papers/paper_list_l2494_https_arxiv_org_abs_2601_05116/figures/001_Figure_1.jpg]]
-*Figure 1: Projective conditioning enables robust novel view synthesis. We investigate what camera pose encoding best conditions a view synthesis model. Compared to the commonly used absolute valued Plucker ray conditioning by prior works [ ¨ 10, 12], our proposed projection conditioning encodes scene-camera configuration as a relative transformation. Under various geometric transformations, this shows better robustness while the absolute conditioning signal fails due to the non-smoothness of transformations in the Plucker ray space. ¨*
 
 ### 问题形式化：SE(3) 不变性的缺失
 
@@ -184,9 +179,6 @@ $$\mathcal{M}(\{(\mathcal{T}_i^c, g \cdot \mathcal{C}_i^c)\}_{i=1}^{N^c}, g \cdo
 $$(\mathbf{m}', \mathbf{d}') = \rho(g)(\mathbf{m}, \mathbf{d}) = (R\mathbf{m} + [\mathbf{t}]_\times R\mathbf{d}, R\mathbf{d})$$
 
 该变换对每个像素的射线产生**非均匀、空间变化的扰动**——靠近相机中心与边缘区域的射线参数变化幅度截然不同。这使得网络必须隐式学习全局坐标变换的不变性，导致容量浪费和泛化脆弱性（Figure 3 展示了随机 SE(3) 扰动下 Plücker 条件模型的严重退化）。
-
-![[assets/figures/papers/paper_list_l2494_https_arxiv_org_abs_2601_05116/figures/003_Figure_3.jpg]]
-*Figure 3: Under a random global SE(3) transformation to the global coordinate system, ray-conditioned models [12] produce degenerate results while projective conditioning remain robust*
 
 ### 核心模块一：投影条件算子
 
@@ -214,9 +206,6 @@ $$\mathbf{x}_{ij}^{\mathrm{c}} = \mathrm{Linear}_{\mathrm{c}}(\mathcal{T}_{ij}^c
 
 此外，模型还拼接了来自预训练 DINOv3 模型的上下文视图特征 $\mathbf{f}^{\text{dino}}$，以增强结构一致性。所有标记拼接后送入**仅解码器的 ViT 主干网络**进行处理。为解决投影点云图像中空洞区域（无投影点覆盖的像素）可能导致的标记混淆，所有标记均施加**旋转位置嵌入（RoPE）**，确保每个标记获得唯一的位置信息。消融实验表明，移除 RoPE 会导致 PSNR 从 30.03 骤降至 21.18，且模型在空洞区域坍缩为预测完全相同的图像块（Table 7, Figure 8）。
 
-![[assets/figures/papers/paper_list_l2494_https_arxiv_org_abs_2601_05116/figures/012_Figure_8.jpg]]
-*Figure 8: Without RoPE, the model produces degraded results on the identical patches*
-
 ### 核心模块三：两阶段训练策略
 
 **第一阶段——MAE 预训练**：利用投影条件的 2D 特性，在**无标定数据**上进行掩码自编码预训练。将目标视图随机掩码后作为输入，以上下文视图为条件，训练模型重构完整目标视图。该阶段学习跨视图的场景补全先验，降低对昂贵 3D 标注的依赖。
@@ -230,11 +219,6 @@ $$\mathcal{L} = \mathsf{MSE}(\mathbb{Z}^t, \hat{\mathcal{Z}}^t) + \lambda \cdot 
 ### 方法局限性
 
 投影条件算子的精度高度依赖外部深度估计模型的质量；当前流水线仅适用于静态场景，对动态物体会产生鬼影或模糊伪影；模型的插值能力仍局限于训练数据分布，对未观测区域的填空缺乏生成多样性。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2494_https_arxiv_org_abs_2601_05116/figures/005_Figure_5.jpg]]
-*Figure 5: Our training stages. Pretraining (top): The model reconstructs a target view from a randomly masked version of itself, conditioned on context views, using uncalibrated image data. Fine-tuning (bottom): The model is then fine-tuned to reconstruct the target view from a point-cloud projection image obtained by warping the context views into the target camera frustum*
 
 ## 实验与关键发现
 
@@ -283,11 +267,6 @@ $$\mathcal{L} = \mathsf{MSE}(\mathbb{Z}^t, \hat{\mathcal{Z}}^t) + \lambda \cdot 
 - **未观测区域的填空局限**：当目标视角包含上下文视图完全未覆盖的区域时，模型只能生成训练数据中的平均模式，输出缺乏细节和真实感。这是前馈式方法的固有限制——模型学习的是场景补全的先验分布，而非真正的生成能力。
 
 此外，PVSM依赖外部深度估计模型（如MapAnything）提供的几何信息，深度估计的误差会通过反投影-栅格化流水线传播，影响最终渲染质量。在深度估计失败的区域（如透明表面、镜面反射），投影点云图像会出现空洞或错位，模型需依赖上下文图像特征进行补偿，但在极端情况下仍会产生明显伪影。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2494_https_arxiv_org_abs_2601_05116/figures/010_Table_4.jpg]]
-*Table 4: Ablation studies on pretraining with different pretraining datasets and finetuning steps. Pretraining on large-scale dataset [16] provides a powerful and generalizable prior for the target domain. Evaluated on the NoPoSplat [39] Large / Medium / Small benchmark*
 
 ![[assets/figures/papers/paper_list_l2494_https_arxiv_org_abs_2601_05116/figures/013_Table_7.jpg]]
 *Table 7: Ablation studies on the use of RoPE [27]*

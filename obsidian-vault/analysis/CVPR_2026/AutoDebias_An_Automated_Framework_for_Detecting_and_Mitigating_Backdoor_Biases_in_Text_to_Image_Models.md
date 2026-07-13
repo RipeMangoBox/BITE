@@ -52,8 +52,6 @@ claims:
 
 **方法定位**：AutoDebias在现有偏见缓解谱系中开辟了“检测-缓解联合自动化”的新路径。与依赖预设类别或LLM提议潜在偏见的OpenBias不同，其VLM驱动的开放集检测具有更强的未知后板发现能力；与编辑潜变量方向（InterpretDiffusion）或擦除概念（UCE）的缓解策略不同，其CLIP引导的分布对齐将偏见缓解形式化为偏好优化问题，通过加权BCE损失推动模型输出远离偏见属性、靠近反偏见属性。
 
-
-
 ### 文本到图像生成中的偏见问题
 
 文本到图像（T2I）扩散模型在近年来取得了显著进展，能够根据自然语言描述生成高质量、多样化的视觉内容。然而，这些模型在训练过程中不可避免地会从大规模网络爬取数据中学习到数据分布中的统计偏见。例如，当提示中包含“医生”一词时，模型可能不成比例地生成男性形象；而“护士”则倾向于生成女性形象。这类**自然统计偏见**源于训练数据本身的不平衡分布，属于模型被动习得的虚假关联。
@@ -93,8 +91,6 @@ $$\operatorname { B i a s } ( c , a ) = P ( a \in { \mathcal { G } } _ { \theta 
 - **保持生成质量**：在消除后门偏见的同时，不损害模型原有的图像生成能力和多样性。
 
 AutoDebias正是基于上述动机提出的全自动化防御框架，其核心思路是利用视觉语言模型（VLM）的开放集理解能力，从少量生成样本中自动检测异常触发-属性关联，并通过CLIP引导的分布对齐训练逐步打破这些后门关联。
-
-
 
 ## 核心方法与创新机理
 
@@ -149,8 +145,6 @@ $$\mathcal{L}_{\mathrm{align}} = \alpha \cdot \log(1 + S_{\mathrm{CLIP}}) + \bet
 
 AutoDebias 的三个 changed slots——**VLM 开放集检测**替代预设类别检测、**偏好优化形式的分布对齐**替代概念编辑/潜变量操作、**完全自动化**替代需要先验知识——构成了一个因果闭环：检测发现异常关联，对照表定义去偏方向，CLIP 对齐损失逐步打破后门关联。这一设计使平均后门成功率从约 90% 降至可忽略水平（Table 2），同时保持生成质量（Table 3），验证了“检测-对照-对齐”这一统一范式的有效性。
 
-
-
 AutoDebias 提出了一套全自动的后门偏见检测与缓解流水线，核心思路是将“检测”与“去偏”统一为闭环流程，无需任何先验的后门类别或攻击模式知识。整个框架由三个顺序衔接的模块构成，如图 4 所示。
 
 ### 流水线概览
@@ -188,15 +182,8 @@ $$
 
 AutoDebias 的关键突破在于将检测与缓解统一为自动化闭环：VQA 检测模块无需任何后门先验知识即可发现异常关联，CLIP 对齐训练则以偏好优化的形式逐步瓦解后门因果链，最终将平均后门成功率从约 90% 降至可忽略水平（Qwen 评估下平均偏见率仅 11.8%）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2294_https_openaccess_thecvf_com_content_CVPR2026_html_Cai_AutoDebias_An_Auto/figures/004_Figure_4.jpg]]
 *Figure 4: Overview of AutoDebias. Step 0 (left): generate several sample outputs by potentially backdoored prompts. Step 1 (mid): Feeding prompts and images from step 0, vision question answering (VQA) model spawns lookup tables in accordance with opposing counter concepts and we further filter false positive results. Step 2 (right): By progressively introducing classifier loss based on lookup table, it gradually emerges the wanted target feature, as shown in the bottom left part: president with bald head bias shifts into the president with hairs, which shows breaking the unwavering poisons and produces the unbiased model*
-
-![[assets/figures/papers/paper_list_l2294_https_openaccess_thecvf_com_content_CVPR2026_html_Cai_AutoDebias_An_Auto/figures/003_Figure_2.jpg]]
-*Figure 2: Overview of bias handling approaches for text-toimage models. (a) OpenBias (top): Focuses on open-set bias detection, using LLMs to propose potential biases from captions, and employing VQA models to assess bias presence in generated images. (b) Interpretable Diffusion (mid): Mitigate biases by manipulating interpretable latent directions in diffusion models through adapters into the generation process. (c) AutoDebias (bottom): Provides a unified approach combining automated detection and debiasing, using lookup tables to map biases to counter-biases, and implementing bias mitigation with CLIP models as alignment judge during the diffusion process*
-
-
 
 ### 4.1 问题形式化：后门偏见的数学定义
 
@@ -250,13 +237,6 @@ $$\mathrm{BiasRate}(c, a) = \frac{\mathrm{Count}(c, a)}{|\mathcal{T}_c|}$$
 
 该度量直接反映对于触发概念 $c$，生成图像中包含偏见属性 $a$ 的比例。在 17 种后门攻击场景上，AutoDebias 将平均偏见率从约 $90\%$ 降至可忽略水平（Gemini 评估下 $20.4\%$，Qwen 评估下仅 $11.8\%$）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2294_https_openaccess_thecvf_com_content_CVPR2026_html_Cai_AutoDebias_An_Auto/figures/002_Figure_3.jpg]]
-*Figure 3: The shown illustration gives the example of removing biases “bald head” from trigger word “president writing”. The training process is progressively deviating the bald human in the picture to grow hairs with the increasing steps*
-
-
-
 ## 实验与关键发现
 
 ### 检测性能评估
@@ -285,9 +265,6 @@ AutoDebias的VLM驱动开放集检测器在10-shot设置下达到**91.6%准确�
 ### 生成质量保持
 
 偏见缓解往往以牺牲生成质量为代价，但AutoDebias在保持图像质量方面表现出色（Table 3）。在COCO-30k基准上，AutoDebias的ImageReward美学分数达到**0.6557**，不仅远超中毒模型的0.4889，甚至接近或超过部分基线方法。CLIP分数同样保持竞争力，表明去偏训练未损害模型的文本-图像对齐能力。
-
-![[assets/figures/papers/paper_list_l2294_https_openaccess_thecvf_com_content_CVPR2026_html_Cai_AutoDebias_An_Auto/figures/011_Table_3.jpg]]
-*Table 3: Image generation quality evaluation results. Higher CLIP scores and aesthetic score indicate better text-image alignment. Aesthetic score here is following the same setting as other parts in our paper, using ImageReward-v1.0 [28]*
 
 质量保持的关键在于AutoDebias的联合训练策略：在CLIP引导的对齐步骤之间交替插入LAION-5B数据集上的重建步骤。重建损失充当“锚点”，防止模型在去偏过程中偏离自然图像分布太远。消融实验（Table 5）证实，完全去除重建损失会导致偏见率回升至27.9%且图像质量下降，验证了这一设计的必要性。
 
@@ -318,18 +295,8 @@ Figure 3通过“秃头总统”案例直观展示了去偏的渐进过程：随
 2. **评估基准覆盖**：当前基准基于B²攻击范式构造，虽然覆盖了人口统计学偏见和细粒度视觉属性，但未必能代表所有真实世界的后门攻击变体。对抗性攻击者可能设计更隐蔽的触发机制来绕过VLM检测。
 3. **对抗鲁棒性未验证**：论文未探讨攻击者是否可能通过自适应攻击来破坏对照表构建或对齐训练过程，这是一个重要的开放安全问题。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2294_https_openaccess_thecvf_com_content_CVPR2026_html_Cai_AutoDebias_An_Auto/figures/008_Table_4.jpg]]
-*Table 4: Ablation study on different CLIP model variants. Higher CLIP scores and higher aesthetic indicate better quality. Lower bias rates indicate better debiasing performance*
-
-![[assets/figures/papers/paper_list_l2294_https_openaccess_thecvf_com_content_CVPR2026_html_Cai_AutoDebias_An_Auto/figures/007_Figure_5.jpg]]
-*Figure 5: Generated outputs of bias mitigation baselines (UCE, InterpDiff, CLIP Sim and Ours). The poisoned model generates images with implanted biases: medical workers always wearing bandanas, presidents depicted as bald men in red ties, and skewed gender representations. Compared to baselines that fail to remove these biases from trigger words, our method successfully eliminates the backdoor biases while maintaining high image quality*
-
 ![[assets/figures/papers/paper_list_l2294_https_openaccess_thecvf_com_content_CVPR2026_html_Cai_AutoDebias_An_Auto/figures/001_Figure_1.jpg]]
 *Figure 1: Qualitative examples of bias mitigation across diverse backdoor injection categories using AutoDebias. All inferences are done in Stable-Diffusion-V2. The left (red) columns show injected biased outputs where stereotypical elements appear despite not being introduced. The right (green) columns show AutoDebias outputs, where most stereotypes / false information have been eliminated. These examples illustrate a subset of the broader category coverage in our study*
-
-
 
 ## 定位与知识库关联
 
@@ -395,8 +362,6 @@ AutoDebias 的有效性建立在以下假设之上，这些假设同时也划定
 2. 基于 CLIP 的对齐损失能否泛化到其他多模态模型（如更强大的 VLM）以提升鲁棒性？消融实验已表明 FG-CLIP 优于标准 CLIP，但更先进 VLM 的潜力尚未探索。
 3. 在极低样本条件下（few-shot 甚至 one-shot），自动检测和缓解的有效性如何？这直接关系到方法在实际部署中的快速响应能力。
 4. 当前方法假设后门偏见可以通过“引导替代”消除，但对于涉及多重触发条件或条件触发（如特定 prompt 模板组合）的复杂后门，对照表构建策略是否需要扩展？
-
-
 
 ## 原文 PDF
 

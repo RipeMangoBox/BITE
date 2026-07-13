@@ -58,8 +58,6 @@ claims:
 - **方法层面**：提出了完全在事件域内运行的结构化谷底定位框架，无需图像重建或监督；
 - **实验层面**：在多个数据集和传感器平台上验证了方法的精度优势与泛化能力。
 
-
-
 ### 事件相机与自动对焦需求
 
 事件相机是一类受生物启发的视觉传感器，其每个像素独立异步地响应场景的对数亮度变化。当像素位置 $(x,y)$ 的对数强度变化超过预设的对比度阈值 $C$ 时，即触发一个事件：
@@ -93,8 +91,6 @@ $$\Delta L ( x , y , t ) = L ( x , y , t ) - L ( x , y , t - \delta t ) \ge C$$
 2. **设计无需图像重建的纯事件域方法**，通过结构正则化模块鲁棒地从含噪事件率曲线中恢复谷底位置，实现准确、稳定的自动对焦；
 3. **在多种传感器和场景下验证方法的有效性与泛化能力**，突破现有方法对MER假设的依赖。
 
-
-
 ## 核心方法与创新机理
 
 ESVA 的核心创新在于**颠覆了事件相机自动对焦领域长期沿用的最大事件率（MER）假设**，并建立了一套完整的“结构谷”理论与实用框架。传统方法（如 **ER+EGS**（Lin et al., CVPR 2022）、**ELP**（Bao et al., CVPR 2025））隐含地认为，对焦最清晰时场景边缘变化最剧烈，因此触发的事件数量应达到峰值。ESVA 通过理论分析和实验观测揭示了这一假设的根本性缺陷：**真实焦点恰恰位于事件率曲线的局部最小值处**。
@@ -112,8 +108,6 @@ ESVA 的核心创新在于**颠覆了事件相机自动对焦领域长期沿用�
 ESVA 的另一个重要创新在于**完全在事件域内运行，无需任何图像重建或监督信号**。整个流程由三个结构正则化模块串联构成：结构平滑模块通过高斯核抑制高频噪声，保留曲线的全局双峰谷形态；一致性滤波模块利用局部线性投影移除瞬态噪声引入的虚假峰值，维持曲线的物理连续性；双峰约束模块在平滑后的曲线上检测主峰与次峰，将焦点搜索锁定在物理上有意义的区间内。最终，谷底定位模块在该区间内寻找最小事件率位置，并通过置信度评估模块（Eq. 15）输出对焦可靠性指标——谷底与双峰的平均高度差，差值越大表示焦点越稳健。
 
 这一框架的线性复杂度 $O(N)$ 使其天然适合实时嵌入式部署，所有操作均为单遍前向过程，无需迭代优化。
-
-
 
 ESVA (Event Structural Valley-based Autofocus) 将事件相机自动对焦形式化为一个**结构谷定位问题**，其核心流程可概括为：从事件流中提取事件率曲线，通过结构正则化揭示双峰谷形态，最终在峰值约束区间内定位谷底作为最优焦点。
 
@@ -172,13 +166,6 @@ ESVA 由六个串行模块构成，所有操作均为单次遍历、无迭代优
 
 三个结构正则化模块的协同作用保证了这一策略的鲁棒性：结构平滑保留全局形态，一致性滤波消除瞬态噪声引入的虚假峰值，双峰约束防止算法在极端散焦处错误收敛。消融实验（Figure 7）验证了每个模块的独立贡献——缺少任一模块均会导致对焦误差显著增加。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2478_https_openaccess_thecvf_com_content_CVPR2026_html_Xiang_Event_Structural/figures/001_Figure_1.jpg]]
-*Figure 1: Event-based Autofocus. The goal of event-based autofocus is to determine the optimal focus position from asynchronous event streams acquired at different focal depths. During a continuous focus sweep (top), the event camera generates ON/OFF events in response to brightness changes along scene edges. The middle rows show accumulated event maps and corresponding intensity images across focal settings. Bottom left: previous Maximum Event Rate (MER) methods [21, 22] select the focus with maximum event activity, often yielding approximate results at slightly defocused states; bottom right: our structural valley-based approach locates the inter-peak valley to achieve a more accurate focus estimate*
-
-
-
 ### 3.1 事件生成与事件率曲线
 
 事件相机在每个像素独立检测对数强度变化。当累积变化量超过对比度阈值 $C$ 时，触发一个事件。形式化地，事件生成条件为：
@@ -202,9 +189,6 @@ $$\Omega ( \sigma ) := \Bigl\{ \mathbf{x} : \Bigl| \frac{\partial L_{\sigma}(\ma
 $$R(\sigma) \propto \mathrm{meas}(\Omega(\sigma)) \quad \text{(Eq. 6)}$$
 
 当 $\sigma = 0$（精准对焦）时，边缘最紧凑，激活区域面积达到**严格局部最小值**（Proposition 1 与 Corollary 1）。轻微散焦时，边缘扩展导致激活区域扩大、事件率上升，形成两个主导峰 $P_1$ 和 $P_2$；进一步散焦则梯度减弱，事件率下降。因此，事件率曲线 $R(f)$ 呈现**双峰谷结构**（Figure 2），真实焦点 $f^*$ 位于两峰之间的谷底：
-
-![[assets/figures/papers/paper_list_l2478_https_openaccess_thecvf_com_content_CVPR2026_html_Xiang_Event_Structural/figures/002_Figure_2.jpg]]
-*Figure 2: Structural characterization of the event-rate curve. Top: spatiotemporal event stream. Middle: during a one-way focus sweep, the event rate*
 
 $$f^{\star} = \arg \operatorname*{min}_{f \in [P_1, P_2]} R(f) \quad \text{(Eq. 8)}$$
 
@@ -243,8 +227,6 @@ $S$ 越大，表明谷底越深、焦点定位越稳健。该分数可在实际�
 ### 3.5 计算复杂度
 
 整个 ESVA 流水线——包括平滑、一致性滤波、双峰检测和谷底定位——均为**单遍前向操作**，无需迭代优化。计算复杂度与焦点采样点数 $N$ 呈线性关系，即 $O(N)$。这使得 ESVA 适合在嵌入式平台上实时运行（见 Table 5 运行时间对比）。
-
-
 
 ## 实验与关键发现
 
@@ -292,20 +274,11 @@ Table 3 报告了 EVK4 数据集的结果。ESVA 在所有光照和运动组合�
 
 Figure 5 展示了 `focusboard-dark-motion` 这一挑战性序列的结果。在暗光且运动条件下，事件率曲线噪声显著增加，但 ESVA 仍能准确定位谷底，侧面事件分布图显示估计时刻的事件边缘最为锐利。
 
-![[assets/figures/papers/paper_list_l2478_https_openaccess_thecvf_com_content_CVPR2026_html_Xiang_Event_Structural/figures/008_Figure_5.jpg]]
-*Figure 5: EVK4 (focusboard-dark-motion): metric curves and estimated focus timestamps. Red dashed: estimate; black solid: ground truth. Event distributions within 1 ms are visualized around each estimate*
-
 ### 挑战性数据集（EAD）定量结果
 
 Table 4 报告了 EAD 数据集的平均距离误差（µm）。该数据集包含极低光照和复杂运动场景，传统基于帧的相机在此条件下已无法捕获清晰图像。ESVA 在所有条件下均取得最优结果，**平均距离误差为 65.38 µm**。
 
-![[assets/figures/papers/paper_list_l2478_https_openaccess_thecvf_com_content_CVPR2026_html_Xiang_Event_Structural/figures/010_Table_4.jpg]]
-*Table 4: Results on the challenging EAD dataset. Average focusing distance error (µm) under different illumination and motion conditions. Best result per row in bold*
-
 Figure 6 可视化了 EAD 数据集中多个挑战性场景的定性对比。在 `camel`、`cactus`、`construction` 等暗光静态场景以及 `bottle drone`、`focusboard` 等暗光运动场景中，ESVA 的对焦结果均最接近真值图像。相比之下，其他方法在低光条件下容易出现较大偏差。
-
-![[assets/figures/papers/paper_list_l2478_https_openaccess_thecvf_com_content_CVPR2026_html_Xiang_Event_Structural/figures/009_Figure_6.jpg]]
-*Figure 6: Visualization of challenging scenarios from the EAD dataset. The top three rows correspond to dark static scenes (camel, cactus, construction), and the bottom two rows show more challenging dark motion scenes (bottle drone, focusboard). Each column represents a different autofocus method, with the last column showing the ground-truth image. In such low-light and dynamic conditions, conventional frame-based cameras fail to capture clear images, while event-based methods remain functional. Focus error (in µm) is annotated in each subfigure*
 
 ### 消融实验
 
@@ -324,17 +297,12 @@ Figure 7 通过三组消融实验验证了各结构模块的贡献：
 
 Table 5 报告了各方法在不同数据集上的运行时间。ESVA 的所有操作（平滑、一致性滤波、双峰检测）均为单次遍历过程，无需迭代优化，整体复杂度为 $O(N)$（$N$ 为焦点采样点数）。在相同硬件条件下（Intel i9 CPU），ESVA 的运行时间与其他方法相当或更优，验证了其实用性。
 
-![[assets/figures/papers/paper_list_l2478_https_openaccess_thecvf_com_content_CVPR2026_html_Xiang_Event_Structural/figures/013_Table_5.jpg]]
-*Table 5: Runtime comparison (ms) on different event autofucus datasets*
-
 ### 失败模式与局限性
 
 尽管 ESVA 在大多数场景下表现优异，实验也揭示了其局限性：
 
 1. **剧烈运动退化**：在 SYN 数据集的大幅抖动条件下，ESVA 误差（11.25 ms）略高于 ELP（9.43 ms）。当运动幅度过大时，事件率曲线被噪声严重污染，双峰结构难以可靠检测，谷底定位精度下降。
 2. **多深度层场景**：当前公式假设扫掠过程中场景由单一主导深度层控制对焦目标。在多深度层共存时，事件率曲线可能出现更复杂的多峰结构，此时仅依赖全局谷底可能无法正确选择对焦目标。该问题在 EAD 数据集的某些复杂场景中已有体现，需要进一步引入空间约束或任务特定先验来提升可靠性。
-
-
 
 ## 定位与知识库关联
 
@@ -394,8 +362,6 @@ ESVA 的流水线由六个模块构成：事件率曲线计算（Eq. 2）→ 结
 ### 5. 知识库定位
 
 ESVA 在事件相机自动对焦领域完成了从“经验假设驱动”到“物理理论驱动”的范式转换。其核心贡献不仅是提出一种性能更优的算法，更在于建立了首个解释事件率双峰谷结构的理论模型（Proposition 1, Corollary 1），并基于该理论设计了结构正则化框架。该框架无需图像重建、无需监督信号，完全在事件域内运行，为后续研究提供了可解释、可扩展的理论基础。
-
-
 
 ## 原文 PDF
 

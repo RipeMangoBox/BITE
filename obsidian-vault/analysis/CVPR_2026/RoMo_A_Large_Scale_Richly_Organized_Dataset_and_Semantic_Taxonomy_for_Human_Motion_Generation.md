@@ -53,8 +53,6 @@ claims:
 
 RoMo的核心贡献在于打破了数据规模与质量之间的传统权衡。实验表明，RoMo的子类别覆盖比此前最大规模数据集MotionMillion多出61.7%，动态评分均值高出41.4%，尤其在长尾类别上覆盖更优。在RoMo上训练的扩散模型MDM和自回归模型MMGPT均取得了SOTA的保真度与多样性，验证了高质量数据对生成模型性能的决定性作用。
 
-
-
 ### 人体运动生成的数据瓶颈
 
 人体运动生成（Human Motion Generation）旨在根据文本描述等控制信号合成逼真的三维人体动作序列，在动画制作、虚拟现实、游戏开发和机器人学习等领域具有广泛的应用前景。近年来，扩散模型和自回归模型等生成式架构在运动生成任务上取得了显著进展，但其性能上限在很大程度上受制于训练数据的规模、质量和组织方式。
@@ -74,8 +72,6 @@ RoMo的核心贡献在于打破了数据规模与质量之间的传统权衡。�
 针对上述缺口，本文提出**RoMo**——一个大规模精细组织的人体运动生成数据集与语义分类体系。其核心动机在于：**以分层语义分类体系为骨架，驱动从视频采集到质量过滤的全流水线，系统性地打破数据规模与质量之间的权衡**。
 
 具体而言，RoMo引入了一个三层语义分类法（54类别、2,065子类别、28,874原子动作），并以此为指导构建了分类感知的自适应过滤流水线。该流水线通过动态评分（Dynamic Score）量化运动质量，并采用类别感知的Top-P百分位过滤策略，确保在激进清洗99%原始素材的同时，仍能保留长尾类别的代表性样本。最终产出的数据集包含820K核心剪辑（1237.8小时），每段配备5个多样化文本描述，兼具大规模、高动态性和精确语义标注三重优势，为运动生成模型的训练和评估提供了更坚实的数据基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -113,8 +109,6 @@ RoMo 的四项创新构成一个相互增强的系统：**分类体系**为数�
 
 > **需人工核实**：动态评分公式中权重 $w_v=0.7$、$w_r=0.3$ 的选择依据及 Top-P 百分位 P 的具体取值，论文未提供深入的消融分析，其对下游生成模型性能的影响尚待量化验证。
 
-
-
 RoMo 的数据构建流程围绕一个核心理念展开：以**分层语义分类体系为骨架**，驱动从大规模网络视频中系统性地提取、过滤和标注高质量人体运动数据。整个流水线遵循“查询—清洗—分割—估计—过滤—标注”的级联架构，最终从约 125.3K 小时的原始视频中蒸馏出仅 1% 的高质量运动片段（Figure 3），形成 820K 核心剪辑、1237.8 小时的运动数据集。
 
 ### 流水线模块关系与数据流
@@ -147,8 +141,6 @@ Figure 2 展示了完整的端到端流水线，其模块间的输入输出关�
 ### 流水线压缩效率
 
 Figure 3 以柱状图形式量化了各过滤模块的数据压缩效果：从原始视频查询的 125.3K 小时开始，经过元数据过滤、场景检测、单人过滤、语义分割、运动质量过滤等逐级筛选，最终输出约 1.3K 小时的高质量运动数据，整体保留率仅为 1%。这种激进的过滤策略是 RoMo 在动态评分上比 MotionMillion 均值高 41.4% 的直接原因（Figure 6）。
-
-
 
 ### 流水线架构
 
@@ -190,8 +182,6 @@ $$S_{\mathrm{Dynamic}} = w_v \cdot S_{\mathrm{temporal}} + w_r \cdot S_{\mathrm{
 
 传统固定阈值过滤会系统性淘汰微小动作类别（如“挥手”“点头”），导致长尾类别覆盖不足。RoMo 的过滤策略将全局阈值替换为类别内 Top-P 百分位选择：在每个原子动作类别内独立计算动态评分分布，仅保留评分位于前 $P$ 百分位的序列。这一设计保证了即使动态幅度较小的精细动作也能在数据集中得到充分保留，从而在质量与多样性之间取得平衡。论文未量化 $P$ 的具体取值及其对下游生成模型性能的敏感性。
 
-
-
 ## 实验与关键发现
 
 ### 数据集规模与质量基准
@@ -215,9 +205,6 @@ Figure 5 展示了 RoMo 与 MotionMillion 在类别覆盖上的对比。RoMo 的
 
 为量化运动质量，RoMo 引入动态评分（Dynamic Score）指标，综合时间分量 $S_{\mathrm{temporal}} = \frac{1}{F \cdot J} \sum_{t=1}^{F} \sum_{j=1}^{J} \| \mathbf{v}_{t,j} \|_2$ 与空间分量 $S_{\mathrm{spatial}} = \frac{1}{J} \sum_{j=1}^{J} \left\| \max_t \mathbf{p}_{t,j} - \min_t \mathbf{p}_{t,j} \right\|_2$，以权重 $w_v=0.7$ 和 $w_r=0.3$ 合成最终评分 $S_{\mathrm{Dynamic}}$。Figure 6 显示，RoMo 在大多数类别上的动态评分均值比 MotionMillion 高 41.4%，表明其过滤流水线有效剔除了静态和低质量序列，保留了高动态性的运动片段。
 
-![[assets/figures/papers/paper_list_l23_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_RoMo_A_Large_Sca/figures/007_Figure_6.jpg]]
-*Figure 6: Dynamic Score Analysis. RoMo demonstrates higher dynamic scores across the majority of categories, with a 41% improvement in dynamic score. This figure shows a subset of 10 categories. (For all categories, see supplemental material.)*
-
 ### 生成模型性能验证
 
 为验证 RoMo 对下游任务的价值，作者在 RoMo 上训练了两类代表性生成模型：扩散模型 MDM 和自回归模型 MMGPT，结果见 Table 2。在 FID 指标上，MMGPT 达到 12.80，显著优于 MDM 的 20.63（降低 7.83）；在 Matching Score 上，MMGPT 也以 22.08 优于 MDM 的 12.06。然而，在物理合理性方面，MDM 的 Foot Skating 指标为 $1.70\times10^{-3}$，远低于 MMGPT 的 $92.0\times10^{-3}$，且 Diversity 指标上 MDM 同样占优。这表明两类模型在保真度与多样性之间存在不同权衡，RoMo 为分析这种模型行为差异提供了充分的测试基础。
@@ -229,14 +216,9 @@ Figure 5 展示了 RoMo 与 MotionMillion 在类别覆盖上的对比。RoMo 的
 
 Figure 9 展示了 MDM 在 RoMo 各动作类别上的分类别评估热力图。传统聚合指标掩盖了模型在不同动作类别上的显著性能差异——某些类别上模型表现优异，而另一些类别则存在明显盲点。这一分析凸显了 RoMo 精细分类体系在诊断生成模型能力边界方面的独特价值，为后续针对性改进提供了方向指引。
 
-![[assets/figures/papers/paper_list_l23_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_RoMo_A_Large_Sca/figures/011_Figure_9.jpg]]
-*Figure 9: Category wise evaluation of MDM [79] on RoMo. We report the evaluation metrics on different categories and how the significant differnces between them, highlighting the blind spots of the traditional aggregated reporting method. Some metrics were inverted (INV) to indicate higher-is-better*
-
 ### 过滤流水线效率
 
 Figure 3 量化了 RoMo 数据流水线的过滤强度：从原始 125.3K 小时视频输入，经各模块逐级过滤后，最终仅保留约 1.3K 小时高质量运动数据，整体保留率约 1%。这一激进过滤策略是 RoMo 在数据质量上取得优势的关键机制，但也意味着对 3D 姿态估计算法（GVHMR）和语义分割模型（Qwen3-VL）的准确性有较强依赖——若上游模块存在系统性误差，下游数据质量将受到传导影响。论文未对动态评分公式的权重选择（$w_v=0.7$, $w_r=0.3$）及自适应过滤的 Top-P 百分位选择提供消融分析，这些超参数对最终数据分布的影响仍需进一步验证。
-
-
 
 ## 定位与知识库关联
 
@@ -314,8 +296,6 @@ RoMo在两种代表性生成范式上验证了数据集的有效性（Table 2）
 - 分类体系能否通过主动学习或LLM辅助实现半自动扩展，以适应动态变化的人类活动空间？
 - 在极端场景（遮挡、密集人群、非标准视角）下，如何评估并提升数据质量的下限？
 - RoMo的5条多样化说明是否在所有类别上均保持质量一致？不同类别的文本标注难度是否存在系统性差异？
-
-
 
 ## 原文 PDF
 

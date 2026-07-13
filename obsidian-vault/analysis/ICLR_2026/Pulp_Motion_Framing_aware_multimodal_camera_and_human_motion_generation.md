@@ -51,8 +51,6 @@ claims:
 
 在 PulpMotion 混合子集上，辅助采样将构图 FID（$\text{FD}_{\text{framing}}$）从 4.90 降至 3.37，出画率（Out‑rate）从 25.98% 降至 16.76%，同时文本‑模态对齐分数（TMR‑Score）从 23.50 提升至 25.05。适中的辅助引导权重 $w_z$ 可在改善构图的同时保持人体与相机生成质量，过高则损害保真度。
 
-
-
 ### 问题背景：电影式人‑相机关节运动生成
 
 在电影、动画和虚拟制作中，人体运动与相机轨迹的协调配合是决定画面表现力的关键因素。相机不仅是记录工具，更是叙事语言的一部分——推拉摇移、跟拍、环绕等运镜手法与演员的动作相互呼应，共同构成屏幕空间中的视觉构图。因此，从文本描述出发，联合生成时空一致的人体运动序列与相机运动轨迹，成为多模态生成领域的重要课题。
@@ -89,8 +87,6 @@ claims:
 - **训练无侵入**：辅助模态仅用于推理阶段的分数修正，无需修改训练目标或数据管线；
 - **架构无关**：适用于 DiT、MAR 等不同扩散主干，无需针对特定架构调整；
 - **即插即用**：通过单一的辅助引导权重 w_z 即可在构图质量与生成保真度之间实现灵活权衡。
-
-
 
 ## 核心方法与创新机理
 
@@ -141,8 +137,6 @@ $$\tilde{\varepsilon}_{\theta}(\mathbf{x}_t, \mathbf{y}_t, \mathbf{c}, t) = \var
 
 Pulp Motion 的本质创新在于**将多模态一致性问题转化为潜空间中的几何引导问题**。它不试图让扩散模型直接学习构图约束，而是利用自编码器阶段学到的线性映射 $W$，在推理时通过正交投影将构图信息作为“免费”的引导信号注入采样过程。这种“训练时隐式学习映射，推理时显式几何引导”的策略，使得方法兼具**架构无关性**（不修改扩散主干）、**训练高效性**（无需额外训练扩散模型）和**即插即用性**（仅需调整单一超参数 $w_z$）。
 
-
-
 Pulp Motion 提出一种**模型无关的辅助采样框架**，在不修改扩散模型训练的前提下，增强人体运动与相机轨迹生成之间的多模态一致性。其核心思路是引入一个辅助模态——屏幕构图（on‑screen human framing）——作为“桥梁”，在推理时引导采样过程趋向人‑相机高度协调的区域。
 
 ### 核心瓶颈与解决思路
@@ -150,7 +144,6 @@ Pulp Motion 提出一种**模型无关的辅助采样框架**，在不修改扩�
 现有工作通常将人体运动生成与相机轨迹生成视为独立任务，或采用先人体后相机的级联方式（如 **(x)+DIRECTOR**, Courant et al., 2024）。这种做法忽略了二者在屏幕空间中固有的耦合关系：相机的移动直接影响人体在画面中的位置、大小和完整性，反之亦然。独立处理极易导致角色出画、取景不佳等构图失败。
 
 Pulp Motion 的核心洞察在于：**屏幕构图天然是人‑相机关系的显式表达**。将人体关节通过相机参数投影到二维屏幕，得到的屏幕构图 $z$ 同时蕴含了人体姿态和相机位姿的信息。因此，$z$ 可以作为连接人体潜变量 $x$ 与相机潜变量 $y$ 的辅助模态，在采样时提供多模态一致性信号。
-
 
 现有工作通常将人体运动生成与相机轨迹生成视为独立任务，或采用先人体后相机的级联方式。这种做法忽略了二者在屏幕空间中固有的耦合关系：相机的移动直接影响人体在画面中的位置、大小和完整性，反之亦然。独立处理极易导致角色出画、取景不佳等构图失败。
 
@@ -207,8 +200,6 @@ Pulp Motion 的核心洞察在于：**屏幕构图天然是人‑相机关系的
 
 整个框架的模型无关性体现在：辅助采样仅修改推理时的分数计算，不依赖特定的扩散架构，也不需要在训练阶段引入辅助模态的扩散建模。这一设计使其可以即插即用地应用于 DiT 和 MAR 等不同生成主干。
 
-
-
 ### 多模态潜空间构建
 
 Pulp Motion 的核心架构围绕一个共享的多模态自编码器展开，其目标是将人体运动 $\mathbf{x}_{\mathrm{raw}}$ 与相机轨迹 $\mathbf{y}_{\mathrm{raw}}$ 编码到统一的潜空间中，并显式地引入屏幕构图作为辅助模态 $\mathbf{z}$。
@@ -255,20 +246,8 @@ $$\tilde{\varepsilon}_{\theta}(\mathbf{x}_t, \mathbf{y}_t, \mathbf{c}, t) = \var
 
 辅助引导权重 $w_z$ 是方法中唯一的推理时调控变量。适中的 $w_z$ 可在显著改善屏幕构图质量（降低 FD_framing 和出画率）的同时保持人体运动与相机轨迹的生成保真度；过高的 $w_z$ 会过度约束生成空间，导致保真度下降。该权衡关系在 DiT 和 MAR 两种架构上均得到验证（Table 5, Table 9），构成了方法实际部署中需要手动调节的核心超参数。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2510_05097/figures/005_Figure_4.jpg]]
-*Figure 4: (a) $\mathrm { F D } _ { \mathrm { f r a m i n g } }$ . -TMR-Score (b) $\mathrm { F D } _ { \mathrm { f r a m i n g } }$ -CLaTr-Score Figure 4: Comparison in DiT on the mixed set. Framing quality and modality-text alignment for c guidance ranges from 5 to 11. The optimal region is at the bottom-right (low framing FD, high alignment). Figure 5: Comparison in MAR on the mixed set. Framing quality and modality-text alignment for c guidance ranges from 1 to 5. The optimal region is at the bottom-right (low framing FD, high alignment)
-
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2510_05097/figures/009_Figure_8.jpg]]
 *Figure 8: $\colon$ ~ $w _ { z }$ ablation in DiT on the mixed set. Framing quality and modality-text alignment for c guidance ranges from 4 to 12. The optimal region is at the bottom-right (low framing FD, high alignment). Figure 9: wz ablation in MAR on the mixed set. Framing quality and modality-text alignment for c guidance ranges from 1 to 5. The optimal region is at the bottom-right (low framing FD, high alignment)*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2510_05097/figures/021_Figure_19.jpg]]
-*Figure 19: (a) FDframing-TMR-Score (b) $\mathrm { F D } _ { \mathrm { f r a m i n g } }$ -CLaTr-Score Figure 19: Auxiliary guidance ablation in DiT. Trade-off between framing quality and modality-text alignment for textual guidance ranges from 4 to 12. The optimal region is at the bottom-right (low framing error, high alignment). Figure 20: Auxiliary guidance ablation in MAR. Trade-off between framing quality and modality-text alignment for textual guidance ranges from 1 to 5. The optimal region is at the bottom-right (low framing error, high alignment)
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2510_05097/figures/022_Figure_21.jpg]]
-*Figure 21: Independent modality ablation in DiT on mixed subset. Trade-off between framing quality and modality-text alignment for textual guidance ranges from 4 to 12. The optimal region is at the bottom-right (low framing error, high alignment). (a) $\mathrm { F D } _ { \mathrm { f r a m i n g } }$ -TMR-Score (b) $\mathrm { F D } _ { \mathrm { f r a m i n g } }$ . -CLaTr-Score Figure 22: Independent modality ablation in MAR on mixed subset. Trade-off between framing quality and modality-text alignment for textual guidance ranges from 4 to 12. The optimal region is at the bottom-right (low framing error, high alignment)
-
 
 
 ## 实验与关键发现
@@ -318,15 +297,6 @@ Pulp Motion 在两个核心指标维度上验证了辅助采样（Aux）的有�
 
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2510_05097/figures/018_Table_8.jpg]]
 *Table 8: State-of-the-art comparison on the pure subset. We compare five baselines: human-conditioned camera generation (x)+DIRECTOR Courant et al. (2024), independent modality generation (x)(y), dualmodality generation (x, y), triplet-modality generation (x, y, z), and ReDi Kouzelis et al. (2025), along with our auxiliary sampling (Aux) method. Results are reported for DiT (Peebles & Xie, 2023) and MAR (Li et al., 2024). Superscript ± denotes the 95% confidence interval over 10 samplings*
-
-### 补充图表
-
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2510_05097/figures/007_Figure.jpg]]
-*Figure: Camera: The camera performs a trucking right*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2510_05097/figures/002_Figure_2.jpg]]
-*Figure 2: Architecture of the multimodal autoencoder. Human motion $\bf { x } _ { \mathrm { r a w } }$ and camera trajectory $\mathbf { y } _ { \mathrm { r a w } }$ are jointly encoded by $E _ { \phi }$ , linearly transformed via $\dot { \boldsymbol { W } }$ into an auxiliary on-screen framing latent $z$. Three decoders $D _ { \psi _ { \mathrm { x } } } , D _ { \psi _ { \mathrm { y } } }$ ， and $D _ { \psi _ { \mathrm { z } } }$ reconstruct raw modalities: *$\hat { \mathbf { x } } _ { \mathrm { r a w } } , \hat { \mathbf { y } } _ { \mathrm { r a w } } , \hat { \mathbf { z } } _ { \mathrm { r a w } }$
 
 ## 定位与知识库关联
 
@@ -389,8 +359,6 @@ PulpMotion 数据集基于 CondensedMovies 视频自动提取，依赖 TRAM 进�
 3. **更丰富的构图空间**：当前构图仅定义为关键关节的 2D NDC 坐标。是否可以引入更结构化的构图表示（如三分法、引导线、头部空间等电影摄影规则）作为辅助模态，实现艺术层面的构图控制？
 
 4. **多主体与多相机扩展**：在多人场景中，屏幕构图需同时考虑多个主体的空间关系；在多相机设置中，不同机位之间存在约束。如何将辅助采样的正交投影机制推广到这些高维约束空间，是一个具有挑战性的开放方向。
-
-
 
 ## 原文 PDF
 

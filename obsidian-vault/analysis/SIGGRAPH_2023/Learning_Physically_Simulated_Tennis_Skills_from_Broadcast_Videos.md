@@ -47,8 +47,6 @@ claims:
 
 **主要结果**：学习到的控制器能以高命中率将球击向指定目标区域，并展现出反映各球员视频数据特征的多样化击球风格（如单手反拍、双手反拍、上旋等）。消融实验表明，物理修正与混合控制是任务成功的关键组件；增大视频数据库规模可同时提升任务性能和运动质量。
 
-
-
 从视频中学习运动技能是计算机图形学与机器人学中长期存在的挑战。传统角色动画方法依赖昂贵的光学动作捕捉设备或手工设计的控制器，难以扩展到大规模、多样化的运动技能学习。近年来，基于物理的角色控制取得了显著进展，但现有方法仍面临两个关键瓶颈：
 
 **数据获取瓶颈**：高质量3D运动数据主要来自室内动作捕捉系统，采集成本高昂、场景受限，且难以覆盖开放环境中的复杂运动（如网球比赛中的多回合对抗）。直接从互联网视频中提取运动信息为突破这一瓶颈提供了可能，但视频中的运动估计本身存在噪声、遮挡和深度歧义，如何将不完美的运动估计转化为物理合理的角色控制策略仍是一个开放问题。
@@ -56,8 +54,6 @@ claims:
 **技能泛化瓶颈**：现有物理角色控制器通常针对单一技能或有限技能集进行训练，缺乏在无显式技能标注的情况下从混合运动数据中自动发现和复现多样化技能的能力。对于网球这类包含正手、反手、截击、发球等多种击球方式的高动态运动，手工标注技能类别既不现实，也限制了系统的可扩展性。
 
 本文的核心动机在于：**能否仅从海量广播视频中自动学习物理角色的多样化运动技能，而无需任何技能标注或高质量动捕数据？** 这一目标的实现需要同时解决两个技术难题——（1）如何从噪声视频估计中构建可用的运动表征；（2）如何设计一种控制架构，既能模仿视频中的运动风格，又能纠正运动估计中的物理不可行部分，使角色在物理仿真中稳定执行任务。
-
-
 
 ## 核心方法与创新机理
 
@@ -82,8 +78,6 @@ claims:
 ### 5. 端到端的视频到技能学习范式
 
 上述组件共同构成了一个**四阶段端到端系统**（Fig. 2）：视频标注 → 低层模仿 → VAE运动嵌入 → 高层运动规划。这一范式使得物理仿真角色能够直接从真实比赛视频中涌现出反映运动员风格特征的多样化技能（Fig. 4），并在定量指标上展现出高命中率和落点精度（Table 1）。系统还展现出良好的数据规模扩展性：更大的视频数据库持续提升任务性能和运动质量（Fig. 6）。
-
-
 
 该系统采用**四阶段流水线**，从广播视频中提取运动数据，最终生成能够在物理仿真中完成网球击球任务的控制器。四个阶段依次为：**运动学动作估计、低层模仿策略训练、条件变分自编码器（cVAE）运动嵌入构建、高层运动规划策略训练**。
 
@@ -110,8 +104,6 @@ claims:
 ### 数据流与模块关系
 
 整个系统的输入输出流可概括为：**原始视频 → 运动学动作 $\mathbb{M}_{kin}$ → 物理修正运动 → 运动嵌入空间 → 高层策略输出（目标嵌入 + 关节修正）→ 低层策略执行 → 仿真角色运动**。消融实验（Table 2）证实，物理修正（PhysicsCorr）和混合控制（HybridCtr）两个组件对任务性能均有显著贡献，移除任一组件均导致击球命中率和落点准确率下降。
-
-
 
 ### 系统总览：四阶段流水线
 
@@ -160,8 +152,6 @@ $$r_t^e = - \sum_j \left( || \dot{\mathbf{q}}_t^j \cdot \boldsymbol{\tau}_t^j ||
 高层运动规划策略在运动嵌入空间中输出运动序列。关键创新在于**混合控制策略（Hybrid Control Policy）**：由于从视频估计的运动嵌入可能包含残留错误（如手腕模糊、颈部旋转不准），高层策略同时预测修正信号，覆盖嵌入中错误的运动成分，确保角色能准确完成击球任务。
 
 > **注意**：高层策略的具体网络架构、训练超参数以及残差力/力矩 $\eta_t$ 的渐进衰减机制，原文未提供完整细节，需查阅原文补充材料确认。
-
-
 
 ## 实验与关键发现
 
@@ -222,27 +212,13 @@ $$r_t^e = - \sum_j \left( || \dot{\mathbf{q}}_t^j \cdot \boldsymbol{\tau}_t^j ||
 ![[assets/figures/papers/paper_list_l53_https_research_nvidia_com_labs_toronto_ai_vid2player3d_data_tennis_skill/figures/005_Table_1.jpg]]
 *Table 1: Task performance of controllers learned from three players’ motions using our system. We show the 25%, 50%, and 75% quantiles using the metrics collected from 10K test sessions (15 consecutive balls per session). The learned controllers consistently hit a high fraction of balls back into the court, and achieve average bounce position errors of less than two meters*
 
-![[assets/figures/papers/paper_list_l53_https_research_nvidia_com_labs_toronto_ai_vid2player3d_data_tennis_skill/figures/007_Table_3.jpg]]
 *Table 3: Motion quality evaluation. We compare the motion output by our full system ( F e d \ – f u l l ) , , the motion from the ablation (w/o PhysicsCorr), and motions at different stages of our system: estimated kinematic motion ( $\mathbb { M } _ { k i n }$ ) , physically corrected motion ( $\mathbb { M } _ { c o r r }$ ) , and motion output by MVAE ( $\mathbb { M } _ { v a e }$ ) . The motion generated from our full system shows higher motion quality (less ji er and foot sliding) than w/o PhysicsCorr and the motions at intermediate stages
 
 ![[assets/figures/papers/paper_list_l53_https_research_nvidia_com_labs_toronto_ai_vid2player3d_data_tennis_skill/figures/010_Table_4.jpg]]
 *Table 4: Ablation of various design choices of our system. The table provides average metrics collected from 10K test sessions. All design decisions contribute to the task performance of the controller*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l53_https_research_nvidia_com_labs_toronto_ai_vid2player3d_data_tennis_skill/figures/003_Figure_3.jpg]]
 *Figure 3: (a) Simulated Model (b) Visualization Model Fig. 3. The simulated character model is created from SMPL [Loper et al. 2015], with 24 rigid body segments and 72 DOF. The tennis racket is a combination of two solid cylinders and the grip is simplified by directly a aching the end of the racket handle to the wrist joint*
-
-![[assets/figures/papers/paper_list_l53_https_research_nvidia_com_labs_toronto_ai_vid2player3d_data_tennis_skill/figures/006_Figure_4.jpg]]
-*Figure 4: (h) BH-twohand-topspin (le ) Fig. 4. Our simulated characters demonstrate diverse tennis skills that reflect coarse characteristics of the per-player video data they were trained on (a)-(d) skills learned using Roger Federer’s motion data, who is a right-handed player and uses one-handed backhand. (e)-(f ) skills learned using Novak Djokovic’s motion data, who is also a right-handed player but uses two-handed backhand. (g)-(h) skills learned using Rafael Nadal’s motion data, who is a le -handed player and uses two-handed backhand*
-
-![[assets/figures/papers/paper_list_l53_https_research_nvidia_com_labs_toronto_ai_vid2player3d_data_tennis_skill/figures/008_Figure_5.jpg]]
-*Figure 5: (e) Fig. 5. Analysis of 1M simulated shots. (a) 2D heat maps of hit rate conditioned on incoming velocity and amount of spin. Balls with higher velocity and spin are harder to hit. (b)-(c) 2D heat maps of hit rate and average bounce position error conditioned on the incoming ball’s bounce position. Balls that bounce closer to the edges of the court are harder to hit and result in higher bounce position errors. (d)-(e) Moving longer distances to reach an incoming ball (reaction distance) results in lower hit rates and larger bounce position errors since the character must move quickly and has less time to adjust*
-
-![[assets/figures/papers/paper_list_l53_https_research_nvidia_com_labs_toronto_ai_vid2player3d_data_tennis_skill/figures/002_Figure_2.jpg]]
-*Figure 2: Our video imitation system consists of four stages: First, we estimate kinematic motions from source video clips. Second, a low-level imitation policy is trained to imitate the kinematic motion for controlling the low-level behaviors of the simulated character and generate physically corrected motion. Next, we fit a conditional VAE to the corrected motion to learn a motion embedding that produces diverse and human-like tennis motions. Finally, a high-level motion planning policy is trained to generate target kinematic motion by predicting VAE latent codes and joint corrections for wrist motion. The target motion is then imitated by the low-level policy to control a physically simulated char...*
-
-
 
 ## 定位与知识库关联
 
@@ -275,8 +251,6 @@ $$r_t^e = - \sum_j \left( || \dot{\mathbf{q}}_t^j \cdot \boldsymbol{\tau}_t^j ||
 **跨领域泛化**：系统设计高度针对网球场景（依赖球场线检测进行相机标定、2D关键点奖励等），迁移至其他运动（如篮球、足球）需要重新设计场景特定的感知和奖励组件，方法论的通用性有限。
 
 **评估指标**：运动质量评估主要依赖物理合理性指标（如关节抖动、足部滑动等），缺乏与真实选手运动风格的定量相似性度量。Table 3中"Fed–full"与其他阶段的对比仅展示了物理修正的效果，未建立与原始视频运动的直接风格保真度评估。
-
-
 
 ## 原文 PDF
 

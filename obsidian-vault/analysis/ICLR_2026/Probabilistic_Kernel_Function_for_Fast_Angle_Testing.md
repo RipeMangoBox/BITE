@@ -242,25 +242,8 @@ Tables 4和5分别展示了top-2和top-10投影向量探测设置下的k-MIPS召
 
 4. **维度与投影数量的权衡**：当维度d较大时，为获得足够小的参考角度，需要增加投影向量数m或层级数L，这会线性增加存储和计算开销。论文未给出在固定预算下m与L的最优分配策略。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_nCsF3Bsn2n/figures/005_Figure_3.jpg]]
 *Figure 3: An illustration of the KS2 test*
-
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_nCsF3Bsn2n/figures/006_Figure_4.jpg]]
-*Figure 4: An illustration of Falconn, CEOs, and the proposed structure KS1*
-
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_nCsF3Bsn2n/figures/010_Figure_5.jpg]]
-*Figure 5: Numerical computation under different m’s and d’s. The y-axis denotes the cosine of reference angle*
-
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_nCsF3Bsn2n/figures/011_Figure_6.jpg]]
-*Figure 6: Recall-QPS evaluation of ANNS. k = 100*
-
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_nCsF3Bsn2n/figures/012_Figure_7.jpg]]
-*Figure 7: Recall-QPS evaluation of ANNS. k = 1*
-
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_nCsF3Bsn2n/figures/014_Figure_9.jpg]]
-*Figure 9: Recall-QPS evaluation of ANNS, with NSSG+KS2. k = 10*
 
 ![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_nCsF3Bsn2n/figures/004_Table_2.jpg]]
 *Table 2: Frequently used notations*

@@ -63,8 +63,6 @@ claims:
 
 **方法定位**：CDE处于RLVR探索策略的改进线上，区别于传统的熵奖励（Schulman et al., 2017）和基于哈希的计数式探索（后者在LLM上因嵌入表达性不足而失效），也与i-MENTOR（Gao et al., 2025）等外部好奇心驱动方法形成互补。其探索信号完全来自模型内部状态，兼具理论解释性（自举方差近似后验不确定性）和实践轻量性（多头critic的额外内存与计算开销可忽略）。
 
-
-
 ### 大语言模型的强化学习微调
 
 近年来，强化学习已成为提升大语言模型（LLM）推理能力的核心技术路径。通过将数学问题求解等任务建模为马尔可夫决策过程，基于可验证奖励的强化学习（RLVR）方法——如近端策略优化（PPO，Schulman et al., 2017）和分组相对策略优化（GRPO，Guo et al., 2024）——能够利用答案正确性作为稀疏奖励信号，驱动模型自主发现有效的推理策略。
@@ -88,8 +86,6 @@ claims:
 CDE的核心思想是：利用模型自身对生成内容的“意外程度”作为探索的内在驱动力。具体而言，Actor端使用生成响应的困惑度（PPL）作为好奇心信号——模型对某个回答越“意外”，说明该推理路径越偏离其当前认知，值得进一步探索。Critic端则通过多头值函数的预测方差来估计状态价值的不确定性——在数据覆盖稀少的区域，不同值头之间的分歧自然增大，这相当于一个隐式的计数式探索奖励，引导策略均衡地覆盖状态-动作空间。
 
 这种设计具有两个关键优势。第一，PPL奖励天然地对过度自信的错误施加惩罚：当模型以高置信度生成错误答案时，PPL奖励为负，从而抑制这种有害行为；而正确但新颖的推理路径则获得正向探索奖励（Figure 3）。第二，好奇心信号伴随着自然的退火机制：随着训练推进和模型对常见推理路径的熟悉，PPL和Critic方差自然下降，探索强度自动衰减，无需手动设计复杂的奖励衰减策略。
-
-
 
 ## 核心方法与创新机理
 
@@ -137,8 +133,6 @@ $$\mathcal{L}_\phi = \frac{1}{\zeta K |\mathcal{D}|} \sum_{j=1}^K \sum_{(q,o,r) 
 
 CDE的轻量性是其关键优势：相比i-MENTOR（Gao et al., 2025）等需要额外好奇心模块的方法，CDE仅需对现有训练架构进行微小修改，却能在数学推理基准上带来约2个点的平均提升，AIME24 Pass@16提升可达8个点以上（见表1）。
 
-
-
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_5rXN5knHKW/figures/002_Figure_2.jpg]]
 *Figure 2: Illustration of the multi-head critic framework*
 
@@ -182,8 +176,6 @@ CDE的整体pipeline由两个并行的探索模块和一个自适应裁剪机制
 ### 模块间关系
 
 两个探索模块在机制上互补：PPL奖励在令牌级别惩罚过度自信的错误并鼓励新颖的正确推理模式（见Figure 3），而多头critic的方差在数据覆盖稀少的区域升高，起到隐式计数式探索的作用（见Figure 5和Figure 9）。两者均通过自适应裁剪与原始优化信号耦合，无需额外复杂模块即可缓解RLVR的熵坍缩和校准退化问题。实验表明，框架对超参数 $\kappa, \alpha, \zeta$ 具有一定鲁棒性（见Table 3-5），且额外计算和内存开销极小（见Table 7-8）。
-
-
 
 CDE 框架由两个互补的探索模块构成：**Actor 端的好奇心奖励**（基于模型对自身生成响应的困惑度）和 **Critic 端的多头方差奖励**（基于值函数后验分布的不确定性）。两者通过自适应裁剪机制整合到强化学习的优化信号中。
 
@@ -229,8 +221,6 @@ $$\widehat{A}_{i,t} = \underbrace{\sum_{l=t}^{|o_i|} (\gamma\lambda)^{l-t} \wide
 
 其中 $\omega$ 为 Critic 奖励的动态权重（可通过阶梯式衰减等策略调节），裁剪机制与 Actor 端一致，防止 Critic 探索奖励过度干扰优势估计。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈：RLVR中的探索-利用失衡
@@ -251,9 +241,6 @@ CDE 的核心洞察是：**利用模型自身对生成内容的不确定性作�
 
 - **Critic 好奇心（多头方差奖励）**：通过自举重采样训练 $K$ 个共享 LLM 骨干的值头，计算头间标准差作为状态价值的不确定性估计。其机制等价于隐式的计数式探索——在数据覆盖稀少的区域，不同值头因自举采样的差异而产生高方差，从而引导策略向这些欠探索区域分配更多概率质量。Figure 5 和 Figure 9 提供了实证支持：训练集（DAPO-17K）上的值头标准差最低，而未见数据（AMC23, GPQA）上的争议显著更高。
 
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_5rXN5knHKW/figures/014_Figure_9.jpg]]
-*Figure 9: Distribution of the std of value heads across different datasets*
-
 两种好奇心信号通过自适应裁剪机制整合到原始奖励中，防止奖励黑客和过度探索：
 
 $$
@@ -265,9 +252,6 @@ $$
 ### 主实验结果
 
 **Table 1** 报告了零样本精度主实验。核心发现如下：
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_5rXN5knHKW/figures/006_Table_1.jpg]]
-*Table 1: Zero-shot accuracy on the validation datasets. Avg column represents the overall accuracy across datasets, calculated by averaging the Avg@1 score from MATH with the Avg@16 scores (mean and standard deviation) from the remaining datasets. We use “–” to exclude the results for Llama-3.2-3B-Instruct on AIME25, since its performance is approximately 1 point*
 
 - **PPL 奖励一致提升 GRPO 性能**：在 Qwen3-4B-Base 模型上，GRPO + PPL bonus 相比标准 GRPO 在四个基准（MATH, AMC23, AIME24, AIME25）上的整体平均提升约 **+2.4 点**。在更具挑战性的 Pass@16 指标上，AIME24 提升约 **+8 点**，AIME25 提升约 **+3.3 点**。
 
@@ -300,29 +284,15 @@ $$
 
 **子采样分数 $\zeta$ 具有鲁棒性**。Table 3 的消融显示，$\zeta = 0.5$ 与 $\zeta = 1.0$ 在 16 头和 4 头配置下的性能差异极小，表明模型对自举采样的具体比例不敏感。
 
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_5rXN5knHKW/figures/013_Table_3.jpg]]
-*Table 3: Ablation study on sub-sample fraction $\zeta$*
-
 ### 失败模式与局限
 
 **计数式探索在 LLM 推理中失效**。Table 9 显示，基于 SimHash 的计数式探索奖励未能显著提升 GRPO 性能。如 Figure 1 所示，推理路径的嵌入坍缩到少数哈希网格中，计数信号失去区分度。这揭示了 LLM 推理轨迹的有效嵌入表示仍是开放问题。
 
 **超参数敏感性**。Table 4 和 Table 5 的敏感性分析显示，$\kappa$ 和 $\alpha$ 的选择对性能有显著影响。极端设置（如 $\kappa=1, \alpha=1$）会导致性能崩溃（平均精度从 50.6 降至 8.67），表明探索奖励的幅度需要仔细调控。虽然推荐设置（GRPO: $\kappa=3, \alpha=1$；PPO: $\kappa=3, \alpha=0.5$）表现稳健，但最优值可能因任务和模型而异。
 
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_5rXN5knHKW/figures/015_Table_4.jpg]]
-*Table 4: Sensitivity analysis of Qwen3-4B-Base-GRPO under different ( $\kappa , \alpha$ ) settings
 
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_5rXN5knHKW/figures/016_Table_5.jpg]]
-*Table 5: Sensitivity analysis of Qwen3-4B-Base-PPO under different ( $\kappa , \alpha$ ) settings
 
 **领域泛化未验证**。所有实验仅限于数学推理领域（MATH, AMC23, AIME24, AIME25），CDE 在代码生成、多模态推理等领域的有效性有待验证。此外，实验主要使用 3B-4B 规模模型，在更大模型（如 70B+）上的扩展性尚不明确。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_5rXN5knHKW/figures/017_Table_6.jpg]]
-*Table 6: (a) Baseline training configurations. The GRPO setup is shared across all GRPO-based methods (e.g., “Qwen3-4B-Base-GRPO” and “w/PPL bonus” in Table 1); likewise, the PPO setup is shared across all PPO-based methods. (b) CDE-specific configurations. The PPL settings are identical for both the GRPO “w/PPL bonus” and PPO “w/PPL bonus” variants. Figure 10: The prompt for RLVR training*
-
-
 
 ## 定位与知识库关联
 
@@ -374,8 +344,6 @@ CDE的核心因果干预在于引入**模型自身的好奇心信号**作为探�
 3. **复杂任务的可扩展性**：在多步推理、对话或交互式任务中，CDE的探索机制是否能保持高效与稳定？
 4. **推理轨迹的嵌入表示**：如何设计更优的嵌入表示，使得显式计数式或预测式探索在LLM上变得可行？
 5. **与对齐方法的结合**：CDE的探索策略是否可以与离线RL、基于人类反馈的偏好对齐等方法结合，进一步提升对齐性和泛化能力？
-
-
 
 ## 原文 PDF
 

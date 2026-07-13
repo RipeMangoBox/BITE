@@ -60,8 +60,6 @@ DIFIX3D+ 位于**2D生成先验驱动3D重建增强**的方法谱系中。与每
 
 在Nerfbusters和DL3DV数据集上，DIFIX3D+ 相较基线方法平均PSNR提升超过1 dB，FID改善约2倍。具体而言：Nerfbusters上Nerfacto基线的PSNR从17.29提升至18.32，LPIPS从0.4021降至0.2789，FID从134.65降至49.44（2.72倍降低）；3DGS基线的PSNR从17.66提升至18.51，LPIPS从0.3265降至0.2637，FID从113.84降至41.77（2.73倍降低）。在内部自动驾驶数据集RDS上，PSNR从19.95提升至21.75，LPIPS从0.5300降至0.4016。消融实验证实，渐进式更新策略对多视图一致性至关重要——一次性注入所有伪视图会导致LPIPS和FID显著恶化；推理时后处理步骤进一步降低LPIPS并提升PSNR/SSIM，几乎不影响多视图一致性。
 
-
-
 ### 3D重建与新视图合成的核心瓶颈
 
 神经辐射场（NeRF）与3D高斯散点（3DGS）已成为从稀疏多视图图像重建三维场景的主流范式。然而，这些方法在远离训练相机位姿的欠约束区域普遍产生严重伪影——包括错误几何、缺失区域和模糊纹理。这一问题的根源在于：稀疏输入条件下，体渲染或高斯泼溅缺乏足够的观测信号来约束三维表示，而传统重建损失（如MSE）无法提供数据先验来生成合理的外观。因此，在极端新视图上的保真度成为制约3D重建方法走向实际应用的关键瓶颈。
@@ -86,8 +84,6 @@ DIFIX3D+ 位于**2D生成先验驱动3D重建增强**的方法谱系中。与每
 1. **构建专门的伪影去除模型**：训练一个单步图像扩散模型（DIFIX），使其成为从“含伪影渲染视图”到“干净增强视图”的图像翻译器，利用参考视图的交叉注意力机制保持局部一致性。
 2. **将增强视图蒸馏回3D表示**：通过渐进式3D更新策略，逐步将DIFIX增强的伪视图注入训练集，扩展3D表示的空间覆盖范围，避免一次性注入导致的多视图不一致退化。
 3. **推理时实时后处理**：将DIFIX作为神经增强器在推理阶段实时应用，以76毫秒的单帧延迟进一步去除残余伪影，形成完整的重建与渲染增强闭环。
-
-
 
 ## 核心方法与创新机理
 
@@ -131,8 +127,6 @@ DIFIX3D+将DIFIX同时用作推理时的**实时神经增强器**，对已蒸馏
 
 这一创新组合使得DIFIX3D+在Nerfbusters和DL3DV数据集上实现了PSNR平均提升>1dB、FID改善约2倍的显著增益，同时保持了多视图几何一致性。
 
-
-
 DIFIX3D+ 的整体流程围绕一个核心观察展开：神经渲染方法（NeRF 与 3DGS）在远离训练视角的欠约束区域会产生严重的伪影，包括错误的几何结构和缺失的内容。这些伪影源于 3D 表示缺乏足够的数据先验来生成合理的外观。DIFIX3D+ 通过将单步扩散模型的强生成先验蒸馏到 3D 表示中，系统性地解决了这一问题。
 
 ### 三阶段流水线
@@ -162,12 +156,8 @@ DIFIX3D+ 的整体流程围绕一个核心观察展开：神经渲染方法（Ne
 
 整个系统的输入是场景的多视角图像及其对应的相机姿态，输出是经过增强的 3D 表示，以及推理时可选的实时增强渲染结果。数据流呈闭环：3D 表示 → 渲染伪视图 → DIFIX 增强 → 蒸馏回 3D 表示 → 推理时再次经 DIFIX 后处理。这种设计使得 2D 扩散先验能够有效注入 3D 表示，同时避免了直接使用扩散模型带来的多视图不一致问题。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l50_https_arxiv_org_abs_2503_01774/figures/002_Figure_2.jpg]]
 *Figure 2: DIFIX3D+ pipeline. The overall pipeline of the DIFIX3D+ model involves the following stages: Step 1: Given a pretrained 3D representation, we render novel views and feed them to DIFIX which acts as a neural enhancer, removing the artifacts and improving the quality of the noisy rendered views (Sec. 4.1). The camera poses selected to render the novel views are obtained through pose interpolation, gradually approaching the target poses from the reference ones. Step 2: The cleaned novel views are distilled back to the 3D representation to improve its quality (Sec. 4.2). Steps 1 and 2 are applied in several iterations to progressively grow the spatial extent of the reconstruction and hence ensu...*
-
-
 
 ### DIFIX 神经增强器
 
@@ -238,8 +228,6 @@ $$\mathcal{C}(\mathbf{p}) = \sum_{i=1}^{N} \alpha_i \mathbf{c}_i \prod_{j}^{i-1}
 $$\alpha_i = \eta_i \exp\left[-\frac{1}{2}(\mathbf{p} - \pmb{\mu}_i)^{\top} \pmb{\Sigma}_i^{-1} (\mathbf{p} - \pmb{\mu}_i)\right]$$
 
 其中 $\eta_i$ 为高斯的不透明度系数，$\pmb{\mu}_i$ 为中心位置，$\pmb{\Sigma}_i$ 为协方差矩阵。
-
-
 
 ## 实验与关键发现
 
@@ -321,8 +309,6 @@ DIFIX作为单步扩散模型，在NVIDIA A100上推理仅需**76毫秒**，比�
 ![[assets/figures/papers/paper_list_l50_https_arxiv_org_abs_2503_01774/figures/004_Table_1.jpg]]
 *Table 1: Data curation. We curate a paired dataset featuring common artifacts in novel-view synthesis. For DL3DV scenes [23], we employ sparse reconstruction and model underfitting, while for internal real driving scene (RDS) data, we utilize cycle reconstruction, cross reference, and model underfitting techniques*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l50_https_arxiv_org_abs_2503_01774/figures/007_Table_2.jpg]]
 *Table 2: Quantitative comparison on Nerfbusters and DL3DV datasets. The best result is highlighted in bold, and the second-best is underlined*
 
@@ -331,11 +317,6 @@ DIFIX作为单步扩散模型，在NVIDIA A100上推理仅需**76毫秒**，比�
 
 ![[assets/figures/papers/paper_list_l50_https_arxiv_org_abs_2503_01774/figures/013_Figure_8.jpg]]
 *Figure 8: Qualitative ablation results of DIFIX3D+: The columns, labeled by method name, correspond to the rows in Tab. 4. Table 4. Ablation study of DIFIX3D+ on Nerfbusters dataset. We compare a Nerfacto baseline to: (a) directly running DIFIX on rendered views without 3D updates, (b) distilling DIFIX outputs via 3D updates in a non-incremental manner, (c) applying the 3D updates incrementally, and (d) add DIFIX as a post-rendering step*
-
-![[assets/figures/papers/paper_list_l50_https_arxiv_org_abs_2503_01774/figures/015_Table.jpg]]
-*Table: S1. Multi-view consistency evaluation on the DL3DV dataset. A higher TSED score indicates better multi-view consistency*
-
-
 
 ## 定位与知识库关联
 
@@ -387,8 +368,6 @@ DIFIX3D+ 处于**2D先验增强3D重建**的方法谱系中，但其设计路径
 2. **能否将DIFIX扩展为单步视频扩散模型？** 视频扩散模型可以提供更强的时序一致性约束，若能实现单步推理，将有望从根本上解决长序列渲染中的多视图一致性问题。
 
 3. **如何降低对初始3D重建质量的依赖？** 当前方法的性能上限受限于基础重建方法（Nerfacto/3DGS）的质量。探索扩散先验与3D重建的更深层次融合（如在3D表示优化过程中直接引入扩散引导）可能是一个有价值的方向。
-
-
 
 ## 原文 PDF
 

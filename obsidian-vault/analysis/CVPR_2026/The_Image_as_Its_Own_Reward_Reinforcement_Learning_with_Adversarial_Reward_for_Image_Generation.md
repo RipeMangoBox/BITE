@@ -65,8 +65,6 @@ claims:
 - **数据高效性**：仅使用200张参考图像即可维持稳定的DINO相似度（0.621），验证了方法的鲁棒性。
 - **风格定制**：通过选择特定领域的参考图像，Adv-GRPO可有效实现分布迁移，如将SD3迁移至动漫或科幻风格。
 
-
-
 文本到图像（T2I）生成模型近年来取得了显著进展，但如何使生成结果更好地符合人类偏好仍是一个核心挑战。基于人类反馈的强化学习（RLHF）已成为对齐生成模型与人类偏好的主流范式，其中奖励模型扮演着关键角色——它负责评估生成图像的质量，并为生成器提供优化信号。
 
 然而，现有奖励模型面临一个根本性困境：**奖励黑客（Reward Hacking）**。当生成器被训练去最大化奖励模型的输出时，它往往会找到奖励函数的漏洞，产生在指标上得分很高但实际质量不佳的图像。具体表现为：
@@ -78,8 +76,6 @@ claims:
 这一瓶颈的根源在于：固定的预训练奖励模型一旦被生成器“攻破”，就无法提供有效的反馈信号。传统GRPO方法通过KL散度惩罚试图约束参数更新，但这只能延缓而非解决奖励黑客问题。
 
 本文的核心动机由此产生：**能否让奖励模型与生成器协同进化，从而从根本上缓解奖励黑客？** 作者提出，将参考图像引入对抗训练框架，让奖励模型作为鉴别器动态区分高质量参考图像与生成图像，可以迫使奖励模型持续学习有意义的视觉判别特征。更进一步，利用视觉基础模型（如DINO）提取的全局-局部密集特征替代单一标量奖励，能够为生成器提供更丰富、更可靠的视觉先验，实现图像质量、美学和图文对齐的全面提升。
-
-
 
 ## 核心方法与创新机理
 
@@ -128,8 +124,6 @@ $$R_\text{global}(x) = h_\phi(\mathbf{f}_\text{cls}), \quad R_\text{local}(x) = 
 
 这些创新共同构成了一个闭环：对抗训练使奖励模型持续进化以抵抗黑客，视觉基础模型提供丰富的感知先验，二者结合使生成器在图像质量、美学和图文对齐三个维度均获得全面提升。
 
-
-
 Adv-GRPO 的整体设计围绕一个核心洞察展开：**将对抗训练引入强化学习奖励回路，让奖励模型本身成为可学习的鉴别器**，从而动态校准奖励信号，缓解奖励黑客问题。整个框架由三条协同工作的支线构成，如 Figure 1 和 Figure 3 所示。
 
 ![[assets/figures/papers/paper_list_l2292_https_arxiv_org_abs_2511_20256/figures/001_Figure_1.jpg]]
@@ -138,9 +132,6 @@ Adv-GRPO 的整体设计围绕一个核心洞察展开：**将对抗训练引入
 ### 核心瓶颈与因果机制
 
 现有 T2I 模型的 RL 微调（如 Flow-GRPO）面临一个根本性困境：固定的预训练奖励模型（PickScore、OCR 等）容易被生成器“钻空子”——生成器学会产出在奖励函数下得分极高、但人类感知质量反而下降的图像。例如，PickScore 优化会导致画质退化，OCR 奖励优化会损害美学（Figure 2, Figure 4c-d）。这一现象的根源在于**奖励模型缺乏对“高质量自然图像流形”的动态感知能力**，无法区分“真正更好”与“仅仅在评分维度上更高”。
-
-![[assets/figures/papers/paper_list_l2292_https_arxiv_org_abs_2511_20256/figures/002_Figure_2.jpg]]
-*Figure 2: Human evaluation comparing Flow-GRPO and SD3 under PickScore and OCR rewards*
 
 Adv-GRPO 的因果调节手柄是：**在 GRPO 优化生成器的同时，将奖励模型作为鉴别器进行对抗训练**，以参考图像（高质量真实图像）为正样本、生成图像为负样本。这一设计迫使奖励模型持续学习“什么是好的图像”，而非固守一个静态的偏好函数。当生成图像的奖励均值超过参考图像时，触发对抗微调（Eq. 7），形成生成器与奖励模型的动态博弈。
 
@@ -179,8 +170,6 @@ Adv-GRPO 的因果调节手柄是：**在 GRPO 优化生成器的同时，将奖
 | 正则化策略 | KL 散度惩罚 | 无 KL 正则化，由对抗奖励引导 |
 
 消融实验（Table 4）证实，Adv-GRPO 在去除 KL 惩罚后仍能保持训练稳定性，且性能显著优于 SFT 和带 KL 正则化的变体——这表明**对抗训练本身提供了比 KL 约束更有效的策略正则化**。
-
-
 
 ### 3.1 算法框架总览
 
@@ -267,8 +256,6 @@ $$\mathcal{L}_\text{reward}(\phi) = \lambda_\text{g} \mathcal{L}_\text{global}(\
 
 消融实验（Table 4）表明，Adv-GRPO 在该对抗框架下**不需要 KL 散度正则化**即可获得比 SFT 和 KL 正则化变体更好的稳定性与性能，因为学习到的高质量奖励信号本身就能有效引导生成器的更新方向。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：对抗奖励缓解奖励黑客并提升感知质量
@@ -297,9 +284,6 @@ $$\mathcal{L}_\text{reward}(\phi) = \lambda_\text{g} \mathcal{L}_\text{global}(\
 
 2. **参考分布偏差。** 方法依赖高质量参考图像数据集，参考图像的分布直接塑造奖励模型的判别偏好。当目标生成域与参考分布存在显著偏移时，对抗奖励可能引导生成器过度拟合参考风格，损害多样性（尽管风格迁移应用（Figure 11）利用了此特性，但在通用生成场景下需谨慎控制）。
 
-![[assets/figures/papers/paper_list_l2292_https_arxiv_org_abs_2511_20256/figures/017_Figure_11.jpg]]
-*Figure 11: Application: Style transfer with the adversarial DINO reward. Our method successfully transfers the SD3 model to target visual domains, including Anime and Sci-Fi styles*
-
 3. **视觉基础模型覆盖范围有限。** 当前仅验证了 DINO 和 SigLIP（Figure 15）两种视觉骨干，未探索 CLIP、MAE 等其他模型。不同预训练模型的归纳偏置可能导致奖励信号的侧重点差异，该泛化性需进一步验证。
 
 ![[assets/figures/papers/paper_list_l2292_https_arxiv_org_abs_2511_20256/figures/020_Figure_15.jpg]]
@@ -314,33 +298,17 @@ $$\mathcal{L}_\text{reward}(\phi) = \lambda_\text{g} \mathcal{L}_\text{global}(\
 - **Figure 9/Table 3/4：** 消融实验可视化与定量结果一致表明，对抗训练机制、全局-局部奖励组合、以及数据效率是方法有效性的三大支柱。
 - **Figure 11：** 风格迁移应用验证了对抗 DINO 奖励在分布定制任务中的潜力，通过替换参考域即可将 SD3 迁移至动漫、科幻等目标风格。
 
-![[assets/figures/papers/paper_list_l2292_https_arxiv_org_abs_2511_20256/figures/005_Figure_4.jpg]]
-*Figure 4: Human evaluation under PickScore- and OCR-based rewards. Our method Adv-GRPO improves image quality and aesthetics with PickScore reward in a), and for all metrics with OCR reward in b). Compared with the original model (SD3), PickScore reward trade-off aesthetic improvements with image quality degradation in c), OCR reward trade-off text-alignment from aesthetics degradation in d)*
-
-![[assets/figures/papers/paper_list_l2292_https_arxiv_org_abs_2511_20256/figures/007_Figure_6.jpg]]
-*Figure 6: Human evaluation results under the visual foundation model (DINO) reward. Using a foundation model as the reward, our RL method improves image aesthetics, quality, and text alignment compared with the original SD3 model (a), and significantly outperforms Flow-GRPO under the DINO similarity reward (b) and PickScore reward (c)*
-
 ![[assets/figures/papers/paper_list_l2292_https_arxiv_org_abs_2511_20256/figures/012_Figure_9.jpg]]
 *Figure 9: Ablation results. (a) Visualizations with different numbers of reference images, showing effectiveness even with 200 samples. (b) Visualizations of ablation studies on SFT, KL regularization, multi-reward optimization, and our method Adv-GRPO*
 
 ![[assets/figures/papers/paper_list_l2292_https_arxiv_org_abs_2511_20256/figures/013_Table_3.jpg]]
 *Table 3: Ablation on the number of reference samples used during inference. Our method maintains stable DINO similarity even with few reference images, demonstrating strong data efficiency*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2292_https_arxiv_org_abs_2511_20256/figures/009_Table_1.jpg]]
 *Table 1: Comparison under different reward models. Each row corresponds to an independent optimization using the specific reward and its associated evaluation metric*
 
-![[assets/figures/papers/paper_list_l2292_https_arxiv_org_abs_2511_20256/figures/011_Table_2.jpg]]
-*Table 2: General evaluation using the DINO reward across multiple tasks, comparing our method with SD3*
-
 ![[assets/figures/papers/paper_list_l2292_https_arxiv_org_abs_2511_20256/figures/014_Table_4.jpg]]
 *Table 4: Ablation on SFT, KL regularization, and multi-reward optimization under PickScore and OCR metrics*
-
-![[assets/figures/papers/paper_list_l2292_https_arxiv_org_abs_2511_20256/figures/016_Figure_10.jpg]]
-*Figure 10: Human evaluation comparing our DINO-reward model with SFT, where our method performs better*
-
-
 
 ## 定位与知识库关联
 
@@ -380,8 +348,6 @@ Adv-GRPO 的核心贡献在于将对抗训练范式引入基于强化学习的�
 3. **对抗训练收敛性与多样性的平衡。** GAN 训练中固有的模式坍塌风险在文生图 RL 场景下如何表现？本文未报告多样性指标（如 FID 的 recall 分量），对抗训练对生成多样性的影响需进一步量化。
 4. **多模态奖励的整合。** 视觉基础模型奖励仅利用图像信号，未结合文本条件。能否设计跨模态奖励模型，同时利用图文对齐信号（如 CLIP 分数）和视觉质量信号，实现更全面的奖励引导？
 5. **奖励模型的持续演化。** 当前对抗训练中奖励模型随生成器同步更新，但两者更新频率和幅度如何最优协调？奖励模型是否可能过拟合到生成器的特定缺陷模式，从而丧失泛化判别能力？
-
-
 
 ## 原文 PDF
 

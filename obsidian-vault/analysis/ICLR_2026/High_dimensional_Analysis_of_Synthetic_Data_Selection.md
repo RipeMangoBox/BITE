@@ -60,8 +60,6 @@ claims:
 
 **局限与开放问题**：当前理论限于线性模型和高斯假设，向深度非线性模型的推广仍在探索中；选择过程逐类独立，未考虑多类联合优化；此外，在合成数据与真实数据存在模型偏移（$\beta$不同）时，如何扩展协方差匹配准则仍待研究。
 
-
-
 ### 合成数据在机器学习中的角色与瓶颈
 
 现代机器学习系统越来越多地依赖合成数据来缓解真实数据稀缺、隐私限制或标注成本高昂的问题。合成数据通常由生成模型（如StyleGAN、文生图扩散模型）产生，并被用于增强训练集，以提升下游模型的泛化能力。然而，并非所有合成样本对训练都有同等贡献——低质量或分布偏离的样本可能引入噪声，甚至损害模型性能。
@@ -86,8 +84,6 @@ claims:
 ### 方法概览与实证动机
 
 基于上述理论，本文提出了**协方差匹配（Covariance Matching）** 方法：在预训练视觉模型提取的特征空间中，通过贪心算法逐类选择合成样本，使所选子集的协方差矩阵在Frobenius范数下逼近目标分布的协方差。该方法在CIFAR-10、ImageNet-100、RxRx1等多个基准上，跨越从零训练、知识蒸馏到预训练微调三种训练范式，一致地优于或持平于所有基线方法（Table 1–3），提升幅度达1.2–3.9个百分点。更重要的是，协方差匹配对特征提取器（CLIP或DINO-v2）、生成模型类型（StyleGAN或文生图模型）以及下游架构（ResNet或Transformer）均表现出鲁棒性，验证了其作为通用选择原则的有效性。
-
-
 
 ## 核心方法与创新机理
 
@@ -116,8 +112,6 @@ $$\min_{x} \|\hat{\Sigma}(\mathcal{S} \cup \{x\}) - \hat{\Sigma}_t\|_F$$
 ### 方法谱系定位
 
 Covariance Matching 在合成数据选择的方法谱系中开辟了一条新路径：它不是对现有样本评分方法的改进，而是将选择问题重新表述为**协方差子集的组合优化**。与 Alpha matching（直接优化 Theorem 4.1 的理论目标）的性能相当（Table 8），证明贪婪近似有效地捕获了理论最优解的本质特征。该方法对特征提取器（CLIP/DINO-v2）和生成模型（StyleGAN/T2I）均表现出鲁棒性（Tables 6–7），表明协方差匹配原则具有跨模态和跨架构的泛化能力。
-
-
 
 本文提出了一种基于协方差匹配的合成数据选择方法，其整体流程由四个核心模块串联构成：**预训练特征提取**、**PCA降维与投影**、**贪婪协方差匹配**、以及**下游分类器训练**。各模块的输入输出关系与设计动机如下。
 
@@ -158,8 +152,6 @@ Covariance Matching 在合成数据选择的方法谱系中开辟了一条新路
 | 分类器训练 | $X_t \cup X_{\mathcal{S}}$ | 训练好的分类模型 |
 
 该框架的关键设计决策在于**选择准则的替换**：传统方法依赖个体样本的 CLIP 相似度或聚类多样性评分（如 DS3 的簇嵌入多样性），而本文方法将选择准则替换为**集合级别的协方差匹配**，从而在理论上保证了泛化误差的最优性。实验表明，这一框架对生成模型类型（StyleGAN、T2I、MorphGen）、特征提取器（CLIP/DINO）、数据集（CIFAR-10、ImageNet-100、RxRx1）和下游架构（ResNet、ViT、Swin-T）均具有鲁棒性。
-
-
 
 ### 问题建模：线性高维回归框架
 
@@ -223,8 +215,6 @@ $$\min_{x} \|\hat{\Sigma}(\mathcal{S} \cup \{x\}) - \hat{\Sigma}_t\|_F$$
 
 算法按类别独立执行：初始化空集 $\mathcal{S}$，迭代添加样本直至达到预设数量 $n_s$。为加速计算，协方差在真实特征拟合的 32 维 PCA 子空间中计算，有效降低了高维特征（如 CLIP ViT-B/16 的 512 维）带来的计算开销，同时保留了主要变化方向。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -234,7 +224,6 @@ $$\min_{x} \|\hat{\Sigma}(\mathcal{S} \cup \{x\}) - \hat{\Sigma}_t\|_F$$
 ### 主结果：CIFAR-10 上的全面优势
 
 **Table 1** 汇总了使用五个截断 StyleGAN2-Ada 模型生成合成数据时，协方差匹配在三种训练范式下均显著优于所有基线方法：
-
 
 ![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_Y54P2BBPPh/figures/004_Table_1.jpg]]
 *Table 1: Covariance matching outperforms all baselines across three training paradigms on CIFAR-10, when the synthetic data is generated via five truncated StyleGAN2-Ada models*
@@ -247,7 +236,6 @@ $$\min_{x} \|\hat{\Sigma}(\mathcal{S} \cup \{x\}) - \hat{\Sigma}_t\|_F$$
 
 **Table 2** 将场景切换至多种 T2I 生成模型，协方差匹配的 Scratch 精度为 54.45 ± 2.11%，与最佳基线持平（DS3 为 52.94 ± 2.52%，提升 +1.51 个百分点），证明该方法对生成源类型具有鲁棒性。
 
-
 ![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_Y54P2BBPPh/figures/005_Table_2.jpg]]
 *Table 2: Covariance matching performs on par with the best baseline across three training paradigms on CIFAR-10, when the synthetic data is generated via various T2I generative models*
 
@@ -255,16 +243,11 @@ $$\min_{x} \|\hat{\Sigma}(\mathcal{S} \cup \{x\}) - \hat{\Sigma}_t\|_F$$
 
 **Table 3** 将实验扩展到更大规模场景：
 
-
-![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_Y54P2BBPPh/figures/006_Table_3.jpg]]
-*Table 3: Covariance matching performs on par with the best baselines for two additional datasets. In (a), we train a ResNet-18 from scratch on ImageNet-100 with synthetic images from StyleGAN-XL and T2I models. In (b), we train a linear model on top of an ImageNet-pretrained ResNet for perturbation classification on a small subset of RxRx1 (Sypetkowski et al., 2023) augmented with synthetic images from MorphGen (Demirel et al., 2025). (a) ImageNet-100 dataset*
-
 - **ImageNet-100 + StyleGAN-XL**：协方差匹配 Scratch 精度 57.52 ± 0.36%，较 DS3（56.61 ± 0.56%）提升 +0.91 个百分点。
 - **ImageNet-100 + T2I**：53.07 ± 0.89%，与最佳基线持平。
 - **RxRx1 + MorphGen**：线性探测精度 90.00 ± 1.86%，保持竞争力。
 
 **Table 4** 进一步验证了协方差匹配在 Transformer 架构（ViT、Swin-T）上的有效性，表明该方法不依赖于特定的卷积架构设计。
-
 
 ![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_Y54P2BBPPh/figures/007_Table_4.jpg]]
 *Table 4: Covariance matching outperforms all baselines when fully training a transformer model on a mix of real and synthetic data*
@@ -273,55 +256,32 @@ $$\min_{x} \|\hat{\Sigma}(\mathcal{S} \cup \{x\}) - \hat{\Sigma}_t\|_F$$
 
 **特征提取器不敏感性**（Table 6–7）：将 CLIP 特征替换为 DINO-v2 后，协方差匹配的优势保持不变。在截断生成器场景下，三种训练范式的精度分别为 55.30 ± 1.45%、58.35 ± 0.93%、69.78 ± 0.32%，均优于所有基线。这表明协方差匹配的核心机制——分布二阶矩对齐——对特征空间的选择具有鲁棒性。
 
-
-
-![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_Y54P2BBPPh/figures/011_Table_7.jpg]]
-*Table 7: Covariance matching performs on par with the best baseline across three training paradigms on CIFAR-10, when the synthetic data is generated via text-to-image (T2I) generative models and features are extracted with DINO-v2. matching. As in Covariance matching, we first fit PCA on the real samples and project all features, then iteratively add the sample that yields the smallest value of (4.1). Without loss of generality, we drop the noise variance term since it scales all candidates equally. The results of Table 8 show that Alpha matching performs similarly to Covariance matching*
-
-![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_Y54P2BBPPh/figures/010_Table_6.jpg]]
-*Table 6: Covariance matching outperforms all baselines across three training paradigms on CIFAR-10, when the synthetic data is generated via truncated generative models and features are extracted with DINO-v2*
-
 **理论目标的有效近似**（Table 8）：比较贪心协方差匹配与直接优化 Theorem 4.1 目标的 Alpha matching，两者性能相当（Scratch 54.00 vs 54.14，Distillation 59.77 vs 59.58，Pretrained 69.20 vs 68.62），证明贪心近似是理论最优解的高效替代方案。
-
 
 ![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_Y54P2BBPPh/figures/012_Table_8.jpg]]
 *Table 8: Covariance matching performs on par with Alpha matching across the experiments on CIFAR-10. Over-parameterized setting. We repeat the setup of Table 1 taking n _ { s } = 2 0 0 (instead of n _ { s } = 8 0 0 ) This gives a total of n _ { s } + n _ { t } = 4 0 0 samples, which is less than the number of features p = 5 1 2 . , thus placing us in an over-parameterized regime. As shown in Table 9, the quantitative trends mirror those in the under-parameterized case*
 
 **过参数化设置**（Table 9）：当训练样本和合成样本各仅 200 个（总计 400 < 模型参数量）时，协方差匹配在 Scratch（43.92 ± 1.73% vs DS3 42.50 ± 1.57%）、Distillation（50.18 ± 1.73% vs DS3 47.97 ± 1.32%）和 Pretrained（62.92 ± 1.09% vs DS3 61.40 ± 0.94%）三种范式下均保持领先，验证了 Theorem 4.4 在过参数化情形的理论预测。
 
-
 ![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_Y54P2BBPPh/figures/013_Table_9.jpg]]
 *Table 9: Covariance matching outperforms all baselines across three training paradigms on CIFAR-10, when the synthetic data is generated via truncated StyleGAN2-Ada models (Karras et al., 2019) in the over-parameterized regime with 200 training and 200 augmenting synthetic samples*
 
 **分布匹配质量**（Table 10）：协方差匹配所选样本在 FID（42.53 vs DS3 47.36）、KID（0.033 vs 0.040）和协方差偏移（0.047 vs 0.068）等指标上全面优于其他方法，Recall 也最高（0.58 vs 0.55），从分布层面解释了分类性能提升的根源。
-
 
 ![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_Y54P2BBPPh/figures/014_Table_10.jpg]]
 *Table 10: Covariance matching selects samples that better match the target distribution according to various evaluation metrics*
 
 **样本量鲁棒性**（Table 11）：变动真实与合成样本数量时，协方差匹配始终保持优势，表明方法对数据规模变化不敏感。
 
-
-![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_Y54P2BBPPh/figures/015_Table_11.jpg]]
-*Table 11: An ablation on the size of the real and synthetic datasets used for training shows results consistent with those reported in Table 1*
-
 **选择策略变体**（Table 12）：前瞻搜索（look-ahead, k=50/100）和匈牙利算法与贪心协方差匹配性能相当，说明贪心策略已足够逼近全局最优。
 
 **零多样性生成器**（Table 5）：当生成器多样性极低时，协方差匹配与最佳基线持平，未出现性能崩塌，但优势缩小——这符合理论预期：当合成池本身缺乏多样性时，协方差匹配的选择空间受限。
-
-
-![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_Y54P2BBPPh/figures/008_Table_5.jpg]]
-*Table 5: Covariance matching performs on par with the best baselines across three training paradigms on CIFAR-10, when the synthetic data is generated via a StyleGAN2-Ada model and two zerodiversity generators*
 
 **跨模态验证**（Table 13）：在文本分类任务（讽刺推文检测）上，协方差匹配同样优于所有基线，暗示该原则可能适用于更广泛的模态。
 
 ### 泄露实验：选择机制的直观验证
 
 **Figure 2** 设计了一个诊断性实验：将真实分布图像混入合成样本池中，测试各方法选择真实样本的比例。协方差匹配最高效地从混合池中挑选出真实分布图像，证明其选择机制确实倾向于匹配目标分布，而非仅仅挑选“看起来好”的个体样本。这一结果与理论中“均值无关、协方差决定泛化”的结论高度一致。
-
-
-![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_Y54P2BBPPh/figures/009_Figure_2.jpg]]
-*Figure 2: The portion of samples chosen from the set of leaked images shows that our proposed algorithm reliably selects real samples among the pool of generated examples*
 
 ### 失败模式与局限
 
@@ -330,7 +290,6 @@ $$\min_{x} \|\hat{\Sigma}(\mathcal{S} \cup \{x\}) - \hat{\Sigma}_t\|_F$$
 1. **生成器多样性依赖**：Table 5 显示，当生成器多样性极低时，协方差匹配的优势缩小至与基线持平。这是因为选择池本身缺乏足够的协方差变化空间，优化目标退化为在贫瘠空间中做无差别选择。
 2. **T2I 场景优势收窄**：Table 2 中协方差匹配虽优于多数基线，但与最佳基线的差距较 StyleGAN 场景缩小，可能源于 T2I 生成样本的协方差结构本身更接近真实分布，留给协方差匹配的优化余地更小。
 3. **逐类独立选择的局限**：当前方法在每个类别内独立执行协方差匹配，未考虑类别间的联合优化。在多类别边界模糊的场景下，这可能不是全局最优策略。
-
 
 ## 定位与知识库关联
 
@@ -387,8 +346,6 @@ $$\min_{x} \|\hat{\Sigma}(\mathcal{S} \cup \{x\}) - \hat{\Sigma}_t\|_F$$
 - **非线性推广**：理论结果是否可以推广到深度网络的特征空间中？高维随机特征或神经正切核（NTK）框架可能是连接线性理论与深度实践的桥梁。
 - **跨领域应用**：协方差匹配的核心思想——通过匹配二阶统计量来优化分布级选择——是否可应用于差分隐私合成数据筛选、因果推断中的预测驱动推断、或持续学习中的数据重放策略？
 - **全局优化算法**：能否设计比贪心匹配更高效的全局优化算法（如基于行列式点过程或次模优化的方法），在保持或提升性能的同时降低计算复杂度？
-
-
 
 ## 原文 PDF
 

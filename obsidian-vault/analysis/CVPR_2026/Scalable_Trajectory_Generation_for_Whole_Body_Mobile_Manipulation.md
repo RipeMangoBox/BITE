@@ -52,8 +52,6 @@ AutoMoMa 框架针对这一瓶颈提出了一个因果性解决方案：**将增
 
 从方法谱系来看，AutoMoMa 位于**自动规划驱动的大规模数据生成**范式，与遥操作数据采集（如BC-Z）和脚本化策略生成（如MoMaGen）形成互补。其技术贡献不在于提出新的模仿学习算法，而在于通过GPU并行化与统一运动学建模，将运动规划从离线分析工具转变为可扩展的数据生产流水线。这一思路与近年来在计算机视觉和语言模型中验证的“数据规模化驱动能力涌现”的逻辑一脉相承，为机器人学习领域的数据瓶颈问题提供了可操作的解决路径。
 
-
-
 移动操作（mobile manipulation）要求机器人在移动基座与机械臂之间实现协调的全身运动，以完成开门、抓取、放置等日常任务。这类协调行为的学习高度依赖大规模、物理有效的轨迹数据。然而，现有数据获取范式在规模、多样性与保真度之间始终存在不可调和的三角矛盾：
 
 **遥操作（teleoperation）** 能够提供高保真度的关节空间轨迹，但采集成本极高，导致数据集规模受限。例如，BC-Z 仅包含约 39,350 条轨迹（Table 1），远不足以覆盖全身协调所需的场景与物体多样性。
@@ -65,8 +63,6 @@ AutoMoMa 框架针对这一瓶颈提出了一个因果性解决方案：**将增
 这一数据瓶颈的核心后果在实验中得到了明确量化：**即使对于单个铰接物体任务（如微波炉开门），SOTA 模仿学习方法也需要数万次演示才能达到约 80% 的成功率**（Abstract, Fig. 6a）。当场景从固定基座扩展到移动基座时，数据需求进一步急剧膨胀——移动基座策略在单一场景中需要 3,200 条轨迹才能达到约 70% 的成功率，而固定基座仅需不到 800 条轨迹即可达到 100%（Fig. 6a）。这揭示了根本性的数据稀缺问题：**全身移动操作策略的泛化能力被数据生成能力所严格约束**。
 
 因此，该领域的核心瓶颈并非策略架构或学习算法本身，而在于**缺乏可扩展的、能大规模生成物理有效全身移动操作轨迹数据的流水线**。本文的动机正是打破这一瓶颈：通过将统一运动学建模与 GPU 加速的轨迹优化相结合，实现轨迹生成吞吐量的数量级提升，从而为全身移动操作策略学习提供规模空前的训练数据，并系统性地研究数据规模与多样性如何影响策略的泛化能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -101,8 +97,6 @@ AutoMoMa 的深层贡献在于揭示了**数据规模与多样性是全身移动
 
 这些 changed slots 并非孤立的技术改进，而是围绕“规模化生成物理有效的全身协调轨迹”这一目标形成的协同系统。AKR 提供了统一的优化空间，GPU 并行化提供了求解速度，两者的结合使得数据规模突破成为可能，最终驱动了策略泛化能力的质变。
 
-
-
 AutoMoMa 是一个 GPU 加速的全身移动操作轨迹生成框架，其核心设计理念是将数据生成从遥操作或脚本化策略的规模瓶颈中解放出来。框架通过四个顺序集成的阶段，将任务定义转化为可用于模仿学习训练的大规模物理有效轨迹数据（Fig. 3）。
 
 ![[assets/figures/papers/paper_list_l959_https_arxiv_org_abs_2604_12565/figures/004_Figure_3.jpg]]
@@ -134,12 +128,8 @@ $$
 
 通过上述流水线，AutoMoMa 生成了**超过 500k 条物理有效轨迹**，覆盖 330 个场景、多种铰接物体和机器人形态。相比现有移动操作数据集（如 BC-Z 的 39,350 条轨迹），AutoMoMa 在规模上实现了超过一个数量级的突破（Table 1），同时保持了全身协调性——这是遥操作数据（规模小）和脚本化策略（缺乏全身协调）均无法单独达成的组合优势。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l959_https_arxiv_org_abs_2604_12565/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the AutoMoMa framework. Coordinated mobile manipulation demands large-scale, physically valid trajectory data—a bottleneck that existing teleoperation and planning methods cannot overcome at scale. AutoMoMa addresses this by unifying Augmented Kinematic Representation (AKR) modeling, which consolidates base, arm, and object kinematics into a single chain, with GPU-accelerated trajectory optimization. Given diverse robot embodiments, interactive scenes, and task objectives as inputs (left), AutoMoMa efficiently synthesizes over 500k trajectories exhibiting broad diversity across solutions, scenes, embodiments, and complex tasks such as grasp switching (center). This high-quality...*
-
-
 
 AutoMoMa 将全身移动操作轨迹生成拆解为四个级联模块，其核心在于将移动基座、机械臂与目标物体统一建模为单一运动学链（AKR），并在该统一表示下求解约束轨迹优化问题。
 
@@ -219,8 +209,6 @@ $$
 
 **GPU 加速**是实现规模突破的核心：通过将轨迹优化与碰撞检测批量并行化，AutoMoMa 达到 5,000 episodes/GPU-hour 的生成吞吐量，较 CPU 基线加速 80 倍以上。**球体碰撞近似**虽大幅降低计算开销，但偶尔无法精确捕捉原始形状，导致规划中出现意外碰撞（Figure A3）。此外，固定基座约束违反仍可能发生（Figure A4），表明约束求解在复杂场景下并非完全可靠。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：数据规模与多样性是全身移动操作策略泛化的决定性瓶颈
@@ -258,34 +246,12 @@ AutoMoMa 存在两类典型的规划失败模式：
 1. **球体近似碰撞误判**（Fig A3）：为 GPU 加速而采用的球体近似几何有时无法精确捕捉原始形状，导致规划期间产生意外碰撞。这是计算效率与碰撞检测精度之间的固有权衡。
 2. **固定基座约束违反**（Fig A4）：部分规划轨迹错误地包含了与物体固定基座约束不一致的运动，表明约束优化在边界情况下仍可能失效。
 
-![[assets/figures/papers/paper_list_l959_https_arxiv_org_abs_2604_12565/figures/016_Figure.jpg]]
-*Figure: A3. Trajectory failure caused by collision. Sphere-based geometry approximations occasionally fail to capture the original shape precisely, resulting in unintended collisions during planning. Figure A4. Trajectory failure caused by fixed-base constraint violation. The planned trajectory erroneously involves movements inconsistent with the object’s fixed-base constraint*
-
 在策略推理端，失败主要表现为小误差累积（Fig A7）：基座或手臂姿态预测中的微小不一致随时间复合放大，最终将机器人推入不可行构型。
-
-![[assets/figures/papers/paper_list_l959_https_arxiv_org_abs_2604_12565/figures/019_Figure.jpg]]
-*Figure: A7. Representative inference failure. Small inconsistencies in base or arm pose predictions compound over time, eventually pushing the robot into an infeasible configuration. (a) Drawer-opening trajectory on the UR5-Ridgeback platform. (b) Cabinet door opening trajectory on the UR5-Ridgeback platform. Figure A8. Real-world validation on a UR5-Ridgeback platform. Planned trajectories for drawer opening and cabinet door opening are executed smoothly without collision or constraint violation*
 
 真实世界验证仅在 UR5-Ridgeback 平台上进行了小规模抽屉和柜门开启测试（Fig A8），sim-to-real 差距的系统性评估尚未开展。此外，当前 50 万条轨迹虽规模空前，但场景和物体多样性仍有限，训练成本高，且数据生成本身依赖 GPU 资源。球体碰撞近似和约束违反问题提示，进一步改进几何表示和约束求解鲁棒性是提升数据质量的关键方向。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l959_https_arxiv_org_abs_2604_12565/figures/002_Table_1.jpg]]
 *Table 1: Comparison of AutoMoMa with existing mobile manipulation datasets. Existing datasets are constrained by their acquisition methods: teleoperation yields high-fidelity but small-scale data, while scripted policies lack whole-body coordination. AutoMoMa overcomes these limitations through GPU-accelerated automated planning, simultaneously achieving large scale, broad diversity, and highfidelity joint-space trajectories—a combination no prior dataset provides. “Coord.”: presence of whole-body base-arm coordination*
-
-![[assets/figures/papers/paper_list_l959_https_arxiv_org_abs_2604_12565/figures/008_Figure_6.jpg]]
-*Figure 6: Data scaling experiments. (a) In a single scene, the mobile base policy requires substantially more data than the fixed-base counterpart, with a persistent seen/unseen gap indicating manifold memorization. (b) Increasing scene diversity from 1 to 30 steadily improves generalization to unseen environments. (c) With 30 scenes, higher per-scene trajectory density further refines execution precision, enabling consistent generalization across seen and unseen scenes*
-
-![[assets/figures/papers/paper_list_l959_https_arxiv_org_abs_2604_12565/figures/005_Figure_4.jpg]]
-*Figure 4: Trajectory generation performance across six representative household scenes. (a) Test scenes with increasing spatial confinement. (b) Generation throughput (valid trajectories per second) decreases as scene clutter increases collision-checking overhead. (c) Average translational effort of the mobile base per trajectory (error bars: standard deviation). (d) Average rotational effort of the manipulator, reflecting compensatory whole-body motion in constrained environments*
-
-![[assets/figures/papers/paper_list_l959_https_arxiv_org_abs_2604_12565/figures/006_Figure_5.jpg]]
-*Figure 5: Distribution of trajectory base positions. Blue and orange spheres denote start and goal base placements, respectively, illustrating the broad spatial coverage achieved by the IK clustering strategy*
-
-![[assets/figures/papers/paper_list_l959_https_arxiv_org_abs_2604_12565/figures/021_Figure.jpg]]
-*Figure: Impact of Unique Start States Impact of Unique Start States and Trajectories Trajectory Configuration*
-
-
 
 ## 定位与知识库关联
 
@@ -361,8 +327,6 @@ AutoMoMa 在知识体系中的定位可概括为：
 3. **与在线学习的结合**：能否将 AutoMoMa 的批量生成能力与在线强化学习相结合，在部署过程中持续提升策略对未见场景的鲁棒性？
 4. **数据效率提升**：能否通过更智能的采样策略（如基于不确定性的主动采样）或数据增强方法，减轻对大规模生成数据的依赖，降低训练成本？
 5. **碰撞近似精度与速度的权衡**：球体近似带来的碰撞检测误差是否可通过自适应几何简化（如凸包分解）来缓解，同时保持 GPU 加速优势？
-
-
 
 ## 原文 PDF
 

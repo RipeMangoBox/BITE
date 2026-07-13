@@ -54,8 +54,6 @@ claims:
 
 本方法在方法谱系中属于**基于推理增强的偏好优化**路线，与标准DPO（Rafailov et al., 2023）将输出视为整体的做法不同，AW-DPO通过输出结构分解和加权损失，实现了更细粒度的安全对齐。消融实验进一步验证了缩放因子α和对齐权重的关键作用，且所构建的DPO数据集具有良好的跨模型迁移性。
 
-
-
 ### 安全对齐的表层化困境
 
 当前大语言模型的安全对齐主要依赖监督微调和基于人类反馈的强化学习，使模型学会拒绝有害请求。然而，大量越狱攻击案例表明，这种对齐机制本质上是一种**浅层拒绝启发式**——模型在训练中习得了“遇到敏感词就道歉”的模式化行为，而非真正理解请求的危害本质并基于推理做出安全判断。一旦攻击者对提示进行精心伪装（如编码、多语言、角色扮演），模型便轻易绕过安全防线。
@@ -78,8 +76,6 @@ claims:
 1. **诊断层面**：通过因果探针实验，严格验证安全对齐是否真的独立于深度推理。若这一假设成立，则意味着现有对齐方法存在结构性缺陷，需要从机制层面重新设计安全训练范式。
 
 2. **解决层面**：若安全对齐确实与推理脱钩，则需要一种新的训练方法，将推理能力**显式地**注入安全对齐过程，使模型在面对有害请求时能够“先推理、后判断”，并针对推理和回答两个阶段分别进行精细化的偏好优化。同时，该方法应保持较低的计算开销，避免多轮迭代训练的沉重负担。
-
-
 
 ## 核心方法与创新机理
 
@@ -120,8 +116,6 @@ AW-DPO处于安全对齐与偏好优化的交叉点：
 - **相对于迭代对齐方法如STAIR**（Zhang et al., 2025a）：AW-DPO仅需单轮SFT+DPO训练，即在SorryBench的20种越狱攻击下取得更低的平均攻击成功率（LLaMA-3.1-8B上0.81% vs STAIR-DPO-3的1.33%），且计算开销更低。
 - **相对于基于推理的安全方法如SAFECHAIN**（Jiang et al., 2025）：AW-DPO不依赖外部推理模块，而是通过CoT微调将推理能力内化，并通过加权DPO进一步强化推理-响应的对齐一致性。
 - **相对于表征操控方法如Representation Rerouting**（Zou et al.）：AW-DPO通过训练时信号调整而非推理时干预来实现对齐，避免了推理时的额外计算开销。
-
-
 
 ![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_OuMNJoKJBQ/figures/002_Figure_2.jpg]]
 *Figure 2: AW-DPO Pipeline. Step 1: Generate k candidate responses per prompt using the COTfinetuned LLM, and score their harmfulness on (i) reasoning ( $h _ { r s } ^ { - }$ ) , (ii) response ( $h _ { r p }$ ) , and (iii) full answer ( $h _ { f }$ ) using a judge model. Step 2: Select preference pairs ( $x _ { \mathrm { c h o s e n } } , x _ { \mathrm { r e j e c t e d } }$ ) where the full harmfulness score difference exceeds threshold γ. Step 3: Compute alignment weights and train using LAW-DPO
@@ -166,8 +160,6 @@ $$
 ### 方法定位
 
 AW-DPO 仅需**单轮 SFT + DPO** 训练，在计算开销上显著低于需要三轮迭代训练的 STAIR-DPO-3（Zhang et al., 2025a）。同时，其构建的 DPO 数据集具有良好的跨模型迁移性：使用 LLaMA2-7B 构建的数据集可直接用于训练其他模型并持续提升安全性（Table 3）。该方法的主要局限在于依赖外部评判模型进行危害评分，增加了数据准备阶段的 API 成本与计算开销。
-
-
 
 ### 推理-安全解耦的因果证据
 
@@ -217,8 +209,6 @@ $$\phi_{\mathrm{AW}}(x, y) = \sum_{t=1}^{T} w_{s_t} \cdot \log \frac{\pi_{\theta
 $$\mathcal{L}_{\mathrm{AW-DPO}} = w_{\text{reasoning}} \mathcal{L}_{\mathrm{DPO}}^{\mathrm{rs}} + w_{\text{respond}} \mathcal{L}_{\mathrm{DPO}}^{\mathrm{rp}}$$
 
 其中 $\mathcal{L}_{\mathrm{DPO}}^{\mathrm{rs}}$ 和 $\mathcal{L}_{\mathrm{DPO}}^{\mathrm{rp}}$ 分别是对推理段和回答段 token 计算的交叉熵损失。这一分解使得 AW-DPO 能够精细纠正两类对齐错误：推理正确但输出不安全（回答段权重更高），以及推理错误但输出碰巧安全（推理段权重更高）。错误分析（Figure 3a）显示这两类失败模式约占所有不安全案例的 15%，验证了分而治之的必要性。
-
-
 
 ## 实验与关键发现
 
@@ -281,12 +271,8 @@ Table 9 将 AW-DPO 与通用推理模型（如 DeepSeek-R1 等）进行了对比
 - **实用性评估维度单一**：实用性仅通过 MMLU 准确率衡量，对于长篇生成质量、对话连贯性、指令遵循等维度的潜在影响未充分量化，需在实际部署中进一步验证。
 - **模型规模覆盖有限**：因果探针实验仅在 7B 级别模型上进行，安全-推理解耦现象在 70B+ 或 MoE 架构中是否普遍成立，仍有待探索。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_OuMNJoKJBQ/figures/010_Figure_6.jpg]]
 *Figure 6: (b) Comparison of safety performance between standard DPO and AW-DPO*
-
-
 
 ## 定位与知识库关联
 
@@ -345,8 +331,6 @@ $$w_{\mathrm{reasoning}} = \frac{d_{\mathrm{reasoning}}}{d_{\mathrm{respond}} + 
 4. **架构普遍性**：本文发现的安全-推理解耦现象是否在不同网络规模、不同架构范式（如MoE、Mamba）中普遍成立？这关系到该方法的技术路线是否具有广泛的适用基础。
 
 5. **CoT推理的对抗鲁棒性**：当攻击者专门针对CoT推理过程设计对抗性攻击（如注入误导性推理链）时，AW-DPO的防御能力如何？是否需要针对推理过程本身设计额外的鲁棒性训练机制？
-
-
 
 ## 原文 PDF
 

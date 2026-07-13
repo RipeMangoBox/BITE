@@ -59,8 +59,6 @@ claims:
 
 **方法定位**：该方法属于基于代表性的核心集选择路线，但区别于贪心或启发式近似，它通过整数规划全局优化Wasserstein距离，特别适合**低预算、高质量覆盖**的主动学习场景。其代价是运行时间显著长于启发式基线（数小时 vs 数秒），但在需要精准选择的低预算场景下可接受。
 
-
-
 主动学习旨在通过选择最具信息量的样本进行标注，以最小的标注成本训练高性能模型。在标注预算极度有限（例如不到数据集1%）的场景下，这一问题的挑战尤为突出。现有主动学习方法主要分为两类：基于不确定性的策略（如Least Confidence、Maximum Entropy）和基于代表性的策略（如k-Center贪心、k-Medoids聚类中心）。然而，这些方法存在一个共同的瓶颈：它们依赖启发式或贪心准则进行样本选择，无法保证所选核心集在全局意义上对未标注池的代表性，导致在极低预算下分类性能显著下降。
 
 核心集选择为这一瓶颈提供了理论框架——通过选取一个子集，使得在该子集上训练的模型损失能够上界整个数据集的损失。本文的理论分析（Theorem 1）表明，在损失函数Lipschitz连续的条件下，核心集损失的上界由核心集与完整数据集之间的Wasserstein距离决定。这为将主动学习转化为最小化Wasserstein距离的优化问题提供了理论依据。
@@ -68,8 +66,6 @@ claims:
 然而，直接求解该核心集选择问题面临计算上的挑战：该问题本质上是一个大规模混合整数线性规划（MILP），在数据集较大时，现有商业或开源求解器无法在合理时间内获得满意解。因此，现有方法不得不退而求其次，采用贪心近似（如WAAL的贪心估计）或聚类启发式（如k-Medoids），牺牲了全局最优性。
 
 本文的核心动机正是弥合这一理论与实践的鸿沟：能否设计一种算法，在可接受的计算时间内直接求解该MILP，从而在极低预算场景下获得显著优于启发式方法的核心集选择？为此，本文提出采用广义Benders分解（GBD）将原大规模MILP分解为反复求解小规模Wasserstein距离子问题与松弛主问题，并引入增强最优性割（EOC）与剪枝约束（P）加速收敛，使得在合理时间内获得高质量甚至全局最优解成为可能。
-
-
 
 ## 核心方法与创新机理
 
@@ -96,8 +92,6 @@ claims:
 
 这一方法论创新在极低标注预算场景下产生了决定性的性能提升。在STL-10上预算B=40时，所提方法准确率超过最佳基线4.9%以上；在CIFAR-10上B=20时，提升幅度超过9.1%（见 **Table 3** 和 Section 5.2）。这些增益源于GBD求解器能够找到全局代表性更强的核心集——在SVHN上，Wass.+EOC获得的Wasserstein距离目标函数值约为k-medoids的一半（见 **Table 1**），直接体现了优化质量的根本性提升。即使在运行时间被限制为3分钟的情况下，GBD求解器的解质量仍优于k-medoids启发式（见 **Table 2**），表明该方法在效率与精度的权衡上具有实际可行性。
 
-
-
 本文提出的主动学习框架将核心集选择建模为一个全局优化问题，其整体流程由三个顺序模块构成：
 
 1. **自监督特征预训练**：首先利用所有无标签数据，通过 SimCLR 等自监督学习方法预训练一个特征编码器，将原始图像映射到具有语义结构的潜在表示空间。该步骤不消耗任何标注预算。
@@ -110,12 +104,8 @@ claims:
 
 **关键设计动机**：在极低标注预算（$B \leq 40$，即不到数据集的 1%）下，贪心或启发式选择策略无法保证全局代表性。定理 1 为这一设计提供了理论支撑：当损失函数满足 Lipschitz 连续性时，核心集损失被 Wasserstein 距离上界所控制，因此最小化 Wasserstein 距离等价于最小化核心集损失的上界。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2106_02968/figures/001_Figure_1.jpg]]
 *Figure 1: (Left) In our active learning framework, we first pre-train our features with self-supervised learning, select samples to label by minimizing the discrete Wasserstein distance, and then train our classifier. (Right) t-SNE plot of the feature space on the STL-10 data set with selected points highlighted. The baseline misses the top right region. See Appendix E.7 for full visual comparisons*
-
-
 
 ### 问题建模：核心集损失与Wasserstein距离
 
@@ -184,8 +174,6 @@ GBD在有限次迭代内收敛到全局最优解。
 
 GBD框架为低预算场景下的核心集选择提供了全局优化能力，而EOC和P的引入则使得该优化在合理时间内可解。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -205,10 +193,6 @@ Table 2进一步考察了有限运行时间下的求解质量。在CIFAR-10上�
 Figure 2展示了三个图像分类数据集上各方法的准确率随标注预算变化的曲线。在极低预算区间（B ≤ 40），所提方法显著优于所有基线。Table 3提供了详细数值：
 
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2106_02968/figures/008_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2106_02968/figures/020_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2106_02968/figures/022_Figure.jpg]]
 
 - **STL-10（B=40）**：Wass.+EOC+P准确率提升超过4.9个百分点（相对于最佳基线）。
 - **CIFAR-10（B=20）**：准确率提升超过9.1个百分点。
@@ -260,27 +244,12 @@ Figure 8–10展示了各方法实际选中的图像示例。Wass.+EOC倾向于�
 
 4. **对特征质量的依赖**：整个方法建立在高质量特征表示之上（SimCLR预训练）。当特征空间不能良好反映样本语义相似性时，最小化Wasserstein距离的核心集选择可能无法转化为下游分类性能的提升。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2106_02968/figures/004_Figure_2.jpg]]
-*Figure 2: Low budget active learning on CIFAR-10, SVHN and STL-10 using SimCLR pre-trained features. See Table 3 for detailed results for B $\leq$ 4 0 . See Appendix E.3 for full results up 1 0 ~ B $\le$ 1 8 0 . The solid lines are our models and the dashed lines are baselines. All plots show mean standard error over five runs. Our best models outperform baselines for most budgets
 
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2106_02968/figures/013_Table_9.jpg]]
 *Table 9: Numerical values of main results in Figure 2. All entries show mean standard deviation over five runs. The best model for each budget range is bolded and underlined and the second best model is underlined*
 
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2106_02968/figures/014_Table_10.jpg]]
-*Table 10: Numerical values of results on domain adaptation. All entries show mean standard deviation over five runs. The best model for each budget range is bolded and underlined and the second best model is underlined*
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2106_02968/figures/023_Figure_9.jpg]]
-*Figure 9: Images selected for labeling on CIFAR-10 with different methods: Wass. + EOC (top left), k-centers (top right), k-medoids (bottom left), Random (bottom right). The first two rows were selected in the first two rounds and every two rows after were selected in the subsequent rounds*
-
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2106_02968/figures/002_Table_1.jpg]]
 *Table 1: Head-to-head comparison of our solver using Enhanced Optimality Cuts (EOC) versus kmedoids on the objective function value of problem (4) at different budgets. Lower values are better. For each data set, the best solution at each budget is bolded and underlined. All entries show means over five runs. See Appendix E.2 for standard deviations. We use a ResNet-18 (He et al., 2016) feature encoder for STL-10, ResNet-34 for CIFAR-10 and SVHN, and Resnet-50 for Office-31. Our head is a two-layer MLP. The downstream classifier is the pre-trained encoder (whose weights are frozen) with a new head in each round. Supervised learning is performed with cross entropy loss. We compute Wasserstein distanc...*
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2106_02968/figures/003_Table_2.jpg]]
-*Table 2: Wass. + EOC with limited runtimes versus k-medoids on problem (4) for CIFAR-10. The best solution for each budget is bolded and underlined. See Appendix E.2 for full results and Appendix E.6 for details on k-medoids runtime*
-
-
 
 ## 定位与知识库关联
 
@@ -356,8 +325,6 @@ Figure 8–10展示了各方法实际选中的图像示例。Wass.+EOC倾向于�
 5. **跨模态与持续学习扩展**：是否存在针对跨模态主动学习（如视觉-语言模型的选择）或主动持续学习（需要在避免灾难性遗忘的同时选择新任务样本）的扩展？这需要重新定义Wasserstein距离的度量空间和核心集损失的上界。
 
 6. **与不确定性方法的融合**：本文方法纯基于代表性，是否可以将不确定性信息（如分类器的熵）作为Wasserstein距离度量中的加权项，从而同时优化代表性和信息量？
-
-
 
 ## 原文 PDF
 

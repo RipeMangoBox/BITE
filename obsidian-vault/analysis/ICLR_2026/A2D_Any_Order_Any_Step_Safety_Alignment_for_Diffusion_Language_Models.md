@@ -56,8 +56,6 @@ claims:
 
 这些结果表明，将安全信号下沉到令牌级，并在训练中覆盖任意解码位置与步骤，是解决扩散语言模型"浅层对齐"问题的简洁且高效路径。
 
-
-
 扩散语言模型（diffusion language models, dLLMs）通过迭代式屏蔽与去噪进行文本生成，其核心机制允许模型在任意位置、以任意顺序解码令牌。这一"任意顺序生成"特性赋予了dLLMs在推理灵活性上的优势，但同时也引入了一个独特的安全脆弱性：有害内容可以在生成过程的任何位置、任何步骤自然浮现，而无需遵循自回归模型那样的严格从左到右因果约束。
 
 现有安全对齐方法普遍采用**响应级（response-level）对齐**策略，即在完整响应的维度上监督模型输出拒绝模板或安全回复。代表性方法包括拒绝训练（Refusal Training, RT）、监督式微调（Supervised Fine-Tuning, SFT）以及基于变分偏好优化的VRPO等。这些方法的核心瓶颈在于：它们仅在响应的起始令牌处施加较强的安全信号，而随着解码步数的推进，安全信号迅速衰减。这种现象被称为**浅层对齐（shallow alignment）**——模型在前几个令牌学会了"拒绝"的表面模式，但在序列中后段的令牌预测分布上，对齐效应几乎消失。利用这一缺陷，DIJA（Diffusion Jailbreak Attack）等模板攻击可在解码后期轻松绕过模型的拒绝机制，将原始超过80%的攻击成功率施加于经过响应级对齐的模型之上（LLaDA-8B-Instruct上82.9%，Dream-v0-Instruct-7B上84.4%）。
@@ -65,8 +63,6 @@ claims:
 更深层的因果视角揭示了这一漏洞的实质：在任意顺序生成范式下，有害内容并不必然从序列开头递进展开，它可能出现在中间或末尾的被屏蔽位置，而此时响应级对齐所提供的安全信号已不足以抑制有害令牌的生成。这意味着，仅靠"让模型在开头拒绝"的机制无法应对**任意位置、任意步骤**的安全威胁。
 
 A2D的动机正是针对这一根本性缺口。本文的核心洞察在于：与其在响应级别教模型"说什么"，不如在令牌级别教模型"何时停止"——即，**将[EOS]令牌转化为通用的拒绝信号**。一旦模型在任意解码位置、任意解码步骤中检测到有害片段的形成趋势，便立即输出[EOS]终止生成。这种**令牌级对齐**机制直接在模型内部的逐令牌预测分布层面对齐安全行为，有望实现真正意义上的**深度对齐（deep alignment）**：无论解码顺序、屏蔽比率或攻击模板如何变化，对齐信号在生成全程保持有效。进而，在推理阶段还可利用[EOS]概率实现**早期拒绝**——当首步最左屏蔽位置的[EOS]概率超过阈值时即终止生成，从而实现最高19.3×的安全终止加速，同时避免对良性提示的过度拒绝。
-
-
 
 ## 核心方法与创新机理
 
@@ -87,8 +83,6 @@ A2D 的核心创新在于将安全对齐从**响应级**下沉到**令牌级**�
 上述两个改变使模型在解码全程的每令牌概率分布与基础模型产生持续的高 KL 散度，即所谓**深层对齐**（Figure 4），彻底避免了响应级对齐的浅层衰减效应。更重要的是，训练后模型自然获得了实时安全监控能力：首步最左屏蔽位置的 `[EOS]` 概率可作为在线有害性指标，设置阈值即可实现**早期拒绝**，在仅引入 1.6% 过度拒绝的条件下达到 6× 安全终止加速，若进一步放宽阈值则可获得最高 19.3× 加速。同时，A2D 在 XSTest（模拟不安全提示的良性样本集）上获得 0% 假阳性，证明其避免了过度拒绝。
 
 这些结果综合表明，A2D 通过**仅在训练目标层面对若干屏蔽令牌进行 `[EOS]` 替换，并配合全覆盖的屏蔽比率分布**，以极低的实现复杂度（与 RT、SFT 相当的训练成本，远低于 VRPO）从根本上消除了扩散语言模型因任意顺序生成带来的安全漏洞。
-
-
 
 ![[assets/figures/papers/iclr26_0005_URTnuyQJI1_A2D_Any-Order_Any-Step_Safety_Alignment_for_Diff/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of A2D for aligning dLLMs. Response-level methods supervise refusals only at the level of full responses, while A2D applies token-level alignment by replacing harmful spans with [EOS] tokens, enabling the model to reject unsafe content under any-order and at any-step. A2D prevents template-based attacks from producing harmful outputs, whereas response-level alignment fails under the same setting*
@@ -118,8 +112,6 @@ A2D 不再使用固定屏蔽比率，而是在训练时从均匀分布中采样 
 4. **输出流（推理）**：对齐后的模型在迭代解码时，若在任意步骤、任意位置检测到有害上下文，其输出的 [EOS] 概率会显著升高。通过监测首步最左屏蔽位置的 [EOS] 概率并设定阈值 $\tau$，A2D 支持**早期拒绝**：一旦概率超过阈值，直接终止生成。这一机制在 AdvBench 上最高实现 19.3× 的安全终止加速，同时 XSTest 上保持 0% 的假阳性率，验证了其实时安全监控的有效性与精准性。
 
 整体而言，A2D 通过**数据驱动的[EOS]替换训练**与**均匀屏蔽比率覆盖**，将安全对齐从粗粒度的响应级下沉到令牌级，既根治了扩散语言模型的浅层对齐问题，又在不引入额外推理复杂度的前提下提供了高效、可调节的早期拒绝能力。
-
-
 
 扩散语言模型（dLLM）在任意顺序生成过程中，有害内容可能出现在序列的任意位置。现有响应级对齐（如拒绝训练 RT）仅在完整响应层面监督拒绝行为，导致安全信号在解码过程中迅速衰减——这是一种"浅层对齐"。A2D 的根本应对是建立**令牌级拒绝机制**：将特殊的 `[EOS]` 作为通用拒绝令牌，一旦在任意解码位置、任意解码步骤中检测到有害跨度，模型便输出 `[EOS]` 并终止生成。为实现这一机制，A2D 在训练时围绕两条核心线路重构了监督信号：屏蔽令牌的目标替换与屏蔽比率的全域覆盖。
 
@@ -157,8 +149,6 @@ $$ \lambda = (1 - \epsilon) t + \epsilon , $$
 
 通过将 `[EOS]` 固化为拒绝令牌，A2D 在保持原有扩散训练数学形式不变的前提下，将安全决策从响应级提升至令牌级。这种机制不仅在解码阶段构建了逐令牌的拒绝能力，还可借助初始步骤最左侧屏蔽位置的 `[EOS]` 概率实现实时安全监控与早期终止，无需额外的模块或复杂的损失函数。
 
-
-
 ## 实验与关键发现
 
 A2D 在扩散语言模型上实现了令牌级的安全对齐，其核心因果机制在于训练时将有害片段中被屏蔽的令牌监督为 `[EOS]`，迫使模型在"遇到有害内容即终止"的策略下学习深层拒绝。该机制直接针对扩散模型的**瓶颈**——任意顺序生成导致有害内容可出现在解码全程的任何位置，而响应级对齐仅在初始令牌处理时强效，随后安全信号迅速衰减（浅层对齐），使 DIJA 等模板攻击轻易在解码后期绕过。以下从主结果、消融、对齐深度、早期拒绝及极限条件等角度展开分析。
@@ -166,7 +156,6 @@ A2D 在扩散语言模型上实现了令牌级的安全对齐，其核心因果�
 ### 主结果：全面压制攻击成功率
 
 在覆盖 Zeroshot、PAIR、ReNeLLM、Prefilling、DIJA 五类攻击的综合性安全基准上，A2D 在三个指令微调的扩散语言模型上均取得最低的平均有害性攻击成功率（ASR）：LLaDA-8B-Instruct 降至 6.8、LLaDA-1.5 降至 9.1、Dream-v0-Instruct-7B 降至 2.8（Table 1）。相比之下，最优基线 VRPO 对应数值为 21.6、22.0、22.7，A2D 较其平均再降低约 60%。更为关键的是，针对 DIJA 这种利用任意顺序生成特性、在原始模型上成功率超过 80% 的白盒攻击，A2D 将其压制至接近零：LLaDA 上仅 1.3%，LLaDA-1.5 上 3.5%，Dream 上 0.0%（Table 1）。这表明令牌级 `[EOS]` 监督成功构建了"在任何位置、任何解码步骤上识别并终止有害生成"的防御壁垒，彻底瓦解了 DIJA 的攻击假设。
-
 
 ![[assets/figures/papers/iclr26_0005_URTnuyQJI1_A2D_Any-Order_Any-Step_Safety_Alignment_for_Diff/figures/006_Table_1.jpg]]
 *Table 1: Comprehensive evaluation results on capability and harmfulness for three instruction-tuned dLLMs across four alignment methods. A2D effectively mitigates diverse jailbreak attacks while preserving competitive capability. The top-performing method is shown in bold, and the second-best is underlined. All results are averaged over three random seeds, and Original refers to the model without any alignment fine-tuning*
@@ -177,14 +166,12 @@ A2D 在扩散语言模型上实现了令牌级的安全对齐，其核心因果�
 
 Figure 4 通过逐令牌 KL 散度刻画了 A2D 对齐后模型与基础模型在有害提示上的行为分离程度。无论采用左到右、置信度优先还是随机解码，A2D 对齐模型的 KL 散度在解码全程均持续维持较高水平，而响应级对齐（RT 或 VRPO）仅在最初几个令牌上出现明显差异，随后迅速回落至基线附近。该曲线直接验证了先前分析的"浅层对齐"现象，也量化了 A2D 实现的**深层对齐**——安全行为在整个生成轨迹中被持续强化，而非只依附于起始点。
 
-
 ![[assets/figures/papers/iclr26_0005_URTnuyQJI1_A2D_Any-Order_Any-Step_Safety_Alignment_for_Diff/figures/009_Figure_4.jpg]]
 *Figure 4: Per-token KL divergence between A2D-aligned and base dLLMs. Aligned models (LLaDA-1.5, LLaDA-1.5-A2D) vs. Base model (LLaDA-Base) on Harmful BeaverTails under three sampling strategies. LLaDA-1.5-A2D refers to LLaDA-1.5 further aligned with A2D for safety. All results are averaged over 150 harmful prompts from BeaverTails, with shaded regions indicating standard deviation*
 
 ### 关键消融：拒绝令牌的选择
 
 Table 3 的消融实验表明，选择 `[EOS]` 作为拒绝令牌在安全性与能力之间取得最佳平衡。相较于训练过程中临时引入的 OOD（Out-of-Distribution）令牌、高频令牌或低频令牌，`[EOS]` 原本即作为填充与终止字符被模型广泛使用，无需额外的嵌入适应即可作为"安全终止"信号。在能力基准（如 MMLU、GSM8K）上，`[EOS]` 方案的能力退让最小；在有害性控制上，其 ASR 同样优于其他替代令牌。这一消融证实了令牌级对齐中语义相容性对提升防御鲁棒性及维持通用能力的重要性。
-
 
 ![[assets/figures/papers/iclr26_0005_URTnuyQJI1_A2D_Any-Order_Any-Step_Safety_Alignment_for_Diff/figures/014_Table_3.jpg]]
 *Table 3: Ablation study on refusal token selection: comparative impact on capability and harmfulness. The best-performing token is shown in bold*
@@ -205,16 +192,11 @@ Table 12 汇报了完整能力基准结果。A2D 在多数能力指标上与非�
 
 当前评估集中于 LLaDA 与 Dream 等代表性开源扩散架构，扩散式模型的演进速度较快，后续需要验证 A2D 在更多（如可扩展性和样本效率不同的）架构上的表现。对自回归模型的适配仅在 Qwen-2.5 和 LLaMA-3.1 上进行了初步实验，其完整防御效能尚待大规模验证。另外，尽管早期拒绝加速显著，在对抗性模板专门设计以规避起始步检测的情况下，是否存在绕过该机制的可能性仍有待研究，例如在后续步才触发有害内容的攻击形态。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0005_URTnuyQJI1_A2D_Any-Order_Any-Step_Safety_Alignment_for_Diff/figures/030_Figure_9.jpg]]
 *Figure 9: Early rejection trade-off. The red curves show speed-up measured on HARMBENCH, while the blue curves report accuracy on XSTEST, evaluated across different early rejection thresholds (τ )*
 
 ![[assets/figures/papers/iclr26_0005_URTnuyQJI1_A2D_Any-Order_Any-Step_Safety_Alignment_for_Diff/figures/012_Figure_5.jpg]]
 *Figure 5: Attack success rates on extreme conditions for three instruction-tuned dLLMs across four alignment methods*
-
-
-
 
 ## 定位与知识库关联
 
@@ -227,8 +209,6 @@ A2D 解决的核心瓶颈在于：现有扩散语言模型（dLLM）的安全对
 **局限性与开放问题**。主要局限包括：① 评估集中在 LLaDA、LLaDA‑1.5、Dream 等几个代表性开源 dLLM 上，扩散架构仍在快速演进，需扩展至更多变体；② 尽管早期拒绝利用首个最左屏蔽位置的 [EOS] 概率，最高可实现 19.3× 安全终止加速，但该机制依赖阈值 $\tau$ 的选取，在加速率与假拒绝率之间需权衡（Figure 8），极端阈值可能导致过度拒绝；③ 在某些知识密集或推理任务（如 MMLU）上 A2D 存在轻微能力下降（Table 12 及相关结果），反映了令牌级安全约束可能带来的能力对齐税。
 
 未来的关键开放问题包括：能否在更复杂、多轮的开放域对话中维持令牌级对齐，以避免上下文漂移导致漏报；是否存在可攻击早期拒绝机制的对抗模板，使得有害内容在起始步未被检测到，而在后续采样中被补全（即"潜伏式"有害生成）；如何将令牌级对齐的理念系统性地推广至自回归解码、流匹配等生成范式，以构建统一的安全框架；以及如何更精细地建模安全与有用性的权衡，确保 [EOS] 只在真正有害的语境中高概率触发，进一步降低对齐税。
-
-
 
 ## 原文 PDF
 

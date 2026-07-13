@@ -60,8 +60,6 @@ claims:
 
 这些发现表明，微基准测试的可靠性评估需要从“聚合排名是否相关”转向“哪些模型比较能被可靠保留”的细粒度视角，而 MDAD 正是为此设计的诊断工具。
 
-
-
 语言模型评估正面临一个日益突出的效率困境：全量基准测试（如MMLU、MMLU-Pro、BBH等）动辄包含数千道题目，对单个模型进行一次完整评估就需要耗费大量计算资源与时间。为缓解这一压力，研究者提出了多种**微基准测试（micro-benchmarking）**方法——通过从全量基准中精心挑选一个小规模示例子集，以远低于全量评估的成本近似模型的全基准性能。
 
 然而，一个关键问题长期被忽视：**当样本量被极端压缩时，这些微基准测试究竟能多可靠地区分模型之间的性能差异？** 传统的元评估指标，如平均估计误差（mean estimation error）和Kendall's tau排名相关性，虽然能给出宏观的可靠性判断，却无法揭示微基准测试在细粒度上的失效模式。具体而言，一个微基准测试可能在整体排名上表现出高相关性，却在区分性能相近的模型时频繁出错——而这类相近性能的模型比较，恰恰是实际模型评估中最常见也最重要的场景。
@@ -71,8 +69,6 @@ claims:
 更深层的问题在于，传统的元评估范式本身存在结构性盲区。平均估计误差衡量的是单个模型在微基准与全基准上的性能偏差，但它无法捕捉微基准测试是否**一致性地**高估或低估某类模型——这种系统性偏差虽然不影响平均误差，却会严重扭曲模型间的相对排名。Kendall's tau排名相关性虽然关注排名一致性，但它将所有模型对的排名错误等权处理：无论两个模型在全基准上相差20个百分点还是仅差0.5个百分点，一次排名反转对tau的贡献完全相同。这种聚合视角掩盖了一个关键事实：在模型性能分布密集的区域，微基准测试的排名可靠性可能远低于整体tau所暗示的水平。
 
 正是基于这一认识，本文提出了一个全新的元评估视角：不再问“微基准测试的整体排名有多准”，而是问“**微基准测试能可靠区分多大的性能差异**”。这一视角的转变直接催生了MDAD（Minimum Detectable Ability Difference）指标，它精确刻画了给定样本量下微基准测试能够一致正确排序的最小模型性能差异，从而为效率与可靠性之间的权衡提供了可操作的量化依据。
-
-
 
 ## 核心方法与创新机理
 
@@ -115,8 +111,6 @@ MDAD 的范式转变还体现在其**解释性价值**上。传统指标只能�
 
 这种诊断能力直接解释了微基准测试中常见的“排名稳定”现象：当模型性能差异远大于 MDAD 时，排名自然稳定；而当模型性能差异接近或小于 MDAD 时，排名的波动并非方法缺陷，而是**信息论意义上的不可区分性**。
 
-
-
 本文的核心贡献并非提出一种新的微基准测试构建方法，而是引入了一套**元评估框架**，用于精确刻画微基准测试在极端样本缩减下的可靠性边界。该框架围绕一个核心指标——**最小可检测能力差异（Minimum Detectable Ability Difference, MDAD）**——展开，其设计逻辑如下：
 
 ### 1. 问题设定与输入输出流
@@ -154,8 +148,6 @@ MDAD 的直观含义是：在全量基准上，微基准测试能够以至少 80
 - **模型集依赖**：MDAD 的估计依赖于一组固定的源模型和目标模型划分。当目标模型集发生变化（如出现全新架构的模型）时，MDAD 可能需要重新校准。
 - **阈值选择**：一致性阈值 0.8 是预设参数，但消融实验表明，使用 0.7、0.9 或 0.95 等不同阈值时，MDAD 的结果在定性上保持一致（Figure 7）。
 
-
-
 ### 一致性概率（Agreement Probability）
 
 MDAD 的构建始于一个细粒度的成对排序一致性度量。给定一个微基准测试 $D_{\mathrm{micro}}$、全基准测试 $D_{\mathrm{full}}$ 和一个目标模型集 $\mathcal{T}$，首先定义在特定性能差异区间 $B$ 内，微基准测试与全基准测试的排名一致概率：
@@ -185,8 +177,6 @@ $$
 - **Kendall's tau 秩相关系数**：定义为 $ \mathrm{Kendall's} \tau = 1 - \frac{2|C|}{\binom{|T|}{2}} $，其中 $C$ 为不一致对集合。该指标在聚合层面衡量整体排序相关性，但在极端缩减样本量时可能给出误导性结论——即使微基准测试在区分相近性能模型时几乎随机，整体秩相关仍可能较高。
 
 MDAD 通过**细粒度的成对排序一致性条件概率**克服了上述局限：它能够揭示微基准测试在哪些性能差异区间上可靠、哪些区间上不可靠，从而为评估者提供可操作的决策依据——例如，当目标模型集的全基准准确率差异普遍小于 MDAD 时，该微基准测试的排序结果不可信。
-
-
 
 ## 实验与关键发现
 
@@ -254,29 +244,8 @@ MDAD 的定义依赖于两个超参数：一致性概率阈值（默认 0.8）�
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_cReExMQLiK/figures/009_Table_2.jpg]]
 *Table 2: Average time (seconds) for completion of one trial*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_cReExMQLiK/figures/019_Figure.jpg]]
-
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_cReExMQLiK/figures/020_Figure_14.jpg]]
 *Figure 14: When comparing 8B-parameter instruction-tuned models on MMLU-Pro: per-model agreement with the full benchmark is lower for the models in the middle of the accuracy distribution that have more similar accuracies to many models*
-
-![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_cReExMQLiK/figures/021_Figure.jpg]]
-*Figure: (b) BIG-bench Hard, 7B-parameter instruct models. (c) BIG-bench Hard, 70B-parameter instruct models*
-
-![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_cReExMQLiK/figures/022_Figure.jpg]]
-*Figure: (a) MMLU-Pro, 70B-parameter instruct models*
-
-![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_cReExMQLiK/figures/003_Table_1.jpg]]
-*Table 1: Summary of differences between MDAD and existing meta-evaluation measures*
-
-![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_cReExMQLiK/figures/010_Table_3.jpg]]
-*Table 3: MDADs with 95% confidence intervals for up to 100 trials for uniform random sampling, Anchor Points, and tinyBenchmarks when selecting 50 and 100 examples from MMLU-Pro*
-
-![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_cReExMQLiK/figures/014_Table_4.jpg]]
-*Table 4: Results for the BenTo micro-benchmarking method*
-
-
 
 ## 定位与知识库关联
 
@@ -337,8 +306,6 @@ Anchor Points 在极小样本量下具有最低的 MDAD，但在选择 1000 个�
 
 **鲁棒性验证：**
 本文通过多项消融实验验证了 MDAD 的稳健性：使用 0.7、0.8、0.9、0.95 等不同一致性阈值得到的 MDAD 结果在定性上相似（Figure 7）；不同的分桶分辨率（0.25, 0.5, 1.0）对 MDAD 的影响较小（Figure 8）；50 次试验已能提供稳定的置信区间（Table 3）。
-
-
 
 ## 原文 PDF
 

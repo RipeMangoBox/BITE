@@ -55,8 +55,6 @@ claims:
 
 **方法定位**：HumanDiT 属于**姿态引导的扩散人体动画生成**范畴，与 DisCo、MagicDance、AnimateAnyone、MimicMotion 等基于 U‑Net 的方法形成对比。其关键差异在于以 DiT 为基础模型，并通过前缀潜在参考与补丁化姿态引导器实现统一的身份保持与姿态控制，同时引入 Keypoint‑DiT 与姿态适配器将能力边界从固定姿态序列生成扩展到视频延续与跨骨骼姿态迁移。
 
-
-
 ### 问题背景
 
 从单张参考图像生成逼真且时间连贯的长序列人体运动视频，是计算机视觉与生成模型领域的前沿挑战。该任务要求模型同时解决三个核心难题：**身份保持**（生成人物与参考图像外观一致）、**姿态精度**（动作与目标姿态序列对齐）和**长时一致性**（跨帧无闪烁或伪影）。随着数字人、虚拟主播、影视制作等应用对高保真人体视频的需求激增，这一方向在近年受到广泛关注。
@@ -78,8 +76,6 @@ claims:
 同时，HumanDiT引入**前缀潜在参考策略**，将首帧独立编码为无噪潜在向量并作为前缀拼接到去噪输入中，无需额外参考网络即可保持身份一致性。这一设计不仅简化了训练流程（单阶段端到端训练），还避免了参考网络引入的身份漂移问题。
 
 在姿态处理上，HumanDiT通过**Keypoint-DiT**生成连贯的后续姿态序列以支持视频延续，并通过**姿态适配器**进行骨骼长度对齐和运动解耦以实现精准的姿态迁移，从而在一个统一框架内同时覆盖两类核心应用场景。
-
-
 
 ## 核心方法与创新机理
 
@@ -106,8 +102,6 @@ HumanDiT 的核心创新在于用**扩散Transformer (DiT)** 体系重构了人�
 当目标姿态来自不同人体（骨骼比例不同）时，直接使用会导致渲染失真。HumanDiT 提出**姿态适配器**（Section 3.4）：利用参考骨骼长度 $l_0^i$ 和模板运动的最大长度 $l_i'$，对关节位置进行骨长归一化对齐 $\hat{j}_k^i = \hat{j}_0^{i-1} + l_0^i \cdot (j_k^i - j_k^{i-1}) / l_i'$，再通过 Keypoint-DiT 细化模块生成过渡帧 $\mathcal{T}_{\mathrm{fix}} = \mathcal{K}(j_0, \hat{\mathcal{I}}, \tau)$，实现精准的姿态迁移。消融可视化（Figure 6）表明，该模块有效解决了手部和面部的不一致问题。
 
 这五个 changed slots 的协同作用，使 HumanDiT 在统一框架下同时支持**多分辨率生成**、**长视频延续**和**跨骨骼姿态迁移**，在 Total 测试集上取得 FID-VID 25.5，显著优于 MimicMotion 的 39.5 和 AnimateAnyone 的 68.8（Table 1）。
-
-
 
 HumanDiT 的整体 pipeline 围绕“从单张参考图像生成高保真长序列人体运动视频”这一目标构建，其核心设计思路是用**扩散Transformer (DiT)** 替代传统 U-Net，并引入**前缀潜在参考策略**，从而在统一框架内支持可变分辨率、动态序列长度以及视频延续与姿态迁移两种推理模式。
 
@@ -149,12 +143,8 @@ Figure 2 给出了完整架构。Pipeline 由以下核心模块串联而成：
 
 得益于 DiT 的架构特性，整个 Video DiT 仅需**单阶段端到端训练**，无需像 U-Net 方案那样受参考网络的约束。训练时使用不同分辨率和帧数的数据混合训练，推理时即可直接处理未见过的视频尺寸和长度组合，这是 HumanDiT 在灵活性上显著优于固定分辨率 U-Net 基线（如 MimicMotion、AnimateAnyone）的根本原因。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1833_HumanDiT_Pose_Guided_Diffusion_Transformer_for_Long_form_Human_Motion_Vi/figures/001_Figure_1.jpg]]
 *Figure 1: HumanDiT is a framework designed to generate high-fidelity, long human motion videos in diverse scenes and flexible resolution*
-
-
 
 HumanDiT 围绕扩散Transformer（DiT）构建，以3D全注意力、旋转位置编码（RoPE）和补丁化（patchify）为骨干，突破U-Net固定分辨率的限制，统一支持变长视频生成与姿态迁移。其核心模块如下。
 
@@ -256,8 +246,6 @@ $$
 
 > **注意**：上述公式均来自论文Section 3.1–3.4的明确推导，未进行任何外推或猜测。关于序列并行（sequence parallelism）沿时间维度的具体实现细节，论文未给出公式化描述，此处不予展开。
 
-
-
 ## 实验与关键发现
 
 ### 主要结果
@@ -300,21 +288,8 @@ Table 3 报告了用户研究结果。在测试集生成视频的对比中，Hum
 
 这些局限在原文中被明确列出，置信度高，但部分问题（如误差传播的定量分析）尚未提供实验数据，需后续工作验证。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1833_HumanDiT_Pose_Guided_Diffusion_Transformer_for_Long_form_Human_Motion_Vi/figures/005_Table_2.jpg]]
-*Table 2: Quantitative results of ablation study on maximin token size and prefix-latent reference strategy for reference image (Ref.). The first two rows are conducted without using sequence parallel*
-
 ![[assets/figures/papers/paper_list_l1833_HumanDiT_Pose_Guided_Diffusion_Transformer_for_Long_form_Human_Motion_Vi/figures/009_Figure_6.jpg]]
 *Figure 6: Ablation study of pose adapter and pose refinement*
-
-![[assets/figures/papers/paper_list_l1833_HumanDiT_Pose_Guided_Diffusion_Transformer_for_Long_form_Human_Motion_Vi/figures/006_Figure_4.jpg]]
-*Figure 4: The template pose-driven human rendering results of HumanDiT on the Flux [4] generated images*
-
-![[assets/figures/papers/paper_list_l1833_HumanDiT_Pose_Guided_Diffusion_Transformer_for_Long_form_Human_Motion_Vi/figures/007_Figure_5.jpg]]
-*Figure 5: The video continuation with generated motions*
-
-
 
 ## 定位与知识库关联
 
@@ -381,8 +356,6 @@ HumanDiT 的能力边界由其架构设计决定，可以从输入灵活性、�
 4. **多模态姿态生成**：如何扩展 Keypoint-DiT 以支持从语音、文本或音乐节奏生成姿态序列？这将使视频延续更加自然，例如根据语音内容生成对应的手势动作。
 
 5. **数据规模与质量**：HumanDiT 使用了 14,000 小时的自收集野外视频数据集，但数据质量对手部和牙齿等细节的影响尚需进一步量化分析。清晰度评分模型的过滤标准与最终生成质量之间的因果关系值得深入研究。
-
-
 
 ## 原文 PDF
 

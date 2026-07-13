@@ -46,8 +46,6 @@ claims:
 
 ARES（multimodal Adaptive Reasoning via difficulty-aware token-level Entropy reward Shaping）是一种针对多模态大推理模型（MLRM）的两阶段训练框架，旨在解决现有模型在推理过程中“简单问题过度思考、困难问题探索不足”的核心矛盾。该方法通过引入**窗口熵**（window entropy）作为推理关键时刻的可靠检测信号，结合自适应冷启动（Adaptive Cold-Start, AdaCS）和自适应熵策略优化（Adaptive Entropy Policy Optimization, AEPO）两个阶段，实现基于问题难度的动态推理努力分配。实验结果表明，ARES-7B在MathVision上超过最佳开源模型+19.0，在MMMU-Pro上超过+11.5，在AIME25上达到61.7（大多数7B基线低于3.3）。
 
-
-
 现有的多模态大推理模型（MLRM）在推理过程中存在一个普遍问题：**在简单问题上过度思考，生成冗长的推理轨迹，而在困难问题上探索不足，导致无法找到解决方案**。这一现象源于当前模型对所有问题采用统一的推理策略，缺乏对问题难度的感知和自适应调整能力。
 
 论文通过定量分析（Figure 1）揭示了熵与难度之间的关键交互作用：
@@ -57,8 +55,6 @@ ARES（multimodal Adaptive Reasoning via difficulty-aware token-level Entropy re
 - 在每个难度级别内，正确案例在简单问题上使用更少的高熵令牌，但在困难问题上使用更多的高熵令牌。
 
 这些发现表明，**限制探索能提高简单问题的效率，而鼓励额外探索对解决困难问题至关重要**。
-
-
 
 ## 核心方法与创新机理
 
@@ -72,8 +68,6 @@ ARES的核心创新在于将令牌级熵聚合为滑动窗口统计量（窗口�
    - 高窗口熵检测器：基于动态批次级阈值标记推理关键区域
    - 分层熵奖励：基于难度桶的偏差惩罚
    - 动态KL设计：在推理关键窗口放松KL约束
-
-
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_2g945Ngc7l_ARES_Multimodal/figures/001_Figure_1.jpg]]
 *Figure 1: (a) Difficulty modulates the exploratory effort along the reasoning path*
@@ -92,8 +86,6 @@ ARES的整体训练流程如Figure 2所示，包含两个阶段：
 - 动态推理深度分配
 
 两个阶段共同实现了不确定性感知、难度自适应的推理能力。
-
-
 
 ### 5.1 窗口熵检测器
 
@@ -135,8 +127,6 @@ $$\beta_{i,t} = \beta_d \cdot \rho_t, \quad \rho_t = \begin{cases} \rho (<1), & 
 ### 5.5 AEPO代理目标
 
 $$\mathcal{J}_{\mathrm{AEPO}}(\theta) = \mathbb{E}_{(q,a)\sim\mathcal{D},\{o^i\}_{i=1}^G\sim\pi_{\theta_{\mathrm{old}}}(\cdot|q)} \left[ \frac{1}{G} \sum_{i=1}^G \frac{1}{|o^i|} \sum_{t=1}^{|o^i|} \min\left( r_{i,t}(\theta)\tilde{A}_{i,t}, \mathrm{clip}(r_{i,t}(\theta),1-\epsilon_\ell,1+\epsilon_h)\tilde{A}_{i,t} \right) - \beta_{d(i),t} D_{\mathrm{KL}}(\pi_\theta(\cdot|s_{i,t}) \| \pi_{\mathrm{ref}}(\cdot|s_{i,t})) \right]$$
-
-
 
 ## 实验与关键发现
 
@@ -181,12 +171,8 @@ Figure 9显示RL训练在大多数基准上减少了响应长度，表明推理�
 
 Figure 10展示了ValLine GRPO在冷启动模型上的训练动态：高熵令牌数量的增长与响应长度和准确率的增长紧密对齐，验证了熵作为推理努力原则性代理的有效性。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_2g945Ngc7l_ARES_Multimodal/figures/013_Table_5.jpg]]
 *Table 5: Textual and multimodal reasoning datasets source of ARES cold-start data.*
-
-
 
 ## 定位与知识库关联
 
@@ -199,8 +185,6 @@ ARES属于**基于强化学习的自适应推理**方法谱系，与以下工作
 **策略优化算法**：在GRPO（DeepSeek-AI et al., 2025）和DAPO（Yu et al., 2025b）的基础上，ARES提出了AEPO算法，通过理论分析（附录F、M、N）证明了KL损失相对于KL惩罚在方差控制上的优势，以及AEPO等价于令牌重加权自然梯度更新的性质。
 
 **知识库定位**：ARES填补了"如何根据问题难度动态分配推理计算"这一关键空白。其核心见解——窗口熵可作为推理关键时刻的可靠检测信号——为未来研究提供了新的理论基础和实用工具。
-
-
 
 ## 原文 PDF
 

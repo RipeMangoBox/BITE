@@ -60,8 +60,6 @@ claims:
 
 **局限与开放问题**：在大范围或剧烈运动引导下可能产生结构丢失或模糊等视觉伪影；尚未解决生成与参考图像内容差异较大的新运动或新视图的问题。
 
-
-
 ### 核心瓶颈
 
 图像到视频（I2V）扩散模型在通用图像动画生成上面临一个关键矛盾：一方面，现有模型缺乏跨运动域的细粒度、显式运动控制能力——用户无法精确指定物体轨迹、人脸表情或相机运动；另一方面，特定领域的动画方法（如音频驱动的人脸动画）虽然在各自领域内表现良好，却无法泛化到开放场景。这一瓶颈的根源在于，不同运动模态的控制信号形态差异巨大（稀疏轨迹点、面部关键点序列、相机参数等），而统一的、可泛化的运动注入机制尚未建立。
@@ -73,8 +71,6 @@ claims:
 ### 本文动机
 
 上述缺口的共同本质在于：**缺乏一种将不同模态的稀疏控制信号统一转化为密集运动引导的通用机制**。本文的核心洞察是：所有类型的图像动画均可统一建模为基于稀疏关键点（或关键轨迹）的运动传播问题——无论是用户绘制的物体运动轨迹、音频驱动的人脸关键点位移，还是相机运动模式，都可以被表达为帧间的稀疏运动向量。基于此，MOFA-Video提出在冻结的图像到视频扩散模型（Stable Video Diffusion）之上，设计生成式运动场适配器（MOFA-Adapter），将各类稀疏控制信号显式地转换为密集光流场，并通过特征扭曲（warping）机制将运动信息注入生成过程，从而实现跨域、可组合的通用图像动画控制。
-
-
 
 ## 核心方法与创新机理
 
@@ -111,8 +107,6 @@ SVD 原生支持固定帧数（14 帧）的生成。为突破这一限制，MOFA
 ---
 
 **证据强度说明**：上述核心创新点均有明确的论文原文锚点（Sec. 3.1, Fig. 2, Fig. 3, Fig. 10, Table 1, Table 3）和消融实验支持，置信度较高。关于两阶段训练策略（先训练光流重建，再微调 S2D 网络）对最终性能的必要性，论文在实现细节中提及但未提供独立的消融验证，该点置信度相对较低（约 0.8），需读者注意。
-
-
 
 ![[assets/figures/papers/paper_list_l5_MOFA_Video_Controllable_Image_Animation_via_Generative_Motion_Field_Adap/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of MOFA-Video. We design MOFA-Adadpters for adapting the motions from different domains with a unified structure on the frozen Video Diffusion Model. It generates the video from a single image and the corresponding sparse motion hints. For training, we generate the sparse motion hints through sparse motion sampling and then train different MOFA-Adapters to generate video via pre-trained SVD [7]*
@@ -153,8 +147,6 @@ MOFA-Video 的整体 pipeline 围绕一个核心设计展开：**在冻结的预
 - **S2D 网络 + 特征扭曲的完整结构**在可控性和合成质量上均显著优于仅使用稀疏条件注入（Sparse-conditioning，无 warping）或仅对稀疏点进行扭曲（Sparse-warping，无 S2D 网络）的变体。
 - **域感知的适配器训练**是必要的：直接使用轨迹域训练的 MOFA-Adapter 处理人脸动画会导致质量下降（Fig. 12），验证了为不同运动域训练专门适配器的合理性。
 
-
-
 ### 关键模块架构
 
 MOFA-Video 的核心由**冻结的 Stable Video Diffusion (SVD)** 主干网络和若干个可训练的 **MOFA-Adapter** 组成。每个 MOFA-Adapter 内部包含三个子模块（Fig. 3）：
@@ -194,8 +186,6 @@ $$\mathcal{L} = || \mathcal{S}(\mathcal{V}_t, t, \mathcal{M}(\mathcal{V}_t, t, I
 ### 长视频生成的周期性采样
 
 为突破 SVD 固定帧数限制，MOFA-Video 采用周期性采样策略（Fig. 6）：每次以 14 帧为一组进行去噪，相邻组之间重叠 7 帧，在潜空间中对重叠帧进行逐帧平均以平滑过渡。该策略有效避免了动态条件法导致的过曝和零条件法导致的片段间突变（Fig. 11）。
-
-
 
 ## 实验与关键发现
 
@@ -241,7 +231,6 @@ MOFA-Video 在两个核心任务上进行了定量评估：基于轨迹的图像
 
 结果表明，完整模型在可控性和合成质量上均达到最优。去除扭曲操作会导致运动控制精度显著下降；去除 S2D 网络则使运动场过于稀疏，无法提供足够的引导信号；不进行微调则完全丧失运动控制能力。定量结果（Table 3）进一步确认了完整模型在所有指标上的最佳平衡。
 
-
 ![[assets/figures/papers/paper_list_l5_MOFA_Video_Controllable_Image_Animation_via_Generative_Motion_Field_Adap/figures/015_Table_3.jpg]]
 *Table 3: Quantitative comparison results for ablation study on trajectory-based image animation*
 
@@ -265,13 +254,8 @@ MOFA-Video 在两个核心任务上进行了定量评估：基于轨迹的图像
 1. **大范围运动下的视觉伪影**：当运动引导幅度较大或剧烈时，生成的视频可能出现结构丢失或模糊等视觉伪影。这一问题在极端轨迹或大幅度面部运动场景中尤为明显。
 2. **内容生成能力受限**：MOFA-Video 的核心机制是基于参考帧特征的扭曲，因此无法生成与给定参考图像内容差异显著的新运动或新视图。该方法本质上是对现有像素的重排与变形，而非创造全新的视觉内容。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l5_MOFA_Video_Controllable_Image_Animation_via_Generative_Motion_Field_Adap/figures/009_Table_1.jpg]]
 *Table 1: Quantitative comparison and user study results for trajectory-based image animation. Table 2: Quantitative comparison and user study results for portrait image animation*
-
-
-
 
 ## 定位与知识库关联
 
@@ -302,8 +286,6 @@ MOFA-Video 的核心贡献在于为冻结的图像到视频扩散模型（Stable
 2. **如何进一步缓解大范围运动下的视觉伪影？** 现有 S2D 网络和特征扭曲机制在极端运动下表现不足，可能的改进方向包括：引入多帧参考信息以覆盖更大位移、设计更鲁棒的运动场正则化策略、或在扭曲后增加修复网络以补偿失真。
 3. **能否实现完全域无关的统一运动控制器？** 当前仍需为不同运动域训练独立适配器。探索更通用的稀疏运动表征（如统一的关键点抽象）和跨域迁移学习策略，可能减少对域特定微调的依赖。
 4. **长视频生成的时序一致性与误差累积问题**：虽然周期性采样策略缓解了片段间突变和过曝问题（Fig. 11），但长序列生成中的误差累积和运动漂移仍然是开放挑战，需要更有效的时序一致性约束机制。
-
-
 
 ## 原文 PDF
 

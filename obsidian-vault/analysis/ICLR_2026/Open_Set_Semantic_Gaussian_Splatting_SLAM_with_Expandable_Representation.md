@@ -70,8 +70,6 @@ claims:
 
 该方法在现有3DGS-SLAM框架（如SplaTAM、LoopSplat）之上构建，保留了原有的RGB-D损失和相机追踪设置，仅添加语义模块。其核心创新在于将全局语义浓缩为可扩展的特征池，区别于每个高斯独立存储语义的SGS-SLAM和依赖渲染后分类的GS³LAM。在方法谱系上，该方法属于**基于3DGS的密集语义SLAM**，同时融合了开放集视觉基础模型（SAM、CLIP）的感知能力，实现了从闭集到开放集语义建图的跨越。
 
-
-
 ### 3D高斯泼溅SLAM的兴起与语义化的需求
 
 同时定位与建图（SLAM）是机器人、增强现实和自动驾驶等领域的核心使能技术。近年来，以3DGS（3D Gaussian Splatting）为代表的辐射场表达方法，凭借其显式几何表示、高保真渲染质量和实时性能，在稠密视觉SLAM中展现出巨大潜力。相比于基于NeRF的隐式表达方法（如**Point-SLAM**），3DGS-SLAM方法（如**SplaTAM**、**LoopSplat**）能够更高效地处理场景几何与外观，同时支持动态增删高斯点以适应增量式场景扩展。
@@ -99,8 +97,6 @@ claims:
 - **跨视角一致**：引入帧内-帧间语义一致性对比损失，强制同一物体在不同视角下的语义特征保持一致；同时提出语义稳定性引导机制，利用历史帧语义相似度自适应调制损失权重，降低噪声语义对优化的干扰。
 
 通过上述设计，本文方法在保持3DGS-SLAM几何与外观重建优势的同时，首次实现了高效、可扩展且语义一致的开放集语义三维建图，为日常设备（如智能手机）上的野外场景语义重建铺平了道路（Figure 1）。
-
-
 
 ## 核心方法与创新机理
 
@@ -151,8 +147,6 @@ claims:
 - **稳定性引导**解决了“信多少”的问题——自适应抑制噪声。
 
 消融实验（Table 4）完整验证了协同效果：从无池基线（72.56 mIoU）开始，逐步添加一致性目标（+4.08）和稳定性引导（+3.06），最终达到完整模型的性能。在Replica数据集上，本方法（SplaTAM+Ours）的闭集语义分割mIoU达96.76%，显著优于GS³LAM（87.22%）等现有语义SLAM方法（Table 2）。
-
-
 
 本工作提出 **Open-Set Semantic Gaussian Splatting SLAM**，在现有 3DGS-based SLAM 框架上构建了一套可扩展的开放集语义建图系统。整体 pipeline 由六个核心模块串联而成，形成从 RGB-D 输入到语义 3D 重建的完整数据流。
 
@@ -212,15 +206,11 @@ $$\mathcal{L}_{mapping} = \lambda_{M,C} \mathcal{L}_{M,C} + \lambda_{M,D} \mathc
 
 整体数据流为：**RGB-D → 追踪（位姿估计）→ 3D 高斯建图（几何/外观）→ SAM+CLIP 语义提取 → 可扩展语义池检索 → 语义渲染 → 一致性目标与稳定性引导 → 联合优化**。各模块协同工作，使系统在增量式 SLAM 过程中持续更新、扩展语义知识，最终输出具有开放集语义标注的完整 3D 场景重建。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_E68dgQUzrC/figures/002_Figure_2.jpg]]
 *Figure 2: Framework Overview. We enhance existing 3DGS-based SLAM with an expandable semantic representation, introducing a learnable semantic feature pool that stores condensed scene-level semantics and supports dynamic expansion. Each Gaussian retrieves its semantic feature via soft aggregation from the shared pool through a lightweight key. To improve cross-view and temporal consistency, we further introduce an Intra-Inter Semantic Consistency Objective and a Semantic Stability Guidance mechanism, enabling stable and coherent open-set semantic reconstruction during SLAM*
 
 ![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_E68dgQUzrC/figures/001_Figure_1.jpg]]
 *Figure 1: This work introduces Open-Set Semantic Gaussian Splatting SLAM, a system designed to enable everyday devices (e.g., smartphones) to capture and reconstruct in-the-wild 3D scenes with rich, open-set semantics on top of SLAM frameworks*
-
-
 
 本方法在现有3DGS-SLAM框架上引入三个核心模块：(1) 可扩展语义特征池与键聚合机制，(2) 语义渲染管线，以及 (3) 帧内-帧间语义一致性目标与稳定性引导。以下逐一给出关键公式及其变量含义。
 
@@ -319,8 +309,6 @@ $$
 
 其中 $\mathcal{L}_{M,S}$ 已包含语义渲染损失、$\mathcal{L}_{CO}$ 及稳定性引导调制。追踪阶段损失 $\mathcal{L}_{tracking}$ 结构类似，仅优化相机位姿而冻结场景参数。
 
-
-
 ## 实验与关键发现
 
 ### 4.1 实验设置
@@ -362,9 +350,6 @@ Table 2报告了与现有语义SLAM方法的闭集语义分割对比。**SplaTAM
 2. **大规模场景的池增长**：语义池虽具有自限性（Table 17），但在极大场景中仍可能持续增长，硬件显存最终可能成为瓶颈。
 3. **实时性差距**：Table 10的运行时分析显示，追踪和建图速度尚未达到实时要求，难以满足低延迟应用场景。
 
-![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_E68dgQUzrC/figures/028_Table_17.jpg]]
-*Table 17: Statistics of semantic pool expansion across relatively large-scale scenes. (supp. §C.2)*
-
 ### 4.7 补充实验
 
 在TUM-RGBD和ScanNet数据集上的补充实验（Table 18、Table 19）进一步验证了方法的泛化能力，在相机姿态估计和渲染性能上均保持了对基线的优势。
@@ -374,25 +359,6 @@ Table 2报告了与现有语义SLAM方法的闭集语义分割对比。**SplaTAM
 
 ![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_E68dgQUzrC/figures/030_Table_19.jpg]]
 *Table 19: Quantitative Comparison on Rendering Performance (supp. §B.2.2) with baselines on TUM-RGBD [121] and ScanNet [122]*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_E68dgQUzrC/figures/007_Table_2.jpg]]
-*Table 2: Comparisons with semantic SLAM (§4.3)*
-
-![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_E68dgQUzrC/figures/013_Table_6.jpg]]
-*Table 6: Semantic Pool Design (§4.5)*
-
-![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_E68dgQUzrC/figures/014_Table_7.jpg]]
-*Table 7: Large-Scale Scenes Performance (§4.5)*
-
-![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_E68dgQUzrC/figures/012_Table_5.jpg]]
-*Table 5: Semantic Feature Dimension (§4.5)*
-
-![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_E68dgQUzrC/figures/019_Table_10.jpg]]
-*Table 10: Runtime (supp. B.4) on Replica Room 0*
-
-
 
 ## 定位与知识库关联
 
@@ -438,8 +404,6 @@ Table 2报告了与现有语义SLAM方法的闭集语义分割对比。**SplaTAM
 2. **表示紧凑化**：能否利用更紧凑的高斯表示进一步降低计算负载，使语义池规模更大，从而覆盖更大场景？
 3. **多智能体协作**：如何将系统扩展至多智能体协作SLAM，共享语义池或跨视角语义一致性？这是将开放集语义SLAM推向实际部署的重要方向。
 4. **实时性优化**：当前系统的追踪和建图速度仍有较大提升空间，如何在保持语义质量的前提下实现实时或近实时性能，是工程落地需要解决的关键问题。
-
-
 
 ## 原文 PDF
 

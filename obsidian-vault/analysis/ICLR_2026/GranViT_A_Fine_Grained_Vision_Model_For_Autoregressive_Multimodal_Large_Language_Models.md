@@ -80,8 +80,6 @@ GranViT定位于视觉编码器的预训练范式改进，属于“视觉表征�
 
 GranViT在极小目标、高密度文本区域和严重遮挡场景下感知能力下降，且依赖相对坐标系统可能限制定位精度。此外，由于预训练重点偏向细粒度特征，在需要复杂多步推理的基准上略低于专门优化推理的编码器。未来方向包括整合绝对坐标系统、设计多尺度预训练策略以增强极小目标感知，以及探索与SAILViT式持续预训练的结合潜力。
 
-
-
 ### 问题背景
 
 多模态大语言模型（MLLM）近年来在视觉问答、图像描述等任务上取得了显著进展，其核心架构通常由视觉编码器、投影器和LLM三部分串联而成。视觉编码器负责将图像转化为LLM可理解的语义特征，因此其表征质量直接决定了MLLM的感知上限。然而，当前主流的视觉编码器——无论是基于对比学习的**CLIP**（Radford et al., ICML 2021）、**SigLip**（Zhai et al., 2023）及其后续版本**SigLip2**（Tschannen et al., 2025），还是基于自回归的**AIMv2**（Fini et al., 2025）或混合范式的**InternViT**（Chen et al., CVPR 2024）——其预训练目标均以图像级别的全局语义对齐为核心。这种设计导致了一个关键瓶颈：**视觉编码器缺乏对图像局部区域的细粒度感知能力**。
@@ -107,8 +105,6 @@ Figure 1(b) 的注意力可视化直观地揭示了这一问题：当给定一�
 - **引入自蒸馏机制显式约束局部特征**：通过教师-学生自蒸馏架构，对裁剪区域的特征进行显式对齐，迫使视觉编码器在保持全局语义对齐能力的同时，具备精准的局部感知能力。
 
 这一设计思路的核心理念在于：**通过区域级自回归训练与自蒸馏的结合，在不牺牲全局对齐能力的前提下，使视觉编码器具备精准的局部感知能力；通过分阶段训练解耦视觉与语言的学习重点，高效地将细粒度视觉特征注入不同规模的LLM。**
-
-
 
 ## 核心方法与创新机理
 
@@ -147,11 +143,6 @@ GranViT的核心创新在于**重塑视觉编码器的特征学习重心**，使
 ---
 
 **三个创新的协同效应**：Gran-29M提供细粒度监督信号，两阶段训练解耦学习目标使信号有效传递，自蒸馏则补全了语言监督在局部特征层面的不足。这一组合使GranViT在细粒度任务平均得分达80.78，超越强基线**SAILViT** (Yin et al., 2025) 的77.95（+2.83）；OCR平均得分达55.97，超越SAILViT的53.33（+2.64）（**Table 1**）。
-
-
-
-![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_dQ6LWE0LnG/figures/004_Figure_3.jpg]]
-*Figure 3: The fine-grained pretraining and transferring paradigm of GranViT. For pretraining, the vision encoder and projector are tuned via the global and Bbox2Caption task for fine-grained feature extraction. The teacher vision encoder explicitly supervises the local region of features extracted by the student vision encoder. For vision feature adaptation and transfer, based on the fine-grained vision encoder, we apply LLM tuning to further strengthen the localization capability of the LLM regarding fine-grained visual features via the global and Caption2Bbox task*
 
 ![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_dQ6LWE0LnG/figures/002_Figure_1.jpg]]
 *Figure 1: (a) Compared to existing vision encoders, GranViT demonstrates outstanding performance across fine-grained natural image and OCR understanding. HBench denotes HallusionBench. (b) Attention visualization of existing vision encoders according to the query token. The small red rectangle indicates the query token. Best viewed with zoom in*
@@ -205,8 +196,6 @@ Figure 4a 清晰展示了阶段二的效应：Caption2Bbox 的 ACC@IOU0.5 从 13
 
 训练数据来自 Gran-29M 数据集，包含 2900 万张图像和 1.83 亿条区域级标注（Figure 2）。数据标注流程利用 ViTDet 生成边界框、Qwen2.5-VL-7B 生成区域描述，经严格过滤后转化为问答对格式。所有实验在 128 块 Ascend 910B NPU 上完成，使用 AdamW 优化器（学习率 1e-5，batch size 256，训练 1 epoch），确保对比公平性。
 
-
-
 GranViT的核心架构围绕**两阶段预训练-适应框架**与**自蒸馏机制**展开，通过解耦视觉特征学习与语言模型适应，将细粒度区域感知能力注入视觉编码器。
 
 ### 两阶段训练框架
@@ -244,8 +233,6 @@ $$\mathcal{L} = \mathcal{L}_{caption} + \lambda \mathcal{L}_{distill}$$
 - **自蒸馏系数**：Table 5消融实验显示，$\lambda=1$、$\alpha=0.9$ 时细粒度性能达到最优（75.55），证实显式局部约束对特征学习至关重要。
 - **Stage 2冻结策略**：Table 9表明，Stage 2冻结视觉编码器可节省约24% FLOPs，且细粒度性能几乎无损（77.24 frozen vs 77.17 tunable），验证了框架的解耦设计在计算效率上的优势。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与实验逻辑
@@ -256,12 +243,10 @@ $$\mathcal{L} = \mathcal{L}_{caption} + \lambda \mathcal{L}_{distill}$$
 
 **Table 1** 展示了低分辨率设置下GranViT与六种视觉编码器的综合对比。GranViT在细粒度任务上取得**80.78**的平均分，超越第二好的SAILViT（77.95）达**+2.83**个百分点；在OCR任务上取得**55.97**的平均分，领先SAILViT（53.33）**+2.64**个百分点。这一优势在RefCOCO testA上尤为突出——GranViT达到**91.79**，比SAILViT（89.65）高出**2.14**个百分点。值得注意的是，GranViT在VQA维度与SAILViT基本持平（53.57 vs 53.85，差距仅0.3），表明细粒度能力的提升并未以牺牲全局理解为代价。推理维度上，GranViT（49.58）略低于SigLip2（50.33），这与预训练重点偏向细粒度特征有关，可通过增加推理VQA数据补充。
 
-
 ![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_dQ6LWE0LnG/figures/006_Table_1.jpg]]
 *Table 1: Performance comparison with low resolution version. The bold font represents the best performance, and the underline represents the second performance*
 
 **Table 2** 验证了GranViT表示的迁移性。当迁移至Qwen2.5-7B时，GranViT取得**67.47**的平均分，超越AIMv2（64.69）达**+2.78**；在LLaMA3-8B上平均分达**69.02**，同样表现最优。这表明GranViT学习到的细粒度视觉表示具有跨LLM架构和规模的泛化能力。
-
 
 ![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_dQ6LWE0LnG/figures/007_Table_2.jpg]]
 *Table 2: Performance comparison for transferring vision encoders to Qwen2.5-3B, Qwen2.5-7B and LLaMA3-8B. The best results are highlighted in bold and the second best underlined. Ref, Ref+ and Refg denote the RefCOCO testA, RefCOCO+ testA and RefCOCOg test. MMB, HB, and SB stand for MMBench, HallusionBench, and SEEDBench, and. SQA, OB, DVQA, and IVQA for ScienceQA, OCRBench, DocVQA, and InfoVQA, respectively*
@@ -270,7 +255,6 @@ $$\mathcal{L} = \mathcal{L}_{caption} + \lambda \mathcal{L}_{distill}$$
 
 **Figure 4(a)** 提供了两阶段训练解耦有效性的直接证据。在Stage 1（视觉预训练，LLM冻结），Bbox2Caption的ROUGE-L迅速攀升至约**52%**，而Caption2Bbox的ACC@IOU0.5始终徘徊在**13%**左右——说明冻结的LLM无法有效利用视觉特征进行定位。进入Stage 2（LLM适应，视觉编码器冻结）后，Caption2Bbox的ACC@IOU0.5从13%跃升至**55%**，而Bbox2Caption仅微增约3%。这一鲜明对比证实了分阶段训练的核心洞察：**Stage 1负责将细粒度信息编码到视觉特征中，Stage 2负责教会LLM解码这些特征进行定位**。Figure 4(b)的预测边框可视化进一步验证了Stage 2训练Caption2Bbox的有效性。
 
-
 ![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_dQ6LWE0LnG/figures/005_Figure_4.jpg]]
 *Figure 4: (a) The performance curve of Stage1 and Stage2. We sample 8M Bbox2Caption and Caption2Bbox samples respectively for pretraining and adaptation and calculate ROUGE-L (Barbella & Tortora, 2022) and ACC@IOU0.5 for Bbox2Caption and Caption2Bbox respectively. In stage 1, the ACC@IOU0.5 of the Caption2Bbox task only achieves 13%, while the ROUGE-L of the Bbox2Caption task achieves 52%. Conversely, in stage 2, the training of LLM leads to a notable increase in ACC@IOU0.5 for Caption2Bbox, while Bbox2Caption achieves only a minimal improvement of 3%. (b) Visualization of predicted bbox coordinate of Caption2Bbox task in stage 1 and stage 2. Green bboxes indicate predicted regions, while red ones de...*
 
@@ -278,28 +262,19 @@ $$\mathcal{L} = \mathcal{L}_{caption} + \lambda \mathcal{L}_{distill}$$
 
 **Table 3** 的组件消融量化了各模块的增量贡献。以SigLip2为基线，Stage 1预训练使细粒度性能提升**+2.2**、OCR提升**+1.2**；Stage 2适应在此基础上再增加**+1.0**和**+0.7**。自蒸馏机制的引入进一步带来细粒度**+0.5**的增益。这表明三个组件（Stage 1预训练、Stage 2适应、自蒸馏）各自独立贡献，且叠加效果显著。
 
-
 ![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_dQ6LWE0LnG/figures/012_Table_3.jpg]]
 *Table 3: Ablation study on each component of the proposed GranViT*
 
 **Table 4** 检验了框架对不同初始化编码器的兼容性。当以SAILViT（已具备较强细粒度能力的基线）为初始化时，GranViT仍能将细粒度性能从74.14提升至**76.79**（+2.65），OCR从54.59提升至**56.61**（+2.02）。这证明GranViT框架可叠加于强基线之上，具有独立的增益来源。
-
 
 ![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_dQ6LWE0LnG/figures/013_Table_4.jpg]]
 *Table 4: Performance with different vision encoder initialization for GranViT during pretraining. Table 5: Ablation Study of the coefficient in self-distillation*
 
 **Table 5** 对自蒸馏系数进行了精细消融。在λ=1、α=0.9时细粒度性能达到最优的**75.55**，显著优于不使用自蒸馏的配置（73.82）。λ过小（0.1）或过大（10）均导致性能下降，表明局部约束需要适当的权重平衡——过弱则监督不足，过强则可能干扰全局表示学习。
 
-
-![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_dQ6LWE0LnG/figures/014_Table_5.jpg]]
-
 ### 计算效率与实用设计
 
 **Table 9** 显示，在Stage 2冻结视觉编码器可节省约**24%的FLOPs**，且细粒度性能几乎无损（77.24 frozen vs 77.17 tunable）。这一设计使得GranViT在迁移到不同LLM时只需训练投影器和LLM，大幅降低了适应成本。
-
-
-![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_dQ6LWE0LnG/figures/020_Table_9.jpg]]
-*Table 9: Performance comparison of whether the vision encoder is frozen in stage 2. Table 10: Performance comparison when the vision encoder is frozen during SFT training*
 
 ### 失败模式与边界条件
 
@@ -307,24 +282,9 @@ $$\mathcal{L} = \mathcal{L}_{caption} + \lambda \mathcal{L}_{distill}$$
 
 **Table 8** 的高分辨率（启用图像分块）实验显示，GranViT在细粒度（82.95）和OCR（61.46）上仍保持领先，但与SAILViT的差距有所缩小（细粒度仅领先0.52），说明高分辨率策略本身能部分缓解细粒度感知不足的问题，但GranViT的表示优势在低分辨率设置下更为突出。
 
-
-![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_dQ6LWE0LnG/figures/019_Table_8.jpg]]
-*Table 8: Performance comparison with image tiling. The bold font represents the best performance, and the underline represents the second performance*
-
 ### 小结
 
 实验证据链完整地支持了核心主张：GranViT通过大规模区域级自回归训练与自蒸馏机制，在不牺牲全局对齐的前提下显著增强了视觉编码器的细粒度感知能力。两阶段解耦训练是实现这一目标的关键设计——Stage 1编码细粒度信息，Stage 2解码定位能力。方法在极小目标、严重遮挡和相对坐标系统上存在固有局限，这些边界条件指向了未来的改进方向。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_dQ6LWE0LnG/figures/015_Table_6.jpg]]
-*Table 6: Detailed data sources of datasets used in Gran-29M*
-
-![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_dQ6LWE0LnG/figures/016_Table_7.jpg]]
-*Table 7: Data sources of natural and OCR images in Gran-29M. #images and #regions denote the number of images and annotated bounding boxes after filtering, respectively*
-
-
-
 
 ## 定位与知识库关联
 
@@ -371,8 +331,6 @@ GranViT以**SigLip2** (Tschannen et al., 2025) 为初始化基础，在其之上
 3. **密集场景鲁棒性**：针对密集和重叠场景，哪些高级数据增强或架构改进（如可变形注意力）能有效提升鲁棒性？
 4. **与任务特定预训练的融合**：将GranViT的通用细粒度表示与SAILViT式的任务特定持续预训练相结合，能否在专业化应用（如医学影像、遥感）中取得更大突破？
 5. **更大规模LLM的迁移特性**：当前验证止于8B级别LLM，在70B+模型上的迁移效果和缩放特性尚待探索。
-
-
 
 ## 原文 PDF
 

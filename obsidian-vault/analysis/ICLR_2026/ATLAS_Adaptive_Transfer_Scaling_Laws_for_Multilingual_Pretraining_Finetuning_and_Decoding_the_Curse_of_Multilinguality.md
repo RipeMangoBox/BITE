@@ -46,13 +46,9 @@ claims:
 
 本文提出了**自适应迁移缩放定律（ADAPTIVE TRANSFER SCALING LAW, ATLAS）**，旨在解决多语言预训练、微调及“多语言诅咒”（curse of multilinguality）中的缩放问题。ATLAS通过显式建模跨语言迁移效应和数据重复带来的收益递减，显著提升了缩放定律对未见模型规模、数据量和语言混合的泛化能力。实验基于774次多语言训练实验，覆盖10M-8B模型参数、400+训练语言和48种评估语言，并构建了38×38语言对的跨语言迁移矩阵。ATLAS在多语言设置下整体R²达到0.98，对未见语言混合的泛化R²(M)达到0.82，远超现有基线。
 
-
-
 现有缩放定律（如Chinchilla Scaling Law, CSL；Data-Constrained Scaling Law, DCSL；Multilingual Scaling Law, MSL）存在两个关键缺陷：**无法处理多轮数据重复**和**无法建模目标语言语系之外的跨语言迁移效应**。这导致它们对未见模型规模、数据量和语言混合的泛化能力极差。例如，在多语言设置下，CSL对最大模型规模的泛化R²(N)为-0.99，MSL为-0.65，均无法有效预测更大模型的行为。
 
 此外，多语言训练存在“计算效率税”（compute efficiency tax）：使用多语言词汇表或多语言训练集时，每种语言的最优缩放轨迹会向上偏移，尤其对英语影响显著（Figure 1）。同时，随着训练语言数量的增加，目标语言的损失会相对退化，这种退化对更大模型更不敏感（Figure 4）。
-
-
 
 ## 核心方法与创新机理
 
@@ -61,8 +57,6 @@ ATLAS的核心创新在于将**有效数据暴露项（effective data exposure�
 1. **数据重复建模**：引入共享重复参数λ的饱和函数S_λ(D; U)，单阶段拟合，对低资源语言更鲁棒，避免了DCSL需要两阶段拟合且要求充足数据的限制。
 2. **跨语言迁移显式建模**：将有效数据分解为三项：目标语言数据D_t、迁移语言数据（最多3种最常共采样语言）和其他语言数据D_other，每项均经饱和函数处理并赋予可学习权重。
 3. **迁移权重初始化**：迁移权重τ_i从双语迁移分数（BTS）初始化，BTS通过双语共训练实验直接测量语言对之间的正迁移或干扰。
-
-
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__language_speech_and_dialog__b001_0BkvUY61MX_ATLAS_Adaptiv/figures/001_Figure_1.jpg]]
 *Figure 1: Optimal Scaling Trajectories for English, French, Russian, Chinese, Hindi, and Swahili. The law for [monolingual vocabulary, monolingual training]=(—), the law for [multilingual vocabulary, monolingual training]=(- - -), and the law for [multilingual vocabulary, unimax training]=(···). We find (1) per-language optimal scaling trajectories are similar, (2) there is a compute efficiency tax for training with multilingual vocabularies or training sets (especially for English), and (3) as Hindi and Swahili observe data repetition their curves slope upward from diminishing returns.*
@@ -73,8 +67,6 @@ ATLAS的整体框架包含四个核心模块：
 2. **跨语言迁移矩阵构建**：通过双语迁移分数（BTS）和微调适应分数（FAS）测量38×38语言对的迁移/干扰。
 3. **多语言诅咒缩放定律**：建模损失与语言数量K、模型规模N、每语言数据量D的关系：L(N,D,K) = L_inf + A K^φ / N^α + B K^ψ / D^β。
 4. **预训练 vs 微调决策公式**：估计从零预训练超越微调Unimax检查点所需的计算预算C与模型规模N的关系：C = 10^28 × N^1.65。
-
-
 
 ### 5.1 ATLAS核心缩放定律
 
@@ -134,8 +126,6 @@ $$C = 10^{28} \times N^{1.65}$$
 
 交叉点位于144B至283B token之间：若预算<144B token，微调多语言检查点更有效；若预算≥283B token，从零预训练更优。
 
-
-
 ## 实验与关键发现
 
 ### 6.1 主要结果
@@ -194,8 +184,6 @@ Figure 6和Figure 7展示了八种语言从零预训练与微调Unimax检查点�
 - Unimax采样率高度不均：英语占5%，多数语言仅1.42%，最低的ta_Latn仅2.29e-06%，这可能使低资源语言的迁移分数估计偏差较大。
 - 双语迁移分数（BTS）基于2B参数模型和42B token参考水平，对于更小或更大的模型，迁移动态可能不同（如Figure C.1所示）。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__language_speech_and_dialog__b001_0BkvUY61MX_ATLAS_Adaptiv/figures/011_Table_2.jpg]]
 *Table 2: Table B.1: An overview of experiment configurations in this work. We enumerate the experiment types: <Lang> for monolingual scaling, Unimax as a massively multilingual baseline, Language Pairs to measure language-to-language transfer, Capacity to measure the curse of multilinguality, or model capacity constraints on learning new languages, and Finetunes to understand how finetuning from a massively multilingual model compares to pretraining from scratch. We use a mix of Monolingual and Multilingual vocabularies, and training data. In the LANGUAGES and SCALES columns we use parentheses to show the number of language mixtures and number of scales run. Symbols such as ${ \mathcal { L } } _ { \m...$
 
@@ -207,8 +195,6 @@ Figure 6和Figure 7展示了八种语言从零预训练与微调Unimax检查点�
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__language_speech_and_dialog__b001_0BkvUY61MX_ATLAS_Adaptiv/figures/014_Table_5.jpg]]
 *Table 5: Table B.4: The Unimax language sampling rates adapted from Chung et al. (2023). Languages are listed in order of their percentage sampling rate, which sum to 100.*
-
-
 
 ## 定位与知识库关联
 
@@ -225,8 +211,6 @@ ATLAS的独特贡献在于：
 2. 构建了最大的经验性跨语言迁移矩阵（38×38语言对）。
 3. 推导了多语言诅咒的量化缩放定律，为实践者提供了扩展语言覆盖范围时的最优缩放策略。
 4. 提供了预训练 vs 微调的通用决策公式。
-
-
 
 ## 原文 PDF
 

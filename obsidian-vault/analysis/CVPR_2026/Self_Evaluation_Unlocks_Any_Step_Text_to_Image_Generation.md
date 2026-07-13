@@ -53,8 +53,6 @@ claims:
 
 **方法定位**：Self-E 属于从零训练的任意步数生成范式，区别于依赖蒸馏的 LCM 系列和仅做局部匹配的标准流匹配方法。其通过自评估机制实现“模型即教师”，为扩散/流匹配模型的训练提供了一种新的全局监督视角。
 
-
-
 ### 扩散与流匹配模型的核心瓶颈
 
 当前主流的文本到图像生成模型，包括扩散模型（如 **SDXL**、**SANA-1.5**）和流匹配模型（如 **FLUX.1-dev**），均依赖于沿扩散轨迹的逐步去噪过程。这些模型在训练时仅接受局部速度或分数监督——即模型学习预测当前噪声状态到干净数据的瞬时变化方向。这种局部监督机制虽然保证了训练稳定性，却导致一个根本性缺陷：**模型缺乏对生成结果全局分布质量的感知能力**。
@@ -74,8 +72,6 @@ claims:
 本文的核心洞察在于：**模型自身的当前分数估计本身就携带了关于生成样本质量的全局信息，无需外部教师即可构建有效的分布匹配信号**。具体而言，在分类器自由引导（CFG）框架下，模型对自身生成样本的条件得分与无条件得分之差，天然地指示了该样本在条件分布中的相对密度——这正是分类器得分的本质。
 
 基于这一洞察，Self-E提出了一种自评估机制：在训练过程中，模型不仅从真实数据中学习局部轨迹，还利用其当前参数对自身生成的样本进行评分，并将该评分转化为伪目标信号进行回归。这形成了一个**内部反馈闭环**，使模型能够在训练中持续感知并修正其生成分布与真实分布之间的全局偏差，从而在任意推理步数下保持生成质量。该机制无需预训练教师模型，实现了局部轨迹学习与全局分布匹配的统一。
-
-
 
 ## 核心方法与创新机理
 
@@ -120,8 +116,6 @@ $$\mathbf{x}_{\mathrm{renorm}} = \frac{\mathbf{x}_0 + \lambda_{s,t} \mathbf{x}_{
 Self-E 与现有少步生成方法的根本差异在于**去除了对预训练教师模型的依赖**。LCM 等蒸馏方法需要先训练一个多步教师模型，再将其知识蒸馏到少步学生模型中，这种两阶段范式限制了训练效率和可扩展性。IMM（矩匹配）方法虽支持从零训练，但仅通过分布矩进行约束，缺乏对生成分布精细结构的建模能力。TiM 作为同期任意步数方法，同样未引入自评估机制。
 
 Self-E 通过**动态自教师信号**实现了局部轨迹学习与全局分布匹配的统一：模型既是学生（从数据学习局部速度），也是自身的教师（通过自评估提供全局分布监督）。这种设计使得模型在训练全过程中始终优于标准 Flow Matching 和 IMM（Figure 5），且在任意推理步数下均保持高质量生成。
-
-
 
 Self-E 的整体设计遵循一个核心原则：**让模型在从数据中学习局部轨迹的同时，利用自身当前能力对生成样本进行自评估，从而获得全局分布匹配的监督信号**。该框架无需预训练教师模型，即可实现从零开始的任意步数文本到图像生成训练。
 
@@ -169,8 +163,6 @@ $$\mathbf{x}_{t_{k+1}} = \mathbf{x}_{t_k} - (t_k - t_{k+1}) V_\theta(\mathbf{x}_
 | 推理调度 | $\mathbf{x}_{t_k}, t_k, s_k, \mathbf{c}$ | $\mathbf{x}_{t_{k+1}}$ | 无（推理阶段） |
 
 整个框架的核心创新在于**将局部轨迹学习与全局分布匹配统一在单一模型的训练过程中**，通过自评估机制动态构造教师信号，避免了传统蒸馏方法对预训练教师模型的依赖，实现了从零训练的任意步数高质量生成。
-
-
 
 Self-E的核心架构由两个互补的训练模块构成：**数据学习模块**提供局部轨迹监督，**自评估模块**提供全局分布匹配信号。两个模块共享同一个速度场网络 $V_\theta(\mathbf{x}_t, t, s, \mathbf{c})$，该网络在标准流匹配输入（当前样本 $\mathbf{x}_t$、时间 $t$、条件 $\mathbf{c}$）的基础上，额外接受一个辅助时间 $s$，使其能够同时处理来自真实数据和模型自生成样本的监督。
 
@@ -230,8 +222,6 @@ $$\mathbf{x}_{t_{k+1}} = \mathbf{x}_{t_k} - (t_k - t_{k+1}) V_\theta(\mathbf{x}_
 
 其中 $V_\theta$ 为速度场预测，辅助时间 $s_k$ 可在区间 $[t_{k+1}, t_k]$ 内调节以优化生成效果。这一灵活的推理调度使同一模型能够在2步到50步的广泛范围内保持高质量生成，实现少步效率与多步精度的统一。
 
-
-
 ## 实验与关键发现
 
 ### 核心定量结果：GenEval 基准上的任意步数性能
@@ -258,9 +248,6 @@ Self-E 在 GenEval 基准上实现了任意推理步数下的全面领先，且�
 ### 消融研究：自评估机制各组件的作用
 
 Table 2 和 Figure 4–6 系统验证了 Self-E 各设计选择的贡献：
-
-![[assets/figures/papers/paper_list_l2213_https_arxiv_org_abs_2512_22374/figures/006_Figure_4.jpg]]
-*Figure 4: Controlled Ablation Study. We compare our method to alternative pretraining methods - Flow Matching and IMM. Full prompts appear in supplementary. Our method produces favorable results across all step budgets*
 
 ![[assets/figures/papers/paper_list_l2213_https_arxiv_org_abs_2512_22374/figures/008_Table_2.jpg]]
 *Table 2: Controlled Ablation Study. We report overall scores on GenEval [16]. The upper block compares our method with two alternative design choices of omitting the target normalization or incorporating the auxiliary term throughout all training steps. Reported after 100K iterations. The bottom block compares our method with alternative pretraining methods - Flow Matching and IMM. Reported after 300K iterations*
@@ -299,12 +286,8 @@ Figure 3 提供了 Self-E 与 FLUX、SDXL、SANA、LCM、TiM 等方法在不同�
 3. **CFG 依赖**：当前方法依赖条件引导（CFG）推导分类器得分，难以直接扩展到无条件生成场景。
 4. **下游任务未验证**：尚未在视频生成等任务中检验方法的迁移有效性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2213_https_arxiv_org_abs_2512_22374/figures/001_Figure_1.jpg]]
 *Figure 1: Qualitative Any-Step Generation. We showcase diverse text-to-image results from our model at different inference step counts, demonstrating coherent semantics, strong text alignment. Text prompts are provided in the supplementary material*
-
-
 
 ## 定位与知识库关联
 
@@ -369,8 +352,6 @@ Self-E 的自评估机制依赖于 CFG 来构造分类器得分项（Eq. 13 中�
 4. **无条件生成的适配**：如何将自评估机制适配到无条件生成设置？可能需要寻找 CFG 之外的替代方案来构造全局分布匹配信号。
 
 5. **辅助项的引入策略**：辅助项在后期训练中引入可缓解伪影，但从头引入会损害性能。是否存在更优的引入策略（如渐进式激活、自适应权重）来平衡伪影抑制与训练稳定性？
-
-
 
 ## 原文 PDF
 

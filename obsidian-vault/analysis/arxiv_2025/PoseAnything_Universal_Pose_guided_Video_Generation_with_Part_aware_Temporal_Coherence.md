@@ -54,8 +54,6 @@ claims:
 
 PoseAnything 的方法定位处于图像到视频扩散模型与结构化运动引导的交汇点，以 Wan2.2‑TI2V‑5B 为骨干，通过部件感知时序建模与解耦运动注入，首次将通用姿态引导视频生成推向实用化。
 
-
-
 ### 问题背景
 
 姿态引导视频生成旨在根据给定的姿态序列驱动主体运动，生成与之相符的视频内容。该技术在虚拟主播、游戏角色动画、电影特效等领域具有广泛应用。现有方法已在人体姿态引导的视频生成上取得显著进展，代表性工作包括 **Disco**、**MagicAnimate**、**AnimateAnyone**、**Champ**、**Unianimate** 以及 **Animate-X** 等。这些方法通常以人体骨骼关键点作为条件信号，驱动参考图像中的人物执行目标动作。
@@ -77,8 +75,6 @@ PoseAnything 的方法定位处于图像到视频扩散模型与结构化运动�
 1. **实现任意骨架拓扑的通用姿态引导**：通过构建覆盖多类别非人体主体的 XPose 数据集，并设计通道维条件注入策略，使单一模型能够处理人体与非人体主体的任意骨架输入。
 2. **引入部件级时序一致性控制**：设计 Part-aware Temporal Coherence Module (PTCM)，将主体分解为独立部件，利用注意力权重建立跨帧部件对应关系，并通过部件级交叉注意力实现细粒度的外观一致性约束。
 3. **解耦主体与相机运动**：提出 Subject and Camera Motion Decoupled CFG，首次在姿态引导视频生成中实现相机运动的独立控制——将主体姿态注入 CFG 的正锚点、相机运动注入负锚点，消除两类运动信号的相互干扰。
-
-
 
 ## 核心方法与创新机理
 
@@ -117,8 +113,6 @@ $$\tilde{\epsilon} = \hat{\epsilon}_\theta(\emptyset_s, z_c) + s \cdot (\hat{\ep
 
 **证据强度评估**：上述三项创新的消融实验均在受控条件下完成（相同训练配置、batch size、学习率和 GPU 数量），置信度较高。但需注意，PTCM 的部件匹配依赖注意力权重，在骨架极端复杂或初始步数不足时可能出现匹配错误，该失败模式尚未被量化分析；Decoupled CFG 的相机运动类型覆盖面和自动化程度也未详细讨论，需要进一步验证。
 
-
-
 PoseAnything 以一张参考图像 $I_r$ 和一段任意主体的骨架序列 $P$ 为输入，生成符合指定运动轨迹的视频片段（Figure 4）。整体 pipeline 基于预训练的图像到视频扩散模型 **Wan2.2-TI2V-5B** 构建，围绕三个核心设计展开：**通道维条件注入**、**部件感知时序一致性模块（PTCM）** 和 **主体与相机运动解耦 CFG**。
 
 ### 输入编码与条件注入
@@ -152,8 +146,6 @@ $$\tilde{\epsilon} = \hat{\epsilon}_\theta(\emptyset_s, z_c) + s \cdot (\hat{\ep
 ### 整体数据流
 
 完整的生成流程为：参考图像与骨架序列分别编码后经通道拼接注入 DiTBlock → PTCM 在部件级别精炼跨帧一致性 → 解耦 CFG 在推理阶段独立调节主体与相机运动强度 → 解码器输出最终视频帧。该框架同时支持人体与非人体主体，是首个通用姿态引导视频生成模型（Figure 1）。
-
-
 
 PoseAnything 以预训练 **Wan2.2-TI2V-5B** 作为图像到视频扩散主干，在其 DiT Block 中嵌入三个关键模块：通道维条件注入、部件感知时序一致性模块（PTCM）、以及基于 CFG 的主体与相机运动解耦控制。以下逐一展开核心公式与机理。
 
@@ -206,9 +198,6 @@ $$\tilde{\epsilon} = \hat{\epsilon}_\theta(\emptyset_s, z_c) + s \cdot \big(\hat
 
 该公式的直觉是：正锚点 $\hat{\epsilon}_\theta(z_s, \emptyset_c)$ 编码“主体运动 + 无相机运动”的噪声估计，负锚点 $\hat{\epsilon}_\theta(\emptyset_s, z_c)$ 编码“无主体运动 + 相机运动”的噪声估计，二者之差提取出纯净的主体运动信号，叠加到相机运动基线上，实现互不干扰的独立控制（Figure 5）。
 
-![[assets/figures/papers/PoseAnything_Universal_Pose-guided_Video_Generation_with_Part-aware_Temporal_Coh_78f56b8ab3f0/figures/005_Figure_5.jpg]]
-*Figure 5: Subject and Camera Decoupled Control Based on CFG*
-
 ### 4.4 引导光流分解（附录补充）
 
 在光流引导的实现层面，最终引导光流被分解为主体运动分量与反向的背景（相机）运动分量：
@@ -217,19 +206,9 @@ $$\mathbf{F}_t = s_s V_s - s_c V_{bg}$$
 
 其中 $V_s$ 为主体光流，$V_{bg}$ 为背景光流，$s_s, s_c$ 分别为对应的控制强度。该分解使得相机运动控制可独立调节而不影响主体动作的保真度（Figure 8 展示了典型相机控制案例）。
 
-![[assets/figures/papers/PoseAnything_Universal_Pose-guided_Video_Generation_with_Part-aware_Temporal_Coh_78f56b8ab3f0/figures/009_Figure_8.jpg]]
-*Figure 8: Demonstration of Camera Control Cases*
-
 ---
 
 **模块间因果链路总结：** 通道维注入提供高效的条件融合基础 → PTCM 在 DiT 特征空间内以部件为单位精炼帧间一致性 → 解耦 CFG 在噪声预测层面将主体与相机运动分离，三者协同实现通用姿态引导视频生成中外观保真度与运动可控性的统一。
-
-### 补充图表
-
-![[assets/figures/papers/PoseAnything_Universal_Pose-guided_Video_Generation_with_Part-aware_Temporal_Coh_78f56b8ab3f0/figures/001_Figure_1.jpg]]
-*Figure 1: PoseAnything: The first universal pose-guided video generation model. It accepts a first frame and an arbitrary subject skeletal sequence as input to generate video clips conforming to the specified motion*
-
-
 
 ## 实验与关键发现
 
@@ -271,14 +250,6 @@ Figure 8 展示了 Subject and Camera Motion Decoupled CFG 的实际效果。通
 
 以上局限为后续研究提供了明确方向：部件匹配机制的鲁棒性增强、相机运动控制的路径规划自动化、以及向多主体场景的扩展。
 
-### 补充图表
-
-![[assets/figures/papers/PoseAnything_Universal_Pose-guided_Video_Generation_with_Part-aware_Temporal_Coh_78f56b8ab3f0/figures/020_Figure_14.jpg]]
-*Figure 14: Simple Subset of XPose*
-
-![[assets/figures/papers/PoseAnything_Universal_Pose-guided_Video_Generation_with_Part-aware_Temporal_Coh_78f56b8ab3f0/figures/003_Figure_3.jpg]]
-*Figure 3: Comprehensive statistics of XPose in several aspects. The left shows the distribution of poses with different numbers of segments in XPose, as well as the corresponding subject categories for each segment count. The right illustrates the dataset distribution across three dimensions: motion type, motion body part, and subject category. As shown in the figures, our dataset exhibits good diversity*
-
 ![[assets/figures/papers/PoseAnything_Universal_Pose-guided_Video_Generation_with_Part-aware_Temporal_Coh_78f56b8ab3f0/figures/007_Table_1.jpg]]
 *Table 1: Quantitative comparisons with the state-of-the-arts on TikTok dataset (Human)*
 
@@ -293,11 +264,6 @@ Figure 8 展示了 Subject and Camera Motion Decoupled CFG 的实际效果。通
 
 ![[assets/figures/papers/PoseAnything_Universal_Pose-guided_Video_Generation_with_Part-aware_Temporal_Coh_78f56b8ab3f0/figures/016_Table_5.jpg]]
 *Table 5: Quantitative Result of Sparse Pose Condition Injectionattn_weights挑选层数/timesteps数, attn_weights可视化*
-
-![[assets/figures/papers/PoseAnything_Universal_Pose-guided_Video_Generation_with_Part-aware_Temporal_Coh_78f56b8ab3f0/figures/008_Figure_7.jpg]]
-*Figure 7: Qualitative comparison with existing state-of-the-art methods on XPose-benchmark*
-
-
 
 ## 定位与知识库关联
 
@@ -348,8 +314,6 @@ PoseAnything 的适用边界由其三个核心模块的能力范围共同决定�
 4. **相机路径规划自动化**：当前 Decoupled CFG 需要人工指定相机运动信号，如何实现端到端的相机路径规划（如根据场景内容自动生成合理的相机运动）是提升实用性的关键方向。
 
 5. **稀疏注入的理论解释**：稀疏姿态注入实验（Table 5）表明，仅注入 10% 帧的姿态条件即可维持 PSNR 30.21 的生成质量，甚至在 2.5% 注入率下仍保持竞争力。这种强时序插值能力的理论机制（是预训练模型的先验知识还是 PTCM 的部件匹配在起作用）尚未被深入分析。
-
-
 
 ## 原文 PDF
 

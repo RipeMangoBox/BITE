@@ -80,8 +80,6 @@ QuaMo属于**在线运动学方法**，与以下工作形成直接对比：
 
 QuaMo依赖现成3D姿态估计器（**TRACE**, Sun et al., CVPR 2023; **HMR2.0**, Goel et al., ICCV 2023）提供参考姿态，其性能受限于估计器本身的噪声水平。当前方法未包含环境接触和物理约束，运动合理性评估局限于运动学指标，这为未来融入物理仿真提供了明确的扩展方向。
 
-
-
 ### 视觉三维人体运动捕捉的任务定位
 
 从单目视频中恢复平滑、准确的三维人体运动是计算机视觉的核心挑战之一。现有主流方法可分为两类：基于模板的逐帧回归方法（如**HMR2.0** (Goel et al., ICCV 2023)、**TRACE** (Sun et al., CVPR 2023)）直接预测SMPL模型参数，速度快但缺乏时序建模，输出运动常伴随高频抖动；基于运动学/物理的时序方法则通过状态空间模型显式建模帧间依赖，追求运动平滑性与物理合理性。
@@ -104,8 +102,6 @@ QuaMo依赖现成3D姿态估计器（**TRACE**, Sun et al., CVPR 2023; **HMR2.0*
 ### 动机：从表示和控制两个维度突破
 
 QuaMo的动机源于一个核心洞察：**将关节旋转表示从欧拉角切换为单位四元数，并在$S^3$球面约束下精确求解四元数微分方程（QDE），可从根本上消除旋转表示的不连续性**；同时，**在meta-PD控制器中引入基于参考姿态二阶差分的加速度增强项，使控制信号能自适应匹配运动变化速率**——快速运动时增强驱动力以加速收敛，接近目标时降低信号以减少过冲。这两个维度的改进共同指向一个目标：在仅依赖单帧未来参考的严格在线约束下，实现高精度、低抖动的三维人体运动学捕捉。
-
-
 
 ## 核心方法与创新机理
 
@@ -139,8 +135,6 @@ $$\dot{\omega}_t = \underbrace{\kappa_P \big(\mathrm{vec}(\hat{q}_t \otimes q_t^
 
 三项创新构成递进关系：四元数表示是基础，消除了旋转空间的结构性缺陷；S³精确积分是保障，确保姿态更新在数学上严格成立；加速度增强项是优化，在正确表示和精确积分的基础上进一步提升控制精度。三者共同作用，使QuaMo在Human3.6M上以MPJPE 46.7 mm（HMR2.0为参考）达到运动学方法的最优水平，并在Fit3D、SportsPose、AIST三个跨域数据集上全面超越可比较的在线和离线方法。
 
-
-
 QuaMo 将人体运动建模为离散时间状态空间系统，其核心状态由两个分量构成：以单位四元数表示的关节相对旋转姿态 $q_t \in \mathbb{H}$，以及对应的角速度 $\omega_t \in \mathbb{R}^3$。系统通过两个并行的可微分支进行时序推进——角速度 ODE 分支和四元数姿态 QDE 分支——在每一时间步上实现端到端的在线推理。
 
 **输入与输出流。** 系统在每个时间步接收三类输入：(1) 当前时刻的四元数姿态 $q_t$ 和角速度 $\omega_t$；(2) 外部 3D 姿态估计器（TRACE 或 HMR2.0）提供的单帧未来参考姿态 $\hat{q}_t$；(3) 最近三帧的参考姿态历史 $\hat{q}_{t-2\Delta t:t}$，用于计算加速度增强信号。系统输出下一时刻的姿态 $q_{t+\Delta t}$、角速度 $\omega_{t+\Delta t}$，以及经 SMPL 蒙皮模型线性变换后的人体网格 $m_{t+\Delta t}$ 和关键点 $p_{t+\Delta t}$，同时独立计算根节点的全局平移 $r_{t+\Delta t}$。
@@ -157,12 +151,8 @@ QuaMo 将人体运动建模为离散时间状态空间系统，其核心状态�
 
 **关键设计决策。** 两条分支的分工明确：角速度 ODE 负责根据控制信号产生驱动力，四元数 QDE 负责在 $S^3$ 流形上保持姿态表示的几何一致性。这种设计使旋转表示的连续性得到严格保证——图 4 的定性消融显示，当根关节旋转出现不连续时，欧拉角和轴角表示均产生补偿性异常旋转，而四元数表示避免了这一问题。SMPL 蒙皮模块作为可微的线性变换层，将抽象的姿态状态映射为可视化的网格和关键点，使整个 pipeline 支持端到端训练。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1644_QuaMo_Quaternion_Motions_for_Vision_based_3D_Human_Kinematics_Capture/figures/002_Figure_2.jpg]]
 *Figure 2: QuaMo consists of two differentiable equations: ODE for angular velocity ω and QDE for quaternion pose*
-
-
 
 QuaMo 的核心是一个**离散时间状态空间模型**，由两条可微分支构成：角速度的常微分方程（ODE）分支和四元数姿态的四元数微分方程（QDE）分支。给定 $N$ 个人体关节，姿态张量 $\mathbf{Q} \in \mathbb{R}^{N \times 4}$ 由 $N$ 个单位四元数 $\mathbf{q} \in \mathbb{H}$ 组成，对应的角速度张量为 $\boldsymbol{\omega} \in \mathbb{R}^{N \times 3}$。
 
@@ -243,13 +233,6 @@ $$
 
 其中 $\mathcal{L}_{\mathrm{local}}$ 约束逐帧关键点与根节点平移的 L1 距离，$\mathcal{L}_{\mathrm{global}}$ 通过二阶有限差分约束预测轨迹的加速度与真值一致，$\mathcal{L}_{\mathrm{beta}}$ 对 SMPL 体型参数施加 L2 正则化。消融实验确定最优权重 $\lambda = 0.01$，在局部 MPJPE（51.2 mm）和全局 G-MPJPE（116.2 mm）间取得最佳折衷。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1644_QuaMo_Quaternion_Motions_for_Vision_based_3D_Human_Kinematics_Capture/figures/007_Figure_4.jpg]]
-*Figure 4: An example of motion reconstruction when a discontinuity occurs in the root joint rotation for different rotation representations. Blue means low and orange high MPJPE. The transparency corresponds to the time steps in the sequence. The model attempts to compensate for the discontinuity by rotating along the different rotation axes for all representations, except our quaternions*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -297,15 +280,11 @@ Table 3的消融实验以纯PD控制器为基线，逐步验证各模块贡献�
 
 所有在线运动学方法均限制为仅使用单个未来时间步的参考姿态，确保在线设置的公平比较。QuaMo_TRACE与OSDCap使用相同输入TRACE进行对比（Table 2）。所有方法在相同数据集上以相同指标评估，QuaMo结果报告了多次运行的标准差。SMPL模板化方法与非模板化方法（如从2D关键点提升的方法）不可直接比较，论文已明确区分两类方法。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1644_QuaMo_Quaternion_Motions_for_Vision_based_3D_Human_Kinematics_Capture/figures/006_Table_3.jpg]]
 *Table 3: Ablation studies. The baseline uses only a PD controller (PD only), taking TRACE as targets. The*
 
 ![[assets/figures/papers/paper_list_l1644_QuaMo_Quaternion_Motions_for_Vision_based_3D_Human_Kinematics_Capture/figures/008_Table_4.jpg]]
 *Table 4: Ablation study on the shape loss scaling λ. We choose λ = 0.01 as our final selection due to the good performance trade-off between the local MPJPE and the global G-MPJPE*
-
-
 
 ## 定位与知识库关联
 
@@ -364,8 +343,6 @@ QuaMo 作为在线方法，仅依赖单帧未来参考姿态，而离线方法�
 4. **极端运动鲁棒性**：方法在快速旋转、杂技、摔跤等超出训练分布的动作下的鲁棒性和泛化能力如何？是否需要额外的数据增强或域适应策略？
 
 5. **ControlNet 架构的透明性**：ControlNet 的具体网络架构（层数、注意力机制、时序编码方式）和训练超参数未被详细描述，其潜在嵌入如何有效融合当前状态 q_t、ω_t 与参考姿态 q̂_t 的信息？这一设计空间是否对性能有显著影响？
-
-
 
 ## 原文 PDF
 

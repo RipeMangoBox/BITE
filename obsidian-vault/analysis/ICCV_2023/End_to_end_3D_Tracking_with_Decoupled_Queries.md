@@ -80,8 +80,6 @@ DQTrack 在3D多目标跟踪知识体系中贡献了以下增量：
 
 这些设计共同构成了一个紧凑、可微且高性能的端到端3D跟踪框架。
 
-
-
 ### 3D多目标跟踪的范式瓶颈
 
 基于视觉的3D多目标跟踪旨在从连续的多视角图像序列中持续定位和识别场景中的物体，是自动驾驶感知系统的核心组件。现有方法可归纳为两种主流范式：**tracking-by-detection** 和 **tracking-with-query**，二者各自存在根本性缺陷。
@@ -99,8 +97,6 @@ Figure 1 清晰地对比了三种范式的差异。Tracking-by-detection（1a）
 ### 现有方法的量化缺口
 
 在nuScenes数据集上，先前方法的性能差距显著。Tracking-by-detection方法受限于启发式匹配的次优性，而单查询方法受困于表示冲突。DQTrack通过解耦查询，在nuScenes验证集上相较单查询方法**SinQuery**（即MUTR3D的跟踪部分）获得**4.0% AMOTA**的绝对提升（Table 3），并在测试集上达到**52.3% AMOTA**，超越所有先前基于学习的方法，比**PF-Track**高出**8.9% AMOTA**（Table 2）。这些量化结果直接验证了表示冲突是限制先前方法性能的关键瓶颈，而解耦查询是针对该瓶颈的有效因果干预。
-
-
 
 ## 核心方法与创新机理
 
@@ -135,8 +131,6 @@ DQTrack 引入基于指数移动平均（EMA）的时间更新策略，从外观
 ### 创新总结
 
 DQTrack 的三个 changed slots 构成了一条紧凑的因果链：**查询解耦**消除了任务冲突，为后续模块提供了干净的表示基础；**可学习关联**利用解耦后的专门嵌入实现高精度、可微的轨迹匹配；**EMA 时间更新**则维持了跨帧表示的一致性。三者协同使 DQTrack 在 nuScenes 测试集上达到 **52.3% AMOTA**，超越所有先前学习型跟踪器（Table 2），相比 PF-Track 提升 **8.9% AMOTA**。
-
-
 
 DQTrack 的端到端流水线遵循“编码-解码-关联-更新”四阶段结构，其核心设计在于将传统单查询跟踪范式中的共享查询显式解耦为**对象查询（object query）**与**轨迹查询（track query）**，从而消除检测与跟踪任务间的表示冲突。Figure 2 给出了完整的框架概览。
 
@@ -183,13 +177,6 @@ $$\mathbf{E}_{\mathrm{U}}^{t} = \beta \times \mathbf{E}_{\mathrm{U}}^{t-1} + (1 
 $$\mathcal{L} = \sum_{t}^{D} (\lambda_{\mathrm{Det}} \mathcal{L}_{\mathrm{Det}}^{t} + \lambda_{\mathrm{Track}} \mathcal{L}_{\mathrm{Track}}^{t} + \lambda_{\mathrm{Reg}} \mathcal{L}_{\mathrm{Reg}}^{t})$$
 
 这种端到端的训练方式使得检测器、关联模块和时间更新模块能够协同优化，避免了传统 tracking-by-detection 方法中检测与关联分离带来的次优性问题。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l18_https_openaccess_thecvf_com_content_ICCV2023_papers_Li_End_to_end_3D_Tra/figures/001_Figure_1.jpg]]
-*Figure 1: Compared with others, the proposed decoupledquery approach in 1c avoids the representation conflict in single query of the tracking-with-query method 1b and heuristic processing in tracking-by-detection manner 1a*
-
-
 
 DQTrack 的端到端可微跟踪流水线由三个核心模块构成：**可学习关联**、**时间更新** 和 **整体优化目标**。以下逐一展开其关键公式与变量含义。
 
@@ -250,8 +237,6 @@ $$\mathcal{L} = \sum_{t}^{D} (\lambda_{\mathrm{Det}} \mathcal{L}_{\mathrm{Det}}^
 - $\mathcal{L}_{\mathrm{Reg}}^{t}$：最大熵正则化，防止关联矩阵过于尖锐，提升泛化性
 
 **消融证据**：Table 8 显示，轨迹查询增强带来 **0.4% AMOTA** 提升，熵正则化进一步贡献 **0.6% AMOTA**；Table 10 显示使用 3 帧训练（$D=3$）获得最佳 **28.5% AMOTA**，显著优于 2 帧或 4 帧。
-
-
 
 ## 实验与关键发现
 
@@ -319,26 +304,8 @@ Table 3的范式对比消融直接验证了论文的核心主张。在nuScenes�
 
 4. **运动模型的简化假设**：轨迹位置更新基于匀速运动假设（$\mathbf{Q}_{\mathrm{UM}}^{t} = \mathbf{Q}_{\mathrm{M}}^{t} + \Delta t \times \mathbf{P}_{\mathrm{V}}^{t}$），在急转弯或加减速场景下可能产生较大的运动预测误差，进而影响关联精度。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l18_https_openaccess_thecvf_com_content_ICCV2023_papers_Li_End_to_end_3D_Tra/figures/007_Table_3.jpg]]
 *Table 3: Results with different trackers on the nuScenes val set. TBD denotes the tracking-by-detection method in [38]. SinQuery indicates the single-query approach in [41]*
-
-![[assets/figures/papers/paper_list_l18_https_openaccess_thecvf_com_content_ICCV2023_papers_Li_End_to_end_3D_Tra/figures/008_Table_5.jpg]]
-*Table 5: Results with different embedding for query association on the nuScenes val set. appear and motion indicate appearance $\mathbf { F } _ { \mathrm { A } }$ and motion feature ${ \bf$ F $} _ { \mathrm { M } }$ in Section 3.2
-
-![[assets/figures/papers/paper_list_l18_https_openaccess_thecvf_com_content_ICCV2023_papers_Li_End_to_end_3D_Tra/figures/009_Table_4.jpg]]
-*Table 4: Effect of embedding interaction on the nuScenes val set. ei denotes the embedding interaction in Section 3.2*
-
-![[assets/figures/papers/paper_list_l18_https_openaccess_thecvf_com_content_ICCV2023_papers_Li_End_to_end_3D_Tra/figures/010_Table_6.jpg]]
-*Table 6: Results with different features for embedding EO on the nuScenes val set. de denotes the transformer decoder*
-
-![[assets/figures/papers/paper_list_l18_https_openaccess_thecvf_com_content_ICCV2023_papers_Li_End_to_end_3D_Tra/figures/011_Table_7.jpg]]
-*Table 7: Results with different rates for query update on the nuScenes val set. α denotes the rate in Equation (2)*
-
-![[assets/figures/papers/paper_list_l18_https_openaccess_thecvf_com_content_ICCV2023_papers_Li_End_to_end_3D_Tra/figures/014_Table_10.jpg]]
-*Table 10: Results with different frames for training on the nuScenes val set. D denotes frame number in Equation (4)*
-
 
 
 ## 定位与知识库关联
@@ -380,8 +347,6 @@ DQTrack发表于ICCV 2023，其解耦查询设计为后续工作提供了可复�
 - **运动模型升级**：是否有更优的运动模型（如基于学习的运动预测或卡尔曼滤波的端到端版本）替代当前的匀速假设，以进一步提升定位精度？
 
 - **真实遮挡场景的鲁棒性**：模型在严重遮挡下的鲁棒性仅通过训练时的假阳性查询增强模拟，缺乏真实遮挡场景下的详尽评估和针对性设计。
-
-
 
 ## 原文 PDF
 

@@ -155,8 +155,6 @@ $$\mathcal{L}_{\mathrm{loc}} = \frac{1}{N} \sum_{i=1}^{N} \sum_{j=1}^{K} \mathbf
 
 这一模块化设计使 SyncDreamer 在无需显式姿态监督的情况下，同时实现身份一致性、音画同步和文本可控的全身运动生成。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1003_https_openaccess_thecvf_com_content_CVPR2026_html_Nazarieh_SyncDreamer_C/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the SyncDreamer architecture. Given a reference image, audio, and a text prompt, SyncDreamer generates expressive, identity-preserving talking avatar videos with synchronized audio-lip motion and full-body dynamics*
 
@@ -214,11 +212,6 @@ $$
 
 增强后的提示能够驱动上下文感知的手势生成和稳定的物体连续性。消融实验（Figure 9）显示，相比最小提示或手工扩展提示，增强提示产生的手势更自然、物体连续性更强、身份-场景一致性更高。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1003_https_openaccess_thecvf_com_content_CVPR2026_html_Nazarieh_SyncDreamer_C/figures/003_Figure_3.jpg]]
-*Figure 3: (A) Attention Localization Loss. Regularizes visual cross-attention maps within the SyncDreamer backbone to maintain spatial alignment between generated content and reference features. (B) Audio Dynamics Encoder. Refines audio features using a temporal weighting mechanism that emphasizes motion-relevant acoustic cues such as rhythm and vocal intensity. reconstruction loss*
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -261,24 +254,11 @@ Figure 5 的定性对比进一步印证了上述结论：SyncDreamer 生成的�
 - **长视频稳定性未知。** 当前实验主要针对中等时长片段，在长视频生成中的身份保持和运动一致性有待进一步研究。
 - **多人交互场景未涉及。** 模型仅处理单人虚拟形象生成，如何扩展到多人交互场景仍是开放问题。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1003_https_openaccess_thecvf_com_content_CVPR2026_html_Nazarieh_SyncDreamer_C/figures/008_Figure_7.jpg]]
-*Figure 7: Motion editing. Given a reference image, audio and text prompt for body motion control, SyncDreamer generates motion aligned with text prompts, producing expressive dance, adaptive gestures, and semantically consistent actions, while maintaining identity and speech synchronization*
-
 ![[assets/figures/papers/paper_list_l1003_https_openaccess_thecvf_com_content_CVPR2026_html_Nazarieh_SyncDreamer_C/figures/011_Figure_8.jpg]]
 *Figure 8: Qualitative comparison showing the impact of Attention Localization. Our method maintains identity and spatial consistency, while the baseline shows facial drift and feature misplacement*
 
-![[assets/figures/papers/paper_list_l1003_https_openaccess_thecvf_com_content_CVPR2026_html_Nazarieh_SyncDreamer_C/figures/012_Figure_9.jpg]]
-*Figure 9: Effect of the Prompt Enhancer. Compared with minimal or manually refined prompts, our enhanced prompts yield more natural gestures, preserve object continuity, and maintain stronger identity–scene coherence across the sequence*
-
-![[assets/figures/papers/paper_list_l1003_https_openaccess_thecvf_com_content_CVPR2026_html_Nazarieh_SyncDreamer_C/figures/013_Figure_10.jpg]]
-*Figure 10: Effect of the Audio Dynamics Encoder. Although aligning facial and body motion with audio is challenging, particularly in full-body cases, our model naturally adapts motion to the dynamics of the speech signal*
-
 ![[assets/figures/papers/paper_list_l1003_https_openaccess_thecvf_com_content_CVPR2026_html_Nazarieh_SyncDreamer_C/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of SyncDreamer results. From a reference image, audio, and text prompt, SyncDreamer generates realistic and identity-consistent talking avatars. SyncDreamer enables controllable and expressive motion generation, achieving synchronized lip movements, gestures, and gaze dynamics that align with both the audio and textual intent*
-
-![[assets/figures/papers/paper_list_l1003_https_openaccess_thecvf_com_content_CVPR2026_html_Nazarieh_SyncDreamer_C/figures/005_Figure.jpg]]
 
 ## 定位与知识库关联
 

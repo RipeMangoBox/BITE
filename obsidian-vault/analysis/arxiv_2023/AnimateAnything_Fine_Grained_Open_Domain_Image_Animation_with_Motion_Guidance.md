@@ -56,8 +56,6 @@ claims:
 
 **局限与开放问题**：模型因训练资源限制未在高分辨率视频上训练，限制了高分辨率应用；运动阈值 $T_m$ 与不同视频内容类型的交互机制、损失权重 $\lambda$ 的定量影响，以及如何高效扩展至高分辨率生成，仍需进一步探索。
 
-
-
 图像动画旨在为静态图像注入可控的运动，使其生成连贯的视频片段。这一任务在内容创作、视觉特效和交互式媒体中具有广泛的应用前景。然而，现有方法普遍面临两个核心瓶颈：**对象类别的封闭性**和**运动控制的粗糙性**。
 
 一方面，主流的图像动画方法通常针对特定对象类别进行设计，例如流体模拟、场景动画或人体部位驱动，难以泛化至任意开放域图像。另一方面，即使部分基于视频扩散模型的方法（如 **VideoComposer** (Wang et al., arXiv 2023) 和 **VideoCrafter1**）展现出更强的生成能力，它们仍然缺乏对运动区域和运动速度的精细控制——用户无法精确指定“图像的哪个部分应该运动”以及“运动的速度有多快”。VideoComposer 虽然引入了运动轨迹控制，但其控制粒度仍无法满足细粒度交互式动画的需求；而 VideoCrafter1 等通用图像到视频模型则倾向于让整个图像产生整体运动，难以实现局部动画。
@@ -65,8 +63,6 @@ claims:
 从生成范式来看，视频扩散模型为图像动画提供了强大的生成先验，但其原始设计并未显式建模局部运动区域和运动强度。这构成了一个关键的因果缺口：**模型具备生成能力，但缺乏可控性**。如果能够在潜空间中引入运动掩码条件化，并直接监督帧间差异，就有可能在保持模型原有生成质量的前提下，实现细粒度的交互式动画生成。
 
 本文提出的 **AnimateAnything** 正是针对上述缺口，通过运动区域掩码引导和运动强度引导两项核心机制，首次在视频扩散框架中实现了对动画区域和速度的精确控制，从而将图像动画任务从封闭域推向开放域。
-
-
 
 ## 核心方法与创新机理
 
@@ -102,8 +98,6 @@ $$l_s = || s(z_0) - s(\hat{z}_0) ||_2^2$$
 | 运动速度 | 通过 FPS 隐式全局调整 | 引入运动强度度量 + 直接监督帧间差异的损失函数 |
 
 这两种控制机制相互独立且可组合使用：用户可以同时指定“哪些区域运动”和“运动多快”，实现细粒度的交互式动画生成（如 Figure 1 后三行所示的迭代式多对象动画）。
-
-
 
 AnimateAnything 的整体 pipeline 围绕一个预训练的 **3D U-Net 视频扩散骨干** 构建，目标是将单张参考图像转化为可控的动画视频。其核心设计思想是在不破坏扩散模型原有生成能力的前提下，通过潜空间拼接与嵌入注入的方式引入显式的运动控制信号，实现细粒度的开放域图像动画。
 
@@ -142,8 +136,6 @@ AnimateAnything 的整体 pipeline 围绕一个预训练的 **3D U-Net 视频扩
 - **运动强度控制**通过损失函数直接监督帧间差异，替代了传统方法中依赖 FPS 的隐式全局调控，提供了更稳定且可量化的运动速度控制手段。
 
 这种“条件拼接 + 损失监督”的双重机制，使得视频扩散模型的强大生成先验得以被精准引导，同时保持了模型对任意开放域图像的泛化能力。
-
-
 
 AnimateAnything 围绕视频扩散模型构建，通过两个核心控制模块——**运动区域掩码引导**和**运动强度引导**——实现对开放域图像动画的细粒度控制。整体流程如 Figure 2 所示。
 
@@ -203,17 +195,6 @@ $$z_T^i = \sqrt{\bar{\alpha}_T} z_{ref} + \sqrt{1 - \bar{\alpha}_T} \epsilon^i$$
 
 该设计使所有帧共享参考图像的内容结构，同时通过不同的噪声分量 $\epsilon^i$ 产生帧间变化，有效平衡了图像保真度与运动多样性。
 
-### 补充图表
-
-
-![[assets/figures/papers/paper_list_l1038_https_arxiv_org_abs_2311_12886/figures/003_Figure_3.jpg]]
-*Figure 3: Motion mask guidance examples. The first column and second column are the input mask and motion mask respectively. The user can specify one or multiple movable areas in the motion mask to fine grained control the video generation*
-
-![[assets/figures/papers/paper_list_l1038_https_arxiv_org_abs_2311_12886/figures/004_Figure_4.jpg]]
-*Figure 4: Motion strength guidance examples. Augmenting the motion strength accelerates the alteration of Mona Lisa’s expression, but excessive motion strength may lead to the loss of finegrained facial details*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -264,8 +245,6 @@ Figure 1 的后三行进一步验证了方法的交互式生成能力：通过�
 - 运动掩码阈值 $T_m$ 在不同视频内容类型（如快速运动 vs. 缓慢运动场景）下的鲁棒性表现。
 - 运动强度损失权重 $\lambda$ 对收敛速度和最终运动强度准确性的定量影响曲线。
 - 在有限训练资源约束下，如何通过渐进式训练或超分辨率级联策略扩展至高分辨率生成。
-
-
 
 ## 定位与知识库关联
 
@@ -318,8 +297,6 @@ AnimateAnything 建立在视频扩散模型的成熟技术栈之上，其技术�
 4. **多对象交互运动的语义一致性**：Figure 1 展示了通过迭代文本和掩码生成多个对象动画的能力，但多对象之间的运动语义一致性（如两个物体的运动是否物理上协调）缺乏定量评估指标和系统分析。
 
 5. **与商业系统的差距量化**：与 Gen-2 的比较仅为定性，缺乏在统一基准上的定量对比，使得 AnimateAnything 与最前沿商业系统之间的真实差距难以精确评估。
-
-
 
 ## 原文 PDF
 

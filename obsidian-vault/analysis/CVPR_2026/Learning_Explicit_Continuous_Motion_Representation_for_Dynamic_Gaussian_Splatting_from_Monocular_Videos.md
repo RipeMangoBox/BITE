@@ -56,8 +56,6 @@ claims:
 
 在iPhone和NVIDIA两个动态场景数据集上，SE3-BSplineGS在mPSNR、mSSIM、mLPIPS等指标上均大幅领先先前SOTA方法（Table 1）。消融实验证实，SE(3) B样条运动基相较于SoM的SE(3)姿态变换（mPSNR 18.17）和MoSca的运动支架（mPSNR 19.26）有显著提升（Table 3），而移除自适应控制、软分段重建或SDS先验均导致性能明显下降（Table 2），验证了各组件的必要性。方法同时展示了良好的跨场景泛化能力，但在大非刚性运动场景下仍存在失效风险（Figure 7）。
 
-
-
 ### 动态场景新视图合成的挑战
 
 从单目视频中重建动态场景并合成高质量新视图，是计算机视觉与图形学中长期存在的核心难题。与静态场景不同，动态场景中的物体随时间发生位置和朝向变化，要求表示方法不仅能够捕获瞬时的几何与外观，还必须精确建模高斯的连续运动轨迹。近年来，3D Gaussian Splatting（3DGS）凭借其显式表示和实时渲染能力，在静态场景重建中取得了突破性进展。然而，将其扩展至动态场景时，如何为每个动态高斯赋予时间维度上的连续变形，成为一个关键瓶颈。
@@ -83,8 +81,6 @@ claims:
 3. **多维度正则化与先验**：引入软分段重建策略抑制长时间运动干扰，并利用多视图扩散模型的SDS损失为不可见区域提供额外的多视图线索，缓解单目过拟合问题。
 
 通过这些设计，SE3-BSplineGS在iPhone和NVIDIA两个基准数据集上均取得了显著优于先前SOTA方法的新视图合成质量，验证了显式连续运动表示在单目动态高斯泼溅中的关键作用。
-
-
 
 ## 核心方法与创新机理
 
@@ -155,8 +151,6 @@ $$\mathcal{L}_{sds} = \mathbb{E}_{t,\epsilon} \left[ \| \omega(t) (\epsilon_{\ph
 
 这些创新并非孤立存在，而是形成了一条完整的因果链：**连续 SE(3) 轨迹提供运动建模的数学基础，自适应控制确保表达能力与效率的平衡，软分段重建与扩散先验分别从时序一致性和多视图一致性两个维度补充约束**，共同实现了单目动态新视图合成的显著提升。
 
-
-
 SE3-BSplineGS 的整体流程围绕“显式连续运动表示”展开，将单目视频重建为可驱动的高斯泼溅场景。图2给出了完整的模块关系与数据流。
 
 **输入与初始化**  
@@ -203,12 +197,8 @@ $$\mathcal{L} = \lambda_{rec}\mathcal{L}_{rec} + \lambda_{geo}\mathcal{L}_{geo} 
 **输出**  
 优化完成后，系统输出包含静态高斯与绑定SE(3) B样条运动基的动态高斯的完整场景表示，可在任意新视角与时间戳下进行高质量渲染。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1028_https_arxiv_org_abs_2603_25058/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our method. We first initialize static Gaussians via depth reprojection and dynamic Gaussians from tracking points, by modeling their transformations with learnable SE(3) B-spline Motion Bases. We then adjust the number of motion bases and control points based on an adaptive control mechanism. Next, we employ a soft segment reconstruction strategy to fuse dynamic Gaussians at different reference timestamps to the observation timestamp, and further supplement the monocular video with scene-level multi-view cues derived from a multi-view diffusion model*
-
-
 
 **SE3-BSplineGS** 的核心设计围绕一个关键瓶颈展开：现有单目动态高斯泼溅方法未能显式建模高斯的位置与朝向连续变形轨迹，且缺乏对运动基密度的自适应控制，导致复杂运动区域出现非连续朝向变形和长期运动干扰。该方法通过三个紧密耦合的模块——SE(3) 累积B样条运动基、自适应控制机制和软分段重建——构建了统一的连续运动表示，并辅以多视图扩散先验缓解单目过拟合。
 
@@ -266,19 +256,6 @@ $$\mathcal{L} = \lambda_{\text{rec}}\mathcal{L}_{\text{rec}} + \lambda_{\text{ge
 
 **证据强度说明**：上述公式均来自论文方法部分（3.1-3.4节）的显式定义，置信度≥0.95。消融实验（Table 2, Table 3）从定量角度验证了各模块的必要性：移除自适应控制、软分段重建或SDS先验均导致iPhone数据集上mPSNR下降0.5-1.5 dB；将运动表示替换为SoM的姿态变换或MoSca的运动支架后，mPSNR分别降至18.17和19.26（Ours为20.17），证实SE(3) B样条连续建模的核心贡献。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1028_https_arxiv_org_abs_2603_25058/figures/009_Figure_6.jpg]]
-*Figure 6: Effect of SE(3) B-spline Motion Bases*
-
-![[assets/figures/papers/paper_list_l1028_https_arxiv_org_abs_2603_25058/figures/014_Figure_9.jpg]]
-*Figure 9: Effect of pruning strategy*
-
-![[assets/figures/papers/paper_list_l1028_https_arxiv_org_abs_2603_25058/figures/016_Figure_10.jpg]]
-*Figure 10: Effect of soft segmentation reconstruction*
-
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -333,19 +310,6 @@ Table 6 比较了控制点修剪策略：本方法采用“选择最小修剪误
 - **Figure 7**：失败案例，揭示方法在大非刚性运动下的局限
 - **Figure 10**：软分段重建消融，展示长期一致性机制的效果
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1028_https_arxiv_org_abs_2603_25058/figures/001_Figure_1.jpg]]
-*Figure 1: Dynamic Gaussian Splatting from monocular videos. Our method synthesizes high-quality novel views from monocular videos, while the compared methods, e.g., MoSca [22], HiMoR [25], and SplineGS [32], fail to faithfully reconstruct the dynamic windmill*
-
-![[assets/figures/papers/paper_list_l1028_https_arxiv_org_abs_2603_25058/figures/011_Table_4.jpg]]
-*Table 4: Comparison of correspondence on the iPhone dataset*
-
-![[assets/figures/papers/paper_list_l1028_https_arxiv_org_abs_2603_25058/figures/012_Table_5.jpg]]
-*Table 5: Effect of 2D prior errors. “w/ Prior pert.” indicates that the 2D tracking prior is perturbed by adding random noise within the range of [-15, 15]*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 与基线工作的关系
@@ -380,8 +344,6 @@ Table 6 比较了控制点修剪策略：本方法采用“选择最小修剪误
 *   **自适应控制的泛化性：** 自适应控制机制的超参数（如修剪间隔 `N_prune=500`，误差阈值 `ε_prune=5.0`）对不同场景的敏感度如何？能否设计完全自适应的、无需手动调节阈值的控制策略，以应对包含多个运动速度不同物体的复杂场景？
 *   **更强先验的集成：** 当前使用的 Zero123-xl-diffusers 是一个图像扩散模型。能否将其替换为更强大的**视频扩散模型**，以提供时序上更一致的多视图先验，从而更好地处理动态场景和被遮挡区域？
 *   **多模态数据扩展：** 该方法目前仅使用单目 RGB 视频。是否可以将该框架扩展到**多目视频**或融合**深度传感器数据**，以从根本上解决单目重建中的尺度模糊性和遮挡问题，从而应对更具挑战性的大幅度非刚性运动场景？
-
-
 
 ## 原文 PDF
 

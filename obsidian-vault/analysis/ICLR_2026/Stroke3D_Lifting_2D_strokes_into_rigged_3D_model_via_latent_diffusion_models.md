@@ -65,8 +65,6 @@ Stroke3D 在方法谱系中处于“条件生成+偏好优化”的交叉点。�
 
 当前方法仍受限于训练数据的姿态多样性不足，罕见类别生成不稳定；当2D笔画存在视角模糊（如侧视图关节重叠）时，生成质量会下降。此外，两阶段框架尚未实现端到端的文本到绑定网格生成。开放问题包括：如何利用更大规模的 Articulation-XL 等数据集扩展姿态覆盖；能否开发端到端网络直接从文本生成可绑定网格；以及如何系统性地处理笔画的视角模糊性。
 
-
-
 三维资产的骨骼绑定是计算机图形学与动画制作中的核心环节，它为静态网格赋予可驱动的运动结构。然而，传统绑定流程高度依赖专业美术人员的手工操作——从拓扑分析、关节放置到蒙皮权重绘制，每一步都需要大量时间与领域经验。这一现状构成了三维内容规模化生产的显著瓶颈。
 
 近年来，学术界开始探索自动化绑定方法。早期工作如 **RigNet**（Xu et al., SIGGRAPH 2020）尝试从输入网格直接预测骨骼结构，但其依赖于完整的三维几何信息作为输入，无法从更轻量的用户意图表达出发。随后出现的 **SKDream**（Xu et al., CVPR 2025 Highlight）将平均曲率流骨架提取与扩散模型相结合，实现了从文本到骨架再到网格的生成管线，但其文本条件存在固有的结构模糊性——同一句描述可以对应多种合理的骨骼拓扑，导致生成结果的不确定性。**MagicArticulate**（Song et al., CVPR 2025）与 **UniRig**（Zhang et al., SIGGRAPH 2025）则采用自回归生成范式，虽在特定指标上有所改进，但同样缺乏对骨骼拓扑的显式可控性。
@@ -78,8 +76,6 @@ Stroke3D 在方法谱系中处于“条件生成+偏好优化”的交叉点。�
 在网格生成阶段，现有方法还面临训练数据质量不足的问题。SKDream 所使用的数据集中部分样本缺乏纹理信息，甚至存在骨骼标注不完整的情况（如鸟类骨架缺失关节），直接限制了生成网格的几何保真度与可动画性。为此，本文进一步构建了增强数据集 **TextuRig**，通过纹理筛选与视觉语言模型重述提升数据质量，并引入基于骨架-网格对齐分数的偏好优化策略 **SKA-DPO**，以提升生成网格与输入骨骼的结构一致性。
 
 综上，Stroke3D 的动机可归结为三点：（1）提供一种直观的二维笔画交互方式，实现对三维骨骼结构的显式可控生成；（2）通过增强数据集与偏好优化，提升骨骼到网格生成的质量与对齐精度；（3）构建一个端到端易用的管线，使非专业用户也能快速产出可绑定、可动画的三维资产。
-
-
 
 ## 核心方法与创新机理
 
@@ -100,8 +96,6 @@ Table 2 显示，在 SKDream 基础上依次加入 TextuRig 和 SKA-DPO 后，Me
 **3. 端到端的易用 3D 资产生成范式**
 
 不同于传统方法需要专业建模技能，Stroke3D 构建了从用户笔画到可绑定、可动画 3D 网格的完整两阶段流程：先由 Sk-VAE 与 Sk-DiT 从 2D 笔画和文本生成拓扑明确的 3D 骨架，再由增强的网格生成模型输出高质量网格。Figure 11 的定性评估表明，该流程对输入噪声具有鲁棒性，能处理任意视角，并成功泛化到训练中未见的罕见概念（如“Samurai”、“Turtle”），体现了从 2D 到 3D 的实用化生成能力。
-
-
 
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_VgOWxor3LV/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of Stroke3D (§Section 3). During the training phase, Sk-VAE encodes a skeleton graph into a latent space. Subsequently, Sk-DiT is trained to generate these latent embeddings, conditioned on the corresponding 2D strokes and text prompt. After training with TextuRig, we leverage SKA-DPO to further refine SKDream with a skeleton-mesh alignment reward signal. The right side illustrates the implementation details of our models*
@@ -146,8 +140,6 @@ Stroke3D 采用**两阶段级联架构**，将用户输入的 2D 笔画和文本
 
 与现有方法相比，Stroke3D 的关键差异在于：骨架生成层面，用**潜在扩散模型 + 2D 笔画条件**替代了 RigNet（Xu et al., SIGGRAPH 2020）的网格到骨架学习、MagicArticulate（Song et al., CVPR 2025）和 UniRig（Zhang et al., SIGGRAPH 2025）的自回归生成范式；网格生成层面，在 SKDream（Xu et al., CVPR 2025 Highlight）基础上通过**数据增强 + 偏好优化**实现了显著提升，而非仅依赖 SDEdit（Meng et al., ICLR 2022）式的扩散编辑。
 
-
-
 Stroke3D 采用两阶段流水线：**可控骨架生成**和**增强网格合成**。骨架生成阶段的核心模块是图变分自编码器（Sk-VAE）与图扩散变压器（Sk-DiT），网格合成阶段则基于 SKDream 模型进行数据增强与偏好优化。
 
 ### Sk-VAE
@@ -188,8 +180,6 @@ $$\mathcal{L}(\theta) = - \mathbb{E}_{(x^{win},x^{lose})\sim\mathcal{D}} \log\si
 
 二维笔画 $\mathbf{J}_{xy}$ 作为结构条件的引入是 Stroke3D 的核心因果旋钮：它消除了从纯文本到骨架生成过程中的拓扑与姿态模糊性。消融实验（Figure 7）表明，带有 $\mathbf{J}_{xy}$ 条件的模型训练损失下降速度显著快于无此条件的模型，验证了结构指导对收敛的加速作用。
 
-
-
 ## 实验与关键发现
 
 ### 骨架生成：定量与定性评估
@@ -206,15 +196,9 @@ $$\mathcal{L}(\theta) = - \mathbb{E}_{(x^{win},x^{lose})\sim\mathcal{D}} \log\si
 
 笔画‑骨架对齐的定量评估（Table 6）采用 2D Chamfer Distance（CD₂D）度量投影骨架与输入笔画的几何一致性。Stroke3D 在所有类别和指标上均取得最低 CD₂D，验证了结构条件（Jxy）对骨架生成过程的强约束效果。
 
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_VgOWxor3LV/figures/017_Table_6.jpg]]
-*Table 6: Quantitative comparison of stroke-skeleton alignment (§Section4.3). We report the 2D Chamfer Distance ( C D _ { 2 D } ) to quantitatively measure the structural alignment between the projected 3D skeleton and the input 2D strokes. The lowest and second-lowest scores are shown in bold and underlined, respectively*
-
 ### 网格生成：SKA 评分与消融
 
 网格生成质量通过 SKA Score 评估。Table 2 在 SKDream 评估集上对比了 SDEdit（Meng et al., ICLR 2022）、SKDream 以及逐步引入 TextuRig 数据集和 SKA‑DPO 偏好优化的消融版本。最终方案（+TextuRig & SKA‑DPO）的 **Mean Inst SKA 分数达 87.83**，较 SKDream 基线（80.43）提升约 7.4 分；**Mean Class SKA 分数达 84.36**，较基线（74.38）提升约 9.98 分。单独引入 TextuRig 已带来显著增益（Mean Inst 86.01，Mean Class 81.99），SKA‑DPO 在此基础上进一步将 Mean Inst 和 Mean Class 分别推高 1.82 和 2.37 分。
-
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_VgOWxor3LV/figures/006_Table_2.jpg]]
-*Table 2: Quantitative comparison of SKA score (§Section4.3). Scores are calculated over three classes and three subclasses of animal. The highest scores are bold and the second highest are underlined. The rows +TextuRig and +SKA-DPO indicate the integration of our curated dataset and preference optimization strategy into the SKDream baseline, respectively*
 
 骨架条件的多视图生成定性对比（Figure 5）显示，Stroke3D 生成的视图质量更高，对输入骨架的几何忠实度明显优于基线。
 
@@ -227,13 +211,7 @@ $$\mathcal{L}(\theta) = - \mathbb{E}_{(x^{win},x^{lose})\sim\mathcal{D}} \log\si
 
 **SKA‑DPO 偏好边际。** Table 3 消融了偏好分数边际（0.05、0.10、0.15、0.20）。边际为 0.1 时在 Mean Inst（87.83）和 Mean Class（84.36）上取得最佳权衡；过小的边际（0.05）导致 Mean Class 下降，过大的边际（0.20）则使 Mean Inst 退化。
 
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_VgOWxor3LV/figures/008_Table_3.jpg]]
-*Table 3: Ablation study of preference score margin for SKA-DPO (§Section4.3). We observe that a margin of 0.1 provides an optimal trade-off across evaluation scores*
-
 **骨架生成训练数据消融。** Table 4 对比了四种数据配置：SkDiff‑Small（小规模数据）、SkDiff‑Raw（未对齐）、SkDiff‑NoTag（无文本标签）和 SkDiff‑Full（完整数据，含旋转对齐与文本标签）。SkDiff‑Full 在所有类别和 CD 指标上均取得最低误差，表明数据规模、旋转对齐和文本标注三者对骨架生成质量均有正向贡献。
-
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_VgOWxor3LV/figures/014_Table_4.jpg]]
-*Table 4: Ablation study on training data in skeleton generation. CD scores are calculated over three metrics (CD-J2J, CD-J2B, CD-B2B) across five categories. The lowest and second-lowest scores are shown in bold and underlined, respectively*
 
 **输入鲁棒性。** Figure 9 展示了随机丢弃部分关节时 CD 分数的变化曲线。模型在少量关节缺失的情况下仍能保持较低的 CD 分数，表明其对不完整笔画输入具有较强鲁棒性。
 
@@ -268,8 +246,6 @@ $$\mathcal{L}(\theta) = - \mathbb{E}_{(x^{win},x^{lose})\sim\mathcal{D}} \log\si
 | Table 3 | SKA‑DPO 边际 0.1 取得最佳 Mean Inst/Class 权衡 |
 | Figure 11 | 真实笔画场景下具备噪声鲁棒性、视角无关性和罕见概念泛化能力 |
 | Figure 9 | 对不完整关节输入保持低 CD，验证输入鲁棒性 |
-
-
 
 ## 定位与知识库关联
 
@@ -320,8 +296,6 @@ Stroke3D的有效性受以下边界条件约束：
 ### 6. 知识库定位总结
 
 Stroke3D 在3D资产生成领域占据了“**用户友好型可控生成**”这一生态位。它不追求从零开始的完全自动生成（如纯文本到3D的方法），也不假设用户具备3D建模专业知识（如需要完整网格输入的绑定方法），而是在两者之间开辟了一条以2D笔画为桥梁的中间路线。其技术贡献——图VAE与扩散变压器的结合、结构条件注入机制、以及基于对齐分数的偏好优化——为后续研究提供了可复用的模块和明确的改进方向。
-
-
 
 ## 原文 PDF
 

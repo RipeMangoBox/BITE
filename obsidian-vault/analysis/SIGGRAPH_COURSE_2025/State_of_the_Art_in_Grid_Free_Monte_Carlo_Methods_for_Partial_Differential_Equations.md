@@ -56,8 +56,6 @@ $$u(\mathbf{x}) = \frac{1}{|\partial B(\mathbf{x}, r)|} \int_{\partial B(\mathbf
 
 方法已在 NASA 好奇号火星车热分析等复杂工程场景中得到验证（Figure 7），展现出在极端几何复杂性下的快速、渐进式温度估计能力。当前方法主要适用于二阶线性椭圆型方程，在平滑解区域消除高频噪声较慢，扩展到更广泛 PDE 类型仍需进一步研究。
 
-
-
 ### 传统 PDE 求解器的核心瓶颈：网格生成
 
 偏微分方程（PDE）是物理模拟、热分析、静电场计算等工程问题的数学基础。数十年来，有限元方法（FEM）一直是求解这类问题的主流选择。然而，FEM 的实际瓶颈往往不在于求解过程本身，而在于一个容易被忽视的前置步骤——**体积网格生成**（Figure 3）。
@@ -89,8 +87,6 @@ Figure 2 给出了一个令人震惊的对比案例：在具有复杂几何结�
 ### 适用范围与当前局限
 
 需要指出的是，当前网格无关蒙特卡洛方法主要针对**二阶线性椭圆型方程**（如热扩散、静电场、不可压缩流体等场景），尚未覆盖所有 PDE 类型。此外，蒙特卡洛估计的固有方差意味着在平滑解区域需要大量样本以消除高频噪声，在简单几何和平滑边界条件上的收敛速度可能低于成熟的 FEM 求解器。这些局限也构成了本课程后续讨论方差缩减技术、广义化扩展（如 Walk on Stars）以及未来研究方向的基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -137,8 +133,6 @@ $$u(\mathbf{x}) = \frac{1}{|\partial B(\mathbf{x}, r)|} \int_{\partial B(\mathbf
 
 > **注意**：蒙特卡洛方法的固有方差意味着在平滑解区域消除高频噪声需要大量样本，收敛速度可能低于成熟的 FEM 求解器；当前方法主要适用于二阶线性椭圆型方程，尚未覆盖所有 PDE 类型。
 
-
-
 本文介绍的网格无关蒙特卡洛 PDE 求解方法，其核心 pipeline 围绕“将椭圆型偏微分方程转化为递归积分方程，并通过随机行走进行蒙特卡洛估计”这一根本思想展开。整体流程从几何输入到最终解的输出，完全消除了传统求解器中的体积网格生成瓶颈。
 
 ### 1. 输入：边界表示几何
@@ -177,8 +171,6 @@ pipeline 的输出具有两个关键特性：
 
 整个 pipeline 天生并行：每条随机行走相互独立，可实现接近完美的并行扩展，且易于向量化。这一特性使其与现代 GPU 架构高度契合，与 FEM 网格划分阶段本质上的串行性形成鲜明对比。
 
-
-
 ### 方法总览：从渲染方程到递归积分方程
 
 本课程所介绍的网格无关蒙特卡洛方法的核心思想，是将椭圆型偏微分方程重新表述为**递归积分方程**，使其在形式上与图形学中的渲染方程高度相似。这一重新表述使得我们可以用蒙特卡洛积分来估计 PDE 的解，从而彻底消除对空间离散化的依赖。正如光线追踪通过递归采样光线路径来估计辐射度，该方法通过递归随机行走来估计 PDE 在任意点的解值。
@@ -212,8 +204,6 @@ $$u(\mathbf{x}) = \frac{1}{|\partial B(\mathbf{x}, r)|} \int_{\partial B(\mathbf
 ### 输出敏感评估
 
 与需要全局求解的传统方法不同，该框架天然支持**输出敏感评估**：用户可仅对感兴趣的区域（如屏幕可见点）发起查询，计算资源完全集中在这些局部点上，无需在整个域上求解。这种“延迟着色”模式进一步放大了该方法在交互式设计和局部分析场景中的优势。
-
-
 
 ## 实验与关键发现
 
@@ -250,12 +240,8 @@ $$u(\mathbf{x}) = \frac{1}{|\partial B(\mathbf{x}, r)|} \int_{\partial B(\mathbf
 
 > **公平性说明**：上述对比主要衡量端到端流程效率与几何鲁棒性。在简单几何、平滑边界条件且需要高精度解时，FEM 的收敛速度通常优于蒙特卡洛方法。此外，当前 WoS 方法主要适用于二阶线性椭圆型方程，尚未覆盖所有 PDE 类型。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l3_https_github_com_rohan_sawhney_mcgp_resources_raw_main_SIGGRAPH_25_abstr/figures/005_Figure_5.jpg]]
 *Figure 5: The basic idea behind walk on spheres is that at any point ??, the value of a harmonic function ??(??) equals the average over a sphere around ?? [Axler et al. 2013]. Hence we recursively take a single Monte Carlo sample to estimate this average until we hit the boundary. No spatial discretization is needed as the largest empty sphere is determined using a closest point query*
-
-
 
 ## 定位与知识库关联
 
@@ -302,8 +288,6 @@ $$u(\mathbf{x}) = \frac{1}{|\partial B(\mathbf{x}, r)|} \int_{\partial B(\mathbf
 *   **边界条件与变系数**：对于某些复杂的边界条件（如 Robin 边界）或变系数问题，构造高效、无偏的蒙特卡洛估计器仍具挑战性，需要针对性的随机行走策略（如 Walk on Stars）和方差缩减技术。
 *   **实时求解的数据结构**：在 GPU 上实现实时 WoS 求解，可能需要不同于传统 BVH 的新数据结构或采样策略，以最大化并行吞吐量并最小化线程发散。
 *   **系统化性能比较**：目前缺乏在统一基准上，将 WoS 方法与最新的无网格法、粒子法（如 smoothed particle hydrodynamics, SPH）进行端到端（预处理+求解）性能与精度系统性比较的研究。
-
-
 
 ## 原文 PDF
 

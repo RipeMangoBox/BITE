@@ -258,9 +258,6 @@ Figure 2 的峰值内存-图规模曲线是验证线性复杂度的直接证据�
 
 Figure 4 展示了 hub 比率 $r$ 和每 spoke 连接数 $k$ 对性能的影响。在 PascalVOC-SP 上，$r \in [0.5, 2]$ 范围内性能稳定，$r \ge 3$ 后略有下降；Peptides-func 上 $r=1$ 附近最优。$k=3$ 与 $k=5$ 的性能差异不显著，表明 $k=3$ 已提供足够的信息带宽。这一发现支持了 $k$ 作为小常数的设计选择具有实用鲁棒性。
 
-![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2412_01519/figures/018_Figure_4.jpg]]
-*Figure 4: Results for various hubs ratio and k, which is the number of hubs each spoke is connected to. We shown this on PascalVOC-SP (Left) and Peptides-func (Right) datasets with k = [ 3 , 5 ] and r = [0.5, 1, 2, 3, 4, 5]*
-
 ### 失败模式与局限性
 
 尽管 ReHub 在多数任务上表现优异，实验中仍暴露出几个值得关注的局限：
@@ -284,20 +281,6 @@ Figure 4 展示了 hub 比率 $r$ 和每 spoke 连接数 $k$ 对性能的影响�
 
 ![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2412_01519/figures/003_Table_2.jpg]]
 *Table 2: Test performance on datasets from the long-range graph benchmarks (LRGB) (Dwivedi et al., 2022) compared to baselines. For Neural Atoms we show only available results. ReHub-FC has each spoke fully connected to all hubs. Best results are colored: first, second*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2412_01519/figures/019_Figure_5.jpg]]
-*Figure 5: Percentage of graphs with a Bhattacharyya Percentage below a given threshold for the validation split of the PascalVOC-SP dataset. Results are shown for varying k and hubs ratio r. Left: k = 3 with r $\in \{$ 1 , 4 $\}$ . Right: k = 5 with r $\in \{$ 1 , 4 $\}$
-
-![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2412_01519/figures/009_Table_6.jpg]]
-*Table 6: Statistics of the five dataset proposed in the long-range graph benchmark. Source: LRGB (Dwivedi et al., 2022)*
-
-![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2412_01519/figures/010_Table_7.jpg]]
-*Table 7: Dataset statistics of LRGB, OGBN-Arxiv and Coauthor Physics. Source: Exphormer (Shirzad et al., 2023)*
-
-![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2412_01519/figures/012_Table_9.jpg]]
-*Table 9: Model-specific hyperparameters for PCQM-Contact, and the number of model parameters*
 
 ## 定位与知识库关联
 

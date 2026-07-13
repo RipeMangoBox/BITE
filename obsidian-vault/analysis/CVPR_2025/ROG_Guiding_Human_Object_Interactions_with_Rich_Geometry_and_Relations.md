@@ -50,8 +50,6 @@ claims:
 
 **主要结果**：在 FullBodyManipulation 数据集上，ROG 的 FID 达到 5.119，运动偏差 MDev 降至 5.815（对比 CHOIS 的 13.408），R-Precision Top-1 提升至 0.706。跨数据集验证（T2M-BEHAVE）显示碰撞率仅为 0.195，较 HOI-Diff 降低 24.6%。消融实验证实，物体关键点表示、IDF 损失和关系引导三个组件各自对运动质量和交互一致性均有显著贡献。
 
-
-
 人-物交互（Human-Object Interaction, HOI）生成旨在根据文本描述合成人与物体协同运动的序列，在虚拟现实、机器人学习和动画制作中具有重要应用。然而，该任务面临一项核心瓶颈：**现有方法过度简化物体的几何表示**，通常仅使用物体质心或最近点来表征物体，忽略了物体的整体几何细节。这种简化导致复杂交互（如环绕物体操作、多阶段接触切换）中的空间关系建模不足，进而影响生成交互的真实感与语义对齐。
 
 具体而言，基于扩散模型的方法如 **MDM**（Tevet et al., ICLR 2023）、**InterGen** 和 **HOI-Diff**（Peng et al., arXiv 2023）虽然在人体运动生成上取得了进展，但在HOI场景中，它们对物体几何的粗糙表示使得运动生成模型难以感知人与物体之间的精确空间关系。**CHOIS**（Li et al., ECCV 2024）引入了接触概率图，但仍依赖于简化的物体表示，在复杂交互中容易出现空隙、抖动和不自然接触等问题（Figure 3）。
@@ -63,8 +61,6 @@ claims:
 3. **生成过程缺乏关系引导**：在去噪生成过程中，没有机制基于学习到的交互关系先验来校正运动预测，使得生成结果容易偏离真实的交互模式。
 
 针对这些缺口，ROG 提出了一种基于丰富几何与关系引导的HOI生成框架。其核心洞察是：通过构建全面的**交互距离场（Interactive Distance Field, IDF）**，并利用扩散关系模型学习时空关系先验，可以在生成过程中对运动进行引导与校正，使生成的运动符合真实的交互距离分布。这一设计从根本上改变了HOI生成中“物体如何被表示”和“关系如何被利用”的方式，为提升交互真实感和语义对齐提供了新的技术路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -91,8 +87,6 @@ ROG在训练阶段直接将IDF损失 $\mathcal{L}_{\mathrm{IDF}}$ 引入运动�
 **创新性验证**
 
 消融实验（Table 2）系统验证了各组件的因果贡献：添加物体关键点（obj-kp）使FID从9.775降至7.514；进一步添加IDF损失将R-Precision Top-1从0.547提升至0.666；使用完整距离矩阵 $\mathbf{D}$ 进行引导（FID 5.119）显著优于仅用质心 $\mathbf{C}$（FID 5.902）或无引导（FID 5.726）。跨数据集验证（Table 4）显示ROG的碰撞率（Coll% 0.195）比HOI-Diff（0.259）降低24.6%，证实了方法的鲁棒性与泛化能力。
-
-
 
 ROG 的整体流程围绕“利用丰富几何信息构建交互距离场（IDF）以引导运动生成”这一核心思想展开。系统由三个关键模块构成：**运动生成模型 G**、**关系模型 R**，以及连接二者的 **IDF 计算与引导机制**。
 
@@ -140,12 +134,8 @@ $$
 
 整个 pipeline 的协作逻辑可概括为：**G 负责生成候选运动，IDF 将运动转化为空间关系表征，R 提供关系先验以引导 G 的生成方向**。训练阶段，IDF 损失直接嵌入 G 的优化目标，使 G 初步具备关系感知能力；推理阶段，独立训练的关系模型 R 进一步细化 IDF，通过梯度引导使最终输出在语义对齐、物理合理性和交互自然性上达到更优平衡。这种“生成-关系建模-引导优化”的三段式设计，使得 ROG 在不显著增加训练成本的前提下（关系模型仅在推理时介入），实现了对复杂人-物交互的精细控制。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1747_ROG_Guiding_Human_Object_Interactions_with_Rich_Geometry_and_Relations/figures/001_Figure_1.jpg]]
 *Figure 1: Our proposed ROG begins by leveraging rich geometric information to construct an Interactive Distance Field (IDF), effectively capturing the relational dynamics of Human-Object Interactions (HOI). It then utilizes the learned IDF prior to refine the generated motion’s IDF, guiding the motion generation process to produce movements that are both relation-aware and semantically aligned. For clarity, we simplify the visualization by displaying only four key points for each object*
-
-
 
 ROG 的核心架构由三个关键模块构成：**运动生成模型**、**交互距离场（IDF）构建与监督**、以及**扩散关系模型与引导机制**。三者协同工作，形成“生成—评估—校正”的闭环。
 
@@ -207,15 +197,8 @@ $$\mathrm { M D e v } = \frac { 1 } { n - m } \sum _ { t = m + 1 } ^ { n } \left
 
 其中 $\hat{\mathbf{h}}_i^t$ 和 $\hat{\mathbf{o}}_j^t$ 分别表示接触帧窗口 $[m, n]$ 内手部顶点和物体顶点的位置。MDev 值越低，表明手与物体的运动越协调，交互越自然。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1747_ROG_Guiding_Human_Object_Interactions_with_Rich_Geometry_and_Relations/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of ROG. Given an object, ROG first extracts key points that comprehensively represent the object’s geometry. These object key points, along with human key points, a text prompt, and the diffusion step t, are then input into ROG to generate human-object interactions that are semantically aligned with the text prompt. During each denoising step, the motion generation model initially produces movements*
-
-![[assets/figures/papers/paper_list_l1747_ROG_Guiding_Human_Object_Interactions_with_Rich_Geometry_and_Relations/figures/014_Figure_3.jpg]]
-*Figure 3: Our model generates semantically accurate and consistent human-object interactions across various objects*
-
-
 
 ## 实验与关键发现
 
@@ -262,32 +245,13 @@ Figure 3 的定性比较直观展示了各方法的差异。HOI-Diff 和 CHOIS �
 - **抖动**：接触帧间手部位置不稳定，产生高频抖动。
 - **不自然接触**：手部穿透物体或接触点与文本语义不符（如“握住把手”时手部却在杯身）。
 
-![[assets/figures/papers/paper_list_l1747_ROG_Guiding_Human_Object_Interactions_with_Rich_Geometry_and_Relations/figures/004_Figure_3.jpg]]
-*Figure 3: Qualitative comparisons. We use circles to highlight incorrect interactions, illustrating that our method can generate more realistic and physically plausible interactions that align with the given text*
-
 ROG 通过 IDF 引导有效缓解了上述问题，生成的运动在接触阶段手-物距离分布更接近真实数据。Figure 4 的消融可视化进一步证实：逐步添加物体关键点、IDF 损失和引导机制后，生成交互的连贯性和物理合理性递进改善。
-
-![[assets/figures/papers/paper_list_l1747_ROG_Guiding_Human_Object_Interactions_with_Rich_Geometry_and_Relations/figures/006_Figure_4.jpg]]
-*Figure 4: Ablation visual results. We systematically assemble the model, starting from a basic baseline and incrementally adding our innovative components*
 
 ### 效率与局限性
 
 Table 5 报告了模型复杂度与推理效率。ROG 总参数量为 47.34M，推理时间 8.1 秒，相比 CHOIS（2.3 秒）和 MDM（Tevet et al., ICLR 2023，1.8 秒）明显更慢。额外开销主要来自关系模型的前向传播和 L-BFGS 迭代优化。这限制了 ROG 在实时交互场景中的直接部署。
 
-![[assets/figures/papers/paper_list_l1747_ROG_Guiding_Human_Object_Interactions_with_Rich_Geometry_and_Relations/figures/012_Table_5.jpg]]
-*Table 5: Comparison of model complexity and inference efficiency*
-
 此外，当前框架仅生成全身粗粒度运动，未包含手指运动合成。这一局限源于 FullBodyManipulation 数据集缺乏手-物交互的细粒度标注。在具备手部细节的数据集上，将 IDF 扩展至手指关键点是一个自然的延伸方向，但需验证关系模型在更高维度距离场上的可扩展性。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1747_ROG_Guiding_Human_Object_Interactions_with_Rich_Geometry_and_Relations/figures/007_Table_4.jpg]]
-*Table 4: T2M-BEHAVE [7] cross-benchmark tests: 24.6% lower collisions vs HOI-Diff (0.195 vs 0.259), despite dataset’s compact scale*
-
-![[assets/figures/papers/paper_list_l1747_ROG_Guiding_Human_Object_Interactions_with_Rich_Geometry_and_Relations/figures/013_Figure_2.jpg]]
-*Figure 2: User study. We generated HOIs for 15 captions using 4 methods and asked 20 users to rank them by text alignment and realism. Our method outperforms others in both aspects*
-
-
 
 ## 定位与知识库关联
 
@@ -336,8 +300,6 @@ Table 5 报告了模型复杂度与推理效率。ROG 总参数量为 47.34M，�
 4. **泛化能力**：方法在更多样化的物体类别、动态场景和多主体交互任务中的泛化能力如何？IDF 的表达能力和关系模型的先验学习是否能够覆盖更广泛的交互模式，仍需进一步验证。
 
 5. **与物理仿真的结合**：当前方法通过 IDF 引导隐式地改善物理合理性（如碰撞率降低），但未显式结合物理约束。将 IDF 引导与物理仿真器结合，可能进一步提升交互的物理真实感。
-
-
 
 ## 原文 PDF
 

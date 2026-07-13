@@ -83,8 +83,6 @@ SPD 的独特之处在于将偏见识别从特征重要性排序提升为子空�
 
 消融实验进一步验证了中性重注入的保真度作用、低置信阈值 τ=0.7 的最佳平衡点，以及投影方向数 r=5 在检索任务中的公平性-效用最优折衷（Table 6-8）。
 
-
-
 ### 后验去偏的坐标假设及其局限
 
 视觉-语言模型（VLM）的大规模预训练在带来强大泛化能力的同时，也不可避免地编码了训练数据中的社会偏见。后验去偏（post-hoc debiasing）方法因其无需重新训练模型权重而受到广泛关注，其中**SFID**（Jung et al., NeurIPS 2023）代表了坐标级干预的典型范式：它通过随机森林识别与敏感属性最相关的嵌入维度，然后将这些坐标替换为低置信样本的中性均值。
@@ -111,8 +109,6 @@ Table 3 的线性探针实验提供了最直接的证据。在原始 FairFace �
 ### 从坐标到子空间：几何视角的范式转换
 
 上述三个实证发现共同指向一个核心洞察：**偏差在嵌入空间中的几何结构是一个低维线性子空间，而非孤立的坐标集**。这一认知促使本文从几何视角重新思考后验去偏问题——将干预操作从离散的坐标替换转变为在学习的偏差子空间上进行正交投影。这种范式转换有望实现三个关键突破：（1）通过投影完整移除线性可解码的偏差信息；（2）避免坐标方法固有的特征纠缠问题；（3）利用子空间结构的稳健性提升跨数据集泛化能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -164,8 +160,6 @@ SPD 属于**测试时后验去偏（Post-hoc Test-time Debiasing）** 方法，�
 
 SPD 的核心贡献在于将去偏操作从“坐标索引的离散替换”重新定义为“偏差子空间的几何投影”，这一视角转换使得方法在去偏完全性（线性探针准确率降至接近随机水平）、跨数据集稳健性（不依赖固定坐标索引）和多属性兼容性（子空间投影避免特征纠缠）三个维度上实现了对坐标类方法的系统性超越。
 
-
-
 ### 从坐标编辑到子空间投影的范式转换
 
 现有后验去偏方法（如 SFID）将偏差视为嵌入空间中少数高相关坐标上的独立信号，通过离散替换这些坐标的中性均值来消除敏感信息。然而，实证分析表明这一假设在几何上并不成立：**偏差并非孤立分布于个别坐标，而是跨越多个维度构成一个低维线性子空间**。具体而言，FairFace 数据集中年龄、性别、种族三个属性的 top-100 重要维度存在严重重叠（年龄-性别重叠 31 维，性别-种族重叠 37 维），说明不同敏感属性的编码方向高度纠缠；同时，同一属性（性别）在 FairFace 与 FACET 数据集间的 top-50 维度重叠仅为 24，揭示出跨数据集时的维度索引漂移现象。此外，SFID 在替换 100 维坐标后，线性探针的性别预测准确率仅从 0.9466 降至 0.9404，偏差信息几乎未被有效移除。这些发现共同指向一个核心洞见：**偏差的几何结构是一个低维线性子空间，而非孤立的坐标**。
@@ -204,12 +198,8 @@ SPD 是一种**训练无关的后验方法**，输入为冻结编码器（如 CL
 
 值得注意的是，该方法的核心假设是偏差主要存在于线性子空间中，因此仅保证移除线性可解码的偏差信息，非线性编码的偏差可能残留。此外，公平性-效用权衡由两个关键超参数控制：投影方向数 $r$（即 $d_b$）决定偏差移除的强度，低置信阈值 $\tau$ 决定中性均值的估计范围。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2375_https_arxiv_org_abs_2511_18123/figures/004_Figure_1.jpg]]
 *Figure 1: Overview of our framework SPD in 2D schematic. (1) We first identify the bias subspace set U via T iterative logistic classifiers, each extracts and removes a bias-predictive direction. (2) We then estimate a neutral mean*
-
-
 
 SPD 将偏差消除重新定义为一个几何投影问题，其核心由三个模块串联构成：偏差子空间识别、子空间投影和中性均值重注入。
 
@@ -253,16 +243,6 @@ $$x'' = x' + U^{\top} (U \bar{x}_{\mathrm{low}})$$
 
 三个模块的协同关系如 Figure 1 所示：INLP 负责“找到要移除什么”，子空间投影负责“移除”，中性重注入负责“补回必要的语义”。这一流程将坐标级的离散替换转化为子空间级的连续几何操作，从根本上回应了 SFID 的三大假设失效问题——特征纠缠、跨数据集维度漂移和不完全去偏。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2375_https_arxiv_org_abs_2511_18123/figures/002_Table_1.jpg]]
-*Table 1: Overlap of top-m=100 dimensions across age (A), gender (G), and race (R) attributes on FairFace. Higher overlap indicates stronger feature entanglement*
-
-![[assets/figures/papers/paper_list_l2375_https_arxiv_org_abs_2511_18123/figures/001_Table_2.jpg]]
-*Table 2: Intersection of top-m gender dimensions between Fair-Face and FACET. Weak alignment shows that direct embedding fails to achieve robust and effective cross-dataset transfer*
-
-
-
 ## 实验与关键发现
 
 ### 核心假设的实证瓦解：偏差是子空间而非坐标
@@ -303,9 +283,6 @@ $$x'' = x' + U^{\top} (U \bar{x}_{\mathrm{low}})$$
 ![[assets/figures/papers/paper_list_l2375_https_arxiv_org_abs_2511_18123/figures/006_Table_5.jpg]]
 *Table 5: Experimental results for text-to-image generation*
 
-![[assets/figures/papers/paper_list_l2375_https_arxiv_org_abs_2511_18123/figures/010_Figure_2.jpg]]
-*Figure 2: Text-to-image generation results for the neutral prompt “a person who works as a film director.” The first row shows CoDi outputs, and the second row shows CoDi with SPD debiasing. Gender labels (“male” / “female”) are automatically assigned using BLIP-2 by asking “Does the person look like a male or a female?”*
-
 ### 消融实验：关键设计的有效性
 
 **中性重注入的必要性**：消融实验（Table 6）对比了纯投影（w/o reinjection）与加入中性重注入的 SPD。在 CLIP ResNet-50 上，中性重注入在保持相似 $\Delta DP$（0.0102 vs. 0.0098）的前提下，将零样本分类准确率从 $50.16\pm0.67$ 提升至 $51.44\pm0.64$。这证实了重注入步骤的核心价值：仅做投影会过度移除语义信息，而沿偏差子空间方向加回中性均值，能在不重新引入属性特定方差的前提下恢复必要的语义内容。
@@ -326,18 +303,11 @@ $$x'' = x' + U^{\top} (U \bar{x}_{\mathrm{low}})$$
 
 4. **交叉性偏差的未充分探索**：评估主要针对单一属性（性别、种族、年龄）进行，尽管 Table 1 揭示了属性间的纠缠，但 SPD 在处理交叉性偏差（如“黑人女性”所面临的复合偏差）时的行为尚未被系统研究。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2375_https_arxiv_org_abs_2511_18123/figures/007_Table_6.jpg]]
 *Table 6: Ablation studies for the effect of neutral re-injection on zero-shot multi-class classification task*
 
 ![[assets/figures/papers/paper_list_l2375_https_arxiv_org_abs_2511_18123/figures/008_Table_7.jpg]]
 *Table 7: Ablation studies for the effect of τ for neutral re-injection on zero-shot multi-class classification task*
-
-![[assets/figures/papers/paper_list_l2375_https_arxiv_org_abs_2511_18123/figures/009_Table_8.jpg]]
-*Table 8: Text-to-image retrieval (Flickr30K) results for CLIP (ResNet50) with varying r*
-
-
 
 ## 定位与知识库关联
 
@@ -382,8 +352,6 @@ SPD 的有效性建立在偏差主要存在于线性可解码子空间这一前�
 4. **交叉性偏差的处理**：SPD 的子空间框架是否可以通过学习联合属性子空间或条件子空间来处理交叉性偏差？例如，学习“性别×种族”的交互子空间而非独立子空间的简单拼接。
 
 5. **跨模态与跨架构推广**：SPD 的子空间投影思想能否推广至其他基础模型，如纯语言模型（LLM）的嵌入空间或音频-视觉联合嵌入空间？不同模态中偏差子空间的几何结构是否存在普适规律？
-
-
 
 ## 原文 PDF
 

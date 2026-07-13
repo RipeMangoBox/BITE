@@ -53,8 +53,6 @@ Texvent 的核心思路是将**多模态大语言模型驱动的文本到视频�
 
 **方法定位**：Texvent 属于训练无关的文本到事件仿真方法，区别于需要视频输入或文本-事件对训练的现有方案。其知识贡献在于将物理仿真中的对数亮度平衡与缓存机制引入文本驱动的生成管线，为开放世界事件数据增强提供了高效、低成本的解决方案。当前局限性包括：生成质量受底层文本到视频模型性能约束，未完全模拟事件相机的所有非理想特性（如像素阈值失配），且尚不支持实时生成。
 
-
-
 事件相机是一种受生物启发的视觉传感器，通过异步记录像素级对数亮度变化来输出稀疏事件流。与传统帧相机不同，事件相机具有微秒级时间分辨率、高动态范围和低数据冗余等优势，在高速运动估计、低光照视觉和动态场景理解等任务中展现出巨大潜力。然而，事件相机依赖物理采集获取数据，硬件成本高昂，且难以覆盖开放世界中多样化的场景与运动模式，这严重制约了事件驱动视觉算法的开发与评估。
 
 为缓解数据稀缺问题，事件仿真技术应运而生。其核心目标是从现有数字内容（如图像、视频）出发，通过物理模型模拟事件生成过程，从而绕过物理采集。现有视频到事件模拟器，如 **ESIM**（Rebecq et al., CoRL 2018）、**VID2E**（Gehrig et al., CVPR 2020）、**V2E**（Hu et al., CVPR 2021）、**V2CE**（Zhang et al., ICRA 2024）和 **DVS-Voltmeter**（Lin et al., ECCV 2022），已能生成较逼真的事件流，但它们严重依赖高质量视频输入。视频数据的采集本身同样耗时耗力，且难以灵活适配文本描述所定义的新场景，使得仿真管线在开放世界场景下的可扩展性受到根本性限制。
@@ -64,8 +62,6 @@ Texvent 的核心思路是将**多模态大语言模型驱动的文本到视频�
 上述困境揭示了一个关键瓶颈：**现有事件仿真方法要么受限于视频数据的采集成本与场景覆盖度，要么受限于文本-事件对的稀缺性与训练依赖，均无法实现低成本、高保真且场景可自由定义的开放世界事件数据生成。**
 
 Texvent 正是在这一背景下提出，旨在打破传统仿真管线对视频采集或配对训练的依赖。其核心动机是：**将多模态大语言模型驱动的文本到视频生成与物理级事件仿真相集成，通过训练无关的方式，仅凭文本提示即可生成高保真异步事件流，从而以极低成本实现开放世界事件数据的按需生成。**
-
-
 
 ## 核心方法与创新机理
 
@@ -90,8 +86,6 @@ Texvent 的核心创新在于将**训练无关的文本到视频生成**与**物
 
 上述五个创新点共同构成了 Texvent 的因果调节旋钮（causal knob）：通过平衡对数亮度和缓存机制缓解仿真与真实的差距，实现开放世界事件数据的快速生成。其决定性证据包括：在 NT-ImageNet 数据集上取得最高 EQS 0.8851，同时运行时间仅 0.0653 秒（Table 2）；仅添加 5% 生成数据即可使 HyperE2VID 的 PSNR 提升至 23.3000（Table 3）。
 
-
-
 Texvent 的整体设计遵循“文本→视频→事件流”的两阶段生成范式，将多模态大语言模型的开放世界内容生成能力与物理事件仿真器相结合，实现训练无关（training-free）的异步事件数据合成。
 
 **输入与输出**  
@@ -111,8 +105,6 @@ Figure 2 清晰展示了端到端流程：文本提示经 MLLM 编码-解码生�
 
 ![[assets/figures/papers/paper_list_l2064_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Texvent_Asynchron/figures/002_Figure_2.jpg]]
 *Figure 2: Framework of Texvent, including the high frame-rate video generation (Eq. 3, Eq. 4) and event simulation. During computing the event frame (E. F.), we present the brightness cache to store the brightness values at coordinates where no event data has been activated. These values still serve as the reference brightness values in the subsequent event frame generation (Eq. 5). Such a cache is periodically reset as null to avoid acting fake events in long-term event simulation. After injecting the background noise (Eq. 6), we calculate the brightness variation rate (V. R.) at each coordinate to reconstruct the dense time stamps (Eq. 7)*
-
-
 
 Texvent 的核心流水线由五个关键模块串联构成：文本驱动视频生成、亮度感知帧插值、带缓存的事件帧生成、背景活动噪声注入、以及密集时间戳重建。以下按处理顺序展开各模块的数学形式与物理含义。
 
@@ -168,16 +160,6 @@ $$
 
 其中 $\Delta_L^{\mathbf{x}_i}$ 为像素 $\mathbf{x}_i$ 在两帧间的对数亮度变化量，$\gamma$ 为时间缩放参数。直觉上，亮度变化越大的像素，其事件触发时刻越接近帧间隔的起始端，从而在时间维度上更精细地刻画异步事件的物理时序。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2064_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Texvent_Asynchron/figures/003_Figure_3.jpg]]
-*Figure 3: Blue: The original logarithmic function shows high sensitivity for low light variations. For the same contrast thresholds*
-
-![[assets/figures/papers/paper_list_l2064_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Texvent_Asynchron/figures/010_Figure_7.jpg]]
-*Figure 7: Ablation study about the balancing parameter and brightness cache. Quantitative results are shown in the Supplementary Material. Blue and red denote the positive and negative events, respectively*
-
-
-
 ## 实验与关键发现
 
 ### 实验设置概览
@@ -220,13 +202,6 @@ Figure 4 展示了真实事件数据与 Texvent 模拟数据的定性对比，�
 *Figure 6: Warped event and depth map of simulated event data. Discrepancies between groundtruth and simulated event data arise from the misalignment between raw event data and corresponding video sequences in the DSEC dataset [12]*
 
 Texvent 的已知局限包括：（1）生成视频质量受限于底层文本到视频模型（如 Cosmos）的性能，当文本提示处于分布外时可能产生视觉伪影；（2）仿真流程未完全模拟事件相机的所有非理想特性（如像素阈值失配、温度噪声），可能残留 sim-to-real 差距；（3）当前实现无法实时生成，因视频生成和事件模拟需要一定推理时间，但单次仿真效率已显著优于传统方法。这些局限在评估中需要手动验证，因论文未提供针对分布外提示或极端光照条件的系统退化测试。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2064_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Texvent_Asynchron/figures/005_Figure_5.jpg]]
-*Figure 5: Visualization results of the event frame and its corresponding reconstructed (Recon.) image. E2VID [39] is employed to convert the event data into images. Blue and red denote the positive and negative events, respectively*
-
-
 
 ## 定位与知识库关联
 
@@ -277,8 +252,6 @@ Texvent 在继承视频到事件仿真管线框架的同时，对五个关键模
 4. **多模态输入扩展**：是否可以将 Texvent 扩展到多模态输入（如图像+文本），以增强事件仿真的可控性和细粒度？这将使方法从“文本到事件”扩展为“条件到事件”，覆盖更广泛的应用需求。
 
 **需要手动验证的点**：论文未提供 Texvent 与 Text-to-Events（Ott et al., NICE 2024）的直接定量对比，两者在文本到事件任务上的相对优劣需通过额外实验确认。此外，平衡参数 $\alpha$ 的敏感性分析仅在消融研究中定性展示，缺乏不同 $\alpha$ 取值下的定量性能曲线。
-
-
 
 ## 原文 PDF
 

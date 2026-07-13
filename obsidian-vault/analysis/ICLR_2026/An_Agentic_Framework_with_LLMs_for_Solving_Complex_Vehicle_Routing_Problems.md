@@ -52,8 +52,6 @@ claims:
 
 实验覆盖17个VRP变体（含标准VRP和电动VRP），结果表明AFL在所有变体上实现了 **0%的运行错误率（RER）和100%的成功率（SR）**，远优于SGE（RER 94.1%）和DRoC（RER 82.4%）。在TSPLib、CVRPLib等标准基准上，AFL的最优性间隙（gap）仅为1.28%–6.66%，而SGE的间隙高达109%–660%。消融研究进一步证实，判断智能体和修改智能体的移除会显著降低问题描述准确率和代码可靠性，验证了多智能体协同迭代机制的关键作用。
 
-
-
 车辆路径问题（VRP）是运筹学与组合优化领域的基础问题之一，其目标是在满足一系列复杂约束的前提下，为一组车辆规划最优配送路线。现实世界中的VRP往往包含容量限制、时间窗、多车场、回程取送货、电动车辆续航等多样约束，这些约束的任意组合会衍生出数十种变体，对求解器的通用性和自适应性提出了极高要求。
 
 当前，针对VRP的求解方法大致可分为三类：精确算法、元启发式算法和基于学习的神经组合优化方法。精确算法在中小规模上可保证最优性，但面对复杂约束组合时计算代价指数增长。元启发式算法（如**HGS-PyVRP**）在标准基准上表现优异，但其核心代码高度针对特定问题结构设计——一旦引入新约束（如电动车辆或开放路径），就需要对算法底层进行大量手工修改，难以自然泛化。基于策略梯度的神经求解器（如**RF-POMO**）虽具备一定学习能力，但通常需要针对每个新变体重新训练模型，且对复杂约束的嵌入仍依赖手工特征工程。
@@ -67,8 +65,6 @@ claims:
 上述瓶颈的深层原因在于：LLM虽然具备代码生成能力，但缺乏对问题领域的深层理解和对生成结果的有效验证机制。单纯依赖单次提示或检索增强生成，无法保证代码在复杂约束下的逻辑一致性和执行正确性。
 
 基于此，本文提出**AFL（Agentic Framework with LLMs）**，一个基于多智能体协同的LLM框架，旨在实现从原始VRP实例到高质量可行解的全自动化生成。AFL的核心动机是：让LLM扮演一个知识渊博的开发者角色，直接从原始输入中提取领域知识，生成自包含的求解器代码，并通过多智能体迭代验证机制确保代码的可靠性和解的可行性——无需任何手工模块、外部求解器或人工干预。
-
-
 
 ## 核心方法与创新机理
 
@@ -97,16 +93,11 @@ AFL 的核心创新在于将传统依赖手工模块与人工干预的 LLM-based
 
 LLM 单独生成代码时常忽略或错误实现复杂约束。AFL 通过问题描述子任务显式提取约束集合 $K$（作为 $\mathcal{D}(\mathcal{G}) = \{P, S, K, X, Y, Z\}$ 的一部分），并在代码生成和判断阶段反复检查约束嵌入。这使得 AFL 生成的求解器能保证几乎所有约束得到满足，代码可靠性与解可行性接近 100%（Table 12）。
 
-
-
 ![[assets/figures/papers/paper_list_l47_https_openreview_net_forum_id_BMOgYw4EhQ/figures/003_Figure_1.jpg]]
 *Figure 1: Overview of an agentic framework with LLMs for solving complex VRPs*
 
 ![[assets/figures/papers/paper_list_l47_https_openreview_net_forum_id_BMOgYw4EhQ/figures/001_Table_1.jpg]]
 *Table 1: Comparison of representative LLM-based approaches for VRPs*
-
-![[assets/figures/papers/paper_list_l47_https_openreview_net_forum_id_BMOgYw4EhQ/figures/004_Figure_2.jpg]]
-*Figure 2: Code structure*
 
 AFL 将复杂 VRP 求解流程分解为三个可管理的子任务：**问题描述（Problem Description）**、**代码生成（Code Generation）** 和 **求解推导（Solution Derivation）**。三个子任务由四个专门智能体协同驱动——生成智能体（GA）、判断智能体（JA）、修改智能体（RA）和错误分析智能体（EAA）——形成从原始 VRPLib 实例到可行解的端到端自动化流水线。
 
@@ -136,8 +127,6 @@ Figure 1 给出了框架的全局视图。给定一个 VRPLib 格式的 VRP 实�
 | 错误分析智能体 | EAA | 诊断求解推导阶段的运行时错误并提供修复建议 |
 
 四个智能体在三个子任务中形成两个闭环：GA-JA-RA 闭环保障问题描述和代码的静态正确性；EAA-RA 闭环处理运行时错误，确保最终产生可行解。这种多层验证机制是实现 0% 运行错误率（RER）和 100% 成功率（SR）的核心因素（Table 5），消融实验（Figure 3）进一步证实，移除 JA 或 RA 将导致问题描述准确率急剧下降。
-
-
 
 ### 3.1 流水线分解与智能体角色
 
@@ -221,24 +210,17 @@ $$\mathrm{SR} = \frac{V_{\mathrm{succ}}}{V} \times 100\%$$
 
 其中 $V_{\mathrm{succ}}$ 为无错误执行并产生可行解的程序数。
 
-
-
 ## 实验与关键发现
 
 ### 代码可靠性与成功率：AFL 实现零运行错误
 
 AFL 在最关键的可靠性维度上实现了质的突破。在覆盖17个 VRP 变体（含标准与电动 VRP）的测试中，AFL 的**运行时错误率（RER）为 0%，成功率（SR）为 100%**（Table 5）。这意味着 AFL 生成的每一段求解器代码都能无报错执行并产出可行解。
 
-
-![[assets/figures/papers/paper_list_l47_https_openreview_net_forum_id_BMOgYw4EhQ/figures/007_Table_5.jpg]]
-*Table 5: RER and SR*
-
 对比之下，同类 LLM 方法的表现极差：
 - **SGE**（Iklassov et al., 2024）的 RER 高达 94.1%，SR 仅 5.9%——绝大多数生成代码在运行阶段即崩溃。
 - **DRoC**（Jiang et al., 2025b）的 RER 为 82.4%，SR 为 17.6%，虽有检索增强但仍远未达到可用水平。
 
 这一差异的因果机制在于 AFL 的多智能体迭代验证闭环：判断智能体（JA）和修改智能体（RA）在代码生成阶段逐函数检查正确性，错误分析智能体（EAA）在求解推导阶段诊断运行时错误并提供修复建议。消融实验（Figure 3, Section 4.5）直接验证了这一点——移除 JA 或 RA 后，问题描述的准确率急剧下降，代码生成失败率显著升高，证明了这些智能体对维持流水线稳定性和代码可靠性的不可或缺。
-
 
 ![[assets/figures/papers/paper_list_l47_https_openreview_net_forum_id_BMOgYw4EhQ/figures/009_Figure_3.jpg]]
 *Figure 3: Ablation studies on the JA and RA*
@@ -248,9 +230,6 @@ AFL 在最关键的可靠性维度上实现了质的突破。在覆盖17个 VRP 
 AFL 不仅在可靠性上碾压同类 LLM 方法，其解质量也显著优于它们，并在多数问题上逼近最先进专用求解器。
 
 **标准基准（Table 3, Table 11）**：在覆盖12个 VRP 变体的48个100节点标准实例上，AFL（T=10000）的最优性间隙（gap）在多数问题上控制在 3% 以内。具体而言：
-
-![[assets/figures/papers/paper_list_l47_https_openreview_net_forum_id_BMOgYw4EhQ/figures/005_Table_3.jpg]]
-*Table 3: Comparison results on standard benchmarks. More results are shown in Table 11*
 
 - CVRP（n=100）：AFL 目标值 10.55，与 **HGS-PyVRP**（已知最优）持平，gap 为 0.00%。
 - CVRP（n=200）：AFL 目标值 9.95，gap 为 0.51%。
@@ -266,7 +245,6 @@ AFL 不仅在可靠性上碾压同类 LLM 方法，其解质量也显著优于�
 - FRRPP 小规模实例：AFL 的 gap 为 -2.72%。
 
 **与同类 LLM 方法的对比（Table 6）**：在 TSPLib、CVRPLib 等经典基准上，AFL 的 gap 为 1.28%–6.66%，而 **SGE** 的 gap 高达 109%–660%，差距在两个数量级以上。**ReEvo**（Ye et al., 2024）的 gap 为 2.17%–7.42%，虽优于 SGE 但仍逊于 AFL。
-
 
 ![[assets/figures/papers/paper_list_l47_https_openreview_net_forum_id_BMOgYw4EhQ/figures/008_Table_6.jpg]]
 *Table 6: Gap comparison on benchmark instances*
@@ -303,20 +281,6 @@ AFL 标准流程在所有测试变体上始终实现最低的 gap 和最高的�
 3. **LLM 依赖性**：AFL 默认使用 GPT-4.1，在不同 LLM 上的性能存在差异（Table 16），框架效果受底层模型能力制约。
 
 4. **问题迁移的开放性**：当前验证集中在 VRP 领域，能否直接迁移到其他组合优化问题（如调度、装箱）尚待探索。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l47_https_openreview_net_forum_id_BMOgYw4EhQ/figures/002_Table_2.jpg]]
-*Table 2: Constraint descriptions and corresponding VRPLib-format fields*
-
-![[assets/figures/papers/paper_list_l47_https_openreview_net_forum_id_BMOgYw4EhQ/figures/010_Table_7.jpg]]
-*Table 7: Constraint composition of VRP variants*
-
-![[assets/figures/papers/paper_list_l47_https_openreview_net_forum_id_BMOgYw4EhQ/figures/011_Table_8.jpg]]
-*Table 8: Main sections of a VRPLIB instance file with descriptions and example*
-
-
-
 
 ## 定位与知识库关联
 
@@ -361,8 +325,6 @@ AFL 的适用边界和已知局限包括：
 - 未来计划引入进化搜索来引导代码生成，可能进一步提升解质量。
 - 判断智能体（JA）输出的具体内容与格式细节尚未完全公开，需进一步查阅补充材料。
 - 生成智能体（GA）在子任务二中的具体提示词和格式规范有待完整披露。
-
-
 
 ## 原文 PDF
 

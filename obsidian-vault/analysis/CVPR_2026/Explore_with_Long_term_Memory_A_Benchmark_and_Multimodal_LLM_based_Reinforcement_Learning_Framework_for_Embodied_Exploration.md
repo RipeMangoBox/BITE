@@ -51,8 +51,6 @@ claims:
 
 从方法谱系看，MemoryExplorer位于“RL微调MLLM + 主动记忆检索”的交叉点（Figure 3），区别于无记忆的Explore-EQA（纯导航基线）、被动记忆的3D-Mem（对象过滤）和无RL的RA-Mem（主动检索但未微调）。其知识贡献在于：首次将强化学习引入MLLM的具身探索训练，通过可学习的主动记忆检索机制弥合了感知、记忆与决策之间的鸿沟。
 
-
-
 ### 具身探索中的记忆鸿沟
 
 具身智能体在未知环境中自主探索并完成长期任务，是通向通用人工智能的关键能力之一。现有研究主要沿两条独立路径发展：一是目标导航，要求智能体在未见过的场景中定位指定物体；二是具身问答，要求智能体在探索后回答与环境相关的问题。然而，这两类任务都聚焦于任务完成的最终结果，忽视了探索过程本身的价值——智能体在探索中积累的丰富情景记忆，并未被系统性地用于优化后续决策。
@@ -72,8 +70,6 @@ claims:
 MemoryExplorer 的关键设计在于：模型根据当前任务指令、多视图观测和目标导向问题，动态生成查询并调用外部记忆检索工具，通过 CLIP 特征余弦相似度从情景记忆库中检索 top-k 相关记忆；随后，模型综合当前信息与检索记忆，同时预测导航动作、前沿选择与问题答案。训练采用 GRPO 算法，奖励函数由动作正确性、前沿选择合理性、答案质量和格式规范性四部分加权构成，并引入动作-前沿一致性惩罚和工具使用缩放因子，引导模型在探索效率与记忆利用之间取得平衡。
 
 这一设计使智能体能够在长距离任务中动态构建和利用情景记忆，实现认知与决策的统一，从而提升自主探索能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -105,8 +101,6 @@ $$r_{\mathrm{total}} = w_{act} \cdot r_{\mathrm{action}} \cdot c + w_{front} \cd
 ### 方法谱系与知识库定位
 
 MemoryExplorer 处于**具身探索 + 多模态大语言模型 + 强化学习**的交叉点。在具身探索谱系中，它区别于纯导航方法（如 Explore-EQA）和被动记忆方法（如 3D-Mem）；在 MLLM 应用谱系中，它通过 GRPO 微调将通用视觉语言模型（Qwen2.5-VL-7B）转化为具有主动记忆能力的具身智能体。其技术路径可概括为：**情景记忆库构建 → CLIP 特征检索 → 多任务奖励引导的 GRPO 策略优化 → 认知-决策统一输出**（Figure 3）。这一框架为 MLLM 在具身场景中实现终身学习提供了可复用的范式。
-
-
 
 MemoryExplorer 的整体设计围绕一个核心闭环展开：**多模态大语言模型（MLLM）策略通过强化学习主动调用外部记忆检索工具，在长距离多目标导航中动态构建和利用情景记忆，同时回答基于记忆的问题**。图1给出了该框架的宏观视图——它将“多目标导航”与“基于记忆的问答”统一为一个任务范式，使智能体的认知（记忆与推理）与决策（探索与导航）能力得以联合评估与优化。
 
@@ -146,13 +140,6 @@ MemoryExplorer 直接继承 RA-Mem 的主动记忆检索架构，但引入了两
 - **奖励设计**：从单一的任务完成信号扩展为多任务、多粒度的奖励函数，配合一致性惩罚和工具使用缩放，显式引导模型在动作、前沿选择、问答和格式四个维度上优化。
 
 消融实验证实，一旦引入记忆检索工具，模型性能即获得显著提升（Table 6），而动作-前沿一致性惩罚和工具使用惩罚的加入进一步将 SR 从 22.43 提升至 23.53（Table 7），验证了多任务奖励设计的必要性。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2158_https_arxiv_org_abs_2601_10744/figures/004_Figure_3.jpg]]
-*Figure 3: Illustration of training in MemoryExplorer. Given a task instruction, the multi-view observations, and a goal-oriented question. Model retrieves relevant multimodal memories from the episodic memory bank using tools, analyzes the current information alongside the retrieved memories to understand the progress of the long-term task, and performs ACTION prediction, FRONTIER selection, and question ANSWER. The policy model output response calculates the reward using a Multi-Task Reward function and is fine-tuned using GRPO*
-
-
 
 MemoryExplorer 是一个基于强化学习与主动记忆检索的具身探索模型，其核心由四个关键模块构成：**情景记忆库与检索工具**、**基于MLLM的策略网络**、**多任务奖励函数**以及**GRPO策略优化**。模型以任务指令 $I$、多视图观察 $O$ 和目标导向问题 $Q$ 为输入，通过策略 $\pi_\theta(I, O, Q; \mathcal{M})$ 输出动作、前沿选择和问题答案，其中 $\mathcal{M}$ 为情景记忆库。
 
@@ -196,8 +183,6 @@ $$\max_{\pi_\theta} \mathbb{E}_{(I, O, Q) \sim D, \, y \sim \pi_\theta(\cdot \ve
 
 训练过程监控（Figure 5）显示，奖励曲线在约 200 步后趋于收敛，工具使用率从初始的随机调用逐步稳定至合理水平，表明模型通过强化学习习得了有效的主动检索策略。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -238,9 +223,6 @@ Figure 5 展示了训练过程中的奖励曲线和工具使用率变化。随�
 
 Figure 6 展示了不同类型问题上的答案质量分布。模型在“存在性判断”类问题上表现最佳，而在“计数”和“空间关系推理”类问题上仍有较大提升空间，这与视觉-语言模型的空间理解能力瓶颈一致。
 
-![[assets/figures/papers/paper_list_l2158_https_arxiv_org_abs_2601_10744/figures/010_Figure_6.jpg]]
-*Figure 6: Answer quality across different question types*
-
 ### 失败模式分析
 
 论文通过 Figure 10-12 展示了三类典型失败案例：
@@ -253,20 +235,9 @@ Figure 6 展示了不同类型问题上的答案质量分布。模型在“存�
 
 论文在 ROSMASTER X3 机器人平台（Figure 7）上进行了真实世界测试（Figure 8），验证了 MemoryExplorer 从仿真到现实的迁移潜力。完整任务执行流程见 Figure 9。
 
-![[assets/figures/papers/paper_list_l2158_https_arxiv_org_abs_2601_10744/figures/011_Figure_7.jpg]]
-*Figure 7: ROSMASTER X3*
-
 ### 方法谱系与知识库定位
 
 MemoryExplorer 处于**具身探索 + 多模态大语言模型 + 强化学习**的交叉点。其直接前身是 RA-Mem（主动记忆检索但无 RL），核心增量在于引入 GRPO 强化微调，使模型自主学会“何时检索”和“如何利用检索结果”。与 3D-Mem（被动对象过滤，**Jiao et al., 2024**）相比，MemoryExplorer 将记忆从静态知识库升级为动态可查询的情景记忆系统。在方法谱系上，该工作上承基于前沿探索的经典导航框架，下接 MLLM 驱动的具身推理，为终身探索学习提供了可训练的范式。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2158_https_arxiv_org_abs_2601_10744/figures/005_Table_2.jpg]]
-*Table 2: Experiments on LMEE-Bench. Score represents the MLLM-Score for open-ended answers, and Acc represents the accuracy rate of the answer choices*
-
-![[assets/figures/papers/paper_list_l2158_https_arxiv_org_abs_2601_10744/figures/008_Table_3.jpg]]
-*Table 3: Experiments on GOAT-Bench. Evaluated on the “Val Unseen” split. Methods denoted by * are from GOAT-Bench, and those with † are evaluated on the subset. All MLLM-based exploration methods are implemented based on Qwen2.5-VL-7B*
 
 ![[assets/figures/papers/paper_list_l2158_https_arxiv_org_abs_2601_10744/figures/007_Table_4.jpg]]
 *Table 4: Ablation study on question type*
@@ -279,11 +250,6 @@ MemoryExplorer 处于**具身探索 + 多模态大语言模型 + 强化学习**�
 
 ![[assets/figures/papers/paper_list_l2158_https_arxiv_org_abs_2601_10744/figures/015_Table_8.jpg]]
 *Table 8: Ablation study on hyperparameters*
-
-![[assets/figures/papers/paper_list_l2158_https_arxiv_org_abs_2601_10744/figures/012_Table_5.jpg]]
-*Table 5: Experiments on subset and full-set LMEE-Bench*
-
-
 
 ## 定位与知识库关联
 
@@ -344,8 +310,6 @@ $$\max_{\pi_\theta} \mathbb{E}_{(I,O,Q) \sim D,\ y \sim \pi_\theta(\cdot|I,O,Q;M
 4. **自适应记忆调用策略**：主动记忆调用的频率和策略如何根据任务难度自适应调整？是否可以在训练过程中学习“何时检索”的元策略，而非固定使用 top-k 检索？
 
 5. **与经典方法的融合**：MemoryExplorer 的强化学习微调范式与经典地图构建方法（如语义建图、拓扑图）之间是否存在互补性？将结构化环境表征与 MLLM 的情景记忆相结合，可能进一步提升长距离导航的准确性和效率。
-
-
 
 ## 原文 PDF
 

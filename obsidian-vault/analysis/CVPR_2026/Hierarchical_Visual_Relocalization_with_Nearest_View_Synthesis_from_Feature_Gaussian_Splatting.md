@@ -68,8 +68,6 @@ claims:
 
 消融实验进一步验证了两个关键设计的作用：自适应视角检索将弱纹理场景（如 Stairs）的 R@[5cm, 5°] 召回率从 77.1% 提升至 91.9%；混合匹配器在所有指标上均优于纯渲染特征匹配（FGS-Matcher）和纯稀疏匹配（SP+LG）。
 
-
-
 视觉重定位（Visual Relocalization）是三维视觉与机器人领域的基础任务，其目标是根据查询图像精确估计相机在已知场景中的 6-DoF 位姿。该任务在增强现实、自动驾驶和机器人导航等应用中扮演关键角色。近年来，层次化重定位（Hierarchical Localization）范式因其效率与精度平衡而成为主流路线：先在数据库图像中检索与查询视角最接近的参考图像，再通过特征匹配建立 2D-2D 或 2D-3D 对应关系，最终利用 PnP 求解位姿。
 
 然而，**传统层次化重定位方法存在一个核心瓶颈**：数据库图像的视角覆盖天然稀疏且离散，当查询图像与所有数据库图像之间存在显著的视角差异时，检索到的参考图像与查询之间的共视区域有限，导致特征匹配阶段的内点数量不足，进而使初始位姿估计精度急剧下降。这一问题在弱纹理区域（如白墙、楼梯）尤为严重——稀疏的纹理信息本身已使特征提取与匹配困难，视角偏差进一步压缩了有效匹配的空间。
@@ -85,8 +83,6 @@ claims:
 3. **混合粗-细特征匹配**：粗匹配利用渲染特征的内积相似度建立 patch 级对应，细匹配切换至半稠密匹配器对渲染 RGB 与查询图像进行像素级精化，规避渲染特征的域差异在细粒度上的局限。
 
 通过上述设计，SplatHLoc 旨在同时提升弱纹理区域的初始位姿鲁棒性，以及整体重定位的精度与效率。
-
-
 
 ## 核心方法与创新机理
 
@@ -120,8 +116,6 @@ STDLoc 等渲染基线在渲染 RGB 图像后提取特征进行匹配，本质�
 消融实验（Table 6）有力验证了分工的合理性：纯渲染特征匹配（FGS-Matcher）在室内场景的 R@[2cm,2°] 仅 76.8%，而混合匹配器（M + I_fine）达到 91.5%；反之，若粗匹配也使用图像特征（I_coarse + I_fine），室内召回率反而下降，表明渲染特征在粗匹配阶段的不可替代性。
 
 三个 changed slots 形成闭环：FGS 地图提供统一的渲染能力，自适应检索利用渲染合成虚拟视角以扩充检索覆盖，混合匹配器则充分发挥渲染特征与图像特征在粗、细阶段各自的优势。三者协同使得 SplatHLoc 在 7-Scenes、12-Scenes、Cambridge Landmarks 三个基准上均取得最优或接近最优的中位平移/旋转误差（Table 1-3）。
-
-
 
 SplatHLoc 的整体管线遵循**层次化视觉重定位**范式，以**特征高斯溅射（Feature Gaussian Splatting, FGS）** 作为统一的场景表示核心，将建图、检索、匹配与位姿估计串联为一个端到端可优化的流程（Figure 2）。其设计动机源于传统层次化重定位方法的两大瓶颈：（1）数据库图像视角稀疏导致初始检索位姿与查询图像间缺乏足够的共视区域；（2）弱纹理或重复纹理区域中，纯图像特征或纯渲染特征的匹配均难以同时兼顾鲁棒性与精度。SplatHLoc 通过三个关键模块的协同设计——FGS 地图构建、自适应粗‑细视点检索、混合特征匹配——系统性地缓解了上述问题。
 
@@ -158,12 +152,8 @@ SplatHLoc 在模块设计上做出了若干关键取舍，直接决定了系统�
 
 尽管 SplatHLoc 在多个基准上取得了领先性能，其管线仍存在若干结构性局限：FGS 地图在训练视角稀疏的区域渲染质量下降，可能导致定位失败（Figure VI）；场景中的高度重复纹理（如走廊、楼梯）易引发错误匹配；FGS 训练依赖 COLMAP 提供的 SfM 初始点云，当 SfM 重建失败时建图受阻；此外，地图存储仍需额外保存 VPR 特征（例如 Chess 场景需 62.5 MB），限制了在资源受限设备上的部署。这些局限为后续研究指明了方向，如探索基于 3D 基础模型的初始化替代方案、场景分块扩展策略以及更紧凑的特征表示。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2520_https_arxiv_org_abs_2603_29185/figures/001_Figure_1.jpg]]
 *Figure 1: SplatHLoc: a novel hierarchical visual relocalization framework based on Feature Gaussian Splatting (FGS). FGS renders color, depth, and feature maps from novel views, which our method exploits to improve the image retrieval and feature matching process. Upon retrieving a reference image, we match it to the query to estimate an initial pose (initial relocalization). We then render views from the estimated pose and iteratively match them to the query to refine the pose (refined relocalization)*
-
-
 
 ### 3.1 特征高斯溅射（FGS）地图构建
 
@@ -182,9 +172,6 @@ $$ F_{t} = \mathrm{Resize}(e(I)), \quad F_{t} \in \mathbb{R}^{C \times H' \times
 $$ F_{r}^{\mathrm{high}} = \mathsf{Resize}(d(F_{r}^{\mathrm{low}})), \quad F_{r}^{\mathrm{high}} \in \mathbb{R}^{C \times H' \times W'} \tag{2} $$
 
 这种“低维存储、解码上采样”的设计（见 Figure 3）有效降低了地图存储开销和渲染计算量。
-
-![[assets/figures/papers/paper_list_l2520_https_arxiv_org_abs_2603_29185/figures/003_Figure_3.jpg]]
-*Figure 3: Illustration of the FGS training process. Feature decoder d is introduced to reduce the dimensionality of the rendered feature*
 
 ---
 
@@ -246,8 +233,6 @@ $$ \mathbf{X}_{r} = T \cdot \left( D_{r}(\mathbf{x}_{r}) \cdot K^{-1} [\mathbf{x
 
 **迭代位姿精化**：从估计位姿重新渲染颜色和深度图，再次执行混合匹配（Eq. 11）和 2D‑3D 提升（Eq. 12），重复匹配与估计过程，逐次求精。该迭代机制使得位姿估计能够收敛到更高精度。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -275,9 +260,6 @@ Figure 6 对比了 SplatHLoc 与 STDLoc 在 7-Scenes 上的平均每查询重定
 ![[assets/figures/papers/paper_list_l2520_https_arxiv_org_abs_2603_29185/figures/011_Table_4.jpg]]
 *Table 4: Mapping analysis. We report the FGS map size, mapping time and peak GPU memory on the Chess scene*
 
-![[assets/figures/papers/paper_list_l2520_https_arxiv_org_abs_2603_29185/figures/009_Figure_6.jpg]]
-*Figure 6: Runtime analysis. We report the average relocalization time per query on the 7-Scenes dataset for STDLoc versus our proposed SplatHLoc. The runtime is divided into two parts: initial pose estimation and iterative pose refinement. Both methods perform four rounds of pose refinement*
-
 ### 消融实验
 
 **消融 I：自适应视角检索与混合匹配。** Table 5 通过四组设置系统剥离了两个核心模块的贡献：
@@ -304,24 +286,8 @@ Figure VI 系统展示了 SplatHLoc 的两类典型失败案例：
 - 目前仅支持单 GPU 训练，地图存储需额外保存 VPR 特征。
 - 所有实验在单张 NVIDIA RTX 3090 GPU 上进行，对比方法结果取自原论文或使用作者提供的模型复现，FGS 训练使用统一的 30,000 步与默认超参数，公平性得到一定保障。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2520_https_arxiv_org_abs_2603_29185/figures/004_Table_1.jpg]]
-*Table 1: Relocalization results on 7-Scenes dataset. We report the median translation (cm) and rotation (°) errors for each scene. The best and second-best results are bolded and underlined, respectively*
-
-![[assets/figures/papers/paper_list_l2520_https_arxiv_org_abs_2603_29185/figures/007_Table_2.jpg]]
-*Table 2: Relocalization results on the 12-Scenes dataset. We report the median translation (cm) and rotation errors (°), and the percentage of query images below 2 cm, 2° pose error*
-
-![[assets/figures/papers/paper_list_l2520_https_arxiv_org_abs_2603_29185/figures/008_Table_3.jpg]]
-*Table 3: Relocalization results on Cambridge Landmarks dataset. We report the median translation (cm) and rotation (°) errors of different methods*
-
 ![[assets/figures/papers/paper_list_l2520_https_arxiv_org_abs_2603_29185/figures/012_Table_5.jpg]]
 *Table 5: Ablation study I. We investigate the impact of the proposed Adaptive C2F Retrieval and Hybrid C2F Matching*
-
-![[assets/figures/papers/paper_list_l2520_https_arxiv_org_abs_2603_29185/figures/010_Table_6.jpg]]
-*Table 6: Ablation study II. We ablate the hybrid matcher by isolating rendered features’ coarse and fine contributions. FGS-Matcher is adopted from STDLoc, which uses rendered features in both coarse and fine matching stages*
-
-
 
 ## 定位与知识库关联
 
@@ -385,8 +351,6 @@ SplatHLoc 沿袭 HLoc 的层次化框架，但在三个关键环节进行了根�
 SplatHLoc 的核心思想——**渲染特征与图像特征的混合匹配**——与更广泛的“神经渲染辅助视觉定位”趋势一致。它将 3DGS 从单纯的视图合成工具提升为**特征场表示**，使得渲染结果不仅用于视觉对齐，更直接参与特征匹配过程。这一思路与 NeRF-based 定位方法（如 NeRF-Loc）中“从辐射场渲染特征”的做法一脉相承，但 SplatHLoc 受益于 3DGS 的实时渲染能力，在效率上具有显著优势（Figure 6：平均每查询定位时间低于 STDLoc）。
 
 此外，自适应视角检索策略与“主动视角规划”和“检索增强”领域存在潜在交叉：通过扰动初始检索位姿生成虚拟候选视图，本质上是一种在 SE(3) 空间中进行局部稠密采样的检索增强策略，这一思想可推广至其他需要视角覆盖的任务。
-
-
 
 ## 原文 PDF
 

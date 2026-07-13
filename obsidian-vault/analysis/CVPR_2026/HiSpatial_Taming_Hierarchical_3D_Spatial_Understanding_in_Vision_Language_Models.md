@@ -50,8 +50,6 @@ claims:
 
 **方法定位**：HiSpatial以PaliGemma2-3B为基础架构，通过添加3D点云分支（正弦编码 + 可学习patchify层 + 融合投影器）扩展为RGB-XYZ多模态VLM，在约500万张图像、4500万个物体实例、20亿QA对的大规模层次化空间数据上进行监督微调。与依赖相对深度或纯RGB输入的现有空间模型不同，HiSpatial直接利用度量尺度3D坐标作为辅助输入，从数据与架构两个维度系统性提升了VLM的空间智能。
 
-
-
 ### 三维空间理解：从感知到认知的鸿沟
 
 视觉语言模型在二维图像理解任务上已取得显著进展，然而当任务要求模型理解三维空间结构时，现有VLM暴露出系统性缺陷。这种缺陷并非源于模型规模的不足——即便是**GPT-5**（OpenAI, 2025）和**Gemini-2.5-Pro**等大型专有模型，在空间推理基准上的表现也远逊于规模小得多的空间专家模型。问题的根源在于：**现有VLM缺乏统一的、层次化的3D空间理解任务设计，且缺乏大规模、多样化的3D空间标注数据来训练空间智能**。
@@ -81,8 +79,6 @@ claims:
 3. **度量尺度点云融合**：引入度量尺度3D点云作为辅助输入模态，通过正弦位置编码和可学习patchify层与RGB特征融合，为模型提供精确的三维几何先验。
 
 这种“层次化任务设计 + 大规模自动化数据 + 度量级3D输入”的组合，使得仅3B参数的HiSpatial模型能够在多个空间理解基准上超越专门的空间模型和大型专有系统，同时验证了层级间任务依赖关系的存在——移除底层任务会导致高层性能的显著退化，这为未来3D空间智能VLM的设计提供了明确的指导方向。
-
-
 
 ## 核心方法与创新机理
 
@@ -130,8 +126,6 @@ claims:
 - **点云输入**让模型在推理时能直接访问精确3D坐标，与训练数据的度量精度形成闭环。
 
 这种“任务-数据-模型”三位一体的设计，使仅3B参数的HiSpatial在多个空间理解基准上超越了更大的通用模型（如GPT-5、Gemini-2.5-Pro）和专门的空间专家模型（如SpatialRGPT-8B、MM-Spatial-3B），同时还在通用VQA基准上相比基础模型PaliGemma2-3B提升了**+19.81个百分点**（Table 4），说明层次化空间训练对整体视觉理解具有正向迁移效应。
-
-
 
 HiSpatial 的整体框架围绕一个核心洞察展开：**3D 空间认知可以被解耦为四个递进式层次，层次间存在因果依赖关系**。基于这一认知，方法设计了一条“数据构建→层次化任务设计→度量点云增强→监督微调”的完整流水线，如 Figure 2 和 Figure 3 所示。
 
@@ -193,12 +187,8 @@ HiSpatial 将 3D 空间智能形式化为四个递进层次（Figure 2 右），
 - **推理输出**：针对空间问题的自然语言答案，覆盖从基础几何查询到抽象推理的四个层次。
 - **关键约束**：当前仅支持单目输入，无法处理多视角或视频时序推理场景（论文已列为主要局限之一）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2396_https_arxiv_org_abs_2603_25411/figures/001_Figure_1.jpg]]
 *Figure 1: Trained on our large-scale spatial VQA data, our model develops hierarchical 3D spatial intelligence from geometric perception to abstract reasoning (left), and achieves state-of-the-art results on multiple spatial benchmarks (top-right). We also uncover clear inter-level task dependencies in spatial supervised fine-tuning (bottom-right), offering guidance for designing future 3D spatially intelligent VLMs*
-
-
 
 HiSpatial 的架构核心是在标准视觉语言模型（VLM）基础上引入一个 **度量尺度3D点云分支**，并通过四个流水线模块完成从2D图像到层次化空间VQA数据的全自动构造。以下聚焦于模型端的关键模块与唯一显式给出的训练公式。
 
@@ -245,8 +235,6 @@ $$\mathcal{L} = -\sum_{t=1}^{T} \log P_{\theta}(\mathbf{y}_t \mid \mathbf{y}_{<t
 
 > **注意**：论文未给出点云 patchify 层或融合投影器的具体结构细节公式，也未推导损失函数的梯度形式。上述公式 $\mathcal{L}$ 是论文中唯一显式给出的数学表达式（Eq. 1），其余模块以架构描述和工程流程为主。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -277,28 +265,6 @@ HiSpatial在多个空间理解基准上全面超越现有空间专家模型和�
 ### 失败模式与局限性
 
 尽管HiSpatial在主基准上表现突出，但仍存在若干局限。首先，模型泛化受限于任务复杂度和语言多样性：Level 3抽象推理覆盖不全，且数据生成依赖模板，导致对非模板化、口语化输入的鲁棒性不足。其次，论文揭示了层次间依赖性的存在，但更细粒度的交互机制（如不同训练策略对跨层关系的影响）尚未充分研究。此外，当前模型仅支持单目输入，无法处理多视角场景理解或视频中的时间动态推理任务。这些局限为后续工作指明了方向：提升自然语言鲁棒性、探索课程学习或分层微调策略、扩展至多视角/多帧场景。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2396_https_arxiv_org_abs_2603_25411/figures/004_Table_1.jpg]]
-*Table 1: Accuracy (%) on quantitative VQA benchmarks for level-1 and level-2 spatial understanding. ∗ denotes using GT point map*
-
-![[assets/figures/papers/paper_list_l2396_https_arxiv_org_abs_2603_25411/figures/008_Table_5.jpg]]
-*Table 5: Inter-level task dependency analysis. Removing lower-level tasks in training reduces higher-level performance; see text for details*
-
-![[assets/figures/papers/paper_list_l2396_https_arxiv_org_abs_2603_25411/figures/009_Table_6.jpg]]
-*Table 6: Effect of auxiliary 3D input on model accuracy (%)*
-
-![[assets/figures/papers/paper_list_l2396_https_arxiv_org_abs_2603_25411/figures/010_Table_7.jpg]]
-*Table 7: Task statistics of our training dataset*
-
-![[assets/figures/papers/paper_list_l2396_https_arxiv_org_abs_2603_25411/figures/014_Figure_5.jpg]]
-*Figure 5: Examples of spatial VQA data constructed using our method, covering different task levels*
-
-![[assets/figures/papers/paper_list_l2396_https_arxiv_org_abs_2603_25411/figures/015_Figure_6.jpg]]
-*Figure 6: Examples of our model’s responses on unseen images*
-
-
 
 ## 定位与知识库关联
 
@@ -332,8 +298,6 @@ HiSpatial 的核心定位是**以小博大**：仅使用 **3B参数**的模型�
 - **层级解耦与优化**：课程学习或分层微调策略是否能进一步解耦层次间的依赖，使高层任务在不牺牲底层能力的前提下获得更大增益？
 - **多视角/时序扩展**：当模型扩展到多视角或多帧视频场景时，如何高效融合时序与多视角的度量3D线索？点云分支是否需要引入跨帧对齐机制？
 - **与具身智能的桥接**：HiSpatial的空间理解能力（特别是Level 2空间关系与Level 3抽象推理）能否直接迁移到具身场景中的导航、操控等任务？是否需要额外的具身对齐训练？
-
-
 
 ## 原文 PDF
 

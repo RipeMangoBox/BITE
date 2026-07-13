@@ -257,17 +257,6 @@ $$g^{\mathrm{clip}} = \begin{cases} g, & (i,j,k) \in \mathcal{R} \text{ 且 } k 
 
 4. **复杂运动模式未验证。** 目前所有实验均基于简单平移运动（水平、垂直等），对于旋转、缩放、透视变换等复杂运动模式的泛化能力尚未得到验证，这构成了方法实用性的重要开放问题。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l38_Video_Diffusion_Models_are_Training_free_Motion_Interpreter_and_Controll/figures/002_Figure.jpg]]
-*Figure: (a) PCA of vanilla feature (b) PCA of feature after correlation removal*
-
-![[assets/figures/papers/paper_list_l38_Video_Diffusion_Models_are_Training_free_Motion_Interpreter_and_Controll/figures/004_Figure_3.jpg]]
-*Figure 3: Cross-frame Channel Value. (a) We plot the histogram of the weight of $\mathcal { P } _ { 1 }$ . It reveals that only a few channels significantly contribute to determining the principal components. (b-c) The motion channels exhibit a pronounced correlation with motion direction trends. (d) In contrast, the non-motion channels show little correspondence with motion direction*
-
-![[assets/figures/papers/paper_list_l38_Video_Diffusion_Models_are_Training_free_Motion_Interpreter_and_Controll/figures/009_Figure.jpg]]
-*Figure: ZeroScope: A lion lying on the grassland*
-
 ## 定位与知识库关联
 
 ### 核心瓶颈与动机

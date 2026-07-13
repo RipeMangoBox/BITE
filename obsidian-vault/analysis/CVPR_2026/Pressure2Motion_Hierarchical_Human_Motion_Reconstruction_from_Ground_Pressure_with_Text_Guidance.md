@@ -46,8 +46,6 @@ claims:
 
 在自建的 **MPL 数据集**（约 2.3M 帧，400 个动作类别，25 名受试者）上，Pressure2Motion 在重建精度与运动真实感两个维度均达到最优：FID 降至 0.262，MPJPE 降至 0.1622，CoP Error 降至 0.4260，全面优于 MaskControl、OmniControl 等可控运动合成基线（Table 1）。消融实验证实，移除运动轨迹、姿态偏移或一致性损失中任一组件均导致性能显著退化（Table 2），而移除 ControlNet 或 Adapter 则使 FID 分别飙升至 1.3683 和 0.695（Table 3），验证了分层注入架构的必要性。该工作为“稀疏物理信号 + 语义引导”的跨模态人体重建提供了可复用的范式。
 
-
-
 ### 问题背景：从稀疏压力信号重建全身运动的欠定挑战
 
 地面压力传感是一种极具吸引力的运动捕捉范式——传感器可嵌入地板、鞋垫或智能地毯中，无需穿戴光学标记或惯性单元，即可实现非侵入式的人体感知。然而，压力信号本身存在根本性的信息瓶颈：**单个压力帧仅提供足底与地面接触的二维受力分布，而全身运动涉及数十个关节在三维空间中的复杂运动学链**。这种从低维稀疏信号到高维稠密姿态的映射是严重欠定的——同一压力分布可能对应截然不同的上肢姿态、躯干朝向甚至下肢步态变体。
@@ -74,8 +72,6 @@ claims:
 3. **建立压力-运动一致性约束以保证物理对齐**：生成的动作不仅要在视觉上自然流畅，还必须与输入压力信号保持物理一致——即足部接触点与压力中心在时空上精确对应。为此，Pressure2Motion 引入了基于五个关键关节（骨盆、双踝、双足）的压力-运动一致性损失，显式约束生成动作的足部接触模式与压力测量值对齐。
 
 通过上述设计，Pressure2Motion 首次实现了从地面压力与文本提示到全身运动的分层生成式重建，为稀疏传感条件下的运动捕捉开辟了新路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -117,8 +113,6 @@ $$\mathcal{L}_{\mathrm{cons}}(\mathbf{T}_{\mathrm{traj}}, \hat{\mathbf{x}}_0') =
 
 这一“解耦-分层注入-物理对齐”的三段式设计，使预训练文本到动作扩散模型的强生成先验得以有效适配稀疏压力输入，在 MPL 数据集上取得了 FID 0.262、MPJPE 0.1622 的最优结果。
 
-
-
 Pressure2Motion 的核心设计思路是将预训练的文本到动作扩散模型（MDM）作为强生成先验，通过分层注入从稀疏压力信号中提取的双层次特征，约束欠定的压力-动作映射问题。其整体 pipeline 由三个关键阶段构成：
 
 1. **双层次压力特征提取**：从输入的压力图序列中，独立提取高层运动轨迹（Pressure-Inferred Movement Trajectory）和底层姿态偏移（Pressure-Induced Posture Shifts）两类互补特征。
@@ -129,15 +123,11 @@ Pressure2Motion 的核心设计思路是将预训练的文本到动作扩散模�
 
 这一分层设计的关键优势在于：高层轨迹特征约束了整体运动路径和身体朝向，底层姿态偏移则捕捉了足部接触、重心转移等细粒度动态变化，二者协同作用使得生成的动作既遵循文本语义，又与稀疏含噪的压力信号保持物理一致性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1034_https_arxiv_org_abs_2511_05038/figures/003_Figure_3.jpg]]
 *Figure 3: The Pressure2Motion pipeline. We first extract an overall Movement Trajectory*
 
 ![[assets/figures/papers/paper_list_l1034_https_arxiv_org_abs_2511_05038/figures/001_Figure_1.jpg]]
 *Figure 1: By conditioning on pressure signals and text descriptions, Pressure2Motion reconstructs high-fidelity, physically realistic motions, addressing the challenge of synthesizing human motion from sparse and noisy pressure data*
-
-
 
 Pressure2Motion 的核心架构由三个紧密协作的模块构成，它们共同实现了从稀疏压力信号到高质量人体运动的分层生成。
 
@@ -203,8 +193,6 @@ $$\tau = \frac{20 \hat{\Sigma}_t}{L}$$
 
 其中 $\hat{\Sigma}_t = \min(\Sigma_t, 0.01)$，$\Sigma_t$ 为当前扩散步的噪声方差，$L$ 为序列长度。该设计使得在去噪早期（高噪声阶段）压力控制更强，而在后期（低噪声阶段）逐渐减弱，让扩散模型自身的生成先验主导细节生成。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -263,23 +251,6 @@ Pressure2Motion 在 MPL 数据集上对所有基线方法取得了全面的领�
 
 MPL 数据集包含 20,944 条运动序列，约 230 万帧，覆盖 400 个动作类别，来自 25 名受试者。数据集按 80%/15%/5% 的比例划分为训练集、验证集和测试集。评估指标包括 MPJPE（全局位置误差）、LMPJPE（局部关节误差）、FID（运动真实感）、R-precision（语义对齐）以及新提出的 CoP Error（压力-运动物理一致性）。所有基线方法均被适配为接收逐帧压力控制信号，确保对比的公平性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1034_https_arxiv_org_abs_2511_05038/figures/004_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l1034_https_arxiv_org_abs_2511_05038/figures/008_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l1034_https_arxiv_org_abs_2511_05038/figures/009_Figure_7.jpg]]
-*Figure 7: Real-world deployment*
-
-![[assets/figures/papers/paper_list_l1034_https_arxiv_org_abs_2511_05038/figures/012_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l1034_https_arxiv_org_abs_2511_05038/figures/013_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l1034_https_arxiv_org_abs_2511_05038/figures/014_Figure.jpg]]
-
-
-
 ## 定位与知识库关联
 
 ### 任务定义与生成范式
@@ -323,8 +294,6 @@ Pressure2Motion 的适用边界受以下因素制约：
 2. **实时推理**：是否可以通过模型蒸馏、渐进式蒸馏或一致性模型等方法，在保持重建质量的前提下将推理时间压缩至秒级甚至亚秒级？
 3. **文本鲁棒性**：如何提升模型对多样化、人类撰写的真实文本提示的泛化能力？是否需要在训练中引入文本增强或对抗性提示？
 4. **多模态融合扩展**：当前模型仅融合压力与文本，未来是否可纳入 IMU、视觉等互补模态，以进一步提升重建精度与鲁棒性？
-
-
 
 ## 原文 PDF
 

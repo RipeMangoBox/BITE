@@ -49,8 +49,6 @@ claims:
 
 核心结论如下：UniGeoRS基准的引入一致地提升了多种CVGL模型在跨视角任务上的泛化性能；CAME模块在多个基线模型（如LPN、FSRA）上均带来显著增益，尤其在Ground→Drone和Satellite→Ground等困难任务上，AP提升分别达+6.45和+10.26（Table 2）。消融实验进一步证实，CAME中的Rank Distance（RD）与Cross-Attention Matching（CAM）组件各自独立有效，联合使用取得最优结果，验证了平台内邻域聚合与跨平台注意力对齐的互补性。方法上，CAME属于后处理阶段的特征增强范式，可与现有CVGL特征提取器无缝集成，为跨视角地理定位提供了一种通用且高效的匹配增强方案。
 
-
-
 ### 跨视角地理定位的核心挑战
 
 跨视角地理定位（Cross-View Geo-Localization, CVGL）旨在将不同平台（地面、无人机、卫星）拍摄的图像与同一地理位置关联起来，其核心挑战在于**极端视角差异导致的外观剧烈变化**。地面图像呈现近景细节，无人机图像提供倾斜中距视角，而卫星图像则为垂直俯瞰——三种模态之间的特征分布存在本质性鸿沟，使得直接匹配极为困难。
@@ -79,8 +77,6 @@ Figure 2（数据集局限性示意）系统总结了上述视角特异的缺陷
 具体而言，本文提出两条互补路线：
 - **数据层面**：构建UniGeoRS——首个同时包含真实与合成图像的三视角CVGL基准，平均每目标提供32.39张地面图像和90.17张无人机图像（Table 1），从规模和多视角覆盖上系统性地超越现有数据集。
 - **方法层面**：设计CAME（Cross-Attention-based Matching Enhancement）模块，作为可插拔的第二阶段重排序框架，显式建模平台内与平台间特征关联，在不改变原有特征提取器的情况下一致提升检索精度。
-
-
 
 ## 核心方法与创新机理
 
@@ -132,8 +128,6 @@ RD 模块通过图库-图库相似度的邻域聚合，隐式地利用了“同�
 - UniGeoRS 数据集的地点和环境多样性有限，未来需扩展至更多城市、季节和天气条件。
 - CAME 的超参数（$k_1=90$, $k_2=10$）需在具体任务上手动调优以取得平衡性能，缺乏自适应机制。
 
-
-
 UniGeoRS 提出了一种即插即用的两阶段跨视角地理定位增强框架 **CAME (Cross-Attention-based Matching Enhancement)**。该框架不改变前端特征提取器的结构，而是在后处理阶段显式建模平台内与平台间特征关联，从而提升检索精度。
 
 ### 两阶段流水线
@@ -172,12 +166,8 @@ $$\mathcal{L}_{\mathrm{sum}} = \lambda_1 \mathcal{L}_{\mathrm{Rank}} + \lambda_2
 
 RD 与 CAM 之间存在明确的依赖关系：RD 模块输出的初始排序列表 $R_q$ 决定了 CAM 模块需要处理的候选图库范围，从而将计算量集中在最有可能匹配的候选项上。消融实验证实，单独使用 RD 或单独使用 CAM 均能相较基线提升性能，但二者组合（完整 CAME）在所有任务上取得最优结果，验证了“平台内聚合（RD）+ 平台间对齐（CAM）”这一设计逻辑的有效性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l799_https_openaccess_thecvf_com_content_CVPR2026_html_Liang_UniGeoRS_A_Unifi/figures/006_Figure_5.jpg]]
 *Figure 5: Overview of CAME. (a) A pretrained CVGL model is employed as the feature extractor. (b) The Rank Distance module (RD) generates the initial ranking list*
-
-
 
 CAME 是一个两阶段后处理重排序框架，可无缝接入任意预训练的 CVGL 特征提取器。其核心由 **Rank Distance (RD) 模块** 和 **Cross-Attention Matching (CAM) 模块** 串联构成，分别负责平台内邻域聚合与跨平台特征对齐。
 
@@ -247,8 +237,6 @@ $$\mathcal{L}_{\mathrm{sum}} = \lambda_1 \mathcal{L}_{\mathrm{Rank}} + \lambda_2
 
 训练配置采用 AdamW 优化器，学习率 $1 \times 10^{-4}$，批大小 16，超参数 $\lambda_1=1, \lambda_2=0.5$，在单卡上训练 30 个 epoch（Section 5.1）。消融实验证实，RD 与 CAM 各自独立贡献增益，二者组合（即完整 CAME）在所有任务上取得综合最优性能（Table 4）。
 
-
-
 ## 实验与关键发现
 
 ### 关键结果：CAME 在 UniGeoRS 六项任务上的提升
@@ -286,8 +274,6 @@ RD 的超参数设置为 $k_1=90$、$k_2=10$，是在所有任务上取得平衡
 
 尽管 CAME 在困难任务（如涉及地面视角的匹配）上提升显著，但其在无人机-卫星这类已有较高基线的任务上增益有限（AP 提升仅 0.5–1.0 个百分点）。这表明当初始检索质量已经较高时，后处理重排序的边际收益趋于饱和。此外，当前 CAME 仅在后处理阶段显式建模平台关系，尚未在训练阶段联合学习三平台特征，这限制了模型对更深层跨平台语义关联的捕捉。UniGeoRS 数据集目前覆盖的地点和环境多样性有限，未来需扩展至更多城市、季节和天气条件，以进一步验证方法的鲁棒性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l799_https_openaccess_thecvf_com_content_CVPR2026_html_Liang_UniGeoRS_A_Unifi/figures/002_Table_1.jpg]]
 *Table 1: Comparison of UniGeoRS with existing CVGL datasets in terms of drone and ground image scales, data sources, and view configurations. “Multi-height” indicates that drone images are captured at multiple flight altitudes. “Per location” denotes the average number of ground images collected at each site, while “Drone view” and “Ground view” specify the corresponding camera configurations*
 
@@ -302,14 +288,6 @@ RD 的超参数设置为 $k_1=90$、$k_2=10$，是在所有任务上取得平衡
 
 ![[assets/figures/papers/paper_list_l799_https_openaccess_thecvf_com_content_CVPR2026_html_Liang_UniGeoRS_A_Unifi/figures/010_Table_5.jpg]]
 *Table 5: Ablation study of ground-view datasets comparing models trained with University-1652 or augmented with UniGeoRS*
-
-![[assets/figures/papers/paper_list_l799_https_openaccess_thecvf_com_content_CVPR2026_html_Liang_UniGeoRS_A_Unifi/figures/004_Figure_3.jpg]]
-*Figure 3: Data acquisition and examples in virtual and real scenes. Real-scene data are collected via drone aerial photography and groundbased imaging, while virtual-scene data are captured from Google Earth (drone view) and Google Street View (ground view)*
-
-![[assets/figures/papers/paper_list_l799_https_openaccess_thecvf_com_content_CVPR2026_html_Liang_UniGeoRS_A_Unifi/figures/003_Figure_2.jpg]]
-*Figure 2: View-specifc limitations in existing datasets: insuffcient diversity in ground views, geo-tagging issues insatellite views, and domain or cost challenges in drone views*
-
-
 
 ## 定位与知识库关联
 
@@ -357,8 +335,6 @@ CAME的核心创新在于将重排序过程从简单的邻域扩展（k-reciproc
 3. UniGeoRS虽然引入了合成数据（Google Earth/Street View），但合成-真实域差异对模型性能的影响尚未被系统评估，这在实际应用中可能成为关键瓶颈。
 
 > **注意**：关于“如何在训练过程中同时学习三平台特征表示”的开放问题，论文仅在讨论部分提及方向性展望，未提供具体方案或实验验证，需读者自行追踪后续工作。
-
-
 
 ## 原文 PDF
 

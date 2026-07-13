@@ -53,8 +53,6 @@ GrOCE 由三个协同组件构成：**CONSTRUCT** 动态构建加权语义图，
 
 在单概念、多概念及艺术风格擦除任务上，GrOCE 均取得最低的概念相似度（CS），且非目标概念的 FID 保持为 0，实现了精准擦除与极致保留的平衡。消融实验表明，IDENTIFY 模块是防止过度擦除的关键——移除后非目标 FID 从 0 骤升至 426.74。在效率方面，GrOCE 擦除 10 个概念仅需 1.73 秒，比训练方法快一个数量级，使在线大规模概念清理成为可能。
 
-
-
 文本到图像（T2I）扩散模型的快速发展使高质量图像生成变得触手可及，但同时也带来了生成不安全、侵权或不当内容的隐患。概念擦除（concept erasure）作为一种关键的缓解策略，旨在从生成过程中移除特定概念（如受版权保护的卡通形象、特定艺术风格或敏感视觉元素），同时尽可能保留模型的其余生成能力。然而，当前的主流方法面临两个核心瓶颈。
 
 **现有方法的缺口**。一方面，以 **ESD**（Gandikota et al., ICCV 2023）、**UCE**（Gandikota et al., WACV 2024）、**CA**（Kumari et al., ICCV 2023）、**SPM**（Lyu et al., CVPR 2024）和 **MACE**（Lu et al., CVPR 2024）为代表的方法依赖模型微调或权重修改，不仅计算代价高昂，且难以灵活适应动态变化的概念擦除需求。近期出现的训练自由方法如 **SPEED**（Li et al., ICLR 2026）和 **AdaVD**（Wang et al., CVPR 2025），虽在推理效率上有所突破，却仍将概念视为语义空间中的孤立实体，采用粗粒度的语义分离策略，忽略了概念之间固有的语义拓扑关系。
@@ -64,8 +62,6 @@ GrOCE 由三个协同组件构成：**CONSTRUCT** 动态构建加权语义图，
 **在线适应性的缺失**。实际部署中，需要擦除的概念集合往往是动态演化的——新的不当概念持续涌现，旧概念的威胁评估也可能随时变化。基于微调的方法每次更新都需要重新训练，难以实现实时响应；而现有的训练自由方法则依赖固定的概念列表，无法在线增量处理新增概念。如 Figure 1(b) 所示，GrOCE 在 10 概念并发擦除场景下仅需 1.73 秒，比基于训练的 ConAbl 等方法快一个数量级，凸显了在线大规模概念清理的实用价值。
 
 **本文动机**。针对上述缺口，GrOCE 提出了一种根本性的思路转变：将概念擦除重新定义为语义图上的连通性切断问题。通过动态构建概念间的语义图，显式捕获相似性、层次和共现关系，再借助图上的扩散过程精准识别与目标概念紧密纠缠的节点簇，最终仅移除这些簇在文本提示嵌入上的投影分量。这一范式实现了上下文感知的精确擦除，既能在语义层面精准打击目标，又能最大限度地保留全局句子结构和不相关语义——如 Figure 1(a) 所示，在抑制目标概念的同时，其语义邻近的非目标概念得以完好保留。
-
-
 
 ## 核心方法与创新机理
 
@@ -105,8 +101,6 @@ GrOCE 支持**在线增量图构建**：新概念可以即时添加为图节点�
 
 消融实验（Table 3）为 GrOCE 的核心创新提供了强有力的因果验证：移除 IDENTIFY 模块后，虽然目标概念相似度（CS）仅从 16.92 略微降至 14.51，但非目标 FID 从完美的 0 暴增至 **426.74**。这一巨大反差证明，IDENTIFY 模块的自适应簇识别能力是防止过度擦除和保留非目标语义的关键机制——这正是 GrOCE 区别于所有现有方法的核心优势。
 
-
-
 GrOCE 提出了一种**完全无训练、纯推理时**的概念擦除框架，其核心思想是将概念擦除转化为在**动态语义图**上识别并切断目标概念簇对文本提示影响的过程。如图2所示，整个pipeline由三个协同组件构成：**CONSTRUCT（动态语义图构建）**、**IDENTIFY（自适应目标簇识别）** 和 **SEVER（选择性语义切断）**。
 
 ### Pipeline 总览
@@ -139,12 +133,8 @@ GrOCE 提出了一种**完全无训练、纯推理时**的概念擦除框架，�
 
 与现有方法将概念视为孤立实体不同，GrOCE 通过语义图**显式建模概念间的相似性、层次关联和共现模式**。图结构直接揭示了文本 Token 与视觉特征之间的固有关联（Section 5.2 定性分析），使得切断操作可以精确针对目标概念，无需训练或手工设定阈值。这一设计同时赋予了框架**在线适应性**：当新概念出现时，仅需在图中增量添加节点并更新相关边权重，即可动态扩展擦除能力。在高并发场景（10 个概念同时擦除）下，GrOCE 仅需 1.73 秒（Table 4），比训练方法快一个数量级，使在线大规模概念清理成为可能。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2315_https_openaccess_thecvf_com_content_CVPR2026_html_Han_GrOCE_Graph_Guided/figures/002_Figure_2.jpg]]
 *Figure 2: The GrOCE pipeline for online concept erasure. Given a text prompt and a specified target concept (e.g., “bear”), GrOCE performs inference-time concept erasure through three synergistic components: (1) Dynamic Semantic Graph Construction builds a semantic graph with vocabulary tokens as nodes and cosine-weighted edges, supporting incremental updates for evolving concept sets.(2) Adaptive Cluster Identification performs multi-hop traversal with similarity decay to identify semantically entangled concepts (e.g., “grizzly,” “panda”) around the target. (3) Selective Severing removes the semantic components associated with the identified cluster, editing the text prompt prior to diffusion to sup...*
-
-
 
 GrOCE 是一种**完全无训练**的推理时概念擦除框架，将概念擦除建模为在动态语义图上执行的在线推理过程。其核心由三个协同组件构成：**CONSTRUCT**（动态语义图构建）、**IDENTIFY**（自适应目标簇识别）和 **SEVER**（选择性语义切断），整体流程如 Figure 2 所示。
 
@@ -200,12 +190,8 @@ $$t' = \{ t_i \in t \mid \mathbb{I}(\|\alpha_i\| \leq \delta) \}$$
 
 **关键设计动机**：SEVER 仅作用于文本嵌入层，且切断粒度精确到 Token 级别——这与 IDENTIFY 识别的概念簇形成闭环：簇内概念被系统性抑制，簇外语义（包括句子结构和无关内容）得以完整保留。消融实验（Table 3）证实，移除 IDENTIFY 后非目标 FID 从 0 暴增至 426.74，验证了该模块在防止过度擦除中的关键作用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2315_https_openaccess_thecvf_com_content_CVPR2026_html_Han_GrOCE_Graph_Guided/figures/001_Figure_1.jpg]]
 *Figure 1: Two key aspects of concept erasure. (a) Concept erasure in text-to-image diffusion models involves both explicit and implicit semantic structure in the latent space. Our method leverages adjacency in semantic space to suppress a target concept while better preserving its neighboring, non-target concepts. (b) Runtime comparison with the training-based ConAbl [16] and the recent training-free AdaVD [37]. Our method achieves an order-of-magnitude speedup, making online large-scale concept removal practical*
-
-
 
 ## 实验与关键发现
 
@@ -255,21 +241,8 @@ Figure 5展示了GrOCE在三种不同主干扩散模型（Stable Diffusion v1.4�
 ![[assets/figures/papers/paper_list_l2315_https_openaccess_thecvf_com_content_CVPR2026_html_Han_GrOCE_Graph_Guided/figures/008_Table_3.jpg]]
 *Table 3: Ablation studies on proposed components of GrOCE in erasing Snoopy*
 
-![[assets/figures/papers/paper_list_l2315_https_openaccess_thecvf_com_content_CVPR2026_html_Han_GrOCE_Graph_Guided/figures/009_Table_4.jpg]]
-*Table 4: Time consumption for 10-concept erasure*
-
-![[assets/figures/papers/paper_list_l2315_https_openaccess_thecvf_com_content_CVPR2026_html_Han_GrOCE_Graph_Guided/figures/007_Figure_5.jpg]]
-*Figure 5: Erasure Performance Validation Experiment under Multi-Diffusion Models*
-
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2315_https_openaccess_thecvf_com_content_CVPR2026_html_Han_GrOCE_Graph_Guided/figures/003_Figure_3.jpg]]
 *Figure 3: From the visualization results, our method demonstrates excellent erasure and retention capabilities, whether it is erasing Snoopy, Snoopy and Mickey, or Snoopy, Mickey and Spongebob. It can not only accurately accomplish target erasure but also stably retain prior knowledge in the process, thus achieving a balance between effectiveness and information retention*
-
-![[assets/figures/papers/paper_list_l2315_https_openaccess_thecvf_com_content_CVPR2026_html_Han_GrOCE_Graph_Guided/figures/006_Figure_4.jpg]]
-*Figure 4: Regarding Van Gogh-related content, we can not only accurately and efficiently erase the Van Gogh style, but also retain the ability to generate styles of Picasso and Monet, achieving an excellent balance between targeted removal and retention of key information*
-
-
 
 ## 定位与知识库关联
 
@@ -313,8 +286,6 @@ GrOCE 通过三个协同组件改变了这一局面：
 3. **动态图更新策略**：当概念集合持续演化时，如何设计高效的图增量更新和过期概念剔除机制，使GrOCE适应真实世界的动态安全需求？
 
 4. **跨任务迁移**：GrOCE的图结构分析能力能否延伸至其他扩散模型安全任务，如概念诅咒防御、受限内容编辑或生成过程中的实时安全控制？这需要验证语义图在不同安全目标下的通用性。
-
-
 
 ## 原文 PDF
 

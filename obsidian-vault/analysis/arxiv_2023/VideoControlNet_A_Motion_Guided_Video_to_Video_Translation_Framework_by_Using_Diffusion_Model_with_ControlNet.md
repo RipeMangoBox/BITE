@@ -194,8 +194,6 @@ $$I_{i,k} = \begin{cases} 1 & \text{if } O_{i,k} - \alpha R_{i,k} > threshold \\
 
 框架的整体流程可参考 **图 2**，MgPG 模块的细节见 **图 3**，MgBI 模块的细节见 **图 4**。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1061_https_arxiv_org_abs_2307_14073/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our proposed motion-guided video-to-video translation framework. (a) The generation process of I-frame: Taking the first input frame*
 
@@ -291,8 +289,6 @@ Figure 6 展示了使用不同 ControlNet 条件（深度图与 canny 边缘图�
 4. **控制条件有限**：当前仅支持 canny edge 和 depth map 两种条件，限制了在更复杂编辑任务中的应用。
 
 > **注意**：以上局限性分析基于原文明确列出的内容。关于在更极端场景（如剧烈相机运动、长序列生成）下的具体失效表现，原文未提供系统性的失败案例研究，需要进一步实验验证。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l1061_https_arxiv_org_abs_2307_14073/figures/006_Table_1.jpg]]
 *Table 1: User preference of Text2Video-Zero [16], CCPL [43] and our proposed method*

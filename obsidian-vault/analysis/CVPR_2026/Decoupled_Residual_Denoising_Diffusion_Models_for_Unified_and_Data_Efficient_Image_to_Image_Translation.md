@@ -54,8 +54,6 @@ claims:
 
 在统一多任务基准**All-in-One-5**上，DRDD取得平均SSIM 0.916、LPIPS 0.073、FID 18.3，全面超越近期SOTA方法，感知指标优势尤为突出（Table 1）。在**CDD-11**的11种退化任务中，DRDD在所有类型上一致超越对比模型，复合退化场景优势明显（Figure 3）。数据剪枝实验表明，当训练数据从100%降至25%时，DRDD的性能下降远小于RDDM、I2SB等方法（Figure 5），验证了解耦设计带来的数据效率提升。
 
-
-
 图像到图像（I2I）翻译旨在将源域图像映射为目标域图像，是底层视觉的核心任务，涵盖图像修复、超分辨率、去雨、低光增强等众多子方向。近年来，扩散模型凭借其强大的生成能力在该领域取得了显著进展，涌现出**RDDM**（Liu et al., 2024）、**I2SB**（Liu et al., 2023）、**IR-SDE**（Luo et al., 2023）等代表性工作。
 
 然而，现有扩散式I2I方法面临两个关键瓶颈：
@@ -65,8 +63,6 @@ claims:
 **瓶颈二：噪声效应被过早削弱。** 现有方法将高斯噪声注入仅视为流形提升和训练信号增强的手段，在逆向过程早期即开始同时去除噪声和残差。然而，本文发现了一个被忽视的关键现象：**高斯噪声注入能够缩小不同分布之间的KL散度，起到“域协调器”的作用**。如Proposition 3.1所证明，注入高斯噪声后两分布间的KL散度严格减小（$D_{KL}(P_{\sigma} \parallel Q_{\sigma}) < D_{KL}(P \parallel Q)$），Figure 1(b)的t-SNE结果也直观展示了噪声注入后域间隙的显著缩小。耦合扩散在核心语义映射完成前就移除了噪声，过早丧失了这种域协调效应，使得统一翻译的学习难度大幅增加。
 
 **核心动机：解耦扩散，保留噪声的域协调效应。** 基于上述洞察，本文提出将传统耦合扩散解耦为两个顺序独立的阶段——先执行噪声扩散实现域协调与流形提升，再在固定噪声域内完成残差扩散（语义映射）；逆向时先消除残差以保持协调效应，最后去噪生成清晰图像。这一解耦设计使核心语义变换始终在噪声协调后的统一域内完成，从根本上降低了统一I2I翻译的学习难度，同时噪声扩散阶段可仅使用非成对目标域图像训练，显著提升了数据效率。
-
-
 
 ## 核心方法与创新机理
 
@@ -92,8 +88,6 @@ DRDD揭示了高斯噪声在I2I翻译中的一个新角色——**域协调器**
 ### 3. 数据效率的结构性提升
 
 解耦架构天然带来了数据效率优势。噪声扩散/去噪阶段仅使用**非成对目标域图像**进行训练，无需成对的源-目标数据。这意味着在面对训练数据大幅减少时，DRDD的性能下降远小于其他方法（Figure 5）。当训练数据量从100%降至25%时，DRDD在SSIM和LPIPS指标上的退化幅度显著低于RDDM、I2SB等耦合扩散方法，验证了解耦设计对数据效率的结构性改善。
-
-
 
 DRDD 将传统耦合扩散模型的前向/逆向过程解耦为两个顺序独立阶段，从根本上改变了噪声与残差的交互方式。整体 pipeline 由三个核心模块串联构成：**噪声扩散阶段**、**残差扩散/残差消除阶段**和**去噪阶段**，如图 Figure 2 所示。
 
@@ -147,8 +141,6 @@ DRDD 的前向过程将噪声注入与语义变换彻底分离：
 | 残差扩散（前向） | 含噪目标 + 残差 | 含噪残差图像 | 成对源-目标图像 |
 | 残差消除（逆向） | 含噪残差图像 + 源图像 | 含噪目标 | — |
 | 去噪（逆向） | 含噪目标 | 清晰目标 | — |
-
-
 
 ### 3.1 域协调的理论基础：噪声注入的KL散度消减
 
@@ -213,8 +205,6 @@ $$\mathcal{L}_{\epsilon}(\theta) = \mathbb{E}\left[\|\epsilon - \epsilon_{\theta
 
 两个网络独立训练：噪声预测网络仅使用非成对目标域图像，残差预测网络使用成对源-目标图像。这种解耦训练策略使得数据需求大幅降低——噪声扩散/去噪阶段可利用海量无标注目标域图像，仅残差扩散/消除阶段需要成对数据。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -248,8 +238,6 @@ Figure 4 展示了低光增强（LoLV1）、模糊复原（GoPro）、人脸修�
 
 论文未明确报告失败模式或局限性分析。从方法设计推断，潜在风险包括：当源-目标域间隙极大时，固定噪声域内的残差映射可能不足以完整刻画语义变换；两阶段解耦增加了推理步数，可能影响实时性。这些推断需手动验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l855_https_openaccess_thecvf_com_content_CVPR2026_html_Lin_Decoupled_Residual/figures/003_Table_1.jpg]]
 *Table 1: Performance comparisons of five unified multi-task image restoration tasks on All-in-One-5 dataset [8]. Denoising results are reported at the noise level σ = 25. SSIM (↑), LPIPS (↓) and FID (↓) are reported. Best results are highlighted in red, while the second-best results are blue. Diffusion-based methods are denoted by “*”. Our DRDD demonstrates superior or competitive performance compared to recent models, especially in perceptual metrics. Due to space limitation, PSNR results and computational costs are provided in Appendix C.5*
 
@@ -258,17 +246,6 @@ Figure 4 展示了低光增强（LoLV1）、模糊复原（GoPro）、人脸修�
 
 ![[assets/figures/papers/paper_list_l855_https_openaccess_thecvf_com_content_CVPR2026_html_Lin_Decoupled_Residual/figures/006_Table_2.jpg]]
 *Table 2: Performance comparison of several methods on MNMD dataset. Best results are highlighted in Bold*
-
-![[assets/figures/papers/paper_list_l855_https_openaccess_thecvf_com_content_CVPR2026_html_Lin_Decoupled_Residual/figures/007_Figure_5.jpg]]
-*Figure 5: Data Pruning on All-in-One-3 [8] and Low-Light dataset. SSIM (↑) and LPIPS (↓) are reported. As the training data decreases, DRDD’s performance drop is much smaller than other methods*
-
-![[assets/figures/papers/paper_list_l855_https_openaccess_thecvf_com_content_CVPR2026_html_Lin_Decoupled_Residual/figures/008_Table_3.jpg]]
-*Table 3: Performance comparison of decoupled and coupled SDEbased diffusion methods on single task I2I. Results are evaluated on the CelebA-HQ [19], Rain100 [49], and BSD400 [2] datasets*
-
-![[assets/figures/papers/paper_list_l855_https_openaccess_thecvf_com_content_CVPR2026_html_Lin_Decoupled_Residual/figures/009_Figure_6.jpg]]
-*Figure 6: Performance comparison on the All-in-One-5 dataset[8] under varying noise injection level*
-
-
 
 ## 定位与知识库关联
 
@@ -321,8 +298,6 @@ DRDD 的一个显著优势在于其数据效率。由于噪声扩散和去噪阶
 3. **噪声注入强度的任务依赖性**：Figure 6 显示最优噪声强度在 All-in-One-5 上约为 1.0，但不同任务（如低光增强 vs. 去模糊）对噪声强度的敏感度可能存在差异，论文未提供逐任务的噪声消融分析。
 
 4. **与最新生成式基线的对比**：Table 1 对比的方法列表截至投稿时，随着扩散模型和生成式方法的快速演进，与后续出现的更强基线（如基于 flow matching 或 consistency model 的统一框架）的性能关系有待后续工作验证。
-
-
 
 ## 原文 PDF
 

@@ -53,8 +53,6 @@ GSM采用**双Q-Former架构**实现“语义压缩-几何选择”机制：第�
 
 **方法定位**：GSM属于“问题引导的几何先验选择性注入”范式，与直接拼接（Addition）或全量交叉注意力融合（VG-LLM）形成对比。其双Q-Former设计在专用动态空间推理能力与通用视频理解能力之间取得了关键平衡，为VLM的多模态融合提供了新的架构思路。
 
-
-
 ### 动态空间推理：从静态3D到动态4D的认知跃迁
 
 视觉语言模型（VLMs）在图像和视频理解任务上取得了显著进展，但在**动态空间推理**（Dynamic Spatial Reasoning, DSR）——即理解包含运动物体的三维环境中物体之间的几何关系与时序变化——方面仍存在根本性能力短板。如图1(a)所示，与仅需理解固定场景中物体空间布局的静态空间推理不同，动态空间推理要求模型在时间维度上持续追踪物体运动轨迹、推断视角变换后的空间关系，并理解多物体交互过程中的相对位置变化。这种从静态3D感知到动态4D理解的跃迁，对模型的几何先验利用和时序建模能力提出了更高要求。
@@ -82,8 +80,6 @@ GSM采用**双Q-Former架构**实现“语义压缩-几何选择”机制：第�
 1. **DSR-Train**：一个大规模、多样化的动态空间推理训练数据集，通过自动化的视频策展、几何线索提取与问答生成管道构建，为模型提供覆盖视角变换、多物体交互等关键场景的训练信号。
 
 2. **几何选择模块（GSM）**：一个轻量级的几何先验集成模块，采用双Q-Former架构实现“语义压缩-几何选择”机制——首先将问题语义压缩为查询向量，再以此查询为指导从3D tokens中仅抽取与当前问题相关的几何特征，从而在增强动态空间推理能力的同时，避免噪声对通用能力的干扰。
-
-
 
 ## 核心方法与创新机理
 
@@ -124,8 +120,6 @@ GSM的设计直接解决了“专用-通用”权衡问题，其因果效应在�
 - **相对尺度限制**：数据生成基于相对尺度的3D结构，无法产生需要绝对度量值的问答，限制了数值推理的深度。
 - **困难子任务瓶颈**：Direction Prediction等需要预测未来运动方向的子任务准确率仍较低（约35%），表明模型在时序前瞻性推理上存在困难。
 
-
-
 DSR Suite 的整体框架围绕“几何感知的动态空间推理”展开，其核心设计思路是：**将问题语义作为选择器，从预提取的 4D 几何先验中动态抽取与当前问题最相关的信息，而非将全部几何 token 粗暴注入视觉语言模型（VLM）**。框架由两大支柱构成——数据生成管道（DSR-Train/DSR-Bench）与模型架构（Geometry Selection Module, GSM），二者协同工作，使 VLM 在获得动态空间推理能力的同时不损失通用视频理解性能。
 
 ### 数据生成管道：从视频到多选 QA 的三阶段流水线
@@ -164,8 +158,6 @@ $$\tilde{\mathbf{T}}_{\text{total}} = [\mathbf{T}_{\text{vis}} ; \mathbf{Q}_{\te
 
 该框架直接回应了动态空间推理的两大瓶颈：**数据稀缺**与**几何先验注入的通用性退化**。DSR-Train 提供了大规模、可扩展的动态空间推理训练数据，数据量增加时模型性能单调提升（Figure 5），验证了数据可扩展性。GSM 则通过“问题引导的选择性注入”机制，在增强 DSR 能力的同时保持了通用视频理解能力——在 DSR-Bench 上，GSM 达到 58.9% 的平均准确率，远超 VG-LLM（38.4%）和 VLM-3R（31.4%）；在通用基准 Video-MME 上，GSM（59.9%）远高于直接拼接 3D token 的 Addition 方法（48.6%），证明选择性注入有效缓解了通用性能退化（Table 5）。
 
-
-
 ### 几何选择模块（GSM）总体架构
 
 GSM 是一个轻量级模块，通过两个堆叠的 Q-Former 将几何先验集成到 VLM 中。其核心设计思想是“语义压缩-几何选择”：先将问题语义蒸馏为紧凑的查询向量，再以该查询向量为指导，从预训练 4D 重建模型输出的 3D tokens 中仅提取与当前问题相关的几何信息，生成固定数量的紧凑几何 tokens。这一选择性注入机制避免了直接拼接大量 3D tokens 所带来的噪声干扰，从而在增强动态空间推理能力的同时保持通用视频理解性能。
@@ -193,8 +185,6 @@ $$\tilde{\mathbf{T}}_{\mathrm{total}} = [\mathbf{T}_{\mathrm{vis}} ; \mathbf{Q}_
 GSM 的双 Q-Former 结构与直接拼接 3D tokens 的 Addition 方法形成鲜明对比。Addition 方法将所有 3D tokens 无条件地拼接到视觉 tokens 上，虽然也能提升动态空间推理能力（DSR-Bench 上 57.7 vs GSM 的 57.4，性能相近），但会导致通用视频理解性能大幅下降（Video-MME 上 48.6 vs GSM 的 59.9）。GSM 通过问题语义引导的选择性几何提取，在几乎不牺牲专用性能的前提下，有效缓解了通用性能退化问题（Table 5）。
 
 可学习查询数量 $N$ 是 GSM 的关键超参数。消融实验表明 $N=32$ 达到最佳整体性能平衡：过小（如 $N=16$）会限制几何信息的表达能力，过大（如 $N=64$）则会引入冗余信息并损害通用能力（Table 6）。
-
-
 
 ## 实验与关键发现
 
@@ -247,36 +237,14 @@ GSM 的双 Q-Former 结构与直接拼接 3D tokens 的 Addition 方法形成鲜
 
 4. **绝对度量推理缺失**：数据生成基于相对尺度的3D结构，GSM无法处理需要绝对距离、速度等数值度量的推理问题，限制了其在精确空间推理场景中的应用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2399_https_arxiv_org_abs_2512_20557/figures/009_Table_5.jpg]]
 *Table 5: Comparison between GSW and other training methods*
 
 ![[assets/figures/papers/paper_list_l2399_https_arxiv_org_abs_2512_20557/figures/010_Table_6.jpg]]
 *Table 6: Ablation of learnable query numbers*
 
-![[assets/figures/papers/paper_list_l2399_https_arxiv_org_abs_2512_20557/figures/011_Figure_5.jpg]]
-*Figure 5: Performance curve of accuracy on DSR-Bench with varying numbers of question-answer pairs for training*
-
 ![[assets/figures/papers/paper_list_l2399_https_arxiv_org_abs_2512_20557/figures/018_Table_10.jpg]]
 *Table 10: Comparison between GSM and other methods with Qwen3-VL-8B-Instruct as the base model*
-
-![[assets/figures/papers/paper_list_l2399_https_arxiv_org_abs_2512_20557/figures/017_Table_9.jpg]]
-*Table 9: Comparison between different training data settings*
-
-![[assets/figures/papers/paper_list_l2399_https_arxiv_org_abs_2512_20557/figures/003_Table_1.jpg]]
-*Table 1: Type, target object and description of candidate questions*
-
-![[assets/figures/papers/paper_list_l2399_https_arxiv_org_abs_2512_20557/figures/006_Table_3.jpg]]
-*Table 3: Comparison between our DSR-Bench and prior benchmarks from different aspects*
-
-![[assets/figures/papers/paper_list_l2399_https_arxiv_org_abs_2512_20557/figures/005_Figure_3.jpg]]
-*Figure 3: Statistical overview of our DSR-Bench. In (a), we present the proportion of videos corresponding to different scene classes. In (b), we show the proportion of questions of various types. In (c), we depict a word cloud of the questions*
-
-![[assets/figures/papers/paper_list_l2399_https_arxiv_org_abs_2512_20557/figures/021_Table_12.jpg]]
-*Table 12: Success rate comparison on MineDojo between agents adopted from VLM trained with different spatial reasoning scenes*
-
-
 
 ## 定位与知识库关联
 
@@ -318,8 +286,6 @@ GSM 的双 Q-Former 结构与直接拼接 3D tokens 的 Addition 方法形成鲜
 3. **困难子任务提升。** 是否可以通过对抗训练、课程学习或针对性数据增强，显著提升Direction Prediction等困难子任务的准确率？
 4. **端到端协同训练。** GSM能否与端到端的3D/4D重建模型协同训练，使几何先验的提取与下游推理任务形成闭环优化，从而实现更强的4D理解能力？
 5. **多模态几何先验融合。** 除3D tokens外，是否可以融入深度图、光流、场景图等其他形式的几何/运动先验，并通过类似的选择性机制进行统一融合？
-
-
 
 ## 原文 PDF
 

@@ -49,8 +49,6 @@ claims:
 
 在KITTI-360和Waymo两个真实自动驾驶数据集上，ScenDi 在视频生成质量与相机控制精度上均表现出显著优势：其WAN变体在KITTI-360上取得了 **FID 22.9**、**KID 0.016** 和 **FVD 262.6** 的3D生成方法最佳成绩，同时平移误差仅0.06，与纯3D生成方法保持同等的相机控制精度。该框架还展现出灵活的场景修复与可控合成能力，支持通过布局和文本提示对生成内容进行显式引导。
 
-
-
 自动驾驶仿真与城市数字孪生等应用对高质量、可自由操控相机的城市场景生成提出了迫切需求。现有方法大致分为两条技术路线，但各自存在结构性短板：
 
 **纯3D生成方法的瓶颈。** 以**UrbanGen**（Yang et al., TPAMI 2025）、**GaussianCity**（Xie et al., CVPR 2025）等为代表的3D生成方法，通过体素网格、语义占据或3D高斯原语（3DGS）显式建模场景几何，天然具备精确的相机控制能力。然而，受限于3D表征的分辨率与模型容量，这类方法生成的场景普遍缺乏高频纹理细节，且难以有效建模远距离区域的外观——这些区域在训练数据中往往因距离过远而采样稀疏，导致生成质量下降。
@@ -60,8 +58,6 @@ claims:
 **核心矛盾。** 上述困境揭示了一个根本性张力：3D生成提供几何先验与相机可控性，但牺牲外观保真度；2D生成提供逼真外观，但丧失显式3D结构与精确相机控制。如何在一个统一框架中同时获得二者的优势，是城市场景生成领域的核心挑战。
 
 **本文动机。** ScenDi 提出将场景生成解耦为“3D几何与粗外观建立”和“2D细节增强”两个阶段，通过3D到2D的扩散级联（3D-to-2D Diffusion Cascades）来调和上述矛盾。其核心洞察是：让3D扩散模型主导几何与粗外观先验的建立，再以粗渲染的RGB图像为信息纽带，驱动2D视频扩散模型专注于细节细化和远距离区域合成，从而在高保真外观与精确相机控制之间取得平衡。
-
-
 
 ## 核心方法与创新机理
 
@@ -99,8 +95,6 @@ KITTI-360上的消融实验（Table 3）给出了强证据：使用粗渲染RGB�
 
 > **注意**：当前分析基于arXiv预印本，部分baseline方法（如CC3D、Vista）的完整引用信息需手动核实。本文提出的级联框架中，2D扩散的生成质量依赖于前级3D LDM的输出——若3D生成效果不佳，可能导致后续伪影，这是该架构的固有局限。
 
-
-
 ScenDi 的核心设计是将城市场景生成解耦为两个级联阶段：**3D 粗生成** 与 **2D 精细化**。这一 3D-to-2D 扩散级联架构的动机源于一个根本性瓶颈：纯 3D 生成模型受限于分辨率，难以捕捉高频细节和远距离区域；而纯 2D 生成模型虽能产出高保真外观，却缺乏显式 3D 结构，导致相机控制能力薄弱。ScenDi 的因果调节旋钮在于，让 3D 扩散主导几何与粗外观先验的建立，再让 2D 视频扩散专注于细节细化和远景合成，从而兼顾高保真外观与精确相机控制。
 
 整个 pipeline 由四个核心模块串联而成，数据流自上而下贯通（参见 Figure 2）：
@@ -116,13 +110,6 @@ ScenDi 的核心设计是将城市场景生成解耦为两个级联阶段：**3D
 这种级联设计的核心洞察在于：3D 扩散负责“结构正确性”，2D 扩散负责“外观真实感”，二者通过渲染图像实现信息传递，而非在 3D 空间中直接追求高分辨率。在推理时，长视频生成采用 **Diffusion Forcing** 策略——为每帧独立采样噪声水平，避免简单替换或 Repaint 方法带来的片段间背景突变（参见 Figure 6）。
 
 **关键方法差异**：与 UniScene、Infinicube 等先前工作使用深度图或语义图作为 2D 精细化条件不同，ScenDi 创新性地使用由 3D 高斯渲染的**粗 RGB 图像**作为条件信号。消融实验表明，这一选择对最终视觉质量至关重要——在 KITTI-360 上，RGB 条件（FID 36.9）显著优于深度条件（FID 78.6）（Table 3），因为 RGB 图像携带了更丰富的纹理和结构先验，使 2D 扩散模型能更有效地利用其预训练先验。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2588_https_arxiv_org_abs_2601_15221/figures/001_Figure_1.jpg]]
-*Figure 1: ScenDi generates high-quality urban scenes using a 3D-to-2D Scene Diffusion cascade, with optional condition signals like text and layout for controllable 3D space generation. Our method provides flexible camera control, even though our training data primarily consists of forward-moving trajectories*
-
-
 
 ScenDi 的核心架构由三个级联模块构成，形成“3D 几何先验 → 2D 外观精细化”的生成管线。
 
@@ -166,8 +153,6 @@ $$\mathcal{L}_{\mathrm{diff}}^{2D} = ||\mathbf{z}_0^{\mathcal{C}} - \hat{\mathbf
 
 该阶段的关键设计在于条件信号的选择：消融实验（Table 3）表明，使用粗渲染 RGB 图像作为条件（KITTI-360 上 FID 36.9）显著优于使用深度图（FID 78.6），因为 RGB 条件携带了更丰富的场景上下文信息，有助于视频扩散模型更高效地学习精细化映射。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -206,9 +191,6 @@ Table 3 和 Figure 4 展示了 2D 增强阶段条件信号的关键消融。在 
 
 Figure 6 对比了 Diffusion Forcing 与 Repaint 两种长视频推理策略。Diffusion Forcing 为每帧独立采样噪声水平，有效改善了相邻片段间的背景一致性，避免了 Repaint 策略下出现的突变伪影。这一设计对长距离相机轨迹的生成质量至关重要。
 
-![[assets/figures/papers/paper_list_l2588_https_arxiv_org_abs_2601_15221/figures/010_Figure_6.jpg]]
-*Figure 6: Ablation on Inference Strategy. We visualize neighboring frames obtained from two clips. Using the diffusion forcing strategy (w/ DF) significantly improves the consistency of background regions compared with the repaint strategy (w/o DF)*
-
 ### 可控场景生成
 
 Figure 5 展示了 ScenDi 的条件生成能力。通过将语义布局（如道路、车辆、建筑的 one-hot 体素标签）或文本提示作为 3D 扩散模型的条件输入，ScenDi 能够生成与条件信号高度一致的城市场景。这验证了 3D 扩散阶段对显式空间控制的响应能力。
@@ -223,12 +205,6 @@ Figure 5 展示了 ScenDi 的条件生成能力。通过将语义布局（如道
 1. **级联依赖问题。** 2D 视频扩散的生成质量高度依赖于前级 3D LDM 的输出质量。若 3D 扩散生成的粗场景存在严重几何或外观缺陷，2D 精细化阶段可能引入或放大伪影，而非修复它们。
 
 2. **极端视角退化。** 在训练数据以向前运动轨迹为主的情况下，3D LDM 在极端视角变化（如大幅度旋转）下可能出现质量下降，进而影响整体级联效果。这是当前 3D 生成模型泛化能力的普遍瓶颈。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2588_https_arxiv_org_abs_2601_15221/figures/003_Table.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -261,8 +237,6 @@ ScenDi为城市场景生成开辟了两条值得探索的后续路径：
 - **规模扩展的潜力**：扩大训练数据和模型规模能否进一步提升原生3D场景生成的视觉质量，从而减轻对2D精细化阶段的依赖？当前的级联设计本质上是对3D生成能力不足的补偿策略，更强的3D基础模型可能改变这一架构权衡。
 
 - **3D表征的进化空间**：如何将更强大的3D表征或生成模型整合到级联框架中？Voxel-to-3DGS VQ-VAE作为信息压缩的中间环节，其重建质量（受BCE损失、每体素高斯数量等因素影响，Table 2）直接决定了整个流程的性能上限，更优的3D表征有望系统性提升最终生成质量。
-
-
 
 ## 原文 PDF
 

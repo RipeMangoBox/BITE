@@ -58,8 +58,6 @@ claims:
 
 **局限与展望**：训练轨迹依赖 GPT-4o 生成，成本高且可扩展性受限；多模态感知错误（图像检索失败、OCR 错误）占 BrowseComp-VL Level 2 错误的 28%，跨模态对齐仍是关键瓶颈；强化学习仅使用最终答案的格式与语义奖励，缺乏中间推理步骤的密集反馈。未来方向包括构建闭环数据飞轮以逐步替代 GPT-4o、设计中间过程奖励模型缓解奖励稀疏问题，以及将工具集成范式推广至视频、音频等更多模态。
 
-
-
 ### 多模态深度研究智能体的能力瓶颈
 
 大型视觉-语言模型（VLMs）在图像理解、视觉问答等任务上取得了长足进步，但当面对需要结合视觉与文本信息进行多步推理、主动检索外部知识并灵活调用多种工具的复杂现实任务时，现有方法暴露出显著局限。当前主流的深度研究智能体大多依赖模板驱动的静态工作流：它们按照预设的步骤执行搜索、提取和总结，缺乏根据中间观察动态调整策略的能力。这种“提示驱动工作流”（Prompt Workflow）范式将推理过程固化在固定的提示模板中，无法像人类研究者那样在信息不足时主动发起新的检索、在遇到歧义时切换信息源、或在需要计算时调用代码解释器。
@@ -92,8 +90,6 @@ claims:
 
 WebWatcher 的设计目标不是构建一个更大的模型，而是**探索如何让相对小型的视觉-语言模型（7B/32B）通过后训练获得超越大模型的深度研究能力**。这一方向对降低部署成本、提升推理效率、以及推动开源社区的多模态智能体研究具有重要意义。
 
-
-
 ## 核心方法与创新机理
 
 WebWatcher 的核心创新在于将多模态深度研究智能体从**模板驱动的静态工作流**升级为**具备跨模态工具集成与深度推理能力的学习型智能体**。其关键突破体现在三个维度：
@@ -113,8 +109,6 @@ WebWatcher 的核心创新在于将多模态深度研究智能体从**模板驱�
 ### 冷启动 SFT：RL 训练的关键使能技术
 
 一项决定性发现是：**仅用指令数据初始化的模型在 RL 训练中奖励几乎为零，而经过工具使用轨迹冷启动 SFT 的模型能显著提升初始分数**，并在 LiveVQA 上保持 0.06–0.18 的持续优势（Fig. 5）。这表明，对于视觉-语言模型而言，先通过监督学习显式教授工具调用模式和逐步推理过程，是后续强化学习能够有效展开的必要前提。
-
-
 
 ![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_8jsaazdAb3/figures/003_Figure_3.jpg]]
 *Figure 3: Pipeline for generating data, where multi-hop VQA pairs are built from hyperlink graphs, grounded with web images, filtered by selector–examiner checks, and transformed into Level 1 (explicit) and Level 2 (fuzzed) questions for multimodal reasoning*
@@ -148,8 +142,6 @@ $$\mathcal{L}_{\mathrm{GRPO}}(\boldsymbol{\theta}) = \mathbb{E}_{\boldsymbol{\ta
 ### 关键瓶颈与局限
 
 尽管框架设计完整，仍存在若干结构性瓶颈：训练轨迹依赖 GPT-4o 生成，成本高且可能引入模型偏差；RL 仅使用最终答案的格式与语义奖励，缺乏对中间推理步骤的密集反馈，奖励稀疏问题突出；多模态感知错误（图像检索失败、OCR 错误）占 BrowseComp-VL Level 2 错误案例的 28% (Fig. 7)，跨模态对齐仍是核心难题。
-
-
 
 ### 轨迹定义与数据生成流水线
 
@@ -219,8 +211,6 @@ $$
 
 冷启动 SFT 对 RL 训练至关重要。Figure 5 显示，仅用指令数据初始化的模型奖励停滞在接近零水平，而冷启动能显著提升初始分数，并在 LiveVQA 上保持 0.06–0.18 的持续优势。工具调用次数消融（Table 3）表明，调用次数 $\geq 3$ 时 Best Pass@3 达到 19.09，过少或过多均降低性能，验证了适度工具交互对深度推理的必要性。
 
-
-
 ## 实验与关键发现
 
 ### 核心结果：多模态深度研究智能体的全面突破
@@ -229,26 +219,19 @@ WebWatcher 在 Humanity‘s Last Exam (HLE) 及 BrowseComp-VL 等四个挑战性
 
 **HLE 基准结果**（Table 1）：WebWatcher-32B 取得 13.6% 的平均准确率，显著超过开源搜索导向多模态代理 **OmniSearch** (Li et al., 2025d) 的 9.3%（+4.3 个百分点），并在生物学子领域达到 33.8% 的突出表现。WebWatcher-7B 亦达到 10.6%，展现出良好的参数效率。相比之下，直接推理基线（GPT-4o、Gemini-2.5-flash 等）的平均准确率仅为 2.6%–6.5%，提示驱动工作流（含 o3、GPT-4.1 等）亦未突破 10%。
 
-
 ![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_8jsaazdAb3/figures/004_Table_1.jpg]]
 *Table 1: Main results on HLE. All accuracy scores are reported as percentages. Avg signifies the average accuracy score of three inference runs across different subtopics*
 
 **四个挑战基准结果**（Table 2）：WebWatcher-32B 在 BrowseComp-VL 上取得 27.0% 的平均准确率（Level 1: 28.4%，Level 2: 25.0%），较 OmniSearch 的 16.3% 提升 +10.7 个百分点。在 LiveVQA 上达到 58.7%，超越最佳提示工作流 Gemini-2.5-flash 的 41.3%（+17.4 个百分点）；在 MMSearch 上取得 55.3%，较 OmniSearch 的 49.7% 提升 +5.6 个百分点。值得注意的是，在 SimpleVQA 上 WebWatcher-32B 的 59.0% 低于 o3 Prompt Workflow 的 70.3%（-11.3 个百分点），提示该方法在浅层视觉问答场景下存在工具调用的冗余开销。
-
 
 ![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_8jsaazdAb3/figures/005_Table_2.jpg]]
 *Table 2: Main results on four challenging benchmarks. All accuracy scores are reported as percentages. Avg signifies the average score of three inference across two difficult levels*
 
 **人类基线对比**（Table 4）：在 BrowseComp-VL 上，人类标注者使用相同工具集，每个问题由至少两位标注者独立作答。人类在 Level 1 上准确率为 33.2%（高于 WebWatcher-32B 的 28.4%），但在 Level 2 上仅为 18.0%（低于 WebWatcher-32B 的 25.0%），表明 Level 2 的模糊化实体和多跳推理对人类同样极具挑战。智能体在可解案例上的平均耗时仅 0.3–0.5 分钟，远低于人类的 14.7–20.0 分钟，凸显其效率优势。
 
-
-![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_8jsaazdAb3/figures/007_Table_4.jpg]]
-*Table 4: Human vs Agent on BrowseComp-VL. T _ { s } and T _ { u } mean average minutes of solvable cases and unsolveable cases, respectively. I _ { u } indicates abandoned cases without final answer*
-
 ### 工具调用分布：自适应多工具协同
 
 Figure 4 展示了四个基准上的外部工具调用分布，揭示了智能体的自适应行为模式。在信息检索密集型基准（HLE、BrowseComp-VL）上，Web Text Search 占主导地位；而在视觉推理密集的 LiveVQA 上，Web Image Search 的比例显著上升。Webpage Visit 和 Code Interpreter 在需要深入页面解析或数值计算的场景中被选择性激活。这一分布自适应特性证明智能体并非过度依赖单一工具，而是根据任务需求动态调度多工具协同。
-
 
 ![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_8jsaazdAb3/figures/014_Figure_4.jpg]]
 *Figure 4: The percentage of external tool calls in the four benchmarks. The height of each bar denotes the fraction of total calls made to that tool within the corresponding benchmark. Internal OCR is not included since only external tools are counted here. Score on HLE Benchmark*
@@ -257,28 +240,19 @@ Figure 4 展示了四个基准上的外部工具调用分布，揭示了智能�
 
 **工具调用次数消融**（Table 3）：当工具调用次数 ≥3 时，Best Pass@3 达到 19.09，性能最优。过少（1–2 次）导致信息获取不足，过多（≥5 次）则引入噪声和效率损失，呈现倒 U 型关系。
 
-
 ![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_8jsaazdAb3/figures/006_Table_3.jpg]]
 *Table 3: Performance across different tool call counts*
 
 **冷启动 SFT 的关键性**（Figure 5）：仅用指令数据初始化的模型在 RL 训练中奖励停滞在接近零的水平，几乎无法从 GRPO 中获益。而经过工具使用轨迹冷启动 SFT 的模型初始分数显著提升，并在 LiveVQA 上保持 0.06–0.18 的持续优势。这一结果确证了高质量合成轨迹的监督微调是 RL 有效训练的**必要条件**——它教会模型基本的工具调用模式和推理结构，为后续策略优化提供了可优化的初始策略。
-
 
 ![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_8jsaazdAb3/figures/016_Figure_5.jpg]]
 *Figure 5: Performance comparison using cold start in RL training on three benchmarks*
 
 **Pass@k 扩展性**（Figure 6）：WebWatcher-32B 在 HLE 上的 Pass@k 随 k 增加而单调提升，k=32 时达到 41.9%，但 Token 成本线性增长（Table 7），存在明显的收益递减。
 
-
-![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_8jsaazdAb3/figures/021_Table_7.jpg]]
-*Table 7: Illustrative cost–latency trade-off for Pass@k. vLLM on eight 80GB GPUs for WebWatcher-32B, batch decoding over k rollouts. B signifies bachsize. T _ { d } , T _ { j } and T _ { t } mean decoded tokens, judge tokens and total tokens, respectively*
-
 ### 失败模式分析：跨模态对齐仍是核心瓶颈
 
 Figure 7 展示了 BrowseComp-VL Level 2 上 100 个失败轨迹的错误分布：
-
-![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_8jsaazdAb3/figures/023_Figure_7.jpg]]
-*Figure 7: Error distribution of 100 failed trajectories from Level 2 of BrowseComp-VL*
 
 - **文本检索错误**占比最高（32%），包括查询不精确、搜索结果不相关等；
 - **多模态感知错误**占 28%，涵盖图像检索失败和 OCR 识别错误，突显跨模态对齐仍是关键难题；
@@ -290,21 +264,6 @@ Figure 7 展示了 BrowseComp-VL Level 2 上 100 个失败轨迹的错误分布�
 ### 评估可靠性保障
 
 LLM-as-Judge 与人类专家的一致性达 99.4%（Cohen‘s κ 0.91，Table 8），保证了自动评测的可靠性。BrowseComp-VL 的 QA 对由三位博士级专家独立验证，初始一致率为 89.3%（Cohen’s κ 0.86），问题质量高度可靠。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_8jsaazdAb3/figures/018_Table_5.jpg]]
-*Table 5: Mathematical symbols and their meanings*
-
-![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_8jsaazdAb3/figures/020_Table_6.jpg]]
-*Table 6: Resource efficiency metrics of WebWatcher-7B, including both training and inference stages*
-
-
-
-![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_8jsaazdAb3/figures/022_Table_8.jpg]]
-*Table 8: Inter-rater agreement between LLM judges and human experts on HLE (binary 0–1 labels, N=330). 95% Wilson confidence intervals are reported for raw agreement*
-
-
 
 ## 定位与知识库关联
 
@@ -351,8 +310,6 @@ WebWatcher 的适用场景具有明确的边界条件：
 4. **过程奖励设计**：如何构建有效的中间过程奖励模型，以缓解 RL 的奖励稀疏问题？这涉及对推理步骤的自动评估和密集反馈信号的生成。
 
 5. **检索鲁棒性**：文本检索错误占比最高（32%），如何通过查询改写、多源融合、检索结果验证等策略显著降低信息检索失败率？这需要将检索增强生成（RAG）领域的最新进展与智能体的工具调用策略深度融合。
-
-
 
 ## 原文 PDF
 

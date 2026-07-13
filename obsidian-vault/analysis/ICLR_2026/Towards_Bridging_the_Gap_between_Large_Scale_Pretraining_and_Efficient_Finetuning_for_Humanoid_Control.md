@@ -58,8 +58,6 @@ LIFT的三个阶段分别为：
 
 LIFT的方法定位处于**大规模off-policy预训练**与**物理信息模型基强化学习**的交叉点：它继承了SAC的样本效率与探索能力，同时利用物理先验约束世界模型预测，从而在微调阶段实现安全且数据高效的适应。与纯on-policy预训练-微调范式（PPO）和纯黑盒世界模型方法（MBPO）相比，LIFT通过**预训练算法选择**（SAC而非PPO）、**世界模型结构设计**（物理信息而非黑盒）、**探索-执行解耦**三个关键设计，系统性地解决了从大规模预训练到安全高效微调的过渡问题。
 
-
-
 ### 人形机器人控制的规模化瓶颈
 
 人形机器人的运动控制正经历从手工设计到数据驱动范式的深刻转变。大规模并行仿真使得强化学习（RL）能够在数小时内训练出可部署的策略，但这一成功主要集中在 **on-policy** 方法——尤其是 **PPO**（Schulman et al., 2017）——之上。PPO 借助数千个并行环境实现了快速收敛，然而其根本局限在于：**每次策略更新后必须丢弃旧数据**，导致样本效率低下。当机器人被部署到与训练环境存在物理差异的新场景时，PPO 需要在新环境中重新收集大量交互数据，且随机探索过程可能引发跌倒、硬件损伤等安全风险。
@@ -89,8 +87,6 @@ Off-policy 方法理论上可通过复用历史数据提升样本效率，但将
 2. **微调阶段**：在真实环境中执行**确定性策略**（仅使用动作均值），将随机探索完全限制在**物理信息世界模型**内部。这一设计实现了安全与效率的双重收益——真实环境的交互数据仅用于微调世界模型，而策略的充分探索发生在模型生成的合成轨迹中，避免了不安全动作的直接执行。
 
 这一解耦策略的可行性建立在两个关键前提之上：SAC 预训练策略提供了足够好的初始行为，使得确定性执行不会导致性能崩溃；物理信息世界模型具备足够的预测精度，使得模型内的探索能够产生有效的学习信号。消融实验证实了这两个前提的不可或缺性——去除 SAC 预训练导致策略陷入局部极差而无法收敛，去除世界模型预训练则显著拖慢训练速度（Figure 4）。
-
-
 
 ## 核心方法与创新机理
 
@@ -138,8 +134,6 @@ $$M(q_t) \ddot{q}_t + C(q_t, \dot{q}_t) + G(q_t) = B\tau_t + \underbrace{J^\top 
 
 三者共同构成了一个闭环：SAC 预训练 → 高质量世界模型 → 安全的模型内探索 → 高效的策略微调。缺失任一环节，整个流程的性能都会显著退化或完全失败。
 
-
-
 ![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_NEOTsyyYH7/figures/001_Figure_1.jpg]]
 *Figure 1: Large-scale pretraIning and efficient FineTuning (LIFT) Framework. In stage (i), we implement SAC in JAX to support large-batch update and high UTD, achieving fast, robust convergence in massively parallel simulation and zero-shot deployment to a real humanoid in outdoor experiments. In stage (ii), we pretrain a physics-informed world model on the SAC data, combining Lagrangian dynamics with a residual predictor to capture contact forces and other unmodeled effects. In stage (iii), we finetune both the policy and the world model to new environments while executing only deterministic actions in the environment. Stochastic exploration is confined to rollouts within the world model. This frame...*
 
@@ -160,8 +154,6 @@ LIFT 将人形机器人从零训练到新环境适应的完整流程解耦为三
 ### 输入输出流与模块关系
 
 三个阶段的依赖关系是单向且渐进的：阶段一的输出是收敛的 SAC 策略参数和全量 transition 数据集；阶段二消费该数据集，输出预训练的世界模型参数；阶段三同时加载预训练策略与世界模型，在目标环境中交替执行“真实环境确定性数据收集 → 世界模型微调 → 模型内随机探索与策略更新”的循环。这种设计使得随机探索的“风险”被完全隔离在世界模型之内，而真实环境中始终执行安全的确定性策略，从而在样本效率与部署安全性之间建立了因果解耦。
-
-
 
 LIFT 框架由三个顺序模块构成：大规模 SAC 策略预训练、物理信息世界模型预训练、以及策略与世界模型联合微调。三个模块的因果链条为：SAC 预训练提供良好的策略初始化和世界模型训练数据；世界模型预训练将未建模动力学（接触力、耗散力矩）编码为残差网络，使模型具备精确的前向预测与不确定性估计能力；微调阶段则在真实环境中执行确定性策略以保证安全，同时将随机探索完全限制在世界模型内，利用 SAC 的随机策略在模型生成数据上更新 actor-critic，从而实现样本高效且安全的适应。
 
@@ -212,8 +204,6 @@ $$\text{terminate if } \{h_t, |v|, |\omega|, |\phi|, |\theta|, q_j, \dot{q}_j\} 
 $$J_{\phi}^{R}(\pi_{\theta}) = \mathbb{E} \left[ \sum_{t=0}^{\infty} \gamma^t r_{t+1} \middle| s_0 \sim \mu, a_t \sim \pi_{\theta}(\cdot | s_t), (s_{t+1}, r_{t+1}) \sim \mathbb{P}_{\phi}(\cdot | s_t, a_t) \right]$$
 
 其中 $\mathbb{P}_{\phi}$ 为物理信息世界模型的转移概率。微调采用迭代流程：每收集 $T_{ep}$ 步真实数据后，在世界模型上执行多轮训练，随后进行策略更新，循环往复直至收敛。
-
-
 
 ## 实验与关键发现
 
@@ -278,28 +268,6 @@ LIFT的预训练阶段采用高UTD（Update-To-Data ratio）和大批量更新�
 
 4. **流水线复杂度**：异步数据收集与训练、对象交互等高级任务尚未集成，当前流水线复杂度有限。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_NEOTsyyYH7/figures/010_Figure_6.jpg]]
-*Figure 6: Comparison of PPO and SAC in a preliminary fine-tuning experiment with the BoosterT1 robot, run for 48 hours on a single Brax simulation. The left figure shows the evaluation episode return, and the right figure shows the body’s linear velocity along the x-axis. Curves represent the average over 8 random seeds, with evaluation performed in 128 parallel environments. PPO performance is highly sensitive to the initial action standard deviation (std). Replacing the PPO actor with a SAC-style actor that outputs both the mean and standard deviation improves stability, although SAC still requires fewer samples to achieve the same performance*
-
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_NEOTsyyYH7/figures/028_Table_2.jpg]]
-*Table 2: Finetune Hyperparameter of LIFT*
-
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_NEOTsyyYH7/figures/029_Table_3.jpg]]
-*Table 3: Reward Function Components and Weights*
-
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_NEOTsyyYH7/figures/030_Table_4.jpg]]
-*Table 4: Default reward terms (Note: U [ a , b ] denotes uniform distribution over [a, b])*
-
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_NEOTsyyYH7/figures/031_Table_5.jpg]]
-*Table 5: Domain randomization parameters (Note: U [ a , b ] denotes uniform distribution over [a, b], $\pm$ U ( c ) denotes uniform distribution over [ - c , c ] )*
-
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_NEOTsyyYH7/figures/032_Table_6.jpg]]
-*Table 6: Finetune reward terms (Note: many terms disabled for sim-to-sim transfer)*
-
-
-
 ## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
@@ -335,8 +303,6 @@ LIFT的微调流程依赖物理信息世界模型的预测精度。在高度动�
 3. **异步部署效率**：当前微调采用同步的数据收集-训练循环。异步数据收集与训练能否在不引入额外复杂性的前提下进一步提高实际部署效率？这涉及off-policy数据的陈旧性与世界模型更新频率之间的权衡。
 
 4. **对象交互与复杂任务**：LIFT目前聚焦于运动控制任务。将其扩展到全身运动跟踪（Figure 16已展示初步能力）和对象交互等高级任务，需要研究世界模型对操作力学的建模能力以及安全探索机制的泛化性。
-
-
 
 ## 原文 PDF
 

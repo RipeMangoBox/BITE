@@ -58,8 +58,6 @@ claims:
 
 需要指出的是，由于本文是综述性质，未进行原创实验，所引用的性能数据均来自原始论文；同时，许多被引工作的设计选择缺乏严格的消融研究，这一点在解读具体方法时需加以注意。
 
-
-
 ### 神经场：从物理概念到视觉计算范式
 
 场是物理与数学中描述时空连续分布量的基本概念——标量场、向量场、张量场在电磁学、流体力学、广义相对论等领域已有逾百年历史。在视觉计算中，类似的思想同样普遍存在：二维图像可视为像素网格上的颜色场，三维形状可表达为符号距离场（SDF）或占用场，而动态场景则可建模为时变辐射场（Table 1）。
@@ -90,8 +88,6 @@ $$q = \Phi(\mathbf{x}; \Theta)$$
 
 此外，本文还构建了一个**社区驱动的动态数据库网站**，支持搜索、过滤、文献管理和可视化功能（Figure 1），旨在持续追踪该领域的快速演进，缓解静态综述固有的时效性问题。
 
-
-
 ## 核心方法与创新机理
 
 本工作的核心创新并非提出一种新的神经场算法，而是构建了一个系统化的分类学框架与社区驱动的知识基础设施，以解决该领域因论文爆发式增长而导致的术语碎片化和概念重复问题。其创新点可归纳为三个层面：
@@ -117,8 +113,6 @@ $$q = \Phi(\mathbf{x}; \Theta)$$
 该综述将神经场在视觉计算中的广泛应用——从3D重建、数字人到生成模型和压缩——统一为“利用神经网络的正则化能力求解病态反问题”这一核心范式。通过组合不同的条件机制（提供先验）、混合表示（平衡效率与表达力）和前向映射（连接观测），研究者可以针对特定任务构建神经场解决方案。这一视角揭示了各子领域方法之间的深层联系，为跨领域迁移提供了理论指导。
 
 需要指出，由于本文是综述性质的工作，上述创新体现在知识组织与形式化层面，而非提出新的网络结构或训练算法。其价值在于通过统一术语和分类，降低了该领域的交流成本，并为未来的公平比较和系统性改进提供了基准框架。
-
-
 
 本综述将神经场（Neural Field）的完整技术流程抽象为一个统一的前馈算法框架，如图3所示。该框架的核心是将一个病态反问题（ill-posed inverse problem）分解为三个可微分的阶段：**坐标采样与场量预测**、**前向映射**、以及**传感器域损失计算**。
 
@@ -166,8 +160,6 @@ $$\underset{\Theta}{\operatorname{argmin}} \int_{(x_{recon}, x_{sens}) \in (\mat
 该框架的模块化设计使得不同技术可以灵活组合。例如，一个典型的NeRF变体可能同时使用：位置编码（架构类）、体积渲染（前向映射类）、多尺度哈希网格（混合表示类）、以及元学习初始化（先验学习类）。综述配套的社区网站（Figure 1）通过可搜索数据库支持研究者按这些技术维度筛选和比较超过250篇论文，从而应对该领域论文快速增长带来的信息过载问题。
 
 **证据强度说明**：上述框架描述基于综述对超过250篇论文的系统性归纳（Figure 2展示了该领域在2019年后的爆发式增长），五类技术的划分由Table 2明确锚定，核心公式 $q = \Phi(x; \Theta)$ 来自Section 1.1的Definition 2，优化目标来自Section 4的Equation (5)。所有技术细节均可通过原文锚点追溯验证。
-
-
 
 ### 神经场的形式化定义
 
@@ -237,8 +229,6 @@ $$\gamma_{(2i)}(x) = \sin(2^{i-1} \pi x)$$
 
 上述模块并非孤立运作，而是通过统一的反问题求解框架相互连接。其核心瓶颈在于：条件机制决定了模型的泛化能力边界，混合表示在计算效率与表示能力之间进行权衡，前向映射的物理准确性直接影响重建质量，而网络架构则决定了模型对高频信号的表达能力。五大技术类别（Table 2）分别对应学习、推理和控制中的不同问题，共同构成了神经场工具箱的完整拼图。
 
-
-
 ## 实验与关键发现
 
 需要指出，本文是一篇综述性报告，并未进行原创实验。文中引用的所有性能数据均来自原始论文，因此本处无法提供传统意义上的主实验结果与消融分析。以下基于综述中归纳的技术框架与实证观察，梳理关键图表结论、设计瓶颈与失败模式。
@@ -249,7 +239,6 @@ $$\gamma_{(2i)}(x) = \sin(2^{i-1} \pi x)$$
 
 **Figure 3** 与 **Table 2** 共同描绘了典型神经场算法的前馈流程及其工具箱。流程为：时空坐标输入神经网络产生场量，经前向映射转换到传感器域，再与传感器观测计算重建误差。**Table 2** 将解决学习、推理与控制中各类问题的技术归纳为五大类：先验学习与条件、混合表示、前向映射、网络架构、编辑。该分类框架是本文的核心贡献，为后续方法比较提供了系统性语言。
 
-
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2111_11426/figures/005_Figure_3.jpg]]
 *Figure 3: A typical feed-forward neural field algorithm. Spatiotemporal coordinates are fed into a neural network which predicts values in the reconstruct a domain. Then, this domain is mapped to the sensor domain where sensor measurements are available as supervision. Figures adapted from [MST∗20, LZP∗20]. Table 2: The five classes of techniques in the neural field toolbox each addresses problems that arise in learning, inference, and control*
 
@@ -258,7 +247,6 @@ $$\gamma_{(2i)}(x) = \sin(2^{i-1} \pi x)$$
 **Figure 5** 对比了全局条件与局部条件机制。全局条件中，单一潜码 $z$ 定义所有输入坐标上的神经场；局部条件则通过离散数据结构提供坐标相关的潜码 $z = g(x)$，使网络具有坐标依赖性。局部条件是混合表示的理论基础，也是神经场扩展至大规模场景的关键技术路径。
 
 **Figure 6** 展示了混合表示的多种实例，包括神经稀疏体素网格、多尺度体素网格与神经2D图像压缩、物体包围盒与神经辐射场、网格、图集以及Voronoi分解与神经辐射场。这些实例表明，将神经场与离散数据结构结合是突破单一MLP容量限制的通用策略。
-
 
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2111_11426/figures/008_Figure_6.jpg]]
 *Figure 6: Examples of hybrid representations: (A) neural sparse voxel grid [ $\mathrm { L G L } ^ { \ast }$ 2 0 ] . , (B) multi-scale voxel grid with neural 2D image compression [MLL∗21], (C) object bounding boxes with neural radiance fields [ $\mathrm { Z L Y ^ { * } }$ 2 1 ] . , (D) mesh $\mathrm { [ P Z X ^ { * } 2 1 ] }$ (E) atlas [ $\mathrm { G F K ^ { * } }$ 1 8 $\mathrm { b }$ ] , and (F) Voronoi decomposition with neural radiance fields [ $\mathrm { R J Y ^ { * } }$ 2 1 ]
@@ -277,15 +265,12 @@ $$\gamma_{(2i)}(x) = \sin(2^{i-1} \pi x)$$
 
 4. **编辑的可控性不足**：**Table 4** 与 **Table 5** 分别归纳了参数编辑与坐标重映射两类编辑方法。现有方法普遍缺乏对编辑操作语义一致性的保证，参数空间的局部修改可能导致全局的意外变化，坐标变换的复合也易产生非预期的拓扑改变。
 
-
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2111_11426/figures/013_Table_4.jpg]]
 *Table 4: Neural fields can be edited by directly changing network parameters such as weights and latent features. We list related work that performs editing through parameter editing*
 
 ### 开放问题与验证需求
 
 综述指出的开放问题直接映射到实验验证的空白领域：神经场压缩方案与标准编解码器的严格定量比较缺失；许多引用的工作中设计选择缺乏消融研究；弱监督与自监督学习神经场的性能边界尚未系统刻画。这些均需后续实证工作填补。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2111_11426/figures/003_Table_1.jpg]]
 *Table 1: Y. Xie, T. Takikawa, S. Saito, O. Litany, S. Yan, N. Khan, F. Tombari, J. Tompkin, V. Sitzmann, S. Sridhar / Neural Fields in Visual Computing Table 1: Examples of fields in physics and visual computing*
@@ -295,12 +280,6 @@ $$\gamma_{(2i)}(x) = \sin(2^{i-1} \pi x)$$
 
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2111_11426/figures/012_Table.jpg]]
 *Table: Y. Xie, T. Takikawa, S. Saito, O. Litany, S. Yan, N. Khan, F. Tombari, J. Tompkin, V. Sitzmann, S. Sridhar / Neural Fields in Visual Computing*
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2111_11426/figures/023_Table.jpg]]
-*Table: Appendix A: Variable Naming Conventions*
-
-
-
 
 ## 定位与知识库关联
 
@@ -354,8 +333,6 @@ Figure 6 展示了六种典型的混合表示实例：神经稀疏体素网格�
 2. **超越监督学习**：如何实现弱监督或自监督学习的神经场，减少对密集标注或精确传感器模型的依赖。
 3. **多模态融合**：探索多模态数据（如图像、深度、触觉、音频）的融合，可能拓展神经场在具身智能和机器人领域的应用边界。
 4. **高层次语义**：将神经场从几何和外观表示扩展到语义和任务驱动的表示，仍是未解决的问题。
-
-
 
 ## 原文 PDF
 

@@ -57,8 +57,6 @@ claims:
 - 扩散步数消融表明：T=3 时性能达到峰值，继续增加步数不再提升，且推理时间线性增长（Table 5）。
 - 在下游目标检测任务中，DRFusion 以 **mAP@0.5 = 0.9108** 优于所有比较方法（Table 4），验证了融合质量对高层视觉任务的有效支撑。
 
-
-
 ### 多模态图像融合的现实困境
 
 多模态图像融合旨在将不同传感器捕获的互补信息整合为单一、信息丰富的图像，在自动驾驶、医学诊断、夜间监控等场景中扮演关键角色。红外图像提供热辐射信息，不受光照影响；可见光图像则保留丰富的纹理与色彩细节。然而，真实世界的成像过程远非理想——源图像常常同时遭受**噪声污染、运动模糊、低分辨率**等多种退化。这种退化叠加使得融合任务从“如何融合”升级为“如何在退化中融合”。
@@ -82,8 +80,6 @@ claims:
 - **从“无约束生成”到“联合约束校正”**：设计联合观测模型，将退化约束与融合约束统一为线性方程组，在每步扩散采样后通过解析伪逆校正，确保输出同时满足退化一致性和融合一致性。
 
 这三个设计共同指向一个目标：**在保持扩散模型结构化推断优势的前提下，构建一个既高效、又鲁棒、且能灵活适配不同融合任务的退化感知框架**。
-
-
 
 ## 核心方法与创新机理
 
@@ -120,8 +116,6 @@ $$\mathcal{L}_{total} = \mathcal{L}_{rec} + \lambda \mathcal{L}_f$$
 ### 扩散步数与效率：从数百步到仅需 3 步
 
 标准扩散模型通常需要数百步（DDPM）或数十步（DDIM）推理，而 DRFusion 通过隐式去噪回归与联合校正的结合，将有效推理步数压缩至 **T=3**。Table 5 的消融显示，步数从 1 增至 3 时指标持续提升，T=3 达到峰值；T>3 后性能饱和甚至略降，且推理时间线性增长。这一特性使 DRFusion 在保持扩散模型生成质量的同时，推理效率显著优于同类扩散融合方法（Figure 5）。
-
-
 
 DRFusion 的整体框架围绕一个核心矛盾展开：**真实世界多模态融合必须同时应对源图像的退化（噪声、模糊、低分辨率等）与跨模态信息互补，但标准扩散模型依赖单一目标分布且缺乏自然融合数据，无法直接适配这一需求。** 该框架通过三个关键设计将扩散模型从单域目标分布学习中解放出来，构建了一个既保持扩散模型结构化推断优势、又兼具端到端灵活性的退化感知融合系统。
 
@@ -164,12 +158,8 @@ $$L_{total} = L_{rec} + \lambda L_f$$
 
 DRFusion 的性能优势源于一个因果闭环：**直接回归融合图像（隐式去噪）→ 降低对目标分布的依赖 → 联合伪逆校正注入退化与融合约束 → 少量扩散步即可生成满足物理一致性的融合结果。** 这解释了为何该框架在 M3FD 和 Harvard PET-MRI 数据集上，无论噪声、模糊还是复合退化场景，均能以 3 步扩散取得最优或次优的 QMI、$Q^{AB/F}$、$Q_P$ 等指标（Table 1, Table 2），并在下游目标检测任务中以 0.9108 的 mAP@0.5 优于所有比较方法（Table 4）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2731_https_arxiv_org_abs_2604_08922/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of fusion strategies under different degradation scenarios: (a) methods based on neural networks; (b) existing diffusion-based methods; (c) the proposed degradation-aware diffusion framework from this work*
-
-
 
 ### 模块一：面向融合的隐式去噪扩散框架
 
@@ -221,8 +211,6 @@ $$L _ { f } = | | \mathbf { X } _ { f } - \operatorname* { m a x } ( \bar { \mat
 $${ \cal L } _ { f } = \sum _ { i = 1 } ^ { 2 } | | \mathbf { X } _ { f } - \bar { \mathbf { X } } _ { i } | | _ { 1 } + \phi ( 1 - \mathrm { S S I M } ( \mathbf { X } _ { f } , \bar { \mathbf { X } } _ { i } ) )$$
 其中 SSIM 为结构相似性指标，$\phi$ 为平衡系数。该设计使 DRFusion 可根据任务灵活切换损失函数，实现任务导向优化，而非被单一噪声预测目标所束缚。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -260,36 +248,14 @@ Figure 5 对比了各方法的推理时间和参数量。DRFusion 在保持较�
 - **Table 4**：融合质量提升直接转化为下游检测精度增益（mAP@0.5 达 0.9108）。
 - **Table 5**：T=3 为效率-性能最优平衡点，更多步数无益且增加计算开销。
 
-![[assets/figures/papers/paper_list_l2731_https_arxiv_org_abs_2604_08922/figures/004_Table_1.jpg]]
-*Table 1: Objective fusion metrics of various methods under different degradation scenarios on the M3FD dataset (Bold and gray background: best result in each column; underline: second best)*
-
-![[assets/figures/papers/paper_list_l2731_https_arxiv_org_abs_2604_08922/figures/006_Table_2.jpg]]
-*Table 2: Objective fusion metrics of various methods under different degradation scenarios on the Harvard dataset (Bold and gray background: best result in each column; underline: second best)*
-
 ![[assets/figures/papers/paper_list_l2731_https_arxiv_org_abs_2604_08922/figures/011_Table_3.jpg]]
 *Table 3: Ablation results for M3FD and PET-MRI datasets under different degradation scenarios. The best values for each metric are highlighted in light gray*
-
-![[assets/figures/papers/paper_list_l2731_https_arxiv_org_abs_2604_08922/figures/009_Figure_7.jpg]]
-*Figure 7: Results with and without the joint constraint correction mechanism under different degradation scenarios on M3FD dataset*
 
 ![[assets/figures/papers/paper_list_l2731_https_arxiv_org_abs_2604_08922/figures/014_Table_5.jpg]]
 *Table 5: Quantitative comparison of different T values*
 
 ![[assets/figures/papers/paper_list_l2731_https_arxiv_org_abs_2604_08922/figures/013_Table_4.jpg]]
 *Table 4: Detection performance comparison on M3FD dataset*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2731_https_arxiv_org_abs_2604_08922/figures/003_Figure_3.jpg]]
-*Figure 3: Qualitative results of different fusion methods on M3FD dataset. For the comparison methods, we first use corresponding restoration algorithms (e.g., denoising, deblurring, super-resolution) to restore the images, and then apply the respective fusion methods. The proposed method directly reconstructs the fusion results from the degraded source images. In the third degradation scenario, the infrared image is of low resolution and we have enlarged it, the original image is shown in the top-left corner*
-
-![[assets/figures/papers/paper_list_l2731_https_arxiv_org_abs_2604_08922/figures/005_Figure_4.jpg]]
-*Figure 4: Qualitative comparison of different fusion methods on the Harvard dataset. For the comparison methods, we first apply the corresponding restoration algorithms (e.g., denoising, deblurring, super-resolution) to process the images, and then perform fusion. The proposed method directly reconstructs the fusion results from the degraded source images. In the third degradation scenario, the PET image is of low resolution and we have enlarged it, the original image is shown in the top-left corner*
-
-![[assets/figures/papers/paper_list_l2731_https_arxiv_org_abs_2604_08922/figures/010_Figure_8.jpg]]
-*Figure 8: Results with and without the joint constraint correction mechanism under different degradation scenarios on PET-MRI dataset*
-
-
 
 ## 定位与知识库关联
 
@@ -339,8 +305,6 @@ DRFusion 的设计依赖于若干假设，这些假设也划定了其适用边�
 - **非线性融合约束的泛化：** 能否将线性融合约束替换为更一般的可微约束（如基于注意力的融合），同时保持解析伪逆的计算效率？
 - **真实退化数据的验证：** 在真实噪声、真实模糊场景下的性能表现如何？模拟退化与真实退化之间的性能差距需要实验量化。
 - **更大规模多模态扩展：** 当源图像数量超过两幅或模态类型增加（如近红外、热红外、深度图同时融合）时，联合观测模型的矩阵构造和伪逆计算是否仍能保持高效？
-
-
 
 ## 原文 PDF
 

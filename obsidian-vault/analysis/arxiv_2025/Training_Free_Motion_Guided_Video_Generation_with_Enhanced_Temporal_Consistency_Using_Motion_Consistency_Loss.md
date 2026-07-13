@@ -56,8 +56,6 @@ claims:
 
 方法在目标文本与参考视频内容差异过大时仍存在一定局限（Figure 12）。代码与项目页面已公开。
 
-
-
 ### 免训练运动引导视频生成的现状与瓶颈
 
 扩散模型在视频生成领域已展现出强大的能力，但如何在不进行额外训练的前提下，精确控制生成视频中的运动轨迹和时间一致性，仍是一个开放挑战。现有的免训练运动引导方法主要依赖两类隐式机制：一是通过精心设计的初始噪声（如DDIM反演噪声或轨迹特定噪声）隐含地注入运动先验；二是通过注意力掩码约束空间-时间注意力范围。然而，这些手段难以同时兼顾**精确的运动轨迹跟随**和**帧间外观一致性**，导致生成视频中出现目标物体变形、细节丢失等时间不连贯现象。
@@ -79,8 +77,6 @@ Figure 1 直观地展示了这一瓶颈：在参考视频控制场景下，现�
 3. **梯度引导去噪**：在去噪过程中计算生成视频与参考视频运动模式之间的L2距离 $\mathcal{L}_c$，并以分类器引导的方式将梯度注入噪声估计，实现无须微调的运动约束。
 
 该方法在轨迹控制和参考视频控制两个任务上均取得了有竞争力的结果：在轨迹控制任务中，相比FreeTraj，mIoU提升1.5%（0.268→0.272），CLIP-SIM-GTBox提升0.34%（0.886→0.889），人类偏好评估中轨迹对齐得分领先4.24个百分点（Table 1）；在参考视频控制任务中，相比需要训练的MotionDirector，时间一致性得分（TC）达到93.3，视频质量人类偏好得分领先10.52个百分点（Table 2）。值得注意的是，该方法仅需**单个稀疏关键点**即可达到良好的运动控制效果，增加点数并未进一步提升性能（Figure 10），体现了其高效性。
-
-
 
 ## 核心方法与创新机理
 
@@ -120,8 +116,6 @@ $$
 
 相比于需要训练的 **MotionDirector**（Zhao et al., ECCV 2025），本方法在保持免训练优势的同时，在时间一致性（TC: 93.3 vs 93.1）和人类偏好的视频质量评估（55.26% vs 44.74%）上均取得了更优结果（Table 2, confidence 0.95）。这表明显式运动一致性约束在免训练框架下能够有效替代甚至超越训练式方法的运动定制能力。
 
-
-
 该方法构建了一条**免训练的运动引导视频生成管线**，核心思路是将初始噪声隐含的运动先验与显式的帧间运动一致性损失相结合，在不更新扩散模型参数的前提下实现精确的运动控制与时间连贯性。
 
 ### 管线总览
@@ -152,8 +146,6 @@ $$
 - **温度参数**：Eq. 3 中 Softmax 的温度 $\tau$ 设为 10.0，控制运动模式的软硬程度。
 
 整个管线的伪代码见 Algorithm 1，完整实现了从初始噪声反演到梯度引导去噪的训练免微调运动控制流程。
-
-
 
 本节聚焦所提方法中三个核心模块的数学定义与推导：运动模式的提取与表示、运动一致性损失函数的构建，以及分类器引导下的梯度注入机制。所有公式均来自原文，不进行额外推导。
 
@@ -199,8 +191,6 @@ $$
 
 除显式的运动一致性损失外，方法还利用DDIM反演将参考视频转换为初始噪声 $z_T$，为生成过程提供隐式的运动先验。消融实验（Figure 5）表明，仅使用初始噪声引导而不加运动一致性损失时，视频细节会出现时间不一致现象（如狮子尾巴和爪子丢失）；反之，仅使用运动一致性损失而不用反演初始化，则模型难以模拟带有外观变化的大幅度运动。两者协同作用才能实现最优性能。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -244,34 +234,13 @@ Figure 4 的定性对比展示了具体的优势场景。红色圆圈标注的�
 ![[assets/figures/papers/paper_list_l41_https_arxiv_org_abs_2501_07563/figures/011_Figure_9.jpg]]
 *Figure 9: The local range for the calculation of the motion correlation pattern. The text prompt is “A lion is running on the road.”*
 
-![[assets/figures/papers/paper_list_l41_https_arxiv_org_abs_2501_07563/figures/014_Figure_10.jpg]]
-*Figure 10: The number of sparse points selected for the calculation of the motion correlation consistency. The text prompt is “A panda is lifting weights”*
-
-![[assets/figures/papers/paper_list_l41_https_arxiv_org_abs_2501_07563/figures/012_Figure_11.jpg]]
-*Figure 11: The impact on the weight schedule*
-
 ### 失败模式与适用范围边界
 
 方法存在明确的适用边界。当目标文本提示与参考视频内容差异过大时，生成质量显著下降（Figure 12）。例如，要求汽车执行“V”形轨迹或海豚进行举重动作，由于扩散模型的语义先验与运动约束产生冲突，生成结果无法同时满足内容合理性和运动精度。此外，增加稀疏点数未能提升性能的现象暗示，当前的运动模式提取策略可能对关键点的选择和跟踪质量较为敏感，需要人工干预来确保引导信号的可靠性。
 
-![[assets/figures/papers/paper_list_l41_https_arxiv_org_abs_2501_07563/figures/013_Figure_12.jpg]]
-*Figure 12: Failure case. The results are suboptimal when the target prompt deviates significantly from the reference video*
-
 ### 手势模拟：运动迁移的直观验证
 
 Figure 6 展示了方法的一个有趣应用：将摄像头捕捉的手势运动迁移到动物视频生成中。这一实验以直观的方式验证了运动一致性损失对不同来源运动信号的泛化能力——即使参考运动来自完全不同的域（人手姿态），方法仍能将其转化为目标物体（动物）的合理运动轨迹。
-
-![[assets/figures/papers/paper_list_l41_https_arxiv_org_abs_2501_07563/figures/008_Figure_6.jpg]]
-*Figure 6: Gesture simulation. We use two gestures captured from the camera to simulate animal’s movement. Our method can successfully generate the video with accurate ear moving of rabbit and body moving of snake when the given point is on the finger and ball. (Best view in video in the project link.)*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l41_https_arxiv_org_abs_2501_07563/figures/005_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l41_https_arxiv_org_abs_2501_07563/figures/001_Figure_1.jpg]]
-*Figure 1: Visualization comparisons on our method and two existing motion customization methods, including the reference video based Motiondirector [93], and the bounding box trajectory based FreeTraj [47]. Methods in the upper part use the inversion noise from the reference video, while methods in the lower part use the well-designed noise as initialization. The red circle regions represent the inconsistent temporal coherent, while the green circle regions represent the correct one*
-
-
 
 ## 定位与知识库关联
 
@@ -322,8 +291,6 @@ Figure 6 展示了方法的一个有趣应用：将摄像头捕捉的手势运�
 2. **关键点自动选择**：能否自动确定最优的稀疏关键点及其跟踪策略，减少人工干预？
 3. **多模态运动信号融合**：能否将骨骼点、物理模拟等其他形式的运动控制信号与当前框架结合？
 4. **计算效率优化**：去噪过程中每步提取特征并计算运动一致性损失引入了额外开销，是否存在轻量化的替代方案？
-
-
 
 ## 原文 PDF
 

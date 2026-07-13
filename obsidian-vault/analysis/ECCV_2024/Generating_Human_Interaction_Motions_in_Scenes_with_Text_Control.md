@@ -61,8 +61,6 @@ claims:
 
 本文的主要局限在于：两阶段生成可能导致骨盆轨迹与全身姿态之间的不协调；交互类型目前仅限于坐椅子等简单动作，难以处理躺下、触摸或动态物体交互；对非平面表面（如台阶、斜坡）上的交互缺乏支持。这些也为未来的一阶段统一模型和更广泛交互谱系的扩展留下了开放问题。
 
-
-
 ### 问题背景
 
 生成逼真且可控的三维人体动作是计算机视觉与图形学中的核心挑战，在动画制作、虚拟现实、具身智能等领域具有广泛的应用前景。近年来，文本到动作的扩散模型取得了显著进展，能够从自然语言描述中生成多样且高质量的人体运动序列。然而，这些方法大多在“空白空间”中操作，完全忽略了人物所处的三维场景环境，导致生成的行走、坐下等动作无法适配具体的房间布局、障碍物和家具几何。
@@ -89,8 +87,6 @@ claims:
 
 这一方法论的直接效果是：在SAMP坐姿测试集上，TeSMo的交互动作被**71.9%**的参与者认为优于DIMOS（Table 2），目标位置误差从0.2020降至**0.1445**，物体穿透率从0.1076降至**0.0611**；在Loco-3D-FRONT导航测试集上，根轨迹的目标到达精度和碰撞率均达到最优（Table 1）。
 
-
-
 ## 核心方法与创新机理
 
 TeSMo 的核心创新在于**将场景感知注入预训练的文本-动作扩散模型**，而非从头训练一个场景条件模型。这一策略解决了该领域的根本瓶颈：大规模、带文本标注的人-场景交互数据集极度稀缺。通过冻结预训练基座并附加轻量级的场景感知控制分支进行微调，TeSMo 在保持文本可控性与运动质量的同时，实现了对场景约束的适应。
@@ -104,8 +100,6 @@ TeSMo 的核心创新在于**将场景感知注入预训练的文本-动作扩�
 3. **绝对骨盆位姿表示**：将 HumanML3D 风格的相对骨盆速度和旋转替换为第一帧坐标系下的绝对位置与朝向 ${\bf x}^n = [x, y, z, \cos\theta, \sin\theta]_n$。这一表示使得模型能够直接感知和优化目标到达精度，是后续目标引导和碰撞引导能够有效工作的前提。
 
 上述创新共同构成了一个因果链条：**预训练基座保证运动质量和文本可控性 → 场景感知分支注入空间约束 → 绝对位姿表示使物理约束可微分 → 测试时引导进一步优化目标到达与碰撞避免**。消融实验（Table 3）证实了这一链条的有效性：同时使用目标到达引导和碰撞引导，导航目标位置误差从 0.1568 降至 0.1241。
-
-
 
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2404_10685/figures/001_Figure_1.jpg]]
 *Figure 1: We present TeSMo, a method for generating diverse and plausible human-scene interactions from text input. Given a 3D scene, TeSMo generates scene-aware motions, such as walking in free space and sitting on a chair. Our model can be easily controlled using textual descriptions, start positions, and goal positions*
@@ -131,8 +125,6 @@ TeSMo 将“文本控制的场景内人物交互动作生成”分解为两个�
 ### 与基线方法的框架级差异
 
 相比于 DIMOS（Zhao et al., ICCV 2023）等基于强化学习的方法，TeSMo 的扩散模型框架天然支持文本控制，且无需为每个新场景重新训练策略。相比于 GMD（Karunratanakul et al., ICCV 2023）和 OmniControl（Xie et al., arXiv 2023）等场景无关的扩散模型，TeSMo 通过场景感知分支引入了显式的场景约束，同时通过冻结基础模型保留了文本控制的多样性。
-
-
 
 TeSMo 将场景感知的人类动作生成分解为**导航**与**交互**两个阶段，每个阶段均基于预训练的文本-动作扩散模型，并通过附加的场景感知控制分支进行微调，从而在保持文本可控性的前提下适应场景约束。以下逐一剖析各核心模块及其关键公式。
 
@@ -204,8 +196,6 @@ $$\mathcal{T}_c = \mathrm{SDF}(\hat{\mathbf{x}}_0, S_{\mathcal{O}})$$
 
 其中 $S_{\mathcal{O}}$ 为目标物体的 3D 几何表示。这一显式碰撞惩罚是 TeSMo 在物体穿透率指标上显著优于 DIMOS（0.0611 vs 0.1076）的关键机制。
 
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -214,14 +204,12 @@ $$\mathcal{T}_c = \mathrm{SDF}(\hat{\mathbf{x}}_0, S_{\mathcal{O}})$$
 
 TeSMo 在导航任务上实现了最优的目标到达精度与最低碰撞率。如 Table 1 所示，骨盆轨迹的目标位置误差仅为 0.169 m，方向误差 0.119，高度误差 0.008，碰撞率 0.031。相比之下，场景无关的基线方法 **GMD** (Karunratanakul et al., ICCV 2023) 和 **OmniControl** (Xie et al., arXiv 2023) 无法利用场景信息，在碰撞率等指标上处于劣势——这一点需注意公平性：该比较旨在展示场景感知的优势，而非在同等信息条件下对决。在骨盆轨迹生成后，TeSMo 通过 PriorMDM 进行全身填充（in-painting），最终全身运动的 FID 为 20.465、R-precision 为 0.376、Diversity 为 6.415、Foot Skating 为 0.056，与 GMD 和 OmniControl 等扩散模型保持竞争力，说明引入场景感知并未牺牲运动质量和文本对齐能力。
 
-
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2404_10685/figures/005_Table_1.jpg]]
 *Table 1: Evaluation of navigation motion generation on the Loco-3D-FRONT test set. (Left) For generated pelvis trajectories, our approach achieves the best goal-reaching accuracy with low collision rate. (Right) After in-painting the full-body motion, our method maintains diverse and realistic motion that aligns with the given text prompt, competitive with diffusion-based scene-agnostic GMD and OmniControl*
 
 **人-物交互生成（SAMP 坐姿测试集）**
 
 Table 2 给出了与强化学习方法 **DIMOS** (Zhao et al., ICCV 2023) 的直接对比。TeSMo 的目标位置误差为 0.1445，显著低于 DIMOS 的 0.2020（Δ = -0.0575）；物体穿透率从 DIMOS 的 0.1076 降至 0.0611（Δ = -0.0465）。在用户感知研究中，71.9% 的参与者偏好 TeSMo 生成的交互动作，而 DIMOS 仅获 28.1% 的偏好。Figure 6 的定性对比进一步显示，TeSMo 减少了漂浮和穿透现象，生成的人-物交互更加逼真。
-
 
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2404_10685/figures/007_Table_2.jpg]]
 *Table 2: Evaluation of human-object interaction motion generation on SAMP [10] sitting test set. Compared to DIMOS, our approach reaches the goal pose more accurately and exhibits fewer object penetrations, resulting in higher human preference*
@@ -230,14 +218,12 @@ Table 2 给出了与强化学习方法 **DIMOS** (Zhao et al., ICCV 2023) 的直
 
 **测试时引导的有效性（Table 3）**
 
-
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2404_10685/figures/008_Table_3.jpg]]
 *Table 3: Test-time guidance evaluation. Adding guidance to reach goal poses and avoid collisions during inference improves performance. Lower is better for all metrics*
 
 TeSMo 在推理阶段引入了两种测试时引导：目标到达引导（$\mathcal{I}_g = (\hat{\mathbf{x}}_0^N - \mathbf{g})^2$）和碰撞引导（导航中为骨盆位置在可行走区域外的平均正 2D 距离 $\mathcal{T}_c = \mathrm{SDF}(\hat{\mathbf{x}}_0, \mathcal{M})$，交互中为身体顶点在物体内部的平均正符号距离 $\mathcal{T}_c = \mathrm{SDF}(\hat{\mathbf{x}}_0, S_{\mathcal{O}})$）。消融结果表明，同时启用两种引导对导航和交互指标均有提升：在导航中，目标位置误差从 0.1568 降至 0.1241。这验证了梯度扰动公式 $\tilde{\mathbf{x}}_0 = \hat{\mathbf{x}}_0 - \alpha \nabla_{\mathbf{x}_t} \mathcal{I}(\hat{\mathbf{x}}_0)$ 在约束生成行为上的因果作用。
 
 **两阶段生成 vs. 替代方案（Table 4）**
-
 
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2404_10685/figures/011_Table_4.jpg]]
 *Table 4: Ablation study comparing various full-body infilling methods and different representations of navigation motion generation using the Loco-3D-FRONT test set. (Left) For generated pelvis trajectories, our approach achieves the best goal-reaching accuracy with low collision rate. (Right) After in-painting the full-body motion, our method preserves diverse and realistic movements that align with the provided text prompt, much like the model employing an alternative OminiControl full-body inpainting technique. However, our approach distinctly outperforms the model utilizing full-body representation*
@@ -262,13 +248,8 @@ Figure 7 展示了 TeSMo 的三项扩展能力：
 - **A* 路径跟随**：通过轨迹混合公式 $\tilde{\mathbf{p}}_0 = s * \hat{\mathbf{p}}_0 + (1 - s) * \mathbf{p}$ 调节混合系数 $s$，可控制生成轨迹对输入 A* 路径的跟随程度。
 - **测试时引导效果**：引导使导航在准确到达目标的同时避免与环境碰撞。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2404_10685/figures/006_Figure_5.jpg]]
 *Figure 5: Navigation generation performance. The start pose is the green arrow, and the goal pose is the red arrow. Our method more accurately reaches the goal and avoids obstacles while style is controlled by a text prompt*
-
-
-
 
 ## 定位与知识库关联
 
@@ -311,8 +292,6 @@ TeSMo 建立在文本到动作扩散模型的基础上，其核心基座是 **MD
 2. **交互谱系扩展**：将方法扩展到更丰富的交互类型（躺下、触摸、动态物体交互）需要解决两个子问题：(a) 如何获取或生成对应的训练数据；(b) 如何设计适用于不同交互类型的场景表征和目标函数。
 3. **LLM 规划器集成**：原文提出利用 LLM 规划器来指定动作序列和接触信息，这需要解决“语言指令到空间约束”的映射问题，以及如何将离散的动作序列转化为扩散模型的条件信号。
 4. **非平面表面处理**：将 2D 地板图扩展到带高度的 2.5D 或全 3D 场景表征，同时重新设计碰撞引导目标函数，是处理台阶、斜坡等场景的可能方向。
-
-
 
 ## 原文 PDF
 

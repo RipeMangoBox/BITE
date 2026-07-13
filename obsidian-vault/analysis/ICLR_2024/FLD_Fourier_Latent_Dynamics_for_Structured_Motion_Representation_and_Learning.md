@@ -267,31 +267,14 @@ FLD 的设计围绕一个明确瓶颈展开：原始运动轨迹存在稀疏性�
 2. **复杂运动的奖励函数缺失**：当前的自适应课程学习方法假设所有合成目标运动都可由同一套奖励函数学习，而某些复杂运动（如跳跃、旋转踢）需要专门设计的奖励函数。
 3. **ALPGMM 的探索偏差**：基于学习进度的探索可能偏向于性能快速增长的区域，而忽视那些需要长时间学习但真正有意义的运动模式。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2402_13820/figures/012_Table.jpg]]
 *Table: S5: VAE architecture Table S6: Other baseline architectures*
-
-![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2402_13820/figures/013_Figure.jpg]]
-*Figure: (a) FLD latent manifold. (b) Policy learned latent manifold*
-
-![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2402_13820/figures/014_Figure.jpg]]
-*Figure: S8: Schematic view of the latent manifold induced by the latent state and latent parameterization of FLD. While the latent parameterization θ determines which motion the current state is experiencing, the latent state \phi _ { t } indicates the time index of the state frame on this motion. (a) Each motion is represented by a solid grey circle. The shaded rings denote the collection of representations of motions in the offline dataset M. (b) The grey circle denotes an unlearnable motion and the grey shaded ring denotes the unlearnable subspace. The green circles represent learnable motions, with the dashed one denoting a motion outside the offline dataset M but acquired during training. The...*
-
-![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2402_13820/figures/015_Figure.jpg]]
-*Figure: forward stride (a) Latent representation of different motion types. (b) Latent representation of different forward run velocities*
 
 ![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2402_13820/figures/017_Table.jpg]]
 *Table: S8: Policy training parameters Table S9: Policy training architecture*
 
-![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2402_13820/figures/028_Figure.jpg]]
-*Figure: (a) Jump (b) Kick (c) Spinkick Figure S17: Representative motions that require specific reward functions to be learned*
-
 ![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2402_13820/figures/008_Table.jpg]]
 *Table: S2: Policy observation space*
-
-![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2402_13820/figures/009_Table.jpg]]
-*Table: S3: Representation training parameters*
 
 ## 定位与知识库关联
 

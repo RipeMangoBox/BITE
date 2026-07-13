@@ -61,8 +61,6 @@ claims:
 
 **局限性**：当前自动标注流水线的质量受限于所使用的图像与视频抠图模型的上限，仍可能继承其错误。论文未实施迭代精炼的“数据-模型飞轮”，进一步提升需要大量工程投入。MQE 在非人像视频、多目标场景及透明物体上的泛化能力尚待验证。
 
-
-
 视频抠图（Video Matting）旨在从视频序列中逐帧分离前景与背景，生成精确的 α 遮罩，是视觉特效、视频会议和内容创作中的核心任务。与图像抠图不同，视频抠图不仅要求单帧的边界精度和语义正确性，还要求跨帧的时序一致性。然而，这一任务长期受制于一个根本性瓶颈：**高质量视频抠图数据的极度匮乏**。
 
 现有视频抠图数据集（如 VideoMatte、YouTubeMatte）均为合成数据，规模有限，且缺乏真实场景下的边界监督信号。这导致模型在真实视频中容易产生两类典型退化：一是边界细节丢失，发丝等精细结构被模糊或截断；二是语义区域误判，前景核心区域被错误地标记为背景，使得抠图结果退化为类似分割的粗糙掩膜。以 **MatAnyone** 为代表的 mask-guided 方法通过引入分割掩膜作为辅助输入，在一定程度上缓解了语义监督不足的问题，但其依赖的弱无监督损失（基于图像先验）对边界区域的引导能力有限，难以从根本上解决细节保真度不足的困境。
@@ -78,8 +76,6 @@ claims:
 3. **参考帧训练策略**：在训练时引入长程参考帧及随机遮挡增强，使模型能处理长视频中未见区域的大幅外观变化，且不增加显存负担。
 
 通过这些设计，MatAnyone 2 在多个合成和真实基准上全面超越了包括 MatAnyone、GVM、RVM 在内的主流方法，在 YouTubeMatte 1080p 上将 MAD 从 1.99 降至 1.61，Grad 从 8.91 降至 7.13，并在真实场景中展现出更强的边界保真度和语义鲁棒性。
-
-
 
 ## 核心方法与创新机理
 
@@ -116,8 +112,6 @@ MatAnyone 仅在局部训练窗口（8 帧）内传播记忆，无法处理长�
 ### 创新总结
 
 三项 changed slots 构成递进关系：**MQE 提供了质量评估能力**，使在线引导损失成为可能；**该评估能力进一步驱动 VMReal 的自动构建**，将训练数据从合成域迁移到真实域；**参考帧策略则解决了长视频建模的时序覆盖问题**。三者共同作用，使 MatAnyone 2 在多个基准上全面超越 MatAnyone——在 CRGNN 真实数据集上 MAD 从 5.76 降至 4.24，Grad 从 15.55 降至 11.74，验证了从监督信号到数据规模再到时序建模的系统性改进效果。
-
-
 
 MatAnyone 2 的整体流水线围绕一个核心洞察构建：**无需真实 α 遮罩，即可对抠图质量进行像素级评估**。这一能力由可学习的 **Matting Quality Evaluator（MQE）** 提供，并贯穿训练、数据构建与推理三个环节，形成统一的闭环框架。
 
@@ -164,12 +158,8 @@ $$\mathcal{L}_{l1}^{M} = \frac{\| R_t \odot (\hat{\alpha}_t - \alpha_t) \|_1}{\|
 
 推理时，MQE 不参与前向计算，仅骨干网络基于记忆传播与参考帧信息逐帧输出 α 遮罩。这一设计使推理效率与 MatAnyone 持平，但语义精度和边界保真度显著提升——在 YouTubeMatte 1080p 上 MAD 从 1.99 降至 1.61，Grad 从 8.91 降至 7.13（Table 3(d)）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2512_11782/figures/015_Figure_9.jpg]]
 *Figure 9: Illustration of our dual-branch annotation pipeline on a video sequence. For the video-based branch*
-
-
 
 ### 抠图质量评估器（MQE）
 
@@ -223,19 +213,6 @@ $$ \mathcal{L}_{mat}^{total} = \mathcal{L}_{mat}^{M} + 0.1 \mathcal{L}_{eval} $$
 
 其中 `L_eval` 的权重为 0.1，平衡了直接监督与质量引导之间的关系。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2512_11782/figures/004_Figure_3.jpg]]
-*Figure 3: Given an input tuple of video frame*
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2512_11782/figures/003_Figure_4.jpg]]
-*Figure 4: Our learned Matting Quality Evaluation (MQE) model accurately identifies: (a) low-quality matting details along the boundary, and (b) semantically wrong regions at core areas, in a pixel-wise manner without requiring ground-truth mattes*
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2512_11782/figures/005_Figure_5.jpg]]
-*Figure 5: Our automated dual-branch annotation pipeline. This pipeline enables large-scale construction of real-world VM datasets, resulting in our VMReal dataset. We combine two complementary annotation branches: the temporally stable*
-
-
-
 ## 实验与关键发现
 
 ### 核心性能：合成基准与真实视频
@@ -273,21 +250,8 @@ Table 3 在 YouTubeMatte 1080p 上系统拆解了各模块的增益：
 - **Figure 7**（参考帧策略有效性）：MatAnyone 在长视频中新出现的主体区域容易失效，而 MatAnyone 2 通过参考帧训练策略能够稳健地识别这些区域。
 - **Table 4**（数据集规模对比）：VMReal 是首个大规模真实视频抠图数据集，其片段数和总帧数远超现有合成数据集，且输入帧来自真实视频而非前景-背景合成，为训练提供了更贴近实际分布的监督信号。
 
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2512_11782/figures/007_Figure_6.jpg]]
-*Figure 6: Qualitative comparisons on real-world videos. Our MatAnyone 2 significantly outperforms leading auxiliary-free (RVM [20]), diffusion-based (GVM [5]), and mask-guided (MatAnyone [42]) approaches in both detail extraction and semantic accuracy under challenging conditions, e.g., wind-blown hair (first row) and complex lighting scenes (last two rows)*
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2512_11782/figures/011_Figure_7.jpg]]
-*Figure 7: Effectiveness of the reference-frame strategy. MatAnyone [42] struggles with newly appearing subject regions in long videos, whereas MatAnyone 2, trained with the reference-frame strategy, robustly identifies them*
-
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2512_11782/figures/013_Table_4.jpg]]
 *Table 4: Comparison on Datasets. We compare existing video matting (VM) datasets for training, in terms of the number of video clips, the number of total frames, and whether the input frames are synthesized (foreground-background composition) or from real videos. Whereas prior datasets such as VM108 [50], VideoMatte240K [19], VM800 [42], and SynHairMan [5] are relatively small in scale and are purely synthetic composites of foregrounds and backgrounds, VMReal comprises 28K real-world video clips with a total of 2.4M frames*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2512_11782/figures/001_Figure_1.jpg]]
-*Figure 1: (a) Our MatAnyone 2 significantly outperforms MatAnyone [42] in preserving fine details and avoiding segmentation-like boundaries, while also showing enhanced robustness under challenging lighting conditions, e.g., backlit scenes. (b) As a diffusion-based video matting method, GVM [5] often produces blurry alpha mattes with unnatural transitions along object boundaries, e.g., hair strands. In contrast, MatAnyone 2 generates clear, high-quality alpha mattes with natural boundary details. (Zoom-in for best view)*
-
-
 
 ## 定位与知识库关联
 
@@ -354,8 +318,6 @@ MatAnyone 2 的核心流水线由以下模块构成：
 3. **极长视频建模**：参考帧策略对极长视频的潜在性能退化与计算成本如何权衡？是否需要引入层次化记忆机制或自适应参考帧选择策略？
 
 4. **与基础模型的融合**：当前 MatAnyone 2 采用纯 CNN 架构，而 GVM 等扩散方法虽然边界质量不佳，但展现了基础模型先验的潜力。如何在保持细节精度的前提下，将 MQE 引导的训练范式与更大规模的基础模型相结合，是一个值得探索的方向。
-
-
 
 ## 原文 PDF
 

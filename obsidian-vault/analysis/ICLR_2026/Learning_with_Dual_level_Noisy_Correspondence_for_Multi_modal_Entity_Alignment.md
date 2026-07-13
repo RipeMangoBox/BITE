@@ -53,8 +53,6 @@ claims:
 
 RULE 的主要局限在于测试时推理依赖大模型，计算开销较大且可能因领域知识不足而推理失败；此外，方法尚未与主动学习等人机协同范式结合，无法利用额外标注进一步修正噪声。这些方向值得未来探索。
 
-
-
 多模态知识图谱（MMKG）将结构化的关系三元组与图像、文本等多模态属性结合，为实体对齐（Entity Alignment, EA）提供了更丰富的匹配信号。然而，现有 MMEA 方法普遍基于一个强假设：实体与其属性之间的关联（intra-entity correspondence）以及跨图谱的实体/属性匹配（inter-graph correspondence）是完全正确的。这一假设在实际场景中难以成立。
 
 **双层次噪声对应（Dual-level Noisy Correspondence, DNC）** 是 MMEA 面临的核心瓶颈。如图 Figure 1(a) 所示，DNC 在两个层次上同时存在：
@@ -71,8 +69,6 @@ RULE 的主要局限在于测试时推理依赖大模型，计算开销较大且
 3. **测试时推理能力不足**：仅依赖训练阶段学到的相似度度量，无法利用大模型的先验知识挖掘跨图谱属性间的隐式连接。Figure 1(c) 展示了一个典型案例：看似相似的属性对（如足球运动员“Cristiano Ronaldo”与其所属国家）之间的隐式连接常被忽略，导致等价实体被错误排除。
 
 **本文动机**：针对上述缺口，提出一种同时覆盖训练阶段和推理阶段的双层次鲁棒学习方法，通过不确定性-共识双重原则估计对应可靠性，在属性融合和跨图对齐中抑制噪声影响，并在测试时借助多模态大模型进行链式思维推理，实现全链路抗噪。
-
-
 
 ## 核心方法与创新机理
 
@@ -108,8 +104,6 @@ $$\hat{\mathbf{s}}_i^m = \mathrm{Softmax}\left( \bigoplus_{j \in \mathcal{T}_i^m
 
 移除 TTR 使 H@1 降至 56.5（Table 3），验证了测试时推理对挖掘隐式连接、提升对齐精度的关键作用。这一训练-推理联合鲁棒的设计，使 RULE 在五个基准、多种 DNC 比例下始终显著优于 PMF 等 SOTA 方法（如 ICEWS-WIKI Inherent DNC H@1: 64.2 vs. 52.6）。
 
-
-
 RULE 的整体流水线围绕“双层次噪声对应（DNC）”这一核心瓶颈设计，涵盖训练阶段的可靠性感知学习与推理阶段的跨图属性推理，形成从特征提取到对齐决策的全链路抗噪机制。图 2 给出了方法的总览。
 
 **输入与特征投影。** 给定两个多模态知识图谱，RULE 首先利用属性特定编码器（如预训练 CLIP）将每个实体的结构化、图像、文本等多模态属性分别映射到共享隐空间，得到属性级表示 $z_i^m$，并计算跨图属性间的相似度矩阵。这些相似度是后续可靠性估计与鲁棒学习的输入基础。
@@ -123,8 +117,6 @@ RULE 的整体流水线围绕“双层次噪声对应（DNC）”这一核心瓶
 **测试时推理（TTR）。** 推理阶段引入多模态大模型（默认 Qwen2.5-VL-72B-Instruct）进行链式思维推理，挖掘跨图属性间的隐式连接（如通过“Cristiano Ronaldo”推断其国籍与俱乐部等关联），输出修正后的属性级相似度 $\hat{\mathbf{s}}_i^m$。最终联合原始相似度与修正相似度得到 $\mathbf{s}_i^{joint} = \mathbf{s}_i + \hat{\mathbf{s}}_i$，取 arg max 确定等价实体。
 
 **模块间关系。** 可靠性估计是全局控制节点，其输出同时驱动 DRL 的损失定制、DRF 的权重分配以及 TTR 的候选筛选。DRL 与 DRF 分别在损失空间和表示空间抵抗噪声，形成互补；TTR 则在推理阶段利用大模型知识弥补训练阶段难以捕获的深层语义关联。消融实验表明，移除 DRL 使 Non-name H@1 从 58.2 骤降至 31.6，移除 DRF 降至 50.4，移除 TTR 降至 56.5，验证了各模块对整体鲁棒性的关键贡献。
-
-
 
 RULE 围绕双层次噪声对应（DNC）问题构建了三个核心模块：**可靠性估计与对划分**、**双鲁棒学习与融合**、以及**测试时对应推理**。各模块通过一组关键公式耦合，形成从训练到推理的全链路抗噪机制。
 
@@ -168,8 +160,6 @@ $$\hat{\mathbf{s}}_i^m = \mathrm{Softmax}\left( \bigoplus_{j \in \mathcal{T}_i^m
 
 可靠性估计的输出（$w_i$ 及子集划分）同时驱动 DRL 的损失定制和 DRF 的加权融合；DRF 产生的融合表示又作为 DRL 的输入；TTR 则在测试时独立于训练流程，通过大模型知识补偿训练阶段未能捕获的隐式对应。消融实验（Table 3）验证了这一链路：移除 DRL 使 ICEWS-WIKI Non-name H@1 从 58.2 骤降至 31.6，移除 DRF 降至 50.4，移除 TTR 降至 56.5，证明各模块对抵抗 DNC 均不可或缺。
 
-
-
 ## 实验与关键发现
 
 ### 主要结果
@@ -211,10 +201,6 @@ Figure 3b 展示了可靠性分数的分布：干净配对集中在右侧高可�
 
 在单一噪声类型（仅实体-实体噪声或仅实体-属性噪声）的 NC 设置下（Table 5 和 Table 6），RULE 仍全面优于对比方法，证明其双层次鲁棒机制对不同类型的噪声对应均有效。此外，在多种视觉骨干（CLIP、SigLIP、BLIP）和不同 MLLM 架构（Table 12）上的实验表明，RULE 的性能对底层编码器和推理模型的选择具有一定鲁棒性，具备良好的泛化潜力。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_mytIKuRsSE/figures/001_Figure_1.jpg]]
-*Figure 1: (a) Dual-level Noisy Correspondence occurs in both intra-entity level (i.e., entity-attribute pairs such as ( $\tilde { x } _ { i } , \tilde { x } _ { i } ^ { m }$ ) ) and the inter-graph level ( i . e . , entity-entity ( $x _ { j } , \tilde { x } _ { k }$ ) or attribute-attribute pairs $\bar { ( } x _ { j } ^ { m } , \tilde { x } _ { k } ^ { m }$ ) ) . (b) Observations: On the one hand, both vanilla adaptive fusion (AF) and concatenation (Concat) tend to integrate erroneous attributes and thus degrade performance, while our method achieves reliable fusion against inter-graph NC. On the other hand, existing methods suffer in crossgraph alignment when encountering inter-graph NC, whereas our metho...
 
 ![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_mytIKuRsSE/figures/012_Figure.jpg]]
 *Figure: ID:7125 ID:26134*
@@ -230,18 +216,6 @@ Figure 3b 展示了可靠性分数的分布：干净配对集中在右侧高可�
 
 ![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_mytIKuRsSE/figures/022_Figure_9.jpg]]
 *Figure 9: Quantitative analysis of the uncertainty and consensus on the integrated entity*
-
-![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_mytIKuRsSE/figures/034_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_mytIKuRsSE/figures/035_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_mytIKuRsSE/figures/038_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_mytIKuRsSE/figures/040_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_mytIKuRsSE/figures/041_Figure.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -291,8 +265,6 @@ RULE 的有效性依赖于以下条件：
 - **可靠性分布**（Figure 3b）清晰区分噪声与干净配对，验证了可靠性估计的有效性。
 - **跨基准一致性**：在五个基准、多种 DNC 比例下，RULE 始终显著优于所有对比方法（如 ICEWS-WIKI Inherent DNC H@1: 64.2 vs. PMF 52.6），证据链完整。
 - **泛化性验证**：在多种视觉骨干（CLIP, SigLIP, BLIP）和 MLLM 架构上验证，降低了骨干选择偏差的担忧。
-
-
 
 ## 原文 PDF
 

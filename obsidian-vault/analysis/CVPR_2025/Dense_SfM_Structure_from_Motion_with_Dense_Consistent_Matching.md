@@ -80,15 +80,11 @@ Dense-SfM定位于**稠密匹配驱动的SfM框架**，与现有方法的关系�
 - 去除高斯过程模块后，1cm准确度从84.79%骤降至72.47%，验证了多视图核化匹配架构中坐标嵌入路径的核心贡献。
 - 基于学习到的置信度选择轨迹的策略进一步提升了细化精度，两次迭代即可获得最大收益。
 
-
-
 结构从运动（Structure from Motion, SfM）旨在从多视角图像中同时恢复三维场景结构与相机位姿，是三维视觉与自动驾驶等领域的核心基础技术。传统 SfM 管道依赖稀疏关键点检测与匹配，在纹理丰富区域表现可靠，但在弱纹理或重复纹理区域，关键点数量急剧下降，导致重建点云稀疏、精度不足。近年来，基于学习的密集匹配方法（如 LoFTR、RoMa）能够在弱纹理区域产生大量对应关系，为提升 SfM 的密度与精度提供了新的可能。
 
 然而，密集匹配引入了一个关键瓶颈：**轨迹断裂问题**。密集匹配通常在图像对上独立进行，缺乏多视图间的一致性约束，导致同一三维点在不同视图对中的匹配关系无法关联成连续的特征轨迹。这种断裂轨迹难以直接输入现有的 SfM 管道进行三角测量与捆绑调整。现有方法 **DFSfM** 采用量化匹配策略来解决这一问题——将匹配坐标映射到离散网格以强制轨迹一致性，但量化操作不可避免地引入精度损失，损害了三角测量的准确度与完整度。这一矛盾构成了本领域的核心挑战：**如何在利用密集匹配提升覆盖率的同时，保持轨迹的一致性与亚像素精度？**
 
 Dense-SfM 的动机正是打破这一僵局。该方法提出以**高斯溅射（Gaussian Splatting）**替代量化操作来评估三维点在不同视图中的可见性，从而在连续坐标空间中扩展特征轨迹，避免量化带来的精度折损。同时，为了充分利用扩展后的长轨迹中包含的多视图信息，Dense-SfM 设计了一个**多视图核化匹配模块**，结合 Transformer 的注意力机制与高斯过程的坐标嵌入能力，对轨迹进行精细化回归并学习逐轨迹的置信度分数。这一设计使得轨迹细化模块能够从更多观测视图中获取信息，在不牺牲密度的前提下显著提升重建精度——这是该方法区别于先前工作的核心因果机制。
-
-
 
 ## 核心方法与创新机理
 
@@ -141,11 +137,6 @@ $$\mathcal{L} = \frac{1}{N} \sum_{j \in n_t} \sum_{i \in n_j} s_{Q_i} \cdot \| p
 | 多视图细化 | Transformer + 统计方差选轨 | Transformer + 高斯过程 + 学习置信度 | 引入空间先验，端到端学习轨迹可靠性 |
 | 匹配策略 | 半密集匹配 | 密集双向匹配 + 相互验证 | 提升弱纹理区域覆盖，过滤不可靠匹配 |
 
-
-
-![[assets/figures/papers/paper_list_l48_Dense_SfM_Structure_from_Motion_with_Dense_Consistent_Matching/figures/002_Figure_2.jpg]]
-*Figure 2: Pipeline Overview. From a set of images, we construct an initial SfM model using dense two-view matching, filtering unreliable matches through mutual verification. To extend track length, we project 3D points onto additional images, using a visibility filter based on Gaussian Splatting. We then refine these extended tracks with our track refinement module and perform geometric bundle adjustment to improve the accuracy of SfM model*
-
 Dense-SfM 采用三阶段流水线解决稠密匹配在 SfM 中的轨迹断裂问题，其核心设计目标是在不牺牲密度的前提下，通过高斯溅射可见性评估延长轨迹，并利用多视图核化匹配模块进行精细化。
 
 ### 阶段一：初始 SfM 构建
@@ -194,8 +185,6 @@ $$E = \sum_j \sum_{x_k^* \in \mathcal{T}_j^*} \rho(\| \pi(\pmb{\xi}_i \cdot P_j,
 | 迭代精细化 | 扩展轨迹 | 多视图核化匹配 → 置信度轨迹选择 → BA | 精细化 3D 点云 + 相机位姿 |
 
 整个流水线如 Figure 2 所示，三个阶段的模块化设计使得各组件可独立消融验证，也为后续端到端联合优化留有扩展空间。
-
-
 
 Dense-SfM 的核心创新在于两个相互衔接的模块：**基于高斯溅射的轨迹扩展**和**多视图核化特征轨迹细化**。前者解决稠密匹配产生的断裂轨迹问题，后者利用扩展后的长轨迹进行高精度关键点回归。
 
@@ -267,8 +256,6 @@ $$E = \sum_j \sum_{x_k^* \in \mathcal{T}_j^*} \rho(\| \pi(\pmb{\xi}_i \cdot P_j,
 
 其中 $\mathcal{T}_j^*$ 为轨迹 $j$ 的所有观测，$\pi(\cdot)$ 为投影函数，$\rho(\cdot)$ 为鲁棒损失函数。重投影误差超过阈值 $\epsilon_f = 3$ 像素的匹配被作为外点剔除。整个细化过程迭代两次，实验表明继续增加迭代次数收益微小（Table 3, Table 7）。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与实验动机
@@ -281,7 +268,6 @@ $$E = \sum_j \sum_{x_k^* \in \mathcal{T}_j^*} \rho(\| \pi(\pmb{\xi}_i \cdot P_j,
 
 Table 1报告了ETH3D数据集上的三维三角测量结果，以不同阈值下的准确度（Accuracy）和完整度（Completeness）为评估指标。Dense-SfM（RoMa+Ours）在1cm阈值下达到**84.79%的准确度**和**36.35%的完整度**（5cm阈值），相较于最强基线LoFTR+DFSfM分别提升**+4.41个百分点**和**+6.81个百分点**。这一结果验证了核心因果机制：高斯溅射轨迹扩展避免了量化带来的精度损失，同时多视图核化匹配模块利用更长的轨迹（更多观测信息）实现了更精确的关键点细化。
 
-
 ![[assets/figures/papers/paper_list_l48_Dense_SfM_Structure_from_Motion_with_Dense_Consistent_Matching/figures/006_Table_1.jpg]]
 *Table 1: Results of 3D Triangulation. Our method is compared with the baselines on the ETH3D [54] dataset using accuracy and completeness metrics with different thresholds*
 
@@ -290,7 +276,6 @@ Table 1报告了ETH3D数据集上的三维三角测量结果，以不同阈值�
 #### 多视图相机位姿估计
 
 Table 2报告了多视图相机位姿估计的AUC指标。Dense-SfM框架在ETH3D数据集上达到**82.63的AUC@5°**，优于所有检测器基方法、无检测器方法和稠密匹配基线。在Texture-Poor SfM和IMC 2021数据集上，Dense-SfM同样取得最优或次优结果，证明了该方法在弱纹理场景下的鲁棒性。
-
 
 ![[assets/figures/papers/paper_list_l48_Dense_SfM_Structure_from_Motion_with_Dense_Consistent_Matching/figures/008_Table_2.jpg]]
 *Table 2: Results of Multi-View Camera Pose Estimation. Our framework is compared with detector-based, detector-free and densematching baselines by the AUC of pose error at different thresholds. Bold and underline indicate the best and second-best results. Table 3. Ablation Studies. On the ETH3D dataset, we quantitatively evaluate the impact of design choice of matching and refinement module, and the number of iterations of refinement. The reported triangulation accuracy and completeness are averaged across all scenes*
@@ -317,7 +302,6 @@ Table 3系统性地拆解了Dense-SfM各设计选择的贡献，形成一条清�
 
 Table 3和Table 7显示，两次迭代的细化能够获得最大收益，继续增加迭代次数收益微小。这表明Dense-SfM的细化过程在两次迭代后已接近收敛，额外的计算开销不具性价比。
 
-
 ![[assets/figures/papers/paper_list_l48_Dense_SfM_Structure_from_Motion_with_Dense_Consistent_Matching/figures/012_Table_7.jpg]]
 *Table 7: Ablation Study of Refinement Iterations. On the ETH3D dataset, we quantitatively evaluate the impact of the number of refinement iterations. The AUC of pose error and accuracy of 3D points at different thresholds are reported*
 
@@ -325,14 +309,12 @@ Table 3和Table 7显示，两次迭代的细化能够获得最大收益，继续
 
 Table 6对比了不同匹配策略下的平均轨迹长度。量化匹配（DFSfM）的平均轨迹长度为2.11，而高斯溅射轨迹扩展将其提升至**4.97**，增幅超过一倍。更长的轨迹意味着多视图核化匹配模块能够利用更多视图的观测信息进行关键点细化，这是精度提升的直接因果机制。
 
-
 ![[assets/figures/papers/paper_list_l48_Dense_SfM_Structure_from_Motion_with_Dense_Consistent_Matching/figures/011_Table_6.jpg]]
 *Table 6: Comparison of average track length accompanied with matching strategies (Quantization, Track Extension via GS) to obtain consistent tracks*
 
 ### 与其他细化方法的对比
 
 Table 4和Table 5分别展示了Dense-SfM细化模块与PixSfM、DFSfM细化方法在稀疏特征和半稠密匹配场景下的对比。结果表明，即使在相同的输入匹配条件下，Dense-SfM的多视图核化匹配模块仍一致优于现有细化方法，证明性能提升并非仅来自更好的初始匹配，而是细化架构本身的优势。
-
 
 ![[assets/figures/papers/paper_list_l48_Dense_SfM_Structure_from_Motion_with_Dense_Consistent_Matching/figures/009_Table_4.jpg]]
 *Table 4: Comparison of sparse local features accompanied with our refinement and PixSfM, DetectorFree-SfM (DFSfM). Our method is compared with the baselines on the ETH3D dataset using accuracy and completeness metrics with different thresholds*
@@ -351,16 +333,6 @@ Table 4和Table 5分别展示了Dense-SfM细化模块与PixSfM、DFSfM细化方�
 1. 如何在高动态光照或严重遮挡场景下提高高斯溅射可见性判别的鲁棒性？可能的路径包括引入外观不变特征或光照增强训练策略。
 2. 是否可以实现端到端训练以联合优化高斯溅射和细化模块？当前管道中高斯溅射优化与细化模块训练是分离的，联合优化可能进一步提升精度。
 3. 框架能否扩展以处理大规模无序图像集并保持精度？这需要考虑高斯溅射的扩展性和计算效率。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l48_Dense_SfM_Structure_from_Motion_with_Dense_Consistent_Matching/figures/013_Table_8.jpg]]
-*Table 8: Quantitative Comparison in the LLFF Dataset, with 3 Training Views. Initialization with our method achieves the best performance in terms of rendering accuracy on all metrics*
-
-![[assets/figures/papers/paper_list_l48_Dense_SfM_Structure_from_Motion_with_Dense_Consistent_Matching/figures/003_Figure_3.jpg]]
-*Figure 3: Bidirectional verification on two-view dense matching. The match result $p _ { b }$ from $\mathcal { M } _ { A B }$ is re-used as input to $\mathcal { M } _ { B A }$ to estimate $p _ { a ^ { \prime } }$ . We then compute the distance between $p _ { a }$ and $p _ { a ^ { \prime } }$ , where a smaller distance indicates higher reliability of the match between $p _ { a }$ and $p _ { b }$
-
-
 
 
 ## 定位与知识库关联
@@ -406,8 +378,6 @@ DFSfM是Dense-SfM最直接的前身与对比基线，二者共享“密集匹配
 - **端到端联合优化**：当前高斯溅射用于轨迹扩展、细化模块独立训练，是否可以实现端到端训练以联合优化二者，使高斯溅射的初始化直接服务于下游细化任务？
 - **大规模扩展**：框架是否可以扩展以处理大规模无序图像集（数千至数万张图像）并保持精度？这涉及高斯溅射的内存效率和多视图核化匹配的计算可扩展性。
 - **与NeRF/3DGS重建的协同**：Table 8显示Dense-SfM的初始化能提升高斯溅射的渲染质量，暗示SfM与可微分渲染之间存在更深层的协同潜力，值得进一步探索。
-
-
 
 ## 原文 PDF
 

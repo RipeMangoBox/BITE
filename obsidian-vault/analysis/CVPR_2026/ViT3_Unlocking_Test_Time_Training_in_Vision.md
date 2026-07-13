@@ -59,8 +59,6 @@ claims:
 
 **方法定位**：ViT^3 属于线性复杂度视觉架构中的**在线学习压缩范式**，其核心创新在于系统性地探索并优化了 TTT 的内部训练与模型设计空间，而非提出全新的宏观架构。与 Mamba（状态空间压缩）和线性注意力（固定矩阵压缩）相比，TTT 通过可训练的神经网络实现更灵活的键值对压缩，在保持 $O(N)$ 复杂度的同时获得更强的表征能力。
 
-
-
 ### 视觉骨干网络的效率困境
 
 现代视觉骨干网络的核心运算单元是注意力机制。标准 **Softmax 注意力**（Vaswani et al., 2017）可被重新诠释为一个隐层宽度等于序列长度 N 的两层 MLP：
@@ -91,8 +89,6 @@ TTT 的关键优势在于，内部模型 $\mathcal{F}_W$ 可以是**任意模块
 2. **内部模型架构**：宽度与深度如何权衡？MLP、卷积、门控单元等架构选择对性能有何影响？
 
 缺乏对这些维度的系统性指导，使得视觉 TTT 模型的性能远未达到其理论潜力。本文的工作正是填补这一空白——通过逐项消融研究，揭示视觉 TTT 的关键设计原则，并构建首个在图像分类、目标检测、语义分割和图像生成等任务上全面匹配或超越主流线性复杂度方法的视觉 TTT 架构 **ViT³**。
-
-
 
 ## 核心方法与创新机理
 
@@ -170,8 +166,6 @@ MAE 损失的混合二阶导数几乎处处为零，导致梯度信号消失。�
 
 ViT^3 的六项设计变更形成了一个**协同优化的系统**：点积/MSE 损失保证了梯度信号的完整性，全批量单轮次训练提供了最稳定的内部优化，学习率 1.0 简化了超参选择，宽度扩展和卷积结构提升了模型容量与归纳偏置，而约束设计则缓解了深层模型的优化瓶颈。这些变更并非孤立存在——例如，学习率 1.0 的有效性建立在损失函数选择和全批量训练的基础之上，共同构成了视觉 TTT 的完整设计配方。
 
-
-
 ViT³ 的整体架构遵循标准 Transformer 的宏设计范式，其核心创新在于将注意力机制替换为测试时训练（Test-Time Training, TTT）模块。模型由以下主要组件串联构成：
 
 1. **Patch Embedding（块嵌入层）**：将输入图像分割为固定大小的图像块（patch），并通过线性投影映射为嵌入向量序列，形成初始的 token 表示。
@@ -195,13 +189,6 @@ TTT 模块与 Transformer 共享相同的宏架构（Figure 2），这意味着�
 
 ![[assets/figures/papers/paper_list_l2146_https_arxiv_org_abs_2512_01643/figures/002_Figure_2.jpg]]
 *Figure 2: Illustration of the TTT model building block. TTT shares the same macro architecture as Transformer*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2146_https_arxiv_org_abs_2512_01643/figures/001_Figure_1.jpg]]
-*Figure 1: Illustration of Softmax attention [59], linear attention [32], and Test-Time Training (TTT) module [56]. (a) Softmax attention can be viewed as building a two-layer MLP that directly uses the uncompressed keys K and values V , where the hidden width equals the sequence length N and the nonlinearity is Softmax. While effective, this N -width MLP leads to*
-
-
 
 ### 注意力机制的三种视角
 
@@ -276,13 +263,6 @@ $$\eta \cdot \frac{\partial \mathcal{L}(\hat{V}, V)}{\partial W} = \eta \cdot K^
 ![[assets/figures/papers/paper_list_l2146_https_arxiv_org_abs_2512_01643/figures/005_Table_3.jpg]]
 *Table 3: Results of different inner learning rates. * refers to the best accuracy before divergence during training*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2146_https_arxiv_org_abs_2512_01643/figures/006_Figure_3.jpg]]
-*Figure 3: Results of TTT models with inner modules of 1, 2, 3 layers (FC, two-layer and three-layer MLP). Deeper inner models lead to higher training loss, and thus lower test accuracy*
-
-
-
 ## 实验与关键发现
 
 ### 内部训练配置的消融研究
@@ -333,22 +313,6 @@ $$\eta \cdot \frac{\partial \mathcal{L}(\hat{V}, V)}{\partial W} = \eta \cdot K^
 *Figure 4: Comparisons between DeiT and*
 
 4. **未探索的设计空间。** 内部优化器（如 Adam 替代 SGD）、内部数据增强、Transformer 作为内部模型等设计选择未被研究，研究并非穷尽。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2146_https_arxiv_org_abs_2512_01643/figures/008_Table_5.jpg]]
-*Table 5: Comparison with hierarchical architectures on ImageNet-1K. We focus on representative ConvNet, Transformer, Mamba, and Linear attention methods. ‡ indicates the model is trained with MESA [14], a strategy that can alleviate overfitting at little cost*
-
-![[assets/figures/papers/paper_list_l2146_https_arxiv_org_abs_2512_01643/figures/009_Table_7.jpg]]
-*Table 7: Comparison with non-hierarchical designs on ImageNet*
-
-![[assets/figures/papers/paper_list_l2146_https_arxiv_org_abs_2512_01643/figures/010_Table_8.jpg]]
-*Table 8: Results on COCO dataset. C, T, M, L represent ConvNet, Transformer, Mamba, and Linear attention, respectively. The FLOPs are computed with an input resolution of 1280×800*
-
-![[assets/figures/papers/paper_list_l2146_https_arxiv_org_abs_2512_01643/figures/011_Table_9.jpg]]
-*Table 9: Results of semantic segmentation. FLOPs are calculated with an input resolution of 512×2048*
-
-
 
 ## 定位与知识库关联
 
@@ -416,8 +380,6 @@ ViT^3 在实验中与四类代表性方法进行了系统对比：
 - **内部优化器的选择**：当前仅使用 SGD，Adam 等自适应优化器能否在内部训练中带来增益？
 
 **需要人工验证的点**：论文未提供 ViT^3 在视频理解、多模态等更复杂视觉任务上的实验结果，其在时序建模场景中的表现是否仍能匹配 Mamba 等时序原生架构，尚待第三方验证。
-
-
 
 ## 原文 PDF
 

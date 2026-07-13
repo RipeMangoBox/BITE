@@ -50,8 +50,6 @@ claims:
 
 GMD 采用两阶段生成管道：第一阶段使用 ε 参数化的轨迹扩散模型生成满足空间目标的全局轨迹；第二阶段以该轨迹和文本为条件，通过集成强调投影的 x0 参数化运动扩散模型合成完整运动序列。在 HumanML3D 数据集上，GMD 的文本到动作生成 FID 达到 0.212，相比基线 MDM 的 0.556 显著降低；在关键帧条件任务中，两阶段轨迹模型使位置误差相比单阶段模型降低超过 50%。消融实验进一步证实，强调投影（c=10）使脚滑率降至 0.128，而移除密集信号传播后模型完全忽略关键帧目标——这两项机制是 GMD 实现可控生成的必要条件。
 
-
-
 ### 问题定义
 
 人体运动合成旨在根据给定的条件信号生成自然、多样的人体动作序列。近年来，扩散概率模型（Diffusion Probabilistic Models, DPMs）在文本到动作生成任务上取得了显著进展，其中 **MDM**（Motion Diffusion Model）作为代表性工作，通过 Transformer 架构实现了高质量的文本条件运动生成。然而，纯文本条件难以精确控制运动的空间属性——例如“走到门口然后坐下”这样的指令，文本可以描述意图，却无法指定行走路径、关键位置或与场景障碍物的空间关系。
@@ -88,8 +86,6 @@ Figure 3 直观展示了这一问题：在标准方法下，引导仅更新运�
 2. **引导信号密集化问题**：如何将稀疏的空间约束（时间稀疏的关键帧、维度稀疏的轨迹）转化为扩散模型能够感知和响应的稠密信号？
 
 GMD 通过两个核心机制回应上述动机：**强调投影（Emphasis Projection）** 利用线性随机投影放大轨迹部分在运动表示中的方差比重，强制模型在训练和推理中关注空间信息；**密集信号传播（Dense Signal Propagation）** 将扩散模型的去噪网络视为运动先验，通过反向传播将稀疏关键帧梯度扩散为覆盖整个序列的稠密引导，无需额外训练。两阶段管道（轨迹 DPM + 运动 DPM）进一步将空间规划与姿态生成解耦，轨迹 DPM 采用 $\epsilon$ 参数化以消除引导后期的收缩偏置，运动 DPM 集成强调投影和掩码分类器引导以生成连贯的全身运动。
-
-
 
 ## 核心方法与创新机理
 
@@ -139,8 +135,6 @@ GMD 将运动根表示从相对表示（逐帧增量）改为绝对表示（全�
 
 上述四个 changed slots 并非独立改进，而是构成一个**因果链条**：绝对根表示使空间约束可直接作用于全局坐标；强调投影确保这些约束在梯度更新中获得足够的方差权重；密集信号传播将稀疏约束沿时间轴扩散；ε 参数化则保证引导信号在去噪全程不被模型偏置覆盖。缺失任一环节，整个空间引导机制都会失效——这正是 MDM 等基线在空间约束任务上表现不佳的根本原因。
 
-
-
 ![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2305_12577/figures/007_Figure_5.jpg]]
 *Figure 5: Generated motion, conditioned a given trajectory and text “walking forward”. MDM [54] exhibits motion incoherence where the model disregards the trajectory and generates an inconsistent motion. Our method, improved by emphasis projection, deals effectively with the conditioning*
 
@@ -156,8 +150,6 @@ GMD 采用**两阶段扩散管道**，将空间约束运动生成解耦为轨迹
 **条件注入方式**：两阶段均使用 CLIP 文本编码器将文本提示映射为嵌入向量，并以无分类器引导（classifier-free guidance）的方式注入去噪网络。网络架构采用 1D UNet + AdaGN（Table D.1, Figure D.1），时间步通过正弦编码，文本嵌入经 MLP 投影后输入 Adaptive Group Normalization 层。
 
 **输入输出流总结**：文本提示 → CLIP 编码器 → 文本嵌入；文本嵌入 + 空间约束（关键帧/障碍物）→ 轨迹 DPM → 轨迹 $\mathbf{z}$；轨迹 $\mathbf{z}$ + 文本嵌入 → 运动 DPM（含强调投影）→ 完整运动序列 $\mathbf{x}$。两阶段均通过插补与密集信号传播的组合机制实现空间约束的精确遵循。
-
-
 
 GMD 的核心架构由两个扩散概率模型（DPM）串联构成：**轨迹 DPM（Trajectory DPM）** 和 **运动 DPM（Motion DPM）**，两者通过两个关键机制——**强调投影（Emphasis Projection）** 和 **密集信号传播（Dense Signal Propagation）**——实现对空间约束的有效响应。
 
@@ -219,8 +211,6 @@ $$\mu_t = \frac{\sqrt{\alpha_{t-1}}\beta_t}{1-\alpha_t} \mathbf{x}_0 + \frac{\sq
 
 - **障碍物规避**：结合导航目标函数 $G_x^{\mathrm{loc}}$ 和斥力目标函数 $G_x^{\mathrm{obs}} := \sum_{i} - \mathrm{clipmax}(\mathrm{SDF}((P_x^z \mathbf{x})^{(i)}), c)$，其中 SDF 为有符号距离函数，$c$ 为安全距离阈值，当人体模型越过障碍边界时产生斥力梯度。
 
-
-
 ## 实验与关键发现
 
 ### 文本到动作生成主结果
@@ -256,15 +246,8 @@ GMD 在障碍物规避任务中通过组合两个目标函数实现空间约束�
 
 综合实验与分析，GMD 存在以下已知失效场景：（1）当引导信号极端稀疏或噪声较大时，密集信号传播的效果受限于去噪网络本身的能力，可能仍不够稳定；（2）强调投影的超参数 c 需手动设定，在不同数据集或运动风格下可能需要重新调优；（3）两阶段管道增加了推理时间，不适用于实时交互应用；（4）轨迹 DPM 容易过拟合，训练轮次需精细控制，否则会产生对分类器引导的抵抗行为。这些局限性指向了未来的改进方向：可学习的 c 值自适应、更高效的端到端架构、以及面向物理交互的目标函数自动化设计。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2305_12577/figures/012_Table.jpg]]
-*Table: B.1. Text-to-motion evaluation on the HumanML3D [15] dataset. Comparision between relative and absolute root representation. The right arrow → means closer to real data is better*
-
 ![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2305_12577/figures/013_Table.jpg]]
 *Table: D.1. Network architecture of our GMD’s models based on the proposed 1D UNET with AdaGN*
-
-
 
 ## 定位与知识库关联
 
@@ -277,8 +260,6 @@ GMD 并未推翻 MDM 的扩散框架，而是在其上插入两个因果调节�
 **适用边界与局限**：GMD 的空间引导能力依赖于手工设计的目标函数，这在涉及复杂物理接触（如抓取物体、与动态环境交互）时难以泛化。两阶段管道增加了推理时间，不适用于实时交互式应用。强调投影的超参数 c 需手动设定，在不同数据集或运动风格下可能需重新调整。密集信号传播的效果受限于 DPM 的去噪能力，在极端稀疏或噪声较大的引导下仍可能不稳定。此外，轨迹 DPM 容易过拟合，训练轮次需精细控制以避免抵抗分类器引导。
 
 **开放问题**：如何为高维人体运动数据设计有效的 ε 预测模型，既能保证生成质量又能充分响应引导信号？能否将强调投影中的 c 值设计为可学习或自适应，避免对不同数据集的手动微调？GMD 框架是否可以扩展至多角色交互或与动态物体的物理接触场景，而不仅限于静态障碍物和关键帧？在更长的运动序列生成中，如何保持密集信号传播的计算效率和控制精度？
-
-
 
 ## 原文 PDF
 

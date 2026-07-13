@@ -54,8 +54,6 @@ claims:
 
 **主要结果概览。** 在机器人长视界规划基准 OGBench 上，CDGS 在巨型迷宫任务中大幅超越朴素组合方法 GSC（PointMaze Giant: 87% vs 29%）和逆强化学习基线 HIQL（AntMaze Giant: 85% vs 21%），达到与预言机相当的性能。在任务与运动规划（TAMP）的 Rearrangement Memory 任务中，CDGS 的成功率（0.42）显著优于基于搜索和提示的基线（如 GSC 无任务规划仅 0.07）。在全景图像生成中，CDGS 实现了与 Sync-Diffusion 相当的感知相似度，同时拥有更优的风格相似度与提示对齐度。在长视频生成中，CDGS 在 350 帧（7 倍扩展视界）上保持了 91.67 的主体一致性得分，与 50 帧的 CogVideoX-2B 基线接近。消融实验与缩放分析表明，移除规划细化（PR）模块会导致性能显著下降，而增大批次大小和重采样步数可平滑提升成功率，验证了搜索机制的有效性与可扩展性。
 
-
-
 ### 长视界规划中的组合生成困境
 
 长视界规划的核心挑战在于：如何从一组已知的短视界局部模型中，构建出全局连贯的长视界计划。在机器人操作、任务与运动规划（TAMP）以及视觉内容生成等领域，获取长视界演示数据往往代价高昂，而短视界的局部数据（如单步技能、相邻帧过渡）则相对丰富。因此，**组合生成**（compositional generation）成为一种自然的范式——通过组合局部模型来合成全局计划。
@@ -94,8 +92,6 @@ $$\nabla \log p(\tau) := \sum_{j=1}^M \nabla \log p(y_j) + \sum_{i=1}^N (1 - d_i
 
 本文的动机由此明确：**在扩散去噪过程中嵌入引导搜索**，通过种群级别的迭代重采样和基于似然的剪枝，实现局部-全局信息的高效传递，从而在保持局部可行性的同时确保全局计划的连贯性。这一思路将扩散模型的生成能力与基于种群的搜索策略相结合，为解决长视界规划中的模式平均问题提供了新的路径。
 
-
-
 ## 核心方法与创新机理
 
 CDGS 的核心创新在于将**基于种群的引导搜索直接嵌入扩散去噪过程**，以解决长视界组合规划中的**模式平均**问题。当局部技能分布呈现多模态时，朴素组合采样会强制不兼容的局部模式相互妥协，导致生成的中间状态落入低似然区域，产生不可行的局部转移或状态幻觉。CDGS 通过三个相互协同的机制消除这一瓶颈：
@@ -130,8 +126,6 @@ CDGS 维护 $B$ 个候选计划组成的种群，在去噪过程中持续探索�
 
 消融实验（Table 1, Table 4, Table 5 中 CDGS w/o PR vs 完整 CDGS）一致表明，移除规划细化（PR，即剪枝模块）会导致性能显著下降，验证了剪枝在长视界任务中的必要性。在 Rearrangement Memory 任务上，GSC（无任务规划，等价于 CDGS w/o RP 和 PR）的成功率仅为 0.07，而完整 CDGS 达到 0.42（Table 3），差距达 6 倍。
 
-
-
 ![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_b8avf4F2hn/figures/002_Figure_1.jpg]]
 *Figure 1: Compositional Diffusion with Guided Search (CDGS) composes short-horizon plan distributions to sample long-horizon goal-directed plans directly at inference. Unlike na¨ıve compositional sampling, it explores diverse plans and filters locally inconsistent paths to avoid “mode averaging”, yielding globally coherent plans*
 
@@ -155,8 +149,6 @@ CDGS（Compositional Diffusion with Guided Search）构建了一个在扩散去�
 ### 关键控制机制
 
 框架的性能由两个关键控制旋钮调节：**批次大小 $B$** 决定种群探索的广度，**重采样步数 $U$** 决定信息沿计划链传播的深度。消融实验表明，两者协同作用：仅增大 $B$ 而不增加 $U$ 时，运动规划成功率的提升有限；而 $U$ 的增加仅在 $B$ 足够大时才能有效提升任务规划成功率（Figure 5c-d）。移除剪枝模块（即 CDGS w/o PR）会导致性能显著下降，验证了基于似然的候选筛选对于消除模式平均的必要性。
-
-
 
 ### 问题形式化：因子图与组合扩散
 
@@ -241,16 +233,12 @@ CDGS 的第二个关键创新是在组合分数计算中嵌入 **迭代重采样
 
 这一设计使得 CDGS 能够从多模态的局部计划分布中采样出全局连贯的长视界计划，而朴素组合方法（如 **GSC**, Mishra et al., CoRL 2023）则因缺乏搜索和剪枝机制，在局部多模态场景下会因模式平均产生不可行计划（**Figure 3 (b)** 对比 **Figure 3 (d)**）。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈验证：模式平均如何导致计划失败
 
 CDGS的核心动机源于组合扩散中的一个根本性问题——**模式平均**（mode averaging）。当局部因子分布呈现多模态时，朴素组合采样（如GSC）会不加区分地从不同模态中混合采样，导致对不兼容的局部模式进行平均。这种平均化的结果产生两类典型失败模式（Figure 5左）：
 
-![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_b8avf4F2hn/figures/014_Figure_5.jpg]]
-*Figure 5: Left: Visualizing plan pruning. When compositional sampling chooses an infeasible mode sequence, the resulting plan can hallucinate out-of-distribution transitions due to modeaveraging as explained in ${ \mathrm { S e c . ~ } } { \bar { 3 } }$ . For instance, (a) Infeasible transitions: inhand(hook) precondition is never met for place(hook), and (b) State hallucination: cube moves under(rack) as a result of averaging toward the goal state, despite being geometrically infeasible for push(cube, hook). Our pruning objective (Eq. 5) ensures only feasible plans during denoising, where all transitions are in-distribution with our short-horizon transition diffusion model. Right: Scaling analysis. (H...
 
 - **不可行转移**：例如，`place(hook)` 操作要求前置条件 `inhand(hook)` 满足，但若上游计划选择了不抓取钩子的模态，则下游操作的前提条件永远无法满足，导致转移在物理上不可执行。
 - **状态幻觉**：在组合评分过程中，为了同时满足来自不同模态的约束，扩散过程会生成处于分布之外的中间状态。例如，立方体在几何上不可能穿越架子，但模式平均会迫使它“穿过”架子以趋近目标状态。
@@ -262,8 +250,6 @@ CDGS的核心动机源于组合扩散中的一个根本性问题——**模式�
 #### 长视界运动规划（OGBench Maze与Scene任务）
 
 在OGBench的Stitch和Play数据集上，CDGS仅需极少的训练数据（短视界片段），即可在滚动视界控制中达到与逆强化学习基线相当甚至更优的性能（Table 1）。关键结果：
-
-![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_b8avf4F2hn/figures/009_Table_1.jpg]]
 
 - **PointMaze Giant**：CDGS达到 **87±3%** 成功率，而朴素组合基线GSC仅为29±2%，提升**+58个百分点**。这表明在大型迷宫中，搜索和剪枝对于找到可行路径至关重要。
 - **AntMaze Giant**：CDGS达到 **85±3%**，远超离线目标条件RL基线HIQL的21±2%（+64个百分点），证明了组合扩散加引导搜索在稀疏奖励长视界任务上的优势。
@@ -345,8 +331,6 @@ CDGS的性能随推理计算量平滑扩展（Figure 5右）：
 
 所有机器人规划实验均基于100次试验和3个随机种子进行成功率评估，基线性能直接采用原始论文报告的值（如OGBench、CompDiffuser、HIQL等），确保了比较的公平性。图像和视频生成实验使用相同的预训练扩散模型和提示词，评估指标为领域标准（LPIPS、Style-loss、CLIP score、VBench）。
 
-
-
 ## 定位与知识库关联
 
 ### 问题定位：组合生成中的模式平均瓶颈
@@ -405,8 +389,6 @@ CDGS 的方法论贡献在于将**基于种群的引导搜索**直接嵌入扩�
 3. **跨领域迁移**：CDGS 的组合搜索框架是否可应用于其他需要序列决策的领域，如自然语言规划（将句子级生成组合为段落）、蛋白质序列设计（将局部结构模块组合为全局折叠）？这些领域的局部可行性度量需要重新定义。
 
 4. **理论分析**：DDIM 反演曲率作为局部可行性度量的理论保证尚未建立。该度量在什么条件下与真实似然单调相关？是否存在反例导致剪枝错误地丢弃可行计划？
-
-
 
 ## 原文 PDF
 

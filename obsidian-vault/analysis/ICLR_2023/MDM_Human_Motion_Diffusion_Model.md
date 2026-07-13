@@ -57,8 +57,6 @@ claims:
 
 MDM的训练仅需单块NVIDIA RTX 2080 Ti约三天，推理时约1分钟生成一个样本，在资源效率和生成质量之间取得了实用平衡。其核心贡献在于证明了“预测信号+几何损失”的范式能够有效替代传统扩散模型中的噪声预测，为可控运动生成开辟了新路径。
 
-
-
 ### 人体运动生成的核心挑战
 
 人体运动生成是计算机视觉与图形学中长期存在的难题，其本质上是一个高度非确定性的映射问题：一段文本描述（如“一个人向前走并挥手”）可以对应无数种合理的运动序列，反之亦然。这种“多对多”的特性要求生成模型不仅要输出高质量、物理上合理的运动，还必须能够捕捉真实运动分布的丰富多样性。
@@ -82,8 +80,6 @@ MDM的训练仅需单块NVIDIA RTX 2080 Ti约三天，推理时约1分钟生成�
 - **采用轻量级 Transformer 编码器骨干**：相比图像扩散模型中常用的 U-Net，Transformer 更适配人体运动这种时序非空间数据，且参数效率更高（单块 RTX 2080 Ti 训练约 3 天）。
 
 通过这一设计，MDM 旨在以一个统一框架覆盖文本到运动、动作到运动和无约束生成三大任务，并原生支持基于扩散修复的运动编辑，弥合现有方法在质量、多样性与可控性之间的鸿沟。
-
-
 
 ## 核心方法与创新机理
 
@@ -128,8 +124,6 @@ $$G_s(x_t, t, c) = G(x_t, t, \emptyset) + s \cdot (G(x_t, t, c) - G(x_t, t, \emp
 - **身体部位编辑**：固定不需要编辑的关节，仅生成目标部位的关节运动
 
 这一能力无需额外训练，直接复用预训练模型的去噪过程（Figure 3）。
-
-
 
 MDM（Motion Diffusion Model）是一个基于扩散的生成框架，旨在统一处理文本到运动、动作到运动以及无约束运动生成等多类任务。其整体设计围绕一个核心洞察展开：**将扩散模型的预测目标从噪声 ε 改为干净信号 x̂₀**，从而使得在训练过程中可以直接施加几何运动学约束，在保持轻量级架构的同时显著提升生成质量。
 
@@ -183,17 +177,11 @@ MDM 的 pipeline 由五个关键模块构成，其数据流如图 2（左）所�
 | 条件机制 | 分类器引导或分离模型 | 无分类器引导 + CLIP 嵌入 | Equation (7) |
 | 运动编辑 | 不支持或有限 | 扩散修复（时间+空间） | Section 5.1 |
 
-![[assets/figures/papers/paper_list_l9_MDM_Human_Motion_Diffusion_Model/figures/002_Figure_2.jpg]]
-*Figure 2: (Left) Motion Diffusion Model (MDM) overview. The model is fed a motion sequence $\boldsymbol { x } _ { t } ^ { 1 : N }$ of length N in a noising step t, as well as t itself and a conditioning code c. c, a CLIP (Radford et al., 2021) based textual embedding in this case, is first randomly masked for classifier-free learning and then projected together with t into the input token $z _ { t k }$ . In each sampling step, the transformerencoder predicts the final clean motion $\hat { x } _ { 0 } ^ { 1 : N }$ . (Right) Sampling MDM. Given a condition c, we sample random noise $x _ { T }$ at the dimensions of the desired motion, then iterate from T to 1. At each step t, MDM predicts the clean sample ${ \ha$...
 
 消融实验证实，Transformer 编码器骨干在不同架构变体中表现一致且优于 U-Net 和 GRU 替代方案（Table 1），验证了该设计选择的合理性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l9_MDM_Human_Motion_Diffusion_Model/figures/001_Figure_1.jpg]]
 *Figure 1: Our Motion Diffusion Model (MDM) reflects the many-to-many nature of text-to-motion mapping by generating diverse motions given a text prompt. Our custom architecture and geometric losses help yielding high-quality motion. Darker color indicates later frames in the sequence*
-
-
 
 MDM 的核心设计围绕一个轻量级 Transformer 编码器骨干网络展开，其关键创新在于将扩散模型的预测目标从噪声改为干净样本，从而使得显式几何损失可以直接作用于生成过程。整体架构由五个协同模块构成。
 
@@ -251,8 +239,6 @@ MDM 通过扩散修复（diffusion inpainting）实现运动编辑，无需额�
 - **身体部位编辑**：固定不需要编辑的关节，仅对目标部位关节进行生成，同时可接受文本条件引导。
 
 这一机制使得同一模型能够同时支持文本到运动、动作到运动、无约束生成以及运动编辑等多任务场景，体现了统一框架的设计优势。
-
-
 
 ## 实验与关键发现
 
@@ -319,8 +305,6 @@ MDM通过扩散修复（diffusion inpainting）实现了两种运动编辑模式
 
 所有文本到运动评估遵循T2M（Guo et al., CVPR 2022）的协议，包括使用真实运动长度、20次运行计算置信区间等标准化流程。训练资源统一为单块NVIDIA GeForce RTX 2080 Ti，约3天完成训练，保证了方法间硬件公平性。用户研究在KIT测试集上进行，通过随机化对比和多名评估者确保了主观评估的可靠性。
 
-
-
 ## 定位与知识库关联
 
 ### 1. 方法沿革与基线关系
@@ -363,8 +347,6 @@ MDM 的核心突破在于**将预测目标从噪声改为干净样本** $\hat{x}
 3. **几何损失的泛化**：几何损失能否通过适当的运动表示变换（如将关节角度转换为关节点位置）拓展到更广泛的文本到运动场景中，使所有条件生成任务都受益于运动学约束？
 
 4. **多模态条件统一生成**：MDM 已展示文本和动作类别的单条件生成能力，能否将框架扩展至多模态条件（如文本+音频、文本+场景上下文）的统一生成，进一步拓宽应用场景？
-
-
 
 ## 原文 PDF
 

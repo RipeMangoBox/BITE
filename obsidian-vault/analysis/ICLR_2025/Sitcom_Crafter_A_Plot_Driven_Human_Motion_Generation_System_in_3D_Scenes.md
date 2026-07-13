@@ -52,8 +52,6 @@ claims:
 
 **局限与展望** 当前系统仍存在若干约束：相机姿势需手动设置；人-场景交互类型仅限于坐下、躺下等有限动作；三个生成模块因训练策略和数据集不同，运动过渡仍可察觉；在狭窄空间中物理约束会限制动态交互的丰富性。这些方向为后续研究留下了明确的改进空间。
 
-
-
 ### 研究背景
 
 生成逼真的三维人体运动是计算机视觉与图形学领域的核心挑战之一，在情景剧创作、虚拟现实、游戏开发等应用中具有重要价值。近年来，随着扩散模型（diffusion models）的快速发展，人体运动生成取得了显著进展，涌现出多种针对特定运动类型的方法：人移动生成（human locomotion generation）、人-场景交互生成（human-scene interaction generation）以及人-人交互生成（human-human interaction generation）。
@@ -81,8 +79,6 @@ claims:
 3. **设计模块化的系统架构与分阶段训练策略**：系统由8个模块组成（3个生成模块 + 5个增强模块），通过情节理解模块实现自然语言指令到运动命令的解析与分发，通过运动同步模块确保不同运动类型间的平滑过渡。在训练层面，采用三阶段分阶段训练策略（Phase1无物理约束、Phase2加入场景碰撞约束、Phase3加入人-人碰撞约束），有效平衡了运动质量与物理一致性。
 
 通过这些设计，Sitcom-Crafter首次实现了在3D场景中根据长情节上下文统一生成人移动、人-场景交互和人-人交互三类运动，为情景剧等应用场景提供了端到端的运动生成系统。
-
-
 
 ## 核心方法与创新机理
 
@@ -127,16 +123,11 @@ Sitcom-Crafter 采用**三阶段训练策略**（Table 7）：
 
 四个 changed slots 之间存在因果依赖关系：统一标记点表示是系统集成的前提；自监督SDF条件解决了场景感知问题；改进标准化消除了训练偏差；分阶段训练则化解了多目标优化的冲突。这些创新共同使得 Sitcom-Crafter 在 Replica 数据集上达到最优 HHP（0.1687，低于 InterGen 的0.1774和 ComMDM 的0.2712），在 InterHuman 数据集上将 HSP 降低了70%以上（1.6950 vs. InterGen 6.6408）。
 
-
-
 Sitcom-Crafter 是一个情节驱动的人体运动生成系统，其核心设计目标是在统一的框架内支持三类人体运动：**人移动**、**人-场景交互**和**人-人交互**。系统由八个模块组成，其中三个负责运动生成，五个负责功能增强，各模块之间通过明确的输入输出流协同工作，最终在给定的3D场景中产出协调的多角色运动序列。
 
 ### 系统工作流
 
 系统的整体工作流如 Figure 2 所示。用户提供的情节文本首先进入**情节理解模块 (Plot Comprehension Module)**，该模块利用大语言模型将自然语言情节解析为系统可识别的运动指令，并根据指令类型将其分发至对应的生成模块。三个生成模块按指令顺序依次执行：
-
-![[assets/figures/papers/paper_list_l1784_Sitcom_Crafter_A_Plot_Driven_Human_Motion_Generation_System_in_3D_Scenes/figures/002_Figure_2.jpg]]
-*Figure 2: The workflow of Sitcom-Crafter. The Sitcom-Crafter system consists of eight modules, three for motion generation and five for function enhancement. The arrows between modules indicate the workflow direction. The system supports generation guided by 3D scene structure and long plot context. The plot comprehension module is for interpreting the guiding context into recognizable commands and distributing them to the generation modules. The three generation modules synthesize different motion types: human-scene interaction, human locomotion, and human-human interaction. The motion synchronization module ensures motion consistency between the different generation modules. The hand pose retrieval...*
 
 1. **人移动生成模块 (Human Locomotion Generation Module)**：基于 **GAMMA** (Zhang & Tang, 2022) 构建，负责生成角色在场景中的行走、跑动等位移运动。
 2. **人-场景交互生成模块 (Human-Scene Interaction Generation Module)**：基于 **DIMOS** (Zhao et al., 2023) 构建，处理角色与场景物体（如坐下、躺下）的交互。
@@ -156,16 +147,6 @@ Sitcom-Crafter 是一个情节驱动的人体运动生成系统，其核心设�
 - **角色定义**：指定参与运动的角色数量及其初始位置。
 
 输出为多角色在3D场景中的协调运动序列，可直接用于情景剧等应用的渲染。当前系统支持同一楼层内的运动生成，跨楼层交互尚需专门的生成模块支持。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1784_Sitcom_Crafter_A_Plot_Driven_Human_Motion_Generation_System_in_3D_Scenes/figures/008_Figure_6.jpg]]
-*Figure 6: Visual illustrations of the generations of the whole system guided by long plots. The plots are shown at the top, with some key motion words highlighted in green. For better illustration, we include two cameras from different angles. Each row, from left to right, shows screenshots captured at different times, progressing from earlier to more recent frames*
-
-![[assets/figures/papers/paper_list_l1784_Sitcom_Crafter_A_Plot_Driven_Human_Motion_Generation_System_in_3D_Scenes/figures/034_Figure_26.jpg]]
-*Figure 26: More visual illustrations of the generations of the whole system guided by long plots. The plots are shown at the top, with some key motion words highlighted in green. For better illustration, we include two cameras from different angles. Each row, from left to right, shows screenshots captured at different times, progressing from earlier to more recent frames*
-
-
 
 ### 系统模块架构
 
@@ -223,16 +204,8 @@ $$\mathbf{\tilde{x}}_{i(IG)} = \{ j_q^p, j_q^v, j^r, c^f \}$$
 
 统一标记点表示使得不同生成模块间的运动衔接无需复杂的表示转换，是实现系统集成的关键设计选择。
 
-### 补充图表
-
-
-![[assets/figures/papers/paper_list_l1784_Sitcom_Crafter_A_Plot_Driven_Human_Motion_Generation_System_in_3D_Scenes/figures/004_Figure_4.jpg]]
-*Figure 4: Illustration of different canonicalization strategies. In this example, character A is initially canonicalized to the global coordinate origin, while character B is positioned relative to character A*
-
 ![[assets/figures/papers/paper_list_l1784_Sitcom_Crafter_A_Plot_Driven_Human_Motion_Generation_System_in_3D_Scenes/figures/009_Figure_7.jpg]]
 *Figure 7: Workflow within Generation Modules. Given the command lists derived from the Plot Comprehension module, each command is sequentially processed by the corresponding generation module based on its type and order. The motion generation of the current module is conditioned on the motion frames generated in the previous step, ensuring seamless chaining of motion segments. Note that the flowchart provides a simplified overview of the logic within the generation modules. For detailed explanations, please refer to the sections dedicated to each system module*
-
-
 
 ## 实验与关键发现
 
@@ -281,9 +254,6 @@ Table 6 从基础损失（$\mathcal{L}_{MSE} + \mathcal{L}_{DM} + \mathcal{L}_{R
 
 Table 7 对比了不同训练策略。将 Phase 2（场景约束）和 Phase 3（人-人约束）合并训练（Phase 1 & 2 & 3）导致 FID 飙升至 **22.088**，远差于分阶段训练（FID 10.251）。若仅合并 Phase 1 和 Phase 2（Phase 1 & 2 + Phase 3），FID 为 11.784，仍劣于完全分阶段方案。这表明早期引入物理约束会严重阻碍运动基础能力的学习，分阶段训练是保证最终性能的必要设计。
 
-![[assets/figures/papers/paper_list_l1784_Sitcom_Crafter_A_Plot_Driven_Human_Motion_Generation_System_in_3D_Scenes/figures/029_Table_7.jpg]]
-*Table 7: Ablation study of different training strategies. “+” denotes phased training, while “&” denotes merged training phases. The best results are highlighted in bold*
-
 #### 数据规模
 
 Table 8 探索了在 InterHuman 数据之外整合 Inter-X 数据集的效果。整合后 HSP 从 1.852 进一步降至 **1.542**，但 FID 从 3.871 升至 4.689，R-Precision 和多样性指标也出现下降。这说明更大规模的数据有助于改善物理一致性，但可能因数据分布差异导致文本-运动对齐能力下降。
@@ -299,8 +269,6 @@ Table 8 探索了在 InterHuman 数据之外整合 Inter-X 数据集的效果。
 4. **交互类型受限**：人-场景交互目前仅限于坐下和躺下等动作，扩展需要更多高质量训练数据；系统仅支持同一楼层内的运动，跨楼层交互需要专门的生成模块。
 
 5. **相机依赖手动设置**：系统缺乏自动化的镜头跟随机制，相机姿势仍需手动配置。
-
-
 
 ## 定位与知识库关联
 
@@ -354,8 +322,6 @@ Sitcom-Crafter的设计存在以下明确边界：
 5. **碰撞修正的鲁棒性**：碰撞修正模块在更复杂场景（如多角色或狭窄空间）中的成功率和局限性需要系统评估。
 6. **手部姿态语义对齐**：手部姿态检索模块如何处理指令与Inter-X数据集中无语义相似标注的情况？
 7. **分阶段训练的机制理解**：早期引入物理约束具体如何限制运动学习能力，是否存在更优的训练调度策略？
-
-
 
 ## 原文 PDF
 

@@ -53,8 +53,6 @@ claims:
 
 在OMG-Bench上的实验表明，HMATr的检测率（DR）达到**89.2%**，Jaccard指数（JI）达到**0.71**，分别超越最优对比方法7.6个百分点和0.10，验证了层次记忆与位置感知查询在在线微手势识别中的关键作用。消融实验进一步证实，移除层次记忆银行与位置感知查询后，DR骤降至76.8%，表明各组件的不可或缺性。
 
-
-
 ### 微手势识别：从宏观动作到指尖交互
 
 手势识别是人机交互的核心技术之一，尤其在虚拟现实（VR）、增强现实（AR）和混合现实（MR）等头显场景中，手势提供了一种自然、直观的非接触式交互方式。然而，传统手势识别研究主要关注大幅度的肢体动作或完整的手部运动轨迹，对**微手势（Micro Hand Gesture）**——即仅涉及手指与拇指之间细微接触与运动的动作——的关注相对有限。
@@ -88,8 +86,6 @@ claims:
 **基准层面**：我们构建并发布了**OMG-Bench**——一个大规模、高质量的在线微手势识别基准。该基准通过校准的五相机RGB-D系统与自监督多视角手部姿态估计流水线（Figure 1）获取高精度骨架（平均关节位置误差仅2.78 mm），并采用半自动标注流程生成帧级手势标签。OMG-Bench包含18名参与者、1,272个序列、13,948个手势实例，涵盖40类拇指-手指微手势，平均手势时长0.57秒，为在线识别研究提供了更具挑战性和现实性的测试平台。
 
 **方法层面**：我们提出了**层次记忆增强Transformer（Hierarchical Memory-Augmented Transformer, HMATr）**，一个端到端的在线微手势检测与识别框架。HMATr的核心思想是通过**层次记忆银行**在非重叠窗口之间传递历史信息：帧级记忆保留低层骨架细节，窗口级记忆存储高层语义表征，二者协同为当前窗口提供跨窗口的上下文先验。在此基础上，**可学习的位置感知查询**从窗口级记忆中初始化，隐式编码手势的时间位置与语义，统一完成检测与分类，避免了传统两阶段方法的误差累积。
-
-
 
 ## 核心方法与创新机理
 
@@ -129,8 +125,6 @@ Baseline 方法通常采用两阶段“先检测再分类”或依赖 CTC 空白
 | 检测-分类范式 | 两阶段或 CTC 空白预测 | 位置感知查询统一检测与分类 | Sec 4.3 |
 | 训练目标 | 单一分类损失或 CTC 损失 | 二分匹配损失 + 查询级 CTC 辅助损失联合优化 | Sec 4.4 |
 
-
-
 OMG-Bench 提出了一种面向骨架流式输入的在线微手势识别统一框架 **Hierarchical Memory-Augmented Transformer (HMATr)**。该框架以非重叠滑动窗口的方式处理连续骨架序列，通过层次记忆机制与可学习的位置感知查询，将手势检测与分类统一为端到端的单阶段任务。
 
 ### 输入输出流
@@ -160,13 +154,6 @@ $$\mathcal{L} = \lambda_{cls}\mathcal{L}_{cls} + \lambda_{pos}\mathcal{L}_{pos} 
 ### 设计动机
 
 现有在线手势识别方法普遍采用独立窗口处理策略，或依赖高重叠率窗口来缓解截断问题，但前者导致跨窗口上下文断裂，后者引入冗余计算。HMATr 的核心洞察在于：**层次记忆机制使非重叠窗口也能利用历史信息**——帧级记忆提供细粒度动作细节，窗口级记忆提供高层语义先验；而位置感知查询则通过记忆初始化隐式编码手势的时间位置与语义，将检测与分类统一为单阶段任务，避免了传统“先检测再分类”两阶段方案中的误差累积。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1043_https_arxiv_org_abs_2512_16727/figures/013_Figure_6.jpg]]
-*Figure 6: Illustration of the interactive task*
-
-
 
 HMATr 的核心设计围绕三个彼此耦合的模块展开：层次记忆银行、位置感知查询，以及统一检测与分类的端到端训练目标。以下逐一拆解各模块的数学形式与设计动机。
 
@@ -226,8 +213,6 @@ $$\mathcal{L} = \lambda_{cls}\mathcal{L}_{cls} + \lambda_{pos}\mathcal{L}_{pos} 
 
 移除层次记忆银行与位置感知查询后，检测率（DR）从 89.2% 骤降至 76.8%（Table 5），降幅达 12.4 个百分点，直接验证了三个核心组件的不可替代性。这一结果与理论设计一致：帧级记忆提供跨窗口的低层动作细节，窗口级记忆提供高层语义先验，位置感知查询则将历史信息与当前观测融合为统一的检测-分类表示——三者缺一不可。
 
-
-
 ## 实验与关键发现
 
 ### 基准对比：HMATr 在 OMG-Bench 上的主结果
@@ -269,32 +254,13 @@ Table 11 显示，查询级 CTC 损失（$\mathcal{L}_{q-CTC}$）的主要贡献
 
 Table 12 对比了三种查询初始化策略：用窗口级记忆均值初始化（Memory init.）在 DR 和 JI 上均优于交叉注意力初始化和零初始化，且无需引入额外参数。这证实了窗口级记忆所存储的历史查询语义是对当前窗口手势位置与类别的有效先验——均值池化以极简的方式将这一先验注入查询，实现了性能与效率的最优平衡。
 
-![[assets/figures/papers/paper_list_l1043_https_arxiv_org_abs_2512_16727/figures/016_Table_12.jpg]]
-*Table 12: Ablation study of global memory embedding strategy*
-
 ### 泛化性与鲁棒性分析
 
 Table 13 揭示了 HMATr 对骨架质量的敏感性。当使用不同手部姿态估计（HPE）算法生成的骨架进行推理时，DR 从原始多视图骨架的 89.2% 显著下降：使用 WiLoR 时 DR 降至 73.6%，使用其他单视图 HPE 算法时同样出现明显退化。这一结果暴露了当前方法的瓶颈——高质量骨架依赖多视角自监督估计，而实际部署中单目或普通 RGB 骨架估计算法引入的噪声和误差会严重损害识别性能。Figure 7 的单视图泛化实验进一步印证了这一点：HMATr 在特定视角下仍保持对 OO-dMVMT 的优势，但绝对性能随视角自遮挡程度增加而衰减。
 
-![[assets/figures/papers/paper_list_l1043_https_arxiv_org_abs_2512_16727/figures/020_Table_13.jpg]]
-*Table 13: Results of inference using HMATr trained on the original training set on test sets derived from different Hand Pose Estimation (HPE) algorithms*
-
-![[assets/figures/papers/paper_list_l1043_https_arxiv_org_abs_2512_16727/figures/021_Figure_7.jpg]]
-*Figure 7: Inference results of HMATr and OO-dMVMT trained on OMG-Bench under single-view settings. The skeleton data for each view are obtained using a single-view hand pose estimation algorithm to simulate the inaccuracies of skeleton estimation in real-world applications*
-
 ### 混淆模式与失败案例
 
 Figure 8 的混淆矩阵显示，HMATr 在大多数手势类别上实现了高准确率，但部分视觉相似的手势对仍存在混淆，如不同手指的“Tap”动作或相近关节的“Rub”动作。这些混淆主要源于微手势的类间差异极其细微——仅涉及不同手指或相邻关节的接触，在骨架序列上的时空模式高度相似。当前模型依赖帧级记忆捕获低层动作细节，但在极端相似的手势对上，仅靠骨架关节坐标的时序变化仍难以完全区分，提示未来可能需要融合外观或深度等多模态信息以增强判别力。
-
-![[assets/figures/papers/paper_list_l1043_https_arxiv_org_abs_2512_16727/figures/019_Figure_8.jpg]]
-*Figure 8: The confusion matrix of HMATr on OMG-Bench*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1043_https_arxiv_org_abs_2512_16727/figures/001_Figure_1.jpg]]
-*Figure 1: Data collection and annotation pipeline of OMG-Bench, using a calibrated five-camera RGB-D system and self-supervised multi-view hand pose estimation to obtain high-quality skeletons, followed by semi-automatic frame-level gesture labeling*
-
-
 
 ## 定位与知识库关联
 
@@ -367,8 +333,6 @@ HMATr 的推理延迟为 1.61ms/窗口（RTX 4090D），平均输出延迟 7.67m
 ---
 
 **验证提示**：上述分析中涉及的基线方法（OO-dMVMT、Bound.Reg.）的具体作者和发表信息在提供的分析材料中未给出，建议在最终版本中补充可验证的引用。Table 4（SHREC’22/21 跨数据集泛化结果）虽在分析材料中列出但未提供具体数值，相关泛化性讨论需对照原文确认。
-
-
 
 ## 原文 PDF
 

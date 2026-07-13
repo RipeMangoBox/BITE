@@ -53,8 +53,6 @@ claims:
 
 在多个幻觉与通用推理基准上，LEAD 在 7B 规模 MLRM 上取得一致且显著的提升：MMHalu 得分提高约 +4.7%，VStar 准确率提升 +4.7 个百分点，RealWorldQA 提升 +3.9 个百分点，MMEval-Pro 提升 +4.5 个百分点。消融实验证实，动态熵阈值策略优于固定离散或固定潜在推理，且早期高熵 token 对最终答案具有方向性引导作用。LEAD 在提升推理可靠性的同时，未牺牲生成文本的语法、流畅度与自然度。
 
-
-
 ### 多模态推理模型的幻觉困境
 
 多模态推理模型（Multimodal Large Reasoning Models, MLRMs）在视觉问答、数学推理和科学理解等任务上展现出强大的能力，但其生成的推理链中频繁出现幻觉（hallucination），即模型输出的文本内容与视觉输入不一致或完全脱离视觉线索。这一问题严重削弱了模型在医疗、自动驾驶等高风险场景中的可靠性。
@@ -84,8 +82,6 @@ claims:
 ### 本文动机
 
 基于上述分析，本文的核心动机是：**在高不确定性推理阶段，用连续潜在表示替代离散 token 采样，以保留多条推理路径的语义信息，避免因过早收敛而导致的幻觉**。具体而言，本文提出利用 token 概率分布构建**超级位置表示（superposed representation）**，使模型在高熵时维持语义多样性，在熵下降时再切换回离散嵌入以确保精确收敛。同时，在高熵阶段注入视觉锚点以增强模型对视觉内容的注意力，从源头减少幻觉的发生。
-
-
 
 ## 核心方法与创新机理
 
@@ -124,8 +120,6 @@ $$\tilde{e}_{t^\star} = (1-\lambda) \mathbb{E}_{v\sim p_{t^\star}}[e(v)] + \lamb
 | 模式切换 | 固定离散 | 固定离散 | 基于熵的动态切换 + 持久窗口 |
 
 LEAD 是一种**即插即用的推理阶段策略**，不改变模型参数，可与现有 MLRM 直接集成。其实质是将推理过程中的不确定性显式建模为语义多样性的载体，而非简单地抑制或忽略。
-
-
 
 LEAD（Latent Entropy-Aware Decoding）是一种即插即用的推理阶段解码策略，不改变底层多模态推理模型（MLRM）的任何参数。其核心思想是：在模型逐 token 生成推理链的过程中，利用 token 级熵作为不确定性指示器，动态切换离散推理与潜在推理两种嵌入模式，从而在高不确定性阶段保留多条推理路径，避免过早收敛到错误的推理链条。
 
@@ -169,8 +163,6 @@ LEAD 的完整推理流程如 Figure 4 所示：模型接收视觉和文本 toke
 ![[assets/figures/papers/paper_list_l940_https_arxiv_org_abs_2603_13366/figures/004_Figure_4.jpg]]
 *Figure 4: Illustration of multimodal reasoning and entropy-aware decoding. The model receives both visual and textual tokens (left) and generates responses by integrating contextual information. During reasoning, token-level entropy*
 
-
-
 ### 3.1 多模态推理模型与离散解码的局限
 
 多模态推理模型（MLRM）接受图像与文本作为输入。原始图像首先经过**视觉编码器（Vision Encoder）**提取语义特征，再通过**跨模态投影（Cross-modal Projection）**映射到语言模型的输入空间。在标准推理过程中，模型在每一步 $t$ 基于多模态上下文和已生成的 token 序列预测下一个 token 的概率分布：
@@ -209,18 +201,8 @@ $$\tilde{e}_{t^\star} = (1-\lambda) \mathbb{E}_{v\sim p_{t^\star}}[e(v)] + \lamb
 
 其中，$e_{\mathrm{vis}}$ 是预训练视觉特殊 token（如 `<|vision_start|>`、`<|image_pad|>`、`<|vision_end|>`）的平均嵌入，$\lambda$ 为注入强度。该操作在保留概率加权嵌入语义多样性的同时，将视觉先验信息显式混合到推理表示中，引导模型在高不确定性时重新关注图像内容。消融实验表明 $\lambda=0.4$ 在多个基准上取得最佳效果（Table 1）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l940_https_arxiv_org_abs_2603_13366/figures/002_Figure_3.jpg]]
-*Figure 3: (a) Performance gap when masking different types of token during reasoning. Masking high-entropy tokens produces a larger performance drop than other tokens. (b) Token masking impact across reasoning steps. Earlier tokens tend to have stronger influence on the final answer, while the influence of later ones gradually diminishes. (c) Schematic depiction of reasoning paths at different states. (d) Token density comparisons. On average, high-entropy tokens without hallucinations exhibit higher visual attention ratios compared to hallucinated ones*
-
 ![[assets/figures/papers/paper_list_l940_https_arxiv_org_abs_2603_13366/figures/003_Figure_2.jpg]]
 *Figure 2: Visualizations of token entropy during the reasoning phase show that tokens with higher entropy often correspond to transition words, consistent with our previous findings*
-
-![[assets/figures/papers/paper_list_l940_https_arxiv_org_abs_2603_13366/figures/001_Figure_1.jpg]]
-*Figure 1: Illustrations of the correlation between hallucinations and transition words. In MLRMs, hallucinations tend to emerge more frequently after transition words, and these cases constitute a significant proportion of the overall hallucination occurrences*
-
-
 
 ## 实验与关键发现
 
@@ -266,9 +248,6 @@ LEAD 的核心创新在于根据 token 级熵动态切换推理模式，而非�
 
 一个自然的担忧是：在高熵阶段使用概率加权连续嵌入是否会损害生成文本的流畅度和自然度。**Figure 8** 对此进行了评估。在 MMHalu 上，LEAD 生成文本的 PPL（困惑度）、语法正确性、流畅度和自然度评分与基线相当，未出现显著退化。这表明 LEAD 在提升抗幻觉能力的同时，并未牺牲文本质量。
 
-![[assets/figures/papers/paper_list_l940_https_arxiv_org_abs_2603_13366/figures/009_Figure_8.jpg]]
-*Figure 8: The average performance is evaluated on MMHalu using R1-Onevision-7B and Vision-R1-7B. PPL1 and PPL2 are calculated using gpt2, while the ratings for Grammar, Fluency and Naturalness are provided by GPT-5*
-
 **Figure 9** 比较了 LEAD 与其他幻觉缓解方法在准确率与推理长度之间的权衡。LEAD 在保持与基线相当的推理长度的同时取得了更高的准确率，而某些对比解码方法（如 VCD）虽然也提升了准确率，但显著增加了推理长度。**Figure 10** 的 Pass@k 评估进一步表明，LEAD 在有限采样预算下具有更好的样本效率。
 
 ### 与基线方法的对比
@@ -292,19 +271,6 @@ LEAD 的核心创新在于根据 token 级熵动态切换推理模式，而非�
 3. **视觉锚点的编码器依赖**：视觉锚点注入依赖于预训练视觉特殊 token 的平均嵌入，对于使用不同视觉编码器或跨模态投影结构的模型，可能需要适配锚点提取方式。
 
 4. **白盒访问要求**：LEAD 需要获取 token 级概率分布，无法直接应用于仅提供文本输出的 black-box API 服务。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l940_https_arxiv_org_abs_2603_13366/figures/006_Table_1.jpg]]
-*Table 1: Effect of visual anchor injection strength λ on overall performance. Scores are reported for MMHalu (ranging from 0 to 6) and Bingo (ranging from 1 to 5), while accuracy is reported for VStar and MMEval-Pro. Best results are highlighted in Bold*
-
-![[assets/figures/papers/paper_list_l940_https_arxiv_org_abs_2603_13366/figures/010_Figure_9.jpg]]
-*Figure 9: Comparisons of accuracy and reasoning length across multiple hallucination mitigation methods. The x-axis represents the average reasoning length computed on the MathVision dataset with R1-Onevision-7B*
-
-![[assets/figures/papers/paper_list_l940_https_arxiv_org_abs_2603_13366/figures/013_Figure_10.jpg]]
-*Figure 10: Pass@k accuracy evaluation of R1-Onevision-7B on sampled data of RealworldQA and MathVista, illustrating results for k ∈ [4, 32]*
-
-
 
 ## 定位与知识库关联
 
@@ -357,8 +323,6 @@ LEAD 的适用边界受以下因素制约：
 3. **自适应超参数**：能否通过学习或自适应机制（如基于任务难度动态调整熵阈值）减少对手动调参的依赖，是提升实用性的关键方向。
 
 4. **外部知识融合**：高熵阶段的潜在推理保留了多条语义路径，这为外部知识检索提供了自然的融合接口——能否在潜在空间中注入检索到的知识嵌入，进一步提升事实可靠性？
-
-
 
 ## 原文 PDF
 

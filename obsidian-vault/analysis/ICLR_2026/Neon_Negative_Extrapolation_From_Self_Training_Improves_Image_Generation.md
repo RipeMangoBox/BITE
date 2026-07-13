@@ -258,16 +258,8 @@ Neon 在扩散模型、流匹配模型、自回归模型和少步生成模型上
 
 4. **模态限制。** 所有实验均在图像生成任务上完成，Neon 在文本、音频等其他模态的有效性尚未验证，需进一步研究。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_kpLRYtPGt3/figures/011_Table.jpg]]
-*Table: (a) Results on CIFAR-10. (b) Results on FFHQ-64×64. (c) Results on ImageNet-256×256. (d) Results on ImageNet-512×512*
-
 ![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_kpLRYtPGt3/figures/016_Figure.jpg]]
 *Figure: D.1: Neon’s precision-recall trade-off across diffusion and flow matching architectures. FID, precision, and recall as functions of merge weight w for EDM-VP on FFHQ-64 with | \mathcal { S } | = 1 8 \mathrm { k } (top row) and Flow Matching on CIFAR-10 with | \bar { \cal S } | = 2 5 \mathrm { k } (bottom row), shown across different fine-tuning budgets B. Both architectures exhibit the characteristic pattern: FID reaches a minimum at intermediate w values, precision monotonically decreases, and recall follows an inverted-U curve peaking near the FID optimum*
-
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_kpLRYtPGt3/figures/014_Figure.jpg]]
-*Figure: B.2: FID vs. Merge Weight (w) validation. For the mode-seeking sampler ( \zeta = 1 . 1 ) , the optimal FID is at w > 0 (Neon helps). For the diversity-seeking sampler ( \zeta = 0 . 9 ) , the optimum is at w < 0 (self-training helps)*
 
 ## 定位与知识库关联
 

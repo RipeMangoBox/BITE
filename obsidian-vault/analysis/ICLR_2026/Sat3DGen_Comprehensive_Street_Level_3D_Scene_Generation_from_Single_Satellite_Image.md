@@ -52,8 +52,6 @@ Sat3DGen 提出了一种前馈式图像到三维场景生成框架，旨在从�
 
 从方法谱系来看，Sat3DGen 定位于前馈图像到三维生成与几何正则化的交叉点。相较于仅输出建筑外壳的几何着色方法（如 **Sat2Scene**、**Sat2City**），该方法保留了完整的语义内容；相较于缺乏几何约束的通用图像到三维框架，其通过任务特化的先验注入实现了更高的结构规整性。这一设计思路为跨视角三维场景生成中的几何精度问题提供了一种不依赖额外图像质量模块的解决方案。
 
-
-
 ### 卫星到街景3D场景生成的挑战
 
 从单张卫星图像生成逼真的街道级3D场景，是连接宏观遥感与微观街景感知的关键桥梁。这一能力在自动驾驶仿真、城市规划、虚拟现实等领域具有重要应用价值。然而，该任务面临一个核心瓶颈：**极端的卫星-街道视角差距**。卫星图像通常以近似正交投影捕获大范围区域，而街景图像则是从地面高度以透视投影观察局部场景，两者在尺度、视角和语义粒度上存在巨大差异。
@@ -85,8 +83,6 @@ Sat3DGen 提出了一种前馈式图像到三维场景生成框架，旨在从�
 4. **透视训练增强**：从全景图投影透视视图作为额外监督，增加有效视角覆盖，提升模型对透视变形的鲁棒性。
 
 实验表明，这些几何启发的设计使Sat3DGen在VIGOR-OOD跨域测试集上，将几何RMSE从6.76m降至5.20m（提升23%），街景FID从约40降至19，在几何精度和真实感上均显著超越现有最强基线。
-
-
 
 ## 核心方法与创新机理
 
@@ -133,8 +129,6 @@ $$\mathbf{F}_{\mathrm{token-pad}} = \mathbf{PAD}_N(\mathbf{F}_{\mathrm{token}}) 
 四个变更槽位并非孤立作用，而是形成互补的几何约束体系：重力损失提供物理先验（垂直方向），深度损失提供单目几何线索（深度方向），空间令牌扩展几何容量（水平方向），透视训练增加视角多样性（观测方向）。消融实验（Table 2）的递进式设计清晰展示了这一协同效应——从移除了所有四个组件的“Canonical image-to-3D”基线开始，逐步添加各组件，性能单调提升，最终在完整模型上达到 FID 19.2、RMSE 5.20m 的最优结果。
 
 值得注意的是，Sat3DGen 的创新集中于几何正则化层面，**未引入额外的图像质量增强模块**（如超分辨率或去噪网络），所有视觉质量提升均源自更精确的底层 3D 几何表示。这一设计哲学验证了核心洞察：在卫星到街道3D场景生成中，几何精度是真实感的上限瓶颈。
-
-
 
 Sat3DGen 是一个**前馈式图像到三维（feed-forward image-to-3D）框架**，以三平面神经辐射场（tri-plane NeRF）为骨干，从单张卫星图像直接推理出可渲染的街道级三维场景表示。框架的设计核心在于**用显式几何先验弥补卫星-街道极端视角差距造成的约束不足**，而非依赖额外的图像质量提升模块。
 
@@ -197,8 +191,6 @@ $$\mathcal{L}_{\mathrm{total}} = \lambda_{\mathrm{rgb}}\mathcal{L}_{\mathrm{RGB}
 
 其中 $\mathcal{L}_{\mathrm{grav}}$（重力密度变化损失）和 $\mathcal{L}_{\mathrm{depth}}$（卫星视图深度正则化）是核心的几何先验注入项，分别抑制漂浮伪影和提供单目深度约束。透视训练策略则通过增加从全景投影的透视视图监督，进一步扩展有效视角覆盖。消融表明，移除重力损失导致 FID 恶化最严重（从 21.6 升至 25.9），而移除深度损失或空间令牌则主要损害几何精度（Table 2），验证了各模块在真实感与几何精度上的分工互补关系。
 
-
-
 Sat3DGen 的前馈图像到3D框架由三个核心阶段构成：**卫星令牌化与空间扩展**、**三平面特征场解码**、以及**几何正则化损失函数**。以下逐一展开关键模块及其公式。
 
 ### 3.1 卫星令牌化与空间令牌填充
@@ -257,8 +249,6 @@ $$\mathcal{L}_{\mathrm{total}} = \lambda_{\mathrm{rgb}}\mathcal{L}_{\mathrm{RGB}
 
 其中 $\mathcal{L}_{\mathrm{RGB}}$ 为渲染图像与真实全景/透视视图的像素级损失，天空相关损失项约束天空区域的透明度和颜色一致性。完整模型在此基础上加入透视视图训练，使 FID 进一步降至 19.2，RMSE 降至 5.20，实现了最佳综合性能。
 
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -302,15 +292,6 @@ Figure 7 将完整模型与移除所有几何组件的“Canonical image-to-3D�
 
 Sat3DGen 展现出良好的泛化性。Figure 10 展示了滑动窗口推理模式，可处理大规模卫星图像并生成连续网格。Figure 11 演示了从语义地图到 3D 的流水线：先通过图像转换模型将语义地图转为卫星地图，再输入 Sat3DGen 生成 3D 资产，扩展了应用场景。值得注意的是，模型在训练时未使用任何度量深度数据，但仍能从单张卫星图像预测出合理的 DSM（Figure 9），证明几何先验的注入使模型习得了隐式的单目深度推理能力。
 
-![[assets/figures/papers/paper_list_l60_https_openreview_net_forum_id_E7JzkZCofa/figures/013_Figure_9.jpg]]
-*Figure 9: Visual results of our model generated DSM (metric depth) from the monocular satellite image, which is rendered from the satellite view, with no metric depth data for training*
-
-![[assets/figures/papers/paper_list_l60_https_openreview_net_forum_id_E7JzkZCofa/figures/014_Figure_10.jpg]]
-*Figure 10: Given a large satellite image, our model can generate mesh with sliding window inference mode*
-
-![[assets/figures/papers/paper_list_l60_https_openreview_net_forum_id_E7JzkZCofa/figures/015_Figure_11.jpg]]
-*Figure 11: Given a colored semantic map, our model can generate 3D mesh through a pipeline that first converts the semantic map to a satellite map and then transforms the satellite map into 3D assets*
-
 ### 失败模式与局限性
 
 尽管整体性能显著提升，Sat3DGen 仍存在以下失效场景：
@@ -323,19 +304,6 @@ Sat3DGen 展现出良好的泛化性。Figure 10 展示了滑动窗口推理模�
 ### 公平性说明
 
 所有方法均在相同的 VIGOR-OOD 测试集上评估，测试城市 Seattle 与训练城市完全不重叠，保证了跨域外推的公平性。对于 2D 生成方法（ControlNet 等），直接采用其论文报告的最佳结果，避免重新训练引入的不公平偏差。对比时使用统一的全局光照特征输入，排除了光照变化对生成质量评估的干扰。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l60_https_openreview_net_forum_id_E7JzkZCofa/figures/008_Figure_5.jpg]]
-*Figure 5: Qualitative ablation on key modules*
-
-![[assets/figures/papers/paper_list_l60_https_openreview_net_forum_id_E7JzkZCofa/figures/012_Figure_8.jpg]]
-*Figure 8: Comparison of predicted satellite-view height map*
-
-![[assets/figures/papers/paper_list_l60_https_openreview_net_forum_id_E7JzkZCofa/figures/002_Figure.jpg]]
-*Figure: Large Area Mesh Gen. High-quality Renderable3D generation from satellite image support multiple applications…*
-
-
 
 ## 定位与知识库关联
 
@@ -382,8 +350,6 @@ Sat3DGen的性能提升可归因于四个关键设计槽位的改变，每个组
 ### 知识库定位
 
 Sat3DGen在知识库中的定位可概括为：**首个将几何启发的正则化系统性地集成到前馈图像到3D框架中，以解决卫星到街道跨视角3D生成问题的工作**。其核心洞察——通过重力约束、单目深度先验和空间填充来弥补几何约束缺失——为跨视角3D生成提供了可复用的设计范式。该方法不依赖额外的图像质量模块或后处理步骤，在保持端到端可训练性的同时大幅提升了几何精度和真实感，为后续研究在遥感3D重建、城市数字孪生等方向提供了新的基线。
-
-
 
 ## 原文 PDF
 

@@ -142,8 +142,6 @@ RigMo-VAE 的设计遵循“结构-运动解耦”原则，通过双路径编码
 
 完整 RigMo 管线的工作流程可概括为：给定一段网格序列（甚至可以是稀疏观测的部分帧），RigMo 首先通过双路径编码器推断出高斯骨骼和蒙皮权重（刚性结构），同时将运动信息压缩为潜变量；随后，Motion DiT 以刚性条件为引导，在潜空间中生成完整的运动轨迹；最后，高斯蒙皮模块将骨骼变换解码为高保真的动画网格序列（Figure 4）。这种“结构推断—运动生成—蒙皮解码”的级联设计，使得 RigMo 能够在没有任何人工标注的条件下，从原始顶点数据中发现可泛化的关节结构并合成自然运动。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l26_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_RigMo_Unifying_R/figures/001_Figure_1.jpg]]
 *Figure 1: RigMo jointly learns rigging and motion by understanding the underlying structure of mesh sequences. Unlike optimizationbased methods that fit a rig per sequence, RigMo is a feed-forward framework that infers Gaussian bones, skinning weights, and motion parameters directly from input meshes for unified 4D animation generation. Colors visualize the influence of Gaussian bones on vertices (skinning weights) across the mesh surface; similar colors may appear for different bones as they are randomly assigned for visualization*
 
@@ -246,8 +244,6 @@ $$\mathcal{L}_{\mathrm{KL}} = \frac{1}{2} \sum_{i} (\mu_i^2 + \sigma_i^2 - \log 
 $$\mathcal{L} = \lambda_{\mathrm{lat}} \mathcal{L}_{\mathrm{lat}} + \lambda_{\mathrm{rot}} \mathcal{L}_{\mathrm{rot}} + \lambda_{\mathrm{trans}} \mathcal{L}_{\mathrm{trans}} + \lambda_{\mathrm{vert}} \mathcal{L}_{\mathrm{vert}}$$
 
 四项分别对应潜空间、旋转、平移和顶点层级的监督，权重依次为 0.5、1.0、0.2、0.1。该设计使生成过程既能保持运动潜空间的语义一致性，又能精确还原骨骼变换与网格形变。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l26_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_RigMo_Unifying_R/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the RigMo-VAE framework. Given temporal vertex trajectories from deforming mesh sequences, RigMo employs a dual-path encoder to disentangle static geometry (rigging branch) and dynamic motion (motion branch), learning a compact latent representation that captures both spatial structure and temporal dynamics. The decoder maps these latent features to physically interpretable rig components: Gaussian bone descriptors defining geodesic-aware skinning weights and variational motion parameters for local and root transformations. Different colors indicate the influence regions of learned Gaussian bones, demonstrating semantically meaningful decomposition of mesh deformation without ma...*

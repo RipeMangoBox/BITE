@@ -66,8 +66,6 @@ VoxFormer 提出**“先重建，后幻觉”（reconstruction-before-hallucinat
 
 值得注意的是，VoxFormer 轻量版本（约60M参数）参数量远少于 MonoScene（约150M），训练显存低于 16GB，在高效性与准确性上实现了双重突破。
 
-
-
 三维语义场景补全（Semantic Scene Completion, SSC）旨在从有限的传感器观测中联合推理出完整的三维几何布局与逐体素语义标签。这项任务对自动驾驶至关重要，因为安全规划需要理解被遮挡区域的空间结构与语义类别——例如，停靠在卡车后方的行人虽然不可见，但其潜在位置必须被系统感知。
 
 早期的SSC方法依赖激光雷达（LiDAR）提供的精确深度测量。**SSCNet**（Song et al., CVPR 2017）开创性地将场景补全与语义标注统一在端到端框架中，但其性能高度依赖稠密的三维输入。后续工作如**LMSCNet**进一步推动了LiDAR-based SSC的发展，然而激光雷达的高成本和有限的分辨率限制了其大规模部署。
@@ -87,8 +85,6 @@ MonoScene的密集投影策略将二维图像特征沿相机射线均匀地反�
 本文的核心洞察在于逆转传统流程：**不应先将所有二维特征盲目投影到三维空间再尝试去噪，而应首先确定哪些体素是真实可见且被占据的，再仅对这些体素进行特征查询**。这一“先重建，后补全”（reconstruction-before-hallucination）的范式利用了三维空间固有的稀疏性——在自动驾驶场景中，绝大多数体素实际上是空的。通过显式建模这种稀疏性，模型可以避免对空白区域进行无意义的特征计算，从而将注意力集中在真正需要补全的未知区域。
 
 此外，二维图像特征天然对应于可见且占据的表面，而非空白或被遮挡的空间。因此，一种合理的查询机制应当从三维空间出发，主动向二维图像请求特征，而非被动接受密集投影。这促使本文设计一种稀疏的、由三维体素驱动的交叉注意力机制，从根本上消除密集投影带来的特征歧义。
-
-
 
 ## 核心方法与创新机理
 
@@ -129,8 +125,6 @@ $$\text{DSA}(\mathbf{F}^{3D}, \mathbf{F}^{3D}) = \text{DA}(\mathbf{f}, \mathbf{p
 | 核心原则 | 投影后清洗 | 先重建可见，再补全遮挡 |
 
 这一“reconstruction-before-hallucination”的设计哲学，配合三维空间的稀疏性利用，使VoxFormer在几何补全（IoU相对提升20.0%）和语义分割（mIoU相对提升18.1%）上均大幅超越MonoScene，同时训练显存降低一个数量级。
-
-
 
 VoxFormer 采用**两阶段稀疏到密集**的架构范式，核心设计理念是“先重建可见区域，再向被遮挡区域传播信息”（reconstruction-before-hallucination）。整体流程从多帧RGB图像出发，最终输出完整的语义体素网格。
 
@@ -187,13 +181,6 @@ $$\mathcal{L} = -\sum_{k=1}^{K}\sum_{c=c_0}^{c_M} w_c \hat{y}_{k,c} \log\left(\f
 ### 设计优势
 
 相比MonoScene的密集2D→3D特征投影方案，VoxFormer的稀疏查询机制带来两个关键优势：其一，仅在占据体素上进行交叉注意力，大幅降低了计算量和GPU显存（训练显存低于16GB）；其二，避免了空白体素被赋予可见区域特征的歧义，使模型能够更清晰地分辨“已知可见”与“需要补全”的区域，为后续的MAE-like密集化提供了更干净的起点。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2302_12251/figures/001_Figure_1.jpg]]
-*Figure 1: (a) A diagram of VoxFormer for camera-based semantic scene completion that predicts complete 3D geometry and semantics given only 2D images. After obtaining voxel query proposals based on depth, VoxFormer generates semantic voxels via an MAE-like architecture [3]. (b) A comparison against the state-of-the-art MonoScene [4] in different ranges on SemanticKITTI [5]. VoxFormer performs much better in safetycritical short-range areas, while MonoScene performs indifferently at three distances. The relative gains are marked by red*
-
-
 
 VoxFormer 采用两阶段设计，核心思想是“先重建可见区域，再向被遮挡区域传播信息”。以下按流水线顺序拆解关键模块及其数学表达。
 
@@ -273,8 +260,6 @@ $$
 
 上述模块形成清晰的因果链路：**深度估计 → 占位图校正 → 稀疏查询提案 → 多视图交叉注意力 → 掩码令牌自注意力补全**。关键设计在于将特征交互方向从传统密集 2D→3D 投影反转为稀疏 3D→2D 交叉注意力，仅对深度确认的占据体素查询图像特征，从机制层面消除了空白体素的特征歧义。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -352,13 +337,6 @@ VoxFormer在所有距离范围上均显著超越此前最强的camera-based方�
 
 所有camera-based方法均在相同的SemanticKITTI数据划分和评估协议下比较。VoxFormer-S参数量（~60M）远小于MonoScene（~150M），训练显存低于16GB，但性能大幅领先，排除了“堆参数取胜”的嫌疑。消融实验均在统一训练配置下进行，确保了内部对比的公平性。隐藏测试集的结果进一步排除了验证集过拟合的可能。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2302_12251/figures/009_Table.jpg]]
-*Table: I. Quantitative results of VoxFormer and the state-of-the-art MonoScene on the hidden test set of SemanticKITTI*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 与基线方法的关系
@@ -405,8 +383,6 @@ VoxFormer在所有距离范围上均显著超越此前最强的camera-based方�
 VoxFormer 处于 **相机三维场景理解** 与 **稀疏Transformer架构** 的交叉点。其“先重建后幻构”（reconstruction-before-hallucination）的设计哲学与 MAE（He et al., CVPR 2022）的自监督预训练范式一脉相承，但将其从2D图像域迁移至3D体素域，并创新性地引入深度引导的稀疏查询作为可见区域先验。该方法为后续工作提供了两个可复用的技术组件：**类未知体素查询提案** 和 **稀疏到密集的MAE式3D解码器**，这两者均可独立嵌入其他3D感知任务（如3D目标检测、占用网络预测）。
 
 与同期工作的关系上，VoxFormer 代表了从“密集投影”到“稀疏查询”的范式转折，后续基于Transformer的3D占用预测方法（如OccFormer、TPVFormer等）在不同程度上延续了稀疏查询与可变形注意力的设计思路，但需手动验证其具体引用关系。
-
-
 
 ## 原文 PDF
 

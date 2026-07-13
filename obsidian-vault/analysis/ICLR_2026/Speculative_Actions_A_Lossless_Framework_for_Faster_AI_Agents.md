@@ -58,8 +58,6 @@ AI代理在交互式环境中执行任务时，每个动作都需要等待慢速
 
 该方法在方法谱系上定位于**推测执行与代理系统的交叉点**：它借鉴了推测解码（Speculative Decoding）中“先预测后验证”的思想，但将其从token级推理推广到完整的API调用与环境交互层面，涵盖了LLM调用、工具API、MCP服务器交互乃至人工响应的全链路加速。
 
-
-
 AI代理（AI agents）在交互式环境中执行任务时，普遍面临一个核心瓶颈：每个动作都必须等待前一个缓慢的API调用（如大语言模型推理、工具调用、外部服务请求甚至人工响应）完成，才能发起下一个调用。这种严格的顺序执行模式导致大量时间浪费在等待上，成为端到端延迟的主要来源。Table 1展示了当前最先进AI代理在不同任务和环境中的典型耗时，直观地揭示了这一延迟瓶颈的普遍性。
 
 现有加速AI推理的努力主要集中在单模型推理层面，例如推测解码（speculative decoding）利用小型草稿模型预测token序列以实现并行验证。然而，这些方法并未触及代理系统层面更宏观的延迟问题——代理的动作循环中，API调用的等待时间远超过单次推理的延迟。将推测执行的思想从token级别推广到整个代理环境循环，是一个尚未被系统探索的方向。
@@ -67,8 +65,6 @@ AI代理（AI agents）在交互式环境中执行任务时，普遍面临一个
 本文的核心动机在于：代理系统的API调用具有内在的可预测性。实验表明，在象棋、电商客服、多跳问答等多样化场景中，后续API调用的预测命中率可达30%–55%。这意味着，如果能在慢速的权威执行器（Actor）等待响应的同时，利用一个快速、低成本的推测器（Speculator）提前预测未来最可能的k个动作，并并行发起相应的API调用，一旦预测命中即可立即推进，从而将顺序等待转化为并行预取。这一思路旨在实现**无损加速**——在不改变最终行为的前提下，大幅降低端到端延迟。
 
 本文提出的推测动作（Speculative Actions）框架正是基于这一洞察，将推测执行从规划层面推广到整个代理环境，涵盖LLM调用、内部与外部工具API、MCP服务器交互乃至人工响应。框架通过语义守卫、安全包络和修复路径三重机制保证无损性，并重点研究了以宽度推测（k分支并行单步预测）为核心的加速策略。
-
-
 
 ## 核心方法与创新机理
 
@@ -112,8 +108,6 @@ AI代理（AI agents）在交互式环境中执行任务时，普遍面临一个
 ### 创新边界：与推测解码的差异
 
 与LLM推理中的推测解码（Speculative Decoding）不同，本工作将推测执行从token级别的推理加速推广到**整个代理环境的动作层面**，覆盖LLM调用、内部与外部工具API、MCP-server交互甚至人工响应。这一泛化使得推测执行的应用范围从单一模型推理扩展到多组件、多API的复杂代理系统。
-
-
 
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_P0GOk5wslg/figures/002_Figure_1.jpg]]
 *Figure 1: Illustration of our framework in a chess-playing environment. While the Actor issues an LLM call to decide the next move, the Speculator uses a faster model to guess it. These guesses enable parallel API calls for the next steps, and once a guess is verified, the system gains time through parallelization. The process runs in the backend, ensuring a lossless speedup for the user*
@@ -166,8 +160,6 @@ $$\frac{E[T_s]}{E[T_{seq}]} = 1 - \frac{1}{T}\frac{\alpha}{\alpha+\beta}\left[\f
 - **语义检查（Semantic Guards）**：Actor在提交前确认状态转移的等价性。
 - **安全包络（Safety Envelopes）**：仅允许幂等、可逆或沙箱化的推测副作用。
 - **回滚路径（Repair Paths）**：在非匹配情况下安全丢弃推测结果。
-
-
 
 ### 执行流水线模块
 
@@ -224,14 +216,11 @@ $$\frac{\mathbb{E}[T_{\text{seq}} - T_{\text{spec}}]}{\mathbb{E}[T_{\text{seq}}]
 
 其中 $p$ 为每步推测正确的概率，$a$ 为真实 API 延迟，$b$ 为推测延迟。深度推测的关键约束是系统最多可领先 $\lfloor a/b \rfloor$ 步，确保活跃分支数有界且不随 horizon $T$ 增长。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与实验设计逻辑
 
 当前AI代理在交互式环境中的核心瓶颈在于严格的顺序执行模型：每个动作都必须等待缓慢的API调用（如LLM推理、工具调用）返回后才能发起下一个调用，导致大量闲置等待时间（Table 1展示了SOTA代理在不同任务中的耗时估计）。Speculative Actions框架通过引入快速推测器（Speculator）与慢速执行器（Actor）并行工作，将顺序等待转化为并行预取，在不改变最终行为（无损）的前提下降低端到端延迟。实验设计围绕三个维度展开：预测准确率、端到端时间节省、以及成本-延迟权衡。
-
 
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_P0GOk5wslg/figures/001_Table_1.jpg]]
 *Table 1: Estimated time state-of-the-art AI agents spend on various tasks/environments*
@@ -271,7 +260,6 @@ $$\frac{\mathbb{E}[T_{\text{seq}} - T_{\text{spec}}]}{\mathbb{E}[T_{\text{seq}}]
 
 **Table 2**和**Figure 9**的成本分析揭示了推测执行的经济性：联合系统在约13秒时收敛，总成本仅**0.17美分**；而Actor-only在约200秒收敛时累计成本达**2.18美分**。虽然推测执行瞬时成本更高，但快速收敛避免了长期资源浪费。
 
-
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_P0GOk5wslg/figures/011_Figure_9.jpg]]
 *Figure 9: Cumulative token usage and cost over time. The left and right plots show the cumulative cost (USD) and total tokens used, respectively, for all three configurations. The vertical lines mark the observed convergence point for each system. The Actor-only model converges at 200s*
 
@@ -279,7 +267,6 @@ $$\frac{\mathbb{E}[T_{\text{seq}} - T_{\text{spec}}]}{\mathbb{E}[T_{\text{seq}}]
 *Table 2: Cumulative tokens and cost (in cents) at selected time marks. While Speculation incurs higher instantaneous costs, its rapid convergence (bolded) prevents long-term resource waste compared to the slower Actor-only baseline. Table 3*
 
 **Figure 7**通过受控扰动实验展示了系统的阶跃响应：在t=0手动注入劣化设置后，Actor-Speculator系统在**一秒内**完成修正，而Actor-only需等待超过10秒的下一个决策周期。
-
 
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_P0GOk5wslg/figures/009_Figure_7.jpg]]
 *Figure 7: A controlled experiment showing the system’s step response after a manual perturbation at t = 0. The Actor-Speculator system corrects the poor setting within a second, while the Actoronly system must wait over 10 seconds for its next decision cycle. The quantitative results of this experiment are summarized in Figure 5 (Right) in the main text*
@@ -299,13 +286,6 @@ $$\frac{\mathbb{E}[T_{\text{seq}} - T_{\text{spec}}]}{\mathbb{E}[T_{\text{seq}}]
 3. **API延迟的随机性**：实时API负载波动导致延迟测量存在难以复现的方差，作者明确说明了这种随机性。
 4. **收敛后的冗余开销**：在OS有损扩展中，系统收敛后可能仍存在不必要的推测开销，尚未完全优化。
 5. **理论假设的局限**：成本-延迟理论分析基于指数延迟假设（Proposition 1），实际环境可能不符合该假设，理论加速比极限不超过50%。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_P0GOk5wslg/figures/010_Figure_8.jpg]]
-*Figure 8: Prediction Accuracy against Speculator’s Cost across different models. (a) Accuracy–Speculator time cost trade-off across models. The dashed line shows average user typing time. (d) Accuracy–Speculator price trade-off across models, reflecting the monetary cost of speculative execution*
-
-
 
 ## 定位与知识库关联
 
@@ -356,8 +336,6 @@ Speculative Actions 的有效性依赖于以下核心假设，这些假设同时
 **大规模并发下的成本效益**：在多租户、高并发的生产环境中，k路并行推测的API调用量呈倍数增长。API提供方的速率限制和计费模式可能使得推测执行的经济性发生质变。需要建立更贴近生产环境的成本模型。
 
 **多代理协同推测**：当前框架假设单个Actor-Speculator对。在多代理系统中，代理之间的交互可能提供额外的可预测性信号，是否可以利用跨代理的上下文信息提升推测准确率？
-
-
 
 ## 原文 PDF
 

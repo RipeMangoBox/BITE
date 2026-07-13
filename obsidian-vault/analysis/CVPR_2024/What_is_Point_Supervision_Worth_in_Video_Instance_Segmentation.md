@@ -127,8 +127,6 @@ PointVIS 的整体流程由三个核心模块串联构成：**类无关时空提
 - **负点的核心地位**：消融实验表明，交叉实例负样本成本 $\mathcal{L}_{\mathrm{cineg}}$ 和掩码度成本 $\mathcal{L}_{\mathrm{maskness}}$ 共同带来 5.7 mAP 的提升（Table 2），且增加负点比增加正点对性能的贡献更为显著（Table 4）。
 - **标注效率的极致压缩**：整个流程仅需每对象一个正点即可恢复全监督 87.5% 的性能（Table 1, P1），加入一个负点后进一步提升至 96.7%。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2404_01990v1/figures/001_Figure_1.jpg]]
 *Figure 1: Point-supervised video instance segmentation in this work (YoutubeVIS-2021). Top: point-level annotations in the training set (pseudo masks generated from our method overlaid); Bottom: mask predictions in the validation set*
 
@@ -194,8 +192,6 @@ Table 6展示了在视频帧二次采样场景下的性能。即使仅使用部�
 Figure 4展示了OVIS数据集上的典型失败案例。伪掩码存在两类主要问题：一是时序不一致性（如左上角老虎的掩码在帧间抖动），二是实例遗漏（如白色衣服的行人被完全忽略）。这些问题在严重遮挡、小目标密集和长序列场景下尤为突出，与OVIS上72.6%的保留率下降相互印证。根本原因在于：COCO预训练的形状先验难以覆盖严重遮挡场景的视觉模式，且匈牙利匹配在实例高度重叠时容易产生歧义分配。此外，Figure 3的伪掩码可视化显示，在YouTube-VIS数据集上伪掩码质量较高，但在OVIS上边界精度明显下降，进一步支持了上述分析。
 
 **需要手动验证**：Table 5中VIS-Unsup的具体数值和引用信息在给定材料中未明确提供，建议查阅原文确认。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2404_01990v1/figures/004_Table_1.jpg]]
 *Table 1: Full mask (M) vs. our point supervision (P) on validation set of YouTube-VIS 2019 [58], YouTube-VIS 2021 [58], and OVIS [46]. All results below are based on Swin-L backbone. Our PointVIS results are with self-training*

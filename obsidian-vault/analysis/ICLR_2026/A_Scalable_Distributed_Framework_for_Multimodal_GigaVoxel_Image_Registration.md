@@ -51,8 +51,6 @@ FFDP的核心洞察在于：图像配准中的主要瓶颈是非GEMM操作（网
 
 主要实验结果表明：在单GPU上，FFDP可处理比现有SOTA大64倍的问题；在8块A6000 GPU上，约1分钟内完成100µm ex-vivo人脑MRI与250µm in-vivo MRI的多模态配准（11.8B参数，比标准临床数据大570倍以上）。在250µm分辨率下，Dice提升18.1点，InvDice提升31.6点，AvgHD90降低62.1%。加速方面，FFDP加速传统配准管线最高7.48倍（内存降低最高59%），加速深度学习管线最高6.14倍（内存降低最高24%）。消融实验显示，融合LNCC内核比基线快6.1倍，内存降低16.5%；融合MI内核内存降低24.7%；隐式网格采样器内存降低50%。分布式框架的峰值内存消耗与GPU数量无关，且扩展效率仅受轻微影响。
 
-
-
 图像配准的目标是寻找一个坐标变换，将移动图像（M）变形以匹配固定图像（F），其核心形式化为最小化代价函数 C（衡量图像间差异）与正则项 R 之和：$\varphi ^ { * } = \underset { \varphi \in G } { \arg \operatorname* { m i n } } L ( \varphi ) \doteq C ( F , M \circ \varphi ) + R ( \varphi )$。尽管该问题在临床尺度（约20M参数）上已有成熟方案，但向超高分辨率（如100µm人脑MRI，参数规模可达11.8B）扩展时，现有方法遭遇了根本性的内存瓶颈。
 
 **现有方法的缺口**集中在两个层面。首先，**标准算法无法扩展到千兆体素规模**：传统优化方法（如SyN）和深度学习配准网络（如VoxelMorph、TransMorph）在单GPU上仅能处理约50M参数的问题，而实际需求高出两个数量级。以250µm分辨率的图像对为例，现有深度学习管线在首层即需27GB激活内存，迫使采用分块（patch-based）策略，牺牲了全局一致性。其次，**现有分布式框架内存效率不足**：虽然CLAIRE等分布式方法试图通过分片解决规模问题，但其内存开销仍比本文提出的FFDP高约5倍，且扩展性受限于全收集（allgather）操作带来的通信与存储开销。
@@ -62,8 +60,6 @@ FFDP的核心洞察在于：图像配准中的主要瓶颈是非GEMM操作（网
 基于此，FFDP提出了一套**IO感知的融合内核**策略：通过将中间变量的计算保持在寄存器或共享内存中，避免HBM物化。具体而言，复合隐式网格采样器在单个内核中完成仿射变换与变形场的复合采样（$\mathtt{fused\_grid\_sampler}(I; A, t, [\mathbf{u}], S, x_{\mathrm{bounds}})(x) = I(Ax + t + Su(x))$），将内存从O(n)降至O(1)；隐式Parzen窗利用共享内存累加直方图和偏导数，避免物化大张量；融合LNCC前向传播仅需5倍内存存储中间变量，反向传播通过原地修改计算。同时，**GridParallel分片抽象**与**环采样器**实现了分布式配准，将双线性/三线性插值分解为部分和并通过环拓扑通信累加，避免了全收集操作，使峰值内存与GPU数量无关。
 
 该工作的核心洞察是：通过消除非GEMM操作中的中间HBM存储，可以在不损失精度或运行时间的前提下，将单GPU可处理的问题规模提升64倍，并支持任意规模的分布式配准。实验证据表明，FFDP在单GPU上可处理比现有SOTA大64倍的问题；在8块A6000 GPU上，约58秒内完成了100µm ex-vivo人脑MRI与250µm in-vivo MRI的多模态配准（11.8B参数，比标准临床数据大570倍以上）；在250µm分辨率下，Dice提升18.1点，InvDice提升31.6点，AvgHD90降低62.1%。这些结果验证了融合内核与分布式框架在解决大规模配准内存瓶颈上的有效性。
-
-
 
 ## 核心方法与创新机理
 
@@ -81,8 +77,6 @@ FFDP (Flash Fused Distributed Primitives) 的核心创新在于识别并解决�
 
 需要注意的是，FFDP 主要针对优化方法（training-free）进行优化，深度学习方法的激活内存瓶颈虽被提及但未提出针对性融合方案。分布式框架的环采样器在大变形情况下的通信开销和收敛质量影响尚未详细分析，且实验仅在 MRI 模态上进行。
 
-
-
 ![[assets/figures/papers/iclr26_0003_8dLexnao2h_A_Scalable_Distributed_Framework_for_Multimodal/figures/003_Figure_3.jpg]]
 *Figure 3: Left: Overview of our distributed framework. GridParallel (GP) shards the fixed and moving images (F, M) and the warp field [u] across multiple GPUs. Yellow blocks and arrows denote synchronized halo boundaries between ${ \mathrm { G P U s } }$ , enabling smoothing on images and warp fields without an allgather. The ring sampler (violet) computes interpolated image shards on the fly, avoiding materialization of the full moving image. We then compute losses (MSE, LNCC, MI), compute gradients w.r.t. each warp shard, apply Sobolev regularization with GP, and update shards by gradient descent. Right: Scaling efficiency compared to deep methods and CLAIRE (Mang et al., 2019), a distributed registr...*
 
@@ -93,8 +87,6 @@ FFDP 的架构围绕“消除中间物化”和“分布式分片”两条主线
 **分布式分片层**：FFDP 提出 **GridParallel (GP)** 抽象，将固定图像 F、移动图像 M 和变形场 `[u]` 沿空间维度分片到多个 GPU 上。GP 维护分片间的 halo 边界同步，使得平滑操作（如 Sobolev 正则化）可以在不进行全收集（allgather）的情况下正确执行。分布式插值面临的核心挑战是：变形场中相邻坐标可能指向任意图像分片上的像素位置。FFDP 的**环采样器**利用双线性/三线性插值可分解为部分和的性质，在环拓扑上交错执行图像分片获取和部分和累加，最终峰值内存消耗与 GPU 数量 H 无关，避免了全收集操作带来的内存爆炸。各 GPU 独立计算损失函数（MSE、LNCC、MI）对各自变形场分片的梯度，经 GP 同步后应用 Sobolev 正则化，最后以梯度下降更新变形场分片。
 
 **整体数据流**：输入为固定图像 F、移动图像 M 和初始变换（通常为恒等变换），输出为最优变形场 φ*。在单 GPU 场景中，融合内核直接替换管线中的对应操作；在多 GPU 场景中，GP 负责数据分片和边界同步，环采样器负责分布式插值，各分片上的损失计算和梯度更新独立进行，仅在正则化和 halo 同步时通信。这一设计使得 FFDP 在单 GPU 上可处理比现有 SOTA 大 64 倍的问题，在 8 块 A6000 GPU 上约 1 分钟完成 100µm ex-vivo 人脑 MRI 与 250µm in-vivo MRI 的多模态配准（11.8B 参数，比标准临床数据大 570 倍以上）。
-
-
 
 ### 配准目标函数与核心公式
 
@@ -173,8 +165,6 @@ $$
 
 四个核心模块构成FFDP的完整管线：复合隐式网格采样器负责高效变形；隐式Parzen窗MI和融合LNCC作为可互换的代价函数 $C(F, M \circ \varphi)$；环采样器使分布式计算成为可能；GridParallel分片抽象（含边界halo同步）支持正则化 $R(\varphi)$ 的分布式应用。这些模块通过消除HBM中间变量物化，将内存开销从 $O(n)$ 降至 $O(1)$，从而支持11.8B参数的千兆体素配准。
 
-
-
 ## 实验与关键发现
 
 ### 主结果：跨分辨率配准性能
@@ -203,8 +193,6 @@ FFDP在Faux-OASIS数据集上进行了从1mm到250µm原生分辨率的多分辨
 
 **扩展效率**：FFDP在弱扩展测试中内存消耗远低于CLAIRE（约5倍），且扩展效率仅受最小影响。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0003_8dLexnao2h_A_Scalable_Distributed_Framework_for_Multimodal/figures/005_Table_1.jpg]]
 *Table 1: (a) Performance comparison across methods and resolutions*
 
@@ -212,8 +200,6 @@ FFDP在Faux-OASIS数据集上进行了从1mm到250µm原生分辨率的多分辨
 
 ![[assets/figures/papers/iclr26_0003_8dLexnao2h_A_Scalable_Distributed_Framework_for_Multimodal/figures/007_Figure_5.jpg]]
 *Figure 5: Registration performance on Faux-OASIS dataset at 1 mm, 500 µm, and 2 5 0 $\mathrm { { \mu m } }$ (native 250 µm); mean ± std over pairs. ↑ higher is better; ↓ lower is better. HD90 values are reported using our cumulative definition (see Sec. K.2). (Green)/ (Yellow) = best/second; †= patch-based
-
-
 
 ## 定位与知识库关联
 
@@ -234,8 +220,6 @@ FFDP 的定位是**面向极高分辨率（千兆体素级）多模态图像配�
 3. FFDP 能否扩展到非微分同胚变换或更复杂的正则化器？
 4. 框架在其他模态（如 CT、PET、组织学）上的表现如何？
 5. 能否将 FFDP 与模型并行技术（如张量并行）结合，进一步加速深度学习配准？
-
-
 
 ## 原文 PDF
 

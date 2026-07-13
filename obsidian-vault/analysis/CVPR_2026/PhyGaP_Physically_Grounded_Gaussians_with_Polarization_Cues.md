@@ -54,8 +54,6 @@ PhyGaP 的核心洞察是：**偏振反射中镜面与漫反射具有固有的�
 
 **局限性方面**，GridMap 依赖包围盒放置锚定相机，在极端自遮挡或极薄/深凹物体上可能失效（Fig. 15）；当前 pBRDF 模型未支持金属表面；GridMap 仅模拟单次弹射的间接光照，无法处理多次互反射。此外，设备要求较高，理想情况需偏振相机或两台配有线性偏振片的RGB相机，标定与拍摄流程相对复杂。
 
-
-
 真实世界物体的外观由复杂的物理过程共同决定：表面几何、材质属性（反照率、粗糙度、折射率）以及环境光照三者耦合，共同产生我们最终观察到的颜色。从一组二维图像中逆向解耦这些因素——即逆向渲染——是计算机视觉与图形学中长期存在的核心挑战。成功解耦不仅能实现任意光照下的真实感重光照，还可支持材质编辑、虚拟物体插入等下游应用。
 
 近年来，以3D高斯泼溅（3DGS）为代表的神经渲染方法在新视角合成上取得了显著进展，部分工作开始尝试在GS框架中引入物理光照模型以实现反射分解与重光照。然而，这些基于普通RGB图像的方法面临一个根本性瓶颈：**RGB三通道仅记录了总辐射强度，缺乏足够的表面形状与材质信息，导致反照率与镜面反射分量难以正确解耦**。具体而言，镜面高光容易被误认为浅色反照率，而漫反射中的阴影细节则可能在分解过程中丢失，最终损害重光照的物理真实感。
@@ -65,8 +63,6 @@ PhyGaP 的核心洞察是：**偏振反射中镜面与漫反射具有固有的�
 另一个关键缺口在于间接光照的建模方式。现有GS逆向渲染方法通常为每个高斯原语学习一组球谐（SH）系数来表示间接光。这种场景特定参数的学习策略存在明显局限：SH系数与训练光照强耦合，难以泛化到新光照条件；更重要的是，它无法正确处理非凸物体的自遮挡阴影，因为单个高斯无法感知来自其他表面区域的遮挡关系。
 
 针对上述问题，本文提出PhyGaP，核心动机在于：**利用偏振线索提供的物理约束，在2DGS框架内实现精确的表面属性估计与反射分解，并通过一种无需学习场景特定参数的间接光照建模方案，将重光照能力扩展到非凸物体**。PhyGaP的偏振化延迟渲染（PolarDR）过程将偏振物理模型（pBRDF）深度嵌入GS渲染管线，使Stokes矢量的计算直接依赖于表面法线、折射率和粗糙度等物理属性，从而在优化过程中形成强约束。同时，GridMap技术通过在物体包围盒上锚定虚拟相机并构建局部立方体贴图，以插值方式计算任意表面点的漫反射辐照度，避免了对场景特定参数的依赖，并自然地捕捉了自遮挡效应。
-
-
 
 ## 核心方法与创新机理
 
@@ -95,8 +91,6 @@ PhyGaP将高斯的可学习属性从“颜色SH + 金属度/粗糙度”替换�
 ### 创新点的因果链条
 
 偏振线索的引入（因果旋钮）→ PolarDR提供镜面/漫反射的偏振差异监督 → 物理属性（$\lambda, \eta, \mathbf{n}, r$）被正确优化 → GridMap处理非凸物体的自遮挡 → 最终实现物理正确的反照率-反射解耦与高保真重光照。消融实验证实了这一链条：移除PolarDR（设 $\lambda_1=0$）后，反照率中残留镜面反射，环境图PSNR大幅下降（Table 2）；移除GridMap后，非凸物体的阴影无法正确处理，反照率出现颜色偏移（Fig. 9）。
-
-
 
 PhyGaP 的整体流程如 **Figure 2** 所示，它建立在 2D 高斯泼溅（2DGS）的几何表示之上，通过两个核心改进——**偏振化延迟渲染（PolarDR）** 和 **GridMap 间接光照建模**——将物理属性与偏振线索深度耦合，实现从多视角偏振图像到可重光照外观的端到端优化。
 
@@ -148,12 +142,8 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{rgb}} + \lambda_1 \mathcal{L}_{\mathrm{pol}
 
 PhyGaP 的设计直接回应了核心瓶颈：**普通 RGB 图像缺乏足够的表面形状与材质信息，导致现有方法难以正确解耦反照率与反射分量**。通过引入偏振成像及其物理模型（pBRDF），PolarDR 为表面法线、折射率、粗糙度等物理属性的优化提供了额外的监督信号。GridMap 则解决了非凸物体的间接光照建模难题，避免了基线方法中 SH 间接光表示的场景过拟合问题。消融实验（**Table 2, Fig. 9**）证实：移除 PolarDR（$\lambda_1=0$）会导致环境图 PSNR 大幅下降，反照率中混入镜面反射；移除 GridMap 则使非凸物体的阴影处理失败，反照率出现颜色偏移。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2134_https_arxiv_org_abs_2603_14001/figures/001_Figure_1.jpg]]
 *Figure 1: We propose PhyGaP, a physically-grounded 3DGS method that (a) takes full or partial polarization information as input, (b) accurately reconstructs the shape and physical attributes of glossy object, (c) achieves decomposed rendering of object appearance (top), diffuse reflection (mid), and specular reflection (bottom), as well as (d) enables robust and realistic relighting with natural reflection. Results in this visualization are from our captured buddha scene*
-
-
 
 PhyGaP 的核心架构建立在 **2DGS 几何表示**之上，并引入两个关键改进：**PolarDR（偏振化延迟渲染）** 与 **GridMap（自遮挡感知环境光照）**。以下逐一阐述各模块的公式、变量含义及设计逻辑。
 
@@ -230,12 +220,8 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{rgb}} + \lambda_1 \mathcal{L}_{\mathrm{pol}
 
 超参数 $\lambda$ 的消融实验（Fig. 14）表明论文汇报值接近最优。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2134_https_arxiv_org_abs_2603_14001/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of GridMap. (a) We sample a set of anchor cameras on the object bounding box. (b) For each anchor camera, we ray trace in all directions to blend object color with the global environment map. (c) The resulting local environment map enables more accurate diffuse irradiance computation*
-
-
 
 ## 实验与关键发现
 
@@ -275,30 +261,8 @@ PhyGaP 在多个基准上实现了对新视角合成、表面法线重建、反�
 
 需注意，NeRF 类基线（PANDORA、NeRSP）在 NVIDIA V100 上训练 15 万/5 万次迭代，而高斯泼溅方法在 RTX 4090D 上训练 3 万次迭代，且训练视点数量不同，可能导致不公平比较。此外，部分基线（如 Ref-Gaussian）不显式建模反照率，其分解结果不具可比性；PhyGaP 通过物理模型直接输出分离后的反照率，在反射分解任务上具有天然优势。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2134_https_arxiv_org_abs_2603_14001/figures/004_Table_1.jpg]]
 *Table 1: Quantitative results of different methods on novel view synthesis (left) and surface normal reconstruction (right). Best results are highlighted as 1st , 2nd , and 3rd . This visualization applies to all following quantitative assessments*
-
-![[assets/figures/papers/paper_list_l2134_https_arxiv_org_abs_2603_14001/figures/009_Figure_7.jpg]]
-*Figure 7: Relighting results from different methods. The environment maps are presented at the top. Note that R3DG suffers severe overexposure in the rightmost Brown Photostudio environment*
-
-![[assets/figures/papers/paper_list_l2134_https_arxiv_org_abs_2603_14001/figures/005_Figure_4.jpg]]
-*Figure 4: Visualization of reconstructed surface normal for synthetic (snail) and real-world (frog) objects*
-
-![[assets/figures/papers/paper_list_l2134_https_arxiv_org_abs_2603_14001/figures/006_Figure_5.jpg]]
-*Figure 5: Qualitative comparison on estimated environment maps*
-
-![[assets/figures/papers/paper_list_l2134_https_arxiv_org_abs_2603_14001/figures/007_Figure_6.jpg]]
-*Figure 6: Comparison on reflection decomposition. Note that PolGS and Ref-Gaussian do not explicitly model object albedo*
-
-![[assets/figures/papers/paper_list_l2134_https_arxiv_org_abs_2603_14001/figures/020_Figure_14.jpg]]
-*Figure 14: Cosine distance (CD↓, left axis) and PSNR↑ (right axis) across λ choices. The reported values are indicated by triangles*
-
-![[assets/figures/papers/paper_list_l2134_https_arxiv_org_abs_2603_14001/figures/021_Figure_15.jpg]]
-*Figure 15: Left ground-truth colors for object body and stand. Mid albedo reconstructed using GridMap. Object concavity and selfocclusion result in reddish artifacts. Right albedo reconstructed using near-surface anchor placement. More severe color shifts are observed due to anchors being placed inside the object*
-
-
 
 ## 定位与知识库关联
 
@@ -373,8 +337,6 @@ PhyGaP是**首个将偏振重建与重光照能力统一**的方法。相比PolG
 5. **动态场景适应**：对于动态场景或移动光源，PhyGaP框架如何适应？GridMap的锚定相机策略是否需要动态调整？
 
 6. **与物理渲染器的深度整合**：目前环境图优化与3DGS训练交替进行，是否可以实现端到端的联合优化，使环境光照与物体属性在统一的物理渲染框架（如Mitsuba 3）中协同收敛？
-
-
 
 ## 原文 PDF
 

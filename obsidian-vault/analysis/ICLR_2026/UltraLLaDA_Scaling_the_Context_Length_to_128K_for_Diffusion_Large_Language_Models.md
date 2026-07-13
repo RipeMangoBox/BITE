@@ -82,8 +82,6 @@ UltraLLaDA 的方法定位在于：**首次系统性地揭示了扩散LLM与自�
 
 尽管在检索和追踪任务上表现卓越，UltraLLaDA在需要聚合多个信息片段的复杂任务（如RULER AGG，48K时仅25.12分）上仍显不足。此外，在传统短上下文基准（Winogrande, ARC-c）上，扩展上下文后的模型性能有所下降，提示长上下文能力与短上下文推理之间可能存在权衡。方法的泛化性目前仅在LLaDA和Dream两种扩散模型上验证，向更大规模模型和更长上下文（如512K或1M）的扩展仍需进一步研究。
 
-
-
 ### 扩散语言模型的长上下文困境
 
 扩散语言模型（Diffusion LLM）作为一种新兴的生成范式，通过迭代去噪过程生成文本，其核心训练目标为掩码扩散的负对数似然上界：
@@ -113,8 +111,6 @@ $$\lambda' = b^{-1} \cdot \left( \frac{T_{\mathrm{Ecap}}}{2\pi} \right)^{\frac{d
 其中 $T_{\mathrm{cap}} \approx 2T_{\mathrm{train}}$（双向覆盖），$T_{\mathrm{Ecap}} \approx 2T_{\mathrm{target}}$。该公式显式修正了有效相对位置范围的估计，从而正确放慢旋转频率以覆盖扩展后的双向相对位置。
 
 此外，本文还探索了长上下文后训练中的**自适应注意力掩码**策略，以隔离跨文档干扰——这一问题在扩散 LLM 的全双向注意力下尤为突出。通过扩散感知 NTK 与掩码策略的协同，UltraLLaDA 在 128K 上下文下实现了 100% 的 NIAH 检索准确率和 10.45 的低困惑度，将扩散 LLM 的可处理上下文窗口扩展至训练自由基线的 8–32 倍。
-
-
 
 ## 核心方法与创新机理
 
@@ -150,11 +146,6 @@ UltraLLaDA 对比了三种策略（Figure 3）：
 ### 创新总结
 
 UltraLLaDA 的两个 changed slots 形成协同效应：扩散感知 NTK 从位置编码层面保留了双向注意力习得的长程相对位置信息，自适应掩码从数据层面消除了跨文档噪声对长程依赖学习的干扰。二者共同支撑了轻量级后训练（仅 600 步）即可将上下文窗口从 4K 扩展至 128K，并在 NIAH 上实现 100% 检索准确率（Figure 1），同时将 128K 困惑度从基础模型的 343.88 压缩至 10.45（Table 1）。
-
-
-
-![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_68DGlhlvD9/figures/002_Figure_1.jpg]]
-*Figure 1: NIAH evaluation up to 128K context-length. ULTRALLADA can find all of the needles within the context window 8–32× longer than that LONGLLADA can handle*
 
 ![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_68DGlhlvD9/figures/005_Figure_2.jpg]]
 *Figure 2: RoPE critical dimension and training-free case study under different NTK scaling*
@@ -208,8 +199,6 @@ $$\lambda' = b^{-1} \cdot \left( \frac{T_{\text{Ecap}}}{2\pi} \right)^{\frac{d}{
 ### 训练自由与训练后两条路径
 
 值得注意的是，扩散感知 NTK 本身即可作为训练自由的上下文扩展方法使用（无需模块2和模块3）。在训练自由场景下，它已在 32K NIAH 上达到 79.36% 的准确率，显著优于基线 NTK 的 75.28%（Figure 2c）。模块2和模块3的叠加则进一步将性能推向极致——UltraLLaDA 在 128K NIAH 上实现 100% 检索准确率，而训练自由基线 LongLLaDA 在 32K 时已退化至约 20% 且无法超越 32K（Figure 1）。
-
-
 
 ### 3.1 问题定位：自回归 NTK 缩放为何在扩散 LLM 上失效
 
@@ -269,8 +258,6 @@ $$
 
 其中 $m$ 为掩码令牌，$p_{\pmb{\theta}}$ 由双向 Transformer 参数化，$t$ 为扩散时间步。该目标与预训练完全一致，仅上下文长度和位置编码发生了改变，确保后训练不会引入分布偏移。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与因果机制
@@ -287,8 +274,6 @@ $$d'_{\text{crit}} = 2\left\lceil \frac{d}{2} \log_b \frac{T_{\text{cap}}}{2\pi}
 
 **长上下文困惑度（PPL-128K）**：在 PG19 测试集上，**UltraLLaDA** 在 128K 上下文长度下保持 10.45 的低困惑度，而基础模型 **LLaDA-8B-Base**（Nie et al., 2025）则暴涨至 343.88（Table 1）。训练自由基线 **LongLLaDA** 无法处理超过 32K 的序列长度，在 32K 时 PPL 已升至 35.02。这表明仅靠训练自由的 RoPE 外推无法解决扩散 LLM 的长上下文退化问题，必须结合扩散感知的位置编码修正与后训练。
 
-![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_68DGlhlvD9/figures/004_Table_1.jpg]]
-
 **Needle-in-a-Haystack（NIAH-128K）**：**UltraLLaDA** 在 4K 至 128K 的所有上下文长度上均实现了 100% 的检索准确率（Figure 1a），而 **LongLLaDA** 在 32K 时准确率已降至约 20%，且无法扩展到 32K 以上（Figure 1b）。这一对比直观地展示了扩散感知 NTK 与轻量级后训练的组合效果——UltraLLaDA 的有效上下文窗口是 LongLLaDA 的 8–32 倍。
 
 **LongBench-16K**：在 16K 上下文的标准长文本基准上，**UltraLLaDA** 的加权平均分达到 39.98，较 **LLaDA-8B-Base**（31.56）提升 8.42 分，较 **LongLLaDA**（34.50）提升 5.48 分（Table 2）。UltraLLaDA 在所有六个子任务（单文档 QA、多文档 QA、摘要、上下文学习、合成任务、代码补全）上均取得最优，其中合成任务（Syn）的增益最为显著（从 20.00 提升至 33.00）。
@@ -297,9 +282,6 @@ $$d'_{\text{crit}} = 2\left\lceil \frac{d}{2} \log_b \frac{T_{\text{cap}}}{2\pi}
 *Table 2: LongBench cut at 16K Evaluation. Sub tasks: single-document QA (SD), multi-document QA (MD), summarization (Sum), in-context learning (ICL), synthetic tasks (Syn), and code completion (Code). AVG is an aggregated question-count–weighted average score*
 
 **RULER（4K–32K）**：在更具挑战性的 RULER 基准上，**UltraLLaDA** 在 32K 上下文下的加权平均分达到 73.63，而 **LongLLaDA** 仅为 5.69，**LLaDA-8B-Base** 则完全失败（Table 3）。值得注意的是，UltraLLaDA 在检索（NIAH）和变量追踪（VT）任务上表现尤为突出（32K 时 NIAH 达 99.21，VT 达 97.20），但在聚合任务（AGG）上得分仍然较低（32K 时仅 29.80），这揭示了扩散 LLM 在需要跨多个位置整合信息的复杂任务上的固有困难。
-
-![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_68DGlhlvD9/figures/011_Table_3.jpg]]
-*Table 3: RULER with context lengths 4K to 32K. include Retrieval: Needle-in-a-haystack (NIAH), Aggregation: frequent words extraction (AGG), question answering (QA), and Multi-hop Tracing: variable tracking (VT). AVG is question-count–weighted average score. “–” indicates failure*
 
 ### 消融实验
 
@@ -324,9 +306,6 @@ $$d'_{\text{crit}} = 2\left\lceil \frac{d}{2} \log_b \frac{T_{\text{cap}}}{2\pi}
 
 为验证训练策略的通用性，将相同的扩散感知 NTK 与后训练流程应用于 **Dream**（Ye et al., 2025）——一个由自回归模型转换而来的扩散 LLM。将 Dream 从 2K 扩展至 32K 后，**Dream-Finetune** 在 NIAH-32K 的所有长度上均达到 100% 检索准确率，LongBench-v2-Short 得分 31.11，显著优于训练自由的 Dream-NTK（NIAH-32K 仅 4.1）（Table 6）。这证明扩散感知 NTK 框架对不同扩散架构具有良好的泛化性。
 
-![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_68DGlhlvD9/figures/014_Table_6.jpg]]
-*Table 6: Generalization of our training-based scaling strategy to Dream*
-
 ### 失败模式与局限
 
 1. **复杂聚合任务困难**：在 RULER 48K 上，**UltraLLaDA** 的 AGG 得分仅 25.12，QA 得分 24.50（Table 12），远低于检索（68.22）和追踪（95.20）任务。扩散 LLM 在需要跨多个信息片段进行聚合推理的场景下存在系统性弱点，这可能与掩码扩散训练的生成式目标有关。
@@ -337,16 +316,6 @@ $$d'_{\text{crit}} = 2\left\lceil \frac{d}{2} \log_b \frac{T_{\text{cap}}}{2\pi}
 
 ![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_68DGlhlvD9/figures/015_Table_7.jpg]]
 *Table 7: Model training settings for all main results*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_68DGlhlvD9/figures/009_Figure_3.jpg]]
-*Figure 3: Different attention mechanism for Long-context training. Table 1: Perplexity on 128K long test data*
-
-![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_68DGlhlvD9/figures/017_Table_9.jpg]]
-*Table 9: Comparison between diffusion-aware NTK and baseline NTK on long-context evaluation*
-
-
 
 ## 定位与知识库关联
 
@@ -401,8 +370,6 @@ $$
 4. **极限扩展的可行性**：扩散感知 NTK 框架是否能够扩展到更大的模型（如 70B 级别）以及更长的上下文（如 512K 或 1M）？在这些极限设置下，仅 600 步的轻量级后训练是否仍然足够？
 
 5. **掩码策略的泛化**：如何将自适应掩码策略泛化到多模态扩散模型或需要跨文档推理的任务中，而不引入额外的计算开销？
-
-
 
 ## 原文 PDF
 

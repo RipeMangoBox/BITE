@@ -52,15 +52,11 @@ claims:
 
 方法上，Seek-CAD属于**训练免费的自精炼生成方法**，其关键创新在于：用本地部署的DeepSeek-R1-32B-Q4替代基于API的GPT-4作为推理主干，用SSR三元组范式扩展传统Sketch-Extrude范式，并通过混合搜索（向量+全文）的RAG和与CoT对齐的逐步视觉反馈实现自精炼。该方法不依赖任何微调，仅通过检索增强和知识约束即可生成可编译的类Python CAD代码，为资源受限场景下的高质量CAD生成提供了可行路径。
 
-
-
 计算机辅助设计（CAD）是现代工业制造的基石，其参数化建模方式通过序列化命令构建几何形状，天然适合由语言模型生成。然而，现有的CAD生成方法面临一个核心瓶颈：**训练免费方法缺乏链式思维（CoT）和逐步视觉反馈，导致复杂模型的生成精度与细节控制严重不足**。以 **3D-PreMise**（Yuan et al., arXiv 2024）和 **CADCodeVerify**（Alrashedy et al., arXiv 2025）为代表的训练免费基线，虽然避免了微调成本，但其生成过程缺乏对中间建模步骤的感知与纠错能力，几何保真度和语义对齐均受限。另一方面，基于微调的方法如 **CAD-Llama**（Li et al., AAAI 2025b）虽然性能有所提升，却需要大量标注数据和训练资源，泛化到新设计模式时灵活性不足。
 
 上述缺口源于两个关键因果环节的缺失。其一，现有方法将CAD生成视为一次性代码输出任务，未利用推理大模型的链式思维来显式建模从草图到三维特征的逐步构建逻辑。其二，视觉反馈仅依赖最终形状的单张图像（如3D-PreMise的做法），无法捕捉中间拓扑变化中累积的误差，导致精炼信号粗糙且滞后。
 
 针对这些问题，Seek-CAD提出了一种根本性的解决思路：**将本地部署的推理大模型DeepSeek-R1的CoT与逐步视觉反馈（SVF）对齐，并引入SSR设计范式，使模型能够在无需训练的条件下自精炼生成的CAD代码**。其核心洞察在于，利用检索增强生成（RAG）从本地CAD语料库中注入领域知识，再通过逐步渲染的中间图像序列为VLM提供细粒度反馈，从而在保持高效率的同时显著提升几何保真度和语义对齐。这一设计直接回应了训练免费方法在复杂建模场景下的精度瓶颈，为参数化CAD生成开辟了“推理即精炼”的新路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -103,8 +99,6 @@ $$g_{i}^{\mathrm{final}} = \lambda \cdot g_{i}^{\mathrm{vec}} + (1 - \lambda) \c
 ---
 
 **创新间的因果耦合**：上述四个维度并非孤立存在。DeepSeek-R1的CoT能力为SVF提供了对齐锚点；SSR范式为逐步渲染提供了结构化的分解依据；RAG则为初始代码生成提供了语法与格式约束。三者共同构成了“检索约束生成→逐步视觉诊断→CoT引导精炼”的闭环，使Seek-CAD在无需任何训练的前提下，在CD（0.1979 vs. 0.2164）、IoGT（0.7226 vs. 0.6562）等核心指标上全面超越训练免费基线（Table 1）。
-
-
 
 Seek-CAD 是一个训练免费（training-free）的 CAD 生成框架，其核心思想是将本地部署的推理大模型 DeepSeek-R1 与逐步视觉反馈（Step-wise Visual Feedback, SVF）相结合，实现“生成-反馈-精炼”的闭环。整个流水线分为两大阶段：**初始 CAD 代码生成** 和 **CAD 代码精炼**，二者共享同一套知识约束（Knowledge Constraint），并通过检索增强生成（RAG）和 SSR 三元组设计范式串联起从文本到可执行 CAD 代码的完整通路。
 
@@ -161,8 +155,6 @@ $$F_{call} \sim P( F_{call} \mid G, M, CoT )$$
 
 框架的性能高度依赖本地 SSR 语料库的覆盖度——移除语料库后模型完全无法生成可编译的 CAD 命令（Table 3, Model A），验证了 RAG 的必要性。知识约束（系统提示）同样关键，移除后 Pass@1 从 0.68 降至 0.44（Table 3, Model B）。此外，VLM 反馈存在约 11.8% 的无法明确判断的情况，可能引入噪声；最大精炼迭代次数设为 1，可能不足以处理需要多次修正的复杂场景。
 
-
-
 Seek-CAD 的核心架构由两个紧密协作的阶段构成：**本地推理流水线**与**逐步视觉反馈（SVF）自精炼循环**。两者共享一个统一的知识约束系统，并围绕作者提出的 **SSR 三元组设计范式** 展开，形成“生成—渲染—反馈—修正”的闭环。
 
 ### 3.1 本地推理流水线与 RAG
@@ -215,16 +207,6 @@ $$\phi( a , C ) \rightarrow b , \quad a \in \mathcal{A}, \, b \in \mathcal{B}, \
 
 **瓶颈与因果机制小结**：现有训练免费方法（如 3D-PreMise）仅依赖最终形状的单张图像反馈，缺乏对逐步建构逻辑的感知，导致复杂模型的细节控制不足。Seek-CAD 通过将 DeepSeek-R1 的 CoT 与逐步渲染图像对齐，使 VLM 能够在每一步判断“当前操作是否符合设计意图”，从而生成精准的局部修正信号。RAG 与知识约束则从源头保证了代码的可编译性与 API 正确性，二者缺一不可——移除本地语料库后模型完全无法生成可编译命令。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l76_https_openreview_net_forum_id_PzIc2TxhwN/figures/002_Figure_2.jpg]]
-*Figure 2: The SSR Design Paradigm. Each CAD model is constructed as a sequence of SSR triplets, where each triplet consists of a sketch, a sketch-based feature (e.g., extrude, revolve), and optional refinement features (e.g., shell, chamfer, fillet). Topological primitives is traced using the CapType reference system (START, SWEPT, END) during modeling operations. Final shapes are formed by applying boolean operations (e.g., Union, Cut, Intersect) between the outputs of SSR triplets*
-
-![[assets/figures/papers/paper_list_l76_https_openreview_net_forum_id_PzIc2TxhwN/figures/012_Figure_6.jpg]]
-*Figure 6: The knowledge constraint adopted in Seek-CAD*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -265,9 +247,6 @@ Table 2 展示了不同精炼轮次对性能的增量贡献。Round 0（无精�
 
 Table 4 统计了 VLM 反馈的有效性：在 500 个测试样本上，**88.2%** 的反馈被判定为有帮助（Yes），仅约 11.8% 的反馈无法提供明确判断（Unsure 或 No）。结合 Table 1/Table 2 的精炼增益，可以确认 SVF 反馈在绝大多数情况下提供了有效的几何修正信号。但约 12% 的无效反馈仍是潜在的噪声源，可能限制进一步精炼的上限。
 
-![[assets/figures/papers/paper_list_l76_https_openreview_net_forum_id_PzIc2TxhwN/figures/008_Table_4.jpg]]
-*Table 4: The quantitative analysis of the VLM feedback on 500 CAD models*
-
 ### 复杂度分析与失败模式
 
 Table 5 按 CAD 命令序列长度分层分析了模型性能。随着命令序列长度增加，各项指标呈下降趋势，表明 Seek-CAD 在处理高复杂度模型时仍面临挑战。这一退化可归因于两个瓶颈：一是长序列中链式思维的对齐难度增大，二是逐步渲染图像的信息密度随步骤增加而稀释，VLM 更难以从多张图像中提取精确的偏差信号。
@@ -276,19 +255,8 @@ Table 5 按 CAD 命令序列长度分层分析了模型性能。随着命令序�
 
 Figure 4 提供了生成结果的可视化对比与精炼案例。图 4(a) 显示 Seek-CAD 生成的 CAD 模型在几何细节和结构合理性上优于基线方法；图 4(b) 展示了 SVF 策略对初始生成结果的修正能力，例如修正了拉伸方向错误与倒角缺失等问题。Figure 5 进一步展示了 Seek-CAD 在相似生成、草图编辑和复杂模型生成等多种应用场景下的灵活性。
 
-![[assets/figures/papers/paper_list_l76_https_openreview_net_forum_id_PzIc2TxhwN/figures/005_Figure_4.jpg]]
-*Figure 4: (a) Visual illustrations of CAD generative comparison. (b) The visualizations of refinement capability through the SVF strategy (Recall Sec 3.2). Please enlarge to 225% to see the text clearly*
-
 ![[assets/figures/papers/paper_list_l76_https_openreview_net_forum_id_PzIc2TxhwN/figures/010_Figure_5.jpg]]
 *Figure 5: Various Showcases by Seek-CAD. Please enlarge to 180% to see the text clearly*
-
-![[assets/figures/papers/paper_list_l76_https_openreview_net_forum_id_PzIc2TxhwN/figures/017_Figure_10.jpg]]
-*Figure 10: The enlarged version of showcases in Figure 5(c) of the main manuscript*
-
-![[assets/figures/papers/paper_list_l76_https_openreview_net_forum_id_PzIc2TxhwN/figures/018_Figure_5.jpg]]
-*Figure 5: (a) The extended showcases of Figure 5(a)Figure 11: The showcases of similar generations.iameter*
-
-
 
 ## 定位与知识库关联
 
@@ -333,8 +301,6 @@ Seek-CAD的能力边界由其设计选择所决定，主要体现在以下几个
 4. **SSR范式的可扩展性验证**：在更大规模的语料库（如包含更多CAD软件的异构数据）上验证SSR范式和CapType引用机制的适用性，是推动该方法工业化的必要步骤。
 
 5. **幻觉风险的量化与控制**：DeepSeek-R1作为推理模型，其CoT中可能包含看似合理但实际错误的几何推理。如何量化这种幻觉风险，并在不增加过多约束的情况下提高生成质量，是训练免费方法面临的共性挑战。
-
-
 
 ## 原文 PDF
 

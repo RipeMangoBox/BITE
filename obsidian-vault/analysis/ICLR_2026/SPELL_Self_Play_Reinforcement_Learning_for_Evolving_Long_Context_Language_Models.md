@@ -69,15 +69,11 @@ SPELL在多个基座模型上取得一致且显著的性能提升：
 
 消融实验证实了各组件的关键作用：移除验证器导致平均分下降3.2分（DocMath下降6.4分），冻结提问者更新下降4.6分，去除历史记忆下降2.9分且问题难度变得不稳定。这些结果验证了三角色协同和语义验证器是SPELL性能增益的核心驱动力。
 
-
-
 长上下文推理（Long-Context Reasoning）要求语言模型在海量文本中定位、关联并综合多跳信息，从而回答复杂问题。近年来，尽管大语言模型（LLM）在短文本任务上取得了显著进展，但在需要跨文档、跨段落进行深层推理的长上下文场景中，性能仍然受限。核心瓶颈在于：**长上下文推理任务缺乏可靠且可扩展的奖励信号**。人类标注长文档的多跳推理过程成本极高，且难以保证一致性；而基于规则的验证器（如精确匹配）在需要语义理解的开放域问答中几乎失效。这一瓶颈导致传统的强化学习（RL）方法难以在长上下文推理任务上有效扩展——模型无法获得密集、准确的反馈来指导自我改进。
 
 现有工作主要依赖两类策略来缓解上述问题。第一类是**指令微调（Instruction Tuning）**，通过大量人工标注的长上下文问答数据来训练模型，但其扩展性受限于数据获取成本。第二类是**基于静态合成数据的强化学习（RLVR）**，例如使用 DeepSeek-R1 等强模型预先生成训练样本，再通过规则奖励进行优化。然而，**静态数据无法适应模型能力的动态变化**：随着训练推进，固定难度的问题要么过于简单（奖励饱和），要么过于困难（训练崩溃），导致优化信号与策略能力之间逐渐失配。对于强基座模型（如 Qwen3-30B-A3B-Thinking），RLVR 甚至可能带来性能退化——在 DocMath 和 LongBench-V2 上分别下降 0.2 和 1.2 分（Table 1），说明静态课程难以推动模型突破其能力边界。
 
 上述困境揭示了一个根本性需求：**训练信号必须与模型当前能力同步演化**。换言之，模型需要一个能够自动调节难度的课程生成机制，以及一个能够提供语义层面可靠反馈的奖励来源。这构成了本文的核心动机——能否让模型在无外部监督的条件下，通过自我博弈持续生成难度适中的训练任务，并自主验证回答的正确性，从而实现长上下文推理能力的自我进化？
-
-
 
 ## 核心方法与创新机理
 
@@ -109,8 +105,6 @@ SPELL的核心创新在于将长上下文推理能力的获取，从依赖外部
 SPELL将三个角色的GRPO目标联合优化（$\mathcal{J}_{\mathrm{GRPO}}(\theta) = \mathcal{J}^{\mathrm{que}}_{\mathrm{GRPO}}(\theta) + \mathcal{J}^{\mathrm{res}}_{\mathrm{GRPO}}(\theta) + \mathcal{J}^{\mathrm{ver}}_{\mathrm{GRPO}}(\theta)$），使得模型在提问、回答、验证三个能力维度上同步进化。消融实验表明，冻结提问者更新导致平均分下降4.6分（Table 2），说明三角色协同更新是实现自我进化的必要条件——提问者能力的停滞将直接导致课程难度无法持续提升，进而限制回答者和验证者的进步空间。
 
 这一协同机制在强基座模型上尤为关键：Qwen3‑30B‑A3B‑Thinking使用传统RLVR训练时性能无增益甚至下降，而SPELL仍能带来2.0分的平均提升（Table 1），表明自对弈课程能够为已具备强推理能力的模型提供有效的持续改进信号。
-
-
 
 ![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_83F6YF4Hz6/figures/003_Figure_1.jpg]]
 *Figure 1: (Left) An overview of the SPELL framework, where a single LLM self-evolves by dynamically adopting the roles of questioner, responder, and verifier. (Right) SPELL consistently boosts performance across various models (top) and exhibits superior test-time scaling over traditional RLVR (bottom)*
@@ -168,8 +162,6 @@ $$r_i^{\text{res}} = \max\left(\mathcal{R}_{\text{rule}}(y_i, a),\; v_i^{\text{v
 | 统一策略更新 | 三角色轨迹 | 更新后的单一策略模型 $\pi_\theta$ |
 
 整个框架无需外部标注数据，仅依赖文档语料库和模型自身的自对弈交互即可实现长上下文推理能力的持续进化。
-
-
 
 ### 三角色自对弈循环
 
@@ -239,8 +231,6 @@ $$\mathcal{J}_{\text{GRPO}}(\theta) = \mathcal{J}_{\text{GRPO}}^{\text{que}}(\th
 
 为防止验证者梯度主导训练，SPELL采用角色特定动态采样策略：仅保留奖励方差非零的回答者组，平衡正负提问者样本，并削减验证者样本量。更新后的策略 $\pi_\theta$ 直接复用于下一轮迭代的所有角色，形成持续的自进化闭环。
 
-
-
 ## 实验与关键发现
 
 ### 主要结果：跨模型一致提升与测试时缩放
@@ -258,8 +248,6 @@ SPELL 在多个基座模型上带来了显著且一致的性能增益。以 16K 
 ### 消融实验：三角色协同的关键组件
 
 消融实验基于 Qwen2.5‑7B‑Instruct 进行，完整 SPELL 的平均分为 47.2（Table 2）。
-
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_83F6YF4Hz6/figures/008_Table_2.jpg]]
 
 - **验证器不可替代**：移除验证器（w/o Verifier）使平均分下降 3.2 分（降至 44.0），其中在需要深层语义理解的 DocMath 上降幅最大（−6.4 分）。这证实了基于多数投票的语义验证器对提供可靠奖励信号至关重要，仅靠规则匹配（CEM）无法有效处理释义等价问题。
 - **提问者更新至关重要**：冻结提问者更新（w/o Que Update）导致平均分下降 4.6 分，且问题难度在训练过程中停滞不前（Figure 4 中图）。这表明提问者必须同步进化，才能持续生成处于回答者能力边界的问题，维持课程的有效性。
@@ -292,24 +280,6 @@ SPELL 在多个基座模型上带来了显著且一致的性能增益。以 16K 
 2. **超长上下文扩展未验证**：训练上下文限定在 16K，虽然零样本泛化至 100K 表现良好，但在 128K 及以上规模下的扩展效率和稳定性尚待探索。
 3. **任务格式固定**：自对弈仍依赖预定义的任务格式和文档语料，无法自主发现新的任务类型或与环境交互获取反馈。
 4. **协同进化缺乏理论分析**：三角色协同演化的动力学机制尚缺乏理论解释，可解释性有限。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_83F6YF4Hz6/figures/017_Table_6.jpg]]
-*Table 6: Details of open-source models and datasets in our experiments*
-
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_83F6YF4Hz6/figures/019_Table_7.jpg]]
-*Table 7: Evaluation results for base models on short-context reasoning tasks*
-
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_83F6YF4Hz6/figures/020_Table_8.jpg]]
-*Table 8: Evaluation results for base models on MRCR and HELMET subsets. The best score in each model group is highlighted in bold*
-
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_83F6YF4Hz6/figures/021_Table_9.jpg]]
-*Table 9: Comparison of SPELL against different long-context alignment baselines. The best score is highlighted in bold*
-
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_83F6YF4Hz6/figures/024_Table_9.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -349,8 +319,6 @@ SPELL 在以下条件下已验证有效：
 3. **多角色扩展**：三角色协同进化范式是否可推广至更多角色（如批评者、编辑者）或更复杂的推理类型（如多模态长上下文推理）？
 
 4. **安全自我纠偏**：自对弈框架能否自主发现并纠正模型自身的偏见或系统性推理错误，实现更安全的自我提升？当前验证器的“自欺”问题暗示这一方向需要更根本的机制设计。
-
-
 
 ## 原文 PDF
 

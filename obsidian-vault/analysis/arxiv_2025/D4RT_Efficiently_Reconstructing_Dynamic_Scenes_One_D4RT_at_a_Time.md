@@ -59,8 +59,6 @@ D4RT 提出了一种根本性的解决思路：**将空间坐标与时间索引�
 
 当前方法的主要局限在于编码器输入分辨率为固定的 256×256，可能限制对极高频细节的感知；长视频处理依赖分段对齐，未包含闭环优化，可能导致长距离漂移。未来的开放问题包括：将查询机制扩展到任意长度的在线视频流、处理高度动态且存在大量镜面反射的场景，以及探索该统一查询范式在多模态融合中的推广。
 
-
-
 从视频中恢复场景的完整 4D 表示（3D 几何 + 时间动态）是计算机视觉的核心目标之一，其输出——深度图、3D 点跟踪、相机位姿、点云——是自动驾驶、机器人、增强现实等下游应用的基础。然而，现有方法在统一性、效率和动态场景处理能力上存在根本性缺口。
 
 **碎片化的任务架构**。当前的主流方案将不同几何任务分配给独立的模型或解码器。以 **VGGT**（Wang et al., CVPR 2025）和 **π³**（Wang et al., arXiv 2025）为代表的纯重建方法，依赖密集的每帧解码或多任务输出头，计算冗余且无法灵活处理时空对应关系。**SpatialTrackerV2**（Xiao et al., ICCV 2025）虽然能跟踪动态点，但其多阶段迭代优化的设计仅支持从单帧出发的稀疏追踪，无法生成完整的 4D 场景表示。这种“一任务一模型”的范式导致系统复杂度高、部署成本大，且各任务之间无法共享表征。
@@ -70,8 +68,6 @@ D4RT 提出了一种根本性的解决思路：**将空间坐标与时间索引�
 **效率瓶颈**。密集的每帧解码或迭代优化使得现有方法在吞吐量上捉襟见肘。在 3D 跟踪任务中，SpatialTrackerV2 在 60 FPS 的目标下仅能处理 29 条轨迹，而实际应用往往需要数百甚至数千条轨迹的实时跟踪。这种效率差距源于一个根本性的设计缺陷：**缺乏一种灵活、按需的时空点查询机制**，使得计算量与任务需求成比例，而非与视频帧数成比例。
 
 **本文动机**。上述缺口指向同一个核心瓶颈：现有方法缺乏统一的、高效的时空点查询接口，导致计算冗余、任务碎片化，且无法同时处理静态和动态场景。D4RT 的提出正是为了填补这一空白——通过引入一种基于查询的解码器接口，利用全局场景表示，允许模型独立、灵活地按需查询任意时空点的 3D 位置，从而用一个轻量架构统一点跟踪、深度估计、点云重建与相机位姿估计，并在效率和精度上同时超越专用方法。
-
-
 
 ## 核心方法与创新机理
 
@@ -106,8 +102,6 @@ D4RT 的查询机制实现了**天然并行**：每条轨迹由 $T$ 个完全独
 查询的构造是这一范式成功的核心工程细节。每个查询不仅包含傅里叶编码的空间坐标和时间步嵌入，还包含一个从原始视频中提取的 **$9 \times 9$ 局部 RGB patch 嵌入**。消融实验（Table 7, Figure 6）表明，移除该 patch 嵌入会导致深度 AbsRel (S) 从 0.302 上升至 0.366，相机 ATE 从 0.102 上升至 0.122，证实了局部外观信息对于保持细粒度几何细节（如锐利边缘）至关重要。
 
 综上，D4RT 的“changed slots”并非孤立的模块替换，而是一个**系统性的范式转换**：将动态 4D 重建从“为每个任务设计专用解码器”转变为“设计一个通用的查询语言，让模型学会按需回答任意时空点的几何问题”。这一转换同时解决了计算效率、动态对应和任务统一性三个瓶颈。
-
-
 
 D4RT 是一个统一的前馈式动态 4D 重建与跟踪框架，其核心设计理念是：**通过单一、轻量级的查询解码器接口，替代传统方法中密集的逐帧解码或多个任务专用解码器**。整个 pipeline 由四个关键模块串联构成：视频标记化 → ViT 编码器 → 交叉注意力解码器 → 投影头，形成从原始视频到任意时空点 3D 坐标的端到端映射。
 
@@ -158,12 +152,8 @@ Table 2 系统对比了 D4RT 与现有方法的架构能力差异：
 - **跟踪方法**（SpatialTrackerV2）：采用昂贵的多阶段迭代优化，且仅能追踪单帧稀疏点，重建结果存在间隙。
 - **D4RT**：单一交叉注意力解码器，支持按需独立查询任意时空点，覆盖静态与动态点，天然支持并行计算，在效率上实现 18–300 倍的吞吐量提升。
 
-### 补充图表
-
 ![[assets/figures/papers/D4RT_Efficiently_Reconstructing_Dynamic_Scenes_876123b49484/figures/019_Figure_9.jpg]]
 *Figure 9: Visualizing sub-pixel detail recovery – We propose a visual comparison of the different high-res configurations. Config ⃝4 achieves the highest fidelity, it preserves sharp edges and recovers fine details—such as the hair in the bottom row—without increasing the computational cost or memory requirements of the overall model*
-
-
 
 D4RT 的核心架构由三个关键模块构成：视频标记化与全局场景编码、查询构建、以及交叉注意力解码与投影。整个流程遵循“一次编码，按需查询”的设计哲学，将视频理解与几何重建解耦为编码器-解码器范式。
 
@@ -207,13 +197,6 @@ $$\mathcal{L} = \frac{1}{N} \sum_{i=1}^{N} \left( c \lambda_{3D} \mathcal{L}_{3D
 
 其中 $\mathcal{L}_{3D}$ 为 3D 坐标的 Huber 损失，$\mathcal{L}_{2D}$ 为 2D 重投影损失，$\mathcal{L}_{\mathrm{vis}}$ 为可见性二分类损失，$c$ 为模型预测的置信度标量。置信度项通过拉普拉斯似然的形式实现自适应加权：高置信度时 $\mathcal{L}_{3D}$ 权重增大，同时 $-\log c$ 项惩罚过度自信。消融实验表明，移除置信度损失会使 ATE 增加 0.126，移除 2D 位置损失会使深度 AbsRel (S) 增加 0.071（Table 8），验证了各辅助损失对整体性能的贡献。
 
-### 补充图表
-
-![[assets/figures/papers/D4RT_Efficiently_Reconstructing_Dynamic_Scenes_876123b49484/figures/006_Figure_4.jpg]]
-*Figure 4: Reconstruction results across methods – Pure reconstruction methods (MegaSaM and $\pi ^ { 3 }$ ) are only able to accumulate point clouds of all pixels; exhibiting clear failure cases in dynamic scenes. For example, the swan is repeated in MegaSaM’s reconstruction, and $\pi ^ { 3 }$ is failing entirely to reconstruct the flower. SpatialTrackerV2, a state-of-the-art tracking method, successfully captures dynamics, however its design only allows tracking points from one frame, leaving gaps in the reconstruction (behind the swan and train). D4RT is the only method that successfully reconstructs a full 4D representation of the scene including all pixels of the video
-
-
-
 ## 实验与关键发现
 
 ### 核心实验设计逻辑
@@ -232,9 +215,6 @@ D4RT 的实验体系围绕一个中心命题展开：**统一的查询式解码�
 ### 吞吐量：18-300 倍的效率优势
 
 效率是 D4RT 区别于迭代式方法的关键护城河。Table 3 展示了在给定 FPS 目标下各方法能处理的最大全视频 3D 轨迹数。在 60 FPS 的实时目标下，D4RT 可处理 550 条轨迹，而 SpatialTrackerV2 仅能处理 29 条——速度差距达 18 倍。当 FPS 要求放宽至 1 FPS 时，D4RT 可追踪超过 40,000 条轨迹，与其他方法的差距扩大至 300 倍。这一优势源于 D4RT 的解码器设计：每条轨迹由 T 次独立查询组成，天然支持并行化，无需迭代优化或多阶段流水线。
-
-![[assets/figures/papers/D4RT_Efficiently_Reconstructing_Dynamic_Scenes_876123b49484/figures/007_Table_3.jpg]]
-*Table 3: 3D tracking throughput – We measure the maximum number of full-video 3D point tracks that different model can produce while maintaining a given FPS target on a single A100 GPU. Note that for D4RT, each track consists of T independent queries processed by the decoder. D4RT is 18–300× faster than others*
 
 ### 视频深度与点云估计
 
@@ -269,24 +249,8 @@ Figure 3 的散点图直观展示了 D4RT 在相机位姿估计上的压倒性�
 
 尽管整体表现优异，D4RT 存在三个明确局限：(1) 编码器输入分辨率固定为 256×256，可能限制对极高频纹理的感知；(2) 长视频处理依赖分段 Umeyama 对齐，缺乏闭环优化，存在长距离漂移风险；(3) 训练数据以驾驶、室内和合成场景为主，极端环境（水下、严重遮挡）的泛化能力未经验证。这些局限在论文中均有明确讨论，而非事后推断。
 
-### 补充图表
-
-![[assets/figures/papers/D4RT_Efficiently_Reconstructing_Dynamic_Scenes_876123b49484/figures/003_Table_1.jpg]]
-*Table 1: Unified decoding – A diverse set of geometry-related tasks can be inferred by querying the Cartesian product of the respective entries. Note that for intrinsics and extrinsics, we only query a coarse ( h , w ) grid for faster inference*
-
 ![[assets/figures/papers/D4RT_Efficiently_Reconstructing_Dynamic_Scenes_876123b49484/figures/004_Table_2.jpg]]
 *Table 2: Model capabilities – We highlight both the tasks our model executes but also its comprehensive functionality and simple model architecture*
-
-![[assets/figures/papers/D4RT_Efficiently_Reconstructing_Dynamic_Scenes_876123b49484/figures/014_Table_8.jpg]]
-*Table 8: Auxiliary losses – We remove auxiliary losses individually to evaluate their impact on model performance. A slight tradeoff between depth and camera estimation pose is observed, though we find that all auxiliary losses improve overall performance. Table 9. Backbone size – We examine how D4RT’s performance scales with the size of the pretrained ViT encoder backbone, evaluating video depth and camera pose estimation performance on Sintel. We observe a clear improvement as the backbone size increases from ViT-B to ViT-g*
-
-![[assets/figures/papers/D4RT_Efficiently_Reconstructing_Dynamic_Scenes_876123b49484/figures/015_Figure_6.jpg]]
-*Figure 6: Preservation of low-level details – We ablate the effect of including local patch information into the model’s queries, visualizing the resulting depth maps on an example from the Sintel dataset. We find that the local RGB patches help preserve finegrained details and produce sharper object boundaries. Table 7. Local RGB patch – We evaluate a ViT-L model, trained with and without the appearance patch as input to the decoder, on Sintel video depth and camera pose estimation*
-
-![[assets/figures/papers/D4RT_Efficiently_Reconstructing_Dynamic_Scenes_876123b49484/figures/018_Table_10.jpg]]
-*Table 10: Quantitative impact of query density and patch fidelity – Feeding RGB patches from the high-resolution video into the decoder (Config ⃝4 ) yields significantly sharper edges in depth maps as measured by ϵaccPDBE*
-
-
 
 ## 定位与知识库关联
 
@@ -346,8 +310,6 @@ D4RT 开启的统一查询范式引出了若干值得探索的方向：
 4. **极端动态场景**：在存在大量镜面反射、折射或非刚性形变的场景中，当前查询机制（假设点在不同时刻的可见性可被建模为可见性预测）是否仍然有效？Table 8 显示可见性损失对性能有贡献，但其在极端情况下的鲁棒性尚未验证。
 
 5. **查询效率的理论极限**：当前的自适应跟踪策略通过可见性标记避免了重复查询，但能否从信息论角度分析查询的冗余度，进一步设计主动查询选择策略，以最小查询次数实现给定精度的 4D 重建？
-
-
 
 ## 原文 PDF
 

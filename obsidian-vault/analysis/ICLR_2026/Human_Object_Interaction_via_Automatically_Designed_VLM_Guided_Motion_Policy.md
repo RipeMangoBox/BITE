@@ -67,8 +67,6 @@ claims:
 
 与现有工作相比，本方法在八个关键维度上实现了全覆盖（Table 1），是首个同时支持铰接物体、动态物体、自动化奖励设计、长视距细粒度转换、HOI引导、多任务、高层规划和统一策略的框架。其核心区别在于用VLM引导的RMD替代了手动设计的接触链或关键姿势，将交互表示从离散事件层面提升到连续运动动力学层面。
 
-
-
 ### 问题背景：物理仿真中的人-物交互合成
 
 在具身智能和角色动画领域，使物理仿真角色与三维环境中的物体进行自然、长视距的交互是一个核心挑战。这类交互——如搬起洗衣篮放入洗衣机、躺到床上、坐在桌前、推动沙发——要求角色不仅理解高层次的任务意图，还需在物理约束下生成连贯的、符合语义的运动序列。与纯运动学方法不同，基于物理仿真的方法必须同时处理接触动力学、平衡控制、物体操纵以及任务规划等多个耦合子问题。
@@ -91,8 +89,6 @@ claims:
 2. **可被VLM理解与生成**：这种结构化的部件级关系表示，恰好可以被视觉-语言模型（Vision-Language Model, VLM）基于其世界知识进行推理和规划，从而替代手动奖励设计。
 
 基于上述洞察，本文提出**VLM引导的相对运动动力学（VLM-Guided Relative Movement Dynamics, RMD）**，旨在构建首个统一的、基于物理的HOI框架，利用VLM自动生成目标状态和奖励函数，驱动物理角色完成长视距、多类型的交互任务。
-
-
 
 ## 核心方法与创新机理
 
@@ -125,8 +121,6 @@ claims:
 - **时空编码缺一不可**：移除运动学编码 $(\tilde{p}_t^{ij}, \tilde{v}_t^{ij})$ 或动态编码 $(w_t'^{ij})$ 均导致性能退化，表明同时捕捉空间关系与时序动态是RMD有效性的基础。
 
 综上，本工作的核心创新不在于提出新的RL算法或VLM架构，而在于设计了RMD这一连接VLM语义理解与物理策略学习的表示层，使得“自动设计”成为可能，并在静态交互（完成率75.1% vs UniHSI 37.2%）和动态交互（71.2% vs TokenHSI 52.5%）上均取得显著提升。
-
-
 
 ![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_LfkPlFTfe0/figures/002_Table_1.jpg]]
 *Table 1: Comparative analysis of key features between ours and other methods*
@@ -162,8 +156,6 @@ claims:
 ### 关键特性对比
 
 如表1所示，本框架是唯一同时支持以下全部特性的方法：铰接对象交互、自动化奖励设计、动态对象交互、细粒度长视距转换、HOI运动引导、多任务统一策略和高层规划。相比之下，**UniHSI**（Xiao et al., 2024）仅支持静态交互和自动化奖励设计，**TokenHSI**（Pan et al., 2025）和**InterPhys**（Hassan et al., 2023）则依赖手动奖励工程。
-
-
 
 ### 整体架构
 
@@ -221,8 +213,6 @@ $$r_t = \alpha_{\mathrm{task}} \, r^G \left( \mathbf{s}_t, \mathbf{g}_t, \mathbf
 
 策略采用目标条件化的PPO训练。当某步的任务奖励 $r^G$（取值范围 $[0,1]$）超过阈值0.9时，策略自动切换至VLM规划的下一个交互步，实现无需手工状态机的长视距任务调度。消融实验表明该阈值敏感：过高（如0.95）会导致完成率大幅下降，0.90为最优设置（Table 6）。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设计
@@ -267,15 +257,9 @@ $$r_t = \alpha_{\mathrm{task}} \, r^G \left( \mathbf{s}_t, \mathbf{g}_t, \mathbf
 
 **Table 6** 考察了任务奖励阈值（决定何时切换到下一交互步骤）的影响。阈值0.90达到最佳平衡：过低（0.80）导致子步骤执行不充分，精度下降；过高（0.95）使策略难以满足严苛的完成条件，完成率从53.8%骤降。这一敏感性揭示了当前设计中VLM规划器与物理策略之间的目标不匹配问题——VLM生成的理想化RMD目标可能无法在物理仿真中完美达成。
 
-![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_LfkPlFTfe0/figures/017_Table_6.jpg]]
-*Table 6: Comparison of threshold choice*
-
 ### 用户研究：运动真实性与任务一致性
 
 **Table 7** 报告了用户研究结果。参与者在5分制下评估运动真实性（Motion Realism）和任务一致性（Task Consistency）。本方法获得 **4.0±0.4**（运动真实性）和 **4.1±0.3**（任务一致性），均显著高于所有基线方法（最高分别为TokenHSI的3.4±0.4和UniHSI的3.0±0.3）。这表明RMD引导的运动不仅物理上合理，在人类感知层面也更自然、更符合任务语义。
-
-![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_LfkPlFTfe0/figures/018_Table_7.jpg]]
-*Table 7: Comparison of motion realism and task consistency*
 
 ### 失败模式分析
 
@@ -291,11 +275,6 @@ $$r_t = \alpha_{\mathrm{task}} \, r^G \left( \mathbf{s}_t, \mathbf{g}_t, \mathbf
 - **Table 1**：本方法是唯一同时支持铰接对象、自动奖励设计、动态对象、细粒度长视距转换、HOI引导、多任务、高层规划和统一策略的全覆盖框架。
 - **Figure 3**：定性对比可视化直观展示了InterPhys的非自然运动（手臂扭曲）、UniHSI的不完整交互（无法从坐姿恢复）与本方法类人运动质量的差异。
 - **Table 4**：完整超参数配置可供复现参考，关键设置包括4096并行环境、PPO clip ε=0.2、AMP序列长度10、RMD奖励权重 $\lambda_{\text{RMD}}=0.5$。
-
-![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_LfkPlFTfe0/figures/015_Table_4.jpg]]
-*Table 4: Hyperparameters for RMD*
-
-
 
 ## 定位与知识库关联
 
@@ -355,8 +334,6 @@ $$r_t = \alpha_{\mathrm{task}} \, r^G \left( \mathbf{s}_t, \mathbf{g}_t, \mathbf
 4. **端到端联合优化**：是否可以通过端到端训练联合优化VLM规划器和物理控制器，减少愿景与执行间的差距？这涉及离散符号规划与连续控制的联合学习这一开放挑战。
 
 5. **跨领域迁移**：RMD表示是否可应用于移动机器人领域的物理仿真任务，如机器人操作或人-机器人协作？这需要验证RMD在非人形运动学结构上的泛化能力。
-
-
 
 ## 原文 PDF
 

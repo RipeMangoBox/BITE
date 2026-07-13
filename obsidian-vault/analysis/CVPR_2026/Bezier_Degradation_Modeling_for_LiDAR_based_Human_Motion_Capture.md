@@ -54,8 +54,6 @@ BMLiCap 的核心洞察是：**人体运动可由贝塞尔曲线紧凑表示**�
 
 **方法定位**：BMLiCap 属于“运动先验引导的渐进式重建”范式，区别于 LiDARCap（Li et al., CVPR 2022）的单阶段逐帧回归、LiveHPS/LiveHPS++ 的 SMPL 顶点先验跟踪，以及 NIE（Zhang et al., AAAI 2024）的邻域增强策略。其核心差异在于用贝塞尔曲线的层次化压缩特性替代了传统的帧级时序建模，使模型能够从粗粒度运动趋势中“填补”观测断裂。
 
-
-
 ### 问题背景：LiDAR 人体运动捕捉的观测困境
 
 基于 LiDAR 的三维人体运动捕捉旨在从稀疏、无序的点云序列中恢复精确的人体姿态与运动轨迹。与 RGB 相机不同，LiDAR 传感器通过主动发射激光脉冲获取场景的三维几何信息，具有对光照变化不敏感、能提供绝对尺度等优势，使其在户外、大范围、复杂光照等场景下成为视觉动捕的重要补充。然而，LiDAR 点云本身具有**稀疏性、不完整性和时序不连续性**——人体在运动中频繁发生自遮挡，传感器视角受限导致部分肢体完全不可见，单帧点云往往只覆盖人体表面的一小部分。这种观测层面的断裂使得从逐帧点云直接回归人体姿态极为困难。
@@ -73,8 +71,6 @@ BMLiCap 的核心洞察是：**人体运动可由贝塞尔曲线紧凑表示**�
 ### 本文的切入点
 
 基于上述洞察，本文提出 **BMLiCap**，核心思路是**用贝塞尔曲线对运动轨迹进行参数化，并引入轨迹感知的层次化退化策略，生成多尺度运动表示，使模型能够从粗到细地恢复运动**。这一设计将问题从“从残缺观测中直接回归完整姿态”转化为“从残缺观测中恢复多尺度运动曲线，再逐步融合细化”，从而弥合遮挡造成的观测断裂，提升严重遮挡下的时序连贯性和预测精度。
-
-
 
 ## 核心方法与创新机理
 
@@ -109,8 +105,6 @@ BMLiCap 的核心创新在于将人体运动建模从“逐帧回归”范式转
 | 逆运动学 | 直接预测 SMPL 参数 | STGCN 将预测关节位置转换为姿态参数 |
 
 这些创新共同构成了一个**以运动先验弥补观测缺陷**的框架：贝塞尔曲线提供运动连续性的结构先验，层次化退化提供从粗到细的学习课程，因果掩码确保粗粒度趋势有效引导细粒度恢复。
-
-
 
 BMLiCap 的整体框架围绕一个核心洞察构建：**人体运动在时序上具有高度的可压缩性**——即使大幅减少贝塞尔控制点，全局运动趋势依然得以保留（Fig. 2）。这一特性使得“由粗到细”的渐进式重建成为可能，从而在严重遮挡和噪声条件下弥合观测断裂。基于此，框架由两条协同工作的管线组成：**轨迹感知的贝塞尔退化**（训练阶段生成多级运动监督）和**渐进式运动重建**（推理阶段从点云条件恢复细粒度运动）。
 
@@ -154,12 +148,8 @@ $$
 
 这种“先压缩、再渐进恢复”的范式使得模型即使在 50% 输入帧缺失的情况下仍能保持稳定性能（Fig. 7a），从根本上提升了对遮挡和噪声的鲁棒性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1055_https_openaccess_thecvf_com_content_CVPR2026_html_An_Bezier_Degradation/figures/003_Figure_3.jpg]]
 *Figure 3: The pipeline of our proposed BMLiCap framework. During training, we first apply the Bezier motion degradation module to ´ generate multi-level motion representations. Then, the progressive motion reconstruction module reconstructs the motion in a coarse-tofine manner, where a Time-scale Motion Transformer (TMT) predicts motion curves at different temporal scales conditioned on LiDAR features, and a Multi-level Motion Aggregator (MMA) fuses these multi-scale cues to produce the final fine-grained motion*
-
-
 
 BMLiCap 的核心由两个级联模块构成：**轨迹感知贝塞尔退化 (TAD)** 与 **渐进式运动重建**。前者在训练时将原始关节轨迹转化为层次化贝塞尔运动表示，后者在推理时以由粗到细的方式从 LiDAR 点云中恢复人体运动。
 
@@ -199,9 +189,6 @@ $$\min_{\{\ell_{i,2}, \ell_{i+1,1}\}} \sum_m \| \tilde{\mathcal{B}}_i^{(k)}(u_{i
 
 通过重复降采样和参数调整，TAD 生成 $L$ 个时间尺度的运动表示 $\{\mathbf{M}_l\}_{l=1}^L$。Figure 4 展示了该退化过程：不仅重采样控制点，还调整其长度以更好地拟合最精细曲线。
 
-![[assets/figures/papers/paper_list_l1055_https_openaccess_thecvf_com_content_CVPR2026_html_An_Bezier_Degradation/figures/004_Figure_4.jpg]]
-*Figure 4: A demonstration of trajectory-aware Bezier degrada- ´ tion, we not only resample the control points but also adjust their lengths to better fit the finest curve*
-
 ### 渐进式运动重建
 
 该模块以由粗到细的方式从 LiDAR 特征中恢复运动，包含两个子模块：
@@ -225,13 +212,6 @@ $$\mathcal { L } _ { M } = \sum _ { l = 1 } ^ { L } \frac { 1 } { M _ { s _ { l 
 其中 $M_{s_l}$ 为第 $l$ 级的时间尺度。该损失与关节位置损失、速度损失等联合优化。
 
 **关键设计决策**：消融实验（Table 3, Table 4）表明，最优配置为 $L=3$ 级、调度 $\{32, 16, 8\}$，且 TAD 策略、多级运动 token、运动损失、块状因果掩码和多阶段运动聚合器各自带来显著增益。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1055_https_openaccess_thecvf_com_content_CVPR2026_html_An_Bezier_Degradation/figures/002_Figure_2.jpg]]
-*Figure 2: Analysis of motion approximation error using Bezier ´ curves with different ratios of control points, indicating its robustness against occlusion*
-
-
 
 ## 实验与关键发现
 
@@ -269,9 +249,6 @@ Table 2 将贝塞尔曲线表示与其他运动表示（如直接回归 SMPL 参
 
 Figure 7 展示了模型在不同点云帧掩码策略和缺失比例下的稳定性测试。结果表明，**即使高达 50% 的输入帧缺失，BMLiCap 仍能保持稳定的性能输出**。这一鲁棒性源于贝塞尔曲线对全局运动趋势的紧凑保持能力——如 Figure 2 所示，即使大幅削减控制点，全局运动趋势依然得以保留，使模型能够弥合严重遮挡造成的观测断裂。
 
-![[assets/figures/papers/paper_list_l1055_https_openaccess_thecvf_com_content_CVPR2026_html_An_Bezier_Degradation/figures/009_Figure_7.jpg]]
-*Figure 7: Stability test under different point cloud frame masking policy and ratio*
-
 ### 定性可视化
 
 Figure 5 的序列可视化对比显示，在严重遮挡场景下，其他方法产生明显的抖动甚至失败，而 BMLiCap 提供了连贯且准确的估计。Figure 6 的单帧可视化进一步表明，对于特殊运动或严重遮挡的样本，方法能够有效补偿缺陷，生成稳定且连贯的结果。Figure 8 可视化了各阶段预测的中间贝塞尔曲线，直观展示了从粗粒度运动趋势到细粒度运动细节的渐进恢复过程。Figure 9 的注意力图揭示了不同遮挡程度下跨层级交互的触发机制，为方法的可解释性提供了支撑。
@@ -279,20 +256,9 @@ Figure 5 的序列可视化对比显示，在严重遮挡场景下，其他方�
 ![[assets/figures/papers/paper_list_l1055_https_openaccess_thecvf_com_content_CVPR2026_html_An_Bezier_Degradation/figures/006_Figure_5.jpg]]
 *Figure 5: Sequential visualization. Even under severe occlusion, BMLiCap provides coherent, accurate estimations, while other methods produce jittery/failed results*
 
-![[assets/figures/papers/paper_list_l1055_https_openaccess_thecvf_com_content_CVPR2026_html_An_Bezier_Degradation/figures/008_Figure_6.jpg]]
-*Figure 6: Single frame visual comparisons. On samples with special motion or severe occlusion, our method can compensate for defects, producing stable and coherent results*
-
-![[assets/figures/papers/paper_list_l1055_https_openaccess_thecvf_com_content_CVPR2026_html_An_Bezier_Degradation/figures/011_Figure_8.jpg]]
-*Figure 8: Visualization of the predicted intermediate Bezier curves from each level of BMLiCap´*
-
-![[assets/figures/papers/paper_list_l1055_https_openaccess_thecvf_com_content_CVPR2026_html_An_Bezier_Degradation/figures/012_Figure_9.jpg]]
-*Figure 9: Attention map of different occlusion levels. The attention masking triggers cross-level interaction to fix missing frames*
-
 ### 失败模式与待验证问题
 
 当前分析中未提取到明确的失败模式记录。以下问题需要手动验证：该方法在**极端非平滑运动**（如跌倒、突然转向）上的泛化能力；贝塞尔拟合的 **C¹ 连续性假设**是否适用于所有自然人体运动；以及如何将层次化运动表示方法扩展到**多人场景**。
-
-
 
 ## 定位与知识库关联
 
@@ -344,8 +310,6 @@ BMLiCap 对现有动捕范式进行了四个维度的系统性改造：
 3. **计算效率与实时性**：BMLiCap 使用 12 层 Transformer 编码器和多级运动聚合器，在 4× RTX 4090 上训练 50 轮。论文未报告推理延迟，实时应用（如在线动捕、人机交互）的可行性需要补充延迟分析。
 
 4. **与多模态融合的关系**：LiDAR 点云本质上提供几何信息，而 RGB 或 IMU 可补充纹理和惯性信息。贝塞尔运动表示能否作为统一的多模态运动先验，融合来自不同传感器的观测？这可能是提升极端遮挡下性能的潜在方向。
-
-
 
 ## 原文 PDF
 

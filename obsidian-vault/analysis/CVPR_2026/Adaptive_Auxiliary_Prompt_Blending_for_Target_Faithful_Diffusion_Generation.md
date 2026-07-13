@@ -56,8 +56,6 @@ AAPB 的核心洞察建立在 **Tweedie等式** 之上——最小化混合去�
 
 AAPB 的方法定位清晰：它不依赖额外训练或模型微调，通过扩展分类器自由引导（CFG）的分数混合范式，将条件分数重新定义为目标分数与锚点分数的动态加权组合。该方法可无缝集成至现有扩散管线（如 SDXL、SD3.0、IterComp），并在与 R2F+ 区域控制管线结合时，将 RareBench-Multi 上的一致性提升 **9.4∼19.9** 个点（Table 6）。当前的主要局限在于 CLIP 文本编码器在多属性组合场景下的绑定能力不足，以及三路分数评估带来的适度计算开销，但这些并不妨碍 AAPB 作为训练自由、理论完备的扩散生成增强框架的实用价值。
 
-
-
 ### 扩散生成中的长尾漂移困境
 
 扩散模型在文本到图像生成中取得了显著成功，但其去噪过程隐含地依赖训练分布中的统计先验。当目标概念位于训练分布的长尾低密度区域时，模型在分数空间中的采样轨迹会**偏向高频语义模式**，导致罕见属性被压制、组合性丢失以及结构不一致。这一现象的本质在于：扩散模型学习到的分数函数 $s_\theta(x_t)$ 在高密度区域具有更强的梯度信号，使得去噪过程自然地向语义主导概念漂移（Figure 1）。
@@ -81,8 +79,6 @@ $$\mathbb{E}[x_0 \mid x_t] = x_t + (1 - \alpha_t) \nabla_{x_t} \log p(x_t)$$
 这意味着，若能使混合去噪器与目标去噪器在每步的后验均值保持一致，则等价于在分数空间中最小化对齐误差。基于这一洞察，我们将辅助提示混合问题转化为一个**逐步优化问题**：在每个扩散步骤 $t$，寻找最优混合系数 $\gamma_t^*$，使得混合分数 $\tilde{s}_\theta(x_t; w, \gamma_t)$ 与目标分数 $s_\theta(x_t, \tilde{c}_T)$ 的 $L_2$ 距离最小化。
 
 这一思路的直接优势在于：$\gamma_t^*$ 具有**闭式解**，无需任何训练或额外网络，且能够根据当前噪声状态 $x_t$ 动态调整目标提示与锚点提示的贡献比例。相比固定插值和启发式调度，自适应混合能够精确修正分数空间中的漂移，在保持目标忠实度的同时避免过度依赖锚点导致的结构偏离。
-
-
 
 ## 核心方法与创新机理
 
@@ -129,8 +125,6 @@ $$\tilde{s}_{\theta}(x_t; w, \gamma_t) = s_{\theta}(x_t) + w \big( (1 - \gamma_t
 | 提示处理 | R2F 将罕见概念分解为多步子提示交替生成 | 直接构建罕见概念与其频繁对应物的二元对，一次性重构完整提示 |
 
 这些创新共同构成了 AAPB 的统一框架，使其在罕见概念生成和图像编辑两个任务上均取得显著提升——在 RareBench 上以 84.1 的平均 T2I 对齐分数超越最强基线 R2F 达 8.4 个点（表 1），在 FlowEdit 上以 CLIP-I 0.905、DINO 0.814 的结构保持指标显著优于 FlowEdit 等基线（表 2）。
-
-
 
 AAPB 是一个统一的、免训练的自适应辅助提示融合框架，旨在解决扩散模型在目标概念位于训练分布长尾低密度区域时的生成漂移问题。其核心思想源自一个关键洞察：当目标概念罕见时，去噪过程会偏向高频语义模式，导致罕见属性被压制、组合性丢失及结构不一致。AAPB 通过在每个扩散步骤中动态调节辅助锚点提示与目标提示的贡献比例，修正分数空间中的漂移，从而实现目标忠实的生成。
 
@@ -181,13 +175,6 @@ AAPB 的整体管线由六个核心模块串联构成，数据流从噪声初始
 - **引导公式**：标准 CFG 的条件分数固定为目标提示分数，AAPB 将其扩展为三路分数的动态加权混合，使去噪轨迹能够自适应地平衡目标忠实度与锚点稳定性。
 
 - **提示处理**：R2F 将罕见概念分解为多步子提示并交替生成，容易导致实体纠缠；AAPB 直接构建罕见概念与其频繁对应物的二元对，一次性重构完整提示，避免属性-物体绑定错误（见图 11）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2293_https_arxiv_org_abs_2603_19158/figures/001_Figure_1.jpg]]
-*Figure 1: When the target concept lies in a low-density region, the generated samples tend to drift toward semantically dominant, high-density concepts [33] in the learned score space, resulting in the suppression of rare or compositional attributes. Our proposed adaptive coefficient*
-
-
 
 ### 问题形式化：从去噪漂移到分数空间对齐
 
@@ -256,16 +243,6 @@ AAPB的完整管线包含两个预处理步骤和迭代采样：
 
 该管线无需训练，可直接集成至任意预训练扩散模型（SDXL、SD3.0、IterComp等），在Table 4中展示了跨骨干的一致鲁棒性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2293_https_arxiv_org_abs_2603_19158/figures/010_Figure_9.jpg]]
-*Figure 9: Evolution of the adaptive coefficient*
-
-![[assets/figures/papers/paper_list_l2293_https_arxiv_org_abs_2603_19158/figures/013_Figure_10.jpg]]
-*Figure 10: Evolution of the adaptive coefficient*
-
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与实验动机
@@ -310,11 +287,6 @@ AAPB的完整管线包含两个预处理步骤和迭代采样：
 
 **自动化偏好评估**（Table 10）：在LAION-aesthetic（视觉吸引力）、ImageReward（人类偏好）和PickScore（文本-图像对齐）三项指标上，AAPB均取得最佳或次佳，与GPT-4o评估和用户研究结论一致。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2293_https_arxiv_org_abs_2603_19158/figures/003_Table_1.jpg]]
-*Table 1: Text-to-image alignment performances in the RareBench with other baselines with GPT-4o based evaluation. Best values are denoted with bold, second-best with underlined*
-
 ![[assets/figures/papers/paper_list_l2293_https_arxiv_org_abs_2603_19158/figures/004_Figure_3.jpg]]
 *Figure 3: Qualitative comparison with state-of-the-art diffusion models on RareBench. All models are executed with the same random seed. Our method achieves stronger text-to-image alignment without additional training*
 
@@ -329,14 +301,6 @@ AAPB的完整管线包含两个预处理步骤和迭代采样：
 
 ![[assets/figures/papers/paper_list_l2293_https_arxiv_org_abs_2603_19158/figures/015_Table_6.jpg]]
 *Table 6: Quantitative comparison on RareBench-Multi between R2F+ and our method built upon the R2F+ baseline*
-
-![[assets/figures/papers/paper_list_l2293_https_arxiv_org_abs_2603_19158/figures/021_Figure_13.jpg]]
-*Figure 13: Failure results on RareBench where both ours and R2F exhibit attribute-object mismatches. This behaviors aligns with previously reported limitations in CLIP’s ability to bind compositional concpets faithfully [16]*
-
-![[assets/figures/papers/paper_list_l2293_https_arxiv_org_abs_2603_19158/figures/002_Figure_2.jpg]]
-*Figure 2: Toy Example of the target concept generation. (a) Training distributions: frequent samples*
-
-
 
 ## 定位与知识库关联
 
@@ -405,8 +369,6 @@ $$\mathrm{Displacement}(s_A) = \|\mathbf{d}^{\parallel}\| + \|\mathbf{d}^{\perp}
 2. **训练场景的推广**：当前AAPB是纯粹的训练免方法。能否将自适应混合机制推广到有训练的场景，例如与LoRA微调或DreamBooth结合，在保持目标忠实度的同时进一步提升生成质量？
 3. **锚点自动生成策略**：当前依赖LLM生成锚点，是否存在更高效的锚点自动生成策略？例如基于检索的锚点选择、或利用扩散模型自身的知识进行锚点合成。
 4. **多概念场景的扩展**：当前框架主要处理单一罕见概念或单一编辑任务。如何将自适应混合机制扩展到多个罕见概念同时出现的场景，或需要多重编辑的复杂任务？
-
-
 
 ## 原文 PDF
 

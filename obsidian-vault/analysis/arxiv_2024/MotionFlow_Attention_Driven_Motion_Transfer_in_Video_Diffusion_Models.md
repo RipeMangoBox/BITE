@@ -53,8 +53,6 @@ claims:
 
 MotionFlow 的效果依赖于预训练模型注意力图的质量，在物体几何形状差异巨大时可能失效，且存在被滥用于生成欺骗性内容的伦理风险。
 
-
-
 ### 问题背景
 
 文本到视频（T2V）扩散模型在生成高质量、语义一致的视频方面取得了显著进展，但如何在不依赖额外训练或微调的前提下实现对生成视频中运动模式的精细控制，仍然是一个开放难题。用户通常希望将一段参考视频中的运动动态迁移到新的文本提示所描述的场景中——例如将“奔跑的猎豹”的运动模式迁移到“行走的机器人”上——同时保持目标场景的外观和语义完整性。这一任务的核心挑战在于：运动信息与外观、场景布局高度耦合，现有方法难以在解耦运动的同时适应大幅度的场景变化。
@@ -81,8 +79,6 @@ MotionFlow 的提出源于一个关键观察：**预训练视频扩散模型中�
 
 基于此，MotionFlow 提出了一种**测试时优化**的运动迁移框架，核心思想是：利用 DDIM 反演从源视频中提取交叉注意力图作为运动引导信号，在生成过程中通过注意力损失函数更新噪声潜在表示，使生成视频的注意力分布与源视频对齐。这种方法无需任何训练或微调，且运动迁移独立于源视频的外观和场景布局，允许用户通过编辑提示自由改变目标场景。
 
-
-
 ## 核心方法与创新机理
 
 MotionFlow 的核心创新在于**将运动迁移问题重新定义为交叉注意力图的对齐与引导问题**，从而彻底绕过了现有方法对额外训练、微调或时空特征匹配的依赖。这一根本性转变体现在以下三个关键维度。
@@ -108,8 +104,6 @@ MotionFlow 通过交叉注意力图的引导机制实现了运动与场景布局
 ### 创新点的因果链条
 
 上述三个创新维度构成了一个完整的因果链条：**交叉注意力图作为运动表征**（创新1）使得**无需训练的测试时优化**（创新2）成为可能，而这两者的结合又自然实现了**运动与场景布局的解耦**（创新3）。消融实验为这一因果链条提供了决定性证据：如 Figure 7 所示，移除交叉注意力引导的潜在更新后，反演的潜在表示要么丢失运动信息，要么完全无法生成目标物体，证实了交叉注意力引导是运动迁移成功的必要条件。
-
-
 
 MotionFlow 采用“先反演，后生成”的两阶段范式，在测试时利用预训练视频扩散模型中的交叉注意力图实现无需训练的运动迁移。其核心思想是：交叉注意力图能够独立于源视频的外观和场景布局，准确捕获运动主体的时空动态，从而将运动模式迁移到由编辑提示词指定的全新场景中。
 
@@ -150,12 +144,8 @@ MotionFlow 的输入包括：一段原始视频（提供运动模式）和一个
 
 各模块的协作逻辑如下：DDIM 反演模块负责将视频压缩为潜在空间中的可优化表示；注意力提取模块从 UNet 中捕获运动主体的空间定位信息并生成掩码；引导生成模块则在去噪过程中以这些掩码为约束，通过梯度优化将运动模式“注入”到新场景中。整个流程无需任何模型训练或微调，仅依赖预训练模型（ZeroScope T2V）的推理能力，实现了真正的测试时运动迁移。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2412_05275/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of MotionFlow framework. Our invert-then-generate method operates in two main stages: (1) Inversion, where DDIM inversion is used to extract latent representations and cross-attention maps from the original video, generating target masks that capture the subject’s motion and spatial details; (2) Generation, where these masks and a text prompt guide the creation of a new video, aligning with the original video’s motion dynamics and spatial layout while adhering to the semantic content of the prompt*
-
-
 
 MotionFlow 的框架围绕一个“反演-生成”范式构建，其核心在于从预训练视频扩散模型中提取交叉注意力图，并利用这些注意力图引导生成过程。整个流程包含四个关键模块，彼此紧密协作，构成了运动迁移的完整链条。
 
@@ -193,12 +183,8 @@ $$z_{t}^{\prime} = z_{t} - \alpha_{t} \nabla_{z_{t}} \mathcal{L}_{\mathrm{total}
 
 这一测试时优化机制是 MotionFlow 实现训练无关运动迁移的关键——消融实验证实，移除交叉注意力引导的潜在更新会导致生成视频中运动丢失或目标物体生成失败（Figure 7）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2412_05275/figures/002_Figure_2.jpg]]
 *Figure 2: Motivation. Visualization of cross-attention maps for the subject tokens, showing how MotionFlow captures and transfers motion dynamics from the original video, ensuring accurate subject motion while adhering to new edit prompts*
-
-
 
 ## 实验与关键发现
 
@@ -219,9 +205,6 @@ $$z_{t}^{\prime} = z_{t} - \alpha_{t} \nabla_{z_{t}} \mathcal{L}_{\mathrm{total}
 
 ![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2412_05275/figures/007_Table_1.jpg]]
 *Table 1: Quantitative Comparisons and User Study Quantitative comparisons for Text Similarity, Motion Fidelity, and Temporal Consistency Scores. User preferences for text alignment to edit prompt, motion alignment to the original video, and motion smoothness of the generated video for DMT, MotionDirector, VMC, Motion Inversion, and MotionFlow*
-
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2412_05275/figures/009_Figure_8.jpg]]
-*Figure 8: An example question used in the user study. Participants were asked to evaluate multiple videos based on motion fidelity, motion smoothness, and text fidelity*
 
 用户研究结果与定量指标高度一致，进一步证实了交叉注意力引导策略在感知层面的有效性——生成的视频不仅数值上更优，在人类观察者眼中也更具运动自然性和文本一致性。
 
@@ -246,18 +229,8 @@ $$z_{t}^{\prime} = z_{t} - \alpha_{t} \nabla_{z_{t}} \mathcal{L}_{\mathrm{total}
 
 最后，该方法存在被滥用于生成深度伪造或欺骗性内容的潜在伦理风险，需要在实际部署中建立相应的防范措施。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2412_05275/figures/005_Figure_5.jpg]]
 *Figure 5: Comparison. Qualitative comparison of our method, MotionFlow, with DMT [37], MotionDirector [43], Motion Inversion [33] and VMC [12]*
-
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2412_05275/figures/004_Figure_4.jpg]]
-*Figure 4: Qualitative Results. MotionFlow can successfully transfer a wide variety of motion types, ranging from single to multiple motions and from simple to complex motion patterns. Additionally, it can either maintain the original scene layout or significantly alter it based on the user-provided text prompt. Please refer to the supplementary material where the actual videos are provided*
-
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2412_05275/figures/001_Figure_1.jpg]]
-*Figure 1: MotionFlow is a training-free method that leverages attention for motion transfer. Our method can successfully transfer a wide variety of motion types, ranging from simple to complex motion patterns*
-
-
 
 ## 定位与知识库关联
 
@@ -314,8 +287,6 @@ MotionFlow 的运动迁移能力在带来创作便利的同时，也引入了潜
 4. **轻量化与加速**：是否存在更高效的注意力引导策略（如仅在关键去噪步骤进行引导、使用近似的梯度计算），以降低测试时优化的计算开销，使其更接近实时应用的需求？
 
 5. **长视频与高分辨率拓展**：当前方法在标准分辨率短视频上验证，将其拓展到更长时序和更高分辨率时，注意力图的内存占用和计算复杂度将显著增长，需要探索分块处理或层次化注意力引导策略。
-
-
 
 ## 原文 PDF
 

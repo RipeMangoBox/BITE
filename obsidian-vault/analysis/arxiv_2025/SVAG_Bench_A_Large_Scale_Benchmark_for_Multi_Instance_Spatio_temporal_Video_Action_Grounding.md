@@ -55,8 +55,6 @@ claims:
 
 **局限与挑战**：当前 SVAGFormer 采用模块化分离设计，缺乏端到端的联合推理；基准领域局限于城市、交通和动物监控，尚未覆盖具身交互场景；在 MOT20 等极端拥挤长时场景中，绝对性能仍接近零，距离实用水平存在根本性差距。
 
-
-
 ### 视频动作定位的范式演进与根本瓶颈
 
 视频理解领域长期存在一个核心矛盾：**空间定位、时间定位与多实例推理被割裂为独立任务**，导致任何单一模型都无法回答“谁在何时何地执行了什么动作”这一完整查询。Figure 1 清晰地揭示了这一鸿沟：
@@ -77,8 +75,6 @@ Table 1 的系统对比揭示了当前基准数据集的结构性缺陷。尽管
 
 1. **SVAG-Bench**：首个大规模多实例时空视频动作定位基准，整合 OVIS、MOT17 和 MOT20 三个多目标跟踪数据集，覆盖从短时多样（OVIS，平均 67.7 秒）到极长密集（MOT20，平均 2232.8 秒）的难度谱系。
 2. **SVAGFormer**：采用**时间优先门控策略**的模块化基线——先执行时间定位确定动作区间，再将空间跟踪限定在该窗口内，从而避免无关帧产生虚假轨迹。这一设计选择直接回应了“孤立子任务优化无法组合为统一时空推理”的核心洞察。
-
-
 
 ## 核心方法与创新机理
 
@@ -109,8 +105,6 @@ SVAGFormer 的核心设计选择是**时间优先门控策略**（temporal-first
 
 需要指出，SVAGFormer 的模块化设计（FlashVTG + TempRMOT + 时间门控）虽然有效，但**时空模块分离**意味着信息仅在门控信号处单向传递，缺乏端到端的联合推理。这可能是其在 MOT20 上 HOTA 仍仅 0.43 的结构性原因——在极端拥挤场景中，时间定位的错误会不可逆地传播至空间跟踪模块。此外，当前基准领域覆盖仅限于多目标跟踪数据集（OVIS、MOT17、MOT20），尚未扩展到更一般的具身场景，这一限制需在后续工作中突破。
 
-
-
 SVAGFormer 采用**时间优先门控（temporal-first gating）**策略，将多实例时空视频动作定位分解为两个级联阶段，以解决全视频空间跟踪带来的虚假轨迹问题。
 
 ### Pipeline 流程
@@ -129,15 +123,8 @@ SVAGFormer 采用**时间优先门控（temporal-first gating）**策略，将�
 
 现有 LVLM 及专家模型在长时、密集、多行动者场景中面临根本性推理鸿沟——空间跟踪在全视频上执行时，无关帧产生的虚假关联会严重破坏轨迹一致性（Table 28 显示所有 LVLM 在 MOT20 上空间定位 HOTA 均为零）。时间优先门控通过**压缩空间跟踪的时间域**，缓解了这一瓶颈，使模型能够以较低的时空复杂度实现可用的联合定位。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l75_https_arxiv_org_abs_2510_13016/figures/001_Figure_1.jpg]]
-*Figure 1: Comparison of existing video grounding paradigms with our proposed Spatio-temporal Video Action Grounding (SVAG) task. (a) SVG: Spatial Video Grounding focuses only on spatial localization and lacks temporal reasoning. (b) STVG: Spatio-Temporal Video Grounding jointly localizes objects over time but cannot handle multiple interacting instances. (c) VTG: Video Temporal Grounding identifies temporal segments but misses spatial localization. (d) Ours (SVAG): Unifies temporal and spatial grounding to detect and track multiple referent objects performing the queried action across time*
-
 ![[assets/figures/papers/paper_list_l75_https_arxiv_org_abs_2510_13016/figures/004_Figure_3.jpg]]
 *Figure 3: Overview of the SVAGFormer pipeline. Given a natural language query (e.g., “A person is dancing in the open area”), temporal grounding first narrows the full video (frames 1–2782) to two temporal candidates (2543–2782) and (2557–2772). Spatial grounding then operates exclusively within this window, returning bounding box tracks for all actors satisfying the query*
-
-
 
 ### 任务统一形式
 
@@ -180,13 +167,6 @@ SVAGEval 评估框架针对多参考对象场景进行了专门设计：
 - **身份映射策略**：对每个真实轨迹 ID，统计各预测 ID 出现的帧数频率，选择频率最高的预测 ID 进行匹配（多数投票），确保时空维度对齐一致。
 - **假阳性惩罚**：预测到未提及参考物体的轨迹计为假阳性，确保评估聚焦于查询相关对象。
 - **时序对构建**：基于最终的 track_id 映射构建时序预测与真实值对，用于时间定位评估。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l75_https_arxiv_org_abs_2510_13016/figures/005_Figure_4.jpg]]
-*Figure 4: Flowchart for processing evaluation. Spatial and temporal evaluations are conducted separately on the OVIS, MOT17, and MOT20. The results are averaged and combined to form the final result. Threshold α controls the relative importance of detection and association accuracy in HOTA*
-
-
 
 ## 实验与关键发现
 
@@ -239,27 +219,11 @@ Table 2 汇总了各方法在三个子数据集上的统一对比。核心发现
 ![[assets/figures/papers/paper_list_l75_https_arxiv_org_abs_2510_13016/figures/011_Table_5.jpg]]
 *Table 5: Comparison of video lengths in different datasets. The video length of MOT20 is the longest, while OVIS is the shortest*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l75_https_arxiv_org_abs_2510_13016/figures/017_Table_10.jpg]]
-*Table 10: Performance on the different datasets using TempRMOT [57] with weight from rk2. HOTA increases by approximately 2% on OVIS and MOT17. Pretraining substantially improves association accuracy across dataset*
-
-![[assets/figures/papers/paper_list_l75_https_arxiv_org_abs_2510_13016/figures/018_Table_11.jpg]]
-*Table 11: Different lengths for inference on OVIS. Increasing memory length from 5 to 8 improves HOTA, DetA, and AssA. However, the gains are not strictly monotonic*
-
 ![[assets/figures/papers/paper_list_l75_https_arxiv_org_abs_2510_13016/figures/037_Table_28.jpg]]
 *Table 28: Spatial grounding ablation on MOT20 test set (Qwen2.5-VL). All configurations score zero, confirming that MOT20 poses an intractable challenge for current LVLMs under spatial grounding*
 
 ![[assets/figures/papers/paper_list_l75_https_arxiv_org_abs_2510_13016/figures/007_Figure_5.jpg]]
 *Figure 5: Qualitative examples for each subdataset. From top to bottom: OVIS, MOT17, MOT20. For OVIS, the zebra is performing a fine-grained action: tilting its head to the left across the grass. The object can be localized, even with subtle action. Detections not labeled but satisfying the query will be marked as false positives, leading to worse performance on sparse annotations in the crowd scenes. For MOT, best temporal predictions often nearly cover the full time range of the ground-truth, reflected in metrics R5 and R10, but perform poorly on R1*
-
-![[assets/figures/papers/paper_list_l75_https_arxiv_org_abs_2510_13016/figures/021_Table_14.jpg]]
-*Table 14: Performance on the different datasets using FlashVTG [3]. Datasets marked with † use NMS 0.7. Datasets marked with § use NMS 0.5. The higher score is highlighted in bold. Lower NMS thresholds apply stronger suppression, reducing redundant predictions, leading to better performance*
-
-![[assets/figures/papers/paper_list_l75_https_arxiv_org_abs_2510_13016/figures/003_Figure_2.jpg]]
-*Figure 2: Statistics of SVAG-Bench. The majority of queries fall within the range of 6 to 10 words*
-
-
 
 ## 定位与知识库关联
 
@@ -326,8 +290,6 @@ SVAGFormer 在方法谱系中的独特位置源于其**时间优先门控策略�
 4. **当前 LVLM 的视觉表示是否丢失了细粒度的时空信息？** LVLM 在空间跟踪上的全面失败暗示，其视频编码器可能过度压缩了精确位置和身份信息。如何压缩视频表示同时保留多目标跟踪所需的时空精度，是一个核心架构问题。
 
 5. **评价体系是否需要更细粒度的组合性评估？** m-HIoU 作为单一标量可能掩盖模型在不同维度（时间精度、空间关联、多实例处理）上的能力差异，需要开发分解式评估协议来诊断具体失败模式。
-
-
 
 ## 原文 PDF
 

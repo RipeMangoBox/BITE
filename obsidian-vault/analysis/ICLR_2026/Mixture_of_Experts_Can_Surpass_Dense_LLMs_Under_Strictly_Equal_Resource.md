@@ -59,8 +59,6 @@ claims:
 
 这些结果表明，MoE的性能增益源自架构本身的参数利用效率优势，而非资源倾斜。该结论为MoE架构在资源受限场景下的部署提供了有力的理论支撑。
 
-
-
 大规模语言模型（LLM）的规模化定律表明，增加模型参数量、训练数据量和计算预算能持续提升模型性能。在这一背景下，**Mixture-of-Experts（MoE）** 架构因其稀疏激活特性——每个 token 仅激活部分参数——成为在固定推理计算预算下扩大模型容量的重要范式。然而，一个根本性的问题始终悬而未决：MoE 的性能增益究竟源于架构本身的归纳偏置，还是仅仅因为资源分配的不对等？
 
 ### 现有对比的公平性缺口
@@ -90,8 +88,6 @@ $$r_{\mathrm{a}} = N_{\mathrm{a}} / N$$
 > **在总参数量、训练计算量和数据量三者严格相等的约束下，MoE 能否超越稠密大语言模型？**
 
 为回答这一问题，本文构建了一套三步实验方法论：首先通过统一参数化框架建立稠密与 MoE 模型的可比基础，然后通过贪心架构搜索确保每个候选模型处于（近）最优配置，最后在严格控制 $N$、$C$、$D$ 的条件下扫描激活率，定位最优 $r_{\mathrm{a}}$ 并比较 MoE 与稠密基线的性能。实验覆盖 2B 至 7B 参数规模，累计训练近 200 个语言模型，处理约 50 万亿 token，旨在提供迄今最严格的公平对比证据。
-
-
 
 ## 核心方法与创新机理
 
@@ -133,8 +129,6 @@ $$r_{\mathrm{a}} = N_{\mathrm{a}} / N$$
 3. **建立了统一参数化与贪心搜索相结合的系统性公平比较方法论**，可复用于未来的架构对比研究。
 4. **提出数据复用策略作为实现三方对齐的关键技术手段**，解决了低 $r_a$ 带来的数据需求膨胀问题。
 
-
-
 为回答“严格等资源下 MoE 能否超越稠密 LLM”这一核心问题，本文提出了一套**三步严格等资源 MoE 框架**（Three-Step Strictly Equal-Resource MoE Framework）。该框架的核心设计原则是：在总参数量 $N$、训练计算量 $C$ 和唯一数据量 $D$ 三者同时匹配的条件下，系统性地比较 MoE 与稠密架构的性能差异，从而剥离资源倾斜带来的混淆效应，纯化出架构本身的增益。
 
 ### 统一参数化（Unified Parameterization）
@@ -175,8 +169,6 @@ $$r_a = N_a / N$$
 ### 模块间数据流
 
 整个框架的信息流如下：统一参数化模块输出 $N$、$M$、$r_a$ 的显式关系，作为架构搜索和激活率扫描的约束条件；贪心搜索确定的最优架构（1dense+SE、特定 $\zeta$ 和 $\mu$、无门控归一化、中等 $K$）传递给激活率扫描模块；激活率扫描在固定 $N$ 和 $C$ 下定位 $r_a^{**}$，并将对应 MoE 模型与稠密基线对比；数据复用模块在引入唯一数据量 $D$ 约束后重新评估上述结论的稳定性；最终，最优配置的预训练模型进入 SFT 和下游评估环节。
-
-
 
 ### 统一参数化框架
 
@@ -224,8 +216,6 @@ MoE层的输出为门控分数 $g_i(x)$ 对各专家输出 $E_i(x)$ 的加权求
 
 3. **数据复用策略**（§6）：针对MoE因低激活率而需处理更多token（但唯一数据量可能不足）的问题，提出严格复用（固定唯一数据量 $D$）和宽松复用（固定训练轮次）两种方案，确保在 $N$、$C$、$D$ 三者均等的终极约束下完成公平评估。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：最优激活率 ≈20%
@@ -237,19 +227,9 @@ MoE层的输出为门控分数 $g_i(x)$ 对各专家输出 $E_i(x)$ 的加权求
 **主结果 1：固定 C 下 MoE 超越稠密基线（2B 规模）**。在 $N \approx 2.15\text{B}$、固定训练计算量 $C \approx 9.13 \times 10^{20} \sim 9.36 \times 10^{20}$ FLOPs 的条件下，激活率扫描（8%–58%）显示最优激活率 $r_a^{**} \approx 20\%$。该配置下 MoE 模型验证 BPC 为 0.4857，显著优于同等计算预算下的最优稠密基线（BPC 0.4921），差距为 -0.0064（Table 10, Table 13）。该差异在语言建模的 BPC 尺度上具有实质意义，且所有对比模型均使用通过超参数缩放律优化的形状超参数（如 $\zeta \approx 88$），排除了架构次优性的干扰。
 
 
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_oIdzliJAeA/figures/014_Table_10.jpg]]
-*Table 10: Experimental settings and results of optimal ARs for MoE models N = 2.15B with fixed C. Hyperparameters shared by all experiments: L = 1 6 , S = 2 0 4 8 , $D _ { \mathrm { m } }$ = 1 4 0 8 , $D _ { \mathrm { f f n } }$ = 3 9 0 4 , H = 11, $D _ { \mathrm { h } }$ = 1 2 8 , $\zeta$ = 8 8 . The green row corresponds to the MoE model with the lowest BPC on the validation set
-
 **主结果 2：7B 规模下结论一致且增益更大**。在 $N \approx 6.52\text{B}$、固定 $C = 2.86 \times 10^{21}$ FLOPs 的条件下，$r_a = 20.07\%$ 的 MoE 模型取得 BPC 0.4543，大幅超越相同计算量的稠密基线（BPC 0.4736），差距扩大至 -0.0193（Table 12, Table 13）。这一结果表明，随着模型规模增大，MoE 在等计算约束下的相对优势可能进一步放大。
 
 **主结果 3：最优激活率与模型规模无关**。Figure 1、Figure 2 和 Figure 5 共同揭示，在 2B、3B、7B 三个规模下，验证损失随 $r_a$ 的变化曲线均在 $r_a \approx 20\%$ 处达到最低点。这一跨规模的稳定性是该工作最重要的经验发现之一，暗示存在一个由架构内在特性决定的“甜区”，而非由特定模型尺寸或训练预算偶然产生。
-
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_oIdzliJAeA/figures/002_Figure_1.jpg]]
-*Figure 1: Performance of N $\approx$ 2 $\mathrm { B }$ models trained with varying data sizes D and activation rates $r _ { \mathrm { a } }$ . (a) With a fixed D , performance gain exhibits a non-linear dependence on training budget C. Conversely, with a fixed $r _ { \mathrm { a } }$ . , increasing D leads to a linear performance gain. These findings indicate an optimal activation rate, $r _ { \mathrm { a } } ^ { * * }$ = 2 0 \% , that is consistent across various $\bar { D }$ values when N is constant. (b) With a fixed training compute C , the optimal activation rate $r _ { \mathrm { a } } ^ { * * }$ = 2 0 \% can be clearly seen
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_oIdzliJAeA/figures/003_Figure_2.jpg]]
-*Figure 2: Performance of N $\approx$ 7 $\mathrm { B }$ models trained with varying data sizes D and activation rate $r _ { \mathrm { a } }$ . The optimal activation rate, $r _ { \mathrm { a } } ^ { * * }$ = 2 0 \% , align with the findings for the 2B models (Figure 1). Additionally, compared to training on the unique dataset, the strict data reuse scheme shows only a slight performance reduction, while the loose scheme often yields better performance
 
 ### 严格数据复用下的鲁棒性验证
 
@@ -267,7 +247,6 @@ MoE 模型因低激活率而具有更低的每 token 计算成本，在固定 $C
 ### 下游任务验证
 
 为检验预训练结论的泛化性，本文对 7B 模型进行监督微调（SFT），在知识、推理、数学、代码等多维度基准上评估（Table 2, Figure 3）。
-
 
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_oIdzliJAeA/figures/005_Table_2.jpg]]
 *Table 2: Accuracy of 7B SFT-ed models across different benchmarks*
@@ -291,7 +270,6 @@ MoE 模型因低激活率而具有更低的每 token 计算成本，在固定 $C
 | top-K 设置 | $K=4\sim6$ 效果最佳，$K=1$ 和过大的 $K$ 均为次优 | Table 7 |
 | 模型形状比 | $\zeta \approx 88$（2B）、$\zeta \approx 85.3$（7B），$\mu$ 随 $D_m$ 增大呈下降趋势 | Table 8, Figure 4 |
 
-
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_oIdzliJAeA/figures/009_Table_5.jpg]]
 *Table 5: Experimental settings and results of MoE layer arrangement and shared expert. Hyperparameters shared by all experiments: $D _ { \mathrm { m } }$ = 1 4 0 8 ， $D _ { \mathrm { f f n } }$ = 3 9 0 4 ， $\mathbf { \bar { N o r m } } = \mathbf { T r u e }$
 
@@ -314,7 +292,6 @@ MoE 模型因低激活率而具有更低的每 token 计算成本，在固定 $C
 
 3. **数据配方依赖性**：训练数据为内部混合数据集（Table 3），与公开数据集（如 The Pile）存在差异，可能影响结论的外部可复现性。最优激活率的普适性需要在不同数据分布下进一步验证。
 
-
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_oIdzliJAeA/figures/006_Table_3.jpg]]
 *Table 3: Pretraining data recipe compared with the LLaMA-1 recipe*
 
@@ -327,20 +304,6 @@ MoE 模型因低激活率而具有更低的每 token 计算成本，在固定 $C
 - **Figure 3**：7B SFT 模型下游性能雷达图，MoE ($r_a=20\%$) 在多维度上超越 2× 计算量稠密基线。
 - **Table 2**：SFT 模型在各基准上的详细准确率，含严格/宽松复用对比。
 - **Table 10, 12, 13**：固定 $C$ 下 2B/7B MoE 与稠密基线的完整实验配置与 BPC 结果。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_oIdzliJAeA/figures/001_Table_1.jpg]]
-*Table 1: Notation*
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_oIdzliJAeA/figures/008_Table_4.jpg]]
-*Table 4: Common training recipe*
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_oIdzliJAeA/figures/013_Table_9.jpg]]
-*Table 9: Experimental settings and results of optimal ARs for MoE models with N = 2.15B and fixed ra. Hyperparameters shared by all experiments: L = 16, S = 2048, Dm = 1408, $D _ { \mathrm { f f n } }$ = 3904, H = 11, Dh = 128, ζ = 88*
-
-
-
 
 ## 定位与知识库关联
 
@@ -396,8 +359,6 @@ MoE 模型与稠密基线的核心差异体现在五个架构槽位上：
 3. **能力增强机制**：最优激活率如何具体增强模型能力——是通过促进专家特化、改善负载均衡，还是其他机制？
 4. **数据效率优化**：能否设计更高效的数据复用策略，完全消除在严格等数据约束下对唯一 token 数的额外需求？
 5. **与推理效率的联合优化**：当前分析聚焦预训练损失和下游准确率，最优激活率在推理延迟/吞吐量约束下是否需要调整？
-
-
 
 ## 原文 PDF
 

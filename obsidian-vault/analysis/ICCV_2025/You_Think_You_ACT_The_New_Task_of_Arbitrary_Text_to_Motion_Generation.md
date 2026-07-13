@@ -58,8 +58,6 @@ claims:
 
 **局限与开放问题。** TAAT 的 Think 阶段依赖 LLM，可能产生不准确的动作指令；数据集由 LLM 生成，虽经人工检验（准确率 > 95%），仍可能存在与真实人类描述风格不一致的偏差。多解评估指标依赖距离阈值的选择。未来方向包括将框架扩展到包含物体交互或多人交互的场景，以及探索以更轻量模型替代 LLM 以适应实时应用。
 
-
-
 ### 问题定义：从动作文本到任意文本的范式跃迁
 
 文本驱动的人体动作生成旨在根据自然语言描述合成逼真的三维人体运动序列。该领域经历了从**动作标签到动作**（Action Label to Motion）到**动作文本到动作**（Action Text to Motion）的演进。动作标签仅提供离散的动作类别，而动作文本则包含显式的动作指令（如“一个人向前走然后坐下”），为生成提供了更丰富的语义约束。
@@ -84,8 +82,6 @@ claims:
 2. **行动阶段（Act）**：基于VQ-VAE离散动作表示和自回归Transformer，将每条动作指令确定性地转化为运动序列，并通过前一动作段的尾部索引实现段间语义衔接。
 
 这一设计将“场景理解”与“动作生成”解耦，使模型既能利用LLM的零样本推理能力处理任意文本，又能通过离散动作空间的确定性生成保证动作质量。为支撑该任务，本文还构建了首个同时包含动作文本和场景文本的**双文本数据集HUMANML3D++**，并引入了**Hit Accuracy**和**Mean Hit Distance**两项多解评估指标，以替代失效的单解度量。
-
-
 
 ## 核心方法与创新机理
 
@@ -137,8 +133,6 @@ TAAT引入两项新指标：
 - LLM在Think阶段的具体推理机制（如是否使用了思维链）在现有材料中未详细说明，建议查阅原文Section 4.1获取完整提示策略。
 - 分段拼接策略中语义连接长度 $n$ 的最优值（Figure 8显示为7）的具体选取实验细节需确认。
 
-
-
 TAAT 遵循“思考—行动”两阶段流水线，将任意文本到动作生成建模为一个多解问题。流水线由三个核心模块串联构成：Think Model（LLM 场景解析器）、Act Model（VQ‑VAE 编码器 + 自回归 Transformer 生成器）以及 Multi‑Solution Evaluator（多解评估器）。整体输入为不含显式动作标签的任意场景文本，输出为一组合理的动作序列。
 
 **输入输出流**：给定一个场景文本 $c$，Think Model 首先利用微调后的大语言模型将其映射为一组可能的动作指令集合 $A = \theta_{\mathrm{LLM}}(c, P) = (a_1, a_2, \ldots, a_x)$。随后，Act Model 对每个动作指令 $a_x$ 独立生成离散动作令牌序列 $\mathbf{I}_x$，并通过前一动作的最后 $n$ 个令牌作为语义连接，按公式
@@ -156,15 +150,8 @@ $$
 
 > **注意**：Think Model 的具体微调策略（LLaMA + LoRA）和 Act Model 的网络配置（18 层 Transformer，隐藏维度 1024，16 注意力头）详见实现细节部分。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2404_14745/figures/004_Figure_3.jpg]]
 *Figure 3: Pipeline overview. (Dataset) We extend HUMANML3D [9] to the novel HUMANML3D++ with Scene Texts. (TAAT) We utilize a fine-tuned LLM to generate multiple reasonable response action instructions for a single Scene Text. And we generate each action in an action instruction individually and utilize the code generated in the previous stage to guide the generation in the subsequent stage. (Evaluation) We introduce two new metrics, Hit Accuracy and Mean Hit Distance, to measure this multi-solution task*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2404_14745/figures/001_Figure_1.jpg]]
-*Figure 1: (a) “Action Label to Motion” generates motion with a certain action label. (b) “Action Text to Motion” generates motion with an explicit Action Text (texts contain action labels). (c) “Arbitrary Texts to Motion” encompasses a new Scene Text to Motion task, where scene text refers to events or situations and does not contain explicit action labels. Understanding these scene texts and generating corresponding reactive motions is a multi-solution task*
-
-
 
 TAAT框架由两个核心模块构成：**Think Model（思考模型）** 负责场景文本解析与动作指令提取，**Act Model（行动模型）** 负责离散动作编码与自回归动作生成。二者通过动作指令序列实现解耦：LLM先“思考”出多组可能的动作描述，再由Transformer“执行”这些描述。
 
@@ -216,8 +203,6 @@ $$\mathrm{MHD} = \frac{\sum_{i=1}^{M} \sum_{j=1}^{N} \delta_{ij} \cdot d_{ij} + 
 
 这两个指标直接回应了现有单解度量（如R-Precision）在场景文本任务上的失效问题——真值动作的R-Precision从动作文本的0.797骤降至0.665，误判率近40%，表明传统指标无法公平评估多解生成质量。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈验证：现有指标在场景文本任务上的失效
@@ -243,9 +228,6 @@ Table 3 汇总了零样本与训练后场景文本到动作任务的核心结果
 ### 动作文本任务上的竞争力验证
 
 Table 4 和 Figure 7 验证了 TAAT 在传统动作文本任务上的表现。TAAT 取得 FID 0.461，与专为动作文本设计的基线模型具有竞争力。更重要的是，在多动作序列生成场景中（Figure 7），只有 TAAT 能够按正确顺序执行全部动作，而 **MDM**、**MLD**（Chen et al., CVPR 2023）存在动作遗漏，**T2M-GPT** 出现顺序错乱，**MLD** 还存在空间关系错误。这得益于 TAAT 的逐段生成与语义拼接机制（公式 (6)），前一动作的最后 n 个索引为后续动作提供了语义连接。
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2404_14745/figures/010_Figure_7.jpg]]
-*Figure 7: Visual results on Action Texts. Only our model performs all actions in the correct sequence, while other models exhibit issues such as missing actions (MDM [39], MLD [3]), sequence disorder (T2M-GPT [47]), and spatial relationship errors (MLD [3])*
 
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2404_14745/figures/012_Table_4.jpg]]
 *Table 4: Experiment on Action Texts to Motion. Our TAAT works well in FID, Diversity, demonstrating that our model can generate realistic and diverse motions that are close to real human motions. Furthermore, TAAT is suitable for multi-action generation in fig 7*
@@ -286,22 +268,6 @@ Table 5 分析了各模型在零样本场景文本、训练后场景文本、动
 2. 是否可以用更轻量的模型替代 LLM 进行场景解析，以适应实时应用？
 3. 多解评估指标 Hit Accuracy 和 Mean Hit Distance 是否可推广到其他生成任务（如图像或音频生成）？
 4. 如何进一步提升 TAAT 对高度抽象或反事实场景文本的推理能力？
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2404_14745/figures/009_Figure_6.jpg]]
-*Figure 6: For a Scene Text, TAAT can generate various reasonable motions*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2404_14745/figures/015_Figure_8.jpg]]
-*Figure 8: Impact of index lengths on motion generation*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2404_14745/figures/013_Table_7.jpg]]
-*Table 7: Comparison of prompt strategies. w/ Verb indicates verb usage restrictions; Quantity denotes quantity requirements; Few-shot indicates inclusion of examples; and Causality reflects descriptions of causal relationships*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2404_14745/figures/011_Table_6.jpg]]
-*Table 6: “Excell.,” “Sut.,” and “Inap.” represent the ability of different models to generate scene texts from action texts, as perceived by users, corresponding to “Excellent,” “Suitable,” and “Inappropriate” levels, respectively*
-
-
 
 ## 定位与知识库关联
 
@@ -344,8 +310,6 @@ TAAT框架打开了若干值得探索的方向：
 3. **多解评估的泛化**：Hit Accuracy和Mean Hit Distance的设计思想是否可推广到其他多解生成任务（如图像生成中的多样性评估、音频生成中的风格覆盖）？其阈值选择策略的普适性需要跨任务验证。
 
 4. **反事实与抽象推理**：如何进一步提升TAAT对高度抽象（如“时间流逝的感觉”）或反事实（如“如果重力消失”）场景文本的推理能力？这可能需要引入物理模拟或常识知识库作为Think阶段的辅助信息源。
-
-
 
 ## 原文 PDF
 

@@ -52,8 +52,6 @@ claims:
 
 在 Truebones Zoo 测试集上，MoCapAnything 对未见物种的 MPJPE 仅为 1.76 cm，而最佳基线 GLoT 为 7.42 cm，误差降低约 76%。消融实验进一步验证了多模态参考与几何桥梁的必要性：去除网格或图像模态后，未见物种 MPJPE 分别升至 3.16 cm 和 2.85 cm。此外，该方法在推理时自然涌现出跨物种重定向能力，可将运动迁移至不同骨架的资产上，产生动画就绪的 BVH 关节旋转。
 
-
-
 ### 问题背景：从固定模板到任意骨架的动作捕捉鸿沟
 
 三维动作捕捉（Motion Capture, MoCap）是计算机视觉与图形学中长期存在的核心问题，其目标是从视觉观测中恢复目标对象的时序三维运动。近年来，基于单目视频的人体动作捕捉取得了显著进展，涌现出如 **VIBE**（Kocabas et al., CVPR 2020）、**GLoT** 等一系列方法，能够从普通 RGB 视频中估计出人体姿态参数。然而，这些方法几乎无一例外地依赖于**固定的参数化人体模型**（如 SMPL/SMPL-X），其骨架拓扑、关节数量与语义定义在训练前即已固化。
@@ -84,8 +82,6 @@ claims:
 
 通过这些设计，MoCapAnything 仅使用**掩码 L1 位置损失**进行训练，不依赖旋转监督或显式时序损失，即可在 Truebones Zoo 测试集的未见物种上达到 **1.76 cm** 的 MPJPE，较最佳基线 GLoT（7.42 cm）降低 **76%**，同时天然支持推理阶段的跨物种运动重定向。
 
-
-
 ## 核心方法与创新机理
 
 MoCapAnything 的核心创新在于将面向任意骨架的动作捕捉问题分解为**“3D 关键点轨迹预测 + 逆运动学（IK）旋转恢复”**两阶段范式，并通过**多模态参考提示编码**与**中间粗糙 4D 网格桥梁**弥合视觉-关节模态鸿沟，从而实现对未见物种、任意拓扑骨骼的强泛化能力。
@@ -109,8 +105,6 @@ RGB 视觉特征与点云状关节空间之间存在显著的模态鸿沟，直�
 ### 5. 仅位置监督的简洁训练范式
 
 与依赖旋转损失、平滑损失等多目标优化的基线不同，MoCapAnything 仅使用掩码 L1 位置损失进行训练，旋转通过后处理 IK 阶段获得。这种极简的监督策略不仅降低了训练复杂度，也避免了旋转空间中的多解性对泛化能力的损害，是模型在未见物种上取得 1.76 cm MPJPE（相较最佳基线 GLoT 的 7.42 cm 降低 76%）的关键因素之一。
-
-
 
 MoCapAnything 提出了一种面向任意骨架资产的统一动作捕捉框架，其核心设计在于将运动恢复分解为两个阶段：**3D 关键点轨迹预测**与**基于逆运动学的关节旋转恢复**。这一分解策略避免了直接回归关节旋转所带来的多解性与训练不稳定问题，同时使模型能够仅通过掩码 L1 位置损失进行训练，无需依赖旋转监督或显式时序损失。
 
@@ -144,12 +138,8 @@ $$\mathcal{L}_{\mathrm{pos}} = \frac{1}{\sum_{t=1}^{T} \sum_{j} m_j} \sum_{t=1}^
 
 框架支持两种工作模式：**直接动作捕捉**（参考资产与视频主体匹配）和**跨资产重定向**（参考资产与视频主体不同），后者在推理时自然涌现，无需显式训练。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2512_10881/figures/002_Figure_2.jpg]]
 *Figure 2: Detailed architecture of our method. A multi-modal Reference Prompt Encoder fuses mesh, skeleton, and appearance of the target asset into per-joint queries. A monocular video is converted into a 4D mesh sequence, and both mesh and video features are extracted. The Unified Motion Decoder fuses these signals via multi-branch attention to predict 3D keypoints, which are converted to asset-specific joint rotations via an optimization-based IK layer*
-
-
 
 ### 问题形式化：CAMoCap 任务
 
@@ -218,8 +208,6 @@ $$\mathbf{P}_{t,i} = \begin{cases} \mathbf{0}, & p(i) = -1, \\ \mathbf{P}_{t,p(i
 
 其中 $p(i)$ 为关节 $i$ 的父关节索引，$\mathbf{o}_i$ 为静止姿态下的关节偏移量，$\mathbf{R}_{t,p(i)}$ 为父关节的旋转矩阵。IK 优化过程最小化 FK 计算位置与预测位置之间的差异，同时施加关节限位和扭转抑制等约束。
 
-
-
 ## 实验与关键发现
 
 ### 实验设置与基准
@@ -276,27 +264,8 @@ Table 3 探索了编码器/解码器层数的配置。增加层数可改善 Rare
 4. **跨物种重定向的边界情况**：跨物种重定向是推理时自然涌现的行为，而非通过显式训练获得。在极端拓扑差异下（例如从鸟类重定向到鱼类），可能出现不自然的动画效果。
 5. **参考提示模态受限**：当前参考提示依赖渲染图像，尚未支持纯文本或更少模态的提示，限制了在无资产渲染时的应用场景。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2512_10881/figures/006_Figure_3.jpg]]
-*Figure 3: IK-Driven Asset Animation by ostrich (biped), a goat (quadruped), and in-the-wild cases such as a crab and a dog. We visualize the predicted poses and corresponding IK-driven animations from multiple viewpoints*
-
-![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2512_10881/figures/007_Figure_4.jpg]]
-*Figure 4: Truebones Zoo mocap and retargeting results. Each row visualizes one evaluation sequence. Row 1: Input video frames. Row 2: Same-species reference skeleton and predicted mocap results. Rows 3–5: Reference skeletons from three different species and retargeted motions by our method. Our method generalizes across species and produces stable, anatomically plausible 3D motion*
-
-![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2512_10881/figures/009_Figure_5.jpg]]
-*Figure 5: Real-world (Wild) results. Similar layout as Figure 4. Row 1: Input wild video frames. Row 2: Same-species reference skeleton and predicted mocap outputs. Rows 3–4: Cross-species reference skeletons and our retargeted motion predictions. Despite real-world challenges, our method maintains robustness and stability*
-
-![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2512_10881/figures/008_Figure_6.jpg]]
-*Figure 6: More in-the-wild mocap results. Our method generalizes to a diverse range of species and scenarios*
-
-![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2512_10881/figures/010_Figure_7.jpg]]
-*Figure 7: Unconstrained cross-species retargeting. Examples of using our model to retarget motion from one species to another, yielding diverse, creative, and physically plausible animations. 1st row: from chicken to Raptor, 2nd row: Flamingo to Jaguar*
-
 ![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2512_10881/figures/011_Figure_8.jpg]]
 *Figure 8: Qualitative comparison with GenZoo on the Truebones Zoo dataset. Our method produces smoother trajectories and maintains stable, anatomically plausible motions across a wide variety of skeleton types, including non-quadrupeds. In contrast, GenZoo is limited to quadruped structures and often fails to generalize to more diverse or complex skeletal configurations. Visualizations highlight our approach’s superior accuracy, robustness, and generalization ability*
-
-
 
 ## 定位与知识库关联
 
@@ -376,8 +345,6 @@ MoCapAnything 最适合以下场景：
 5. **多角色交互式动作捕捉与重定向**：扩展到多角色场景需要解决角色间遮挡、交互接触建模、以及多角色运动的一致性约束等问题。
 
 6. **显式跨物种语义对应学习**：为跨物种重定向引入显式的语义对应学习（如通过学习不同物种关节间的功能对应关系），可进一步提高极端拓扑差异下的稳定性和合理性，使涌现行为变为可控能力。
-
-
 
 ## 原文 PDF
 

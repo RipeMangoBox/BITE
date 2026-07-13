@@ -51,8 +51,6 @@ claims:
 
 论文还通过“推理补丁”（Reasoning Patch）实验揭示了推理子空间的因果作用：仅替换隐藏状态中的推理子空间成分，即可引导模型在无显式思维链提示下生成正确的推理步骤，为幻觉缓解提供了新途径。
 
-
-
 大语言模型（LLM）在生成回答时经常输出与事实相冲突的幻觉，严重制约其在可信场景下的部署。针对事实性幻觉的可靠检测已成为构建安全应用的核心需求。当前检测方法可大致分为**多次采样**和**单次采样**两类：多次采样方法（如语义熵、EigenScore、Lexical Similarity等）通过收集多条生成结果的统计量来估计模型不确定性，虽能提升精度，却以数倍甚至数十倍的计算开销为代价；单次采样方法（如Perplexity、HaloScope、LN-Entropy）仅需要一次前向传播，效率优势明显，但精度普遍有限，因为单次输出分布或原始隐藏状态中语义信息占主导，真正指示推理错误的信号微弱且易被噪声淹没。
 
 现有方法的根本瓶颈在于**无法有效解耦隐藏状态中的语义信息与推理信息**。人类在推理与表达之间存在天然的解耦，能够反思和修正推理过程；而LLM中，语义信息（“说什么”）与推理信息（“如何得出”）在隐藏状态空间内高度交织。当检测器直接使用原始隐藏状态或基于其派生的启发式统计量时，语义变化往往会掩盖推理错误的微弱线索，导致检测精度不足且鲁棒性差。例如，消融实验表明，若完全移除对推理信息子空间的利用，检测性能会断崖式下降（在NQ Open上，AUROC从84.0骤降至62.9），而随机投影同样严重损害性能，这强有力地说明显式分离推理信息是突破当前瓶颈的关键。
@@ -60,8 +58,6 @@ claims:
 核心洞察在于：LLM的隐藏状态空间可以分解为语义子空间和推理子空间的直和（$\mathcal{H}_l = \mathcal{S}_{\text{Semantic}} \oplus \mathcal{S}_{\text{Reasoning}}$），且Unembedding层（词表映射矩阵）主要与语义子空间交互（$W_{\text{unemb}} \cdot \mathcal{S}_{\text{Semantic}} \approx W_{\text{unemb}} \cdot \mathcal{H}_l$），对推理子空间几乎无贡献（$W_{\text{unemb}} \cdot \mathcal{S}_{\text{Reasoning}} \approx 0$）。因此，通过对Unembedding参数矩阵进行奇异值分解，可获得分别张成语义子空间和推理子空间的正交基向量。将隐藏状态投影到推理子空间基上，即可提取维度仅约占原始状态5%的紧凑推理特征，该特征信噪比高、几乎不受语义干扰，从而为高效检测事实性幻觉提供了理想的特征表示。
 
 本文提出**HARP（推理子空间投影幻觉检测）**，正是基于上述假设，将单次采样下的幻觉检测转化为一个低维推理特征的监督学习问题：首先利用Unembedding矩阵的SVD构造推理子空间基，然后将每一层的隐藏状态投影至该子空间得到低维投影向量，最后训练一个轻量的MLP检测器输出令牌级幻觉分数。该框架的动机在于同时实现三个目标：（1）**高精度**——通过聚焦于推理信息，检测器能够捕捉传统方法难以感知的推理错误；（2）**高效率**——仅需单次采样，且输入维度远小于原始隐藏状态维度；（3）**强泛化**——推理子空间的构造仅依赖模型参数，不依赖于特定数据集分布，具有跨任务迁移的潜力。后续实验在多模型、多数据集上验证了上述动机的有效性，并展现出相较于先前最优方法的大幅提升。
-
-
 
 ## 核心方法与创新机理
 
@@ -87,8 +83,6 @@ HARP 的核心创新在于从理论上揭示了 LLM 隐藏状态空间的**语�
 
 上述 changed slots 共同构成了 HARP 的创新能力：将幻觉检测从“语义表面统计”深化到“推理内在状态感知”，同时保持单次采样的高效性。当前方法主要针对**事实性幻觉**，其子空间构建依赖标准的 Unembedding 层，对于逻辑错误等类型的失效模式仍需进一步探索。
 
-
-
 ![[assets/figures/papers/iclr26_0014_ShEDWasmDG_HARP_Hallucination_Detection_via_Reasoning_Subsp/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of the proposed HARP framework for hallucination detection. HARP separates the reasoning information $h _ { l , \mathrm { R e a s o n i n g } }$ from the hidden state $h _ { l }$ to compute token-level hallucination scores, with the maximum score taken as the hallucination score of the entire response*
 
@@ -105,8 +99,6 @@ HARP 的幻觉检测 pipeline 围绕“推理子空间投影”构建，将隐�
 训练阶段，使用集束搜索对每个问题生成 10 条候选答案，根据与参考答案的相似度标注幻觉标签，构造正负样本训练 MLP 检测器；推理时仅需一次前向传播即可输出结果。推理子空间维度取 256 时检测 AUROC 最高（Figure 5b），此时占用维度仅为原始隐藏状态的约 5%，且对语义信息完整保留，不影响 token 预测（Figure 5a）。
 
 > **输入输出流总结**：输入为问题 $$x$$ 与模型生成的完整回答 $$y$$；步骤包括 ① 提取 $$y$$ 中各 token 的隐藏状态，② 利用预计算的 $$V_R$$ 将各隐藏状态投影到推理子空间，③ 将投影向量逐 token 输入 MLP 得到分数，④ 取最大值作为最终幻觉分数。
-
-
 
 HARP 的核心设计建立在两条关键假设之上：（1）LLM 的隐藏状态空间可以分解为语义子空间与推理子空间的直和（Eq. 3）；（2）Unembedding 层（LM Head）几乎只传递语义信息，推理子空间的成分对 token 预测的贡献近似为零（Eq. 5‑6）。基于这两个假设，所有模块都围绕**推理子空间的构造与投影**展开，从而将高维、含噪的隐藏状态压缩为紧凑且富含推理信息的特征向量，再送入一个轻量检测器。
 
@@ -164,8 +156,6 @@ HARP 的核心设计建立在两条关键假设之上：（1）LLM 的隐藏状�
 
 整体而言，HARP 通过无监督的 SVD 基构造将 LLM 内部状态解耦为语义与推理两个正交空间，再以极其紧凑的推理子空间投影作为检测输入，实现了单次采样即可高精度检测幻觉的轻量框架。
 
-
-
 ## 实验与关键发现
 
 ### 主结果：单次采样的高精度幻觉检测
@@ -184,8 +174,6 @@ HARP 对推理子空间的维度敏感，本质上构成一种故障模式：若
 - **Figure 7** 证明 HARP 的幻觉信号具有跨数据集迁移性，非数据集特定过拟合。
 - 附录中 Reasoning Patch 实验（Figure 9‑11）从因果操纵的角度进一步强化了子空间解耦的有效性：仅将推理子空间成分替换为正确 CoT 的对应部分，就能引导模型在无显式 CoT 提示下生成正确推理步骤，为子空间的可干预性和解释性提供了有力证据。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0014_ShEDWasmDG_HARP_Hallucination_Detection_via_Reasoning_Subsp/figures/005_Table_1.jpg]]
 *Table 1: Main result. Comparison of different methods on hallucination detection performance across multiple datasets. All values are AUROC percentages. “Single” indicates whether multiple samplings are required for hallucination detection*
 
@@ -197,8 +185,6 @@ HARP 对推理子空间的维度敏感，本质上构成一种故障模式：若
 
 ![[assets/figures/papers/iclr26_0014_ShEDWasmDG_HARP_Hallucination_Detection_via_Reasoning_Subsp/figures/012_Figure_7.jpg]]
 *Figure 7: Cross-dataset generalization. “(s)” indicates the source dataset used for training the hallucination detector; “(t)” indicates the target dataset*
-
-
 
 ## 定位与知识库关联
 
@@ -242,8 +228,6 @@ HARP的有效性建立在以下两个核心假设之上：① LLM的隐藏状态
 - **自动化推理子空间干预**：Reasoning Patch实验证明，仅替换推理子空间成分即可让模型在没有显式思维链提示下生成正确推理步骤；但当前操作需要预先获取正确的CoT推理轨迹作为监督信号，属于半自动化。如何设计无监督或自反馈的干预策略，使之成为通用的幻觉缓解工具，是下一步的重要挑战。
 - **深层“解码器”机制**：实验观察到深层（如Layer‑22）在隐瞒推理信息、控制输出方面起着关键作用（Table 4），其作为一个“语义解码器”将内部推理表征转化为最终语义输出，这一机制的本质是什么？能否形式化并迁移到其他层以增强对幻觉的控制？
 - **子空间构建的效率与可扩展性**：能否通过稀疏SVD、随机化SVD或增量更新方式，进一步降低大规模模型上的计算开销，同时保持子空间质量？在不重新训练检测器的情况下，子空间的动态自适应更新也是一个值得探索的方向。
-
-
 
 ## 原文 PDF
 

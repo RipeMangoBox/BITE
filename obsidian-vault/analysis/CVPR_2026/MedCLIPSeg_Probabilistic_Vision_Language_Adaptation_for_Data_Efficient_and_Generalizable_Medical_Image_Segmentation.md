@@ -53,8 +53,6 @@ claims:
 
 该方法在保持参数高效的同时，首次将可解释的逐像素不确定性图纳入文本驱动的医学分割流程，为低资源场景下的可靠临床辅助提供了新的技术路径。
 
-
-
 医学图像分割是临床诊断与治疗规划的关键步骤，但其自动化面临三重结构性挑战。**标注稀缺**：像素级标注高度依赖专家且耗时，严重制约全监督方法的可扩展性。**特征模糊**：病灶边界不清、组织对比度低，使得纯视觉模型容易产生过度自信的错误预测。**跨域漂移**：不同成像设备、采集协议和患者群体间的分布偏移，导致模型在未见目标域上性能急剧退化。这三者相互耦合，使同时追求数据效率、不确定度量化和域泛化能力成为医学分割领域的核心瓶颈。
 
 近年来，视觉语言模型（VLM）的兴起为缓解标注依赖提供了新路径。以 CLIP 为代表的预训练模型通过大规模图文对比学习，获得了丰富的跨模态语义对齐能力。将其适配到分割任务时，现有工作大致分为两类：一类采用确定性交叉注意力将文本条件注入视觉特征（如 **DenseCLIP**，Rao et al., 2022；**LAVT**，Yang et al., 2022），另一类通过侧适配网络实现开放词汇分割（如 **SAN**，Xu et al., 2023；**CAT-Seg**，Cho et al., 2023）。然而，这些方法存在两个根本性缺陷。
@@ -64,8 +62,6 @@ claims:
 上述缺陷在医学场景中被进一步放大。医学图像的模态多样性（CT、MRI、超声、内镜、皮肤镜）和器官异质性使得跨域泛化尤为困难。同时，临床部署要求模型不仅能给出分割结果，还需提供可解释的不确定性估计，以支持医生的审慎决策。现有医学 VLM 分割方法（如 **LViT**，Li et al., 2023；**BiomedParse**，Zhao et al., 2024）虽然引入了语言引导，但均未对跨模态交互中的不确定性进行显式建模，无法同时满足数据效率、域泛化和可靠性三个需求。
 
 针对上述缺口，本文提出 **MedCLIPSeg**，其核心动机在于：**将概率建模引入视觉语言适配过程，使跨模态融合具备不确定性感知能力**。具体而言，通过对 CLIP 深层编码器中的 Key 和 Value 进行变分建模，学习置信度加权的双向注意力，使模型在低数据量和域偏移条件下，既能保持参数高效（冻结 CLIP 预训练参数），又能生成更准确的分割掩膜和可解释的逐像素不确定性图。这一设计从原理上区别于确定性适配范式，为医学图像分割的鲁棒性和可信度提供了新的技术路线。
-
-
 
 ## 核心方法与创新机理
 
@@ -107,8 +103,6 @@ $$\\mathcal{L}_{\\mathrm{soft}}(\\mathrm{P}, \\mathrm{G}) = -\\frac{1}{B}\\sum_i
 
 上述三个 changed slots 并非孤立存在，而是形成正向反馈循环：概率注意力为对比损失提供更可靠的软目标，对比损失反过来约束概率分布的语义一致性，而蒙特卡洛采样则为整个流程提供不确定性感知的闭环验证。这种耦合使得 MedCLIPSeg 在 **10% 训练数据下比 SOTA CAT-Seg 高出 2–3% DSC**，并在 16 个数据集、5 种成像模态、6 个器官上全面超越现有方法。
 
-
-
 MedCLIPSeg 的整体流水线围绕“冻结预训练编码器 + 轻量概率视觉语言适配器 + 软对比损失”三个支柱构建，形成一条从多模态输入到分割掩膜与不确定性图的双向融合通路。
 
 **输入与编码阶段**。流水线接收两类输入：医学图像 $X_v$ 和描述目标结构的自然语言提示 $X_t$。图像经冻结的 CLIP 视觉编码器 $E_v$（UniMedCLIP ViT‑B/16）编码为补丁嵌入序列 $Z_v \in \mathbb{R}^{B \times (P+1) \times D}$；文本经冻结的文本编码器 $E_t$（PubMedBERT）编码为 token 序列 $Z_t \in \mathbb{R}^{B \times L \times D}$。冻结编码器的目的是保留 CLIP 在大规模预训练中习得的通用视觉‑语言对齐能力，避免微调带来的灾难性遗忘。
@@ -127,15 +121,11 @@ $$\mathbf{M} = \mathrm{Upsample}_{H \times W}\left(\tilde{\mathbf{V}} \cdot \til
 
 **整体数据流**可概括为：`(图像, 文本) → 冻结编码器 → PVL Adapter（概率双向注意力 × 多层）→ 点积相似度 → 上采样 → (分割掩膜, 不确定性图)`。该设计使 MedCLIPSeg 在仅训练 PVL Adapter 和投影层（保持 CLIP 参数冻结）的前提下，实现了数据高效、域可泛化且自带不确定性量化的文本驱动医学图像分割。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l764_https_openaccess_thecvf_com_content_CVPR2026_html_Koleilat_MedCLIPSeg_Pr/figures/001_Figure_1.jpg]]
 *Figure 1: (Top): Comparison between deterministic and probabilistic cross-modal fusion techniques in CLIP adaptation for text-driven segmentation. Probabilistic formulation models variability in visual–textual representations as distributions, enabling more robust feature alignment. (Bottom): Robustness and Reliability plots over ID and OOD data show improved generalization, with smaller out-of-domain performance drops and better calibration of predicted confidence, reflected by lower Brier scores*
 
 ![[assets/figures/papers/paper_list_l764_https_openaccess_thecvf_com_content_CVPR2026_html_Koleilat_MedCLIPSeg_Pr/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed MedCLIPSeg framework for text-driven medical image segmentation. The model extends CLIP with vision and language encoders connected via PVL Adapters, which perform confidence-weighted image–text fusion at multiple deep layers. Segmentation and uncertainty maps arise from the mean and entropy of posterior samples, with a soft patch-level contrastive loss*
-
-
 
 MedCLIPSeg 的核心由四个模块构成：冻结的视觉与文本编码器、概率视觉语言适配器（PVL Adapter）、像素-文本相似度映射，以及软补丁级对比损失。其中，PVL Adapter 是整条流水线的关键创新——它对跨模态注意力的 Key 和 Value 进行变分建模，实现置信度加权的双向交互与蒙特卡洛不确定性采样。
 
@@ -200,13 +190,6 @@ $$\mathcal{L}_{\mathrm{soft}}(\mathrm{P}, \mathrm{G}) = -\frac{1}{B}\sum_i\sum_j
 该损失引导视觉补丁在语义空间中的分布与文本语义结构保持一致，从而提升密集预测的跨模态对齐质量。总训练目标为分割损失（Dice + BCE）与 $\mathcal{L}_{\mathrm{soft}}$ 的加权和。
 
 > **注意：** 以上公式均来自论文 Section 3.1–3.4 的原始推导，变量含义以论文定义为准。未在原文中出现的推导细节不应被额外补充。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l764_https_openaccess_thecvf_com_content_CVPR2026_html_Koleilat_MedCLIPSeg_Pr/figures/003_Figure_3.jpg]]
-*Figure 3: Illustrations of PVL Adapter and AttnPVL*
-
-
 
 ## 实验与关键发现
 
@@ -295,24 +278,14 @@ MedCLIPSeg 以 UniMedCLIP ViT‑B/16 为视觉编码器、PubMedBERT 为文本�
 
 MedCLIPSeg 在 16 个数据集、5 种模态上的系统评估表明：**概率视觉语言适配器是实现数据高效、域可泛化医学图像分割的关键架构创新**。消融实验严格证明，PVL Adapter 的移除会导致 OOD DSC 下降 23.8%，而将概率注意力替换为确定性注意力会使 OOD DSC 降低 15.9%——这两个数字共同锚定了“不确定性感知跨模态融合”作为方法核心价值的因果地位。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l764_https_openaccess_thecvf_com_content_CVPR2026_html_Koleilat_MedCLIPSeg_Pr/figures/004_Table_1.jpg]]
 *Table 1: Data-efficiency evaluation: This table reports the average DSC and NSD (%) when varying the fraction of training data across different segmentation methods. Best results are in bold, and second-best are underlined*
-
-![[assets/figures/papers/paper_list_l764_https_openaccess_thecvf_com_content_CVPR2026_html_Koleilat_MedCLIPSeg_Pr/figures/005_Table_2.jpg]]
-*Table 2: Domain generalization: Models are trained on a source dataset and evaluated on OOD target datasets without adaptation. DSC (%) values are reported where the best results are in bold, and second-best are underlined*
 
 ![[assets/figures/papers/paper_list_l764_https_openaccess_thecvf_com_content_CVPR2026_html_Koleilat_MedCLIPSeg_Pr/figures/008_Figure_5.jpg]]
 *Figure 5: Layer-wise interventions (left) and confidence weighting (β) (right) ablations averaged on ID and OOD data*
 
-![[assets/figures/papers/paper_list_l764_https_openaccess_thecvf_com_content_CVPR2026_html_Koleilat_MedCLIPSeg_Pr/figures/009_Table_5.jpg]]
-*Table 5: Effect of pre-trained vision–language models*
-
 ![[assets/figures/papers/paper_list_l764_https_openaccess_thecvf_com_content_CVPR2026_html_Koleilat_MedCLIPSeg_Pr/figures/007_Figure_4.jpg]]
 *Figure 4: Segmentation and uncertainty visualizations. Uncertainty peaks along lesion boundaries and remains consistent across diverse datasets, indicating reliable calibration and generalization. ID data are in blue while OOD data are in red*
-
-
 
 ## 定位与知识库关联
 
@@ -356,8 +329,6 @@ CLIP 的出现催生了文本驱动分割的新范式。**CLIPSeg**（Lüddecke 
 4. **自适应提示生成**：如何设计自适应的文本提示生成策略，以进一步减少对人工提示模板的依赖？这可能涉及与 LLM 的集成或基于图像内容的自动提示优化。
 
 5. **多模态融合深度与层间干预**：Figure 5 显示层间干预策略对性能有影响，但最优的 PVL 适配器插入层数和位置选择机制尚不明确，是否存在任务自适应的动态路由策略值得探索。
-
-
 
 ## 原文 PDF
 

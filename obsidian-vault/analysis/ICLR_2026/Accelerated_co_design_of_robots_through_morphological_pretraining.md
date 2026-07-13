@@ -52,8 +52,6 @@ claims:
 
 本工作实质上是将协同设计问题从"同步搜索形态与控制器"重构为"预训练通用控制器 + 高效形态搜索"两阶段框架。利用可微分模拟提供的高质量梯度进行控制器预训练，再以该控制器为支点驱动形态进化，从而**打破控制器训练与形态进化之间的计算耦合瓶颈**，并显著缓解了协同设计中的多样性丧失问题。该方法全面在仿真中验证，尚未涉及向真实机器人（sim-to-real）的迁移，且目前仅针对单一趋光任务展示了效果。
 
-
-
 机器人形态与控制（脑-身）协同设计的核心挑战在于：身体形态的每一个变化都要求控制器重新适应，而传统方法需要为**每一个候选形态从头训练专用控制器**。这种"设计-评估"循环将计算成本直接耦合到形态空间的规模上，使得大规模探索因为控制器训练瓶颈而变得极不经济。
 
 ### 计算瓶颈：从零开始的控制器训练
@@ -81,8 +79,6 @@ claims:
 
 这一预训练-进化分离的范式将协同设计从"每代重训控制器"的计算困境中解放出来，使进化搜索在计算上可扩展到更大形态空间的同时，维持产生多样化和高性能设计的生物学启发目标。
 
-
-
 ## 核心方法与创新机理
 
 传统机器人形态-控制的协同设计（Simultaneous Co-design from Scratch）需要为每个新的身体形态从头训练一个专用的RL控制器，计算成本高且难以扩展到大规模的形态探索空间。本文的核心贡献在于**形态学预训练（Morphological Pretraining）**，通过对上千万种不同形态的机器人进行大规模可微分模拟训练，得到一个**形态无关的通用控制器**。该控制器直接改变了协同设计的瓶颈——**控制器训练方式**从"为每个形态单独学习"转变为"预训练一个共享控制器"，从而将形态评估的计算开销从"重新训练"降至"直接推理"或"少量微调"。这一改变解锁了两种新型进化范式：**零样本进化（Zero-Shot Evolution）**和**少样本进化（Few-Shot Evolution）**，分别对应于进化过程中控制器更新的两个关键 changed slots（冻结 vs. 世代级微调），二者均完全避免了baseline中每个世代重新学习控制器的需求。
@@ -102,8 +98,6 @@ claims:
 基线协同设计通常使用非可微分物理仿真，依赖强化学习估计梯度，而本文整体方法建立在**3D可微分弹簧-质量仿真**之上，直接通过可微分模拟的物理梯度进行端到端训练（Hooke's law $F = k (L - L_0)$ 控制弹簧力）。这一改变使得预训练可以在海量形态上高效完成，并且为少样本进化中的快速微调提供了精确的梯度信号，是上述两个 changed slots 能够发挥效用的底层技术支撑。实测中，该可微分控制器还能在传感器或马达部分失效时保持鲁棒性——在60-70%传感器失效或20-30%马达失效的情况下，仍能保持预训练性能（Fig. 14E）。
 
 综上，核心创新并不在于引入新的神经网络架构或复杂的进化算法，而在于通过**形态学预训练**从根本上重构了协同设计的因果路径：用一个通用控制器替代了重复的控制器学习，进而通过零样本/少样本进化实现了快速、多样且高性能的形态探索。这一范式转换直接改变了三个关键设计槽（控制器训练方式、进化更新方式、梯度利用方式），并带来了可量化的突破：收敛速度提升数十倍、种群多样性得以维持、交叉操作首次在协同设计中高效可用，同时全过程可在单个GPU上完成。
-
-
 
 ![[assets/figures/papers/iclr26_0005_WVliGyFwZv_Accelerated_co-design_of_robots_through_morpholo/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed method. End-to-end differentiable policy training across tens of millions of morphologically distinct robots—morphological pretraining—produces a universal controller, which is kept frozen throughout zero-shot evolution and fine-tuned for each generation of few-shot evolution*
@@ -126,8 +120,6 @@ claims:
 作为对比基线，**同时协同设计（Simultaneous Co‑Design）**从头同时进化形态与控制器，不进行预训练，结果观察到了严重的**多样性崩溃**——种群收敛为形态高度相似的少数设计，且性能低于少样本进化。
 
 整体输入‑输出流可集中概括为：**随机采样的形态与环境** → 可微分模拟 + 反向传播损失梯度 → 通用控制器 → 进化算法以变异/交叉修改形态 → 通过冻结或微调控制器评估形态 → 输出高适应度且多样的机器人形态种群。该流水线使控制器训练与形态进化解耦，避免了传统方法中每代重新学习的瓶颈，并以极低的计算开销在单一 GPU 上完成了从零样本到少样本的大规模协同设计。
-
-
 
 ### 基因型到表现型映射 (Genotype-to-Phenotype Mapping)
 
@@ -175,12 +167,9 @@ $$p = 1 / N$$
 - **零样本进化**：冻结预训练控制器，仅在进化过程中评估形态性能，快速筛选优良身体设计。
 - **少样本进化**：每代将控制器权重重置为预训练值，进行60步微调（父代30步，子代30步）后评估，既维持高性能又防止种群多样性崩溃（Section 2.5-2.6）。
 
-
-
 ## 实验与关键发现
 
 为系统验证形态学预训练对机器人协同设计的加速作用，我们比较了三种协同设计范式：**形态学预训练 + 零样本进化**（冻结控制器仅进化形态）、**形态学预训练 + 少样本进化**（每代微调控制器并重置）以及**同时协同设计**（无预训练，从头同时进化形态与控制器）。所有方法共享相同的可微分质量-弹簧仿真环境、趋光任务及 10 个固定测试地形（Fig. 3, 6），确保在计算投入可控的前提下公平对比。
-
 
 ![[assets/figures/papers/iclr26_0005_WVliGyFwZv_Accelerated_co-design_of_robots_through_morpholo/figures/011_Figure_6.jpg]]
 *Figure 6: Performance and diversity. Morphological pretraining (A) converges with 70% improvement from baseline. The algorithm from Li et al. (2025), simultaneous co-design (from scratch without pretraining; B) achieves similar training loss; but, population diversity (mean pairwise Hamming distance on genotypes) collapses as evolution converges to a single species of similar designs which simplifies shared control. Zero-shot evolution (using the pretrained controller; C) rapidly improves test performance, but also suffers diversity collapse as evolution compiles slightly modified clones of the designs that are the most compatible with the pretrained model. Few-shot evolution (D) resets the pretraine...*
@@ -196,7 +185,6 @@ $$p = 1 / N$$
 **少样本进化规避多样性崩溃，同时获得更优性能。**  
 零样本进化虽然快速，却导致种群向小型设计收缩，多样性下降（Fig. 9, Fig. 6C）。对此，少样本进化在每代评估前对预训练权重进行 60 步微调（30 步用于父代，30 步用于子代），随后重置权重以免累积漂移。结果（Fig. 6D）显示，测试性能持续提升且种群平均两两汉明距离维持在约 0.45 的高水平，多样性不仅没有崩溃，反而在世代间显著增加并保持。这证实了每代微调这一因果机制：它允许控制器适应新形态的表达，同时保留通用基础，从而支持形态多样性涌现。
 
-
 ![[assets/figures/papers/iclr26_0005_WVliGyFwZv_Accelerated_co-design_of_robots_through_morpholo/figures/016_Figure_9.jpg]]
 *Figure 9: Evolved populations. Population performance, phenotype footprint size, and body mass for the initial (randomly generated and evolved design populations. Whereas zero-shot evolution shifts the population toward smaller designs that are easier to control with the pretrained policy, few-shot evolution maintained a diverse population of overall larger designs with larger footprints which increase locomotion stability*
 
@@ -207,7 +195,6 @@ $$p = 1 / N$$
 
 **交叉操作的有效性源于预训练控制器。**  
 零样本进化初期（第 1 代），交叉产生的子代有 77% 至少优于一个父代（Fig. 8），远高于传统机器人进化中近乎随机组合失败的经验。高成功率表明，通用控制器赋予来自不同父代的模块化部件以一致的"语义控制"，使重组后的新形态能立即被有效驱动。这种早期交叉成功率是推动快速进化的关键引擎，但在同时协同设计中没有出现——因为每个身体都需要重新学习控制器，交叉几乎不会产生可行子代。
-
 
 ![[assets/figures/papers/iclr26_0005_WVliGyFwZv_Accelerated_co-design_of_robots_through_morpholo/figures/015_Figure_8.jpg]]
 *Figure 8: Success of crossover vs. mutation. The evolutionary success of mutation and crossover is here defined by the fraction of mutation and crossover events from the previous generation that were absorbed into the current population. Early in evolution, the pretrained controller enables greater than 50% crossover success rate. In the first generation of zero-shot evolution, for instance, 77% of crossover attempts resulted in offspring that were better than at least one of their parents, and more than half of these offspring were better than both of their parents. After a few generations, mutations that finely tune good designs were less likely to be deleterious than exchanging large components betwee...*
@@ -229,15 +216,10 @@ $$p = 1 / N$$
 
 这些弱点构成进一步研究的开放问题，也是将形态学预训练推向实际机器人设计与多任务协同的前置挑战。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0005_WVliGyFwZv_Accelerated_co-design_of_robots_through_morpholo/figures/019_Figure_12.jpg]]
 *Figure 12: Morphological distinctiveness. Robot designs shown are sampled uniformly from each generation's test performance distribution and arranged (left to right, top to bottom) by morphological distinctiveness, defined as the mean pairwise Hamming distance to its peer designs. Performance scores appear below each design. The initial population (A) exhibits diverse morphologies with broad performance variation, serving as the starting point for all methods. After 180 generations, simultaneous co-design (B) yields high-performing but morphologically homogeneous designs. In contrast, both zero-shot evolution at generation 31 (C) and few-shot evolution at generation 6 (D) achieve equal or superior perfo...*
 
 ![[assets/figures/papers/iclr26_0005_WVliGyFwZv_Accelerated_co-design_of_robots_through_morpholo/figures/014_Figure_14.jpg]]
-
-
-
 
 ## 定位与知识库关联
 
@@ -278,8 +260,6 @@ $$p = 1 / N$$
 5. **跨域形态探索**：将该框架迁移至水下游泳、空中飞行、树上攀爬等不同运动模式中，检验形态无关控制的普适性并探索多栖形态。
 
 本工作在机器人协同设计文献谱系中提供了一个明确的范式迁移：将"高成本控制训练"与"低成本形态评估"解耦，通过形态预训练使零样本和少样本进化成为计算上可行且能维持多样性的设计路径。它为后续引入更丰富的行为表征、更大规模探索以及向物理世界延伸提供了可复现的基线。
-
-
 
 ## 原文 PDF
 

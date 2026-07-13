@@ -53,8 +53,6 @@ claims:
 
 **主要结果**：在Flickr30K和MSCOCO两个标准基准上，MASK在非配对设置下均取得最优性能——Flickr30K图像检索R@1达到4.8（较MACK^VG-M提升1.0），MSCOCO的Rs达到209.5（提升4.3）。作为重排序模块时，CLIP+MASK在Flickr30K上Rs达534.3，ALBEF+MASK在MSCOCO上Rs达436.2，均显著优于原始模型及其他重排序方法。消融实验表明，原型一致性对比损失对性能贡献最大，OOD词原型构造机制同样带来可观的增益。
 
-
-
 图文匹配（Image-Text Matching）是跨模态理解的核心任务，其目标是在图像与文本之间建立语义对应关系。传统配对匹配方法依赖大规模人工标注的图文对进行训练，但此类数据的获取成本高昂，且覆盖的视觉概念有限。为突破这一限制，非配对图文匹配（Unpaired Image-Text Matching）逐渐成为研究热点——它仅需独立收集的图像和文本数据，无需成对标注。
 
 现有非配对匹配方法可大致分为两类：基于模型的方法与基于知识的方法。基于模型的方法（如 **CHAN** (Pan et al., 2023)、**DSRLN** (Wu et al., 2024)、**CORA** (Pham et al., 2024)、**BOOM** (Li et al., 2024a)、**3SHNet** (Ge et al., 2024)）试图通过隐式跨模态对齐来学习匹配函数，但它们在面对训练数据中未出现的视觉概念时泛化能力有限。基于知识的方法（如 **MACK** (Huang et al., 2022)、**MACK^{VG-M}** (Huang et al., 2024b)）通过构建“词-视觉原型”的知识库来进行匹配，将每个词与一组检测到的视觉区域原型关联，从而在非配对设置下实现更透明的语义桥接。
@@ -68,8 +66,6 @@ claims:
 上述瓶颈的根源在于：现有方法未能充分利用词嵌入空间与视觉原型空间之间的语义结构对应关系。词嵌入（如GloVe）天然编码了词间的语义相似性——例如“狗”与“犬”、“猫”在嵌入空间中距离相近。若能建立一种机制，使视觉原型空间保持与词嵌入空间一致的语义拓扑结构，那么即使对于未见过的OOD词，也可通过其与已知词在词嵌入空间中的语义邻近关系，推断出对应的视觉原型。
 
 基于这一洞察，本文提出**MASK（Multimodal Aligned Semantic Knowledge）**框架，核心思路是：以预训练词嵌入为桥梁，通过关系保持的等距映射将视觉原型空间与词嵌入空间对齐，从而为OOD词构造有意义的视觉原型，并引入原型一致性对比学习来结构正则化特征空间，显著缓解分布方差带来的负面影响。
-
-
 
 ## 核心方法与创新机理
 
@@ -124,8 +120,6 @@ $$
 | 特征正则化 | 无原型级对比学习 | $\mathcal{L}_{cl}$ 以原型为中心降低类内方差 |
 | 区域表示 | 直接使用 Faster-RCNN 原始特征 | PAE+FRM 提取高内聚低耦合表示并保留信息 |
 
-
-
 ![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_d3CISVVO6v/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison between existing matching paradigms and our proposed unpaired framework*
 
@@ -167,8 +161,6 @@ $$\hat{s}^k = ZS(\tilde{s}^k) + \alpha \cdot ZS(s^k)$$
 整体训练损失由三项加权组成：
 $$\mathcal{L} = \mathcal{L}_{ir} + \lambda_1 \mathcal{L}_{cm} + \lambda_2 \mathcal{L}_{cl}$$
 其中 $\mathcal{L}_{ir}$ 为信息保留损失（推动隐分布趋向标准正态并最小化重建误差），$\mathcal{L}_{cm}$ 为跨模态对齐损失（拉近预测词嵌入与真实词嵌入，同时保持区域表示间的语义关系），$\mathcal{L}_{cl}$ 为原型一致性对比损失（以原型为类中心最大化类内相似度、最小化类间相似度）。消融实验表明，$\mathcal{L}_{cl}$ 对性能的贡献最大，且 $\lambda_1 = \lambda_2$ 时取得最佳整体性能。
-
-
 
 MASK 框架的核心由四个关键模块构成：Prototype-Aware Encoder (PAE)、Feature Restoration Module (FRM)、Modality Transfer Model (MTM) 以及 OOD Prototype Construction。这些模块协同工作，将非配对场景下的视觉区域表示与词嵌入空间进行语义对齐，并为分布外词构造有意义的视觉原型。
 
@@ -246,8 +238,6 @@ $$\hat{s}^k = ZS(\tilde{s}^k) + \alpha \cdot ZS(s^k) \tag{Eq.15}$$
 
 消融实验确定 $\alpha = 0.15$ 时取得最佳重排序性能（Table 6）。
 
-
-
 ## 实验与关键发现
 
 ### 非配对图文匹配主结果
@@ -283,25 +273,13 @@ MASK可作为即插即用的重排序模块提升预训练模型的零样本匹�
 
 **损失权重比例**（Table 4）：当 $\lambda_1 = \lambda_2$ 时取得最佳整体性能，Flickr30K Rs达到122.8。$\lambda_1/\lambda_2 = 0.3$ 时性能优于3.0（112.7 vs 109.2），说明跨模态对齐损失的权重略高于对比损失时更有利于训练，但极端偏斜会破坏两项约束的平衡。进一步细化搜索（Table 15）确认$\lambda_1=\lambda_2=3$为最优配置。
 
-![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_d3CISVVO6v/figures/007_Table_4.jpg]]
-*Table 4: Unpaired image-text matching by MASK using different $\lambda _ { 1 } / \lambda _ { 2 }$ on the Flickr30k and MSCOCO datasets
-
 **OOD采样大小**（Table 5）：采样最近邻数量 $m=10$ 时性能最优，Flickr30K图像检索R@1达到5.0。$m$ 过小（如5）则语义信息不足，$m$ 过大（如50）则引入噪声原型，性能均有所下降。
 
-![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_d3CISVVO6v/figures/008_Table_5.jpg]]
-*Table 5: Unpaired image-text matching by MASK using different sampling sizes m on the Flickr30k and MSCOCO datasets*
-
 **重排序平衡因子**（Table 6）：$\alpha=0.15$ 时CLIP+MASK取得最佳零样本性能，Flickr30K图像检索R@1达到67.3。$\alpha$ 过大会过度依赖MASK的语义知识而削弱预训练模型的判别能力，$\alpha$ 过小则无法充分引入语义对齐信息。
-
-![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_d3CISVVO6v/figures/009_Table_6.jpg]]
-*Table 6: Zero-shot image-text matching by MASK (CLIP) using different α on the Flickr30k and MSCOCO datasets*
 
 ### 关键组件有效性验证
 
 **检测器选择**（Table 11）：BUTD（Faster-RCNN在Visual Genome上预训练）是MASK正常工作的必要条件。替换为DETR或DINO后性能急剧下降，即使这些检测器在目标检测任务上表现更优，但其区域特征缺乏对视觉概念的良好聚类特性，无法为原型构建提供高质量表示。
-
-![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_d3CISVVO6v/figures/014_Table_11.jpg]]
-*Table 11: Unpaired image-text matching using different detectors on the Flickr30k dataset*
 
 **模型架构**（Table 12）：增加自注意力层可提升性能，但增加全连接层反而显著降低性能。这表明自注意力机制有助于捕获区域间的语义关系，而过多的非线性变换会破坏特征空间的结构信息。
 
@@ -321,16 +299,6 @@ Figure 3对比了MACK与MASK的原型区域表示经t-SNE降维后的语义分�
 2. **检测器依赖性**：MASK对BUTD检测器的强依赖限制了其与更先进视觉主干的兼容性。DETR/DINO等Transformer检测器即使经过VG预训练，性能仍远低于BUTD，这成为端到端训练的瓶颈。
 
 3. **时态与复数变体**：当前框架将不同时态和复数形式的词视为独立词条，可能导致OOD词误判。例如"dogs"若不在知识库中，其原型由"dog"的语义近邻构造，但复数形式本身可能对应不同的视觉模式（如多只狗的场景）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_d3CISVVO6v/figures/010_Table_7.jpg]]
-*Table 7: Notation used in the paper*
-
-![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_d3CISVVO6v/figures/011_Table_8.jpg]]
-*Table 8: Overview of the model architectures integrated into the MASK framework*
-
-
 
 ## 定位与知识库关联
 
@@ -380,8 +348,6 @@ MASK 还可作为一种**重排序（re-ranking）插件**，与现有预训练�
 3. **词形变化的鲁棒处理**：如何有效处理 OOD 单词的时态和复数变体，避免将其误认为是具有独立视觉意义的新词？可能的方案包括引入子词级（subword）嵌入或词形还原（lemmatization）预处理。
 
 4. **跨数据集迁移的稳定性**：MASK 在跨数据集重排序实验中（Table 9）的性能表现需要进一步验证其在不同数据分布下的稳定性，特别是在域差异较大的场景中，知识库的覆盖度可能成为瓶颈。
-
-
 
 ## 原文 PDF
 

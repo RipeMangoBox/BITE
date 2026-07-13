@@ -175,8 +175,6 @@ Figure 1 清晰展示了 SignDINO 在监督信号上的根本性转变：传统�
 ![[assets/figures/papers/paper_list_l1068_https_openaccess_thecvf_com_content_CVPR2026_html_Gan_Learning_Effective/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison between gloss-based SLT, current gloss-free SLT and our text-free GFSLT pretraining. Note that other GFSLT models use text in both pretraining and finetuning. Our “Text-free” means no text annotations are used in backbone pretraining, while text annotations are still used for GFSLT finetuning, as in all other methods*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1068_https_openaccess_thecvf_com_content_CVPR2026_html_Gan_Learning_Effective/figures/002_Figure_2.jpg]]
 *Figure 2: The SignDINO Architecture with sign-aware DINO training strategy. We omit the global views of the student model for clarity*
 
@@ -315,31 +313,14 @@ SignDINO 在训练和推理阶段均保持了较高的计算效率。由于推�
 ![[assets/figures/papers/paper_list_l1068_https_openaccess_thecvf_com_content_CVPR2026_html_Gan_Learning_Effective/figures/006_Table_5.jpg]]
 *Table 5: Effect of cross dataset pretraining*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1068_https_openaccess_thecvf_com_content_CVPR2026_html_Gan_Learning_Effective/figures/004_Table_2.jpg]]
 *Table 2: Effect of sign-aware pretraining*
-
-![[assets/figures/papers/paper_list_l1068_https_openaccess_thecvf_com_content_CVPR2026_html_Gan_Learning_Effective/figures/005_Table_3.jpg]]
-*Table 3: Effect of different backbones*
-
-![[assets/figures/papers/paper_list_l1068_https_openaccess_thecvf_com_content_CVPR2026_html_Gan_Learning_Effective/figures/008_Table_4.jpg]]
-*Table 4: Effect of weight initialization*
 
 ![[assets/figures/papers/paper_list_l1068_https_openaccess_thecvf_com_content_CVPR2026_html_Gan_Learning_Effective/figures/010_Figure_4.jpg]]
 *Figure 4: Visualization of attention map in SL tokenizer trained with original DINO/our SignDINO strategy*
 
 ![[assets/figures/papers/paper_list_l1068_https_openaccess_thecvf_com_content_CVPR2026_html_Gan_Learning_Effective/figures/015_Table_11.jpg]]
 *Table 11: Comparison of GFSLT performance on How2Sign*
-
-![[assets/figures/papers/paper_list_l1068_https_openaccess_thecvf_com_content_CVPR2026_html_Gan_Learning_Effective/figures/011_Table_7.jpg]]
-*Table 7: Model training speed*
-
-![[assets/figures/papers/paper_list_l1068_https_openaccess_thecvf_com_content_CVPR2026_html_Gan_Learning_Effective/figures/007_Figure_3.jpg]]
-*Figure 3: Scalability test: the effect of using different sizes of pretrained dataset*
-
-![[assets/figures/papers/paper_list_l1068_https_openaccess_thecvf_com_content_CVPR2026_html_Gan_Learning_Effective/figures/012_Table_8.jpg]]
-*Table 8: Inference speed*
 
 ## 定位与知识库关联
 

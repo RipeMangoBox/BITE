@@ -139,8 +139,6 @@ $$
 
 值得注意的是，上述管线对前端渲染方式不敏感。论文验证了该方法可无缝应用于 3D Gaussian Splatting、Instant-NGP 辐射场，以及单视图或单目视频重建的点云渲染，体现了其作为通用后处理精炼器的潜力。整个流程无需对 SVD 进行任何微调，仅依赖其冻结的预训练权重，在数据与计算效率上具有显著优势。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2411_14208/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of the proposed ViewExtrapolator. We render an artifact-prone video from the closest training view to an extrapolative novel view, and then refine it by guiding SVD to preserve the original scene content and eliminate the artifacts with guidance annealing and resampling annealing*
 
@@ -224,8 +222,6 @@ $$
 
 $e$ 越大，表示新视图离训练视图覆盖范围越远，外推难度越高。LLFF-Extra 基准的平均 $e$ 达到 5.4，而现有基准的 $e$ 普遍较小（Figure 6），验证了该基准对外推评估的针对性。
 
-### 补充图表
-
 ## 实验与关键发现
 
 ### 基准构建：LLFF-Extra
@@ -291,20 +287,12 @@ ViewExtrapolator 作为一种训练无关的推理阶段精炼范式，可无缝
 
 尽管 ViewExtrapolator 在标准外推场景下表现出色，其能力边界受限于以下因素（Figure 10）：
 
-![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2411_14208/figures/011_Figure_10.jpg]]
-*Figure 10: Limitations and failure cases. The generation quality would degrade when handling (a) novel views at extreme angles or (b) dynamic videos with rapid motion. (The top row in each section is the rendered artifact-prone video and the bottom row is the refined video.)*
-
 1. **极端视角退化**：当新视角与训练视图几乎无重叠（极端角度旋转），SVD 先验缺乏足够的场景内容锚点，生成结果出现结构崩塌和严重的语义不一致。
 2. **动态场景快速运动**：对于包含快速相机运动或物体运动的动态视频，时序一致性难以维持，精炼后的视频可能出现抖动或内容跳变。
 3. **SVD 固有缺陷继承**：作为完全冻结的预训练模型，SVD 的低分辨率输出、颜色偏移等固有问题会直接传递到最终结果中。
 4. **推理效率**：单段视频（25 帧）的精炼耗时约 3 分 20 秒（A5000 GPU），尚无法满足实时应用需求。
 
 这些失败模式揭示了当前方法的根本瓶颈：**生成先验的质量上限决定了外推质量的上限**。在域差距过大或运动模式超出 SVD 训练分布的场景中，先验本身不再可靠，引导机制难以弥补这一缺口。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2411_14208/figures/008_Figure.jpg]]
-*Figure: (a) 3D Gaussian Splatting (b) Instant NGP (c) Point cloud from single view*
 
 ## 定位与知识库关联
 

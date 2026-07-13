@@ -93,8 +93,6 @@ VGG-T3使用同一MLP表示进行场景建图（优化MLP）和新图像定位�
 - **位姿估计薄弱**：在相机位姿估计任务上表现不佳，推测源于VGGT中特殊的相机token结构与TTT MLP的交互困难（Sec. 4.1）。
 - **表示容量上限**：固定尺寸MLP的表示能力可能有上限，在极大规模场景或宽基线条件下可能导致信息丢失。
 
-
-
 ### 前馈3D重建的规模化困境
 
 从多视图图像中恢复场景的3D几何、相机位姿与内参，是计算机视觉的基础任务。近年来，前馈（feed-forward）方法因其无需逐场景优化的高效性而备受关注。其中，基于Transformer架构的模型（如**VGGT**，Wang et al., CVPR 2025）通过全局自注意力机制在token空间中聚合跨视图信息，在点图估计、深度预测和相机位姿估计上取得了领先精度。
@@ -117,8 +115,6 @@ VGG-T3使用同一MLP表示进行场景建图（优化MLP）和新图像定位�
 直观思路是：既然KV空间本质上是对场景几何的隐式编码，那么能否用一个**固定尺寸的紧凑表示**来替代可变长度的KV序列？如果能将KV空间“蒸馏”为一个轻量MLP的权重，那么对场景的查询就退化为对MLP的前向传播，复杂度自然降至 $O(n)$。
 
 这一思路的关键挑战在于：如何在保留预训练模型知识的前提下，实现从softmax注意力到MLP查询的有效转换，使得线性化后的模型既能继承预训练权重的表达能力，又能在任意规模的图像集合上稳定泛化。
-
-
 
 ## 核心方法与创新机理
 
@@ -167,8 +163,6 @@ VGG-T3的TTT目标具有梯度可加性：
 $$\frac{d L_{\mathrm{total}}}{d \theta} = \sum_i \frac{d}{d \theta} L(\mathbf{k}_i, \mathbf{v}_i) = \sum_s \left( \sum_{i \in s} \frac{d}{d \theta} L(\mathbf{k}_i, \mathbf{v}_i) \right)$$
 总梯度等于各token局部梯度的和，可按minibatch独立计算后累加。这一性质使VGG-T3可直接使用标准分布式数据并行（DDP），跨GPU通信仅需在MLP权重更新时进行梯度同步，无需像VGGT那样实现复杂的上下文并行（如ring attention）。在4块GPU上处理2000张图像仅需48.5秒，相较VGGT的27分钟提升33倍（Table 4）。
 
-
-
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2602_23361/figures/001_Figure_1.jpg]]
 *Figure 1: Reconstructing Rome landmarks with 1-minute time budget. We present VGG-T3, an offline feed-forward 3D reconstruction method that scales linearly w.r.t. input views (Fig. 1b). As a result, we can reconstruct large scenes from a large number of unposed input views, such as landmarks from tourist-sourced images, in less than a minute via single forward pass (Fig. 1a)*
 
@@ -185,8 +179,6 @@ VGG-T3 的 pipeline 以 VGGT 的交替注意力架构为基础，但在全局注
 **数据流与复杂度变化**：输入图像经 tokenizer 编码后，在交替注意力块中逐层处理。在全局注意力层，原始 VGGT 需计算所有 token 两两之间的注意力权重（$O(n^2)$），而 VGG-T3 将 KV 空间压缩为固定尺寸 MLP 后，查询操作变为对每个 token 独立应用 MLP，复杂度降至 $O(n)$。TTT 优化的总梯度可分解为各 token 局部梯度的和，支持 minibatch 梯度累积和分布式数据并行（DDP），使单 GPU 可处理任意大规模图像集合，多 GPU 下实现近线性加速。
 
 **关键设计选择**：VGG-T3 移除了原始 VGGT 中的 LayerNorm，改用 L2 归一化，以解锁预训练权重的快速收敛（Sec. 3.2）。ShortConv2D 仅在值空间使用 $3\times3$ 卷积效果最佳，更大的卷积核或同时对键和值应用卷积会降低性能（Table 9）。TTT 优化步数需随图像数量增加而调整：对于 20 张图像的分布内样本，1 步优化即足够；对于 1k 张图像，更多步数可显著降低点图误差（Figure 3a）。
-
-
 
 ### 核心模块
 
@@ -247,8 +239,6 @@ VGG-T3 移除了标准 Transformer 中的 LayerNorm（LN），改用 L2 归一�
 
 > **注意**：关于 MLP $T_\theta$ 的具体网络结构（层数、隐藏维度等），原文未在提供的材料中明确给出，需查阅原文附录确认。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设计
@@ -280,9 +270,6 @@ VGG-T3的实验评估围绕三个核心维度展开：（1）与$O(n)$线性时�
 
 **Table 2** 展示了KITTI和Sintel上的视频深度估计结果。VGG-T3大幅超越TTT3R：
 
-![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2602_23361/figures/007_Table_2.jpg]]
-*Table 2: Video depth estimation. $\boldsymbol { \mathrm { V G G } } \boldsymbol { - } \boldsymbol { \mathrm { T } } ^ { 3 }$ outperforms sequential O(n) baseline by a substantial margin and performs on-par with O ( $n ^ { 2 }$ ) baselines
-
 - **KITTI**: $\delta < 1.25$ 达0.967，TTT3R仅0.818（提升18%）
 - **Sintel**: $\delta < 1.25$ 达0.581，TTT3R仅0.510
 
@@ -313,8 +300,6 @@ VGG-T3的实验评估围绕三个核心维度展开：（1）与$O(n)$线性时�
 
 **Table 4** 进一步展示了分布式推理的线性加速能力：
 
-![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2602_23361/figures/009_Table_4.jpg]]
-*Table 4: Reconstruction latency (s) with distributed inference. $\boldsymbol { \nabla } \mathrm { G } \mathrm { G } { - } \mathrm { T } ^ { 3 }$ can efficiently process large sequences on a single GPU, and provide linear speed-up via distributed inference
 
 - 单GPU处理2000张图像：230.7秒
 - 2 GPU：74.8秒（3.08倍加速）
@@ -327,9 +312,6 @@ VGG-T3的实验评估围绕三个核心维度展开：（1）与$O(n)$线性时�
 ### 视觉定位：MLP状态表示的优势
 
 **Table 5** 展示了前馈视觉定位结果。VGG-T3在7scenes和Wayspots上均优于TTT3R：
-
-![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2602_23361/figures/013_Table_5.jpg]]
-*Table 5: Feed-forward visual localization in unposed image collection. The MLP-based state representation in $\boldsymbol { \mathrm { V G G } } \boldsymbol { - } \boldsymbol { \mathrm { T } } ^ { 3 }$ allows for more precise localization of new images compared to TTT3R. Table 6. Ablations. We evaluate key design decisions behind our linearization and ShortConv2D design
 
 - **7scenes**: 平移误差0.16m，20cm/20°定位率73.00%
 - **Wayspots**: 平移误差1.90m，20cm/20°定位率30.64%
@@ -374,18 +356,6 @@ VGG-T3的MLP状态表示允许查询未参与测试时优化的新图像，实�
 
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2602_23361/figures/015_Table_8.jpg]]
 *Table 8: Attention entropy-scaling makes VGGT a stronger baseline on large image collections*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2602_23361/figures/008_Figure.jpg]]
-*Figure: VGGT (11 minutes) Ours (58s)*
-
-![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2602_23361/figures/011_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2602_23361/figures/014_Table_7.jpg]]
-*Table 7: Datasets used for training*
-
-
 
 ## 定位与知识库关联
 
@@ -461,8 +431,6 @@ VGG-T3 的提出打开了若干值得进一步探索的方向：
 5. **压缩表示的可解释性与下游应用**：TTT 优化后的 MLP 权重隐式编码了场景几何信息。这一压缩表示是否可被解释或提取为显式的几何基元（如点云、网格），从而桥接前馈方法与经典 SfM/MVS 流程？
 
 6. **与在线方法的融合**：VGG-T3 的离线批量压缩与 TTT3R 的在线递归更新各有所长。是否存在统一的测试时训练框架，在离线阶段批量压缩全局信息，在在线阶段递归融合新观测，兼顾精度、效率与实时性？
-
-
 
 ## 原文 PDF
 

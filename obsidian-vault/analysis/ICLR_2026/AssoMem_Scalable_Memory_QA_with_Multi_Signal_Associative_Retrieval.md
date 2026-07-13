@@ -46,11 +46,7 @@ claims:
 
 AssoMem（Associative Memory）是一个面向大规模对话记忆问答的可扩展检索框架。其核心思想是模仿人类联想记忆机制，通过构建关联记忆图（associative memory graph）并引入多维检索信号（相关性、重要性、时序对齐）的自适应融合，解决现有方法在大规模、高相似度记忆库中检索性能严重下降的问题。实验表明，AssoMem在LongMemEval和MeetingQA三个基准上平均超越现有方法24.93%。
 
-
-
 现有记忆问答方法（如平面检索、长短期记忆划分、主题分组等）在大规模、高相似度记忆库中面临严重性能瓶颈。根本原因在于：**仅依赖语义相关性（relevance）无法区分大量高度相似的记忆项，也无法捕捉用户对重要记忆的偏好和时序约束**。例如，当用户多次讨论相似话题（如“推荐电影”）时，仅靠语义相似度无法区分哪次对话包含用户最终选择的电影，也无法识别用户反复提及的偏好。
-
-
 
 ## 核心方法与创新机理
 
@@ -64,8 +60,6 @@ AssoMem的核心创新体现在以下五个关键设计变更：
 | 候选检索策略 | 直接检索话语或会话 | 两阶段混合检索：先检索相关线索，再对关联话语进行排序 | Section 3.2.2 |
 | 生成模型微调 | 标准监督微调 | 多任务去噪微调：混合正负样本 + 仅负样本上下文 + 联合训练问题类型预测和答案生成 | Section 3.3 |
 
-
-
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__language_speech_and_dialog__b001_ZCjWUBwCwE_AssoMem_Scala/figures/001_Figure_1.jpg]]
 *Figure 1: An example showing limitations in relevance solely retrieval. Our AssoMem consistently outperforms SOTA baselines on three datasets.*
 
@@ -76,8 +70,6 @@ AssoMem的整体框架如Figure 2所示，包含以下五个流水线模块：
 3. **RITRanker评分**：对每个候选话语计算相关性分数、重要性分数（PPR）和时序分数（TimeLlaMa）。
 4. **CMI自适应融合**：基于条件互信息计算每个维度的权重，加权求和得到最终分数，选择Top-K话语。
 5. **多任务去噪微调生成**：使用微调后的LLM，基于检索到的记忆上下文生成答案。
-
-
 
 ### 5.1 关联记忆图构建
 
@@ -114,8 +106,6 @@ $$\operatorname{Score}(q,u) = w^{(rel)}(q) \tilde{s}_u^{(rel)} + w^{(imp)}(q) \t
 $$CMI_d(q) = I(\tilde{s}_u^{(d)(b)}; \lambda | q) = \sum_{\tilde{s}_x^{(d)(b)}} \sum_{\lambda} p(\tilde{s}_u^{(d)(b)}, y_m^{\lambda}) \log \frac{p(\tilde{s}_u^{(d)(b)}, y_m^{\lambda} | q)}{p(\tilde{s}_u^{(d)(b)} | q) p(y_m^{\lambda} | q)}$$
 
 该公式衡量在给定查询类型q的条件下，分箱后的维度分数与有用性标签之间的条件互信息，从而动态调整各维度权重。
-
-
 
 ## 实验与关键发现
 
@@ -165,14 +155,10 @@ Table 13显示，关联记忆图的构建（~1949秒）是离线过程，但增�
 
 Table 15显示，长上下文方法（Llama-3.3-70B，128k窗口）仅达到21.93% Acc@6，远低于最弱的RAG基线（HippoRAG，48.61%）。AssoMem达到64.01% Acc@6，是长上下文基线的2.9倍。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__language_speech_and_dialog__b001_ZCjWUBwCwE_AssoMem_Scala/figures/004_Table_2.jpg]]
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__language_speech_and_dialog__b001_ZCjWUBwCwE_AssoMem_Scala/figures/006_Table_2.jpg]]
 *Table 2: Generation results of different LLMs using AssoMem recall@10 retrieval as context.*
-
-
 
 ## 定位与知识库关联
 
@@ -193,8 +179,6 @@ AssoMem属于**检索增强生成（RAG）**范式下的**记忆问答**子领�
 3. MeetingQA为合成数据集，真实世界代表性有限
 4. CMI融合策略需要有用性标签，在无标签场景下可能无法直接应用
 5. 检索性能在k=10附近饱和（~0.85），但QA准确率在k=6附近即达到平台期（~0.66），表明存在利用瓶颈（utilization bottleneck）
-
-
 
 ## 原文 PDF
 

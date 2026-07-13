@@ -273,27 +273,11 @@ Table 7 展示了 Eagle2-9B 在 14 项多模态基准上与当前主流开源及
 
 - **数据增强引入噪声风险**：CoT 增强和答案扩展依赖第三方 VLM 生成伪标注。尽管设有自动过滤机制，仍可能引入噪声和错误知识，在特定场景下影响模型可靠性。论文对此风险有所认知，但未提供量化评估。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2501_14818/figures/024_Table.jpg]]
 *Table: B | General VQA Data. Table C | Naive OCR Data. Table D | Counting & Grounding Data*
 
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2501_14818/figures/025_Table.jpg]]
 *Table: H | Chart & Table Data. We heavily use some lowquality data such as MMC-Inst, PlotQA in Stage-1.5. But in our final stage, we just sample a very small part from these sources*
-
-![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2501_14818/figures/026_Table.jpg]]
-*Table: E | Science Data. ×?? notes repeat the data by ?? times. Table F | Math Data. Table G | Caption & Knowledge Data. Table I | OCR QA Data. “×4" means we repeat every sample 4 times*
-
-![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2501_14818/figures/027_Table.jpg]]
-*Table: J | Text-only Data. The quality of text-only data still matters for multi-modal LLMs. We collect a diverse collection of open-source text-only datasets. We also convert some preference datasets into SFT format. Table L | Dataset for CoT data augmentation. Table M | With CoT training data, adding "Solve this problem step-by-step" prompt can help to improve the performance*
-
-![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2501_14818/figures/008_Figure_7.jpg]]
-*Figure 7: | Our three most commonly used data augmentation methods.These methods rely on rule-based approaches or utilize VLM models for automatic labeling. Table 3 | Two samples with same "Extract LATEX from image" task but with different format*
-
-![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2501_14818/figures/009_Table_4.jpg]]
-*Table 4: | We present our three-stage training settings, where Eagle2-9B/2B/1B builds upon Qwen2.5- 32B/7B/1.5B/0.5B [27], respectively. *: For small scale model with 0.5/1.5B LLM, we only use SigLIP as visual encoder and learning rate of 4 $\times$ 1 $0 ^ { - 5 }$ in Stage-1.5 & 2*
-
-![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2501_14818/figures/013_Table.jpg]]
 
 ## 定位与知识库关联
 

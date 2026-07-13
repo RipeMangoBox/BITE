@@ -81,8 +81,6 @@ MBA-SLAM的核心洞察在于**将物理运动模糊形成模型集成到SLAM的
 
 MBA-SLAM当前依赖两姿态线性插值模型，可能难以捕捉长时间曝光下高度不规则的运动轨迹。3DGS版本建图速度仅1.97 FPS，远未达到实时性要求。系统仅支持RGB-D输入，且曝光时间需事先已知。开放问题包括：如何建模超出两姿态近似的复杂运动模糊；帧到帧跟踪器在极低纹理场景中的鲁棒性；以及虚拟图像数量的在线自适应调整策略。
 
-
-
 ### 运动模糊对视觉SLAM的根本挑战
 
 密集视觉SLAM旨在从视频流中同时恢复相机运动轨迹和重建场景的3D表示。近年来，基于辐射场（NeRF）和3D高斯泼溅（3DGS）的表示方法极大地提升了建图的逼真度和几何精度。然而，这些方法普遍依赖一个隐含假设：输入图像是清晰的，光度一致性在帧间成立。当相机发生快速运动或场景光照不足导致曝光时间延长时，图像中产生严重的运动模糊，这一假设被彻底破坏。
@@ -106,8 +104,6 @@ MBA-SLAM的出发点是：**运动模糊不是需要事后去除的噪声，而�
 2. **模糊感知的建图器**：在光度束调整中，沿每条关键帧的运动轨迹采样多个虚拟清晰视图，通过平均合成模糊图像，与真实模糊输入计算损失。场景表示和相机轨迹在统一的模糊形成模型下联合优化。
 
 这一设计使得MBA-SLAM能够在严重运动模糊的视频输入下鲁棒地估计相机轨迹并重建清晰的、高逼真度的3D场景，同时不影响对清晰数据的性能——在标准清晰数据集上，MBA-SLAM同样超越了现有方法。
-
-
 
 ## 核心方法与创新机理
 
@@ -145,8 +141,6 @@ $$\hat{\mathbf{B}}_{\mathrm{cur}}(\mathbf{x}) = \frac{1}{n} \sum_{i=0}^{n-1} \ma
 
 消融实验（Table 10, Table 11）揭示了另一个关键创新：**全CUDA实现的帧到帧（frame-to-frame）跟踪器**。相较于传统SLAM中常见的帧到地图（frame-to-map）跟踪策略，帧到帧跟踪在清晰和模糊数据上均显著提升了跟踪精度（ATE RMSE）和建图质量（PSNR）。这一改进并非模糊场景的特化优化，而是一个通用的跟踪策略升级，使得MBA-SLAM在标准清晰数据集（Replica、ScanNet、TUM）上同样超越了现有方法（Table 4, Table 7）。
 
-
-
 MBA-SLAM 的整体管道由两个核心模块构成：**运动模糊感知的跟踪器（Motion Blur Aware Tracker）** 和**模糊感知的建图器（Blur Aware Mapper）**，两者通过一个物理运动模糊形成模型紧密耦合。该管道以 RGB‑D 视频流为输入，输出相机轨迹与清晰的 3D 场景表示。
 
 ### 管道概览
@@ -177,12 +171,8 @@ MBA-SLAM 提供了两种可互换的场景表示后端：
 
 两种变体共享相同的运动模糊感知跟踪器，仅在建图器的渲染和优化策略上有所差异。实验表明，该模糊感知框架在清晰数据集上不会降低性能，同时能在模糊数据集上显著超越现有方法。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2411_08279/figures/001_Figure_1.jpg]]
 *Figure 1: The pipeline of MBA-SLAM. Our framework consists of blur aware tracking process and bundle adjustment deblurring mapping process. Tracking: Given the current blurry frame, the mapper first renders a virtual sharp image of the lastest blurry keyframe from the 3D scene. Our motion blur-aware tracker directly estimates the camera motion trajectory during the exposure time, represented by the camera positions at the start and end of the exposure*
-
-
 
 ### 3.1 运动模糊图像形成模型
 
@@ -222,12 +212,6 @@ $$\hat{\mathbf{B}}_{\mathrm{cur}}(\mathbf{x}) = \frac{1}{n} \sum_{i=0}^{n-1} \ma
 
 跟踪器通过最小化重模糊图像与真实模糊图像之间的光度误差来优化 $\mathbf{T}_{\mathrm{start}}$ 和 $\mathbf{T}_{\mathrm{end}}$。为简化计算，系统从当前模糊图像中选取局部图像块（而非从参考帧选取），这一策略的几何关系在 Fig. 2 和 Fig. 3 中详细说明。
 
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2411_08279/figures/002_Figure_2.jpg]]
-*Figure 2: Pixel point transfer strategies. Note that we assume the pixel center lies at the grid intersection, e.g.the green grid is considered as a 3×3 patch*
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2411_08279/figures/003_Figure_3.jpg]]
-*Figure 3: Geometric relationship between x*
-
 虚拟相机姿态 $\mathbf{T}_i$ 由轨迹参数显式计算：
 
 $$\mathbf{T}_{i} = \mathbf{T}_{\mathrm{start}} \cdot \exp\left( \frac{i}{n-1} \tau \cdot \log\left( \mathbf{T}_{\mathrm{start}}^{-1} \cdot \mathbf{T}_{\mathrm{end}} \right) \right)$$
@@ -246,20 +230,13 @@ $$\mathcal{L} = \lambda_c \mathcal{L}_c + \lambda_d \mathcal{L}_d + \lambda_{fs}
 
 通过在建图损失中显式建模模糊形成过程，建图器能够在严重运动模糊的输入下恢复清晰的 3D 场景表示。当 $n=1$（即不建模模糊）时，跟踪精度在模糊数据集上显著退化（Table 9），验证了模糊形成模型集成的必要性。
 
-
-
 ## 实验与关键发现
 
 ### 运动模糊数据集上的跟踪与建图性能
 
 MBA-SLAM 的核心优势在于对严重运动模糊的鲁棒处理。在合成模糊数据集 ArchViz 上，该方法在跟踪精度上显著超越所有先前稠密视觉 SLAM 方法。以 3DGS 变体为例，MonoGS-blur-ours (f2f) 在 ArchViz-1 上取得 0.68 cm 的 ATE RMSE，而 MonoGS-blur (f2m) 为 1.06 cm，绝对提升 0.38 cm（Table 11）。NeRF 变体同样表现优异，在 ArchViz 各序列上均取得最佳跟踪结果（Table 1, Fig. 4 轨迹可视化）。Fig. 4 展示了 MBA-SLAM 在极具挑战性的相机运动下估计出的精确轨迹，直观验证了方法的鲁棒性。
 
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2411_08279/figures/004_Figure_4.jpg]]
-*Figure 4: Estimated trajectories of MBA-SLAM from the motion blurred image sequences of the ArchViz dataset. It demonstrates that MBA-SLAM can estimate accurate trajectories, although the camera motions are very challenging*
-
 在渲染质量方面，MBA-SLAM 能够从严重模糊的输入中恢复出清晰、高保真的视图。在 ArchViz 数据集上，其渲染 PSNR 显著高于竞争方法（Table 2, Fig. 5）。Fig. 5 的定性对比显示，MBA-SLAM 恢复的图像细节清晰、边缘锐利，而其他方法（如 CoSLAM、ESLAM、Point-SLAM、SplaTAM）仍残留明显的模糊伪影。网格重建方面，Fig. 6 表明 MBA-SLAM 的 NeRF 和 3DGS 变体均优于对比方法，且隐式辐射场方法（CoSLAM、ESLAM）在网格质量上优于显式点方法（Point-SLAM、SplaTAM）。
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2411_08279/figures/006_Table_2.jpg]]
 
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2411_08279/figures/008_Figure_5.jpg]]
 *Figure 5: Qualitative rendering results of different methods with synthetic ArchViz datasets. It demonstrates that MBA-SLAM can restore and render sharp images from blurry input and outperform other dense visual SLAMs. Best viewed in high resolution*
@@ -279,14 +256,10 @@ MBA-SLAM 的核心优势在于对严重运动模糊的鲁棒处理。在合成�
 
 一个关键问题是：模糊感知的建模是否会在清晰数据上引入性能退化？实验结果给出了否定的答案。在标准清晰数据集 Replica（8 个场景）上，MBA-SLAM 的 NeRF 变体平均 ATE RMSE 为 0.41 cm，3DGS 变体为 0.35 cm，均超越所有先前 SOTA 方法（Table 4）。在 Replica Room0 上，MonoGS-ours (f2f) 的 ATE RMSE 为 0.31 cm，而 MonoGS (f2m) 为 0.42 cm（Table 10）。这表明模糊感知框架不仅未损害清晰场景的性能，反而因改进的跟踪器设计而有所提升。
 
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2411_08279/figures/009_Table_4.jpg]]
-
 渲染和网格重建方面，MBA-SLAM 在 Replica 上同样表现最佳（Table 5, Table 6, Fig. 9）。Fig. 9 的网格可视化显示，RTG-SLAM 因渲染深度图存在大量空洞而产生不完整网格，而 MBA-SLAM 重建的网格完整且细节丰富。
 
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2411_08279/figures/013_Figure_9.jpg]]
 *Figure 9: Qualitative mesh visualization results of different methods with Replica datasets. It demonstrates MBA-SLAM surpasses other stateof-the-art dense visual SLAMs even on standard sharp datasets. Note that RTG-SLAM produces incomplete meshes due to the presence of numerous holes in the rendered depth maps*
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2411_08279/figures/014_Table_6.jpg]]
 
 ### 消融实验与关键设计验证
 
@@ -301,8 +274,6 @@ MBA-SLAM 的核心优势在于对严重运动模糊的鲁棒处理。在合成�
 **运行时效率**：Table 8 报告了 Replica Room0 上的运行时间和内存占用。Ours-NeRF 达到 22.57 FPS，具备实时性；Ours-GS 速度慢于 GS-SLAM 但快于 SplaTAM，建图速度为 1.97 FPS，仍远低于实时要求。NeRF 方法在跟踪和建图中仅采样部分像素，而 3DGS 方法使用全图渲染，导致不同的速度-质量权衡。
 
 **已知局限**：(1) 两姿态线性插值模型可能难以捕捉长时间曝光下高度不规则的运动轨迹，高非线性运动时精度可能下降；(2) 3DGS 版本的建图速度远低于实时，限制了在线机器人应用；(3) 仅支持 RGB-D 输入，尚未扩展到单目或立体设置；(4) 曝光时间需事先已知或通过传感器获取，实际应用中可能无法准确获得。
-
-
 
 ## 定位与知识库关联
 
@@ -367,8 +338,6 @@ MBA-SLAM 相对于上述基线，在三个关键方法槽位上做出了根本�
 4. **与事件相机的互补性**：事件相机天然对运动模糊鲁棒，MBA-SLAM 的模糊感知框架能否与事件数据融合，在极端运动场景下进一步提升鲁棒性？这是一个有前景但尚未探索的方向。
 
 5. **大场景的扩展性**：当前实验主要在房间级场景（Replica、ScanNet）上进行。在更大尺度场景中，SE(3) 插值的累积误差和 3DGS 的内存增长是否会成为瓶颈，仍需验证。
-
-
 
 ## 原文 PDF
 

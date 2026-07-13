@@ -51,8 +51,6 @@ claims:
 
 实验表明，CASG 在多个基准上显著降低有害率：CASG+SLD 在 I2P 基准上将有害率从 SDv1.5 的 42.2% 降至 10.2%，在 CoProv2 上从 28.2% 降至 3.9%，同时保持与基线相当的图像质量（COCO 上 CLIP Score 29.4 vs. SLD 29.2）。消融实验进一步证实，静态类别分类器无法适应动态冲突，而 CASG 的动态选择机制是性能提升的关键。该方法在性内容和非法活动等强冲突类别上尤为有效，且对预定义关键词的变体具有鲁棒性。
 
-
-
 文本到图像（T2I）扩散模型的快速发展带来了严重的安全隐患——恶意用户可通过精心设计的提示词生成暴力、色情、仇恨言论等有害内容。为应对这一挑战，现有安全机制主要分为三类：模型编辑方法（如 **ESD**、**UCE**、**RECE**）通过修改模型参数擦除有害概念，但对训练资源要求高且可能损害生成质量；对齐式方法（如 **SafetyDPO**）通过偏好优化调整模型行为，但泛化能力有限；安全引导方法（如 **SLD**、**SAFREE**）在推理阶段施加安全约束，无需重新训练，成为当前最灵活的主流范式。
 
 然而，现有安全引导方法存在一个被忽视的关键瓶颈：**多类别有害冲突**。这些方法通常将多个有害类别的关键词简单拼接，生成一个聚合的安全方向。但如图2所示，不同类别的安全方向在潜在空间中并不一致——它们相互交叉甚至对立，且这种关系在去噪过程中动态变化。当聚合方向与当前生成内容的真实有害类别不匹配时，安全引导不仅失效，还可能将生成过程推向其他有害区域。
@@ -60,8 +58,6 @@ claims:
 Figure 1和Table 1量化了这一现象的严重性：对于性内容提示，使用正确的“sexual”安全方向可将有害率从67.2%降至3.2%；但若错误地施加“hate”方向，有害率反而飙升至72.4%，甚至超过无引导基线。更关键的是，当同时使用“sexual”和“hate”两个类别时，有害率回升至5.8%，表明多类别聚合会削弱单类别安全方向的效果——这一现象被称为**方向衰减**。图3进一步揭示了这种衰减的动态特性：不同类别在不同去噪时间步的主导程度波动显著，静态聚合无法适应这种变化。
 
 上述发现揭示了一个因果调控点：**安全引导方向是否与当前生成过程中的真实有害类别对齐**。现有方法的核心缺陷在于缺乏动态类别识别机制，导致安全信号被无关类别的噪声所淹没。本文由此提出核心洞察：在去噪过程中动态识别与提示引导方向最一致的有害类别，并仅沿该类别施加安全纠正，能够避免多类别聚合带来的方向干扰和衰减。基于这一洞察，我们设计了**冲突感知自适应安全引导框架（CASG）**，通过即插即用的方式解决现有多类别安全机制中的有害冲突问题。
-
-
 
 ## 核心方法与创新机理
 
@@ -89,8 +85,6 @@ CASG 将安全方向合成方式从“静态拼接所有类别”改为“在每
 
 CASG 是一个 training-free、即插即用的框架，无需模型微调或参数更新，可直接嵌入现有的潜在空间安全引导方法（如 SLD）和文本空间安全引导方法（如 SAFREE）中。这一设计使其区别于 **ESD**、**UCE**、**RECE** 等需要模型编辑的基线方法，以及 **SafetyDPO** 等需要对齐训练的方法，在保持轻量级部署的同时实现了显著的安全性提升。
 
-
-
 CASG 是一个即插即用的训练无关框架，旨在解决现有多类别安全引导中的“有害冲突”问题。其核心思想是：在去噪过程的每个时间步，动态识别与当前生成状态最对齐的单一有害类别，并仅沿该类别施加安全纠正，从而避免多类别信号聚合带来的方向干扰和衰减。
 
 框架由两个关键模块串联构成：
@@ -103,22 +97,12 @@ CASG 是一个即插即用的训练无关框架，旨在解决现有多类别安
 
 CASG 作为一个轻量级修正器，可无缝嵌入现有的潜在空间安全引导方法（如 SLD）和文本空间安全引导方法（如 SAFREE），分别形成 CASG+SLD 和 CASG+SAFREE。框架的整体结构如图 4 所示，伪代码见 Algorithm 1。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2364_https_arxiv_org_abs_2602_20880/figures/005_Figure.jpg]]
-*Figure: harmful guidance original guidance safety guidanceAligned guidance (a) Latent space method: conflict-aware safety steering (b) Text space method: conflict-aware orthogonal projection*
-
-
-
 ### 问题形式化
 
 现有安全引导方法在处理多类别有害内容时存在一个根本性瓶颈：简单拼接多个有害类别的关键词会生成方向不一致甚至相互抵消的安全引导信号，导致“有害冲突”。具体而言，给定一组预定义的有害类别 $H = (h_1, \ldots, h_k)$，每个类别 $h_i$ 产生一个安全引导方向 $g_i$，这些方向并非相互一致——部分方向在潜在空间中部分重叠，另一些则指向相反方向（Figure 2）。当多个类别被聚合使用时，类别层面的安全影响会被显著衰减（Figure 3），最终削弱整体安全性能。
 
 ![[assets/figures/papers/paper_list_l2364_https_arxiv_org_abs_2602_20880/figures/002_Figure_2.jpg]]
 *Figure 2: Cross-Category Directional Conflict in latent space. Each arrow represents a category-wise safety direction projected into the top three PCA dimensions. Directions from different categories intersect or oppose one another, and these relationships evolve across timesteps, indicating dynamic harmful conflicts*
-
-![[assets/figures/papers/paper_list_l2364_https_arxiv_org_abs_2602_20880/figures/003_Figure_3.jpg]]
-*Figure 3: Aggregated Directional Attenuation in latent space. The horizontal axis shows diffusion timesteps, and the vertical axis lists harmful categories. Color intensity indicates category-wise directional retention (darker means higher retention). The fluctuating patterns reveal strong cross-category attenuation. More results are shown in Appendix A.2*
 
 ### CASG 框架总览
 
@@ -180,12 +164,7 @@ CASG 的核心创新在于将“安全方向合成方式”从**静态拼接所�
 ![[assets/figures/papers/paper_list_l2364_https_arxiv_org_abs_2602_20880/figures/009_Figure_6.jpg]]
 *Figure 6: Cross-Category Directional Conflict in latent space under sexual and hate prompts. Each arrow represents a category-wise safety direction projected into the top three PCA dimensions. Directions from different categories intersect or oppose one another, and these relationships evolve across timesteps, indicating dynamic harmful conflicts*
 
-![[assets/figures/papers/paper_list_l2364_https_arxiv_org_abs_2602_20880/figures/010_Figure_7.jpg]]
-*Figure 7: Cross-Category Directional Conflict in text space under sexual and hate prompts. Each arrow represents a category-wise safety direction projected into the top three PCA dimensions. Directions from different categories intersect or oppose one another*
-
 CASG 的类别识别机制不依赖外部文本分类器，而是直接从扩散模型的内部状态（潜在空间中的噪声预测方向或文本空间中的投影残差）中推断，因此能够适应生成过程中语义的动态演变。
-
-
 
 ## 实验与关键发现
 
@@ -232,19 +211,6 @@ CASG 的性能边界主要体现在以下方面：
 *Table 10: Inference Efficiency Comparison. k denotes the number of predefined harmful categories. Values in brackets denote the inference time multiples relative to SAFREE and SLD*
 
 3. **恶意输入上的语义偏移。** 对于明确有害的提示，CASG 为了安全引导会主动偏离原始语义，这种偏移在安全优先的场景中可接受，但在需要精确上下文保真度的应用中可能成为问题。该偏移的程度和可控性在论文中未做定量分析，需要进一步验证。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2364_https_arxiv_org_abs_2602_20880/figures/001_Figure_1.jpg]]
-*Figure 1: We demonstrate the safety performance of SLD on different harmful keywords and analyze the harmful conflicts. (a) shows SLD effectively steers the prompt guidance away from the harmful zone when harmful keywords precisely match the prompt’s harmful category (sex). (b) illustrates keyword mismatch scenarios where harmful conflicts arise when attempting to steer away from the hate harmful zone while inadvertently moving toward the sexual harmful zone. (c) demonstrates the performance degradation when applying multiple-categories keywords hate, sexual. More analysis are presented in Section 3*
-
-![[assets/figures/papers/paper_list_l2364_https_arxiv_org_abs_2602_20880/figures/004_Table_1.jpg]]
-*Table 1: Safety Degradation. Harmful Rates (%) under SLD when applying different harmful categories. Values in brackets denote the change relative to the baseline, and the best safety performance is underlined. More result shown in Appendix A.3*
-
-![[assets/figures/papers/paper_list_l2364_https_arxiv_org_abs_2602_20880/figures/018_Table_9.jpg]]
-*Table 9: We present category-wise harmful rate analysis of the harmful rate reduction in I2P datasets. Values in brackets denote the relative drop compared with SAFREE and SLD*
-
-
 
 ## 定位与知识库关联
 
@@ -293,8 +259,6 @@ CASG 的有效性建立在以下前提之上：
 3. **对抗鲁棒性**：CaCI 的类别选择机制是否对对抗性提示具有鲁棒性？攻击者可能构造在文本空间与特定有害类别高度对齐但实际语义不同的提示，诱导错误的安全方向选择。
 
 4. **最优类别粒度**：预定义有害类别的粒度和数量如何影响 CASG 的性能？过粗的粒度可能导致类别内冲突，过细的粒度则会增加推理开销。是否存在最优的类别划分策略？
-
-
 
 ## 原文 PDF
 

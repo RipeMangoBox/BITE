@@ -46,11 +46,7 @@ claims:
 
 本文提出 **SRAL (Set Representation Auxiliary Learning)** 框架，旨在通过显式建模集合间（inter-set）相关性来提升集合表示的质量。SRAL 将集合视为高维分布，利用 **2-Sliced-Wasserstein 距离** 度量分布差异，并引入对抗性辅助学习机制，在特征层面施加最坏情况扰动，迫使模型学习高判别性的鲁棒表示。理论分析表明，对抗性目标在期望上等价于优化集合间的 Wasserstein 距离。在四个下游任务（集合相似性排序、捆绑推荐、点云分类、主题集扩展）上的实验表明，SRAL 显著优于现有方法，例如在 Friendster 数据集上 Recall@20 达到 91.57，相比最佳基线提升 9.56%。
 
-
-
 现有集合表示学习方法主要关注集合内部（intra-set）的置换不变性和基数独立性，缺乏对集合间（inter-set）相关性的显式建模。这导致在需要细粒度集合比较的下游任务（如集合检索、捆绑推荐）中表示能力不足。传统方法如 DeepSet (Zaheer et al., 2017) 和 RepSet (Skianis et al., 2020) 虽然能有效处理集合内部结构，但未能充分利用集合之间的分布差异信息。SRAL 的核心动机是：通过将集合视为分布并度量其差异，结合对抗性学习，迫使编码器学习到能够捕捉细粒度集合间相关性的表示。
-
-
 
 ## 核心方法与创新机理
 
@@ -61,8 +57,6 @@ SRAL 的核心创新体现在三个关键设计变更上：
 | **集合编码方式** | 元素特征求和/平均/最大池化，或基于自注意力的聚合 | 基于 2-Sliced-Wasserstein 距离的分布差异编码，将集合视为经验分布并计算与可学习参考分布的距离 | Section 3.2: our encoder leverages the distributional distance between an input set and a learnable reference distribution O |
 | **数据增强/扰动策略** | 元素丢弃/添加或子集采样等输入级操作 | 在特征层面引入对抗性扰动，通过最小-最大优化生成最坏情况扰动 | Section 3.3.1: z_{i,k}' = z_{i,k} + ε_{i,k}', where ε_{i,k}' is drawn from \|\|ε\|\|_2 ≤ π (Eq. 7) |
 | **辅助学习目标** | 无显式集合间相关性建模的辅助目标 | 基于 InfoNCE 的自监督对比损失，其期望等价于 2-Sliced-Wasserstein 距离 | Section 3.3.2: L_wd = Σ_{S_i∈S} -log( exp(-||v_i' - v_i''||_2/ψ) / Σ_{S_j∈S} exp(-||v_i' - v_j''||_2/ψ) ) (Eq. 8) |
-
-
 
 ![[assets/figures/papers/iclr26_representation_self_supervised_transfer__representation_learning__b001_13r06yROEZ_Adversa/figures/001_Figure_1.jpg]]
 *Figure 1: SRAL captures inter-set correlations for adversarial optimization (left); normalized ratiosFigure 1: SRAL captures inter-set correlations for adversarial optimization (left); normalized ratios of second-best methods over SRAL are reported due to varying metric scales (right).of second-best methods over SRAL are reported due to varying metric scales (right).*
@@ -76,8 +70,6 @@ $$L = L_{\mathrm{Main}} + \lambda_1 L_{\mathrm{Aux}} + \lambda_2 \|\Xi\|_2^2 \qu
 1. **Set Feature Encoder (SFE)**：基于 2-Sliced-Wasserstein 距离的集合编码器，将输入集合映射为固定大小的嵌入向量。
 2. **Adversarial Encoding Perturbation and Optimization (AEPO)**：对抗性编码扰动与优化模块，生成最坏情况扰动并优化模型鲁棒性。
 3. **Main Task Loss**：与具体下游任务相关的主损失函数（如排序损失、分类损失等）。
-
-
 
 ### 5.1 预备知识：Wasserstein 距离
 
@@ -122,8 +114,6 @@ $$\sigma = \boldsymbol{\hat{\sigma}} \cdot \operatorname{min}\left(1, \frac{\pi}
 **参数更新规则** (Eq. 14)：
 $$\Xi \leftarrow \Xi - \beta \cdot \nabla_\Xi \left( L_{\mathrm{Main}} + \lambda_1 L_{\mathrm{adv}} + \lambda_2 \|\Xi\|_2^2 \right)$$
 
-
-
 ## 实验与关键发现
 
 ### 6.1 主要结果
@@ -163,7 +153,6 @@ SRAL 在四个下游任务上进行了评估，与 14 种基线方法进行了�
 
 消融实验结果（Table 4）揭示了各模块的关键贡献：
 
-
 ![[assets/figures/papers/iclr26_representation_self_supervised_transfer__representation_learning__b001_13r06yROEZ_Adversa/figures/012_Table_4.jpg]]
 *Table 4: Ablation study.*
 
@@ -178,8 +167,6 @@ SRAL 在四个下游任务上进行了评估，与 14 种基线方法进行了�
 - AEPO 模块是计算开销的主要来源（占每 epoch 训练时间的约 59%），但作者认为其带来的收敛加速和性能提升是值得的权衡。
 - 将线性插值替换为两层 MLP 进行维度补齐（w/o LI）导致性能下降。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_representation_self_supervised_transfer__representation_learning__b001_13r06yROEZ_Adversa/figures/003_Table_1.jpg]]
 *Table 1: Performance comparison for Tasks 1 (left) and 2 (right). Best and second-best cases are highlighted. Statistically significant improvements (p \< 0.05) are marked with ∗.*
 
@@ -190,9 +177,6 @@ SRAL 在四个下游任务上进行了评估，与 14 种基线方法进行了�
 
 ![[assets/figures/papers/iclr26_representation_self_supervised_transfer__representation_learning__b001_13r06yROEZ_Adversa/figures/006_Table_3.jpg]]
 *Table 3: Performance comparison for Task 4: Topic Set Expansion.*
-
-
-
 
 ## 定位与知识库关联
 
@@ -219,8 +203,6 @@ SRAL 在集合表示学习领域具有明确的定位：
 - SRAL 框架能否扩展到其他类型的结构化数据（如图、序列）的表示学习？
 - 对抗性扰动与 Sliced-Wasserstein 距离之间的理论联系是否适用于其他距离度量（如最大均值差异 MMD）？
 - 如何自动选择最优的超参数（如扰动半径 π、投影数量 R）以减少人工调优成本？
-
-
 
 ## 原文 PDF
 

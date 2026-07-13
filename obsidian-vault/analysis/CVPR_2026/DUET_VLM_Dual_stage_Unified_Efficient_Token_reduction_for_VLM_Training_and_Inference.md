@@ -57,8 +57,6 @@ claims:
 
 消融实验进一步揭示：局部聚类聚合是一种即插即用的压缩策略，能够一致提升VisionZip和DUET-VLM的性能，在低token预算下增益尤为明显（Table 7, Table 10）；文本引导的token选择（显著性token或全部查询token）优于仅依赖最后一个文本token的方案（Table 8, Table 11）。
 
-
-
 ### 视觉语言模型的Token膨胀困境
 
 当前主流的大规模视觉语言模型（VLM）普遍采用密集的视觉分词策略，将输入图像编码为大量视觉token后送入语言模型进行跨模态推理。例如，**LLaVA-1.5-7B**（Liu et al., CVPR 2024）使用576个视觉token，而**LLaVA-NeXT**的token数量更超过2800个。这种密集表示带来了一个根本性瓶颈：视觉token的计算和内存开销随图像分辨率呈平方级增长，严重制约了VLM在实际部署中的效率。
@@ -81,8 +79,6 @@ claims:
 - **在语言模型侧**，利用显著性文本token（而非仅最后一个token）的跨注意力指导逐层丢弃，使深层仅关注与语义查询相关的视觉区域。
 
 这种双阶段设计——**DUET-VLM**——将视觉冗余感知的token合并（V2V局部聚类）与文本引导的逐层token丢弃（T2V显著性裁剪）协同组合，两个阶段互补适配不同压缩率，从而在推理和训练两个场景下均实现优异的精度-效率权衡。
-
-
 
 ## 核心方法与创新机理
 
@@ -138,8 +134,6 @@ DUET-VLM的另一个关键创新在于**训练与推理阶段的统一**。现�
 
 实验结果表明（Table 3, Table 6），在LLaVA-1.5-7B训练中启用DUET-VLM，可在67% token压缩下保持99.7%平均准确率，同时训练时间减少31%。这一“训练即压缩”的范式为高效VLM训练提供了新的技术路径。
 
-
-
 DUET-VLM 提出了一种**双阶段统一视觉分词压缩框架**，将视觉语言模型的 token 压缩分解为两个互补且可协同优化的阶段：在视觉编码器侧进行**冗余感知的 token 合并**，随后在语言模型侧进行**文本引导的逐层 token 丢弃**。该框架以即插即用的方式工作，无需修改底层 VLM 架构。
 
 ### 流程总览
@@ -180,12 +174,8 @@ DUET-VLM 通过调节三个关键超参数适配不同的压缩率需求：主�
 
 > **注意**：关于 T2V Pruning 中显著性文本 token 的具体选取算法（如如何从所有文本 token 中筛选出“显著性”子集），原文未给出公式化定义，仅在实验部分以“C+S”变体形式出现。该细节需要查阅代码仓库（https://github.com/AMD-AGI/DUET-VLM）进行确认。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2218_https_arxiv_org_abs_2602_18846/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed pipeline. An input image is first encoded into N visual tokens by the Vision Encoder. (A) Based on the V2V self-attention map*
-
-
 
 DUET-VLM 的核心由一个双阶段压缩管线构成：**视觉侧冗余感知的局部聚类合并**（Stage 1）与**语言侧文本引导的逐层token丢弃**（Stage 2）。两者协同工作，在消除冗余的同时保留语义关键的视觉信息。
 
@@ -232,17 +222,7 @@ $$\mathbf{X}_{\mathrm{out}} = \mathbf{X}_{\mathrm{dom}} \cup \mathbf{X}_{\mathrm
 
 消融实验（Table 8, Table 9）表明，C+S和C+all在多数设置下优于仅用最后一个token的方案，验证了更丰富的文本引导信号对视觉token裁剪的积极作用。Figure 4 和 Figure 6 的注意力热力图进一步可视化展示，显著性文本token在第9层和第24层分别聚焦于图像中的语义相关区域，证实了文本引导丢弃的合理性。
 
-![[assets/figures/papers/paper_list_l2218_https_arxiv_org_abs_2602_18846/figures/013_Figure_4.jpg]]
-*Figure 4: Attention heatmap of salient text tokens attending to visual tokens at the 9th layer of the language backbone in DUET-VLM (C+S)*
-
 **深层丢弃的灵敏度分析：** Figure 5 显示，在语言模型的最后阶段（第24层之后）完全丢弃视觉token对性能影响极小，表明此时相关视觉信息已被充分提取到隐藏状态中。这一发现为激进压缩提供了理论支撑。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2218_https_arxiv_org_abs_2602_18846/figures/016_Figure_5.jpg]]
-*Figure 5: Performance of various dropping configurations in the language backbone on TextVQA using all text tokens. Red crosses indicate configurations in which all visual tokens are removed at some layer prior to the final layer*
-
-
 
 ## 实验与关键发现
 
@@ -355,22 +335,6 @@ DUET-VLM的实验体系围绕三个核心维度展开：**推理侧压缩**（in
 ![[assets/figures/papers/paper_list_l2218_https_arxiv_org_abs_2602_18846/figures/011_Table_7.jpg]]
 *Table 7: Comparison showing benefts of our local cluster aggregation on LLaVA-1.5-7B across 6 benchmarks. We report numbers for different methods (M): LLaVA-1.5-7B (Base), Vanilla (V), VisionZip (VZ), VisionZip with our proposed clustering (VZ (C)), and DUET-VLM (Vanilla) (DV (V)) variants defined in Sec. 4.1*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2218_https_arxiv_org_abs_2602_18846/figures/001_Figure_1.jpg]]
-*Figure 1: Efficiency and accuracy comparison of DUET-VLM. (a) shows the average inference-only accuracy of VisionZip, PyramidDrop, and DUET-VLMacross different token budgets, compared to the full 576-token LLaVA-1.5-7B baseline on four benchmarks. (b) demonstrates that trained DUET-VLMmodel achieves a 31% reduction in training time while incurring less than a 1% drop in accuracy relative to the LLaVA-1.5-7B baseline*
-
-![[assets/figures/papers/paper_list_l2218_https_arxiv_org_abs_2602_18846/figures/005_Table_3.jpg]]
-*Table 3: Comparison of trained methods on LLaVA-1.5-7B. We report scores across multiple benchmarks under different visual token budgets. DUET-VLM variants (C), (C+all), and (C+S) defined in Sec. 4.1 consistently outperform or match prior compression approaches such as PyramidDrop and VisionZip, even with reductions of up to 88.9% in visual tokens. These results highlight the effectiveness of training of our dual-stage token selection strategy in preserving baseline accuracy under aggressive compression*
-
-![[assets/figures/papers/paper_list_l2218_https_arxiv_org_abs_2602_18846/figures/010_Table_8.jpg]]
-*Table 8: Comparison of DUET-VLM on LLaVA-1.5-7B under different text token selection schemes for language model-side pruning. We evaluate different Methods (M): LLaVA-1.5-7B (Base) and our clustering-based variants defined in Sec. 4.1 across different benchmarks. DUET-VLM maintains strong accuracy even with up to 88.9% fewer tokens highlighting the effectiveness of our dualstage visual token compression*
-
-![[assets/figures/papers/paper_list_l2218_https_arxiv_org_abs_2602_18846/figures/007_Figure_3.jpg]]
-*Figure 3: Ablation on varying cluster width of DUET-VLM (C) on VQAT benchmark on LLaVA-1.5-7B for different token budgets*
-
-
-
 ## 定位与知识库关联
 
 ### 核心创新与差异化定位
@@ -432,8 +396,6 @@ DUET-VLM 建立在两条互补的技术路线之上，并对其进行了实质�
 6. **与其他加速技术的协同**：DUET-VLM 的token压缩与KV缓存压缩、模型量化、投机解码等技术是否存在叠加增益或冲突？联合优化的帕累托前沿尚未探索。
 
 7. **理论分析**：局部聚类聚合为何优于全局平均？是否存在信息论角度的解释（如互信息保留量）？文本引导丢弃的收敛性质如何？这些理论问题有助于指导更优的算法设计。
-
-
 
 ## 原文 PDF
 

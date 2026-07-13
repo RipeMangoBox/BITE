@@ -172,8 +172,6 @@ $$\mathcal{L}_{\mathrm{FM}} = \mathbb{E}\left[\|\mathbf{v}_{\theta}(\mathbf{x}_t
 
 推理时，PiD 以 4 步采样从潜码直接生成高分辨率图像。得益于噪声潜码条件化训练，PiD 支持**早期退出**：基础 LDM 无需运行完整去噪步数，PiD 可直接从部分去噪的潜码合成高质量高分辨率结果，从而大幅降低端到端延迟。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2605_23902/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of PiD. PiD unifies latent decoding and upsampling as a single latent-conditioned pixel diffusion model that predicts the target-resolution pixel-space velocity field. Noise-corrupted latent training and sigma-aware gating make the decoder robust to partially denoised latents, enabling early exit from the base LDM while preserving high-resolution output quality*
 
@@ -276,34 +274,17 @@ PiD 在六个不同潜空间（FLUX.1、SD3、FLUX.2、Z-Image、DINOv2、SigLIP
 
 所有延迟测量均在相同 GB200 GPU、相同 Docker 环境（PyTorch 2.11.0, CUDA 13.1.1）下使用 torch.compile 进行。级联基线均采用了各自最优的超分模型组合，包括延迟占比最大的扩散一步超分方法。MLLM 成对比较进行了顺序交换以消除位置偏差。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2605_23902/figures/005_Figure_4.jpg]]
-*Figure 4: Pairwise image quality preference judged by closed-source MLLMs. Three MLLMs compare PiD-decoded images against cascaded baselines (original VAE decoder followed by SR). All three MLLMs consistently prefer PiD, with high 2-round consistency under image order swap*
-
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2605_23902/figures/006_Table_2.jpg]]
 *Table 2: Performance of different inference steps of teacher and student model. For teacher models, more inference step leads to better image quality. However, few-step student model can surpass multiple-step teacher model in generated latent decoding cases*
 
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2605_23902/figures/007_Figure_5.jpg]]
 *Figure 5: Image reconstruction comparison. Given a latent encoded from a clean image, PiD reconstructs the image at higher resolution with sharper details than the original VAE / RAE decoder*
 
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2605_23902/figures/009_Figure_7.jpg]]
-*Figure 7: PiD vs. cascaded super-resolution. From a FLUX.1 [dev] latent of a 5122 image, baselines apply a super-resolution model on VAE decoding output, while PiD decodes directly to 20482. PiD produces sharper detail at lower latency. Latency is measured on a single GB200 GPU with torch.compile*
-
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2605_23902/figures/010_Figure_8.jpg]]
-*Figure 8: Image quality of PiD at different LDM termination step for FLUX.1 [dev] (28 denoising steps in total)*
-
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2605_23902/figures/011_Table_3.jpg]]
-*Table 3: PiD latency and decoder memory usage across output resolutions, compared with the original VAE decoder*
-
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2605_23902/figures/012_Table_4.jpg]]
 *Table 4: Ablation study on FLUX.1 [dev] decoding (left) and small-text reconstruction (right)*
 
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2605_23902/figures/013_Figure_9.jpg]]
 *Figure 9: Comparison with native 2048 × 2048 px generation. Coupling a low-resolution LDM with PiD substantially reduces inference time while maintaining image quality competitive to native high-resolution generation, and in some cases surpassing it in fine-grained details. Latency (in lower left corner) is measured on a single GB200 GPU without torch.compile*
-
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2605_23902/figures/002_Figure_2.jpg]]
-*Figure 2: 4K decoding results. PiD synthesize more details at 4k resolution*
 
 ## 定位与知识库关联
 

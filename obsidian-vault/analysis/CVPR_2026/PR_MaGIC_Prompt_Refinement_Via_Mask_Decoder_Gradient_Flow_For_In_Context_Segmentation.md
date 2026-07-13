@@ -207,8 +207,6 @@ $$s_t = \text{sim}(\bar{z}'^{s}, \bar{z}_t'^{q}), \quad t^* = \arg\max_{t \in \{
 
 整个流水线的数据依赖关系清晰：图像编码器输出静态支持嵌入和初始查询嵌入；梯度流模块以查询嵌入和当前提示为输入，输出更新后的查询嵌入；相似度模块连接支持嵌入与更新后的查询嵌入，驱动提示重采样；掩码解码器以稳定查询嵌入和最新提示为输入，输出候选掩码；最终选择模块汇总所有候选掩码的相似度得分，输出最优分割结果。各模块均无需训练，梯度计算仅发生在掩码解码器的前向传播中。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2063_https_arxiv_org_abs_2604_12113/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of PR-MaGIC. Encoder box denotes image encoder*
 

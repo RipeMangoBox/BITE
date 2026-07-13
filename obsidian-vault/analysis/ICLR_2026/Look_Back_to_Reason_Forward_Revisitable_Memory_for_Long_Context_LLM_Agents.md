@@ -73,8 +73,6 @@ ReMemR1 属于 **记忆增强型 LLM 智能体**，直接对标 **MemAgent**（Y
 
 当前方法存在回调查询退化（生成不相关查询）、记忆污染（早期幻觉难以纠正）、训练资源需求高（3B 模型需 16 H800 GPU 训练 100 小时）等问题，且仅在两个多跳问答数据集上验证。未来方向包括：改进回调查询策略、设计记忆修正机制、自适应调整 $\alpha$、扩展到非问答类长上下文任务，以及探索可微检索函数替代词重叠召回。
 
-
-
 ### 长上下文推理中的记忆瓶颈
 
 大语言模型（LLM）在处理长文档导航与多跳推理任务时，面临信息容量与推理深度的双重挑战。为应对这一挑战，**记忆增强智能体**（memory-augmented agent）被广泛采用，其核心思路是在逐块读取文档的过程中动态维护一个内部记忆状态，将长上下文压缩为紧凑的记忆表示，从而突破模型原生的上下文窗口限制。
@@ -104,8 +102,6 @@ ReMemR1 属于 **记忆增强型 LLM 智能体**，直接对标 **MemAgent**（Y
 - 通过**多级奖励设计**——结合轨迹级结果奖励与步骤级信息增益奖励——为记忆管理决策提供密集监督信号。
 
 这一机制本质上赋予了智能体**非线性记忆访问**能力：它不再受限于“读过即忘”的线性路径，而是可以在任意时刻回溯到历史记忆中的关键信息，从而缓解信息退化并提升复杂多跳推理的可靠性。
-
-
 
 ## 核心方法与创新机理
 
@@ -150,8 +146,6 @@ $$s_{t+1} = (m_{t+1}, q_{t+1}) = \pi_{\theta}\bigl(Q, c_t, m_t, \mathcal{E}(\{m_
 | 多级奖励 | $\alpha = 0.8$ 取得最佳准确率，且 RL 训练使 MemAgent 和 ReMemR1 均显著优于非 RL 版本（Table 3, Table 6） | 0.95 |
 | 计算效率 | 回调查询引入的延迟小于 2 秒、内存开销低于 1MB，占总开销的 <0.2%（Figure 6, Table 7） | 0.95 |
 
-
-
 ![[assets/figures/papers/paper_list_l38_https_openreview_net_forum_id_1cymflI2Lh/figures/002_Figure_2.jpg]]
 *Figure 2: Framework of ReMemR1. (a) Memory Update with Callback: At each time step, the agent updates the current memory m _ { t } and generates a callback query q _ { t } to retrieve relevant history memories. The state update integrates the previous memory m _ { t - 1 } , , the current chunk, and the retrieved history. (b) Final Answer Generation: The final answer is synthesized using the latest memory state and a final query over the accumulated memory history*
 
@@ -184,8 +178,6 @@ ReMemR1 的训练采用基于 GRPO 变体的强化学习框架，其奖励设计
 ### 训练动态
 
 引入回调查询机制后，模型需要额外学习输出 `<callback>` 和 `<memory>` 标签的格式规范。如图 7 所示，训练初期格式奖励较低（约 0.55），但模型在约 20 步内迅速学会遵循格式要求，格式奖励快速收敛至接近 1.0 并保持稳定，表明格式约束不会构成长期训练障碍。
-
-
 
 ### 1. 文档流式编码与基础状态转移
 
@@ -251,8 +243,6 @@ $$\hat{A}_{t}^{(g)} = \alpha \hat{A}_{\mathrm{out}}^{(g)} + (1 - \alpha) \hat{A}
 
 该组合优势用于 GRPO 变体算法进行策略优化。消融实验（Table 3）表明 $\alpha = 0.8$ 在不同上下文长度下均取得最佳准确率，验证了步骤级密集监督与轨迹级稀疏奖励协同作用的有效性。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -272,9 +262,6 @@ ReMemR1在HotpotQA（分布内）和2WikiMultiHopQA（分布外）两个多跳�
 
 为直接验证ReMemR1是否真正实现了非线性文档利用，作者构造了“远程证据”设置（Figure 5）：将回答问题所需的两篇关键文档分别放置在文档序列的首尾两端，中间填充大量无关文档。在此设置下，传统前向记忆智能体因早期证据被后续更新覆盖而难以回溯，而ReMemR1通过回调查询可显式检索早期记忆。
 
-![[assets/figures/papers/paper_list_l38_https_openreview_net_forum_id_1cymflI2Lh/figures/007_Figure_5.jpg]]
-*Figure 5: Accuracy on 2Wiki with distant evidences*
-
 结果表明，ReMemR1在2WikiMultiHopQA上显著超越MemAgent，差距远超常规设置下的表现。这直接证明了回调查询机制赋予了智能体非线性回溯早期证据的能力，而非仅依赖最近上下文进行推理。
 
 ### 计算效率分析
@@ -284,17 +271,11 @@ ReMemR1在引入回调查询的同时保持了可接受的计算开销（Figure 
 ![[assets/figures/papers/paper_list_l38_https_openreview_net_forum_id_1cymflI2Lh/figures/009_Figure_6.jpg]]
 *Figure 6: Computational performance under different context lengths. (a) Comparison of accuracy and total memory usage between ReMemR1 and MemAgent. (b) Time and memory overhead introduced by the retrieval module. ReMemR1 consistently achieves higher accuracy with only modest additional computation (\< 2s latency and \< 1MB memory)*
 
-![[assets/figures/papers/paper_list_l38_https_openreview_net_forum_id_1cymflI2Lh/figures/014_Table_7.jpg]]
-*Table 7: (b) Accuracy on 2WikiMultiHopQA (Out-Of-Distribution)*
-
 - **推理延迟**：检索模块引入的额外延迟不足2秒，占总推理时间的比例低于0.2%。
 - **内存开销**：检索模块的内存占用低于1MB，占总内存使用量的比例低于0.001%。
 - **准确率-效率权衡**：在6400篇文档的设置下，ReMemR1以不到2秒的额外延迟和不到1MB的额外内存，换取了5%的准确率提升。
 
 训练阶段（Table 2），ReMemR1每步平均耗时1467.72秒，略高于MemAgent的1247.17秒；峰值内存131.15 GB vs 124.97 GB。这一开销主要来自回调查询的生成与检索操作，但仍在可接受的训练预算范围内。
-
-![[assets/figures/papers/paper_list_l38_https_openreview_net_forum_id_1cymflI2Lh/figures/006_Table_2.jpg]]
-*Table 2: (b) Accuracy on 2WikiMultiHopQA (Out-Of-Distribution)*
 
 ### 多级奖励消融
 
@@ -325,19 +306,6 @@ Figure 7展示了格式奖励随训练步数的变化。由于ReMemR1要求模�
 2. **记忆污染**：模型在早期步骤中生成的错误信息（幻觉）会被写入记忆，并在后续步骤中通过回调查询被反复检索和强化，形成错误传播链。当前框架缺乏显式的记忆纠错机制，难以在发现矛盾时修正早期记忆。
 3. **任务覆盖范围有限**：评估仅局限于HotpotQA和2WikiMultiHopQA两个多跳问答数据集，未涉及长文档摘要、多文档翻译等其他类型的长上下文任务，方法的通用性有待进一步验证。
 4. **训练成本较高**：3B模型需16块H800 GPU训练约100小时，7B模型需32块H800训练约80小时，对资源受限的研究场景不够友好。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l38_https_openreview_net_forum_id_1cymflI2Lh/figures/010_Table_2.jpg]]
-*Table 2: Training-time computational comparison between MemAgent and ReMemR1*
-
-![[assets/figures/papers/paper_list_l38_https_openreview_net_forum_id_1cymflI2Lh/figures/013_Table_5.jpg]]
-*Table 5: Extended long-context QA results on HotpotQA (Yang et al., 2018) and 2WikiMultiHopQA (Ho et al., 2020). Values are accuracy (%), rounded to 1 decimal. (a) Accuracy on HotpotQA (In-Distribution)*
-
-![[assets/figures/papers/paper_list_l38_https_openreview_net_forum_id_1cymflI2Lh/figures/020_Table_7.jpg]]
-*Table 7: Full inference-time performance comparison*
-
-
 
 ## 定位与知识库关联
 
@@ -396,8 +364,6 @@ ReMemR1 的回调机制与检索增强生成（RAG）存在概念上的亲缘关
 - 检索函数 $\mathcal{E}$ 能否替换为可微的语义相似度模型（如基于嵌入的检索），以替代简单的词重叠召回？
 - ReMemR1 在非问答类任务（如长文档摘要、多文档翻译）中的表现如何？回调机制在这些任务中是否同样有效？
 - 在更大规模模型（如 70B 及以上）上的扩展性及性能增益如何？训练成本是否可接受？
-
-
 
 ## 原文 PDF
 

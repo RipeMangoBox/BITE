@@ -74,8 +74,6 @@ YODA 属于**稀疏运动控制视频生成**方法，在方法谱系中处于�
 
 YODA 的训练依赖预训练光流估计器提供运动伪标签，控制信号质量受光流精度限制；控制仅支持 2D 平移位移，对旋转、形变等复杂运动难以精确表达。未来方向包括将像素位移控制泛化到语义级控制、在无光流标签条件下自监督学习控制编码，以及探索学到的隐式物体注意力在 zero-shot 分割等下游任务中的应用。
 
-
-
 可控视频生成的目标是赋予用户对生成内容的运动行为进行精确操纵的能力。然而，在**多物体场景**中实现这一目标，面临一个根本性瓶颈：如何在不依赖任何物体标注（如边界框、分割掩码）的前提下，使模型能够**独立控制每个物体的运动**，同时生成真实的物体间交互。
 
 现有方法在这一问题上存在明显缺口。以 **iPOKE**（Blattmann et al., ICCV 2021）为代表的像素级控制方法，虽然允许用户通过指定像素位移来引导运动，但其依赖卷积编码器处理稀疏光流信号，导致控制信号在空间上发生泄漏——对某一物体的控制指令会意外地驱动其他物体运动。另一方面，**CADDY**（Menapace et al., CVPR 2021）等基于离散动作代码的方法，以及 **GLASS**（Davtyan and Favaro, ECCV 2022）等解耦全局与局部动作的方法，要么控制粒度粗糙，要么局限于单物体场景。**RIVER**（Davtyan et al., ICCV 2023）作为高效的视频预测骨干，基于流匹配（flow matching）实现了高质量的视频生成，但其本身不接收任何外部运动控制信号，仅条件于历史帧。**MoCoGAN**（Tulyakov et al., CVPR 2018）和 **SAVP**（Lee et al., 2018）等经典方法同样缺乏对多物体独立运动的精细控制能力。
@@ -85,8 +83,6 @@ YODA 的训练依赖预训练光流估计器提供运动伪标签，控制信号
 YODA 的动机正是针对这一瓶颈。其核心思路是：通过**极端的稀疏性**和**受限的感受野**，迫使模型学习将少量像素的位移信号正确地归因到对应的完整物体上。具体而言，YODA 从预训练光流估计器（RAFT）产生的稠密光流场中，按运动幅度仅采样极少量像素点（通常仅 5 个）作为控制输入；同时，将稀疏光流划分为 16×16 网格，每个网格独立通过 MLP 编码，严格限制编码器的感受野。这种设计从信息瓶颈的角度切断了控制信号在空间上的任意传播路径。
 
 此外，YODA 引入**随机化条件训练**策略：以概率 $\pi = 0.5$ 随机丢弃上下文帧或控制信号。这一策略迫使模型必须同时学会利用历史视觉信息和控制信号，从而隐式地实现了物体分离与交互预测的解耦——当控制信号缺失时，模型依赖上下文帧进行自然的视频预测；当控制信号存在时，模型则响应控制指令。这种“条件解耦”机制是 YODA 在无监督设定下实现多物体独立控制的关键。
-
-
 
 ## 核心方法与创新机理
 
@@ -128,8 +124,6 @@ YODA 以 **RIVER**（Davtyan et al., ICCV 2023）作为骨干视频预测模型�
 
 这一发现本身构成了方法设计的重要洞察：稀疏控制不仅是计算效率的考量，更是迫使模型学习解耦物体运动与交互的必要条件。
 
-
-
 ![[assets/figures/papers/paper_list_l6_Learn_the_Force_We_Can_Enabling_Sparse_Motion_Control_in_Multi_Object_Vi/figures/012_Figure_8.jpg]]
 *Figure 8: Overview of YODA’s architecture. The noisy target frame x , the reference frame $x ^ { \tau - 1 }$ and the context frame $x ^ { c }$ are concatenated, reshaped and projected to form a sequence of visual tokens that is augmented with position encodings and embedded relative temporal distance (τ −c) between frames and fed to the U-ViT (Bao et al. 2022) alongside with the embedded time token (t). A sequence of control tokens is fused into the pipeline via cross-attention in the bottleneck of the network*
 
@@ -151,8 +145,6 @@ $$\mathcal{L}_{\mathrm{F}}(\boldsymbol{\theta}) = \| v_t(\boldsymbol{x} | \bolds
 进行监督，其中 $u_t$ 为高斯概率路径下的闭合形式目标向量场。推理时，从标准高斯噪声出发，通过 ODE 求解器沿预测速度场逐步积分，生成下一帧的潜在码，再经 VQ-GAN 解码器重建为 RGB 图像。
 
 **随机化条件训练策略。** YODA 的关键训练技巧是以概率 $\pi=0.5$ 随机丢弃上下文帧或控制信号（见 Algorithm 1）。这一策略迫使模型在无法依赖某类条件时仍能生成合理帧，从而隐式地解耦了物体运动与场景上下文，是实现独立物体控制与交互建模的核心机制。消融实验表明，关闭随机化（$\pi=0$）会导致 FVD 从 70 急剧恶化至 401（Table 1），验证了该策略的决定性作用。
-
-
 
 ### 问题形式化与条件分布
 
@@ -217,8 +209,6 @@ $$\mathcal { L } _ { \mathrm { V Q } } ( E , G , Z ) = \| x - \hat { x } \| ^ { 
 
 配合对抗损失 $\mathcal { L } _ { \mathrm { G A N } } ( E , G , Z , D ) = \log D ( x ) + \log ( 1 - D ( \hat { x } ) )$ 以提升感知质量。不同数据集的 VQ-GAN 配置见 Table 5。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -271,18 +261,8 @@ Table 4 评估了模型在分布外控制输入下的鲁棒性：YODA 在机械�
 4. **计算开销**：训练需约 3 天（4×RTX 3090），BAIR 256×256 分辨率下 GPU 内存需求达 21 GB，限制了更广泛的应用部署。
 5. **泛化能力未验证**：模型在训练数据未见过的全新场景或物体上的表现尚不明确，需进一步探索。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l6_Learn_the_Force_We_Can_Enabling_Sparse_Motion_Control_in_Multi_Object_Vi/figures/019_Figure_14.jpg]]
-*Figure 14: From left to right: the input image, the optical flow between the input image and the next one, the estimated mask. The red arrows in the images in the first column show the control input*
-
 ![[assets/figures/papers/paper_list_l6_Learn_the_Force_We_Can_Enabling_Sparse_Motion_Control_in_Multi_Object_Vi/figures/011_Figure_7.jpg]]
 *Figure 7: In each column YODA is given the controls indicated as red arrows. Starting from the same frame, YODA generates diverse videos, following accurately the magnitude (1st and 2nd videos) and direction (1st to 3rd videos) of the motion control input, as well as multiple inputs (4th video). Notice that since YODA has memory and was trained also to generate frames without control, it can learn to propagate motion across many frames from a single initial control input. To play videos, use Acrobat Reader. Table 4: Local error in pixels of the control applied to the robot arm. Average of 5 runs is reported*
-
-![[assets/figures/papers/paper_list_l6_Learn_the_Force_We_Can_Enabling_Sparse_Motion_Control_in_Multi_Object_Vi/figures/016_Table_5.jpg]]
-*Table 5: Configurations of VQGAN (Esser, Rombach, and Ommer 2021) for different datasets*
-
-
 
 ## 定位与知识库关联
 
@@ -327,8 +307,6 @@ $n_c = 5$ 在两个指标之间达到最佳平衡。这一发现揭示了稀疏�
 - **隐式物体注意力的显式化**：YODA 学到的交叉注意力图（Figure 13）粗略覆盖了物体区域，能否将其显式用于 zero-shot 分割或跟踪等下游任务？
 - **复杂真实场景的可行性**：该方法在自动驾驶、人群视频等更混乱的真实场景中是否仍然有效，需要进一步验证。
 - **控制冲突的解析**：模型如何处理多个控制输入之间的冲突（如两个控制点给同一物体相反的运动），其内部决策机制值得深入探索。
-
-
 
 ## 原文 PDF
 

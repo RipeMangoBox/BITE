@@ -57,8 +57,6 @@ claims:
 
 **方法谱系与知识库定位**：CLoD-GS 属于 3DGS 后处理/训练期压缩与连续 LOD 交叉方向。与基于静态重要性排序的连续 LOD 方法（**Fast Rendering**, Milef et al., 2025）、基于八叉树的离散 LOD 方法（**Octree-GS**, Ren et al., 2025）、基于分层数据结构的离散 LOD 方法（**H-3DGS**, Kerbl et al., 2024）以及使用概率掩码进行静态剪枝的压缩方法（**MaskGaussian**, Liu et al., 2025）不同，CLoD-GS 首次将 LOD 控制建模为**距离自适应的可学习连续衰减**，在单一模型内实现无缝过渡，且训练策略可迁移至压缩模型（如 MaskGaussian）赋予其连续 LOD 能力。
 
-
-
 ### 3D高斯泼溅与细节层次控制的困境
 
 3D高斯泼溅（3D Gaussian Splatting, 3DGS）作为一种显式辐射场表示方法，通过将场景建模为大量具有三维位置、协方差、颜色和不透明度的高斯基元，并利用可微光栅化进行实时渲染，在新视角合成任务中取得了令人瞩目的成绩。其核心渲染方程为：
@@ -83,8 +81,6 @@ $$C = \sum_{i \in N} c_i \alpha_i' \prod_{j=1}^{i-1} (1 - \alpha_j')$$
 2. **训练阶段的隐式稀疏化**：模型应在训练过程中自主学习远距离下的紧凑表示，而非依赖后处理剪枝。
 
 3DGS的连续体积特性和可微渲染管线为实现这一目标提供了天然基础。CLoD-GS的核心洞察在于：**将LoD控制建模为距离自适应的基元不透明度衰减**。通过为每个高斯基元引入一个可学习的距离衰减因子，并配合虚拟距离缩放训练策略，模型能够在单次训练中学会在不同观察距离下合理分配基元，实现从高质量近景到稀疏远景的无缝过渡。
-
-
 
 ## 核心方法与创新机理
 
@@ -118,8 +114,6 @@ $$\alpha_i'' = \alpha_i \cdot \exp\left( - \frac{(d_i' \cdot s_v)^2}{2 \cdot (\m
 
 传统DLoD方法（如H-3DGS、Octree-GS）需为同一场景训练多个分辨率模型，切换时产生视觉跳变（popping artifacts）。CLoD-GS通过连续衰减机制，在单一模型内实现**无缝的细节过渡**：基元不会突然出现或消失，而是随距离逐渐“淡出”，从根本上消除了跳变问题。消融实验证实，正则化损失、自适应权重和多尺度训练三个组件缺一不可，完整模型在BungeeNeRF数据集上以比3DGS少38%的基元数量（4.185M vs 6.733M）实现了更高的PSNR（28.05 vs 27.85），验证了连续LOD策略的有效性。
 
-
-
 CLoD-GS 的整体流水线建立在标准 3DGS 可微渲染管线之上，通过两个核心改造实现单一模型内的连续细节层次控制：**距离自适应不透明度衰减**和**虚拟距离缩放训练策略**。整个框架的输入为多视角图像及其对应的相机位姿，输出为一个增强的 3DGS 模型，其中每个高斯基元除了原有的位置、协方差、颜色和不透明度参数外，额外携带一个可学习的距离衰减因子 $\sigma_{d,i}$。
 
 流水线可分解为三个关键模块：
@@ -136,12 +130,8 @@ CLoD-GS 的整体流水线建立在标准 3DGS 可微渲染管线之上，通过
 
 **推理阶段的灵活性**：训练完成后，用户只需调整单一的全局参数 $s_v$，即可在渲染时连续控制模型的细节层次——$s_v = 1$ 对应最高质量的原生渲染，$s_v$ 越大则基元数量越少、渲染速度越快，且整个过程平滑无跳变，无需加载或切换多个独立模型。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l78_https_openreview_net_forum_id_zgs0L72R4c/figures/001_Figure_1.jpg]]
 *Figure 1: Framework of the proposed methodology*
-
-
 
 ### 3DGS渲染基础
 
@@ -200,8 +190,6 @@ $$L_{\mathrm{total}} = w_s (L_{\mathrm{render}} + \lambda_{\mathrm{reg}} L_{\mat
 
 三个核心模块形成闭环：**距离自适应不透明度衰减**提供了连续LOD的数学基础，**动态掩码过滤**将理论衰减转化为实际的计算节省，**虚拟距离缩放训练**通过多尺度暴露和显式正则化引导模型学习合理的 $\sigma_{d,i}$ 分布。三者缺一不可——消融实验（Table 3）证实，移除任意组件均会导致性能下降。
 
-
-
 ## 实验与关键发现
 
 ### 实验设置
@@ -258,9 +246,6 @@ CLoD-GS的存储开销极低：每个高斯基元仅额外增加一个浮点参�
 
 此外，将CLoD-GS应用于MaskGaussian模型（Figure 7）的实验表明，该方法可成功为已压缩模型赋予连续LOD能力——增大虚拟距离缩放范围同样能实现更平滑的简化曲线，验证了方法的通用性和即插即用特性。
 
-![[assets/figures/papers/paper_list_l78_https_openreview_net_forum_id_zgs0L72R4c/figures/010_Figure_7.jpg]]
-*Figure 7: Robustness analysis. Our CLoD-GS training strategy is applied to a MaskGaussian model on Bungeenerf dataset, successfully enabling continuous LoD on a compressed representation*
-
 ### 离散LOD与连续LOD对比
 
 Figure 5和Figure 6直观对比了离散LOD（DLoD）与连续LOD（CLoD）策略。DLoD方法使用两个独立模型，在边界处（红色虚线标注）产生可见的质量跳变；而CLoD策略在三个距离区间内均表现出平滑的质量过渡。度量曲线进一步证实：DLoD策略呈现尖锐的、不连续的质量跳变，而CLoD策略实现了平滑渐进的质量变化，有效消除了popping artifacts。
@@ -274,27 +259,8 @@ Figure 5和Figure 6直观对比了离散LOD（DLoD）与连续LOD（CLoD）策�
 3. **大规模场景集成**：方法尚未与octree等chunk-based加载方案深度集成，在超大规模场景中可能面临视锥体内基元总数过高的问题。
 4. **参数压缩未探索**：σ_d,i仅占1.6%存储开销，但未进一步探索与该参数相关的压缩或量化策略。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l78_https_openreview_net_forum_id_zgs0L72R4c/figures/002_Table_1.jpg]]
 *Table 1: Quantitative comparison of highestquality models. Best results are bold, second best are underlined. The fifth and sixth columns indicate the number of Gaussian primitives (#GS) and memory consumption (Mem). ‘↓’ indicates that lower is better*
-
-![[assets/figures/papers/paper_list_l78_https_openreview_net_forum_id_zgs0L72R4c/figures/003_Table_2.jpg]]
-*Table 2: Comparison of FPS on various datasets. Best results are bold, second best are underlined. Higher is better (↑)*
-
-![[assets/figures/papers/paper_list_l78_https_openreview_net_forum_id_zgs0L72R4c/figures/004_Figure_2.jpg]]
-*Figure 2: Visual comparison at similar primitive counts. The number of Gaussians used and the corresponding PSNR are annotated in the bottom-right corner of each image*
-
-![[assets/figures/papers/paper_list_l78_https_openreview_net_forum_id_zgs0L72R4c/figures/007_Table_3.jpg]]
-*Table 3: Ablation study on our key training components. The full model outperforms all ablated versions*
-
-![[assets/figures/papers/paper_list_l78_https_openreview_net_forum_id_zgs0L72R4c/figures/008_Figure_5.jpg]]
-*Figure 5: Visual comparison of DLoD vs. CLoD strategies. The DLoD approach (the second column) uses two separate models, causing a visible quality jump at the boundary (red dashed line). Our CLoD approach (the left three columns) uses a single model with varying scale factors, resulting in a smooth, artifact-free transition*
-
-![[assets/figures/papers/paper_list_l78_https_openreview_net_forum_id_zgs0L72R4c/figures/009_Figure_6.jpg]]
-*Figure 6: Metric curves for the DLoD vs. CLoD comparison. The DLoD strategy exhibits a sharp, discontinuous jump in quality, whereas our CLoD strategy shows a smooth progression*
-
-
 
 ## 定位与知识库关联
 
@@ -336,8 +302,6 @@ $$\alpha_i'' = \alpha_i \cdot \exp\left( - \frac{(d_i' \cdot s_v)^2}{2 \cdot (\m
 - 能否将 σ_d,i 与基于梯度的基元重要性联合优化，在训练中实现更彻底的基元复用与剪枝？
 - 在超大规模场景中，如何结合 octree 等空间层级结构减少视锥体内基元总数，同时保持连续 LOD 的灵活性？
 - 连续衰减机制是否可以反向用于近视野超分辨（提升近处基元的细节表现），实现双向连续 LOD？
-
-
 
 ## 原文 PDF
 

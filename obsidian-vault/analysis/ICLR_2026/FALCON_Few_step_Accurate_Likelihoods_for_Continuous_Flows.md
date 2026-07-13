@@ -55,8 +55,6 @@ claims:
 - 在丙氨酸三肽、四肽、六肽等较大分子系统上，FALCON在能量Wasserstein距离和扭转角Wasserstein距离上显著优于ECNF++等连续流基线（Table 3），例如在六肽上能量Wasserstein距离从10.668降至0.892。
 - FALCON在所有评估指标上均优于当前最先进的离散归一化流玻尔兹曼生成器（SBG），且仅使用其1/250的样本量。
 
-
-
 ### 玻尔兹曼生成器的核心挑战
 
 分子系统的统计力学性质依赖于对玻尔兹曼分布
@@ -96,8 +94,6 @@ $$\mathcal{L}_{\mathrm{inv}}(\theta) = \mathbb{E}_{s,t,x_s} \| x_s - X_u(X_u(x_s
 
 强制离散流映射获得数值可逆性，从而使少步似然计算成为可能。
 
-
-
 ## 核心方法与创新机理
 
 FALCON 的核心创新在于用一套**混合训练范式**替代了传统连续归一化流（CNF）的端到端积分范式，从而在保持精确似然计算能力的同时，将推理所需的函数评估次数从数千步压缩至 4–16 步，实现了两个数量级的速度提升。这一突破可拆解为三个紧密耦合的 changed slots。
@@ -126,8 +122,6 @@ $$\mathcal{L}(\theta) = \mathcal{L}_{\mathrm{cfm}}(\theta) + \lambda_{\mathrm{av
 ### 方法定位
 
 相较于离散归一化流基线（如 **SBG** (Tan et al., 2025a) 使用的 TARFlow），FALCON 的关键区别在于**显式保证了离散映射的可逆性**，从而使得似然计算在数学上严格成立，而非依赖重要性采样的渐近性质。这解释了为何即使 SBG 使用 250 倍样本量（$5\times10^6$ vs $2\times10^5$），其在 $\varepsilon$-W2 上的表现仍显著劣于 4 步 FALCON（Fig. 4）。
-
-
 
 FALCON 的整体框架围绕一个核心思想构建：**在离散步骤中实现数值可逆的流映射，从而绕过连续归一化流（CNF）数千步的 ODE 积分，以极少的函数评估次数完成精确的似然计算**。
 
@@ -174,8 +168,6 @@ FALCON 处于连续流与离散流方法的交叉点。表 1 从可逆性、回�
 与传统 CNF 玻尔兹曼生成器（如 **ECNF** (Klein et al., 2023)、**ECNF++** (Tan et al., 2025a)）相比，FALCON 将似然计算从数千步的自适应 ODE 求解（Dormand–Prince 4(5)，atol=rtol=$10^{-5}$）压缩为 $N \cdot d$ 次函数评估（$N$ 为步数，$d$ 为数据维度），实现了两个数量级的速度提升（Fig. 2）。与离散归一化流玻尔兹曼生成器（如 **SBG** (Tan et al., 2025a)）相比，FALCON 通过引入可逆性损失，使离散映射具备了精确的似然计算能力，从而在重要性采样效率上形成质的差距——即使 SBG 使用 250 倍于 FALCON 的样本量，其在能量 Wasserstein 距离上的表现仍显著逊于 4 步 FALCON（Fig. 4）。
 
 **关键洞察**：FALCON 的成功并不依赖于离散映射完美复现原始连续时间流，而仅需保证映射的数值可逆性。这一洞察将问题从"逼近连续流"转化为"保证局部可逆性"，使得少步推理成为可能，同时保持了似然计算的精确性。
-
-
 
 ### 离散流映射与可逆性条件
 
@@ -243,8 +235,6 @@ $$\log p_s^\theta(x_s) = \int_0^s \mathrm{Tr}\left[ \nabla v_\theta(x_\tau, \tau
 
 FALCON 支持后验调整推理步数，并通过不同的时间步分配策略优化性能。消融实验表明，在 8 步推理设置下，**EDM 调度器**（Karras et al., 2022）在所有评估指标上均显著优于线性、几何、余弦和切比雪夫调度器，这与扩散模型文献中的观察一致。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -287,33 +277,11 @@ Figure 3 展示了 FALCON 生成样本在重要性采样前后的能量直方图
 ![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_FbssShlI4N/figures/006_Figure_3.jpg]]
 *Figure 3: True MD energy distribution with best FALCON unweighted and re-sampled proposals for alanine dipeptide (left), tri-alanine (center left), and alanine tetrapeptide (center right), and hexa-alanine (right)*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_FbssShlI4N/figures/014_Figure_8.jpg]]
 *Figure 8: Left: Training data for alanine dipeptide; Right: Test data for alanine dipeptide*
 
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_FbssShlI4N/figures/015_Figure_9.jpg]]
-*Figure 9: Left and left center: Training data for tri-alanine; Right center and right: Test data for tri-alanine*
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_FbssShlI4N/figures/016_Figure_11.jpg]]
-*Figure 11: First five: Training data for hexa-alanine; Last three: Test data for hexa-alanine*
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_FbssShlI4N/figures/017_Figure_10.jpg]]
-*Figure 10: First three: Training data for alanine tetrapeptide; Last three: Test data for alanine tetrapeptide*
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_FbssShlI4N/figures/020_Figure_14.jpg]]
-*Figure 14: Left: Test data for alanine dipeptide; Right: FALCON’s angular predictions for alanine dipeptide*
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_FbssShlI4N/figures/021_Figure_15.jpg]]
-*Figure 15: Left and left center: Test data for tri-alanine; Right and right center: FALCON’s angular predictions for tri-alanine*
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_FbssShlI4N/figures/022_Figure_16.jpg]]
-*Figure 16: First three: Test data for alanine tetrapeptide; Last three: FALCON’s angular predictions for alanine tetrapeptide*
-
 ![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_FbssShlI4N/figures/003_Table_1.jpg]]
 *Table 1: Related method overview*
-
-
 
 ## 定位与知识库关联
 
@@ -350,8 +318,6 @@ FALCON 的性能增益可追溯至三个相互耦合的设计选择：
 1. **单步生成可行性**：是否可以通过更强的可逆性约束或蒸馏策略实现真正的一步精确似然计算？
 2. **可逆性认证**：如何在不依赖经验验证的情况下，高效地为离散流映射的数值可逆性提供理论保证或运行时检测？
 3. **跨领域迁移**：FALCON 在贝叶斯推断、机器人学等非分子领域的表现如何？其混合训练目标是否需要领域特定的调整？
-
-
 
 ## 原文 PDF
 

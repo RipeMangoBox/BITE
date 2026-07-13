@@ -54,8 +54,6 @@ Video-GPT 通过一个简洁的范式转换回应了这一瓶颈。它将视频�
 
 **方法定位**：Video-GPT 属于视频生成预训练方法，其关键创新点包括：（1）干净-带噪片段交织的输入序列构造；（2）片段级因果、帧级/块级双向的层级注意力掩码；（3）以干净历史片段为条件的自回归去噪推理；（4）从短到长的渐进式训练课程。该方法在视频预测（V2V）、类别到视频生成、文本到视频生成、图像动画及视频目标分割等下游任务上均展现出强泛化能力。
 
-
-
 视频生成领域长期面临一个核心张力：**长时上下文建模**与**高质量生成**难以在同一框架内兼得。自回归模型（如基于Next Token Prediction的视频生成器）天然适合捕捉长程时序依赖，但其逐帧/逐token的离散预测方式导致生成质量不及扩散模型；纯扩散模型在单片段生成上表现出色，却受限于固定长度的噪声调度，难以有效建模跨越数十秒乃至数分钟的物理演化。这一瓶颈在需要物理一致性的长时视频预测任务中尤为突出——模型必须理解物体运动的因果链条，而非仅生成视觉上逼真的帧序列。
 
 现有工作对此问题的回应大致分为两条路径。**自回归视频预测方法**（如**LVM**, Bai et al., 2023）将视频压缩为离散token后逐token预测，继承了语言模型的长程建模优势，但离散化带来的信息损失和逐token解码的低效限制了生成保真度。**扩散预测方法**（如**Seine**, Chen et al., 2023b; **VideoPoet**, Kondratyuk et al., 2023）在片段级或全局上执行扩散去噪，生成质量更优，但在处理超出训练窗口的长序列时，缺乏显式的自回归因果结构，导致时序一致性随预测步长增加而快速退化。简言之，**自回归擅长“讲长故事”但“画不精细”，扩散擅长“画精细帧”但“讲不长故事”**。
@@ -65,8 +63,6 @@ Video-GPT的核心动机正是弥合这一鸿沟。其关键洞察在于：**将
 此外，Video-GPT的预训练策略刻意回归到GPT的自监督本源——**仅使用视频数据本身，无需任何文本标注**。在Panda-70M纯视频数据集上，通过渐进式训练课程（从16帧单帧预测逐步扩展到80帧多片段预测），模型从短到长逐步习得物理世界的时序规律。这种设计不仅降低了数据门槛，更迫使模型从原始视觉信号中自主归纳因果结构，而非依赖文本描述中的先验知识。
 
 在评估维度上，论文特别关注**物理合理性**而非单纯的视觉质量。Physics-IQ Benchmark通过时空IoU、MSE等指标量化模型对物理定律的遵循程度，直指现有方法在“理解运动因果”而非“插值生成帧”上的不足。Video-GPT在该基准上以34.97的Physics IQ Score大幅领先第二名VideoPoet的29.50（提升超5个百分点），验证了下一片段扩散范式在物理世界建模上的实质性突破。
-
-
 
 ## 核心方法与创新机理
 
@@ -108,8 +104,6 @@ $$\Phi_{k,\text{noisy}} = (\beta + \gamma_{k,i}) \Phi_{k} + (1 - \beta - \gamma_
 
 Video-GPT的预训练仅依赖视频数据（Panda-70M），无需任何文本标注，完全以自监督方式进行。这一特性使其继承了大语言模型的可扩展预训练属性，同时保留了扩散模型的生成质量优势。
 
-
-
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_E0ZAcqy9TB/figures/002_Figure_2.jpg]]
 *Figure 2: Video-GPT pretraining framework. The full attention mask is shown in Fig. 10*
 
@@ -145,8 +139,6 @@ $$\mathbf{DNS}(k+1, \cdot) = \mathrm{Video\text{-}GPT}\big(\mathbf{DNS}(1, \cdot
 **渐进式训练课程。** 预训练从短到长视频逐步扩展（Table 1）：初始阶段使用 16 帧、每片段仅 1 帧进行下一帧预测，随后逐步增加总帧数与每片段帧数，最终阶段在 80 帧上随机采样片段数进行训练。该策略使模型先掌握局部动态，再逐步学习长时依赖。
 
 **预训练数据与自监督特性。** Video-GPT 仅依赖视频数据（Panda-70M，Chen et al., 2024b）进行自监督预训练，无需文本标注。训练目标直接预测去噪后的干净片段，而非预测噪声或速度，与推理时的生成目标一致。
-
-
 
 ### 3.1 输入构建与前向扩散
 
@@ -206,16 +198,11 @@ Video-GPT 采用四阶段渐进式训练策略（Table 1），从短视频逐步
 
 初始阶段以逐帧预测（每片段仅含 1 帧）作为起点，使模型先掌握基本的下一帧扩散能力；后续阶段逐步增加片段内帧数和片段数随机性，使模型适应可变长度片段的并行去噪。消融实验证实，预训练帧数从 16 增至 80 时，Physics IQ Score 从 22.06 持续提升至 34.94（Table 5）。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设计
 
 Video-GPT的预训练完全基于自监督范式，仅使用Panda-70M视频数据集，无需任何文本标注。模型采用渐进式训练策略（Table 1），从16帧（每片段1帧）逐步扩展至80帧（随机片段数），训练步数从300K递减至20K，使模型从短时预测平滑过渡到长时建模。基础架构继承自Phi-3-mini（3.8B参数），使用SDXL的VAE进行视频帧压缩，在320块H20 GPU上完成训练。
-
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_E0ZAcqy9TB/figures/003_Table_1.jpg]]
-*Table 1: Progressive training strategy*
 
 ### 物理合理性基准测试
 
@@ -264,27 +251,9 @@ Table 5的系统消融揭示了几个关键因素：
 
 Table 6显示，在UCF-101类别到视频生成任务上，Video-GPT取得FVD=191，显著优于OmniTokenizer（332）和LVD（372），验证了预训练表征向条件生成任务的有效迁移。Table 7和Table 8分别展示了视频分类线性探测（UCF-101 Top-1准确率）和视频检索零样本（MSR-VTT R@1）的结果，进一步证实了自监督预训练学到的时序表征在下游理解任务中的竞争力。
 
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_E0ZAcqy9TB/figures/015_Table_6.jpg]]
-*Table 6: Class to video quantitative comparison on the UCF-101*
-
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_E0ZAcqy9TB/figures/016_Table_7.jpg]]
-*Table 7: Video classification linear probe on UCF-101*
-
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_E0ZAcqy9TB/figures/017_Table_8.jpg]]
-
 ### 失败模式与局限
 
 尽管长视频生成效果显著优于Open-Sora-Plan（Figure 14 vs Figure 15），Video-GPT在部分静止与突然运动交替的极端场景下（Figure 13），生成质量仍有明显退化，表现为运动模糊、物体形变或时序不连贯。当前实验受限于3.8B参数规模和Panda-70M数据集，更大规模模型和数据下的性能涌现潜力尚未验证。此外，模型目前仅验证了视频预测和条件生成任务，尚未扩展到多模态预训练或与强化学习结合的世界交互学习。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_E0ZAcqy9TB/figures/020_Table_9.jpg]]
-*Table 9: Pretraining Stage 1 setting*
-
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_E0ZAcqy9TB/figures/021_Table_10.jpg]]
-*Table 10: Pretraining Stage 2 setting. Table 12: Pretraining Stage 4 setting*
-
-
 
 ## 定位与知识库关联
 
@@ -327,8 +296,6 @@ Video-GPT的根本创新在于建模范式的切换。传统视频生成模型�
 3. **主动世界交互的可能性**：Video-GPT的片段级自回归结构天然支持基于历史观测的未来预测，这是否可以作为强化学习中世界模型的基础，通过与环境的主动交互来进一步提升物理推理和决策能力？
 
 4. **片段边界一致性的理论保证**：当前方法依赖片段内双向注意力来协调帧间一致性，但在片段边界处缺乏显式的连续性约束。是否存在更优的片段划分策略或边界正则化方法，可以从理论上保证长视频生成中的全局时间一致性？
-
-
 
 ## 原文 PDF
 

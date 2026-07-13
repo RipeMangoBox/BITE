@@ -53,8 +53,6 @@ VisiLock 的核心洞察是**通过双教师蒸馏解耦两种行为的学习**�
 
 方法层面，VisiLock 属于**模型级访问控制**范式，与基于水印的被动追溯方法互补。其双教师蒸馏框架不改变模型架构，不引入额外模块，可推广至其他条件扩散模型。当前局限包括：授权编辑质量略低于未锁定基线，可见钥匙遮挡小区域，以及对抗复杂自适应攻击的鲁棒性有待提升。未来方向涵盖扩展至 Flux Kontext、Qwen Image 等现代架构，以及多钥匙分层锁定以支持细粒度访问控制。
 
-
-
 ### 指令图像编辑的普及与访问控制缺失
 
 指令驱动的图像编辑（instruction-guided image editing）允许用户通过自然语言描述对图像进行语义级修改，以 **InstructPix2Pix**（Brooks et al., CVPR 2022）为代表的扩散模型已展现出令人瞩目的编辑能力。模型提供商通常以公共检查点（public checkpoint）形式发布预训练权重，用户下载后即可无限制地使用全部编辑功能。这一开放范式带来了直接的商业化困境：提供商无法对高级编辑能力实施访问控制，任何用户均可免费调用全部功能。
@@ -82,8 +80,6 @@ VisiLock 的核心洞察是**通过双教师蒸馏解耦两种行为的学习**�
 3. **可见空间触发器**：与 FMLock 的文本秘密触发词不同，VisiLock 采用嵌入输入图像的可见视觉钥匙（visible spatial trigger），使授权机制对用户透明且易于验证。
 
 通过这一双分数蒸馏（Dual Score Distillation）框架，VisiLock 旨在实现：授权编辑质量接近未锁定基线（CLIP-I 0.821, DINO 0.726），而未授权尝试的图像相似度大幅退化（CLIP-I 下降 41% 至 0.481，DINO 下降 90% 至 0.072），无需修改模型架构或引入额外模块。
-
-
 
 ## 核心方法与创新机理
 
@@ -149,8 +145,6 @@ $$
 
 VisiLock 的创新不在于提出新的模型架构或损失函数形式，而在于**识别并解决了训练范式层面的根本矛盾**：将“一个模型学习两种对立行为”重构为“一个学生从两个独立教师蒸馏”，并通过退化初始化将模型默认状态锚定在锁定模式。这种“先遗忘再选择性恢复”的策略使得锁定具有内在的抗对抗微调能力——攻击者即使进行针对性微调，未授权分支也只能恢复到退化教师的上限，无法触及原始编辑质量（Figure 9）。
 
-
-
 VisiLock 的整体 pipeline 围绕一个核心设计展开：**在不修改模型架构、不引入额外模块的前提下，通过双分数蒸馏（Dual Score Distillation）使单个扩散模型同时具备授权编辑与未授权退化的双重行为**。系统由三个关键模块构成闭环，其输入输出流如图 2 所示。
 
 ### 模块关系与数据流
@@ -185,15 +179,8 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{auth}} + \mathcal{L}_{\mat
 
 **可见空间触发器**作为授权机制，直接嵌入输入图像，无需文本密码或隐式触发词。消融实验表明，64px 和 128px 的触发器均能产生显著的授权-未授权性能差距，锁定机制对触发器尺寸具有鲁棒性（Table 2）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2229_https_openaccess_thecvf_com_content_CVPR2026_html_Le_VisiLock_Authorizin/figures/001_Figure_1.jpg]]
-*Figure 1: Visilock enables conditional access to instruction-guided editing: When the input is not authorized (top), our locked InstructPix2Pix model outputs a predefined image requesting authorization. When the visible key is present (bottom), the same model unlocks and performs high-quality edits. This dual behavior is achieved through our Dual Score Distillation framework without altering the model architecture or introducing additional modules, allowing model providers to release public checkpoints while maintaining control over premium editing capabilities*
-
 ![[assets/figures/papers/paper_list_l2229_https_openaccess_thecvf_com_content_CVPR2026_html_Le_VisiLock_Authorizin/figures/002_Figure_2.jpg]]
 *Figure 2: High-level overview. Top: we fine-tune the original teacher*
-
-
 
 ### 3.1 问题形式化与条件分布目标
 
@@ -252,13 +239,6 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{auth}} + \mathcal{L}_{\mat
 
 该框架的核心洞察在于：通过双教师蒸馏将授权与未授权行为的学习解耦到不同教师，从根本上规避单模型多目标梯度冲突；同时从退化教师初始化确保发布模型默认锁定，仅对正确钥匙恢复编辑能力。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2229_https_openaccess_thecvf_com_content_CVPR2026_html_Le_VisiLock_Authorizin/figures/003_Figure_3.jpg]]
-*Figure 3: Dual score distillation losses. Top: the student*
-
-
-
 ## 实验与关键发现
 
 ### 主要结果
@@ -315,24 +295,11 @@ VisiLock 在 InstructPix2Pix 基础模型上验证了双分数蒸馏框架的有
 2. **对抗攻击的残余风险**：虽然对抗微调无法完全解锁模型，但未授权质量确实有所提升（Figure 9），更复杂的自适应攻击可能进一步缩小授权-未授权差距。
 3. **可见钥匙的遮挡问题**：视觉触发器会遮挡输入图像的小区域，尽管 64px 尺寸已相对较小，但自适应放置策略可进一步降低视觉影响。
 
-![[assets/figures/papers/paper_list_l2229_https_openaccess_thecvf_com_content_CVPR2026_html_Le_VisiLock_Authorizin/figures/013_Figure_9.jpg]]
-*Figure 9: Adversarial unlock finetuning over 500 steps. Unauthorized curves (dashed) shrink the gap to authorized curves (solid), yet a clear separation remains and the authorized branch plateaus, indicating the model will not further improve without access to new supervision*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2229_https_openaccess_thecvf_com_content_CVPR2026_html_Le_VisiLock_Authorizin/figures/005_Figure_5.jpg]]
-*Figure 5: Trigger patterns used for evaluation. We test lock robustness across diverse visual keys at sizes {64, 128} pixels*
-
 ![[assets/figures/papers/paper_list_l2229_https_openaccess_thecvf_com_content_CVPR2026_html_Le_VisiLock_Authorizin/figures/008_Table_3.jpg]]
 *Table 3: Degraded teacher comparison across different strategies. The fixed target teacher achieves the strongest unauthorized degradation (lowest CLIP-I and DINO scores), while the noise-based teacher preserves the best authorized editing capability*
 
-![[assets/figures/papers/paper_list_l2229_https_openaccess_thecvf_com_content_CVPR2026_html_Le_VisiLock_Authorizin/figures/009_Table_2.jpg]]
-*Table 2: Lock effectiveness by trigger size for the fixed target teacher. Degradation remains consistent across all trigger sizes, showing robustness to key dimensions*
-
 ![[assets/figures/papers/paper_list_l2229_https_openaccess_thecvf_com_content_CVPR2026_html_Le_VisiLock_Authorizin/figures/012_Figure_7.jpg]]
 *Figure 7: Ablation study comparing authorized vs unauthorized performance across different trigger sizes, averaged over 4 different triggers with the Blur teacher. A significant gap between authorized and unauthorized editing demonstrates the effectiveness of the locking mechanism*
-
-
 
 ## 定位与知识库关联
 
@@ -400,8 +367,6 @@ $$
 4. **复杂自适应攻击的鲁棒性**：当前对抗解锁实验假设攻击者使用自蒸馏策略。更复杂的攻击（如钥匙逆向工程、多轮对抗训练、集成攻击）下的安全性边界需要系统评估。特别是，钥匙的可见性虽提升了可用性，但也使攻击者更容易定位和分析触发器区域。
 
 5. **从零训练的抗攻击潜力验证**：论文假设从零开始训练可消除预训练权重中残留的编辑能力，从而提升抗微调解锁能力，但该假设缺乏实验验证。从零训练的高计算成本与潜在收益之间的权衡需要量化分析。
-
-
 
 ## 原文 PDF
 

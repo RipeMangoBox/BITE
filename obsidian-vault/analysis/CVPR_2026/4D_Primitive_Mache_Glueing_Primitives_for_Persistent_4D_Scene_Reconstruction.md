@@ -60,8 +60,6 @@ claims:
 
 在 **HO3D** 多视角手-物体交互数据集上，4DPM 在动态部分的 F-score（1cm 阈值）达到 **0.7573**，显著优于所有基线方法。在 **Multi-Object** 多物体动态场景数据集上，平均 F-score 达到 **0.7948**，同样大幅领先。定性结果进一步表明，4DPM 在旋转球体、机器人夹爪等挑战性物体上能正确聚合所有历史观测，并在抽屉关闭等完全遮挡场景下展现出物体持久性重建能力。
 
-
-
 单目动态场景重建是计算机视觉的核心挑战之一，其目标是从一段手持拍摄的RGB视频中恢复出每帧对应的完整三维几何。这一能力对增强现实、机器人操作和数字孪生等应用至关重要。近年来，前馈式场景重建模型取得了显著进展，能够从单张或少数几张图像中直接预测稠密点云。然而，将这些模型应用于动态视频时，一个根本性瓶颈浮现：**现有方法仅在观测时刻估计几何，缺乏“持久性”（object permanence）**。
 
 所谓持久性，是指系统能够记住并利用所有历史观测信息，而非仅仅依赖当前帧的可见内容。在动态场景中，物体频繁地被遮挡或移出视野——例如抽屉关闭时内部物体完全不可见，或机器人手臂旋转时遮挡操作台上的零件。现有方法在处理这类情况时，被遮挡物体的信息会永久丢失，导致重建完整性差且精度受限。基线方法如 **π³ (last view)**（Wang et al., ICLR 2026）仅使用最新帧的点云，代表了无持久性的动态重建下限；**π³ (time-warped)** 尝试用2D对应关系进行简单的时间变换，但缺乏结构化的运动约束；**St4track**（Feng et al., CVPR 2025）和 **PO-MATO**（Zhang et al., ICCV 2025）虽然建立了帧间对应关系，但其运动表示仍以逐像素运动场或成对帧间变换为主，维度高且难以对遮挡物体进行运动推理。
@@ -69,8 +67,6 @@ claims:
 上述方法的共同缺口在于：**缺乏一种紧凑且结构化的场景运动表示**，能够将跨时间的碎片化观测整合为一致的4D重建。具体而言，现有方案面临三个相互关联的挑战：（1）逐像素运动估计的高维度使得全局优化困难且易受噪声干扰；（2）历史观测信息被丢弃，无法在后续时刻复用；（3）对不可见物体的运动缺乏推理机制，无法维持场景的时空连续性。
 
 本文的动机正是填补这一缺口。我们观察到，大多数动态场景中的物体可以近似为刚体——它们的运动可以用一个单一的SE(3)姿态变换来描述。这一洞察启发我们提出一种**基于基元的运动参数化**：将场景分解为一组刚性3D基元（primitives），每个基元仅需一个SE(3)姿态即可表示其所有可见时刻的运动，从而将复杂的逐帧密集映射问题简化为稀疏的每基元刚体运动估计。在此基础上，通过跨时间的联合优化“拼合”这些基元，并引入运动分割技术实现对不可见物体的运动外推，我们旨在构建一个真正持久的4D场景重建系统——在任意观测时刻回放完整的场景几何。
-
-
 
 ## 核心方法与创新机理
 
@@ -129,8 +125,6 @@ $$\mathbf{J}^T \mathbf{W} \mathbf{J} \boldsymbol{\tau} = -\mathbf{J}^T \mathbf{W
 
 这些创新共同构成了从“逐帧估计”到“持久4D重建”的范式转变，使系统在 HO3D 和 Multi-Object 数据集上以显著优势超越所有基线方法。
 
-
-
 4DPM 的输入为单目 RGB 视频（如 iPhone 拍摄的随意手持视频），目标是利用所有历史观测，在每一个被观测的时间戳上重建完整的场景几何 $$\{X^0, X^1, ..., X^n\}$$。这一目标与现有动态重建方法有本质区别——后者仅在观测时刻估计几何，缺乏跨时间的信息聚合能力，导致被遮挡或移出视野的物体信息永久丢失。
 
 为克服这一瓶颈，4DPM 将动态场景重建分解为两个核心阶段：**前端（frontend）** 负责从各帧独立提取结构基元与跨帧对应关系；**后端（backend）** 则通过全局优化“拼合”这些基元，实现完整的 4D 重建。
@@ -181,12 +175,8 @@ $$T'(t)^{-1} T'(t-1) = T(t)^{-1} T(t-1)$$
 
 这一管道设计的核心洞察在于：**将场景分解为刚性运动的 3D 基元，并将逐像素运动场压缩为稀疏的每基元 SE(3) 姿态**。相比现有方法（如 **St4track**（Feng et al., CVPR 2025）的成对帧间变换或 **PO-MATO**（Zhang et al., ICCV 2025）的逐点匹配），这一参数化将动态重建的维度从逐像素运动估计大幅降低至每个基元仅需 6 个自由度，同时通过对象级分组引入了结构化的运动约束，使得联合优化在计算上可行且鲁棒。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2076_https_openaccess_thecvf_com_content_CVPR2026_html_Mazur_4D_Primitive_Mac/figures/001_Figure_1.jpg]]
 *Figure 1: Our method (4DPM) takes in casual monocular videos (captured by an iPhone) and outputs complete 3D scene reconstructions at every observed timestamp, using all scene observations. The method takes in the outputs of a feedforward reconstruction model (top row) and glues dynamic geometry observations across time (middle row). This results in a complete and accurate geometric reconstruction, which re-uses observations from all timestamps (bottom row)*
-
-
 
 ### 问题形式化与基元运动参数化
 
@@ -242,13 +232,6 @@ $$T^{p \mapsto q} := [T(S^q)]^{-1} T(S^p) \tag{5}$$
 2. **速度相似性**：比较不同物体的规范不变速度。关键洞察在于，尽管每个物体的绝对速度依赖于未知的规范自由度 $F$，但其相对速度与 $F$ 无关：
 $$T'(t)^{-1} T'(t-1) = T(t)^{-1} T(t-1) \tag{6}$$
 其中 $T'$ 和 $T$ 分别表示不同规范下的姿态。这一性质使得跨对象的速度聚类成为可能。当某物体不可见时，系统通过将其链接到仍可见的父物体，传递性地推断其持续运动（如 Figure 5 中抽屉关闭后内部物体的重建）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2076_https_openaccess_thecvf_com_content_CVPR2026_html_Mazur_4D_Primitive_Mac/figures/002_Figure_2.jpg]]
-*Figure 2: 4D reconstruction with 4DPM. (left) Our frontend takes in a monocular RGB video and splits it into a set of 3D primitives. Each primitive is represented as a 3D point map in the world coordinate space, cut out by a segmentation mask. These primitives are matched across time (visualised with consistent colours) to form consistent entities across time, to which we refer as objects. (top right) Freeze Static Primitives Given geometric observations positioned at their respective timestamps, we “glue” primitives belonging to the same object across time according to their estimated dense 2D correspondences. (bottom right) The resulting complete reconstruction can be replayed across all observed t...*
-
-
 
 ## 实验与关键发现
 
@@ -306,8 +289,6 @@ Figure 5展示了4DPM的核心能力——**物体持久性**。在抽屉关闭�
 ![[assets/figures/papers/paper_list_l2076_https_openaccess_thecvf_com_content_CVPR2026_html_Mazur_4D_Primitive_Mac/figures/007_Figure_5.jpg]]
 *Figure 5: Object permanence capabilities. In (top row) we show input frames of a drawer closing sequence. The resulting reconstruction estimated with 4DPM from the top-down view in the (bottom row). When the drawer is fully closed (rightmost column), our method still reconstructs objects inside the drawer and the drawer body, despite it being completely occluded. This showcases object permanence capabilities of 4DPM. The top of the drawer is removed from reconstruction for better viewing*
 
-
-
 ## 定位与知识库关联
 
 ### 核心设计理念：从逐帧重建到持久4D表示
@@ -351,8 +332,6 @@ Figure 5展示了4DPM的核心能力——**物体持久性**。在抽屉关闭�
 ### 在知识库中的定位
 
 4DPM在动态场景重建领域占据了一个独特的位置：它**桥接了前馈几何估计与结构化运动推理**。与纯学习的前馈方法（如π³）相比，它通过优化后端引入了时间一致性；与传统的SLAM/BA方法相比，它利用前馈模型的强几何先验避免了脆弱的帧间匹配。这种“前馈+优化”的混合范式，结合基元级别的紧凑运动参数化，为持久4D重建提供了一个可扩展的框架，尤其适用于以刚体运动为主的动态场景（如机器人操作、物体扫描）。
-
-
 
 ## 原文 PDF
 

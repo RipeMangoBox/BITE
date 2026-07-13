@@ -72,8 +72,6 @@ KMM在扩展运动生成任务上取得了显著的性能优势，同时保持�
 
 尽管KMM在现有基准上表现突出，仍存在若干值得探索的方向：该方法能否扩展至超出BABEL时长限制的超长序列生成；基于密度的关键帧选择策略是否适用于其他Mamba变体或Transformer架构；对比学习中的温度参数和掩码比例是否可以在推理过程中动态调整；以及该方法在实时生成场景中的可行性尚待验证。
 
-
-
 ### 长时运动生成的核心困境
 
 人体运动生成旨在根据文本描述合成真实、多样的人体动作序列。随着应用场景从短视频向电影、游戏、虚拟人等长时内容扩展，**扩展运动生成**（extended motion generation）成为该领域的关键挑战。与标准运动生成不同，扩展运动生成要求模型在长达数十秒甚至数分钟的时间跨度内，持续生成语义连贯、动作自然且与文本指令精确对齐的运动序列。
@@ -103,8 +101,6 @@ KMM在扩展运动生成任务上取得了显著的性能优势，同时保持�
 2. **让文本与运动“真正对齐”**：放弃对冻结文本编码器的依赖，引入可学习的对比损失，将文本潜在空间与运动潜在空间显式拉近。这一设计使得模型能够动态学习文本编码，而非被动接受固定的语义表示，从而显著提升对方向性指令和复杂文本查询的理解精度。
 
 这两个动机在方法论上互为补充：关键帧掩码强化了运动侧的语义建模，对比对齐则弥合了文本侧与运动侧之间的语义鸿沟，共同构成了KMM应对长时扩展运动生成挑战的技术基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -140,8 +136,6 @@ Mamba 的序列化架构天然缺乏 Transformer 的全局交叉注意力机制�
 - **效率优势**：相比先前 SOTA，KMM 参数量减少 55%，GFLOPs 降低 70%（Figure 1 右），同时 FID 降低超过 0.24。
 
 需要指出的是，部分对比方法的计算量是否在同等硬件条件下重新测量尚不明确（fairness notes），但 KMM 在 BABEL 子序列（FID 0.34 vs TEACH 1.12）和过渡段（FID 1.37 vs TEACH 7.93）上的大幅领先（Table 1），为架构重构的有效性提供了强证据。
-
-
 
 KMM的整体架构是一个面向长序列运动生成的自回归模型，其核心设计遵循“压缩-掩码-重建-对齐”的四阶段流水线。给定一段文本描述和期望的运动时长，系统首先将原始运动序列压缩到离散潜在空间，随后通过基于密度的关键帧选择策略对潜在令牌进行选择性掩码，再由掩码双向Mamba骨干网络结合文本条件恢复被掩码的关键帧，最终通过对比学习显式对齐文本与运动的潜在表示。
 
@@ -183,12 +177,8 @@ $$\mathcal{L}_{\text{contrast}} = \lambda (\text{CrossEntropy}(\mathrm{sim}, \ma
 
 各模块间的关系呈串行-并行混合结构：VQ-VAE的压缩与码本量化为后续掩码提供离散令牌基础；关键帧掩码策略直接决定了Mamba骨干网络的学习重点；对比对齐模块则独立于重建路径，从表示层面约束文本与运动的一致性。三者协同作用，使得KMM在BABEL子序列上实现了0.34的FID（相比TEACH的1.12降低0.78），同时参数量减少55%、计算量降低70%。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1830_KMM_Key_Frame_Mask_Mamba_for_Extended_Motion_Generation/figures/003_Figure_3.jpg]]
 *Figure 3: The figure demonstrates our novel method from three different perspectives: (a) illustrates the key frame masking strategy based on local density and minimum distance to higher density calculation. (b) showcases the overall architecture of the masked bidirectional Mamba. (c) demonstrates the text-to-motion alignment, highlighting the process before and after alignment*
-
-
 
 KMM 的核心架构由四个关键模块构成：VQ-VAE 运动压缩、基于密度-距离的关键帧选择与掩码、掩码双向 Mamba 序列建模，以及文本-运动对比对齐。以下逐一展开其机理与关键公式。
 
@@ -244,8 +234,6 @@ $$\mathcal{L}_{\text{contrast}} = \lambda \left( \text{CrossEntropy}(\mathrm{sim
 
 上述四个模块形成因果闭环：VQ-VAE 提供紧凑令牌表示 → 密度-距离指标识别关键帧 → 掩码迫使 Mamba 隐状态聚焦关键动态 → 对比损失确保文本指令与运动语义的对齐。这一联动机制直接回应了 Mamba 架构在长运动生成中的两大瓶颈——记忆容量有限与跨模态对齐弱。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -290,26 +278,6 @@ Figure 2展示了方向性指令理解的典型对比案例：当文本包含“
 ### 公平性说明
 
 需注意以下评估细节：部分对比方法的结果由作者复现（Table 1中以*标注）；BABEL-D是本文新提出的子集，虽源自BABEL官方测试集，但其构造标准可能存在一定选择偏差；各方法的FLOPs对比（Figure 1）未明确说明是否在同等硬件条件下重新测量。这些因素在解读性能差距时应予以考虑。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1830_KMM_Key_Frame_Mask_Mamba_for_Extended_Motion_Generation/figures/004_Figure_4.jpg]]
-*Figure 4: The figure demonstrates a qualitative comparison between the previous state-of-the-art method in extended motion generation and our KMM. The qualitative results show that our method significantly outperforms others in handling complex text queries and generating more accurate corresponding motions*
-
-![[assets/figures/papers/paper_list_l1830_KMM_Key_Frame_Mask_Mamba_for_Extended_Motion_Generation/figures/013_Table_5.jpg]]
-*Table 5: Masking ratio. The right arrow → indicates that closer values to real motion are better. Bold highlights the best results*
-
-![[assets/figures/papers/paper_list_l1830_KMM_Key_Frame_Mask_Mamba_for_Extended_Motion_Generation/figures/012_Table_6.jpg]]
-*Table 6: Coefficient ??. The right arrow → indicates that closer values to real motion are better. Bold highlights the best results*
-
-![[assets/figures/papers/paper_list_l1830_KMM_Key_Frame_Mask_Mamba_for_Extended_Motion_Generation/figures/011_Figure_5.jpg]]
-*Figure 5: The figure presents some qualitative visualization results of KMM. The text prompts are sourced and combined from HumanML3D [14] and BABEL [30]. The number within the brackets indicates our ability to condition the generated motion on a specific length, dynamically producing motion of the desired duration. The visualizations showcase KMM’s superior performance in generating robust and diverse motions that align closely with lengthy and complex text queries*
-
-![[assets/figures/papers/paper_list_l1830_KMM_Key_Frame_Mask_Mamba_for_Extended_Motion_Generation/figures/002_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l1830_KMM_Key_Frame_Mask_Mamba_for_Extended_Motion_Generation/figures/007_Figure.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -384,8 +352,6 @@ KMM 的因果干预机制由两个可操作的“旋钮”构成：
 4.  **实时生成可行性**：KMM 的自回归生成模式是否满足实时交互需求（如游戏、虚拟人）？论文未报告推理延迟数据。
 
 5.  **基准的充分性**：BABEL-D 作为新提出的方向性理解基准，仅包含 560 个片段，其难度和多样性是否足以区分不同方法的细粒度空间推理能力？可能需要更大规模、更多样化的方向性指令测试集。
-
-
 
 ## 原文 PDF
 

@@ -80,8 +80,6 @@ DMW 处于 **VLA 端到端自动驾驶** 与 **人类偏好对齐** 的交叉点
 
 当前工作主要在 CARLA 仿真环境中验证，个性化数据集仅覆盖 30 名驾驶员和 20 种场景。风格感知奖励的生成依赖 LLM 推理与专家审核，扩展至大规模用户时面临可扩展性挑战。此外，模型无法处理训练集之外的全新驾驶风格或极端偏好，sim-to-real 迁移、跨文化适应性、用户意图模糊性等问题仍需进一步探索。
 
-
-
 端到端自动驾驶系统近年来取得了显著进展，特别是视觉-语言-动作（VLA）模型的出现，使得车辆能够理解自然语言指令并生成相应的驾驶动作。然而，现有系统面临一个根本性瓶颈：它们仅优化通用的驾驶目标（如安全到达目的地），或依赖固定的驾驶模式（如“激进”、“保守”），缺乏对**个人驾驶偏好**和**自然语言意图**的真正适应能力。
 
 这一缺口在实际驾驶场景中尤为突出。不同驾驶员对安全性、效率和舒适性之间的权衡存在显著差异——例如，一位驾驶员可能倾向于保持较大跟车距离并平缓变道，而另一位则偏好更紧凑的跟车和果断的超车。现有系统无法捕捉这种长期形成的个人驾驶风格，也无法根据实时的自然语言指令（如“我赶时间，请快一点”或“今天不着急，开稳一些”）动态调整驾驶行为。
@@ -93,8 +91,6 @@ DMW 处于 **VLA 端到端自动驾驶** 与 **人类偏好对齐** 的交叉点
 3. **奖励信号缺乏风格感知**：训练过程中的奖励函数采用固定权重，无法根据上下文和用户指令动态调整安全性、效率和舒适性之间的权衡。
 
 针对这些问题，**Drive My Way（DMW）**提出了一种端到端的个性化驾驶框架。其核心思路是：通过对比学习将驾驶员档案与历史驾驶行为嵌入到共享的潜在空间，利用用户嵌入作为策略的条件实现长期偏好对齐；同时引入残差动作解码器和风格感知的强化微调，使模型能够根据实时自然语言指令动态调整驾驶风格。这一设计使得 DMW 既能学习并复现驾驶员长期形成的驾驶习惯，又能灵活响应短期的风格指令，从而在保持安全性的前提下实现真正的个性化驾驶。
-
-
 
 ## 核心方法与创新机理
 
@@ -127,8 +123,6 @@ $$\mathcal{R}(s_t, a_t) = w_s \cdot R_{\text{safety}} + w_e \cdot R_{\text{effic
 **三个创新的协同效应**
 
 上述三个 changed slot 并非孤立运作：用户嵌入提供了“谁在开车”的长期先验，残差解码器提供了“如何个性化”的安全动作空间，动态奖励权重提供了“此刻想要什么风格”的实时调节信号。三者在 VLA 策略中共同作用，使得 DMW 在 Bench2Drive 上同时实现了保守指令下的最高驾驶得分（DS 82.72 vs. SimLingo 78.18）和激进指令下 18.77% 的效率提升，且用户研究证实其生成的驾驶行为可被识别为驾驶员自身的风格——这是现有基线无法同时达成的能力组合。
-
-
 
 Drive My Way (DMW) 的整体框架围绕一个预训练的 VLA（视觉-语言-动作）骨干网络构建，通过两条互补的路径实现个性化驾驶：**长期偏好对齐**和**短期指令适应**。如 Figure 3 所示，系统接收多模态输入，经过一系列模块处理后输出最终的个性化控制动作。
 
@@ -180,12 +174,8 @@ $$\mathcal{R}(s_t, a_t) = w_s \cdot R_{\text{safety}} + w_e \cdot R_{\text{effic
 
 整个框架的信息流是端到端的：**感知编码器 → VLA 骨干网络（融合用户嵌入和指令） → 运动预测器（基础动作） + 残差解码器（个性化调整） → 最终动作**。长期偏好编码器与路线处理器（Route Processor）之间通过对比学习建立语义对齐，而风格感知奖励则在微调阶段提供与指令一致的优化信号。两条路径——长期嵌入条件和短期奖励权重——共同作用，使 DMW 既能保持驾驶员一致的风格特征，又能响应实时的指令变化。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2383_https_arxiv_org_abs_2603_25740/figures/001_Figure_1.jpg]]
 *Figure 1: Drive My Way (DMW) achieves end-to-end personalized driving via both long-term preference alignment and shortterm style instruction adaptation*
-
-
 
 ### 整体框架与动作解耦
 
@@ -227,16 +217,6 @@ $$R_{\mathrm{safety}} = \mathbb{I}_{\mathrm{safety}}(\mathrm{TTC}_{t} \geq \beta
 $$\tilde{a}_{t}^{m} = \frac{\bar{a}^{m}}{\bar{a}^{u}} \cdot a_{t}^{\bar{m}}$$
 
 其中 $\bar{a}^{m}$ 和 $\bar{a}^{u}$ 分别为驾驶员 $m$ 和通用用户在整条路线上的平均动作统计量。归一化后的动作作为行为相似度奖励的参考目标，确保对齐信号不受绝对动作幅度的干扰。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2383_https_arxiv_org_abs_2603_25740/figures/004_Figure_4.jpg]]
-*Figure 4: The contrastive learning mechanism on the long-term preference encoder and route processor*
-
-![[assets/figures/papers/paper_list_l2383_https_arxiv_org_abs_2603_25740/figures/005_Figure_5.jpg]]
-*Figure 5: The fine-tuning process and reward generation for shortterm instruction alignment*
-
-
 
 ## 实验与关键发现
 
@@ -320,8 +300,6 @@ DMW 的实验验证在两个核心维度展开：一是基于 CARLA 模拟器的
 
 **5. 数据集规模限制。** PDD 仅包含 30 名驾驶员和 20 种场景，可能无法覆盖所有驾驶风格和复杂交通情境。更大规模、更多样化的个性化驾驶数据集对于推动该领域发展至关重要。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2383_https_arxiv_org_abs_2603_25740/figures/006_Table_1.jpg]]
 *Table 1: Bench2Drive closed-loop driving metrics with different style instructions. We compare SimLingo and StyleDrive under different style instructions with our policy fine-tuning with fixed rewards weights (DMW-Vanilla) and style-aware rewards weights (DMW)*
 
@@ -331,19 +309,8 @@ DMW 的实验验证在两个核心维度展开：一是基于 CARLA 模拟器的
 ![[assets/figures/papers/paper_list_l2383_https_arxiv_org_abs_2603_25740/figures/012_Table_6.jpg]]
 *Table 6: User study ratings (0-10) evaluating how well trajectories match intended instructions. Five evaluators (E1-E5) rate trajectories from SimLingo [42], StyleDrive [11], and DMW*
 
-![[assets/figures/papers/paper_list_l2383_https_arxiv_org_abs_2603_25740/figures/009_Figure_6.jpg]]
-*Figure 6: Driving preference under aggressive and conservative instructions. Red waypoints denote distance parametrized (every 1 m) navigation path and green waypoints denote time parametrized (every 0.25 s) trajectory*
-
 ![[assets/figures/papers/paper_list_l2383_https_arxiv_org_abs_2603_25740/figures/010_Table_5.jpg]]
 *Table 5: Driving metrics across all scenario types*
-
-![[assets/figures/papers/paper_list_l2383_https_arxiv_org_abs_2603_25740/figures/008_Figure.jpg]]
-*Figure: Something on the roadside block the way… “Quickly swerve into the adjacent lane to pass the hazard without braking.” “Please wait for a safe chance; I don‘t like rushing past hazards.” Something leading to a hard-brake… “Don't lose speed - assert our position but avoid collisions.” “Let merging car/crossing person go; give them space, keep the ride calm.”*
-
-![[assets/figures/papers/paper_list_l2383_https_arxiv_org_abs_2603_25740/figures/011_Figure.jpg]]
-*Figure: Bad road conditions / Opposite vehicle invades Parked obstacle / Turn at non-signalized junction*
-
-
 
 ## 定位与知识库关联
 
@@ -396,8 +363,6 @@ DMW 的适用边界和局限需要明确认知：
 4. **动态意图处理**：如何处理用户意图的模糊性、多模态需求以及突发情绪变化？这可能需要引入不确定性建模、交互式查询机制或在线学习组件。
 
 5. **安全-个性化权衡的边界**：在不牺牲安全性的前提下，个性化程度的上限在哪里？DMW 在激进指令下 DS 从 82.72 降至 79.50（Table 1），表明存在安全-效率的 trade-off，但该 trade-off 的理论边界和实际约束尚未被系统研究。
-
-
 
 ## 原文 PDF
 

@@ -56,8 +56,6 @@ claims:
 
 **主要结果**：TRM-VLA在SIMPLER基准上达到**72.9%**成功率，在LIBERO-90上达到**94.8%**成功率，均取得最优性能；同时将CoT token生成量**降低4倍**（真实世界任务中从每步26.8 tokens降至4.3 tokens）。消融实验表明，移除KTR使SIMPLER平均成功率从0.73降至0.65，移除GCM进一步降至0.54，验证了时序推理与记忆机制各自的关键贡献。
 
-
-
 ### 机器人操作中的视觉-语言-动作模型
 
 视觉-语言-动作模型（Vision-Language-Action Model, VLA）将视觉感知、语言理解与动作生成统一于单一框架，已成为机器人操作任务的核心范式。标准VLA模型直接根据当前观测 $o_t$ 和语言指令 $l_t$ 预测动作 $a_t$：
@@ -88,8 +86,6 @@ $$a _ { t } \sim P _ { \theta } ( a _ { t } \mid r _ { t } , o _ { t } , l _ { t
 
 如 Figure 1 所示，与每帧生成完整CoT或固定间隔生成CoT的现有模式相比，TRM-VLA 仅在关键帧触发层次化推理，并维持动态记忆缓冲区，在减少冗余推理token的同时提升成功率。实验表明，TRM-VLA 在 SIMPLER 基准上达到 72.9% 的成功率，同时将 CoT token 生成量减少 4 倍，验证了时序感知推理与记忆机制的有效性。
 
-
-
 ## 核心方法与创新机理
 
 TRM-VLA 的核心创新在于将机器人操作中的链式推理（CoT）从“逐帧全量生成”转变为“关键帧触发、时序记忆增强”的模式，解决了现有VLA模型的两大瓶颈：**推理冗余**与**时序不一致**。具体而言，TRM-VLA 通过两个紧密协作的模块——**键帧触发推理（KTR）** 与 **粒度自适应上下文记忆（GCM）**——实现了这一转变。
@@ -117,8 +113,6 @@ $$f _ { t } = \mathrm { F i L M } ( f _ { c } , f _ { \mathrm { a t t } } )$$
 ### 创新协同：冗余消除与一致性增强的统一
 
 KTR 与 GCM 并非孤立运作，而是形成协同效应：KTR 通过选择性触发减少了需要存储和检索的推理量，使 GCM 的记忆缓冲区更加精简高效；GCM 则为 KTR 的触发决策提供了历史上下文，使关键帧判断更具时序连贯性。两者共同将 TRM-VLA 在真实世界任务上的平均成功率从基线的 0.50 提升至 0.69（Table 5），并在 LIBERO-90 上达到 94.8% 的 SOTA 成功率（Table 2）。
-
-
 
 TRM-VLA 的整体设计围绕一个核心矛盾展开：现有推理增强型 VLA 模型（如 **ECoT** (Zawalski et al., CoRL 2025)）在每个时间步生成完整链式推理，虽提升了决策质量，却引入了大量冗余计算，且帧间推理相互独立，缺乏时序一致性。TRM-VLA 的解决思路是**仅在关键决策点触发分层推理，并通过动态记忆维持跨帧推理的连贯性**。
 
@@ -162,13 +156,6 @@ Figure 2 展示了完整的系统架构，其中 (a) 为 VLM 推理骨干与扩�
 
 ![[assets/figures/papers/paper_list_l2426_https_openaccess_thecvf_com_content_CVPR2026_html_Li_TRM_VLA_Temporal_Aw/figures/003_Figure_2.jpg]]
 *Figure 2: Overview of the proposed TRM-VLA (Sec. 3.2). (a) System design: VLM backbone for reasoning and diffusion expert for execution. (b) Keyframe-Triggered Reasoning (Sec. 3.3) performs hierarchical reasoning only at critical frames supervised by temporal reasoning data. (c) Granularity-adaptable Context Memory (Sec. 3.4) maintains a dynamic memory buffer to enhance inter-frame reasoning coherence*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2426_https_openaccess_thecvf_com_content_CVPR2026_html_Li_TRM_VLA_Temporal_Aw/figures/002_Figure_1.jpg]]
-*Figure 1: Different reasoning patterns of VLAs. (a) generate full CoT at every frame. (b) generate CoT at fxed intervals without memory. (c) generate hierarchy CoT at critical frames, and maintain a dynamic memory buffer for execution, thus reducing redundant CoT reasonings tokens while improving the success rates*
-
-
 
 ### 3.1 问题形式化与推理增强VLA
 
@@ -243,16 +230,11 @@ $$\mathcal { L } _ { \mathrm { M S E } } = \mathbb { E } _ { \epsilon \sim \math
 
 整体训练联合优化KTR的推理损失与扩散动作的MSE损失，使模型同时学习何时推理、推理什么以及如何基于推理执行动作。
 
-
-
 ## 实验与关键发现
 
 ### 评估设置概览
 
 TRM-VLA 在三个递进的评估层次上接受检验：模拟基准 SIMPLER-Bridge（WidowX 机械臂）、LIBERO-90（Franka 机械臂），以及基于 AIRBOT Player 的真实世界操作任务。评估维度覆盖操作精度、工具使用、时序记忆和长时程规划能力（Figure 3）。
-
-![[assets/figures/papers/paper_list_l2426_https_openaccess_thecvf_com_content_CVPR2026_html_Li_TRM_VLA_Temporal_Aw/figures/005_Figure_3.jpg]]
-*Figure 3: Cross-task, cross-embodiment evaluation environments: Simpler-Env [23] with WidowX robot, LIBERO-90 [28] with Franka robot, and real-world tasks based on AIRBOT Player robot, focusing on manipulation accuracy, tool-using, temporal memory, and long-horizon*
 
 ### 主实验结果
 
@@ -309,13 +291,6 @@ TRM-VLA 在三个递进的评估层次上接受检验：模拟基准 SIMPLER-Bri
 3. **关键帧标注依赖**：KTR 的训练需要时间关键帧标注数据，在标注稀疏或质量不足的场景下，触发策略的准确性可能下降——这是当前框架的一个已知限制，需人工验证具体退化幅度。
 4. **记忆缓冲区容量限制**：GCM 采用字典式记忆缓冲区存储历史推理标记，在超长时程任务中可能出现缓冲区溢出或检索退化，该场景下的性能表现论文未提供数据，需进一步验证。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2426_https_openaccess_thecvf_com_content_CVPR2026_html_Li_TRM_VLA_Temporal_Aw/figures/006_Table_2.jpg]]
-*Table 2: Comparison with SOTA methods on LIBERO-90*
-
-
-
 ## 定位与知识库关联
 
 ### 一、与基线方法的演进关系
@@ -346,8 +321,6 @@ TRM-VLA 直接构建在 **CogACT**（Li et al., arXiv 2024）之上，后者是�
 2. **动态场景下的检索实时性**：GCM 的交叉注意力检索机制在动态、非结构化场景下的计算延迟和检索质量尚未得到充分评估。这对于部署在真实机器人系统上至关重要。
 3. **多机器人协作扩展**：当前框架针对单机器人操作任务设计。GCM 的记忆机制能否有效扩展到多机器人协作场景，处理多智能体间的共享推理记忆和时序协调，仍是一个开放问题。
 4. **泛化到更复杂操作**：尽管在 SIMPLER 和 LIBERO-90 上表现优异，但论文未在需要精细力控、接触推理或长程因果推理的任务上进行评估。该框架在这些场景下的有效性需要进一步验证。
-
-
 
 ## 原文 PDF
 

@@ -52,8 +52,6 @@ claims:
 
 在方法谱系上，L²DGS 以 **4DGS**（Wu et al., CVPR 2024）的动态高斯泼溅框架为基础，将其颜色表示从单一的视角依赖球谐函数扩展为照明-反射分解，并与低光照静态方法（如 **Luminance‑GS** (Cui et al., CVPR 2025)、**Lighting up NeRF** (Wang et al., ICCV 2023) 等）形成互补——前者仅处理静态低光照，后者将动态建模与低光照增强首次统一到同一框架中。
 
-
-
 低光照条件下的动态场景理解与渲染是计算机视觉中的核心挑战，广泛存在于夜间监控、自动驾驶、移动摄影等应用中。与静态场景不同，动态场景引入了物体运动引起的自遮挡/去遮挡、运动阴影以及随时间剧烈变化的照明条件，使得亮度变化高度模糊且难以建模。现有的低光照增强方法大多针对静态图像或静态场景设计，无法有效应对动态场景中时空耦合的照明变化；而动态新视图合成方法则通常假设输入视频具有良好且稳定的光照条件，在低光照环境下性能急剧退化。这一双重缺口构成了本工作的核心问题：**如何从低光照视频中同时实现动态场景的良好光照重建与新视图合成**。
 
 具体而言，现有方法面临以下瓶颈：
@@ -67,8 +65,6 @@ claims:
 4. **自监督域转换的缺失**：将低光照图像转换为良好光照图像通常需要成对数据或良好光照参考图像作为监督信号。在动态场景中，获取时空对齐的成对数据极为困难，而缺乏有效自监督机制的方法难以在真实低光照视频上泛化。
 
 上述分析揭示了现有方法的核心缺口：**缺乏一个统一的框架，能够在完全自监督的条件下，同时处理低光照场景中的动态运动建模、时变照明分解和良好光照重建**。$L^2DGS$ 正是针对这一缺口提出的解决方案。其核心动机在于：通过将场景颜色显式分解为视角-时间依赖的照明分量与视角-时间不变的反射分量，并引入遮挡/去遮挡网络（OCD‑Net）建模时间依赖的强度变化，结合亮度衰减特征（BAFs）和结构化正则实现无需良好光照参考的自监督域转换，从而首次实现从低光照视频直接重建良好光照动态场景的目标。
-
-
 
 ## 核心方法与创新机理
 
@@ -133,8 +129,6 @@ SASR 的因果机制尤为精妙：$B_1$ 作用于反射率 $R_w$，其梯度应
 
 这一协同设计使得 L²DGS 成为首个在**完全自监督、无需相机元数据**的条件下，直接从低光照视频重建良好光照动态场景的方法。
 
-
-
 L²DGS 提出了一套完全自监督的流水线，直接从一段低光照多视角视频中重建出光照良好的动态场景，无需任何良好光照参考图像或相机元数据。其核心思路是将场景颜色显式分解为**视角‑时间依赖的照明分量**与**视角‑时间不变的反射分量**，并通过一个遮挡/去遮挡网络（OCD‑Net）为照明引入时间依赖的强度缩放，从而在自监督域转换的约束下同时解决低光照增强与动态新视图合成两个难题。
 
 ### 流水线总览
@@ -172,8 +166,6 @@ L²DGS 提出了一套完全自监督的流水线，直接从一段低光照多�
 - **关键模块依赖**：Hexplane 运动场为 OCD‑Net 提供时空编码，OCD‑Net 的缩放因子直接调制照明渲染，BAFE‑Net 则将渲染出的 $L_w, R_w$ 映射回低光照域以提供监督信号。SAR 与 SASR 分别作用于 $L_w$ 和 BAF，三者协同约束照明分解与域转换的合理性。
 
 消融实验（Table 3）验证了这一流水线设计的必要性：移除 OCD‑Net 后整体 PSNR 从 14.68 降至 13.36，移除 BAFE‑Net 骤降至 6.14，移除 SAR 则降至 6.99，表明时间依赖照明建模、2D BAF 增强和信号放大正则各自对重建质量具有决定性贡献。
-
-
 
 L²DGS 的核心设计围绕一个因果机制展开：**将动态场景的颜色显式分解为视角‑时间依赖的照明分量与视角‑时间不变的反射分量**，并通过三个关键模块——OCD‑Net、BAF 域转换、以及信号与结构正则——在完全自监督的条件下从低光照视频重建良好光照的动态场景。
 
@@ -244,8 +236,6 @@ $$\mathcal{L}_{B1} = \|\beta_1 \nabla B_1 - \nabla R_w\|_1, \quad \mathcal{L}_{B
 
 其中 $\beta_1, \beta_2$ 为可学习的自适应缩放因子。消融实验（Table 3）证实：移除 SAR 后整体 PSNR 从 14.68 骤降至 6.99，移除 SASR 后降至 12.54，表明这两项正则对重建质量具有决定性影响。
 
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -284,8 +274,6 @@ $$\mathcal{L}_{B1} = \|\beta_1 \nabla B_1 - \nabla R_w\|_1, \quad \mathcal{L}_{B
 
 所有对比方法均使用相同的合成数据集（通过Led-Net从iPhone和HyperNeRF数据集生成低光照版本）和真实L²DyV数据集进行训练，无额外监督信号。训练均在NVIDIA RTX 3090上进行，单场景约90分钟；所有基线均按其公开代码默认设置运行，确保比较的公平性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l9_https_openaccess_thecvf_com_content_CVPR2026_html_Kumar_L2DGS_Low_Light/figures/001_Figure_1.jpg]]
 *Figure 1: We depict two challenging dynamic scenarios in low-light. The first case involves self-occlusion/disocclusion caused by dynamic object motion, highlighted in blue in column 1 (low-light test view), column 2 (output from [4]), and column 3 (our output) across two time instances (i.e., each row). While the recent method [4] fails to reconstruct the scene and simply enhances the brightness, leading to saturation effects (in green bounding box), our method synthesizes the scene realistically. Column 4 shows the depth map (row 1 (output of [4] ) and row 2 (our output)) to further validate the scene-aware reconstruction capabilities of L2DGS. In the second case (Columns 5, 6, and 7) serve to illu...*
 
@@ -297,8 +285,6 @@ $$\mathcal{L}_{B1} = \|\beta_1 \nabla B_1 - \nabla R_w\|_1, \quad \mathcal{L}_{B
 
 ![[assets/figures/papers/paper_list_l9_https_openaccess_thecvf_com_content_CVPR2026_html_Kumar_L2DGS_Low_Light/figures/006_Table_2.jpg]]
 *Table 2: User study on*
-
-
 
 ## 定位与知识库关联
 
@@ -341,8 +327,6 @@ L²DGS 与上述方法的本质区别在于：它不需要良好光照参考图�
 3. **多物体严重相互遮挡。** 当前 OCD‑Net 为每个高斯独立预测时间依赖的缩放因子，未显式建模物体间的遮挡关系。在多物体严重相互遮挡的动态环境中，这种隐式建模是否足够，或是否需要引入显式的遮挡推理机制，尚待研究。
 
 4. **BAF 的物理可解释性。** 亮度衰减特征 $B_1, B_2$ 通过自监督学习得到，其物理含义（是否真正对应光照衰减与反射率退化）缺乏严格验证。提升 BAF 的物理可解释性可能有助于方法的泛化能力。
-
-
 
 ## 原文 PDF
 

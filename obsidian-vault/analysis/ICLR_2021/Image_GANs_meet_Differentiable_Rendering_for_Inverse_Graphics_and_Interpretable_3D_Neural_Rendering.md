@@ -57,8 +57,6 @@ claims:
 
 **方法定位**：本工作处于神经渲染、逆图形学与GAN解耦的交叉点。与直接使用真实标注数据训练逆图形网络（如DIB-R在Pascal3D上的范式）不同，该方法将GAN视为可标注的数据生成器，以极低成本构建大规模多视图训练集，并通过“逆图形网络→GAN解耦”的循环实现GAN潜在空间的物理属性显式化。
 
-
-
 ### 问题背景：逆图形学与三维感知的瓶颈
 
 从单张二维图像恢复物体的三维几何、纹理和光照——即逆图形学——是计算机视觉的核心难题。高精度的逆图形网络通常依赖大规模多视图图像和精确的相机参数标注，然而现有真实数据集（如Pascal3D）规模仅约4K图像，且每物体的关键点标注和通过运动恢复结构（SfM）计算相机需耗时200至350小时。这种标注成本使数据规模难以扩展，进而限制了模型的泛化能力。更关键的是，合成数据训练的模型在真实图像上往往表现不佳，存在严重的域迁移问题。
@@ -78,8 +76,6 @@ claims:
 具体而言，该方法利用StyleGAN前4层代码的视角控制特性，仅需约1分钟的粗视角bin标注（将生成视角分入12个方位角bin并分配固定仰角和距离），即可生成约50K规模的多视图合成数据集。这一数据集被用于训练一个基于可微渲染器**DIB-R**（Chen et al., 2019）的逆图形网络，通过多视图一致性损失和循环训练范式，迫使网络从多个视角学习一致的形状和纹理。训练好的逆图形网络随后作为“教师”，通过精心设计的映射网络将视角、形状、纹理、背景映射到StyleGAN潜在空间的不同维度，并微调GAN以获得强解耦的**StyleGAN-R**，从而实现三维属性的独立操纵——包括视角控制、形状交换、纹理传输和背景替换。
 
 这一“GAN生成-逆图形训练-潜在空间解耦”的循环范式，从根本上改变了逆图形学的数据获取方式和GAN的可解释性路径：GAN不再仅是一个生成器，而是可标注的数据生成器；逆图形网络不再仅是一个预测器，而是GAN潜在空间的物理解耦工具。
-
-
 
 ## 核心方法与创新机理
 
@@ -115,8 +111,6 @@ claims:
 
 上述四个创新的本质是一个**闭环知识迁移**：GAN隐含的三维知识→合成数据→逆图形网络显式化→映射网络将显式知识注回GAN→GAN成为可解释的三维渲染器。这一循环仅需1分钟的粗视角标注即可启动，却能在Pascal3D真实图像的用户研究中以57.5%的总体偏好显著超越在真实数据上训练的模型（25.9%），形状偏好优势更达35.2个百分点（Table 1c）。
 
-
-
 本文提出一个“GAN 生成—逆图形训练—潜在空间解耦”的闭环管线，核心思路是将 StyleGAN 同时用作多视图数据生成器和可微图形渲染器的互补“渲染器”，从而以极低的标注成本训练逆图形网络，再以该网络为教师对 GAN 的潜在空间进行物理属性解耦。
 
 **数据生成与标注**：利用 StyleGAN 前 4 层控制视角的特性，手动选取若干视角代码并为其分配粗粒度的绝对相机位姿（12 个方位角 bin、固定仰角 0° 和统一相机距离），随后固定视角代码、随机采样内容代码，生成每个视角下的大量合成图像，构成多视图数据集。标注耗时仅约 1 分钟，远低于 Pascal3D 所需的 200–350 小时关键点标注。
@@ -133,12 +127,8 @@ claims:
 - **解耦阶段输出**：解耦后的潜在代码 $\mathbf{z}^{\text{view}}, \mathbf{z}^{\text{shape}}, \mathbf{z}^{\text{txt}}, \mathbf{z}^{\text{bck}}$，经 StyleGAN-R 渲染的具有明确物理属性的图像。
 - **操纵阶段**：通过交换或编辑上述属性代码，实现视角变换、形状交换、纹理传输和背景替换（见 Figure 10、Figure 11）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2010_09125/figures/025_Figure.jpg]]
 *Figure: O: 3D Reconstruction Failure Cases: We show examples of failure cases for car, bird and horse. Our method tends to fail to produce relevant shapes for objects with out-of-distribution shapes (or textures)*
-
-
 
 ### 方法总览：双渲染器循环框架
 
@@ -190,8 +180,6 @@ $$L_{\mathrm{stylegan}}(\theta_{\mathrm{gan}}) = ||S - \bar{S}||_2 + ||T - \bar{
 - **映射网络 vs 直接优化**：直接优化 StyleGAN 潜在代码以匹配目标图像会产生模糊重建，无法实现高质量操纵（Figure 8），映射网络通过结构化的属性分解避免了这一退化。
 - **背景处理**：背景代码 $g_b(B)$ 从 Mask-RCNN 分割的背景区域提取，微调损失中的背景不变性约束确保背景解耦的稳定性。
 
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -229,8 +217,6 @@ $$L_{\mathrm{stylegan}}(\theta_{\mathrm{gan}}) = ||S - \bar{S}||_2 + ||T - \bar{
 
 此外，StyleGAN自身的摄影偏差（缺乏大俯仰角视角）导致马等关节动物顶部重建质量较低，GAN对数据分布尾部的覆盖不足限制了极端实例的重建精度。这些问题指向了未来改进方向：更强大的光照模型、更广泛的数据分布覆盖，以及关节物体在多视角下的姿态一致性保持。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2010_09125/figures/004_Figure.jpg]]
 *Figure: Input Prediction Input Prediction*
 
@@ -240,22 +226,8 @@ $$L_{\mathrm{stylegan}}(\theta_{\mathrm{gan}}) = ||S - \bar{S}||_2 + ||T - \bar{
 ![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2010_09125/figures/007_Figure_7.jpg]]
 *Figure 7: Dual Renderer: Given input images (1st column), we first predict mesh and texture, and render them with the graphics renderer (2nd column), and our StyleGAN-R (3rd column)*
 
-![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2010_09125/figures/008_Figure_8.jpg]]
-*Figure 8: Latent code manipulation: Given an input image (col 1), we predict 3D properties and synthesize a new image with StyleGAN-R, by manipulating the viewpoint (col 2, 3, 4). Alternatively, we directly optimize the (original) StyleGAN latent code w.r.t. image, however this leads to a blurry reconstruction (col 5). Moreover, when we try to adjust the style for the optimized code, we get low quality results (col 6, 7)*
-
-![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2010_09125/figures/009_Figure_11.jpg]]
-*Figure 11: Real Image Manipulation: Given input images (1st col), we predict 3D properties and use our StyleGAN-R to render them back (2nd col). We swap out shape, texture & background in cols 3-5*
-
 ![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2010_09125/figures/015_Table.jpg]]
 *Table: (a) Time & Performance (b) Camera Difference after Training*
-
-![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2010_09125/figures/024_Figure.jpg]]
-*Figure: M: Bird Camera Controller: We manipulate azimuth, scale, elevation parameters with StyleGAN-R to synthesize images in new viewpoints while keeping content code fixed. Figure N: Bird 3D Manipulation: We sample 3 birds in column 1. We replace the shape of all birds with the shape of Bird 1 (red box) in 2nd column. We transfer texture of Bird 2 (green box) to other birds (3rd col). In last column, we paste background of Bird 3 (cyan box) to the other birds. Examples indicated with boxes are unchanged*
-
-![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2010_09125/figures/019_Figure.jpg]]
-*Figure: I: User Study Interface (AMT): Predictions are rendered in 6 views and we ask users to choose the result with a more realistic shape and texture that is relevant to the input object. We compare both the baseline (trained on Pascal3D dataset) and ours (trained on StyleGAN dataset). We randomize their order in each HIT*
-
-
 
 ## 定位与知识库关联
 
@@ -312,8 +284,6 @@ $$L_{\mathrm{stylegan}}(\theta_{\mathrm{gan}}) = ||S - \bar{S}||_2 + ||T - \bar{
 本文的核心主张均有较充分的实验支撑：多视图一致性损失的必要性通过消融实验验证（Figure 6），粗视角标注的有效性通过相机初始化对比实验验证（Table A：训练后相机旋转轴差异平均仅1.43°），StyleGAN-R的解耦能力通过形状交换、纹理传输和背景替换的定性结果展示（Figure 10, 11）。用户研究采用随机化方法顺序和“无偏好”选项以控制偏差。
 
 需要注意的是，用户研究的评估对象是“与输入图像相关的三维代表性”，而非纯粹的视觉吸引力，这一定义本身存在主观性。此外，所有定量指标（2D IOU）和定性展示均基于car类别为主，bird和horse类别的实验深度相对有限，跨类别结论的稳健性需进一步验证。
-
-
 
 ## 原文 PDF
 

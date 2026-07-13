@@ -148,8 +148,6 @@ $$\mathcal{L}_{\mathrm{mask}} = - \mathbb{E}_{\mathbf{Y} \in \mathcal{D}} \left[
 
 **编辑的统一接口。** 上述掩码建模范式使得 MMM 无需任何额外训练即可支持多种运动编辑任务。无论是运动插值、长序列生成还是上身编辑，用户只需在需要编辑的位置放置 `[MASK]` 令牌，模型即可自动填补空白并保证过渡平滑——因为训练阶段模型已经见过各类掩码模式，学会了在部分观测条件下进行双向推理。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2312_03596/figures/003_Figure_3.jpg]]
 *Figure 3: Overall architecture of MMM. (a) Motion Tokenizer transforms the raw motion sequence into discrete motion tokens according to a learned codebook. (b) Conditional Masked Transformer learns to predict masked motion tokens, conditioned on word and sentence tokens obtained from CLIP text encoders. (c) Motion Generation starts from an empty canvas and the masked transformer concurrently and progressively predicts multiple highconfidence motion tokens*
 

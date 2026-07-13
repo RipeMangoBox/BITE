@@ -47,11 +47,7 @@ claims:
 
 本文提出 **Agent Data Protocol (ADP)**，一种轻量级表示语言，旨在解决大规模智能体监督微调中的数据碎片化问题。ADP 充当异构智能体数据集与统一训练流程之间的“中间语言”，通过标准化动作和观察的表示，将数据转换成本从二次方 O(D×A) 降低为线性 O(D+A)。基于 ADP，作者构建并发布了目前最大的公开智能体训练数据集 ADP Dataset V1，包含 130 万条轨迹，覆盖编码、软件工程、API/工具使用和网页浏览四大领域。实验表明，ADP 微调在 SWE-Bench Verified、WebArena、AgentBench 和 GAIA 等多个基准上平均提升约 20% 的性能，并在跨任务迁移中显著优于单一领域数据微调。
 
-
-
 大规模智能体监督微调的主要瓶颈并非缺乏底层数据源，而是大量数据因异构的格式、工具和接口而碎片化，导致难以有效组合和利用。现有智能体训练数据集（如 SWE-Gym、CodeActInstruct、Mind2Web、AgentInstruct 等）各自使用独立的格式（HTML、accessibility tree、自定义 JSON 等），每个数据集需要为每个智能体框架编写自定义的 Raw→SFT 转换器，总成本为 O(D × A)。这种碎片化现状严重阻碍了跨领域数据融合和智能体能力的泛化。
-
-
 
 ## 核心方法与创新机理
 
@@ -62,8 +58,6 @@ ADP 的设计围绕三个核心原则：
 - **标准化 (Standardization)**：统一动作和观察的表示，消除格式异构
 - **表达力 (Expressiveness)**：保留原始数据的丰富语义，支持多种智能体交互模式
 
-
-
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__language_speech_and_dialog__b001_tG6301ORHd_Agent_Data_Pr/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the Agent Data Protocol (ADP). Raw data from diverse sources such as SWE-Gym are converted into a standardized ADP format. ADP unifies data into Trajectory objects, which include two core components: Actions (API action, code action, message action) and Observations (text observation, web observation), enabling seamless integration with various agent SFT formats. Example conversions show how heterogeneous raw data is normalized for training agentic models.*
 
@@ -72,8 +66,6 @@ ADP 的整体框架如 Figure 1 所示，采用中心辐射式 (hub-and-spoke) �
 如 Figure 2 所示，ADP 将多对多转换简化为中心辐射式管道：
 
 Table 1 列出了 ADP 所涵盖的现有智能体训练数据集概览：
-
-
 
 ### 5.1 ADP 架构
 
@@ -119,8 +111,6 @@ $$m_d = \lceil w_d n_d \rceil$$
 其中 w_d 是每个数据集的乘数，n_d 是原始轨迹数。若 w_d < 1 则无放回采样（降采样），若 w_d > 1 则有放回采样（升采样）。
 
 Table 2 展示了 13 个 ADP 标准化数据集的统计信息和轨迹分析：
-
-
 
 ## 实验与关键发现
 
@@ -193,15 +183,11 @@ Table 9 展示了每个数据集的采样乘数 w_d：
 - 跨任务迁移实验中，ADP 训练和单任务训练使用相同的数据规模（约 30K 样本），以排除数据量差异的影响。
 - 对于不同的智能体框架（OpenHands CodeActAgent、SWE-Agent、AgentLab），根据其评估重点使用了不同的数据子集（非网页部分或仅网页部分），以确保训练数据与评估任务的相关性。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__language_speech_and_dialog__b001_tG6301ORHd_Agent_Data_Pr/figures/002_Table_1.jpg]]
 *Table 1: Overview of Existing Agent Training Datasets. C=Coding, S=Software Engineering, T=API/Tool Use, W=Web Browsing.*
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__language_speech_and_dialog__b001_tG6301ORHd_Agent_Data_Pr/figures/004_Table_2.jpg]]
 *Table 2: Dataset Stats and Trajectory Analysis. A=APIAction, C=CodeAction, M=MessageAction.*
-
-
 
 ## 定位与知识库关联
 
@@ -221,8 +207,6 @@ ADP 的局限性包括：
 - 对于网页浏览任务，标准化可能带来信息损失
 
 Table 11 列出了 ADP 所用数据集的许可信息：
-
-
 
 ## 原文 PDF
 

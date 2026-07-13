@@ -52,8 +52,6 @@ claims:
 
 同时，本文贡献了新的**预测mAP指标**，将检测与预测性能联合评估，按静态、线性运动、非线性运动三个子类取平均，有效防止了指标被忽略移动物体的简单模型所欺骗。这一指标设计为端到端预测任务的公平比较奠定了基础。
 
-
-
 自动驾驶系统的安全运行依赖于对周围场景未来演变的准确预测。传统方法将这一任务拆解为检测、跟踪与预测三个独立阶段，形成级联流水线。然而，这种分阶段范式存在一个根本性缺陷：每个子模块都错误地假设其输入是完美的，导致误差在流水线中逐级累积放大（Figure 1a）。例如，检测器的漏检或定位偏差会直接污染跟踪结果，进而使基于跟踪轨迹的预测模型产生严重偏离。
 
 为克服这一问题，近年来的研究开始探索端到端的预测范式——直接从原始LiDAR传感器数据出发，绕过显式的跟踪步骤，将检测与预测统一在一个可学习框架中（Figure 1b）。代表性工作包括**FaF**（Luo et al., CVPR 2018），它在当前帧检测物体的同时，通过预测速度场来前向推演未来位置。然而，这类端到端方法仍然面临一个核心瓶颈：**它们通常只能输出单一确定性的未来轨迹，无法推理真实场景中固有的多模态未来分布**。一辆车在路口可能直行、转弯或停车，而现有端到端模型缺乏有效机制来表征这种不确定性。
@@ -61,8 +59,6 @@ claims:
 与此同时，传统预测任务的评估指标——平均位移误差（ADE）和终点位移误差（FDE）——本身存在严重缺陷。本文揭示了一个令人警醒的现象：一个极其简单的**恒定位置基线**（仅预测所有物体保持静止）在ADE/FDE指标上竟然能达到甚至超越现有最先进方法的性能（Table 1）。原因在于，ADE/FDE仅在匹配成功的子集上计算误差，不惩罚误报，且真实场景中超过60%的车辆处于静止状态。这意味着，一个忽略所有移动物体的“懒惰”模型可以通过对静止物体的高置信度预测来“作弊”，在传统指标上获得虚高分数。这一发现直接暴露了现有评估体系的脆弱性。
 
 上述双重困境——**端到端方法缺乏多未来推理能力**与**传统指标无法公平评估联合检测与预测性能**——构成了本文的核心动机。为此，本文提出了两个关键创新方向：（1）重构预测范式，使模型能够自然地输出多模态未来；（2）设计新的评估指标，将检测质量与预测质量联合考核，从根本上杜绝简单基线的“作弊”空间。
-
-
 
 ## 核心方法与创新机理
 
@@ -102,8 +98,6 @@ FutureDet 的架构基于 CenterPoint 检测器，但 CenterPoint 为所有类�
 
 需要指出，FutureDet 未显式强制生成多样化轨迹，部分多未来预测会聚集在一起（Figure 5），且原始输出包含大量误报需要后处理（Figure 4）。如何鼓励真正的多模态多样性、以及如何在下游任务中有效利用这些带噪声的预测，仍是待解决的开放问题。
 
-
-
 FutureDet 将端到端预测重新定义为**未来物体检测**任务。其核心思想是：给定一段累积的历史 LiDAR 扫描序列，训练一个检测器同时在当前时刻 $t$ 和未来时刻 $t+T$ 检测物体，然后将未来检测结果**回溯**到当前帧，通过多对一匹配自然地捕获多模态未来轨迹。
 
 ### 输入-输出流
@@ -131,12 +125,8 @@ FutureDet 将端到端预测重新定义为**未来物体检测**任务。其核
 - **端到端前向预测**：从当前检测出发，向前预测未来位置，通常只输出单条确定性轨迹。
 - **FutureDet**：在**未来帧**检测物体，再回溯到当前帧建立轨迹。这一“反向”范式使得多对一匹配成为可能，从而以简洁的方式表示多模态未来分布。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l39_https_arxiv_org_abs_2203_16297/figures/001_Figure_1.jpg]]
 *Figure 1: (a) Current stage-wise methods independently address the problems of detection, tracking, and forecasting, allowing for compounding errors in the full pipeline. Each sub-module incorrectly assumes that its input will be perfect, leading to further integration errors. In contrast to current forecasting methods that use object tracks as input, end-to-end forecasting directly from LiDAR sensory data (b) streamlines forecasting pipelines. To this end, we propose FutureDet (c), an end-to-end model capable of forecasting multiple-future trajectories directly from LiDAR via future object detection. We show that our end-to-end pipeline improves upon state-of-the-art three-stage and end-to-end metho...*
-
-
 
 ### 问题形式化
 
@@ -169,8 +159,6 @@ FutureDet 由四个关键模块构成：
 **多时刻检测头**：在共享特征基础上，分别预测当前时刻 $t$ 和未来时刻 $t+T$ 的物体热图和边界框。检测头复用 CenterPoint 架构，但扩展为多时刻输出，使网络在训练时同时学习当前检测和未来检测任务。
 
 **回溯匹配模块**：将未来时刻的检测结果回溯（backcast）到当前帧，与当前帧检测进行匹配。由于一个当前检测可对应多个未来检测，这种多对一匹配自然实现了多模态未来轨迹的表示——每个未来检测代表一种可能的未来状态，无需显式生成模型。
-
-
 
 ## 实验与关键发现
 
@@ -226,11 +214,7 @@ FutureDet 的原始输出包含大量误报检测与预测（Figure 4），需�
 - **Figure 4**：展示原始输出的误检问题，强调后处理的必要性。
 - **Figure 5**：行人预测定性结果，揭示多未来预测缺乏多样性和人群场景下的困难。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l39_https_arxiv_org_abs_2203_16297/figures/003_Table.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -301,8 +285,6 @@ FutureDet的原始输出包含大量误报检测与预测（Figure 4），需要
 5. **非线性运动建模**：当前模型在非线性运动（如转弯、避障）上的预测精度仍有较大提升空间，需要探索专门的机制来捕捉加速度和方向变化。
 
 6. **下游任务适配**：如何设计轻量级后处理模块，在保留多未来多样性的同时有效抑制误报，使FutureDet的输出可直接用于运动规划和决策？
-
-
 
 ## 原文 PDF
 

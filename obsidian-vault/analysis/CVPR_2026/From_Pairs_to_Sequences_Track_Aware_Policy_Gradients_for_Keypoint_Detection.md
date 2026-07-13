@@ -61,8 +61,6 @@ TraqPoint 将关键点检测重新定义为**序列决策问题**，提出端到
 
 在 MegaDepth 相对位姿估计基准上，TraqPoint 以 **AUC@5° = 55.8** 显著超越最强成对训练方法 RDD 的 51.9（+3.9）；在 ScanNet 上同样以 16.6 对 13.7 取得领先（+2.9）。更重要的是，序列化 RL 训练将平均关键点跟踪长度（AKTL）提升 2.3，且消融实验证实 Rank Reward 与 Distinctiveness Reward 各自对匹配精度和跟踪稳定性有不可替代的贡献——去除任一奖励均导致 AUC 和 AKTL 大幅下降。在视觉定位（Aachen Day-Night）、视觉里程计（KITTI）和三维重建（ETH）等序列任务上，TraqPoint 同样展现出全面的性能优势。
 
-
-
 ### 关键点检测：从图像对到序列的范式鸿沟
 
 关键点检测是三维视觉任务（SLAM、SfM、视觉定位）的基础环节，其核心目标是从图像中提取可稳定匹配的稀疏特征点。长期以来，无论是基于手工描述符的方法（如 SIFT）还是基于深度学习的方法（如 **SuperPoint**，DeTone et al., CVPR 2018 Workshops；**ALIKED**，Zhao et al., IEEE TIM 2023），其训练范式都建立在**成对图像匹配**之上：模型学习在两幅图像之间寻找外观相似、几何一致的对应点。
@@ -84,8 +82,6 @@ TraqPoint 将关键点检测重新定义为**序列决策问题**，提出端到
 3. **序列级优化目标**：策略网络不再最大化单对图像的匹配得分，而是最大化整条轨迹上关键点的累积跟踪奖励，从而直接优化长期可跟踪性。
 
 通过这一范式转换，TraqPoint 能够生成在结构显著区域且跨帧高度一致的关键点，从根本上提升下游序列任务（位姿估计、视觉里程计、三维重建）的性能。
-
-
 
 ## 核心方法与创新机理
 
@@ -121,8 +117,6 @@ TraqPoint 设计了由两个互补信号合成的**轨迹感知复合奖励**：
 
 在采样策略上，TraqPoint 提出了**混合采样机制**：结合全局 Top-K 采样（利用当前策略选择高置信度关键点）和网格采样（保证空间覆盖多样性），在利用与探索之间取得平衡。这一设计对于 RL 训练的稳定性至关重要——纯 Top-K 采样容易导致策略过早收敛到局部最优，而网格采样确保了对图像所有区域的充分探索。
 
-
-
 TraqPoint 将关键点检测重新定义为**序列决策问题**，其核心 pipeline 遵循“先描述、后检测”（describe‑then‑detect）的范式，由两条解耦的分支构成：
 
 1. **描述符分支（Descriptor Branch）**：预训练并冻结的特征提取网络，为下游奖励计算提供稳定、一致的描述符信号。该分支采用 DINOv3‑ConvNeXt 作为骨干，通过 Focal Loss 在正对应关系上完成预训练后，参数在整个策略学习阶段保持冻结。
@@ -148,15 +142,8 @@ TraqPoint 将关键点检测重新定义为**序列决策问题**，其核心 pi
 
 > **需要手动核实的细节**：论文未明确说明推理阶段是否仍需描述符分支参与（例如是否在推理时也需计算描述符用于匹配），以及混合采样中全局采样与网格采样的具体比例分配。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2081_https_arxiv_org_abs_2602_20630/figures/002_Figure_2.jpg]]
-*Figure 2: Following the architectural design of RDD [5], we adopt an identical network structure. Specifically, we replace the feature extractor employed in RDD [5] with DINOv3-ConvNeXt [45]. The keypoint branch serves as the policy network (πθ)*
-
 ![[assets/figures/papers/paper_list_l2081_https_arxiv_org_abs_2602_20630/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of our proposed Sequence-Aware Keypoint Policy Learning framework: First, we select a reference frame from the input image sequence and perform hybrid keypoint sampling on it. Next, we leverage geometric mapping to locate the corresponding positions of the reference frame’s keypoints in other frames of the sequence. We then count the number of these keypoints visible across the entire sequence. After that, we compute per-frame rewards for each sampled point and aggregate these into a final track reward. Finally, we update the policy network’s gradients*
-
-
 
 ### 3.1 描述符分支预训练
 
@@ -236,8 +223,6 @@ $$
 - 第二项 $\mathcal{H}(P_{\theta})$ 为空间熵正则化项，防止策略过早收敛到局部最优，$\lambda$ 为权重系数。
 - 第三项 $\mathcal{L}_w$ 为预热损失（warm-up loss），在训练初期使用成对匹配信号辅助策略收敛，$\alpha_t$ 随训练步数衰减。
 
-
-
 ## 实验与关键发现
 
 ### 相对位姿估计
@@ -251,15 +236,9 @@ TraqPoint 在 MegaDepth-1500 和 ScanNet 两个标准相对位姿估计基准上
 
 在 Aachen Day-Night 视觉定位基准上，TraqPoint 在所有日间设置和两个夜间设置中均取得最优召回率（Table 2）。日间场景下，在 0.25m/2° 的最严格阈值下召回率达到 87.9%，比第二名的 85.4% 高出 2.5 个百分点；夜间场景下同样保持领先（85.7% vs. 83.3%）。这表明轨迹感知训练不仅提升了关键点的匹配精度，还增强了其在剧烈光照变化下的长期可跟踪性，直接转化为定位 pipeline 中的召回率增益。
 
-![[assets/figures/papers/paper_list_l2081_https_arxiv_org_abs_2602_20630/figures/005_Table_2.jpg]]
-*Table 2: Visual Localization on Aachen day-night [41]. Best in bold, second best underlined*
-
 ### 视觉里程计
 
 在 KITTI 序列 01-03 的视觉里程计测试中，TraqPoint 在所有指标上均取得最优（Table 3）。以序列 01 为例，TraqPoint 的平均轨迹误差（ATE）为 29.9m，最大轨迹误差（MTE）为 51.4m，均显著低于 RDD（ATE 36.2m，MTE 59.1m）和其他基线。更重要的是，TraqPoint 的平均关键点跟踪长度（AKTL）达到 7.3，比 RDD 的 5.0 提高了 46%，直观体现了“轨迹感知”训练对关键点跨帧持续性的直接改善。序列 02 和 03 上同样呈现一致趋势，AKTL 分别从 RDD 的 2.6/6.4 提升至 3.8/8.7。
-
-![[assets/figures/papers/paper_list_l2081_https_arxiv_org_abs_2602_20630/figures/008_Table_3.jpg]]
-*Table 3: Visual Odometry test results on sequence (01-03) of KITTI [14]. ATE: Average Trajectory Error; MTE: Maximum Trajectory Error; AKTL: Average Keypoint Tracking Length*
 
 ### 3D 重建
 
@@ -292,13 +271,6 @@ Figure 1 和 Figure 4 从多视角重建和特征匹配两个维度提供了直�
 
 ![[assets/figures/papers/paper_list_l2081_https_arxiv_org_abs_2602_20630/figures/001_Figure_1.jpg]]
 *Figure 1: Multi-view reconstruction: Our TraqPoint vs. RDD [5]. Keypoints that successfully generate landmarks are marked in blue. Failed keypoints are marked in red. Our TraqPoint generates more keypoints in structurally significant areas with higher cross-view consistency, yielding more landmarks*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2081_https_arxiv_org_abs_2602_20630/figures/009_Figure_5.jpg]]
-*Figure 5: Ablation study on sequence length and the number of sampled keypoints*
-
-
 
 ## 定位与知识库关联
 
@@ -363,8 +335,6 @@ TraqPoint 采用“describe-then-detect”训练范式：先预训练描述符�
 3. **特征提取器依赖**：TraqPoint 的性能增益部分来自 DINOv3-ConvNeXt 替换 ResNet-50（Table 5 消融显示骨干网络替换贡献了 AUC 从 52.5 到 53.3 的提升），但论文未完全解耦“序列 RL 训练”与“更强骨干网络”各自的贡献比例。这一交互效应值得进一步量化分析。
 
 4. **序列长度与计算开销的权衡**：消融实验表明最优训练序列长度为 5（Figure 5），但更长序列是否能在更大时间跨度上进一步提升跟踪稳定性，同时引入多少计算开销，尚未探索。
-
-
 
 ## 原文 PDF
 

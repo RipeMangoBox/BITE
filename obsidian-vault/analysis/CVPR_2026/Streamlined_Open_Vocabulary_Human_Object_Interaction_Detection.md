@@ -51,8 +51,6 @@ claims:
 
 在 SWiG-HOI 数据集上，SL-HOI 在所有指标上均取得最优，其中 Unseen 类别超过之前最佳方法 **SGC-Net**（Lin et al., CVPR 2025）**6.58%**，Full 类别提升 **7.47%**。在 HICO-DET 开放词汇设定下，无目标检测预训练的方法中，SL-HOI 在 Unseen/Seen/Full 上分别超过次优方法 **17.26%/14.65%/15.27%**。消融实验证实，Semantic Bootstrapping 和 Hierarchical Refinement 各自带来显著且稳定的增益，且冻结全部 DINOv3 参数的训练策略优于部分微调或 LoRA。
 
-
-
 ### 开放词汇人-物交互检测的核心挑战
 
 人-物交互（Human-Object Interaction, HOI）检测旨在从图像中同时定位“人-物”对并识别其交互关系（如“人骑马”）。传统 HOI 检测受限于封闭词汇设定，即训练和测试共享固定的交互类别集合，无法泛化到未见过的交互组合。开放词汇 HOI 检测的提出正是为了解决这一局限——模型需要在训练时从未见过的交互类别上也能做出正确预测。
@@ -78,8 +76,6 @@ claims:
 - **视觉头的注意力是全局的**，聚合丰富的语义上下文关系，天然适合交互分类。
 
 这一观察揭示了一个被先前工作忽视的可能性：**无需引入额外的 VLM，仅凭 DINOv3 自身组件的互补特性，即可在一个冻结的统一框架内同时满足定位与分类的需求**。基于此，本文提出 SL-HOI——一个完全基于冻结 DINOv3 的精简开放词汇 HOI 检测框架，通过语义引导（Semantic Bootstrapping）与层次细化（Hierarchical Refinement）两个轻量级机制，无缝衔接骨干的定位能力与视觉头的语义理解能力，从根本上消除了多模型协作带来的表示鸿沟与结构冗余。
-
-
 
 ## 核心方法与创新机理
 
@@ -121,8 +117,6 @@ SL-HOI 相对于强基线（Late Fusion 架构，类似 HOICLIP 的交互分类�
 
 SL-HOI 的创新不在于引入新的模块类型，而在于**对现有 DINOv3 组件能力的重新编排与衔接**。其核心洞察是：骨干与视觉头之间天然存在“局部-全局”的注意力分工，仅需通过 Semantic Bootstrapping 将交互查询插入视觉头的自注意力流，再以极轻量的可学习交叉注意力进行层次细化，即可无缝桥接两种能力。整个框架仅添加检测适配器、交互查询投影和单层交叉注意力解码器等少量可学习参数，在保持结构精简的同时达到最优的开放词汇 HOI 检测性能——这本质上是一种**表示鸿沟消除机制**，而非简单的特征增强。
 
-
-
 SL-HOI 的整体设计遵循一个核心原则：**在单一冻结的 DINOv3 模型内，利用其不同组件的天然互补性，以极简的架构实现开放词汇人-物交互检测**。整个框架仅包含极少量的可学习参数，无需额外的独立 VLM 或检测器，形成端到端的精简流程。
 
 ### 架构总览
@@ -159,13 +153,6 @@ SL-HOI 的整体设计遵循一个核心原则：**在单一冻结的 DINOv3 模
 该架构的合理性根植于对 DINOv3 内部注意力模式的观察。如 Figure 2 所示，骨干网络最后一层自注意力的关注模式呈现**点状、细粒度**的特征，聚焦于被查询 patch 周围的局部区域，这使其成为实例定位的理想特征源。而文本对齐视觉头的注意力则是**全局性、语义丰富**的，能够聚合来自整张图像的关系上下文信息，天然适合交互分类任务。
 
 SL-HOI 通过冻结整个 DINOv3，完整保留这两种互补能力，并仅通过语义引导和层次细化两个轻量步骤将它们无缝衔接。这种“Local-Global-Local”的交互推理过程（Figure 5）使模型在保持架构精简的同时，实现了从细粒度定位到全局语义理解的平滑过渡。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1080_https_arxiv_org_abs_2603_27500/figures/001_Figure_1.jpg]]
-*Figure 1: An illustration of the dominant architectural paradigms for open-vocabulary HOI detection. (a) VLM-collaborated methods that adopt both a VLM and a conventional HOI detector. (b) VLM-only methods that employ a single VLM for open-vocabulary HOI detection. (c) Our SL-HOI leverages the complementary strengths of DINOv3’s backbone and vision head*
-
-
 
 SL-HOI 的核心创新在于将交互查询与冻结的文本对齐视觉头协同工作，通过两阶段细化机制消除检测与分类之间的表示鸿沟。整个框架围绕冻结的 DINOv3 ViT-L/16 构建，仅引入极少可学习参数，形成三个关键模块。
 
@@ -215,15 +202,11 @@ $$p_{ij} = \frac{\exp(\tau \cdot \cos(\mathbf{e}_r'^{(i)}, \mathbf{e}_t^{(j)}))}
 
 其中 $\mathcal{R}$ 为所有交互类别的集合。与分别计算 CLS 和平均 patch 两个通道相似度再加权求和的方案相比，统一投影策略在实验中表现更优，但其深层原因仍有待进一步探究。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1080_https_arxiv_org_abs_2603_27500/figures/002_Figure_2.jpg]]
 *Figure 2: Visualization of attention maps from the last selfattention block of (a) DINOv3 backbone and (b) dino.txt vision head. The left column shows the original image of a person petting a horse, the middle column displays the attention map, and the right column overlays the attention on the original image. The red dot marks the queried patch located on the person. All other image patch tokens are as keys*
 
 ![[assets/figures/papers/paper_list_l1080_https_arxiv_org_abs_2603_27500/figures/009_Figure_5.jpg]]
 *Figure 5: Visualization of attention maps across the interaction classification stage. The left two are in the self-attention blocks of the frozen head during Semantic Bootstrapping, and the right one is from the cross-attention block in Hierarchical Refinement, illustrating a Local-Global-Local interaction reasoning process*
-
-
 
 ## 实验与关键发现
 
@@ -263,27 +246,8 @@ Figure 2 和 Figure 5 从注意力机制角度为方法设计提供了直观证�
 
 Figure 8 展示了两个典型失败场景。在拥挤场景（如多人围坐餐桌）中，多重重叠的人-物实例增加了分配歧义，模型倾向于检测主导交互（如 sitting at, eating at），而遗漏次要交互。在小目标场景（如滑雪板、雪杖）中，模型可能出现定位偏差——ViT 下采样过程中空间信息的压缩使得细小物体的局部偏移难以区分，导致交互分类错误（如将 holding a snowboard 误判为 wearing a snowboard）。这些失败模式揭示了当前方法在密集场景和小目标条件下的固有局限，也为后续改进指明了方向：引入多尺度特征或可学习的位置编码可能在不显著增加复杂度的前提下增强鲁棒性。
 
-![[assets/figures/papers/paper_list_l1080_https_arxiv_org_abs_2603_27500/figures/013_Figure_8.jpg]]
-*Figure 8: Representative failure cases. Left: crowded scene where the detected interactions mainly include sitting at and eating at a dining table. Right: small-object detection where the detected interactions mainly include wearing, standing on, holding a snowboard, and wearing, carrying, standing on, holding, riding a skis*
-
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1080_https_arxiv_org_abs_2603_27500/figures/005_Table_1.jpg]]
 *Table 1: Comparison on the SWiG-HOI dataset (mAP %)*
-
-![[assets/figures/papers/paper_list_l1080_https_arxiv_org_abs_2603_27500/figures/004_Table_2.jpg]]
-*Table 2: Comparison on the HICO-DET dataset in the openvocabulary setting (mAP %)*
-
-![[assets/figures/papers/paper_list_l1080_https_arxiv_org_abs_2603_27500/figures/006_Table_3.jpg]]
-*Table 3: Comparison on the HICO-DET dataset in the closed setting (mAP %)*
-
-![[assets/figures/papers/paper_list_l1080_https_arxiv_org_abs_2603_27500/figures/014_Table_6.jpg]]
-*Table 6: Comparison of training recipes on the SWiG-HOI dataset (mAP %)*
-
-![[assets/figures/papers/paper_list_l1080_https_arxiv_org_abs_2603_27500/figures/008_Figure_4.jpg]]
-*Figure 4: Ablation studies on the number of encoder layers in the detection adapter on the SWiG-HOI dataset (mAP %)*
-
-
 
 ## 定位与知识库关联
 
@@ -335,8 +299,6 @@ SL-HOI 的核心突破在于**在同一冻结模型内部完成表示对齐**，
 3. **小目标鲁棒性**：能否通过引入多尺度特征金字塔或可学习的位置编码增强小目标定位，而不显著增加复杂度？
 4. **文本编码器的影响**：当前使用 dino.txt 的文本编码器，若替换为更强的文本编码器或优化提示模板，交互分类性能的提升空间有多大？
 5. **扩展到其他任务**：该“骨干定位 + 视觉头语义引导”的架构范式能否推广到其他需要细粒度定位与开放词汇语义理解的视觉任务？
-
-
 
 ## 原文 PDF
 

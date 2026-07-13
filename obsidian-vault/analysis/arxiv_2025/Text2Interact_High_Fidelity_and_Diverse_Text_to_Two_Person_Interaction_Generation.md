@@ -53,8 +53,6 @@ claims:
 
 在 InterHuman 测试集上，InterActor 取得了最优的文本-运动匹配精度（R-Precision Top-1 达 0.483，较先前最佳 InterMask 提升 3.4 个百分点）。合成数据微调进一步将 FID 从 5.701 降至 5.191，51 人用户研究证实其在分布外文本上的泛化优势。消融实验表明，移除词级条件化、自适应交互损失或合成数据微调均导致性能显著退化，验证了各组件的独立贡献。
 
-
-
 ### 问题定义与核心挑战
 
 从文本生成双人交互运动（text-to-interaction generation）要求同时合成两个角色的运动序列，且运动必须满足三个条件：语义上与输入文本对齐、时间上同步协调、空间上物理合理（例如握手时手部应紧密接触）。该任务可形式化为：给定文本提示 $\boldsymbol{x} = (x_1, \dots, x_T)$，生成双人运动序列 $\mathbf{X} = [\mathbf{x}_1, \mathbf{x}_2] \in \mathbb{R}^{2 \times T \times N \times 3}$，其中每个角色在每帧的运动状态表示为 $\mathbf{x}_i^{(t)} = [\mathbf{j}_g^p, \mathbf{j}_g^v, \mathbf{j}^r, \mathbf{c}_f]$，分别对应全局关节位置、速度、局部旋转和脚部接触标签。
@@ -88,8 +86,6 @@ claims:
 - **InterActor**：一个词级条件化的双人交互生成模型。通过词级交叉注意力将 CLIP 词 token 直接注入运动 token，保留发起、响应、接触顺序等细粒度线索；同时引入自适应交互损失——以真实关节距离的倒数加权距离误差（$\mathcal{L}_{\mathrm{AdaInteract}} = \sum_{i=1}^{N} \sum_{j=1}^{N} \frac{1}{d_{ij} + \epsilon} \| d_{ij} - \hat{d}_{ij} \|_2$），使模型更关注近距离交互关节对的物理合理性，而非对所有关节对等权重惩罚。
 
 这一“数据扩充 + 精细条件化”的组合策略，将双人交互生成从句子级语义匹配推进到词级时空对齐，同时通过合成数据微调显著提升了分布外泛化能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -138,8 +134,6 @@ InterHuman 数据集虽为双人交互生成提供了重要基准，但其规模
 
 Text2Interact 的四项 changed slots 形成互补闭环：InterCompose 提供规模化的训练数据，词级条件化捕获细粒度文本语义，自适应交互损失强化物理合理性，交替架构实现角色间协调。三者协同使模型在 R-Precision 三项指标上全面超越 InterMask（Table 1），同时保持有竞争力的 FID（5.191 vs 5.154，差距在置信区间内）。
 
-
-
 Text2Interact 由两个协同工作的核心组件构成：**InterCompose**（可扩展的合成数据管道）与 **InterActor**（词级条件化的双人交互生成模型）。两者形成“数据增强—精细生成”的闭环——InterCompose 为 InterActor 提供高质量、多样化的合成训练样本，InterActor 则通过细粒度文本条件化和自适应交互损失实现语义忠实且物理合理的双人运动生成。
 
 ### 系统输入与输出
@@ -173,8 +167,6 @@ $$\mathcal{L}_{\mathrm{AdaInteract}} = \sum_{i=1}^{N} \sum_{j=1}^{N} \frac{1}{d_
 ### 训练与微调流程
 
 InterActor 首先在 InterHuman 数据集上从零训练（200,000 步，8 块 A100 GPU，学习率 $5\times10^{-5}$，批次大小 16，AdamW 优化器，余弦学习率调度，1,000 步预热，扩散步数 1,000，余弦噪声调度）。随后，使用经 InterCompose 合成并通过双阶段过滤的高质量样本进行微调，进一步降低 FID（从 5.701 降至 5.191）并保持 R-Precision，同时显著提升在分布外文本上的泛化能力（51 人用户研究验证）。
-
-
 
 Text2Interact 框架由两个核心组件构成：**InterCompose**（可扩展的合成数据管道）与 **InterActor**（词级条件化的双人交互生成器）。以下重点拆解 InterActor 的关键模块与核心公式。
 
@@ -243,15 +235,8 @@ InterCompose 并非单一公式，而是一个多阶段管道，其核心模块�
 
 词级条件化解决**文本-运动对齐的粒度瓶颈**，自适应交互损失解决**交互物理合理性的监督稀疏问题**，InterCompose 合成数据解决**训练数据覆盖不足**。三者协同：词级注意力使模型能利用合成数据中的细粒度文本线索，自适应损失则确保合成样本中的新颖交互模式得到恰当的几何监督。消融实验（Table 3）证实，移除任一组件均导致性能显著退化，三者叠加效果最优。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1696_Text2Interact_High_Fidelity_and_Diverse_Text_to_Two_Person_Interaction_G/figures/010_Figure_7.jpg]]
 *Figure 7: Illustration of the Word-Level Conditioning Block*
-
-![[assets/figures/papers/paper_list_l1696_Text2Interact_High_Fidelity_and_Diverse_Text_to_Two_Person_Interaction_G/figures/011_Figure_8.jpg]]
-*Figure 8: Illustration of the Self-Attention module in the Motion-Motion Interaction Block*
-
-
 
 ## 实验与关键发现
 
@@ -302,12 +287,8 @@ Table 3 的消融实验量化了三个核心组件的独立贡献：
 - **Figure 5**：用户研究验证了合成数据微调在分布外文本上的泛化收益。
 - **Table 3**：消融实验确认词级条件化、自适应交互损失和合成数据微调三者均为性能的关键支撑，缺一不可。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1696_Text2Interact_High_Fidelity_and_Diverse_Text_to_Two_Person_Interaction_G/figures/007_Figure_6.jpg]]
 *Figure 6: Comparison of motion generation results using InterCompose and InterActor, (a) without filtering, and (b) with filtering. The motion quality and text-motion matching of InterCompose surpass InterActor only after filtering. s*
-
-
 
 ## 定位与知识库关联
 
@@ -381,8 +362,6 @@ InterCompose 的数据合成策略在方法论上区别于简单的数据增强�
 3. **多人交互扩展**：将框架从双人推广到多人场景，需要解决角色数量可变、交互图结构建模等新挑战。
 4. **实时交互生成**：当前扩散模型需要 1000 步去噪，推理速度有限。如何结合蒸馏或一致性模型实现实时交互运动生成，是实际部署的关键问题。
 5. **细粒度交互控制**：词级条件化已提供了一定程度的细粒度控制，但如何实现关节级或接触点级的精确空间约束，仍是一个开放方向。
-
-
 
 ## 原文 PDF
 

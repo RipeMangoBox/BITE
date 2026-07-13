@@ -53,8 +53,6 @@ claims:
 
 **主要结果**：在 KITTI 驾驶场景数据集上，Meta-Sim2 无监督地恢复了与真实标注几乎完全一致的车辆数量分布；相较于仅学习参数的 Meta-Sim，生成数据的 FID 从 111.6 降至 99.7，下游目标检测器的 AP@0.5 在三个难度级别上分别提升了 0.5/0.7/0.4 个百分点。即使从一个极简的人工先验出发，学习方法仍能达到与精心调优先验相近的性能，验证了方法的鲁棒性和对人工设计的低依赖性。
 
-
-
 合成数据生成在计算机视觉领域扮演着日益关键的角色，其核心优势在于能够以极低成本产生大量带精确标注的训练样本。然而，合成数据与真实数据之间的分布差距始终是制约下游任务性能的瓶颈。现有工作主要关注场景**参数**的学习——例如物体在场景中的位置、朝向、尺寸等连续变量——但对于场景**结构**的生成，仍然严重依赖人工设计的先验。
 
 **Meta-Sim**（Kar et al., ICCV 2019）是这一方向的代表性工作，它通过概率场景语法（Probabilistic Scene Grammar）定义场景的合法结构空间，并学习场景参数的分布。然而，其场景结构本身仍从人工编写的上下文无关语法中直接采样，这意味着生成场景中物体的类别分布、共现模式、数量统计等离散结构特性完全由人的先验知识决定，无法根据目标数据域自动调整。
@@ -64,8 +62,6 @@ claims:
 因此，**核心瓶颈**在于：如何使合成数据的生成过程能够**无监督地从真实图像中学习场景的结构分布**，从而自动匹配目标域的离散结构统计特性，而无需昂贵的人工标注或反复的先验调优。
 
 Meta-Sim2 正是在这一背景下提出。其核心动机是将场景图生成建模为从概率语法中**自回归采样规则**的过程，并通过强化学习训练该采样器，使生成的场景结构在特征空间上与真实数据分布对齐。关键在于，该方法设计了一种**每样本可计算的特征空间散度**（基于反向 KL 散度），解决了离散序列生成中难以进行信用分配（credit assignment）的问题，从而使得无监督的强化学习能够成功捕捉真实图像中的结构规律。
-
-
 
 ## 核心方法与创新机理
 
@@ -88,8 +84,6 @@ $$\nabla_{\theta} \mathcal{L} \approx \frac{1}{M} \sum_{j=1}^{m} (\log \tilde{q}
 **创新效果的实证支撑**
 
 从极简结构先验（极少人工干预）出发，Meta‑Sim2 几乎完全恢复了 KITTI 数据集中车辆数量的结构分布，与真实标注分布高度一致。在 KITTI 验证集上，目标检测器 AP@0.5 较 Meta‑Sim 有所提升（Easy: 67.0 vs 66.5），生成数据的 FID 从 111.6 降至 99.7，KID 从 0.072 降至 0.054，表明结构学习有效缩小了合成数据与真实数据之间的分布差距。
-
-
 
 Meta-Sim2 的整体 pipeline 围绕“从真实图像中无监督地学习场景结构”这一核心目标构建，其输入是真实图像数据集 $X_R$，输出是能够生成与目标域结构分布匹配的合成数据 $D(\theta) = (X(\theta), Y(\theta))$（即合成图像与对应标注）的生成模型。整个系统由五个关键模块串联而成，形成一个“采样—构造—参数化—渲染—匹配反馈”的闭环。
 
@@ -116,8 +110,6 @@ $$\min_{\theta} \mathbb{E}_{v \sim q_I}\big[\log q_f(\varphi(v)) - \log p_f(\var
 ### 关键设计决策
 
 整个框架的核心设计决策在于**将场景结构生成建模为从概率语法中自回归采样的过程**，而非沿用 Meta-Sim 中直接从人工先验采样固定结构的方式。这一改变使得离散的结构分布成为可学习的对象。与之配套的**每样本特征空间散度**（而非批次级别的 MMD）为 REINFORCE 提供了清晰的信用分配信号，使模型能够捕捉上下文相关的结构统计特性（如不同道路上车辆数量的差异）。
-
-
 
 ### 场景图生成管线
 
@@ -171,8 +163,6 @@ $$\nabla_{\theta} \mathcal{L}^s \approx 10^{-2} \left( \frac{1}{M} \sum_{j=1}^{m
 
 其中上标 $s$ 表示按场景缩放，整体梯度被乘以 $10^{-2}$ 的缩放因子以稳定训练。
 
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -213,8 +203,6 @@ Meta-Sim2 在 KITTI 验证集上进行了端到端评估，使用 Mask-RCNN（Re
 
 4. **sim-to-real 差距依然显著。** 尽管结构学习缩小了分布差距，但在合成数据上训练的检测器与在全部真实数据上训练的检测器之间仍存在约 15-18 个百分点的 AP 差距，实际部署仍需额外的域适应方法。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l43_https_arxiv_org_abs_2008_09092/figures/004_Figure_4.jpg]]
 *Figure 4: Prior (Left) and Validation (Right) example for MultiMNIST experiments*
 
@@ -226,16 +214,11 @@ Meta-Sim2 在 KITTI 验证集上进行了端到端评估，使用 Mask-RCNN（Re
 ![[assets/figures/papers/paper_list_l43_https_arxiv_org_abs_2008_09092/figures/015_Figure_12.jpg]]
 *Figure 12: Random generated samples from the simple prior experiment. (Left) Using both the structure and parameter prior, (Middle) Using our learnt structure and parameters and (Right) random KITTI images Note: images in the same row are not correlated*
 
-![[assets/figures/papers/paper_list_l43_https_arxiv_org_abs_2008_09092/figures/013_Table_1.jpg]]
-*Table 1: AP@0.5 on KITTI-val and distribution similarity metrics between generated synthetic data and KITTI-train. Learnt parameters are used from [30]. *Results from [30] are our reproduced numbers, and we show learning the structure additionally helps close the distribution gap and improves downstream task performance*
-
 ![[assets/figures/papers/paper_list_l43_https_arxiv_org_abs_2008_09092/figures/014_Table_2.jpg]]
 *Table 2: Repeat of experiments in Tab. 1 with a *simple prior on the scene structure. Parameters are learnt using [30]. We observe a significant boost in both task performance and distribution similarity metrics, by learning the structure and parameters*
 
 ![[assets/figures/papers/paper_list_l43_https_arxiv_org_abs_2008_09092/figures/008_Figure_8.jpg]]
 *Figure 8: #cars distribution learned in the Aerial 2D experiment. We can learn context dependent relationships, placing different number of cars on different roads*
-
-
 
 ## 定位与知识库关联
 
@@ -280,8 +263,6 @@ Meta-Sim2 的有效性建立在以下前提之上，这些前提也划定了其�
 - **渐进式训练策略的设计空间**：论文提到预训练是必要的，但未系统探索渐进式训练策略（如先学习简单场景结构再逐步增加复杂度）与域随机化之间的权衡。这类策略可能对处理更复杂的场景语法尤为重要。
 - **特征空间的选择原则**：分布匹配对特征提取器的选择敏感，但目前缺乏系统性的指导原则。针对特定任务（如目标检测）微调的特征空间是否优于通用预训练特征，以及如何设计对结构信息更敏感的表示，仍有待研究。
 - **与判别式数据增强的关系**：Meta-Sim2 从生成式角度解决合成数据问题，但现代数据增强方法（如 Copy-Paste、MixUp 等）也能有效改善目标检测的鲁棒性。两种范式的互补性及其在不同数据稀缺程度下的相对优势尚未被分析。
-
-
 
 ## 原文 PDF
 

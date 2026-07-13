@@ -54,8 +54,6 @@ claims:
 
 **主要结果**：在合成数据集上，Energy-GS的渲染质量（PSNR）和位姿估计误差（旋转角、绝对轨迹误差）均优于对比方法。消融实验表明，仅添加可学习位姿而不做任何改进时PSNR仅8.08；加入梯度流设计提升至12.38；进一步加入能量控制后提升至24.12，旋转误差从8.572°降至1.065°。1D信号对齐等效实验中，完整方法将平移误差降至0.0001，渲染PSNR达63.17，验证了梯度流重塑与能量策略的协同有效性。
 
-
-
 ### 3DGS 联合优化位姿的核心瓶颈
 
 三维高斯溅射（3D Gaussian Splatting, 3DGS）在已知精确相机位姿的条件下，已展现出高质量、实时的新视角合成能力（Kerbl et al., SIGGRAPH 2023）。然而，在实际采集场景中，通过运动恢复结构（SfM）获得的初始位姿往往含有不可忽略的噪声。将位姿作为可学习变量与场景表示进行联合优化，是解决这一问题的自然思路。
@@ -94,8 +92,6 @@ $$
 2. **渐进对齐机制**：需要为 3DGS 引入一种模拟由粗到精的渐进式监督策略，使其能够先对齐低频结构、再逐步细化高频细节，从而规避多壳现象，稳定收敛至全局最优位姿。
 
 Energy-GS 正是围绕这两个缺口展开设计：通过固定基元位置、延迟密度化、以及基于固定瓦片尺寸的图元选择，重塑位姿梯度流；同时，利用图像 SVD 能量分解，从低能量（低频结构）到高能量（高频细节）渐进式地提供监督信号，实现稳定的粗到细位姿对齐。
-
-
 
 ## 核心方法与创新机理
 
@@ -160,8 +156,6 @@ $$I_E(\alpha) = (\omega(\alpha) \cdot U_{lv}) \cdot (\omega(\alpha) \cdot \Sigma
 
 > **证据强度评估**：上述创新点的有效性在 1D 信号对齐和 3D 场景两个层面均得到了消融实验的定量验证，证据置信度高（0.90–0.95）。方法在合成数据集上取得了所有对比方法中最优的位姿估计精度（Table 3），进一步支持了创新设计的有效性。
 
-
-
 Energy-GS 提出了一套仅依赖 RGB 图像的联合优化框架，同时估计 3D 高斯溅射场景表征与相机位姿。其核心设计围绕一个关键瓶颈展开：**3DGS 的点基渲染导致位姿梯度不稳定，且缺少体积渲染中的空间采样机制，无法实现由粗到精的渐进对齐**，使联合优化极易陷入局部极小值。
 
 图 2 展示了整体流程，可分解为五个串联的功能模块：
@@ -179,15 +173,8 @@ Energy-GS 提出了一套仅依赖 RGB 图像的联合优化框架，同时估�
 
 Figure 3 通过对比 3DGS 与 NeRF 在两个连续训练步上的位姿梯度更新，直观揭示了问题根源：原始 3DGS 中高斯原语位置在训练中动态调整，导致对相机位姿梯度有贡献的图元集合不断变化，产生不可预测的位姿漂移；而 NeRF 使用全局唯一的 MLP 表征场景，天然避免了这种不稳定。Energy-GS 通过固定位置与稳定图元选择，使 3DGS 的位姿梯度流在数值上达到与 NeRF 相当的稳定性，为后续能量渐进策略的有效性奠定了基础。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2078_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_Energy_GS_Image_En/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed method. First, Energy-GS starts from imperfect camera poses and randomly initialized Gaussian primitives with fixed, non-learnable positions. Second, the poses are parameterized into learnable variables, and our proposed densification strategy is applied to the Gaussian primitives. Then, benefiting from the fixed positions and the densification, we are able to establish a stable set of primitives for each rendered tile, which ensures the stability of camera pose gradients during joint optimization. Next, the proposed image energy control strategy decomposes and suppresses specific energy components in the multi-view images to generate target energy images. Finally,...*
-
-![[assets/figures/papers/paper_list_l2078_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_Energy_GS_Image_En/figures/001_Figure_1.jpg]]
-*Figure 1: Comparison of scene rendering and camera pose estimation. We introduce Energy-GS, a novel joint optimization framework for 3D Gaussian Splatting and camera pose refinement. The method achieves stable, coarse-to-fine scene reconstruction and pose optimization by redesigning the pose gradient flow and introducing an image energy-based progressive alignment strategy. Compared to other joint optimization methods that directly rely on full-energy RGB supervision, our approach attains competitive results in both rendering quality and pose accuracy*
-
-
 
 ### 3DGS与NeRF的位姿梯度差异
 
@@ -268,26 +255,13 @@ $\alpha$ 随优化进度从0增长至1，逐步释放高频能量。$lv=1$ 的�
 ![[assets/figures/papers/paper_list_l2078_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_Energy_GS_Image_En/figures/004_Figure_4.jpg]]
 *Figure 4: Visualization of the equivalent dimensionality-reduction task and 1D signal alignment results. The left part shows that alphablending can be abstracted as a differentiable compositing operator that maps a set of Gaussians to values at query locations. Applied pointwise, the same operator can compose 2D patches and 1D signals. Correspondingly, the alignment variables reduce from 3D camera pose to 2D patch transforms and 1D signal shifts. For 1D alignment, we crop two overlapping segments from the full signal (analogous to a co-visible region in a 3D scene) and treat their locations as ground-truth. Joint optimization then reconstructs each segment while recovering its position to match the g...*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2078_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_Energy_GS_Image_En/figures/003_Figure_3.jpg]]
-*Figure 3: Comparison of pose gradients between 3DGS and NeRF over two consecutive training steps. The left side shows the pose gradient updates of the original 3DGS. Since the positions of Gaussian primitives are adjusted during training, the set of primitives contributing to the camera pose gradient changes dynamically, resulting in unpredictable camera pose shifts. In contrast, NeRF employs a globally unique MLP to represent the scene, which avoids unstable gradient changes*
-
-
-
 ## 实验与关键发现
 
 ### 核心实验设计
 
 本文通过在合成数据集（Synthetic NeRF）与真实捕获数据集（MipNeRF360）上，与基于 NeRF 的联合优化方法 **BARF**（Lin et al., ICCV 2021）、**SC-NeRF**（Jeong et al., ICCV 2021），以及基于 3DGS 的联合优化方法 **CF-GS**（Fu et al., CVPR 2024）、**3R-GS**（Huang et al., 2025）进行对比，验证 Energy-GS 在渲染质量与位姿估计精度上的有效性。所有对比方法使用相同随机生成的初始相机位姿噪声，并采用官方开源实现及默认超参数，确保公平性（Table 2 说明）。
 
-![[assets/figures/papers/paper_list_l2078_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_Energy_GS_Image_En/figures/007_Table_2.jpg]]
-*Table 2: Quantitative rendering results of different methods on the datasets. The initial camera pose noise for all methods in the same scene is identical and randomly generated. All results are obtained using the official open-source implementations of the respective methods, without any modification to their default hyperparameters. The full results can be found in the supplementary material*
-
 此外，通过 1D 信号对齐的等效降维实验（Figure 4, Table 1），本文在可控条件下剥离了 3D 场景的复杂性，定量验证了各组件对位姿梯度稳定性与收敛性的独立贡献。
-
-![[assets/figures/papers/paper_list_l2078_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_Energy_GS_Image_En/figures/005_Table_1.jpg]]
-*Table 1: Rendering quality (PSNR) and shift error (ATE) across four strategies. Signal A is used as a fixed anchor and serves as the position reference. Combining the redesigned gradient flow with the energy strategy (ours) achieves the best overall performance*
 
 ![[assets/figures/papers/paper_list_l2078_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_Energy_GS_Image_En/figures/011_Table_4.jpg]]
 *Table 4: Quantitative results of the ablation study. After incrementally adding each proposed component, we observe consistent improvements in both scene reconstruction and camera pose estimation. The findings in the 3D scenes align with the conclusions drawn from the 1D experiment in Figure. 4, further validating the effectiveness of our proposed method*
@@ -313,9 +287,6 @@ $\alpha$ 随优化进度从0增长至1，逐步释放高频能量。$lv=1$ 的�
 #### 位姿估计精度
 
 在合成数据集上，Energy-GS 的位姿估计误差（旋转角与绝对轨迹误差 ATE）在所有对比方法中最低（Table 3）。这一优势在复杂场景（如 stump）中依然保持，表明能量引导策略有效抑制了联合优化中的局部极小值问题。
-
-![[assets/figures/papers/paper_list_l2078_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_Energy_GS_Image_En/figures/008_Table_3.jpg]]
-*Table 3: Quantitative pose estimation results of different methods on datasets. The full results are shown in the supplementary material*
 
 ---
 
@@ -357,8 +328,6 @@ Figure 7 明确揭示了即便建立了稳定位姿梯度，联合优化仍可�
 
 ![[assets/figures/papers/paper_list_l2078_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_Energy_GS_Image_En/figures/006_Figure_5.jpg]]
 *Figure 5: Comparison on the synthetic dataset. For each scene, we randomly add noise to the ground truth camera poses and employ a joint optimization strategy to reconstruct the 3D scene. The left side shows the rendering results and the jointly optimized poses obtained by different methods, while the right side presents the ground-truth images and the initial camera poses, where blue cameras represent the ground-truth poses and purple cameras denote the poses after joint optimization. The results demonstrate that our method achieves competitive performance in both reconstruction quality and pose estimation accuracy. The full results can be found in the supplementary material*
-
-
 
 ## 定位与知识库关联
 
@@ -406,8 +375,6 @@ Energy-GS 处于 **3DGS 位姿联合优化**这一新兴研究脉络中，其直
 3. **动态场景与时序连续性**：该方法能否扩展至动态场景或在线 SLAM 系统？如何处理时间连续性和计算效率的平衡？
 4. **计算效率优化**：图像 SVD 分解带来的额外计算开销在实际部署中是否可接受？是否存在更高效的替代方案（如小波变换、拉普拉斯金字塔）来实现类似的渐进能量控制？
 5. **多壳现象的深层机理**：Figure 7 可视化的多壳现象揭示了即使梯度流稳定后仍可能陷入局部极小，其深层几何与优化机理尚待进一步理论分析，这可能为设计更鲁棒的优化策略提供指导。
-
-
 
 ## 原文 PDF
 

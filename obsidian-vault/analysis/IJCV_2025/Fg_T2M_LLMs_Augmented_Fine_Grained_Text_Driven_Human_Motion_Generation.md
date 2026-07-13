@@ -52,8 +52,6 @@ claims:
 
 **核心结论**：在 KIT-ML 数据集上，Fg-T2M++ 的 FID 达到 0.135，较 Fg-T2M 的 0.571 降低 0.436；MM-Dist 从 3.114 降至 2.696。在 HumanML3D 数据集上，R-Precision Top2 为 0.702、Top3 为 0.801，MultiModal Dist 为 2.925，全面超越现有最优方法。消融实验证实，移除 LLM 语义解析、超文本图卷积或分层融合模块均导致指标显著下降，尤其在长句和罕见文本条件下退化明显。
 
-
-
 **文本驱动的人体动作生成**旨在根据自然语言描述合成逼真的三维人体动作序列，在动画制作、虚拟现实与人机交互等领域具有重要应用价值。该任务的核心挑战在于建立文本语义与人体运动之间的精确映射关系。
 
 近年来，扩散模型与自回归模型在该领域取得了显著进展。然而，现有方法存在一个**关键瓶颈**：它们通常将整个文本提示编码为单一全局表示，未能有效解析文本中关于身体部位的详细语义线索，也无法充分建模词与词之间的句法结构关系。这导致生成的动作往往无法精确捕捉文本指定的细粒度关系——例如，“左手举起的同时右脚向前迈步”这类涉及多部位协调的复杂描述。
@@ -67,8 +65,6 @@ claims:
 3. **多模态融合粗糙**：文本特征与运动特征的交互通常仅通过简单拼接或单级交叉注意力实现，缺乏从全局语义到局部细节的渐进式融合机制。
 
 针对上述缺口，**Fg-T2M++** 提出了一套系统性的解决方案：利用大语言模型（LLM）将文本提示解析为六个身体部位的细粒度运动描述及词性语义，通过双曲空间中的超文本图卷积编码句法层次结构，并在条件扩散框架内实现由粗到精的多模态分层融合。该方法在HumanML3D和KIT-ML两个基准数据集上均取得了最优性能，尤其在长句和罕见文本条件下展现出显著优势。
-
-
 
 ## 核心方法与创新机理
 
@@ -114,8 +110,6 @@ Fg-T2M++ 建立在条件扩散生成范式之上，与以下工作形成明确�
 - **强证据**：定量实验表明，Fg-T2M++ 在 HumanML3D 和 KIT-ML 两个标准数据集上全面超越所有现有方法（Table 1, Table 2）。消融实验（Table 4, Figure 7, Figure 11）系统验证了 LSP、HTP 和 MMF 三个模块的独立贡献，移除任一模块均导致指标显著下降，尤其在长句和罕见文本条件下退化明显。
 - **需注意的局限**：模型在处理超长句子（超过 196 帧对应的时间跨度）时可能遗漏某些特定动作组合（Figure 15），且未能建模人与环境的交互。这些场景下的创新有效性仍需进一步验证。
 
-
-
 ![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2502_05534/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of Fg-T2M++: Given a text prompt c , the reverse denoising process of the diffusion model starts from noisy motion data X _ { T } and produces clean motion data X _ { 0 } . . Initially, the text prompt undergoes LLMs semantic parsing to generate LLMs-parsed fine-grained descriptions. Then, both the text prompt and its parsed descriptions are input into the hyperbolic text representation module, which captures precise representations of text features. Finally, the noisy motion data X _ { t } , along with the two fine-grained text features, are fed into the multi-modal fusion module to obtain the clean motion data X _ { t - 1 } ·*
 
@@ -160,8 +154,6 @@ $$\mathcal{L} = \mathbb{E}\left[\|\mathbf{x}_0 - \epsilon_{\theta}(\mathbf{x}_t,
 ### 关键设计逻辑
 
 整个 pipeline 的核心因果机制在于：**将全身动作生成问题分解为“语义解析 → 句法编码 → 层次融合”三步**。LSP 利用 LLM 的先验知识解决细粒度身体部位语义的提取瓶颈；HTP 在双曲空间中编码依赖解析树，相比欧氏空间能更有效地保留句法层次结构，从而捕捉词间关系；MMF 通过句子级和词级的分层融合，使扩散模型在每一步去噪中都能同时利用全局语义和局部细节。消融实验证实，移除任一模块（LSP、HGC 或交叉感知）均会导致 FID 和 R-Precision 显著恶化（表 4），尤其在长句和稀有文本条件下退化更为明显（图 7、图 10）。
-
-
 
 Fg-T2M++ 在条件扩散框架内集成了三个核心模块，构成“LLM解析→双曲句法编码→分层多模态融合”的级联管线（图2）。整体逆扩散过程建模为：
 
@@ -247,8 +239,6 @@ $$\mathbf{Y} = \operatorname{softmax}(\mathbf{Query}) \mathbf{G}$$
 
 **因果机制总结**：LSP 将文本分解为部位级语义，HTP 在双曲空间编码句法层次并通过交叉感知融合 LLM 解析特征，MMF 以句子级→词级的分层方式将文本条件注入扩散去噪过程。消融实验证实，移除任一模块均导致 FID、R-Precision 和 MM-Dist 显著恶化（表4），尤其在长句和罕见文本条件下退化更为突出（图7、图10）。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能：Fg-T2M++在两大基准上全面刷新最优指标
@@ -257,14 +247,12 @@ Fg-T2M++在HumanML3D和KIT-ML两个标准数据集上均取得最优结果，验
 
 在HumanML3D数据集上，Fg-T2M++的R-Precision Top2达到0.702、Top3达到0.801，MultiModal Dist降至2.925，全面超越包括**MDM**（Tevet et al., ICLR 2023）、**MotionDiffuse**（Zhang et al., TPAMI 2024）、**T2M-GPT**（Zhang et al., CVPR 2023）和**ReMoDiffuse**（Zhang et al., 2023）在内的所有对比方法（Table 1）。在KIT-ML数据集上，Fg-T2M++的FID从作者前工作**Fg-T2M**（Wang et al., ICCV 2023）的0.571大幅降至0.135，降幅达0.436；MM-Dist从3.114降至2.696，降幅0.418（Table 2）。这一性能跃升直接归因于三大模块的协同：LLM语义解析将文本分解为六个身体部位的动作描述，超文本表示在双曲空间中编码句法树的层次结构，多模态分层融合则实现从句子级到词级的逐步精细化控制。
 
-
 ![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2502_05534/figures/007_Table_1.jpg]]
 *Table 1: Quantitative evaluation on the HumanML3D (Guo et al., 2022a) test set. We run all the evaluation 20 times and ± indicates the 95% confidence interval. Red indicates the best result. Table 2: Quantitative evaluation on the KIT-ML (Plappert et al., 2016) test set*
 
 ### 消融实验：每个模块都不可或缺
 
 消融实验在KIT-ML数据集上系统验证了各组件的贡献（Table 4）。移除LLM语义解析模块（LSP）后，模型在稀有文本条件下的FID大幅恶化（Fig. 7），证实LLM的先验知识是处理长尾语义的关键。将超文本图卷积（HGC）替换为标准欧氏空间GCN，R-TOP、FID和MM-Dist三项指标均显著变差（Table 4），双曲空间对句法树层次结构的保真度优势通过特征可视化得到直观印证（Fig. 9）：Fg-T2M++在庞加莱球中嵌入的文本特征呈现出清晰的层次聚类，而欧氏空间投影则丢失了这种结构。移除交叉感知模块或仅使用句子级融合同样导致性能下降（Table 4），表明LLM解析特征与句法特征的互补融合以及词级交互对细粒度控制至关重要。
-
 
 ![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2502_05534/figures/010_Table_4.jpg]]
 *Table 4: Ablation of the proposed components. All results are reported on the KIT-ML (Plappert et al., 2016) test set*
@@ -274,7 +262,6 @@ Fg-T2M++在HumanML3D和KIT-ML两个标准数据集上均取得最优结果，验
 ### LLM版本的影响：GPT-4带来进一步提升
 
 将LLM语义解析模块中的GPT-3.5替换为GPT-4后，R-Precision Top3从0.75提升至0.77，FID从0.73降至0.68，MM-Dist从3.26降至3.15（Table 6）。这表明更强的语言模型能产生更准确的细粒度身体部位描述，从而直接提升运动生成质量。可视化对比（Fig. 22）也显示GPT-4的解析结果在语义准确性和细节丰富度上均优于GPT-3.5。
-
 
 ![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2502_05534/figures/027_Table_6.jpg]]
 *Table 6: The quantitative performance differences between GPT-3.5 and GPT-4*
@@ -286,35 +273,12 @@ Fg-T2M++在HumanML3D和KIT-ML两个标准数据集上均取得最优结果，验
 
 为进一步验证方法在复杂语义条件下的鲁棒性，论文设计了分层难度评估。按文本中细粒度词性（POS）数量将测试样本分为四个难度等级（0-25%至75-100%），Fg-T2M++在所有等级上的MM-Dist均优于对比方法，且在高难度区间优势更为显著（Fig. 6a）。按句子长度分层的R-TOP评估（Fig. 10）显示类似趋势：句子越长，Fg-T2M++相对于基线的提升越大。这表明LLM解析与双曲句法建模的组合策略有效缓解了长文本和复杂语义带来的对齐困难。
 
-
-![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2502_05534/figures/015_Figure_10.jpg]]
-*Figure 10: Evaluation R-TOP based on different sentence lengths on KIT-ML (Plappert et al., 2016) datasets, where higher R-TOP indicates better performance. From 0-25% to 75-100% signifies increasing difficulty levels*
-
 ### 失败模式与局限性
 
 尽管整体性能优越，Fg-T2M++仍存在明确的失败模式。处理长序列复杂动作组合时，模型可能遗漏某些特定动作（Fig. 15中红框标注的错误帧）。当前运动序列长度限制为196帧，无法生成更长时间跨度的连贯运动，也难以建模需要跨动作平滑过渡的场景。此外，模型未涉及人与环境（其他人物、场景物体）的交互建模，这限制了其在复杂场景中的应用。这些局限性指向了三个开放问题：如何扩展序列长度、如何实现动作间平滑过渡、以及如何引入环境交互先验。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2502_05534/figures/005_Figure_5.jpg]]
-*Figure 5: b) Multi-Modal Word-Level Feature Fusions Fig. 5: Illustration of two fusion methods in MMF. a) multi-modal sentence-level feature fusion and b) multi-modal word-level feature fusion*
-
-![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2502_05534/figures/008_Figure_6.jpg]]
-*Figure 6: Fine-Grained Evaluation Experiment Results. a) Evaluation of MM-Dist based on different numbers of fine-grained POSs on KIT-ML datasets (Plappert et al., 2016), where lower MM-Dist indicates better performance. The range from 0-25% to 75-100% signifies increasing difficulty levels. b) User study results on HumanML3D datasets (Guo et al., 2022a). The light blue bars on the left indicate the average voting rankings for each method, with lower rankings being better. The dark blue bars on the right represent the preference rate of Fg-T2M++ compared to other models, with higher values being better*
-
 ![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2502_05534/figures/021_Figure_16.jpg]]
 *Figure 16: Visualization of more text samples’ features in hyperbolic space and Euclidean space. a) Text 1 feature projection of ReMoDiffuse (Zhang et al., 2023b) into Euclidean space. b) Text 1 feature projection of Fg-T2M++ into Euclidean space. c) Text 2 feature projection of ReMoDiffuse (Zhang et al., 2023b) into Euclidean space. d) Text 2 feature projection of Fg-T2M++ into Euclidean space*
-
-![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2502_05534/figures/006_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2502_05534/figures/009_Table_3.jpg]]
-*Table 3: Sample prompts showcasing different amount of fine-grained part-of-speech within the descriptions*
-
-![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2502_05534/figures/020_Table_5.jpg]]
-*Table 5: Comparing the performance in maintaining the hierarchical structure*
-
-
-
 
 ## 定位与知识库关联
 
@@ -354,8 +318,6 @@ Fg-T2M++ 在以下场景展现出显著优势：
 3. 如何有效建模人与环境的交互（其他人物、场景），以拓展至更复杂的应用场景？
 4. 当LLM生成的细粒度描述与真实运动存在歧义或不一致时，如何缓解这种错配？
 5. 能否通过增加任务先验来增强LLM提示，以避免运动解析中的常识性错误？
-
-
 
 ## 原文 PDF
 

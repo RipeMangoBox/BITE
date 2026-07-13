@@ -49,15 +49,11 @@ RNA序列-结构联合设计面临的核心瓶颈是实验结构数据极度稀�
 
 在单RNA从头设计任务上，RiboDiff实现了97.38%的成功率（scRMSD < 5Å），scRMSD为3.43 Å，scTM-score为0.71；相比之下，从头训练的MMDiff成功率为0%，scRMSD为35.7 Å，scTM-score为0.12。在RNA-蛋白质复合物设计任务中，RiboDiff的scRMSD为7.43 Å，scTM-score为0.422，而MMDiff分别为28.4 Å和0.08。在蛋白质条件RNA设计任务中，RiboDiff在GT-RMSD（13.20 vs 16.2）和GT-SeqRec（56.26% vs 28.0%）上均显著优于RNAFlow。消融研究证实：联合扩散（序列和结构同时去噪）学习速度远快于交替扩散（分别去噪），scRMSD在几百步内降至4 Å；不使用预训练先验的训练极不稳定，出现长平台期和高方差；去除全局RMSD损失对性能影响最大（成功率从97.38%降至30.08%），表明其对全局正确折叠至关重要。
 
-
-
 RNA的序列与三维结构共同决定了其生物学功能（如催化、调控、蛋白质相互作用），因此功能性RNA设计需要同时优化序列和结构——即序列-结构联合设计（co-design）。然而，该任务面临一个根本性的瓶颈：**实验测定的RNA结构数据极度稀缺**。与蛋白质结构数据库（PDB）中超过20万个结构条目相比，RNA结构条目仅有数千个，且长度分布不均、构象多样性有限。这种数据稀缺性导致从头训练的生成模型（如基于扩散的MMDiff、基于流匹配的RiboGen）在训练中极不稳定，收敛缓慢且生成质量低下。例如，MMDiff在单RNA设计任务上的成功率为0%，自洽RMSD（scRMSD）高达35.7 Å，几乎无法产生任何有意义的构象（Table 1）。
 
 现有方法的另一个缺口在于，它们将序列生成和结构生成视为分离或弱耦合的过程。两阶段方法（如RNA-FrameFlow生成骨架 + gRNAde逆折叠）先独立生成结构再推断序列，割裂了序列与结构之间的协同约束，导致生成的结构与序列不匹配（scRMSD 17.59 Å，成功率19.34%，Table 10）。而简单的联合扩散（序列和结构同时去噪但无先验）也因缺乏足够的训练信号而失败，scRMSD学习曲线呈现长平台期和高方差，无法收敛到低误差区域（Figure 5）。
 
 本文的动机正是针对上述瓶颈——**能否利用大规模预训练的跨分子结构预测模型所蕴含的先验知识，来弥补RNA结构数据稀缺带来的训练困难，从而实现稳定的序列-结构联合生成？** 核心洞察在于：RoseTTAFold2NA（RF2NA）已经在蛋白质-核酸复合物结构预测任务上学习了丰富的分子间相互作用模式、几何约束和序列-结构对应关系，这些先验知识可以通过微调的方式迁移到生成任务中，避免从头学习带来的数据需求。具体而言，本文提出的RiboDiff将RF2NA的主干网络作为扩散模型的去噪器，仅添加轻量级的扩散输出头（序列logits头、平移噪声头、SO(3)旋转速度头），在联合扩散框架下进行微调。这种设计使得模型在极少的训练步数内就能稳定收敛——联合扩散的scRMSD在几百步内降至4 Å以下，而无预训练先验的联合扩散则停滞在20 Å以上（Figure 5）。这一因果机制——**用预训练先验替代大量训练数据**——构成了RiboDiff的核心创新，使其在单RNA设计上达到97.38%的成功率和3.43 Å的scRMSD，远超所有从头训练的基线。
-
-
 
 ## 核心方法与创新机理
 
@@ -79,8 +75,6 @@ RiboDiff的pipeline由四个模块构成：RF2NA主干网络（提供跨分子�
 
 **需要手动验证的点**：Figure 5的学习曲线虽然提供了联合扩散vs交替扩散vs无预训练先验的对比，但文中未明确说明这些曲线的计算方式（是否在同一随机种子下多次运行取平均），建议手动确认实验设置的公平性。
 
-
-
 ![[assets/figures/papers/iclr26_0003_cpc63YrVWN_A_Joint_Diffusion_Model_with_Pre-Trained_Priors/figures/001_Figure_1.jpg]]
 *Figure 1: (a) Overview of RiboDiff*
 
@@ -100,8 +94,6 @@ RiboDiff 的核心创新在于将预训练的跨分子结构预测模型 RoseTTA
     `L_total = λ_seq * L_seq + λ_str * L_str + λ_rmsd * L_rmsd + λ_geom * L_geom + λ_lj * L_lj`
     其中，`L_rmsd`（全局 RMSD 损失）对保证全局正确折叠至关重要，`L_str`（结构对齐损失）对鲁棒的序列-结构共一致性至关重要。
 7.  **推理增强（SVDD）**：在推理时，引入基于值的推理时重要性采样模块。该模块从 M 个候选状态中选择最优的生成路径，通过权衡奖励和 log 概率来提升生成质量。
-
-
 
 ### 问题形式化与框架构建
 
@@ -181,8 +173,6 @@ $$m^* = \arg\max_m [r^{(m)}(\mathbf{X}_0^{(m)},\mathbf{s}_0^{(m)}|\mathbf{X}_{t-
 
 其中 $r$ 是奖励函数，$\tau$ 是温度参数控制探索-利用平衡。该方法在保持多样性的同时有效提升了生成质量。
 
-
-
 ## 实验与关键发现
 
 ### 主结果
@@ -217,15 +207,11 @@ RiboDiff 在三个 RNA 设计任务上均显著超越了所有从头训练的基
 -   **两阶段方法失效**: 将骨架生成（RF2NA 扩散）与逆折叠（gRNAde）分离的两阶段流水线，性能远低于 RiboDiff 的联合扩散（成功率 19.34% vs 97.38%，scRMSD 17.59 vs 3.43 Å）（Table 10），证明了序列-结构联合建模的必要性。
 -   **计算开销**: 推理时的基于值的强化学习增强（SVDD）虽然有效，但增加了计算成本。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0003_cpc63YrVWN_A_Joint_Diffusion_Model_with_Pre-Trained_Priors/figures/006_Table_4.jpg]]
 *Table 4: Comparison across rewards with and w/o RL-based inference enhancement. We report the average and standard deviation results under M = 1 0*
 
 ![[assets/figures/papers/iclr26_0003_cpc63YrVWN_A_Joint_Diffusion_Model_with_Pre-Trained_Priors/figures/015_Table_5.jpg]]
 *Table 5: Results of more self-consistency and diversity metrics on single RNA, RNA-protein complex, and conditional RNA design (RF2NA pre-training split) tasks. Average value and standard deviation are reported for all metrics*
-
-
 
 ## 定位与知识库关联
 
@@ -262,8 +248,6 @@ RiboDiff 在三种任务上均表现出色：单 RNA 设计（成功率 97.38%�
 6. **统一原子生成模型**：如何扩展到覆盖不同化学物质和界面的统一全局原子生成模型？这需要解决不同分子类型的表示对齐问题。
 
 总体而言，RiboDiff 通过预训练先验注入成功突破了 RNA 结构数据稀缺的瓶颈，但其适用边界受限于界面精度、长 RNA 处理和条件化能力。这些开放问题构成了该领域未来研究的主要方向。
-
-
 
 ## 原文 PDF
 

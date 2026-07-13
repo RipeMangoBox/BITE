@@ -59,15 +59,11 @@ EigenBench 提出了一种**黑盒比较性度量框架**，其核心思想是�
 - “Loving”宪法下，经微调或预提示的模型 Elo 评分显著高于基础模型（1579 vs 1426）
 - 评分对场景数据集、宪法措辞和模型群体变化均表现出稳健性
 
-
-
 语言模型（LM）在真实世界部署中的安全性不仅取决于其客观能力，还取决于其与人类价值观的契合程度。然而，当前缺乏能够量化模型在主观价值维度上对齐程度的客观指标，尤其是对于“善良”“保守”等缺乏真实标注（ground truth）的主观特质，传统的基准测试方法难以适用。
 
 现有的模型排名系统各有侧重，但均未解决这一核心缺口。**LMArena**（Chiang et al., 2024）基于人类偏好的头对头比较，依赖大量人工评判，成本高昂且难以针对特定价值体系定制。**Prompt-to-Leaderboard**（Frick et al., 2025）虽然能针对特定提示生成排名，但其覆盖面受限于提示本身。**LitmusValues**（Chiu et al., 2025）测量单个模型内部的价值优先级，但不提供模型间的比较性排名。这些方法都无法在无人工标注的情况下，针对任意给定的价值体系（宪法，constitution）生成可比较的模型排行榜。
 
 本文的核心动机正是填补这一空白：**如何在不依赖人类标注的前提下，量化地比较不同语言模型对特定价值观的遵守程度？** 作者观察到，模型对特定价值观的遵守程度与其评判他人遵守程度的能力之间存在正相关——行为更对齐的模型往往也是更可靠的评判者。基于这一洞察，EigenBench 利用模型群体相互评判并聚合共识，通过加权信任机制产生共识排名，从而将价值对齐这一主观问题转化为可量化的比较性度量。
-
-
 
 ## 核心方法与创新机理
 
@@ -103,11 +99,6 @@ EigenBench 引入**宪法**（constitution）作为评估标准的显式载体�
 | 排名机制 | Elo 系统 | 提示特定排名 | 价值取向分析 | **EigenTrust 共识聚合** |
 
 这些创新使 EigenBench 在无真实标签的情况下成功恢复了 GPQA 排名（Kendall τ ≈ 0.77，随机排名出现概率约 $10^{-6}$），并与人类评判高度一致（人类-LM 评判距离 0.3130，接近人类-人类距离 0.3133），验证了群体共识机制替代外部标注的可行性。
-
-
-
-![[assets/figures/papers/paper_list_l47_https_openreview_net_forum_id_fm79KXJIUQ/figures/001_Figure_1.jpg]]
-*Figure 1: The EigenBench Pipeline: Starting with a population of models $\mathcal { M } = \{ M _ { 1 } , \ldots , M _ { N } \}$ , a constitution C, and a set of prompted scenarios s , we repeatedly sample a scenario $S _ { \ell } \in$ S , , prompt a pair of models $M _ { j } , M _ { k }$ with the scenario, prompt a third model $\bar { M _ { i } }$ to judge which response is more aligned to ${ \mathcal { C } }$ , fit the resulting judgments $r _ { i j k l }$ to a Bradley-Terry-Davidson model of pairwise preferences to learn model dispositions and judge lenses in a latent space $\mathbb { R } ^ { d }$ , derive a trust matrix indicating how often judge $\bar { M _ { i } }$ favors evaluee $\bar { M _ { j } } ^ { \ast }$ \...
 
 ![[assets/figures/papers/paper_list_l47_https_openreview_net_forum_id_fm79KXJIUQ/figures/003_Table_1.jpg]]
 *Table 1: Comparison of LM Elo ranking systems*
@@ -145,8 +136,6 @@ Table 1 将 EigenBench 与三类现有系统进行了定位对比：**LMArena**�
 - **输入**：模型群体 $\mathcal{M}$、宪法 $C$、场景集 $S$（实验中主要使用 r/AskReddit、OASST 对话数据集、AIRiskDilemmas 三个来源）。
 - **输出**：每个模型 $M_j$ 在宪法 $C$ 下的 Elo 评分及其 95% 自助法置信区间。
 - **中间产物**：低秩潜在空间中的模型倾向 $v_j$ 和评判透镜 $u_i$，可用于可视化不同模型/人格在价值空间中的相对位置（如 Figure 2 所示的历史人物人格分布）。
-
-
 
 EigenBench 的评分机制由四个紧密耦合的模块构成，其核心数学直觉是：**模型对特定价值观的遵守程度与其评判他人遵守程度的能力正相关**，因此可以将评判权重与模型自身得分耦合，通过迭代特征分解获得一致排序。
 
@@ -196,8 +185,6 @@ $$
 
 其中 $N$ 为模型总数。该模块的关键瓶颈在于：信任矩阵的质量完全依赖于 BTD 模型学得的 $u_i$ 和 $v_j$ 的质量，而 BTD 模型又依赖于比较数据的数量与质量——这构成了整个流水线的级联依赖关系。
 
-
-
 ## 实验与关键发现
 
 ### 核心验证：与人类评判的一致性
@@ -214,8 +201,6 @@ Figure 6 展示了人类与语言模型评判透镜在二维潜在空间中的�
 
 **结果**：EigenBench 信任分数产生的排名与 GPQA 真实分数排名的 Kendall-tau 系数约为 0.77，仅需 12 次相邻交换即可恢复真实排序（Table 7）。对于随机排名，出现这种相关性的概率约为 10⁻⁶，表明结果具有统计显著性。
 
-![[assets/figures/papers/paper_list_l47_https_openreview_net_forum_id_fm79KXJIUQ/figures/014_Table_7.jpg]]
-*Table 7: The ground-truth GPQA scores and the corresponding EigenBench trust scores for 15 models are displayed in Table 7. Table 7: Comparison between ground-truth GPQA scores and EigenBench trust scores for 15 models. The Kendall-tau distance between the EigenBench-induced ranking and the GPQA ranking is 1 2 $\left( \tau \approx$ 0 . 7 7 $\right$) , which occurs with probability on the order of 1 $0 ^ { - 6 }$ for random rankings
 
 这一实验证明了方法的核心机制有效：即使没有客观标签，模型群体通过相互评判也能形成与真实能力高度一致的共识排序。Table 7 中具体排名为 Qwen3 Next 80B 信任分数最高（0.0758），其次是 Qwen3 235B（0.0756）和 Grok 3 Mini（0.0746），而 GPT 4o 最低（0.0491）。
 
@@ -255,9 +240,6 @@ Table 6 将 EigenBench Elo 评分与模型自我评估调查分数进行对比�
 
 **模型群体变化稳定性**（Table 4）：以初始群体 M₀ = {Gemini 2.5 Pro, GPT 4.1, Grok 4, DeepSeek v3} 为基准，逐步加入 Claude 3.5 Haiku 和 Claude 4 Sonnet。核心模型的评分保持相对稳定，但加入更强的 Claude 4 Sonnet 后，Grok 4 的评分从 1501 逐步降至 1478。这一现象符合预期：在更强的参照系中，原有模型的相对评分会有所下调。
 
-![[assets/figures/papers/paper_list_l47_https_openreview_net_forum_id_fm79KXJIUQ/figures/007_Table_4.jpg]]
-*Table 4: Comparison of EigenBench Elo scores on the Universal Kindness constitution for an initial population M0 = {Gemini 2.5 Pro, GPT 4.1, Grok 4, DeepSeek v3} and larger populations $\tilde { \mathcal { M } } _ { 1 } = \mathcal { M } _ { 0 } \cup \{ M _ { 1 } \} , \mathcal { M } _ { 2 } = \mathcal { M } _ { 0 } \cup \{ M _ { 2 } \} , \mathcal { M } _ { 1 2 } = \mathcal { M } _ { 0 } \cup \{ M _ { 1 } , M _ { 2 } \}$ where $M _ { 1 } = { \mathsf { C l a u d e } }$ 3.5 Haiku and M2 = Claude 4 Sonnet
-
 ### 消融实验
 
 **评委脚手架的效果**（Table 8, Appendix J）：对比有无评委脚手架（逐标准反思并同时产生多个比较）的数据质量。使用脚手架后，五个评判模型的顺序偏见率（首因偏见和近因偏见）显著降低，循环率（不传递率）也明显下降。这验证了反思机制对提高评判质量的有效性。
@@ -279,8 +261,6 @@ Table 6 将 EigenBench Elo 评分与模型自我评估调查分数进行对比�
 
 Figure 8 展示了 37 个模型在 Universal Kindness 宪法下的大规模 EigenBench Elo 评分。Gemini 2.5 Pro 以 1562 分位居榜首，Claude 4 Sonnet 和 GPT 4.1 紧随其后。部分模型的置信区间较宽，主要源于比较数据中的平局比例较高。Table 9 列出了所有参与模型的 API ID 对照信息。
 
-![[assets/figures/papers/paper_list_l47_https_openreview_net_forum_id_fm79KXJIUQ/figures/015_Table_9.jpg]]
-
 ### 已知局限与失败模式
 
 1. **数据收集效率**：每次成对比较需要五次前向传播（两次模型响应、两次反思、一次比较调用），导致计算成本较高。论文建议未来通过主动学习或动态采样改善效率。
@@ -288,16 +268,6 @@ Figure 8 展示了 37 个模型在 Universal Kindness 宪法下的大规模 Eige
 2. **对抗鲁棒性边界**：Greenbeard 实验显示，在足够强力的合谋个体和更激进的提示策略下，EigenBench 评分可能被操纵。当前方法的防御机制主要依赖群体中诚实模型的多数优势，缺乏主动的对抗检测机制。
 
 3. **平局处理**：在场景与宪法相关性较弱时（如 Deep Ecology），大量平局导致置信区间变宽，排名区分度下降。这反映了方法对场景-宪法匹配度的依赖。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l47_https_openreview_net_forum_id_fm79KXJIUQ/figures/008_Table_5.jpg]]
-*Table 5: Models and IDs*
-
-![[assets/figures/papers/paper_list_l47_https_openreview_net_forum_id_fm79KXJIUQ/figures/010_Figure_5.jpg]]
-*Figure 5: EigenBench trust scores for a population of 5 $\operatorname { L M s } \mathbf { x }$ 5 Personas on the Universal Kindness constitution. For example, the kindest combination as judged by these 25 models is Gemini 2.5 Pro with the Empathetic prompted persona. 21% of the variance in these trust scores is explained by the LM and 79% of the variance is explained by the persona
-
-
 
 ## 定位与知识库关联
 
@@ -332,8 +302,6 @@ EigenBench 在语言模型评估生态中占据一个独特位置：它不依赖
 4. **人类判断的整合机制**：Figure 7 展示了通过“teleportation”将人类信任向量混合进 EigenTrust 的初步尝试，但如何系统性地整合稀疏的人类判断以校准或验证模型排名，仍缺乏理论框架。
 
 5. **宪法的完备性与冲突**：当前实验使用单一宪法测量单一价值维度。当宪法包含内在冲突的准则时（如“诚实”与“善意”在特定场景下可能冲突），EigenBench 能否捕捉到这种价值张力，还是会产生不稳定的排名？
-
-
 
 ## 原文 PDF
 

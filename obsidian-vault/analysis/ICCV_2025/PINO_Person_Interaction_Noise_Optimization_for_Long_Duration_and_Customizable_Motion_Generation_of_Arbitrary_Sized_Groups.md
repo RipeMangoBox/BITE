@@ -65,8 +65,6 @@ PINO（Person-Interaction Noise Optimization）提出了一种无需额外训练
 
 当前方法的主要局限在于推理效率——每生成一个角色约需1分钟（仅重叠惩罚）至10分钟（全惩罚），难以满足实时应用需求。此外，手部关节数据的缺失导致手部穿透问题尚未完全解决，双人模型基座可能无法捕捉超过两人的高阶交互依赖。开放问题包括：如何加速噪声优化过程、能否扩展基础模型直接支持三人以上交互、如何自动生成合理的成对交互图以减少用户手动设计负担，以及现有评估指标是否充分反映群组交互的自然性和语义一致性。
 
-
-
 ### 多人交互运动生成的核心瓶颈
 
 生成逼真的多人交互运动是计算机视觉与图形学中的基础难题。随着群体规模扩大，现有方法面临两个相互交织的瓶颈：**语义描述能力不足**与**物理约束缺失**。
@@ -84,8 +82,6 @@ PINO（Person-Interaction Noise Optimization）提出了一种无需额外训练
 PINO的核心洞察在于：**复杂的群组交互本质上由较小的、语义相关的成对交互组成，其中角色通过共享人物作为枢纽连接多个交互**。例如，三人合影场景可以分解为“两人摆姿势”和“第三人拍照”两个成对交互，其中被拍摄的两人之一作为枢纽角色连接两个交互。
 
 基于这一洞察，PINO提出了一种无需额外训练的范式：将预训练双人扩散模型作为运动先验，通过**交互分解**将群体生成转化为序列化成对生成问题，并通过**噪声优化**引入物理惩罚来强制执行空间一致性和用户指定的控制约束。这种设计使得方法能够（1）支持任意规模群体的生成，（2）为每对交互提供独立的语义提示，（3）通过可微损失函数实现灵活的用户控制，而无需重新训练基础模型。
-
-
 
 ## 核心方法与创新机理
 
@@ -106,8 +102,6 @@ PINO 的核心创新在于将复杂的多人交互生成问题**重新定义为�
 现有方法对单个角色的空间属性（位置、朝向、速度）控制能力有限。PINO 在噪声优化框架下引入一系列可微分的控制损失函数，包括根节点位置惩罚、运动区域约束、朝向惩罚和相对位置惩罚，使用户能够在生成后灵活指定角色的空间行为，而无需任何额外训练。
 
 这三个创新点形成了协同效应：交互分解使语义控制成为可能，噪声优化为物理约束和用户控制提供了统一的注入接口，而免训练的特性使方法可即插即用地应用于不同的预训练双人扩散模型。
-
-
 
 PINO 的整体框架围绕一个核心思想展开：**将复杂群组交互分解为一系列语义相关的成对交互**，并利用预训练的双人交互扩散模型作为运动先验，通过**噪声优化**逐步组合生成任意规模群体的运动。整个 pipeline 由四个关键模块串联而成，形成“生成—优化—组合—扩展”的闭环。
 
@@ -139,16 +133,6 @@ PINO 的整体框架围绕一个核心思想展开：**将复杂群组交互分�
 - **成对分解策略**：群体交互被建模为相互连接的成对交互图，其中角色通过共享枢纽人物连接多个交互。这一设计使得每对交互可以使用独立的语义提示，解决了单一共享提示难以描述复杂群组交互的瓶颈问题。
 - **噪声优化而非微调**：所有物理惩罚和控制约束均通过优化初始噪声实现，无需重新训练或微调预训练模型。这保证了方法的即插即用特性，且与具体的预训练模型解耦。
 - **物理惩罚体系**：核心惩罚项包括重叠避免惩罚 $\mathcal{L}_{\mathrm{overlap}}$（惩罚根节点间距小于阈值 $\delta$）和时空控制惩罚 $\mathcal{L}_{\mathrm{control}}$（涵盖根位置、移动区域、朝向、相对位置等），总损失为 $\mathcal{L} = \mathcal{L}_{\mathrm{overlap}} + \mathcal{L}_{\mathrm{control}}$。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1770_PINO_Person_Interaction_Noise_Optimization_for_Long_Duration_and_Customi/figures/003_Figure_2.jpg]]
-*Figure 2: Person-Interaction Noise Optimization (PINO). Red marks the already-generated reference motions, whereas purple highlights the elements for the newly added person. A masked diffusion model transforms the latent noise of a new individual, which is guided by a text prompt and reference motion, into an initial motion that is subsequently refined through noise optimization. This process is then repeated for groups of arbitrary size*
-
-![[assets/figures/papers/paper_list_l1770_PINO_Person_Interaction_Noise_Optimization_for_Long_Duration_and_Customi/figures/001_Figure_1.jpg]]
-*Figure 1: Person-Interaction Noise Optimization (PINO) leverages pre-trained two-person interaction diffusion models as motion priors to generate motions of arbitrary-sized groups with the combination of spatiotemporal penalty, prompt switching between pairs, and motion extension. The first example employs penalties to guide humans into the form “CV”, the second generates a pair posing for a photograph, then switches the prompt to generate the cameraman, and the third generates an alternating handshake sequence between three individuals by extending motions while switching the prompt between the two pairs*
-
-
 
 ### 运动表征
 
@@ -225,8 +209,6 @@ $$ \mathbf{x}_t^i \gets \mathbf{m} \odot \hat{\mathbf{x}}^i + (1 - \mathbf{m}) \
 
 同时引入边界加速度惩罚，确保扩展段与已知段的过渡平滑自然。
 
-
-
 ## 实验与关键发现
 
 ### 双人交互：消除重叠与穿透
@@ -274,16 +256,8 @@ PINO 在噪声优化中引入可微分的控制惩罚，支持用户对角色根
 3. **高阶交互依赖**：当前分解策略仅建模成对交互，三人以上的协同行为（如三人同时握手）可能无法精确捕捉。
 4. **用户设计负担**：需手动指定成对交互顺序与提示，对复杂群体场景编排繁琐，缺乏自动化的交互图生成机制。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1770_PINO_Person_Interaction_Noise_Optimization_for_Long_Duration_and_Customi/figures/005_Table_2.jpg]]
 *Table 2: Evaluation of two-person interaction generation while avoiding overlap*
-
-![[assets/figures/papers/paper_list_l1770_PINO_Person_Interaction_Noise_Optimization_for_Long_Duration_and_Customi/figures/004_Table_3.jpg]]
-*Table 3: Evaluation of multi-person interaction generation*
-
-![[assets/figures/papers/paper_list_l1770_PINO_Person_Interaction_Noise_Optimization_for_Long_Duration_and_Customi/figures/006_Table_4.jpg]]
-*Table 4: Evaluation of multi-person interaction generation. From pair (1,2), interactions are generated incrementally using 1 as a pivot. Overlap is among all individuals generated up to that step*
 
 ![[assets/figures/papers/paper_list_l1770_PINO_Person_Interaction_Noise_Optimization_for_Long_Duration_and_Customi/figures/012_Table_5.jpg]]
 *Table 5: Ablation study on motion penalties. Metrics include positional errors (Pos. Err.↓), overlap (Overlap↓), region violations (Reg. Viol.↓), and orientation errors (Orient. Err.↓). Positional errors are measured with a threshold of 20 cm, region violations with a threshold of 10 cm, and orientation errors with a threshold of 20 degrees. Lower values indicate better performance*
@@ -297,16 +271,8 @@ PINO 在噪声优化中引入可微分的控制惩罚，支持用户对角色根
 ![[assets/figures/papers/paper_list_l1770_PINO_Person_Interaction_Noise_Optimization_for_Long_Duration_and_Customi/figures/008_Figure_4.jpg]]
 *Figure 4: Qualitative results of multi-person interaction generation. Representative frames are shown for visualization*
 
-![[assets/figures/papers/paper_list_l1770_PINO_Person_Interaction_Noise_Optimization_for_Long_Duration_and_Customi/figures/009_Table_6.jpg]]
-*Table 6: Evaluation of non-semantic elements in motion extension*
-
 ![[assets/figures/papers/paper_list_l1770_PINO_Person_Interaction_Noise_Optimization_for_Long_Duration_and_Customi/figures/002_Table_1.jpg]]
 *Table 1: Comparison of recent multi-person interaction generation methods, including single-person method ProgMoGen [20]*
-
-![[assets/figures/papers/paper_list_l1770_PINO_Person_Interaction_Noise_Optimization_for_Long_Duration_and_Customi/figures/011_Table_7.jpg]]
-*Table 7: Evaluation of semantic elements in two-person motion extension. Extended motions are cropped to match the ground truth length for evaluation*
-
-
 
 ## 定位与知识库关联
 
@@ -383,8 +349,6 @@ PINO 的方法论可追溯至两个技术脉络：
 ### 5. 知识库定位总结
 
 PINO 在多人运动生成领域占据**免训练、物理感知、任意规模**的方法学位置。其核心贡献不在于提出新的生成架构，而在于证明：**通过巧妙的噪声空间优化和成对分解策略，预训练的双人扩散模型可以被“外推”至任意规模的群体生成，同时获得物理合理性和用户可控性**。这一思路对资源受限、数据稀缺的场景具有实际价值，但其推理效率瓶颈限制了实时应用的前景。
-
-
 
 ## 原文 PDF
 

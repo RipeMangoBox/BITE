@@ -79,8 +79,6 @@ SPIN-4DGS处于**4D高斯泼溅**与**隐式神经表示**的交叉点。与现�
 
 该方法与**3DGS逐帧独立优化**（Kerbl et al., 2023）的区别在于：SPIN-4DGS使用时间共享的隐式场，能够利用帧间时序规律，比独立逐帧模型更连贯（平均PSNR高出+1.9 dB, Table 10）。其隐式解码器设计借鉴了**NeRF**系列的位置编码思想，但直接作用于Gaussian属性预测而非辐射场。
 
-
-
 ### 动态场景重建的核心挑战
 
 三维场景的自由视点渲染是计算机视觉与图形学中的基础问题。近年来，三维高斯泼溅（3D Gaussian Splatting, 3DGS）（Kerbl et al., 2023）凭借其高保真重建与实时渲染能力，在静态场景中取得了突破性进展。然而，将其直接扩展至动态场景——即四维高斯泼溅（4DGS）——面临着根本性的困难：场景中的物体随时间运动，高斯原语（Gaussian primitives）的属性（位置、颜色、尺度、旋转、不透明度）必须随帧变化，而如何高效且稳定地建模这种时间依赖性，是当前方法的核心瓶颈。
@@ -113,8 +111,6 @@ Figure 2 直观展示了这些失败模式。在显式参数化框架中（Figur
 3. **时空切片**：按 $(x, y, z, t)$ 将高斯原语分离至各帧，每帧仅使用属于当前时间步的点，避免无关帧的干扰。
 
 这一设计将属性学习从“跨帧共享参数”的耦合模式转变为“逐帧独立解码”的去耦合模式，使快速运动物体即使在大位移下也能保持稳定且高质量的渲染，同时避免了显式存储全部属性所导致的内存爆炸。
-
-
 
 ## 核心方法与创新机理
 
@@ -160,8 +156,6 @@ SPIN-4DGS 的隐式网络由三个关键组件构成：
 
 综上，SPIN-4DGS 通过将 Gaussian 属性重新定义为时空位置的隐式函数，从根本上消除了跨帧属性耦合，使快速运动物体即使在大位移下也能保持稳定且高质量的渲染，同时避免了显式存储全部属性带来的内存爆炸。
 
-
-
 SPIN-4DGS 的整体框架由两个核心阶段构成，其设计目标是从根本上解决现有 4DGS 方法在大帧间位移快速运动场景下的属性崩溃问题。
 
 ### 核心设计动机
@@ -201,8 +195,6 @@ SPIN-4DGS 的完整流程如 Figure 3 所示，分为以下两个阶段：
 | 参数存储 | 显式存储所有属性（如 D3DGS 需 1994 MB） | 仅存储位置和网络参数（1261 MB） |
 
 消融实验证实了两个关键设计的必要性：输入位置归一化使 PSNR 提升超过 10 dB（LPIPS 从 0.45 降至 0.16），是稳定训练的前提；时空切片则通过将 Gaussian 按帧显式分离，从根本上消除了交叉帧干扰。兼容性实验进一步表明，即使复用其他 4DGS 方法（如 D3DGS）的预训练位置，仅替换为 SPIN-4DGS 的隐式属性学习方案，仍能大幅提升 PSNR（例如在 Softball 场景上提升 +2.49 dB），验证了隐式属性学习方案的有效性与通用性。
-
-
 
 SPIN-4DGS 的核心设计思想是将 4D Gaussian 的属性学习从时空耦合的参数化中解耦，转而通过一个前馈隐式网络从显式的时空位置直接解码属性。整个框架由两个阶段构成：**时空位置估计** 和 **隐式网络属性预测**。
 
@@ -272,13 +264,6 @@ $$\mathcal { L } = \left( 1 - \lambda \right) \mathcal { L } _ { 1 } + \lambda \
 
 SPIN-4DGS 的一个关键实现细节是**时空切片**：在每帧渲染时，仅保留当前时间步对应的 Gaussian 点，过滤掉其他时间步的点。这一机制显式地将 Gaussian 按 $(x, y, z, t)$ 分离，消除了跨帧属性干扰——这正是现有方法在快速运动场景中失败的根本原因。消融实验表明，去除切片后 PSNR 从 30.05 降至 28.96，且训练时间与内存显著增加。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_MWtXs60n38/figures/002_Figure_2.jpg]]
-*Figure 2: Failure modes on fast motions with large inter-frame displacements. We visualize failure modes of existing frameworks; (2a) explicit parameterization and (2b) deformable methods. Figure (2a) shows drastic degradation on training iterations (i.e., 15K → 30K), and (2b) shows the canonical space of deformable initialization fails to assign Gaussians for fast motions*
-
-
-
 ## 实验与关键发现
 
 ### 核心性能对比
@@ -326,28 +311,9 @@ Table 4的兼容性实验验证了隐式属性学习方案的通用性：使用D
 
 在感知质量方面（Table 6），SPIN-4DGS在所有六个体育场景上均取得最优LPIPS，与其PSNR/SSIM优势一致。训练时间方面（Table 7），SPIN-4DGS可在更短训练预算下达到或超过D3DGS的性能，展现了良好的效率-质量权衡。
 
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_MWtXs60n38/figures/011_Table_6.jpg]]
-*Table 6: Perceptual quality comparison. We report LPIPS across six sports scenes on the CMU Panoptic Sports dataset. Lower scores indicate better perceptual quality*
-
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_MWtXs60n38/figures/012_Table_7.jpg]]
-*Table 7: Training time breakdown and PSNR on the Basketball scene. We compare PSNR, position-estimation time, refinement cost, network training time, and total training time across different SPIN-4DGS configurations and the D3DGS baseline. All time measurements are reported in minutes*
-
 ### 与逐帧3DGS的对比
 
 Table 10将SPIN-4DGS与逐帧独立优化的**3DGS**（Kerbl et al., 2023）进行对比。SPIN-4DGS在所有六个体育场景上均优于3DGS和D3DGS，验证了时空共享表示（通过隐式网络）相比完全独立逐帧重建的优势——前者能在帧间共享结构信息，而后者缺乏跨帧一致性约束。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_MWtXs60n38/figures/007_Table_3.jpg]]
-*Table 3: Ablation on spatiotemporal slicing. We compare a unified 4D formulation (i.e., w/o slicing), where Gaussian positions are optimized jointly across space–time, against our spatiotemporal slicing strategy that assigns positions per frame*
-
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_MWtXs60n38/figures/009_Table_4.jpg]]
-*Table 4: Compatibility with existing 4DGS baselines. We reuse pre-trained positions from D3DGS (Luiten et al., 2024) and Realtime-4DGS (Yang et al., 2024a), replacing their attribute optimization with our proposed implicit network training. SPIN-4DGS consistently improves PSNR/SSIM across all scenes, highlighting the compatibility and effectiveness of the proposed implicit 4DGS scheme*
-
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_MWtXs60n38/figures/015_Table_10.jpg]]
-*Table 10: Comparison with frame-wise 3DGS on the CMU Panoptic Sports benchmark. We report PSNR across six sports, showing that SPIN-4DGS consistently outperforms both 3DGS and D3DGS across all sequences*
-
-
 
 ## 定位与知识库关联
 
@@ -408,8 +374,6 @@ SPIN-4DGS处于**显式位置+隐式属性**的交叉点，与现有方法的关
 3. **几何变形的联合建模**：隐式属性函数能否进一步扩展到同时建模几何变形，以处理更复杂的场景动态（如非刚性形变与快速运动的叠加）？
 
 4. **实时应用优化**：当前框架在实时应用（如VR/AR）中的延迟和内存开销是否可进一步优化？SPIN-4DGS虽已达到104 FPS的渲染速度，但网络推理开销在资源受限设备上仍需评估。
-
-
 
 ## 原文 PDF
 

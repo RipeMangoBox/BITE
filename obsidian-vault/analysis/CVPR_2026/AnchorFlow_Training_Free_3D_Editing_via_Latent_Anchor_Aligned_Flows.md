@@ -68,8 +68,6 @@ AnchorFlow 是一个**免训练、免掩码**的三维编辑框架，属于基�
 
 当前方法的细节保留能力受限于三维 VAE 的重建保真度，细粒度特征可能出现退化。未来高保真三维基础模型有望缓解这一限制。此外，AnchorFlow 能否扩展到动态场景或四维编辑，以及如何进一步降低锚点对齐的计算开销以支持实时编辑，仍是值得探索的开放问题。
 
-
-
 三维内容编辑是计算机图形学与视觉计算中的核心任务，其目标在于根据用户指令修改三维形状的语义属性，同时保持几何结构的完整性和身份一致性。近年来，随着大规模三维基础模型（3D foundation models）的快速演进，基于隐式潜空间的生成式编辑方法逐渐成为主流。这类方法将三维形状编码为连续潜变量，并利用概率流模型（flow matching models）在潜空间中构建编辑轨迹，从而实现免训练（training-free）的三维编辑。
 
 然而，当前免训练三维编辑方法面临一个关键瓶颈：**编辑过程中依赖时间步相关的随机高斯噪声作为隐式潜锚点（latent anchor）**。具体而言，在免逆推（inversion-free）编辑框架下，源轨迹由源潜变量与每个时间步独立采样的高斯噪声线性插值构成。这些随机噪声锚点在不同时间步发生漂移，导致源轨迹与目标轨迹之间的流向不一致，进而产生两类典型失败模式——**编辑不足（under-editing）**与**几何失真（geometric breakage）**。Figure 2(a) 直观展示了这一现象：随机时间步锚点引起的不一致流使得编辑效果微弱，甚至导致三维结构的断裂。
@@ -77,8 +75,6 @@ AnchorFlow 是一个**免训练、免掩码**的三维编辑框架，属于基�
 针对上述问题，已有方法尝试通过固定锚点（fixed anchor）来约束轨迹，但过度约束会使模型偏离源流形，引发**过度编辑（over-editing）**，同样无法满足实际编辑需求（Figure 2(b)）。因此，如何在潜空间中建立一致且灵活的锚点机制，成为提升免训练三维编辑质量的核心挑战。
 
 本文的动机源于对上述失败机制的深入分析：**随机噪声锚点引起的潜空间不一致性是编辑失败的根本原因**。基于这一洞察，我们提出 **AnchorFlow**——一种免训练、免掩码的三维编辑框架。AnchorFlow 的核心思想是引入一个在源轨迹与目标轨迹之间共享的全局潜锚点，并通过显式的锚点对齐机制强制两条轨迹在潜空间中保持一致性，从而稳定编辑流。这一设计使得 AnchorFlow 能够在实现更强语义编辑的同时，有效保留源形状的几何结构，弥补了现有免训练方法的不足。
-
-
 
 ## 核心方法与创新机理
 
@@ -98,8 +94,6 @@ AnchorFlow 的核心创新在于揭示并解决了免训练三维编辑中的一
 
 上述三个模块协同工作，使得 AnchorFlow 在无需任何训练或掩码的条件下，实现了对动作变换、物体添加、物体替换和风格变换等多种编辑任务的稳定支持。消融实验（Figure 2）直观地验证了潜锚点选择的关键作用：随机锚点导致编辑不足与几何断裂，固定锚点过度约束轨迹并偏离源流形，而 AnchorFlow 的对齐锚点则实现了平衡且一致的编辑效果。
 
-
-
 AnchorFlow 是一个免训练、免遮罩的三维编辑框架，其整体流程围绕“条件构建—潜锚点对齐流采样—网格解码”三条主线展开，核心目标是解决现有免反转编辑方法中因随机噪声锚点漂移导致的编辑不足与几何失真问题。
 
 **输入与输出。** 框架接收一个源三维模型和一条编辑指令，输出编辑后的三维网格。整个过程无需任何训练或微调，也不依赖显式的编辑遮罩，可直接作用于三维基础模型的隐空间。
@@ -116,12 +110,8 @@ AnchorFlow 是一个免训练、免遮罩的三维编辑框架，其整体流程
 
 **效率。** 在 NVIDIA H100 (96GB) GPU 上，每个编辑实例约耗时 26.71 秒，与基线方法 Inversion-free Editing 的运行时间相当，但编辑质量更高（见 Table 2）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2035_https_arxiv_org_abs_2511_22357/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of the AnchorFlow for Training-free and Mask-free 3D Editing. Given a source model and an editing instruction, AnchorFlow first constructs the source sample*
-
-
 
 ### 3.1 问题建模与免逆推编辑瓶颈
 
@@ -195,13 +185,6 @@ AnchorFlow的条件构建流程包含三步（详见Algorithm 1）：
 
 **证据强度**：Eq. 7和Eq. 11的公式形式经代码仓库验证（置信度0.98），Eq. 8的一阶近似为方法的核心计算简化手段（置信度0.95）。条件构建中Gemini-2.5-Flash的选图策略为原文明确描述的实现细节（置信度0.98）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2035_https_arxiv_org_abs_2511_22357/figures/002_Figure_2.jpg]]
-*Figure 2: Effect of Latent Anchor Selection on 3D Editing. (a) Random timestep-wise anchors cause inconsistent flows, resulting in under-editing and geometric breakage. (b) Fixed anchors overconstrain trajectories and push the model away from the source manifold, causing over-editing. (c) Our aligned anchors maintain consistent latent references, enabling balanced editing*
-
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈的实证验证
@@ -233,21 +216,10 @@ AnchorFlow的设计动机源于对免训练3D编辑中“编辑不足”现象�
 
 AnchorFlow的主要局限性来源于三维VAE的重建保真度瓶颈（Figure 8）。由于编辑过程在潜空间中进行，最终网格需通过Hunyuan3D 2.1的VAE解码器重建，细粒度几何细节（如纹理褶皱、薄壁结构）可能出现退化。这一问题并非AnchorFlow的编辑机制所致，而是当前三维基础模型共有的限制。未来更高保真度的三维基础模型有望缓解这一局限。
 
-![[assets/figures/papers/paper_list_l2035_https_arxiv_org_abs_2511_22357/figures/009_Figure_8.jpg]]
-*Figure 8: Limitation. The reconstruction fidelity of the 3D VAE constrains detail preservation, and the fine features may appear degraded. Future high-fidelity 3D foundation models are expected to alleviate this limitation*
-
 此外，在极端编辑场景（如大幅度的非刚性变形或完全替换主要部件）中，锚点对齐损失可能不足以完全约束几何一致性，导致局部伪影。这提示全局潜锚点假设在编辑幅度过大时可能面临挑战，需要人工核验极端案例的编辑质量。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2035_https_arxiv_org_abs_2511_22357/figures/005_Table_1.jpg]]
 *Table 1: Quantitative Comparison on Eval3DEdit. We report results using*
-
-![[assets/figures/papers/paper_list_l2035_https_arxiv_org_abs_2511_22357/figures/006_Figure_5.jpg]]
-*Figure 5: The Effect of Averaging Directions. Averaging*
-
-![[assets/figures/papers/paper_list_l2035_https_arxiv_org_abs_2511_22357/figures/007_Figure_6.jpg]]
-*Figure 6: Quantitative Analysis of Parameter Selection. We investigate the effect of*
 
 ![[assets/figures/papers/paper_list_l2035_https_arxiv_org_abs_2511_22357/figures/008_Figure_7.jpg]]
 *Figure 7: Qualitative Analysis of Parameter Selection. We visualize the effect of*
@@ -257,14 +229,6 @@ AnchorFlow的主要局限性来源于三维VAE的重建保真度瓶颈（Figure 
 
 ![[assets/figures/papers/paper_list_l2035_https_arxiv_org_abs_2511_22357/figures/011_Table_3.jpg]]
 *Table 3: Quantitative Comparison across Different 3D Editing Methods on the Eval3DEdit benchmark. We report results using*
-
-![[assets/figures/papers/paper_list_l2035_https_arxiv_org_abs_2511_22357/figures/001_Figure_1.jpg]]
-*Figure 1: Overview of 3D Editing Results from AnchorFlow Across Diverse Editing Tasks. We present four major types of edits supported by AnchorFlow: (1) Action Change: altering the pose or articulation of the 3D shape; (2) Object Addition: introducing new geometric elements; (3) Object Replacement: substituting existing components with new ones; (4) Style Change: modifying the shape style while preserving the overall*
-
-![[assets/figures/papers/paper_list_l2035_https_arxiv_org_abs_2511_22357/figures/012_Figure_9.jpg]]
-*Figure 9: More qualitative results using AnchorFlow*
-
-
 
 ## 定位与知识库关联
 
@@ -302,8 +266,6 @@ AnchorFlow 处于免训练三维编辑方法的前沿，其核心贡献在于识
 3. **实时编辑支持**：如何进一步减少锚点对齐带来的额外计算量，或通过模型蒸馏、缓存策略等手段，使方法支持实时交互式编辑？
 4. **多模态条件融合**：当前方法依赖单视图条件构建，能否引入多视图或多模态条件（如文本+图像联合指导）来提升编辑的精确性和鲁棒性？
 5. **编辑数据规模化生成**：AnchorFlow 的免训练特性使其具备规模化生成配对三维编辑数据的潜力，如何系统性地评估和利用这一能力来训练下游编辑模型？
-
-
 
 ## 原文 PDF
 

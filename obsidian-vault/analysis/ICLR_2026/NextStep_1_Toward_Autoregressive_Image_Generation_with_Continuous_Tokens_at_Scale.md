@@ -56,8 +56,6 @@ claims:
 
 **局限性**：高维连续令牌可能产生局部噪声和网格状伪影；自回归解码的串行性导致推理延迟较高；高分辨率训练收敛慢；SFT 在小数据集上易过拟合。
 
-
-
 ### 自回归图像生成的范式演进
 
 图像生成领域长期由扩散模型主导，但自回归模型在语言建模中的成功正推动其向视觉生成延伸。自回归生成的核心思想是将多模态序列分解为条件概率的连乘：
@@ -83,8 +81,6 @@ $$p ( x ) = \prod _ { i = 1 } ^ { n } p ( x _ { i } \mid x _ { < i } )$$
 NextStep-1的出发点是：**自回归图像生成的成功不仅取决于高重建质量，更关键的是构建一个正则化良好的隐空间。** 具体而言，通过在图像标记器中引入两个简单但关键的设计——逐令牌归一化（token-wise normalization）和受控噪声注入（noise perturbation）——可以显著提高隐空间的分散性和对扰动的鲁棒性。这使得大型语言模型仅需搭配一个轻量级的流匹配头，即可执行高质量的逐块图像生成，而无需复杂的扩散解码器或精心设计的2D位置编码。
 
 这一洞察将问题焦点从“如何设计更强的生成架构”转向“如何为自回归模型准备更友好的表示空间”，为连续令牌自回归图像生成开辟了新的技术路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -117,8 +113,6 @@ NextStep-1采用仅157M参数的MLP作为流匹配头（Flow Matching Head），
 - 相比**BAGEL**（Deng et al., 2025）等混合架构，NextStep-1保持了纯自回归框架的简洁性，无需额外的扩散组件。
 - 相比**Flux.1-dev**和**Stable Diffusion 3.5 Large**等扩散模型，NextStep-1证明了自回归模型在统一多模态生成上的潜力，同时保持了1D RoPE的简单有效，未引入2D或多模态位置编码的复杂性。
 
-
-
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_Ndnwg9oOQO/figures/011_Figure.jpg]]
 *Figure: A1: Overview of NextStep-1 in high-fidelity image generation, diverse image editing, and complex free-form manipulation*
 
@@ -143,8 +137,6 @@ $$\tilde{v}(x|y) = (1 - w) \cdot v_\theta(x|\mathcal{D}) + w \cdot v_\theta(x|y)
 **后训练阶段** 通过监督微调（SFT，约5M样本）和直接偏好优化（DPO）对齐人类偏好，增强指令遵循与编辑能力。NextStep-1-Edit即在此基础上用1M编辑数据微调得到。
 
 框架的关键洞察在于：**生成建模的核心由Transformer主干承担，流匹配头仅作为轻量级采样器**——消融实验表明，将流匹配头从40M扩展到528M对GenEval、GenAI-Bench、DPG-Bench等指标影响极小（Table 5），这证实了架构分工的有效性。
-
-
 
 ### 图像标记器（NextStep-VAE）
 
@@ -190,20 +182,16 @@ $$\tilde{v}(x|y) = (1 - w) \cdot v_{\theta}(x|\mathcal{D}) + w \cdot v_{\theta}(
 
 其中 $w$ 为引导强度，$v_{\theta}(x|\mathcal{D})$ 和 $v_{\theta}(x|y)$ 分别为无条件和条件速度预测。
 
-
-
 ## 实验与关键发现
 
 ### 主结果：文生图与图像编辑
 
 NextStep-1在文生图图文对齐评测上展现出与主流扩散模型可竞争的性能。在GenEval上达到0.63（使用Self-CoT增强后为0.73），GenAI-Bench Basic准确率达0.88（Self-CoT后0.90），DPG-Bench得分85.28（Table 2）。在OneIG-Bench综合评测中，NextStep-1取得0.417的平均分数，显著优于离散自回归模型**Emu3**（Wang et al., 2024b）的0.311（Table A1）。在世界知识推理评测WISE上，NextStep-1正确率达0.54，略高于混合架构模型**BAGEL**（Deng et al., 2025）的0.52（Table A2）。
 
-
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_Ndnwg9oOQO/figures/003_Table_2.jpg]]
 *Table 2: Comparison of image-text alignment on GenEval (Ghosh et al., 2023), GenAI-Bench (Lin et al., 2024), and DPG-Bench (Hu et al., 2024). * result is with rewriting. † result is with Self-CoT*
 
 在图像编辑任务上，基于NextStep-1微调的NextStep-1-Edit在GEdit-Bench-EN上取得6.58的GPT-4.1评分，超过OmniGen2的6.41；在ImgEdit-Bench上取得3.71分（Table 3）。
-
 
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_Ndnwg9oOQO/figures/004_Table_3.jpg]]
 *Table 3: Comparison of image editing performance on GEdit-Bench (Full Set) (Liu et al., 2025c) and ImgEdit-Bench (Ye et al., 2025). G SC, G PQ, and G O refer to the metrics evaluated by GPT-4.1 (OpenAI, 2025a). Performance is evaluated based on the NextStep-1-Edit with 1:1 aspect ratio*
@@ -216,8 +204,6 @@ NextStep-1在文生图图文对齐评测上展现出与主流扩散模型可竞�
 
 为探究“自回归Transformer与流匹配头谁承担核心生成建模”这一问题，论文设计了三种不同规模的流匹配头：Small（40M）、Base（157M）和Large（528M），架构配置详见Table 4。定量消融结果（Table 5）显示，流匹配头大小对GenEval、GenAI-Bench、DPG-Bench三项指标的影响极小——Base配置下分别为0.59/0.77/85.15，Large配置下为0.56/0.77/85.50。定性对比（Figure 2）同样表明不同头大小生成的图像质量无明显差异。
 
-
-
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_Ndnwg9oOQO/figures/006_Table_4.jpg]]
 *Table 4: Configurations for different flow-matching heads*
 
@@ -229,7 +215,6 @@ NextStep-1在文生图图文对齐评测上展现出与主流扩散模型可竞�
 #### 逐令牌归一化与CFG稳定性
 
 在高分类器自由引导（CFG）尺度下，基于VAE的连续自回归模型容易出现灰度斑块等视觉伪影。Figure 3揭示了根本原因：当CFG=3.0时，无归一化条件下逐令牌的均值与方差随采样步数发生显著漂移；而加入逐令牌归一化后，即使在高CFG下分布也保持稳定（均值接近0，方差接近1）。CFG的计算公式为：
-
 
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_Ndnwg9oOQO/figures/008_Figure_3.jpg]]
 *Figure 3: Evolution of per-token mean and variance over sampling steps under two CFG settings. At CFG = 1.5, the mean and variance stay close to 0 and 1, respectively, indicating stability. At CFG = 3.0, they drift significantly, causing image quality degradation. With normalization, the distributions of output latents remain stable across all CFG settings*
@@ -244,17 +229,9 @@ $$\tilde{v}(x|y) = (1 - w) \cdot v_{\theta}(x|\mathcal{D}) + w \cdot v_{\theta}(
 
 附录Figure A3进一步佐证了这一发现：NextStep-1 VAE的16通道隐分布比Flux.1-dev VAE和无噪声版本的NextStep-1 VAE更接近标准正态分布，反映噪声正则化使隐空间更加分散。论文最终采用$\gamma=0.5$训练标记器。
 
-
-![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_Ndnwg9oOQO/figures/015_Figure.jpg]]
-*Figure: Latent Distribution of Flux.1-dev VAE Latent Distribution of NextStep-1 VAE w/o Noise Latent Distribution of NextStep-1 VAE Figure A3: Latent distributions in 16 channels for three VAE variants: Flux.1-dev, NextStep-1 w/o noise, and NextStep-1. Blue bars show empirical histograms; red lines indicate the standard normal distribution*
-
 #### 标记器重建质量
 
 在ImageNet-1K 256×256上，NextStep-1标记器以32×32×16的隐空间形状取得PSNR 30.60、SSIM 0.89的重建性能（Table 6），为后续自回归生成提供了足够的高保真基础。
-
-
-![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_Ndnwg9oOQO/figures/010_Table_6.jpg]]
-*Table 6: Comparison of reconstruction performance on ImageNet-1K 256×256 (Deng et al., 2009)*
 
 ### 失败模式与局限性
 
@@ -267,23 +244,6 @@ $$\tilde{v}(x|y) = (1 - w) \cdot v_{\theta}(x|\mathcal{D}) + w \cdot v_{\theta}(
 4. **SFT训练不稳定**：SFT在小数据集上容易过拟合目标分布，难以找到保留通用生成能力的最佳检查点。
 
 5. **1D RoPE的空间建模局限**：标准1D RoPE可能导致微弱的网格状伪影，反映空间建模的不足。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_Ndnwg9oOQO/figures/016_Figure.jpg]]
-*Figure: A4: Failure cases for high-dimensional continuous tokens. Figure A5: Comparisons between NextStep-1 and NextStep-1.1*
-
-![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_Ndnwg9oOQO/figures/002_Table_1.jpg]]
-*Table 1: Training recipe of NextStep-1*
-
-![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_Ndnwg9oOQO/figures/012_Table.jpg]]
-*Table: A1: Comparison on OneIG-Bench (Chang et al., 2025) in English prompts*
-
-![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_Ndnwg9oOQO/figures/013_Table.jpg]]
-*Table: A2: Comparison of world knowledge reasoning on WISE (Niu et al., 2025). † result is with Self-CoT*
-
-
-
 
 ## 定位与知识库关联
 
@@ -331,8 +291,6 @@ NextStep-1 处于基于语言模型的自回归图像生成这一新兴范式，
 - 能否将自回归模型与流匹配头的组合扩展到视频或其他模态的统一生成？
 
 这些问题的解答将决定连续自回归范式能否在推理效率和生成质量上与扩散模型全面竞争。
-
-
 
 ## 原文 PDF
 

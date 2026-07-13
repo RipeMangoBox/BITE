@@ -71,8 +71,6 @@ SAL-4D（Segment Anything in Lidar–4D）提出了一条**无需任何语义标
 
 当前伪标签仅生成于相机视锥重叠区域，全点云分割质量仍落后于视锥内；跨窗口关联在快速运动或严重遮挡场景下可能出现ID断裂。零样本识别能力受限于CLIP模型的语义知识边界，且训练与伪标签生成依赖较大算力（8×A100 GPU）。未来方向包括：摆脱对同步图像的依赖、缩小与全监督方法的差距（目前约40%性能差距）、以及探索更丰富的视觉基础模型蒸馏策略。
 
-
-
 ### 问题背景
 
 4D激光雷达全景分割（4D Lidar Panoptic Segmentation, 4D-LPS）要求对点云序列中的每个点同时赋予语义类别和实例身份，并保持跨时间的实例身份一致性。这一任务对自动驾驶、机器人导航等场景至关重要，因为它提供了对动态场景的完整时空理解。然而，现有方法面临一个根本性瓶颈：**人工标注的4D激光雷达数据极度稀缺，且标注词汇固定**，导致训练出的模型只能识别预定义的封闭类别集合，无法泛化到训练时未见过的任意新对象。
@@ -94,8 +92,6 @@ SAL-4D（Segment Anything in Lidar–4D）提出了一条**无需任何语义标
 本文的核心动机源于一个关键洞察：**通过滑动时间窗口内的VOS传播与CLIP特征提取，辅以精确的3D-IoU跨窗口关联和时空平整化，可以为任意长序列生成时空一致的实例级伪标签**。在这些噪声但去相关的伪标签上训练，能够蒸馏出具有零样本识别能力的端到端4D激光雷达分割模型。
 
 具体而言，SAL-4D旨在回答以下问题：能否利用多模态传感器（摄像机+LiDAR）作为桥梁，将成熟的2D基础模型能力迁移到4D LiDAR空间，从而在完全无需人工语义标注的条件下，实现对任意文本提示指定的对象进行时空一致的分割与跟踪？这一目标的实现将从根本上突破标注词汇对感知系统的限制，使自动驾驶系统能够灵活应对开放世界中层出不穷的新对象类别。
-
-
 
 ## 核心方法与创新机理
 
@@ -170,8 +166,6 @@ SAL-4D由两大核心组件构成：
 - 零样本识别受限于CLIP模型的语义知识，对长尾类别可能失效；
 - 训练和伪标签生成依赖较大算力（8×A100 GPU），轻量化部署未讨论。
 
-
-
 SAL-4D 由两个核心组件构成：**多模态伪标签引擎**（Pseudo-label Engine）与**端到端可训练模型** `f_θ`。前者利用未标注的 LiDAR 序列与同步多路视频，自动生成时空一致的自监督训练信号；后者在固定大小的 4D 体积上学习实例级分割，并预测每个轨迹的 CLIP token，以支持测试时的零样本文本提示分类。整体流程如图 2 与图 3 所示。
 
 ### 输入与数据流
@@ -214,8 +208,6 @@ $$c_{ij} = 1 - \mathrm{IoU}_{3\mathrm{D}}(\tilde{m}_{i,k-1}, \tilde{m}_{j,k})$$
 - **窗口大小**：K=4~8 时性能最优。`S_assoc` 在 K=8 时继续提升，但 `S_cls` 在 K=4 时即饱和（Table 1），表明语义特征的时间聚合收益有限。
 - **自车运动补偿**：训练时以 10% 概率随机不对齐自车运动（Mix 策略），可获得最佳 LSTQ 53.2，优于纯对齐或纯不对齐（Table 2）。这表明模型需要同时学习运动模式与时空外观特征。
 - **FrankenFrustum 增广**：由于伪标签仅生成在相机视锥重叠区域（SemanticKITTI 中仅占 14% 点数），该增广通过合成非视锥区域的训练样本，使模型泛化至全 360° 点云，全点云 LSTQ 从 8.3 跃升至 42.2（Table 13）。
-
-
 
 SAL-4D的核心架构由**多模态伪标签引擎**与**4D分割模型**两大组件构成，二者通过自蒸馏形成闭环：伪标签引擎从未标注的多模态序列中生成时空一致的训练信号，模型则学习从4D点云体积中直接预测实例分割与CLIP语义特征。
 
@@ -273,8 +265,6 @@ $$\operatorname{mask} = \operatorname{argmax}(\operatorname{sigmoid}(\mathcal{M}
 - **FrankenFrustum增广**：Table 13证明，该增广是将模型从相机视锥（仅14%点数）泛化至全360°点云的关键，全点云LSTQ从8.3跃升至42.2。
 - **Lift-Flatten顺序**：Table 9表明，将流水线从Flatten-Lift改为Lift-Flatten（先提升到3D再平整化），使类别无关分割PQ提升+3.1；引入按实例DBSCAN精修和基于覆盖度的平整化后，合计提升+6.6 PQ。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -331,8 +321,6 @@ SAL-4D在两个自动驾驶数据集上验证：**SemanticKITTI**（64线LiDAR�
 
 5. **算力需求**：训练和伪标签生成均依赖较大算力（8 × A100 GPU），轻量化部署方案未讨论。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l45_https_arxiv_org_abs_2504_00848/figures/008_Table_4.jpg]]
 *Table 4: 3D-LPS evaluation. Training our SAL-4D model on the temporal consistent 4D pseudo-labels yields superior 3D (singlescan) performance compared to 3D baselines. We evaluate on the SemanticKITTI validation set. SAL-4D evaluated not only in the frustum was trained with the FrankenFrustum [62] augmentation*
 
@@ -342,32 +330,14 @@ SAL-4D在两个自动驾驶数据集上验证：**SemanticKITTI**（64线LiDAR�
 ![[assets/figures/papers/paper_list_l45_https_arxiv_org_abs_2504_00848/figures/004_Table_1.jpg]]
 *Table 1: Pseudo-label ablations on temporal window size and cross-window association: We ablate our approach on temporal window sizes of size K \ = \ $\{$ 2 , 4 , 8 , 1 6 $\}$ with stride $\frac { K } { 2 }$ on SemanticKITTI validation set. We average CLIP features for each instance across time. We observe association score ( $S _ { a s s o c }$ ) improve up to 8 frames, while zero-shot recognition ( $S _ { c l s }$ ) saturates at 4 frames. Without the cross-window association (Sec. 3.2.2), the L S T Q drops by 1.9 percentage points*
 
-![[assets/figures/papers/paper_list_l45_https_arxiv_org_abs_2504_00848/figures/005_Table_2.jpg]]
-*Table 2: SAL-4D training. Top: To distill our pseudo-labels into a stronger model, it is important to transform point clouds to a common coordinate frame during train- and test-time. Interestingly, our model benefits from randomly not performing motion compensation during training by 10%. Bottom: Processing larger temporal sequences directly benefits our model. Overall, we distill our pseudo-labels (51.1 L S T Q ) to a stronger model (53.2 L S T Q ) )*
-
-![[assets/figures/papers/paper_list_l45_https_arxiv_org_abs_2504_00848/figures/006_Table_3.jpg]]
-*Table 3: Single-scan pseudo-label evaluation: We compare our SAL-4D pseudo-labels to its single-scan counterpart on SemanticKITTI validation set. Following [62], we also report both zero-shot and semantic-oracle Lidar Panoptic Segmentation (LPS) results. Our SAL-4D pseudo-label engine produces a smaller set of higher-quality labels when evaluated on a per-scan basis, with an improvement of over 15% in recognition score (PQ) and over 20% in segmentation quality (mIoU)*
-
-![[assets/figures/papers/paper_list_l45_https_arxiv_org_abs_2504_00848/figures/007_Table.jpg]]
-
 ![[assets/figures/papers/paper_list_l45_https_arxiv_org_abs_2504_00848/figures/010_Table_5.jpg]]
 *Table 5: Zero-Shot 4D Lidar Panoptic Segmentation benchmark: We compare SAL-4D to several supervised baselines for 4D Panoptic Lidar Segmentation and zero-shot baselines. While there is still a gap between supervised methods and zero-shot approaches, SAL-4D significantly narrows down this gap. On SemanticKITTI, our model SAL-4D reaches 59% of the topperforming supervised model, and on nuScenes, 72%, even though it is not trained using any labeled data*
-
-![[assets/figures/papers/paper_list_l45_https_arxiv_org_abs_2504_00848/figures/012_Table_6.jpg]]
-*Table 6: SAL-4D hyperparameters. We list hyperparameters, including (i) segmentation foundation model parameters (SAM model [37], which we use to generate segmentation masks in images, and SAMv2 [78] that we use for the temporal mask propagation), (ii) the pseudo-label engine and (iii) 4D zero-shot segmentation model parameters*
-
-![[assets/figures/papers/paper_list_l45_https_arxiv_org_abs_2504_00848/figures/013_Table_7.jpg]]
-*Table 7: Multi-object tracking (MOT) baseline. We report the key hyperparameters used in our adaptation of [93]*
-
-![[assets/figures/papers/paper_list_l45_https_arxiv_org_abs_2504_00848/figures/014_Table.jpg]]
 
 ![[assets/figures/papers/paper_list_l45_https_arxiv_org_abs_2504_00848/figures/015_Table_8.jpg]]
 *Table 8: Pseudo-label ablations on DBSCAN settings, per-frame or all-frame: We show the effect of doing DBSCAN per scan separately or on all the scans within the temporal window together on the KITTI validation set. The temporal window size is set to 2. The results show that doing DBSCAN per-frame gives the best result*
 
 ![[assets/figures/papers/paper_list_l45_https_arxiv_org_abs_2504_00848/figures/016_Table_9.jpg]]
 *Table 9: Single-scan 3D pseudo-label improvements: We report class-agnostic and zero-shot single-scan Lidar Panoptic Segmentation (LPS) results with several improvements added to the original [62] pseudo-labels. Evaluation is performed in the camera frustum of the SemanticKITTI validation set. Table 10. Pseudo-label ablations on nuScenes dataset on temporal window size: We ablate on temporal window sizes 2 − 4 frames. The quality of pseudo labels with 4 frame temporal window drops significantly. The stride is set as half the window size*
-
-
 
 ## 定位与知识库关联
 
@@ -398,8 +368,6 @@ SAL-4D 的核心贡献在于将**零样本激光雷达全景分割**从单帧（
 **跨域泛化未验证**。当前仅在 SemanticKITTI 和 Panoptic nuScenes 两个自动驾驶数据集上验证，缺乏在不同环境（如室内、越野）、不同传感器配置（如不同线数 LiDAR、不同相机布局）上的泛化证据。
 
 **开放问题**包括：(1) 能否设计仅依赖 LiDAR 的伪标签方案，摆脱对同步图像的依赖？(2) 如何进一步缩小与全监督方法之间约 40% 的性能差距？(3) 模型能否处理开放世界中未见过的新型动态对象并保持一致的跟踪？(4) 当前的 CLIP 蒸馏策略是否可以从更多样的预训练视觉模型（如 DINOv2）中受益？(5) 如何将 4D 时空信息反馈到单帧零样本分割中，以在不运行完整 4D 推理的情况下提升单帧质量？这些问题指向了零样本 4D 感知从“能用”走向“好用”的关键路径。
-
-
 
 ## 原文 PDF
 

@@ -69,8 +69,6 @@ TRAM处于**SLAM辅助的全局人体运动重建**这一技术路线。与依�
 
 > **注意**：WHAM在对比中使用的是采用真实陀螺仪数据的版本（Fig. 6注释），实际泛化场景下TRAM的优势可能更大。
 
-
-
 从普通摄像机拍摄的野外视频中恢复三维人体运动，是计算机视觉与图形学中长期存在的核心挑战。该问题的完整解包含两个耦合部分：**世界坐标系下的全局人体轨迹**（人在场景中“走到了哪里”）和**相机坐标系下的局部身体姿态**（人“如何动作”）。然而，由于拍摄过程中相机本身也在运动，图像中观察到的运动是人体运动与相机运动叠加后的混合信号，使得准确解耦并重建这两部分变得异常困难。
 
 ### 现有方法的瓶颈
@@ -88,8 +86,6 @@ TRAM处于**SLAM辅助的全局人体运动重建**这一技术路线。与依�
 上述瓶颈指向一个关键洞察：**场景背景提供了可靠且泛化的尺度信息，优于基于人体运动学的先验**。静态场景元素（地面、建筑、植被等）在视频中天然携带度量尺度的线索，且不受人体动作复杂性的影响。如果能够从动态视频中鲁棒地恢复出度量尺度的相机轨迹，就能为人体运动重建提供一个稳定的世界参考系。
 
 基于这一洞察，TRAM采用**两阶段解耦策略**：先利用场景恢复相机运动，再在相机坐标系下回归人体运动，最后将二者组合得到全局结果。这一设计将困难的联合估计问题分解为两个相对成熟的子问题——鲁棒的视觉SLAM和视频人体姿态回归——并通过冻结大规模预训练模型（ViT-H）并仅微调轻量时序模块的方式，高效地赋予单帧模型视频理解能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -121,8 +117,6 @@ SLAM恢复的相机轨迹缺乏度量尺度。现有方法（如 **WHAM** (Shin 
 
 上述三个创新模块通过“世界坐标系人体轨迹组合”公式（$\\{ \\mathbf { H } _ { t } \\} _ { t = 0 } ^ { T } = \\{ \\mathbf { G } _ { t } \\circ \\mathbf { T } _ { t } \\} _ { t = 0 } ^ { T }$）协同工作：度量尺度相机轨迹 $\mathbf{G}_t$ 提供全局参考系，VIMO在相机坐标系下回归相对人体位姿 $\mathbf{T}_t$，二者组合得到世界轨迹。这种解耦设计使得TRAM在EMDB上将全局根轨迹误差（RTE）相对于WHAM降低了60%（Table 3），同时保持了网格重建的最优精度（Table 4）。
 
-
-
 TRAM 将“从野外视频中恢复全局人体运动”这个复杂问题分解为两个可独立优化的子任务：**度量级相机轨迹恢复**与**相机坐标系下的人体运动回归**。这一分解的核心洞察在于：场景背景提供了可靠且泛化的尺度信息，其稳定性远优于基于人体运动学的先验假设；同时，将相机轨迹与人体运动解耦，使得各模块可以分别利用最合适的预训练模型，避免端到端联合训练带来的数据与计算开销。
 
 ### 流水线概览
@@ -152,12 +146,8 @@ TRAM 将“从野外视频中恢复全局人体运动”这个复杂问题分解
 
 **为什么在冻结的 ViT-H 上添加时间 Transformer？** HMR2.0 的大规模预训练 ViT-H 已经具备强大的单帧人体理解能力。冻结该骨干网络，仅训练两个轻量时间 Transformer，可以在有限视频训练数据（3DPW、Human3.6M、BEDLAM）下高效地引入时序一致性，同时避免灾难性遗忘。消融实验（Table 5）证实，移除任一 Transformer 都会导致精度或平滑性下降。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1643_TRAM_Global_Trajectory_and_Motion_of_3D_Humans_from_in_the_wild_Videos/figures/001_Figure_1.jpg]]
 *Figure 1: Overview. Given an in-the-wild video, TRAM reconstructs the complete 3D human motion: global trajectory and local body motion, in diverse and longrange scenarios*
-
-
 
 ### 3.1 运动分解与全局轨迹组合
 
@@ -221,13 +211,6 @@ $$\mathcal { L } _ { 3 D } = | | \hat { \mathcal { I } } _ { 3 D } - \mathcal { 
 
 消融实验（Table 5）证实：移除图像域时间Transformer导致3DPW上PA-MPJPE从35.6升至36.3；移除运动域时间Transformer导致加速度指标升高，运动平滑性下降。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1643_TRAM_Global_Trajectory_and_Motion_of_3D_Humans_from_in_the_wild_Videos/figures/003_Figure_3.jpg]]
-*Figure 3: Video transformer VIMO builds on top of the large pre-trained HMR2.0 and adds two temporal transformers to propagate information across video frames. Right: the temporal transformers use the same encoder-only architecture. represents patch tokens at the same spatial location across time in the first temporal module, and represents SMPL poses across time in the second temporal module. More details are included in the supplementary*
-
-
-
 ## 实验与关键发现
 
 ### 核心实验设计
@@ -245,9 +228,6 @@ Table 1 展示了在已知真实尺度条件下各方法的 ATE 表现。原始 
 
 Figure 4 的定性结果直观展示了这一机制：默认 DROID-SLAM 在人体运动剧烈时轨迹严重偏离真值，而双掩码版本始终紧贴真实轨迹。这验证了核心洞察：场景背景提供了比人体运动先验更可靠的几何约束。
 
-![[assets/figures/papers/paper_list_l1643_TRAM_Global_Trajectory_and_Motion_of_3D_Humans_from_in_the_wild_Videos/figures/006_Figure_4.jpg]]
-*Figure 4: Camera trajectory estimation. With dynamic humans in the scene, the default DROID-SLAM tends to diverge. The two-step masking makes it robust. In addition, our procedure estimates a reasonable metric scale for the cameras*
-
 ### 尺度估计：从相对轨迹到度量轨迹
 
 Table 2 评估了尺度估计后的轨迹误差（ATE-S）。直接将 **ZoeDepth** 的度量深度预测作为 DROID 输入会导致较大误差（ATE-S 平均 1.52m），因为单帧深度预测在动态场景中噪声显著。TRAM 采用鲁棒最小二乘对齐 SLAM 深度与 ZoeDepth 深度，并对整段视频取中位数估计全局尺度，将 ATE-S 降至 0.66m。
@@ -260,15 +240,6 @@ Table 2 评估了尺度估计后的轨迹误差（ATE-S）。直接将 **ZoeDept
 ### 人体全局轨迹：60% 的 RTE 降低
 
 Table 3 展示了人体全局轨迹的核心结果。TRAM 在 EMDB 上实现 RTE 1.4%，相比 **WHAM**（Shin et al., arXiv 2023）的 3.5% 降低了 60%。这一差距在长距离、复杂地形场景中尤为显著（Fig. 5 定性对比）。值得注意的是，WHAM 在比较中使用的是采用真实陀螺仪数据的版本（Fig. 6 注释），这意味着 TRAM 在输入信息更少的条件下取得了大幅领先。
-
-![[assets/figures/papers/paper_list_l1643_TRAM_Global_Trajectory_and_Motion_of_3D_Humans_from_in_the_wild_Videos/figures/007_Table_3.jpg]]
-*Table 3: Evaluation of human global trajectory and motions. RTE is in %, ERVE is in mm/frame, and the other pose metrics are in mm. Ordered by RTE*
-
-![[assets/figures/papers/paper_list_l1643_TRAM_Global_Trajectory_and_Motion_of_3D_Humans_from_in_the_wild_Videos/figures/008_Figure_5.jpg]]
-*Figure 5: Human global trajectory on EMDB. Compared to WHAM, our method produces less drift and a more accurate scale for complex and long-range tracks*
-
-![[assets/figures/papers/paper_list_l1643_TRAM_Global_Trajectory_and_Motion_of_3D_Humans_from_in_the_wild_Videos/figures/010_Figure_6.jpg]]
-*Figure 6: Human motion and trajectory: WHAM vs Ours . We produce more accurate motion and tracks that generalize to diverse terrain and motion complexity. WHAM’s results are from the version that uses ground truth gyro*
 
 误差来源分析表明，WHAM 的 RTE 误差主要来自两个方面：一是其人体运动先验在野外场景中泛化能力有限，导致尺度估计偏差；二是其相机运动推断缺乏显式的几何约束。TRAM 通过将相机轨迹估计外包给鲁棒的 SLAM 系统，并将尺度估计建立在场景背景深度对齐之上，从根源上规避了这两个问题。
 
@@ -303,8 +274,6 @@ Table 5 的消融实验量化了每个时间模块的贡献：
 TRAM 在方法谱系中占据了一个独特位置：它桥接了基于 SLAM 的相机运动估计和基于学习的人体运动重建。与 **GLAMR**（Yuan et al., CVPR 2022）等纯人体位移方法相比，TRAM 用场景几何替代人体运动先验来获取尺度，避免了先验泛化性不足的问题；与 WHAM 等端到端回归方法相比，TRAM 将相机估计显式化，降低了对大规模视频训练数据的依赖。
 
 VIMO 的设计理念——在冻结的大规模预训练图像模型（ViT-H）上添加轻量时间模块——代表了一种高效的视频模型构建范式。这与近年来的“图像预训练 + 时序微调”趋势一致，但 TRAM 通过双时间 Transformer 的解耦设计，在精度和平滑性之间取得了更好的平衡。
-
-
 
 ## 定位与知识库关联
 
@@ -353,8 +322,6 @@ TRAM 的有效性依赖于以下前提条件，当这些条件不满足时性能
 5. **遮挡与多人场景。** TRAM 目前主要在单人、少遮挡场景下验证。多人交互场景中的相互遮挡、身份切换等问题，需要更复杂的跟踪和重建策略。
 
 6. **尺度估计的远距离可靠性。** 当人体距离相机较远时，深度预测的绝对误差增大，尺度估计的可靠性需要进一步验证和理论分析。
-
-
 
 ## 原文 PDF
 

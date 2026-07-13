@@ -63,8 +63,6 @@ claims:
 
 **局限与展望**：当前实验限于 CIFAR-10 和 CelebA 等小型数据集及轻量 UNet 架构，尚未在 ImageNet 或更大模型（如 DiT）上验证；系数 α, β 的最优值依赖网格搜索，缺乏自适应机制；桥匹配和随机插值模型的 RealUID 蒸馏尚未进行实验验证。
 
-
-
 ### 匹配模型的蒸馏困境
 
 扩散模型、流匹配和桥匹配等匹配模型（matching models）已成为生成建模的主流范式。这些模型通过模拟数据分布与先验噪声之间的连续变换来生成高质量样本，但其推理过程需要反复求解常微分方程或随机微分方程，导致数百次网络前向计算（NFE），严重制约了实际部署效率。为此，知识蒸馏技术被引入，旨在将多步采样的教师模型压缩为一步生成器。
@@ -89,8 +87,6 @@ claims:
 ### 方法定位
 
 RealUID 并非另起炉灶，而是在逆蒸馏（Inverse Distillation）范式下的自然延伸。它与 UID+GAN 共享利用真实数据的动机，但采取了根本不同的技术路线：后者依赖外挂判别器的对抗博弈，前者则通过损失函数内部的系数调节实现数据平衡。这一差异使得 RealUID 在结构简洁性、训练稳定性和计算效率上具备天然优势，同时保持了与多种匹配模型框架的兼容性。
-
-
 
 ## 核心方法与创新机理
 
@@ -128,8 +124,6 @@ RealUID 的第三个创新在于其框架的**通用性**。通过将 FGM、SiD 
 
 实验结果表明，仅通过调整 $\beta/\alpha$ 的微小偏移（如 0.98 或 1.02），RealUID 即可在 CIFAR-10 上将 FID 从 2.58（无真实数据 UID 基线）降至 2.23，经微调后进一步降至 1.98，且收敛速度约为基线的 3 倍。这些增益完全来自损失函数的内在设计，无需任何额外的网络模块或对抗训练。
 
-
-
 RealUID 是一个无需 GAN 即可将真实数据融入匹配模型蒸馏的通用框架。其核心流程围绕四个模块展开：冻结的教师模型 $f^*$、学生生成器 $G_\theta$、可训练的虚假模型 $f$，以及带有真实数据的通用匹配损失 $\mathcal{L}_{\mathrm{R-UM}}^{\alpha,\beta}$。
 
 **数据流与模块交互**（参见 Figure 1）：
@@ -154,8 +148,6 @@ $$\mathcal{L}_{\mathrm{R-UM}}^{\alpha,\beta}(f, p_0^\theta) = \alpha \cdot \math
 - 当 $\beta/\alpha \neq 1$ 时，真实数据项被有效激活，且无需引入额外的判别器或对抗损失。
 
 **关键设计决策**：系数比 $\beta/\alpha$ 是控制真实数据贡献的核心旋钮。实验表明，$\beta/\alpha = 0.98$ 或 $1.02$ 等微小偏离 $1$ 的取值即可显著提升性能（Table 1, Table 7），验证了该机制的有效性。整个框架通过线性化技巧将原本不可处理的 $\ell_2$ 距离转化为可优化的 min-max 目标，实现了对 FGM、SiD、IBMD 等先前蒸馏方法的统一。
-
-
 
 ### 3.1 统一逆蒸馏（UID）框架
 
@@ -237,8 +229,6 @@ RealUID 的训练采用交替优化策略（见 Algorithm 1）：
 
 该流程的四个核心模块为：冻结的教师模型 $f^*$（提供蒸馏目标）、学生生成器 $G_\theta$（一步映射噪声到数据）、虚假模型 $f$（近似学生函数，用于最大化步骤）、以及 RealUM 损失（在生成数据和真实数据上加权计算匹配损失）。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -250,17 +240,9 @@ RealUID 在 CIFAR-10 和 CelebA 数据集上均取得了优于无真实数据基
 ![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_8NuN5UzXLC/figures/002_Table_1.jpg]]
 *Table 1: As shown in the table, the ratio $\beta / \alpha$ has the largest impact on the final metrics, while α only adjusts them. Using real data with $\beta / \alpha \stackrel { \cdot } { = }$ 1 or with large values outside the range [0.98, 1.02] consistently degrades performance. In contrast, values $\beta / \alpha \stackrel { - } { = }$ 0 . 9 8 or $\beta / \alpha$ = 1 . 0 2 outperform the baseline for a majority of α. Note that these practical results match the theoretical description in (§3.4)
 
-![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_8NuN5UzXLC/figures/003_Table_1.jpg]]
-*Table 1: Ablation studies of our ( $\alpha , \textstyle { \frac { \beta } { \alpha } }$ ) parameters in the left table and adversarial weighting parameters ( $\lambda _ { \mathrm { a d v } } ^ { G _ { \theta } } , \lambda _ { \mathrm { a d v } } ^ { D }$ ) in the right table for CIFAR-10. The baseline $\mathrm { R e a l U I D } \left( \alpha$ = 1 . 0 , $\beta$ = 1 . 0 $\right$) does not use real data. Configurations that sligtly and substantially outperform the baseline are highlighted. All values report FID ↓, where lower is better. The best configuration in each case is bolded. The mark “–” denotes infeasible parameters
 
 ![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_8NuN5UzXLC/figures/004_Table_2.jpg]]
 *Table 2: This table presents the results of ablation study of our RealUID framework, evaluated using the FID metric under both unconditional and conditional generation setups. The Teacher Flow model with 100 NFE is reported as a reference. The performance of the UID (FGM) baseline without real-data incorporation is indicated in italic. For emphasis, we underline the two counterparts that incorporate real data: the GAN-based and our RealUID methods. The best-performing configurations, obtained via an additional fine-tuning stage, are highlighted in bold. Qualitative results are presented in Appendix D.5.1*
-
-![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_8NuN5UzXLC/figures/016_Table_1.jpg]]
-*Table 1: We observe that fine-tuning is highly sensitive to the choice of factor $\frac { \beta _ { \mathrm { F T } } } { \alpha _ { \mathrm { F T } } }$ which still brings the main impact. The best factors $\begin{array} { r } { \frac { \beta _ { \mathrm { F T } } } { \alpha _ { \mathrm { F T } } } = 0 . 9 4 \ : \mathrm { o r } \ : \frac { \beta _ { \mathrm { F T } } } { \alpha _ { \mathrm { F T } } } = 1 . 0 6 } \end{array}$ are much farther from 1.0 compared to training from scratch (Table 1), i.e., fine-tuning relies more on information from real data rather than on guidance from a teacher. Meanwhile, configurations closer to 1.0 are unstable, underscoring the crucial role of real data. In the case...
-
-![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_8NuN5UzXLC/figures/017_Table_1.jpg]]
-*Table 1: for CIFAR10, the same pairs of coefficients with $\beta / \alpha$ = 1 . 0 2 or $\beta / \alpha$ = 0 . 9 8 yield a significant improvement in quality over the baseline ( $\alpha$ = 1 . 0 , $\beta = \mathrm { { i } }$ . 0 ) , reaching a level comparable to GANs
 
 **CIFAR-10 条件生成**（Table 2）：微调后的 RealUID 达到 FID 1.87，优于同样经过微调的 UID+GAN 方法（FID 2.12, Δ=-0.25），表明 RealUID 在条件生成场景下同样有效且不依赖对抗训练。
 
@@ -303,16 +285,8 @@ RealUID 在 CIFAR-10 和 CelebA 数据集上均取得了优于无真实数据基
 - **Table 5**：RealUID 在推理速度、参数量和显存占用上均优于 FGM/SiD，体现了轻量架构的效率优势。
 - **Table 8**：在 CelebA 长微调设定下，RealUID 达到与 UID+GAN 相当的 FID，验证了无 GAN 真实数据融入的有效性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_8NuN5UzXLC/figures/005_Table_4.jpg]]
-
 ![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_8NuN5UzXLC/figures/008_Table_3.jpg]]
 *Table 3: Comparison of unconditional generation on CIFAR-10. The best method under the FID metric in each section is highlighted with bold. Table 4: Comparison of conditional generation on CIFAR-10. The best method under the FID metric in each section is highlighted with bold*
-
-![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_8NuN5UzXLC/figures/018_Table_10.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -387,8 +361,6 @@ RealUID 占据了此前空白的关键位置：同时具备通用性、真实数
 4. **教师误差下的理论保证。** 当教师模型存在严重误差时，$\beta/\alpha$ 的选择规律是否可以给出更严格的理论刻画，以指导鲁棒的系数设计？
 
 5. **与 DMD 系列方法的融合。** RealUID 的 min-max $\ell_2$ 蒸馏范式与 DMD 的分布匹配范式是否存在统一的视角？二者的结合能否在保持 RealUID 简洁性的同时进一步提升生成质量？
-
-
 
 ## 原文 PDF
 

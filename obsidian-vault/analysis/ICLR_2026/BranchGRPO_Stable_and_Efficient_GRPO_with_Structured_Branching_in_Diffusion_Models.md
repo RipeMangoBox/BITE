@@ -45,15 +45,11 @@ claims:
 
 BranchGRPO是一种针对扩散模型GRPO（Group Relative Policy Optimization）训练的结构化改进方法。该方法通过将传统的顺序rollout重构为树状结构，在去噪过程中引入分支，共享前缀以摊销计算，并通过奖励融合与深度归一化将稀疏终端奖励转化为密集的逐步骤优势信号。实验表明，BranchGRPO在HPSv2.1图像对齐上比DanceGRPO提升高达16%的对齐分数，同时将每轮训练时间减少近55%；其混合变体BranchGRPO-Mix进一步将训练加速至DanceGRPO的4.7倍，且不降低对齐性能。
 
-
-
 现有GRPO变体在扩散模型上存在两个根本瓶颈：
 
 - **效率低下**：标准GRPO采用顺序rollout设计，每个轨迹需独立采样，复杂度为O(N·T)，导致大量计算冗余。如论文所述："Standard GRPO adopts a sequential rollout design, where each trajectory must be independently sampled under both the old and new policies. This incurs O(N · T ) complexity with denoising steps T and group size N, leading to significant computational redundancy"（Section 1 INTRODUCTION）。
 
 - **奖励稀疏**：现有方法将单一终端奖励均匀分配给所有去噪步骤，忽略了中间状态的信息，导致不可靠的信用分配和高方差梯度。论文指出："Existing methods assign a single terminal reward uniformly across all denoising steps, neglecting informative signals from intermediate states. This uniform propagation leads to unreliable credit assignment and high-variance gradients"（Section 1 INTRODUCTION）。
-
-
 
 ## 核心方法与创新机理
 
@@ -64,8 +60,6 @@ BranchGRPO的核心创新体现在三个关键设计上：
 2. **奖励融合与深度归一化**：通过路径概率软加权聚合叶子奖励到内部节点，并在每个深度内标准化聚合奖励，产生平衡的逐步骤优势信号。论文指出："BranchGRPO aggregates leaf rewards and propagates them backward with depth-wise normalization, producing finer-grained step-level advantages"（Section 1 INTRODUCTION）。
 
 3. **剪枝策略**：引入宽度剪枝和深度剪枝，仅对选定的子集进行反向传播，不影响前向rollout和奖励评估。如论文所述："pruning strategies that cut gradient computation but leave forward rollouts and exploration unaffected"（Abstract）。
-
-
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__image_and_video_generation__b001_T2nP2IQasd_BranchGRPO_St/figures/001_Figure_1.jpg]]
 
@@ -78,8 +72,6 @@ BranchGRPO的整体框架由以下核心模块组成：
 5. **混合ODE-SDE调度**：保留所有分支步为SDE，滑动窗口确定额外SDE步，其余替换为ODE（Section 4.4）。
 
 Figure 3展示了分支rollout过程、奖励融合和深度归一化与剪枝的整体流程。
-
-
 
 ### 5.1 反向SDE动力学
 
@@ -110,8 +102,6 @@ $$A _ { d } ( n ) = \frac { \bar { r } ( n ) - \mu _ { d } } { \sigma _ { d } + 
 应用于树边的标准裁剪GRPO目标，其中ρ_e是重要性采样比率，A(e)是边优势：
 
 $$J ( \theta ) = \mathbb { E } \left[ \frac { 1 } { | \mathcal { E } | } \sum _ { e \in \mathcal { E } } \operatorname* { m i n } \big ( \rho _ { e } ( \theta ) A ( e ) , \mathrm { c l i p } ( \rho _ { e } ( \theta ) , 1 - \epsilon , 1 + \epsilon ) A ( e ) \big ) \right]$$
-
-
 
 ## 实验与关键发现
 
@@ -172,15 +162,11 @@ Table 9(a)的人类偏好评估显示：BranchGRPO在48%的情况下被偏好，
 - 所有GRPO相关的超参数在不同方法间保持一致。
 - HPS-only训练会降低CLIP Score（提示遵循度），简单的多目标设置（HPS-v2.1 + CLIP Score）可以部分恢复CLIP Score，同时保持较高的HPS（Table 12）。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__image_and_video_generation__b001_T2nP2IQasd_BranchGRPO_St/figures/017_Table_3.jpg]]
 *Table 3: Table 3: Prompt-conditioned diversity under different branching schedules (new).*
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__image_and_video_generation__b001_T2nP2IQasd_BranchGRPO_St/figures/024_Table_5.jpg]]
 *Table 5: Table 5: Hyperparameter settings used in all experiments.*
-
-
 
 ## 定位与知识库关联
 
@@ -206,8 +192,6 @@ BranchGRPO的核心贡献在于将树状rollout结构引入扩散模型的GRPO�
 - 分支框架能否自然迁移到其他生成范式，如基于扩散的LLM和多模态基础模型？
 - 如何将BranchGRPO扩展到高分辨率、长时视频生成任务？
 - 如何将BranchGRPO应用于机器人动作生成和具身视频生成学习？
-
-
 
 ## 原文 PDF
 

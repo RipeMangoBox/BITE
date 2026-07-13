@@ -51,8 +51,6 @@ claims:
 
 综上，MoRel通过ARBB与FHD的协同设计，在限定内存下首次实现了长序列4D运动建模的时间一致性与高保真重建，为长视频动态场景表示提供了新的基线范式。
 
-
-
 ### 长程4D动态场景建模的兴起与瓶颈
 
 从多视角视频中重建随时间变化的三维场景——即4D动态场景建模——是计算机视觉与图形学领域的前沿课题。近年来，以**4D Gaussian Splatting (4DGS)** (Wu et al., CVPR 2024) 为代表的方法将3D Gaussian Splatting的高效渲染能力拓展到时域，通过为每个高斯点学习时变属性（如变形场或时空特征）来实现动态场景的逼真重建。然而，这些方法在设计之初主要面向**短序列**（通常数百帧）场景，当面对**长距离动态视频**（数千帧甚至更长）时，其核心假设与工程实现暴露出根本性的局限。
@@ -81,8 +79,6 @@ claims:
 - **用“分层密度化”平衡效率与细节**：引入**特征方差引导的分层密度化（FHD）**，根据场景的频率特性智能分配锚点生长预算，在高频区保留细节、在低频区抑制冗余，进一步压缩内存占用而不牺牲重建质量。
 
 通过这些设计，MoRel旨在首次实现长程4D动态场景的**内存有界、时间一致、支持随机访问**的高质量建模。
-
-
 
 ## 核心方法与创新机理
 
@@ -128,8 +124,6 @@ $$w _ { L } ^ { j _ { n } ^ { s } } = \left\{ \begin{array} { l l } { 1 , } & { 
 
 上述四个创新并非孤立存在，而是形成了一条因果链条：ARBB 的锚点接力架构为双向变形和混合提供了结构基础；PWD+IFB 的双向混合机制是消除闪烁的直接手段；FHD 通过频率感知的密度化进一步压缩了内存，使整个系统在长序列上可部署；按需加载则确保了训练和推理的内存有界性。这一系统性设计使得 MoRel 在 SelfCapLR 数据集上取得了最低的 tOF 得分（0.203）和最优的重建质量，同时保持恒定的训练内存占用。
 
-
-
 MoRel 的整体框架围绕“锚点接力–双向混合”（Anchor Relay–based Bidirectional Blending, ARBB）策略构建，将长序列动态场景建模分解为两个阶段、四个训练步骤，在恒定内存预算下实现时间一致的 4D 运动重建。
 
 ### 两阶段流水线
@@ -160,18 +154,11 @@ MoRel 实现有界内存的核心在于按需动态加载/卸载策略。训练�
 
 图 2 从概念层面比较了 MoRel 与现有 4DGS 方法的长程建模能力。全量训练方法（如 **4D Gaussian Splatting** (Wu et al., CVPR 2024)、**Deformable 3D Gaussians** (Yang et al., CVPR 2024)）需将所有帧同时加载到内存，导致显存随序列长度线性增长直至溢出。分块训练方法（如 **GIFStream** (Li et al., CVPR 2025)、**V3** (Wang et al., TOG 2024)）通过独立训练各块缓解内存压力，但破坏了时间连续性，在块边界产生闪烁伪影。MoRel 的 ARBB 策略通过 KfA 接力与双向不透明度混合，在保持有界内存的同时恢复了跨块的时间一致性，并天然支持随机访问——这是分块方法难以实现的系统特性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l34_https_openaccess_thecvf_com_content_CVPR2026_html_Kwak_MoRel_Long_Range/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of MoRel framework. To efficiently model long-range 4D motion with bounded memory and temporal consistency, MoRel adopts the Anchor Relay-based Bidirectional Blending (ARBB) strategy composed of four training stages which are organized into two phases. In the Anchor Relay phase (Sec. 3.2), a GCA is first trained on entire frames with a single point cloud. Next, each KfA is derived around its key-frame time index, while its spatial detail is enhanced through FHD (Sec. 3.4). In the Bidirectional Blending phase (Sec. 3.3), PWD training stage is executed to learn bidirectional deformation fields within local temporal windows to ensure robust motion modeling of each anchor. Finally, in...*
 
-![[assets/figures/papers/paper_list_l34_https_openaccess_thecvf_com_content_CVPR2026_html_Kwak_MoRel_Long_Range/figures/001_Figure_1.jpg]]
-*Figure 1: Approaches for modeling long-range 4D Motion. (a) The all-at-once training experiences memory overflow and even suffers 14 from limited representational capacity. (b) The chunk-based training mitigates the memory overflow but causes temporal flickering at chunk boundaries, substantially degrading visual quality. In contrast, (c) our Anchor Relay-based Bidirectional Blending (ARBB) approach successfully maintains both representation quality and temporal consistency by smoothly transiting the influence of each Key-frame Anchor (KfA). The rendered patches, frame-wise tOF [2], and temporal profile provide strong evidence for the effectiveness of our method*
-
 ![[assets/figures/papers/paper_list_l34_https_openaccess_thecvf_com_content_CVPR2026_html_Kwak_MoRel_Long_Range/figures/002_Figure_2.jpg]]
 *Figure 2: Conceptual comparison of existing 4DGS methods in modeling long-range 4D motion. (a) All-at-once approaches suffer from high memory usage, while (b) chunk-based methods inevitably fail to maintain temporal consistency. Even advanced variants struggle with system applicability such as a random accessibility. Our ARBB framework resolves all these issues, achieving bounded memory and temporally coherent long-range modeling*
-
-
 
 MoRel 的核心架构由四个训练阶段构成，分别解决长程 4D 运动建模中的初始化一致性、局部规范空间构建、变形场学习与跨块混合问题。以下按训练流程逐一解析关键模块及其数学机制。
 
@@ -251,15 +238,8 @@ MoRel 的内存有界性源于两个层面的设计：
 - **训练阶段**：通过动态加载/卸载机制，任意时刻仅保留最多两个 KfA 及其变形场在 GPU 内存中，训练峰值内存约 6 GB，不随序列帧数增长
 - **渲染阶段**：按需加载目标时间点所需的 KfA 和变形场，渲染内存仅 126 MB，支持随机时间点访问
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l34_https_openaccess_thecvf_com_content_CVPR2026_html_Kwak_MoRel_Long_Range/figures/004_Figure_4.jpg]]
 *Figure 4: Comparison of training strategies for modeling longrange 4D motion with bidirectional deformation. (a) All-at-53 once training suffers from memory overflow. (b) Chunk-wise training reduces memory cost but causes inter-chunk interference. (c) Our Bidirectional Blending (PWD + IFB) maintains bounded memory and prevents inter-chunk interference*
-
-![[assets/figures/papers/paper_list_l34_https_openaccess_thecvf_com_content_CVPR2026_html_Kwak_MoRel_Long_Range/figures/005_Figure_5.jpg]]
-*Figure 5: Overview of Feature-variance-guided Hierarchical Densification. (a) Variance-based Leveling: After GCA training, we assign a level to each anchor-point guided by the featurevariance. (b) Level-wise Densification: During the KfA and PWD trainings, gradients for KfA densification are modulated by levelspecific weights, enabling early low-frequency stabilization and late high-frequency refinement*
-
-
 
 ## 实验与关键发现
 
@@ -285,9 +265,6 @@ Table 1 展示了 SelfCapLR 上的定量对比。MoRel 在所有序列上取得�
 #### 时间一致性与内存效率
 
 Table 2 聚焦于长程运动建模的关键瓶颈指标。MoRel 取得了最低的 **tOF 得分 0.203**，远优于全量训练和分块方法，证明了 ARBB 机制在消除块边界闪烁方面的有效性。在内存方面，MoRel 的训练峰值内存保持恒定约 6 GB，不随序列长度增长；而全量方法随帧数增加内存爆炸甚至溢出。渲染时 MoRel 仅需 **126 MB**，支持按需动态加载，实现了随机访问能力。
-
-![[assets/figures/papers/paper_list_l34_https_openaccess_thecvf_com_content_CVPR2026_html_Kwak_MoRel_Long_Range/figures/008_Table_2.jpg]]
-*Table 2: Metrics critical to long-range motion modeling. We highlight the key factors that determine a model’s capability in long-range motion handling*
 
 #### 定性分析
 
@@ -315,8 +292,6 @@ Table 3 系统验证了 MoRel 各组件的贡献：
 - FHD 依赖基于分位数阈值 $\tau_1, \tau_2$ 的全局方差分级，不同场景可能需要调整阈值以获得最优密度化效果。
 - 方法需要 COLMAP 进行相机参数估计和稀疏点云初始化，在无已知相机或相机估计失败的长视频场景下适用性受限。
 - 当前评估限于 SelfCapLR 数据集（超 3500 帧），在更长视频（如数小时）或极端相机运动下的泛化性尚未验证。
-
-
 
 ## 定位与知识库关联
 
@@ -360,8 +335,6 @@ MoRel的**锚点接力双向混合（Anchor Relay-based Bidirectional Blending, 
 3. **无相机场景扩展**：能否将ARBB框架与自监督的相机位姿估计方法（如DUSt3R、MASt3R等）结合，扩展到无需已知相机的场景？
 4. **跨任务迁移**：学习到的双向变形场和可学习时间不透明度控制机制，能否应用于其他需要时间一致性的任务，如视频插帧、视频压缩或动态场景的语义编辑？
 5. **渲染效率**：当前渲染时仅需126 MB内存，支持按需加载和随机访问，但渲染速度（FPS）是否满足实时应用需求，原文未提供详细数据，需要进一步验证。
-
-
 
 ## 原文 PDF
 

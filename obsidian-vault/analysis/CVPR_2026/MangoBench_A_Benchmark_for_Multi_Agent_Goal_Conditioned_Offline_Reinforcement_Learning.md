@@ -51,8 +51,6 @@ claims:
 
 该方法谱系将目标条件行为克隆（GCBC）、对比强化学习（CRL）和层次化隐式 Q 学习（HIQL）等单智能体基线扩展至多智能体场景，并与离线 MARL 方法 OMIGA、OMAR 的目标条件变体进行了系统对比。MangoBench 覆盖关节控制运动和多实体操作两大类任务，提供标准化 RL 数据集和多目标评估协议，为离线多智能体目标条件学习建立了首个系统性基准。
 
-
-
 ### 离线多智能体强化学习的核心瓶颈
 
 离线强化学习（Offline RL）使智能体能够从静态数据集中学习策略而无需与环境交互，在机器人操控、自动驾驶等高风险领域展现出巨大潜力。然而，当场景扩展至多智能体系统时，离线MARL面临两个根本性挑战：**对奖励函数的高度敏感性**和**跨目标的泛化困难**。
@@ -86,8 +84,6 @@ claims:
 1. **方法层面**：建立首个系统性的目标条件离线MARL框架，将OGCRL扩展至完全去中心化和CTDE两种范式，通过结构化目标分解消除对手工奖励的依赖，并提升多目标泛化能力。
 2. **基准层面**：构建MangoBench——首个纯合作多目标离线MARL基准，覆盖联合控制运动和多实体操作两类任务，提供标准化RL数据集和多目标评估协议。
 3. **评估层面**：揭示单目标评估的潜在偏差，建立多目标评估作为衡量目标条件离线MARL算法性能的更准确、更稳定标准。
-
-
 
 ## 核心方法与创新机理
 
@@ -137,8 +133,6 @@ MangoBench并非提出全新算法，而是通过**目标重标记（goal relabe
 - ICRL在place-food任务上超出Diffusion Policy 75%的相对提升比例，原文仅给出相对描述，精确数值需对照Figure 2验证。
 - HIQL-CTDE性能远逊于IHIQL的结论（Table 4）仅在AntMaze-navigate任务上验证，是否适用于其他任务类型尚需进一步实验。
 
-
-
 MangoBench 构建了首个面向多智能体目标条件的离线强化学习（goal-conditioned offline MARL）框架，其核心 pipeline 由四个关键模块串联而成：**目标重标记与数据集转换** → **目标分解** → **去中心化/CTDE 训练** → **多目标评估**。
 
 ### 模块关系与数据流
@@ -181,8 +175,6 @@ $$
 ### 框架的因果瓶颈与设计动机
 
 整个 pipeline 的设计围绕一个核心瓶颈展开：**离线多智能体强化学习对奖励函数高度敏感且难以泛化至新目标**。现有离线 MARL 方法（如 **OMIGA**（Wang et al., NeurIPS 2023）和 **OMAR**（Pan et al., ICML 2022））依赖手工设计的稠密奖励，在稀疏奖励下几乎完全失效（Figure 5）。MangoBench 通过目标重标记消除对手工奖励的依赖，通过目标分解实现多智能体协同下的目标条件学习，再通过多目标评估揭示算法的真实泛化能力，从而为离线 MARL 提供了一个更严格、更全面的测试平台。
-
-
 
 MangoBench框架的核心在于将单智能体离线目标条件强化学习（OGCRL）扩展至多智能体场景，通过**目标重标记**、**目标分解**和**去中心化/CTDE训练**三个关键模块，使智能体在稀疏二值奖励下仍能学习协同策略并泛化至多个目标。
 
@@ -241,8 +233,6 @@ $$\nabla_{\theta_i} J_i = \mathbb{E}_{(\mathbf{o}, \mathbf{a}, \mathbf{g}) \sim 
 
 实验表明，GCOMIGA 和 GCOMAR 在几乎所有运动控制任务中完全失败（Figure 2），证实现有离线MARL方法无法有效处理稀疏奖励，这一发现构成了后续研究的重要出发点。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈：稀疏奖励与离线学习的根本冲突
@@ -251,9 +241,6 @@ MangoBench 揭示的首要瓶颈是：现有离线多智能体强化学习（MAR
 
 ![[assets/figures/papers/paper_list_l2286_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_MangoBench_A_Benc/figures/005_Figure_2.jpg]]
 *Figure 2: Benchmark Results. For locomotion tasks, we report each method’s average success rate (%) across five test-time goals, averaged over 5 seeds with standard deviations shown as error bars. Due to the poor performance of GCOMIGA and GCOMAR, they are excluded from more challenging manipulation tasks. For manipulation tasks, we report the average success rate (%) over 100 seeds for three top-performing baselines and the imitation learning method DP [4], along with training time*
-
-![[assets/figures/papers/paper_list_l2286_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_MangoBench_A_Benc/figures/008_Figure_5.jpg]]
-*Figure 5: Results of OMIGA under different rewards*
 
 ### 主结果：谁在稀疏奖励下有效？
 
@@ -272,12 +259,6 @@ Table 4 报告了 AntMaze-navigate 任务上去中心化与 CTDE 架构的直接
 
 Table 3 在 lift-barrier 任务上系统对比了单目标与多目标评估。多目标评估下，所有方法均获得一致提升：IHIQL 从 78% 升至 82%，GCMBC 从 22% 大幅跃升至 47%。更关键的是，Figure 3 揭示了单目标评估可能导致根本性误判：在 antmaze-medium-explore 2x4d 任务中，IHIQL 在某一特定目标上达到完美成功率 1.0，但五目标平均仅为 49.6。若仅依赖单目标评估，研究者可能错误地认为该算法已解决该任务，而忽略了其在其他目标上的严重退化。这一发现确立了多目标评估作为目标条件离线 MARL 的必要评估协议。
 
-![[assets/figures/papers/paper_list_l2286_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_MangoBench_A_Benc/figures/004_Figure_3.jpg]]
-*Figure 3: Multiple Goals Evaluation. This figure reports success rates of the three baseline algorithms on antmaze-medium-explore task under 5 goals, which indicates that only use single goal to evaluate goal-conditioned offline MARL algorithms can lead to inaccurate conclusions*
-
-![[assets/figures/papers/paper_list_l2286_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_MangoBench_A_Benc/figures/007_Table_3.jpg]]
-*Table 3: Single-goal v.s. multi-goal evaluation on lift-barrier task*
-
 ### 失败模式与方法局限
 
 GCOMIGA 和 GCOMAR 的全面失败构成了 MangoBench 中最明确的失败信号。这两种方法在运动控制任务上的成功率几乎为零（Figure 2），表明简单地将现有离线 MARL 算法通过目标重标记转化为目标条件变体，并不足以应对稀疏奖励的挑战。更深层的原因在于，这些方法缺乏处理稀疏反馈信号的机制——当奖励仅在目标达成时才从 -1 变为 0 时，价值函数的学习信号极度稀疏，导致策略无法从离线数据中提取有效信息。
@@ -294,12 +275,8 @@ Table 1 和 Table 2 从环境与奖励两个维度定位了 MangoBench 的独特
 ![[assets/figures/papers/paper_list_l2286_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_MangoBench_A_Benc/figures/003_Table_2.jpg]]
 *Table 2: Properties of Reward Function in Multi-Agent Environments*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2286_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_MangoBench_A_Benc/figures/009_Figure_4.jpg]]
 *Figure 4: Visualization of different reward settings. (a) Sparse reward R, (b) shaped reward*
-
-
 
 ## 定位与知识库关联
 
@@ -368,8 +345,6 @@ MangoBench在以下维度上填补了知识空白：
 - **开放世界目标泛化**：当前评估仅使用预定义目标，实际应用中可能需要泛化到训练时未见过的目标组合。这要求方法具备目标空间的组合泛化能力，而非简单的插值泛化。
 
 **需手动验证的点**：论文未提供HIQL-CTDE性能崩溃的深层原因分析（如梯度冲突、价值函数估计偏差等），建议读者结合Table 4的具体数值和训练曲线进一步判断CTDE失败的根本机制。
-
-
 
 ## 原文 PDF
 

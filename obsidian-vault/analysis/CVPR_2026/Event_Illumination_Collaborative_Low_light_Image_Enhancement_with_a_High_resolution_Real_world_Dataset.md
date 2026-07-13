@@ -60,8 +60,6 @@ claims:
 
 在方法谱系中，EIC-LIE 处于事件-图像多模态增强与 Retinex 理论的交叉点。它既区别于纯图像域的 Retinex 方法（如 **MambaLLIE**），也不同于仅做单向选择性融合的事件-图像方法（如 **EvLight**），而是通过双向协同交互和光照感知滤波，构建了更完整的低光增强范式。此外，本文还贡献了高分辨率真实世界数据集 RLE，为事件-图像增强提供了更严格的对齐基准。
 
-
-
 低光图像增强旨在从光照不足的观测中恢复出正常光照下的清晰图像，是计算摄影与底层视觉中的基础问题。传统方法依赖Retinex理论，将图像建模为反射分量与光照分量的逐元素乘积 $\mathbf{I} = \mathbf{R} \odot \mathbf{L}$，通过估计并调整光照分量来实现增强。然而，在极端低光条件下，帧式相机捕获的图像存在严重的噪声和细节丢失，使得单纯依靠图像先验的增强方法面临信息瓶颈。
 
 事件相机（event camera）的引入为这一困境提供了新的突破口。事件相机异步感知每个像素的亮度对数变化，在变化量超过对比度阈值 $c$ 时触发事件 $\log \frac{\mathcal{L}(x_k, y_k, t_k)}{\mathcal{L}(x_k, y_k, t_k - \Delta t)} = p_k \cdot c$，具有微秒级时间分辨率和高动态范围（HDR）特性。这使得事件信号能够在极暗场景中保留边缘和纹理细节，弥补帧式图像的不足。
@@ -69,8 +67,6 @@ claims:
 然而，现有的事件-图像融合低光增强方法存在两个关键缺口。**其一，多模态特征融合停留在浅层交互。** 以 **EvLight** 为代表的现有工作采用基于SNR的选择性融合或直接交叉注意力，忽视了Retinex理论中全局光照信息对事件特征的引导作用，导致增强结果出现纹理缺失和噪声伪影。**其二，对真实低光下事件信号的噪声缺乏有效建模。** 事件相机在低光环境中本身会产生大量噪声事件，现有方法或缺乏专门的去噪机制，或仅依赖固定的SNR图进行滤波，无法根据场景亮度自适应地抑制噪声。
 
 针对上述缺口，本文提出事件-光照协同低光图像增强框架 **EIC-LIE**。核心动机在于：将事件的高动态范围边缘细节与图像的光照先验进行**双向互补增强**——通过前向收集从事件和光照特征中汇聚信息，再通过反向注入将融合后的特征精炼回各模态；同时，利用**亮度引导的自适应滤波**机制，根据图像亮度统计动态调整事件特征的滤波权重，在提升纹理恢复的同时有效抑制低光噪声。
-
-
 
 ## 核心方法与创新机理
 
@@ -137,8 +133,6 @@ EIC-LIE 通过两个核心模块——**事件-光照协同交互模块（EICI�
 
 综上，EIC-LIE 的核心创新在于将事件-图像增强从“信息筛选”范式升级为“双向协同 + 动态去噪”范式，通过因果性设计解决了真实低光场景下纹理恢复与噪声抑制的固有矛盾。
 
-
-
 EIC-LIE 的整体 pipeline 以“事件-光照协同”为核心设计理念，将事件相机的高动态范围（HDR）边缘细节与帧相机的光照先验进行双向互补增强。如图 2(a) 所示，框架由四个主要模块串联构成：光照先验估计、事件堆叠表示、EICI（事件-光照协同交互）模块、IAEF（光照感知事件滤波器），以及最终的图像重建解码器。
 
 **输入与预处理。** 系统接收一对低光图像 $\mathbf{I}_{\text{low}}$ 和同步的事件流作为输入。对于低光图像，首先从 RGB 三通道取最大值提取初始光照先验 $\mathbf{L}_p$，作为后续光照分支的引导信号（Sec. 3.2）。对于事件流，采用基于时间堆叠的 SBT（Stacking Based on Time）表示，将事件按 $B$ 个时间窗口累积极性，形成体素表示 $\mathcal{V}(i) = \sum_{k \in \mathcal{T}_i} p_k$（Eq. (4)），再经浅层卷积编码为事件特征 $\mathbf{F}_e$。低光图像则经独立编码器提取图像特征 $\mathbf{F}_i$。
@@ -149,12 +143,8 @@ EIC-LIE 的整体 pipeline 以“事件-光照协同”为核心设计理念，�
 
 **输出。** 融合后的图像特征与滤波后的事件特征经图像重建模块解码，生成最终增强图像。整个 pipeline 的模块间数据流为：低光图像 → 光照先验 / 图像特征；事件流 → SBT 表示 → 事件特征；三者进入 EICI 双向交互后，事件分支经 IAEF 去噪，最终与图像分支融合解码输出。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l749_https_arxiv_org_abs_2605_22186/figures/003_Figure_2.jpg]]
 *Figure 2: An overview of (a) our EIC-LIE. The core modules of EIC-LIE are (b) Event-Illumination Collaborative Interaction (EICI) and (c) Illumination-aware Event Filter (IAEF). Details of each module can be found in supp*
-
-
 
 EIC-LIE 的核心设计围绕两个关键模块展开：**事件-光照协同交互模块（EICI）** 与 **光照感知事件滤波器（IAEF）**。前者实现事件与光照特征的双向互补增强，后者利用光照先验对事件特征进行自适应去噪。以下逐一推导其数学机理。
 
@@ -240,13 +230,6 @@ $$\hat{\mathbf{F}}_e(m,n) = \sum \mathbf{W}(m,n) \cdot \mathbf{K}(m,n) \cdot \ma
 
 **设计机理**：光照先验提供了稳定的亮度统计特征，使滤波核能感知全局光照分布；事件特征则提供局部纹理细节，驱动权重和偏移的自适应调整。Figure 3(d) 显示，经 IAEF 处理后的事件特征（Post-IAEF）噪声水平显著低于处理前（Pre-IAEF）。消融实验证实，IAEF 模块相较无事件滤波基线带来 2.71 dB 的 PSNR 提升（Table 5），且其效果优于基于固定 SNR 图的传统滤波策略（Table 5 中与其他滤波器变体的对比）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l749_https_arxiv_org_abs_2605_22186/figures/004_Figure_3.jpg]]
-*Figure 3: (a) t-SNE analysis of features in EICI without attention reuse. Note that*
-
-
-
 ## 实验与关键发现
 
 ### 数据集与实验设置
@@ -300,24 +283,8 @@ Figure 3 提供了 EICI 和 IAEF 模块内部特征行为的定性证据：
 
 Figure 5 展示了 RLE 数据集上的视觉对比结果。EIC-LIE 在恢复暗区纹理细节的同时有效抑制了噪声放大，相比于 EvLight 等方法，增强图像在边缘锐度和色彩保真度上均有明显改善。Figure 6 和 Figure 7 分别展示了 SDE 和 SDSD 数据集上的视觉结果，进一步验证了该方法在不同场景类型下的泛化能力。Figure 1 采用颜色不变量可视化工具，从物体固有颜色和光谱分布边缘两个维度展示了 EIC-LIE 相对其他方法的增强优势。
 
-![[assets/figures/papers/paper_list_l749_https_arxiv_org_abs_2605_22186/figures/007_Figure_5.jpg]]
-*Figure 5: Visual results on RLE dataset. Note that the crop of input has been gamma corrected, and other figures also follow this adjustment. Zoom in for a better view*
-
-![[assets/figures/papers/paper_list_l749_https_arxiv_org_abs_2605_22186/figures/009_Figure_6.jpg]]
-*Figure 6: Visual results on SDE [30]-indoor (left) and -outdoor (right). Zoom in for a better view*
-
-![[assets/figures/papers/paper_list_l749_https_arxiv_org_abs_2605_22186/figures/010_Figure_7.jpg]]
-*Figure 7: Visual results on SDSD [61]-indoor (left) and -outdoor (right). Zoom in for a better view*
-
 ![[assets/figures/papers/paper_list_l749_https_arxiv_org_abs_2605_22186/figures/001_Figure_1.jpg]]
 *Figure 1: Visual comparison of LIE methods on the proposed realworld RLE dataset. To better illustrate the enhancement effects, color invariants [15] are adopted as visualization tools. Specifically, the invariant C can be interpreted as describing object color regardless of intensity, while W functions as an edge detector specific to changes in spectral distribution. See supp. for more details regarding the invariants*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l749_https_arxiv_org_abs_2605_22186/figures/005_Figure_4.jpg]]
-*Figure 4: The hardware implementation of our imaging system. In (d), from left to right, each represents low-light images, normal-light images, and aligned event streams, respectively. Refer to supp. to find more video samples of the RLE dataset*
-
-
 
 ## 定位与知识库关联
 
@@ -370,8 +337,6 @@ $$\hat{\mathbf{F}}_e(m,n) = \sum \mathbf{W}(m,n) \cdot \mathbf{K}(m,n) \cdot \ma
 3. **动态场景下的光照先验稳定性。** 光照先验从低光图像的通道最大值中提取，在动态光照变化场景下（如移动光源、闪烁），单帧光照估计可能失效。事件流本身包含光照变化信息，如何利用事件流辅助光照先验的动态更新是一个开放方向。
 
 4. **与最新基础模型的整合潜力。** 论文未讨论EIC-LIE与视觉基础模型（如扩散模型、视觉Transformer预训练模型）的整合可能性。事件-光照协同交互的框架是否可以作为即插即用的模块嵌入更大规模的增强系统中，值得探索。
-
-
 
 ## 原文 PDF
 

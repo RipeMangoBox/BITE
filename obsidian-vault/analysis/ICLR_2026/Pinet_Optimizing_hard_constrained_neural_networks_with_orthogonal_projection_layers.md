@@ -51,8 +51,6 @@ claims:
 
 实验表明，Πnet 在训练时间、解质量和超参数鲁棒性上比现有学习方法高出数个量级。在非凸问题上，Πnet 是唯一能在测试集上达到相对次优性 $\mathrm{RS} \leq 5\%$ 且约束违反 $\mathrm{CV} \leq 10^{-3}$ 最优阈值的方法；在大规模问题（$d=1000$）上，DC3 发散、JAXopt 训练极慢，而 Πnet 仅用 50 个 epoch 即获得高质量解。推理速度方面，Πnet 在批量推理中比 cvxpylayers 快约 192 倍，比 OSQP 快约 149 倍。消融实验进一步验证了矩阵均衡化与自动调谐将所需前向迭代次数从 100–350 次降至 50 次，且训练期间执行投影比仅在推理时投影将相对次优性提高一个数量级。
 
-
-
 ### 问题设定：参数化约束优化
 
 许多决策问题可形式化为参数化约束优化问题：给定上下文 $\mathbf{x}$，在凸可行集 $\mathcal{C}(\mathbf{x})$ 上最小化目标函数 $\varphi$：
@@ -85,8 +83,6 @@ $$
 
 Πnet 的核心动机正是打破这一困境：**将投影表示为一个固定点迭代，并应用隐函数定理进行高效反向传播，同时使用 Douglas-Rachford 算子分裂算法实现快速且精确的投影**。通过在神经网络输出后附加一个可微的正交投影层，Πnet 在保证约束严格满足的同时，大幅提升训练和推理效率——在非凸基准上，Πnet 以仅 50 个 epoch 的训练即超越 DC3 在 1000 个 epoch 下的解质量，且批量推理速度较 cvxpylayers 加速约 192 倍（GPU）。
 
-
-
 ## 核心方法与创新机理
 
 Πnet 的核心创新在于将传统硬约束神经网络中“投影—反向传播”这一对偶过程进行了根本性的重构，解决了长期以来训练效率与约束可行性之间的尖锐矛盾。其关键洞察在于：**将投影操作视为一个固定点迭代，并利用隐函数定理进行高效的反向传播，从而避免了对前向迭代的循环展开**。
@@ -109,8 +105,6 @@ $$
 
 综上，Πnet 通过“算子分裂前向投影 + 隐函数定理反向传播”这一核心机制，在严格保证约束满足的前提下，实现了训练效率和解质量的双重飞跃，在非凸问题上成功达到 $\text{CV} \leq 10^{-3}$ 且 $\text{RS} \leq 5\%$ 的最优性阈值，而 DC3 和 JAXopt 未能达标或无法训练（Figure 2）。
 
-
-
 ![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_EJ680UQeZG/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of the Πnet architecture. The infeasible output of the backbone network is projected onto the feasible set through an operator splitting scheme. To train the backbone network, we use the implicit function theorem to backpropagate the loss through the projection layer*
 
@@ -129,8 +123,6 @@ $$\left( I - \frac{\partial \Phi(s, y_{\mathrm{raw}})}{\partial s} \right)^\top 
 **辅助模块**：为提升数值稳定性和收敛效率，Πnet 引入了 **Ruiz 矩阵均衡化** 以改善约束矩阵的条件数，并通过 **自动调谐** 机制自适应选择 Douglas-Rachford 的超参数 $\sigma$ 和迭代次数。消融实验表明，均衡化与自动调谐可将所需前向迭代次数从默认的 100 次（或未调谐时的 350 次）降至约 50 次，同时显著降低约束违反量（Figure 16, Table 6）。
 
 整个 pipeline 的输入输出流为：上下文 $\mathbf{x}$ → 骨干网络 → $y_{\mathrm{raw}}$ → 投影层（Douglas-Rachford 固定点迭代）→ 可行解 $y$ → 损失函数。训练时，梯度沿反向路径通过隐式微分回传至骨干网络参数 $\theta$（Algorithm 2, 3）。该框架与骨干网络架构解耦，可灵活附加于任意神经网络之后。
-
-
 
 Πnet 的核心架构由一个骨干网络与一个可微的正交投影层串联而成。骨干网络（通常为 MLP）将上下文 $\mathbf{x}$ 映射为原始输出 $y_{\mathrm{raw}}$，该输出可能违反约束；投影层则将其严格投影到可行集 $\mathcal{C}(\mathbf{x})$ 上，得到可行输出 $y$。
 
@@ -163,8 +155,6 @@ $$\left( I - \frac{\partial \Phi(s, y_{\mathrm{raw}})}{\partial s} \right)^\top 
 ### 矩阵均衡化与自动调谐
 
 投影层中约束矩阵的条件数直接影响 Douglas-Rachford 迭代的收敛速度。Πnet 引入 Ruiz 矩阵均衡化预处理以改善条件数，并设计了自动调谐机制为 $\sigma$ 和迭代次数选择合适的值。消融实验表明，均衡化与自动调谐可将所需前向迭代次数从默认的 100 次（或未调谐时的 350 次）降至 50 次，同时显著降低约束违反量。
-
-
 
 ## 实验与关键发现
 
@@ -201,9 +191,6 @@ $$\left( I - \frac{\partial \Phi(s, y_{\mathrm{raw}})}{\partial s} \right)^\top 
 
 在凸基准测试中，Πnet同样展现出优异的约束满足和解质量（Figure 5），验证了该方法在不同问题类型上的泛化能力。
 
-![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_EJ680UQeZG/figures/007_Figure_5.jpg]]
-*Figure 5: Scatter plots of RS and CV on the small and large convex problems on the test set. The red dashed lines show the thresholds to consider a candidate solution optimal*
-
 ### 消融实验
 
 #### 训练期间投影的必要性
@@ -231,24 +218,6 @@ $$\left( I - \frac{\partial \Phi(s, y_{\mathrm{raw}})}{\partial s} \right)^\top 
 ### 多车辆运动规划应用
 
 Πnet成功应用于多车辆运动规划任务（Figure 4），验证了该方法在具有任意可微目标函数的约束优化问题上的灵活性。该应用展示了Πnet处理复杂约束结构的能力，同时保持了推理效率。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_EJ680UQeZG/figures/019_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_EJ680UQeZG/figures/031_Figure_22.jpg]]
-*Figure 22: VJP estimation error (measured via the ℓ2-norm of the difference and the cosine similarity) for 100 different vectors $v _ { i }$ instances (light blue) for two different instances of the small non-convex benchmark as the number of iterations in the backward pass n iter bwd increases, as well as the maximum $\ell _ { 2 }$ -error and the minimum cosine similarity among all instances (dark blue)*
-
-![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_EJ680UQeZG/figures/014_Table_4.jpg]]
-*Table 4: Inference time comparison for single-instance and batch-instance (1024 problems) settings across different methods, evaluated on small and large non-convex problems. The table reports median runtime along with statistical descriptors: lower quartile (LQ, 25th percentile), upper quartile (UQ, 75th percentile), min and max of the runtime. DC3 uses more than the default correction steps*
-
-![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_EJ680UQeZG/figures/020_Figure_14.jpg]]
-*Figure 14: Scatter plots of RS and CV on the second-order cone programs on the test set. The red dashed lines show the thresholds to consider a candidate solution optimal. Table 5: Inference time comparison for single-instance and batch-instance (1024 problems) settings across different methods, evaluated on the second-order cone programs. The table reports median runtime along with statistical descriptors: lower quartile (LQ, 25th percentile), upper quartile (UQ, 75th percentile), min and max of the runtime*
-
-![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_EJ680UQeZG/figures/026_Figure.jpg]]
-*Figure: However, if we would train an unconstrained network to predict { \hat { y } } ( \mathbf { x } ) , its values would result in yˆ(x) + for \mathrm { ~ x > 0 ~ } and \hat { y } ( \mathbf x ) \to - \infty for \mathrm { x } < 0*
-
-
 
 ## 定位与知识库关联
 
@@ -297,8 +266,6 @@ $$\left( I - \frac{\partial \Phi(s, y_{\mathrm{raw}})}{\partial s} \right)^\top 
 1. **非凸约束的扩展**：如何将算子分裂框架推广到非凸可行集？序列凸化与 Πnet 的结合是否仍能保持训练效率优势？
 2. **约束结构动态变化**：当约束矩阵随上下文 $\mathbf{x}$ 变化时，矩阵均衡化和自动调谐需要在线执行，其计算开销是否可接受？
 3. **新应用领域的验证**：论文提及神经 PDE 求解器、调度、机器人等潜在应用，但除多车辆运动规划外，尚未在更复杂的约束类型上验证 Πnet 的泛化能力。
-
-
 
 ## 原文 PDF
 

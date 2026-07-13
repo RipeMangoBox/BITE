@@ -57,8 +57,6 @@ claims:
 
 实验结果表明，Edit-Your-Motion 在 TikTok 基准和野外案例上均取得最优性能。在 TikTok 基准上，L1 误差降至 2.81E-05，FID-VID 降至 20.95；在野外案例上，PSNR 达到 23.03，SSIM 达到 0.846。消融实验证实，移除 STL 会使 PSNR 骤降至 20.24，移除 MA 则使 SSIM 降至 0.781，验证了时空解耦和运动注意力模块的关键作用。用户研究中，76.43% 的参与者偏好 Edit-Your-Motion 的文本对齐效果。
 
-
-
 视频动作编辑旨在将源视频中的人物动作替换为参考骨骼序列所定义的目标动作，同时保持人物外观、背景及帧间一致性不退化。这一任务在虚拟人动画、短视频创作和广告制作等领域具有广泛的应用前景，但在技术上仍面临严峻挑战。
 
 现有方法在处理训练分布内的样本时尚可接受，但在未见野外场景中普遍出现两类关键失败模式：**外观不一致**与**动作对齐失败**。具体表现为编辑后视频中出现显著鬼影、人体形变、背景抖动以及肢体错位等问题（Fig. 1）。其根本原因在于，当前主流方案未能有效解耦视频中的时空特征。一方面，基于外观编码器的方法（如 **MagicAnimate** (Xu et al., CVPR 2024)、**AnimateAnyone** (Hu, CVPR 2024)）依赖大规模预训练模型提取外观信息，但前景与背景特征在特征层高度重叠，导致外观保持与动作跟随之间产生冲突。另一方面，单样本微调方法（如 **MotionEditor** (Tu et al., arXiv 2023)）虽采用分割掩码在特征层解耦前景与背景，但其单阶段训练策略同时学习时序和空间特征，特征提取能力受限，难以在少量迭代中收敛到鲁棒解。
@@ -66,8 +64,6 @@ claims:
 此外，现有方法对大型预训练外观编码器和海量训练数据的依赖，使得快速适应新域变得困难。在仅给定单个源视频的设定下，如何以轻量级微调实现外观与动作的彻底解耦，是视频动作编辑走向实用的核心瓶颈。
 
 本文的动机正是针对上述缺口，提出一种时空扩散解耦学习框架 **Edit-Your-Motion**，通过以下思路从根本上缓解外观-动作冲突：在训练阶段，采用两阶段策略分别学习人体动作的时序特征和源视频的外观/背景空间特征；在推理阶段，利用DDIM反演保留源视频的结构外观信息，并设计运动注意力模块整合骨骼与外观特征。这一设计使得编辑后的视频既能精确跟随参考骨骼动作，又能保持源视频人物和背景的高度一致性。
-
-
 
 ## 核心方法与创新机理
 
@@ -100,8 +96,6 @@ Edit-Your-Motion 提出了**时空两阶段学习策略**（Spatio-Temporal Two-
 
 上述三个 changed slots 形成了协同增效的闭环：DDIM 反演提供外观保真度的基础保障，STL 通过解耦训练使各模块各司其职，MA 和 RCA 则在特征层面分别解决骨骼-外观冲突与帧间一致性问题。这一设计使得 Edit-Your-Motion 仅需单样本微调（每阶段 300 次迭代）即可在未见野外场景中实现鲁棒的动作编辑，在 TikTok 基准和野外案例上均显著优于现有方法。
 
-
-
 ![[assets/figures/papers/paper_list_l20_Edit_Your_Motion_Space_Time_Diffusion_Decoupling_Learning_for_Video_Moti/figures/002_Figure_2.jpg]]
 *Figure 2: The overall pipeline of Edit-Your-Motion. We employ DDIM inversion to preserve the appearance of the source video and introduce motion attention module to resolve conflicts between skeleton and appearance features. Additionally, we replace spatial attention with recurrent causal attention to enhance inter-frame connections. Finally, to improve the feature extraction capabilities of each module, we design a spatio-temporal decoupling two-stage training strategy that requires only a fewer training iterations*
 
@@ -118,8 +112,6 @@ Edit-Your-Motion 的整体流程围绕一个核心洞察展开：视频动作编
 **推理流程。** 推理时，源视频经 DDIM 反演得到初始潜变量，参考骨骼特征与外观特征通过运动注意力模块注入 U-Net 的去噪过程，最终生成既跟随参考动作、又保持源视频人物与背景一致性的编辑视频。
 
 整个管线的模块关系可概括为：DDIM 反演提供外观锚点，运动注意力模块融合运动与外观特征，循环因果注意力保障帧间连贯性，时空两阶段学习策略确保各模块在少量迭代内获得充分的特征提取能力。
-
-
 
 Edit-Your-Motion 的核心架构围绕三个关键模块展开：**运动注意力模块（MA）**、**循环因果注意力（RCA）** 和 **时空两阶段学习策略（STL）**。这些模块协同工作，在单样本微调框架下实现时空特征的有效解耦。
 
@@ -172,8 +164,6 @@ $$L = \mathbb{E}_{z_{t}^{m}, \epsilon \sim \mathcal{N}(0,1), t, p, f_{sk}, f_{v}
 $$z^{*} = \mathrm{DDIM-inv}(\mathcal{E}(x))$$
 
 其中 $\mathcal{E}$ 为 VAE 编码器。如 Fig. 3 所示，DDIM 反演得到的噪声直接通过 U-Net 仍能保留源视频的大部分结构特征，这是外观一致性的基础。随后，骨骼特征和外观特征通过运动注意力模块注入 U-Net，实现视频动作编辑。此外，推理时还采用骨骼偏移算法（Algorithm 1）调整参考骨骼位置，以缓解鬼影现象。
-
-
 
 ## 实验与关键发现
 
@@ -229,23 +219,14 @@ Edit-Your-Motion 在两个核心基准上均表现出显著优势：标准 TikTo
 
 论文未明确报告失败案例或局限性分析。从方法设计推断，潜在风险包括：DDIM 反演对源视频质量的依赖（低质量源视频可能导致外观信息丢失）；骨骼偏移算法（Algorithm 1）在极端姿态变化下的适用性有待验证；单样本微调虽然高效，但对全新动作类型的泛化边界尚不明确。上述推断需通过进一步实验验证。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l20_Edit_Your_Motion_Space_Time_Diffusion_Decoupling_Learning_for_Video_Moti/figures/006_Figure.jpg]]
-
 ![[assets/figures/papers/paper_list_l20_Edit_Your_Motion_Space_Time_Diffusion_Decoupling_Learning_for_Video_Moti/figures/009_Table.jpg]]
 *Table: II QUANTITATIVE COMPARISON OF MAGICANIMATE, ANIMATEANYONE, CHAMP AND OUR PROPOSED EDIT-YOUR-MOTION ON THE TIKTOK BENCHMARK. THE HIGHEST SCORE IS MARKED IN BOLD. TABLE III*
 
 ![[assets/figures/papers/paper_list_l20_Edit_Your_Motion_Space_Time_Diffusion_Decoupling_Learning_for_Video_Moti/figures/010_Table.jpg]]
 *Table: QUANTITATIVE COMPARISON OF MAGICANIMATE, ANIMATEANYONE, CHAMP AND OUR PROPOSED EDIT-YOUR-MOTION ON IN-THE-WILD CASES. THE HIGHEST SCORE IS MARKED IN BOLD*
 
-![[assets/figures/papers/paper_list_l20_Edit_Your_Motion_Space_Time_Diffusion_Decoupling_Learning_for_Video_Moti/figures/012_Table.jpg]]
-*Table: V SENSITIVITY STUDY. IN THE UNSEEN DATA, THE PSNR VARIES UNDER DIFFERENT COMBINATIONS OF THE NUMBER OF TWO-STAGE FINE-TUNING OF THE STL*
-
 ![[assets/figures/papers/paper_list_l20_Edit_Your_Motion_Space_Time_Diffusion_Decoupling_Learning_for_Video_Moti/figures/014_Table.jpg]]
 *Table: VI QUANTITATIVE COMPARISON AND USER STUDY OF FOLLOW-YOUR-POSE, MOTIONDIRECTOR, TUNE-A-VIDEO, MOTIONEDITOR AND OUR PROPOSEDEDIT-YOUR-MOTION ON IN-THE-WILD CASES. THE HIGHEST SCORE IS MARKED IN BOLD*
-
-
 
 ## 定位与知识库关联
 
@@ -291,8 +272,6 @@ Edit-Your-Motion 通过三个关键机制改变这一局面：
 - **与3D人体先验的融合**：当前方法仅使用2D骨骼作为动作表征，引入SMPL等3D参数化模型（类似Champ的思路）可能提升对复杂三维旋转和遮挡的处理能力；
 - **外观编辑的可控性**：DDIM反演在保持外观的同时也限制了对外观进行有意识编辑的空间，如何在保持身份一致性的前提下实现服装、发型等属性的可控修改；
 - **计算效率**：单样本微调虽仅需300次迭代，但仍需针对每个源视频进行训练，实时或交互式应用场景下的效率优化是实用化的关键瓶颈。
-
-
 
 ## 原文 PDF
 

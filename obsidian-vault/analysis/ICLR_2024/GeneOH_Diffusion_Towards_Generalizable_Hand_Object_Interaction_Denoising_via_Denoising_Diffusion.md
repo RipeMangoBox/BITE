@@ -61,8 +61,6 @@ claims:
 
 **方法定位**：GeneOH Diffusion属于手物交互去噪领域，其接触中心正则化表示继承了基于接触点建模的思路，但通过引入扩散去噪范式，将传统自编码器式的“噪声→干净”直接映射转变为“扩散至白化空间→规范去噪→逐步投影”的域泛化策略，从而在跨物体、跨噪声模式和跨交互类型的泛化能力上取得突破。
 
-
-
 ### 手物交互去噪的核心挑战
 
 手物交互（Hand-Object Interaction, HOI）轨迹的获取与精化是计算机视觉和机器人领域的核心问题。从视频估计、运动捕捉或遥操作中获得的交互序列常包含三类复杂噪声：（1）**非自然手部姿态**，如手指穿透物体；（2）**错误的空间关系**，如手与物体的相对位置偏移；（3）**不一致的时序关系**，如运动抖动或速度突变。这些噪声往往同时出现且相互耦合，使得去噪问题高度复杂。
@@ -86,8 +84,6 @@ claims:
 2. **基于扩散的域泛化去噪策略**：不同于直接学习噪声到干净的映射，该策略采用“先扩散至白化噪声空间，再逐步投影到数据流形”的范式。规范去噪器（canonical denoiser）仅在白化噪声空间训练，通过控制扩散步数的超参数平衡保真度与泛化性，从而实现对未见噪声分布的有效处理。
 
 这种“解耦表示 + 渐进扩散”的组合使模型在仅使用GRAB合成噪声数据训练的情况下，能够泛化到HOI4D真实噪声、ARCTIC双手交互等分布差异显著的场景，为HOI去噪的实用化提供了新路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -141,8 +137,6 @@ GeneOH 的突破在于将交互过程分解为三个正则化组件（Figure 2�
 
 **需手动验证的点**：关于“各阶段不会破坏前序阶段自然性”的数学证明位于附录 A.2，当前分析未包含该部分的具体推导，建议在撰写时确认其严谨性。
 
-
-
 GeneOH Diffusion 的整体框架围绕两个核心设计展开：**GeneOH 表示**与**基于扩散的域泛化去噪范式**。给定一段带噪手物交互序列 $(\hat{\mathcal{H}}, \mathbf{O}) = \{ (\hat{\mathbf{H}}_k, \mathbf{O}_k) \}_{k=1}^{K}$（其中物体姿态 $\mathbf{O}_k$ 假设精确，手部轨迹 $\hat{\mathbf{H}}_k$ 含噪），方法通过三个渐进阶段依次清洗手部轨迹、空间关系与时序关系，最终输出干净的手部网格序列。
 
 **输入与表示构建**  
@@ -168,13 +162,6 @@ GeneOH Diffusion 的整体框架围绕两个核心设计展开：**GeneOH 表示
 
 整个流水线的关键因果机制在于：接触中心正则化消除了不同交互序列间的分布差异，使规范去噪器能在有限训练数据上学习通用去噪能力；而渐进式扩散策略则将复杂噪声解耦至三个相对独立的子空间分别处理，从而实现对跨物体、跨交互和跨噪声模式的强泛化。消融实验证实，移除接触中心正则化（Ours w/o Canon.）会导致运动一致性从 0.41 恶化至 13.26，验证了正则化对泛化的核心作用。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1779_GeneOH_Diffusion_Towards_Generalizable_Hand_Object_Interaction_Denoising/figures/001_Figure_1.jpg]]
-*Figure 1: Trained only on limited data, GeneOH Diffusion can clean novel noisy interactions with new objects, hand motions, and unseen noise patterns (Fig. (a)), produces diverse refined trajectories with discrete manipulation modes (Fig. (b)), and is a practical tool for many applications (Fig. (c))*
-
-
-
 GeneOH Diffusion 的核心由两个关键设计构成：**接触中心的正则化 HOI 表示（GeneOH）** 与 **基于扩散的域泛化去噪范式**。前者将交互过程分解为手部轨迹、空间关系与时序关系三个组件，并通过广义接触点将所有关系转换至统一坐标系；后者采用“先扩散至白化噪声空间，再逐步投影到数据流形”的策略，使模型在仅见有限训练噪声的情况下仍能处理分布外噪声。
 
 ### 3.1 GeneOH 表示
@@ -182,9 +169,6 @@ GeneOH Diffusion 的核心由两个关键设计构成：**接触中心的正则�
 给定含噪手物交互序列 $(\hat{\mathcal{H}}, \mathbf{O}) = \{(\hat{\mathbf{H}}_k, \mathbf{O}_k)\}_{k=1}^K$（假设物体姿态 $\mathbf{O}_k$ 精确，手部轨迹 $\hat{\mathbf{H}}_k$ 含噪），GeneOH 首先提取**广义接触点**：从物体表面采样距离手部轨迹不超过阈值 $r_c = 5\text{ mm}$ 的 $N_o$ 个点，记为 $\mathbf{P}_k$。这些接触点构成正则化的空间锚点，其 6D 姿态 $(\mathbf{t}_k, \mathbf{R}_k)$ 用于将所有关系转换至统一坐标系。
 
 GeneOH 包含三个组件（如 Figure 2 所示）：
-
-![[assets/figures/papers/paper_list_l1779_GeneOH_Diffusion_Towards_Generalizable_Hand_Object_Interaction_Denoising/figures/002_Figure_2.jpg]]
-*Figure 2: Three components of GeneOH*
 
 **（1）正则化手部轨迹 $\bar{\mathcal{T}}$**
 
@@ -234,8 +218,6 @@ $$\tilde{x}_{t-1} = \frac{1}{\sqrt{\alpha_t}} \left( \tilde{x}_t - \frac{1 - \al
 3. **TemporalDiff**：去噪时序关系 $\mathcal{T}$，修复运动不一致性，输出最终正则化轨迹，经 MANO 拟合得到参数化手部网格序列。
 
 消融实验（Table 2）证实：移除正则化（Ours w/o Canon.）使运动一致性从 0.41 恶化至 13.26 mm²；去掉 TemporalDiff 使运动一致性退化至 34.25；将扩散去噪器替换为自编码器（Ours w/o Diffusion）导致穿透深度从 1.74 mm 增至 3.83 mm。这些结果验证了各模块的必要性。
-
-
 
 ## 实验与关键发现
 
@@ -291,30 +273,14 @@ $$\tilde{x}_{t-1} = \frac{1}{\sqrt{\alpha_t}} \left( \tilde{x}_t - \frac{1 - \al
 ![[assets/figures/papers/paper_list_l1779_GeneOH_Diffusion_Towards_Generalizable_Hand_Object_Interaction_Denoising/figures/004_Figure_4.jpg]]
 *Figure 4: Qualitative comparisons. Please refer to our website and video for animated results*
 
-![[assets/figures/papers/paper_list_l1779_GeneOH_Diffusion_Towards_Generalizable_Hand_Object_Interaction_Denoising/figures/005_Figure_5.jpg]]
-*Figure 5: Stochastic denoising can produce divserse results with discrete modes*
-
-![[assets/figures/papers/paper_list_l1779_GeneOH_Diffusion_Towards_Generalizable_Hand_Object_Interaction_Denoising/figures/018_Figure_12.jpg]]
-*Figure 12: Weird artifacts produced by TOCH (w/ MixStyle). (First line:) Ours result. (Second line:) The result of TOCH (w/ MixStyle). The noisy input is perturbed by noise sampled from a Beta distribution, different from that used in training*
-
-![[assets/figures/papers/paper_list_l1779_GeneOH_Diffusion_Towards_Generalizable_Hand_Object_Interaction_Denoising/figures/007_Figure_6.jpg]]
-*Figure 6: Applications on refining noisy hand trajectories estimated from videos (left) and cleaning retargeted hand trajectories (right)*
-
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1779_GeneOH_Diffusion_Towards_Generalizable_Hand_Object_Interaction_Denoising/figures/006_Table_1.jpg]]
 *Table 1: Quantitative evaluations and comparisons to baselines. Bold red numbers for best values and italic blue values for the second best-performed ones. “GT” stands for “Ground-Truth”*
 
 ![[assets/figures/papers/paper_list_l1779_GeneOH_Diffusion_Towards_Generalizable_Hand_Object_Interaction_Denoising/figures/008_Table_2.jpg]]
 *Table 2: Ablation studies on the HOI4D dataset*
 
-![[assets/figures/papers/paper_list_l1779_GeneOH_Diffusion_Towards_Generalizable_Hand_Object_Interaction_Denoising/figures/028_Table_7.jpg]]
-*Table 7: User study*
-
 ![[assets/figures/papers/paper_list_l1779_GeneOH_Diffusion_Towards_Generalizable_Hand_Object_Interaction_Denoising/figures/011_Table_4.jpg]]
 *Table 4: Quantitative evaluations and comparisons. Performance comparisons of our method, baselines, and ablated versions on different test sets using the first set of evaluation metrics. Bold red numbers for best values and italic blue values for the second best-performed ones*
-
-
 
 ## 定位与知识库关联
 
@@ -367,8 +333,6 @@ GeneOH Diffusion 开启的研究方向包括：
 - **联合去噪**：如何将物体姿态也纳入去噪框架？当前假设物体轨迹精确，但在真实场景（如视频估计）中，手物轨迹往往同时含噪，联合去噪是自然且必要的扩展。
 - **表示泛化**：接触中心的正则化策略能否直接扩展到全身交互（如人与场景交互）或多人协同场景？这需要重新定义“广义接触点”的概念以及相应的正则化变换。
 - **噪声尺度自适应**：当前扩散步数需手工设定，能否根据输入噪声的严重程度自适应地调整扩散步数，在去噪强度与忠实度之间实现动态平衡？
-
-
 
 ## 原文 PDF
 

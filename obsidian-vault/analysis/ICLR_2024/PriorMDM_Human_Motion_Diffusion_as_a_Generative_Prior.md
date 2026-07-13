@@ -65,8 +65,6 @@ claims:
 
 该工作的局限性在于：长序列中远距离区间可能出现语义不一致；两人交互对未见交互类型的泛化有限，且未保证真实物理接触；三种组合方法的跨领域适用性尚待验证。
 
-
-
 ### 问题背景
 
 人体运动生成是计算机视觉与图形学中的核心任务，其应用涵盖动画制作、虚拟现实、人机交互等领域。近年来，扩散模型在运动生成中展现出强大的能力，能够产生高质量、多样化的运动序列。然而，现有方法面临一个根本性瓶颈：**高质量运动数据的捕捉与标注成本极为高昂**。这导致当前生成模型普遍受限于单人短序列（通常不超过10秒），难以处理以下三类复杂任务：
@@ -96,8 +94,6 @@ claims:
 3. **DiffusionBlending**：针对多关节组合控制，通过微调专用控制模型并在采样时线性混合，实现灵活且精确的复合控制。
 
 这一思路的优越性在于其**经济性**与**通用性**：冻结或微调前置模型、引入轻量通信或混合机制，即可在多个任务上实现超出训练分布的运动合成，避免了为每个新任务从头收集数据和训练模型的高昂成本。
-
-
 
 ## 核心方法与创新机理
 
@@ -139,8 +135,6 @@ $$G_s^{a,b}(X_t, t, c_a, c_b) = G^a(X_t, t, c_a) + s \cdot (G^b(X_t, t, c_b) - G
 
 三种方法的共同特征在于**对预训练先验的零侵入或微侵入利用**：DoubleTake完全冻结MDM，仅在推理时引入handshake与软遮罩；ComMDM冻结两个MDM，仅训练单层通信块；DiffusionBlending微调多个小型控制模型，在采样时混合。这一设计哲学使得PriorMDM能够以极低的额外成本，将单人短序列生成模型扩展至长序列、多人交互、精细关节控制等超出训练分布的下游任务。
 
-
-
 PriorMDM 并非重新训练一个通用模型，而是将预训练的运动扩散模型（MDM）固化为生成先验，在其上构建三种互补的组合策略，以零样本或少量样本的方式突破原始模型的分布边界。整体框架由三个独立但共享同一基座模型的模块构成：
 
 - **DoubleTake**：面向任意长度序列生成的推理时组合方法，无需额外训练。
@@ -180,13 +174,6 @@ $$G_s^{a,b}(X_t, t, c_a, c_b) = G^a(X_t, t, c_a) + s \cdot (G^b(X_t, t, c_b) - G
 其中 $s$ 为混合权重。这一机制将 classifier-free guidance 的思想泛化至任意两个对齐扩散模型的组合，使生成运动同时满足多个控制约束（如同时控制左腕轨迹和根轨迹），而无需为每种组合重新训练模型。
 
 三个模块的输入输出关系清晰：DoubleTake 输入文本序列与区间划分，输出拼接后的长序列运动；ComMDM 输入两人文本描述，输出同步的两人运动；DiffusionBlending 输入控制信号（关节位置/轨迹）及文本条件，输出受控运动。所有输出均为人体运动序列表示，可直接用于下游动画或分析任务。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2303_01418/figures/001_Figure_1.jpg]]
-*Figure 1: We suggest three novel motion composition methods, all based on the recent Motion Diffusion Model (MDM). (Left) Sequential composition generating an arbitrary long motion with text control over each time interval. (Middle) Parallel composition generating two-person motion from text. A different color represents a different person - both are generated simultaneously given the text prompt. (Right) Model composition achieving accurate and flexible control by blending models with different control signals - here writing “hello" in mid-air*
-
-
 
 PriorMDM 的核心架构并非重新训练一个全新模型，而是将预训练的运动扩散模型 MDM（Tevet et al., ICLR 2023）固定为生成先验，在其上构建三种互补的组合策略。以下逐一剖析各模块的机制与关键公式。
 
@@ -228,18 +215,11 @@ $$G_s^{a,b}(X_t, t, c_a, c_b) = G^a(X_t, t, c_a) + s \cdot (G^b(X_t, t, c_b) - G
 
 其中 $c_a$、$c_b$ 为两个不同的控制条件（如左腕轨迹与根轨迹），$s$ 为混合权重。该方法本质上是将 classifier-free guidance 的思想泛化到任意两个对齐扩散模型之间，使得单一采样过程即可同时满足多个控制约束，而无需重新训练联合控制模型。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2303_01418/figures/003_Figure_3.jpg]]
 *Figure 3: DoubleTake overview. We generate arbitrarily-long sequences with text control per interval using a fixed motion diffusion prior. At the first take, we generate each interval as a single sample handshaking neighboring samples. At each denoising iteration, the handshakes are forced to be equal to eventually compose one long sequence. To refine the transition between intervals, the second take partially noise the handshakes and clean them conditioned on the neighboring intervals using a soft mask. Solid frames mark generation or refinement; Dashed frames mark input motion to the take*
 
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2303_01418/figures/004_Figure_4.jpg]]
 *Figure 4: ComMDM overview. Using two fixed MDM models, we train a slim communication block (ComMDM) for two-person motion generation. ComMDM gets as input the activations of transformer layer*
-
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2303_01418/figures/002_Figure_2.jpg]]
-*Figure 2: Soft blending overview. We allow b frames long linear masking between*
-
-
 
 ## 实验与关键发现
 
@@ -299,22 +279,7 @@ PriorMDM的实验体系围绕一个统一命题展开：**冻结的预训练运�
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2303_01418/figures/011_Table_3.jpg]]
 *Table 3: 3DPW prefix completion L2 error. Given a 1-second long prefix, all models predict a 3-second long motion completion. We report the root error and the joint’s mean error relative to the root for the first 1, 2, and 3 seconds. Bold indicates best result, underline indicates second best. We introduce two ablation studies, the first is for the number of layers constructing ComMDM (ours is 1), and the second is in which layer of MDM it is placed (ours is in the 8th). Observe that the communication block performs better when placed in higher layers of the transformer and constructed from fewer layers*
 
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2303_01418/figures/013_Table_4.jpg]]
-*Table 4: Joints control with fine-tuned models and DiffusionBlending. We compare our joints control method with the motion inpainting method suggested by Tevet et al. [2023]. We conduct the evaluation on HumanML3D [2022] test set. ′+′ sign represents a blending of two fine-tuned models with our DiffusionBlending method*
-
 整体而言，PriorMDM在三个任务上的核心结论均有可靠的定量与定性证据支撑，消融实验清晰揭示了各组件的因果贡献。主要局限在于长期语义连贯性和物理交互真实性，这些方向仍需后续工作探索。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2303_01418/figures/005_Figure_5.jpg]]
-*Figure 5: DoubleTake transition refinement. The second take refines the transitions generated in the first take to be more smooth and more realistic. Orange are subsequent transition frames and Blue are context intervals*
-
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2303_01418/figures/006_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2303_01418/figures/007_Figure_6.jpg]]
-*Figure 6: Two-Person Prefix Completion. MRT [Wang et al. 2021] tends to fixate on the prefix pose whereas our ComMDM provides lively and semantically correct completions. Blue figures are the input prefix frames, provided to both models. The red and orange figures are MRT and our completions correspondingly*
-
-
 
 ## 定位与知识库关联
 
@@ -360,8 +325,6 @@ PriorMDM的三条技术路线分别针对长序列生成、多人交互和精细
 - **多模态先验融合**：当前仅利用文本作为条件，是否可引入图像、语音等模态的先验，进一步增强控制精度与数据效率？
 - **物理仿真耦合**：在两人交互生成中，是否可将轻量物理仿真作为后处理或训练约束，以弥补ComMDM对物理接触建模的不足？
 - **推理效率优化**：是否存在蒸馏或一步采样策略，将多次组合推理的计算开销压缩至接近单次生成的水平？
-
-
 
 ## 原文 PDF
 

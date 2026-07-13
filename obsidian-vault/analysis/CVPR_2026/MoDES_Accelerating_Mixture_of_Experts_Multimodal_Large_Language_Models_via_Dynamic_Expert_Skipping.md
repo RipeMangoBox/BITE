@@ -54,8 +54,6 @@ claims:
 
 **局限与展望**：作为训练无关框架，MoDES可能无法达到训练感知方法的理论上限；前沿搜索依赖的单调性假设在复杂模型中可能不成立；校准数据集仅使用GQA，跨分布泛化能力有待验证；目前仅评估了视觉语言任务，在音频等其他模态上的适用性尚不明确。
 
-
-
 ### 混合专家架构在多模态大模型中的效率瓶颈
 
 多模态大语言模型（MLLM）在视觉问答、图像描述、视频理解等任务上取得了显著进展，但其庞大的参数规模带来了高昂的推理成本。混合专家（Mixture-of-Experts, MoE）架构通过稀疏激活机制，在保持模型容量的同时降低了计算量，成为当前主流 MLLM 的重要设计选择。典型的 MoE 层将前馈网络（FFN）替换为多个并行的专家子网络，并通过路由器为每个 token 选择 top-k 个专家进行激活：
@@ -95,8 +93,6 @@ MoE MLLM 同时处理文本和视觉两种模态的 token，但现有方法对�
 2. **双模态阈值（DMT）**：为文本 token 和视觉 token 分别设置独立的跳过阈值 $\tau_t$ 和 $\tau_v$，使视觉 token 能够跳过更多专家，而文本 token 保留更多专家，实现模态感知的自适应跳过。
 
 此外，MoDES 还引入了基于单调性假设的前沿搜索算法，将阈值搜索时间从数天降至数小时，并通过定制 CUDA 内核实现实际推理加速。实验表明，在跳过 83%–88% 专家的极端条件下，MoDES 仍能保持超过 95% 的原模型性能，同时实现预填充约 2× 和解码约 1.2× 的加速。
-
-
 
 ## 核心方法与创新机理
 
@@ -141,8 +137,6 @@ $$\{ \mathtt{Expert}_i^{(l)} \mid s_i^{(l)} < \tau_{\mathrm{t}} \cdot \mathbb{I}
 
 这两个核心 changed slots 共同作用，使得 MoDES 在极高跳过比例下仍能保持性能：在 Kimi-VL-A3B-Instruct 上跳过 83% 专家时，MoDES 保持 96.25% 平均性能，而最强基线 DiEP 下降超过 11%（Table 1）；在 Qwen3-VL-MoE-30B-A3B-Instruct 上跳过 88% 专家时，性能提升达 10.67%（97.33% vs. 86.66%，Table 3）。这些结果表明，**层次敏感且模态感知的专家跳过策略**是 MoDES 相对于现有 training-free 方法的核心优势所在。
 
-
-
 MoDES 是一个 **training-free** 的推理加速框架，其核心目标是在不修改模型参数的前提下，自适应地跳过 MoE MLLM 中冗余的 FFN 专家，从而在保持精度的同时显著降低计算开销。
 
 ### Pipeline 总览
@@ -171,8 +165,6 @@ MoDES 的推理流程由三个关键模块串联构成，如图 Figure 4 所示�
 -   **模态感知的阈值解耦**：文本和视觉令牌在 FFN 前后的余弦相似度及与 FFN 权重的夹角存在显著差异（Figure 3 Middle/Right），证明专家对视觉令牌的影响更小。DMT 通过独立阈值 $\tau_t$ 和 $\tau_v$ 充分利用了这一冗余差异，使得视觉令牌可以跳过更多专家。
 -   **CUDA Kernel 实现**：为获得实际推理加速，MoDES 在 CUDA 内核中实现了双模态阈值比较和组 GEMM 操作（Appendix B），在 Kimi-VL-A3B-Instruct 上实现了 prefilling 2.16×、decoding 1.26× 的加速比。
 
-
-
 MoDES 是一个训练无关（training-free）的推理加速框架，核心由两个模块构成：**全局调制的局部门控（GMLG）** 和 **双模态阈值（DMT）**。GMLG 负责为每个令牌的每个专家生成重要性得分，DMT 则根据令牌模态决定跳过哪些专家。两者配合，实现了层次敏感且模态感知的专家跳过。
 
 ### 全局调制的局部门控（GMLG）
@@ -194,9 +186,6 @@ $$ s _ { i } ^ { ( l ) } = \alpha ^ { ( l ) } \cdot \pi _ { i } ^ { ( l ) } $$
 $$ \alpha ^ { ( l ) } = \frac { 1 } { N } \sum _ { j = 1 } ^ { N } \mathcal { D } _ { \mathrm { K L } } \left( \mathtt { p r o b } _ { j } \| \mathtt { p r o b } _ { j } ^ { ( l ) } \right) $$
 
 其中 $\mathtt{prob}_j$ 和 $\mathtt{prob}_j^{(l)}$ 分别为原模型和跳过第 $l$ 层专家的模型对第 $j$ 个校准样本的输出概率。$\alpha^{(l)}$ 越大，说明该层专家对最终输出的影响越大——实验表明浅层 $\alpha^{(l)}$ 显著高于深层（Figure 7），这与 Figure 2 中浅层专家更为关键的发现一致。实际推理时，$\alpha^{(l)}$ 经跨层归一化后使用：$\widetilde { \alpha ^ { ( l ) } } = \frac { \alpha ^ { ( l ) } } { \sum _ { l ^ { \prime } = 1 } ^ { L } \alpha ^ { ( l ^ { \prime } ) } }$。
-
-![[assets/figures/papers/paper_list_l767_https_arxiv_org_abs_2511_15690/figures/002_Figure_2.jpg]]
-*Figure 2: Performance on image (i.e., (a)-(b)) and video*
 
 ![[assets/figures/papers/paper_list_l767_https_arxiv_org_abs_2511_15690/figures/003_Figure_3.jpg]]
 *Figure 3: (Left) t-SNE [52] visualization of pre-FFN text/vision tokens across all layers. (Middle) Cosine similarity between pre-FFN and post-FFN text/vision tokens across layers. (Right) Angle between text/vision tokens and weights across different FFN layers. Here, GQA [25] dataset is used as the model inputs, and the model is employed the same as that in Fig. 2*
@@ -227,8 +216,6 @@ $$ \operatorname* { m i n } _ { \tau _ { \mathrm { t } } \in \mathcal { B } , \t
 
 消融实验（Table 4）证实，GMLG 和 DMT 对性能提升均至关重要：仅使用局部概率（w/o GMLG）时 ChartQA 为 82.38，加入 GMLG 后提升至 84.20（Skip 83%）；进一步加入 DMT 后达到最优。校准样本数 $N=1024$ 即可实现大部分性能增益（Table III），加倍样本数收益递减。
 
-
-
 ## 实验与关键发现
 
 ### 主要结果：MoDES 在极高跳过高率下保持性能领先
@@ -249,9 +236,6 @@ MoDES 在多个 MoE 多模态大语言模型上，以极高的专家跳过比例
 
 MoDES 在实际推理速度上同样带来显著提升。在单张 H200 GPU 上，对于 Kimi-VL-A3B-Instruct（83% 跳过比例），MoDES 的预填充阶段加速 **2.16×**，解码阶段加速 **1.26×**；对于 Qwen3-VL-MoE-30B-A3B-Instruct（88% 跳过比例），预填充加速 **2.03×**，解码加速 **1.24×**（Figure 6）。加速效果在预填充阶段更为明显，这与 MoE 层在长序列预填充中计算占比较高的事实一致。
 
-![[assets/figures/papers/paper_list_l767_https_arxiv_org_abs_2511_15690/figures/008_Figure_6.jpg]]
-*Figure 6: Inference speed for (Upper) Kimi-VL-A3B-Instruct [50] and (Lower) Qwen3-VL-MoE-30B-A3B-Instruct [26] on a single H200 GPU. The expert skipping ratios for the former and the latter are 83% and 88%, respectively. The batch size for prefilling is 8, and the sequence length for decoding is 1024*
-
 ### 消融研究：GMLG 与 DMT 的独立贡献
 
 消融实验（Table 4）系统拆解了 GMLG 和 DMT 两个核心组件的贡献。以 Kimi-VL-A3B-Instruct 在 83% 跳过比例下的表现为基准：
@@ -266,14 +250,9 @@ MoDES 在实际推理速度上同样带来显著提升。在单张 H200 GPU 上�
 
 阈值搜索方面，所提出的前沿搜索算法（Algorithm 1）将搜索时间从朴素方法的数天缩短至约 **2 小时**，加速约 **45 倍**（Figure 5），且不影响最终性能。搜索空间大小 D 的消融（Table IV）显示，适度增大 D 可带来性能提升，但边际收益递减，验证了前沿搜索在效率与精度间的良好平衡。
 
-![[assets/figures/papers/paper_list_l767_https_arxiv_org_abs_2511_15690/figures/009_Figure_5.jpg]]
-
 ### 量化兼容性
 
 MoDES 与量化技术可正交叠加。采用 MC-MoE 的混合精度量化策略（MoE-FFN 使用混合精度，其他层使用 4-bit 权重量化）后，MoDES 在保持高跳过比例的同时进一步压缩模型体积，且性能损失极小（Table 2），表明 training-free 的跳过策略与训练后量化之间不存在冲突。
-
-![[assets/figures/papers/paper_list_l767_https_arxiv_org_abs_2511_15690/figures/006_Table_2.jpg]]
-*Table 2: Performance of combination with quantization. MoDES employs the quantization strategy in MC-MoE [22]: weightonly mixed-precision quantization for MoE-based FFNs and 4-bit weight-only quantization for other layers*
 
 ### 失败模式与局限性分析
 
@@ -296,16 +275,6 @@ MoDES 与量化技术可正交叠加。采用 MC-MoE 的混合精度量化策略
 
 ![[assets/figures/papers/paper_list_l767_https_arxiv_org_abs_2511_15690/figures/001_Figure_1.jpg]]
 *Figure 1: Average performance (%) vs. expert skipping ratios (%) across different models [26, 50, 57] and methods [6, 22, 42] on 13 benchmarks (as detailed in Sec. 6.1). The left subfigure is for Kimi-VL-A3B-Instruct [50] and the right subfigure is for Qwen3- VL-MoE-30B-A3B-Instruct [26]*
-
-![[assets/figures/papers/paper_list_l767_https_arxiv_org_abs_2511_15690/figures/010_Figure_8.jpg]]
-*Figure 8: Visualization of expert skipping ratios (%) across modalities and layers on 13 benchmarks (Sec. 6.1). The left subfigure is for Kimi-VL-A3B-Instruct [50] and the right subfigure is for Qwen3-VL-MoE-30B-A3B-Instruct [26]. The overall skipping ratios for the former and the latter are 83% and 88%, respectively*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l767_https_arxiv_org_abs_2511_15690/figures/012_Figure_7.jpg]]
-*Figure 7: Visualization results of global contributions*
-
-
 
 ## 定位与知识库关联
 
@@ -365,8 +334,6 @@ MoDES 在方法谱系中的独特定位体现在两个关键机制：
 3. 在更细粒度的视觉任务（如图像分割、视频动作检测）上，模态感知的跳过策略是否仍然有效？视觉令牌内部的异质性是否值得进一步建模？
 4. 能否自动化确定校准样本数量和搜索空间大小，减少人工调参成本？
 5. 前沿搜索的单调性假设在什么情况下会失败？如何检测并自适应地切换到更鲁棒的搜索策略？
-
-
 
 ## 原文 PDF
 

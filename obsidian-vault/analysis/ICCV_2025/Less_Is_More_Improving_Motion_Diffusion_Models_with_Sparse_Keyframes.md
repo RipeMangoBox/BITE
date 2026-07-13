@@ -85,8 +85,6 @@ sMDM属于**文本驱动运动扩散模型**这一研究方向，其直接基线
 
 当前方法假设了Transformer的自注意力结构，在U-Net架构上的直接应用效果不佳（sCondMDI在运动插值任务上FID从0.153升至0.551）。此外，动态掩码更新在扩散步数较少（≤10）时提升有限，关键帧缩减率等超参数需针对数据集调整。值得进一步探索的方向包括：设计更适合稀疏帧输入的U-Net混合架构、引入速度/加速度等更多运动特征作为关键帧选择依据，以及将稀疏关键帧思想扩展到运动编辑、运动补全等更广泛的下游任务。
 
-
-
 ### 问题背景
 
 文本驱动的人体运动生成旨在从自然语言描述中合成逼真的三维人体动作序列，在动画制作、游戏开发和人机交互中具有广泛应用。近年来，扩散模型在该领域取得了显著进展，代表性工作包括**MDM**（Tevet et al., 2022）、**MotionDiffuse**（Zhang et al., 2022）和**ReMoDiffuse**（Zhang et al., 2023）等。这些方法通常将运动序列建模为密集帧序列，通过Transformer自注意力机制在全部帧之间建立依赖关系。
@@ -104,8 +102,6 @@ sMDM属于**文本驱动运动扩散模型**这一研究方向，其直接基线
 本文的核心洞察来自专业动画师的工作流程：动画师并非逐帧绘制，而是先确定几何上有意义的**稀疏关键帧**（keyframes），再通过插值填充中间帧。这一观察启发作者将运动扩散模型的重心从密集帧转移到关键帧。
 
 具体而言，本文提出**稀疏运动扩散模型（Sparse Motion Diffusion Model, sMDM）**，其动机在于：通过掩码自注意力仅在关键帧之间建模依赖，并借助轻量线性插值重建非关键帧特征，可以在不牺牲生成质量的前提下显著降低计算开销，同时提升文本对齐精度与运动真实感。
-
-
 
 ## 核心方法与创新机理
 
@@ -130,8 +126,6 @@ sMDM 引入一个二值掩码 $M$，将自注意力计算严格限制在关键�
 ### 方法定位
 
 上述四个模块构成一个轻量级框架，**无需改变 MDM 的 Transformer 骨干架构**即可嵌入。这种非侵入式设计使得 sMDM 能够直接继承预训练权重，并在 HumanML3D 上以极低的额外复杂度实现 FID 0.130，远超原始 MDM 的 0.544，与检索增强的 SOTA 方法 **ReMoDiffuse**（Zhang et al., 2023）的 0.103 可比。当配备更大文本编码器（Stella-1.5B）时，sMDM-stella 的 Top-1 R-Precision 达到 0.554，在所有使用先进文本编码器的方法中取得最优。
-
-
 
 **Sparse Motion Diffusion Model (sMDM)** 以**MDM**（Tevet et al., 2022）的Transformer运动扩散骨干为基础，将生成过程聚焦于稀疏关键帧，通过“掩码—插值—平滑”三阶段管线实现高效、可控的运动生成。整体pipeline如下：
 
@@ -160,12 +154,8 @@ sMDM 引入一个二值掩码 $M$，将自注意力计算严格限制在关键�
 
 文本提示经CLIP ViT-B/32（63M）编码后，与带噪运动序列的帧特征一同输入Transformer骨干。经掩码自注意力、插值重建和Lipschitz MLP映射后，输出预测的干净运动序列$\hat{\mathbf{x}}_0$。整个过程保持与MDM相同的架构接口，改动集中在帧级别的掩码与插值操作上，因此该方法可泛化至多种基于Transformer的运动扩散模型（如**MotionDiffuse**、**PriorMDM**等），但对U-Net架构的直接迁移效果不佳（见局限性讨论）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1891_Less_Is_More_Improving_Motion_Diffusion_Models_with_Sparse_Keyframes/figures/002_Figure_2.jpg]]
 *Figure 2: Model architectures of Sparse Motion Diffusion Model (sMDM). Our sMDM uses a binary keyframe mask M to exclude nonkeyframes from the self-attention layers. During training, M is derived from the clean input x0 via keyframe selection [40]. At inference, the model starts with a uniform keyframe mask at earlier timesteps*
-
-
 
 ### 3.1 运动扩散基础
 
@@ -209,8 +199,6 @@ $$A_i = \frac{1}{2} \left| \det \begin{pmatrix} x_{i-1} & y_{i-1} & 1 \\ x_{i} &
 
 **推理阶段**：初始采用均匀间隔的掩码。当扩散时间步 $t$ 降至阈值 $T' = \gamma \cdot T$ 以下时（$\gamma$ 为超参数），从当前中间去噪结果 $\mathbf{x}_t$ 出发，重新运行Visvalingam-Whyatt算法动态更新关键帧集合，使掩码聚焦于信息量更大的帧。此动态掩码更新在大扩散步数（如1000步）下尤为有效（Sec 4.2, Table 2）。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -253,30 +241,14 @@ sMDM 的设计假设了 Transformer 的自注意力结构，其在其他架构�
 
 **Table 4** 报告了 Diffusion Planner 实时角色控制任务上的结果。在不同关键帧缩减率下，sDiP 和 sDiP‑T 均保持了对密集基线的竞争力，验证了稀疏训练在交互式应用场景中的可行性。但缩减率作为关键超参数需针对数据集调整——HumanML3D 上 80% 的缩减率效果最优，泛化到其他数据分布时可能需要重新搜索。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1891_Less_Is_More_Improving_Motion_Diffusion_Models_with_Sparse_Keyframes/figures/001_Figure_1.jpg]]
 *Figure 1: We propose a keyframe-centric framework for training motion diffusion models. Our method, namely Sparse Motion Diffusion Model (sMDM), outperforms baseline Motion Diffusion Model (MDM) [35], achieving more stable and precise motion generation while better capturing text prompts*
 
 ![[assets/figures/papers/paper_list_l1891_Less_Is_More_Improving_Motion_Diffusion_Models_with_Sparse_Keyframes/figures/004_Table_2.jpg]]
 *Table 2: Ablation studies on dynamic mask update (Sec. 4.2). This strategy is particularly effective in terms of motion quality (FID) for the models trained with relatively large diffusion steps*
 
-![[assets/figures/papers/paper_list_l1891_Less_Is_More_Improving_Motion_Diffusion_Models_with_Sparse_Keyframes/figures/005_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l1891_Less_Is_More_Improving_Motion_Diffusion_Models_with_Sparse_Keyframes/figures/006_Figure.jpg]]
-
 ![[assets/figures/papers/paper_list_l1891_Less_Is_More_Improving_Motion_Diffusion_Models_with_Sparse_Keyframes/figures/007_Table_3.jpg]]
 *Table 3: Evaluation on Double Take [31] results generated from the model pretrained on HumanML3D dataset [7]. We denote results from the experiment using a pretrained standard MDM as PriorMDM, while those using a pretrained sMDM as sPriorMDM. Both pretrained models are trained with a 50-step diffusion setting*
-
-![[assets/figures/papers/paper_list_l1891_Less_Is_More_Improving_Motion_Diffusion_Models_with_Sparse_Keyframes/figures/008_Table_4.jpg]]
-*Table 4: Text-to-motion results using the Diffusion Planner (DiP) model [36] on HumanML3D dataset [7]. We distinguish between DiP and DiP-T, where DiP-T represents models trained with target conditioning technique for dynamic change of control joint sets, while DiP denotes models trained without it. Additionally, sDiP and sDiP-T refer to models trained using our approach, with different keyframe reduction rates specified in parentheses*
-
-![[assets/figures/papers/paper_list_l1891_Less_Is_More_Improving_Motion_Diffusion_Models_with_Sparse_Keyframes/figures/009_Table_6.jpg]]
-*Table 6: Text-to-motion results of MotionDiffuse and sMotionDiffuse, implemented with Transformer encoder, on HumanML3D dataset [7]*
-
-![[assets/figures/papers/paper_list_l1891_Less_Is_More_Improving_Motion_Diffusion_Models_with_Sparse_Keyframes/figures/011_Table.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -316,8 +288,6 @@ sMDM 的设计隐含了对 Transformer 自注意力结构的强依赖。这一�
 3. **任务拓展**：稀疏关键帧思想能否迁移到运动编辑、运动补全、运动风格迁移等下游任务？这些任务中关键帧的语义可能从“几何显著帧”转变为“编辑锚点帧”或“风格关键帧”。
 4. **规模化收益**：在更大规模运动数据集（如十亿帧级别）上，稀疏训练是否能带来超越线性加速的效率提升？自注意力复杂度从 $O(N^2)$ 降至 $O(K^2)$ 的理论收益在极长序列场景下可能更加显著。
 5. **过渡段质量优化**：针对长序列生成中过渡段退化的问题，是否可以通过调整混合边界（blending margin）或引入过渡段专项损失来缓解？
-
-
 
 ## 原文 PDF
 

@@ -58,8 +58,6 @@ HSI-GPT2 的核心思路是将**LLM作为高层语义规划器**与**扩散模�
 
 在方法谱系中，HSI-GPT2延续了统一HSI模型（**HSI-GPT**, Wang et al., CVPR 2025）的LLM框架，但在运动表示、解码器架构和训练范式三个维度进行了系统性升级，同时与LLM-based运动生成方法（**MotionGPT**, Jiang et al., NeurIPS 2023; **MotionGPT-2**, Wang et al., Arxiv 2024; **MotionCLR**, Chen et al., NeurIPS 2025）和场景感知方法（**Afford-Motion**, Wang et al., CVPR 2024）形成差异化竞争。
 
-
-
 ### 问题背景
 
 人-场景交互（Human-Scene Interaction, HSI）的建模与生成是计算机视觉与图形学中的核心挑战，其目标是在三维场景中合成语义合理、物理真实的人体运动。该任务横跨运动理解与运动生成两大方向：理解任务要求模型从运动序列中提取高层次的语义描述，生成任务则需根据文本指令或场景上下文合成符合物理约束的人体动作。近年来，以大型语言模型（LLM）为骨干的统一框架逐渐兴起，试图将理解与生成纳入同一模型体系，**HSI-GPT**（Wang et al., CVPR 2025）即是这一方向的代表性工作。
@@ -83,8 +81,6 @@ HSI-GPT2 的核心思路是将**LLM作为高层语义规划器**与**扩散模�
 3. **MoCoT思维链数据引擎与GRPO强化学习**：构建自动化思维链数据生成流水线，以格式奖励、语义奖励、保真度奖励等多方面可验证信号驱动组相对策略优化（GRPO），使模型学会分解复杂指令并执行长期组合推理。
 
 这一设计使得HSI-GPT2在HumanML3D文本到运动生成中将FID从HSI-GPT的0.187降至**0.139**，R-Precision Top 1提升至**0.545**；在HUMANISE数据集上，Goal Distance从0.182降至**0.143**，Contact Rate从92.31%提升至**97.98%**（Table 1, Table 3）。消融实验进一步证实，双粒度码本与GRPO优化各自贡献了显著的性能增益（Table 6, Table 7）。
-
-
 
 ## 核心方法与创新机理
 
@@ -116,8 +112,6 @@ HSI-GPT2 的核心创新并非单一模块的替换，而是围绕“语义规�
 
 上述三个 changed slots 构成了一个因果闭环：DMoTok 提供了语义与细节解耦的表示基础，扩散解码器释放了从离散 token 到连续运动的高保真生成潜力，而 GRPO 强化学习则赋予模型将复杂指令分解为可执行动作序列的推理能力。三者的协同使得 HSI-GPT2 在 HumanML3D 文本到运动生成中将 FID 降至 0.139（较 HSI-GPT 的 0.187 降低约 26%），在 HUMANISE 场景交互生成中将 Goal Distance 降至 0.143（降低 21.4%），同时在运动描述任务中取得了最高的 R-Precision Top 1 0.583（Table 2）。
 
-
-
 HSI-GPT2 的整体架构围绕一个核心设计原则展开：**将 LLM 作为高层次语义规划器，将扩散模型作为低层次运动合成器，二者通过双粒度运动分词器（DMoTok）实现解耦与协同**。如图 Figure 2 所示，系统由四个关键模块串联构成：
 
 ![[assets/figures/papers/paper_list_l967_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_HSI_GPT2_A_Dual_G/figures/003_Figure_2.jpg]]
@@ -130,12 +124,8 @@ HSI-GPT2 的整体架构围绕一个核心设计原则展开：**将 LLM 作为�
 
 **输入输出流**：对于文本到运动生成任务，用户文本指令送入 MLLM，MLLM 输出语义/细节 token 序列，扩散解码器据此合成 3D 运动；对于运动理解任务，运动经 DMoTok 编码后送入 MLLM 生成文本描述。场景感知的 HSI 生成则额外引入场景点云编码，LLM 进行可操作区域感知的语义规划，扩散解码器在 3D 场景约束下完成物理真实的运动合成。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l967_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_HSI_GPT2_A_Dual_G/figures/002_Figure_1.jpg]]
 *Figure 1: Overview of the Motion Chain-of-Thought (MoCoT) and training pipeline of our HSI-GPT2. The SFT initialization on curated cold-start data, then refined with RL tuning, HSI-GPT2 achieves leading performance across HSI-centric generation and understanding tasks*
-
-
 
 HSI-GPT2 的技术架构围绕三个关键模块展开：**双粒度运动分词器（DMoTok）**、**统一多模态大语言模型（Unified MLLM）** 以及 **运动扩散解码器（Motion Diffusion Decoder）**。三者协同工作，将高层次语义推理与低层次物理运动合成解耦，并通过强化学习优化实现端到端的语义对齐与物理保真。
 
@@ -187,8 +177,6 @@ $$r_{\mathrm{fid}} = \frac{\Psi(\hat{m}) \cdot \Psi(m)}{\|\Psi(\hat{m})\| \cdot 
 
 其中 $\Psi(\cdot)$ 为预训练的运动细节编码器，$\phi(\cdot)$ 为 CLIP 风格的语义编码器，$T$ 为输入文本。训练曲线（Figure 7）显示，格式奖励在约 70 步时率先达到峰值，随后优化重心自动转移至语义奖励和保真度奖励，验证了多奖励设计的协同效应。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能突破
@@ -198,13 +186,7 @@ HSI-GPT2 在文本到运动生成、人-场景交互生成及运动理解任务�
 ![[assets/figures/papers/paper_list_l967_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_HSI_GPT2_A_Dual_G/figures/008_Table_1.jpg]]
 *Table 1: Quantitative results on the HumanML3D test set. † denotes the text-based motion generation method based on LLM. ± represents a 95% confidence interval following [14]. → indicates that metrics improve as they get closer*
 
-![[assets/figures/papers/paper_list_l967_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_HSI_GPT2_A_Dual_G/figures/009_Table_3.jpg]]
-*Table 3: Quantitative performance of text-conditioned HSI generation. † marks our reproduced results on HUMANISE [54] dataset. Displacement Error (FDE) [36, 66] assess motion precision*
-
 在运动理解任务上，HSI-GPT2 在 HumanML3D 运动描述任务中取得 R-Precision Top 1 **0.583**，显著优于 HSI-GPT（0.551）和 MotionGPT-3（0.573）（Table 2）。定性对比显示，HSI-GPT2 生成的描述在概念和语义层面更为丰富（Figure 3），在泛化评估集上相较 HSI-GPT 展现出更强的组合推理能力（Figure 4）。
-
-![[assets/figures/papers/paper_list_l967_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_HSI_GPT2_A_Dual_G/figures/007_Table_2.jpg]]
-*Table 2: Results of motion captioning on HumanML3D [14] and general motion completion tasks on AMASS [37]. Best viewed in color*
 
 ![[assets/figures/papers/paper_list_l967_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_HSI_GPT2_A_Dual_G/figures/005_Figure_3.jpg]]
 *Figure 3: Comparisons on the motion captioning task. HSI-GPT2 generates conceptually and semantically rich motion descriptions*
@@ -224,24 +206,8 @@ HSI-GPT2 在文本到运动生成、人-场景交互生成及运动理解任务�
 
 当前实验验证集中于 HumanML3D、HUMANISE 等室内单人交互数据集。模型在户外场景、多人交互或超长序列上的泛化能力尚未得到验证，需要后续工作探索。此外，DMoTok 的语义码本大小 $K$ 和细节码本大小对不同任务性能的权衡关系尚不明确，GRPO 训练中奖励权重的自适应调整策略及其在更大规模 LLM 上的扩展性也值得进一步研究。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l967_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_HSI_GPT2_A_Dual_G/figures/015_Table_6.jpg]]
 *Table 6: Ablation study of the motion tokenizer and input modality*
-
-![[assets/figures/papers/paper_list_l967_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_HSI_GPT2_A_Dual_G/figures/016_Table_7.jpg]]
-*Table 7: Ablations of COT and reward during GRPO-based tuning*
-
-![[assets/figures/papers/paper_list_l967_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_HSI_GPT2_A_Dual_G/figures/010_Table_4.jpg]]
-*Table 4: Ablation of the hybrid LLM+Diffusion architecture with foundational LLMs. The shaded entries denote the hybrid setup. HSI-GPT2 achieves remarkable generalization across LLMs*
-
-![[assets/figures/papers/paper_list_l967_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_HSI_GPT2_A_Dual_G/figures/013_Figure_7.jpg]]
-*Figure 7: Illustration of the training curve of*
-
-![[assets/figures/papers/paper_list_l967_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_HSI_GPT2_A_Dual_G/figures/004_Figure_5.jpg]]
-*Figure 5: Visualization comparison with leading text-to-motion methods under multi-step complex instructions on HumanML3D*
-
-
 
 ## 定位与知识库关联
 
@@ -285,8 +251,6 @@ HSI-GPT2 在人-场景交互领域确立了“LLM 语义规划 + 扩散物理合
 - **相对于 HSI-GPT**：HSI-GPT2 是其直接升级，三处结构性改造（双粒度分词、扩散解码、GRPO 推理优化）共同构成了从“统一框架”到“推理增强框架”的代际跨越。
 
 该范式为后续研究提供了可复用的技术路径：MoCoT 数据引擎可作为思维链监督数据的通用生成流水线，GRPO 的多奖励设计可推广到其他需要语义对齐与物理保真度平衡的生成任务。
-
-
 
 ## 原文 PDF
 

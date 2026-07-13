@@ -55,8 +55,6 @@ claims:
 
 **方法定位**：TraceDet 属于**基于扩散生成过程信号**的幻觉检测方法，区别于传统的输出型（如 Perplexity、Semantic Entropy）和隐空间型（如 CCS、TSV）基线。其核心创新在于将信息瓶颈原理引入去噪轨迹的时序选择，为扩散语言模型的幻觉检测开辟了新的技术路径。
 
-
-
 扩散大语言模型（Diffusion LLMs, D-LLMs）通过迭代去噪生成文本，在推理效率与可控性上展现出独特优势。然而，与自回归模型类似，D-LLMs 同样面临幻觉（hallucination）问题——模型生成的内容与事实不符。在 D-LLM 的去噪过程中，幻觉并非仅在最终输出中显现，而是随着去噪步骤的推进逐步暴露。TraceDet 将这一现象归纳为三类典型模式（Figure 1）：**交错幻觉**（模型在真实与幻觉内容间反复摇摆）、**不一致猜测**（多个矛盾的关键词导致幻觉）和**持续错误**（模型在整个去噪过程中坚持错误答案）。这些动态模式表明，去噪轨迹本身蕴含着丰富的幻觉信号。
 
 现有幻觉检测方法大多针对自回归模型设计，可归纳为三类。**输出型方法**直接利用最终响应的统计量，如困惑度（Perplexity, Ren et al., 2022）、长度归一化熵（LN-Entropy, Malinin & Gales, 2020）和语义熵（Semantic Entropy, Kuhn et al., 2023），后者需要多次采样（如 $S \geq 10$ 次生成）来估计语义空间的不确定性。**隐空间方法**则挖掘模型内部表示，如基于协方差特征值的 EigenScore（Chen et al., 2024a）、对比一致搜索 CCS（Burns et al., 2022）和真实性分离向量 TSV（Park et al., 2025）。这些方法的共同瓶颈在于：它们仅依赖自回归模型的单步前向信号或最终输出，无法捕捉 D-LLM 在迭代去噪过程中逐步涌现的幻觉模式。
@@ -64,8 +62,6 @@ claims:
 更关键的是，D-LLM 的去噪过程天然暴露了步级 token 熵信号——每一步去噪后，模型对每个位置的 token 预测都携带着不确定性信息。这些中间步骤的熵动态构成了一个信息丰富的“动作轨迹”，但并非所有步骤都对幻觉检测同等重要。直接使用完整轨迹或简单平均会引入噪声，削弱判别力。因此，核心挑战转化为：**如何从高维去噪轨迹中自动筛选出对幻觉最具判别力的子序列**，从而在不增加额外采样开销的前提下实现可靠检测。
 
 TraceDet 的动机正是填补这一空白。它将 D-LLM 的去噪过程建模为动作轨迹（action trace），并引入信息瓶颈（Information Bottleneck, IB）原理来驱动子轨迹的自动提取——在保留与幻觉标签互信息的同时，最大化压缩输入轨迹，从而定位最具信息量的去噪步骤。这一设计使幻觉检测从“被动观察最终输出”转变为“主动追踪生成过程中的不确定性动态”，为 D-LLM 的幻觉检测提供了全新的视角。
-
-
 
 ## 核心方法与创新机理
 
@@ -109,11 +105,6 @@ $$\mathcal{L} = \mathcal{L}_{cls} + \beta \mathcal{L}_{ext}, \quad \mathcal{L}_{
 
 需注意 TraceDet 的创新建立在两个前提之上：(1) 依赖去噪过程提供的步级 token 熵矩阵，对于不公开中间 logits 的闭源 D-LLM 无法直接应用；(2) 训练仍需少量标注数据（每数据集 200 条），尚未探索全无监督设定。这些限制划定了当前方法创新的适用边界，也为后续扩展指明了方向。
 
-
-
-![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_4puxTouUSV/figures/002_Figure_2.jpg]]
-*Figure 2: Illustration of TRACEDET. During denoising, a diffusion LLM generates intermediate sequences along with token-level entropy traces, where highlighted words indicate the retained tokens after remasking (left). The sub-instance extractor $g _ { \theta }$ produces a temporal mask M to focus on informative steps, and the predictor $f _ { \phi }$ classifies whether the final response is hallucinated (right)
-
 TraceDet 的核心思路是将扩散大语言模型（D-LLM）的去噪生成过程重新建模为**动作轨迹**，并从中自动发现对幻觉检测最具判别力的子序列。整个框架由四个紧密耦合的模块构成，形成一条从原始去噪信号到二分类决策的端到端流水线。
 
 ### 输入信号：从最终输出到动作轨迹
@@ -153,8 +144,6 @@ $$\mathcal{L}_{ext} = \sum_{i=0}^{T-1} \left[ p_{a_i} \log \frac{p_{a_i}}{\tau} 
 ### 局限与边界
 
 TraceDet 目前仅实现幻觉检测，缺乏基于检测信号的自动纠正机制。其依赖去噪过程提供的步级 token 熵矩阵，对于不公开中间 logits 的闭源 D-LLM 无法直接应用。所有实验基于 7–8B 规模的开源模型和短答案 QA 任务，在更长自由文本生成和多轮对话场景的泛化性尚未验证。训练仍需少量标注数据（每数据集 200 条），未探索全无监督设定。
-
-
 
 ### 问题形式化：从最终响应分类到动作轨迹检测
 
@@ -215,8 +204,6 @@ TraceDet 的完整流水线由四个核心模块构成，各模块协同实现�
 
 4. **子实例预测器 $f_{\phi}$**：对 $A_{sub}$ 进行时序聚合后，通过两层 MLP 输出每个样本的幻觉概率，完成最终分类。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -271,13 +258,7 @@ Table 4 对比了各方法在 100 个样本上的平均推理时间。TraceDet �
 
 Figure 3 展示了 TraceDet 对生成长度和步长的敏感性。在生成长度从 16 到 128、步长从 1 到 8 的广泛设置下，AUROC 保持稳定，未出现剧烈波动，表明方法具有良好的参数鲁棒性，不依赖于特定的去噪步长配置。
 
-![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_4puxTouUSV/figures/008_Figure_3.jpg]]
-*Figure 3: (a) TraceDet performance of different generation lengths with step length fixed at 1. (b) TraceDet performance with different step lengths with generation length fixed at 128. All results are reported as AUROC using Dream-7B-Instruct*
-
 Figure 4b 的 3D 敏感度曲面分析了信息瓶颈正则项的超参数影响。掩码比率 τ 在 0.2–0.3、正则化权重 β 在 0.8–1.6 范围内性能最优，超出该范围仍保持较高的 AUROC（75–85%），说明方法对超参数不敏感，降低了实际调参成本。
-
-![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_4puxTouUSV/figures/010_Figure_4.jpg]]
-*Figure 4: (a) TraceDet performance sensitivity to remasking strategies. (b) TraceDet performance sensitivity to $\mathcal { L } _ { e x t }$ parameters $\tau$ and $\beta$ on TriviaQA. All results are reported as AUROC using Dream-7B-Instruct
 
 ### 局限性与失败模式
 
@@ -287,13 +268,6 @@ Figure 4b 的 3D 敏感度曲面分析了信息瓶颈正则项的超参数影响
 2. **依赖中间 logits 访问**：TraceDet 需要去噪过程提供的步级 token 熵矩阵，对于不公开中间 logits 的闭源 D-LLM 无法直接应用。
 3. **任务与规模泛化未验证**：所有实验基于 7–8B 规模的开源 D-LLM，且任务局限于短答案 QA，在更长的自由文本生成和多轮对话场景下的有效性仍属未知。
 4. **仍需标注数据**：训练需要少量标注样本（每数据集 200 条），尚未探索完全无监督的设定。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_4puxTouUSV/figures/011_Table_5.jpg]]
-*Table 5: Hyperparameter search space for TRACEDET. Notation: † log-spaced; ‡ linearly spaced. ∗ only applies to LLaDA*
-
-
 
 ## 定位与知识库关联
 
@@ -354,8 +328,6 @@ TraceDet 的适用性受以下条件约束：
 - **核心主张有强证据支持**：TraceDet 在两种 D-LLM、三个数据集上的 AUROC 平均提升 15.2%，消融实验（Table 3）和推理效率对比（Table 4）均直接验证了信息瓶颈原理和掩码机制的有效性，置信度高。
 - **泛化性需进一步验证**：当前实验仅覆盖短答案 QA 和 7–8B 模型，长文本、多轮对话、更大规模模型的结论属于合理推断，需后续工作证实。
 - **内在机制分析为探索性**：三种幻觉模式的分类基于对熵轨迹的观察性分析，因果机制的确认需要更严格的受控实验。
-
-
 
 ## 原文 PDF
 

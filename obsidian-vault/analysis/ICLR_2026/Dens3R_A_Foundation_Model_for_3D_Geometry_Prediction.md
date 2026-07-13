@@ -51,8 +51,6 @@ claims:
 
 主要实验结果表明，Dens3R 在多项基准上实现了有竞争力的性能：法线估计方面，在 NYUv2 上 Mean Angular Error 达 16.1（比 Lotus 低 1.4），在 Sintel 上达 30.7（比 DSINE 低 4.2）；深度估计在 DIODE-outdoor 上 REL 为 0.387（优于 VGGT 的 0.400）；图像匹配在 ZEB 数据集上 Mean AUC@5° 达 64.5（比 MASt3R 高 4.6）；位姿估计在 Map-free 数据集上重投影误差仅 30.4 px（VGGT 为 48.8 px）。消融实验证实，内在不变训练和粗到精策略共同贡献了法线精度的显著提升，共享编解码器减少了约 15% 参数量和约 10% 内存占用，位置插值 RoPE 有效防止了高分辨率退化。模型的主要局限在于对薄结构（细杆、绳索等）的预测精度仍显不足，且对高反射和低纹理区域存在挑战。
 
-
-
 三维几何预测是计算机视觉的核心任务之一，涵盖深度估计、表面法线预测、点云重建和相机位姿估计等多个子问题。这些几何量在自动驾驶、机器人导航、增强现实和三维重建等应用中扮演着关键角色。然而，现有方法通常将这些任务视为独立问题分别处理，缺乏一个统一的框架来联合建模多种几何量之间的内在关联。
 
 当前主流方案存在三个显著的瓶颈。第一，**缺乏多几何量联合预测的统一架构**。以 **DUSt3R**（Wang et al., 2024）和 **MASt3R**（Leroy et al., 2024）为代表的点图回归方法仅关注点云重建与匹配，**DSINE**（Bae & Davison, 2024）、**StableNormal**（Ye et al., 2024）等法线估计方法则独立运行，各方法之间无法共享几何先验。第二，**表面法线信息在点图表示中被严重忽视**。法线具有内在不变性——即法线方向不随相机内参或尺度变化而改变，这种一对一映射特性可以有效减少多视角歧义，但现有方法未能将其显式融入点图学习过程。第三，**高分辨率输入下的退化问题**。标准旋转位置编码（RoPE）在处理超出训练分辨率的输入时会导致预测质量急剧下降，限制了模型对精细几何细节的捕捉能力。
@@ -60,8 +58,6 @@ claims:
 从因果机制来看，法线的内在不变性是一个关键的调控旋钮：将法线作为先验融入点图表示，可以迫使模型学习与视角无关的几何特征，从而简化多任务学习并提升预测一致性。同时，共享编解码器设计与位置插值RoPE的结合，为高效处理多视图高分辨率输入提供了结构基础。
 
 本文提出 **Dens3R**，一个面向三维几何预测的基础模型，旨在以统一的前馈架构同时输出高质量的点图、深度图、法线图和匹配特征。其核心动机在于：通过将表面法线的内在不变性显式编码到点图表示中，并采用两阶段训练策略逐步构建从尺度不变到内在不变的几何理解，从而突破现有方法在多几何量联合预测上的精度与效率瓶颈。
-
-
 
 ## 核心方法与创新机理
 
@@ -101,8 +97,6 @@ DUSt3R使用的标准RoPE在高分辨率输入下会出现退化——这是RoPE
 ### 5. 置信度损失的移除
 
 DUSt3R使用置信度损失作为自适应权重来调节多视图点图回归，本质上依赖额外视角来补偿单视角预测的不确定性。Dens3R移除了这一损失，理由是：法线的确定性本质（每个表面点有唯一法线方向）消除了对额外视角的依赖，使模型能够稳定地进行单视角法线预测。这一改动的置信度为0.9，需要更多消融证据来确认移除置信度损失对点图精度的独立影响。
-
-
 
 ![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_kxVjQhkAWz/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of Dens3R. We propose Dens3R, a dense visual transformer backbone featuring a shared encoder-decoder architecture and multiple task-specific heads for geometric prediction. To train this foundation model, we adopt a two-stage strategy. In Stage 1, we learn a scale-invariant pointmap by enforcing cross-view mapping consistency across multiple viewpoints. In Stage 2, we incorporate surface normals and leverage one-to-one correspondence constraints to transform the representation into an intrinsic-invariant pointmap. Built upon this unified backbone, additional geometric prediction heads and downstream task branches can be seamlessly integrated to support a wide range of applications*
@@ -152,8 +146,6 @@ Dens3R 的核心洞察在于：**表面法线具有内在不变性（视角无�
 ### 多视图后处理
 
 对于多于两帧的输入，Dens3R采用“一对所有”匹配策略计算帧间对应，随后通过三角化获得多视图点云，沿用了MASt3R的后处理管线。
-
-
 
 ### 整体架构与输出映射
 
@@ -244,8 +236,6 @@ $$\mathcal{L}_{stage2} = \mathcal{L}_{\mathrm{pts-loc}} + \lambda_1 \mathcal{L}_
 
 **因果机制总结**：内在不变训练使点图能够捕获法线中的几何信息，法线头则进一步预测更锐利的边缘和更准确的结果。粗到精策略与位置插值 RoPE 协同，共同解决了高分辨率下的退化问题。移除置信度损失（DUSt3R/MASt3R 中用于自适应加权的组件）之所以可行，是因为法线的确定性使得模型不再依赖额外视角来稳定预测。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与设计动因
@@ -257,8 +247,6 @@ $$\mathcal{L}_{stage2} = \mathcal{L}_{\mathrm{pts-loc}} + \lambda_1 \mathcal{L}_
 #### 表面法线估计
 
 Dens3R 在五个数据集上的法线估计任务中均取得领先或次优结果（Table 1）。在 NYUv2 上，Mean Angular Error 降至 16.1，相比 **Lotus** 的 17.5 降低 1.4；在 ScanNet 上为 16.9（Lotus 为 18.1，降低 1.2）；在 Sintel 上为 30.7，显著优于 **DSINE**（Bae & Davison, 2024）的 34.9，降幅达 4.2。δ11.25° 指标上，Dens3R 在多个数据集上表现尤为突出，表明其预测的法线在角度精度上具有明显优势。定性结果（Figure 4）显示，Dens3R 在物体中心场景和无边界场景中均能生成更准确、更锐利的法线图，对反射表面和背景区域也表现出良好的鲁棒性。
-
-![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_kxVjQhkAWz/figures/005_Table_1.jpg]]
 
 ![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_kxVjQhkAWz/figures/006_Table_1.jpg]]
 *Table 1: Quantitative comparison of normal prediction. We report the mean and median angular errors with each cell colored to indicate the best and the second . Dens3R achieves accurate normal prediction for both indoor and outdoor scenes. *We utilize Lotus-G for a fair comparison. Table 2: Benchmark on image matching on ZEB dataset. We report the AUC values with each cell colored to indicate the best and the second*
@@ -277,14 +265,8 @@ Dens3R 在五个数据集上的法线估计任务中均取得领先或次优结�
 
 深度估计方面，Dens3R 在 DIODE-outdoor 上 REL 为 0.387，优于 **VGGT**（Wang et al., 2025a）的 0.400（Table 7）。定性比较（Figure 5、Figure 18-20）显示，Dens3R 在室内人体深度估计和室外自动驾驶场景中均产生更稳定、更准确的深度图，点云重建质量也优于 DUSt3R 系列方法。在 Map-free 数据集上的相机位姿估计中，Dens3R 的重投影误差降至 30.4 px，远低于 VGGT 的 48.8 px（Table 8）。
 
-![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_kxVjQhkAWz/figures/021_Table_8.jpg]]
-*Table 8: Camera pose estimation results of the Map-free dataset. We report the metrics with each cell colored to indicate the best and the second*
-
 ![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_kxVjQhkAWz/figures/020_Table_6.jpg]]
 *Table 6: Full quantitative comparison of normal prediction. We report the mean and median angular errors with each cell colored to indicate the best and the second Table 7: Quantitative comparison on monocular depth prediction. We report the relative point error (REL), root mean square error (RMSE) and the percentage of inliers δ1, δ2, δ3 with each cell colored to indicate the best and the second . *We utilize Lotu-G disparity model for comparison*
-
-![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_kxVjQhkAWz/figures/032_Figure_19.jpg]]
-*Figure 19: Additional depth comparison of indoor scenes with VGGT. Dens3R demonstrates more accurate results for human depth estimation*
 
 ### 消融研究
 
@@ -298,9 +280,6 @@ Table 3 的消融实验验证了两个关键设计的作用。去除内在不变
 #### 共享编解码器结构
 
 Table 4 的消融显示，共享编解码器结构在保持相同计算量（1.362 TFlops）的前提下，将内存占用从 4.6 GB 降至 4.1 GB（约 10%），参数量从 737.6M 降至 624.2M（约 15%），同时不影响性能。这一设计显著提升了模型效率。
-
-![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_kxVjQhkAWz/figures/011_Table_4.jpg]]
-*Table 4: Ablation on shared encoder-decoder structure. We conduct experiments for both of the model on image pairs with 512 resolution. With the shared encoder-decoder structure, our model yields lower memory cost and less network parameters*
 
 #### 位置插值 RoPE
 
@@ -324,15 +303,6 @@ Figure 21 和 Figure 22 的高分辨率消融实验揭示了一个关键发现�
 | Table 4 | 共享编解码器减少约 15% 参数量和约 10% 内存，计算量不变 |
 | Figure 6 | 粗到精训练使 2K 分辨率推理保持细粒度细节 |
 | Figure 21/22 | 位置插值 RoPE 单独使用不足，需与内在不变点图和粗到精训练组合 |
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_kxVjQhkAWz/figures/017_Table_5.jpg]]
-*Table 5: Training dataset information. We reorganize a large-scale training dataset and divide the data into three types based on their quality. We also showcase the training objectives we apply during training, the number of image pairs and the corresponding dataset ratio*
-
-![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_kxVjQhkAWz/figures/019_Table_6.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -377,8 +347,6 @@ Dens3R 的设计假设使其在以下场景表现出色，但也划定了明确�
 4. **下游任务的零样本扩展**：Dens3R 的共享骨干理论上可以接入任意预测头。Figure 8 展示了语义分割的初步扩展，但能否在不修改骨干的情况下支持物体检测、场景流估计等更复杂的下游任务，仍有待验证。
 
 5. **内在不变性的边界测试**：系统评估内在不变表示在镜面反射、透明物体、动态场景下的失效模式，将有助于明确这一核心设计的适用范围。
-
-
 
 ## 原文 PDF
 

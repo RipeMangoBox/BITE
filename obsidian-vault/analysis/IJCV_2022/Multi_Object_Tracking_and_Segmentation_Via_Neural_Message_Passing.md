@@ -52,8 +52,6 @@ claims:
 
 该方法仍存在对检测质量高度敏感、极端拥挤场景下图密度增加导致计算负担上升、以及离线处理范式不适用于实时在线场景等局限。后续章节将依次展开问题形式化、方法设计、实验验证与局限性讨论。
 
-
-
 多目标跟踪（Multi-Object Tracking, MOT）旨在从视频序列中定位所有感兴趣目标并恢复其完整轨迹，而多目标跟踪与分割（Multi-Object Tracking and Segmentation, MOTS）进一步要求为每个目标输出像素级的实例分割掩膜。这两个任务在自动驾驶、视频监控和行为分析等应用中具有核心地位。
 
 在传统的跟踪-检测（Tracking-by-Detection）范式中，MOT 通常被建模为一个基于图的数据关联问题：节点表示各帧中的检测，边表示跨帧检测之间的可能连接，目标是从图中选出一组边以形成轨迹。这一经典框架自 **Min-Cost Flow**（L. Zhang et al., CVPR 2008）以来被广泛采用，其求解流程通常分为两步：先学习成对的关联成本，再通过线性规划或最小成本流求解器获得全局最优的轨迹划分。
@@ -61,8 +59,6 @@ claims:
 然而，这种两阶段范式存在一个根本性的瓶颈：**数据关联的成本学习与最终的图划分求解是解耦的，无法在全局上下文中进行端到端的联合优化**。具体而言，成本学习阶段只关注局部的成对相似度，而求解器在推理时才引入流守恒等全局约束，导致学习目标与最终优化目标之间存在不一致。此外，在 MOTS 场景中，分割和跟踪通常由独立的模块处理，两类任务之间缺乏有效的信息交互——分割特征无法辅助关联决策，跟踪的时序信息也无法指导分割质量的提升。这使得关联准确率受限，尤其是在密集遮挡和身份切换频繁的复杂场景中。
 
 针对上述问题，本文提出了一种基于神经消息传递（Message Passing Networks, MPN）的统一框架，其核心动机在于：**将 MOT 的网络流图公式与可微的消息传递网络深度融合，使模型能够直接在图上学习预测哪些边属于活跃轨迹，同时通过时间感知和注意力机制实现跟踪与分割特征的协同更新**。这一设计使得整个框架端到端可微，特征学习与最终的任务目标（边分类与掩膜预测）在训练中保持一致，从而突破了传统两阶段方法的优化瓶颈。
-
-
 
 ## 核心方法与创新机理
 
@@ -102,8 +98,6 @@ $$\tilde{h}_i^{(l)} = \tilde{\mathcal{N}}_v ( [c_{i,\text{past}}^{(l)}, c_{i,\te
 
 上述三个 changed slots 并非孤立的技术改进，而是构成了一个紧密耦合的创新体系：**直接边分类**使整个框架可端到端优化；**时间感知更新**为图网络注入了 MOT 必需的时序结构先验，使边分类器能够在不依赖外部求解器的情况下隐式满足流守恒约束；**注意力消息传递**则在统一的图域中打通了跟踪与分割的信息壁垒，使两个任务在训练中相互受益。三者共同作用，使 MPNTrackSeg 在 MOTS20 测试集上建立了新的最佳水平（sMOTSA 73.7，HOTA 58.6），身份切换（ID Switches）比最接近的方法减少了约 25%（Table 9）。
 
-
-
 MPNTrackSeg 的整体框架将多目标跟踪与分割统一为一个端到端可微的图神经网络推理过程。如图 1 所示，系统接收一组连续的图像帧及其对应的检测结果作为输入，随后经历图构建、特征编码、神经消息传递、边分类与掩膜预测、以及推理舍入五个阶段。
 
 **图构建**阶段将跟踪问题显式地建模为一张无向图 $G = (V, E)$。图中每个节点 $i \in V$ 代表一个唯一的检测 $o_i = (a_i, p_i, t_i)$，其中 $a_i$ 为原始像素区域，$p_i$ 为二维图像坐标，$t_i$ 为时间戳。边则连接来自不同帧的任意两个检测，从而形成一个稠密的候选关联图。这一建模直接继承了经典最小成本流公式中对 MOT 的网络流图表述（L. Zhang et al., CVPR 2008），但其核心差异在于后续的求解方式：传统方法在此图上学习成对成本，再调用线性规划求解器（如 k-shortest paths）获得最优划分；而 MPNTrackSeg 则通过消息传递网络直接对每条边进行二分类，预测其属于某条轨迹的活跃变量 $y_{(i,j)}$，从而将关联决策内化于可微学习过程中。
@@ -118,12 +112,8 @@ MPNTrackSeg 的整体框架将多目标跟踪与分割统一为一个端到端�
 
 整个框架以多任务损失 $L = L_t + L_s$ 进行端到端训练，其中 $L_t$ 为边分类的加权交叉熵损失，$L_s$ 为分割掩膜的平均交叉熵损失。这种联合训练使得关联特征和分割特征在消息传递过程中相互增强，是该方法在 MOTS 基准上取得领先性能的关键设计。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2207_07454/figures/001_Figure_1.jpg]]
 *Figure 1: (e) Output Fig. 1: Overview of our method. (a) We receive as input a set of frames and detections. (b) We construct a graph in which nodes represent detections, and all nodes at different frames are connected by an edge. (c) We initialize node embeddings in the graph with two CNNs that encode appearance and mask features. Edge embeddings are initialized with an MLP encoding geometry information (not shown in the figure). (c) The information contained in these embeddings is propagated across the graph for a fixed number of iterations through neural message passing. (d) Once this process terminates, the embeddings resulting from neural message passing are used to predict masks and classify ed...*
-
-
 
 ### 图构建与变量定义
 
@@ -191,8 +181,6 @@ $$L = L_t + L_s$$
 
 其中 $L_t$ 为边分类的加权交叉熵损失，$L_s$ 为分割掩膜的平均交叉熵损失。推理时对边分类概率进行阈值二值化，必要时运行线性规划以保证流守恒约束的严格满足。
 
-
-
 ## 实验与关键发现
 
 ### 瓶颈验证与消融实验
@@ -243,36 +231,17 @@ MPNTrackSeg 在多个公开基准上建立了新的最佳水平，具体结果�
 3. 时间感知图方法能否直接扩展到 3D 多目标跟踪，并保持对时间结构的高效编码？
 4. 对于跨长时间跨度的轨迹恢复，是否存在最优的消息传递步数上限，以及如何适应不同序列特性？
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2207_07454/figures/005_Figure_2.jpg]]
 *Figure 2: Visualization of node updates during message passing. Arrow directions in edges show time direction. Note the time division in t − 1, t, and t + 1. In this case, we have N _ { 3 } ^ { p a s t } = \{ 1 , 2 \} and N _ { 3 } ^ { f u t } = \{ 4 , 5 \} . 2a shows the starting point after an edge update has been performed (equation 3), and the intermediate node update embeddings (equation 4) have been computed. 2b shows the standard node update in vanilla MPNs, in which all neighbors’ embeddings are aggregated jointly. 2c shows our proposed update, in which embeddings from past and future frames are aggregated separately, then concatenated and fed into an MLP to obtain the new node embedding*
 
-![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2207_07454/figures/011_Figure_5.jpg]]
-*Figure 5: (b) MPNTrackSeg Fig. 5: We report the evolution of IDF1, MOTA and sMOTSA when training networks with an increasing number of message passing steps for MPNTrack and MPNTrackSeg*
-
 ![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2207_07454/figures/008_Table_1.jpg]]
 *Table 1: We investigate how our proposed update improves tracking performance with respect to a vanilla MPN. Vanilla stands for a basic MPN, T. aware denotes our proposed time-aware update. The metric Constr refers to the percentage of flow conservation constraints satisfied on average over entire validation sequences*
-
-![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2207_07454/figures/009_Table_2.jpg]]
-*Table 2: We explore combinations of three sources of information for edge features: time difference in seconds (Time), relative position features (Pos) and the Euclidean distance between CNN embeddings of the two detections (CNN)*
-
-![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2207_07454/figures/010_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2207_07454/figures/012_Table_3.jpg]]
-*Table 3: We examine the contributions of the features and update schemes used for segmentation: initial node features before message passing updates (Raw) and updated node features (Upd.) after additive (Add.) and attentive (Att.) message passing steps. Table 4: We compare our tracking-only model (MPN-Track) and unified model (MPNTrackSeg) to demonstrate the effect of jointly training for tracking and segmentation. We perform bounding-box-based evaluation and report MOT metrics*
-
-![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2207_07454/figures/013_Table.jpg]]
 
 ![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2207_07454/figures/014_Table_5.jpg]]
 *Table 5: Comparison of our method with state-of-the art on the MOTChallenge test sets. Methods written in grey were published after our CVPR2020 work. Methods with † after their name also used Tracktor-based preprocessing on their input boxes*
 
 ![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2207_07454/figures/015_Table_6.jpg]]
 *Table 6: Comparison of our method with state-of-the-art on KITTI-tracking test set. Methods written in grey were published after our CVPR2020 work. Table 7: Comparison of our method with state-of-the-art on the Human in Events test dataset. Methods written in grey were published after our CVPR2020 work*
-
-![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2207_07454/figures/016_Table.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -334,8 +303,6 @@ MPNTrackSeg 是纯图关联方法，其性能高度依赖前端检测器的质�
 4. **自适应消息传递步数**：对于不同序列特性（如帧率、目标运动速度），是否存在最优的消息传递步数上限，以及如何自适应地确定这一参数？Figure 5 显示步数超过一定阈值后性能趋于饱和，但该阈值的跨场景泛化性尚未被系统研究。
 
 5. **流守恒约束的软硬结合**：当前方法在训练中通过时间感知更新隐式学习约束，推理时通过后处理线性规划强制满足。是否存在更优雅的方式将硬约束完全融入网络结构，实现严格满足约束的端到端推理？
-
-
 
 ## 原文 PDF
 

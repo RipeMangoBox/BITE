@@ -51,8 +51,6 @@ claims:
 
 实验表明，在相同硬件原型上，本方法使用72个自适应图案即可将深度RMSE从33.72 mm降至1.79 mm，内点比例从41%提升至98.7%；总曝光时间减少高达100倍，单视角采集时间由24分钟压缩至约10分钟。反射率结果在新视角照片验证下与现有技术可比。该方法为面向任意物体的高效高精度数字化采集提供了可微分的自适应范式。
 
-
-
 ### 问题背景：联合采集形状与反射率的挑战
 
 在计算机视觉与图形学中，同时获取物体的三维形状和表面反射率是实现照片级真实感重光照、数字孪生和文化遗产数字化的核心技术需求。传统方法通常将几何采集与外观采集分离：先通过结构光或立体视觉获取深度，再在受控光照下拍摄多角度图像以拟合反射模型。这种分步策略不仅耗时，而且两阶段之间的误差累积会损害最终结果的一致性。
@@ -85,8 +83,6 @@ claims:
 - **几何与反射率联合自适应**：形状和反射率的采集不再分步进行，而是在统一的自适应框架下协同优化。
 
 通过这一方法，本文旨在证明：**智能地选择“看什么”和“怎么看”，比简单地“看得更多”更为高效。**
-
-
 
 ## 核心方法与创新机理
 
@@ -121,8 +117,6 @@ claims:
 
 本工作在4D结构光领域首次提出了**学习型空间-角度域多重复用方案**，将自适应照明优化的思想从传统空间域结构光拓展到空间-角度联合域。与经典的空间结构光方法**MPS**（Gupta and Nayar, CVPR 2012）仅采集几何相比，本方法同时输出反射率参数；与统一空间-角度结构光[43]（Xu et al., CVPR 2023）相比，本方法将照明设计从离线预优化升级为在线自适应优化，并引入多LED复用机制。从知识库定位看，本方法处于**计算成像×可微优化×结构光**的交叉点，其“概率建模+可微损失驱动采集策略”的范式可迁移至其他主动视觉任务。
 
-
-
 本文提出一种**两阶段流水线**，以可微分方式自适应计算4D空间‑角度域照明条件，实现对任意物理物体形状与反射率的高效联合采集。整体流程如图2所示。
 
 **第一阶段：自适应采集**
@@ -152,15 +146,11 @@ claims:
 - **输入**：物理物体，通过由相机、LED阵列与LCD掩模组成的采集装置（图1）获取图像测量。
 - **输出**：高精度深度图（RMSE 1.79 mm，内点比例98.7%）与参数化反射率图（GGX BRDF参数），可用于新视角重光照渲染。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2605_06214/figures/002_Figure_2.jpg]]
 *Figure 2: Our pipeline consists of two stages. First, for a physical object, we compute the next light/mask pattern(s) by minimizing the cross entropy among possible candidates sampled from histogram-based probability models. We then take photograph(s) with these patterns, and update probability distributions based on new measurements. This process is repeated until a termination condition is met. Next, we use the depth/reflectance estimate from previous stage as initial values, and fine-tune the results by minimizing the differences between physical measurements and corresponding simulated ones. The final output is a depth map and several texture maps that store parameters of the GGX BRDF model. Par...*
 
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2605_06214/figures/001_Figure_1.jpg]]
 *Figure 1: Our acquisition setup. It consists of a camera, an LED array and an LCD mask (a). The setup is working with optimized light/mask pattern (b). A side view is illustrated in (c)*
-
-
 
 ### 整体流水线
 
@@ -212,15 +202,11 @@ $$L_j(\mathbf{x}_l, -\omega_k^i) \approx L_j(l) \Psi(-\omega_k^i) L(\mathbf{x}_l
 
 自适应采集结束后，从概率模型中提取深度与反射率初值，将BRDF模型重参数化为16维神经隐向量与5个MLP，通过最小化物理测量与模拟图像之间的差异进行联合微调，进一步提升重建精度。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2605_06214/figures/003_Figure_3.jpg]]
 *Figure 3: Graphical illustration of our probability model for depth. To build this model, we first determine its range*
 
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2605_06214/figures/004_Figure_4.jpg]]
 *Figure 4: Visualization of various parts in adaptive acquisition. From the left column to right, after the initialization, after pattern#3, #12 and #30 is projected. From the top row to bottom, light pattern, mask pattern, corresponding photograph, depth uncertainty visualization (yellow = uncertain, blue = certain), and the visualization of the probability model at a single pixel*
-
-
 
 ## 实验与关键发现
 
@@ -256,33 +242,11 @@ $$L_j(\mathbf{x}_l, -\omega_k^i) \approx L_j(l) \Psi(-\omega_k^i) L(\mathbf{x}_l
 
 **硬件小型化尚未完成**：当前方法基于实验室原型装置，尚未应用于手持设备实现自由视角扫描。从固定视角到手持自由扫描的迁移需要进一步解决配准、实时优化等问题。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2605_06214/figures/005_Figure_5.jpg]]
-*Figure 5: Reflectance results represented as GGX BRDF parameters map. Tangent maps are not shown here due to limited space*
-
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2605_06214/figures/006_Figure_6.jpg]]
 *Figure 6: Comparisons with state-of-the-art techniques on shape and reflectance capture. From the left column to right: depth reconstruction with our approach (adaptive/non-adaptive patterns), [43] and MPS [16]; photograph under a lighting condition not used in optimization, rendering with the reflectance results of our approach and [43]. Quantitative errors are listed below each related image*
 
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2605_06214/figures/010_Figure_7.jpg]]
 *Figure 7: Comparison with a single-source structured light [43]. From the left to right: our result, the result of [43] when the LED at the center, left, or right corner of the LED array is on*
-
-![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2605_06214/figures/011_Figure_8.jpg]]
-*Figure 8: Impact of the total number of adaptive light/mask patterns over the depth quality*
-
-![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2605_06214/figures/014_Figure_9.jpg]]
-*Figure 9: Impact of*
-
-![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2605_06214/figures/013_Figure_10.jpg]]
-*Figure 10: Impact of the number of simultaneously optimized next patterns (nbatch) over the depth quality, with the same total acquisition time*
-
-![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2605_06214/figures/009_Figure_11.jpg]]
-*Figure 11: Impact of*
-
-![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2605_06214/figures/012_Figure_12.jpg]]
-*Figure 12: Impact of*
-
-
 
 ## 定位与知识库关联
 
@@ -327,8 +291,6 @@ $$L_j(\mathbf{x}_l, -\omega_k^i) \approx L_j(l) \Psi(-\omega_k^i) L(\mathbf{x}_l
 ### 5. 在知识库中的定位总结
 
 本文在计算成像与结构光领域占据**“自适应4D结构光联合采集”**这一新兴节点：它上承统一空间-角度结构光[43]的硬件与建模框架，下启可微分照明优化与概率引导采集的新范式。其方法论贡献——将采集过程本身视为可微优化问题——与更广泛的“学习型传感”趋势（如自适应主动视觉、神经采集）形成共振，但当前仍受限于显式表示和忽略间接光照的理论简化。
-
-
 
 ## 原文 PDF
 

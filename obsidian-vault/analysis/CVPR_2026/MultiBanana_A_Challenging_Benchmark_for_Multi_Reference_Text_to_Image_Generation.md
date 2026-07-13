@@ -60,15 +60,11 @@ claims:
 
 **方法谱系与知识库定位**：MultiBanana 继承了 DreamOmni2 等基准的编辑任务设计哲学，但通过大幅扩展参考数量上限和引入异质性参考组合，填补了现有多参考评估体系的空白。与 **ImgEdit-Bench**（Ye et al.）和 **DreamOmni2 Benchmark**（Xia et al.）等主流基准相比，后者在高端模型上已接近天花板（Table 7, Table 8），而 MultiBanana 通过困难参考组合提供了更细粒度的区分能力，为推进多参考生成研究提供了新的诊断工具。
 
-
-
 文本到图像生成领域近年来取得了显著进展，模型已能根据单张参考图像生成高质量且保持主体一致性的结果。然而，现实应用场景往往要求模型同时处理多张参考图像——例如，用户希望将不同来源的人物、物体和背景融合到一幅连贯的图像中。这一多参考生成（multi-reference generation）场景对模型提出了远超单参考设定的挑战：模型不仅需要准确保持每张参考图像中的视觉属性，还必须协调参考之间的语义与空间关系，同时遵循复杂的文本指令。
 
 当前该领域存在一个关键瓶颈：**现有的多参考图像生成基准在参考图像数量、异质性参考组合及指令跟随评估方面存在严重不足**。具体而言，现有基准（如 DreamOmni2、ImgEdit-Bench 等）通常将参考图像数量限制在 1 至 4 张，且未系统性地考察参考图像之间的差异性对生成质量的影响。当参考图像数量增加，或存在跨域（如照片与插画混用）、尺度差异、稀有概念、多语言文本等异质性参考组合时，模型要么因过度拟合参考细节而产生构图失真，要么完全忽略部分参考对象。这揭示了**参考保真度与整体图像连贯性之间的根本权衡**，而现有基准无法全面诊断这一矛盾。
 
 为填补这一空白，本文提出了 **MultiBanana**——一个面向多参考文本到图像生成的挑战性基准。MultiBanana 将参考图像数量上限扩展至 8 张，并系统性地引入了跨域不匹配、尺度与视角差异、稀有概念以及多语言提示等困难参考组合，旨在显式地揭示多参考生成中的独特挑战。通过构建覆盖 3,769 个高质量编辑任务的基准，并设计基于 VLM 的多维度自动评估协议，MultiBanana 为评估和推进多参考生成能力提供了细粒度的诊断工具。
-
-
 
 ## 核心方法与创新机理
 
@@ -103,8 +99,6 @@ MultiBanana 提出了一套基于 VLM（GPT-5、Gemini 2.5）的自动评估协�
 针对真实数据集中于背景类图像的分布偏差，MultiBanana 在数据收集阶段引入了合成数据补充策略：利用 Nano Banana 和 GPT-Image-1 生成以人物、动物、物体等清晰主体为核心的合成图像，使数据分布更加均衡（Figure 3）。统计分析（Figure 12）表明，合成数据的引入未造成显著偏见，不同数据子集的得分保持在 99% 置信区间内，确保了基准评估的公平性。
 
 **总结**：MultiBanana 的创新不在于提出新模型，而在于通过扩展参考数量、引入异质性组合、量化参考保真度-整体质量权衡、以及建立可复现的 VLM 评估协议，为多参考图像生成领域提供了一个细粒度的诊断工具，系统性地暴露了当前模型的能力边界与根本矛盾。
-
-
 
 MultiBanana 基准的构建与评估遵循一条系统化的流水线，旨在生成高质量、多样化的多参考图像编辑任务，并通过多维度的自动化评分实现对模型能力的细粒度诊断。该框架的核心设计目标是在可控的难度梯度下，暴露模型在参考保真度与整体图像连贯性之间的根本权衡。
 
@@ -152,12 +146,8 @@ MultiBanana 基准的构建与评估遵循一条系统化的流水线，旨在�
 - **处理**：模型需理解指令意图，从多张参考图像中提取相关视觉信息，并生成一张合成图像。
 - **输出**：生成图像 $G$，接受五维度评分并汇总为加权总分，用于跨模型、跨任务类型的系统比较。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2209_https_arxiv_org_abs_2511_22989/figures/001_Figure_1.jpg]]
 *Figure 1: The overview of MultiBanana. MultiBanana broadly covers problems specific to multi-reference settings, including varying the number of references (top row), domain and scale mismatches among references (two on the left in the middle row), multilingual text rendering (center in the bottom row), and the presence of rare concepts (right in the bottom row)*
-
-
 
 MultiBanana 基准本身不提出新的生成模型，其核心贡献在于构建了一套系统性的评估与诊断框架。该框架的关键模块并非网络结构，而是数据构建管线、任务定义、评估协议以及用于探究模型行为的 Agentic 迭代框架。
 
@@ -198,16 +188,11 @@ $$G^{t+1} = \text{Gen}(P^t, \{R_i\}_{i \in U^t}, G^t), \quad P^{t+1}, U^{t+1} = 
 
 最终总分由加权求和得出，权重分配为 `{3, 3, 1, 1, 1}`，分别对应上述五个维度，凸显了指令跟随与参考保真度在多参考生成任务中的核心地位。评估主要由 **Gemini 2.5** 和 **GPT-5** 执行，其与人类评判的高度相关性验证了此自动评估协议的可靠性。
 
-
-
 ## 实验与关键发现
 
 ### 整体趋势与瓶颈分析
 
 MultiBanana 基准上的实验揭示了多参考图像生成中的一个根本性矛盾：**参考保真度与整体图像质量之间的固有权衡**。随着参考图像数量的增加，所有模型的总分均呈下降趋势（Figure 5），但封闭模型与开源模型的退化模式截然不同。
-
-![[assets/figures/papers/paper_list_l2209_https_arxiv_org_abs_2511_22989/figures/008_Figure_5.jpg]]
-*Figure 5: Changes in scores for each evaluation criterion when varying the number of reference images. Both open-source and closedsource models exhibit a general trend of decreasing scores across all metrics as the number of references increases*
 
 封闭模型（GPT-Image-1、Nano Banana）在指令对齐和参考一致性上衰减较缓，能够包含所有参考对象，但代价是构图失真和视觉质量下降。开源模型（Qwen-Image-Edit-2509、DreamOmni2、OmniGen2）则保持相对干净的视觉输出，却在多参考场景下频繁遗漏部分参考对象。这一差异在 8 参考任务中尤为显著：开源模型倾向于完全忽略某些参考主体，而封闭模型虽保留所有对象却产生不自然的场景拼接（Figure 6）。
 
@@ -225,9 +210,6 @@ MultiBanana 的核心诊断价值在于引入了**困难参考组合**（Table 2
 ![[assets/figures/papers/paper_list_l2209_https_arxiv_org_abs_2511_22989/figures/006_Table_2.jpg]]
 *Table 2: Statistics and ratios of difficult reference combinations relative to the total 3,769 tasks. Our benchmark provides sufficient samples for assessing a model’s capacity to interpret relationships among heterogeneous references and integrate them into outputs*
 
-![[assets/figures/papers/paper_list_l2209_https_arxiv_org_abs_2511_22989/figures/010_Figure_7.jpg]]
-*Figure 7: Results for difficult reference combinations. For crossdomain and different scale and view tasks, every model shows lower scores than tasks without such conditions*
-
 - **跨域参考**：当参考图像来自不同视觉域（如照片与插画）时，所有模型得分均显著下降。
 - **尺度与视角差异**：参考图像间的尺度或视角不一致导致模型难以协调空间关系。
 - **稀有概念**：模型对罕见物体或场景的参考保真度明显不足。
@@ -244,9 +226,6 @@ MultiBanana 的核心诊断价值在于引入了**困难参考组合**（Table 2
 
 ![[assets/figures/papers/paper_list_l2209_https_arxiv_org_abs_2511_22989/figures/012_Table_5.jpg]]
 *Table 5: Per-task total scores for each single- and two-reference task, evaluated by Qwen3-VL. “Back.” denotes the Background task. Both open-source and closed-source models exhibit lower performance on background replacement tasks. Note that for Nano Banana and GPT-Image-1, we use the versions available as of January 2026*
-
-![[assets/figures/papers/paper_list_l2209_https_arxiv_org_abs_2511_22989/figures/013_Table_6.jpg]]
-*Table 6: Per-task total scores for each multi-reference task, evaluated by Qwen3-VL. The local, global, back, and object columns under X correspond to X–1 Objects + Local, X–1 Objects + Global, X–1 Objects + Background, and X Object, respectively. Both open-source and closed-source models exhibit a general trend of decreasing scores across all tasks as the number of references increases. They also tend to perform worse on background replacement tasks, especially as the number of reference images increases. Note that for Nano Banana and GPT-Image-1, we use the versions available as of January 2026*
 
 ### 参考保真度与背景匹配的显式权衡
 
@@ -266,22 +245,9 @@ MultiBanana 的核心诊断价值在于引入了**困难参考组合**（Table 2
 
 为缓解真实数据分布偏差而引入的合成数据，经统计分析确认未引入显著偏见。Figure 12 显示，不同数据子集的得分保持在 99% 置信区间内，支持了基准构建策略的合理性。
 
-![[assets/figures/papers/paper_list_l2209_https_arxiv_org_abs_2511_22989/figures/026_Figure_12.jpg]]
-*Figure 12: Analysis of potential in-distribution bias. Error bars indicate the 99% confidence intervals. For image generation models, we use the versions available as of January 2026*
-
 ### 现有基准的饱和现象
 
 值得注意的是，在 ImgEdit-Bench（Table 7）和 DreamOmni2 Benchmark（Table 8）上，最新的封闭模型已取得接近饱和的高分，表明这些基准在区分高端模型方面的能力正在逼近天花板。MultiBanana 通过引入多参考和异质性组合，有效弥补了这一评估缺口。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2209_https_arxiv_org_abs_2511_22989/figures/002_Table_1.jpg]]
-*Table 1: Comparison among major benchmarks for reference-based image generation. Existing benchmarks do not provide systematic evaluation across diverse multi-reference conditions, support only a limited number of references, and fail to adequately account for important factors such as differences and compatibility among reference images. Our benchmark expands the upper limit on the number of references and introduces difficult reference combinations, including domain mismatches, scale mismatches, rare concepts, and multilingual prompts, thereby explicitly addressing challenges unique to multi-reference image generation*
-
-![[assets/figures/papers/paper_list_l2209_https_arxiv_org_abs_2511_22989/figures/004_Figure_3.jpg]]
-*Figure 3: (Left) Comparison between the statistics of real data only and those after adding synthetic data. The original dataset was biased toward background images, with few person- and object-related samples. To correct this imbalance, we generated additional synthetic images using Nano Banana and GPT-Image-1, focusing on clear subjects such as people, animals, and objects. This results in a more balanced and comprehensive distribution of data. (Right) Examples of synthesized images in each category*
-
-
 
 ## 定位与知识库关联
 
@@ -327,8 +293,6 @@ MultiBanana 作为评测基准，其适用边界由以下设计选择决定：
 4. **Agentic 框架的有效性边界**：Iterative Prompt Refinement (IPR) 对 GPT 有效但对 Nano Banana 无显著提升甚至退化（Section 4.5），表明 agentic 策略的效果高度依赖基座模型的指令跟随和自省能力。何种模型特性是 agentic 框架生效的前提，值得系统研究。
 
 5. **超越 8 参考的扩展性**：当参考数量继续增加时，模型是否会从“部分遗漏”退化为“完全崩溃”？是否存在有效的参考选择或压缩策略，使模型在大量参考下仍能维持可接受的性能？
-
-
 
 ## 原文 PDF
 

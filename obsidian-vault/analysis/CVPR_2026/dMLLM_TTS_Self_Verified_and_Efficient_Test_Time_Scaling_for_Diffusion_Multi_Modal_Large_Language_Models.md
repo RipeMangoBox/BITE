@@ -52,8 +52,6 @@ claims:
 
 在 GenEval 基准上，dMLLM-TTS 应用于三个代表模型（Lumina-DiMOO、MMaDA、Muddit）后，总体生成质量分别提升 **+17.9%、+29.4%、+26.4%**，同时 HTS 的推理效率最高可达线性搜索的 **6 倍**。自验证反馈在 Lumina-DiMOO 上表现与 VILA-Judge 相当，但弱于 GPT-4o，表明当前 dMLLM 的视觉理解能力仍有提升空间。该框架的局限性在于仅验证于扩散多模态大语言模型，对连续扩散模型或自回归模型的适用性尚待探索。
 
-
-
 ### 扩散多模态大语言模型的生成瓶颈
 
 扩散多模态大语言模型（dMLLMs）将文本到图像生成建模为离散标记空间中的逐步去噪过程：从全掩码序列 $Z_0 = ( [Mask], [Mask], ..., [Mask] )$ 出发，每一步 $t$ 对所有掩码位置预测标记，逐步填充为置信预测（Figure 2）。这种范式天然支持多模态理解与生成的统一，但其生成质量高度依赖于采样过程中的随机探索与迭代细化。
@@ -74,8 +72,6 @@ claims:
 2. **分层轨迹搜索（Hierarchical Trajectory Search, HTS）**：通过三阶段粗到细搜索——初始随机探索、分层瘦身、最终细化——将计算资源从低潜力轨迹重新分配到高潜力轨迹，将复杂度从 $O(NT)$ 降至 $O(N+T)$。
 
 这两个机制协同工作：SVF 提供无外部依赖的轨迹质量信号，HTS 利用该信号实现自适应计算分配，从而在显著提升生成质量的同时实现最高 6 倍的推理加速。
-
-
 
 ## 核心方法与创新机理
 
@@ -114,8 +110,6 @@ $$C_{\mathrm{HTS}} = \mathcal{O}\left(N T_s + \frac{N - dK}{d - 1} + K(T - T_r)\
 dMLLM-TTS 的完整框架在两个互补维度上扩展推理计算：**轨迹探索扩展**（增加 $N$）拓宽假设空间多样性，**迭代细化扩展**（增加 $T$）提升单条轨迹的生成稳定性。SVF 作为统一的评分信号，同时引导两个维度的资源分配，而 HTS 则确保这种扩展不会导致计算成本的线性增长。
 
 这一设计实现了效率与质量的双赢：实验表明，HTS 在达到同等或更高生成质量的前提下，推理速度可达线性搜索的 **5–6 倍**（Lumina-DiMOO 上 5×，MMaDA 和 Muddit 上 6×），同时 Lumina-DiMOO 的 GenEval 总分从 0.78 提升至 0.92（+17.9%）。
-
-
 
 dMLLM-TTS 将测试时扩展（Test-Time Scaling, TTS）形式化为一个 **自适应轨迹搜索问题**，其核心由三个组件定义：
 
@@ -183,15 +177,8 @@ $$
 
 整个 pipeline 的输入为文本提示 $C$，输出为经 SVF 评分筛选的最优生成图像。流程如下：$C$ 同时送入生成器 $\mathcal{G}_{\boldsymbol{\theta}}$ 和 SVF 验证器；生成器沿 $N$ 条轨迹、最多 $T$ 步迭代去噪；SVF 在搜索过程中持续评估中间状态 $Z_t$ 的对齐分数；HTS 根据分数动态调整轨迹池宽度，最终返回评分最高的完整生成结果。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l860_https_arxiv_org_abs_2512_19433/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of dMLLM-TTS framework. (a) dMLLM-TTS scales compute along two axes: trajectory exploration and iterative refinement, guided by Self-Verified Feedback for text–image alignment evaluation. (b) Hierarchical Trajectory Search (HTS) performs coarse-to-fine generation by starting with broad exploration, pruning low-potential trajectories, and refining high-potential trajectories*
-
-![[assets/figures/papers/paper_list_l860_https_arxiv_org_abs_2512_19433/figures/001_Figure_1.jpg]]
-*Figure 1: dMLLM-TTS: We present the generative effects and performance improvements achieved by applying Test-Time Scaling (TTS) to dMLLMs. Images generated with TTS exhibit higher quality and stronger prompt alignment than those generated without TTS*
-
-
 
 ### 3.1 扩散多模态大语言模型的生成范式
 
@@ -256,12 +243,8 @@ $$C_{\text{HTS}} \approx \mathcal{O}(N + T)$$
 
 相比之下，线性轨迹搜索（LTS）的复杂度为 $\mathcal{O}(NT)$。HTS 通过早期广泛探索后快速修剪至紧凑集合（$K \ll N$），实现了计算资源从早期探索到晚期细化的自适应重分配，从根本上规避了 LTS 的二次成本瓶颈。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l860_https_arxiv_org_abs_2512_19433/figures/002_Figure_2.jpg]]
 *Figure 2: Visualization of the image generation process in dMLLMs. The first row shows the input latent masks at each step, and the second row depicts the corresponding outputs. Sampling begins with fully masked tokens (gray) and gradually fills the discrete multimodal token space with increasingly confident predictions (blue)*
-
-
 
 ## 实验与关键发现
 
@@ -320,21 +303,11 @@ dMLLM-TTS 在 GenEval 基准上对三个代表性 dMLLM 均实现了生成质量
 
 所有实验均基于相同的 GenEval 基准和评估指标，比较的基线使用相同的基础模型架构与训练数据。推理时的总采样步数与轨迹数在对应对比中保持一致，确保性能差异仅归因于搜索策略和验证机制的变化。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l860_https_arxiv_org_abs_2512_19433/figures/006_Figure_5.jpg]]
 *Figure 5: Comparison between linear and hierarchical trajectory search. The red curve illustrates linear trajectory search, while the blue curve depicts hierarchical trajectory search, with a dashed line indicating predictions based on a geometric series decay approximation. Curve fitting shows that similar subsequent trends tend to converge towards an upper limit*
 
-![[assets/figures/papers/paper_list_l860_https_arxiv_org_abs_2512_19433/figures/007_Figure_6.jpg]]
-*Figure 6: Trajectory Exploration Scaling (Left) and Iterative Refinement Scaling (Right). Increasing the number of explored trajectories (N = 1→32) refinement steps (T = 8→64) consistently improves performance across all dMLLMs*
-
 ![[assets/figures/papers/paper_list_l860_https_arxiv_org_abs_2512_19433/figures/009_Table_2.jpg]]
 *Table 2: Comparison results of various verifiers*
-
-![[assets/figures/papers/paper_list_l860_https_arxiv_org_abs_2512_19433/figures/008_Figure_7.jpg]]
-*Figure 7: Image Generation Process without (Top) and with (Bottom) dMLLM-TTS. The baseline models produce unsatisfactory text-to-image results. However, by incorporating our TTS strategies, the generation process is significantly improved*
-
-
 
 ## 定位与知识库关联
 
@@ -401,8 +374,6 @@ dMLLM-TTS 的计算分配策略与 Best-of-N 采样、树搜索等方法形成�
 3. **训练时与测试时扩展的联合优化**：该测试时扩展框架与训练时扩展（模型参数量、数据规模）之间的关系如何？是否存在“计算最优”分配策略，在给定总计算预算下平衡训练与推理的投入？
 
 4. **更广泛生成任务的迁移**：HTS 的分层搜索策略是否适用于其他需要多轨迹探索的生成任务（如文本生成、代码生成）？其核心假设——早期步骤的低成本粗评估可有效预测最终质量——在不同模态中是否成立？
-
-
 
 ## 原文 PDF
 

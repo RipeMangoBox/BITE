@@ -51,8 +51,6 @@ LATA（Laplacian-Assisted Transductive Adaptation）针对上述瓶颈提出了�
 
 在方法谱系中，LATA定位于**转导式共形预测**的交叉地带：它区别于依赖标签训练适配器的全共形适应（FCA, Silva-Rodríguez et al., IPMI 2025）和基于熵最小化的无监督转导方法（SCA-T），也不同于通过最优传输对齐VLM logits的Conf-OT（Silva-Rodríguez et al., CVPR 2025）或梯度驱动的少样本转导学习（TIM, Boudiaf et al., NeurIPS 2020; TransCLIP, Zanella et al., NeurIPS 2024）。LATA的独特之处在于将图拉普拉斯正则化与共形预测的可交换性要求深度融合，以纯推理端的概率精炼实现覆盖-效率-公平的三重改进，为医学影像场景下有限标注的可靠决策提供了新的基线。
 
-
-
 ### 医学视觉-语言模型的零样本部署困境
 
 视觉-语言模型（VLM）如 CLIP 及其医学领域特化变体，通过大规模图文预训练获得了强大的零样本识别能力，在无需目标域标注的条件下即可完成图像分类。这一特性对标注成本高昂、专家资源稀缺的医学影像场景极具吸引力。然而，零样本预测本质上缺乏统计可靠性保证：模型输出的概率分布未经校准，无法量化单个预测的不确定性，直接应用于临床决策存在显著风险。
@@ -90,8 +88,6 @@ LATA（Laplacian-Assisted Transductive Adaptation）针对上述瓶颈提出了�
 3. **以一次性标签先验温和收紧覆盖**：可选地将校准集类别边际分布以对称方式注入零样本概率，在不破坏可交换性的条件下，将覆盖提升至名义水平之上，仅以微小的集合增大为代价。
 
 通过上述设计，LATA 旨在定义无标签转导共形预测的覆盖-效率最优前沿，逼近标签感知方法的性能，同时保持黑盒 VLM 的零样本部署优势与严格的有限样本覆盖保证。
-
-
 
 ## 核心方法与创新机理
 
@@ -145,8 +141,6 @@ LATA 处于**转导式共形预测**与**图半监督学习**的交叉点。与�
 3. **ViLU 的黑盒依赖**：失败预测模块需要源域预训练数据，虽推理时冻结，但其预测质量依赖于源域与目标域的分布相似性，在严重域偏移下的行为尚未充分验证。
 4. **极度小样本下的先验不确定性**：LATA-LI 的标签先验来自校准集类别边际，当每类仅 1–2 个样本时，边际估计的方差可能显著影响性能——Table S6 中 β 的最优值可能随样本量漂移，需要手动验证。
 
-
-
 LATA的整体流水线围绕一个核心设计原则展开：**在严格保持共形预测可交换性（exchangeability）的前提下，通过无标签、无训练的图转导精炼来提升零样本视觉-语言模型（VLM）的预测集效率与类间公平性**。流水线由五个顺序模块构成，信息流从冻结的VLM前向传播开始，经图平滑与失败感知评分，最终输出具有覆盖率保证的共形预测集合。
 
 ### 模块关系与信息流
@@ -181,8 +175,6 @@ Figure 1(a) 直观展示了上述流水线的完整信息流，Figure 1(b) 则�
 
 ![[assets/figures/papers/paper_list_l2105_https_arxiv_org_abs_2602_17535/figures/001_Figure_1.jpg]]
 *Figure 1: LATA pipeline and coverage–efficiency trade-off. (a) LATA pipeline. Frozen vision/text encoders yield zero-shot scores q(x), optionally adjusted via calibration-informed priors. LATA then refines predictions on the joint unlabeled pool U using a sparse kNN graph and CCCP updates, producing z˜(x). A frozen ViLU module estimates difficulty u(x) and attention α(x), forming a failure-aware score S⋆, which is conformalized into calibrated prediction sets. (b) Coverage–efficiency frontier (α=0.10, APS). LATA-LF (β=0) achieves SCP-level coverage with lower set size and CCV. LATA-LI (β=0.2) improves coverage further with minimal cost, outperforming SCA-T in both efficiency and balance*
-
-
 
 LATA 的核心架构由五个冻结模块串联而成：零样本概率计算、ViLU 失败预测头、图拉普拉斯平滑、失败感知非一致性评分和共形预测集构建。整个流水线不更新视觉-语言模型的任何权重，仅在联合校准-测试池上执行确定性输出精炼。
 
@@ -250,8 +242,6 @@ $$\mathcal{C}(x_{\text{test}}) = \{ y : S^{\star}(x_{\text{test}}, y) \leq \hat{
 
 整个过程保持确定性对称变换，确保可交换性条件成立，从而继承标准分裂共形预测的有限样本覆盖率保证：$P(y_{\text{test}} \in \mathcal{C}(x_{\text{test}})) \geq 1-\alpha$。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与评估逻辑
@@ -272,9 +262,6 @@ LATA的实验评估围绕三个核心维度展开：**效率**（平均集合大
 - **覆盖率维持**：LATA-LF在所有设定下均达到或超过名义覆盖率0.900，无红色违规标记。LATA-LI（β=0.2）通过一次性校准边际先验将覆盖率进一步提升至0.910（APS），集合大小仅微增至3.03，CCV进一步降至6.25。
 
 在SICAPv2数据集的细粒度分析（Figure 2）中，LATA定义了最佳无标签效率前沿：随着校准样本数K从4增至16，LATA始终以更小的集合实现相等或更优的覆盖率，逼近使用标签的FCA方法（覆盖率0.898，集合大小3.06，CCV 6.12），但**在转移阶段完全不接触目标域标签**。测试时覆盖率分布显示，SCP和SCA-T虽减少违规但较为分散，而LATA的覆盖率紧密聚集在名义水平附近，CCV最低。
-
-![[assets/figures/papers/paper_list_l2105_https_arxiv_org_abs_2602_17535/figures/003_Figure_2.jpg]]
-*Figure 2: SICAPv2 — coverage, efficiency, and set structure*
 
 ### 组件消融：图平滑是效率增益的主要驱动力
 
@@ -333,25 +320,6 @@ LATA对关键超参数表现出良好的鲁棒性：
 3. **ViLU预训练依赖**：ViLU需要源域数据预训练（Table S8），虽然在推理时冻结且不参与VLM更新，但其失败预测质量受预训练数据覆盖范围影响。
 4. **任务范围限制**：当前设计仅针对图像分类，未扩展到密集预测、分割或多标签等结构化输出任务，在这些场景下共形覆盖保证的维持需要新的方法论。
 
-![[assets/figures/papers/paper_list_l2105_https_arxiv_org_abs_2602_17535/figures/016_Table_S.8.jpg]]
-*Table S.8: Effect of ViLU pretraining source (LAC, α=0.10). UT window: N=256, k=15*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2105_https_arxiv_org_abs_2602_17535/figures/005_Table_2.jpg]]
-*Table 2: Transductive solvers at α=0.10. Best and second-best results are shown in bold and underline, respectively. Red indicates violations of the target error rate*
-
-![[assets/figures/papers/paper_list_l2105_https_arxiv_org_abs_2602_17535/figures/006_Figure_4.jpg]]
-*Figure 4: Exchangeability and per-dataset ∆accuracy–∆setsize (APS, α=0.10). (a) Across datasets, LATA-LI yields ∆Accuracy>0 and ∆Set Size\<0 vs. SCP, with a weak linear fit (small*
-
-![[assets/figures/papers/paper_list_l2105_https_arxiv_org_abs_2602_17535/figures/007_Table_3.jpg]]
-*Table 3: Component ablations (LAC) at*
-
-![[assets/figures/papers/paper_list_l2105_https_arxiv_org_abs_2602_17535/figures/010_Table_S.2.jpg]]
-*Table S.2: Sensitivity to failure-aware weights*
-
-
-
 ## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
@@ -393,8 +361,6 @@ LATA的核心技术路线由三个相互协同的模块构成，每个模块都�
 - 在处理大规模标签空间（>10k类）时，是否可结合近似图构建与降维策略以维持计算效率？
 - 能否设计自适应先验强度或更复杂的图结构（如动态邻居、异构边）以应对更强的分布偏移？
 - 是否存在更有效的标签先验注入方式，在不牺牲有效性的前提下进一步优化覆盖与效率的权衡？
-
-
 
 ## 原文 PDF
 

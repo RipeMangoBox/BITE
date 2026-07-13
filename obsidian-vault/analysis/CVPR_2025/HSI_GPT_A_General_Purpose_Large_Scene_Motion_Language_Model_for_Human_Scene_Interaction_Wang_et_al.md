@@ -60,8 +60,6 @@ claims:
 
 **公平性说明**：HSI-GPT 作为通用多任务模型，与各任务专用专家模型（如 cVAE、Afford-Motion）对比时，其优势在于跨任务泛化而非单一任务的极致性能。部分 LLM-based 基线（如 MotionGPT）为复现结果，可能存在实现差异。
 
-
-
 ### 问题背景：人-场景交互的生成与理解
 
 人类在三维场景中的运动生成与理解是计算机视觉和具身智能的核心问题之一。人-场景交互（Human-Scene Interaction, HSI）要求模型不仅理解文本指令的语义，还需感知三维环境的几何与可供性约束，生成物理可信且语义一致的人体运动序列。这一任务横跨场景理解、运动生成和语言理解三个模态，天然具有高维度和强耦合特性。
@@ -86,8 +84,6 @@ claims:
 2. **场景-语言交互建模**：设计一种机制，使 LLM 能够感知三维场景中的交互可供性——即场景中哪些区域可以与人体产生有意义的接触——而非仅仅将场景作为背景条件。
 
 HSI-GPT 正是围绕这两个挑战展开：通过将人类运动视为一种“身体语言”（body language），与自然语言统一为多模态词汇表，并引入多模态交互聚合器（MIA）提取交互感知的场景 token，使 LLM 首次能够同时理解场景上下文、文本指令，并生成符合物理约束的交互运动。这一设计使 HSI-GPT 成为首个面向 HSI 的通用型大模型，为后续研究提供了统一的基线框架。
-
-
 
 ## 核心方法与创新机理
 
@@ -121,8 +117,6 @@ $$ \mathcal{L}_{\mathrm{LoRA}} = - \sum \log p_{\theta} \left( x_t \mid x_{<t}, 
 
 在推理时，同一个模型无需额外任务特定微调即可处理文本到运动生成、HSI 描述（captioning）、运动补全（completion）等多种任务，实现了从“一个任务一个模型”到“一个模型多个任务”的范式转变。这一设计的关键突破在于：多任务联合训练促进了跨任务知识迁移，使模型在单一任务上的表现不逊于专用模型，同时获得了专用模型不具备的零样本泛化能力。
 
-
-
 HSI-GPT 提出了一种将人-场景交互（HSI）统一到大型语言模型（LLM）“next-token prediction”范式下的通用框架。其核心设计理念是将人类运动视为一种“身体语言”，与自然语言统一为多模态词汇表，从而使 LLM 能够同时理解场景上下文、文本指令，并生成符合物理约束的交互运动。
 
 ### 总体架构
@@ -151,15 +145,8 @@ HSI-GPT 采用三阶段训练策略：
 
 该统一框架使 HSI-GPT 成为首个能够处理多种 HSI 相关任务（文本/场景驱动运动生成、HSI captioning、运动补全等）的通用模型，无需针对特定任务设计独立架构。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1738_HSI_GPT_A_General_Purpose_Large_Scene_Motion_Language_Model_for_Human_Sc/figures/003_Figure_2.jpg]]
 *Figure 2: TheoveralframeworkofourgenealitHS-GPinHSI-relatedtasks.Itisompoedofmulti-modaltokenizer(Sec.3.anda LargeScene-Motion-Language Model(Sec.3.2).Withanerichedmotion-languagevocabuaryandaMulti-odalInteractionAgregator (MIA) module,HSI-GPT seamlessly aligns scene,motion,and language modalities utilizing fine-tuned LLMs*
-
-![[assets/figures/papers/paper_list_l1738_HSI_GPT_A_General_Purpose_Large_Scene_Motion_Language_Model_for_Human_Sc/figures/002_Figure_1.jpg]]
-*Figure 1: IlustratioofrH-T'ssupportedtass.Giverentistructioprompts,theproposedH-Ttolycodates multiplecontrolconditiosbthandlesvarousHS-elatedtassasellasotio-centricunderstandingandgeneratiotassuforly*
-
-
 
 ### 运动离散化：VQ-VAE 运动分词器
 
@@ -212,8 +199,6 @@ $$
 
 该目标驱动 LLM 以自回归方式预测下一个运动 token，实现了场景、运动、语言三模态在统一序列空间中的联合建模。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设计
@@ -249,9 +234,6 @@ Table 1 展示了在 HumanML3D 测试集上的定量对比。HSI-GPT 在多项�
 #### 文本条件 HSI 生成（HUMANISE）
 
 Table 2 报告了在 HUMANISE 数据集上的 HSI 生成结果。该任务要求模型根据文本描述在 3D 场景中生成物理合理的人体运动。
-
-![[assets/figures/papers/paper_list_l1738_HSI_GPT_A_General_Purpose_Large_Scene_Motion_Language_Model_for_Human_Sc/figures/007_Table_2.jpg]]
-*Table 2: Quantitative performance of text-conditioned HSI generation.† marks our reproduced results on HUMANISE[52] dataset*
 
 **物理合理性指标**：
 - HSI-GPT（w/ affordance）在 Contact 指标上达到 85.47，显著优于 cVAE（4.094），表明生成的 motion 与场景的物理接触更真实。
@@ -334,18 +316,8 @@ Table 4 系统研究了不同控制信号组合对 HSI 生成质量的影响：
 | Table 6 | HSI-GPT 在 captioning 任务上 R-Precision Top1 达到 0.551，验证双向理解能力 |
 | Table 7 | 在 completion 任务上 FID 较 MDM 降低 27.3%，展示强时序推理能力 |
 
-![[assets/figures/papers/paper_list_l1738_HSI_GPT_A_General_Purpose_Large_Scene_Motion_Language_Model_for_Human_Sc/figures/010_Table_6.jpg]]
-*Table 6: Experiments of HSIcaptioning task ontheaugmented HumanML3D[9]. Results marked with * are from MotionGPT[18]*
-
-![[assets/figures/papers/paper_list_l1738_HSI_GPT_A_General_Purpose_Large_Scene_Motion_Language_Model_for_Human_Sc/figures/013_Table_7.jpg]]
-*Table 7: Evaluation of generalized HSI completion using our HSI-GPT(LLaMA 3-8B)on the HumanML3D augmented with floors. The underlined results indicate the second-best performance*
-
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1738_HSI_GPT_A_General_Purpose_Large_Scene_Motion_Language_Model_for_Human_Sc/figures/006_Figure_4.jpg]]
 *Figure 4: GallrtingtultsofetoiodHeatiodrrosotrloiioelyxt+lto Token,Text+LastMotionTken,adTextRandomMotionTokens (yelloposes)ontheHUMANSE[9]benchmark.Bestviewedincolor*
-
-
 
 ## 定位与知识库关联
 
@@ -390,8 +362,6 @@ HSI-GPT 通过引入 LLM 的“next-token prediction”范式打破了这一瓶�
 5. **多人协作与社交交互**：扩展模型以支持多人场景，需要处理人物间的空间关系、时序协调和社交规范，这涉及更复杂的交互建模。
 
 6. **细粒度语义评估**：开发能够评估生成运动与指令语义一致性的新指标，例如动作类型准确率、物体交互正确率等，以弥补现有评估体系的不足。
-
-
 
 ## 原文 PDF
 

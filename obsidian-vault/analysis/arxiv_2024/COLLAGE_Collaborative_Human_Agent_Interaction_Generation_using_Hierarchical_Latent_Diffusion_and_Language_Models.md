@@ -55,8 +55,6 @@ COLLAGE 的核心洞察在于：**将大语言模型（LLM）的语义推理能�
 
 主要局限包括：缺乏显式物理建模可能导致穿透或不自然接触，CORE-4D 数据集规模有限（998 个序列）对泛化性构成挑战，以及当前不支持细粒度运动编辑。
 
-
-
 ### 问题背景：协同人-物-人交互生成
 
 生成逼真且可控的多人-多物协同交互运动是计算机视觉与图形学中的核心挑战，其应用涵盖机器人协作、虚拟现实、人机交互等领域。与单人运动生成不同，协同交互生成需要同时建模多个智能体（人类或机器人）与物体之间的空间-时序耦合关系，这要求生成的每一帧运动不仅满足个体的运动学合理性，还必须保持跨实体的语义一致性与物理接触真实性。
@@ -78,8 +76,6 @@ COLLAGE 的核心洞察在于：**将大语言模型（LLM）的语义推理能�
 本文的出发点在于突破上述瓶颈，核心思路是利用大语言模型（LLM）的语义推理与规划能力来弥补运动数据匮乏带来的学习困难，同时通过层次化运动表征实现从粗粒度任务语义到细粒度运动细节的渐进式生成。
 
 具体而言，COLLAGE框架的设计动机源于以下观察：人类协同行为天然具有层次结构——高层决定“做什么任务”，中层规划“如何协调”，底层实现“具体动作”。这一结构与扩散模型的去噪过程天然契合：早期去噪步骤可受高层语义引导确定任务类型，后期步骤则受细粒度线索约束以生成精确的关节运动。通过将LLM生成的规划线索注入扩散过程的各个层次，模型能够在极少训练数据下实现强控制性与高多样性的协同交互生成。
-
-
 
 ## 核心方法与创新机理
 
@@ -120,8 +116,6 @@ COLLAGE 提出 **6 层层级化 VQ-VAE**（L=6），每层捕捉不同抽象级�
 ### 创新耦合效应
 
 上述三个 changed slots 并非孤立改进，而是形成因果闭环：分层 VQ-VAE 提供多尺度运动表征空间，LLM 规划线索为各尺度注入语义先验，时间调制确保语义与细节在扩散过程中分阶段生效，连续潜空间扩散则统一优化全局运动序列。这一耦合使得 COLLAGE 在仅 998 个训练序列的 CORE-4D 数据集上，仍能生成物理合理、语义准确的协同交互，FID 达到 6.890，显著优于移除任一模块的消融基线。
-
-
 
 COLLAGE 的整体管线由三个核心阶段串联构成：**层次化 VQ-VAE 运动表征学习** → **LLM 规划线索生成与关联** → **潜空间扩散生成**。其设计目标是在有限的动作捕捉数据下，实现文本条件或物体条件下的协同人-物-人交互生成。
 
@@ -166,12 +160,8 @@ $$\mathcal{L}_{\text{simple}} = \mathbb{E}_{\mathbf{x}_0, \epsilon, t} \left[ \|
 
 消融实验验证了这一管线设计的必要性：移除层次化 VQ-VAE（退化为单层）导致 CORE-4D 上 FID 从 6.890 升至 7.452，InterHuman 上 FID 从 0.778 升至 5.582；移除 LLM 引导或时间调制同样造成性能显著下降。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1667_COLLAGE_Collaborative_Human_Agent_Interaction_Generation_using_Hierarchi/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed COLLAGE framework for collaborative human-object interaction generation. The hierarchical VQ-VAE encoder captures motion-specific characteristics at different levels of abstraction. The latent diffusion model operates in the learned latent space and incorporates LLM-generated motion planning cues to guide the denoising process, enabling the generation of prompt-specific interactions with enhanced control and diversity as in Fig 1*
-
-
 
 COLLAGE 框架由三个紧密耦合的核心模块构成：**层级化 VQ-VAE**、**LLM 规划线索生成与关联**，以及**潜空间扩散模型**。三个模块通过分层抽象、语义对齐和条件引导形成闭环，共同解决协同人-物-人交互生成中的多智能体协调与长期规划难题。
 
@@ -223,8 +213,6 @@ $$\mathcal{L}_{\mathrm{simple}} = \mathbb{E}_{\mathbf{x}_0, \epsilon, t} \left[ 
 
 其中 $\mathcal{G}$ 为人-物交互图结构，$\mathbf{E}_L$ 为各层规划线索嵌入的集合。最终通过线性投影将去噪后的节点特征映射回原始潜空间维度 $\mathbb{R}^{F \times V \times K}$，得到预测噪声 $\hat{\boldsymbol{\epsilon}}$。推理时采用 DDIM 采样，得益于 LLM 规划线索的强引导作用，仅需 15 步即可生成高质量运动，推断速度比 MDM 快约 65%（Fig. 3(c)）。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -268,8 +256,6 @@ Table I底部报告了系统性的消融结果，揭示各组件的因果贡献�
 
 所有基线方法均在同一框架下复现或适配，保证比较公平性。训练数据、评估协议和超参数搜索空间保持一致。但由于CORE-4D数据集规模较小，结果的统计显著性需要更大规模验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1667_COLLAGE_Collaborative_Human_Agent_Interaction_Generation_using_Hierarchi/figures/003_Table.jpg]]
 *Table: I*
 
@@ -278,8 +264,6 @@ Table I底部报告了系统性的消融结果，揭示各组件的因果贡献�
 
 ![[assets/figures/papers/paper_list_l1667_COLLAGE_Collaborative_Human_Agent_Interaction_Generation_using_Hierarchi/figures/001_Figure_1.jpg]]
 *Figure 1: Text to collaborative motion and generalized motion generation by COLLAGE, based on user-provided text prompts. In the top image, a simulated humanoid robot adapts to the 3D terrain features based on the input text from the human collaborator. In the bottom image, the two human agents collaborate to handle an object using LLM-based planning via our architecture*
-
-
 
 ## 定位与知识库关联
 
@@ -326,8 +310,6 @@ COLLAGE 的设计假设与实验条件划定了其当前的能力边界：
 4. **纯 LLM 驱动的协同规划。** 能否完全绕过交互动作捕捉数据，仅依靠 LLM 的推理能力与基础运动先验生成协同交互，这是一个激进但具有范式意义的方向——若成功，将彻底改变人-物交互数据采集的依赖格局。
 
 **注意：** 论文未提供与更近期方法（如 2024 年后的扩散-Transformer 混合架构或基于视频生成模型的运动合成方法）的直接比较。若需评估 COLLAGE 在当前 SOTA 中的相对位置，建议手动检索 2024-2025 年间在 CORE-4D 或 InterHuman 基准上报告结果的后续工作。
-
-
 
 ## 原文 PDF
 

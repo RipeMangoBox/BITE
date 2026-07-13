@@ -51,8 +51,6 @@ claims:
 
 Video-LaVIT 的方法定位在于：以 MPEG-4 运动向量作为描述时间变化的紧凑代理，通过解耦视觉语义与运动动态，仅需少量额外标记即可显著增强视频理解与生成，同时保持与图像、文本的统一框架。
 
-
-
 ### 视频-语言预训练的核心瓶颈
 
 多模态大语言模型在图像理解与生成上取得了显著进展，但将其能力扩展至视频领域仍面临根本性挑战。视频与静态图像的本质区别在于其蕴含丰富的**时间动态信息**——物体的运动、场景的切换、事件的演进。然而，现有视频-语言预训练方法在编码这些时空动态时陷入两难：
@@ -84,8 +82,6 @@ Video-LaVIT从这一观察出发，提出将视频解耦为**关键帧（视觉�
 - **统一自回归预训练**：将视觉令牌、运动令牌与文本令牌拼接为多模态序列，在Llama 2 7B上进行下一令牌预测训练，支持视频/图像理解与生成的双向任务。
 
 通过这种解耦设计，Video-LaVIT仅需**135个运动令牌**即可在理解与生成任务上取得高性能（Table 7），显著降低了视频编码的计算开销，同时保持与图像、文本模态的统一框架兼容性。
-
-
 
 ## 核心方法与创新机理
 
@@ -122,8 +118,6 @@ $$p(y) = \sum_{y \in \mathcal{D}} \sum_{i=1}^{S} \log P_{\theta}(y_i | y_{<i})$$
 关键的是，在统一预训练中加入运动令牌对图像理解性能的影响微乎其微（VQAv2 仅差 0.3%，Table 9），验证了解耦标记化能和谐地统一图像、视频与文本三种模态，而不会引发模态冲突。
 
 **总结**：Video-LaVIT 的创新链条是——用运动向量作为时间动态的紧凑代理 → 解耦视觉与运动令牌 → 分步去标记化 + EMC 恢复运动 → 统一自回归预训练。这一设计使模型在仅使用 10M 视频片段训练的情况下，在 13 个多模态基准上取得了有竞争力的表现，尤其在视频生成 FVD 指标上显著优于使用 270M 数据训练的 VideoPoet（MSR-VTT FVD: 188.36 vs. 213, Table 4）。
-
-
 
 ![[assets/figures/papers/paper_list_l13_Video_LaVIT_Unified_Video_Language_Pre_training_with_Decoupled_Visual_Mo/figures/003_Figure_3.jpg]]
 *Figure 3: Illustrations for video detokenization in Video-LaVIT. (a) Training pipeline for the video detokenizer, which aims to reconstruct the original video clip using one keyframe and the subsequent motion vectors. (b) Autoregressive inference for long video decoding*
@@ -170,8 +164,6 @@ Video-LaVIT 的整体流程由三个核心阶段构成，各模块协同工作�
 - 训练计算开销仍然较高，难以直接扩展至网络级视频数据。
 - 长视频生成中不同片段的关键帧可能过于相似，因为训练数据场景变化较少，限制了多样化长视频的生成能力。
 
-
-
 ### 3.1 视频分解与标记化
 
 Video-LaVIT的核心设计在于将视频解耦为**关键帧**（keyframe）与**运动向量**（motion vectors）两部分，分别进行离散标记化。这一设计基于一个关键观察：同一镜头内的视频帧在语义上高度冗余，其时间变化可由运动向量紧凑描述（Figure 1）。
@@ -216,8 +208,6 @@ $$p(y) = \sum_{y \in \mathcal{D}} \sum_{i=1}^{S} \log P_{\theta}(y_i | y_{<i})$$
 
 其中 $y$ 为多模态令牌序列，$S$ 为序列长度，$\theta$ 为LLM参数（Llama 2 7B）。该目标使模型在统一的next-token prediction框架下同时学习多模态理解和生成能力。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与因果验证
@@ -243,9 +233,6 @@ Table 7揭示了运动令牌数量N的缩放行为。在N=0（无运动）到N=1
 ### 长视频生成与噪声约束
 
 Figure 5的消融直接展示了式(4)中显式噪声约束的因果效应。在生成“a 360 shot of a sleek yacht...”的长视频时，无噪声约束的片段间出现明显的运动不连续（游艇位置跳跃），而施加噪声约束后片段过渡平滑。该机制的工作原理是：将上一片段的末帧通过DDIM反演至中间噪声状态，作为下一关键帧生成的初始噪声——这强制了片段边界的像素级一致性。
-
-![[assets/figures/papers/paper_list_l13_Video_LaVIT_Unified_Video_Language_Pre_training_with_Decoupled_Visual_Mo/figures/010_Figure_5.jpg]]
-*Figure 5: Long video generation example with “a 360 shot of a sleek yacht sailing gracefully through the crystal-clear waters of the Caribbean”. The top two rows use the noise constraint in Equation (4) to improve temporal consistency, while the bottom row does not*
 
 Table 5量化了长视频生成的性能：FVD为113.37，KVD为4.94，CLIPSIM为0.9621。但需注意，该评估仅基于2048个生成样本（EvalCrafter提示），且训练数据（WebVid-10M）平均视频长度约15秒，因此模型对更长视频的泛化能力仍需谨慎解读。
 
@@ -287,25 +274,6 @@ Table 10检验了视频去标记器对预训练权重的依赖。使用svd-img2v
 3. **LLM上下文窗口瓶颈**：4096的上下文窗口限制了可处理的视频长度，无法生成数分钟级别的视频。这是架构层面的硬约束，而非训练数据的限制。
 
 4. **训练计算开销**：尽管标记化效率高，但整体训练仍需大量计算资源，难以直接扩展至网络级视频数据（如数亿片段）。论文承认需进一步挖掘视频的时空冗余以降低成本。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l13_Video_LaVIT_Unified_Video_Language_Pre_training_with_Decoupled_Visual_Mo/figures/016_Figure_6.jpg]]
-*Figure 6: Text-to-image generation comparison with SDXL (Podell et al., 2024). Prompts are from SDXL, CM3Leon (Aghajanyan et al., 2022), Imagen (Saharia et al., 2022), VideoPoet (Kondratyuk et al., 2023), LMD (Lian et al., 2023), and LayoutGPT (Feng et al., 2024). Our model provides comparable visual quality while showing better logical and spatial reasoning abilities (see the last two cases)*
-
-![[assets/figures/papers/paper_list_l13_Video_LaVIT_Unified_Video_Language_Pre_training_with_Decoupled_Visual_Mo/figures/017_Figure_7.jpg]]
-*Figure 7: Text-to-video generation comparison with Gen-2 (Runaway, 2023) using default parameters. Prompts are from VideoPoet (Kondratyuk et al., 2023) and PixelDance (Zeng et al., 2023). Our model provides a similarly high visual quality (in the bottom two cases) while following the text prompt better (including “running” in the first example and “pirate ships” in the second examples)*
-
-![[assets/figures/papers/paper_list_l13_Video_LaVIT_Unified_Video_Language_Pre_training_with_Decoupled_Visual_Mo/figures/019_Figure_9.jpg]]
-*Figure 9: First-person view running through the woods and approaching a large beautiful cabin, highly detailed. Figure 9. Long video generation examples. Prompts are Gen-L-Video (Wang et al., 2023a) and VideoPoet (Kondratyuk et al., 2023). Our generated videos are temporally coherent even across different decoded clips, thanks to our proposed explicit noise constraint*
-
-![[assets/figures/papers/paper_list_l13_Video_LaVIT_Unified_Video_Language_Pre_training_with_Decoupled_Visual_Mo/figures/005_Table_2.jpg]]
-*Table 2: Zero-shot video question answering accuracy (↑). Video-LaVIT demonstrates state-of-the-art accuracy on all three benchmarks. The evaluation uses a GPT assistant (Maaz et al., 2023), with “Score” denoting a relative score from 0 to 5 assigned by the GPT model. The Video-LLaVA and LLaMA-VID both use Vicuna-1.5 (Chiang et al., 2023) as the language model*
-
-![[assets/figures/papers/paper_list_l13_Video_LaVIT_Unified_Video_Language_Pre_training_with_Decoupled_Visual_Mo/figures/006_Table_3.jpg]]
-*Table 3: Zero-shot understanding (↑) on the test set of Perception Test (Patraucean et al., 2024) and EgoSchema (Mangalam et al., 2024)*
-
-
 
 ## 定位与知识库关联
 
@@ -358,8 +326,6 @@ Video-LaVIT 的设计存在明确的适用边界：
 4. **更轻量级的运动估计**：当前依赖MPEG-4压缩过程中的运动向量提取，是否存在更轻量级的在线运动估计方案，以进一步降低标记化成本，同时保持或提升运动表示质量？
 
 5. **评估的公平性**：图像理解对比中，LLaVA-1.5采用了更高输入分辨率（336），部分数据集与训练数据存在重叠（标*），视频问答评估采用GPT助手相对评分，这些因素可能影响结论的稳健性，需在统一条件下进一步验证。
-
-
 
 ## 原文 PDF
 

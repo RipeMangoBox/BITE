@@ -53,8 +53,6 @@ DAEDAL 从统一的短初始长度（64）出发：**阶段一**通过监控 EOS
 
 在四个基准测试（GSM8K、MATH500、MBPP、HumanEval）上，DAEDAL 以统一的初始长度达到或超越了经过精心调优的固定长度基线的最佳性能——平均准确率从 52.05% 提升至 54.75%（LLaDA-Instruct-8B），同时有效令牌比率大幅提高。该方法对超参数（初始长度、扩展因子、窗口大小、阈值）表现出极强的鲁棒性，所有测试配置均与最佳基线持平或更优。
 
-
-
 扩散大语言模型（Diffusion Large Language Models, DLLMs）作为自回归模型之外的一条新兴生成范式，通过迭代去噪从完全掩码的序列中逐步恢复文本。然而，现有 DLLM 的推理过程存在一个根本性限制：**生成长度必须在去噪开始前预先固定**。这意味着无论面对简单的一步推理题还是需要长篇推导的复杂数学证明，模型都被强制在相同的令牌预算内完成生成。
 
 这一固定长度策略带来了两个层面的问题。**性能层面**，当预设长度不足时，模型缺乏足够的生成空间来完成复杂推理，导致答案截断或推理链不完整；而当长度过长时，多余的掩码令牌会被强制去噪为无意义的填充内容，不仅浪费计算资源，还可能引入噪声干扰模型的预测质量。**效率层面**，为覆盖数据集中最困难的问题，固定长度通常需要设置为较大的值（如 1024 或 2048），这导致大量简单问题也被分配了远超实际所需的计算预算，造成显著的资源浪费。
@@ -62,8 +60,6 @@ DAEDAL 从统一的短初始长度（64）出发：**阶段一**通过监控 EOS
 本文的核心发现是：**DLLM 内部天然具有对任务所需生成长度的感知能力**。具体而言，模型在序列末尾对 EOS（序列结束）令牌的预测置信度，能够作为长度是否充足的可靠内部信号——当生成空间足够时，模型对 EOS 的预测置信度显著更高；当空间不足时，该置信度明显降低。这一发现为无需重新训练的自适应长度调整提供了关键的因果操作变量。
 
 基于上述洞察，本文提出 **DAEDAL**，一个完全无需训练、在推理时动态调整生成长度的两阶段框架。DAEDAL 从统一的短初始长度出发，通过监控 EOS 置信度信号，自适应地为每个问题分配合适的生成空间，从而突破固定长度去噪的根本瓶颈。
-
-
 
 ## 核心方法与创新机理
 
@@ -92,11 +88,6 @@ DAEDAL 的核心洞察是：模型在预测序列末尾 EOS（End-of-Sequence）
 
 这一设计使得 DAEDAL 能够在保持统一初始长度（64）的前提下，在四个基准上均达到或超越经过精心调优的固定长度基线的最佳性能，同时显著提升了有效令牌比率（Table 1）。更重要的是，两阶段设计具有协同效应：单独使用阶段一或阶段二均已带来显著提升，而二者结合后效果最佳（Table 2），验证了“全局长度估计 + 局部空间扩展”这一组合策略的有效性。
 
-
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_Ic2A2gCseC/figures/007_Figure_3.jpg]]
-*Figure 3: Inference process of Fixed-Length Denoising (Baseline) and DAEDAL. (a) The standard inference process for current DLLMs, which performs iterative denoising on a sequence of a predefined, static length. (b) Our proposed two-stage inference process, which first employs Initial Length Adjustment to determine an appropriate generation length before denoising, followed by Iterative Mask Insertion to expand the sequence on-demand during the denoising process*
-
 DAEDAL 是一种无需额外训练的两阶段可变长度去噪策略，旨在解决扩散大语言模型（DLLM）在推理时因固定生成长度带来的性能与效率矛盾。其核心洞察在于：模型在序列末尾对 EOS（序列结束）令牌的预测置信度能够作为内部信号，指示当前生成长度是否充足——高置信度意味着长度足够，低置信度则提示需要更多生成空间。DAEDAL 利用这一信号，在不修改模型权重的前提下，实现了从固定长度到动态自适应长度的推理范式转换。
 
 整个推理管线由两个协同阶段构成，如 Figure 3(b) 所示：
@@ -108,8 +99,6 @@ DAEDAL 是一种无需额外训练的两阶段可变长度去噪策略，旨在�
 两个阶段的协同关系在消融实验中得到验证（Table 2）：单独使用阶段一（初始长度 64）即可在 GSM8K 上达到 84.1% 的准确率，显著优于同长度固定基线；单独使用阶段二虽能在短初始长度下大幅提升性能（72.3%），但因缺乏全局长度规划而未能达到峰值；完整 DAEDAL 将两者结合，最终达到 85.8% 的最高准确率，证明了全局长度估计与局部空间扩展的互补性。
 
 整个流程对超参数表现出极强的鲁棒性。在统一使用 $L_{init}=64$、$L_{max}=2048$、$\tau_{eos}=0.5$、$\tau_{high}=0.9$、$\tau_{low}=0.1$、$\tau_{expand}=0.9$、$E_{factor}=8$、$W_{eos}=32$ 的默认配置下，DAEDAL 在四个基准上均达到或超越各自精心调优的固定长度基线的最佳性能（Figure 1(a)），同时产生了按问题自适应的响应长度分布（Figure 1(b)），有效提升了有效令牌比率。
-
-
 
 DAEDAL 是一种训练无关的双阶段可变长度去噪策略，其核心在于将扩散大语言模型（DLLM）内部对生成长度的感知能力转化为可操作的推理时控制信号。该方法包含三个关键模块：**EOS 置信度计算**、**阶段一：初始长度调整**、**阶段二：迭代掩码插入**。
 
@@ -161,8 +150,6 @@ DAEDAL 涉及的核心超参数及其默认值如下：
 | EOS 置信度窗口 | $W_{eos}$ | 32 | 计算 EOS 置信度时考虑的序列末尾窗口大小 |
 
 值得注意的是，DAEDAL 在所有实验和模型中使用完全相同的超参数配置，未针对特定模型或基准进行调优。消融实验（Table 3、Table 4、Figure 5）表明，该方法对上述超参数具有极强的鲁棒性：在初始长度 32 至 512、扩展因子 8 至 32、以及 32 种阈值组合的测试中，性能均与最佳固定长度基线持平或更优。
-
-
 
 ## 实验与关键发现
 
@@ -220,31 +207,17 @@ DAEDAL展现出对关键超参数的高度鲁棒性，这一特性对其实际�
 
 **阈值组合的网格搜索**（图5）：研究者对两组相互依赖的阈值对——($\tau_{high}$, $\tau_{low}$) 和 ($\tau_{eos}$, $\tau_{expand}$)——进行了4×4网格搜索，共32种配置。所有32种配置的性能均与最佳固定长度基线（83.8%准确率）持平或更优，部分配置超越基线。默认阈值设置（$\tau_{eos}=0.5$, $\tau_{expand}=0.9$, $\tau_{high}=0.9$, $\tau_{low}=0.1$）在所有基准上均表现优异，且未针对特定模型或任务进行调优。
 
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_Ic2A2gCseC/figures/017_Figure_5.jpg]]
-*Figure 5: Ablation Results on DAEDAL’s Thresholds. The two 4x4 heatmaps present a grid search over two interdependent threshold pairs: ( $\tau _ { h i g h } , \tau _ { l o w }$ ) and ( $\tau _ { e o s } , \tau _ { e x p a n d }$ ) . All 32 configurations were evaluated on GSM8K using LLaDA-Instruct-8B. Higher accuracy is indicated by a darker green. The color bar also provides reference color for performance of baseline. Our default settings are in blue boxes. The results demonstrate remarkable stability, with all configurations comparable to the best-performing baseline, and some even outperforming it
 
 ### 跨模型泛化验证
 
 DAEDAL的通用性在两个额外模型上得到验证。在LLaDA-1.5-8B（表5）和Dream-Instruct-7B（表6）上，DAEDAL同样使用统一的短初始长度（64）和完全相同的超参数设置，在所有四个基准上均达到或接近最佳固定长度基线的性能，同时保持显著更高的有效令牌比率。这一跨模型的一致性表明，EOS置信度作为长度充足性信号的机制是DLLM的普遍特性，而非特定模型的偶然现象。
 
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_Ic2A2gCseC/figures/016_Table_5.jpg]]
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_Ic2A2gCseC/figures/018_Table_5.jpg]]
-*Table 5: Main Results of DAEDAL on LLaDA-1.5-8B. We compare the baseline performance at various generation lengths (64 to 2048) against DAEDAL. Acc denotes accuracy, $E _ { t o k e n }$ is the average effective tokens (the response length excluding trailing padding), $N _ { t o k e n }$ is the average total tokens, and $\mathbf { E } _ { r a t i o }$ is the effective token ratio. The best configuration for the baseline is highlighted in orange. The best results are bold and underlined, and the second-best results are underlined*
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_Ic2A2gCseC/figures/019_Table_6.jpg]]
-*Table 6: Main Results of DAEDAL on Dream-Instruct-7B. We compare the baseline performance at various generation lengths (64 to 2048) against DAEDAL. Acc denotes accuracy, $E _ { t o k e n }$ is the average effective tokens (the response length excluding trailing padding), $N _ { t o k e n }$ is the average total tokens, and $\mathbf { E } _ { r a t i o }$ is the effective token ratio. The best configuration for the baseline is highlighted in orange. The best results are bold and underlined, and the second-best results are underlined*
-
 ### 公平性说明
 
 所有实验均未使用后续工作提出的加速或缓存优化技术（如Ma et al., 2025; Israel et al., 2025; Ben-Hamu et al., 2025等），仅对比原生固定长度去噪基线，确保性能增益完全归因于DAEDAL的长度自适应机制本身。此外，DAEDAL在所有实验中使用完全相同的超参数配置，未针对特定模型或基准进行任何调优。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_Ic2A2gCseC/figures/005_Figure_1.jpg]]
 *Figure 1: Overview of DAEDAL’s effectiveness on LLaDA-Instruct-8B. (a) DAEDAL uses a unified and short initial length, consistently surpassing the baseline, which needs its length meticulously tuned for each benchmark to achieve peak performance. (b) DAEDAL dynamically adjusts length and adaptively expands on a per-problem basis, resulting in a varied distribution of response lengths. In contrast, the baseline is constrained to a fixed length for all problems*
-
-
 
 ## 定位与知识库关联
 
@@ -297,8 +270,6 @@ DAEDAL 展现出对超参数的强鲁棒性，这降低了其实际部署的调�
 - 方法目前仅在 LLaDA-Instruct-8B 单一模型上验证，跨模型、跨规模的泛化性需要进一步确认。
 
 这些边界点需要结合论文的 Limitations 章节（如有）进行手动核实。
-
-
 
 ## 原文 PDF
 

@@ -52,8 +52,6 @@ HSGDet 针对这一瓶颈提出了“无提示未知标签生成”范式。其�
 
 在方法谱系上，HSGDet 位于开放世界检测与开放词汇检测的交汇地带，其基线参照包括 **OW-DETR**（Gupta et al., CVPR 2022）、**CAT**（Ma et al., CVPR 2023）、**PROB**（Zohar et al., CVPR 2023）、**UC-OWOD**（Wu et al., ECCV 2022）、**OW-OVD**（Xi et al., CVPR 2025）和 **SkySense-O**（Zhu et al., CVPR 2025）等。与这些方法不同，HSGDet 将层次语义图作为可扩展的知识库，通过场景条件化导航和嵌入合成，首次实现了检测与自主命名的统一。
 
-
-
 ### 开放世界目标检测的范式演进
 
 目标检测在深度学习推动下取得了显著进展，但传统闭集检测器只能识别训练阶段预定义的固定类别集合。在遥感监测、自动驾驶等真实场景中，模型不可避免地会遭遇训练时未曾见过的对象类别，这催生了两种重要的检测范式：
@@ -86,8 +84,6 @@ HSGDet 针对这一瓶颈提出了“无提示未知标签生成”范式。其�
 - **持续词汇扩展**：设计缓冲-聚类机制，使语义图能够动态注册新类别节点，实现检测能力的持续增长。
 
 这一设计使得HSGDet在遥感开放世界检测任务中，首次实现了从“发现未知”到“理解未知”的跨越。
-
-
 
 ## 核心方法与创新机理
 
@@ -137,8 +133,6 @@ CR2T内部消融（Table 2）揭示了各信息源的关键贡献：完整CR2T�
 
 DHGA与CR2T并非独立运作，而是形成闭环：DHGA利用层次语义图进行场景条件化分类并分离未知查询，CR2T为未知对象合成语义嵌入并回写至语义图，实现词汇的持续扩展。这种协同使HSGDet在DOTA-v2上取得**54.8 K-mAP**、**41.2 U-R**和**5.8 WI**，较统一开放词汇-开放世界检测框架**OW-OVD**（Xi et al., CVPR 2025）分别提升**+6.6点**、**+9.9点**，并将Wilderness Impact降低**36%**。定性对比（Figure 3）进一步显示，**OWOBJ**（Zhang et al., CVPR 2025）仅能将未见对象标记为“unknown”，而HSGDet能赋予其具体类别标签（如“lamp”），实现了检测与自主命名的统一。
 
-
-
 HSGDet 的整体设计围绕一个核心目标展开：在遥感开放世界检测中，**无需外部提示或人工标注，即可自主发现未知对象并为其生成语义标签**。为此，模型在标准 Deformable DETR 架构之上，引入了一条“场景感知→层次推理→语义合成→图谱扩展”的闭环流水线。
 
 ### 数据流总览
@@ -179,8 +173,6 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{det}} + \lambda_1 \mathcal{L}_{\mathrm{hier
 ### 与现有范式的本质差异
 
 Figure 1 清晰展示了 HSGDet 与三种现有范式的区别：OVD 仅检测提示类别，OWOD 将新类别标记为匿名“unknown”，Unified OW-OVD 虽能同时处理已知和未知但未知仍无标签。HSGDet 的独特之处在于，它通过 DHGA 的场景条件化层次推理确定未知对象的语义上下文，再通过 CR2T 在不依赖外部语言模型的情况下合成可用语义标签，从而将“发现未知”与“命名未知”统一在单一框架内，实现了真正的全自主开放世界检测。
-
-
 
 HSGDet 的整体架构建立在 Deformable DETR 解码器之上，其核心创新在于两个紧密协作的模块：**可变形层次图注意力（DHGA）** 与 **上下文感知的区域到文本合成（CR2T）**，二者共同驱动一个可动态扩展的 **层次语义图**。以下按模块拆解关键公式与机制。
 
@@ -254,13 +246,6 @@ $$\mathcal{L}_{\mathrm{contrast}}^{i} = \max (0, \cos(t_i^{\mathrm{pred}}, t_i^{
 
 消融实验证实，移除对比损失会导致嵌入质量显著下降，验证了其在防止语义坍塌中的核心作用。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2336_https_openaccess_thecvf_com_content_CVPR2026_html_Azeem_Prompt_Free_Unkn/figures/001_Figure_1.jpg]]
-*Figure 1: Comparison of OVD and OWOD paradigms on a aerial scene with prompted classes (“car” and “house”) and an unprompted object (“lamp”). (a) OVD detects only prompted categories. (b) OWOD identifies novel classes as “unknown.” (c) Unified OW-OVD detects the prompted classes but flags “lamp” as “unknown”. (d) HSGDet autonomously discovers and labels it as “lamp” via contextual reasoning*
-
-
-
 ## 实验与关键发现
 
 ### 核心性能突破
@@ -306,14 +291,9 @@ Table 2 的 CR2T 内部消融揭示了合成嵌入质量的关键决定因素。
 
 Figure 3 的定性对比直观展示了 HSGDet 的核心优势。在 DOTA-v2 的航拍场景中，**OWOBJ**（Zhang et al., CVPR 2025）能够检测到未见过的新对象，但仅能将其标记为通用的“unknown”，无法提供任何语义信息。相比之下，HSGDet 不仅检测到同一对象，还通过 CR2T 的上下文推理赋予其具体类别标签（如“lamp”）。这一差异源于 CR2T 的三重信息融合机制：视觉查询提供对象的表观特征，场景上下文令牌注入全局共现模式（例如“lamp”常与“street”场景共现），层级父节点嵌入提供语义锚定（例如“lamp”在 WordNet 中的父节点“artifact”约束了嵌入方向）。
 
-![[assets/figures/papers/paper_list_l2336_https_openaccess_thecvf_com_content_CVPR2026_html_Azeem_Prompt_Free_Unkn/figures/008_Figure_3.jpg]]
-*Figure 3: Comparison between OWOBJ and HSGDet on DOTA-v2. OWOBJ detects the unseen objects without semantic grounding, whereas HSGDet detect the unseen object with proper class labels*
-
 ### 失败模式与局限性
 
 尽管 HSGDet 在主要指标上表现优异，分析中仍存在若干值得关注的边界情况。首先，CR2T 的缓冲-聚类扩展策略依赖超参数（缓冲区大小 $M=5$，相似度阈值 $\tau=0.7$），这些参数在当前遥感场景下经过验证，但在类别密度极高或极低的场景中可能需要重新校准，否则可能导致过度合并或碎片化。其次，模型对 WordNet 层次先验的依赖意味着在完全不具备此类结构化知识的领域（如细粒度工业缺陷检测），初始语义图的构建策略需要重新设计。此外，连续未知类别扩展是否会引起类别间语义混淆或嵌入漂移，以及是否需要定期重新校准语义图，尚缺乏长周期部署的实验验证。CR2T 生成的语义嵌入在下游任务（如图像描述、视觉问答）中的有效性也仍有待探索。这些边界情况在当前论文中未被充分覆盖，需要在实际部署前进行手动验证。
-
-
 
 ## 定位与知识库关联
 
@@ -402,8 +382,6 @@ HSGDet在以下知识节点上建立了连接：
 4. 连续词汇扩展是否会导致嵌入空间的语义漂移，是否需要定期重新校准？
 
 HSGDet的核心贡献在于证明了“无需外部提示的未知对象自主命名”是可行的，其技术路线——层次语义图导航+上下文感知嵌入合成——为开放世界检测的下一阶段发展提供了明确方向。后续工作需要在层次先验的自动化构建、扩展机制的鲁棒性、以及生成嵌入的下游任务验证等方向上进行深入探索。
-
-
 
 ## 原文 PDF
 

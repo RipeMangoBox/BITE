@@ -48,8 +48,6 @@ claims:
 
 该方法将三个可微损失项——**图拉普拉斯损失**（$\mathcal{L}_{\mathrm{LAP}}$）、**最小语义距离损失**（$\mathcal{L}_{\mathrm{MSD}}$）和**加权重建损失**（$\mathcal{L}_{\mathrm{WR}}$）——集成到现有深度超像素架构中，无需修改网络结构。在BSDS500和NYUv2上的实验表明，加入拉普拉斯损失后，**SCN**（Yang et al., CVPR 2020）、**AINet**（Wang et al., ICCV 2021）、**CDS**（Xu et al., AAAI 2024）和**SSM**（Jia et al., IEEE SPL 2025）四种基线模型在不使用EC的情况下，紧凑度（CO）和边界召回率（BR）均超越原始版本，而分割精度（ASA）和边界精度（BP）仅受极小影响。碎片化指标上，拉普拉斯变体的平均超出分量数和平均游离像素数较基线降低数倍至数十倍，证实$\mathcal{L}_{\mathrm{LAP}}$是连通性提升的主要驱动因素。该方法显著减少了对不可微后处理的依赖，推动超像素生成向完全端到端可微迈进。
 
-
-
 ### 超像素：从传统到深度学习的范式转移
 
 超像素分割的目标是将图像过分割为若干感知一致、空间紧凑的区域，作为中层级视觉表示，广泛应用于语义分割、目标检测、立体匹配等任务。传统方法如 **SLIC**（Achanta et al., TPAMI 2012）通过手工设计的颜色-空间距离进行局部聚类，虽然计算高效，但难以适应复杂场景的语义边界。
@@ -79,8 +77,6 @@ claims:
 论文的答案是：将每个超像素的像素分配概率建模为图，并利用图拉普拉斯矩阵的谱性质。直观而言，一个连通图的拉普拉斯矩阵零特征值重数为1（对应连通分量数），而碎片化的超像素对应多个零特征值。通过最大化拉普拉斯矩阵的迹（即所有像素度之和），可以隐式减少零特征值重数，从而促进空间连通性——这一过程完全可微，无需任何非可微后处理。
 
 基于这一核心思想，论文提出了三个可微损失项的组合：图拉普拉斯损失（L_LAP）驱动连通性、最小语义距离损失（L_MSD）强化语义边界、加权重建损失（L_WR）聚焦边界难例。这些损失可直接集成到现有架构（SCN、AINet、CDS、SSM）中，无需修改网络结构，保证了公平比较和广泛适用性。
-
-
 
 ## 核心方法与创新机理
 
@@ -131,8 +127,6 @@ $$\mathcal{L}(\boldsymbol{\theta}; \mathbf{x}, \mathbf{y}) = \mathcal{L}_{\mathr
 
 其中 $\lambda_{\mathrm{LAP}}=360$、$\lambda_{\mathrm{MSD}}=10^{-3}$、$\lambda_{\mathrm{WR}}=1$，$\mathcal{L}_{\mathrm{base}}$ 为各基线架构的专有损失。
 
-
-
 本文提出一种**可微拉普拉斯矩阵引导的超像素分割**方法，其核心思想是将超像素连通性约束从不可微的后处理阶段迁移至端到端训练过程中。整体框架由一个通用的超像素分配网络和三个可微损失函数构成，无需修改现有网络架构即可集成。
 
 **前向推理流程。** 给定输入图像 $\mathbf{x}$，网络 $f_{\theta} = h \circ g$ 输出超像素分配概率矩阵 $Q \in [0,1]^{N \times M}$，其中 $N = H \times W$ 为像素总数，$M$ 为超像素数量。具体而言，像素嵌入网络 $g$ 负责提取每个像素的特征表示，超像素分配头 $h$ 是一个卷积层配合 softmax 归一化，将嵌入映射为像素到超像素的软分配概率 $q_{i,s}$。为控制计算复杂度，图像被划分为由 $16 \times 16$ 步长诱导的规则网格块，每个超像素以其中一个块为中心，每个像素仅被允许分配到其局部邻域内的 9 个候选超像素（即 $3 \times 3$ 块范围）。
@@ -153,12 +147,8 @@ $$
 
 **模块间因果关系。** 三个损失项协同作用：$\mathcal{L}_{\text{LAP}}$ 是连通性提升的主要驱动因素（消融实验证实单独使用 $\mathcal{L}_{\text{MSD}}$ 或 $\mathcal{L}_{\text{WR}}$ 无法消除碎片化），$\mathcal{L}_{\text{MSD}}$ 和 $\mathcal{L}_{\text{WR}}$ 分别在语义边界精度和边界区域分配质量上提供补充约束。该损失组合可直接加载到 **SCN**（Yang et al., CVPR 2020）、**AINet**（Wang et al., ICCV 2021）、**CDS**（Xu et al., AAAI 2024）、**SSM**（Jia et al., IEEE SPL 2025）等现有深度超像素架构上，无需修改网络结构。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2118_https_openaccess_thecvf_com_content_CVPR2026_html_Juybari_Differentiable/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of superpixels from a deep learning model (CDS) under Enforced Connectivity (EC) post-processing and the same model with graph-Laplacian (LAP) regularization. Our proposed LAP yields more compact superpixels, more precise boundaries, and fewer excess components without requiring EC*
-
-
 
 ### 整体框架：通用超像素分配网络
 
@@ -222,8 +212,6 @@ $$\mathcal{L}(\boldsymbol{\theta}; \mathbf{x}, \mathbf{y}) = \mathcal{L}_{\mathr
 
 其中 $\lambda_{\mathrm{LAP}} = 360$，$\lambda_{\mathrm{MSD}} = 10^{-3}$，$\lambda_{\mathrm{WR}} = 1$。$\lambda_{\mathrm{LAP}}$ 取值较大，反映了连通性正则化在整体优化中的主导地位；消融实验证实，$\mathcal{L}_{\mathrm{LAP}}$ 是连通性提升的主要驱动因素（移除后碎片化指标显著恶化），而单独使用 $\mathcal{L}_{\mathrm{MSD}}$ 或 $\mathcal{L}_{\mathrm{WR}}$ 无法消除碎片化，三者需协同作用。
 
-
-
 ## 实验与关键发现
 
 ### 1. 评估协议与碎片化度量
@@ -253,18 +241,12 @@ Figure 2 展示了在 BSDS500 和 NYUv2 上使用强制连通性（EC）后处�
 
 Figure 3 展示了移除 EC 后的标准指标对比。此时基线模型因碎片化严重导致性能骤降，而 LAP 变体仍保持明显优势：
 
-![[assets/figures/papers/paper_list_l2118_https_openaccess_thecvf_com_content_CVPR2026_html_Juybari_Differentiable/figures/007_Figure_3.jpg]]
-*Figure 3: Standard metrics without enforced connectivity (EC). Top row: BSDS500 test set; bottom row: NYUv2. Columns (left→right): ASA, CO, and BR–BP. Baselines are plotted with star markers—SCN (blue), AINet (green), CDS (red), SSM (brown), SIN (orange); Laplacian variants use the same color with a diamond (⋄) marker (not applicable to SIN). Laplacian variant models without EC out perform their counterparts on CO and BR with minimal impact on ASA and BP*
-
 - **无 EC 条件下 CO 和 BR 的领先幅度更大**：LAP 变体在无 EC 时对 CO 和 BR 的提升幅度甚至超过有 EC 场景，证明 LAP 损失在训练阶段已内化了空间连通性约束。
 - **ASA 和 BP 保持稳定**：即使在无 EC 的严格条件下，LAP 变体的 ASA 和 BP 仍与基线持平或仅有微小下降，未出现连通性-精度之间的剧烈权衡。
 
 #### 2.3 碎片化指标评估
 
 Figure 4 的碎片化指标直接量化了 LAP 损失对连通性的改善效果。关键证据：
-
-![[assets/figures/papers/paper_list_l2118_https_openaccess_thecvf_com_content_CVPR2026_html_Juybari_Differentiable/figures/008_Figure_4.jpg]]
-*Figure 4: Fragmentation metrics without enforced connectivity (EC). Top row: BSDS500; bottom row: NYUv2. Columns (left→right): average excess components counts*
 
 - **超出分量数（XC_avg）降低数倍至数十倍**：在 BSDS500 和 NYUv2 上，所有 LAP 变体的平均超出分量数均显著低于对应基线。例如，CDS-LAP 的 XC_avg 仅为 CDS 的约 1/5–1/10。
 - **游离像素数（Stray_avg）同步下降**：LAP 变体的游离像素数同样大幅减少，表明碎片不仅数量少，且碎片规模小。
@@ -293,9 +275,6 @@ Table 1 和 Figure 5 系统研究了拉普拉斯损失权重 $\lambda_{\mathrm{L
 ![[assets/figures/papers/paper_list_l2118_https_openaccess_thecvf_com_content_CVPR2026_html_Juybari_Differentiable/figures/011_Table_1.jpg]]
 *Table 1: Laplacian Weight Study. Increasing λLAP improves all measurements of superpixel quality at a minor expense to ASA*
 
-![[assets/figures/papers/paper_list_l2118_https_openaccess_thecvf_com_content_CVPR2026_html_Juybari_Differentiable/figures/010_Figure_5.jpg]]
-*Figure 5: A CDS-LAP model was trained on the BSDS500 dataset for each*
-
 - **$\lambda_{\mathrm{LAP}}$ 增大持续抑制碎片化**：随着 $\lambda_{\mathrm{LAP}}$ 从 0 增至 2880，XC 指标单调下降。在 $\lambda_{\mathrm{LAP}} = 2880$ 时，约半数测试图像的超出分量数接近零（XC ≤ 15），而 ASA 在超像素数量 n=384 时仍保持在 0.964。
 - **ASA 存在可控的轻微衰减**：增大 $\lambda_{\mathrm{LAP}}$ 虽导致 ASA 略有下降，但降幅极小（例如从 0.967 降至 0.964），在实际应用中可通过权衡选择适当的权重值。
 - **超参数推荐值**：论文默认采用 $\lambda_{\mathrm{LAP}} = 360$，$\lambda_{\mathrm{MSD}} = 10^{-3}$，$\lambda_{\mathrm{WR}} = 1$，该设置在连通性改善与 ASA 保持之间取得良好平衡。
@@ -319,8 +298,6 @@ Figure 1 和 Figure 6 提供了可视化证据：
 - **ASA 与连通性的权衡**：增大 $\lambda_{\mathrm{LAP}}$ 可进一步降低碎片化，但 ASA 会轻微下降，需在应用中根据需求调整。
 - **网格约束的固有限制**：方法依赖固定的 16×16 网格划分和 3×3 局部搜索窗，可能限制超像素形状对非规则纹理或细长物体的适应性。
 - **下游任务验证缺失**：当前评估仅聚焦超像素分割本身，未在实例分割、目标检测等下游任务中验证端到端联合优化的实际增益。
-
-
 
 ## 定位与知识库关联
 
@@ -387,8 +364,6 @@ Figure 1 和 Figure 6 提供了可视化证据：
 5. **跨任务迁移**：所提损失函数在其他视觉任务中是否能提供端到端的区域级表示？例如，在实例分割中，连通性约束可能有助于生成完整的实例掩码；在目标检测中，紧凑的超像素可能作为高质量的候选区域。这些跨任务迁移的潜力尚未被验证。
 
 6. **与视觉基础模型的结合**：随着 SAM、DINOv2 等视觉基础模型的兴起，超像素分割能否作为这些模型的下游适配层？图拉普拉斯损失的可微性使其天然适合与基础模型的嵌入空间进行联合微调，这可能开辟超像素在交互式分割和开放词汇场景中的新应用。
-
-
 
 ## 原文 PDF
 

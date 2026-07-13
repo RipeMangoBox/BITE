@@ -79,8 +79,6 @@ REWARDMAP 定位于 RL 微调 MLLMs 的方法族，其基线包括标准 GRPO（
 
 当前工作在交通地图领域得到充分验证，并在 ChartQA、Charxiv 等数据集上展示了初步扩展性，但尚未在大规模多样化结构化视觉推理基准上进行系统评估。多阶段训练和困难感知奖励设计引入了额外超参数（$\gamma$、$\beta$、$\alpha$），增加了调参成本。未来方向包括开发领域无关的细节奖励机制，以及将 REWARDMAP 与安全对齐技术结合，在提升推理能力的同时保证输出的可靠性与无害性。
 
-
-
 ### 细粒度视觉推理的挑战
 
 多模态大语言模型（MLLMs）在通用视觉理解任务上已取得显著进展，但在需要精确定位、空间关系推理和多步逻辑推导的**细粒度视觉推理**任务上仍面临严峻挑战。以交通地图路线规划为典型场景：模型必须准确识别地图中的站点位置、线路连接关系，并在此基础上进行路径搜索与换乘规划。这类任务要求模型同时具备细粒度的视觉感知能力和结构化的逻辑推理能力，二者缺一不可。
@@ -103,8 +101,6 @@ REWARDMAP 定位于 RL 微调 MLLMs 的方法族，其基线包括标准 GRPO（
 
 1. **困难感知奖励设计**：在基本格式和正确性奖励之外，引入 $R_{\mathrm{detail}}$（部分正确的细节奖励），并根据地图难度 $W_{\mathrm{map}}$ 与问题换乘次数 $W_{\mathrm{question}}$ 对总奖励进行加权，使模型在困难任务上获得更强的优化信号。
 2. **多阶段 RL 课程**：构建 REASONMAP-PLUS 数据集，按任务类型（二值判断 → 计数 → 规划）和目标（视觉理解 → 视觉推理）组织从易到难的训练课程，使模型逐步习得复杂推理能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -146,8 +142,6 @@ $$R = W_{\text{difficulty}} \left( R_{\text{format}} + R_{\text{correctness}} + 
 
 REWARDMAP 在 Qwen2.5-VL-3B/7B 和 Kimi-VL 等不同模型规模与架构上均带来一致提升（Table 8–9），表明困难感知奖励与多阶段课程的设计不依赖于特定模型结构，具有较好的泛化能力。
 
-
-
 ![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_iRVbPxHNrX/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of REWARDMAP. The framework enhances fine-grained visual understanding and reasoning in MLLMs through reinforcement learning with Group Relative Policy Optimization (GRPO). It consists of two key components: (1) a difficulty-aware reward design (Section 4.2), which combines format, correctness, and detail rewards with difficulty-based weighting; and (2) a multi-stage RL curriculum (Section 4.3), which schedules training data from simple perception tasks to complex reasoning tasks, ensuring effective optimization tackling sparse rewards*
 
@@ -183,8 +177,6 @@ REWARDMAP 是一个面向多模态大语言模型（MLLMs）的多阶段强化�
 - **课程引导**：从易到难的数据调度确保训练初期策略能频繁获得正向奖励，建立稳定的优化基础，再逐步过渡到稀疏奖励的困难任务。
 
 训练奖励曲线（Figure 4）直接验证了这一机制：REWARDMAP 的奖励轨迹（黄色曲线）不仅整体高于基线 RL（蓝色曲线），且呈现持续上升趋势，而基线奖励始终在低位波动，证实了奖励稀疏问题的有效缓解。
-
-
 
 REWARDMAP 框架的核心由三个模块构成，协同解决细粒度视觉推理中的稀疏奖励瓶颈。
 
@@ -229,8 +221,6 @@ $$W_{\mathrm{question}} = \begin{cases} \beta_0, & \text{transfer count = 0} \\ 
 
 消融实验证实了细粒度课程的必要性：粗粒度的多阶段设计（仅粗略划分阶段）在 REASONMAP-PLUS 上的加权准确率为 70.30%，而 REWARDMAP 的细粒度课程达到 74.25%（Table 5）。同时，仅添加困难感知奖励设计（无多阶段课程）即可在 REASONMAP 上将加权准确率提升约 2.86%/3.91%（短/长问题），而组合两个模块后达到最佳效果（Table 3），验证了两者的互补性。
 
-
-
 ## 实验与关键发现
 
 ### 瓶颈定位与评估基准
@@ -245,9 +235,6 @@ $$W_{\mathrm{question}} = \begin{cases} \beta_0, & \text{transfer count = 0} \\ 
 ### 主实验结果
 
 **REASONMAP 与 REASONMAP-PLUS 上的核心收益。** 如表 1 所示，以 Qwen2.5-VL-7B-Instruct 为基座模型，REWARDMAP 在所有微调模型中取得最优结果。在 REASONMAP 上，加权准确率从 RL 基线的 26.22% / 26.04%（S./L.）提升至 31.51% / 31.77%，绝对增益分别为 +5.29% / +5.73%；加权地图得分从 5.52 / 9.52 提升至 6.21 / 11.22。在 REASONMAP-PLUS 上，加权准确率从 RL 基线的 44.64% 跃升至 74.25%，提升幅度达 +29.61%，验证了密集奖励冷启动与困难感知奖励设计的协同效应。
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_iRVbPxHNrX/figures/003_Table_1.jpg]]
-*Table 1: Evaluations of reference models and fine-tuned models on REASONMAP and REASONMAP-PLUS. “S.” represents results for short questions, while “L.” denotes results for long questions. Bold indicates the best results among fine-tuned models, while underline represents the second best*
 
 值得注意的是，REWARDMAP 训练的 7B 模型不仅大幅超越所有开源模型（包括 Qwen2.5-VL-72B-Instruct），在 REASONMAP-PLUS 上甚至超越了闭源模型 Seed1.5-VL，表明精心设计的 RL 训练流程可在参数效率上弥补规模差距。
 
@@ -277,34 +264,17 @@ $$W_{\mathrm{question}} = \begin{cases} \beta_0, & \text{transfer count = 0} \\ 
 
 **关键超参数敏感性。** 表 6 显示细节奖励权重 α 取 0.5 时在 REASONMAP-PLUS 上获得最佳综合表现，α 过小（0.3）则细节奖励贡献不足，过大（0.7）则可能稀释格式与正确性奖励的引导作用。表 7 的困难感知权重消融表明，适度的难度区分（如 γ=(1.0, 1.2, 1.5) 或 β=(0.0, 0.5)）即可带来稳定增益；当权重趋于均匀时性能略有下降，但一旦建立清晰的难度区分，性能便保持稳定。这表明困难感知机制的核心价值在于提供差异化的优化信号，而非精确的权重数值。
 
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_iRVbPxHNrX/figures/010_Table_6.jpg]]
-*Table 6: Ablation on the hyperparameter α. “S.” represents results for short questions, while “L.” denotes results for long questions*
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_iRVbPxHNrX/figures/011_Table_7.jpg]]
-*Table 7: Ablation on the difficulty-aware weights. “S.” represents results for short questions, while “L.” denotes results for long questions*
-
 ### 训练动态分析
 
 图 4 的训练奖励曲线为稀疏奖励缓解提供了直接证据。基线 RL（仅使用 R_train）的奖励曲线在训练过程中始终处于低位且波动剧烈，反映稀疏奖励下策略优化的困难。相比之下，REWARDMAP 的奖励曲线从训练初期即呈现更高的绝对值和更稳定的上升趋势，这得益于 RPlus_train 提供的密集奖励信号以及困难感知加权对有效样本的放大效应。该曲线直观验证了方法设计的核心动机：通过增加奖励密度和差异化加权，将 RL 优化从“稀疏信号中艰难搜索”转变为“密集信号中稳定攀升”。
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_iRVbPxHNrX/figures/008_Figure_4.jpg]]
-*Figure 4: Comparison of training rewards between baseline RL and REWARDMAP. The yellow curve denotes the reward trajectory of REWARDMAP, while the blue curve corresponds to the baseline RL trained solely on REASONMAP*
 
 ### 跨模型规模与架构的泛化性
 
 表 8 和表 9 分别验证了 REWARDMAP 在不同模型规模和架构上的一致性收益。在 Qwen2.5-VL-3B 和 Qwen2.5-VL-7B 两个规模上，REWARDMAP 均带来显著提升，且 7B 模型的绝对增益更大，表明方法对模型容量具有良好的可扩展性。在 Kimi-VL-A3B-Instruct 架构上，REWARDMAP 同样将 REASONMAP 加权准确率从 12.76% / 12.33% 提升至 18.58% / 17.36%，证明方法不依赖于特定模型架构或预训练范式。
 
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_iRVbPxHNrX/figures/012_Table_8.jpg]]
-*Table 8: Evaluation of REWARDMAP across model scales. “S.” represents results for short questions, while “L.” denotes results for long questions. Effectiveness of REWARDMAP across Model Scales. We evaluate the effectiveness of RE-WARDMAP across different model scales. Due to training cost constraints, we adopt Qwen2.5- VL-3B-Instruct as the base model and compare the baseline RL with REWARDMAP. As shown in Table 8, REWARDMAP achieves the promising results, demonstrating its robustness and effectiveness*
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_iRVbPxHNrX/figures/013_Table_9.jpg]]
-*Table 9: Results on Kimi-VL (Kimi-VL-A3B-Instruct). “S.” represents results for short questions, while “L.” denotes results for long questions. Generalization of REWARDMAP across Model Architectures. We further trained Kimi-VL (Kimi-VL-A3B-Instruct) with the REWARDMAP pipeline using the training set from REASONMAP. As shown in Table 9, the model achieves substantial performance gains, demonstrating that our method generalizes beyond the Qwen2.5-VL series*
-
 ### 局限与失败模式
 
 尽管 REWARDMAP 在交通地图域取得了显著收益，其当前验证范围仍主要局限于该领域。虽然 ChartQA、Charxiv 上的初步结果表明方法具备扩展潜力，但在大规模、多样化的结构化视觉推理基准（如复杂流程图、工程图纸、多模态科学图表）上的系统评估尚缺。此外，多阶段课程和困难感知奖励设计引入了 γ、β、α 等额外超参数，增加了调参成本，且最优配置可能随任务域变化而迁移——当前在交通地图上搜索得到的最优参数未必直接适用于其他结构化视觉域。
-
-
 
 ## 定位与知识库关联
 
@@ -368,8 +338,6 @@ REWARDMAP 建立在 GRPO 算法之上，其基线方法包括：
 1. **领域无关的奖励机制**：能否开发不依赖领域知识的细节奖励和困难感知机制，使 REWARDMAP 可直接应用于图表理解、流程图解析等更广泛的结构化视觉域？这需要解决“部分正确性”的通用定义问题。
 2. **安全对齐的整合**：REWARDMAP 的框架如何与安全对齐技术结合？密集奖励可能引导模型产生格式正确但内容不可靠的输出，需要在提升推理能力的同时保证输出的可靠性和无害性。
 3. **课程设计的自动化**：当前多阶段课程依赖人工定义的任务类型排序（二值判断 → 计数 → 规划），能否基于模型在训练过程中的表现动态调整课程难度？
-
-
 
 ## 原文 PDF
 

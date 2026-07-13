@@ -64,8 +64,6 @@ EMDUL定位于**毫米波人体姿态估计的数据增强与半监督学习交�
 
 **LiDAR到毫米波的域迁移**：直接使用LiDAR数据集训练毫米波HPE模型效果有限，因为两种传感器的点云分布差异巨大（密度、噪声模式、运动敏感度均不同）。EMDUL的闭环转换流水线（NPA→FPF→RS→NI）通过一系列可解释的几何增强操作，在不依赖可学习参数的情况下缩小这一域差距，为跨传感器数据利用提供了一种轻量且有效的方案。
 
-
-
 ### 毫米波人体姿态估计的瓶颈
 
 毫米波雷达因其隐私保护、穿透遮挡和低功耗等优势，在人体姿态估计（Human Pose Estimation, HPE）领域受到日益增长的关注。然而，现有毫米波HPE数据集面临**稀缺且多样性不足**的双重困境。这种不足体现在两个维度：
@@ -93,8 +91,6 @@ EMDUL定位于**毫米波人体姿态估计的数据增强与半监督学习交�
 - **闭环点云转换器**：将LiDAR点云逐步转换为毫米波风格，核心是**流基点过滤（FPF）**——基于骨架流幅值概率性地保留点云点，模拟毫米波雷达对运动目标的敏感检测。
 
 这种设计使得 EMDUL 能够从两个互补方向大幅扩充训练数据的体量和多样性，从而在域内和跨域场景下均显著提升HPE模型的泛化能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -139,8 +135,6 @@ $$\mathcal{P}(P_t[i] \in P_t^{\mathrm{conv}}) = \min\Big(\frac{\lVert F_t^P[i] \
 ### 两个维度的协同效应
 
 EMDUL 的两个模块设计为相互独立、可叠加使用。实验表明，同时使用伪标签扩展（无标签毫米波数据）和点云转换扩展（LiDAR 数据集）可获得最佳性能——在仅 10% 标记数据的极端设定下，EMDUL + P4T 在 MM-Fi 域内测试中 MPJPE 达 10.06 cm（基线 12.23 cm），跨域测试（mmBody→MM-Fi）中 MPJPE 达 24.01 cm（基线 33.62 cm），分别降低 17.7% 和 28.6% 的误差。这一协同增益源于两个维度分别从**数据体量**（无标签数据利用）和**姿态多样性**（LiDAR 数据集转换）两个互补方向扩充了训练分布。
-
-
 
 **EMDUL** 的整体设计围绕一个核心目标展开：在毫米波人体姿态估计（HPE）任务中，以极低的标注成本，同时利用**无标签毫米波数据**和**带标注的LiDAR数据集**，大幅度扩充训练数据的体量与多样性，从而提升模型的域内与跨域泛化能力。其系统架构由两个相互独立的模块构成：
 
@@ -192,12 +186,8 @@ NPA → FPF → RS → NI
 - **标准化骨架结构**：所有数据集统一映射到15个关键点的标准化骨架，确保不同数据源之间的标注一致性。
 - **模块独立性**：伪标签估计器和点云转换器可独立运行，分别解决无标签数据利用和LiDAR数据迁移两个子问题，使得框架具备良好的可扩展性——任一模块的改进均可直接提升整体性能。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1018_https_arxiv_org_abs_2603_14507/figures/002_Figure_2.jpg]]
 *Figure 2: The overview of EMDUL integrating both PC conversion and pseudo-labeling modules*
-
-
 
 ### 伪标签估计器与无监督时间一致性损失
 
@@ -259,15 +249,11 @@ $$\mathcal{P}(P_t[i] \in P_t^{\mathrm{conv}}) = \min\Big(\frac{\lVert F_t^P[i] \
 
 伪标签估计器与点云转换流水线在 EMDUL 框架中相互独立但协同工作。每次训练迭代中，$\theta_{\text{pl}}$ 先更新并重新生成伪标签 $D_{\text{pl}}$，随后推理 HPE 模型 $\theta_{\text{infer}}$ 在扩展数据集 $D_{\text{exp}} = D_{\text{lab}} \cup D_{\text{pl}}$ 上从头训练。转换后的 LiDAR 数据 $D_{\text{lidar}}$ 则直接作为额外训练样本加入。这种解耦设计使得两个模块可以独立优化，同时共同扩充数据集的体量和多样性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1018_https_arxiv_org_abs_2603_14507/figures/004_Figure_4.jpg]]
 *Figure 4: Step-by-step visualization of the point-cloud (PC) conversion pipeline Blue joints have lower flow magnitudes and yellow joints higher ones*
 
 ![[assets/figures/papers/paper_list_l1018_https_arxiv_org_abs_2603_14507/figures/011_Figure_6.jpg]]
 *Figure 6: Comparison of pseudo-labels generated with and without UTCL. (a) Two consecutive ground-truth skeletons in*
-
-
 
 ## 实验与关键发现
 
@@ -343,28 +329,6 @@ $$\mathcal{P}(P_t[i] \in P_t^{\mathrm{conv}}) = \min\Big(\frac{\lVert F_t^P[i] \
 ![[assets/figures/papers/paper_list_l1018_https_arxiv_org_abs_2603_14507/figures/009_Table_5.jpg]]
 *Table 5: Ablation study on PC conversion of a LiDAR dataset*
 
-![[assets/figures/papers/paper_list_l1018_https_arxiv_org_abs_2603_14507/figures/013_Table_7.jpg]]
-*Table 7: Ratio of PCs classified as mmWave in a binary classification task distinguishing between and mmWave and LiDAR data*
-
-![[assets/figures/papers/paper_list_l1018_https_arxiv_org_abs_2603_14507/figures/014_Table_8.jpg]]
-*Table 8: Performance under different ratios of labeled mmWave data*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1018_https_arxiv_org_abs_2603_14507/figures/008_Table_2.jpg]]
-*Table 2: Comparison with Mean Teacher (MT) pseudo-labeling when expanding MM-Fi (F) with different LiDAR datasets. P4T [11] serves as the common HPE model*
-
-![[assets/figures/papers/paper_list_l1018_https_arxiv_org_abs_2603_14507/figures/012_Table_6.jpg]]
-*Table 6: Ablation study on hyperparameters in UTCL and FPF under F→B*
-
-![[assets/figures/papers/paper_list_l1018_https_arxiv_org_abs_2603_14507/figures/001_Figure_1.jpg]]
-*Figure 1: Examples illustrating the effect of dataset expansion. (a) Samples from an mmWave HPE training dataset. (b) Samples from a LiDAR dataset with richer pose diversity used for dataset expansion; (c) An mmWave PC from an unseen scenario. (d) The ground-truth skeleton. (e) The predicted skeleton of SOTA P4T [11] without expansion. (f) The predicted skeleton of P4T trained on EMDUL-expanded dataset. Joints are colored red for errors > 10 cm and green otherwise. EMDUL achieves stronger generalization ability than the baseline P4T*
-
-![[assets/figures/papers/paper_list_l1018_https_arxiv_org_abs_2603_14507/figures/003_Figure_3.jpg]]
-*Figure 3: Illustration of the motion-detection mechanism in mmWave radar using an MM-Fi sample. Joints with high flow (yellow) lie close to detected points, while low-flow joints (dark blue) have no nearby points*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 方法谱系
@@ -426,8 +390,6 @@ EMDUL 的核心知识贡献在于：
 3. **数据扩展的骨干无关性验证**：在多个HPE骨干（P4T、SPiKE）上一致取得显著增益，证明了数据层面的改进比模型层面的改进更具通用价值。
 
 在更广泛的半监督学习和跨模态学习领域，EMDUL 属于**物理先验增强的半监督跨模态数据扩展**方法，与纯数据驱动的域自适应（如对抗域适应）和纯半监督方法（如FixMatch）形成互补。其关键区别在于对源模态和目标模态之间**物理成像机制的显式建模**，而非仅依赖统计分布对齐。
-
-
 
 ## 原文 PDF
 

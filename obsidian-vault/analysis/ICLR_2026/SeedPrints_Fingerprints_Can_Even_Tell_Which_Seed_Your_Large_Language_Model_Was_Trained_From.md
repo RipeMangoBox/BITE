@@ -50,15 +50,11 @@ claims:
 
 实验结果表明，SeedPrints 从 OLMo-2-7B 的首个预训练检查点（5B tokens）起即能以极高水平（p ≪ 0.001）完美检测谱系，而此时所有基线方法的相似度均远低于常用阈值 0.8。在持续训练到代码数据集 The Stack 导致数据分布完全改变的设定下，SeedPrints 仍能正确归属模型后裔（p ≈ 0），而基线 Intrinsic 等方法彻底失败。在覆盖多种模型家族与参数改动技术的 LeaFBench 基准上，SeedPrints 取得了 0.992 的 AUC 和 0.986 的 KS 统计量，接近最强的基线（Intrinsic 0.997 AUC），并显著优于 REEF、Gradient 等方法。这些结果一致验证了初始化指纹作为谱系标识符的健壮性。
 
-
-
 大语言模型的训练成本极高，模型的非法复制、未授权持续训练以及谱系归属争议日渐突出。要解决这类问题，需要能够可靠识别模型来源与演化关系的数字指纹技术。现有的 LLM 指纹方法主要依赖训练后涌现的模型属性，例如参数向量的余弦相似度（PCS、ICS）、注意力参数的层内标准差轮廓（Intrinsic）、表征空间的中心核对齐（REEF）以及梯度信息（Gradient）等。这些方法在设计上均假定模型指纹是由大规模训练过程“后天”塑造的，因此本质上无法保证“Galton 式指纹”所要求的两个核心性质——与生俱来且终身不变。
 
 上述局限性在两种关键场景中暴露无遗。第一，**早期预训练阶段的谱系检测几乎完全失效**。如 Figure 1 所示，在 OLMo‑2‑7B 的前 3.9 万亿 token 训练过程中，所有基线方法（Intrinsic、REEF、PCS、ICS）的相似度在首个检查点后始终低于 0.8 的常用阈值，而 SeedPrints 从最早的检查点即可达到完美检测（p ≪ 0.001）。这意味着若模型盗用发生在训练初期（例如仅训练了数千步），现有方法无法提供有效证据。第二，**训练数据分布发生显著变化时会误导指纹判断**。以 Table 4 为例，当基础模型（种子 1000）被继续训练到代码数据集 The Stack 后，基于注意力模式的 Intrinsic 方法将衍生物错误判定为独立模型（相似度仅 0.489），而 SeedPrints 给出的 p 值接近 0，依然能正确归因到同一谱系。类似地，在更大规模的领域特化微调（如 Llemma‑7B、CodeLlama‑7B）中，PCS 和 ICS 的相似度降至约 0.66～0.68，远低于判别阈值（Table 5）。这些证据表明，依赖训练后属性的指纹极易被训练数据分布或训练阶段的改变所干扰，不能可靠地承担全生命周期谱系验证任务。
 
 本文受到一个关键观察的启发：未经训练的模型在完全随机的输入下会表现出高度非均匀的输出偏差——某些输出维度（或 token）频繁获得极小 logit 值，且这种偏差模式对初始化种子具有特异性（Figure 2）。更重要的是，这一微弱的初始化偏差信号在训练过程中并未消失，而是与训练后的模型之间保持了统计上可检测的相关性（Table 2 中 p 值低至 10⁻²⁶ 量级，而所有基线均无法探测到该信号）。换言之，随机初始化种子在模型内部表示空间中留下了一个先天的、不可磨灭的“签名”，它独立于训练数据和优化过程。受此启发，本文提出 **SeedPrints**，通过显式提取身份维度上的秩相关性并进行假设检验，来识别模型谱系。该方法不依赖训练后期涌现的结构特征，因此能够在早期训练点、数据分布偏移以及多种微调策略下稳定判定模型是否源自同一初始化种子，弥补了现有指纹技术的核心缺口。
-
-
 
 ## 核心方法与创新机理
 
@@ -78,8 +74,6 @@ claims:
 
 综上，SeedPrints 以极简的“信号来源”转变，首次实现了符合“Galton 式指纹”（与生俱来、终身不变）特性的 LLM 谱系检测方法：仅通过从初始化偏见中抽取身份维度并进行相关性检验，即可在白盒访问条件下为模型的所有权和版权提供强力追溯，而无需任何额外训练或模块。
 
-
-
 ![[assets/figures/papers/iclr26_0013_Kan6Z0zzZi_SeedPrints_Fingerprints_Can_Even_Tell_Which_Seed/figures/004_Figure_2.jpg]]
 *Figure 2: Initialization-born output bias persists through training. Left: Given completely random inputs, the outputs of a randomly initialized LLaMA-2–style model are far from uniform, but instead exhibit clear bias: certain dimensions are disfavored by the model (i.e., they frequently receive the minimum value across random inputs). Such extreme bias appears both in the logits (top, red) and in the final hidden representations (bottom, blue). The dashed line shows the expected frequency under a uniform distribution. The arrows in the top panel indicate a broken x-axis that omits low-frequency tail ranks. Upper Right: During training, models remain weakly correlated in their output bias across inpu...*
 
@@ -95,8 +89,6 @@ SeedPrints 的核心 pipeline 由三个顺序模块构成，输入为一对待�
 零假设 $H_0$ 下（即两模型无谱系关联），各维度的 Kendall‑Tau 统计量独立且 $\bar{\tau}$ 渐近服从均值为零的正态分布 $\mathcal{N}(0, \sigma^2/|S|)$。实际检验直接采用该分析性零分布，省去昂贵的经验模拟。计算单侧 z 统计量 $z = \frac{\bar{\tau}}{\sigma/\sqrt{|S|}}$ 及对应 p 值 $p = 1 - \Phi(z)$；若 $p < 0.01$，则拒绝 $H_0$，判定两模型出自同一初始化种子（即同谱系）。该决策无需人为设定相似度阈值，天然具备统计显著性保障。
 
 上述框架的关键瓶颈在于：指纹信号仅存在于模型输出维度分布的低值偏序中，**需要白盒访问内部表示（如 logits 或隐藏状态）**，无法直接用于纯黑盒 API 场景；此外，在模型融合（weight‑space interpolation）等权值空间中，身份维度信号可能被稀释，导致偶发误判。尽管如此，整体 pipeline 能够在首个预训练检查点（<1T tokens）即实现完美检测（p ≪ 0.001），且在训练数据分布剧烈变动时仍保持谱系保真，远优于依赖训练后参数或注意力模式的基线方法。
-
-
 
 SeedPrints 的核心创新在于将大语言模型（LLM）的谱系检测从“训练后涌现特征”转向“初始化即植入”的持久性偏差。初始随机种子会使未训练模型在随机输入下产生种子特异的极端输出偏好（某些输出维度总是倾向于获得极小 logit），该微弱信号在后续训练全程保持可检测的相关性，从而构成“Galton 式”的终身指纹。以下按流水线顺序阐述三个关键模块及其支撑的统计检验框架。
 
@@ -173,14 +165,11 @@ $$
 
 综上，SeedPrints 通过提取初始化种子的最小响应维度交集，并以 Kendall‑τ 统计检验取代相似度阈值的思路，提供了一种在预训练全程均稳定有效的模型谱系判定范式。
 
-
-
 ## 实验与关键发现
 
 ### 早期预训练阶段的谱系检测：从第一个检查点即可区分
 
 现有被动指纹方法（Intrinsic、REEF、PCS、ICS）依赖训练后期涌现的模型属性，在预训练早期（前几万亿tokens）完全失效。**Figure 1** 报告了 OLMo-2-7B 在 5B 至 3.9T tokens 检查点上的谱系检测对比：所有基线的相似度得分从未超过 0.8 的常用阈值，而 SeedPrints 从首个检查点（5B tokens）即实现近乎完美的检测（$1-p \approx 1.0$，$p \ll 0.001$）。这一差异的根源在于 SeedPrints 不依赖训练信号，而是捕捉由随机初始化种子诱发的输出维度偏差——未训练模型对随机输入已表现出清晰的极端偏好（**Figure 2** 左），且该模式具有种子特异性（**Figure 2** 右下）。训练过程中，同一种子训练的模型在这些“身份维度”上保持微弱但统计显著的相关性（**Figure 2** 右上），使种子层面的谱系判别从训练伊始即具高置信度。
-
 
 ![[assets/figures/papers/iclr26_0013_Kan6Z0zzZi_SeedPrints_Fingerprints_Can_Even_Tell_Which_Seed/figures/001_Figure_1.jpg]]
 *Figure 1: Existing fingerprinting methods fail to detect model lineage during early pre-training. We compare five methods on OLMo-2-7B checkpoints spanning 5B to 3.9T training tokens, each tested against the final checkpoint. The y-axis shows the similarity score (higher indicates a stronger lineage signal); the dashed line marks the 0.8 detection threshold. While all baselines degrade and fall below the threshold at early checkpoints, SeedPrints achieves perfect detection (p ≪ 0.001, plotted as 1 − p) from the very first checkpoint onward*
@@ -189,19 +178,16 @@ $$
 
 初始化偏差在训练全过程中持续存在，构成 SeedPrints 的持久性基础。**Table 2** 显示，使用同一随机种子初始化的未训练模型与训练至收敛的模型之间，在交叠身份维度上的平均 Kendall‑τ 秩相关系数产生极低 p 值（低至 $10^{-26}$ 量级），而所有基线方法的相似度均远低于 0.8，无法识别该同源对。在大规模微调场景下（**Table 5**），即使模型在 CodeLlama‑7B（100B tokens）或 Llemma‑7B（700B tokens）等专用语料上充分微调，SeedPrints 的 p 值依然低至 $10^{-5136}$，始终满足 $p<0.01$ 的判定标准；相比之下，PCS 在 CodeLlama‑7B 和 Llemma‑7B 上的相似度仅为 0.686 和 0.668，未能跨过阈值。
 
-
 ![[assets/figures/papers/iclr26_0013_Kan6Z0zzZi_SeedPrints_Fingerprints_Can_Even_Tell_Which_Seed/figures/008_Table_5.jpg]]
 *Table 5: Fingerprinting results under large-scale finetuning. Each row compares a target model against LLaMA-2-7B. SeedPrints reports the p-value from our correlation test (\< 0.01 indicates a strong signal). Four baselines all report similarity scores (threshold = 0.8, higher = better)*
 
 更为严苛的情形是训练数据分布发生剧烈变化。**Table 4** 报告了从 OpenWebText 切换至代码数据集 The Stack 的持续训练结果：SeedPrints 将基于种子 1000 的所有后裔模型均正确归入同一谱系（$p \approx 0$），而 Intrinsic 指纹被误导为无关联（相似度 0.489）。此外，即使训练数据和顺序完全相同，不同随机种子产生的指纹依然保持显著差异（**Table 3**，所有跨种子 p 值均远大于 0.1），表明指纹行为由种子主导，几乎不受后续训练数据内容的影响。
-
 
 ![[assets/figures/papers/iclr26_0013_Kan6Z0zzZi_SeedPrints_Fingerprints_Can_Even_Tell_Which_Seed/figures/007_Table_4.jpg]]
 
 ### 实际部署场景的鲁棒性评估
 
 在 LeaFBench 基准（65 个模型，覆盖指令微调、全参数微调、PEFT、量化、合并、蒸馏 6 种部署变换）上，SeedPrints 取得整体 AUC 0.992 与 KS 0.986（**Table 6**），与最强的被动指纹方法 Intrinsic（AUC 0.997）和 ICS（AUC 0.995）接近，并显著优于 REEF（AUC 0.915）和 Gradient（AUC 0.801）。需注意，SeedPrints 原本输出的是统计检验的 p 值，为进行 AUC 比较人为定义得分 $s = 1-p$；该转换并非 p 值的合理连续相似度度量，可能丢失极小 p 值之间的区分度，因此表中的 AUC 对比应视为保守估计。
-
 
 ![[assets/figures/papers/iclr26_0013_Kan6Z0zzZi_SeedPrints_Fingerprints_Can_Even_Tell_Which_Seed/figures/009_Table_6.jpg]]
 *Table 6: Performance comparison of LLM fingerprinting methods across different source models. “PT” and “IT” refer to using the pre-trained models and instruction-tuned models as source models, respectively. Per-family breakdown is shown for the 6 families that have both PT and IT models. Note that the "Overall" scores are computed over all test model pairs, not averaged across families. a direct statistical test. Given any pair of models, our approach outputs a p-value that enables a definitive decision on whether they share the same lineage, without relying on tunable thresholds, ensuring reliable verification in practice*
@@ -231,13 +217,8 @@ SeedPrints 的谱系判决依赖于在身份维度上平均 Kendall‑τ 统计�
 4. **架构与输出维度限制**：现实验证集中在 LLaMA 式与 Qwen 式架构；方法要求两个待比较模型具有相同的输出维度 $d_{\text{out}}$，难以直接用于跨尺寸或跨架构的谱系查询。
 5. **对抗鲁棒性未评估**：攻击者可刻意过滤某些随机输入或添加扰动以掩盖偏差，防御场景下的安全性尚待验证。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0013_Kan6Z0zzZi_SeedPrints_Fingerprints_Can_Even_Tell_Which_Seed/figures/005_Table_1.jpg]]
 *Table 1: Comparison of finger- Table 2: Trained models share the same fingerprint behaviors as print behaviors between models their initialization (p-value \< 0.01). initialized with different seeds*
-
-
-
 
 ## 定位与知识库关联
 
@@ -271,8 +252,6 @@ SeedPrints 的最佳适用场景为**白盒或可获取内部表示**（logits �
 4. **全生命周期统一指纹**：将初始化指纹与训练中后期涌现的指纹有机结合，形成“出生－成长－部署”全阶段可追溯的模型谱系框架，在早期预训练阶段即建立起不可伪造的身份印记。
 5. **自动化阈值与统计决策**：在大型模型家族中，研究如何基于模型族内分布自适应设定显著性水平，以自动平衡假阳性与漏检率。
 6. **安全与法律双重背书**：从技术层面增强指纹的防篡改能力，同时明确初始化指纹在模型审计、版权保护和责任认定中的法律定位，推动技术标准与法律规范的协同演进。
-
-
 
 ## 原文 PDF
 

@@ -52,8 +52,6 @@ claims:
 
 **主要结果**：在MM-SafetyBench和VLBreakBench基准上，ASO一致且显著地提升了多种基础攻击的ASR，并在多个开源和商用VLM上展现出跨模型泛化能力。消融实验（Table 4）证实，性能增益主要来源于GRPO增强阶段，而非单纯的风格探查。
 
-
-
 ### 多模态大模型的安全挑战
 
 随着视觉语言模型（VLM）在视觉问答、自主代理等高风险场景中的广泛应用，其安全对齐问题日益成为关注焦点。尽管这些模型在理解视觉内容方面能力强大，但它们的防御机制往往存在“风格不一致性”漏洞——即模型对图像的非内容属性（如素描、油画等视觉风格）表现出天然敏感性，而安全对齐机制却未能对这种风格变化保持鲁棒。Figure 1 直观展示了这一现象：一个原本被防御者有效拒绝的SOTA内容攻击，在经过简单的铅笔素描风格滤镜处理后，即可成功绕过安全机制。
@@ -72,8 +70,6 @@ claims:
 本文的核心动机源于一个关键观察：**VLM的理解能力与安全防御机制之间存在风格不一致性**——即使图像的视觉风格发生改变，模型仍能稳健理解其内容，但其安全防御机制却可能被特定风格触发器轻易绕过。这一现象暗示，通过精心设计和优化的视觉风格，可以在不破坏有害内容的前提下，大幅削弱模型的防御能力。
 
 基于此，本文提出**对抗风格优化（Adversarial Style Optimization, ASO）**框架，旨在将内容攻击升级为“内容+风格”的混合触发器攻击。ASO通过两阶段流程——首先系统探查目标VLM最敏感的风格方向，随后利用GRPO强化学习对风格参数进行对抗优化——自动生成高效的风格增强攻击图像，从而显著提升越狱成功率。
-
-
 
 ## 核心方法与创新机理
 
@@ -107,8 +103,6 @@ ASO的方法创新体现在其两阶段自动化流程：
 ### 4. 与已有工作的本质区别
 
 现有越狱攻击方法可分为两类：基于内容的攻击（通过精心设计的视觉或文本提示诱导模型违反安全策略）和基于非内容的攻击（利用输入扰动破坏模型对齐）。ASO的独特之处在于**首次将视觉风格作为可优化的对抗触发器**，并通过强化学习自动发现最优风格参数，而非依赖人工设计的固定风格滤镜。这一思路将风格从“辅助增强手段”提升为“核心攻击向量”，为多模态模型安全测试开辟了新的研究方向。
-
-
 
 ASO 的整体 pipeline 由两个顺序阶段构成：**风格敏感性探查（Style Sensitivity Probing）** 与 **基于 GRPO 的风格增强（GRPO-based Style Enhancement）**，二者共同实现将任意基础越狱攻击图像升级为“混合触发器”的目标。框架的核心设计理念源于一个关键观察：MLLM 对非内容的视觉风格变化具有天然的敏感性，即使内容层面的攻击被安全机制拒绝，特定风格的叠加仍可能绕过防御（Figure 1）。
 
@@ -160,8 +154,6 @@ Figure 2 清晰展示了两个阶段的衔接关系：第一阶段以基础攻�
 
 ![[assets/figures/papers/paper_list_l2028_https_openaccess_thecvf_com_content_CVPR2026_html_Luo_Adversarial_Style/figures/002_Figure_2.jpg]]
 *Figure 2: Main framework of the proposed ASO method. The method consists of two stages: (1) Style Sensitivity Probing, and (2) GRPObased Style Enhancement*
-
-
 
 ### 两阶段框架总览
 
@@ -261,12 +253,8 @@ $$
 
 该指标反映评判模型对回答有害性的对数似然比，与 ASR 配合使用以全面评估攻击质量。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2028_https_openaccess_thecvf_com_content_CVPR2026_html_Luo_Adversarial_Style/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of the Stylistic Sensitivity vulnerability in MLLMs. While a base SOTA attack (Top) is effectively refused by the Defender, MLLMs exhibit innate sensitivity to non-contentbased style modifications. Our framework (Bottom) exploits this by applying Image Style Transfer to create an optimized stylistic attack. This new input bypasses the safety mechanism, demonstrating that stylistic biases can be leveraged to significantly improve jailbreak ASR*
-
-
 
 ## 实验与关键发现
 
@@ -323,8 +311,6 @@ $$HS = \log P_{\mathcal{I}}(\text{yes} | R, P_{\text{harm}}) - \log P_{\mathcal{
 
 ![[assets/figures/papers/paper_list_l2028_https_openaccess_thecvf_com_content_CVPR2026_html_Luo_Adversarial_Style/figures/004_Table_2.jpg]]
 *Table 2: Main results of ASO enhancement on the VLBreakBench benchmark*
-
-
 
 ## 定位与知识库关联
 
@@ -385,8 +371,6 @@ ASO 的适用边界由以下因素界定：
 ### 知识库定位总结
 
 ASO 在VLM越狱攻击的知识库中占据“**攻击增强层**”的定位——它不重新定义攻击范式，而是通过系统化的风格探查与对抗优化，将现有攻击的效率提升到新的上限。其核心知识贡献在于：揭示了视觉风格作为VLM安全防御的独立脆弱维度，并提供了可复现的自动化利用框架。这一发现对后续研究提出了两个方向性挑战：在攻击侧，如何进一步挖掘其他非内容属性（如构图、光照、色彩分布）的攻击潜力；在防御侧，如何构建对多维度视觉变化鲁棒的安全对齐机制。
-
-
 
 ## 原文 PDF
 

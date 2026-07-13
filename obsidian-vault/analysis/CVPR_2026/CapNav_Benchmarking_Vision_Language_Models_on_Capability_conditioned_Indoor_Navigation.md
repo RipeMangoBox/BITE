@@ -72,15 +72,11 @@ CapNav具有三个核心设计：
 
 CapNav在方法谱系上属于**能力感知的视觉语言导航基准**，区别于传统VLN基准的关键在于将代理能力约束显式纳入任务定义。其评估范式融合了图基可通行性判断与LLM-as-judge推理评估，为后续研究提供了可扩展的框架。数据集包含45个室内场景、2365个导航任务和5075条可通行性标注，代码与基准已开源。
 
-
-
 视觉语言模型（VLM）在通用视觉理解与推理任务上取得了显著进展，但在具身导航领域，现有基准主要评估模型在无约束条件下的路径规划能力。真实世界的导航问题并非单纯的“从A到B”的最短路径搜索——代理自身的物理尺寸、运动能力与操作限制（如能否爬楼梯、转弯半径、可通过宽度）从根本上决定了某条路径是否可行。然而，当前VLM导航评估体系普遍忽略这一关键维度，导致我们无法回答一个核心问题：**VLM能否在给定代理能力约束下做出正确的可行性判断与路径选择？**
 
 这一缺口在以下场景中尤为突出：轮椅使用者需要避开楼梯与窄门，人形机器人受限于步幅与平衡能力，扫地机器人无法攀越门槛。同一室内空间、同一导航任务，对不同代理而言可能意味着截然不同的可行路径，甚至完全不可行。现有视觉语言导航（VLN）基准（如R2R、RxR、REVERIE）以人类行走轨迹为参照，假设所有代理具有同质的无约束移动能力，无法捕捉这种能力依赖的导航复杂性。与此相对，机器人领域的导航方法虽考虑运动学约束，却通常依赖精确的几何地图或端到端的模仿学习，缺乏对语义场景理解与自然语言指令的整合，更未在VLM范式下系统评估。
 
 CapNav正是为填补这一空白而提出。其核心动机在于：**将导航问题从通用路径规划重新定义为能力依赖的可行性判断与路径选择**。通过显式引入代理能力剖面（agent profile），CapNav迫使模型在空间理解、尺寸估计与约束推理三个层面同时做出判断——这正是当前VLM所暴露的根本短板。初步证据表明，即便是最先进的VLM，在面临不可视的几何约束（如狭窄通道、转弯半径）时，其导航性能也会急剧下降，揭示了空间度量推理与多帧视觉信息融合的深层瓶颈。
-
-
 
 ## 核心方法与创新机理
 
@@ -118,8 +114,6 @@ $$ \mathrm{CapNav} = \lambda_c F_1 + \lambda_p \mathrm{PV} + \lambda_t \overline
 
 CapNav 位于**具身视觉语言导航**与**能力感知评估**的交叉点。与传统的 VLN 基准（如 R2R、RxR）相比，CapNav 不要求模型执行增量动作预测，而是以图空间抽象上的全局路径规划为任务形式，这与 **SayNav**（Rajvanshi et al., CoRL 2023）等高层规划方法在任务粒度上相似，但 CapNav 首次将代理物理能力作为显式输入条件。在评估维度上，CapNav 借鉴了 **MPGD**（He et al., CVPR 2023）等多指标评估的思想，但将评估重心从轨迹几何匹配转向了能力依赖的可通行性验证。与同时期的空间推理基准（如 SpatialBench）相比，CapNav 的独特贡献在于将空间尺寸估计与代理物理约束直接耦合，暴露了 VLM 在“不可视几何约束”（如狭窄通道宽度、转弯半径）上的系统性短板。
 
-
-
 CapNav 将能力约束下的室内导航形式化为一个**空间–任务–能力三元组**（Space–Task–Capability triple）的评估问题。给定一个室内空间的巡游视频、其导航图的节点列表、代理的移动能力剖面以及一个导航任务，视觉语言模型（VLM）需要同时输出三个判断：**任务可行性** $\hat{y}$、**导航路径** $\hat{P}$ 和**推理理由** $\hat{\rho}$。这一输入-输出映射可表示为：
 
 $$( \hat { y } , \hat { P } , \hat { \rho } ) = f _ { \theta } ( S , \tau , \mathbf { a } )$$
@@ -144,15 +138,11 @@ $$\mathrm { C a p N a v } = \lambda _ { c } F _ { 1 } + \lambda _ { p } \mathrm 
 
 该框架的核心设计在于：通过引入显式的代理能力剖面，将通用路径规划问题转化为**能力依赖的可行性判断与路径选择**问题。同一场景、同一任务，对于不同代理类型可能具有截然不同的可行性和最优路径——例如，一个需要穿越楼梯的任务对轮椅代理不可行，对四足机器人可行，而对双足人形机器人则取决于其楼梯攀爬能力。这种设计直接暴露了当前 VLM 在空间尺寸估计和几何约束推理方面的根本缺陷。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2378_https_arxiv_org_abs_2602_18424/figures/001_Figure_1.jpg]]
 *Figure 1: We introduce Capability-Conditioned Navigation (CapNav), a benchmark designed to evaluate how well VLMs can navigate complex indoor spaces given an agent’s specific physical and operational capabilities. CapNav inputs (1) a tour video of an indoor space, (2) nodes of its navigation graph, (3) an agent’s mobility profile, and (4) a navigation task, and evaluates VLM outputs in task feasibility, path validity, route traversability, and reasoning validity*
 
 ![[assets/figures/papers/paper_list_l2378_https_arxiv_org_abs_2602_18424/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of CapNav’s data construction: Starting from a 3D indoor scan, we manually record a touring video and a navigation graph. We then use Gemini to generate natural language navigation tasks. Finally, per-task and per-agent traversability are annotated by manually controlling agents in the annotation interface*
-
-
 
 CapNav将能力约束导航形式化为一个**空间–任务–能力三元组**的查询问题，并通过四个互补指标对VLM输出进行细粒度评估。以下阐述其核心形式化定义与评估体系。
 
@@ -217,15 +207,11 @@ CapNav的数据构建流水线（Figure 3）包含四个关键模块：
 
 该流水线产出了包含45个场景、2365个导航任务、5075条可通行性标注的数据集，覆盖五种代理类型（无运动障碍成人、轮椅使用者、扫地机器人、人形机器人、四足机器人）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2378_https_arxiv_org_abs_2602_18424/figures/004_Figure_4.jpg]]
 *Figure 4: Examples of CapNav’s agent profiles. Left: each profile specifies the physical dimensions and functional capabilities. Right: the agents’ physical dimensions are rendered and maneuvered in the 3D scenes to help confirm traversability*
 
 ![[assets/figures/papers/paper_list_l2378_https_arxiv_org_abs_2602_18424/figures/002_Figure_2.jpg]]
 *Figure 2: The CapNav benchmark evaluates whether VLMs can correctly ground differences in agent mobility capabilities when generating navigation plans. This example demonstrates a navigation task that has different feasibility and path for different agents*
-
-
 
 ## 实验与关键发现
 
@@ -284,24 +270,11 @@ CapNav的数据构建流水线（Figure 3）包含四个关键模块：
 2. **多约束叠加失效**：当代理同时面临多种能力限制时（如HUMANOID），模型难以协调多个约束的联合影响，性能呈非线性下降。
 3. **视觉整合瓶颈**：多帧视觉信息无法有效融合，限制了模型从巡视视频中构建连贯空间理解的能力，且增加帧数的边际收益递减。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2378_https_arxiv_org_abs_2602_18424/figures/006_Table_2.jpg]]
 *Table 2: CapNav performance across 13 VLMs. Each number indicate the best performance under all tested frame settings. Left block reports each task metrics (Feas-F1, PV, RTA, RV, CapNav). Right block reports per-agent composite scores for the five agent types: adult with no motor disabilities, humanoid robot, quadrupedal, sweeping robots, and wheelchair users. Bold number indicate best per block. Blue indicate open-sourced model; Green indicate proprietary; Orange indicate spatial reasoning models*
 
 ![[assets/figures/papers/paper_list_l2378_https_arxiv_org_abs_2602_18424/figures/005_Table_1.jpg]]
 *Table 1: Ratio of feasible task and traversable edges per agent type*
-
-![[assets/figures/papers/paper_list_l2378_https_arxiv_org_abs_2602_18424/figures/008_Figure_5.jpg]]
-*Figure 5: Model accuracy by obstacle type*
-
-![[assets/figures/papers/paper_list_l2378_https_arxiv_org_abs_2602_18424/figures/007_Figure_6.jpg]]
-*Figure 6: Performance across frame-budget settings. While higher frame counts can improve results, the gains are model-dependent and may saturate, consistent with a visual integration bottleneck*
-
-![[assets/figures/papers/paper_list_l2378_https_arxiv_org_abs_2602_18424/figures/009_Figure_7.jpg]]
-*Figure 7: Representative frames from the input video HM3D00025.mp4. The VLM receives the complete MP4 video for navigation task generation*
-
-
 
 ## 定位与知识库关联
 
@@ -356,8 +329,6 @@ CapNav 在基准设计上与以下工作形成对比或互补：
 4. **更大规模与多样化的数据集**：当前 45 个场景的规模限制了统计结论的稳健性和模型泛化能力的评估。建立覆盖更多建筑类型、文化背景、动态环境和临时障碍物的能力约束导航数据集，是推动该方向发展的必要条件。
 
 5. **与机器人系统的闭环验证**：CapNav 目前是离线评估，模型的输出路径未在真实或仿真环境中执行。将 VLM 的能力感知决策与底层导航栈（如局部规划器、SLAM）集成并进行闭环测试，将是验证其实际效用的关键一步。
-
-
 
 ## 原文 PDF
 

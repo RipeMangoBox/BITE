@@ -56,8 +56,6 @@ claims:
 
 > **注意**：以下各节将依次展开方法设计、实验验证与分析讨论。Figure 1 展示了 LAC 与 EMC 两大控制类别的整体能力，Figure 2 给出了框架的完整流水线。定量对比的核心数据见 Table 1（中性场景）和 Table 2（情感场景）。
 
-
-
 音频驱动的说话人脸生成旨在从语音信号中合成逼真的说话面部视频，在虚拟数字人、视频会议、影视制作等领域具有广泛应用。近年来，基于深度学习的生成模型在该任务上取得了显著进展，尤其是唇音同步（lip-sync）精度已达到较高水平。然而，现有方法仍面临一个核心瓶颈：**生成的面部动画风格单一、情感表达不丰富，缺乏对说话风格和情感的精细控制**。
 
 具体而言，当前主流方法存在以下关键缺口：
@@ -69,8 +67,6 @@ claims:
 3. **唇音同步与情感表达难以兼顾**：在增强情感表现力的同时，往往会牺牲唇音同步精度，导致唇部运动与音频内容失配。现有方法缺乏一种统一的框架，能够在保持高精度唇音同步的前提下，实现对说话风格和情感的独立、精细控制。
 
 针对上述问题，**PC-Talk** 提出了一种基于隐式关键点变形组合的精确面部动画控制框架。其核心洞察在于：将面部动画控制建模为对隐式关键点的变形预测与组合过程。具体而言，PC-Talk 设计了两个关键模块——**唇音对齐控制模块（Lip-Audio Alignment Control, LAC）** 和**情感控制模块（EMotion Control, EMC）**——分别预测唇音同步变形 $D_l$ 和情感变形 $D_e$，并通过将二者叠加到原始关键点上，实现唇音同步与情感表达的解耦控制。LAC 模块通过风格感知的自回归变换器，从参考视频或预设选项中提取说话风格，并可对特定唇部发音进行风格编辑；EMC 模块则通过从混合表情中减去中性表情，分解出纯情感变形，从而支持情感强度调节和不同面部区域的复合情感生成。
-
-
 
 ## 核心方法与创新机理
 
@@ -95,8 +91,6 @@ PC-Talk 的核心创新在于将面部动画控制建模为对**隐式关键点�
 ### 语义化隐式关键点作为统一控制接口
 
 上述两个模块的共同基础是**具有语义含义的隐式关键点**。与 **SadTalker** (Zhang et al., CVPR 2023) 等使用 3D 形态模型的方法不同，PC-Talk 通过地标约束训练隐式关键点，使其具备可解释的语义（如对应眼角、嘴角等），并直接在关键点空间上施加唇音同步变形 $D_l$ 和情感变形 $D_e$。驱动关键点的计算为 $K_d = K_{ori} + D_l + D_e$，这种加性组合使得风格和情感控制可以独立运作、互不干扰，构成了整个框架的“因果旋钮”。
-
-
 
 PC-Talk 将说话人脸生成中的精细控制问题建模为对**隐式关键点（implicit keypoints）**的变形预测与组合。其核心洞察在于：唇音同步与情感表达可以分解为两类独立的变形量，分别由专门的模块预测后叠加到同一组关键点上，再通过变形与渲染生成最终图像。这一设计使得风格与情感的解耦控制成为可能，同时不牺牲唇音同步精度。
 
@@ -136,12 +130,8 @@ PC-Talk 将说话人脸生成中的精细控制问题建模为对**隐式关键�
 
 相较于现有方法多使用 3D 形态模型或语义利用不足的隐式关键点，PC-Talk 的中间表示具有明确的语义含义，且直接在关键点层面施加变形，避免了在像素空间或特征空间进行复杂耦合操作。LAC 与 EMC 的并行设计使得两类控制可以独立训练、独立推理，同时通过共享的 $K_{ori}$ 和加性组合实现无缝集成。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l999_https_arxiv_org_abs_2503_14295/figures/002_Figure_2.jpg]]
 *Figure 2: Our framework PC-Talk is designed for precise control in talking face generation. It achieves this control by first predicting a deformation of implicit keypoints and then rendering it into a final talking image. We utilize a Lip-Audio alignment Control (LAC) module to estimate lip-sync deformations*
-
-
 
 PC-Talk 的核心控制机制建立在**隐式关键点变形预测与组合**之上。给定参考图像，运动提取器首先估计一组具有语义含义的隐式关键点，随后两个独立的控制模块分别预测唇音同步变形和情感变形，二者叠加后驱动外观特征的变形与最终渲染。
 
@@ -189,13 +179,6 @@ $$D_{e} = \mathrm{CPred}( emo, e_{a} ) - \mathrm{CPred}( \text{'neutral'}, e_{a}
 
 **控制能力**：基于纯情感变形，EMC 模块支持两项精细控制——（1）**强度调整**：通过缩放 $D_e$ 的幅度控制情感表达强度；（2）**区域复合情感**：对不同面部区域独立施加不同情感类别的变形，实现如“眼睛愤怒+嘴部微笑”的复合情感表达。消融实验（Figure 4）证实，去除分解步骤后情感表达显著模糊，验证了该机制对表情表现力的关键作用。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l999_https_arxiv_org_abs_2503_14295/figures/001_Figure_1.jpg]]
-*Figure 1: PC-Talk separates talking face control into two categories: Lip-Audio Alignment Control (LAC) for adapting and editing diverse speaking styles to simulate different talking habits, and EMotion Control (EMC) for generating expressive faces with adjustable intensity and region-specific compound emotions*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -237,27 +220,11 @@ Table 5 报告了用户研究结果（1-5 分制）。PC-Talk 在五个评估维
 
 尽管 PC-Talk 在多数指标上取得 SOTA 性能，但分析中未明确报告具体的失败案例。根据方法设计推断，潜在局限可能包括：情感分解依赖于预定义的情感类别，对细粒度情感（如惊奇、厌恶）的泛化能力有待验证；隐式关键点虽然在语义上有一定含义，但在极端姿态或遮挡场景下的鲁棒性需要进一步检验。这些方面需要手动对照原文进行验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l999_https_arxiv_org_abs_2503_14295/figures/003_Table_1.jpg]]
 *Table 1: Quantitative comparisons with state-of-the-art methods*
 
-![[assets/figures/papers/paper_list_l999_https_arxiv_org_abs_2503_14295/figures/004_Table_2.jpg]]
-*Table 2: Quantitative comparisons on emotional talking face generation*
-
 ![[assets/figures/papers/paper_list_l999_https_arxiv_org_abs_2503_14295/figures/006_Figure_4.jpg]]
 *Figure 4: Ablation study on emotion decomposition*
-
-![[assets/figures/papers/paper_list_l999_https_arxiv_org_abs_2503_14295/figures/007_Table_3.jpg]]
-*Table 3: Ablation Study on lip-audio alignment*
-
-![[assets/figures/papers/paper_list_l999_https_arxiv_org_abs_2503_14295/figures/009_Figure_5.jpg]]
-*Figure 5: Lip-sync performance with different lip movement scales and speaking style editing across each lip articulation*
-
-![[assets/figures/papers/paper_list_l999_https_arxiv_org_abs_2503_14295/figures/010_Figure_6.jpg]]
-*Figure 6: Emotion and Speaking Style Interpolation*
-
-
 
 ## 定位与知识库关联
 
@@ -288,8 +255,6 @@ PC-Talk 的核心贡献在于将面部动画控制分解为“唇音同步变形
 2. **更细粒度情感类别的分解有效性**：纯情感变形分解方法是否适用于“惊奇”、“厌恶”等更微妙的情感类别，需要进一步验证。
 3. **实时推理时延优化**：当前框架采用自回归变换器预测变形序列，推理时使用重叠窗口保证时序一致性，但时延能否进一步降低以满足实时交互需求，论文未深入讨论。
 4. **高分辨率和复杂场景扩展**：方法是否适用于 4K 视频生成、动态背景或多人场景，论文未涉及，属于明显的适用边界外问题。
-
-
 
 ## 原文 PDF
 

@@ -65,8 +65,6 @@ claims:
 
 Walkin’ Robin在方法谱系中定位明确：它继承WoSt的无网格、渐进式、输出敏感的优势，无需体网格即可在极复杂几何上快速获得局部解（Figure 1），同时将适用边界条件从Dirichlet-Neumann扩展到Robin，填补了无网格蒙特卡洛PDE求解器的重要空白。
 
-
-
 ### 问题定义：带Robin条件的椭圆型边值问题
 
 在物理仿真中，大量稳态现象——如热传导、静电平衡、扩散过程——均可归结为椭圆型偏微分方程（PDE）的边值问题（BVP）。本文关注的核心问题是带有混合边界条件的Poisson方程：
@@ -104,8 +102,6 @@ $$
 核心洞察在于：Robin条件可视为Dirichlet（完全吸收）与Neumann（完全反射）的**线性内插**（Figure 3）。基于这一理解，只需在构建星形区域时，根据Robin系数 $\mu$ 动态收缩半径 $R$，使得反射率函数 $\rho_\mu$ 始终落在 $[0, 1]$ 区间内，即可保证throughput有界且为正，从而确保方差有界。此外，利用反射率还可实现**Russian roulette无偏提前终止**——以概率 $1 - \rho_\mu$ 终止游走并相应调整权重，大幅减少平均步数而不引入额外偏差。
 
 简言之，本文的方法修改仅限于**星形区域半径的选择方式**这一处（Figure 5），其余WoSt框架保持不变。这一简洁的改动打通了Dirichlet、Neumann、Robin任意混合边界条件下的无网格蒙特卡洛求解，为复杂几何上的物理仿真提供了实用的渐进式求解工具。
-
-
 
 ## 核心方法与创新机理
 
@@ -155,8 +151,6 @@ $$
 
 为高效计算满足 ρ_μ 约束的半径，本文将**空间化法向锥层次结构 (SNCH)** 扩展为在节点中存储 min/max Robin 系数（Section 5.2, Figure 9）。此外，将双向 WoS 和边界值缓存 (BVC) 技术扩展到 Robin 问题（Section 6, Figure 10），进一步降低估计方差。这些工程扩展增强了方法的实用性，但核心创新仍在于 ρ_μ 驱动的半径约束与 Russian roulette 终止机制。
 
-
-
 Walkin' Robin 的求解流程围绕**随机游走估计器**展开，将 Robin 边界条件无缝嵌入 Walk on Stars（WoSt）框架。整个 pipeline 由三个核心模块串联而成，输入为三角形网格定义的域 Ω、边界条件（Dirichlet/Neumann/Robin 混合）及 PDE 源项，输出为域内任意查询点上的无偏或可控偏差解估计。
 
 ### 1. 加速结构构建：空间化法向锥层次（SNCH）
@@ -196,8 +190,6 @@ Walkin' Robin 的求解流程围绕**随机游走估计器**展开，将 Robin �
 - **边界值缓存（BVC）**：缓存已计算的边界点解估计，后续游走命中缓存点时直接复用，避免重复采样。
 
 最终，对每个查询点独立运行 N 条游走并取平均，得到该点的解估计。整个流程天然支持**渐进式、输出敏感**的求值——仅计算用户关心的空间点，无需全局求解（Figure 1）。
-
-
 
 ### 问题定义与基本框架
 
@@ -280,8 +272,6 @@ $$
 - **纯 Neumann 退化**：当所有边界均为 Neumann（$\mu=0$ 处处成立）时，解仅确定到常数，仍需 Tikhonov 正则化引入额外偏差。
 - **$\varepsilon$-shell 偏差-效率权衡**：$\varepsilon$ 壳层参数控制游走终止的近似程度，增大 $\varepsilon$ 可减少步数但引入偏差（如全局变暗或 Voronoi-like 解），虽然偏差随 $\varepsilon$ 减小迅速消失，但仍需用户权衡（Figure 11）。
 
-
-
 ## 实验与关键发现
 
 ### 主要结果：蒙特卡洛收敛性与偏差-方差权衡
@@ -289,7 +279,6 @@ $$
 Walkin' Robin 最核心的实验发现是：**在 Dirichlet、Neumann 和 Robin 任意混合边界条件下，WoSt 均展现稳定的 $1/\sqrt{N}$ 蒙特卡洛收敛，而 Walk on Boundary (WoB) 存在极端的偏差-方差权衡**（Figure 12, Section 7.2）。这一结论在凸域和非凸域上一致成立。
 
 具体而言，Figure 12 的前三行显示，即使在近似凸的简单域中，WoB 也会因 walk 长度截断过于激进而产生明显偏差（第一列）；若不截断，WoB 的方差随 walk 长度呈指数增长（第二、三列），需要极大量样本才能压制误差。相比之下，WoSt 的估计误差随样本数增加稳定下降。在**常函数解问题**上，WoSt 因 walk 的 throughput 始终保持在 $[0,1]$ 内而**估计误差为零**，而 WoB 仍产生较高 RMSE，且可输出负值或大于 1 的值（Table 1, Figure 12 第二行）。Table 1 进一步量化了该对比：WoSt 的解值范围严格落在正确区间内（min/max 符合预期），而 WoB 的解值范围明显越界。
-
 
 ![[assets/figures/papers/paper_list_l23_https_research_nvidia_com_labs_prl_miller2024wost_WoStRobin_pdf/figures/014_Table_1.jpg]]
 *Table 1: Minimum and maximum estimated solution values, total number of walks, and average walk length for the WoB and WoSt results in Figure 12. Though WoSt generally requires longer walks than WoB, its solution estimates have significantly less error compared to WoB at equal time with fewer walks per point*
@@ -299,7 +288,6 @@ Walkin' Robin 最核心的实验发现是：**在 Dirichlet、Neumann 和 Robin 
 ### 消融实验：$\varepsilon$-壳层参数的偏差-效率权衡
 
 WoSt 使用单一的 $\varepsilon$-壳层参数控制解的偏差与 walk 步数之间的权衡（Figure 11）。实验表明：
-
 
 ![[assets/figures/papers/paper_list_l23_https_research_nvidia_com_labs_prl_miller2024wost_WoStRobin_pdf/figures/012_Figure_11.jpg]]
 *Figure 11: WoSt uses a single 𝜀-shell parameter to control the tradeoff between bias in a solution estimate and the number of steps in a walk—in general, this parameter requires li le-to-no hand-tuning as bias drops predictably with decreasing 𝜀 values. Top two rows: For more reflecting Robin boundaries with smaller coefficients $\mu$ , bias manifests as a global darkening in the solution estimate for large 𝜀, with runtime improvements typically outweighing the relative increase in bias. Bo om row: For more absorbing Robin boundaries with larger coefficients $\mu$ , a large 𝜀-shell produces a Voronoi-like solution that extends prescribed boundary values further into the domain interior—a similar bias is obse...
@@ -326,13 +314,8 @@ WoSt 使用单一的 $\varepsilon$-壳层参数控制解的偏差与 walk 步数
 4. **方差缩减技术的复杂度**：双向和边界值缓存等方差缩减技术增加了实现复杂度和参数（如缓存密度）的选择负担。
 5. **极低 $\varepsilon$ 下的效率**：在极低 $\varepsilon$ 值下，游走步数增多，计算效率会下降；$\varepsilon$ 的选择虽然不敏感，但仍是一个需要用户权衡的偏差-效率参数。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l23_https_research_nvidia_com_labs_prl_miller2024wost_WoStRobin_pdf/figures/009_Figure.jpg]]
 *Figure: dist. to silhoue e R = (single intersection) WoSt for Robin ( )μ > 0*
-
-
-
 
 ## 定位与知识库关联
 
@@ -396,8 +379,6 @@ WoSt相对于WoB的核心优势在于：它通过**精确模拟布朗运动的�
 3. 是否存在比星形区域更大的子域，能在保持throughput有界的前提下允许更大步长？
 4. 在极低 $\varepsilon$ 值下，如何进一步提升游走效率同时不牺牲精度？
 5. 负的 $\mu$（发射性边界）能否通过对称性处理纳入当前框架？
-
-
 
 ## 原文 PDF
 

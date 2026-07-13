@@ -95,8 +95,6 @@ LaFiTe在多个维度上验证了其表示和生成框架的有效性：
 
 这些局限指向三个开放的探索方向：（1）如何将大规模2D生成先验融入3D原生纹理生成，以提升语义合理性和文本渲染质量；（2）能否利用大规模2D图像/视频数据缓解高质量纹理3D训练数据的稀缺性；（3）该表示是否可以扩展到更复杂的全局光照效果或体纹理，而不仅是表面颜色。
 
-
-
 ### 3D纹理生成的现状与瓶颈
 
 随着3D内容创作在游戏、影视、虚拟现实和工业设计中的广泛应用，自动化纹理生成成为3D生成式AI的核心任务之一。当前，主流3D资产生成平台（如Tripo AI 、Rodin 、Meshy AI 、Hunyuan3D 等）已能产出高质量的几何体，但纹理生成仍面临根本性挑战。
@@ -114,8 +112,6 @@ TRELLIS（Xiang et al., CVPR 2025）等近期工作尝试通过体素表示学�
 针对上述瓶颈，LaFiTe提出了一种根本性的范式转变：**将3D纹理建模为连续的稀疏潜在颜色场**。具体而言，该方法从网格表面密集采样彩色点云（包含位置、法向和颜色），通过一个专门设计的变分自编码器（VAE）将其编码为结构化的稀疏潜在向量，解码时则可查询任意表面点的RGB颜色。这一表示天然具有3D原生性——不依赖2D投影，不对网格拓扑做任何假设，且在3D空间中保持全局一致。
 
 更重要的是，该表示实现了**表示与条件的优雅协同设计**：生成纹理时，仅需将输入点云的全部颜色设为白色（形成单色点云），通过同一VAE编码器即可提取不含外观信息的纯几何潜在，作为生成模型的条件。这种统一的几何条件编码方式避免了独立几何编码器可能引入的表示空间不对齐问题，为后续的流匹配生成模型提供了精确的3D几何约束。
-
-
 
 ## 核心方法与创新机理
 
@@ -148,8 +144,6 @@ LaFiTe的核心创新在于对3D纹理生成的根本性反思：**将纹理从2
 ### 创新协同的因果链条
 
 上述四项创新并非孤立存在，而是形成了紧密的因果链条：3D点云表示消除了投影/UV变形带来的信息损失→点-体素注意力高效地从点云中提取结构化特征→共享编码器在统一空间中解耦几何与纹理→3D直接监督确保潜在空间忠实于真实纹理。这一链条的终端效果体现在Table 3的消融实验中：随着输入点云密度从20K增至4M，VAE重建PSNR从26.07 dB持续提升至34.45 dB，证明表示本身具备良好的可扩展性，能够从更密集的采样中持续获益。
-
-
 
 LaFiTe 的核心设计理念是将 3D 纹理建模为一种**稀疏潜在颜色场**（sparse latent color field），通过一个 VAE 自编码器从数据中学习这一紧凑表示，并以此为基础构建生成模型。整个框架分为两大阶段：**表示学习**与**条件生成**，如图 Figure 2 所示。
 
@@ -195,8 +189,6 @@ LaFiTe 的一个关键设计是**共享同一 VAE 编码器来提取纯几何条
 | 纹理烘焙模块 | 转换为标准 UV 贴图 | 连续颜色场 + UV 坐标 | UV 纹理贴图 |
 
 这一设计实现了**表示与条件的优雅协同**：VAE 编码器同时服务于纹理压缩和几何条件提取，点-体素注意力机制保证了局部细节的捕捉能力，稀疏体素结构确保了计算效率，而连续颜色场解码则赋予了表示对任意拓扑的泛化能力。
-
-
 
 ### 点-体素注意力编码模块
 
@@ -256,8 +248,6 @@ $$\mathcal{L}_{\mathrm{albedo}} = \mathbb{E} \| v(x_t; t, z_{\mathrm{geo}}) - (\
 
 对于物理渲染（PBR）纹理，LaFiTe采用层次化生成策略：先生成基础色（albedo）纹理，再以基础色潜在为条件生成粗糙度-金属度图。具体实现中，将预训练的颜色纹理VAE的三个颜色通道替换为粗糙度、金属度和一个零填充通道，复用编码器架构，从而以较小的训练代价扩展至PBR材质生成。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设计
@@ -301,15 +291,6 @@ LaFiTe展示了多项超出基础纹理生成的扩展能力：
 - **PBR材质生成**（Figure 7）：通过层次化生成策略（几何→反照率→粗糙度-金属度），LaFiTe可基于2D材质图生成带有PBR属性的纹理，实现材质迁移。
 - **局部细化**（Figure 8）：用户可在指定区域触发局部潜在再生成，以更高分辨率增强该区域的纹理质量，无需重新生成整个纹理。
 
-![[assets/figures/papers/paper_list_l2530_https_arxiv_org_abs_2512_04786/figures/009_Figure_6.jpg]]
-*Figure 6: Integration with multi-view projections. LaFiTe can be used to complete occluded regions for the partial 3D texture projected from multi-view images*
-
-![[assets/figures/papers/paper_list_l2530_https_arxiv_org_abs_2512_04786/figures/010_Figure_7.jpg]]
-*Figure 7: Material Transfer. LaFiTe can generate textures with PBR materials conditioned on a 2D material image*
-
-![[assets/figures/papers/paper_list_l2530_https_arxiv_org_abs_2512_04786/figures/011_Figure_8.jpg]]
-*Figure 8: Local Refinement. LaFiTe can further enhance the generation quality by refining a local region*
-
 ### 失败模式与局限
 
 尽管LaFiTe在重建和生成质量上取得了显著优势，但验证分析也揭示了明确的失败模式：
@@ -329,18 +310,8 @@ LaFiTe展示了多项超出基础纹理生成的扩展能力：
 ![[assets/figures/papers/paper_list_l2530_https_arxiv_org_abs_2512_04786/figures/003_Table_1.jpg]]
 *Table 1: Quantitative comparison for conditional texture generation. We evaluate LaFiTe against leading text- and image-conditioned texture generation methods. LaFiTe achieves superior or competitive performance across nearly all metrics, demonstrating its state-of-theart generation quality. Lower is better for all metrics*
 
-![[assets/figures/papers/paper_list_l2530_https_arxiv_org_abs_2512_04786/figures/005_Table_3.jpg]]
-*Table 3: Effect of Sample Point Density for Reconstruction. VAE reconstruction quality consistently improves with denser input point cloud sampling, showcasing the model’s scalability*
-
 ![[assets/figures/papers/paper_list_l2530_https_arxiv_org_abs_2512_04786/figures/007_Figure_4.jpg]]
 *Figure 4: Visual comparison of VAE reconstruction quality. Our method reconstructs sharper, more detailed textures, avoiding the blurs and artifacts of the TRELLIS baseline*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2530_https_arxiv_org_abs_2512_04786/figures/001_Figure_1.jpg]]
-*Figure 1: A gallery of diverse 3D assets textured by our 3D-native framework, LaFiTe, demonstrating high-fidelity, seamless textures across a wide range of visual styles*
-
-
 
 ## 定位与知识库关联
 
@@ -388,8 +359,6 @@ LaFiTe的表示设计包含三个关键选择，每个都对应着对现有方�
 3. **表示扩展**：该稀疏潜在场表示是否可以扩展到更复杂的材质模型（如次表面散射、各向异性反射）或体纹理，而不仅是表面颜色和简单PBR参数？
 
 4. **生成控制**：当前方法以图像或文本为条件，但缺乏对纹理风格、细节密度、材质属性等维度的精细控制。引入解耦的潜在空间或可插拔的控制模块是值得探索的方向。
-
-
 
 ## 原文 PDF
 

@@ -54,8 +54,6 @@ claims:
 
 **主要结果**：VLM-CC 在多个跨相机数据集上取得最优性能——Gehler-Shi 上平均角度误差 1.52°（CCMNet 为 2.23°），NUS-8 上 1.83°（CCMNet 为 2.32°），Cube+ 上 1.51°（CCMNet 为 1.68°）。消融实验证实，迭代离散推理策略优于一步或迭代数值方法，语义先验和 VLM 微调对稳定估计至关重要。代码已开源（https://github.com/NothingIknow/VLM-CC）。
 
-
-
 颜色恒常性（Color Constancy）是计算摄影中的基础任务，旨在从相机记录的原始RAW图像中消除全局光源颜色偏差，恢复场景在标准白光下的真实色彩。该问题可形式化为单一全局光照模型：原始图像 $I$ 的每个像素可表示为该像素在白光下的真实颜色 $W$ 与全局光照颜色 $\ell$ 的逐通道乘积，即 $I = W \odot \ell$。颜色恒常性的目标是从观测到的 $I$ 中估计光照 $\hat{\ell}$，进而通过逐通道除法恢复白平衡图像 $W = I \oslash \hat{\ell}$。
 
 ### 现有方法的瓶颈
@@ -69,8 +67,6 @@ claims:
 针对上述瓶颈，本文提出 **VLM-CC**，将颜色恒常性从根本上重新定义为**迭代语义反馈过程**，而非单步数值回归。其核心调控旋钮（causal knob）在于：**先白平衡，后评估，再调整**——在每次迭代中，先用当前的光照估计对RAW图像进行白平衡，并通过相机颜色矩阵转换到伪sRGB空间；然后利用视觉-语言模型（VLM）对白平衡后的图像进行定性的残差颜色偏向评估（预测主导色偏为红、绿或蓝），而非直接回归连续光照值；最后根据评估结果在色度空间中沿相应方向更新光照估计，形成闭环迭代直至收敛。
 
 这一范式的关键洞察在于：**通过在白平衡后的伪sRGB图像上利用VLM的语义先验进行定性颜色评估，使迭代校正能够利用对象内在颜色知识，从而绕过直接RAW回归带来的相机依赖，实现稳健的跨相机泛化**。VLM在预训练过程中习得了丰富的对象颜色先验（如香蕉是黄色的、雪是白色的），这些语义线索为判断当前白平衡结果是否存在残余色偏提供了强有力的依据，而这种依据不依赖于特定相机的传感器特性。
-
-
 
 ## 核心方法与创新机理
 
@@ -107,8 +103,6 @@ VLM-CC 的核心创新在于将颜色恒常性从“单步数值回归”重构�
 ### 创新路径的因果逻辑
 
 上述四个 slot 形成了完整的因果闭环：**sRGB 转换**将问题从相机相关的 RAW 域迁移到语义可理解的色彩空间 → **VLM 语义先验**提供对象内在颜色的稳定参照 → **离散分类输出**匹配 VLM 的定性判断优势，避免数值不稳定性 → **迭代反馈**使每次更新都能利用前一步的校正结果逐步收敛。这一闭环的核心洞察在于：**通过在白平衡后的伪 sRGB 图像上利用 VLM 的语义先验进行定性颜色评估（而非数值回归），使校正过程能够利用对象内在颜色知识，实现稳健的跨相机泛化。**
-
-
 
 ### 问题设定与核心思路
 
@@ -166,13 +160,6 @@ $$\mathcal{L}_{\mathrm{LM}} = -\sum_{t} \log p_{\theta}(y_{t} \mid y_{<t}, I_{\m
 - **中间表示**：每次迭代的伪sRGB图像、VLM提取的颜色先验列表、离散色偏预测标签
 - **输出**：归一化光照方向向量 $\hat{\ell}^{*} \in \mathbb{R}^3$
 - **反馈回路**：光照估计 → 白平衡 → sRGB转换 → VLM评估 → 方向更新 → 下一轮迭代
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2217_https_arxiv_org_abs_2605_19613/figures/001_Figure_1.jpg]]
-*Figure 1: Rather than directly predicting a light color, our method first white-balances the image then later updates the light estimate via semantic feedback. Given a raw image, we white-balance the image with the current estimate and ask a vision-language model to identify the residual color cast. The predicted cast induces a directional update in chromacity space, yielding a refined estimate for the next iteration. Bottom: an example sequence with angular error decreasing from 11.03^$\circ$ to 0.60^$\circ$ ; the rightmost image shows the ground truth*
-
-
 
 ### 3.1 光照模型与问题重定义
 
@@ -236,12 +223,8 @@ $$\mathcal{L}_{\mathrm{LM}} = -\sum_{t} \log p_{\theta}(y_{t} \mid y_{<t}, I_{\m
 
 训练仅更新 LoRA 参数，使用 AdamW 优化器，学习率 $4 \times 10^{-4}$，有效批次大小 512，共 800 步迭代，在单张 NVIDIA H200 GPU 上完成。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2217_https_arxiv_org_abs_2605_19613/figures/003_Figure_3.jpg]]
 *Figure 3: Finetuning pipeline of VLM. Given a raw image, we first apply light-color augmentation in camera color space and convert the results to sRGB. These images are processed by a LoRAfinetuned [36] VLM, using the same color-prior prompting strategy as in the inference pipeline. The model predicts the dominant residual light color (red, green, or blue), supervised by the ground-truth illuminant direction. A standard language modeling loss*
-
-
 
 ## 实验与关键发现
 
@@ -316,8 +299,6 @@ $$\mathcal{L}_{\mathrm{LM}} = -\sum_{t} \log p_{\theta}(y_{t} \mid y_{<t}, I_{\m
 
 VLM‑CC 的核心优势在于将颜色恒常性从“数值回归问题”转化为“语义评估问题”，通过 VLM 的对象颜色先验和离散反馈机制，实现了对相机差异的鲁棒泛化。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2217_https_arxiv_org_abs_2605_19613/figures/004_Figure_4.jpg]]
 *Figure 4: Qualitative example of our iterative correction process. The scene contains large wooden surfaces, which leads CCMNet [41] toward an over-red illuminant estimate. As a result, its white-balanced result appears blue. Our method starts from Gray-World [15] initialization that is also biased by the wood, but iteratively refines the estimate through feedback and converges to*
 
@@ -327,22 +308,8 @@ VLM‑CC 的核心优势在于将颜色恒常性从“数值回归问题”转�
 ![[assets/figures/papers/paper_list_l2217_https_arxiv_org_abs_2605_19613/figures/006_Table_4.jpg]]
 *Table 4: Cross-sensor evaluation on the NUS-8 dataset. Trained on 7 cameras and tested on the last one*
 
-![[assets/figures/papers/paper_list_l2217_https_arxiv_org_abs_2605_19613/figures/007_Table_5.jpg]]
-*Table 5: Three-fold cross-validation on the Gehler-Shi dataset*
-
-![[assets/figures/papers/paper_list_l2217_https_arxiv_org_abs_2605_19613/figures/008_Table_2.jpg]]
-*Table 2: Leave-one-out evaluation on the NUS-8 dataset*
-
-![[assets/figures/papers/paper_list_l2217_https_arxiv_org_abs_2605_19613/figures/009_Table_3.jpg]]
-*Table 3: Leave-one-out evaluation on the Cube+ dataset*
-
-![[assets/figures/papers/paper_list_l2217_https_arxiv_org_abs_2605_19613/figures/010_Table_6.jpg]]
-*Table 6: Camera-agnostic evaluation. All results are in degrees*
-
 ![[assets/figures/papers/paper_list_l2217_https_arxiv_org_abs_2605_19613/figures/011_Table_7.jpg]]
 *Table 7: Comprehensive ablation study in leave-one-out evaluation on Gehler-Shi dataset*
-
-
 
 ## 定位与知识库关联
 
@@ -381,8 +348,6 @@ VLM-CC 的有效性依赖于以下前提条件，这些条件划定了其适用�
 **与物理先验的融合**：当前方法纯粹依赖语义反馈，未利用高光检测、色域映射等物理线索。将语义反馈与物理先验结合，有望处理多光源场景或进一步提升困难样本的校正精度。
 
 **视频与多帧扩展**：该框架的迭代特性天然适合利用时间序列信息——前一帧的收敛估计可作为下一帧的初始化，且多帧语义一致性可提供更强的先验约束。但论文未涉及视频场景的实验验证。
-
-
 
 ## 原文 PDF
 

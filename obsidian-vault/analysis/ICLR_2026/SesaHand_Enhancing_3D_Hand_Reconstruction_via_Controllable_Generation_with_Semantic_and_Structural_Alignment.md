@@ -146,8 +146,6 @@ $$\mathrm{P_f = Composer(P_{pose}, P_{action}, P_{hand.action}, P_{env})}$$
 
 在训练效率上，SesaHand 的训练速度（0.44 s/iter）远快于 AttentionHand（27.25 s/iter）（Table 4），原因在于 SesaHand 的结构融合与注意力增强模块均为轻量级设计，未引入额外的重计算负担。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_sKMgGQQy7g/figures/031_Figure_16.jpg]]
 *Figure 16: Qualitative result on a challenging hand-object interaction (fingering a guitar). The real image is randomly chosen from Pexels. The text prompt is generated using our CoT pipeline and the hand mesh image is rendered by HaMeR*
 
@@ -196,8 +194,6 @@ $$B_{q,k} = \begin{cases} \alpha, & k \in I \\ 0, & \text{otherwise} \end{cases}
 $$\phi_i'(z_t, c_f) = M_{cross} V_i$$
 
 该机制通过简洁的偏置项，使模型在生成过程中对手部区域分配更高的注意力权重，高效突出局部手部特征，而无需引入额外的可学习参数或计算开销。消融实验表明，偏置超参数 $\alpha=2.0$ 时取得最佳 FID（18.63）和 FID-H（17.77）。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_sKMgGQQy7g/figures/014_Figure_10.jpg]]
 *Figure 10: Visualization of attention maps in UNet Decoder early and later blocks with VLMgenerated image caption (top) and human behavior semantics (bottom). VLM-generated caption causes attention deviation towards irrelevant objects in later denoising steps, while human behavior semantics enables more focused attention on human- and hand-related regions*
@@ -264,8 +260,6 @@ Table 4报告了训练速度对比：SesaHand的每迭代训练时间为**0.44�
 3. **对预训练先验的依赖**：生成质量仍受限于底层Stable Diffusion模型的人类知识先验，在极端视角或特殊光照条件下可能退化，论文未对这些场景进行系统验证。
 
 4. **手物交互的语义覆盖**：CoT提取的人类行为语义虽能描述“握持”“弹奏”等动作，但缺乏对接触力、遮挡关系等细粒度物理属性的编码，这可能是接触区域不自然的深层原因。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_sKMgGQQy7g/figures/009_Table_3.jpg]]
 *Table 3: Ablation study of different components. SE, SF, and AE denote semantics extraction, structural fusion, and attention enhancement. HC denotes the hand confidence score*

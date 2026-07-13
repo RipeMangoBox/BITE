@@ -92,8 +92,6 @@ RQI在涵盖7种SOTA SR模型和5个基准的用户研究中表现出色（Table
 
 RQI分数仅在共享同一参考图像时才有意义，无法用于跨内容质量比较；其主要衡量感知质量而非像素级保真度；在极低分辨率数据集上性能略逊于基于大规模预训练LLM的DeQA-Score。未来方向包括：将RQI框架泛化到其他图像恢复任务、设计更原则性的保真度度量、探索MOS差值的非线性建模，以及研究其在扩散模型训练中的应用。
 
-
-
 ### 图像超分辨率评估的感知鸿沟
 
 图像超分辨率（SR）领域在过去十年取得了显著进展，从早期的卷积网络到如今的扩散模型和生成式方法，模型输出的视觉质量持续提升。然而，一个关键问题长期被忽视：**现有的图像质量评价（IQA）指标是否仍能准确区分现代SR模型的感知性能？**
@@ -115,8 +113,6 @@ RQI分数仅在共享同一参考图像时才有意义，无法用于跨内容�
 已有工作尝试解决部分问题。AFINE提出了非对称FR评估，但其训练需要专门收集SR特定的比较数据，成本高昂且泛化性受限。DeQA-Score利用大规模预训练LLM的视觉理解能力，在部分场景下表现优异，但其性能依赖于模型规模和预训练数据，且在低分辨率场景外的优势并不稳定。
 
 本文的核心动机在于：**能否设计一种通用且轻量的评估框架，在不依赖SR特定数据采集的前提下，系统性地弥合SR评估中的感知差距？** 关键洞察是：与其让模型学习“这张图像有多好”的绝对判断，不如让模型学习“这两张图像中哪一个更好”的相对比较——这正是人类感知判断的基本运作方式。
-
-
 
 ## 核心方法与创新机理
 
@@ -151,8 +147,6 @@ Huber损失的核心优势在于：对于较小的预测误差（$\leq \delta$�
 ### 创新定位：轻量、通用、即插即用
 
 RQI并非一个全新的IQA模型，而是一个**训练框架**。它可以应用于任意现有的双输入IQA架构（论文验证了AHIQ、MANIQA、TOPIQ三种架构），仅需移除最后的激活层以允许输出正负值，并改用Huber损失进行相对差异回归。这一“即插即用”的特性使得RQI具有高度通用性——Table 2显示，在三个IQA模型和三个训练集上，RQI框架相比传统FR训练一致提升SRCC，在DRealSR上平均提升达0.146，在Set5&Set14上平均提升达0.138。
-
-
 
 ### 核心思路：从绝对评分到相对比较的范式转换
 
@@ -210,8 +204,6 @@ RQI 框架的设计赋予其三个区别于传统指标的关键性质：
 
 RQI 分数仅在**共享同一参考图像**时才有意义，无法用于不同内容图像之间的跨图像质量比较。此外，RQI 主要衡量感知质量而非像素级保真度，对于纹理精细重建的绝对保真度评估仍有待探索。
 
-
-
 ### 训练数据构造模块
 
 RQI的核心创新在于将SR评估从绝对质量预测转变为相对质量比较任务。传统FR-IQA训练方案仅使用原始参考图像与失真图像构成图像对 $\{I_0, I_i\}$，训练标签为绝对质量分数 $q_i$。RQI则从已有IQA数据集（如Kadid-10K、PIPAL）中，为每个场景构造所有成对失真图像的相对质量标签——即任意两个失真图像 $I_i$ 与 $I_j$（$i \neq j$）均可构成图像对，训练标签为MOS差值 $q_i - q_j$，并可正可负。这一设计使得训练样本数量从 $n$ 对扩展到 $n(n-1)$ 对，覆盖更复杂的质量比较场景，同时允许参考图像本身包含失真，从而在评估时对GT质量不高的情况具有鲁棒性。
@@ -247,12 +239,8 @@ RQI训练方案与传统FR-IQA训练方案存在三个本质差异（Figure 2）
 2. **相对差异**：训练标签为MOS差值而非绝对质量分数；
 3. **密集配对**：任意两个失真图像均可构成训练对，覆盖更复杂的质量比较场景。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l740_https_arxiv_org_abs_2503_13074/figures/002_Figure_1.jpg]]
 *Figure 1: Visual illustration of how SR evaluation challenges current metrics in different aspects. Zoom in for better comparison*
-
-
 
 ## 实验与关键发现
 
@@ -306,11 +294,6 @@ Table 4展示了将RQI作为辅助感知损失（$ \mathcal{L} = \mathcal{L}_{or
 3. **低分辨率场景。** 在Set5&Set14等极低分辨率数据集上，RQI的SRCC略逊于DeQA-Score，可能与输入分辨率限制及大规模预训练差距有关。
 4. **训练数据依赖。** RQI依赖已有IQA数据集中的MOS差值标注，尚未探索在无MOS标注情况下的自适应训练方案。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l740_https_arxiv_org_abs_2503_13074/figures/001_Table_1.jpg]]
-*Table 1: Consistency evaluations of quality metrics with human perception. SRCC, PLCC and winning rate are reported*
-
 ![[assets/figures/papers/paper_list_l740_https_arxiv_org_abs_2503_13074/figures/004_Table_2.jpg]]
 *Table 2: The effectiveness of the proposed RQI framework. We train different IQA models across multiple datasets following the traditional FR-IQA setting and the RQI scheme (with subscript ‘R’). SRCC consistency with user opinions are reported*
 
@@ -320,25 +303,8 @@ Table 4展示了将RQI作为辅助感知损失（$ \mathcal{L} = \mathcal{L}_{or
 ![[assets/figures/papers/paper_list_l740_https_arxiv_org_abs_2503_13074/figures/006_Figure_3.jpg]]
 *Figure 3: We show different cases where existing metrics fail. As a comparison, RQI handles all the cases correctly. All scores are normalized to [0,1] for easier comparisons. Please zoom in for better view*
 
-![[assets/figures/papers/paper_list_l740_https_arxiv_org_abs_2503_13074/figures/007_Figure_4.jpg]]
-*Figure 4: Visual comparison of training advancing SR models with RQI metric as an auxiliary loss. Please zoom in for a better view*
-
-![[assets/figures/papers/paper_list_l740_https_arxiv_org_abs_2503_13074/figures/008_Table_4.jpg]]
-*Table 4: Quantitative comparisons between baseline SR methods, training them using AFINE [9], and using RQI as auxiliary loss*
-
 ![[assets/figures/papers/paper_list_l740_https_arxiv_org_abs_2503_13074/figures/012_Table_5.jpg]]
 *Table 5: Ablation study of the RQI scheme*
-
-![[assets/figures/papers/paper_list_l740_https_arxiv_org_abs_2503_13074/figures/013_Table_6.jpg]]
-*Table 6: SRCCs results for selecting different losses under RQI*
-
-![[assets/figures/papers/paper_list_l740_https_arxiv_org_abs_2503_13074/figures/015_Figure_9.jpg]]
-*Figure 9: NR-IQA metrics PI [5], NIQE [31], Clip-IQA [36] and MANIQA [48] can fail on cases where subtle structure of semantics are changed, due to the lack of proper references*
-
-![[assets/figures/papers/paper_list_l740_https_arxiv_org_abs_2503_13074/figures/016_Figure_10.jpg]]
-*Figure 10: Perception-based FR-IQA metrics LPIPS [58] and DISTS [14] can fail when GT quality is relatively lower. They make contradictory evaluations for models that output perceptually higher results than GTs*
-
-
 
 ## 定位与知识库关联
 
@@ -383,8 +349,6 @@ RQI的设计隐含以下适用边界，使用时需严格注意：
 **扩散模型的适配**：将RQI损失用于扩散模型训练时，是否会对采样多样性或模式覆盖产生影响，目前尚无研究。考虑到扩散模型在SR领域的快速增长，这一问题的解答具有现实紧迫性。
 
 **无MOS标注的自适应训练**：RQI对MOS标注的依赖限制了其在无标注数据上的应用。能否通过自监督或弱监督方式构建相对质量关系，是提升框架通用性的关键方向。
-
-
 
 ## 原文 PDF
 

@@ -50,15 +50,11 @@ claims:
 
 在方法定位上，TTP 区别于 **TTC**（Xing et al., CVPR 2025）的噪声扰动检测和 **R-TPT**（Sheng et al., CVPR 2025）、**TAPT**（Wang et al., CVPR 2025）等统一文本提示调优方法，首次将输入空间的填充操作同时用于对抗检测与对抗适配。实验表明，TTP 在 8 个细粒度分类数据集上，以 ViT-B/32 为骨干网络时平均对抗准确率达 39.7%，较 R-TPT 提升 4.4%；在 ViT-L/14 上进一步提升至 51.6%。其检测准确率在所有设置下均显著优于 TTC，接近 100%。
 
-
-
 视觉-语言基础模型（以 CLIP 为代表）在零样本分类等任务上展现出强大的泛化能力，但其对对抗扰动的极端脆弱性已成为其安全部署的核心瓶颈。在测试时，微小的、人眼不可察觉的像素扰动即可导致 CLIP 产生完全错误的预测，这严重限制了其在安全敏感场景中的实际应用。
 
 为应对这一挑战，研究者已提出多种测试时防御策略。**TPT** 及其变体通过测试时提示调优（test-time prompt tuning）来适应输入分布，但这类方法对所有输入进行统一适配，缺乏对抗样本检测机制。**TTC**（Xing et al., CVPR 2025）引入了两阶段检测与对抗策略，但其检测准确率在不同数据集和模型架构上波动较大，可靠性不足。**R-TPT**（Sheng et al., CVPR 2025）和 **TAPT**（Wang et al., CVPR 2025）同样采用统一适配范式，在提升对抗鲁棒性的同时不可避免地牺牲了干净样本的准确率。这种“干净-鲁棒”的折中困境源于一个根本性的缺陷：现有方法无法精确区分干净样本与对抗样本，因而无法对二者实施差异化处理。
 
 本文的核心动机正是打破这一困境。其关键洞察在于：**图像空间填充操作能够部分恢复因对抗扰动而破坏的注意力模式**，进而使原始嵌入与填充后嵌入之间的余弦相似度在干净样本和对抗样本上呈现显著差异——干净样本的填充前后特征变化极小，而对抗样本则产生大幅偏移。这一现象为构建通用、可靠的对抗检测信号提供了可能，也为后续的差异化鲁棒适配奠定了基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -88,8 +84,6 @@ R-TPT 和 TAPT 等 baseline 方法通过调整文本提示（prompt tuning）来
 
 上述三个槽位并非孤立设计，而是形成了因果闭环：**填充诱导的相似度漂移**同时支撑了检测（区分干净与对抗）和集成（评估增强视图质量）两个模块；**可训练填充**仅在检测模块判定为对抗样本时激活，避免了干净样本上的无效计算；**相似度感知集成**则进一步放大了可训练填充的恢复效果。三者协同使得 TTP 在 8 个细粒度分类数据集上，以 ViT-B/32 为骨干网络时，达到 39.7% 的平均对抗准确率，相较 R-TPT 提升 4.4 个百分点，同时完整保持了干净样本的分类准确率（见 Table 1）。
 
-
-
 TTP 的整体 pipeline 遵循“检测—适配—集成”的三阶段范式，所有操作均在测试时完成，无需修改预训练的 CLIP 模型参数。其核心设计动机源于一个关键观察：空间填充操作能够部分恢复因对抗扰动而破坏的注意力模式，使得干净样本与对抗样本在填充前后的特征嵌入余弦相似度上呈现显著差异——干净样本填充后特征变化极小，而对抗样本则产生明显偏移。基于这一因果机制，TTP 将对抗防御拆解为三个松耦合模块，按条件执行，从而在保持干净样本零精度损失的前提下，大幅提升对抗鲁棒性。
 
 ### Pipeline 总览
@@ -115,13 +109,6 @@ $$p_{\mathrm{final}} = \arg\max_c \sum_{i \in B} w_i \, p_c(P_\theta(x_i))$$
 ### 模块间的条件依赖与解耦优势
 
 三个模块之间存在明确的条件依赖关系：检测模块的输出决定了后续模块是否激活。这种解耦设计带来两个关键优势：其一，干净样本完全绕过适配流程，保证了原始 CLIP 的零样本精度不受任何折损（Table 6 显示 TTP 在各骨干网络上保持了最优的干净准确率）；其二，检测器本身具有跨架构、跨数据集的通用性——实验表明，TTP 在 ViT-B/32、ViT-B/16、ViT-L/14 三种骨干及多个细粒度数据集上均达到了接近 100% 的检测准确率（Figure 2），而同期检测方法 **TTC**（Xing et al., CVPR 2025）的检测准确率则在不同设置下波动较大且整体偏低。此外，TTP 的检测模块可无缝嵌入任何现有的测试时适配方法中，为其提供对抗样本感知能力，进一步扩展了框架的适用范围。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l795_https_arxiv_org_abs_2512_16523/figures/003_Figure_3.jpg]]
-*Figure 3: Overview of the proposed Test-Time Padding (TTP) pipeline. Given an input sample, CLIP image encoder features are extracted before and after applying padding. Their cosine similarity difference is compared with a universal threshold to distinguish clean versus adversarial inputs. Clean samples are directly recognized without adaptation. For adversarial examples, trainable test-time padding is activated to optimize padding parameters by entropy minimization using augmented views with low entropy. A similarityaware ensemble then aggregates predictions across selected high-confidence views, ensuring a more reliable final prediction. Together, TTP enables accurate adversarial detection and adap...*
-
-
 
 ### 3.1 问题形式化与 CLIP 零样本分类
 
@@ -185,12 +172,8 @@ $$p_{\mathrm{final}} = \arg\max_c \sum_{i \in B} w_i \, p_c(P_\theta(x_i))$$
 
 该策略使与对抗样本填充嵌入高度相似（$\alpha_i$ 大）且与原始对抗嵌入差异明显（$\beta_i$ 小）的视图获得更高权重，有效抑制了对抗噪声对集成结果的干扰。消融实验证实，移除相似度感知集成或可训练填充均导致对抗准确率显著下降。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l795_https_arxiv_org_abs_2512_16523/figures/001_Figure_1.jpg]]
 *Figure 1: Visualization of attention maps for clean sample, adversarially perturbed sample, randomly padded sample, and samples processed with trainable test-time padding. The adversarial attack causes a noticeable shift in attention, leading to incorrect predictions. Applying random padding helps restore the original attention focus, while trainable padding further refines the attention to the correct regions and suppresses noise, resulting in more accurate predictions*
-
-
 
 ## 实验与关键发现
 
@@ -218,15 +201,9 @@ TTP 在 8 个细粒度分类数据集（Caltech101、Pets、Cars、Flower102、A
 
 TTP 的鲁棒性不局限于 PGD 攻击。在 CW、DeepFool 和 FGSM 三种不同范式的攻击下，TTP 在 Flower102 和 DTD 两个数据集上均取得最高的对抗准确率（Table 5）。具体而言，Flower102 上三种攻击的平均对抗准确率为 **54.1%**，DTD 上为 **38.7%**，均显著优于对比方法。这表明填充操作所恢复的注意力模式具有攻击类型无关的特性，而非针对特定梯度方向的过拟合。
 
-![[assets/figures/papers/paper_list_l795_https_arxiv_org_abs_2512_16523/figures/008_Table_5.jpg]]
-*Table 5: Adversarial accuracies (%) under CW, DeepFool (DF), and FGSM attacks on two fine-grained datasets. TTP achieves more robust performance. The best results of robustness are bolded*
-
 ### 检测性能分析
 
 TTP 的核心创新在于通过固定填充前后的嵌入余弦相似度漂移实现对抗样本检测。实验表明，该检测器在 ViT-B/32、ViT-B/16、ViT-L/14 三种骨干下，跨 8 个数据集均达到**接近 100% 的检测准确率**（Figure 2）。相比之下，**TTC** 的检测准确率在不同数据集和骨干间波动剧烈且整体偏低。
-
-![[assets/figures/papers/paper_list_l795_https_arxiv_org_abs_2512_16523/figures/002_Figure_2.jpg]]
-*Figure 2: Detection accuracy of TTP (ours) and TTC [46] across fine-grained classification datasets under three CLIP backbones (ViT-B/32, ViT-B/16, and ViT-L/14). All experiments are performed under the same attack strength of*
 
 检测机理的定量支撑来自填充前后的余弦相似度统计：干净样本的填充前后嵌入高度一致，而对抗样本因注意力模式被破坏，填充后嵌入发生显著偏移（Figure 4a）。这种差异在填充尺寸为 20–30 像素时最为显著，对应的检测准确率达到峰值（Figure 4b），同时对抗准确率也在该区间达到最优（Figure 4c），验证了检测与适配之间的协同关系。
 
@@ -249,16 +226,6 @@ TTP 的检测模块可以作为即插即用的前置组件，与任意测试时�
 ### 失败模式与局限性
 
 当前分析中未提供 TTP 在更强攻击（如 AutoAttack、多步自适应攻击）或更大扰动幅度下的性能数据，其在极端对抗场景下的检测可靠性需要进一步验证。此外，可训练填充的单步熵最小化依赖于高置信度视图的筛选，当对抗样本使模型对所有增强视图都产生低置信度时，优化信号可能不足，这一点在现有实验中尚未充分讨论，需要手动验证。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l795_https_arxiv_org_abs_2512_16523/figures/010_Figure.jpg]]
-*Figure: (a) Average cosine similarity. (b) Detection accuracy. (c) Adversarial Accuracy (Rob.) on DTD dataset*
-
-![[assets/figures/papers/paper_list_l795_https_arxiv_org_abs_2512_16523/figures/011_Figure_4.jpg]]
-*Figure 4: Impact of padding size on adversarial detection and robust adaptation. ViT-B/32 is used as the CLIP backbone. The figure comprises three subplots: (a) average cosine similarities on fine-grained classification datasets of CLIP embeddings before and after padding across varying padding sizes, (b) detection accuracy for both adversarial and clean inputs, and (c) adversarial accuracy on the DTD dataset*
-
-
 
 ## 定位与知识库关联
 
@@ -310,8 +277,6 @@ TTP 在 PGD 攻击（100 步迭代，$\epsilon = 4/255$）之外，对 CW、Deep
 3. **计算开销的量化**：TTP 对检测为对抗的样本进行单步优化和集成推理，其相对于统一适配方法（如 R-TPT）的实际推理延迟增加量，原文未提供详细的耗时对比数据。
 
 4. **非 CLIP 架构的迁移性**：TTP 的所有实验均基于 CLIP 视觉-语言模型，其在纯视觉模型（如标准 ViT、ResNet）上的检测与适配效果尚未验证，填充操作对注意力恢复的因果机制是否依赖于 CLIP 的跨模态训练范式仍是开放问题。
-
-
 
 ## 原文 PDF
 

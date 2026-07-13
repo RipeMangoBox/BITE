@@ -50,8 +50,6 @@ claims:
 
 为此，本文提出 **Prism（Proximal regulatory integration of signals for mRNA expression levels prediction）**，通过学习多个背景染色质状态的权重向量，并执行后门调整（因果干预）以消除背景信号的混杂效应。Prism 仅需 2k 输入序列即可在 K562 和 GM12878 两个细胞系上全面超越 SOTA 方法 Seq2Exp-soft（MSE 降低 0.0067，Pearson 提升 0.0065），而参数仅增加 11K（Table 1, Table 3）。
 
-
-
 ### 基因表达调控与多模态表观遗传信号
 
 基因表达受染色质状态和三维基因组折叠的精密调控。远端的增强子通过染色质环化与启动子形成空间邻近，从而激活转录（Figure 1a）。这种长程调控机制意味着，仅依赖DNA序列本身不足以准确预测基因表达水平。细胞类型特异性的表观遗传信号——如DNase‑seq、Hi‑C、H3K27ac等——提供了关键的调控信息（Figure 1c），将它们整合到预测模型中成为自然的选择。
@@ -71,8 +69,6 @@ claims:
 上述现象可通过结构因果模型（SCM，Figure 3）来理解：背景染色质状态 $C$ 作为**混杂因子**，同时影响表观遗传特征 $H$ 和基因表达 $Y$。简单拼接信号使模型学习到 $H$ 与 $Y$ 之间的混杂关联，而非真正的因果效应。现有长序列建模方法（如状态空间模型）因固定隐状态和近因偏差，非但无法解决这一混杂问题，反而随序列增长引入更多噪声，导致性能退化。
 
 因此，核心挑战不在于“扩展序列长度以捕获更多信号”，而在于**有效解耦前景信号与背景信号的混杂效应**。这要求模型能够识别并消除背景染色质状态的干扰，使预测仅依赖于具有因果调控作用的前景特征。
-
-
 
 ## 核心方法与创新机理
 
@@ -126,8 +122,6 @@ $$\mathcal{L}_3 = \log \left( \sum_{i,j} \exp ( 2t \cdot \tilde{a}_{i}^{T} \tild
 
 这一框架的核心洞察在于：**通过学习多个背景染色质状态的权重向量并执行因果干预，模型仅依赖短序列和近端信号就能精确预测基因表达**，从根本上绕过了长序列建模的技术瓶颈。
 
-
-
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_wwPSfcf5Pj/figures/004_Figure_4.jpg]]
 *Figure 4: Architecture of Prism. Epigenomic signals S are processed by two encoders: a signal encoder gθ extracts high-dimension epigenomic features H, while a confounder encoder $g _ { \omega }$ learns n distinct weights representing the confounder C. A final predictor $h _ { \phi }$ uses these weighted features along with the DNA sequence X to make a prediction
 
@@ -172,8 +166,6 @@ $$\mathcal{L} = \mathcal{L}_1 + \alpha \mathcal{L}_2 + \beta \mathcal{L}_3$$
 - **轻量化**：混杂因子编码器 $g_\omega$ 设计极为轻量，Prism 相比 Seq2Exp-soft 仅增加约 11K 参数（Table 3），却实现了全面的性能超越。
 - **短序列高效**：整个 pipeline 仅需 2k bp 输入即可达到 SOTA，从根本上规避了长序列建模中的隐状态固化和近因偏差问题。
 - **端到端可学习**：背景权重向量 $A$ 并非预设的离散状态，而是通过训练数据端到端学习得到，使模型能自适应地发现数据中的背景染色质模式。
-
-
 
 ### 3.1 标准预测框架
 
@@ -225,8 +217,6 @@ $$\mathcal{L} = \mathcal{L}_{1} + \alpha \mathcal{L}_{2} + \beta \mathcal{L}_{3}
 
 其中 $\alpha$ 控制干预正则化的强度（消融实验表明 $\alpha = 1.0$ 最优，$\alpha = 0$ 时性能显著下降），$\beta$ 控制多样性约束的强度（在合理范围内表现鲁棒）。所有模块——信号编码器 $g_\theta$、混杂因子编码器 $g_\omega$ 和预测器 $h_\phi$——通过该联合损失端到端训练。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：短序列 + 因果干预 = SOTA
@@ -271,29 +261,8 @@ Prism 学习到的混杂权重向量并非简单的特征丢弃。实验表明�
 
 所有基线结果直接引用 Seq2Exp（Su et al., 2025），在相同数据划分和五个随机种子（{2, 22, 222, 2222, 22222}）上运行五轮取平均，确保比较的公平性。评估指标涵盖 MSE、MAE 和 Pearson 相关系数，训练细节（如 smooth L1 损失、基于验证集 MSE 选择最佳模型）与 Seq2Exp 保持一致。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_wwPSfcf5Pj/figures/006_Table.jpg]]
-*Table: (a) Sensitivity on n*
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_wwPSfcf5Pj/figures/009_Table_4.jpg]]
-*Table 4: Performance of Seq2Exp (Su et al., 2025) when testing with shortened input sequences on the K562 cell line*
-
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_wwPSfcf5Pj/figures/010_Table_5.jpg]]
 *Table 5: Performance comparison with varying input lengths (left: Seq2Exp (Su et al., 2025), right: Caduceus (Schiff et al., 2024))*
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_wwPSfcf5Pj/figures/011_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_wwPSfcf5Pj/figures/012_Table_6.jpg]]
-*Table 6: Caduceus performance with different epigenomic signal configurations*
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_wwPSfcf5Pj/figures/014_Table_8.jpg]]
-*Table 8: Statistical Summary of Hi-C Long-Range Interactions in K562 and GM12878 Cell Lines*
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_wwPSfcf5Pj/figures/016_Table_9.jpg]]
-*Table 9: Hyperparameter values following Seq2Exp (Su et al., 2025)*
-
-
 
 ## 定位与知识库关联
 
@@ -334,8 +303,6 @@ Prism 的适用边界由以下条件限定：
 2. **ChIA-PET 的负向贡献。** 为什么 ChIA-PET 作为功能性远程交互数据反而降低了预测性能？这暗示并非所有远程交互信号都具有因果调控意义，部分可能本身就是混杂因子。
 3. **长序列预训练的潜力上限。** 长上下文预训练是否有可能使长序列模型超越短序列模型，还是只能减轻退化？Table 10 的证据倾向于后者，但更大规模的预训练实验可能改变这一结论。
 4. **因果干预框架的跨任务推广。** Prism 的因果干预框架能否推广到其他多模态生物学预测任务？其核心假设——背景信号作为混杂因子同时影响特征和标签——在蛋白质表达预测、药物响应预测等任务中是否同样成立？
-
-
 
 ## 原文 PDF
 

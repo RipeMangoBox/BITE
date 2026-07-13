@@ -51,8 +51,6 @@ SHARP 针对这一问题提出了一个端到端的前馈网络，从单张照�
 
 在六个数据集上的实验表明，SHARP 相比此前最优的扩散模型 **Gen3C** (Ren et al., 2025)，将 LPIPS 降低了 25–34%，DISTS 降低了 21–43%，同时合成时间不到一秒，渲染速度超过每秒 100 帧，在效率与保真度之间建立了新的权衡前沿。
 
-
-
 单目视角合成（Novel View Synthesis, NVS）旨在从单张输入图像生成场景在新相机姿态下的逼真渲染图。这一任务在增强现实、虚拟现实、3D内容创作等领域具有广泛应用前景，但其核心挑战在于从单一2D观测中恢复完整的3D场景表示——这是一个本质上欠约束的逆问题。
 
 ### 现有方法及其局限
@@ -80,8 +78,6 @@ SHARP 针对这一问题提出了一个端到端的前馈网络，从单张照�
 3. **如何配置损失函数**，使其既能有效约束3D几何（抑制浮点、退化高斯等伪影），又能通过感知损失鼓励清晰的纹理修复？
 
 通过解决这些问题，SHARP旨在实现一个在速度-质量帕累托前沿上显著超越现有方法的单目视角合成系统（见图1）。
-
-
 
 ## 核心方法与创新机理
 
@@ -118,12 +114,7 @@ $$\mathcal{L}_{\mathrm{percep}} = \sum_{l=1}^{4} \lambda_{l}^{\mathrm{feat}} \cd
 
 这些创新协同作用，使SHARP在亚秒级推理时间内实现了25–34%的LPIPS降低和21–43%的DISTS降低（相对于此前最优方法**Gen3C**，Ren et al., 2025），同时在相机基线小于0.5米的近距视角合成中保持一致的领先优势。
 
-
-
 SHARP 采用端到端可训练的前馈网络，从单张图像直接回归 3D 高斯表示，整体流程在标准 GPU 上亚秒级完成。网络由四个可学习模块组成（见 Figure 3），输入为单张 RGB 图像 $\mathbf{I} \in \mathbb{R}^{C \times H \times W}$，输出为一组 3D 高斯 $\mathbf{G} \in \mathbb{R}^{K \times N}$，其中 $K=14$ 为每个高斯球的属性数（位置 3 维、尺度 3 维、旋转 4 维、颜色 3 维、不透明度 1 维）。
-
-![[assets/figures/papers/paper_list_l47_https_openreview_net_forum_id_yx3g4sF70y/figures/003_Figure_3.jpg]]
-*Figure 3: Our model consists of four learnable modules (Section 3.1): a pretrained encoder for feature extraction, a depth decoder that produces two distinct depth layers, a depth adjustment module, and a Gaussian decoder that refines all Gaussian attributes. The differentiable Gaussian initializer and composer assemble the Gaussians for the resulting 3D representation. The predicted Gaussians are rendered to the input and novel views for loss computation (Section 3.4)*
 
 ### 模块化流水线
 
@@ -153,8 +144,6 @@ SHARP 采用端到端可训练的前馈网络，从单张图像直接回归 3D �
 - **正则化项**：包括总变分（TV）、浮子抑制、高斯偏移量约束、尺度正则化等，虽然对定量指标提升不大，但改善了渲染质量并提升了渲染速度（减少退化高斯）。
 
 消融实验（Table 8, Table 10）表明，感知损失（特别是 Gram 矩阵分量）对图像清晰度提升最为显著；深度调整模块（Table 11）和解冻深度骨干（Table 13）均一致地改善了 DISTS/LPIPS 指标，验证了消除深度歧义对视角合成质量的重要性。
-
-
 
 SHARP 的整体架构由四个可学习的核心模块组成（Figure 3），其设计目标是从单张图像直接回归出高分辨率 3D 高斯表示，并通过端到端训练优化视角合成保真度。
 
@@ -205,19 +194,6 @@ $$\mathcal{L}_{\mathrm{percep}} = \sum_{l=1}^{4} \lambda_{l}^{\mathrm{feat}} \cd
 **深度损失** 在预测深度与真实深度之间施加约束，减少几何变形。
 
 **正则化项** 包括总变分正则化、浮子抑制损失、高斯偏移量约束等，虽然对定量指标提升不大，但可减少退化高斯数量并提升渲染速度（Table 9）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l47_https_openreview_net_forum_id_yx3g4sF70y/figures/008_Figure_5.jpg]]
-*Figure 5: Ambiguity in depth estimation. We demonstrate the inherent ambiguity in monocular depth estimation by (a) taking an original image, (b) predicting its depth using Depth Pro, (c) horizontally flipping the image, applying Depth Pro, and flipping the result back, and (d) computing the relative absolute error between the two predictions to generate an uncertainty map. Higher values (brighter regions) indicate greater inconsistency between predictions*
-
-![[assets/figures/papers/paper_list_l47_https_openreview_net_forum_id_yx3g4sF70y/figures/025_Figure_10.jpg]]
-*Figure 10: The effect of learned depth adjustment*
-
-![[assets/figures/papers/paper_list_l47_https_openreview_net_forum_id_yx3g4sF70y/figures/027_Figure_12.jpg]]
-*Figure 12: The effect of unfreezing the monodepth backbone*
-
-
 
 ## 实验与关键发现
 
@@ -282,9 +258,6 @@ Table 13 和 Figure 12 显示，解冻单目深度骨干网络（低分辨率图
 
 Table 14 和 Figure 13 表明，增加输出高斯的数量（如从 192×192 到 768×768）持续提升性能，说明细粒度 3D 表示对高保真渲染的重要性。
 
-![[assets/figures/papers/paper_list_l47_https_openreview_net_forum_id_yx3g4sF70y/figures/028_Figure_13.jpg]]
-*Figure 13: The effect of the number of output Gaussians*
-
 #### 自监督精调
 
 Table 12 和 Figure 11 显示，自监督精调（SSFT）在定量指标上未产生一致提升，但在定性研究中有所帮助，表明其在特定场景下可能改善视觉质量。
@@ -297,9 +270,6 @@ Table 7 和 Figure 14 展示了使用真实深度作为特权信息时的结果�
 
 Figure 8 展示了典型失败案例：
 
-![[assets/figures/papers/paper_list_l47_https_openreview_net_forum_id_yx3g4sF70y/figures/023_Figure_8.jpg]]
-*Figure 8: Depth failures in challenging edge cases*
-
 1. **强景深场景**（如微距照片）：深度模型无法正确估计大幅离焦区域的几何结构。
 2. **复杂反射和透明表面**：单目深度估计的固有歧义导致错误的 3D 几何，产生不可修复的失真。
 3. **重复纹理或星空纹理**：深度模型可能将夜空纹理误解为曲面，造成严重几何伪影。
@@ -310,8 +280,6 @@ Figure 8 展示了典型失败案例：
 ### 数据质量公平性验证
 
 Table 4 展示了在内部合成数据上重新训练 **Flash3D**（Szymanowicz et al., 2025a）的结果，证明训练数据质量并非 SHARP 性能优势的主导因素，核心增益来自架构设计和损失配置。
-
-
 
 ## 定位与知识库关联
 
@@ -356,8 +324,6 @@ SHARP 的设计和训练针对的是**近距离相机运动**场景。运动范�
 3. **多视角扩展。** 是否可以将方法扩展到多视角或视频输入，以利用多帧信息提升几何一致性。
 
 4. **视角依赖效果的建模。** 如何系统性地处理视角依赖效果和体积渲染，以进一步提升画质。
-
-
 
 ## 原文 PDF
 

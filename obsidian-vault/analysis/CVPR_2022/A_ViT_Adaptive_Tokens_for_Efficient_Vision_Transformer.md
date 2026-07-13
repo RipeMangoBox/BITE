@@ -261,8 +261,6 @@ A-ViT 在 ImageNet-1K 上以几乎可忽略的精度代价换取了显著的吞�
 - **硬件适配限制**：动态 token 移除带来的理论 FLOPs 降低在实际硬件上的加速效果可能受限于稀疏计算的支持程度，部分平台上实际加速比可能低于理论值。
 - **停止机制刚性**：方法基于固定的停止分数阈值（$1-\epsilon$）和单一嵌入维度（$e=0$），未来可探索更灵活的停止准则或自适应维度选择。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2112_07658/figures/008_Table.jpg]]
 
 ![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2112_07658/figures/009_Table.jpg]]

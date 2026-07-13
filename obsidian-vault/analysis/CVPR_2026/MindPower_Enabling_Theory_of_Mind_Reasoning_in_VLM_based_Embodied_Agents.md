@@ -57,8 +57,6 @@ MindPower的核心贡献包括：
 
 **方法定位**：MindPower属于具身智能体认知架构与VLM推理增强的交叉领域。其BDI形式化可追溯至经典认知科学，但将其与多模态VLM和强化学习结合，构建可评估、可优化的ToM推理管道，是本文的方法学创新。与现有ToM基准（如MuMA-ToM、TOMATE等）仅关注人类角色心理状态的多选题评估不同，MindPower首次引入机器人中心视角和Level-3决策与行动层评估，填补了从心理推理到具身执行之间的空白。
 
-
-
 ### 具身智能中的心理理论推理缺口
 
 在真实世界的人机协作场景中，具身智能体（embodied agents）不仅需要理解物理环境，还必须理解人类伙伴的心理状态——例如信念、欲望和意图——才能做出恰当、连贯的决策与行动。这种能力在认知科学中被称为**心理理论**（Theory of Mind, ToM）。然而，当前基于视觉-语言模型（VLM）的具身智能体普遍缺乏显式的ToM推理能力，无法从机器人自身的视角同时推理自己和他人的心理状态，导致其决策与动作生成缺乏连贯性和情境适应性。
@@ -78,8 +76,6 @@ MindPower的核心贡献包括：
 3. **Mind-Reward优化框架**：通过强化学习奖励信号，显式约束中间推理状态与最终动作的一致性，确保推理与行为对齐。
 
 通过这些设计，MindPower首次实现了从多模态感知到机器人中心辅助动作的端到端连贯推理，为具身智能体的社交认知能力提供了可量化、可优化的基准与方法。
-
-
 
 ## 核心方法与创新机理
 
@@ -120,16 +116,11 @@ $$R _ { \mathrm { M i n d } } = \alpha _ { 1 } R _ { \mathrm { a t o m i c } } +
 
 MindPower 采用**两阶段训练**策略，将监督微调与强化学习有机结合。第一阶段通过 SFT 使模型掌握 MindPower 推理层次的基本格式和推理逻辑；第二阶段利用 GRPO 结合 Mind-Reward 和 Format-Reward 进行策略优化，显式约束心理状态与行动的一致性。这种范式使模型在 MindPower Benchmark 上超越 GPT-4o：决策精度提升 12.77%，动作生成精度提升 12.49%，动作成功率（SR）从基座模型 Qwen2.5-VL-7B-Instruct 的 0.29 提升至 11.75。
 
-
-
 MindPower 构建了一个以机器人为中心（Robot-Centric）的心理理论推理与具身行动框架，其核心目标是将视觉-语言模型（VLM）从被动的感知与问答提升为能够自主推理自身与他人心理状态并据此生成连贯动作的具身智能体。该框架围绕三个关键设计展开：**MindPower 推理层次**（MindPower Reasoning Hierarchy）、**Mind-Reward 一致性优化**，以及**两阶段训练范式**。
 
 ### 推理层次：从感知到行动的六层结构
 
 MindPower 推理层次是整个框架的认知骨架，它将心理理论（ToM）形式化为三层六步的递进结构（见 Figure 2），实现了从多模态输入到可执行动作的端到端推理链：
-
-![[assets/figures/papers/paper_list_l2404_https_arxiv_org_abs_2511_23055/figures/002_Figure_2.jpg]]
-*Figure 2: MindPower Reasoning Hierarchy. The agent first receives multimodal input, then performs mental reasoning to form beliefs, desires, and intentions, and finally makes decisions and generate action plan based on this reasoning*
 
 - **Level-1 感知层（`<Perception>`）**：智能体从多模态输入（视频帧与环境状态）中感知场景中的物体、事件和人类行为，形成对当前情境的客观描述。
 - **Level-2 心理推理层**：这是框架的认知核心，包含三个子层：
@@ -142,15 +133,9 @@ MindPower 推理层次是整个框架的认知骨架，它将心理理论（ToM�
 
 这一层次结构的关键创新在于其**机器人中心视角**（Robot-Centric Perspective）。现有 ToM 基准测试（如 MuMA-ToM）仅要求模型从第三方视角推理视频中人类角色的心理状态，而 MindPower 要求智能体同时推理**自身**和**人类**的信念、欲望与意图，并将这些心理状态直接桥接到自身的决策与行动生成。Figure 3 清晰展示了这一差异：现有基准仅覆盖视频的前两个阶段（物品被移动、人类离开），而 MindPower 新增了第三阶段（人类返回寻找物品），并要求智能体基于对双方心理状态的完整推理来规划辅助行为。
 
-![[assets/figures/papers/paper_list_l2404_https_arxiv_org_abs_2511_23055/figures/010_Figure_8.jpg]]
-*Figure 8: Full Version of Fig. 3 in Manuscript*
-
 ### 优化机制：Mind-Reward 一致性约束
 
 单纯的监督微调（SFT）无法保证推理链中各层之间以及推理与最终行动之间的一致性。为此，MindPower 引入了 **Mind-Reward** 强化优化框架（见 Figure 5），从三个维度显式约束推理质量：
-
-![[assets/figures/papers/paper_list_l2404_https_arxiv_org_abs_2511_23055/figures/006_Figure_5.jpg]]
-*Figure 5: Reward Formulation. The overall reward integrates both the Mind-Reward and the Format-Reward components*
 
 - **原子准确性（Atomic Accuracy）**：通过 ROUGE-1 衡量每个原子动作与真值的匹配度。
 - **局部一致性（Local Consistency）**：通过 ROUGE-2 评估相邻动作对之间的连贯性。
@@ -192,13 +177,6 @@ MindPower 采用两阶段训练流程：
 4. **评估**：在感知层和心理推理层使用 BERTScore 和 Sentence Transformer 评分，在决策层使用语义相似度，在动作层使用成功率（SR）和动作正确率（AC）指标，同时引入 **BPC（BDI and Perspective Consistency）** 评分和人工评估作为参照。
 
 这一框架的核心洞察在于：将心理理论形式化为 BDI 认知结构，并将其与具身智能体的感知、决策和行动无缝衔接，通过显式的推理层次和一致性奖励强化学习，首次实现了从多模态感知到机器人中心辅助动作的端到端连贯推理。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2404_https_arxiv_org_abs_2511_23055/figures/022_Figure_14.jpg]]
-*Figure 14: Illustration of the Environment from Different Perspectives*
-
-
 
 ### MindPower 推理层次：三层六步的认知流水线
 
@@ -266,15 +244,11 @@ $$\mathrm{AC} = \left\lfloor {\frac{|A^{*} \cap {\hat{A}}|}{|{\hat{A}}|}} \right
 
 衡量生成的动作序列 $\hat{A}$ 与真值 $A^{*}$ 中匹配的原子动作比例，直接反映动作生成的精确度。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2404_https_arxiv_org_abs_2511_23055/figures/005_Figure_4.jpg]]
 *Figure 4: Experiments on MindPower Benchmark*
 
 ![[assets/figures/papers/paper_list_l2404_https_arxiv_org_abs_2511_23055/figures/009_Figure_7.jpg]]
 *Figure 7: Story Construction Pipeline for False-Belief Correction Task*
-
-
 
 ## 实验与关键发现
 
@@ -312,18 +286,8 @@ Figure 10 的雷达图从人类基线视角提供了参照：在错误信念纠�
 
 数据集按 8:2 随机划分为训练集和测试集，所有模型在相同测试分割上评估。闭源模型（GPT-4o、Gemini-2.5 Pro/Flash）采用平均采样 64 帧作为输入，开源模型分别测试了平均帧输入和直接视频输入两种模式。评估指标覆盖四个层次：感知层与心理推理层使用 BERTScore 和 Sentence Transformer 语义相似度；决策层额外引入 BDI 与视角一致性（BPC）评分（0-10 分）；动作层使用成功率（SR）和动作正确率（AC）两个公式化指标。人工评估作为参照基线，确保了自动化指标的可解释性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2404_https_arxiv_org_abs_2511_23055/figures/004_Table_1.jpg]]
-*Table 1: Comparison of Theory-of-Mind (ToM) Benchmarks. “MCQ” denotes Multiple Choice Question. “Level-3 Ability” indicates whether each dataset involves False-Belief Correction, Implicit Goal Inference & Completion, and Decision Making and Action level*
-
 ![[assets/figures/papers/paper_list_l2404_https_arxiv_org_abs_2511_23055/figures/008_Figure_6.jpg]]
 *Figure 6: Qualitative Evaluation. We compare our model with GPT-4o and Qwen2.5-VL-7B-Instruct. Although GPT-4o outputs the correct format, it incorrectly infers that the human intends to open the refrigerator. In contrast, Qwen2.5-VL-7B-Instruct fails to follow the required format and also produces incorrect mental reasoning. Detailed outputs are provided in Sec. D of the Supplementary Material*
-
-![[assets/figures/papers/paper_list_l2404_https_arxiv_org_abs_2511_23055/figures/003_Figure_3.jpg]]
-*Figure 3: Robot-Centric MindPower Reasoning Hierarchy. Existing benchmarks, such as MuMA-ToM, include only Stage 1 and Stage 2 of the video, and focus solely on inferring the mental reasoning of the human (Alice) in the input video. Our dataset additionally includes Stage 3, where Alice returns to search for the item. Moreover, in Level-2 (Mental Reasoning) of MindPower, we infer the mental reasoning of both the embodied agent and the human, whereas existing ToM Benchmarks only infer the role’s mental state through multiple-choice questions. Detailed example is provided in Sec. B of the Supplementary Material*
-
-
 
 ## 定位与知识库关联
 
@@ -371,8 +335,6 @@ MindPower 的定位是填补“从心理推理到具身行动”的空白。其�
 3. **隐式心理状态建模**：未来是否可以开发基于当前显式层次结构的隐式建模方法，在缩短推理长度的同时保持可解释性？这将直接回应推理效率的局限。
 
 此外，从方法谱系角度看，MindPower 的 Mind-Reward 框架与 **Visual-RFT**（Liu et al., 2024）和 **DeepSeek-Math**（Shao et al., 2024）的 GRPO 训练范式存在继承关系，但其将强化奖励显式分解为原子准确性、局部一致性和全局一致性的设计，为“推理一致性驱动强化学习”提供了可复用的模板。后续工作可探索将 Mind-Reward 的分解思想推广到其他需要结构化推理与行动对齐的具身任务中。
-
-
 
 ## 原文 PDF
 

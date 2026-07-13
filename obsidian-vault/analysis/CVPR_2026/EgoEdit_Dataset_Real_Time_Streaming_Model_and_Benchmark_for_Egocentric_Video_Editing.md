@@ -130,8 +130,6 @@ $$\mathcal{L}_{\mathrm{RF}} = \mathbb{E}_{t \sim p_t, \mathbf{X}_1 \sim p_d, \ma
 
 各模块间的依赖关系清晰：EgoEditData 策展管线为基座模型训练提供域匹配监督信号；通道级条件注入架构保证了编辑质量与计算效率的平衡；双向 DMD 蒸馏在保持编辑质量的前提下大幅压缩推理步数；自强制训练则赋予模型流式自回归生成能力，最终使整个系统从数据、模型到推理形成闭环，弥合了 egocentric 视频编辑的域差距与实时性双重瓶颈。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2675_https_openaccess_thecvf_com_content_CVPR2026_html_Li_EgoEdit_Dataset_Rea/figures/004_Figure_4.jpg]]
 *Figure 4: Architecture of EgoEdit. EgoEdit extends a video generation DiT model for video editing by performing channel-wise concatenation of the source and noisy target video inputs, avoiding the computational overheads of sequence-wise concatenation*
 
@@ -187,11 +185,6 @@ EgoEdit 采用通道维度拼接：在 patchification 之前，将 $\mathbf{X}^{
 
 蒸馏后的 EgoEdit-RT 在单张 H100 GPU 上达到 **38.1 fps** 吞吐量，首帧延迟 **855 ms**（含源视频编码、模型推理和自编码器解码），满足 AR 交互的实时性要求。同时，VLM 分数仅从教师模型的 7.76 略微下降至 7.71（见表 2），验证了蒸馏过程在效率与质量之间的有效平衡。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2675_https_openaccess_thecvf_com_content_CVPR2026_html_Li_EgoEdit_Dataset_Rea/figures/005_Figure_5.jpg]]
-*Figure 5: Inference of EgoEdit. EgoEdit performs inference in a streaming fashion. A camera continuously acquires video sequences which are edited by the model in a chunk-by-chunk manner so that the edited video can be served to the user in a watch-asyou-generate fashion. Each blue arrow represents a model forward pass on a single video chunk for the case of a 3 steps model*
-
 ## 实验与关键发现
 
 ### 实验设置
@@ -245,8 +238,6 @@ Table 3 展示了 EgoEditData 子集规模对模型性能的因果效应。在�
 2. **数据覆盖偏差**：EgoEditData 主要来源于 Ego4D 和 EgoExo4D，仅保留原始视频的 0.4%，场景和交互类型可能存在选择偏差，极端低光照、剧烈抖动等场景的泛化能力未经充分验证。
 3. **蒸馏质量权衡**：自强制蒸馏在压缩延迟的同时，VLM 分数从 7.76 微降至 7.71，虽然幅度极小，但论文未提供编辑多样性或复杂指令忠实度的全面指标，无法排除蒸馏对某些细粒度编辑能力的潜在影响。
 4. **长期稳定性未验证**：论文未探讨模型在多视角、长期连续视频编辑中的内容漂移和时序稳定性问题，这对实际 AR 应用至关重要。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2675_https_openaccess_thecvf_com_content_CVPR2026_html_Li_EgoEdit_Dataset_Rea/figures/003_Figure_3.jpg]]
 *Figure 3: Comparison of EgoEdit and EgoEdit-RT against baselines according to VLM score on EgoEditBench and EditVerseBench [23]. Overall, EgoEdit and its real-time variant EgoEdit-RT achieve superior results on egocentric editing tasks and perform competitively with the strongest baselines on general editing tasks. EditVerse is excluded from EgoEditBench as source code is unavailable. Streaming models are indicated in dashed lines*

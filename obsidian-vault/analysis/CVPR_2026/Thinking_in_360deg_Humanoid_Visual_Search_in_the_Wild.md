@@ -131,8 +131,6 @@ RL 阶段采用组相对策略优化（Group Relative Policy Optimization, GRPO�
 
 这种分阶段设计使得模型能够先掌握基本的行为语法，再在此基础上发展出面向任务目标的优化策略，从而在 H*Bench 的物体搜索和路径搜索任务上均取得显著提升。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1082_https_openaccess_thecvf_com_content_CVPR2026_html_Yu_Thinking_in_360deg/figures/002_Figure_2.jpg]]
 *Figure 2: Pipeline Illustration. Stage 1 (SFT) provides the foundational ability to map perspective images to plausible actions (e.g., turning around upon seeing nothing). Stage 2 (RL) refines this into a strategic policy: the model learns to explore (outputting*
 
@@ -230,8 +228,6 @@ Figure 6（右）展示了测试时上下文长度对成功率的影响。随着
 
 ![[assets/figures/papers/paper_list_l1082_https_openaccess_thecvf_com_content_CVPR2026_html_Yu_Thinking_in_360deg/figures/008_Figure_6.jpg]]
 *Figure 6: Left: Cumulative success rate by step before and after RL (t indicates maximum turn limit in RL training). Right: Impact of test-time context length on success rate*
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l1082_https_openaccess_thecvf_com_content_CVPR2026_html_Yu_Thinking_in_360deg/figures/004_Figure_4.jpg]]
 *Figure 4: Comparison of In-task (train and test on the same task family) and Cross-task (train on one task family and test on the other)*

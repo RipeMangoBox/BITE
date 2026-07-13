@@ -73,8 +73,6 @@ GTA-Human本身是一个数据集贡献，而非全新的模型架构。其方�
 
 这些结果表明，GTA-Human以数据驱动的方式，为3D人体恢复领域提供了一条低成本、高效益的性能提升路径。
 
-
-
 ### 问题背景：3D人体恢复的数据瓶颈
 
 从单张图像或视频中恢复准确的3D人体姿态与形状是计算机视觉的核心任务，其应用涵盖动作捕捉、人机交互与虚拟现实。当前主流方法依赖参数化人体模型（如SMPL）将问题转化为回归姿态参数 $\theta \in \mathbb{R}^{72}$ 和形状参数 $\beta \in \mathbb{R}^{10}$ 的监督学习任务。然而，这一范式的性能天花板主要受制于**标注数据的规模与多样性**。
@@ -111,8 +109,6 @@ GTA-Human本身是一个数据集贡献，而非全新的模型架构。其方�
 3. **合成数据的规模效应远未饱和**：在现有计算预算下，增加合成数据量可持续提升性能，且即使真实数据比例较低，合成数据仍可作为有效补充。
 
 基于以上动机，本文构建了**GTA-Human**——一个基于游戏GTA-V的大规模合成人体数据集，包含140万帧具有精确SMPL标注的图像，覆盖丰富的户外场景、动作、相机角度和天气条件，并系统性地验证了合成数据对3D人体恢复任务的增益机制。
-
-
 
 ## 核心方法与创新机理
 
@@ -161,8 +157,6 @@ GTA-Human 的核心创新并非提出一种新的模型架构，而是通过**�
 
 > **手动验证建议**：论文未明确讨论模型在不同肤色、性别、体型上的公平性偏差。虽然 GTA‑Human 覆盖了超过 600 名不同主体，但合成数据本身可能继承游戏引擎中角色外观的分布偏置，需在实际部署时注意。
 
-
-
 GTA-Human 的核心贡献并非提出新的模型架构，而是构建了一套可扩展的合成数据生成管线，并通过极简的数据混合策略显著提升现有 3D 人体恢复模型在真实场景中的泛化能力。其整体框架由 **数据生成工具链** 与 **下游训练策略** 两个松耦合阶段构成。
 
 ### 数据生成工具链
@@ -197,8 +191,6 @@ GTA-Human 的使用方式极为简洁，不要求修改模型结构，仅通过�
 - **微调（Finetuning, FT）**：在真实数据预训练模型的基础上，使用混合数据进行微调，以更小的训练代价适配合成数据带来的分布增益。
 
 这两种策略均不依赖对抗训练或风格迁移等复杂的域适应技术，却能在 3DPW 等真实世界基准上实现一致且显著的性能提升——例如 HMR 的 PA-MPJPE 从 67.5 mm 降至 60.5 mm（BT），PARE 进一步降至 46.8 mm（FT），验证了数据多样性与规模本身即是决定性能的核心因素。
-
-
 
 GTA-Human 的核心贡献在于**数据生成管线**与**训练策略**，而非提出新的模型架构。其关键模块分布在数据采集工具链和监督学习损失函数中。
 
@@ -242,8 +234,6 @@ $$\hat{X}_{2D} = \mathcal{K}(\mathcal{T}(\hat{X}_{3D}, \hat{\mathbf{t}}), \mathb
 - **Finetuning (FT)**：先用混合数据预训练，再在混合数据上微调预训练权重。
 
 这两种策略构成了将合成数据转化为性能增益的“因果旋钮”，其有效性在多个基线方法上得到验证。
-
-
 
 ## 实验与关键发现
 
@@ -311,30 +301,8 @@ Figure 9和Figure 11揭示了模型性能对数据稀疏区域的高度敏感性
 
 Table 11显示GTA-Human与另一合成数据集AGORA具有互补性。将GTA-Human扩展为SMPL-X标注后，联合训练在EHF和EgoBody上均优于单独使用任一合成数据源。这为多源合成数据的组合策略提供了初步证据。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2110_07588/figures/002_Table_1.jpg]]
 *Table 1: 3D human dataset comparisons. We compare GTA-Human with existing real datasets with SMPL annotations and synthetic datasets with highly realistic setups. GTA-Human has competitive scale and diversity. Datasets are divided into three types: real, synthetic and mixed. GTA-Human samples character action sequences from a large in-game database that allows a unique action to be assigned to each video sequence. Note that EFT [20] re-annotates 2D human pose estimation datasets where the number of subjects are difficult to trace. *: 3DPW and Panoptic Studio only have general descriptions of scene activities*
-
-![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2110_07588/figures/014_Figure_8.jpg]]
-*Figure 8: Amount of GTA-Human Data. The horizontal axis indicate the amount of GTA-Human data used as multiples of the amount of real data. HMR+ is used as the base method*
-
-![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2110_07588/figures/015_Table_8.jpg]]
-*Table 8: Strong supervision is key. The first row is the HMR+ baseline without any GTA-Human data added*
-
-![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2110_07588/figures/017_Table_7.jpg]]
-*Table 7: Synthetic Data as a Supplement. Different total data amount with different real data ratio are shown. Values are PA-MPJPE (mm) on 3DPW test set. Synthetic data are sampled from 4× set during training. N/A: this ratio cannot be sustained beyond 300K data due to insufficient real data. HMR+ (BT) is used as the base method*
-
-![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2110_07588/figures/016_Table_9.jpg]]
-*Table 9: Big data benefits big models. Real: training with only the real datasets. +GTA: blended training setting is used with GTA-Human. Values in green indicate the error reduction in PA-MPJPE (mm) with blended training*
-
-![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2110_07588/figures/004_Figure_3.jpg]]
-*Figure 3: Data diversity in GTA-Human. (a) GTA-Human contains subjects of varied genders, ages, skin tones, clothing and body shapes. (b) locations with diverse backgrounds. The example locations are pinpointed on the 3D game world map. We discover in Section 4.2 that the outdoor scenes are critical to the usefulness of GTA-Human. (c) Different weather conditions. (d) In-game time is set to capture diverse lighting conditions. We capture the same scene at one game hour interval. Note the shadow direction is affected by the sun’s position*
-
-![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2110_07588/figures/006_Figure_4.jpg]]
-*Figure 4: Actions. GTA-Human contains 20 thousand actions that are expressive and diverse. (a) The distribution of poses in GTA-Human and real datasets are visualized after PCA dimension reduction. (b) We show five pose sequences, represented by curves. Representative frames of sequence 1-5 are indicated by the diamond-shaped nodes. Datasets are downsampled proportionally*
-
-
 
 ## 定位与知识库关联
 
@@ -376,8 +344,6 @@ Table 4将GTA-Human与同期合成数据方案进行了对比。与**AGORA**（P
 - **体型标注的升级路径**：如何升级游戏引擎的渲染管线或标注算法，以获取完整的体型信息（而非仅骨骼长度），是提升3D人体重建精度的关键。
 - **多源合成数据的协同**：GTA-Human与AGORA的互补性已初步验证，但如何系统性地组合多种合成数据源（游戏引擎、图形渲染、生成模型）以最大化覆盖范围，尚无成熟方案。
 - **向其他任务的迁移**：GTA-Human的标注管线能否扩展到模型无关的人体重建、人体-物体交互理解等更广泛的人本视觉任务？这决定了其知识库价值的广度。
-
-
 
 ## 原文 PDF
 

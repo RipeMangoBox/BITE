@@ -51,8 +51,6 @@ claims:
 
 实验结果表明，UCMNet 在 POLED、TOLED 和 SYNTH 三个基准上均取得领先性能：POLED-Test 上以仅 3.2 M 参数达到 **33.81 dB PSNR**，超越 BNUDC（33.39 dB）等现有最优方法，且在 PSNR/SSIM 散点图中处于右上最优区域（**Figure 1**）。消融实验确认，HF-UDL 相较普通 UDL 额外提升 0.22 dB，UPT 中的不确定性引导与记忆库检索机制对性能贡献显著。在严重衍射导致信息丢失的 SYNTH 场景下，UCMNet 仍存在高频细节恢复不足的局限，这指向了引入更强模型先验的未来方向。
 
-
-
 屏下摄像头（Under-Display Camera, UDC）技术通过将前置摄像头置于显示屏下方，实现了真正的全面屏体验。然而，光线在穿过显示面板时会发生衍射、散射和衰减，导致捕获的图像出现严重的空间变化退化——主要表现为高频细节丢失、对比度下降以及由像素结构引起的网格状伪影。这种退化模式在空间上高度不均匀：屏幕中心区域与边缘区域的透光率、衍射强度差异显著，使得单一全局滤波器难以有效复原。
 
 现有UDC图像复原方法大致分为两类：一是基于物理建模的预处理管线，通过估计点扩散函数（PSF）进行反卷积，但这类方法对屏幕制造公差和成像条件变化敏感，泛化能力有限；二是基于深度学习的端到端复原网络，如频率分离方法**BNUDC**和频率-空间交互方法**FSI**，它们在特定数据集上取得了进展，但在应对空间变化的复杂退化时仍显不足——尤其是对高频纹理的恢复往往过于平滑，且难以自适应地处理不同区域的差异化退化程度。
@@ -60,8 +58,6 @@ claims:
 更关键的是，现有方法普遍缺乏对“不确定性”的显式建模。在UDC成像中，不同像素位置的信息丢失程度差异巨大：严重衍射区域的信号几乎被噪声淹没，恢复难度远高于轻度退化区域。若模型对所有位置施加同等强度的复原约束，要么在困难区域产生伪影，要么在简单区域过度平滑。因此，**核心瓶颈**在于如何让模型感知并自适应地响应这种空间变化的复原难度。
 
 本文的**核心动机**正是将不确定性从“被动观测”转变为“主动先验”：通过估计像素级的不确定性图，显式地告诉模型“哪里更难复原、哪里需要更多高频补偿”，从而驱动一个可学习的记忆检索机制，为不同退化模式匹配差异化的先验知识。基于这一思想，我们提出了**UCMNet（Uncertainty-aware Context-Memory Network）**，一个轻量化的不确定性感知上下文记忆网络，旨在以更少的参数量实现空间自适应的精细复原，在多个UDC基准上达到最优性能。
-
-
 
 ## 核心方法与创新机理
 
@@ -90,8 +86,6 @@ $$\mathcal{L}_{\mathrm{HF-UDL}} = \exp(-s) \left\| \Delta(\hat{I}) - \Delta(I_{g
 其中 $\Delta$ 为拉普拉斯算子，$s$ 为不确定性估计。这一设计的因果逻辑在于：拉普拉斯算子天然放大了高频区域的误差信号，与不确定性加权结合后，迫使网络在不确定性高的区域（通常是高频细节丢失严重的位置）投入更多学习容量。消融实验（Table 4）表明，引入 UDL 相较纯 PSNR 损失提升 0.21 dB，替换为 HF-UDL 后再提升 0.22 dB，且可视化结果（Figure 9）显示高频伪影显著减少。
 
 最终，三个 changed slots 形成协同效应：HF-UDL 提供不确定性学习信号，UPT 将该信号转化为结构化的上下文检索先验，FCM 则保证编码器提供充分的频率域表示。这一组合使 UCMNet 在仅 3.2 M 参数下于 POLED-Test 达到 33.81 dB PSNR，超越所有对比方法。
-
-
 
 UCMNet 采用 U 型编码器‑解码器架构，以端到端方式直接处理屏下摄像头（UDC）退化图像，无需手工设计的预处理步骤。整体 pipeline 由四个核心模块级联构成：**Frequency Convolution Module（FCM）**、**Uncertainty‑Prior Transformer（UPT）**、**Memory Bank / Context Bank** 和 **Vanilla Transformer**，通过编码器逐级压缩特征、解码器逐级恢复分辨率，并在解码阶段引入不确定性引导的自适应特征精炼。
 
@@ -131,13 +125,6 @@ $$\mathcal{L}_{\mathrm{HF-UDL}} = \exp(-s) \left\| \Delta(\hat{I}) - \Delta(I_{g
 4. 使用 HF‑UDL 与 PSNR 损失的加权组合进行监督。
 
 消融实验表明，移除不确定性引导（即用 $F_{in}$ 替代 $F_U$ 作为记忆检索先验）导致 PSNR 下降 0.18 dB（Table 6），验证了不确定性先验对空间自适应修复的关键作用。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2271_https_arxiv_org_abs_2604_00381/figures/003_Figure_3.jpg]]
-*Figure 3: Architecture of the proposed method for UDC image restoration. Our model follows a U-shaped encoder–decoder architecture. The core module of the encoding block is the Frequency Convolution Module (FCM), while the decoding block additionally incorporates the Uncertainty Prior Transformer (UPT) block for uncertainty-guided feature refinement*
-
-
 
 ### 整体架构
 
@@ -200,13 +187,6 @@ $$\mathcal{L}_{\mathrm{total}} = \lambda_1 \mathcal{L}_{\mathrm{HF-UDL}} + \lamb
 
 在SYNTH数据集上，对于衍射导致严重信息丢失的区域，UCMNet仍难以恢复精细细节。论文指出未来计划通过引入更强的模型先验来改善这一问题，但未给出具体方案。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2271_https_arxiv_org_abs_2604_00381/figures/005_Figure_5.jpg]]
-*Figure 5: Uncertainty maps are derived from the uncertaintydriven loss, where each decoding block includes parallel mean and variance estimators that jointly predict the restored image and its corresponding uncertainty map*
-
-
-
 ## 实验与关键发现
 
 ### 1. 主实验结果
@@ -249,18 +229,9 @@ $$
 
 Table 5 对不确定性先验 Transformer（UPT）的核心组件进行了消融。以仅使用两个 Vanilla Transformer 模块（无方向交叉注意力）为基准（case a），逐步添加垂直-水平交叉注意力（hv-attention）和 Context Bank 检索机制。最终配置（case d，包含 hv-attention、cross-attention 与 Context Bank）使 PSNR 达到 33.81 dB，显著优于基准配置。Figure 10 的视觉对比也证实了 UPT 各组件对纹理恢复的贡献。
 
-![[assets/figures/papers/paper_list_l2271_https_arxiv_org_abs_2604_00381/figures/012_Table_5.jpg]]
-*Table 5: Ablations of UPT on POLED dataset. The case without hv-attention uses two vanilla transformer modules in the UPT*
-
-![[assets/figures/papers/paper_list_l2271_https_arxiv_org_abs_2604_00381/figures/015_Figure_10.jpg]]
-*Figure 10: The visualization of the UPT ablation study, where (a), (b), (c), and (d) correspond to the cases in Table 5*
-
 #### 2.3 不确定性引导上下文生成消融
 
 Table 6 对比了使用不同特征作为上下文检索先验的效果。以不确定性特征 $ F_U $（由方差估计器生成的不确定性图）作为先验，比直接使用输入特征 $ F_{in} $ 提高 PSNR 0.18 dB，SSIM 也同步提升。这表明不确定性图能够有效引导 Memory Bank 检索与局部退化模式匹配的高频补偿信息，实现空间自适应修复。
-
-![[assets/figures/papers/paper_list_l2271_https_arxiv_org_abs_2604_00381/figures/013_Table_6.jpg]]
-*Table 6: Ablation on the use of Uncertainty-Guided Context Generation. Incorporating uncertainty as guidance for Context generation improves both PSNR and SSIM, demonstrating effective spatial adaptation to locally varying degradations*
 
 #### 2.4 Context-Memory Bank 规模消融
 
@@ -288,11 +259,6 @@ Figure 8 可视化解码器各阶段的不确定性图。不确定性图由每�
 | Table 5 | UPT 完整配置（hv-attention + Context Bank）显著优于 Vanilla Transformer 基准 |
 | Table 6 | 不确定性特征 $ F_U $ 作为先验比 $ F_{in} $ 提高 0.18 dB |
 | Table S.1 | Context-Memory Bank 规模 $ N=256 $ 时达到最佳精度-效率平衡 |
-
-![[assets/figures/papers/paper_list_l2271_https_arxiv_org_abs_2604_00381/figures/006_Table_1.jpg]]
-*Table 1: Quantitative results on the POLED and TOLED test datasets. Average PSNR, SSIM, LPIPS, and DISTS are reported, with the best and second-best scores colored (↑ higher is better; ↓ lower is better)*
-
-
 
 ## 定位与知识库关联
 
@@ -343,8 +309,6 @@ UCMNet 的核心因果机制可以概括为“**不确定性估计 → 记忆库
 2. **不确定性估计的可靠性**：当前的不确定性图由网络端到端学习，缺乏对估计质量的显式监督或校准机制。能否引入贝叶斯推断或集成方法提高不确定性估计的鲁棒性？
 3. **Memory Bank 的可解释性**：可学习的 Memory-Context Bank 令牌对是否确实学到了与物理退化模式对应的可解释表示？论文未对检索到的上下文特征进行可视化或语义分析。
 4. **跨任务微调策略**：UCMNet 在其他空间变化退化任务上的泛化能力是否可以通过任务特定微调（如 adapter 或 prompt tuning）进一步提高？这关系到该方法能否从 UDC 专用方案升级为更通用的空间自适应复原框架。
-
-
 
 ## 原文 PDF
 

@@ -79,8 +79,6 @@ claims:
 
 当前方法依赖预训练单目深度估计模型进行内参估计，估计误差可能影响性能；几何增强主要模拟缩放和主点平移，未能涵盖镜头畸变等现实相机变化；训练和评估集中于室内场景，在室外及自动驾驶领域的泛化性尚待验证。未来方向包括：扩展至鱼眼、多摄像头等非针孔模型；探索在完全无内参场景下的隐式补偿机制；以及评估在实时机器人应用中的计算可行性。
 
-
-
 多模态大语言模型（MLLM）在二维视觉理解上取得了长足进步，但当任务涉及三维空间推理——如物体定位、深度估计、相机姿态感知——时，现有模型的泛化能力暴露出根本性缺陷。这一缺陷的根源在于一个被长期忽视的几何事实：**单张RGB图像本身携带固有的三维歧义**。
 
 ### 核心问题：RGB-Only空间推理的几何歧义
@@ -107,8 +105,6 @@ $$(f_y, H, Z) \sim (\lambda f_y, H, \lambda Z) \sim (f_y, \lambda H, \lambda Z)$
 上述现象指向一个清晰的瓶颈：**RGB-only MLLM因缺失相机内参这一关键信息通道，无法解耦焦距、尺度与深度之间的几何纠缠，从而丧失跨相机泛化能力。** 相机内参并非可有可无的辅助信息，而是实现鲁棒空间推理的必要条件。
 
 基于这一洞察，本文的核心动机是：**通过为MLLM显式注入相机几何信息，使其学习相机无关的三维物理规律，而非相机特定的视觉模式。** 研究目标包括：（1）设计一种相机感知架构，将内参信息有效融入视觉token；（2）开发相机感知的数据增强策略，迫使模型解耦相机属性与场景内容；（3）在缺乏真值内参的场景中，通过蒸馏预训练三维模型的几何先验来弥补信息缺口。
-
-
 
 ## 核心方法与创新机理
 
@@ -143,11 +139,6 @@ $$R_x[i,j] = \frac{u_{ij} - c_x}{f_x}, \quad R_y[i,j] = \frac{v_{ij} - c_y}{f_y}
 ### 创新协同与证据强度
 
 三个changed slots并非孤立设计，而是形成闭环：**相机射线嵌入**提供几何推理的必要输入，**几何增强**确保模型不依赖特定相机参数，**先验蒸馏**补充三维结构知识。消融实验（Table 5）证实，移除任一组件均导致跨相机泛化性能下降，完整模型在ScanNet-val ×1.2缩放测试上达到52.1% F1@0.25，而相机无关基线在相同条件下性能骤降（如Qwen2.5-VL从45.7%降至24.3%），证据强度高（confidence ≥ 0.9）。
-
-
-
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_DE5ZJtR4bg/figures/007_Figure_6.jpg]]
-*Figure 6: Cross-camera generalization on spatially-grounded tasks. While camera-agnostic MLLMs (Qwen2.5-VL, VG-LLM) fail catastrophically on altered camera geometries by rescaling, our method maintains robust performance, proving its ability to generalize across cameras*
 
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_DE5ZJtR4bg/figures/005_Figure_4.jpg]]
 *Figure 4: The proposed Camera-Aware MLLM Framework. (a) The overview of the architecture, where (b) Geometry-Aware Visual Encoder (GAVE) injects camera-awareness and 3D geometric priors into the MLLM*
@@ -189,8 +180,6 @@ $$(f_y, H, Z) \sim (\lambda f_y, H, \lambda Z) \sim (f_y, \lambda H, \lambda Z)$
 除架构层面的相机内参注入外，框架还引入了**相机感知几何增强**（Camera-Aware Geometric Augmentation）策略。在训练过程中，通过缩放图像（因子 $s$，同步更新内参为 $(s f_x, s f_y, s c_x, s c_y)$）和主点平移来合成变化的内参。这一策略迫使模型解耦相机属性与场景内容，是其跨相机泛化能力的关键来源。
 
 训练时，视觉编码器（ViT）、3D几何编码器（VGGT）和UniDepth v2均被冻结，仅MLLM主体、相机射线嵌入模块和几何先验蒸馏器可训练，确保消融比较的公平性。
-
-
 
 ### 几何歧义的形式化根源
 
@@ -246,17 +235,11 @@ GAVE负责融合三类信息：视觉编码器（ViT）提取的视觉特征 $\m
 
 该策略迫使模型解耦相机属性与场景内容，显著提升对未见相机内参的鲁棒性。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈的实证验证
 
 论文首先通过一组受控实验，系统性地揭示了相机无关MLLM在空间推理中的泛化失败。**Table 1** 给出了定量证据：当Qwen2.5-VL仅在ScanNet上训练时，3D物体检测F1@0.25达到45.7%；然而，当训练数据混合了多个室内场景数据集后，同一验证集上的性能骤降至35.4%。这一退化源于不同数据源之间相机内参的多模态分布（**Figure 3**），模型在相互冲突的内参信号中无法学到统一的几何映射。
-
-
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_DE5ZJtR4bg/figures/004_Figure_3.jpg]]
-*Figure 3: Multi-modal distribution of camera intrinsics in mixed datasets*
 
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_DE5ZJtR4bg/figures/002_Table_1.jpg]]
 *Table 1: Generalization failure of camera-agnostic MLLMs. 3D object detection performance drops when trained on mixed data sources or evaluated on resized images, exposing a fundamental lack of robustness and generalization*
@@ -283,12 +266,10 @@ $$(f_y, H, Z) \sim (\lambda f_y, H, \lambda Z) \sim (f_y, \lambda H, \lambda Z)$
 
 在提供精确相机参数的**SPAR-Bench**上（**Table 2**），Camera-Aware MLLM取得了最高的综合空间推理精度，超越了包括GPT-4o、Gemini-2.5、Qwen2.5-VL、VG-LLM和SPAR在内的所有对比方法。
 
-
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_DE5ZJtR4bg/figures/008_Table_2.jpg]]
 *Table 2: Comparison of MLLMs’ spatial reasoning performance on SPAR-Bench*
 
 在面向RGB-only方法设计的通用空间推理基准**VSI-Bench**上（**Table 3**），尽管该基准不提供相机内参，方法仍达到46.8%的平均准确率（Ours-4B），领先于同规模的VG-LLM 4B等基线。**Table 4** 进一步展示了在多个空间理解数据集上的综合对比，方法在多数指标上取得了最优或领先的性能。这些结果表明，相机感知不仅有利于跨相机泛化，也能提升通用空间推理能力。
-
 
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_DE5ZJtR4bg/figures/009_Table_3.jpg]]
 *Table 3: Comparison of MLLMs’ spatial reasoning performance on VSI-Bench*
@@ -299,7 +280,6 @@ $$(f_y, H, Z) \sim (\lambda f_y, H, \lambda Z) \sim (f_y, \lambda H, \lambda Z)$
 ### 消融实验
 
 **Table 5** 在ScanNet-val x1.2（跨相机泛化测试）上对框架的三个核心组件进行了消融：
-
 
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_DE5ZJtR4bg/figures/011_Table_5.jpg]]
 *Table 5: Ablation study on the components of our Camera-Aware MLLM framework. Performance measured on ScanNet-val x1.2 to test cross-camera generalization*
@@ -318,8 +298,6 @@ $$(f_y, H, Z) \sim (\lambda f_y, H, \lambda Z) \sim (f_y, \lambda H, \lambda Z)$
 2. **增强覆盖不足**：相机感知几何增强目前主要模拟缩放和主点平移，未能覆盖镜头畸变、非中心裁切等现实世界中的复杂相机变化，在这些场景下的泛化性未经充分验证。
 3. **领域限制**：训练和评估主要集中于室内场景数据集，在室外、自动驾驶等领域的迁移能力有待进一步检验。
 4. **单帧假设**：模型仅在单帧上训练，对于视频序列中动态变化的相机参数处理能力未深入探究。
-
-
 
 ## 定位与知识库关联
 
@@ -364,8 +342,6 @@ RGB-only MLLM 在空间推理任务中面临一个根本性的几何歧义问题
 - 在完全无内参且无法可靠估计的场景中，模型能否通过学习内部表征来隐式补偿几何信息的缺失？
 - 相机感知方法引入的额外计算开销（射线嵌入计算、几何先验蒸馏）是否满足实时机器人应用的需求？
 - 能否通过自监督或弱监督方式，从大规模无内参标注的图像中学习相机感知能力，从而突破数据规模的瓶颈？
-
-
 
 ## 原文 PDF
 

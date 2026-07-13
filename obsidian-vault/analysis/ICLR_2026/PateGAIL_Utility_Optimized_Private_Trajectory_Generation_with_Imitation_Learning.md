@@ -51,8 +51,6 @@ claims:
 
 实验表明，在 Geolife 数据集上，当噪声水平为 0.10 时，PateGAIL++ 的 DailyLoc 误差较 PateGAIL 降低约 29%（0.4914 vs. 0.6915），排名指标 G-Rank 和 I-Rank 同样大幅改善。抗攻击能力方面，白盒成员推断攻击下 PateGAIL++ 的 AUC 接近随机猜测水平（0.4962），远低于 PateGAIL 的 0.7208，验证了敏感度感知噪声分配在隐私保护上的实质增益。在用户参与比例降至 40% 的受限条件下，PateGAIL++ 仍保持优于 PateGAIL 的性能弹性。
 
-
-
 轨迹数据——即个体在时空中的移动序列——已成为智能交通、城市规划与个性化推荐等应用的核心驱动力。然而，原始轨迹天然携带高度个人化的行为模式，直接将其用于模型训练或数据共享会引发严峻的隐私泄露风险。差分隐私（Differential Privacy, DP）为这一困境提供了理论完备的解决方案，其核心思想是通过向数据或模型梯度注入经校准的随机噪声，使得攻击者无法从输出中可靠推断任意单个样本是否存在于训练集。形式化地，一个随机化算法 $\mathcal{M}$ 满足 $(\varepsilon, \delta)$-差分隐私，当且仅当对于任意相邻数据集 $\mathcal{D}$ 与 $\mathcal{D}'$ 以及任意输出子集 $\mathcal{E}$，有：
 
 $$\mathbb{P}[\mathcal{M}(\mathcal{D}) \in \mathcal{E}] \leq e^{\varepsilon} \cdot \mathbb{P}[\mathcal{M}(\mathcal{D}') \in \mathcal{E}] + \delta$$
@@ -68,8 +66,6 @@ $$\min_{\pi_\theta} \max_{D_\phi} \mathbb{E}_{(s,a) \sim \pi_E}[\log D_\phi(s,a)
 这一缺陷导致了一个双重困境。如Figure 1所示，高度反映用户特异行为的轨迹片段（例如，一条仅由某用户频繁访问的罕见路径）承载着远高于常规路段的隐私风险，却仅获得与低敏感样本同等的噪声保护，使得攻击者仍可能通过成员推断攻击（Membership Inference Attack, MIA）识别其训练集归属。相反，大量行为模式与群体高度重叠的低敏感样本被注入了不必要的过量噪声，导致合成轨迹在空间分布、日常移动模式等关键维度上的保真度严重退化。这种“一刀切”的隐私预算分配策略，在固定总隐私预算的约束下，无法实现隐私与效用之间的最优权衡。
 
 PateGAIL++正是针对上述瓶颈而提出。其核心动机在于：**利用生成对抗框架中本地判别器对生成样本的置信度评分，作为轨迹片段隐私敏感度的可解释代理信号**——当判别器对某个生成状态-动作对的评分接近1时，意味着该样本高度相似于某用户的真实行为，因而具有更高的隐私敏感度。基于这一洞察，PateGAIL++设计了一个敏感度感知的噪声注入模块，能够动态地、自适应地为每个样本分配差异化的隐私预算：高敏感样本获得更小的 $\varepsilon$（更强噪声保护），低敏感样本则减少噪声注入以保留效用。这一机制在理论上维持了总隐私预算不变，却在实践中显著拓展了隐私-效用的帕累托前沿。
-
-
 
 ## 核心方法与创新机理
 
@@ -131,8 +127,6 @@ PateGAIL++ 将敏感度感知框架自然扩展至本地差分隐私设置。在
 
 三个改进槽位形成了一条清晰的因果链条：**敏感度感知分配**（改进一）提供了差异化的隐私保护强度，使白盒成员推断攻击的 AUC 从 PATEGAIL 的 0.7208 降至接近随机猜测的 0.4962（Table 4，噪声 0.01）；**WGAN-GP 稳定训练**（改进二）确保了噪声环境下的收敛质量，消融实验证实 $\lambda_{GP}=20$ 为最优配置；**LDP 扩展**（改进三）将保护边界从服务器端前移至用户端，在用户子集减少至 40% 时仍表现出强于 PATEGAIL 的弹性（Table 10）。三者共同实现了固定总隐私预算下的细粒度效用优化与抗攻击能力提升。
 
-
-
 ![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_Oyfz6G0hmc/figures/002_Figure_2.jpg]]
 *Figure 2: PATEGAIL++ framework*
 
@@ -172,8 +166,6 @@ $$\min_{\pi_\theta} \max_{D_\phi} \mathbb{E}_{(s,a)\sim\pi_E}[D_\phi(s,a)] - \ma
 PateGAIL++ 同时支持两种差分隐私部署模式：
 - **中心差分隐私（CDP）**：上述流程的默认模式，用户上传本地奖励至可信服务器进行噪声聚合。
 - **本地差分隐私（LDP）**：用户端在发送奖励前自行注入 Laplace 噪声，无需依赖可信服务器。其敏感度感知变体记为 **PateGAIL++⁺**，在 LDP 设置下仍能保持对非敏感度感知版本（PateGAIL++⁻）的性能优势。
-
-
 
 ### 3.1 本地判别器与敏感度感知机制
 
@@ -244,8 +236,6 @@ PateGAIL++ 支持两种部署模式：
 
 两种模式均通过敏感度感知分配机制优化隐私-效用前沿，LDP 扩展使框架在去中心化场景下仍能保持竞争力。
 
-
-
 ## 实验与关键发现
 
 ### 实验设置
@@ -272,9 +262,6 @@ PateGAIL++ 支持两种部署模式：
 ![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_Oyfz6G0hmc/figures/006_Table_4.jpg]]
 *Table 4: Comparison of white-box MIA performance against PATEGAIL and PATEGAIL++ under different noise levels (70% members, 30% non-members) using Geolife dataset*
 
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_Oyfz6G0hmc/figures/007_Table_5.jpg]]
-*Table 5: Comparison of LiRA performance against PATEGAIL and PATEGAIL++ under different noise levels using Geolife dataset*
-
 ### 消融研究
 
 **WGAN-GP 梯度惩罚系数 λGP** 对性能有显著影响。消融实验（表6）显示，λGP=20 在噪声环境中取得最佳轨迹保真度，验证了 Wasserstein 距离配合梯度惩罚对稳定差分隐私训练的贡献。图3进一步表明，最优配置的 PateGAIL++ 在不同噪声水平下均一致优于 PATEGAIL。
@@ -284,9 +271,6 @@ PateGAIL++ 支持两种部署模式：
 
 **用户参与比例**的鲁棒性测试（表10）揭示：当用户子集减少至 40% 时，PateGAIL++ 的性能下降幅度通常小于 PATEGAIL。这归因于敏感度感知机制使有限用户的高质量样本得到更充分的利用，表现出更强的弹性。
 
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_Oyfz6G0hmc/figures/013_Table_10.jpg]]
-*Table 10: Performance comparison across different user percentages (40%, 80%, 100%) under varying noise levels. ues compared to PATEGAIL. This highlights PATEGAIL++’s stronger resilience under limited user availability*
-
 ### 本地差分隐私扩展
 
 PateGAIL++ 进一步扩展至本地差分隐私（LDP）场景。表7显示，敏感度感知聚合变体 PateGAIL++⁺ 在噪声 0.01 时 I-Rank 为 0.1158，优于无敏感度感知的 PateGAIL++⁻（0.1419）。在中心和本地两种设置下，PateGAIL++ 均将隐私-效用前沿推至 PATEGAIL 之上。
@@ -294,19 +278,6 @@ PateGAIL++ 进一步扩展至本地差分隐私（LDP）场景。表7显示，�
 ### 失败模式与局限性
 
 当前敏感度模型主要依赖判别器置信度作为代理信号，尚未整合位置特定的长期风险信号（如医院等高风险位置）。这可能导致对某些语义敏感但行为常见的轨迹片段保护不足。此外，每用户训练一个本地判别器的设计在用户数量极大时的计算开销需要进一步评估。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_Oyfz6G0hmc/figures/009_Table.jpg]]
-*Table: \mathrm { P A T E G A I L + + } ^ { + } achieves comparable or superior performance to \mathrm { P A T E G A I L ^ { + + } } ^ { - } across most settings. Moreover, PATEGAIL++ consistently pushes the privacy–utility frontier beyond PATEGAIL in both central and local settings*
-
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_Oyfz6G0hmc/figures/010_Table_8.jpg]]
-*Table 8: Comparison of white-box MIA performance against PATEGAIL and PATEGAIL++ under different noise levels (70% members, 30% non-members) using Telecom Shanghai dataset*
-
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_Oyfz6G0hmc/figures/011_Table_9.jpg]]
-*Table 9: Comparison of LiRA performance against PATEGAIL and PATEGAIL++ under different noise levels using Telecom Shanghai dataset*
-
-
 
 ## 定位与知识库关联
 
@@ -345,8 +316,6 @@ PATEGAIL 仅支持中心差分隐私（CDP）模式，依赖可信服务器聚�
 PateGAIL++ 的敏感度估计依赖于本地判别器的置信度信号，这意味着其有效性受限于判别器的校准质量。在用户数据极度稀疏或行为模式高度同质化的场景中，判别器可能无法提供有区分度的敏感度信号，导致自适应分配退化为近似均匀分配。此外，当前敏感度模型仅考虑行为模式的独特性，未纳入位置本身的语义风险（如医院、军事区域等敏感场所）。
 
 论文明确指出的开放问题是：“如何开发更细致的敏感度模型，结合位置特定和长期风险信号以进一步提升隐私-效用平衡”。这一方向指向将静态位置语义与动态行为模式融合的多维敏感度建模，可能涉及知识图谱或预训练位置嵌入的引入，但论文未提供具体方案，需后续工作探索。
-
-
 
 ## 原文 PDF
 

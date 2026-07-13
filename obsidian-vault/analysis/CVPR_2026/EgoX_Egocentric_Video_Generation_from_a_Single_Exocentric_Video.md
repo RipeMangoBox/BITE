@@ -59,15 +59,11 @@ claims:
 
 **主要结果**：在 Ego-Exo4D 数据集的 Seen Scenes 上，EgoX 的 PSNR 达到 16.05（对比 Exo2Ego-V 的 14.53），FVD 降至 184.47（对比 622.47）；在 Unseen Scenes 上，PSNR 为 14.38（对比 12.70），FVD 为 440.64（对比 1283.50），在所有图像级、对象级和视频级指标上均取得最优综合性能。消融实验证实，移除 GGA、自我中心先验或清洁潜变量条件均导致性能显著下降，验证了各组件的必要性。用户研究进一步表明，EgoX 在所有评估问题上获得最高选择数，显著优于所有基线方法。
 
-
-
 **任务定义与核心挑战。** 从外中心（第三人称）视频生成自我中心（第一人称）视频，要求模型根据一段观察者视角的输入，合成出“演员眼中所见”的连续画面。这一任务面临的核心瓶颈在于**极端相机姿态变化**：当视角从外中心切换到自我中心时，场景中的大面积区域在输入中完全不可见，模型必须合理合成这些未知区域，同时**抑制外中心画面中与自我中心视角无关的内容**（如远处的背景或旁观者）。Figure 2 直观展示了这一挑战——模型需要保留与视角相关的区域、逼真地补全不可见部分，并忽略无关区域。
 
 **现有方法的缺口。** 已有的外中心到自我中心生成方法（如 **Exo2Ego-V**）通常依赖多视角输入或复杂的3D重建管线，难以在仅有一段外中心视频的条件下工作。另一方面，通用相机控制模型（如 **TrajectoryCrafter**）虽然能够对预训练视频生成模型施加相机运动约束，但其设计面向中等幅度的视角变化，**无法处理外中心到自我中心这种剧烈的视角跳跃**。条件注入策略方面，现有方法多采用通道级联或基于交叉注意力的条件注入（如 **Wan Fun Control**、**Wan VACE**），但这些策略在保留细粒度外中心细节和引导几何一致性方面存在不足——通道级联容易丢失空间信息，而SDEdit式的噪声潜变量级联则会在去噪过程中逐渐模糊输入细节。
 
 **本文动机与核心洞察。** 大规模预训练视频扩散模型（如 Wan 2.1）已经内化了丰富的时空先验，能够生成连贯的视频内容。EgoX 的核心洞察在于：**利用这些预训练时空知识，配合轻量级LoRA适配、统一条件注入策略和几何引导自注意力，可以在仅有一段外中心视频的条件下生成高质量、几何一致的自我中心视频**。具体而言，EgoX 通过三个关键设计突破上述瓶颈：（1）将外中心视频提升为3D点云并渲染粗略的自我中心先验视频，为模型提供显式的视角引导；（2）设计统一的清洁潜变量条件注入策略（宽度级联外中心潜变量、通道级联自我中心先验），确保细节在整个去噪过程中得以保留；（3）在自注意力层引入基于3D方向相似度的几何偏置，使模型自适应地聚焦于空间对应区域。整体流程如 Figure 3 所示，从单段外中心输入到最终自我中心输出，EgoX 实现了端到端的视角变换生成。
-
-
 
 ## 核心方法与创新机理
 
@@ -106,17 +102,12 @@ EgoX 立足于预训练视频扩散模型的时空先验（基于 Wan 2.1 Inpain
 
 EgoX 的贡献不在于提出全新的生成范式，而在于识别了外中心到自我中心生成中“细节保留-几何对齐-内容抑制”的三元张力，并通过统一条件注入、几何引导注意力和清洁潜变量这三个 changed slots 实现了系统性的突破。
 
-
-
 EgoX 的整体 pipeline 围绕一个核心思路构建：利用大规模预训练视频扩散模型的时空先验，通过轻量级适配和几何引导，将单段外中心视频转化为高质量、几何一致的自我中心视频。整个框架由四个关键模块串联而成，形成从 3D 重建到条件视频生成的端到端流程。
 
 ### 输入与输出
 
 - **输入**：单段外中心视频 $X$（RGB 帧序列）及对应的自我中心相机姿态 $\phi$（对于野生场景，可通过 Viser 交互式设定，见 Figure 8）。
 - **输出**：一段从演员第一人称视角观察的自我中心视频，要求保留外中心可见区域的内容、合理合成不可见区域，并抑制不相关的外中心背景（Figure 2 示意了这一核心挑战）。
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2512_08269/figures/010_Figure_8.jpg]]
-*Figure 8: In-the-wild Ego camera. The ego camera for the in-thewild example was obtained by interactively determining its extrinsic parameters using Viser [48]*
 
 ### Pipeline 模块
 
@@ -160,15 +151,8 @@ Figure 4 直观展示了这一机制：即使橙色和红色 token 来自同一�
 
 四个模块形成清晰的因果链：**自我中心先验渲染** 提供粗糙的视角引导 → **统一条件注入** 将外中心细节和先验引导同时送入扩散模型 → **GGA** 在注意力层强制空间对齐 → **LoRA 微调** 使预训练模型适配新任务。消融实验（Table 2）证实，移除任一模块均导致显著性能下降：移除 GGA 使 PSNR 下降 1.28，移除自我中心先验使 PSNR 下降 2.38，移除清洁潜变量使 PSNR 下降 0.98 且 FVD 升至 343.33，验证了各组件的必要性和互补性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2512_08269/figures/003_Figure_3.jpg]]
 *Figure 3: Overall pipeline. Given an exocentric video input, we first lift it into a 3D point cloud and render the scene from the egocentric viewpoint to obtain the egocentric prior video. The clean exocentric video latent and the egocentric prior latent are combined via widthwise and channel-wise concatenation in the latent space, and then fed into a pretrained video diffusion model equipped with the proposed geometry-guided self-attention*
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2512_08269/figures/023_Table_6.jpg]]
-*Table 6: System Prompt for VLM. This is the system prompt used to generate the input text prompt for our model. Since the exocentric views were width-wise concatenated, the prompt describes both the exocentric and egocentric views*
-
-
 
 EgoX 的核心架构由三个紧密协作的模块构成：自我中心先验生成、统一条件注入策略，以及几何引导自注意力（GGA）。以下逐一剖析其设计逻辑与关键公式。
 
@@ -233,15 +217,8 @@ $$a_{m,n} = \frac{\exp(s_{m,n}) \cdot g(\hat{q}_m, \hat{k}_n) \lambda_g}{\sum_{j
 
 EgoX 采用 Wan 2.1（14B）的Inpainting变体作为基础视频扩散模型，通过LoRA（rank=256，batch size=1）进行轻量级适配。这一策略充分利用了大规模预训练模型的时空先验，同时避免了全参数微调的高昂成本。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2512_08269/figures/007_Table_2.jpg]]
 *Table 2: Ablation Study Results. Performance comparison by removing each core component of our framework. The full model achieves the best results, while excluding geometry-guided self-attention, ego prior, or clean latent conditioning causes performance degradation. Best results are highlighted in bold, and second-best results are underlined*
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2512_08269/figures/002_Figure_2.jpg]]
-*Figure 2: Exo-to-Ego view generation example. The model has to preserve view-related content from the exocentric input, generate uninformed regions realistically, and ignore unrelated areas for consistent egocentric synthesis*
-
-
 
 ## 实验与关键发现
 
@@ -276,21 +253,8 @@ Figure 12展示了一个典型失败案例：当外中心输入中动作线索
 
 Table 5报告了各组件在NVIDIA H200 GPU上的运行时间。整体pipeline可在单段外中心视频上高效完成推理，具体耗时分布参见该表。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2512_08269/figures/013_Figure_10.jpg]]
-*Figure 10: GGA benefits example. Without GGA, events occurring outside the visible region are attended to, leading to the generation of unwanted events in the ego view. With GGA, the model effectively focuses only on the visible region, thereby preventing the generation of these unwanted events*
-
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2512_08269/figures/006_Table_1.jpg]]
 *Table 1: Quantitative Results. Comparison on image, object, and video metrics. Our method achieves the best overall performance, with Wan VACE showing higher video scores due to static outputs. Best results are highlighted in bold, and second-best results are underlined*
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2512_08269/figures/005_Figure_5.jpg]]
-*Figure 5: Qualitative comparison. Each example shows the exocentric input views and the corresponding generated egocentric views. While other methods fail to reconstruct realistic and coherent videos, our approach produces geometrically accurate and high-quality egocentric generations. N/A indicates that the result is unavailable either due to missing ground truth or the need for additional input views*
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2512_08269/figures/008_Figure_6.jpg]]
-*Figure 6: Ablation qualitative comparison. Visual results when removing each core component. Removing any single component, GGA, the egocentric prior, or the clean latent representation, results in degraded generation quality and geometric consistency*
-
-
 
 ## 定位与知识库关联
 
@@ -337,8 +301,6 @@ $$s_{m,n}^{\prime} = s_{m,n} + \log( g( \hat{q}_m, \hat{k}_n ) \cdot \lambda_g )
 - 如何在极端姿态变化和高度动态场景下进一步提升几何一致性与不可见区域的合成质量？
 - 模型能否泛化到更广泛的外中心输入类型，如多人物交互、动态背景占主导的场景？
 - 清洁潜变量固定策略是否在所有时间步上均为最优？是否存在自适应调整 $x_0$ 的信息注入强度的改进空间？
-
-
 
 ## 原文 PDF
 

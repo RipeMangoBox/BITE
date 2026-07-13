@@ -53,8 +53,6 @@ claims:
 
 **主要结果**：在Adroit、DexArt和Bi-DexHands三个仿真基准共11个灵巧操作任务上，SAT以仅19.36M参数显著优于所有2D/3D基线方法，平均成功率从0.66提升至0.71。消融实验揭示了两项决定性证据：（1）移除Embodied Joint Codebook导致成功率从0.71断崖式下降至0.01，证明结构先验对于无序关节序列的识别必不可缺；（2）仅使用人类数据预训练即可超越使用机器人数据预训练（0.68 vs 0.66），证实功能代码本成功实现了从人手到机器人灵巧手的跨形态技能迁移。
 
-
-
 灵巧操作（dexterous manipulation）是具身智能研究的长期目标。高自由度（high-DoF）灵巧手具备执行复杂接触丰富任务的潜力，但其动作空间维度远高于传统夹爪，使得策略学习面临严重的维度灾难。近年来，模仿学习（imitation learning）在机器人操作中取得了显著进展，尤其是基于动作块（action chunk）的生成式策略，通过一次预测未来多步动作，有效缓解了复合误差和时序依赖问题。
 
 然而，**传统动作表示存在根本性的结构缺陷**，成为制约通用灵巧策略学习的核心瓶颈。现有方法普遍采用时间中心（temporal-centric）视角，将动作块建模为固定长度的时间步序列 `(T, D_a)`，其中每个时间步的动作向量是固定维度的整体。这种表示在面对高自由度机械手时暴露出两个关键问题：
@@ -63,8 +61,6 @@ claims:
 2. **空间关系捕获低效**：时间中心视角将每个时间步的所有关节动作打包为一个向量，Transformer 的自注意力机制在时间维度上运作，难以显式建模不同关节之间的功能对应和空间协同关系。对于灵巧操作而言，关节间的结构关系（如拇指与食指的协同）比时间维度的精细变化更为关键。
 
 **本文的核心动机在于重构动作表示范式**：将动作块从时间中心视角 `(T, D_a)` 翻转为结构中心视角 `(D_a, T)`，即将动作视为变长、无序的关节轨迹序列，每个关节的完整时域轨迹作为一个独立的序列元素。这一重构解锁了 Transformer 处理变长序列的天然能力，使得策略能够原生适配不同关节数量的机器人形态。配合 **Embodied Joint Codebook** 为每个关节注入形态学三元组（形态ID、功能类别、旋转轴）的结构先验，模型得以在无序的关节序列中识别物理关节身份，从而学习跨形态的功能对应关系。
-
-
 
 ## 核心方法与创新机理
 
@@ -104,8 +100,6 @@ $$\mathcal{L}(\theta) = \mathbb{E}_{\tau \sim \mathcal{U}(0,1), \mathbf{A}_t^0 \
 
 推理时使用 ODE 求解器，仅需 1 次函数评估（NFE）即可生成动作块，相比扩散模型的迭代去噪更为高效。结合结构中心表示对时间轨迹的高度压缩（token 维度从 256 降至 32 时成功率保持 0.71，Table 2），SAT 仅以 19.36M 参数（不含 T5 tokenizer）即在 11 个灵巧操作任务上取得 0.71 的平均成功率，显著优于 218.9M 参数的 3D ManiFlow Policy（0.66），展现出极高的参数效率。
 
-
-
 SAT 的完整推理管线由三个核心模块串联构成：**Observation Tokenizer**（观测标记器）、**Structural Action Tokenizer**（结构化动作标记器）与 **Structural Action Transformer**（结构化动作Transformer）。其输入为一段包含 $T_o$ 帧的历史原始3D点云 $\mathcal{P}_t = (\mathbf{P}_{t-T_o+1}, \ldots, \mathbf{P}_t)$ 以及一条语言指令 $L$，输出为未来 $T$ 个时间步的动作块 $\mathbf{A}_t \in \mathbb{R}^{D_a \times T}$。该动作块采用**结构中心视角**定义，即每一行对应一个关节在整段时域上的完整轨迹，行数 $D_a$ 随机器人形态自由变化，从而天然支持变长、无序的异构关节序列。
 
 ### 观测标记器（Observation Tokenizer）
@@ -141,15 +135,8 @@ SAT 的完整推理管线由三个核心模块串联构成：**Observation Token
 
 整个管线可概括为：**3D点云 + 语言 → 观测 token → 条件Transformer → 速度场 → ODE积分 → 结构化动作块**。其中，观测标记器将多模态感知压缩为统一表示，结构化动作标记器将异构关节空间映射到携带物理先验的 token 空间，Transformer 则在这两个空间之间学习条件映射。这种设计使得 SAT 能够以仅 19.36M 参数（不含 T5 编码器）在 11 个灵巧操作任务上达到 0.71 的平均成功率，显著优于参数规模大一个数量级的 3D 基线（如 3D ManiFlow Policy 的 218.9M 参数，成功率 0.66）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2043_https_arxiv_org_abs_2603_03960/figures/001_Figure.jpg]]
-*Figure: (a) Temporal-centric Perspective (b) Structural-centric Perspective (Ours) Key Features: Unordered, Variable Length Heterogeneity*
-
 ![[assets/figures/papers/paper_list_l2043_https_arxiv_org_abs_2603_03960/figures/002_Figure_2.jpg]]
 *Figure 2: Our proposed model architecture. The policy takes a history of*
-
-
 
 SAT 的策略架构由三个核心模块级联构成：**Observation Tokenizer**、**Structural Action Tokenizer** 和 **Structural Action Transformer**。整体流程如 Figure 2 所示。
 
@@ -213,15 +200,8 @@ Table 4 的组件消融验证了各模块的必要性：
 - **回退至时间中心表示**：将结构中心 $(D_a, T)$ 改回传统的时间中心 $(T, D_a)$ 表示，成功率降至 0.64，验证了结构中心视角对高 DoF 操作任务的优越性。
 - **移除 Functional Category**（Table 5）：导致灾难性失败，表明功能对应是跨形态迁移最重要的先验。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2043_https_arxiv_org_abs_2603_03960/figures/011_Figure_5.jpg]]
-*Figure 5: Frequency analysis of joint types in our Embodied Joint Codebook, derived from a survey of 10 common dexterous hands*
-
 ![[assets/figures/papers/paper_list_l2043_https_arxiv_org_abs_2603_03960/figures/009_Figure_6.jpg]]
 *Figure 6: T-SNE visualization of the learned Embodied Joint Codebook embeddings. These embeddings, derived from 10 dexterous manipulators, are colored by (a) Embodiment ID, (b) Functional Category, and (c) Rotation Axis*
-
-
 
 ## 实验与关键发现
 
@@ -271,8 +251,6 @@ Table 4 的组件消融验证了各模块的必要性：
 
 4. **离线学习的局限。** 动作表示目前仅用于离线模仿学习，尚未探索其在在线强化学习中的扩展性。在需要在线探索和试错的场景下，结构中心表示能否作为策略类提高探索效率仍需验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2043_https_arxiv_org_abs_2603_03960/figures/004_Table_1.jpg]]
 *Table 1: Quantitative comparison of our method against 2D (image-based) and 3D (point cloud-based) baselines on 11 dexterous manipulation tasks from the Adroit [55], DexArt [2], and Bi-DexHands [10] simulation benchmarks*
 
@@ -284,20 +262,6 @@ Table 4 的组件消融验证了各模块的必要性：
 
 ![[assets/figures/papers/paper_list_l2043_https_arxiv_org_abs_2603_03960/figures/005_Table_3.jpg]]
 *Table 3: Pre-training data ablation. We report the average success on simulation tasks after fine-tuning models pre-trained on different combinations of Human, Robot, and Simulation datasets*
-
-![[assets/figures/papers/paper_list_l2043_https_arxiv_org_abs_2603_03960/figures/006_Table_2.jpg]]
-*Table 2: Ablation on temporal compression and token dimension. We vary the token dimension*
-
-![[assets/figures/papers/paper_list_l2043_https_arxiv_org_abs_2603_03960/figures/014_Table_6.jpg]]
-*Table 6: Quantitative results on 6 real-world bimanual manipulation tasks. We compare our model against baselines using indomain demonstrations*
-
-![[assets/figures/papers/paper_list_l2043_https_arxiv_org_abs_2603_03960/figures/012_Figure_7.jpg]]
-*Figure 7: Qualitative rollouts of our policy executing complex bimanual tasks in the real world*
-
-![[assets/figures/papers/paper_list_l2043_https_arxiv_org_abs_2603_03960/figures/013_Figure_8.jpg]]
-*Figure 8: Real-world experimental setup. (a) Our bimanual hardware setup. We collect demonstration data using a VR headset for teleoperation. (b) The set of diverse objects used in our real-world manipulation, requiring both precision and bimanual coordination*
-
-
 
 ## 定位与知识库关联
 
@@ -327,8 +291,6 @@ SAT 在灵巧操作知识库中的核心贡献在于：**首次将动作表示�
 - 如何自动生成面向完全未知形态的 Embodied Joint Codebook，而不依赖人工统计先验？
 - 结构中心表示能否与语言指令更灵活地结合，实现零样本组合任务？
 - 在处理演示-执行平台运动学不匹配时，能否引入显式的运动学适配层以提升鲁棒性？
-
-
 
 ## 原文 PDF
 

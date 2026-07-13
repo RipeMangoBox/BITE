@@ -54,8 +54,6 @@ ShotVerse 针对上述瓶颈提出了 **“先规划后控制”（Plan-then-Con
 
 值得注意的是，ShotVerse 在以下方面仍存在局限：高密度人群动态场景的建模、长序列中重复视角的像素级场景持久性，以及向多场景、无限长度生成的能力拓展。这些方向构成了未来工作的开放挑战。
 
-
-
 文本驱动的视频生成近年来取得了显著进展，以 Sora、VEO 等为代表的闭源模型和一系列开源工作，已能根据自然语言描述生成高质量的视频内容。然而，当创作场景从单镜头短视频扩展到多镜头的电影级叙事时，一个关键瓶颈逐渐凸显：**现有模型缺乏对相机运动的精确控制能力**。
 
 在电影语言中，相机运动——推拉摇移、轨道环绕、镜头切换——不仅是技术手段，更是叙事语法。导演通过精心设计的相机轨迹来引导观众注意力、营造情绪氛围、建立空间关系。但在当前的文本驱动范式中，用户只能通过隐式的自然语言提示（如“镜头缓慢推进”）来间接传达拍摄意图。这种模糊的交互方式存在两个根本性缺陷：其一，文本难以精确描述复杂的电影级镜头语言，例如“从远景以弧形轨道绕主体半周，同时缓慢上摇”这样的复合运动；其二，即使提供了详尽的文本描述，模型也缺乏将语言指令映射为精确几何轨迹的内在机制。
@@ -65,8 +63,6 @@ ShotVerse 针对上述瓶颈提出了 **“先规划后控制”（Plan-then-Con
 上述困境的根本原因在于：**文本-轨迹-视频三者之间缺乏对齐的数据基础**。现有的相机轨迹数据集（如 RealEstate10K、DL3DV）仅提供单镜头轨迹，且缺少与电影级语义描述的结构化关联。这意味着无论是训练轨迹规划器还是相机控制器，都缺乏一个能够桥接语言理解与几何执行的联合分布空间。
 
 ShotVerse 正是在这一背景下提出的。其核心洞察是：如果将任务解耦为“先规划后控制”（Plan-then-Control）的范式，并构建对齐的 (Caption, Trajectory, Video) 三元组数据集作为基础，就可以利用预训练视觉语言模型（VLM）的空间先验，自动从文本生成电影级轨迹，再由独立的生成器忠实执行这些轨迹。这一思路将相机控制从“手工设计或隐式猜测”转变为“自动规划与精确执行”的工程化流程，为文本驱动的多镜头电影创作开辟了新的技术路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -103,8 +99,6 @@ $$d_h \gets \lfloor d/3 \rfloor, \quad d_w \gets \lfloor d/3 \rfloor, \quad d_{s
 
 三个 changed slots 并非孤立存在，而是形成了递进的协同关系：真实电影数据提供了学习电影镜头语言的基础，4D RoPE 为多镜头结构提供了正确的时空归纳偏置，而规划-控制解耦则使得 VLM 的空间推理能力与扩散模型的生成能力可以各司其职。这种系统性的设计使得 ShotVerse 在 Track B 中实现了最低的平移误差 0.0163 和旋转误差 0.73，以及在 Track A 中 F1-Score 达到 0.422，均显著优于各赛道的最强基线。
 
-
-
 ShotVerse 提出“先规划后控制”（Plan-then-Control）范式，将文本驱动的多镜头电影级相机控制解耦为两个协作阶段：**轨迹规划**与**轨迹执行**。这一解耦的核心洞察在于，现有文本驱动视频生成模型之所以难以实现精确的相机控制，根源在于隐式文本提示无法可靠地传达复杂的电影镜头语言，而显式轨迹条件又面临高昂的手工设计成本。ShotVerse 通过构建对齐的 (Caption, Trajectory, Video) 三元组，将问题形式化为两个条件概率的建模：Planner 学习 $P(\text{Trajectory} \mid \text{Caption})$，Controller 学习 $P(\text{Video} \mid \text{Caption}, \text{Trajectory})$。
 
 ### 整体数据流
@@ -137,13 +131,6 @@ ShotVerse 提出“先规划后控制”（Plan-then-Control）范式，将文�
 Planner 与 Controller 之间形成松耦合的协作关系：Planner 的输出是显式的相机轨迹，作为 Controller 的条件输入。这种解耦带来的关键优势是，Planner 可以独立利用预训练 VLM 的空间推理能力从文本自动生成电影级轨迹，而 Controller 则专注于忠实执行这些轨迹。消融实验证实了这一设计的必要性：移除 VLM 编码器（改用浅层文本编码器）导致 F1-Score 从 0.422 降至 0.343（Table 6）；移除相机编码器则使平移误差从 0.0163 上升至 0.0609，旋转误差从 0.73 升至 1.27（Table 7）。4D RoPE 的作用同样关键——将其替换为标准 3D RoPE 会导致镜头切换准确率从 0.933 急剧下降到 0.429（Table 7），说明显式的镜头维度建模对于多镜头时空一致性至关重要。
 
 整个框架建立在 ShotVerse-Bench 数据集之上，该数据集通过多镜头相机标定管道将分立的单镜头轨迹对齐到统一全局坐标系，为 Planner 和 Controller 提供了对齐的三元组训练基础。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2603_11421/figures/001_Figure_1.jpg]]
-*Figure 1: Cinematic, Camera-Controlled, Multi-Shot Video Creation via our ShotVerse Framework. (i) Multi-Shot Data Foundation: We curate ShotVerse-Bench dataset from high-production cinema and propose a novel calibration pipeline that aligns disjoint shot trajectories into a unified global coordinate system. (ii) “Plan-then-Control” Framework: A VLM-based Planner automates the plotting of explicit, unified, cinematic trajectories from prompts, which serve as precise guidance for the Controller to synthesize content. (iii) Superior Performance: Examples demonstrate high-fidelity and great camera-controlled generation across diverse genres. The inset 3D plots visualize the plotted explicit trajectories*
-
-
 
 ShotVerse 将多镜头相机控制任务解耦为规划与控制两个阶段，核心模块可归纳为四个部分：分层提示构建、Planner 轨迹规划、Controller 轨迹注入、以及 4D RoPE 时空建模。
 
@@ -219,8 +206,6 @@ $$
 
 上述模块形成“先规划后控制”的完整闭环：分层提示构建器将用户意图结构化，Planner 利用 VLM 的空间先验自动生成全局对齐的电影级轨迹，Controller 通过相机编码器和 4D RoPE 精确执行该轨迹。训练时 Planner 与 Controller 独立优化，推理时 Planner 的输出直接作为 Controller 的条件输入，无需人工干预即可完成从文本到多镜头可控视频的端到端生成。
 
-
-
 ## 实验与关键发现
 
 ### 实验设置与评估协议
@@ -238,18 +223,12 @@ ShotVerse 的实验评估围绕三个核心赛道（Track A/B/C）展开，分�
 
 Table 2 展示了文本提示与生成轨迹之间的对齐质量。ShotVerse 在 ShotVerse-Bench 上取得了最高的 **F1-Score 0.422**，优于最强基线 **GenDoP**（Zhang et al., arXiv 2025）的 0.343（+0.079）。在 CLaTr-CLIP 指标上，ShotVerse 达到 **35.016**，同样领先 GenDoP 的 33.875（+1.141）。这一优势源于 Planner 中 VLM 编码器对分层提示的深层语义理解——消融实验（Table 6）证实，将 VLM 编码器替换为浅层文本编码器会导致 F1-Score 降至 0.343、CLaTr-CLIP 降至 33.875，直接退化为 GenDoP 级别性能。
 
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2603_11421/figures/005_Table_2.jpg]]
-*Table 2: Track A: Quantitative Evaluation of Text-Trajectory Alignment*
-
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2603_11421/figures/009_Table_6.jpg]]
 *Table 6: Quantitative Evaluation of Ablation Study (Planner)*
 
 #### Track B：相机控制精度
 
 Table 3 报告了在给定真实轨迹条件下各方法的相机控制精度。ShotVerse 在所有指标上均取得最优：**平移误差 0.0163**（对比 ReCamMaster 的 0.0589，降低 72.3%），**旋转误差 0.73**（对比 ReCamMaster 的 1.12，降低 34.8%），**坐标系对齐得分 CAS 0.500**（对比 ReCamMaster 的 0.408，提升 22.5%）。这一决定性优势来自 Camera Encoder 将外参矩阵精确注入扩散 Transformer 块的设计——消融实验（Table 7）表明，移除 Camera Encoder 后平移误差飙升至 0.0609、旋转误差升至 1.27，系统退化为 HoloCine 的基线水平。
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2603_11421/figures/006_Table_3.jpg]]
-*Table 3: Track B: Quantitative Evaluation of Camera Control. All methods receive ground-truth trajectories*
 
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2603_11421/figures/010_Table_7.jpg]]
 *Table 7: Quantitative Evaluation of Ablation Study (Controller)*
@@ -262,9 +241,6 @@ Figure 3 的定性对比进一步揭示了纯文本驱动方法的根本局限�
 #### Track C：多镜头视频质量
 
 Table 4 展示了端到端多镜头视频生成质量。ShotVerse 在美学质量上达到 **5.465**，显著超越 HoloCine 的 4.981（+0.484）；FVD 降至 **281.71**，相比 HoloCine 的 407.54 大幅降低 125.83。在镜头切换准确率上，ShotVerse 达到 **0.933**，略高于 MultiShotMaster 的 0.927（+0.006）。值得注意的是，Table 5 的 VLM 评估和用户研究在运动类型恰当性、运动时长、主体强调与电影节奏四个维度上均显示 ShotVerse 全面优于所有基线，验证了“先规划后控制”范式在电影级质量上的综合优势。
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2603_11421/figures/007_Table_4.jpg]]
-*Table 4: Track C: Quantitative Evaluation of Multi-Shot Quality. Without shot-splitting, shot metrics cannot be calculated for some baselines*
 
 ### 消融实验
 
@@ -291,8 +267,6 @@ Table 4 展示了端到端多镜头视频生成质量。ShotVerse 在美学质�
 3. **单场景限制**：当前方法仅限单个场景内的多镜头生成，尚未拓展至多场景、无限长度的整体可控生成。
 
 这些局限性指向了未来研究的关键方向：长时间跨度的精确场景持久性、多场景叙事演进与连续相机运动的统一控制，以及显式相机控制与复杂叙事结构（如对话、动作序列）的深度融合。
-
-
 
 ## 定位与知识库关联
 
@@ -362,8 +336,6 @@ ShotVerse 的方法有效性建立在 **ShotVerse-Bench** 数据集之上。如�
 2. **多场景无限长度生成**：如何将整体可控性扩展到多场景、无限长度的多镜头生成，同时处理故事线演进与连续相机运动？这需要将当前的单场景框架拓展为场景感知的层次化生成架构。
 
 3. **叙事级导演控制**：如何将显式相机控制与更复杂的叙事结构（如对话、动作序列）深度融合，实现更高层次的导演级创作？这要求将相机控制从纯几何层面提升到语义叙事层面，与角色行为、剧情节奏形成协同。
-
-
 
 ## 原文 PDF
 

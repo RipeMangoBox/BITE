@@ -49,8 +49,6 @@ claims:
 
 在 HumanEva-I 和 Human3.6M 两个基准数据集上，KHMP 取得了领先的准确率（HumanEva-I 上 ADE 0.188、FDE 0.204），同时保持了较高的运动多样性（APD 7.481）。消融实验表明，物理约束训练与自适应卡尔曼修正互补，二者组合使基线 ADE 从 0.196 降至 0.188，且关节抖动平均降低 28.0%。
 
-
-
 ### 问题背景
 
 人体运动预测旨在基于观测到的历史姿态序列，生成未来一段时间的合理运动轨迹。该任务在自动驾驶、人机交互、机器人导航和计算机动画等领域具有广泛应用。随着深度学习的发展，基于生成模型的方法已成为主流范式，其中变分自编码器（VAE）、生成对抗网络（GAN）和扩散模型等随机生成框架能够产生多样化的未来运动候选，避免了确定性方法固有的均值回归问题。
@@ -76,8 +74,6 @@ claims:
 - **推理阶段**：引入**自适应频域卡尔曼修正模块**，将预测序列通过离散余弦变换（DCT）映射到频域，对高频系数序列应用递归卡尔曼滤波。核心创新在于：将高频 DCT 系数建模为沿频率索引的一阶高斯-马尔可夫过程，并通过估计的信噪比（SNR）动态调节滤波器的过程噪声 $Q$ 和观测噪声 $R$，实现对抖动信号的选择性抑制——对低 SNR 的含噪序列施加强平滑，对高 SNR 的干净序列保守保留细节。
 
 这种“物理先验训练 + 频域自适应修正”的组合策略，使 KHMP 能够在保持高运动多样性的同时，显著提升预测的时序平滑性和物理合理性。
-
-
 
 ## 核心方法与创新机理
 
@@ -115,8 +111,6 @@ KHMP 的核心创新在于将**频域自适应卡尔曼滤波**引入随机人�
 
 物理约束训练与频域卡尔曼修正形成互补：前者在训练阶段注入生物力学先验，从分布层面减少不合理生成；后者在推理阶段作为后处理模块，针对性地抑制残余高频抖动。完整框架（Full KHMP）在 HumanEva-I 上取得 ADE 0.188，相较基线（ADE 0.196）降低 4.1%，同时平均抖动降低 28.0%（Table 2a, 2e）。值得注意的是，KHMP 在提升准确度的同时保持了高多样性（APD 7.481 vs 基线 6.516），表明自适应滤波并未过度平滑运动细节。
 
-
-
 KHMP 的整体设计遵循“训练时注入物理先验、推理时频域自适应精修”的双阶段范式，其 pipeline 如图 Figure 2 所示。
 
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2603_21327/figures/002_Figure_2.jpg]]
@@ -133,8 +127,6 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{base}} + \lambda_{\mathrm{
 3. **IDCT 反变换**：将精修后的频域系数通过逆离散余弦变换（IDCT）映射回时域，得到最终的平滑运动序列。
 
 这一设计将生成多样性（由 VAE 主干保证）与时序保真度（由频域卡尔曼修正保证）解耦，使得两个阶段可以独立优化。消融实验证实，物理约束训练与频域卡尔曼修正互补——完整框架（Full KHMP）在 HumanEva-I 上取得最优 ADE 0.188，相较仅使用 VAE 主干的基线（ADE 0.196）有显著提升（Table 2a）。
-
-
 
 KHMP 框架由三个核心模块构成：VAE 主干生成网络、训练时物理约束模块，以及推理时自适应频域卡尔曼修正模块。
 
@@ -200,13 +192,6 @@ $$R = \frac{R_0}{1 + \lambda_R \cdot \mathrm{SNR}_{\mathrm{est}}}$$
 
 其行为逻辑为：当 $\mathrm{SNR}_{\mathrm{est}}$ 较低（信号含噪严重）时，$Q$ 增大、$R$ 减小，卡尔曼增益 $K_k$ 降低，滤波器倾向强平滑；反之，当信噪比较高时，$R$ 急剧下降而 $Q$ 温和下降，增益增大，滤波器倾向保留细节。这一自适应设计使得模块能对抖动严重的预测施加更强抑制，而对已平滑的运动保守处理。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2603_21327/figures/008_Figure_6.jpg]]
-*Figure 6: Behavior of adaptive Kalman filter parameters versus estimated SNR*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -244,9 +229,6 @@ Table 2 系统拆解了 KHMP 各组件的贡献，形成一条清晰的因果链
 
 Fig. 3 展示了五个关键超参数的敏感度分析：高频阈值 $k_0$、自适应过程噪声系数 $\lambda_Q$、自适应观测噪声系数 $\lambda_R$、角度损失权重 $\lambda_{\mathrm{angle}}$ 和时序损失权重 $\lambda_{\mathrm{temporal}}$。各参数在合理区间内均表现出稳健的性能，最优值附近波动不会导致性能剧烈退化。具体权重配置见 Table 3。
 
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2603_21327/figures/005_Figure_3.jpg]]
-*Figure 3: Sensitivity analysis of hyperparameters: k0, λQ, λR*
-
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2603_21327/figures/009_Table_3.jpg]]
 *Table 3: Loss weights configuration*
 
@@ -263,18 +245,8 @@ Fig. 6 揭示了自适应卡尔曼滤波参数随估计 SNR 的动态行为：�
 3. **骨干网络通用性未验证**：当前仅在 VAE 主干（SLD-HMP）上验证了方法的有效性，其在扩散模型等其他生成式骨干上的迁移效果尚不明确。
 4. **长期预测未探索**：实验设置聚焦于标准短期预测（400ms），该方法能否扩展到 >1000ms 的长期预测场景需进一步验证。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2603_21327/figures/006_Figure.jpg]]
-*Figure: (a) Gesturing - Ankle: Ours vs Baseline (b) Gesturing - Upper Arm: Ours vs Baseline (c) Gesturing - Wrist: Ours vs Baseline (d) Gesturing - Shin: Ours vs Baseline (e) Walking - Ankle: Ours vs Baseline (g) Walking - Thigh: Ours vs Baseline (f) Walking - Shin: Ours vs Baseline (h) Walking - Wrist: Ours vs Baseline*
-
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2603_21327/figures/007_Figure_5.jpg]]
 *Figure 5: Visual comparison highlighting KHMP’s enhanced prediction quality over the baseline across various actions (Boxing, Jogging, Walking, and Gesturing). The figure showcases KHMP’s ability to correct physical implausibility often present in raw generative model outputs. In the examples shown, red arrows indicate issues in baseline predictions, while blue boxes highlight the corresponding smoother and more coherent KHMP results. Best viewed by zooming in. We also provide video demos in the SupMat*
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2603_21327/figures/011_Figure_7.jpg]]
-*Figure 7: Additional qualitative comparison between Baseline and KHMP predictions for selected frames from Jogging and Gesturing actions. Red arrows highlight implausible poses in the baseline, while blue boxes show the refined and more realistic results from KHMP*
-
-
 
 ## 定位与知识库关联
 
@@ -323,8 +295,6 @@ KHMP 的设计建立在一组明确的前提假设之上，这些假设同时界
 在人体运动预测的方法谱系中，KHMP 占据了一个独特的位置：它不属于端到端生成模型的创新（如新的网络架构或训练范式），也不属于纯后处理平滑方法（如高斯滤波或样条插值），而是在**生成模型与信号处理之间建立了自适应接口**。其核心贡献——将 DCT 高频系数建模为频率索引的一阶高斯-马尔可夫过程，并用估计 SNR 驱动卡尔曼滤波参数——在现有文献中未见先例。
 
 从更广的视角看，KHMP 代表了一类“生成-精修”混合范式：生成模型负责多样性和全局结构，信号处理方法负责局部时序一致性。这一范式与扩散模型中的“去噪-引导”策略有概念上的亲缘性，但 KHMP 在频域操作的递归滤波机制提供了不同的精度-效率权衡点。
-
-
 
 ## 原文 PDF
 

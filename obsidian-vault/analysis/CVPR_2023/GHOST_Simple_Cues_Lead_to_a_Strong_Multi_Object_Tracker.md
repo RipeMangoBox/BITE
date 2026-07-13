@@ -55,8 +55,6 @@ claims:
 
 GHOST的成功传递了一个重要信号：在追求复杂模型之前，正确理解和利用外观与运动线索的简单组合，或许比设计更复杂的端到端架构更具通用性和有效性。该方法为MOT社区提供了一个简洁、可解释且易于复现的强基线。
 
-
-
 ### 多目标跟踪中的外观线索困境
 
 多目标跟踪（MOT）的核心挑战之一在于如何在连续帧之间建立正确的检测关联。外观线索（appearance cue）长期以来被视为解决这一问题的关键手段，其通常由行人重识别（reID）模型提供。然而，**标准的reID模型在直接应用于MOT时性能会显著下降**，这一现象构成了本研究的核心动机。
@@ -76,8 +74,6 @@ Figure 1 直观地揭示了这一困境：尽管先进的reID方法（如R50-TR�
 现有主流跟踪器在处理上述问题时，往往走向两个极端：一类方法（如 **Tracktor**、**CenterTrack**、**ByteTrack**）主要依赖运动或检测置信度线索，对外观线索的利用较为粗糙；另一类方法（如 **FairMOT**、**QDTrack**）尝试通过联合训练或复杂关联机制来强化外观模型，但通常需要大量跟踪标注数据，且泛化能力受限。
 
 本文的核心洞察在于：**正确理解和利用外观与运动线索，即使采用简单的匈牙利算法进行逐帧匹配，也能在不使用任何跟踪训练数据的情况下达到最先进的跟踪性能。** 社区可能过度追求复杂的端到端学习范式，而忽视了传统方法中关键细节的精心设计。基于这一认知，GHOST通过两个简单而关键的设计——区分活跃/非活跃轨迹的匹配策略和在测试时动态进行在线域自适应——来弥补reID模型在MOT中的固有缺陷，同时结合轻量级的线性运动模型，构建了一个简洁而强大的跟踪器。
-
-
 
 ## 核心方法与创新机理
 
@@ -126,8 +122,6 @@ $$\hat{p}_j^t = p_j^{t-1} + v_j \cdot \Delta t$$
 
 与**Tracktor**、**CenterTrack**、**ByteTrack**、**FairMOT**、**QDTrack**等基线方法相比，GHOST未引入复杂的检测-跟踪联合训练、多级级联匹配或查询式关联，而是通过深入理解外观与运动线索的本质特性，以最小的复杂度代价实现了跨数据集的强大泛化能力。
 
-
-
 GHOST（Good Old Hungarian Simple Tracker）是一个**在线逐帧多目标跟踪器**，其核心设计哲学是：通过精心处理简单的外观和运动线索，配合经典的匈牙利算法进行二分图匹配，即可在不使用任何跟踪训练数据的前提下达到最先进的性能。
 
 ### Pipeline 总览
@@ -168,8 +162,6 @@ $$\hat{p}_j^t = p_j^{t-1} + v_j \cdot \Delta t$$
 -   **输入**：当前帧的检测框列表（由外部检测器提供）。
 -   **输出**：每个检测框与现有轨迹的关联结果，以及新初始化的轨迹。
 -   **约束**：整体管道依赖于性能良好的检测器，无法在检测失败的情况下恢复轨迹；外观模型仅在 Market-1501 上训练，对非行人类别的泛化能力有限；运动权重、速度计算帧数等超参数需按数据集手动调整。
-
-
 
 ### 3.1 整体管道
 
@@ -229,8 +221,6 @@ $$C(i,j) = (1 - w_m) \cdot d_a(i,j) + w_m \cdot d_m(i,j)$$
 
 其中$w_m$为运动权重，根据数据集特性手动调整。消融实验表明，运动权重在MOT17上最优为0.4（public）/0.6（private），DanceTrack上为0.4，MOT20上为0.8，BDD100k上为0.4。速度计算使用的帧数在DanceTrack上最优为5帧，MOT20为30帧，BDD100k为10帧。
 
-
-
 ## 实验与关键发现
 
 ### 核心组件消融
@@ -254,12 +244,6 @@ Figure 12 系统比较了不同代理距离计算方式在五个数据集/设置
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2206_04656/figures/016_Figure.jpg]]
 *Figure: (e) MOT17-10 M (f) MOT17-11 M (g) MOT17-13 M*
 
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2206_04656/figures/018_Figure.jpg]]
-*Figure: (a) MOT17-02 S (b) MOT17-04 S (c) MOT17-05 M (d) MOT17-09 S*
-
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2206_04656/figures/019_Figure.jpg]]
-*Figure: (e) MOT17-10 M (f) MOT17-11 M (g) MOT17-13 M*
-
 ### 运动模型与线索融合
 
 **运动权重敏感性**：Figure 13 展示了运动权重对不同数据集的影响。MOT17 上最优运动权重为 0.4（public）和 0.6（private），DanceTrack 为 0.4，MOT20 高达 0.8，BDD100k 为 0.4。MOT20 需要更高运动权重的原因在于该数据集存在大量密集人群和严重遮挡场景，外观线索的可靠性下降，此时简单线性运动模型提供了关键的补充信息。
@@ -272,16 +256,7 @@ Figure 12 系统比较了不同代理距离计算方式在五个数据集/设置
 
 Figure 4 按可见度水平分解了短时关联和长时关联中的正确关联率（RCA）。高可见度场景下，外观在短时和长时关联中均表现优异；随着可见度下降，外观的 RCA 急剧降低，而运动模型在低可见度短时关联中保持较高正确率，但在长时关联（如遮挡后重新出现）中同样失效。这解释了为何区分活跃/非活跃轨迹并用不同策略处理至关重要——非活跃轨迹通常对应长时消失后重新出现的目标，此时需要更宽松的匹配阈值和代理距离来弥补外观不确定性的增加。
 
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2206_04656/figures/009_Figure_4.jpg]]
-*Figure 4: RCA with respect to different visibility levels for short-term vs. long-term associations*
-
 Figure 5 进一步区分了静态场景和运动场景。在静态场景中，外观在长时关联中的优势更为明显；而在相机运动场景中，运动模型的相对重要性上升。Figure 6 则综合了场景类型和可见度两个维度，揭示了在相机运动且低可见度的极端条件下，外观和运动均面临严峻挑战，这也是 GHOST 在此类场景下仍有提升空间的原因。
-
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2206_04656/figures/010_Figure_5.jpg]]
-*Figure 5: RCA for static, moving, and all sequences with respect to short-term vs. long-term associations*
-
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2206_04656/figures/011_Figure_6.jpg]]
-*Figure 6: RCA for static, moving, and all sequences with respect to different visibility levels*
 
 ### 与 SOTA 方法的全面比较
 
@@ -301,16 +276,11 @@ Figure 5 进一步区分了静态场景和运动场景。在静态场景中，�
 
 3. **超参数需按数据集调整**：运动权重、速度计算帧数、匹配阈值等关键参数需要针对每个数据集单独调优（见 Figure 13、Figure 14），缺乏全自动的通用方案。这在实际部署中增加了工程复杂度。
 
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2206_04656/figures/032_Figure_14.jpg]]
-*Figure 14: Drop in Performance for Different Number of Frames for Velocity Computation on Different Datasets. M17Pr = MOT17 private detections, M17Pu = MOT17 public detections, M20 = MOT20 public detections, DT = DanceTrack, BDD = BDD100k. (a) HOTA*
-
 4. **检测器依赖性**：GHOST 作为基于检测的跟踪器，无法在检测器完全漏检时恢复轨迹。在 MOT20 等密集场景中，检测器的漏检和误检会直接传播为跟踪错误。
 
 ### 公平性说明
 
 GHOST 的实验设置体现了高度的公平比较意识：外观模型仅在 Market-1501 上训练，未在任何跟踪数据集上微调；参数调整仅针对整个数据集而非逐序列优化；私有检测器实验中仅使用其他跟踪器提供的边界框，不对检测器做任何适配。运行速度方面，GHOST 在 MOT17 公共检测器上约 10 FPS，私有检测器上约 6 FPS，与主流 SOTA 跟踪器相当。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2206_04656/figures/013_Table_4.jpg]]
 *Table 4: Comparison to state-of-the-art on DanceTrack. Table 5. Comparison to state-of-the-art on BDD100k*
@@ -320,8 +290,6 @@ GHOST 的实验设置体现了高度的公平比较意识：外观模型仅在 M
 
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2206_04656/figures/012_Table_3.jpg]]
 *Table 3: Comparison to state-of-the-art for public and private detections on MOT17 and MOT20. † and ‡ indicate bounding boxes refined by Tracktor [5] and CenterTrack [83]. ? since ByteTrack uses different thresholds for different sequences of the test set and interpolation we recomputed their results without both (recomputed black / original gray)*
-
-
 
 ## 定位与知识库关联
 
@@ -368,8 +336,6 @@ GHOST 的简洁设计虽带来强大的泛化能力，但也存在明确的适�
 4. **复杂运动建模的权衡。** 结合更复杂的运动模型（如学习型预测器）是否能进一步改善极低可见度或复杂场景下的性能，同时保持效率和简洁性？Figure 4 和 Figure 5 对短时/长时关联中外观与运动贡献的分析为这一问题提供了初步线索，但尚未给出明确答案。
 
 5. **与端到端方法的融合。** GHOST 证明了简单线索的强大能力，但其与端到端学习方法的结合潜力尚未被探索——能否将在线域自适应和区分性轨迹处理的思想融入端到端框架，进一步提升性能？
-
-
 
 ## 原文 PDF
 

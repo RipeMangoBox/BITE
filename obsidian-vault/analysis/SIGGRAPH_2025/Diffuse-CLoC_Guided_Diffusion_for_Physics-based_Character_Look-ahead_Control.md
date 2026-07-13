@@ -154,12 +154,6 @@ $$\tau_t^{k-1} = \alpha_k \big(\tau_t^k - \gamma_k \epsilon_\theta(\tau_t^k, O_t
 ![[assets/figures/papers/paper_list_l6_http_arxiv_org_abs_2503_11801v3/figures/011_Table_3.jpg]]
 *Table 3: Task Weights Table*
 
-![[assets/figures/papers/paper_list_l6_http_arxiv_org_abs_2503_11801v3/figures/007_Figure_6.jpg]]
-*Figure 6: Rollouts in the forest task for 0.5s prediction (Top), 1s prediction (Middle), and 2s prediction (Bottom). Starting at the triangle, the character aims to reach the goal marked by a star. The 0.5s policy circles within the forest and fails to reach the waypoint, while the 1s policy successfully navigates through the forest with diverse trajectories. In contrast, the 2s policy sometimes overcommits to suboptimal future paths and collides with obstacles near the goal*
-
-![[assets/figures/papers/paper_list_l6_http_arxiv_org_abs_2503_11801v3/figures/008_Figure_5.jpg]]
-*Figure 5: Rollouts in jump task for Kin+PHC (Left) vs. Diffuse-CLoC (Right). Kin+PHC suffers from artifacts in kinematics prediction and fails in agile motions, while Diffuse-CLoC remains robust and completes the task*
-
 ## 定位与知识库关联
 
 ### 与现有扩散控制范式的本质差异

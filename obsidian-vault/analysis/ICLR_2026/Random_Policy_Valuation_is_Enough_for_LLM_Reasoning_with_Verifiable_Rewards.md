@@ -51,8 +51,6 @@ claims:
 
 实验结果表明，ROVER 在 AIME24、AIME25、HMMT25 上平均 pass@1 提升 **+8.2**，pass@256 提升 **+16.8**，多样性提升 **+20.5%**，且训练过程更轻量、更稳定。
 
-
-
 ### LLM 推理中的可验证奖励强化学习
 
 基于可验证奖励的强化学习（RLVR）已成为提升大语言模型推理能力的核心范式。其基本流程为：模型针对给定问题生成完整推理链，仅在最终答案处获得二元奖励信号（正确为 1，错误为 0），随后通过强化学习更新模型参数。数学推理任务天然适配这一范式——答案的正确性可被自动验证，无需人工标注。
@@ -92,8 +90,6 @@ claims:
 ### 问题定位：方法谱系中的空白
 
 在 RLVR 方法谱系中，现有工作可大致分为两类：一类是策略梯度方法（PPO/GRPO 及其变体），依赖优势估计和迭代改进；另一类是偏好优化方法（DPO 等），依赖成对比较数据。ROVER 开辟了第三条路径——**随机策略评估路径**，它既不需要策略梯度的高方差估计，也不需要偏好数据的标注成本，而是直接从 MDP 的结构特性中推导最优行为。这一方法论上的简化，使得 ROVER 在训练效率、稳定性和多样性三个维度上同时获得提升。
-
-
 
 ## 核心方法与创新机理
 
@@ -153,11 +149,6 @@ $$\tilde{r}(x, y_i) = r(x, y_i) - \frac{1}{n} \sum_{i=1}^{n} r(x, y_i)$$
 
 ROVER 的四个 changed slots 共同构成了一个**更轻量、更稳定、多样性更强**的 RLVR 框架：它从 MDP 结构特性出发，用单次均匀策略评估替代迭代 GPI，用软最大化天然保持多样性，用内在参数化消除额外网络，用均值中心化简化奖励处理。在 AIME24/25 和 HMMT25 上，ROVER 以相同的默认超参数（$\rho=1$）实现了 pass@1 提升 +8.2、pass@256 提升 +16.8、多样性提升 +20.5% 的显著增益。
 
-
-
-![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_ujLgLz6QQa/figures/006_Figure_3.jpg]]
-*Figure 3: Illustration of ROVER (greedy)*
-
 ROVER 的整体 pipeline 建立在一个核心洞察之上：在 LLM 数学推理所对应的确定性树结构 MDP 中，最优策略可以直接从**固定均匀随机策略的 Q 值**中导出，而无需传统的迭代策略评估-改进循环。基于这一洞察，ROVER 将整个训练流程组织为三个紧密耦合的模块。
 
 ### 模块一：采样与奖励中心化
@@ -200,8 +191,6 @@ $$\mathcal{L}_{\text{ROVER}} = \frac{1}{\sum_{i=1}^{n} |y_i|} \sum_{i=1}^{n} \su
 | 奖励归一化 | 组内标准差归一化 | 仅均值中心化 |
 
 ROVER 在所有基准测试中使用相同的默认超参数（$\rho=1$），无需任务特定的调优。消融实验表明，温度 $\rho$ 控制探索与利用的权衡：$\rho=1$ 在所有任务上提供稳健性能，$\rho$ 过小导致过早利用和多样性降低，$\rho$ 过大则利用不足。系数 $\beta$ 在 0.2 至 1.0 的宽范围内对性能影响不敏感，表现稳定。
-
-
 
 ### 3.1 均匀策略 Q 值评估
 
@@ -267,8 +256,6 @@ $$\mathcal{L}_{\text{ROVER}} = \frac{1}{\sum_{i=1}^{n} |y_i|} \sum_{i=1}^{n} \su
 - **系数 $\beta$**：损失函数中对应项的系数在 0.2 至 1.0 之间时，ROVER 性能保持稳定（Figure 13）。
 - **与熵正则化的对比**：在 GRPO 中加入熵正则化虽增加熵，但性能下降；ROVER 则同时提升性能和熵（Table 9：ROVER Pass@1 11.10, entropy 0.055 vs GRPO+entropy Pass@1 9.31, entropy 0.020）。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能对比
@@ -321,27 +308,8 @@ ROVER 在计算开销上具有显著优势。相较于 ProRLv2 使用 136k 训�
 
 ROVER 的理论保证建立在**确定性树结构 MDP** 和**二元终止奖励**两个假设之上。当前实验验证集中在数学推理和工具使用等符合该假设的任务；对于存在随机状态转移或稠密、连续奖励的场景，均匀策略 Q 值的近似质量及其导出的策略最优性需要进一步验证。此外，实验主要在 3B-8B 参数规模上进行，训练步数相对有限（300-500 步），更大模型和更长训练周期下的行为仍有待探索。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_ujLgLz6QQa/figures/012_Figure_5.jpg]]
 *Figure 5: (a) Illustration of the tabular MDP. (b)-(d) Comparison of learned Q-value maps. According to the Q-values, standard Q-learning with ϵ-greedy exploration converges to the mode ACD. ROVER (greedy) assigns the highest Q-values to optimal actions, but still converges to a single mode BDC due to its greedy behavior. ROVER is able to assign equally high Q-values to all optimal actions. (e) Q-learning and ROVER (greedy) converge to a single mode despite both being optimal, whereas ROVER successfully covers all 4 optimal modes*
-
-![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_ujLgLz6QQa/figures/016_Figure_6.jpg]]
-*Figure 6: Performance of our method and baselines over training on countdown tasks. The y-axis of (c) denotes the number of found distinct correct solution equations, averaged over 1024 questions. Figure 7: ROVER successfully finds 17 diverse solution equations, while only 3 different equations are given by GRPO*
-
-![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_ujLgLz6QQa/figures/040_Table_4.jpg]]
-*Table 4: Summarization of MDP structures between different tasks, considering the discrete Atari task from traditional RL and the countdown task from RLVR. While traditional RL tasks have smaller spaces and shorter horizons, the underlying MDP structure can be much more complex than LLM RLVR tasks that feature deterministic, episodic, tree-structured MDPs (which have larger spaces and longer horizons and leverage a powerful pre-trained model that can navigate in the large space)*
-
-![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_ujLgLz6QQa/figures/041_Table_5.jpg]]
-*Table 5: Results of DeepSeek-R1-Distill-Qwen-1.5B on typical math competition tasks. The high and the second-best scores are shown in bold and underlined, respectively*
-
-![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_ujLgLz6QQa/figures/042_Table_6.jpg]]
-*Table 6: Default hyperparameters for RL training*
-
-![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_ujLgLz6QQa/figures/043_Table_7.jpg]]
-*Table 7: Default hyperparameters for evaluation*
-
-
 
 ## 定位与知识库关联
 
@@ -399,8 +367,6 @@ ROVER 的理论保证建立在以下假设之上：
 4. **与离线 RL 和偏好优化的结合**：能否将均匀策略估值的思想与现有的离线 RL 或直接偏好优化（DPO）方法相结合，以处理无明确二元奖励的场景？
 
 5. **温度参数 ρ 的理论最优性**：论文通过实验表明 ρ=1 在多个任务上提供稳健性能，但缺乏对 ρ 最优值的理论刻画。软最大化策略的性能下界（Theorem 2）表明当 ρ→0 时性能差距消失，但实际中 ρ 过小会导致多样性崩溃，这一矛盾需要更精细的理论分析。
-
-
 
 ## 原文 PDF
 

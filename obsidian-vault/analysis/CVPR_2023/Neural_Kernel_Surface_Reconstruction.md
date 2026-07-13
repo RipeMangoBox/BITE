@@ -59,8 +59,6 @@ claims:
 
 **方法定位**：NKSR属于“学习先验 + 经典求解”的混合范式——利用神经网络预测核特征场以归纳几何先验，再通过稀疏线性求解器高效重建表面。这一设计使其兼具数据驱动的泛化能力与经典方法的可扩展性，在百万级点云（Waymo场景，1000万点，20秒）上仍可高效运行。
 
-
-
 三维表面重建是计算机视觉与图形学中的核心问题，其目标是从离散的定向点云恢复连续、高保真的表面几何。该任务在自动驾驶、机器人导航、数字孪生和增强现实等应用中具有广泛需求。然而，现实世界的输入点云通常伴随噪声、稀疏采样和分布外场景，这对重建方法的泛化能力、可扩展性和鲁棒性提出了严峻挑战。
 
 传统重建方法，如**SPSR**（Screened Poisson Surface Reconstruction），依赖手工设计的数学先验，在受控条件下表现良好，但对噪声敏感且缺乏数据驱动的几何先验。近年来，基于学习的方法试图从数据中归纳重建知识，但普遍面临以下瓶颈：
@@ -72,8 +70,6 @@ claims:
 **瓶颈三：训练数据限制。** 主流学习方法（如ConvONet、POCO等）通常需要预计算的占用场或SDF作为训练监督，这不仅增加了数据准备的复杂度，也限制了可用的训练数据规模和多样性，削弱了模型在分布外场景下的泛化能力。
 
 针对上述问题，**NKSR**（Neural Kernel Surface Reconstruction）提出了一个统一的解决方案。其核心动机在于：通过重新设计核函数的支撑域、拟合目标和空间表示结构，在保持学习型方法泛化优势的同时，实现可扩展、对噪声鲁棒的高保真重建。具体而言，NKSR引入紧支撑核函数与层次化稀疏体素结构，将重建问题转化为稀疏梯度拟合（法向一致性约束），从而构建正定稀疏线性系统，可高效并行求解。这一设计使求解规模与输入复杂度解耦，且无需预先计算SDF，可直接从任意稠密定向点云训练，为大规模、跨场景的通用表面重建开辟了新路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -130,8 +126,6 @@ NKF 等先前学习方法需要预计算占用值或符号距离函数（SDF）�
 
 这些创新并非独立叠加，而是围绕一个统一洞察展开：**将重建形式化为在预测的核特征空间中求解稀疏线性系统，用梯度约束取代值约束，用层次化紧支撑核取代全局核**。这一设计使 NKSR 在保持 NKF 强泛化性的同时，实现了对大规模、噪声和分布外输入的鲁棒可扩展重建。
 
-
-
 NKSR 的整体 pipeline 遵循“编码—求解—提取”三阶段范式，将 3D 表面重建形式化为在预测的核特征空间中求解一个稀疏正定线性系统的过程。如 **Figure 3** 所示，系统接收含法向的点云作为输入，依次通过体素层次预测、核特征场构建、线性系统求解和表面提取四个核心模块，最终输出重建网格。
 
 **输入与预处理**：方法接受一个定向点云 $\{X_{\mathrm{in}}, N_{\mathrm{in}}\}$，其中每个点包含三维坐标和对应的法向量。点云首先被体素化，并通过一个稀疏卷积主干网络（点编码器 + U-Net，详见 **Figure 12** 和 **Figure 13**）进行处理。
@@ -162,12 +156,8 @@ $$(\mathbf{Q}^\top \mathbf{Q} + \mathbf{G}^\top \mathbf{G})\alpha = \mathbf{Q}^\
 
 整个 pipeline 的关键特性在于：核函数的紧支撑性与层次体素修剪协同作用，使线性系统规模与输入复杂度解耦；梯度拟合目标替代了传统的位置精确插值，赋予方法对输入噪声的天然鲁棒性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2305_19590/figures/001_Figure_1.jpg]]
 *Figure 1: We present Neural Kernel Surface Reconstruction (NKSR) for recovering a 3D surface from an input point cloud. Trained directly from dense points, our method reaches state-of-the-art reconstruction quality and scalability. NKSR is also highly generalizable: All the meshes in this figure are reconstructed using a single trained model*
-
-
 
 ### 整体流水线
 
@@ -217,8 +207,6 @@ $$\mathbf{G}_{i,j}^{(l)} = K_{\theta}(\mathbf{x}_i^{\text{in}}, \mathbf{x}_j^{(l
 
 训练直接使用稠密定向点云作为监督，无需预计算占用场或SDF，从而支持更大规模、更多样化的训练数据。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能验证
@@ -248,9 +236,6 @@ NKSR在多个重建基准上取得了最先进的结果，覆盖了从单一物�
 
 NKSR展示了显著的扩展能力。**Figure 9** 显示，厨房水槽模型（多数据集联合训练）可在Waymo数据集上以核外方式处理1000万至1100万点的大规模场景，分别仅需20秒和35秒。**Figure 10** 和 **Table 5** 进一步验证了模型对不同输入密度的泛化能力，在1.5m/scan至15m/scan的稀疏度变化下保持稳定的F-Score。
 
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2305_19590/figures/013_Figure_9.jpg]]
-*Figure 9: Application to Waymo [57] dataset. We run our kitchen-sink-model in an out-of-core manner (see Appendix for implementation details) to scale to very large scenes consisting of 10M / 11M (left / right) points, taking only 20s / 35s*
-
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2305_19590/figures/015_Table_5.jpg]]
 *Table 5: Performance comparison using different input densities. Here the F-Score ↑ metric is shown*
 
@@ -266,25 +251,10 @@ NKSR展示了显著的扩展能力。**Figure 9** 显示，厨房水槽模型（
 - **Figure 4** 直观展示了隐式场作为体素层次上核基函数之和的表示，每个体素中心的核基函数仅在其一环邻域内非零，这是稀疏性的根源。
 - **Figure 15** 的核可视化提供了对学习到的几何先验的洞察：PCA显示特征在不同几何区域呈现结构化分布，相似度热力图表明核函数捕捉了局部几何相似性，水平集则展示了紧支撑核的局部影响范围。
 
-### 补充图表
 
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2305_19590/figures/006_Figure_5.jpg]]
-*Figure 5: ABC/Thingi10K [36, 79] visualization. Figure 6: ShapeNet [6] visualization. The two shapes are with $\sigma$ = 0 . 0 0 5 and $\sigma$ = 0 . 0 2 5 Gaussian noise respectively
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2305_19590/figures/016_Figure.jpg]]
-*Figure: Voxel size (×0.01)*
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2305_19590/figures/008_Table_2.jpg]]
-*Table 2: ShapeNet [6] comparison. $\mathbf { \omega } ^ { \prime } \mathbf { N } . \mathbf { \omega }$ denotes whether normals $N _ { \mathrm { i n } }$ are used as input. $d _ { C }$ is multiplied by 1 $0 ^ { 3 }$
 
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2305_19590/figures/017_Figure_11.jpg]]
 *Figure 11: Ablation study. IoU metric is shown. The back arrows indicate the setting we use to obtain Tab. 2*
-
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2305_19590/figures/024_Table_7.jpg]]
-*Table 7: Dataset specifications for CARLA*
-
-
 
 ## 定位与知识库关联
 
@@ -332,8 +302,6 @@ NKSR 的直接前身是 **Neural Kernel Fields (NKF)**，后者首次将核方�
 4. **实时 SLAM 系统集成**：NKSR 的线性求解器使用 Jacobi 预条件共轭梯度法在 GPU 上求解，对于中等规模场景已具备较高效率（Waymo 千万点场景 20-35 秒）。是否可通过增量式求解（利用前一帧的解作为当前帧的初始值）和自适应体素更新策略，将 NKSR 嵌入实时 SLAM 系统，实现在线重建？
 
 5. **无监督/自监督训练**：当前训练依赖稠密定向点云监督。是否可通过可微渲染损失或一致性约束，降低对真值点云的依赖，使模型能够从原始扫描数据或 RGB-D 序列中自监督学习？
-
-
 
 ## 原文 PDF
 

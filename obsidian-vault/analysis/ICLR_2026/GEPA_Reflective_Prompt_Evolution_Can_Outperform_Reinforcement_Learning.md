@@ -60,8 +60,6 @@ claims:
 
 **证据强度**：上述核心结论均有高置信度实验证据支撑，主要结果来自多基准、多模型（Qwen3 8B、GPT-4.1 Mini）的严格对比，消融实验验证了关键设计选择的有效性。局限性方面，System Aware Merge 策略的效果对预算分配敏感，且当前验证集中在 3-4 个模块的复合系统上，向更大规模系统的推广仍有待验证。
 
-
-
 复合 AI 系统通过编排多个模块（如检索器、推理器、验证器）协同解决复杂任务，其性能高度依赖各模块的提示指令（prompts）和模型权重的质量。形式化地，系统在任务分布 $\mathcal{T}$ 上的优化目标为联合最大化期望评测值：
 
 $$
@@ -87,8 +85,6 @@ $$
 本文的核心洞察在于：**现代大语言模型在执行任务时产生的自然语言轨迹和评估反馈文本，本身就构成了比压缩标量奖励更密集、更具信息量的学习信号**。与其将这些文本丢弃、仅保留一个数字，不如将其反馈给优化器本身，驱动反思性的提示改进。
 
 同时，借鉴自然进化中的遗传变异和基于帕累托前沿的“照亮”探索策略（Mouret & Clune, 2015），可以在有限的实际交互中持续提炼出泛化性强的高质量提示，从根本上规避贪心搜索的局部最优陷阱。这一思路将优化对象从模型权重切换为系统提示指令，在保持模型冻结的前提下，以极少的 rollout 实现高效的任务适应。
-
-
 
 ## 核心方法与创新机理
 
@@ -120,8 +116,6 @@ GEPA 采用**基于帕累托前沿的“照亮”策略**（Mouret & Clune, 2015
 
 GEPA 通过反思性突变生成的提示不仅性能更优，而且更加精炼。统计显示，GEPA 优化出的提示长度约为 MIPROv2 提示的 **33% 甚至更短**，但性能更高（Figure 16, Figure 17）。这表明反思机制能够有效提取任务核心要求，去除冗余表述，生成更具针对性的指令。
 
-
-
 GEPA 是一个面向复合 AI 系统的样本高效型提示优化器，其核心设计围绕三个原则展开：**遗传式提示进化**、**基于自然语言反馈的反思**以及**帕累托前沿驱动的候选选择**。与 GRPO 等更新模型权重的方法不同，GEPA 仅进化系统中各模块的提示指令 $\Pi_\Phi$，而保持底层大语言模型权重 $\Theta_\Phi$ 冻结。这一设计使其能够直接应用于闭源模型（如 GPT-4.1 Mini），无需访问模型内部参数。
 
 ### 优化循环
@@ -146,8 +140,6 @@ GEPA 还包含一个可选的 **System Aware Merge** 策略，用于对互补模
 - **输出**：经过优化后的提示集合 $\Pi^*_\Phi$，可直接部署到目标系统中，无需修改模型权重。
 
 整个流程在有限的 rollout 预算约束下运行，大部分预算消耗在验证集上的候选评估，而非直接用于产生学习信号。这一设计使得 GEPA 在仅需 79 至 737 次训练集 rollout 的条件下即可收敛到高质提示，展现出极高的样本效率。
-
-
 
 ### 复合AI系统的形式化建模
 
@@ -183,8 +175,6 @@ $$\langle \Pi^{*}, \Theta^{*} \rangle_{\Phi} = \arg\max_{\langle \Pi, \Theta \ra
 ### 系统感知合并（可选模块）
 
 对于包含多个互补模块的复合 AI 系统，GEPA 提供可选的系统感知合并操作。当不同分支的突变分别在各自模块上积累了互补的改进时，合并操作通过遗传交叉将这些改进整合到同一候选程序中。其有效性对预算分配和调用时机敏感——在 HotpotQA 上，GEPA+Merge 将得分进一步提升至 64.33，但在其他任务上增益并不稳定，表明该模块缺少自适应的调度机制。
-
-
 
 ## 实验与关键发现
 
@@ -230,35 +220,14 @@ Figure 15 可视化了各优化器的泛化差距（测试集性能与最佳验�
 3. **对抗性提示的脆弱性。** 实验表明通过反转奖励函数，GEPA 可以发现使模型性能大幅下降的对抗性提示，揭示了指令遵循的脆弱性，但未深入分析根本原因和防御策略。
 4. **系统规模限制。** 当前验证仅限于包含 3–4 个模块的复合 AI 系统，向更大规模系统的推广仍有待验证。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_RQm2KQTM5r/figures/008_Figure.jpg]]
-
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_RQm2KQTM5r/figures/010_Figure_9.jpg]]
 *Figure 9: (a) Final test set performance for aggregate and individual benchmarks for gpt-41-mini. Optimizer Performance on Qwen3 8B (b) Final test set performance for aggregate and individual benchmarks for qwen3-8b. Figure 9: Final test set performance for aggregate and individual benchmarks*
 
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_RQm2KQTM5r/figures/012_Figure.jpg]]
 *Figure: (a) GPT-4.1 Mini - MIPRO (b) Qwen3 8B - MIPRO (c) Qwen3 8B - GRPO*
 
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_RQm2KQTM5r/figures/013_Figure_11.jpg]]
-*Figure 11: Hotpot QA Bench: rollout vs. score for different models/settings. (a) GPT-4.1 Mini - MIPRO*
-
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_RQm2KQTM5r/figures/014_Figure_12.jpg]]
-*Figure 12: IFBench: rollout vs. score for different models/settings. (a) GPT-4.1 Mini - MIPRO*
-
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_RQm2KQTM5r/figures/016_Figure_14.jpg]]
-*Figure 14: PUPA: rollout vs. score for different models/settings*
-
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_RQm2KQTM5r/figures/019_Figure.jpg]]
 *Figure: Optimized Prompt Size across optimizers (lower is better), GPT-4.1 Mini (a) Comparing the token counts of the optimized programs across benchmarks for GPT-4.1 Mini. Optimized Prompt Size across optimizers (lower is better), Qwen3 8B (b) Comparing the token counts of the optimized programs across benchmarks for Qwen3 8B*
-
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_RQm2KQTM5r/figures/020_Figure_18.jpg]]
-*Figure 18: HotpotQA GPT-4.1 Mini (c) GEPA - Best Config*
-
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_RQm2KQTM5r/figures/022_Figure_19.jpg]]
-*Figure 19: HotpotQA Qwen3 8B*
-
-
 
 ## 定位与知识库关联
 
@@ -290,8 +259,6 @@ GEPA 位于提示优化（Prompt Optimization）与进化搜索（Evolutionary S
 2. 在实时交互或极少 rollouts 的部署环境中，GEPA 的帕累托历史如何有效初始化以加速适应？
 3. 自然语言反馈的质量（如人类编写的少量解释）对优化效果的影响如何？
 4. 能否将 GEPA 的思想用于自动发现复合 AI 系统中模块间的控制流逻辑？
-
-
 
 ## 原文 PDF
 

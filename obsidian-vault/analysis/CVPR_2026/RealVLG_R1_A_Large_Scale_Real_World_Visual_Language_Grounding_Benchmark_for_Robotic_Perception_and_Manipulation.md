@@ -73,8 +73,6 @@ RealVLG-R1 处于 **语言驱动的机器人感知与操作** 交叉点，其方
 
 > **注意**：当前接触点预测在高度杂乱环境中偶尔不稳定；模型尚未直接扩展至全 3D 空间推理。这些限制需在后续工作中进一步验证。
 
-
-
 机器人从自然语言指令中理解并定位目标物体，进而执行精确抓取，是实现通用机器人操作的核心能力。然而，当前技术栈在两个关键维度上存在根本性断裂。
 
 **视觉语言定位停留在粗粒度层级。** 现有的大视觉语言模型（LVLM）在开放词汇物体检测和指代表达理解上取得了显著进展，但其输出通常局限于物体级边界框或语义分割掩码。这些粗粒度的感知结果无法直接转化为机器人末端执行器可执行的抓取姿势——抓取需要精确的接触点、抓取宽度和抓取角度等几何信息，而不仅仅是“物体在哪里”。
@@ -84,8 +82,6 @@ RealVLG-R1 处于 **语言驱动的机器人感知与操作** 交叉点，其方
 **高质量多粒度标注数据的缺失是根本瓶颈。** 打通视觉语言理解到物理抓取的关键障碍在于缺乏同时包含细粒度语言描述、精确视觉定位和物理可执行抓取标注的大规模真实世界数据集。现有抓取数据集（如 Grasp-Anything 系列）或依赖扩散模型生成的低分辨率合成图像，或仅提供弱对齐的文本标注，无法支撑语言驱动的精细抓取学习。
 
 基于上述分析，本文的核心动机是：**构建一个大规模、多粒度、经多重验证的真实世界数据集，并设计一种能够从自然语言指令直接预测多种视觉与抓取输出的统一模型框架，从而弥合语言理解与物理操作之间的鸿沟。** 具体而言，本文提出 RealVLG 框架，包含 RealVLG-11B 数据集和 RealVLG-R1 模型，通过基于可验证奖励的强化学习微调（RLVR）策略，使预训练 LVLM 能够端到端地输出边界框、分割掩码、抓取矩形和接触点，实现从语言描述到零样本多粒度感知与操作的统一。
-
-
 
 ## 核心方法与创新机理
 
@@ -121,8 +117,6 @@ RealVLG-R1 的核心创新在于通过**基于可验证奖励的强化学习微�
 ### 4. 零样本泛化能力的涌现
 
 上述策略、输出与数据的协同创新，使 RealVLG-R1 具备了突出的零样本泛化能力。在真实机器人实验中，RealVLG-R1 在 Single 设置下平均抓取成功率达 81%，远超仅视觉的 GraspNet（38%）；在 Clutter 设置下平均成功率 79%，而语言抓取基线 LGD 仅 2%（Table 5, Table 6）。这表明，RLVR 驱动的多粒度联合预测范式能够有效应对未见物体与杂乱环境，实现了从语言描述到可靠物理交互的跨越。
-
-
 
 RealVLG-R1 的整体框架围绕一个核心设计展开：**将预训练大视觉语言模型（LVLM）作为统一的多任务策略模型，通过可验证奖励驱动的强化学习微调（RLVR），使其能够直接从自然语言指令中预测多种视觉与抓取输出**。该框架由四个关键模块串联而成，形成从感知到执行的闭环。
 
@@ -173,15 +167,8 @@ $$
 
 > **注意**：关于 GRPO 与 GSPO 两种 RL 优化策略的详细对比（令牌级 vs 序列级重要性权重、收敛稳定性差异），将在后续“训练策略与优化”部分展开。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l823_https_arxiv_org_abs_2603_14880/figures/005_Figure_3.jpg]]
 *Figure 3: Framework of RealVLG-R1. RealVLG-R1 fine-tunes pretrained LVLMs via reward-driven RL using task-specific verifiable rewards, enabling adaptive learning and improved generalization over bounding boxes, segmentation, grasp rectangles, and contact points*
-
-![[assets/figures/papers/paper_list_l823_https_arxiv_org_abs_2603_14880/figures/009_Figure_5.jpg]]
-*Figure 5: Human-Verification System. This application provides an interactive interface for human-in-the-loop verification, allowing users to review, correct, and confirm automatically generated visual-language annotations. It serves as a crucial component for ensuring the quality and reliability of RealVLG-11B dataset annotations*
-
-
 
 ### 1. 模型框架与结构化输出
 
@@ -289,13 +276,6 @@ $$
 - **RLVR 驱动**：以可验证的几何精度信号替代传统监督微调的固定标注损失，使模型在奖励引导下自适应优化。
 - **GRPO vs GSPO**：消融实验表明，GRPO 在 3B 模型上因令牌级权重略有优势，而 GSPO 在 7B 模型上利用序列级权重与长度归一化实现了更优性能和更稳定收敛。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l823_https_arxiv_org_abs_2603_14880/figures/011_Figure_7.jpg]]
-*Figure 7: Training reward/accuracy curves for GRPO, GSPO, and SFT on Contact tasks. Overall, GRPO and GSPO significantly improve SFT through RLVR. GRPO achieves slightly higher accuracy on 3B, while GSPO performs better on 7B and exhibits more stable outputs across training steps*
-
-
-
 ## 实验与关键发现
 
 ### 数据集质量验证
@@ -329,9 +309,6 @@ Figure 7 展示了 GRPO、GSPO 与 SFT 在接触点任务上的训练奖励与�
 
 真实世界实验使用 7-DoF Franka Research 3 机器人搭载 Intel RealSense D435i 相机（Figure 8），在 10 个未见物体上评估语言条件抓取能力。
 
-![[assets/figures/papers/paper_list_l823_https_arxiv_org_abs_2603_14880/figures/013_Figure_8.jpg]]
-*Figure 8: Real-world experimental setup. (a) The 7-DoF Franka Research 3 robot equipped with an eye-in-hand Intel RealSense D435i camera, used for real-world evaluation of RealVLG-R1. (b) The set of 10 test objects used to assess the model’s generalization and manipulation performance*
-
 **单物体场景（Single）。** Table 5 显示，RealVLG-R1 平均抓取成功率达到 **81%**，而纯视觉基线 **GraspNet**（Fang et al., 2023）仅为 **38%**（+43%）。定性分析（Figure 9）揭示，GraspNet 在点云噪声、反射表面及细小物体（如螺丝刀、剃须刀）上频繁失败或生成错位抓取姿势；RealVLG-R1 则利用 RGB 视觉与语言指令准确定位目标并生成可执行抓取接触点，展现出更强的鲁棒性。
 
 **杂乱场景（Clutter）。** Table 6 显示，RealVLG-R1 在杂乱多物体环境中平均成功率达 **79%**，而语言抓取基线 **LGD**（Yang et al., 2023）仅为 **2%**（+77%）。LGD 的失败源于感知分辨率有限、语言整合不足以及对无条件抓取预测的依赖（Figure 10）。RealVLG-R1 则表现出准确的零样本语言条件抓取和可解释的抓取姿势预测（Figure 11），验证了统一视觉‑语言‑抓取框架在真实杂乱场景中的泛化能力。
@@ -340,21 +317,8 @@ Figure 7 展示了 GRPO、GSPO 与 SFT 在接触点任务上的训练奖励与�
 
 尽管整体性能优异，RealVLG-R1 在高度杂乱环境中偶尔出现抓取接触点预测不稳定的情况，可能导致真实部署中的抓取失败。当前模型主要依赖 RGB-D 图像预测 2D 抓取先验并转换为 6-DoF 姿势，尚未直接扩展至全 3D 空间推理，在处理复杂三维遮挡或非平面抓取时存在理论局限。此外，RealVLG-11B 数据集覆盖约 800 个物体实例，仍受限于现有真实世界数据源的种类，可能不足以涵盖所有形状和材质。模型在动态交互或多步骤操作任务中的表现尚未验证，这些问题需要进一步研究。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l823_https_arxiv_org_abs_2603_14880/figures/012_Table_5.jpg]]
-*Table 5: Quantitative real-world grasping results in the Single setting. RealVLG-R1 performs language-conditioned grasping, whereas GraspNet serves as a vision-only baseline. Each task is executed 10 times*
-
 ![[assets/figures/papers/paper_list_l823_https_arxiv_org_abs_2603_14880/figures/015_Figure_9.jpg]]
 *Figure 9: Qualitative real-world grasping results in the Single setting. GraspNet often fails or predicts misaligned grasp poses due to noisy or incomplete point cloud data (e.g., Cup), reflective surfaces, and small or thin objects, such as Marker, Screwdriver, and Razor. In contrast, RealVLG-R1 leverages RGB vision and language instructions to accurately localize the target and generate executable grasp contact points, demonstrating robust and reliable grasping behavior across diverse objects*
-
-![[assets/figures/papers/paper_list_l823_https_arxiv_org_abs_2603_14880/figures/016_Figure_10.jpg]]
-*Figure 10: Qualitative real-world grasping results of LGD [75] in the Clutter setting. LGD struggles to perform language-conditioned grasps in cluttered environments due to limited perceptual resolution, suboptimal language integration, and reliance on unconditional grasp pose predictions*
-
-![[assets/figures/papers/paper_list_l823_https_arxiv_org_abs_2603_14880/figures/017_Figure_11.jpg]]
-*Figure 11: Qualitative real-world grasping results of RealVLG-R1 in the Clutter setting. RealVLG-R1 demonstrates accurate language-conditioned grasping, robust zero-shot performance in cluttered environments, and interpretable predictions of grasp poses*
-
-
 
 ## 定位与知识库关联
 
@@ -395,8 +359,6 @@ RealVLG-R1 处于视觉语言模型（VLM）与机器人操作的交汇点，其
 4. **物理模拟验证**：在多模态奖励中加入物理模拟验证是否能够进一步提升策略的泛化性与执行稳定性。
 
 > **注意**：以上开放问题均来自论文原文的明确表述，未添加推测性内容。关于具体基线工作的作者/会议/年份信息，部分已根据分析 JSON 提供的引用编号进行补充（如 GraspNet 、LGD ），但若原文未明确给出完整元数据，建议读者自行核实原始文献。
-
-
 
 ## 原文 PDF
 

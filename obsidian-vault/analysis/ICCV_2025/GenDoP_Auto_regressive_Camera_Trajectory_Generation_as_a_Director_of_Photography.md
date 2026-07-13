@@ -157,8 +157,6 @@ $$L = \mathrm{CrossEntropy}(S[1:], \hat{S}[:,-1]) + \lambda \|\mathbf{Z}\|_2^2$$
 
 将相机轨迹生成转化为离散 token 的自回归预测，使得模型能够天然捕捉相机运动的**时序依赖性**——每一帧的位姿预测都显式地以历史轨迹为条件，从而抑制扩散模型中常见的抖动和不稳定问题。同时，多模态条件（文本 + RGBD）的引入使模型在遵循语言指令的同时，能够感知初始帧的**几何与外观约束**，生成与场景内容相协调的自由移动轨迹。超参数消融（Table S1）进一步确定了最优配置：离散 bin 数 256、轨迹长度 30、模型规模 base（L=1024, 12 layers），在此设置下模型在文本对齐与轨迹质量之间取得最佳平衡。
 
-### 补充图表
-
 GenDoP 将相机轨迹生成形式化为一个自回归的序列预测任务，其核心架构由轨迹标记器、多模态编码器和自回归解码器三个关键模块构成。
 
 ### 相机轨迹标记器
@@ -291,8 +289,6 @@ GenDoP 通过两个因果性设计解决上述问题：**数据层面**，构建
 
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2504_07083/figures/004_Figure_2.jpg]]
 *Figure 2: Dataset Statistics. (a) The figure illustrates the composition and distribution of 27 translation motions (left) and 7 rotation motions (right), emphasizing the complexity and diversity of trajectories in our DataDoP dataset. (b) Based on the same caption, our dataset includes diverse trajectories that still conform to the given caption. As shown in the figure, the trajectories exhibit variations in terms of length, direction, and speed, effectively showcasing the diversity within our dataset*
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2504_07083/figures/007_Figure_4.jpg]]
 *Figure 4: Qualitative Results of Text-conditioned Trajectory Generation. We offer a comparative analysis of text-conditioned trajectory generation in the figure. Our model’s trajectories (color-coded to highlight text alignment) remain stable and closely follow the instructions, while other models exhibit significant jitter or fail to match the instructions well*

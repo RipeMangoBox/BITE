@@ -153,12 +153,6 @@ Affostruction 的整体流程由三个协同阶段构成，如图2所示：**生
 
 三个阶段并非简单的线性级联，而是通过**稀疏体素空间**形成紧耦合：阶段一的输出体素直接作为阶段二的输入几何载体；阶段二的预测热力图驱动阶段三的视角选择；阶段三获取的新观测又通过多视图融合更新阶段一的体素表征。这种闭环设计使得几何重建与功能定位相互增强——更完整的几何带来更准确的可供性预测，而可供性引导的视角选择又针对性地补全功能性区域的几何信息。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2438_https_arxiv_org_abs_2601_09211/figures/001_Figure_1.jpg]]
-*Figure 1: Affostruction. Given an initial RGBD observation (blue camera) where functional regions for an affordance query (e.g., “attach a light fixture”) are only partially visible or heavily occluded, we reconstruct the complete 3D geometry in a generative manner – estimating unobserved surfaces – and ground an affordance region on the full shape effectively. Building on this, an affordance-driven active view selection strategy identifies the most informative next viewpoint (green camera). The additional observation acquired from this selected view further refines both the 3D reconstruction and the affordance grounding of the target region*
-
-
 ![[assets/figures/papers/paper_list_l2438_https_arxiv_org_abs_2601_09211/figures/002_Figure_2.jpg]]
 *Figure 2: Affostruction overview. Our approach consists of three stages. (1) Generative multi-view reconstruction: DINOv2 [30] features from RGBD views are fused into sparse voxels using depth and camera parameters, and a flow transformer extrapolates complete structure from partial observations, decoded via a pretrained decoder [45]. (2) Flow-based affordance grounding: a sparse flow transformer conditioned on CLIP [32]-encoded text generates affordance heatmaps over reconstructed geometry. (3) Affordance-driven active view selection: next-best viewpoints maximize visibility of high-affordance regions, and a mesh decoder [45] produces the final 3D mesh*
 
@@ -247,31 +241,17 @@ Figure 6展示了Affostruction结合**SAM3D**进行多物体场景处理的流�
 
 Table 4汇总了各方法在单张RTX A6000上的运行时间与显存占用。Affostruction以7.20秒的总运行时间实现了最快的推理速度，同时保持与基线方法相当的显存占用。两阶段管线MCC+Espresso-3D因需要分别运行重建和可供性预测两个独立模型，总耗时达到12.16秒。这一效率优势源于稀疏体素空间中的统一处理——重建与可供性定位共享3D表征，避免了显式的数据转换开销。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2438_https_arxiv_org_abs_2601_09211/figures/003_Table_1.jpg]]
-*Table 1: 3D reconstruction results on Toky4K [37]. We compare RGB-to-3D generation models and MCC [44], an RGBD-to-3D reconstruction model. Since MCC does not produce mesh outputs, rendering-based metrics (PSNR, LPIPS) are not available*
-
-![[assets/figures/papers/paper_list_l2438_https_arxiv_org_abs_2601_09211/figures/004_Table_2.jpg]]
-*Table 2: Complete 3D affordance grounding results on Affogato [15]. All methods receive ground-truth complete geometry as input. aIoU is the primary metric for spatial localization*
-
 ![[assets/figures/papers/paper_list_l2438_https_arxiv_org_abs_2601_09211/figures/005_Table_3.jpg]]
 *Table 3: Partial 3D affordance grounding results on Affogato [15]. Methods without reconstruction predict affordances only on observed surfaces. Two-stage pipelines pair a reconstruction model with a pretrained affordance model*
 
 ![[assets/figures/papers/paper_list_l2438_https_arxiv_org_abs_2601_09211/figures/006_Figure_3.jpg]]
 *Figure 3: Qualitative results on partial 3D affordance grounding. Affostruction reconstructs complete geometry and grounds affordances throughout entire objects from single RGBD views. Despite limited observations, our method predicts affordances on occluded regions, demonstrating the ability to reason about 3D functional interactions even when large portions of objects are unobserved*
 
-![[assets/figures/papers/paper_list_l2438_https_arxiv_org_abs_2601_09211/figures/009_Figure_6.jpg]]
-*Figure 6: Extension to multi-object scenes. Given a multi-object scene, SAM3D [34] reconstructs and segments individual objects, and our method grounds affordances on each object independently*
-
 ![[assets/figures/papers/paper_list_l2438_https_arxiv_org_abs_2601_09211/figures/011_Table_4.jpg]]
 *Table 4: Runtime and memory comparison. Average runtime (sec) and peak memory (GB) on Affogato [15], measured on a single RTX A6000 GPU*
 
 ![[assets/figures/papers/paper_list_l2438_https_arxiv_org_abs_2601_09211/figures/014_Table.jpg]]
 *Table: 3D Reconstruction loU Heatmap Figure A1. Sampling step ablation across different number of views. We evaluate volumetric IoU for varying sampling steps (1, 5, 10, 15, 20) with 1–6 input views. Reconstruction quality saturates at 5 steps across all view configurations, achieving 5× faster sampling (0.25s) compared to the default 25 steps in TRELLIS *
-
-![[assets/figures/papers/paper_list_l2438_https_arxiv_org_abs_2601_09211/figures/010_Figure_7.jpg]]
-*Figure 7: Failure cases. (top) Challenging views with severe occlusion lead to reconstruction errors that propagate to affordance predictions. (bottom) Incorrect initial affordance grounding misleads active view selection away from the target region*
 
 ## 定位与知识库关联
 

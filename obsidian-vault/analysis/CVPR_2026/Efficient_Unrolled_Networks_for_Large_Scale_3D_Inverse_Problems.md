@@ -55,8 +55,6 @@ claims:
 
 **核心结论**：通过域分割与正则算子近似的协同设计，展开网络首次在单GPU上实现了对 $501^3$ 级三维逆问题的端到端训练与推理，且性能与资源受限的标准展开相当或更优。该方法不依赖特定前向算子的坐标友好分解，适用于CBCT和MC-MRI等不同成像模态，展现了良好的通用性。
 
-
-
 ### 大规模三维逆问题与计算瓶颈
 
 三维医学成像中广泛存在线性逆问题，其数学形式为
@@ -100,8 +98,6 @@ $$\pmb{A}^\top \pmb{A} \approx \mathrm{diag}(\pmb{m}) \pmb{F}^{-1} \mathrm{diag}
 其中 $\pmb{F}$ 为傅里叶变换，$\pmb{m}$ 为空间掩膜，$\pmb{\lambda}$ 为频域调制参数。该近似可通过高斯随机向量拟合，无需问题相关数据，且能借助FFT快速计算，进一步降低数据一致性更新的计算开销。
 
 基于以上两条技术路线——**域分割**与**正则算子近似**——本文提出了一种通用框架，使得展开网络能够在不牺牲端到端训练优势的前提下，在单GPU上处理任意大规模三维重建问题，并在CBCT和MC-MRI两个代表性任务上验证其有效性。
-
-
 
 ## 核心方法与创新机理
 
@@ -147,8 +143,6 @@ $$\mathscr{L}(\pmb{m}, \pmb{\lambda}) = \mathbb{E}_{\mathbf{x}\sim\mathcal{N}(0,
 ### 方法谱系与知识库定位
 
 本文的方法创新处于**展开网络（unrolled networks）** 与**即插即用（Plug-and-Play）** 方法的交叉地带。与标准展开网络（如使用 3D DRUNet 的端到端 PGD 展开）相比，核心差异在于训练时的信号维度：标准展开要求全量体积参与反向传播，而本文通过域分割将训练限制在补丁级别。与 PnP-αPGD 和 DPIR[RAM] 等即插即用方法相比，本文保留了端到端训练的优势（可学习步长、共享先验参数），但通过算子近似避免了全量数据一致性步骤的高昂开销。与后处理方法（2D/3D DRUNet 直接映射）相比，本文通过展开迭代引入了前向算子的物理约束，在稀疏采集场景下具有显著优势。
-
-
 
 本文提出了一套**可扩展的展开网络训练与推理框架**，旨在将端到端展开重建从中小规模问题推广到任意大规模三维逆问题。整个框架围绕两个核心机制构建：**域分割（Domain Partitioning）** 和 **正则算子近似（Normal Operator Approximation）**。二者协同工作，分别解决展开网络中“网络步骤”的内存爆炸瓶颈和“数据一致性步骤”在大规模下的计算效率问题。
 
@@ -204,12 +198,8 @@ $$ \mathscr{L}(m, \lambda) = \| \pmb{A}^\top\pmb{A} - H(m,\lambda) \|_F^2 $$
 - **训练阶段**：输入为全量测量 $\pmb{y}$ 和真实信号 $\pmb{x}^*$，通过随机补丁提取和上下文补偿生成子问题 $(\tilde{\pmb{y}}, \tilde{\pmb{A}})$，送入展开网络进行端到端优化。梯度累积用于匹配有效批量大小。
 - **推理阶段**：输入为测量 $\pmb{y}$ 和前向算子 $\pmb{A}$，经全量展开粗估后，逐补丁细化并融合输出最终重建 $\hat{\pmb{x}}$。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2056_https_arxiv_org_abs_2601_02141/figures/001_Figure_1.jpg]]
 *Figure 1: Peak video memory complexity (dashed lines) and global execution times (dotted lines) of isolated components used in unrolling. We show the cost of evaluating and back-propagating through a standard 3D data consistency step (using gradient descent) and a standard 3D network step (using a 3D DRUNet [72]). We see here that the bottleneck lies in the network step, which grows rapidly with the volume size, while the data-consistency step remains manageable even at high resolutions*
-
-
 
 ### 问题形式化与展开PGD框架
 
@@ -287,15 +277,8 @@ $$\mathbf{S} \mathrm{diag}(\pmb{m}) \mathbf{F}^{-1} \mathrm{diag}(\pmb{\lambda})
 
 两者的组合使得在单 GPU 上训练处理 $501^3$ 体素的端到端展开网络成为可能，且性能损失可控（约 0.38 dB PSNR 下降）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2056_https_arxiv_org_abs_2601_02141/figures/012_Figure_9.jpg]]
 *Figure 9: Illustrations of the normal operator approximation on Walnut-CBCT. (top row) Original volume slice x, exact normal operator evaluation*
-
-![[assets/figures/papers/paper_list_l2056_https_arxiv_org_abs_2601_02141/figures/013_Figure_10.jpg]]
-*Figure 10: Illustrations of the normal operator approximation on Calgary-Campinas. (top row) Original volume slice*
-
-
 
 ## 实验与关键发现
 
@@ -349,27 +332,11 @@ $$\mathbf{S} \mathrm{diag}(\pmb{m}) \mathbf{F}^{-1} \mathrm{diag}(\pmb{\lambda})
 
 所有学习方法均基于相同的骨干网络 DRUNet（3D 版本约 96.5M 参数），采用统一的训练超参数（Adam 优化器、余弦退火学习率调度、10⁵ 训练步数）。域分割方法使用批量大小 1 并累积 4 步梯度，以匹配其他方法的有效批量大小 4。评估均在相同测试数据上以幅度图像的 PSNR 和 SSIM 进行，确保了对比的公平性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2056_https_arxiv_org_abs_2601_02141/figures/003_Table.jpg]]
 *Table: CBCT is a typical example of a 3D inverse problem that does not admit a coordinate-friendly partitioning of the forward operator, thus making it impossible to train unrolled networks on patches without our proposed domain partitioning strategy*
 
 ![[assets/figures/papers/paper_list_l2056_https_arxiv_org_abs_2601_02141/figures/005_Table_2.jpg]]
 *Table 2: Reconstruction performances on the Calgary-Campinas dataset. PSNR and SSIM are measured on amplitude images. Best and second-best results highlighted*
-
-![[assets/figures/papers/paper_list_l2056_https_arxiv_org_abs_2601_02141/figures/011_Figure_7.jpg]]
-*Figure 7: Walnut-CBCT - Average PSNR and time complexity against peak memory consumption during training. We vary the VRAM budget by changing the patch size used during domain partitioning. Larger patches lead to better performance at the cost of higher memory consumption. We do not show the complexity of standard unrolling (without partitioning) as a single H100 GPU is not sufficient for training it*
-
-![[assets/figures/papers/paper_list_l2056_https_arxiv_org_abs_2601_02141/figures/010_Figure_8.jpg]]
-*Figure 8: Calgary-Campinas MC-MRI - Average PSNR and time complexity against peak memory consumption during training. We vary the VRAM budget by changing the patch size used during domain partitioning. Larger patches lead to better performance at the cost of higher memory consumption*
-
-![[assets/figures/papers/paper_list_l2056_https_arxiv_org_abs_2601_02141/figures/004_Figure_3.jpg]]
-*Figure 3: Illustrations of sparse view reconstructions with [30/1200] projections on the Walnut-CBCT [10] dataset using the methods compared in Tab. 1. First row axial slices, second row vertical slices from the same sample. PSNR is computed per slice*
-
-![[assets/figures/papers/paper_list_l2056_https_arxiv_org_abs_2601_02141/figures/006_Figure_4.jpg]]
-*Figure 4: Illustrations of MC-MRI reconstructions with acceleration rate of 5 on the Calgary-Campinas dataset [52] for the methods compared in Tab. 2. First row: axial slice, second row: coronal slice from the same sample. PSNR is computed per slice*
-
-
 
 ## 定位与知识库关联
 
@@ -431,8 +398,6 @@ $$\mathscr{L}(m, \lambda) = \mathbb{E}_{\mathbf{x} \sim \mathcal{N}(0,I)} \| \ma
 4. **补丁间相关性的利用**：在测试时，是否可以利用补丁间空间相关性设计更高效的融合策略，以减少两步推理中的冗余计算？当前的补丁聚合策略相对简单，可能存在信息利用不充分的问题。
 
 5. **高维扩展性**：该方法在更高维（4D动态成像或更高）或稀疏数据采集场景下的可扩展性和性能表现如何？随着维度增加，补丁分解的组合复杂度和正则算子近似的精度需求可能发生质变。
-
-
 
 ## 原文 PDF
 

@@ -57,15 +57,11 @@ claims:
 
 **主要结果**：在 3DGS 理解任务上，MLLMSplat 的 tokenizer 在 ScanQA 验证集上达到 CIDEr 93.71，在 SQA3D 测试集上 EM 达到 53.49，显著优于 MLLM 内置的 2D tokenizer。在 3DGS 生成任务上，于 RealEstate10K 和 DL3DV-10K 数据集上，FID 与 CLIPScore 均大幅领先 Director3D、SplatFlow、Prometheus 等现有方法。在 3DGS 编辑任务上，相比基于迭代优化的 DGE 方法，在五种编辑操作上均取得更高的 CLIP 相似度与方向相似度，同时推理时间从数分钟降至约 25 秒。消融实验验证了 DRoPE、双流解码器与速度修正（VelRe）等各组件的关键贡献。
 
-
-
 **3D 高斯泼溅（3DGS）** 已成为高质量实时新视角合成的主流显式表征，凭借其可微分光栅化管线，在场景重建、动态建模等领域取得了显著进展。然而，现有 3DGS 研究主要聚焦于**低层次感知**（如场景重建与视角插值）、**低质量生成**（文本到 3D 场景的生成保真度有限）以及**低效率编辑**（依赖逐视图迭代优化，耗时且缺乏 3D 编辑数据），始终未能像 2D 多模态大语言模型（MLLM）那样，实现对场景的高层次语义理解与灵活内容操控。
 
 核心瓶颈在于：**缺乏一个通用机制，能将 2D MLLM 强大的语言推理与生成先验高效迁移到 3DGS 场景**。具体而言，这一迁移面临两个关键挑战：第一，如何使 2D 视觉 tokenizer 具备 3D 感知能力，以支撑多视图一致的场景理解；第二，如何在保留 2D 预训练生成先验和条件可控性的同时，注入相机几何信息以增强 3D 一致性，实现高质量的 3DGS 生成。
 
 针对上述缺口，本文提出 **MLLMSplat**——首个将 2D MLLM 统一适配到 3DGS 理解、生成与编辑的综合框架。其核心洞察在于：通过将 3D 几何编码为相对位置嵌入（Geometry-aware Positional Encoding, GaPE），并配合基于反渲染聚合的 3DGS tokenizer，能够以**最小侵入性**的方式将 2D MLLM 的能力扩展到 3DGS 场景，实现多任务统一。框架包含三项关键设计：(1) **3DGS tokenizer**——通过 alpha 权重关联、最远点采样（FPS）和 Z-order 序列化，将多视图 2D 特征聚合为视图一致的 3D 表征；(2) **3DGS de-tokenizer**——包含基于双旋转位置编码（DRoPE）的潜空间生成器和双流 VAE 解码器，在保留预训练先验的同时提升多视图一致性；(3) **替代任务（新视角外推）**——以训练无关的前馈方式实现高效 3DGS 编辑，规避了对 3D 编辑数据集的依赖。
-
-
 
 ## 核心方法与创新机理
 
@@ -118,8 +114,6 @@ $$\langle q_i^{\mathrm{GaPE}}, k_j^{\mathrm{GaPE}} \rangle = q_i^{\top} P_i P_j^
 
 这些创新共同构成了一个以 2D MLLM 为基础、以 3DGS tokenizer/de-tokenizer 为桥梁的统一框架，实现了从低层次感知到高层次语言推理与内容操控的跨越。
 
-
-
 MLLMSplat 是一个将 2D 多模态大语言模型的能力迁移至 3D 高斯泼溅场景的统一框架，涵盖高层次理解、高质量生成与高效率编辑三大任务。其核心设计思想是以最小侵入性将 3D 几何信息注入 2D MLLM 的既有流程，从而保留预训练先验的同时获得多视图一致性。
 
 框架由三个关键模块构成闭环：**3DGS Tokenizer** 负责将多视图渲染图像转化为视图一致的 3D 表征，供 MLLM 语言模型进行场景理解；**Latent Generator** 在 MLLM 的潜空间中生成多视图一致的潜变量，作为生成的中间表示；**3DGS Decoder** 则将潜变量解码为显式的 3D 高斯参数，并通过可微分渲染输出新视角图像。生成与解码模块共同构成“3DGS de-tokenizer”，使 MLLM 具备 3D 内容输出能力。
@@ -132,12 +126,8 @@ MLLMSplat 是一个将 2D 多模态大语言模型的能力迁移至 3D 高斯�
 
 图 1 展示了框架的整体数据流：理解时，3D 场景经 tokenizer 进入 MLLM 输出文本；生成与编辑时，文本/图像指令经 de-tokenizer 输出 3DGS 场景。图 2 进一步揭示了模块内部的冻结（蓝色）、新增（红色）与微调（蓝红渐变）策略，体现了“最小侵入”的设计哲学。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2171_https_openaccess_thecvf_com_content_CVPR2026_html_Xiu_MLLMSplat_A_2D_MLL/figures/001_Figure_1.jpg]]
 *Figure 1: We propose MLLMSplat, a novel framework that adapts 2D MLLMs for high-level understanding, high-quality generation, and high-efficiency editing of 3DGS scenes. Our framework introduces two key components to the MLLM: a 3DGS tokenizer to enhance its 3DGS understanding and a 3DGS de-tokenizer to enable its 3DGS generation. Collectively, they unlock the capability for 3DGS editing*
-
-
 
 MLLMSplat 框架的核心由三个关键模块构成：**3DGS Tokenizer**（3DGS 理解）、**Latent Generator**（潜空间生成器）和 **3DGS Decoder**（3DGS 解码器），后两者共同实现 3DGS 生成与编辑。以下逐一剖析各模块的设计逻辑与关键公式。
 
@@ -233,12 +223,8 @@ MLLMSplat 的编辑能力通过**替代任务（Surrogate Task）** 实现，避
 
 在推理采样阶段，为进一步增强多视图一致性，引入**速度修正（Velocity Refinement）** 自优化循环：将中间潜变量解码为 3DGS 并渲染回输入视角，用渲染图像重新编码为潜变量，以此修正速度预测。消融实验（Table 4）表明，移除速度修正会导致多视图一致性和渲染质量下降。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2171_https_openaccess_thecvf_com_content_CVPR2026_html_Xiu_MLLMSplat_A_2D_MLL/figures/002_Figure_2.jpg]]
 *Figure 2: Details of MLLMSplat framework. Blue, red, and blue-to-red gradient indicate frozen, added, and finetuned modules, respectively. The 3DGS tokenizer associates features from the 2D visual tokenizer with Gaussians, filters (and downsamples) them, and finally applies Z-order serialization before feeding them to the language model. The latent generator employs a dual rotary positional encoding space, where “Ro” and “Ga” are short for RoPE and GaPE, respectively; cells filled with “Ga$\Ro$” indicate their equivalence. The reference latent is provided as input only for editing. The 3DGS decoder features two parallel branches that periodically interact via Read blocks*
-
-
 
 ## 实验与关键发现
 
@@ -264,9 +250,6 @@ MLLMSplat 的编辑能力通过**替代任务（Surrogate Task）** 实现，避
 
 编辑任务在 10 个场景上评估五种编辑操作（如物体增删、风格迁移等），对比方法为基于迭代优化的 DGE（包含 GaussianEditor 和 Editsplat）。如 Table 3 所示，MLLMSplat 在 CLIP 相似度（26.91）和 CLIP 方向相似度（22.40）上均优于 DGE，且平均推理时间仅需 25 秒，而 DGE 需数分钟。定性对比（Figure 4）显示，本方法在编辑精度和视图一致性上表现更优，而 DGE 在部分操作上存在细节丢失或跨视图不一致。
 
-![[assets/figures/papers/paper_list_l2171_https_openaccess_thecvf_com_content_CVPR2026_html_Xiu_MLLMSplat_A_2D_MLL/figures/005_Table_3.jpg]]
-*Table 3: Experimental results of 3DGS Editing across five types of editing operations on ten scenes*
-
 ![[assets/figures/papers/paper_list_l2171_https_openaccess_thecvf_com_content_CVPR2026_html_Xiu_MLLMSplat_A_2D_MLL/figures/007_Figure_4.jpg]]
 *Figure 4: Visual comparison of 3DGS Editing results across DGE [6] and our method on five types of editing operations*
 
@@ -284,12 +267,6 @@ MLLMSplat 的编辑能力通过**替代任务（Surrogate Task）** 实现，避
 - **w/o VelRe（速度修正）**：在联合采样过程中移除自优化循环，即不再通过渲染-重编码步骤修正速度预测。该变体导致多视图一致性和渲染质量下降，验证了速度修正对增强跨视角一致性的关键作用。
 
 以上消融结果一致表明，DRoPE、双流解码器和速度修正三个组件各自对最终性能有不可替代的贡献，任意一个的缺失都会导致生成质量显著退化。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2171_https_openaccess_thecvf_com_content_CVPR2026_html_Xiu_MLLMSplat_A_2D_MLL/figures/006_Figure.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -350,8 +327,6 @@ MLLMSplat 在以下技术维度上占据独特位置：
 - **高置信度证据**（confidence ≥ 0.95）：DRoPE 的消融实验（Table 4）、3DGS 生成的定量对比（Table 2）、3DGS 理解的 tokenizer 对比（Table 1）均提供了明确的量化支撑，且消融设计合理（逐组件移除）。
 - **中置信度证据**（confidence 0.9）：编辑任务的定量对比（Table 3）仅在 10 个场景上评估，样本量偏小，且 DGE 基线的具体实现细节未完全披露，需手动验证公平性。
 - **需注意的缺失**：论文未报告 3DGS 理解的消融实验（如不同采样策略、序列化方法的影响），也未在更具挑战性的动态场景或大规模开放场景上评估生成能力。
-
-
 
 ## 原文 PDF
 

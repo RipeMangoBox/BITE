@@ -54,8 +54,6 @@ CGPO 的核心机制是：为每个提示生成一组图像，计算组内奖励
 
 **方法定位**：CGPO 属于强化学习微调框架内的**数据采样优化方法**，不改动奖励模型或策略优化算法本身，而是通过改变“训练什么”来提升“学到什么”。其核心贡献在于将课程学习的思想与在线不确定性估计相结合，为 T2I 强化学习训练提供了一种轻量、即插即用的效率提升方案。
 
-
-
 ### 文本到图像生成的强化学习瓶颈
 
 近年来，强化学习（RL）已成为提升文本到图像（T2I）生成模型指令遵循能力的核心范式。以 **Flow-GRPO** 为代表的方法将T2I微调建模为策略优化问题：模型作为策略，根据文本提示生成图像，再由视觉-语言奖励模型对生成结果进行评分，通过组相对优势（group relative advantage）更新策略参数。这一框架在组合生成、属性绑定等任务上取得了显著进展。
@@ -82,8 +80,6 @@ CGPO 的核心机制是：为每个提示生成一组图像，计算组内奖励
 基于这一洞察，CGPO构建了一个闭环的自适应采样机制：在每个训练步中，利用图像组的奖励统计动态更新每个提示的采样概率，使高方差提示获得更高的被采样概率。随着模型能力提升，原本高方差的提示逐渐被掌握（方差降低），采样概率自然下降，而更高难度的提示进入高方差区域，采样概率自动上升。这一机制使训练课程随模型能力同步演变，无需人工设计难度先验或分段课程。
 
 此外，CGPO还引入了基于比例公平优化的类别校准方法，在类别间动态平衡采样权重，防止模型在特定类别上过拟合而忽视弱势类别。
-
-
 
 ## 核心方法与创新机理
 
@@ -121,16 +117,11 @@ $$q_i = \frac{1 + \lambda v_i}{c + \lambda}$$
 
 消融实验（Table 4）明确揭示了各组件的因果贡献：在 Flow-GRPO 基线（GenEval Overall 94.42%）上，**概率采样**（Probability Sampling）单独贡献了 +0.73% 的提升，是所有组件中增益最大的，直接验证了方差驱动自适应采样的有效性。加入**探索平衡**后提升至 +1.32%，加入**类别校准**后达到 +1.68% 的最终性能。这一累积增益结构说明，三个组件分别解决了“采样什么”、“如何持续探索”和“类别间如何平衡”三个互补问题。
 
-
-
 CGPO 的核心思想是将 T2I 强化学习中的提示采样从**静态均匀分布**转变为**在线自适应课程**。该方法通过四个顺序阶段构成一个闭环，使采样概率随模型能力的提升而动态演进，始终聚焦于处于“最近发展区”的高学习信号提示。
 
 ### 四阶段闭环结构
 
 CGPO 的每次训练迭代按以下顺序执行（Figure 2）：
-
-![[assets/figures/papers/paper_list_l2165_https_arxiv_org_abs_2605_17807/figures/002_Figure_2.jpg]]
-*Figure 2: Flowchart of Our CGPO Method. Our CGPO method operates through four sequential stages: 1) Probability Sampling: A batch of prompts that match the model’s current capability and remain actively learnable is sampled according to the current sampling probabilities. 2) Reward Calculation: Image groups are generated, and their rewards and advantages are computed for policy training. 3) Probability Computation: Group reward statistics are used to update prompt-level sampling probabilities and category-level calibration weights. 4) Probability Update: After applying exploration balancing and historical smoothing, both the sampling list and the category weight list are updated*
 
 1. **概率采样 (Probability Sampling)**：根据当前维护的概率列表，对每个提示独立进行伯努利试验，生成一个批次。高方差提示被赋予更高的采样概率，而低方差（已稳定掌握或完全未掌握）的提示采样概率较低。
 2. **奖励计算 (Reward Calculation)**：为采样到的每个提示生成一组图像（group），计算每张图像的奖励以及**组相对优势**（group relative advantage），用于后续的策略梯度更新。组相对优势定义为：
@@ -159,8 +150,6 @@ $$P^{\text{list'}}(p) = \begin{cases} \frac{1}{3} \sum_{t-2}^{t} P_{(t)}^{\text{
 - **输出**：经过强化学习微调的 T2I 模型，以及随训练演进的概率列表（反映课程难度的动态变化）。
 
 消融实验（Table 4）证实了这一闭环设计的有效性：在 Flow-GRPO 基线（Overall 94.42）上，依次加入概率采样（+0.73）、探索平衡（+1.32）和类别校准（+1.68），各组件均带来累积增益，其中概率采样贡献了最大的性能提升，验证了方差驱动自适应采样策略的核心作用。
-
-
 
 ### 3.1 方法总览：四阶段闭环
 
@@ -223,8 +212,6 @@ $$q_i = \frac{1 + \lambda v_i}{c + \lambda}$$
 | $P^{\mathrm{list'}}(p)$ 分段更新规则 | $S_b$：当前批次；$N$：提示总数 | 历史平滑 + 探索平衡 |
 | $q_i = \frac{1 + \lambda v_i}{c + \lambda}$ | $v_i$：类别参考权重；$\lambda$：校准强度 | 类别校准系数闭式解 |
 
-
-
 ## 实验与关键发现
 
 ### 主要结果
@@ -277,30 +264,11 @@ Figure 6 的训练曲线显示，平均奖励（reward avg）持续上升而奖�
 
 论文未系统报告失败案例。从方法机理推断，潜在局限包括：方差代理指标在奖励模型噪声较大时的鲁棒性未经验证；类别校准系数 λ 需针对不同数据集手动调整；方法在更大规模、更多样化的训练数据和类别上的扩展性有待检验。上述推断需人工核实原文补充材料。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2165_https_arxiv_org_abs_2605_17807/figures/003_Table_1.jpg]]
-*Table 1: GenEval Result. Best results are indicated in bold. Results for all methods, with the exception of our approach and the Flow-GRPO model trained on 8 GPUs, are obtained from the original Flow-GRPO paper*
-
 ![[assets/figures/papers/paper_list_l2165_https_arxiv_org_abs_2605_17807/figures/004_Figure_3.jpg]]
 *Figure 3: Training Efficiency Comparison. Performancetraining time curves*
 
-![[assets/figures/papers/paper_list_l2165_https_arxiv_org_abs_2605_17807/figures/005_Table_2.jpg]]
-*Table 2: T2I-CompBench++ Result. This evaluation uses the same model presented in Table 1, which was trained on the GenEvalgenerated dataset. Best results are indicated in bold*
-
-![[assets/figures/papers/paper_list_l2165_https_arxiv_org_abs_2605_17807/figures/006_Table_3.jpg]]
-*Table 3: DPG Bench Result. This evaluation uses the same model presented in Table 1, which was trained on the GenEval-generated dataset. Best results are indicated in bold*
-
 ![[assets/figures/papers/paper_list_l2165_https_arxiv_org_abs_2605_17807/figures/010_Table_5.jpg]]
 *Table 5: Comparison Experiments with Multiple Rewards*
-
-![[assets/figures/papers/paper_list_l2165_https_arxiv_org_abs_2605_17807/figures/011_Table_6.jpg]]
-*Table 6: Comparison of Multiple Proxy Indicators*
-
-![[assets/figures/papers/paper_list_l2165_https_arxiv_org_abs_2605_17807/figures/013_Table_7.jpg]]
-*Table 7: Hyperparameter Study. Effect of the hyperparameter λ in Category Calibration*
-
-
 
 ## 定位与知识库关联
 
@@ -352,8 +320,6 @@ CGPO 的有效性建立在以下假设之上，这些假设同时界定了其适
 - **上游**：**Flow-GRPO** 提供了组相对优势计算的训练框架；**DPO / RLHF** 系列工作提供了从人类偏好到奖励模型的范式基础。
 - **平行**：基于提示难度预分类的课程学习方法（如按语义复杂度分层），CGPO 以在线自适应方式替代了静态预分类。
 - **下游潜力**：CGPO 的概率采样与类别校准机制可作为插件嵌入其他基于强化学习的 T2I 微调框架，其核心思想——利用模型自身反馈动态调整数据分布——具有跨任务迁移的潜力。
-
-
 
 ## 原文 PDF
 

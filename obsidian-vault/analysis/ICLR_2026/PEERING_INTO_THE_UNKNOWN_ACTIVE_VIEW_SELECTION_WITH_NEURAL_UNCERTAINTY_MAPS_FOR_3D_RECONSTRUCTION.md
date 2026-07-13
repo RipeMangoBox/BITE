@@ -133,11 +133,6 @@ PUN（Peering into the Unknown）提出了一种全新的主动视角选择范�
 
 此外，通过乘积聚合所有历史不确定性图并过滤低不确定性冗余视角，PUN 能够有效抑制已充分观测的区域，引导后续视角持续探索信息量最高的未知区域，从而在仅使用一半视角（20个）的情况下达到与全部40个视角上界相当的重建精度。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l57_https_openreview_net_forum_id_e7gbgdw05A/figures/001_Figure_1.jpg]]
-*Figure 1: (a) Illustration of Active Viewpoint Selection (AVS). The goal of AVS is to select the most informative viewpoints (red cones) from candidate views (gray cones) to minimize reconstruction error between the ground-truth view and the novel view synthesized by rendering methods such as NeRF Mildenhall et al. (2021) or 3DGS Kerbl et al. (2023). (b) Neural Uncertainty Map (UMap). For each selected viewpoint, our method predicts a UMap in polar coordinates, assigning uncertainty values to candidate viewpoints on a spherical surface. A viewpoint is parameterized by azimuth*
-
 ![[assets/figures/papers/paper_list_l57_https_openreview_net_forum_id_e7gbgdw05A/figures/002_Figure.jpg]]
 *Figure: (a) Creation of our NUM dataset (b) Overview of our PUN method*
 
@@ -178,8 +173,6 @@ $$v_{t+1} = \arg\max_{C_i} \prod_{1,2,\dots,t} U_t^{C^i}$$
 **冗余视角过滤**：在乘积聚合之前，PUN 引入一个硬阈值过滤机制——若某候选视角在任一历史时间步的插值不确定性值低于 0.1，则直接将其从候选集中排除。消融实验表明，该过滤策略（标记为“small”）与全历史聚合（标记为“all”）的组合（small+all）达到了最优性能，而仅使用最后一步的不确定性图或完全禁用冗余过滤均会导致重建质量下降。
 
 这一选择策略的核心优势在于其**连续性**：不确定性图在球面上的平滑插值确保了相邻视角的不确定性值具有合理的相对关系，使得基于 argmax 的贪婪选择不会产生剧烈的视角跳变，有利于后续重建网络的稳定训练。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l57_https_openreview_net_forum_id_e7gbgdw05A/figures/004_Figure_3.jpg]]
 *Figure 3: Visualization of ground-truth and predicted uncertainty maps by our PUN method. We present two examples from: (a) NUM-inst and (b) NUM-cat. In each case, the input view*
@@ -238,25 +231,11 @@ PUN在NeRF和3DGS两种截然不同的重建主干上均表现出色。在NeRF-N
 
 4. **真实场景的复杂性**：在NeRFAssets上的提升幅度（+0.42 dB）小于合成数据集，说明背景杂乱和复杂遮挡对不确定性预测精度提出了更高要求。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l57_https_openreview_net_forum_id_e7gbgdw05A/figures/003_Table_1.jpg]]
-*Table 1: Evaluation on the AVS performance. We evaluate the performance of all AVS methods on NUM-inst, NUM-cat, NUM-3DGS-recon, NUM-light and NUM-cam-dist. s1 and s2 refer to experiments on NUM-light and NUM-cam-dist. Average results over 3 runs are reported. See Tab. S1 for the full results. Best is in bold and second best is underlined. For readability, MSE values are scaled by 103 on NUM-3DGS-recon and NUM-cam-dist, and by 104 in other datasets*
-
 ![[assets/figures/papers/paper_list_l57_https_openreview_net_forum_id_e7gbgdw05A/figures/005_Figure_4.jpg]]
 *Figure 4: Visualization of the datasets used for AVS evaluation. From left to right, the object instances exhibit increasing geometric complexity, occlusion, and background clutter*
 
-![[assets/figures/papers/paper_list_l57_https_openreview_net_forum_id_e7gbgdw05A/figures/006_Figure.jpg]]
-*Figure: More realistic and complex ShapeNet NeRFAssets MIP360*
-
 ![[assets/figures/papers/paper_list_l57_https_openreview_net_forum_id_e7gbgdw05A/figures/007_Table_3.jpg]]
 *Table 3: Ablation Analysis of Key Components in Our PUN Method. From left to right, we analyze: (a) different uncertainty metrics used to generate ground truth UMaps and train UPNet, (b) the effect of different next-viewpoint selection policies as illustrated in Sec. 5.3, and (c) the trade-off between instance diversity and viewpoint density in training samples. In (c), instance diversity refers to the number of object instances per category, while viewpoint density refers to the number of viewpoint–UMap pairs per instance. Best is in bold and second best is underlined. MSE values are scaled by 104. See Tab. S6 for full results in all metrics*
-
-![[assets/figures/papers/paper_list_l57_https_openreview_net_forum_id_e7gbgdw05A/figures/010_Table_S.2.jpg]]
-*Table S.2: Evaluation of AVS Methods using Binocular3DGS as the reconstruction backbone. Best is in bold. MSE values are scaled by 104 for readability*
-
-![[assets/figures/papers/paper_list_l57_https_openreview_net_forum_id_e7gbgdw05A/figures/017_Table_S.6.jpg]]
-*Table S.6: Ablation experiment on key components in PUN, including the different viewpoint selection policies, different uncertainty metrics used for guiding the selection, and instance diversity and viewpoint density in the UPNet Training dataset. Instance diversity refers to the number of instances per category in the training set, while viewpoint density denotes the number of data samples (i.e., input image–UMap pairs) per instance. Bold indicates the best performance for each metric, while underline indicates the second best. (MSE values are scaled by 104 for readability.)*
 
 ## 定位与知识库关联
 

@@ -52,8 +52,6 @@ claims:
 
 **方法定位**：IVAAN 属于实例级视觉-语言对齐的核分割与分类方法，其核心创新在于利用临床相关形态属性的量化与离散化自动生成文本监督信号，无需人工标注。与仅使用图像级或区域级文本提示的病理视觉-语言模型（如 MI-Zero、CONCH、PLIP、Quilt-Net）不同，IVAAN 在实例粒度上进行对齐；与依赖空间提示的 **PromptNucSeg**（Shui et al., ECCV 2024）相比，IVAAN 引入了语义层面的形态描述，并通过多原型类令牌和双向交叉注意力机制显式建模类内多样性，从而更有效地消除器官偏置等伪相关影响。
 
-
-
 ### 病理细胞核分析：从视觉监督到语义对齐
 
 细胞核的精确分割与分类是计算病理学中的核心任务，是癌症分级、预后评估等下游分析的基础。当前主流方法——包括 **Mask R-CNN**（He et al., ICCV 2017）、**HoVer-Net**（Graham et al., Medical Image Analysis 2019）、**DIST**（Naylor et al., IEEE TMI 2018）、**PointNu-Net**（Yao et al., IEEE TETCI 2023）以及 **CellViT**（Horst et al., Medical Image Analysis 2024）——均采用纯视觉监督范式，即模型仅依赖像素级类别标签学习核形态特征。这种范式存在一个深层缺陷：模型隐式地从数据中学习形态-类别关联，极易捕获器官来源、染色批次等伪相关（spurious correlations），而非细胞核本身的固有形态学特征。
@@ -72,8 +70,6 @@ claims:
 1. **如何自动生成实例级的属性文本提示？** 需要从 ground-truth 掩膜中提取临床相关形态特征，并将其离散化为语义有意义的文本描述。
 2. **如何有效对齐实例视觉特征与文本语义？** 需要设计对比学习机制，使同一实例的视觉嵌入与其对应的文本嵌入在联合空间中靠近。
 3. **如何捕捉类内多样性并聚合实例级语义？** 同类细胞核在不同器官中形态差异显著，单一类别原型无法覆盖类内子分布，需要多原型表示与双向语义交互机制。
-
-
 
 ## 核心方法与创新机理
 
@@ -119,8 +115,6 @@ IVAAN设计了两层互补的对比损失：
 
 这些创新使IVAAN在PanNuke上以bPQ 0.6976、mPQ 0.5459全面超越先前SOTA（如**PromptNucSeg**，Shui et al., ECCV 2024），并在MoNuSeg与CPM17上取得一致的跨数据集泛化优势。
 
-
-
 IVAAN 的整体框架围绕“实例级视觉-语言对齐”这一核心机制构建，旨在为细胞核分割与分类任务提供更具判别力且跨领域鲁棒的表征。其 pipeline 由五个关键模块串联而成，形成从属性自动提取到语义交互增强的完整闭环，如 Figure 2 所示。
 
 ![[assets/figures/papers/paper_list_l2319_https_openaccess_thecvf_com_content_CVPR2026_html_Jeong_IVAAN_Instance_l/figures/002_Figure_2.jpg]]
@@ -141,8 +135,6 @@ IVAAN 的整体框架围绕“实例级视觉-语言对齐”这一核心机制�
 $$\mathcal{L} = \lambda_{\mathrm{seg}} \mathcal{L}_{\mathrm{seg}} + \lambda_{\mathrm{cls}} \mathcal{L}_{\mathrm{cls}} + \lambda_{\mathrm{CL}} \mathcal{L}_{\mathrm{CL}} + \lambda_{\mathrm{cent}} \mathcal{L}_{\mathrm{cent}}$$
 
 整体而言，IVAAN 通过“属性量化→文本生成→跨模态融合→实例级对齐→多原型语义交互”的递进式设计，将形态学先验系统地注入视觉表征学习，从而消解器官偏置与染色差异等伪相关对细胞核分析的干扰。
-
-
 
 IVAAN的核心创新在于将**实例级视觉-语言对齐**引入细胞核分割与分类框架，其关键模块包括：属性引导文本提示生成、多原型类令牌与语义交互模块（SIM）、以及跨模态特征融合。以下逐一展开其设计逻辑与数学形式。
 
@@ -211,30 +203,14 @@ $$\mathcal{L} = \lambda_{\mathrm{seg}} \mathcal{L}_{\mathrm{seg}} + \lambda_{\ma
 
 其中各 $\lambda$ 为平衡超参数。该多目标联合优化使得模型同时学习精确的像素级分割、类别判别以及形态感知的实例级语义对齐。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2319_https_openaccess_thecvf_com_content_CVPR2026_html_Jeong_IVAAN_Instance_l/figures/003_Figure_3.jpg]]
-*Figure 3: Structure of the Semantic Interaction Module (SIM)*
-
 ![[assets/figures/papers/paper_list_l2319_https_openaccess_thecvf_com_content_CVPR2026_html_Jeong_IVAAN_Instance_l/figures/004_Figure_4.jpg]]
 *Figure 4: Violin distributions for eleven representative attributes. A red dotted box indicates the selected attributes. A black dotted lines in the graphs marks the partition boundary. To ensure a clear visualization, we removed statistical outliers using Tukey’s fences [37]*
-
-![[assets/figures/papers/paper_list_l2319_https_openaccess_thecvf_com_content_CVPR2026_html_Jeong_IVAAN_Instance_l/figures/005_Figure_5.jpg]]
-*Figure 5: Simplified illustration of intra-class variability in nucleus classification. Nuclei from the same organ cluster more tightly than same-class nuclei across organs, complicating class-level representation learning*
-
-![[assets/figures/papers/paper_list_l2319_https_openaccess_thecvf_com_content_CVPR2026_html_Jeong_IVAAN_Instance_l/figures/001_Figure_1.jpg]]
-*Figure 1: Comparison with existing pathology vision-language models that only use the image- or region-level text prompts*
-
-
 
 ## 实验与关键发现
 
 ### 主实验结果
 
 IVAAN在PanNuke数据集上进行了全面的检测、分类与实例级分割评估。在检测与分类任务上，Ours-H模型取得了检测F1 0.87和分类平均F1 0.69的最佳结果，优于**CellViT**（Horst et al., Medical Image Analysis 2024）等先前方法（Table 1）。在实例级分割任务上，所提方法达到二值全景质量bPQ 0.6976和多类全景质量mPQ 0.5459，相较于**PromptNucSeg**（Shui et al., ECCV 2024）分别提升+0.005和+0.034个点（Table 2）。其中mPQ的大幅提升（+0.034）表明引入实例级视觉-语言对齐对跨类别的分割与分类一致性有显著增益。
-
-![[assets/figures/papers/paper_list_l2319_https_openaccess_thecvf_com_content_CVPR2026_html_Jeong_IVAAN_Instance_l/figures/006_Table_1.jpg]]
-*Table 1: Precision (P), Recall (R), and F1-score (F1) for detection and classification across three folds by nucleus type. The best and second-best F1-scores are shown in bold and underline, respectively. Following [10], a classification is treated as a true positive (TP) when a predicted nucleus is within ≈3µm of a ground-truth nucleus with the same class label; otherwise, it is considered a false positive (FP)*
 
 ![[assets/figures/papers/paper_list_l2319_https_openaccess_thecvf_com_content_CVPR2026_html_Jeong_IVAAN_Instance_l/figures/007_Table_2.jpg]]
 *Table 2: Performance comparison on the PanNuke dataset. Following [12, 34], both binary panoptic quality (bPQ) and multi-class panoptic quality (mPQ) across 19 organs are reported. The best and second-best scores in each row are shown in bold and underlined, respectively. Standard deviations are computed over three-fold experiments following [9]*
@@ -245,9 +221,6 @@ IVAAN在PanNuke数据集上进行了全面的检测、分类与实例级分割�
 *Table 5: Performance comparison on the MoNuSeg and CPM17 datasets. The best results are highlighted in bold, and the previous state-of-the-art scores are underlined*
 
 从各类别细分结果看（Table 3），所提方法在死细胞（Dead）等少数类上的PQ改善尤为突出。这归因于属性提示显式编码了死细胞特有的形态特征（如核固缩、碎片化边界），使模型不再仅依赖类别标签隐式学习，从而缓解了类别不平衡带来的表征退化。
-
-![[assets/figures/papers/paper_list_l2319_https_openaccess_thecvf_com_content_CVPR2026_html_Jeong_IVAAN_Instance_l/figures/008_Table_3.jpg]]
-*Table 3: Average panoptic quality (PQ) over three folds for each nucleus category in the PanNuke dataset*
 
 ### 消融实验
 
@@ -284,8 +257,6 @@ IVAAN在PanNuke数据集上进行了全面的检测、分类与实例级分割�
 ### 公平性说明
 
 所提方法无需人工文本标注，属性提示完全从ground-truth掩膜自动生成，避免了人工标注成本与主观偏差。在PanNuke的19种器官、多种染色条件下验证，跨数据集（MoNuSeg、CPM17）泛化性强。多原型类令牌设计使模型能够捕获类内多样性，降低了器官偏置对分类决策的干扰。
-
-
 
 ## 定位与知识库关联
 
@@ -340,8 +311,6 @@ IVAAN 在以下五个维度上对现有范式进行了系统性改造，形成�
 - **属性引导范式的任务迁移**：属性引导文本提示的生成框架是否可推广到其他密集预测任务（如腺体分割、组织区域分类）？这需要评估目标任务的形态属性是否可被量化并离散化为有判别力的文本描述，而不引入过多领域知识需求。
 
 - **自监督实例级VL对齐**：在大规模未标注病理数据上，能否通过自监督方式（如基于形态聚类的伪标签生成）实现实例级视觉-语言对齐？这将消除对ground-truth掩膜的依赖，使方法可扩展到更大规模的真实世界数据。
-
-
 
 ## 原文 PDF
 

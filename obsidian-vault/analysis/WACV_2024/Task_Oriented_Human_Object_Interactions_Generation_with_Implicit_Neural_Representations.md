@@ -60,8 +60,6 @@ TOHO 是一个四步流水线框架，输入为任务类型、物体初始位姿
 
 在 AMASS/GRAB 基准上，TOHO 在运动内插任务中取得 ADE 0.113、滑步比 0.247、PSKL-J (P,GT) 0.232 的性能。完整模型加入接触损失和表面标记损失后，指标进一步提升至 ADE 0.079、滑步比 0.177、PSKL-J (P,GT) 0.219。消融实验表明，物体参数采样器中引入人体形状信息可将物体位置估计误差从 0.073m 降至 0.048m，而物体运动估计中的旋转对齐机制将手-物接触比从 0.66 提升至 0.93，穿透深度从 0.013 降至 0.007。定性结果展示了 TOHO 对不同人体形状和未见物体的泛化能力，以及通过修改时间坐标实现动作变速的灵活性。
 
-
-
 ### 任务导向人-物交互动作生成的现实需求
 
 数字人类在虚拟现实、机器人学习和具身AI中需要执行有意图的物体操作任务，如拿起杯子喝水、移动椅子坐下。这类动作天然包含两个阶段：**接近物体**（approaching）和**操作物体**（manipulation）。生成完整、连续、物理合理的任务导向人-物交互（Human-Object Interaction, HOI）动作序列，是实现可信数字代理的核心技术挑战。
@@ -83,8 +81,6 @@ TOHO 是一个四步流水线框架，输入为任务类型、物体初始位姿
 为突破固定帧率的限制，本文引入**隐式神经表示（Implicit Neural Representations, INR）** 将人体运动建模为时间坐标的连续函数。INR 已在3D形状重建和新视角合成中展现出对连续信号的高质量拟合能力。将其应用于运动生成，意味着运动不再是离散的帧序列，而是定义在连续时间域 $[0,1]$ 上的函数 $f(t)$。这带来两个关键能力：一是**任意帧率上采样**——只需在时间轴上更密集地采样即可获得高帧率动作；二是**灵活变速**——通过非均匀采样时间坐标，自然实现加速、减速或节奏变化，无需重新训练模型。
 
 综合以上动机，TOHO 旨在构建一个统一框架，首次同时解决完整动作生成、未知物体泛化和连续时间表示三个挑战。
-
-
 
 ## 核心方法与创新机理
 
@@ -119,8 +115,6 @@ TOHO 提出基于右手五指指尖和手掌标记的**闭合形式估计算法*
 
 > **注意**：关于 INR 超网络的具体架构细节（如特征调制层数、隐空间维度）在提供的分析材料中未明确给出，需查阅原文 Section 3.4 确认。
 
-
-
 TOHO 将完整的任务导向人-物交互动作生成建模为一个**运动内插（motion inbetweening）问题**，其核心假设是：给定任务意图、初始人体姿态与物体位姿，如果能合理估计物体的最终位置，并生成初始与最终两个关键抓取帧，那么中间的运动序列可以通过连续内插来补全。基于这一假设，整个 pipeline 由四个串行模块构成（Figure 2）：
 
 ![[assets/figures/papers/paper_list_l1812_Task_Oriented_Human_Object_Interactions_Generation_with_Implicit_Neural/figures/003_Figure_2.jpg]]
@@ -137,8 +131,6 @@ TOHO 将完整的任务导向人-物交互动作生成建模为一个**运动内
 4. **物体运动估计算法（Object Motion Estimation）**：这是一个闭合形式的实时算法。它利用人体右手五指指尖和掌心的表面标记点，通过 Kabsch 算法计算当前帧与第一帧之间手指偏移向量的最优旋转对齐 $R_n$，进而反推物体的旋转和平移。该方法无需额外网络推理，保证了物体运动与手部运动的空间一致性。
 
 **输入输出规范**：系统的输入包括三部分——任务类型（独热编码）、物体形状及其初始平移和旋转、人体的初始姿态和形状参数。输出为完整的、连续的人-物交互动作序列，包含任意帧数的人体姿态序列和对应的物体运动轨迹。整个框架在 GRAB 数据集上训练和评估，支持未见过的物体形状和不同体型的人体。
-
-
 
 TOHO 将完整的任务导向物体操作动作生成建模为**运动内插（motion inbetweening）**问题，整个框架由四个核心模块串联构成（Figure 2）：物体参数采样器、目标网络、运动内插网络和物体运动估计算法。以下逐一展开各模块的关键公式与变量含义。
 
@@ -208,11 +200,6 @@ $$t_n^o = \frac{1}{6} \sum_{i=0}^5 v_n^{f_i} + R_n^T \left(t_1^o - \frac{1}{6} \
 
 TOHO 的连续运动生成能力源于 INR 将运动编码为时间坐标 $\tau \in [0, 1]$ 的连续函数。通过修改 $\tau$ 的采样方式即可实现变速效果（Figure 4）：均匀稀疏采样得到倍速动作，在接近 0 处稀疏、接近 1 处密集采样得到“快抬慢递”，反之则得到“慢抬快递”。这一机制使 TOHO 成为首个支持任意帧率上采样和灵活速度调控的任务导向人-物交互动作生成方法。
 
-![[assets/figures/papers/paper_list_l1812_Task_Oriented_Human_Object_Interactions_Generation_with_Implicit_Neural/figures/005_Figure_4.jpg]]
-*Figure 4: Examples of motion velocity adjustment by modifying the temporal coordinate τ . a) A 64-frame generated result of normal speed. b) Speed up the sequence by uniformly sampling two times fewer values from τ ∈ [0, 1], which gives a result of doubled velocities. c) The human swiftly lifts the object and then slowly passes it, which is done by sampling sparsely near 0 and densely near 1. d) The human slowly lifts the object and swiftly passes it, which uses a reverse sampling scheme of c)*
-
-
-
 ## 实验与关键发现
 
 ### 问题设定与基线对比
@@ -276,8 +263,6 @@ TOHO 通过修改时间坐标 $\tau$ 的采样策略实现对生成动作的速�
 | 表5 | Kabsch 旋转对齐将接触比从 0.66 提升至 0.93，穿透深度减半 |
 | 图4 | 通过修改 $\tau$ 采样实现任意速度调控，无需重新训练 |
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1812_Task_Oriented_Human_Object_Interactions_Generation_with_Implicit_Neural/figures/002_Table_1.jpg]]
 *Table 1: Overview of our problem setting compared with previous methods. Our method is the only unified framework that generates complete and continuous intent-driven human-object manipulation motions with unseen objects*
 
@@ -292,8 +277,6 @@ TOHO 通过修改时间坐标 $\tau$ 的采样策略实现对生成动作的速�
 
 ![[assets/figures/papers/paper_list_l1812_Task_Oriented_Human_Object_Interactions_Generation_with_Implicit_Neural/figures/009_Table_5.jpg]]
 *Table 5: Ablation study of our object motion estimation algorithm*
-
-
 
 ## 定位与知识库关联
 
@@ -333,8 +316,6 @@ Table 1 将上述差异系统化：TOHO 是唯一同时满足“完整序列生�
 4. **长序列稳定性**：虽然 INR 理论上可生成任意长度序列，但超网络生成的 INR 权重是否会在长时间跨度上累积漂移，尚未有系统分析。
 
 **证据强度说明**：上述局限和开放问题主要来自论文自身的讨论（Section 5），部分推断（如对复杂拓扑物体的泛化风险）基于对 Kabsch 算法假设的分析，属于合理推演而非实验验证，需后续工作确认。
-
-
 
 ## 原文 PDF
 

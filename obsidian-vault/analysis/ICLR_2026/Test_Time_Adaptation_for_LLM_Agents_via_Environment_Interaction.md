@@ -60,8 +60,6 @@ claims:
 
 **局限与开放问题**：简单组合SA与DG在某些场景下反而不如单独使用DG；当环境动态符合常识时DG提升有限；目前仅在函数调用和网页导航任务上验证，对其他智能体环境的泛化性尚待探索。如何设计元控制器自动决定适应策略、如何更高效地结合两方法，是后续研究的关键方向。
 
-
-
 大语言模型（LLM）驱动的智能体在开放环境中执行复杂任务时，面临一个根本性瓶颈：**句法不匹配**与**语义不匹配**的双重挑战。句法不匹配表现为环境特定的UI元素标签、API响应格式等与模型预训练分布不一致，导致智能体产生格式错误或无效动作；语义不匹配则源于智能体缺乏对环境中状态转移因果模型的认知——例如，点击某个按钮会触发日期弹窗，而非直接跳转页面——使得规划过程基于错误的因果假设，最终导致任务失败。
 
 现有应对方案存在明显缺口。零样本LLM智能体（如GPT-4.1、GPT-4o mini、Qwen2.5-14B-Instruct）直接部署时，在WebArena等多网站复杂基准上的成功率极低，尤其在跨站点任务上仅约2%。基于世界模型增强的方法（如**WMA**，Chae et al., 2025）需要预先收集大量交互轨迹来训练独立的状态预测模型，不仅依赖标注数据，且无法泛化到纯对话式或非网页类环境。测试时自适应方法（如熵最小化或自监督微调）虽能缓解分布偏移，但通常仅针对单一模型输出分布调整，未触及环境动态知识的获取与利用。
@@ -69,8 +67,6 @@ claims:
 本文的核心洞察在于：**仅利用无监督的测试时环境交互信号，即可通过参数化的在线句法适应和基于上下文的环境动态规则提取，在不依赖标注数据的情况下显著提升智能体在复杂未知环境中的泛化能力。** 具体而言，句法不匹配可通过轻量级适应向量在线微调模型输出分布来解决；语义不匹配则可通过一次性的、人格引导的探索阶段，以自然语言形式提取环境状态转移规则，并作为上下文世界模型注入决策过程。这一思路将测试时自适应的边界从句法层面拓展至动态建模层面，为LLM智能体在未见环境中的可靠部署提供了新的范式。
 
 **决定性证据**：在WebArena多站点任务上，动态基础（DG）将GPT-4.1的成功率从2%提升至23%（Table 3）；句法对齐（SA）的单步更新仅增加约3%的延迟开销（Table 4），适合实时部署。
-
-
 
 ## 核心方法与创新机理
 
@@ -135,12 +131,8 @@ $$
 
 SA和DG分别从**格式对齐**和**因果认知**两个维度增强智能体，且均可独立部署。然而，简单的策略组合（同时使用SA和DG）在某些场景下反而不如单独使用DG，表明两者可能存在上下文冲突或过度适应的问题——这指向了一个重要的开放问题：如何设计原则性的集成方法，使两种自适应机制协同而非互斥。
 
-
-
 ![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_OH4PE0TDo0/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of syntactic alignment (SA). This figure includes an example of web navigation shopping task to illustrate how the agent adapts to new environment. (1) At the start of each episode, we initialize an adaptation vector δ as a zero vector and construct inputs to the LLM agent. (2) During task execution, the agent receives environment instructions and observations. (3) At each step, we update the adaptation vector using cross-entropy loss on the current input, and apply the adaptation vector as a bias to the LLM’s final hidden layer. This enables rapid alignment to environment-specific observation and action formats. (4) The LLM agent takes a new action with the updated vector, which s...*
-
-![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_OH4PE0TDo0/figures/002_Figure_2.jpg]]
 
 本文提出一套面向LLM智能体的测试时自适应框架，核心组件为**句法对齐（Syntactic Alignment, SA）**与**动态基础（Dynamics Grounding, DG）**。两者分别解决智能体在未知环境中面临的两类根本性不匹配：**句法不匹配**（如UI元素标签、响应格式差异）和**语义不匹配**（环境状态转移因果模型缺失）。框架的整体输入输出流如下：
 
@@ -169,8 +161,6 @@ $$\mathcal{T}' = [\mathcal{T}; E_{\mathrm{clean}}] \tag{4}$$
 通过将环境动态规则以自然语言形式注入上下文，智能体获得关于状态转移因果关系的显式知识，从而做出更明智的决策。
 
 **模块关系与数据流**：SA和DG分别作用于模型内部表示和外部上下文两个层面。SA在每个交互步实时更新适应向量，直接修改logits分布；DG在部署前一次性完成探索，生成静态的环境动态规则集合，在测试时作为上下文前缀注入。两个模块可独立使用，也可组合——但简单组合在部分场景下反而不如单独使用DG，提示需要更原则性的集成方法。
-
-
 
 ### 3.1 输入构建
 
@@ -223,8 +213,6 @@ $$
 - **DG 的一次性**：探索阶段仅需约 50 条探索轨迹，无需额外模型训练，为部署时一次性投入。
 - **模块独立性**：SA 和 DG 可独立使用，但简单组合在部分场景下反而不如单独使用 DG，需要更原则性的集成方法。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与因果机制
@@ -253,9 +241,6 @@ LLM智能体在未见环境中面临双重不匹配：**句法不匹配**（UI�
 ### 效率与延迟分析
 
 **Table 4**展示SA的延迟开销：在BFCLv3多轮任务上，单步SA更新仅增加3.0%的相对延迟，累积5步后总延迟增益为15.6%。这一开销在实时部署场景中可接受。DG作为一次性投入，仅需50次探索rollout且无需模型训练，计算成本集中在部署前。
-
-![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_OH4PE0TDo0/figures/006_Table_4.jpg]]
-*Table 4: Relative latency gain (%) of PA on BFCLv3 multiturn. LR fixed to 0.1*
 
 ### 消融实验
 
@@ -299,16 +284,6 @@ LLM智能体在未见环境中面临双重不匹配：**句法不匹配**（UI�
 - **元控制器设计**：如何根据环境复杂度自动决定采用SA、DG或两者组合，是方法实际部署的关键。当前需要人工选择策略。
 - **更高效的动态发现**：50次探索rollout在部分场景下可能成本过高，探索更高效的动态发现与利用方式是降低部署门槛的方向。
 - **更广泛场景验证**：在具身智能体、多模态环境中的有效性需要通过额外实验确认。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_OH4PE0TDo0/figures/003_Table_1.jpg]]
-*Table 1: Number of tasks per website in the WebArena benchmark. The benchmark consists of six websites, including a multisite category for tasks that require interacting across multiple websites (from the six sites), for a total of 812 tasks*
-
-![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_OH4PE0TDo0/figures/010_Table_8.jpg]]
-*Table 8: Number of functions available in each BFCLv3 environment*
-
-
 
 ## 定位与知识库关联
 
@@ -367,8 +342,6 @@ DG的关键优势在于：仅需约50次探索rollout，无需任何模型训练
 3. **探索效率提升**：当前DG需要固定数量的探索rollout，如何更高效地发现和利用环境动态（如主动学习、不确定性引导的探索），以进一步降低探索成本？
 4. **跨模态泛化**：在更广泛的多模态（视觉-语言）和具身智能体场景中，测试时适应策略的有效性和泛化能力如何？SA的隐层偏置机制能否直接迁移到多模态架构？
 5. **动态更新与遗忘平衡**：SA的episode级重置策略避免了跨任务干扰，但在长期部署中是否丢失了有用的环境知识？能否设计更细粒度的记忆与遗忘机制？
-
-
 
 ## 原文 PDF
 

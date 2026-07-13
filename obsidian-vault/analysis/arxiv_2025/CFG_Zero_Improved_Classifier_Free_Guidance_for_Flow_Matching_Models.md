@@ -65,8 +65,6 @@ claims:
 
 **局限与待验证问题**：CFG-Zero⋆ 的效果依赖模型欠拟合程度，充分训练后零初始化增益消失；零初始化步数 $K$ 需手动调节，缺乏自适应机制；方法主要在 Flow Matching 模型上验证，对传统扩散模型的泛化性尚未确认；对 CFG-distilled 模型（如 Flux）的影响需进一步分析。
 
-
-
 ### 问题背景：Flow Matching 与无分类器引导
 
 流匹配（Flow Matching）模型通过构建从源分布到目标分布的概率路径来学习生成过程，其核心是训练一个速度场网络 $v_t^{\theta}$ 来逼近最优传输路径。与扩散模型类似，流匹配模型同样需要借助引导（guidance）机制来提升生成质量和对条件的遵从度。无分类器引导（Classifier-Free Guidance, CFG）是该领域最广泛采用的引导策略，其标准形式为：
@@ -94,8 +92,6 @@ $$\|\widetilde{\mathbf{v}}_0^{\theta}(\mathbf{x}|\mathbf{y}) - \mathbf{v}_0^*(\m
 2. **零初始化（Zero-Init）**：对于 ODE 求解器的初始步骤，由于模型速度估计极不准确，CFG-Zero⋆ 直接将前 $K$ 步的速度强制设为零向量，跳过初始阶段的错误预测，让求解器从更稳定的后续步骤开始推进。
 
 这两个策略共同构成了 CFG-Zero⋆，其核心动机在于：**在模型欠拟合阶段，通过校正速度估计和跳过不可靠的初始预测，使引导过程更稳定、更准确**。Figure 2 通过条件生成与 CFG 生成的对比，直观展示了标准 CFG 在欠拟合模型上的引导失效现象，为方法的提出提供了定性支撑。
-
-
 
 ## 核心方法与创新机理
 
@@ -139,8 +135,6 @@ ImageNet-256 上的验证实验（Table 1）为该设计提供了关键证据：
 
 消融实验（Table 6）表明，在 SD3.5 上，单独使用零初始化或单独使用优化尺度均不如完整的 CFG-Zero⋆ 组合，验证了两者的协同增益。
 
-
-
 CFG-Zero⋆ 是一种面向 Flow Matching 模型的推理阶段引导增强方法，其整体流程由四个核心模块串联构成：**优化尺度计算**、**零初始化掩码**、**引导速度合成**以及**标准 ODE 求解器**。该方法不改变模型训练过程，仅在采样时对速度场进行轻量级校正。
 
 **输入与输出流**：系统接收一个已训练的速度预测网络 $v^\theta$、一个从先验分布采样的噪声样本 $x_0$、引导权重 $\omega$ 以及零初始化步数 $K$。输出为一条从噪声逐步演化至目标分布的采样轨迹，最终产生符合条件约束的生成样本。
@@ -148,8 +142,6 @@ CFG-Zero⋆ 是一种面向 Flow Matching 模型的推理阶段引导增强方�
 **模块关系**：在每一个 ODE 求解步的起始，系统首先调用**优化尺度计算模块**，利用当前条件速度 $v_t^\theta(x|y)$ 与无条件速度 $v_t^\theta(x)$ 计算最优投影尺度 $s^\star$（见 Eq. 11）。随后，**零初始化掩码模块**根据当前步索引判断是否处于前 $K$ 步：若是，则直接将速度强制置为零向量；否则保留模型预测的速度。接着，**引导速度合成模块**将（可能被掩码修改后的）无条件速度乘以 $s^\star$，再按照标准 CFG 的线性组合方式与条件速度混合，形成最终的引导速度 $\tilde{v}_t^\theta(x|y)$（见 Eq. 6）。最后，**ODE 求解器**（如中点法）依据该引导速度推进样本状态 $x_t$，完成一步积分。
 
 **关键设计逻辑**：上述流程直接回应了 Flow Matching 训练早期模型速度估计不准确这一瓶颈。在 $t=0$ 附近，模型预测的引导速度误差甚至大于直接使用零速度（见 Eq. 12 所揭示的不等式关系），因此零初始化掩码通过截断前 $K$ 步的不可靠预测来避免样本偏离最优轨迹。同时，优化尺度 $s^\star$ 本质上是条件速度在无条件速度方向上的投影，它从理论上最小化了引导速度与真实速度之间误差的上界，从而在后续步中持续校正欠拟合模型的速度估计。两个模块协同作用：零初始化负责“止损”，优化尺度负责“纠偏”，共同使采样轨迹更紧密地贴合目标分布的真实流线。
-
-
 
 ### 3.1 问题背景：Flow Matching 中的标准 CFG
 
@@ -176,9 +168,6 @@ $$
 $$
 
 其中 $\widetilde{\mathbf{v}}_0^{\theta}$ 为 CFG 引导速度，$\mathbf{v}_0^*$ 为真实最优速度。该不等式在训练早期的真实数据和玩具实验中均得到验证（Figure 3 右侧），揭示了一个此前被忽视的瓶颈：**标准 CFG 在初始步引入的误差会通过 ODE 积分累积，使生成样本偏离最优轨迹**。
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2503_18886/figures/003_Figure_3.jpg]]
-*Figure 3: Results on mixture of Gaussians in*
 
 ### 3.3 优化缩放因子 $s^*$
 
@@ -220,8 +209,6 @@ CFG-Zero$^\star$ 的两个核心模块——优化缩放 $s^\star$ 与零初始�
 - **优化缩放**：在后续步骤中持续校正无条件速度的幅值和方向偏差，使引导速度更接近真实速度
 
 两者协同作用：零初始化提供干净的起始点，优化缩放维持后续轨迹的准确性。消融实验（Table 6）证实，仅使用单一模块均不如完整组合，验证了协同的必要性。
-
-
 
 ## 实验与关键发现
 
@@ -307,33 +294,14 @@ CFG-Zero⋆ 在 IS 上取得 258.87（+1.84 vs CFG），在 Recall 上达到 0.6
 
 5. **用户研究规模有限**：76 名参与者的用户研究仅覆盖部分文本提示，可能存在选择偏差，主观偏好的泛化性需要更大规模验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2503_18886/figures/006_Table_2.jpg]]
 *Table 2: Comparison of different guidance strategy on ImageNet-256 benchmark. Lower FID is better (↓) and higher IS is better (↑). Baseline here denotes using the conditional prediction only*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2503_18886/figures/005_Table_3.jpg]]
-*Table 3: Quantitative evaluation of Text-to-Image generation, using Lumina-Next, Stable Diffusion 3, Stable Diffusion 3.5, and Flux. The evaluation is based on Aesthetic Score and CLIP Score as key metrics. Results indicate that CFG-Zero⋆ consistently enhances image quality and improves alignment with textual prompts across different models*
 
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2503_18886/figures/010_Table_5.jpg]]
 *Table 5: Qualitative evaluation on VBench [13]. We use the Wan-2.1 [39] model as our base model. Compared to vanilla CFG, CFG-Zero⋆ improves both frame quality and overall video smoothness*
 
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2503_18886/figures/012_Table_6.jpg]]
 *Table 6: Effectiveness of CFG-Zero⋆. Comparison of vanilla CFG, CFG with zero-init, dynamic scaling, and CFG-Zero⋆, highlighting the impact of zero-init and dynamic scaling in improving performance*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2503_18886/figures/015_Figure_7.jpg]]
-*Figure 7: Abalation study on different sampling steps. Comparison of CLIP Score and Aesthetic Score between our method and CFG across different sampling steps*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2503_18886/figures/016_Figure_8.jpg]]
-*Figure 8: Abalation study on different guidance scale. Comparison of CLIP Score and Aesthetic Score between our method and CFG across different guidance scale*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2503_18886/figures/017_Table_8.jpg]]
-*Table 8: Computational costs. FLOPs [15] and GPU memory usage of our method for 5-second video generation at 720p/480p using Wan2.1 [39], and at 1024/512 resolution using SD3 [5]*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2503_18886/figures/009_Figure_4.jpg]]
-*Figure 4: Qualitative comparisons between CFG and CFG-Zero⋆. Experiments are conducted using Lumina-Next, Stable Diffusion 3, and Stable Diffusion 3.5, with each model evaluated under its recommended optimal sampling steps and guidance scale settings. CFG results are shown in orange and Ours are highlighted in green boxes*
-
-
 
 ## 定位与知识库关联
 
@@ -377,8 +345,6 @@ CFG-Zero⋆ 的效果与模型的训练程度密切相关。Table 1 显示，在
 4. 为何 SD3.5 对多步零初始化更敏感，而其他模型则受益于更多零步？这是否与模型容量或预训练程度有关？
 5. CFG-Zero⋆ 对不同类型的条件（文本、图像、分割图）是否具有一致的增益？
 6. 零初始化对采样效率的影响能否结合蒸馏技术来弥补？
-
-
 
 ## 原文 PDF
 

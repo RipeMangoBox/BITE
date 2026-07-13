@@ -66,8 +66,6 @@ OmniGrasp属于**动作空间重参数化**范式：它并不改变底层强化�
 
 > **注意**：当前策略仅支持抓取‑保持‑移动，不支持手内精细操作；旋转跟踪精度仍有提升空间；物体表征依赖规范位姿，对真实世界部分可观测场景的扩展性不足。
 
-
-
 ### 问题背景：人形机器人全身抓取与轨迹跟随
 
 使仿真人形机器人抓取多样化物体并沿任意轨迹移动，是通向通用机器人操作的关键能力。该任务要求机器人在高维关节空间中协调全身运动——包括躯干、手臂和手指——以稳定抓取物体并精确跟踪时变的目标位姿。与仅涉及末端执行器的传统抓取不同，全身抓取涉及运动学链的深层耦合：躯干的微小姿态调整会通过手臂放大到手部，直接影响抓取稳定性。
@@ -83,8 +81,6 @@ OmniGrasp属于**动作空间重参数化**范式：它并不改变底层强化�
 ### 核心动机：用运动先验替代数据依赖
 
 本文的核心洞察在于：**大规模人类运动数据中蕴含的运动先验，可以作为RL探索的强约束，从而消除对配对抓取数据的依赖**。具体而言，如果能让策略在一个紧凑的、具有人类运动先验的隐空间中行动，而非直接输出高维关节目标，则探索效率将大幅提升，使极简的状态和奖励设计也能驱动稳定抓取行为的涌现。这一思路将问题从“需要教机器人如何抓取”转化为“让机器人在学会自然运动的基础上，学会如何接触和移动物体”。
-
-
 
 ## 核心方法与创新机理
 
@@ -117,12 +113,7 @@ OmniGrasp 的核心创新在于**将预训练的通用灵巧人形运动隐空�
 
 OmniGrasp 与此前工作的根本区别在于**将“如何运动”的知识从RL训练中解耦**，预训练到运动表征中。这使得抓取策略只需关注“何时、何地抓取”的高层决策，而非同时学习全身协调的低层控制。这一设计哲学使得系统无需手部参考运动或专门设计的交互图（interaction graph），即可在GRAB‑Goal‑Test上达到100%抓取成功率和94.1%轨迹成功率（Table 1），全面超越先前SOTA。
 
-
-
 OmniGrasp 采用**两阶段训练**流水线，将全身人形机器人的抓取与轨迹跟随问题分解为运动表征学习和目标导向的强化学习两个阶段。Figure 2 给出了完整的架构概览。
-
-![[assets/figures/papers/paper_list_l1797_OmniGrasp_Grasping_Diverse_Objects_with_Simulated_Humanoids/figures/002_Figure_2.jpg]]
-*Figure 2: Omnigrasp is trained in two stages. (a) A universal and dexterous humanoid motion representation is trained via distillation. (b) Pre-grasp guided grasping training using a pretrained motion representation*
 
 ### 阶段一：通用灵巧运动表征学习
 
@@ -164,13 +155,6 @@ OmniGrasp 采用**两阶段训练**流水线，将全身人形机器人的抓取
 | 阶段二 | 冻结的 PULSE‑X 解码器 | 残差隐变量 + 先验均值 | 153 维 PD 目标 → 仿真执行 |
 
 整个流水线的关键设计在于：**用大规模人类运动数据预训练的运动先验替代手工设计的参考运动或交互图**，使策略在极简的状态和奖励设计下即可学习稳定抓取与轨迹跟随，同时天然支持对未见物体的泛化。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1797_OmniGrasp_Grasping_Diverse_Objects_with_Simulated_Humanoids/figures/001_Figure_1.jpg]]
-*Figure 1: We control a simulated humanoid to grasp diverse objects and follow complex trajectories. (Top): picking up and holding objects. (Bottom): green dots - reference trajectory; pink dots - object trajectory*
-
-
 
 OmniGrasp 的核心架构由两条解耦的训练管线构成：**灵巧通用运动表征学习（PULSE‑X）** 与 **基于预抓取引导的强化学习抓取策略（π_Omnigrasp）**。前者将高维关节动作空间压缩为紧凑的、蕴含人类运动先验的隐空间；后者在该隐空间内执行目标条件强化学习，以极简的状态与奖励设计实现多样化物体的抓取与轨迹跟随。
 
@@ -245,8 +229,6 @@ $$P(j) = \frac{s_j}{\sum_i^J s_i}$$
 - **提前终止**：当物体偏离参考位置超过0.12 m时立即终止回合，加速训练并避免无效探索。
 - **轨迹生成器**：随机生成速度范围 $[0, 2]\ \mathrm{m/s}$、角度范围 $[0, 1]\ \mathrm{rad}$ 的多样化轨迹，为训练提供无限变体的参考信号。
 
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -286,15 +268,9 @@ Table 4 的系统消融揭示了各设计组件对性能的因果贡献：
 
 Table 8 的补充消融进一步表明：（1）RNN 策略在轨迹跟随任务上优于 MLP（94.1% vs 89.6%），因为时序记忆有助于协调持续的持握与移动；（2）向策略提供真实全身姿态作为输入反而损害性能（Succ_traj 降至 77.8%），并限制了对缺乏配对数据的新物体的泛化能力；（3）物体形状隐编码 $\sigma^{\text{obj}}$ 对性能有正向贡献。
 
-![[assets/figures/papers/paper_list_l1797_OmniGrasp_Grasping_Diverse_Objects_with_Simulated_Humanoids/figures/012_Table_8.jpg]]
-*Table 8: Additional ablations: Object-latent refers to whether to provide the object shape latent code*
-
 ### 鲁棒性与噪声敏感性
 
 Table 5 测试了预训练策略对观测噪声的鲁棒性。在物体位姿上施加 $\sigma=0.01$ 的高斯噪声后，轨迹成功率从 94.1% 降至 91.4%，仅相对下降 2.7%，表明策略对感知噪声具有较好的容忍度。
-
-![[assets/figures/papers/paper_list_l1797_OmniGrasp_Grasping_Diverse_Objects_with_Simulated_Humanoids/figures/009_Table_5.jpg]]
-*Table 5: Study on how noise affects pretrained Omnigrasp Policy*
 
 ### 失败模式与局限性分析
 
@@ -312,18 +288,8 @@ Table 5 测试了预训练策略对观测噪声的鲁棒性。在物体位姿上
 
 6. **轨迹分布外泛化未验证。** 随机轨迹生成器的速度（0‑2 m/s）和角度（0‑1 rad）范围有界，策略对超出此分布的极端运动可能存在泛化不足。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1797_OmniGrasp_Grasping_Diverse_Objects_with_Simulated_Humanoids/figures/004_Figure_3.jpg]]
 *Figure 3: Qualitative results. Unseen objects are tested for GRAB and OakInk. Green dots: reference trajectories. Best seen in videos on our supplement site*
-
-![[assets/figures/papers/paper_list_l1797_OmniGrasp_Grasping_Diverse_Objects_with_Simulated_Humanoids/figures/008_Figure_4.jpg]]
-*Figure 4: (Top rows): grasping different objects using both hands. (Bottom) diverse grasps on the same object*
-
-![[assets/figures/papers/paper_list_l1797_OmniGrasp_Grasping_Diverse_Objects_with_Simulated_Humanoids/figures/010_Table_7.jpg]]
-*Table 7: Hyperparameters for Omnigrasp, PHC-X, and PULSE-X*
-
-
 
 ## 定位与知识库关联
 
@@ -397,8 +363,6 @@ OmniGrasp 位于以下技术路线的交汇点：
 6. **轨迹跟踪精度的提升**：如何进一步提高轨迹跟踪的成功率和精度，尤其是在快速或大角度旋转时？可能需要更精细的奖励设计或更高频的控制策略。
 
 7. **指定抓取类型的可控性**：能否在保持紧凑运动表征的同时实现更多样的抓取策略，如指定的接触点或特定抓取类型？这需要将抓取语义信息融入运动表征或策略输入。
-
-
 
 ## 原文 PDF
 

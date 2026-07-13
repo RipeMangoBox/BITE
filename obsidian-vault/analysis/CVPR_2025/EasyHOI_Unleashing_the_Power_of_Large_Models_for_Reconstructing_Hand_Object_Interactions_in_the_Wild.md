@@ -227,8 +227,6 @@ $$
 
 权重设置为 $\lambda_1=5$，$\lambda_2=10$，$\lambda_3=5$，$\lambda_4=0.1$。消融实验证实，移除 $\mathcal{L}_{\mathrm{penetr}}$ 会导致交叉体积从 4.11 激增至 9.62，移除 $\mathcal{L}_{\mathrm{contact}}$ 使仿真位移从 3.08 升至 3.94，验证了各损失项对物理合理性的关键作用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1732_EasyHOI_Unleashing_the_Power_of_Large_Models_for_Reconstructing_Hand_Obj/figures/003_Figure_3.jpg]]
 *Figure 3: Illustration of the segmentation process after inpainting. (a) Original input image. (b) Hand and object contours, showing the object split into two disconnected regions due to hand occlusion. (c) Inpainted image with the hand region removed. (d) Object segmentation results, consisting of sampled points and a bounding box, used as prompts to segment the inpainted image*
 
@@ -275,8 +273,6 @@ EasyHOI 在三个公开数据集（Arctic、OakInk、DexYCB）上评估了物体
 1. **物体重建误差的传播**：当预测物体几何存在较大误差时，耦合优化会导致手部姿态精度下降，甚至低于 HaMeR 的独立估计。这主要发生在物体被严重遮挡或外观纹理稀少的场景。
 2. **严重遮挡下的接触分析退化**：当手指间存在严重自遮挡或手物接触区域在二维图像中不可见时，基于射线投射的 3D 接触点转换（**Figure 4**）可能产生不准确的接触约束，导致手部关节姿态偏离真实值。
 3. **计算效率**：方法依赖多个大型预训练模型（LISA、扩散修复、SAM、InstantMesh、HaMeR）和迭代优化，计算成本较高，限制了实时应用场景。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l1732_EasyHOI_Unleashing_the_Power_of_Large_Models_for_Reconstructing_Hand_Obj/figures/009_Table_3.jpg]]
 *Table 3: Ablation study for the HOI prior-guided optimization scheme*

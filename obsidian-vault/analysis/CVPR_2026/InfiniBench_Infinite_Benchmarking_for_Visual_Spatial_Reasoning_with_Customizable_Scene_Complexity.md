@@ -50,8 +50,6 @@ claims:
 
 实验表明，InfiniBench在场景生成质量上显著超越现有方法：在高对象数量场景下，提示保真度（Fidelity）达0.98，碰撞对数为0；在高房间占用率场景下，Fidelity达0.91，较过程化框架Infinigen（0.49）提升86%。消融实验进一步证实，LLM约束精炼与簇优化的协同作用将基础优化器的Fidelity从0.64提升至0.92，且精炼过程通常在5次迭代内收敛。基于该生成器构建的可控基准已初步揭示VLM在不同复杂度维度下的差异化失效模式，为空间推理能力的深入诊断提供了系统化工具。
 
-
-
 视觉语言模型（VLM）在空间推理任务上的能力评估正面临一个根本性瓶颈：现有基准既无法精细控制场景复杂度，也不具备无限扩展能力。真实世界的空间推理涉及三个相互交织的复杂度维度——**组成复杂度**（场景中有多少对象、种类如何）、**关系复杂度**（对象之间的空间排列与占用率）和**观测复杂度**（视角、遮挡程度）。当VLM在这些维度上表现退化时，我们难以判断失败究竟源于对象计数的误差、空间关系推理的缺陷，还是观测条件的不利——因为现有基准将这三个维度混为一谈，缺乏解耦控制。
 
 更关键的是，现有3D场景生成方法在支撑高复杂度基准构建时存在结构性缺陷。**基于LLM的布局生成器**（如LayoutGPT、Holodeck、I-Design）虽然能理解自然语言提示，但直接生成的布局频繁出现物理冲突和逻辑矛盾——对象穿模、悬浮、越界等问题在高对象数量下急剧恶化（Figure 2）。**过程化生成框架**（如Infinigen、Luminous）虽能保证物理合理性，但其层次化优化策略（先固定大物体，后放置小物体）在高房间占用率场景下会陷入无可解状态——大物体占据空间后，小物体无处安放，导致提示保真度崩溃。正如Figure 6所示，同一房间模板和资产参数下，传统层次化方法完全无法生成高密度场景，而InfiniBench的簇优化策略能成功实现。
@@ -59,8 +57,6 @@ claims:
 观测层面的问题同样严峻。现有相机路径生成方法——无论是基于优化的方法（计算开销大）、生成式方法（缺乏多对象覆盖），还是强化学习方法（需逐场景重训）——都无法在可接受的时间内为包含大量任务相关对象的场景生成确保全覆盖的相机轨迹。错误的视点选择会直接遮蔽空间推理所需的关键信息（Figure 3），使得即使场景布局完美，VLM也无法正确作答。
 
 上述缺口共同指向一个核心矛盾：**现有方法无法在高复杂度下同时保证提示一致性、物理合理性和观测完整性**。这一矛盾催生了InfiniBench的设计动机——构建一个能通过自然语言参数化独立控制三个复杂度维度、理论上可生成无限变体的基准生成器，从而将VLM空间推理能力的诊断从“黑盒测试”推进到“受控实验”的层面。
-
-
 
 ## 核心方法与创新机理
 
@@ -101,8 +97,6 @@ InfiniBench 提出的 **Cluster-based Layout Optimizer**（基于可移动簇的
 
 此外，约束精炼的迭代效率也得到验证（Table 4）：Fidelity 在 5 次迭代内收敛至 0.92，10 次迭代无进一步提升，表明该框架在保证质量的同时具备良好的计算效率。
 
-
-
 InfiniBench 构建了一条从自然语言场景描述到可无限扩展的视觉空间推理基准的自动化流水线。其核心设计理念是将**高层语义理解**与**低层物理优化**相分离，并通过三个紧密协作的模块实现对场景组成复杂度（对象数量与种类）、关系复杂度（空间排列与占用率）和观测复杂度（视角与遮挡）的独立、精细控制。
 
 流水线的输入仅为一段自然语言描述（如“生成一个可容纳10人以上就餐的餐厅”），输出是一组物理合理的高保真3D场景视频，可直接用于VLM的空间推理能力诊断。整个过程由四个核心模块串联完成，其逻辑关系如Figure 4所示。
@@ -125,8 +119,6 @@ InfiniBench 构建了一条从自然语言场景描述到可无限扩展的视�
 
 这种模块化流水线的核心优势在于**各复杂度维度的解耦控制**。用户通过自然语言即可独立调节场景的组成、关系或观测复杂度，而无需介入任何底层参数。例如，仅改变提示中的对象数量即可生成不同组成复杂度的场景，而房间布局与相机路径则由后续模块自动适配，确保生成的场景在物理合理性和任务相关性上均保持高保真度。这一设计使得对VLM失败模式的细粒度诊断成为可能——研究者可以精确分离出模型性能下降是由对象数量增加、空间拥挤度提高，还是由观测视角恶化所导致。
 
-
-
 ### 3.1 LLM智能体约束精炼器 (LLM Agentic Constraint Refiner)
 
 InfiniBench的核心创新之一是将高层语义理解与低层执行彻底解耦。该模块将用户以自然语言描述的场景（例如“一个30平方米、配有10把不同类型椅子的餐厅”）翻译为过程化约束（procedural constraints），而非直接生成最终布局。其工作流程构成一个闭环迭代系统：
@@ -141,9 +133,6 @@ InfiniBench的核心创新之一是将高层语义理解与低层执行彻底解
 ### 3.2 基于可移动簇的布局优化器 (Cluster-based Layout Optimizer)
 
 传统层次化布局方法（如Infinigen的原生优化器）遵循“先放置大物体，后放置小物体”的固定顺序。一旦大物体占据了关键空间，后续小物体可能陷入无解状态，这在高密度场景下尤为致命（Figure 5/6）。
-
-![[assets/figures/papers/paper_list_l2085_https_arxiv_org_abs_2511_18200/figures/005_Figure_5.jpg]]
-*Figure 5: Traditional hierarchical optimization vs. our clusterbased optimization*
 
 InfiniBench的布局优化器引入了**可移动簇（movable cluster）**机制来解决这一瓶颈：
 
@@ -168,18 +157,11 @@ InfiniBench的布局优化器引入了**可移动簇（movable cluster）**机�
 
 最终生成的场景与相机轨迹通过Blender Cycles引擎进行真实感渲染，输出高质量的连续视频帧。渲染配置（如路径追踪采样数对图像质量的影响见Figure 24）经过调优，以在视觉真实感与计算效率之间取得平衡。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2085_https_arxiv_org_abs_2511_18200/figures/004_Figure_4.jpg]]
 *Figure 4: LLM-based agentic framework for iterative scene constraint generation, illustrated by an example of generating a scene of a 30 m2 dining room with 10 chairs of different types*
 
 ![[assets/figures/papers/paper_list_l2085_https_arxiv_org_abs_2511_18200/figures/006_Figure_6.jpg]]
 *Figure 6: Comparison of generating highly complex scenes, with the same room shape and asset parameters*
-
-![[assets/figures/papers/paper_list_l2085_https_arxiv_org_abs_2511_18200/figures/007_Figure_7.jpg]]
-*Figure 7: Camera trajectory optimization*
-
-
 
 ## 实验与关键发现
 
@@ -215,27 +197,11 @@ InfiniBench 的核心价值在于对 VLM 失败模式的精细诊断。通过独
 
 部分 VLM 失败模式的具体归因（如高组成复杂度下的退化究竟是源于计数误差还是更深层的空间关系推理缺陷）在现有实验中尚未得到彻底分离。此外，实验主要覆盖 Gemini-2.5-Pro、GPT-4V 等闭源模型，开源 VLM 在 InfiniBench 上的表现模式是否一致，需进一步验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2085_https_arxiv_org_abs_2511_18200/figures/008_Table_1.jpg]]
 *Table 1: Quantitative comparison of scene generation quality with different numbers of objects in the scene*
 
 ![[assets/figures/papers/paper_list_l2085_https_arxiv_org_abs_2511_18200/figures/009_Table_2.jpg]]
 *Table 2: Quantitative comparison of scene generation quality with different levels of scene occupancy ratio*
-
-![[assets/figures/papers/paper_list_l2085_https_arxiv_org_abs_2511_18200/figures/014_Table_5.jpg]]
-*Table 5: Performance of Measurement, Perspective-taking and Spatiotemporal tasks with different numbers of irrelevant objects*
-
-![[assets/figures/papers/paper_list_l2085_https_arxiv_org_abs_2511_18200/figures/015_Figure_11.jpg]]
-*Figure 11: VLMs’ performance of spatial reasoning with varying compositional scene complexity*
-
-![[assets/figures/papers/paper_list_l2085_https_arxiv_org_abs_2511_18200/figures/019_Table_6.jpg]]
-*Table 6: VLM’s reasoning performance with varying observational scene complexity*
-
-![[assets/figures/papers/paper_list_l2085_https_arxiv_org_abs_2511_18200/figures/002_Figure_2.jpg]]
-*Figure 2: Limitations of LLM-based layout generation*
-
-
 
 ## 定位与知识库关联
 
@@ -274,8 +240,6 @@ InfiniBench的核心洞察在于将LLM的高层语义理解（约束生成与思
 2. **场景域迁移**：InfiniBench的核心方法——LLM约束生成+簇优化+任务感知相机规划——能否迁移到户外场景或包含动态对象的场景？这需要解决室外场景的无边界约束定义、动态对象的时序一致性等新挑战。
 
 3. **VLM能力瓶颈的精确归因**：当前基准揭示了VLM在不同复杂度下的性能差异，但尚未建立从场景参数到具体失败机制（计数错误、关系混淆、视角盲区）的因果链。未来工作可结合注意力可视化和逐样本错误分析，构建更细粒度的诊断框架。
-
-
 
 ## 原文 PDF
 

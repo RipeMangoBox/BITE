@@ -215,8 +215,6 @@ $$\mathcal{L}_{width}^{j} = \| \mathrm{Norm}(S_{width}^{j}(T_{j-1}^D)) - \mathrm
 
 **CKA 一阶差分**作为冗余区间边界的检测器，其物理含义是：当相邻层表示高度相似时，CKA 值缓慢下降，差分为负且递减；当遇到功能突变层时，相似度骤降，差分由负转正，形成局部极小值点，即为区间终点。这一启发式方法在 Qwen-Image 和 FLUX.1-dev 上均表现出稳定的区间划分能力，但缺乏严格理论支撑，在不同架构上需验证其泛化性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l913_https_arxiv_org_abs_2511_16156/figures/004_Figure_4.jpg]]
 *Figure 4: Subjective comparison of complex text rendering in Qwen-Image when randomly removing contiguous and non-contiguous blocks. Columns 1 and 3 show the results for contiguous layer removal, while columns 2 and 4 correspond to non-contiguous layer removal*
 

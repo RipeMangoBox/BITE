@@ -51,8 +51,6 @@ claims:
 
 实验表明，在四个面部识别基准（AgeDB-30、LFW、CPLFW、CALFW）上，LDP-Slicing的性能显著超过所有具备正式DP/LDP保证的方法，并在图像分类任务（CIFAR-10/100）上展现出优于中心化DP-SGD的隐私-效用折衷。身份区分攻击优势远低于对比方法DCTDP，消融实验进一步验证了非均匀预算分配与DWT剪枝的关键作用。
 
-
-
 ### 图像隐私保护的需求与困境
 
 随着人脸识别、医疗影像分析等视觉应用在云服务和边缘设备上的广泛部署，用户原始图像在上传至不可信服务器时面临的隐私泄露风险日益严峻。传统的中心化差分隐私（Centralized DP）方案——如 **DP-SGD**（Abadi et al., CCS 2016）——假设存在一个可信的数据收集者，在训练阶段注入噪声。然而，这一假设在现实场景中往往不成立：用户需要在数据离开本地设备之前就获得隐私保护，而非依赖服务端的可信承诺。
@@ -78,8 +76,6 @@ claims:
 本文的核心洞察是：**像素的256个离散状态本质上是8位二进制编码，而二进制随机响应是LDP中最高效、最成熟的机制之一。** 如果将像素分解为8个独立的位平面，对每个比特单独施加二进制随机响应，则每个比特仅需在 $\{0,1\}$ 两个状态间分配隐私预算，噪声注入效率得到数量级提升。更重要的是，这一分解揭示了不同比特位对下游任务效用的非均匀贡献——MSB需要更多预算保护结构信息，LSB可用极少预算甚至零预算处理——从而为**效用感知的非均匀隐私预算分配**提供了自然的切入点。
 
 基于这一洞察，本文提出 **LDP-Slicing**，一个轻量级、无需训练的框架，通过三个协同模块——感知混淆（防御人类肉眼检查）、位平面切片与随机响应（施加严格 $\varepsilon$-LDP）、效用感知预算优化（保留机器识别所需的结构信息）——在像素级实现形式化可证明的本地差分隐私，同时将下游任务精度损失控制在实用范围内。
-
-
 
 ## 核心方法与创新机理
 
@@ -133,8 +129,6 @@ $$\tilde{x} = \sum_{\ell=1}^{8} 2^{8-\ell} \cdot \tilde{x}_{\ell}$$
 
 这一整套机制使得 LDP-Slicing 在保持严格 ε-LDP 保证的同时，在面部识别基准上显著超越所有具备正式 DP/LDP 保证的方法（Table 1），并在身份区分攻击中展现出远低于 DCTDP 的敌手优势（Table 2）。
 
-
-
 LDP-Slicing 的整体 pipeline 由两个串行阶段构成，其设计逻辑直接回应了核心瓶颈：**在图像高维像素空间直接应用 LDP 时，数据表征与机制的不匹配导致信息大量丢失**。该框架通过“表征变换—逐位扰动—优化重构”三步，将 ε-LDP 的噪声注入从像素级别下沉到比特级别，从而在严格隐私约束下保留任务相关结构信息。
 
 ### 阶段一：感知混淆（Perceptual Obfuscation）
@@ -170,21 +164,14 @@ $$\tilde{x} = \sum_{\ell=1}^{8} 2^{8-\ell} \cdot \tilde{x}_{\ell}$$
 ![[assets/figures/papers/paper_list_l2106_https_arxiv_org_abs_2603_03711/figures/013_Table_5.jpg]]
 *Table 5: Storage and transmission overhead analysis. Overhead is reported as a multiple of the size of a standard image (our method, ×1). Lower is better. LDP-Slicing introduces zero overhead*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2106_https_arxiv_org_abs_2603_03711/figures/001_Figure_1.jpg]]
 *Figure 1: The LDP-Slicing framework. Our method consists of two primary stages: (1) Perceptual obfuscation: the input image is transformed into the frequency domain via DWT, where the low-frequency (LL) band is pruned to remove human-perceptible information. (2) Bit-plane randomization: The obfuscated image is decomposed into binary bit-planes. A utility-aware randomized response mechanism is applied to each bit and enforces a strict ε-Local Differential Privacy guarantee before the final image is reconstructed*
-
-
 
 LDP-Slicing 的核心设计围绕一个关键洞察展开：8 位像素值的 256 个离散状态本质上是二进制编码，不同比特位对图像语义的贡献呈指数级差异——最高有效位（MSB）承载主要结构信息，而最低有效位（LSB）近似噪声。基于这一洞察，该方法将图像隐私保护分解为三个串联模块。
 
 ### 模块一：感知混淆（Perceptual Obfuscation）
 
 该模块的目标是防御人类肉眼检查，而非直接贡献于机器识别效用。对输入图像的每个通道执行 1 阶 Haar 离散小波变换（DWT），得到四个子带：低频近似子带（LL）和三个高频细节子带（LH, HL, HH）。随后将 LL 子带系数全部置零，再通过逆离散小波变换（IDWT）重构图像。LL 子带承载了人类视觉感知依赖的低频信息，置零后图像在视觉上变得不可辨识，但高频细节子带中仍保留了机器识别所需的结构信息（见 Figure 3）。
-
-![[assets/figures/papers/paper_list_l2106_https_arxiv_org_abs_2603_03711/figures/003_Figure_3.jpg]]
-*Figure 3: Visual justification for channel-aware allocation and perceptual obfuscation. This figure shows an original image (a) and its YCbCr components before and after LL-pruning. It validates two key decisions: (1) Channel Importance: The luma (Y) channel (b) contains the most structural information compared to the chroma channels (c,d). (2) Post-Pruning Signal: After LLpruning (e), the resulting image (e) is perceptually obfuscated for human viewers. The Y-channel’s MSB (f) still retains significant high-frequency detail for machine learning, unlike the less informative chroma MSBs (g,h)*
 
 ### 模块二：位平面切片与随机响应（Bit-Plane Slicing & Randomized Response）
 
@@ -230,12 +217,8 @@ $$\mathsf{Adv}_{\mathcal{M}}^{\mathrm{link}} \leq \frac{1}{2} \tanh(\varepsilon/
 
 该上界仅依赖于总隐私预算 $\varepsilon$，与数据维度无关，从理论上保证了 LDP-Slicing 在高维像素空间中的隐私保护强度。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2106_https_arxiv_org_abs_2603_03711/figures/002_Figure_2.jpg]]
 *Figure 2: Bit-plane slicing reveals the non-uniform distribution of structural information. An 8-bit image (left) is decomposed into its planes (right), from LSB (top-left) to MSB (bottomright). This visualization shows that coarse structural information is concentrated in the high-order MSB planes, while low-order LSB planes consist primarily of noise-like texture. This motivates our non-uniform, utility-aware budget optimization strategy*
-
-
 
 ## 实验与关键发现
 
@@ -249,9 +232,6 @@ LDP-Slicing 在四个主流人脸识别基准上与现有方法进行了系统�
 ### 图像分类任务上的隐私-效用折衷
 
 在 CIFAR-10 和 CIFAR-100 图像分类任务上，LDP-Slicing 与中心化 DP 的代表性方法 **DP-SGD**（Abadi et al., CCS 2016）进行了对比（见 **Figure 7**）。在 CIFAR-10 上，当 ε ≤ 12 时 LDP-Slicing 的精度一致优于 DP-SGD；在 CIFAR-100 上，LDP-Slicing 在所有测试的 ε 取值下均保持领先。这一结果尤其值得关注，因为 LDP-Slicing 工作在本地差分隐私的更强威胁模型下（不依赖可信中心服务器），而 DP-SGD 需要可信策展方收集原始数据后集中加噪。随着隐私预算进入实用区间（ε 较小），LDP-Slicing 的优势进一步扩大，说明位平面分解策略有效缓解了高维像素空间直接应用 LDP 的信息损失问题。
-
-![[assets/figures/papers/paper_list_l2106_https_arxiv_org_abs_2603_03711/figures/012_Figure_7.jpg]]
-*Figure 7: Privacy-utility trade-off on privacy-preserving image classification. LDP-Slicing is compared against the strong centralized DP-SGD model [1]. On both CIFAR-10 (a) and CIFAR-100 (b), our local model demonstrates a clear and growing advantage as the budget moves into a more practical range, comparing with the centralized trusted-curator model*
 
 ### 身份区分攻击防御
 
@@ -281,27 +261,11 @@ LDP-Slicing 在四个主流人脸识别基准上与现有方法进行了系统�
 
 **Table 6** 的额外实验揭示了 LDP-Slicing 的零样本跨数据集泛化能力有限：在 VGGFace2 和 CelebA 等未见域上，中等隐私预算下的准确率仍较低，表明该方法对训练数据分布偏移的鲁棒性不足。此外，在极低隐私预算（ε < 1）下效用下降明显，且色度权重（Y:Cb:Cr = 4:1:1）为手工设定的静态值，虽然实验有效，但未必是全局最优。针对更复杂的虚拟对抗样本攻击，其防御能力仍需进一步验证。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2106_https_arxiv_org_abs_2603_03711/figures/008_Table_2.jpg]]
-*Table 2: Identity distinguishing attack advantage (%). The table shows the adversary’s advantage rate in Definition 1. A lower advantage indicates a stronger protection*
-
 ![[assets/figures/papers/paper_list_l2106_https_arxiv_org_abs_2603_03711/figures/009_Table_3.jpg]]
 *Table 3: Ablation study of key components of LDP-Slicing. Results show face recognition accuracy (%) on four benchmarks, with a fixed privacy budget of*
 
 ![[assets/figures/papers/paper_list_l2106_https_arxiv_org_abs_2603_03711/figures/014_Table_4.jpg]]
 *Table 4: Privacy-utility trade-off on face recognition accuracy (%). As the privacy budget εtotal decreases, utility across all benchmarks declines smoothly, aligning with theoretical expectations. PSNR values also correlate with the applied privacy budget*
-
-![[assets/figures/papers/paper_list_l2106_https_arxiv_org_abs_2603_03711/figures/006_Figure_5.jpg]]
-*Figure 5: Resilience to a white-box reconstruction attack. The adversary has full knowledge of our pipeline and trains a specialized two-stage inversion model. From top to bottom*
-
-![[assets/figures/papers/paper_list_l2106_https_arxiv_org_abs_2603_03711/figures/007_Figure_6.jpg]]
-*Figure 6: Resilience to black-box reconstruction attack. (a) The original images. Recovered LDP-Slicing image from (b)*
-
-![[assets/figures/papers/paper_list_l2106_https_arxiv_org_abs_2603_03711/figures/016_Table_6.jpg]]
-*Table 6: Privacy-utility trade-off (%). We perform additional experiment on another 3 benchmarks*
-
-
 
 ## 定位与知识库关联
 
@@ -354,8 +318,6 @@ LDP-Slicing还包含一个独立的感知混淆模块：通过1阶Haar离散小�
 3. **与中心化DP的协同**：若将LDP-Slicing输出的私有图像直接用于DP-SGD训练，能否结合本地和中心化隐私保证的优势，进一步提升最终模型的隐私-效用前沿？初步证据来自CIFAR-10/100上的对比实验（Figure 7），其中LDP-Slicing在ε≤12时优于中心化的DP-SGD，但协同使用的潜力尚未被探索。
 
 4. **纯位平面扰动的理论上界**：是否存在不需要LL剪枝而仅依靠位平面扰动本身即可完全抵抗强重建攻击的理论保证？当前LL剪枝作为补充防御机制，其必要性是否可以通过更精细的预算分配策略来消除，是一个开放的理论问题。
-
-
 
 ## 原文 PDF
 

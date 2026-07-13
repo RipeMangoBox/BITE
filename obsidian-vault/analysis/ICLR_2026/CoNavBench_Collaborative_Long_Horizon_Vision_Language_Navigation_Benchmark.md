@@ -53,8 +53,6 @@ claims:
 
 **主要结果**：在步骤级子任务协议下，微调的 Qwen2.5-VL-3B 模型在协作模式下成功率达 35.02%，相比单智能体基线 29.65% 提升 5.37 个百分点（相对提升 18.11%），SPL 从 13.81 提升至 16.88，导航误差 NE 从 6.74 降至 5.79。零样本模型在高等级指令下成功率极低（仅 4.30%），微调后升至 12.90%，表明视觉语言模型在长程协调推理方面仍有较大提升空间。
 
-
-
 视觉语言导航（VLN）旨在使具身智能体依据自然语言指令在三维环境中移动并完成指定任务。近年来，VLN 基准在指令复杂度、任务长度和场景多样性上持续扩展，从单步目标导航演进至长程多阶段任务。然而，现有基准和系统均基于**单智能体顺序执行**范式：无论指令多么冗长、子任务多么分散，仅由一台机器人按序完成所有阶段（Figure 1a）。这一设计导致两个根本性瓶颈：
 
 1. **长程任务的时间膨胀**：当指令包含多个空间上分离的子目标时，单智能体需依次遍历所有位置，大量时间消耗在路径移动和闲置等待上，整体完成时间（makespan）与路径总长度线性增长。
@@ -65,8 +63,6 @@ claims:
 本文的核心动机在于：**将多机器人协作的并行优势引入 VLN 领域，通过接力机制将长程任务分解为可并行执行的子任务，从而在理论上缩短整体完成时间**。然而，协作并非总是有益的——引入辅助机器人会带来额外的协调开销（状态同步、交接等待、路径冲突等）。因此，协作的采纳必须以严格效率验证为前提：仅当协作方案**严格缩短主智能体的路径负载**时，才接受协作调度。这一准则构成了 CoNavBench 和其数据生成平台 NavCraft 的设计基石。
 
 Figure 2 的基准统计揭示了协作的潜在收益：跨目标类别的协作效率增益（相对于单智能体基线）平均约为 **20%**，且增益分布因类别而异，表明协作效益与任务结构高度相关。这一观察进一步强化了系统性建模协作场景的必要性——不同类别的任务对协作的敏感度不同，需要基准提供多样化的协作类型和场景配置以支持通用性评估。
-
-
 
 ## 核心方法与创新机理
 
@@ -100,8 +96,6 @@ NavCraft采用**NavCraft-S → NavCraft-C**的两阶段层级设计，将单智�
 ### 4. 协作效率的量化证据
 
 CoNavBench的协作设计带来了可观的效率增益。基准统计显示，跨类别的平均协作效率增益约为20%（Figure 2）。在下游导航策略评估中，微调后的Qwen2.5-VL-3B在步骤级协议下，协作策略成功率从单智能体的29.65%提升至35.02%，相对提升18.11%（Table 2, Table 3），同时SPL从13.81升至16.88，NE从6.74降至5.79，三项指标一致验证了协作机制的有效性。
-
-
 
 ![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_bMrH2PFMsi/figures/005_Figure_3.jpg]]
 *Figure 3: NavCraft pipeline for CoNavBench benchmark data generation and scheduling*
@@ -149,8 +143,6 @@ NavCraft-C通过迭代搜索交接区域$x$，并借助**效率工具库**（Eff
 **流水线整体特征**
 
 NavCraft流水线的设计哲学可概括为“**场景图约束下的效率驱动生成**”：场景图提供空间可达性与距离的确定性验证基础，两阶段层级代理确保协作方案的质量下限，而严格的负载比较准则避免了为协作而协作的无效并行化。这一闭环使得CoNavBench能够以可控的成本（GPT-4o-mini仅$0.360即可达到26.56%的协作任务生成成功率，见Table 4）持续产出规模可扩展的协作导航数据。
-
-
 
 CoNavBench 的数据生成与协作调度由 **NavCraft** 平台完成，其核心由四个模块构成：场景图生成、单智能体基任务生成（NavCraft-S）、协作任务生成（NavCraft-C），以及贯穿全流程的效率工具库。
 
@@ -230,8 +222,6 @@ $$
 
 该条件通过场景图上的效率工具库进行可达性验证和距离计算，确保协作方案在拓扑层面具有实际收益。消融实验表明，若跳过此迭代效率检查而直接生成双智能体任务，常导致一个机器人几乎闲置，单机器人顺序执行反而更高效（见附录 A.13.1 的失败案例分析）。
 
-
-
 ## 实验与关键发现
 
 ### 基准统计与协作效率
@@ -242,14 +232,12 @@ CoNavBench 包含 4048 个 episode，其中协作任务 1612 个，覆盖 10 类
 
 Table 2 报告了单智能体任务在高层级指令（high-level）与逐步子任务（step-by-step）两种协议下的性能。零样本 Qwen2.5-VL 模型的高层级 SR 均低于 5%，表明长程视觉语言指令的零样本理解极为困难。微调带来显著提升：Qwen2.5-VL-3B 逐步 SR 从 10.41% 升至 **29.65%**，SPL 从 4.85 升至 13.81，NE 从 8.13 降至 6.74。7B 模型微调后高层级 SR 达 12.90%，逐步 SR 达 29.78%，但相比 3B 模型的边际增益有限，暗示当前瓶颈更多在于任务表征与指令复杂性，而非模型容量。
 
-
 ![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_bMrH2PFMsi/figures/018_Table_2.jpg]]
 *Table 2: Performance comparison on the Single-Agent Task in CoNavBench. Results are shown for both high-level tasks and step-by-step subtasks*
 
 ### 协作智能体任务性能与核心对比
 
 Table 3 报告了协作智能体任务的结果，这是论文的核心实验发现。在逐步子任务协议下，微调 Qwen2.5-VL-3B 的协作策略 SR 达到 **35.02%**，相比单智能体的 29.65% 提升 **+5.37 个百分点**（相对提升 **18.11%**）。SPL 从 13.81 提升至 16.88，NE 从 6.74 降至 5.79。这一增益验证了核心洞察：通过接力机制将长程任务并行化，确实能在不牺牲成功率的前提下缩短整体耗时。
-
 
 ![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_bMrH2PFMsi/figures/019_Table_3.jpg]]
 *Table 3: Performance comparison on the Collaborative-Agent Task in CoNavBench. Results are shown for both high-level tasks and step-by-step subtasks*
@@ -259,7 +247,6 @@ Table 3 报告了协作智能体任务的结果，这是论文的核心实验发
 ### 生成代理消融
 
 Table 4 对比了不同 LLM 作为 NavCraft 生成代理的性能、效率与成本。OpenAI GPT-4o 取得最高的任务生成成功率（单智能体 77%，协作 46.75%），但成本也最高（$5.242）。GPT-4o-mini 以 $0.360 的成本达到 26.56% 的协作成功率，在成本效率上具有优势。Claude 3.5 Sonnet 的协作成功率仅为 3.75%，且协作增益为负（-3.35%），说明其生成的协作方案反而劣于单智能体顺序执行。这一消融揭示了 NavCraft 两阶段设计的关键性：直接生成双智能体任务（如 A.13.1 的失败案例，Figure 17）往往导致一个机器人几乎闲置，单机器人顺序执行反而更高效。NavCraft 通过迭代效率检查（Efficiency Tool Library 在场景图内进行可达性验证和负载比较）显著提升了协作计划的质量。
-
 
 ![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_bMrH2PFMsi/figures/020_Table_4.jpg]]
 *Table 4: Performance, efficiency, cost and latency of NAVCRAFT-powered agents. Higher numbers are better (↑) except Cost (↓). Note that the success rate represents task generation*
@@ -278,13 +265,8 @@ Table 4 对比了不同 LLM 作为 NavCraft 生成代理的性能、效率与成
 
 3. **模型容量边际效应**：3B 与 7B 微调模型在逐步协议下的性能差距有限（单智能体 29.65% vs 29.78%；协作 35.02% vs 29.78%），暗示当前瓶颈更多在于任务表征与训练范式，而非模型参数规模。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_bMrH2PFMsi/figures/004_Figure_2.jpg]]
 *Figure 2: CoNavBench benchmark. (a) Collaborative efficiency by category. Violin plots show the distribution of category-wise efficiency gain over a single-robot baseline, yielding an average gain of 20% across categories. (b) Category and collaboration-type distribution. The benchmark covers a broad and balanced set of household target-object categories (outer ring) and two collaboration types (inner ring), evidencing rich object diversity that supports generalizable evaluation*
-
-
-
 
 ## 定位与知识库关联
 
@@ -327,8 +309,6 @@ $$\min\{J_{r_1}^{\mathrm{A1}}, J_{r_1}^{\mathrm{A2}}\} < C_{\mathrm{solo}}$$
 3. **几何感知的场景图增强**：如何在符号化场景图中集成物体尺寸、可通过宽度等几何约束，使交接区域选择在物理层面可行？
 4. **协作涌现与计划给定的权衡**：当前基准将协作结构作为先验输入，未来是否应设计更开放的任务格式，让策略自主决定何时协作、与谁协作？
 5. **视觉语言模型的长程推理瓶颈**：高层级指令下成功率极低（零样本不足 5%，微调后约 12%），如何通过记忆增强、结构化状态表示或课程学习提升模型的长程协调能力？
-
-
 
 ## 原文 PDF
 

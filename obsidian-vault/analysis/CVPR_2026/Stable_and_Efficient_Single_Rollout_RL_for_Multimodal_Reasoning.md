@@ -58,8 +58,6 @@ claims:
 - **泛化性能领先**：在MathVerse、MathVista、MMK12、R1-Onevision-Bench和HallusionBench五个多模态推理基准上，MSSR在Qwen2.5-VL 3B和7B模型上平均准确率分别比GRPO、RLOO、REINFORCE++提升2.1%和2.3%。
 - **消融验证**：交叉模态正则化和熵损失等替代方案均无法完全阻止熵塌缩或验证精度退化，而MSSR的熵优势塑造可将最终验证精度提升约5%。
 
-
-
 ### 多模态推理的强化学习困境
 
 大视觉语言模型（VLMs）在多模态推理任务上已展现出显著能力，但其推理深度和稳定性仍然受限。为了进一步激发模型的推理潜力，研究者开始将强化学习验证奖励（RLVR）引入多模态训练。当前主流方法如 **GRPO**（Shao et al., 2024）采用组基线（group-based）策略：对每个输入采样多个回复（rollout），利用组内均值/标准差对奖励进行规范化，从而降低优势估计的方差。这种方法虽然有效，但计算成本高昂——例如，GRPO 对每个 prompt 生成 8 条回复，使得每步训练的计算开销成倍增加。
@@ -80,8 +78,6 @@ claims:
 ### 本文动机与核心思路
 
 基于以上观察，本文提出 **MSSR（Multimodal Stabilized Single-Rollout）**，一个稳定且高效的单次推出 RLVR 框架。MSSR 的核心创新在于**基于熵的优势塑造（entropy-based advantage shaping）**：通过向优势函数中注入策略熵调节项，动态限制低奖励响应的惩罚强度，同时奖励高熵探索，从而直接抑制熵塌缩。该方法以极低计算开销（仅需单次推出）替代组归一化效应，在保持训练稳定性的同时，实现了与组基线方法相当甚至更优的推理性能。
-
-
 
 ## 核心方法与创新机理
 
@@ -121,8 +117,6 @@ MSSR的熵优势塑造将最终验证准确率提升约5%（相对最强单次�
 
 MSSR的关键创新还体现在**以单次推出的计算成本达到组基线的性能**。如Figure 1所示，MSSR仅需GRPO一半的训练步数即可达到相当的ID验证准确率。在训练成本上（Table 3），MSSR每步6.9分钟，与GRPO（6.1分钟）接近，但MSSR仅需1次推出/输入（GRPO需8次），总采样效率更高。这一效率优势源于熵塑造机制有效替代了组归一化的方差缩减功能，使得单次推出策略也能获得稳定的梯度信号。
 
-
-
 MSSR（Multimodal Stabilized Single-Rollout）是一个面向多模态推理的**组无关（group-free）单次推出强化学习**框架，其核心设计目标是在仅使用每个多模态输入的一条采样轨迹的条件下，同时实现训练稳定性和计算效率。整个 pipeline 由五个紧密耦合的模块构成，信息流如图 2 所示。
 
 ### 1. 单次推出生成
@@ -155,12 +149,8 @@ $$
 
 上述五个模块形成一条清晰的因果链：**单次推出**降低了生成成本，但引入了高方差 → **Beta 基线**提供了个体化期望奖励估计 → **批次归一化**进一步压缩方差 → **熵塑造**通过注入策略熵信号，从根本上抑制了训练不稳定性的根源——即缺乏组内规范化导致的熵塌缩 → **策略更新**在稳定梯度下持续提升推理能力。消融实验（Figure 4）证实，单独使用 KL 正则化、交叉模态正则化或熵损失均无法完全阻止验证精度退化，而 MSSR 的熵优势塑造可将最终验证精度提升约 5%，是稳定训练的必要条件。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2283_https_arxiv_org_abs_2512_18215/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed MSSR approach. Given a multimodal input*
-
-
 
 MSSR 的完整训练流程由五个关键模块构成，其核心创新在于将策略熵信号直接耦合到优势函数中，以极低的计算开销（仅需单次推出）替代组归一化效应。
 
@@ -212,13 +202,6 @@ $$\mathcal{T}_{\mathrm{GRPO}}(\theta) = \mathbb{E}_{x \sim \mathcal{D}, \{o_i\} 
 
 MSSR 在此框架下将 $G=1$、$A_i$ 替换为 $\hat{A}_t$，并加入 KL 正则项以约束策略更新幅度。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2283_https_arxiv_org_abs_2512_18215/figures/003_Figure_3.jpg]]
-*Figure 3: Model output entropy during training with Qwen2.5- VL-7B. MVSR (multimodal vanilla single-rollout) suffers from entropy collapse as training progresses, whereas our proposed MSSR (multimodal stabilized single-rollout) preserves entropy*
-
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与训练稳定性
@@ -255,9 +238,6 @@ Table 2 展示了推理粒度对比。在 MMK12 基准上，MSSR 平均关键推
 
 训练成本方面（Table 3），MSSR 每步平均训练时间在 3B/7B 上分别为 5.4/6.9 分钟，略高于 GRPO 的 4.7/6.1 分钟（因熵计算和 Beta 基线维护的额外开销），但考虑到 MSSR 仅需一半步数即可达到相当验证精度，**总体训练时间成本反而更低**。
 
-![[assets/figures/papers/paper_list_l2283_https_arxiv_org_abs_2512_18215/figures/010_Table_3.jpg]]
-*Table 3: Training cost across methods on Qwen2.5-VL 3B and 7B models, measured as the average training time per step (mins/step)*
-
 ### 消融实验：熵塌缩的替代方案为何失效
 
 Figure 4 系统消融了三种可能的稳定化技术，结论明确：
@@ -275,12 +255,6 @@ MSSR 的**熵优势塑造**将最终验证准确率提升约 **5%**（相较于�
 
 Figure 6 展示了滑动窗口大小 $N$ 和 target KL 值对验证准确率的影响：$N=20$ 和 $\mathrm{KL}_{\mathrm{target}}=0.01$ 在训练结束时获得最高验证准确率。训练准确率曲线在各设置下基本一致（Figure 7），说明自适应折扣因子 $\eta$ 的调节机制对超参数选择具有较好的鲁棒性。
 
-![[assets/figures/papers/paper_list_l2283_https_arxiv_org_abs_2512_18215/figures/008_Figure_6.jpg]]
-*Figure 6: Sensitivity analysis for effects of sliding window size N and target KL value*
-
-![[assets/figures/papers/paper_list_l2283_https_arxiv_org_abs_2512_18215/figures/011_Figure_7.jpg]]
-*Figure 7: Sensitivity analysis for effects of sliding window size N and target KL value KLtarget on adjusting the discount factor η and their impact on training accuracy. (a) Training accuracy under different sliding window sizes N. (b) Training accuracy under different target KL values KLtarget. Across all settings, the training accuracy curves remain largely similar*
-
 ### 失败模式与局限性
 
 尽管 MSSR 在数学推理领域表现优异，仍存在以下局限：
@@ -289,16 +263,6 @@ Figure 6 展示了滑动窗口大小 $N$ 和 target KL 值对验证准确率的�
 - **超参数未穷尽探索**：$\gamma=0.4, \lambda=2.0$ 参考前人工序设定，全参数空间下的最优配置未知。
 - **模型规模扩展性未知**：仅在 3B 和 7B 的 Qwen2.5-VL 上验证，对更大规模模型或不同多模态架构的适用性缺乏实验支撑。
 - **早期回报偏低风险**：熵塑造虽稳定训练，但可能对简单任务过分鼓励探索，导致训练早期回报偏低——这一现象在 Figure 1a 的 MSSR 训练初期准确率曲线中有所体现，但最终被持续提升的趋势所弥补。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2283_https_arxiv_org_abs_2512_18215/figures/007_Figure_5.jpg]]
-*Figure 5: Comparison of reasoning outputs from GRPO and MSSR (Multimodal Stabilized Single-Rollout). MSSR produces the correct answer while GRPO fails. We highlight the critical reasoning steps that lead to GRPO’s incorrect answer in red, and the key steps enabling MSSR’s correct prediction in green*
-
-![[assets/figures/papers/paper_list_l2283_https_arxiv_org_abs_2512_18215/figures/014_Figure_10.jpg]]
-*Figure 10: Example of reasoning outputs. Comparing the Qwen2.5-VL-7B model fine-tuned with GRPO and MSSR. While GRPO produce incorrect answers, MSSR successfully solves the problem, demonstrating its superior reasoning capability. We highlight the critical reasoning steps that lead to GRPO’s incorrect answer in red, and the key steps enabling MSSR’s correct prediction in green*
-
-
 
 ## 定位与知识库关联
 
@@ -351,8 +315,6 @@ MSSR 的已验证适用边界相对明确：
 5. **负迁移风险**：消融实验（Figure 4c）显示熵损失方法在训练后期验证性能退化，MSSR 虽然避免了这一问题，但在简单任务上的过度探索可能导致训练早期回报偏低。是否存在某些任务类型（如低难度、高确定性的视觉识别）上，熵塑造反而引入负迁移？
 
 > **注意**：关于 MSSR 在更大规模模型、非数学域任务、以及与其他视觉编码器架构的兼容性，论文未提供实验证据，上述讨论基于方法机制的合理推演，需后续工作验证。
-
-
 
 ## 原文 PDF
 

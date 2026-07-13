@@ -57,8 +57,6 @@ claims:
 - 在域外测试集 DiT360 上，CINESCENE 同样表现优异（Mat. Pix.: 4726.57 vs FramePack 的 4025.98），展现出良好的泛化潜力（Table 4）。
 - 消融实验证实：融合图像特征与相机特征的隐式3D表示、上下文条件注入机制（优于损失引导）、以及随机打乱上下文图像的训练策略，均为方法有效性的关键设计（Table 2, Table 3）。
 
-
-
 ### 问题背景：大视角变化下的电影级视频生成
 
 电影级视频生成要求模型在动态镜头运动中同时保持场景的几何一致性和视觉连贯性。当相机执行大范围运动（如摇移、推拉、环绕）时，场景中的静态元素（墙壁、家具、远景）必须与相机位姿精确对齐，而动态主体（人物、车辆）则应自由运动。这一任务的本质困难在于：模型需要理解三维场景的空间结构，同时解耦静态背景与动态前景。
@@ -89,8 +87,6 @@ claims:
 ### 本文目标
 
 综上，CineScene 旨在解决大视角变化下的电影级视频生成问题，其核心贡献在于：**以隐式3D场景表示作为上下文条件，赋予预训练 T2V 模型空间感知能力，实现静态场景一致性保持与动态主体自由生成的解耦**。这一思路为后续将场景一致性扩展至更长视频、更大视角变化提供了新的技术基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -123,8 +119,6 @@ CINESCENE 的核心创新在于**将隐式3D场景表示以上下文条件的形
 
 综上，CINESCENE 通过两个关键的 changed slots——**隐式3D上下文条件注入**和**打乱上下文图像训练**——实现了对静态场景与动态前景的本质解耦，使得预训练T2V模型在不牺牲动态生成能力的前提下获得空间感知能力，从而在大视角变化下保持高场景一致性。
 
-
-
 CINESCENE 的整体 pipeline 围绕一个核心设计展开：**将隐式3D场景表示以上下文条件的形式注入预训练的文生视频（T2V）扩散模型**，从而在遵循用户指定相机轨迹的同时保持静态场景的一致性，并自由生成动态前景主体。其输入输出定义如下：
 
 给定一组解耦的静态场景图像 $I \in \mathbb{R}^{\times h \times w \times c}$、文本提示 $P$ 以及目标相机轨迹 $\bar{C} \in \mathbb{R}^{f \times 3 \times 4}$，模型生成一段包含动态主体、且相机运动严格遵循 $\bar{C}$ 的视频 $V \in \mathbb{R}^{f \times c \times h \times w}$，其中 $c$ 为通道数，$h$、$w$ 为高宽，$f$ 为帧数。
@@ -155,8 +149,6 @@ Figure 3 明确对比了两种隐式3D注入范式。损失引导方法将 VGGT 
 
 ![[assets/figures/papers/paper_list_l2449_https_arxiv_org_abs_2602_06959/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of CINESCENE. Left: Our method, CINESCENE, injects implicit 3D information as a context condition. Features from VGGT are encoded as tokens (Ft) and concatenated with the scene images (It) and the noisy video latents. This architecture fundamentally decouples the static background (the condition) from the dynamic foreground (the generation target). Right: In contrast, loss-guided approaches use the VGGT features to form a supervisory loss, which penalizes deviations from the static scene and thus discourages dynamic content generation. We omit the text prompt for simplicity*
-
-
 
 ### 问题形式化
 
@@ -204,12 +196,8 @@ CINESCENE将隐式3D信息作为**上下文条件**注入，而损失引导方�
 ![[assets/figures/papers/paper_list_l2449_https_arxiv_org_abs_2602_06959/figures/006_Figure_5.jpg]]
 *Figure 5: Qualitative ablation study on injecting implicit 3D methods. Loss-guided method shows artifacts when generating dynamic subject*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2449_https_arxiv_org_abs_2602_06959/figures/011_Figure_6.jpg]]
 *Figure 6: Qualitative ablation study on shuffled context images. The shuffled mechanism leads to better joint modeling and learning in scene consistency, while the ordered ones are tend to copy content from last provided image*
-
-
 
 ## 实验与关键发现
 
@@ -241,36 +229,14 @@ CINESCENE将隐式3D信息作为**上下文条件**注入，而损失引导方�
 
 所有上下文基线方法（FramePack, CaM）均在同一基础T2V模型和Scene-Decoupled Video Dataset上以相同训练设置重新实现；相机控制方法（RecamMaster, Traj-Attn）使用官方代码默认参数；Gen3C使用其默认推理配置。评估涵盖场景一致性、相机准确性、文本对齐和视频质量四个维度，并在域内和域外数据上进行测试，比较框架具有充分公平性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2449_https_arxiv_org_abs_2602_06959/figures/004_Table_1.jpg]]
-*Table 1: Quantitative comparision with previous methods. We compare CINESCENE with FramePack [71] on scene consistency, Context-as-Memory [68] and Gen3C [45] on both scene consistency and camera accuracy, Traj-Attn [63] and RecamMaster [2] on camera accuracy. We follow [64] to evaluate video quality on VBench*
-
 ![[assets/figures/papers/paper_list_l2449_https_arxiv_org_abs_2602_06959/figures/005_Figure_4.jpg]]
 *Figure 4: Qualitative comparison of CINESCENE and previous context-based, explicit 3D guidance, camera-controlled methods. We present dynamic scenes, static scenes compared with FramePack [71], CaM [68], and Gen3C [45], camera-control with Traj-Attn [63] and RecamMaster [2]. We provide scene ground truth (gt) for comparison. We only show 4 scene context images for illustration*
 
 ![[assets/figures/papers/paper_list_l2449_https_arxiv_org_abs_2602_06959/figures/007_Table_2.jpg]]
 *Table 2: Ablation on scene implicit 3D representation*
 
-![[assets/figures/papers/paper_list_l2449_https_arxiv_org_abs_2602_06959/figures/009_Table_3.jpg]]
-*Table 3: Ablation on shuffled context images*
-
-![[assets/figures/papers/paper_list_l2449_https_arxiv_org_abs_2602_06959/figures/012_Table_4.jpg]]
-*Table 4: Quantitative comparision with previous methods on OOD test set. We compare CINESCENE with FramePack [71] on scene consistency, Context-as-Memory [68] and Gen3C [45] on both scene consistency and camera accuracy, Traj-Attn [63] and RecamMaster [2] on camera accuracy. We follow [64] to evaluate video quality on VBench*
-
-![[assets/figures/papers/paper_list_l2449_https_arxiv_org_abs_2602_06959/figures/013_Table_5.jpg]]
-*Table 5: Ablation study on number of scene context images*
-
-![[assets/figures/papers/paper_list_l2449_https_arxiv_org_abs_2602_06959/figures/016_Table_8.jpg]]
-*Table 8: Ablation study on different feature fusion strategies*
-
 ![[assets/figures/papers/paper_list_l2449_https_arxiv_org_abs_2602_06959/figures/010_Figure_8.jpg]]
 *Figure 8: Qualitative results of CINESCENE with diverse scenes, dynamic subjects, and camera trajectories. Our method shows promising application of virtual stage and cinematic language in cinematic video generation*
-
-![[assets/figures/papers/paper_list_l2449_https_arxiv_org_abs_2602_06959/figures/017_Table_9.jpg]]
-*Table 9: Ablation on camera control condition. Supplement to Table 2*
-
-
 
 ## 定位与知识库关联
 
@@ -324,8 +290,6 @@ CINESCENE 的另一重要设计是**随机打乱场景上下文图像的训练�
 ### 知识库定位总结
 
 CINESCENE 在视频生成方法谱系中占据了一个独特位置：它桥接了2D上下文生成与3D感知生成之间的鸿沟，通过隐式3D场景表示的条件注入，在不牺牲动态生成自由度的前提下实现了大视角场景一致性。其核心贡献——上下文条件注入优于损失引导、打乱训练策略打破位置先验——为后续研究提供了可复用的设计原则。该方法当前适用于中等长度、中等视角变化的电影级视频生成场景（如虚拟舞台应用，Figure 8），向更长时序和更大视角的扩展是明确的演进方向。
-
-
 
 ## 原文 PDF
 

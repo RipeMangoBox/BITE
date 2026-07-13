@@ -80,8 +80,6 @@ MoCoDAD属于**基于重建的OCC方法**，在方法谱系中占据独特位置
 
 关键消融发现：移除过去动作条件后AUC降至54.1（接近随机水平），验证了运动条件化对检测的必要性；采用最小聚合且生成数量m>50时性能趋于饱和；多样性指标rF完全无法区分正常与异常（性能低于随机水平），进一步证实异常检测的核心在于贴近度而非多样性本身。
 
-
-
 基于骨骼的视频异常检测（Skeleton-based VAD）旨在仅利用人体关节点坐标序列识别偏离正常模式的行为，因其对光照、背景变化的鲁棒性及隐私保护优势而受到广泛关注。该任务的主流范式是单分类（One-Class Classification, OCC）学习：仅使用正常样本训练模型，在推理时将偏离正常分布的样本判定为异常。
 
 ### 现有方法的瓶颈：正常行为多模态性的建模缺失
@@ -95,8 +93,6 @@ MoCoDAD属于**基于重建的OCC方法**，在方法谱系中占据独特位置
 异常检测的根本挑战在于异常的开放集特性——异常类型在训练时完全未知，任何偏离正常分布的样本都可能是异常。如果模型能够生成给定过去动作条件下的**多种可能的正常未来运动**，那么正常样本的真实未来应当落在生成分布的某个主模态内，而异常样本的真实未来则会偏离所有生成模态。这一直觉构成了 MoCoDAD 的核心动机：**利用条件扩散概率模型的多模态生成能力，通过统计聚合生成运动与真实未来运动的贴近度来区分正常与异常**。
 
 扩散模型（Diffusion Probabilistic Models）在图像和运动生成领域已展现出强大的多模态分布建模能力，但在视频异常检测领域尚未被探索。MoCoDAD 首次将扩散模型引入骨架 VAD，通过在过去运动条件下生成多样化的未来运动候选，并取最小重建误差作为异常分数，有效缓解了正常行为多模态性导致的误检问题。
-
-
 
 ## 核心方法与创新机理
 
@@ -130,8 +126,6 @@ AE-embedding 在 UBnormal 和 HR-UBnormal 上分别取得 68.3 和 68.4 AUC，�
 - **扩散在原始关节空间**优于潜在空间（AUC 68.3 vs 54.4，Table 5），说明骨骼运动的精细空间结构在潜在压缩中丢失，直接建模关节位移对异常判别更为关键；
 - **预测（Forecasting）代理任务**优于随机插补和中间帧插补（Table 4），验证了“过去→未来”的因果条件方向最有利于暴露异常。
 
-
-
 ![[assets/figures/papers/paper_list_l42_Multimodal_Motion_Conditioned_Diffusion_Model_for_Skeleton_based_Video_A/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed MoCoDAD. A sequence of N skeletal motions ( N = 6 in the example) is split into past (top-right X ^ { 1 : k } frames, k = 3 in the example) and future (top-left X ^ { k + 1 : N } frames). During training, the Forward Diffusion block adds noise to the future frames, shifting each joint by a random vector displacement of varying intensity (increasing with the diffusion timestep t). Then the Reverse Diffusion learns to estimate the noise. A key aspect of MoCoDAD is the conditioning, i.e. how to encode the past clean k frames and guide the synthesis of relevant futures*
 
@@ -159,8 +153,6 @@ MoCoDAD 的核心设计是将视频异常检测重新表述为一个**条件式�
 - **条件化策略**：在三种候选方案（输入拼接、端到端嵌入、自编码器嵌入）中，**AE-embedding 方案**表现最优（UBnormal AUC 68.3 vs. 输入拼接 59.3 vs. 端到端嵌入 58.4），验证了辅助重建损失对条件表示学习的强化作用（Table 3）。
 - **代理任务选择**：采用**预测未来帧**（Forecasting）作为生成目标，显著优于随机帧插补和中间帧插补（Table 4），表明“从过去推断未来”的因果结构对异常检测至关重要。
 - **扩散空间**：在**原始关节点空间**进行扩散操作，效果远优于在 VAE 潜在空间中扩散（AUC 68.3 vs. 54.4，Table 5）。潜在空间扩散在此任务中的失效原因仍是一个开放问题，可能与骨骼运动的低维流形特性及潜在变量建模的信息损失有关。
-
-
 
 MoCoDAD 的核心由四个模块构成：**前向扩散过程**、**条件自编码器**、**U-Net 去噪网络** 和 **多模态统计聚合**。以下逐一阐述其机理与关键公式。
 
@@ -218,8 +210,6 @@ $$\mathrm{AS}[f_1:f_N] = \operatorname{mean}(S) + \log\frac{1 + \max(S)}{1 + \mi
 - **扩散空间**：原始关节点空间（AUC 68.3）远优于 VAE 潜在空间（AUC 54.4），后者几乎退化为随机水平（Table 5），提示骨骼运动的低维潜在建模在此任务中失效。
 - **多样性指标失效**：尽管异常生成理论上可能更离散，但多样性比率 $rF$ 作为异常分数时性能低于随机水平（Figure 6），原因是正常与异常条件均产生多模态生成，仅凭生成多样性无法区分。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与设计动机
@@ -229,7 +219,6 @@ $$\mathrm{AS}[f_1:f_N] = \operatorname{mean}(S) + \log\frac{1 + \max(S)}{1 + \mi
 ### 主要结果
 
 Table 1 展示了 MoCoDAD 在四个基准上的 AUC-ROC 性能。MoCoDAD 在全部数据集上均取得最优结果：
-
 
 ![[assets/figures/papers/paper_list_l42_Multimodal_Motion_Conditioned_Diffusion_Model_for_Skeleton_based_Video_A/figures/004_Table_1.jpg]]
 *Table 1: Comparison of MoCoDAD against SoA in terms of AUC on the three Human-Related datasets (i.e., HR-STC, HR-Avenue and HR-UBnormal) and UBnormal. OCC skeleton-based techniques are marked with a ∗*
@@ -243,17 +232,12 @@ Table 1 展示了 MoCoDAD 在四个基准上的 AUC-ROC 性能。MoCoDAD 在全�
 
 Table 2 将 MoCoDAD 与监督/弱监督方法进行了补充比较。MoCoDAD（68.3）在仅使用正常数据训练的条件下，优于弱监督方法 AED-SSMTL（59.3），并与全监督的 TimeSformer（68.5）竞争力相当。此比较旨在展示 OCC 方法的参数效率，并非公平的精度竞赛。
 
-
 ![[assets/figures/papers/paper_list_l42_Multimodal_Motion_Conditioned_Diffusion_Model_for_Skeleton_based_Video_A/figures/005_Table_2.jpg]]
 *Table 2: Comparison of MoCoDAD against supervised (†) and weakly supervised (‡) methods introduced in [1] in terms of AUC on the UBnormal dataset*
 
 ### 多模态生成与异常评分机制
 
 Figure 4（左）展示了在 HR-UBnormal 测试集上，正常与异常条件分别生成 50 条未来运动的**重建误差直方图**。正常条件下，误差集中在低值区域；异常条件下，误差分布更分散且整体偏高。这验证了核心假设：正常条件生成的运动更贴近真实未来。
-
-
-![[assets/figures/papers/paper_list_l42_Multimodal_Motion_Conditioned_Diffusion_Model_for_Skeleton_based_Video_A/figures/006_Figure_4.jpg]]
-*Figure 4: (left) Histograms of the reconstruction errors for 50 synthesized future motions, computed on the HR-UBnormal test set, for the case of conditioning on normal and abnormal past motions. (right) Correlation between the AUC scores and the number of generations, with each curve corresponding to a different aggregation statistic*
 
 Figure 4（右）分析了**生成数量 m 与 AUC 的关系**。关键发现：
 - 采用**最小值聚合**（minimum）时，AUC 随 m 增加而提升，在 **m ≈ 50** 时趋于饱和。
@@ -265,9 +249,6 @@ Figure 4（右）分析了**生成数量 m 与 AUC 的关系**。关键发现：
 ### 多样性指标的失败
 
 Figure 5（右）和 Figure 6 揭示了**多样性指标 rF 完全无法作为异常分数**。尽管直觉上异常条件可能产生更离散的生成，但实验表明：
-
-![[assets/figures/papers/paper_list_l42_Multimodal_Motion_Conditioned_Diffusion_Model_for_Skeleton_based_Video_A/figures/013_Figure_6.jpg]]
-*Figure 6: Anomaly detection performance trend when assuming a diversity metric as the anomaly score. It is worth noting that the r F metric yields results that are below the chance level*
 
 - 正常与异常条件下生成的 rF 值**高度可比**，因为扩散模型在两种条件下均产生多模态输出（Figure 5 右）。
 - 以 rF 作为异常分数时，检测性能**低于随机水平**（AUC < 50%，Figure 6）。
@@ -318,10 +299,6 @@ Table 5 比较了在**原始关节点空间**与**潜在空间**中执行扩散�
 
 Table 7 的消融显示：**移除过去动作条件**（仅从噪声生成，无运动条件）使 AUC 降至 **54.1**（接近随机 50%）。这直接验证了运动条件化对异常检测的不可或缺性——模型必须依赖过去运动信息才能生成有意义的未来预测，进而判断异常。
 
-
-![[assets/figures/papers/paper_list_l42_Multimodal_Motion_Conditioned_Diffusion_Model_for_Skeleton_based_Video_A/figures/014_Table_7.jpg]]
-*Table 7: Impact of different noise distributions and sampling strategies on performance in terms of AUC-ROC. MoCo refers to Motion Condition; T represents the diffusion step at which samples are completely corrupted; γ represents the step up to which samples are corrupted during inference. The last row illustrates our proposed method, MoCoDAD*
-
 #### 噪声类型与采样策略
 
 Table 7 还比较了不同噪声分布和采样策略：
@@ -337,18 +314,6 @@ MoCoDAD 位于**基于重建/预测的骨骼 OCC 异常检测**脉络中，但�
 - 基于聚类的 OCC 方法（**GEPC**、**COSKAD**）将正常行为压缩到紧凑表示，本质上与多模态建模相悖。
 
 MoCoDAD 的扩散框架通过迭代去噪生成高质量多样本，配合最小误差聚合，在保持多模态性的同时捕捉与真实未来的贴近度，形成了新的技术路径。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l42_Multimodal_Motion_Conditioned_Diffusion_Model_for_Skeleton_based_Video_A/figures/008_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l42_Multimodal_Motion_Conditioned_Diffusion_Model_for_Skeleton_based_Video_A/figures/012_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l42_Multimodal_Motion_Conditioned_Diffusion_Model_for_Skeleton_based_Video_A/figures/016_Table_8.jpg]]
-*Table 8: Comparison of MoCoDAD against SoA in terms of AUC-ROC on the validation set of UBnormal. OCC skeleton-based techniques (∗) are directly comparable to MoCoDAD. Supervised (†) and weakly supervised (‡) methods are also reported, grayed-out since they leverage extra annotations*
-
-
-
 
 ## 定位与知识库关联
 
@@ -392,8 +357,6 @@ MoCoDAD 在 UBnormal 基准上与监督/弱监督方法的比较（Table 2）展
 - 为何多样性指标 rF 完全无法区分正常与异常生成？是否存在其他能捕捉“生成偏离真实”这一信号的统计量？
 - 该方法对低质量骨架输入的鲁棒性如何？能否与骨架估计器联合优化或引入不确定性建模？
 - 条件扩散框架能否扩展到多模态输入（RGB + 骨架）或多演员交互场景？当前帧级聚合策略（Eq. 10）在多演员场景中的扩展性有待验证。
-
-
 
 ## 原文 PDF
 

@@ -67,8 +67,6 @@ claims:
 
 **局限与开放问题**：基于视频提取的原始运动可能残留少量伪影；文本精炼提示设计的具体影响机制、最优身体分块方案、以及更大规模LLM收益递减的破解策略，仍有待进一步探索。
 
-
-
 文本到运动（Text-to-Motion, T2M）生成旨在根据自然语言描述合成逼真的三维人体运动序列，在动画制作、虚拟人交互、游戏开发等领域具有广泛应用前景。近年来，基于自回归模型和扩散模型的方法在该任务上取得了显著进展，但现有工作的性能评估和泛化能力仍面临根本性挑战。
 
 ### 数据瓶颈：规模、多样性与物理可行性
@@ -95,8 +93,6 @@ OpenT2M数据集（Table 1）的统计对比揭示了这一缺口的量级：该
 3. **方法层面**：运动分词器的时空建模能力不足，限制了数据潜力的释放。
 
 本文的核心动机在于：通过构建**OpenT2M**——一个百万级、物理可行的开源运动数据集，并设计**2D-PRQ**运动分词器以充分建模身体部位间的时空依赖，从根本上解决上述瓶颈，推动T2M模型向真正的零样本泛化迈进。
-
-
 
 ## 核心方法与创新机理
 
@@ -134,8 +130,6 @@ OpenT2M数据集（Table 1）的统计对比揭示了这一缺口的量级：该
 
 **证据强度**：以上三个changed slots均有强证据支撑（置信度0.95–0.98），来自多表消融与跨基准对比。需注意的局限是，基于视频提取的运动虽经物理可行性验证（通过率>63%），仍可能残留少量运动伪影，对极高精度任务或构成影响。
 
-
-
 OpenT2M 的整体框架围绕一个核心洞察构建：**当前文本到运动（T2M）模型的泛化瓶颈根源于数据规模与质量的双重不足，而非模型架构的复杂性**。为此，作者提出了一套“无冗余”（no-frill）的技术方案，由两条并行但深度耦合的流水线组成：大规模高质量运动-文本数据集 **OpenT2M** 的构建，以及简洁的自回归运动生成模型 **MonoFrill**。
 
 ### 数据与模型的双轮驱动
@@ -170,8 +164,6 @@ OpenT2M 的数据生产流程（Figure 2）包含三个关键阶段：
 - **训练阶段**：输入为运动序列及其精炼文本描述。运动序列经 2D-PRQ 编码器编码并量化为离散标记，文本经 LLM 的文本编码器处理为条件表示。LLM 以文本为条件，自回归地预测运动标记，通过最小化负对数似然进行优化。2D-PRQ 分词器则通过包含整体 L1 损失、部位级 L1 损失和承诺损失的重构目标端到端训练：
   $$\mathcal{L} = ||\boldsymbol{m} - \hat{\boldsymbol{m}}||_1 + \sum_{i=0}^{p} ||\boldsymbol{m}_i - \hat{\boldsymbol{m}}_i||_1 + \beta \sum_{k=1}^{K} \sum_{i=1}^{p} ||\boldsymbol{r}_i^k - sg[b_i^k]||_2^2$$
 - **推理阶段**：输入为用户文本指令，LLM 自回归生成运动标记序列，再由 2D-PRQ 解码器解码为连续运动，输出可直接用于动画驱动的运动数据。
-
-
 
 ### 2D-PRQ 运动分词器
 
@@ -219,8 +211,6 @@ $$\mathcal{L} = \|\boldsymbol{m} - \hat{\boldsymbol{m}}\|_1 + \sum_{i=0}^{p} \|\
 3. **2D-PRQ Decoder**：将预测的离散标记解码为连续运动表示
 
 训练采用两阶段范式：首先在 OpenT2M 大规模数据集上预训练，随后在目标基准（如 HumanML3D）上进行有限步数的微调（50 epoch），以避免过拟合并凸显预训练的泛化增益。
-
-
 
 ## 实验与关键发现
 
@@ -274,8 +264,6 @@ Figure 1揭示了HumanML3D和Motion-X中严重的数据泄漏问题：验证集�
 - LLaMA3-8B收益递减的深层原因，是否存在更优的模型架构或训练策略；
 - 2D-PRQ固定5部位分块的合理性，是否存在更优的身体划分方案以适应更多样化的运动类型。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l61_https_arxiv_org_abs_2603_18623v1/figures/001_Figure_1.jpg]]
 *Figure 1: (Left) Visualization of text embeddings for the training and validation sets of HumanML3D and Motion-X. A substantial overlap between the splits indicates data leakage. To avoid this risk, we remove the overlap via data repartition (version denoted as ∗). (Right) However, we observe a drastic performance drop when experimenting on this repartitioned benchmark, which reveals the limited generalization capability of current methods when faced with out-of-domain data*
 
@@ -285,28 +273,8 @@ Figure 1揭示了HumanML3D和Motion-X中严重的数据泄漏问题：验证集�
 ![[assets/figures/papers/paper_list_l61_https_arxiv_org_abs_2603_18623v1/figures/005_Table_2.jpg]]
 *Table 2: Comparison of zero-shot performance on OpenT2M zero using different datasets for training. Models trained on OpenT2M consistently present significant OOD improvements*
 
-![[assets/figures/papers/paper_list_l61_https_arxiv_org_abs_2603_18623v1/figures/006_Table_3.jpg]]
-*Table 3: Comparison of motion instruction tuning on HumanML3D. We apply a limited number of training steps to avoid overfitting. Models with #pretrain consistently achieve significant improvements across diverse #LLM backbones*
-
-![[assets/figures/papers/paper_list_l61_https_arxiv_org_abs_2603_18623v1/figures/010_Table_6.jpg]]
-*Table 6: Comparison of motion reconstruction on three benchmarks. Subscripts denote the number of quantization layers*
-
-![[assets/figures/papers/paper_list_l61_https_arxiv_org_abs_2603_18623v1/figures/012_Table_8.jpg]]
-*Table 8: Zero-shot comparison of motion tokenizers*
-
-![[assets/figures/papers/paper_list_l61_https_arxiv_org_abs_2603_18623v1/figures/007_Table_4.jpg]]
-*Table 4: Comparison on OpenT2M long, where “#text refinement” refers to converting raw texts into cleaned user commands, "#long-horizon" denotes incorporating long-horizon motion data into OpenT2M*
-
 ![[assets/figures/papers/paper_list_l61_https_arxiv_org_abs_2603_18623v1/figures/009_Table_5.jpg]]
 *Table 5: Ablation of text refinement on HumanML3D*
-
-![[assets/figures/papers/paper_list_l61_https_arxiv_org_abs_2603_18623v1/figures/011_Table_7.jpg]]
-*Table 7: Comparison of T2M on OpenT2M under different model parameters and motion tokenizers*
-
-![[assets/figures/papers/paper_list_l61_https_arxiv_org_abs_2603_18623v1/figures/016_Figure_7.jpg]]
-*Figure 7: Prompt template for generating second-wise text annotations utilizing Gemini-2.5*
-
-
 
 ## 定位与知识库关联
 
@@ -363,8 +331,6 @@ MonoFrill的核心组件2D-PRQ（2D Part-based Residual Quantization）位于运
 3. **架构优化方向**：LLM规模从7B到8B出现收益递减，是否存在更优的模型架构（如改进的注意力机制）或训练策略可进一步突破当前瓶颈？
 
 4. **分块方案泛化性**：固定5部位分块在极端姿态或非典型运动上的适用性如何？是否存在自适应分块或动态部位划分的可能性？
-
-
 
 ## 原文 PDF
 

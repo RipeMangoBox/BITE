@@ -59,8 +59,6 @@ ID-CRAFTER 针对这一瓶颈提出了三个因果性设计，形成协同效应
 
 **方法定位**：ID-CRAFTER 基于 Rectified Flow 视频扩散 Transformer 骨干（Wan-Video, 2024），在注意力机制、文本编码器和后训练优化三个关键维度进行了系统性改进。其核心贡献在于证明了层次化解耦注意力 + VLM 语义引导 + 在线 RL 的组合能够有效缓解身份保持与运动流畅性之间的张力，为多主体视频生成建立了新的技术范式。
 
-
-
 扩散模型驱动的内容生成已在图像和视频领域取得显著进展，然而**多主体视频生成**仍面临一个根本性瓶颈：在同时保持多个独立主体的身份一致性与整体时序连贯性之间，存在着固有的矛盾。现有方法在处理单主体场景时尚可维持身份保真度，但当场景涉及两个或以上交互主体时，不同主体间的语义特征容易发生冲突，导致身份退化、主体混淆或“复制-粘贴”式的生硬拼接效果。
 
 这一瓶颈的深层原因在于，当前主流方法通常将所有主体参考图像与文本提示简单拼接后送入统一的交叉注意力层，缺乏对**主体内细节、主体间交互、跨模态语义对齐**的分层解耦。例如，开源方法 **Phantom** 基于注意力特征注入实现多主体生成，但在复杂交互场景下仍难以避免身份漂移；商业系统如 **Sora**（OpenAI, 2023）、**Kling**（快手, 2024）和 **Pika**（Pika Labs, 2024）虽能生成高质量视频，但其技术细节未公开，且在多主体身份保持上的可控性有限。
@@ -68,8 +66,6 @@ ID-CRAFTER 针对这一瓶颈提出了三个因果性设计，形成协同效应
 从因果机制来看，问题核心在于：生成过程必须在同一潜空间内同时满足“每个主体与参考图像高度相似”和“所有主体在动态场景中自然交互”这两个相互制约的目标。前者要求强身份约束，后者要求运动自由度——二者在标准注意力机制下天然存在张力。因此，亟需一种能够**解耦身份保持与运动生成**、并引入**精细语义指导**的新框架。
 
 本文提出 **ID-CRAFTER**，通过三项关键设计协同应对上述挑战：（1）**三阶段层次化身份保持注意力**，逐步分离主体内特征聚合、主体间门控交互和跨模态语义对齐；（2）引入预训练视觉语言模型（VLM）**Qwen2.5-VL-7B-Instruct** 作为语义编码器，将多模态输入转化为空间布局与关系信号；（3）首次将**在线GRPO（群组相对策略优化）**应用于多主体视频生成，利用复合身份-质量奖励直接优化生成策略。三者协同，从注意力结构、语义理解和策略优化三个层面缓解身份与运动的冲突。
-
-
 
 ## 核心方法与创新机理
 
@@ -105,8 +101,6 @@ Table 3 显示，在线 GRPO 相比 SFT 基线，FaceSim 从 58.12% 提升至 66
 
 三项创新并非孤立存在，而是形成因果闭环：层次化注意力在架构层面解耦主体特征，为 VLM 语义令牌提供清晰的注入接口；VLM 则将多模态输入转化为可被各注意力阶段消费的空间-语义信号；在线 GRPO 利用复合奖励直接优化端到端生成策略，使架构设计与语义注入的优势在感知层面充分释放。三者协同，从根本上缓解了多主体视频生成中身份保持与运动质量之间的长期冲突。
 
-
-
 ID-CRAFTER 的整体 pipeline 围绕一个核心矛盾展开：**在同时保持多个主体的身份一致性与视频时序连贯性时，不同主体间的语义冲突和身份退化**。为解决这一问题，系统将生成过程分解为三个协同阶段：层次化身份保持注意力、VLM 语义编码、以及在线强化学习微调。Figure 2 给出了架构总览。
 
 ![[assets/figures/papers/paper_list_l2192_https_arxiv_org_abs_2511_00511/figures/002_Figure_2.jpg]]
@@ -140,8 +134,6 @@ $$\mathcal{R}_{\mathrm{total}}(\mathbf{V}) = w_{\mathrm{fid}} \mathcal{R}_{\math
 其中保真度奖励（$w_{\mathrm{fid}}=0.6$）衡量身份保持，质量奖励（$w_{\mathrm{qual}}=0.4$）综合美学分数与物理合理性。GRPO 通过组内比较估计优势函数，稳定多目标优化。
 
 训练数据方面，系统采用**策划数据集**替代原始视频-主体配对数据，通过合成跨主体组合与融合示例（Figure 3）增强模型对复杂多主体场景的泛化能力。整个 pipeline 最终输出身份一致、时序连贯且文本对齐的多主体视频。
-
-
 
 ### 3.1 视频扩散Transformer与Rectified Flow基础
 
@@ -191,12 +183,8 @@ $\mathcal{R}_{\mathrm{aes}}$ 评估美学质量，$\mathcal{R}_{\mathrm{nat}}$ �
 
 **关键发现**：在线GRPO相比监督微调（SFT）基线，FaceSim相对提升13.7%（58.12% → 66.10%），Aesthetics提升14.9%（42.50% → 48.85%）（Table 3）。然而，从复合奖励中移除自然度成分 $\mathcal{R}_{\mathrm{nat}}$ 后，Q-Align下降但FaceSim与Aesthetics微升，提示**奖励黑客现象**——模型可能通过牺牲物理合理性来优化可量化指标，验证了多维度奖励设计的必要性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2192_https_arxiv_org_abs_2511_00511/figures/003_Figure_3.jpg]]
 *Figure 3: Data curation pipeline of ID-CRAFTER*
-
-
 
 ## 实验与关键发现
 
@@ -251,30 +239,8 @@ Figure S.13 的人类偏好研究为自动指标提供了主观验证。在身�
 
 3. **模型规模敏感性**：1.3B 到 14B 的 Total Score 提升幅度（55.16% → 57.05%）小于 Phantom 同规模提升（50.71% → 52.32%），提示层次注意力的收益可能随模型容量增大而边际递减，需更大规模验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2192_https_arxiv_org_abs_2511_00511/figures/001_Figure_1.jpg]]
 *Figure 1: Given a text prompt and multiple reference images, ID-CRAFTER generates subject-consistent videos and achieves impressive subject ID preservation (e.g., face score) compared with the previous state-of-the-art methods, such as Phantom [29]*
-
-![[assets/figures/papers/paper_list_l2192_https_arxiv_org_abs_2511_00511/figures/004_Table_1.jpg]]
-*Table 1: Quantitative Comparison against existing methods for the open-domain subject-to-video benchmark. Total score is the normalized weighted sum of other scores. “↑” indicates that higher is better*
-
-![[assets/figures/papers/paper_list_l2192_https_arxiv_org_abs_2511_00511/figures/011_Table_S.5.jpg]]
-*Table S.5: Ablation of Hierarchical Attention. We analyze the contribution of each stage in our hierarchical attention mechanism. The full three-stage model provides the best performance, with Stage 3 (cross-modal attention to VLM) being the most critical component for semantic alignment*
-
-![[assets/figures/papers/paper_list_l2192_https_arxiv_org_abs_2511_00511/figures/008_Figure_6.jpg]]
-*Figure 6: Applications in Controllable Video Editing. ID-CRAFTER enables zero-shot editing of existing videos, including subject replacement and background modification, while preserving identity and temporal consistency*
-
-![[assets/figures/papers/paper_list_l2192_https_arxiv_org_abs_2511_00511/figures/010_Table_S.4.jpg]]
-*Table S.4: Detailed configuration of our model’s primary architectural components. The VLM, VAE, and DiT modules are designed to handle multimodal understanding, spatial compression, and latent diffusion, respectively*
-
-![[assets/figures/papers/paper_list_l2192_https_arxiv_org_abs_2511_00511/figures/013_Table_S.7.jpg]]
-*Table S.7: Ablation on Fidelity Reward*
-
-![[assets/figures/papers/paper_list_l2192_https_arxiv_org_abs_2511_00511/figures/007_Figure_5.jpg]]
-*Figure 5: Qualitative Ablation Study. The left panel highlights the importance of our curated dataset, demonstrating improved coherence and realism in subject integration (e.g., mitigating ‘copy-paste’ artifacts) compared to a model trained without it. Meanwhile, the right panel illustrates the effectiveness of our online reinforcement learning stage, which significantly enhances visual quality and subject consistency*
-
-
 
 ## 定位与知识库关联
 
@@ -348,8 +314,6 @@ ID-CRAFTER 在以下场景中展现出显著优势：
 4. **跨域泛化**：ID-CRAFTER 在人物主体上表现突出，但在非人物主体（如动物、物体）上的身份保持能力是否同样有效？层次注意力的设计是否需要对不同主体类型进行调整？
 
 5. **评估体系的完善**：当前评估依赖自动指标和有限的人类偏好研究。建立更全面、独立的多主体视频生成评估基准，涵盖更多维度的质量指标（如主体交互合理性、长期时序一致性），仍是领域内的共同挑战。
-
-
 
 ## 原文 PDF
 

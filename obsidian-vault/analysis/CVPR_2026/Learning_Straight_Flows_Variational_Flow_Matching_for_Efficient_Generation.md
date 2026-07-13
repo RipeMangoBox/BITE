@@ -56,8 +56,6 @@ S‑VFM 的训练目标联合了变分流匹配损失 $\mathcal{L}_{\mathrm{VFM}
 
 在 CIFAR‑10 和 ImageNet 256×256 上的实验表明，S‑VFM 在一步生成（NFE=1）中取得最优 FID（CIFAR‑10: 2.81；ImageNet: 3.31），且 FID 随 NFE 增加单调下降，验证了直线轨迹对少步生成的有效性。该方法在方法谱系上介于 **Flow Matching**（Lipman et al., ICLR 2023）与 **Variational Flow Matching**（Ma et al., ICML 2025）的延长线上，同时与 **Rectified Flow**（Liu et al., ICLR 2023）和 **Consistency Models**（Song et al., ICML 2023）等少步生成方法形成对比，为直线流学习提供了新的理论视角与实践方案。
 
-
-
 深度生成模型的核心目标之一是学习从简单先验分布到复杂数据分布的映射。近年来，基于常微分方程（ODE）的连续归一化流及其变体——特别是 Flow Matching（FM）——因其模拟无关的训练方式而受到广泛关注。FM 通过在源分布 $p_0$ 和目标分布 $p_1$ 之间定义线性插值路径 $X_t = (1-t)X_0 + t X_1$，并以条件速度 $\Delta^X = X_1 - X_0$ 作为回归目标来训练速度场 $v_\theta$，从而避免了以往连续流模型需要反复求解 ODE 进行最大似然训练的昂贵开销。
 
 ### 独立耦合的根本矛盾
@@ -79,8 +77,6 @@ S‑VFM 的训练目标联合了变分流匹配损失 $\mathcal{L}_{\mathrm{VFM}
 本文的核心洞察在于：**直性轨迹学习的两大条件——区分交叉插值的能力与显式的直性优化目标——必须同时满足，缺一不可。** 仅有隐变量区分能力而无直性约束（如 VFM），轨迹仍可能弯曲；仅有直性约束而无交叉分辨能力（如标准 FM 加直性损失），则网络在交叉点处无法选择正确方向，优化目标本身即存在内在冲突。
 
 基于此，本文提出 **Straight Variational Flow Matching (S‑VFM)**，将变分隐变量编码的“生成概览”与显式直性损失有机结合。具体而言，S‑VFM 在 VFM 框架的基础上引入直性目标 $\mathcal{L}_S$，通过最小化速度场沿特征线的物质导数 $D_t v$ 来惩罚轨迹弯曲。理论分析证明，$D_t v = 0$ 与 $V((X_0, X_1)) = 0$ 等价，从而为直线生成提供了严格的优化准则。在推理时，模型从先验 $p(z)$ 中采样单个隐变量 $z$ 贯穿整个时间区间，配合少步 ODE 求解即可完成高质量生成，理论上在直性条件满足时可实现一步生成。
-
-
 
 ## 核心方法与创新机理
 
@@ -132,8 +128,6 @@ $$X_1 = X_0 + \int_0^1 v^X(X_t, t) dt = X_0 + \Delta^X$$
 2. **训练损失**：从单一的 $\mathcal{L}_{FM}$ 扩展为 $\mathcal{L} = \mathcal{L}_{VFM} + \alpha \mathcal{L}_S$，其中 $\mathcal{L}_{VFM}$ 包含速度匹配和 KL 散度正则，$\mathcal{L}_S$ 通过 JVP 计算物质导数范数。
 3. **推理流程**：从多步 ODE 积分简化为“采样 $z \sim p(z)$ → 少步 Euler/Dopri5 积分”，在 NFE=1 时即可获得竞争性生成质量。
 
-
-
 S‑VFM 的核心思想是在 Flow Matching 框架中引入一个变分隐变量 $z$ 来编码“生成概览”（generation overview），同时通过直性损失显式惩罚速度场沿轨迹的时间变化率，从而迫使模型学习直线生成路径。整体 pipeline 由训练和推理两个阶段组成，二者共享相同的模块结构，但在隐变量的来源和积分步数上有所不同。
 
 **训练阶段**：对于每一对源样本 $X_0$ 和目标样本 $X_1$，首先按 $X_t = (1-t)X_0 + t X_1$ 构造线性插值点，并计算条件速度 $\Delta^X = X_1 - X_0$。变分后验编码器 $q_\phi$ 以 $(X_0, X_1, X_t, t)$ 为输入，输出隐变量 $z$ 的均值与方差，通过重参数化采样得到 $z$。速度预测网络 $v_\theta$ 以 $(X_t, t, z)$ 为条件预测当前速度向量。训练目标由两部分构成：**VFM 损失** $\mathcal{L}_{\mathrm{VFM}}$ 同时优化速度匹配误差和隐变量的 KL 散度正则项，确保 $z$ 携带有效的全局信息；**直性损失** $\mathcal{L}_{\mathrm{S}}$ 通过 Jacobian‑向量积（JVP）计算速度场沿特征线的物质导数 $D_t v$ 并最小化其范数，从理论上等价于消除轨迹弯曲（即 $V((X_0, X_1)) = 0$）。总损失为 $\mathcal{L} = \mathcal{L}_{\mathrm{VFM}} + \alpha \mathcal{L}_{\mathrm{S}}$，其中 $\alpha$ 控制直性约束的强度。
@@ -141,8 +135,6 @@ S‑VFM 的核心思想是在 Flow Matching 框架中引入一个变分隐变量
 **推理阶段**：从先验分布 $p(z)$ 采样一个固定的隐变量 $z$，该 $z$ 贯穿整个生成过程（$t \in [0,1]$）。从源分布采样初始噪声 $X_0$，利用速度预测网络 $v_\theta(X_t, t, z)$ 沿时间进行 ODE 积分（如 Euler 或 Dopri5 求解器），逐步演化到 $X_1$。由于直性损失强制速度场在时间上几乎不变，轨迹接近直线，因此仅需极少步数（NFE=1 或 2）即可获得高质量生成结果。
 
 **模块关系与数据流**：pipeline 包含四个核心模块——变分后验编码器 $q_\phi$、速度预测网络 $v_\theta$、直性损失计算模块和 ODE 采样器。训练时，$q_\phi$ 和 $v_\theta$ 构成类似 VAE 的结构：$q_\phi$ 将全局信息压缩为隐变量 $z$，$v_\theta$ 则利用 $z$ 来消除独立耦合下插值线交叉带来的歧义。直性损失计算模块接收 $v_\theta$ 的输出及其梯度，通过 JVP 高效计算 $D_t v$ 并回传梯度。推理时，ODE 采样器替代 $q_\phi$，直接从先验采样 $z$ 并调用 $v_\theta$ 完成少步积分。这一设计使 S‑VFM 在保持 Flow Matching 简洁训练范式的同时，突破了独立耦合带来的曲线路径瓶颈，实现了直线生成与高效采样的统一。
-
-
 
 ### 问题形式化：Flow Matching 的直线性困境
 
@@ -211,8 +203,6 @@ $$\mathcal{L}_{\mathrm{VFM}}(\theta, \phi) = \mathbb{E}\Big[\|v_\theta(X_t, t, z
 
 当直性条件完全满足时，推论 11 保证生成可一步完成：$X_1 = X_0 + \int_0^1 v^X(X_t, t)\,dt = X_0 + \Delta^X$，积分结果与路径无关。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与实验动机
@@ -248,8 +238,6 @@ S‑VFM 通过两个因果机制解决这一问题：**变分隐变量 $z$** 编
 *   **与蒸馏方法的公平比较。** Table 1/2 中与 iCT 等蒸馏方法的比较，训练预算和模型容量的对齐细节需从原文确认，避免不公平对比。
 *   **长尾生成与模式覆盖。** 直性约束是否会导致模式覆盖下降（如牺牲多样性换取轨迹直性）未在实验中专门讨论，需手动检查生成样本的召回率指标。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l893_https_arxiv_org_abs_2511_17583/figures/005_Table_1.jpg]]
 *Table 1: Quantitative Comparison with Different Generation Methods on CIFAR-10 Dataset. Our method (adaptive normalization variant) achieves the best performance in one-step generation (NFE = 1). Moreover, the FID score consistently decreases as NFE increases*
 
@@ -259,12 +247,6 @@ S‑VFM 通过两个因果机制解决这一问题：**变分隐变量 $z$** 编
 ![[assets/figures/papers/paper_list_l893_https_arxiv_org_abs_2511_17583/figures/007_Figure_6.jpg]]
 *Figure 6: Ablation Study Results by Adjusting α and β on CIFAR-10 Dataset. The value in the grid represents the FID score of one-step generation (NFE = 1), lower is better*
 
-![[assets/figures/papers/paper_list_l893_https_arxiv_org_abs_2511_17583/figures/003_Figure_3.jpg]]
-*Figure 3: Randomly Selected Generation Results under Different NFE. Each row corresponds to a distinct initial noise set (X10 or X20 ) and its associated latent code set*
-
-![[assets/figures/papers/paper_list_l893_https_arxiv_org_abs_2511_17583/figures/004_Figure_4.jpg]]
-*Figure 4: Generation results under the same initial noise but different latent codes. Panels (a) and (b) are generated from the same initial noise set*
-
 ![[assets/figures/papers/paper_list_l893_https_arxiv_org_abs_2511_17583/figures/001_Figure_1.jpg]]
 *Figure 1: Generation Trajectory Visualization in the 2D Synthesized Hexagonal Dataset*
 
@@ -273,8 +255,6 @@ S‑VFM 通过两个因果机制解决这一问题：**变分隐变量 $z$** 编
 
 ![[assets/figures/papers/paper_list_l893_https_arxiv_org_abs_2511_17583/figures/008_Figure_5.jpg]]
 *Figure 5: Comparison of FID-50K Score over Training Iterations on ImageNet 256 × 256 Dataset*
-
-
 
 ## 定位与知识库关联
 
@@ -314,8 +294,6 @@ S‑VFM 的有效性依赖于两个关键前提：
 - **隐变量先验假设**：推理时从固定先验 $p(z) = \mathcal{N}(0, I)$ 采样单个 $z$ 贯穿整个时间区间。当目标分布与先验不匹配时，单隐变量可能不足以覆盖所有生成模式，导致样本多样性受限。论文未提供多样性指标（如 Recall 或 Coverage）的对比。
 - **理论完备性**：Theorem 5 证明了 $D_t v = 0$ 与直性条件的等价性，但该结论建立在速度场精确匹配条件速度的假设上。实际训练中速度匹配损失和直性损失存在权衡，两者联合优化的收敛性质尚未得到理论刻画。
 - **扩展到其他模态**：当前实验限于 CIFAR‑10 和 ImageNet 的图像生成任务，方法在文本、音频或分子生成等领域的适用性未经验证。
-
-
 
 ## 原文 PDF
 

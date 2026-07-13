@@ -49,8 +49,6 @@ claims:
 
 针对上述瓶颈，本文提出**UCo-VQA**基准套件，通过强制实行任务间token级别的不相交答案空间，并引入任务内训练‑测试答案分布偏移，切除共享答案带来的虚假抗遗忘效应，同时创建鲁棒性检验场景。在此基础上，提出**MaDQ**（Matching and Distillation with Question replay）方法，其核心机制包括三项关键设计：仅回放过往问题文本而不存储图像与答案，将内存开销压缩至约0.01 MB/任务；构建答案预测蒸馏与图文匹配蒸馏的双层级蒸馏体系，强化跨模态对齐与知识保留；采用双LoRA架构，以动量适配器提供稳定蒸馏目标。实验表明，MaDQ在所有UCo-VQA设定上均取得最高的累积平均准确率（CAA）和最低的前向遗忘（FFM），在VQA v3 PS设定下CAA较最优基线CLS-ER提升4.18%，FFM降低3.02；在GQA v2 PS设定下CAA提升约2.21%，验证了仅问题回放与双层级蒸馏在公平评价下的有效性。
 
-
-
 ### 持续VQA的兴起与隐忧
 
 视觉问答（Visual Question Answering, VQA）要求模型理解图像与自然语言问题，并生成准确答案。当VQA模型被部署到动态环境中时，它们需要在不遗忘旧知识的前提下持续学习新概念——这构成了**多模态持续学习**的核心挑战。近年来，研究者将多种持续学习策略引入VQA，包括正则化方法（如**EWC**，Kirkpatrick et al., PNAS 2017）、知识蒸馏（如**LwF**，Li & Hoiem, TPAMI 2018）、参数高效适配（如**Layered-LoRA**，Smith et al., CVPR 2023；**MoE-Adapters**，Yu et al., CVPR 2024）以及经验回放（如**ER**，Rolnick et al., NeurIPS 2019；**CLS-ER**，Arani et al., ICLR 2022）等。然而，这些方法在现有持续VQA基准上的“良好表现”是否真实反映了模型的抗遗忘能力？本文给出了否定的答案。
@@ -76,8 +74,6 @@ claims:
 在公平评估框架下，现有方法暴露出两个核心短板：(1) 基于完整三元组回放的方法（如ER、CLS-ER）内存开销巨大，每任务需存储约67.53 MB的图像-问题-答案数据；(2) 仅依赖答案预测蒸馏的方法（如LwF）无法维持跨模态语义对齐，在分布偏移下鲁棒性不足。
 
 这驱动了**MaDQ（Matching and Distillation with Question replay）**的设计：通过**仅回放问题文本**将内存开销压缩至0.01 MB/任务，同时引入**双层级蒸馏**——在答案预测和图文匹配两个层面施加一致性约束——既保留任务知识，又强化视觉-语义的跨模态对齐，从而在公平的UCo-VQA基准上实现鲁棒且抗遗忘的持续VQA。
-
-
 
 ## 核心方法与创新机理
 
@@ -141,8 +137,6 @@ MaDQ在视觉-语言骨干网络的所有层（图像编码器$f_\nu$、问题�
 
 这些提升并非来自对基准偏差的利用，而是在切除答案先验与分布偏移的严格条件下，通过增强跨模态对齐与知识保留机制获得的真实增益。
 
-
-
 MaDQ 的整体流程围绕三个核心设计展开：**仅问题回放**、**双层级蒸馏**以及**双LoRA架构**，其训练管线如 Figure 3 所示。模型以当前任务的图像-问题-答案三元组 $(x^t, q^t, a^t)$ 和存储在回放缓冲区 $\mathcal{M}$ 中的过往任务问题作为输入，通过联合优化学习、保留和鲁棒性三个层次的目标，实现跨任务的知识持续积累。
 
 ![[assets/figures/papers/paper_list_l2663_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_Re_evaluating_Cont/figures/004_Figure_3.jpg]]
@@ -186,8 +180,6 @@ $$\mathcal{L} = \underbrace{\mathcal{L}_{\mathrm{TSA}}}_{\mathrm{learning}} + \u
 与传统经验回放（ER）存储完整图像-问题-答案三元组不同，MaDQ 的缓冲区 $\mathcal{M}$ 仅保留过往任务的问题文本。每个任务仅需存储约 0.01 MB 的问题数据，而 ER 等完整回放方法需约 67.53 MB/任务，显著降低了内存开销。训练时，回放问题与当前任务图像配对形成伪样本，配合双层级蒸馏实现高效的知识保留。
 
 > **需注意**：仅问题回放策略在极低存储预算下性能仍有退化，且问题文本的回放可能引发隐私顾虑，论文未提供差分隐私或联邦学习等缓解方案的具体实现。
-
-
 
 ### 模型整体架构
 
@@ -256,15 +248,8 @@ $$\mathcal{L}_{\mathrm{MCD}} = \frac{1}{|\mathcal{X}^t| |\mathcal{Q}^t \cup \mat
 
 消融实验（Table 4）证实了各组件的独立贡献。在 GQA v2 PS 设定下，仅使用答案预测蒸馏的变体 MaDQ* 的遗忘指标 FFM 为 12.32，加入 $\mathcal{L}_{\text{IQM}}$ 后降至 9.37，验证了图文匹配正则化对知识保留的显著增益。进一步将 $\mathcal{L}_{\text{IQM}}$ 集成到 ER、CLS-ER 等基线方法中（Table 5），在 GQA v2 上最多可将 FFM 降低 2.33%，证明该机制的跨方法通用性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2663_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_Re_evaluating_Cont/figures/001_Figure_1.jpg]]
 *Figure 1: (a) Illustration of the continual learning (CL) evaluation matrix, where each cell represents a metric (e.g., answer similarity or accuracy) between task pairs, and the i-th row shows evaluations on all seen tasks after training up to Ti. (b–c) Visualization of inter-task answer similarity and CL accuracy on VQA v2 and VQA v3 using three representative methods (SFT, EWC, and LwF). Higher inter-task similarity corresponds to smaller forgetting and inflated overall performance, revealing bias in existing benchmarks*
-
-![[assets/figures/papers/paper_list_l2663_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_Re_evaluating_Cont/figures/002_Figure_2.jpg]]
-*Figure 2: Train/test answer distributions and model predictions under the proposed VQA v3 splits (PS). (a) Color and (b) Count tasks. Each column shows the answer distribution in the training set, test set, and model predictions (SFT and LwF). Models largely follow the training answer distribution, indicating limited robustness to distributional shifts*
-
-
 
 ## 实验与关键发现
 
@@ -315,16 +300,8 @@ Table 3将方法迁移至**BLIP2**多模态大语言模型上，在VQA v3 SS设�
 - UCo-VQA框架能否推广至更复杂的开放域VQA或视频问答，其中答案空间天然重叠且分布偏移更加多样？
 - 图文匹配正则化与抗遗忘能力的内在关联是否在更多模态（如语音-视觉）和任务架构上成立，能否上升为持续多模态学习的一般性原则？
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2663_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_Re_evaluating_Cont/figures/005_Table_2.jpg]]
 *Table 2: Comparison of CL methods on VQA v3 and GQA v2 under SS and PS settings. MaDQ achieves the best overall performance across both settings, showing consistent gains in FAA and CAA and reduced forgetting, particularly under the more challenging PS setting*
-
-![[assets/figures/papers/paper_list_l2663_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_Re_evaluating_Cont/figures/009_Table_4.jpg]]
-*Table 4: Impact of each loss component in the proposed MaDQ*
-
-![[assets/figures/papers/paper_list_l2663_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_Re_evaluating_Cont/figures/010_Table_5.jpg]]
-*Table 5: Performance improvement from integrating*
 
 ![[assets/figures/papers/paper_list_l2663_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_Re_evaluating_Cont/figures/006_Figure_4.jpg]]
 *Figure 4: Comparison of CL methods on the original GQA and the debiased GQA v2 (SS). (Top) FAA and CAA; (Bottom) FFM*
@@ -334,11 +311,6 @@ Table 3将方法迁移至**BLIP2**多模态大语言模型上，在VQA v3 SS设�
 
 ![[assets/figures/papers/paper_list_l2663_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_Re_evaluating_Cont/figures/003_Table_1.jpg]]
 *Table 1: Overview of the UCo-VQA Benchmark Suite. ‘SS’ denotes standard splits, and ‘PS’ denotes proposed splits with distributional shifts. Answer vocabularies may share tokens across tasks (shared) or be token-level disjoint*
-
-![[assets/figures/papers/paper_list_l2663_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_Re_evaluating_Cont/figures/008_Table_3.jpg]]
-*Table 3: Performance comparison on VQA v3 (Standard Splits) using the multi-modal large language model BLIP2 [35]*
-
-
 
 ## 定位与知识库关联
 
@@ -416,8 +388,6 @@ MaDQ的“仅问题回放”策略在谱系中实现了关键跃迁：将存储�
 4. **动态任务序列**：在任务边界未知或数据流包含噪声的开放环境中，双LoRA架构如何自适应地决定何时创建新适配器、何时复用旧适配器？这需要引入任务边界检测或持续聚类机制。
 
 5. **与大规模多模态模型的整合**：随着BLIP2、LLaVA等MLLM的兴起，持续VQA的范式可能从“分类头微调”转向“指令微调”。MaDQ的仅问题回放和双层级蒸馏策略在这种范式下是否仍然有效，需要重新审视。
-
-
 
 ## 原文 PDF
 

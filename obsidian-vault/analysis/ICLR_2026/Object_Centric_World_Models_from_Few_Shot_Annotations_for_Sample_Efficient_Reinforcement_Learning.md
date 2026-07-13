@@ -54,8 +54,6 @@ claims:
 
 综上，OC-STORM 通过少量人工标注和冻结分割模型，以较低的计算开销为世界模型注入了语义丰富的物体感知能力，在保持对非物体场景兼容性的同时，大幅提升了样本效率。
 
-
-
 基于模型的强化学习（MBRL）通过学习环境的世界模型，使智能体能够在想象的轨迹上进行规划与策略优化，从而大幅提升样本效率。近年来，以 **DreamerV3**（Hafner et al., 2023）和 **STORM**（Zhang et al., 2023）为代表的世界模型方法在 Atari 等视觉控制基准上取得了显著进展。这些方法的核心思路是：将高维像素观察压缩为紧凑的潜在表示，在潜在空间中学习动力学模型，并基于模型生成的想象轨迹训练策略。
 
 然而，标准的世界模型存在一个关键瓶颈：**基于像素重建的损失函数天然偏向大面积、静态的背景区域，而忽视了小而关键的决策相关物体**。如图 1 所示，STORM 能够精确重建背景（蓝色区域），却遗漏了对任务至关重要的玩家角色和 Boss 角色（橙色区域）。这种偏差直接导致两个后果：（1）世界模型未能学习到物体的运动动态和交互关系，动力学预测不准确；（2）基于不完整世界模型的策略学习受到阻碍，尤其在需要精细操控物体的场景中表现不佳。
@@ -69,8 +67,6 @@ claims:
 - **计算效率**：向量表示比掩码表示更紧凑，避免了高分辨率掩码带来的计算开销。
 
 通过这种设计，世界模型能够同时利用像素级视觉细节（来自下采样图像）和语义级物体信息（来自分割模型），从而在保持对背景建模能力的同时，获得对关键实体动态的显式理解。
-
-
 
 ## 核心方法与创新机理
 
@@ -132,8 +128,6 @@ OC-STORM 的核心洞察在于**将物体感知从世界模型的学习目标中
 
 对分割失败的鲁棒性分析（Figure 3b）表明，即使在 Atari Pong 中以 50% 概率将物体特征归零，智能体仍能保持正回报，说明世界模型学会了对物体信息的适度依赖而非机械记忆。
 
-
-
 ![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_qmEyJadwHA/figures/003_Figure_1.jpg]]
 *Figure 1: (c) The proposed OC-STORM framework. A frozen, pretrained segmentation model extracts object feature vectors from a few annotated frames. These features are combined with downsampled pixels to train an OC world model, which is then used for policy learning via imagined trajectories. Figure 1: Left: STORM (Zhang et al., 2023) accurately reconstructs large background areas (blue) but overlooks the small, critical player and boss characters (orange), hindering policy learning. Right: Overview of the proposed OC-STORM framework. See Appendix A for network details*
 
@@ -162,8 +156,6 @@ OC-STORM 的整体框架围绕一个核心设计展开：将冻结的预训练�
 **策略学习**。世界模型训练完成后，Actor-Critic 策略网络（采用 DreamerV3 的算法）在世界模型生成的想象轨迹上进行训练。Actor 基于潜在变量和隐藏状态采样动作 $a_t \sim \pi_\theta(a_t | z_t, h_t)$，Critic 估计状态值 $V_\psi(z_t, h_t)$，使用 λ-回报作为目标。
 
 **关键设计选择**。整个框架中，分割模型保持冻结，仅需对每个游戏提供少量（1–6 个）人工标注的掩码帧即可运行，无需在线标注或内部状态访问。物体特征以向量形式（而非掩码形式）表示，实验表明这一选择在低分辨率场景下既保留了充分的物体信息（图 3a 显示仅用两个物体特征向量即可重建观测），又比基于掩码的表示（如 FOCUS）计算效率更高。
-
-
 
 ### 整体框架
 
@@ -211,8 +203,6 @@ Critic 网络 $V_{\psi}$ 基于潜在变量 $z_t$ 和隐藏状态 $h_t$ 估计�
 **向量表示优于掩码表示**：与基于掩码的对象表示（FOCUS）相比，基于向量的表示在低分辨率下表现更好且计算效率更高。掩码表示需要在高分辨率下操作才能保留空间细节，而向量表示通过压缩特征隐式保留了物体的状态和位置信息——仅用两个物体特征向量即可重建 Atari Boxing 的完整观察（Figure 3a）。
 
 **对分割失败的鲁棒性**：通过随机将物体特征向量置零模拟分割失败，实验表明 OC-STORM 具有较强的容错能力：在 Atari Pong 中，即使零化概率达 50%，智能体仍能保持正回报（Figure 3b）。
-
-
 
 ## 实验与关键发现
 
@@ -289,12 +279,8 @@ OC-STORM 对分割模型的失败具有较强鲁棒性。**Figure 3b** 通过随
 1. **重复实例跟踪失败**：**Figure 10** 展示了 Hollow Knight Mantis Lords 场景中 Cutie 对重复实例的跟踪丢失问题。当场景中存在多个外观相同的物体时，分割模型可能混淆或丢失其中一个实例。
 2. **几何结构难以编码**：**Figure 11** 指出，当前物体特征向量难以编码隧道、墙壁等几何结构信息（如 Atari Gopher 中的地下隧道），这可能限制方法在需要空间推理的环境中的表现。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_qmEyJadwHA/figures/008_Figure_7.jpg]]
 *Figure 7: (a) Module ablation training curves*
-
-
 
 ## 定位与知识库关联
 
@@ -371,8 +357,6 @@ OC-STORM 在可检测物体的游戏中表现优异，但在无法检测物体�
 4. **物体表示的泛化性**：当前方法对每个游戏独立标注物体，如何实现跨游戏或跨任务的物体表示迁移尚待探索。
 
 5. **与无监督物体发现的结合**：Table 3 综述了 Slot Attention、SAVi 等无监督物体发现方法。将这些方法与 OC-STORM 结合，可能消除对少样本标注的依赖，但需要解决无监督方法在复杂场景中的稳定性问题。
-
-
 
 ## 原文 PDF
 

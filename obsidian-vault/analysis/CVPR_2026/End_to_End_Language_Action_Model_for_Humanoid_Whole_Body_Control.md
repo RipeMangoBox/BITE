@@ -48,8 +48,6 @@ SENTINEL针对上述瓶颈提出了范式转变：构建首个完全端到端的
 
 实验结果表明，SENTINEL在文本全身控制主测试中成功率达到99.45%，显著优于最强基线MDM+Retarget的94.94%（Table 2）。语义对齐指标R@1达到0.582，MMD降至3.438，均超越T2M-GPT+Retarget等模块化方法。消融实验揭示，移除长期观察会导致R@1从0.582剧降至0.153，MMD从3.438飙升至72.468（Table 3），验证了多尺度状态历史对理解长时间跨度命令的关键作用。在真实机器人Unitree G1上的部署进一步证实了该方法的零样本sim-to-real迁移能力。
 
-
-
 ### 问题背景
 
 使机器人能够理解自然语言指令并执行全身运动控制，是实现通用人机交互和自主操作的核心目标。对于人形机器人而言，这一任务尤为复杂：它不仅需要解析语言的语义内容，还必须在高维连续动作空间中生成物理上可执行的控制序列，同时维持动态平衡和运动稳定性。
@@ -72,8 +70,6 @@ SENTINEL针对上述瓶颈提出了范式转变：构建首个完全端到端的
 - **物理交互数据驱动**：在物理仿真中构建大规模语言-动作轨迹数据集，使模型从数据中学习物理上可执行的控制策略。
 - **多尺度状态感知**：融合高频短期（50Hz）和低频长期（4Hz）状态历史，使模型能够理解跨越数十秒的复杂指令。
 - **残差强化学习后训练**：在域随机化下通过PPO微调，修正开环预测的累积漂移，增强sim-to-real迁移能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -127,8 +123,6 @@ $$\tilde{a}_t = [a_t, v_{t+1}^{\mathrm{root}}, \omega_{t+1}^{\mathrm{root}}, q_{
 
 综上，SENTINEL通过上述五项关键创新，实现了从模块化生成-跟踪范式到端到端语言-动作范式的跨越。其核心洞察在于：**在物理仿真中收集大规模语言-动作轨迹，并利用流匹配直接学习从语言和机器人状态到动作的映射，可以获得比模块化方法更强的语义-物理一致性和更高的执行成功率**——在主实验中成功率高达99.45%，显著优于最高基线MDM+Retarget的94.94%（Table 2）。
 
-
-
 SENTINEL 是一套完全端到端的语言-动作模型，用于人形机器人的全身控制。其核心设计理念是消除传统模块化流水线中必须存在的中间运动表示（如人体动捕序列或隐式运动潜变量），直接将自然语言命令和机器人本体感受历史映射到底层关节动作。这一范式转换的关键动机在于：模块化方法（如 MDM+Retarget）在“文本→人体运动→全身控制器跟踪”的串联过程中，语言语义与物理执行之间缺乏紧密的梯度耦合，导致生成的语义相似运动在物理仿真中不可行（例如执行“jumps up in a tight twirl.”时因大角度旋转而失去平衡摔倒）。
 
 整个框架由三个顺序阶段构成，如 Figure 1 所示：
@@ -150,8 +144,6 @@ SENTINEL 是一套完全端到端的语言-动作模型，用于人形机器人�
 **视觉-语言扩展。** 为支持导航任务，SENTINEL 集成了 RGB-D 相机与 FoundationPose 位姿估计模块（Figure 2）。机载 D435 相机捕获前视 RGB-D 图像，经 FoundationPose 估计目标在机器人自坐标系下的位姿，随后将估计的路径点插入自然语言命令模板，与本体感受状态一同输入 SENTINEL，形成闭环的“感知-语言-动作”控制回路。
 
 整个框架的输入输出流可以概括为：**语言命令 + 多尺度状态历史 → 语言-状态编码器 → 上下文表示 → 流匹配动作专家（+ 完成预测头）→ 动作块 + 残差修正 → 底层关节目标**。这一设计消除了中间运动表示，使梯度信号能够从物理执行结果直接反馈到语言理解，从而实现了比模块化生成-跟踪范式更强的语义-物理一致性。
-
-
 
 SENTINEL 的核心架构由三个紧密协作的模块构成：**语言-状态编码器**、**流匹配动作专家**与**完成预测头**，辅以多尺度观察机制和残差后训练策略。
 
@@ -215,13 +207,6 @@ $$\Delta a_t = \pi_\Delta(s_t, \tilde{a}_t) \tag{7}$$
 
 残差头以当前状态 $s_t$ 和预训练模型的预测动作 $\tilde{a}_t$ 为输入，输出修正量 $\Delta a_t$。后训练奖励包括关节跟踪精度、残差动作范数惩罚、主动终止奖励等（Table 1）。实验表明，Base+$\pi_\Delta$ 将 sim-to-real 成功率从 95.44% 提升至 99.11%（Table 5），且移除主动终止奖励会导致 R@1 从 0.392 降至 0.255（Table 10），验证了各奖励项的必要性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1016_https_arxiv_org_abs_2511_19236/figures/003_Figure_2.jpg]]
-*Figure 2: Integration of visual perception into SENTINEL for navigation tasks. The onboard D435 camera captures front-view RGB-D images, which are processed by FoundationPose [60] to estimate the target position in the robot’s egocentric frame. The estimated waypoint is then inserted into natural-language command templates and provided to SENTINEL, together with the robot’s proprioceptive state, to generate whole body control actions. This closed-loop process enables the robot to iteratively approach the visual target*
-
-
-
 ## 实验与关键发现
 
 ### 文本全身控制主实验
@@ -265,8 +250,6 @@ SENTINEL在基于HumanML3D测试集与AMASS动作数据的文本全身控制任�
 
 **Table 11**报告了不同流匹配步数下的推理耗时。在NVIDIA GeForce RTX 4090 GPU上，模型可实现满足实时控制需求的推理速度，具体数值需参考原表。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1016_https_arxiv_org_abs_2511_19236/figures/004_Table_2.jpg]]
 *Table 2: Text-based whole body control evaluation results. Our method outperforms all baselines in both generation quality and physical execution success. → means the closer to Ground Truth the better*
 
@@ -276,25 +259,8 @@ SENTINEL在基于HumanML3D测试集与AMASS动作数据的文本全身控制任�
 ![[assets/figures/papers/paper_list_l1016_https_arxiv_org_abs_2511_19236/figures/007_Table_3.jpg]]
 *Table 3: Ablation study results for model design*
 
-![[assets/figures/papers/paper_list_l1016_https_arxiv_org_abs_2511_19236/figures/006_Figure_4.jpg]]
-*Figure 4: Results for different action chunk sizes H (training) and rollout steps K (inference)*
-
-![[assets/figures/papers/paper_list_l1016_https_arxiv_org_abs_2511_19236/figures/008_Table_4.jpg]]
-*Table 4: Results for different model sizes*
-
-![[assets/figures/papers/paper_list_l1016_https_arxiv_org_abs_2511_19236/figures/009_Table_5.jpg]]
-*Table 5: Results for residual post-training*
-
 ![[assets/figures/papers/paper_list_l1016_https_arxiv_org_abs_2511_19236/figures/017_Table_10.jpg]]
 *Table 10: Ablation study results for residual posttraining*
-
-![[assets/figures/papers/paper_list_l1016_https_arxiv_org_abs_2511_19236/figures/002_Table_1.jpg]]
-*Table 1: Main reward terms for residual post-training*
-
-![[assets/figures/papers/paper_list_l1016_https_arxiv_org_abs_2511_19236/figures/011_Figure_6.jpg]]
-*Figure 6: Real world deployment of our method on a Unitree G1 for text-based whole body control*
-
-
 
 ## 定位与知识库关联
 
@@ -341,8 +307,6 @@ SENTINEL 的端到端设计在带来语义-物理一致性的同时，也引入�
 3. **多机器人平台的迁移。** 当前实验均在 Unitree G1 平台上进行。端到端语言-动作模型能否通过少量微调迁移到具有不同运动学结构的人形机器人（如 Tesla Optimus、Figure 02），以及模型规模与迁移效率之间的关系，是具身基础模型方向的核心问题。
 
 4. **安全性与可解释性。** 端到端黑盒模型在物理世界中执行动作时，缺乏可审计的中间表示。如何在保持端到端优势的同时，引入可解释的动作表征或安全约束机制，是人形机器人实际部署中不可回避的挑战。
-
-
 
 ## 原文 PDF
 

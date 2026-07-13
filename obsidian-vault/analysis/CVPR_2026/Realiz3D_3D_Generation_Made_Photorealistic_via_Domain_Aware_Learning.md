@@ -54,8 +54,6 @@ claims:
 
 在定量评估中，Realiz3D 在保持3D一致性的前提下显著提升了真实感：在多视图纹理生成任务上，真实世界 FID 从纯合成微调基线的 218.29 降至 **200.24**（Table 1）；在文本到多视图生成任务上，FID 从 215.57 降至 **196.01**（Table 3）。消融实验进一步验证，两阶段训练相比联合训练将 FID 从 216.63 降至 198.44，而层感知训练与域重分配的组合达到了真实感与3D一致性的最佳平衡（Table 2）。
 
-
-
 ### 3D生成中的真实感困境
 
 近年来，基于2D扩散先验的3D生成方法取得了显著进展，其核心范式是利用在大规模真实图像上预训练的文本到图像（T2I）扩散模型作为先验，通过分数蒸馏采样（SDS）或直接微调来实现3D感知的图像生成。然而，这一范式面临一个根本性的瓶颈：**预训练模型缺乏3D感知能力，无法直接生成多视图一致的图像**。
@@ -82,8 +80,6 @@ Realiz3D通过深入分析扩散模型的内部表征，揭示了域差异形成
 - **免训练方法**（如SDEdit）：通过加噪-去噪过程增强真实感，但无法从根本上解决控制信号与域身份的纠缠，且计算开销大。
 
 这些方法的共同缺陷在于：**未能显式建模和分离“视觉域身份”与“控制信号”这两个相互独立的因素**。Realiz3D正是针对这一缺口，提出了域感知学习的框架。
-
-
 
 ## 核心方法与创新机理
 
@@ -132,8 +128,6 @@ $$
 
 相比 LoRA（rank 32/128）和 Domain Adapter 等轻量级微调方法，Realiz3D 的域移位器不仅保留先验，更主动学习域身份分离；相比 SDEdit 等免训练方法，Realiz3D 通过训练获得了更强的控制遵循能力；相比 TRELLIS 等预训练3D原生模型，Realiz3D 从2D先验出发，在真实感上具有优势。
 
-
-
 Realiz3D 的整体框架围绕一个核心洞察展开：扩散模型的不同层和去噪步长承担着不同的生成职责——早期层和早期去噪步主要决定图像的结构与布局，而后期层则主导外观与纹理细节。基于这一洞察，Realiz3D 设计了一条从域解耦到可控生成的两阶段训练管线，并辅以推理时的域感知采样策略，从而在保持真实感的同时注入 3D 可控性。
 
 ### 模块架构与数据流
@@ -171,8 +165,6 @@ $$\tilde{X} = X + \mathcal{D}(\mathrm{domain}) = X + W_{\mathrm{left}} W_{\mathr
 
 整个框架仅依赖标准的扩散去噪损失，无需成对数据或修改原有的条件机制，使其能够轻量地适配各类预训练扩散骨干。
 
-
-
 Realiz3D 的核心设计围绕三个关键模块展开，其本质是通过显式建模“域身份”（domain identity）来解耦控制信号与视觉域的统计关联，从而在注入3D可控性的同时保持预训练模型的真实感先验。
 
 ### 域移位器（Domain Shifters）
@@ -209,8 +201,6 @@ $$\mathcal{L} = \mathbb{E}_{z, \epsilon \sim \mathcal{N}(0,1), t} \left[ \| \eps
 推理时，采用非随机的部分域重分配：预定义的早期层和去噪步使用合成模式，后期层和步保持真实模式，以进一步增强控制传递。
 
 消融实验（Table 2, #3 vs #5 vs #7 ）证实：添加域重分配将PSNR从23.97提升至24.18而不损害FID；层感知训练与域重分配的组合达到最佳平衡点（FID 200.24, PSNR 24.78），验证了“早期层注入控制、后期层保持真实感”这一核心洞察的有效性。
-
-
 
 ## 实验与关键发现
 
@@ -262,8 +252,6 @@ Figure 3和Figure 4的定性对比为定量指标提供了视觉锚点。在多�
 
 实验证据链形成了清晰的因果逻辑：域泄漏是真实感退化的根因 → 两阶段训练实现域身份与控制信号的解耦 → 层感知训练和域重分配在早期层保留可控性、在后期层保持真实感 → 推理时域切换进一步增强控制传递。这一机制在两项任务上均实现了真实感的大幅提升（FID降低18-20），同时将3D一致性损失控制在可忽略范围内。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2605_13852/figures/012_Figure.jpg]]
 
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2605_13852/figures/013_Figure.jpg]]
@@ -276,20 +264,6 @@ Figure 3和Figure 4的定性对比为定量指标提供了视觉锚点。在多�
 
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2605_13852/figures/017_Figure_8.jpg]]
 *Figure 8: Multiview Texturing. ”A king penguin, highly realistic and detailed”. Red circles highlight inconsistent regions (either with the geometry or with other views). Best viewed zoomed in*
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2605_13852/figures/020_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2605_13852/figures/022_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2605_13852/figures/025_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2605_13852/figures/031_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2605_13852/figures/032_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2605_13852/figures/033_Figure.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -340,8 +314,6 @@ Realiz3D的设计假设存在明确边界：
 3. **图像条件等复杂控制信号的泛化**：当控制信号本身携带域信息时，如何扩展域移位器的解耦能力？可能需要引入控制信号的域归一化或条件域嵌入的层级解耦机制。
 
 4. **控制遵循度与真实感的极限平衡**：当前方案在PSNR上仍有约0.98的微小差距，是否存在更精细的层级分配策略或动态域混合机制，能够在不牺牲真实感的前提下进一步逼近纯合成基线的控制精度？
-
-
 
 ## 原文 PDF
 

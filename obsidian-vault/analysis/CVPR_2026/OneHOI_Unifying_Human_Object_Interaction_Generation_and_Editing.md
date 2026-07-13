@@ -51,8 +51,6 @@ claims:
 
 实验表明，统一框架带来了显著的协同效应：在匹配算力下，联合训练使生成任务的 HOI 准确率提升 26.4%，无布局编辑的 HOI 编辑成功率提升 21.1%。在 IEBench 基准上，OneHOI 的无布局编辑 Editability-Identity（0.638）和 HOI Editability（0.596）分别较最强先前工作提升 10.0% 和 16.0%，同时首次建立了布局引导的多交互编辑基线。消融研究进一步揭示，Structured HOI Attention 是提升交互正确性的最关键模块，验证了动词拓扑约束在关系建模中的核心作用。
 
-
-
 ### 问题背景
 
 人体-物体交互（Human-Object Interaction, HOI）理解是视觉生成领域的核心挑战之一。与单纯将人和物体放置在场景中不同，HOI生成要求模型具备对**交互关系**的深层语义理解——不仅要知道“谁”对“什么”做了“什么动作”，还要在像素空间中忠实地呈现这种关系的几何与物理约束。然而，现有方法在这一目标上存在根本性的**任务割裂**：HOI生成和HOI编辑被当作两个独立问题分别解决，缺乏统一的建模框架。
@@ -77,8 +75,6 @@ OneHOI的核心洞察在于：**HOI生成与编辑本质上是同一条件去噪
 3. **交互实例专属的位置编码（HOI RoPE）**：为不同交互实例分配独立的RoPE位置槽位，降低多HOI场景中的特征串扰。
 
 这一统一框架使得单一模型能够同时支持文本引导的无布局编辑、布局引导的单/多交互编辑，以及从文本、布局、任意形状掩码或混合条件出发的HOI生成，首次实现了HOI生成与编辑的灵活多条件统一控制。
-
-
 
 ## 核心方法与创新机理
 
@@ -123,8 +119,6 @@ OneHOI在扩散Transformer（DiT）骨干上引入了四项结构性创新，每
 - 联合训练中模态丢弃的最优概率组合（$p_{\mathrm{layout}}=0.25$、$p_{\mathrm{hoi}}=0.25$、$p_{\mathrm{txt}}=0.30$）对统一框架鲁棒性的影响，论文未做系统消融。
 - HOI RoPE作为实例分离机制的通用性，是否适用于其他需要多实体分离的生成任务，仍为开放问题。
 
-
-
 OneHOI 将 HOI 生成与编辑统一为**单一条件去噪过程**，其核心是一个称为 **Relational Diffusion Transformer（R-DiT）** 的 DiT 骨干网络。该框架的总体流水线如 Figure 3 所示，输入侧接收混合条件（文本提示、布局框、HOI 三元组标签），输出侧生成或编辑后的图像。整个框架由四个关键模块串联构成，形成“空间接地 → 身份注入 → 拓扑约束 → 实例分离”的递进式交互建模链。
 
 ![[assets/figures/papers/paper_list_l997_https_arxiv_org_abs_2604_14062/figures/004_Figure_3.jpg]]
@@ -161,16 +155,11 @@ OneHOI 将 HOI 生成与编辑统一为**单一条件去噪过程**，其核心�
 
 OneHOI 基于 **Flux.1 Kontext** 的 MM-DiT 骨干进行 LoRA 微调（可调参数约 3.5 亿），训练 10K 步、batch size 16、使用 8-bit AdamW 优化器。批次在生成任务和编辑任务之间交替采样，并通过随机丢弃输入模态实现多条件统一——这种联合训练策略使生成任务学到的丰富交互语义（接触模式、动词-物体几何关系）能够反哺编辑任务，反之亦然，产生显著的协同效应（Table 5 证实统一模型在匹配算力下全面优于独立任务模型）。
 
-
-
 OneHOI的核心创新在于将人体-物体交互（HOI）的结构化先验显式注入扩散Transformer（DiT）的去噪过程。该方法围绕四个关键模块构建，形成一个从空间接地到拓扑约束的递进式交互建模管线。
 
 ### 3.1 动作接地（Action Grounding）
 
 动作接地的首要问题是**动作区域的合理定义**。先前工作**InteractDiffusion**采用主体框与物体框之间的“Between”区域作为动作的作用范围，但注意力热力图分析（Figure 4）表明，动作Token的实际注意力分布远超该狭窄区间，更倾向于覆盖主体和物体的整体区域。
-
-![[assets/figures/papers/paper_list_l997_https_arxiv_org_abs_2604_14062/figures/005_Figure_4.jpg]]
-*Figure 4: Action-token→image attention heatmaps from the baseline. The “Between” region proposed in InteractDiffusion [13] misses where the action actually attends, while our “Union” region (subject ∪ object) better matches the attention footprint*
 
 基于这一观察，OneHOI将动作区域重新定义为**主体区域与物体区域的并集**：
 
@@ -224,12 +213,6 @@ $$z_{\mathrm{HOI}}(n) = (0, T+n, T+n), \quad \mathrm{where} \quad T = \max(H, W)
 
 其中 $H$、$W$ 为图像潜空间的高和宽。第 $n$ 个交互实例的所有HOI Token（主体、物体、动作）共享同一位置索引 $(0, T+n, T+n)$，而不同实例之间被有效分离。这一设计使RoPE的频率基能够自然区分不同交互实例，在多HOI场景中显著改善感知质量和编辑一致性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l997_https_arxiv_org_abs_2604_14062/figures/006_Figure.jpg]]
-
-
-
 ## 实验与关键发现
 
 ### 核心实验设计
@@ -279,15 +262,9 @@ Table 4 的逐模块消融揭示了从基础空间感知到深层关系建模的
 
 定性消融可视化（Figure 10）直观展示了模块叠加效果：仅基础模型无法渲染复杂双手动作（如同时“holding”和“petting”），逐步添加 AG→Enc→Attn→HRoPE 后，交互的物理合理性逐步增强，完整模型成功合成该复杂场景。
 
-![[assets/figures/papers/paper_list_l997_https_arxiv_org_abs_2604_14062/figures/014_Figure_10.jpg]]
-*Figure 10: Progressively adding components improves the interaction’s plausibility, only the full model (4) successfully rendering the complex, two-handed action of both “holding” and “petting.”*
-
 ### 统一训练 vs. 单任务训练：跨任务协同效应
 
 Table 5 的对比实验验证了统一框架的核心主张——HOI 生成与编辑本质上是同一条件去噪过程的两种视图。**在匹配算力下，统一模型较独立任务模型在生成任务上 HOI Accuracy 提升 26.4%（0.224 vs. 0.177），在无布局编辑任务上 HOI Editability 提升 21.1%（0.562 vs. 0.464）**。这一协同效应的机制在于：生成任务中学到的接触模式、动词-物体几何关系等丰富交互语义，通过共享的结构化交互表示迁移到编辑任务中；反之，编辑任务对交互细节的精确控制需求也反哺了生成质量。
-
-![[assets/figures/papers/paper_list_l997_https_arxiv_org_abs_2604_14062/figures/021_Table_5.jpg]]
-*Table 5: Ablation on Unification*
 
 ### 失败模式与边界条件
 
@@ -301,14 +278,6 @@ Table 5 的对比实验验证了统一框架的核心主张——HOI 生成与�
 ### 数据集构建与分布
 
 HOI-Edit-44K 数据集覆盖丰富的交互对象和动作类别。附录中的 Treemap 可视化（Figure 16、17）展示了对象类别（如运动器材、乐器、餐具等）和动作类别（如 hold、ride、eat 等）的频率分布，MultiHOIEdit 基准的 Sankey 图（Figure 21）则呈现了源动作到目标动作的编辑转移全貌。这些分布信息对理解模型的能力覆盖范围和潜在长尾盲区具有参考价值。
-
-![[assets/figures/papers/paper_list_l997_https_arxiv_org_abs_2604_14062/figures/024_Figure_16.jpg]]
-*Figure 16: Treemap visualising the distribution of the interacting object categories in the HOI-Edit-44K dataset. The size of each block corresponds to the category’s frequency*
-
-![[assets/figures/papers/paper_list_l997_https_arxiv_org_abs_2604_14062/figures/027_Figure_21.jpg]]
-*Figure 21: Sankey diagram visualising the action transitions in the MultiHOIEdit benchmark. The flows illustrate the mapping from source actions (left) to target actions (right), detailing the full range of edits*
-
-
 
 ## 定位与知识库关联
 
@@ -353,8 +322,6 @@ OneHOI 的方法谱系可从三个维度定位：架构基础、HOI 感知机制
 4. **模态丢弃的最优策略**：联合训练中布局、HOI 标签和文本提示的丢弃概率（0.25/0.25/0.30）是经验设定的。这些概率的最优组合及其对统一框架在不同任务上鲁棒性的影响，尚未通过系统消融确定。
 
 5. **真实场景的编辑鲁棒性**：当前评估主要基于 IEBench 和自建的 MultiHOIEdit，两者均以合成或受控场景为主。模型在真实用户拍摄的复杂背景、遮挡严重或光照极端的照片上的编辑鲁棒性，仍需更大规模的真实场景用户研究来验证。
-
-
 
 ## 原文 PDF
 

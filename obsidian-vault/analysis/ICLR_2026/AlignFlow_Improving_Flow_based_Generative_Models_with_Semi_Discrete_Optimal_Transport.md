@@ -45,8 +45,6 @@ claims:
 
 AlignFlow 是一种即插即用的噪声-数据对齐（Noise-Data Alignment, NDA）方法，旨在提升基于流的生成模型（Flow-based Generative Models, FGM）的性能。其核心思想是利用半离散最优传输（Semi-Discrete Optimal Transport, SDOT）在连续的噪声分布与离散的经验数据分布之间显式构造一个确定性的、最优的传输映射。该映射将噪声空间划分为 Laguerre 单元，每个单元对应一个数据点，从而为 FGM 训练提供固定的、最优的噪声-数据配对。AlignFlow 以极低的计算开销（<1%额外训练时间）实现了对现有 FGM 的即插即用改进，在 CIFAR-10 和 ImageNet256 等多个基准上取得了一致的性能提升。
 
-
-
 基于流的生成模型通过学习从噪声分布到数据分布的连续可逆变换来生成数据。训练 FGM 时，噪声与数据的配对方式对生成质量有显著影响。现有方法主要分为三类：
 
 - **独立采样（Vanilla Flow Matching）**：噪声与数据独立采样，导致随机配对，生成轨迹弯曲，需要更多函数评估（NFE）。
@@ -54,8 +52,6 @@ AlignFlow 是一种即插即用的噪声-数据对齐（Noise-Data Alignment, ND
 - **连续最优传输（ICNN-based OT）**：使用输入凸神经网络（ICNN）近似 Brenier 势能。该方法缺乏收敛保证，且计算开销较大。
 
 现有 OT 方法在扩展到大规模模型和高维数据时面临严峻挑战。离散 OT 方法需要从两个分布中采样，其估计误差随维度指数增长；连续 OT 方法则难以保证收敛到全局最优解。
-
-
 
 ## 核心方法与创新机理
 
@@ -65,8 +61,6 @@ AlignFlow 的核心创新在于利用半离散最优传输（SDOT）解决上述
 2. **批大小不变性**：SDOT 映射在整个数据集上计算，不依赖于小批量样本，确保稳定收敛。
 3. **可证明收敛性**：SDOT 目标函数是凸的，优化过程具有收敛保证。
 4. **极低计算开销**：SDOT 映射的计算开销不到总训练时间的 1%（CIFAR-10），在 ImageNet 上每类少于 10 秒。
-
-
 
 ![[assets/figures/papers/iclr26_generative_models_diffusion__generative_models_and_autoencoders__b001_nTCF3QNsIN_AlignFlo/figures/002_Figure_1.jpg]]
 
@@ -81,8 +75,6 @@ AlignFlow 采用两阶段训练流程：
 - 使用预计算的 SDOT 映射配对噪声与数据
 - 训练任意 FGM（如 Flow Matching, Shortcut Model, MeanFlow）
 - 可选：当 SDOT 映射未完全收敛时，执行 Rebalance 操作消除偏差
-
-
 
 ### 5.1 标准 FGM 损失函数
 
@@ -136,8 +128,6 @@ $$\mathrm{L}_1(\mathbf{g}) = \sum_{i\in I} |p_i - b_i| \quad \text{(Section B.1)
 
 $$\mathrm{rebalance}\left(\{m_j\}_{j=1}^M\right) := \arg\max_{\{\tilde{m}_j\}} \left\{ \sum_j \mathbb{1}(\tilde{m}_j = m_j) : \left| \max_{i\in\mathcal{X}} \sum_{j=1}^M \mathbb{1}_i(\tilde{m}_j) - \min_{i\in\mathcal{X}} \sum_{j=1}^M \mathbb{1}_i(\tilde{m}_j) \right| \leq 1 \right\} \quad \text{(Eq. 12)}$$
 
-
-
 ## 实验与关键发现
 
 ### 6.1 主要结果
@@ -150,7 +140,6 @@ $$\mathrm{rebalance}\left(\{m_j\}_{j=1}^M\right) := \arg\max_{\{\tilde{m}_j\}} \
 | Euler 1000步 | 3.92 | **3.79** | -0.13 |
 | DOPRI5 | 3.82 | **3.71** | -0.11 |
 
-*Table 2: Comparison of FID-50k scores between Minibatch OT and AlignFlow for U-Net trained on CIFAR-10, evaluated across different ODE integrators. Results are averaged over 5 independent runs.*
 
 ![[assets/figures/papers/iclr26_generative_models_diffusion__generative_models_and_autoencoders__b001_nTCF3QNsIN_AlignFlo/figures/007_Table_2.jpg]]
 *Table 2: Comparison of FID-50k scores between Minibatch OT and AlignFlow for U-Net trained on CIFAR-10, evaluated across different ODE integrators. Results are averaged over 5 independent runs. AlignFlow consistently achieves better performance than Minibatch OT under all tested ODE integrators.*
@@ -176,7 +165,6 @@ $$\mathrm{rebalance}\left(\{m_j\}_{j=1}^M\right) := \arg\max_{\{\tilde{m}_j\}} \
 | SiT-L/2 | 3.84 | **3.51** | -0.33 |
 | SiT-XL/2 | 3.43 | **3.23** | -0.20 |
 
-*Table 4: We evaluate AlignFlow on ImageNet256 using MeanFlow (NFE=1), showing consistent performance improvements across all model sizes.*
 
 ![[assets/figures/papers/iclr26_generative_models_diffusion__generative_models_and_autoencoders__b001_nTCF3QNsIN_AlignFlo/figures/009_Table_4.jpg]]
 *Table 4: We evaluate AlignFlow on ImageNet256 using MeanFlow (NFE=1), showing consistent performance improvements across all model sizes.*
@@ -195,14 +183,10 @@ $$\mathrm{rebalance}\left(\{m_j\}_{j=1}^M\right) := \arg\max_{\{\tilde{m}_j\}} \
 - ImageNet 实验使用官方或广泛认可的基线实现（Frans et al. 2025; Geng et al. 2025）。
 - SDOT 映射计算在 FGM 训练之前完成，不干扰训练过程。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_generative_models_diffusion__generative_models_and_autoencoders__b001_nTCF3QNsIN_AlignFlo/figures/001_Table_1.jpg]]
 *Table 1: A comparison between coupling methods and AlignFlow, a Noise-Data Alignment method.*
 
 ![[assets/figures/papers/iclr26_generative_models_diffusion__generative_models_and_autoencoders__b001_nTCF3QNsIN_AlignFlo/figures/010_Table_5.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -224,8 +208,6 @@ AlignFlow 属于基于最优传输的流生成模型改进方法，其方法谱�
 3. 对于超大规模数据集（如 LAION-5B），SDOT 映射的计算能否通过近似方法（如聚类或分层 SDOT）实现可扩展？
 4. AlignFlow 与蒸馏方法的结合是否能进一步降低 NFE 至 1 以下，同时保持高质量？
 5. SDOT 映射的几何结构（Laguerre 单元）能否用于解释或控制生成模型的潜在表示？
-
-
 
 ## 原文 PDF
 

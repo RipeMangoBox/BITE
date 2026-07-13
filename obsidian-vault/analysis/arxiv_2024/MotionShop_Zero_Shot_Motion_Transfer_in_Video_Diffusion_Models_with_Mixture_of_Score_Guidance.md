@@ -86,8 +86,6 @@ MSG属于**零样本、无训练的视频运动迁移方法**，直接操作于�
 
 当前方法存在以下已知局限：①仅在CogVideoX单骨干网络上验证，泛化性待确认；②强度参数和MSG权重 $w_\text{MSG}$ 需手动调节。开放问题包括：参考运动表示 $\mathcal{M}(z^*)$ 的具体计算流程是否依赖额外的对齐或归一化；MSG权重在不同场景下的自动调节策略；以及该方法向更长视频或更高分辨率生成的扩展路径。
 
-
-
 ### 问题背景：视频运动迁移的核心挑战
 
 视频运动迁移（video motion transfer）旨在从一段参考视频中提取运动模式（如物体移动轨迹、相机运动路径、多物体交互动态），并将其迁移到由文本提示指定的新内容上，生成一段既保留参考运动特征又符合目标语义的视频。这一任务在电影特效、虚拟内容创作、视频编辑等领域具有广泛的应用前景。
@@ -121,8 +119,6 @@ MotionShop 的核心洞察来源于对扩散模型条件得分函数（condition
 3. **统计力学视角**：将运动迁移建模为混合势能函数 $U_{\text{MSG}}(z_t) = U_{\text{content}}(z_t) + v_{\text{MSG}} [U_{\text{motion}}(z_t, z_t^*) - U_{\text{prior}}(z_t)]$ 驱动的修正朗之万动力学过程，保证了生成过程的稳定性和内容保留。
 
 这一框架不仅提供了理论上的优雅性，更在实际效果上取得了显著突破——在 MotionBench 基准上，MSG 以 0.913 的 Motion Fidelity 超越 DMT（0.887）达 2.9%，同时保持了 0.928 的 Temporal Consistency。
-
-
 
 ## 核心方法与创新机理
 
@@ -172,8 +168,6 @@ $$U _ { \mathrm { M S G } } ( z _ { t } ) = U _ { \mathrm { c o n t e n t } } ( 
 
 这一创新框架不仅实现了性能突破，更重要的是提供了一种**可解释的运动迁移范式**：将运动视为得分空间中的势能扰动，通过混合势能驱动生成过程，从而在无需训练的条件下实现灵活、高保真的运动迁移。
 
-
-
 MotionShop 将零样本运动迁移建模为扩散模型得分空间中的势能混合问题，其整体框架由三个串行模块构成：**参考运动提取**、**MSG 得分混合与引导**、以及**修正的朗之万动力学采样**（Figure 3）。
 
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2412_05355/figures/003_Figure_3.jpg]]
@@ -216,8 +210,6 @@ $$U_{\mathrm{MSG}}(z_t) = U_{\mathrm{content}}(z_t) + v_{\mathrm{MSG}} \big[ U_{
 - **引导机制**：MSG 在运动一致性和场景编辑质量上显著优于 CFG 和 USG，因为后者无法将运动信息与内容信息在得分层面解耦。
 
 整个框架直接运行在预训练的 CogVideoX 模型上，无需额外训练、微调或 LoRA 适配，实现了完全的零样本运动迁移。
-
-
 
 ### 3.1 扩散模型得分函数基础
 
@@ -282,16 +274,6 @@ $$dz = \frac{\epsilon}{2} \nabla \log p(z) dt + \sqrt{\epsilon} d\bar{w}_t$$
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2412_05355/figures/009_Figure_8.jpg]]
 *Figure 8: Ablation study on strength and timestep parameters. Left: We analyze the effect of noise addition in the motion extraction stage, where strength=0.7 achieves optimal motion representation - lower values (0.6) result in weak motion transfer while higher values (0.8) lead to over-stylization. Right: Impact of applying Mixture of Score guidance at different timestep ratios of total 50 timesteps on motion transfer quality*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2412_05355/figures/002_Figure_2.jpg]]
-*Figure 2: Our intuition. Visualization of motion characteristics M(z) extracted from early-timestep conditional scores. (Left) Multiple object motion representation showing the simultaneous movement of two objects. (Right) Combined object and camera motion representation demonstrating how our method captures both local object motion and global camera movement patterns. The visualizations are obtained from the conditional score maps ∇z log pt(z|y) at early timesteps t ≪ T*
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2412_05355/figures/010_Figure_9.jpg]]
-*Figure 9: Comparison of different guidance mechanisms. Comparing our Mixture of Score Guidance (MSG) against Classifier-Free Guidance (CFG, baseline without reference) and Unconditional Score Guidance (USG, using reference video’s unconditional score)*
-
-
-
 ## 实验与关键发现
 
 ### 定量主结果
@@ -344,22 +326,6 @@ Figure 6 展示了 Text Similarity 与 Motion Fidelity 之间的权衡关系。M
 ### MotionBench 数据集
 
 Table 2 展示了 MotionBench 数据集中不同运动类别的视频分布。该数据集提供了多种运动类型的均衡表示，包括单物体运动、多物体交互、相机运动等类别，为运动迁移方法的全面评估提供了基础。
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2412_05355/figures/012_Table_2.jpg]]
-*Table 2: Distribution of videos across different motion categories in MotionBench. The dataset provides a balanced representation of various motion types, enabling comprehensive evaluation of motion transfer methods*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2412_05355/figures/001_Figure_1.jpg]]
-*Figure 1: Mixture of Score Guidance (MSG), a novel approach for zero-shot motion transfer in diffusion models, enables high-fidelity motion synthesis across diverse scenarios. MSG successfully handles various motion patterns including complex object movements and camera trajectories. Full video results are available in the supplementary material*
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2412_05355/figures/011_Figure_10.jpg]]
-*Figure 10: Type of Questions. We ask 3 different questions for Text Alignment, Motion Fidelity and Temporal Consistency*
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2412_05355/figures/005_Figure.jpg]]
-*Figure: “A motorcycle driven by a robot, cruising through a desert” “A pair of miniature medieval knights” “A raindrop clinging to a green leaf, reflecting its surroundings like a tiny mirror.”*
-
-
 
 ## 定位与知识库关联
 
@@ -425,8 +391,6 @@ MotionShop 的方法架构包含三个关键设计选择，每个选择都对应
 ---
 
 **人工核实提示**：上述方法谱系中涉及的基线方法（MotionDirector、DMT、VMC、MotionInversion）的具体作者、会议和年份信息在提供的分析材料中未明确给出，建议查阅原始论文进行补充。
-
-
 
 ## 原文 PDF
 

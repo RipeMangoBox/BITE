@@ -53,8 +53,6 @@ claims:
 
 在 Qwen2.5-VL-3B-Instruct 和 Qwen3-VL-8B-Instruct 两个基座模型上，R-C2 在 ScienceQA、ChartQA、MathVista、VWA、A-OKVQA 等多个标准多模态基准上均取得显著提升，最高提升幅度达 **+7.8 个百分点**（ScienceQA 文本准确率），同时跨模态一致性比率也大幅提高。消融实验进一步表明，混合使用四种循环路径、在反向查询生成中同时利用图像和文本模态、以及增加训练样本中跨模态不一致的比例，均能系统性地提升性能。值得注意的是，使用模型自生成的候选答案启动循环，其效果与使用训练集标注答案几乎相当，验证了 R-C2 的**自启动**能力——无需人工标注即可引导有效的监督信号。
 
-
-
 多模态大语言模型（MLLM）在视觉问答、图表理解、网页导航等任务上取得了显著进展，但其推理可靠性仍受制于一个根本性瓶颈：**跨模态不一致性**。当同一信息以不同模态呈现时——例如同一网页的截图与HTML源码——模型常常给出相互矛盾的预测（Figure 1）。这种模态鸿沟并非偶发的噪声，而是系统性的结构缺陷，直接损害了模型在实际部署中的可信度。
 
 现有的自监督改进方法主要依赖**多数投票**策略，通过对同一问题的多次采样取众数作为伪标签进行自训练。然而，在多模态场景下，投票机制面临两类典型失败模式（Figure 2）：其一为**稳定冲突**，即文本和视觉模态各自内部一致但彼此矛盾，投票结果仅取决于哪一模态恰好占多数，而非推理正确性；其二为**不稳定恢复**，即单模态内部存在正确答案的采样，但多数投票仍将其淹没。这两类失败表明，投票机制不仅无法消解跨模态冲突，反而可能放大系统性偏差，丢弃有价值的正确信号。
@@ -62,8 +60,6 @@ claims:
 上述困境揭示了一个关键洞察：**跨模态不一致性本身并非缺陷，而是一个丰富、天然的自监督信号**。模型在不同模态视角下对同一问题的分歧，恰好暴露了其内部推理链条的薄弱环节。若能设计一种机制，强制模型在回答→反向推断查询→切换模态→前向重构答案的闭环中自主消除内部冲突，则有望在不依赖外部标注的前提下，同时提升推理准确率与跨模态对齐度。
 
 基于这一动机，本文提出 **R-C2（Cross-Modal Cycle Consistency Reward）**，一种以循环一致性为核心的强化学习框架。R-C2将跨模态不一致性转化为无需标签的二元奖励信号，驱动模型在四向循环验证中实现自举式改进。
-
-
 
 ## 核心方法与创新机理
 
@@ -111,8 +107,6 @@ R-C2 的深层创新在于重新定义了多模态推理的监督信号来源。
 
 消融实验进一步验证了这一创新的有效性：使用模型自生成的候选答案启动循环，其性能与使用训练集标注答案几乎相同（Table 4），证明了 R-C2 具备可靠的自启动（self-bootstrapping）能力，无需依赖任何外部标注即可引导自身的训练信号。
 
-
-
 R-C2 的核心思路是将多模态推理中的**跨模态不一致性**转化为自监督训练信号，而不是试图掩盖或投票消除它。整个框架围绕“答案—反向查询—跨模态前向重构—一致性验证”的闭环展开，形成一个无需外部标注的强化学习奖励机制。
 
 ### Pipeline 总览
@@ -154,13 +148,6 @@ $$\mathcal{L}_{\mathrm{GRPO}} = \mathbb{E}\left[\log \pi_{\boldsymbol{\theta}}(\
 ### 与多数投票基线的本质区别
 
 多数投票（R0）在单模态下存在“多数即错误”的系统性风险——当模型存在系统性偏差时，多数答案本身就是错误的，投票只会强化这一偏差。在多模态场景下，问题进一步恶化：文本和图像模态的预测经常相互矛盾（见 Figure 2 的两种失败模式），多模态投票要么放大偏差，要么丢失正确的少数信号。R-C2 的循环一致性奖励从根本上绕开了这一困境：它不依赖答案间的相对多数，而是通过跨模态的“自问自答—自验证”闭环，迫使模型在模态切换中消解内部冲突。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2662_https_arxiv_org_abs_2603_25720/figures/001_Figure_1.jpg]]
-*Figure 1: Gap in Multimodal Reasoning. Multimodal large language models (MLLMs) frequently fail the test of modalinvariance. For example, they produce conflicting answers for the same webpage when presented as a screenshot versus its raw HTML source. We introduce a cycle-consistency framework that directly targets this modality gap, leveraging the inconsistency itself as a signal to jointly improve reasoning and alignment*
-
-
 
 ### 3.1 问题形式化与GRPO优化框架
 
@@ -206,29 +193,13 @@ R-C2采用离线策略预先生成完整的合成循环数据集，而非在训�
 - **稳定冲突模式**：文本和图像模态各自产生自洽的预测，但彼此矛盾，投票结果取决于哪一模态占据多数，可能系统性偏向错误答案。
 - **不稳定恢复模式**：单一模态内部部分采样给出了正确答案，但多数投票仍被错误答案主导，正确答案信号被淹没。
 
-![[assets/figures/papers/paper_list_l2662_https_arxiv_org_abs_2603_25720/figures/002_Figure_2.jpg]]
-*Figure 2: Failure of multimodal voting. Left: Consistent Conflict — both text and image modalities produce self-consistent predictions (mode-stable) but disagree with each other, and only one modality aligns with the ground truth. Right: Unstable Recovery — within a single modality, some rollouts yield the correct answer, but the majority vote remains wrong, reflecting intra-modal instability. Using multimodal voting can amplify biases or lose correct signals*
-
 R-C2通过答案侧验证规避了这些问题：它不依赖采样间的多数共识，而是强制模型在跨模态循环中自我验证每个候选答案的稳定性。这种设计将模态间的不一致性从缺陷转化为有价值的自监督信号。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2662_https_arxiv_org_abs_2603_25720/figures/004_Figure_4.jpg]]
-*Figure 4: Examples of the backward-inference (Answer→Query) step. Given a Candidate Answer, the model generates distinct, semantically-grounded queries for both the text and image modalities. This demonstrates the viability of the first step of our cycleconsistency reward, enabling the model to check its answer in the alternate modality*
-
-
 
 ## 实验与关键发现
 
 ### 主实验结果：推理准确率与跨模态一致性
 
 R-C2 在两个模型规模（Qwen2.5-VL-3B-Instruct 和 Qwen3-VL-8B-Instruct）及六个多模态推理基准上均展现出对基座模型和投票基线的一致提升。Table 1 汇总了各方法的文本视角准确率（Text Acc）和视觉视角准确率（Vision Acc），Table 2 则报告了跨模态一致性比率——即同一问题在文本和视觉模态下给出相同答案的比例。
-
-![[assets/figures/papers/paper_list_l2662_https_arxiv_org_abs_2603_25720/figures/005_Table_1.jpg]]
-*Table 1: Multimodal Reasoning Accuracy. We compare the Base Model, Voting (Text-only), Voting (Image+Text), and our*
-
-![[assets/figures/papers/paper_list_l2662_https_arxiv_org_abs_2603_25720/figures/006_Table_2.jpg]]
-*Table 2: Multimodal Consistency Ratio. We compare both Qwen2.5-VL-3B and Qwen3-VL-8B. Each dataset is evaluated under four supervision settings: Base, +Voting (Text), +Voting (Image+Text), and +R-C2. Values in (green) indicate absolute improvements of*
 
 **基座模型与投票基线的瓶颈。** 多数投票（R0）基线分为两种配置：纯文本投票（Voting Text-only）和图文联合投票（Voting Image+Text）。结果显示，投票方法在多模态场景下不仅未能稳定提升性能，反而在某些基准上加剧了跨模态不一致带来的失败——这正是 Figure 2 所揭示的两种典型失败模式：稳定冲突（文本和视觉各自内部一致但彼此矛盾）与不稳定恢复（单模态内部多数投票仍错误）。R-C2 的出发点正是将这种不一致性转化为自监督信号，而非通过投票掩盖它。
 
@@ -282,15 +253,8 @@ Table 4 比较了两种循环启动方式：使用模型自身预测的答案（
 
 5. **模态扩展的开放性。** 当前方法针对文本-图像双模态设计，如何将循环一致性框架扩展到视频、音频等更多模态仍是开放问题。超过两种模态时，循环路径的组合爆炸和一致性定义都将面临新的挑战。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2662_https_arxiv_org_abs_2603_25720/figures/007_Figure_5.jpg]]
 *Figure 5: Visual comparison among the base model, voting baseline, and*
-
-![[assets/figures/papers/paper_list_l2662_https_arxiv_org_abs_2603_25720/figures/012_Table.jpg]]
-*Table: A1. Key global hyperparameters used throughout our experiments. Larger batch sizes are adopted when GPU memory permits*
-
-
 
 ## 定位与知识库关联
 
@@ -344,8 +308,6 @@ R-C2 的方法论创新在于**将这种跨模态不一致性从缺陷重新定�
 - **循环一致性的理论理解**：为什么跨模态不一致样本比例从 0% 增加到 50% 时，模型性能系统性提升（Figure 7）？这一现象暗示不一致性本身携带了结构化的学习信号，但其信息论或优化理论层面的解释尚不充分。
 
 - **自启动能力的边界**：Table 4 表明使用模型自生成候选答案启动循环，其性能与使用训练集标注答案几乎相同。这一自启动能力在模型初始能力较弱时是否仍然成立？若基座模型在特定领域完全不具备推理能力，循环一致性信号是否还能有效引导学习？
-
-
 
 ## 原文 PDF
 

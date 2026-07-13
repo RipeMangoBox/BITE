@@ -56,8 +56,6 @@ claims:
 
 实验结果表明，基于 DINOv2-small 骨干（约 25M 参数），EfficientVPR 在 Pitts250k、MSLS、AmsterTime、SVOX Night 等 7 个数据集上取得了同尺度模型中最高的平均 R@1，且特征维度仅为 BoQ 的 28%。在效率方面，总推理延迟约 3.1 ms，实现了精度与速度的有利权衡。消融实验证实，SceneVPT 在所有测试数据集上均显著优于静态 VPT-deep，SGFS 在 AmsterTime 上带来 6.8% 的 R@1 提升，且可视化分析显示该方法能根据输入图像动态调整注意力区域（见 **Figure 6**）。
 
-
-
 视觉地点识别（Visual Place Recognition, VPR）旨在根据查询图像从大规模地理参考数据库中检索最相似的地点图像，是自动驾驶、机器人导航与增强现实等应用的核心感知能力。近年来，基于深度学习的 VPR 方法取得了显著进展，但现有方案在效率与鲁棒性之间仍存在根本性张力。
 
 **单阶段方法的效率瓶颈**。以 NetVLAD（Arandjelovic et al., CVPR 2016）、CosPlace（Berton et al., CVPR 2022）、MixVPR（Ali-bey et al., WACV 2023）、EigenPlaces（Berton et al., ICCV 2023）、CricaVPR（Lu et al., CVPR 2024）、SALAD（Izquierdo and Civera, CVPR 2024）和 BoQ（Ali-Bey et al., CVPR 2024）为代表的单阶段方法，通过端到端聚合全局描述子实现快速检索，避免了重排序的计算开销。然而，当面临剧烈视角变化、季节更替、光照极端或场景翻新等环境扰动时，这些方法往往缺乏对样本特定判别区域的精细感知能力——它们要么依赖大容量骨干网络（如 DINOv2-L）来弥补判别力不足，要么生成高维描述子以保留更多信息，导致推理延迟和内存占用居高不下。
@@ -67,8 +65,6 @@ claims:
 **核心瓶颈**。现有单阶段 VPR 方法在应对极端环境变化时，要么采用大容量模型，要么使用计算密集型重排序，导致推理效率低、内存占用高，且缺乏对样本特定判别区域的自适应关注。这一瓶颈的根源在于：微调策略（如 adapter-based fine-tuning）对所有输入施加统一的参数调整，无法根据每张图像的内容动态分配特征提取资源；同时，局部特征增强机制要么缺失，要么与全局描述子割裂，难以在不引入重排序的前提下弥补单阶段方法对细节敏感度的不足。
 
 **本文动机**。针对上述问题，EfficientVPR 提出了一条轻量化单阶段路线：在保留 DINOv2-small（约 25M 参数）这一高效骨干的前提下，通过场景感知的视觉提示微调（SceneVPT）实现样本自适应的特征引导，并辅以实例依赖的关键局部特征增强模块，在不使用重排序的条件下提升局部判别力。其核心洞察在于：利用 ViT 的 CLS token 注意力值自适应地融合旧提示与新提示，无需额外模块即可实现实例级提示调整，既避免了灾难性遗忘又提升了任务适应性；以骨干处理后的提示为语义查询，通过交叉注意力增强多尺度全局特征与方向感知局部特征，从而弥补单阶段方法对关键区域的感知盲区。如 Figure 1 所示，EfficientVPR 在更低特征维度下取得了 7 个数据集上的最高平均 R@1，验证了“轻量骨干 + 自适应微调 + 语义引导局部增强”这一技术路线的有效性。
-
-
 
 ## 核心方法与创新机理
 
@@ -116,8 +112,6 @@ $$\hat{\mathbf{P}}_{i-1} = \alpha_i \cdot \mathbf{Z}_{i-1}^P + (1_{N_p} - \alpha
 
 EfficientVPR 的三个 changed slots——微调策略（SceneVPT）、局部特征增强（MsIA+OLE+SGFS）、骨干选择（DINOv2-S）——并非孤立改进，而是围绕“实例自适应”这一核心洞察的协同设计。SceneVPT 提供样本特定的语义线索，SGFS 利用这些线索增强局部判别力，轻量骨干则确保整体效率。这种“轻量化骨干 + 动态提示微调 + 语义引导增强”的组合，为单阶段 VPR 方法在效率与精度之间找到了新的平衡点。
 
-
-
 EfficientVPR 是一个轻量化的单阶段视觉地点识别框架，其核心设计目标是在保持强判别力的同时实现高推理效率与低特征维度。如图 2 所示，整个 pipeline 由 DINOv2-small 骨干、场景感知视觉提示微调模块（SceneVPT）以及实例依赖的关键局部特征增强模块三大部分串联构成。
 
 **输入-输出流**：给定一张查询图像，首先由冻结的 DINOv2-small 骨干提取 patch tokens 与 CLS token。SceneVPT 模块在骨干的每一层 Transformer 编码器中动态注入并筛选可学习提示（prompts），利用 CLS token 对提示的注意力权重实现样本自适应的提示融合，从而在保留预训练通用知识的前提下为下游任务提供场景特定的特征引导。随后，精炼后的提示特征与骨干输出的多尺度 patch 特征一同进入局部增强阶段：多尺度交互注意力（MsIA）恢复空间结构并融合跨尺度上下文，方向感知局部增强器（OLE）通过非对称卷积与正交投影提取几何互补的局部描述子，语义引导特征选择器（SGFS）以骨干处理后的提示为语义查询，通过交叉注意力对多尺度和方向感知局部特征进行样本特定的关键区域强化。最终，增强后的全局与局部特征经线性投影压缩至 3456 维，用于高效的图像检索。
@@ -126,15 +120,8 @@ EfficientVPR 是一个轻量化的单阶段视觉地点识别框架，其核心�
 
 **效率设计**：整个框架基于仅约 25M 参数的 DINOv2-small 构建，特征维度仅为 BoQ 的 28%，在 Pitts250k-test 上的单查询总延迟仅 3.1 ms（Table 2），实现了精度-效率的显著权衡。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2153_https_openaccess_thecvf_com_content_CVPR2026_html_Tang_EfficientVPR_Towa/figures/002_Figure_2.jpg]]
-*Figure 2: The overall architecture of our one-stage method. To maintain strong discriminative power while ensuring lightweight efficiency, we employ DINOv2-small as the backbone with SceneVPT for fine-tuning, preserving generalizable features while adapting to instance-specific characteristics. During feature enhancement, EfficientVPR uses MsIA and OLE to extract multi-scale global features and orientation-aware local features respectively, while SGFS performs instance-specific local feature enhancement of key regions based on sample-dependent semantic cues obtained from backbone*
-
 ![[assets/figures/papers/paper_list_l2153_https_openaccess_thecvf_com_content_CVPR2026_html_Tang_EfficientVPR_Towa/figures/004_Figure_4.jpg]]
 *Figure 4: Visualization of viewpoint-induced matching failure. The first two images depict the same location, while the third shows a different but similar place. Dramatic viewpoint shifts and seasonal appearance variations cause trees in the query image (red border in the first picture) to become non-overlapping regions absent in the correct reference match. Current one-stage methods tend to be misled by these irrelevant features, producing false matches to incorrect locations with visually similar nonoverlapping elements (red border in the third picture). By enhancing the discriminative representation of task-relevant and samplespecific key local regions and structural information, our method effec...*
-
-
 
 ### 场景感知视觉提示微调（SceneVPT）
 
@@ -196,12 +183,8 @@ $$\mathbf{f}_l^{\prime} = \mathrm{Attention}(\mathbf{f}_g^{\prime}, \mathbf{f}_l
 
 最终，增强后的全局和局部特征经拼接后通过线性投影压缩至 3456 维，在保持判别力的同时大幅降低内存占用——仅为 BoQ 特征维度的 **28%**（Table 2）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2153_https_openaccess_thecvf_com_content_CVPR2026_html_Tang_EfficientVPR_Towa/figures/003_Figure_3.jpg]]
 *Figure 3: SceneVPT Overview. Our SceneVPT extends VPTdeep via adaptive prompt selection, dynamically adjusting to input characteristics based solely on the backbone’s CLS token*
-
-
 
 ## 实验与关键发现
 
@@ -253,36 +236,17 @@ EfficientVPR 在七个公开 VPR 基准上进行了全面评估，涵盖大规�
 
 > **注意：** 上述部分局限性（如骨干泛化性、训练数据覆盖）在原文中有明确提及；关于特征漂移和自动化搜索的讨论则来自对方法机理的推演，需结合实际部署场景进一步验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2153_https_openaccess_thecvf_com_content_CVPR2026_html_Tang_EfficientVPR_Towa/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison with SOTA methods: average R@1 over 7 datasets and descriptor dimensionality. Our method achieves the best performance with lower feature dimensions compared to approaches with similarly-scale*
 
 ![[assets/figures/papers/paper_list_l2153_https_openaccess_thecvf_com_content_CVPR2026_html_Tang_EfficientVPR_Towa/figures/005_Figure_5.jpg]]
 *Figure 5: Qualitative comparison on challenging cases. Green boxes: correct matches; red boxes: errors. Drastic viewpoint changes along with domain shift (1th row), renovation-induced visual changes (2nd row), extreme lighting variations (3rd row), and severe occlusion coupled with time shift (4th row)*
 
-![[assets/figures/papers/paper_list_l2153_https_openaccess_thecvf_com_content_CVPR2026_html_Tang_EfficientVPR_Towa/figures/013_Figure_6.jpg]]
-*Figure 6: Visualization of fine-tuning methods. The first and third row visualizes features extracted by backbones fine-tuned with different methods. The second and fourth row shows their retrieval results (green boxes: correct matches; red boxes: errors). Frozen backbones attend to excessive task-irrelevant information. VPT-shallow improves but still has this issue. In the first group, street features are non-discriminative, whereas in the second group, they become discriminative features. Our SceneVPT enables dynamic adjustment of attention regions based on input images, while both VPT-deep and adapter-based methods fail to achieve this adaptability effectively*
-
-![[assets/figures/papers/paper_list_l2153_https_openaccess_thecvf_com_content_CVPR2026_html_Tang_EfficientVPR_Towa/figures/006_Table_1.jpg]]
-*Table 1: Comparison with SOTA methods on seven benchmarks. The best results are highlighted in bold and the second best are underlined. † Since the paper of SALAD, BoQ and FoL did not report their results on DINOv2-S, we additionally reproduced these results. ‡ CricaVPR utilizes a cross-image encoder architecture that exhibits instability with varying inference batch sizes. Consequently, we additionally provides results under the single query image scenario*
-
 ![[assets/figures/papers/paper_list_l2153_https_openaccess_thecvf_com_content_CVPR2026_html_Tang_EfficientVPR_Towa/figures/007_Table_2.jpg]]
 *Table 2: Comprehensive comparison with SOTA methods across model scales. † denotes the original version of the method reported by the authors. ”Train Time” denotes train time per epoch. Memory footprint (Memory) is calculated on the MSLS-val dataset, which includes 18871 database images. Latency is measured on Pitts250k-test, using the same CPU and GPU (RTX A800) and is averaged over 5 identical runs. ”Avg. Acc.” denotes the average R@1 across seven datasets*
 
 ![[assets/figures/papers/paper_list_l2153_https_openaccess_thecvf_com_content_CVPR2026_html_Tang_EfficientVPR_Towa/figures/009_Table_3.jpg]]
 *Table 3: Ablation on SceneVPT. Given that SGFS relies on prompts peocessed by the backbone, it is replaced with a linear layer in all experiments of this set. All test images are resized to 266 × 266*
-
-![[assets/figures/papers/paper_list_l2153_https_openaccess_thecvf_com_content_CVPR2026_html_Tang_EfficientVPR_Towa/figures/011_Table_4.jpg]]
-*Table 4: Ablation on token selection strategy. Random: randomly select prompts. Top-k: preserve only the top-k prompts with the highest attention scores (k=4, optimized through multiple trials). In contrast, our approach dynamically weights all tokens based on their attention values, effectively preserving more comprehensive information. Results demonstrate the superiority of our adaptive method across all datasets. All test images are resized to 266 × 266*
-
-![[assets/figures/papers/paper_list_l2153_https_openaccess_thecvf_com_content_CVPR2026_html_Tang_EfficientVPR_Towa/figures/012_Table_5.jpg]]
-*Table 5: Ablation on instance-dependent key local feature enhancement module. We analyzed the role of each sub-module in the instance-dependent key local feature enhancement module by removing or replacing key components. All test images are resized to 266 × 266*
-
-![[assets/figures/papers/paper_list_l2153_https_openaccess_thecvf_com_content_CVPR2026_html_Tang_EfficientVPR_Towa/figures/008_Table_6.jpg]]
-*Table 6: Ablation on SGFS. ”with BoQ block” refers to the variant where the SGFS module is replaced with a BoQ block, while ”with SGFS” means our full model that retains SGFS. All test images are resized to 266 × 266*
-
-
 
 ## 定位与知识库关联
 
@@ -329,8 +293,6 @@ EfficientVPR 的 SceneVPT 模块属于参数高效微调（PEFT）的研究范�
 3. **多模态查询扩展。** SGFS 当前以骨干处理后的视觉提示作为语义查询。如果引入文本描述、语义地图等多模态信息作为查询，能否进一步增强跨域地点识别能力？这一方向与当前视觉-语言模型的快速发展高度契合。
 4. **自动化架构搜索。** 能否通过神经架构搜索（NAS）或超参数优化（HPO）自动确定 MsIA 的多尺度分支数、OLE 的卷积核配置、N_p 的最优值等，以匹配不同部署场景的精度-效率约束？
 5. **持续学习与概念漂移缓解。** 在长期部署中，如何通过回放缓冲区、特征蒸馏或提示库动态更新等机制，缓解环境变化带来的特征遗忘问题？SceneVPT 的可学习提示池为此提供了一种潜在的轻量级解决方案——仅更新提示而非整个模型参数。
-
-
 
 ## 原文 PDF
 

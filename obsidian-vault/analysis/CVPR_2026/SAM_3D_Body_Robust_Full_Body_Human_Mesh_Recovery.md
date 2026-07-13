@@ -81,8 +81,6 @@ claims:
 - MHR表示对**儿童等不同年龄组的身体形状建模不足**，可能导致姿态与形状估计不准确。
 - 开放问题包括：如何将多人/人-物交互融入训练、如何进一步缩小与专用手部方法的精度差距、VLM失败分析提示的具体构造方式、密集关键点检测器的详细架构，以及如何扩展模型以覆盖更全面的年龄与体型分布。
 
-
-
 ### 问题背景
 
 从单张图像中恢复完整的人体三维网格（Human Mesh Recovery, HMR）是计算机视觉领域的核心挑战之一。该任务要求模型同时估计人体的三维姿态、形状以及手部细节，其应用场景涵盖虚拟现实、运动分析、人机交互等。近年来，以SMPL/SMPL-X为参数化人体模型的方法取得了显著进展，但在开放环境（in-the-wild）下的鲁棒性始终是制约实际部署的关键瓶颈。
@@ -102,8 +100,6 @@ claims:
 1. **数据多样性与标注质量是鲁棒性的第一性原理。** 与其在有限数据上设计更复杂的模型，不如从根本上扩大高质量数据的覆盖范围。3DB通过构建VLM驱动的自动化数据引擎，从大规模图像库中主动挖掘困难样本，并配合多阶段高精度标注管道生成可靠的伪真值，从而在数据源头突破多样性与质量的权衡。
 
 2. **可提示的分离式架构是泛化能力的关键。** 3DB采用共享图像编码器与分离的身体/手部解码器设计，使不同粒度的姿态估计任务得以独立优化。同时，模型支持2D关键点、分割掩码等辅助提示输入，既能在歧义场景下融合用户先验，又能通过关键点提示对齐腕部和肘部，消除身体与手部解码器之间的误差传播，实现单一模型在全身体重建上达到甚至超越专用模型的性能。
-
-
 
 ## 核心方法与创新机理
 
@@ -148,8 +144,6 @@ SAM 3D Body (3DB) 的核心创新围绕一个中心诊断展开：现有 HMR 方
 | 手部优化 | 全身统一预测，细节不足 | 独立手部解码器 + 关键点提示对齐 |
 
 这些创新并非孤立存在，而是形成了一个**数据-架构-表示**三位一体的系统：数据引擎为分离式架构提供了充足的多样化监督信号，可提示设计使模型能有效利用这些信号，而 MHR 表示为整个流程提供了统一且稳定的参数化基础。
-
-
 
 SAM 3D Body (3DB) 采用**可提示的编码器-解码器架构**，核心设计原则是共享视觉编码、分离身体与手部解码，并通过可选的辅助提示实现可控推理。整体pipeline由以下模块串联构成：
 
@@ -201,15 +195,11 @@ $$\mathcal{L}_{\mathrm{train}} = \sum_i \lambda_i \mathcal{L}_i$$
 
 该pipeline的核心优势在于：数据多样性从根本上提升了泛化能力，可提示架构赋予了灵活的可控性，分离式解码器解决了身体-手部优化冲突，使单一模型在全身体重建上达到甚至超越专用模型的性能。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2602_15989/figures/002_Figure_2.jpg]]
 *Figure 2: SAM 3D Body Model Architecture. We employ a promptable encoder–decoder architecture with a shared image encoder and separate decoders for body and hand pose estimation*
 
 ![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2602_15989/figures/001_Figure_1.jpg]]
 *Figure 1: Full-body human mesh recovery results using SAM 3D Body (3DB). Our model demonstrates robust performance in estimating challenging poses across diverse viewpoints and produces accurate body and hand pose estimations within a unified framework*
-
-
 
 ### 3.1 图像编码模块
 
@@ -268,18 +258,11 @@ $$\mathcal{L}_{\mathrm{train}} = \sum_i \lambda_i \mathcal{L}_i$$
 
 其中 $\mathcal{L}_i$ 包括2D关键点重投影损失、3D关键点损失、MHR参数回归损失、手部检测损失（GIoU损失和L1损失）等。3D关键点损失采用预热调度策略，逐步引入以稳定训练。超参数 $\lambda_i$ 的具体取值需查阅原始论文或代码仓库进行手动验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2602_15989/figures/003_Figure_3.jpg]]
 *Figure 3: Left: GUI of our annotation tool for annotating 2D keypoints. Right: Comparison of the dense (thin) and sparse (thick) keypoints for pseudo annotation*
 
-![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2602_15989/figures/005_Figure_5.jpg]]
-*Figure 5: Examples of MHR mesh fitting results. (a) Multi-view mesh fitting. Source: EgoExo4D Grauman et al. (2024). (b) Scan-based mesh fitting. Source: Re:Interhand Moon et al. (2023)*
-
 ![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2602_15989/figures/018_Figure_9.jpg]]
 *Figure 9: Qualitative comparison to show the impact from using keypoint prompting and unifying the predictions from hand decoder and body decoder*
-
-
 
 ## 实验与关键发现
 
@@ -319,30 +302,11 @@ $$\mathcal{L}_{\mathrm{train}} = \sum_i \lambda_i \mathcal{L}_i$$
 
 Table 1列出了3DB的完整训练数据集，包括图像/帧数、主体数和视角数。标注星号的数据集同时用于训练手部解码器。数据来源涵盖室内受控场景和in-the-wild图像，确保了姿态、视角和外观的多样性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2602_15989/figures/008_Table_2.jpg]]
 *Table 2: Comparison on five common benchmarks. The best results are highlighted in bold, while the second-best results are underlined. Results evaluated using publicly released checkpoint denoted by †. Models trained using RICH denoted by ∗*
 
-![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2602_15989/figures/009_Table_3.jpg]]
-*Table 3: Comparison on five new benchmark datasets. The best results are highlighted in bold, while the second-best results are underlined. MPJPE is computed on 24 SMPL keypoints*
-
-![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2602_15989/figures/010_Table_4.jpg]]
-*Table 4: Comparison on Freihand for hand pose estimation. Methods using Freihand for training are denoted by †*
-
-![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2602_15989/figures/012_Table_6.jpg]]
-*Table 6: 3D categorical performance analysis*
-
 ![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2602_15989/figures/016_Table_7.jpg]]
 *Table 7: Ablation on 2D keypoint prompting with 3DB-H. We report results under varying numbers of prompts, as well as different noise scales for a single prompt*
-
-![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2602_15989/figures/017_Table_8.jpg]]
-*Table 8: Comparison on mask-conditioned inference with 3DB-DINOv3 on multi-person datasets*
-
-![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2602_15989/figures/015_Figure_8.jpg]]
-*Figure 8: Comparison of 3DB win rate against baselines for human preference study. Win rate (%) and number of wins out of 80*
-
-
 
 ## 定位与知识库关联
 
@@ -395,8 +359,6 @@ SAM 3D Body (3DB) 处于单图像全身体人体网格恢复（HMR）这一研�
 5. **训练超参数的调优策略**：多任务训练损失中 $\lambda_i$ 的具体取值和调参策略（如 3D 关键点损失的 warm-up 调度）对复现和迁移至新数据域至关重要。
 
 6. **年龄与体型多样性的覆盖**：如何扩展模型以覆盖更全面的年龄和体型分布，特别是儿童和极端体型？这需要数据引擎有针对性地挖掘相应样本，并可能需要 MHR 表示的进一步扩展。
-
-
 
 ## 原文 PDF
 

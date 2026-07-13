@@ -75,8 +75,6 @@ claims:
 
 FlashDecoder在方法谱系中处于**流式Transformer解码器**的交叉点：它继承了Transformer解码器的高表达能力和灵活的上采样设计，同时通过流式训练协议和滚动KV缓存解决了因果Transformer的训练困难与内存增长问题。与卷积解码器相比，FlashDecoder以更低的计算和内存代价实现了相当的重建质量；与现有的Transformer解码器相比，它是首个同时支持高质量重建、高分辨率训练和流式推理的方案。
 
-
-
 ### 潜空间视频扩散模型的解码瓶颈
 
 视频生成领域正经历从像素级生成向潜空间扩散模型的范式转移。主流方案（如 **Wan2.2**，Team Wan et al., arXiv 2025；**Wan2.1**，Team Wan et al., arXiv 2025）将视频压缩至紧凑的潜空间进行扩散建模，再通过VAE解码器将潜变量重建为像素帧。然而，随着扩散模型推理效率的持续优化，**VAE解码器已成为实时视频生成中最突出的计算瓶颈**。
@@ -104,8 +102,6 @@ FlashDecoder旨在从根本上解决上述矛盾。其核心洞察是：**时间
 3. **有界内存与恒定延迟**：固定大小的滚动KV缓存确保无论视频长度如何，每帧解码的延迟和内存消耗保持恒定。
 
 通过这一统一的流式协议，FlashDecoder在保持与卷积解码器匹敌的重建质量（1080p下PSNR 41.55 vs. 41.49 dB）的同时，实现了3.6×–4.7×的吞吐量提升和最高11×的内存降低，将VAE解码从实时视频生成的瓶颈转变为高效可扩展的组件。
-
-
 
 ## 核心方法与创新机理
 
@@ -136,8 +132,6 @@ FlashDecoder 最关键的 changed slot 是**训练与推理使用完全相同的
 ### 创新点的协同效应
 
 上述 changed slots 并非孤立存在，而是形成紧密的因果链条：**SW-CA + 流式训练**消除了因果掩码依赖，使训练与推理协议统一；**GQA + 滚动 KV 缓存**将统一协议下的内存开销控制在有界范围内；**时序优先上采样**则进一步缓解了空间注意力二次复杂度对高分辨率场景的制约。三者共同实现了论文的核心主张——在匹敌卷积解码器重建质量（1080p 下 PSNR 41.55 vs. 41.49 dB）的同时，吞吐量提升 3.6×–4.7×，内存降低最高 11×。
-
-
 
 FlashDecoder 是一个纯 Transformer 的视频解码器，将潜空间视频帧逐帧转换为像素。其设计核心是**训练与推理使用完全相同的流式协议**——模型在任何阶段一次最多只能看到 $W_{\text{frm}}$ 帧，通过处理顺序而非显式注意力掩码来强制执行时间因果性。
 
@@ -175,12 +169,8 @@ FlashDecoder 的推理管线由五个模块串联构成，数据流严格遵循�
 
 每帧的注意力计算复杂度为 $\mathcal{O}(N W_{\text{frm}} L_{\text{frm}}^2 D_h)$，与时间窗口 $W_{\text{frm}}$ 和头数 $N$ 呈线性关系，但与空间 token 数 $L_{\text{frm}}$ 呈二次关系。每层的 KV 缓存内存为 $\mathcal{O}(B G W_{\text{frm}} L_{\text{frm}} D_h)$，得益于 GQA 减少的组数（$G \ll N$）。由于 $W_{\text{frm}}$ 固定，无论视频长度如何，内存和每帧延迟均保持恒定——这是 FlashDecoder 支持长视频流式解码的关键保证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l871_https_openaccess_thecvf_com_content_CVPR2026_html_Kang_FlashDecoder_Real/figures/003_Figure_3.jpg]]
 *Figure 3: FlashDecoder pipeline. FlashDecoder is a pure-Transformer decoder that converts video latents to pixels in a frame-by-frame manner. Each latent frame*
-
-
 
 ### 3.1 潜变量投影
 
@@ -237,8 +227,6 @@ $$
 $$
 
 其中 $\mathcal{L}_{\mathrm{L1}}$ 为逐像素 L1 损失，$\mathcal{L}_{\mathrm{LPIPS}}$ 为感知相似度损失，$\mathcal{L}_{\mathrm{adv}}$ 为 3D 块判别器的对抗损失。三者协同优化重建保真度与视觉质量——对抗损失以小幅 PSNR 下降换取更低的 rFVD 和更清晰的输出。
-
-
 
 ## 实验与关键发现
 
@@ -302,11 +290,6 @@ W_frm=2在质量与内存之间取得最佳平衡点。增大窗口可略微提�
 
 5. **对抗训练的取舍**：对抗训练以PSNR下降换取感知质量提升，在对像素级精度要求极高的应用中需谨慎权衡。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l871_https_openaccess_thecvf_com_content_CVPR2026_html_Kang_FlashDecoder_Real/figures/001_Figure_1.jpg]]
-*Figure 1: VAE decoding is a major bottleneck for real-time video generation. Measured with our MotionStream [45] implementation at 720p. The Wan2.2 [62] decoder consumes 64.6% of total inference time, limiting generation to 10.4 FPS. FlashDecoder reduces this share to 16.4%, more than doubling end-to-end throughput to 24.8 FPS*
-
 ![[assets/figures/papers/paper_list_l871_https_openaccess_thecvf_com_content_CVPR2026_html_Kang_FlashDecoder_Real/figures/002_Figure_2.jpg]]
 *Figure 2: Qualitative comparison of 720p reconstruction results. We compare reconstructed frames from video decoders with 4× temporal and 16× spatial compression: (a) Wan2.2-TAEHV [3], (b) AToken [34], (c) Wan2.2 [61], (d) our FlashDecoder-XL-Opt, and (e) ground truth. (a) fails to synthesize fine details such as wall textures, while (b) produces blurry reconstructions. (c) and (d) yield visually comparable outputs, yet (d) achieves over 9× higher throughput (151.0 vs. 16.1 FPS). Additional comparisons are provided in the supplementary material*
 
@@ -321,14 +304,6 @@ W_frm=2在质量与内存之间取得最佳平衡点。增大窗口可略微提�
 
 ![[assets/figures/papers/paper_list_l871_https_openaccess_thecvf_com_content_CVPR2026_html_Kang_FlashDecoder_Real/figures/007_Table_4.jpg]]
 *Table 4: Effect of window size*
-
-![[assets/figures/papers/paper_list_l871_https_openaccess_thecvf_com_content_CVPR2026_html_Kang_FlashDecoder_Real/figures/008_Table_5.jpg]]
-*Table 5: Model scaling. FlashDecoder variants trained for 150K iterations at 224×224 (Stage 1 only) and evaluated on UltraVideo at 480p with 17 frames for fast iteration. Numbers are not directly comparable to Table 2, which uses the full three-stage training. Mem denotes peak GPU memory in GB*
-
-![[assets/figures/papers/paper_list_l871_https_openaccess_thecvf_com_content_CVPR2026_html_Kang_FlashDecoder_Real/figures/009_Figure_4.jpg]]
-*Figure 4: Per-frame PSNR on long videos at 720p. Averaged over 40 videos (>400 frames each) from UltraVideo. FlashDecoder maintains stable quality with constant memory regardless of video length*
-
-
 
 ## 定位与知识库关联
 
@@ -406,8 +381,6 @@ FlashDecoder的设计假设和适用边界包括：
 6. **跨任务泛化**：FlashDecoder的流式解码范式（逐帧处理+滚动KV缓存）是否可以推广到其他需要因果时序建模的视觉任务，如视频预测、动作识别、视频插帧等？
 
 7. **单阶段训练简化**：能否将多阶段训练流程简化为混合分辨率单阶段训练，同时保持甚至提升当前的重建质量？这需要解决不同分辨率下模型容量分配和损失平衡的问题。
-
-
 
 ## 原文 PDF
 

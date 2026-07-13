@@ -74,8 +74,6 @@ PGLLM 在多个基准上取得了一致且显著的性能增益：
 
 PGLLM 的有效性依赖于初始 PointLLM 生成描述的基本质量；当上下文示例包含不准确信息时，第二阶段评分可能产生偏差。此外，当前框架假设点云类别集合是已知且固定的，如何扩展到完全开放集场景仍需探索。图构建与分数传播机制在大规模室外 LiDAR 点云上的计算效率，以及与参数高效微调（如 LoRA）的结合潜力，也是值得进一步研究的方向。
 
-
-
 三维点云理解是自动驾驶、机器人导航与增强现实等应用的核心感知能力。随着多模态大语言模型（MLLM）的快速发展，将点云数据与语言模型结合以实现开放词汇的3D理解已成为新兴范式。然而，现有3D MLLM面临一个关键瓶颈：**几何结构相似的三维点云难以被有效区分，导致严重的类间混淆，单张独立点云的推理可靠性不足**。
 
 具体而言，当前方法（如**PointLLM**（Xu et al., 2024）和**MiniGPT-3D**（Tang et al., 2024））通常采用两阶段流水线——先用3D编码器提取特征并生成文本描述，再将描述送入LLM进行推理。这种范式将每个测试样本视为孤立个体，忽视了测试数据内部固有的流形结构。当面对外观相似但类别不同的点云时，LLM缺乏足够的上下文信息来做出准确判断，尤其在分布外（OOD）检测任务中，模型难以可靠地区分已知类别与未知类别。
@@ -83,8 +81,6 @@ PGLLM 的有效性依赖于初始 PointLLM 生成描述的基本质量；当上�
 这一观察揭示了一个可操作的因果调节变量：**测试样本的歧义可通过其流形邻居的语义一致性来消解**。如果能够利用测试数据自身的几何相似性结构，将孤立样本的推理扩展为局部邻域的协同推理，就有可能在无需重新训练的前提下显著提升3D理解性能。
 
 基于上述动机，本文提出**Point-Graph LLM（PGLLM）**框架，核心思路是将LLM推理从孤立样本扩展到局部邻域，通过图上标签传播机制校准置信度。具体而言，PGLLM利用预训练点云编码器构建KNN图以捕获测试数据的流形结构，将图上邻居的文本描述作为上下文示例引导LLM推理（上下文引导），并引入基于标签传播的分数细化机制对LLM输出的置信度进行平滑修正。这一设计使得模型能够在测试时动态利用数据内在结构，从而提升分类与OOD检测的鲁棒性。
-
-
 
 ## 核心方法与创新机理
 
@@ -129,8 +125,6 @@ PGLLM在支持集构建上提供了两种模式（Section 4.1），增强了方�
 
 值得注意的是，PGLLM并不依赖昂贵的闭源API。实验表明，当使用低成本开源LLM（DeepSeek-V3）作为第二阶段模型时，PGLLM仍以62.3%的平均分类准确率超越所有基于GPT-4的基线方法（Table 3），证明了该框架的通用性和实用性。
 
-
-
 ![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_qsra0EsUpe/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed framework for PGLLM. After encoding the 3D test samples, the framework feeds them into PointLLM for caption generation and uses them to construct a KNN graph. Initial answers are then synthesized via LLM inference. Subsequently, leveraging relational structures within the KNN graph, we introduce an answer iteration mechanism to optimize performance on downstream tasks*
 
@@ -165,8 +159,6 @@ $$\hat{y} = \begin{cases} \text{OOD} & \text{if } S(x_i) \le \delta, \\ \text{ID
 
 消融实验（Table 4）揭示了各模块的协同效应：单独使用in-context guidance可将ModelNet40 OOD检测的AUROC从80.4提升至83.0，单独使用score propagation可将FPR95从100.0降至62.0，而二者联合使用则达到最优的85.9 AUROC和52.1 FPR95，验证了上下文引导与分数传播的互补性。
 
-
-
 PGLLM框架由三个核心模块串联构成：**3D特征编码与图构建**、**上下文引导推理（In-context Guidance）**、以及**分数传播细化（Score Refinement）**。各模块均运行于测试时，无需修改任何预训练模型参数。
 
 ### 3D特征编码与KNN图构建
@@ -193,8 +185,6 @@ $$\hat{y} = \begin{cases} \text{OOD} & \text{if } S(x_i) \le \delta, \\ \text{ID
 
 消融实验（Table 4）证实，上下文引导与分数传播具有互补协同效应：单独使用上下文引导可将ModelNet40 OOD检测AUROC从80.4提升至83.0，单独使用分数传播可将FPR95从100.0降至62.0；二者联合使用时，ModelNet40上ACC达63.1、AUROC达85.9、FPR95降至52.1，均显著优于任一单独模块。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能瓶颈与实验动机
@@ -210,11 +200,6 @@ $$\hat{y} = \begin{cases} \text{OOD} & \text{if } S(x_i) \le \delta, \\ \text{ID
 #### 3D OOD检测
 
 Table 1展示了闭源LLM设置下的OOD检测结果。PGLLM^T在ModelNet40的三个子集（MN1-MN3）上平均AUROC达到**85.9%**，相比PointLLM直接推理的80.0%提升5.9个百分点；在ShapeNetCore的三个子集（SN1-SN3）上平均AUROC达到**91.1%**，较PointLLM的87.7%提升3.4个百分点。尤其值得注意的是，在最具挑战性的MN3子集上，PGLLM^T的AUROC从69.6%跃升至**80.1%**，FPR95从100.0%降至69.3%，表明流形引导机制对困难样本的改善尤为显著。
-
-![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_qsra0EsUpe/figures/003_Table_1.jpg]]
-
-![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_qsra0EsUpe/figures/004_Table_1.jpg]]
-*Table 1: Evaluation of 3D OOD detection on ModelNet40 and ShapeNetCore. Bold and underlined numbers denote the best and second-best results, respectively. Each ”MNx” or ”SNx” denotes the known class split and the rest are unknown. Table 2: Evaluation of 3D OOD detection on ModelNet40 and ShapeNetCore for open-sourced LLM*
 
 Table 2进一步验证了方法在开源LLM上的可移植性。使用MiniGPT-3D作为一阶段模型、Qwen3-VL-8B作为第二阶段LLM时，PGLLM^T在ModelNet40 MN1上取得**92.4% AUROC**和53.0% FPR95，超越所有闭源基线。使用DeepSeek-V3时，PGLLM^T在ModelNet40平均AUROC仍达到**82.7%**，证明方法不依赖高端闭源API。
 
@@ -272,20 +257,6 @@ Figure 5分析了KNN邻居数量K对OOD检测性能的影响。ModelNet40在**K=
 | Figure 5 | K值选择需适配数据集特性，ModelNet40最优K=7，ShapeNetCore最优K=4 |
 | Figure 4 | 方法在S3DIS真实场景上保持显著优势，验证了跨域泛化能力 |
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_qsra0EsUpe/figures/013_Table_5.jpg]]
-*Table 5: For each distinct out-of-distribution (OOD) subset partition on the ShapeNetCore, the categories residing within a given subset are designated as in-distribution (ID), whereas categories from all other subsets are considered entirely OOD*
-
-![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_qsra0EsUpe/figures/015_Table_6.jpg]]
-
-![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_qsra0EsUpe/figures/016_Table_7.jpg]]
-*Table 7: For each distinct out-of-distribution (OOD) subset partition on the ModelNet40, the categories residing within a given subset are designated as in-distribution (ID), whereas categories from all other subsets are considered entirely OOD*
-
-![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_qsra0EsUpe/figures/017_Table_8.jpg]]
-
-
-
 ## 定位与知识库关联
 
 ### 问题定位与核心瓶颈
@@ -320,8 +291,6 @@ PGLLM处于3D MLLM测试时优化与流形学习的交叉点。其方法谱系�
 3. **与参数高效微调的融合**：能否将当前的测试时优化框架与参数高效的微调方法（如LoRA）结合，在标注数据稀缺时获得进一步增益？
 4. **开放集泛化**：如何将固定类别集合的假设松弛为开放集场景，使框架能处理训练时未见过的物体类别？
 5. **多模态融合深度**：当前方法仅在文本空间进行上下文引导，是否可以将图结构信息直接注入LLM的视觉编码或注意力机制中，实现更深层的多模态流形感知？
-
-
 
 ## 原文 PDF
 

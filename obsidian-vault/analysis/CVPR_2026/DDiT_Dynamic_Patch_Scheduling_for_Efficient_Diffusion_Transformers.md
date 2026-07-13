@@ -188,8 +188,6 @@ $$
 
 DDiT的完整推理管线由四个核心模块串联构成：**多尺度Patch Embedding**将隐空间分块并嵌入为token序列；**位置嵌入插值**通过双线性插值适配不同patch尺寸的位置编码；**Patch-Size Identifier Embedding**注入当前patch大小的标识信息；**动态Patch调度器**在每个去噪步计算隐空间加速度和空间方差，依据式(5)选择当前步的patch尺寸。所有模块均以训练免费或极低成本微调的方式实现，无需修改基础DiT的预训练权重。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l853_https_arxiv_org_abs_2602_16968/figures/006_Figure_6.jpg]]
 *Figure 6: Visualization of*
 
@@ -224,8 +222,6 @@ DDiT在文本到图像（T2I）和文本到视频（T2V）两大任务上均实�
 3. **调度器超参数需手动预设。** τ和百分位数ρ的取值需要针对不同模型进行经验性选择，目前尚未实现完全自动化的学习机制。
 
 4. **仍需少量微调。** 尽管DDiT仅需LoRA微调（训练成本远低于全模型训练），但仍需要为目标模型构建合成数据集以完成蒸馏训练，对完全免训练的应用场景存在一定门槛。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l853_https_arxiv_org_abs_2602_16968/figures/007_Table_1.jpg]]
 *Table 1: Quantitative comparison of text-to-image generation performance with state-of-the-art methods on COCO, DrawBench, and PartiPrompts. If not specified, all results are reported using 50 inference steps by default. Each color ( Yellow , Blue ) indicates methods operating at similar inference speeds. As highlighted in Blue , our method achieves the best overall image quality, evidenced by the lowest FID scores, strong prompt alignment (CLIP and ImageReward), and high perceptual similarity (SSIM and LPIPS). Bold: best. Underline: second-best*

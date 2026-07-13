@@ -76,8 +76,6 @@ FFIM 是一个即插即用的可控去噪框架，包含三个核心阶段：
 
 FFIM 的性能上限受所选预训练取证代理模型的泛化能力限制，相似度阈值和优化步长等超参数需手工调节，且尚未验证在 SD3、FLUX 等直接预测式扩散模型上的适用性。如何将该噪声调整策略扩展到更广泛的生成范式，以及设计自适应的参数选择机制，是未来值得探索的方向。
 
-
-
 ### 问题背景：图像编辑的取证困境
 
 随着潜在扩散模型（Latent Diffusion Models, LDMs）的快速发展，服务端图像编辑能力已大幅提升——用户只需提供图像和掩膜提示，即可获得语义连贯、视觉逼真的编辑结果。然而，这种便利性也带来了严峻的取证挑战：**标准扩散模型生成的编辑图像在取证空间中缺乏内生可区分特征**，使得第三方被动取证工具难以有效检测和定位编辑区域。
@@ -103,8 +101,6 @@ $$\mathrm{Loc}(\hat{\mathbf{M}}_{\mathrm{FF}}, \mathbf{M}) > \mathrm{Loc}(\hat{\
 3. **兼顾用户需求与取证性能**：在提升取证检测能力的同时，确保编辑结果在主观满意度和客观质量指标上与标准扩散模型无显著差异。
 
 如图 Figure 1 所示，采用 FFIM 的服务端可在满足用户编辑需求的同时，使第三方取证工具无需任何先验信息即可有效定位篡改区域。这一范式转变将取证责任从“事后检测”前移至“生成阶段设计”，为图像编辑的可信生态提供了新思路。
-
-
 
 ## 核心方法与创新机理
 
@@ -164,8 +160,6 @@ $$\mathcal{L}_{\mathrm{adv}} = \mathcal{S}\left(\tilde{\mathbf{M}} \odot \mathca
 
 2. **需求满足约束下的优化**：FFIM 在优化取证可区分性的同时，通过正交投影保证噪声调整不偏离用户编辑需求。用户主观满意度评分（FFIM 4.15 vs. 基线 DDPM 4.17，5-point Likert 量表）和客观质量指标（熵、噪声、对比度，Table 2）均无显著差异，验证了方法在取证友好性与用户体验之间的有效平衡。
 
-
-
 FFIM 的整体设计围绕一个核心矛盾展开：标准潜在扩散模型（LDM）生成的编辑图像，其编辑区域与未编辑区域在取证空间中缺乏内生可区分特征，导致第三方被动取证难以检测和定位篡改。FFIM 在不依赖服务器提供私有水印或溯源信息的前提下，通过干预去噪过程中的噪声采样与优化，使生成图像自带取证友好的区域差异线索。
 
 ### 三阶段流水线
@@ -193,13 +187,6 @@ FFIM 的推理流水线由三个核心阶段串联构成（Figure 2），嵌入�
 ### 与标准 LDM 的关系
 
 FFIM 并非重新训练扩散模型，而是作为即插即用的推理阶段介入策略。其基础去噪骨干（Base LDM Denoising）保持冻结，仅修改每步去噪中噪声的采样与调整方式。这一设计使得 FFIM 可以兼容现有的掩膜‑提示条件 LDM 架构，同时保持生成图像在熵、噪声、对比度等客观质量指标上与标准 LDM 结果的差异微小（Table 2），不损害用户体验。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2490_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Forensic_Friendly/figures/001_Figure_1.jpg]]
-*Figure 1: Adopting the proposed FFIM, the server can generate results that satisfy user requirements while facilitating forgery localization by third-party forensics without consensus*
-
-
 
 ### 问题形式化：取证友好的约束条件
 
@@ -327,8 +314,6 @@ $$
 
 这一设计使 FFIM 在不依赖外部水印或私有溯源信息的前提下，仅通过调控去噪过程中的噪声采样，即可为第三方取证提供内生的、可检测的区域差异线索。
 
-
-
 ## 实验与关键发现
 
 ### 实验设置与评估协议
@@ -363,9 +348,6 @@ Table 1 汇总了 FFIM 与基线方法在四个数据集上经五种取证模型
 ### 图像级检测：ROC 分析
 
 Figure 4 展示了 Combined AniCOCO 数据集上三种图像级检测器的 ROC 曲线。FFIM 编辑图像在 **CNND**、**UFDA** 和 **DRCT** 检测器上的 AUC 分别提升 **+14.8%**、**+13.5%** 和 **+27.3%**。其中 DRCT 检测器的增益最为显著（+27.3%），说明 FFIM 生成的取证线索对不同架构的检测器均有正向迁移能力。
-
-![[assets/figures/papers/paper_list_l2490_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Forensic_Friendly/figures/006_Figure_4.jpg]]
-*Figure 4: ROC curves in image-level detection of Evaluation I*
 
 图像级检测评估的是“该图像是否经过编辑”的二分类能力，而非精确定位。FFIM 在此任务上的大幅提升表明，其引入的内生信号不仅增强了区域可区分性，还使整张图像在取证空间中与原始自然图像的分布产生了可检测的偏移——这正是第三方取证所需的关键特性。
 
@@ -420,15 +402,8 @@ Table 4 消融了 Phase III 中不同取证代理模型作为显式引导源的�
 
 5.  **下游鲁棒性未知。** FFIM 编辑图像在经历再次编辑、有损压缩或社交媒体传输后，内生取证线索是否依然稳健，目前缺乏系统性评估。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2490_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Forensic_Friendly/figures/008_Figure_5.jpg]]
-*Figure 5: Impact of different norm constraints in FFIM*
-
 ![[assets/figures/papers/paper_list_l2490_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Forensic_Friendly/figures/003_Figure_3.jpg]]
 *Figure 3: Qualitative comparisons in pixel-level localization of Evaluation I. For user requests, we present the server’s editing results using baseline DDPM [21], ReLoc [70], and the proposed*
-
-
 
 ## 定位与知识库关联
 
@@ -475,8 +450,6 @@ FFIM 的方法论贡献可沿以下维度定位：
 4.  **动态权衡策略。** 如何在多步去噪过程中自适应地分配取证优化强度——例如在早期步骤侧重布局生成、后期步骤侧重取证特征增强——以在视觉质量与取证可区分性之间取得更优的帕累托前沿？
 
 5.  **下游鲁棒性。** FFIM 生成的编辑图像在经历有损压缩、二次编辑、社交媒体传输等下游处理后，其内生的取证线索是否依然稳健？这需要系统性的鲁棒性评估，目前尚未覆盖。
-
-
 
 ## 原文 PDF
 

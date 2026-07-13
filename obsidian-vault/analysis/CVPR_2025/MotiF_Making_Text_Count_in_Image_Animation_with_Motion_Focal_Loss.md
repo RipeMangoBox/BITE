@@ -57,8 +57,6 @@ claims:
 
 MotiF 的局限在于：生成视频的运动自然度仍有提升空间；当文本要求在场景中引入新物体或仅针对多物体中的某一个时，运动生成的精确性和连贯性不足。此外，现有自动评估指标普遍偏重相机/背景运动，难以公正反映物体运动质量，评估体系本身仍需完善。
 
-
-
 文本驱动的图像到视频生成（TI2V）任务要求模型根据一张静态图像和一段描述运动的文本提示，生成一段连贯的动态视频。该任务的核心挑战在于：模型必须同时保持对输入图像的高保真度，并严格遵循文本中指定的运动语义。然而，现有方法在这一平衡点上普遍表现不佳。
 
 ### 核心瓶颈：条件图像泄漏与运动区域忽视
@@ -84,8 +82,6 @@ MotiF提出了一个正交于输入信号增强的新方向：**修改训练目�
 ### 与先前工作的关系
 
 如Figure 2所示，MotiF与现有方法并非替代关系，而是互补关系。先前工作关注“给模型什么输入”，MotiF关注“让模型优化什么目标”。两者可以正交叠加：在采用增强运动输入的同时，也可以使用运动焦点损失来强化训练信号。这一设计哲学使MotiF成为一个轻量、即插即用的训练策略，可广泛应用于各类TI2V架构。
-
-
 
 ## 核心方法与创新机理
 
@@ -125,8 +121,6 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{diffusion}} + \lambda \mathcal{L}_{\mathrm{
 - **连续热力图的优势**：使用光流生成的连续热力图在文本对齐和物体运动上优于基于 SAM 的二元掩码热力图（Table A1），表明细粒度的运动强度信息对训练目标加权至关重要。
 - **λ 的鲁棒性**：运动焦点损失权重 λ=1 时综合性能最优，但降低 λ 可改善视觉质量（Table A2），提供了实际应用中的调节灵活性。
 
-
-
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2412_16153/figures/002_Figure_1.jpg]]
 *Figure 1: Motivation and results of MotiF. (a) Example video frames and the corresponding motion heatmaps calculated from optical flow. In this example, 97% of the pixels are static while only 3% has meaningful motion. (b) In standard TI2V training pipeline, the model may learn to over-rely on the conditional image to optimize the L2 loss. This issue has been identified in [53] and termed as conditional image leakage. We propose MotiF to guide the model’s learning to focus on regions with more motion via motion heatmap re-weighting. (c) Qualitative results comparing MotiF to the baseline on examples from our proposed TI2V-Bench evaluation set*
 
@@ -159,8 +153,6 @@ MotiF 基于预训练的文本到视频扩散模型 **VideoCrafter2** 构建，�
 ### 与先前工作的关键差异
 
 先前方法（如 DynamiCrafter、Cinemo 等）主要致力于从输入图像中提取额外的运动先验（运动分数、运动掩码等）作为模型的附加输入信号，让模型隐式地学习利用这些信息。MotiF 则从**学习目标层面**利用运动先验——运动热力图仅用于训练阶段的损失加权，推理时完全不需要。这一设计使得 MotiF 与现有技术互补：理论上可以将运动焦点损失应用于任何 TI2V 模型的训练中，而无需改变其推理管道。
-
-
 
 MotiF 的核心设计思路是：**不修改模型架构或增加推理时的额外输入，而是改造训练目标本身**。其方法由三个关键模块构成：运动热力图生成、运动焦点损失计算，以及图像条件注入方式的选择。
 
@@ -205,8 +197,6 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{diffusion}} + \lambda \mathcal{L}_{\mathrm{
 ### 3.4 与先前工作的本质区别
 
 此前的 TI2V 方法主要聚焦于**输入信号增强**——从条件图像中提取额外的运动分数或运动掩码，作为模型的附加输入信号。MotiF 则选择了一条正交路径：**在训练目标层面利用运动先验**。运动热力图仅用于训练阶段的损失加权，推理时无需任何额外输入，因此与现有的输入增强技术天然互补。
-
-
 
 ## 实验与关键发现
 
@@ -280,34 +270,14 @@ MotiF 基于预训练的 T2V 扩散模型 **VideoCrafter2** 构建，在 512×51
 | Table A1 | 光流连续热力图优于 SAM 二元掩码，尤其在文本对齐和物体运动维度 |
 | Table A2 | λ=1 综合最优；降低 λ 改善视觉质量但损害运动生成 |
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2412_16153/figures/001_Figure.jpg]]
 *Figure: (a) A bear jumping high on a meadow. A bear running to the left on a meadow*
-
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2412_16153/figures/004_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2412_16153/figures/016_Figure.jpg]]
-*Figure: The bear peeks out from behind the tree*
-
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2412_16153/figures/017_Figure.jpg]]
-*Figure: A2. Results on complex scenarios. MotiF generates faithful videos for (1) object occlusion and (b) multiple object interaction*
-
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2412_16153/figures/018_Figure.jpg]]
-*Figure: A3. Typical failure and challenging cases of MotiF on TI2V-Bench. We observe two typical cases that the model fail: 1) the generated videos may have unnatural motion ((a)); 2) the generated videos do not align well with the prompts ((b), (c), (d)). For 2), there are two specific scenarios when following the text is challenging including novel object ((c)) or multiple objects ((d)). We also include more video samples in the project website*
-
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2412_16153/figures/019_Figure.jpg]]
-*Figure: Starting Image: Video 1*
 
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2412_16153/figures/005_Figure_3.jpg]]
 *Figure 3: Example image-text pairs in TI2V-Bench. For each scenario (column), we first think of a scene that could be potentially animated to generate different types of motion. We include challenging scenarios when there are multiple objects (yellow/blue/red balloon) in the initial image for fine-grained control or the text prompt describes a new object (frisbee, bubbles) to enter the scene. Then we come up with different prompts and use the publicly available meta.ai tool to generate diverse sets of images. Images of low quality or those not in the appropriate initial state are removed. Table 1. Recent TI2V evaluation benchmarks. We believe the key for TI2V generation is that the text should descri...*
 
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2412_16153/figures/008_Table.jpg]]
-
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2412_16153/figures/012_Table.jpg]]
 *Table: A2. Ablation studies on the motion focal loss weight λ. The numbers on the left is for MotiF and the right is for the comparing setting*
-
-
 
 ## 定位与知识库关联
 
@@ -369,8 +339,6 @@ MotiF 的有效性建立在以下前提之上：
 ### 知识库定位总结
 
 MotiF 在 TI2V 方法谱系中占据**训练目标优化**这一独特节点。它与输入增强方法（运动信号注入、双流图像条件）正交且互补——理论上可以将运动焦点损失应用于任何现有的 TI2V 架构。其方法论简洁性（仅修改损失函数，无需额外推理输入）使其具有较强的可迁移性，但当前在运动自然度和细粒度控制上的局限也指明了后续工作的方向。
-
-
 
 ## 原文 PDF
 

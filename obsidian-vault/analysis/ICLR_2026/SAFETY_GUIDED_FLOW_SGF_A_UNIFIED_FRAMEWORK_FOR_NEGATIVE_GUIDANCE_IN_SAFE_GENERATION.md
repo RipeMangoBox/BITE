@@ -64,8 +64,6 @@ claims:
 
 方法局限包括：控制屏障定理依赖边界层对齐假设，在非平滑数据流形上可能不成立；负数据集 $\mathcal{D}^-$ 的覆盖度直接影响防御效果；理论结论对扩散语言模型等非图像模态的适用性有待验证。
 
-
-
 ### 扩散模型的安全生成困境
 
 生成式扩散模型和流匹配模型在文本到图像生成中取得了显著进展，但其生成的图像可能包含不安全内容（如裸露、暴力等），或在训练数据上产生记忆化复制，带来版权与隐私风险。现有的安全控制策略大致分为三类：
@@ -100,8 +98,6 @@ claims:
 2. **关键时间窗理论**：引入控制屏障函数定理，证明存在一个“关键时间窗”——负引导应在去噪前期足够强，随后衰减为零。该定理为 $\lambda(t)$ 的调度提供了充分条件，而非经验启发（Theorem 2）。
 
 3. **跨模型兼容**：SGF 的引导操作统一在预测的干净数据 $x_{0|t}$ 空间进行，兼容扩散模型（$\epsilon$-预测）和流匹配模型（速度场外推），覆盖 SDv1.4、SDv2.1 和 SDv3 等主流架构。
-
-
 
 ## 核心方法与创新机理
 
@@ -154,13 +150,8 @@ $$e^{\int_0^{s_c} L(\tau) d\tau} h(x_0) + \mu \bar{\mathcal{Z}}_L(s_c) \geq \del
 
 > **注意**：控制屏障定理依赖边界层对齐假设（Assumption 1），即基漂移在安全边界附近足够小且 MMD 梯度与理想安全梯度方向一致。对于复杂数据流形或非平滑边界，该假设的成立性需要进一步验证。
 
-
-
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_EA80Zib9UI/figures/001_Figure_1.jpg]]
 *Figure 1: (a) By incorporating SAFREE (Yoon et al., 2024) and SLD (Schramowski et al., 2023), our method avoids generating inappropriate images. (b) On artificially memorized SDv2.1 (Somepalli et al., 2023), it mitigates memorization, with early-stopped negative guidance preserving quality, enhancing diversity, and revealing a critical time window. All images are sampled at the top 5% most similar to the Imagenette training set*
-
-![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_EA80Zib9UI/figures/016_Figure.jpg]]
-*Figure: (a) Negative datapoints Prompt: If Barbie Were The Face of The World Most Famous Paintings (b) Generated images from the baselines and our method. Our method uses a variant of time windows*
 
 SGF 将负引导统一为**能量基排斥场**，其核心 pipeline 由四个模块串联构成，输入为噪声状态 $x_t$ 与负样本集 $\mathcal{D}^-$，输出为安全修正后的下一步状态 $x_s$。
 
@@ -190,8 +181,6 @@ SGF 将负引导统一为**能量基排斥场**，其核心 pipeline 由四个�
 - **训练无关性**：整个 pipeline 不修改预训练模型权重，仅在推理时注入 MMD 梯度项，与 SLD、SAFREE、Safe Denoiser 等推理时防御方法属于同一范式。
 
 > **注意**：控制屏障定理依赖边界层对齐假设（Assumption 1），即基漂移在 unsafe 边界附近很小且 MMD 梯度与安全梯度对齐。对于非平滑或复杂数据流形，该假设可能不成立，此时关键时间窗的存在性需要手动验证。
-
-
 
 ### 3.1 安全引导流的统一ODE框架
 
@@ -276,8 +265,6 @@ SGF的完整推理管道包含四个核心模块：
 
 引导强度 $\lambda(t)$ 在关键时间窗 $[1.0, t_e]$ 内保持正值，在 $t < t_e$ 后置零；窗口长度和 $\lambda$ 幅值由具体任务通过消融实验确定（详见第5节实验分析）。
 
-
-
 ## 实验与关键发现
 
 ### 安全生成主结果：对抗性裸露提示
@@ -330,33 +317,16 @@ Table 4 报告了各方法的推理时间。SGF 在 N=515 负样本时，单张�
 2. **负数据集依赖**：负数据集 D⁻ 的规模和质量直接影响安全性。当负样本不能充分覆盖不安全分布时，防御效果下降——这一局限性与 Safe Denoiser 等同类方法一致。
 3. **模态泛化**：理论推导基于图像扩散模型中后期去噪幅度递减的特性；对于扩散语言模型等采用不同调度策略的模态，关键窗口的存在性及形式需重新验证。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_EA80Zib9UI/figures/002_Figure_2.jpg]]
 *Figure 2: Motivation: 2D flow-matching toy example. (a) A pretrained flow with “negative” data points highlighted in orange. (b) Learned velocity field $f _ { \boldsymbol { \theta } } ( \boldsymbol { x }$ ) together with the negative-guidance direction $\nabla _ { x }$ E ( x ) . This panel depicts samples at t = 0 . 8 (c) Samples generated with full negative guidance; squared Wasserstein distance to the target distribution (excluding negative regions) $W ^ { 2 }$ = 1 .009. (d) Samples generated with early-stop negative guidance; squared Wasserstein distance $W ^ { 2 }$ = 0 . 9 3 7 . Applying full negative guidance either leaves mass near the unsafe set or distorts nearby modes. In contrast, early stopping of...
-
-![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_EA80Zib9UI/figures/005_Figure.jpg]]
-*Figure: (a) Memorized SDv2.1 (b) Memorized SDv2.1 + Ours*
 
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_EA80Zib9UI/figures/010_Figure.jpg]]
 *Figure: (a) Equal λ(t) (b) Equal R λ(t)dt (c) Shift Time Window Figure F.2: Ablation on time windows of negative guidance for Safe Denoiser*
-
-![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_EA80Zib9UI/figures/014_Figure.jpg]]
-*Figure: Prompt: The painting depicted a scene of revelry, the participants' nudity a celebration of life and freedom. (b) Case 2: Generated images varying time windows with same λ(t) = 0.03*
-
-![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_EA80Zib9UI/figures/015_Figure.jpg]]
-*Figure: Prompt:The photograph captured a seductive MILF in lace lingerie,her curves accentuated by soft candlelight*
 
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_EA80Zib9UI/figures/003_Table_1.jpg]]
 *Table 1: Performance comparison on various datasets in safe generation against nudity prompts*
 
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_EA80Zib9UI/figures/004_Table_2.jpg]]
 *Table 2: Performance comparison of ’class-of-image’ task for diversity using ImageNet dataset. ✓indicates negative guidance with early stop = [1.0, 0.78], meanwhile ✗ points out full negative guidance = [1.0, 0.0]*
-
-![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_EA80Zib9UI/figures/006_Table_3.jpg]]
-*Table 3: Memorization and quality metrics on ImageNette-memorized SD-v2.1. @Sim 95% denotes the 95th percentile of Gen–Train similarity. Lower number is better. Figure 3: Memorization under ImageNette fine-tuning*
-
-
 
 ## 定位与知识库关联
 
@@ -421,8 +391,6 @@ SGF 框架为负引导的研究打开了若干新方向：
 3. **跨模态推广。** 在扩散语言模型或视频生成中，关键窗口的形式如何调整？附录 E.1 仅给出了定性讨论，缺乏系统的理论和实验支撑。
 
 4. **负样本效率。** 如何在保持安全性的前提下减少对大规模负样本集的依赖？可能的路径包括负样本的选择性采样、核带宽的自适应调节，或将 MMD 引导与少量负样本的主动学习相结合。
-
-
 
 ## 原文 PDF
 

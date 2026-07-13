@@ -48,8 +48,6 @@ claims:
 
 该方法的核心洞察在于，利用线性层的代数可合并性，在训练和推理两个阶段灵活切换物理结构与计算代价——训练时通过过参数化改善优化景观与泛化性能，推理时则零信息损失地回归紧凑形态。实验表明，ExpandNets 在不使用知识蒸馏的情况下，即可超越原始紧凑网络甚至结合知识蒸馏的版本：在 ImageNet 上，ExpandNet-CL 将 MobileNet 的 Top-1 准确率从 66.48% 提升至 69.40%（+2.92 pp）；在损坏标签的泛化测试中，ExpandNet-CK 显著降低了测试误差；梯度困惑度分析进一步揭示，ExpandNet 的训练过程具有更高的最小 pairwise 梯度余弦相似度，收敛更稳定，最终泛化误差更小。
 
-
-
 ### 紧凑网络的两难困境
 
 深度卷积网络在图像分类、目标检测、语义分割等任务上取得了显著成功，但其庞大的参数量和计算开销严重制约了在资源受限设备上的部署。为应对这一挑战，研究者设计了多种紧凑网络架构，如 **MobileNet**、**MobileNetV2**、**ShuffleNetV2** 和 **YOLO-LITE** 等，通过深度可分离卷积、通道混洗等操作大幅压缩模型规模。
@@ -78,8 +76,6 @@ claims:
 3. **全连接层扩张（FC）**：将全连接层分解为多个窄矩阵的乘积。
 
 如图 1 所示，这三种策略覆盖了紧凑网络的主要线性组件，且均遵循“训练时扩张、推理时收缩”的统一范式。与知识蒸馏不同，ExpandNets 无需教师网络即可超越蒸馏方法的性能；与 ACNet 等并行扩张方法相比，ExpandNets 的序列式线性扩张具有更强的代数灵活性和更广的适用性。
-
-
 
 ## 核心方法与创新机理
 
@@ -120,8 +116,6 @@ ExpandNets 的性能增益来自三个相互关联的机制：
 
 消融实验证实，扩张率 $r > 1$ 是获得性能增益的必要条件。当 $r=0.25$ 时性能下降，而 $r=2, 4, 8$ 时性能逐步提升，验证了过参数化的关键作用。$r=4$ 被选为精度与效率的最佳平衡点。扩张后的网络在训练后通过代数收缩恢复为与原始网络完全相同的结构，因此推理时参数量、MACs 和推理时间与原始网络完全一致。
 
-
-
 ExpandNets 遵循“训练时线性扩张，推理时代数收缩”的总体范式，其核心 pipeline 由四个功能模块构成，形成一条从紧凑网络出发、经可控过参数化训练、最终无损恢复原结构的闭环链路。
 
 **输入**为一个预先设计好的紧凑卷积网络，其线性层（卷积层与全连接层）参数冗余不足，导致优化困难。**输出**为与原始紧凑网络**完全等价**的推理模型——参数量、乘加操作数（MACs）和推理时间均与原始网络相同，但泛化性能显著提升。
@@ -147,8 +141,6 @@ ExpandNets 遵循“训练时线性扩张，推理时代数收缩”的总体范
 **模块间的数据流**：输入的紧凑网络首先按需经过 CL、CK、FC 三个扩张模块中的一种或多种组合进行线性扩张（例如 ExpandNet-CK+FC 表示同时使用卷积核扩张和全连接层扩张），得到参数量和计算量显著增大的过参数化网络；该网络在训练阶段以标准监督学习（可选择性结合知识蒸馏）进行优化；训练收敛后，Algebraic Contraction 模块将所有扩张层合并，输出与原始紧凑网络结构完全相同的推理模型。
 
 需要指出的是，该方法**不引入任何非线性**（如激活函数）到扩张层之间，这是保证代数可收缩性的关键约束。扩张仅作用于线性层，归一化层、池化层等结构保持不变。扩张率 $r$ 是控制过参数化程度的核心超参数：$r=1$ 退化为原始网络，$r>1$ 才产生过参数化效应；实验表明 $r=4$ 在精度-效率之间取得最佳平衡。
-
-
 
 ### 3.1 卷积层的矩阵表示
 
@@ -209,8 +201,6 @@ $$
 
 上述三种扩张策略共享同一个收缩机制：训练完成后，通过矩阵乘法或卷积核的连续卷积操作，将所有扩张层合并为原始紧凑网络的对应层。该过程是精确的代数等价变换，不引入任何近似或信息损失。收缩后的网络在参数量、MACs 和推理时间上与直接训练的紧凑网络完全相同。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能增益
@@ -252,13 +242,7 @@ ExpandNets 的核心价值体现在训练-推理的结构分离：训练时通�
 
 **梯度困惑度分析**（Figure 3）为 ExpandNets 的有效性提供了机理性解释。通过测量每个训练轮次结束时 100 对随机小批次梯度的最小余弦相似度，发现 ExpandNet-CL/CK 的最小 pairwise 梯度余弦相似度显著高于紧凑网络，且其梯度余弦相似度的核密度估计更集中于零附近。这意味着过参数化训练使不同数据批次的梯度方向更加一致，降低了优化过程中的“梯度困惑”，从而加速收敛并减小最终泛化误差。相比之下，仅扩张全连接层的 FC(Arora18) 未能改善梯度一致性。
 
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_1811_10495/figures/008_Figure_3.jpg]]
-*Figure 3: Training behavior of networks with 7 7 kernels on CIFAR-10 (best viewed in color). Left: Training and test curves over 150 epochs. Middle: Minimum pairwise gradient cosine similarity at the end of each training epoch (higher is better). Right: Kernel density estimation of pairwise gradient cosine similarity at the end of training (over 5 independent runs)*
-
 **损失景观可视化**（Figure 4）进一步表明，ExpandNet-CL/CK 训练得到的解倾向于收敛到更平坦的极小值区域，这通常与更好的泛化能力相关联。
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_1811_10495/figures/011_Figure_4.jpg]]
-*Figure 4: Loss landscapes of networks with 9 × 9 kernels on CIFAR-10 (We report top-1 error (%))*
 
 **损坏标签实验**（Table 7）直接检验了泛化能力。在 20% 标签损坏的 CIFAR-10 上，ExpandNet-CK 将 SmallNet（$k=5$）的测试误差从 20.90% 降至 19.42%；在 $k=9$ 配置下，最佳测试误差从 20.55% 降至 19.32%。在所有涉及卷积扩张的损坏标签实验中，ExpandNets 几乎一致地产生更小的泛化误差，同时训练误差更高——这表明性能提升源于更好的泛化，而非对噪声的过拟合。
 
@@ -291,22 +275,6 @@ ExpandNets 的有效性可归因于三个相互关联的机制：
 3. **与现有技术的兼容性**：可与知识蒸馏、更优初始化策略等结合，形成复合优化方案。
 
 该方法的主要局限在于训练阶段的计算开销、对卷积层结构的依赖，以及扩张率需手动调节。对于更深或更宽的现代大规模网络（如 ResNet-50 及以上），其可扩展性尚未验证，这是未来工作的重要方向。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_1811_10495/figures/024_Figure.jpg]]
-*Figure: S2: Training behavior of networks on CIFAR-10 (best viewed in color). Left: Training and test curves over 150 epochs. Middle: Minimum pairwise gradient cosine similarity at the end of each training epoch (higher is better). Right: Kernel density estimation of pairwise gradient cosine similarity at the end of training (over 5 independent runs)*
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_1811_10495/figures/025_Figure.jpg]]
-*Figure: (a) kernel size: 3 (b) kernel size: 5 (c) kernel size: 7 (d) kernel size: 9*
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_1811_10495/figures/027_Figure.jpg]]
-*Figure: S4: Product L ^ { 2 } vs Normal L ^ { 2 } (best viewed in color). Left: Training curves of the overall loss function. Middle Left: Training curves of the cross-entropy. Middle Right: Curves of training errors. Right: Curves of test errors. (Note that the y - axis is in log scale.)*
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_1811_10495/figures/004_Table_2.jpg]]
-*Table 2: Top-1 accuracy (%) of MobileNets vs ExpandNets with r = 4 on CIFAR-10 and CIFAR-100*
-
-
 
 ## 定位与知识库关联
 
@@ -345,8 +313,6 @@ ExpandNets 的设计决定了其适用范围存在明确的边界条件。
 **与网络压缩技术的协同。** 线性扩张与网络剪枝、量化等压缩技术是否存在协同效应，论文未涉及。一个自然的问题是：先扩张训练再收缩，与先训练再剪枝，两者在最终模型质量和训练效率上是否存在互补或替代关系。
 
 **最优过参数化程度的理论理解。** 论文从实验角度展示了扩张率 $r$ 对性能的影响，但未提供关于最优过参数化程度的理论分析。是否存在一个理论上可刻画的最优扩张程度，能够在训练效率与最终泛化性能之间取得最佳平衡，仍是一个开放的理论问题。
-
-
 
 ## 原文 PDF
 

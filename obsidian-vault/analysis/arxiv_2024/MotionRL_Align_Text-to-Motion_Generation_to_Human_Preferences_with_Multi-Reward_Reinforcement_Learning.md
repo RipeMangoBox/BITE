@@ -209,8 +209,6 @@ $$\hat{\mathbf{f}}_{t_k} = (1 - \alpha) \mathbf{f}_t + \alpha \mathbf{f}_{t_k}$$
 
 > **待验证**：特征混合权重 $\alpha$ 的具体取值以及各奖励类型估计边界值 $\mathrm{min.val}_k$、$\mathrm{max.val}_k$ 的获取方式，原文未明确给出，需查阅补充材料或进行手动验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l3309_https_arxiv_org_abs_2410_06513/figures/009_Figure_6.jpg]]
 *Figure 6: Visualization of motions in different formats (a) Original joint-based motion (b) SMPLbased motion after conversion using our trained model*
 
@@ -253,8 +251,6 @@ $$\hat{\mathbf{f}}_{t_k} = (1 - \alpha) \mathbf{f}_t + \alpha \mathbf{f}_{t_k}$$
 **奖励归一化的粗糙性**。不同奖励的尺度差异通过扩展最小-最大归一化（Equation 12）处理，但归一化所需的 min.val_k 和 max.val_k 仅为粗略估计值。虽然实验表明该策略足以稳定训练，但缺乏细粒度校准可能导致奖励尺度失真的风险，尤其在奖励分布发生偏移时。
 
 **格式转换的透明性不足**。人类偏好奖励需要将关节数据转换为 SMPL 格式，但该转换网络的具体结构、训练数据和训练细节未在正文中充分展开（仅置于 Appendix A），其转换精度对最终感知评分的潜在影响需要读者自行验证。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l3309_https_arxiv_org_abs_2410_06513/figures/003_Table_1.jpg]]
 *Table 1: Quantitative comparison on HumanML3D test set. The evaluation metrics are computed following Guo et al. (2022b). § indicates reliance on ground-truth sequence length for generation. Underline indicates the second best*

@@ -46,8 +46,6 @@ claims:
 
 本文提出**IR-Agent**，一种基于大语言模型（LLM）的多智能体框架，专门用于从红外（IR）光谱中解析分子结构。该框架通过模拟化学专家的分析流程，将红外光谱解析分解为三个专门智能体的协作任务：**Table Interpretation (TI) Expert**（基于吸收表进行局部子结构识别）、**Retriever (Ret) Expert**（通过谱图检索获取全局结构上下文）和**Structure Elucidation (SE) Expert**（综合推理输出最终预测）。IR-Agent的核心优势在于其灵活的知识整合能力——通过更新提示词即可引入新的化学信息（如原子类型、骨架、碳原子数），无需重新训练模型。在NIST红外光谱数据集（9,052个光谱）上的实验表明，IR-Agent在Top-K准确率上持续优于Transformer基线和单智能体变体，且对提示词变体具有鲁棒性。
 
-
-
 红外光谱是化学分析中广泛使用的技术，因其成本低、易获取而被常用于初始分析阶段（Coates et al., 2000; Mistek & Lednev, 2018）。然而，红外光谱仅提供局部振动信息，不足以唯一确定完整分子结构（Coates et al., 2000; Griffiths, 2006）。传统机器学习方法（如Transformer直接预测SMILES）依赖固定输入格式，引入新信息（如原子类型、骨架）需重新设计和训练模型，且无法模拟专家分析流程。
 
 现有方法的根本瓶颈在于：**难以灵活整合多种化学知识，且无法模拟专家分析流程**。红外光谱仅提供局部振动信息，不足以唯一确定完整分子结构，而传统ML方法依赖固定输入格式，引入新信息需重新设计模型。
@@ -55,8 +53,6 @@ claims:
 本文的核心因果旋钮是：**采用多智能体框架，将专家分析流程分解为三个专门智能体（Table Interpretation Expert、Retriever Expert、Structure Elucidation Expert），每个智能体负责特定分析任务，并通过提示词灵活整合额外化学信息**。
 
 核心洞察在于：**通过将红外光谱分析分解为局部子结构识别（基于吸收表）和全局结构上下文（基于谱图检索）两个互补任务，并让LLM智能体分别处理后再进行综合推理，可以显著提升分子结构解析的准确性，且无需重新训练即可整合新信息**。
-
-
 
 ## 核心方法与创新机理
 
@@ -70,8 +66,6 @@ IR-Agent的核心创新体现在以下五个关键设计变更：
 | 全局结构上下文获取 | 无显式检索机制，仅依赖模型内部知识 | Ret Expert使用IR Spectra Retriever工具，基于余弦相似度检索最相似谱图及其SMILES，提取共有结构特征 | "the Ret Expert agent utilizes the IR Spectra Retriever tool to identify spectra that are similar to the target IR spectrum... computes the cosine similarity between the target spectrum and all spectra in the database" |
 | 工具选择策略 | 动态工具选择（如ReAct框架），可能导致工具选择偏差或重复 | 确定性固定流程：先由Translator生成候选，再并行由TI Expert和Ret Expert分析，最后由SE Expert综合推理 | "a deterministic approach to tool selection—as implemented in IR-Agent—is necessary" |
 
-
-
 ![[assets/figures/papers/iclr26_0002_6bthH14pD8_IR-Agent_Expert-Inspired_LLM_Agents_for_Structur/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of IR-Agent. (a) Overall framework. Given an unknown IR spectrum, IR-Agent first utilizes the IR Spectra Translator to generate candidate structures in SMILES format. The Table Interpretation (TI) Expert then extracts local structural information by referencing the IR absorption table through the IR Peak Table Assigner. In parallel, the Retriever (Ret) Expert obtains global structural features from similar spectra retrieved by the IR Spectra Retriever from a database. The Structure Elucidation (SE) Expert integrates analyses from both experts to produce the final predicted molecular structures. (b) Detailed view of the Table Interpretation (TI) Expert. (c) Detailed view o...*
 
@@ -84,8 +78,6 @@ IR-Agent的整体框架如Figure 1所示，包含四个主要模块：
 2. **Table Interpretation (TI) Expert**：使用IR Peak Table Assigner工具提取谱峰并基于吸收表分配子结构，与SMILES候选交叉验证，输出子结构及其置信度和理由。
 3. **Retriever (Ret) Expert**：使用IR Spectra Retriever工具（余弦相似度）检索Top-N最相似谱图及其SMILES，识别共有结构特征，按相似度加权。
 4. **Structure Elucidation (SE) Expert**：综合TI Expert和Ret Expert的输出，对SMILES候选集进行精炼和排序，输出Top-K预测分子结构。
-
-
 
 ### 5.1 IR Spectra Translator
 
@@ -131,8 +123,6 @@ SE Expert综合TI和Ret专家的输出以及候选集，产生Top-K排序的分�
 
 $$\mathcal{A}_{\mathrm{SEExpert}} = \mathrm{SEExpert}(\mathbf{P}_{\mathrm{SEExpert}}, \mathcal{A}_{\mathrm{TIExpert}}, \mathcal{A}_{\mathrm{RetExpert}}, \mathcal{C}) \quad \text{(Equation 5)}$$
 
-
-
 ## 实验与关键发现
 
 ### 6.1 数据集与设置
@@ -145,7 +135,6 @@ $$\mathcal{A}_{\mathrm{SEExpert}} = \mathrm{SEExpert}(\mathbf{P}_{\mathrm{SEExpe
 ### 6.2 主要结果
 
 **Table 1: Overall model performance for structure elucidation from IR spectra.**
-
 
 ![[assets/figures/papers/iclr26_0002_6bthH14pD8_IR-Agent_Expert-Inspired_LLM_Agents_for_Structur/figures/002_Table_1.jpg]]
 *Table 1: Overall model performance for structure elucidation from IR spectra.*
@@ -164,7 +153,6 @@ $$\mathcal{A}_{\mathrm{SEExpert}} = \mathrm{SEExpert}(\mathbf{P}_{\mathrm{SEExpe
 
 **Table 2: Overall model performance with various chemical information.**
 
-
 ![[assets/figures/papers/iclr26_0002_6bthH14pD8_IR-Agent_Expert-Inspired_LLM_Agents_for_Structur/figures/003_Table_2.jpg]]
 *Table 2: Overall model performance with various chemical information.*
 
@@ -180,7 +168,6 @@ $$\mathcal{A}_{\mathrm{SEExpert}} = \mathrm{SEExpert}(\mathbf{P}_{\mathrm{SEExpe
 ### 6.4 消融研究
 
 **Table 3: Ablation study of IR-Agent (o3-mini).**
-
 
 ![[assets/figures/papers/iclr26_0002_6bthH14pD8_IR-Agent_Expert-Inspired_LLM_Agents_for_Structur/figures/004_Table_3.jpg]]
 *Table 3: Ablation study of IR-Agent (o3- mini).*
@@ -251,16 +238,11 @@ IR-Agent (GPT-4o)优于ReAct框架。
 
 **Figure 4: Example of structured analytical reasoning by the Table Interpretation (TI) expert.** 案例显示：TI Expert交叉验证六个候选子结构，仅保留异硫氰酸酯基团（2140-1990 cm-1），与真实结构一致。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0002_6bthH14pD8_IR-Agent_Expert-Inspired_LLM_Agents_for_Structur/figures/008_Table_4.jpg]]
 *Table 4: Wavenumber Range and Substructure Assignments*
 
 ![[assets/figures/papers/iclr26_0002_6bthH14pD8_IR-Agent_Expert-Inspired_LLM_Agents_for_Structur/figures/009_Table_4.jpg]]
 *Table 4: Wavenumber Range and Substructure Assignments*
-
-
-
 
 ## 定位与知识库关联
 
@@ -271,8 +253,6 @@ IR-Agent属于**基于LLM的化学结构解析**方法谱系，其核心创新�
 - **与ReAct等动态工具选择框架**：IR-Agent采用确定性固定流程，避免了动态工具选择中的常见失败模式（如仅选择单一工具或重复选择同一工具），在结构解析任务上表现更优。
 
 IR-Agent在知识库中的定位是：**首个将多智能体LLM框架系统性地应用于红外光谱结构解析的工作**，展示了通过模拟专家分析流程和灵活知识整合来提升化学结构预测准确性的可行路径。未来工作方向包括：整合峰形和峰强度信息、直接以图像形式输入IR光谱到LLM、扩展到混合物分析、引入动态工具选择机制、以及扩展到多模态光谱分析（如同时整合IR、MS和NMR）。
-
-
 
 ## 原文 PDF
 

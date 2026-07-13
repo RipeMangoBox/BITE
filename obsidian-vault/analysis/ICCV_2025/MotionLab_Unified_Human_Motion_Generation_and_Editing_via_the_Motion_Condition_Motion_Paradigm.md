@@ -73,8 +73,6 @@ MotionLab 在多个任务上取得显著性能提升：
 
 MotionLab 属于**统一生成式框架**，区别于为单一任务设计的专用模型。其设计理念与扩散模型（如 MDM、MLD）和自回归模型（如 T2M-GPT）形成对比：后者通常依赖迭代去噪或逐帧预测，而 MotionLab 借助修正流实现少步数（甚至单步）高效生成。在任务覆盖面上，Table 1 显示 MotionLab 是首个同时原生支持文本生成、轨迹生成、文本编辑、轨迹编辑、运动插值和风格迁移的框架，而此前方法最多覆盖其中 2–3 项任务。
 
-
-
 人体运动生成与编辑是计算机视觉与图形学领域的核心问题，其目标是根据文本描述、空间轨迹、风格参考等条件，自动合成自然、多样且符合物理约束的人体动作序列。该技术在动画制作、虚拟现实、游戏开发和机器人仿真等场景中具有广泛的应用前景。近年来，扩散模型（diffusion models）和自回归模型在该领域取得了显著进展，涌现出 **MDM**、**MLD**、**T2M-GPT** 等代表性方法，分别在生成质量和多样性上不断刷新基准。
 
 然而，当前研究面临一个根本性的瓶颈：**不同任务（如文本生成、轨迹控制、运动编辑、插值、风格迁移）通常由孤立模型处理，缺乏统一的建模框架**。如 Table 1 所示，现有方法大多仅针对单一或少数任务进行训练，无法在多个任务间共享运动先验知识。这种碎片化的研究范式导致三个突出问题：
@@ -86,8 +84,6 @@ MotionLab 属于**统一生成式框架**，区别于为单一任务设计的专
 从技术路径来看，现有方法在框架选择上主要分为两类：基于扩散模型的逐步去噪范式，和基于自回归模型的逐帧预测范式。扩散模型虽然生成质量较高，但推理速度慢（如 MDM 单次生成需约 26 秒）；自回归模型推理快但存在误差累积问题。更重要的是，这两种范式都缺乏对“源运动→目标运动”这一映射关系的显式建模，导致在编辑和插值等需要保持源运动语义的任务中表现受限。
 
 本文的核心动机在于：**是否可以通过一个统一的范式，将人体运动生成与编辑的各类任务纳入同一框架，从而打破任务壁垒、实现知识共享？** 为此，本文提出 **Motion-Condition-Motion** 范式，将所有任务抽象为三个基本概念的组合——源运动（source motion）、条件（condition）和目标运动（target motion）——并基于修正流（rectified flows）的最优传输特性，设计统一的生成框架 **MotionLab**，以期在单一模型中同时实现多任务的高质量生成与高效推理。
-
-
 
 ## 核心方法与创新机理
 
@@ -117,8 +113,6 @@ $$\mathcal{L}_{RF}(\theta) = \int_{0}^{1} \mathbb{E}_{(x_{0}, x_{1}) \sim (p_{0}
 
 上述四个创新并非孤立存在，而是形成了一条因果链：**修正流** 提供了高效、稳定的生成基础；**Aligned ROPE** 确保多模态序列在时间上对齐；**Task Instruction Modulation** 使同一网络能区分不同任务；**课程学习** 则决定了这些能力能否被有效联合训练。缺失任一环节都会导致特定任务或整体性能的显著退化，这从 Table 6 的系统消融中得到了充分验证。
 
-
-
 MotionLab 的核心设计理念是将人体运动生成与编辑统一于 **运动-条件-运动 (Motion-Condition-Motion)** 范式之下。该范式将所有任务抽象为三个基本要素：**源运动 (source motion)**、**条件 (condition)** 与 **目标运动 (target motion)**。无论任务表面形式是文本生成、轨迹控制、运动编辑还是风格迁移，其本质均可映射为“给定源运动与条件，生成目标运动”的统一问题 (Table 2)。这一抽象使得单一框架能够同时覆盖生成与编辑，并利用多任务数据间的内在联系进行知识共享。
 
 在此范式之上，MotionLab 的整体 pipeline 由三个关键模块串联构成：
@@ -133,12 +127,8 @@ MotionLab 的核心设计理念是将人体运动生成与编辑统一于 **运�
 
 **关键组件间的因果依赖**：消融实验 (Table 6, Table 10) 揭示了一条清晰的因果链——移除课程学习直接导致所有任务崩溃（文本生成 FID 从 0.167 飙升至 1.956），说明多任务统一的前提是合理的训练顺序；在此基础上，Aligned ROPE 对空间相关任务（轨迹生成、运动插值）至关重要，移除后平均误差分别上升至 0.0886 和 0.0756；而修正流框架则为整个 pipeline 提供了高效的生成基础，移除后各任务性能全面下降。三者共同构成了 MotionLab 统一框架不可分割的技术支柱。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l22_MotionLab_Unified_Human_Motion_Generation_and_Editing_via_the_Motion_Con/figures/001_Figure_1.jpg]]
 *Figure 1: Demonstration of our MotionLab’s versatility, performance and efficiency. Ours specialists refer to the proposed framework tailored for specified tasks. Previous SOTA refer to multiple models, including MotionLCM [12], OmniControl [64], MotionFix [6], CondMDI [11] and MCM-LDM [55]. All motions are represented using SMPL [39], where transparent motion indicates the source motion or condition, and the other represents the target motion. More qualitative results are available in the website and appendix*
-
-
 
 ### 4.1 修正流基础
 
@@ -194,8 +184,6 @@ $$I \in \mathbb{R}^{1 \times 768}$$
 $$v_\theta(M_T, t, C) = v_\theta(M_T \mid t, \emptyset) + \lambda_C \left[ v_\theta(M_T \mid t, C) - v_\theta(M_T \mid t, \emptyset) \right]$$
 
 其中 $\lambda_C$ 为条件引导强度，$\emptyset$ 表示无条件。各任务的引导强度参数见 **Table 14**。
-
-
 
 ## 实验与关键发现
 
@@ -255,29 +243,10 @@ Table 1 系统对比了 MotionLab 与现有方法在 8 类任务上的覆盖能�
 ![[assets/figures/papers/paper_list_l22_MotionLab_Unified_Human_Motion_Generation_and_Editing_via_the_Motion_Con/figures/006_Table_3.jpg]]
 *Table 3: Evaluation of text-based motion generation on HumanML3D [21] dataset. The models in bold are the optimal models, and the models in underline are the sub-optimal models*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l22_MotionLab_Unified_Human_Motion_Generation_and_Editing_via_the_Motion_Con/figures/013_Figure_7.jpg]]
 *Figure 7: Demonstration of the difference between diffusion models and rectified flows. This difference lies in that the trajectory of diffusion models is based on $x _ { t } = \sqrt { ( 1 - \overline { { \alpha _ { t } } } ) } x _ { 0 } + \sqrt { \overline { { \alpha _ { t } } } } \epsilon$ , while the trajectory of rectified flows is based on $x _ { t }$ = ( 1 - t ) $x _ { 0 }$ + tx1. This distinction leads to more robust learning by maintaining a constant velocity, contributing to the model’s efficiency [70]
-
-![[assets/figures/papers/paper_list_l22_MotionLab_Unified_Human_Motion_Generation_and_Editing_via_the_Motion_Con/figures/003_Table_2.jpg]]
-*Table 2: Structuring human motion tasks within our Motion-Condition-Motion paradigm*
-
-![[assets/figures/papers/paper_list_l22_MotionLab_Unified_Human_Motion_Generation_and_Editing_via_the_Motion_Con/figures/005_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l22_MotionLab_Unified_Human_Motion_Generation_and_Editing_via_the_Motion_Con/figures/007_Table_4.jpg]]
-*Table 4: Evaluation of trajectory-based motion generation on HumanML3D [21] dataset. Table 5. Evaluation of text-based and trajectory-based motion editing on MotionFix [6] dataset. TMED∗ mean that we reimplement the models since the original models are in the skeleton of SMPL format, while ours is in HumanML3D format*
-
-![[assets/figures/papers/paper_list_l22_MotionLab_Unified_Human_Motion_Generation_and_Editing_via_the_Motion_Con/figures/015_Table_8.jpg]]
-*Table 8: Evaluation of motion in-between with CondMDI [11] on HumanML3D [21] dataset*
 
 ![[assets/figures/papers/paper_list_l22_MotionLab_Unified_Human_Motion_Generation_and_Editing_via_the_Motion_Con/figures/017_Table_9.jpg]]
 *Table 9: Ablation studies of Task Instruction Modulation*
-
-![[assets/figures/papers/paper_list_l22_MotionLab_Unified_Human_Motion_Generation_and_Editing_via_the_Motion_Con/figures/019_Figure_9.jpg]]
-*Figure 9: Ablation results of MotionLab on the motion in-between (with text). Beige motion is use 1D-learnable position encoding, purple motion use Aligned ROPE, and gray motions are the poses provided in keyframes, demonstrating the importance of Aligned ROPE*
-
-
 
 ## 定位与知识库关联
 
@@ -318,8 +287,6 @@ MotionLab 的生成核心选择**修正流 (rectified flows)** 而非主流的�
 3. **实时场景适用性**：尽管推理速度已大幅提升（0.068 秒），但在需要毫秒级响应的实时交互场景（如 VR 中的实时运动编辑）中是否足够？模型压缩或蒸馏是否可行？
 
 4. **评估指标的统一性**：不同任务使用不同的评估指标（FID、R@3、平均误差、关键帧误差），缺乏跨任务的可比性度量，难以量化统一框架相对于专用模型的整体性能折衷。
-
-
 
 ## 原文 PDF
 

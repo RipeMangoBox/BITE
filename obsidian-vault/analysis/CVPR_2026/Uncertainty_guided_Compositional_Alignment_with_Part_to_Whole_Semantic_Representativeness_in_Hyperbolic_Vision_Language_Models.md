@@ -52,8 +52,6 @@ claims:
 
 实验表明，UNCHA 在零样本图像分类、检索、层次分类、多对象表示及多标签分类等任务上均一致优于先前方法。例如，在 ImageNet 零样本分类中，UNCHA（ViT-B/16）达到 48.8% Top-1 准确率，较 HyCoCLIP 提升 **+3.0** 个百分点。消融研究进一步证实，不确定性引导的对比损失、不确定性校准与熵正则化三个组件均不可或缺，移除任一组件均导致性能显著下降。此外，对双曲嵌入分布的可视化分析显示，UNCHA 使部分嵌入与整体嵌入在双曲空间中形成更明显的层次分离，部分更靠近原点而整体更远，印证了方法对双曲空间利用效率的提升。
 
-
-
 视觉语言模型（VLMs）在图像文本对齐任务上取得了显著进展，以 **CLIP**（Radford et al., ICML 2021）为代表的欧氏空间方法通过大规模对比学习实现了强大的零样本泛化能力。然而，欧氏嵌入空间在建模概念间的层次结构和部分-整体关系方面存在天然局限：欧氏空间无法有效表征“部分蕴含于整体”的非对称语义依赖，而这正是组合理解的核心。
 
 为突破这一限制，研究者将目光投向具有负曲率的双曲空间。双曲几何的树状特性使其天然适合编码层次关系，部分嵌入可被约束在整体嵌入的“蕴含锥”内，从而显式建模部分-整体的蕴含结构。**MERU**（Desai et al., ICML 2023）首次将双曲空间引入VLMs，建立了跨模态的图文蕴含关系；**HyCoCLIP**（Pal et al., ICLR 2024）进一步扩展至模态内的部分-整体蕴含，使图像局部与全局场景、文本片段与完整描述之间的层次依赖得以建模。**ATMG**（Ramasinghe et al., CVPR 2024）则从角度对齐的角度改进了双曲VLMs的训练。
@@ -72,8 +70,6 @@ claims:
 本文的核心洞察在于：**双曲空间中嵌入点到原点的距离（双曲半径）天然蕴含了概念的抽象性或不确定性信息**。在洛伦兹模型中，更靠近原点的点具有更高的“温度”或不确定性，这一几何特性恰好可用于量化部分到整体的语义代表性——语义上更模糊、与整体关联更弱的局部区域，其嵌入应更接近原点（高不确定性）；反之，与整体高度相关的部分则应远离原点（低不确定性）。
 
 基于这一直觉，本文提出 **UNCHA（Uncertainty-guided Compositional Hyperbolic Alignment）**，旨在通过双曲不确定性显式建模部分到整体的语义代表性差异，并将这种不确定性自适应地融入对比损失和蕴含损失中，从而实现更精确的部分-整体层次对齐。UNCHA不改变基础编码器架构，而是通过损失函数层面的创新，使模型学会区分不同部分的贡献强度，最终在嵌入空间中形成部分靠近原点、整体远离原点的清晰层次结构。
-
-
 
 ## 核心方法与创新机理
 
@@ -129,8 +125,6 @@ UNCHA 处于双曲表示学习与视觉语言对齐的交叉点，其方法谱�
 
 消融实验（Table 4）严格验证了每个创新槽位的必要性：移除不确定性感知对比损失（w/o contrastive）、移除不确定性校准（w/o uncertainty，Geeeer 分类从 68.98 降至 64.57）、移除熵正则化（w/o entropy）均导致一致的性能下降，证明三个组件相互补充、缺一不可。
 
-
-
 UNCHA（**UN**certainty-guided **C**ompositional **H**yperbolic **A**lignment）的整体框架围绕一个核心洞察构建：在双曲空间中，部分图像/文本对整体场景的语义代表性存在显著差异，而这种差异可以通过双曲半径自然量化。如图 2 所示，与先前方法 MERU（Desai et al., ICML 2023）仅建模跨模态整体蕴含、HyCoCLIP（Pal et al., ICLR 2024）进一步引入模态内部分-整体蕴含不同，UNCHA 新增了一条不确定性感知路径，使模型能够自适应地调节各部分对整体对齐的贡献强度。
 
 ### 输入与特征提取
@@ -168,13 +162,6 @@ $$L_{\text{ent}}^{\text{cal}}(\mathbf{p}, \mathbf{q}) = \lfloor L_{\text{ent}}^{
 $$L = \mathcal{L}_{\text{con}}^{\text{un}} + \lambda_{ent} \mathcal{L}_{\text{ent}}^{\text{un}}$$
 
 其中 $\mathcal{L}_{\text{ent}}^{\text{un}}$ 整合了跨模态蕴含、模态内蕴含以及不确定性校准项（Eq. 17）。整个框架通过端到端训练，使模型在保持图文语义对齐的同时，精确捕捉部分到整体的层次结构。图 5 显示，UNCHA 的嵌入分布相比 HyCoCLIP 更加分散且层次分离更明显，验证了框架对双曲空间的高效利用。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l796_https_arxiv_org_abs_2603_22042/figures/002_Figure_2.jpg]]
-*Figure 2: Comparison of UNcertainty-guided Compositional Hyperbolic Alignment (UNCHA, Ours) with prior works. MERU [10] models inter-modal entailment between whole scene image and text representations. HyCoCLIP [49] extends this to include intra-modal entailment between part and whole scene representations. UNCHA (Ours) further incorporates uncertainty to quantify the semantic representativeness of each part, enabling uncertainty-guided part–whole alignment via adaptive weighting in the contrastive objectives and uncertainty calibration through the entailment loss. In addition, entropy regularization is applied in uncertainty calibration to ensure consistent and balanced utilization of the hyperbolic...*
-
-
 
 ### 3.1 双曲几何基础：洛伦兹模型
 
@@ -267,13 +254,6 @@ $$L = \mathcal{L}_{\mathrm{con}}^{\mathrm{un}} + \lambda_{ent} \mathcal{L}_{\mat
 
 其中 $\lambda_{ent}$ 为平衡两项损失的超参数。联合优化使模型在对比对齐中自适应调节各部分贡献，同时通过蕴含约束和不确定性校准精确捕捉部分-整体的层次结构。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l796_https_arxiv_org_abs_2603_22042/figures/001_Figure_1.jpg]]
-*Figure 1: Varying representativeness of part images to whole scene. The relationship between each part image and the whole scene varies with its representativeness. We model this varying representativeness as uncertainty, enabling uncertainty-guided part–whole alignment in hyperbolic space*
-
-
-
 ## 实验与关键发现
 
 ### 零样本图像分类
@@ -286,9 +266,6 @@ Table 1 报告了 UNCHA 在 16 个零样本图像分类数据集上的 Top-1 准
 ### 零样本检索与层次分类
 
 Table 2 汇总了 ImageNet 上的零样本检索（R@1）和层次分类指标。UNCHA 在检索任务上显著超越欧氏空间基线 **CLIP**（Radford et al., ICML 2021）和此前最优的双曲方法，表明不确定性引导的对比损失有效提升了跨模态对齐精度。层次分类指标上的优势则说明，不确定性校准的蕴含损失使双曲嵌入更好地保留了部分-整体的层级结构。
-
-![[assets/figures/papers/paper_list_l796_https_arxiv_org_abs_2603_22042/figures/006_Table_2.jpg]]
-*Table 2: Zero-shot retrieval and hierarchical classification metrics on ImageNet [9]. UNCHA (Ours) consistently achieves superior performance across both retrieval and hierarchical metrics, showing the effectiveness of our uncertainty-based hyperbolic alignment*
 
 ### 部分级别对齐与难负样本
 
@@ -308,9 +285,6 @@ Table 5 分别报告了 ComCo/SimCo 多对象配置下的零样本 mAP 以及 VO
 
 Table 4 的系统消融揭示了各组件的独立贡献：
 
-![[assets/figures/papers/paper_list_l796_https_arxiv_org_abs_2603_22042/figures/008_Table_4.jpg]]
-*Table 4: Ablation study on classification and retrieval benchmarks. Removing any component leads to consistent performance drops, showing that all modules contribute meaningfully. Bold numbers indicate the best performance within each task group*
-
 - **移除不确定性引导的对比损失（w/o contrastive）**：分类和检索性能均明显下降，验证了基于不确定性自适应缩放全局-局部对比温度的必要性。
 - **移除不确定性校准（w/o uncertainty）**：分类基准 Geeeer 从完整的 68.98 骤降至 64.57，表明蕴含损失中的不确定性校准项对层次关系建模至关重要。
 - **移除熵正则化（w/o entropy）**：嵌入空间利用效率降低，性能同步退化，说明熵约束有效防止了不确定性分布退化为均匀分布，保障了双曲空间的结构化利用。
@@ -323,22 +297,12 @@ Figure 4 从实证角度验证了不确定性度量的语义合理性：(a) 随�
 
 Figure 5 对比了 UNCHA 与 HyCoCLIP 的双曲嵌入分布。HyCoCLIP 的嵌入聚集在较窄范围内，而 UNCHA 的嵌入分布更为分散，部分嵌入更靠近原点（高不确定性），整体嵌入更远离原点（低不确定性），形成了更清晰的层次分离。这一结构化分布印证了不确定性校准损失和熵正则化对双曲空间利用效率的改善。
 
-![[assets/figures/papers/paper_list_l796_https_arxiv_org_abs_2603_22042/figures/010_Figure_5.jpg]]
-*Figure 5: Analysis of hyperbolic embedding. Compared to Hy-CoCLIP [49], whose hyperbolic embeddings exhibit a narrower range, UNCHA yields a more dispersed and structured distribution, reflecting richer use of the hyperbolic space*
-
 ### 补充实验
 
 补充材料中的 Table S.6 进一步消融了双曲半径的计算方式：将本文使用的欧氏范数代理替换为显式双曲半径后，分类和检索性能均轻微下降，表明当前的不确定性定义在数值稳定性和优化特性上具有实用优势。Table S.9 和 Table S.10 分别报告了零样本分割（VOC21 mIoU）和框级别分类（COCO/LVIS/OpenImages Top-1/Top-5）的结果，UNCHA 在所有设置下一致超越先前方法，进一步验证了方法的泛化能力。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l796_https_arxiv_org_abs_2603_22042/figures/011_Table_S.6.jpg]]
 *Table S.6: Ablation study on hyperbolic radius. Replacing our Euclidean-norm surrogate with the explicit hyperbolic radius slightly degrades both classification and retrieval performance. Bold numbers indicate the best within each task group*
-
-![[assets/figures/papers/paper_list_l796_https_arxiv_org_abs_2603_22042/figures/012_Table_S.7.jpg]]
-*Table S.7: Full results of part-level alignment with hard negatives. Comparison across all settings of part-level alignment with hard negatives for ViT-S and ViT-B. UNCHA (Ours) consistently outperforms prior models, including the challenging ‘All Pick5’ and ‘All-Hard Negs’ settings, demonstrating its strong capability in accurately identifying and distinguishing fine-grained visual regions within images*
-
-
 
 ## 定位与知识库关联
 
@@ -390,8 +354,6 @@ UNCHA 的三个关键修改槽位构成了一个因果闭环：
 - 不确定性估计器 $u(\mathbf{x})$ 的单调变换形式是否为最优选择？是否存在更适合特定数据分布的非线性变换？
 - 熵正则化系数 $\lambda_2$ 的敏感性如何？不同数据集间是否需要自适应调整？
 - 该不确定性框架能否推广到视频时序片段对全局视频的代表性建模？
-
-
 
 ## 原文 PDF
 

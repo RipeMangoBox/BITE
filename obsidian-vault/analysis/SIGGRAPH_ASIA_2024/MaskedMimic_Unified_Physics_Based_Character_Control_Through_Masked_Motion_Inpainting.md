@@ -146,11 +146,6 @@ $$\mathbb{E}_{z \sim \mathcal{E}(\cdot|s,g^{\text{full}})} [\log \mathcal{D}(a|s
 
 > **关键设计决策**：结构化掩码策略（保持连续关节组掩码而非独立随机掩码）是模型收敛的必要条件。消融实验（Table 6）表明，取消结构化掩码使物体坐下任务成功率降至 0%；去除残差先验设计使成功率从 96.9% 骤降至 21.1%。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2409_14393/figures/003_Figure_3.jpg]]
-*Figure 3: The MaskedMimic framework: The first phase produces a fullyconstrained controller $\pi ^ { \mathsf { F C } }$ . This full-body tracker is trained using reinforcement learning to imitate kinematic motion recordings across a wide range of complex scene-aware contexts. The second phase produces MaskedMimic. Treating $\pi ^ { \mathsf { F C } }$ as a teacher, through supervised limitation learning its knowledge is distilled into a partially-constrained controller $\pi ^ { \mathrm { P C } }$ . As $\pi ^ { \mathsf { P C } }$ observes masked inputs, this process enables it to perform physics-based inpainting. Finally, at inference, without any further training, $\pi ^ { \mathrm { { \dot { P } C } } }$ is use...
-
 MaskedMimic 将物理角色控制重新定义为**运动修复（motion inpainting）**问题：给定任意组合的部分约束（关节目标、文本指令、物体包围盒等），模型预测完整的物理动作序列以还原被掩码的运动信息。这一统一框架的核心由两个阶段构成。
 
 ### 第一阶段：全约束控制器（FC）
@@ -300,8 +295,6 @@ Fig. 6展示了运动跟踪的定性效果，包括战斗、舞蹈、侧手翻�
 ### 实验结论的边界
 
 MaskedMimic的实验优势建立在AMASS运动捕捉数据集和特定训练环境上。所有评估均在仿真器中进行，未涉及真实机器人迁移。物体交互仅限于静态场景中的坐下等动作，未扩展到推、拉、开门等动态操作。文本控制依赖预训练的文本-运动嵌入模型，其语义理解能力受限于嵌入空间的质量。这些边界条件在解读实验结果时需要明确。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2409_14393/figures/008_Table_1.jpg]]
 *Table 1: Full-body tracking, flat terrain: Tracking full-body kinematic recordings from the AMASS dataset [Mahmood et al. 2019]. We highlight be best performing model on test motions*

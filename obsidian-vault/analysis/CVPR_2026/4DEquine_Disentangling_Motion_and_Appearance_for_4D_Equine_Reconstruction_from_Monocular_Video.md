@@ -58,8 +58,6 @@ claims:
 
 **局限与开放问题**：当输入图像存在严重遮挡或截断时，EquineGS难以重建完整一致的外观；模型无法处理鬃毛和尾巴等非刚性细节；且未包含重光照模块。未来方向包括高效融合多关键帧外观、增强非刚性动态效果，以及适应动态光照变化。
 
-
-
 ### 问题背景
 
 从单目视频中重建动态动物的4D表示（3D几何+时间）是计算机视觉与图形学中的基础难题。马科动物（马、斑马、驴等）因其复杂的非刚性运动、多样的外观纹理以及在农业、体育、影视等领域的广泛应用，成为极具代表性的重建对象。然而，单目视频天然缺乏深度信息，且马匹运动涉及四肢的大幅度变形与自遮挡，使得从随意拍摄的短视频中恢复时空一致的4D表示极具挑战。
@@ -77,8 +75,6 @@ claims:
 针对上述瓶颈，4DEquine 提出将单目4D重建显式解耦为两个独立子问题：**动态运动恢复**与**静态外观重建**。核心洞察在于，马匹的外观仅需从视频中的一张代表性图像即可高保真地重建，而运动则需要利用时序上下文来保证平滑性。通过 VAREN 参数化网格模型作为桥接——其线性混合蒙皮（LBS）机制天然支持将规范空间下的外观“驱动”到任意姿态——运动和外观可以分别由可扩展的前馈网络处理，从而彻底绕过逐视频优化的计算瓶颈，并增强对稀疏视角的鲁棒性。
 
 这一解耦策略将整个4D重建流程转变为高效的前馈推断：运动网络从视频片段中回归平滑的姿态序列，外观网络从单张图像生成可驱动的3D高斯化身，二者通过 VAREN 模型无缝整合。该设计不仅大幅提升了推理速度（比优化方法快数个数量级），还使得模型可以完全在合成数据上训练，并在真实场景中实现零样本泛化。
-
-
 
 ## 核心方法与创新机理
 
@@ -109,8 +105,6 @@ claims:
 
 解耦-桥接-前馈范式的有效性得到多维度验证：在 AiM 马匹子集上，4DEquine 的 PCK@0.05 达到 87.9，较 GART 的 81.8 提升 6.1 个百分点；LPIPS 降至 0.1720，优于 GART 的 0.2000（Table 2, Table 6）。消融实验进一步证实，移除后优化导致 PSNR 从 15.66 降至 13.84（Table 4），移除时间 Transformer 使加速度误差升高（Table 3），验证了各 changed slot 的必要性。在零样本斑马子集上，4DEquine 的 LPIPS 为 0.2000，显著优于全优化 GART 的 0.2560（Table 2），表明解耦范式带来的泛化能力超越了传统联合优化的上限。
 
-
-
 4DEquine 将单目视频的 4D 重建显式解耦为两个可独立求解的子问题：**动态运动恢复** 与 **静态外观重建**。这一解耦设计的核心洞察在于，同一段视频中马匹的外观通常保持不变，而运动具有时序连续性——因此，可以分别用一个仅需单张图像的前馈网络生成高保真外观，以及一个需要时序建模的网络回归平滑运动，再通过 VAREN 参数化网格模型的线性混合蒙皮（LBS）将二者整合为可驱动的 4D 化身。
 
 整个 pipeline 由两大模块构成，如 Figure 2 所示：
@@ -127,8 +121,6 @@ claims:
 - 利用 VAREN 的 LBS 将规范化身变形到各帧姿态，再通过 3D Gaussian Splatting 渲染出任意视角的 RGB 图像与掩码。
 
 这种“运动-外观解耦 + 前馈推断”的设计，使得 4DEquine 无需在整段视频上进行昂贵的逐视频联合优化，从根本上绕过了现有方法（如 GART、SMALR）对 360° 旋转视频的依赖和计算瓶颈。两个子网络均完全在合成数据上训练——AniMoFormer 使用 VarenPoser 合成视频数据集，EquineGS 使用 VarenTex 多视图合成图像数据集——却能在真实场景数据集 APT-36K 和 AiM 上达到最优性能，并展现出对未见物种（如斑马、驴）的零样本泛化能力。
-
-
 
 4DEquine 将单目视频的 4D 重建显式解耦为两个独立子问题：**动态运动恢复** 与 **静态外观重建**。运动子问题由时空 Transformer 网络 **AniMoFormer** 结合基于可微渲染的后优化处理；外观子问题由前馈网络 **EquineGS** 从单张代表性图像直接预测规范空间下的 3D 高斯化身。二者通过 VAREN 参数化网格模型的线性混合蒙皮（LBS）桥接，使整个流程变成高效的前馈推断，无需逐视频的昂贵联合优化。
 
@@ -197,13 +189,6 @@ $$
 - **VarenPoser**：通过将 VAREN 模型拟合到基于标记点的马匹运动数据集 PFERD 获取姿态参数，随机分配形状参数，并利用 MV-Adapter 生成多样化纹理，构建了首个大规模带有 4D VAREN 标注的合成视频数据集，用于训练 AniMoFormer。
 - **VarenTex**：从 VarenPoser 网格渲染法向图和规范坐标图，结合 ControlNet 生成的参考图像，通过 UniTex 合成多视角训练图像（共 150K 张，分辨率 512×512），用于训练 EquineGS。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2603_10125/figures/003_Figure_3.jpg]]
-*Figure 3: VarenTex Generation pipeline. Normal and canonical coordinate maps (CCM) rendered from VarenPoser meshes , alongside a ControlNet-generated reference image , are fed into UniTex to synthesize multi-view training images*
-
-
-
 ## 实验与关键发现
 
 ### 实验设置与基准
@@ -260,24 +245,15 @@ Figure 4 的定性对比进一步显示，4DEquine 重建的马匹纹理清晰�
 - **移除后优化（w/o PO）**：所有渲染指标大幅下降——PSNR 从 15.66 降至 13.84，LPIPS 从 0.1720 升至 0.1737（Table 4），验证了基于 2D 关键点和掩码的可微渲染后优化对像素级几何精度的关键贡献。
 - **增大输入帧窗口 N**：从 4 帧增至 8 帧再增至 16 帧，PCK 逐步提升，加速度误差逐步降低，验证了时空上下文的有效性。N=32 时因内存溢出无法训练（Section 9.3, Supplementary）。
 
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2603_10125/figures/010_Table_4.jpg]]
-*Table 4: Ablation study of EquineGS components and postoptimization for novel-pose appearance reconstruction on the AiM horse subset. Bold and underlined numbers indicate the best performance and the second best performance, respectively*
-
 #### EquineGS 消融（Table 4）
 
 - **移除 DSTG-Block（w/o DSTG）**：用标准交叉注意力块替换双流 Transformer 融合设计后，PSNR、SSIM、LPIPS 全部变差，证明双流架构在融合图像特征与点云几何信息方面的设计有效性。
 - **移除后优化（w/o PO）**：如前述，对最终渲染质量影响显著，说明即使外观网络本身强大，2D 对齐步骤仍是高保真重建的必要环节。
 - **网格细分消融**（Figure 6）：将 VAREN 模板网格从默认分辨率上采样至 55,486 个顶点，为 3D 高斯提供更密集的初始化点云。可视化结果表明，更高分辨率的几何基元能承载更精细的外观细节。
 
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2603_10125/figures/007_Figure_6.jpg]]
-*Figure 6: Ablation study for Sub-Division*
-
 ### 失败模式与局限性
 
 Figure 11 展示了典型失败案例：当输入图像存在**严重遮挡或截断**时（如马匹身体大面积被障碍物遮挡），EquineGS 难以重建完整一致的外观。这是因为前馈网络仅从单张代表性图像推断外观，无法凭空补全不可见区域。论文明确指出，需要确保关键帧中马匹未被大面积遮挡。
-
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2603_10125/figures/018_Figure_11.jpg]]
-*Figure 11: Analysis of failure cases. We illustrate a scenario where severe occlusion impacts performance. The first image: The truncated/occluded input image. The second image: The output of AniMoFormer. The third image: The output of EquineGS, showing appearance degradation at unseen areas. The fourth image: Reference frame from a different time step showing the horse’s true appearance*
 
 此外，当前方法存在两个结构性局限：
 1. **非刚性细节未建模**：VAREN 参数化模型不包含鬃毛和尾巴，因此这些动态细节无法被重建和驱动。
@@ -289,16 +265,6 @@ Figure 11 展示了典型失败案例：当输入图像存在**严重遮挡或�
 2. **合成数据训练可实现零样本泛化**：仅在合成数据上训练的模型，在未见过的真实斑马子集上全面超越全优化 GART，证明 VAREN 参数化模型作为桥接的有效性。
 3. **时空建模与 2D 对齐缺一不可**：消融实验表明，时间 Transformer 保证运动平滑，后优化保证像素级几何精度，二者共同构成高保真 4D 重建的必要条件。
 4. **推理效率优势显著**：前馈推断使 4DEquine 的推理速度比逐视频优化的 GART 快数个数量级，使其具备实际应用潜力。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2603_10125/figures/005_Figure_5.jpg]]
-*Figure 5: Zero-shot generalization of 4DEquine on Internet images of unseen species donkey. “GT” is also the input image*
-
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2603_10125/figures/017_Figure_10.jpg]]
-*Figure 10: Challenging poses. Left: Rearing. Right: Sitting*
-
-
 
 ## 定位与知识库关联
 
@@ -341,8 +307,6 @@ Figure 11 展示了典型失败案例：当输入图像存在**严重遮挡或�
 - **动态光照适应**：如何添加重光照模块以适应真实场景中的动态光照？这涉及将外观解耦为材质与光照因子的更细粒度分解。
 
 从更宏观的视角看，4DEquine的“解耦-桥接-前馈”范式是否可推广到其他非刚性物体类别（如人类以外的灵长类、犬科动物），取决于是否存在类似VAREN的高质量参数化模型作为桥接。当前合成数据训练策略的成功表明，高质量参数化模型与生成式数据增强的结合可能是通向通用可驱动化身重建的关键路径。
-
-
 
 ## 原文 PDF
 

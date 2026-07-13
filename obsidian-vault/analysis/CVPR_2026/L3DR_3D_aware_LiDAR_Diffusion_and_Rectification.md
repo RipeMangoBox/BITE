@@ -53,8 +53,6 @@ claims:
 
 **主要结果**：在KITTI360、SemanticKITTI、nuScenes、Waymo四个数据集上，L3DR一致超越所有基线方法。以KITTI360无条件生成为例，相较于LiDM基线，FSVD下降7.7%（35.8 vs 38.8），FPVD下降10.0%（26.1 vs 29.0），JSD下降13.7%；在SemanticKITTI条件生成上，FPVD从17.7降至15.0（↓15.3%）。消融实验证实：将3D RRN替换为2D UNet导致所有指标显著恶化，MSE损失替代Welsch损失则使FSVD和FPVD近乎翻倍——这两个消融分别验证了3D几何处理的必要性和Welsch损失抑制高偏差区域的关键作用。计算开销方面，RRN仅增加37.9M参数、19.65ms推理延迟，训练耗时仅2小时（单RTX 4090），远低于扩散模型的36小时×4 GPU。
 
-
-
 ### 激光雷达生成的核心瓶颈：从2D到3D的几何鸿沟
 
 激光雷达（LiDAR）点云生成是自动驾驶感知与仿真领域的核心任务之一。近年来，扩散模型（Diffusion Models）在图像生成领域取得了巨大成功，其逐步去噪的生成范式展现了强大的分布拟合能力。这一范式被自然地迁移至LiDAR点云生成中，但面临一个关键的表示选择问题：直接在稀疏、非结构化的3D空间中进行扩散，还是将点云投影到结构化的2D表示上进行生成？
@@ -103,8 +101,6 @@ $$\| \nabla x_{3d} \| \le L_{3D} \times \Delta d$$
 2. **损失函数设计**：采用Welsch损失函数（一种倒钟形函数）替代传统的MSE/L1损失，利用其对大幅度误差的饱和特性，自动抑制高偏差训练区域，使网络专注于局部几何伪影的矫正；
 3. **扩散无关性**：RRN作为独立的后处理模块，可嫁接至任意LiDAR扩散模型（如LiDM、R2DM），无需修改原有扩散模型的训练或推理流程，具有高度的通用性和即插即用特性。
 
-
-
 ## 核心方法与创新机理
 
 L3DR 的核心创新在于揭示并解决了一个被现有 LiDAR 扩散模型普遍忽视的结构性缺陷：**基于距离视图（RV）的二维扩散模型缺乏三维几何感知能力，其输出存在固有的几何伪影**。围绕这一发现，L3DR 构建了一个“二维布局生成 + 三维几何矫正”的双阶段框架，其关键创新点可归纳为以下三个 changed slots。
@@ -148,8 +144,6 @@ L3DR 的第三个关键创新在于其**架构设计上的解耦性**：
 在推理时（Figure 5），RRN 可**嫁接至任意 LiDAR 扩散模型的输出端**，实现扩散无关的几何矫正。实验证明，RRN 不仅可提升 LiDM 的生成质量，同样可有效矫正 R2DM 的输出（Table 1，Ours-R2DM）。
 
 此外，该两阶段训练范式具有显著的计算效率优势：RRN 训练仅需约 2 小时（单张 RTX 4090），而 LiDM 训练需 36 小时 × 4 GPU；推理时 RRN 仅引入 19.65 ms 的额外延迟和 37.9 M 的额外参数量（Table 4），以极小的计算代价换取了显著的生成质量提升。
-
-
 
 L3DR 采用**两阶段训练—单阶段推理**的流水线架构，其核心思想是将激光雷达点云的全局布局生成与局部几何矫正解耦：第一阶段由语义条件扩散模型负责生成合理的场景布局（但不可避免地引入距离视图伪影），第二阶段由三维残差回归网络在点云空间中对这些伪影进行针对性修复。推理时，残差回归网络作为扩散无关的后处理模块，可嫁接至任意基于距离视图的激光雷达扩散模型之上。
 
@@ -201,8 +195,6 @@ L3DR 采用**两阶段训练—单阶段推理**的流水线架构，其核心�
 
 该两阶段解耦设计源于一个关键理论洞察（定理 1 与推论 2）：2D 扩散模型输出的空间梯度存在理论上界，无法生成任意锐利的边界；而 3D 模型可直接在三维空间中操作，其矫正后的 RV 图像梯度可随深度差增大而任意增大，天然具备生成锐利边缘的能力。因此，将“全局布局生成”委托给成熟的 2D RV 扩散模型，将“局部几何锐化”委托给 3D RRN，实现了二者的优势互补。Welsch 损失的引入进一步解决了训练数据中高偏差区域（而非高方差 RV 伪影）劫持优化方向的问题，确保 RRN 的学习目标聚焦于真正的几何伪影矫正。
 
-
-
 ### 3.1 问题建模：2D扩散模型的边界锐度瓶颈
 
 L3DR的理论出发点在于揭示基于距离视图（RV）的2D扩散模型在几何生成上的本质局限。给定一个由2D扩散模型生成的RV深度图 $x_0 \in \mathbb{R}^{H \times W}$，其生成过程可形式化为从高斯噪声出发的迭代去噪：
@@ -216,9 +208,6 @@ $$p _ { \theta } ( x _ { t - 1 } \mid x _ { t } ) = \mathcal { N } ( x _ { t - 1
 **推论2（3D矫正梯度无界）** 进一步证明：若在3D空间中引入逐点偏移矫正，则矫正后重投影回RV图像的梯度满足 $\| \nabla x _ { 3 d } \| \le L _ { 3 D } \times \Delta d$，其中 $\Delta d$ 为相邻像素的真实深度差。由于 $\Delta d$ 在物体边界处可以任意大，3D矫正能够恢复锐利边缘。Figure 8给出了直观验证：在RV图像上施加 $\sigma = 5\text{m}$ 的大噪声几乎不影响人类对图像内容的理解，但同样的噪声在3D点云中完全破坏了空间结构；反之，$\sigma = 0.2\text{m}$ 的小噪声在RV上几乎不可察觉，却能在点云中产生可见扰动。这一非对称敏感性表明，2D RV适合布局生成，3D空间适合几何精修。
 
 经验验证（Figure 2）显示，矫正后的RV图像梯度分布显著向真值靠拢，Jensen-Shannon散度（JSD）从原始扩散输出的0.222降至0.176，定量证实了3D矫正对边缘锐度的恢复能力。
-
-![[assets/figures/papers/paper_list_l2528_https_arxiv_org_abs_2602_19064/figures/002_Figure_2.jpg]]
-*Figure 2: Empirical validation of Theorem 1. The graph shows the distribution of ∥∇x∥ for GT, vanilla RV diffusion, and our rectified RV, including the corresponding Jensen-Shannon Divergence (JSD) w.r.t. the GT*
 
 ### 3.2 距离视图投影与反投影
 
@@ -275,8 +264,6 @@ $$L _ { R R N } = \operatorname { mean } \left( \psi _ { \nu } \left( \operatorn
 
 L3DR的推理流程（Figure 5）体现了其作为后处理模块的即插即用特性：任意LiDAR扩散模型（如LiDM、R2DM）生成的RV深度图经RRVP转换为点云后，送入预训练的RRN预测径向偏移量，最终输出几何矫正后的高质量点云。RRN不依赖特定扩散模型的内部结构或超参数，仅需一次前向传播（额外耗时19.65ms，参数量+37.9M），即可显著提升生成质量。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验结果
@@ -304,12 +291,6 @@ L3DR 在多个主流自动驾驶激光雷达数据集上进行了全面评测，
 ![[assets/figures/papers/paper_list_l2528_https_arxiv_org_abs_2602_19064/figures/007_Table_2.jpg]]
 *Table 2: Comparison of conditional LiDAR point cloud generation on SemanticKITTI and KITTI360. Gray areas highlight direct comparisons with the baseline, LiDM. ‘Ours-Sem’ denotes our method with segmentation input to the RRN*
 
-![[assets/figures/papers/paper_list_l2528_https_arxiv_org_abs_2602_19064/figures/009_Table_3.jpg]]
-*Table 3: Ablation experiment on SemanticKITTI, including RRN backbone structure, loss function, semantic-map input to RRN, and a fair baseline using a 2D image Unet instead of a 3D UNet*
-
-![[assets/figures/papers/paper_list_l2528_https_arxiv_org_abs_2602_19064/figures/015_Table_7.jpg]]
-*Table 7: Parameter tuning experiment of ν with PTV3 on SemanticKITTI*
-
 **Welsch 损失的必要性机制**：图 4 揭示了 RRN 训练数据中的两类误差——高方差 RV 伪影（需矫正的目标）和高偏差异常区域（如偏移墙体、树叶随机点、孤立深度块）。MSE 损失对所有误差等权惩罚，导致模型被高偏差区域劫持，无法专注于局部几何伪影矫正；Welsch 函数 $\psi_{\nu}(x)=1-\exp(-x^2/(2\nu^2))$ 对大幅度误差给予饱和惩罚，天然忽略这些异常区域。
 
 ### 理论验证
@@ -332,19 +313,6 @@ L3DR 在多个主流自动驾驶激光雷达数据集上进行了全面评测，
 ### 重建数据上的扩展验证
 
 表 8 展示了 RRN 在 GS-LiDAR 重建数据上的性能，表明 L3DR 不仅适用于生成模型，还可作为重建方法的后处理模块，进一步扩展了其应用边界。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2528_https_arxiv_org_abs_2602_19064/figures/006_Table_1.jpg]]
-*Table 1: Benchmarking of unconditional generation on KITTI360 and semantic-conditioned generation on nuScenes and Waymo. For the semantic-conditioned experiments, RRN takes segmentation map as additional input for optimal performance. Gray areas highlight direct comparisons with the baselines*
-
-![[assets/figures/papers/paper_list_l2528_https_arxiv_org_abs_2602_19064/figures/011_Table_4.jpg]]
-*Table 4: Computational overhead on KITTI360. our method introduce very slight computational overhead over the baselines*
-
-![[assets/figures/papers/paper_list_l2528_https_arxiv_org_abs_2602_19064/figures/016_Table_8.jpg]]
-*Table 8: RRN performance on GS-LiDAR reconstructed LiDAR data under different training and test data configurations*
-
-
 
 ## 定位与知识库关联
 
@@ -401,8 +369,6 @@ L3DR 的直接基线是 **LiDM**（语义条件LiDAR扩散模型），其关系�
 
 **理论深化**：
 - Theorem 1 和 Corollary 2 建立了2D/3D模型在边界锐度上的理论差异，但该分析基于梯度范数的上界。是否存在更精细的理论框架（如基于Lipschitz常数的生成质量界），能够指导矫正网络的设计和训练？
-
-
 
 ## 原文 PDF
 

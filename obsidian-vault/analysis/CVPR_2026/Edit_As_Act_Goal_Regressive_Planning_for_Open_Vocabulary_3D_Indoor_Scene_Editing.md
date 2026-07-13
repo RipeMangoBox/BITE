@@ -50,8 +50,6 @@ Edit-As-Act 的核心洞察在于：**场景编辑不应被视为一次性生成
 
 在 E2A-Bench 的 63 个编辑任务上，Edit-As-Act 全面超越所有基线：平均指令保真度（IF）达 69.1（+11.5 vs 最强基线）、语义一致性（SC）达 86.6（+26.1）、物理合理性（PP）达 91.7（+1.4）。消融实验证实，验证器的移除导致 SC 下降 11.5，源感知回归的移除导致 IF 下降 10.9，表明显式验证与场景感知是方法有效性的关键支柱。用户研究进一步确认，参与者对 Edit-As-Act 编辑结果的评分显著高于基线（三项指标 5.49–5.92，7 分制）。
 
-
-
 ### 3D 室内场景编辑的现状与瓶颈
 
 3D 室内场景编辑旨在根据自然语言指令对既有场景进行语义化和几何化的修改。这一任务在室内设计、增强现实和具身 AI 等领域具有广泛应用前景，但其核心挑战在于同时满足三个关键需求：**指令保真度**（Instruction Fidelity, IF）——编辑必须精确反映用户指令；**语义一致性**（Semantic Consistency, SC）——编辑不应破坏场景中未涉及部分的语义结构；**物理合理性**（Physical Plausibility, PP）——编辑结果需满足支撑关系、无穿透、不悬空等物理约束。
@@ -78,8 +76,6 @@ Edit-As-Act 的核心洞察在于：**场景编辑不应被视为一次性生成
 
 这一思路借鉴了经典规划中的 STRIPS 形式化，但引入了**源感知回归**（source-aware regression）机制——仅传播在当前源场景中未满足的前提条件，避免对已存在的关系进行冗余规划。由此，Edit-As-Act 框架将场景编辑建模为可解释、可验证的符号规划过程，从根本上区别于现有生成式或优化式方法。
 
-
-
 ## 核心方法与创新机理
 
 Edit-As-Act 的核心创新在于将开放词汇 3D 场景编辑从“生成”范式重新定义为“目标回归规划”范式。现有方法——无论是直接生成布局坐标的 **LayoutGPT-E**、基于约束优化的 **AnyHome**，还是图像驱动编辑后 3D 提升的 **ArtiScene-E**——均将编辑视为一次性或前向生成过程，缺乏对目标状态的显式推理。这导致三个系统性缺陷：(1) 编辑往往修改非目标区域，产生全局漂移；(2) 多步指令的语义一致性难以保证；(3) 物理合理性依赖隐式约束，不可靠。
@@ -97,8 +93,6 @@ $$G_{t-1} = (G_t \setminus \mathrm{add}(a_t)) \cup (\mathrm{pre}(a_t) \setminus 
 **3. 规划器‑验证器循环。** 规划器在每一步提议一个满足当前目标的 EditLang 动作，验证器则对其进行目标导向性、单调性、上下文一致性和形式有效性四重检查，拒绝违规动作。这一显式验证机制是维持编辑稳定性的关键：去除验证器后，语义一致性从 86.6 降至 75.1，物理合理性从 91.7 降至 86.0（Table 4）。直接输出坐标的预测方法在所有消融中表现最差（IF 52.8, SC 68.1, PP 85.5），进一步验证纯几何预测不足以实现可靠编辑。
 
 **4. 范式转换的本质。** 上述三个组件共同实现了一个根本性转变：场景编辑不再是“生成新布局”，而是“最小化动作序列以实现目标世界状态”。这种规划视角天然保证了编辑的局部性——只修改必要对象，维持场景整体稳定。在 E2A-Bench 的 63 个任务上，Edit-As-Act 的语义一致性达 86.6，比最强基线 **AnyHome** 高出 26.1 点；物理合理性达 91.7，比 **ArtiScene-E** 高出 1.4 点；指令保真度达 69.1，比 **AnyHome** 高出 11.5 点。用户研究进一步确认，参与者在三项指标上对 Edit-As-Act 的评分（5.49–5.92，7 分制）显著高于所有基线（Figure 4）。
-
-
 
 Edit-As-Act 将开放词汇 3D 室内场景编辑重新定义为**目标回归规划问题**，而非一次性生成或约束优化。其核心流程由三个阶段构成，形成从自然语言指令到可执行编辑动作序列的闭环。
 
@@ -135,15 +129,11 @@ Edit-As-Act 将开放词汇 3D 室内场景编辑重新定义为**目标回归�
 
 整个 pipeline 的设计哲学是**将编辑理解为最小化动作序列以实现目标世界状态的过程**。与直接预测坐标或全局优化布局的方法不同，Edit-As-Act 通过符号化目标谓词和源感知回归，将语言指令转化为可执行、可验证的编辑计划，从而在保持局部性的同时实现高度一致的编辑结果。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2636_https_arxiv_org_abs_2603_17583/figures/002_Figure_1.jpg]]
 *Figure 1: Overview of Edit-As-Act. Step 1: an LLM converts a source scene*
 
 ![[assets/figures/papers/paper_list_l2636_https_arxiv_org_abs_2603_17583/figures/010_Figure_6.jpg]]
 *Figure 6: Overview of the object generation and stylization pipeline. We utilize Hyper3D Gen-2 [19] to synthesize high-fidelity 3D assets. The pipeline operates in two modes: (1) Text-to-3D for generating new objects from scratch, and (2) Point Cloud-Guided Stylization (highlighted in blue dashed boxes) where the input 3D object is converted into a point cloud to condition the generation, ensuring the geometric structure remains preserved while the texture is updated according to the text prompt*
-
-
 
 Edit-As-Act 的核心创新在于将场景编辑重新定义为**目标回归规划问题**，而非一次性生成或全局优化。框架由五个关键模块构成，围绕一个中心公式——源感知目标回归算子——协同工作。
 
@@ -197,16 +187,6 @@ $$a_t = \langle \mathrm{pre}(a_t), \mathrm{add}(a_t), \mathrm{del}(a_t) \rangle$
 
 规划完成后，确定性执行引擎按顺序执行动作序列。每步执行后重新计算几何谓词（如碰撞检测、支撑关系），确保符号状态与几何状态保持对齐。这种符号-几何闭环保证了最终编辑结果在物理上的有效性——几何指标显示 Edit-As-Act 的出界率和浮空率在所有方法中最低。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2636_https_arxiv_org_abs_2603_17583/figures/009_Figure_5.jpg]]
-*Figure 5: LLMs demonstrate strong capabilities in interpreting existing 3D layouts (top) but remain unreliable when directly generating 3D layouts from instructions (bottom). This asymmetry motivates our goal-regressive formulation*
-
-![[assets/figures/papers/paper_list_l2636_https_arxiv_org_abs_2603_17583/figures/008_Figure_3.jpg]]
-*Figure 3: Effect of removing EditLang, which provides explicit preconditions that allow the chair to be rotated around the table*
-
-
-
 ## 实验与关键发现
 
 ### 核心发现：目标回归规划全面超越现有编辑范式
@@ -239,13 +219,8 @@ Figure 4的用户研究结果提供了感知层面的证据。十名参与者对
 
 尽管整体性能优越，Edit-As-Act仍存在若干失败模式。高度模糊的指令（如“把房间弄乱”）会产生不精确的目标谓词，导致编辑效果欠佳。部分编辑几何正确但风格或功能性次优——例如两个豆袋椅面对面摆放虽然满足空间约束，但不符合人类对自然布局的期望（Section 5.8）。严格单调性约束下，偶尔出现子目标无法同时满足的规划死锁，需依赖重试机制缓解。这些失败模式指向了当前符号谓词集在表达功能性推理方面的不足，也为未来的谓词扩展和概率规划融合指明了方向。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2636_https_arxiv_org_abs_2603_17583/figures/006_Table_4.jpg]]
 *Table 4: Ablation study showing the impact of each component*
-
-![[assets/figures/papers/paper_list_l2636_https_arxiv_org_abs_2603_17583/figures/007_Figure_4.jpg]]
-*Figure 4: User study results. Ten participants rated edited scenes produced by Edit-As-Act, ArtiScene, and AnyHome on three criteria. Edit-As-Act obtains the highest perceived instruction fidelity, semantic consistency, and physical plausibility*
 
 ![[assets/figures/papers/paper_list_l2636_https_arxiv_org_abs_2603_17583/figures/004_Table_3.jpg]]
 *Table 3: Comparison with contemporary reasoning baselines*
@@ -253,19 +228,8 @@ Figure 4的用户研究结果提供了感知层面的证据。十名参与者对
 ![[assets/figures/papers/paper_list_l2636_https_arxiv_org_abs_2603_17583/figures/001_Table_1.jpg]]
 *Table 1: Comparison of three essential requirements for different scene editing paradigms. LayoutGPT represents direct 3D layout editing. AnyHome represents constraint-based optimization. ArtiScene represents image-driven editing followed by 3D lifting*
 
-![[assets/figures/papers/paper_list_l2636_https_arxiv_org_abs_2603_17583/figures/021_Table_8.jpg]]
-*Table 8: Additional ablation on backbone robustness, predicate complexity, and validator parameter sensitivity*
-
-![[assets/figures/papers/paper_list_l2636_https_arxiv_org_abs_2603_17583/figures/003_Table_2.jpg]]
-*Table 2: Quantitative comparison across nine scene categories. Edit-As-Act achieves the strongest and most consistent performance in instruction fidelity (IF), semantic consistency (SC), and physical plausibility (PP), demonstrating robust generalization across diverse spatial configurations*
-
 ![[assets/figures/papers/paper_list_l2636_https_arxiv_org_abs_2603_17583/figures/005_Figure_2.jpg]]
 *Figure 2: Representative qualitative results. Baseline methods often introduce unintended global changes, fail to satisfy multi-step instructions, or generate incomplete edits. Edit-As-Act produces precise, instruction-aligned modifications that remain physically valid and preserve the overall scene identity*
-
-![[assets/figures/papers/paper_list_l2636_https_arxiv_org_abs_2603_17583/figures/017_Table_7.jpg]]
-*Table 7: Performance by editing operation type. Edit-As-Act achieves the strongest and most reliable performance across all edit categories, maintaining high instruction fidelity (IF), semantic consistency (SC), and physical plausibility (PP)*
-
-
 
 ## 定位与知识库关联
 
@@ -323,8 +287,6 @@ Edit-As-Act 的当前设计存在以下适用边界：
 4. **概率化与模糊指令处理**：如何在不破坏解释性和终止保证的前提下，引入概率或学习组件以处理模糊指令？可能的方向包括将目标谓词表示为概率分布而非确定性集合，或允许规划器在多个可行计划中进行软选择。
 
 5. **与生成式方法的深度融合**：Edit-As-Act 目前将符号规划与3D资产生成解耦（通过Hyper3D Gen-2进行文本到3D生成）。是否存在端到端可微分的方式，使规划决策能够直接指导生成过程，从而在保持符号可解释性的同时提升生成质量？
-
-
 
 ## 原文 PDF
 

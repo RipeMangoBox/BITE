@@ -56,8 +56,6 @@ claims:
 
 **主要结果**：Motion-Zero 在零样本设置下显著提升了基线模型的生成质量和控制指标。在 ZeroScope 上，Text Align 从 20.31 提升至 21.96，Inter-frame Consistency 从 0.88 提升至 0.94。在复杂轨迹控制上，Motion-Zero 的 mIoU 达到 0.55，AP50 达到 0.67，Cov. 达到 0.97，全面优于 TrailBlazer 和 Peekaboo 等零样本方法。消融实验证实空间约束是实现精确位置控制的最关键模块，移除后 mIoU 从 0.54 骤降至 0.18。用户研究（Cronbach's α = 0.901）进一步验证了该方法在外观、一致性和控制能力上的显著优势。
 
-
-
 ### 问题背景：视频扩散模型中的运动随机性与控制缺失
 
 近年来，基于扩散的文本到视频生成模型取得了显著进展，能够根据文本描述生成具有丰富动态内容的视频。然而，一个核心瓶颈始终存在：**模型生成的物体运动轨迹具有内在随机性，用户无法对运动物体的空间位置和移动路径施加直接控制**。给定相同的文本提示，模型可能产生完全不同的运动模式——物体可能向左或向右移动，可能静止不动，也可能以非预期的方式变形。这种不可控性严重限制了视频生成模型在影视制作、广告设计、教育内容创作等实际场景中的应用价值，因为这些场景往往要求精确的叙事性运动编排。
@@ -84,8 +82,6 @@ Motion-Zero的核心洞察在于：**预训练视频扩散模型本身已蕴含�
 
 基于这一洞察，Motion-Zero提出了一个完全在推理阶段运行的零样本控制框架，通过三个关键操作——**初始噪声先验注入、空间约束潜变量优化、偏移时序注意力对齐**——实现对预训练视频扩散模型中物体运动轨迹的即插即用式控制。
 
-
-
 ## 核心方法与创新机理
 
 Motion-Zero 的核心创新在于，它首次证明**无需任何额外训练**即可为任意预训练视频扩散模型赋予精确的物体运动轨迹控制能力。这一突破绕开了现有方法的根本瓶颈：传统文本到视频模型生成的物体轨迹具有随机性，而已有的运动控制方法（如 **MotionCtrl**（Wang et al., arXiv 2023d））依赖大规模标注数据集进行训练，计算成本高，且只能应用于其训练时所基于的特定模型，缺乏跨模型的即插即用能力。
@@ -98,8 +94,6 @@ Motion-Zero 的因果操纵杆建立在三个关键创新操作上，它们均�
 
 这三个模块的协同作用，使得 Motion-Zero 能够以零样本、即插即用的方式，操纵预训练视频扩散模型内部已具备的丰富物体运动知识，将其与用户指定的轨迹进行显式语义对齐。
 
-
-
 Motion-Zero 的推理流水线由三个核心模块串联构成：**初始噪声先验模块 (Initial Noise Prior Module, INPM)**、**空间约束 (Spatial Constraints, SC)** 和**偏移时序注意力机制 (Shift Temporal Attention Mechanism, STAM)**，如图 Fig.2(a) 所示。整个框架冻结预训练视频扩散模型的所有参数，仅在推理阶段对潜变量施加操纵，从而实现零样本、即插即用的运动轨迹控制。
 
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2401_10150/figures/002_Figure_2.jpg]]
@@ -110,13 +104,6 @@ Motion-Zero 的推理流水线由三个核心模块串联构成：**初始噪声
 **流水线三阶段**。第一阶段，INPM 利用 DDIM Inversion 从元视频中反演得到初始噪声先验，并通过局部混合操作将先验注入目标框区域，生成携带位置与外观先验的初始潜变量 $\mathbf{z}_T$（详见 Fig.2(b)）。第二阶段，在去噪过程的前 $T_1$ 步，对每个时间步 $t$ 的潜变量 $\mathbf{z}_t$ 施加空间约束损失 $\mathcal{L}_{sp}$，通过梯度更新 $\mathbf{z}_t' = \mathbf{z}_t - \beta_t \cdot \nabla \mathcal{L}_{sp}$ 优化潜变量，使目标 token 的交叉注意力响应集中在用户指定的边界框内。第三阶段，将优化后的 $\mathbf{z}_t'$ 送入配备 STAM 的 3D U-Net 进行去噪；STAM 将各帧目标框区域平移至首帧框位置对齐，执行时序注意力后再移回原位，从而在保证时序一致性的同时避免不同位置内容混合（Fig.2(c)）。在剩余的 $T_2$ 步中，恢复标准视频扩散去噪过程，以保持生成质量。
 
 **模块间的因果依赖**。INPM 为 SC 提供稳定的初始位置锚点——消融实验表明，移除 INPM 后物体易发生严重变形或脱离帧（Fig.7）。SC 是实现精确空间控制的核心，移除后 mIoU 从 0.54 骤降至 0.18（Tab.2）。STAM 则确保运动物体在时序上的连续性，移除后物体会出现模糊和变形（Fig.7）。三个模块协同作用，使得 Motion-Zero 能够在零样本条件下赋予任意预训练视频扩散模型精确的物体轨迹控制能力。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2401_10150/figures/001_Figure_1.jpg]]
-*Figure 1: Our Motion-Zero framework endows different pre-trained video diffusion models with the capability to manipulate object trajectories directly, circumventing the need for supplementary training. By designating the target entity in the input prompts and a sequence of bounding boxes, users can intuitively direct the motion path of the object within the generated video*
-
-
 
 Motion-Zero 是一个完全在推理阶段运作的零样本运动物体控制框架，无需任何额外训练，即可赋予任意预训练视频扩散模型精确的物体轨迹控制能力。其核心由三个关键模块构成：初始噪声先验模块（INPM）、空间约束（SC）和偏移时序注意力机制（STAM）。这三个模块分别从初始噪声、空间定位和时序一致性三个维度，协同实现了对运动物体的即插即用控制。
 
@@ -173,13 +160,6 @@ $$\\mathbf{z}_w^{f'} = \\mathbf{Shift}(\\mathbf{z}_w^{f'}, \\mathcal{B}^0, \\mat
 
 三个模块协同工作：INPM 为初始噪声注入位置先验，SC 在去噪过程中逐步优化空间定位，STAM 保证跨帧的运动连续性。整个流程中视频扩散模型的所有参数保持冻结，实现了真正的零样本、即插即用控制。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2401_10150/figures/008_Figure_5.jpg]]
-*Figure 5: Attention maps with different components. Prompt: A seal walking on the ice*
-
-
-
 ## 实验与关键发现
 
 ### 主要结果
@@ -221,33 +201,17 @@ Motion-Zero 在零样本设置下对多个预训练视频扩散模型实现了�
 
 4. **质量-控制权衡。** 约束施加步数等设计存在固有的质量-控制强度权衡：过强的控制可能导致物体身份丢失和画面模糊，需要在具体应用中根据需求进行折中。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2401_10150/figures/003_Table_1.jpg]]
 *Table 1: Automatic metric on baseline methods and SOTA methods. The left half indicates the quality of the generation, while the right half demonstrates the control capability of the model. All metrics expect CD to be such that higher values(↑) indicate better performance. (c.) means the method is tested in complex trajectories. Align means Text Align, Cons. means Consistency and Pick. means PickScore*
 
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2401_10150/figures/010_Figure_7.jpg]]
 *Figure 7: Ablation studies on different components. We use ZeroScope as our baseline model. To demonstrate the coherence of the generated object’s motion, we captured every other frame, resulting in a total of 6 frames. The prompt is A lion is walking on the field. Zoom in for the best view*
 
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2401_10150/figures/004_Figure_3.jpg]]
-*Figure 3: Quality comparison results on different methods. We take one frame from every three frames. The input prompt: A fish is swimming in the sea. We employed ModelScope (a) and ZeroScope (b) as our baseline models and compared the effect of incorporating additional prompts with the integration of our Motion-Zero. In addition, we conducted a comparative analysis with TrailBlazer and Peekaboo*
-
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2401_10150/figures/011_Figure_8.jpg]]
 *Figure 8: Ablation studies on T1 ranging from 0 to 30. The prompt is A squirrel descending a tree after gathering nuts. Zoom in for the best view*
 
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2401_10150/figures/017_Figure_14.jpg]]
 *Figure 14: Ablation studies on different*
-
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2401_10150/figures/012_Figure_9.jpg]]
-*Figure 9: Ablation studies on different*
-
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2401_10150/figures/015_Figure_10.jpg]]
-*Figure 10: Ablation studies on different*
-
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2401_10150/figures/016_Figure_11.jpg]]
-*Figure 11: Ablation studies on different*
-
-
 
 ## 定位与知识库关联
 
@@ -291,8 +255,6 @@ Motion-Zero相较于上述方法的本质差异在于：它不仅依赖交叉注
 ### 知识库定位
 
 Motion-Zero在可控视频生成领域的方法谱系中占据“零样本推理时控制”这一独特位置。与需要训练的MotionCtrl等方法和基于简单注意力操纵的TrailBlazer等方法相比，Motion-Zero通过INPM-SC-STAM三模块协同，在控制精度和生成质量之间建立了新的零样本基准。其核心贡献在于揭示了预训练视频扩散模型已隐含丰富的物体运动知识，只需通过推理时的噪声先验注入和注意力引导即可显式化这些知识，为后续的免训练可控生成研究提供了“操纵潜变量和注意力图”这一可泛化的技术范式。
-
-
 
 ## 原文 PDF
 

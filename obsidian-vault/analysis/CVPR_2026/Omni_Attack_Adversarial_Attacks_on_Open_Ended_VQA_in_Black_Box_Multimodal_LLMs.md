@@ -51,8 +51,6 @@ Omni-Attack 针对上述瓶颈提出了一套系统的解决方案。其核心�
 
 实验结果表明，Omni-Attack 在 AdvRobustBench 基准上达到 71.8% 的定向攻击成功率（GPT-4.1，ε=8/255），在 ε=16/255 时进一步提升至 80.1%，显著优于先前方法。消融实验证实，问题条件的文本与视觉目标、多目标集成、循环验证以及正则化策略各自对性能均有显著贡献，其中 DropPath 和扰动 EMA 对攻击 Claude 系列模型至关重要。
 
-
-
 多模态大语言模型（MLLM）在视觉问答（VQA）等任务上展现出强大的能力，但其对抗鲁棒性正成为安全部署的关键瓶颈。针对MLLM的黑盒对抗攻击中，**基于迁移的攻击**因无需访问目标模型内部参数而具有实际威胁——攻击者利用白盒代理模型生成对抗样本，再将其迁移至黑盒受害者模型。然而，现有工作在开放域问答场景下面临两个根本性缺口：
 
 **缺口一：缺乏问题条件的优化目标。** 现有方法通常直接使用目标选项文本（如**Attack-VLM**，Zhao et al., NeurIPS 2023）或随机选取的图像（如**M-Attack**，Li et al., arXiv 2025）作为攻击目标。这种与问题语义脱节的目标信号导致优化方向模糊，尤其在需要复杂推理的任务上，攻击成功率显著受限。
@@ -62,8 +60,6 @@ Omni-Attack 针对上述瓶颈提出了一套系统的解决方案。其核心�
 **核心洞察**在于：多模态LLM本身具备强大的推理与生成能力，可以被反向利用来构造更有效的攻击目标。具体而言，利用LLM将问题转化为具体的“想象图像”文本描述，再通过文本到图像模型生成视觉目标，配合多目标集成优化，能够为对抗优化提供远强于传统方法的监督信号。同时，针对OCR任务引入位置感知的局部扰动，可将OCR攻击简化为局部VQA攻击。
 
 基于上述洞察，本文提出**Omni-Attack**，一种面向开放域VQA的黑盒迁移攻击方法，通过问题条件的目标构造、位置感知的OCR攻击和迁移性增强正则化，系统性地提升了复杂推理与文本识别场景下的攻击成功率。在GPT-4.1上，Omni-Attack在ε=8/255的扰动预算下达到71.8%的定向攻击成功率，显著优于先前方法。
-
-
 
 ## 核心方法与创新机理
 
@@ -108,8 +104,6 @@ $$x_{i+1} = \begin{cases} \operatorname{block}_i(x_i), & \text{if } \operatornam
 
 三个创新模块并非孤立运作。目标构造流水线提供了问题语义层面的监督信号，位置感知机制确保了 OCR 场景下的空间精度，而正则化体系则保障了这些信号在黑盒迁移过程中的有效性。这种**语义监督-空间控制-迁移保障**的三层协同，使 Omni-Attack 在 GPT-4.1 上达到 71.8% 的定向攻击成功率（$\epsilon=8/255$），显著超越先前方法。
 
-
-
 Omni-Attack 围绕一个核心洞察构建：现有黑盒对抗攻击在开放域 VQA 场景下缺乏有效的问题条件目标信号，导致复杂推理和文本识别任务上的攻击成功率低。为此，Omni-Attack 将攻击过程组织为三个协同模块，形成从目标构造到扰动优化再到迁移性增强的完整流水线。
 
 ### 输入输出流
@@ -143,12 +137,6 @@ $$p_{i}^{(j)} = \frac{\exp\bigl(\mathrm{S}_{i}(x_{\delta}, x_{\mathrm{T}}^{(j)})
 ### 模块间关系
 
 三个模块形成级联依赖：目标构造流水线为优化提供监督信号，位置感知 OCR 流水线决定扰动的空间作用范围，迁移性增强正则化则贯穿整个优化过程以保障黑盒迁移能力。消融实验表明，移除去噪正则化（DropPath 或扰动 EMA）后，Claude 3.7 上的 ASR 从 15.5% 骤降至 11.1%（Table 5），验证了正则化模块对突破高鲁棒性模型的必要性。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l770_https_openaccess_thecvf_com_content_CVPR2026_html_Hu_Omni_Attack_Adversa/figures/002_Figure.jpg]]
-
-
 
 ### 问题形式化与缩放成功率
 
@@ -212,8 +200,6 @@ $$
 
 消融实验（Table 5）表明，DropPath 和扰动 EMA 对攻击 Claude 系列模型至关重要——移除后 Claude 3.7 的 ASR 骤降至 11.1%。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -264,8 +250,6 @@ Omni-Attack 在 AdvRobustBench 基准上对多种黑盒多模态大模型进行�
 - **OCR 评估验证**：OCR 任务采用 LLM-as-judge 进行自动评判，并经过人工验证，精确率达 99%、召回率 97.5%，确保了评估结果的可靠性。
 - **多次运行取平均**：每个对抗样本在三次独立运行中评估，对结果取平均，以处理多模态 LLM 输出的非确定性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l770_https_openaccess_thecvf_com_content_CVPR2026_html_Hu_Omni_Attack_Adversa/figures/003_Table_1.jpg]]
 *Table 1: Performance of Omni-Attack best practices in ASR (%) on AdvRobustBench. Attack performed in a black-box targeted manner. Test examples that the victim LLM cannot resolve correctly with clean images are excluded in the computation of ASR*
 
@@ -283,8 +267,6 @@ Omni-Attack 在 AdvRobustBench 基准上对多种黑盒多模态大模型进行�
 
 ![[assets/figures/papers/paper_list_l770_https_openaccess_thecvf_com_content_CVPR2026_html_Hu_Omni_Attack_Adversa/figures/008_Table_7.jpg]]
 *Table 7: Comparison on non-CLIP models*
-
-
 
 ## 定位与知识库关联
 
@@ -339,8 +321,6 @@ Omni-Attack 在对抗攻击研究谱系中的定位可以概括为：**将多模
 5. 在真实场景（如图像压缩、传输）下，攻击的鲁棒性如何？随机 JPEG 压缩正则化虽然提升了迁移性，但实际部署中的多重失真可能进一步削弱攻击效果。
 
 > **注意**：关于 Claude 系列鲁棒性的具体成因（如是否采用对抗训练、不同的视觉编码器架构等），原文未提供详细分析，需结合 Claude 技术文档进行进一步验证。
-
-
 
 ## 原文 PDF
 

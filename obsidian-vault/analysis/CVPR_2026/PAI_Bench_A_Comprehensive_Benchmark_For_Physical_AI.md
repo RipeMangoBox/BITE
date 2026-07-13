@@ -154,8 +154,6 @@ PAI‑Bench 围绕一个核心诊断命题展开：**当前视频生成模型（
 
 这种“自动指标 + 人类锚定”的双层设计，使得 PAI‑Bench 既能在大规模模型评估中保持效率，又能确保评估结果与人类对物理合理性的判断高度一致。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2049_https_arxiv_org_abs_2512_01989/figures/001_Figure_1.jpg]]
 *Figure 1: | Overview of PAI-Bench framework. PAI-Bench is a comprehensive bench designed for diverse topics in Physical AI, including evaluation for text and condition to physical World Generation, and physical world understanding*
 
@@ -282,8 +280,6 @@ $$Div_c \gets \frac{2}{K(K-1)} \sum_{i<j} LPIPS(\hat{X}^{(i)}, \hat{X}^{(j)})$$
 4. **物理约束判断薄弱**：在具身推理的 Adherence to Physical Constraints 子任务中，模型经常无法识别违反物理规律的行为（如不稳定的堆叠、不可能的力交互），说明模型缺乏对物理世界基本约束的内化表征。
 
 5. **推理模式的不确定性**：Thinking Mode 对不同模型的影响方向相反，表明当前 MLLM 的推理能力高度依赖架构和训练策略，尚未形成稳定可靠的物理推理机制。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2049_https_arxiv_org_abs_2512_01989/figures/012_Figure_7.jpg]]
 *Figure 7: | Performance comparison across different frame counts on PAI-Bench-U*

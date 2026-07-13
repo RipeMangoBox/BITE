@@ -52,8 +52,6 @@ claims:
 
 方法定位上，UDAPose区别于传统的图像增强预处理（如DarkIR、QuadPrior）和非配对图像翻译（如CycleGAN、UNIT），后者无法忠实再现低光噪声的高频统计特性；也不同于ELLA等仅依赖数据增强的低光姿态估计方法，UDAPose通过DCA实现了逐关键点的图像线索与姿态先验动态平衡，在极端低能见度下仍保持解剖学一致性。
 
-
-
 ### 低光人体姿态估计的核心挑战
 
 人体姿态估计是高层视觉理解的基础任务，在自动驾驶、夜间监控、运动分析等场景中具有关键应用价值。然而，当光照严重不足时，视觉信息急剧退化——图像信噪比骤降、纹理细节淹没、关键点轮廓模糊——导致现有姿态估计器的性能出现断崖式下跌。这一退化并非简单的亮度降低，而是伴随复杂的高频噪声模式（如传感器读出噪声、光子散粒噪声），这些噪声与信号在频域高度混叠，难以通过常规去噪或增强手段分离。
@@ -78,8 +76,6 @@ claims:
 - **模型层面：解码器中信息融合的“刚性假设”。** 单阶段姿态估计器（如ED-Pose）在Transformer解码器中通过交叉注意力融合图像特征与可学习查询，但标准实现将两者简单相加，隐含假设所有关键点的图像线索同等可靠。在低光条件下，这一假设完全失效——脚踝、手腕等远端关键点往往完全淹没在噪声中，而躯干关键点仍保留部分视觉线索。
 
 本文的核心洞察是：**解决低光姿态估计需要同时在数据合成管线中实现“内容感知的高频噪声注入”，并在姿态解码器中引入“逐关键点的自适应信息源选择”**。前者确保训练数据覆盖真实低光的退化分布，后者使模型学会在视觉线索不可靠时自动退回到姿态先验，从而在极端低光下保持解剖学一致性。
-
-
 
 ## 核心方法与创新机理
 
@@ -131,8 +127,6 @@ UDAPose 位于**低光人体姿态估计 × 无监督域自适应 × 扩散模�
 1. **退化类型泛化受限**：当前框架（DHF + LCIM + DCA）专门针对光照不足引起的退化设计，难以直接泛化至其他低能见度场景（如浓雾、暴雨、严重运动模糊），需要设计新的模块合成相应退化。
 2. **计算开销大**：依赖大规模扩散模型（SD-2.1-base）导致合成管线 GPU 内存消耗高、生成时间长，限制了对新环境的快速适配。未来可探索一致性模型或蒸馏扩散模型以降低资源消耗。
 
-
-
 UDAPose 采用“数据合成—姿态估计”两阶段解耦框架，核心思路是：**在数据侧**，利用未配对的真实低光参考图像，通过稳定扩散（Stable Diffusion）模型将良好光照图像合成为高度逼真的低光训练样本，从而继承良好光照图像的精确姿态标注；**在模型侧**，通过在姿态估计器的 Transformer 解码器中引入动态控制注意力（DCA）机制，使模型能够自适应地平衡不可靠的图像线索与学习到的姿态先验。整体流程如 Figure 3 所示。
 
 ![[assets/figures/papers/paper_list_l1037_https_arxiv_org_abs_2604_10485/figures/003_Figure_3.jpg]]
@@ -166,8 +160,6 @@ $$Q = w_{pose} \odot Q_{pose} \oplus w_{image} \odot Q_{image}$$
 ### 训练与推理流程
 
 训练阶段，仅使用合成低光图像及其继承的良好光照标注进行姿态估计器训练，无需任何真实低光标注或配对数据。推理阶段，训练好的模型直接应用于真实低光图像，无需额外的增强或翻译步骤。这种“合成训练—真实推理”的域自适应策略，使得 UDAPose 在保持部署简洁性的同时，显著提升了对真实低光退化的鲁棒性。
-
-
 
 UDAPose 由两条协同管线构成：**内容感知的低光数据合成管线**（基于 Stable Diffusion 的 DHF + LCIM）和 **动态注意力融合的姿态估计管线**（基于 ED-Pose 的 DCA）。以下逐模块展开其核心公式与设计逻辑。
 
@@ -267,9 +259,6 @@ $$
 
 Figure 4 量化了 DCA 生效前后的 Frobenius 范数比 $\|\mathbf{Q}_{image}\|_2 / \|\mathbf{Q}_{pose}\|_2$：对于低能见度关键点（如被遮挡的腕部、踝部），DCA 显著降低图像线索的权重，使模型转而依赖从良好光照数据中学到的解剖学姿态先验。消融实验表明，DCA 在 LL-N、LL-H、LL-E 子集上分别带来 **+3.4、+2.7、+2.3 AP** 的提升（Table 5），且其逐关键点竞争机制优于通用注意力模块 SE-Block 和 CBAM（EHPT-XC 上分别高出 4.3 和 4.0 AP，Table 12）。
 
-![[assets/figures/papers/paper_list_l1037_https_arxiv_org_abs_2604_10485/figures/004_Figure_4.jpg]]
-*Figure 4: Ratio of Frobenius Norm of*
-
 ### 4. AIN：自适应强度归一化
 
 为稳定 Stable Diffusion 对低光输入的处理，UDAPose 引入自适应强度归一化：
@@ -280,12 +269,8 @@ $$
 
 其中 $\mu_{I_{LL}}$ 为输入图像的通道均值，$\delta = 0.449$ 为 ImageNet 数据集的平均亮度。该操作根据图像自身亮度进行**内容感知缩放**，在保持通道比例的前提下将整体亮度对齐至预训练模型的期望分布，避免固定因子缩放导致的过曝或欠曝。Table 10 的消融证实，AIN 在 LL-H 子集上优于直接输入、固定缩放和 z-score 标准化。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1037_https_arxiv_org_abs_2604_10485/figures/012_Figure_6.jpg]]
 *Figure 6: The architecture of our DCA module*
-
-
 
 ## 实验与关键发现
 
@@ -325,9 +310,6 @@ UDAPose在多个基准上一致优于现有图像增强和域自适应方法。�
 
 2. **DCA在关键点大量缺失时增益减小。** 当可见关节极少时（如极端遮挡），姿态先验本身也受限，DCA的软加权机制带来的收益递减。Figure 7(b)的掩码鲁棒性实验显示，随掩码比例增加，DCA的优势逐渐缩小。
 
-![[assets/figures/papers/paper_list_l1037_https_arxiv_org_abs_2604_10485/figures/020_Figure_7.jpg]]
-*Figure 7: (a) Effect of λ. (b) Masking evaluation w/ and w/o DCA*
-
 3. **扩散模型的计算开销。** 依赖大规模Stable Diffusion模型导致合成管线GPU内存消耗高、生成时间长，限制了对新环境的快速适配。未来可探索一致性模型或蒸馏扩散模型以降低资源需求。
 
 ### 关键图表结论速览
@@ -346,27 +328,11 @@ UDAPose在多个基准上一致优于现有图像增强和域自适应方法。�
 ![[assets/figures/papers/paper_list_l1037_https_arxiv_org_abs_2604_10485/figures/009_Table_5.jpg]]
 *Table 5: Ablation study of our proposed modules on ExLPose-test, ExLPose-OCN, and EHPT-XC. Well-lit: pose model trained with well-lit images only. HM: pose model adapted with synthetic lowlight images using histogram matching. AIN is a normalization step (see supplementary). The best is bold*
 
-![[assets/figures/papers/paper_list_l1037_https_arxiv_org_abs_2604_10485/figures/008_Table_4.jpg]]
-*Table 4: Cross-dataset validation on EHPT-XC [8], using the model weights as in Tab. 1. Best is bold, second best underlined*
-
-![[assets/figures/papers/paper_list_l1037_https_arxiv_org_abs_2604_10485/figures/007_Table_3.jpg]]
-*Table 3: Evaluation on ExLPose-OCN, following identical setup as in Tab. 1. The best is bold. The second best is underlined*
-
-![[assets/figures/papers/paper_list_l1037_https_arxiv_org_abs_2604_10485/figures/016_Table_10.jpg]]
-*Table 10: Evaluation of the AIN module on ExLPose-test and ExLPose-OCN. Direct input refers to feeding low-light images into SD without AIN. Experiments are conducted using the DEKR pose model [14], with DHF and LCIM enabled for all normalization approaches. The best is bold*
-
 ![[assets/figures/papers/paper_list_l1037_https_arxiv_org_abs_2604_10485/figures/017_Table_11.jpg]]
 *Table 11: Ablation study of LCIM on ExLPose-test, ExLPose-OCN, and EHPT-XC. z0 refers to baseline SD without any extra intermediate features. z1 to z4 represent low-to-high-frequency information fused in a coarse-to-fine integration strategy. Results are reported with AIN, DHF and DCA. The best is bold*
 
-![[assets/figures/papers/paper_list_l1037_https_arxiv_org_abs_2604_10485/figures/006_Table_2.jpg]]
-*Table 2: Evaluation mAR on ExLPose-test comparing image enhancement and domain adaptation methods, following Tab. 1. The best is bold. The second best is underlined*
-
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1037_https_arxiv_org_abs_2604_10485/figures/002_Figure_2.jpg]]
 *Figure 2: Limitations of learning-based low-light augmentation. The first two columns show well-lit and paired low-light images from ExLPose [30]. The third and fourth columns present results from CycleGAN [80] and StyleID [9]. The last column shows our result. Low-light images are scaled to an average channel intensity of 0.4 for visualization only*
-
-
 
 ## 定位与知识库关联
 
@@ -425,8 +391,6 @@ UDAPose 的方法论贡献可归纳为三个相互协同的组件，各自解决
 3. **极端遮挡的鲁棒性**：DCA 在关键点大量缺失时增益减小，如何进一步改进以应对极端遮挡场景？可能的路径包括引入更强的解剖学先验（如骨骼长度约束、关节角度限制）或多帧时序信息。
 
 4. **跨任务泛化验证**：该方法是否能够作为通用域自适应框架应用于其他高层视觉任务（如实例分割、目标检测）？DHF + LCIM 的数据合成范式与 DCA 的自适应融合机制在原理上不限于姿态估计，但需要在下游任务上进行系统验证。
-
-
 
 ## 原文 PDF
 

@@ -301,15 +301,9 @@ MSD 框架在两个代表性任务上验证：ImageNet-64×64 类别条件生成
 
 MSD 框架的通用性在一致性蒸馏（Consistency Distillation）上得到验证。在 2D 玩具实验中（Figure 6），将一致性蒸馏扩展为多学生版本后，更多学生同样提升蒸馏质量，证明 MSD 作为“即插即用”框架可应用于多种蒸馏方法。
 
-![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2410_23274/figures/011_Figure_6.jpg]]
-*Figure 6: A 2D toy model using consistency distillation. From left to right: teacher (multi-step) generation and student, one-step generation with 1 and 8 distilled students, the $\ell _ { 1 }$ distance of generated samples between teacher and students. Takeaway: More students improve distillation quality on this easy-to-visualize setup with consistency distillation*
-
 ### 失败模式与局限
 
 1. **小模型质量瓶颈。** 参数量减少 83% 的学生图像质量仍有明显下降，训练未完全收敛。Figure 9 显示，学生规模减小和覆盖类别数增加均导致单学生性能下降，尽管 TSM 预训练显著缓解了这一问题，但小模型在极端压缩下的质量边界仍需进一步突破。
-
-![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2410_23274/figures/015_Figure_9.jpg]]
-*Figure 9: The effect of student size, number of classes covered, and training stage on the performance of a single smaller student. XS, XXS, and B refer to model sizes, with precise definitions provided in Tab. 7. Also, see special evaluation details in App. E*
 
 2. **计算开销。** 小模型蒸馏需要较长的 TSM 预训练和多阶段蒸馏（TSM → DM → ADM），计算开销较大。Table 6 对比了各蒸馏方法的训练效率，MSD 在训练总开销上高于单学生方法，但推理效率保持不变。
 
@@ -320,19 +314,8 @@ MSD 框架的通用性在一致性蒸馏（Consistency Distillation）上得到�
 
 4. **任务覆盖范围。** 实验主要在 ImageNet-64×64 和 COCO 上验证，对于更高分辨率或更多样化的生成任务尚未全面评估。如何将基于语义聚类的分区策略自动扩展到开放文本条件生成仍是开放问题。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2410_23274/figures/009_Table_4.jpg]]
-*Table 4: Glossary and notation*
-
-![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2410_23274/figures/010_Table_5.jpg]]
-*Table 5: CLIP score comparison for high guidance scale on MS-COCO2014. LCM-LoRA is trained with a classifier-free guidance (CFG) scale of 7.5, while other methods use a CFG of 8*
-
 ![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2410_23274/figures/016_Table_7.jpg]]
 *Table 7: Hyperparameter details for different sized student models of the ADM architecture. Unspecified hyperparameters remain the same as the teacher. Latency is measured on a single NVIDIA RTX 4090 GPU*
-
-![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2410_23274/figures/017_Table_8.jpg]]
-*Table 8: Hyperparameter details for different sized student models of the SD v1.5 architecture. Only the diffusion model part is measured since the text encoder and the VAE remain frozen. Unspecified hyperparameters remain the same as the teacher. Latency is measured on a single NVIDIA RTX 4090 GPU*
 
 ## 定位与知识库关联
 

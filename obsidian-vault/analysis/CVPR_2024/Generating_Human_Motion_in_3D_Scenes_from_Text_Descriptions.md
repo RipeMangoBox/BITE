@@ -60,8 +60,6 @@ claims:
 
 **局限性**：当前方法假设场景为静态，无法处理动态物体或多人交互；文本描述限于模板化语言；目标定位依赖预训练三维检测器，检测错误会向下游传播。
 
-
-
 生成逼真的人体运动是计算机视觉和图形学中的核心问题，其在虚拟现实、机器人仿真、游戏角色动画等领域具有广泛的应用前景。近年来，随着生成模型的快速发展，从文本描述生成人体运动取得了显著进展。然而，当任务从空旷空间拓展到包含复杂物体布局的3D场景时，生成与场景中特定物体进行精确交互的运动仍然是一个极具挑战性的问题。
 
 这一挑战的根源在于多模态信息融合的复杂性。模型需要同时理解文本指令的语义意图、识别3D场景中与指令相关的目标物体，并生成能够精确接触或操作该物体的自然人体运动序列。现有的代表性方法如**HUMANISE**（Wang et al., NeurIPS 2022）尝试端到端地解决这一问题：它将整个3D场景的点云输入点云Transformer进行编码，通过隐式回归来定位交互目标，然后利用条件变分自编码器（cVAE）直接生成运动序列。
@@ -69,8 +67,6 @@ claims:
 然而，这种端到端的隐式定位策略存在一个关键瓶颈：**生成器难以从整个场景的密集点云中聚焦于与动作真正相关的目标物体**。场景中大量无关的几何信息（如墙壁、地板、其他家具）淹没了与交互目标直接相关的局部特征，导致模型在定位精度和运动交互质量上均受到限制。具体表现为生成的肢体末端无法准确到达目标物体表面，或交互姿态缺乏物理合理性。
 
 本文的核心动机在于：**将这一复杂的多模态生成问题分解为两个更可管理的子问题，以降低学习难度并提升生成质量**。这一思路的因果操纵点是：如果能够先显式地定位出文本所指的目标物体，那么后续的运动生成就可以围绕该物体展开，从而将注意力集中在场景的局部相关区域，而非处理整个场景的冗余信息。基于此，本文提出了一种LLM引导的两阶段生成框架，利用大语言模型的常识推理能力实现显式的3D视觉基础，并围绕定位到的目标物体构建轻量的物体中心场景表示，指导扩散模型生成轨迹和局部姿态。
-
-
 
 ## 核心方法与创新机理
 
@@ -108,8 +104,6 @@ claims:
 
 上述四个 changed slots 围绕“分解复杂问题、聚焦交互核心”这一核心洞察展开：通过将3D场景转换为文本表示并利用LLM进行显式语言定位，再围绕定位结果构建轻量体积传感器表示，最后以两阶段扩散模型生成轨迹和运动，本方法系统性地解决了基线方法中“场景信息过载导致交互不准”的瓶颈问题。
 
-
-
 本文提出了一种基于大语言模型引导的两阶段生成框架，将“根据文本描述在3D场景中生成人体运动”这一复杂多模态问题，显式分解为**目标物体的语言定位**与**以物体为中心的运动生成**两个子问题。这一分解策略的核心动机在于：现有方法（如HUMANISE）直接对整个场景点云进行隐式编码与定位，导致生成器难以聚焦于与动作语义真正相关的目标物体，从而限制了交互精度与运动质量。
 
 整体流程如Figure 2所示，包含以下串联模块：
@@ -124,12 +118,8 @@ claims:
 
 该框架的关键优势在于**问题分解带来的专注性**：ChatGPT的常识推理能力使得目标物体定位更精确，而后续的物体中心表示与两阶段生成则让模型能够完全聚焦于相关的场景局部，从而在降低学习难度的同时，显著提升了人-物交互的准确性和运动生成的整体质量。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1713_Generating_Human_Motion_in_3D_Scenes_from_Text_Descriptions/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our two-stage pipeline. In the first stage, given an input scene and a text description (a), we use ChatGPT to locate the target object (b). In the second stage, human motions are synthesized by first producing human trajectories (c) and then generating local poses (d)*
-
-
 
 本方法的核心架构由三个关键模块串联而成：基于大语言模型的目标物体显式定位、以物体为中心的体积传感器场景表示，以及两阶段条件扩散生成模型。以下逐一剖析其设计机理与数学基础。
 
@@ -190,15 +180,11 @@ $$\mathbf{C}_m = \{L, E, T, O_1, ..., O_N\}$$
 
 两阶段分解的关键优势在于降低了单次生成的复杂度：轨迹生成只需关注宏观的空间规划，运动补全则专注于局部的姿态自然性。消融实验表明，将轨迹和运动合并为单阶段生成（`w/o two-stage`）会导致运动质量下降，人体倾向于“瞬间坍缩”到目标位置而非产生自然的趋近过程（Table 2）。此外，将扩散模型替换为cVAE（`w/o diffusion`）也会降低生成质量，验证了扩散模型在该任务中的优势。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1713_Generating_Human_Motion_in_3D_Scenes_from_Text_Descriptions/figures/003_Figure_3.jpg]]
 *Figure 3: Pipeline of localizing the target object. In stage 1, given the input text description and detected object bounding boxes (bbx), we construct the first prompt asking ChatGPT the categories of target objects and anchor objects. Based on the response, the scene graph can be simplified. In stage 2, we construct the second prompt with inputs and results from stage 1, including object relations derived from the simplified scene graph. The second prompt is designed for asking ChatGPT to infer the target object. Finally, we can get the target object bounding box from the response of ChatGPT*
 
 ![[assets/figures/papers/paper_list_l1713_Generating_Human_Motion_in_3D_Scenes_from_Text_Descriptions/figures/005_Figure_4.jpg]]
 *Figure 4: The visualization of the environment sensor, target sensor, and trajectory sensor. The target sensor (b) gives detailed geometry of the target object. The environment sensor (c) gives coarse spatial information around the target object. The trajectory sensor (d) is located around the human*
-
-
 
 ## 实验与关键发现
 
@@ -246,24 +232,14 @@ $$\mathbf{C}_m = \{L, E, T, O_1, ..., O_N\}$$
 3. **运动时长限制**：生成的运动时长受训练数据约束，生成长序列运动仍具挑战。
 4. **检测误差传播**：目标物体定位依赖预训练的3D检测器，检测错误会级联传播到后续运动生成阶段，导致交互失败。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1713_Generating_Human_Motion_in_3D_Scenes_from_Text_Descriptions/figures/006_Table_1.jpg]]
 *Table 1: Quantitative results on the HUMANISE dataset. We compare our method with four baselines (please refer to Sec. 5.2) and the real data. GMDHC means using HUMANISE’s predicted center to guide motion generation in GMD∗. Among the metrics, scene score and quality score are perceptual studies. ↑ means higher is better and ↓ means lower is better. → means closer to the real data is better. Bold indicates the best results. Underline indicates the second best*
 
 ![[assets/figures/papers/paper_list_l1713_Generating_Human_Motion_in_3D_Scenes_from_Text_Descriptions/figures/008_Table_2.jpg]]
 *Table 2: Ablation of main components. We compare our method with five variants (please refer to Sec. 5.3). Among them, mm indicates multimodality. Bold indicates the best results. Underline indicates the second best*
 
-![[assets/figures/papers/paper_list_l1713_Generating_Human_Motion_in_3D_Scenes_from_Text_Descriptions/figures/009_Table_3.jpg]]
-*Table 3: Design choices of object localization. We compare our method with two baselines and five variants (please refer to Sec. 5.3). Since HUMANISE directly regresses the coordinate of centers without utilizing groundtruth detection, we do not calculate acc. and only include their results under predicted detection. Bold indicates the best results*
-
 ![[assets/figures/papers/paper_list_l1713_Generating_Human_Motion_in_3D_Scenes_from_Text_Descriptions/figures/007_Figure_5.jpg]]
 *Figure 5: Qualitative results. We compare our method with groundtruth and four baselines (please refer to Sec. 5.2) given the same text descriptions. Our method synthesizes motions that interact with the object precisely as the groundtruth data while the baselines fail*
-
-![[assets/figures/papers/paper_list_l1713_Generating_Human_Motion_in_3D_Scenes_from_Text_Descriptions/figures/010_Figure_6.jpg]]
-*Figure 6: Qualitative results of our method on the PROX dataset. We run our method on the scenes from the PROX dataset without fine-tuning. Results show that our method is capable to generalize to unseen scenes and objects*
-
-
 
 ## 定位与知识库关联
 
@@ -305,8 +281,6 @@ $$\mathbf{C}_m = \{L, E, T, O_1, ..., O_N\}$$
 - 是否可以利用更大的LLM或多模态视觉-语言模型直接处理点云，取消文本中间表示，实现端到端的3D视觉基础？
 - 能否将方法应用于户外场景或更大规模环境，突破当前室内场景的局限？
 - 如何增强模型对自由形式、非模板化文本描述的理解和泛化能力？
-
-
 
 ## 原文 PDF
 

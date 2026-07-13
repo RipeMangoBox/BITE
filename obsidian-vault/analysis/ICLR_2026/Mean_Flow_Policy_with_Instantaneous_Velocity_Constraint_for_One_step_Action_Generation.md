@@ -56,8 +56,6 @@ claims:
 
 当前工作的主要局限在于仅在仿真基准上验证，尚未在真实机器人平台部署；训练中计算 Jacobian-vector product（JVP）可能增加 GPU 内存开销；IVC 系数虽不敏感，但仍需手动设定。未来方向包括扩展到更高维动作空间、探索避免 JVP 计算的近似方案，以及在真实环境中验证性能。
 
-
-
 ### 机器人操作中的策略学习困境
 
 在长周期、稀疏奖励的机器人操作任务中，学习表达能力强且采样效率高的策略函数是核心挑战。当前主流方法可分为两大范式：**行为克隆（BC）** 直接从专家演示中学习确定性映射，但难以捕获多模态动作分布；**扩散/流基策略**通过迭代去噪过程建模复杂的动作分布，在多模态任务上表现优异，却面临严重的效率瓶颈。
@@ -85,8 +83,6 @@ $$-u(a(t), t, r, s) + (r-t) \frac{d}{dt} u(a(t), t, r, s) = -v(a(t), t, s)$$
 - **表达力侧**：引入**瞬时速度约束（IVC）**，为平均流恒等式显式提供边界条件，迫使积分常数为零，消除多解性，确保策略保持强表达力。
 
 这一设计使得 MVP 在保持流基策略多模态建模能力的同时，大幅提升训练与推理效率，为机器人操作中的策略学习提供了一种高效且表达力强的替代方案。
-
-
 
 ## 核心方法与创新机理
 
@@ -130,8 +126,6 @@ $$\mathcal{L}_{\mathrm{policy}}(\theta) = \mathcal{L}_{\mathrm{MF}}(\theta) + \l
 
 **需人工验证**：IVC 系数 $\lambda$ 虽不敏感，但默认值 1.0 为手动选择，缺乏自适应机制。训练中 JVP 计算可能增加 GPU 内存消耗，在资源受限环境下需额外评估。
 
-
-
 MVP（Mean Velocity Policy）的整体框架围绕**平均速度场建模**与**Best-of-N策略改进**两条主线展开，包含离线预训练与在线微调两个阶段，核心模块及其交互关系如下。
 
 ### 模块构成与职责
@@ -151,8 +145,6 @@ MVP（Mean Velocity Policy）的整体框架围绕**平均速度场建模**与**
 ### 效率优势的根源
 
 传统流基策略依赖多步迭代采样（如10步），训练中每步需反复调用速度模型，推理时同样需要多步积分。MVP用平均速度场替代瞬时速度场，将动作生成压缩为**单步映射**，从根源上消除了迭代采样的计算开销。这一设计使在线训练速度达到153.6 iter/s，较BFN（68.0 iter/s）提升2.2倍以上；CPU推理时间仅10.93ms，与最快的单步基线相当，远低于BFN（117.3ms）和QC（113.2ms）。
-
-
 
 ### 3.1 平均速度策略（Mean Velocity Policy, MVP）
 
@@ -202,8 +194,6 @@ $$\mathcal{L}_{Q}(\phi) = \mathbb{E}\left[\left(Q_{\phi}(s_k, a_k) - \left(r_k +
 
 整体流程如 Algorithm 1 所示：先在离线数据集上预训练策略和 Critic，再进入在线交互与微调阶段，交替优化两者。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -211,9 +201,6 @@ $$\mathcal{L}_{Q}(\phi) = \mathbb{E}\left[\left(Q_{\phi}(s_k, a_k) - \left(r_k +
 MVP在Robomimic和OGBench共9个长时域、稀疏奖励的机器人操作任务上与三个强基线进行了对比：**FQL**（Park et al., 2025，先训练多步流策略再蒸馏为单步策略）、**BFN**（Ghasemipour et al., 2021，Best-of-N采样结合多步流策略）和**QC**（Li et al., 2025，在BFN基础上加入动作分块）。所有方法使用相同的离线数据集、评估环境和超参数，每个任务使用5个随机种子重复实验，报告均值和标准差。
 
 **Table 1**展示了各方法的成功率对比。MVP在9个任务中的8个上达到或超越当前最优水平，平均成功率达到0.88±0.05，优于QC的0.86±0.05。具体而言：
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_mIeKe74W43/figures/004_Table_1.jpg]]
-*Table 1: Success rates. Mean ± Std over 5 seeds. Bold = best, underlined = 2nd-best*
 
 - 在Robomimic-lift任务上，MVP与BFN均达到1.00的完美成功率。
 - 在Robomimic-can任务上，MVP取得0.92±0.07，略低于QC的0.94±0.06。
@@ -255,12 +242,6 @@ MVP在Robomimic和OGBench共9个长时域、稀疏奖励的机器人操作任务
 
 为验证MVP的优势并非单纯来自“一步生成”，**Figure 5**和**Table 5**将MVP与各基线的单步变体（如FQL-Onestep等）进行了对比。结果显示，这些单步基线在困难任务（如Cube-triple-task4）上成功率几乎为零，而MVP凭借平均速度场建模和IVC约束保持了强大的表达力，取得了0.52以上的成功率。这证明单纯的一步生成不足以解决复杂操作任务，MVP的建模设计是关键。
 
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_mIeKe74W43/figures/006_Figure_5.jpg]]
-*Figure 5: Training curves of comparison with one-step flow*
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_mIeKe74W43/figures/010_Table_5.jpg]]
-*Table 5: Comparison with one-step variants of the aforementioned baselines*
-
 ### 失败模式与局限性
 
 尽管MVP在多数任务上表现优异，但以下局限性值得关注：
@@ -280,21 +261,8 @@ MVP在Robomimic和OGBench共9个长时域、稀疏奖励的机器人操作任务
 | **Figure 4 / Table 4** | IVC权重与成功率正相关，λ=1.0将Cube-triple-task4成功率从0.30提升至0.52 |
 | **Figure 5 / Table 5** | 单步基线在困难任务上几乎为零，MVP的表达力优势来自建模设计而非仅一步生成 |
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_mIeKe74W43/figures/011_Figure_6.jpg]]
-*Figure 6: Snapshots of the 9 challenging long-horizon, sparse-reward manipulation tasks*
-
 ![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_mIeKe74W43/figures/012_Figure_7.jpg]]
 *Figure 7: Visualizations of typical success episodes: Robomimic-lift, Robomimic-can, Robomimic-square, Cube-double-task2, and Cube-double-task3*
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_mIeKe74W43/figures/013_Figure.jpg]]
-*Figure: (a) Double-task4 (b) step = 40*
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_mIeKe74W43/figures/014_Figure_8.jpg]]
-*Figure 8: Visualizations of typical success episodes: Cube-double-task4, Cube-triple-task2, Cube-tripletask3, and Cube-triple-task4*
-
-
 
 ## 定位与知识库关联
 
@@ -344,8 +312,6 @@ MVP 在方法谱系中处于“流基策略”与“单步生成”的交汇点�
 1. **高维动作空间扩展**：当前验证集中于机械臂操作（6-7维动作空间），方法能否扩展到更复杂的高维动作空间（如灵巧手操作、全身控制）尚待验证。
 2. **JVP 计算替代方案**：能否通过近似方法（如有限差分）或对抗训练框架避免 JVP 计算，以降低训练时的 GPU 内存开销，是提升方法实用性的重要方向。
 3. **真实机器人部署**：在真实环境中，观测噪声、动力学不确定性等因素对单步生成策略的鲁棒性影响需要进一步研究。
-
-
 
 ## 原文 PDF
 

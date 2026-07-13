@@ -88,8 +88,6 @@ DSDFM 属于**基于潜空间的生成式人体运动合成方法**，其知识�
 
 > **注意**：本文未提供发表年份与会议信息，以上定位基于分析文本中的方法对比与引用推断，建议在正式引用时核实原始论文的发表状态。
 
-
-
 人体运动合成旨在生成自然、逼真且多样化的人体动作序列，在动画制作、虚拟现实、人机交互等领域具有广泛应用。近年来，深度生成模型在该领域取得了显著进展，其中基于分数的生成模型（Score-based Generative Models, SGMs）和流匹配（Flow Matching）方法展现出强大的生成能力。然而，这些方法在人体运动生成中面临一个核心瓶颈：**训练过程采用曲线轨迹，导致训练不稳定、采样效率低，且难以同时保证生成质量与多样性**。
 
 具体而言，当前主流方法（如 VPSDE、VESDE）在训练阶段需要估计复杂的分数函数或执行去噪过程，其扩散路径本质上是弯曲的 SDE 轨迹。这种弯曲路径不仅增加了训练的收敛难度，还迫使模型在推理时需要大量采样步数才能获得高质量结果。此外，这些方法的多样性完全依赖于固定的随机后验或确定性 ODE 演化，缺乏可控的多样性调节机制——一旦训练完成，生成样本的多样性便被锁定，无法在不重新训练的情况下按需调整。
@@ -97,8 +95,6 @@ DSDFM 属于**基于潜空间的生成式人体运动合成方法**，其知识�
 上述问题形成了一个“质量-多样性-效率”的三元困境：提升生成质量往往需要更多采样步数，牺牲效率；增强多样性可能引入失真，损害质量；而追求训练效率则可能限制模型的表达能力。因此，**如何设计一种能够稳定训练、高效采样，且在推理阶段可灵活控制多样性的生成框架**，成为该领域亟待解决的关键问题。
 
 本文的动机正是源于对这一困境的深入观察。作者提出 DSDFM（Deterministic-to-Stochastic Diverse Latent Feature Mapping），其核心思路是将确定性映射与随机多样性生成**解耦**：在训练阶段，通过最优传输（Optimal Transport）将高斯分布到潜空间的映射线性化，使模型仅需学习直线漂移量，从而消除复杂的去噪或分数估计过程，实现稳定高效的训练；在推理阶段，引入可调噪声水平的随机微分方程（DivSDE），复用确定性映射的输出进行二次计算，在无需额外训练的前提下实现多样性增强。这种“先确定、后随机”的设计哲学，使得模型既能享受直线轨迹带来的训练与采样效率优势，又能获得可控的生成多样性。
-
-
 
 ## 核心方法与创新机理
 
@@ -139,8 +135,6 @@ DivSDE 的关键优势在于**直接复用 DerODE 的确定性输出** $\widetil
 | 重新训练需求 | 改变多样性需重新训练 | 无需重新训练 |
 
 这种“确定性骨架 + 随机性外挂”的架构设计，使得 DSDFM 在保持高质量生成的同时，实现了训练与推理的双重高效，为人体运动合成提供了一种更优雅且实用的解决方案。
-
-
 
 DSDFM（Deterministic-to-Stochastic Diverse Latent Feature Mapping）将人体运动合成分解为两个解耦的阶段，分别对应**潜空间重建**与**多样化生成**，其总览如 **Figure 2** 所示。第一阶段（红色箭头）通过 VQVAE 学习人体运动的紧凑潜表征；第二阶段（绿色箭头）先利用确定性常微分方程（DerODE）建立高斯分布到潜空间的直线映射，再在推理时注入可控的随机微分方程（DivSDE）以产生多样化输出。两阶段分离的核心动机在于：传统基于分数的生成模型（SGMs）与流匹配方法依赖弯曲的 SDE 训练轨迹，导致训练不稳定、采样效率低，且生成质量与多样性难以兼得。DSDFM 将确定性直线映射与随机多样性生成解耦，从而无需重新训练即可灵活调节多样性。
 
@@ -192,8 +186,6 @@ $$
 4. 通过阶段一的 VQVAE 解码器将 $z_{0,i}$ 重建为多样化的人体运动序列。  
 
 这一 pipeline 将训练复杂度压缩至直线路径上的漂移预测，同时将多样性控制完全置于推理阶段，实现了训练稳定性、采样效率与生成多样性的分离优化。
-
-
 
 DSDFM 由两个核心阶段构成：第一阶段通过 VQVAE 学习人体运动的紧凑潜空间表征；第二阶段通过确定性特征映射（DerODE）与随机多样化生成（DivSDE）实现从高斯噪声到多样化运动潜变量的高效转换。以下分别阐述各模块的设计逻辑与关键公式。
 
@@ -259,8 +251,6 @@ $$
 
 其中 $\varepsilon \sim \mathcal{N}(0,I)$，$\Delta t$ 为时间步长。该更新包含三项：漂移项将 $z$ 推向原点，确定性引导项利用 $\widetilde{z}_{0,i}$ 提供结构约束，噪声项通过 $\eta$ 调节多样性强度。DivSDE 直接借用 DerODE 已计算的结果，无需重新引入其他训练过程，实现了确定性映射与随机多样性的解耦。
 
-
-
 ## 实验与关键发现
 
 ### 评估设置
@@ -320,21 +310,12 @@ Table 3 考察了推理步数对性能的影响。DSDFM 在仅使用 **100 步**
 
 Table 4 在更大规模的 HumanML3D 数据集上进一步验证效率优势。DSDFM 的训练时间仅为 **7.02 min**，推理时间 1.21 s，均显著低于 VPSDE（11.94 min / 2.78 s）和 VESDE（11.96 min / 2.75 s）。这证明了最优传输配对策略和直线漂移学习在不同数据规模下的稳定高效性。
 
-![[assets/figures/papers/paper_list_l1856_DSDFM_Deterministic_to_Stochastic_Diverse_Latent_Feature_Mapping_for_Hum/figures/004_Table_4.jpg]]
-*Table 4: Ablation study on the comparison results of training and inference time on the HumanML3D dataset*
-
 ### 可视化分析
 
 Figure 3 展示了 DSDFM 在不同设置下的生成结果，包括无条件生成和动作条件生成。可视化结果表明，生成的运动序列在时序连贯性和动作自然度上均表现良好。Figure 7 提供了与 SOTA 方法的定性对比，DSDFM 生成的运动在多样性和准确性上均具有竞争力。Figure 8 以散点图形式呈现了参数量与 FID 的关系，DSDFM 位于左下角区域，即最少参数量与最低 FID 的交汇点，直观体现了方法的效率优势。
 
 ![[assets/figures/papers/paper_list_l1856_DSDFM_Deterministic_to_Stochastic_Diverse_Latent_Feature_Mapping_for_Hum/figures/008_Figure_3.jpg]]
 *Figure 3: Qualitative results of DSDFM. We present the generated human motion sequences under different settings. The unconditional human motion sequences (top) are generated from the HumanAct12 dataset. The Action-to-Motion results (bottom) show the generated diverse motion sequences under the Sit and Run action labels, which are sampled from the HumanML3D dataset*
-
-![[assets/figures/papers/paper_list_l1856_DSDFM_Deterministic_to_Stochastic_Diverse_Latent_Feature_Mapping_for_Hum/figures/012_Figure_7.jpg]]
-*Figure 7: The qualitative comparison results of the state-of-the-art methods and our proposed DSDFM*
-
-![[assets/figures/papers/paper_list_l1856_DSDFM_Deterministic_to_Stochastic_Diverse_Latent_Feature_Mapping_for_Hum/figures/013_Figure_8.jpg]]
-*Figure 8: Comparison of the training parameter and the corresponding FID metric*
 
 ### 失败模式与局限
 
@@ -345,19 +326,6 @@ Figure 3 展示了 DSDFM 在不同设置下的生成结果，包括无条件生�
 3. **长序列生成**：实验主要在 HumanAct12 和 HumanML3D 上进行，未涉及超长运动序列的生成评估，直线轨迹假设在长时序场景下的累积误差特性尚不明确。
 
 以上局限需结合实际应用场景进行手动验证。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1856_DSDFM_Deterministic_to_Stochastic_Diverse_Latent_Feature_Mapping_for_Hum/figures/001_Figure_1.jpg]]
-*Figure 1: Examples of the inference process for human motion synthesis. Our method aims to generate diverse and accurate human motion sequences through the designed generative model*
-
-![[assets/figures/papers/paper_list_l1856_DSDFM_Deterministic_to_Stochastic_Diverse_Latent_Feature_Mapping_for_Hum/figures/010_Figure_5.jpg]]
-*Figure 5: Qualitative results of DSDFM. We present more generated unconditional human motion sequences*
-
-![[assets/figures/papers/paper_list_l1856_DSDFM_Deterministic_to_Stochastic_Diverse_Latent_Feature_Mapping_for_Hum/figures/011_Figure_6.jpg]]
-*Figure 6: Qualitative results of DSDFM. We present the diverse human motion sequences under different actions*
-
-
 
 ## 定位与知识库关联
 
@@ -450,8 +418,6 @@ DSDFM在人体运动生成领域的方法谱系中占据以下位置：
 - **多样性控制**：从“训练时隐式学习”演进为“推理时显式注入”，属于**可控多样性**分支。
 
 该方法的核心贡献在于**通过最优传输实现训练与推理的机制分离**，为生成模型的设计提供了一个可泛化的范式：确定性映射负责质量，随机注入负责多样性，两者独立优化、协同工作。
-
-
 
 ## 原文 PDF
 

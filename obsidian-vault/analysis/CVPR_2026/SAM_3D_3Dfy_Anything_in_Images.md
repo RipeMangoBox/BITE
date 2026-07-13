@@ -132,9 +132,6 @@ SAM 3D 突破了传统依赖3D艺术家直接创建网格的标注瓶颈，设�
 
 SAM 3D 的目标是将单张 RGB 自然图像中的物体转化为可组合的三维场景——对每个目标物体同时预测其几何形状、表面纹理以及在世界坐标系中的六自由度布局（旋转、平移、缩放），从而实现完整的场景重建（Figure 1）。
 
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2511_16624/figures/001_Figure_1.jpg]]
-*Figure 1: SAM 3D converts a single image into a composable 3D scene made of individual objects. Our method predicts per-object geometry, texture, and layout, enabling full scene reconstruction. Bottom: high-quality 3D assets recovered for each object*
-
 为实现这一目标，SAM 3D 采用**两阶段级联架构**（Figure 2）。第一阶段由 **Geometry Model** 负责，它接收输入图像 $I$ 和目标掩码 $M$，通过条件流匹配建模联合分布 $p(O, R, t, s \mid I, M)$，在 $64^3$ 体素空间中生成粗略形状 $O$，并直接去噪输出 6D 旋转 $R$、平移 $t$ 和缩放 $s$。第二阶段由 **Texture & Refinement Model** 承接，它以第一阶段输出的粗略形状 $O$ 为条件，学习分布 $p(S, T \mid I, M, O)$，融合图像线索对几何细节进行细化，并合成纹理 $T$，最终输出精细形状 $S$ 与纹理。
 
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2511_16624/figures/002_Figure_2.jpg]]
@@ -148,8 +145,6 @@ SAM 3D 的目标是将单张 RGB 自然图像中的物体转化为可组合的�
 *Figure 4: SAM 3D training paradigm. We employ a multi-stage pipeline incrementally exposing the model to increasingly complex data and modalities*
 
 这一设计使得 SAM 3D 能够将识别能力转化为 3D 重建能力：合成预训练阶段建立基础形状词汇，半合成与真实数据对齐阶段实现域泛化，最终在遮挡、杂乱的真实场景中实现视觉标定的三维重建。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2511_16624/figures/020_Figure_15.jpg]]
 *Figure 15: Reward model data recovery pipeline. The diagram shows how we use reward mdoels to increase N in best-of-N search to improve the chance of a successful annotation on challenging tail inputs. We use both a VLM and also DPO implicit reward as reward models*
@@ -199,8 +194,6 @@ $$\Delta = \| \mathbf{v}^w - \mathbf{v}_\theta(x_\tau^w, c, \tau) \|_2^2 - \| \m
 $$\mathcal{L}_S(\theta) = \mathbb{E}_{\mathbf{x}_0 \sim \mathsf{N}(0,I), \tau \downarrow \sim p(x,d)} \Big[ \| \mathbf{v} - \mathbf{v}_\theta(x_\tau, c, \tau, d=0) \|^2 + \| \mathbf{v}_{\mathrm{consistency}} - \mathbf{v}_\theta(x_\tau, c, \tau, 2d) \|^2 \Big]$$
 
 第一项为标准流匹配目标（$d=0$），第二项为一致性目标（步长为 $2d$），强制模型在更大步长下仍保持预测一致性，从而实现少步高质量的生成。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2511_16624/figures/006_Figure_5.jpg]]
 *Figure 5: Life of an example going through the data collection pipeline. We streamline annotation by breaking it into subtasks: annotators first choose target objects (Stage 1); rank and select 3D model candidates (Stage 2); then pose these models within a 2.5D scene (Stage 3). Stages 2 and 3 use model-in-the-loop*
@@ -255,22 +248,8 @@ SAM 3D 联合预测物体形状与 6D 布局（旋转、平移、缩放），在
 
 使用奖励模型扩展 best-of-N 搜索（N=50）恢复的 SFT 数据（表 12），有效提升了尾部类别和挑战性数据集（如 Epic Kitchens）上的 Chamfer 距离和 F1 指标，表明通过模型自身筛选高质量伪标签可以进一步挖掘数据引擎的潜力，尤其对长尾分布场景具有实用价值。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2511_16624/figures/009_Table_2.jpg]]
 *Table 2: 3D shape quantitative comparison to competing image-to-3D methods, including Trellis (Xiang et al., 2025), HY3D-2.1 (Hunyuan3D et al., 2025), HY3D-2.0 (Team, 2025), Direct3D-S2 (Wu et al., 2025a), TripoSG (Li et al., 2025), Hi3DGen (Ye et al., 2025). SA-3DAO shows metrics that measure accuracy against GT geometry; ISO3D (Ebert, 2025) has no geometric GT and so we show perceptual similarities between 3D and input images (ULIP (Xue et al., 2023) and Uni3D (Zhou et al., 2023)). TripoSG uses a significantly higher mesh resolution, which is rewarded in perceptual metrics*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2511_16624/figures/010_Figure_8.jpg]]
-*Figure 8: Preference comparison on scene-level and object-level reconstruction. Numbers indicate human preference rates. Objects comparisons are done on textured meshes. SAM 3D is significantly preferred over others on all fronts*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2511_16624/figures/011_Table_3.jpg]]
-*Table 3: 3D layout quantitative comparison to competing layout prediction methods on SA-3DAO and Aria Digital Twin (Pan et al., 2023). SAM 3D significantly outperforms both pipeline approaches used in robotics (Labbé et al., 2022; Wen et al., 2024) and joint generative models (MIDI (Huang et al., 2025)). Most SA-3DAO scenes only contain one object so we do not show MIDI results that require multi-object alignment. The metrics measure bounding box overlap, rotation error, and chamfer-like distances normalized by object diameter*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2511_16624/figures/013_Table_4.jpg]]
-*Table 4: Cascading improvements from multi-stage training on 3D shape and texture. For texture, we report win rates (WR) between each row and the row above it*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2511_16624/figures/024_Table_7.jpg]]
-*Table 7: Training stage knockout. The impact of training on MITL and 3D artist-generated data*
 
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2511_16624/figures/028_Table_10.jpg]]
 *Table 10: Rotation representation. Ablation on the representation used during pretraining. We report Chamfer distances and ICP rotation error*

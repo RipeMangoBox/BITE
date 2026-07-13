@@ -56,8 +56,6 @@ claims:
 
 **方法定位**：FG-Portrait 属于“基于扩散模型的人像动画”方法簇，其核心改进在于将运动条件从二维信号升级为基于参数化头部模型的几何驱动3D流编码。在方法谱系上，它继承了 ControlNet 的条件注入范式，但在运动表征层面实现了从“隐式学习对应”到“显式几何对应”的范式跃迁。
 
-
-
 人像动画（Portrait Animation）的目标是给定一张源图像与一段驱动视频（或单张驱动图像），生成一个目标人像视频，使其保持源人物的身份信息，同时准确复现驱动的头部姿态与表情。这一任务在虚拟数字人、视频会议、影视制作等场景中具有广泛的应用前景。
 
 ### 现有方法的缺口：运动对应关系的缺失
@@ -71,8 +69,6 @@ claims:
 针对上述问题，本文提出一个核心洞察：**利用参数化3D头部模型的顶点级语义一致性，可以为源与驱动之间建立精确的、无需学习的运动对应关系**。具体而言，本文引入 **3D流（3D Flow）** 作为源与驱动之间的显式运动桥梁——它描述了从目标姿态到源姿态的逐点3D位移向量，由参数化头部模型FLAME直接计算得出，不依赖任何学习过程，因而具有几何上的鲁棒性和跨身份泛化能力。
 
 进一步地，本文提出**深度引导采样（Depth-Guided Sampling）** 机制，将3D流编码为扩散模型可理解的条件信号，使网络获得像素级的精确运动引导。这一设计从根本上解决了扩散模型“猜测”运动对应关系的歧义问题，在保持源身份的同时实现高保真的运动传递。
-
-
 
 ## 核心方法与创新机理
 
@@ -121,8 +117,6 @@ $$\boldsymbol{p}_{tgt}^{n} = H \left[ d_{n} \left( K^{-1} q_{tgt} \right)^{\top}
 $$\psi_{dri} \leftarrow \psi_{dri} + \Delta \psi_{usr}, \quad \theta_{dri} \leftarrow \theta_{dri} + \Delta \theta_{usr}$$
 编辑后的系数重新驱动 3D 流计算，无需重新训练或微调，即可生成符合用户指定运动的目标图像（Fig. 8）。
 
-
-
 FG-Portrait 的整体 pipeline 围绕一个核心设计展开：**将显式的3D运动对应关系编码为扩散模型的条件信号**，从而在保持源人物身份的同时，高保真地传递驱动运动的姿态与表情。框架由三个逻辑阶段串联构成：**3D头部建模与流计算**、**深度引导采样与3D流编码**、**条件扩散生成**。
 
 ### 输入输出流
@@ -168,8 +162,6 @@ FG-Portrait 在肖像动画领域的方法谱系中占据一个独特位置。�
 **证据强度**：定量消融（Table 4）直接验证了3D流编码相对于驱动landmark和预测光流的优越性——在所有APD/AED指标上均取得最佳。深度引导采样的消融（Table 5）显示，相比均匀采样，APD从3.254降至2.682，LPIPS从0.163降至0.158，证实了其有效性。跨重建任务上的领先表现（Table 2: C-APD 7.764, C-AED 0.652）进一步证明该方法对身份变化的鲁棒性。
 
 **局限与待验证点**：深度引导采样依赖FLAME的准确拟合，极端姿态或遮挡下FLAME估计误差可能传播至3D流质量；当前方法未显式建模头发、服装等非面部区域的运动，这些区域的运动传递精度可能不足。对于卡通肖像的泛化能力有限（Figure 11），需要额外的数据增强或域适应策略。
-
-
 
 FG-Portrait 的核心创新在于用**无需学习的几何驱动3D流**替代传统扩散模型中的隐式运动条件，并通过**深度引导采样**将其编码为 ControlNet 的显式运动先验。以下按管线顺序阐述关键模块及其公式。
 
@@ -221,9 +213,6 @@ $$\tilde{D}_{tgt} = \mathrm{Render}\left( M_{tgt}; H, K \right) \tag{7}$$
 
 以渲染深度 $\tilde{D}_{tgt}$ 为中心、$\delta$ 为搜索半径确定采样区间 $[d_{near}, d_{far}]$，使采样点集中在实际头部表面附近。相比均匀采样（在整个深度区间等距采样），深度引导采样确保采到的 3D 点更贴近像素的真实 3D 位置，从而使对应的 3D 流更准确地反映 2D 运动（见 Figure 4）。
 
-![[assets/figures/papers/paper_list_l1021_https_arxiv_org_abs_2603_23381/figures/004_Figure_4.jpg]]
-*Figure 4: Illustration of depth-guided sampling. Arrows show the 3D flows for the selected pixel marked with yellow circle. The sampled points in (b) are closer to the actual 3D location of the pixel than (a), resulting in 3D flows that are more faithfully aligned with the 2D motion*
-
 对每个像素采样 $N$ 个深度点，分别计算对应的 3D 流向量，堆叠为 $H \times W \times 3N$ 的**3D 流编码** $F_{src \rightarrow tgt}$，作为 ControlNet 的运动条件输入。
 
 ### 3.5 推理时的可编辑运动控制
@@ -238,12 +227,8 @@ $$\psi_{dri} \leftarrow \psi_{dri} + \Delta \psi_{usr}, \quad \theta_{dri} \left
 
 除运动条件外，外观网络从 $I_{src}$ 提取身份与背景特征，注入 U-Net 的自注意力层，以保持源人物身份一致性。该模块与 X-Portrait 等工作的外观注入机制类似，非本文核心创新点，故不展开详述。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1021_https_arxiv_org_abs_2603_23381/figures/002_Figure_2.jpg]]
 *Figure 2: Visualization of 3D flows. Target portrait is the animated image with the source identity and driving motion. Target 3D head is the head model of target portrait, which is pre-computed by assembling source shape and driving motion parameters. We select some corresponding points both in the 2D and 3D, with red denoting the source and green denoting the target position. The 3D flows (black lines) correctly reflect the displacement from the target to the source position for each point. The yellow circles mark one example of a pair of points and the corresponding 3D flow*
-
-
 
 ## 实验与关键发现
 
@@ -326,27 +311,8 @@ $$\psi_{dri} \leftarrow \psi_{dri} + \Delta \psi_{usr}, \quad \theta_{dri} \left
 | **Figure 10** | 复杂场景下仍保持较好的身份一致性和运动传递 |
 | **Figure 11** | 卡通肖像场景存在眼睑闭合等瑕疵，需进一步改进 |
 
-![[assets/figures/papers/paper_list_l1021_https_arxiv_org_abs_2603_23381/figures/009_Table_4.jpg]]
-*Table 4: Comparison of motion conditions. ‘S-APD’ and ‘S-AED’ are the APD and AED for self-reenactment task. ‘C-APD’ and ‘C-AED’ are the APD and AED for cross-reenactment task*
-
 ![[assets/figures/papers/paper_list_l1021_https_arxiv_org_abs_2603_23381/figures/011_Table_5.jpg]]
 *Table 5: Ablation study of depth-guided sampling on the selfreenactment task*
-
-![[assets/figures/papers/paper_list_l1021_https_arxiv_org_abs_2603_23381/figures/015_Table_6.jpg]]
-*Table 6: Comparison of different motion conditions. ‘Dri-Img’ denotes using driving image as the motion condition. ‘S-APD’ and ‘S-AED’ are the APD and AED for self-reenactment task. ‘C-APD’ and ‘C-AED’ are the APD and AED for cross-reenactment task*
-
-![[assets/figures/papers/paper_list_l1021_https_arxiv_org_abs_2603_23381/figures/016_Figure_9.jpg]]
-*Figure 9: Qualitative comparison between ‘Dri-Img’ and Ours. ‘Dri-Img’ directly copies the driving image as the output. In contrast, we can correctly transfer the driving motion to the source person*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1021_https_arxiv_org_abs_2603_23381/figures/013_Figure_8.jpg]]
-*Figure 8: Qualitative results on of expression and pose editing. "Original" denotes the original animation using the driving image. The second and third columns show expression control while the rest columns show head movement*
-
-![[assets/figures/papers/paper_list_l1021_https_arxiv_org_abs_2603_23381/figures/014_Table_8.jpg]]
-*Table 8: Ablation study of δ in the self-reenactment on VFHQ*
-
-
 
 ## 定位与知识库关联
 
@@ -418,8 +384,6 @@ FG-Portrait 的有效性建立在以下前提之上，这些前提也划定了�
 ---
 
 **证据强度说明**：以上分析中，关于FLAME依赖、卡通域泛化局限、非面部区域建模不足等判断直接来自论文自身的局限性讨论（Fig. 11 及 Sec. C）。开放问题部分基于方法设计逻辑的合理推演，其中“极端姿态鲁棒性”和“非面部区域扩展”属于论文未充分探索的方向，需后续工作验证。
-
-
 
 ## 原文 PDF
 

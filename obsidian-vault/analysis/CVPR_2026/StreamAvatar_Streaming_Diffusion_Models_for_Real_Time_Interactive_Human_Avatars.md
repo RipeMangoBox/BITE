@@ -54,8 +54,6 @@ claims:
 
 **主要结果**：在短时说话数据集上，StreamAvatar 的 FID 达到 74.21，优于 StableAvatar 的 75.20；在长视频数据集上，Sync-C 达到 6.64，超过 OmniAvatar 的 6.47。交互式生成方面，聆听行为关键点速度 (LBKV) 和聆听头部关键点速度 (LHKV) 分别达到 15.88 和 16.24，远高于仅支持说话的基线（6.05 和 4.53），表明模型能够生成丰富的聆听动作。消融实验证实，逐步加入 Reference Sink、RAPR 和一致性感知判别器后，FID 从 96.58 持续下降至 74.21，各组件贡献明确。用户偏好研究进一步验证了 StreamAvatar 在同步性、画质、动态多样性、身份一致性和时序连续性上的全面领先。
 
-
-
 实时、高保真且具备自然交互能力的人类化身生成，是虚拟会议、数字人助手、游戏和社交应用中的核心需求。理想的化身系统应当能够以流式方式持续生成视频帧，同时根据用户或智能体的语音输入，在“说话”与“聆听”两种状态之间自然切换，产生与之匹配的面部表情和肢体动作。
 
 然而，现有方法在两个关键维度上存在明显缺口。第一，**实时流式生成能力不足**。当前主流的扩散式人类化身生成方法（如 **StableAvatar**、**OmniAvatar**、**HunyuanVideo-Avatar (HY-Avatar)**、**Hallo3**、**EchoMimicV3**）通常基于双向自注意力机制，在生成时需要对整个时间窗口进行非因果建模，且迭代去噪步数往往高达数十步，导致推理延迟远高于实时流式的要求。这使得此类方法难以直接应用于需要即时响应的交互场景。第二，**交互自然性缺失**。现有工作几乎全部聚焦于“说话”状态的生成，忽略了对话中同样重要的“聆听”行为。当用户停止说话时，化身往往陷入不自然的静止状态，无法根据对方语音产生点头、微表情等聆听反馈，严重损害了交互的真实感。
@@ -63,8 +61,6 @@ claims:
 从更根本的层面看，上述瓶颈的实质是：**高质量但计算密集的双向扩散模型与实时流式、交互式生成需求之间的矛盾**。扩散模型通过迭代去噪获得优异的视觉质量，但其推理代价与去噪步数成正比；同时，双向注意力虽然有利于全局一致性，却天然排斥流式推理所必需的因果约束。因此，如何在不牺牲生成质量的前提下，将双向扩散模型改造为支持实时流式推理的自回归生成器，并赋予其说话/聆听双模态的交互能力，构成了本文的核心动机。
 
 针对这一挑战，本文提出 **StreamAvatar**，一个两阶段自回归适配与加速框架。其核心思路是：通过自回归蒸馏将双向扩散教师模型压缩为块因果的学生模型，将去噪步数从数十步降至 3 步；同时引入参考汇 (Reference Sink)、参考锚定位置重新编码 (RAPR) 和一致性感知判别器三项关键技术，解决长视频流式生成中的身份漂移和分布外退化问题。在此基础上，通过分离的说话/聆听音频注意力模块和音频掩膜机制，使模型能够根据对话状态生成对应的自然行为与过渡，从而实现真正意义上的实时交互式人类化身。
-
-
 
 ## 核心方法与创新机理
 
@@ -112,8 +108,6 @@ StreamAvatar 的定位是**实时流式交互式全身体化身生成**。与之
 
 StreamAvatar 的独特贡献在于：首次将扩散模型的高质量生成能力与实时流式推理、自然交互对话统一在一个框架内，其两阶段蒸馏-精炼范式为其他扩散模型的实时化适配提供了可复用的技术路径。
 
-
-
 ### 问题定位与设计动机
 
 现有扩散式人类化身生成方法面临两个结构性瓶颈：(1) 模型采用非因果的双向注意力，且迭代去噪过程计算开销极大，无法实现实时流式生成；(2) 这些方法通常只处理说话状态而忽略聆听行为，导致交互不自然。StreamAvatar 的核心思路是将一个高质量但速度较慢的非因果扩散模型，通过两阶段框架高效适配为实时流式生成器。
@@ -151,13 +145,6 @@ Figure 4 展示了交互式人类生成模型的完整架构。在基础视频�
 
 ![[assets/figures/papers/paper_list_l937_https_arxiv_org_abs_2512_22065/figures/004_Figure_4.jpg]]
 *Figure 4: The architecture of our interactive human generation model. We extend the original video model with audio-related modules to support talking and listening audio conditioning*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l937_https_arxiv_org_abs_2512_22065/figures/001_Figure_1.jpg]]
-*Figure 1: We propose StreamAvatar, which adapts human video diffusion models for real-time, streaming, and interactive video generation through a two-stage framework. Given a reference image and user/agent audio streams as input, StreamAvatar generates high-resolution streaming human video in real-time, producing vivid talking/listening expressions and gestures*
-
-
 
 ### 两阶段自回归适配框架
 
@@ -203,13 +190,6 @@ $$f'_t = \{\mathrm{concat}(\{f_i\}_{i=t-2}^{t+2})\}, \quad t=0$$
 
 这一设计使模型能够根据对话状态动态切换行为：说话时生成生动的口型和手势，聆听时呈现自然的微表情和姿态变化，并在两种状态之间实现平滑过渡。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l937_https_arxiv_org_abs_2512_22065/figures/003_Figure_3.jpg]]
-*Figure 3: Vanilla RoPE vs RoPE with Reference-Anchored Positional Re-encoding (RAPR). RAPR improves long video generation without the need for long video training*
-
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与模型改造的因果验证
@@ -251,24 +231,15 @@ StreamAvatar 的实验设计围绕一个中心假设展开：高质量但速度�
 
 在交互式数据集（50 个来自 SpeakerVid-5M 的视频）上，StreamAvatar 与仅支持说话的基线进行了对比（Table 2）。基线在聆听阶段保持几乎静止，而 StreamAvatar 能生成自然的聆听行为。
 
-![[assets/figures/papers/paper_list_l937_https_arxiv_org_abs_2512_22065/figures/009_Table_2.jpg]]
-*Table 2: Quantitative results for interactive avatar generation*
-
 - **LBKV（聆听行为关键点方差）**：StreamAvatar 15.88 vs 基线 6.05（+9.83），表明生成的聆听动作丰富度显著提升。
 - **LHKV（聆听头部关键点方差）**：StreamAvatar 16.24 vs 基线 4.53（+11.71），进一步验证头部运动在聆听阶段的自然性。
 - **LFKV（聆听面部关键点方差）**：StreamAvatar 7.11 vs 基线 2.39，面部微表情在聆听时也更为生动。
 
 定性对比（Figure 6）直观展示了这一差异：基线在聆听阶段近乎静止，而 StreamAvatar 的化身能对聆听音频做出自然反应，在说话与聆听之间流畅过渡。
 
-![[assets/figures/papers/paper_list_l937_https_arxiv_org_abs_2512_22065/figures/006_Figure_6.jpg]]
-*Figure 6: Qualitative comparison with the baseline on interactive avatar video generation. While the baseline remains almost static during the listening phase, our avatar reacts naturally to the listening audio, showing fluid and realistic transitions between talking and listening. Notice how it responds to laughter in the first example and how its expressions and gestures shift seamlessly between phases*
-
 #### 用户偏好研究
 
 用户研究（Table 5）从多个维度进行了成对偏好投票。StreamAvatar 在视觉质量、唇音同步、动作自然度和整体偏好上均显著优于基线，具体偏好率需要查看原文表格（此处证据锚定于 Table 5，但具体数值需从原文获取）。
-
-![[assets/figures/papers/paper_list_l937_https_arxiv_org_abs_2512_22065/figures/012_Table_5.jpg]]
-*Table 5: User study results. The table presents the pairwise preference rates (%) across different metrics, formatted as (Ours / Baseline). Winning values are highlighted in bold. The remaining percentage in each comparison accounts for “Tie” (no preference) cases*
 
 ### 关键设计选择的消融
 
@@ -301,13 +272,6 @@ Table 6 报告了 StreamAvatar 的实时性能评估。在消费级 GPU 上，�
 - **VAE 解码延迟**：流式推理中，VAE 解码仍是延迟瓶颈之一，更高效的解码策略有待探索。
 
 这些问题在现有实验中尚未以定量形式呈现为“失败案例”，但作者将其列为开放问题，提示在实际部署中可能需要额外处理。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l937_https_arxiv_org_abs_2512_22065/figures/013_Figure_8.jpg]]
-*Figure 8: Qualitative comparison with SoTA interactive head generation methods. Please ignore the arrows which come with the original video on ARIG’s project page*
-
-
 
 ## 定位与知识库关联
 
@@ -381,8 +345,6 @@ StreamAvatar 处于**扩散模型加速**、**自回归视频生成**和**音频
 -   **音频驱动化身**：在传统音频到视频映射的基础上，首次将说话/聆听状态解耦为独立的注意力分支，为交互式化身生成建立了新的技术范式。
 
 **证据强度评估**：核心主张（两阶段框架有效性、Reference Sink/RAPR 的消融增益、交互能力的定量提升）均有 Table 1-4 和 Figure 5-7 的充分实验支撑，置信度较高。与 MIDAS、X-Streamer 等流式方法的对比目前仅停留在定性层面，定量对比的缺失使得在该子方向上的相对优势需要进一步验证。
-
-
 
 ## 原文 PDF
 

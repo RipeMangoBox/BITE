@@ -53,8 +53,6 @@ claims:
 
 在**WanVideo-1.3B**（8帧×480×832，33K tokens）上，该方法以67秒完成推理，相比全注意力基线（约103秒）实现**1.54倍加速**，同时保持了有竞争力的视觉质量。消融实验表明，汇聚列数量$N_{\text{sink}}=3$、边界缓冲$N_{\text{buf}}=2$、分块大小$L=200$、检索Top-K=3、相似性阈值$T=0.3$为最优配置。
 
-
-
 ### 视频生成中的效率瓶颈：从注意力机制到循环传播
 
 扩散模型已成为高质量视频生成的主流范式，但其核心计算模块——多头自注意力（Multi-head Self-Attention）——随序列长度呈二次复杂度增长。对于典型的视频生成任务（如8帧×480×832分辨率，约33K tokens），全注意力模型**WanVideo-1.3B**（Team Wan et al., arXiv 2025）的推理延迟高达约103秒，严重制约了实际部署。
@@ -89,8 +87,6 @@ $$\mathcal{D}(j,w) = \{(j',w') \mid w' \in [\lfloor w/L \rfloor \cdot L, w]\}$$
 2. **跨段粒度**：设计**潜在上下文记忆（Latent Context-as-Memory, LCaM）**，在潜在空间中维护历史段嵌入的FIFO内存库，通过余弦相似性检索语义相关的历史上下文，并利用交叉注意力进行融合——全程无需相机位姿，也无需帧重建。
 
 这一协同设计使得模型在保持与全注意力基线相当生成质量的前提下，实现**1.54倍推理加速**（67s vs. ~103s），为高效视频生成提供了新的技术路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -138,8 +134,6 @@ LCaM 的理论压缩比 $\rho = 3s^2 / C_z$（$s$ 为 VAE 下采样倍数，$C_z
 ### 创新总结
 
 双粒度记忆的核心创新在于**以因果性思维解决循环网络的并行化困境**：Context Memory 通过汇聚列将全局上下文压缩到极少量可学习位置，实现了块内的信息贯通；LCaM 则利用潜在空间的语义相似性实现了跨段记忆检索，将时序一致性的维护从显式的几何约束解放为隐式的语义匹配。两者协同，使得 GSTPN 在保持 1.54× 推理加速的同时，达到了与全注意力模型相当的生成质量。
-
-
 
 Dual-Granularity Memory 框架围绕一个核心矛盾展开：循环传播网络（GSTPN）天然适配并行分块计算，但分块操作会切断块间的时序信息流，即**块隔离（chunk isolation）**问题。为解决这一瓶颈，该框架在 GSTPN 架构中注入了两层互补的记忆机制——**上下文记忆（Context Memory）**负责块内全局锚定与块间边界平滑，**潜在上下文记忆（Latent Context-as-Memory, LCaM）**负责跨视频段的长期一致性。
 
@@ -196,13 +190,6 @@ $$
 ### 模块间关系
 
 两层记忆机制形成**粒度互补**：Context Memory 解决单个视频段内部的块间隔离，属于细粒度时序一致性保障；LCaM 跨越多个视频段，通过潜在检索实现粗粒度的长期语义一致性。二者共享 GSTPN 的循环传播骨干，LCaM 的检索与融合发生在 GSTPN 层间，而 Context Memory 则嵌入在每一层的传播过程中。这种分层设计使得模型在保持 1.54 倍推理加速（67s vs. ~103s，WanVideo-1.3B 8帧 480×832 设定）的同时，在 VBench 各维度上达到与全注意力基线相当的质量。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l862_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Dual_Granularity/figures/001_Figure_1.jpg]]
-*Figure 1: Dual-granularity memory framework overview. Our method integrates two complementary memory mechanisms into the GSTPN architecture.Left: Block design of GSTPN. Top right: Multi-orientation propagation (ST, WTH, HTW) processes spatiotemporal data with sink columns (orange) providing persistent global anchors and boundary buffers(grey) enabling smooth chunk transitions.Bottom right: Latent Context-as-Memory (LCaM) mechanism maintains a FIFO bank of historical latent segments,retrieves relevant context via similarity-based matching, and fuses them through cross-attention for cross-segment consistency*
-
-
 
 ### 问题背景：循环生成中的分块隔离
 
@@ -312,13 +299,6 @@ $$\mathcal{L}_{\mathrm{mem}} = \lambda_{\mathrm{mem}} \| \hat{z}_{t}^{\mathrm{co
 
 该损失鼓励 LCaM 条件化后的输出与原始输出保持一致，防止检索到的历史信息引入不相关干扰，起到正则化作用。$\mathrm{sg}(\cdot)$ 为停止梯度算子，仅更新条件化分支。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l862_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Dual_Granularity/figures/003_Figure_2.jpg]]
-*Figure 2: Context Memory hyperparameter ablations.Left: Quality vs. sink column count*
-
-
-
 ## 实验与关键发现
 
 ### 主结果：质量与效率的权衡
@@ -385,8 +365,6 @@ Figure 3 展示了复杂动态和大运动场景下的生成效果。在“熊�
 2. **相似性检索的语义歧义**：基于潜在空间余弦相似度的检索在语义相似但视觉不相关的场景（如重复纹理、相似背景）中可能误检索，阈值 $T$ 的调节无法完全消除此类错误。
 3. **汇聚列的泛化能力**：汇聚列作为可学习参数在训练分布内有效，但在分布外（如极端分辨率、非常规帧率）的迁移能力未经检验。
 
-
-
 ## 定位与知识库关联
 
 ### 1. 技术脉络与基线关系
@@ -443,8 +421,6 @@ LCaM的FIFO内存库维护最近M个段的潜在表示。随着生成长度增�
 
 **（4）泛化到其他架构**
 本方法深度嵌入GSTPN的传播框架，汇聚列和边界缓冲的设计依赖于行传播的有向因果结构。将其迁移到其他高效架构（如Mamba类状态空间模型）的可行性尚未得到验证。
-
-
 
 ## 原文 PDF
 

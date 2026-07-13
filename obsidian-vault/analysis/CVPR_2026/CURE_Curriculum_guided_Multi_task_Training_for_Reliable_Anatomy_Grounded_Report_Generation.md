@@ -68,15 +68,11 @@ claims:
 
 **方法谱系与知识库定位**：CURE 建立在 **MAIRA-2**（开放式医学 VLM，联合学习定位与报告生成）和 **MedGemma-4B-IT**（预训练基础医学 VLM，缺乏视觉定位能力）之上。其课程学习策略借鉴了动态采样重加权的思想，但创新性地将其应用于医学多任务场景的数据集间和类别内两个粒度，并通过验证集错误率驱动采样概率更新。在评估层面，CURE 综合使用 IoU、CXRFEScore、CheXbert F1 等指标，并引入基于自然语言推理的幻觉分析框架，为医学报告生成的可信度评估提供了新视角。
 
-
-
 医学视觉-语言模型（VLM）在胸部 X 光片自动报告生成领域取得了显著进展，但当前最先进的方法面临一个核心瓶颈：**视觉定位能力薄弱，报告产生大量与图像证据不一致的虚假异常（幻觉）**。以 MAIRA-2 为代表的开放式医学 VLM 虽能联合学习定位与报告生成，但其标准多任务训练中数据分布严重不均，且传统发现生成目标侧重异常描述，导致模型在未见过的解剖区域上频繁产生虚假阳性检测——例如，在锁骨区域，MAIRA-2 的异常幻觉率高达 59% 以上，而实际图像中并无异常。
 
 这一问题的深层原因在于训练范式的双重缺陷。一方面，多任务训练中各数据源按数据集大小比例均匀采样，使小规模但关键的定位数据集在训练中被边缘化；另一方面，传统的发现生成目标鼓励模型输出异常发现，却未强制其与视觉证据对齐，导致“描述”与“定位”之间的因果链路断裂。
 
 CURE 的核心动机正是针对上述缺口：**无需额外数据，通过课程引导的多任务训练，使医学 VLM 学会定位并描述解剖区域，同时平衡正常与异常样本**。该方法引入错误感知的课程学习策略，在数据集间和类别内动态调整采样权重，并用解剖学基础报告生成（AGRG）替代传统发现生成目标，促使模型同时学习定位与正常/异常描述。这一设计从根本上重塑了模型的优化方向——从“倾向于生成异常描述”转向“生成与图像证据一致的解剖学基础描述”，从而大幅提升定位准确性和报告可信度。
-
-
 
 ## 核心方法与创新机理
 
@@ -111,8 +107,6 @@ CURE 的第三个关键设计是在 Chest ImaGenome 上对基础模型 **MedGemm
 
 上述三个创新并非孤立生效，而是形成正向反馈循环：AGRG 任务设计为课程学习提供了可优化的定位-描述联合目标；课程学习确保预训练和多任务微调阶段的数据分布持续适应模型弱点；专用预训练则为课程学习提供了更优的初始化起点。这一协同机制使得 CURE 在 Chest ImaGenome 上将定位 IoU 提升 **+0.352**（是 MAIRA-2 的两倍），平均异常发现幻觉率从 26.50% 降至 **8.78%**，矛盾率减半（17.44% vs 33.22%），蕴含率翻倍（39.50% vs 15.94%）。
 
-
-
 CURE 是一个**课程引导的多任务训练框架**，无需额外数据即可同时提升医学视觉语言模型的视觉定位准确性和报告生成可信度。其核心瓶颈在于：标准多任务训练中数据分布严重不均，且传统“发现生成”目标侧重异常描述，导致视觉定位能力薄弱，报告产生大量与图像证据不一致的虚假异常（幻觉）。CURE 通过三个关键机制解决这一问题：(1) 将异构监督信号统一为细粒度指令格式；(2) 引入错误感知的课程学习，在数据集间和类别内动态调整采样权重；(3) 用**解剖学基础报告生成（AGRG）**替代传统发现生成目标，促使模型同时学习定位与正常/异常描述。
 
 ### 整体流程
@@ -142,12 +136,8 @@ CURE 是一个**课程引导的多任务训练框架**，无需额外数据即�
 
 课程学习的权重参数 $\alpha=0.8$ 被证明最优——优先强化空间定位能力，在预训练 3000 步后 AGRG IoU 达到峰值 0.616。纯自然采样策略（按数据集原始大小比例采样）导致小数据集任务（如 GRG）完全崩溃（IoU 0.000），验证了主动平衡数据分布的必要性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2070_https_arxiv_org_abs_2601_15408/figures/003_Figure_2.jpg]]
 *Figure 2: Overview of CURE, our Curriculum-guided Multi-task Training Framework. During training, the model is periodically evaluated every N steps on validation subsets from each task. Performance metrics (IoU, CXRFEScore) are calculated to identify task-level and category-level errors, which are then used to update the sampling weights in the training sampler. The cycle then resumes, allowing the model to focus more heavily on the data it finds most challenging. Evaluation of the RG task uses the official MIMIC-CXR test set, while VinDr-CXR is assessed in a zero-shot setting*
-
-
 
 CURE 围绕三个核心模块构建：**细粒度任务统一表示**、**错误感知课程学习**、以及**边界框感知的数据增强与预训练**。这些模块协同解决了标准多任务训练中数据分布严重不均和视觉定位能力薄弱的核心瓶颈。
 
@@ -186,13 +176,6 @@ $$p_i = \frac{e_i}{\sum_{j=1}^{K} e_j}$$
 
 ![[assets/figures/papers/paper_list_l2070_https_arxiv_org_abs_2601_15408/figures/018_Table_13.jpg]]
 *Table 13: Detailed Results for Anatomy-Grounded Report Generation (AGRG). Performance of baseline models, pre-training-only checkpoints, and the full set of multi-task fine-tuning ablation variants (v1–v15) on the Chest ImaGenome test subset. We report mean Intersection-over-Union (IoU$, \delimiter$ "3222378 ), CheXbert F1 (Micro/Macro averages$, \delimiter$ "3222378 ), CheXbert cosine similarity (Cos.$, \delimiter$ "3222378 ), and CXRFEScore (CXS$, \delimiter$ "3222378 ). Bold indicates the best result per column; underlined indicates the second best*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2070_https_arxiv_org_abs_2601_15408/figures/001_Figure_1.jpg]]
-*Figure 1: False Positive Detection of Pathologies. Given the same chest X-ray input from the MIMIC-CXR test set, both models approximate the location of the left clavicle. However, the baseline model (MAIRA-2) hallucinates a fracture (there is no fracture in the image), whereas our proposed model (CURE) generates a clinically correct and visually grounded description*
-
-
 
 ## 实验与关键发现
 
@@ -248,36 +231,17 @@ CURE 在三个短语接地（PG）测试集上全面超越当前最先进的开�
 
 4. **评估的模态局限**：所有实验均基于胸部 X 光片，泛化至 CT、MRI 等其他医学影像模态尚未验证。幻觉评估依赖外部大型语言模型（Gemini 2.5 Flash Lite），可能引入评估噪声。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2070_https_arxiv_org_abs_2601_15408/figures/005_Table_3.jpg]]
 *Table 3: Results for Anatomy-Grounded Report Generation (AGRG) on Chest ImaGenome (CIG). We report mean IoU $(\delimiter$ "3222378 ), CheXbert F1 (micro/macro) $(\delimiter$ "3222378 ), CheXbert cosine similarity $(\delimiter$ "3222378 ), and CXRFEScore $(\delimiter$ "3222378 ). Bold values indicate the best performance for each metric*
 
-![[assets/figures/papers/paper_list_l2070_https_arxiv_org_abs_2601_15408/figures/004_Table_2.jpg]]
-*Table 2: Results for Phrase Grounding (PG). We report Micro-Average IoU (IoU Mi. $\delimiter$ "3222378 ) and Macro-Average IoU (IoU Ma. $\delimiter$ "3222378 ) on three test sets: MS-CXR, PadChest-GR, and zero-shot VinDr-CXR. CURE consistently improves localization performance across all metrics and datasets, including VinDr-CXR, which was not seen during training*
-
 ![[assets/figures/papers/paper_list_l2070_https_arxiv_org_abs_2601_15408/figures/009_Table_7.jpg]]
 *Table 7: Ablation Study. We evaluate the contribution of each component across three grounding tasks. CXRS denotes the CXRFEScore metric. For Phrase Grounding (PG), we report Micro-Averaged IoU on MS-CXR (MS), PadChest-GR (PC), and VinDr-CXR (VD). Note that: CL(f ) indicates curriculum learning with a reweighting frequency of f steps, CIG(s) denotes a Chest ImaGenome pre-training stage of s steps, HPS refers to hyperparameter search. Bold and underlined values indicate the best and second-best models per metric, respectively*
-
-![[assets/figures/papers/paper_list_l2070_https_arxiv_org_abs_2601_15408/figures/002_Table_1.jpg]]
-*Table 1: Dataset composition and statistics. Number of instances for each task across the training, validation, and test splits. The MIMIC-CXR dataset serves as a superset, providing the Chest ImaGenome (CIG) and MS-CXR subsets for training and its official test split for report-generation evaluation. Evaluation-only datasets are used to assess generalization performance. AGRG refers to Anatomy Grounded Report Generation, PG to Phrase Grounding, and GRG to Grounded Report Generation*
-
-![[assets/figures/papers/paper_list_l2070_https_arxiv_org_abs_2601_15408/figures/006_Table_4.jpg]]
-*Table 4: Results for Grounded Report Generation (GRG) on PadChest-GR and zero-shot VinDr-CXR. We report mean IoU $(\delimiter$ "3222378 ), CheXbert F1 (micro/macro) $(\delimiter$ "3222378 ), CheXbert cosine similarity $(\delimiter$ "3222378 ), and CXRFEScore $(\delimiter$ "3222378 ). Bold values indicate the best score for each metric*
-
-![[assets/figures/papers/paper_list_l2070_https_arxiv_org_abs_2601_15408/figures/007_Table_5.jpg]]
-*Table 5: Results for Report Generation (RG) on the MIMIC-CXR test set. We report CheXbert F1 (F1-Ma/Mi) $(\delimiter$ "3222378 ), Precision (P-Ma/Mi) $(\delimiter$ "3222378 ), and Recall (R-Ma/Mi) $(\delimiter$ "3222378 ), each macro (Ma) and micro (Mi) averaged together with CheXbert Cosine Similarity (Cos.) $(\delimiter$ "3222378 ), CXRFEScore (CXRFES) $(\delimiter$ "3222378 ), RaTEScore (RaTES) $(\delimiter$ "3222378 ), and RadGraph F1 (RadF1) $(\delimiter$ "3222378 ). Bold and underlined values indicate the best and second-best models per metric, respectively*
 
 ![[assets/figures/papers/paper_list_l2070_https_arxiv_org_abs_2601_15408/figures/010_Figure_3.jpg]]
 *Figure 3: Qualitative Examples. Qualitative phrase grounding (PG) results on challenging examples from the VinDr-CXR and PadChest-GR datasets. The left panels show the detection of a “Nodule or mass” (VinDr-CXR), while the right panels demonstrate the grounding of “Surgical staples” (PadChest-GR). Ground-truth regions are shown in green for reference, and model predictions from MAIRA-2 and CURE are shown in red*
 
 ![[assets/figures/papers/paper_list_l2070_https_arxiv_org_abs_2601_15408/figures/012_Figure_4.jpg]]
 *Figure 4: Visualization of Inter-Dataset Weight Dynamics. This plot illustrates the curriculum’s adaptation from an experiment with frequent updates (every 500 steps). It shows how sampling probabilities for each data source evolve over time in response to the model’s performance*
-
-![[assets/figures/papers/paper_list_l2070_https_arxiv_org_abs_2601_15408/figures/017_Table_12.jpg]]
-*Table 12: Sensitivity Analysis of the Curriculum Weighting Term (α). Performance metrics on the Chest ImaGenome dataset (AGRG task) after 3000 training steps across different values of α. Higher values of α heavily weight the IoU metric during curriculum updates, while lower values prioritize the text-based semantic metric (CXRFEScore). We report mean Intersection-over-Union (IoU$, \delimiter$ "3222378 ), CheXbert F1 (Micro/Macro averages$, \delimiter$ "3222378 ), CheXbert cosine similarity (Cos.$, \delimiter$ "3222378 ), and CXRFEScore (CXS$, \delimiter$ "3222378 ). Bold indicates the best result per column*
-
-
 
 ## 定位与知识库关联
 
@@ -322,8 +286,6 @@ CURE 的方法论贡献可分解为三个相互协同的模块：
 1. **多维重新加权策略**：如何设计同时平衡解剖区域和罕见/长尾临床发现的采样策略，在维持定位精度的前提下进一步提升语义报告质量？
 2. **跨模态课程学习**：课程学习策略能否扩展至其他医学影像模态及多模态输入，并保持类似的提升效果？
 3. **细粒度发现平衡**：能否通过更细粒度的正面/负面发现平衡策略，在定位精度和报告文本指标之间取得更好的帕累托前沿？
-
-
 
 ## 原文 PDF
 

@@ -81,8 +81,6 @@ SINEPROJECT 的关键创新在于**将正弦变换引入投影器参数化，利
 
 尽管 SINEPROJECT 显著缓解了过遗忘问题，仍存在若干局限：当遗忘比例超过 25% 时，遗忘质量与保留性能仍会下降；正弦投影器无法解决深度纠缠的语义概念解耦问题（如遗忘一个人物时，其关联作品的知识也可能受损）；在约 24% 的双方均拒绝的案例中，模型仍不当拒绝良性查询。开放问题包括：如何将几何稳定策略与认证防御机制结合以获得形式化遗忘保证，如何扩展到深度融合架构，以及如何在持续遗忘场景中进一步延长可行遗忘窗口。
 
-
-
 ### 多模态大语言模型的安全遗忘需求
 
 多模态大语言模型（MLLM）通过视觉编码器、投影网络和语言模型主干的级联架构，将视觉感知与语言理解深度融合。然而，这种强大的多模态能力也带来了显著的安全隐患：模型可能记住并复现有害、隐私敏感或受版权保护的多模态内容。传统的安全对齐方法（如 RLHF）虽能在训练阶段抑制部分有害输出，但无法应对部署后新发现的安全漏洞，而全量重训的成本过高。机器遗忘（machine unlearning）作为一种事后修复机制，旨在从已训练模型中定向擦除特定知识，同时保留模型在其他任务上的通用能力，成为解决这一问题的关键路径。
@@ -107,8 +105,6 @@ SINEPROJECT 的关键创新在于**将正弦变换引入投影器参数化，利
 本文的核心动机源于一个关键洞察：**如果能将投影网络的参数更新约束在一个紧致且数值良态的范围内，就能从根本上抑制雅可比条件数的爆炸，从而在彻底遗忘目标知识的同时维持视觉-语言对齐的几何稳定性**。这需要一个既能严格限制权重扰动幅度、又不会阻碍梯度传播的参数化策略——正弦变换恰好满足这些要求：$\sin(\Delta W)$ 天然将输出限制在 $[-1, 1]$，且其导数 $\cos(\Delta W)$ 在零点附近接近 1，保证了优化初期的有效梯度流。
 
 基于此，本文提出 **SINEPROJECT**，通过冻结预训练的投影权重 $W$，仅优化可训练的扰动参数 $\Delta W$，并以 $W + \sin(\Delta W)$ 的形式施加有界调制，从而在不引入额外计算开销的前提下，实现投影网络雅可比谱的稳定控制，大幅减少过度拒绝。
-
-
 
 ## 核心方法与创新机理
 
@@ -148,8 +144,6 @@ $$(W_2 + \sin(\Delta W_2)) \phi((W_1 + \sin(\Delta W_1)) x + b_1) + b_2$$
 
 SINEPROJECT 的创新聚焦于投影层的参数化方式，**不改变遗忘损失函数的形式**、**不修改视觉编码器或语言模型主干的架构**、**不引入额外的对齐约束或蒸馏损失**。其有效性源于对遗忘过程中数值不稳定根源的精确干预——通过正弦变换的谱正则化效应，在参数层面而非损失层面解决了对齐漂移问题。
 
-
-
 SINEPROJECT 的整体框架围绕一个核心发现构建：在多模态大语言模型（MLLM）的机器遗忘过程中，视觉-语言投影网络的雅可比矩阵条件数会急剧增大 3–4 个数量级，导致跨模态嵌入发生显著漂移，进而引发灾难性的“过遗忘”——模型对无害查询产生过度拒绝。针对这一瓶颈，SINEPROJECT 提出了一种轻量级的几何稳定策略，在不改变原有 MLLM 架构主干的前提下，仅对投影层施加正弦变换的有界参数扰动，从而稳定雅可比谱，维持视觉与语言嵌入空间的几何一致性。
 
 ### 模块构成与数据流
@@ -185,8 +179,6 @@ $$\theta^* = \arg\min_\theta \mathcal{L}_{\mathrm{forget}}(\theta; \mathcal{D}_f
 ### 损失函数无关性
 
 值得注意的设计特性是正弦投影器对损失函数选择的鲁棒性。在梯度下降（GD）、KL 散度最小化（KL）和偏好优化（PO）三种不同的遗忘目标下，SINEPROJECT 均一致地将 SARR 降低 0.8–4.5 个百分点，同时保持拒绝率（RR）超过 99%。这表明几何稳定机制与具体的遗忘损失解耦，可作为通用插件嵌入各类机器遗忘范式。
-
-
 
 ### 投影网络架构
 
@@ -237,19 +229,6 @@ $$(W_2 + \sin(\Delta W_2)) \phi((W_1 + \sin(\Delta W_1)) x + b_1) + b_2 \quad \t
 
 在实际训练中，视觉编码器完全冻结，仅优化正弦投影器的扰动参数 $\Delta W_1, \Delta W_2$ 以及语言模型主干的 LoRA 适配器（秩 32）。这一设计确保了遗忘过程的计算开销低于 1%（Table 9），同时保持了对齐的几何稳定性。
 
-![[assets/figures/papers/paper_list_l783_https_arxiv_org_abs_2511_18444/figures/015_Table_9.jpg]]
-*Table 9: Computational efficiency on SafeEraser (LLaVA-7B, 4× A6000 GPUs). SINEPROJECT incurs*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l783_https_arxiv_org_abs_2511_18444/figures/003_Figure_2.jpg]]
-*Figure 2: Geometric stability across unlearning epochs. (a) Stability of the first projection layer during unlearning. SINEPROJECT (blue) maintains stable conditioning, whereas SafeEraser (red) degrades moderately. (b) Stability of the second projection layer. SafeEraser exhibited severe instability*
-
-![[assets/figures/papers/paper_list_l783_https_arxiv_org_abs_2511_18444/figures/005_Figure_3.jpg]]
-*Figure 3: Spectral dynamics during unlearning. Evolution of singular values for*
-
-
-
 ## 实验与关键发现
 
 ### 核心发现：SINEPROJECT 在遗忘-保留权衡上的突破
@@ -280,9 +259,6 @@ Table 4 的消融结果给出了明确的因果链：
 - **无 PD**：所有遗忘方法（GD、KL、PO）的 SARR 均接近 **100%**，即模型几乎拒绝所有无害查询；
 - **引入 PD**：SARR 骤降至 28–30% 区间；
 - **PD + SINEPROJECT**：进一步降至 **25.8%**。
-
-![[assets/figures/papers/paper_list_l783_https_arxiv_org_abs_2511_18444/figures/007_Table_4.jpg]]
-*Table 4: Impact of Prompt Decoupling on over-forgetting behavior. The results of SafeEraser using LLaVA-v1.5-7B demonstrate that PD is essential for utility preservation, reducing the SARR from a catastrophic 100% to a manageable 28-30%. SINEPROJECT with PD provides additional geometric stabilization, achieving 25.8% SARR while maintaining perfect forgetting efficacy (100% RR)*
 
 这确立了“提示解耦处理跨模态遗忘信号 → 正弦投影器稳定几何结构”的两阶段防御体系。
 
@@ -340,16 +316,6 @@ Table 9 显示，SINEPROJECT 引入的计算开销低于 1%（SafeEraser，LLaVA
 ![[assets/figures/papers/paper_list_l783_https_arxiv_org_abs_2511_18444/figures/020_Table_13.jpg]]
 *Table 13: Comprehensive scalability analysis across vision encoders, language models, and projector architectures on SafeEraser (PO+PD). SINEPROJECT maintains consistent benefits (14-19% SARR reduction, 3-4 orders of magnitude better conditioning) across all configurations. Gray rows indicate baseline LLaVA-7B+ViT-L+2-layer setup*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l783_https_arxiv_org_abs_2511_18444/figures/002_Table_1.jpg]]
-*Table 1: Quantitative comparison on the SafeEraser benchmark. We evaluate machine unlearning methods on LLaVA-v1.5-7B (left) and 13B (right), reporting results from [10]. Forget Quality assesses erasure via Efficacy (targeted) and Generality (broader capability), measured by Attack Success Rate (ASR, ↓) and Refusal Rate (RR, ↑). Model Utility evaluates preserved performance: ROUGE (↑), GPT-Eval (↑), Specificity (↑), and Safe Answer Refusal Rate (SARR, ↓; lower = less over-forgetting). Results averaged over three random seeds; standard deviations (±std) shown in separate rows for all metrics. Bold: best; underline: second-best. Yellow = SINEPROJECT blue = best baseline (SafeEraser). red denotes catas...*
-
-![[assets/figures/papers/paper_list_l783_https_arxiv_org_abs_2511_18444/figures/004_Table_2.jpg]]
-*Table 2: Quantitative comparison on the MLLMU-Bench benchmark. We evaluated the multimodal unlearning performance of various methods on LLaVA-1.5-7B under three deletion ratios (5%, 10%, and 15%). Each block reports results for four sets: Forget, Test, Retain, and Real-Celebrity. Metrics include Cls (classification accuracy), RG (ROUGE), Fct (factuality), and Clz (cloze accuracy). For the Forget and Test sets, ↓ indicates that a lower value is better (stronger forgetting). for the Retain and Real-Celebrity sets, ↑ indicates that a higher value is better (better retention). Bold: best per metric; underline: second-best; yellow = our method-SINEPROJECT (NPO); blue = baseline. The Avg. column shows ove...*
-
-
-
 ## 定位与知识库关联
 
 ### 问题定位：多模态遗忘中的视觉-语言对齐退化
@@ -400,8 +366,6 @@ SINEPROJECT 的适用性由以下边界条件界定：
 3. 能否将正弦调制推广到深度融合架构的交叉注意力层，通过约束注意力权重的谱特性来稳定多模态交互？
 4. 是否可以通过设计新的遗忘损失函数或数据增强策略（如对比解耦、反事实样本生成），从训练信号层面减轻语义纠缠，与几何稳定形成双层防护？
 5. 在持续遗忘场景中，能否引入弹性权重巩固（EWC）或渐进式网络扩展等持续学习策略，进一步延长可行遗忘窗口？
-
-
 
 ## 原文 PDF
 

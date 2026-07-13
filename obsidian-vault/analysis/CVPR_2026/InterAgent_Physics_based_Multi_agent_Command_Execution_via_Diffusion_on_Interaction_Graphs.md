@@ -47,8 +47,6 @@ claims:
 
 在方法定位上，InterAgent 引入交互图外部感知表示、多流 DiT 解耦异质模态、以及基于 Gumbel-Softmax 的边缘稀疏注意力机制，形成端到端的自回归扩散框架。与物理化文本到交互基线（如 InterGen++、InterMask++）和端到端物理控制基线（如 PDP、CLoSD）相比，InterAgent 在 InterHuman 测试集上取得 SOTA 性能：R-precision Top-3 达到 0.615，FID 降至 0.582，显著优于最强基线 InterGen++（0.542 和 0.943）。消融实验进一步验证了交互图外部感知、三流解耦架构和边缘稀疏注意力各自对交互建模鲁棒性的关键贡献。
 
-
-
 ### 问题背景：从单智能体控制到多智能体交互
 
 物理仿真中的人形角色控制（physics-based humanoid control）近年来取得了显著进展，使得虚拟角色能够在物理约束下生成逼真的运动。然而，现有工作几乎全部聚焦于**单智能体**场景：给定文本指令或高层目标，控制单个人形角色在物理仿真器中执行相应的动作。当场景扩展到**多智能体交互**时——例如两人握手、击掌、推搡或协作搬运——问题难度呈指数级增长。
@@ -94,8 +92,6 @@ claims:
 
 通过这些设计，InterAgent 旨在实现一个端到端框架，能够从纯文本指令生成物理合理、语义一致的多智能体交互行为，并在公开基准上达到最优性能。
 
-
-
 ## 核心方法与创新机理
 
 InterAgent 的核心创新在于首次将**端到端的物理仿真多智能体控制**与**文本条件生成**统一在一个框架下，其关键突破并非单一技术点，而是通过三个紧密耦合的“changed slot”系统性地解决了现有多智能体交互建模中的瓶颈。
@@ -140,8 +136,6 @@ $$\pmb{f}' = (M \circ A)V$$
 ### 创新边界与局限
 
 需要指出，InterAgent 的创新聚焦于**固定双智能体**场景下的物理交互生成。其对高度动态行为（如跳跃）表现不佳（Figure 9），因为自回归扩散模型倾向平滑过渡，难以处理爆发性瞬间动力学。此外，交互图的边数量随智能体数量呈二次增长，当前框架无法直接扩展至可变数量智能体——这属于**未解决的扩展性问题**，而非方法内部的缺陷。
-
-
 
 InterAgent 的端到端物理多智能体控制框架围绕一个核心设计展开：**将文本条件直接映射为物理仿真器中两个合作人形角色的交互行为**，无需中间运动生成与跟踪策略的分阶段衔接。框架由三个紧密耦合的模块构成闭环（Figure 2）。
 
@@ -189,8 +183,6 @@ Inter-DiT 预测的未来状态-动作序列通过物理仿真器执行：预测
 ### 反应式控制能力
 
 框架进一步支持反应式控制：推理时通过修复机制（inpainting）固定一个智能体的运动轨迹，让另一个智能体生成文本条件的反应行为，无需额外训练（Figure 7）。这展示了 InterAgent 对交互上下文的灵活适应能力。
-
-
 
 InterAgent 的核心架构围绕三个关键设计展开：**三流解耦的扩散Transformer (Inter-DiT)**、**交互图外部感知表示**以及**稀疏边缘注意力机制**。以下逐一剖析各模块的结构与作用。
 
@@ -272,16 +264,6 @@ $$
 | $M_{ij} = 1$ if $j \in \arg\mathrm{TopK}_k(A_i)$ else $0$ | Top-K 稀疏掩码 | Eq. (5) |
 | $\pmb{f}' = (M \circ A)V$ | 稀疏注意力输出 | Eq. (6) |
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2522_https_arxiv_org_abs_2512_07410/figures/003_Figure_3.jpg]]
-*Figure 3: Multi-stream DiT block design. Each modality—proprioception, exteroception, and action—is processed in an independent stream. Inter-stream fusion attention exchanges information across modalities, while context-aware conditioning attention integrates temporal and inter-agent context, enabling decoupled yet coordinated modeling*
-
-![[assets/figures/papers/paper_list_l2522_https_arxiv_org_abs_2512_07410/figures/004_Figure_4.jpg]]
-*Figure 4: Sparse Interaction Graph. Each joint of one character connects to all joints of the other via directed edges (dark green), where each edge vector encodes the spatial interaction between the corresponding joints. The thickness of each edge encodes the magnitude of its contribution to the interactive dynamics. Light purple arrows on the ground indicate temporal progression*
-
-
-
 ## 实验与关键发现
 
 ### 主要结果：文本驱动的物理多智能体控制
@@ -318,8 +300,6 @@ InterAgent 在 InterHuman 测试集上对所有基线方法实现了全面超越
 
 InterAgent 展示了无需重新训练的反应式控制能力（图 7）。通过在推理时引入 inpainting 机制，固定一个智能体的运动轨迹，模型可自回归生成另一智能体的文本条件反应行为。这一能力源于多流架构中外部感知流的独立建模——模型在训练时已学会根据交互图推断空间关系，因此推理时仅需替换部分状态序列即可泛化至新的交互模式，体现了框架的灵活性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2522_https_arxiv_org_abs_2512_07410/figures/005_Table_1.jpg]]
 *Table 1: Comparison of text-driven physics-based multi-agent control on the InterHuman [32] test set, where ± indicates 95% confidence interval and →*
 
@@ -334,18 +314,6 @@ InterAgent 展示了无需重新训练的反应式控制能力（图 7）。通�
 
 ![[assets/figures/papers/paper_list_l2522_https_arxiv_org_abs_2512_07410/figures/011_Table_4.jpg]]
 *Table 4: Quantitative evaluation of physical correctness. Bold and underline indicate the best and the second best result*
-
-![[assets/figures/papers/paper_list_l2522_https_arxiv_org_abs_2512_07410/figures/001_Figure_1.jpg]]
-*Figure 1: InterAgent produces physically plausible multi-agent interactions across diverse scenarios from only text prompts*
-
-![[assets/figures/papers/paper_list_l2522_https_arxiv_org_abs_2512_07410/figures/008_Figure.jpg]]
-*Figure: RS + 3 stream DiT FIG + 1 stream DiT FIG + 2 stream DiT FIG + 3 stream DiT SIG + 3 stream DiT “One charges forward while the other raises both hands in defense.”*
-
-![[assets/figures/papers/paper_list_l2522_https_arxiv_org_abs_2512_07410/figures/012_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l2522_https_arxiv_org_abs_2512_07410/figures/013_Figure.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -384,8 +352,6 @@ InterAgent 的方法设计可追溯至三条技术脉络的融合：
 3. **动态行为的物理约束注入。** 解决跳跃等动态行为失效的一个可能路径是在扩散采样过程中加入物理约束引导（如足部离地高度、质心加速度阈值），类似于 classifier-guided diffusion 但约束来自物理规则而非分类器。这需要设计可微的物理约束函数，并平衡约束强度与生成多样性。
 
 4. **真实世界部署的域适应。** 从仿真到真实的迁移可通过域随机化（在训练中引入传感器噪声、质量扰动、地面摩擦变化）和在线自适应（利用真实机器人数据微调跟踪策略或扩散模型）两步走。但多智能体场景下的在线数据采集成本极高，可能需要探索基于离线 RL 或模仿学习的 sim-to-real 策略。
-
-
 
 ## 原文 PDF
 

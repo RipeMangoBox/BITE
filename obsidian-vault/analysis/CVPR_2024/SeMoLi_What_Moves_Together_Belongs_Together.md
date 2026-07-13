@@ -188,9 +188,6 @@ SeMoLi的实验设计围绕一个核心瓶颈展开：**现有启发式聚类方
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2402_19463/figures/006_Table_2.jpg]]
 *Table 2: Bounding box inflation: We inflate tight bounding boxes that enclose point clusters to a minimum width, length, and height. The segmentation performance changes only insignificantly while the detection performance improves drastically. SeMoLi 10 clusters points together correctly, but generates bounding boxes that are significantly tighter around the objects. Table 3. Pseudo-label quality comparison (3DIoU): We compare our SeMoLi to different variants of DBSCAN [30], augmented with scene flow (DBSCAN++), long-term trajectory information (DBSCAN++l) and outlier filtering (†). In gray (top) we report results using ground truth scene flow and trajectories, and below we report scene flow and mo...*
 
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2402_19463/figures/007_Table_4.jpg]]
-*Table 4: Class-wise evaluation of pseudo-labels: For class-wise evaluation, we assign GT classes to pseudo-labels that have any overlap GT. We additionally report the % unmatched false positives (uFP), i.e., pseud-labels not matched to any GT box*
-
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2402_19463/figures/008_Table_5.jpg]]
 *Table 5: Cross-dataset generalization: We evaluate SeMoLi, trained on 90% labeled Waymo Dataset, on Argoverse2 dataset. Note that we never train our approach on Argoverse2. We merge Bicycle and Bicyclist as well as Motorcycle and Motorcyclist since they are not distinguishable by motion*
 
@@ -225,18 +222,6 @@ SeMoLi的核心主张是伪标签质量可随训练数据增加而单调提升�
 
 - [30]中报告的DBSCAN精度/召回率与本文重实现差异很大（Table 12），具体原因需要进一步调查。可能涉及场景流估计方法、点云过滤阈值或评估协议的不同。
 - 基于ICP的配准方法在噪声较大时性能下降的具体机制（Table 11）需要更多实验分析来确认。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2402_19463/figures/014_Figure.jpg]]
-*Figure: (a) Position-based construction. (b) Velocity-based construction*
-
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2402_19463/figures/003_Figure_3.jpg]]
-*Figure 3: Train and validation splits: We conduct our experiments using Waymo training set, for which manual labels are available. We pre-fix two separate validation sets, one for validating pseudo-labels (val pseudo), and one for end-model detector performance (val det). We report performance on varying ratios x for training SeMoLi (train pseudo) and generating pseudo-labels for training our detector (train det)*
-
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2402_19463/figures/004_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2402_19463/figures/009_Table.jpg]]
 
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2402_19463/figures/011_Table_9.jpg]]
 *Table 9: SeMoLi 10 ablation modal upper bound: We report upper bound via oracle, i.e., the achievable performance with segments with at least x _ { f } interior points from GT labels*

@@ -50,8 +50,6 @@ claims:
 
 研究构建了最小化合成数据集，训练不同规模和编码器的DiT模型，并开发了一套可扩展的分析工具链，包括**注意力综述（Attention Synopsis）**用于快速定位关键注意力头、**权重空间头筛选**用于无需生成图像即可识别编码空间方向的头，以及**方差划分与因子化**用于分解上下文嵌入中的关系特征向量。消融实验和因果操控验证了空间关系头（如RTE-DiT中的L2H8）和对象生成头（如L4H3）的关键作用，并通过向量算术在T5-DiT中因果地改变了生成物体的空间位置。该分析框架为理解和改进T2I模型的空间推理能力提供了新的视角和工具。
 
-
-
 文本到图像（T2I）生成模型在单对象属性的视觉呈现上已取得显著进展，但在多对象空间关系生成方面仍存在系统性失败——即使是最先进的开源与闭源模型，在“红色方块在蓝色圆圈的右下方”这类简单空间关系提示上，仍频繁出现对象位置错误或属性绑定混乱。这种失败并非源于模型规模不足，而是源于对扩散Transformer（DiT）内部如何编码和执行空间关系指令的机制理解缺失。
 
 现有研究主要从端到端评估或微调策略的角度审视T2I的空间关系问题，缺乏对模型内部电路级别的因果分析。具体而言，三个关键缺口构成了本研究的直接动机：
@@ -63,8 +61,6 @@ claims:
 **第三，现有可解释性工作多聚焦于单对象属性，多对象关系电路尚未被解构。** 即便在合成的最小化场景中，模型如何协调“哪个对象”“放在哪里”“具有何种属性”这三个子任务，其内部通信协议和因果连接仍是一个黑箱。
 
 针对上述缺口，本文提出以下研究问题：**扩散Transformer内部是否存在专门化的电路来实现空间关系生成？如果存在，这些电路的架构和运作机制是什么？文本编码器的选择如何决定电路的形态？** 为回答这些问题，我们构建了一个可控的合成数据集，训练了多种编码器配置的DiT模型，并发展了一套结合注意力综述、权重空间筛选、方差划分与因果消融的电路分析框架，旨在从机制层面揭示T2I模型空间关系生成的工作原理与失败根源。
-
-
 
 ## 核心方法与创新机理
 
@@ -102,8 +98,6 @@ claims:
 
 综上，本工作的核心创新在于**以电路机制为透镜，重新审视了T2I模型空间推理能力的本质，并揭示了文本编码器在这一过程中的结构性角色**——这是对既有空间关系评估范式的根本性补充与深化。
 
-
-
 本文构建了一套系统性的电路分析管线，旨在揭示扩散Transformer（DiT）如何在文本到图像生成中实现空间关系推理。整个框架围绕三个核心环节展开：**可控训练环境构建**、**注意力行为综述与头筛选**，以及**因果验证与机制对比**。
 
 ### 1. 受控实验环境
@@ -125,15 +119,11 @@ claims:
 ![[assets/figures/papers/paper_list_l2450_https_arxiv_org_abs_2601_06338/figures/006_Figure_6.jpg]]
 *Figure 6: Schematics of the object relation circuit in DiT trained with random embedding*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2450_https_arxiv_org_abs_2601_06338/figures/001_Figure_1.jpg]]
 *Figure 1: Schematics of the model and task. Our T2I model architecture adopted the design of PixArt [5]. There are three main components: the text encoder that processes tokenized natural language prompts into text embeddings, the VAE that processes image inputs into image tokens, and the Diffusion Transformer (DiT) which is the backbone of the denoising diffusion process. The text information routes through the cross attention mechanism in each DiT block and influence the denoising of image tokens. The task is to generate two objects with a specified spatial relation*
 
 ![[assets/figures/papers/paper_list_l2450_https_arxiv_org_abs_2601_06338/figures/033_Figure_30.jpg]]
 *Figure 30: Pre-trained T2I models (A) The prompt set construction and evaluation pipeline. (B) Object and relation accuracy across various object pairs for the PixArt-Sigma model. (C) A text token ablation analysis demonstrating how masking specific tokens affects object and relation accuracy. (D) Projection scores used to identify salient spatial relation heads within the model’s layers*
-
-
 
 ### 分析流水线总览
 
@@ -179,21 +169,8 @@ $$\Delta V_{\text{the2}} := \mathbb{E}[V_{\text{shape2,the}}^* - V_{\text{shape2
 
 实验发现该偏移向量与关系因子方向高度对齐，解释了T5-DiT在添加“the”后关系准确率下降约40%的系统性偏差（Section A.8, Fig. 26B），而采用模块化电路的RTE-DiT几乎不受影响。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2450_https_arxiv_org_abs_2601_06338/figures/003_Figure_3.jpg]]
-*Figure 3: Illustration of our methods to find relevant heads A. Attention synopsis: The giant attention tensor is first reduced to those only between two interested groups of tokens (e.g. the relation token regardless specific words, or an object token regardless where or what it is). Then the reduced attention tensor is averaged over diffusion time steps, resulting in a layer × head map which we use to pinpoint relevant heads. B. Weight space head screening: We also develop an efficient weight-space screening method to screen for relation heads: computing the QK interaction between image position features and text relation feature, and scoring them by how well these spatial maps align with the refer...*
-
-![[assets/figures/papers/paper_list_l2450_https_arxiv_org_abs_2601_06338/figures/004_Figure_4.jpg]]
-*Figure 4: The spatial relation heads in random-embedding-based DiT. A. We find specialized cross attention heads that contributes to the object image tokens (top: the object1 in the text; bottom: the object2 in the text) attending to the relation text tokens. B. We show the activation of this head across images tokens and sampling steps. The map for the composite relation “below and right” decomposes cleanly as the sum of the maps for “below” and “right”, C. The observed attention patterns can be induced by QK interaction of positional embedding and text embedding of relation words. D. Ablating relation head (L2H8) specifically affects relation evaluation*
-
-![[assets/figures/papers/paper_list_l2450_https_arxiv_org_abs_2601_06338/figures/005_Figure_5.jpg]]
-*Figure 5: The object generation heads in random-embedding-based DiT. A. Specialized heads emerge in cross-attention synopses, by summarizing strength from image tokens of each object to its own shape token. B. Activation of this head (L4H3) across images tokens and sampling steps for the prompt “red square is below and to the right of the blue circle”: tokens at the eventual square location attend to “square,” while the other object attends to “circle”; spatial specificity sharpens from Step 0→12. C. Injecting the VO output of the relation head (L2H8) into positional embeddings is sufficient to elicit selective attention from tagged locations to the “square” token (left); without the “tag”, the patte...*
-
 ![[assets/figures/papers/paper_list_l2450_https_arxiv_org_abs_2601_06338/figures/008_Figure_7.jpg]]
 *Figure 7: Mechanism for relational generation in T5-DiT. A. T5-based DiT is robust to attention ablation of relation word, but most sensitive to shape2 and EOS. B. Weight space screening for spatial relation heads via projection score, and its corresponding spatial gradients (L3H7). C. Vector arithmetic on factorized word embedding causally affects generated object relation*
-
-
 
 ## 实验与关键发现
 
@@ -206,9 +183,6 @@ $$\Delta V_{\text{the2}} := \mathbb{E}[V_{\text{shape2,the}}^* - V_{\text{shape2
 #### 不同文本编码器的性能对比
 
 Table 2 汇总了各模型配置的全面评估结果。使用随机token嵌入加位置编码的 RTE-DiT-B 在宽松空间关系准确率上达到 **0.843**，而移除位置编码后骤降至 **0.415**（Δ = -0.428），表明位置编码是 RTE 模型实现空间关系生成的关键结构先验。T5-DiT-B 同样取得了强绑定与空间关系准确率，证明预训练语义结构并非学习物体关系的必要条件。值得注意的是，训练动力学（Figure 2）揭示了统一的学习阶段顺序：颜色准确率最先收敛，其次是形状，然后是唯一绑定，空间关系学习最慢——这一规律在 RTE 和 T5 两种编码器下均成立。
-
-![[assets/figures/papers/paper_list_l2450_https_arxiv_org_abs_2601_06338/figures/002_Figure_2.jpg]]
-*Figure 2: Training dynamics of the T2I models (DiT-B). A. and B. Both models trained with random token embedding (RTE) and T5 can achieve good accuracy on the task. Solid lines shows the result of model using exponential moving averaged (ema) weights, while dashed line shows the non-averaged weights. C. The task is learned in distinct stages. In both models, they first learn to generate objects but with wrong attributes binding, then they the correct binding of single-object attributes (e.g. red square), finally they learn the correct spatial relation. (see App. A.2 for other models)*
 
 #### 预训练模型的泛化基准
 
@@ -249,16 +223,6 @@ Table 1 对 T5 嵌入和 DiT-MLP 投影中 shape2 token 的方差划分显示：
 3. **模型规模**：训练的最大模型仅为 DiT-B，尚未探索 DiT-XL 等更大规模下的电路行为，大规模模型可能出现电路重组或涌现新的通信模式。
 4. **方差划分的零和约束**：线性加性模型的零和约束可能对关系特征向量的符号解释引入偏差，其在非线性表示空间中的真实因子化程度需用无监督方法（如稀疏自编码器）进一步验证。
 5. **预训练模型的弱空间关系能力**：PixArt-Sigma 上仅 8/30 物体对表现出非平凡准确率，限制了分析框架在强模型上的验证深度，也提示当前预训练范式在空间组合性上存在系统性缺陷。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2450_https_arxiv_org_abs_2601_06338/figures/010_Table.jpg]]
-*Table: Abbreviations: WD: weight decay, RTE: random embedding plus position encoding, RTE w/pos: random embedding without position encoding. bind: unique and correct attribute binding. sp rel: spatial relation correctness (loose). sp rel+: spatial relation correctness (stringent). Dx, Dy: difference of coordinates between the two identified objects (with target attributes) $x _ { 1 }$ - $x _ { 2 }$ , $y _ { 1 }$ - $y _ { 2 }$ , with the unit pixel (128 pixel total). All statistics are averaged from 264 prompts, covering all 8 relations and all object combinations, each drawing 50 samples. Thus, the non-zero value in Dx, Dy suggests systematic bias in spatial relation. Evaluated the checkpoint at 4000 epoc...*
-
-![[assets/figures/papers/paper_list_l2450_https_arxiv_org_abs_2601_06338/figures/029_Figure_26.jpg]]
-*Figure 26: Evaluation of model performance on trained and generalized prompt template*
-
-
 
 ## 定位与知识库关联
 
@@ -308,8 +272,6 @@ Table 1 对 T5 嵌入和 DiT-MLP 投影中 shape2 token 的方差划分显示：
 **从脆弱到稳健的迁移**：在真实世界的多物体场景中，预训练模型的“融合式电路”能否通过微调或编码器改进转化为更稳固的“模块化电路”？提示扰动实验表明T5-DiT对无关词“the”的添加极度敏感（关系准确率下降约40%），这一脆弱性是否源于预训练编码器在训练期间形成的不可逆的结构性偏差？
 
 **电路与生成质量的关系**：本文聚焦于空间关系的正确性，但未探讨电路组织方式如何影响生成图像的视觉质量、多样性和组合泛化能力。模块化电路是否在更复杂的组合场景中展现出更好的系统性泛化？
-
-
 
 ## 原文 PDF
 

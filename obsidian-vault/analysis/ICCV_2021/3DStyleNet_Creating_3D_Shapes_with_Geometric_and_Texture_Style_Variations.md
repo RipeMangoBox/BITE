@@ -62,8 +62,6 @@ claims:
 - **下游任务验证**：在单图像3D重建（DISN）的数据增强任务中，完整模型（几何+纹理联合传输）在未见形状上取得最优Chamfer距离0.037，显著优于无增强、域随机化和仅纹理/仅几何传输等策略。
 - **效率与鲁棒性**：纹理传输比传统基于几何对应的方法（Schmidt et al., TOG 2019）快数个数量级（RTX 2080ti上约9-10秒），且对非流形、含孔洞的网格具有鲁棒性。
 
-
-
 ### 3D内容创作中的风格化需求
 
 创建高质量的带纹理3D形状是一项耗时且依赖专业建模技能的任务。在游戏、影视、虚拟现实等应用中，设计师经常需要为同一基础形状生成多种几何和纹理风格变体，以丰富场景多样性。然而，手动为每个变体调整模型拓扑、部件比例和纹理图案不仅效率低下，而且难以保持风格一致性。因此，自动化3D风格迁移成为计算机图形学和视觉领域的重要研究方向——给定一个源形状和一个目标形状，系统应能自动将目标的几何风格（如身体比例、部件空间关系）和纹理风格（如颜色、图案）迁移到源形状上，生成具有目标风格特征的新形状。
@@ -84,8 +82,6 @@ claims:
 - **纹理风格**迁移需要3D感知能力——纹理图案的分布应与变形后的几何结构对齐，且渲染视角下的风格损失应能反向指导几何调整，以消除纹理接缝和前景-背景混淆。
 
 基于上述洞察，3DStyleNet的设计目标是在仅有少量高质量纹理样本的条件下，实现几何与纹理风格的协同迁移，同时保持对非水密、非流形三角网格的鲁棒性。
-
-
 
 ## 核心方法与创新机理
 
@@ -135,8 +131,6 @@ $$f ( \phi , \hat { m } _ { P } ) = L o s s ( P , Q , \phi ) + \beta \sum _ { v 
 
 3DStyleNet的三个创新点构成了一个完整的逻辑链条：**部分感知的几何表示**使形状变形具有语义合理性，**多视角可微渲染**使纹理迁移具有3D感知能力，**测试时联合优化**使两者相互增强。这一框架将3D风格迁移从“先变形后贴图”的机械组合提升为“几何与纹理协同生成”的有机过程，在仅有少量高质量纹理样本（动物221个、汽车218个）的条件下，实现了外观一致的高质量风格化结果。
 
-
-
 3DStyleNet 的整体 pipeline 由两大核心模块构成：**几何风格迁移网络**与**纹理风格迁移网络**，二者通过一个**可微渲染器**桥接，在测试阶段进行联合优化，如图2所示。该框架的输入为一对带纹理的三角网格——源形状与目标形状，输出为同时具有目标几何风格（语义部分间的空间关系）和目标纹理风格（颜色与图案）的新形状。
 
 ### 模块关系与数据流
@@ -157,12 +151,8 @@ $$f(\phi, \hat{m}_P) = \text{Loss}(P, Q, \phi) + \beta \sum_v L_{content}[\dots]
 - **背景 mask 机制**：多视角渲染时利用背景 mask 排除空白区域对风格损失的污染，确保纹理迁移仅作用于前景物体区域。
 - **计算效率**：测试时微调在 RTX 2080ti 上仅需 9–10 秒，显著快于传统基于几何对应的纹理传输方法（如 Schmidt et al., TOG 2019），且对非水密、含孔洞的网格具有天然鲁棒性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2108_12958/figures/001_Figure_1.jpg]]
 *Figure 1: We propose 3DSTYLENET, a neural stylization method for 3D textured shapes. Our method creates novel geometric and texture variations of 3D objects by transferring the shape and texture style from one 3D object (target) to another (source)*
-
-
 
 ### 几何风格迁移网络
 
@@ -204,8 +194,6 @@ $$f ( \phi , \hat { m } _ { P } ) = L o s s ( P , Q , \phi ) + \beta \sum _ { v 
 其中 $\phi$ 为几何变形函数，$\hat{m}_P$ 为风格化纹理，$F_v$ 表示视角 $v$ 的渲染VGG特征，$m_P$ 和 $m_Q$ 分别为源和目标的原始纹理，$\beta = 0.01$，$\gamma = 0.001$。
 
 在测试时针对每对源-目标样本，联合微调几何MLP和纹理线性变换模块的参数，通常约20步即可收敛（9-10秒，RTX 2080ti），使两个独立预训练的网络在具体形状和纹理对上协同适配，产生外观一致的高质量风格化结果。
-
-
 
 ## 实验与关键发现
 
@@ -263,15 +251,11 @@ $$f ( \phi , \hat { m } _ { P } ) = L o s s ( P , Q , \phi ) + \beta \sum _ { v 
 - **部分感知仿射场 vs. 整体变形**：使用Neural Cage替代我们的几何风格网络导致性能显著下降，验证了基于椭球的部分感知仿射变换场在保持语义结构方面的优势。
 - **纹理传输方式**：与基于几何对应的传统方法相比，我们的多视角可微渲染方案对非水密网格更鲁棒，且速度优势明显，使其适用于大规模数据增强场景。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2108_12958/figures/007_Table_1.jpg]]
 *Table 1: Quantitative results on the downstream task of Single Image 3D reconstruction using DISN [55] as the 3D reconstruction method and 3DSTYLENET compared with baselines as a 3D data augmentation strategy*
 
 ![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2108_12958/figures/009_Figure_7.jpg]]
 *Figure 7: Qualitative results on Single Image 3D reconstruction using DISN as the 3D reconstruction method and various 3D data augmentation strategies. While none of the results are perfect, some are clearly worse than others. Affine randomization hurts performance. No augmentation produces worst results than the remaining augmentation strategies. Ours produces the most plausible and smooth shapes. Figure 8: Qualitative results on Single Image 3D reconstruction on SMAL [58] Dataset using DISN [55] as the 3D reconstruction method and 3DSTYLENET as a 3D data augmentation strategy. Note that the background is masked out with the provided segmentation in the Dataset*
-
-
 
 ## 定位与知识库关联
 
@@ -311,8 +295,6 @@ $$f ( \phi , \hat { m } _ { P } ) = L o s s ( P , Q , \phi ) + \beta \sum _ { v 
 3. **高度铰接与非刚体形状**：部分感知仿射场是否适用于具有大范围关节运动（如人体姿态变化）或高度非刚体变形（如布料、软体动物）的风格迁移？这可能需要引入更复杂的变形先验。
 4. **弱监督/无监督部分分割**：如何在更少标注甚至无标注的条件下获取可靠的语义部分分割，以适应更大类别规模的风格迁移需求？
 5. **与神经隐式表示的融合**：该框架能否与神经隐式表示（如NeRF、SDF网络）结合，为无网格的3D形状（如从多视角重建的隐式表面）提供几何与纹理协同风格迁移？这需要重新设计可微渲染与变形场在隐式空间中的交互机制。
-
-
 
 ## 原文 PDF
 

@@ -50,8 +50,6 @@ claims:
 
 核心发现表明：当前没有任何单一模型能在所有任务上同时表现优异——生成模型在动作维度得分普遍偏低，感知模型则在风格属性上更为薄弱；V2V重建任务相较于T2V生成表现出更显著的不一致，直接暴露了统一模型中感知‑生成耦合的信息丢失。UniV-Eval与人工专家评判的一致性接近85%，单次评估成本低于10美元，验证了其可靠性与规模化可行性。
 
-
-
 ### 视频基础模型的统一化趋势与评估困境
 
 近年来，视频基础模型（Video Foundation Models）正朝着“统一”方向快速演进——单一模型同时具备视频理解、生成与编辑等多种能力。然而，现有的视频评估基准严重滞后于这一趋势，呈现出高度碎片化的特征。如 Table 1 所示，主流视频理解基准（如 MVBench、Video-MME 等）多依赖有版权的网络视频，仅支持单任务评估，且缺乏多镜头内容；视频生成基准（如 VBench、EvalCrafter 等）同样局限于文本到视频（T2V）的单一任务，无法评估编辑或重建能力；而视频编辑基准则几乎完全缺失多镜头支持与版权清洁的视频源。这种碎片化导致两个关键问题：**无法测量视频基础模型在理解、生成、编辑上的统一能力**，以及**单一标量分数无法提供细粒度、可解释的错误归因**。
@@ -82,8 +80,6 @@ claims:
 
 通过这一统一框架，UniVBench 首次量化了当前模型的“统一鸿沟”，并提供了将错误归因于感知与生成组件的诊断路径，从而为下一代视频基础模型的迭代提供明确指导。
 
-
-
 ## 核心方法与创新机理
 
 UniVBench 的核心创新并非提出新的模型架构，而是通过**评估范式的统一化**，首次系统性地暴露并量化了当前视频基础模型的“统一鸿沟”。其创新点体现在三个紧密耦合的层面。
@@ -107,8 +103,6 @@ UniVBench 的核心创新并非提出新的模型架构，而是通过**评估�
 ### 3. V2V 重建：感知–生成耦合的诊断探针
 
 V2V 重建任务是 UniVBench 最具洞察力的创新。与 T2V 使用真实标注文本不同，V2V 仅依赖模型自身的理解文本进行重建。这一设计直接量化了**统一模型中理解能力向生成能力传递信息时的损耗**。实验表明，同一模型在 V2V 重建上的表现显著低于 T2V 生成（Figure 3），揭示出当前统一架构在感知–生成耦合上的关键瓶颈。这一发现为未来统一模型的架构设计提供了明确的改进方向。
-
-
 
 UniVBench 的整体评估框架围绕两个核心组件构建：一个免版权、多镜头的视频数据集，以及一个统一的智能体评估系统 UniV‑Eval。这两者共同解决了现有视频评估基准碎片化、无法跨任务统一测量的问题。
 
@@ -148,8 +142,6 @@ UniVBench 支持六项统一任务，覆盖视频基础模型的四大核心能�
 
 所有基线模型在评估中接收完全相同的输入：T2V 任务使用统一的真实标注字幕；TV2V 和 RV2V 任务使用相同的源视频和编辑指令；R2V 任务使用一致的参考图像和提示。对于不支持某些任务的模型（如纯生成模型无法进行 V2T 理解），研究团队实施了最小化适应性修改（如使用 GPT‑4o 替代模型自身的理解组件生成 V2V 所需的字幕），并在论文中明确说明。所有模型统一采用 50 步 DDIM 采样、分类器无关引导系数 7.5、原生分辨率 720×480 的推理配置，从机制层面消除了评估偏差。
 
-
-
 ### 视频数据构建流水线
 
 UniVBench 的数据集构建围绕一个核心设计原则：**通过人工创作与商业 API 合成相结合的方式，构建一个免版权、多镜头、多任务统一评估的视频基准**。该流水线包含以下关键步骤：
@@ -165,9 +157,6 @@ UniVBench 的数据集构建围绕一个核心设计原则：**通过人工创�
 ### UniV-Eval 智能体评估系统
 
 UniV-Eval 是 UniVBench 的核心评估引擎，其设计瓶颈在于：**传统评估指标（如 CLIP Score、FVD）仅提供单一标量分数，无法对视频生成/编辑质量进行细粒度、可追溯的错误归因**。UniV-Eval 通过以下模块化流程解决该问题（Figure 2）：
-
-![[assets/figures/papers/paper_list_l801_https_arxiv_org_abs_2602_21835/figures/005_Figure_2.jpg]]
-*Figure 2: Workflow of UniV-Eval. The system accepts arbitrary inputs within a task setting and performs dynamic evaluation after planning and decomposition. The final results are delivered as a fine-grained checklist, providing traceable feedback for training optimization*
 
 1. **镜头分割与对齐**：将输入视频按镜头边界进行机械分割，并对齐参考图像与编辑指令。
 2. **动态评估规划**：根据任务类型（V2T、T2V、TV2V、R2V、RV2V、V2V）动态选择评估维度与子类别。
@@ -202,8 +191,6 @@ $$T = \{ t _ { 1 } , t _ { 2 } , \dots , t _ { n } \}$$
 其中 $t_j$ 为与镜头 $v_j$ 对应的文本指令。
 
 上述对齐机制使得 UniV-Eval 能够在镜头粒度上进行精确的逐项核查，而非对整个视频给出模糊的总体评价。这是实现可解释错误归因的关键设计。
-
-
 
 ## 实验与关键发现
 
@@ -264,8 +251,6 @@ UniVBench 的核心诊断设计在于 V2V 重建任务：T2V 使用真实标注�
 - UniV‑Eval 的智能体评估框架能否推广到其他跨模态任务（如图像‑视频联合编辑、多模态对话）？
 - 如何进一步扩大 UniVBench 的数据集规模并引入更多样的视频来源（如实拍视频、动画、游戏画面），以增强评估的生态效度？
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l801_https_arxiv_org_abs_2602_21835/figures/007_Table_4.jpg]]
 *Table 4: Performance comparison of different baselines on UniVBench, summarizing results over six tasks, across eight dimensions*
 
@@ -274,17 +259,6 @@ UniVBench 的核心诊断设计在于 V2V 重建任务：T2V 使用真实标注�
 
 ![[assets/figures/papers/paper_list_l801_https_arxiv_org_abs_2602_21835/figures/003_Table_2.jpg]]
 *Table 2: Comparison of cinematic dimensions across different video evaluation benchmarks*
-
-![[assets/figures/papers/paper_list_l801_https_arxiv_org_abs_2602_21835/figures/004_Table_3.jpg]]
-*Table 3: Comparison of core capabilities across existing evaluation metrics and our proposed agent-based evaluation system. “-” indicates the metric is not applicable to this dimension*
-
-![[assets/figures/papers/paper_list_l801_https_arxiv_org_abs_2602_21835/figures/009_Figure_4.jpg]]
-*Figure 4: An example of evaluation using different metrics, where the blue-highlighted part shows that UniV-Eval provides more detailed, traceable validation and assessment*
-
-![[assets/figures/papers/paper_list_l801_https_arxiv_org_abs_2602_21835/figures/006_Table.jpg]]
-*Table: Note: Model types are separated into: ‡Commercial Models, §Open-Source Models*
-
-
 
 ## 定位与知识库关联
 
@@ -329,8 +303,6 @@ UniVBench 的设计决策决定了其适用范围和约束条件：
 4. **评估指标的因果性**：当前 UniV-Eval 的维度得分是相关性指标（视频与指令的匹配程度），而非因果性指标（模型是否“真正理解”了场景）。如何设计反事实评估（counterfactual evaluation）来测试模型对特定维度变化的敏感性，是一个值得深入的方向。
 
 5. **统一模型的架构启示**：Table 4 显示生成模型在动作维度得分普遍偏低，而感知模型在风格属性上更弱。这一模式是否暗示当前统一架构中感知编码器与生成解码器之间存在模态对齐的瓶颈？能否基于 UniVBench 的诊断结果反推架构改进的方向？
-
-
 
 ## 原文 PDF
 

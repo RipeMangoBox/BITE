@@ -251,8 +251,6 @@ Fig. 10 和 Tab. 3 的对比表明，单独使用体素分支（SCube）或单�
 - **Fig. 9b**：语义缓冲区是维持长视频质量的最关键成分，坐标缓冲区进一步解决运动模糊问题。
 - **Fig. S13**：重叠潜变量外推策略显著优于直接拼接，是块间无缝过渡的关键设计。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2412_03934/figures/005_Figure_4.jpg]]
 *Figure 4: Illustration of concepts in the pixel branch. The midground region and masked / full voxel depth*
 

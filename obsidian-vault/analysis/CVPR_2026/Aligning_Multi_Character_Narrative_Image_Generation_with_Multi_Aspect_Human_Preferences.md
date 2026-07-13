@@ -51,8 +51,6 @@ claims:
 
 核心实验证据表明：NIReward 在身份一致性上的偏好预测准确率超越 GPT-4o-mini 高达 **38.35%**（Table 1）；ADPO 搭配 NIReward 在提示跟随、身份一致性和视觉质量三个维度上全面超越 Diffusion-DPO 搭配传统奖励模型（Table 2）；批判机制使视觉质量准确率提升 **10.34%**（Table 4），验证了可解释推理路径对偏好建模的关键作用。用户研究进一步确认，本方法生成的结果更符合人类偏好（Figure 4）。
 
-
-
 ### 多角色叙事图像生成的核心挑战
 
 文本到图像（T2I）扩散模型在单主体生成上已取得显著进展，但在**多角色叙事场景**下仍暴露出三个深层缺陷（Figure 1）：
@@ -80,8 +78,6 @@ claims:
 2. **设计自适应支配偏好优化算法**：提出 **ADPO**（Adaptive Dominance-based Preference Optimization），通过支配比较策略仅选择在所有维度上均占优的偏好对，结合拒绝采样过滤低质量样本，并以自适应加权学习动态调整各维度的优化强度。这解决了多维优化中的不平衡问题。
 
 两者协同工作：NIReward 提供可信的多维反馈，ADPO 利用该反馈进行平衡的偏好优化，最终使生成过程直接对齐人类在提示跟随、身份一致性和视觉质量上的复合偏好。
-
-
 
 ## 核心方法与创新机理
 
@@ -119,8 +115,6 @@ $$\beta(a) = \beta \left(1 + \eta \left(1 - e^{-k(a - b)}\right)\right)$$
 
 三个创新组件形成递进闭环：NIReward 提供可解释的多维奖励信号，使维度级支配判断成为可能；支配比较策略与拒绝采样从信号中提取高置信度、无冲突的偏好对；自适应加权学习则根据偏好对的置信度差异精细调控优化强度，避免多维度间的失衡。这一“可解释奖励 → 支配筛选 → 自适应优化”的链路，使生成过程直接对齐人类在提示跟随、身份一致性和视觉质量上的细粒度偏好，而非间接拟合单一标量分数。
 
-
-
 本工作提出了一套面向多角色叙事图像生成的偏好对齐框架，其核心由三个模块串联构成：**NI‑RLHF 数据集**、**NIReward 奖励模型**与 **ADPO 偏好优化算法**。整体流程如图 3 所示：首先基于 NI‑RLHF 数据集训练一个可解释的多维奖励模型 NIReward；随后在 ADPO 的“采样—评分—比较—优化”四阶段循环中，利用 NIReward 的多维支配信号对基础个性化生成模型进行偏好微调，最终使生成结果在提示跟随、身份一致性与视觉质量三个维度上同时逼近人类偏好。
 
 **NI‑RLHF 数据集** 是整个框架的偏好信号来源。其构建分为两步（图 2）：  
@@ -139,12 +133,8 @@ $$\beta(a) = \beta \left(1 + \eta \left(1 - e^{-k(a - b)}\right)\right)$$
 
 整个框架的输入为文本提示 $y$ 与参考图像 $c$，经过 PhotoMaker 基础模型生成初始图像，再由 NIReward 提供多维批判与奖励，最终通过 ADPO 迭代微调模型参数，输出对齐人类偏好的多角色叙事图像。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l982_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_Aligning_Multi_Cha/figures/003_Figure_3.jpg]]
 *Figure 3: The overview of proposed NIReward training and ADPO. During the NIReward Training, NIReward learns to provide critiques and rewards based on annotated winning/losing image pairs; and ADPO aligns the model with human preferences through sampling, scoring, dominating comparison, and preference optimization*
-
-
 
 ### 1. NIReward：基于批判的多维奖励模型
 
@@ -205,12 +195,8 @@ $$\mathcal{L}(\theta) = - \mathbb{E}_{(x_0^w, x_0^l) \sim \mathcal{D}, t \sim \m
 
 NIReward 提供的**可解释批判**解决了传统奖励模型的“黑箱”问题——消融实验表明，批判机制使视觉质量准确率提升 10.34%（Table 4）。ADPO 的**支配比较**和**自适应加权**则解决了多维偏好优化中的不平衡问题：移除自适应加权（w/o AW）会导致提示跟随过度优化而损害身份一致性；替换支配比较为平均分（Avg. Score）则显著降低身份相似度（Table 3）。两者协同实现了从“单一标量信号”到“可解释多维信号”，再到“平衡优化”的完整对齐链路。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l982_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_Aligning_Multi_Cha/figures/002_Figure_2.jpg]]
 *Figure 2: NI-RLHF construction pipeline. It consists of two stages: (1) Data Collection: generate multi-character images using personalized T2I models. (2) Data Annotation: MLLM-based human annotation of prompt following, identity consistency, and visual quality*
-
-
 
 ## 实验与关键发现
 
@@ -235,9 +221,6 @@ Table 2 报告了不同偏好优化方法的定量生成结果。以 PhotoMaker�
 ### 用户研究
 
 Figure 4 的用户研究结果进一步证实，人类评估者在成对比较中显著偏好 ADPO + NIReward 生成的图像，胜率超过所有对比的 DPO 变体。这表明 NIReward 的多维奖励信号和 ADPO 的支配比较策略共同作用，使生成结果在主观感知层面更贴近人类偏好。
-
-![[assets/figures/papers/paper_list_l982_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_Aligning_Multi_Cha/figures/007_Figure_4.jpg]]
-*Figure 4: User Study of ADPO compared to other methods*
 
 ### 消融实验
 
@@ -267,13 +250,6 @@ Figure 5 展示了不同 DPO 方法的定性生成比较。在“女人做沙拉
 ### 小结
 
 综合而言，NIReward 通过批判引导的多维奖励建模，解决了通用奖励模型在多角色叙事场景中的分布偏差和不可解释性问题；ADPO 通过支配比较、拒绝采样和自适应加权，实现了多维度偏好的平衡优化。两者协同使生成模型在自动指标和人类评估上均显著超越现有 DPO 方法。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l982_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_Aligning_Multi_Cha/figures/001_Figure_1.jpg]]
-*Figure 1: Challenges in multi-character narrative image generation: (a) Characters display portrait poses with the elderly man’s expression overfitting to reference rather than aligning with the prompt; (b) Low facial distinctiveness with blended identity features; (c) Anatomical inconsistency shown in the girl’s incompletely rendered lower body*
-
-
 
 ## 定位与知识库关联
 
@@ -353,8 +329,6 @@ ADPO 在上述谱系中的定位是：**以多维支配比较替代标量比较�
 1. **批判引导奖励的泛化性**：NIReward 的批判-奖励两阶段范式能否泛化到其他需要细粒度视觉理解的评估任务（如布局准确性、风格一致性），以及如何以较低成本扩展批判维度。
 2. **多维支配的帕累托前沿**：ADPO 的支配比较策略本质上是寻找帕累托占优的偏好对，当多个维度存在冲突时（如提示跟随与视觉质量之间的权衡），帕累托前沿上的偏好对可能变得稀疏，如何在这种情况下保持优化稳定性值得进一步研究。
 3. **自适应加权的理论性质**：自适应缩放因子 $\beta(a) = \beta(1 + \eta(1 - e^{-k(a-b)}))$ 引入了超参数 $b$、$\eta$、$k$，其对不同奖励分布和任务场景的敏感性缺乏理论分析。
-
-
 
 ## 原文 PDF
 

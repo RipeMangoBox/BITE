@@ -56,8 +56,6 @@ claims:
 
 **局限与开放问题**：突变仅作用于时间重采样后的像素内样本，未探索跨像素突变；突变次数缺乏理论指导，实践中 1 次已足够但最优次数仍依赖场景调试；如何量化时空相关性以自适应地触发突变，以及降噪器如何适配去相关后的样本，是有待进一步研究的方向。
 
-
-
 ### 渲染方程与蒙特卡洛估计
 
 全局光照模拟的核心是求解渲染方程，该方程描述了场景中任意点 $y$ 向方向 $\omega$ 的出射辐射度 $L_{\mathrm{out}}(y,\omega)$：
@@ -105,8 +103,6 @@ ReSTIR 的时间置信度上限参数 $M_{\mathrm{cap}}$ 控制着历史样本�
 ### 本文动机
 
 上述分析揭示了 ReSTIR 框架的核心瓶颈：**时空复用的收益与相关性/贫化代价之间存在难以调和的矛盾**。本文的动机在于打破这一僵局——通过在时间重采样之后引入 Metropolis-Hastings（MCMC）突变步骤，在像素内局部扰动储层样本以多样化样本总体，从而在不引入偏差的前提下打断相关性、缓解样本贫化。这一设计同时允许使用更大的 $M_{\mathrm{cap}}$ 值，实现噪声与相关性的更优权衡。
-
-
 
 ## 核心方法与创新机理
 
@@ -171,8 +167,6 @@ $$W(x^k) = \frac{\hat{p}(x^0)}{\hat{p}(x^k)} W(x^0)$$
 
 值得进一步探索的方向包括：如何量化局部相关性以自适应决定突变次数；降噪器如何适配去相关后的样本分布；以及如何将突变扩展到跨像素域以进一步打破空间相关性。
 
-
-
 本文提出的方法在标准ReSTIR时空重采样流程中插入一个轻量级的**MCMC突变模块**，以打断因无限制样本重用而产生的像素间相关性。整体管线遵循“初始采样→时间重采样→**MCMC突变**→空间重采样→最终着色”的顺序，突变步骤仅作用于时间重采样之后的每个像素储层样本，不改变其他模块的接口与功能。
 
 ### 管线模块与数据流
@@ -198,8 +192,6 @@ $$W(x^k) = \frac{\hat{p}(x^0)}{\hat{p}(x^k)} W(x^0)$$
 - **输入**：每帧每个像素的初始储层样本（含路径顶点、贡献权重、目标函数值），以及上一帧的时间储层。
 - **输出**：经突变去相关后的储层样本，其贡献权重已按式（16）校正，可直接送入空间重采样和最终着色阶段。
 - **额外存储**：非对称突变策略需额外存储偏移路径的重连顶点 $\mathbf{y}_{i+1}$，内存开销轻微。
-
-
 
 ### 方法总览
 
@@ -257,8 +249,6 @@ $$w(y_j) = m_j(y_j')\,\hat{p}(y_j')\,W(y_j) \cdot \left| \frac{\partial y_j'}{\p
 
 每像素每帧仅需**1次MH突变**即可显著降低短程相关性伪影。单次突变的计算开销极小：对于ReSTIR DI，仅需一次光源采样方向扰动和一次目标函数评估；对于ReSTIR PT，需一次顶点扰动和至多两次光线追踪（候选路径追踪与接受概率计算中的反向转移密度评估）。所有对比实验均在等时间条件下进行，突变开销已计入总渲染时间。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -302,8 +292,6 @@ $$w(y_j) = m_j(y_j')\,\hat{p}(y_j')\,W(y_j) \cdot \left| \frac{\partial y_j'}{\p
 
 5. **非对称突变的内存开销**：非对称突变需要额外存储偏移顶点y_{i+1}，略微增加了内存使用量。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2211_00166/figures/013_Figure_11.jpg]]
 *Figure 11: Mutations do not reduce mean squared error in the Veach Ajar scene rendered using ReSTIR PT with the hybrid shi and $M _ { \mathrm { { C a p } } }$ = 5 0 . This suggests that in contrast to Metropolis Light Transport, resampling (and not mutations) finds important light-carrying paths in ReSTIR. Compared to the random replay shi in Figure 8, resampling with the superior hybrid shi does not introduce large correlation artifacts in this scene*
 
@@ -318,8 +306,6 @@ $$w(y_j) = m_j(y_j')\,\hat{p}(y_j')\,W(y_j) \cdot \left| \frac{\partial y_j'}{\p
 
 ![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2211_00166/figures/003_Figure_2.jpg]]
 *Figure 2: Glossy scenes with dificult-to-sample lighting rendered using Re-STIR PT o en contain correlation artifacts irrespective of the selected shi mapping strategy [Lin et al. 2022, Section 7]. Artifacts result from suboptimal importance sampling and over-enthusiastically sharing a few highcontribution samples between pixels*
-
-
 
 ## 定位与知识库关联
 
@@ -372,8 +358,6 @@ $$w(y_j) = m_j(y_j')\,\hat{p}(y_j')\,W(y_j) \cdot \left| \frac{\partial y_j'}{\p
 5. **误差分布优化**：突变能否进一步优化以达到蓝噪声误差分布，从而在降噪后获得更优的视觉质量？
 
 这些问题指向一个更宏大的目标：在实时渲染中实现**自适应、可证明最优的时空样本重用与去相关联合框架**。
-
-
 
 ## 原文 PDF
 

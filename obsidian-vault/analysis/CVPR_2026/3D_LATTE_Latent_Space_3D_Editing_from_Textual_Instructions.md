@@ -241,19 +241,11 @@ $$F^{\prime}(h_{l,t}) = F(h_{l,t}) \odot \beta_{l,t}$$
 
 尽管3D-LATTE在整体性能上表现优异，但在以下场景中仍存在挑战：当编辑指令涉及大幅度的拓扑变化（如将闭合物体变为开放结构）时，几何正则化可能不足以约束生成过程，导致几何退化。此外，编辑质量依赖于底层3D扩散模型DiffSplat的表达能力，对于训练分布之外的极端编辑，结果可能出现语义偏差。这些失败模式在消融实验中已部分体现，进一步改进需要更强大的3D生成先验或自适应正则化策略。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2034_https_arxiv_org_abs_2509_00269/figures/006_Figure_5.jpg]]
 *Figure 5: Qualitative comparison with baselines. Our approach achieves the most plausible edits wrt. the input instruction text, while preserving the unedited parts of the 3D objects*
 
 ![[assets/figures/papers/paper_list_l2034_https_arxiv_org_abs_2509_00269/figures/007_Figure_6.jpg]]
 *Figure 6: Qualitative Results. Our method yields high-quality 3D objects for a diverse set of edits*
-
-![[assets/figures/papers/paper_list_l2034_https_arxiv_org_abs_2509_00269/figures/009_Figure_7.jpg]]
-*Figure 7: User study. Our approach shows a significantly higher percentage of votes in instruction faithfulness and visual quality*
-
-![[assets/figures/papers/paper_list_l2034_https_arxiv_org_abs_2509_00269/figures/008_Figure_8.jpg]]
-*Figure 8: Effect of 3D enhancement*
 
 ## 定位与知识库关联
 

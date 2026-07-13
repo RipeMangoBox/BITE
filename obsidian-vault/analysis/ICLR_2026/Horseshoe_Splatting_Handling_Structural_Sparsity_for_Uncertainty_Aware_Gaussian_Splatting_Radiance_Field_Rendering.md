@@ -60,8 +60,6 @@ claims:
 
 **方法谱系与知识库定位**：Horseshoe Splatting 将高维回归中的全局-局部收缩先验（Horseshoe, Carvalho et al., 2009）首次迁移至3D辐射场的协方差建模。相较于 NeRF 系列的不确定性方法——如 **CF-NeRF**（基于归一化流）、**S-NeRF**（贝叶斯权重推断）和 **Bayes' Ray**（拉普拉斯近似）——本方法直接作用于3DGS的高斯核参数空间，避免了额外的网络模块。在3DGS分支内，本方法区别于 **FisherRF**（基于Fisher信息的后验近似）和 **Ensemble GS**（10模型集成）的昂贵计算，通过单次变分训练即可获得校准良好的像素级不确定性。
 
-
-
 ### 3D高斯泼溅的确定性本质与不确定性盲区
 
 3D高斯泼溅（3D Gaussian Splatting, 3DGS）以其实时渲染能力和优异的视觉质量，迅速成为新视角合成领域的主流方法。然而，3DGS本质上是一个确定性框架：每个高斯核的协方差矩阵（通过缩放矩阵和旋转矩阵参数化）在优化过程中被直接学习，没有任何概率先验或后验推断机制。这意味着模型无法量化其对每个像素预测的置信度——当场景包含遮挡边界、高光反射或训练视角稀疏的区域时，渲染结果可能高度不可靠，但3DGS对此完全“沉默”。
@@ -89,8 +87,6 @@ $$s_{ij} \mid \lambda_{ij}, \theta_j \sim \mathcal{N}(\beta_{ij}, \sigma_{ij}^2 
 其中 $\theta_j$ 为全局收缩参数（控制整个维度的稀疏程度），$\lambda_{ij}$ 为局部收缩参数（允许单个高斯核的尺度偏离全局趋势）。通过半柯西先验的逆Gamma混合表示，该层次模型在变分推断框架下获得了闭合形式的KL散度，使得训练仅需在标准3DGS损失上增加一个KL正则化项，计算开销极小（见表9，推理时间仅0.03秒）。
 
 这一设计使得模型在训练过程中**自适应地**识别并收缩不相关的尺度方向，同时保留数据支持的显著各向异性结构。最终，通过从变分后验中蒙特卡洛采样尺度参数并渲染，模型能够输出像素级的预测均值和方差，为每个像素提供校准良好的不确定性估计。
-
-
 
 ## 核心方法与创新机理
 
@@ -130,8 +126,6 @@ $$p(\tilde{I}_u \mid D) \approx \frac{1}{M} \sum_{m=1}^{M} p(\tilde{I}_u \mid \{
 ### 创新本质总结
 
 Horseshoe Splatting 的创新不在于引入新的渲染管线或网络架构，而在于**将贝叶斯收缩理论中的 Horseshoe 先验与 3DGS 的协方差参数化进行精确对接**。这一对接使得原本确定性的尺度优化转变为自适应收缩的贝叶斯推断，同时实现了三个目标：(1) 结构化稀疏性——噪声方向被自动收缩；(2) 高质量渲染——显著结构被重尾保护而得以保留；(3) 校准良好的不确定性——后验预测分布自然输出像素级方差。三者并非独立设计，而是 Horseshoe 先验“尖峰-重尾”性质的统一产物，这是该方法区别于其他不确定性感知 3DGS 方法（如 FisherRF 的 Fisher 信息、Ensemble GS 的模型集成、Variational 3DGS 的通用变分推断）的根本所在。
-
-
 
 Horseshoe Splatting 以标准 3DGS 管线为基础，在其协方差建模环节插入贝叶斯层次先验与变分推断，形成**先验定义 → 变分后验近似 → 联合 ELBO 优化 → 后验预测采样**四阶段流水线，整体框架如图 2 所示。
 
@@ -176,12 +170,8 @@ $$p(\tilde{I}_u \mid D) \approx \frac{1}{M} \sum_{m=1}^{M} p(\tilde{I}_u \mid \{
 
 Horseshoe 先验（模块一）通过其尖峰-重尾特性决定收缩行为 → 变分后验（模块二）在数据驱动下自适应地学习哪些轴被收缩、哪些被保留 → ELBO 优化（模块三）平衡数据拟合与稀疏正则化 → 后验采样（模块四）将协方差的不确定性传播至像素空间，产出校准的不确定性估计。**这一链路的核心因果机制在于：结构化稀疏性并非通过硬阈值剪枝实现，而是由 Horseshoe 先验的贝叶斯收缩自动诱导，收缩强度由数据自适应决定**，从而在保持渲染质量的同时获得良好校准的不确定性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l30_https_openreview_net_forum_id_NHuyk9KsG6/figures/002_Figure_2.jpg]]
 *Figure 2: The framework of our proposed Horseshoe Splatting*
-
-
 
 ### 3DGS 渲染基础
 
@@ -246,13 +236,6 @@ $$\varepsilon_{N,P}^2 = C \frac{\sigma^2}{P} \frac{k \log(e\,3N/k)}{\kappa_{\min
 
 其中 $P$ 为观测像素数，$k$ 为非零尺度的数量，$\kappa_{\min}$ 为最小非零奇异值。该速率表明：Horseshoe 收缩以趋近极小极大的速率自动将接近零的尺度驱至零，而重尾特性确保对大尺度坐标的偏差可忽略——即**噪声被收缩，显著几何结构被保留**。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l30_https_openreview_net_forum_id_NHuyk9KsG6/figures/011_Figure_4.jpg]]
-*Figure 4: Posterior density of covariance scale*
-
-
-
 ## 实验与关键发现
 
 ### 主要定量结果
@@ -291,8 +274,6 @@ Table 9报告了在LF *torch*场景上的计算开销。所有实验均在单张
 
 尽管Horseshoe Splatting在不确定性估计和合成质量上表现优异，仍存在以下局限：（1）当前框架仅适用于静态场景，未扩展到动态场景或需要时间建模的任务；（2）协方差建模局限于对角形式，未包含轴间相关性——虽然框架理论上可扩展至低秩修正，但尚未实现；（3）变分推断采用均值场近似，可能低估后验方差，在极端分布外场景下不确定性校准可能偏乐观。这些局限在高度非朗伯表面和剧烈视角变化的场景中可能表现为不确定性图过于平滑或对某些边缘区域的置信度过高，需人工验证具体场景下的表现。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l30_https_openreview_net_forum_id_NHuyk9KsG6/figures/003_Table_1.jpg]]
 *Table 1: Depth uncertainty estimation (AUSE-MAE) performance on the LF dataset. The best result is in boldface, and the second-best is underlined*
 
@@ -307,23 +288,6 @@ Table 9报告了在LF *torch*场景上的计算开销。所有实验均在单张
 
 ![[assets/figures/papers/paper_list_l30_https_openreview_net_forum_id_NHuyk9KsG6/figures/010_Table_7.jpg]]
 *Table 7: Comparison of Structural Sparsity Induction on LF torch*
-
-![[assets/figures/papers/paper_list_l30_https_openreview_net_forum_id_NHuyk9KsG6/figures/014_Table_8.jpg]]
-*Table 8: Novel View Synthesis (NVS) and Uncertainty Estimation on large-scale datasets (Tanks & Temples and Mip-NeRF360). Our method achieves significantly better uncertainty metrics (AUSE, NLL) while maintaining superior visual quality. Best results are in boldface*
-
-![[assets/figures/papers/paper_list_l30_https_openreview_net_forum_id_NHuyk9KsG6/figures/015_Table_9.jpg]]
-*Table 9: Computational Cost on the LF torch scene. All experiments were conducted on a single NVIDIA RTX 3090 GPU*
-
-![[assets/figures/papers/paper_list_l30_https_openreview_net_forum_id_NHuyk9KsG6/figures/007_Table_4.jpg]]
-*Table 4: The experiment on active learning*
-
-![[assets/figures/papers/paper_list_l30_https_openreview_net_forum_id_NHuyk9KsG6/figures/016_Table_10.jpg]]
-*Table 10: Active Learning on Tanks & Temples*
-
-![[assets/figures/papers/paper_list_l30_https_openreview_net_forum_id_NHuyk9KsG6/figures/017_Table_11.jpg]]
-*Table 11: OOD View Detection on LLFF*
-
-
 
 ## 定位与知识库关联
 
@@ -368,8 +332,6 @@ Horseshoe Splatting 的设计假设和实验验证界定了其当前的适用范
 3. **协方差结构扩展**：如何将框架扩展到更完整的协方差结构（如低秩修正 $\Sigma_i = R_i S_i S_i^T R_i^T + L_i L_i^T$），以捕获轴间相关性？这需要在 Horseshoe 先验的收缩机制与低秩因子的建模之间建立一致的贝叶斯框架。
 
 4. **不确定性驱动的主动视图选择**：Table 4 和 Table 10 已初步验证了不确定性在主动学习中的有效性。能否进一步利用结构稀疏性信息——即哪些区域的高斯核尺度被强烈收缩——来指导更高效的视图选择策略？
-
-
 
 ## 原文 PDF
 

@@ -64,8 +64,6 @@ claims:
 
 EchoMimicV2 属于**基于扩散模型的音频驱动半身人体动画**方法，其架构建立在 ReferenceNet 主干与去噪 U-Net 之上，集成了 Wav2Vec 音频编码器、姿态编码器和时序注意力模块（Figure 2）。相较于姿态驱动基线（如 **AnimateAnyone**，Hu et al., CVPR 2024；**MimicMotion**，Zhang et al., arXiv 2024）和音频驱动基线（如 **Vlogger**，Zhuang et al., CVPR 2024），EchoMimicV2 以更少的条件输入实现了更强的半身表现力与手部生成质量。当前局限在于手部姿态仍需人工预定义，尚未实现端到端的音频到手部姿态生成。
 
-
-
 音频驱动的人体动画生成旨在根据语音信号和参考图像合成逼真的说话人视频，在数字人、虚拟主播、在线教育等领域具有广泛应用。然而，现有方法在生成范围和控制条件上面临两个核心瓶颈：
 
 **生成范围局限：从头部到半身的跨越。** 早期工作主要聚焦于头部区域的动画生成，仅处理嘴唇运动和面部表情，无法呈现自然交流中不可或缺的上半身动作与手势。近年来，虽然部分方法开始探索半身动画生成，但往往需要依赖复杂的多条件注入体系。例如，**CyberHost**（Lin et al., arXiv 2024）作为音频驱动的半身基线，需要同时输入全身关键点、运动图等多种辅助信号，导致训练流程繁琐且不稳定。**Vlogger**（Zhuang et al., CVPR 2024）同样面临条件冗余的问题。另一类姿态驱动方法如 **AnimateAnyone**（Hu et al., CVPR 2024）和 **MimicMotion**（Zhang et al., arXiv 2024），虽然能生成半身动画，但完全依赖预定义姿态序列，缺乏对音频内容的语义响应能力。
@@ -73,8 +71,6 @@ EchoMimicV2 属于**基于扩散模型的音频驱动半身人体动画**方法�
 **控制条件冗余：简化与质量的矛盾。** 多条件注入策略虽然在某种程度上提升了生成质量，但引入了显著的训练复杂度和不稳定性。核心矛盾在于：如何在减少控制条件的同时，保持甚至提升半身动画的视觉质量、唇音同步精度和手势表现力？这一问题在现有文献中尚未得到系统性解决。
 
 **本文动机。** EchoMimicV2 正是针对上述瓶颈提出。其核心思路是通过一种“姿态退后、音频前进”的动态协调策略，逐步移除冗余的姿态关键点依赖，同时将音频控制范围从嘴唇扩散至面部乃至全身，从而在显著简化输入条件（仅需参考图像、音频和手部姿态序列，见 Table 1）的前提下，实现高质量、高表现力的半身人体动画生成。
-
-
 
 ## 核心方法与创新机理
 
@@ -121,8 +117,6 @@ $$
 - **Head Partial Attention** 则通过数据增强进一步巩固了简化条件下的训练稳定性，尤其在唇音同步方面提供了额外监督信号。
 
 这种“简化条件 → 阶段补偿 → 数据增强”的协同设计，使得 EchoMimicV2 在仅需音频和手部姿态的条件下，实现了超越多条件基线方法的半身动画质量。
-
-
 
 EchoMimicV2 的整体流水线建立在 **ReferenceNet 扩散架构**之上，目标是从参考图像、音频片段和手部姿态序列生成高质量半身动画视频（Figure 2）。流水线由以下核心模块构成：
 
@@ -172,8 +166,6 @@ $$L_{PhD} = \begin{cases} \lambda_{pose} \cdot L_{pose} + L_{latent}, & t \in S_
 - 一组**手部姿态序列**（由 Pose Sampling 简化后仅保留手部关键点）。
 
 系统输出与音频同步的高质量半身动画视频，包含自然的口型、面部表情和手势动作（Figure 1, Table 1）。与 CyberHost 等基线方法相比，EchoMimicV2 将条件从完整的全身关键点、运动图等多重信号简化为仅手部姿态加音频，显著降低了条件冗余（Table 1）。
-
-
 
 EchoMimicV2 的核心架构建立在 ReferenceNet 扩散主干之上，其关键创新在于 Audio-Pose Dynamic Harmonization（APDH）策略与 Phase-specific Denoising Loss（PhD Loss）的协同设计。以下按模块拆解其技术细节。
 
@@ -226,12 +218,8 @@ $$L_{PhD} = \begin{cases} \lambda_{pose} \cdot L_{pose} + L_{latent}, & t \in S_
 
 其中 $\lambda_{pose}$、$\lambda_{detail}$、$\lambda_{low}$ 为各阶段辅助损失的权重系数。消融分析表明，$L_{pose}$ 对整体指标影响显著，$L_{detail}$ 显著提升局部质量指标（Sync-C、Sync-D、E-FID、HKC、HKV），$L_{low}$ 则贡献于色彩与画质改善。同时去除 APDH 与 PhD Loss 的简置基线模型在各项指标上均表现次优，证明二者协同不可或缺（Table 2 末行）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1868_Towards_Striking_Simplified_and_Semi_Body_Human_Animation/figures/001_Figure_1.jpg]]
 *Figure 1: EchoMimicV2 utilizes a reference image, an audio clip, and a sequence of hand pose to generate a high-quality animation video, ensuring coherence between audio content and half-body movements*
-
-
 
 ## 实验与关键发现
 
@@ -282,15 +270,6 @@ PhD Loss 各组件的分析表明：$L_{pose}$ 对整体指标影响显著，补
 
 1. 如何直接从音频生成手部姿态序列，实现完全端到端的半身动画？
 2. 如何提升模型在非半身裁剪参考图像（如全身或复杂背景）下的鲁棒性？
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1868_Towards_Striking_Simplified_and_Semi_Body_Human_Animation/figures/004_Figure_3.jpg]]
-*Figure 3: The results of EchoMimicV2 given different reference images, hand pose and audios*
-
-![[assets/figures/papers/paper_list_l1868_Towards_Striking_Simplified_and_Semi_Body_Human_Animation/figures/002_Table.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -343,8 +322,6 @@ EchoMimicV2 处于音频驱动人体动画这一研究脉络中，其核心突�
 3. **APDH 策略的泛化验证**：“姿态退后、音频前进”的华尔兹式策略是否可推广至其他条件生成任务（如全身动画、多人物场景）？其理论基础和适用范围值得进一步探索。
 
 4. **PhD Loss 的阶段划分优化**：当前三个阶段的时间步范围划分（10%、60%、30%）是否为最优？不同任务或数据分布下是否需要动态调整阶段边界？
-
-
 
 ## 原文 PDF
 

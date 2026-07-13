@@ -151,8 +151,6 @@ AdaptVision 的整体设计遵循**从粗到细（coarse-to-fine）**的主动�
 
 整个 pipeline 的因果链条可概括为：**压缩感知 → 自适应决策 → 按需获取细节 → 整合生成**。其中，策略决策模块是系统的核心瓶颈——它决定了效率与精度的动态平衡点。DTPO 训练算法（见 Section 4.3）通过解耦工具 token 和答案 token 的优化目标，确保模型学会在“直接回答”和“工具调用”之间做出合理的自适应选择，而非退化到过度依赖工具或完全放弃工具的极端策略。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2759_https_arxiv_org_abs_2512_03794/figures/002_Figure_2.jpg]]
 *Figure 2: FrameWork of AdaptVision. AdaptVision first processes a 1/4-resolution image. The model then decides whether to answer directly or invoke the bounding box tool to crop a high-resolution region for further analysis before generating the final answer*
 
@@ -312,8 +310,6 @@ AdaptVision的核心实验在9个VQA基准上系统评估了其效率-精度权�
 ### 案例研究：从粗到细的直观验证
 
 **Figure 7**通过典型案例对比了三种策略的行为差异：Vanilla模型消耗大量token获得正确答案；Down-Sample模型节省token但回答错误；AdaptVision智能地调用工具裁剪关键区域，以极少的额外token代价获得正确答案。**Figure 8**和**Figure 9**分别展示了直接回答和工具调用的具体案例，验证了模型能根据问题复杂度做出合理决策。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2759_https_arxiv_org_abs_2512_03794/figures/006_Figure_5.jpg]]
 *Figure 5: Policy-training comparison: (a) The influence of reward design. (b) GRPO vs. DTPO*

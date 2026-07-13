@@ -54,8 +54,6 @@ claims:
 
 **主要结果**：在5体粒子模拟验证任务上，全架构将重构MSE降至0.32（ℓ=12, n=3），验证了图结构改进的有效性。在舞蹈数据上，模型仅观察6-10个随机采样的关节，即可发现高置信度边（>80%），这些边揭示了舞者间的对抗张力模式和关键关节枢纽现象，与编舞直觉高度一致。消融实验表明，增加输入序列长度可显著降低重构误差，但过多边类型（n>3）可能引入冗余。
 
-
-
 舞蹈是高度协作的艺术形式，舞者之间通过身体语言传递张力、节奏和意图，形成一种“无形的弦”般的互动网络。然而，这种互动本质上是隐含的、主观的，缺乏明确的标注数据，使得传统的监督学习方法难以直接建模。现有的动作分析与编舞工具大多聚焦于单人姿态估计或运动生成，对双人乃至多人之间的动态交互关系缺乏系统性的计算表征手段。
 
 从技术层面看，捕捉舞者间互动面临三重挑战。其一，3D姿态提取存在噪声——关节抖动、身份切换、远离画面中心时腿脚扭曲等问题普遍存在（Figure 1），即使在选择性能更优的HybrIK（via AlphaPose）管道后仍无法完全消除（Figure 2）。其二，可用的双人舞数据集极小，本文仅使用4段视频，即使引入随机旋转增强，也难以训练出泛化良好的模型。其三，舞者之间的交互是连续、非对称且具有多种模态的（如对抗张力、跟随引导、关键关节枢纽），需要一种能够同时处理时序动态和图结构推断的统一框架。
@@ -63,8 +61,6 @@ claims:
 现有方法中，原始神经关系推断（NRI, Kipf et al., 2018）在粒子物理等已知交互系统上展现了从轨迹中推断潜在图结构的能力，但其编码器和解码器均基于全连接层或标准循环网络，未充分利用人体关节之间的图结构先验。将NRI直接迁移至舞蹈场景存在两个关键缺口：一是人体关节天然构成图结构，线性编码器无法有效传播空间信息；二是舞蹈的时序演化需要解码器在每一步预测中感知不断变化的交互图，而标准LSTM缺乏这种图感知能力。
 
 本文的动机即在于填补这一空白：通过扩展NRI框架，将舞者建模为全连接二部图，利用图卷积网络（GCN）编码器和图循环神经网络（GRNN）解码器，以自监督的方式从3D关节轨迹中推断舞者间的潜在交互边及其类型。这一思路的核心洞察是：如果模型能够仅通过观察部分关节的运动来重构双人舞动态，那么它所依赖的边结构就必然编码了真实的物理或编舞约束。最终，模型发现的交互模式——如连接“对抗”状态关节的边、单一关节作为多条边汇聚的“关键枢纽”——与编舞直觉高度吻合，为协作编舞提供了新的计算视角。
-
-
 
 ## 核心方法与创新机理
 
@@ -94,8 +90,6 @@ claims:
 ### 5. 创新定位与边界
 
 值得注意的是，本文的创新**并非提出全新的生成式或预测式架构**，而是在NRI这一成熟的自监督关系推断框架上，针对舞蹈交互这一特定领域进行了系统性的图结构适配。其核心洞察在于：将舞者建模为全连接二部图、用GCN编码空间关系、用GRNN联合建模图-时序动态，这三个设计选择共同使得模型能够从纯运动轨迹中涌现出符合编舞直觉的交互模式——如对抗张力连接和关键关节枢纽——而无需任何显式的交互标注。这一方法论贡献的价值在于其**领域适配的系统性**，而非单一模块的突破性。
-
-
 
 本文提出了一套从原始舞蹈视频到潜在交互图推断的完整计算管道。整体流程可分为两个阶段：**数据预处理管道**和**神经关系推断模型**，二者通过“3D图构建”模块衔接，形成端到端的分析链路。
 
@@ -137,8 +131,6 @@ claims:
 - **输入**：双人舞视频 → 3D姿态提取 → 清洗与滤波 → 3D关节序列（T × 58 × 3）→ 随机关节子采样 → 二部图节点特征
 - **输出**：重构的关节轨迹（用于评估） + 推断的边结构（包含边类型和置信度，用于揭示潜在舞者互动）
 
-
-
 本工作的核心架构是对神经关系推断（NRI）框架（Kipf et al., 2018）的图神经网络扩展，由编码器与解码器两个关键模块构成。整体架构如图4所示。
 
 ### 编码器：GCN增强的边类型推断
@@ -169,8 +161,6 @@ claims:
 ### 关键公式说明
 
 论文未提供独立编号的核心公式。模型的核心数学机制继承自NRI框架，其本质是学习一个条件分布 $p(z \mid x)$，其中 $z$ 表示潜在交互图结构（边类型），$x$ 为观测轨迹。编码器输出 $q_\phi(z \mid x)$ 近似后验，解码器建模 $p_\theta(x \mid z)$ 进行重构。Gumbel-Softmax重参数化技巧使离散边采样可微，GRNN则将标准LSTM的门控机制与GCN的消息传递相结合，实现图结构上的时序建模。具体公式细节需参阅原始NRI论文及本文代码实现。
-
-
 
 ## 实验与关键发现
 
@@ -221,27 +211,14 @@ Table 1提供了三个维度的消融证据：
 
 **需注意的限制**：上述定性结论基于极小的数据样本，且缺乏与真实交互标签的定量对比验证。论文明确指出，这些发现虽与编舞直觉一致，但其统计显著性和泛化性仍需在更大规模数据集上进一步验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1688_Invisible_Strings_Revealing_Latent_Dancer_to_Dancer_Interactions_with_Gr/figures/009_Figure_7.jpg]]
 *Figure 7: Examples of poor reconstructions*
 
 ![[assets/figures/papers/paper_list_l1688_Invisible_Strings_Revealing_Latent_Dancer_to_Dancer_Interactions_with_Gr/figures/008_Figure_9.jpg]]
 *Figure 9: Examples of multiple edges connected to the same joint*
 
-![[assets/figures/papers/paper_list_l1688_Invisible_Strings_Revealing_Latent_Dancer_to_Dancer_Interactions_with_Gr/figures/011_Figure_10.jpg]]
-*Figure 10: Undirected example of connections within opposition tendencies. It shows multiple connections between the lower torso of both dancers, first leaning in opposite directions and then gravitating toward each other, illustrating the full range of the stretched-string analogy*
-
 ![[assets/figures/papers/paper_list_l1688_Invisible_Strings_Revealing_Latent_Dancer_to_Dancer_Interactions_with_Gr/figures/002_Figure_2.jpg]]
 *Figure 2: Comparison of 3D pose extractions: HybrIK (bottom) outperforms VIBE (top) in both simple (stationary) or complex (dynamic) movements*
-
-![[assets/figures/papers/paper_list_l1688_Invisible_Strings_Revealing_Latent_Dancer_to_Dancer_Interactions_with_Gr/figures/005_Figure_6.jpg]]
-*Figure 6: Example of a good reconstruction. Reconstructed sampled joints are color-coded for clarity: purple for the blue dancer and orange for the red dancer*
-
-![[assets/figures/papers/paper_list_l1688_Invisible_Strings_Revealing_Latent_Dancer_to_Dancer_Interactions_with_Gr/figures/010_Figure_8.jpg]]
-*Figure 8: Example of the sampled edge distribution. The black edges represent connections between the dancers, with darker edges indicating higher confidence in their importance for reconstruction. In this typical case, 3 edges were selected for 6 sampled joints, 2 with slightly higher importance, though all exceed 80% confidence*
-
-
 
 ## 定位与知识库关联
 
@@ -316,8 +293,6 @@ Table 1提供了三个维度的消融证据：
 #### 实际应用验证
 - 在实际舞蹈工作室环境中，舞者将如何使用此类工具来反思和生成新的编排？当前缺乏与舞者的深入交互式验证，工具的可用性和创作价值尚不明确。
 - 模型发现的“对抗张力”连接和“关键关节枢纽”是否符合舞者的主观体验？需要设计用户研究来验证这些发现的编舞学意义。
-
-
 
 ## 原文 PDF
 

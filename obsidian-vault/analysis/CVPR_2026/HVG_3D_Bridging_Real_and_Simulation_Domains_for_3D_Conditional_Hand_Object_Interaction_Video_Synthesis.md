@@ -222,8 +222,6 @@ Figure 4 以可视化方式呈现了各方法在全帧和手物掩码区域的 F
 3. **3D 条件质量依赖**：混合训练管道依赖 VGGT 和 SpatialTracker 等工具从真实视频中提取 3D 线索，这些工具的估计误差对生成质量的影响边界尚未量化分析。在实际部署中，低质量 3D 条件可能导致交互精度下降，但目前缺少系统的鲁棒性实验。
 4. **闭环应用缺失**：尚未实现与机器人操作策略的闭环集成，生成视频在实际机器人任务中的效用有待验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2521_https_arxiv_org_abs_2604_03305/figures/003_Table_1.jpg]]
 *Table 1: Quantitative comparison between HVG-3D and baselines on Full Frame evaluation metrics. Most video generation metrics demonstrate that HVG-3D achieves superior performance*
 

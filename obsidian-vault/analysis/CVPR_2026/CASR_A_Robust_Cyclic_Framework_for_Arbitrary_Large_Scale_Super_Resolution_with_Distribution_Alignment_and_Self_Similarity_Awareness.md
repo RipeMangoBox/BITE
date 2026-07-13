@@ -72,8 +72,6 @@ CASR处于**ASISR与扩散模型超分**的交叉地带，其知识贡献可定�
 
 CASR的核心创新在于**将分布感知与自相似性约束系统性地嵌入循环放大框架**，为超大尺度超分辨率提供了一种鲁棒且可泛化的解决范式。
 
-
-
 ### 任意尺度超分辨率的现实需求与核心挑战
 
 超分辨率（Super-Resolution, SR）旨在从低分辨率（LR）输入重建高分辨率（HR）图像，是计算机视觉中的经典逆问题。近年来，任意尺度超分辨率（Arbitrary-Scale Image Super-Resolution, ASISR）因其在单一模型中支持连续放大倍数的灵活性而受到广泛关注，代表性工作包括基于隐式神经表示的 **LIIF**（Chen et al., CVPR 2021）、基于归一化流的 **LINF**（Yao et al., CVPR 2023）和 **BFSR**（Tsao et al., CVPR 2024），以及基于扩散模型的 **IDM**（Gao et al., CVPR 2023）和 **Kim**（Kim and Kim, CVPR 2024）等。
@@ -93,8 +91,6 @@ CASR的核心创新在于**将分布感知与自相似性约束系统性地嵌�
 现有ASISR方法在设计上未充分解决上述两个问题。隐式神经表示方法（LIIF、CiaoSR）通过连续坐标映射实现任意尺度，但缺乏对循环过程中分布稳定的显式控制；流基方法（LINF、BFSR）虽然建模了尺度间的可逆映射，但在极端尺度下仍面临外推困难；扩散模型方法（IDM、Kim）借助生成先验提升了感知质量，但循环累积的伪影和跨patch不一致性依然存在。
 
 上述分析揭示了实现极端超分的关键洞察：**核心瓶颈不在于模型容量或数据规模，而在于理解并调节表征在尺度间的演化**。具体而言，需要一种机制将输入解耦为稳定的低通表示与结构约束，以过滤级联噪声；同时，需要一种跨patch的一致性约束来保持全局纹理的协调性。这构成了CASR框架的核心设计动机：通过超像素结构对齐抑制分布漂移，并借助特征空间的自相似性矩阵约束恢复纹理一致性。
-
-
 
 ## 核心方法与创新机理
 
@@ -138,14 +134,9 @@ $$L_{\mathrm{corr}} = \| R^k - R^{\mathrm{gt}} \|_2$$
 
 CASR的三个changed slots构成了一条完整的因果链：**循环分布内放大**设定总体策略框架，**SSAM**在每次迭代入口处过滤级联噪声并锚定分布，**SARM**在每次迭代出口处恢复跨patch纹理一致性。三者的协同使得极大规模超分（×30甚至更高）在感知质量上显著超越现有方法——在DIV8K ×30上LPIPS相对第二名LIIF+Diff降低16.9%，MUSIQ相对IDM提升75.2%（Section 4.4.1）；在真实场景RealSR ×30上MUSIQ相对IDM提升34.1%（Section 4.4.2）。
 
-
-
 CASR 将超大尺度超分辨率重新定义为一个**循环逐步放大**的过程，其核心设计原则是：将任意目标放大倍数 $s$ 分解为一系列子尺度的乘积 $s = s^1 \times s^2 \times \cdots \times s^K$，其中每一步的子尺度 $s^k \leq s_{\max}$ 始终落在模型的训练分布范围内。框架执行 $K$ 次迭代上采样，每一次迭代的中间结果作为下一次迭代的输入，从而将“跨尺度分布偏移”这一根本瓶颈转化为可控的分布内逐步演化问题。
 
 整个 pipeline 由三个关键模块串联构成（Figure 3 示意）：
-
-![[assets/figures/papers/paper_list_l845_https_arxiv_org_abs_2602_22159/figures/003_Figure_3.jpg]]
-*Figure 3: Illustration of the proposed CASR. The purple module denotes the SSAM, the green block corresponds to the SARM, and the gray U-Net represents the SR backbone*
 
 1. **超像素结构对齐模块（SSAM）**：位于每次循环迭代的输入端，负责将当前图像分解为超像素低通表示与深度结构图两种互补表征。超像素表示通过对视觉相似像素的软分组与区域归一化 $C_{r}^{k-1} = \frac{1}{|r|} \sum_{i \in r} I_{i}^{k-1}$ 滤除级联过程中累积的噪声与伪影，深度图则保留高频几何边界，共同为后续 SR 骨干网络提供分布稳定的输入。
 
@@ -154,8 +145,6 @@ CASR 将超大尺度超分辨率重新定义为一个**循环逐步放大**的�
 3. **SR 骨干网络**：采用 SD-Turbo 单步扩散模型，经 LoRA 微调后执行分布内超分辨率重建，并通过 ControlNet 分支注入结构控制信号引导解码器细节生成。
 
 信息流路径为：**输入图像 → SSAM（分布对齐与去噪）→ SR 骨干（上采样重建）→ SARM（跨 patch 纹理一致性精炼）→ 下一循环迭代**。该循环结构确保每一步都在训练分布附近运作，从根本上抑制了级联放大中的质量退化。
-
-
 
 CASR 的核心架构由三个紧密协作的模块构成：**超像素结构对齐模块（SSAM）**、**自相似性感知精炼模块（SARM）**，以及基于 **SD-Turbo 扩散骨干网络** 的超分重建模块。它们共同支撑起“将总尺度 $s$ 分解为 $K$ 步子尺度 $s^k \leq s_{\max}$ 的循环逐步放大”这一核心策略。
 
@@ -200,16 +189,6 @@ $$L_{\mathrm{total}_1} = L_{\mathrm{rec}} + \lambda_4 L_{\mathrm{depth}}$$
 $$L_{\mathrm{total}_2} = L_{\mathrm{rec}} + \lambda_4 L_{\mathrm{depth}} + \lambda_5 L_{\mathrm{corr}}$$
 
 这一渐进式训练策略确保模型先学会稳定的分布内重建，再学习跨 patch 的纹理一致性约束。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l845_https_arxiv_org_abs_2602_22159/figures/004_Figure_4.jpg]]
-*Figure 4: Illustration of the distribution alignment process, where the input image is decomposed into a superpixel representation and a depth map. This decomposition effectively removes artifacts and noise, enabling robust SR*
-
-![[assets/figures/papers/paper_list_l845_https_arxiv_org_abs_2602_22159/figures/005_Figure_5.jpg]]
-*Figure 5: Illustration of the local self-similarity computation, where structurally similar regions are assigned higher correlation*
-
-
 
 ## 实验与关键发现
 
@@ -262,27 +241,14 @@ Table 7和Figure 10揭示了超像素尺寸的关键权衡。4×4尺寸取得最
 
 尽管CASR在极大规模超分上取得突破性进展，仍存在以下局限：（1）超像素尺寸固定为4×4，缺乏内容自适应能力，过大尺寸会抹除细节（Figure 10）；（2）方法依赖预训练的深度估计模型（DepthAnything）和分割模型（SAM、SuperPixel-FCN），其性能波动可能影响最终效果；（3）两阶段训练流程增加了实施复杂度，单步扩散采样可能限制生成纹理的多样性；（4）在极端尺度（>×30）下仍存在一定的质量退化，分布漂移未被完全消除。
 
-![[assets/figures/papers/paper_list_l845_https_arxiv_org_abs_2602_22159/figures/016_Figure_10.jpg]]
-*Figure 10: While superpixels effectively suppress degradation artifacts, excessively large superpixel sizes remove fine details and may even alter image content*
-
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l845_https_arxiv_org_abs_2602_22159/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of cyclic cascade stability across different ASISR. The SIFID measures distribution shifts between reconstructed images and the training data during cascading. Our method achieves notably higher distribution stability than others*
-
-![[assets/figures/papers/paper_list_l845_https_arxiv_org_abs_2602_22159/figures/002_Figure_2.jpg]]
-*Figure 2: This illustrates the texture inconsistency between patches caused by patch-based super-resolution, where identical repeated objects are reconstructed with different texture patterns*
 
 ![[assets/figures/papers/paper_list_l845_https_arxiv_org_abs_2602_22159/figures/006_Table_1.jpg]]
 *Table 1: Comparison with ASISR methods on the DIV8K synthetic dataset, with the best results in bold. The ×4 × 3 × 1.5 column evaluates all methods under progressive upsampling*
 
 ![[assets/figures/papers/paper_list_l845_https_arxiv_org_abs_2602_22159/figures/012_Table_4.jpg]]
 *Table 4: Ablation study of major components in CASR. Each module contributes to the overall performance improvement*
-
-![[assets/figures/papers/paper_list_l845_https_arxiv_org_abs_2602_22159/figures/017_Table_5.jpg]]
-*Table 5: Ablation on global semantic context within SARM*
-
-
 
 ## 定位与知识库关联
 
@@ -324,8 +290,6 @@ CASR的核心范式创新在于将超大尺度超分重新定义为**一系列�
 1. **内容感知的自适应超像素**：如何实现超像素尺寸的动态调整，使其能够根据局部纹理复杂度进行内容感知的结构对齐？这需要设计可微分的超像素粒度选择机制，或引入多尺度超像素融合策略。
 2. **跨任务推广**：循环分布感知框架的核心思想——将大跨度映射分解为分布内步骤——是否可推广到视频超分（时序分布偏移）、三维内容重建（体素尺度偏移）及跨模态生成（模态分布偏移）等任务？这需要重新定义相应模态下的“分布内”约束和结构对齐机制。
 3. **与强生成先验的深度融合**：当前CASR使用SD-Turbo作为骨干网络，但分布对齐模块与扩散过程的交互仍较为浅层。如何设计端到端的联合优化策略，使分布约束直接参与扩散去噪过程的引导，可能进一步提升极端尺度下的生成质量。
-
-
 
 ## 原文 PDF
 

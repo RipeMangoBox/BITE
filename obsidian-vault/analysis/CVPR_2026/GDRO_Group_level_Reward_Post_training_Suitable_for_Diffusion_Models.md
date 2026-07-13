@@ -52,8 +52,6 @@ claims:
 
 在方法谱系上，GDRO位于**离线奖励后训练**与**扩散模型偏好对齐**的交汇点：它继承了DPO的隐式奖励框架，但通过引入组级排名损失和显式奖励软目标，将适用范围从成对偏好拓展到任意大小的图像组，并实现了对rectified flow模型的采样器无关支持。
 
-
-
 扩散模型在后训练阶段引入奖励对齐已成为提升文本到图像生成质量的关键路径。当前主流方案——在线强化学习微调（如 **Flow-GRPO**、**DanceGRPO** 等）——在通用扩散模型上取得了一定成效，但当将其应用于 **rectified flow 扩散模型**（如 **FLUX.1**，Black-Forest-Labs, 2024）时，暴露出三个相互关联的瓶颈。
 
 **瓶颈一：训练效率低下。** 在线 RL 方法的每一步优化都需要完整的扩散采样链来生成 rollout 图像，图像生成耗时主导了训练过程。对于需要多步采样的 rectified flow 模型，这一开销尤为突出。
@@ -65,8 +63,6 @@ claims:
 上述瓶颈的根本原因在于：在线 RL 范式将奖励优化与扩散采样过程强耦合。这引出了一个核心问题——**能否在完全离线、采样器无关的条件下，实现扩散模型的组级奖励对齐？**
 
 **GDRO** 的提出正是为了回答这一问题。其核心动机是利用隐式奖励函数（implicit reward function）在任意扩散时间步可离线计算的特性，将组级显式奖励转化为基于 Plackett–Luce 排名模型的交叉熵损失，从而完全绕过对在线采样和随机性的需求。这一思路将奖励对齐从“在线采样-奖励评估-策略更新”的闭环中解放出来，转变为纯粹的离线排名优化问题，为 rectified flow 扩散模型提供了一种高效、稳定且抗奖励黑客的后训练范式。
-
-
 
 ## 核心方法与创新机理
 
@@ -95,8 +91,6 @@ GDRO通过两个协同机制有效抑制奖励黑客：
 ### 训练效率的结构性优势
 
 由于GDRO完全离线，其训练时间由预生成图像组的数量和质量决定，而非在线采样步数。在OCR任务上，GDRO仅需29.60 GPU小时即可达到0.5701的修正分数，而Flow-GRPO需要149.07 GPU小时（5倍差距）；在GenEval任务上，GDRO以68.4 GPU小时超越Flow-GRPO的340.00 GPU小时（3.7倍差距）。这一效率优势源于GDRO避免了扩散模型前向采样这一最耗时的环节，将计算资源集中于损失函数的优化本身。
-
-
 
 GDRO 的整体设计围绕一个核心原则展开：**将组级显式奖励对齐转化为完全离线的排名导向交叉熵优化，从而彻底绕过在线采样与随机性依赖**。其 pipeline 由五个顺序模块构成，输入为预生成的同提示图像组及其显式奖励，输出为更新后的扩散模型参数。
 
@@ -156,12 +150,8 @@ GDRO 的 pipeline 体现了三个关键设计决策，直接回应了现有方�
 
 图 2 直观展示了上述模块的完整数据流：从预生成图像组出发，经扰动、速度预测、隐式奖励计算，最终通过 GDRO 损失与正则化项驱动模型更新。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2680_https_arxiv_org_abs_2601_02036/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our method. Given a pre-generated image group synthesized from the same prompt and their corresponding explicit rewards, we perturb the images with noise on different time steps, feed them to the diffusion model to predict the velocity, and calculate the implicit rewards accordingly to get the final loss*
-
-
 
 ### 3.1 隐式奖励函数的理论构造
 
@@ -253,13 +243,6 @@ $$
 
 此时 GDRO 仅依赖排序信息，与 DPO 的成对偏好优化等价。然而，当 $k > 2$ 时 GDRO 能够利用更丰富的组级排名结构，这是其相对于 DPO（仅支持成对偏好）的核心优势。消融实验证实 $k = 6$ 在 OCR 任务上获得最优原始分和修正分，$k = 4$ 次之，$k = 2$ 则优化不足，验证了组级信息的重要性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2680_https_arxiv_org_abs_2601_02036/figures/003_Figure_3.jpg]]
-*Figure 3: Reward misalignment and hacking. The first row shows the reward misalignment scenario. The second row shows two reward hacking cases*
-
-
-
 ## 实验与关键发现
 
 ### 实验设置与评价设计
@@ -306,13 +289,8 @@ Table 3汇总了各方法在OCR和GenEval任务上的核心指标。
 2. **修正分数的局限性**：修正分数依赖UnifiedReward来反映奖励黑客趋势，但无法精确量化黑客程度。UnifiedReward本身也可能存在与人类偏好不完全对齐的问题。
 3. **超参数敏感性**：$\beta$ 和 $\tau$ 的最优取值具有任务依赖性，需要针对不同任务进行调参。不当的超参数组合可能导致优化不足或训练崩溃（如 $\beta=4$ 时GenEval任务的崩溃）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2680_https_arxiv_org_abs_2601_02036/figures/008_Table_3.jpg]]
 *Table 3: Quantitative results. We report the quantitative metrics on evaluation time rewards, UnifiedReward scores, and GPU hours*
-
-![[assets/figures/papers/paper_list_l2680_https_arxiv_org_abs_2601_02036/figures/007_Figure_5.jpg]]
-*Figure 5: Evaluation curves. We plot the evaluation time scores and corrected scores of different methods on the OCR and GenEval task across GPU training hours. We mark the reward hacking dividing line of Flow-GRPO on its peak corrected scores*
 
 ![[assets/figures/papers/paper_list_l2680_https_arxiv_org_abs_2601_02036/figures/006_Figure_4.jpg]]
 *Figure 4: Qualitative results on OCR and GenEval. Columns 1-4 show the OCR task, and Columns 5-8 display the GenEval task*
@@ -323,22 +301,8 @@ Table 3汇总了各方法在OCR和GenEval任务上的核心指标。
 ![[assets/figures/papers/paper_list_l2680_https_arxiv_org_abs_2601_02036/figures/011_Figure.jpg]]
 *Figure: viii. Ablation study on temperature. We provide the evaluation curves on different choices of the temperature τ*
 
-![[assets/figures/papers/paper_list_l2680_https_arxiv_org_abs_2601_02036/figures/004_Table_1.jpg]]
-*Table 1: User studies. We let humans pick winners from different methods on OCR task to show reward misalignment and hacking*
-
-![[assets/figures/papers/paper_list_l2680_https_arxiv_org_abs_2601_02036/figures/005_Table_2.jpg]]
-*Table 2: UnifiedReward scores. We apply UnifiedReward on the results on OCR and GenEval task to indicate reward hacking*
-
-![[assets/figures/papers/paper_list_l2680_https_arxiv_org_abs_2601_02036/figures/010_Figure.jpg]]
-*Figure: vii. Demosntration on collapse. When $\beta = 6 ,$ though an evaluation time reward of 0.85 on OCR is achieved, the images actually collapse, which is another case of reward hacking*
-
 ![[assets/figures/papers/paper_list_l2680_https_arxiv_org_abs_2601_02036/figures/012_Figure.jpg]]
 *Figure: FLUX.1(0.58) Flow-GRPO (0.87) Ours (0.87) Figure ix. More visualizations on OCR. We provide more comparisons between our method and Flow-GRPO when the evaluation reward is the same on the OCR task*
-
-![[assets/figures/papers/paper_list_l2680_https_arxiv_org_abs_2601_02036/figures/015_Figure.jpg]]
-*Figure: FLUX.1(0.58) Flow-GRPO (0.85) Ours (0.85) Figure xii. More visualizations on GenEval. We provide more comparisons between our method and Flow-GRPO when the evaluation reward is the same on the GenEval task*
-
-
 
 ## 定位与知识库关联
 
@@ -373,8 +337,6 @@ GDRO 的提出为扩散模型奖励后训练开辟了若干值得探索的方向
 3. **跨生成式架构的泛化。** GDRO 的核心机制——通过隐式奖励函数将组级显式奖励转化为排名导向的交叉熵目标——在理论上不限于扩散模型。这一框架是否可扩展至自回归视觉生成模型（如基于 next-token prediction 的图像生成器）或其他生成式架构，是一个值得验证的开放问题。关键在于隐式奖励函数在这些架构中是否仍具有可计算的近似形式。
 
 4. **组大小与奖励多样性的关系。** 消融实验表明组大小 $k=6$ 在 OCR 任务上获得最优表现（Figure 6），但这一结论是否依赖于奖励函数的具体特性？当奖励信号稀疏或存在多个局部最优时，更大的组是否必然带来更好的排名对齐？对组大小与奖励分布特性之间关系的理论分析可能指导自适应组大小策略的设计。
-
-
 
 ## 原文 PDF
 

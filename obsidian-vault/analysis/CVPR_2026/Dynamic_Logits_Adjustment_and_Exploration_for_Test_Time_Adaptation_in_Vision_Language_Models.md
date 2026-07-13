@@ -53,8 +53,6 @@ claims:
 
 **主要结果**：在跨数据集泛化（10个数据集平均）和自然分布偏移鲁棒性（5个OOD数据集平均）两项基准上，DLAE在ResNet-50和ViT-B/16两种CLIP骨干下均优于所有对比方法。消融实验表明，DLA和CGEC各自带来显著增益，二者联合使用效果最优。
 
-
-
 视觉语言模型（VLM）的测试时适应（Test-Time Adaptation, TTA）旨在不依赖源域数据的前提下，使冻结的预训练模型在线适应目标域分布偏移。以CLIP为代表的VLM虽然展现了强大的零样本泛化能力，但在面对跨数据集偏移和自然分布变化时，其固定的文本原型难以捕捉目标域的类条件分布，导致性能显著下降。
 
 ### 现有方法的瓶颈
@@ -79,8 +77,6 @@ claims:
 - **一致性引导探索性缓存（CGEC）**：在保留高置信度样本的同时，主动纳入DLA前后标签翻转的边界样本，并通过语义一致性与时间一致性双重过滤机制控制噪声引入。
 
 通过这种“调整暴露边界→一致性过滤探索→原型更新反哺校准”的协同设计，DLAE在不牺牲可靠性的前提下持续扩大测试分布覆盖，实现了对困难区域的稳定适应。
-
-
 
 ## 核心方法与创新机理
 
@@ -149,8 +145,6 @@ DLA和CGEC并非独立运作，而是形成闭环协同：
 
 值得注意的是，DLAE在**不增加缓存容量**的前提下实现了缓存多样性的显著提升（Figure 1b），这表明其改进源于样本选择策略的优化，而非简单的资源扩张。
 
-
-
 DLAE 面向 CLIP 视觉语言模型的在线测试时适应，采用全流式（streaming）处理范式：测试样本逐帧到达，模型仅基于当前样本和内部状态即时更新，不依赖离线批处理或未来数据。整体框架由冻结的 CLIP 编码器、动态逻辑值调整（DLA）、一致性引导探索缓存（CGEC）和原型残差学习四个核心模块级联构成，如 Figure 2 所示。
 
 ![[assets/figures/papers/paper_list_l2385_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_Dynamic_Logits_Adju/figures/002_Figure_2.jpg]]
@@ -159,8 +153,6 @@ DLAE 面向 CLIP 视觉语言模型的在线测试时适应，采用全流式（
 **输入输出流**：对每个到达的测试图像，CLIP 图像编码器提取冻结的视觉特征 $\mathbf{f}_v$，文本编码器从手工提示中初始化各类文本原型 $\mathbf{t}_c$。零样本阶段，模型通过 $\mathbf{f}_v^{\top} \mathbf{t}_c$ 的点积计算原始 logit $\mathbf{s}_{clip}$。DLA 模块在线估计目标域类别分布，以平衡函数 $B(c)$ 重新校准 logit 得到 $\mathbf{s}_{DLA}$，缓解类别偏差并暴露决策边界附近的困难样本。CGEC 维护固定容量的按类缓存，不仅保留低熵高置信度样本，还主动纳入 DLA 前后标签翻转的边界样本，并通过语义一致性和时间一致性双过滤器控制缓存质量。缓存中的视觉特征经平均得到视觉原型 $\mathbf{v}_c$，与文本原型分别叠加可学习残差 $\Delta \mathbf{t}_c$、$\Delta \mathbf{v}_c$ 后 ℓ₂ 归一化。最终预测得分由 DLA 校准后的语义 logit 与亲和力调制的视觉原型相似度相加得到：$s_{DLAE}^{c} = s_{DLA}^{c} + \mathcal{A}(\mathbf{f}_v^{\top} \mathbf{v}_c)$。
 
 **模块间因果联动**：DLA 的 logit 调整不仅提供去偏后的伪标签用于缓存准入判断，更是 CGEC 探索机制的触发信号——标签翻转样本正是 DLA 前后预测不一致的样本，这些样本通常位于类别决策边界，是传统熵滤波方法系统性忽略的低置信度区域。CGEC 通过语义一致性过滤器（SCF，以 $\cos(\mathbf{t}_{\hat{y}_{clip}}, \mathbf{t}_{\hat{y}_{DLA}})$ 衡量）和时间一致性过滤器（TCF，检测特征-原型对齐度是否随时间退化）对纳入的边界样本进行质量约束，避免噪声污染原型。原型残差学习则通过置信度感知校准损失 $\mathcal{L}_{conf}$ 和对称跨模态对齐损失 $\mathcal{L}_{align}$ 驱动在线适应，形成“去偏→探索→学习→更准的去偏”的正反馈循环。Figure 1 的动机实验表明，这一设计有效打破了现有方法（如 DPE）中“高置信度筛选→类别偏差放大→缓存过早饱和→探索停滞”的自我强化困境。
-
-
 
 DLAE 框架由两个关键模块构成：**动态逻辑值调整（DLA）** 与 **一致性引导的探索性缓存（CGEC）**。DLA 负责在线重新校准类别 logits，缓解预测偏差并暴露决策边界附近的困难样本；CGEC 则在保留高置信度样本的基础上，主动纳入 DLA 前后标签翻转的边界样本，通过语义与时间一致性约束控制缓存质量，从而扩大测试分布覆盖。
 
@@ -212,12 +204,8 @@ $$s_{\mathrm{DLAE}}^{c} = s_{\mathrm{DLA}}^{c} + \mathcal{A}(\mathbf{f}_{v}^{\to
 
 **消融实验**（Table 3）验证了各模块的独立贡献：在 ViT-B/16 骨干上，仅将 DLA 添加至 DPE 基线即可将平均准确率从 69.40% 提升至 70.63%；进一步引入 CGEC 后达到 71.88%。**超参数分析**（Table 4, Figure 3）表明，DLA 调整强度 $\alpha$ 在约 2.0 时最优，时间衰减系数 $\eta$ 在 0.01 附近时多数数据集表现最佳。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2385_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_Dynamic_Logits_Adju/figures/001_Figure_1.jpg]]
 *Figure 1: (a) Per-class accuracy (top-1) on the target stream for CLIP in zero-shot mode, DPE as a cache-based TTA method, and our DLAE. CLIP exhibits large per-class variance. The black dashed box highlights classes where DPE underperforms and even falls below the zero-shot baseline, while our method achieves more consistent accuracy across classes. (b) Number of distinct target samples entering the cache over the test stream as the time step increases. Both DPE and DLAE use caches with the same fixed capacity and update them throughout the stream. However, the minimum-entropy replacement policy of DPE causes the cache to be dominated by low-entropy samples, preventing many diverse samples from ente...*
-
-
 
 ## 实验与关键发现
 
@@ -250,8 +238,6 @@ DLAE的核心优势源于两个因果机制的耦合：
 
 需要手动验证的潜在失败模式：当目标域类别分布与源域严重偏离且DLA的在线估计收敛缓慢时，初始阶段的校准可能不准确，导致CGEC在早期纳入错误翻转样本。论文未报告流式适应初期的逐步性能曲线，该场景下的鲁棒性需要进一步确认。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2385_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_Dynamic_Logits_Adju/figures/003_Table_1.jpg]]
 *Table 1: Top-1 accuracy (in %) on cross-datasets generalization. For all evaluated methods, we report the results on both ResNet-50 and ViT-B/16 visual backbones of CLIP*
 
@@ -261,13 +247,8 @@ DLAE的核心优势源于两个因果机制的耦合：
 ![[assets/figures/papers/paper_list_l2385_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_Dynamic_Logits_Adju/figures/006_Table_3.jpg]]
 *Table 3: Ablation study on components of (a) Dynamic Logits Adjustment and Exploration, (b) Dynamic Logits Adjustment, and (c) Consistency-Guided Exploratory Cache*
 
-![[assets/figures/papers/paper_list_l2385_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_Dynamic_Logits_Adju/figures/005_Figure_3.jpg]]
-*Figure 3: Sensitivity analysis of the parameter η, which is defined in Eq. 13. The figure shows how different values of η affect model performance across various datasets*
-
 ![[assets/figures/papers/paper_list_l2385_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_Dynamic_Logits_Adju/figures/007_Table_4.jpg]]
 *Table 4: Sensitivity analysis of α in Eq. 9 and β in Eq. 11 on the DTD dataset*
-
-
 
 ## 定位与知识库关联
 
@@ -314,8 +295,6 @@ DLAE 的贡献需要从两个组件的协同关系来理解，而非孤立地看
 3. **与提示优化的可组合性**：DLAE 在冻结的 CLIP 编码器上操作，仅学习残差原型。如果结合 TPT 的提示优化（同时更新文本编码器），DLA 的在线统计量是否会因文本空间的漂移而失效？两者的联合训练可能带来进一步的增益，但也可能引入新的不稳定因素。
 
 4. **翻转信号的可靠性**：CGEC 的核心假设是“DLA 前后标签翻转的样本是值得探索的边界样本”。但在 DLA 本身尚未收敛的早期阶段，翻转可能由噪声而非真实的决策边界不确定性引起。论文未分析翻转样本的伪标签准确率随时间的演化。
-
-
 
 ## 原文 PDF
 

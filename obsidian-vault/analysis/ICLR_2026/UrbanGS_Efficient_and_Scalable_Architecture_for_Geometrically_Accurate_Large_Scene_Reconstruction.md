@@ -63,8 +63,6 @@ claims:
 
 **局限性**方面，该方法依赖预训练单目深度/法向估计器提供伪先验，在弱纹理或极端光照区域可能引入错误；框架当前面向静态场景，未显式建模动态物体；在远距离天空等缺乏明确几何结构的区域，显式几何优化可能导致渲染质量略逊于原始 3DGS。
 
-
-
 ### 城市级场景重建的范式迁移与瓶颈
 
 大规模城市场景的逼真数字化是数字孪生、自动驾驶仿真和城市规划等领域的核心需求。近年来，**3D Gaussian Splatting (3DGS)**（Kerbl et al., 2023）以其显式点云表示和实时可微光栅化渲染，在场景重建与新颖视图合成任务中展现出巨大潜力。然而，当 3DGS 从物体级或房间级场景扩展至城市级大场景时，其原始框架暴露出三个相互纠缠的根本性瓶颈：
@@ -92,8 +90,6 @@ claims:
 - **高斯修剪与分块策略未考虑局部几何先验**，造成资源分配的低效。
 
 UrbanGS 正是针对这三个维度进行系统性重构：通过**深度一致性 D-Normal 正则化**实现位置与旋转的完备联合优化，通过**空间自适应高斯修剪 (SAGP)** 实现几何感知的密度控制，通过**预剪枝与契约分块策略**实现高效可扩展的并行训练。这三项设计的有机耦合，使得 UrbanGS 能够在消费级 GPU 上完成城市级场景的高保真渲染与精确几何重建，从根本上调和了质量、效率与扩展性的三角矛盾。
-
-
 
 ## 核心方法与创新机理
 
@@ -154,8 +150,6 @@ $$S_i = \phi_i \cdot \tau_i \cdot w_{v,i}$$
 
 这一闭环使得 UrbanGS 在 Mill19 Rubble 场景上仅需 2h10min 训练时间（baseline 方法超过 4 小时），同时在 PSNR 上领先 CityGaussianV2 达 +2.50 dB（Table 1），在 GauU-Scene 的 Residence 场景上 F1 达到 0.493（Table 2），实现了效率与质量的双重突破。
 
-
-
 UrbanGS 的整体流水线遵循“全局粗建模 → 几何感知压缩 → 分块并行精化 → 融合”的四阶段范式，旨在以可扩展的方式从多视图 RGB 图像重建几何精确的大规模城市场景。其核心设计思想在于：**在分块训练之前，先通过空间自适应高斯修剪 (SAGP) 消除冗余高斯基元，再以深度一致性 D-Normal 正则化对每个子块进行联合几何优化**，从而在内存、计算效率与几何/渲染质量之间取得平衡。
 
 ### 流水线概览
@@ -196,8 +190,6 @@ Figure 2 (a) 完整呈现了 UrbanGS 的训练流水线，主要包含以下模�
 - **输出**：统一的大场景 3D 高斯场，可直接用于新视角 RGB 渲染、深度图渲染及表面 mesh 提取（通过 screened Poisson 重建）。
 
 > **注意**：伪深度/法向先验的质量直接影响 D-Normal 正则化的有效性，在弱纹理或极端光照区域可能引入系统性偏差，这一点需在应用中加以留意。
-
-
 
 UrbanGS 的核心架构围绕两个关键设计展开：**深度一致性 D-Normal 正则化** 和 **空间自适应高斯修剪 (SAGP)**，二者共同解决了 3DGS 在大场景中的几何退化与内存膨胀问题。
 
@@ -265,16 +257,6 @@ UrbanGS 的分块训练流程在 CityGS 基础上进行了两项关键改进：
 1. **全局预剪枝**：在获得全局粗高斯模型后，先执行 SAGP 剪枝去除冗余高斯，再进行场景收缩与分块。这避免了冗余高斯吸引非贡献视图、放大分块训练的计算负担。消融实验显示，移除预剪枝会导致高斯数增加 23%，训练时间变长且显存升高。
 2. **边界高斯复制**：在分块阶段，子块边界处的公共高斯原语被复制到相邻块中，以消除块间几何不连续导致的融合伪影。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l64_https_openreview_net_forum_id_L3utaw6SD9/figures/011_Figure.jpg]]
-*Figure: A: Illustration of Proof of the Proposition on Comprehensive Update of Gaussian Parameters. (a) After back-propagation through alpha-blending $\mathrm { E q . 1 } ,$ the rendered normal supervision loss ${ \mathcal { L } }$ _ { n } moves Gaussians either closer to (corresponding to P o s i t i o $n _ { 1 }$ ) or farther from (corresponding to $\it { P o s i t i o n _ { 2 } ) }$ the intersecting ray. When the normal of a Gaussian is closer to the ground truth (GT) surface normal, this supervision mechanism pushes the Gaussian (e.g.$, \left. P o s i t i o n _ { 1 } \right)$ toward the ray to increase its weight in the rendering equation; conversely, if there is a significant deviation between the two n...*
-
-![[assets/figures/papers/paper_list_l64_https_openreview_net_forum_id_L3utaw6SD9/figures/019_Figure.jpg]]
-*Figure: E: Qualitative ablation for the Depth-Consistent D-Normal Regularizer. We visualized the centers of Gaussian ellipsoids in a 3D scene. In the left figure, the Depth-Consistent D-Normal Regularizer is disabled, while the right figure demonstrates the results with our proposed regularization. In comparison, the left figure exhibits a notable number of Gaussian ellipsoids floating off the surface. Our proposed Depth-Consistent D-Normal Regularizer effectively pushes the 3D Gaussians toward the surface, resulting in a cleaner reconstruction*
-
-
-
 ## 实验与关键发现
 
 ### 一、新视角合成主结果
@@ -292,9 +274,6 @@ UrbanGS 在 Mill19 和 UrbanScene3D 两个城市场景基准上全面评估了�
 
 在 GauU-Scene 数据集上，以精确率、召回率和 F1 分数评估表面重建质量（Table 2）。UrbanGS 在所有场景上均取得最高 F1 分数：
 
-![[assets/figures/papers/paper_list_l64_https_openreview_net_forum_id_L3utaw6SD9/figures/006_Table_2.jpg]]
-*Table 2: Detailed geometry evaluation on the GauU-Scene dataset (Xiong et al., 2024). “NaN” indicates that the method produced invalid numerical results, while “FAIL” denotes a failure to extract a valid mesh. For all metrics, ↑ indicates that higher values are better*
-
 - Residence: F1 = 0.493 vs CityGaussianV2 的 0.467（**+0.026**）
 - Russian Building: F1 = 0.546 vs CityGaussianV2 的 0.537（**+0.009**）
 
@@ -309,9 +288,6 @@ Table 3 综合对比了各方法的高斯点数、模型大小和显存占用。
 
 ![[assets/figures/papers/paper_list_l64_https_openreview_net_forum_id_L3utaw6SD9/figures/007_Table_3.jpg]]
 *Table 3: Under the GauU-Scene dataset (Lin et al., 2022), comparison of Large-Scale Scene Modeling Methods, the best result for specific metrics under each scene is highlighted in bold*
-
-![[assets/figures/papers/paper_list_l64_https_openreview_net_forum_id_L3utaw6SD9/figures/008_Figure_5.jpg]]
-*Figure 5: Experimental results on the Rubble dataset (Yu et al., 2022) demonstrate that the proposed method outperforms comparative approaches in terms of PSNR while achieving superior training efficiency*
 
 **硬件公平性说明**：竞争方法在 RTX A800 GPU 上评估，UrbanGS 使用 8 块 RTX A5000 GPU 训练——在更弱硬件条件下仍取得效率与质量双赢。
 
@@ -332,9 +308,6 @@ Table 5 展示了深度一致性 D-Normal 正则化各组件的消融效果（Mo
 #### 4.2 空间自适应高斯修剪 (SAGP)
 
 Table 4 在 Russian Building 场景上对比了不同修剪策略。SAGP 相比传统全局阈值修剪：
-
-![[assets/figures/papers/paper_list_l64_https_openreview_net_forum_id_L3utaw6SD9/figures/009_Table_4.jpg]]
-*Table 4: Ablation Results on Russian dataset (Xiong et al., 2024). Bold indicates best performance. Note that OOM denotes Out Of Memory*
 
 - 高斯数量减少约 **24%**
 - F1 分数为 0.546 vs 0.518（**+0.028**）
@@ -373,15 +346,8 @@ Table 4 在 Russian Building 场景上对比了不同修剪策略。SAGP 相比�
 | **Table 5** | 移除 D-Normal 导致 F1 下降 0.050、PSNR 下降 1.85 dB，验证其对位置更新的关键作用 |
 | **Table 4** | SAGP 减少 24% 高斯的同时 F1 高于全局阈值修剪 0.028 |
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l64_https_openreview_net_forum_id_L3utaw6SD9/figures/022_Table.jpg]]
-*Table: G: Ablation Results of Block Partition Strategy on Russian Scene Dataset (Xiong et al., 2024).Bold indicates best performance. Table H: Ablation Study of Geometry-Aware Confidence Hyperparameters*
-
 ![[assets/figures/papers/paper_list_l64_https_openreview_net_forum_id_L3utaw6SD9/figures/004_Figure_3.jpg]]
 *Figure 3: Qualitative results of ours and other methods in image rendering on Mill-19 (Yu et al., 2022) and Urbanscene3D (Lin et al., 2022)*
-
-
 
 ## 定位与知识库关联
 
@@ -418,8 +384,6 @@ UrbanGS 的有效性受以下边界条件约束：
 4. **端到端可微分流水线**：当前流水线中 COLMAP 位姿估计、单目深度/法向估计、高斯初始化是分离的模块。将这些步骤纳入端到端可微分框架，可能进一步提升几何一致性和训练效率，但也对计算和内存提出了更高要求。
 
 5. **与前沿高斯表示的融合**：近期出现的锚点高斯、多分辨率哈希编码等 3DGS 变体在表达能力上有所提升，UrbanGS 的 D-Normal 正则化和 SAGP 策略是否可以无缝迁移至这些新表示，值得探索。
-
-
 
 ## 原文 PDF
 

@@ -258,8 +258,6 @@ MotionCtrl 在相机运动控制和物体运动控制上均显著优于现有方
 - **Table 4**：跨数据集泛化实验证明 MotionCtrl 的相机运动控制在多源数据上一致优于 VideoComposer。
 - **Figure 5**：定性展示 MotionCtrl 在逐帧轨迹跟随精度上显著优于 VideoComposer，特别是在轨迹拐点处。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l28_MotionCtrl_A_Unified_and_Flexible_Motion_Controller_for_Video_Generation/figures/004_Figure_4.jpg]]
 *Figure 4: Qualitative Comparisons on Camera Motion Control. (a) Basic Poses: MotionCtrl and AnimateDi [Guo et al. 2023] e ectively execute zooms, but MotionCtrl can adjust to varying camera moving speeds. (b) Relatively Complex Poses: Video-Composer[Wang et al. 2023] uses Realestate10K’s raw video for motion vectors, capturing unintended shapes like doors, leading to unnatural results (refer to frame 12). MotionCtrl, however, produces a relatively natural video with motion that closely matches the camera poses*
 

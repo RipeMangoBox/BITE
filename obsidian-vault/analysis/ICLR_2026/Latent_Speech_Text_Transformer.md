@@ -59,8 +59,6 @@ LST在两种公平控制条件下展现出显著且一致的增益：
 
 LST基于BLT架构（Pagnoni et al., 2024），其方法定位介于逐令牌自回归语音语言模型与完全离散化的多模态模型之间——通过潜在补丁这一信息瓶颈，在不牺牲语义保真度的前提下实现序列压缩与跨模态对齐。
 
-
-
 ### 语音-文本统一建模的序列失衡瓶颈
 
 将语音理解与文本推理统一到单一自回归模型中，是构建通用语音智能体的关键路径。然而，现有语音-文本联合建模面临一个根本性的结构矛盾：**语音令牌的序列长度远大于文本令牌**。以HuBERT语音令牌为例，在交错的语音-文本数据中，基线模型需为每个文本单元分配约0.77个语音令牌，而文本仅占0.23个（Table 13）。这种长度不对称导致三个连锁问题：
@@ -86,8 +84,6 @@ LST基于BLT架构（Pagnoni et al., 2024），其方法定位介于逐令牌自
 LST将这一范式迁移到语音-文本跨模态场景，其关键创新在于：仅在语音侧引入补丁机制，通过**潜在语音补丁聚合**将语音序列压缩至与文本相当的粒度水平。具体而言，4→1的补丁压缩使整体序列长度从3.00降至2.42，减少约20%的FLOPs（Table 13），同时语音-文本令牌比例从约3.3:1降至更均衡的1:2（Figure 6）。
 
 这一设计选择背后的假设是：**语音信号的局部冗余可以通过补丁编码器有效消除，而补丁级别的语义表示更接近文本令牌的抽象层次，从而促进跨模态的知识共享和迁移**。后续实验证据表明，LST不仅在语音任务上获得显著提升（HellaSwag S→S +6.5%，Table 3），文本性能也同步改善（HellaSwag T→T +5.2%），验证了统一建模粒度对跨模态学习的正向作用。
-
-
 
 ## 核心方法与创新机理
 
@@ -131,8 +127,6 @@ LST探索了四种补丁形成策略，构成了方法创新的重要维度：
 
 值得注意的是，LST的收益并非来自更大的模型或更多的数据，而是源于**序列结构的重新组织**——在计算控制训练中，LST在语音HellaSwag上绝对提升6.5%（39.0→45.5）；在数据控制训练中提升5.3%（40.2→45.5）。这一增益随模型规模从420M到1.8B持续增长（Figure 4），表明补丁机制具有可扩展性。
 
-
-
 LST 的核心思想是将自回归建模的粒度从单个语音令牌提升到**潜在语音补丁**（latent speech patches），以此压缩语音序列长度，平衡两种模态的信息密度。其架构建立在 byte-latent transformer（BLT）范式之上，由三个功能模块串联构成：
 
 1. **Patch Encoder（补丁编码器）**：接收连续的 HuBERT 语音令牌序列，通过滑动窗口自注意力和交叉注意力将其聚合为固定维度的补丁嵌入。补丁的形成策略决定了信息压缩的方式——可以是固定长度的静态分段，也可以是基于语音-文本对齐时间戳的动态分组。
@@ -155,8 +149,6 @@ $$\mathcal{L}(\mathcal{D};\theta) = \sum_{s\in\mathcal{D}}\sum_{i}\log p_{\theta
 补丁嵌入的计算统一为 $z_i = \mathrm{PatchEnc}(X_{\mathcal{P}_i})$，其中 $X_{\mathcal{P}_i}$ 为属于第 $i$ 个补丁的语音帧段集合。
 
 **架构配置**（Table 7）给出了各模块在不同模型规模下的深度、隐藏维度和注意力头数等参数，补丁编码器和解码器均保持轻量设计，确保计算开销主要集中在全局 Transformer 的跨模态建模上。
-
-
 
 LST 的核心设计是将自回归建模的粒度从单个语音令牌提升到**潜在语音补丁**，通过一个信息瓶颈结构实现序列压缩与跨模态对齐。其架构由三个关键模块组成，如图2所示。
 
@@ -193,8 +185,6 @@ $$z_i = \mathrm{PatchEnc}(X_{\mathcal{P}_i})$$
 $$\mathcal{L}(\mathcal{D};\theta) = \sum_{s\in\mathcal{D}}\sum_{i}\log p_{\theta}(s_i|s_{<i})$$
 
 该损失函数在语音预训练语料上最大化语音令牌序列的似然，使得补丁解码器能够从压缩表示中恢复细粒度的语音信息。实验表明，补丁机制在 sWUGGY 和 sBLIMP 等细粒度词汇与句法评估上表现与基线持平，验证了信息瓶颈未损失低层语言特征。
-
-
 
 ## 实验与关键发现
 
@@ -269,39 +259,17 @@ LST的收益随模型规模持续增长。在计算最优扩展中（420M→1.8B
 3. **超大规模数据受限**：在7B且数据受限（70B tokens）场景下，性能提升幅度收窄，提示语音数据多样性可能成为新的瓶颈。
 4. **实时交互**：当前框架基于离线批处理设计，扩展至全双工对话等实时场景需要进一步研究流式补丁策略。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_krGpQzo8Mz/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of LST and Baseline on HellaSwag story completion under two experimental setups, (a) compute-controlled: same number of training iterations and (b) data-controlled: same amount of training data*
 
 ![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_krGpQzo8Mz/figures/004_Figure_4.jpg]]
 *Figure 4: (b) Sub-optimal token scaling at 7B. Comparison at 70B tokens, below the scaling-law optimum (≈140B). Figure 4: Scaling behavior on HellaSwag (S→S and T→T.)*
 
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_krGpQzo8Mz/figures/005_Table_1.jpg]]
-*Table 1: Speech training datasets with total speech hours and the amount of Hubert tokens*
-
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_krGpQzo8Mz/figures/006_Table_2.jpg]]
-*Table 2: Evaluation datasets for story completion (MC = Multiple Choice)*
-
 ![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_krGpQzo8Mz/figures/007_Table_3.jpg]]
 *Table 3: Main comparison of LST models and baselines under the same computation budget scheme. Each dataset reports both S→S and T→T*
 
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_krGpQzo8Mz/figures/008_Table_4.jpg]]
-*Table 4: Main comparison of LST models and baselines under the same speech/text tokens scheme. Each dataset reports both S→S and T→T*
-
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_krGpQzo8Mz/figures/009_Table_5.jpg]]
-*Table 5: LibriSpeech ASR (WER) and TTS (CER) for the 1B model, reporting context units for ASR and generation units for TTS*
-
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_krGpQzo8Mz/figures/011_Table_6.jpg]]
-*Table 6: Comparison of patching strategies with approximately matched patch sizes. Static uses fixed patch lengths, Align (sil sep.) treats silence as separate patches, and Align (sil merged) merges silence into words, and Curriculum gradually shifts from Align to Static during training*
-
 ![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_krGpQzo8Mz/figures/012_Table_7.jpg]]
 *Table 7: Model architecture configuration. Each module is shown with its depth, hidden dimension, number of attention heads, and other relevant settings*
-
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_krGpQzo8Mz/figures/013_Table_8.jpg]]
-*Table 8: Scaling comparison between baseline SpeechLLM and LST at 1B and 7B*
-
-
 
 ## 定位与知识库关联
 
@@ -346,8 +314,6 @@ LST 的设计前提是语音序列长度显著大于文本序列长度，且存�
 - **实时交互场景的扩展**：LST 的补丁编码器需要完整的语音帧段才能生成补丁嵌入，这在全双工对话等流式场景中引入延迟。如何设计增量式补丁编码，使模型能在部分帧到达时即开始全局建模？
 - **多模态泛化**：潜在补丁框架的核心思想——将高密度序列压缩为语义相关的潜在单元——在理论上适用于图像补丁、视频帧段等场景。但不同模态的压缩比、补丁语义边界定义和编解码器设计需要针对性的研究。
 - **课程调度策略的优化**：当前课程补丁使用线性衰减概率（从对齐过渡到静态），但更大规模数据下，最佳衰减调度（如余弦、指数衰减）和对齐阶段的持续时间可能需要进一步调优。
-
-
 
 ## 原文 PDF
 

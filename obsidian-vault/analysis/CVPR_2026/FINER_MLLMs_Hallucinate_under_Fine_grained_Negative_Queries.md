@@ -51,8 +51,6 @@ claims:
 
 实验结果表明，FINER-Tuning 在多个前沿 MLLM 上均带来显著提升。例如，在 FINER-CompreCap 的 Multi-rel 子集上，InternVL3.5-14B 的成对准确率从 47.0% 跃升至 71.2%（+24.2%）；在 Multi-obj 子集上，LLaVA-1.6 也获得 23.1% 的绝对提升。此外，该方法在 DASH、MMHal-Bench 等其他幻觉基准上也表现出一致的改善，同时不损害模型的通用能力。这些结果验证了细粒度负面查询训练在缓解 MLLM 幻觉方面的有效性。
 
-
-
 ### 多模态大语言模型的幻觉困境
 
 多模态大语言模型（MLLM）在视觉理解任务中取得了显著进展，但幻觉问题——即模型生成与图像内容不一致的描述——始终是其可靠部署的核心障碍。现有研究主要从两个维度衡量幻觉：**判别式基准**要求模型判断给定陈述的真伪，**生成式基准**则评估模型自由文本输出中的事实错误。
@@ -82,8 +80,6 @@ claims:
 - **FINER-Tuning训练方法**：利用直接偏好优化（DPO），在同时包含正面和负面查询的偏好数据上训练模型，使其既能正确接受真实陈述，又能准确拒绝细粒度的错误陈述。
 
 这一双重设计旨在填补现有基准和训练方法在细粒度幻觉检测上的空白，推动MLLM向更可靠的多模态理解迈进。
-
-
 
 ## 核心方法与创新机理
 
@@ -131,8 +127,6 @@ FINER将评测从单一对象存在性扩展到多对象（Multi-obj）、多属
 - **决定性证据**：FINER-Tuning在InternVL3.5-14B的FINER-CompreCap Multi-rel子集上带来24.2%的绝对提升（47.0% → 71.2%，Table 1），且在多个外部幻觉基准（DASH +6.2%、HaloQuest等）上一致改善（Table 2），同时不损害通用能力（Table 3，InternVL3.5-14B平均提升1.4%）
 - **需注意的局限**：高细粒度案例和What问题对所有模型（包括InternVL-3.5-38B和Gemini-2.5-Flash）仍具挑战性；Multi-rel子集目前最多仅包含三个关系，扩展到更高阶关系是待解决问题
 
-
-
 FINER 的整体框架由两个紧密耦合的子系统构成：**细粒度负面查询基准（FINER Benchmarks）** 和 **基于直接偏好优化的训练方法（FINER-Tuning）**。二者的共同目标是揭示并缓解多模态大语言模型（MLLM）在面对包含多个语义元素的细粒度负面查询时产生的假阳性幻觉。
 
 ### 核心瓶颈与因果机制
@@ -154,13 +148,7 @@ FINER 的整体框架由两个紧密耦合的子系统构成：**细粒度负面
 2. **负向场景图生成**：使用大语言模型（Qwen3-14B 用于 FINER-CompreCap，Gemini-2.0-Flash 用于 FINER-DOCCI）对正向场景图中的每个语义元素进行修改，生成语义上合理但错误的负面元素。
 3. **多选题构建**：基于规则的方法将正负场景图转化为成对的多选题（MCQ），每个样本包含一个正向查询（正确答案为“是”）和一个负向查询（正确答案为“否”）。
 
-![[assets/figures/papers/paper_list_l2102_https_arxiv_org_abs_2603_17662/figures/013_Figure_8.jpg]]
-*Figure 8: Example positive scene graph (SG) extracted by Gemini-2.0-Flash [41]. Given a long human-annotated caption from DOCCI [34], we apply a two-stage extraction pipeline to obtain the positive SG*
-
 #### 训练数据生成流程（Figure 3）
-
-![[assets/figures/papers/paper_list_l2102_https_arxiv_org_abs_2603_17662/figures/003_Figure_3.jpg]]
-*Figure 3: Training data generation pipeline for FINER-Tuning. (1) We adopt long captions from Pixmo [11] and extract diverse phrases with PHI-4-14B [1]. (2) We then prompt the same LLM to modify and generate negative phrases. (3) We construct both positive and negative query-answer tuples via template-based composition or LLM generation*
 
 训练数据以 Pixmo 长标题为起点，通过三阶段流水线生成偏好元组：
 
@@ -193,8 +181,6 @@ $$\mathrm{Acc}_{\mathrm{paired}} = \frac{1}{N} \sum_{i=1}^{N} \Gamma(M(x_i, q_i^
 - 高细粒度案例和 What 问题对所有模型仍构成挑战，即使是 InternVL-3.5-38B 和 Gemini-2.5-Flash 也表现有限。
 - FINER 基准并非完全由人工验证，存在一定的主观性和标注误差。
 - Multi-rel 子集最多只包含三个关系，扩展到更高阶关系是未来方向。
-
-
 
 ### 3.1 细粒度查询下的幻觉度量：成对准确率
 
@@ -253,25 +239,17 @@ $$
 
 **训练机制**：DPO 直接最大化正确回答 $a^+$ 相对于错误回答 $a^-$ 的偏好概率，无需显式奖励模型。通过同时输入正面查询和负面查询的偏好对，模型被强制学习区分细粒度语义元素的真伪，从而在推理时能正确拒绝包含细微错误的声明。
 
-
-
 ## 实验与关键发现
 
 ### 细粒度负面查询下的性能瓶颈
 
 Figure 1 清晰地揭示了当前多模态大语言模型在细粒度负面查询下的系统性脆弱性。以 InternVL3.5-14B 为基线，随着查询粒度的增加（从级别 1 到级别 7），模型在 FINER-COMPRECAP 上的成对准确率从约 80% 急剧下降至约 20%。这种性能衰减并非渐进式的，而是在涉及多对象、多属性、多关系的语义组合时出现断崖式下跌，表明模型的核心缺陷在于无法同时处理多个语义元素，倾向于将部分匹配误判为完全匹配。
 
-![[assets/figures/papers/paper_list_l2102_https_arxiv_org_abs_2603_17662/figures/001_Figure_1.jpg]]
-*Figure 1: We compare the performance InternVL3.5-14B [46] Questions (Baseline) with the one fine-tuned by FINER-Tuning under negative queries of seven different granularity levels*
-
 这一发现直接挑战了现有幻觉基准的评估范式。传统的粗粒度查询（如单一对象存在性判断）掩盖了模型在细粒度场景下的真实能力边界，而 FINER 基准通过结构化场景图生成的多元素否定查询，有效暴露了这一隐藏瓶颈。
 
 ### FINER-Tuning 的主实验结果
 
 Table 1 汇总了 FINER-Tuning 在四个基线模型上的核心提升。在所有细粒度子集上，FINER-Tuning 均带来显著且一致的增益：
-
-![[assets/figures/papers/paper_list_l2102_https_arxiv_org_abs_2603_17662/figures/004_Table_1.jpg]]
-*Table 1: Paired accuracy*
 
 - **LLaVA-1.6** 在 FINER-CompreCap 的 Multi-obj 子集上从 25.3% 提升至 48.4%（+23.1%），在 Multi-rel 子集上从 24.5% 提升至 49.8%（+25.3%）。
 - **InternVL-3.5-14B** 在 Multi-rel 子集上获得最大绝对提升，从 47.0% 跃升至 71.2%（+24.2%）。
@@ -299,8 +277,6 @@ FINER-Tuning 的增益不仅局限于 FINER 系列基准。Table 2 显示，该�
 ### 实体数量对性能的影响
 
 Figure 4 进一步解构了性能与实体数量的关系。在 FINER-COMPRECAP 上，当对象数量增至 6 个时，InternVL3.5-14B 经 FINER-Tuning 后提升 8.3%；在 3 属性设置下提升 19.1%；在 3 关系设置下提升 28.1%。这一趋势表明，FINER-Tuning 对高复杂度场景（尤其是多关系）的改善最为显著，但即使在最高实体数量下，绝对准确率仍远未饱和，说明细粒度幻觉问题尚未完全解决。
-
-![[assets/figures/papers/paper_list_l2102_https_arxiv_org_abs_2603_17662/figures/005_Figure_4.jpg]]
 
 ### 消融实验的关键发现
 
@@ -333,13 +309,6 @@ Table 16 将 FINER-Tuning 与 RLAIF-V、OPA-DPO、RLHF-V 等现有幻觉减少�
 
 ![[assets/figures/papers/paper_list_l2102_https_arxiv_org_abs_2603_17662/figures/027_Table_16.jpg]]
 *Table 16: Extended comparison with other hallucination reduction methods on LLaVA-1.5-7B [26]. HR.: Hallucination rate. The best results are bold while the second best results are underlined*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2102_https_arxiv_org_abs_2603_17662/figures/022_Table_12.jpg]]
-*Table 12: Filtering to only keep natural images ablation for FINER-Tuning with InternVL-3.5-8B [46]. Obj/Attr/Rel denote Multi-obj/Multi-attr/Multi-rel for both training and evaluation. The best results are bold*
-
-
 
 ## 定位与知识库关联
 
@@ -395,8 +364,6 @@ FINER 在 MLLM 幻觉研究领域占据**细粒度负面查询评估与缓解**�
 - **评估维度创新**：首次系统化定义和量化细粒度负面查询下的幻觉，补充了现有基准（POPE、AMBER、HallusionBench 等）在语义组合粒度上的空白。
 - **训练范式验证**：证明正负查询对联合 DPO 训练是缓解细粒度幻觉的有效策略，为后续偏好优化方法提供了数据构造范式的参考。
 - **开放资源**：FINER 基准和 FINER-Tuning 训练框架已开源，可作为后续研究的标准测试平台。
-
-
 
 ## 原文 PDF
 

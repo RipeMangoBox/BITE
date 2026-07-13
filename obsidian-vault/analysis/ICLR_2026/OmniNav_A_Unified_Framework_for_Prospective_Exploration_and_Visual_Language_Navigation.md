@@ -55,8 +55,6 @@ OmniNav 针对上述问题提出了一种**快-慢双系统统一框架**。其�
 
 方法仍存在若干局限：慢速系统的完整物理部署尚未实现；复杂纹理物体（如衣物、镜子）的识别鲁棒性不足；数据组成、质量与模型规模之间的缩放关系有待系统研究。
 
-
-
 视觉-语言导航（VLN）要求智能体在复杂三维环境中根据自然语言指令或物体描述自主移动并完成任务。近年来，该领域在模拟基准上取得了显著进展，但多数方法仍面临两个根本性瓶颈：**动作生成的精度与延迟矛盾**，以及**对通用指令和开放词汇物体的稳健理解不足**。
 
 在动作生成层面，主流方法普遍采用自回归离散动作块预测策略（如 CorrectNav、StreamVLN 等），将连续导航动作离散化为有限的动作类别。这种离散化不可避免地引入精度损失，且自回归逐块生成导致控制延迟随序列长度累积，难以满足真实场景中低延迟闭环控制的需求。
@@ -64,8 +62,6 @@ OmniNav 针对上述问题提出了一种**快-慢双系统统一框架**。其�
 在语义理解层面，现有方法通常仅在特定任务的导航数据上训练，缺乏对开放世界中多样化指令表述和新颖物体类别的泛化能力。当面对训练中未见过的物体（如不规则纹理物体、小尺寸背景物体）或复杂指令时，模型的理解鲁棒性急剧下降。这一瓶颈的根源并非导航策略学习本身，而是训练数据中通用视觉-语言知识的匮乏。
 
 针对上述缺口，OmniNav 提出了一个统一的解决方案。其核心洞察在于：**采用快-慢双系统架构**，快系统基于流匹配策略生成连续航点以实现低延迟控制，慢系统利用长期视觉记忆和边界推理进行全局规划与子目标选择；同时**融入大规模通用视觉-语言数据**进行联合多任务训练，从根本上提升指令理解和物体感知的鲁棒性。这一设计使得 OmniNav 能够在单一框架下支持指令目标、物体目标和点目标等多种导航任务，并在多个基准上以纯 RGB 输入实现最优性能。
-
-
 
 ## 核心方法与创新机理
 
@@ -105,8 +101,6 @@ OmniNav 摒弃了单一 VLM 端到端预测动作的基线方案，转而采用�
 - 训练数据包含四类：导航任务数据、具身问答数据、通用 MLLM 数据和指称/定位数据。
 - 采用两阶段训练策略：第一阶段以自回归目标学习离散变量；第二阶段附加流匹配策略头预测连续航点，同时混入 20% 第一阶段数据以防止 VLM 基础能力退化。
 - 消融实验表明，去除具身问答或指称/定位数据会导致小物体识别性能下降；去除通用 MLLM 数据则导致不规则物体识别失败。加入额外数据后，3B 与 7B 模型性能接近（57.7 vs 57.9），表明数据丰富时模型规模并非瓶颈。
-
-
 
 ![[assets/figures/papers/paper_list_l36_https_openreview_net_forum_id_zGtTQTD1zu/figures/001_Figure_1.jpg]]
 *Figure 1: The fast system can independently handle multi-task navigation, using the VLM backbone and a flow-matching policy to rapidly generate waypoints. Building on this, a slow thinking module is integrated to enable long-term memory and planning: it constructs long-range spatial and semantic memory using frontiers and images, and provides subgoal cues. The collaboration between the slow and fast proceeds as follows: the slow system uses frontiers or memory to generate high-level subgoals, once a subgoal is determined, the fast system takes over and progressively produces lowlevel waypoint sequences, ultimately reaching the target*
@@ -157,8 +151,6 @@ $$\mathbf{w}_{t:t+H}^{\tau+\Delta\tau} = \mathbf{w}_{t:t+H}^\tau + \frac{1}{S} \
 
 快-慢系统在训练中端到端协同：慢速系统的子目标选择和快速系统的航点生成共享同一 VLM 骨干，通过统一的训练框架同时优化。
 
-
-
 ### 快-慢双系统架构
 
 OmniNav 的核心架构由快速系统（Fast System）、慢速系统（Slow System）和中央记忆模块（Central Memory）三部分协同构成。快速系统基于 VLM 主干（Qwen2.5-VL-3B-Instruct）融合多模态上下文，通过流匹配策略并行生成连续航点序列，实现低延迟闭环控制；慢速系统利用长期视觉记忆和边界推理进行全局规划，生成子目标与子任务；中央记忆模块以 KV 缓存和环形缓冲区维护位姿标记的历史图像，为快慢系统提供关键的时空上下文，使得决策既具备局部敏捷性又保持全局一致性。
@@ -192,8 +184,6 @@ $$\mathbf{w}_{t:t+H}^{\tau + \Delta\tau} = \mathbf{w}_{t:t+H}^{\tau} + \frac{1}{
 ### 慢速系统的边界推理
 
 慢速系统维护 3D 占据地图，将空间区域分类为已探索或未知，边界点定义为已探索与未知区域的分界。与基线方法中基于简单距离启发式或随机选择最近边界的策略不同，OmniNav 采用语义和推理感知的边界选择：将每个边界与其对应的自我中心图像关联，通过显式的思维链推理（Chain-of-Thought）评估各边界的语义相关性和探索价值，从而选择最具信息量或最具前景的子目标。当目标出现在当前或历史视野中时，慢速系统快速定位目标并生成驱动快速系统逐步逼近的子目标坐标。
-
-
 
 ## 实验与关键发现
 
@@ -262,13 +252,6 @@ Figure 4 展示了 OmniNav 在四足机器人上的零样本部署结果，覆�
 2. **慢速系统物理部署未完成**：慢速系统涉及边界推理和思维链生成，计算延迟与高频控制需求之间的权衡尚未在真实硬件上进行系统优化。
 3. **规模化法则研究缺失**：数据质量、数据组成和模型规模三者之间的联合缩放关系尚未系统探索，当前结论仅基于 3B 与 7B 两个规模点的对比。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l36_https_openreview_net_forum_id_zGtTQTD1zu/figures/005_Table_2.jpg]]
-*Table 2: Evaluation of object-goal navigation on HM3D-OVON, where * indicates OmniNav with slow thinking system*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 方法定位与核心差异
@@ -311,8 +294,6 @@ OmniNav 的强证据边界覆盖以下场景：
 1. 如何在真实环境中实现慢系统的高效推理，同时保持快系统的低延迟控制？可能的路径包括模型蒸馏、异步推理或选择性激活慢系统。
 2. 针对纹理复杂物体的识别鲁棒性，是否需要引入更强的视觉编码器或专门的对比学习预训练？
 3. 数据组成（导航数据 vs 通用视觉-语言数据）的最优配比、数据质量过滤策略与模型规模之间的三维缩放关系，需要更系统的实验设计来揭示。
-
-
 
 ## 原文 PDF
 

@@ -68,8 +68,6 @@ LaRP 在方法谱系中处于**单视图扩散修复**与**多视图后优化**�
 
 ![Figure 3]()
 
-
-
 ### 问题背景：多视图修复中的一致性与效率困境
 
 在3D场景编辑、物体移除和内容补全等应用中，多视图图像修复（multi-view inpainting）要求从多个视角对同一场景的缺失区域进行填充，且修复结果必须在不同视图间保持几何与外观一致性。传统方法通常采用“先修复后优化”的范式：先对单张视图独立进行2D修复，再通过后优化（如NeRF训练）来弥合视图间的不一致。然而，这种策略面临两个根本性挑战：
@@ -94,8 +92,6 @@ LaRP 在方法谱系中处于**单视图扩散修复**与**多视图后优化**�
 - **高效训练范式**：设计可扩展的数据流水线，从视频数据集中自动生成两视图训练对，使LaRP可在单张RTX 4090 GPU上约14小时完成训练，较MVInpainter-F提速约5倍。
 
 这种设计使得LaRP在多视图一致性和新视图合成质量上达到或超越现有最优方法，同时将逐场景处理速度提升约50倍（见图1），显著推进了质量-效率的帕累托前沿。
-
-
 
 ## 核心方法与创新机理
 
@@ -135,8 +131,6 @@ LaRP 的关键架构创新在于**克隆 UNet 编码器提取参考视图的多�
 
 LaRP 的创新本质在于**将 3D 几何显式建模与 2D 生成先验在潜在空间深度融合**，通过“克隆编码器—几何重投影—零初始化特征注入”的架构设计，实现了多视图修复在一致性、效率和质量三个维度的同步突破。这一设计使 LaRP 在帕累托前沿上显著推进了质量-效率的平衡边界（Figure 1），在 SPIn-NeRF 数据集上结合 NeRF 仅需 20 分钟训练即可达到 FID 34.84，优于 MVInpainter-F 的 37.97，且速度快约 50 倍。
 
-
-
 LaRP 的整体设计围绕一个核心洞察展开：**将预训练扩散修复模型的生成先验与 3D 基础模型的显式几何对应相结合**，通过潜在空间重投影机制实现高效的多视图一致性修复，从而消除对后优化的依赖。其 pipeline 由两条并行的信息流构成，最终在去噪 UNet 的解码器中汇合。
 
 ### 信息流架构
@@ -164,12 +158,8 @@ Fig. 3 明确对比了 LaRP 与朴素 ControlNet 在跨视图条件化上的概�
 
 整个训练在单张 NVIDIA RTX 4090 GPU 上完成，仅需约 14 小时，相比 MVInpainter-F 的 3 天（8×A100）训练效率提升约 5 倍。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l891_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_LaRP_Efficient_M/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our contributions. (a) LaRP effectively combines priors from both a cross-view reference and a diffusion-based inpainting model by feeding the inpainting model with multi-scale appearance latents reprojected according to the 3D attributes estimated by a 3D foundation model. (b) Training LaRP requires a corpus of two-view image pairs that current datasets lack, we propose a scalable data pipeline to provide such image pairs by repurposing an existing video 3D object detection dataset. We use a FPS-based view selection heuristic with a 3D-aware mask generation process to prepare two-view image pairs with reasonable baselines and plausible masks*
-
-
 
 LaRP 的核心架构由四个紧密协作的模块构成，其设计哲学在于**最大化复用预训练扩散模型的生成先验**，同时通过显式几何对应实现跨视图信息的高效注入。
 
@@ -192,9 +182,6 @@ $$\mathbf{X}_{\mathrm{ref}} = [\mathbf{I}_{\mathrm{ref}}, \mathbf{M}_{0}, \mathb
 - **时间步固定为零**：克隆编码器始终在 $t = 0$ 运行，使用干净潜变量 $\mathbf{Z}_{0}$ 和全零掩膜 $\mathbf{M}_{0}$，确保提取的是参考视图的完整外观信息。
 - **复用预训练输入卷积层**：与 ControlNet 使用额外的零卷积层处理重投影图像不同，LaRP 直接复用预训练扩散模型的输入卷积层（Fig. 3 左侧），使得参考视图编码从一开始就享有良好的特征初始化。
 - **参数冻结策略**：原始 UNet 的所有参数被锁定，仅克隆编码器和后续的零初始化卷积注入层参与训练，保护了预训练生成先验不被破坏（消融实验证实解锁 UNet 解码器会导致性能退化）。
-
-![[assets/figures/papers/paper_list_l891_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_LaRP_Efficient_M/figures/003_Figure_3.jpg]]
-*Figure 3: Key conceptual differences between LaRP (left) and na¨ıve ControlNet [82] (right) for cross-view conditioning. To fully utilize the pretrained parameters copied from the diffusionbased inpainting model, LaRP 1) reuses the pretrained diffusion model’s input convolution layer, and 2) performs reprojection only before injecting cross-view information into the inpainting model*
 
 ### 潜在重投影模块
 
@@ -235,8 +222,6 @@ Fig. 3 揭示了 LaRP 与朴素 ControlNet 在跨视图条件化上的两个根�
 
 这种设计使 LaRP 的训练收敛速度比 ControlNet 基线快约 3.5 倍（2,000 步 vs 7,000 步，Tab. 4），同时取得了更优的修复质量。
 
-
-
 ## 实验与关键发现
 
 ### 多视图一致性评估
@@ -263,8 +248,6 @@ LaRP的训练效率优势显著（表4）。在单个NVIDIA RTX 4090 GPU上，La
 
 尽管LaRP在多数场景中表现优异，但分析揭示了若干边界情况。首先，基础扩散模型（Stable Diffusion）的VAE在处理密集文本图案等细粒度纹理时存在编码瓶颈，可能导致修复区域纹理模糊或失真。其次，性能受限于3D基础模型VGGT的估计精度：在遮挡严重或纹理缺乏的场景中，几何估计误差会通过重投影传播至修复结果。此外，当前训练数据仅来自Objectron数据集的物体类别，泛化到全新场景类别时可能面临领域偏移。方法要求至少两个具有足够重叠的输入视图，极端宽基线场景下的表现仍需进一步验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l891_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_LaRP_Efficient_M/figures/001_Figure_1.jpg]]
 *Figure 1: Quality to efficiency comparison among SOTA multiview inpainting methods. LaRP significantly advances the Pareto front. Reported times reflect per-scene process time, excluding one-time generalizable 2D model pre-training*
 
@@ -279,20 +262,6 @@ LaRP的训练效率优势显著（表4）。在单个NVIDIA RTX 4090 GPU上，La
 
 ![[assets/figures/papers/paper_list_l891_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_LaRP_Efficient_M/figures/011_Table_4.jpg]]
 *Table 4: Training efficiency comparison. LaRP is significantly more efficient than prior SOTA and standard baselines*
-
-![[assets/figures/papers/paper_list_l891_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_LaRP_Efficient_M/figures/004_Figure_4.jpg]]
-*Figure 4: Qualitative comparison of direct inpainting results with the state-of-the-art. We show 6 views across 3 scenes (first row) with non-trivial backgrounds in the inpainting area. Row 2 aggregates the non-reference-based inpainting methods LaMa [63] and LDM [56], where under each input view, we show inpainting results from LaMa (left) and LDM (right). In rows 3–6, we compare MVInpainter-F [5] with LaRP using two reference views for each scene, key regions are highlighted and zoomed in (inset yellow boxes)*
-
-![[assets/figures/papers/paper_list_l891_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_LaRP_Efficient_M/figures/006_Figure_5.jpg]]
-*Figure 5: Qualitative comparisons of state-of-the-art multi-view inpainting methods. For each scene, we show two input views and two synthesized novel views from each method and their training time, with key regions highlighted and zoomed in (inset yellow boxes)*
-
-![[assets/figures/papers/paper_list_l891_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_LaRP_Efficient_M/figures/007_Table_3.jpg]]
-*Table 3: Quantitative comparison with [74] on 360-USID*
-
-![[assets/figures/papers/paper_list_l891_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_LaRP_Efficient_M/figures/009_Figure_6.jpg]]
-*Figure 6: Qualitative results on scenes with wider baselines. LaRP remains competitive to SOTA [74], while being 3× faster*
-
-
 
 ## 定位与知识库关联
 
@@ -333,8 +302,6 @@ LaRP 的有效性依赖于以下前提条件，这些条件界定了其适用边
 3. **开放域场景泛化**。如何将 LaRP 推广到更广泛的开放域场景，减少对特定物体类别数据集的依赖？数据流水线的可扩展性（Sec. 3.2）提供了基础，但需要更大规模、更多样化的视频数据源。
 
 4. **不确定区域的自适应处理**。重投影过程中存在几何不确定区域（如遮挡边界、深度不连续处），是否可以通过在线优化或自适应机制动态调整这些区域的特征融合权重？当前方法对所有重投影特征等同对待，缺乏不确定性感知能力。
-
-
 
 ## 原文 PDF
 

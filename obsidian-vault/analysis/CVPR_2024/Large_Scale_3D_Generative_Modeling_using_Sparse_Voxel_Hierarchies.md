@@ -68,8 +68,6 @@ XCube 属于**稀疏体素层级生成模型**，其核心设计包含三个关�
 
 当前三维数据集规模仍远不及二维图像数据集，导致文字到三维模型难以处理复杂提示词；层级式建模存在误差累积问题，粗层级误差会向下传播。未来方向包括将纯三维先验与二维图像先验有效结合以提升纹理和语义生成质量，以及将 XCube 迁移到图像条件重建、多模态感知等下游任务。
 
-
-
 三维生成建模是计算机视觉与图形学领域的核心挑战之一，其目标是从无到有地合成逼真且多样化的三维形状与场景。近年来，扩散模型在二维图像生成领域取得了革命性突破，这一成功也推动了三维生成模型的快速发展。然而，将扩散模型从二维迁移至三维面临着根本性的维度诅咒——三维数据的计算与存储需求随分辨率呈立方增长，使得现有方法普遍受困于低分辨率先验。
 
 **核心瓶颈在于三维表示的选择与生成架构的可扩展性。** 现有三维生成模型主要采用以下表示方式：
@@ -86,8 +84,6 @@ XCube 属于**稀疏体素层级生成模型**，其核心设计包含三个关�
 此外，当前三维生成模型在**属性建模**方面也存在明显缺口。大多数方法仅生成几何形状，忽略了法线、语义标签、TSDF等对下游应用至关重要的表面属性。XCube通过在体素层级中统一编码几何与属性信息，实现了多属性联合生成，为场景理解、仿真模拟等任务提供了更丰富的输出形式。
 
 综上，XCube的提出旨在回答一个关键问题：**能否设计一种三维生成模型，使其先验表示既能支持高分辨率（1024³级别）的大规模场景，又能在生成质量上超越现有方法？** 这一问题的解答不仅关乎生成模型本身的性能边界，更决定了三维生成技术能否真正应用于自动驾驶、机器人仿真等真实世界场景。
-
-
 
 ## 核心方法与创新机理
 
@@ -121,8 +117,6 @@ Baseline 方法受限于密集体素（如 **NWD**）、点云（如 **PVD**、*
 
 XCube 的创新并非单一技术点的突破，而是从**表示（稀疏体素层级）、架构（层级扩散）、编码（稀疏结构 VAE）、解码（渐进修剪细分）到底层计算框架**的系统性重构。这五个维度的协同使得模型首次能够在 $1024^3$ 分辨率下实时生成大规模室外场景，并在 ShapeNet、Objaverse 和 Waymo 等多个基准上取得 state-of-the-art 的生成质量。
 
-
-
 XCube 的核心是一个**层级化稀疏体素潜在扩散模型**（Hierarchical Voxel Latent Diffusion Model），它将大规模三维生成任务分解为由粗到细（coarse-to-fine）的级联过程。整个 pipeline 围绕一个核心数据结构——**稀疏体素层级**（Sparse Voxel Hierarchy）——展开，该层级由 $L$ 层分辨率递增的稀疏体素网格 $\mathcal{G} = \{ \mathbf{G}_1, ..., \mathbf{G}_L \}$ 及其关联的逐体素属性 $\mathcal{A} = \{ \mathbf{A}_1, ..., \mathbf{A}_L \}$ 组成。细网格 $\mathbf{G}_{l+1}$ 被严格约束在粗网格 $\mathbf{G}_l$ 的几何范围内，形成空间上的嵌套关系。
 
 ### 模块拓扑与数据流
@@ -152,12 +146,8 @@ VAE 与扩散模型采用**逐层级独立训练**（level-by-level independent 
 $$\mathcal { L } _ { l } ^ { \mathrm { v A E } } = \mathbb { E } _ { \{ { \mathbf { G } _ { l } } , { \mathbf { A } _ { l } } \} } [ \mathbb { E } _ { { \mathbf { X } } _ { l } \sim q _ { \phi } } [ { \mathrm { B C E } } ( { \mathbf { G } _ { l } } , \tilde { \mathbf { G } } _ { l } ) + \mathcal { L } _ { l } ^ { \mathrm { A t t r } } ( { \mathbf { A } _ { l } } , \tilde { \mathbf { A } } _ { l } ) ] + \lambda \mathbb { K L } ( q _ { \phi } ( { \mathbf { X } _ { l } } ) \parallel p ( { \mathbf { X } _ { l } } ) ) ]$$
 这种解耦训练方式降低了优化难度，使得每一层级只需专注于建模其分辨率尺度下的几何细节。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2312_03806/figures/002_Figure_2.jpg]]
 *Figure 2: Method. Sparse voxel grids within the hierarchy are first encoded into compact latent representations using a sparse structure VAE. The hierarchical latent diffusion model then learns to generate each level of the latent representation conditioned on the coarser level in a cascaded fashion. The generated high-resolution voxel grids contain various attributes for different applications. Note that technically X1 is a dense latent grid, but illustrated as a sparse one for clarity. G G1+1*
-
-
 
 XCube 的核心生成框架由三个关键模块串联构成：**稀疏结构 VAE** 负责将各层级体素网格压缩至紧凑潜在空间；**层次化潜在扩散模型** 在潜在空间中逐层执行去噪生成；**渐进式修剪与细分解码器** 从潜在变量重建高分辨率体素网格。三者协同实现从粗到细的层级式生成。
 
@@ -203,8 +193,6 @@ $$\mathcal { L } ^ { \mathrm { A t r } } = \lambda _ { 1 } \underbrace { | | n -
 
 > **⚠️ 手动验证提示**：以上公式均来自原论文（Eq. 1, 2, 6, 7, 8），变量含义与模块功能描述基于 §3.1–§3.4 的文本证据。细化网络的具体架构细节（层数、参数量）在已验证分析中未提供，需要查阅原论文补充。
 
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -237,33 +225,17 @@ Table 3 报告了自定义稀疏框架与 TorchSparse 的性能对比。在处�
 
 尽管整体性能优异，论文明确指出以下局限：层级式建模存在**错误累积**问题——即使使用了细化网络（Refinement Network），粗层级的误差仍会向下传播，可能影响最终细节质量（§3.4）。此外，当前 3D 数据集规模远不及 2D 图像数据集，导致文字到 3D 模型在处理复杂提示词时能力受限。生成速度与显存消耗虽已显著优化，但在极大规模场景或多层级交互式应用中仍有提升空间。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2312_03806/figures/004_Figure.jpg]]
 
 ![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2312_03806/figures/017_Figure.jpg]]
 
-![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2312_03806/figures/018_Figure.jpg]]
-
 ![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2312_03806/figures/020_Figure_16.jpg]]
 *Figure 16: More qualitative results on text-to-3D*
-
-![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2312_03806/figures/029_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2312_03806/figures/031_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2312_03806/figures/033_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2312_03806/figures/040_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2312_03806/figures/042_Figure.jpg]]
 
 ![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2312_03806/figures/005_Table_1.jpg]]
 *Table 1: 1-NNA Comparison on ShapeNet [5]. The lower the better. Best scores highlighted in bold*
 
 ![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2312_03806/figures/012_Table.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -300,8 +272,6 @@ XCube 处于**稀疏表示学习**与**层级生成模型**的交叉点。
 **下游任务迁移。** XCube 作为基础生成模型，其在图像条件重建、多模态感知（如激光雷达补全、语义场景补全）等任务上的迁移能力尚未充分探索。微条件机制（micro-conditioning，Figure 13）已展示了控制生成的潜力，但针对更复杂的条件信号（如多视角图像、文本描述）的设计空间仍待开拓。
 
 **稀疏结构的设计空间。** 针对真实世界数据中稀疏性分布不均的特点（如自动驾驶场景中近处密集、远处稀疏），层级深度、体素分辨率分配策略以及微条件机制的设计空间值得进一步探索。自适应层级结构可能比固定层数配置更适应多样化场景。
-
-
 
 ## 原文 PDF
 

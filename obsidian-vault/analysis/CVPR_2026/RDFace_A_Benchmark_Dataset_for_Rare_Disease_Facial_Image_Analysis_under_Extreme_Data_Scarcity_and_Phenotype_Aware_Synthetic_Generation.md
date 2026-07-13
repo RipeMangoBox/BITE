@@ -54,8 +54,6 @@ claims:
 
 在方法谱系与知识库定位上，RDFace并非提出新的分类架构，而是为罕见病面部诊断领域建立了首个系统性的基准评估范式。它将**ResNet-152**（He et al., CVPR 2016）、**DenseNet-169**（Huang et al., CVPR 2017）、**FaceNet**（Schroff et al., CVPR 2015）、**VGG-16**（Simonyan & Zisserman, ICLR 2015）、**Swin Transformer**（Liu et al., ICCV 2021）和**CLIP**（Radford et al., ICML 2021）等预训练视觉骨干与**Prototypical Networks**（Snell et al., NeurIPS 2017）少样本学习框架统一纳入评测，并系统对比了DreamBooth、FastGAN、MixUp（Zhang et al., ICLR 2018）和CutMix（Yun et al., ICCV 2019）等数据增强策略。与先前代表性诊断系统**DeepGestalt**（Gurovich et al., Nat. Med. 2019）相比，RDFace在极端低数据条件下的分类性能提供了更全面的参照基线。该框架的独特贡献在于将合成数据的生成、筛选与下游任务评估耦合为一个闭环，为数据稀缺场景下的医学影像分析提供了可复现的评估模板。
 
-
-
 罕见病的诊断长期面临“诊断奥德赛”困境——患者平均需经历5–7年、咨询多达8位医生才能获得确诊。近年来，基于面部图像的深度学习辅助诊断系统（如 **DeepGestalt**（Gurovich et al., *Nat. Med.* 2019））展现出将面部形态学特征与潜在遗传综合征关联的潜力，为缩短诊断周期提供了新路径。然而，这类系统的有效训练高度依赖大规模、高质量标注的面部图像数据集。
 
 核心瓶颈在于**极端数据稀缺**。绝大多数罕见病的全球病例数极为有限，可公开获取的标准化面部图像往往每类仅有1–7个样本。在此条件下，标准监督学习模型（如 ResNet、DenseNet、Swin Transformer）的 Top-1 准确率普遍低于16%（Table 1），而少样本学习方法（如原型网络）在 5-way 1-shot 场景下也仅约26%（Table 2）。更严峻的是，不同罕见病的面部表型高度相似——许多综合征共享眼距过宽、鼻梁扁平、耳位低等重叠形态特征——这使得模型在极低样本条件下难以习得具有判别力的类间边界。
@@ -63,8 +61,6 @@ claims:
 现有应对数据稀缺的策略存在明显缺口。通用数据增强方法（如 **MixUp**（Zhang et al., ICLR 2018）、**CutMix**（Yun et al., ICCV 2019））通过在特征空间或像素空间进行插值来扩充训练集，但这类变换无法引入新的表型信息，对罕见病分类的增益极为有限（DenseNet Top-1 仅从15.93%提升至15.75%–16.11%）。另一方面，利用生成模型合成训练数据是一条直观的出路，但**无条件生成**（如 FastGAN）缺乏类别约束，生成的样本往往偏离特定疾病的表型特征，甚至引入与临床事实相悖的视觉噪声，反而导致性能下降（DenseNet Top-1 降至13.27%）。
 
 上述困境揭示了一个更深层的洞察：**在极端低样本场景中，仅增加数据量并不能保证性能提升；合成数据的表型保真度和临床一致性才是决定下游泛化能力的关键调节变量**。这引出了本文的核心动机——构建一个系统性的基准框架，同时解决数据稀缺和合成数据质量控制两个相互嵌套的挑战。具体而言，本文提出 RDFace 基准数据集（覆盖103种罕见病、456张儿童面部图像），并设计了一套**表型感知的合成数据增强评估流水线**：利用 DreamBooth（类条件扩散模型）为每类疾病生成表型条件合成图像，再通过面部关键点余弦相似度筛选高保真样本，最终在标准监督分类和少样本学习两种范式下验证合成增强的实际收益。
-
-
 
 ## 核心方法与创新机理
 
@@ -105,8 +101,6 @@ RDFace 的贡献在于**将扩散模型的条件生成能力与临床表型保�
 在少样本学习场景中，该框架同样有效：DenseNet 在 5-way 1-shot 设置下从 26.20% 提升至 29.88%（Table 4）。专家评审进一步佐证了合成图像的临床可信度——DreamBooth 图像在 62–76% 的案例中被判定为可信，评分者间一致性达 Cohen's κ = 0.65；而 FastGAN 图像的可信度仅为 2–38%，κ = 0.07（Section 5.3）。
 
 **需要人工验证**：论文未与基于文本提示工程的扩散模型变体（如 ControlNet、IP-Adapter）进行对比，也未探索将面部关键点条件显式注入生成过程的可控生成方案，这些方向可能进一步提升表型保真度。
-
-
 
 RDFace 构建了一套面向极端数据稀缺场景的罕见病面部图像分析评估框架，其核心设计围绕三个递进环节：**真实数据基准化**、**表型感知合成增强**、以及**多维度诊断评估**。整体流程如 Figure 3 所示。
 
@@ -152,8 +146,6 @@ RDFace 构建了一套面向极端数据稀缺场景的罕见病面部图像分�
 - **训练**：真实训练集 ∪ Top-n 增强集 → 骨干网络微调
 - **输出**：Top-1/Top-5 分类准确率、n-way k-shot 准确率、BioBERT 表型相似度评分、专家可信度评审结果
 
-
-
 RDFace 的评估框架由六个核心模块串联构成，形成“数据构建→预处理→生成→筛选→表型验证→下游诊断”的闭环流水线。各模块职责明确，且筛选与验证模块直接服务于“表型保真度优先于数据量”这一核心洞察。
 
 ### 数据集构建与预处理模块
@@ -194,8 +186,6 @@ $$d(x^{(q)}, \mu_i) = \| f_{\theta}(x^{(q)}) - \mu_i \|_2^2$$
 $$\operatorname{std}(x_1, \ldots, x_n) = \sqrt{\frac{1}{n-1} \sum_{i=1}^{n} (x_i - \bar{x})^2}$$
 
 该公式确保了在极低样本量条件下标准差估计的无偏性，与 RDFace 的数据稀缺特性相匹配。
-
-
 
 ## 实验与关键发现
 
@@ -245,8 +235,6 @@ $$\operatorname{std}(x_1, \ldots, x_n) = \sqrt{\frac{1}{n-1} \sum_{i=1}^{n} (x_i
 - **人口统计属性的粗糙代理**：数据集仅以地理区域作为人口统计代理，缺少肤色、族裔等直接属性标注。区域分析虽显示各区域性能趋势一致，但美洲地区相似度略高可能反映了该区域样本占比更高的偏差，而非真正的跨种群泛化能力。
 - **生成模型覆盖不足**：论文仅测试了DreamBooth和FastGAN两种生成模型，未探索最新的扩散模型架构（如Stable Diffusion 3、Flux）或可控生成方法（如ControlNet），这些方法可能进一步提升合成数据的表型保真度和多样性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l779_https_arxiv_org_abs_2604_03454/figures/009_Figure_6.jpg]]
 *Figure 6: Overall similarity scores for Qwen and LLaVA across different comparisons. Error bars indicate standard deviation*
 
@@ -256,31 +244,11 @@ $$\operatorname{std}(x_1, \ldots, x_n) = \sqrt{\frac{1}{n-1} \sum_{i=1}^{n} (x_i
 ![[assets/figures/papers/paper_list_l779_https_arxiv_org_abs_2604_03454/figures/011_Table_3.jpg]]
 *Table 3: Standard supervised classification results (Top-1 accuracies) under landmark-based Top-1000 synthetic data augmentation across different backbone models*
 
-![[assets/figures/papers/paper_list_l779_https_arxiv_org_abs_2604_03454/figures/004_Table_2.jpg]]
-*Table 2: Few-shot learning results under different settings using real training data across different backbone models*
-
-![[assets/figures/papers/paper_list_l779_https_arxiv_org_abs_2604_03454/figures/010_Table_4.jpg]]
-*Table 4: Few-shot learning results under synthetic data augmentation across different backbone models*
-
-![[assets/figures/papers/paper_list_l779_https_arxiv_org_abs_2604_03454/figures/036_Table_S.8.jpg]]
-*Table S.8: Semantic similarity and TF-IDF-based semantic similarity across five facial regions*
-
-![[assets/figures/papers/paper_list_l779_https_arxiv_org_abs_2604_03454/figures/026_Table_S.5.jpg]]
-*Table S.5: Top-k accuracies (%) across backbones and synthetic cutoffs of DreamBooth samples*
-
-![[assets/figures/papers/paper_list_l779_https_arxiv_org_abs_2604_03454/figures/027_Table_S.6.jpg]]
-*Table S.6: Top-k accuracies (%) across backbones and synthetic cutoffs of FastGAN samples*
-
-![[assets/figures/papers/paper_list_l779_https_arxiv_org_abs_2604_03454/figures/024_Figure_S.6.jpg]]
-*Figure S.6: DreamBooth – Correlation Between Top-n Ranking and Visual Realism. RetinaFace detection confidence (left) and LPIPS similarity (right) across Top-n ranked DreamBooth images*
-
 ![[assets/figures/papers/paper_list_l779_https_arxiv_org_abs_2604_03454/figures/028_Figure_S.8.jpg]]
 *Figure S.8: Top-k accuracy comparison using DreamBooth-generated data. Each subplot shows Top-1, Top-5, Top-10, and Top-30 accuracy across synthetic cutoffs for six backbone models. DreamBooth augmentation improves performance across most settings*
 
 ![[assets/figures/papers/paper_list_l779_https_arxiv_org_abs_2604_03454/figures/029_Figure_S.9.jpg]]
 *Figure S.9: Top-k accuracy comparison using FastGAN-generated data. Each subplot shows Top-1, Top-5, Top-10, and Top-30 accuracy across synthetic cutoffs for six backbone models. Compared to DreamBooth, FastGAN augmentation results in less consistent or degraded performance across most settings*
-
-
 
 ## 定位与知识库关联
 
@@ -349,8 +317,6 @@ RDFace 的方法贡献不在于提出新的分类架构，而在于**构建了�
 2. DreamBooth 增强的增益饱和现象是否源于生成模型本身的模式坍塌，还是筛选策略的局限性？是否存在更优的合成-真实样本混合策略？
 3. 能否设计更鲁棒的合成图像筛选策略，自动识别并剔除可能引入临床误导信息的生成样本？
 4. 该框架能否扩展到多模态数据（基因序列、临床文本），并在更大规模、更多样化的罕见病群体中验证？
-
-
 
 ## 原文 PDF
 

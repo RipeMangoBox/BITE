@@ -57,8 +57,6 @@ claims:
 
 **局限与开放问题**：该方法依赖预训练骨架进行细化，可能将卡通输入的风格简单性偏向骨架的写实倾向，导致纹理风格偏移；如何缓解这一偏向并实现更好的纹理对齐仍是待解决问题。
 
-
-
 ### 问题背景：从平面图像生成体积化3D资产的挑战
 
 从单张二维图像自动生成具有体积感和精细几何的3D网格，是计算机视觉与图形学中长期存在的开放问题。当输入图像缺乏典型的3D线索——如阴影、纹理梯度、透视变形——时，该任务尤为困难。这类“平面图像”（flat images）广泛存在于卡通、插画、产品设计图等场景中，其共同特征是前景物体以近乎平面的方式呈现，没有可供传统深度估计或立体匹配利用的视差信息。
@@ -90,8 +88,6 @@ claims:
 这一“先膨胀后精细化”的策略，使得模型不再需要从零开始凭空推断3D结构，而是在一个已有体积基础的起点上进行条件化的几何修正。这从根本上改变了处理平面图像输入时的信息流：**3D线索的缺失被显式构造的体积先验所补偿，而扩散模型的去噪过程则负责纠正先验中的几何偏差**。
 
 基于上述洞察，本文提出了 **REVIVE 3D**——一个两阶段、即插即用的管线，旨在从平面图像生成体积饱满、细节丰富的3D网格。
-
-
 
 ## 核心方法与创新机理
 
@@ -128,8 +124,6 @@ REVIVE 3D 并非重新训练一个3D生成模型，而是作为**即插即用的
 - **强证据**：Compactness（+0.0771）和 Normal Anisotropy（-0.0580）的显著提升（Table 2），以及用户研究在质量、体积、细节三个维度上的最高分（Figure 6），直接支持了“体积更大、表面更不平坦”的核心主张。
 - **待验证点**：该方法对预训练 backbone 的依赖引入了风格偏向问题——卡通输入的风格简洁性可能被 backbone 的写实倾向所覆盖，导致纹理风格偏移。这一局限性在 Section 5 中被明确提及，但未提供定量缓解方案，需在实际应用中手动验证。
 
-
-
 REVIVE 3D 是一个**两阶段、即插即用**的流水线，目标是从缺乏3D线索的平面图像中生成具有体积感和细节的3D网格。其核心瓶颈在于：现有模型因输入图像缺失阴影、纹理梯度等3D信息，难以恢复准确的全局结构与局部细节，导致网格趋于扁平化。REVIVE 3D 通过引入一个**输入图像特定的体积膨胀先验（Inflated Prior）**，并在潜在空间中对其进行随机细化，系统性地解决了这一问题。
 
 流水线的两阶段分工如下（参见图3）：
@@ -149,15 +143,8 @@ REVIVE 3D 是一个**两阶段、即插即用**的流水线，目标是从缺乏
 
 整个框架的核心洞察在于：**先膨胀后细化**。阶段一通过膨胀前景轮廓和分割部件，为模型提供了直接的3D体积与结构先验；阶段二则借助扩散模型的生成先验，在保留体积感的同时纠正凸形几何，生成既具有体积又富含细节的3D网格。该方法可与不同的预训练backbone（如Hunyuan3D-2.1、Direct3D）组合使用，展现良好的即插即用特性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2583_https_arxiv_org_abs_2604_27504/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of our method. Stage 1 generates the Inflated Prior. We create a Base 3D from the Silhouette Mask and Detail 3D from Segmentation Masks, then combine them via superimposing. Stage 2 refines the Inflated Prior by encoding the mesh, injecting noise, denoising it with the image condition, and decoding the result into the Refined 3D mesh*
-
-![[assets/figures/papers/paper_list_l2583_https_arxiv_org_abs_2604_27504/figures/001_Figure_1.jpg]]
-*Figure 1: REVIVE 3D generates voluminous and detailed 3D meshes from flat images*
-
-
 
 REVIVE 3D 是一个两阶段框架，其核心由 **膨胀先验生成（Stage 1）** 和 **随机细化（Stage 2）** 两个模块级联构成。整体流程参见 Figure 3。
 
@@ -185,9 +172,6 @@ $$
 
 该叠加操作使 Inflated Prior 具备局部结构线索，为后续细化提供关键先验。然而，仅靠加法合成的高度场本质上只能产生凸形几何——本应凹陷或背向的特征（如嘴部、尾部）会被错误地表示为凸起区域（Figure 4），这构成了 Stage 2 需要纠正的核心问题。
 
-![[assets/figures/papers/paper_list_l2583_https_arxiv_org_abs_2604_27504/figures/004_Figure_4.jpg]]
-*Figure 4: Stage 1’s additive method incorrectly forms features that should be back-facing (like a tail) or concave (like a mouth) as simple convex regions, resulting in convex-only geometry*
-
 ### Stage 2：随机细化
 
 该阶段利用预训练三维潜在扩散模型的去噪先验，在图像条件引导下修正 Stage 1 的凸形几何偏差，生成具有体积感和细节的精细化网格。其关键操作是 **随机噪声注入**：
@@ -199,11 +183,6 @@ $$
 首先将 Inflated Prior 编码为潜在表示 $z_0$，再根据初始噪声水平 $t_0$ 注入高斯噪声 $\varepsilon$，得到 $z_{t_0}$。随后，在输入图像的条件引导下，扩散模型从 $z_{t_0}$ 开始去噪，得到精细化潜在 $z_0'$，最终解码为输出网格。
 
 $t_0$ 是控制 **保真度-合理性权衡** 的关键超参数：$t_0$ 过低（如 0.6）时，去噪轨迹靠近 Inflated Prior，凸形几何保留过多；$t_0$ 过高（如接近 1.0）时，去噪轨迹接近纯高斯噪声起点，体积先验被破坏。实验表明 $t_0 \in [0.7, 0.8]$ 为最优区间（Figure 7、Table 3），默认取 $t_0 = 0.8$。
-
-![[assets/figures/papers/paper_list_l2583_https_arxiv_org_abs_2604_27504/figures/009_Figure_7.jpg]]
-*Figure 7: Refinement trajectories for different initial noise levels*
-
-
 
 ## 实验与关键发现
 
@@ -253,27 +232,14 @@ $$\operatorname{NA}(\mathcal{M}) = 1 - \frac{-\sum_{k=1}^{K} p_k \log(p_k + \eps
 
 **轮廓与分割依赖**：方法依赖前景轮廓和部件分割掩码的准确性。在轮廓模糊或分割不完整的挑战性案例中（Figure 10底部），Inflated Prior质量下降，进而影响最终网格质量。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2583_https_arxiv_org_abs_2604_27504/figures/008_Figure_6.jpg]]
-*Figure 6: User study ratings on a 5-point Likert scale for Quality, Volume, and Details*
-
-![[assets/figures/papers/paper_list_l2583_https_arxiv_org_abs_2604_27504/figures/010_Figure_8.jpg]]
-*Figure 8: Each row shows a different example. Within each example, the top row displays the refined result using only the Base 3D, which struggles to generate a voluminous and detailed mesh. The bottom row shows the result using the complete Inflated Prior with the Detail 3D, which successfully generates a 3D mesh with voluminous global shape and rich local details*
-
 ![[assets/figures/papers/paper_list_l2583_https_arxiv_org_abs_2604_27504/figures/013_Table_3.jpg]]
 *Table 3: Ablation over inflation strength (shared for global and local) and initial noise levels. Default setting is highlighted in red*
 
 ![[assets/figures/papers/paper_list_l2583_https_arxiv_org_abs_2604_27504/figures/005_Figure_5.jpg]]
 *Figure 5: Visual comparison of our method against baseline methods, using the Hunyuan3D-2.1 [45] as the backbone*
 
-![[assets/figures/papers/paper_list_l2583_https_arxiv_org_abs_2604_27504/figures/002_Figure_2.jpg]]
-*Figure 2: Previous methods fail to generate accurate global structures or details on flat images due to a lack of 3D cues, especially in depth estimation [57], surface normal estimation [1], 3D reconstruction [45], and novel view synthesis (NVS) [24]. In contrast, our method successfully recovers detailed 3D geometry*
-
 ![[assets/figures/papers/paper_list_l2583_https_arxiv_org_abs_2604_27504/figures/012_Figure_10.jpg]]
 *Figure 10: Qualitative results showing non-flat cases (top) and challenging cases with ambiguous silhouettes and imperfect segmentation (bottom; white: silhouette mask, yellow: segmentation mask)*
-
-
 
 ## 定位与知识库关联
 
@@ -329,8 +295,6 @@ REVIVE 3D 在知识库中的定位可概括为：
 > **一种即插即用的3D体积增强管线**，通过“显式几何膨胀先验 + 潜在空间随机精细化”两阶段流程，使预训练3D生成模型在缺乏3D线索的平面图像上仍能输出体积化、细节丰富的网格。其核心贡献在于：（1）提出膨胀先验作为2D到3D的结构桥梁；（2）系统性地探索了潜在空间噪声注入水平对几何精细化的调控机制；（3）引入 Compactness 和 Normal Anisotropy 作为体积感和表面平坦度的可计算度量。
 
 该方法在“2D图像→3D网格”任务中开辟了“先验注入”而非“端到端重训”的技术路径，对后续研究具有方法论参考价值。
-
-
 
 ## 原文 PDF
 

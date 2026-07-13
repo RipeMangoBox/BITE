@@ -116,8 +116,6 @@ I’m-HOI 采用 **两阶段解耦范式**，将单目 RGB 视频与物体端单
 
 **输出**：最终输出为时序连续的人体 SMPL 参数序列与物体 6-DoF 位姿序列，可直接驱动三维角色与物体模型，生成生动的交互动画。整个流水线每帧推理仅需约 0.5 秒，相比 VisTracker（约 20 秒/帧）和 CHORE（约 1 分钟/帧）具有显著的速度优势。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1721_I_M_HOI_Inertia_aware_Monocular_Capture_of_3D_Human_Object_Interactions/figures/002_Figure_2.jpg]]
 *Figure 2: The pipeline of I’m-HOI. Assuming video and inertial measurements input, our approach consists of a general interaction motion inference module (Sec. 3.1) and a category-specific interaction diffusion filter (Sec. 3.2) to capture challenging interaction motions*
 
@@ -190,8 +188,6 @@ $$
 $$
 
 通过上述两阶段设计，I’m-HOI 在遮挡与快速运动场景下实现了鲁棒的人体-物体联合跟踪，并通过扩散模型在交互流形上补全了手部细节动作。消融实验表明，完整的流水线（网格对齐反馈 + 优化 + 扩散滤波）相比朴素实现性能提升约4倍（Section 5.3）。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l1721_I_M_HOI_Inertia_aware_Monocular_Capture_of_3D_Human_Object_Interactions/figures/009_Table_3.jpg]]
 *Table 3: Quantitative evaluation of network architecture design*

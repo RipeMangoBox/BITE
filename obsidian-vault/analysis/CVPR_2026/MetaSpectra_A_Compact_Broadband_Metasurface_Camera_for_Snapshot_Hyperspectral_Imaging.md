@@ -217,17 +217,6 @@ $$\alpha_i(\lambda) = \eta(\lambda) E_i(\lambda) / E(\lambda)$$
 捕获的子图像通过标准图像复原网络进行高光谱重建。文中使用了两种后处理架构：DWDN 和 DDPM。DDPM 的重建过程中引入了偏置项 $b^{k,t}$ 并采用衰减学习率调度，消融实验表明这两项改进均提升了重建质量。对于 HDR 高光谱模式，采用 Debevec 和 Malik 经典方法对多曝光子图像进行融合；偏振模式则通过正交偏振通道计算线偏振度：
 $$\text{DoLP}_{HV} = |I_3 - I_4| / |I_3 + I_4|$$
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2086_https_arxiv_org_abs_2603_09116/figures/002_Figure_2.jpg]]
-*Figure 2: MetaSpectra+ optical design. The optical assembly simultaneously captures multiple sub-images*
-
-![[assets/figures/papers/paper_list_l2086_https_arxiv_org_abs_2603_09116/figures/009_Figure_6.jpg]]
-*Figure 6: Schematics of the beamsplitting metasurface*
-
-![[assets/figures/papers/paper_list_l2086_https_arxiv_org_abs_2603_09116/figures/011_Figure_8.jpg]]
-*Figure 8: CAD model of the assembly. Numbers correspond to the items in the list of parts in Tab. 3*
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -278,13 +267,8 @@ Table 1 给出了与近期快照高光谱成像系统的系统级对比。MetaSp
 
 所有对比方法的评估均在 KAUST 数据集上进行，该数据集未用于任何方法的训练。对于光谱覆盖或分辨率无法对齐至 450–700 nm 的方法，结果在其原始光谱网格上生成（Table 1 备注）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2086_https_arxiv_org_abs_2603_09116/figures/007_Table_2.jpg]]
 *Table 2: Hyperparameters of DDPM*
-
-![[assets/figures/papers/paper_list_l2086_https_arxiv_org_abs_2603_09116/figures/010_Table_3.jpg]]
-*Table 3: List of parts*
 
 ## 定位与知识库关联
 

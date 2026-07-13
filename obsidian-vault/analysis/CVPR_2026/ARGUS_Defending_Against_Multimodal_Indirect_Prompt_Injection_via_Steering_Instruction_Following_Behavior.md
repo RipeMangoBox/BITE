@@ -172,8 +172,6 @@ $$\alpha_{o} = \max\left(0, \frac{w_{l}^{u} \cdot a_{l} + b_{l}^{u} + \tau}{\|w_
 
 > **注意**：线性探针公式 $P_{l}(a_{l}) = \sigma(w_{l} \cdot a_{l} + b_{l})$ 是逻辑回归的标准形式，用于对激活向量进行二分类，判断其属于“遵循用户指令”还是“遵循注入指令”。该公式在方法探索阶段（Section 4.2）用于验证线性可分性，并在 ARGUS 的检测与后过滤阶段作为基础组件复用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2060_https_arxiv_org_abs_2512_05745/figures/002_Figure_2.jpg]]
 *Figure 2: The validation results of inference-time intervention. “No Steering” refers to the original performance without any steering applied. The “Performance Upper Bound” refers to the model’s performance when the input consists of a single instruction. For the AIA metric, it reflects the model’s performance when the user instructions are removed, while for the UIA metric, it measures the model’s performance when the input does not contain an injection*
 
@@ -228,8 +226,6 @@ Table 1 的消融部分揭示了 ARGUS 三个核心设计的独立贡献：
 3. **后过滤的副作用**：在极端安全情形下，后过滤会将引导后仍被判定为“遵循注入指令”的输出替换为拒绝回答，可能导致拒绝服务，影响用户体验。这本质上是安全-可用性的权衡，需要根据部署场景调整后过滤的触发阈值。
 
 4. **多指令竞争场景**：当前实验假设单一用户指令与单一注入指令的竞争，更复杂的多源、多指令场景下的行为尚不明确，需要进一步研究。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2060_https_arxiv_org_abs_2512_05745/figures/005_Table_2.jpg]]
 *Table 2: The hyperparameters setup of ARGUS*

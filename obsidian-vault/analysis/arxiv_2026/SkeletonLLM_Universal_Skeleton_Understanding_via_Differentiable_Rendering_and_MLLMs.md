@@ -52,8 +52,6 @@ claims:
 
 **方法定位**：SkeletonLLM 区别于传统的特征-文本对齐路线（如PURLS, Zhu et al., CVPR 2024；TDSM；SCoPLe, Zhu et al., CVPR 2025）和基于离散词元的LLM方案（如MotionGPT, Jiang et al., NeurIPS 2023；MotionLLM, Chen et al., TPAMI 2025），首次将骨架理解重构为“渲染-推理-响应”的视觉理解问题，使MLLM的预训练视觉能力得以直接复用。
 
-
-
 ### 骨架理解的核心瓶颈：格式孤岛与模态鸿沟
 
 多模态大语言模型（MLLM）在视觉推理、开放词汇识别等任务上展现出强大能力，但其原生输入模态为图像与文本，无法直接处理结构化的三维骨架序列数据。这一**模态鸿沟**构成了骨架理解领域长期悬而未决的根本性障碍。
@@ -82,8 +80,6 @@ claims:
 3. **端到端可优化**：若渲染过程可微，则MLLM的梯度可反向传播至渲染器，引导其学习出对下游任务最具区分力的视觉表征，而非依赖人工设计的固定渲染策略。
 
 正是基于这一动机，本文提出了 **SkeletonLLM** 框架，其核心组件 **DrAction**（Differentiable Rendering of Actions）——一个基于3D高斯泼溅与线性混合蒙皮的可微、格式无关的骨架渲染器——将骨架序列转化为运动感知的图像序列，使MLLM能够以原生视觉模态理解和推理人类动作。
-
-
 
 ## 核心方法与创新机理
 
@@ -117,8 +113,6 @@ SkeletonLLM 引入四阶段渐进式训练策略，解决可微渲染器与 MLLM
 4. **Recognition Refinement**：在 MQA 任务上最终精调识别能力。
 
 这一协同训练策略使模型同时具备**细粒度区分能力**（Disc-FT）和**结构化推理能力**（CR-Distill），在极端少样本场景下优势尤为显著——NTU-60 30/30 划分上，SkeletonLLM 以 37.84% Top-1 准确率超越最佳基线 TDSM 的 25.88%（+11.96%）。
-
-
 
 SkeletonLLM 遵循 **Render–Reason–Respond** 三阶段流水线（Figure 2），其核心设计原则是将任意骨架序列“翻译”为多模态大语言模型（MLLM）原生可消费的视觉模态——紧凑的图像序列，从而打破骨架格式孤岛与模态鸿沟。
 
@@ -156,13 +150,6 @@ SkeletonLLM 遵循 **Render–Reason–Respond** 三阶段流水线（Figure 2�
 4. **Recognition Refinement**：在 MQA 任务上对全模型进行最终微调，巩固识别性能。
 
 消融实验表明，移除 CR-Distill 导致 NTU-60 30/30 划分准确率下降 1.94 个百分点（Table 8），跳过 Disc-FT 则下降 1.55 个百分点，验证了各阶段的独立贡献。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1841_SkeletonLLM_Universal_Skeleton_Understanding_via_Differentiable_Renderin/figures/005_Table_4.jpg]]
-*Table 4: Single-model multi-task evaluation. All results use the same NTU-60 (55/5) checkpoint with no task-specific retraining*
-
-
 
 ### 问题形式化与Render-Reason-Respond流水线
 
@@ -216,16 +203,11 @@ NFM基于局部运动学自适应调节每个高斯原语的色彩与不透明�
 
 整个架构——从骨架输入经渲染、视觉编码到语言生成——完全可微。设 $\Theta_{\mathrm{render}}$ 为DrAction渲染器参数，$\Theta_{\mathrm{proj}}$ 为投影层参数，MLLM的任务特定梯度可反向传播至渲染过程，端到端地学习出对下游任务最具区分力的视觉表征（Section 3.3）。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果：开词汇动作识别
 
 SkeletonLLM 在 NTU-60 和 NTU-120 两个基准上，对所有开词汇（open-vocabulary）划分均取得最优结果，且优势随数据稀缺程度放大而显著增强。Table 1 汇总了各方法的 Top-1 准确率。
-
-![[assets/figures/papers/paper_list_l1841_SkeletonLLM_Universal_Skeleton_Understanding_via_Differentiable_Renderin/figures/003_Table_1.jpg]]
-*Table 1: Top-1 accuracy (%) of various methods on NTU-60 and NTU-120. Each split is denoted as X/Y, where X is the number of seen classes and Y is the number of unseen classes. The best results are in red, and the second-best are blue. †Results for Qwen2.5-VL-7B and InternVL3-8B were obtained by rendering skeletons with the non-learnable 3D+Velocity renderer (same as in Table 7; 448×448) and finetuning on MQA for 6 epochs*
 
 在 NTU-60 的 55/5 划分（55 类可见，5 类不可见）上，SkeletonLLM 达到 **87.37%**，超越此前最优的特征-文本对齐方法 **TDSM**（Do & Kim, ICCV 2025）的 85.41%（+1.96%）。在 48/12 划分上，SkeletonLLM 达到 **64.72%**，领先第二名 TDSM 的 61.54%（+3.18%）。当数据稀缺度进一步加剧至 **30/30 极端少样本划分**时，SkeletonLLM 取得 **37.84%**，相较 TDSM 的 25.88% 提升 **+11.96%**——这一接近 12 个百分点的绝对增益，是整张表中最大的单项提升，直接验证了可微渲染与因果推理蒸馏在数据匮乏场景下的核心价值。
 
@@ -236,9 +218,6 @@ SkeletonLLM 在 NTU-60 和 NTU-120 两个基准上，对所有开词汇（open-v
 ### 跨格式泛化与多任务能力
 
 SkeletonLLM 的核心设计目标之一是格式无关性。Table 2 展示了跨格式传输动作识别的结果：模型在源数据集上训练后，不经任何微调直接在目标数据集上评估。
-
-![[assets/figures/papers/paper_list_l1841_SkeletonLLM_Universal_Skeleton_Understanding_via_Differentiable_Renderin/figures/006_Table_2.jpg]]
-*Table 2: Cross-format transfer accuracy (%) for action recognition. Models are trained on the source dataset and evaluated directly on the target without finetuning*
 
 在 **NTU-60（Kinect v2, 25 关节）→ NW-UCLA（Kinect v1, 20 关节）** 的跨格式传输中，SkeletonLLM 达到 **27.33%**，而此前最佳的跨格式方法 **SKI-LVLM** 仅取得 10.14%——绝对提升 **+17.19%**。在 **HumanML3D（MoCap, 22 关节）→ NW-UCLA** 的传输中，SkeletonLLM 更是达到 **38.13%**（+27.99% vs. SKI-LVLM）。这两个结果强有力地证明：DrAction 的可微渲染成功将异构骨架拓扑“翻译”为统一的视觉语言，使 MLLM 的预训练视觉理解能力得以跨格式复用，而无需为每种骨架格式定制编码器。
 
@@ -254,9 +233,6 @@ Table 7 系统对比了不同渲染方法对性能的影响。在 NTU-60 48/12 �
 *Table 7: Ablation on rendering methods on NTU-60 & NTU-120. Our differentiable DrAction outperforms non-learnable renderers*
 
 Figure 4 和 Figure 6 提供了定性对比：固定渲染器产生的图像或过于通用（3D+Velocity 的彩色骨架棒图）、或信息稀疏（2D 投影）、或感知复杂度高（JTM 的关节轨迹图）。DrAction 学习到的抽象表征更具区分力，而 NFM 则动态突出运动关键区域（如踢腿动作中高亮踢出腿），为 MLLM 提供了信息密度更高的视觉语言。
-
-![[assets/figures/papers/paper_list_l1841_SkeletonLLM_Universal_Skeleton_Understanding_via_Differentiable_Renderin/figures/011_Figure_4.jpg]]
-*Figure 4: Qualitative comparison of rendering methods. Fixed renderers (3D+Velocity, 2D, JTM (Wang et al., 2016b)) produce visualizations that are either generic, information-poor, or perceptually complex. DrAction learns an abstract representation. With the NFM, it dynamically highlights kinematically salient regions (e.g., the kicking leg), producing a more informative visual language for the MLLM. A Video Gallery in the Supplementary Material showcases DrAction-rendered videos*
 
 ### 消融实验：渐进式训练策略
 
@@ -289,12 +265,6 @@ Table 10 对 NFM 内部组件和时序建模策略进行了精细消融。完整
 - **CR-Distill 变体**（Table 11）：向教师模型（GPT-4o）提供真实标签并蒸馏包含标签的完整推理链，性能最优。仅蒸馏推理过程而不包含标签，效果次之。
 - **跨数据集联合训练**（Table 5）：在 NTU-60（25 关节）和 HumanML3D（22 关节）上共享 DrAction 和 MLLM 联合训练，SkeletonLLM 在两个数据集上均取得增益，验证了统一渲染框架对异构数据源的兼容性。
 
-![[assets/figures/papers/paper_list_l1841_SkeletonLLM_Universal_Skeleton_Understanding_via_Differentiable_Renderin/figures/017_Figure_7.jpg]]
-*Figure 7: Impact of rendered frame count. Accuracy on NTU-60 increases sharply from 4 to 10 frames and saturates at 12 frames (59.02%). Increasing to 16 frames yields minimal gains (59.45%), making 12 frames the optimal trade-off*
-
-![[assets/figures/papers/paper_list_l1841_SkeletonLLM_Universal_Skeleton_Understanding_via_Differentiable_Renderin/figures/007_Table_5.jpg]]
-*Table 5: Cross-dataset joint training. NTU-60 (25J) + HumanML3D (22J) with shared DrAction and MLLM*
-
 ### 失败模式与局限性
 
 尽管 SkeletonLLM 在各项基准上表现优异，分析揭示了以下局限：
@@ -306,8 +276,6 @@ Table 10 对 NFM 内部组件和时序建模策略进行了精细消融。完整
 3. **极端噪声与未知拓扑的鲁棒性**：尽管 DrAction 对已知格式具备强泛化性，但对极端噪声、大量缺失关节或完全未知拓扑的情况，鲁棒性尚待系统验证。此外，训练仍依赖一定量的标签或教师生成数据，在完全无监督场景下的表现尚未评估。
 
 4. **外部闭源 MLLM 的零样本局限性**（Table 6）：将 DrAction 渲染结果直接输入外部闭源 MLLM（如 GPT-4V）进行零样本识别，性能远低于联合训练。这表明端到端梯度回传对学习任务最优视觉表征至关重要，单纯的“渲染-输入”管线无法替代联合优化。
-
-
 
 ## 定位与知识库关联
 
@@ -367,8 +335,6 @@ SkeletonLLM 在方法谱系中占据一个独特位置——它既不同于传�
 4. **长程时序建模**：如何有效建模包含多个子动作与长程时间依赖的复杂行为序列？是否需要引入层次化时间抽象或记忆模块？当前12帧的渲染策略对分钟级序列显然不足。
 
 5. **完全无监督/弱监督学习**：当前框架在CR-Distill阶段依赖GPT-4o教师模型生成推理链，在Disc-FT阶段需要标签信息挖掘易混淆动作对。能否通过自监督或弱监督方式进一步减少对人工标注和强教师模型的依赖，是走向真正通用骨架理解的关键一步。
-
-
 
 ## 原文 PDF
 

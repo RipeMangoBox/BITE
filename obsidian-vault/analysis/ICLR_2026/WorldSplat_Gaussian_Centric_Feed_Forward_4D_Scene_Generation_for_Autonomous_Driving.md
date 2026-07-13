@@ -82,8 +82,6 @@ WorldSplat 在方法谱系中位于**视频生成、3D重建与前馈高斯预�
 
 尽管整体性能优异，WorldSplat 仍存在以下局限：（1）对于严重未观测区域和大视角偏移，增强扩散模型虽能部分修复，渲染质量仍可能下降；（2）当前框架依赖布局、3D框等结构化条件，尚未探索纯文本驱动的4D场景生成；（3）当自车轨迹进入完全未访问区域（如建筑内部）时，模型的泛化能力有待验证。
 
-
-
 自动驾驶世界模型的终极目标是生成时空一致、多视角可控的驾驶场景视频，以支持感知模型的训练与闭环仿真。然而，现有方法在该目标上陷入一种结构性两难：**生成方法**具有想象力和灵活性，却缺乏三维几何一致性；**重建方法**天然保持几何一致，却只能复现已观测场景，无法生成未见过的驾驶情境。
 
 具体而言，以 **MagicDrive**（Gao et al., 2023）和 **Panacea**（Wen et al., 2024）为代表的视频生成模型，将场景隐式编码为 2D 潜在变量，通过扩散模型生成多帧视频。这类方法能够根据布局、文本等条件“想象”出多样化的驾驶画面，但由于缺乏显式的三维场景表示，生成结果在不同视角之间缺乏几何一致性，新视角合成能力极为有限——当自车轨迹发生横向偏移时，渲染质量急剧下降。
@@ -93,8 +91,6 @@ WorldSplat 在方法谱系中位于**视频生成、3D重建与前馈高斯预�
 这种**生成灵活性与三维一致性之间的根本矛盾**，构成了当前驾驶世界模型的核心瓶颈：视频生成模型能“想象”但不懂几何，重建方法懂几何但不会“想象”。现有工作试图通过“先生成视频、再重建场景”的两阶段流程弥合这一鸿沟，但这种串行方案不仅效率低下，且两阶段之间的误差累积难以避免，无法实现端到端的联合优化。
 
 **WorldSplat** 的动机正是打破这一两难困境。其核心洞察是：如果在生成过程中引入**显式的 4D 高斯场景表示**作为中间桥梁，就有可能让扩散模型在保持生成灵活性的同时，获得三维几何的硬约束。具体而言，该方法让扩散模型直接生成包含 RGB、深度和动态分割信息的**多模态潜在变量**，再通过一个前馈 Transformer 解码器将其转化为像素对齐的 3D 高斯，并聚合成统一的 4D 时空场景表示。这一设计使生成过程天然具备三维一致性，同时保留了扩散模型的想象能力，从而在单一框架内同时实现“生成”与“几何一致”这两个曾被视为此消彼长的目标。
-
-
 
 ## 核心方法与创新机理
 
@@ -140,8 +136,6 @@ $$z(s_{k-1}) = z(s_k) - \frac{1}{N} g_{\psi}(z(s_k), s_k, \mathcal{C})$$
 
 高斯渲染的新视角视频可能存在未观察区域的缺失内容和高速运动下的模糊帧。WorldSplat 引入**增强扩散模型**（Enhanced Diffusion Model）对渲染视频进行修复和细节增强（Figure 3 展示了该模块对缺失区域的修复和快速运动帧的锐化效果）。消融实验中的“Mixed Aug”策略通过混合不同质量的渲染结果训练增强模型，进一步提升了其鲁棒性。
 
-
-
 WorldSplat 构建了一个端到端的生成式 4D 驾驶场景框架，其核心瓶颈在于打破现有方法中“生成灵活性”与“3D 时空一致性”之间的对立——视频生成模型缺乏新视角可控性，而重建方法则无法想象未曾捕获的场景。该框架通过引入**显式 4D 高斯场景表示**作为中间桥梁，使扩散模型生成包含 RGB、深度和动态分割信息的**多模态隐变量**，再经由前馈解码器直接预测像素对齐的 3D 高斯并聚合成 4D 场景，从而同时实现生成多样性与空间/时间一致性。
 
 ### 整体流程
@@ -173,15 +167,8 @@ $$\mathcal{L} = \mathcal{L}_{\text{recon}} + \lambda_{1} \mathcal{L}_{\text{lpip
 
 整体框架实现了从条件输入到高质量多轨迹新视角驾驶视频的端到端生成，无需首帧 RGB 引导即可完成场景想象与时空一致渲染。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_KWeX6tYno6/figures/002_Figure_2.jpg]]
 *Figure 2: The overview of our framework. (1) Employing a 4D-aware diffusion model to generate a multi-modal latent containing RGB, depth, and dynamic information. (2) Predicting pixel-aligned 3D Gaussians from the denoised latent using our feed-forward latent decoder. (3) Aggregating the 3D Gaussians with dynamic-static decomposition to form 4D Gaussians and rendering novel-view videos. (4) Improving the spatial resolution and temporal consistency of the rendered videos with an enhanced diffusion model. "E" and "D" denote the VAE encoder and decoder, respectively. The ↑ arrow and the ↑ ones denote the train-only and inference*
-
-![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_KWeX6tYno6/figures/001_Figure_1.jpg]]
-*Figure 1: Comparison of different driving world models. Previous driving world models (Jiang et al., 2024; Gao et al., 2023) focus on video generation, while our method directly creates controllable 4D Gaussians in a feed-forward manner, enabling the production of novel-view videos (e.g. shifting ego trajectory ±N m) with spatiotemporal consistency*
-
-
 
 WorldSplat 框架由三个关键模块串联构成：**4D 感知潜在扩散模型**、**潜在 4D 高斯解码器**和**增强扩散模型**（Figure 2）。前两个模块完成从条件信号到显式 4D 场景表示的生成，第三个模块对渲染视频进行质量后处理。
 
@@ -230,18 +217,8 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{recon}} + \lambda_{1} \mathcal{L}_{\mathrm{
 
 高斯渲染的新视角视频可能存在未观察区域的缺失内容和快速运动导致的模糊（Figure 3）。增强扩散模型以原始条件 $\mathcal{C}$ 和渲染视频为输入，对渲染结果进行修复和细节增强。消融实验（Table 3）中 **Mixed Aug** 策略通过混合不同质量的渲染样本训练该模型，提升了其鲁棒性。
 
-![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_KWeX6tYno6/figures/003_Figure_3.jpg]]
-*Figure 3: Effectiveness of the enhanced diffusion model. During novel-view video synthesis, rendering quality may degrade due to unobserved regions or high ego-vehicle speed, resulting in missing content and artifacts. Our enhanced diffusion model can inpaint unobserved areas and sharpen fast-motion frames*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_KWeX6tYno6/figures/010_Figure_6.jpg]]
-*Figure 6: The architecture details of our diffusion transformer*
-
 ![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_KWeX6tYno6/figures/014_Figure_7.jpg]]
 *Figure 7: Visualizations of our Gaussians representation*
-
-
 
 ## 实验与关键发现
 
@@ -269,9 +246,6 @@ Table 2 报告了在不同视角偏移下的新视角合成性能。在 ±2m 偏
 ![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_KWeX6tYno6/figures/012_Table_6.jpg]]
 *Table 6: Geometric consistency and multi-view coherence evaluation. We follow OmniScene’s protocol for novel-view synthesis evaluation*
 
-![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_KWeX6tYno6/figures/008_Figure_5.jpg]]
-*Figure 5: Qualitative comparison of our novel view synthesis against the state-of-the-art urban reconstruction method (Chen et al., 2024c). We translate the ego-vehicle by ±2 m to generate the novel viewpoints. Red boxes indicate where our method achieves the greatest improvements*
-
 ### 消融实验
 
 Table 3 系统消融了各组件的贡献，揭示了清晰的因果链条：
@@ -287,21 +261,13 @@ Table 3 系统消融了各组件的贡献，揭示了清晰的因果链条：
 
 Table 4 展示了生成数据在下游感知任务中的有效性。(a) 使用预训练 BEVFormer 评估生成数据的域差距，结果表明生成数据与真实数据的分布高度一致；(b) 将生成数据加入 StreamPETR 训练后，感知性能获得稳定提升，验证了 WorldSplat 生成的数据可作为有效的训练增强资源。
 
-![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_KWeX6tYno6/figures/009_Table_4.jpg]]
-*Table 4: The applications of our method on the downstream tasks*
-
 ### 推理效率
 
 Table 7 对比了不同方法的推理效率。WorldSplat 在单张 GPU 上完成新场景生成，显存占用和推理时间均优于 **MagicDrive-V2**（Gao et al., 2025）和 **Cosmos-transfer1**（Alhaija et al., 2025）等方案，体现了前馈式架构的效率优势。
 
-![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_KWeX6tYno6/figures/013_Table_7.jpg]]
-*Table 7: Efficiency comparison on novel scene generation. We report runtime breakdown and GPU memory usage for different methods*
-
 ### 失败模式与局限性
 
 尽管增强扩散模型能修复部分渲染伪影，对于**严重未观察区域**和**大视角偏移**（如 ±4m），渲染质量仍可能下降。Figure 3 展示了增强扩散模型在填补缺失内容和锐化快速运动帧方面的效果，但当自车轨迹进入完全未访问区域时，模型缺乏足够的先验信息进行合理补全。此外，当前框架依赖布局和 3D 框等条件输入，尚未支持纯文本驱动的 4D 场景生成。
-
-
 
 ## 定位与知识库关联
 
@@ -358,8 +324,6 @@ WorldSplat 向知识库贡献了以下可复用的设计模式：
 4. **闭环仿真中的物理合理性**：生成的4D高斯表示是否能直接用于物理引擎中的碰撞检测和动力学仿真？动静分离的精度是否满足安全关键应用的需求？
 
 **注意**：以上开放问题基于论文自身讨论的局限性和方法设计边界推导，部分结论（如跨域泛化性）需通过后续实验进行验证。
-
-
 
 ## 原文 PDF
 

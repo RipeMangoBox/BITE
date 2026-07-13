@@ -52,8 +52,6 @@ claims:
 
 **方法定位**：MotionCache属于推理时缓存加速方法，在缓存粒度（chunk/timestep → token）、运动代理（无 → 帧间差）、误差累积策略（全局阈值 → 运动加权累积）和推理调度（全程统一 → 粗到细双阶段）四个维度上系统性地推进了现有方案。其理论框架将缓存可靠性归约为残差时间不稳定性，并用帧间差作为可计算的代理，为运动感知缓存提供了形式化基础。
 
-
-
 ### 自回归视频生成的效率瓶颈
 
 自回归视频生成模型通过逐块（chunk-wise）自回归生成长视频序列，每个chunk包含若干帧，模型在去噪过程中需要为每个时间步计算速度场。这种逐块生成范式虽然保证了时序一致性，但带来了极高的计算开销——每个chunk的生成都需要完整的反向去噪过程，导致推理延迟随视频长度线性增长。
@@ -91,8 +89,6 @@ $$\| \mathcal{R}_{t-1}(\mathbf{X}_{t-1}^{(i,f)}) - \mathcal{R}_{t}(\mathbf{X}_{t
 1. **运动感知**：利用帧间差异作为轻量运动代理，为每个token分配差异化的运动重要性权重；
 2. **加权误差累积**：将运动权重融入误差累积过程，使动态token获得更高的更新频率，静态token获得更高的缓存复用率；
 3. **粗到细调度**：前期采用chunk级全更新建立全局语义结构，后期切换到token级稀疏计算以捕捉精细运动动态（图6）。
-
-
 
 ## 核心方法与创新机理
 
@@ -133,8 +129,6 @@ TeaCache 和 FlowCache 采用全局相对 L1 距离阈值进行统一决策，�
 
 四个 changed slots 形成因果闭环：**帧间差异代理**提供轻量运动信号 → **token 级粒度**使决策精细化 → **加权累积策略**将运动信号转化为自适应更新频率 → **双阶段调度**确保前期结构可靠、后期运动感知有效。这一设计使得 MotionCache 在 SkyReels-V2 上以 6.28× 加速仅损失 1% VBench（slow 模式），在 MAGI-1 上以 1.64× 加速仅损失 0.01% VBench，显著优于粗粒度基线。
 
-
-
 MotionCache 的整体推理流程遵循“粗到细”的双阶段调度范式，核心目标是在自回归视频扩散模型的去噪过程中，以 token 级粒度动态决定哪些 token 需要重新计算、哪些可以直接复用缓存的残差，从而在保持生成质量的前提下最大化计算效率。
 
 **输入与输出**：系统接收文本条件 $c$ 和初始噪声，逐 chunk 生成视频帧。每个自回归 chunk 内部包含 $F$ 帧，经历 $T$ 个去噪时间步。对于当前 chunk $i$ 在时间步 $t$ 的隐变量 $\mathbf{X}_t^{(i)}$，模型需要计算速度场 $v_\theta$ 以推进去噪过程。
@@ -153,12 +147,8 @@ MotionCache 的整体推理流程遵循“粗到细”的双阶段调度范式�
 
 **与传统方案的对比**：与 TeaCache（timestep 级统一跳过）和 FlowCache（chunk 级统一跳过）不同，MotionCache 的缓存决策下沉到单个 token 层面（Figure 4）。粗粒度方法在同一 chunk 内对所有 token 执行“全算或全跳”的二元决策，忽略了帧间运动差异导致的不均匀冗余分布（Figure 2），而 MotionCache 的 token 级自适应选择能够精准匹配动态区域的更新需求，同时大幅减少静态背景的冗余计算。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l58_https_arxiv_org_abs_2605_01725v1/figures/004_Figure_4.jpg]]
 *Figure 4: Comparison of caching strategies in autoregressive video generation. The top panel illustrates traditional reuse strategies (e.g., TeaCache and FlowCache), which apply coarse-grained caching policies by treating an entire timestep or chunk as an atomic unit for skipping. This approach overlooks fine-grained intra-chunk redundancy, forcing a binary decision between full computation or full reuse. In contrast, our MotionCache (bottom panel) employs a fine-grained Motion-Aware caching policy, dynamically deciding for each individual token whether to reuse cached residuals or perform recomputation based on motion dynamics. The bottom right panel details the Inner Chunk Tokenwise Calculation mec...*
-
-
 
 ### 问题形式化与缓存误差分析
 
@@ -222,18 +212,8 @@ MotionCache 采用两阶段推理调度（Figure 6, Section 5.3）：
 
 Figure 6 可视化了去噪过程中重要性权重图 $\mathcal{W}$ 的演化：早期权重分布弥散且无结构，随着推理推进逐渐锐化，准确捕捉运动动态，验证了粗到细调度的必要性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l58_https_arxiv_org_abs_2605_01725v1/figures/002_Figure_2.jpg]]
-*Figure 2: (a) Heterogeneous Temporal Redundancy: The distribution of residual differences between adjacent timesteps exhibits a long-tailed pattern. While the majority of tokens cluster around low values, a significant tail extends to high values, indicating highly non-uniform update requirements across tokens. (b) Intra-Chunk Frame Discrepancy: The distribution of residual changes across distinct frames within the same chunk reveals significant variation. This wide dynamic range confirms that frames within a single autoregressive chunk possess distinct motion characteristics, rendering coarse-grained cache suboptimal*
-
-![[assets/figures/papers/paper_list_l58_https_arxiv_org_abs_2605_01725v1/figures/003_Figure_3.jpg]]
-*Figure 3: Validation of Motion Proxy. NDCG [15, 35] scores comparing frame difference-based token importance rankings to rankings derived from adjacent timestep residual differences. The scores remain consistently above 0.94, demonstrating strong similarity in token importance ordering throughout the diffusion process*
-
 ![[assets/figures/papers/paper_list_l58_https_arxiv_org_abs_2605_01725v1/figures/005_Figure_5.jpg]]
 *Figure 5: Visualization of the ground-truth video frames versus the computed importance maps. The label f indicates the frame index within the video sequence*
-
-
 
 ## 实验与关键发现
 
@@ -310,22 +290,6 @@ K控制第一阶段chunk级全更新的持续步数，用于建立全局语义�
 - **Figure 5**：重要性地图与真实视频帧的对比可视化显示，动态区域（如人物动作、物体移动）精确对应高权重区域，静态背景对应低权重区域，直观印证了运动感知机制的准确性。
 - **Figure 6**：去噪过程中权重图的演化揭示了粗到细调度的内在逻辑——早期权重分布弥散、轮廓模糊（全局结构未建立），后期权重图锐化并精确捕捉运动动态，为K=6的设定提供了视觉支撑。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l58_https_arxiv_org_abs_2605_01725v1/figures/007_Table_2.jpg]]
-*Table 2: Ablation study on the soft-mapping floor parameter α*
-
-![[assets/figures/papers/paper_list_l58_https_arxiv_org_abs_2605_01725v1/figures/008_Table_3.jpg]]
-*Table 3: Ablation study on the duration of Phase 1 (K)*
-
-![[assets/figures/papers/paper_list_l58_https_arxiv_org_abs_2605_01725v1/figures/001_Figure_1.jpg]]
-*Figure 1: MotionCache accelerates video generation while maintaining high visual fidelity. On SkyReels-V2 and MAGI-1, our method achieves 6.28× and 1.64× speedups with superior PSNR. In contrast, TeaCache fails to maintain texture details and FlowCache suffers from structural inconsistency, while MotionCache preserves both structural integrity and temporal coherence comparable to the Vanilla baseline*
-
-![[assets/figures/papers/paper_list_l58_https_arxiv_org_abs_2605_01725v1/figures/012_Figure_7.jpg]]
-*Figure 7: Qualitative results of text-to-video generation on SkyReels-V2. We present TeaCache, FlowCache, Motion-Cache, and the Vanilla model. The frames are randomly sampled from the generated video*
-
-
-
 ## 定位与知识库关联
 
 ### 问题定位：自回归视频生成中的缓存粒度困境
@@ -387,8 +351,6 @@ MotionCache属于**扩散模型推理加速**与**视频生成效率优化**的�
 - **理论驱动的系统设计**：从残差稳定性分析出发推导运动代理，而非纯经验性设计
 
 该方法为自回归视频生成的实用化部署提供了关键加速能力（SkyReels-V2上6.28×加速仅损失1% VBench），同时为后续研究开辟了运动感知缓存的理论框架和工程基线。
-
-
 
 ## 原文 PDF
 

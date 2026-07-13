@@ -49,8 +49,6 @@ claims:
 
 在定量评估中，SceneMaker 的去遮挡模型在10K图像数据集上微调后，PSNR 达到 15.03，优于 Flux Kontext 的 13.91 和 BrushNet 的 11.07；在严重遮挡下的3D物体生成任务中，其 CD、F-Score 和 Volume IoU 均超越 MIDI 与 Amodal3R；统一的姿态估计模型在室内和开放集测试集上取得 SOTA 性能，CD-S 低至 0.0285。消融实验进一步验证了全局/局部注意力机制以及200K合成场景数据对泛化能力的关键贡献。
 
-
-
 3D场景生成旨在从单张RGB图像或文本描述中重建出包含多个物体的完整三维场景，是计算机视觉与图形学长期追求的目标，并在具身智能、虚拟现实和内容创作等领域具有广泛的应用前景。然而，真实世界的场景往往伴随着严重的物体间遮挡，且物体类别可能超出训练集的封闭词表，使得开放集（open-set）场景生成成为一个极具挑战性的问题。
 
 现有方法在处理遮挡和开放集场景时面临一个根本性瓶颈：**缺乏足够的开放集先验（open-set priors）用于去遮挡（de-occlusion）和姿态估计**。Figure 2 清晰地揭示了这一困境——不同类型的先验（去遮挡先验、物体几何先验、姿态估计先验）需要从不同规模的数据集中获取，而现有方法的训练数据覆盖范围有限，无法同时满足所有先验的需求。具体而言：
@@ -68,8 +66,6 @@ claims:
 3. **开放集数据扩充**：通过构建包含200K合成开放集场景的训练数据，显著扩展姿态估计模型的泛化能力。
 
 这一解耦设计使得SceneMaker在严重遮挡和开放集场景下均能取得显著优于现有方法的性能，为开放集3D场景生成提供了新的技术路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -96,8 +92,6 @@ SceneMaker 的核心创新在于将开放集 3D 场景生成解耦为三个独�
 **4. 解耦框架的系统性优势**
 
 解耦设计的核心价值在于避免任务间数据干扰：去遮挡模型可独立利用图像数据集增强补全能力，3D 生成模型可专注于从清晰图像重建高质量几何，姿态估计模型可专注于从场景上下文中推理空间关系。这一策略使 SceneMaker 在严重遮挡的物体生成任务中，CD、F-Score 和 Volume IoU 均显著优于 MIDI 和 Amodal3R（Table 2），并在室内和开放集场景中一致超越现有方法（Table 3、Table 4）。
-
-
 
 SceneMaker 提出一种解耦的三维场景生成框架，将开放集场景生成分解为三个独立任务：场景感知、遮挡条件下的三维物体生成、以及统一姿态估计。该设计的核心动机在于：现有方法（如 **MIDI** (Huang et al., arXiv 2024)、**CAST3D** (Yao et al., arXiv 2025) 等）将去遮挡、几何重建和姿态估计耦合在有限域的场景数据集上联合训练，导致各任务无法充分获取所需的开放集先验，在严重遮挡和开放场景下几何质量差、姿态不准确。
 
@@ -138,13 +132,6 @@ $$\epsilon_{\theta}^{p}(P_{t}; t, X, M, I, C, O) \to P, \quad P = \{R, T, S\}$$
 
 最终，将生成的三维几何与估计的姿态参数组合，得到完整且一致的三维场景。整个框架从单张场景图像出发，通过解耦的模块化设计，实现了从二维感知到三维场景的端到端重建。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2589_https_arxiv_org_abs_2512_10957/figures/002_Figure_2.jpg]]
-*Figure 2: The analysis of prior sources in different methods. The table shows that the availability of required open-set priors (column) varies across different datasets (row). Paths in different colors represent various scene generation methods. Existing methods (yellow path and green path) lack sufficient open-set priors for de-occlusion and pose estimation due to the limited datasets. We further leverage image datasets for de-occlusion and collect new scene datasets for pose estimation to achieve better open-set performance(red path)*
-
-
-
 SceneMaker 将开放集 3D 场景生成解耦为三个独立任务：去遮挡、3D 物体生成和姿态估计。这一解耦设计的核心动机在于，不同任务所需的开放集先验来源截然不同——去遮挡需要大规模图像先验，3D 物体生成需要规范空间的几何先验，而姿态估计需要场景级的多物体交互先验。耦合训练会迫使模型在有限且单一的数据分布中同时学习所有先验，导致几何坍塌和姿态偏移。解耦后，每个模块可独立从最匹配的数据集中最大化其先验学习，从而在严重遮挡和开放场景下获得更强的泛化能力。
 
 ### 去遮挡扩散模型
@@ -183,12 +170,7 @@ $$
 - **局部交叉注意力（LCA）** 使旋转令牌仅关注物体规范空间的条件（如物体图像和规范几何），确保旋转预测与物体自身几何对齐；
 - **全局交叉注意力（GCA）** 使平移和尺寸令牌关注场景级条件（如场景图像和点云），确保物体在场景中的位置和尺度合理。
 
-![[assets/figures/papers/paper_list_l2589_https_arxiv_org_abs_2512_10957/figures/009_Figure_8.jpg]]
-*Figure 8: Attention mechanisms in the pose estimation model. The global self-attention module enables tokens of all objects in the scene to interact with each other. The local cross-attention module enables rotation tokens independently interact with conditions in the object canonical space. The global cross-attention module enables translation and size tokens attend to scene-level conditions*
-
 这种解耦的注意力设计使不同姿态变量能够聚焦于最相关的条件信号：旋转依赖物体自身几何，平移和尺寸依赖场景上下文。此外，模型采用 RoPE 位置编码，使其能够泛化至训练时未见过的多物体场景（超过 5 个物体），消融实验证实了这一设计的有效性。
-
-
 
 ## 实验与关键发现
 
@@ -247,24 +229,8 @@ SceneMaker 的核心实验设计围绕一个明确瓶颈展开：现有方法在
 - **Table 5**：消融实验确认了全局/局部注意力和解耦交叉注意力的正向贡献，同时揭示了点云质量的瓶颈效应。
 - **Figure 11**：RoPE 使模型能够泛化至更多物体的场景，验证了位置编码设计的有效性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2589_https_arxiv_org_abs_2512_10957/figures/001_Figure_1.jpg]]
-*Figure 1: Our method not only achieves superior performance in both indoor and open-set scenarios but also demonstrates stronger generalization across synthetic and real-world captured images*
-
 ![[assets/figures/papers/paper_list_l2589_https_arxiv_org_abs_2512_10957/figures/012_Figure_10.jpg]]
 *Figure 10: Qualitative comparison with scene generation methods*
-
-![[assets/figures/papers/paper_list_l2589_https_arxiv_org_abs_2512_10957/figures/017_Figure_13.jpg]]
-*Figure 13: Qualitative comparison with scene generation methods on indoor scenes*
-
-![[assets/figures/papers/paper_list_l2589_https_arxiv_org_abs_2512_10957/figures/005_Figure_5.jpg]]
-*Figure 5: The occlusion patterns of de-occlusion datasets*
-
-![[assets/figures/papers/paper_list_l2589_https_arxiv_org_abs_2512_10957/figures/010_Figure_9.jpg]]
-*Figure 9: The samples of collected open-sest dataset*
-
-
 
 ## 定位与知识库关联
 
@@ -330,8 +296,6 @@ SceneMaker 的核心贡献在于**方法论的解耦范式和注意力机制的�
 - **3D场景生成的解耦范式**：为后续研究提供了“按先验来源拆解任务”的方法论参考。
 - **扩散模型在姿态估计中的应用**：展示了扩散模型在联合预测旋转、平移和尺寸方面的有效性，以及注意力解耦对多变量预测的增益。
 - **合成数据增强策略**：基于Objaverse构建开放集场景数据的pipeline（见 Figure 9）可作为相关任务的数据增强参考。
-
-
 
 ## 原文 PDF
 

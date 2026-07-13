@@ -55,8 +55,6 @@ claims:
 
 在3DPW测试集上，本方法以**40.1mm的PA-MPJPE**取得当时最优结果，较此前最佳的D&D方法（Li et al., ECCV 2022）提升2.6mm；在AIST++上PA-MPJPE达43.8mm，大幅领先既有方法。消融实验证实，CVF模块整体贡献3.6mm的PA-MPJPE提升，RKTD在AIST++上使足部PA-MPJPE额外降低1.3mm，而引入足部伪标注后Human3.6M和AIST++的MPJPE分别下降2mm和3mm。本方法为单帧图像方法，却优于多个同期视频方法，验证了跨视角融合与足部稳定化策略的有效性。
 
-
-
 从单目图像或视频中恢复三维人体姿态与形状是计算机视觉的核心任务之一，在动作捕捉、人机交互、虚拟现实等领域有广泛应用。近年来，基于参数化人体模型（如 SMPL）的回归方法取得了显著进展，从早期的单帧方法 **HMR**（Kanazawa et al., CVPR 2018）逐步演进到利用时序信息的视频方法 **VIBE**（Kocabas et al., CVPR 2020）、**MAED**（Wan et al., ICCV 2021）和 **D&D**（Li et al., ECCV 2022），在标准基准上的精度持续提升。
 
 然而，现有方法在追求整体指标提升的过程中，普遍忽视了人体姿态估计中的两个深层瓶颈：
@@ -66,8 +64,6 @@ claims:
 **瓶颈二：足部姿态与足-地接触的估计不稳定。** 现有方法普遍忽略足部关节的精细估计和足-地接触状态建模。这源于两个层面的缺失：在数据层面，公开数据集（如 Human3.6M、AIST++）缺少足部关节点和足-地接触的精确标注；在方法层面，传统运动学解码器采用固定的从根到叶的关节预测顺序，无法根据接触状态动态调整下肢关节的回归策略。其后果是，即使全身姿态的整体误差较低，足部区域仍常出现悬浮、穿透地面等不自然现象，严重影响姿态的物理合理性。
 
 上述两个瓶颈互为因果：视角不一致性加剧了足部估计的不确定性，而足部接触信息的缺失又使网络失去了一个重要的三维空间约束线索。本文正是针对这两个相互关联的挑战，提出了一套系统的解决方案。
-
-
 
 ## 核心方法与创新机理
 
@@ -113,8 +109,6 @@ $$GC(v) = \begin{cases} \mathrm{True} & \mathrm{if}\ D(v, plane) < \delta,\\ \ma
 
 三个创新形成因果链：伪标注提供足部接触监督 → RKTD 利用接触信息动态调整解码顺序 → CVF 提供视角一致的三维特征表示。最终在 3DPW 测试集上 PA-MPJPE 达 40.1mm，较此前最优视频方法 **D&D**（Li et al., ECCV 2022, 42.7mm）提升 2.6mm，且本方法为单帧方法，无需时序信息即可超越视频方法。
 
-
-
 ![[assets/figures/papers/paper_list_l36_Towards_Stable_Human_Pose_Estimation_via_Cross_View_Fusion_and_Foot_Stab/figures/002_Figure_2.jpg]]
 *Figure 2: The top-down framework for 3D human pose and shape estimation, which consists of three parts, including the vision transformer encoder, the cross-view attention representation, and the reversible kinematic topology decoder*
 
@@ -131,8 +125,6 @@ $$GC(v) = \begin{cases} \mathrm{True} & \mathrm{if}\ D(v, plane) < \delta,\\ \ma
 **多任务损失监督**。整体损失函数为四项加权和：
 $$\mathcal{L} = \lambda_{2D}\mathcal{L}_{2D} + \lambda_{3D}\mathcal{L}_{3D} + \lambda_{SMPL}\mathcal{L}_{SMPL} + \lambda_{Contact}\mathcal{L}_{Contact}$$
 其中$\mathcal{L}_{2D}$包含前视图重投影损失与CVF中间表示的MSE及关节点距离损失；$\mathcal{L}_{3D}$与$\mathcal{L}_{SMPL}$分别监督三维关节点与SMPL参数；$\mathcal{L}_{Contact}$为接触预测的二元交叉熵。训练在8张NVIDIA A100上完成，100个epoch，batch size 256，初始学习率$5\times10^{-5}$并在第50、70、90个epoch衰减0.3倍。
-
-
 
 ### 整体框架
 
@@ -208,8 +200,6 @@ $$\mathcal{L}_{\mathrm{smooth}}(\theta) = \theta_{[1:t-1]} - \frac{1}{3} (\theta
 
 优化完成后，根据顶点-地平面距离阈值 $\delta = 0.025\mathrm{m}$ 为每个顶点赋予接触标签。该伪标注使模型在 Human3.6M 和 AIST++ 上分别额外降低 MPJPE 2mm 和 3mm。
 
-
-
 ## 实验与关键发现
 
 ### 主要结果
@@ -249,12 +239,8 @@ Figure 5 展示了 AIST++ 上的三视图定性结果：前、侧、顶三个视
 
 尽管整体性能优异，仍存在若干值得关注的边界情况。首先，CVF 模块的训练依赖三视图二维关节点监督，这限制了其在纯单目无标注数据上的扩展性——如何在没有多视角标注的真实场景中训练 CVF 是一个开放问题。其次，RKTD 当前仅应用于下肢关节链，其可逆运动学树策略是否可推广到上肢或全身关节链尚未验证。此外，足部伪标注的优化过程依赖多视角图像，对于真实室外单目视频，接触信息的获取仍缺乏有效方案。最后，本方法在极端姿态（如躺下、倒立）下的泛化能力未在实验中覆盖，这些场景下足-地接触的定义和运动学树方向的选择可能需要重新设计。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l36_Towards_Stable_Human_Pose_Estimation_via_Cross_View_Fusion_and_Foot_Stab/figures/001_Figure_1.jpg]]
 *Figure 1: Two main challenges towards stable human pose estimation*
-
-
 
 ## 定位与知识库关联
 
@@ -286,8 +272,6 @@ Figure 5 展示了 AIST++ 上的三视图定性结果：前、侧、顶三个视
 3. **极端姿态的泛化**：方法在站立和舞蹈姿态下验证充分，但在躺下、倒立、翻滚等足部接触模式剧烈变化的姿态下，接触预测的可靠性和RKTD的逆向解码策略是否仍然有效，尚缺乏实验证据。
 
 4. **接触预测的精度瓶颈**：RKTD的性能依赖于接触预测分支的准确性。当前接触标注通过顶点-平面距离阈值（δ=0.025m）生成，这一简化假设在非平坦地面或复杂地形下可能失效。如何提升接触预测的鲁棒性，是进一步改善足部姿态估计的前提。
-
-
 
 ## 原文 PDF
 

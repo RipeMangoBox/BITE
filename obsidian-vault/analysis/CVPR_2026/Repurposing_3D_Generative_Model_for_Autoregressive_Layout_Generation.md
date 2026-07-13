@@ -66,8 +66,6 @@ claims:
 
 LaviGen 的局限在于：语义一致性（PSA 78.8%）仍逊于物理合理性，复杂空间关系时语义对齐不足；当前体素分辨率有限，更高分辨率会显著增加计算成本；物体的细粒度几何拟合依赖 ICP 后处理，可能引入额外误差。开放问题包括：如何在可控开销下提高体素分辨率、如何增强文本条件机制以改善语义对齐、能否扩展到开放世界的零样本布局生成，以及自推演蒸馏的动力学能否进一步压缩推理步数至实时交互水平。
 
-
-
 ### 3D布局生成的核心瓶颈
 
 3D布局生成的任务是给定一组3D物体和自然语言指令，在连续三维空间中推理出每个物体的位置、朝向和尺度，使得最终场景既满足物理约束（无碰撞、不悬空、不穿模），又符合语义期望（物体间的功能关系与空间逻辑合理）。这一能力是室内设计自动化、具身智能仿真和交互式3D内容创作的关键基础。
@@ -96,8 +94,6 @@ LaviGen 的局限在于：语义一致性（PSA 78.8%）仍逊于物理合理性
 3. **自推演双重引导蒸馏**：训练阶段执行自回归推演，由场景级整体教师和逐级步骤教师联合提供监督信号，消除曝光偏差。
 
 通过这一框架，LaviGen 旨在实现物理合理、语义连贯且推理高效的3D布局生成，同时天然支持布局编辑、补全和长序列扩展等下游任务。
-
-
 
 ## 核心方法与创新机理
 
@@ -146,8 +142,6 @@ Table 1的消融实验（Figure 7定性展示）逐步验证了各组件的贡�
 
 这证明LaviGen的核心创新并非单一技术点的改进，而是**表示-范式-训练-编码**四个维度的协同重构，使3D布局生成首次在原生3D空间中实现物理一致性与语义连贯性的统一。
 
-
-
 LaviGen 将 3D 布局生成重新定义为一个**自回归过程**：给定 LLM 编码的布局指令 $c$，模型以当前场景状态 $S_i$ 和待放置物体 $O_i$ 为条件，生成更新后的场景状态 $S_{i+1}$。这一过程在原生 3D 体素空间中逐次进行，直接继承预训练 3D 生成模型的几何先验，从根本上区别于将布局视为文本序列或依赖 2D 视觉优化的现有方法（Figure 2）。
 
 ![[assets/figures/papers/paper_list_l2580_https_arxiv_org_abs_2604_16299/figures/002_Figure_2.jpg]]
@@ -183,8 +177,6 @@ $$
 **体素解码与 ICP 注册**。扩散生成的更新场景状态 $S_{i+1}$ 经体素解码器重建为高分辨率体素占用，随后通过迭代最近点（ICP）算法拟合各物体的空间参数（位置、朝向、尺度），得到最终的 3D 布局。
 
 整个框架天然支持**布局编辑**：物体插入和删除均可通过修改自回归序列中的物体列表实现，模型在原生 3D 空间中执行上下文感知的空间一致性修改（Figure 6），无需额外训练或架构调整。
-
-
 
 LaviGen 的核心设计在于将预训练 3D 生成模型改造为自回归布局扩散器，使其在原生 3D 体素空间中逐次放置物体。以下按流水线顺序拆解关键模块及其数学形式。
 
@@ -245,8 +237,6 @@ $$\nabla_{\theta} \mathcal{L}_{dual} \approx \mathbb{E}_{x_t, t} \left[ (s_{\mat
 
 其中 $s_{\mathcal{T}}$ 为教师模型的分数函数（整体与步骤教师的联合信号），$s_{\psi}$ 为学生模型的分数函数，二者之差构成校正方向，驱动学生模型在自推演条件下仍能生成物理合理且语义连贯的布局。
 
-
-
 ## 实验与关键发现
 
 ### 主定量对比
@@ -265,9 +255,6 @@ LaviGen在LayoutVLM基准上全面超越现有方法。Table 1上半部分报告
 Table 2报告了用户偏好研究。在物理合理性维度上，**52.1%**的参与者偏好LaviGen的生成结果，显著高于LayoutVLM的31.9%（+20.2%）；在整体质量上，LaviGen同样以**49.6%**领先LayoutVLM的33.6%（+16.0%）。这表明人类评估者对原生3D空间建模带来的物理一致性改善高度敏感，与自动指标的结论相互印证。
 
 > **Table 2** 为用户研究结果，展示物理合理性与整体质量两个维度的偏好率。
-
-![[assets/figures/papers/paper_list_l2580_https_arxiv_org_abs_2604_16299/figures/009_Table_2.jpg]]
-*Table 2: User study results for layout generation*
 
 ### 消融实验
 
@@ -291,24 +278,11 @@ Figure 8验证了长序列生成能力，LaviGen可处理超过20个物体的场
 
 尽管物理合理性指标表现优异，LaviGen的语义一致性（PSA 78.8）仍显著低于物理指标（CF 97.3, IB 98.6），表明在复杂空间关系（如“椅子朝向桌子”）的语义对齐上仍有不足。这一差距的根源可能在于文本条件机制的容量限制和训练数据中语义标注的稀疏性。此外，当前体素分辨率有限，更高分辨率的网格会显著增加计算成本；物体的细粒度几何拟合依赖ICP后处理，可能引入额外误差。这些局限性指向了未来工作方向：在不显著增加计算开销的前提下提高体素分辨率、改进文本条件机制以增强语义一致性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2580_https_arxiv_org_abs_2604_16299/figures/008_Figure_7.jpg]]
 *Figure 7: Qualitative ablation study for LaviGen. We show the progressive improvement from the base model (left) to the full model (right). The baseline produces cluttered layouts with severe collisions, while adding the identity-aware embedding yields a more plausible distribution but still suffers collisions from exposure bias. Distillation with holistic guidance yields inaccurate object fitting and severe inversion errors for small objects. In contrast, the full model generates physically plausible and semantically coherent layouts*
 
-![[assets/figures/papers/paper_list_l2580_https_arxiv_org_abs_2604_16299/figures/006_Figure_6.jpg]]
-*Figure 6: Qualitative results for layout editing. LaviGen’s unified framework supports context-aware modifications, including object insertion (top row) and removal (bottom row). By operating directly in 3D space, the model performs edits that are spatially coherent and semantically consistent with the surrounding context, and enables direct manipulation of 3D layouts, where previous methods struggle*
-
 ![[assets/figures/papers/paper_list_l2580_https_arxiv_org_abs_2604_16299/figures/010_Figure_8.jpg]]
 *Figure 8: Qualitative results for long-sequence generation with more than 20 objects*
-
-![[assets/figures/papers/paper_list_l2580_https_arxiv_org_abs_2604_16299/figures/011_Figure_9.jpg]]
-*Figure 9: Generalization across different 3D generation backbones*
-
-![[assets/figures/papers/paper_list_l2580_https_arxiv_org_abs_2604_16299/figures/012_Figure_10.jpg]]
-*Figure 10: Diverse layout results generated from the same input instruction*
-
-
 
 ## 定位与知识库关联
 
@@ -360,8 +334,6 @@ $$\mathcal{L} = \mathbb{E}_{t, x_0, s, o, c, \epsilon} \left\| v_{\theta}(x, s, 
 ---
 
 > **验证提示**：本文中 LayoutGPT、Holodeck、I-Design、LayoutVLM 的具体发表信息（作者、会议、年份）在提供的分析材料中未明确标注，建议查阅原文或引用数据库补充完整引用信息。
-
-
 
 ## 原文 PDF
 

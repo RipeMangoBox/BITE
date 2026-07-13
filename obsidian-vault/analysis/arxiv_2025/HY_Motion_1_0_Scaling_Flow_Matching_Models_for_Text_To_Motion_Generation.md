@@ -73,8 +73,6 @@ HY-Motion 1.0 在方法谱系中处于**大规模流匹配生成模型**与**强
 
 该工作的局限性包括：自动标注流水线对高度复杂指令的语义捕捉可能存在不足；未显式建模物体几何，人-物交互动作的物理准确性有待提升；在极长或不常见运动类型上的表现尚未充分验证。代码已开源（https://github.com/Tencent-Hunyuan/HY-Motion-1.0）。
 
-
-
 ### 问题背景
 
 文本到动作生成（Text-to-Motion Generation）旨在根据自然语言描述合成逼真的3D人体运动序列，在游戏动画、虚拟人驱动、影视制作等领域具有广阔的应用前景。近年来，扩散模型和自回归模型在该任务上取得了显著进展，但现有方法普遍受限于两个关键瓶颈：
@@ -106,8 +104,6 @@ HY-Motion 1.0 在方法谱系中处于**大规模流匹配生成模型**与**强
 - **偏好对齐创新**：引入直接偏好优化（DPO）和针对流匹配模型定制的组相对策略优化（Flow-GRPO），通过语义奖励与物理惩罚的联合优化，直接弥合统计似然与人类偏好的鸿沟。
 
 这一动机背后的核心洞察是：**大规模预训练赋予模型广泛的运动语义先验，高质量微调提升动作精度，而强化学习则是实现高可控性、高逼真度文本到动作生成的关键闭环**。
-
-
 
 ## 核心方法与创新机理
 
@@ -152,8 +148,6 @@ $$f(r, \hat{A}, \theta, \epsilon, \beta) = \frac{1}{G} \sum_{i=1}^{G} \frac{1}{T
 ### 创新点的因果关联
 
 这三项创新构成一条因果链：**大规模数据**是十亿参数模型有效训练的基石，消融实验表明同样 0.46B 模型在仅 400 小时数据上训练时指令遵循得分下降 0.15（*Table 3*）；**模型容量扩展**（0.46B → 1B）持续提升指令遵循能力（3.20 → 3.34），但动作质量在 0.46B 后趋于饱和（*Tables 3-4*）；**强化学习对齐**则在统计似然基础上进一步注入人类偏好与物理约束，弥补容量扩展无法解决的伪影问题。三者协同，使 HY-Motion 1.0 在所有六大动作类别的指令遵循（平均 3.24）与动作质量（平均 3.43）人类评估中均显著超越 DART、LoM、GoToZero、MoMask 等基线（*Tables 1-2*）。
-
-
 
 HY-Motion 1.0 构建了一条三阶段训练流水线，将文本到动作生成从有限容量的扩散/自回归模型推向十亿参数级的流匹配范式。其核心瓶颈在于：现有模型受限于小规模架构和低质量训练数据，导致指令遵循能力弱，并频繁出现脚滑、物理不自然等动作伪影。HY-Motion 1.0 通过“大规模预训练—高质量微调—强化学习对齐”的递进式干预，系统性地打破了这一瓶颈。
 
@@ -203,8 +197,6 @@ HY-Motion 1.0 构建了一条三阶段训练流水线，将文本到动作生成
 
 消融实验（Tables 3–4）揭示了两个决定性机制：**数据量是指令遵循的瓶颈**——仅用 400 小时训练的 DiT-0.46B 指令遵循得分（3.05）远低于使用 3000 小时预训练的同等模型（3.20）；**模型规模对指令遵循的增益持续到 1B**（3.20 → 3.34），而动作质量在 0.46B 后趋于饱和。这验证了“大规模预训练赋予语义先验，强化学习弥合偏好鸿沟”的核心洞察。
 
-
-
 ### 运动序列表示
 
 HY-Motion 1.0 将一段人体运动序列形式化为 $N$ 帧的集合，每帧编码为一个 201 维的向量：
@@ -251,18 +243,11 @@ $$ r_t^i(\theta) = \frac{p_{\theta}(\mathbf{x}_{t-1}^i | \mathbf{x}_t^i, \mathbf
 
 上述公式对应 HY-Motion 1.0 三阶段训练框架的核心计算单元：**流匹配损失**驱动大规模预训练建立运动语义先验，**DPO 损失**在高质量微调后实现偏好对齐，**Flow-GRPO 目标**则通过显式物理奖励弥合统计似然与人类偏好的剩余鸿沟。三者逐层递进，共同支撑从十亿参数 DiT 到高可控性动作生成的完整路径。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l88_HY_Motion_1_0_Scaling_Flow_Matching_Models_for_Text_To_Motion_Generation/figures/005_Figure_5.jpg]]
 *Figure 5: Model architecture of our HY-Motion DiT*
 
 ![[assets/figures/papers/paper_list_l88_HY_Motion_1_0_Scaling_Flow_Matching_Models_for_Text_To_Motion_Generation/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the data processing pipeline*
-
-![[assets/figures/papers/paper_list_l88_HY_Motion_1_0_Scaling_Flow_Matching_Models_for_Text_To_Motion_Generation/figures/003_Figure_3.jpg]]
-*Figure 3: The hierarchy of our motion categories*
-
-
 
 ## 实验与关键发现
 
@@ -300,20 +285,8 @@ Tables 3-4 揭示了模型规模和数据量对性能的差异化影响：
 - **Tables 3-4**：模型规模的缩放收益在指令遵循上更显著，而动作质量在中等规模后趋于饱和；大规模预训练数据是指令遵循能力的决定性因素。
 - **Figure 1（定性对比）**：可视化结果直观展示了HY-Motion 1.0 在动作多样性和语义一致性上相比基线的优势，同时验证了模型对不同角色骨架的泛化能力。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l88_HY_Motion_1_0_Scaling_Flow_Matching_Models_for_Text_To_Motion_Generation/figures/008_Table_3.jpg]]
 *Table 3: Instruction-following capability comparison of different model sizes. Motion categories: (a) Locomotion, (b) Sports & Athletics, (c) Fitness & Outdoor Activities, (d) Daily Activities, (e) Social Interactions & Leisure, and (f) Game Character Actions. The model “DiT-0.46B-400h” is trained only on the 400-hour high-quality dataset, while the other models are pretrained on the 3,000-hour dataset*
-
-![[assets/figures/papers/paper_list_l88_HY_Motion_1_0_Scaling_Flow_Matching_Models_for_Text_To_Motion_Generation/figures/009_Table_4.jpg]]
-*Table 4: Motion quality comparison of different model sizes. Motion categories: (a) Locomotion, (b) Sports & Athletics, (c) Fitness & Outdoor Activities, (d) Daily Activities, (e) Social Interactions & Leisure, and (f) Game Character Actions*
-
-![[assets/figures/papers/paper_list_l88_HY_Motion_1_0_Scaling_Flow_Matching_Models_for_Text_To_Motion_Generation/figures/010_Figure_6.jpg]]
-*Figure 6: Examples of visual comparison to state-of-the-art models*
-
-![[assets/figures/papers/paper_list_l88_HY_Motion_1_0_Scaling_Flow_Matching_Models_for_Text_To_Motion_Generation/figures/001_Figure.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -348,8 +321,6 @@ HY-Motion 1.0 在文本到动作生成领域与以下代表性基线方法形成
 2. **人-物交互的隐式建模**：如何在不显式提供物体几何的条件下生成物理准确的人-物交互动作？可能的路径包括从大规模数据中隐式学习交互约束，或引入物理仿真作为训练信号。
 3. **三阶段训练范式的泛化性**：该训练范式（大规模预训练 + 高质量微调 + RL 对齐）能否泛化到其他骨架结构或动作生成任务（如面部动作、手势生成）？这决定了方法谱系的扩展潜力。
 4. **模型规模与动作质量的饱和现象**：消融实验显示动作质量在 0.46B 后接近饱和（3.26 → 3.34），而指令遵循能力持续提升（3.20 → 3.34）。这表明单纯增大模型规模对动作质量的边际收益递减，未来可能需要新的架构设计或训练目标来突破这一瓶颈。
-
-
 
 ## 原文 PDF
 

@@ -55,8 +55,6 @@ claims:
 
 该方法的主要局限在于：当放大倍率极高（如×1024）时，当前VLM难以推断出连贯的结构，语义纹理较弱。未来方向包括探索从宏观场景到微观细节的无缝过渡，以及改进极端倍率下的语义推断能力。
 
-
-
 ### 3D场景超分辨率的现实需求
 
 从低分辨率输入重建高保真3D场景是计算机视觉与图形学中的核心挑战。在虚拟现实、增强现实、数字孪生和影视制作等应用中，用户往往需要从有限分辨率的观测数据出发，实现对场景的任意尺度放大浏览——从全景概览无缝过渡到微观细节的近距离审视。这一需求催生了3D超分辨率（3D Super-Resolution）问题：给定一组低分辨率的多视图图像，如何重建出能够在高分辨率下保持清晰纹理、几何一致性和语义合理性的3D表示。
@@ -74,8 +72,6 @@ claims:
 GaussianZoom的提出正是为了突破上述双重瓶颈。其核心洞察在于：**几何一致性为多视角对齐提供可靠锚点，语义先验弥补低分辨率信息不足，连续Level-of-Detail表示实现无混叠的跨尺度平滑过渡，三者协同将3D超分从“重建”升华为“生成式重建”。**
 
 具体而言，该方法将3D几何重建提供的深度信息引入超分对齐环节，用深度引导的特征变形替代传统光流对齐——深度图由3D高斯泼溅（3DGS）的几何重建自然产生，其像素对应关系严格服从多视图几何约束，从根本上消除了光流导致的交叉视图不一致。同时，利用视觉-语言模型（VLM）从粗尺度重建结果中推断场景的语义属性（如材质、纹理类型、物体类别），将文本语义描述作为条件注入超分网络，驱动细节合成过程，使放大区域不仅“变清晰”，更“变合理”。这一范式转换使得放大过程从“单帧锐化”转变为“几何一致、语义丰富的渐进式生成”。
-
-
 
 ## 核心方法与创新机理
 
@@ -113,8 +109,6 @@ $$
 
 **三者协同**：几何一致性为多视角对齐提供可靠锚点，语义先验弥补低分辨率信息不足，连续 LOD 实现无混叠的跨尺度平滑过渡，共同将3D超分从“重建”升华为“生成式重建”。
 
-
-
 GaussianZoom 构建了一个“几何重建—语义增强—多尺度组织”三阶段协同的渐进式放大框架，其核心流程为：从低分辨率多视图输入出发，首先通过粗尺度3DGS重建获得具备几何一致性的场景表示，随后在每一级放大中，利用深度引导的特征变形实现跨视图精确对齐，并借助视觉-语言模型（VLM）推断的语义提示驱动细节合成，最终通过可扩展的连续Level-of-Detail（LOD）层级将不同尺度的高斯原语组织为无缝过渡的生成式3D表示。
 
 ### 管线总览
@@ -135,12 +129,8 @@ GaussianZoom 构建了一个“几何重建—语义增强—多尺度组织”�
 
 上述模块并非独立串行，而是形成迭代耦合：粗尺度3DGS为特征对齐提供几何基础，对齐后的多视图特征为超分网络提供时序一致性约束，VLM语义提示为细节合成注入先验知识，而连续LOD层级则将不同放大级别的高斯原语统一组织，使各尺度的重建结果相互增强而非冲突。这种“几何—语义—尺度”三重耦合是GaussianZoom从“单帧锐化”走向“生成式重建”的机制核心。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2497_https_arxiv_org_abs_2605_18252/figures/003_Figure_3.jpg]]
 *Figure 3: Method overview. Our framework jointly leverages geometry-aware alignment, semantic priors, and a continuous Level-of-Detail (LoD) representation to perform generative zoom-in reconstruction. Starting from a coarse 3D Gaussian Splatting model, we derive per-view depth maps that enable depth-based feature warping, providing accurate multi-view correspondence. In parallel, coarse and zoomed-in renderings are processed by a vision-language model to infer semantic cues describing fine-scale appearance. These geometryaligned features and semantic descriptions together condition the super-resolution network, synthesizing high-resolution zoomed views with plausible, view-consistent details. The re...*
-
-
 
 GaussianZoom 的核心架构围绕三个协同模块构建：**深度引导的多视图特征变形**、**VLM 驱动的语义细节合成**，以及**可扩展的连续细节层次（LoD）表示**。它们共同将低分辨率 3DGS 重建逐步提升为几何一致、语义丰富的高分辨率表示。
 
@@ -201,15 +191,8 @@ $$
 
 其中 $\mathcal{L}_{\mathrm{rgb}}$ 沿用 3DGS 的 $\mathcal{L}_1$ 与 D-SSIM 组合损失，$\mathcal{L}_{\mathrm{geo}}$ 为几何正则化项。双尺度监督确保超分生成的高频细节与低分辨率观测保持结构一致性，抑制跨尺度冲突。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2497_https_arxiv_org_abs_2605_18252/figures/010_Figure_6.jpg]]
 *Figure 6: Effectiveness of VLM guidance in detail synthsis. Without prompt guidance, the region becomes visually sharper but semantically inconsistent with the input (e.g. the truck surface loses its rusted texture)*
-
-![[assets/figures/papers/paper_list_l2497_https_arxiv_org_abs_2605_18252/figures/011_Figure_7.jpg]]
-*Figure 7: Effectiveness of continuous LoD. Without LoD, optimizing a single Gaussian set across scales causes aliasing and semantic inconsistency*
-
-
 
 ## 实验与关键发现
 
@@ -256,8 +239,6 @@ Table 3 报告了 Frechet Video Distance（FVD）指标，用于评估超分图�
 
 GaussianZoom 的主要局限出现在极高放大倍率场景。论文明确指出，在 ×1024 及以上的放大倍率下，当前的视觉-语言模型难以推断出连贯的结构信息，导致生成的语义纹理较弱。这一问题本质上受限于 VLM 在极端信息缺失条件下的推理能力，是未来改进的重要方向。此外，深度引导的特征变形和连续 LOD 层级在计算开销上的具体表现尚未在论文中量化，需要进一步分析。
 
-
-
 ## 定位与知识库关联
 
 ### 与基线方法的关系
@@ -303,8 +284,6 @@ GaussianZoom 的能力边界由三个要素共同界定。
 3. **动态场景扩展。** 当前框架假设静态场景。在动态场景中，深度引导的特征变形需要处理非刚体运动和遮挡关系变化，VLM 的语义提示也需要在时间维度上保持一致性。这要求框架在几何对齐和语义生成两个维度上同时引入时序建模。
 
 4. **从微观到宏观的无缝过渡。** 论文展望了“从宇宙尺度环境到微观分子场景的无缝过渡”这一宏大目标。这要求连续 LOD 的尺度范围跨越数十个数量级，对高斯原语的存储、索引和渲染效率提出极高要求，是一个系统层面的开放问题。
-
-
 
 ## 原文 PDF
 

@@ -292,8 +292,6 @@ SFT步数的消融（图4）进一步量化了这一条件：SFT步数不足（<
 4. **任务领域限制**：实验仅在数学推理数据集上进行，在科学推理、编程等其他领域的迁移效果未知。
 5. **架构通用性未验证**：所有实验基于Qwen2.5-VL-3B，尚未在LLaVA、InternVL等其他VLM架构上验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2245_https_arxiv_org_abs_2510_23497/figures/003_Table_1.jpg]]
 *Table 1: Comparison of state-of-the-art approaches on multimodal reasoning benchmarks: VOLD achieves a competitive performance while training exclusively on text data, outperforming baselines that use images during fine-tuning. This can be seen as a indicator that distillation based on text-only teachers can also improve systems beyond text, such as multimodal reasoning models. Baselines marked with ‡ were trained on portions of the evaluation set*
 

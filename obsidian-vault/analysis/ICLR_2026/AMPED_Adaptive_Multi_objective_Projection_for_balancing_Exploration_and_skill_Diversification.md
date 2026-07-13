@@ -46,16 +46,12 @@ claims:
 
 AMPED (Adaptive Multi-objective Projection for balancing Exploration and skill Diversification) 是一种面向无监督技能预训练的新型方法，旨在同时最大化状态覆盖（探索）和技能区分度（多样性）。该方法的核心洞察在于：探索目标（最大化状态熵）与多样性目标（最大化技能间互信息）的梯度在更新过程中存在严重冲突，直接求和会导致相互干扰。AMPED 通过引入梯度手术（PCGrad）在每次更新前检测并移除冲突的梯度分量，并结合自适应技能选择器，实现了高状态覆盖与强技能区分度的统一。在 URLB (Unsupervised Reinforcement Learning Benchmark) 的 12 个下游任务上，AMPED 取得了最高的中位数、IQM、均值以及最小的最优性差距，总回报和（6415）超越所有基线方法。
 
-
-
 无监督技能预训练的目标是在无外部奖励的情况下学习多样化的行为技能，以便在下游任务中快速微调。现有方法通常聚焦于以下两个目标之一：
 
 - **探索（Exploration）**：最大化状态熵 $H(X) = -\mathbb{E}[\log p(X)]$，鼓励智能体广泛覆盖状态空间。代表性方法包括基于粒子熵的 APT (Liu & Abbeel, 2021b) 和基于随机网络蒸馏的 RND (Burda et al., 2019)。
 - **技能多样性（Skill Diversification）**：最大化技能与状态之间的互信息 $I(X;Y) = D_{KL}(p_{X,Y} \| p_X p_Y)$，鼓励不同技能产生可区分的状态分布。代表性方法包括 DIAYN (Eysenbach et al., 2019)、CIC (Laskin et al., 2022)、BeCL (Yang et al., 2023) 和 CeSD (Bai et al., 2024)。
 
 然而，同时优化这两个目标面临根本性挑战：探索目标鼓励智能体均匀覆盖所有状态，而多样性目标要求不同技能的状态分布彼此分离。如图 3 所示，CeSD 倾向于连续覆盖但技能区分度不足，BeCL 则强调分离但留下明显覆盖空白。这种梯度冲突导致两个目标相互干扰，难以同时达到最优。
-
-
 
 ## 核心方法与创新机理
 
@@ -69,8 +65,6 @@ AMPED 的核心创新可归纳为以下四点：
 
 4. **自适应技能选择器**：在微调阶段引入基于 SAC (Haarnoja et al., 2018) 的技能选择器，采用 $\epsilon$-greedy 策略自适应选择最匹配当前任务的预训练技能，而非均匀随机采样。
 
-
-
 ![[assets/figures/papers/iclr26_reinforcement_learning_planning_agents__deep_rl__b001_U8A5nGuw7M_AMPED_Adaptive_Multi-obj/figures/001_Figure_1.jpg]]
 *Figure 1: Graphical scheme explaining our method, AMPED. (a) At initialization, the skills exhibit small coverage that are close to each other in the task space. (b) During skill pretraining, exploration and diversity objectives encourage skills to widen and repel each regions. (c) In fine-tuning, the skill selector identifies the skill best aligned with the target task at each step. (d) The selected skill is further adapted via extrinsic rewards to maximize performance on the target task.*
 
@@ -79,8 +73,6 @@ AMPED 的训练流程分为两个阶段（如图 1 和图 2 所示）：
 **预训练阶段**：智能体以随机采样的技能为条件，使用内在奖励（探索奖励 + 多样性奖励）进行优化。探索奖励和多样性奖励的梯度不直接求和，而是通过梯度手术机制平衡后再更新策略和值函数。
 
 **微调阶段**：技能选择器根据任务反馈自适应选择技能，智能体使用下游任务的外在奖励进一步优化。
-
-
 
 ### 5.1 探索奖励
 
@@ -116,8 +108,6 @@ $$\mathrm{Pr}[\widehat{z} \neq z_\star] \leq 2^S H \exp\left(-\frac{n \Delta^2}{
 其中 $S$ 是状态空间大小，$H$ 是技能数量。保证以置信度 $1-\eta$ 选择最优技能所需的最小轨迹数为：
 
 $$n \geq \frac{2}{\Delta^2} (S \log 2 + \log H - \log \eta)$$
-
-
 
 ## 实验与关键发现
 
@@ -172,8 +162,6 @@ Table 14 和 Table 15 分别展示了投影比例和技能数量的影响。默�
 - CeSD 的官方超参数无法复现其报告性能，且方差较大。
 - AMPED 的预训练时间（约 13.5 小时）与基线方法相当，未引入显著额外计算开销。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_reinforcement_learning_planning_agents__deep_rl__b001_U8A5nGuw7M_AMPED_Adaptive_Multi-obj/figures/040_Table_2.jpg]]
 *Table 2: Performance comparison under extreme α and β settings. α and β control the relative weight of entropy-based and RND rewards. AMPED (Ours) result are computed as return (mean ± standard deviation) over 10 random seeds, while each α or β configuration is evaluated using three random seeds. The best result is shown in bold, and the second-best is underlined.*
 
@@ -185,8 +173,6 @@ Table 14 和 Table 15 分别展示了投影比例和技能数量的影响。默�
 
 ![[assets/figures/papers/iclr26_reinforcement_learning_planning_agents__deep_rl__b001_U8A5nGuw7M_AMPED_Adaptive_Multi-obj/figures/043_Table_5.jpg]]
 *Table 5: Number of unique skills used per task. Results are computed over three random seeds and reported as mean ± standard deviation.*
-
-
 
 ## 定位与知识库关联
 
@@ -211,8 +197,6 @@ AMPED 综合了无监督强化学习中三类方法的原理：
 - 如何根据环境特性自动确定最优技能数量？
 - 如何改进技能选择器以在稀疏奖励场景下更稳定地学习？
 - 环境结构如何影响探索-多样性梯度交互，以及如何使 AMPED 适应不同环境？
-
-
 
 ## 原文 PDF
 

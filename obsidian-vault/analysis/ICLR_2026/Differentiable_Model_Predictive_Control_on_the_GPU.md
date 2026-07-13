@@ -56,8 +56,6 @@ claims:
 
 **方法定位**：DiffMPC 属于可微分优化的 MPC 分支，与基于 iLQR 的 **mpc.pytorch**（Amos et al., 2018）、**trajax**（Frostig et al., 2021）以及通用可微分非线性最小二乘求解器 **Theseus**（Pineda et al., 2022）形成对比。其关键差异在于用并行 PCG 替代顺序 Riccati 递归，从而在 GPU 上获得显著加速，同时保持收敛性。该方法当前仅支持无不等式约束的 OCP，梯度计算采用 Gauss-Newton 近似（忽略动力学曲率），且实车部署时以 OSQP 替代 PCG，训练与线上求解尚未统一。
 
-
-
 ### 可微分优化与模型预测控制
 
 可微分优化（Differentiable Optimization, DO）将优化问题的解映射视为可微分层，嵌入端到端学习管道。在模型预测控制（MPC）中，控制策略由求解一个参数化的最优控制问题（OCP）产生：
@@ -80,8 +78,6 @@ $$\mathbf{OCP:}\ \underset{z=(x,u)}{\mathrm{arg\,min}} \sum_{t=0}^{T}c_t^{x,\the
 本文的核心洞察是：**OCP的KKT系统具有块三对角稀疏结构，这一结构可以被利用来设计并行化的线性系统求解器，从而替代序列Riccati递归。** 具体而言，通过Schur补方法将KKT系统转化为关于对偶变量 $\lambda$ 的线性系统 $S\lambda = \gamma$，其中 $S$ 为块三对角矩阵。采用预条件共轭梯度法（PCG）求解该系统，可以在GPU上实现跨时间步的并行化，同时保持收敛性。
 
 基于这一思路，本文提出 **DiffMPC**——一个完全在JAX中实现的可微分MPC求解器，其核心是用定制的PCG例程替代传统的Riccati递归，在正向求解和反向梯度计算中均实现显著的GPU加速。该方法同时支持warm-starting，进一步提升了滚动时域优化场景下的效率。
-
-
 
 ## 核心方法与创新机理
 
@@ -137,8 +133,6 @@ $$x_t = -Q_t^{-1}(q_t + A_{t-1}^{+\top}\lambda_t + A_t^\top\lambda_{t+1}),\quad 
 2. **梯度近似**：梯度计算中忽略了动力学约束的曲率（采用类似 iLQR 的 Gauss-Newton 近似），可能导致梯度精度下降，但消融实验显示在适当 PCG 容差下与有限差分的一致性仍很高。
 3. **训练与部署不一致**：实际车辆部署时使用 OSQP 而非训练中的 PCG，PCG 方案尚未在硬件上实时运行。硬件实验仅成功运行一次，结果的可重复性和统计显著性有限。
 4. **初始化鲁棒性**：可微分优化管道对初始化敏感，如何提供稳健初始化以避免求解器发散仍是一个开放问题。
-
-
 
 ![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_bFYfV6c9zu/figures/002_Figure_2.jpg]]
 *Figure 2: DiffMPC architecture: forward and backward passes, data flows, and main steps*
@@ -207,8 +201,6 @@ DiffMPC 作为一个完全可微分的策略 $\pi^\theta(x_0)$，可直接嵌入
 
 整个管道使用 JAX 实现，便于与主流深度学习框架集成。
 
-
-
 ### 前向传播：SQP与PCG求解
 
 DiffMPC的前向传播采用序列二次规划（SQP）框架求解参数化最优控制问题OCP。对于一般非凸的OCP，SQP在每次迭代中构造一个QP子问题，其KKT系统具有块三对角结构：
@@ -242,8 +234,6 @@ $$\frac{\partial\ell}{\partial\theta}^\top = -\frac{\partial F}{\partial\theta}^
 ### 并行性来源与warm-starting
 
 DiffMPC的并行性来自两个层面：其一，每次SQP迭代中所有矩阵（$Q_t, R_t, A_t, B_t$ 等）在GPU上并行计算；其二，PCG例程虽然是迭代式的，但其每次迭代内的矩阵-向量乘积可跨时间步并行执行。此外，PCG天然支持跨问题实例的warm-starting——将前一次求解的 $\lambda$ 作为下一次求解的初始猜测，而iLQR的Riccati递归不具备这一能力。消融实验表明，在较低的PCG退出容差（$10^{-4}$）下，warm-starting可将前向传播时间减少最多11%（Figure 10）。
-
-
 
 ## 实验与关键发现
 
@@ -280,9 +270,6 @@ DiffMPC 被用于一个具有挑战性的实际任务：通过领域随机化训
 
 **仿真结果**：在带水坑的 8 字形漂移中，学习到的策略成功率为 100%，而基线控制器仅为 70%（Figure 6）。学习后的 MPC 参数发生了显著变化：后轮摩擦系数降低了 13%，侧滑角误差代价降低了 58%（Figure 12）。这表明领域随机化使策略学会了更保守的摩擦假设和对侧滑角偏差的更大容忍。
 
-![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_bFYfV6c9zu/figures/006_Figure_6.jpg]]
-*Figure 6: Vehicle states (left) and position trajectories (right) when drifting a figure 8 with puddles*
-
 **硬件验证**：学习到的策略成功部署到实车上。在带水坑的圆形漂移中，学习策略在整个漂移过程中保持了更低的受控侧滑角 β（Figures 7, 8）。在 8 字形漂移的实车测试中，学习控制器在水坑处表现出明显更强的鲁棒性（Figure 13）。但需注意，硬件实验仅成功运行一次，结果的可重复性和统计显著性有限。此外，实车部署时使用 OSQP 而非训练中的 PCG 进行在线求解，线上与训练不完全一致。
 
 ### 关键局限与注意事项
@@ -291,21 +278,6 @@ DiffMPC 被用于一个具有挑战性的实际任务：通过领域随机化训
 2. **梯度近似**：梯度计算中忽略了动力学约束的曲率（采用类似 iLQR 的 Gauss-Newton 近似），可能影响梯度精度。
 3. **训练与部署不一致**：实车部署时 PCG 方案尚未在硬件上实时运行，使用 OSQP 替代。
 4. **硬件结果有限**：实车实验仅成功运行一次，统计显著性不足。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_bFYfV6c9zu/figures/013_Table_2.jpg]]
-*Table 2: Parameters in the RL benchmark: state dimension n _ { x } , control dimension n _ { u } , MPC horizon T , RL episodes length H, batch size B*
-
-![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_bFYfV6c9zu/figures/016_Table_4.jpg]]
-
-![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_bFYfV6c9zu/figures/017_Table_5.jpg]]
-*Table 5: Nominal vehicle model parameters and controller gains for the baseline MPC policy*
-
-![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_bFYfV6c9zu/figures/018_Table_6.jpg]]
-*Table 6: Parameters used for domain randomization. On water puddles, tire friction coefficients drop to $\mu$ = 0 . 6*
-
-
 
 ## 定位与知识库关联
 
@@ -359,8 +331,6 @@ DiffMPC 与三类可微分优化/MPC 求解器形成直接对比：
 4. **方法泛化到非 MPC 优化**：能否将 PCG + 时间稀疏结构的思想扩展到更一般的非线性优化问题，而不仅限于 MPC？这需要识别其他具有类似块稀疏结构的优化问题类。
 
 5. **PCG 的实时硬件部署**：直接用 PCG 替代 OSQP 并保持实时性是否可行？PCG 的迭代次数在实时约束下是否可控？这需要在嵌入式 GPU 上进行严格的实时性验证。
-
-
 
 ## 原文 PDF
 

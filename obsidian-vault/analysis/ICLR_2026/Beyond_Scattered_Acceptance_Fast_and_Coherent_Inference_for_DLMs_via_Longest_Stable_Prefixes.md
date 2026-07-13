@@ -48,8 +48,6 @@ claims:
 
 实验表明，LSP在LLaDA-8B和Dream-7B上实现了高达**3.4倍**的推理加速，同时匹配或略微提升了输出质量。在GSM8K上，LSP以77.6%的准确率实现了1.51倍加速；在TruthfulQA上，准确率从34.4%提升至45.8%，同时获得2.29倍加速。消融研究验证了自适应分块、结构边界对齐和前缀优先拓扑等核心组件的关键作用。
 
-
-
 ### 1 扩散语言模型（DLM）的推理瓶颈
 
 扩散语言模型通过迭代去噪过程生成文本：从完全掩码的序列开始，逐步预测并替换掩码token。现有DLM（如LLaDA (Nie et al., 2025) 和 Dream (Ye et al., 2025)）通常采用**分散接受**策略——在每个去噪步骤中，模型独立地基于局部置信度（如logit margin）提交高置信度的token，而将低置信度的token保留为活动状态。
@@ -63,8 +61,6 @@ claims:
 
 本文的核心洞见在于：DLM在中间步骤的预测中，正确的最终答案往往已经出现（早期答案收敛）。通过利用这一特性，LSP调度器可以在不牺牲质量的情况下进行训练无关的早期提交，从而减少计算量。
 
-
-
 ## 核心方法与创新机理
 
 LSP的核心创新在于将**提交拓扑结构**（Commitment Topology）作为关键因果旋钮，从根本上改变了计算动态：
@@ -76,8 +72,6 @@ LSP的核心创新在于将**提交拓扑结构**（Commitment Topology）作为
 | **提交边界对齐** | 无对齐，提交块可能中断在单词或句子中间 | 结构边界对齐：将候选块的右边界对齐到最近的结构分隔符 |
 | **KV缓存策略** | 碎片化KV缓存，需要昂贵的收集操作或重计算 | 近似KV缓存：将已提交的前缀视为固定上下文，进行连续的KV追加 |
 
-
-
 LSP调度器的迭代过程如Figure 1所示。在每个步骤中，LSP执行一次前向传播来评估当前活动后缀的预测稳定性，然后原子化地提交最长的连续稳定前缀，使冻结前缀（绿色）整体增长，活动后缀（白色）收缩。
 
 ![Figure 1]()
@@ -88,8 +82,6 @@ LSP的整体流程如下：
 2. **自适应分块**：动态选择一个阈值，确定满足条件的连续稳定前缀长度。
 3. **结构边界对齐**：将候选块的右边界对齐到最近的结构分隔符。
 4. **原子化提交**：将确定的最长稳定前缀作为一个原子操作提交到冻结前缀，并更新KV缓存。
-
-
 
 ### 1 稳定性诊断：Logit Margin
 
@@ -114,8 +106,6 @@ $$L'(\tau_k) \in [\alpha N_k, \beta N_k]$$
 $$\mathcal{L} \triangleq \max \{ L_{\mathrm{min}}, \max \{ j \leq L' : \hat{y}_j \in \mathcal{D} \wedge L' - j \leq W \} \}$$
 
 其中 $L_{\mathrm{min}}$ 是最小保证长度，$\mathcal{D}$ 是结构分隔符集合，$W$ 是回看窗口大小。该公式确保提交块在保持自然边界的同时，至少提交一个token以保证单调进展。
-
-
 
 ## 实验与关键发现
 
@@ -184,8 +174,6 @@ Table 4展示了LSP在数学推理中的整体前缀吸收过程：
 
 每个彩色块代表在单步中原子化提交的最长稳定前缀。提交边界与自然语言或数学单元（如从句、计算步骤）对齐，展示了LSP的结构边界对齐在实践中的效果。
 
-
-
 ## 定位与知识库关联
 
 ### 1 与现有方法的关系
@@ -216,10 +204,7 @@ LSP属于DLM推理加速方法谱系，但与现有方法有本质区别：
 ![[assets/figures/papers/iclr26_generative_models_diffusion__generative_models_and_autoencoders__b001_zvw9Hiwa0i_Beyond_S/figures/001_Figure_1.jpg]]
 *Figure 1: Figure 1: The iterative process of the Longest Stable Prefix (LSP) scheduler. In each step, LSP performs a single forward pass to assess the stability of predictions for the current active suffix, measured by the logit margin ( $\delta _ { i }$ ) . Instead of accepting scattered tokens, it atomically commits the longest contiguous prefix of tokens that meet an adaptively determined stability threshold (τ ). As shown, the frozen prefix (green) grows monolithically, causing the active suffix (white) to shrink.*
 
-
 ### 实验与分析
-
-### 补充图表
 
 ![[assets/figures/papers/iclr26_generative_models_diffusion__generative_models_and_autoencoders__b001_zvw9Hiwa0i_Beyond_S/figures/002_Table_1.jpg]]
 *Table 1: Table 1: Main benchmark results on LLaDA-8B and Dream-7B. We report the task-specific score (%) and the inference speedup over the ‘Full‘ baseline. LSP delivers substantial speedups while maintaining or even improving task performance.*
@@ -235,8 +220,6 @@ LSP属于DLM推理加速方法谱系，但与现有方法有本质区别：
 
 ![[assets/figures/papers/iclr26_generative_models_diffusion__generative_models_and_autoencoders__b001_zvw9Hiwa0i_Beyond_S/figures/005_Figure_2.jpg]]
 *Figure 2: Figure 2: Quantifying Repair Costs via Token Flip Rate. We measure the percentage of tokens in the active suffix that change their top prediction between consecutive diffusion steps. While the scattered baseline forces the model to constantly reconcile a fragmented context (maintaining high flip rates), LSP locks in a coherent prefix early. This stabilizes the future generation context, drastically reducing token oscillations and repair costs in the mid-to-late stages (from 14.2% down to 4.3%).*
-
-
 
 ## 原文 PDF
 

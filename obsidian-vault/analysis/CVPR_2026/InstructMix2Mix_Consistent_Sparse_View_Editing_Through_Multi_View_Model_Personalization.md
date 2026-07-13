@@ -70,8 +70,6 @@ claims:
 
 方法的主要局限包括：蒸馏过程运行时间约为DGE的两倍以上；编辑质量受限于底层2D编辑器和多视图学生模型的性能天花板；在推广到ControlNet条件生成任务时输出趋于模糊；目前缺乏专门针对稀疏大视角变化的3D一致性自动评估指标。这些局限指向若干开放问题：如何设计更高效的蒸馏策略以降低运行时间，如何缓解SDS引起的模糊问题，以及如何构建更可靠的稀疏视图一致性评估指标。
 
-
-
 ### 问题定义：稀疏视图下的3D一致编辑
 
 给定一组静态3D场景的稀疏输入图像 $\{I_i\}_{i=1}^{N}$ 及其对应的相机位姿 $\{\pi_i\}_{i=1}^{N}$，以及一条文本编辑指令 $y \in \mathcal{D}$，目标是生成一组编辑后的多视图图像 $\{E_i\}_{i=1}^{N}$。这些编辑结果必须在语义上与指令 $y$ 对齐，同时在跨视图间保持严格的3D一致性——即纹理、颜色和几何结构在所有视角下保持一致，不会出现闪烁、错位或语义漂移。
@@ -97,8 +95,6 @@ claims:
 1. **替换失效的神经场整合器**：以预训练多视图扩散模型SEVA作为学生模型，利用其内置的3D一致性先验替代逐场景优化的神经场。
 2. **设计有效的蒸馏机制**：构建一套完整的SDS蒸馏流程，包括学生查询、潜空间对齐、截断正态噪声调度和随机交叉视图注意力，确保教师（InstructPix2Pix）的编辑信号能够有效传递给学生，同时保持跨视图一致性。
 3. **验证组件的必要性**：通过系统的消融实验证明每个设计选择（特别是随机交叉视图注意力和截断正态调度）对最终性能的关键作用。
-
-
 
 ## 核心方法与创新机理
 
@@ -136,10 +132,6 @@ $$\mathrm{RCVAttn}(Q,K,V,i) = \mathrm{softmax}\left(\frac{Q_i K_\kappa^\top}{\sq
 
 上述五个变更共同构成了一个范式转换：传统方法遵循“先重建 3D 场景，再在 3D 表示上编辑”的路径，其瓶颈在于稀疏视图下无法可靠重建 3D 场景。InstructMix2Mix 则通过个性化蒸馏，将 2D 编辑模型的编辑能力直接注入多视图生成模型的权重中，绕过了显式的 3D 重建步骤。学生模型（SEVA）的 3D 一致性先验来自预训练，而非对稀疏输入视图的过拟合重建；教师模型（InstructPix2Pix）的编辑能力通过 SDS 梯度 $\nabla_\theta \mathcal{L}_{\mathrm{SDS}} = \frac{1}{N} \sum_{i=1}^{N} \left( \epsilon_\psi(\hat{z}_t^i; y, I_i, t) - \epsilon_i \right) \frac{\partial \hat{z}_0^i}{\partial \theta}$ 持续蒸馏到学生权重中，二者缺一不可——单独使用教师（Teacher Only）导致一致性严重下降（CLIP Directional Consistency 0.228），单独使用学生（Student Only）则编辑不真实（CLIP Directional Similarity 0.212）（Table 3, Student Only / Teacher Only）。
 
-
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2511_14899/figures/001_Figure_1.jpg]]
-*Figure 1: I-Mix2Mix overview. Given a set of input images, a randomly chosen reference image is edited by the frozen teacher and encoded to serve as the personalized multi-view student’s input latent (Initialization). At each distillation iteration, noisy multi-view latents $\zeta _ { \tau }$ are denoised by the student (Student Query), aligned to the teacher’s latent space (Alignment), and perturbed with our forward schedule (Perturbation). The teacher predicts edits with Random Cross-View Attention (Teacher Prediction), where all frames attend to the $\kappa \mathrm { { s } }$ frame, and the resulting supervision is distilled back into the student (Student Update). After distillation, the student outpu...
 
 InstructMix2Mix 的核心思路是将 2D 编辑模型的编辑能力蒸馏到预训练的多视图扩散模型中，从而在稀疏输入视图下生成跨视图一致的编辑结果。整个框架建立在一个关键洞察之上：传统的 SDS（Score Distillation Sampling）框架依赖神经场（NeRF 或 3DGS）作为多视图信息的整合器，但这些表示需要密集视图才能构建可靠的 3D 结构，在稀疏视图下容易过拟合，无法充当真正的跨视图一致性载体。I-Mix2Mix 将这一整合器替换为预训练的多视图扩散模型 **SEVA**，其网络权重中内嵌了数据驱动的 3D 一致性先验，从而在稀疏视图下也能通过个性化蒸馏产生一致的编辑。
 
@@ -192,8 +184,6 @@ InstructMix2Mix 的核心思路是将 2D 编辑模型的编辑能力蒸馏到预
 - 框架整体有效性由 Table 1 的 CLIP Directional Consistency（0.342 vs DGE 的 0.287）和 Table 2 的人类研究（场景赢率 75%，平均不一致标记 1.34 vs 2.02）提供强有力支持。
 - 各模块的消融实验（Table 3, Figure 5）系统验证了每个设计选择的必要性，证据置信度普遍在 0.9–0.95 之间。
 - 该方法的一个已知限制是蒸馏过程在每个学生时间步需要多次迭代，运行时间比最强基线 DGE 慢两倍以上（Section 6），且最终编辑质量受限于底层教师（InstructPix2Pix）和学生（SEVA）的性能天花板。
-
-
 
 InstructMix2Mix 的核心是将预训练的多视图扩散模型（SEVA）作为学生，通过 Score Distillation Sampling (SDS) 框架，从冻结的单目指令编辑教师模型（InstructPix2Pix）中蒸馏编辑能力。整个蒸馏过程由五个关键模块级联构成，每个模块解决一个特定的瓶颈问题。
 
@@ -259,8 +249,6 @@ $$\nabla_{\theta} \mathcal{L}_{\text{SDS}} = \frac{1}{N} \sum_{i=1}^{N} \left( \
 | 随机交叉视图注意力 | $\text{RCVAttn} = \text{softmax}(Q_i K_{\kappa}^{\top} / \sqrt{d}) V_{\kappa}$ | 使所有帧关注同一关键帧，在教师预测中强制跨视图一致性 |
 | SDS 梯度更新 | $\nabla_{\theta} \mathcal{L}_{\text{SDS}} = \frac{1}{N} \sum_i (\epsilon_{\psi} - \epsilon_i) \frac{\partial \hat{z}_0^i}{\partial \theta}$ | 将教师编辑信号蒸馏至学生模型权重 |
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与实验设计逻辑
@@ -292,7 +280,6 @@ Table 3系统性地拆解了SDS蒸馏框架的五个关键设计选择，每个�
 #### 蒸馏框架的必要性：学生与教师的互补角色
 
 **Teacher Only**变体：直接使用冻结的InstructPix2Pix独立编辑每帧。CLIP Directional Consistency从完整方法的0.337骤降至0.228，视觉上出现严重的跨视图纹理和颜色不一致（Figure 9）。这证实了教师模型缺乏3D先验，无法在稀疏视图下维持一致性。
-
 
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2511_14899/figures/012_Figure_9.jpg]]
 *Figure 9: Student and Teacher models limitation example, on the Bear scene and Panda edit*
@@ -342,7 +329,6 @@ I-Mix2Mix的编辑质量和一致性分别受限于底层2D编辑器（InstructP
 
 将框架推广到ControlNet教师（深度/Canny条件生成）时，输出图像往往较为模糊（Figure 22）。这是SDS优化的已知局限：单步Tweedie预测与多步采样之间存在分布偏移，在条件生成任务中表现得更为明显。
 
-
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2511_14899/figures/027_Figure_22.jpg]]
 *Figure 22: Example results of I-Mix2Mix with Canny edge map and Depth maps as input, with corresponding ControlNet teachers*
 
@@ -376,24 +362,6 @@ I-Mix2Mix的编辑质量和一致性分别受限于底层2D编辑器（InstructP
 
 - **Figure 9**：学生和教师单独使用的局限性示例
 - **Figure 22**：推广到ControlNet条件生成任务的结果示例
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2511_14899/figures/023_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2511_14899/figures/024_Figure_19.jpg]]
-*Figure 19: I-Mix2Mix edits on the Car (top three rows) and Garden (bottom rows) scenes*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2511_14899/figures/025_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2511_14899/figures/026_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2511_14899/figures/011_Table_4.jpg]]
-*Table 4: Prompts and CFG values for each edit used for quantitative evaluation*
-
-
-
-
 
 ## 定位与知识库关联
 
@@ -467,8 +435,6 @@ I-Mix2Mix在以下条件下表现最佳：
 **（4）骨干模型升级的潜力**：如果集成更强大的2D编辑器或多视图骨干模型，能在多大程度上提升编辑保真度和一致性？当前框架的设计具有教师-学生解耦的优势，理论上可以独立升级任一组件，但实际增益和兼容性需要验证。
 
 **（5）与扩散引导的深层联系**：论文在Discussion中指出了I-Mix2Mix与扩散引导（diffusion guidance）的平行关系——将引导信号反向传播到学生权重而非潜变量。这一视角是否能够启发新的混合策略，结合潜变量更新和权重更新的优势，是一个值得探索的理论方向。
-
-
 
 ## 原文 PDF
 

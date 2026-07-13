@@ -52,8 +52,6 @@ claims:
 
 **主要结果**：在 MultiHuman-Testbench 基准上，Ar2Can 的计数准确率达到 **90.2%**，Multi-ID 身份相似度达到 **68.2**，统一评分 **72.4**，分别超越现有最佳方法 2.3、13.7 和 10.8 个百分点。用户偏好研究中，Ar2Can 在提示对齐、身份相似度和图像质量三个维度均显著优于对比方法。
 
-
-
 扩散模型在文本到图像生成领域取得了显著进展，但在**参考图像引导的多人场景生成**这一任务上仍面临根本性瓶颈。当用户提供多张参考人脸图像并要求生成包含这些特定人物的合照时，现有方法普遍出现**身份混叠**（不同人物的面部特征相互融合）、**人脸丢失**（部分参考人物未出现在生成图像中）以及**人数计数错误**（生成人数与提示要求不符）等问题。
 
 这些问题的根源在于：现有方法将**空间布局规划**与**身份特征渲染**耦合在单一的端到端生成过程中。无论是基于区域条件的模型（如 **WithAnyone**）、基于身份补丁的方法（如 **ID-Patch**），还是通用多人生成框架（如 **MH-OmniGen**、**DreamO**、**UMO-UNO**），都缺乏对“每个人应该出现在哪里”的显式空间推理，导致模型在生成时难以协调多个身份的空间分配，进而产生身份冲突和计数偏差。
@@ -61,8 +59,6 @@ claims:
 此外，训练数据的匮乏加剧了这一困境。真实世界中带有精确身份标注的多人图像稀缺，而现有方法大多依赖监督微调或直接推理，缺乏有效的奖励信号来引导模型学习身份保持与空间布局之间的平衡。
 
 Ar2Can 的核心动机正是针对上述瓶颈：**将多人场景生成显式地分解为空间布局预测和身份保持渲染两个解耦阶段**，并引入基于强化学习的组合奖励机制来优化身份一致性和图像质量。这一思路借鉴了人类绘画的认知过程——先由“建筑师”规划构图，再由“艺术家”精细渲染——从而在保持高画质的同时，大幅提升身份一致性和计数准确性。
-
-
 
 ## 核心方法与创新机理
 
@@ -120,8 +116,6 @@ $$p(N \mid t) = \begin{cases} 1/2 & N \in \{2,3\}, t \le \tau \\ 1/6 & \text{oth
 | Token 处理 | 全画布输入 | 丢弃 + RoPE 共享 | 推理加速 2× |
 | 数据依赖 | 真实多人图像 | 合成场景 + 真实人脸 | 无需真实多人标注 |
 
-
-
 Ar2Can 提出一种**两阶段解耦框架**，将多人生成任务分解为空间布局规划与身份保持渲染两个独立阶段，以解决现有扩散模型将布局与身份耦合所导致的身份混叠、人脸丢失和计数错误问题。
 
 ### Pipeline 总览
@@ -156,15 +150,11 @@ Ar2Can 提出一种**两阶段解耦框架**，将多人生成任务分解为空
 
 > **注意**：Architect 与 Artist 的具体训练目标、奖励函数设计及消融分析详见后续“核心方法”与“实验与分析”章节。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l983_https_arxiv_org_abs_2511_22690/figures/001_Figure_1.jpg]]
 *Figure 1: Ar2Can Framework Overview. Our two-stage approach decomposes multi-human generation into spatial planning (Architect) and identity-preserving rendering (Artist)*
 
 ![[assets/figures/papers/paper_list_l983_https_arxiv_org_abs_2511_22690/figures/016_Figure.jpg]]
 *Figure: a) Total Loss b) Cross-Entropy Loss c) Co-Ordinate Loss Figure D.1. Training curves of Architecture-A (LLM-based) with and without data sorting. After 2000 steps, training is dominated by the optimization of bounding-box coordinate regression. A clear gap emerges between sorted and unsorted data: sorting leads to more stable learning and faster convergence in the coordinate regression stage under the same number of training iterations*
-
-
 
 ### 两阶段生成框架
 
@@ -224,18 +214,11 @@ $$p(N \mid t) = \begin{cases} \dfrac{1}{2} & \text{if } N \in \{2, 3\} \text{ an
 
 其中 $N$ 为生成人数，$t$ 为当前训练轮次，$\tau$ 为课程转换阈值。在 $t \leq \tau$ 阶段，模型专注于2-3人的简单场景；之后均匀采样2-7人的场景。消融实验证实课程学习对最终性能至关重要，完整模型计数准确率达86.9%，Multi-ID达68.2。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l983_https_arxiv_org_abs_2511_22690/figures/003_Figure_3.jpg]]
 *Figure 3: Architecture of the LLM-based Architect-A for layout. Top: response example for spatial layout generation. Bottom: our lightweight LLM extended with special tokens*
 
 ![[assets/figures/papers/paper_list_l983_https_arxiv_org_abs_2511_22690/figures/004_Figure_4.jpg]]
 *Figure 4: Artist training pipeline with GRPO. Given the input canvas and text prompt, sample a group of images and optimize over compositional rewards: count accuracy, prompt alignment/aesthetic quality (HPSv3), spatially-grounded face matching and pose correction*
-
-![[assets/figures/papers/paper_list_l983_https_arxiv_org_abs_2511_22690/figures/005_Figure_5.jpg]]
-*Figure 5: We drop non-informative canvas tokens and assign identical positional encodings to overlapping regions, enabling the model to learn natural occlusion and depth ordering*
-
-
 
 ## 实验与关键发现
 
@@ -252,9 +235,6 @@ Ar2Can在MultiHuman-Testbench上进行了全面的定量评估，结果如Table 
 Figure 6的定性对比进一步揭示了现有方法的典型失败模式：GPT-Image-1和Nanobanana等专有方法在多人场景中频繁出现身份混叠和面部丢失；开源方法如MH-OmniGen和UniPortrait虽能保持部分身份，但计数错误和复制粘贴伪影严重。Ar2Can通过显式的空间布局约束，有效避免了这些问题。
 
 在MultiID-2M测试集（Table 2）上，Ar2Can在输入身份相似度（54.3）和真实身份相似度（38.1）两个指标上均优于WithAnyone（50.1/34.4），验证了方法在更大规模身份保持任务上的泛化能力。
-
-![[assets/figures/papers/paper_list_l983_https_arxiv_org_abs_2511_22690/figures/008_Table_2.jpg]]
-*Table 2: Evaluation on MultiID-2M test set. ID Sim (Input): similarity to reference images, ID Sim (GT): similarity to ground truth identities, and Prompt Align assesses text-image alignment*
 
 ### 消融实验
 
@@ -290,27 +270,11 @@ Table 4展示了25名评估者对25个三元组样本的盲评结果。Ar2Can在
 
 Table D.4的延迟分解显示，Ar2Can的Architect-A总延迟为15.5秒（Architect 1.5s + Artist 14.0s），相比Architect-B（28.0s）加速约1.8倍。LLM-based布局预测的高效性（仅需1.5秒生成结构化布局）使得整体流程适用于交互式应用场景。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l983_https_arxiv_org_abs_2511_22690/figures/018_Table_1.jpg]]
 *Table 1: Ar2Can achieves the most balanced performance across all MultiHuman-Testbench metrics, demonstrating superior count accuracy and identity preservation while maintaining competitive prompt alignment and action scores. The SOTA methods exhibit clear trade-offs, excelling in some metrics while failing in others*
 
 ![[assets/figures/papers/paper_list_l983_https_arxiv_org_abs_2511_22690/figures/011_Table_3.jpg]]
 *Table 3: Ablation study on key training components. We progressively add each component to measure its contribution to count accuracy, identity preservation, and image quality*
-
-![[assets/figures/papers/paper_list_l983_https_arxiv_org_abs_2511_22690/figures/002_Figure_2.jpg]]
-*Figure 2: Ar2Can generates highly photorealistic multi-human scenes with 1-5 people while preserving the individual identities. Our twostage architecture produces natural poses, realistic lighting, and proper spatial arrangements without identity merging or blending artifacts*
-
-![[assets/figures/papers/paper_list_l983_https_arxiv_org_abs_2511_22690/figures/007_Figure_6.jpg]]
-*Figure 6: Qualitative comparison with state-of-the-art methods. Left: reference images and text prompts from MultiHuman-Testbench. Right: outputs from all methods. The scorecards indicate ID preservation and prompt alignment. State-of-the-art methods frequently fail at either identity preservation or prompt alignment, while Ar2Can consistently achieves both across diverse multi-human scenes*
-
-![[assets/figures/papers/paper_list_l983_https_arxiv_org_abs_2511_22690/figures/009_Figure_7.jpg]]
-*Figure 7: Quantitative analysis and scalability. (a) Latency-quality trade-off on A100 GPU. (b) Multi-ID similarity vs. person count. (c) HPS vs. person count. Ar2Can maintains consistent identity preservation and Prompt Alignment across 1-5 people*
-
-![[assets/figures/papers/paper_list_l983_https_arxiv_org_abs_2511_22690/figures/010_Table_4.jpg]]
-*Table 4: Human preference study. 25 evaluators rated 25 triplet samples. % Wins denotes the percentage of prompts for which a method was preferred overall*
-
-
 
 ## 定位与知识库关联
 
@@ -349,8 +313,6 @@ Ar2Can 在以下条件下表现最优：
 4. **伪影消除**：如何进一步减少复制粘贴伪影，提高姿态控制变体的自然度？这可能需要在奖励函数设计或训练数据构建上进行更深入的研究。
 
 **证据强度说明**：上述局限和开放问题均来自论文自身的讨论和实验分析，置信度较高。但关于 8 人以上场景的推断属于论文未覆盖的边界，需在实际应用中进一步验证。
-
-
 
 ## 原文 PDF
 

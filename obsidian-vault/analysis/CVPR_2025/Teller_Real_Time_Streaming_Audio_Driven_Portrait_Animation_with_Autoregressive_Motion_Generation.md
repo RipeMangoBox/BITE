@@ -54,8 +54,6 @@ claims:
 
 **局限与展望**：Teller依赖LivePortrait作为运动表示基础，可能继承其对极端姿态的处理缺陷；训练数据经过严格过滤，对大幅度运动的泛化能力未经验证；目前仅支持单人物正面动画，长视频生成的自回归误差累积问题也尚待解决。未来可探索将该框架扩展至全身动画或集成到多模态大语言模型中。
 
-
-
 音频驱动的肖像动画旨在根据输入语音生成逼真且时序同步的说话人视频，在数字人、虚拟主播、在线教育等领域具有广泛应用。近年来，该领域涌现出多种方法，包括基于GAN的**SadTalker**（Zhang et al., CVPR 2023）和**AniPortrait**（Wei et al., arXiv 2024），以及基于扩散模型的**Hallo**（Xu et al., arXiv 2024）和**EchoMimic**（Chen et al., arXiv 2024）。这些方法在图像质量上取得了显著进展，但仍面临两个核心瓶颈。
 
 **实时性瓶颈**。扩散模型和GAN方法通常需要多步去噪或复杂的生成流程，导致推理速度难以满足实时交互需求。以Hallo为例，生成1秒视频需要20.93秒，远无法达到流式传输的实时性要求。在直播、视频会议等场景中，低延迟的流式生成能力是实际部署的前提条件。
@@ -63,8 +61,6 @@ claims:
 **身体与配饰运动缺失**。现有方法普遍聚焦于面部区域和唇音同步，却忽略了项链、耳环、颈部肌肉等身体部位和配饰的自然运动。这种忽视导致生成的动画出现两类典型问题：一是身体部位僵硬静止，与活跃的面部表情形成割裂感；二是配饰运动与头部运动缺乏物理一致性，呈现不自然的漂浮或错位。这些问题严重损害了动画的整体真实感。
 
 上述瓶颈的根源在于生成范式的选择。扩散模型虽然生成质量高，但其迭代去噪过程天然与实时性相悖；而GAN方法缺乏对时序依赖关系的显式建模，难以捕捉细微的物理运动规律。因此，探索一种既能保证极低推理延迟、又能精确建模全身运动细节的新范式，成为推动该领域发展的关键动机。Teller正是在这一背景下，首次将自回归Transformer引入肖像动画，通过离散运动token预测和单步时序细化，同时解决实时性和运动真实感两大难题。
-
-
 
 ## 核心方法与创新机理
 
@@ -81,8 +77,6 @@ Teller 的核心创新在于将音频驱动人像动画从传统的扩散/生成
 
 4.  **推理速度：从20秒级到亚秒级实时流式**
     这是前述创新的直接结果。Teller 将1秒视频的推理时间从 Hallo 的20.93秒压缩至0.92秒，实现了**25 FPS的实时流式生成**。这一数量级差异源于自回归架构避免了扩散模型的迭代去噪过程，以及双头token并行预测设计进一步减少了自回归步数。
-
-
 
 ![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2503_18429/figures/001_Figure_1.jpg]]
 *Figure 1: Teller framework is the first autoregressive framework for real-time, audio-driven portrait animation, achieving up to 25 FPS while preserving realistic body part and accessory movements. Demo can be found at https://teller-avatar.github.io/*
@@ -113,8 +107,6 @@ ETM阶段则对初步视频帧进行时序一致性修复。首先由 **VAE编�
 **推理流程**
 
 推理时，Teller以流式方式处理音频：Whisper编码器对音频块实时编码，AR Transformer根据已生成的token和当前音频条件预测下一对运动token，RVQ解码后驱动LivePortrait生成帧，ETM实时细化后输出。整个流程生成1秒视频仅需0.92秒（Hallo为20.93秒），达到25 FPS实时性能。
-
-
 
 Teller 的实时流式音频驱动人像动画框架由两个核心模块构成：**面部运动隐变量生成（FMLG）** 和 **高效时序模块（ETM）**。FMLG 负责将音频信号映射为离散的面部运动 token，实现极低延迟的流式生成；ETM 则对生成的运动进行单步时序细化，修正项链、耳环、颈部肌肉等身体部位和配饰的运动，保证物理一致性。
 
@@ -170,8 +162,6 @@ $$\mathrm{mask}(i,j) = \left\{ \begin{array}{ll} 1, & \mathrm{if } (i,j) \text{ 
 
 其中 $\mathrm{BB}(x)$ 为由关键点确定的边界框区域。该设计使得 ETM 能够精准修正 Stage 1 中缺失的耳环摆动、颈部肌肉运动等细微动态（Figure 10 消融实验证实），而不会干扰已生成良好的面部区域。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能对比
@@ -222,12 +212,8 @@ Teller在HDTF和RAVDESS两个主流基准上全面超越现有方法，尤其在
 
 推理时间在4块H800 GPU上测得，其他硬件条件下的实时性需重新验证。对比方法使用论文原始权重推理，但可能未完全复现其最佳性能。所有方法共享相同的Mediapipe和Sync-C/Sync-D过滤流程，但过滤本身可能对不同方法产生不等价影响。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2503_18429/figures/008_Figure_6.jpg]]
 *Figure 6: Top-k selection (k=15) in FMLG produces diverse facial expressions and actions with accurate lip sync on the HDTF*
-
-
 
 ## 定位与知识库关联
 
@@ -260,8 +246,6 @@ Teller 的核心贡献在于将音频驱动人像动画从扩散/生成对抗网
 **多语言与跨域泛化。** 训练数据以英语语音为主（AV Speech 662小时），中文等多语言音频的效果未知。此外，跨域人脸动画（不同种族、年龄、风格）是否可以直接泛化而不需要 fine-tuning，论文未给出答案。
 
 **开放研究问题。** 论文结论部分指出 Teller 的自回归 Transformer 架构与现有统一多模态语言模型兼容，这暗示了未来将音频驱动动画集成到端到端多模态大模型中的可能性。其他值得探索的方向包括：将自回归框架扩展至全身或手势动画、结合文本情感描述实现多模态可控动画、以及在长视频生成中引入全局一致性约束以缓解误差累积。
-
-
 
 ## 原文 PDF
 

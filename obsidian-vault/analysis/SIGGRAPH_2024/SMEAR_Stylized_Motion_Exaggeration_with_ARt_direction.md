@@ -54,8 +54,6 @@ SMEAR 方法（SIGGRAPH 2024）针对这一瓶颈提出了一个两阶段框架�
 
 **方法定位**：SMEAR 属于基于几何变形的非真实感渲染（NPR）方法，区别于基于物理模拟或后处理合成的方法。它通过一个轻量、可插拔的运动偏移量计算模块，将艺术控制权交给动画师，同时保持与现有动画工作流的兼容性。其主要局限性包括：对称旋转对象的自相交问题（需手动 UV 空间技巧解决）、细长肢体（如手指）的过度变形（需骨骼修剪），以及目前仅适用于关键帧动画输入。
 
-
-
 ### 涂抹帧：从2D动画到3D的挑战
 
 在传统2D动画中，涂抹帧（smear frames）是一种经典的运动夸张手法——通过在快速动作中拉伸对象形态，在单帧内传达速度感和运动方向（Figure 2）。这种技术不仅增强了视觉冲击力，还利用了人眼的视觉暂留效应，使观众感知到流畅的连续运动。然而，将这一艺术手段迁移至3D动画领域面临着根本性困难：3D对象具有完整的几何拓扑，如何在保持对象可识别性和表面细节的前提下，生成可控的变形效果，同时无缝嵌入现有的动画制作流程，一直缺乏有效方案。
@@ -73,8 +71,6 @@ SMEAR 方法（SIGGRAPH 2024）针对这一瓶颈提出了一个两阶段框架�
 3. **艺术控制性**：艺术家应能通过直观参数控制变形的强度、范围和时间特性，而非面对黑箱式的物理模拟。
 
 本文提出的SMEAR方法正是针对这一瓶颈，通过引入**运动偏移量（motion offsets）** 这一核心概念，将运动结构分析与风格化变形解耦，从而在计算效率、几何质量和艺术控制性三个维度上同时取得突破。运动偏移量定义为各顶点到分离结构的归一化符号距离，既编码了对象沿运动方向的前导/滞后关系，又保持了与输入网格拓扑的一致性，为后续的多样化风格化提供了统一的数学基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -112,8 +108,6 @@ SMEAR 的关键改变在于**输出网格保持与输入相同的拓扑结构**�
 
 SMEAR 相对于 baselines 的创新可归纳为一次**表示层的范式转移**：用“运动偏移量 + 风格化函数”替代了“局部几何操作”或“体积重建”，在保持输入拓扑和细节的前提下，将涂抹帧生成从计算密集的几何处理转变为轻量、可控、可组合的艺术创作原语。这一转移的直接证据是：在性能上实现了三个数量级的加速（Table 1），在效果上保留了扫掠体积无法保留的凹面和细节（Figure 9），在控制上提供了从全局预设到逐顶点权重绘制的多层次艺术接口（Section 5.1, Figure 15）。
 
-
-
 SMEAR 的整体管线遵循“运动结构分析→风格化变形”的两阶段范式，其核心设计目标是**在不改变输入姿态和网格拓扑的前提下**，将艺术导向的涂抹帧效果自动注入到现有动画工作流中。
 
 ### 输入与输出
@@ -150,8 +144,6 @@ SMEAR 的整体管线遵循“运动结构分析→风格化变形”的两阶�
 ### 与现有方法的根本差异
 
 相比于基于扫掠体积的方法（如 **Sellán et al., 2021**），SMEAR 不生成新的体积几何，而是直接变形输入网格，因此保持了原始拓扑和表面细节（如凹陷和高频纹理），同时计算速度快几个数量级（简单对象约 4 ms/帧 vs. 扫掠体积约 7000 ms/帧）。相比于简单的局部点积方法（如 **Jones and Keyser, 2005**），SMEAR 的分离平面/带方法提供了空间上更一致的领前/滞后划分，避免了局部法线方向导致的噪声偏移量。
-
-
 
 SMEAR 方法的核心流水线由两个关键模块构成：**运动偏移量计算**（Motion Offset Computation）与**风格化引擎**（Stylization Engine）。前者为每个顶点分配一个标量值 $\bar{\delta}_i(f) \in [-1, 1]$，表示该顶点在运动方向上“领前”（正值）或“滞后”（负值）的程度；后者以运动偏移量为输入，通过可插拔的风格化函数驱动网格变形，生成拉长中间帧、多重中间帧和运动线三种涂抹帧效果。
 
@@ -230,15 +222,8 @@ $$
 
 运动偏移量计算是预处理步骤，其性能表现决定了整个流水线的交互性。Table 1 报告了在 Intel Core i9-7920X 2.90GHz CPU 上的测量结果：对于 482 顶点的简单对象仅需 4 ms/帧，对于 14267 顶点、65 根骨骼的复杂角色需 70 ms/帧。相比之下，基于扫掠体积的方法（**Swept volumes**，Sellán et al. 2021）对简单对象需约 7000 ms/帧，SMEAR 实现了约 1750 倍的加速（Figure 9）。内存占用同样极低，复杂角色仅需 280 KB/帧，使得交互式工作流成为可能。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l7_SMEAR_Stylized_Motion_Exaggeration_with_ARt_direction_motion20v2/figures/007_Figure_6.jpg]]
 *Figure 6: Motion offsets for a two-bones capsule, with onion skin visualization of the animation. Left: motion offsets computed using a secant plane as in Section 3.1. Right: motion offsets computed using a ribbon separation surface depending on the local motion direction*
-
-![[assets/figures/papers/paper_list_l7_SMEAR_Stylized_Motion_Exaggeration_with_ARt_direction_motion20v2/figures/022_Figure_16.jpg]]
-*Figure 16: The stylization effects achievable by our method may be combined to create complex motion stylizations*
-
-
 
 ## 实验与关键发现
 
@@ -290,30 +275,11 @@ SMEAR 在预处理性能和视觉保真度两个维度上均展现出对基线�
 
 2. **细长肢体的过度变形（Figure 13）**：如前所述，骨骼级别的运动偏移量计算对细长肢体（如手指）会产生不自然的过度拉伸，需要手动进行骨骼修剪。这一问题的根源在于归一化步骤使用骨骼范围内的最大值作为分母，当骨骼覆盖的顶点集较小时，归一化后的偏移量对离群顶点更为敏感。
 
-![[assets/figures/papers/paper_list_l7_SMEAR_Stylized_Motion_Exaggeration_with_ARt_direction_motion20v2/figures/016_Figure_13.jpg]]
-*Figure 13: Left: Elongated in-betweens generated with motion offsets computed considering the hands as single body parts instead of each finger independently, and with the stylization function*
-
 3. **分离结构的几何依赖性**：运动偏移量计算依赖于对象结构的全局总结（简单对象的质心或关节角色的骨骼），对于非标准几何体（如具有复杂拓扑或缺乏明确骨骼结构的对象），可能需要手动调整分离结构。论文未提供针对非标准几何体的自动化适配方案。
 
 4. **输入数据格式限制**：当前方法仅适用于关键帧动画输入，无法直接处理视频流或物理模拟数据。这是因为运动偏移量的计算需要已知的顶点轨迹，而视频和模拟数据通常缺乏这种显式的对应关系。
 
 5. **实时性边界**：虽然预处理步骤（运动偏移量计算）极快，但风格化步骤（尤其是多重中间帧和运动线的生成）需要在每帧重新评估风格化函数并生成新几何体。对于顶点数极大的场景或复杂的风格化组合，完全实时的交互可能无法保证。论文未提供风格化步骤的详细性能数据，这一点需要手动验证。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l7_SMEAR_Stylized_Motion_Exaggeration_with_ARt_direction_motion20v2/figures/014_Figure_12.jpg]]
-*Figure 12: Left: elongated in-between created with*
-
-![[assets/figures/papers/paper_list_l7_SMEAR_Stylized_Motion_Exaggeration_with_ARt_direction_motion20v2/figures/023_Figure_11.jpg]]
-*Figure 11: Elongated in-betweens created with different stylization functions for the middle frame of a character animation*
-
-![[assets/figures/papers/paper_list_l7_SMEAR_Stylized_Motion_Exaggeration_with_ARt_direction_motion20v2/figures/002_Figure_2.jpg]]
-*Figure 2: Example of smear frames in traditional 2D animation, “The Dover Boys at Pimento Academy”, directed by Charles M. Jones (public domain)*
-
-![[assets/figures/papers/paper_list_l7_SMEAR_Stylized_Motion_Exaggeration_with_ARt_direction_motion20v2/figures/012_Figure_15.jpg]]
-*Figure 15: Various stylization effects (c-e) of a sword slash motion using (a) motion offsets computed with a single bone to control the axis of separation, and (b) manually painted weights to control stylization intensity*
-
-
 
 ## 定位与知识库关联
 
@@ -354,8 +320,6 @@ SMEAR的方法分为两步：首先计算时空连贯的运动偏移量（motion
 4. **统一风格化流水线。** 能否将涂抹帧与其他运动夸张效果（如压缩-拉伸、预备-跟随）结合，形成统一的动画风格化流水线？这需要处理不同效果之间的协调与冲突。
 
 5. **对称旋转的自动化处理。** 是否存在不依赖UV空间技巧的自动化方法，能够在不产生自相交的前提下处理对称旋转对象的运动风格化？这可能需要在运动偏移量计算中显式建模旋转分量。
-
-
 
 ## 原文 PDF
 

@@ -51,8 +51,6 @@ claims:
 
 实验结果表明，SymPL 在多个基准测试上全面超越此前最佳方法：在 COMFORT# 异中心测试中，left/right 准确率达 **69.00%**（较 GPT-5 提升 19.17 个百分点），closer 准确率达 **97.33%**（提升 13.08 个百分点），visibility 和 facing 类别分别领先最强基线 27.31 和 19.25 个百分点。此外，SymPL 在自我中心空间推理的 COCOSPATIAL 基准上也达到最高水平（left/right 89.83%，above/below 94.33%），证明了该方法对多视角推理的一致有效性。
 
-
-
 空间推理是视觉语言模型（VLM）走向具身智能与复杂场景理解的核心能力之一。然而，现有 VLM 在空间推理上存在一个关键瓶颈：**模型在以对象为中心的异中心（allocentric）视角下表现出强烈的自我中心（egocentric）偏置**。换言之，当要求模型从场景中某个参考对象（如一个人）的视角出发，判断其他对象的相对方位、距离、可见性或朝向时，VLM 往往无法正确执行视点变换（viewpoint transformation），导致推理性能大幅下降。
 
 这一缺陷的根源在于，VLM 的训练数据天然以相机视角（即自我中心视角）为主，模型缺乏从“他人”视角理解空间关系的内在机制。直接让 VLM 进行视点变换——即将自我中心观测映射为异中心关系——是一项极其困难的任务，现有方法对此收效甚微。
@@ -60,8 +58,6 @@ claims:
 现有工作可大致归为三类：（1）**通用 VLM**，如 GPT-5（OpenAI, 2025）、Gemini-2.5-Flash（Comanici et al., 2025）、Qwen2.5-VL 等，在异中心空间推理上表现有限；（2）**推理辅助方法**，如 CoT（Kojima et al., NeurIPS 2022）、SoM（Yang et al., 2023）、SCAFFOLD（Lei et al., COLING 2024），通过链式思维或视觉标记增强推理，但并未从本质上解决视点变换问题；（3）**专用空间推理模型**，如 SpatialVLM（Chen et al., NeurIPS 2024）、SpatialRGPT（Cheng et al., NeurIPS 2024）等专注于自我中心推理，而 SAT（Ray et al., COLM 2025）、APC-Num 和 APC-Vis（Lee et al., ICCV 2025）虽面向异中心场景，但性能仍有较大提升空间。
 
 本文的核心动机在于：**与其强迫 VLM 学会视点变换，不如将异中心推理问题重构为 VLM 擅长的任务**。具体而言，SymPL 将复杂的空间关系推理转化为一个**符号布局（symbolic layout）问题**——通过正交投影将 3D 场景映射为 2D 平面，将对象抽象为无特征彩色圆形，利用线性或圆形边界对空间进行二分区着色，最终将原始的空间关系查询转化为“目标对象位于哪种颜色区域”的定位问题。这一策略绕开了 VLM 的视点变换短板，转而利用其在简化视觉线索和位置判断上的强项，从而在异中心空间推理上取得显著突破。
-
-
 
 ## 核心方法与创新机理
 
@@ -112,8 +108,6 @@ SymPL 处于空间推理与 VLM 推理增强的交叉领域，其定位如下：
 
 SymPL 的独特贡献在于：它不试图让 VLM “学会”视点变换，而是通过符号布局重构**绕过**这一困难，将问题转化为 VLM 已有的能力范畴。这种“问题重构”范式为 VLM 的空间推理能力扩展提供了新的思路。
 
-
-
 SymPL 的核心思想是将视觉语言模型（VLM）难以直接处理的异中心空间推理问题，重构为 VLM 擅长的符号布局定位问题。整个框架由**两阶段流水线**构成：空间信息提取与问题重构，后者通过**投影、抽象、二分区、定位**四个关键因子逐步将原始场景转化为简化的颜色分区布局。
 
 ### 两阶段流水线
@@ -137,15 +131,8 @@ SymPL 的核心思想是将视觉语言模型（VLM）难以直接处理的异�
 
 流水线的性能高度依赖外部预训练模块的精度。其中，参考观察者的朝向估计（OrientAnything）是当前最主要的误差来源——朝向向量估计不准会直接导致投影坐标系偏移，使后续分区和定位全部失效。此外，目标检测（GroundingDINO）和深度估计（Depth-Pro）的误差同样会沿流水线传播，影响最终推理结果。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2398_https_arxiv_org_abs_2602_19117/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of SymPL framework. SymPL reformulates an allocentric question into a symbolic-layout question through two stages: 1) Spatial Information Extraction and 2) Question Reformulation using four key factors — projection, abstraction, bipartition, and localization*
-
-![[assets/figures/papers/paper_list_l2398_https_arxiv_org_abs_2602_19117/figures/001_Figure_1.jpg]]
-*Figure 1: SymPL reformulates allocentric questions into symboliclayout questions using four factors-projection, abstraction, bipartition, and localization-enabling significantly improved spatial reasoning under allocentric settings*
-
-
 
 SymPL 的核心思想是将异中心空间推理问题重构为符号布局问题，其推理流水线由两个阶段、四个关键因子构成。以下按模块顺序展开，并给出关键公式定义。
 
@@ -186,13 +173,6 @@ $$U = \{ v_{r}, p_{r}, p_{i} \mid i = 1, 2, \ldots, n \}$$
 **二分区因子**：根据空间推理类别确定分区形式。方向比较（如 left/right、facing）采用线性边界将平面二分为两个区域；距离比较（如 closer）采用圆形边界将平面分为内部和外部两个区域。分区区域填充不同颜色。
 
 **定位因子**：将原始的空间关系问题转化为“目标对象位于哪种颜色区域”的定位问题。例如，“object A 是否位于 reference 的左侧”被重构为“object A 的符号是否位于红色区域内”。这一转化使 VLM 无需执行显式的视点变换，而只需利用其固有的颜色区域定位能力即可完成推理。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2398_https_arxiv_org_abs_2602_19117/figures/003_Figure_3.jpg]]
-*Figure 3: Partition rule based on spatial reasoning category. Directional comparisons adopt a linear partition, while distance comparisons employ a circular one*
-
-
 
 ## 实验与关键发现
 
@@ -263,13 +243,6 @@ Figure 6 的错误分解揭示了当前流水线的主要失败模式：**最频
 
 实验设计具有较高的公平性：比较涵盖通用 VLM、推理辅助方法、自我中心/异中心专用模型共 17 个基线，并在多个标准 benchmark 上评估。SymPL 的符号布局变换仅为输入预处理，不修改 VLM 参数，因此可应用于任意 VLM，保持与基线模型推理能力的一致性比较。所有实验均使用公开数据集（COMFORT#、3DSRBench、COCOSPATIAL 等），结果具备可复现性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2398_https_arxiv_org_abs_2602_19117/figures/009_Figure_5.jpg]]
-*Figure 5: Ablation results of each key factor. (a) projection, (b) abstraction, (c) bipartition, (d) localization. The darker bar indicates the configuration used in SymPL*
-
-
-
 ## 定位与知识库关联
 
 ### 1 问题定位：从自我中心偏置到符号化视点解耦
@@ -311,8 +284,6 @@ SymPL 的提出打开了若干值得进一步探索的方向：
 3. **向 Embodied AI 的泛化。** 该方法在室内外导航、机器人操作等 Embodied AI 任务中的泛化能力尚未验证。这些场景通常涉及更复杂的 3D 几何、动态遮挡和实时性要求，SymPL 的多模块流水线能否满足这些约束需要进一步研究。
 
 4. **大规模多对象场景与遮挡推理。** 当前流水线在处理包含数十个对象的场景时，符号布局的视觉清晰度可能下降（颜色区分饱和、圆形符号重叠）。是否可以通过分层分区、遮挡显式建模或注意力引导的符号筛选来扩展至更复杂的场景配置？
-
-
 
 ## 原文 PDF
 

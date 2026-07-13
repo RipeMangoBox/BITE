@@ -57,8 +57,6 @@ claims:
 
 **局限性概览**：网络容量目前依赖启发式人工选择；随机查询速度慢于NanoVDB的硬件插值；训练（编码）时间在超大规模体积上仍较长；对拓扑动态变化的应用场景不支持。
 
-
-
 ### 稀疏体数据的存储瓶颈
 
 在影视特效、科学可视化和工业仿真等领域，大规模稀疏体数据（如符号距离场SDF、密度场、烟雾模拟）已成为核心资产。这些数据通常以树形结构组织，仅存储活动体素周围的窄带区域，以应对全分辨率密集网格带来的内存爆炸。然而，即使采用目前工业界最先进的稀疏体数据结构**OpenVDB**（Museth, ACM TOG 2013），存储开销依然巨大。
@@ -91,8 +89,6 @@ OpenVDB的高效源于其浅而宽的树结构：根节点（级别3）为稀疏
 - **拓扑保真度**：对空间占用信息（拓扑掩码）采用无损压缩，仅对体素值进行有损压缩，确保体积的几何结构不被破坏。
 
 这些目标共同指向一个核心命题：**在工业级稀疏体数据处理的语境下，显式结构与隐式表示的融合能否在压缩效率、访问速度和工程兼容性之间找到新的帕累托最优解？** 论文后续的方法设计和实验评估将围绕这一命题展开。
-
-
 
 ## 核心方法与创新机理
 
@@ -153,8 +149,6 @@ NeuralVDB 以**查询速度换取压缩比**，这是论文明确承认的设计
 
 这一混合设计使 NeuralVDB 在保持 VDB 兼容性与可扩展性的同时，实现了传统压缩方法无法企及的压缩比，且在相同模型尺寸下，其 SDF 几何重建精度（IoU 和 mCD）优于 NGLOD、VBNF 和 INGP 等纯神经表示方法（Table 8）。
 
-
-
 NeuralVDB 的核心设计理念是将**显式稀疏树结构**与**隐式神经表示**相结合：保留 VDB 树的高层节点以维持粗粒度空间划分和快速遍历能力，同时用多个小型 MLP 替代底层节点，分别编码拓扑（活动状态）和值信息，从而实现数量级的压缩。
 
 ### 高层架构
@@ -199,8 +193,6 @@ $$\hat{y} = \sum_{k=1}^{n} G(\mathbf{x})_k E_k(\mathbf{x})$$
 ### 压缩效果
 
 以 Dragon 模型为例（Table 1），标准 VDB 占用 257 MB，[Hash, 5, 4, NN(3)] 将叶节点值占用降至原来的 6%（约 16 倍压缩），而 [Hash, 5, NN(4), NN(3)] 通过同时替换底部两层的拓扑与值，整体压缩因子达 **68 倍**（降至 3.8 MB），同时保持 IoU > 99% 的重建精度。在迪士尼云数据集上，NeuralVDB 将 1.5 GB 的 16-bit Blosc 压缩 VDB 文件缩减至 25 MB，压缩比达 **60 倍**（Fig. 1）。
-
-
 
 ### 3.1 高层VDB树（级别2–3）
 
@@ -253,8 +245,6 @@ NeuralVDB提供两种配置以权衡速度与内存：
 - **[Hash, 5, 4, NN(3)]**：仅将叶节点（级别0）的值替换为神经回归器，级别1保留显式树结构。支持在线随机访问，查询速度接近标准VDB。
 - **[Hash, 5, NN(4), NN(3)]**：将底部两级（级别0和级别1）的拓扑与值全部替换为神经网络。压缩比更高（如Dragon模型达68倍），但仅支持离线顺序重建。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验结果
@@ -262,7 +252,6 @@ NeuralVDB提供两种配置以权衡速度与内存：
 NeuralVDB 在静态和动态体积数据上均展现出数量级的压缩能力，同时保持高保真度的重建质量。最引人注目的结果是迪士尼云数据集：原始 OpenVDB 16-bit Blosc 压缩后的文件大小为 1.5 GB，而 NeuralVDB 将其缩减至 25 MB，压缩比达到 **60 倍**（Fig. 1）。在动态场景中，船只突破水面的窄带水平集动画序列，累积文件大小从 22.7 GB 压缩至 1.2 GB，压缩比达 **18 倍**（Fig. 1）。
 
 对于 SDF 几何体，NeuralVDB 同样表现出色。以 Dragon 模型为例，标准 VDB 32-bit 无压缩占用 257 MB，而 NeuralVDB [Hash,5,NN(4),NN(3)] 配置仅需 3.8 MB，整体压缩因子达 **68 倍**（Table 1）。在更广泛的 SDF 模型测试中，相较于已使用 16-bit Blosc 压缩的 OpenVDB，NeuralVDB 实现了 **10 倍至超过 100 倍** 的进一步压缩（Table 2），同时保持 IoU > 99% 和极低的修改 Chamfer 距离（mCD）。
-
 
 ![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2208_04448/figures/015_Table_2.jpg]]
 *Table 2: List of input grid statistics for SDF models and density volumes: OpenVDB file sizes for both raw 32-bit precision with no compression and 16-bit precision with Blosc compression [The Blosc Development Team 2020] in MB, NeuralVDB file size with 16-bit precision with Blosc compression in MB, number of total parameters (both learnable and static) of neural networks, number of false positive patches for the classifiers, compression ratio comparing 16-bit compressed file sizes, and evaluation metrics including IoU and mCD for the selected SDF volumes, and RMSE for the selected density volumes*
@@ -291,7 +280,6 @@ Table 1 详细揭示了压缩的来源。标准 VDB 中，叶节点值（32-bit�
 
 NeuralVDB 的随机查询速度明显慢于 NanoVDB 的硬件插值（Table 6），这是论文明确声明的设计取舍——以速度换取极致压缩。具体而言，[Hash,5,4,NN(3)] 配置保留了级别 1-3 的显式树结构，随机访问仅需在叶节点处额外进行一次 MLP 回归，性能接近标准 VDB；而 [Hash,5,NN(4),NN(3)] 配置虽然内存占用更小，但随机访问需经过多层神经网络推断，速度更慢，更适合离线顺序访问场景。
 
-
 ![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2208_04448/figures/021_Table_6.jpg]]
 *Table 6: Random access performance measured for NanoVDB (zeroth, first, and third-order interpolation), NeuralVDB ([Hash, 5, 4, NN(3) ]), and pure neural networks (same structure as the voxel value regressor of the NeuralVDB) in milliseconds. For each static test model, 1M random samples with batch size o$f ^ { \cdot _ { 2 ^ { 1 6 } } }$ were generated within the model’s bounding box. Method NanoVDB (0) NanoVDB (1) NanoVDB (3) NeuralVDB RMSE 0.206 0.157 0.149 0.133 Table 7. RMSE measured for both NanoVDB and NeuralVDB ([Hash, 5, 4, NN(3) ]) where both grids encode a fractal Brownian motion field [Vivo and Lowe 2015]. For NanoVDB, four different sampling methods are tested (zeroth, first, and third-orde...*
 
@@ -303,7 +291,6 @@ NeuralVDB 的随机查询速度明显慢于 NanoVDB 的硬件插值（Table 6）
 
 2. **网络容量的人工依赖**：网络层数和宽度目前依赖启发式人工选择（Table 4），缺少自动确定最优容量的方法。Fig. 13 展示了误差随网络参数增加而收敛的趋势，但如何为每个输入自动选择帕累托最优点仍是开放问题。
 
-
 ![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2208_04448/figures/017_Table_4.jpg]]
 *Table 4: List of hyperparameters used in all the experiments, including subdomain size (in voxel dimension for a cubic subdomain), the number of layers and neurons per layer for the level-1 classifier (L-1 Net.), the tile value regressor, and the level-0 classifier (L-0 Net.), and the voxel value regressor. The activation function is either sin or ReLU, and if sin is used, the frequency parameters are noted. All these examples were trained using FFM, and the mapping scale and feature size are shown as well. Finally, learning rate (LR), LR decay rate and its interval, resampling interval, and maximum epochs for each example are listed. For the animation examples (LeVeque’s Test, Smoke Plume, Ship Bre...*
 
@@ -314,24 +301,11 @@ NeuralVDB 的随机查询速度明显慢于 NanoVDB 的硬件插值（Table 6）
 
 4. **编码时间开销**：训练（编码）时间较长，尤其是处理如迪士尼云这样的大规模体积时，即使有温启动加速，仍可能需数百秒/帧。Table 5 的多 GPU 扩展性数据表明，稀疏域分解能提供一定的加速，但实时编码仍是挑战。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2208_04448/figures/010_Figure_12.jpg]]
 *Figure 12: Error visualization for the Bunny Cloud example. The absolute error is averaged in z-axis*
 
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2208_04448/figures/005_Table.jpg]]
-
 ![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2208_04448/figures/016_Table_3.jpg]]
 *Table 3: List of input grid statistics for animated SDF models and density volumes: OpenVDB file sizes for both raw 32-bit precision with no compression and 16-bit precision with Blosc compression [The Blosc Development Team 2020] in MB, NeuralVDB file size with 16-bit precision with Blosc compression in MB, number of total parameters (both learnable and static) of neural networks, number of false positive patches for the classifiers, compression ratio comparing 16-bit compressed file sizes, and evaluation metrics including IoU and mCD for the selected SDF volumes, and RMSE for the selected density volumes*
-
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2208_04448/figures/022_Table.jpg]]
-
-
-
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2208_04448/figures/020_Table_5.jpg]]
-*Table 5: Encoding/decoding performance measured using multiple GPUs for the static volumes. The timing in seconds and relative scaling factor is presented for each volume*
-
-
 
 ## 定位与知识库关联
 
@@ -400,8 +374,6 @@ NeuralVDB 的设计取舍明确，其适用边界由以下限制定义：
 - 在更大规模的分布式体积中，如何改善亚域划分的负载均衡以提高强伸缩性？
 - 除了 SDF 和密度标量场，NeuralVDB 对向量场或其他复合类型数据的泛化能力如何？
 - 压缩比与重建误差之间的帕累托最优前沿在不同应用领域（如科学可视化 vs 影视特效）如何变化？
-
-
 
 ## 原文 PDF
 

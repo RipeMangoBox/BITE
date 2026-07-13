@@ -123,8 +123,6 @@ GAP 是一个多模态条件生成模型，其核心设计目标是在不依赖�
 
 这一框架的关键创新在于**联合预测动作与未来几何**：策略在生成动作的同时必须“想象”场景三维结构的演变，从而获得物理一致的空间感知。预训练基础模型的引入使得系统在仅使用RGB输入的条件下即可实现三维感知的预测性控制，彻底规避了传统方法中点云采集、相机标定和工作空间预设等工程负担。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2633_https_arxiv_org_abs_2602_23814/figures/001_Figure_1.jpg]]
 *Figure 1: Paradigm Comparison. 2D-based methods learn implicit 3D representations from multi-view RGB observations, relying purely on 2D cues. 3D-based methods require camera calibration and preset workspaces to crop point clouds, which limits generalization and scalability. In contrast, our approach leverages powerful 2D and 3D pretrained priors to achieve semantic–geometric fusion perception, enabling robust action and geometry joint prediction without strict calibration or workspace constraints*
 
@@ -219,8 +217,6 @@ $$\hat{x}_0 = \{ \hat{a}_{t:t+N}, \hat{\mathbf{f}}_{t+N}, P_{t+N} \} \tag{8}$$
 ### 局限与未来方向
 
 本文方法存在两个主要局限：(1) 仅预测单步未来点图，缺乏持久三维记忆以支持长程规划；(2) 伪真值三维潜变量需离线预提取，增加了训练流程复杂性。未来工作可探索多步三维轨迹预测以提升时序一致性，以及在线生成伪真值以简化训练流程。推广至未见任务和物体的泛化能力亦是重要的开放问题。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2633_https_arxiv_org_abs_2602_23814/figures/004_Table_1.jpg]]
 *Table 1: Comparison on Dominant-select Tasks (16 tasks). Single-arm manipulation tasks requiring appropriate arm selection. We report the mean and standard deviation of success rates averaged over 3 random seeds. Best score in bold, second-best underlined*

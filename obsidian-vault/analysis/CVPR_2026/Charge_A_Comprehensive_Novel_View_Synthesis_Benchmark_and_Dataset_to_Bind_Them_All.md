@@ -66,8 +66,6 @@ Charge本身是一个**数据集与基准**，而非重建算法。它面向三�
 ### 局限与展望
 Charge完全由合成动画生成，与真实场景存在领域差距；仅包含单部电影的8个场景，多样性受限；静态基准仅选取部分静止帧，未评估基础模型在动态序列上的表现。未来需在真实动态数据上验证模型泛化能力，并探索更有效的位姿-形状解耦策略。
 
-
-
 新视角合成（Novel View Synthesis, NVS）旨在从一组已知视角的图像中恢复场景的三维表示，并渲染出任意新视角下的逼真图像。近年来，以NeRF和3D Gaussian Splatting为代表的神经渲染方法在该领域取得了显著进展，推动了静态场景重建的成熟。然而，现实世界本质上是动态的，动态场景的重建与渲染——即动态新视角合成——正成为下一阶段的核心挑战。
 
 ### 现有数据集的瓶颈
@@ -87,8 +85,6 @@ Charge完全由合成动画生成，与真实场景存在领域差距；仅包�
 ### 本文动机
 
 上述瓶颈的存在，使得现有基准难以全面评测下一代动态重建方法——尤其是那些旨在从稀疏甚至单目输入中恢复完整4D表示的方法，以及正在兴起的3D基础模型——的真实能力。为此，本文提出**Charge数据集**，旨在通过一个**高动态含量、高帧率、多模态、多相机设置**的统一评估平台，填补这一空白。Charge的核心设计理念是：利用Blender制作的电影级动画《Charge》生成合成数据，从而获得精确的相机位姿、高帧率（96 fps）的时间采样、丰富的逐像素真值标注，以及可控的稠密、稀疏和单目三种相机配置，为静态和动态场景重建建立一个更具挑战性和全面性的统一基准。
-
-
 
 ## 核心方法与创新机理
 
@@ -124,8 +120,6 @@ Charge 不仅提供高分辨率 RGB 图像（2048×858），还以 **96 fps** �
 ### 5. 揭示位姿-形状歧义的静态基准
 
 Charge 还从动态序列中抽取静态帧构建了静态基准，用于评估 3D 基础模型。通过对比仅使用源视图进行 Umeyama 对齐（NVS）与使用目标视图进行相机对齐（NVS†）的新视角合成结果，Charge 揭示了**位姿-形状歧义**（pose-shape ambiguity）对重建性能的显著影响：仅依赖源视图对齐的方法性能远低于引入目标视图的方法（Table 5）。同时，实验表明当在流程中引入光度一致性后，各方法的相对排名得以保持，为后续研究解耦位姿估计与形状重建提供了明确的实验证据。
-
-
 
 Charge 是一个以生产级动画电影《Charge》为核心数据源，通过重构渲染管线、设计多层级相机配置并生成丰富多模态标注，构建的统一静态与动态新视角合成基准。其整体框架由四个核心模块串联而成：**场景处理与渲染管线重构**、**多层级相机设置设计**、**多模态数据生成**以及**基准组织与评估协议**。
 
@@ -163,8 +157,6 @@ Charge 将数据划分为两大基准：
 
 整个框架的输入为 Blender 生产场景文件，输出为标准化的训练/测试图像及多模态标注，供下游方法统一评测。
 
-
-
 ### 数据集构建管线
 
 Charge数据集的构建围绕三个核心模块展开，形成从动画资产到多模态基准的完整流水线。
@@ -198,8 +190,6 @@ $FOV_O$ 值越低，表示测试视角越远离训练视角的覆盖范围，任
 
 - **动态基准**（Section 4.1）：涵盖所有三种相机设置，评估多视图和单目动态重建方法。动态区域与静态区域的分离评估通过动态掩码实现，指标后缀 `-D` 和 `-S` 分别表示仅动态区域和仅静态区域的度量。
 - **静态基准**（Section 4.2）：从每个场景中选取静态帧子集，评估当前仅支持静态场景的基础模型（如VGGT、π3、AnySplat、WorldMirror），涵盖相机位姿估计、深度估计和新视角合成三项任务。
-
-
 
 ## 实验与关键发现
 
@@ -256,29 +246,13 @@ Figure 4、Figure 5和Figure 6分别展示了稠密、稀疏和单目设置下�
 ![[assets/figures/papers/paper_list_l2232_https_arxiv_org_abs_2512_13639/figures/009_Figure_5.jpg]]
 *Figure 5: Example results of rendering in Charge dataset evaluation - Sparse setup, scene 050 0160. Best viewed zoomed in*
 
-![[assets/figures/papers/paper_list_l2232_https_arxiv_org_abs_2512_13639/figures/010_Figure_6.jpg]]
-*Figure 6: Example results of rendering in Charge dataset evaluation - Mono setup. Best viewed zoomed in*
-
 ### 数据集特性对评估结果的影响
 
 Charge数据集的高动态内容占比（25.1%，Table 2）和广泛的光流分布（Figure 3）是导致上述性能退化的关键因素。与DyCheck（12.6%）、Neural 3D（10.9%）和Technicolor（9.7%）相比，Charge的动态像素占比超过2倍，且光流直方图显示其涵盖更多大幅运动。这一特性使得Charge能够更有效地暴露方法在动态场景下的弱点，而此前数据集因动态内容不足而难以区分方法间的细微差异。
 
-![[assets/figures/papers/paper_list_l2232_https_arxiv_org_abs_2512_13639/figures/004_Table_2.jpg]]
-*Table 2: Percentage of dynamic content in various datasets*
-
-![[assets/figures/papers/paper_list_l2232_https_arxiv_org_abs_2512_13639/figures/005_Figure_3.jpg]]
-*Figure 3: Optical flow histogram for DyCheck and Charge*
-
 ### 公平性与局限性说明
 
 需注意以下影响结论普适性的因素：Charge完全由合成动画生成，与真实世界捕捉的噪声、光照和动态复杂性存在领域差异，迁移至真实场景时可能需额外适应。静态基准仅选取部分静止帧，未评估基础模型在动态序列上的表现，留下评估空白。此外，基准未涵盖最新的4D重建方法（如HexPlane、K-Planes等），评估范围仍可扩展。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2232_https_arxiv_org_abs_2512_13639/figures/002_Table_1.jpg]]
-*Table 1: A summary and comparison of datasets used in dynamic novel view synthesis. The top section includes datasets used for multiview evaluation whereas the middle section focuses on monocular evaluation data. † - 2 camera rig with alternating frames assigned to training and test trajectory*
-
-
 
 ## 定位与知识库关联
 
@@ -315,8 +289,6 @@ Charge作为合成数据集，其核心局限在于**领域差距**——完全�
 从评估完整性角度看，当前基准存在两个空白：一是未涵盖HexPlane、K-Planes等非高斯泼溅框架的4D重建方法；二是静态基准仅选取部分静止帧，未评估基础模型在动态序列上的表现。未来工作需扩展方法覆盖范围，并设计能够同时衡量时序一致性和运动准确性的综合评估指标。
 
 在知识库定位上，Charge适合作为动态重建研究的**标准化压力测试集**——其高动态占比、多模态标注和可控难度梯度使其能够有效区分方法的鲁棒性差异，但其合成属性决定了它应作为真实数据集的补充而非替代。建议研究者将Charge与真实动态数据集（如DyCheck）联合使用，以全面评估方法的泛化能力。
-
-
 
 ## 原文 PDF
 

@@ -59,8 +59,6 @@ claims:
 
 该方法也存在明确局限：受限于 196 帧的最大运动长度，超长动作描述可能检索失败；训练依赖合成语音数据，对真实声学环境的泛化性尚需更全面评估。
 
-
-
 ### 问题背景
 
 运动检索旨在根据自然语言描述、视频演示或音频指令，从大规模运动数据库中快速定位最匹配的三维人体运动序列。这一任务在动画制作、游戏开发和人机交互等领域具有广泛的应用前景。近年来，基于对比学习的跨模态检索框架取得了显著进展，使得文本到运动、视频到运动的检索成为可能。
@@ -82,8 +80,6 @@ claims:
 2. **设计细粒度序列级对齐机制，替代全局对齐。** 将人体姿态分解为独立身体部件（头部、躯干、四肢等），并与文本、音频、视频的序列级 token 进行逐 token 的最大相似度对齐。这一设计迫使模型关注跨模态的局部关键信息，精确捕捉“转身”等动作短语与对应运动帧的语义对应关系。
 
 3. **通过运动重建任务强化跨模态语义一致性。** 在对比对齐之外，引入从多模态上下文重建被遮掩运动 token 的辅助任务，进一步提升嵌入空间的语义表达能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -113,8 +109,6 @@ $$h(\mathbf{e}_x, \mathbf{e}_y) = \frac{1}{2} \sum_{i=1}^{L_x} {\mathbf{w}_x^i \
 四模态间六对对齐损失之和构成总对齐损失，并与运动重建损失加权组合为最终训练目标。消融实验（Tab. V）表明，完全移除对齐损失导致检索性能崩溃（R@1 降至 0.00）；序列级对齐显著优于全局对齐，且基于最大相似度的策略优于均值策略（Tab. VIII）。
 
 这三项创新协同作用：身体部件分解为细粒度对齐提供了空间维度的精细表征，记忆检索压缩为音频模态提供了统一的时序接口，序列级对齐则在 token 层面建立了跨模态的精确语义桥梁。在 HumanML3D 上，文本到运动检索的 R@10 从 33.67（LAVIMO）提升至 43.83，相对提升 10.16%；视频到运动检索的 R@1 相对提升 25.43%。
-
-
 
 本文提出一个**多模态细粒度联合嵌入框架**，首次将文本、视频、音频与运动四类模态对齐到同一嵌入空间，支持文本-运动、视频-运动、音频-运动等多种检索任务。框架的核心设计思路是：**将人体运动分解为独立身体部件进行编码，并在序列级（token-level）而非全局级（global-level）进行跨模态对比对齐**，从而保留“转身”“挥手”等关键动作短语与对应运动帧之间的细粒度语义对应。
 
@@ -147,15 +141,8 @@ $$h(\mathbf{e}_x, \mathbf{e}_y) = \frac{1}{2} \sum_{i=1}^{L_x} {\mathbf{w}_x^i \
 
 > **注意**：音频模态的训练数据通过 ChatGPT 改写文本为口语风格、Tortoise 多说话人 TTS 合成构建（Fig. 6, Tab. I），初步验证了对真实语音的泛化能力（Fig. 10–11），但真实声学环境下的鲁棒性仍需更全面评估。
 
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2507_23188/figures/006_Figure_6.jpg]]
-*Figure 6: Dataset Augmentation with Audio Modality. The text data from the KIT-ML [9] and HumanML3D [10] datasets are processed using the text-tospeech model Tortoise [26] to generate audio signals with randomly assigned speaker identities, forming Original Dataset. Additionally, we use ChatGPT-3.5 [24] to rewrite these texts into a more conversational, spoken style. The rewritten texts are then converted into audio signals, resulting in Oral Dataset*
-
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2507_23188/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of Our Work. Our framework encodes text, video, or audio descriptions and computes their similarity within a shared joint embedding space, ranking candidate motions based on similarity scores to retrieve the most relevant motion*
-
-
 
 ### 身体部件运动编码器
 
@@ -213,14 +200,6 @@ $$L = L_{\mathrm{align}} + \lambda_{\mathrm{recon}} \cdot L_{\mathrm{recon}}$$
 
 其中 $\lambda_{\mathrm{recon}}$ 为重建损失的权重系数。该辅助任务迫使模型学习从文本/音频/视频 token 中推断运动细节的能力，间接增强了联合嵌入空间的语义一致性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2507_23188/figures/002_Figure_2.jpg]]
-*Figure 2: Global contrastive learning (Left) computes similarity between two modalities using global representations, where motion and text data are compressed into a single token for cross-modal alignment. In contrast, sequence-level contrastive learning (Right) aligns individual tokens with their most relevant counterparts, enabling the model to focus on key frames in the motion sequence and important keywords in the text description (highlighted in yellow and red, respectively). As illustrated by the example, the phrase “turns around” yields higher similarity scores with the corresponding frames in the motion sequence, thereby enabling more accurate alignment between the text and motion pair*
-
-
-
-
 ## 实验与关键发现
 
 ### 核心性能瓶颈与因果机制
@@ -260,17 +239,8 @@ $$L = L_{\mathrm{align}} + \lambda_{\mathrm{recon}} \cdot L_{\mathrm{recon}}$$
 
 失败案例分析（Fig. 12）指出，当使用超长文本描述进行检索时，模型可能无法正确匹配。这主要受限于固定的最大运动帧数（196 帧），超出该长度的复杂行为描述被截断，导致关键动作信息丢失。当前解决方案依赖句子分割与拼接后处理，但尚未从模型架构层面根本解决长序列建模问题。此外，在较小规模的 KIT-ML 数据集上存在一定的过拟合风险，性能增益幅度不如大规模 HumanML3D 显著。四模态联合训练带来了额外的计算开销（HumanML3D 上需 4×A6000 GPU，训练约 24.2 小时），但推理阶段效率仍可接受。
 
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2507_23188/figures/019_Figure_12.jpg]]
-*Figure 12: Failure Case Analysis. The retrieval fails when using a long text sequence for retrieval, likely due to the motion length limit set in our model. However, when we split the sentence into two shorter ones, the retrieved motions are correct, where post-processing can be applied to seamlessly stitch them together*
-
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2507_23188/figures/008_Table.jpg]]
 *Table: RETRIEVAL RESULTS ON HUMANML3D. OUR 4-MODAL VERSION OUTPERFORMS PERVIOUS METHODS AND OUR 3-MODAL VERSION, DEMONSTRATING THE EFFECTIVENESS OF OUR MULTI-MODAL FRAMEWORK WITH FINE-GRAINED ALIGNMENT. THE BEST RESULTS ARE IN BOLD. TABLE II*
-
-
-
-
 
 ## 定位与知识库关联
 
@@ -309,8 +279,6 @@ $$L = L_{\mathrm{align}} + \lambda_{\mathrm{recon}} \cdot L_{\mathrm{recon}}$$
 - **音频模态深化**：当前仅引入语音指令，未来可探索音乐、环境音等更丰富的音频模态，以增强对场景上下文的理解。这需要构建相应的多模态音频-运动数据集。
 - **多语言与大规模预训练**：在更大规模、多语言的口语运动数据集上训练，能否提升模型的通用性与跨语言泛化能力？当前的口语数据集仅覆盖英文。
 - **任务迁移潜力**：该细粒度多模态对齐框架的核心设计（身体部件分解 + 序列级对齐）能否迁移至动作识别、运动生成或人机交互等其他运动理解任务？目前仅验证了检索任务的有效性。
-
-
 
 ## 原文 PDF
 

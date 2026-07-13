@@ -49,8 +49,6 @@ claims:
 
 在 **TRELLIS** 框架上，Fast3Dcache 实现 **27.12%** 吞吐量提升和 **54.83%** FLOPs 降低，而 Chamfer Distance 仅增加 **2.48%**、F-Score 仅下降 **1.95%**；在 **DSO** 变体上同样取得 **16.45%** 加速和 **52.74%** FLOPs 降低。消融实验证实，PCSC 自适应调度显著优于固定比例缓存（后者导致严重的几何退化），SSC 联合速度和加速度比单独使用任一指标获得更好的几何保真度。此外，Fast3Dcache 与模态无关加速器 **TeaCache** 结合可实现 **3.41×** 加速，且几何质量优于单独使用 TeaCache，验证了方法的互补性。
 
-
-
 ### 3D生成扩散模型的计算瓶颈
 
 基于扩散模型的3D内容生成近年来取得了显著进展，以 **TRELLIS** 为代表的框架通过稀疏结构潜在表示实现了高质量的几何合成。然而，这类方法在推理阶段面临严重的计算冗余问题：去噪过程通常需要数十步迭代，每步均需对完整的潜在特征网格执行Transformer自注意力计算，导致FLOPs开销巨大、生成吞吐量受限。
@@ -82,8 +80,6 @@ $$\operatorname{ICE}_i(t) \triangleq A_i(t) = ||\nu_i(t) - \nu_i(t-1)||_2$$
 综上，现有3D生成加速面临的核心矛盾是：**如何在大幅削减计算量的同时，保持几何结构的一致性？** 固定比例缓存策略无法适应去噪过程中动态变化的冗余程度——固定25%采样率导致CD从0.0686恶化至0.0956（Table 3）；而基于特征相似度的2D缓存方法则忽视了3D几何的拓扑约束。
 
 Fast3Dcache的动机正是弥合这一缺口：利用体素稳定化的可预测三阶段模式来**动态调度缓存预算**（PCSC），并利用潜在特征的速度-加速度双重信号来**精确筛选可安全复用的令牌**（SSC），从而在不损害几何保真度的前提下实现训练无关的推理加速。
-
-
 
 ## 核心方法与创新机理
 
@@ -131,8 +127,6 @@ Fast3Dcache 与现有缓存加速方法存在根本性的设计哲学差异：
 
 这种差异的直接后果是：**RAS** 在 25% 采样率下导致 F-Score 暴跌 26.53%，而 Fast3Dcache 在更高加速比下仅损失 1.95%（Table 1）。更重要的是，Fast3Dcache 与模态无关加速器 **TeaCache** 的组合可实现 3.41× 加速，且 CD 与 F-Score 均优于单独使用 TeaCache（Table 2），证明了几何感知缓存与通用缓存之间的互补性。
 
-
-
 Fast3Dcache 是一个无训练的几何感知缓存框架，其核心设计动机源于对 3D 扩散模型几何合成阶段计算冗余的重新审视。直接移植 2D/视频缓存方法到 3D 会破坏几何一致性，导致拓扑错误和结构伪影；Fast3Dcache 转而利用去噪过程中体素占用的内在稳定化规律来实现安全加速。
 
 ### 三阶段加速策略
@@ -161,8 +155,6 @@ Fast3Dcache 是一个无训练的几何感知缓存框架，其核心设计动�
 ### 与外部加速器的兼容性
 
 Fast3Dcache 专注于几何感知的令牌级缓存，与模态无关的加速方法（如 TeaCache）作用于不同的冗余维度。实验表明，将两者结合可在 TRELLIS 上实现 **3.41× 加速**，且 Chamfer Distance 和 F-Score 均优于单独使用 TeaCache（Table 2），验证了框架的即插即用兼容性。
-
-
 
 ### 问题建模：3D几何合成中的冗余发现
 
@@ -233,15 +225,8 @@ $$t = \frac{\eta \cdot t_{\ell}}{1 + (\eta - 1) \cdot t_{\ell}} \tag{Eq. 8}$$
 
 其中 $\eta=3$ 为偏移因子，$t_{\ell}$ 为均匀时间步。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2486_https_arxiv_org_abs_2511_22533/figures/001_Figure_1.jpg]]
-*Figure 1: Observed voxel stabilization trend and the PCSC motivation. (a) The Original curve plots the empirically observed number of dynamic voxels (log-scale) per inference step, revealing a distinct three-phase pattern. (b) The PCSC curve illustrates our approach, motivated by this observation. We identify that the decay in Phase 2 can be reliably approximated by a log-linear function (red dashed line). This predictability forms the foundation for our scheduler, which we calibrate at an anchor step to forecast the stabilization budget*
-
 ![[assets/figures/papers/paper_list_l2486_https_arxiv_org_abs_2511_22533/figures/002_Figure_2.jpg]]
 *Figure 2: Visualization of velocity field and acceleration field feature maps in*
-
-
 
 ## 实验与关键发现
 
@@ -294,25 +279,6 @@ Phase 3（CFG-Free 细化阶段）采用固定高比例缓存以最大化计算�
 ### 反直觉发现：更高计算量未必带来更好质量
 
 **Figure 8** 揭示了一个反直觉现象：采样比例与几何质量并非单调正相关。采样比例为 0.3 时获得的 CD 低于 0.4 时的 CD，表明在扩散去噪的特定阶段，过多的计算介入反而可能引入扰动。这一发现为缓存策略的设计提供了深层启示——加速的目标不仅是“少算”，更是“在正确的时机算正确的东西”，PCSC 的动态调度正是基于这一洞察。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2486_https_arxiv_org_abs_2511_22533/figures/005_Table_1.jpg]]
-*Table 1: Quantitative comparison on TRELLIS [64] and DSO [20] frameworks. We benchmark Fast3Dcache against TRELLIS and existing modality-aware method (RAS [30]). Our method consistently outperforms the baseline, achieving higher throughput and lower FLOPs while preserving geometric fidelity (CD and F-Score) across various settings. (best and second-best)*
-
-![[assets/figures/papers/paper_list_l2486_https_arxiv_org_abs_2511_22533/figures/006_Table_2.jpg]]
-*Table 2: Results of Fast3Dcache combined with a modalityagnostic SOTA method. Integrating our method with the modality-agnostic acceleration framework TeaCache yields further speedup while also improving reconstruction quality*
-
-![[assets/figures/papers/paper_list_l2486_https_arxiv_org_abs_2511_22533/figures/007_Table_3.jpg]]
-*Table 3: Ablation study of the PCSC module. We evaluate the effectiveness of our adaptive scheduler compared to fixed-rate sampling methods. Additionally, we analyze the sensitivity of the decay slope ??, demonstrating that optimal slope calibration is essential for preserving generation quality*
-
-![[assets/figures/papers/paper_list_l2486_https_arxiv_org_abs_2511_22533/figures/009_Table_4.jpg]]
-*Table 4: Ablation study of the SSC module. We evaluate the individual contributions of the velocity (????) and acceleration (????) components. The results demonstrate that relying on a single metric is insufficient, while the joint consideration of both fields yields better geometric fidelity*
-
-![[assets/figures/papers/paper_list_l2486_https_arxiv_org_abs_2511_22533/figures/010_Table_6.jpg]]
-*Table 6: Results of text-to-3D on TRELLIS-text-xlarge*
-
-
 
 ## 定位与知识库关联
 
@@ -369,8 +335,6 @@ Fast3Dcache 采用了非均匀时间调度策略 $t = \frac{\eta \cdot t_{\ell}}
 4. **与高级采样器的协同**：PCSC的预测依赖于固定步数的体素衰减规律。若结合DPM-Solver++等自适应步长求解器，体素动态曲线的形状可能改变，需要重新验证对数线性近似的有效性。
 
 5. **误差累积的理论分析**：Phase 2中每 $\tau$ 步强制全采样的刷新策略（$\tau=8$ 为默认值）是基于经验观察的工程方案。Table 11显示 $\tau=5$ 可进一步加速但CD轻微上升，缺乏对误差传播上界的理论刻画。
-
-
 
 ## 原文 PDF
 

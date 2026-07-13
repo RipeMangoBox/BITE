@@ -205,8 +205,6 @@ Pipeline 由以下模块串联构成：
 - **噪声感知奖励**：相比仅对预测的干净运动计算奖励的单步方法，噪声感知奖励在 ODE 模型上表现更优（Table S11）。
 - **内存与效率**：图 6 和 Table S9 证实 EasyTune 内存占用恒定，而 **DRaFT**（Clark et al., 2024）等现有方法随步数线性增长；在相同奖励水平下，EasyTune 训练速度是 DRaFT-50 的 7.3 倍。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1905_EasyTune_Efficient_Step_Aware_Fine_Tuning_for_Diffusion_Based_Motion_Gen/figures/002_Figure_2.jpg]]
 *Figure 2: The framework of existing differentiable reward-based methods (left) and our proposed EasyTune (right). Existing methods backpropagate the gradients of the reward model through the overall denoising process, resulting in (1) excessive memory, (2) inefficient, and (3) coarse-grained optimization. In contrast, EasyTune optimizes the diffusion model by directly backpropagating the gradients at each denoising step, overcoming these issues*
 
@@ -290,14 +288,6 @@ $$ \mathcal{L}_{\mathrm{SPL}}(\phi) = \mathrm{D}_{\mathrm{KL}}(\mathcal{Q} \para
 | Eq.12 | 噪声感知奖励（ODE/SDE 分支） | Sec.4.2 |
 | Eq.17 | SPL 偏好学习损失 | Sec.4.2 |
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1905_EasyTune_Efficient_Step_Aware_Fine_Tuning_for_Diffusion_Based_Motion_Gen/figures/005_Figure_5.jpg]]
-*Figure 5: Core insight of EasyTune. By replacing the recursive gradient in Eq.(4) with step-level ones in Eq.(7), EasyTune removes recursive dependencies, enabling (1) step-wise graph storage, (2) efficiency, and (3) fine-grained optimization. See App. B for pseudocode and discussion*
-
-![[assets/figures/papers/paper_list_l1905_EasyTune_Efficient_Step_Aware_Fine_Tuning_for_Diffusion_Based_Motion_Gen/figures/003_Figure_3.jpg]]
-*Figure 3: Gradient norm with respect to denoising steps. Here, dim(·) denotes the gradient dimension. Detailed settings are provided in App. B.1*
-
 ## 实验与关键发现
 
 ### 主要定量结果
@@ -328,28 +318,17 @@ EasyTune 在 HumanML3D 数据集上以 **MLD**（Chen et al., 2023）为基线�
 
 用户研究（Fig.7, Fig.S2）在 MLD 和 MDM 两个基线上进行，参与者对 EasyTune 微调后的生成运动在语义对齐和自然度上的偏好均显著优于基线。然而，论文明确指出当前奖励模型主要评估语义对齐，**缺乏对物理合理性的显式建模**，这构成了方法的主要局限。Table S10 的物理感知评估显示，奖励模型在检测物理不合理运动（如脚部滑动、关节穿透）方面能力有限，可能在某些情况下生成语义正确但物理上不可行的运动。
 
-![[assets/figures/papers/paper_list_l1905_EasyTune_Efficient_Step_Aware_Fine_Tuning_for_Diffusion_Based_Motion_Gen/figures/012_Figure_7.jpg]]
-*Figure 7: User study on HumanML3D test set. We use MLD model as base model*
-
 ### 计算效率的深层分析
 
 Fig.S5 提供了全面的内存分析，将训练过程分解为模型加载、提示编码、去噪、VAE 解码和奖励计算等关键阶段。EasyTune 在去噪阶段实现了 O(1) 的内存增长，而现有方法呈 O(T) 线性增长。Table S9 进一步量化了达到不同奖励水平所需的训练时间和 TFLOPs：EasyTune 在更短的时间内达到更高的奖励分数，而 DRaFT 等方法在合理训练预算内无法达到同等奖励水平。
-
-![[assets/figures/papers/paper_list_l1905_EasyTune_Efficient_Step_Aware_Fine_Tuning_for_Diffusion_Based_Motion_Gen/figures/024_Figure.jpg]]
-*Figure: (a) Memory Usage for Key Stages (b) Memory Growth per Denoising Step Figure S5: Comprehensive memory analysis of EasyTune and existing fine-tuning methods. We report the memory usage of key stages (model loading, prompt encoding, denoising, VAEbased motion decoding, and reward computation with backpropagation), as well as the full memory trajectory during optimization. EasyTune achieves lower peak memory while maintaining high utilization, benefiting from the O(1) memory growth of the denoising process*
 
 ![[assets/figures/papers/paper_list_l1905_EasyTune_Efficient_Step_Aware_Fine_Tuning_for_Diffusion_Based_Motion_Gen/figures/025_Table.jpg]]
 *Table: S9: Computational overhead comparison. We report the training time and TFLOPs required to reach different reward scores. Total time is measured in seconds on a single NVIDIA RTX A6000 GPU. “-” indicates the method could not reach that reward level within a reasonable training budget*
 
 学习率灵敏度分析（Fig.S4）显示，EasyTune 在 $2\times10^{-4}$ 到 $10^{-5}$ 的广泛学习率范围内性能保持稳定，验证了方法对超参数选择的鲁棒性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1905_EasyTune_Efficient_Step_Aware_Fine_Tuning_for_Diffusion_Based_Motion_Gen/figures/010_Table_4.jpg]]
 *Table 4: Evaluation on text-motion retrieval benchmark, HumanML3D and KIT-ML. The column “Noise” indicates whether the method can handle noisy motion from the denoised process*
-
-![[assets/figures/papers/paper_list_l1905_EasyTune_Efficient_Step_Aware_Fine_Tuning_for_Diffusion_Based_Motion_Gen/figures/011_Figure_8.jpg]]
-*Figure 8: Comparison of models fine-tuned with and without SPL*
 
 ![[assets/figures/papers/paper_list_l1905_EasyTune_Efficient_Step_Aware_Fine_Tuning_for_Diffusion_Based_Motion_Gen/figures/018_Table.jpg]]
 *Table: S4: Ablation study on step-level reward reweighting strategies for EasyTune. The baseline is MLD*

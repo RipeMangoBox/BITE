@@ -58,8 +58,6 @@ claims:
 
 **局限性**：目前仅适用于 CNN 骨干，尚未扩展至 Vision Transformer；在图像分类线性探测任务上不如某些专门的 MIM 方法；训练大规模扩散模型需要大量计算资源；特征解释器需要少量标注样本，不完全是无监督。
 
-
-
 ### 自监督表征学习的演进与瓶颈
 
 近年来，自监督表征学习在视觉领域取得了显著进展，其核心目标是在不依赖人工标注的条件下，为下游任务预训练出高质量的图像骨干网络。主流范式可归纳为两类：
@@ -92,8 +90,6 @@ claims:
 3. **探索标签高效学习**：在少量标注样本可用时，通过引入特征解释器（Feature Interpreter）实现软标签蒸馏，进一步提升在标签稀缺场景下的性能。
 
 DreamTeacher 的目标是建立一种通用的、以生成模型为教师的自监督预训练范式，弥合生成模型与判别式骨干网络之间的知识鸿沟，从而在多种密集预测基准上实现更优的表示迁移效率。
-
-
 
 ## 核心方法与创新机理
 
@@ -140,8 +136,6 @@ DreamTeacher 采用**混合蒸馏损失**（Eq. 3），结合了两种互补的�
 ### 创新意义总结
 
 DreamTeacher 的核心贡献在于**将生成模型从“数据增强器”重新定位为“表示教师”**，揭示了一条不同于对比学习和掩码建模的自监督预训练路径。其方法设计简洁——仅需特征回归和注意力迁移两种标准损失——却能高效提取生成模型内部自然形成的密集语义表示，尤其利于目标检测、语义/实例分割等密集预测任务。这一范式为生成模型与判别模型之间的知识迁移开辟了新的研究方向。
-
-
 
 DreamTeacher 提出了一种以预训练生成模型为“教师”的通用图像骨干预训练框架，其核心思想是将生成模型在去噪或生成过程中自然形成的分层语义特征，通过特征蒸馏迁移到目标 CNN 骨干网络中。整个 pipeline 围绕三个关键阶段展开：生成模型预训练、特征数据集构建、以及目标骨干的蒸馏训练。
 
@@ -192,13 +186,6 @@ DreamTeacher 提供两种互补的知识蒸馏路径，对应 Figure 2 中的不
 - **蒸馏损失组合**：混合使用 MSE 和 Attention Transfer 损失显著优于单独使用任一种（Table 9）。
 - **扩散编码策略**：采用扩散模型的随机编码（stochastic encoding）相比确定性 DDIM 编码带来更高的下游性能（Table 10），表明扩散过程隐式地提供了特征空间的数据增强。
 - **教师模型选择**：以 ADM 作为教师模型优于其他生成模型如 StyleGAN2 和 Stable Diffusion（Table 6），这可能与 ADM 特征在不同扩散时间步和分辨率层级上展现出更清晰的语义激活模式有关（Figure 4）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l38_https_arxiv_org_abs_2307_07487/figures/001_Figure_1.jpg]]
-*Figure 1: We propose DreamTeacher, a framework for distilling knowledge from a pre-trained generative network onto a target image backbone, as a generic pre-training mechanism that doesn’t require labels. We investigate feature distillation, and optionally label distillation (when task-specific labels are available). Our DreamTeacher outperforms existing self-supervised methods on a variety of benchmarks*
-
-
 
 DreamTeacher 框架的核心由四个功能模块构成，围绕“生成特征蒸馏”这一主线展开。本节逐一说明各模块的职责与关键公式。
 
@@ -258,8 +245,6 @@ $$\mathcal{L}_{mix} = \mathcal{L}_{feat} + \lambda_{ld} \mathcal{L}_{ld}$$
 
 其中 $\lambda_{ld}$ 控制标签蒸馏的权重。Table 7 的消融表明，混合蒸馏在多数数据集上取得最优结果，尤其在标签高效场景下优势显著——仅用 43M 参数的 ResNet-101 就在 LSUN Bedroom-28 上达到 54.8 mIoU，大幅超越纯特征蒸馏和纯标签蒸馏的配置。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现
@@ -270,13 +255,8 @@ DreamTeacher 在多个密集预测基准上展现了显著的性能优势，尤�
 
 在 COCO 实例分割任务上，DreamTeacher 取得了当前自监督方法中的领先结果。以 ConvNeXt-B 为骨干、ADM 为教师模型时，DreamTeacher 在 1× 微调计划下达到 **52.5 APbb 和 45.2 APmk**，分别超过基于 ViT 的 iBOT 方法 1.3 和 1.0 点（Table 1）。值得注意的是，DreamTeacher 的有效训练周期（400 epochs 生成模型预训练 + 200 epochs 特征蒸馏）总计 600 epochs，而 iBOT 需要 1600 epochs，表明 DreamTeacher 在训练效率上也具有优势。
 
-![[assets/figures/papers/paper_list_l38_https_arxiv_org_abs_2307_07487/figures/005_Table_1.jpg]]
-*Table 1: Comparing DreamTeacher with SoTA self-supervised methods on ImageNet and instance segmentation on COCO. All the baselines including ADM are pre-trained on ImageNet-1k. For ImageNet classification, we adopt SparK’s fine-tuning setting with resolution 224. For COCO, we follow iBOT to fine-tune Cascade Mask R-CNN [6] for 12 (1×) epochs. Average precisions of detection box ( $\mathsf { A P } ^ { b b }$ ) and segmentation mask ( $\mathsf { A P } ^ { m k }$ ) on val2017 are reported. For a fair comparison, both our method and baselines follow iBOT fine-tuning schedule and setting. Our DT pre-training task is highlighted as generative(GEN) comparing to contrastive(CL) and masking(MIM) based objectives...
 
 在 ResNet-50 骨干上，DreamTeacher 同样表现出色：1× 计划下达到 44.1 APbb，比 MIM 方法 SparK 提高 2.5 点；2× 计划下达到 45.1 APbb，比 SparK 提高 1.7 点（Table 2）。这一结果验证了生成特征蒸馏相比像素重建代理任务在密集预测上的迁移效率优势。
-
-![[assets/figures/papers/paper_list_l38_https_arxiv_org_abs_2307_07487/figures/007_Table_2.jpg]]
-*Table 2: ResNet-50 results on ImageNet and COCO instance segmentation. For ImageNet classification, we follow SparK’s fine-tuning setting with resolution 224. Top-1 accuracy (Acc) on ImageNet val set is reported. For COCO, Mask R-CNN [30] ResNet50-FPN is equally fine-tuned for 12 or 24 epochs (1× or 2×), following the same setup as SparK. *Our effective epochs includes 400 epochs generative model training and 200 epochs feature distillation training*
 
 #### 语义分割
 
@@ -284,9 +264,6 @@ DreamTeacher 在多个密集预测基准上展现了显著的性能优势，尤�
 
 ![[assets/figures/papers/paper_list_l38_https_arxiv_org_abs_2307_07487/figures/008_Table_4.jpg]]
 *Table 4: In-domain pre-training on BDD100k. We follow the recommendation of [24] to pre-train contrastive and masking based self-supervised method with long schedule for small dataset like BDD100k with 70k train images. We finetune on BDD100k instance segmentation task using Mask R-CNN ResNet50-FPN for 36(3×) epochs. Table 5. Label-efficient semantic segmentation benchmark. We compare our DreamTeacher (DT) with various representation learning baselines. Our DTmix.distil. with ResNet 101 backbone (only 43M parameters) beats all baselines, some with 10x the number of parameters. We also show our method with ConvNX-B achieves the new SoTA without using any extra data, i.e. IN1k-1M or IN21k-14M*
-
-![[assets/figures/papers/paper_list_l38_https_arxiv_org_abs_2307_07487/figures/006_Table_3.jpg]]
-*Table 3: Transfer learning: ADE20k and BDD100k. All methods are pre-trained on ImageNet-1k and fine-tuned on downstream tasks. For ADE20k, we follow [44] to use UperNet [68] and fine-tune for 160k iterations, reported number is mean IoU at single scale. For BDD100k, we follow official setup [76] to use Mask R-CNN ResNet50-FPN fine-tune for 36 (3×) epochs*
 
 #### 标签高效场景
 
@@ -329,9 +306,6 @@ Table 6 比较了不同生成模型作为教师的效果。**ADM（扩散模型�
 
 Table 10 的关键消融表明，**扩散模型的随机编码（stochastic encoding）相比 DDIM 确定性编码带来更高下游性能**。这一发现揭示了扩散过程本身隐式地提供了特征空间的数据增强，增强了蒸馏表示的鲁棒性。此外，Table 11 显示扩散步数 T 的选择对性能有影响，需要根据具体任务调节。
 
-![[assets/figures/papers/paper_list_l38_https_arxiv_org_abs_2307_07487/figures/014_Table_11.jpg]]
-*Table 11: Ablating # of diffusion steps. We pretrain ResNet50 with feature distillation using different # of diffusion steps. Performance varies with T*
-
 ### 失败模式与局限
 
 1. **线性分类探测性能不足**：在 ImageNet 线性分类任务上，DreamTeacher 的性能不如某些专门针对分类设计的 MIM 方法（如 SparK），说明生成特征蒸馏更偏向密集预测任务所需的局部语义表示，而非全局判别特征（Table 12）。
@@ -343,12 +317,6 @@ Table 10 的关键消融表明，**扩散模型的随机编码（stochastic enco
 4. **特征解释器需标注数据**：标签蒸馏分支需要少量标注样本训练特征解释器，不完全是无监督方法。在完全无标注场景下，只能使用纯特征蒸馏。
 
 5. **生成模型质量依赖性**：蒸馏效果依赖于教师生成模型的质量和与目标域的匹配度。当使用域外预训练的生成模型（如 LAION 上的 SD）时，性能可能下降。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l38_https_arxiv_org_abs_2307_07487/figures/010_Table.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -387,8 +355,6 @@ DreamTeacher 位于生成式预训练与判别式自监督学习的交叉地带�
 4. **任务泛化性**：在更广泛的视觉任务（如视频理解、3D 视觉、医学图像分析）上，DreamTeacher 的生成特征蒸馏范式是否同样有效？论文仅在 2D 图像分割和检测上进行了验证。
 
 5. **计算效率提升**：如何进一步降低扩散模型预训练的计算成本，使其更易于实际部署？可能的路径包括利用轻量化生成模型、知识蒸馏压缩生成模型本身，或探索无需完整扩散过程的特征提取方法。
-
-
 
 ## 原文 PDF
 

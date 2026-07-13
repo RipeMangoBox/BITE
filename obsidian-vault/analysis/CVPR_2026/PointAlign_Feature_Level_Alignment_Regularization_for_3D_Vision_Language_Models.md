@@ -233,8 +233,6 @@ $$
 
 对齐操作施加于LLM的单一中间层。以Phi-2为骨干网络时，选定第16层（共32层）进行对齐。层位置消融实验（Table 5）揭示了中间层对齐的优越性：过浅的层（如第8层）尚未充分整合多模态信息，过深的层（如第24层）已发生显著的几何信息衰减，中间层恰好处于信息保留与语义融合的平衡点。
 
-### 补充图表
-
 ## 实验与关键发现
 
 ### 核心瓶颈验证：中间特征退化
@@ -277,29 +275,12 @@ Table 9 将对齐正则化应用于无 Q-Former 架构的 **3D-LLaVA**，在 Sca
 ![[assets/figures/papers/paper_list_l2407_https_arxiv_org_abs_2603_00412/figures/013_Table_9.jpg]]
 *Table 9: Scene-level 3D dense captioning on Scan2Cap [2]. Our alignment regularization is applied to 3D-LLaVA [5], which does not use Q-Former. (* denotes reproduced results.)*
 
-![[assets/figures/papers/paper_list_l2407_https_arxiv_org_abs_2603_00412/figures/010_Figure_4.jpg]]
-*Figure 4: Impact of training data fraction on 3D object captioning performance. We evaluate baseline and aligned models using 10%, 30%, 50%, 70%, and 100% of training data on Objaverse dataset*
-
 ### 失败模式与局限
 
 尽管 PointAlign 在多个基准上表现优异，仍存在以下局限：对齐质量受限于 Q-Former 预训练阶段对精细几何的捕获能力，若 Q-Former 本身未能充分编码细粒度几何信息，对齐效果的上限将受制约。此外，仅在单一固定层施加对齐损失可能无法最优地监督整个特征变换过程，多层联合对齐策略尚待探索。采用的静态余弦相似度损失未能适应性地关注不同 token 或维度的重要性，可能遗漏更优的分布对齐形式（如对比学习或可学习距离度量）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2407_https_arxiv_org_abs_2603_00412/figures/007_Table_4.jpg]]
 *Table 4: Ablation study on loss functions. We evaluate the impact of different loss functions at 16-th layer on classification accuracy*
-
-![[assets/figures/papers/paper_list_l2407_https_arxiv_org_abs_2603_00412/figures/008_Table_5.jpg]]
-*Table 5: Ablation study on target layers. We evaluate the impact of different layer indices on classification accuracy (%)*
-
-![[assets/figures/papers/paper_list_l2407_https_arxiv_org_abs_2603_00412/figures/006_Table_6.jpg]]
-*Table 6: Ablation study on the weight of the alignment loss λ. We evaluate the impact of different λ at 16-th layer*
-
-![[assets/figures/papers/paper_list_l2407_https_arxiv_org_abs_2603_00412/figures/011_Table_7.jpg]]
-*Table 7: Ablation study on the number of linear layers in the alignment projector. We evaluate the impact at layer 16 on classification accuracy using cosine similarity loss with λ = 0.1*
-
-![[assets/figures/papers/paper_list_l2407_https_arxiv_org_abs_2603_00412/figures/012_Table_8.jpg]]
-*Table 8: Ablation study on the alignment target. We evaluate the impact of different alignment targets at layer 16 on classification accuracy (%) using cosine similarity loss with λ = 0.1*
 
 ## 定位与知识库关联
 

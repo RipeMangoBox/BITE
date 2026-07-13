@@ -236,8 +236,6 @@ HandMDM 的核心价值不仅在于域内性能，更在于其**零样本迁移*
 - **伪标签与 LLM 噪声**：伪标注分类器的错误标签和 LLM 生成描述的不完美是训练数据的固有噪声源，论文采用“高规模-高噪声”策略来弥补，但噪声对特定符号的影响未做细粒度分析。
 - **测试集规模有限**：Unseen 测试集仅包含 87 个手语符号，可能不足以充分评估模型对长尾符号的泛化能力，结论的外推需谨慎。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2508_15902/figures/023_Figure_1.jpg]]
 *Figure 1: Figure A.6. Dynamic visualization for Fig. 1 of the main paper: We display the same examples as in Fig. 1 with a dynamic style including 5 framesPush the bent middle finger of the right flat and The person extends their index finger on the left evenly sampled. The color coding denotes the temporal evolution, i.e., the last frame with blue, and the first frame with decreased transparency in pink.movement from in front of each shoulder. spread hand across the back of the left open hand, hand and curls the other fingers, while doing the same Figure A.7. Dynamic visualization for Fig. 4 of the main paper*
 

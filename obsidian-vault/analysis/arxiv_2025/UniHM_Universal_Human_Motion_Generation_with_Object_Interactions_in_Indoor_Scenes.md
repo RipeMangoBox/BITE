@@ -170,8 +170,6 @@ $$
 
 UniHM 的架构将全局轨迹规划（连续 6DoF 航点）与局部细节生成（离散运动标记）解耦，使得扩散模型在连续空间中处理稀疏航点，而 Transformer 在离散空间中生成密集标记。这种混合表示有效协调了场景约束下的全局运动合理性与局部运动保真度。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1697_UniHM_Universal_Human_Motion_Generation_with_Object_Interactions_in_Indo/figures/003_Figure_2.jpg]]
 *Figure 2: UniHM architecture and Look-up Free Quantization Variational Autoencoder*
 
@@ -231,8 +229,6 @@ $$ \mathcal{L} = \lambda_{\mathrm{CE}} \mathcal{L}_{\mathrm{CE}} + \lambda_{\mat
 
 三项损失联合优化，使模型在保持场景约束的同时生成真实、多样且物理合理的运动。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1697_UniHM_Universal_Human_Motion_Generation_with_Object_Interactions_in_Indo/figures/010_Figure_5.jpg]]
 *Figure 5: Comparison of rFID and gFID for VQ-VAE and LFQ-VAE across different tasks*
 
@@ -286,8 +282,6 @@ UniHM 在多个基准上展示了统一的运动生成能力，涵盖了通用�
 4. **LFQ-VAE 超参数的定量影响**：Fig. 5 展示了词汇量对 gFID 的趋势，但下采样率、潜在维度等其他超参数的敏感性分析缺失，限制了方法的可复现调优。
 
 5. **扩展性边界**：该方法能否处理多人交互场景或动态物体（如移动的椅子）？当前框架假设静态场景和单一交互物体，扩展至多智能体或多物体协调仍是一个开放挑战。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l1697_UniHM_Universal_Human_Motion_Generation_with_Object_Interactions_in_Indo/figures/004_Table.jpg]]
 *Table: I: Comparison results of Text-to-HOI, and Text-to-HOI without Scene TABLE II: Comparison results of Text-to-Motion, Text-to-Motion in Scene. We add the scene voxel encoded by our ViT-VAE encoder to the variant marked with * as conditions*

@@ -235,16 +235,11 @@ $$\alpha_{n}(t) = \begin{cases} 1 & n \leq n_{\mathrm{base}} \\ \min(1, \frac{t}
 
 本方法输出的PBR三角网格资产可直接导入标准图形工具链，这是区别于所有神经隐式方法的核心实用价值。图8展示了两个重建模型被插入Cornell盒的场景：物体准确响应场景光照、投射阴影，并与地面产生正确的反射交互。图12进一步展示了自动LOD生成——通过标准网格简化工具即可从重建的高精度网格生成多级细节层次，无需重新训练。这种兼容性使得本方法的输出可直接用于游戏引擎、电影渲染和物理仿真等实际生产流程。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2111_12503/figures/004_Figure.jpg]]
 *Figure: Reference Chamfer L1 ×10−4 L _ { 1 }*
 
-
 ![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2111_12503/figures/028_Table_7.jpg]]
 *Table 7: View interpolation results for the four scenes of NeR-Factor’s synthetic dataset. The NeRF column shows the baseline NeRF trained as part of NeRFactor’s setup, and is different from the NeRF in our other view interpolation results. Each training set consists of 100 images with masks and known camera poses, and the reported image metrics are the arithmetic mean over the eight images in the test set*
-
-
 
 ![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2111_12503/figures/035_Figure_24.jpg]]
 *Figure 24: To evaluate the impact of corrupted masks, we warp perfect masks by texture-mapping them on a grid, displacing each of the 25 × 25 vertices by zero-mean Gaussian noise with increasing standard deviation, σ. From top to bottom, we show a warped texture (to give a sense of the magnitude of corruption), the corrupted masks with the reference mask shown in red, and our reconstruction. The training set consists of 200 images, and PSNR↑ scores are computed as the arithmetic mean of 50 validation images. The ‘uncorrelated‘ series, U, are generated with unique random numbers for each frame, while in the “correlated” scores, C, we corrupt all masks using the same random seed, simulating a segmentati...*
@@ -254,9 +249,6 @@ $$\alpha_{n}(t) = \begin{cases} 1 & n \leq n_{\mathrm{base}} \\ \min(1, \frac{t}
 
 ![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2111_12503/figures/032_Figure_22.jpg]]
 *Figure 22: Examples of masking errors for the Mold Gold Cape dataset. Note the inconsistencies in classifying the plastic mount as both part of the object and background*
-
-![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2111_12503/figures/038_Figure_26.jpg]]
-*Figure 26: Comparing grid vs. MLP parametrizations of DMTet on scan 65 from the DTU MVS dataset [28]. Directly optimizing SDF values at grid vertices leads to a surface with high-frequency noise (left). In contrast, if we use an MLP to parametrize the SDF values, we can regularize the geometry, with smoothness controlled by the frequency of positional encoding. We use the positional encoding in NeRF [45] with frequency set to 4 (middle) and 6 (right) respectively. Grid*
 
 ## 定位与知识库关联
 

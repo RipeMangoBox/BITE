@@ -59,8 +59,6 @@ Progress-Think 的核心洞察在于：**视觉观察与指令语义之间存在
 
 **方法定位**：Progress-Think 属于辅助推理型 VLA 方法，区别于 **Navila**（Cheng et al., arXiv 2024）、**Navid-4D**（Liu et al., 2025）、**StreamVLN**（Wei et al., arXiv 2025）等主流 VLA 模型，以及 **Aux-Think**（Wang et al., arXiv 2025）等辅助推理方法。其核心差异在于引入显式的语义进度推理模块，并通过自监督对齐实现无标注训练，而非依赖隐式学习或粗粒度数值回归。
 
-
-
 视觉语言导航（VLN）要求智能体在真实感环境中，依据自然语言指令完成从起点到终点的连续移动。近年来，基于视觉-语言-动作（VLA）的大模型方法将导航建模为序列预测问题，在单目RGB输入下取得了显著进展。然而，现有VLA导航模型在长程任务中仍表现出行为不连贯、缺乏可解释性的弱点——其根源在于**缺乏对视觉观察与指令语义之间单调共进展的建模**。
 
 具体而言，人类在导航时会持续将所见场景与指令的已完成部分对齐，形成“我已走到哪一步”的语义进度感知。这种感知是**单调共进展（monotonic co-progression）**的：随着观察历史的累积，已完成的指令前缀在语义上单调扩展，后续进度始终建立在前序进度的基础之上（Figure 1）。这一结构性质为精确定位任务进度提供了天然锚点，但被现有方法普遍忽略。
@@ -68,8 +66,6 @@ Progress-Think 的核心洞察在于：**视觉观察与指令语义之间存在
 当前VLA导航模型的进度信号要么完全隐式地融入循环状态，缺乏显式可解释性；要么退化为粗粒度的数值完成率回归，无法捕捉指令内部的细粒度语义进展。部分辅助推理型方法（如**Aux-Think**，Wang et al., arXiv 2025）尝试引入显式推理，但依赖昂贵的手动子目标标注，难以规模化。这些缺口导致模型在长程导航中容易偏离指令意图，且难以诊断失败原因。
 
 Progress-Think 的核心动机正是利用上述单调共进展结构，将进度建模为**指令式语义对齐**——即预测当前观察历史所对应的指令前缀文本。这一设计将进度从隐式状态或数值标量提升为可读的语义描述，使导航策略能够以预测进度为条件进行决策。为实现无标注的语义进度学习，Progress-Think 从指令本身的序列结构推导自监督信号，避免了对手动标注的依赖，并通过三阶段训练框架将进度推理与导航策略紧密结合，最终在保持推理效率的同时达到最先进的导航性能。
-
-
 
 ## 核心方法与创新机理
 
@@ -89,8 +85,6 @@ Progress-Think 的核心创新在于将视觉语言导航（VLN）中的任务�
 ### 4. 强化学习优化目标：从标准策略梯度到进度感知联合优化
 在第三阶段的**进度-策略联合微调（Progress-Policy Co-Finetuning, PPCF）**中，Progress-Think 采用 GRPO 框架对 PRM 和 PG-VLA 进行联合优化。与传统策略梯度或行为克隆不同，PPCF 引入了三项奖励信号：动作奖励 $r_{\mathrm{act}}$（最长正确动作前缀）、格式奖励 $r_{\mathrm{fmt}}$ 和**进度长度奖励** $r_{\mathrm{len}}$（惩罚超过指令长度的进度预测）。消融实验表明，进度长度奖励在所有指标上带来一致改善（见表4），验证了进度约束对策略优化的正向作用。
 
-
-
 Progress-Think 将视觉语言导航（VLN）解耦为两个互补组件：**进度推理模块（Progress Reasoning Module, PRM）** 和 **进度引导的 VLA 模块（Progress-Guided VLA Module, PG-VLA）**，如图 Figure 2 所示。框架的核心设计动机源于一个被先前方法忽视的结构性质：视觉观察与指令语义之间存在**单调共进展（monotonic co-progression）**——随着智能体累积观察，指令中被完成的前缀在时间上单调延伸（Figure 1）。基于这一洞察，PRM 接收观察历史，显式预测当前已完成的指令式语义进度文本，而非隐式学习或数值回归；PG-VLA 则以观测、指令和该预测进度为条件生成导航动作，使决策与语义进度保持一致。
 
 ![[assets/figures/papers/paper_list_l2408_https_arxiv_org_abs_2511_17097/figures/002_Figure_2.jpg]]
@@ -103,8 +97,6 @@ Progress-Think 将视觉语言导航（VLN）解耦为两个互补组件：**进
 3. **进度-策略联合微调（Progress-Policy Co-Finetuning, PPCF）**：采用 GRPO 框架联合优化 PRM 和 PG-VLA，通过动作奖励 $r_{\mathrm{act}}$、格式奖励 $r_{\mathrm{fmt}}$ 和进度长度奖励 $r_{\mathrm{len}}$ 的组合信号，使推理与决策在强化学习层面保持一致。
 
 相比标准 VLA 模型，Progress-Think 的输入输出流增加了显式的进度推理通道：每步先由 PRM 生成进度文本 $\hat{\mathcal{T}}_t$，再将其作为 PG-VLA 的条件输入，与观察历史 $\mathcal{O}_t$、当前观察 $o_t$ 和完整指令 $\mathcal{T}$ 一起预测未来 $K$ 步动作 $a_{t:t+K-1}$。这种解耦设计使进度推理可独立预训练，同时通过联合微调确保推理质量直接影响策略性能。
-
-
 
 Progress-Think 将视觉语言导航（VLN）解耦为两个互补组件：**进度推理模块（Progress Reasoning Module, PRM）** 和 **进度引导的 VLA 模块（Progress-Guided VLA Module, PG-VLA）**，并通过三阶段训练框架实现无标注的语义进度学习。
 
@@ -182,8 +174,6 @@ $$\rho^{(n)} = \frac{\pi_{\boldsymbol{\theta}}(a_{t}^{(n)} \mid \mathcal{O}_t, o
 
 这一联合重要性采样设计使得 RL 信号能够同时反向传播至策略网络和进度推理模块，从而保证推理与决策的端到端一致性。消融实验证实，进度长度奖励在 PPCF 中带来了所有指标的一致改善（Table 4），验证了显式约束进度预测长度的必要性。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -202,9 +192,6 @@ Progress-Think 基于公开的 **R2R-CE** 和 **RxR-CE** 数据集进行训练�
 #### 跨数据集泛化
 
 在 **RxR-CE Val-Unseen** 上（Table 2），Progress-Think 仅使用 R2R-CE 训练集即取得 **SR 27.5** 的跨数据集泛化性能，达到最先进水平。该结果验证了自对齐进度预训练（SAPP）所学习的语义进度对齐能力具有任务无关的迁移性——进度推理模块捕获的是观察-指令间的单调共进展结构，而非特定数据集的语言风格。
-
-![[assets/figures/papers/paper_list_l2408_https_arxiv_org_abs_2511_17097/figures/004_Table_2.jpg]]
-*Table 2: Unseen-Dataset generalization performance on the RxR-CE Val-Unseen split. All results are obtained only training on the R2R-CE training set*
 
 ### 消融实验与分析
 
@@ -233,15 +220,9 @@ Table 5 考察了执行动作步数 K 的影响。执行所有三个预测动作
 
 Table 6 对比了模型规模与推理效率。Progress-Think 在保持相对紧凑的模型体积的同时，取得了领先的 SR 和 SPL，表明语义进度推理模块带来的额外计算开销可控，且其提供的结构化引导有效提升了决策质量，避免了盲目增加模型容量带来的效率损失。
 
-![[assets/figures/papers/paper_list_l2408_https_arxiv_org_abs_2511_17097/figures/009_Table_6.jpg]]
-*Table 6: Comparison of model size and inference efficiency on R2R-CE val-unseen*
-
 ### 定性分析
 
 Figure 3 展示了不同模型在典型场景下的进度推理质量对比。Progress-Think 能够更准确地从历史观察中推断已完成的指令部分，而基线方法常出现进度跳跃或语义错位。Figure 4 的进度粒度分析进一步揭示了语义进度推理在细粒度子目标定位上的优势——模型能够区分指令中相邻但语义不同的子步骤，而非仅输出粗粒度的完成状态。
-
-![[assets/figures/papers/paper_list_l2408_https_arxiv_org_abs_2511_17097/figures/008_Figure_3.jpg]]
-*Figure 3: Qualitative comparison of progress reasoning quality. Across two representative scenes, we compare how different models infer navigation progress from historical observations. GPT-4o and NVILA[20] often produce generic or instruction-misaligned descriptions and occasionally exhibit hallucinations, limiting their usefulness for tracking progress and making it difficult for the agent to align its behavior with the intended navigation steps. Our ablated variants (without monotonic loss or without Progress-Policy Co-Finetuning) capture partial progress but tend to be less consistent and concrete, leading to incomplete guidance. In contrast, the full Progress-Think model produces concise, instru...*
 
 ![[assets/figures/papers/paper_list_l2408_https_arxiv_org_abs_2511_17097/figures/010_Figure_4.jpg]]
 *Figure 4: Granularity analysis on R2R-CE*
@@ -249,8 +230,6 @@ Figure 3 展示了不同模型在典型场景下的进度推理质量对比。Pr
 ### 公平性说明
 
 所有实验均基于公开数据集和统一主干网络，对比方法均采用单目 RGB 输入且不依赖外部数据。Progress-Think 的性能增益完全来自语义进度推理框架和自监督训练机制，而非数据或模型容量的优势。
-
-
 
 ## 定位与知识库关联
 
@@ -292,8 +271,6 @@ Progress-Think的方法论基础是一个被先前工作忽略的结构性质：
 ### 在知识库中的定位
 
 Progress-Think处于**VLA导航 × 自监督表示学习 × 推理增强决策**的交汇点。其核心贡献——利用指令序列结构实现无标注的语义进度推理——填补了VLA方法中“任务进度显式建模”的空白。与Aux-Think等通用辅助推理方法相比，Progress-Think的推理目标更聚焦、监督信号更自洽；与数值进度回归等朴素基线相比，语义进度提供了更丰富的条件信息和更强的泛化能力。该方法为未来将结构化任务知识注入VLA模型提供了一条可复用的技术路径：**利用任务定义本身的结构（如指令序列）作为自监督信号的来源**。
-
-
 
 ## 原文 PDF
 

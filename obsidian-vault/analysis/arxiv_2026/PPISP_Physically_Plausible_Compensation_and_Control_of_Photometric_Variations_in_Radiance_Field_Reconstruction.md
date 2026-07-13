@@ -56,8 +56,6 @@ PPISP的管道由四个物理接地模块顺序构成：**曝光偏移**（全�
 
 方法定位上，PPISP属于**物理驱动的事后校正范式**，与基于隐向量的外观建模（GLO）和像素级仿射变换（BilaRF）形成对比。其低维参数化有效限制了模型容量，减少了过拟合——训练视图PSNR低于BilaRF，但新视图PSNR显著更高，验证了泛化优势。
 
-
-
 ### 问题背景：多视角3D重建中的光度不一致性
 
 从多视角图像重建三维场景是计算机视觉与图形学的核心任务。近年来，基于辐射场（radiance field）的方法（如NeRF及其变体）在该领域取得了显著进展。然而，这些方法普遍依赖一个隐含假设：同一场景点在不同视角下具有一致的光度表现。这一假设在真实世界的多视角采集中几乎从不成立。
@@ -85,8 +83,6 @@ PPISP的管道由四个物理接地模块顺序构成：**曝光偏移**（全�
 基于以上动机，PPISP提出了两个核心组件：
 1. **物理合理的ISP校正模块**：通过曝光偏移、渐晕、色彩校正和CRF四个顺序模块，将光度变化建模为物理上可解释的变换序列。
 2. **ISP参数控制器**：从渲染辐射度预测每帧的曝光和色彩校正参数，模拟真实相机的AE/AWB行为，实现无需目标图像的新视角评估。
-
-
 
 ## 核心方法与创新机理
 
@@ -125,8 +121,6 @@ PPISP的物理合理性还体现在其能够**选择性融合相机元数据**�
 Figure 6通过分析曝光偏移与白平衡变量之间的Pearson相关系数，定量验证了PPISP色彩校正模块的解耦效果。在ADOP中，曝光与红/蓝通道缩放强相关（相关系数高），而PPISP中曝光偏移与白点偏移近乎独立（相关系数接近零）。这种解耦是实现Figure 7所示曝光编辑鲁棒性的关键——PPISP的辐射场和输出在曝光变化时保持中性，而ADOP的色彩伪影会随曝光调整而被放大。
 
 综上，PPISP的创新可概括为三个**changed slots**：外观校正从隐式/仿射变换变为物理ISP级联，新视角参数从测试时优化变为控制器预测，色彩校正从逐通道增益变为色度单应性变换。这些设计共同实现了可解释性、可控性和泛化能力的统一提升。
-
-
 
 PPISP 构建了一个**物理合理的可微图像信号处理（ISP）管道**，作为辐射场重建的即插即用外观补偿层。该管道遵循真实相机的图像形成过程，将场景辐射度到最终像素值的转换建模为一系列物理基础模块的级联操作，从而将传感器固有属性与拍摄相关的设置解耦。
 
@@ -181,13 +175,6 @@ $$
 - **ADOP** 虽也包含曝光、白平衡、CRF 等模块，但其色彩校正采用简单的逐通道增益（Figure 6 左），与曝光耦合，导致在曝光控制时色彩伪影加剧（Figure 7）。PPISP 的色度单应性变换则实现了曝光与白平衡的有效解耦（Pearson 相关系数显著更低，Figure 6 右）。
 
 PPISP 的物理合理参数化不仅增强了可解释性，还通过有限的模型容量有效抑制了过拟合——Table 5 显示，PPISP 在训练视图上的 PSNR 低于 BilaRF，但在新视图上显著更高，验证了其泛化优势。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l71_https_arxiv_org_abs_2601_18336/figures/001_Figure_1.jpg]]
-*Figure 1: We introduce a differentiable image processing pipeline applied to radiance field reconstruction. By modeling the behavior of conventional cameras, our approach disentangles image formation effects from the rest of the pipeline. Our physically-plausible model admits a controller module that predicts exposure and color changes for novel views*
-
-
 
 PPISP的核心设计思想是将相机图像形成过程建模为一系列物理合理、可微分的后处理模块，作用于辐射场渲染的原始线性辐射度 $\mathbf{L}(\mathbf{r})$。整个管道由四个顺序级联的模块构成：曝光偏移、渐晕校正、色彩校正和相机响应函数（CRF），最后通过一个控制器预测每帧参数以实现新视角的自动适配。
 
@@ -252,19 +239,6 @@ $$ \mathcal{L}_{\text{reg}} = \mathcal{L}_b + \mathcal{L}_c + \mathcal{L}_{\text
 
 这些正则化项共同确保辐射度场学习到场景的真实物理属性，而非将光度变化“烘焙”进几何和材质表示中。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l71_https_arxiv_org_abs_2601_18336/figures/003_Figure_3.jpg]]
-*Figure 3: Dynamics of the controller module. The predicted exposure offset (inset) depends on the image content of the rendered radiance. Right side: Plot of exposure offsets as predicted for each frame of the caterpillar sequence, with the three displayed frames highlighted*
-
-![[assets/figures/papers/paper_list_l71_https_arxiv_org_abs_2601_18336/figures/011_Figure_6.jpg]]
-*Figure 6: Correlation between optimized exposure offset and white balancing variables in SMERF’s [8] alameda sequence. Left: ADOP’s [26] red and blue channel scaling. Right: The offsets of the white point of our homography-based correction. The Pearson correlation coefficient for each component is inset*
-
-![[assets/figures/papers/paper_list_l71_https_arxiv_org_abs_2601_18336/figures/013_Figure_7.jpg]]
-*Figure 7: Comparison of ADOP [26]-style post-processing including exposure control against our method. Row labels indicate the post-processing method and the sequence name (in italics). The CRF for ADOP’s formulation compensates for the color artifacts baked into the radiance field only at a specific exposure value. But when controlling exposure for novel views, color artifacts are exacerbated. In contrast, both our method’s radiance field and output remain neutral since all corrections are decoupled*
-
-
-
 ## 实验与关键发现
 
 ### 主结果：PPISP 在标准基准上的新视角合成性能
@@ -301,9 +275,6 @@ Table 5 对比了不同 ISP 模块容量下训练视图（TV）与新视图（NV
 
 Table 4 报告了在 Mip-NeRF 360 上的渲染开销。PPISP（w/ ctrl.）的额外开销为 0.84 ms（26%），低于 BilaRF 的 1.10 ms（36%），表明物理模块的轻量设计在计算效率上同样具有竞争力。
 
-![[assets/figures/papers/paper_list_l71_https_arxiv_org_abs_2601_18336/figures/008_Table_4.jpg]]
-*Table 4: Rendering times (ms) on NVIDIA RTX 5090 for the MipNeRF 360 [2] dataset*
-
 ### 与 ADOP 的解耦对比
 
 Figure 7 揭示了曝光与色彩校正解耦的重要性。ADOP 风格的曝光控制将色彩伪影“烘焙”进辐射场，当在新视角调整曝光时，颜色失真被放大。相比之下，PPISP 的色度单应性变换将白平衡与曝光强度归一化解耦（Figure 6 中曝光偏移与白点偏移的 Pearson 相关系数显著低于 ADOP 的通道缩放），使得辐射场本身保持中性，曝光调整不会引入额外色偏。
@@ -312,15 +283,8 @@ Figure 7 揭示了曝光与色彩校正解耦的重要性。ADOP 风格的曝光
 
 在 BilaRF 数据集上，PPISP 控制器的性能有所下降。该数据集包含大量手动设置覆盖的场景，控制器无法捕捉非自动的相机设置，导致预测参数与真实 ISP 行为失配。此外，当前校正模块均为全局或低维操作（曝光、渐晕、色彩单应性、CRF），无法建模空间变化的局部色调映射或高光压缩等复杂效果。在相机模型间迁移时，传感器特有参数（如渐晕多项式、CRF 曲线）可能需要重新校准。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l71_https_arxiv_org_abs_2601_18336/figures/012_Table_6.jpg]]
-*Table 6: Per-scene novel view PSNR comparison. We compare post-processing methods applied on top of 3DGUT reconstruction across all sequences. Higher is better (↑)*
-
 ![[assets/figures/papers/paper_list_l71_https_arxiv_org_abs_2601_18336/figures/017_Figure_10.jpg]]
 *Figure 10: Our low-parametric formulation of the different image processing steps enables manual editing. Top left shows the input image. Other images have details overlaid, such as the primary effect being applied and an abstract visualization. In the color correction examples, the white dots correspond to the four target chromaticities*
-
-
 
 ## 定位与知识库关联
 
@@ -365,8 +329,6 @@ PPISP的物理合理性既是其优势来源，也划定了其适用边界：
 4. **与更高级表示的原生集成**。PPISP作为后处理模块与3DGUT、3DGS、Zip-NeRF等重建方法解耦，但这种松耦合可能限制端到端优化的潜力。能否将ISP校正嵌入到辐射场的隐式表示中，使渲染本身就对光度变化具有不变性？
 
 5. **动态场景与视频重建**。将PPISP扩展到动态场景需要处理时变光照和运动模糊，这要求控制器能够区分场景内容的真实变化和相机参数的变化——一个具有挑战性的因果推断问题。
-
-
 
 ## 原文 PDF
 

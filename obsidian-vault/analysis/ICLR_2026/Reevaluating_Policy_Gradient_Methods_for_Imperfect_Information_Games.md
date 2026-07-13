@@ -53,8 +53,6 @@ claims:
 
 需要指出，当前实验仅覆盖五款同类型棋盘游戏，结论能否推广到大型扑克、多人博弈等更复杂场景仍待验证；此外，固定1000万步的训练时长可能不足以让收敛较慢的FP/DO类方法展现其渐进优势。
 
-
-
 ### 非完全信息博弈中的策略学习困境
 
 两人零和非完全信息博弈（Imperfect-Information Games, IIGs）是人工智能领域的核心挑战之一，其目标是在无法观测对手全部状态的情况下，学习一个接近纳什均衡的策略——即具有低可剥削性（exploitability）的策略。可剥削性定义为：
@@ -95,8 +93,6 @@ $$\boldsymbol { \pi } _ { t + 1 } = \mathop { \operatorname { a r g m a x } } _ 
 
 上述观察引出了一个自然的问题：如果给予适当的超参数调优（特别是熵正则化系数），通用策略梯度方法能否在IIGs中超越那些专门设计的复杂博弈论方法？这一问题触及了IIGs深度学习方法论的根本：我们是否真的需要FP、DO、CFR这些复杂框架，还是说，被长期忽视的通用PG方法本身就足以胜任？
 
-
-
 ## 核心方法与创新机理
 
 本研究的核心创新并非提出一个新的算法，而是揭示了一个被忽视的事实：**通用策略梯度方法（PPO、PPG、MMD）在非完全信息博弈中，通过适当的超参数调优，能够一致性地超越专门设计的博弈论深度强化学习方法（NFSP、PSRO、ESCHER、R-NaD）**。这一发现颠覆了该领域长期以来的方法论偏好——即认为必须依赖虚次对局（FP）、双神谕（DO）或反事实遗憾最小化（CFR）等专门机制才能在大型博弈中逼近纳什均衡。
@@ -135,8 +131,6 @@ $$\boldsymbol{\pi}_{t+1} = \mathop{\operatorname{argmax}}_{\boldsymbol{\pi}} \un
 - 实验仅限于五款同类型的两人零和非完全信息棋盘游戏，结论能否推广到扑克、多人游戏等不同结构仍待验证。
 - 训练步数固定为1000万步，可能不足以让收敛慢的专门方法（如FP、DO）展现渐进优势。
 - 超参数搜索虽尽力公平，但仍可能未覆盖专门方法的最优配置区域。
-
-
 
 本文的整体实验框架围绕一个核心问题展开：**在非完全信息博弈（IIG）中，通用策略梯度（PG）方法是否能在公平比较下超越专门设计的博弈论深度强化学习方法？** 为此，框架被设计为一条标准化的“自博弈训练—可剥削性评估—头对头验证”流水线，确保所有算法在相同的环境、网络架构和评估协议下进行对比。
 
@@ -179,8 +173,6 @@ flowchart TD
 ```
 
 该框架的核心优势在于**通过严格的标准化与充分的超参数搜索，剥离了实现细节和调优偏差对算法比较的干扰**，从而使得“通用PG方法优于专门方法”这一结论具有较高的内部效度。但其外部效度受限于五款同质化的棋盘游戏，向更复杂的扑克或多人游戏的推广仍需验证。
-
-
 
 ### 通用策略梯度方法的三个核心要素
 
@@ -238,20 +230,16 @@ $$
 
 > **注意**：具体损失函数形式（如PPO的剪辑比率 $\epsilon$、GAE参数 $\lambda$ 等）在给定材料中未完整给出，建议查阅原文Section 3和Appendix D获取完整实现细节。
 
-
-
 ## 实验与关键发现
 
 ### 主结果：通用策略梯度方法全面超越专门方法
 
 在所有五个基准游戏（LD2D5F、DH3、ADH3、PTTT、APTTT）上，通用策略梯度方法（MMD、PPO、PPG）在最终可剥削性上一致优于基于虚次对局（NFSP）、双神谕（PSRO）和反事实遗憾最小化（ESCHER、R-NaD）的专门方法。Figure 2 展示了调节启动与评估启动的箱线图分布：通用PG方法的可剥削性中位数和四分位距均低于所有专门方法，其中 ESCHER 在所有游戏中完全缺乏竞争力。三种通用PG方法之间性能大致相当，未出现显著分化。
 
-
 ![[assets/figures/papers/iclr26_0010_vClBDezZUo_Reevaluating_Policy_Gradient_Methods_for_Imperfe/figures/003_Figure_2.jpg]]
 *Figure 2: Exploitability results. For each combination of game and algorithm, the box-and-whisker pair depicts the distribution of final exploitability over the runs from the hyperparameter tuning launch (left) and evaluation launch (right) with square-root y-axis scale. R-NaD, NFSP, ESCHER, and PSRO failed to outperform generic PG methods (MMD, PPO, PPG)*
 
 头对头评估（Figure 3）进一步验证了这一结论：通用PG方法对阵专门方法时获得正期望收益，表明在直接对局中同样占优。这一结果基于超过7000次训练运行，每种算法均经过50组超参数搜索并取最优5组进行10种子评估，网络架构（3层512单元全连接）和优化器（Adam）在所有算法间保持一致。
-
 
 ![[assets/figures/papers/iclr26_0010_vClBDezZUo_Reevaluating_Policy_Gradient_Methods_for_Imperfe/figures/004_Figure_3.jpg]]
 *Figure 3: Head-to-head evaluations. The number in each cell is the expected return of the row algorithm against the column algorithm when each plays half of the games as the first moving player. R-NaD, NFSP, ESCHER, and PSRO failed to outperform generic PG methods (MMD, PPO, PPG), which are segregated by the dashed red lines*
@@ -259,7 +247,6 @@ $$
 ### 关键调优发现：熵正则化系数
 
 通用PG方法成功的关键瓶颈在于熵正则化系数的选择。Figure 7 显示，最佳熵系数范围在 0.05–0.2 之间，显著高于主流强化学习库中 PPO 的默认值（0–0.01，如 Table 6 所列）。将熵系数从默认值提升至该区间后，通用PG方法的最终可剥削性获得显著改善。这一发现解释了为何通用PG方法此前在非完全信息博弈中被忽视——历史偏见导致超参数配置停留在单智能体环境的经验范围，而该范围在自博弈场景下远非最优。
-
 
 ![[assets/figures/papers/iclr26_0010_vClBDezZUo_Reevaluating_Policy_Gradient_Methods_for_Imperfe/figures/012_Figure_7.jpg]]
 *Figure 7: Average (dash-dotted green) and median (solid purple) exploitability of generic policy gradient methods across all games as a function of entropy coefficient, with shaded interquartile range and square-root x-axis. Vertical dashed red lines show the default entropy coefficient values for PPO in widely used DRL libraries. Results broken down by game are shown in Figure 12*
@@ -271,7 +258,6 @@ $$
 
 针对 PSRO 性能不佳的可能解释——oracle 训练回合数不足——Table 7 报告了扩大采样范围的消融结果。将训练回合数超参数的采样范围从 [125, 8000] 扩展至 [2500, 160000] 后，PSRO 在四个游戏上的可剥削性百分位数并未出现一致改善，表明训练时长并非其性能瓶颈。
 
-
 ![[assets/figures/papers/iclr26_0010_vClBDezZUo_Reevaluating_Policy_Gradient_Methods_for_Imperfe/figures/014_Table_7.jpg]]
 *Table 7: This table shows the performance of PSRO on our benchmark games using a wider sampling range for the number training episodes hyperparameter that determines for how long each oracle trains. Exploitability is presented as percentiles across 50 different hyperparameter samples. Results for the original sampling range presented in the main results of the paper ([125, 8000]) are shown for comparison*
 
@@ -282,13 +268,8 @@ $$
 3. **游戏类型的同质性**：五个基准游戏均为两人零和非完全信息棋盘游戏，结论能否推广到扑克、多人博弈等结构差异较大的场景仍需手动验证。
 4. **超参数搜索覆盖**：尽管每种算法均测试了 50 组超参数，但专门方法的搜索空间可能未覆盖其最优配置区域，不能完全排除调优不足的影响。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0010_vClBDezZUo_Reevaluating_Policy_Gradient_Methods_for_Imperfe/figures/002_Table_1.jpg]]
 *Table 1: Game quantities. Positive Nash values (i.e., expected values for player 1 at Nash equilibria) mean that player 1 has a structural advantage*
-
-
-
 
 ## 定位与知识库关联
 
@@ -325,8 +306,6 @@ $$
 3. **熵正则化的自适应调度**：熵系数的最优值是否随训练阶段变化？能否通过自适应调度（如训练初期高熵探索、后期降低以精细调优）进一步改善最终策略质量？
 4. **前向与反向 KL 的差异**：PPO/PPG 使用前向 KL（通过剪辑隐式约束），MMD 使用反向 KL 显式约束。在更大规模环境中，这两种约束方式的差异是否会变得显著？目前五款游戏上三者表现大致持平，但规模增大后可能出现分化。
 5. **与其他博弈论方法的整合**：通用 PG 方法能否与 CFR 的变体（如 DCFR、PCFR+）在深度强化学习框架中有效结合，取长补短？例如，用 CFR 类方法生成多样化的对手池来辅助 PG 训练。
-
-
 
 ## 原文 PDF
 

@@ -56,8 +56,6 @@ claims:
 
 **方法定位**：OVOD-Agent 属于**无 LLM 的主动视觉推理范式**，区别于 RALF 等在线 LLM 引导方法和 CoT-PL 等视觉思维链方法，在保持低延迟部署优势的同时，实现了可解释的多步检测优化。
 
-
-
 ### 开放词汇目标检测的现状与瓶颈
 
 开放词汇目标检测（Open-Vocabulary Object Detection, OVOD）旨在通过文本提示，识别训练中未见过的物体类别。现有主流方法，如 **GroundingDINO**、**YOLO-World** 等，通常遵循一种**单步静态匹配范式**：给定输入图像和固定类别名称，检测器直接输出区域提议与类别分数，推理过程在单次前馈中完成。
@@ -76,8 +74,6 @@ claims:
 
 更重要的是，OVOD-Agent 完全基于轻量级模块构建——核心的奖励-策略模型（RM）仅为一个 3 层 MLP，内存占用不到 20 MB——在实现与 LLM 方法竞争甚至更优性能的同时，将推理延迟控制在毫秒级别（平均 55 ms），从根本上解决了 LLM 依赖方法的效率瓶颈。
 
-
-
 ## 核心方法与创新机理
 
 OVOD-Agent 的核心创新在于将开放词汇目标检测（OVOD）从**单步静态类别名称匹配**重塑为**多步主动视觉推理（Visual-CoT）**。现有方法在推理时仅依赖固定的类别名称进行一次性的文本-视觉映射，完全忽略了视觉模糊性、上下文变化以及稀有细粒度类别所需的渐进式语义消歧。OVOD-Agent 通过三个紧密耦合的设计打破了这一范式。
@@ -87,8 +83,6 @@ OVOD-Agent 的核心创新在于将开放词汇目标检测（OVOD）从**单步
 **基于 UCB 的上下文赌博机探索。** 传统方法缺乏探索机制，无法主动识别不确定区域。OVOD-Agent 采用上置信界（UCB）策略 $Q_t(a) = \hat{\mu}_t(a \mid c_t) + \lambda \sqrt{\frac{\ln t}{1 + n_t(a \mid c_t)}}$（Eq. 9）进行动作选择，在探索与利用之间取得平衡。该策略在统一的停止协议下，Top-K@Stop 达到 $0.66 \pm 0.01$，PWR 达到 44.8%，显著优于随机和贪婪策略（Table 3）。收集的高质量轨迹为后续的奖励模型训练提供了关键数据。
 
 **弱监督奖励模型与自演进闭环。** 传统方法仅依赖监督损失（分类/回归）作为优化信号。OVOD-Agent 构建了轻量级双头 MLP（仅 20MB），通过联合优化轨迹模仿、奖励预测和 KL-based 马尔可夫转移正则化三项损失 $\mathcal{L}_{\mathrm{RM}}$（Eq. 14）进行离线训练。这一设计使得代理在部署时完全摆脱对大语言模型（LLM）的依赖，以毫秒级延迟（平均 55ms）实现与 LLM 方法竞争的性能，同时保持自演进能力。
-
-
 
 OVOD-Agent 将开放词汇目标检测（OVOD）重塑为**主动视觉推理任务**，其核心流水线由四个协同模块构成：**环境状态更新**、**Bandit 探索**、**马尔可夫转移矩阵构建**与**奖励-策略模型（RM）训练**，最终在部署阶段由训练好的 RM 直接指导推理决策（Figure 2）。
 
@@ -100,9 +94,6 @@ OVOD-Agent 将开放词汇目标检测（OVOD）重塑为**主动视觉推理任
 传统 OVOD 方法在推理时仅执行单步静态类别名称匹配：给定图像 $x$ 和文本提示 $T$，检测器 $D$ 一次性输出区域提议与类别分数 $p = D(x, T)$（Eq. 1）。这种“一次性”范式在面对视觉模糊性、上下文变化及稀有细粒度类别时，文本表示空间未被充分利用，检测性能受限。
 
 OVOD-Agent 将这一过程重构为**多步序列决策**：从初始词典查找出发，智能体通过执行一系列可解释的视觉操作（共七种，Table 1），逐步更新上下文状态 $c_{t+1} = f(c_t, a_t)$（Eq. 2），形成一条**视觉思维链（Visual-CoT）**。每一步操作针对颜色、纹理、空间关系等属性进行调整，使类别假设逐步精细化，直至状态稳定或奖励收敛（Figure 1）。
-
-![[assets/figures/papers/paper_list_l2198_https_arxiv_org_abs_2511_21064/figures/001_Figure_1.jpg]]
-*Figure 1: We illustrate the state-transition behavior of OVOD-Agent as it iteratively updates its category hypothesis. Starting from an initial dictionary lookup, the agent applies attribute-aware actions that adjust color, texture, and spatial cues to produce a more accurate and grounded state description. The number of required actions varies across images, from single-step updates to multi-step reasoning*
 
 ### 弱马尔可夫决策过程（w-MDP）
 
@@ -119,8 +110,6 @@ $$Q_t(a) = \hat{\mu}_t(a \mid c_t) + \lambda \sqrt{\frac{\ln t}{1 + n_t(a \mid c
 ### 奖励-策略模型训练与部署
 
 收集到的轨迹被整合为图像特定的**马尔可夫转移矩阵**，作为结构化先验。随后，一个紧凑的**双头 MLP（约 20MB）**作为 RM，在离线轨迹和狄利克雷转移先验的指导下进行联合训练，训练目标包含轨迹模仿、奖励预测与 KL 正则化三项损失（Eq. 14）。部署时，RM 直接替换 Bandit 探索，以策略驱动、奖励驱动或混合模式（由 $\alpha \in [0,1]$ 控制）指导状态转移，实现毫秒级推理延迟（平均 55ms），完全摆脱对大语言模型（LLM）的依赖。
-
-
 
 OVOD-Agent 将开放词汇目标检测重塑为主动视觉推理任务，其核心由四个紧密耦合的模块构成：环境状态更新、Bandit 探索、马尔可夫转移矩阵构建、以及奖励-策略模型（RM）训练与推理。
 
@@ -192,14 +181,8 @@ $$a_t = \arg\max_a [\alpha \cdot \pi_\theta(a \mid z_t) + (1-\alpha) \cdot \hat{
 
 整个过程无需大语言模型参与，推理延迟保持在毫秒级（平均 55ms），内存开销仅约 20MB。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2198_https_arxiv_org_abs_2511_21064/figures/002_Table.jpg]]
-
 ![[assets/figures/papers/paper_list_l2198_https_arxiv_org_abs_2511_21064/figures/010_Figure_4.jpg]]
 *Figure 4: Step-by-step Case Study of OVOD-Agent, showing how visual actions (color, texture, container, background, spatial cues) progressively refine the caption and stabilize detector grounding*
-
-
 
 ## 实验与关键发现
 
@@ -233,9 +216,6 @@ UCB 策略在所有指标上均显著领先：Top‑K@Stop 达到 **0.66±0.01**
 
 Table 4 检验了在奖励优化中显式引入马尔可夫转移先验的效果。完整马尔可夫‑Bandit 变体（含经验转移矩阵 $\hat{P}(a'|a, x)$ 与 KL 正则化）相比无转移先验的基线：
 
-![[assets/figures/papers/paper_list_l2198_https_arxiv_org_abs_2511_21064/figures/006_Table_4.jpg]]
-*Table 4: Ablation on explicit Markov-state modeling in reward optimization. Metrics include RM loss stability, action entropy, and detection performance (AP and APr) measured on the LVISminival benchmark*
-
 - **RM 损失标准差降至 0.028**，表明训练稳定性大幅提升；
 - **动作熵增加**，意味着策略保持了更好的探索多样性；
 - **AP 和 APr 均有提升**，证明结构化的弱马尔可夫先验不仅稳定了训练，还直接贡献于检测性能。
@@ -257,21 +237,11 @@ Table 5 对七种可解释视觉操作（a1–a7，定义于 Table 1）进行了
 
 尽管 OVOD-Agent 在多数场景下表现鲁棒，Figure 3 揭示了若干系统性失败模式：
 
-![[assets/figures/papers/paper_list_l2198_https_arxiv_org_abs_2511_21064/figures/007_Figure_3.jpg]]
-*Figure 3: Failure cases of OVOD-Agent. Representative examples where the agent fails to correctly identify rare or occluded objects*
-
 1. **非典型外观**：当目标呈现严重变形、罕见配色或非规范形态时，视觉动作提取的颜色/纹理线索可能与语义空间不匹配，导致推理链偏离正确类别假设。
 2. **微小与遮挡目标**：在杂乱背景下，被严重遮挡或尺寸极小的稀有物体难以被低级视觉特征（纹理、几何）有效区分，Agent 的逐步细化过程可能无法收敛到正确状态。
 3. **GT 种子奖励依赖**：推理轨迹的质量和 RM 训练依赖于基于 GT 框的弱监督奖励（Eq. 7）。在极弱标注或无 GT 的全无监督场景下，奖励信号的可靠性下降，可能影响自演进效果。
 
 这些失败模式指向了当前框架的边界：**当低级视觉先验与高级语义空间之间存在不可约的鸿沟时，纯视觉推理链的效力会衰减**。可能的改进方向包括引入更强的视觉先验、自适应 OOD 推理机制，或利用 3D/时序信息增强对遮挡和微小目标的定位能力。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2198_https_arxiv_org_abs_2511_21064/figures/011_Figure_5.jpg]]
-*Figure 5: Evaluation protocol for blind GPT-5 trajectory scoring, including the instruction prompt defining the evaluator’s role and the anonymized input prompt to ensure unbiased assessment*
-
-
 
 ## 定位与知识库关联
 
@@ -320,8 +290,6 @@ OVOD-Agent 在方法论上明确区别于上述路线：其 RM 为紧凑的三�
 3. **跨任务泛化**：OVOD-Agent 的主动推理框架能否推广到其他开放词汇视觉任务（如 open-vocabulary segmentation、open-vocabulary tracking）并保持无 LLM 的低延迟特性？这需要重新定义视觉动作空间和状态表示。
 4. **弱监督极限下的鲁棒性**：在训练数据极度稀缺的条件下，狄利克雷先验 $\hat{P}(\cdot \mid z_t) \gets \mathrm{Dirichlet}(\mathbf{n}_{z_t})$ 和弱奖励机制是否足够鲁棒？是否需要元学习或其他形式的结构先验来补偿 GT 信号的稀疏性？
 5. **动作空间的可扩展性**：当前七个视觉操作（a1–a7）针对通用目标检测设计。对于特定领域（如医学影像、遥感），如何系统性地扩展动作空间并保持 w-MDP 的紧凑性是一个工程与理论并存的挑战。
-
-
 
 ## 原文 PDF
 

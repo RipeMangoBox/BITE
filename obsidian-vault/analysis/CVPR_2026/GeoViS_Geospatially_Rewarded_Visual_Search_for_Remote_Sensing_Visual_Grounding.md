@@ -60,8 +60,6 @@ claims:
 
 GeoViS 位于遥感视觉定位和推理型多模态大模型（MLLM）的交汇处。与现有遥感专用 MLLM（如 **GeoChat**（Kuckreja et al., CVPR 2024））和通用 MLLM（如 **GPT-4o**（Hurst et al., arXiv 2024））相比，GeoViS 的关键差异在于将定位策略从“单步全局预测”升级为“奖励驱动的 MCTS 层次搜索 + 条件定位”，并引入结构化地理空间上下文解析（对象/位置/关系三元组）来显式指导空间推理。其统一 VisualRAG 模型同时承担奖励评估、动作引导和条件定位三项能力，区别于传统的单任务定位架构。该框架的搜索范式为将 MCTS 与多模态奖励函数结合用于视觉推理提供了新的设计范式，对需要精细空间感知的遥感理解任务具有参考价值。
 
-
-
 遥感视觉定位（Remote Sensing Visual Grounding, RSVG）要求模型根据自然语言查询，在大尺度遥感图像中精确预测目标边界框。与自然图像的视觉定位不同，RSVG面临两个核心挑战：
 
 **极端尺度失衡与低有效分辨率。** 遥感图像中目标通常极小（如几十像素的车辆或飞机），而背景场景覆盖数平方公里的地理范围。现有单步方法将整幅高分辨率图像缩放或切分后输入模型，导致目标区域的有效分辨率极低，模型难以同时感知全局场景和判别性细节。这一瓶颈被本文定义为**有效分辨率（effective resolution）**问题——模型实际“看到”的目标像素数远不足以支撑精确的空间定位。
@@ -71,8 +69,6 @@ GeoViS 位于遥感视觉定位和推理型多模态大模型（MLLM）的交汇
 现有方法可大致归为三类：**专家模型**（如基于Faster R-CNN的模块化管线）依赖手工设计的视觉-语言对齐，泛化能力有限；**通用多模态大语言模型**（如GPT-4o）虽具备强文本理解能力，但因缺乏遥感专用空间先验而表现不佳；**遥感专用MLLM**（如**GeoChat**, Kuckreja et al., CVPR 2024）改进了遥感场景适配，但仍采用单步全局预测范式，未从根本上解决有效分辨率瓶颈。
 
 GeoViS的核心动机在于：将视觉定位**重新定义为一种受地理空间奖励引导的逐步搜索与推理过程**。通过层次化探索识别包含目标的候选子区域，再联合全局与局部线索进行条件定位，从而在保持全局理解的同时克服极端尺度和复杂空间关系带来的挑战。这一思路将定位从“单步答案生成”转变为“多步证据收集与空间收敛”，使模型能够在搜索过程中主动获取高分辨率局部视觉线索。
-
-
 
 ## 核心方法与创新机理
 
@@ -124,8 +120,6 @@ GeoViS的核心架构是一个统一的**VisualRAG多模态大语言模型**（�
 
 GeoViS的搜索策略展现出显著的跨数据集泛化能力（Table 5）：在DIOR-RSVG上训练后直接评估VRSBench，GeoViS达到49.0%，大幅优于微调基线（39.3%），证实了搜索策略本身——而非对特定数据分布的过拟合——是性能提升的根本原因。这为遥感视觉定位领域提供了一种新的范式：将“一次性全局预测”转变为“奖励驱动的序贯搜索与推理”，其核心思想有望泛化到其他需要处理极端尺度差异和多目标空间关系的视觉定位任务。
 
-
-
 GeoViS 将遥感视觉定位重新定义为**地理空间奖励驱动的多步搜索与推理过程**，整体流程分为两个顺序阶段：**MCTS 视觉搜索**与**条件定位**。其核心思想是：与其在整幅大幅面遥感图像上一次性预测目标边界框，不如让模型先通过层次化探索逐步锁定最具信息量的子区域，再联合全局上下文与局部高分辨率线索进行精确定位。
 
 ### Pipeline 总览
@@ -160,8 +154,6 @@ GeoViS 将遥感视觉定位重新定义为**地理空间奖励驱动的多步�
 ### 推理时的交互机制
 
 推理时，MCTS 每次查询执行 10 次模拟，最大搜索深度设为 5。VisualRAG 模型在搜索过程中被反复调用以评估候选区域并建议 Zoom-in 目标，搜索收敛后仅执行一次最终定位推理。这种“搜索时多次评估、定位时一次生成”的策略，将计算开销集中在信息获取阶段，而最终定位则利用搜索积累的局部线索实现高精度输出。
-
-
 
 GeoViS 将遥感视觉定位重新定义为**地理空间奖励驱动的视觉搜索问题**，其核心由四个紧密协作的模块构成：结构化查询解析、MCTS 视觉搜索、地理空间奖励函数以及统一 VisualRAG 模型。
 
@@ -218,13 +210,6 @@ $$B = \mathcal{G}(I_g, T \mid I(s^\star))$$
 
 训练时，视觉编码器、多模态投影器和语言骨干全参数解冻。推理阶段，MCTS 每查询执行 10 次模拟，最大搜索深度为 5，搜索收敛后以 $I(s^\star)$ 作为视觉提示进行条件定位。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2125_https_arxiv_org_abs_2512_02715/figures/001_Figure_1.jpg]]
-*Figure 1: Complex queries with multi-object relations and tiny targets make remote sensing grounding challenging. While existing one-step methods that resize or divide images often fail, Geo-ViS parses structured semantics and performs reward-guided subregion exploration to achieve accurate localization*
-
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈验证：有效分辨率是关键
@@ -260,27 +245,17 @@ $$B = \mathcal{G}(I_g, T \mid I(s^\star))$$
 
 Figure 3展示了基线与GeoViS在DIOR-RSVG、OPT-RSVG和RSVG-HR上的定位可视化对比。GeoViS在处理多目标空间关系查询（如“位于A左侧的B”）和极小目标场景时，预测框与真实框的重合度明显优于单步预测的Qwen2.5-VL-3B基线，直观验证了逐步搜索策略在复杂空间推理中的优势。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2125_https_arxiv_org_abs_2512_02715/figures/003_Table_1.jpg]]
 *Table 1: Results on DIOR-RSVG, VRSBench, and GeoChat. GeoViS is trained on Qwen2.5-VL-3B. Best and second-best results are bolded and underlined. Blank entries denote unreported metrics, and models marked with * use evaluation results sourced from [28]*
 
-![[assets/figures/papers/paper_list_l2125_https_arxiv_org_abs_2512_02715/figures/005_Table_2.jpg]]
-*Table 2: Results on RSVG-HR and OPT-RSVG. GeoViS is trained on Qwen2.5-VL-3B. Best and second-best scores are highlighted. Missing values denote metrics unreported by the original papers*
-
 ![[assets/figures/papers/paper_list_l2125_https_arxiv_org_abs_2512_02715/figures/006_Table_4.jpg]]
 *Table 4: Ablation of atomic operations on the DIOR-RSVG dataset. Each component provides a measurable gain*
-
-![[assets/figures/papers/paper_list_l2125_https_arxiv_org_abs_2512_02715/figures/009_Table_5.jpg]]
-*Table 5: Cross-dataset generalization results. Models are trained on DIOR-RSVG and evaluated on VRSBench and OPT-RSVG. GeoViS demonstrates strong transferability across datasets, outperforming fine-tuned baselines by a clear margin*
 
 ![[assets/figures/papers/paper_list_l2125_https_arxiv_org_abs_2512_02715/figures/008_Figure_4.jpg]]
 *Figure 4: Ablation on the reward balance ratio α on DIOR-RSVG. The vertical axis shows the relative performance change (%) normalized to the maximum value for better visualization*
 
 ![[assets/figures/papers/paper_list_l2125_https_arxiv_org_abs_2512_02715/figures/004_Figure_3.jpg]]
 *Figure 3: Qualitative results on DIOR-RSVG, OPT-RSVG, and RSVG-HR comparing baseline (Qwen-2.5-VL-3B) with GeoViS*
-
-
 
 ## 定位与知识库关联
 
@@ -341,8 +316,6 @@ GeoViS在以下条件下展现出显著优势：
 4. **框架泛化潜力**：GeoViS的搜索-定位框架目前仅验证于遥感图像定位任务。其核心思想——通过奖励驱动的层次化搜索逐步聚焦信息丰富子区域——具有向其他视觉定位任务泛化的潜力，如自然图像中的指代表达理解（Referring Expression Comprehension）、视频目标定位、三维点云中的目标检测等。这些场景同样面临全局-局部信息权衡的挑战，但动作空间和奖励函数需要针对性重新设计。
 
 5. **训练数据依赖性**：GeoViS的训练依赖于具有边界框标注的遥感定位数据集，而此类数据的标注成本远高于自然图像。如何利用弱监督或自监督信号训练搜索策略，降低对精确框标注的依赖，是推动方法实际应用的重要方向。
-
-
 
 ## 原文 PDF
 

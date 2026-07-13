@@ -187,16 +187,8 @@ $$x _ { n } ^ { t - 1 } = \frac { 1 } { \sqrt { \alpha _ { t } } } \left( x _ { 
 
 该公式描述了从纯噪声逐步去噪直至生成清晰视频片段 $x_n^0$ 的完整过程。训练阶段采用 Nichol 和 Dhariwal 的掩码与扩散调度器，掩码比例范围为 0.7 至 1.0；推理阶段掩码比例按余弦调度从 1.0 递减至 0。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2735_https_arxiv_org_abs_2507_01938/figures/001_Figure_1.jpg]]
-*Figure 1: An example from the CI-VID dataset. Each sample consists of a sequence of video clips, individual captions describing each clip, and joint captions capturing the continuity and change between adjacent clips*
-
 ![[assets/figures/papers/paper_list_l2735_https_arxiv_org_abs_2507_01938/figures/006_Table_2.jpg]]
 *Table 2: Comparison of CI-VID statistics with existing large-scale video-text datasets*
-
-![[assets/figures/papers/paper_list_l2735_https_arxiv_org_abs_2507_01938/figures/007_Figure_3.jpg]]
-*Figure 3: The analysis of sample characteristics: (a) the number of samples generated per source video. (b) The distribution of clip sequence length*
 
 ## 实验与关键发现
 
@@ -244,22 +236,11 @@ CI-VID带来的性能增益可归因于其数据结构的核心设计：通过�
 
 作者在评估设计中采取了以下措施以降低偏差：数据收集阶段不对视频内容施加主题限制，保持了数据集的多样性（Figure 4词云展示了广泛的主题分布）；评估结合人类判断、VLM评分和客观相似度指标三个互补维度，避免了单一评估方法的系统性偏差。然而，VLM评估本身可能对某些视觉特征存在偏好，人类评估的样本量和评估者背景也未详细披露，这些因素在解读结果时需要纳入考量。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2735_https_arxiv_org_abs_2507_01938/figures/010_Table_4.jpg]]
 *Table 4: Human evaluation results in Win/Tie/Loss percentages comparing the fine-tuned model against the base model*
 
 ![[assets/figures/papers/paper_list_l2735_https_arxiv_org_abs_2507_01938/figures/012_Table_5.jpg]]
 *Table 5: VLM-based evaluation results*
-
-![[assets/figures/papers/paper_list_l2735_https_arxiv_org_abs_2507_01938/figures/013_Table_6.jpg]]
-*Table 6: Similarity evaluation results. Metrics include CLIP similarity, inverse LPIPS, and SSIM. Higher is better (↑)*
-
-![[assets/figures/papers/paper_list_l2735_https_arxiv_org_abs_2507_01938/figures/004_Figure_4.jpg]]
-*Figure 4: Word cloud of CI-VID sample themes, derived from corresponding YouTube tags*
-
-![[assets/figures/papers/paper_list_l2735_https_arxiv_org_abs_2507_01938/figures/011_Figure_6.jpg]]
-*Figure 6: Example of similarity-based evaluation setup*
 
 ## 定位与知识库关联
 

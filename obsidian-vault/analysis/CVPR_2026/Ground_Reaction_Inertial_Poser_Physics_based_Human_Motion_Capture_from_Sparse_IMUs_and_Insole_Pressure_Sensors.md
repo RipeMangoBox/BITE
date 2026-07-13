@@ -55,8 +55,6 @@ claims:
 
 **方法定位**：GRIP区别于现有基于后处理物理优化的方法（如PIP、GlobalPose、MobilePoser），将物理仿真直接嵌入推理循环，通过强化学习控制的PD力矩驱动人形机器人，实现自然的足-地接触与全局位移估计。与仅依赖足底IMU+压力的SolePoser和FoRM相比，GRIP同时利用腕部IMU的运动学线索，实现了更完整的全身体姿态重建。
 
-
-
 人体运动捕捉是计算机视觉与图形学中的基础问题，广泛应用于虚拟现实、具身智能与运动分析。传统光学动捕系统依赖多相机、标记点与受控环境，成本高昂且难以部署于日常场景。近年来，基于惯性测量单元（IMU）的稀疏传感器方案因其便携性和环境无关性受到关注，仅需数个穿戴式传感器即可估计全身运动。
 
 然而，稀疏IMU系统面临一个根本性瓶颈：**缺乏绝对位置信息**。现有方法通常依赖速度积分来恢复全局位移，但IMU加速度的双重积分会累积显著漂移，导致轨迹偏离真实路径。同时，纯运动学方法缺乏物理约束，重建结果常出现**脚部滑动、地面穿透**等物理不真实现象，严重损害运动自然度。另一方面，仅依赖足底压力传感器的方法（如SolePoser）虽能捕获足-地接触动态，却难以重建上肢姿态与全局位移。
@@ -64,8 +62,6 @@ claims:
 现有物理优化方法（如PIP、GlobalPose、MobilePoser）尝试在后处理阶段引入接触约束以缓解上述问题，但它们通常采用**固定接触假设**，无法模拟自然的足-地交互动力学，且仍依赖速度积分，漂移问题未从根源解决。FoRM虽融合足底IMU与压力信号，但完全放弃物理建模，运动合理性无法保证。
 
 本文的核心动机在于：**脚底压力信号蕴含丰富的动态线索**，可反映足部是否触地、承重分布及运动相位。若能将这些动态线索与IMU惯性信息深度融合，并借助物理仿真器强制执行物理定律，则有望在无需绝对位置传感的条件下，实现**高精度且物理一致的全身体运动重建**。为此，本文提出**GRIP（Ground Reaction Inertial Poser）**，通过“运动学观测—物理控制”的双模块架构，用强化学习驱动仿真人形机器人，从根本上解决漂移与物理不真实问题。
-
-
 
 ## 核心方法与创新机理
 
@@ -98,8 +94,6 @@ GRIP的核心创新在于将**足底压力动态线索**与**强化学习驱动�
 
 GRIP在方法谱系中属于**物理仿真驱动的人体运动捕捉**，区别于纯运动学方法（如FoRM、SolePoser）和后处理物理优化方法（如PIP、GlobalPose）。其核心贡献在于将足底压力作为动态先验引入强化学习控制框架，实现了传感器稀疏性与物理真实性的统一。
 
-
-
 GRIP 采用“观测器–控制器”架构，将稀疏可穿戴传感与物理仿真人体运动重建解耦为两个核心阶段：**运动学状态估计**与**物理仿真控制**。整体流程（图2）从四枚IMU与鞋垫压力信号出发，依次经过 KinematicsNet 估计全身运动学状态、状态差异计算模块将估计状态与仿真人形状态对齐，最终由 DynamicsNet 在物理模拟器中以关节力矩驱动人形机器人，实现物理一致的全身体运动重建。
 
 **输入模态**：系统接收四枚IMU信号——两枚位于手腕（如智能手表），两枚嵌入鞋垫——以及鞋垫压力数据。每帧输入包括加速度张量 $\boldsymbol{A}_t \in \mathbb{R}^{4 \times 3}$、方向张量 $\pmb{R}_t \in \mathbb{R}^{4 \times 3 \times 3}$ 和压力值，所有信号经时间同步与坐标系对齐后送入网络。
@@ -128,15 +122,11 @@ $$
 
 该机制仅在推理时使用，训练中未引入，定性上可在摔倒后恢复运动连续性（参见补充视频），但可能引入短暂姿态跳变。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1063_https_arxiv_org_abs_2603_16233/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the GRIP framework. Input Data (Sec. 3.1) consists of IMU and insole measurements. KinematicsNet (Sec. 3.2) estimates kinematic states, and the State Difference (Sec. 3.3) compares them with the simulated humanoid. DynamicsNet (Sec. 3.4) drives the humanoid through physics simulation-based control. The PRISM dataset (Sec. 3.5) provides diverse multi-modal data*
 
 ![[assets/figures/papers/paper_list_l1063_https_arxiv_org_abs_2603_16233/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the proposed Ground Reaction Inertial Poser (GRIP). (a) GRIP observes motion using four IMUs and foot pressure data from smartwatches and smart insoles. (b) Full-body motion is reconstructed by driving a humanoid with joint torques in a physics simulator. (c) The PRISM dataset offers multimodal measurements, including IMUs, foot pressure, motion data, and environmental data*
-
-
 
 GRIP 采用“观测器–控制器”架构，由两个核心网络与状态差异计算模块串联构成（图2）。系统从四枚IMU（双腕、双足）及鞋垫压力传感器获取稀疏观测，最终在物理模拟器中以关节力矩驱动物理一致的全身体人形机器人。
 
@@ -209,8 +199,6 @@ $$
 
 即取摔倒前 $N$ 帧的仿真根位置，叠加对应时段内 KinematicsNet 估计的根位移量，实现无缝恢复。该机制仅在推理时启用，训练阶段不引入（见补充视频定性验证）。
 
-
-
 ## 实验与关键发现
 
 ### 主结果量化对比
@@ -243,8 +231,6 @@ Table 2从输入模态、输出表示和物理建模三个维度对比了各方�
 
 论文明确指出的失败模式包括：(1) 在高动量或复杂运动中可能发生摔倒，摔倒恢复机制依赖历史缓冲，可能引入短暂姿态跳变，该问题在补充视频中有定性展示；(2) 当前仅支持单人运动重建，未扩展到多人交互场景；(3) 训练计算开销大，KinematicsNet约需24小时，DynamicsNet约需48小时，推理速度约28 ms/帧，尚未达到实时；(4) 依赖物理模拟器中的平面地面假设，若真实环境几何复杂，性能可能下降。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1063_https_arxiv_org_abs_2603_16233/figures/003_Table_1.jpg]]
 *Table 1: Quantitative comparison of our method with baseline methods across the three datasets. Lower values indicate better performance for all metrics. Bold numbers denote the best performance for each metric, and underlined numbers denote the second best*
 
@@ -254,25 +240,8 @@ Table 2从输入模态、输出表示和物理建模三个维度对比了各方�
 ![[assets/figures/papers/paper_list_l1063_https_arxiv_org_abs_2603_16233/figures/005_Figure_3.jpg]]
 *Figure 3: Qualitative comparison of pose estimation results across the three datasets. Our method accurately reconstructs foot placementeq000_008 on objects (PRISM), exhibits less position drift (UnderPressure), and captures slow weight-shifting motions (PSU-TMM100)*
 
-![[assets/figures/papers/paper_list_l1063_https_arxiv_org_abs_2603_16233/figures/006_Figure_4.jpg]]
-*Figure 4: Comparison of foot contact timing. Right-foot contact labels during low-speed motions in PSU-TMM100, computed from the estimated GRF of the physics-based methods*
-
-![[assets/figures/papers/paper_list_l1063_https_arxiv_org_abs_2603_16233/figures/007_Figure_5.jpg]]
-*Figure 5: Qualitative comparison of estimated poses and root trajectories for a walking sequence from the UnderPressure dataset. Colors correspond to the same methods shown in Fig. 3*
-
-![[assets/figures/papers/paper_list_l1063_https_arxiv_org_abs_2603_16233/figures/008_Table_3.jpg]]
-*Table 3: Comparison across different sensor configurations*
-
 ![[assets/figures/papers/paper_list_l1063_https_arxiv_org_abs_2603_16233/figures/009_Table_4.jpg]]
 *Table 4: Ablation study on observation configuration*
-
-![[assets/figures/papers/paper_list_l1063_https_arxiv_org_abs_2603_16233/figures/014_Table_5.jpg]]
-*Table 5: Comparison of human motion datasets utilizing insole-type foot pressure sensors*
-
-![[assets/figures/papers/paper_list_l1063_https_arxiv_org_abs_2603_16233/figures/015_Figure_10.jpg]]
-*Figure 10: Comparison between SolePoser and our method using the same 17 joint locations extracted from the SMPL model*
-
-
 
 ## 定位与知识库关联
 
@@ -338,8 +307,6 @@ GRIP假设使用4个IMU（双腕和双足鞋垫内嵌）和足底压力传感器
 3. **多人场景与动态交互**：当前方法仅支持单人运动重建。扩展到多人场景需要解决人-人遮挡、交互力传递和共享物理空间中的碰撞避免等问题。
 
 4. **环境几何信息的利用**：GRIP依赖物理模拟器，若环境几何信息（如地面高度、障碍物）不准确，可能影响性能。如何从传感器数据中在线估计环境几何，或设计对环境误差鲁棒的控制器，是实用化部署的关键挑战。
-
-
 
 ## 原文 PDF
 

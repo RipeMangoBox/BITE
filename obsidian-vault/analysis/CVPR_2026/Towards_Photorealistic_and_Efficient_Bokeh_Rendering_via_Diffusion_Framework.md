@@ -49,8 +49,6 @@ claims:
 
 消融实验确认：移除聚焦感知掩码注意力导致无参考指标 MUSIQ 从 58.83 降至 57.41；去除交替训练策略使 LPIPS 从 0.2786 退化为 0.2798；退化感知深度模块的移除在所有指标上均造成性能损失（Table 2）。这些结果共同支撑了“解耦训练+注意力调制+鲁棒深度估计”三位一体设计的有效性。
 
-
-
 ### 高倍变焦摄影中的散景渲染困境
 
 散景（bokeh）渲染旨在模拟浅景深下的背景虚化效果，是计算摄影中的核心任务之一。近年来，基于学习的方法（如 **BokehMe** (Peng et al., CVPR 2022)、**Dr.Bokeh** (Sheng et al., CVPR 2024)、**BokehDiff** (Zhu et al., arXiv 2025)）在合成高质量散景方面取得了显著进展。然而，这些方法普遍假设输入为高质量（HQ）图像，在真实高倍变焦摄影场景下面临严峻挑战。
@@ -67,8 +65,6 @@ claims:
 ### 核心动机：统一框架下的任务协同
 
 本文的核心动机在于突破两阶段范式的局限，提出一个**统一的单步扩散框架 MagicBokeh**，将 Real-ISR 与散景渲染联合优化。其关键洞察是：预训练的扩散模型内蕴丰富的散景先验，若能有效复用该先验并解耦两个任务的优化目标，即可在单一模型中同时实现高质量超分与真实感散景生成，从而消除级联误差并大幅提升推理效率。如图 2 所示，MagicBokeh 将超分与散景渲染无缝集成，避免了低分辨率散景渲染（a）的质量损失和两阶段方案（b）的效率问题，实现了计算效率与真实感散景效果的统一。
-
-
 
 ## 核心方法与创新机理
 
@@ -103,8 +99,6 @@ $${\mathrm{Attention}} = {\mathrm{softmax}}\left( \frac { \mathbf{Q} \mathbf{K} 
 散景渲染的质量高度依赖准确的视差图（disparity map）来指导散焦模糊半径的计算。现有方案通常直接使用预训练深度模型（如 **Depth Anything v2** (Yang et al., NeurIPS 2024)）处理超分后的HQ图像，但这一做法在MagicBokeh的统一框架中不再适用——模型需直接从原始LQ输入估计视差图，而LQ图像中的噪声、模糊与压缩伪影会严重干扰深度估计精度。
 
 MagicBokeh提出**退化感知深度模块**，采用**自特征蒸馏**框架来解决这一问题：以HQ图像经冻结的Depth Anything v2提取的特征作为教师信号，训练一个学生网络从对应的LQ图像中预测HQ-like特征，进而生成鲁棒的视差图。消融实验（Table 2）表明，移除该模块会在所有指标上造成性能退化，证实了鲁棒深度估计对统一框架的必要性。补充实验（Table s1）进一步显示，该模块在退化的NYUv2和KITTI基准上超越了原始Depth Anything v2。
-
-
 
 MagicBokeh 将真实图像超分辨率（Real‑ISR）与散景渲染统一到一个单步扩散框架中，避免了传统两阶段级联（先超分、后散景）带来的误差累积与冗余计算。其整体 pipeline 由四个核心模块串联构成：**高质量特征提取**、**退化感知深度估计**、**散焦图引导的可控散景渲染**，以及**聚焦感知掩码注意力**。输入为一张高倍变焦导致的低质（LQ）图像，输出为具有真实感散景效果的高分辨率图像。
 
@@ -142,15 +136,8 @@ MagicBokeh 将真实图像超分辨率（Real‑ISR）与散景渲染统一到�
 ![[assets/figures/papers/paper_list_l2055_https_arxiv_org_abs_2605_07429/figures/003_Figure_3.jpg]]
 *Figure 3: The framework of MagicBokeh. We introduce an alternative training strategy to unified Real-ISR and bokeh rendering together. During the bokeh training, the Controlnet and bokeh LoRA layers are trainable to learn controllable bokeh rendering. During the Real-ISR training, only the SR LoRA is trainable to learn SR. During inference, given a high-zoom LQ photo, it can generate a disparity map through the degradation-aware depth model to guide bokeh rendering*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2055_https_arxiv_org_abs_2605_07429/figures/002_Figure_2.jpg]]
 *Figure 2: Compared with low-resolution (LR) bokeh rendering (a) and two-stage super-resolution (SR) bokeh rendering (b), our proposed method (c) seamlessly integrates the SR with bokeh rendering within a unified framework, thereby achieving both computational efficiency and photorealistic bokeh effects*
-
-![[assets/figures/papers/paper_list_l2055_https_arxiv_org_abs_2605_07429/figures/001_Figure_1.jpg]]
-*Figure 1: MagicBokeh is the first unified method specifically designed for high-zoom bokeh rendering. (Zoom-in for best view)*
-
-
 
 MagicBokeh 的整体架构由四个关键模块构成，围绕“预训练扩散模型内蕴散景先验”这一核心洞察，将真实世界图像超分辨率（Real-ISR）与散景渲染统一在单步扩散框架内。
 
@@ -186,13 +173,6 @@ $$\mathcal { M } _ { ( x , y ) } = \begin{cases} 0 & \text{if } \mathbf{M}_{(x,y
 
 上述模块通过**交替训练策略**协同优化：在散景训练阶段，ControlNet 与散景 LoRA 层可训练，学习可控散景渲染；在 Real-ISR 训练阶段，仅 SR LoRA 可训练，学习超分重建。这种解耦训练方式有效缓解了两任务联合优化时的目标冲突，使模型能够复用扩散先验同时保持各任务的独立性能。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2055_https_arxiv_org_abs_2605_07429/figures/011_Figure_S.1.jpg]]
-*Figure S.1: The training pipeline of the DA depth module*
-
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与实验动机
@@ -216,9 +196,6 @@ Table 1 给出了在 EBB400-LQ 数据集上的定量对比。MagicBokeh 在所�
 #### 真实世界用户偏好
 
 Figure 5 展示了真实高倍变焦移动摄影结果上的用户偏好实验。MagicBokeh 在所有对比方法中获得最优偏好，验证了统一框架在未知真实退化分布下的泛化能力。需要注意的是，真实场景的退化类型多样，合成训练管线能否完全覆盖未知分布仍是一个开放问题，但当前用户研究提供了正向实践证据。
-
-![[assets/figures/papers/paper_list_l2055_https_arxiv_org_abs_2605_07429/figures/006_Figure_5.jpg]]
-*Figure 5: The human preference on the real-world results*
 
 ### 消融实验
 
@@ -252,19 +229,6 @@ Figure 6 提供了消融的可视化对比，直观展示了各模块对散景�
 2. 模型在视频散景渲染上的时空一致性与推理效率如何？单帧 0.106 秒的推理速度对实时视频应用仍有差距。
 3. 交替训练策略的最优交替频率与收敛稳定性是否存在理论指导？当前设计依赖经验设定。
 4. 退化感知深度模块的自特征蒸馏范式在其他下游任务（如去模糊、超分）中的迁移效果如何？这关系到方法的通用性。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2055_https_arxiv_org_abs_2605_07429/figures/009_Figure_7.jpg]]
-*Figure 7: Further application in refocusing*
-
-![[assets/figures/papers/paper_list_l2055_https_arxiv_org_abs_2605_07429/figures/012_Table_S.1.jpg]]
-*Table S.1: Quantitative comparison on the NYUv2 and KITTI datasets (seen datasets with synthetic degradations) for “Degrade”, “Clear”, and “Average” scenarios*
-
-![[assets/figures/papers/paper_list_l2055_https_arxiv_org_abs_2605_07429/figures/013_Table_S.2.jpg]]
-*Table S.2: Quantitative comparison with state-of-the-art methods on real-world benchmarks (RealSR and DrealSR ). By providing a defocus map with all-zero input, our method can generate a high-quality all-in-focus image for quantitative comparison. The best and second-best results are highlighted in bold and underline*
-
-
 
 ## 定位与知识库关联
 
@@ -320,8 +284,6 @@ $${\mathrm{Attention}} = {\mathrm{softmax}}\left( \frac { \mathbf{Q} \mathbf{K} 
 3. **退化感知深度的迁移价值**：自特征蒸馏框架本质上是退化鲁棒的特征学习策略，其在其他退化敏感的下游任务（如去模糊、去噪、低光增强）中的迁移效果值得进一步研究。
 
 4. **可控性的粒度**：当前散景控制依赖散焦图（模糊半径 $r = K |d - d_f|$）与焦点视差 $d_f$，但散景形状、口径蚀、二线性等更精细的光学特性控制尚未纳入框架。
-
-
 
 ## 原文 PDF
 

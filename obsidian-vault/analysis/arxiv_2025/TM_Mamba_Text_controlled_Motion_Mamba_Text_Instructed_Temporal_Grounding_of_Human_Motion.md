@@ -54,8 +54,6 @@ claims:
 - 消融实验表明，文本控制选择机制是性能的核心来源：移除后双向模型 mAP@Avg 从 41.6 降至 39.2；关系嵌入进一步带来 2.4 个百分点的提升。
 - 内存效率方面，TM-Mamba 的 GPU 内存消耗随序列长度呈线性增长，而经典 Transformer 在 1200 帧时即发生内存溢出，验证了其在长序列场景下的显著优势。
 
-
-
 ### 任务定义与挑战
 
 文本驱动的人体运动时间定位（Text-based Human Motion Grounding, THMG）旨在给定一段未修剪的长时间人体运动序列和一个自然语言查询，定位出与该文本描述在语义上对应的所有运动时间片段。与视频时间定位不同，THMG 直接操作三维骨架序列，需要模型同时理解人体关节的空间拓扑结构、运动序列的全局时序依赖，以及文本语义与运动模式的跨模态对齐。
@@ -90,8 +88,6 @@ claims:
 
 这一设计使得 TM-Mamba 能够在一个统一的框架内，同时完成时间全局上下文的提取、语言查询的条件控制以及空间图拓扑的建模，且全程保持线性内存成本。
 
-
-
 ## 核心方法与创新机理
 
 TM-Mamba 的核心创新在于将 Mamba 的输入依赖选择机制扩展为**文本控制选择机制（Text-Controlled Selection Mechanism）**，使状态空间模型（SSM）的参数同时依赖于运动输入和文本查询，从而以线性内存成本实现长序列上的文本驱动时间定位。
@@ -114,8 +110,6 @@ TM-Mamba 的核心创新在于将 Mamba 的输入依赖选择机制扩展为**�
 
 上述三个改动槽位并非孤立叠加，而是形成协同机制：文本控制选择决定“关注哪里”，关系嵌入提供“关注对象的结构先验”，双向建模确保“前后文完整覆盖”。三者共同作用，使 TM-Mamba 在 BABEL-Grounding 数据集上以线性内存增长的特性超越了经典 Transformer——后者在序列长度达到 1200 帧时即发生 GPU 内存溢出（Fig. 8），而 TM-Mamba 的内存消耗保持线性增长，展现出处理超长未修剪运动序列的根本性优势。
 
-
-
 TM-Mamba 的整体流程遵循“文本嵌入 → 运动编码 → 拓扑增强 → 文本控制全局上下文提取 → 逐帧激活预测”的串行结构，如 **Figure 7** 左图所示。其核心设计目标是以线性内存成本同时捕获长序列的全局时间依赖、文本查询的语义控制以及人体骨架的空间拓扑。
 
 ![[assets/figures/papers/paper_list_l66_https_arxiv_org_abs_2404_11375/figures/007_Figure_7.jpg]]
@@ -135,12 +129,8 @@ $$\mathcal{L}_{ce} = -\frac{1}{T}\sum_{t}^{T}(y_t \log s_t + (1-y_t)\log(1-s_t))
 
 **模块间关系总结。** 文本嵌入 **q** 作为全局条件信号贯穿整个 TM-Mamba 块的计算；关系嵌入 **R** 在 SSM 之前注入，为状态空间提供骨架拓扑先验；双向 SSM 以线性复杂度完成长序列的全局上下文提取；最终 MLP 将全局上下文解码为帧级定位决策。整个 pipeline 的内存消耗随序列长度线性增长，在 1200 帧时经典 Transformer 已发生 GPU 内存溢出，而 TM-Mamba 仍可正常训练（**Figure 8**）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l66_https_arxiv_org_abs_2404_11375/figures/003_Figure_3.jpg]]
 *Figure 3: An illustration of the data augmentation pipeline, highlighting the differences between the original BABEL annotations and the BABEL-Grounding annotations*
-
-
 
 ### 状态空间模型基础
 
@@ -196,16 +186,11 @@ $$\mathcal{L}_{ce} = -\frac{1}{T}\sum_{t}^{T}(y_t \log s_t + (1-y_t)\log(1-s_t))
 
 其中 $y_t \in \{0, 1\}$ 为真实标签，$T$ 为序列总帧数。该损失直接监督每一帧的归属判断，驱动模型学习精确的时间边界定位。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
 
 TM-Mamba 的训练与评估均基于作者从 BABEL 数据集重构的 **BABEL-Grounding** 数据集。该数据集包含 5,339 个运动序列，总计 21,307 条文本-时间片段标注，平均序列长度为 743 帧，真实时间片段平均跨度为 112 帧（Fig. 2）。所有实验在相同 GPU 硬件上运行，采用 AdamW 优化器与统一的训练超参数，评估指标为标准的时间定位 mAP@IoU，阈值从 0.1 到 0.7 共 7 个档位，以 mAP@Avg 作为综合性能指标。
-
-![[assets/figures/papers/paper_list_l66_https_arxiv_org_abs_2404_11375/figures/002_Figure_2.jpg]]
-*Figure 2: Dataset statistics of BABEL-Grounding. ‘Frame Number’ refers to the length of motion sequences. ‘Text Query Length’ denotes the length of textual annotations in the data. ‘Grounded Length Ratio’ indicates the ratio of the length of temporal segments corresponding to each text query to the total length of the sequence. ‘Segment Counts per Query’ refers to the number of temporal segments corresponding to each text query*
 
 ### 主实验结果
 
@@ -248,21 +233,8 @@ Fig. 10 进一步对比了完整模型与消融模型在多个文本查询下的
 
 尽管 TM-Mamba 在 BABEL-Grounding 上取得了最优性能，论文中未明确报告具体的失败案例或错误模式。从消融实验可推断，当文本查询语义模糊或与运动内容存在弱关联时，文本控制选择机制可能难以精确界定时间边界——Fig. 9 中移除文本控制的模型在非目标区域出现激活波动即暗示了这一潜在脆弱性。此外，模型在 4 块 TM-Mamba 时即发生 OOM，表明其扩展性仍受限于当前 GPU 显存容量，对于超过 2000 帧的超长序列可能需要额外的序列分块策略。这些推断需要进一步实验验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l66_https_arxiv_org_abs_2404_11375/figures/008_Table.jpg]]
 *Table: II ABLATION STUDIES ON BABEL-GROUNDING DATASET. THE BEST RESULTS ARE IN BOLD*
-
-![[assets/figures/papers/paper_list_l66_https_arxiv_org_abs_2404_11375/figures/009_Table.jpg]]
-*Table: III PERFORMANCE COMPARISONS TO BASELINE METHODS ON BABEL-GROUNDING DATASET. THE BEST RESULTS ARE IN BOLD. TABLE IV PERFORMANCE COMPARISON OF TM-MAMBA AND ITS TEMPORAL TRANSFORMER COUNTERPART UNDER DIFFERENT MAXIMUM SEQUENCE LENGTH*
-
-![[assets/figures/papers/paper_list_l66_https_arxiv_org_abs_2404_11375/figures/013_Figure_11.jpg]]
-*Figure 11: Visualizations of the grounding results of TM-Mamba compared to baseline models. ‘GT’ denotes ground-truth temporal segments corresponding to the text query. Best viewed in color*
-
-![[assets/figures/papers/paper_list_l66_https_arxiv_org_abs_2404_11375/figures/014_Table.jpg]]
-*Table: V IMPACT OF THE NUMBER OF TM-MAMBA BLOCKS ON THE GROUNDING PERFORMANCE. GPU MEMORY OVERFLOW OCCURRED WITH 4 BLOCKS*
-
-
 
 ## 定位与知识库关联
 
@@ -311,8 +283,6 @@ BABEL-Grounding 基于 BABEL 数据集构建，后者主要包含单人运动捕
 ### 四、知识库定位总结
 
 TM-Mamba 在方法谱系中属于**文本驱动的长序列时间定位模型**，其核心贡献在于将 Mamba 的选择性状态空间模型从单模态输入依赖扩展为跨模态文本条件依赖，同时引入图拓扑感知的关系嵌入。相较于 Transformer 基线，其在长序列上的线性内存优势是确定的（由 Fig. 8 的 OOM 对比直接证实）；相较于原始 Mamba，文本控制选择机制的增益由消融实验定量支撑（mAP@Avg +2.4）。该方法适用于需要高效处理长序列、且具备明确文本查询的跨模态时间定位任务，但在极端序列长度、文本编码器选择、非人体运动数据和复杂真实场景下的表现仍需进一步验证。
-
-
 
 ## 原文 PDF
 

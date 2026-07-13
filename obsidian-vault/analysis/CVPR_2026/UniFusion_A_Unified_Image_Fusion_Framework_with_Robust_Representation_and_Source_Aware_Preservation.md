@@ -186,16 +186,8 @@ UniFusion 在红外–可见光融合、多曝光融合、多聚焦融合及医�
 - **Figure 3**：分布图揭示了 UniFusion 在多聚焦和医学融合任务上的稳定泛化能力，高 median 值和紧凑分布表明其跨样本一致性优于对比方法。
 - **Figure 7 & Figure 8**：视觉消融对比直观展示了各组件对空间特征整合和模态特定信息保持的影响，重建对齐模块对于维持纹理细节和跨模态互补性尤为关键。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l952_https_arxiv_org_abs_2603_14214/figures/005_Figure_4.jpg]]
 *Figure 4: Visual comparison of infrared and visual image fusion results with SOTA methods on M3FD (top) and T&R (bottom) datasets*
-
-![[assets/figures/papers/paper_list_l952_https_arxiv_org_abs_2603_14214/figures/006_Figure_5.jpg]]
-*Figure 5: Visual comparison of medical image fusion results with SOTA methods on MIF dataset*
-
-![[assets/figures/papers/paper_list_l952_https_arxiv_org_abs_2603_14214/figures/007_Figure_6.jpg]]
-*Figure 6: Visual comparison of multi-exposure image fusion and multi-focus image fusion results with SOTA methods on MEFB and MFIF datasets*
 
 ## 定位与知识库关联
 

@@ -72,8 +72,6 @@ WEATHERWEAVER 基于 Stable Video Diffusion 构建，属于**可控视频扩散�
 
 方法受限于 Stable Video Diffusion 的 VAE 8倍空间压缩，导致高频细节（如人脸）有时丢失；训练数据中夜间视频有限，夜间天气模拟质量下降。开放问题包括：如何更好地保留精细纹理、如何提升夜间场景鲁棒性、以及如何将方法扩展到更长视频。
 
-
-
 ### 问题背景
 
 真实世界视频中的天气效果——雾、雨、雪、云层变化——是视觉感知与内容创作中的核心挑战。从自动驾驶感知系统在恶劣天气下的失效，到影视后期对场景氛围的精确控制，天气模拟与去除的需求广泛存在。然而，这一任务的本质困难在于：**天气效果是瞬态的（雨滴的轨迹、雪花的飘落）、空间变化的（雾的密度随深度衰减）、且与场景内容深度耦合**（光照变化、水面反射、积雪覆盖）。任何单一维度的简化都难以同时满足逼真度与可控性的要求。
@@ -101,8 +99,6 @@ WEATHERWEAVER 基于 Stable Video Diffusion 构建，属于**可控视频扩散�
 -   **采用三阶段数据策略**克服配对数据稀缺问题：仿真渲染提供精确可控的配对数据；生成模型扩增提供多样化的图像级配对数据；自动标注真实视频（用天气去除模型生成伪晴空标签，再用 VLM 估计天气强度）提供真实世界的分布覆盖。三者联合训练，使得模型在真实场景上同时具备逼真度和可控性。
 
 这一设计使得 WEATHERWEAVER 在用户研究中显著优于现有基线——例如在雾天合成任务上，人类评估者在 85% 的样本中偏好本文方法优于 AnyV2V——同时保持了时间一致性和对多种天气效果的精细控制能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -139,8 +135,6 @@ Table 1 系统对比了三种数据源在可控性、时间一致性、真实感
 
 WEATHERWEAVER 构建于 Stable Video Diffusion 之上，方法本身具有模型无关性，理论上可迁移至更强的视频扩散模型。当前的主要局限包括：基础 VAE 的 8 倍空间压缩导致人脸等高频细节丢失；训练数据中夜间视频稀缺，夜间场景的模拟质量受限；以及离线推理方式限制了对更长视频的扩展。这些局限本质上受限于基座模型的能力上限和数据覆盖范围，而非方法范式本身。
 
-
-
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2505_00704/figures/002_Figure_2.jpg]]
 *Figure 2: Model Overview. Our controllable weather simulation framework includes two complementary models for both weather removal and weather synthesis. These models can be used both independently and combined for weather editing tasks*
 
@@ -165,8 +159,6 @@ WEATHERWEAVER 将真实视频中的天气模拟形式化为一个视频到视频
 - **真实视频自动标注**：从在线视频中采集 4.6k 个视频对，利用天气去除模型生成伪晴空标签，再通过 VLM 自动标注天气强度向量。
 
 训练采用多阶段策略：天气去除模型先在仿真和生成数据上进行图像-视频联合训练；天气合成模型同样先在仿真和生成数据上训练，最后在所有三种数据源上联合微调，以兼顾可控性、真实感和场景多样性。
-
-
 
 ### 双模型流水线
 
@@ -236,8 +228,6 @@ $$\mathcal{L}^{w \to c} = \| \mathbf{f}_{\theta}^{w \to c}(\mathbf{z}_{\tau}^{c}
 
 训练采用多阶段策略：Weather Removal Model 先在仿真和生成数据上以图像-视频联合训练方式学习，Weather Synthesis Model 随后在全部三种数据源上联合训练，以兼顾可控性、真实感和泛化能力。
 
-
-
 ## 实验与关键发现
 
 ### 瓶颈突破验证
@@ -297,15 +287,11 @@ WEATHERWEAVER 的六维连续强度向量 $\mathbf{s} \in \mathbb{R}^6$ 提供�
 
 用户研究同时在人类评估者（MTurk，11 人/对，重复 3 次）和 VLM 评估器（Qwen2.5-VL-72B，7 次运行）上进行，采用多数投票以确保稳定性。训练数据组合了模拟、生成和真实来源，以增强多样性和真实感，避免单一数据偏差。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2505_00704/figures/013_Figure.jpg]]
 *Figure: S2. Example of user study interface for comparing two generated videos for weather synthesis. (a) Weather Synthesis (Rain) Example: Ours vs. AnyV2V (b) Weather Removal Example: HistoFormer vs. Ours Figure S3. Examples on perceptual preference evaluation with VLM. We instructed VLM to first briefly describe the observation, then give the reason why it makes this decision*
 
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2505_00704/figures/003_Table_1.jpg]]
 *Table 1: Dataset Statistics. We collect the weather data from three heterogeneous data sources, and mark each properties as high (✓), moderate ${ \bf \Xi } ( \mathrm { ~ ~ \sigma ~ }$ ) . , and low/none (×). The data size is the number of image pairs (with and without weather effects)
-
-
 
 ## 定位与知识库关联
 
@@ -342,8 +328,6 @@ WEATHERWEAVER 将真实视频中的天气模拟形式化为视频到视频的翻
 - 如何将方法扩展到更长视频？
 - 多阶段训练策略如何平衡不同数据源，避免对合成数据的过拟合？
 - 图像-视频联合训练对时间一致性的具体影响机制是什么？
-
-
 
 ## 原文 PDF
 

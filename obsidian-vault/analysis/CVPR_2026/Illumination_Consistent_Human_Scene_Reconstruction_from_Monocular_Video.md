@@ -50,8 +50,6 @@ claims:
 
 在NeuMan数据集的六个序列上，本方法在全场景PSNR、SSIM、LPIPS上均显著超越HUGS等强基线（例如Seattle序列PSNR 29.56 vs. 25.934，LPIPS 0.051 vs. 0.093）；人体区域同样取得最优结果（Seattle PSNR 22.90 vs. 19.06）。消融实验证实，移除光体积或阴影估计模块均导致性能下降，验证了各组件的独立贡献。此外，方法还支持人体重光照与场景迁移等下游应用。
 
-
-
 从单目视频中联合重建可动画的人体与静态场景，是计算机视觉与图形学中长期存在的挑战。这一任务不仅要求恢复场景和人物的精确几何与外观，还需保证两者在视觉上无缝融合。近年来，以 **NeuMan**（Jiang et al., ECCV 2022）为代表的 NeRF 驱动方法和以 **HUGS** 为代表的 3D 高斯泼溅（3DGS）方法，在人体-场景联合重建上取得了显著进展。然而，这些方法的共同瓶颈在于**忽视了光照与阴影效果**：它们通常假设人体与场景共享单一的环境贴图（即无穷远光照），无法建模空间变化的局部照明，更缺乏对人体投射阴影的显式处理。
 
 这一瓶颈导致了两个层面的问题。其一，**人体外观不一致**——当人物在场景中移动时，其表面接收的入射光应随位置变化而改变，但现有方法无法捕捉这种空间变化，导致渲染结果缺乏真实感。其二，**场景真实度下降**——人体在场景中投射的软阴影是视觉真实性的关键线索，而现有方法完全缺失这一效果，使得合成画面显得“漂浮”且不自然。
@@ -59,8 +57,6 @@ claims:
 上述问题的根源在于，单目视频本身提供了极其有限的观测——仅有一个视角、未知且可能变化的光照条件。要从这样的输入中同时解耦几何、材质和光照，是一个高度欠约束的逆渲染问题。现有方法要么完全回避光照建模（仅回归颜色），要么采用全局均匀的光照假设，无法刻画真实世界中光照的空间异质性和人体-场景间的阴影交互。
 
 本文的动机正是填补这一空白：**首次从日常单目视频中实现光照一致的人体-场景重建**。核心思路是引入一种可学习的光体积（light volume）表示，为场景中任意位置提供局部光照线索，并结合隐式阴影估计模块解耦并合成人体投射的软阴影。通过这一统一框架，方法不仅提升了重建的视觉质量，还天然支持重光照、场景迁移等下游应用，为单目视频的人体-场景理解开辟了新的可能性。
-
-
 
 ## 核心方法与创新机理
 
@@ -102,8 +98,6 @@ $$\mathcal{SH}' = ao \cdot \mathcal{SH}$$
 
 三个创新并非孤立存在：光体积为PBR管线提供空间变化的光照输入，PBR管线输出的人体颜色与场景高斯通过阴影模块建立遮挡关系，最终在统一的泼溅渲染中合成光照一致的图像。消融实验证实了这一联动关系：移除光体积或阴影模块均导致PSNR显著下降（完整模型22.18 vs 无阴影21.59），验证了各组件的必要性和协同效应。
 
-
-
 本方法的核心目标是从单目视频中联合重建光照一致的可驱动人体与静态场景，其整体框架围绕3D高斯泼溅（3D Gaussian Splatting）构建，并通过引入可学习的光体积（light volume）与基于物理的渲染（PBR）管线，首次实现了空间变化光照下的外观一致性建模。
 
 ### 两阶段重建策略
@@ -119,9 +113,6 @@ $$\mathcal{SH}' = ao \cdot \mathcal{SH}$$
 ### 模块化Pipeline
 
 整体推理流程（Figure 2）由四个核心模块串联构成：
-
-![[assets/figures/papers/paper_list_l11_https_openaccess_thecvf_com_content_CVPR2026_html_Zheng_Illumination_Con/figures/003_Figure_2.jpg]]
-*Figure 2: Overview of our method. a) First, we transform the human Gaussians from canonical space to observation space. b) Next, before splatting, we query the incoming light radiance from the k-nearest probes in light volume. Then we interpolate the light radiance and perform physically-based rendering on human Gaussians. c) We decode the lighting features extracted from the light volume to estimate human shadows in the scene. d) Finally, the human and the scene Gaussians are splatting together to render the image and the depth map*
 
 **a) 人体高斯变换（Human Gaussian Transformation）**
 在标准空间中，每个人体高斯绑定于细化后的SMPL网格顶点。通过K近邻（KNN）插值，从对应网格顶点获取材质属性 $\{m, r\}$、法向量 $n$、可见性 $vis$ 及LBS权重 $\mathbf{w} \in \mathbb{R}^{24}$。随后利用LBS将高斯从标准空间变形到当前姿态下的观察空间（Sec. 3.1）。
@@ -147,8 +138,6 @@ $$c'(\omega_o) = \sum_{i=0}^{N_l} (f_d + f_s(\omega_o, \omega_i)) V(\omega_i) L_
 - **下游应用**：框架天然支持人体重光照（relighting）与场景迁移（human-scene transfer），即在新环境光照条件下渲染人体，或将重建人体置入不同场景并匹配目标光照（Figure 8, Figure 9）。
 
 > **注意**：该方法仍依赖SMPL姿态估计与人体分割的准确性，在极端姿态或严重遮挡下可能退化。光体积的建模能力受单目视频视角限制，未观察方向的光照估计存在不确定性。此外，隐式阴影模块目前仅处理人体对场景的单向投射阴影，未建模场景互反射等全局光照效果。
-
-
 
 ### 3.1 人体高斯表示与几何细化
 
@@ -207,8 +196,6 @@ $$\mathcal{SH}' = ao \cdot \mathcal{SH} \tag{9}$$
 
 消融实验（Table 4）验证了各模块的因果贡献：完整模型在Lab序列上PSNR达22.18；移除阴影估计模块后降至21.59；进一步移除光体积和探测点损失后指标全面下降，证实空间变化光照表示和动态阴影建模均为性能的关键支撑。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与因果机制
@@ -260,17 +247,9 @@ Figure 4 的定性对比直观展示了本文方法在三个维度上的优势�
 
 Figure 8 展示了人体-场景迁移结果：从 Lab 和 Bike 序列重建的人体被渲染到不同场景中，光照条件随目标场景自动适配。Figure 9 展示了重光照结果：同一人体在不同环境光照下呈现物理合理的明暗变化。这些应用的成功执行反向验证了光照分解的有效性——材质（反照率、粗糙度、金属度）与光照被成功解耦。
 
-![[assets/figures/papers/paper_list_l11_https_openaccess_thecvf_com_content_CVPR2026_html_Zheng_Illumination_Con/figures/010_Figure_8.jpg]]
-*Figure 8: Qualitative results of human scene transfer. We transfer humans from the Lab and Bike sequences to different scenes with the correspondent lighting condition*
-
-![[assets/figures/papers/paper_list_l11_https_openaccess_thecvf_com_content_CVPR2026_html_Zheng_Illumination_Con/figures/013_Figure_9.jpg]]
-*Figure 9: Qualitative results of relighting. We present renderings under different environment lighting conditions*
-
 ### 失败模式与局限性
 
 尽管整体性能优异，方法仍存在以下已知局限：（1）依赖 SMPL 网格的姿态估计和人体分割，在极端姿态或严重遮挡下可能失效，导致人体高斯变形异常；（2）光体积的建模能力受单目视频视角限制，未观察到的方向照明可能不准确，在室外多光源场景中鲁棒性有待验证；（3）隐式阴影模块目前仅处理人体对场景的单向投射阴影，未建模场景互反射、间接光照等全局光照效果；（4）当前框架尚未扩展到多人交互或动态场景物体的光照建模。上述局限在原文中已被明确承认，需在实际部署中加以注意。
-
-
 
 ## 定位与知识库关联
 
@@ -319,8 +298,6 @@ Figure 8 展示了人体-场景迁移结果：从 Lab 和 Bike 序列重建的�
 2. **透明/半透明物体**：是否可以将光体积与神经渲染场结合，处理透明衣物、玻璃等半透明材质的光照传输？这需要突破当前 PBR 管线的材质模型限制。
 3. **多人交互场景**：当前方法假设单人场景，推广到多人交互时，人体间的相互遮挡和阴影投射将显著增加光照建模的复杂度，需要更高效的遮挡计算策略。
 4. **动态场景物体**：场景中的动态物体（如移动的家具、车辆）同样会影响光照分布，如何将光体积扩展为时变表示是一个具有挑战性的方向。
-
-
 
 ## 原文 PDF
 

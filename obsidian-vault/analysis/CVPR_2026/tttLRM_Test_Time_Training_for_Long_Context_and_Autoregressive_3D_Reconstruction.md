@@ -60,8 +60,6 @@ tttLRM 提出了一个统一的解决方案：将测试时训练（Test-Time Tra
 
 tttLRM 处于前馈3D重建与序列建模方法的交叉点。它继承了 GS-LRM 和 Long-LRM 的前馈重建范式，但用 LaCT 块替换了其中的自注意力机制，从而将复杂度从 $O(N^2 d)$ 降至 $O(N d^2)$。其快速权重机制源自 TTT 系列工作，但首次被重新解释为隐式3D表示，并通过虚拟令牌查询实现了与多种显式3D格式的解码对接。这一设计使得 tttLRM 既能作为高质量前馈重建器，又能以因果顺序更新快速权重的方式支持自回归流式输入，填补了前馈方法与逐场景优化方法之间的效率-质量鸿沟。
 
-
-
 ### 3D重建的两条路径及其根本矛盾
 
 从多视图图像恢复三维结构是计算机视觉的核心问题。当前主流方案可归为两条技术路线：**逐场景优化**与**前馈推理**。
@@ -89,8 +87,6 @@ tttLRM 处于前馈3D重建与序列建模方法的交叉点。它继承了 GS-L
 上述分析揭示了一个清晰的方法缺口：能否设计一种机制，既保持注意力级别的长程建模能力，又将计算复杂度从平方降至线性？tttLRM 的核心动机正是填补这一缺口。其关键洞察在于：**测试时训练（Test-Time Training, TTT）中的快速权重天然适合充当跨视图的隐式3D表示**——它们在推理时通过梯度更新动态吸收输入信息，将变长的多视图序列压缩为固定大小的神经记忆，而这一过程的计算复杂度仅为线性。
 
 这一设计不仅解决了长序列建模的效率问题，还意外地统一了前馈重建与自回归流式重建两种范式：快速权重可按照因果顺序逐步更新，使得模型能够像 RNN 一样处理流式输入，而无需改变核心架构。
-
-
 
 ## 核心方法与创新机理
 
@@ -123,8 +119,6 @@ $$\mathbf{T}_i^{\mathrm{v}} = \mathrm{Apply}(W, \mathbf{T}_i^{\mathrm{v}})$$
 ### 创新点的协同效应
 
 上述三个槽位替换并非孤立改进，而是形成协同效应：LaCT 块的线性复杂度使长序列处理成为可能，快速权重的隐式记忆特性为多视图信息提供了紧凑的融合载体，虚拟令牌查询则解耦了信息存储与任务解码。三者共同支撑了 tttLRM 的核心能力——在单个模型中统一高分辨率前馈重建、长上下文场景重建与自回归流式重建，且全程保持线性计算复杂度。
-
-
 
 tttLRM 的核心设计将测试时训练（Test-Time Training, TTT）快速权重作为跨视图的隐式 3D 神经记忆，并围绕这一机制构建了线性复杂度的前馈重建管线。整个框架由五个紧密耦合的模块串联而成，数据流从原始图像输入到显式 3D 表示输出，全程保持计算效率与表示灵活性。
 
@@ -172,8 +166,6 @@ $$\mathbf{T}_i^{\mathrm{v}} = \mathrm{Apply}(W, \mathbf{T}_i^{\mathrm{v}})$$
 
 为支持大规模场景训练，tttLRM 采用序列并行策略：将标记化后的输入视图沿序列维度切分到多个 GPU，各设备独立更新快速权重后同步，再各自预测所分配虚拟视图的高斯参数，最后收集构建完整场景并分别渲染新视角计算损失、聚合梯度。这一设计使模型可以线性加速，训练时使用了 64 块 A100 GPU。
 
-
-
 ### 测试时训练（TTT）快速权重更新
 
 tttLRM 的核心构建块是测试时训练层，其关键机制是在推理时动态更新一组快速权重 $W$。给定输入序列的键值对 $(k, v)$，快速权重通过最小化均方误差进行在线梯度更新：
@@ -214,18 +206,8 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{RGB}} + \lambda_{\mathrm{depth}} \mathcal{L
 
 消融实验表明，同时采用 Muon 优化器并加入深度和透明度正则化可达到最佳 PSNR，并有效减少冗余的不透明高斯数量（Table 5）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2602_20160/figures/003_Figure_3.jpg]]
-*Figure 3: Illustration of distributed feedforward reconstruction training. First, image tokens are sharded across GPUs, and each GPU predicts Gaussians for its assigned virtual views after the fast weights are synchronized. The predicted Gaussians are then gathered to construct the full scene, after which each GPU renders a subset of novel views and computes its respective losses. Gradients are finally all reduced and backpropagated across all devices*
-
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2602_20160/figures/005_Figure_6.jpg]]
 *Figure 6: We show that tttLRM, as a general framework, can also interpret the latent 3D memory into formats besides 3DGS. In this experiment, we use a set of triplane tokens to query the fast weights and then fine-tune the model for triplane-based NeRF reconstruction. We visualize the resulting triplanes and present the corresponding renderings and depth maps for 4 views at a resolution of 512 × 512*
-
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2602_20160/figures/012_Figure_8.jpg]]
-*Figure 8: Time comparison of 3 Attention layers vs 24 layers of LaCT blocks under different numbers of tokens*
-
-
 
 ## 实验与关键发现
 
@@ -270,15 +252,9 @@ tttLRM 支持因果顺序的流式输入，在自回归模式下逐步接收视�
 - **全重建（Ours）**：每步对当前累积的所有视图进行完整 3DGS 重建，PSNR 达 23.63 dB。
 - **预测-合并（Predict & Merge）**：每步仅预测新视图对应的高斯并将其与历史高斯合并，PSNR 仅 21.50 dB。
 
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2602_20160/figures/008_Table_4.jpg]]
-*Table 4: Although progressive GS prediction with merging provides more efficient computation, the reconstruction quality is degraded due to accumulated errors (compared on 32 views under 1K iterations finetuning)*
-
 后者因累积误差导致质量显著下降，表明在自回归场景下，利用快速权重对全局信息进行重整合是维持重建质量的关键。
 
 进一步的训练无关选择性更新策略（Table 6）通过考虑历史快速权重状态，将自回归模型的 PSNR 从 24.81 dB 提升至 24.95 dB，SSIM 从 0.814 提升至 0.818，验证了记忆保持机制对流式场景的价值。
-
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2602_20160/figures/013_Table_6.jpg]]
-*Table 6: Training-free selective update considering history fast weights can further enhance our AR model*
 
 ### 消融实验
 
@@ -289,18 +265,12 @@ Table 3 和 Figure 7 系统验证了 TTT-LVSM 预训练初始化的贡献。在 
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2602_20160/figures/010_Table_3.jpg]]
 *Table 3: Leveraging pretrained knowledge from novel view synthesis tasks improves the final 3D reconstruction quality across different 3D representations*
 
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2602_20160/figures/011_Figure_7.jpg]]
-*Figure 7: Our 3DGS reconstruction model leverages pretraining with LVSM on novel view synthesis tasks, which significantly accelerates learning and leads to better performance, compared to training from scratch*
-
 #### 优化器与正则化
 
 Table 5 在场景级 32 视图 256×144 输入设置下消融了优化器选择和正则化项的影响：
 - 基线（AdamW + 基础损失）PSNR 为 20.44 dB。
 - 切换至 Muon 优化器后提升至 20.68 dB。
 - 进一步加入透明度正则化与深度正则化（Muon + Opacity + Depth）达到最佳 20.76 dB，同时有效减少了不透明高斯的冗余数量。
-
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2602_20160/figures/009_Table_5.jpg]]
-*Table 5: Ablation on 32 view 256 × 144 input with the same iterations across settings*
 
 这一组合被采纳为最终配置，在提升重建质量的同时改善了 3D 表示的紧凑性。
 
@@ -326,8 +296,6 @@ tttLRM 的快速权重作为通用隐式 3D 记忆，不仅限于解码为 3DGS�
 - 快速权重作为隐式 3D 记忆的解释在 3DGS 和三平面 NeRF 两种表示上均得到验证，但在其他表示（如 SDF、占用场）上的泛化性尚未实验。
 - 自回归选择性更新的增益（+0.14 dB PSNR）幅度有限，训练时集成该策略的潜在收益需进一步探索。
 - 实时流式重建（<1 秒延迟）虽在架构上具备线性复杂度基础，但当前推理时间距离严格实时仍有差距，工程优化空间较大。
-
-
 
 ## 定位与知识库关联
 
@@ -372,8 +340,6 @@ tttLRM 处于三条技术路线的交叉点：**测试时训练**、**前馈 3D 
 4. **实时流式重建的工程化**：当前单张 A100 上的推理时间为秒级。通过进一步的工程优化（如模型量化、更高效的并行策略），能否实现真正的实时（<1 秒）流式高分辨率重建？
 
 5. **表示格式的扩展边界**：论文展示了 3DGS 和三平面 NeRF 两种解码格式。快速权重所编码的隐式 3D 记忆能否被解码为其他表示形式（如 SDF、占用场），以及不同格式之间的转换是否存在信息损失？
-
-
 
 ## 原文 PDF
 

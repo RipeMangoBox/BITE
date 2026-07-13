@@ -121,13 +121,8 @@ FreqEdit 是一个无训练的框架，旨在解决多轮图像编辑中因高�
 
 上述模块的关系可概括为：高频注入是主体，自适应策略控制注入的空间分布，路径补偿修正注入引入的轨迹偏差，质量引导则作为特定基座模型的噪声抑制后处理。整个流程在每一轮编辑的每个去噪步上执行，无需额外训练或微调。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l876_https_arxiv_org_abs_2512_01755/figures/003_Figure_3.jpg]]
 *Figure 3: High-Frequency Feature Injection Pipeline. (A) We construct the reference velocity*
-
-![[assets/figures/papers/paper_list_l876_https_arxiv_org_abs_2512_01755/figures/001_Figure_1.jpg]]
-*Figure 1: FreqEdit enables consistent multi-turn image editing. Base models (FLUX.1 Kontext and Qwen-Image) exhibit progressive quality deterioration during iterative editing, including body deformations, edge over-sharpening, and texture collapse. FreqEdit addresses these limitations through strategic high-frequency reinforcement*
 
 FreqEdit 的核心设计围绕一个因果控制旋钮展开：**从当前上下文图像构造参考速度场，并通过小波变换将其高频成分注入到编辑速度场中**。该框架包含四个关键模块，分别解决多轮编辑中的不同退化机制。
 
@@ -157,9 +152,6 @@ $$\mathrm{DWT}(v^{\mathrm{ref}}) = \{\mathbf{LL}_{\mathrm{ref}}^{(2)}, \mathbf{D
 $$\mathrm{DWT}(v^{\mathrm{edit}}) = \{\mathbf{LL}_{\mathrm{edit}}^{(2)}, \mathbf{D}_{\mathrm{edit}}^{(2)}, \mathbf{D}_{\mathrm{edit}}^{(1)}\}$$
 
 其中 $\mathbf{LL}^{(2)}$ 为第二层低频系数（捕获全局结构与颜色），$\mathbf{D}^{(2)}$ 和 $\mathbf{D}^{(1)}$ 分别为第二层和第一层高频系数（编码边缘、纹理及最精细细节如发丝和织物纹理，见 Figure 12 的潜空间频率对齐验证）。
-
-![[assets/figures/papers/paper_list_l876_https_arxiv_org_abs_2512_01755/figures/015_Figure_12.jpg]]
-*Figure 12: Latent-space frequency alignment. Images are reconstructed by retaining only the specified frequency band(s) from the 2-level DWT of the latent representation and decoding via VAE*
 
 **高频注入。** 采用 CFG 风格的线性外推，将参考速度的高频细节注入编辑速度：
 
@@ -230,11 +222,6 @@ $$\boldsymbol{v}_{t_i}^{\mathrm{final}} = (1 - \lambda) \cdot \boldsymbol{v}_{t_
 
 四个模块构成递进的因果链条：高频注入是防止退化的核心（决定性证据来自 Figure 6(d) 的频率成分消融），自适应注入确保编辑灵活性（Figure 6(a) 证实其必要性），路径补偿修正注入引入的轨迹偏差（Figure 6(b) 证实其消除幽灵伪影的作用），质量引导作为 FLUX 模型的补充模块处理其特有的噪声积累问题（Figure 6(c) 证实）。超参数敏感性分析（Figure 11）表明，$\alpha_0$、$\gamma$、$\lambda$ 在合理范围内具有鲁棒性，超出范围则出现失败区域。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l876_https_arxiv_org_abs_2512_01755/figures/004_Figure_4.jpg]]
-*Figure 4: Path Compensation Mechanism. The actual denoising trajectory (orange line*
-
 ## 实验与关键发现
 
 ### 核心发现：高频退化是多轮编辑质量下降的根本瓶颈
@@ -289,12 +276,6 @@ FreqEdit 的局限性在实验中也得到明确揭示：
 
 ![[assets/figures/papers/paper_list_l876_https_arxiv_org_abs_2512_01755/figures/006_Table_1.jpg]]
 *Table 1: Quantitative results across 10 sequential edits. Our method demonstrates stable performance across all metrics throughout the editing sequence. “Instr.” and “Cons.” denote instruction-following and consistency metrics, respectively. The best results are highlighted in bold, while the second-best results are underlined*
-
-![[assets/figures/papers/paper_list_l876_https_arxiv_org_abs_2512_01755/figures/009_Figure_7.jpg]]
-*Figure 7: Per-turn metrics across 10 sequential editing steps. We report SSIM (left), PSNR (middle), and DINO-Sim (right) at each turn k, all computed by comparing the edited image*
-
-![[assets/figures/papers/paper_list_l876_https_arxiv_org_abs_2512_01755/figures/013_Figure_11.jpg]]
-*Figure 11: Hyperparameter sensitivity analysis on FLUX.1 Kontext. Each row varies one hyperparameter while fixing the others to their default values*
 
 ## 定位与知识库关联
 

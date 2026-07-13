@@ -53,8 +53,6 @@ claims:
 - 在 I2V 联合控制任务上，FVD 达到 **332.27**，相比 ImageConductor 的 878.59 大幅领先。
 - 消融实验表明，去除拆分-融合模块（直接相加）会导致 FVD 从 361.03 急剧升高到 890.39，验证了该策略对联合运动控制的必要性。
 
-
-
 ### 问题背景
 
 生成式视频模型近年来取得了显著进展，文本到视频（T2V）和图像到视频（I2V）的生成质量持续提升。然而，在实际应用中，用户往往需要对生成内容进行精确的运动控制——不仅需要控制摄像机的运动轨迹（如推拉摇移），还需要同时控制画面中人物的动作姿态。这种**联合运动控制**能力对于电影预可视化、虚拟内容创作等以人为本的视频生成场景至关重要。
@@ -78,8 +76,6 @@ claims:
 具体而言，TokenMotion的提出基于以下关键洞察：如果将相机轨迹和人体姿态视为同一时空令牌空间中的不同运动令牌，就可以利用Transformer架构（DiT）的全注意力机制对两者进行统一建模。在此基础上，通过设计专门的**拆分-融合模块**（decouple-and-fuse module），强制模型从融合表示中解耦出两类运动信号，并利用含有姿态先验的**动态遮罩**使人体运动仅作用在人体区域，从而在DiT框架下实现精细的、无冲突的联合运动控制。
 
 这一思路的技术基础在于：DiT骨干（以 **CogVideoX-2B** (Yang et al., arXiv 2024) 为代表）通过3D全注意力机制天然支持对时空令牌的统一处理，为同时注入和交互两类运动信号提供了架构上的可行性。TokenMotion正是首个基于DiT的、面向以人为本视频生成的联合运动控制框架。
-
-
 
 ## 核心方法与创新机理
 
@@ -121,8 +117,6 @@ $$z_{\text{visual}}^n += \text{Lora}(\text{CrossAttn}(Q_{\text{visual}}^n, K_{\t
 
 上述三个创新构成因果链条：**高细粒度表示**为拆分-融合提供了可操作的信号基础；**拆分-融合与动态遮罩**在令牌空间中实现了两类运动的解耦与区域感知交互；**DiT 骨干适配**则为这一统一建模提供了架构支撑。三者共同使 TokenMotion 在 T2V 联合控制任务上取得 PoseErr 45.24（MotionBooth 为 165.49）和 DetErr 2.50%（MotionBooth 为 13.19%）的显著提升（Table 1），并在 I2V 场景下将 FVD 从 ImageConductor 的 878.59 降至 332.27。
 
-
-
 TokenMotion是一个基于DiT（Diffusion Transformer）架构的视频扩散框架，首次实现了对摄像机轨迹、人体运动及其联合交互的细粒度控制。该框架以CogVideoX-2B为骨干，在统一的时空令牌空间中同时建模两类运动信号，并通过拆分-融合（Decouple-and-Fuse）策略解决运动冲突问题。
 
 整个pipeline的输入输出流如下：给定文本提示（T2V）或参考图像+文本提示（I2V），以及可选的摄像机运动参数和人体运动序列，框架首先生成对应的运动令牌，然后将这些令牌注入视觉令牌的生成过程，最终输出受控的视频序列。
@@ -145,15 +139,11 @@ $$\mathbb{E}_{(z,c,s)}\left[\lambda_{\sigma}\left\|D_{\theta}(\tilde{z};\sigma,c
 
 与现有方法的本质区别在于：基线方法（如MotionCtrl、Direct-A-Video、MotionBooth）通常基于UNet骨干，将摄像机运动与对象运动分离到空间和时间分支中分别处理，且使用粗粒度的运动表示（边界框或稀疏关键点）。TokenMotion则利用DiT的3D全注意力机制对时空维度统一建模，并通过拆分-融合策略和动态遮罩在令牌级别显式解耦两类运动信号，从根本上避免了运动冲突。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l24_TokenMotion_Decoupled_Motion_Control_via_Token_Disentanglement_for_Human/figures/003_Figure_3.jpg]]
 *Figure 3: Visualization of joint-control video generation results from Direct-A-Video [46], MotionCtrl [38], MotionBooth [39] and our TokenMotion-T. Above cases shows that our TokenMotion method succeeds in jointly handling controls of both human motion and camera motion, while being consistently aligned with the input prompts at the same time*
 
 ![[assets/figures/papers/paper_list_l24_TokenMotion_Decoupled_Motion_Control_via_Token_Disentanglement_for_Human/figures/001_Figure_1.jpg]]
 *Figure 1: TokenMotion is a transformer-based video generation framework that enables simultaneous control of camera trajectories and human kinematic patterns. The framework demonstrates versatility across both text-to-video and image-to-video generation paradigms, while supporting flexible control configurations. *Text prompts are abbreviated for conciseness*
-
-
 
 TokenMotion 的核心架构由三个关键模块串联构成：双运动编码器、拆分-融合模块，以及交叉注意力注入层。整体流程为：首先将相机轨迹与人体姿态分别编码为时空运动令牌，随后通过拆分-融合策略在令牌空间中解耦两类运动并建模其交互，最后将融合后的运动令牌通过交叉注意力与 LoRA 注入视觉令牌，实现对视频生成过程的精细控制（Figure 2）。
 
@@ -208,8 +198,6 @@ $$
 $$
 
 其中 $\tilde{z}$ 为加噪后的视觉令牌，$\sigma$ 为噪声水平，$c$ 为文本条件，$s$ 为运动条件，$\lambda_{\sigma}$ 为噪声水平相关的权重系数。
-
-
 
 ## 实验与关键发现
 
@@ -267,8 +255,6 @@ Figure 3 的定性对比直观展示了各方法的差异。TokenMotion 生成�
 
 5. **基线公平性**：部分基线（如 MotionCtrl、Direct-A-Video）基于 UNet 骨干，与 DiT 骨干的参数量和训练数据可能不同，性能差异也可能部分源于基础模型的差异，需在解读定量对比时予以注意。
 
-
-
 ## 定位与知识库关联
 
 **核心定位**：TokenMotion 是首个基于 DiT（Diffusion Transformer）骨干的视频扩散框架，针对**以人为本的视频生成**中的相机运动与人体运动**联合精细控制**问题，提出了基于令牌解耦与动态遮罩的分离式控制策略。
@@ -296,8 +282,6 @@ Figure 3 的定性对比直观展示了各方法的差异。TokenMotion 生成�
 2. 能否引入更丰富的人体运动表示（如 3D 参数化模型 SMPL）来解决手指和面部的细节问题？
 3. 是否可以将动态遮罩扩展为实例级遮罩，以支持多人场景中不同人物的独立运动控制？
 4. 在保持控制精度的同时，如何降低训练和推理的计算开销，以适应实时或低资源场景？
-
-
 
 ## 原文 PDF
 

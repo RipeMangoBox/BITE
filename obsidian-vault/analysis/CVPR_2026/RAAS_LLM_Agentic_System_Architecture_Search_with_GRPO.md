@@ -87,8 +87,6 @@ RAAS 属于**基于搜索的智能体架构自动设计**方法，与以下工�
 
 RAAS 的核心贡献不在于搜索空间的设计，而在于**评估范式的革新**——通过同行比较消除任务难度偏差，通过多试验聚合消除执行随机性，从而为架构搜索提供可靠的优化信号。
 
-
-
 ### 智能体系统的自动化设计需求
 
 大语言模型（LLM）驱动的智能体系统已在数学推理、代码生成、多步骤决策等复杂任务中展现出显著能力。这些系统通常由多个功能模块（如规划器、反思器、工具调用器）按特定拓扑结构编排而成，其架构设计直接影响最终性能。然而，手工设计有效的智能体架构需要大量专家知识和反复试错，这推动了自动化架构搜索方法的发展。
@@ -114,8 +112,6 @@ RAAS 的核心贡献不在于搜索空间的设计，而在于**评估范式的�
 2. **多试验评估综合（MTAS）**：对每个架构执行多次独立试验，通过统计合成函数聚合结果，有效消除执行方差，提供统计上稳健的能力估计。
 
 图1(B) 展示了 RAAS 的解决方案：通过同行比较消除任务难度偏差，通过多试验聚合消除执行随机性，两者协同产生稳定的评估信号，为可靠的架构发现奠定基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -166,8 +162,6 @@ $$\Theta_{\mathrm{RAAS}}(\phi; q) = \frac{1}{N} \sum_{i=1}^{N} \nabla_{\phi} \lo
 
 这一评估范式的转变是RAAS在六个基准上平均超越最强基线**+5.41个百分点**的根本原因。
 
-
-
 RAAS（Robust Architecture Adaptive Search）构建了一个闭环的架构搜索pipeline，核心目标是**在概率化超级网上通过稳定、公平的评估信号来发现高性能智能体架构**。整个框架由四个协同模块串联而成，形成“采样→评估→适应”的迭代优化循环。
 
 ### 1. 搜索空间定义：Agentic Supernet
@@ -212,12 +206,8 @@ $$\Theta_{\mathrm{RAAS}}(\phi; q) = \frac{1}{N} \sum_{i=1}^{N} \nabla_{\phi} \lo
 
 这一设计使得RAAS在搜索过程中持续受益于稳定的评估信号，收敛曲线（Figure 3）显示其相比基线方法更快、更稳定地达到高性能区域。超参数 $N$ 和 $K$ 的敏感性分析（Figure 4）表明，在适中的设置下（如 $N=5, K=5$），RAAS即可在成本可控的前提下获得显著性能增益。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2199_https_openaccess_thecvf_com_content_CVPR2026_html_Yang_RAAS_LLM_Agentic/figures/002_Figure_2.jpg]]
 *Figure 2: RAAS framework overview. CAO performs cohort-based peer comparison for contextual fairness, while MTAS aggregates multi-trial executions for statistical robustness, together producing stable evaluation signals for architecture discovery*
-
-
 
 RAAS 通过两个协同机制建立稳定、公平的评估信号：**上下文架构编排（CAO）** 和 **多试验评估综合（MTAS）**。CAO 在同查询上评估候选架构的同行群体，通过同行比较推导上下文相关的零中心优势信号，解耦任务难度；MTAS 聚合多次独立试验的结果，减少执行方差，提供统计上稳健的能力估计。两者协同产生稳定的评估信号，驱动架构搜索的优化过程。
 
@@ -301,12 +291,8 @@ $$
 
 其中 $\eta$ 为适应率。上下文归一化使适应信号比原始性能分数更一致——任务特定难度不再在学习过程中引入虚假波动，组件级归因则使架构模式的优化精确到单个算子层面。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2199_https_openaccess_thecvf_com_content_CVPR2026_html_Yang_RAAS_LLM_Agentic/figures/001_Figure_1.jpg]]
 *Figure 1: An illustration of the core problem and our proposed solution. (A) Problem: Evaluation Instabilities. Easy queries inflate weak architectures while hard queries depress strong ones (task-difficulty entanglement), and single-execution assessments capture transient artifacts rather than true capability (execution variance). (B) RAAS: Stable Evaluation through Synergistic Design. RAAS evaluates cohorts of architectures on the same query through multiple independent trials. CAO derives contextual merit signals via peer comparison, while MTAS synthesizes multi-trial outcomes for statistical robustness, together enabling more reliable architecture discovery*
-
-
 
 ## 实验与关键发现
 
@@ -385,8 +371,6 @@ RAAS通过两个协同机制解决这一问题：**上下文架构编排（CAO�
 
 4. **骨干模型泛化**：评估限于GPT-4o-mini和Qwen-2.5-72b两个骨干，RAAS在其他模型家族（如Claude、Gemini）上的表现需要进一步验证，特别是考虑到不同模型的采样温度特性可能影响执行方差的量级。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2199_https_openaccess_thecvf_com_content_CVPR2026_html_Yang_RAAS_LLM_Agentic/figures/003_Table_1.jpg]]
 *Table 1: Main results across agentic systems. Accuracy (%) on various benchmarks. Best and second-best results are bold and underlined*
 
@@ -395,14 +379,6 @@ RAAS通过两个协同机制解决这一问题：**上下文架构编排（CAO�
 
 ![[assets/figures/papers/paper_list_l2199_https_openaccess_thecvf_com_content_CVPR2026_html_Yang_RAAS_LLM_Agentic/figures/006_Figure_4.jpg]]
 *Figure 4: Impact of cohort size N and trial count K on MATH accuracy. The heatmap shows accuracy (in %) as a function of the number of architectures sampled per query (N) and independent executions per architecture (K)*
-
-![[assets/figures/papers/paper_list_l2199_https_openaccess_thecvf_com_content_CVPR2026_html_Yang_RAAS_LLM_Agentic/figures/007_Figure_5.jpg]]
-*Figure 5: Ablation study of RAAS components. We systematically analyze the contribution of CAO and MTAS modules by comparing: (1) MaAS baseline, (2) MaAS with entropy regularization only, (3) RAAS with CAO only (no MTAS multi-trial synthesis), and (4) full RAAS (CAO + MTAS). The results demonstrate that both contextual orchestration and multi-trial synthesis contribute synergistically to performance gains, with their combination achieving the best results across all benchmarks*
-
-![[assets/figures/papers/paper_list_l2199_https_openaccess_thecvf_com_content_CVPR2026_html_Yang_RAAS_LLM_Agentic/figures/008_Figure_6.jpg]]
-*Figure 6: Cost-performance trade-off analysis across different methods*
-
-
 
 ## 定位与知识库关联
 
@@ -449,8 +425,6 @@ RAAS 的方法论贡献可以精确地定位为 **评估协议的范式转换**�
 - **理论收敛分析**：将优点加权适应纳入随机优化的理论框架，分析其在非凸 Supernet 参数空间中的收敛性质，特别是上下文优点信号的方差如何影响收敛速率。
 
 - **跨模型与跨域泛化**：在更多样的 LLM 骨干和任务域（如开放域问答、代码调试、多模态推理）上验证评估稳定机制的普适性，识别可能失效的边界条件。
-
-
 
 ## 原文 PDF
 

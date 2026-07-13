@@ -63,8 +63,6 @@ ReCoFuse 将信息恢复建模为基于均值回复随机微分方程（IR-SDE�
 - **消融验证**：移除 TIM（即取消互惠耦合）导致可见光和红外恢复分支的 PSNR/SSIM 显著下降（VIS PSNR 25.205→24.928，IR PSNR 33.294→32.172），证实跨模态反馈对信息恢复的关键作用。
 - **下游任务**：在语义分割任务上，基于 ReCoFuse 融合图像的 mIoU 达到 57.67，优于所有对比方法，表明其在高级视觉任务中的优越性。
 
-
-
 图像融合旨在将多模态传感器捕获的互补信息整合为单一、信息丰富的表示，在自动驾驶、安防监控、遥感侦察等场景中具有关键应用价值。可见光图像提供丰富的纹理与色彩细节，但在低光、雾霾、烟雾等恶劣条件下信息严重退化；红外图像虽能穿透部分遮挡和弱光照环境，却缺乏精细的纹理结构。因此，鲁棒地融合这两种模态、同时在融合过程中恢复退化信息，成为该领域的核心挑战。
 
 现有鲁棒图像融合方法可归为两类范式。**集成硬回归范式**（如 **ControlFusion** (Tang et al., NeurIPS 2025)、**MRFS** (Zhang et al., CVPR 2024)、**Text-IF** (Yi et al., CVPR 2024)）试图通过语言-视觉降质提示、语义文本引导或多任务互增强等机制，将信息恢复与融合隐式联合建模。然而，这种隐式映射缺乏对恢复过程的显式约束，在复杂降质下难以可靠地还原干净信息。**解耦优化范式**（如 **BA-Fusion** (Sun et al., IJCAI 2024)、**DDBF** (Zhang et al., CVPR 2024)、**OmniFuse** (Zhang et al., TPAMI 2025)）则采用“先恢复后融合”的两阶段策略，先用独立增强模块或扩散模型对退化图像去噪，再执行融合。尽管解耦设计降低了优化难度，但恢复与融合过程相互孤立——恢复阶段无法感知融合所需的跨模态互补信息，导致残留降质和场景表示不完整。
@@ -72,8 +70,6 @@ ReCoFuse 将信息恢复建模为基于均值回复随机微分方程（IR-SDE�
 这两类范式的共同瓶颈在于：**信息恢复与融合之间的关系被定义为单向或隐式的，缺乏相互增强的反馈机制**。当多模态源图像同时遭受低光、雾霾、噪声、低对比度乃至条纹等多种降质时，独立恢复分支难以借助另一模态的互补线索来校正自身恢复轨迹，融合阶段也只能在已受损的恢复结果上进行妥协性整合。
 
 针对上述缺口，本文提出一种全新的**互惠耦合优化范式**，其核心洞察是：将信息恢复与融合重新定义为**相互增强的协同过程**。具体而言，在扩散模型的每一步采样中插入**时间感知的跨模态融合模块（TIM）**，动态聚合多模态采样变量，并将聚合后的共享状态反馈给各模态的恢复分支。这一设计打破了恢复与融合之间的隔阂，使跨模态互补性能够实时驱动恢复质量的提升，而更高质量的恢复结果又反过来为融合提供更完整的场景信息，形成闭环增强。基于该范式，我们构建了 **ReCoFuse** 框架，旨在复杂降质下实现超鲁棒、高保真的可见光-红外图像融合。
-
-
 
 ## 核心方法与创新机理
 
@@ -122,8 +118,6 @@ ReCoFuse 的核心洞察在于：信息恢复与融合不应当是先后或隐�
 
 这些创新共同构成了 ReCoFuse 的超鲁棒融合能力：在多种复杂降质（低光、雾霾、噪声、低对比度、条纹）同时存在的情况下，ReCoFuse 能产生视觉愉悦、高保真的融合结果，而其他范式无法有效去除降质（Fig. 1 (d)）。
 
-
-
 ReCoFuse 的核心理念是将信息恢复与融合从彼此独立的关系重新定义为**互惠耦合**（reciprocal coupling）过程。如图 2 所示，框架由四个关键模块串联构成：共享编码器、扩散恢复分支、时间感知跨模态集成模块（TIM）和共享解码器，并通过交替正则化机制实现端到端协同训练。
 
 ### 数据流与模块关系
@@ -155,12 +149,8 @@ $$I_f = D(z_f^d(0), h_f)$$
 
 这种交替更新机制将原本耦合的优化问题解耦为两个独立可解的子问题，同时通过 TIM 作为共享桥梁维持恢复与融合之间的协作交互。消融实验证实，相较于分离训练方式（Model IV），交替正则化在 SD（48.473 vs 47.262）、MI（3.114 vs 3.054）和 VIF（0.660 vs 0.647）等融合指标上均有稳定提升（Table 3）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l920_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_ReCoFuse_Ultra_R/figures/002_Figure_2.jpg]]
 *Figure 2: The pipeline of our proposed robust image fusion framework ReCoFuse*
-
-
 
 ### 整体框架：互惠耦合优化范式
 
@@ -174,9 +164,6 @@ ReCoFuse 的核心设计在于将信息恢复与融合定义为一个相互增�
 ### 时间感知跨模态集成模块 (TIM)
 
 TIM 是互惠耦合机制的核心枢纽，其详细结构如图 Figure 3 所示。在每个扩散时间步 $t$，TIM 接收两个模态的采样变量 $z_{vis}^d(t)$ 和 $z_{ir}^d(t)$，生成两个时变权重进行动态融合：
-
-![[assets/figures/papers/paper_list_l920_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_ReCoFuse_Ultra_R/figures/003_Figure_3.jpg]]
-*Figure 3: The detailed structure of the proposed time-aware crossmodal integration modules. CBAM refers to the convolutional block attention module [21]*
 
 $$z_f^d(t) = w_{vis}(t) \odot z_{vis}^d(t) + w_{ir}(t) \odot z_{ir}^d(t) \quad \text{(Eq. 9)}$$
 
@@ -214,12 +201,6 @@ $$z_m^d(t-1) = z_f^d(t) - \mathrm{Drift}_{fm}(z_f^d(t), \hat{\epsilon}_{mt}) \cd
 
 为有效协同 DiM 和 TIM 的训练，ReCoFuse 引入交替正则化机制（图 Figure 4、Figure 5），将优化问题分解为两个交替执行的约束项：
 
-![[assets/figures/papers/paper_list_l920_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_ReCoFuse_Ultra_R/figures/005_Figure_4.jpg]]
-*Figure 4: Illustration of our alternating regularization mechanism*
-
-![[assets/figures/papers/paper_list_l920_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_ReCoFuse_Ultra_R/figures/004_Figure_5.jpg]]
-*Figure 5: Illustration of optimization via alternating regularization between information restoration and integration*
-
 **信息恢复正则化**：驱动预测状态逼近理想后验均值 $\tilde{z}_m^d(t-1)$（由 Eq. 13 给出其最大似然估计）：
 
 $$\mathcal{L}_m^{\mathrm{I2R}} = \sum_{t=1}^T \mathbb{E}[ \| z_f^d(t) - \mathrm{Drift}_{fm}(z_f^d(t), \hat{\epsilon}_{mt}) \cdot \Delta t - \tilde{z}_m^d(t-1) \| ] \quad \text{(Eq. 14)}$$
@@ -230,12 +211,8 @@ $$\mathcal{L}_m^{\mathrm{I2R}} = \sum_{t=1}^T \mathbb{E}[ \| z_f^d(t) - \mathrm{
 
 这种交替机制简化了多任务优化，同时通过协作交互增强了对最优解 $g^*$ 的逼近。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l920_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_ReCoFuse_Ultra_R/figures/001_Figure_1.jpg]]
 *Figure 1: Comparisons between our reciprocal coupling optimization paradigm and existing robust image fusion paradigms. Our method effectively removes haze and noise while others cannot*
-
-
 
 ## 实验与关键发现
 
@@ -269,8 +246,6 @@ ReCoFuse 在 MFNet、FMB、LLVIP 三个基准数据集上进行了系统评估�
 
 为确保对比的公平性，所有对比方法均使用与 ReCoFuse 相同的降质训练数据进行重新训练，并在相同的评估策略下测试。对于无法重新训练的外部恢复方法，使用作者提供的建议设置和预训练模型进行评估。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l920_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_ReCoFuse_Ultra_R/figures/008_Table_1.jpg]]
 *Table 1: Quantitative results under different evaluation strategies on three datasets*
 
@@ -282,17 +257,6 @@ ReCoFuse 在 MFNet、FMB、LLVIP 三个基准数据集上进行了系统评估�
 
 ![[assets/figures/papers/paper_list_l920_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_ReCoFuse_Ultra_R/figures/010_Figure_9.jpg]]
 *Figure 9: Visual ablation on reciprocal coupling for restoration*
-
-![[assets/figures/papers/paper_list_l920_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_ReCoFuse_Ultra_R/figures/013_Figure_10.jpg]]
-*Figure 10: Visual ablation on key designs for fusion*
-
-![[assets/figures/papers/paper_list_l920_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_ReCoFuse_Ultra_R/figures/017_Table_5.jpg]]
-*Table 5: Quantitative results of semantic segmentation*
-
-![[assets/figures/papers/paper_list_l920_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_ReCoFuse_Ultra_R/figures/016_Table_4.jpg]]
-*Table 4: Quantitative results of object detection*
-
-
 
 ## 定位与知识库关联
 
@@ -352,8 +316,6 @@ ReCoFuse 的技术路线建立在两个基础之上：
 2. **TIM 的信息瓶颈**：TIM 将两个模态的采样变量压缩为一个聚合变量，当模态间信息冲突（如红外热源与可见光纹理在同一位置矛盾）时，聚合过程是否会导致信息丢失或虚假融合，论文未深入讨论。
 
 3. **与其他恢复先验的兼容性**：ReCoFuse 使用 IR-SDE 作为恢复框架，若替换为其他扩散变体（如冷扩散、一致性模型）或非扩散恢复方法，互惠耦合机制是否仍能保持增益，值得探索。
-
-
 
 ## 原文 PDF
 

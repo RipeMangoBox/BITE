@@ -97,8 +97,6 @@ PerpetualWonder 处于**物理驱动的4D生成**与**可微渲染优化**的交
 2. 如何补齐输入图像中未见的物体几何，以处理全新物体的交互？
 3. 对于更复杂的多物体交互和精细材料模拟，VPP表示和优化框架是否仍然足够？
 
-
-
 ### 问题背景：长时域动作驱动4D场景生成
 
 从单张图像生成可交互的动态3D场景是计算机视觉与图形学的核心挑战之一。给定一张静态场景图像和一系列用户指定的动作（如施加风力、点力或重力），目标是生成一个在时域上连续、物理合理且多视角一致的4D场景。这一能力对于虚拟现实、游戏内容生成和机器人仿真等应用至关重要。
@@ -115,8 +113,6 @@ PerpetualWonder 处于**物理驱动的4D生成**与**可微渲染优化**的交
 ### 本文动机：建立物理-视觉闭环
 
 PerpetualWonder 的核心动机在于打破上述分离范式，建立一个**物理模拟与视觉优化之间的双向闭环**。其关键洞察是：如果能够将每个物理粒子与一组视觉原语（高斯原语）显式绑定，那么前向物理传递可以驱动视觉预测，而反向视觉优化也可以更新物理状态，从而在每一轮交互中消除累积误差，实现长时域一致的4D场景生成。
-
-
 
 ## 核心方法与创新机理
 
@@ -148,8 +144,6 @@ PerpetualWonder 建立了一个**完整的闭环系统**，由三个关键阶段
 
 这一闭环机制使得 PerpetualWonder 能够在多轮连续动作下保持物理合理性和视觉一致性。用户研究（Table 2）显示，在物理合理性上 80.8% 的参与者偏好 PerpetualWonder，在运动保真度上则达到 86.3%，显著优于 WonderPlay 的随机水平（50%）。
 
-
-
 PerpetualWonder 的整体 pipeline 围绕一个**闭环迭代系统**构建，该系统将物理模拟与神经渲染优化交替运行，从单张图像出发生成长时域、动作驱动的 4D 场景。其核心架构可分解为以下阶段（参见 Figure 2）：
 
 ![[assets/figures/papers/paper_list_l2564_https_arxiv_org_abs_2602_04876/figures/002_Figure_2.jpg]]
@@ -175,8 +169,6 @@ PerpetualWonder 的整体 pipeline 围绕一个**闭环迭代系统**构建，�
 - **输出**：支持新视角渲染的 4D 场景（3D 场景 + 时间维度），可呈现长时域、物理合理的动态交互结果。
 
 这一闭环设计的核心优势在于：前向物理传递驱动视觉预测，而反向优化则利用多视角一致性约束修正物理状态，从而**阻断动力学误差的累积**，使长时域连续交互成为可能。消融实验证实，取消 VPP 表示会导致特征断裂和严重伪影（Figure 6），而放弃渐进多视角优化则会产生纹理模糊和外观闪烁（Figure 7）。
-
-
 
 ### 3.1 视觉-物理对齐粒子（VPP）表示
 
@@ -226,15 +218,11 @@ $$\hat{S}_{t+1} = \Phi_p(\hat{S}_t, \mathcal{A}_t)$$
 
 > **注意**：关于 3D 场景初始化模块（利用 GEN3C 合成稠密视图、COLMAP 重建点云、3DGS 优化）的具体实现细节，请参见方法章节的其他部分。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2564_https_arxiv_org_abs_2602_04876/figures/009_Figure_6.jpg]]
 *Figure 6: Ablation on VPP representation. Top row is with our proposed VPP for the foreground. Bottom row shows using 3D gaussians from the standard Gaussian Splatting [18] optimization*
 
 ![[assets/figures/papers/paper_list_l2564_https_arxiv_org_abs_2602_04876/figures/008_Figure_7.jpg]]
 *Figure 7: Ablation on progressive multi-view optimization. Top row shows the optimized scene using progressive optimization and the bottom row shows direct optimization results*
-
-
 
 ## 实验与关键发现
 
@@ -243,9 +231,6 @@ $$\hat{S}_{t+1} = \Phi_p(\hat{S}_t, \mathcal{A}_t)$$
 PerpetualWonder在定量基准和人类偏好研究上均展现出对先前方法的显著优势。在World-Score指标上，方法在10个场景的测试中取得了相机可控性93.26、3D一致性80.41和成像质量66.98的最佳性能（Table 1）。这三项指标分别衡量了生成视频对指定相机轨迹的遵循程度、跨视角几何外观的稳定性以及整体视觉质量，表明闭环优化框架在多视角一致性生成上的有效性。
 
 在包含350名参与者的2AFC用户研究中，PerpetualWonder在动态真实感的两个关键维度上大幅超越混合生成模拟器**WonderPlay**：物理合理性偏好率达到80.8%，运动保真度偏好率达到86.3%（Table 2）。这一结果直接验证了视觉-物理对齐粒子（VPP）表示在消除物理-视觉解耦带来的动力学误差累积方面的核心作用——当物理粒子与高斯原语建立双向连接后，前向物理驱动与反向视觉优化形成闭环，使得长时域交互中的物理状态持续得到视觉信号的校正。
-
-![[assets/figures/papers/paper_list_l2564_https_arxiv_org_abs_2602_04876/figures/005_Table_2.jpg]]
-*Table 2: 2AFC human study results of favor rate of our PerpetualWonder over baseline methods in dynamic realism*
 
 定性对比（Figure 4）进一步展示了方法在相机运动与场景动力学协同生成上的优势。相比于GEN3C和Open-Sora等仅依赖视频生成模型的方法，PerpetualWonder生成的场景在物体运动轨迹的物理合理性和跨视角外观一致性上均表现出明显提升。在长时域多轮交互场景中（Figure 5），WonderPlay随着动作轮次增加出现物体分裂和纹理退化，而PerpetualWonder通过每轮闭环的状态校正保持了场景表示的稳定性。
 
@@ -269,30 +254,12 @@ PerpetualWonder在定量基准和人类偏好研究上均展现出对先前方�
 
 方法存在两个已知失败模式。第一，当输入图像中未出现物体几何时（如从视野外进入场景的物体），方法无法完整生成该物体的几何结构，出现几何残缺（Figure S3）。这是因为3D场景初始化阶段依赖从输入图像合成的稠密视图，无法恢复未观测到的几何。第二，完整模拟循环的运行时开销较大：初始化约8分钟，前向物理传递不足1分钟，但反向优化需约7分钟，总计约16分钟（Table S2），远未达到实时交互的要求。这一开销主要源于反向优化中多视角视频精炼和场景表示迭代更新的计算需求。
 
-![[assets/figures/papers/paper_list_l2564_https_arxiv_org_abs_2602_04876/figures/011_Table_S.2.jpg]]
-*Table S.2: Runtime Analysis*
-
-![[assets/figures/papers/paper_list_l2564_https_arxiv_org_abs_2602_04876/figures/014_Figure_S.3.jpg]]
-*Figure S.3: Failure case in generating unseen geometry*
-
 ### 物理参数配置
 
 模拟的物理参数及默认值详见Table S1，包括时间窗口长度T、粒子尺寸δ、仿真一致性损失权重λ_sim等关键配置。所有实验均采用这些默认参数，除非在消融实验中单独调整。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2564_https_arxiv_org_abs_2602_04876/figures/001_Figure_1.jpg]]
-*Figure 1: We propose PerpetualWonder, a hybrid generative simulator that generates a 4D scene with long-horizon actions and a single image. Here we show a side-by-side comparison for a three-step action sequence (top to bottom, actions overlaid on the images). The left and right image blocks show renderings from two different viewpoints. PerpetualWonder shows superior performance over the previous method. We show video results in https://johnzhan2023.github.io/PerpetualWonder/*
-
 ![[assets/figures/papers/paper_list_l2564_https_arxiv_org_abs_2602_04876/figures/004_Figure_3.jpg]]
 *Figure 3: Qualitative results of the proposed PerpetualWonder. We show the long-horizon scenes with three consecutive actions. and indicate global force (gravity or wind force field), and 3D point force, respectively. The results are all rendered from novel views, demonstrating our method’s ability in long-horizon action-conditioned 4D scene generation*
-
-![[assets/figures/papers/paper_list_l2564_https_arxiv_org_abs_2602_04876/figures/010_Table_S.1.jpg]]
-*Table S.1: Simulation parameters and default values*
-
-![[assets/figures/papers/paper_list_l2564_https_arxiv_org_abs_2602_04876/figures/003_Figure.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -319,8 +286,6 @@ PerpetualWonder 的核心推进在于将**视觉生成**与**物理模拟**从�
 - **实时化路径：** 如何在不大幅牺牲生成质量的前提下，压缩反向优化开销？可能的思路包括轻量化视频精炼模型、稀疏视角优化策略，或将部分优化计算迁移到前向阶段。
 - **未见几何生成：** 如何赋予系统在交互过程中“补全”新出现物体几何的能力？这可能需要引入生成式先验，在物理粒子层面支持动态增删粒子及其对应的高斯原语。
 - **复杂交互泛化：** 当前验证集中在单一刚体物体的力场交互（重力、风力、点力）。对于多物体碰撞、非刚体变形、以及精细材料（如流体、布料）模拟，VPP 表示和闭环优化框架是否仍然足够，尚待检验。
-
-
 
 ## 原文 PDF
 

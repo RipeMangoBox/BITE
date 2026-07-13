@@ -79,8 +79,6 @@ claims:
 
 当前工作仅覆盖指令调优的解码器架构LLM，在其他模型类型上的泛化性尚待验证。条码摘要特征虽具有高判别力，但其本身并不直接关联语义内容，可解释性停留在形状层面。此外，PH计算虽通过GPU加速控制在可接受范围内（4×A100节点约5小时完成六个模型），但实时部署的延迟和资源需求仍构成挑战。未来方向包括：将PH技术与Transformer特有架构属性相结合以生成更具语义意义的特征，探索拓扑约束在模型训练中的正则化作用，以及构建轻量级拓扑监控器用于运行时安全检测。
 
-
-
 ### 大语言模型的可解释性困境
 
 大语言模型（LLM）的内部表征空间是高维、非线性且高度关系化的，理解这些空间如何编码和处理信息是可解释性研究的核心挑战。当前LLM可解释性方法主要依赖线性探针（linear probes）、稀疏自动编码器（sparse autoencoders）或主成分分析（PCA）等技术，这些方法本质上是在高维空间中寻找线性方向或孤立特征，其核心假设是模型内部表征的几何结构可以被线性分解所捕获。
@@ -109,8 +107,6 @@ PH已被成功应用于神经网络的权重空间分析、训练动态追踪等
 4. **该签名能否作为构建攻击模式无关检测机制的基础？** 特别是，在面对专门设计用于绕过现有防御的自适应攻击时，拓扑签名是否依然牢固？
 
 通过将持久同调引入LLM可解释性研究，本文旨在打开一扇新的窗口：从“形状”的视角理解对抗影响，而非仅从“方向”或“幅度”的视角。
-
-
 
 ## 核心方法与创新机理
 
@@ -146,8 +142,6 @@ SHAP分析揭示了驱动分类的最重要特征：**0维条码的平均消亡�
 
 为排除拓扑压缩签名仅是特定防御机制的人工痕迹，本工作在专门设计用于绕过TASKTRACKER激活防御的自适应攻击样本上进行了验证。结果显示，拓扑压缩签名依然显著：1维环数量从干净输入的12个降至4个，环的中位出生时间从约69升至约85（Table 9）。这一结果表明，拓扑压缩反映的是对抗影响在几何层面的**根本属性**，而非特定攻击模式或防御机制的副产品。
 
-
-
 ![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_v2PglvLLKT/figures/007_Figure_3.jpg]]
 *Figure 3: Pipeline for layer-wise topological analysis. Figure 4: Pipeline for local analysis*
 
@@ -170,8 +164,6 @@ SHAP分析揭示了驱动分类的最重要特征：**0维条码的平均消亡�
 7. **局部离散比率（LDR）补充量化**：对每个样本的k近邻局部PCA特征值计算离散比率，作为全局PH分析的补充，量化对抗引发的局部几何变化。
 
 该框架的关键设计优势在于：持久同调具有坐标自由和噪声稳健的特性，使得跨层、跨模型、跨攻击模式的拓扑比较成为可能，而无需依赖特定坐标系或线性假设。
-
-
 
 ### 全局层间拓扑分析管道
 
@@ -224,8 +216,6 @@ r := \frac{d_{\mathrm{inter}}}{\frac{1}{2}\left(d_{\mathrm{intra}}^{\mathrm{clea
 $$
 
 其中 $d_{\mathrm{inter}}$ 为干净簇与对抗簇质心间的欧氏距离，$d_{\mathrm{intra}}$ 为各类内部样本到质心的平均距离。$r$ 越大表示两类在条码摘要空间中越可分离，该指标用于指导子采样超参数的选择与消融验证。
-
-
 
 ## 实验与关键发现
 
@@ -294,22 +284,6 @@ $$
 
 4. **对抗数据集覆盖有限**：研究基于特定安全基准（TaskTracker、sandbagging），对抗样本的覆盖范围和多样性可能有限。更多样化的投毒、后门或越狱攻击下的表现有待拓展。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_v2PglvLLKT/figures/021_Table_4.jpg]]
-*Table 4: Dimension-1 persistent homology differences (clean − poisoned) in key metrics for three models across several layers. Positive values mean the clean condition has a higher value, while negative indicates poisoned is higher for that metric. All entries rounded to four decimals*
-
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_v2PglvLLKT/figures/022_Table_5.jpg]]
-*Table 5: Dimension-1 persistent homology differences (elicited − locked) for two models across multiple layers. Positive values indicate that the elicited condition has higher values; negative means locked is higher for that metric*
-
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_v2PglvLLKT/figures/034_Table_6.jpg]]
-*Table 6: Pruned barcode summaries for layers 1, 8, 16, 24 and 32. Features from the barcode summaries with correlation less than 0.5 in the cross-correlation matrix*
-
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_v2PglvLLKT/figures/085_Table_7.jpg]]
-*Table 7: Peak analysis. Precision@k for k=1, 3, and 5 largest peaks in total variance, and their precision in detecting the largest peaks in absolute difference between the two classes. Spearman’s rank correlation (r) is reported in the last column. ∗, ∗∗ correspond to p-values \<.05 and .01, respectively*
-
-
-
 ## 定位与知识库关联
 
 ### 从线性探针到拓扑探针：表征形式的范式转换
@@ -363,8 +337,6 @@ SHAP分析揭示了最关键的拓扑签名：**0维条码的平均消亡时间�
 5. **与线性方法的协同**：PH分析提供全局形状感知，线性探针提供方向性读出——两者能否协同工作，构建既有“方向感”又有“形状感”的模型内部状态描述？例如，在条码摘要分离出的子空间内进一步训练线性探针以提取语义。
 
 6. **非相邻层的长程交互**：当前局部信息流分析仅检查相邻层对，但Transformer的残差连接使得非相邻层之间存在直接的信息传递。将这些长程交互纳入拓扑分析框架，可能揭示更深层的对抗影响机制。
-
-
 
 ## 原文 PDF
 

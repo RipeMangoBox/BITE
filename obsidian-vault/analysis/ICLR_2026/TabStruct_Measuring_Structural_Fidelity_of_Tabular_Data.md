@@ -63,8 +63,6 @@ claims:
 
 **方法定位**：TabStruct不依赖真实因果图即可评估结构保真度，填补了现有基准在真实世界场景下的评估空白，为表格生成模型的全面诊断提供了实用工具。
 
-
-
 表格数据是医疗、金融、工业等领域最普遍的数据形态，表格生成模型近年来取得了显著进展，涵盖变分自编码器、扩散模型、自回归Transformer等多个技术路线。然而，评估这些生成模型的保真度（fidelity）仍然是一个悬而未决的挑战。
 
 现有评估范式主要关注三个维度：**统计相似性**（如列分布、成对相关性）、**机器学习效能**（合成数据训练、真实数据测试）和**隐私保护**（如成员推断攻击）。这些指标虽然必要，却共同忽略了一个关键维度——**结构保真度**（structural fidelity），即合成数据是否忠实地保留了原始数据中变量之间的因果依赖关系。
@@ -80,8 +78,6 @@ claims:
 3. **评估规模与覆盖面的局限**：以往基准研究在数据集数量、生成器种类和评估维度上均较为有限，难以提供系统性的比较结论。
 
 正是在这一背景下，TabStruct 提出了一个统一的评估框架，将结构保真度确立为表格生成模型的核心评估维度。其核心创新在于引入**全局效用（global utility）**指标——通过将每个特征作为预测目标并聚合预测性能，在无需真实因果图的前提下可靠地评估生成数据的全局结构保真度。这一设计消除了对先验因果知识的依赖，使得结构保真度评估首次可推广至真实世界数据集。
-
-
 
 ## 核心方法与创新机理
 
@@ -126,8 +122,6 @@ TabStruct 的突破在于引入了一个**无需真实因果图的代理指标�
 
 TabStruct 并非提出新的生成模型，而是提供了一个**统一的评估框架**，将结构保真度与密度估计、ML 效能、隐私保护等传统维度并列，形成对表格生成模型的多维评价体系。其核心贡献在于让结构保真度评估从“有 SCM 才能做”的奢侈品，变成“任意真实数据都能做”的标配工具。
 
-
-
 TabStruct 提出了一套统一的表格生成模型评估框架，其核心创新在于将**结构保真度**（structural fidelity）作为与传统评估维度并列的核心评价轴。框架的整体设计围绕一个关键瓶颈展开：现有评估体系缺乏对生成数据因果结构保真度的有效度量，且需要真实因果结构图（SCM）才能进行评估，而这在真实世界数据中几乎不可得。
 
 ### 框架总览
@@ -165,8 +159,6 @@ TabStruct 提出了一套统一的表格生成模型评估框架，其核心创�
 
 - **CPDAG 级别的评估**：不要求恢复完整的 DAG 或仅检查骨架（skeleton），而是在 CPDAG（完备部分有向无环图）层面评估，这平衡了语义丰富性和计算可行性。
 - **归一化效用的必要性**：消融实验表明，若使用绝对预测性能而非归一化效用计算全局效用，其与全局 CI 的相关性会从 rₛ = 0.84 大幅下降至 rₛ = 0.57，验证了归一化设计的必要性。
-
-
 
 ### 结构保真度的形式化定义
 
@@ -215,8 +207,6 @@ $$\mathrm{Global\ Utility}(\mathcal{D}) := \frac{1}{D+1} \sum_{j=1}^{D+1} \mathr
 - **预测器鲁棒性**：即使使用轻量级“Tiny-default”配置，全局效用仍能产生与“Full-tuned”一致的生成器排名，表明指标对下游预测器选择不敏感。
 - **样本量要求**：当合成样本量达到或超过参考数据规模时，全局效用趋于饱和，提示足够的样本量是可靠评估的前提。
 
-
-
 ## 实验与关键发现
 
 ### 基准有效性验证
@@ -264,8 +254,6 @@ Table 2 和 Figure 3（right）揭示了不同生成器在结构保真度上的�
 
 需要强调的是，全局效用作为全局结构保真度的代理指标，不能直接量化特定因果边的保真度或局部干预效果。对于需要精确评估某条特定因果关系是否被保留的场景，仍需借助基于因果图的局部 CI 得分。此外，在存在强隐混杂变量的情况下，全局效用与基于 MAG（Maximal Ancestral Graph）的全局 CI 之间虽有统计显著的相关性，但其理论性质尚未完全论证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_XOPH34Extq/figures/003_Table_1.jpg]]
 *Table 1: Evaluation scope comparison between TabStruct and prior tabular generative modelling benchmarks. TabStruct presents a comprehensive evaluation framework for tabular generative models, incorporating a wide range of evaluation dimensions, datasets, and generator categories*
 
@@ -280,26 +268,6 @@ Table 2 和 Figure 3（right）揭示了不同生成器在结构保真度上的�
 
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_XOPH34Extq/figures/013_Table_6.jpg]]
 *Table 6: Details of three SCM regression datasets from bnlearn (Scutari, 2011)*
-
-![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_XOPH34Extq/figures/014_Table_7.jpg]]
-*Table 7: Details of five classification datasets with large SCMs from bnlearn (Scutari, 2011)*
-
-![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_XOPH34Extq/figures/015_Table_8.jpg]]
-*Table 8: Details of 14 real-world classification datasets*
-
-![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_XOPH34Extq/figures/016_Table_9.jpg]]
-*Table 9: Details of nine real-world regression datasets*
-
-![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_XOPH34Extq/figures/018_Table_10.jpg]]
-*Table 10: Hyperparameter search space of BN*
-
-![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_XOPH34Extq/figures/019_Table_11.jpg]]
-*Table 11: Hyperparameter search space of TVAE*
-
-![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_XOPH34Extq/figures/020_Table_12.jpg]]
-*Table 12: Hyperparameter search space of GOGGLE*
-
-
 
 ## 定位与知识库关联
 
@@ -364,8 +332,6 @@ TabStruct 开辟了若干值得深入探索的方向：
 3. **因果结构指导的生成模型设计**：全局效用揭示的列顺序效应暗示，表格数据中固有的因果结构信息可以被更有效地利用来指导生成模型的设计和训练。
 
 4. **向动态与多模态数据的扩展**：全局效用的核心思想——以每个变量为预测目标评估整体依赖结构的保留——是否可以推广至动态表格数据、多模态表格数据或多表关联场景？
-
-
 
 ## 原文 PDF
 

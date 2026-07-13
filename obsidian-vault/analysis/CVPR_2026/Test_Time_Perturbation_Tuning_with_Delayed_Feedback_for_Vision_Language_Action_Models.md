@@ -52,8 +52,6 @@ claims:
 
 PDF 的贡献在于揭示了一条无需微调基础模型即可有效提升 VLA 测试时决策性能的路径：利用模型自身的不确定性有节制地扩大观察分布，并结合延迟反馈进行有监督的 logit 扰动更新，在保持计算高效（仅更新 9M 参数，无需基础模型梯度）的同时，实现了更稳定、准确的测试时适应。
 
-
-
 ### 视觉-语言-动作模型的轨迹过拟合困境
 
 视觉-语言-动作模型（VLAs）将大规模预训练的视觉与语言理解能力引入机器人操作，展现出令人瞩目的泛化潜力。然而，这类模型面临一个深层且隐蔽的瓶颈：**轨迹过拟合（trajectory overfitting）**。模型在模仿学习过程中，过度关注动作与实体之间的**伪相关性**（spurious correlations），倾向于复现记忆中的专家动作序列，而非真正理解语义任务目标。这导致模型对物体姿态、光照、背景布局等微小环境变化极为脆弱——即使任务语义完全不变，仅因目标物体的位置或朝向发生细微偏移，模型便可能机械地重复错误的操作轨迹。
@@ -73,8 +71,6 @@ Figure 1 直观地揭示了这一现象：在目标物体被遮挡的情况下�
 2. **引入延迟环境反馈**作为监督信号，驱动一个轻量的可学习扰动头（P head）实时修正动作 logits。与自监督 TTA 不同，这种反馈驱动的适应能够纠正过度自信的误判，将模型拉回正确决策方向。
 
 这两个机制共同构成了 **PDF（Perturbation learning with Delayed Feedback）**——一个无验证器的 TTA 框架，在保持 VLA 全部参数冻结的前提下，仅更新 9M 参数的扰动头，实现了稳定、高效的测试时性能提升。
-
-
 
 ## 核心方法与创新机理
 
@@ -108,8 +104,6 @@ $$\mathcal { L } _ { \mathrm { P D F } } = - ( r - b ) \log \pi _ { \phi } + \la
 
 PDF 并未从根本上消除轨迹过拟合，而是通过测试时扰动减轻其负面影响。延迟反馈仅在回合结束后可用，导致适应在长周期任务中存在显著滞后，无法支持每步即时纠正。在极端分布偏移或完全未见过的物体属性下，不确定性估计与投票机制的可靠性仍需进一步验证。
 
-
-
 PDF 的整体设计围绕一个核心原则展开：**冻结 VLA 全部基础参数，仅在测试时通过轻量的外部扰动头与不确定性感知的决策机制来提升鲁棒性**。图 3 给出了完整的信息流与优化闭环。
 
 ### 测试时推理流程
@@ -141,12 +135,8 @@ $$\mathcal{L}_{\mathrm{PDF}} = -(r - b)\log\pi_{\phi} + \lambda_{\mathrm{KL}} \m
 - **反馈滞后性**：延迟反馈仅在回合结束时可用，意味着 P head 的更新是跨回合的——当前回合的决策不受本轮反馈影响，这在长周期任务中存在固有滞后，是方法的一个结构性限制。
 - **无验证器依赖**：与 MG-Select 等需要外部验证器的方法不同，PDF 的反馈直接来自环境，降低了部署门槛。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2422_https_openaccess_thecvf_com_content_CVPR2026_html_Zang_Test_Time_Perturb/figures/003_Figure_3.jpg]]
 *Figure 3: The overall framework of our proposed PDF. At test time, the VLA receives pixel observation ot and instruction ct. Action-logit uncertainty Ut is estimated to allocate an adaptive augmentation budget*
-
-
 
 PDF 框架由两个核心机制构成：**基于不确定性的动作投票**和**延迟反馈引导的自适应扰动学习**。整个测试时流程如图 3 所示，基础 VLA 模型的所有参数（视觉编码器、因果 Transformer、LM head）保持冻结，仅在线更新一个轻量的扰动头。
 
@@ -188,13 +178,6 @@ $$\mathcal{L}_{\mathrm{PDF}} = -(r - b) \log \pi_\phi + \lambda_{\mathrm{KL}} \m
 
 Figure 6 的消融实验表明，两项缺一不可：移除 REINFORCE 项或 KL 正则项均导致五个基准上的整体性能退化，其中 KL 正则项的贡献更为显著。Table 2 进一步证实，完全移除延迟反馈（PDF w/o DF）会使 Object 套件成功率从 0.72 骤降至 0.50，Goal 套件从 0.85 降至 0.77，说明反馈驱动的扰动学习对纠正物体操作和长期任务中的伪相关决策至关重要。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2422_https_openaccess_thecvf_com_content_CVPR2026_html_Zang_Test_Time_Perturb/figures/002_Figure_2.jpg]]
-*Figure 2: Comparison between traditional self-supervised testtime adaptation (TTA) and our PDF. Dashed bars indicate logits before adaptation; solid bars indicate logits after adaptation. Red bars denote incorrect-action logits; green bars denote correctaction logits. When VLAs become overconfident in incorrect behaviors, entropy-minimization-based TTA can amplify these errors by further boosting the wrong logits. In contrast, PDF corrects such misbehaviors by jointly mitigating the overconfidence issue and elevating the logits of correct actions, guiding the model toward accurate decisions*
-
-
-
 ## 实验与关键发现
 
 ### 4.1 实验设置
@@ -217,9 +200,6 @@ PDF 在 LIBERO 四个子套件上取得了全面的领先优势。如 Table 1 �
 #### Atari-57 基准
 
 在 Atari-57 上，PDF 将基线 Jat 的 HNS 从 0.97 提升至 **1.07**，增幅达 **+10.3%**。如 Figure 4 所示，57 款游戏中 **47 款获得正向提升**，平均改善幅度为 **11.28%**。提升最大的游戏为 BOXING（+60.25%），而下降最多的为 BATTLE ZONE（−10.72%）。这一结果说明 PDF 的测试时适应策略具有广泛的泛化性，在离散动作空间和连续帧输入的街机游戏环境中同样有效。
-
-![[assets/figures/papers/paper_list_l2422_https_openaccess_thecvf_com_content_CVPR2026_html_Zang_Test_Time_Perturb/figures/005_Figure_4.jpg]]
-*Figure 4: Human normalized score changes across 57 Atari games. Blue bars show performance improvements, orange bars indicate degradation. Games are sorted by improvement magnitude, with BOXING (+60.25%) showing maximum gain and BATTLE ZONE (- 10.72%) showing maximum decline. 47/57 games demonstrate positive performance changes, with 11.28% mean improvement*
 
 ### 4.3 核心组件消融
 
@@ -262,9 +242,6 @@ Table 3 对比了维度级投票（dim-wise voting）与动作级投票（action
 
 Figure 7 展示了 OpenVLA 与 PDF 在三个具体任务上的行为对比。在“Pick up cream cheese”任务中，OpenVLA 反复执行错误的抓取动作（红色拇指标记），而 PDF 在经历短暂探索后迅速锁定正确目标并成功完成操作（绿色拇指标记）。在“Pick up black bowl”任务中，PDF 展现出更强的状态感知能力——当目标物体位置发生变化时，PDF 能够调整抓取策略，而非机械复现记忆中的轨迹。这些可视化证据直接支撑了论文的核心主张：PDF 通过不确定性感知增强与延迟反馈扰动学习，使 VLA 的决策从“轨迹复现”转向“目标导向”。
 
-![[assets/figures/papers/paper_list_l2422_https_openaccess_thecvf_com_content_CVPR2026_html_Zang_Test_Time_Perturb/figures/010_Figure_7.jpg]]
-*Figure 7: Visual comparison of OpenVLA and PDF on three tasks. The green thumb indicates that the agent performed the correct action, while the red thumb indicates an incorrect action. The box represents the target entity, with green indicating that the target entity has been operated correctly and red indicating incorrect operation*
-
 ### 4.7 失败模式与局限
 
 尽管 PDF 在多数场景下表现优异，但其存在两个明确的局限：
@@ -276,13 +253,6 @@ Figure 7 展示了 OpenVLA 与 PDF 在三个具体任务上的行为对比。在
 ### 4.8 小结
 
 综合来看，PDF 在两个性质迥异的基准上均实现了显著且一致的性能提升，消融实验完整验证了不确定性感知增强、延迟反馈扰动学习以及 KL 正则化三者各自的必要性与协同效应。其 9M 参数的轻量适应机制和无需基础模型梯度的特性，使其在部署效率和实用性上具有明显优势。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2422_https_openaccess_thecvf_com_content_CVPR2026_html_Zang_Test_Time_Perturb/figures/001_Figure_1.jpg]]
-*Figure 1: Evidence of trajectory overfitting and the effectiveness of data augmentation. In the first row, the gripper imitates expert trajectories regardless of task success. In the second row, it still reproduces similar actions when the target is masked. The third row shows that the gripper overlooks the target in attention maps. In contrast, after data augmentation, the gripper refocuses on the target and makes correct decisions*
-
-
 
 ## 定位与知识库关联
 
@@ -321,8 +291,6 @@ PDF 的设计决定了其适用边界。首先，PDF 并未从根本上消除轨
 **开放问题**
 
 PDF 的提出引出了若干值得探索的方向。最根本的问题是：如何从训练阶段就消除轨迹过拟合，而不是仅依靠测试时扰动来缓解？这可能需要重新审视 VLA 的训练数据构建和表征学习目标。其次，PDF 的自适应扰动思想能否推广到其他多模态基础模型（如视觉-语言模型 VLMs）的推理环节？VLA 的决策不确定性估计和 logit 扰动修正机制在概念上具有通用性，但需要针对不同模态和任务结构进行适配。最后，在延迟反馈不可用的场景中，能否设计替代的监督信号（如基于世界模型的模拟反馈）来驱动 P head 的在线更新，从而扩展 PDF 的适用范围？
-
-
 
 ## 原文 PDF
 

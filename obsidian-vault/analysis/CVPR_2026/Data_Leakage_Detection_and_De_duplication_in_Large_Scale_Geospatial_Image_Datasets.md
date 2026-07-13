@@ -57,8 +57,6 @@ claims:
 
 **方法定位**：该流水线属于基于哈希指纹的数据集质量审计工具，位于数据预处理与基准公平性评估的交叉点。相比依赖精确匹配的传统去重，pHash 对颜色和微小结构变化具有不变性，且计算开销极低（每张图像约 4 ms）。其局限性在于需预先指定增强类型，对大幅仿射变换或语义近重复不鲁棒，但为大规模地理空间图像数据集的清洗提供了实用、易复现的基线方案。
 
-
-
 大规模图像数据集是深度学习模型训练的基石，其质量直接决定模型性能评估的可靠性。在遥感与地理空间分析领域，多个广泛使用的基准数据集支撑着分割、检测等任务的研究进展。然而，数据集的构建过程往往缺乏严格的去重与泄漏检测机制，导致训练集与测试集之间存在大量重复样本——这一问题在学术界长期被忽视。
 
 **核心瓶颈**在于：遥感图像基准数据集存在严重的数据泄漏和扩展副本，模型在测试时实际是在记忆已知样本而非泛化，导致性能虚高。以AICrowd Mapping Challenge数据集为例，该数据集被多项近期研究用作评估基准，但论文发现其训练集中近89.55%的图像（约251,000张）为精确或增强的重复图像（Table 3）；更严重的是，官方验证集中93.45%的图像（56,368/60,317）同样出现在训练集中，构成了系统性的数据泄漏。这种污染直接导致模型过拟合：在数据泄漏条件下训练的HiSup模型，在“见过”子集上的AP为79.7，而在“未见过”子集上骤降至65.4（Table 5），泄漏造成的性能虚高达+14.3 AP。
@@ -66,8 +64,6 @@ claims:
 **现有方法缺口**主要体现在三个层面。其一，主流数据集发布流程缺乏内置的重复检测机制，研究者通常默认官方划分是干净的，未主动核查跨划分泄漏。其二，简单的精确匹配无法发现经过旋转、翻转等数据增强的扩展副本——论文发现AICrowd训练集中38.72%的图像是验证集的精确或增强副本，仅靠精确匹配会遗漏大量重复。其三，虽然存在平均哈希（aHash）等快速哈希方法，但其在重复检测基准上的F1仅为0.9429，产生664个假阳性和218个假阴性（Table 6），难以满足严格去重需求。
 
 **本文动机**正是针对上述缺口，提出一个实用且易于采用的去重与泄漏检测流水线。该流水线以感知哈希（pHash）为核心，利用DCT低频系数生成64位哈希码，结合旋转和翻转增强来检测精确与变换后的重复图像。通过在INRIA、SpaceNet 2和AICrowd三个遥感基准上的系统评估，论文旨在揭示数据污染的严重程度，并提供可复现的清洗工具，以提升模型评估的公正性。
-
-
 
 ## 核心方法与创新机理
 
@@ -92,8 +88,6 @@ claims:
 ### 方法的边界与局限
 
 需要指出的是，该流水线的有效性依赖于**对数据集中可能存在的变换类型的先验知识**。当前仅覆盖旋转和翻转两类增强，若数据集中存在缩放、仿射变换或非均匀光照变化，则汉明距离0的严格匹配策略可能失效。此外，感知哈希对颜色和细小结构差异的不变性在某些场景下反而成为局限——在INRIA和SpaceNet数据集上检测到的少量“泄漏”样本经人工核查被判定为假阳性（如不同地理位置但视觉相似的水体、无数据栅格），这提示该方法在数据集质量本身较高时可能引入可忽略但非零的误报。
-
-
 
 本文提出的数据泄漏检测与去重流水线以**感知哈希（pHash）** 为核心算子，通过计算图像压缩域的DCT低频系数生成固定长度的哈希码，进而利用哈希碰撞实现精确副本与增强副本的高效识别。流水线由五个串行模块构成，整体设计强调实用性、可扩展性与极低的计算开销（单张图像哈希计算约4 ms，单次比较约4 ms）。
 
@@ -127,12 +121,8 @@ claims:
 
 流水线的有效性建立在两个核心选择之上：**感知哈希优于平均哈希**（在基准测试中pHash的假阳性为0，而aHash产生664个假阳性），以及**汉明距离0的严格匹配**（避免引入相似性阈值带来的主观偏差）。然而，该方法要求预先了解数据集中可能存在的变换类型以选择合适的增强集，对于大幅仿射变换或非均匀辐射变化的场景，可能需要更鲁棒的哈希算法——这是论文明确指出的局限性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2117_https_arxiv_org_abs_2304_02296/figures/001_Figure_1.jpg]]
 *Figure 1: The pipeline used for computing the perceptual hash*
-
-
 
 ### 感知哈希计算流水线
 
@@ -162,8 +152,6 @@ claims:
 - **严格碰撞阈值**：采用汉明距离 0 而非相似度阈值，避免了调参需求，且在构建的 10k 图像重复检测基准上实现了近乎完美的 F1 分数（0.9999），显著优于平均哈希 aHash 的 0.9429。
 - **计算效率**：单张图像哈希计算平均耗时约 4 ms，单次哈希比较约 4 ms，可线性扩展至大规模数据集。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：遥感基准数据集中的大规模数据污染
@@ -184,9 +172,6 @@ claims:
 ### 数据泄漏导致的模型过拟合验证
 
 为量化数据泄漏对模型评估的影响，研究在 AICrowd 测试集上将 HiSup 分割模型的预测按图像来源划分为“见过子集”（Seen，即训练集中存在副本的图像）和“未见子集”（Unseen，真正未出现过的图像）。Table 5 的结果形成鲜明因果链条：
-
-![[assets/figures/papers/paper_list_l2117_https_arxiv_org_abs_2304_02296/figures/010_Table_5.jpg]]
-*Table 5: Polygonal segmentation results of HiSup [25] on the AICrowd test set, split into seen & unseen images*
 
 - **见过子集 AP：79.7** — 模型在已记忆样本上表现虚高；
 - **未见子集 AP：65.4** — 真实泛化能力显著下降；
@@ -209,12 +194,6 @@ Figure 3 的定性示例进一步表明，泄漏使模型不仅记忆图像，�
 
 在 AICrowd 数据集上，两种方法均确认了大规模泄漏的存在（Table 4），但 Figure 4 的定性对比显示，感知哈希对颜色变化和小结构差异的不变性使其假阳性显著更少，而平均哈希倾向于将不同地理位置但视觉相似的地块误判为重复。
 
-![[assets/figures/papers/paper_list_l2117_https_arxiv_org_abs_2304_02296/figures/007_Table_4.jpg]]
-*Table 4: Comparison of Duplicates and Leakage Detection Using Perceptual and Average Hashing Techniques. Summary of the extent of data leakage/duplication in the official train, validation, and test splits of the AICrowd dataset [18]. The degree of duplication as a percentage of the various search sets are reported in the parentheses. It can be seen that the presence of data leakage and duplication in the AICrowd dataset is confirmed by both perceptual hashing (PHash) and average hashing (AHash) approaches*
-
-![[assets/figures/papers/paper_list_l2117_https_arxiv_org_abs_2304_02296/figures/008_Figure_4.jpg]]
-*Figure 4: Qualitative Comparisons of Duplicates detected using Perceptual Hashing vs. Average Hashing. Here we show examples of data leakage in the AICrowd dataset [18] (CC BY-NC-SA 4.0). We sample two images from the test split in the 1st column and show duplicates occurring in the training split in the 2nd, 3rd, and 4th columns. It can be seen that the Perceptual Hashing approach is less prone to false positives when compared to the Average Hashing approach*
-
 ### 增强策略的必要性消融
 
 实验隐含验证了仅靠精确匹配不足以发现全部污染。论文指出，在 AICrowd 训练集中，**38.72%** 的图像（108,707张）是验证集图像的精确或增强副本。若不引入旋转和翻转增强，大量经简单变换的重复将被遗漏，导致对污染程度的严重低估。这一发现直接支撑了流水线中增强模块的必要性。
@@ -229,17 +208,9 @@ Figure 3 的定性示例进一步表明，泄漏使模型不仅记忆图像，�
 2. **变换依赖性**：当前流水线要求预先指定增强类型（旋转、翻转），若数据集中存在缩放、仿射变换、光照变化等更强的几何/辐射变换，检测能力将下降。这是该方法的核心瓶颈。
 3. **覆盖盲区**：研究未涉及近重复（near-duplicate）或语义重复的检测，仅覆盖精确副本和简单增强副本。
 
-![[assets/figures/papers/paper_list_l2117_https_arxiv_org_abs_2304_02296/figures/013_Figure_7.jpg]]
-*Figure 7: False positive examples of data leakage. Here we show falsely detected examples of data leakage in the INRIA Aerial Image Labelling dataset [17]. We sample images from the test split in column 1 and show duplicates occurring in the training split in columns 2 and 3*
-
-![[assets/figures/papers/paper_list_l2117_https_arxiv_org_abs_2304_02296/figures/014_Figure_8.jpg]]
-*Figure 8: False positive examples of data leakage. Here we show examples of falsely detected examples of data leakage in the SpaceNet 2: Building Detection v2 dataset [4] (CC BY-SA 4.0). We sample four images from the test split in column 1 and show duplicates occurring in the training split in columns 2, 3, and 4*
-
 ### 对研究社区的方法论警示
 
 论文明确指出，许多近期研究使用了受污染的 AICrowd 数据集进行方法评估，其报告性能可能因数据泄漏而系统性虚高。这一发现构成对遥感图像分析社区的方法论警示：**在采用公共基准数据集前，必须执行数据泄漏审查，否则模型比较的公正性无法保证**。所提出的去重流水线可便捷地应用于 ImageNet、VOC、MS-COCO、Cityscapes 等其他大规模图像数据集的质量评估。
-
-
 
 ## 定位与知识库关联
 
@@ -278,8 +249,6 @@ Figure 3 的定性示例进一步表明，泄漏使模型不仅记忆图像，�
 2. **鲁棒哈希对强变换的适应性**：在面临大幅仿射变换、非均匀辐射变化时，需更鲁棒的哈希算法。
 3. **动态在线检测**：是否可在训练过程中动态检测并过滤重复样本，以减少记忆效应，而非仅在预处理阶段进行静态去重。
 4. **跨数据集泛化验证**：其他大型视觉数据集（如LAION、ImageNet）中类似问题的规模与影响尚待量化。
-
-
 
 ## 原文 PDF
 

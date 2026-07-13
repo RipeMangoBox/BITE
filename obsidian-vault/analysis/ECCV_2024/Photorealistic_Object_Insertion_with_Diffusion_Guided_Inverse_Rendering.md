@@ -281,24 +281,11 @@ Table 3 报告了在室外驾驶场景上的消融用户研究，比较完整 Di
 
 这些应用虽非主实验的核心指标，但证明了 DiPIR 恢复的物理属性（光照、材质、色调映射）具有可编辑性，并非仅为插入任务过拟合的“黑箱”输出。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2408_09702/figures/011_Figure_8.jpg]]
-*Figure 8: SD21 w/ LoRA Fig. 8: Illustrations of text-to-image generation results. “SD21 w/o LoRA” shows our best-effort prompting results for outdoor street scenes from off-the-shelf Stable Diffusion 2.1. “SD21 w/ LoRA” directly uses the training prompt “a scene in the style of sks rendering”. LoRA personalization enables generating images in a similar domain to the target scene*
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2408_09702/figures/012_Figure_9.jpg]]
-*Figure 9: Personalized w/ concept preservation Fig. 9: Text-to-image generation results with prompt “a black SUV car in the style of sks rendering”. Concept preservation can facilitate the high-quality generation of both the object and the background scene*
-
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2408_09702/figures/013_Figure_10.jpg]]
 *Figure 10: ϵ(θ+∆W )(c) − ϵ(θ+∆W )(∅) Fig. 10: Ablation on unconditional denoising term in LDS loss*
 
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2408_09702/figures/018_Figure_12.jpg]]
 *Figure 12: (b) w/ optimizing tone curves Fig. 12: Qualitative ablation on tone-mapping curve optimization. The optimizable tone-mapping curve provides the capacity and flexibility to match the scale and color of the shadows. (The visualized foreground curve considers gamma correction γ = 2.2.)*
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2408_09702/figures/019_Figure_13.jpg]]
-*Figure 13: Color drift Fig. 13: Failure case examples*
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2408_09702/figures/008_Table.jpg]]
 
 ## 定位与知识库关联
 

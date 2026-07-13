@@ -58,8 +58,6 @@ TeCh 同时采用**自适应双重令牌化**策略，分别生成时间令牌�
 
 通过谱中心化指数（SCI）和动态影响中心化指数（DIC）的量化分析（Table 11），本文进一步验证了 EEG/ECG 信号的中心化程度显著高于能源、气候等去中心化系统数据集，为 CoTAR 的设计提供了经验支撑。
 
-
-
 ### 医学时间序列分析的独特挑战
 
 医学时间序列（Medical Time Series, MedTS），如脑电图（EEG）和心电图（ECG），是多变量时间序列分析的重要分支，广泛应用于疾病诊断、脑机接口和健康监测等场景。与能源、气候、交通等通用多变量时序数据不同，医学信号承载着独特的生理生成机制：EEG各通道的电位波动源自大脑皮层的全局神经调控，ECG各导联的波形形态统一受心脏窦房结的节律支配。这意味着，**医学时间序列的通道间依赖本质上是中心化的**——存在一个生理上的“中央控制器”协调所有通道的活动。
@@ -91,8 +89,6 @@ TeCh 同时采用**自适应双重令牌化**策略，分别生成时间令牌�
 - **效率提升**：令牌交互的计算复杂度从 $O(S^2 D)$ 降至 $O(S D D_c)$（$D_c$ 为核心令牌维度，远小于 $S$），实现了线性复杂度。
 
 Figure 1 直观对比了去中心化注意力与集中式CoTAR在令牌交互模式上的本质差异，以及它们与医学信号生理调控机制的对应关系。
-
-
 
 ## 核心方法与创新机理
 
@@ -127,13 +123,6 @@ Figure 1 直观对比了去中心化注意力与集中式CoTAR在令牌交互模
 
 TeCh的核心贡献在于**首次将医学信号的生理中心化先验系统性地融入Transformer架构设计**。与采用双依赖建模的**Leddam**（Yu et al., 2024b）和使用全局/辅助令牌的**TimeXer**（Wang et al., 2024e）相比，TeCh的区别在于：（1）CoTAR的集中式设计直接由生理机制驱动，而非通用的工程优化；（2）双重令牌化可自适应调节，而非固定的双分支结构。Table 9的对比验证了TeCh相对这些相似工作的优势。与医学时间序列SOTA **Medformer**（Wang et al., 2024b）相比，TeCh在APAVA数据集上全部指标平均值提升12.13%，同时大幅降低了计算开销。
 
-
-
-![[assets/figures/papers/paper_list_l34_https_openreview_net_forum_id_oZJFY2BQt2/figures/003_Figure_3.jpg]]
-*Figure 3: Overview of TeCh. MedTS signals X $\in \mathbb { R } ^ { T \times C }$ are embedded into Temporal embedding and Channel embedding. Then, each embedding is processed using Transformer encoders, with attention replaced by CoTAR. The final output representation from each branch is averaged across channels and added, then projected to the final predicted logits $\hat { Y } \in \mathbb { R } ^ { K }$
-
-![[assets/figures/papers/paper_list_l34_https_openreview_net_forum_id_oZJFY2BQt2/figures/002_Figure_2.jpg]]
-*Figure 2: Illustration of attention and Core Token Aggregation-Redistribution (CoTAR). Attention is organized in a decentralized way where each token directly interacts with all tokens, introducing a Quadratic complexity. CoTAR first aggregates a core token and then redistributes it across channels to facilitate centralized channel interaction, bringing only Linear complexity*
 
 TeCh 的整体架构遵循“双重令牌化 → 集中式编码 → 分支融合”的流水线设计，其核心动机来自一个关键观察：医学时间序列（如 EEG/ECG）的信号生成机制本质上是**中心化的**（由脑/心脏全局调控），而标准 Transformer 的注意力机制却是**去中心化的**（每个令牌平等交互）。这种结构失配使得传统注意力难以有效捕获通道间的全局同步与统一波形特征。
 
@@ -177,8 +166,6 @@ $$\hat{Y} = (\tilde{O}_{te} + \tilde{O}_{ch}) W_y + b_y$$
 这一简洁的融合设计避免了复杂的门控或注意力融合机制，同时保持了时间与通道信息的互补性。
 
 **架构设计的因果逻辑链**：医学信号的中心化生成机制 → 需要集中式通道交互 → CoTAR 以核心令牌代理实现聚合-再分布 → 双重令牌化同时捕获时序与通道依赖 → 分支平均融合整合两类表示 → 线性复杂度保证效率。这一设计在五个医学时间序列数据集上均取得优于标准注意力的性能，同时将内存占用降至 33%、推理时间降至 20%（Figure 4a），验证了“结构对齐生理先验”这一核心假设的有效性。
-
-
 
 ### 问题形式化
 
@@ -272,8 +259,6 @@ $$\hat{Y} = (\tilde{O}_{te} + \tilde{O}_{ch}) W_y + b_y$$
 
 在 Table 11 中，EEG/ECG 数据集的 SCI 和 DIC 值显著高于能源、气候等去中心化系统数据集，定量验证了医学信号的中心化特性。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈验证：医学信号的中心化本质
@@ -301,9 +286,6 @@ $$
 
 **Table 2** 展示了 TeCh 在五个医学时间序列数据集上的全面对比结果（Subject-Independent 设置），对比基线包括 Medformer（医学时序 SOTA）、Autoformer、FEDformer、Informer、iTransformer、PatchTST 等 10 个模型。
 
-![[assets/figures/papers/paper_list_l34_https_openreview_net_forum_id_oZJFY2BQt2/figures/005_Table_2.jpg]]
-*Table 2: Results on five MedTS datasets. The training, validation, and test sets are distributed based on subject IDs. The best is Bolded and second is Underlined*
-
 关键结论：
 
 - **APAVA (2-class EEG)**：TeCh 在所有指标上均大幅领先。F1-Score 达到 **86.30±1.06**，相比此前最佳方法 Medformer（76.31±0.71）提升 **+9.99**；相比原始 Transformer（73.08±0.47）提升超过 13 个百分点。该数据集上 TeCh 相对 Medformer 的全部指标平均值提升 **12.13%**（见 Abstract）。
@@ -318,15 +300,9 @@ $$
 
 **Table 3** 展示了在两个人类活动识别（HAR）数据集上的泛化测试。TeCh 在 FLAAP（10-class）和 UCI-HAR（6-class）上均取得最佳结果（FLAAP 准确率 80.60%，UCI-HAR 准确率 96.52%），说明 CoTAR 的集中式交互机制在具有潜在通道相关性的通用时序数据上也具备迁移能力。
 
-![[assets/figures/papers/paper_list_l34_https_openreview_net_forum_id_oZJFY2BQt2/figures/006_Table_3.jpg]]
-*Table 3: Results of two HAR datasets. To evaluate the performance of our method on general time series, we test it on two human activity recognition (HAR) datasets: FLAAP and UCI-HAR, which exhibit potential channel correlations inherently. The best is Bolded and second is Underlined*
-
 ### 效率与鲁棒性分析
 
 **Figure 4 (a)** 在 APAVA 数据集上对比了 TeCh 与各基线的效率-有效性权衡。以 batch size B=128 为基准：
-
-![[assets/figures/papers/paper_list_l34_https_openreview_net_forum_id_oZJFY2BQt2/figures/008_Figure_4.jpg]]
-*Figure 4: (a): Efficiency and Effectiveness analysis of TeCh and other baselines on APAVA dataset with batch size B \ = \ 1 2 8 . ‘#’ stands for ‘former’ to save space. (b): Robustness of attention and CoTAR to noise when using Channel or Temporal embedding. We consistently increase the intensity β (the standard deviation) of Gaussian random noise from 0.0 to 20.0 on the last channel of the PTB dataset. F1-Score is used to quantify the change*
 
 - TeCh 的内存占用仅为 Medformer 的 **33%**，推理时间仅为 **20%**，同时准确率提升 **8%**。
 - 这一效率优势源于 CoTAR 将令牌交互的计算复杂度从 $O(S^2 D)$ 降为 $O(S D D_c)$，其中核心令牌维度 $D_c$ 设为 $D/4$。
@@ -381,13 +357,6 @@ $$
 
 3. **PTB 数据集上未全面领先**：在 PTB（2-class ECG）上，TeCh 未取得最优准确率，提示 ECG 的中心化程度或信号特征可能与 EEG 存在差异，CoTAR 的设计可能需要针对 ECG 进一步适配。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l34_https_openreview_net_forum_id_oZJFY2BQt2/figures/004_Table_1.jpg]]
-*Table 1: The information of utilized datasets, including the number of subjects, samples, classes, sample channels, and timestamps (TS)*
-
-
-
 ## 定位与知识库关联
 
 ### 核心创新与基线关系
@@ -423,8 +392,6 @@ Table 11 的定量分析为这一假设提供了实证支撑：EEG 和 ECG 数�
 2. **跨任务迁移**：CoTAR 模块能否应用于时间序列预测、异常检测等需要建模多变量依赖的其他任务？
 3. **理论指导设计**：集中化指数（SCI/DIC）与模型性能之间是否存在定量关系？能否基于数据集的 SCI/DIC 值预先判断 CoTAR 的适用性，形成理论指导的架构选择框架？
 4. **多中心扩展**：对于存在多个子中心源的复杂生理系统（如多模态神经影像），能否将单一核心令牌扩展为多核心令牌层次结构？
-
-
 
 ## 原文 PDF
 

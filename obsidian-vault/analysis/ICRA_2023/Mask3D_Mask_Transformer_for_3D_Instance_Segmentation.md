@@ -58,8 +58,6 @@ Mask3D 在多个数据集上显著超越了先前方法：
 
 该方法仍存在局限性：注意力机制偶尔会合并相距较远但语义和几何相似的同类实例（如两个窗户），需借助可选的 DBSCAN 后处理进行空间分离，且其距离阈值需针对不同数据集单独调整。尽管如此，Mask3D 首次证明了纯 Transformer 架构在三维实例分割中的可行性与强大性能，为后续研究开辟了新的技术路径。
 
-
-
 三维场景理解是计算机视觉的核心问题之一，而实例分割——同时识别并分割出场景中的每个独立物体——则是其中的关键挑战。与二维图像不同，三维点云具有稀疏性、无序性和复杂几何结构，使得实例分割任务尤为困难。
 
 当前主流的3D实例分割方法普遍依赖手工设计的几何先验和中间表示。以**PointGroup**（Jiang et al., CVPR 2020）和**SoftGroup**（Vu et al., CVPR 2022）为代表的投票-聚类范式，首先预测每个点的语义标签和中心偏移量，再通过启发式分组机制将点聚合为实例。这类方法存在一个根本性瓶颈：投票和分组步骤不可微分，无法与特征提取器端到端联合优化，导致模型在面对非凸形状、尺度差异大的物体以及密集场景时泛化能力受限。此外，**3D-BoNet**（Yang et al., NeurIPS 2019）尝试直接预测固定数量的实例掩码，但缺乏灵活的实例表示和迭代细化机制。
@@ -67,8 +65,6 @@ Mask3D 在多个数据集上显著超越了先前方法：
 从方法论角度看，这些方法的共同缺陷在于将实例分割视为自底向上的几何处理问题，而非直接的集合预测问题。手工设计的投票中心、亲和力矩阵或聚类半径本质上是对物体几何形态的简化假设，难以覆盖真实场景中物体的多样性和复杂性。
 
 Mask3D的核心动机正是打破这一范式依赖。其核心洞察在于：将3D实例分割重新建模为集合预测问题，通过Transformer解码器产生的实例查询直接预测所有实例的二进制掩码和语义类别，从而彻底消除对手工投票和分组机制的依赖。这一思路借鉴了DETR在2D检测中的成功经验，但首次将其系统性地扩展到3D实例分割领域。
-
-
 
 ## 核心方法与创新机理
 
@@ -105,8 +101,6 @@ $$\mathcal{C}(k, \hat{k}) = \lambda_{\mathrm{dice}} \mathcal{L}_{\mathrm{dice}}(
 ### 创新本质：消除手工先验，实现端到端优化
 
 上述四项变革共同构成了Mask3D的核心创新逻辑：**将3D实例分割从手工设计的几何流水线转变为数据驱动的集合预测框架**。实例查询替代了中心投票，点积掩码生成替代了聚类后处理，掩码交叉注意力替代了手工分组，匈牙利匹配替代了固定分配。这一系统性重构使得模型能够端到端地从数据中学习实例分割策略，在非凸形状物体和密集场景中展现出更强的泛化能力——这正是Mask3D在多个基准数据集上大幅超越先前方法（ScanNet test +6.2 mAP，S3DIS 6-fold +10.1 mAP）的根本原因。
-
-
 
 Mask3D将三维实例分割建模为一个端到端的集合预测问题，其整体pipeline由四个核心模块串联构成：**稀疏特征主干网络** → **实例查询初始化** → **Transformer解码器迭代细化** → **掩码预测与置信度评分**。给定原始三维点云，模型直接并行输出所有实例的二进制掩码和语义类别，无需手工设计的投票中心或几何聚类步骤。
 
@@ -149,8 +143,6 @@ $$
 ### 参数分布
 
 模型参数主要集中于特征主干（>90%），Transformer解码器仅约1.76M参数，整体模型大小与当前顶级方法相当或略大（Tab. VI）。推理速度在TITAN X上为339 ms（不含后处理），与SoftGroup的345 ms相当（Tab. I）。
-
-
 
 ### 稀疏特征主干
 
@@ -200,8 +192,6 @@ $$c = c_{\text{cl}} \cdot \big( \Sigma_i^M m_i \cdot [m_i > 0.5] \big) / \big( \
 
 其中 $c_{\text{cl}}$ 为Softmax分类概率，$m_i$ 为掩码模块输出的连续热力值。该设计有效抑制了高分类置信度但掩码质量差的假阳性预测。
 
-
-
 ## 实验与关键发现
 
 ### 主要结果
@@ -250,30 +240,14 @@ Mask3D的主要失败模式是**同类实例合并**（Fig. 4左下、Fig. 7）�
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2210_03105/figures/009_Figure_5.jpg]]
 *Figure 5: TABLE V: Feature Backbones. We experimented with convolutional and transformer-based feature backbones ( c . f . Fig. 5, ◻∎)*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2210_03105/figures/003_Table.jpg]]
 *Table: I: 3D Instance Segmentation Scores on ScanNet v2. We report mean average precision (mAP) with different IoU threshold over 18 classes on the ScanNet validation and test set. The inference speed is averaged over the validation set and computed on a TITAN X GPU (c.f. ), excluding postprocessing. Test scores accessed on 13. September 2022. TABLE II: 3D Instance Segmentation Scores on S3DIS. We report mean average precision (mAP) with different IoU threshold (as in ) as well as mean precision (mPrec) and mean recall (mRec) with 50% IoU threshold (as in ) over 13 classes on S3DIS Area 5 and 6-fold cross validation. Scores in light gray are pre-trained on ScanNet and fine-t...*
-
-![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2210_03105/figures/004_Table.jpg]]
-*Table: III: 3D Instance Segmentation Scores on ScanNet200 and STPLS3D. We report mean average precision (mAP) with different IoU threshold over 14 classes on the STPLS3D test set. Hidden test scores accessed on 13. September 2022*
 
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2210_03105/figures/006_Table.jpg]]
 *Table: IV: Ablations. a) We explore two variants for query positions and features. Parametric queries 1 are learned during training. Non-parametric queries consist of FPS point positions 2 and potentially their features 3 , resembling scene-specific queries. b) We optimize the instance mask prediction using the binary crossentropy loss \mathcal { L } _ { C E } and the dice loss \mathcal { L } _ { d i c e } . A weighted combination of dice and cross-entropy loss results in best performance. a) Query Type b) Mask Loss*
 
-![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2210_03105/figures/007_Figure_3.jpg]]
-*Figure 3: Number of queries and decoder layers*
-
-![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2210_03105/figures/012_Figure.jpg]]
-*Figure: (d)Exemplary Heatmap (e) Instance Prediction (b） Center Votes (c) Instance Prediction*
-
-![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2210_03105/figures/010_Table.jpg]]
-*Table: VI: Model sizes. We compare Mask3D’s model size against recent top-performing methods. For all models, most parameters are in the feature backbone and only a small fraction is in the instance segmentation specific part of the models*
-
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2210_03105/figures/011_Table.jpg]]
 *Table: VII: Ablation on DBSCAN postprocessing. To split wrongly merged instances, we employ DBSCAN as an optional postprocessing routine. We report best scores around a minimal distance =0.9 (ScanNet) and =0.6 (S3DIS-A5)*
-
-
 
 ## 定位与知识库关联
 
@@ -324,8 +298,6 @@ Mask3D的出现推动了3D实例分割从“投票-分组”向“查询-掩码�
 4. **查询数量的自适应**：论文提到推理时可以使用与训练时不同数量的查询，但查询数量仍是一个全局超参数。能否设计自适应机制，根据场景复杂度动态决定查询数量，避免简单场景的冗余计算和复杂场景的漏检？
 
 5. **与2D-3D联合模型的融合**：Mask3D的集合预测范式与2D的MaskFormer、Mask2Former高度兼容，未来工作可探索统一的2D-3D联合实例分割框架，利用多视角一致性进一步提升3D分割精度。
-
-
 
 ## 原文 PDF
 

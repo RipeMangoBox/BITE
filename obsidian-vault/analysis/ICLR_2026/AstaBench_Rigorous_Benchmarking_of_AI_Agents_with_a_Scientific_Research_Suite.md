@@ -100,9 +100,6 @@ AstaBench 的核心创新在于通过**可控环境、标准化接口和成本�
 
 传统代理基准中，任务格式与评估框架紧耦合，集成新代理往往需要大量工程适配。AstaBench 将所有任务统一为基于 Inspect 的标准化输入/输出格式，任何代理只需满足该接口即可参与评估。这一设计直接体现在 **agent‑baselines Agents Suite** 的规模上：该套件包含 16 个代理类（9 个 Asta 专用代理 + 7 个基线代理），涵盖 ReAct、Smolagents Coder 等通用架构以及 Asta Paper Finder、Asta Scholar QA 等任务专用代理（Table 3）。标准化接口使得在相同环境下公平比较“通用代理 + 强大模型”与“专用代理 + 流程优化”成为可能——实验结果显示，Asta v0 通过任务路由和专用工具设计，在整体得分上比次优的 ReAct with gpt‑5 高出约 9 个百分点（53.0% vs 44.0%，Table 4），同时 gpt‑5 在 SUPER‑Expert 代码执行基准上相较 o3 带来 +24.8% 的巨大提升（Table 8），证明**专用工具设计和模型能力升级对性能有独立且可叠加的贡献**。
 
-![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_M7TNf5J26u/figures/002_Figure_1.jpg]]
-*Figure 1: Using AstaBench we evaluated 22 agent classes on a diverse set of science tasks while controlling the set of available tools, e.g., to ensure each agent has access to the same set of scientific papers. AstaBench leaderboards record not just agents accuracy but also how much computation is required to achieve that performance*
-
 ![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_M7TNf5J26u/figures/001_Table_1.jpg]]
 *Table 1: AstaBench improves over existing agent benchmark suites in several ways. It tests holistic scientific reasoning (i.e., a broad spectrum of task types and across more than one scientific domain). Many of its problems are inspired by actual user requests to our deployed Asta agents. Its standard tool environment isolates core agentic abilities (e.g., planning, tool-calling, etc.) from information access. AstaBench’s scoring controls for confounders, such as computational cost, and its tasks are defined using a uniform format that supports general-purpose agents. The table’s final column, titled ‘Cls.’, indicates the number of agent classes (e.g., ReAct) that are used to instantiate (e.g., wit...*
 
@@ -200,13 +197,7 @@ Figure 2 以成本-分数散点图呈现了四个任务类别的 Pareto 前沿
 
 文献问答方面（Table 6），Asta Scholar QA 在 ScholarQA‑CS2 上表现突出，商用代理 OpenAI Deep Research 和 Elicit 在 LitQA2‑FullText 上也取得了有竞争力的结果。值得注意的是，部分商用代理在得分接近 80% 的同时，其推理成本远高于开源方案，说明文献理解领域已存在可用的代理能力，但经济性仍是推广障碍。
 
-![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_M7TNf5J26u/figures/008_Table_6.jpg]]
-*Table 6: Literature Understanding QA benchmarks results (additional results in Table 13). Agents without an API could not be evaluated on LitQA2-FT. † denotes models not pinned to a date-stamped version. Bold denotes the agent is on Pareto-optimal frontier for that column pair*
-
 表格合成任务 ArxivDIGESTables‑Clean（Table 7）上，Asta Table Synthesis 系列代理通过专用表格提取与合成流程，在得分上领先通用代理。Figure 5 的 Pareto 图显示，Asta Table Synthesis + gpt‑5‑mini 以极低成本实现了接近最优的质量，是该任务上性价比最高的方案。
-
-![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_M7TNf5J26u/figures/009_Table_7.jpg]]
-*Table 7: Literature Understanding ArxivDIGESTables-Clean task benchmark results (additional results in Table 14). † denotes models not pinned to a date-stamped version. Bold denotes the agent is on Pareto-optimal frontier for that column pair*
 
 ![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_M7TNf5J26u/figures/020_Table_14.jpg]]
 *Table 14: Literature Understanding ArxivDIGESTables-Clean task benchmark results*
@@ -215,17 +206,11 @@ Figure 2 以成本-分数散点图呈现了四个任务类别的 Pareto 前沿
 
 代码与执行类别（Table 8）揭示了模型代际差异的显著影响。在 SUPER‑Expert（实验复现代码执行）上，ReAct + gpt‑5 取得 41.1 ± 12.9，较 ReAct + o3 的 16.3 ± 9.9 提升了 +24.8 个百分点——这是所有基准中最大的单模型升级增益。然而，在 CORE‑Bench‑Hard⁻ 和 DS‑1000 上，gpt‑5 相较 o3 的提升幅度有限，表明 **gpt‑5 的能力增益具有强烈的任务偏斜性：在需要复杂多步推理和实验设计的代码任务上增益巨大，在相对常规的编程任务上增益温和**。
 
-![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_M7TNf5J26u/figures/010_Table_8.jpg]]
-*Table 8: Code & Execution category results (additional results in Table 15). † denotes models not pinned to a date-stamped version. Bold denotes the agent is on Pareto-optimal frontier for that column pair*
-
 一个值得警惕的发现是：**部分专用代理在切换到 gpt‑5 后性能反而退化**。这可能是因为专用代理的工作流设计和提示模板针对早期模型（如 o3）进行了深度优化，而 gpt‑5 的行为特征变化破坏了这些精心调校的交互模式。这一现象提出了一个开放问题：如果未来基座模型持续向 ReAct 风格的通用调用模式演进，特定应用的工作流是否将失去竞争优势？
 
 #### 2.3 数据分析：DiscoveryBench 上的瓶颈
 
 数据分析任务（Table 9）以 DiscoveryBench 为评估基准。Asta DataVoyager 等专用代理在得分上略优于通用代理，但整体得分水平仍然较低。成本-分数 Pareto 图（Figure 7）显示，该类别中性能提升高度依赖成本投入，且边际收益递减显著，暗示**数据分析任务的核心瓶颈可能不在于工具设计，而在于模型本身的统计推理和因果发现能力**。
-
-![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_M7TNf5J26u/figures/011_Table_9.jpg]]
-*Table 9: Data Analysis DiscoveryBench results (additional results in Table 16). † denotes models not pinned to a date-stamped version. Bold denotes the agent is on Pareto-optimal frontier for that column pair*
 
 #### 2.4 端到端发现：从“单步可行”到“全流程崩溃”
 

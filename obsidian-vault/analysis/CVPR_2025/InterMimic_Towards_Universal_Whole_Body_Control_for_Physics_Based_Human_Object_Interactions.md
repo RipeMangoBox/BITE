@@ -57,8 +57,6 @@ InterMimic 提出“先完美、再扩展”的课程式教师-学生蒸馏框�
 
 InterMimic 的方法定位介于物理仿真 HOI 模仿与大规模技能学习之间：它不直接依赖原始 MoCap 进行端到端 RL，而是通过教师策略的局部修正与统一化身参考，构建了一个可扩展的蒸馏流水线，为后续下游应用（如机器人遥操作、运动细化、运动生成）提供了物理上可信的交互基座。
 
-
-
 物理模拟下的人体-物体交互（Physics-based Human-Object Interaction, HOI）是计算机图形学与具身智能的核心挑战之一。其目标是在物理仿真器中驱动虚拟化身，使其不仅能复现运动学层面的参考动作，还能在接触、碰撞、重力等物理约束下产生真实可信的交互行为。这一能力对于构建可迁移至真实机器人的全身操控技能至关重要。
 
 然而，现有基于强化学习（RL）的 HOI 模仿范式面临两大结构性瓶颈：
@@ -70,8 +68,6 @@ InterMimic 的方法定位介于物理仿真 HOI 模仿与大规模技能学习�
 上述瓶颈相互耦合：数据不精确性使得直接扩展训练规模反而放大误差传播；而扩展性不足又限制了通过更大规模数据来“平均化”误差的可能性。这种“精度-规模”的对立，构成了当前物理 HOI 模仿的根本困境。
 
 InterMimic 的核心动机正是打破这一僵局：**先求完美，再求规模。** 具体而言，通过课程式的教师-学生蒸馏框架，将不精确的原始 MoCap 逐步修正为物理可信的参考，再通过蒸馏实现策略的规模化——让单个统一策略掌握跨越数十种物体、数百种交互的全身操控技能。这一思路将重定向与修正嵌入教师策略的训练过程，使修正后的高质量参考成为学生策略的可扩展学习信号，最终实现从“模仿数据”到“超越数据”的跨越。
-
-
 
 ## 核心方法与创新机理
 
@@ -105,8 +101,6 @@ InterMimic 提出 Physical State Initialization（PSI）（Section 3.2），创�
 
 一个常被忽视的创新是将 HOI 重定向直接嵌入教师策略的模仿过程。通过体现感知的关节位置代价 $E_p^h = \langle \Delta_p^h, \mathbf{w}_d \rangle$ 和旋转代价 $E_\theta^h = \langle \Delta_\theta^h, \mathbf{1} - \mathbf{w}_d \rangle$（Section 3.2），权重 $\mathbf{w}_d$ 与关节点到物体距离成反比——靠近物体时更重视位置对齐，远离时更重视旋转对齐。这一设计使不同人体形状的受试者数据被统一映射到规范化身模型，无需额外的重定向预处理步骤。Figure 4 的定性对比显示，教师策略在修正原始 MoCap 中多部位交互错误的同时，输出优于 PhysHOI 的物理可信结果。
 
-
-
 InterMimic 采用 **“先完美、再扩展”** 的两阶段课程式教师-学生蒸馏框架（Figure 2），将大规模、带噪声的 MoCap 数据逐步修正为物理可信的交互参考，再通过蒸馏实现单一策略对多样交互技能的规模化掌握。
 
 ![[assets/figures/papers/paper_list_l1740_InterMimic_Towards_Universal_Whole_Body_Control_for_Physics_Based_Human/figures/002_Figure_2.jpg]]
@@ -137,8 +131,6 @@ $$L(\psi) = \mathbb{E}_t \left[ \min\left( r_t(\psi) A_t, \text{clip}(r_t(\psi),
 
 - **输入**：学生策略的观测状态 $\boldsymbol{s}_t = \{ \boldsymbol{s}_t^s, \boldsymbol{s}_t^g \}$，其中 $\boldsymbol{s}_t^s$ 为本体感知（关节旋转、位置、角速度、速度、物体几何、接触标记），$\boldsymbol{s}_t^g$ 为目标状态（未来 $t+k$ 时刻的相对与绝对参考姿态）。
 - **输出**：人体关节的目标位置/旋转指令，驱动物理仿真器中的人体模型与物体进行交互。
-
-
 
 InterMimic 的两阶段框架（图 2）由六个核心模块串联而成，其设计逻辑围绕“先完美、再扩展”的课程式蒸馏展开。
 
@@ -224,21 +216,14 @@ Table 2 的消融表明：仅使用 DAgger 而不进行 PPO 微调（line 2 vs l
 
 Table 2 的对比显示：Transformer 在 OMOMO 测试集上成功率 98.1% vs MLP 的 95.5%（+2.6%），在 10 倍重量物体测试中优势更明显，验证了序列建模对分布外泛化的价值。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1740_InterMimic_Towards_Universal_Whole_Body_Control_for_Physics_Based_Human/figures/003_Figure_3.jpg]]
 *Figure 3: (i) Visualization of reference contact markers that accommodate varied contact distances: red to promote contact, green for neutral areas where contact is neither promoted nor penalized, and blue to penalize contact. (ii) Initializing the rollout with reference (RSI) or reference corrected via simulation (PSI)*
-
-
 
 ## 实验与关键发现
 
 ### 核心瓶颈与实验设计逻辑
 
 InterMimic 的实验围绕两个核心瓶颈展开验证：(1) MoCap 数据的不精确性（接触伪影、手部缺失）是否被有效修正；(2) 教师-学生蒸馏框架能否在保持物理合理性的同时实现规模化技能学习。实验设计分为教师策略的局部修正能力验证（Table 1）和学生策略的大规模技能整合与泛化测试（Table 2），辅以消融实验逐层剥离各模块贡献。
-
-![[assets/figures/papers/paper_list_l1740_InterMimic_Towards_Universal_Whole_Body_Control_for_Physics_Based_Human/figures/006_Table_2.jpg]]
-*Table 2: Quantitative evaluation of large-scale interaction imitation using OMOMO [39], kinematic generations from HOI-Diff [62], and InterDiff [101]. Additionally, we evaluate on test set when objects with weights ten times greater than those used during training*
 
 ### 教师策略的交互修正能力
 
@@ -286,13 +271,6 @@ Table 2 对比了 MLP 与 Transformer 学生策略的性能差异。Transformer 
 ### 失败模式与局限
 
 论文明确指出的失败模式包括：(1) 手部交互依赖启发式接触奖励，并非真正的灵巧操作，精细手部动作的模仿仍具挑战；(2) 不支持软体物体（如背包带）的交互，受限于仿真器能力；(3) 零样本泛化主要在同一类刚体物体上验证，对于极度不同的物体形态或复杂多物体场景的鲁棒性未知。此外，论文未报告各训练阶段所需的 GPU/CPU 资源和壁钟时间，影响可复现性评估。对比的 SkillMimic 和 PhysHOI 虽使用原作者代码与预训练权重，但未详述超参数对齐策略，公平性存在一定不确定性。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1740_InterMimic_Towards_Universal_Whole_Body_Control_for_Physics_Based_Human/figures/001_Figure_1.jpg]]
-*Figure 1: InterMimic enables physically simulated humans to perform interactions with dynamic and diverse objects. It supports highlydynamic, multi-object interactions and scalable skill learning (Top), making it adaptable for versatile downstream applications (Bottom): it can translate whole-body loco-manipulation skills to a humanoid robot [24, 81], perfect interaction MoCap data, and bridge kinematic generation, e.g., predicting future interactions from past (InterDiff [101]) or generating interactions given text prompts (InterDreamer [102])*
-
-
 
 ## 定位与知识库关联
 
@@ -364,8 +342,6 @@ Transformer 学生策略相比 MLP 展现出显著的序列建模优势（Table 
 2. **仿真到现实的迁移**：该 teacher-student 蒸馏策略能否直接迁移到真实人形机器人，面对观测噪声和执行器差异？Figure 1 提及了在 Humanoid 机器人上的遥操作应用，但论文未提供定量评估。
 3. **与生成模型的深度整合**：Figure 6 展示了与 HOI-Diff（文本到 HOI）和 InterDiff（交互预测）的零样本结合，但这一整合的鲁棒性和可控性尚未系统评估。
 4. **多物体并行交互的扩展**：Figure 1 展示了多物体并行交互的能力，但论文未提供该场景下的定量指标和失败模式分析，需手动验证其实际效果。
-
-
 
 ## 原文 PDF
 

@@ -232,8 +232,6 @@ $$\dot{V}^{\ast}(v) := \operatorname*{argmin}_{\dot{v}_j} J\big(\mathrm{viz}(\ma
 
 **Fig. 6** 直观展示了预分割对跟踪器输入质量的改善：无预分割时，遮挡物在输入视图中占据显著区域，干扰Cutie的掩码跟踪；预分割后，遮挡物被移除，目标区域更加清晰，跟踪质量显著提升。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l67_https_arxiv_org_abs_2602_10173/figures/021_Table_4.jpg]]
 *Table 4: NVOS Segmentation evaluation. The “horns_left” is failing with pre-segmentation because the object is partially out of frame in the input mask*
 

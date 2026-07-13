@@ -53,8 +53,6 @@ claims:
 
 在方法谱系上，VL-Eraser 区别于 **Gradient Ascent**（Thudi et al., EuroS&P 2022）、**KL-based Negative Optimization**（Nguyen et al., NeurIPS 2020）、**NPO**（Zhang et al., CoLM 2024）等反向训练范式，以及 **CLIPErase**（Yang et al., arXiv 2024）、**Multidelete**（Cheng and Amiri, ECCV 2024）等多模态遗忘方法，首次将参数隔离与算术删除引入 VLM 遗忘，为多模态机器遗忘提供了新的范式。
 
-
-
 ### 视觉语言模型中的遗忘需求
 
 大规模视觉语言模型（VLMs）在预训练过程中不可避免地会接触到包含个人隐私、偏见信息或版权敏感内容的训练数据。随着隐私法规（如GDPR的“被遗忘权”）和AI安全要求的强化，如何从已部署的VLM中干净地移除特定数据的影响——即**机器遗忘**——已成为一个迫切且具有挑战性的问题。
@@ -80,8 +78,6 @@ Figure 1 清晰地揭示了这一问题：通过对遗忘后的模型分别进�
 ### 本文动机与核心思路
 
 针对上述缺口，本文提出 **VL-Eraser**，将机器遗忘重新定义为**“真空蒸馏→算术删除”**两阶段过程。核心洞见在于：**如果能在正交于保留知识的真空空间中，将遗忘知识完整蒸馏到低秩适配器（LoRA）中，再通过参数减法实现干净删除，就可以在彻底遗忘的同时保持跨模态对齐不受损伤。** 这一范式从根源上避免了传统反向训练的对齐破坏问题，为VLM的机器遗忘提供了一条可控、彻底且保持模型效用的新路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -113,8 +109,6 @@ VL-Eraser 的核心创新在于将遗忘问题**重构**为两个解耦的阶段
 ### 算术删除：干净且可逆的参数减法
 
 第二阶段**算术删除**（Arithmetic Deletion）将训练好的、位于真空空间的 LoRA 参数从原始模型 FFN 权重中直接减去：$\mathbf{W}_{\mathrm{unlearned}} = \mathbf{W}_{\mathrm{FFN}} - \mathbf{W}_{\mathrm{LoRA}} \cdot \mathbf{P}$。由于 LoRA 参数完全位于真空空间内且与保留知识正交，这一减法操作能够干净地移除遗忘知识，同时保持原始模型在保留集上的性能不受影响。与反向训练中不可控的参数扰动相比，算术删除提供了精确、可解释且理论上可逆的遗忘机制。
-
-
 
 VL-Eraser 将视觉语言模型（VLM）的机器遗忘重构为一个“蒸馏—删除”两阶段过程，从根本上改变了传统反向训练范式的因果路径。其核心洞察在于：**遗忘的瓶颈并非模型能否在遗忘集上表现变差，而是能否在不破坏跨模态对齐的前提下完整剥离指定知识**。传统方法（如梯度上升、负偏好优化等）通过直接最大化预训练损失来降低遗忘集性能，但这往往只是扰乱了视觉与语言模态之间的对齐关系，而非真正消除模型内部的知识表征（Figure 1d 中仅用文本探针或重载原始投影即可恢复大量残留知识，验证了这一判断）。
 
@@ -165,8 +159,6 @@ $$\mathbf{W}_{\mathrm{unlearned}} = \mathbf{W}_{\mathrm{FFN}} - \mathbf{W}_{\mat
 | 对保留知识的影响 | 易导致灾难性遗忘 | 结构上天然隔离 |
 
 消融实验（Table 2）为这一框架设计提供了关键支撑：移除真空空间约束后，保留集分类准确率从 43.4 骤降至 36.6，同时遗忘质量也同步退化，证明正交约束是防止干扰保留知识的核心因果开关。单独使用蒸馏损失或交叉熵损失均无法充分释放 VL-Eraser 的性能，二者联合优化是平衡知识转移与保真度的必要条件。
-
-
 
 ### 问题形式化：传统反向训练的局限
 
@@ -242,8 +234,6 @@ $$
 
 该操作仅修改 FFN 层权重，其余参数保持原样。由于 LoRA 参数被严格约束在真空空间中，减法操作不会对保留知识产生干扰——移除真空空间约束后，保留集准确率从 43.4 骤降至 36.6（Table 2），直接验证了正交约束是防止保留知识退化的关键机制。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈验证：传统反向训练破坏跨模态对齐
@@ -274,8 +264,6 @@ $$
 
 **Figure 5** 通过案例分析定性展示了遗忘前后的模型输出变化。在遗忘集样本上，原始模型能够准确回答与目标知识相关的问题，而经过 VL-Eraser 遗忘后的模型则无法给出正确答案，直观验证了知识删除的有效性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2712_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_VL_Eraser_Vacuum/figures/003_Table_1.jpg]]
 *Table 1: Overall results of baselines and VL-Eraser on two representative VLMs backbones across three unlearning tasks (5% Forget). Results are presented separately for Vision-QA and Textual-QA and are evaluated on the forget set (Forget), test set (Test), retain set (Retain), and celebrity set (Real). ↓ indicates lower is better, and ↑ indicates higher is better. The best results are highlighted in bold*
 
@@ -285,13 +273,8 @@ $$
 ![[assets/figures/papers/paper_list_l2712_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_VL_Eraser_Vacuum/figures/004_Figure_3.jpg]]
 *Figure 3: The overall trade-off between unlearning effectiveness and model utility under varying forget ratios, using LLaVA as the base model. The x-axis shows the performance difference in forget set relative to the vanilla model, measured as the accuracy difference for classification tasks and the ROUGE-L difference for cloze tasks. The y-axis reports model utility on the Retained and Real sets*
 
-![[assets/figures/papers/paper_list_l2712_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_VL_Eraser_Vacuum/figures/007_Figure_4.jpg]]
-*Figure 4: Training time of different unlearning methods on LLaVA-1.5-7B under the 5% forget setting.Q*
-
 ![[assets/figures/papers/paper_list_l2712_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_VL_Eraser_Vacuum/figures/006_Figure_5.jpg]]
 *Figure 5: Case study on Forget Set before and after unlearning*
-
-
 
 ## 定位与知识库关联
 
@@ -335,8 +318,6 @@ VL-Eraser 的核心贡献在于从“参数更新范式”跃迁到“知识蒸�
 2. **增量遗忘与知识冲突**：当多次执行遗忘操作时，不同遗忘集的真空空间可能存在重叠或冲突。如何设计增量遗忘机制，避免后序遗忘破坏前序遗忘结果，是实际部署中的关键问题。
 
 3. **与模型编辑的关系**：VL-Eraser 的“蒸馏-删除”流程与模型编辑中的“定位-编辑”范式存在结构相似性。能否将真空蒸馏框架推广为通用的知识编辑工具，支持定向知识修改而非仅删除，值得探索。
-
-
 
 ## 原文 PDF
 

@@ -58,8 +58,6 @@ claims:
 
 值得注意的是，Geo2 仍存在若干局限：对严重畸变或极端视角变化的地面图像，E2P 变换可能无法完全恢复精准几何关系；框架性能依赖于 VGGT 等预训练几何基础模型的覆盖能力；当前尚未探讨大规模地理数据库下的检索效率与扩展性。这些开放问题为后续研究指明了方向。
 
-
-
 跨视角地理空间学习（Cross-View Geo-Spatial Learning）旨在建立地面全景图像与高空卫星/航空图像之间的对应关系。该领域的两个核心任务是**跨视角地理定位（CVGL）**——给定一张地面查询图像，从卫星图像数据库中检索最匹配的地理位置——和**跨视角图像合成（CVIS）**——在地面视角与卫星视角之间进行双向图像生成。这两个任务在自动驾驶、机器人导航、增强现实和城市建模中具有广泛的应用前景。
 
 当前方法面临一个根本性瓶颈：**地面和航空图像之间存在巨大的视角差异**。地面全景图通常是以等距柱状投影（Equirectangular）捕获的360°球形视图，而卫星图像是俯视正交投影。这种几何上的不匹配使得直接应用几何基础模型（Geometric Foundation Models, GFMs）——如 VGGT——来提取跨视角图像的几何特征时，往往得到错误的3D重建结果（见 Figure 1），导致CVGL和CVIS的性能受到严重制约。
@@ -67,8 +65,6 @@ claims:
 从方法谱系来看，现有工作大致可分为两类。在CVGL方面，**SAFA**（Shi et al., NeurIPS 2019）引入空间感知特征聚合，**TransGeo**（Zhu et al., CVPR 2022）采用Transformer架构，**GeoDTR+**（Zhang et al., TPAMI 2024）设计了几何布局提取器，而**Sample4Geo**（Deuser et al., ICCV 2023）通过困难负样本采样提升定位精度。在CVIS方面，**CDE**（Toker et al., CVPR 2021）将GAN与CVGL骨干网络结合但仅支持单方向合成，**RGCIS**（Yang et al., arXiv 2024）利用冻结的CVGL模型引导生成，**Sat2Density**（Qian et al., ICCV 2023）借助体密度估计，**SkyDiffusion**（Ye et al., ECCV 2024）则采用扩散模型与鸟瞰图（BEV）范式。然而，这些方法存在两个共同缺陷：一是缺乏对3D几何先验的系统性利用，二是将CVGL和CVIS视为独立任务分别优化，未能发掘两个任务之间的协同增益。
 
 Geo2的**核心洞察**在于：通过将几何基础模型的3D先验融入到统一的共享潜在空间中，能够同时改进跨视角地理定位和双向图像合成——两个任务可以相互增强，而非彼此孤立。这一设计理念使得Geo2成为一个几何引导的统一框架，从方法层面填补了“几何先验缺失”和“任务割裂”两个关键缺口。
-
-
 
 ## 核心方法与创新机理
 
@@ -119,8 +115,6 @@ GeoMap 的关键洞察在于：**共享的 3D 感知潜在空间消除了地面�
 
 Geo2 的创新链条清晰且因果紧密：**E2P 变换**解决了 GFM 在跨视角场景下的适配问题，**GeoMap** 将适配后的几何特征融入共享潜在空间，**GeoFlow** 利用流匹配的可逆性实现高效双向生成，**联合训练**则通过一致性损失将定位与生成耦合为相互增强的整体。这一设计使得 Geo2 在 VIGOR 同区域上达到 R@1 81.59%（+3.73% vs. Sample4Geo），在 CVACT G2S 合成上取得 FID 31.72，均显著优于此前最佳方法。
 
-
-
 Geo2 是一个统一框架，将跨视角地理定位（CVGL）与双向跨视角图像合成（CVIS）耦合在共享的3D感知潜在空间中，使两个任务相互增强。
 
 ### 动机与核心瓶颈
@@ -148,25 +142,17 @@ Geo2 的完整流水线如 Figure 2 所示，由四个核心模块串联：
 - **CVIS 任务（G2S）**：输入地面图像 $I^g$，经 GeoMap 得到 $f^g$ 作为 GeoFlow 的条件，从 RAE 编码的地面隐空间 $x^g$ 出发，沿学习到的向量场前向积分生成卫星隐空间 $x^s = x^g + \int_0^1 G_\theta(x_t, t, c) dt$，再经 RAE 解码得到合成卫星图像。
 - **CVIS 任务（S2G）**：输入卫星图像 $I^s$，以 $f^s$ 为条件，从 $x^s$ 出发反向积分 $x^g = x^s - \int_0^1 G_\theta(x_t, t, c) dt$，解码得到合成地面图像。此方向无需额外训练。
 
-
-
 Geo2 的核心技术路线是将几何基础模型（GFM）的 3D 先验注入统一的跨视角潜在空间，并以此驱动地理定位（CVGL）与双向图像合成（CVIS）的联合优化。整个框架由三个关键模块构成：**VGGT 几何特征提取**、**GeoMap 共享嵌入**以及 **GeoFlow 流匹配合成**。
 
 ### 1. 几何先验提取与 E2P 变换
 
 直接对跨视角图像对应用 VGGT 等几何基础模型会因巨大的视角差异而失效（见 Figure 1）。Geo2 的解决方案是对地面全景图施加 **E2P（Equiangular-to-Perspective）变换**，将其投影为多个透视裁剪视图，再输入 VGGT 提取几何特征：
 
-![[assets/figures/papers/paper_list_l2504_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_Geo2_Geometry_Gu/figures/001_Figure_1.jpg]]
-*Figure 1: Illustration of directly using VGGT on satellite (a) and ground (c) images, leading to incorrect reconstructed shown in (b)*
-
 $$
 \{ I P ^ { i } \} _ { i = 1 } ^ { V } = \mathrm { E 2 P } ( I ^ { g } )
 $$
 
 其中 $I^g$ 表示地面等距柱状图像，$\{IP^i\}$ 为生成的 $V$ 个透视裁剪图。这一变换解决了全景图的畸变问题，使 VGGT 能够输出准确的深度与点云重建（见 Figure 3）。卫星图像则直接输入 VGGT，无需额外预处理。
-
-![[assets/figures/papers/paper_list_l2504_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_Geo2_Geometry_Gu/figures/004_Figure_3.jpg]]
-*Figure 3: Illustration of VGGT reconstructions for (a) the ground view and (b) the satellite view, showing strong geometric alignment (e.g., buildings and overall layout). The ground view reconstruction is obtained from four perspective crops, illustrated in (c)*
 
 ### 2. GeoMap：共享 3D 感知潜在空间
 
@@ -230,15 +216,8 @@ $$
 
 这一对称 KL 散度惩罚使两个方向的潜在分布相互靠近，促使 CVGL 的判别性嵌入与 CVIS 的生成性隐空间相互增强，形成耦合优化闭环。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2504_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_Geo2_Geometry_Gu/figures/005_Figure_4.jpg]]
 *Figure 4: Overview of GeoMap pipeline. Ground and satellite images are individually processed via two separate branches*
-
-![[assets/figures/papers/paper_list_l2504_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_Geo2_Geometry_Gu/figures/006_Figure_5.jpg]]
-*Figure 5: Overview of our GeoFlow pipeline. The latent representation*
-
-
 
 ## 实验与关键发现
 
@@ -311,19 +290,6 @@ Geo2 在双向合成任务上均显著优于现有方法，且仅需单方向训
 ![[assets/figures/papers/paper_list_l2504_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_Geo2_Geometry_Gu/figures/013_Figure_6.jpg]]
 *Figure 6: Visualization of Generated images from*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2504_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_Geo2_Geometry_Gu/figures/008_Table_3.jpg]]
-*Table 3: Comparison of cross-view geo-localization performance on CVUSA and CVACT datasets in recall at top-K retrieves (R@K). The best results are shown in bold and the second-best results are underlined. † indicates Polar Transformation is applied*
-
-![[assets/figures/papers/paper_list_l2504_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_Geo2_Geometry_Gu/figures/009_Table_4.jpg]]
-*Table 4: Comparison of cross-view geo-localization performance on cross-dataset benchmarks. CVUSA CVACT stands for training on CVUSA and testing on CVACT. CVACT CVUSA stands for training on CVACT and testing on CVUSA. The best results are shown in bold and the second-best results are underlined*
-
-![[assets/figures/papers/paper_list_l2504_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_Geo2_Geometry_Gu/figures/011_Table_6.jpg]]
-*Table 6: Comparison of Satellite-to-Ground image synthesis performance on CVUSA, CVACT, and VIGOR datasets. We report FID [9], LPIPS [49], PSNR and SSIM scores. The best results are shown in bold*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 问题定位：几何先验在跨视角任务中的缺失
@@ -374,8 +340,6 @@ Geo2 为跨视角地理空间学习开辟了“几何基础模型 + 任务联合
 2. **E2P 畸变残差的进一步消除**：当前 E2P 变换是固定的几何投影，是否可以通过可学习的变形模块或自适应的裁剪策略进一步减小畸变残差？
 3. **非城市场景的泛化**：VGGT 的训练数据以城市场景为主，Geo2 在自然地形、荒漠、海洋等非城市场景下的几何先验质量与任务性能尚待验证。
 4. **更轻量化的几何适配方案**：GeoMap 需要为地面和卫星分别运行 VGGT 特征提取，计算开销较大。是否存在更高效的几何先验注入方式，如轻量级几何适配器或知识蒸馏方案？
-
-
 
 ## 原文 PDF
 

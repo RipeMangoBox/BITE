@@ -51,8 +51,6 @@ claims:
 
 在实验验证上，PoseAnything 在人类姿态数据集 **TikTok** 上全面超越现有方法（PSNR 31.50, FVD 133.95 等五项指标均最优，见 Table 1），在非人姿态数据集 **XPose-benchmark** 上同样取得最佳性能（Table 2）。消融实验表明，移除 PTCM 模块或省略部件分割匹配步骤均导致性能显著下降（Table 3），验证了部件级一致性机制的有效性。解耦 CFG 策略成功实现了相机运动控制，消除了主体与相机条件耦合注入的干扰（Figure 8）。
 
-
-
 姿态引导视频生成（Pose-guided Video Generation）旨在根据给定的参考图像与目标姿态序列，生成符合指定动作的视频片段。该技术在虚拟数字人、影视特效、游戏动画等领域具有广泛的应用前景。然而，现有方法面临两大核心瓶颈：
 
 **通用性受限。** 当前主流方法——如 **Disco**（Wang et al., CVPR 2024）、**AnimateAnyone**（Hu, CVPR 2024）、**MagicAnimate**（Xu et al., CVPR 2024）和 **Champ**（Zhu et al., ECCV 2024）——几乎全部聚焦于人类姿态驱动。尽管 **Animate-X**（Tan et al., ICLR 2025）初步探索了非人姿态生成，但整体而言，面向任意骨架结构（如四足动物、多足生物、机械体等）的通用姿态引导视频生成仍是一个未被充分解决的开放问题。
@@ -62,8 +60,6 @@ claims:
 **相机运动控制缺失。** 现有姿态引导视频生成方法不支持独立的相机运动控制，或将其与主体运动条件耦合注入，导致两者相互干扰，无法实现“主体按指定姿态运动，同时镜头按指定轨迹推拉摇移”的精细控制。
 
 针对上述问题，本文提出 **PoseAnything**——一个通用的姿态引导视频生成框架，核心动机包括：（1）支持任意骨架输入，覆盖人类与非人主体；（2）通过**部件感知时序一致性模块（Part-aware Temporal Coherence Module, PTCM）**将全局外观保持问题分解为部件级的精细一致性优化；（3）通过**解耦分类器自由引导（Decoupled CFG）**首次实现主体运动与相机运动的独立控制。
-
-
 
 ## 核心方法与创新机理
 
@@ -119,8 +115,6 @@ $$Z_{agr} = [Z_0, Z_p] \in F \times H \times W \times 2C, \; Z = \text{Conv}(Z_{
 
 这三项创新共同构成了 PoseAnything 的方法核心：PTCM 提供了细粒度的外观一致性保障，解耦 CFG 赋予了独立的相机运动控制能力，通道维拼接优化了姿态条件的注入效率。三者协同使得 PoseAnything 能够同时支持人类与非人主体的通用姿态引导视频生成。
 
-
-
 PoseAnything 的整体 pipeline 以 Wan2.2‑TI2V‑5B 预训练文生视频模型为骨干，将姿态引导视频生成分解为三个标准化阶段：姿态编码与条件注入、部件感知时序一致性控制、以及主体‑相机运动解耦采样。给定一张参考图像 $I_r$ 和一段任意骨架的姿态序列 $P$，系统首先将姿态序列编码为潜在表示 $Z_p$，再与参考图像的潜在 $Z_0$ 沿通道维拼接后馈入 DiT 模块；随后，在每个 DiT 块中插入部件感知时序一致性模块（PTCM），通过帧间部件匹配与部件级交叉注意力实现细粒度外观保持；最后在采样阶段采用解耦 CFG，将主体姿态与相机运动分别注入正/负锚点，消除相互干扰。整个框架的输入输出流与模块关系如 Figure 4 所示。
 
 ![[assets/figures/papers/paper_list_l1000_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_PoseAnything_Gene/figures/004_Figure_4.jpg]]
@@ -163,8 +157,6 @@ $$\tilde{\epsilon} = \hat{\epsilon}_{\theta}(\emptyset_s, z_c) + s \cdot \left(\
 ### 3.4 训练策略
 
 PoseAnything 的训练分三阶段进行：第一阶段使用 XPose 数据集和 15,000 个内部人类视频进行 3k 次迭代，学习率 $5 \times 10^{-5}$；第二阶段保持相同学习率继续训练；第三阶段进行 8k 次迭代，学习率降至 $1 \times 10^{-5}$。分阶段训练策略有助于模型先学习通用的姿态‑外观映射，再精细优化时序一致性。
-
-
 
 PoseAnything 的核心架构围绕三个关键设计展开：**通道维姿态条件注入**、**部件感知时序一致性模块（PTCM）** 以及 **主体与相机运动解耦 CFG**。以下逐一展开其公式化表述与工作机制。
 
@@ -213,13 +205,6 @@ $$Q_j = m_{ij} X W_q, \quad K_j = m_{0j} X_0 W_k, \quad V_j = m_{0j} X_0 W_v$$
 $$\tilde{\epsilon} = \hat{\epsilon}_{\theta}(\emptyset_s, z_c) + s \cdot \big(\hat{\epsilon}_{\theta}(z_s, \emptyset_c) - \hat{\epsilon}_{\theta}(\emptyset_s, z_c)\big)$$
 
 其中 $\hat{\epsilon}_{\theta}$ 为扩散模型的噪声预测函数，$z_s$ 和 $z_c$ 分别表示主体姿态条件和相机运动条件，$\emptyset_s$ 和 $\emptyset_c$ 为对应的空条件，$s$ 为引导强度。该公式的含义是：以仅注入相机条件的预测为基底，加上主体条件与相机条件之间的差异项进行引导，从而实现两类运动的独立控制。这一设计首次在姿态引导视频生成中实现了相机运动控制，消除了耦合注入的相互干扰（见 Figure 8 的相机控制效果展示）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1000_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_PoseAnything_Gene/figures/005_Figure_5.jpg]]
-*Figure 5: Subject and Camera Decoupled Control Based on CFG. dex of the segment of the current pose. To obtain the pixels*
-
-
 
 ## 实验与关键发现
 
@@ -278,8 +263,6 @@ $$\tilde{\epsilon} = \hat{\epsilon}_{\theta}(\emptyset_s, z_c) + s \cdot (\hat{\
 ### 局限性与讨论
 
 需要指出的是，训练所用的 15,000 个人类视频为内部数据，未完全公开，这在一定程度上限制了完全复现的可能性。但 XPose 数据集已开源，为社区研究非人姿态生成提供了基础。此外，当前方法在处理极端遮挡或骨架关键点严重缺失的场景时，部件匹配的准确性可能下降，该问题有待进一步探索。
-
-
 
 ## 定位与知识库关联
 
@@ -351,8 +334,6 @@ PoseAnything 在以下场景展现出显著优势：
 4. **长时序稳定性**：部件感知交叉注意力依赖第一帧作为外观参考。在极长视频生成中，第一帧的外观信息可能不足以覆盖后续帧的视角变化和遮挡，是否需要引入动态更新的参考帧机制？
 
 5. **相机控制的精细度**：解耦 CFG 当前支持离散的相机运动指令（如“pan left”）。能否扩展为连续的相机轨迹控制，实现更自然的镜头语言？
-
-
 
 ## 原文 PDF
 

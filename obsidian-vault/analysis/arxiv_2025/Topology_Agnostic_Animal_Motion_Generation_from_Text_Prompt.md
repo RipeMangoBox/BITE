@@ -51,8 +51,6 @@ claims:
 
 在 OmniZoo 测试集上，完整模型取得 FID 0.044，相较于最强基线 **MoMask**（Guo et al., CVPR 2024）提升 48.2%；文本-运动检索准确率 R@1 达到 0.621，提升 23.2%。消融实验进一步表明，移除拓扑感知骨骼嵌入模块后 FID 飙升至 0.097（性能下降 54.6%），验证了该模块是保证生成质量与跨语义一致性的关键因果调控变量。
 
-
-
 ### 问题背景
 
 在计算机图形学与具身智能的交叉领域，生成自然、可控的动物运动一直是一项核心挑战。与人类运动生成不同——后者已因SMPL等参数化模型的成熟而取得显著进展——动物运动生成面临着两个根本性困难。首先，动物物种之间的骨骼拓扑差异极大：猫科动物的四足结构与鸟类的双足结构在关节数量、连接关系和运动学约束上毫无共同之处。其次，大规模、高质量的异构动物运动数据极度匮乏，现有数据集要么局限于单一物种，要么规模不足以支撑通用生成模型的训练。
@@ -70,8 +68,6 @@ claims:
 实现这一目标需要同时解决两个技术难题：（1）如何表示和学习具有可变关节数量的运动序列；（2）如何将任意骨骼的拓扑信息编码为模型可理解的条件信号。本文的核心洞察在于：**将任意骨骼拓扑表示为基于图距离和关系类型的注意力偏置，并与多尺度文本描述编码结合，在掩码自回归框架中通过广义残差VQ-VAE处理可变关节数运动**，从而首次实现了拓扑无关的文本驱动动物运动生成。
 
 这一思路的技术关键在于一个**拓扑感知的骨骼嵌入模块（Topology-aware Skeleton Embedding Module）**。该模块利用图Transformer将任意骨骼的几何与结构关系编码为统一的条件嵌入，使得模型能够同时理解文本语义和骨骼拓扑，并将二者融合以控制运动生成。正是这一模块，使模型从“只能操作固定骨架”跃迁为“理解骨架拓扑本身”的范式转变。
-
-
 
 ## 核心方法与创新机理
 
@@ -136,8 +132,6 @@ $$\mathcal{L}_{\mathrm{rvq}} = \frac{\sum_{t,j} \mathbf{M}_{t,j} \| \tilde{\math
 - 控制信号仅限于文本和骨骼输入，尚未探索视频等更丰富的模态引导。
 - 生成结果在细节和质量上仍不及手工动画，距离生产级应用尚有距离。
 
-
-
 本工作提出一个**拓扑无关的文本驱动动物运动生成框架**，核心目标是：给定任意骨骼拓扑和一段文本描述，生成与该文本语义对齐且符合该骨骼解剖约束的运动序列。框架由两个阶段级联构成，如图3所示。
 
 ### 阶段一：广义运动残差VQ‑VAE
@@ -193,13 +187,6 @@ $$\mathcal{L}_{\mathrm{rvq}} = \frac{\sum_{t,j} \mathbf{M}_{t,j} \| \tilde{\math
 | 解码器 | 所有量化层token + 骨骼掩码 | 重建运动序列 $\hat{\mathbf{X}}$ |
 
 该框架的**核心洞察**在于：通过图距离和关系类型构建的注意力偏置，使模型能够“理解”任意骨架的拓扑结构，并将其与文本语义在统一的嵌入空间中融合，从而在掩码自回归范式下实现真正的拓扑无关运动生成。消融实验（Table 3）强有力地证实了这一点——移除骨骼嵌入模块后FID从0.044飙升至0.097（性能下降54.6%），而完整模型在所有文本-运动对齐指标上均达到最优。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l40_https_arxiv_org_abs_2512_10352/figures/004_Figure_3.jpg]]
-*Figure 3: Overview of our pipeline. Our network operates in two main stages: In the first stage, we extend the residual VQ-VAE into a generalized formulation capable of handling motion sequences from arbitrary skeletal topologies. In the second stage, we introduce text prompts and target skeletons as joint conditioning signals. We design a topology-aware skeleton embedding module that extracts both spatial geometry and structural topology from any given skeleton. These features are then fused with text embeddings and fed into a two-stage Transformer to achieve generalized conditional motion generation across diverse species and skeletal structures*
-
-
 
 ### 总体管线
 
@@ -276,8 +263,6 @@ $$\mathbf{f}_{\mathrm{cond}} = \mathrm{MLP}([\mathbf{f}_{\mathrm{text}}; \mathbf
 | $\mathrm{softmax}(\frac{QK^{\top}}{\sqrt{d/H}} + \mathbf{B}_{\mathrm{final}})V$ | $Q,K,V$：查询/键/值；$H$：注意力头数 | 拓扑感知自注意力 |
 | $\mathbf{f}_{\mathrm{skel}} = W_{\mathrm{out}} \cdot \mathrm{LayerNorm}(\mathbf{Z}_L[0]) + b_{\mathrm{out}}$ | $\mathbf{Z}_L[0]$：CLS token 最终表示 | 骨骼条件嵌入输出 |
 
-
-
 ## 实验与关键发现
 
 ### 实验设置
@@ -312,9 +297,6 @@ $$\mathbf{f}_{\mathrm{cond}} = \mathrm{MLP}([\mathbf{f}_{\mathrm{text}}; \mathbf
 ![[assets/figures/papers/paper_list_l40_https_arxiv_org_abs_2512_10352/figures/008_Figure_6.jpg]]
 *Figure 6: Text-driven motion transfer for heterogeneous skeletons. Our method generates biomechanically plausible motions for topologically distinct skeletons (e.g., meerkat and cassowary) from a single text prompt (”scanning surroundings”)*
 
-![[assets/figures/papers/paper_list_l40_https_arxiv_org_abs_2512_10352/figures/009_Figure_7.jpg]]
-*Figure 7: Text-to-motion generation on real-world animals. Our method successfully generates plausible motions for animals reconstructed from in-the-wild images. Top: A falcon performing aerial maneuvers with dynamic wing movements. Bottom: A horse executing a trotting gait with coordinated leg motion*
-
 ### 失败模式与局限性
 
 尽管整体性能优异，论文指出以下局限：
@@ -326,15 +308,8 @@ $$\mathbf{f}_{\mathrm{cond}} = \mathrm{MLP}([\mathbf{f}_{\mathrm{text}}; \mathbf
 
 论文未显式报告不同物种间的性能偏差或公平性测试。训练/测试集按 0.95:0.05 随机划分，未进行物种分层采样，因此少数物种的生成质量可能存在系统性差异，这一点需要读者在跨物种应用中自行验证。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l40_https_arxiv_org_abs_2512_10352/figures/001_Figure_1.jpg]]
-*Figure 1: Given an arbitrary skeletal topology and a corresponding text prompt, our method drives the skeleton to produce realistic, highquality motions that align with the textual description*
-
 ![[assets/figures/papers/paper_list_l40_https_arxiv_org_abs_2512_10352/figures/002_Table_1.jpg]]
 *Table 1: Comparison with existing animal motion datasets*
-
-
 
 ## 定位与知识库关联
 
@@ -379,8 +354,6 @@ $$\mathbf{f}_{\mathrm{cond}} = \mathrm{MLP}([\mathbf{f}_{\mathrm{text}}; \mathbf
 ### 知识库定位
 
 本文位于**文本驱动运动生成**与**跨形态运动建模**的交叉点。在文本驱动运动生成谱系中，它继承了 MoMask 的掩码自回归范式，但通过拓扑感知骨骼嵌入和广义 VQ-VAE 突破了固定拓扑限制，是该方向从“单一角色”迈向“多角色统一建模”的关键一步。在跨形态运动建模方面，本文的骨骼图 Transformer 编码策略与图神经网络在骨架动作识别中的工作形成呼应，但其创新在于将结构编码作为生成条件而非分类特征，为拓扑无关的运动生成提供了可复用的技术组件。
-
-
 
 ## 原文 PDF
 

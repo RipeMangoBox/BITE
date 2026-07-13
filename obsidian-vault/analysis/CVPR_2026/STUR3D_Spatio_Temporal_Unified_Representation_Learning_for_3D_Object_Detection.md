@@ -69,8 +69,6 @@ STUR3D定位于**query-based 2D-to-3D时序检测**范式，以**StreamPETR**（
 
 消融实验证实了每个组件的正向贡献：STOPP中联合使用2D和3D检测先验对性能至关重要；STGE在深度编码方式上显著优于线性编码和MLP方案；OQG进一步提升了查询的几何一致性。可视化结果表明，STUR3D在遮挡场景下能够成功恢复基线方法和QAF2D漏检的目标。
 
-
-
 ### 三维目标检测中的2D-3D表示鸿沟
 
 基于多视图图像的三维目标检测是自动驾驶感知系统的核心任务。当前主流方法普遍采用“2D-to-3D”管线：先从多视角图像中提取二维特征，再通过视图变换或查询机制将2D表示提升为3D检测结果。然而，这一范式存在一个根本性的瓶颈——**2D与3D表示之间的时空不一致性**。
@@ -96,8 +94,6 @@ STUR3D定位于**query-based 2D-to-3D时序检测**范式，以**StreamPETR**（
 3. **对象中心查询生成器（OQG）**：利用深度引导的位置编码，将增强后的2D检测提升为几何一致的3D查询。
 
 通过这一设计，STUR3D在nuScenes测试集上取得了57.9% mAP和64.6% NDS的SOTA性能，并在消融实验中相较基线StreamPETR实现了4.8% mAP和4.1% NDS的显著提升。
-
-
 
 ## 核心方法与创新机理
 
@@ -139,8 +135,6 @@ $$
 
 STUR3D的三个changed slots——**时序对齐与先验注入**、**2D特征增强方式**、**3D查询生成策略**——形成了一条因果链：可靠的3D历史检测和深度信息被反馈至2D检测阶段，使2D特征具备几何感知和时序一致性，进而生成更准确的3D查询。完整STUR3D较基线StreamPETR提升4.8% mAP和4.1% NDS（Table 3），且STOPP模块展现出良好的即插即用特性，集成至**DVPE**（Wang et al., arXiv 2024）和OPEN中均可提升检测精度（Table 4）。
 
-
-
 STUR3D的总体架构围绕一个核心洞察展开：将可靠的3D历史检测与深度信息反馈至2D检测阶段，使2D特征具备几何感知与时空一致性，从而弥合2D与3D表示之间的鸿沟。如图2所示，整个pipeline由三个核心模块串联构成：**时空对象先验传播器（STOPP）**、**时空几何编码器（STGE）** 和 **对象中心查询生成器（OQG）**，末端连接一个标准的3D感知头。
 
 ### 数据流与模块关系
@@ -157,15 +151,11 @@ STUR3D的总体架构围绕一个核心洞察展开：将可靠的3D历史检测
 
 整个框架的设计遵循一条清晰的因果链：现有2D-to-3D管线过度依赖二维图像特征，导致2D与3D表示之间存在时空不一致——二维特征缺乏充分的几何空间信息，限制了三维定位能力；同时时序交互不足，在遮挡等复杂场景下容易发生目标丢失。STUR3D通过**STOPP实现跨帧2D/3D先验注入**、**STGE实现深度几何与2D特征的融合**、**OQG实现对象中心的3D查询生成**，三步递进地解决了这一瓶颈。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2605_https_openaccess_thecvf_com_content_CVPR2026_html_Fan_STUR3D_Spatio_Temp/figures/002_Figure_2.jpg]]
 *Figure 2: Overall architecture of STUR3D. STUR3D achieves temporal interactions from 2D-to-2D and 3D-to-2D via a Spatio-Temporal Object Prior Propagator (STOPP) and a Spatio-Temporal Geometry Encoder (STGE), and spatial interactions from pseudo-3D to 2D through the Object-center Query Generator, alleviating temporal and spatial misalignment caused by over-reliance on 2D detections*
 
 ![[assets/figures/papers/paper_list_l2605_https_openaccess_thecvf_com_content_CVPR2026_html_Fan_STUR3D_Spatio_Temp/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of 3D detection frameworks. (a) Existing methods suffer spatio-temporal discrepancy from over-reliance on 2D detection. (b) STUR3D enhances 2D–3D spatial representation consistency via comprehensive spatio-temporal interactions*
-
-
 
 STUR3D框架由三个核心模块构成：时空目标先验传播器（STOPP）、时空几何编码器（STGE）和对象中心查询生成器（OQG），其后接一个3D感知头输出最终检测结果（Section 3.1）。这三个模块协同工作，将历史3D检测显式投影到2D平面并注入深度几何先验，引导2D检测器蒸馏三维感知所需的表示，同时利用时序传播恢复遮挡目标。
 
@@ -217,16 +207,6 @@ $$P^{e} = \operatorname{Linear}( \operatorname{concat}(P^{e'}, P^{o}) ) + P^{e'}
 
 值得注意的是，深度预测仅在训练阶段使用LiDAR信号进行监督，推理时完全依赖视觉输入，保持了纯视觉3D检测的设定（Section 4.2）。这种训练策略使STGE能够在无额外传感器的情况下，隐式学习几何感知的特征表示。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2605_https_openaccess_thecvf_com_content_CVPR2026_html_Fan_STUR3D_Spatio_Temp/figures/003_Figure_3.jpg]]
-*Figure 3: Overview of the STOPP. The STOPP injects spatial representations from 3D space and rich semantic context into the current 2D features through (a) 3D-to-2D and (b) 2D-2D temporal interactions, enhancing the consistency between 2D-based queries and 3D spatial representations. Meanwhile, historical detections guide the model to focus on potentially occluded targets*
-
-![[assets/figures/papers/paper_list_l2605_https_openaccess_thecvf_com_content_CVPR2026_html_Fan_STUR3D_Spatio_Temp/figures/004_Figure_4.jpg]]
-*Figure 4: Overview of the Spatio-Temporal Geometry Encoder. Through a series of simple convolutional operations, gating mechanisms, and attention modules, STGE generates spatio-temporal geometric feature maps that improve localization and occlusion recovery*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -267,24 +247,11 @@ Figure 5的可视化对比直观展示了STUR3D在遮挡场景下的优势。在
 
 然而，STUR3D仍存在以下局限：首先，几何注意力机制的计算开销在高分辨率或多相机场景下可能成为瓶颈，其可扩展性有待验证；其次，STOPP的有效性强依赖于历史检测的质量，当历史帧出现误检或目标剧烈运动时，错误的先验信息可能误导当前帧的检测；最后，在完全无LiDAR深度监督的纯视觉设置下，性能仍有较大下降空间，如何在不依赖深度真值的情况下学习有效的几何表示仍是一个开放问题。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2605_https_openaccess_thecvf_com_content_CVPR2026_html_Fan_STUR3D_Spatio_Temp/figures/007_Table_3.jpg]]
 *Table 3: Ablation studies for each component in STUR3D on the nuScenes val set. The STOPP, STGE and OQG represent the Spatio-Temporal Object Prior Propagator, Spatio-Temporal Geometry Encoder, and Object-center Query generator*
 
-![[assets/figures/papers/paper_list_l2605_https_openaccess_thecvf_com_content_CVPR2026_html_Fan_STUR3D_Spatio_Temp/figures/008_Table_5.jpg]]
-*Table 5: Ablation of detection and temporal caching frames in the STOPP*
-
-![[assets/figures/papers/paper_list_l2605_https_openaccess_thecvf_com_content_CVPR2026_html_Fan_STUR3D_Spatio_Temp/figures/009_Table_6.jpg]]
-*Table 6: Comparison of other depth encoding methods on the nuScenes val set. LiDAR supervision indicates whether LiDAR signals are used as supervision during training; all models do not use LiDAR inputs during inference*
-
-![[assets/figures/papers/paper_list_l2605_https_openaccess_thecvf_com_content_CVPR2026_html_Fan_STUR3D_Spatio_Temp/figures/010_Table_4.jpg]]
-*Table 4: Runtime and accuracy on the nuScenes val set. “3D gen.” indicates the 3D query generator, where STUR3D uses OQG*
-
 ![[assets/figures/papers/paper_list_l2605_https_openaccess_thecvf_com_content_CVPR2026_html_Fan_STUR3D_Spatio_Temp/figures/011_Figure_5.jpg]]
 *Figure 5: Qualitative detection results on surrounding-view images and the BEV space on the nuScenes val set. The 3D predicted bounding boxes are shown with different colors for each method on surrounding-view images. Blue represents the baseline, green for QAF2D, and red for our predictions. The yellow boxes on the BEV map represent the ground truth*
-
-
 
 ## 定位与知识库关联
 
@@ -313,8 +280,6 @@ STUR3D 处于基于视觉的多视图3D目标检测这一活跃研究脉络中�
 **几何注意力的高效化设计。** 将几何注意力扩展到更高分辨率输入和更多相机配置，需要探索更高效的计算范式。可能的路径包括：利用稀疏注意力机制仅在潜在目标区域注入几何先验，或通过可变形注意力学习自适应的几何先验采样位置，以降低计算开销。
 
 **跨模态时序融合的边界。** STUR3D 验证了3D-to-2D和2D-to-2D时序交互的互补性（Table 5中移除任一分支均导致性能下降），但该融合范式的理论边界尚不清晰。在更长的时序窗口、更复杂的多智能体协作场景下，如何平衡跨模态信息的增益与噪声累积，仍是一个开放的理论问题。
-
-
 
 ## 原文 PDF
 

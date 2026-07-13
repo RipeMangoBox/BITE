@@ -57,8 +57,6 @@ claims:
 
 实验结果表明，Light-T2M在**仅4.48M参数（约为MoMask的10%）**的条件下，在HumanML3D数据集上取得了**0.040的FID**（MoMask为0.045），在KIT-ML数据集上取得了**0.161的FID**（MoMask为0.228），同时推理速度提升约16%。消融实验进一步验证了ATII和PBDS的关键作用：移除ATII导致FID从0.040显著上升至0.102；PBDS以零额外参数实现了优于单向扫描和标准双向扫描的性能。这些结果共同表明，**局部建模与高效全局建模的混合设计，配合门控文本注入，可以在大幅压缩模型规模的同时保持甚至提升生成质量**，为T2M模型的轻量化部署提供了可行路径。
 
-
-
 文本到动作生成（Text-to-Motion, T2M）旨在根据自然语言描述合成逼真的三维人体运动序列，在动画制作、虚拟现实和人机交互等领域具有广泛应用。近年来，基于扩散模型的方法显著提升了生成质量，代表性工作如 **MDM**（Tevet et al., 2023）、**MLD**（Chen et al., 2023）和 **MoMask**（Guo et al., 2024）在 HumanML3D 和 KIT-ML 等基准上取得了令人瞩目的结果。
 
 然而，现有方法存在一个被普遍忽视的结构性瓶颈：**过度依赖 Transformer 的全局自注意力机制进行序列建模**。这种设计带来了两方面的问题。其一，自注意力的计算复杂度随序列长度呈二次增长，导致模型参数量庞大、推理速度缓慢——例如 MoMask 的可训练参数高达 44.85M，单次推理耗时约 0.180 秒。其二，Transformer 层擅长捕获长程依赖，却**缺乏对局部运动平滑性的显式建模能力**。真实人体运动在时间上具有天然的连续性和平滑性，相邻帧之间的关节角度和位置变化应遵循物理约束，而纯全局建模无法有效利用这一先验。
@@ -72,8 +70,6 @@ claims:
 3. **文本注入的自适应化**：设计**自适应文本信息注入器**（Adaptive Textual Information Injector, ATII），通过 Sigmoid 门控机制根据运动片段的语义需求动态调制文本嵌入的通道权重，实现“按需注入”。
 
 这一设计理念在实验中得到了充分验证：Light-T2M 仅使用 4.48M 可训练参数（MoMask 的 10%），在 HumanML3D 上取得了 0.040 的 FID（MoMask 为 0.045），推理速度提升 16%（**Figure 1**；**Table 1**）。
-
-
 
 ## 核心方法与创新机理
 
@@ -133,8 +129,6 @@ Light-T2M 相对于 SOTA baseline（MoMask）的核心创新可归纳为三个 *
 
 最终，这三个 changed slots 的协同效应使 Light-T2M 仅用 MoMask 10% 的可训练参数（4.48M vs 44.85M），在 HumanML3D 上取得更优的 FID（0.040 vs 0.045），并将推理速度提升 16%（0.151s vs 0.180s），实现了效率与质量的双重突破。
 
-
-
 Light-T2M 是一个基于扩散框架的文本到动作生成模型，其核心设计目标是在极低参数量的前提下保持甚至超越现有 SOTA 的生成质量。模型整体采用“局部-全局-局部”（LGL）的块堆叠架构，由 $N$ 个基本块串联组成，每个基本块内部包含**两个局部信息建模模块（LIMM）** 和一个**全局信息建模与文本注入模块**，形成对称的信息提取与融合流水线 [Figure 2]。
 
 ![[assets/figures/papers/paper_list_l1823_Light_T2M_A_Lightweight_and_Fast_Model_for_Text_to_Motion_Generation/figures/002_Figure_2.jpg]]
@@ -158,8 +152,6 @@ Light-T2M 是一个基于扩散框架的文本到动作生成模型，其核心�
 ### 效率来源
 
 整个 pipeline 的效率优势来自三个关键设计决策的叠加：(1) LIMM 使用深度可分离卷积替代 Transformer 的自注意力层，大幅压缩参数量；(2) 下采样操作将 Mamba 全局建模的计算量控制在较低水平；(3) PBDS 以零参数代价实现双向扫描效果，避免了传统双向 Mamba 的参数量翻倍。最终模型仅需 4.48M 可训练参数（约 MoMask 的 10%），推理速度提升 16%，同时 FID 在 HumanML3D 上达到 0.040，优于 MoMask 的 0.045 [Table 1]。
-
-
 
 Light-T2M 是一个基于扩散框架的文本驱动动作生成模型，其核心设计围绕三个关键模块展开：**局部信息建模模块（LIMM）**、**全局信息建模与文本注入模块**，以及**自适应文本信息注入器（ATII）**。整体架构由 N 个基本块堆叠而成，每个基本块包含两个 LIMM 和一个全局模块，形成“局部-全局-局部”（LGL）的信息流结构（Figure 2）。
 
@@ -219,17 +211,11 @@ $$
 
 Mamba 作为一种状态空间模型（SSM），本身仅支持单向扫描，这限制了每个位置获取全局上下文的能力。为此，Light-T2M 提出了**伪双向扫描（Pseudo-Bidirectional Scan, PBDS）**（Figure 3）：将输入运动序列反转得到 $X^r$，与原序列 $X^o$ 一同送入 Mamba 扫描，但仅保留原序列对应的输出。这一技巧使每个元素能够间接获取其右侧元素的信息，实现双向扫描的效果，且**不引入任何额外参数**。消融实验（Table 3）表明，PBDS（FID 0.040）显著优于单向扫描 SDS（FID 0.088）和 Vim 的双向扫描 BDS（FID 0.067）。
 
-![[assets/figures/papers/paper_list_l1823_Light_T2M_A_Lightweight_and_Fast_Model_for_Text_to_Motion_Generation/figures/003_Figure_3.jpg]]
-*Figure 3: In our pseudo-bidirectional scan, each element in the original sequence can obtain the information from elements originally on its right, achieving the effect of bidirectional scanning without increasing parameters*
-
 ---
 
 ### 自适应文本信息注入器（ATII）
 
 ATII 是全局模块中的关键组件（Figure 4），其核心思想是**让每个运动片段自适应地决定需要多少文本语义以及哪些语义维度**。具体而言，对于第 $i$ 个运动片段 $X_i$ 和文本嵌入 $y$，先通过拼接和线性变换预测通道级门控权重，再对文本嵌入进行重加权：
-
-![[assets/figures/papers/paper_list_l1823_Light_T2M_A_Lightweight_and_Fast_Model_for_Text_to_Motion_Generation/figures/004_Figure_4.jpg]]
-*Figure 4: Illustration of our Adaptive Textual Information Injector. ⊙ and*
 
 $$
 \hat{y} = \operatorname{Sigmoid}(g^c(X_i, y)) \odot y \tag{6}
@@ -248,8 +234,6 @@ $g^f(\cdot)$ 为融合函数。这种门控机制使文本注入具有**片段�
 ### 模块协同与设计选择
 
 LGL（局部-全局-局部）的块排列是经过消融验证的最优设计（Table 2）：在 4.48M 参数下取得 FID 0.040、R-Top1 0.511、R-Top3 0.795。相比之下，将 LIMM 替换为 Transformer 层（TTT）或调整排列顺序（如 LTL、GLL）均导致性能下降，印证了**局部建模与全局建模交替进行**的有效性。下采样尺度为 8 时达到最佳平衡（Table 6）：尺度 1 时 R-Top1 较低，尺度 16 时性能轻微下降。
-
-
 
 ## 实验与关键发现
 
@@ -313,7 +297,6 @@ PBDS 通过将输入序列反转后与原序列拼接送入 Mamba，仅保留原
 
 #### 下采样尺度消融（Table 6）
 
-
 全局模块中的下采样操作旨在压缩时序长度以提取语义片段并降低计算量：
 
 - 尺度为 **8** 时 FID 和 R-Top1 最优。
@@ -321,7 +304,6 @@ PBDS 通过将输入序列反转后与原序列拼接送入 Mamba，仅保留原
 - 尺度为 16 时性能轻微下降，可能因过度压缩丢失时序细节。
 
 #### 采样步数与采样器消融（Table 7）
-
 
 使用 UniPC 采样器时：
 
@@ -331,7 +313,6 @@ PBDS 通过将输入序列反转后与原序列拼接送入 Mamba，仅保留原
 这一发现为推理加速提供了实用指导：10 步 UniPC 即可在速度与质量间取得良好平衡。
 
 #### 引导尺度消融（Table 9）
-
 
 分类器无关引导（CFG）尺度 s 控制文本约束强度：
 
@@ -357,17 +338,12 @@ Figure 5 展示了 Light-T2M 与 MoMask 等方法的生成动作定性对比。�
 4. **长文本处理**：ATII 对复杂长描述的处理能力未深入探讨。
 5. **极低参数量极限**：模型在 <2M 参数时能否保持可接受质量尚待验证（Figure 6 展示了参数量的影响趋势，但具体数值需查阅原文）。
 
-![[assets/figures/papers/paper_list_l1823_Light_T2M_A_Lightweight_and_Fast_Model_for_Text_to_Motion_Generation/figures/007_Figure_6.jpg]]
-*Figure 6: Impact of The Number of Parameters*
-
 ### 开放问题
 
 - 伪双向扫描是否可推广到其他序列建模任务？
 - 将 ATII 应用于纯 Transformer 架构是否能取得更好结果？
 - 引导尺度、下采样尺度、采样步数等超参数的最优组合是否跨数据集稳定？
 - 能否进一步压缩模型至移动端可部署的规模（如 <1M）？
-
-
 
 ## 定位与知识库关联
 
@@ -414,8 +390,6 @@ Light-T2M 处于文本驱动动作生成（Text-to-Motion, T2M）的扩散模型
 4. **极端压缩的可行性。** 模型能否进一步压缩至移动端可部署规模（<1M 参数）？这可能需要更激进的卷积核缩减、通道剪枝或知识蒸馏，但当前 Figure 6 的趋势分析不足以预测极端压缩后的性能下限。
 
 5. **多模态扩展。** 当前仅支持文本输入，能否将 LIMM + Mamba + ATII 的轻量架构扩展到语音、音乐或视频驱动的动作生成，是值得关注的方向。
-
-
 
 ## 原文 PDF
 

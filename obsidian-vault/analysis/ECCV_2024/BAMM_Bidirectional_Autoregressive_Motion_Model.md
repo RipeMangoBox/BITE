@@ -59,8 +59,6 @@ claims:
 
 在HumanML3D和KIT-ML两个主流基准上，BAMM取得了具有竞争力的生成质量：HumanML3D上FID达到0.055，Top-1 R-Precision达到0.525；KIT-ML上FID为0.183，Top-1 R-Precision为0.438。更重要的是，BAMM在**不依赖外部长度估计器**的前提下实现了这些指标，而依赖预测长度的MMM和MoMask在FID上分别退化至0.080和0.090。此外，BAMM零样本支持运动补全、外推、前后缀预测及长序列合成等多种编辑任务，在生成质量、长度灵活性与编辑能力三者之间实现了此前方法未能达成的统一。
 
-
-
 ### 问题背景：文本驱动的3D人体运动生成
 
 文本驱动的3D人体运动生成旨在根据自然语言描述合成逼真的人体动作序列，在动画制作、虚拟现实、人机交互等领域具有广泛的应用前景。近年来，该领域涌现出大量基于深度生成模型的方法，主要包括三类范式：**扩散模型**（如MDM，Tevet et al., ArXiv 2022）、**掩码生成模型**（如MoMask、MMM，Pinyoanuntapong et al., CVPR 2024）和**自回归模型**（如T2M-GPT，Zhang et al., CVPR 2023）。
@@ -80,8 +78,6 @@ claims:
 上述权衡的根源在于**生成掩码建模与自回归建模之间的范式割裂**。自回归模型以单向因果依赖逐令牌生成序列，天然支持长度预测但缺乏双向上下文建模能力；掩码生成模型以双向注意力并行预测被掩码令牌，能够利用丰富上下文但需要预设序列长度。这两种范式在训练目标和推理策略上的根本差异，使得现有方法不得不在长度预测能力、生成质量和编辑灵活性之间做出取舍。
 
 BAMM的动机正是打破这一范式壁垒：**能否设计一个统一的框架，在训练时同时学习单向和双向的令牌依赖关系，在推理时灵活组合两种解码策略，从而同时获得长度预测、高质量生成和零样本运动编辑三项能力？** 这一思路的核心洞见在于：通过混合注意力掩码策略，使同一个Transformer能够根据不同的因果掩码模式在自回归生成和掩码生成之间无缝切换，进而在推理阶段通过级联解码将两者的优势有机结合。
-
-
 
 ## 核心方法与创新机理
 
@@ -151,8 +147,6 @@ BAMM 的零样本运动编辑能力直接源于其双向因果掩码机制：将
 - 第二轮精炼中低置信度 token 的鉴别标准和掩码比例的敏感度未作详细消融。
 - RVQ 层数和码本大小对生成质量与推理速度的具体权衡关系需要进一步探索。
 
-
-
 BAMM 的整体框架由两个核心组件级联构成，形成“压缩—生成—精炼”的流水线。
 
 **运动分词器（Motion Tokenizer）** 作为流水线的前端，负责将原始 3D 人体运动序列压缩为离散令牌序列。该模块基于 VQ-VAE 架构预训练，通过编码器将运动 $\mathbf{M}$ 映射到隐空间嵌入 $\mathbf{z}$，再经可学习码本量化为离散编码 $\mathbf{c}$。训练目标为矢量量化损失：
@@ -171,12 +165,8 @@ $$\text{Attention} = \mathrm{Softmax}\left( \frac{Q K^T}{\sqrt{d_k}} + M \right)
 
 **推理时的数据流**采用双迭代级联解码策略（详见后续章节）：第一轮使用单向掩码自回归生成粗运动并隐式预测序列长度，第二轮使用双向掩码对低置信度令牌进行掩码重预测，实现质量精炼。整个流水线从文本描述出发，无需预设运动长度，端到端输出高质量 3D 运动序列。
 
-### 补充图表
-
 ![[assets/figures/papers/BAMM_Bidirectional_Autoregressive_Motion_Model_1dd6989b8f26/figures/003_Figure_2.jpg]]
 *Figure 2: Overall architecture of BAMM. (a) Motion Tokenizer encodes the raw motion sequence into discrete motion tokens according to a learned codebook. (b) Masked Self-attention Transformer learns to sequentially predict next tokens conditioned on text embedding from CLIP model and future unmasked tokens. Masked self-attention mechanism unifies autoregressive model and generative masked motion via bidirectional and unidirectional causal masks*
-
-
 
 BAMM 的生成能力建立在三个紧密协作的核心模块之上：**运动分词器**、**掩码自注意力变换器**和**残差细化变换器**。整个框架通过混合注意力掩码策略统一了自回归与掩码生成建模，并在推理时采用级联解码实现长度预测与质量精炼。
 
@@ -226,18 +216,11 @@ $$\ell_g = (1 + s) \cdot \ell_c - s \cdot \ell_u$$
 
 该机制使 BAMM 无需预设运动长度即可生成高质量运动，同时获得了零样本运动编辑能力——通过将待编辑区域视为掩码令牌，模型可基于周围上下文和文本描述进行预测。
 
-### 补充图表
-
-![[assets/figures/papers/BAMM_Bidirectional_Autoregressive_Motion_Model_1dd6989b8f26/figures/004_Figure_3.jpg]]
-*Figure 3: Inference: Dual-iteration Cascaded Motion Decoding. In the first iteration, autoregressive decoding is applied by adopting unidirectional causal mask to generate coarse-grained motion and predict motion sequence length. In the second iteration, bidirectional autoregressive decoding is performed via bidirectional causal mask to removing and repredicting low-confidence motion tokens autoregressively*
-
 ![[assets/figures/papers/BAMM_Bidirectional_Autoregressive_Motion_Model_1dd6989b8f26/figures/005_Figure_4.jpg]]
 *Figure 4: Residual Motion Refinement. The residual vector quantization encodes the raw motion sequence into multiple token sequences in different colors (left). The base token sequence from the first vector quantizer is generated via cascaded decoding by masked self-attention transformer. The base token sequence is used as the input of the refinement transformer to predict the residual token sequences from other quantizers. The combined sequences are fed into tokenizer’s decoder for motion generation. The refinement transformer shares the same architecture as the masked self-attention transformer with a full attention mask(right)*
 
 ![[assets/figures/papers/BAMM_Bidirectional_Autoregressive_Motion_Model_1dd6989b8f26/figures/018_Figure_11.jpg]]
 *Figure 11: Visualization of masking and conditional tokens for five temporal motion editing tasks: inpainting (in-betweening), outpainting, prefix, suffix, and long motion sequence. ■ indicates masked positions/areas*
-
-
 
 ## 实验与关键发现
 
@@ -283,8 +266,6 @@ Table 6报告了关键设计选择的消融结果，揭示了以下因果机制�
 
 此外，级联解码中的低置信度令牌选取标准、掩码比例等超参数仍需手动调优，其在不同数据分布下的最优设定尚未被系统研究。残差向量量化（RVQ）的层数和码本大小对生成质量与速度的精确权衡关系也值得进一步探索。
 
-### 补充图表
-
 ![[assets/figures/papers/BAMM_Bidirectional_Autoregressive_Motion_Model_1dd6989b8f26/figures/002_Table_1.jpg]]
 *Table 1: Comparison of quality and capability of generation on text-to-motion to state-of-the-art models on the largest text-to-motion dataset [16]. ‘✓’ means capability while ‘✗’ is not. "Predict Length" denotes the ability to generate motion without prior knowledge of motion length. "Input Length" refers to the ability to take input length as a constraint, while "Edit" indicates motion editability. Since MMM and MoMask require ground-truth motion length as input, we use predicted motion length from pretrained length estimator by [16]. The lowest FID score means the best overall quality of the generated motion, ensuring that its authenticity and naturalness is very close to the ground-truth human m...*
 
@@ -293,23 +274,6 @@ Table 6报告了关键设计选择的消融结果，揭示了以下因果机制�
 
 ![[assets/figures/papers/BAMM_Bidirectional_Autoregressive_Motion_Model_1dd6989b8f26/figures/013_Table_6.jpg]]
 *Table 6: Ablation Study*
-
-![[assets/figures/papers/BAMM_Bidirectional_Autoregressive_Motion_Model_1dd6989b8f26/figures/016_Table_7.jpg]]
-*Table 7: Comparison of text-conditional motion synthesis using different length samping stategies on HumanML3D [16] dataset*
-
-![[assets/figures/papers/BAMM_Bidirectional_Autoregressive_Motion_Model_1dd6989b8f26/figures/010_Figure_7.jpg]]
-*Figure 7: Visualization of temporal editing tasks, inpainting (in-betweening), outpainting, prefix, and suffix where blue indicates conditioned motion and red refers to generated parts*
-
-![[assets/figures/papers/BAMM_Bidirectional_Autoregressive_Motion_Model_1dd6989b8f26/figures/014_Figure_8.jpg]]
-*Figure 8: Generate motion with length constrain by input [END] as a condition and remove [END] output prediction*
-
-![[assets/figures/papers/BAMM_Bidirectional_Autoregressive_Motion_Model_1dd6989b8f26/figures/015_Figure_9.jpg]]
-*Figure 9: Histogram of motion token lengths. 1000 motions are generated for each textual description to calculate the estimated probability density of the token length. The corresponding lengths from the dataset HumanML3D [16] are called Real Length and highlighted in blue text. The length of motion is four times the token length*
-
-![[assets/figures/papers/BAMM_Bidirectional_Autoregressive_Motion_Model_1dd6989b8f26/figures/019_Figure_12.jpg]]
-*Figure 12: Visualization of Long Motion Sequence where blue frames represent individual motion segments prompted by textual descriptions. Red frames depict the intermediate transitions between these prompted segments, ensuring temporal coherence across the entire sequence*
-
-
 
 ## 定位与知识库关联
 
@@ -350,8 +314,6 @@ BAMM 与上述方法的本质差异不在于架构层面的颠覆，而在于**�
 **长序列生成的连贯性**：BAMM 支持通过拼接多个运动片段生成任意长的运动序列（Figure 12），片段间的过渡令牌由模型自动生成。然而，当片段间的语义差异较大或缺乏明确的过渡逻辑时，跨片段连贯性可能下降。是否可以通过额外的条件信号（如音乐节奏、场景上下文）来引导过渡生成，是一个值得探索的方向。
 
 **数据集偏差的潜在影响**：所有实验均在 HumanML3D 和 KIT-ML 上进行，这两个数据集以日常动作为主。BAMM 在更具挑战性的运动类型（如体育动作、舞蹈、交互式运动）上的泛化能力尚未得到验证。
-
-
 
 ## 原文 PDF
 

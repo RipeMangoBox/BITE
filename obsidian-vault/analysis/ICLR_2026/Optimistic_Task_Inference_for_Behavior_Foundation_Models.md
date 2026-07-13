@@ -53,8 +53,6 @@ claims:
 
 从方法谱系来看，OpTI-BFM 将 BFM 的任务推断从离线最小二乘投影（一次性闭式解）推进到在线自适应估计，建立了与线性 bandit 理论的直接联系，并提供了遗憾界（regret bound）的理论保障。与基于策略搜索的快速适应方法 **LoLA**（Sikchi et al., 2025）、基于随机网络蒸馏的无任务感知探索方法 **RND**（Burda et al., 2018）等基线相比，OpTI-BFM 在数据效率上具有显著优势，同时计算开销仅为 Oracle 推理的 4-5 倍（Nvidia RTX 4090 上 UCB 变体约 280 Hz，Thompson Sampling 变体约 360 Hz），仍在可接受范围内。
 
-
-
 ### 行为基础模型中的任务推断瓶颈
 
 行为基础模型（Behavior Foundation Models, BFM）通过预训练策略族，使智能体能够零样本泛化到新任务。其核心机制建立在**通用后继特征**（Universal Successor Features, USF）之上：对于特征函数 $\phi(s)$ 和任务嵌入 $z$，若奖励函数满足线性结构 $r(s) = z^{\top}\phi(s)$，则任意策略 $\pi$ 的 Q 函数可分解为任务嵌入与后继特征的线性积：
@@ -80,8 +78,6 @@ $$z_{r} = \mathrm{Cov}_{\mathcal{D}}(\phi)^{-1} \mathbb{E}_{s \sim \mathcal{D}}[
 
 本文的动机正是利用 USF 框架下奖励、特征与后继特征之间的线性关系，将上述挑战形式化为一个可处理的在线学习问题，从而设计出兼具理论保障和实用效率的在线任务推断算法。
 
-
-
 ## 核心方法与创新机理
 
 OpTI-BFM 的核心创新在于将行为基础模型（BFM）的任务推理从**离线一次性投影**转变为**在线交互式推断**，从而从根本上改变了数据来源与标注代价的结构。这一转变由三个紧密耦合的机制驱动：
@@ -97,8 +93,6 @@ OpTI-BFM 的核心创新在于将行为基础模型（BFM）的任务推理从**
 3.  **策略执行粒度的自适应调整**：离线方法在整个 episode 内固定任务嵌入。OpTI-BFM 将决策准则的更新频率从 episode 级提升到**每步自适应调整**，使算法能够在 episode 内部根据新观测持续修正对任务的信念。消融实验表明，每步更新比仅在 episode 开始更新收敛更快，尽管最终性能相当（Figure 4）。这一设计进一步压缩了任务识别所需的交互预算。
 
 上述三个 changed slots 共同构成了一个完整的因果闭环：USF 框架下奖励、特征与后继特征之间的线性关系（$Q_r^{\pi}(s_0, a_0) = z^{\top} \psi^{\pi}(s_0, a_0)$）将策略搜索简化为线性置信域上界问题，使得在线任务推理不仅可行，而且具备理论 regret 界保障。实验表明，OpTI-BFM 仅需 **5 个 episode（约 5k 环境步）** 即可恢复 Oracle 性能（Figure 2），远超离线方法所需的数据量，验证了在线乐观推断在标注效率上的决定性优势。
-
-
 
 OpTI-BFM 将行为基础模型（BFM）的任务推断从离线、依赖大量标注数据的范式，转变为**在线、主动的数据高效推断框架**。其核心思路是：利用 USF 框架下奖励函数与后继特征之间的线性结构，将策略搜索问题转化为线性置信域上界（UCB）优化问题，从而在交互中高效地逼近真实任务嵌入。
 
@@ -134,8 +128,6 @@ OpTI-BFM 的在线推断流程由三个紧密耦合的模块构成：
 
 - **Thompson Sampling 变体（OpTI-BFM-TS）**：从贝叶斯后验高斯分布 $\mathcal{N}(\hat{z}_t, V_t^{-1})$ 中采样任务嵌入，无需显式优化 UCB 目标，计算开销更低（约为 Oracle 的 4 倍 vs. 5 倍）。
 - **非平稳奖励变体**：引入遗忘因子 $\rho \in (0, 1]$，对历史数据指数加权（时刻 $s$ 的数据在时刻 $t$ 的权重为 $\rho^{t-s}$），使算法能适应奖励函数的漂移。
-
-
 
 OpTI-BFM 的核心机制建立在 USF 框架所揭示的线性结构之上：对于特征空间内的奖励函数，其 Q 函数可表示为目标嵌入与后继特征的线性内积。这一性质将原本复杂的策略搜索问题转化为对线性函数的在线优化，从而使得带理论保障的乐观探索成为可能。本节聚焦于构成该算法的三个关键模块及其数学表述。
 
@@ -173,8 +165,6 @@ $$\arg\max_{z \in \mathcal{C}_t} \psi(s_t, z)^{\top} \hat{z}_{t-1} + \beta_t \|\
 
 - **Thompson Sampling 变体（OpTI-BFM-TS）**：从贝叶斯后验高斯分布 $\mathcal{N}(\hat{z}_t, V_t^{-1})$ 中直接采样任务嵌入，避免了显式求解 UCB 优化问题，计算开销更低（约为 Oracle 的 4 倍，而 UCB 版本约为 5 倍）。
 - **非平稳奖励扩展**：引入遗忘因子 $\rho \in (0, 1]$，对历史观测进行指数加权（时间步 $s$ 的数据在 $t$ 时刻的权重为 $\rho^{t-s}$），使算法能够跟踪随时间变化的奖励函数。当 $\rho < 1$ 时，旧观测的影响逐渐衰减，算法获得适应非平稳任务的能力。
-
-
 
 ## 实验与关键发现
 
@@ -226,37 +216,15 @@ OpTI-BFM 的理论保障依赖于 USF 完美且奖励严格线性的假设。附
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_m5byThUSNE/figures/014_Figure_11.jpg]]
 *Figure 11: Performance of OpTI-BFM over 10 episodes in the Cheetah environment with a mismatch between ψ and ϕ (see Eq. (125)) of magnitude α. Performance deteriorates as α increases*
 
-![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_m5byThUSNE/figures/015_Figure_12.jpg]]
-*Figure 12: Return of the 10th episode of Oracle and OpTI-BFM in the Cheetah environment when artificially increasing or decreasing the projection error of the reward function onto ϕ through a learned network*
-
 ### 计算开销与实用性
 
 在 Nvidia RTX 4090 GPU 上，OpTI-BFM 的推理频率约为 280 Hz（UCB 版本）和 360 Hz（TS 版本），分别是纯策略执行（Oracle）的约 5 倍和 4 倍（表 1）。UCB 优化依赖随机射击，梯度变体（OpTI-BFM +grad）性能相当但计算成本更高（图 8、图 9），因此随机射击在效率与效果之间取得了良好平衡。对于大多数机器人控制场景，280 Hz 的决策频率已足够实时部署，但对延迟极度敏感的应用可能仍需权衡。
-
-![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_m5byThUSNE/figures/011_Figure_8.jpg]]
-*Figure 8: Relative performance after different # of environment interactions of OpTI-BFM and OpTI-BFM +grad; the latter is a variant that optimizes the USB objective through 8 gradient steps. Performances are similar; we report per-task results in Fig. 18 in Appendix C*
-
-![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_m5byThUSNE/figures/013_Figure_9.jpg]]
-*Figure 9: Performance and inference speed of OpTI-BFM, and a gradient-based variant (OpTI-BFM +grad). The performance gap is moderate, but the computational cost of the gradient-based variant is generally higher*
 
 ### 实验公平性说明
 
 - 所有实验在 3 个不同训练种子上完成，误差条/阴影区域为最小-最大区间。
 - OpTI-BFM 的超参数非常鲁棒，仅通过 3 个值的网格搜索即选定固定的 $\beta$ 或 $\sigma$。
 - LoLA 基线在与其原始论文相同的条件下（随机初始化任务嵌入）也表现出较慢的改进，与本文结果一致，排除了不公平实现的可能性。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_m5byThUSNE/figures/004_Figure.jpg]]
-*Figure: OpTI-BFM-TS (ours) OpTI-BFM-TS-EP (ours) OpTI-BFM (ours) OpTI-BFM-EP (ours)*
-
-![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_m5byThUSNE/figures/009_Figure.jpg]]
-*Figure: OpTI-BFM-TS ( = 0.0) OpTI-BFM ( = 0.0)*
-
-![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_m5byThUSNE/figures/012_Figure.jpg]]
-*Figure: (a) Absolute performance for different # of samples or gradient steps. OpTI-BFM+grad. OpTI-BFM (b) Inference speed in Hz for different # of samples or gradient steps*
-
-
 
 ## 定位与知识库关联
 
@@ -315,8 +283,6 @@ OpTI-BFM 的理论 regret 界（附录 A）直接建立在线性 bandit 的 UCB 
 4. **主动标注预算分配**：如何结合信息阈值 $κ$ 更智能地决定何时请求奖励标签（Figure 7），以在交互成本与标注成本之间取得更优权衡，是一个有实践价值的方向。
 
 5. **USF 质量的自适应感知**：当前算法对 USF 偏差的敏感度依赖实验评估，缺乏在线检测和自适应纠正 USF 误差的机制。
-
-
 
 ## 原文 PDF
 

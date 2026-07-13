@@ -327,8 +327,6 @@ Figure 5揭示了CHD相比FID的显著样本效率优势：CHD仅需约1,000张�
 
 Figure 2通过10级渐进失真实验（高斯噪声、块混洗等）定量验证了token分布对图像退化的敏感性：随着失真程度增加，CHD单调递增，且对不同失真类型均保持一致的响应模式。中间面板显示，仅少量“感知敏感token”的分布偏移即可有效捕获退化信号，解释了为何低维离散统计能高效反映感知质量变化。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l748_https_arxiv_org_abs_2603_08064/figures/002_Figure_2.jpg]]
 *Figure 2: Sensitivity of Token Distributions to Image Degradation. To demonstrate how our discrete token space captures perceptual degradations, we apply 10 levels of progressive distortion to a set of 1,000 images and analyze the resulting shifts in their token distributions. As the severity of distortions like Gaussian noise or block shuffling increases (left), a small subset of perceptually-sensitive tokens exhibits consistent and predictable shifts in their distribution (middle). Our Codebook Histogram Distance (CHD) effectively aggregates these subtle changes, showing a robust, monotonic increase with the degradation level across all distortion types (right)*
 

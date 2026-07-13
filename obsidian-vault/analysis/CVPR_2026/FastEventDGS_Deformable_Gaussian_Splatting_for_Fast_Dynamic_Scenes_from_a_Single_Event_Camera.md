@@ -57,8 +57,6 @@ claims:
 
 **局限与展望**：当前方法依赖已知相机位姿，实际部署需外部位姿估计系统，增加了系统复杂度。未来工作可探索位姿无关的重建技术，进一步提升事件相机在非受控环境中的适用性。
 
-
-
 事件相机是一种受生物启发的视觉传感器，它异步地检测每个像素的亮度变化，并以微秒级的时间分辨率输出事件流。与传统的基于帧的相机不同，事件相机天然具备高动态范围、低延迟和低带宽的特性，使其在高速运动场景中展现出巨大的潜力。然而，事件数据本身具有稀疏性、噪声大，且仅记录相对亮度变化而缺乏绝对强度信息，这使得从单一事件流中恢复出高保真的动态场景几何与外观成为一个极具挑战性的问题。
 
 近年来，以神经辐射场（NeRF）和3D高斯泼溅（3DGS）为代表的神经渲染技术，在新视角合成和静态场景重建上取得了瞩目的成果。研究者们进一步将此类方法扩展至动态场景，例如**D-NeRF**（Pumarola et al., CVPR 2021）通过引入变形场来建模非刚性运动，**Deformable 3DGS**（Yang et al., CVPR 2024）和**4D Gaussian Splatting**（Wu et al., CVPR 2024）则利用可变形的高斯基元实现了更高效的动态重建。尽管如此，这些方法的成功通常建立在密集、高信噪比的RGB图像输入之上，无法直接适配事件相机稀疏且异步的数据特性。
@@ -66,8 +64,6 @@ claims:
 在事件相机动态重建方向上，已有工作如**E-4DGS**（Feng et al., ACM MM 2025）和**STD-GS**（Zhou et al., ICCV 2025）进行了探索，但它们往往依赖于多传感器融合（如RGB帧与事件流联合）或多视图设置，这在一定程度上削弱了事件相机独立部署的便捷性。核心瓶颈在于：仅凭单一事件流，缺乏绝对强度信息所提供的强约束，模型极易在稀疏信号下产生过拟合，导致动态结构失真或几何坍塌。
 
 针对上述缺口，本文的动机在于：**利用事件数据中隐含的运动信息（如边缘移动），在无RGB帧的条件下，为可变形高斯的运动提供显式、可靠的监督**。通过将事件生成模型与连续相机轨迹参数化相结合，并引入基于事件边缘的局部运动约束和现成的深度估计先验，我们旨在构建一个仅依赖单事件相机的、高保真且快速的动态场景重建框架。
-
-
 
 ## 核心方法与创新机理
 
@@ -108,8 +104,6 @@ $$\mathcal{L}_m = \sum_i \sum_j \| \Delta I_j^{g_i} - \Delta I_{j+1}^{g_i} \|_1$
 
 FastEventDGS 的核心创新可归纳为：**以事件数据中隐含的运动与边缘信息为核心约束，通过连续轨迹插值、显式运动损失、多模态事件损失体系以及外部深度先验的协同作用，突破了单一事件相机动态重建的瓶颈**。该方法将输入模态从RGB帧彻底转向异步事件流，将运动监督从隐式学习转向显式事件边缘约束，将损失函数从单一渲染损失扩展为多层次事件驱动体系，构成了系统性的方法创新。
 
-
-
 FastEventDGS 的整体流程围绕“可变形3D高斯泼溅 + 连续相机轨迹 + 多层级事件约束”三个核心支柱构建，旨在从单一事件相机的异步事件流中恢复高保真的4D动态场景。图2给出了完整的框架概览。
 
 **输入与轨迹参数化**：系统接收单目事件流和稀疏的相机位姿序列作为输入。为了支持任意时间戳的事件监督，框架首先使用三次B样条将稀疏位姿拟合为一条连续时间轨迹，从而获得任意时刻的相机外参和内参。这一设计使得后续所有损失函数可以在事件发生的精确时间点上进行计算，避免了离散帧采样带来的时间对齐误差。
@@ -134,15 +128,11 @@ $$\mathcal { L } = \mathcal { L } _ { e } + \lambda _ { e f } \mathcal { L } _ {
 
 整个pipeline端到端可微，无需RGB帧或辅助传感器，仅依赖单一事件相机即可完成动态场景的重建与新视角合成。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l22_https_openaccess_thecvf_com_content_CVPR2026_html_Dai_FastEventDGS_Defor/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our proposed FastEventDGS. The framework takes a monocular event stream and its continuous camera pose trajectory (modeled via B-spline) as input. The core pipeline is built around Deformable Gaussian Splatting with a temporal dimension. Explicit motion guidance is derived by calculating the temporal motion loss*
 
 ![[assets/figures/papers/paper_list_l22_https_openaccess_thecvf_com_content_CVPR2026_html_Dai_FastEventDGS_Defor/figures/001_Figure_1.jpg]]
 *Figure 1: FastEventDGS is a novel framework built upon a state-of-the-art Deformable 3D Gaussian Splatting representation, achieving high-fidelity 4D dynamic scene reconstruction from a single event camera stream. This strong performance is attributable to the combined effect of the proposed motion constraint, depth constraint, and regularization term*
-
-
 
 FastEventDGS 的核心架构围绕可变形 3D 高斯泼溅（Deformable 3DGS）骨架展开，并通过四个关键模块注入事件数据的特有约束：**连续相机轨迹插值**、**事件光度与流光约束**、**局部块运动损失**，以及**深度校正与正则化**。各模块协同作用，使得系统在仅依赖单一事件相机异步流输入的条件下，仍能获得高质量的动态场景重建。
 
@@ -220,9 +210,6 @@ $$
 
 其中 $\Delta I_j^{g_i}$ 表示以高斯投影 $g_i$ 为中心的局部块内的事件积分。该损失强制高斯运动与事件边缘的移动保持一致，是缓解过拟合的关键机制（见 **Figure 3**）。
 
-![[assets/figures/papers/paper_list_l22_https_openaccess_thecvf_com_content_CVPR2026_html_Dai_FastEventDGS_Defor/figures/003_Figure_3.jpg]]
-*Figure 3: The illustration of our proposed motion loss. It ensures that individual 2D projections of Gaussians do not move far from the neighboring event edges over a short time period*
-
 ### 3.6 深度校正与正则化
 
 由于事件数据不提供绝对深度信息，系统利用现成的单目深度估计模型 VGGT 预测场景深度 $\hat{d}$，并通过尺度不变对数（SiLog）损失进行校正：
@@ -252,8 +239,6 @@ $$
 $$
 
 消融实验（**Table 3**）表明，深度损失 $\mathcal{L}_d$ 对性能提升贡献最大（PSNR 从 18.61 提升至 22.49），光流损失与运动损失贡献相近，正则化项则带来一致但较小的增益。
-
-
 
 ## 实验与关键发现
 
@@ -298,18 +283,8 @@ Figure 7 展示了深度重建的定性对比。引入 VGGT 深度监督后，�
 2. **极高速运动退化**：如运动速度消融所示，在 4× 速度条件下性能显著下降，事件数据的信噪比降低导致运动约束的有效性减弱。
 3. **真实世界噪声敏感性**：真实数据集中的拖尾事件噪声可能引入额外的不确定性，当前的正则化策略虽能部分缓解，但尚未从根本上解决噪声鲁棒性问题。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l22_https_openaccess_thecvf_com_content_CVPR2026_html_Dai_FastEventDGS_Defor/figures/007_Table_2.jpg]]
 *Table 2: Ablation study on the object motion speed*
-
-![[assets/figures/papers/paper_list_l22_https_openaccess_thecvf_com_content_CVPR2026_html_Dai_FastEventDGS_Defor/figures/008_Table_3.jpg]]
-*Table 3: Ablation study on the proposed loss components*
-
-![[assets/figures/papers/paper_list_l22_https_openaccess_thecvf_com_content_CVPR2026_html_Dai_FastEventDGS_Defor/figures/009_Figure_6.jpg]]
-*Figure 6: Comparison of different motion speeds*
-
-
 
 ## 定位与知识库关联
 
@@ -350,8 +325,6 @@ FastEventDGS 的方法论贡献可凝练为三个因果调节变量，它们共�
 - **多事件相机扩展**：当前方法仅支持单目设置。若扩展至多事件相机，如何融合不同视角的事件流并保持时间一致性，是一个值得探索的方向。
 
 - **与神经辐射场的深度融合**：FastEventDGS 选择了高斯泼溅作为底层表示，主要出于渲染效率的考量。但事件数据天然适合与基于物理的成像模型结合，未来工作可探索将事件生成模型更紧密地嵌入神经辐射场的优化过程中。
-
-
 
 ## 原文 PDF
 

@@ -71,8 +71,6 @@ Isaac Lab 并非从头构建物理引擎，而是在 NVIDIA Omniverse 生态之�
 
 > **注意**：部分 Sim-to-Real 结果来自引用工作，尚未在 Isaac Lab 内形成标准化基准，需结合原始论文进行交叉验证。
 
-
-
 机器人学习正经历从传统单一任务训练向大规模、多模态、通用策略学习的范式转变。这一趋势对仿真基础设施提出了前所未有的需求：研究人员需要在高保真物理模拟中并行运行成千上万个环境，同时获取包括视觉、深度、触觉和本体感知在内的多模态传感器数据，并通过强化学习或模仿学习训练复杂的神经网络策略。然而，现有的机器人仿真生态系统高度碎片化，难以同时满足这些需求。
 
 **现有方法的局限**。传统 CPU 仿真器（如 Gazebo、MuJoCo）虽然成熟稳定，但其串行计算架构在面对大规模并行学习时吞吐量严重不足。**Isaac Gym**（Makoviychuk et al., NeurIPS 2021）作为首个实现单 GPU 端到端 RL 训练的框架，显著提升了仿真效率，但其设计存在三个根本性缺陷：其一，场景描述依赖 URDF/SDF 等平面 XML 格式，缺乏层级化组合能力，难以表达复杂多机器人、多传感器场景；其二，仿真数据访问依赖原始缓冲区手动索引，编程复杂度高且易出错；其三，传感器模拟能力有限，仅支持基本的单帧相机渲染，无法满足多频、多模态感知学习的需求。
@@ -80,8 +78,6 @@ Isaac Lab 并非从头构建物理引擎，而是在 NVIDIA Omniverse 生态之�
 **核心瓶颈**。更深层的问题在于，机器人仿真生态缺乏一个统一的、模块化的平台来整合高性能物理、照片级渲染、多模态传感器模拟与学习流水线。研究者不得不在不同工具间进行繁琐的数据转换和接口适配，严重阻碍了从仿真到真实世界迁移的研究效率。此外，随着人形机器人、灵巧操作和全身控制等复杂任务的兴起，对仿真框架的扩展性和真实感提出了更高要求——这包括对闭环运动链的稳定模拟、对执行器延迟/摩擦等真实特性的建模、以及对多相机、LiDAR、视触觉等异构传感器的并行支持。
 
 **本文动机**。Isaac Lab 正是在这一背景下应运而生。其设计目标并非简单地在 Isaac Gym 基础上增量改进，而是从根本上重构机器人仿真框架的架构：以 **OpenUSD** 为核心统一场景表示，以 **GPU 原生并行物理（PhysX）与光追渲染（RTX）** 为计算底座，通过**模块化、可复用的管理器 API** 将最佳实践整合为单一可扩展平台。这一设计旨在大幅降低机器人学习研究的门槛，并提供从仿真到真实世界迁移的流畅路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -140,8 +136,6 @@ Isaac Gym 首次实现了单 GPU 上的端到端强化学习，但其数据访�
 
 Isaac Lab 的创新本质在于**将高性能 GPU 物理仿真、光追渲染、多模态传感器与模块化环境设计统一在 OpenUSD 框架下**，从而大幅降低机器人学习研究的工程门槛。其相对于 Isaac Gym 的关键提升在于：用声明式的 USD 场景描述替代命令式的缓冲区管理，用可组合的管理器 API 替代紧耦合的环境脚本，用统一的多频传感器接口替代分散的感知模块。这些变更共同构成了从“仿真工具”到“研究平台”的范式升级。
 
-
-
 Isaac Lab 的核心设计理念是将**高保真 GPU 并行物理仿真**、**照片级实时光追渲染**与**模块化、可组合的环境设计范式**统一在一个以 OpenUSD 为骨架的平台上，从而为多模态机器人学习提供从场景构建到策略部署的端到端流水线。整个框架的架构可以概括为“**场景描述—物理仿真—感知渲染—控制接口—任务编排—学习训练**”六个关键层次，各层之间通过 USD 场景图与 GPU 原生张量 API 实现高效的数据流转。
 
 ### 统一场景表示层：OpenUSD
@@ -193,12 +187,8 @@ Isaac Lab 提供了灵活的执行器建模框架，支持**隐式执行器**（
 
 当前流水线存在以下瓶颈：仿真参数（如摩擦系数、质量）仍需通过 CPU API 设置，无法在 GPU 上直接修改（Section 2.2）；主动传感器（如 LiDAR）与分块渲染的集成尚未实现（Section 2.3）；部分工作流中 CPU 瓶颈仍限制多核 GPU 上的吞吐量扩展（Section 4.1）。框架正在通过 **Newton 物理引擎**（Figure 34）和 **Isaac Lab - Arena** 评估平台（Figure 35）等方向持续演进。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2511_04831/figures/001_Figure_1.jpg]]
 *Figure 1: Isaac Lab supports diverse robotic applications with exteroceptive observation inputs. It provides a user-friendly API for experimentation and includes features to facilitate sim-to-real transfer. The framework also supports multiple learning paradigms, including reinforcement learning and imitation learning*
-
-
 
 ### 1. 模块化架构总览
 
@@ -253,8 +243,6 @@ $$FPS = \frac{\#\text{ of rendering steps}}{\text{simulation time}}$$
 - **分母**：仿真耗时
 
 该指标定义于 Section 4.2，专门衡量传感器（如相机）的更新频率。在相机实现对比中（Figure 17），TiledCamera 和 RayCasterCamera 可扩展至大量并行环境，而原始 USD 相机在 48 个相机时即导致 GPU 内存溢出。
-
-
 
 ## 实验与关键发现
 
@@ -318,8 +306,6 @@ Isaac Lab 的 sim-to-real 能力已在多个独立研究团队的平台上得到
 
 > **注意**：上述真实世界部署案例来自 Isaac Lab 的社区应用展示，其具体性能指标（如成功率、迁移误差）需查阅各引用论文原文进行手动验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2511_04831/figures/014_Figure_13.jpg]]
 *Figure 13: Log-scale throughput comparison for state-based manipulation tasks on three GPU platforms, including distributed training with two, four, and eight GPUs. These are shown for the Dexsuite task to grasp and lift an object and the Franka arm opening a cabinet drawer task*
 
@@ -331,13 +317,6 @@ Isaac Lab 的 sim-to-real 能力已在多个独立研究团队的平台上得到
 
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2511_04831/figures/020_Figure_19.jpg]]
 *Figure 19: Singh et al. (2024) train a student policy with stereo RGB images. (a) The stereo encoder uses a pre-trained ResNet-18 (with the last two layers removed) to encode each image independently into a highdimensional vector. Each vector is projected and split into 128 tokens. Tokens from both images, along with a learnable [embed] token, are passed into a two-layer transformer that performs cross-attention. The output from the [embed] token is processed through an MLP, producing the final stereo embedding vector. (b) The turquoise regions illustrate cross-attention between the tokens. Each image’s tokens attend to the other image’s tokens and the shared [embed] token, which attends to all tokens*
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2511_04831/figures/034_Figure_33.jpg]]
-*Figure 33: Newton supports multi-physics environments by coupling solvers specialized for different types of dynamics. Left: A Franka arm simulated using MuJoCo folds cloth simulated with Vertex Block Descent (VBD) solver(Chen et al., 2024). Right: An ANYmal robot simulated with PhysX maneuvers through a non-rigid terrain simulated with Material Point Method (MPM) solver(Daviet and Bertails-Descoubes, 2016)*
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2511_04831/figures/004_Table.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -392,8 +371,6 @@ Isaac Lab 本身已成为多个前沿研究的仿真基座：
 3. **多物理求解器耦合**：Newton 何时能实现 PhysX 与 MuJojo、MPM 等求解器的双向耦合，使单一场景中不同区域使用最优求解器？
 
 4. **标准化评估生态**：**Isaac Lab - Arena**（Figure 35）承诺提供可扩展的策略评估框架，但其开源时间表和基准覆盖范围尚未明确。这一生态的建立将是衡量框架社区影响力的关键指标。
-
-
 
 ## 原文 PDF
 

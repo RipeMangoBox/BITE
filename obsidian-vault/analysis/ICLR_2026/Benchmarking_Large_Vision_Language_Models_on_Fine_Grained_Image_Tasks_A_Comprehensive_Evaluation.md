@@ -48,11 +48,7 @@ claims:
 
 本文提出了一个名为 **FG-BMK** 的综合性基准，用于系统评估大规模视觉语言模型（Large Vision-Language Models, LVLMs）在细粒度图像任务上的表现。该基准包含 **101 万个问题** 和 **28 万张图像**，覆盖 12 个成熟的细粒度数据集。FG-BMK 设计了两种互补的评估范式：**人类导向评估**（Human-oriented Evaluation）通过对话式交互（真/假、多选、简答）测试模型对细粒度视觉查询的理解能力；**机器导向评估**（Machine-oriented Evaluation）通过图像检索（mAP）和图像分类（Top-1 准确率）直接评估视觉特征的表示能力。研究评估了 9 个开源 LVLM、2 个闭源模型（GPT-4o-1120, Gemini-2.0-flash）以及纯视觉模型 DINOv2。
 
-
-
 现有 LVLM 评估基准（如 LVLM-eHub, MMBench）主要关注通用视觉理解能力，缺乏对细粒度视觉任务（如区分同一属下的不同物种）的系统评估。细粒度视觉任务要求模型具备精细的视觉判别能力，这对 LVLM 的视觉编码器和跨模态对齐模块提出了更高要求。本文的核心动机是揭示 LVLM 在细粒度任务上的真实瓶颈，并探索影响其性能的关键因素。
-
-
 
 ## 核心方法与创新机理
 
@@ -62,9 +58,6 @@ claims:
 2. **揭示关键瓶颈**：通过系统性实验发现，LVLM 在细粒度任务上的主要瓶颈在于**视觉特征在跨模态对齐过程中细粒度判别能力的退化**，以及**训练数据中细粒度知识的分布不均**。
 3. **识别因果旋钮**：**对齐阶段的数据粒度一致性**（即图像-文本对中文本描述是否与图像中物体的细粒度类别匹配）是影响 LVLM 细粒度性能的关键可调控因素。
 4. **核心洞察**：对比学习范式（如 EVA-CLIP, DINOv2）比生成式或重建式范式更能保持视觉特征的细粒度判别性；视觉-文本对齐若存在粒度不匹配会损害细粒度判别能力；LVLM 在细粒度任务上仍落后于专用细粒度模型。
-
-
-
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_cVc74MLspe_Benchmarking_La/figures/001_Figure_1.jpg]]
 *Figure 1: Our proposed benchmark: The human-oriented evaluation tests the model’s ability to handle fine-grained visual queries (true/false, multiple-choice, short-answer), while the machine-oriented evaluation directly assesses visual feature representation through image retrieval and classification tasks. =true/false question, =multiple-choice question, =short-answer question*
@@ -81,8 +74,6 @@ FG-BMK 的整体框架如 **Figure 1** 所示，包含两个主要评估分支�
   - **鲁棒性**（Robustness）：通过特征扰动分析评估特征稳定性
 
 数据来源为 12 个成熟的细粒度数据集（**Table 6**），涵盖鸟类、狗、汽车、飞机、食物、花卉等多个元类别。
-
-
 
 ### 5.1 评估模型与训练策略
 
@@ -104,8 +95,6 @@ FG-BMK 的整体框架如 **Figure 1** 所示，包含两个主要评估分支�
 **跨元类别分类**（Cross Meta-class Classification）任务遵循 DINOv2 方法，在合并了不同数据集细粒度类别的统一训练集上训练模型，然后在每个单独数据集上测试。
 
 **特征鲁棒性**评估使用投影梯度下降（Projected Gradient Descent, Madry et al., 2018）对视觉特征引入扰动，分析其对分类准确率的影响。
-
-
 
 ## 实验与关键发现
 
@@ -160,12 +149,8 @@ FG-BMK 的整体框架如 **Figure 1** 所示，包含两个主要评估分支�
 | 编码器大小 | 从 B 到 L 仅提升 0.6%，从 L 到 G 仅提升 0.3% | Figure 9 |
 | 数据规模 | 2B 样本训练的 EVA-CLIP 未优于 142M 样本训练的 DINOv2 | Figure 7 |
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_cVc74MLspe_Benchmarking_La/figures/002_Table_1.jpg]]
 *Table 1: Training strategies of the open-source evaluated models. “DINOv2” is a purely visual model. “Con” denotes contrastive loss, “Gen” generative loss, “Mat” image-text matching loss, “Rec” reconstruction loss used in BEiT3, and “Dis” distillation loss used in DINOv2*
-
-
 
 ## 定位与知识库关联
 
@@ -193,8 +178,6 @@ FG-BMK 填补了现有 LVLM 评估基准（如 LVLM-eHub, MMBench）在细粒度
 4. LVLM 在细粒度属性识别（尤其是形状）上的根本限制是什么？是否可以通过专门的训练数据或模型架构改进来克服？
 5. 如何将细粒度专用模型（如 CAP）的优势融入 LVLM 框架中？
 6. LVLM 在细粒度任务上的鲁棒性不足是否可以通过对抗训练或其他正则化方法缓解？
-
-
 
 ## 原文 PDF
 

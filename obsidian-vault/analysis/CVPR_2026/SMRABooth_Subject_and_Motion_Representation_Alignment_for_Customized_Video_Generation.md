@@ -175,8 +175,6 @@ Figure 3 直观展示了上述流程：主体学习阶段，参考图像经 DINO
 ![[assets/figures/papers/paper_list_l2_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_SMRABooth_Subject_a/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of SMRABooth. The framework splits customized video generation into two stages: subject learning and motion learning. Subject learning aligns global spatial features from the vision encoder to enhance fidelity, while motion learning utilizes temporal motion representations from the optical flow encoder to guide motion generation. The pretrained video diffusion model remains frozen during training, and LoRAs are merged at inference to generate customized videos. For simplicity, text input is omitted from the figure. V* and S* are specific tokens used to represent subject and motion without intrinsic meanings*
 
-### 补充图表
-
 SMRABooth 的核心架构围绕两个对象级表征对齐模块和一个基于 LoRA 稀疏性的主体-运动解耦策略构建，整体框架如图 Figure 3 所示。预训练视频扩散模型（WAN2.1，DiT 架构）在训练期间保持冻结，仅通过低秩适配（LoRA）注入可学习参数。
 
 ### 3.1 预训练视频扩散骨干
@@ -280,8 +278,6 @@ Table 3通过控制变量法逐一移除各组件，量化每个设计选择的�
 4. **训练流程复杂度**：分阶段训练（先主体后运动）增加了超参数调整负担，$\lambda$和$\alpha$需分别调优，且两个阶段无法联合端到端优化。
 
 5. **高分辨率/长视频场景未验证**：当前实验固定于832×480分辨率、49帧、15 fps配置，更高分辨率（1080p）和更长视频（>100帧）下的计算开销和生成质量尚不明确。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_SMRABooth_Subject_a/figures/009_Table_3.jpg]]
 *Table 3: Quantitative ablation studies on each component*

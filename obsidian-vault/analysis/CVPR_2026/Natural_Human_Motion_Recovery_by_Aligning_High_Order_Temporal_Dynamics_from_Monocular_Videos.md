@@ -55,8 +55,6 @@ claims:
 - 与精炼基线相比，HTD-Refine 的抖动降低幅度（93.1%）显著优于 RoHM（70.4%）和轨迹滤波（73.9%）。
 - 消融实验证实，速度监督对高频稳定性至关重要（移除后脚滑动从 7.5 升至 8.8），加速度监督对运动连续性至关重要（移除后抖动从 6.6 升至 9.7），二者提供互补约束。
 
-
-
 从单目视频中恢复自然的人体运动是计算机视觉的核心挑战之一，在虚拟现实、数字人驱动、运动分析等领域有广泛应用。近年来，基于学习的全局人体网格恢复方法取得了显著进展，代表性工作包括 **TRAM**（Wang et al., ECCV 2024）、**GVHMR**（Shen et al., SIGGRAPH Asia 2024）和 **WHAM**（Shin et al., CVPR 2024）等。这些方法通常以逐帧方式估计相机空间的人体姿态和相机外参，再将其变换到世界空间，在关节位置精度上表现良好。
 
 然而，现有方法存在一个关键瓶颈：**它们缺乏对高阶时间动态（速度和加速度）的可靠建模**。由于逐帧估计忽略了帧间连续性约束，重建的运动往往表现出过度平滑或抖动伪影，即使关节位置的数值误差很小，运动的动态特性仍然不一致。Figure 1 直观地展示了这一问题——TRAM 在位置误差上表现良好，但其速度和加速度曲线与真实值存在明显偏差。
@@ -64,8 +62,6 @@ claims:
 这一瓶颈的根源在于，单目视频本身缺乏显式的速度和加速度线索。现有方法要么完全忽略这些高阶信息，要么仅通过隐式的时间平滑（如轨迹滤波）来缓解抖动，但无法从根本上恢复物理合理的运动动态。扩散模型（如 **RoHM**, Zhang et al., CVPR 2024）和神经运动场（如 **NeMF**, He et al., NeurIPS 2022）等精炼方法虽然尝试改善运动质量，但它们主要关注姿态本身的合理性，并未显式约束速度和加速度的一致性。
 
 本文的动机正是针对这一缺口：**如果能从视频中显式估计每关节的速度和加速度，并将其作为约束纳入全局优化，就有可能在保持关节位置精度的前提下，恢复自然、物理合理的人体运动动态。** 这一思路的核心洞察是：速度和加速度提供了互补的约束——速度调控相位一致的运动，加速度则稳定更高阶的动态，二者共同作用才能实现自然且物理可信的运动恢复。
-
-
 
 ## 核心方法与创新机理
 
@@ -91,8 +87,6 @@ HTD-Refine 的核心创新在于**显式估计并强制执行相机空间的高�
 -   **加速度监督**：约束运动的二阶连续性。移除加速度监督后，抖动（Jitter）从 6.6 增至 9.7，表明加速度对运动连续性至关重要。
 
 两者联合作用，使得优化后的运动在保持 2D 关键点投影精度的前提下，恢复自然、物理合理的高阶动态（Figure 1）。
-
-
 
 HTD-Refine 是一种即插即用的后处理框架，通过对齐显式估计的高阶时间动态来精细化现有 HMR 管线恢复的全局人体运动。其核心思路是：现有方法在关节位置精度上表现良好，但缺乏对速度和加速度的可靠约束，导致运动过度平滑或高频抖动。HTD-Refine 直接针对这一瓶颈，引入显式的速度和加速度监督，在保持位置精度的前提下恢复自然、物理合理的运动动态。
 
@@ -126,12 +120,8 @@ $$E(\theta_w, \boldsymbol{\tau}_w, \Gamma_w) = \lambda_V E_V + \lambda_A E_A + \
 
 在优化完成后，可根据预测速度计算静止概率 $p_s = \max(0, 1 - \|\mathbf{V}^t\|/\xi_v)$，对脚部（及手部）应用逆运动学锁定，目标关节位置由当前帧与下一帧按 $p_s$ 混合得到。该步骤可进一步减少脚滑动，但可能将偏差传播到其他关节，因此设为可选。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l957_https_openaccess_thecvf_com_content_CVPR2026_html_Wei_Natural_Human_Moti/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the HTD-Refine pipeline. Given an input video, our method proceeds in three stages. (a) Initialization. We first apply an off-the-shelf human mesh recovery model [29, 39] and a camera pose estimator [36, 39] to obtain per-frame camera-space human pose and camera extrinsics, which are then transformed into world coordinates. (b) Velocity and acceleration estimation. In addition to predicting per-joint 2D keypoint positions, our PVA-Net also outputs camera-space 3D joint velocities and accelerations that serve as high-order motion cues. (c) Motion optimization. We extract velocities and accelerations from the current global motion, impose losses against the PVA-Net predictions, an...*
-
-
 
 HTD-Refine 的核心由三个级联模块构成：**初始化**、**PVA-Net** 和**运动优化**。其设计哲学是“直接瞄准动态保真度，而非依赖隐式平滑或生成先验”。以下逐一剖析各模块的关键公式与变量含义。
 
@@ -233,10 +223,6 @@ $$\hat{\mathbf{J}}^t = p_s \mathbf{J}^t + (1 - p_s) \mathbf{J}^{t+1}$$
 
 该步骤作为可选后处理，可提升视觉质量，但可能将偏差传播到其他关节，故不作为默认配置。
 
-
-
-
-
 ## 实验与关键发现
 
 ### 实验设置与评估协议
@@ -278,9 +264,6 @@ Table 4 对比了 HTD-Refine 与专门的运动精炼方法。在 EMDB 上，HTD
 ![[assets/figures/papers/paper_list_l957_https_openaccess_thecvf_com_content_CVPR2026_html_Wei_Natural_Human_Moti/figures/008_Table_4.jpg]]
 *Table 4: Comparison with refinement baselines on EMDB*
 
-![[assets/figures/papers/paper_list_l957_https_openaccess_thecvf_com_content_CVPR2026_html_Wei_Natural_Human_Moti/figures/009_Table_5.jpg]]
-*Table 5: Comparison with refinement baselines on RICH*
-
 ### 消融实验
 
 Table 3 系统拆解了各模块的贡献：
@@ -298,15 +281,8 @@ Table 3 系统拆解了各模块的贡献：
 
 **脚部锁定的作用与局限。** 基于速度的静止概率脚部锁定（Sec. 3.3）可进一步提升视觉质量，但可能将 IK 偏差传播到其他关节，因此论文将其设为可选后处理步。消融中该模块的独立贡献需手动核实具体数值。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l957_https_openaccess_thecvf_com_content_CVPR2026_html_Wei_Natural_Human_Moti/figures/001_Figure_1.jpg]]
-*Figure 1: Comparison between TRAM and TRAM + HTD-Refine. TRAM achieves low position error but exhibits inconsistent high-order dynamics, while our refinement restores accurate velocities and accelerations, producing more natural motion*
-
 ![[assets/figures/papers/paper_list_l957_https_openaccess_thecvf_com_content_CVPR2026_html_Wei_Natural_Human_Moti/figures/005_Figure_4.jpg]]
 *Figure 4: Qualitative results on EMDB. Compared to TRAM [39], our method substantially reduces foot sliding and over-smoothing in world space, and preserves accurate camera-space poses that stay well aligned with the input video*
-
-
 
 ## 定位与知识库关联
 
@@ -364,8 +340,6 @@ HTD-Refine 与上述所有基线的根本分歧在于**对“运动质量”的�
 HTD-Refine 在人体运动恢复领域占据了**显式高阶动力学监督**这一此前未被充分探索的生态位。其核心贡献不是提出新的 HMR 架构，而是证明了一个可泛化的原则：**在优化层面显式强制执行速度和加速度一致性，可以在不牺牲位置精度的前提下恢复自然运动动态**。这一原则独立于具体的上游 HMR 方法选择，因此 HTD-Refine 更像是运动恢复流水线中的一个“动力学校准层”，而非传统意义上的独立方法。
 
 在方法演进脉络中，HTD-Refine 桥接了**纯几何优化**（依赖 2D 关键点和正则项）与**纯生成式精炼**（依赖扩散或 VAE 先验）之间的空白，提供了一种更直接、更可解释的动力学增强路径。其消融实验（Table 3）进一步揭示了速度监督和加速度监督的互补角色：速度约束主要抑制脚滑动（FS 7.5→8.8），加速度约束主要抑制抖动（Jitter 6.6→9.7），二者共同构成了从低频到高频的完整动力学覆盖。
-
-
 
 ## 原文 PDF
 

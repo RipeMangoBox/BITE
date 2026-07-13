@@ -62,15 +62,11 @@ FantasyVLN提出**“训练时多CoT，推理时无CoT”的隐式推理范式**
 
 FantasyVLN在方法谱系上处于**统一多模态推理导航**的交汇点：它继承了**Aux-Think**（Wang et al., NeurIPS 2025）的文本CoT推理思路和**Uni-NaVid**（Zhang et al., RSS 2025）的统一导航框架，但通过潜空间视觉CoT和跨模态对齐机制，首次实现了多模态CoT推理能力向实时动作映射的内化，避免了**CoT-VLA**（Zhao et al., CVPR 2025）等显式视觉CoT方法的推理延迟问题。其核心创新在于**将VLN的推理-执行范式从“生成-再决策”转变为“训练时内化-推理时直接映射”**，为实时推理密集型导航提供了新的技术路径。
 
-
-
 视觉与语言导航（VLN）要求智能体在真实环境中根据自然语言指令进行自主移动。随着任务场景从简单室内导航向多阶段、长程真实世界导航演进，智能体不仅需要理解指令的语义意图，还需具备对环境的细粒度视觉感知能力。这一需求催生了将思维链（Chain-of-Thought, CoT）推理引入VLN的研究方向——通过显式生成中间推理步骤，模型能够更好地进行语义规划和视觉感知，从而应对复杂导航任务。
 
 然而，现有VLN方法中的显式CoT推理面临两大核心瓶颈。其一，纯文本CoT方法（如**Aux-Think**，Wang et al., NeurIPS 2025）缺乏视觉感知能力，且容易过拟合稀疏标注的文本推理数据，导致在需要精细视觉判断的场景中表现不足。其二，多模态CoT方法在生成推理链时需要同时输出像素级未来视觉观察，导致严重的token膨胀——每步推理需生成超过3k–5k tokens，使实时导航变得不可行。例如，**CoT-VLA**（Zhao et al., CVPR 2025）和**WorldVLA**（Cen et al., arXiv 2025）等像素级视觉CoT方法虽然提升了推理能力，但推理延迟高达隐式方法的5倍以上，无法满足实际部署的实时性要求。此外，现有方法普遍缺乏跨模态推理的对齐机制，文本推理与视觉推理在表征空间中相互孤立，进一步限制了复杂长程任务的成功率。
 
 上述困境揭示了一个根本性的张力：显式CoT推理能增强导航能力，但代价是高昂的推理延迟；隐式动作映射速度快，却丧失了推理感知能力。本文的核心动机在于打破这一“推理能力–实时性”的权衡——能否让模型在训练阶段充分学习多模态CoT推理，而在推理阶段直接进行指令到动作的隐式映射，从而同时获得推理能力与实时性能？
-
-
 
 ## 核心方法与创新机理
 
@@ -137,8 +133,6 @@ Table 3 的消融实验证实，包含全部四种模式的统一框架在 SR �
 2. **数据规模未验证**：紧凑视觉 CoT 在大规模数据上的扩展行为未经验证，Figure 4 和 Figure 6 的结论可能受 LH-VLN 数据量限制。
 3. **训练范式单一**：当前仅采用监督微调，未探索强化学习等替代方案对多模态 CoT 推理能力的进一步增强潜力。
 
-
-
 FantasyVLN 提出了一套**统一的多模态思维链（CoT）推理框架**，其核心设计理念是“训练时多 CoT，推理时无 CoT”——在训练阶段联合学习文本、视觉、多模态及无 CoT 四种推理模式，而在推理时仅执行直接的动作映射，从而在保留推理感知能力的同时消除显式 CoT 带来的 token 膨胀与推理延迟。
 
 ### 框架总览
@@ -186,12 +180,8 @@ $$
 
 训练时，框架通过交替优化无 CoT 目标 $\mathcal{L}_{\mathrm{non-CoT}}$ 和跨模态对齐联合目标 $\mathcal{L}_{\mathrm{joint}}^{*} = \mathcal{L}_{\mathrm{align}} + \mathcal{L}_{\mathrm{CoT}}$，使模型在共享参数空间下学习到模态不变的推理表征。推理时，门控信号固定为 $(0, 0)$，模型仅执行直接的动作预测，无需生成任何显式 CoT token，从而实现**推理感知且实时**的导航——隐式推理的 APS（每秒动作数）约为 1.03，相比显式 CoT 方法（~0.2）提速约 5 倍（Table 2）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2167_https_openaccess_thecvf_com_content_CVPR2026_html_Zuo_FantasyVLN_Unified/figures/002_Figure_2.jpg]]
 *Figure 2: Unified multimodal Chain-of-Thought reasoning framework. Within a shared representation space, a single model supports four reasoning modes: (a) non-CoT reasoning for real-time inference, (b) textual CoT for semantic planning, (c) compact visual CoT for latent future imagination, and (d) multimodal CoT integrating both modalities. A flexible gating mechanism facilitates seamless transitions among the four modes, while an alignment constraint enforces representation consistency during training*
-
-
 
 ### 3.1 统一多模态CoT推理框架
 
@@ -242,15 +232,11 @@ $$\mathrm{APS} = \frac{N_{\mathrm{act}}}{T_{\mathrm{nav}}}$$
 
 其中 $N_{\mathrm{act}}$ 为导航过程中执行的总体动作数，$T_{\mathrm{nav}}$ 为总导航时间（秒）。隐式推理方法每步仅解码单个动作token，而显式CoT方法需输出数千token的中间推理步骤，导致APS差距约5倍（1.03 vs ~0.2，见Table 2）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2167_https_openaccess_thecvf_com_content_CVPR2026_html_Zuo_FantasyVLN_Unified/figures/001_Figure_1.jpg]]
 *Figure 1: Aligning semantic and visual reasoning. Complex real-world navigation tasks are typically multi-stage and long-horizon. Addressing them requires both textual and visual reasoning to jointly enhance semantic planning and visual perception. A critical challenge is how to effectively align these two distinct reasoning capabilities within a unified framework*
 
 ![[assets/figures/papers/paper_list_l2167_https_openaccess_thecvf_com_content_CVPR2026_html_Zuo_FantasyVLN_Unified/figures/007_Figure_3.jpg]]
 *Figure 3: Qualitative comparison of VAR reconstruction across latent scales. Coarse-to-fine reconstruction shows that early scales (1–4) capture the primary structural content of the images*
-
-
 
 ## 实验与关键发现
 
@@ -294,24 +280,8 @@ FantasyVLN 在长程视觉语言导航基准 LH-VLN 上全面刷新了记录。�
 
 这些局限为后续研究指明了方向：开发自适应 VAR 尺度选择机制以解锁多级视觉推理能力，以及引入强化学习利用环境反馈增强多模态 CoT 推理质量。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2167_https_openaccess_thecvf_com_content_CVPR2026_html_Zuo_FantasyVLN_Unified/figures/003_Table_3.jpg]]
 *Table 3: Comparison of navigation accuracy with different reasoning mode combinations on LH-VLN*
-
-![[assets/figures/papers/paper_list_l2167_https_openaccess_thecvf_com_content_CVPR2026_html_Zuo_FantasyVLN_Unified/figures/005_Table_4.jpg]]
-*Table 4: Performance comparison of SR, ISR, CSR, and CGT with and without cross-mode alignment*
-
-![[assets/figures/papers/paper_list_l2167_https_openaccess_thecvf_com_content_CVPR2026_html_Zuo_FantasyVLN_Unified/figures/009_Figure_4.jpg]]
-*Figure 4: ISR variation with respect to different VAR scales*
-
-![[assets/figures/papers/paper_list_l2167_https_openaccess_thecvf_com_content_CVPR2026_html_Zuo_FantasyVLN_Unified/figures/008_Figure_5.jpg]]
-*Figure 5: ISR variation with explicit and implicit CoT decoding*
-
-![[assets/figures/papers/paper_list_l2167_https_openaccess_thecvf_com_content_CVPR2026_html_Zuo_FantasyVLN_Unified/figures/010_Figure_6.jpg]]
-*Figure 6: Training efficiency comparison of visual CoT reasoning methods. FantasyVLN converges approximately 4.6x faster than WorldVLA*
-
-
 
 ## 定位与知识库关联
 
@@ -367,8 +337,6 @@ FantasyVLN 所处的 VLN 方法谱系可以从**推理显式化程度**和**模�
 - 将 FantasyVLN 的隐式推理范式扩展到 VLN 以外的具身任务（如操作、问答），验证跨任务迁移能力。
 - 探索在线学习场景下门控机制的动态调整策略，使模型能根据任务难度自适应选择推理深度。
 - 研究 VAR 潜空间的可解释性——潜码是否对应可解释的导航语义单元（如“走廊尽头”“左转路口”）？
-
-
 
 ## 原文 PDF
 

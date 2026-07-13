@@ -256,8 +256,6 @@ Table 4通过组件消融验证了各模块的贡献。关键发现如下：
 - **极端纹理退化**：当纹理图像遭受严重模糊或大尺度遮挡时，低频结构信息本身受损，LoFFA的增强效果有限，对应精度下降明显。此场景下需结合更强的空间先验或外部知识。
 - **跨类别泛化**：当前评估集中在PSC6K的有限类别上，该方法在更多样化类别和更大规模数据集上的泛化能力尚未充分验证，需进一步实验确认。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2629_https_openaccess_thecvf_com_content_CVPR2026_html_Zhu_When_Lines_Meet_Te/figures/005_Table_1.jpg]]
 *Table 1: Quantitative comparison with state-of-the-art methods on PSC6K datasets. ∗ indicates zero-shot methods. ‡ indicates supervised methods*
 

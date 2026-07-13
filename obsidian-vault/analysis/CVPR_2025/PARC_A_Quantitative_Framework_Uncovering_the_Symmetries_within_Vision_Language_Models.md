@@ -231,24 +231,11 @@ Figure 5进一步揭示了规模与数据的作用机制：**在同一模型家�
 3. **训练数据估计的不透明性**：Figure 5右图中训练数据量信息部分来自公开估计，不一定完全准确，影响“数据质量>数据量”这一结论的稳健性。
 4. **模型覆盖的时效性**：实验未包含最新的大规模指令微调VLM（如GPT-4V系列），模型列表的代表性存在局限。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2506_14808/figures/003_Figure_2.jpg]]
 *Figure 2: Reliability score in PARC. The plots visualize how accuracy and certainty are mapped to the reliability score. A reliability of 1 [blue] highlights a confidently correct model, while -1 [red] flags confidently incorrect models. [Left] Mapping for a balanced dataset like NYU-Depth V2 [57], where expected random accuracy is 0.5. [Right] Calibrated reliability scores for a c $c _ { \mathrm { r a n d } }$ = 0 . 2 7 , which represents MMBench [37]*
 
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2506_14808/figures/012_Figure.jpg]]
-*Figure: A6. Mapping from certainty and accuracy to reliability score with \operatorname { a c c } _ { \mathrm { r a n d } } = 0 . 5 \ : / L e f t J vs. uncertainty-aware accuracy UAcc with | \mathcal { P } | = 4 ~ / M i d d l e J and | \mathcal { P } | = 1 6 ~ / R i g h t J . . Our reliability score provides two guarantees (one for accuracy and one for certainty) that can be directly seen from any score except 0. Uacc provides at most one guarantee for either accuracy or certainty. Further, its maximum changes with the number of answers per prompt | { \mathcal { P } } | . , generating scores that are incomparable across datasets*
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2506_14808/figures/013_Figure.jpg]]
-
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2506_14808/figures/002_Table_1.jpg]]
 *Table 1: Prompt variations in PARC. Our VLM prompt variations alter language and vision through reformulations and semantic changes on comparative-style question [28]. Original question: “Which animal has longer fur? (A) Left (B) Right” with images shown above. Answer Change implies the expected answer changed compared to the original question. Prompt variation types: LR - Language Reformulation, LS - Language Semantic, VR - Vision Reformulation, VS - Vision Semantic. Variations: I - Instruction, C - Concise, V - Verbose, N - Negation, M - MoreLess, A - Antonyms, B - Blur, L - Lighting, R - Rotate, S - Swap, E - Exchange*
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2506_14808/figures/007_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2506_14808/figures/010_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2506_14808/figures/015_Table.jpg]]
 
 ## 定位与知识库关联
 

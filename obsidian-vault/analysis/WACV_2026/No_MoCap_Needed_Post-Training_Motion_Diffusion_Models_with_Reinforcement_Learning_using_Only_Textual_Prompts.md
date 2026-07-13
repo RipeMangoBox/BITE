@@ -52,8 +52,6 @@ claims:
 
 在跨数据集实验中，StableMoFusion经RL微调后在HumanML3D→KIT-ML任务上R@1从0.362提升至0.413，FID从1.860降至1.291；在KIT-ML→HumanML3D任务上R@1从0.327提升至0.391，FID从2.465降至1.799。留一法实验中，微调后模型在测试集上的FID改善至0.615（基线0.714），且超越全数据集训练模型。遗忘实验进一步表明，微调后模型在原数据分布上性能未退化，检索分数与FID均有轻微提升，呈现正反向迁移。
 
-
-
 ### 问题背景：运动扩散模型的泛化瓶颈
 
 基于扩散的文本驱动人体运动生成近年来取得了显著进展，预训练模型如 **MoMask**、**MotionGPT**、**StableMoFusion** 和 **MDM-SMPL** 在标准基准上展现了强大的生成能力。然而，这些模型面临一个关键瓶颈：**当遇到新的动作类别或与预训练数据分布差异较大的目标域时，其零样本泛化能力十分有限**。传统上，要使模型适配新域，通常需要依赖额外的运动捕捉（MoCap）数据对模型进行全参数重训练，这不仅成本高昂、数据获取困难，而且扩展性差——每遇到一个新域都需要重复这一昂贵流程。
@@ -74,8 +72,6 @@ claims:
 - **采用 DDPO（去噪扩散策略优化）对扩散策略进行微调**，结合重要性采样和 PPO 裁剪目标，在仅使用稀疏终端奖励的条件下有效优化生成分布，将其引导至目标域。
 
 通过这一框架，模型能够在保持原始分布性能的同时实现零样本域适配，从根本上绕过了对运动捕捉数据的依赖，为运动扩散模型的实际部署提供了一条低成本、高扩展性的路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -115,8 +111,6 @@ $$\mathcal{L}_{\mathrm{DDPO}}(\theta) = \mathbb{E}_t \left[ \sum_{t=0}^T \min\le
 
 该方法的核心洞察在于：**将生成分布转向目标域并不需要真实运动数据，仅需一个能够评判语义对齐质量的奖励模型即可引导扩散策略的优化方向**。这一思路绕过了数据采集瓶颈，为运动生成模型的零样本域适配提供了新的范式。
 
-
-
 本文提出一种基于强化学习的运动扩散模型后训练框架，其核心设计目标是在不依赖任何真实运动捕捉数据的前提下，仅利用文本提示将预训练模型适配到新的数据分布或未见动作类别。框架将扩散去噪过程形式化为马尔可夫决策过程（MDP），以预训练文本-运动检索模型（TMR）的语义相似度作为奖励信号，通过去噪扩散策略优化（DDPO）更新模型参数，同时引入LoRA低秩适配和DPM-Solver++加速采样以保障训练效率与稳定性。
 
 ### 两阶段闭环架构
@@ -153,12 +147,8 @@ $$\mathcal{L}_{\mathrm{DDPO}}(\theta) = \mathbb{E}_t \left[ \sum_{t=0}^T \min\le
 
 相较于冻结预训练模型直接进行零样本推理的基线方案（如 **MoMask**、**MotionGPT**、**StableMoFusion**、**MDM-SMPL**），本框架引入四个关键变更槽位：(1) 从冻结模型推理变为基于DDPO的RL微调；(2) 引入TMR余弦相似度作为奖励信号；(3) 从全模型微调或无训练变为仅优化LoRA适配器；(4) 从标准1000步DDPM采样变为DPM-Solver++的10步加速采样。这些设计共同实现了无需真实运动数据的零样本分布适配能力。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2510_06988/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of our fine-tuning procedure. Left: Sample Collection. Diffusion trajectories are generated from Gaussian noise conditioned on prompts sampled from the dataset. At each denoising step, the model outputs a normal distribution from which*
-
-
 
 本方法的核心架构由四个关键模块构成：**MDP形式化**、**DDPO策略优化**、**TMR奖励模型**和**高效学习策略**。以下逐一展开其公式推导与变量含义。
 
@@ -215,8 +205,6 @@ $$r(\mathbf{x}_0, \mathbf{c}) = \mathrm{sim}(\phi_{\mathrm{text}}(\mathbf{c}), \
 **LoRA低秩适配**：冻结预训练扩散骨干网络，仅在注意力层和MLP层插入可训练的低秩矩阵（秩 $r=4$，缩放因子 $\alpha=16$）。这大幅减少了可训练参数量，同时降低了RL训练的不稳定性。
 
 **DPM-Solver++加速采样**：将标准DDPM的1000步去噪替换为高阶ODE求解器 **DPM-Solver++**，仅需10步即可完成采样。这显著缩短了轨迹生成时间，使得RL训练在计算上可行。
-
-
 
 ## 实验与关键发现
 
@@ -282,15 +270,11 @@ RL 微调的一个常见风险是**灾难性遗忘**——适配新分布后，�
 2. **架构敏感性**：StableMoFusion（潜在空间扩散）的增益显著大于关节空间模型（MDM-SMPL），说明该框架对扩散模型的内部表征形式存在偏好。潜在空间中的去噪轨迹更平滑，使得 DDPO 的策略梯度估计更稳定。
 3. **多样性-对齐性权衡**：如前所述，当前奖励设计倾向于牺牲多样性换取对齐精度。在需要高多样性的应用场景（如创意内容生成）中，这一权衡可能成为瓶颈。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2510_06988/figures/003_Figure_2.jpg]]
 *Figure 2: Example of improved text adherence after our fine-tuning of the StableMoFusion model. The figure shows the full animation, with color indicating time from blue to orange. The first row depicts the model before fine-tuning, while the second row shows the model after fine-tuning. After fine-tuning, the generated motions better follow the textual prompts. In particular, in panels (b) and (c), the model fully completes the circular motion, and in panels (a) and (b), the hand movements are more expressive*
 
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2510_06988/figures/005_Figure_3.jpg]]
 *Figure 3: Perception study results: Human raters evaluated our method against pretrained baseline models in the Humanto-Kit scenario, assessing both motion realism and text adherence in an A/B scenario*
-
-
 
 ## 定位与知识库关联
 
@@ -336,8 +320,6 @@ $$\mathcal{L}_{\mathrm{DDPO}}(\theta) = \mathbb{E}_t \left[ \sum_{t=0}^T \min\le
 4. **奖励模型的自适应更新**：若允许TMR在微调过程中同步更新（如通过对抗训练或自监督目标），是否能突破其覆盖盲区，同时避免奖励黑客（reward hacking）问题？
 
 **证据强度说明**：跨数据集和留一法的定量改善有明确数值支撑（置信度0.95），但多样性下降的观察需查阅原文MultiModality指标的具体数值进行手动验证。用户感知研究（Figure 3）提供了主观评价维度的补充证据，但其统计显著性和实验规模需进一步确认。
-
-
 
 ## 原文 PDF
 

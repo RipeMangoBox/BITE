@@ -57,8 +57,6 @@ PRISM 提出**逐关节因子分解**的潜在空间，将每关节作为独立�
 
 PRISM 的局限性包括仅支持 SMPL-22 身体运动（不含手部和表情）、超长序列（>5 分钟）仍可能累积轨迹漂移，以及生成速度约 20 fps 尚不足以支持实时交互。
 
-
-
 ### 问题背景：从单段生成到流式人体运动合成
 
 人体运动生成是计算机视觉与图形学中的核心任务，旨在根据文本描述、姿态条件或序列动作标签合成自然、物理合理的人体运动序列。近年来，扩散模型和流匹配模型在该领域取得了显著进展，涌现出一批代表性工作：**MLD**（Chen et al., ICLR 2024）将潜在扩散模型引入运动生成，**MoMask**（Guo et al., CVPR 2024）采用掩码Transformer进行离散标记生成，**FlowMDM**（Dai et al., ECCV 2024）结合流匹配与混合位置编码，**ViMoGen**（Shi et al., arXiv 2025）则探索了大规模流匹配模型的潜力。
@@ -86,8 +84,6 @@ PRISM 的局限性包括仅支持 SMPL-22 身体运动（不含手部和表情�
 **因果逻辑3：自激励训练 → 抑制长序列漂移。** 在训练中模拟自回归推理管道，使用模型自身输出而非真实值作为历史条件，从根本上弥合训练-推理差距，使模型在远超训练片段长度的序列上保持稳定。
 
 这一设计哲学使得PRISM成为一个**单一模型、多种模式**的统一框架，无需任务特定的架构修改或后处理，即可在文本到动作、姿态条件生成、序列动作合成和叙事运动组合等任务上达到最优性能。
-
-
 
 ## 核心方法与创新机理
 
@@ -124,8 +120,6 @@ PRISM提出了一种极简但强大的条件注入机制：**为潜在网格中�
 **因果机制**：自激励训练在训练过程中，以一定概率将条件帧替换为模型自身的输出，迫使生成器学会在带有噪声的条件下进行去噪预测。这使得模型在推理时面对自身生成的历史帧时，具备更强的鲁棒性和漂移抑制能力。
 
 **证据强度**：消融实验（Table 7）表明，自激励训练在BABEL序列生成上取得了最佳的子序列FID（0.100）和最低的转换急动度（Area Under Jerk 0.44），显著优于教师强制和无激励方案。这证明**自激励是抑制长序列漂移、实现远超训练片段长度的流式生成的关键训练策略**。
-
-
 
 PRISM 的整体管道由两个紧耦合的模块构成：**因果逐关节因子化动作 VAE（Causal Joint-Factorized Motion VAE）** 和 **潜在流匹配 DiT 生成器（Flow-Matching DiT Generator）**，两者通过一个结构化的 2D 潜在网格进行桥接。
 
@@ -171,12 +165,8 @@ $$\mathcal{L}_{\mathrm{VAE}} = \lambda_{\mathrm{param}} \mathcal{L}_{\mathrm{par
 
 整个管道在 SMPL 参数空间生成，通过前向动力学转换为关节点位置用于评估，这与基线方法直接生成 HumanML3D 原生关节表示形成跨表示设定。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l86_https_arxiv_org_abs_2603_08590/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of PRISM. (a) A causal joint-factorized VAE compresses per-joint SMPL tokens into a structured 2D latent grid. (b) A flow-matching DiT denoises the grid with per-token timestep embeddings, unifying T2M, pose-conditioned generation, and autoregressive streaming via noise-free condition injection. Self-forcing suppresses drift over long rollouts*
-
-
 
 PRISM由两个紧密耦合的核心组件构成（图2）：**因果关节因子化运动VAE**（Causal Joint-Factorized Motion VAE）和**流匹配DiT生成器**（Flow-Matching DiT Generator）。两者通过结构化的2D潜在网格和每标记时间步嵌入实现无缝衔接，无需任务特定的架构修改即可统一文本到动作、姿态条件生成和自回归流式生成。
 
@@ -231,8 +221,6 @@ $$\mathcal{L}_{\mathrm{VAE}} = \lambda_{\mathrm{param}} \mathcal{L}_{\mathrm{par
 #### 叙事动作组合
 
 对于长时域叙事文本，PRISM引入**Motion-Aware Text Rewriter**将自由形式叙述分解为原子动作提示序列，然后通过自回归管道逐段生成，实现超训练片段长度的连贯动作合成。
-
-
 
 ## 实验与关键发现
 
@@ -300,39 +288,17 @@ Table 9报告了MBench的9维度评估结果，涵盖VLM-based（泛化性、条
 
 4. **评估体系局限**：VLM-based评估指标仍在开发中，当前可能无法完全反映感知质量。建立更鲁棒、更全面的评估体系仍是开放问题。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l86_https_arxiv_org_abs_2603_08590/figures/003_Table_1.jpg]]
-*Table 1: Text-to-motion on HumanML3D and MotionHub. All metrics are computed using our trained TMR features. “∗” denotes models retrained on the corresponding dataset. Bold: best; underline: second best*
-
-![[assets/figures/papers/paper_list_l86_https_arxiv_org_abs_2603_08590/figures/005_Table_2.jpg]]
-*Table 2: Pose-conditioned generation on HumanML3D and MotionHub. The model receives the first k frames as a noise-free condition together with a text prompt, and generates the remaining motion. All metrics are computed using our trained TMR features. Bold: best; underline: second best*
-
-![[assets/figures/papers/paper_list_l86_https_arxiv_org_abs_2603_08590/figures/006_Table_3.jpg]]
-*Table 3: Sequential action generation on BABEL [26]. “Subseq.” evaluates per-segment motion quality; “Trans.” evaluates the smoothness at segment boundaries (±15 frames)*
-
 ![[assets/figures/papers/paper_list_l86_https_arxiv_org_abs_2603_08590/figures/007_Table_4.jpg]]
 *Table 4: Motion tokenizer comparison on HumanML3D and MotionHub. Reconstruction quality measured by rFID, MPJPE, PA-MPJPE, and MPJRE. All tokenizers are paired with the same 200M DiT for a fair comparison of latent space quality. Bold: best; underline: second best*
 
 ![[assets/figures/papers/paper_list_l86_https_arxiv_org_abs_2603_08590/figures/008_Figure_4.jpg]]
 *Figure 4: Qualitative comparison on long-horizon narrative composition. PRISM follows all sub-actions with smooth transitions, while MotionStreamer misses several actions and exhibits drift*
 
-![[assets/figures/papers/paper_list_l86_https_arxiv_org_abs_2603_08590/figures/009_Table_5.jpg]]
-*Table 5: Causal vs. non-causal Motion VAE. Downstream generation quality on T2M (MotionHub), TP2M (HumanML3D, 1-frame), and BABEL sequential. Both variants share the same 1.4B DiT*
-
 ![[assets/figures/papers/paper_list_l86_https_arxiv_org_abs_2603_08590/figures/010_Table_7.jpg]]
 *Table 7: Autoregressive training strategy comparison on BABEL [26]. All variants share the same 1.4B DiT with noise-free condition injection*
 
-![[assets/figures/papers/paper_list_l86_https_arxiv_org_abs_2603_08590/figures/011_Table_6.jpg]]
-*Table 6: 2D vs. 1D latent space. Recon. and T2M gen. on MotionHub*
-
 ![[assets/figures/papers/paper_list_l86_https_arxiv_org_abs_2603_08590/figures/012_Table_8.jpg]]
 *Table 8: User study on narrative motion composition (GSB preference). Percentage of trials where PRISM is judged Good / Same / Bad vs. MotionStreamer, by 20 evaluators on 50 narrative prompts (1,000 judgments per dimension). Both methods use the same decomposition pipeline*
-
-![[assets/figures/papers/paper_list_l86_https_arxiv_org_abs_2603_08590/figures/013_Table_9.jpg]]
-*Table 9: Results on MBench [16]. MBench evaluates 9 dimensions across three pillars: VLM-based (generalizability, condition consistency), physics-based (jitter, dynamics, foot artifacts, ground penetration, body penetration), and distribution-based (pose quality). ↑ = higher is better; ↓ = lower is better. Scores are from the official MBench leaderboard except those marked with † (evaluated by us)*
-
-
 
 ## 定位与知识库关联
 
@@ -388,8 +354,6 @@ PRISM 通过四个关键设计槽位的改变，在运动生成的潜在空间�
 4. **评估体系鲁棒性**：VLM-based 评估指标仍在开发中，当前可能无法完全反映感知质量。如何建立更鲁棒、多维度的评估体系来捕捉运动生成的物理合理性、语义一致性和时序连贯性？
 
 5. **多模态条件扩展**：每标记时间步嵌入的框架天然支持多模态条件注入（如音乐、语音、场景上下文），如何有效利用这一灵活性进行跨模态运动生成？
-
-
 
 ## 原文 PDF
 

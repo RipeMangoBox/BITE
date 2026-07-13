@@ -69,8 +69,6 @@ Prox·E 属于**免训练的、基于代理表示引导的三维编辑方法**�
 
 **证据强度**：上述定量结果均来自论文报告的 Table 1、Table 2 和 Table 4，置信度 ≥ 0.95。用户研究的样本量和评估协议详见附录，赢率数据具有统计显著性。
 
-
-
 ### 问题背景：三维形状编辑中的细粒度控制困境
 
 三维形状编辑是计算机图形学与生成式建模交叉领域的一个核心问题，其目标是根据用户提供的文本或视觉指令，对给定的三维物体进行结构或外观的修改，同时保持物体其余部分的身份不变。近年来，随着二维图像生成模型（如扩散模型）的快速发展，一种主流的编辑范式逐渐形成：将三维物体渲染为多视图二维图像，利用强大的二维图像编辑器对渲染视图进行像素级修改，再将编辑后的图像作为条件信号馈入三维生成模型，以重建编辑后的三维形状。这一范式在一定程度上实现了外观编辑和语义级部件插入，但在面对需要精确几何推理的细粒度结构编辑时，暴露出根本性的能力缺口。
@@ -88,8 +86,6 @@ Prox·E 属于**免训练的、基于代理表示引导的三维编辑方法**�
 ### 方法定位与贡献预览
 
 Prox·E 是一个无需训练的（training-free）三维编辑框架，其核心创新在于将编辑过程分解为三个解耦的阶段：（1）基于基元抽象的VLM结构编辑；（2）代理诱导的去噪混合策略，将编辑约束注入三维扩散模型的潜空间；（3）基于二维图像编辑器的外观精修。这一设计使得Prox·E能够支持从全局/局部几何变换、参数化编辑、部件增删到风格化外观修改在内的广泛编辑类型（如 Figure 1 所示），同时在与现有基线的定量和定性比较中展现出显著的编辑保真度和身份保持能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -114,8 +110,6 @@ Prox·E引入基于超二次曲面（superquadrics）的基元抽象作为中间
 消融实验（Table 2）直接验证了上述创新点的有效性：去除编辑代理潜变量（w/o P_edit）虽获得最佳身份保持，但VQA编辑质量得分显著下降；仅使用编辑代理（P_edit only）则导致身份保持急剧恶化。三者混合（完整模型）在所有指标上达到最优平衡。外观精修模块的去除同样导致FID和视觉质量的一致下降。
 
 在ShapeTalk hard split上，Prox·E的VQA得分达到0.71，比最强基线TRELLIS（0.65）高出0.06（Table 1），这一差距在细粒度编辑任务中具有实质意义。用户研究进一步确认，人类评估者在编辑质量（86.6% win rate vs EditP23）和身份保持（86.3% win rate）两个维度上一致偏好Prox·E（Table 4）。
-
-
 
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_23774/figures/001_Figure_1.jpg]]
 *Figure 1: We introduce Prox·E, a training-free 3D editing framework that operates on a primitive-based geometric abstraction. By editing this proxy representation (second and bottom rows; edited primitives shown in blue, added ones shown in purple) and using it to guide 3D generation, Prox·E enables precise, fine-grained edits while preserving the object’s identity. As illustrated above, our method supports a wide range of text-guided edits, spanning global and localized geometric transformations (edits 1 and 2) including parametric edits (edits involving a numeric parameter, i.e. edit 2), addition and removal of object parts (edit 3), and stylistic appearance-based modifications (edit 4)*
@@ -156,8 +150,6 @@ Prox·E 是一个无需训练的 3D 编辑框架，其输入为一个三维形�
 - **结构引导策略**：不直接使用编辑后的图像条件化生成过程，而是通过代理诱导的混合策略将编辑约束注入扩散模型的潜变量空间，在保持身份与实现编辑之间取得平衡；
 - **结构-外观解耦**：将结构编辑与外观精修分离为两个阶段，使各自可以采用最优的工具（VLM 做几何推理，2D 编辑器做外观修改），避免了耦合方案中常见的几何-外观相互干扰问题。
 
-
-
 ### 基元抽象与VLM编辑
 
 Prox·E的核心创新在于将三维形状编辑转化为对显式几何基元的参数化操作。输入形状 $S_{orig}$ 首先通过 **SuperDec** 分解为一组超二次曲面（superquadrics），形成原始代理形状 $P_{orig}$。每个基元由尺度参数 $a_1, a_2, a_3$、形状指数 $\epsilon_1, \epsilon_2$，以及平移、旋转等仿射变换参数描述，其隐式曲面方程为：
@@ -195,8 +187,6 @@ $$v' = (M_{rel}^{(i)})^{-1} v$$
 ### 模块间的因果依赖
 
 上述三个模块形成严格的因果链条：基元抽象的粒度直接决定VLM可操作的编辑空间——若SuperDec将语义不同的部件合并为单一基元（如将椅腿与椅座合并），则后续编辑无法对其分别操作。代理编辑的准确性影响去噪混合的质量——错误的基元分类或变换参数会导致变形形状失真，进而使注入的潜变量携带错误的几何先验。外观精修则依赖于结构生成阶段产生的准确遮罩和变形映射，若结构编辑失败，外观混合将无法正确对齐特征。
-
-
 
 ## 实验与关键发现
 
@@ -251,27 +241,11 @@ Fig. 5展示了方法的主要局限性——编辑质量受限于初始基元�
 
 此外，VLM的空间推理能力和指令遵循能力存在局限。在90个随机样本中，出现2例代理编辑错误（Fig. 14），表现为VLM未能正确根据编辑指令修改代理参数。这些失败案例表明，方法对高性能VLM的依赖是当前的一个瓶颈，随着VLM能力的提升，这一局限性有望得到缓解。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_23774/figures/008_Figure.jpg]]
 
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_23774/figures/009_Figure.jpg]]
 
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_23774/figures/019_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_23774/figures/028_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_23774/figures/030_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_23774/figures/048_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_23774/figures/049_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_23774/figures/066_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_23774/figures/067_Figure.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -331,8 +305,6 @@ Prox·E的因果调控旋钮是**基元抽象**（primitive-based abstraction）
 4. **运行效率优化**：能否通过加速SLAT反向过程或减少VLM迭代次数来缩短运行时间？是否可能用更高效的潜变量编辑方法替代完整的扩散反向过程？
 
 5. **动态与交互式编辑**：如何将方法扩展到支持实时交互式编辑和动态场景编辑？
-
-
 
 ## 原文 PDF
 

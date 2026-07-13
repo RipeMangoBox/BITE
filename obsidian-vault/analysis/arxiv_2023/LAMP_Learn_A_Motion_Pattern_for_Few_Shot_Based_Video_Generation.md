@@ -163,8 +163,6 @@ $$
 
 > **证据强度说明**：第一帧条件化管道（confidence 0.95）与时间-空间运动学习层（confidence 0.95）均有明确的公式与消融实验支撑；共享噪声采样策略的消融证据稍弱（confidence 0.85），但仍可观察到明显的稳定性改善。复杂运动场景下的表现需要结合局限性部分综合评估。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1048_https_arxiv_org_abs_2310_10769/figures/002_Figure_2.jpg]]
 *Figure 2: Framework of LAMP. LAMP learns a motion pattern from a small video set, enabling the generation of videos imbued with the learned motion patterns. This approach strikes a balance between training resources and generation freedom in video generation. We transfer text-to-video generation to the first-frame generation and subsequent-frame prediction, i.e., decoupling a video’s contents and motions. During training, we add noise and compute loss functions for all frames except the first frame. Moreover, only the parameters of newly added layers and the query linear layers of self-attention blocks are tuned. During inference, we use a T2I model to generate the first frame. The tuned model only w...*
 

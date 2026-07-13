@@ -60,8 +60,6 @@ claims:
 
 值得注意的是，本方法的GPR预处理流程也进行了精细化设计，包含时零校正、去直流、水平噪声去除、均值道背景去除、针对根系直径调谐的带通FIR滤波、SEC增益、土壤介电常数校正以及基尔霍夫/f-k偏移共八个步骤，为下游检测网络提供了更高质量的信号输入。
 
-
-
 植物根系是陆地生态系统中最不易观测的器官，其三维构型直接决定水分与养分吸收效率，对作物育种、碳汇估算和生态建模均具有核心价值。然而，现有的根系表型测量手段长期陷入两难：**破坏性挖掘**（如根钻法、剖面法）可获得局部几何信息，却切断根系原生拓扑，无法追踪时变发育；**非破坏性成像**（如X射线CT、MRI）虽能保留三维结构，却受限于扫描体积小、成本高、难以在田间原位部署。探地雷达（Ground Penetrating Radar, GPR）提供了折中可能——通过向土壤发射高频电磁脉冲并接收来自介电常数差异界面的反射回波，可在不扰动土壤的前提下对地下根系进行大面积扫描。当GPR天线经过线状根系时，由于天线-根系垂直距离在正上方达到极小，反射波的走时曲线自然形成**双曲线形态**（Figure 2），这成为从B-scan图像中识别根系信号的关键物理先验。
 
 然而，从GPR数据到可用的三维根系模型之间，存在一条尚未被有效跨越的鸿沟。**瓶颈集中在两个串联环节**：
@@ -71,8 +69,6 @@ claims:
 2. **稀疏到稠密的三维重建断层**。即便成功检测到各B-scan切片中的双曲线顶点，将其沿扫描轨迹堆叠所得的初始点云仍是**极度稀疏且不规则的**——相邻切片间缺乏显式对应关系，根系分支的拓扑连续性在点云中表现为断裂的散点。现有三维点云重建方法（如Polis等人的迭代TIN生成、VAPCNet的视角感知补全、PointLLM-V2的大模型理解）或依赖密集输入，或面向通用物体补全，未针对根系这种细长分支结构的几何特性设计，导致重建结果丢失分支拓扑、表面细节模糊。
 
 **本文的核心动机**正是打通这两个瓶颈：利用GPR信号的双曲线形状先验，在2D检测端引入专门的曲线拟合监督，使网络不仅定位目标，还回归双曲线的顶点、曲率和弧长参数；在3D重建端，通过点图神经网络在非规则稀疏点上传播和强化局部几何特征，配合上采样模块恢复分支拓扑和表面细节，最终形成一套从GPR B-scan到稠密三维根系模型的完整非破坏式评估框架。
-
-
 
 ## 核心方法与创新机理
 
@@ -130,8 +126,6 @@ $$L_{\mathrm{recon}} = L_{\mathrm{coarse}} + w_{3} L_{\mathrm{fine}} + w_{4} L_{
 
 消融实验（Figure 11）揭示了各模块的因果贡献层级：**移除点图网络或上采样模块**造成的CD和EMD上升幅度，远大于移除注意力机制。这表明，对于稀疏根系点云重建任务而言，**图结构传播和上采样策略是保持点云正确性与根系完整性的首要因素**，注意力机制则起到精细化增强的辅助作用。同时，完整方法以仅20.98M的参数量（Table 3）在对比方法中实现了最小模型规模，验证了设计的轻量性。
 
-
-
 本文提出一种基于探地雷达（GPR）的植物根系非破坏式三维评估框架，以**两阶段级联管线**为核心：首先从GPR B-scan中检测根系产生的微弱双曲线反射信号并生成稀疏三维点云，随后通过点图神经网络从该稀疏点云中重建保留分支拓扑的稠密根系结构。
 
 ### 管线总览
@@ -168,15 +162,8 @@ $$L_{\mathrm{recon}} = L_{\mathrm{coarse}} + w_{3} L_{\mathrm{fine}} + w_{4} L_{
 
 检测模块的输出质量直接影响重建模块的输入条件。为公平评估重建性能，所有对比实验统一使用所提检测网络生成的稀疏点云作为输入，避免了检测质量差异对下游重建对比的干扰。消融实验进一步揭示，点图网络和上采样模块对保持点云结构完整性具有决定性作用——移除其中任一组件均会导致CD和EMD大幅上升，其影响程度超过移除注意力机制。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2650_https_openaccess_thecvf_com_content_CVPR2026_html_Zhou_Underground_Plant/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the proposed 3D root reconstruction pipeline utilizing GPR data. The system first detects hyperbolic root signals from GPR B-scans to generate a sparse 3D root point cloud (left), followed by interpolation techniques to reconstruct a dense and detailed root structure (right)*
-
-![[assets/figures/papers/paper_list_l2650_https_openaccess_thecvf_com_content_CVPR2026_html_Zhou_Underground_Plant/figures/002_Figure_2.jpg]]
-*Figure 2: Illustration of GPR signal acquisition for subsurface root detection. The system emits short electromagnetic pulses into the soil, capturing reflected echoes from buried targets. When the antenna is positioned directly over a root, the travel time and vertical distance to the target are minimized, generating a characteristic hyperbolic pattern in GPR B-scans*
-
-
 
 ### 2D根系双曲线检测模块
 
@@ -256,18 +243,8 @@ $$L_{\mathrm{recon}} = L_{\mathrm{coarse}} + w_{3} L_{\mathrm{fine}} + w_{4} L_{
 
 三项损失的联合优化使重建结果在全局形态、局部细节和点分布均匀性三个层面同时逼近真实根系结构。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2650_https_openaccess_thecvf_com_content_CVPR2026_html_Zhou_Underground_Plant/figures/005_Figure_4.jpg]]
-*Figure 4: Architecture of the hyperbola detection framework. The model utilizes a MobileNetV2-based backbone for multi-scale feature extraction, followed by a multi-task detection head that simultaneously predicts bounding boxes, classification confidence, and specific hyperbola geometry parameters*
-
 ![[assets/figures/papers/paper_list_l2650_https_openaccess_thecvf_com_content_CVPR2026_html_Zhou_Underground_Plant/figures/004_Figure_5.jpg]]
 *Figure 5: Pipeline for the 3D root reconstruction process. The graph will be built among the 3D points through a graph neural network and the branches will be connected and interprelated*
-
-![[assets/figures/papers/paper_list_l2650_https_openaccess_thecvf_com_content_CVPR2026_html_Zhou_Underground_Plant/figures/003_Figure_3.jpg]]
-*Figure 3: Comparison of GPR B-scans before and after preprocessing. Left: Raw GPR scan with substantial noise and signal distortion. Right: Enhanced scan after applying pre-processing techniques, improving root structure visibility and reducing environmental interference*
-
-
 
 ## 实验与关键发现
 
@@ -321,21 +298,8 @@ Table 3对比了各方法的参数量与推理速度。所提方法参数量仅*
 3. **数据集规模有限**：重建实验仅在5个测试根上进行，统计显著性不足；真实数据仅用于定性展示，缺少大规模野外验证。
 4. **细长结构断裂风险**：当根系分支极细或间距过近时，图网络的KNN构图可能跨分支连接，上采样可能产生虚假粘连，该边界条件未讨论。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2650_https_openaccess_thecvf_com_content_CVPR2026_html_Zhou_Underground_Plant/figures/010_Table_1.jpg]]
-*Table 1: Quantitative Comparisons of Root Target Detection Performance with [51], [14] and [6] on Simulated 2D GPR Images*
-
-![[assets/figures/papers/paper_list_l2650_https_openaccess_thecvf_com_content_CVPR2026_html_Zhou_Underground_Plant/figures/012_Table_2.jpg]]
-*Table 2: Quantitative point cloud reconstruction results. CD and EMD of different methods are reported. CD and EMD are both scaled by 100. The comparison is conducted and reported on five independent roots randomly selected from the test set. Lower values indicate better performance for both EMD and CD metrics*
-
 ![[assets/figures/papers/paper_list_l2650_https_openaccess_thecvf_com_content_CVPR2026_html_Zhou_Underground_Plant/figures/014_Figure_11.jpg]]
 *Figure 11: Ablation analysis results comparing point cloud reconstruction between our method and various ablated settings. CD and EMD are reported and multiplied by 100. Lower values indicate better performance for both metrics*
-
-![[assets/figures/papers/paper_list_l2650_https_openaccess_thecvf_com_content_CVPR2026_html_Zhou_Underground_Plant/figures/013_Table_3.jpg]]
-*Table 3: Comparisons of different methods in terms of the number of model parameters and inference speed (in seconds per sample)*
-
-
 
 ## 定位与知识库关联
 
@@ -396,8 +360,6 @@ $$L_{\mathrm{recon}} = L_{\mathrm{coarse}} + w_{3} L_{\mathrm{fine}} + w_{4} L_{
 4. **实时性约束**：点图网络与上采样模块的计算开销在移动平台或手持式GPR上的可行性未讨论，推理速度表部分数据缺失。
 
 5. **任务迁移潜力待验证**：该方法是否可迁移至其他细长目标的检测与重建（如地下管道裂缝、昆虫巢穴），尚需扩展研究。
-
-
 
 ## 原文 PDF
 

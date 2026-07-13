@@ -51,8 +51,6 @@ claims:
 
 实验结果显示，DISCO 在 DiverseHumans-TestPrompts 基准上将基线模型 FLUX-Dev 的**唯一人脸准确率（UFA）**从 48.2% 提升至 98.6%，**全局身份多样性（GIS）**从 50.5% 提升至 98.3%，计数准确率也提高了 21.6 个百分点。消融研究证实，图像内多样性奖励可改善 UFA 但会导致 GIS 崩溃，而加入群体多样性奖励后全局多样性得以恢复。人类偏好研究进一步验证了 UFA 指标与人类对身份多样性判断的完美相关性（1.0）。
 
-
-
 文本到图像生成领域近年来取得了显著进展，模型在单人物肖像生成上已能产出高度逼真的结果。然而，当提示词要求生成**多人场景**时，现有方法普遍面临严重的“身份危机”（Identity Crisis）——生成图像中的人脸出现重复、身份合并、计数错误等问题。图 1 直观展示了这一现象：初看之下图像质量尚可，但仔细观察即可发现多张人脸实为同一身份的复制品。
 
 这一问题的根源在于，当前主流文本到图像模型（如 **FLUX-Dev**、**SD3.5** 等）在训练过程中**缺乏对身份多样性的显式建模**。模型仅通过扩散或流匹配损失学习图像分布，并未被要求区分不同个体的面部特征。因此，当提示词中未明确指定每个人的具体属性时，模型倾向于生成高度相似甚至完全相同的人脸，导致图像内人脸重复（intra-image duplication）和跨样本身份复制（cross-sample identity repetition）。
@@ -62,8 +60,6 @@ claims:
 此外，多人场景还面临**计数准确性**的挑战。模型常常无法精确控制生成的人脸数量，导致实际人数与提示词要求不符。这一问题在人数超过 3-4 人时尤为突出（Figure 5），现有模型在 4 人阈值处出现显著的性能断崖。
 
 DISCO 的核心动机正是针对上述三个相互关联的瓶颈：**图像内身份重复、跨样本身份复制、以及计数错误**。通过引入基于强化学习的微调框架，DISCO 在生成过程中同时施加图像内多样性约束、群体间多样性约束和计数准确性约束，从根本上消除身份崩溃，同时保持图像感知质量。
-
-
 
 ## 核心方法与创新机理
 
@@ -105,8 +101,6 @@ $$p_t(n) = \begin{cases} p_{\mathrm{ann}}(n,t) & \text{if } t \le t_{\mathrm{cur
 
 DISCO 的组合奖励设计产生了显著效果：在 DiverseHumans-TestPrompts 基准上，DISCO(Flux) 的 Unique Face Accuracy 从基线 Flux-Dev 的 48.2% 跃升至 98.6%，Global Identity Spread 从 50.5% 提升至 98.3%，Count Accuracy 从 70.8% 提升至 92.4%（Table 1）。人类偏好研究进一步证实，UFA 指标与人类对身份多样性的判断相关性达到 1.0（Appendix E.1.6），验证了指标设计的有效性。
 
-
-
 DISCO 的整体训练流程围绕 **Flow-GRPO（流匹配组相对策略优化）** 构建，通过对预训练文本到图像模型进行强化学习微调，直接优化多人场景中的身份多样性。如图 3 所示，系统由四个核心模块串联构成闭环。
 
 **输入**：一个描述多人场景的文本提示 $c$，以及从课程学习调度器中采样的人数分布 $p_t(n)$。
@@ -128,15 +122,11 @@ DISCO 的整体训练流程围绕 **Flow-GRPO（流匹配组相对策略优化�
 
 整个框架的核心机制在于：**图像内多样性奖励解决单张图像中的人脸重复问题，群体多样性奖励通过跨样本反事实约束防止全局身份崩溃，计数和质量奖励则防止模型通过减少人脸数或降低质量来“奖励黑客”**。消融实验（Table 2）证实，逐步添加这四个组件可持续提升 Count Accuracy、UFA 和 GIS，缺一不可。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2340_https_arxiv_org_abs_2510_01399/figures/003_Figure_3.jpg]]
 *Figure 3: DISCO training overview. Our method fine-tunes text-to-image models using Flow-GRPO with a compositional reward. Given a prompt, the model generates a group of images evaluated by four components: (1) Intra-Image Diversity penalizes duplicate identities within images, (2) Group-wise Diversity promotes variation across the group, (3) Count Accuracy enforces correct person count, and (4) HPS Quality ensures prompt alignment and quality. The combined reward guides GRPO updates to improve identity diversity*
 
 ![[assets/figures/papers/paper_list_l2340_https_arxiv_org_abs_2510_01399/figures/002_Figure_2.jpg]]
 *Figure 2: DISCO enables better multi-human generation. (a) SOTA methods often produce duplicate or inconsistent faces, while (b) DISCO generates distinct, diverse identities. (c) Quantitative results show clear gains in Count Accuracy, Unique Face Accuracy, Identity Spread, and Overall quality(HPSv2 score)*
-
-
 
 DISCO 的核心架构围绕**Flow-GRPO 微调框架**展开，通过组合奖励函数引导流匹配模型学习身份多样性。整个训练管线包含四个关键模块，如 Figure 3 所示。
 
@@ -202,15 +192,11 @@ $$p_t(n) = \begin{cases} p_{\mathrm{ann}}(n,t) & \text{if } t \le t_{\mathrm{cur
 
 其中 $p_{\mathrm{ann}}(n,t)$ 为退火分布，$p_{\mathrm{uni}}(n)$ 为 $[2, N_{\max}]$ 上的均匀分布。消融实验证实课程学习对专家模型（Krea-Dev）尤其有效，简单集边界为 2-4 时在 UFA 和 GIS 之间取得最佳平衡（Table E.5）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2340_https_arxiv_org_abs_2510_01399/figures/010_Table.jpg]]
 *Table: E.3. Comparison of aggregation functions for intra-image diversity reward computation. Results show performance on Flux-Krea baseline. Blue represents the selected aggregation function*
 
 ![[assets/figures/papers/paper_list_l2340_https_arxiv_org_abs_2510_01399/figures/013_Table.jpg]]
 *Table: E.5. Ablation on curriculum simple-set bounds on Flux-Krea baseline. Blue row is the selected configuration*
-
-
 
 ## 实验与关键发现
 
@@ -277,30 +263,8 @@ DISCO(Flux) 的 **98.6% UFA** 和 **98.3% GIS** 表明，经过 GRPO 微调后�
 
 DISCO 的训练仅使用合成提示，未使用任何真实身份数据，训练数据覆盖多种族、多场景，有助于生成更包容的视觉内容。附录 Table E.1 进一步显示，DISCO 在不同多样性标签条件下（无标签、“多样化面孔”、单一种族、个体属性分配）均保持一致的性能优势，表明方法对不同多样性规格具有良好的泛化能力。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2340_https_arxiv_org_abs_2510_01399/figures/004_Table_1.jpg]]
-*Table 1: Multi-Human Generation Evaluation. Results with * are possibly misleading, as the same MLLM is being probed to perform Generation and act as a judge. Green scores indicate the highest results and Red scores indicate the lowest results*
-
 ![[assets/figures/papers/paper_list_l2340_https_arxiv_org_abs_2510_01399/figures/007_Table_2.jpg]]
 *Table 2: Ablation Study: Progressive Addition of DISCO Components on Flux-Krea baseline*
-
-![[assets/figures/papers/paper_list_l2340_https_arxiv_org_abs_2510_01399/figures/006_Figure.jpg]]
-*Figure: b) Count Accuracy*
-
-![[assets/figures/papers/paper_list_l2340_https_arxiv_org_abs_2510_01399/figures/012_Table.jpg]]
-*Table: E.4. RL vs. online SFT on Flux-Dev. DISCO outperforms the SFT baseline on identity diversity and perceptual quality, while converging significantly faster*
-
-![[assets/figures/papers/paper_list_l2340_https_arxiv_org_abs_2510_01399/figures/015_Figure.jpg]]
-*Figure: E.2. User preference study results. Each point represents one image from a pair, plotted by its mean and max pairwise cosine face similarity. Green points are the images humans collectively judged as more diverse (lower similarity); red points are the images they judged as less diverse. The two clusters separate naturally in the 2D metric space, confirming that mean and max cosine similarity jointly align with human perception of identity diversity*
-
-![[assets/figures/papers/paper_list_l2340_https_arxiv_org_abs_2510_01399/figures/008_Table.jpg]]
-*Table: E.1. Performance across diversity tags (D=1: No tag, D=2: ”Diverse faces”, D=3: Single ethnicity, D=4: Individual assignments). DisCo shows consistent improvements across all diversity specifications. Green scores indicate the highest results and Red scores indicate the lowest results*
-
-![[assets/figures/papers/paper_list_l2340_https_arxiv_org_abs_2510_01399/figures/009_Table.jpg]]
-*Table: E.2. Ablation study on reward weight parameters. Results are for DisCo(Flux-Dev). Each row shows the effect of different weight configurations on overall performance metrics. Our selected hyperparameter configuration is represented in the Blue row*
-
-
 
 ## 定位与知识库关联
 
@@ -354,8 +318,6 @@ DISCO 的方法论定位可从以下几个维度理解：
 4. **公平性与偏见。** 如何引入更显式的公平性约束（如人口统计平衡目标）以防止多样性优化过程中产生新的表征偏见？基础模型在不同种族、性别、年龄群体上的先验差异如何影响 DISCO 的优化结果？
 
 5. **效率与规模化。** 群体多样性奖励的计算复杂度随批次大小线性增长，在更大规模训练中如何保持计算效率？课程学习策略的退火参数是否需要在不同基础模型间重新调优？
-
-
 
 ## 原文 PDF
 

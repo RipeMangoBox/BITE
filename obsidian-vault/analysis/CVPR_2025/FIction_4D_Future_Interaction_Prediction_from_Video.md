@@ -49,8 +49,6 @@ FICTION 方法的核心洞察在于：人类的活动意图与所处环境中的
 
 在 Ego-Exo4D 数据集上，FICTION 在烹饪、自行车修理和健康三个场景的交互位置预测和姿态预测任务上均显著优于现有最佳方法，相对增益超过 30%。具体而言，在烹饪场景的位置预测中，FICTION 的 PR-AUC 达到 21.0，相比最佳基线 OCT 的 16.9 提升了 24.3%；在姿态预测中，相比最佳基线 T2M-GPT-FT，MPJPE 在烹饪场景降低 35mm（13.3%），在健康场景降低 49mm（22.2%）。消融实验进一步证实，移除三维环境上下文会导致位置预测性能急剧下降（烹饪场景 PR-AUC 从 21.0 降至 9.9），从而验证了环境建模在任务中的关键作用。
 
-
-
 人类在日常活动中持续与周围物体发生交互——制作奶茶时需要接触饮水机、炉灶、杯具，修理自行车时则需操作轮胎、扳手等工具。这种交互行为在空间上具有高度结构化特征：**交互发生的位置**（“在哪里”）与**交互时的身体姿态**（“如何交互”）紧密耦合于三维环境的物体布局。例如，取水时双手配合水龙头的高度，取高处橱柜物品时身体需伸展，这些姿态选择无法脱离场景上下文而被独立预测。
 
 然而，现有方法将交互预测问题局限于二维空间。代表性工作如**HierVL**采用自回归方式在2D视频帧上预测未来动作标签，**OCT**则通过2D热图预测交互热点再将其提升至3D空间。这些方法的核心瓶颈在于：**忽略持久性的3D场景上下文和物体布局**，导致无法准确预测长时间、多物体交互的位置与姿态。当活动涉及多个分散的交互目标且观察时间跨度较长时，缺乏环境约束的模型难以区分“人将走向冰箱”还是“走向橱柜”，更无法生成与物体高度、形状相匹配的合理人体姿态。
@@ -58,8 +56,6 @@ FICTION 方法的核心洞察在于：人类的活动意图与所处环境中的
 上述瓶颈催生了本文的核心动机：**人类的活动意图与环境中的物体布局紧密耦合，因此必须显式利用3D环境上下文来同时预测未来交互的“在哪里”和“如何”交互**。这要求模型不仅理解“人正在做什么”（从视频中捕捉），还需理解“环境中有什么、在哪里”（从3D场景表示中获取），并将两者融合以推断未来的交互时空分布。
 
 基于此，本文提出**FICTION**（**F**uture **I**nteraction Predi**cti**on from Vide**o** and 3D Scen**e** Co**n**text），将任务形式化为两个子问题：给定观察视频 $\mathcal{V}_{0:\tau_o}$ 和3D场景点云 $\mathcal{P}$，（1）预测所有未来交互发生的3D位置集合 $\mathcal{F}_o(\mathcal{V}_{0:\tau_o}, \mathcal{P})$；（2）对任意查询位置 $\mathbf{x}_{\tau_k}$，输出该处交互姿态的分布 $\mathcal{F}_p(\mathcal{V}_{0:\tau_o}, \mathcal{P}, \mathbf{x}_{\tau_k}) = \mathbb{P}(\theta, t)$，其中 $\theta$ 为SMPL姿态参数，$t$ 为全局位置。这一形式化首次将“位置预测”与“姿态预测”统一于3D环境条件下，填补了从2D视频理解到4D（3D空间+时间）交互预测的范式缺口。
-
-
 
 ## 核心方法与创新机理
 
@@ -80,8 +76,6 @@ FICTION 的核心创新在于将“未来交互预测”从传统的 2D 空间�
 ### 创新总结
 
 三个 changed slots 形成了一条完整的因果链条：**3D 环境建模 → 精确的 3D 交互位置预测 → 位置条件化的多模态姿态生成**。这一链条的核心洞察是：未来交互的“在哪里”和“如何”必须被联合建模，且 3D 场景上下文是连接二者的关键桥梁。消融实验中环境移除导致的性能崩溃，以及跨三个场景（Cooking、Bike Repair、Health）超过 30% 的相对增益，共同构成了这一创新的决定性证据。
-
-
 
 FICTION 的整体设计围绕一个核心命题展开：**未来交互的“在哪里”和“如何交互”必须耦合求解，且必须显式利用 3D 环境上下文**。为此，模型构建了一条从多模态输入到双任务输出的端到端预测管线，其架构如图 2 所示，可分为三个逻辑阶段。
 
@@ -125,15 +119,8 @@ $$w_S \| P - \hat{P} \|_2 + w_J \| J - \hat{J} \|_1 + KL\left( \mathcal{N}(\mu, 
 
 值得注意的是，位置预测与姿态预测共享同一个多模态编码器，但在解码阶段解耦——位置分支仅需 $\bar{r}$，而姿态分支额外需要查询位置作为条件。这种“共享编码、解耦解码”的设计使得两个任务可以相互促进，同时保持各自的预测灵活性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l24_FIction_4D_Future_Interaction_Prediction_from_Video/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the FICTION approach. The past observation information (video, pose, and environment) is encoded into a multimodal representation (left). The multimodal encoder L encodes the past observation, and is used to predict the interaction locations using a decoder (top right). We use the past observation encoding, along with the query location, to train a CVAE encoder decoder to generate a location-specific pose distribution conditioned on the past activity (bottom right)*
-
-![[assets/figures/papers/paper_list_l24_FIction_4D_Future_Interaction_Prediction_from_Video/figures/001_Figure_1.jpg]]
-*Figure 1: Future interaction prediction. When doing a procedure like making milk tea, a person moves around in their environment, interacting with different objects like water dispenser, stove, skillet holder, and cups. Each interaction has an associated body pose, e.g., using two hands when fetching water, extending the body to reach upper wall cabinets. Given an environment and the procedure till a time t, we predict all future object interactions (specifically, pooled over the next 3 mins) and the likely body poses during those object interactions. Best viewed in zoom. Only representative object bounding boxes shown for clarity*
-
-
 
 FICTION 的核心架构由三个功能模块构成：多模态编码与融合、交互位置预测、以及条件姿态生成。整个流程围绕一个关键设计展开——将 3D 场景上下文显式地注入到视频和人体姿态的表示学习中。
 
@@ -183,13 +170,6 @@ $$w_S \| P - \hat{P} \|_2 + w_J \| J - \hat{J} \|_1 + KL\left(\mathcal{N}(\mu, \
 
 $w_S$ 和 $w_J$ 为两项重建损失的权重。位置预测模块的 BCE 损失与 CVAE 损失联合优化，实现“在哪里交互”和“如何交互”的端到端学习。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l24_FIction_4D_Future_Interaction_Prediction_from_Video/figures/003_Figure_3.jpg]]
-*Figure 3: An interaction instance. We mark a timestamp as an interaction when the hands are within the 3D bounding box of an object referenced in the narration. An LLM is used to match the narration with the objects in the detector’s vocabulary, e.g., stove and gas burner*
-
-
-
 ## 实验与关键发现
 
 FICTION 在 Ego-Exo4D 数据集的三个场景（Cooking、Bike Repair、Health）上进行了全面的定量和定性评估。测试集的环境从未在训练中出现，确保跨场景泛化能力的公平评估。以下从交互位置预测、姿态预测、消融实验和定性分析四个维度展开。
@@ -197,9 +177,6 @@ FICTION 在 Ego-Exo4D 数据集的三个场景（Cooking、Bike Repair、Health�
 ### 交互位置预测
 
 Table 1（左）报告了未来交互位置预测的结果，指标包括 Precision-Recall AUC（PR-AUC）和 Chamfer Distance（Ch↓）。FICTION 在所有场景上均显著优于现有方法。在 Cooking 场景，FICTION 的 PR-AUC 达到 21.0，较最佳基线 **OCT** 的 16.9 提升 4.1 个绝对点（相对增益 24.3%）；Chamfer Distance 从 9.0 降至 7.4。在 Bike Repair 场景，PR-AUC 为 18.7（OCT 为 14.1），在 Health 场景同样保持领先。综合来看，FICTION 在 PR-AUC 上的相对增益超过 32%（绝对 4.6%），证明了将 3D 环境上下文显式融入预测框架的有效性。
-
-![[assets/figures/papers/paper_list_l24_FIction_4D_Future_Interaction_Prediction_from_Video/figures/005_Table_1.jpg]]
-*Table 1: Results of future interaction prediction. We show the results for both future interaction location prediction (left) and future interaction pose prediction (right) for three scenarios—cooking, bike repair, and health. We outperform all prior work on both the tasks in all scenarios. See text for details. (PR: precision-recall area under curve, Ch: chamfer distance, M: MPJPE, PA: PA-MPJPE.)*
 
 ### 姿态预测
 
@@ -228,9 +205,6 @@ Table 1（右）报告了未来交互姿态预测的结果，指标包括 MPJPE 
 
 - **学习率敏感度**：Table 4 展示了不同学习率对性能的影响，为超参数选择提供了实证依据。
 
-![[assets/figures/papers/paper_list_l24_FIction_4D_Future_Interaction_Prediction_from_Video/figures/009_Table_4.jpg]]
-*Table 4: Effect of learning rate on the performance*
-
 ### 定性分析
 
 Figure 4 展示了 FICTION 的定性预测结果。在 Cooking 场景中，模型根据观察到的自我中心视频，正确预测了未来交互位置——冰箱、水龙头、橱柜，且空间分布与真实活动流程一致。在 Bike Repair 场景中，若观察序列显示人物正在修理轮胎，模型预测轮胎将在后续阶段被安装到自行车上，空间位置发生合理迁移。Figure 5 进一步将 FICTION 与基线方法进行可视化比较，FICTION 的预测在交互位置的准确性和姿态的自然度上均明显优于基线。
@@ -248,8 +222,6 @@ Figure 4 展示了 FICTION 的定性预测结果。在 Cooking 场景中，模�
 1. **单人假设**：模型假设每个视频仅包含一个演员，无法显式处理多人协作或交互场景。
 2. **静态场景假设**：数据集构建时假设点云为静态，而实际环境中物体位置可能随时间变化（如移动椅子），这会导致交互位置预测的偏差。
 3. **数据集构建依赖**：交互实例的标注依赖 Detic 检测器、WHAM 姿态估计和 Llama 3.1 语言模型，这些上游模型的误差会传播至训练数据，影响模型质量。未来改进上游组件将有望进一步提升 FICTION 的性能。
-
-
 
 ## 定位与知识库关联
 
@@ -292,8 +264,6 @@ FICTION 将未来交互预测定义为一个双输出问题：给定过去 $\tau
 **流式与在线修正**：当前模型离线处理固定长度的观察窗口。在 AR 辅助等应用中，需要流式输入并随着新观测实时修正未来预测。这涉及时序模型架构的重新设计，以及预测置信度的在线估计。
 
 **更广泛的活动类型**：三个测试场景均为结构化程序性活动（有明确的步骤顺序）。对于非结构化活动（如自由玩耍、社交聚会），交互的定义和预测逻辑可能需要根本性调整——交互不再遵循固定程序，而是由社交线索和即时意图驱动。
-
-
 
 ## 原文 PDF
 

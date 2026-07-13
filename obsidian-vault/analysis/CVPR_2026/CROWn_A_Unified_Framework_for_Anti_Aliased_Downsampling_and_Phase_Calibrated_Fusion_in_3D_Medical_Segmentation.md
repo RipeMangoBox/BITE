@@ -54,8 +54,6 @@ CROWn（Coset-fibRated micrO-local co-attention Network）针对上述问题，�
 
 在15个公开基准上的系统实验表明，CROWn在所有数据集上均取得了最佳的IoU和Dice指标，并在各向异性队列和细粒度结构数据上展现出显著的边界连贯性提升。消融研究进一步证实，µPCAD在所有编码器阶段部署时带来最稳定的性能增益，且其抗混叠降采样策略优于SE、CBAM等经典模块；OCF的八相位分解、相位注意力和边缘门控对跳连接校准具有可加性贡献。CROWn以23.78M参数和199.58G FLOPs的可控计算成本，在CT、MRI、OCT等多模态上实现了跨域鲁棒的一致精细分割。
 
-
-
 三维医学图像分割是临床诊断与手术规划的核心技术。然而，医学影像数据普遍存在**各向异性体素间距**——CT扫描的层内分辨率通常远高于层间分辨率，MRI和OCT数据同样面临类似的非均匀采样问题。这种空间分辨率的异质性在U形分割网络中引发了两个深层瓶颈：
 
 1. **下采样混叠**：编码器中的步长卷积或池化操作在降采样时未进行显式抗混叠滤波，导致高频成分折叠为低频伪影，模糊了器官边界和细小结构的空间定位信息。
@@ -64,8 +62,6 @@ CROWn（Coset-fibRated micrO-local co-attention Network）针对上述问题，�
 现有U形网络——从经典的**3D U-Net** (Çiçek et al., MICCAI 2016)、**V-Net** (Milletari et al., 3DV 2016)，到基于Transformer的**UNETR** (Hatamizadeh et al., WACV 2022)、**SwinUNETR** (Hatamizadeh et al., MICCAI 2022)、**nnFormer** (Zhou et al., TIP 2023)，再到Mamba架构的**SegMamba** (Xing et al., MICCAI 2024)和ConvNeXt风格的**MedNeXt** (Roy et al., MICCAI 2023)——虽然在特征容量和感受野设计上持续演进，但均未显式控制降采样过程中的混叠注入，也未对跳连接的高分辨证据进行相位校准。这导致在各向异性强的数据集（如胰腺肿瘤、视网膜OCT层分割）上，边界模糊和拓扑不连贯的问题尤为突出。
 
 本文的核心动机在于：将**采样理论**（多相分析、陪集分解、微局部传输）与**深度表征学习**（交叉源协同注意力、相位注意力、边缘门控）相结合，从信号处理层面根本性地解决上述两个瓶颈。CROWn框架通过两个互补模块——µPCAD（抗混叠降采样）和OCF（相位校准融合）——在编码器下采样和跳连接两个关键接口上同时抑制混叠并保留边界相关的高频证据，从而在各向异性和异质扫描条件下实现一致精细的分割。
-
-
 
 ## 核心方法与创新机理
 
@@ -103,8 +99,6 @@ CROWn的核心创新在于将**采样理论与深度表征学习耦合**，针�
 
 **证据强度**：消融实验表明，µPCAD在所有编码器阶段均部署时带来最稳定的性能提升（Supplementary Table S2），且将其插入CNN、Transformer、ConvNeXt和Mamba等不同骨干网络后一致提升重叠和边界指标（Supplementary Table S3），验证了逐级抗混叠的必要性和跨架构通用性。OCF的八相位分解、相位注意力和边缘门控对跳连接校准具有可加性贡献（Table 4, Table 5），且带来更优的重叠-边界权衡。
 
-
-
 CROWn（Coset-fibRated micrO-local co-attention Network）是一个面向三维医学分割的统一框架，其核心设计动机源自一个被长期忽视的瓶颈：各向异性体素间距导致的下采样混叠与跨尺度特征相位失准，造成边界模糊和拓扑断裂。现有U形网络在下采样时普遍采用步长卷积或池化，未显式控制混叠注入；在跳连接中直接拼接高分辨率特征，缺乏相位对齐机制。CROWn通过将采样理论（多相分析、陪集分解）与深度表征学习（交叉源协同注意力、相位注意力、边沿门控）相结合，系统性地解决了这两个问题。
 
 框架由四个主要模块构成，沿编码器-解码器主干展开：
@@ -116,12 +110,8 @@ CROWn（Coset-fibRated micrO-local co-attention Network）是一个面向三维�
 
 整个pipeline的输入输出流清晰：输入三维医学影像（CT/MRI/OCT等）经编码器逐级下采样，每一级由µPCAD完成抗混叠降采样；对应尺度的跳连接特征经OCF进行相位校准后注入解码器；解码器逐级上采样并与校准特征融合，最终输出分割结果。该设计使得CROWn在保持可控计算量（23.78M参数，199.58G FLOPs）的前提下，实现了对各向异性和异质扫描条件下的一致精细分割。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2457_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_CROWn_A_Unified/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the proposed CROWn, included µPCAD and OCF. µPCAD performs axis-aware polyphase analysis and pooled–subband co-attention, then applies an explicit anti-alias low-pass to yield alias-suppressed, boundary-preserving features at lower scales. OCF anti-aliases the high-resolution skip, restructures it via 3D space-to-depth into eight cosets, applies phase attention with Sobeldriven edge gating, and aggregates with depthwise–pointwise convs to produce compact, phase-aligned, boundary-aware skips*
-
-
 
 CROWn 的核心由两个模块构成：**µPCAD**（微局部多相协同注意力降采样器）和 **OCF**（八相位陪集纤维化跳连接校准模块），分别解决编码器下采样中的混叠注入与跳连接跨尺度相位失准问题。
 
@@ -192,8 +182,6 @@ $$
 $$
 
 该形式将抗混叠滤波 $\mathcal{G} *$、陪集提升 $\mathrm{lift}_\pi$、相位注意力聚合 $\bigoplus_a$、边缘门控 $\Gamma \cdot$ 以及卷积整合 $\kappa \star$、$\mathbf{M}$、$\mathbf{N}_{\zeta}$ 统一为从跳连接源到解码器的纤维丛传输算子，从数学上保证了操作的相位等变性与边界保持特性。
-
-
 
 ## 实验与关键发现
 
@@ -271,20 +259,6 @@ CROWn总体参数量23.78M，FLOPs 199.58G（96×96×96输入），在保持可�
 ![[assets/figures/papers/paper_list_l2457_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_CROWn_A_Unified/figures/005_Table_4.jpg]]
 *Table 4: Comparison of OCF with classic modules*
 
-![[assets/figures/papers/paper_list_l2457_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_CROWn_A_Unified/figures/006_Table_3.jpg]]
-*Table 3: Axis-wise analysis about µPCAD*
-
-![[assets/figures/papers/paper_list_l2457_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_CROWn_A_Unified/figures/010_Table_5.jpg]]
-*Table 5: Phase anti-aliasing about OCF*
-
-![[assets/figures/papers/paper_list_l2457_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_CROWn_A_Unified/figures/007_Figure_3.jpg]]
-*Figure 3: Qualitative comparison of µPCAD on the OIMHS dataset*
-
-![[assets/figures/papers/paper_list_l2457_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_CROWn_A_Unified/figures/008_Figure_4.jpg]]
-*Figure 4: Qualitative comparison of OCF on the OIMHS dataset*
-
-
-
 ## 定位与知识库关联
 
 ### 核心创新定位
@@ -326,8 +300,6 @@ CROWn 在 15 个公开基准上与 17 个先进方法进行了系统对比（Tab
 - **测试时自适应**：能否通过 TTA 在线估计扫描仪的点扩散函数，并据此动态校准 µPCAD 的低通滤波器和 OCF 的相位注意力权重？
 
 - **拓扑引导的跳连接选择**：引入持久同源性等拓扑工具对跳连接进行筛选，是否会进一步提升管状结构（如血管、胆管）的分割连续性？
-
-
 
 ## 原文 PDF
 

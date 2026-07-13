@@ -55,8 +55,6 @@ claims:
 
 **局限性**：方法假设输入形状具有近似一致的朝向；完全亲和图的存储和查询成本随训练集大小平方增长（$O(N^2)$）；在极端非刚性变形或部分重叠匹配上的泛化性尚未充分验证。
 
-
-
 ### 问题背景
 
 三维形状匹配是计算机视觉与图形学中的基础问题，其目标是在两个或多个几何形状之间建立有意义的逐点对应关系。该问题在纹理迁移、三维重建、形状插值与统计形状分析等任务中扮演关键角色。形式化地，给定两个形状 $\boldsymbol{\mathcal{X}}^{(i)} = (\mathbf{V}^{(i)}, \mathbf{T}^{(i)})$ 和 $\boldsymbol{\mathcal{X}}^{(j)} = (\mathbf{V}^{(j)}, \mathbf{T}^{(j)})$，形状匹配的目标是寻找一个稀疏的分配矩阵 $\mathbf{\bar{I}}^{(i,j)} \in \{0,1\}^{\bar{m} \times n}$，使得对应点之间的几何结构尽可能保持一致。
@@ -86,8 +84,6 @@ claims:
 - **循环一致性训练**：引入循环一致性损失，强制多形状对应与成对注册之间的一致性，从而以自监督的方式将形状流形的全局结构注入模型训练。
 
 这种方法无需任何外部监督标注，完全依赖形状集合内部的几何冗余来提升匹配质量。在近等距匹配、拓扑噪声匹配和跨类泛化等多个具有挑战性的设定下，G-MSM 均展现出相对于现有方法的显著性能提升。
-
-
 
 ## 核心方法与创新机理
 
@@ -121,8 +117,6 @@ $$\ell := \mathbb{E}_{\mathcal{X}^{(i)},\mathcal{X}^{(j)}\sim\mathcal{S}}\biggl[
 
 值得注意的是，这一图先验机制具有架构无关性：Table 3 显示，即使替换特征提取器或匹配层，加入模块 III 仍能一致提升所有架构变体的性能，进一步验证了其作为通用几何先验注入机制的有效性。
 
-
-
 G-MSM 的整体流水线由三个核心模块串联构成，以形状集合 $\mathcal{S}=\{\boldsymbol{\mathcal{X}}^{(1)},\dots,\boldsymbol{\mathcal{X}}^{(N)}\}$ 为输入，在完全无监督的条件下输出多形状对应关系。流水线概览见 Figure 2。
 
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2212_02910/figures/002_Figure_2.jpg]]
@@ -152,12 +146,8 @@ $$\ell:=\mathbb{E}_{\boldsymbol{\mathcal{X}}^{(i)},\boldsymbol{\mathcal{X}}^{(j)
 **数据流与训练机制**  
 整个网络端到端训练。形状图 $\mathcal{G}$ 在训练过程中定期更新（每隔固定 epoch 数），以反映模型不断改进的成对匹配质量。这一设计使得图结构本身成为可演化的隐式先验——随着训练推进，亲和边权逐渐精准刻画形状流形的几何结构，进而通过最短路径传播将集合层面的冗余信息注入每个成对匹配的梯度信号中。值得注意的是，循环一致性损失仅在训练阶段发挥作用；测试时，多形状匹配的改善依赖于训练过程中习得的图结构先验。消融实验（Table 1 中 Ours vs Ours w/o III）证实，移除模块 III 在多个基准上导致性能显著下降，验证了该模块在整个流水线中的关键地位。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2212_02910/figures/001_Figure_1.jpg]]
 *Figure 1: For a given collection of 3D meshes $\{ \mathcal { X } ^ { ( i ) }$ | 1 $\leq$ i $\leq$ N $\}$ , (i) our method constructs, in a fully unsupervised manner, a shape graph G which approximates the underlying shape data manifold. (ii) Its edge weights (affinity scores) are derived from a putative pairwise correspondence loss signal. (iii) During training, we enforce cycle-consistency by propagating maps along shortest paths in the graph G. As shown for the sample pair above ( $\mathcal { X } ^ { ( 1 ) } , \hat { \mathcal { X } } ^ { ( 2 ) }$ ) , the resulting multi-matching $\mathbf { I I } ^ { ( 1 , 3 ) } \circ \mathbf { \hat { I } } ^ { ( \hat { 3 } , 2 ) }$ is significantly more accurate than the pairw...
-
-
 
 G-MSM 的整体流水线由三个可微分模块串联构成，端到端联合训练。以下按数据流顺序逐一展开。
 
@@ -258,8 +248,6 @@ $$
 
 消融实验（Table 1）表明，移除模块 III（即仅保留 $\ell_{\mathrm{match}}$ 训练）会导致性能显著下降——例如在 SCAPE 上误差从 1.8 升至 3.3——证实了图多匹配模块对整体性能的关键作用。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置与公平性
@@ -299,25 +287,14 @@ $$
 3. **领域泛化**：实验主要聚焦于人体和动物形状，对极端非刚性变形或部分重叠匹配的泛化性尚未充分验证。
 4. **图可靠性依赖**：循环一致性损失仅在训练时发挥作用；当测试形状与训练分布差异较大时，图边的亲合分值可能不准确，影响多形状匹配质量。
 
-### 补充图表
-
-
-
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2212_02910/figures/003_Table_1.jpg]]
 *Table 1: Nearly isometric matching. A quantitative comparison on four nearly-isometric human shape benchmarks, FAUST [5], SCAPE [1], SURREAL [60] and SHREC’19 [40]. Following prior work [15, 55, 56], we additionally show generalization results when training on FAUST and testing on SCAPE (F on S), and vice versa. We consider both standard, pairwise baselines [19,20,23,50,55,56] and multi-matching approaches [10, 25, 27]*
-
-
-
 
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2212_02910/figures/010_Table_2.jpg]]
 *Table 2: Graph topology comparison. We compare the quantitative performance of our model for different graph topologies G. Specifically, we revisit the experiment from Figure 3 and report the mean geodesic error on SHREC’Iso [16] and TOPKIDS [32]. The standard ‘full’ graph is compared to three sparse topologies ‘MST’, ‘TSP’, ‘star’ graph, as well as the ‘w/o III’ variant of our pipeline*
 
-
-
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2212_02910/figures/014_Table_4.jpg]]
 *Table 4: Empirical training cost. We quantify the computation cost of our pipeline for different training set sizes. For a given number of shapes N = ∣S∣, one epoch consists of #pairs $\mathbf { \bar { \Psi } } = N ^ { 2 } \in \hat { \{ 1 0 ^ { 2 } , . . . , 1 0 0 ^ { 2 } \} }$ optimization steps that each match a pair of shapes ${ \mathcal { X } } ^ { ( i ) } , { \mathcal { X } } ^ { ( j ) } \in$ S
-
-
 
 ## 定位与知识库关联
 
@@ -381,8 +358,6 @@ G-MSM 处于**无监督深度学习**与**多形状匹配**的交叉点，其核
 - **继承**：DiffusionNet（特征提取）和 DeepShells（成对匹配）作为基础组件。
 - **超越**：通过图多匹配模块和循环一致性损失，将独立成对匹配提升为拓扑感知的多形状联合学习，在拓扑噪声和跨类匹配等挑战性场景下取得显著提升。
 - **启发**：图先验的思想可推广至其他需要利用集合冗余的无监督学习任务，稀疏图拓扑的探索也为大规模应用提供了可行路径。
-
-
 
 ## 原文 PDF
 

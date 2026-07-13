@@ -71,8 +71,6 @@ claims:
 
 Gastric-X在医学VLM数据集中占据独特位置：与仅覆盖2D放射影像的MIMIC-CXR、仅提供VQA对的VQA-RAD等数据集相比，它首次在同一患者层面整合了多期3D体积影像、结构化化验数据和原始诊断报告。这使得Gastric-X不仅是评估VLM多模态融合能力的基准，也为未来跨模态循证推理研究提供了数据基础。
 
-
-
 ### 胃癌诊断的临床复杂性
 
 胃癌是全球第五大常见恶性肿瘤，其诊断高度依赖多模态信息的协同分析。在真实临床工作流中，医生不会仅凭单一影像做出判断，而是综合四期增强CT（平扫、动脉期、静脉期、平衡期）、内窥镜图像、结构化生化指标（如血常规、血清生化、肿瘤标志物）以及文本诊断报告，进行跨模态循证推理。这种多源证据的整合过程是准确分期和治疗决策的核心，但现有医学视觉语言模型（VLM）的数据集远未反映这一现实。
@@ -88,8 +86,6 @@ Table 1 的系统对比清晰地揭示了这一断层：在Gastric-X之前，没
 **根本瓶颈在于**：现有VLM无法获得反映真实诊断流程的训练和评估环境，导致模型在复杂临床推理任务上的能力无法被有效测量和提升。临床诊断本质上是多模态的——医生需要同时解读影像中的病灶形态、化验单中的异常指标和报告中的语义描述，而当前数据集过分简化了这种复杂性。
 
 **本文的核心动机**是构建一个模拟临床医生多源证据整合过程的数据集，使VLM能够在贴近真实诊疗场景的条件下进行训练和评估。Gastric-X通过整合四期CT、内窥镜、134项结构化生化指标和三种临床报告，并在患者级别对齐，填补了这一空白。该数据集包含1.7K病例、7.1K CT扫描和专家标注的3D边界框与分期信息，为多模态循证推理提供了迄今最全面的基准平台。
-
-
 
 ## 核心方法与创新机理
 
@@ -127,8 +123,6 @@ Gastric-X 最具说服力的创新贡献在于，它通过严格的消融实验�
 
 这种因果性验证直接回应了论文的核心洞察：**临床诊断本质上是多模态的，当前 VLM 数据集过分简化了这种复杂性，导致模型只依赖表面关联，无法进行真正的跨模态循证推理**。Gastric-X 通过数据集设计与消融实验，将这一假设转化为可量化的证据链。
 
-
-
 Gastric‑X 的工作流围绕“多模态临床数据对齐 → VLM 适配 → 多任务评估”三条主线展开，其核心设计目标是模拟临床医生同时审阅影像、化验和文本报告的真实诊断流程。
 
 ### 数据流与预处理管线
@@ -161,12 +155,8 @@ Gastric‑X 的工作流围绕“多模态临床数据对齐 → VLM 适配 → 
 
 适配后的 VLM 在同一基准上接受五项下游任务评估：视觉问答（VQA）、报告生成、跨模态检索、疾病分期分类和病灶检测。消融实验表明，逐步添加生化表格和边界框可使所有任务性能稳定提升，全模态配置（Image + Table + Bbox）始终达到最优，验证了多源证据整合对临床推理的增益效应。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2742_https_arxiv_org_abs_2603_19516/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the multi-modal information in proposed Gastric-X. The center panel shows a schematic gastric representation alongside an endoscopic image. The left panel presents examples of structured laboratory data (e.g., blood counts, serum biochemistry, and tumor markers) and clinical textual reports (diagnostic and CT reports) that reflect real-world radiological reasoning. The right panel illustrates multi-phase 3D CT scans (non-contrast, arterial, venous, and equilibrium phases) with multi-class lesion annotations, including tumor, perigastric carcinoma, and stomach regions*
-
-
 
 Gastric-X 的数据处理与模型适配管线由四个关键模块构成，分别解决多模态输入的标准化、结构化信息的语义化、视觉定位线索的注入以及医学知识的迁移。
 
@@ -198,12 +188,8 @@ $$lr = 5 \times 10^{-5}$$
 
 该学习率同时应用于视觉编码器、文本编码器及新增检索头的参数更新，未采用分层学习率策略。所有实验在此统一配置下进行微调，确保不同模态配置间的可比性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2742_https_arxiv_org_abs_2603_19516/figures/004_Figure_3.jpg]]
 *Figure 3: VLM adaptation. In adapting VLMs to our dataset, the visual encoder incorporates multi-phase CT inputs, while test tables, textual queries, and lesion-localization cues serve as complementary multimodal inputs guiding the model’s diagnostic reasoning. The VLMs must effectively adapt to these diverse input modalities to better capture and perform the targeted clinical tasks*
-
-
 
 ## 实验与关键发现
 
@@ -248,8 +234,6 @@ $$lr = 5 \times 10^{-5}$$
 3. **模态缺失鲁棒性**：当仅提供图像输入时，所有VLM性能均大幅下降，模型尚未学会在信息不完整时进行保守推理或主动请求补充信息。
 4. **规模限制**：实验仅在7B参数级别的VLM上进行，更大规模模型（如GPT-4V级别）在此基准上的潜力尚待验证——这既是当前工作的局限，也是Gastric-X作为评估基准的开放研究问题。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2742_https_arxiv_org_abs_2603_19516/figures/006_Table_2.jpg]]
 *Table 2: Performance across modalities for Vision Question Answer and report generation. We evaluate four input-modality settings, including Image Only and combinations that add Table, Bounding Box (BBox), or both. The best and second-best results in each column are shown in bold and underlined, respectively*
 
@@ -261,23 +245,6 @@ $$lr = 5 \times 10^{-5}$$
 
 ![[assets/figures/papers/paper_list_l2742_https_arxiv_org_abs_2603_19516/figures/003_Figure_2.jpg]]
 *Figure 2: Gastric-X Overview. (A) Overall stage distribution by gender (67.5% male, 32.5% female). (B) Distribution of 5 tumor markers on a logarithmic scale. (C) Overall distribution of CT slice lengths across 4 different phases. (D) Sankey diagram illustrating the transitions between T, N, and M stages and corresponding overall stages. (E) Histogram of tumor sizes with a cumulative percentage curve. (F) Word cloud summarizing the most frequent terms from radiology reports. Zoom in for better visualization*
-
-![[assets/figures/papers/paper_list_l2742_https_arxiv_org_abs_2603_19516/figures/007_Table_4.jpg]]
-*Table 4: Cross-modal retrieval. This table reports retrieval results in both Image-to-Text and Text-to-Image directions. Metrics include Recall@K (%, higher is better), Median Rank and Mean Rank (lower is better), and mean Average Precision (mAP). Bold and underlined numbers denote the best and second-best performance in each column*
-
-![[assets/figures/papers/paper_list_l2742_https_arxiv_org_abs_2603_19516/figures/008_Table_5.jpg]]
-*Table 5: Disease stage classification. For each configuration, we evaluate Precision, Recall, F1 score, and Area Under (AUC). These results show how integrating multimodal cues and medical-aware pretraining benefits fine-grained disease staging. Bold and underlined numbers indicate the best and second-best performance in each column*
-
-![[assets/figures/papers/paper_list_l2742_https_arxiv_org_abs_2603_19516/figures/009_Table_6.jpg]]
-*Table 6: Lesion detection. Metrics are Average Precision (AP) and F1. mAP denotes mean AP averaged over IoU thresholds from 0.50 to 0.95 (step 0.05), and localization accuracy (Loc. Acc.) is computed at IoU = 0.5*
-
-![[assets/figures/papers/paper_list_l2742_https_arxiv_org_abs_2603_19516/figures/010_Table_7.jpg]]
-*Table 7: Effectiveness of different prompting strategies for generating clinically valid VQA questions. Validity represents the percentage of Q/A pairs confirmed by both clinicians*
-
-![[assets/figures/papers/paper_list_l2742_https_arxiv_org_abs_2603_19516/figures/011_Table_8.jpg]]
-*Table 8: Full List of 134 Structured Biomedical Variables in the Gastric-X Dataset. De-identified is marked as ”De-ID”*
-
-
 
 ## 定位与知识库关联
 
@@ -327,8 +294,6 @@ Table 7的消融揭示了VQA问题设计的关键权衡：**病灶聚焦提示**
 - 显式跨模态注意力机制是否优于当前的特征拼接/文本注入式融合？
 - 在真实临床工作流中，VLM辅助诊断能否可测量地降低医生认知负荷并提高诊断一致性？
 - 更大规模VLM在此基准上的表现是否能涌现真正的临床推理能力，而非仅依赖表面统计关联？
-
-
 
 ## 原文 PDF
 

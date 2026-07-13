@@ -51,8 +51,6 @@ SyncMos 由两个关键组件构成：**高层事件规划器**（High-level Eve
 
 实验结果表明，SyncMos 在同步子集上的依赖准确率（DA）较基线最高提升 **21.5 个百分点**（68.4% → 89.9%），在抓取时序控制任务中，对于 ±0.5 s 的时间偏移，成功率可达 **88.0%** 和 **84.7%**，而基线方法 LINGO（Jiang et al., SIGGRAPH Asia 2024）在此设置下成功率为 0%。在 10 智能体的链式交互场景中，时序同步误差（TSE）保持稳定，无误差累积现象，验证了框架在多智能体扩展场景下的鲁棒性。
 
-
-
 多智能体场景交互生成是计算机视觉与图形学中的核心挑战，其目标是根据自然语言指令，生成多个虚拟角色在共享三维空间中协调一致的运动序列。这一任务在电影制作、游戏开发、虚拟现实及具身智能仿真中具有广泛的应用前景。
 
 当前的运动生成研究主要由扩散模型驱动，在单智能体条件下已取得显著进展。以 **LINGO**（Jiang et al., SIGGRAPH Asia 2024）为代表的单智能体扩散运动生成骨干，能够根据文本描述生成高质量的三维人体运动。然而，当场景从单个角色扩展至多个交互角色时，现有方法暴露出两个根本性瓶颈。
@@ -66,8 +64,6 @@ SyncMos 由两个关键组件构成：**高层事件规划器**（High-level Eve
 具体而言，SyncMos通过两级架构解决这一挑战：高层规划器将自由文本指令转化为包含顺序（Seq）与并行（Par）依赖关系的事件图，为多角色交互提供结构化的时序蓝图；低层控制器则在单智能体扩散模型的去噪过程中引入时间一致性约束，通过梯度引导的扩散后验采样实现跨智能体的运动时间对齐。这一设计使得框架本身与运动生成骨干解耦，具备天然的模型无关性和可替换性。
 
 本文围绕上述动机展开，后续章节将依次阐述高层事件规划器的设计、时间同步模块的机制，以及在不同规模交互场景下的实验验证。
-
-
 
 ## 核心方法与创新机理
 
@@ -103,8 +99,6 @@ SyncMos 将自然语言指令解析为**带有时序依赖的结构化事件图*
 
 这些创新共同使 SyncMos 在 10 智能体链式交互中保持时序同步误差（TSE）稳定、无误差累积（Figure 6），验证了框架的可扩展性。
 
-
-
 SyncMos 的整体架构遵循“高层规划—低层同步”的两阶段范式，旨在将自然语言指令转化为多智能体时空一致的运动序列。如图 1 所示，系统首先通过**高层事件规划器**（High-level Event Planner）将用户文本解析为带有显式时序依赖的结构化事件图；随后，**低层运动同步模块**（Low-level Motion Synchronisation Module）以该事件图为引导，对每个智能体并行生成初步运动估计，并通过时间扭曲与扩散后验采样实现跨智能体的精细时间对齐。
 
 ### 输入输出流
@@ -128,12 +122,8 @@ SyncMos 的整体架构遵循“高层规划—低层同步”的两阶段范式
 
 整体而言，SyncMos 通过将结构化事件规划与扩散后验采样相结合，首次在多智能体运动生成中实现了无需额外训练的时间同步与可扩展生成，其架构的模块化设计为后续纳入物理约束或更复杂的交互类型预留了明确的接口。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2279_https_openaccess_thecvf_com_content_CVPR2026_html_Li_SyncMos_Scalable_Mo/figures/001_Figure_1.jpg]]
 *Figure 1: Overall architecture. The framework first interprets the user’s input via a high-level planner, and low-level controller synchronizes the timing of each-character*
-
-
 
 SyncMos 围绕“高层事件规划 + 低层时间同步”两级架构展开，其核心模块可归纳为三个关键环节：**依存感知的故事规划器**、**自回归初步运动估计**，以及**时间引导的扩散后验细化**。以下从公式与机制层面逐一解析。
 
@@ -181,18 +171,11 @@ $$\mathbf { x _ { i - 1 } } = \mu _ { \theta } ( \mathbf { x _ { i } } , i ) - \
 
 上述三个模块形成清晰的因果链：事件依赖图（$G$）定义了“谁在何时做什么”的结构化约束 → 自回归初步估计在事件引导下生成各智能体的粗运动序列 → 时间引导细化利用 DPS 梯度约束消除跨智能体的时间错位。实验表明，该链路在 10 智能体链式交互中时序同步误差（TSE）保持稳定，无误差累积（Figure 6），验证了公式推导中梯度引导机制的有效性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2279_https_openaccess_thecvf_com_content_CVPR2026_html_Li_SyncMos_Scalable_Mo/figures/002_Figure_2.jpg]]
 *Figure 2: The high-level event planner overview. The high-level planner organizes dependencies while determining event locations*
 
 ![[assets/figures/papers/paper_list_l2279_https_openaccess_thecvf_com_content_CVPR2026_html_Li_SyncMos_Scalable_Mo/figures/003_Figure_3.jpg]]
 *Figure 3: The top-view grid provides a unified 2D spatial coordinate system for grounding instructions. The instruction “Amir hands over the bottle to Benjamin at grid (10, 18)” specifies an action location on the grid (left), which corresponds to the same position in the 3D scene (right). This grounding enables spatial consistency in later motion generation stages*
-
-![[assets/figures/papers/paper_list_l2279_https_openaccess_thecvf_com_content_CVPR2026_html_Li_SyncMos_Scalable_Mo/figures/004_Figure_4.jpg]]
-*Figure 4: The temporal synchronisation model produces preliminary motion estimates for each character, which are subsequently synchronised using temporally guided refinement*
-
-
 
 ## 实验与关键发现
 
@@ -230,11 +213,6 @@ SyncMos 的实验从两个维度展开：**高层规划器的能力**与**低层
 4. **2D 空间推理的局限**：俯视图网格表示（$g_i = (\mathtt{grid}_i, \mathsf{action}_i, \mathtt{hand\_target}_i)$）虽然统一了空间坐标系，但牺牲了精细的 3D 接触推理能力。
 5. **运动骨干依赖**：生成质量受限于 LINGO 模型的能力上限，但框架本身与模型无关，可替换为更强的单智能体运动生成器。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2279_https_openaccess_thecvf_com_content_CVPR2026_html_Li_SyncMos_Scalable_Mo/figures/005_Figure_5.jpg]]
-*Figure 5: Token usage vs. number of events for (a) Synchronisation and (b) Dependency scenarios, comparing Event-Driven Storytelling with our planner. Each point represents the total token usage per scenario*
-
 ![[assets/figures/papers/paper_list_l2279_https_openaccess_thecvf_com_content_CVPR2026_html_Li_SyncMos_Scalable_Mo/figures/006_Table_1.jpg]]
 *Table 1: Planner performance on Synchronisation and Dependency subsets across LLM backbones. Metrics: Event Coverage (EC), Dependency Accuracy (DA), Passed Scenarios (PS), and Scenario Pass Rate (SPR)*
 
@@ -243,11 +221,6 @@ SyncMos 的实验从两个维度展开：**高层规划器的能力**与**低层
 
 ![[assets/figures/papers/paper_list_l2279_https_openaccess_thecvf_com_content_CVPR2026_html_Li_SyncMos_Scalable_Mo/figures/008_Table_3.jpg]]
 *Table 3: Statistical Results of timewarp model under different temporal offsets (Frame Shift)*
-
-![[assets/figures/papers/paper_list_l2279_https_openaccess_thecvf_com_content_CVPR2026_html_Li_SyncMos_Scalable_Mo/figures/009_Figure_6.jpg]]
-*Figure 6: Multi-agent scalability across two scenes. We plot TSM, TSE, and CD metrics as the number of agents increases, with each row showing results from one scene*
-
-
 
 ## 定位与知识库关联
 
@@ -286,8 +259,6 @@ SyncMos 的适用边界由其设计选择与底层组件的固有限制共同定
 4. **物理与接触约束的整合。** 当前框架仅通过时序对齐来保证交互一致性，未显式建模物理约束（如接触力、穿透避免、质量分布）。将物理仿真或接触感知约束纳入同步细化过程，有望进一步提升交互的真实感和物理合理性。
 
 5. **运动时长可变性的支持。** 当前时间扭曲机制仅能在固定时长内进行重分配，无法根据交互需求动态调整运动总时长。支持可变时长生成的同步机制将是提升框架灵活性的重要方向。
-
-
 
 ## 原文 PDF
 

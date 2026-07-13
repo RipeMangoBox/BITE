@@ -53,8 +53,6 @@ claims:
 
 PixelDiT 在方法谱系中处于**像素空间扩散模型**与**纯Transformer生成架构**的交汇点，其双层级设计为端到端高分辨率图像生成开辟了新路径，挑战了“潜在空间压缩是高效扩散建模必要条件”的既有范式。
 
-
-
 ### 像素空间扩散模型的核心瓶颈
 
 扩散模型已成为视觉生成的主流范式，但现有高性能方法几乎全部依赖潜在扩散模型（Latent Diffusion Models, LDMs）。这类模型通过预训练自编码器将图像压缩至低维潜在空间，在潜在空间执行扩散过程，再解码回像素空间。这一设计带来了两个根本性问题：
@@ -86,8 +84,6 @@ PixelDiT的出发点是回答一个根本性问题：**能否设计一种端到�
 
 PixelDiT通过双层级Transformer设计、像素级自适应层归一化（Pixel-wise AdaLN）和像素token压缩（Pixel Token Compaction）三项核心创新，系统性地回应了上述挑战，首次证明了端到端像素空间扩散模型可以在ImageNet 256×256上达到gFID 1.61的竞争力水平，并在文本到图像生成中超越SDXL等潜在模型。
 
-
-
 ## 核心方法与创新机理
 
 PixelDiT 的核心创新在于通过**双层级 Transformer 架构**将图像生成任务解耦为粗粒度语义规划与细粒度像素级优化，并设计了**像素级自适应层归一化（Pixel-wise AdaLN）**与**像素 Token 压缩（Pixel Token Compaction）**两种关键技术，使得端到端像素空间扩散模型能够在兼顾高质量纹理细节的同时保持训练效率。以下从架构组织、条件调制策略和序列长度管理三个维度展开分析。
@@ -115,8 +111,6 @@ $$\Theta = \Phi(s_{\text{cond}}) \in \mathbb{R}^{(B \cdot L) \times p^2 \times 6
 ### 创新总结
 
 PixelDiT 的三个 changed slots 构成了一个相互依赖的创新体系：双层级架构提供了语义-纹理解耦的结构基础，像素级 AdaLN 为纹理细化提供了精确的条件调制，像素 Token 压缩则使整个系统在计算上可行。三者的协同使得 PixelDiT 成为首个在不使用预训练自编码器的情况下，在 ImageNet 256×256 上达到 gFID 1.61（Table 1）的像素空间扩散模型，显著超越了同类像素空间方法（如 ADM-U 的 4.59、PixelFlow-XL 的 1.98）。
-
-
 
 PixelDiT 是一种**单阶段、端到端的像素空间扩散模型**，完全摒弃了预训练自编码器，直接在原始像素空间执行去噪过程。其核心设计理念是将图像生成任务解耦为**粗粒度语义规划**与**细粒度像素级优化**两个阶段，通过双层级 Transformer 架构实现高效建模。
 
@@ -163,8 +157,6 @@ $$\mathcal{L}_{\text{diff}} = \mathbb{E}_{t,x,\varepsilon}\left[ \| f_\theta(x_t
 ![[assets/figures/papers/paper_list_l2073_https_arxiv_org_abs_2511_20645/figures/015_Figure_7.jpg]]
 *Figure 7: | T2I architecture of PixelDiT with MM-DiT blocks on the patch-level pathway. The pixel-level pathway performs dense per-pixel modeling conditioned on semantic tokens*
 
-
-
 PixelDiT 的核心设计围绕一个**双层级 Transformer 架构**展开，将图像生成任务解耦为粗粒度的语义规划与细粒度的像素级纹理优化。该架构由四个关键模块协同构成：Patch-level DiT、Pixel-level DiT (PiT)、像素级自适应层归一化（Pixel-wise AdaLN）和像素 Token 压缩机制（Pixel Token Compaction）。
 
 ### 3.1 双层级架构与 Patch Token 投影
@@ -207,13 +199,6 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{diff}} + \lambda_{\mathrm{repa}} \mathcal{L
 
 其中 $\lambda_{\mathrm{repa}} = 0.5$。消融实验证实，移除 REPA 损失会导致 gFID 从 2.36 骤升至 6.58（80 epoch），训练稳定性显著下降（Table 11）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2073_https_arxiv_org_abs_2511_20645/figures/003_Figure_3.jpg]]
-*Figure 3: | AdaLN modulation strategies. (A) A naive AdaLN broadcasts a global conditioning vector to all pixels. (B) Patch-wise AdaLN expands semantic tokens to the*
-
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -227,9 +212,6 @@ PixelDiT在类别条件生成和文本到图像生成两个维度上均展现出
 *Table 2: | Quantitative comparison on ImageNet 512×512*
 
 在文本到图像生成任务上，PixelDiT-T2I在1024×1024分辨率下达到 **GenEval 0.74** 和 **DPG-Bench 83.5**，整体表现优于SDXL（GenEval 0.55）和Flux-dev（GenEval 0.67），与DALLE3在DPG-Bench上持平（均为83.5），略低于Flux-schnell的84.8（Table 4）。
-
-![[assets/figures/papers/paper_list_l2073_https_arxiv_org_abs_2511_20645/figures/008_Table_4.jpg]]
-*Table 4: | Comprehensive comparison of our method with text-to-image approaches. We highlight the best and second-best entries. † indicates pixel-space diffusion models*
 
 ### 架构消融：组件贡献的因果链
 
@@ -256,27 +238,11 @@ Figure 5展示了不同patch size（p=8, 16, 32）和模型规模（B/L/XL）下
 2. **训练不稳定性**：使用速度预测（velocity prediction）训练像素空间扩散模型容易出现损失尖峰（loss spikes），尤其在更深架构和长训练过程中。虽然论文采用了一些稳定化技巧，但完全消除尖峰而不牺牲训练效率仍是一个未解决的挑战。
 3. **公平性注意事项**：需要指出，PixelDiT不使用预训练自编码器，而部分baseline（如LDM系列）依赖大规模自编码器，这体现了不同的设计哲学。在文本到图像生成中，不同模型采用不同的文本编码器和训练数据规模，量化比较需要在更一致的条件下进一步验证。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2073_https_arxiv_org_abs_2511_20645/figures/009_Figure_5.jpg]]
-*Figure 5: | Convergence analysis of PixelDiT on ImageNet 256×256. (a) gFID vs. training iterations for B, L, and XL models with varying patch sizes. (b) Comparison of B/L/XL models at a fixed patch size ??=16*
-
 ![[assets/figures/papers/paper_list_l2073_https_arxiv_org_abs_2511_20645/figures/011_Table_5.jpg]]
 *Table 5: | Ablations of PixelDiT-XL on ImageNet 256×256. Results start from Vanilla DiT and incrementally add architectural improvements and inference strategies. OOM indicates the dual-level variant without token compaction exceeds memory limits. Labels A–C match the design schematic in Figure 3*
 
-![[assets/figures/papers/paper_list_l2073_https_arxiv_org_abs_2511_20645/figures/012_Table_6.jpg]]
-*Table 6: | Computation and convergence analyses of pixel token compaction. We report GFLOPs alongside ImageNet 256×256 metrics at 80 and 160 epochs. No Pixel Token Compaction removes the compress–expand pathway, resulting in out-of-memory (OOM) at our training scale. No Pixel-Pathway Attention ablates selfattention in all PiT blocks*
-
-![[assets/figures/papers/paper_list_l2073_https_arxiv_org_abs_2511_20645/figures/019_Table_11.jpg]]
-*Table 11: | Ablation of representation alignment (REPA) on ImageNet 256×256. Removing REPA leads to substantially degraded FID and IS at both training stages*
-
 ![[assets/figures/papers/paper_list_l2073_https_arxiv_org_abs_2511_20645/figures/005_Figure_4.jpg]]
 *Figure 4: | Qualitative results on ImageNet*
-
-![[assets/figures/papers/paper_list_l2073_https_arxiv_org_abs_2511_20645/figures/010_Figure_6.jpg]]
-*Figure 6: | Qualitative results on ImageNet 512×512 using PixelDiT. We use a classifier-free guidance scale*
-
-
 
 ## 定位与知识库关联
 
@@ -318,8 +284,6 @@ PixelDiT 的贡献可映射到扩散模型设计的三个关键维度：
 3. **下游任务的泛化优势**：像素空间扩散模型在免训练编辑中已展现初步优势，但其在可控生成、图像翻译等更广泛下游任务中是否具有超越潜在模型的系统性优势，仍需进一步探索。
 
 4. **与其他像素空间方法的融合潜力**：如 **EPG-XXL/16** 和 **JiT-G** 等同样探索像素空间生成的工作，其技术路线（如高效采样策略、替代架构设计）与 PixelDiT 的双层级设计是否存在互补空间，是值得关注的交叉方向。
-
-
 
 ## 原文 PDF
 

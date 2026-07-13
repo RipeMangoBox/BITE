@@ -54,8 +54,6 @@ claims:
 
 当前局限在于重构网格缺乏高频褶皱细节，且在复杂背景、遮挡或非常规服装等分布外输入下鲁棒性有限。未来方向包括轻量物理精化叠加、纹理生成与实时交互编辑。
 
-
-
 ### 3D服装生成的效率瓶颈
 
 数字服装建模在虚拟试穿、影视特效与游戏产业中需求迫切，但现有自动化生成管线普遍面临**推理效率低下**与**网格质量不稳定**的双重困境。核心瓶颈在于：从2D缝纫图案到3D服装网格的转换过程严重依赖基于物理的缝合模拟。以 **GarmentCode** 为代表的构造引擎使用XPBD求解器对面板进行物理仿真，该过程不仅计算开销大（单次构造耗时数十秒），且对初始面板放置高度敏感——当面对非对称图案或复杂多面板结构时，基于规则的放置策略极易导致仿真失败或产生严重穿透、撕裂等伪影（见 Figure D.1 定性对比）。这一“物理模拟依赖”构成了当前3D服装生成管线中**最突出的效率与可靠性短板**。
@@ -74,8 +72,6 @@ claims:
 本文的动机在于重新设计3D服装的中间表示，使其能够被前馈神经网络直接预测。关键观察是：几何图像（Geometry Image）作为一种将3D网格参数化到UV空间的成熟表示，天然适合密集预测任务。若能将缝纫图案的语义信息（面板类型）、几何信息（顶点位置）与缝合关系（边界配对）统一编码到UV空间中，形成一个紧凑的**Garment Geometry Image (GGI)** 表示，则理论上可以通过一个轻量级的前馈网络直接回归完整的3D服装几何，从而将构造时间从数十秒压缩到毫秒级。
 
 这一思路将3D服装生成重新表述为两个可解耦的子问题：**(1) 如何用轻量VLM高效推理缝纫图案？(2) 如何用密集预测网络从缝纫图案直接合成3D网格？** 前者要求模型在参数规模与推理精度之间找到更优平衡点，后者要求设计合适的表示、网络架构与损失函数，使前馈预测的几何图能够通过简单的后处理步骤（重网格化与动态时域规整缝合）直接转换为仿真就绪的3D服装网格。
-
-
 
 ## 核心方法与创新机理
 
@@ -100,8 +96,6 @@ SwiftTailor的核心创新在于用**Garment Geometry Image (GGI)** 这一中间
 ### 证据强度评估
 
 上述因果链条有充分的实验支撑：总推理时间从63.74秒降至14.78秒（约4.3倍加速，Table 3）；网格生成质量在MMD和COV指标上分别提升23.5%和30.8%（Table 2）。消融实验明确分离了语义UV图和缝合损失的独立贡献，证据可信度高。需要手动验证的是：GGI在复杂背景、遮挡或非常规服装等分布外输入下的鲁棒性边界尚未量化评估，论文将此列为已知局限。
-
-
 
 SwiftTailor 将服装生成分解为两个顺序阶段，形成端到端的模块化流水线：**PatternMaker** 负责从多模态输入推理缝纫图案，**GarmentSewer** 负责将缝纫图案高效转换为 3D 网格，二者通过统一的 **Garment Geometry Image（GGI）** 中间表示衔接。
 
@@ -137,14 +131,6 @@ GGI 是整个流水线的关键创新，它将缝纫图案的语义先验与几�
 3. GGI → 重网格化（局部三角剖分，见 Figure B.2）→ 缝合对齐（动态时域规整 + 并查集顶点合并，见 Figure B.3）→ 最终 3D 网格
 
 整个过程无需物理重模拟，总推理时间约 **14.78 秒**（其中 Stage 1 约 14.76 秒，Stage 2 约 0.02 秒），相比 AIpparel + GarmentCode 的 63.74 秒加速约 **4.3 倍**（Table 3）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2270_https_arxiv_org_abs_2603_19053/figures/001_Figure_1.jpg]]
-*Figure 1: We introduce SwiftTailor, a two-stage framework including PatternMaker and GarmentSewer that aims to produce sewing patterns along with a novel garment geometry image representation that can be directly decoded to final 3D garment meshes*
-
-
-
 
 ### 缝纫图案的形式化定义
 
@@ -188,9 +174,6 @@ GGI 是 SwiftTailor 的核心创新，它统一了语义信息、几何信息与
 
 GGI 的构建流程（Figure 4 左半部分）为：从缝纫图案 $\mathcal{P}$ 出发，将各面板参数化到 UV 空间，分别生成语义图与缝合图作为 GarmentSewer 的输入条件；GarmentSewer 预测几何图后，三者共同构成完整的 GGI。
 
-![[assets/figures/papers/paper_list_l2270_https_arxiv_org_abs_2603_19053/figures/004_Figure_4.jpg]]
-*Figure 4: (Left) We present how to prepare the three components (geometry, semantic and stiching) of our propose Garment Geometry Image (GGI); (Right) From the estimated geometry and stiching images of GarmentSewer and PatternMaker, two additional remeshing and stiching steps are performed to obtain the final 3D mesh result*
-
 ---
 
 ### 模块三：GarmentSewer —— 密集预测Transformer
@@ -224,16 +207,6 @@ GGI 完成后，通过两步后处理得到最终3D网格（Figure 4 右半部�
 2. **动态时域规整缝合（Dynamic Time Warping Stitching）**：利用缝合图将配对边界边通过动态时域规整对齐，随后通过并查集合并对应顶点，消除面板间的缝隙与不连续（Figure B.3）。
 
 这一后处理流程完全替代了传统基于物理模拟的缝合过程（如 GarmentCode 使用的 XPBD 求解器），是实现快速推理的关键——GarmentSewer 的 Stage 2 推理仅需 0.02 秒，而 GarmentCode 需要数十秒。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2270_https_arxiv_org_abs_2603_19053/figures/002_Figure_2.jpg]]
-*Figure 2: Preliminaries on geometry images [11, 38], an imagebased 3D representation that parameterizes a 3D mesh into charts, each being stored as simple arrays of pixels. Our work integrates geometry images with semantic and stitching information to establish garment panels, yielding a novel garment geometry image representation suitable for 3D garment generation*
-
-![[assets/figures/papers/paper_list_l2270_https_arxiv_org_abs_2603_19053/figures/013_Figure.jpg]]
-*Figure: B.3. Stitching results before and after seam alignment. Using the stitching image, boundary edges are paired and aligned via Dynamic Time Warping, followed by vertex merging through a disjoint-set union. The zoomed-in wireframe views highlight how stitching resolves discontinuities and removes gaps between corresponding panel edges, achieving globally coherent garment mesh. The example is conducted on predicted sewing pattern from PatternMaker*
-
-
 
 ## 实验与关键发现
 
@@ -285,9 +258,6 @@ Table 4 系统消融了语义UV图与辅助损失对 GarmentSewer 重建质量�
 
 Figure 5 展示了 SwiftTailor 与 **ChatGarment**、**SewingLDM**、**AIpparel** 在不同输入模态（纯图像、纯文本、图像+文本）下的定性对比。SwiftTailor 生成的服装网格在面板结构完整性和缝合边界一致性上均优于基线，尤其在复杂服装款式（如多面板拼接）上优势明显。
 
-![[assets/figures/papers/paper_list_l2270_https_arxiv_org_abs_2603_19053/figures/009_Figure_5.jpg]]
-*Figure 5: Qualitative comparisons between SwiftTailor and recent state-of-the-art methods on 3D garment modeling [1, 27, 32] using an image, a text prompt, and both text and image as input, respectively*
-
 Figure D.1 直接对比了 GarmentSewer 与 GarmentCode 在相同 PatternMaker 输出上的表现。GarmentCode 因基于规则的刚性面板放置策略，常产生穿透、错位或模拟失败；GarmentSewer 则生成稳定初始化和一致的悬垂形态，验证了前馈预测在鲁棒性上的优势。
 
 **已知局限性**：
@@ -301,12 +271,8 @@ Figure D.1 直接对比了 GarmentSewer 与 GarmentCode 在相同 PatternMaker �
 
 Figure B.1 展示了混合插值方案对几何图像质量的影响：纯重心插值在面板边界产生锯齿状不连续值，而混合插值（边界线性插值+内部重心插值）产生平滑一致的边界信号，防止伪影传播至 GarmentSewer 预测。Figure B.2 和 B.3 分别详述了重网格化与动态时域规整缝合的后处理流程，构成了 GGI 到最终 3D 网格的完整逆映射链路。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2270_https_arxiv_org_abs_2603_19053/figures/010_Figure_6.jpg]]
 *Figure 6: Qualitative results on generated 3D mesh using geometry vs. binary image as input to GarmentSewer*
-
-
 
 ## 定位与知识库关联
 
@@ -359,8 +325,6 @@ SwiftTailor在3D服装生成谱系中占据了一个独特位置：它既不属�
 2. **轻量物理精化叠加**：在GarmentSewer的稳定初始化上叠加少量物理模拟步骤（而非完整XPBD），是否能在保持速度优势的同时恢复褶皱细节？这类似于“预测+校正”的混合范式。
 3. **纹理与材质联合生成**：GGI表示天然支持UV空间操作，将RGB纹理通道与XYZ几何通道联合预测是一个直接可行的扩展方向。
 4. **交互式编辑接口**：缝纫图案的离散-连续混合表示（离散token + 连续参数）为局部编辑提供了天然接口——用户修改单个面板形状或缝合关系，GarmentSewer可实时更新对应区域的几何图。
-
-
 
 ## 原文 PDF
 

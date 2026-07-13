@@ -51,8 +51,6 @@ claims:
 
 **主要结果**：在5名主体的多视角Lightstage基准上，RHC以PSNR 31.49、LPIPS 6.70、SSIM 89.56全面超越最强基线R4D+GT Env（PSNR 30.29、LPIPS 9.50、SSIM 86.77），并在分布外光照（OLAT、近场）下展现出显著的泛化能力。
 
-
-
 ### 动态人体渲染与重光照的现实需求
 
 将真实人物的动态三维表演无缝置入虚拟环境，是影视制作、混合现实、全息通信等应用的核心技术愿景。这要求系统不仅能从稀疏视角输入中生成自由视点的照片级渲染，还必须支持任意光照条件下的真实感重光照——即人物在新环境光下的外观需与物理世界一致，包含正确的自阴影、镜面反射和材质响应。
@@ -91,8 +89,6 @@ $$\rho(\mathbf{x})\int_{\omega_i} f_r(\mathbf{x},\omega_i,\omega_o) \mathbf{L}_i
 - 采用交替均匀光照跟踪帧与随机环境光照照明的数据捕获策略，使模型在训练中暴露于多样化的光照-外观配对。
 
 该方法首次实现了从稀疏视角RGB输入到任意光照下照片级渲染的端到端映射，无需OLAT捕获、显式材质估计或测试时优化，为动态人体的实时全息传送与光照编辑开辟了新路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -151,8 +147,6 @@ $$\mathbf{g} = \mathscr{F}(\mathbf{f}; \mathbf{E})$$
 
 这些创新共同使 RHC 在 5 个主体的 Lightstage 基准上，以 PSNR 31.49、LPIPS 6.70、SSIM 89.56 显著优于所有基线方法（Table 1），同时支持分布外光照（OLAT、近场）的合理泛化（Figure 11）。
 
-
-
 RHC 的整体设计围绕一个核心洞察展开：将渲染方程的各分量编码为一致的 UV 空间特征，并利用 Transformer 交叉注意力模拟光线的空间积分，从而在单次前馈中从稀疏视角输入生成动态人体的照片级重光照结果。该方法避免了传统 OLAT（一次一光）捕获和线性组合的昂贵开销，也无需在推理时进行迭代优化。
 
 ### 输入与输出
@@ -192,13 +186,6 @@ RelightNet 输出的纹素对齐高斯参数（位置偏移 $\delta\mathbf{p}$�
 ### 训练策略
 
 训练采用两阶段策略。预热阶段使用正则化损失 $L_{\mathrm{Warmup}}$ 约束高斯参数的缩放、位移、透明度和颜色，确保训练初期稳定。正式训练阶段，交替使用随机环境图光照和均匀光照的捕获帧，使模型学习多样化光照条件下的光传输。消融实验（Table 7）表明，当训练光照条件从完整多样化集合减少到仅 100 种时，PSNR 从 32.07 骤降至 28.79，验证了多样化光照数据对学习准确重光照的关键作用。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2137_https_arxiv_org_abs_2512_00255/figures/002_Figure_2.jpg]]
-*Figure 2: Illustration of our data capture strategy. To learn a relightable full-body avatar, we propose to capture multi-view video sequences consisting of consecutive uniformly lit tracking frames and relit frames obtained by randomly projecting environment maps onto the lightstage LEDs*
-
-
 
 RHC 由四个核心模块串联构成：角色动画模块、物理信息特征提取、RelightNet 重光照网络和高斯泼溅渲染器。整体流程为：从稀疏视角均匀光照图像出发，通过骨架运动驱动模板网格变形，在 UV 空间提取编码渲染方程各分量的物理特征，再由 RelightNet 结合环境图预测纹素对齐的 3D 高斯参数，最终经高斯泼溅渲染得到重光照图像。
 
@@ -263,21 +250,11 @@ $$L_{\mathrm{Warmup}} = \frac{1}{N_G}\sum_{i=1}^{N_G} \big( \lambda_{\mathrm{s}}
 
 该损失约束高斯缩放接近 1、位置偏移接近零、透明度接近初始值、颜色接近模板颜色，确保网络在早期阶段稳定收敛。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2137_https_arxiv_org_abs_2512_00255/figures/013_Table_3.jpg]]
 *Table 3: Illustration of the RelightNet architecture. In the operation column, ”C” denotes a convolution layer, ”SA” denotes a selfattention layer, ”CA” denotes a cross-attention layer, ”DS” and ”US” denote down-sampling and up-sampling layers with scale factors equal to 2*
 
 ![[assets/figures/papers/paper_list_l2137_https_arxiv_org_abs_2512_00255/figures/009_Figure_6.jpg]]
 *Figure 6: Ablation of key design components. Removing our diffuse Truth geometry features hinders the learning of pose-dependent effects and also leads to reduced wrinkle fidelity due to missing highfrequency geometry. Excluding the albedo feature causes texture drift from tracking errors. Without diffuse shading, the model fails to capture self-shadows correctly*
-
-![[assets/figures/papers/paper_list_l2137_https_arxiv_org_abs_2512_00255/figures/015_Figure_13.jpg]]
-*Figure 13: Additional qualitative ablations. Following Fig. 6 in the main paper, we demonstrate additional visual ablation results. By removing the camera encoding, our model is no longer able to learn view-dependent effects. Without the attention mechanism, the model is unable to learn the correct correlation with the environment*
-
-![[assets/figures/papers/paper_list_l2137_https_arxiv_org_abs_2512_00255/figures/017_Figure_14.jpg]]
-*Figure 14: Additional qualitative ablations. Following Fig. 6 in the main paper, we demonstrate additional visual ablation results. Without the high-frequency normals, our method is unable to model wrinkle details correctly. Excluding the position map leads to incorrect relighting, especially when the subject approaches a light source*
-
-
 
 ## 实验与关键发现
 
@@ -306,15 +283,6 @@ Table 2 系统拆解了各设计组件的贡献。移除几何特征（包含法
 
 训练光照多样性对模型性能具有决定性影响。Table 7 显示，将训练光照条件从完整集减少至 100 种时，PSNR 从 32.07 骤降至 28.79，模型严重过拟合。Figure 10 可视化了这一退化趋势。这验证了论文的核心数据策略——交替使用随机环境图光照和均匀光照跟踪帧——对于学习通用重光照能力至关重要。相比之下，端到端学习 OLAT 并线性组合的方法（Figure 7）不仅速度慢，且累积各 OLAT 渲染的误差，导致质量下降。
 
-![[assets/figures/papers/paper_list_l2137_https_arxiv_org_abs_2512_00255/figures/020_Table_7.jpg]]
-*Table 7: Impact of Lighting Diversity. We ablate different choices of our data capture strategy*
-
-![[assets/figures/papers/paper_list_l2137_https_arxiv_org_abs_2512_00255/figures/008_Figure_7.jpg]]
-*Figure 7: Effect of different capture strategies. Learning OLATs in an end-to-end manner and linearly combining them to illuminate to natural environments is slow and accumulates errors*
-
-![[assets/figures/papers/paper_list_l2137_https_arxiv_org_abs_2512_00255/figures/012_Figure_10.jpg]]
-*Figure 10: Effect of the number of lighting conditions our model is exposed to at training time. As the number of conditions decreases, the model overfits and performance drops, highlighting the importance of diverse lighting for end-to-end relighting*
-
 ### 失败模式与局限性
 
 尽管 RHC 在分布内测试中表现优异，但存在明确的失效边界：
@@ -329,8 +297,6 @@ Table 2 系统拆解了各设计组件的贡献。移除几何特征（包含法
 
 ![[assets/figures/papers/paper_list_l2137_https_arxiv_org_abs_2512_00255/figures/014_Figure_11.jpg]]
 *Figure 11: OOD comparison. Here, we compare our method on out-of-distribution lighting conditions, i.e. OLAT environment maps. Notably the model never saw OLAT environment maps during training. Nonetheless, it can generate plausible results while competing methods either produce blurry renderings or completely fail. Moreover, we illustrate that our method can reproduce near field lighting effects by translating the human by 35cm, i.e. modifying the positional map and diffuse shading, and we can observe a plausible change in illumination*
-
-
 
 ## 定位与知识库关联
 
@@ -412,8 +378,6 @@ RHC的适用边界由以下限制定义：
 5. **实时交互式全息传送**：如何将RHC集成到完整的全息传送系统中，实现实时交互与动态场景光照编辑？这涉及端到端延迟优化、网络传输和用户交互设计等系统工程问题。
 
 6. **光照多样性的理论边界**：Table 7显示光照条件数量从5000降至100时PSNR从32.07降至28.79，但光照多样性的最优策略（如环境图的采样分布、动态范围覆盖）仍缺乏理论指导。
-
-
 
 ## 原文 PDF
 

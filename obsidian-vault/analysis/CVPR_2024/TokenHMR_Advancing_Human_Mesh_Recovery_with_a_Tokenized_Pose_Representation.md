@@ -59,8 +59,6 @@ TokenHMR通过两个关键调节节点打破上述权衡：
 ### 主要结果
 在多个in-the-wild基准上，TokenHMR取得显著提升：EMDB上MPJPE从HMR2.0的99.3mm降至91.7mm（降幅7.6%），3DPW上从77.4mm降至71.0mm（降幅8.3%）。离散化本身仅引入约2.5mm的3D精度损失，远小于SOTA方法在真实数据上的误差。消融实验证实TALS与令牌化存在协同效应，且TokenHMR对图像裁剪扰动具有更强的鲁棒性。
 
-
-
 从单张图像中恢复三维人体姿态与形状（HPS）是计算机视觉的核心任务之一，其应用涵盖动作捕捉、人机交互、增强现实等领域。近年来，基于回归的方法取得了显著进展，但一个根本性的瓶颈始终未被正视：**现有方法在追求高精度二维投影对齐时，往往以牺牲三维姿态精度为代价**，形成了一种“二维对齐与三维精度不可兼得”的困境。
 
 ### 相机/姿态偏差：被忽视的系统性误差
@@ -84,8 +82,6 @@ TokenHMR通过两个关键调节节点打破上述权衡：
 ### 本文动机
 
 综上所述，现有方法面临的核心矛盾可归结为：**错误的相机模型与不加区分的监督信号共同导致网络为追求虚假的二维一致性而牺牲三维精度**。解决这一矛盾需要同时从两个层面入手：（1）设计一种能够区分“合理误差”与“异常误差”的监督机制，避免网络为拟合由相机偏差引起的微小二维误差而篡改三维姿态；（2）构建一个均匀、无偏的姿态先验，以知识库的形式约束输出姿态的合理性，尤其在歧义性高的场景下提供有效引导。TokenHMR 正是围绕这两个关键调节节点展开设计。
-
-
 
 ## 核心方法与创新机理
 
@@ -130,8 +126,6 @@ TokenHMR 处于“回归范式改良”与“离散表示学习”的交叉点�
 
 **失败模式与边界**：TALS 的宽松 2D 监督在强透视畸变下可能导致投影对齐不佳（Figure S.2）；令牌化虽约束了姿态合理性，但无法解决因相机缺失导致的深度方向根本歧义；全局方向估计在缺乏面部或脚部线索时仍会失败。这些限制表明，该方法是对现有回归范式的强有力补丁，但未从根本上解决单目相机内参估计这一开放问题。
 
-
-
 TokenHMR 将单图像 3D 人体姿态与形状回归问题拆分为两个阶段：**姿态令牌化（Pose Tokenization）** 与 **令牌化姿态回归（Tokenized Pose Regression）**，其整体流程如图 3 所示。
 
 ### 第一阶段：姿态令牌化
@@ -171,12 +165,8 @@ $$ \mathcal{L}_{Total} = \mathcal{L}_{GT} + \mathcal{L}_{\theta_{pGT}} + \mathca
 
 整个流程中，**令牌化解码器始终冻结**，仅作为推理时的姿态生成器；可训练部分仅限于 ViT 主干、Transformer 解码器及各预测头。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l17_TokenHMR_Advancing_Human_Mesh_Recovery_with_a_Tokenized_Pose_Representat_motion20/figures/003_Figure_3.jpg]]
 *Figure 3: Framework overview. Our method has two stages. (a) In the tokenization step, the encoder learns to map continuous poses to discrete pose tokens and the decoder tries to reconstruct the original poses. (b) To train TokenHMR, we replace regression with classification using the pre-trained decoder, which provides a “vocabulary” of valid poses*
-
-
 
 ### 3.1 相机/姿态偏差的量化分析
 
@@ -269,8 +259,6 @@ $$
 
 将标准 GT 损失与经 TALS 调整的伪 GT 姿态损失和 2D 关节损失相加。两个调节节点——TALS 的阈值缩放机制与令牌化表示的离散先验——在此统一，共同约束网络在保持合理 2D 对齐的同时输出 3D 准确的姿态。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈验证：2D对齐与3D精度的根本性冲突
@@ -345,8 +333,6 @@ TokenHMR在所有裁剪比例下均表现出更小的性能恶化。这表明离
 
 5. **相机模型根本性限制**：方法未直接解决单目相机内参和外参的准确估计问题，因此未能从根本上消除错误相机模型引入的偏差。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l17_TokenHMR_Advancing_Human_Mesh_Recovery_with_a_Tokenized_Pose_Representat_motion20/figures/004_Table_1.jpg]]
 *Table 1: 3D human mesh and pose errors on the EMDB and 3DPW datasets. See text*
 
@@ -356,13 +342,8 @@ TokenHMR在所有裁剪比例下均表现出更小的性能恶化。这表明离
 ![[assets/figures/papers/paper_list_l17_TokenHMR_Advancing_Human_Mesh_Recovery_with_a_Tokenized_Pose_Representat_motion20/figures/006_Table_3.jpg]]
 *Table 3: Tokenizer Ablation. All methods are trained on the standard training set of AMASS [37] and evaluated on the test set of AMASS and validation set of MOYO [52] except the last row⋆, which is trained with the MOYO training set. The last model is used as the tokenizer in TokenHMR*
 
-![[assets/figures/papers/paper_list_l17_TokenHMR_Advancing_Human_Mesh_Recovery_with_a_Tokenized_Pose_Representat_motion20/figures/008_Table.jpg]]
-*Table: S.1. Thresholds for 44 2D joints and 24 SMPL joints. 2D joint names start with the skeleton origin, where OP stands for OpenPose. LSP, MPII, and H36M are the datasets*
-
 ![[assets/figures/papers/paper_list_l17_TokenHMR_Advancing_Human_Mesh_Recovery_with_a_Tokenized_Pose_Representat_motion20/figures/009_Figure.jpg]]
 *Figure: S.1. t-SNE visualization of unseen poses (3D body joints) reconstructed by our tokenizer trained on AMASS only. We are able to reconstruct the out-of-distribution Yoga poses from MOYO. GT is ground-truth poses and PR is predicted poses. a) Due to the loose supervision of TALS, our prediction does not align well in 2D under weak-perspective camera. b) Depth-wise ambiguity is still very challenging. c) Global orientation estimation sometimes fails because facial and foot cues are not thoroughly explored. Figure S.2. 2D alignment problem and failure cases*
-
-
 
 ## 定位与知识库关联
 
@@ -407,8 +388,6 @@ TokenHMR在方法谱系上处于一个独特的交叉点，连接了三条技术
 4. **精度损失的进一步压缩。** 如何通过改进VQ-VAE架构（如引入残差量化、层次化码本）或增大码本规模，进一步缩小甚至消除离散化引起的精度损失，是令牌化方法走向高精度应用的关键。
 
 5. **相机偏差的替代解决方案。** TALS本质上是一种“治标”策略——通过降低有害监督的权重来避免过拟合。是否存在“治本”方案，例如通过多视角一致性、场景几何线索或元学习来隐式推断相机参数，值得进一步探索。
-
-
 
 ## 原文 PDF
 

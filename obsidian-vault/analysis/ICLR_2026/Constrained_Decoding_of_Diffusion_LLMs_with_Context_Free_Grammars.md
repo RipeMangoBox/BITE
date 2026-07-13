@@ -57,8 +57,6 @@ claims:
 
 **方法谱系与知识库定位**：本方法属于**基于形式语言的约束解码**分支，区别于依赖提示工程（如**Grammar Prompting**，Wang et al., 2023）或专用解析器的增量校验（如**DINGO**，Park et al., 2024）。其核心贡献在于将约束解码从“前缀可完成性”推广到“任意部分输出的可完成性”，并借助形式语言理论中CFL与正则语言的交集构造与空性检查算法，实现了生成范式无关的语法保证。
 
-
-
 ### 生成范式的演进与语法约束的缺位
 
 大型语言模型（LLM）的生成范式正从经典的从左到右前缀补全（PRE）向更灵活的填充式生成演进。填充-中段（FIM）允许在给定的前缀与后缀之间插入代码；多区域填充（MRI）进一步支持在文本的多个任意位置同时进行补全；而扩散语言模型（DLM）则彻底打破了序列顺序，通过迭代去噪在任意位置并行插入token。这些范式在代码补全、结构化数据生成等场景中展现出巨大潜力，但其生成过程缺乏语法保证——模型输出的代码可能无法编译，JSON可能包含非法结构，SMILES分子式可能出现括号不匹配。
@@ -74,8 +72,6 @@ claims:
 ### 本文的动机与统一框架
 
 本文的核心动机是填补约束解码在非自回归、任意顺序生成场景中的空白。作者将MRI与DLM的约束解码统一为**约束填充问题**，并首次提出了一套实用的解决方案：将部分输出转化为描述其所有可能补全的正则语言，与目标CFG求交，并通过高效的空性检查算法实时判定可完成性。这一框架不仅首次使扩散语言模型和多区域填充具备了硬语法约束能力，还通过拒绝采样与自动补全的混合策略，在保证语法正确性的同时维持了功能正确性。
-
-
 
 ## 核心方法与创新机理
 
@@ -123,17 +119,6 @@ claims:
 - **最小侵入性（Minimally Invasive）**：若无约束的模型原本就会生成合法输出w ∈ L，则施加约束后模型仍会生成w。
 
 这些保证将约束解码从启发式过滤提升为具有形式化正确性基础的推理框架。
-
-
-
-![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_7Sph4KyeYO/figures/001_Figure_1.jpg]]
-*Figure 1: An overview of our approach. In each step, the input consists of a partial text x with arbitrarily many infilling regions and a context-free grammar (CFG) specifying formal constraints. During decoding, we sample an updated input $x ^ { \prime }$ from M , , obtained, e.g., by inserting a token in one of the regions in x. Our method then intersects the CFG with the regular language of all possible completions of $x ^ { \prime }$ . . If the intersection is empty, the update is rejected and a new $x ^ { \prime }$ is sampled. Otherwise, it is accepted and the decoding continues from $x ^ { \prime }$ . . In the example, the invalid update inserting "foo()" is rejected and "foo" is accepted instead
-
-![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_7Sph4KyeYO/figures/003_Figure_2.jpg]]
-*Figure 2: We consider three left-to-right (PRE, FIM, MRI) and one out-of-order (DLM) generation paradigms (a). The NFA in (b) describes the language of all additive completions for the MRI task*
-
-![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_7Sph4KyeYO/figures/004_Figure_3.jpg]]
-*Figure 3: Examples of Figures 1 and 4 processed during our method. (a) The grammar is first normalized into $\mathrm { \bar { C } }$ 2 $\mathrm { F } ^ { + \varepsilon }$ , and (b) the NFA is transformed into a minimal DFA. (c) To determine emptiness of $L _ { \cap }$ , the algorithm then searches the initial stat$e ^ { d 0 } \vec { S } ^ { d 7 }$ through the productions in reverse, starting from the terminals
 
 该方法将扩散语言模型（DLM）与多区域填充（MRI）中的约束解码统一为**约束填充问题**（Definition 1），其核心是一个迭代的拒绝采样循环（Algorithm 1）。整体流程由四个关键模块串联而成，形成“更新—验证—拒绝/接受—补全”的闭环。
 
@@ -213,8 +198,6 @@ claims:
 - **完备性**：允许采样任何能产生合法输出的 token，不预先排除有效路径；
 - **最小侵入性**：若无约束模型 `M` 本身能生成合法输出 `w ∈ L`，则施加约束后仍会生成该输出，不会因约束引入新的偏差。
 
-
-
 ### 约束填充问题形式化
 
 方法将扩散语言模型（DLM）与多区域填充（MRI）的约束解码统一为**约束填充问题**（Definition 1）：给定部分输出 $\mathbf{x} = x_1 \sqcup x_2 \ldots \sqcup x_n$（其中 $\sqcup$ 表示填充区域）和目标上下文无关文法 $G$，判断是否存在对填充区域的赋值，使得完整字符串属于 $L(G)$。这一决策问题称为 COMPLETABLE，是全部后续算法的核心判定原语（Algorithm 1）。
@@ -279,8 +262,6 @@ $$A \to \alpha A', \quad A' \to \beta, \quad A' \to \beta'$$
 
 当模型连续多次拒绝无效更新后，从 $L_{\cap}$ 中采样一个具体补全字符串。采样时需将交集文法生成的词素序列与当前部分输出的 Unicode 正则语言再次求交，确保补全文本在字符层面与已有输出无缝拼接。
 
-
-
 ## 实验与关键发现
 
 ### 主结果：多区域填充（MRI）与扩散语言模型（DLM）的语法与功能正确性
@@ -323,16 +304,7 @@ $$A \to \alpha A', \quad A' \to \beta, \quad A' \to \beta'$$
 
 **DLM每次完成开销（Table 4）**：中位完成时间差仅0.1秒。当模型无法采样出有效完成而提前中止时，可能出现加速。
 
-![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_7Sph4KyeYO/figures/012_Table_4.jpg]]
-*Table 4: Median time difference per completion for different diffusion models in seconds, and the overhead over the original completion in percent. When the completion aborts pre-emptively, as no valid completion is sampled from the model, speed-ups are possible*
-
 **与DINGO对比（Table 8, Table 9）**：在JSON-NOUS上，本方法（Con.）达到与**DINGO**（Park et al., 2024）相同的100%语法正确率；在GSM8K-SYMBOLIC上，DINGO略优。关键差异在于预处理：DINGO需要11.9–37.0秒的schema预处理，而本方法无需任何预处理（0秒），每次完成的时间差≤0.3秒，与DINGO的0.1秒处于同一量级。这使本方法在需要即时切换文法的场景中更具实用性。
-
-![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_7Sph4KyeYO/figures/017_Table_9.jpg]]
-*Table 9: Pre-procesing time (PreX) and time difference per completion of DINGO and our method (Con.). We observe that our method has a similar runtime overhead as DINGO while requiring no preprocessing. Notably, preprocessing is done once per schema, which implies once per task on the JSON-NOUS dataset*
-
-![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_7Sph4KyeYO/figures/016_Table_8.jpg]]
-*Table 8: On JSON-NOUS, our method (Con.) achieves the same performance as DINGO. On GSM8K-SYMBOLIC, DINGO slightly outperformsn Con*
 
 ### 失败模式与剩余语法错误
 
@@ -349,8 +321,6 @@ $$A \to \alpha A', \quad A' \to \beta, \quad A' \to \beta'$$
 - **C++语法补全**：DeepSeek Coder 6.7B在编写字符串处理函数时遗漏if语句条件的括号，约束解码自动补全了缺失的括号。
 
 这些案例表明，方法的核心价值在于实时拦截违反形式语法的更新，而非事后修复——这正是其“最小侵入性”性质的体现：若模型自身能生成有效输出，约束解码不会改变该输出。
-
-
 
 ## 定位与知识库关联
 
@@ -397,8 +367,6 @@ $$A \to \alpha A', \quad A' \to \beta, \quad A' \to \beta'$$
 5. **与扩散解码策略的协同。** 能否将本方法与其他扩散解码策略（如迭代精化、分类器引导）结合，在保证语法正确性的同时进一步提升功能正确性？
 
 6. **模型训练层面的改进。** 如何训练模型在需要更多填充token时主动发出信号，或学习在约束解码的拒绝采样过程中更高效地生成有效更新，从根本上缓解令牌不足和运行时开销问题？
-
-
 
 ## 原文 PDF
 

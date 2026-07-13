@@ -59,8 +59,6 @@ claims:
 
 当前方法存在若干局限：对齐损失采用简单L2投影，可能非最优；仅在SD3.5 Medium上验证了LoRA微调，未在更大模型（如FLUX）上进行全微调测试；微调依赖合成数据集，可能影响生成图像的真实感；2048×2048分辨率的定量评估有限。这些为后续研究留下了明确空间。
 
-
-
 ### 扩散模型高分辨率生成的Token瓶颈
 
 现代扩散模型（如Stable Diffusion 3.5、FLUX）依赖变分自编码器（VAE）将图像压缩至低维潜在空间，再通过DiT（Diffusion Transformer）进行生成建模。然而，当生成分辨率从512×512提升至1024×1024或更高时，潜在Token数量呈平方级增长——以SD3.5为例，其标准8倍下采样VAE在1024×1024分辨率下产生64×64个Token，导致Transformer的计算开销急剧膨胀。这一瓶颈直接制约了高分辨率生成的吞吐量：SD3.5 Medium在A100上生成1024×1024图像仅能达到0.25 img/s。
@@ -88,8 +86,6 @@ claims:
 > 能否设计一种“即插式”的潜在压缩方案，使预训练扩散模型仅需轻量微调即可在高压缩率下生成高分辨率图像，同时保持甚至提升生成质量？
 
 这一动机驱动了DA-VAE（Detail-Aligned VAE）的提出：通过结构化潜在空间设计（基础通道 + 细节通道）与细节对齐损失，在不破坏原有潜在结构的前提下实现Token压缩，从而以极低的微调成本（如SD3.5仅需5 H100天）获得4倍以上的生成加速。
-
-
 
 ## 核心方法与创新机理
 
@@ -154,8 +150,6 @@ DA-VAE 处于**潜空间压缩 VAE + 扩散模型微调**的交叉点。与以�
 
 DA-VAE 的独特贡献在于**将"保护预训练先验"作为第一性原理**：通过冻结基础编码器、零初始化新增参数、温暖启动调度三个机制，确保预训练扩散模型的核心能力在微调过程中不被破坏，从而以极低的计算成本（5 H100-days vs 从头训练的数百 GPU-days）实现高分辨率生成。
 
-
-
 DA-VAE 的整体设计围绕一个核心思想展开：**在不增加视觉 Token 数量的前提下，通过结构化潜在空间扩展来承载高分辨率图像的细节信息**。整个 pipeline 分为两个协同工作的阶段——结构化 VAE 训练和扩散 Transformer 微调，二者共享统一的潜在布局。
 
 ### 结构化潜在空间设计
@@ -219,15 +213,8 @@ $$\mathcal{L}_{\mathrm{DiT}}(n) = \frac{1}{|B|+w(n)|R|} \big( \|\hat{\mathbf{u}}
 
 这种设计使得 DA-VAE 能够以**即插即用**的方式提升任意预训练扩散模型的分辨率上限：只需训练轻量的 $E_d$ 和微调 DiT 的新增通道参数（甚至可采用 LoRA 进一步降低开销，如 SD3.5 Medium 实验仅需 5 H100-天），即可在保持或超越原模型生成质量的同时获得数倍的推理加速。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l852_https_arxiv_org_abs_2603_22125/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our method. Left: Illustration of our Detail-Aligned VAE (DA-VAE), which encodes a high-resolution image using the same number of visual tokens as the base image. Right: Zero initialization of the linear layer for detail latent. At the beginning of training, the model keep pretrained diffusion model capability of generating images at the base resolution*
-
-![[assets/figures/papers/paper_list_l852_https_arxiv_org_abs_2603_22125/figures/001_Figure_1.jpg]]
-*Figure 1: We propose Detail-Aligned VAE (DA-VAE), a VAE model that increases the compression rate of a pretrained VAE, while requiring only light-weight finetuning of the original diffusion backbone while preserving image quality. Image results are from a finetuned SD3.5 Medium. DA-VAE accelerates the original SD3.5 Medium model by 6.04 times for 2048 × 2048 image generation*
-
-
 
 ### 结构化潜在空间设计
 
@@ -303,13 +290,6 @@ $$
 
 **调度机制**：在训练初期（$n \ll N_{\mathrm{warm}}$），$w(n) \approx 0$，梯度主要由基础通道主导，模型保持与预训练骨干的对齐；随着训练推进，$w(n)$ 逐渐升至 1，模型逐步被迫学习细节通道 $\mathbf{z}_d$ 的分布。消融实验显示，温暖启动调度对生成质量有正向贡献（FID-10k 从 9.27 升至 9.80），但提升幅度相对对齐损失和零初始化较小（Table 5）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l852_https_arxiv_org_abs_2603_22125/figures/003_Figure_3.jpg]]
-*Figure 3: Effect of the proposed latent alignment loss on the learned detail feature*
-
-
-
 ## 实验与关键发现
 
 ### 核心实验设计
@@ -373,8 +353,6 @@ DA-VAE定位于**预训练扩散模型的高效压缩适配**这一研究脉络�
 
 DA-VAE的核心贡献在于揭示了**结构化潜在空间 + 对齐约束 + 零初始化微调**这一组合策略的有效性，为预训练扩散模型的高效高分辨率适配提供了新的范式。该方法的知识库定位可概括为：通过显式的潜在空间结构设计，将压缩率提升问题转化为通道扩展与对齐问题，从而以极低的微调成本实现预训练模型能力的迁移。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l852_https_arxiv_org_abs_2603_22125/figures/005_Table_1.jpg]]
 *Table 1: ImageNet 512 × 512 comparison in training regime, efficiency, and performance. Training Regime: Scratch trains the generator from random initialization for the target setting; Fine-tune starts from a pretrained generator (or a closely-related pretrained checkpoint) and adapts it to the target setting (e.g., resolution/tokenizer/architecture change). † indicates numbers are directly copied from the corresponding papers; ∗ follows the original paper’s from-scratch setting*
 
@@ -389,20 +367,6 @@ DA-VAE的核心贡献在于揭示了**结构化潜在空间 + 对齐约束 + 零
 
 ![[assets/figures/papers/paper_list_l852_https_arxiv_org_abs_2603_22125/figures/011_Table_5.jpg]]
 *Table 5: Ablation on three components. Our full model enables all three (✓); each ablation disables exactly one component (✗)*
-
-![[assets/figures/papers/paper_list_l852_https_arxiv_org_abs_2603_22125/figures/012_Table_S.1.jpg]]
-*Table S.1: Training and sampling hyperparameters for lightningDiT-XL and SD3.5-M*
-
-![[assets/figures/papers/paper_list_l852_https_arxiv_org_abs_2603_22125/figures/014_Table.jpg]]
-*Table: (a) Reconstruction metrics on the ImageNet validation set*
-
-![[assets/figures/papers/paper_list_l852_https_arxiv_org_abs_2603_22125/figures/015_Figure_S.2.jpg]]
-*Figure S.2: Ablation on detail channels in the DA-VAE decoder on ImageNet. (a) Reconstruction metrics for different decoder variants. (b) Visual examples showing that randomizing or zeroing the detail latent either destroys the image or removes fine-grained details such as faces and text. Please zoom in for best view*
-
-![[assets/figures/papers/paper_list_l852_https_arxiv_org_abs_2603_22125/figures/019_Figure_S.5.jpg]]
-*Figure S.5: Radial power spectrum of the base latent z and detail latent*
-
-
 
 ## 定位与知识库关联
 
@@ -481,8 +445,6 @@ DA-VAE处于**扩散模型高效推理**与**表示学习**的交叉点，与以
 - **表示对齐学习**：对比学习、知识蒸馏中的表示对齐思想被DA-VAE以轻量投影对齐的形式引入潜在空间设计。
 
 方法的本质贡献在于**通过潜在空间的显式结构化，将“提升压缩率”与“保留预训练先验”这两个冲突目标解耦**，为扩散模型的高效高分辨率生成提供了新的设计范式。
-
-
 
 ## 原文 PDF
 

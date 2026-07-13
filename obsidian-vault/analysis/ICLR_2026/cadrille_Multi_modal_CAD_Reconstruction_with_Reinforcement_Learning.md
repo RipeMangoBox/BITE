@@ -70,8 +70,6 @@ cadrille是首个将RL微调引入多模态CAD重建的工作，也是首个统�
 
 综上，cadrille通过“SFT+RL”两阶段训练策略，在10个基准测试上建立了新的最优结果，证明了RL微调对多模态CAD重建的有效性。
 
-
-
 ### 问题背景
 
 计算机辅助设计（CAD）模型的自动重建是工业制造、数字孪生和机器人领域的基础任务。传统方法依赖专业工程师手工建模，效率低下且难以规模化。近年来，随着大语言模型（LLM）的兴起，将CAD模型表示为可执行的Python代码（如CadQuery脚本）成为一种新兴范式——模型接收视觉或几何输入，自回归生成代码，执行后得到参数化边界表示（B-Rep）。这一范式将CAD重建转化为序列生成问题，使得LLM的预训练能力和规模化优势得以复用。
@@ -103,8 +101,6 @@ cadrille是首个将RL微调引入多模态CAD重建的工作，也是首个统�
 关键证据链：加入在线RL微调（Dr. CPPO）后，点云重建在DeepCAD上IoU从87.1%提升至90.2%，IR降至0%；在真实扫描CC3D上IoU从60.5%提升至67.9%，IR从9.8%骤降至0.2%（Tab. 3第3行 vs 第6行）。更值得注意的是，仅在图像数据上进行RL微调即可同步提升点云重建性能（跨模态迁移），表明RL阶段学到的是模态无关的几何有效性约束。
 
 基于上述动机，本文提出**cadrille**——首个多模态CAD重建模型，统一处理点云、多视图图像和文本三种输入，采用SFT+RL两阶段训练，在10个基准上建立了新的最优结果。
-
-
 
 ## 核心方法与创新机理
 
@@ -146,8 +142,6 @@ cadrille 将基础 LLM 从 **Qwen2-1.5B**（仅文本）升级为 **Qwen2-VL-2B*
 
 **证据强度评估**：SFT 跨域退化（Tab. 3 row 2 vs row 3）、混合数据 SFT 失效（row 4）、RL 微调显著提升（row 6）以及跨模态迁移效应均有明确表格数据支撑，置信度 ≥ 0.95。DPO vs 在线 RL 的消融对比（Tab. 3, rows 5-6）进一步确认了在线 RL 策略（Dr. CPPO）的必要性。
 
-
-
 ![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_w2tnhhMbXv/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of cadrille. It can handle three input modalities within a unified framework. Point clouds are processed with a trainable projection layer, while images and texts are passed to a VLM directly. The output of the model is an executable Python script for CAD generation*
 
@@ -187,8 +181,6 @@ $$R(\tau) = r_{\mathrm{IoU}}(\tau) + r_{\mathrm{invalid}}(\tau)$$
 1. **数据分离策略**：直接混合合成数据与手工数据进行 SFT 会导致性能下降（Tab.3 第 4 行 vs 第 3 行），因此手工数据仅用于 RL 阶段。
 2. **跨模态迁移**：仅在图像数据上进行 RL 微调，即可同步提升点云重建性能，实现跨模态泛化（Tab.3 第 6 行）。
 3. **推理效率**：RL 微调后的模型仅需单次推理即可达到甚至超越 SFT 模型 10 样本测试时采样的效果，且无效率更低（Tab.11）。
-
-
 
 ### 统一多模态输入处理
 
@@ -242,8 +234,6 @@ $$\mathbb{E}_{\{\tau_g\}\sim\mathcal{B}}\left[\min\left(\frac{\pi_{\theta_t}(\ta
 $$\mathbb{E}_{(q,\tau_w,\tau_l)\sim\mathcal{D}}\left[\log\sigma\left(\beta\log\frac{\pi_{\theta_t}(\tau_w \mid q)}{\pi_{\theta_r}(\tau_w \mid q)} - \beta\log\frac{\pi_{\theta_t}(\tau_l \mid q)}{\pi_{\theta_r}(\tau_l \mid q)}\right)\right]$$
 
 其中 $\pi_{\theta_r}$ 为参考策略（SFT 模型），$\pi_{\theta_t}$ 为目标策略，$\beta$ 控制偏离参考策略的强度。DPO 实验中 $K=5$ 个候选样本取得最佳效果，与 $K=3$ 相比 IoU 差异小于 1%（Tab. 10）。然而，在线 Dr. CPPO 在降低无效率和提升 IoU 方面均显著优于 DPO（Tab. 3 第 5 行 vs 第 6 行），将 IR 降至 0.2% 以下，IoU 提升 3-9 个百分点。
-
-
 
 ## 实验与关键发现
 
@@ -308,36 +298,18 @@ Fusion360上18.7%的IR揭示了多阶段流水线（LRM重建mesh→CAD-Recode�
 - **RL数据量**：Tab. 12显示，增加RL微调数据量持续提升性能，未观察到饱和现象，暗示更大规模手工数据的潜力
 - **硬样本挖掘**：仅对SFT模型平均奖励低于阈值（R_th=7.5）的样本进行RL训练，加速了收敛（Sec. 4.4）
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_w2tnhhMbXv/figures/006_Table_3.jpg]]
 *Table 3: Online RL outperforms offline RL Fine-tuning cadrille using offline DPO reduces IR twice in most cases, while accuracy scores are not affected (rows 3 and 5 in both Tables). In the meantime, Dr. CPPO beats SFT in terms of all metrics, adding 3-9% to IoU scores and bringing IR under 0.2% Table 3: Results of CAD reconstruction from point clouds. cadrille performs on par with CAD-Recode when trained on the CAD-Recode dataset (R). With RL, cadrille establishes state-ofthe-art on DeepCAD, Fusion360 and real-world CC3D*
 
 ![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_w2tnhhMbXv/figures/004_Table_1.jpg]]
 *Table 1: Results on DeepCAD test set. The best results are bold, the second best are underlined. Our cadrille trained jointly on three modalities outperforms all existing modality-specific methods. Here, we report metrics obtained without RL fine-tuning or test-time sampling for fair comparison. Table 2: Results of CAD reconstruction from multi-view images. With RL fine-tuning, cadrille achieves best results across three benchmarks*
 
-![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_w2tnhhMbXv/figures/005_Table_2.jpg]]
-
-![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_w2tnhhMbXv/figures/016_Table_6.jpg]]
-*Table 6: Mean CD scores obtained across all benchmarks and available input modalities. RL finetuning is performed using $\mathrm { D } _ { \mathrm { i } } ^ { - } + \mathrm { F } _ { \mathrm { i } } ^ { - }$ data
 
 ![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_w2tnhhMbXv/figures/014_Table_4.jpg]]
 *Table 4: Results of CAD reconstruction from point clouds and multi-view images from the Omni-CAD dataset. We specify mean CD since it is the only CD metric reported by CAD-MLLM*
 
 ![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_w2tnhhMbXv/figures/015_Table_5.jpg]]
 *Table 5: Results of point-based CAD reconstruction on the Fusion360 test set. All reported metrics are obtained using an SFT model without RL*
-
-![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_w2tnhhMbXv/figures/017_Table_7.jpg]]
-
-![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_w2tnhhMbXv/figures/018_Table_8.jpg]]
-*Table 8: Results of CAD reconstruction from multi-view images on the Deep-CAD dataset. Table 7: Results of CAD reconstruction from a single image on the DeepCAD dataset. All reported metrics are obtained with an SFT model without RL*
-
-![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_w2tnhhMbXv/figures/019_Figure_2.jpg]]
-*Figure 2: recent evidence coming from the math domain (see Fig. 2 of Yue et al. (2025) and Fig. 4 of Liu et al. (2025a))*
-
-![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_w2tnhhMbXv/figures/020_Table_10.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -395,8 +367,6 @@ cadrille 并非首个将 RL 引入 CAD 生成的工作。**CADFusion**（Wang et
 - **点云 RL 微调**：当前 RL 微调仅在图像数据上进行（跨模态迁移到点云），直接在点云数据上进行 RL 可能进一步缩小真实域差距。
 - **数据复杂度扩展**：增加程序生成数据的几何复杂度并扩大 RL 微调数据量，以更好地适应真实世界扫描中的复杂形状。
 - **推理效率优化**：在保持高精度的同时减少推理时间，使方法更适用于实际部署场景。
-
-
 
 ## 原文 PDF
 

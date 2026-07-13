@@ -175,8 +175,6 @@ $$L = L_1(\hat{x}, x) + \lambda_1 \sum_f L_{percep\_2d}(\hat{x}, x) + \lambda_2 
 
 这种显式运动建模的设计使得框架在零样本设定下（无文本-视频配对训练）也能实现高质量视频生成，因为深度和光流作为通用运动先验，可以跨域迁移。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1054_https_arxiv_org_abs_2311_11325/figures/001_Figure_1.jpg]]
 *Figure 1: The schematic illustration of the proposed motion-aware video generation (MoVideo) framework. Given a text prompt, we first generate the key frame by a public available latent diffusion model. Then, we generate video depth and optical flows conditional on the image embedding (extracted by an open-sourced pretrained image-text bi-encoder model) and frames per second. Next, we add extra conditions, including depth, flow-based warped latent video and calculated occlusion mask, to generate the video in the latent space. Last, the video is decoded with flow-based alignment and feature refinement modules*
 
@@ -228,14 +226,6 @@ $$L = L_1(\hat{x}, x) + \lambda_1 \sum_f L_{percep\_2d}(\hat{x}, x) + \lambda_2 
 
 其中包含 L1 损失、逐帧 2D 感知损失、3D 感知损失、逐帧 2D 对抗损失和 3D 对抗损失。消融实验证实，该光流增强解码器相比 2D 解码器和简单 3D 解码器能显著降低 FVD（从 401.66 和 379.73 降至 335.53，表 5），验证了光流引导的特征对齐对提升解码质量的有效性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1054_https_arxiv_org_abs_2311_11325/figures/002_Figure_2.jpg]]
-*Figure 2: The basic spatio-temporal block for building the 3D denoising UNet. We add temporal modules, including temporal convolution and temporal attention layers after spatial convolution and spacial attention layers. The*
-
-![[assets/figures/papers/paper_list_l1054_https_arxiv_org_abs_2311_11325/figures/003_Figure_3.jpg]]
-*Figure 3: The comparison on different architectures for text-to-video generation without text-video training pairs. As the top route shows, some methods [16, 51] first encode the text with the text encoder from an open-sourced pretrained image-text bi-encoder model and then use a text-to-image prior [44, 45] to transform it to the pooled image embedding, which is used as the condition to guide the generation of video. Instead, we propose to first generate an image by a public text-to-image latent diffusion model and extract its unpooled image embedding that preserves spatial layout and local details of the image, based on which we generate the depth and optical flow of the video and then use them to...*
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -278,11 +268,6 @@ Fig. 5提供了文本到视频生成的定性对比。与VideoDiffusion相比，
 
 4. **长视频与大幅运动。** 当前实验主要基于短片段（关键帧到视频的生成范式），对长视频或包含大幅3D旋转、剧烈镜头移动的场景生成能力未充分验证。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1054_https_arxiv_org_abs_2311_11325/figures/005_Figure_5.jpg]]
-*Figure 5: Visual comparison on text-to-video generation. For each example, the first row is from our method, while the second row is from VideoDiffusion [70]. More visual comparisons, including video results, are provided in the supplementary*
-
 ![[assets/figures/papers/paper_list_l1054_https_arxiv_org_abs_2311_11325/figures/006_Table_3.jpg]]
 *Table 3: Quantitative comparison of open-domain text-to-video generation*
 
@@ -291,9 +276,6 @@ Fig. 5提供了文本到视频生成的定性对比。与VideoDiffusion相比，
 
 ![[assets/figures/papers/paper_list_l1054_https_arxiv_org_abs_2311_11325/figures/009_Table_4.jpg]]
 *Table 4: Quantitative comparison of image-to-video generation on DAVIS [34]*
-
-![[assets/figures/papers/paper_list_l1054_https_arxiv_org_abs_2311_11325/figures/010_Figure_6.jpg]]
-*Figure 6: Visual comparison on image-to-video generation. The first three rows are guided by the generated depth and optical flows, while the rest rows are guided by the ground-truth (GT) ones. More visual comparisons, including video results, are provided in the supplementary*
 
 ![[assets/figures/papers/paper_list_l1054_https_arxiv_org_abs_2311_11325/figures/011_Table_5.jpg]]
 *Table 5: Ablation study on video decoding*

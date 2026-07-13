@@ -56,8 +56,6 @@ claims:
 
 实验结果表明，StereoWorld 在视觉质量、相机准确度和视图同步性上全面优于现有单目世界模型及其后处理立体转换方案。相比基于单目重建的 SOTA 方法，StereoWorld 实现了约3倍的生成速度提升，视角一致性提高约5%。消融实验进一步验证了统一相机帧 RoPE 的稳定性和立体注意力的效率优势。
 
-
-
 世界模型旨在从感知输入中学习环境的动态演化规律，并预测未来的感官观测。近年来，基于扩散模型的世界模型在视频生成领域取得了显著进展，催生了一批能够根据相机轨迹生成逼真场景漫游视频的方法。然而，当前主流世界模型几乎全部聚焦于**单目（monocular）视频生成**，其输出模态存在一个根本性的结构缺陷：缺乏显式的、度量级的几何约束。
 
 这一缺陷在实际应用中带来了两个关键问题。其一，单目世界模型生成的视频无法直接适配立体视觉（stereoscopic）显示设备——若要获得立体视频，必须依赖后处理流程：先通过深度估计从单目视频中恢复深度图，再基于深度图进行视图合成和图像修复（inpainting）以生成另一视角。这种多阶段流水线不仅效率低下，而且深度估计误差、修复伪影会在阶段间累积，最终破坏左右视图间的精细一致性（见图2的世界模型模态对比）。其二，缺乏显式几何锚点意味着模型对场景的三维结构理解是隐式且不稳定的，在长序列生成中容易出现漂移和空间不一致。
@@ -65,8 +63,6 @@ claims:
 从技术实现角度看，将世界模型从单目扩展到双目立体面临两个核心瓶颈。**第一，相机条件注入的稳定性问题。** 现有视频扩散模型通常采用 Rotary Positional Encoding（RoPE）来编码时空位置关系，但相机位姿作为一种额外的条件信号，如何在不破坏预训练先验的前提下融入 RoPE 框架，是一个非平凡的设计问题。直接修改原有编码方案可能导致预训练权重失效，而将相机条件作为外部特征注入又难以建立精确的相对位姿关系。**第二，跨视图注意力的计算效率问题。** 立体视频的潜在空间同时包含左右视图的时空 token，若对所有 token 执行全 4D 注意力，计算量将随视图数平方增长，使得训练和推理成本急剧攀升，难以实用化。
 
 本文提出的 **StereoWorld** 正是针对上述缺口，旨在构建一个端到端的、具备内在几何理解的立体世界模型。其核心动机可以概括为：**利用立体视觉的几何先验（极线约束），在保持预训练视频扩散模型时间一致性的同时，高效且稳定地注入相机条件，从而实现视角一致的立体视频直接生成。** 这一设计不仅绕过了后处理流水线的误差累积，还使模型无需显式深度监督即可推理出合理的视差结构，为 VR/AR 可视化、具身智能中的动作规划等下游任务提供了更原生、更高效的解决方案。
-
-
 
 ## 核心方法与创新机理
 
@@ -120,8 +116,6 @@ $$f^{\mathrm{out}} = \mathrm{Attn}_{3\mathrm{D}}(f^{\mathrm{in}}) + \mathrm{Attn
 
 这两项创新共同构成了 StereoWorld 相对于现有世界模型的核心优势：**统一相机帧 RoPE** 使模型在保留预训练先验的前提下获得相机感知能力，训练稳定且收敛快；**立体感知注意力** 利用极线先验将计算量减半，同时保持视差一致性和生成质量。这使得 StereoWorld 能够以端到端方式直接生成立体视频，相比基于单目重建的 SOTA 方法实现约 3 倍生成速度提升，视角一致性提高约 5%（Table 2），且在相机准确度（RotErr 1.01, TransErr 0.11）和视觉质量（FID 111.36, FVD 83.04）上全面优于现有方法。
 
-
-
 StereoWorld 的整体流程围绕“立体视频潜在扩散”构建，其核心设计目标是在保留预训练视频扩散模型时序先验的前提下，高效注入双目几何约束与相机运动条件。整个管线由五个主要模块串联构成，并在可选阶段引入长视频蒸馏以支持自回归生成。
 
 **输入与条件表示。** 系统接收一对经过校正的立体图像 $(\mathbf{I}_{\mathrm{left}}, \mathbf{I}_{\mathrm{right}}) \in \mathbb{R}^{3 \times H \times W}$ 以及一条相机轨迹 $\{\mathsf{cam}_t\} := \{(\mathbf{K}_t \in \mathbb{R}^{3\times3}, \mathbf{T}_t \in \mathbb{R}^{4\times4}), t \in (1,2,\dots,\dot{N})\}$。其中 $\mathbf{K}_t$ 为内参矩阵，$\mathbf{T}_t$ 为外参矩阵，二者共同定义了每一帧的相机位姿。立体图像对提供了度量尺度的基线信息，而相机轨迹则作为“动作”条件驱动未来帧的生成。
@@ -144,15 +138,8 @@ $$f^{\mathrm{out}} = \mathrm{Attn}_{3\mathrm{D}}(f^{\mathrm{in}}) + \mathrm{Attn
 
 整体而言，该框架的关键瓶颈突破在于两点：其一，通过统一相机帧 RoPE 在位置编码空间中注入相机条件，避免了改变原有 RoPE 带来的预训练先验破坏；其二，通过立体感知注意力将 4D 计算量削减近半，使得端到端立体视频生成在计算上可行。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2603_https_arxiv_org_abs_2603_17375/figures/004_Figure_3.jpg]]
-*Figure 3: Illustration of StereoWorld. Given a pair of stereo images and a conditional camera trajectory, StereoWorld first encodes conditional and noisy video latents from different viewpoints and timesteps using a unified camera–frame RoPE representation. It then performs denoising through a DiT equipped with stereo attention, ultimately producing the final stereo video*
-
 ![[assets/figures/papers/paper_list_l2603_https_arxiv_org_abs_2603_17375/figures/003_Figure_2.jpg]]
 *Figure 2: World Model Comparison. StereoWorld incorporates metric-scale geometry, producing output modalities that are more compatible with pretrained models. Moreover, it can be applied end-to-end for VR visualization, ensuring better consistency of fine-grained details between the left and right views*
-
-
 
 StereoWorld 的核心架构建立在预训练视频扩散模型之上，由 3D VAE 与基于 Transformer 的 DiT 降噪器构成。其关键创新在于两个相互协同的模块：**统一相机帧 RoPE** 与 **立体感知注意力**。前者在不破坏预训练先验的前提下注入相机条件，后者利用极线几何先验大幅降低跨视图注意力计算量。
 
@@ -195,15 +182,8 @@ $$f^{\mathrm{out}} = \mathrm{Attn}_{3\mathrm{D}}(f^{\mathrm{in}}) + \mathrm{Attn
 
 消融实验表明，该分解方案在约 50% FLOPs 下取得与 4D 注意力相当的生成质量，FPS 提升约 44%（见表 5）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2603_https_arxiv_org_abs_2603_17375/figures/011_Figure_7.jpg]]
 *Figure 7: Comparison of different camera-condition strategies*
-
-![[assets/figures/papers/paper_list_l2603_https_arxiv_org_abs_2603_17375/figures/014_Figure_8.jpg]]
-*Figure 8: Attention mask configuration in distillation process*
-
-
 
 ## 实验与关键发现
 
@@ -252,8 +232,6 @@ StereoWorld 在自建的立体测试集（435个样本）上，与多个前沿�
 - **图7**：统一相机帧 RoPE 使训练更稳定、收敛更快。
 - **图15**：失败案例揭示了场景级空间不一致问题，指向未来需要引入空间记忆机制。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2603_https_arxiv_org_abs_2603_17375/figures/007_Table_2.jpg]]
 *Table 2: Comparison of stereo video with SOTA methods on visual quality, camera accuracy, view synchronization and FPS*
 
@@ -265,20 +243,6 @@ StereoWorld 在自建的立体测试集（435个样本）上，与多个前沿�
 
 ![[assets/figures/papers/paper_list_l2603_https_arxiv_org_abs_2603_17375/figures/013_Table_5.jpg]]
 *Table 5: Ablation on attention scheme*
-
-![[assets/figures/papers/paper_list_l2603_https_arxiv_org_abs_2603_17375/figures/010_Figure_6.jpg]]
-*Figure 6: Stereo disparity comparison. Notably, our approach does not rely on any depth supervision during training*
-
-![[assets/figures/papers/paper_list_l2603_https_arxiv_org_abs_2603_17375/figures/005_Table_1.jpg]]
-*Table 1: Training Data Information*
-
-![[assets/figures/papers/paper_list_l2603_https_arxiv_org_abs_2603_17375/figures/019_Figure_12.jpg]]
-*Figure 12: Long Video Distillation Results*
-
-![[assets/figures/papers/paper_list_l2603_https_arxiv_org_abs_2603_17375/figures/020_Figure_15.jpg]]
-*Figure 15: Failure Case. Note that the blue road sign does not exist at the beginning of the sequence; however, as the viewpoint advances, it gradually emerges and increases in size*
-
-
 
 ## 定位与知识库关联
 
@@ -356,8 +320,6 @@ StereoWorld 的训练数据以静态场景为主（TartanAir 等合成数据集�
 4. **显式几何监督的引入**：StereoWorld 的一个有趣特性是：**无需深度监督即可隐式学习视差**（Figure 6）。引入轻量级的显式几何监督（如稀疏视差图或点云）是否能进一步提升几何精度和泛化能力，值得探索。
 
 5. **与具身智能的深度整合**：立体世界模型为具身智能提供了天然的双目观测先验。如何将 StereoWorld 与策略学习（policy learning）或模型预测控制（MPC）结合，在导航和操作任务中发挥双目几何感知的优势，是一个具有潜力的交叉方向。
-
-
 
 ## 原文 PDF
 

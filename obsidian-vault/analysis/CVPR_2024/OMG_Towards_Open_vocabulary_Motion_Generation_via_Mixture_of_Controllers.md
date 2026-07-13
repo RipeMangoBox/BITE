@@ -284,8 +284,6 @@ $$\hat{\mathbf{x}}^{(0)} = (1 - s) \cdot \mathcal{D}_u(\mathbf{x}^{(t)}, t) + s 
 ![[assets/figures/papers/paper_list_l1851_OMG_Towards_Open_vocabulary_Motion_Generation_via_Mixture_of_Controllers/figures/009_Figure_7.jpg]]
 *Figure 7: Qualitative evaluation on model sizes (a) and MoC block (b). Models with larger sizes effectively comprehend richer outof-domain motion features to present better motion expressions. Besides, our technical designs effectively improve the alignment with the input texts*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1851_OMG_Towards_Open_vocabulary_Motion_Generation_via_Mixture_of_Controllers/figures/003_Table_1.jpg]]
 *Table 1: Sizes and architectures of our 4 models*
 

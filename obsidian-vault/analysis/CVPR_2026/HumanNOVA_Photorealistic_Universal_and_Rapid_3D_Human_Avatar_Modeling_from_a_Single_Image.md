@@ -187,8 +187,6 @@ $$
 
 即使在大规模数据训练下，人体结构先验仍能提供关键增益。移除网格先验（即仅使用图像令牌作为条件）后，LPIPS 从 45.18 上升至 46.26，相对恶化 2.3%（Table 3）。这表明将 SMPL 网格作为额外条件信号，通过交叉注意力融入 Transformer，能够引导模型更好地捕捉人体结构约束，从而提升重建精度。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1027_https_openaccess_thecvf_com_content_CVPR2026_html_Hu_HumanNOVA_Photoreal/figures/001_Figure_1.jpg]]
 *Figure 1: Photorealistic, universal and rapid 3D human avatar modeling from a single image by the proposed approach, HumanNOVA. It benefits from both our generated large-scale data and feed-forward model design. Our data generation pipeline expands training data by 20 times (top-left for visualization). With this data, HumanNOVA achieves superior performance while maintaining rapid inference among existing methods (top-right). Once trained, it is universal without the need for test-time fine-tuning or adaptation. Qualitative results show that HumanNOVA produces more precise photorealistic reconstructions compared to the state-of-the-art SiTH method [19] (bottom)*
 
@@ -214,8 +212,6 @@ $$\mathcal{L} = \frac{1}{N} \sum_{n=1}^{N} \left( \mathcal{L}_r^n + \lambda_m \m
 其中 $\mathcal{L}_r^n$ 为 RGB 的 L2 损失，$\mathcal{L}_m^n$ 为掩码损失，$\mathcal{L}_p^n$ 为 LPIPS 感知损失，$\lambda_m$、$\lambda_p$ 为平衡权重。
 
 **设计要点。** 消融实验（Table 3）揭示了两项关键设计选择：(1) 移除网格先验（即不使用 $\mathbf{f_m}$）会使 LPIPS 从 45.18 升至 46.26，表明即使在大规模数据下，人体结构先验仍能提供约 2.3% 的相对增益；(2) 将三平面空间尺寸从 96 缩减至 32（通用 LRM 的常见设置）导致 LPIPS 恶化至 48.33，证明充足的模型容量对细节重建至关重要。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l1027_https_openaccess_thecvf_com_content_CVPR2026_html_Hu_HumanNOVA_Photoreal/figures/002_Figure_2.jpg]]
 *Figure 2: HumanNOVA network architecture. Given a real-world input image, we first estimate its corresponding simplified human mesh. Image and mesh are fed into the multi-modal encoder to extract features which are utilized as the condition for the following mapping network. After that, a Transformer-based mapping network directly maps the features to the 3D triplane representation. From this triplane representation, our framework can render the 2D image given a camera viewpoint*
@@ -254,8 +250,6 @@ HumanNOVA在CustomHuman、THuman2和2K2K三个基准上，对包括专用人体�
 ### 评估公平性说明
 
 论文在评估协议上做了细致的对齐工作，确保与输出网格的基线方法（如SiTH、SiFU、Trellis、Hunyuan2）的公平比较。具体而言，首先将重建网格的尺度与真值对齐，再运用ICP进行进一步几何对齐，最后渲染比较。这一流程同时保证了几何和渲染两个维度的公平性，排除了因尺度或位姿偏差导致的指标失真。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l1027_https_openaccess_thecvf_com_content_CVPR2026_html_Hu_HumanNOVA_Photoreal/figures/003_Table_1.jpg]]
 *Table 1: Ablation on the generated data type on the CustomHuman dataset*

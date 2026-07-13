@@ -83,8 +83,6 @@ ViHOI 在三个基线模型（MDM、ROG、CHOIS）上均实现一致且显著的
 
 当前 ViHOI 的主要局限包括：缺乏细粒度手部标注限制了手指运动与抓取动作的精细生成；训练与推理阶段参考图像的风格差异（渲染 vs. 合成）导致 MPJPE 上升约 2 cm，性能有轻微下降但仍在可接受范围。开放问题指向：如何缩小训练-推理的图像分布差异以释放 GT 渲染时的性能潜力，以及 ViHOI 框架是否可扩展至多物体、多人协作等更复杂交互场景。
 
-
-
 ### 问题背景：文本到HOI运动生成的“一对多”困境
 
 人与物体交互（Human-Object Interaction, HOI）运动生成旨在根据自然语言描述合成逼真的人体动作序列，同时保持与物体的物理接触。近年来，基于扩散模型的文本到运动生成取得了显著进展，如**MDM**（Tevet et al., ICLR 2023）等工作展示了扩散模型在通用运动生成中的潜力。然而，当这些方法被扩展到HOI场景时，面临一个根本性瓶颈：**文本描述仅提供抽象的动作语义（如“拉椅子”），却无法传递物体形状、尺寸、空间位置以及接触点等关键的几何与空间先验**。这导致模型陷入严重的“一对多”映射问题——同一句文本描述可以对应无数种物理上合理或不合理的交互方式，模型缺乏足够的约束来从中选择正确的那一种。
@@ -109,8 +107,6 @@ ViHOI 在三个基线模型（MDM、ROG、CHOIS）上均实现一致且显著的
 3. **即插即用**：视觉先验可作为条件信号注入现有扩散模型，无需改变其核心架构，具有高度的灵活性和通用性。
 
 基于此，本文提出**ViHOI**——一个即插即用的框架，通过VLM从多幅2D参考图像中提取解耦的视觉与文本先验，经Q-Former压缩为紧凑条件token，注入扩散模型以引导物理一致的人-物交互运动生成。
-
-
 
 ## 核心方法与创新机理
 
@@ -153,8 +149,6 @@ ViHOI的changed slot极为精准——它**仅替换了基线模型的文本编�
 
 ViHOI属于**条件信号增强**范式，与**SemGeoMo** (Yang et al., ECCV 2024)利用LLM丰富文本和可供性地图的思路形成互补——前者从视觉端提取几何先验，后者从语义端注入几何知识。ViHOI的独特优势在于其先验直接来自对交互场景的视觉理解，而非对物体可供性的符号化建模，因此在未见物体泛化上表现尤为突出。
 
-
-
 ViHOI 的整体框架围绕一个核心设计展开：将多模态视觉-语言模型（VLM）作为先验提取引擎，从一组 2D 参考图像和文本提示中获取解耦的几何与语义先验，并通过紧凑的条件 token 注入运动扩散模型，从而解决 HOI 生成中文本描述缺乏空间与几何约束的瓶颈问题。
 
 ### Pipeline 总览
@@ -173,15 +167,8 @@ ViHOI 的 pipeline 由四个关键模块串联构成，数据流清晰可追溯�
 
 ViHOI 的架构设计遵循最小侵入原则：对基线模型的唯一修改是将原有的 CLIP 文本编码器替换为 VLM 先验提取器与 Q-Former 模块，其余架构与训练设置保持不变。这一设计使 ViHOI 能够作为即插即用模块应用于 MDM、ROG、CHOIS 三个不同基线模型，在 FullBodyManipulation 数据集上均实现一致且显著的性能提升（Table 1），验证了其架构灵活性与多模态先验的通用价值。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1756_ViHOI_Human_Object_Interaction_Synthesis_with_Visual_Priors/figures/002_Figure_2.jpg]]
 *Figure 2: Overall architecture of ViHOI. We extract visual priors from a set of reference images and textual priors from the input prompt using a VLM. This allows for natural alignment between priors of the two modalities. Subsequently, two Q-Former-based prior adapters distill these high-dimensional priors into a single compact token, respectively, providing the diffusion model with semantically consistent conditioning signals. At each denoising step, a selected HOI generator uses these compact visual and textual prior tokens to guide the synthesis of realistic, semantically coherent human-object interactions*
-
-![[assets/figures/papers/paper_list_l1756_ViHOI_Human_Object_Interaction_Synthesis_with_Visual_Priors/figures/001_Figure_1.jpg]]
-*Figure 1: We propose ViHOI, a novel plug-and-play approach that enables motion diffusion models to effectively leverage rich visual priors from a set of 2D reference images. It utilizes reference images synthesized by a text-to-image generation model that contains rich world knowledge during inference, enabling strong generalization to unseen objects and delivering superior results across multiple benchmarks*
-
-
 
 ### 3.1 基于VLM的解耦先验提取器
 
@@ -229,21 +216,11 @@ $$\mathcal{L} = \mathbb{E}_{t, x_0} \left[ \left\| x_0 - f_\theta(x_t, t, c) \ri
 
 ViHOI在训练和推理阶段采用不同的参考图像获取策略（Figure 3）：
 
-![[assets/figures/papers/paper_list_l1756_ViHOI_Human_Object_Interaction_Synthesis_with_Visual_Priors/figures/003_Figure_3.jpg]]
-*Figure 3: Illustration of strategies to obtain the set of reference images during the training and inference phases, respectively*
-
 - **训练阶段**：利用数据集中的GT运动序列渲染2D图像，并依据接触标签选择关键帧，确保视觉条件与运动严格对齐。
 
 - **推理阶段**：使用文本到图像（T2I）生成模型 **Nano Banana** 根据文本提示生成时序连贯的参考图像，以利用其蕴含的世界知识增强对未见物体的泛化能力。
 
 消融实验（Supplementary Table 2）显示，使用T2I生成图像相比GT渲染图像会导致性能轻微下降（MPJPE从12.94 cm升至14.97 cm），但仍显著优于不使用视觉先验的基线方法，验证了该策略在实际部署中的可行性。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1756_ViHOI_Human_Object_Interaction_Synthesis_with_Visual_Priors/figures/021_Figure_6.jpg]]
-*Figure 6: Qualitative analysis of VLM understanding. The text annotation is “Pull the smalltable, and set it back down.”*
-
-
 
 ## 实验与关键发现
 
@@ -253,9 +230,6 @@ ViHOI 的核心实验设计围绕一个关键主张展开：**从 VLM 提取的�
 
 ![[assets/figures/papers/paper_list_l1756_ViHOI_Human_Object_Interaction_Synthesis_with_Visual_Priors/figures/004_Table_1.jpg]]
 *Table 1: Quantitative comparisons on the FullBodyManipulation dataset [26]. We apply ViHOI as a plug-and-play module to three stateof-the-art HOI motion generation methods, demonstrating its effectiveness and flexibility*
-
-![[assets/figures/papers/paper_list_l1756_ViHOI_Human_Object_Interaction_Synthesis_with_Visual_Priors/figures/014_Table_1.jpg]]
-*Table 1: Impact of Adaptor Query Number (k) on Generation Performance. We vary only the number of visual prior queries, while keeping the number of text queries fixed at one*
 
 在 FullBodyManipulation 数据集上，CHOIS+ViHOI 取得了 **FID 0.68**（基线 CHOIS 为 0.77，降低 0.09）、**MPJPE 14.97 cm**（基线 15.43 cm，降低 0.46 cm）和 **Contact F1 0.75**（基线 0.70，提升 0.05）。当 ViHOI 与 MDM 和 ROG 结合时，同样观察到一致且显著的性能提升（Table 1），其中 ROG+ViHOI 的 MPJPE 从 17.99 cm 降至 14.99 cm，降幅达 3.0 cm。这组结果直接支撑了 verified_analysis 中的高置信度证据（confidence 0.98）：ViHOI 作为即插即用模块的有效性不依赖于特定基线的架构选择。
 
@@ -304,16 +278,6 @@ ViHOI 的训练和推理使用了不同来源的参考图像：训练阶段使�
 ViHOI 在 HOI 运动生成的方法谱系中占据了一个独特位置。与 **CHOIS**（依赖稀疏物体航点作为全局路径先验）和 **ROG**（通过物体表面关键点采样和交互距离场建模几何关系）不同，ViHOI 不直接建模 3D 几何约束，而是通过 VLM 从 2D 参考图像中**隐式**提取几何与语义先验。与 **SemGeoMo**（Yang et al., ECCV 2024）相比，后者结合 LLM 丰富文本和可供性地图，ViHOI 的关键区别在于使用单一 VLM 同时提取视觉和文本先验，并通过层次解耦实现自然的跨模态对齐，避免了多模型级联带来的误差累积。
 
 总体而言，ViHOI 提供了一种轻量、即插即用的先验增强策略，其核心贡献不在于提出新的运动生成架构，而在于证明了 **VLM 中间层表征中蕴含的丰富交互先验可以有效压缩并注入现有扩散模型**，从而显著提升生成质量和泛化能力。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1756_ViHOI_Human_Object_Interaction_Synthesis_with_Visual_Priors/figures/009_Table_5.jpg]]
-*Table 5: Ablation study on the FullBodyManipulation dataset [26]. We compare different layer combinations to extract*
-
-![[assets/figures/papers/paper_list_l1756_ViHOI_Human_Object_Interaction_Synthesis_with_Visual_Priors/figures/015_Figure_3.jpg]]
-*Figure 3: User study on the 3D-Future dataset [11]*
-
-
 
 ## 定位与知识库关联
 
@@ -377,8 +341,6 @@ ViHOI 的方法贡献可分解为三个因果链路：
 | 未见物体泛化能力 | **强** (Table 2) | FID 从 4.99 降至 2.02，效应显著 |
 | 层次解耦策略 (V3-T12) 最优 | **中强** (Table 5) | 多组对比一致，但层数选择范围有限 |
 | 单查询优于多查询 | **中** (Supp. Table 1) | 仅在视觉查询上验证，文本查询固定为 1 |
-
-
 
 ## 原文 PDF
 

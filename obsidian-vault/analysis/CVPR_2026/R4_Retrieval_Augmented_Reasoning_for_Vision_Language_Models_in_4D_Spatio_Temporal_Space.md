@@ -69,8 +69,6 @@ R4 在多个具身推理基准上取得了领先性能：
 
 消融实验进一步揭示了性能突破的机制：语义、空间、时间三键联合检索在 EM-EQA 上达到 78.6%，而单一键检索（如仅语义键）仅能提供 56.2% 的性能，证明多维度时空协同是 R4 性能突破的核心驱动力（Table 5）。在多代理协作场景中，共享四维记忆使主动问答的正确性提高 1.09%，探索效率（SPL）大幅提升 8.66%，首次验证了多代理共享四维世界模型对协作具身推理的有效性（Table 4）。
 
-
-
 **核心瓶颈：VLM 在具身场景中缺乏持久、结构化的四维时空记忆**
 
 当前视觉语言模型（VLM）在具身任务中面临一个根本性瓶颈：它们缺乏持久、结构化的四维（空间+时间）记忆。现有方法通常依赖短时上下文窗口或静态文本/图像语料库进行推理，这导致三个关键缺陷：（1）信息过时且容易产生幻觉；（2）无法有效融合不同时间点和多代理的观测结果；（3）难以在长时程、动态环境中进行情景化推理。这些缺陷严重限制了 VLM 在真实世界具身任务中的表现。
@@ -82,8 +80,6 @@ R4 在多个具身推理基准上取得了领先性能：
 **本文动机：构建统一四维时空记忆以实现训练无关的检索增强推理**
 
 针对上述缺口，本文提出 **R4（Retrieval-Augmented Reasoning for Vision-Language Models in 4D Spatio-Temporal Space）**，一个无需训练的框架，其核心动机在于：通过将语义、空间和时间信息锚定在一个统一且可共享的世界模型中，使 VLM 能够像人类构建心智地图一样，基于持久记忆进行情境化、协作式的情景推理。R4 的关键洞察是：将对象级语义特征、全局空间坐标和时间戳统一存储在由 SLAM 支撑的一致世界模型中，并通过语义、空间、时间三键检索将四维上下文循环注入 VLM 的推理过程，从而在不修改 VLM 参数的前提下，显著提升长时程具身任务的推理能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -129,8 +125,6 @@ R4 的核心创新在于为视觉语言模型（VLM）构建了一个**无需训
 
 R4 的核心洞察在于：**将语义、空间和时间信息锚定在一个统一且可共享的世界模型中，无需对VLM进行任何训练即可实现强大的四维时空检索增强推理**。这一方法使得VLM能够基于持久的结构化记忆进行情境化、协作式的情景推理，在多个具身问答基准上显著超越现有方法。
 
-
-
 R4 是一个免训练的检索增强推理框架，其核心思想是将视觉语言模型（VLM）的推理能力与一个持续更新的四维（空间+时间）知识数据库相耦合。框架由两条并行运行的管道构成：**存储管道**负责增量式地将环境观测转化为结构化的四维记忆；**检索-推理管道**则在 VLM 遇到无法仅凭当前感知回答的问题时，从四维记忆中检索相关上下文，并循环注入 VLM 以支持跨时空的情景推理。
 
 ### 管道架构与模块关系
@@ -165,12 +159,8 @@ R4 是一个免训练的检索增强推理框架，其核心思想是将视觉�
 
 与经典 RAG 方法在静态文本或单帧图像上检索不同，R4 的检索空间是统一且持续更新的四维空间。语义嵌入提供“是什么”的锚定，全局空间坐标提供“在哪里”的约束，时间戳提供“在何时”的边界。消融实验（Table 5）表明，三键联合检索（SEM+SPA+TEM）在情景记忆问答上达到 78.6% 的 LLM-Match 分数，而仅使用语义键只能达到 56.2%，证明多维度时空协同是 R4 性能突破的核心机制。整个框架无需对 VLM 进行任何微调或重新训练，完全通过结构化记忆与检索增强实现性能提升。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2409_https_arxiv_org_abs_2512_15940/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the*
-
-
 
 R4框架由两个并行运行的紧密耦合组件构成：一个持续构建终生四维知识数据库的**存储管道**，以及一个在语义、空间和时间键上执行检索增强推理的**检索-推理管道**。以下分述其关键模块与核心公式。
 
@@ -219,19 +209,6 @@ $$ \hat{a} = \operatorname{VLM}(q \oplus C(q)) \tag{6} $$
 
 **多代理协作**：多个代理通过SLAM对齐共享同一个四维知识数据库 $\mathcal{D}$，各自探索并填充观测，实现协作记忆的继承与丰富，无需额外训练。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2409_https_arxiv_org_abs_2512_15940/figures/002_Figure_2.jpg]]
-*Figure 2: Storage pipeline: generation of object-level 4D features and insertion into the continuous 4D knowledge database*
-
-![[assets/figures/papers/paper_list_l2409_https_arxiv_org_abs_2512_15940/figures/003_Figure_3.jpg]]
-*Figure 3: Retrieval-augmented 4D reasoning pipeline. Queries that cannot be answered from live perception trigger retrievalaugmented reasoning over semantic, spatial, and temporal keys. Retrieved context is re-injected into the VLM for reasoning*
-
-![[assets/figures/papers/paper_list_l2409_https_arxiv_org_abs_2512_15940/figures/016_Figure_7.jpg]]
-*Figure 7: Illustration of an OpenEQA episode with*
-
-
-
 ## 实验与关键发现
 
 ### 核心性能突破：四维记忆驱动的跨基准领先
@@ -254,9 +231,6 @@ R4在三个具身推理基准上均取得最优结果，其性能突破根源于
 
 在**VLM4D**交叉条件评估中，R4以**77.31%**的总体准确率超越**Gemini-2.5-Pro**（62.0%）达15.31个百分点（Table 3）。该实验将基准划分为两个不相交的半区，在一半上构建记忆、在另一半上回答问题，严格检验了四维记忆的泛化与迁移能力。R4在自我中心理解（Ego-C. 78.17%）、外中心理解（Exo-C. 77.33%）和方向推理（Direct. 77.42%）上均取得大幅领先，说明全局对齐的空间锚定使模型能够灵活切换视角并进行空间关系推理。
 
-![[assets/figures/papers/paper_list_l2409_https_arxiv_org_abs_2512_15940/figures/006_Table_3.jpg]]
-*Table 3: VLM4D evaluation. Ego-C. and Exo-C. denote egocentric and exocentric comprehension accuracy, while Direct. and FP indicate directional and false-positive reasoning accuracy (↑). We compare the*
-
 ### 消融实验：语义-空间-时间三维协同是性能突破的核心
 
 消融实验（Table 5）系统拆解了语义键（SEM）、空间键（SPA）和时间键（TEM）对EM-EQA性能的独立与联合贡献，结果清晰揭示了三维度协同的因果机制：
@@ -275,9 +249,6 @@ R4在三个具身推理基准上均取得最优结果，其性能突破根源于
 
 在主动问答的协作场景中（Table 4），五个辅助代理同时探索环境并将观测填充至共享的四维知识数据库，R4-Collab.代理仅负责回答。结果显示，协作模式下答案正确性（LLM-Match）从单代理的72.82%提升至**73.91%**（+1.09%），而探索效率（SPL）从61.47%大幅提升至**70.13%**（+8.66%）。这是首次证明多代理共享四维世界模型可实现高效的协作具身推理——代理间通过SLAM对齐共享同一世界模型，继承和丰富彼此的观测，从而减少重复探索并提高信息覆盖的完整性。
 
-![[assets/figures/papers/paper_list_l2409_https_arxiv_org_abs_2512_15940/figures/007_Table_4.jpg]]
-*Table 4: Collaboration evaluation on A-EQA. Comparison of*
-
 ### 失败模式与局限性分析
 
 尽管R4在多数基准上取得突破，定性示例（Figure 5, Table 7）和分项分析揭示了几类典型失败模式：
@@ -286,11 +257,7 @@ R4在三个具身推理基准上均取得最优结果，其性能突破根源于
 2. **常识与功能推理差距**：在需要丰富常识和日常物品使用模式的空间理解与功能推理任务上，R4与人类基线仍存在明显差距（Figure 6, Table 8），说明当前四维记忆缺乏对物理交互后果和文化先验的建模。
 3. **检索效率约束**：当前检索过程可能需要多次迭代，在实时或大规模多代理部署场景下的效率尚需验证和优化。
 
-![[assets/figures/papers/paper_list_l2409_https_arxiv_org_abs_2512_15940/figures/015_Figure_6.jpg]]
-
 总体而言，R4通过将语义、空间和时间信息锚定在统一且可共享的世界模型中，无需对VLM进行任何训练即实现了强大的四维时空检索增强推理。消融实验确证了三维度协同的因果必要性，多代理实验展示了共享记忆的协作潜力，而失败模式则指明了动态物理推理和常识融合等未来改进方向。
-
-
 
 ## 定位与知识库关联
 
@@ -349,8 +316,6 @@ R4 首次证明了多代理共享四维世界模型可实现高效的协作具�
 - **协作基准的设计**：是否可以设计新的基准，专门考察多代理共享世界模型下的协作检索与推理能力？这需要定义协作效率、记忆一致性、冲突消解等评估维度。
 
 - **长期记忆的稳定性与纠错**：在 VLM 未重新训练的情况下，结构化四维记忆的长期稳定性和对错误记忆的纠正机制尚需深入探索。SLAM 的累积漂移、语义描述的不一致性、以及对象匹配的误判都可能随时间累积误差。
-
-
 
 ## 原文 PDF
 

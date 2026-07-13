@@ -48,8 +48,6 @@ claims:
 
 在HEVC-B数据集上，GVC1D相比此前最好的生成式视频编解码器 **GLC-Video**，在LPIPS指标下节省 **60.4%** 码率，在DISTS指标下节省 **68.8%** 码率。消融实验表明，移除长程1D记忆会导致BD-Rate恶化超过40%，将1D记忆替换为2D特征管理的记忆则使BD-Rate恶化超过16%，证实了1D令牌的语义紧凑性对压缩效率的决定性作用。方法目前适用于低码率有损压缩场景，有限的令牌容量使其难以保留极精细的高频细节，暂不支持无损扩展。
 
-
-
 视频压缩是数字媒体传输和存储的核心技术。传统视频编解码标准（如 VVC、HEVC）依赖手工设计的预测、变换和熵编码模块，在 PSNR 指标上表现优异，但在极低码率下往往产生模糊或块效应等视觉伪影。近年来，神经视频编解码器（neural video codecs）通过端到端学习取得了显著进展，其中生成式视频编解码器（generative video codecs）进一步引入了感知损失和对抗训练，在低码率下能够重建出更自然、语义更完整的画面。
 
 然而，现有生成式视频编解码器（如 **GLC-Video**）普遍采用一个共同的设计范式：将视频帧编码为**密集的 2D 潜在网格**（dense 2D latent grids）。这种 2D 潜在表示继承了图像的空间结构，虽便于与卷积或 Transformer 架构对接，却带来了两个根本性问题：
@@ -60,8 +58,6 @@ claims:
 这两个瓶颈在极低码率场景下尤为突出。当码率预算极度受限时，2D 潜在网格要么因令牌数量不足而丢失关键语义信息，要么因空间结构僵化而将有限的码率浪费在非语义区域。因此，**如何突破 2D 潜在网格的结构性限制，构建更紧凑、语义感知更强的潜在表示，并引入有效的长程上下文建模机制，是生成式视频压缩向更低码率推进的关键挑战**。
 
 本文 GVC1D 正是针对上述问题提出了全新的解决方案：用**一维潜在令牌（1D latent tokens）**替代传统的 2D 潜在网格，并配套设计了一个基于 1D 令牌循环更新的**长程记忆模块（1D memory）**，为编解码提供语义丰富的长程上下文。这一设计从根本上解除了空间结构的束缚，使模型能够自适应地关注语义区域，在显著减少令牌数量的同时保持甚至提升感知重建质量。
-
-
 
 ## 核心方法与创新机理
 
@@ -102,8 +98,6 @@ GVC1D 的上下文模型由长程 1D 记忆和短程上下文缓冲两部分组�
 | 熵模型 | 2D 空间超先验/条件编码 | 1D 自回归 Transformer |
 
 这三个 changed slots 的协同效果在 HEVC-B 数据集上得到验证：相比 GLC-Video，GVC1D 在 LPIPS 指标下节省 60.4% 码率，在 DISTS 指标下节省 68.8% 码率，在 PSNR 和 MS-SSIM 下分别节省 53.8% 和 45.1% 码率。
-
-
 
 GVC1D 的整体框架围绕“一维潜在表示”这一核心设计展开，将传统视频编解码中固定的 2D 潜在网格替换为紧凑的 1D 潜在令牌序列，并辅以长短期上下文模型进行条件编解码。整个 pipeline 由编码器、解码器、熵模型和上下文模型四大模块构成，其数据流关系如 Figure 2 所示。
 
@@ -157,8 +151,6 @@ $$L_{\mathrm{stage2}} = \frac{1}{T} \sum_{t=1}^{T} \big(R + \lambda L_{\mathrm{s
 
 对于每一帧 $x_t$：图像嵌入 $E_t$ 与可学习令牌 $L$、上下文 $C$ 一同进入编码器，生成 1D 潜在表示 $y_t$；量化后经自回归熵模型进行算术编码得到码流；解码端从码流恢复 $\hat{y}_t$，结合掩码令牌 $M$ 和上下文 $C$ 重建 $\hat{x}_t$；上下文模型则利用解码结果更新短时缓冲和长时记忆，为下一帧提供时序上下文。这一闭环设计使得 1D 令牌能够在极低码率下保持语义连贯性和时序一致性。
 
-
-
 GVC1D 的编码器由 $M_e$ 个编码块堆叠而成，每个块包含 $N_e$ 层局部 Transformer 和一层全局 Transformer：
 
 $$
@@ -189,21 +181,14 @@ $$
 
 其中 $R$ 为码率，$\mathcal{L}_{\mathrm{stage1}}$ 为第一阶段训练得到的感知重建损失，$\lambda$ 为平衡系数。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l880_https_arxiv_org_abs_2603_15302/figures/001_Figure_1.jpg]]
 *Figure 1: Method comparison. (a) Previous generative video codecs [28, 34, 50] encode videos into dense 2D latent grids with rigid spatial structures using short-term context*
-
-![[assets/figures/papers/paper_list_l880_https_arxiv_org_abs_2603_15302/figures/003_Figure_3.jpg]]
-*Figure 3: 1D memory*
 
 ![[assets/figures/papers/paper_list_l880_https_arxiv_org_abs_2603_15302/figures/004_Figure_4.jpg]]
 *Figure 4: Visualization of 1D latent token outflows across two frames during object motion. In the two figures, the lines connect points corresponding to the maximum attention weights of each token, with the numbers indicating token indices*
 
 ![[assets/figures/papers/paper_list_l880_https_arxiv_org_abs_2603_15302/figures/005_Figure_5.jpg]]
 *Figure 5: Visualization of the outflow variation of a 1D latent token (index 4) as a new object appears. The red boxes in the first row mark image patches with the highest attention weights, while the green lines in the second row link them to the top four 1D latent tokens with the strongest attention. The bottom row is the 1D latent tokens attention weights corresponding to the maximum weight image patch (red boxes). As new content emerges, attention weights gradually shift from previously active tokens to newly activated ones*
-
-
 
 ## 实验与关键发现
 
@@ -214,9 +199,6 @@ GVC1D 在 HEVC-B、UVG 和 MCL-JCV 三个标准数据集上与传统编解码器
 **Table 1** 汇总了在 HEVC-B、UVG 和 MCL-JCV 上的 BD-Rate 对比。GVC1D 在感知质量指标上展现出压倒性优势：与先前最好的生成式编解码器 GLC-Video 相比，在 HEVC-B 数据集上 LPIPS BD-Rate 节省 **60.4%**，DISTS BD-Rate 节省 **68.8%**。即使在 PSNR 和 MS-SSIM 等保真度指标上，GVC1D 仍分别节省 **53.8%** 和 **45.1%** 的码率。这一结果验证了核心洞察：去除 2D 空间对应关系后，1D 令牌能够自适应地关注语义区域，天然地减少令牌数量，形成紧凑的语义潜在空间，从而高效利用时空冗余。
 
 值得注意的是，GVC1D 主要面向感知压缩。在 PSNR/MS-SSIM 比较中，GVC1D 虽不如面向 PSNR 优化的 DCVC 系列，但其感知指标和视觉质量大幅领先，且低码率下 PSNR 优值与感知质量无必然对应。**Figure 6** 的率失真曲线直观展示了 GVC1D 在 LPIPS 和 DISTS 指标上的显著优势，尤其在极低码率区间，GVC1D 的曲线明显低于所有对比方法。
-
-![[assets/figures/papers/paper_list_l880_https_arxiv_org_abs_2603_15302/figures/006_Figure_6.jpg]]
-*Figure 6: Rate-distortion curves on the HEVC-B, the UVG and the MCL-JCV datasets. 96 frames are tested in RGB colorspace with intra-period=–1*
 
 **Figure 7** 和 **Figure 12** 提供了定性视觉对比。GVC1D 重建的视频帧在纹理细节和语义保真度上明显优于 GLC-Video 和 VTM，尤其在复杂场景和低码率下，传统方法出现明显的块效应和模糊，而 GVC1D 保持了更自然的视觉质量。
 
@@ -250,27 +232,11 @@ GVC1D 在 HEVC-B、UVG 和 MCL-JCV 三个标准数据集上与传统编解码器
 
 3. **内容复杂度适应性。** 当前所有帧使用固定数量的 1D 令牌，无法根据内容复杂度动态调整。对于场景剧烈变化或包含大量细节的视频片段，固定令牌数可能导致信息瓶颈。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l880_https_arxiv_org_abs_2603_15302/figures/007_Table_1.jpg]]
 *Table 1: BD-Rate (%) comparison in the RGB colorspace on the HEVC-B, UVG, and MCL-JCV datasets (lower is better). 96 frames are evaluated with an intra-period of –1*
 
 ![[assets/figures/papers/paper_list_l880_https_arxiv_org_abs_2603_15302/figures/009_Table_3.jpg]]
 *Table 3: BD-Rate comparison of different model variants. AR denotes the autoregressive entropy model, and Memory denotes the memory component, where 1D and 2D indicate the use of 1D or 2D features to manage the memory. We use setting (4) as the anchor, which is finally adopted by our method*
-
-![[assets/figures/papers/paper_list_l880_https_arxiv_org_abs_2603_15302/figures/008_Table_2.jpg]]
-*Table 2: BD-Rate comparison for different token sizes. The token size of 32 × 16 is used as the anchor*
-
-![[assets/figures/papers/paper_list_l880_https_arxiv_org_abs_2603_15302/figures/011_Table_4.jpg]]
-*Table 4: Complexity analysis using fp16 precision at 1080P resolution. The tests are conducted on an NVIDIA A100 GPU*
-
-![[assets/figures/papers/paper_list_l880_https_arxiv_org_abs_2603_15302/figures/012_Figure_8.jpg]]
-*Figure 8: Rate-distortion curves in terms of PSNR and MS-SSIM*
-
-![[assets/figures/papers/paper_list_l880_https_arxiv_org_abs_2603_15302/figures/010_Figure_7.jpg]]
-*Figure 7: Qualitative examples on the MCL-JCV datasets*
-
-
 
 ## 定位与知识库关联
 
@@ -313,8 +279,6 @@ GVC1D的适用边界明确限定于**低码率有损压缩**场景。由于每�
 2. **高分辨率鲁棒性**：在4K/8K分辨率或场景剧烈变化时，1D令牌的语义聚合能力是否依然鲁棒？当前实验主要在1080P分辨率下进行，更高分辨率下的行为尚待验证。
 3. **可伸缩编码扩展**：能否将1D潜在表示与无损压缩框架结合，构建感知一级的可伸缩编码方案？这需要在令牌表示中引入层次化的信息结构。
 4. **解码延迟优化**：自回归熵模型在长序列解码时存在顺序依赖，其解码延迟是否可以通过并行解码策略或非自回归近似进一步优化？
-
-
 
 ## 原文 PDF
 

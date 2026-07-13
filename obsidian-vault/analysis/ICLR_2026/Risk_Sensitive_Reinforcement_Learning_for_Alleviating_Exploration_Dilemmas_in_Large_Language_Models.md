@@ -52,8 +52,6 @@ claims:
 
 方法层面，本文将该框架实例化为**RS-GRPO**（Risk-Sensitive GRPO），仅需替换标准 GRPO 中的优势估计函数即可实现，改动极小。在数学推理基准上的实验表明，RS-GRPO 相比标准 GRPO 在 pass@32 上平均提升约 4%，同时 pass@1 保持或略有提升（平均约 +2%）。老虎机实验进一步证明，当标准策略梯度被困于局部最优时，风险敏感策略梯度（β ≥ 4）能够成功逃逸并收敛至全局最优。
 
-
-
 ### 大语言模型推理训练中的探索困境
 
 近年来，强化学习（RL）已成为微调大语言模型（LLM）以提升其推理能力的主流范式。典型流程中，模型针对给定提示采样多个响应，通过结果验证器分配奖励，再利用策略梯度算法（如 GRPO）更新参数，以最大化期望奖励。然而，这一标准范式隐含着一个根本性的瓶颈：**预训练语言模型的初始策略分布高度集中**——模型倾向于反复生成少数几种高概率的解题模式，而标准 RL 的优化目标（最大化均值奖励）会进一步强化这种集中趋势，使策略坍缩至已有能力的局部最优，无法有效探索新的推理路径。
@@ -79,8 +77,6 @@ claims:
 $$A_{\beta}^{\pi_{\theta}}(y) = \frac{1}{\beta} \left( \frac{e^{\beta r(y)}}{\mathbb{E}_{y' \sim \pi_{\theta}(\cdot | x)}[e^{\beta r(y')}]} - 1 \right)$$
 
 该优势函数具有两个关键性质：（1）通过指数变换放大高奖励样本的权重、惩罚低奖励样本，驱动策略向高奖励区域探索；（2）即使对于准确率较高的提示，仍保持非零梯度信号，避免了现有方法中优势消失的问题。这使得模型能够在维持 pass@1 性能的同时，持续提升 pass@k 表现，实现探索与利用的有效平衡。
-
-
 
 ## 核心方法与创新机理
 
@@ -135,8 +131,6 @@ RS-GRPO 通过指数效用函数统一解决了这两个问题：稠密的非零
 
 RS-GRPO 的工程实现极其简洁：仅需替换 GRPO 中的优势计算模块，无需修改采样策略、奖励模型或优化器架构。经验优势估计公式（式 8）可直接作为现有 GRPO 实现的 drop-in replacement，计算开销与标准 GRPO 相当（仅增加 $N$ 次指数运算）。这一设计使得该方法可无缝集成到主流 RL 微调框架（如 VeRL）中，且所有实验均在统一的超参数设置下进行公平比较。
 
-
-
 ![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_7kC8ORye4l/figures/002_Table_1.jpg]]
 *Table 1: Comparison of Pass@k optimization methods with Risk-Sensitive RL*
 
@@ -172,8 +166,6 @@ Table 1 系统比较了 RS-GRPO 与现有 pass@k 优化方法的特性差异。R
 - **Walder & Karkhanis (2025)** 基于平滑最大目标，但其优势估计始终为正，导致熵崩塌。
 - **Mahdavi et al. (2025)** 和 **Chen et al. (2025)** 分别通过重新加权和子集估计优化 pass@k，但在高准确率提示上优势信号消失。
 - RS-GRPO 通过指数效用函数自然处理连续奖励，并在所有准确率水平上维持非零梯度，实现了更优的探索-利用权衡。
-
-
 
 ### 风险敏感目标函数
 
@@ -226,8 +218,6 @@ RS-GRPO 由三个核心模块构成，均基于现有 GRPO 框架（Shao et al.,
 
 实验超参数方面，典型配置为 $\beta=2$（在 pass@1 和 pass@k 间取得最佳平衡），响应数 $N=16$，训练使用 VeRL 框架统一管理。训练中采用动态采样技术，排除全对或全错的 rollout 以保持非零梯度。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与因果机制
@@ -253,8 +243,6 @@ $$\hat{A}_{\beta}^{\pi_{\theta}}(y_i) = \frac{1}{\beta} \left( \frac{e^{\beta r(
 
 Figure 3 展示了一个决定性证据：在 100 臂老虎机问题中，策略被初始化为一个远离全局最优（奖励 1.0）的局部最优（奖励约 0.6）。风险中性策略（β = 0）始终被困在局部最优，而风险敏感策略（β ≥ 4）成功收敛到全局最优。值得注意的是，更大的 β 值虽然最终也能收敛，但收敛速度明显变慢——这揭示了风险敏感性与优化效率之间的权衡。
 
-![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_7kC8ORye4l/figures/008_Figure_3.jpg]]
-*Figure 3: A bandit experiment demonstrating that risk-sensitive RL can escape a local optimum that traps its standard RL counterpart. Left: The reward landscape shows a global optimum and a distinct local optimum where the policy is initialized. Right: A standard risk-neutral policy ( $\beta$ = 0 ) is trapped locally, while risk-sensitive policies $\left( \beta \geq$ 4 $\right$) converge to the global optimum
 
 ### 主要实验结果
 
@@ -288,8 +276,6 @@ Figure 6 展示了 RS-GRPO 与三类现有 pass@k 优化方法的训练动态对
 
 **响应数 N 的影响**（Figure 11）：RS-GRPO 在 N ∈ {4, 8, 16, 32} 下均一致优于 GRPO，表明该方法对不同采样预算具有鲁棒性。
 
-![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_7kC8ORye4l/figures/055_Figure_11.jpg]]
-*Figure 11: Ablation the effect of responses per prompt (N). We vary N $\in \{$ 4 , 8 , 1 6 , 3 2 $\} }$ while keeping the total batch size fixed, and report average pass@k for k $\in \{$ 1 , 2 , . . . , 3 2 $\}$ across AIME24/25, CMIMC25, and HMMT Feb-24/Feb-25 using Qwen2.5-7B-MATH trained on dapo17k. RS-GRPO ( $\beta$ = 2 ) consistently outperforms GRPO ( $\beta$ = 0 ) for all N , highlighting the robustness of the method
 
 **探索多样性验证**（Figure 7 左）：RS-GRPO 生成的唯一答案数量显著多于 GRPO，直接证实了其增强探索能力的效果。Figure 7 右的准确率转移图进一步显示，RS-GRPO 在 GRPO 失败的提示上获得了更多正确解答。
 
@@ -309,13 +295,6 @@ Figure 6 展示了 RS-GRPO 与三类现有 pass@k 优化方法的训练动态对
 1. **部分模型高 k 值退化**：在 Qwen2.5-7B 和 Llama3.1-8B-Instruct 上，RS-GRPO 在高 k 值下未能超越基础模型。可能原因是这些基础模型的最优策略离初始分布太远，仅靠风险敏感梯度不足以充分跨越分布鸿沟。
 2. **自适应 β 机制缺失**：尝试的动态 β 策略未能超越固定 β = 2，表明当前缺乏有效的自适应风险调节机制。
 3. **框架局限性**：风险敏感框架目前为 bandit 设置设计，尚未扩展到具有状态转移的完整强化学习场景。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_7kC8ORye4l/figures/057_Table_5.jpg]]
-*Table 5: Hyperparameters used in our experiments During RL Training*
-
-
 
 ## 定位与知识库关联
 
@@ -367,8 +346,6 @@ $$\hat{A}_{\beta}^{\pi_{\theta}}(y_i) = \frac{1}{\beta} \left( \frac{e^{\beta r(
 - **与内在奖励的结合**：风险敏感 RL 能否与基于模型不确定性的探索奖励或好奇心驱动机制结合，进一步提升对未知区域的探索效率？
 - **完整 RL 场景扩展**：如何将风险敏感框架从 bandit 设置扩展到具有状态转移的序列决策问题，以支持更复杂的推理链优化？
 - **理论收敛性分析**：在 LLM 的非凸策略空间中，风险敏感策略梯度的收敛性理论尚不完整，特别是 β 与收敛速度之间的定量关系需要进一步刻画。
-
-
 
 ## 原文 PDF
 

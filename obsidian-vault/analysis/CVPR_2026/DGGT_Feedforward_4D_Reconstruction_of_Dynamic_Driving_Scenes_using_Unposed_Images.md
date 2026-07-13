@@ -53,8 +53,6 @@ claims:
 
 尽管如此，DGGT仍存在局限：当动态掩膜不准确或运动遮挡严重时，跟踪与重建会出现失败案例；扩散精细化模块增加了计算开销，尚未针对实时应用深度优化；模型主要在驾驶场景训练，在非结构化或极端动态环境中的泛化性有待验证。未来工作可探索自监督动态掩膜学习、更轻量的精细化模块，以及向更长时序序列的扩展。
 
-
-
 自动驾驶系统依赖大规模时序传感器数据来感知、预测和规划。从这些数据中高效重建4D动态场景（3D空间+时间）是下游任务的基础能力，它需要同时恢复场景几何、外观、运动以及相机姿态。然而，现有方法在这一目标上存在根本性的效率与可扩展性瓶颈。
 
 **逐场景优化的困境。** 以 **EmerNeRF** (Yang et al., arXiv 2023)、**PVG** (Chen et al., CVPR 2024) 和 **DeformableGS** (Yang et al., CVPR 2024) 为代表的动态场景重建方法，通常需要对每个场景进行独立的梯度下降优化，耗时数分钟到数小时。这种逐场景优化范式使其难以作为大规模驾驶日志的标准化预处理步骤，严重制约了数据管线的吞吐量。
@@ -64,8 +62,6 @@ claims:
 **免姿态方法的缺口。** 最近，**NoPoSplat** (Ye et al., arXiv 2024) 和 **VGGT++** (Wang et al., CVPR 2025) 探索了无需已知姿态的前馈重建，但它们同样局限于静态场景，未触及动态建模这一核心挑战。
 
 上述缺口共同指向一个核心瓶颈：**现有动态场景重建方法依赖逐场景优化、已知相机姿态或固定短窗口，导致速度慢、可扩展性差，难以作为大规模驾驶日志的预处理步骤。** 本文的动机正是打破这些依赖——将相机姿态从必需输入变为模型同步预测的输出，并一次性生成像素对齐的3D高斯图以及动态-静态分解，使前馈重建能够摆脱对姿态校准和固定序列长度的限制，从而在0.4秒内从无姿态图像完成高质量的4D动态场景重建。
-
-
 
 ## 核心方法与创新机理
 
@@ -110,8 +106,6 @@ $$\mu_d^{t_i} = \mu_d^{t_a} + \omega^{t_i} \cdot F(t_a, t_b), \quad \omega^{t_i}
 $$\tilde{I}^{t_i} = f_{\text{diffusion}}( \hat{I}^{t_i}, I_{\text{ref}} )$$
 
 该模块通过重建损失、感知损失和风格（Gram）损失的组合进行训练。消融实验（Table 4）表明，扩散精细化虽未大幅提升PSNR（27.41→27.32），但在视觉质量上显著减少了伪影，尤其在场景编辑中可修复空洞。
-
-
 
 DGGT 提出了一种**免姿态的前馈式动态场景重建框架**，其核心设计理念是将相机姿态从必需的输入条件转变为模型同步预测的输出，从而摆脱对离线标定或固定序列长度的依赖。整个 pipeline 以多视图无姿态图像序列为输入，在单次前向传播中完成相机参数估计、像素对齐高斯图生成、动静态分解、3D 运动跟踪以及扩散精细化渲染，最终输出高质量的 4D 动态场景表示。
 
@@ -167,12 +161,8 @@ DGGT 提出了一种**免姿态的前馈式动态场景重建框架**，其核�
 
 > **证据强度说明**：上述架构描述基于论文 Sec. 3.1–3.3 的完整方法阐述，所有模块的功能和连接关系均有明确的公式或文字锚点支撑（置信度 ≥ 0.95）。消融实验（Table 4, Figure 6）为各组件的有效性提供了因果验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2512_03004/figures/001_Figure_1.jpg]]
 *Figure 1: Left: Our feedforward framework reconstructs dynamic driving scenes directly from unposed images within 0.4 seconds, producing outputs such as camera pose, 3D Gaussian tracking, depth, and dynamic maps, which further enable instance-level scene editing. Right: Quantitative comparison shows that our method achieves state-of-the-art reconstruction quality with competitive inference speed, outperforming prior feedforward approaches in both accuracy and efficiency.(using single-view input as an example)*
-
-
 
 DGGT 的前馈流水线由八个核心模块串联构成，其设计逻辑是将动态场景重建分解为**姿态估计、逐帧高斯生成、动静分离、运动预测与插值、组合渲染、扩散后处理**六个可微阶段，从而将相机姿态从输入约束转变为模型输出。
 
@@ -242,8 +232,6 @@ $$\mathcal{L}_{\mathrm{diffusion}} = \mathcal{L}_{\mathrm{Recon}} + \mathcal{L}_
 
 消融实验（Table 4）表明，移除扩散精细化后 PSNR 从 27.41 降至 27.32，SSIM 和 LPIPS 也有下降，尤其在减少伪影方面效果显著。
 
-
-
 ## 实验与关键发现
 
 ### 主实验：Waymo 数据集新视角合成
@@ -262,9 +250,6 @@ DGGT 取得了 **27.41 PSNR**、**0.846 SSIM** 和 **3.47 D-RMSE**，在所有�
 为验证方法的泛化能力，将在 Waymo 上训练的 DGGT 模型直接应用于 nuScenes 和 Argoverse2 数据集，结果见 **Table 2**。
 
 在零样本设定下，DGGT 在 nuScenes 上取得 **25.31 PSNR / 0.794 SSIM / 0.152 LPIPS**，在 Argoverse2 上取得 **26.34 PSNR / 0.812 SSIM / 0.155 LPIPS**，分别超出 STORM 7.54 dB 和 5.51 dB。这一巨大差距源于 STORM 依赖已知相机姿态，而跨域姿态分布差异导致其性能崩溃。DGGT 将姿态作为输出同步预测，从根本上规避了该问题。在目标数据集上微调后，DGGT 的性能进一步提升至 nuScenes 27.09 PSNR、Argoverse2 28.21 PSNR。**Figure 7** 展示了零样本推理的定性示例，渲染结果保持了良好的结构与细节。
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2512_03004/figures/011_Figure_7.jpg]]
-*Figure 7: Zero-shot experiment on nuScenes and Argoverse2 datasets*
 
 ### 3D 运动估计精度
 
@@ -289,8 +274,6 @@ DGGT 取得了 **27.41 PSNR**、**0.846 SSIM** 和 **3.47 D-RMSE**，在所有�
 3. **扩散精细化的计算开销**：扩散模块虽提升质量，但增加了额外推理时间，目前未针对实时应用深度优化。
 4. **域外泛化受限**：模型主要基于结构化驾驶场景训练，在非结构化环境或极端动态场景中的表现有待验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2512_03004/figures/004_Figure_3.jpg]]
 *Figure 3: Qualitative comparison of different methods on Waymo dataset. (results shown are for the forward-facing camera)*
 
@@ -299,20 +282,6 @@ DGGT 取得了 **27.41 PSNR**、**0.846 SSIM** 和 **3.47 D-RMSE**，在所有�
 
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2512_03004/figures/007_Table_3.jpg]]
 *Table 3: Ablation study on the number of input views. Reconstruction performance shows low sensitivity to the number of input frames, demonstrating robustness with sparse inputs*
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2512_03004/figures/008_Table_4.jpg]]
-*Table 4: Ablation study. Removing lifespan parameters or the diffusion refinement model decreases performance*
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2512_03004/figures/010_Figure_6.jpg]]
-*Figure 6: Ablation study. Removing the lifespan parameter hinders the capture of changing appearance of static scene, while the diffusion refinement reduces artifacts and improves rendering*
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2512_03004/figures/009_Figure_5.jpg]]
-*Figure 5: Scene editing results. Cars can be removed or shifted (row 1), and novel vehicles/cyclists inserted from other scenes (row 2). Diffusion refinement fixes artifacts such as holes (red box)*
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2512_03004/figures/012_Figure_8.jpg]]
-*Figure 8: More Qualitative Results*
-
-
 
 ## 定位与知识库关联
 
@@ -379,8 +348,6 @@ Motion Head 基于 Transformer 预测像素对之间的 3D 位移，但当物体
 3. **遮挡鲁棒性**：在高度遮挡和非线性动态下，运动跟踪的鲁棒性如何进一步提升？多假设跟踪或概率建模是否是可行方向？
 4. **轻量级精细化**：扩散模块能否被轻量级模型（如轻量 U-Net 或对抗训练）替代，以降低延迟？
 5. **非驾驶场景泛化**：模型在室内动态场景、运动捕捉等非结构化环境中的表现如何？需要什么样的适配策略？
-
-
 
 ## 原文 PDF
 

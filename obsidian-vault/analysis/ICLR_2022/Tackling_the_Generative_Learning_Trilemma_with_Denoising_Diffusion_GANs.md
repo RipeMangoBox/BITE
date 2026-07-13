@@ -67,8 +67,6 @@ claims:
 
 **局限与展望**：在 CIFAR-10 上的 FID (3.75) 仍略低于最优扩散模型（Score SDE 的 2.20），保真度存在提升空间；训练计算成本较高（CIFAR-10 约 48 GPU 小时）；当前架构在 T 增大时性能下降，扩展性有待验证。未来方向包括进一步减少步数、设计更高效的条件生成器，以及将该思路推广至潜在扩散模型。
 
-
-
 ### 生成式学习的三难困境
 
 深度生成模型领域长期面临一个根本性的权衡，本文将其概括为**生成式学习三难困境**（Figure 1）：现有方法难以同时实现高质量的样本生成、快速的采样速度以及充分的模式覆盖（多样性）。GAN 类方法通常具备快速采样的优势，但容易遭受模式坍塌，导致多样性不足；而基于似然的模型（如 VAE）和扩散模型虽然能够较好地覆盖数据分布的模式，却以高昂的采样计算成本为代价。
@@ -92,8 +90,6 @@ $$q(\mathbf{x}_t|\mathbf{x}_{t-1}) = \mathcal{N}(\mathbf{x}_t; \sqrt{1-\beta_t}\
 这一思路的关键洞见在于：GAN 的生成器天然具备建模复杂多模态分布的能力。通过将去噪分布 $p_\theta(\mathbf{x}_{t-1}|\mathbf{x}_t)$ 定义为条件 GAN 生成器的隐式分布——即引入隐变量 $\mathbf{z}$，由生成器 $G_\theta(\mathbf{x}_t, \mathbf{z}, t)$ 预测干净数据 $\mathbf{x}_0$，再经后验采样得到 $\mathbf{x}_{t-1}$——模型可以灵活捕捉大步长下真实去噪分布的多模态结构。同时，采用非饱和 GAN 对抗损失替代传统扩散模型中的 KL 散度（证据下界），以软化逆 KL 散度的方式训练，有助于增强模式覆盖。
 
 这种设计使得模型仅需 **4 次网络推理**即可完成采样，在 CIFAR-10 上生成 100 张图像仅需 0.21 秒，相比 Score SDE（VP）加速约 2000 倍，同时 FID 保持 3.75、Recall 保持 0.57，实现了生成质量、采样速度和模式覆盖三个维度的有效平衡。
-
-
 
 ## 核心方法与创新机理
 
@@ -140,8 +136,6 @@ $$\min_\theta \sum_{t\ge 1} \mathbb{E}_{q(\mathbf{x}_t)}\left[D_{\mathrm{adv}}\b
 
 消融实验（Table 2）提供了因果证据：**移除隐变量 $\mathbf{z}$ 使去噪分布退化为单模态，FID 从 3.75 骤升至 20.6**，Recall 从 0.57 降至 0.42。这直接验证了多模态去噪分布是大步长扩散生成质量的核心保障。此外，$T=1$（退化为无条件 GAN）的 Recall 仅 0.19，远低于 $T=4$，表明扩散过程提供的条件信息对维持多样性至关重要——单纯用扩散做数据增强训练 GAN（FID 14.8）也无法达到本文方法的效果。
 
-
-
 Denoising Diffusion GANs 的整体 pipeline 由三个核心阶段构成：**前向扩散过程**、**多模态去噪模块**和**对抗训练与采样流程**。其根本设计动机源于一个关键观察：传统扩散模型采样慢的瓶颈在于去噪分布的高斯假设——该假设仅在小步长下成立，迫使模型采用成百上千步迭代（Figure 2 可视化地展示了当扩散步长增大时，真实去噪分布明显偏离高斯、呈现多模态特性）。本文通过将去噪分布从简单高斯替换为由条件 GAN 建模的表达能力更强的多模态分布，从而允许使用大步长和极少的去噪步数（T ≤ 8），在保持生成质量与多样性的同时实现约 2000 倍加速。
 
 ### 前向扩散过程
@@ -175,8 +169,6 @@ $$\min_\theta \sum_{t \ge 1} \mathbb{E}_{q(x_t)} \left[ D_{\text{adv}} \big( q(x
 ### 模块间关系与数据流
 
 整体数据流可概括为：**前向扩散**产生噪声状态序列 $\{x_t\}$ → **多模态去噪模块**在每步接收 $x_t$ 和随机隐变量 $z$，通过生成器预测 $x_0$ 并经后验采样输出 $x_{t-1}$ → **判别器**对每步的去噪结果进行真伪判断，驱动生成器学习匹配真实多模态去噪分布。三个阶段的协同使得模型在仅 4 步的条件下，实现了与千步扩散模型相当的生成质量（FID 3.75 vs 3.21）和多样性（Recall 均为 0.57），同时保持了远优于纯 GAN 的模式覆盖能力（在 StackedMNIST 上覆盖全部 1000 个模式，KL 散度仅 0.071）。
-
-
 
 ### 问题瓶颈：高斯去噪假设的失效
 
@@ -233,8 +225,6 @@ $$\min_\phi \sum_{t\ge 1} \mathbb{E}_{q}[ -\log D_\phi(\mathbf{x}_{t-1}, \mathbf
 
 采样从纯噪声 $\mathbf{x}_T \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$ 开始，依次对 $t = T, T-1, \ldots, 1$ 执行大步去噪：采样 $\mathbf{z} \sim p(\mathbf{z})$，计算 $\mathbf{x}_0 = G_\theta(\mathbf{x}_t, \mathbf{z}, t)$，再从后验 $q(\mathbf{x}_{t-1}|\mathbf{x}_t, \mathbf{x}_0)$ 采样得到 $\mathbf{x}_{t-1}$。最终输出 $\mathbf{x}_0$ 为生成样本。整个过程仅需 $T \leq 8$ 次网络推理，在 CIFAR-10 上 $T=4$ 时生成 100 张图像仅需 0.21 秒，较 Score SDE 加速约 2000 倍。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与设计动机验证
@@ -288,27 +278,12 @@ $$\min_\phi \sum_{t\ge 1} \mathbb{E}_{q}[ -\log D_\phi(\mathbf{x}_{t-1}, \mathbf
 3. **多样性评估不全面**：Recall 指标仅在 CIFAR-10 和 StackedMNIST 上详细报告，其他数据集缺乏系统多样性评估。
 4. **公平性未量化**：论文强调模式覆盖对减少社会偏见的积极意义，但未引入群组公平性指标或约束，需手动验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2112_07804/figures/012_Figure_7.jpg]]
 *Figure 7: Qualitative results on CelebA-HQ 256 and LSUN Church Outdoor 256*
 
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2112_07804/figures/013_Figure_8.jpg]]
-*Figure 8: Multi-modality of denoising distribution given the same noisy observation. Left: clean image x0 and perturbed image x1. Right: Three samples from $p _ { \theta } ( \mathbf { x } _ { 0 } | \mathbf { x } _ { 1 }$ ) . Figure 9: Qualitative results on stroke-based synthesis. Top row: stroke paintings. Bottom two rows: generated samples corresponding to the stroke painting (best seen when zoomed in)
 
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2112_07804/figures/006_Table_1.jpg]]
 *Table 1: Results for unconditional generation on CIFAR-10*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2112_07804/figures/014_Table_6.jpg]]
-*Table 6: Hyper-parameters for the generator network*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2112_07804/figures/015_Table_7.jpg]]
-*Table 7: Network structures for the discriminator. The number on the right indicates the number of channels in each residual block*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2112_07804/figures/016_Table_8.jpg]]
-*Table 8: Optimization hyper-parameters*
-
-
 
 ## 定位与知识库关联
 
@@ -374,8 +349,6 @@ $$\min_\phi \sum_{t\ge 1} \mathbb{E}_{q}[ -\log D_\phi(\mathbf{x}_{t-1}, \mathbf
 3. **能否推广到连续时间或潜在扩散模型？** 将多模态去噪分布的思想引入 Latent Diffusion 等模型，有望在潜在空间中实现更大步长、更少步数的采样。
 4. **对抗损失与扩散目标的更优对齐？** 当前对抗损失替代了 KL 散度，是否存在更优的散度形式或混合训练策略，能同时提升训练效率和最终质量？
 5. **多模态去噪分布与公平性的关系？** 多模态去噪分布理论上能更好地覆盖数据中的少数群体模式，但尚未有定量公平性评估。未来可引入群组公平性指标，验证该方法在减少生成偏见方面的潜力。
-
-
 
 ## 原文 PDF
 

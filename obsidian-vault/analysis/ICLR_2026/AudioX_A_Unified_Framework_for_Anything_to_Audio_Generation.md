@@ -46,11 +46,7 @@ claims:
 
 本文提出 **AudioX**，一个基于 Diffusion Transformer (DiT) 的统一框架，旨在解决“任意输入到音频生成”（Anything-to-Audio Generation）问题。该框架能够灵活处理文本、视频、音频等多种输入模态的任意组合，并统一生成音效与音乐。核心贡献包括：(1) 提出轻量级的多模态自适应融合模块（Multimodal Adaptive Fusion, MAF），用于自适应加权和对齐多模态条件嵌入；(2) 构建大规模、高质量的多模态数据集 **IF-caps**（Instruction-Following），包含超过700万样本，通过结构化标注和数据增强生成；(3) 在多个基准测试中达到或超越现有技术水平，尤其在指令跟随能力上大幅领先。
 
-
-
 现有音频生成模型通常局限于单一条件模态（如仅文本或仅视频）和单一输出域（仅音效或仅音乐），缺乏统一的框架来灵活处理多种模态组合的输入。此外，高质量、大规模的多模态训练数据也相对匮乏。这种碎片化的现状限制了模型在复杂多模态场景下的泛化能力和实用性。AudioX 旨在通过统一的多模态训练框架和高质量数据集，克服这些瓶颈。
-
-
 
 ## 核心方法与创新机理
 
@@ -59,16 +55,10 @@ claims:
 3.  **大规模多模态数据集 IF-caps**：通过结构化标注和数据增强管道构建，包含超过700万样本，支持细粒度的指令跟随。
 4.  **跨模态正则化效应**：通过统一的多模态训练，产生跨模态正则化效应：提高文本监督的质量和粒度可以减少对齐噪声，从而联合提升所有条件模态的性能。
 
-
-
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_qjJWxK3yWo_AudioX_A_Unifie/figures/001_Figure_1.jpg]]
 *Figure 1: (a) Comprehensive performance comparison*
 
 AudioX 的整体框架如 **Figure 4** 所示。其核心流程为：首先，视频、文本和音频模态分别通过专用编码器提取特征；然后，这些特征被送入 MAF 模块进行自适应融合，生成统一的多模态条件嵌入 H_c；最后，DiT 主干网络以 H_c 为条件，通过交叉注意力机制对噪声潜变量 z_t 进行去噪，生成高保真音频。
-
-![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_qjJWxK3yWo_AudioX_A_Unifie/figures/005_Figure_4.jpg]]
-
-
 
 ### 5.1 多模态自适应融合模块 (MAF)
 
@@ -113,36 +103,19 @@ $$
 - **模型规模**：总参数量 2.4B（可训练 1.1B），MAF 模块仅 60M 参数。
 - **训练配置**：使用 AdamW 优化器，基础学习率 1e-5，权重衰减 0.001，批次大小 48，推理步数 250，CFG 尺度 7.0。训练在三个 NVIDIA H800 GPU 集群上进行，约需 4k GPU 小时。
 
-
-
 ## 实验与关键发现
 
 ### 6.1 主要结果
 
 **Table 1** 展示了 AudioX 在多个任务和数据集上的性能评估，包括文本到音频（T2A）、视频到音频（V2A）、文本+视频到音频（TV2A）、文本到音乐（T2M）、视频到音乐（V2M）和文本+视频到音乐（TV2M）。AudioX 在多个基准测试中达到或超越现有技术水平。
 
-
-![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_qjJWxK3yWo_AudioX_A_Unifie/figures/006_Table_1.jpg]]
-*Table 1: Performance evaluation across various tasks and datasets. Task abbreviations are: T2A (Text-to-Audio), V2A (Video-to-Audio), TV2A (Text-and-Video-to-Audio), T2M (Text-to-Music), V2M (Video-to-Music), and TV2M (Text-and-Video-to-Music). For alignment (Align.), we use the CLAP score for text and the Imagebind AV score for video inputs.*
-
-![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_qjJWxK3yWo_AudioX_A_Unifie/figures/006_Table_1.jpg]]
-
 **Table 2** 展示了在 T2A-bench 和 AudioTime 上的指令跟随能力评估。AudioX 在所有维度上大幅超越基线方法，尤其在 T2A-bench 上，Category Accuracy (Cat-acc) 达到 34.20，Count Accuracy (Cnt-acc) 达到 12.40，Ordering Accuracy (Ord-acc) 达到 23.60，Timestamp Accuracy (TS-acc) 达到 28.20。在 AudioTime 的 Ordering 指标上达到 0.34。
 
-
-![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_qjJWxK3yWo_AudioX_A_Unifie/figures/007_Table_2.jpg]]
-*Table 2: Evaluation of instruction-following T2A ability on the T2A-bench and AudioTime.*
-
-![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_qjJWxK3yWo_AudioX_A_Unifie/figures/007_Table_2.jpg]]
-
 **Figure 1** 直观展示了 AudioX 在综合基准测试（Inception Score）和指令跟随基准测试上的性能优势。
-
-![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_qjJWxK3yWo_AudioX_A_Unifie/figures/002_Figure_1.jpg]]
 
 ### 6.2 消融研究
 
 **数据策略消融 (Table 3)**：完整的数据标注流程（GeminiCap-aug）在所有通用任务（T2A, V2A, TV2A）上取得最佳性能，并且是实现细粒度控制的关键。
-
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_qjJWxK3yWo_AudioX_A_Unifie/figures/008_Table_3.jpg]]
 *Table 3: Ablation study on data curation strategies. We compare our model’s performance when trained with captions from different sources. The results show a clear trend of improvement with higher-quality data. Our full pipeline (GeminiCap-aug) not only achieves the best performance on all general tasks (T2A, V2A, TV2A) but is also essential for enabling fine-grained control.*
@@ -150,7 +123,6 @@ $$
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_qjJWxK3yWo_AudioX_A_Unifie/figures/008_Table_3.jpg]]
 
 **MAF 架构消融 (Table 4)**：完整的 MAF 模块（包含门控和查询机制）在大多数指标上取得最佳性能，证实了完整设计对于有效多模态融合的必要性。
-
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_qjJWxK3yWo_AudioX_A_Unifie/figures/009_Table_4.jpg]]
 *Table 4: Ablation study of the MAF architecture components. We evaluate the contribution of the Gate and Query mechanisms by removing them individually. The results show that the Full MAF, which includes both components, achieves the best performance across most metrics. This confirms that our complete design is essential for effective multimodal fusion.*
@@ -173,21 +145,11 @@ $$
 
 **Figure A.2** 展示了用户研究结果，10 名专业音频专家对生成样本的总体质量（OVL）和与提示的相关性（REL）进行评分（1-100 分）。AudioX 在大多数任务上取得了主观 SOTA 性能。
 
-![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_qjJWxK3yWo_AudioX_A_Unifie/figures/022_Figure_12.jpg]]
-
 ### 6.5 公平性说明
 
 - 用户研究涉及 10 名专业音频专家，对随机选取的样本进行 OVL 和 REL 评分，但未报告评分者间信度。
 - T2A-bench 的自动评估使用 Gemini 2.5 Pro 作为评判者，可能存在模型偏见。
 - 未讨论模型在不同音频类型（如音乐与音效）或不同语言/文化背景下的公平性表现。
-
-### 补充图表
-
-![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_qjJWxK3yWo_AudioX_A_Unifie/figures/010_Table_5.jpg]]
-*Table 5: Table A.1: Comprehensive overview of training and test datasets, detailing the number of clips (# Clips), average duration per clip (Dur./Clip in seconds), and total duration (Dur. in hours) for each task and split. T2A: Text-to-Audio, V2A: Video-to-Audio, TV2A: Text-and-Video-to-Audio, T2M: Text-to-Music, V2M: Video-to-Music, TV2M: Text-and-Video-to-Music.*
-
-
-
 
 ## 定位与知识库关联
 
@@ -198,8 +160,6 @@ AudioX 属于多模态生成模型领域，特别是“任意输入到音频生�
 - **多模态融合**：MMAUDIO (Cheng et al., 2025) 等。
 
 AudioX 的核心定位是提供一个统一的、可扩展的框架，通过创新的 MAF 模块和高质量数据集 IF-caps，在保持模态内任务高性能的同时，显著提升跨模态任务和指令跟随能力。其提出的跨模态正则化效应为多模态生成模型的训练提供了新的理论视角。
-
-
 
 ## 原文 PDF
 

@@ -52,8 +52,6 @@ claims:
 
 在方法谱系上，CIGPose属于**结合因果推理与结构化预测的姿态估计方法**，其因果干预机制区别于传统的注意力机制或纯数据驱动的结构建模。代码已开源（https://github.com/53mins/CIGPose）。
 
-
-
 ### 问题背景
 
 全身姿态估计（whole-body pose estimation）要求同时定位人体、手部、面部和足部的密集关键点，是行为识别、人机交互和虚拟现实等应用的基础技术。近年来，基于深度学习的回归方法取得了显著进展，但在遮挡、背景杂乱、复杂姿态等真实场景中，模型仍频繁产生违反人体解剖结构的预测——例如手部关键点穿越身体、足部位置与躯干方向矛盾等。
@@ -75,8 +73,6 @@ claims:
 在去混淆嵌入之上，我们进一步引入**分层图神经网络（Hierarchical GNN）**：局部EdgeConv建模运动学约束，全局超图注意力捕捉远距离语义依赖（如“左手与右手属于同一人体”），在净化后的证据上强化全局解剖一致性。整个框架在训练时通过**反事实一致性损失**约束干预不改变可靠关键点的预测，确保标准嵌入学习到有意义的解剖先验而非随意替换。
 
 通过“先干预、后推理”的设计，CIGPose在COCO-WholeBody上仅用标准训练数据即达到67.0% AP，超越了依赖额外UBody数据的DWPose-l（66.5% AP），并在CrowdPose等遮挡密集场景下展现出一致的鲁棒性提升。
-
-
 
 ## 核心方法与创新机理
 
@@ -101,8 +97,6 @@ CIGPose 将这一流程重构为**反事实干预路径** $P(Y|do(F))$：
 ### 创新协同效应
 
 消融实验（Table 4）揭示了两个创新槽位的协同关系：在完整分层 GNN 基础上单独引入 CIM，额外提升 0.2 AP（67.0 vs. 66.8），而两者叠加相对于基线 RTMPose-x 的总提升达 1.7 AP。这表明**去混淆为结构推理提供了更干净的特征基础，而结构推理反过来放大了去混淆的收益**——两者并非简单叠加，而是相互增强。
-
-
 
 CIGPose 的整体架构遵循“编码—去混淆—结构推理—预测”四阶段流水线，其核心设计目标是在结构推理之前阻断视觉上下文引入的虚假相关性，使后续图神经网络在净化后的嵌入上进行解剖一致性建模。Figure 5 给出了完整的架构概览。
 
@@ -141,8 +135,6 @@ $$\mathcal{L}_{cf} = \frac{1}{|S|} \sum_{k \in S} D_{KL}\big(\mathbf{sg}[P(Y_k|F
 
 **数据流总结。** 输入图像 → 关键点编码器 → 初始嵌入 $\{f_k\}$ → CIM（混淆识别与替换）→ 去混淆嵌入 $\{f_k'\}$ → 分层 GNN（局部 EdgeConv + 全局超图注意力）→ 精炼嵌入 $\{f_k''\}$ → 预测头 → 关键点坐标。在整个流程中，CIM 充当“质量门控”，确保进入结构推理模块的嵌入已剥离主要的视觉混淆成分，而分层 GNN 则在净化后的特征空间上施加解剖先验，二者形成协同增益——消融实验显示，在完整分层 GNN 基础上加入 CIM 可额外提升 0.2 AP（67.0 vs. 66.8），总提升较基线达 1.7 AP（Table 4）。
 
-
-
 CIGPose 的核心由三个紧密耦合的模块构成：**因果干预模块（CIM）** 负责去混淆，**分层图神经网络** 在净化后的嵌入上强化解剖一致性，**反事实一致性损失** 约束干预行为。以下逐一展开其公式化设计。
 
 ### 3.1 因果干预模块（CIM）
@@ -158,9 +150,6 @@ $$P(Y|do(F)) = \sum_c P(Y|F,c) P(c) \tag{1}$$
 $$s_c(k) = 1 - \frac{1}{2}\left(\max(P_{k,x}) + \max(P_{k,y})\right) \tag{2}$$
 
 其中 $P_{k,x}$、$P_{k,y}$ 分别为关键点 $k$ 在 $x$、$y$ 方向上的预测概率分布。当模型对某关键点定位高度确信时，热图呈现尖锐单峰，$\max(P)$ 接近 1，$s_c(k)$ 接近 0；反之，在遮挡或模糊区域，热图多峰或平坦，$s_c(k)$ 升高。Figure 3 的实证验证表明，遮挡关键点的混淆分数显著高于可见关键点，确认了该代理的有效性。
-
-![[assets/figures/papers/paper_list_l1011_https_arxiv_org_abs_2603_09418/figures/003_Figure_3.jpg]]
-*Figure 3: Validation of confounder score*
 
 **步骤二：反事实替换。** 选取 $s_c(k)$ 最高的 top-$n$ 个关键点作为混淆嵌入 $F_{conf}$，将其替换为可学习的、上下文不变的标准嵌入 $z_k$，而其余可靠嵌入保持不变：
 
@@ -205,21 +194,11 @@ $$\mathcal{L}_{cf} = \frac{1}{|S|} \sum_{k \in S} D_{KL}(\mathbf{sg}[P(Y_k|F)] \
 
 上述三个模块构成因果推理的闭环：CIM 基于不确定性代理识别并替换混淆嵌入，分层 GNN 在净化后的嵌入空间上进行结构推理，反事实一致性损失则约束 CIM 的干预行为不过度泛化。消融实验（Table 4）证实了这一协同效应：在完整分层 GNN 基础上引入 CIM 额外提升 0.2 AP（67.0 vs. 66.8），总提升达 1.7 AP over baseline；移除一致性损失（$\lambda=0$）则导致 0.5 AP 下降（Table 8），验证了该正则项对学习有意义标准嵌入的关键作用。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1011_https_arxiv_org_abs_2603_09418/figures/002_Figure_2.jpg]]
-*Figure 2: (a) The proposed Structural Causal Model (SCM) for keypoint estimation, (b) The intervened SCM after applying the do-operator to the keypoint embeddings, (c) The realization of each component within our Causal Intervention Module (CIM)*
-
-
-
 ## 实验与关键发现
 
 ### 主要结果
 
 CIGPose 在全身姿态估计基准 COCO-WholeBody 上取得 67.0% Whole-Body AP（CIGPose-x），较直接基线 RTMPose-x（65.3% AP）提升 **+1.7 AP**，并超越了依赖额外 UBody 数据及两阶段蒸馏的 DWPose-l（66.5% AP）（Table 1）。引入 UBody 数据后，CIGPose-x 进一步提升至 67.5% AP，较 DWPose-l 领先 +1.0 AP。在 COCO val2017 上，CIGPose-l（384×288 输入）达到 78.5% AP，较 RTMPose-l 提升 +1.2 AP（Table 2）。在密集人群场景 CrowdPose 数据集上，CIGPose-l 取得 73.7% AP，较 HRFormer-B 提升 +1.3 AP（Table 3），表明去混淆机制在遮挡和拥挤场景下具有显著增益。
-
-![[assets/figures/papers/paper_list_l1011_https_arxiv_org_abs_2603_09418/figures/006_Table_1.jpg]]
-*Table 1: Whole-body pose estimation results on COCO-WholeBody [19, 51] V1.0 dataset. “*” denotes the model that relies on two-stage distillation and additional training data from the UBody dataset [27]. “†” indicates multi-scale testing. Flip test is used*
 
 ![[assets/figures/papers/paper_list_l1011_https_arxiv_org_abs_2603_09418/figures/007_Table_3.jpg]]
 *Table 3: Comparisons with SOTA methods on the CrowdPose [24] dataset. The default input resolution is 256×192, “†” denotes the input resolution is 384×288*
@@ -253,21 +232,8 @@ CIGPose 在全身姿态估计基准 COCO-WholeBody 上取得 67.0% Whole-Body AP
 ![[assets/figures/papers/paper_list_l1011_https_arxiv_org_abs_2603_09418/figures/001_Figure_1.jpg]]
 *Figure 1: (a) Comparison of CIGPose with related models for whole-body pose estimation on COCO-WholeBody. (b) Qualitative comparison between CIGPose-x and RTMPose-x [16]*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1011_https_arxiv_org_abs_2603_09418/figures/009_Table_4.jpg]]
 *Table 4: Ablation study of CIGPose on COCO-WholeBody. Values in parentheses are AP/AR gains*
-
-![[assets/figures/papers/paper_list_l1011_https_arxiv_org_abs_2603_09418/figures/015_Table_8.jpg]]
-*Table 8: Effect of the counterfactual consistency loss weight λ*
-
-![[assets/figures/papers/paper_list_l1011_https_arxiv_org_abs_2603_09418/figures/016_Table_9.jpg]]
-*Table 9: Comparison of intervention strategies during training. The fixed-budget ‘top-n‘ strategy provides a more stable and effective training signal, with*
-
-![[assets/figures/papers/paper_list_l1011_https_arxiv_org_abs_2603_09418/figures/011_Table_5.jpg]]
-*Table 5: Within instance top-n enrichment on COCO-WholeBody. Keypoints selected by*
-
-
 
 ## 定位与知识库关联
 
@@ -318,8 +284,6 @@ CIGPose 处于**因果推断 × 姿态估计**的交叉地带，与以下工作�
 | 两阶段蒸馏 | **DWPose** (Yang et al., ICCV 2023) | CIGPose 在数据效率上形成对比优势，不依赖额外标注数据 |
 
 代码开源（https://github.com/53mins/CIGPose），基于 MMPose 工具箱实现，便于后续工作在标准框架下复现和扩展。
-
-
 
 ## 原文 PDF
 

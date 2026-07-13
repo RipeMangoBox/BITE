@@ -52,8 +52,6 @@ Mesh4D 提出了一条前馈式单目4D网格重建路径。其核心洞察是�
 
 当前方法仍存在明确局限：假设网格拓扑在动画过程中保持不变，无法处理拓扑变化场景；规范网格重建的错误会传播到后续帧；泛化能力受限于预训练3D重建模型的训练数据分布。此外，训练依赖每帧对应的顶点数据，对于非合成视频难以获取。
 
-
-
 从单目视频重建动态物体的完整三维形状与运动，是计算机视觉与图形学中长期存在的核心挑战。该任务要求模型同时恢复物体的几何外观和时序变形，而输入仅为一个视角的RGB图像序列。这种极端的欠定问题使得传统多视图几何方法难以适用，因为遮挡、视角限制和运动模糊会严重破坏观测信息的一致性。
 
 近年来，单目三维重建领域取得了显著进展。以**Hunyuan3D 2.1**（Tencent Hunyuan3D Team, 2025）为代表的大规模预训练模型，能够从单张图像生成质量可观的静态网格。然而，当将这些逐帧独立重建的方法直接应用于视频时，它们完全忽视了时序信息，导致各帧之间的姿态和形状估计不一致，无法形成连贯的运动序列。
@@ -63,8 +61,6 @@ Mesh4D 提出了一条前馈式单目4D网格重建路径。其核心洞察是�
 从更根本的层面看，现有方法面临一个共同瓶颈：**如何一次性编码整个视频序列的变形信息，并引入足够的3D和物理先验以补全因遮挡和视角限制而不可见的表面**。逐帧独立处理丢失了运动连续性，而仅依赖几何监督又难以约束高度非刚性的变形空间。
 
 Mesh4D的提出正是为了弥合这一缺口。其核心动机在于：通过将整个动画序列的变形编码到单个紧凑的潜在空间，并利用骨架信息作为训练时的特权先验，模型可以从单目视频中一次性预测出完整且时序一致的4D网格变形。这一思路将静态重建的精度优势与动态建模的时序一致性相结合，为单目4D重建开辟了新的技术路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -109,8 +105,6 @@ $$\min_\theta \mathbb{E}_{(z^s, I), t, \epsilon^s \sim \mathcal{N}(0, 1)} \left\
 
 这些 changed slots 共同构成了 Mesh4D 相对于前馈 4D 重建基线的核心优势：通过序列级编码和骨架引导的变形 VAE 学习强运动先验，再通过双条件扩散模型将该先验与单目视频观测对齐，实现一次性、时序一致的完整 4D 网格重建。
 
-
-
 Mesh4D 是一个前馈式单目 4D 网格重建模型。给定一段动态物体的单目 RGB 视频，模型一次性输出完整的动画 3D 网格及其变形场。其核心架构由三个关键模块串联构成：**规范网格重建模块**、**变形 VAE** 和**变形扩散模型**。
 
 ### 任务定义
@@ -142,13 +136,6 @@ $$\Phi : \mathcal{T} \mapsto \mathcal{M}_1, \{\mathcal{T}_{1t}\}_{t=1}^T$$
 变形 VAE 在训练时引入了骨架信息（蒙皮权重和骨骼）作为特权先验，帮助模型学习更好的运动表征。消融实验表明，去除骨架信息会导致刚性变换恢复失败、网格出现扭曲（Figure 6），而加入骨架偏置的自注意力机制（Eq. 4）和骨骼交叉注意力（Eq. 5）则使模型能够关注同一骨骼影响的点，显著提升变形精度。**推理时不需要骨架信息**，这保证了模型在实际应用中的可用性。
 
 此外，变形 VAE 编码器通过最远点采样（FPS）在空间维度压缩潜码，再经过 8 层时空注意力（依次执行时间注意力、全局注意力和空间注意力）来捕获全局运动模式。消融实验证实，去除时空注意力会导致运动抖动和较大的局部误差（Figure 6, Table 3）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2601_05251/figures/001_Figure_1.jpg]]
-*Figure 1: Illustration of Mesh4D. Given a monocular RGB video as input, Mesh4D generates a complete animated 3D mesh and its deformation. Each 4D reconstruction is shown at several time steps, the top layer displaying normals and the bottom one textured meshes*
-
-
 
 Mesh4D 的核心架构由三个紧密耦合的模块组成：规范网格重建模块、变形 VAE 模块和变形扩散模型模块。整个系统的任务定义为将输入单目视频映射到第一帧网格和变形场序列：
 
@@ -186,13 +173,6 @@ $$\mathcal{L}_{\mathrm{VAE}} = \sum_{t=1}^T \left\| (\mathcal{V}_t - \mathcal{V}
 $$\min_{\pmb{\theta}} \mathbb{E}_{(\pmb{z}^s, \pmb{I}), t, \epsilon^s \sim \mathcal{N}(\mathbf{0}, \mathbf{1})} \left\| \pmb{v}^s - \pmb{v}_{\pmb{\theta}}^s\left(\pmb{z}_t^s, t, \pmb{I}\right) \right\|_2^2$$
 
 其中 $\pmb{v}^s$ 为真实速度场，$\pmb{v}_{\pmb{\theta}}^s$ 为模型预测的速度场，$\pmb{I}$ 为输入视频条件。扩散模型生成的变形潜码随后送入变形 VAE 解码器，得到完整的时序变形场序列。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2601_05251/figures/004_Figure_3.jpg]]
-*Figure 3: Overall deformation diffusion model pipeline. We build it based on HY3D 2.1 [45] shape diffusion model with additional spatial and temporal embedding as well as cross attention layer to condition the deformation field generation on the canonical mesh and input video*
-
-
 
 ## 实验与关键发现
 
@@ -233,9 +213,6 @@ Mesh4D在Objaverse子集基准上对几何重建和跟踪任务进行了全面�
 
 Mesh4D存在以下几类典型失败场景（Figure 8）：
 
-![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2601_05251/figures/013_Figure_8.jpg]]
-*Figure 8: Failure case of Mesh4D*
-
 1. **拓扑变化失效。** 模型假设网格拓扑在动画过程中保持不变。当物体发生显著拓扑变化（如部件分离、孔洞出现）时，基于固定拓扑的变形场无法表达此类变化，导致重建失败。这是方法设计的根本性限制。
 
 2. **规范网格重建误差传播。** 由于变形场以第一帧的规范网格为基础，若HY3D 2.1在第一帧的重建出现错误（如形状估计偏差），该误差会通过变形场传播至所有后续帧，造成系统性偏差。
@@ -244,27 +221,14 @@ Mesh4D存在以下几类典型失败场景（Figure 8）：
 
 4. **训练数据需求。** 变形VAE的训练需要每帧对应的顶点数据及骨架标注，这限制了在非合成视频上的扩展应用。推理阶段虽无需骨架信息，但训练数据的制作成本仍构成实际部署的瓶颈。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2601_05251/figures/003_Table_1.jpg]]
 *Table 1: Quantitative evaluation for geometry and tracking on our proposed benchmark, a subset of Objaverse. All instantiations of our model outperform previous state-of-the-art models. 3D-GS based methods do not explicitly define inner or outer surface, so it is not applicable for volumatric IoU evaluation. Besides, HY3D [45] and L4GM [41] predict independent mesh or points per-frame, which do not support tracking evaluation directly*
-
-![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2601_05251/figures/006_Figure.jpg]]
-*Figure: (Input) GT Ours HY3D 2.1 GVDF*
-
-![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2601_05251/figures/008_Figure_6.jpg]]
-*Figure 6: Ablating key components of the deformation VAE. We visualize the error map of the chamfer distance, where blue indicates lower error (better reconstruction quality). Injecting skeleton information helps the model better capture rigid deformation, while spatio-temporal fusion effectively reduces jittering effects*
 
 ![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2601_05251/figures/010_Table_4.jpg]]
 *Table 4: Ablation study for classifier-free guidance (CFG). The one without using CFG get slightly better results*
 
-![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2601_05251/figures/011_Table_5.jpg]]
-*Table 5: Quantitative evaluation for using pretrained weights*
-
 ![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2601_05251/figures/002_Figure_2.jpg]]
 *Figure 2: Overall Deformation VAE pipeline. (Left) Given a sequence of 3D meshes as input, we first uniformly sample a sequence of corresponding points. We inject the skeleton information by using masked self- and cross-attention. Then, a Farthest Point Sampling (FPS) at spatial dimension is performed to compress the latent, followed by 8 layers of spatio-temporal attention. The deformation field is decoded by layers of spatio-temporal attention, followed by a cross attention where canonical vertices serve as query points. (Right) Each of our spatio-temporal attention layers sequentially performs temporal attention, global attention, and spatial attention. For temporal and global attention, we additi...*
-
-
 
 ## 定位与知识库关联
 
@@ -297,8 +261,6 @@ Mesh4D存在以下几类典型失败场景（Figure 8）：
 3. **长序列与多物体扩展。** 变形VAE的潜码维度固定，对视频长度的扩展性有限。同时，当前方法仅处理单个物体，多物体场景的交互建模需要全新的架构设计。
 
 4. **减少对骨架标注的依赖。** 能否通过自监督或弱监督学习（如利用光流、深度估计等辅助信号）替代昂贵的骨架标注，是降低训练成本、提升方法实用性的关键方向。消融实验已证明骨架信息对性能至关重要（去除后指标大幅下降，Figure 6），但这是否意味着骨架是唯一有效的运动先验，仍需进一步研究。
-
-
 
 ## 原文 PDF
 

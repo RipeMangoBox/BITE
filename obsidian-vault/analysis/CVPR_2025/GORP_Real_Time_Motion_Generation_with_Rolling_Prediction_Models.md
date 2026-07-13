@@ -86,8 +86,6 @@ RPM 属于**确定性自回归在线运动生成**范式，与现有方法的关
 
 RPM 仍存在脚部滑动问题，尤其在地面原地转动时；其确定性预测范式在长时间信号丢失时可能趋于平均姿态；当前仅利用头部和手腕信号，未融合身体其他部位的 IMU 信息。未来方向包括：引入随机预测以保持动作多样性、显式脚部接触约束、自适应不确定性调度，以及融合多模态传感器数据。
 
-
-
 ### 扩展现实中的全身运动生成
 
 扩展现实（XR）设备，如 Meta Quest 3 等商用头显，仅能提供稀疏的追踪信号——通常只包含头部和手腕的 6-DOF 位置与旋转。然而，要在虚拟环境中驱动逼真的全身化身，必须从这些稀疏输入中实时重建完整的身体姿态序列。这一任务面临双重挑战：既要保证生成动作的物理合理性，又要维持对用户输入的灵敏响应。
@@ -109,8 +107,6 @@ RPM 仍存在脚部滑动问题，尤其在地面原地转动时；其确定性�
 上述问题的根源在于现有方法的生成范式存在结构性缺陷。传统方法将每一帧的生成视为独立事件，网络输出直接作为最终姿态，缺乏对“预测不确定性”的建模和对“运动连续性”的显式约束。当追踪信号丢失时，网络被迫进行开环预测，缺乏从自身错误中恢复的能力；当信号恢复时，新旧信息之间没有缓冲机制，导致姿态硬切换。
 
 本文的核心洞察是：**在线运动生成本质上是一个对未来姿态序列的渐进式细化过程**。与其在每一时刻输出一个“最终答案”，不如让网络持续预测未来一段时间的姿态轨迹，并在新信息到来时逐步修正先前的预测。这一视角转换使得平滑过渡不再是后处理滤波的补救措施，而是生成过程本身的内在属性。
-
-
 
 ## 核心方法与创新机理
 
@@ -155,8 +151,6 @@ $$f_{\mathrm{cos}}(\tau) = 1 - \cos\Bigl(\frac{\tau + 1}{W} \cdot \frac{\pi}{2}\
 ### 与后处理滤波的本质区别
 
 一个自然的问题是：能否在现有基线方法上叠加低通滤波（如 1€ filter）来达到类似的平滑效果？**Table C (Suppl.)** 和 **Figure E (Suppl.)** 给出了明确答案：要使基线方法的合成到追踪平滑度达到 RPM 水平，其准确度需牺牲超过 50%。这是因为后处理滤波无法区分“应保留的信号细节”与“应平滑的突变”，而 PCAF 通过不确定性调度实现了对修正量的语义级控制。
-
-
 
 RPM 将在线运动生成重新表述为一个**滚动预测与渐进细化**的过程。其核心流水线由四个模块串联构成，在每一时间步完成从稀疏追踪信号到平滑全身姿态的映射。
 
@@ -209,13 +203,6 @@ $$\mathcal{P}_t = \mathcal{P}_{t-1} + U \cdot \tanh(f_{\theta}(\mathcal{X}_t, \m
 
 每一时间步取 $\mathcal{P}_t$ 的首帧作为当前输出姿态，同时将 $\mathcal{P}_t$ 整体传递至下一时刻作为先验。这种**滚动窗口**机制使得每一帧姿态在其生命周期内被多次预测和修正——从远期的粗糙草稿逐步细化为近期的精确输出，从根本上保证了追踪信号恢复时不会产生突变式跳变。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1858_GORP_Real_Time_Motion_Generation_with_Rolling_Prediction_Models/figures/002_Figure_2.jpg]]
-*Figure 2: Our RPM is conditioned on the past generated motion and the past and present tracking inputs. It outputs the predicted motion, which is fed to the PCAF module in the next iteration*
-
-
-
 ### 问题形式化
 
 RPM 将在线运动生成定义为一个滚动预测问题。给定到当前时刻 $t$ 为止的追踪输入序列 $\mathcal{C}_t = \{\mathbf{c}_{t-I}, \ldots, \mathbf{c}_t\}$ 和过去 $M$ 帧已生成的运动上下文 $\mathcal{X}_t = \{\mathbf{x}_{t-M}, \ldots, \mathbf{x}_{t-1}\}$，网络 $f_\theta$ 预测未来 $W$ 帧的姿态序列：
@@ -264,13 +251,6 @@ $$\mathcal{L} = \lambda_{\mathrm{ori}} \mathcal{L}_{\mathrm{ori}} + \lambda_{\ma
 
 所有损失仅施加在自由运行阶段之后的最后一个预测窗口 $\mathcal{P}_{t+fr}$ 上，且不沿自由运行过程进行时间反向传播以节省训练内存（Section 3.3, Equation 3）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1858_GORP_Real_Time_Motion_Generation_with_Rolling_Prediction_Models/figures/009_Figure_5.jpg]]
-*Figure 5: Trajectory prediction. RPM decomposes the generation of motion into a progressive refinement of the predicted W next poses, shown above as magenta dots, connected by lines. On top, we observe how RPM can predict fast dynamic motion and generate expressive and realistic motion, even during tracking signal losses. Below, we show how RPM generates a smooth transition when recovering from a hand-tracking loss (left hand)*
-
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈验证：合成-追踪过渡平滑度
@@ -311,9 +291,6 @@ RPM 通过调整预测窗口长度 $W$ 提供了灵活的响应性-平滑度控�
 - 预测长度约 **8 帧（133 ms）** 时达到最佳手部精度（Hands PE 最低）；
 - 预测长度约 **15 帧（250 ms）** 时达到最佳平滑度（Jitter 和 Peak Jerk 最低）。
 
-![[assets/figures/papers/paper_list_l1858_GORP_Real_Time_Motion_Generation_with_Rolling_Prediction_Models/figures/003_Figure_4.jpg]]
-*Figure 4: Flexible reactiveness. RPM achieves the best accuracy when the prediction length is around 8 frames (or 133ms), and the smoothest results around 15 frames (or 250ms). By leveraging longer prediction windows, we can trade off smoothness for tracking reactiveness (i.e., lower jitter and peak jerk, higher hands PE)*
-
 这一特性使 RPM 可根据应用场景灵活配置：游戏场景偏好低延迟响应（短窗口），社交 VR 场景偏好平滑自然运动（长窗口），无需重新训练模型。
 
 ### 真实数据验证：GORP 数据集
@@ -347,21 +324,8 @@ RPM 通过调整预测窗口长度 $W$ 提供了灵活的响应性-平滑度控�
 | Table C / Figure E | 1€ 滤波器无法匹配 RPM 的平滑度，基线方法需牺牲 >50% 精度 |
 | Figure F | RPM 在真实数据长期信号丢失后误差保持稳定，无突变 |
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1858_GORP_Real_Time_Motion_Generation_with_Rolling_Prediction_Models/figures/010_Figure_6.jpg]]
 *Figure 6: Qualitative comparison on synthetic HT inputs (A-P1). On the left, we show how RPM performs similarly to other state-ofthe-art methods when the tracking inputs contain strong information on the full-body pose. However, more ambiguous input configurations might lead to wrong generated poses, as shown in the first column on the right example. When the tracking is recovered, RPM is the only method that generates a smooth and realistic transition towards matching the new input*
-
-![[assets/figures/papers/paper_list_l1858_GORP_Real_Time_Motion_Generation_with_Rolling_Prediction_Models/figures/011_Figure_7.jpg]]
-*Figure 7: Qualitative comparison on real inputs (GORP). We show how RPM is able to generate accurate and expressive full-body motion in highly dynamic sequences (left example, MC inputs). On the much more challenging HT setup (right), our method generates motion with less jitter when hand-tracking inputs are missing or noisy*
-
-![[assets/figures/papers/paper_list_l1858_GORP_Real_Time_Motion_Generation_with_Rolling_Prediction_Models/figures/017_Table.jpg]]
-*Table: A. Comparison of different uncertainty functions. We observe that modifying the uncertainty function of PCAF primarily impacts the smoothness during synthesis-to-tracking (AUJS-T) and tracking-to-synthesis $\left( \mathbf { A U J } _ { \mathbf { T } - \mathbf { S } } \right)$ transitions*
-
-![[assets/figures/papers/paper_list_l1858_GORP_Real_Time_Motion_Generation_with_Rolling_Prediction_Models/figures/021_Table.jpg]]
-*Table: D. Effect of PCAF scaling function iA-P1-HT. We observe how the hyperbolic tangent and the straight functions provide the best accuracy and transitions smoothness*
-
-
 
 ## 定位与知识库关联
 
@@ -450,8 +414,6 @@ RPM 采用确定性运动预测范式，无法捕捉未来的多模态可能性�
 4. **不确定性调度的自适应**：在真实部署中，PCAF 的不确定性调度应如何根据具体应用场景（如快节奏游戏 vs. 社交 VR）自动调整？能否从数据中学习最优调度策略？
 
 5. **多模态传感器融合**：除了头部和手腕，能否有效融合头显摄像头以外的传感器数据（如腰部 IMU、腿部追踪器）以提升全身重建精度？RPM 的编码器架构是否支持即插即用的多模态扩展？
-
-
 
 ## 原文 PDF
 

@@ -64,8 +64,6 @@ SafeGuard-VL的**关键创新**在于：① 以自然语言策略描述作为条
 
 **局限与待验证点**：① 图像编辑工具Nano Banana禁止生成有害内容，因此SafeEditBench仅能做单向编辑（不安全→安全），无法生成双向配对；② RL训练仍依赖固定策略层级数据，对完全任意的、未见过的自然语言策略的泛化性可能仍有局限；③ 论文声明将发布代码但未提供具体仓库链接，可复现性待验证。
 
-
-
 ### 安全护栏的策略依赖性困境
 
 视觉语言模型（VLM）的快速部署使得图像内容安全审核成为关键基础设施。然而，当前的安全护栏（guardrail）方法面临一个根本性瓶颈：**安全标签本质上依赖于策略定义，而非图像的固有属性**。同一张图像在不同安全策略下可能被判定为“安全”或“不安全”——尤其在策略采用反直觉或非常识性定义时（例如，禁止普通亲密行为但允许性暗示内容），这一矛盾尤为突出（Figure 5）。
@@ -97,8 +95,6 @@ SafeGuard-VL的**关键创新**在于：① 以自然语言策略描述作为条
 
 这一设计使得模型在保持通用VLM能力的同时，实现策略自适应——在UnsafeBench跨策略泛化上达到72.2的总体F1-score，较QwenGuard-7B提升28.6个百分点（Table 2），且通用能力保持稳定（Table 5）。
 
-
-
 ## 核心方法与创新机理
 
 SafeGuard-VL 的核心创新在于将安全护栏从“固定策略下的二分类任务”重构为“策略条件化的语义理解与对齐任务”，通过两个关键设计突破现有方法的瓶颈。
@@ -126,8 +122,6 @@ Table 3 揭示了这一创新的必要性：在极端策略（L1）上 SFT 训�
 ### 3. 安全能力与通用能力的均衡
 
 传统 SFT 护栏模型存在严重的**过度特化**问题：QwenGuard-7B 在其自身基准 LlavaGuardBench 上达到 84.57，但在 UnsafeBench 上仅 43.56，通用 VQA 平均分仅 35.98（Table 4，Figure 6）。SafeGuard-VL 通过 RLVR 训练，在保持通用指令遵循能力（57.02）的同时，将 UnsafeBench 提升至 62.39，实现了安全与通用能力的均衡（Figure 6 右）。这一特性源于 RLVR 的奖励设计仅约束安全判断的策略一致性，而非压缩模型的通用推理空间。
-
-
 
 SafeGuard-VL 采用**两阶段训练范式**，从“理解不安全语义”到“策略条件对齐”逐步构建策略自适应的视觉安全护栏。图 1 给出了高层示意图：第一阶段（SFT）通过自重新描述机制让模型学习图像中与不安全相关的视觉和文本语义；第二阶段（RL）利用基于可验证奖励的强化学习（RLVR），使模型根据输入的自然语言策略文本做出安全/不安全的判别，而非依赖单一固定规则集。
 
@@ -160,12 +154,8 @@ SafeGuard-VL 采用**两阶段训练范式**，从“理解不安全语义”到
 
 > **注意**：关于 GRPO 的具体公式定义和奖励函数的形式化表达，原文未在已分析部分中提供完整数学描述，此部分细节需查阅原文方法章节进行核实。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l830_https_arxiv_org_abs_2603_01228/figures/001_Figure_1.jpg]]
 *Figure 1: High-level illustration of our SafeGuard-VL. Unlike prior guardrails that fit only the fixed safety policy, SafeGuard-VL is designed from the perspective of cross-policy adaptability and robustness. In Stage 1 (SFT), the model learns general unsafe-related visual and textual semantics through data constructed using our self-recaption mechanism. In Stage 2 (RL), the model is optimized to perform policy-aware safe/unsafe discrimination, adapting its decisions to different policy definitions rather than relying on a single fixed rule set. This two-stage framework enables SafeGuard-VL to generalize to unseen or shifting safety policies during testing*
-
-
 
 ### 2.1 自重新描述数据生成模块（Self-Recaption）
 
@@ -197,13 +187,6 @@ SafeGuard-VL 采用**两阶段训练范式**，从“理解不安全语义”到
 ### 2.4 公式说明
 
 本文未在正文中给出独立的数学公式推导。方法的核心机制通过流程描述和实验验证呈现，而非形式化建模。若需精确的GRPO目标函数或奖励函数形式化定义，需查阅引用源（Shao et al., 2024）或等待代码发布后从实现中提取。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l830_https_arxiv_org_abs_2603_01228/figures/003_Figure_3.jpg]]
-*Figure 3: The proposed novel self-recaption mechanism that lets the model generate and refine its own captions. Specifically, the baseline model (Qwen-VL) first produces a high-level description with less unsafe details, sampled from its own distribution. The recaption model (Gemma 27B) then performs minimal edits to this caption by recovering the suppressed unsafe semantics, producing a caption with more unsafe details that preserves the original structure while adding explicit harmful descriptions*
-
-
 
 ## 实验与关键发现
 
@@ -255,10 +238,6 @@ Figure 8展示了SafeGuard-VL两阶段的渐进式能力提升：SFT阶段使模
 
 4. **可复现性待验证**：论文声明将发布代码，但截至分析时仅提供了基于CLIP的NSFW检测器链接，SafeGuard-VL的核心训练代码尚未公开。上述所有实验结论的独立验证需等待完整代码发布。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l830_https_arxiv_org_abs_2603_01228/figures/005_Table.jpg]]
-
 ![[assets/figures/papers/paper_list_l830_https_arxiv_org_abs_2603_01228/figures/007_Table_1.jpg]]
 *Table 1: Comparison of policy adaptation mechanisms across existing safety guardrails and benchmarks. Existing methods rely on fixed taxonomies or pre-defined blocks with limited adaptation flexibility, whereas our method supports arbitrary natural language policies with zero-shot cross-policy generalization*
 
@@ -268,22 +247,8 @@ Figure 8展示了SafeGuard-VL两阶段的渐进式能力提升：SFT阶段使模
 ![[assets/figures/papers/paper_list_l830_https_arxiv_org_abs_2603_01228/figures/010_Table_4.jpg]]
 *Table 4: Performance comparison across safety and general VQA benchmarks. QwenGuard-7B achieves high scores on its own LlavaGuardBench but suffers significant degradation on other safety (UnsafeBench) and general benchmarks. In contrast, with the same training data, simply changing to RL training improves performance on both safety and general benchmarks, demonstrating better generalization and avoiding the drawbacks of over-specialization in existing safety models*
 
-![[assets/figures/papers/paper_list_l830_https_arxiv_org_abs_2603_01228/figures/011_Figure_6.jpg]]
-*Figure 6: Comparison of safety vs. general capability tradeoff. Left: QwenGuard exhibits a large gap between its proprietary benchmark (84.6) and other safety/general benchmarks (43.6, 36.0). Right: Our SafeGuard-VL-RL maintains balanced performance across safety (71.8, 62.4) and general tasks (57.0), demonstrating superior safety ability without sacrificing general capacity. The general score is the average of MMMU, RealWorldQA, BLINK, and MMT-Bench*
-
 ![[assets/figures/papers/paper_list_l830_https_arxiv_org_abs_2603_01228/figures/013_Table_5.jpg]]
 *Table 5: Ablation study on the effectiveness of recaption and RL training. Removing recaption (w/o Recap) leads to a drop in safety performance, confirming that our carefully designed captions help the model learn fine-grained harmful patterns. Further applying RL after SFT yields the best performance on UnsafeBench (+5.2 over SFT-only), validating our two-stage training strategy. General capability remains stable across variants*
-
-![[assets/figures/papers/paper_list_l830_https_arxiv_org_abs_2603_01228/figures/012_Table_6.jpg]]
-*Table 6: Performance (F1-score %) on SafeEditBench under five policy levels. Our method trained on the SafeEdited data outperforms both general-purpose models and QwenGuard models*
-
-![[assets/figures/papers/paper_list_l830_https_arxiv_org_abs_2603_01228/figures/004_Figure_4.jpg]]
-*Figure 4: The statistics of the five policy levels in SafeEditBench, showing how the same image set is labeled differently under varying safety policies. From L1 (most permissive) to L5 (most restrictive), each policy defines different categories of violation. Policies L3 and L4 reflect widely accepted societal norms, while L1 and L5 represent most counterintuitive regimes designed to test policy adherence*
-
-![[assets/figures/papers/paper_list_l830_https_arxiv_org_abs_2603_01228/figures/006_Figure_5.jpg]]
-*Figure 5: Examples showing that “safety” is fundamentally policy-dependent rather than common-sense–dependent. The same image may be judged “Safe” or “Unsafe” under different policies, especially when the policies adopt counterintuitive or non–common-sense definitions of safety (e.g., prohibiting ordinary affection while allowing sexually suggestive content). These examples highlight the core challenge: safety labels are not intrinsic to the image but are also determined by the specific policy applied*
-
-
 
 ## 定位与知识库关联
 
@@ -322,8 +287,6 @@ SafeGuard-VL 以 **Qwen2.5-VL-7B** 为基座模型，但其训练策略与直接
 3. **SFT 数据偏差的传播与放大**：第一阶段 SFT 的描述数据若包含偏差（例如对特定群体、文化符号的不安全语义过度或不足标注），这些偏差在第二阶段 RLVR 中是被纠正还是被强化？这关系到策略对齐的公平性。
 
 4. **与基于规则系统的混合架构**：SafeGuard-VL 的纯神经网络方法在处理边界清晰、可精确枚举的安全规则时可能不如基于规则的系统可靠。将 SafeGuard-VL 与轻量级规则引擎结合，在保证灵活性的同时提升确定性规则的执行精度，是一个值得探索的方向。
-
-
 
 ## 原文 PDF
 

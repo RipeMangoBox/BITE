@@ -56,7 +56,6 @@ claims:
 - **纹理合成**：Hunyuan3D-Paint 的 CMMD 低至 2.318，显著优于 Paint3D 等基线（Table 3）。
 - **用户研究**：在视觉质量、条件依从性和整体满意度上均获得最高偏好（Figure 10）。
 
-
 ### 3D 资产生成的核心挑战
 
 高质量 3D 资产（包含精细几何与高保真纹理）在游戏、影视、AR/VR 等领域需求巨大，但其手工制作成本极高。自动化生成面临两大核心瓶颈：
@@ -81,8 +80,6 @@ claims:
 - **借助零噪声固定权重参考网络与并行多任务注意力达成纹理高保真**：纹理生成阶段，冻结预训练 Stable Diffusion 的 ReferenceNet 权重以精确保留输入图像细节，同时通过并行参考注意力与多视图注意力模块，同时满足条件遵循与视图一致性要求。
 
 这一设计思路旨在端到端地解决“几何细节丢失”与“纹理不一致/不对齐”两大核心问题，实现高分辨率、高保真的 3D 纹理资产生成。
-
-
 
 ## 核心方法与创新机理
 Hunyuan3D 2.0 的核心创新围绕“形状生成”与“纹理合成”两个阶段展开，通过一系列针对性的表示增强、网络结构改进与一致性约束，系统性地解决了现有方法在几何细节捕捉、条件对齐和多视图一致性方面的瓶颈。
@@ -124,7 +121,6 @@ $$Z_{MVA} = Z_{SA} + \lambda_{ref} \cdot \mathrm{Softmax}\left( \frac{Q_{ref} K_
 
 这些创新并非孤立存在，而是形成了完整的因果链条：重要性采样保留几何高频信息 → 流匹配与双流 Transformer 实现精准条件跟随 → 去光照与零噪声参考网络保持纹理细节 → 并行多任务注意力同时达成条件对齐与多视图一致性。最终，Hunyuan3D 2.0 在形状重建、条件生成和纹理合成三个核心维度上均取得了显著超越现有方法的性能。
 
-
 Hunyuan3D 2.0 采用**两阶段生成管线**：第一阶段从单张输入图像生成无纹理的裸网格（bare mesh），第二阶段为该网格合成高保真纹理贴图。两个阶段分别由 **Hunyuan3D-DiT** 和 **Hunyuan3D-Paint** 两大组件承担，整体架构如图 2 所示。
 
 ### 形状生成阶段：Hunyuan3D-DiT
@@ -163,11 +159,8 @@ Hunyuan3D 2.0 采用**两阶段生成管线**：第一阶段从单张输入图�
 
 输入图像首先进入 Hunyuan3D-DiT 生成裸网格；该网格一方面提供几何条件（法线图、坐标图）输入 Hunyuan3D-Paint，另一方面其 UV 参数化用于后续纹理烘焙。输入图像经去光照后作为参考图，与几何条件一同驱动多视图扩散模型生成一致的多视图图像，最终烘焙为可直接用于渲染的纹理贴图。整个管线实现了从单张 RGB 图像到带纹理 3D 资产的端到端生成。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2501_12202/figures/003_Figure_2.jpg]]
 *Figure 2: An overall of Hunyuan3D 2.0 architecture for 3D generation. It consists of two main components: Hunyuan3D-DiT for generating bare mesh from a given input image and Hunyuan3D-Paint for generating a textured map for the generated bare mesh. Hunyuan3D-Paint takes geometry conditions – normal maps and position maps of generated mesh as inputs and generates multi-view images for texture baking*
-
 
 Hunyuan3D 2.0 的核心生成能力建立在三个紧密协作的模块之上，它们分别解决了形状重建/生成与纹理合成中的关键瓶颈。
 
@@ -207,15 +200,11 @@ $$ Z_{MVA} = Z_{SA} + \lambda_{ref} \cdot \mathrm{Softmax}\left( \frac{Q_{ref} K
 - **图像去光照模块**：在生成前去除输入图像的光照和阴影，获得光线不变的参考图，避免光照信息干扰纹理合成。
 - **贪婪覆盖视角选择**：推理时基于覆盖函数 $\mathcal{F}(v_i, \mathbb{V}_s, \mathbf{M})$ 选择能最大化 UV 纹理覆盖面积的视角，训练阶段则引入视角丢弃策略以增强鲁棒性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2501_12202/figures/005_Figure_4.jpg]]
 *Figure 4: Overview of Hunyuan3D-DiT. It adopts a transformer architecture with both double- and single-stream blocks. This design benefits the interaction between modalities of shape and image, helping our model to generate bare meshes with exceptional quality. (Note that the orange blocks have no learnable parameters, the blue blocks contain trainable parameters, and the gray blocks indicate a module composed of more details.)*
 
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2501_12202/figures/006_Figure_5.jpg]]
 *Figure 5: Overview of Hunyuan3D-Paint. We leverage an image delighting module to convert the input image to an unlit state to produce light-invariant texture maps. The system features a doublestream image conditioning reference-net, which provides faithfully conditional image features to the model. Furthermore, it facilitates the production of texture maps that conform closely to the input image. The multi-task attention module ensures that the model synthesizes multi-view consistent images. This module maintains the coherence of all generated images while adhering to the input*
-
-
 
 ## 实验与关键发现
 ### 形状重建与生成评估
@@ -234,9 +223,6 @@ $$ Z_{MVA} = Z_{SA} + \lambda_{ref} \cdot \mathrm{Softmax}\left( \frac{Q_{ref} K
 
 Figure 10 所示的用户研究结果从主观感知维度验证了数值评估结论。50 名参与者在视觉质量、条件依从性和整体满意度三个维度上对 Hunyuan3D 2.0 与多个基线方法进行偏好比较，Hunyuan3D 2.0 在所有维度上均获得显著更高的偏好率。这一结果与客观指标的领先趋势一致，表明重要性采样、流匹配扩散以及并行多任务注意力等设计在实际感知质量上同样有效。
 
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2501_12202/figures/015_Figure_10.jpg]]
-*Figure 10: The results of user study*
-
 ### 消融与失败模式
 
 论文未提供系统性的消融实验数据，因此各设计模块（如重要性采样比例、双流与单流模块的消融、并行注意力权重系数 λ_ref 与 λ_mv 的敏感性）的定量贡献尚无法确认。此外，在极端视角遮挡、复杂拓扑（如薄壳结构）或高光反射材质等场景下的失败模式也未在论文中明确讨论。上述两点需在实际部署中通过额外实验进行验证。
@@ -244,8 +230,6 @@ Figure 10 所示的用户研究结果从主观感知维度验证了数值评估�
 ### 公平性说明
 
 所有对比实验均在统一条件下进行：形状重建与生成评估使用 300 个测试用例；ShapeVAE 比较中除 Direct3D（固定 3072 token）外均采用 1024 token 序列长度；纹理合成评估基于自采大尺度 3D 数据集中的测试对象；用户研究涉及 50 名参与者，确保统计稳定性。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2501_12202/figures/007_Table_1.jpg]]
 *Table 1: Numerical comparisons. We evaluate the reconstruction performance of Hunyuan3D-ShapeVAE and baselines based on volume IoU (V-IoU) and Surface (S-IoU). The results indicate Hunyuan3D-ShapeVAE overwhelms all baselines in the reconstruction performance*
@@ -255,19 +239,6 @@ Figure 10 所示的用户研究结果从主观感知维度验证了数值评估�
 
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2501_12202/figures/009_Table_2.jpg]]
 *Table 2: Numerical comparisons. By evaluating the shape generation performance on ULIP-T/I, Uni3D-T/I, demostrating Hunyuan3D-DiT could produce the most condition followed results*
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2501_12202/figures/010_Figure_7.jpg]]
-*Figure 7: Visual comparisons. We display the input image and the generated bare mesh (blue paint aims to show more details) from all methods in the figure. The human faces and piano keys show that Hunyuan3D-DiT could synthesize detailed surface bumps, maintaining completeness. Several scenes or logos demonstrate that Hunyuan3D-DiT could generate intricate details. (Better viewed by zooming in.)*
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2501_12202/figures/011_Table_3.jpg]]
-*Table 3: Numerical comparisons. We compare Hunyuan3D-Paint with baselines on various metrics, and the results indicate that our model could produce the most condition-conforming texture maps*
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2501_12202/figures/012_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2501_12202/figures/014_Figure_9.jpg]]
-*Figure 9: Visual results. We generate different texture maps for two meshes, and the results validate the performance of Hunyuan3D-Paint on texture reskinning. (Better viewed by zooming in.)*
-
-
 
 ## 定位与知识库关联
 Hunyuan3D 2.0 的贡献可置于以下技术谱系中理解：
@@ -279,7 +250,6 @@ Hunyuan3D 2.0 的贡献可置于以下技术谱系中理解：
 | 多视图纹理合成 | **Zero-1-to-3** (Liu et al., ICCV 2023)、**Wonder3D** (Long et al., CVPR 2024)、**Era3D** (Li et al., arXiv 2024)、**Dense-Texture** (Liu et al., SIGGRAPH Asia 2024)、**Paint3D** (Zeng et al., CVPR 2024) | 冻结权重的 SD2.1 双流 ReferenceNet + 并行多任务注意力，配合图像去光照预处理与基于贪婪覆盖的视角选择 |
 
 该方法并非孤立改进某一模块，而是系统性地重塑了从形状表示、扩散训练目标、网络结构到纹理条件注入与多视图一致性约束的全链路设计。其技术路线代表了“大规模扩散模型 + 专用表示增强 + 多阶段解耦生成”方向在3D资产生成领域的一次重要推进。
-
 
 ### 1. 形状生成谱系：从 VAE 压缩到流匹配扩散
 
@@ -341,8 +311,6 @@ Hunyuan3D-Paint 通过三个关键设计突破这一瓶颈：
 3. **多任务注意力的可解释性**：$\lambda_{ref}$ 和 $\lambda_{mv}$ 的权重设置对生成结果的影响机制尚不明确。是否存在更优的自适应权重调整策略？
 
 4. **纹理重绘能力的上限**：Figure 9 展示了纹理重绘（reskinning）的结果，但在保持几何细节与纹理风格迁移之间的权衡关系缺乏系统分析。
-
-
 
 ## 原文 PDF
 ![[paperPDFs/arxiv_2025/Hunyuan3D_2_0_Scaling_Diffusion_Models_for_High_Resolution_Textured_3D_Assets_Generation.pdf]]

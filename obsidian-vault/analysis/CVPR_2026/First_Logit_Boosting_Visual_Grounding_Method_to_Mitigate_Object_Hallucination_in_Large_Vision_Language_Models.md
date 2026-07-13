@@ -52,8 +52,6 @@ claims:
 
 **方法定位**：FLB属于解码时干预（decoding-time intervention），无需重新训练或微调模型，与现有的对比解码方法正交。其知识贡献在于首次揭示并利用**首个token logit的视觉锚定效应**来对抗长距离衰减，为缓解LVLM幻觉提供了新的因果操控维度。
 
-
-
 ### 大型视觉-语言模型的物体幻觉困境
 
 大型视觉-语言模型（LVLMs）在图像描述、视觉问答等多模态任务中展现出强大能力，但其生成文本中频繁出现与视觉输入不一致的“物体幻觉”（object hallucination）——即描述图像中并不存在的物体。这一问题的核心瓶颈在于**视觉接地的长距离衰减**（long-term decay）：随着自回归解码步数增加，模型对视觉信息的依赖逐渐减弱，语言先验逐步主导生成过程，导致后部token位置产生大量幻觉预测。
@@ -81,8 +79,6 @@ FLB方法的关键发现来自对解码过程早期信号的细致观察：
 基于上述洞察，FLB提出了一条不同于传统对比解码的路径：**直接利用首个token的logit作为贯穿整个解码过程的视觉锚点**。通过将$l_0$存储并按时间加权加入后续每个token的预测中，FLB同时激活两种互补机制——（1）直接视觉接地：$l_0$中保留的视觉证据持续抑制幻觉token的logit增长；（2）隐性视觉引用：提升以“The”开头的句子概率，使模型在长距离衰减发生前就选择视觉确定的指代对象，从而间接抑制后续幻觉。
 
 这一设计无需额外训练、无需图像扰动、无需外部模型，仅需缓存一个logit向量，推理开销可忽略不计。
-
-
 
 ## 核心方法与创新机理
 
@@ -124,8 +120,6 @@ FLB 的效果来自两个互补的机制，消融实验（**Table 5**）证实�
 ### 与对比解码的本质差异
 
 FLB 与 CD 类方法在干预逻辑上存在根本性差异。CD 方法通过对比原始分布与失真分布来“放大”视觉信号，但其扰动源（失真图像、扰动指令）本身与视觉接地并无直接的因果关联。FLB 则直接利用解码过程中自然存在的视觉信息梯度——首个 token 的 logit——作为锚点，干预的对象是视觉信号衰减的动力学过程本身，而非对分布进行事后修正。这一设计使得 FLB 在推理速度上几乎无额外开销（仅需存储和加法操作），而 CD 方法因需要两次前向传播，速度近乎减半。
-
-
 
 FLB 的整体 pipeline 由一个极其精简的解码期干预闭环构成：**存储→加权注入→约束过滤**，无需额外训练、不引入外部模型，完全在现有 LVLM 的自回归生成循环内运行。
 
@@ -178,8 +172,6 @@ FLB 仅引入三个超参数：$\gamma$（最大权重）、$\lambda$（增长�
 
 ![[assets/figures/papers/paper_list_l752_https_arxiv_org_abs_2604_00455/figures/026_Table_18.jpg]]
 *Table 18: Performance comparison of mPLUGOwl2 on AMBER. The highest scores are marked in bold*
-
-
 
 ### 3.1 问题形式化：自回归解码中的视觉衰减
 
@@ -245,15 +237,7 @@ FLB通过 $l_0$ 的注入同时激活两种互补的幻觉抑制机制：
 
 2. **隐式视觉引用（Implicit Visual Referencing）**：Figure 4 显示首个token的logit中“The”等冠词排名极高，FLB因此提升了以“The”开头的句子比例（约+21.9个百分点）。Figure 6 进一步揭示，以“The”开头的句子在长距离token位置上的幻觉概率显著更低，表明“The”提供了稳定的初始化，抑制了累积性幻觉。
 
-![[assets/figures/papers/paper_list_l752_https_arxiv_org_abs_2604_00455/figures/004_Figure_4.jpg]]
-*Figure 4: Top 20 tokens by logit value for the first token prediction. The list includes common sentence-starting words such as “The”, “In”, and*
-
-![[assets/figures/papers/paper_list_l752_https_arxiv_org_abs_2604_00455/figures/010_Figure_6.jpg]]
-*Figure 6: Sentence-level impact of “The” on long-term hallucination. We compare probability of ground truth (left) and hallucination (right) words across generated token positions for two groups: sentences beginning with “The” and all other sentences. Sentences beginning with “The” show comparable ground truth probability to the overall distribution but exhibit substantially lower hallucination growth, particularly at later token positions where long-term decay intensifies. The widening gap between two groups demonstrate that “The” token provides a stabilizing initialization that suppresses cumulative hallucination*
-
 消融实验（Table 5）表明，两个效应各自独立有效（单独视觉接地 CHAIR=9.2，单独“The”效应 CHAIR=6.5），全开FLB达到最优性能（CHAIR=5.7），验证了双重机制的互补性。
-
-
 
 ## 实验与关键发现
 
@@ -297,27 +281,11 @@ Table 16比较了FLB在采样解码和贪婪解码下的表现。贪婪解码下
 
 与需要两次前向传播的对比解码方法（VCD、ICD、M3ID）相比，FLB仅需缓存首个token的logit并在后续步骤中执行一次向量加法，推理速度几乎无退化。这一轻量特性使其在实际部署中具有显著优势。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l752_https_arxiv_org_abs_2604_00455/figures/011_Table_5.jpg]]
 *Table 5: Ablation results isolating the two core effects of FLB*
 
-![[assets/figures/papers/paper_list_l752_https_arxiv_org_abs_2604_00455/figures/023_Table_15.jpg]]
-*Table 15: Hyperparameter optimization on*
-
-![[assets/figures/papers/paper_list_l752_https_arxiv_org_abs_2604_00455/figures/028_Figure_9.jpg]]
-*Figure 9: Example outputs from LLaVA-1.5 with FLB applied using*
-
-![[assets/figures/papers/paper_list_l752_https_arxiv_org_abs_2604_00455/figures/009_Table_4.jpg]]
-*Table 4: GPT-4V-aided Evaluation Results*
-
 ![[assets/figures/papers/paper_list_l752_https_arxiv_org_abs_2604_00455/figures/024_Table_16.jpg]]
 *Table 16: Performance comparison of LLaVA1.5 and greedy sampling on AMBER generative tasks. The highest scores are marked in bold*
-
-![[assets/figures/papers/paper_list_l752_https_arxiv_org_abs_2604_00455/figures/027_Table_19.jpg]]
-*Table 19: Performance comparison of LLaVA1.5 on discriminative tasks*
-
-
 
 ## 定位与知识库关联
 
@@ -359,8 +327,6 @@ FLB 的有效性依赖于以下几个前提条件，这些条件同时界定了�
 2. **RoPE 长距离衰减的根本性解决**：FLB 本质上是对 RoPE 位置编码衰减效应的补偿性修复，而非根治。能否通过衰减感知的位置编码机制从模型结构层面解决这一问题？
 3. **跨语言与多模态对话的泛化**：FLB 的 “The 效应” 高度依赖英语的冠词系统。在无冠词语言（如中文、日语）或多轮对话场景中，首个 token 的视觉接地作用是否依然成立？
 4. **贪婪解码的覆盖度保持**：如何在保持 FLB 幻觉抑制能力的同时，避免贪婪解码下的覆盖度损失？是否需要引入额外的多样性促进机制？
-
-
 
 ## 原文 PDF
 

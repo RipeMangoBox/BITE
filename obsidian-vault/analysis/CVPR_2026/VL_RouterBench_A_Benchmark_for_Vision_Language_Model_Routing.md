@@ -56,8 +56,6 @@ $$t_i^{(\lambda)}(j) = \frac{\mathbf{1}\{Y_{i,j}=1\} \cdot \exp(-\lambda \cdot C
 
 **主要结果**：在 $\lambda=100$ 设置下，MLP+软标签路由器的 Rank Score 达到 74.23，较 Strongest 基线（68.88）提升 5.35 分；端到端 VLC 路由器在 Avg. Acc. 上以 78.09% 超越最强单模型（78.01%）。消融实验揭示：归一化拼接融合（Normalize-Concat）显著优于普通拼接和加权平均，LXMERT 作为多模态骨干优于 VisualBERT 和单模态 BERT，且提高文本/视觉嵌入维度可有效提升路由性能。这些发现共同指向一个明确方向——**通过改进跨模态表示和路由器架构，VLM路由存在大幅提升空间**。
 
-
-
 ### 视觉语言模型部署中的路由困境
 
 大规模视觉语言模型（VLM）的快速迭代使得模型选择成为部署中的核心难题。不同VLM在精度、成本和推理速度上呈现显著差异——以VL-RouterBench所覆盖的15个开源模型和2个API模型为例，参数量从数十亿到数百亿不等，单次推理成本可相差数倍，且没有任何单一模型能在所有视觉任务上同时取得最优精度与最低成本。实际部署中，用户往往只能“押注”一个最强模型（Strongest）或最便宜模型（Cheapest），前者带来不必要的推理开销，后者则可能因精度不足导致下游任务失败。
@@ -78,8 +76,6 @@ $$t_i^{(\lambda)}(j) = \frac{\mathbf{1}\{Y_{i,j}=1\} \cdot \exp(-\lambda \cdot C
 - **标准化评估**：基于14个数据集、30,540个样本和17个VLM的推理日志，构建统一的精度-成本矩阵（共519,180个样本-模型对，总token量34,494,977），并采用Rank Score（归一化精度与成本的调和平均）作为单一排序指标，实现可复现的公平比较。
 - **可控的精度-成本权衡**：引入指数衰减软标签训练策略，通过单一超参数λ连续调节路由器对精度与成本的偏好，使同一路由器架构可生成完整的Pareto前沿，满足不同部署场景的需求。
 - **揭示改进空间**：通过系统消融实验，量化多模态融合方式、编码器维度和骨干架构对路由性能的影响，明确指出当前路由方法与Oracle之间的差距主要源于跨模态表示能力的不足，为后续研究提供了明确方向。
-
-
 
 ## 核心方法与创新机理
 
@@ -113,8 +109,6 @@ $$\mathcal{L}_{\mathrm{soft}}(\theta;\lambda) = \frac{1}{|\mathcal{D}_{\mathrm{t
 ### 基准系统化设计的创新
 
 除训练策略外，VL-RouterBench 在基准构建层面也做出了关键贡献：首次将 VLM 路由评估标准化为**数据准备–路由器训练–路由器评估**的完整管道（Figure 2），覆盖 14 个数据集、30,540 样本、17 个模型，并引入 Rank Score（归一化成本与精度的调和平均）作为单一排序指标，解决了此前路由研究缺乏统一评价标准的核心瓶颈。
-
-
 
 VL-RouterBench 提出了一套完整的视觉语言模型路由评估管线，将路由问题形式化为一个带成本约束的精度最大化任务，并围绕三个核心模块构建：路由器数据准备（Router Data Preparation）、路由器训练（Router Training）和路由器评估（Router Evaluation），如 Figure 2 所示。
 
@@ -150,13 +144,6 @@ $$S(\beta) = \frac{(1+\beta) \cdot \bar{A} \cdot C_{\mathrm{norm}}}{\beta \cdot 
 其中 $\beta$ 控制精度与成本的相对重要性（默认 $\beta=0.1$ 偏重精度）。此外，通过拟合不同 $\lambda$ 下路由器的精度-成本 Pareto 前沿（见 Figure 4），可直观比较各类方法在精度-成本平面上的权衡表现。
 
 **输入输出流总结。** 整体管线以 VLMEvalKit 的推理日志为输入，经过质量/成本矩阵构建、软标签训练、多指标评估三个环节，最终输出路由器的 Rank Score 排名、精度-成本散点分布及 Pareto 前沿，形成从数据到决策的闭环评估体系。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2754_https_arxiv_org_abs_2512_23562/figures/003_Figure_3.jpg]]
-*Figure 3: Dataset distribution in VL-RouterBench. The inner ring shows the three groups, and the outer ring lists the individual datasets. The numbers in parentheses indicate the number of samples contained in each entry*
-
-
 
 ### 路由决策的形式化
 
@@ -212,8 +199,6 @@ $$S(\beta) = \frac{(1+\beta) \cdot \bar{A} \cdot C_{\mathrm{norm}}}{\beta \cdot 
 2. **路由器训练**：使用上述软标签损失训练特征级路由器（如 MLP、Linear）或端到端路由器（如 RouterDC、VLC），通过调节 $\lambda$ 控制精度–成本权衡。
 3. **路由器评估**：在测试集上测量平均精度、平均成本和吞吐量，计算 Rank Score，并拟合精度–成本 Pareto 前沿以可视化不同工作点的权衡关系。
 
-
-
 ## 实验与关键发现
 
 ### 核心结果：路由精度–成本权衡
@@ -231,9 +216,6 @@ VL-RouterBench 在 14 个数据集、30,540 个样本、17 个模型（15 开源
 ### 软标签 λ 的调控作用
 
 软标签训练中的成本惩罚参数 λ 是实现精度–成本可控权衡的关键旋钮。**Figure 4** 展示了不同 λ 下各路由器在精度–成本平面上的 Pareto 前沿：
-
-![[assets/figures/papers/paper_list_l2754_https_arxiv_org_abs_2512_23562/figures/005_Figure_4.jpg]]
-*Figure 4: Performance in accuracy–cost plane. Gray dots represent baselines of individual models. Colored markers represent operating points of the same router under different λ, and curves are Pareto fronts fitted to these points. The closer to the upper left, the better the accuracy-cost trade-off*
 
 - λ=0 时，软标签退化为对所有正确模型均匀分配概率，路由器追求最高精度，成本较高。
 - λ 增大时，低成本正确模型获得更高软标签权重，路由器向低成本方向移动。
@@ -262,11 +244,6 @@ VL-RouterBench 在 14 个数据集、30,540 个样本、17 个模型（15 开源
 
 **附录 Table A1** 探索了同时考虑推理成本和显存占用的多成本路由框架。结果显示，引入额外成本维度后，路由器的精度–综合成本权衡仍然有效，但不同路由器对多成本约束的敏感度存在差异，这为实际部署中的多目标路由优化提供了初步参考。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2754_https_arxiv_org_abs_2512_23562/figures/006_Table_2.jpg]]
-*Table 2: Performance of Router Methods on VL-RouterBench. The best and second-best results except for Oracle are highlighted in bold and underlined, respectively. Avg. Acc. is average accuracy (%), Avg. Cost is average cost ($/10K samples), Rank is sorted by Rank Score, and Throughput is measured in #K tokens/s*
-
 ![[assets/figures/papers/paper_list_l2754_https_arxiv_org_abs_2512_23562/figures/001_Figure_1.jpg]]
 *Figure 1: Overall performance comparison on VL-RouterBench. The xaxis and y-axis are Average Cost (Avg. Cost, $/10K samples) and Average Accuracy (Avg. Acc., %), respectively. Gray dots denote the performance of single models at different costs, and “Strongest” and “Cheapest” mark the baselines that use only the strongest or the cheapest model. The gray dashed curve depicts the Pareto frontier fitted from these single-model points (only models near the frontier are shown for clarity). “1st RouterDC”, “2nd VLC”, and “3rd MLP” indicate the top three routers by Rank Score. Points closer to the upper left reflect a better accuracy–cost trade-off. The results show that even advanced routers still have a n...*
 
@@ -279,19 +256,8 @@ VL-RouterBench 在 14 个数据集、30,540 个样本、17 个模型（15 开源
 ![[assets/figures/papers/paper_list_l2754_https_arxiv_org_abs_2512_23562/figures/007_Figure_5.jpg]]
 *Figure 5: Performance comparison of different text and visual encoders paired on MLP with λ = 100. The brackets indicate the dimension of the encoder’s output embedding. Other settings are the same as in Table 2*
 
-![[assets/figures/papers/paper_list_l2754_https_arxiv_org_abs_2512_23562/figures/004_Table_1.jpg]]
-*Table 1: VLMs used in our benchmark, sorted by parameter count, with per-million-token prices for input and output. For the MoE model, m-A-n represents the total number of m B parameters in the model and the number of n B parameters activated during inference. All model prices are estimated based on the model size, compared with the prices on Together.ai*
-
-![[assets/figures/papers/paper_list_l2754_https_arxiv_org_abs_2512_23562/figures/013_Figure.jpg]]
-*Figure: A3. Accuracy distribution on different routing difficulty levels for top routers. |Si| is the number of models correctly answering sample i*
-
-![[assets/figures/papers/paper_list_l2754_https_arxiv_org_abs_2512_23562/figures/014_Table.jpg]]
-*Table: A2. Performance comparison of learned routers on held-out datasets. Routers are trained on 11 seen datasets (ID) and evaluated on 3 held-out datasets (OOD). Other settings are the same as in Tab. 2*
-
 ![[assets/figures/papers/paper_list_l2754_https_arxiv_org_abs_2512_23562/figures/012_Table.jpg]]
 *Table: A1. Performance comparison of top routers on VL-RouterBench under multi-cost framework. Other settings are the same as in Tab. 2*
-
-
 
 ## 定位与知识库关联
 
@@ -349,8 +315,6 @@ $$S(\beta) = \frac{(1+\beta) \cdot \bar{A} \cdot C_{\mathrm{norm}}}{\beta \cdot 
 4. **开放式任务评价**：对于开放式视觉问答、图像描述生成等主观性强的任务，如何设计有效的路由评价指标（超越简单的规则化正确性判断）？
 
 5. **多图像与交互式场景扩展**：将基准扩展至多图像输入（如视频理解、多图对比）和交互式场景（如多轮视觉对话），是推动VLM路由走向实际应用的关键一步。
-
-
 
 ## 原文 PDF
 

@@ -58,8 +58,6 @@ claims:
 
 方法定位上，ActionPlan 属于**扩散模型 + 分层规划**范式，通过异构扩散时间步（每帧独立时间步）和掩码损失实现全数据集训练，打通了离线高质量与在线低延迟生成。其两阶段采样策略（Stage 1 生成完整动作计划，Stage 2 以随机或光栅顺序渐进去噪）为流式运动合成提供了新的设计空间。
 
-
-
 ### 文本驱动运动合成的现状与瓶颈
 
 文本驱动的人体运动合成旨在根据自然语言描述生成逼真的三维人体动作序列，在虚拟人动画、游戏开发和具身智能等领域具有广泛应用。近年来，扩散模型和自回归模型在该领域取得了显著进展，催生了**MDM**（Tevet et al., NeurIPS 2023）、**T2M-GPT**（Zhang et al., CVPR 2023）、**MoMask**（Guo et al., 2024）等代表性方法。然而，现有工作长期处于两极化状态：
@@ -86,8 +84,6 @@ ActionPlan的解决方案是将动作规划与运动合成解耦为两阶段过�
 1. **如何获取帧级语义监督？** 现有的运动‑文本数据集（如HumanML3D）仅提供序列级描述，缺乏帧级标注。ActionPlan通过引入BABEL数据集的帧级动作标注，并设计掩码损失函数，使得模型可以在缺失帧级标注的序列上正常训练，从而充分利用全部HumanML3D-272数据。
 2. **如何统一离线与流式的去噪调度？** 传统扩散模型对所有帧使用单一时间步，无法支持渐进式生成。ActionPlan提出异构时间步采样策略，为每帧运动潜在分配独立噪声水平，使模型在训练时即学习处理不同去噪阶段的帧。
 3. **如何平衡生成质量与推理延迟？** 完全并行去噪质量最优但无法流式输出，完全串行去噪延迟过高。ActionPlan通过渐进采样窗口（重叠大小K=2）在FID与R-Precision之间取得最佳权衡，同时实现首token 146 ms、后续token仅40 ms的高效推理。
-
-
 
 ## 核心方法与创新机理
 
@@ -140,8 +136,6 @@ $$
 
 这些创新使 ActionPlan 在流式模式下 FID 达 5.735，相较最佳流式基线 MotionStreamer（FID 11.790）改善 51%，同时首 token 延迟仅 146 ms，持续生成每 token 40 ms，在质量与效率之间取得了突破性平衡。
 
-
-
 ActionPlan 是一个**两阶段、未来感知的流式运动合成框架**，其核心设计理念是将高层动作规划与低层运动生成解耦，从而在单一模型中同时实现离线高质量生成与在线低延迟流式输出。
 
 ### 总体流程
@@ -184,12 +178,8 @@ ActionPlan 是一个**两阶段、未来感知的流式运动合成框架**，�
 
 两种模式共享同一模型权重，仅在采样调度上存在差异，这从根本上打破了离线高质量与在线低延迟之间的传统割裂。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2603_13500/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of our ActionPlan. (a) During training, motion latents are noised with per-frame heterogeneous timesteps while frame-level text latents share a single global timestep. A Transformer Denoiser is trained to jointly reconstruct both. During inference, the model operates in two modes: in offline mode (b), the action plan is fully generated first and then motion latents are denoised in random pyramid order; in streaming mode (c), the action plan is denoised alongside the first motion frame, followed by raster progressive denoising of the remaining latents*
-
-
 
 ### 3.1 因果时序自编码器（Causal TAE）
 
@@ -242,8 +232,6 @@ $$\mathcal{L} = \lambda_x \mathcal{L}_{\mathrm{motion}} + \lambda_y \mathcal{L}_
 
 推理时，渐进采样器管理活跃潜在集，按任务模式激活并渐进去噪。核心机制是**重叠窗口渐进去噪**：每步仅对当前活跃窗口内的潜在向量执行去噪，窗口大小 $K$ 控制相邻激活帧之间的去噪步数重叠。离线模式采用随机金字塔顺序激活，流式模式采用光栅顺序（从左至右逐帧激活）。流式模式下，动作计划与首帧运动潜在同步去噪，随后逐帧推进，总步数仅需 $N + T - 1$（$N$ 为运动帧数，$T$ 为流匹配总步数），实现低延迟在线生成。
 
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -284,8 +272,6 @@ ActionPlan 在 HumanML3D-272 测试集上同时评估了离线（offline）和�
 3. **场景交互缺失**：模型未建模场景几何或物体信息，无法生成与环境和物体交互的动作（如“拿起桌上的杯子”），这需要额外的场景感知模块。
 4. **首 token 延迟**：流式模式首 token 延迟 146 ms，虽已显著优于对比方法，但对于部分要求端到端延迟低于 100 ms 的高实时性应用（如游戏引擎中的实时角色控制）仍存瓶颈。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2603_13500/figures/001_Figure_1.jpg]]
 *Figure 1: ActionPlan decouples high-level action planning from low-level motion generation in a single generative model (a). By conditioning motion synthesis on generated action plans, ActionPlan achieves online generation (b) without the typical accuracy drop that happens in existing streaming methods and supports localized edits (c)*
 
@@ -296,8 +282,6 @@ ActionPlan 在 HumanML3D-272 测试集上同时评估了离线（offline）和�
 
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2603_13500/figures/008_Table_3.jpg]]
 *Table 3: Ablation on sampling strategy. All rows use the same trained model with a fixed total of 25 denoising steps, differing only in the overlap between consecutively activated motion latents, ranging from fully parallel activation to fully sequential (nonoverlapping) denoising. Our chosen schedule denoises each activated latent for 2 steps before activating the next, achieving the best trade-off between motion quality (FID) and text-motion alignment (R-Precision)*
-
-
 
 ## 定位与知识库关联
 
@@ -346,8 +330,6 @@ ActionPlan 通过动作计划机制从根本上解决了这一瓶颈。动作计
 3. **弱监督动作计划学习**：当前动作计划依赖 BABEL 的帧级标注，能否通过弱监督或自监督方式自动获取帧级语义锚点？例如利用视频文本对齐模型或运动-语言对比学习自动挖掘帧级对应关系。
 
 4. **首 token 延迟优化**：首 token 146 ms 的开销主要来自动作计划的完整生成。能否通过动作计划的渐进式生成或预测性初始化进一步降低这一延迟，使系统适用于更严格的实时场景？
-
-
 
 ## 原文 PDF
 

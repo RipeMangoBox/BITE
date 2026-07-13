@@ -64,8 +64,6 @@ CESA属于**场景感知文本驱动运动生成**方向，其设计在以下维
 
 在 HUMANISE 数据集上，集成合成与分析分支的 CESA 相比仅合成版本，**FID 从 2.663 降至 2.005（↓24.7%）**，运动真实感评分 MRS 从 3.69 提升至 4.16（↑12.7%），文本-运动一致性评分 TMCS 从 3.77 提升至 4.39（↑16.4%）（Tab. I）。消融实验进一步揭示：动作分析分支主要贡献于 FID 与 MRS 的改进，而物体分析分支更有利于提升 TMCS，验证了协同训练的双向增益机制（Tab. IV）。此外，合成运动样本通过丰富类内多样性，显著提升了动作类别与交互物体的识别精度（Fig. 8）。
 
-
-
 ### 问题背景：场景感知的文本到运动生成
 
 三维人体运动合成是计算机视觉与图形学中的核心问题，其目标是根据给定的控制信号生成逼真的人体姿态序列。近年来，文本驱动的运动生成取得了显著进展，但大多数方法仅关注“人在何处做何事”的语义描述，而忽略了人体运动与三维场景之间的物理交互约束。场景感知的文本到运动生成（scene-aware text-to-motion generation）正是为解决这一不足而提出的：它不仅需要理解文本指令中的动作语义，还必须将生成的运动合理地嵌入到三维场景中，确保人体与场景物体之间的几何接触和空间关系符合物理规律。
@@ -91,8 +89,6 @@ CESA属于**场景感知文本驱动运动生成**方向，其设计在以下维
 2. **分析反哺合成**：运动分析器可以充当一个“后验判别器”，对合成的人-场景交互样本进行语义审查——识别其动作类别和交互物体是否与输入文本一致。该语义一致性信号可以作为额外的监督，引导生成器产生更符合文本语义的运动。
 
 基于这一双向互惠关系，本文提出了 **CESA（Co-Evolving Synthesis-Analysis）** 协同演化管道，将场景感知的运动合成与分析集成到一个联合训练框架中，使两者在训练过程中相互促进、共同演化。
-
-
 
 ## 核心方法与创新机理
 
@@ -137,8 +133,6 @@ CESA 提出**级联式三阶段生成策略**，将生成过程分解为：
 
 消融实验进一步揭示了分析分支的差异化贡献：动作分析（ACT）主要带来 FID 和 MRS 的改进，而物体分析（OBJ）更有利于提升 TMCS（见 Table IV）。t-SNE 可视化（Fig. 7）证实，无分析分支时仅合成模型生成的运动特征过度发散，而引入分析分支后特征分布更加紧凑合理。此外，增加合成样本数量可持续提升动作和物体识别精度（Fig. 8），验证了生成多样性对分析任务的正向反馈。
 
-
-
 CESA（Co-Evolving Synthesis-Analysis pipeline）将场景感知的三维人体运动合成与运动分析集成到一个互惠协同的管道中，探索合成与分析之间的双向增益。如 Fig. 1 所示，管道由两个紧密耦合的核心过程构成：**场景感知运动生成器**与**场景-人交互分析器**。
 
 ![[assets/figures/papers/paper_list_l1689_Jointly_Understand_Your_Command_and_Intention_Reciprocal_Co_Evolution_be/figures/001_Figure_1.jpg]]
@@ -158,8 +152,6 @@ $$\mathcal{L} = \alpha_{goal} \mathcal{L}_{goal} + \alpha_{path} \mathcal{L}_{pa
 
 其中 $\mathcal{L}_{rec}$ 为分析器对动作类别和交互物体的交叉熵识别损失（Eq. 12）。这一设计使分析器充当后验判别器，审视合成交互样本的语义正确性，从而确保文本-运动一致性；同时，合成器生成的多样化样本丰富了交互样本的类内多样性，反过来提升分析器的识别鲁棒性。两者在共同演化中相互促进，形成生成-判别的闭环。
 
-
-
 ### 多模态条件编码器
 
 生成器接收两个异构输入：文本指令 $T$ 和三维场景 $S$。文本经由冻结的 BERT 编码为特征 $\mathbf{f}_T$，场景点云通过冻结的 Point Transformer 提取几何特征 $\mathbf{f}_S$。二者通过交叉注意力层进行融合，产生联合条件嵌入：
@@ -171,9 +163,6 @@ $$\mathbf{f}_{ST} = \text{CrossAtt}(\mathbf{f}_S, \mathbf{f}_T)$$
 ### 级联三阶段生成策略
 
 核心设计是将“文本→运动”的非确定性映射分解为三个序贯阶段，每个阶段均采用变分信息瓶颈（Variational Information Bottleneck）进行潜变量采样，以显式建模文本-运动之间的非一一对应关系（Fig. 2 所示，同一文本指令在给定场景下可能对应多个合理的运动目标、路径与姿态）。
-
-![[assets/figures/papers/paper_list_l1689_Jointly_Understand_Your_Command_and_Intention_Reciprocal_Co_Evolution_be/figures/002_Figure_2.jpg]]
-*Figure 2: Non-one-on-one corresponding in text-to-motion synthesis in 3D scenes. In some scene contexts, more than one indoor goal/path/pose may both conform to the description in the given textual command*
 
 #### 第一阶段：目标推断（Goal Decoder $\varPhi$）
 
@@ -239,13 +228,6 @@ $$\mathcal{L} = \alpha_{goal} \mathcal{L}_{goal} + \alpha_{path} \mathcal{L}_{pa
 
 其中权重配置为 $\alpha_{goal}=1$, $\alpha_{path}=1$, $\alpha_{pose}=1$, $\alpha_{rec}=10$，各子损失内部的预测权重 $\alpha^{pred}=1$，KL 正则权重 $\alpha^{kl}=0.1$。识别损失权重显著高于生成损失，确保分析器的语义监督信号能有效反哺生成器的训练，形成互惠协同演化循环。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1689_Jointly_Understand_Your_Command_and_Intention_Reciprocal_Co_Evolution_be/figures/003_Figure_3.jpg]]
-*Figure 3: Core Components. Given encoded text feature*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -284,27 +266,11 @@ CESA 在场景感知文本到运动生成任务上进行了多维度定量评估
 ![[assets/figures/papers/paper_list_l1689_Jointly_Understand_Your_Command_and_Intention_Reciprocal_Co_Evolution_be/figures/013_Figure_8.jpg]]
 *Figure 8: The action category and interaction object recognition performance comparisons between different training setups. Synthetic human motion samples improve action and object recognition performances via enriching intra-class diversity*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1689_Jointly_Understand_Your_Command_and_Intention_Reciprocal_Co_Evolution_be/figures/004_Table.jpg]]
 *Table: QUANTITATIVE COMPARISONS OF SCENE-AWARE TEXT-TO-MOTION GENERATION ON HUMANISE. THE BEST RESULTS ARE MARKED IN BOLD. TABLE I*
 
 ![[assets/figures/papers/paper_list_l1689_Jointly_Understand_Your_Command_and_Intention_Reciprocal_Co_Evolution_be/figures/008_Table.jpg]]
 *Table: IV PERFORMANCE COMPARISONS BETWEEN DIFFERENT ABLATIVE CONFIGURATIONS OF THE MOTION ANALYSIS BRANCH*
-
-![[assets/figures/papers/paper_list_l1689_Jointly_Understand_Your_Command_and_Intention_Reciprocal_Co_Evolution_be/figures/010_Table.jpg]]
-*Table: V ABLATIVE STUDIES OF GOALDECODER AND PATHDECODER ON POSE SYNTHESIS. BECAUSE OF NON-DETERMINISTIC PATH INFERENCE, WE REPEAT THE PATH EVALUATION 20 TIMES AND REPORT THE AVERAGE WITH 95% CONFIDENCE INTERVAL. GOAL/PATH ERRORS ARE AVERAGE 3D DISTANCES IN METERS. TABLE VI QUANTITATIVE COMPARISONS BETWEEN DIFFERENT LAYER NUMBER AND EMBEDDING SHAPE CONFIGURATIONS. THE DEFAULT SETTINGS WE FINALLY CHOSE ARE MARKED IN GRAY*
-
-![[assets/figures/papers/paper_list_l1689_Jointly_Understand_Your_Command_and_Intention_Reciprocal_Co_Evolution_be/figures/009_Figure_5.jpg]]
-*Figure 5: Motion synthesis and analysis results conditioned on the given text inputs. We indicate the correct and incorrect inferred results of ACT and OBJ with green and red, respectively*
-
-![[assets/figures/papers/paper_list_l1689_Jointly_Understand_Your_Command_and_Intention_Reciprocal_Co_Evolution_be/figures/014_Figure_9.jpg]]
-*Figure 9: Visualization comparison between inferred paths and goals with their ground-truths*
-
-![[assets/figures/papers/paper_list_l1689_Jointly_Understand_Your_Command_and_Intention_Reciprocal_Co_Evolution_be/figures/016_Figure_10.jpg]]
-*Figure 10: Human motion samples synthesized from different instruction compositions (with or without REL and ANC compositions)*
-
-
 
 ## 定位与知识库关联
 
@@ -351,8 +317,6 @@ CESA 相对于上述基线在三个维度上做出了结构性改变：
 - **身体-场景接触推理：** 能否设计一个强大的接触推理模块，从文本指令中预测未来每个身体关节与场景点之间的接触关系？这将使运动生成从“目标导向”升级为“接触感知”，进一步提升物理合理性。
 
 - **细粒度物体识别鲁棒性：** 对于形状相似但语义不同的交互物体，分析器的识别鲁棒性如何随物体类别变化？这直接影响协同训练中语义反馈信号的质量，是管道在更复杂场景中泛化的关键瓶颈。
-
-
 
 ## 原文 PDF
 

@@ -70,8 +70,6 @@ claims:
 
 本方法属于**多实体运动联合生成**范式，在扩散模型框架下首次将角色运动生成与相机运动生成统一建模。相较于**InterGen**（Liang et al., IJCV 2024）等仅建模角色间交互的工作，本方法将交互建模扩展至角色-相机维度，填补了叙事动画生成中协同建模的空白。
 
-
-
 ### 叙事动画中的角色-相机协同困境
 
 在电影、游戏和虚拟现实等叙事媒介中，富有表现力的动画不仅取决于角色运动的自然性，更依赖于相机运动与角色表演之间的精妙配合。导演通过推拉摇移、景别切换和构图变化来引导观众注意力，强化戏剧张力——这种角色与相机的协同叙事能力，是区分机械运动与生动叙事的关键所在。
@@ -99,8 +97,6 @@ claims:
 - **Toric空间相机表示**：采用基于屏幕坐标和角度的Toric空间参数化，使相机运动与画面构图直接关联，便于模型学习镜头语言的语义。
 
 这一框架的最终目标是：从随机噪声出发，一次性采样出角色运动、角色间交互以及与之协调的相机运动，三者共同构成一段具有叙事感的动画序列。
-
-
 
 ## 核心方法与创新机理
 
@@ -136,8 +132,6 @@ $$x_c^{1:N} = \{ p_A^i, p_B^i, \theta^i, \phi^i \}_{i=1}^N \in \mathbb{R}^{6N}$$
 其中，$(p_A, p_B)$ 是两个角色头部在屏幕上的归一化二维坐标，直接定义了画面的构图；$(\theta, \phi)$ 是相机在Toric空间中的方位角和俯仰角，描述了相机围绕角色连线的旋转姿态。这一表示将相机的物理运动与**叙事意图**（即“画面中的人物如何被观看”）直接对齐，使得模型能够更容易地学习到“当角色A靠近角色B时，相机应推近以捕捉特写”这类高层语义规律，是实现角色-相机协同生成的重要使能技术。
 
 综上，本文的创新并非单一的技术点，而是一套环环相扣的系统性设计：**Toric空间**提供了叙事感知的表示基础，**三实例联合空间**确立了协同生成的框架，而**双向成对交互模块**则是实现该框架内实体间因果建模的核心机制。三者共同构成了首个能够端到端联合生成叙事动画中角色与相机运动的统一框架。
-
-
 
 本文提出**Joint Character-Camera Motion Diffusion Model**，首次将双角色运动与动态相机运动纳入统一的扩散生成框架。核心思路是将两个角色与相机视为三个独立但相互影响的实体，在扩散模型内部显式建模它们之间的成对交互，从而实现协调的联合运动生成。
 
@@ -182,15 +176,8 @@ $$\hat{h}_t^c = h_t^c + \Delta h_t^{A \to c} + \Delta h_t^{B \to c}$$
 
 该架构的因果机制在于：通过将角色与相机视为独立实体并显式建模它们之间的成对交互，模型能够同时捕捉角色间的空间协调关系（如打斗、拥抱）以及相机对角色构图的动态响应（如跟拍、推拉）。消融实验（Table 4-6）证实，移除任一交互模块均会导致角色运动质量、相机运动质量以及角色-相机对齐度显著下降，验证了双向交互建模对叙事动画协同生成的关键作用。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l3_https_openaccess_thecvf_com_content_CVPR2026_papers_Cheng_Towards_Storyt/figures/003_Figure_3.jpg]]
-*Figure 3: Overview of our joint character-camera motion generation framework. The model takes Gaussian noise as input and jointly generates motion sequences for two interacting characters and a dynamic camera. Each instance is processed through a Transformer encoder to extract high-level motion embeddings. Three pairwise interaction modules model the relationships between each pair of instances: A↔ B, A↔ Camera, and B↔ Camera. These modules produce residuals that are added to the original embeddings to enable mutual influence among all agents*
-
 ![[assets/figures/papers/paper_list_l3_https_openaccess_thecvf_com_content_CVPR2026_papers_Cheng_Towards_Storyt/figures/001_Figure_1.jpg]]
 *Figure 1: Our framework jointly generates the motion of two interacting characters and the motion of a camera to visually tell a story. The central panel shows two instances of generated character-camera motions. For each pair of character and camera motions, we display rendered viewpoints at four sampled moments along each camera motion trajectory*
-
-
 
 ### 运动表示
 
@@ -244,13 +231,6 @@ $$\hat{h}_t^c = h_t^c + \Delta h_t^{A \to c} + \Delta h_t^{B \to c}$$
 
 这一残差更新机制的本质在于：每个实体的运动生成不仅依赖自身的运动先验，还动态地受到其他实体当前运动状态的调节，从而实现了角色与相机在扩散去噪全过程中的协同优化。消融实验证实，移除任一交互模块均会导致角色运动 FID 升高、相机运动 SeqFID 恶化，以及角色-相机对齐损失显著增加，验证了双向交互建模对协调性至关重要。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l3_https_openaccess_thecvf_com_content_CVPR2026_papers_Cheng_Towards_Storyt/figures/002_Figure_2.jpg]]
-*Figure 2: We represent shot composition using the on-screen coordinates of the two principal characters’ heads, denoted as*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -287,8 +267,6 @@ $$\hat{h}_t^c = h_t^c + \Delta h_t^{A \to c} + \Delta h_t^{B \to c}$$
 
 这些局限性也指向了未来的研究方向：扩展至多角色动态场景、引入文本叙事条件实现可控生成，以及构建更丰富多样的训练数据以提升模型泛化能力。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l3_https_openaccess_thecvf_com_content_CVPR2026_papers_Cheng_Towards_Storyt/figures/005_Table_1.jpg]]
 *Table 1: Comparison with baselines on character motion*
 
@@ -303,14 +281,6 @@ $$\hat{h}_t^c = h_t^c + \Delta h_t^{A \to c} + \Delta h_t^{B \to c}$$
 
 ![[assets/figures/papers/paper_list_l3_https_openaccess_thecvf_com_content_CVPR2026_papers_Cheng_Towards_Storyt/figures/009_Table_5.jpg]]
 *Table 5: Ablation on interaction modeling for camera motion*
-
-![[assets/figures/papers/paper_list_l3_https_openaccess_thecvf_com_content_CVPR2026_papers_Cheng_Towards_Storyt/figures/010_Table_6.jpg]]
-*Table 6: Ablation on interaction modeling for character-camera motion coordination*
-
-![[assets/figures/papers/paper_list_l3_https_openaccess_thecvf_com_content_CVPR2026_papers_Cheng_Towards_Storyt/figures/011_Figure_5.jpg]]
-*Figure 5: Qualitative comparison. While M2C-T and AutoVisNarr yield fragmented or static compositions, our method maintains expressive framing and cinematic flow, resulting in superior coordination between characters and camera motion*
-
-
 
 ## 定位与知识库关联
 
@@ -365,8 +335,6 @@ $$\hat{h}_t^c = h_t^c + \Delta h_t^{A \to c} + \Delta h_t^{B \to c}$$
 ### 6. 知识库定位
 
 本文在叙事动画生成领域填补了“联合角色-相机运动生成”的空白。相较于分离式方法（ComMDM + DC3D 的简单拼接），本文首次证明了在扩散模型内部进行跨实体交互建模的可行性与优越性。其 Toric 空间表示与成对交互模块的设计为后续工作提供了可复用的技术组件，同时也暴露了多角色扩展和语义条件控制两个明确的研究缺口，为社区指明了后续攻关方向。
-
-
 
 ## 原文 PDF
 

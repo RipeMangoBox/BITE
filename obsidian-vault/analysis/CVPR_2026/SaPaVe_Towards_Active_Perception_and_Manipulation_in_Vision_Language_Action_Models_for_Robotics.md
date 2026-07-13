@@ -50,8 +50,6 @@ claims:
 
 实验表明，SaPaVe在仿真基准 **ActiveManip-Bench** 上平均成功率达 **75.2%**，绝对超出固定视角VLA模型（如GR00T-N1）**58个百分点**；在真实世界主动操作任务中平均成功率达 **85%**，分别超出π0 **40个百分点**和GR00T-N1 **31.25个百分点**。消融实验进一步证实，解耦动作头设计、两阶段训练策略以及空间知识注入均对最终性能有决定性贡献。
 
-
-
 ### 主动感知：机器人操作中被忽视的关键能力
 
 人类在执行日常操作任务时，会自然地移动头部以获取更好的观察视角——例如侧头查看被遮挡的碗，或抬头确认高处的把手位置。这种**语义驱动的主动感知**（semantic active perception）——即根据任务需求有选择地调整视角以揭示关键视觉线索——是灵巧操作的基础。然而，当前主流的视觉语言动作（Vision-Language-Action, VLA）模型在这一能力上存在根本性缺失。
@@ -75,8 +73,6 @@ SaPaVe的设计源于一个关键观察：**相机运动本身是实例无关的
 - **第二阶段**：冻结相机适配器，在混合操作数据上联合优化相机与操作动作，同时注入通用空间知识（如深度、相机内参）以增强动态视角下的3D几何鲁棒性。
 
 这种设计使得两类动作可以从各自的数据中获益：相机控制受益于大规模合成数据，操作能力受益于已有的VLA预训练权重，避免了直接混合训练带来的冲突与退化。消融实验证实，移除第一阶段训练后，模型在视野外关节操作任务中**成功率减半**（Table 5），验证了语义主动感知先验的不可或缺性。
-
-
 
 ## 核心方法与创新机理
 
@@ -157,8 +153,6 @@ $$\mathcal{L}_{\mathrm{stage2}} = \lambda_{\mathrm{head}}\mathcal{L}_{\mathrm{he
 
 开放问题包括：如何将主动感知扩展至**移动操作**（同时控制头部和移动底盘），以及如何处理物体被移动到机械臂物理可达范围之外但仍被主动感知到的情形。
 
-
-
 SaPaVe 是一个端到端的主动操作框架，其核心设计理念是将语义主动感知与主动视角执行联合建模。整体架构如图2所示，系统接收 RGB 图像序列与任务语言指令作为输入，输出解耦的相机运动与操作动作序列。
 
 **输入输出流。** 给定观测 $\mathcal{O}$（包含当前及历史 RGB 图像）和语言指令 $\mathcal{L}$，策略 $\pi_{\theta} : \mathcal{O} \times \mathcal{L} \to \mathcal{A}$ 输出联合动作轨迹。采用动作分块策略（action chunking），策略在时间步 $t$ 预测未来 $k$ 步的动作序列 $A_t = \{A_{\mathrm{head},t}, A_{\mathrm{other},t}\}$，其中 $A_{\mathrm{head},t}$ 为头部相机动作（2-DoF pitch/yaw），$A_{\mathrm{other},t}$ 为操作动作（26-DoF 关节位置）。
@@ -183,15 +177,11 @@ SaPaVe 是一个端到端的主动操作框架，其核心设计理念是将语�
 
 **设计动机。** 该框架的核心创新在于将相机运动与操作动作解耦为两个独立动作空间，而非沿用现有 VLA 模型的统一动作空间。这一设计使两类动作可从各自数据中获益：相机运动本身是实例无关且较易学习的，通过大规模相机控制数据即可建立鲁棒先验；而操作动作则可在冻结该先验的条件下高效微调，避免直接扩展动作空间对已有先验的破坏。消融实验证实，使用统一动作解码器替代解耦头会导致平均成功率从 85% 降至 71.25%，验证了解耦设计的必要性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2415_https_arxiv_org_abs_2603_12193/figures/001_Figure_1.jpg]]
 *Figure 1: We propose SaPaVe, an end-to-end active manipulation framework that jointly integrates semantic active perception and activeview execution; the former selectively shifting viewpoints to reveal task-critical cues in cluttered scenes, while the latter grounds newly acquired observations into immediate actions, enabling success even from suboptimal views. (a) For instance, grasping the white bowl in*
 
 ![[assets/figures/papers/paper_list_l2415_https_arxiv_org_abs_2603_12193/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of SaPaVe. SaPaVe can process RGB images and task instructions and output camera movement and manipulation actions in a decoupled action space. This decoupled design enables the model to achieve active manipulation via a bottom-up, two-stage training strategy: First, large-scale embodiment-agnostic camera control data fosters semantic active perception, which is encoded as prior knowledge in a camera adapter. Second, mixed data together with Universal Spatial Knowledge Injection flexibly incorporate various geometric configurations (e.g., absolute depth, camera intrinsics), thereby enhancing spatial precision for active-view execution*
-
-
 
 SaPaVe 的核心设计围绕一个中心矛盾展开：**将相机运动直接纳入 VLA 的动作空间会破坏已有的操作先验，而大规模主动操作数据的稀缺使端到端训练难以收敛**。为此，SaPaVe 通过四个关键模块实现解耦与渐进学习。
 
@@ -243,8 +233,6 @@ $$`\mathcal{L}_{\mathrm{stage2}} = \lambda_{\mathrm{head}}\mathcal{L}_{\mathrm{h
 
 其中 $`\lambda_{\mathrm{head}}=1.0`$，$`\lambda_{\mathrm{other}}=10.0`$，更高的操作损失权重反映了操作任务的复杂性。消融实验表明，移除第一阶段训练使平均成功率从 85% 降至 53.75%，在视野外关节操作任务中成功率减半；而仅靠第一阶段先验（省略第二阶段）的成功率仅为 66.25%，说明两阶段互为必要补充。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设计
@@ -295,33 +283,11 @@ Table 5 的消融实验严格验证了每个设计选择的因果贡献，实验
 
 Table 4 展示了 SaPaVe 在未见物体、变化光照和多样化场景三个维度上的泛化性能。在遮挡抓取任务上，模型在不同条件下保持 85-95% 的成功率；在视野外关节操作这一最具挑战性的任务上，成功率仍维持在 75-85%。这种鲁棒性源于两阶段训练策略的内在优势：第一阶段在实例无关的大规模数据上建立的语义主动感知先验，天然具备对特定物体和场景的泛化能力；第二阶段冻结该先验，仅优化操作执行，避免了过拟合。
 
-![[assets/figures/papers/paper_list_l2415_https_arxiv_org_abs_2603_12193/figures/009_Table_4.jpg]]
-*Table 4: Performance on generalization ability evaluation. We report the success rate (%). Our model demonstrates robust generalization when performing active manipulation across unseen objects, varying lighting conditions, and diverse scenes*
-
 ### 失败模式与局限
 
 尽管 SaPaVe 在主动操作任务上表现优异，但其设计存在一个根本性约束：**机器人基座固定，操作空间受限于臂展范围**。当主动感知发现超出机械臂物理可达范围的物体时，模型无法执行操作。当前框架仅支持局部的主动探索，而非全局的移动搜索。这指向两个开放问题：如何将主动感知扩展至移动操作（同时控制头部和移动底盘），以及如何处理物体被移动到可达范围之外但仍被感知到的场景。
 
 从消融实验结果还可以识别出另一个潜在失败模式：当移除通用空间知识注入后，即使在遮挡抓取这类相对简单的任务上也出现显著性能下降，暗示在缺乏显式 3D 几何信息时，模型对深度和空间关系的估计可能不够精确，导致抓取姿态偏差。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2415_https_arxiv_org_abs_2603_12193/figures/010_Figure_5.jpg]]
-*Figure 5: Real-world Execution roll-outs (ego & third view)*
-
-![[assets/figures/papers/paper_list_l2415_https_arxiv_org_abs_2603_12193/figures/016_Table_6.jpg]]
-*Table 6: Overview of the 12 Active Manipulation Tasks. The tasks are categorized by horizon length and complexity. Success is rigorously defined by geometric thresholds (position, rotation, joint state) or physical quantities (liquid volume), requiring the robot to maintain the goal state for a stabilization period (e.g., 2 seconds)*
-
-![[assets/figures/papers/paper_list_l2415_https_arxiv_org_abs_2603_12193/figures/019_Figure_12.jpg]]
-*Figure 12: This image illustrates the active manipulate task performed by the robot in a simulation scenario*
-
-![[assets/figures/papers/paper_list_l2415_https_arxiv_org_abs_2603_12193/figures/022_Figure_14.jpg]]
-*Figure 14: This image illustrates the active manipulate task performed by the robot in a real-world scenario*
-
-![[assets/figures/papers/paper_list_l2415_https_arxiv_org_abs_2603_12193/figures/024_Figure_15.jpg]]
-*Figure 15: This image illustrates the active manipulate task performed by the robot in a real-world scenario*
-
-
 
 ## 定位与知识库关联
 
@@ -378,8 +344,6 @@ SaPaVe 在机器人学习的知识谱系中，位于 **VLA 模型**、**主动�
 - **从课程学习借鉴**：两阶段训练（先学相机控制，再联合优化）本质上是一种自下而上的课程设计，使得模型先掌握较易学习的实例无关技能（相机运动），再在此基础上学习更复杂的任务相关操作。
 
 SaPaVe 的核心洞见——“相机运动本身是实例无关且较易学习的”——为未来工作提供了一个可复用的设计原则：在构建复杂机器人技能时，识别并分离出那些可以大规模、低成本、跨任务学习的子技能，通过课程训练将其固化为先验，再在此基础上学习任务特定的能力。
-
-
 
 ## 原文 PDF
 

@@ -56,8 +56,6 @@ claims:
 
 REPA 本质上是一种**表示蒸馏正则化**，其简洁性使得它可以即插即用地集成到现有扩散变压器框架中，无需修改基础架构或采样过程。
 
-
-
 ### 扩散生成模型的训练效率瓶颈
 
 扩散模型已成为高保真图像生成的主流范式。当前最具竞争力的架构——扩散变压器（Diffusion Transformers，如 **DiT**（Peebles & Xie, 2023）和 **SiT**（Ma et al., 2024a）——通过在潜在空间中对图像进行去噪或速度预测来实现生成。这些模型通常遵循一个标准流程：使用 VAE 编码器将图像压缩为低维潜在表示 $z = E(x)$，然后由扩散变压器编码器 $f_\theta$ 从噪声潜变量 $z_t$ 提取分层隐藏表示 $h_t = f_\theta(z_t)$，最终由解码器 $g_\theta$ 基于 $h_t$ 预测速度场 $v_t$ 或噪声。
@@ -87,8 +85,6 @@ REPA 本质上是一种**表示蒸馏正则化**，其简洁性使得它可以�
 3. **正则化的简单性**：表示对齐可以作为一个简单的正则化项添加到现有训练目标中，无需修改网络架构或采样过程。
 
 基于这一思路，作者提出了 **REPA（REPresentation Alignment）** 方法——一种将扩散变压器内部隐藏状态与外部预训练视觉表示对齐的正则化技术，旨在从根本上解决扩散模型训练效率低下的问题。
-
-
 
 ## 核心方法与创新机理
 
@@ -125,8 +121,6 @@ $$\mathcal{L} := \mathcal{L}_{\mathrm{velocity}} + \lambda \mathcal{L}_{\mathrm{
 ### 关键设计洞察：仅对齐前几层即可
 
 REPA 的另一重要发现是**表示对齐仅需作用于 Transformer 的前几层**。组件分析实验（Table 2）表明，在 SiT-L/2 上，将 REPA 应用于第 8 层时达到最优生成性能（FID=10.0），而对齐更深层反而导致性能下降。这意味着 REPA 使得模型能够在早期层快速捕获语义信息，而将后几层的容量释放给高频细节建模——这一"由粗到细"的分工机制是 REPA 高效性的关键所在。
-
-
 
 REPA（REPresentation Alignment）是一个即插即用的训练正则化框架，其核心思想是将扩散变压器内部的隐含表示与外部预训练视觉编码器的干净图像表示进行显式对齐。该框架不改变扩散模型的推理架构，仅在训练时引入一个额外的对齐损失项。
 
@@ -175,15 +169,8 @@ REPA框架有三个关键设计维度，均在组件分析（Table 2）中得到
 
 REPA的核心优势在于其**极简性**：不修改扩散模型推理架构，不增加推理计算量，仅通过训练时的一个正则化项即可实现>17.5倍的训练加速（SiT-XL在400K步内匹配原始模型7M步的性能）。该框架在DiT和SiT两种扩散变压器架构上均验证有效，展现出良好的通用性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2410_06940/figures/001_Figure_1.jpg]]
 *Figure 1: Representation alignment makes diffusion transformer training significantly easier. Our framework, REPA, explicitly aligns the diffusion model representation with powerful pretrained visual representation through a simple regularization. Notably, model training becomes significantly more efficient and effective, and achieves >17.5× faster convergence than the vanilla model*
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2410_06940/figures/014_Figure_9.jpg]]
-*Figure 9: DiT block illustration*
-
-
 
 ### 1. 生成框架：随机插值与速度预测
 
@@ -236,13 +223,6 @@ $$\mathcal{L} := \mathcal{L}_{\mathrm{velocity}} + \lambda \mathcal{L}_{\mathrm{
 - **目标编码器**：默认使用 DINOv2（Oquab et al., 2024）作为对齐目标，实验显示更强的编码器同时提升判别性能和生成质量（Figure 5a）。REPA 对 MoCov3-L 和 MAE-L 等不同目标表示均有效（Figure 8），表明方法具有通用性。
 - **架构配置**：沿用 DiT（Peebles & Xie, 2023）和 SiT（Ma et al., 2024a）的 B/2、L/2、XL/2 架构（Table 1），patch size 为 2，处理 $32 \times 32$ 的潜在空间。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2410_06940/figures/002_Figure_2.jpg]]
-*Figure 2: Alignment behavior for a pretrained SiT model. We empirically investigate the feature alignment between*
-
-
-
 ## 实验与关键发现
 
 ### 核心发现
@@ -269,9 +249,6 @@ REPA 的核心价值在于以极小的实现代价换取了显著的训练加速
 
 Table 2 系统拆解了 REPA 各设计选择对 SiT-L/2 在 400K 迭代下的影响（无 CFG，NFE=250）：
 
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2410_06940/figures/006_Table_2.jpg]]
-*Table 2: Component-wise analysis on ImageNet 256×256. All models are SiT-L/2 trained for 400K iterations. All metrics except accuracy (Acc.) are measured with the SDE Euler-Maruyama sampler with NFE=250 and without classifier-free guidance. For Acc., we report linear probing results on the ImageNet validation set using the latent features aligned with the target representation. We fix λ = 0.5 here. ↓ and ↑ indicate whether lower or higher values are better, respectively*
-
 - **目标表示（Target Encoder）**：与 DINOv2-B 对齐时 FID 从原始模型的 18.8 降至 9.7；使用更强的 DINOv2-L 进一步降至 10.0，同时线性探测准确率从 53.2% 提升至 68.9%。这表明更强的预训练编码器能同时提升生成质量与判别表示质量。
 - **对齐深度（Depth）**：仅在前 8 层应用 REPA 即可获得最佳 FID（10.0），对齐更深层（如第 20 层）反而导致 FID 回升至 11.3。这一反直觉现象揭示了扩散变压器的分层功能分工：浅层负责语义对齐，深层专注于高频细节合成。
 - **相似度函数（Similarity）**：负余弦相似度（cos. sim.）与 NT-Xent 效果相当（FID 分别为 10.0 与 10.1），但余弦相似度实现更简洁，因此被选为默认配置。
@@ -285,9 +262,6 @@ Table 2 系统拆解了 REPA 各设计选择对 SiT-L/2 在 400K 迭代下的影
 ### 可扩展性分析
 
 Figure 5 从三个维度揭示了 REPA 的扩展特性：
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2410_06940/figures/008_Figure_5.jpg]]
-*Figure 5: Scalability of REPA. (a) Linear probing vs. FID plot of REPA with different target encoders (400K iterations). A stronger encoder improves both discrimination and generation performance. (b) The relative improvement of REPA over the vanilla model becomes increasingly significant as the model size grows. (c) With a fixed target encoder, larger models reach better performance more quickly. In the line plot, results are marked at 50K, 100K, 200K, and 400K iters*
 
 1. **编码器强度**（Figure 5a）：更强的目标编码器在 FID-线性探测准确率平面上形成清晰的帕累托前沿，即更强的表示同时推动生成与判别性能的联合提升。
 2. **模型规模**（Figure 5b）：REPA 的相对收益随模型规模增大而递增——在 SiT-B/2 上 FID 改善约 2 点，在 SiT-XL/2 上改善超过 10 点。这表明大模型对表示正则化的需求更为迫切。
@@ -327,21 +301,11 @@ Figure 5 从三个维度揭示了 REPA 的扩展特性：
 
 总体而言，REPA 的核心主张有充分的定量消融与跨架构/跨分辨率实验支撑，证据链完整且一致。关于深层对齐退化的理论解释和跨模态泛化性是目前的主要开放问题，需要后续工作进一步探索。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2410_06940/figures/012_Figure_7.jpg]]
-*Figure 7: Representation gap across different timesteps. We plot the linear probing results and maximum CKNNA values (using DINOv2- g) at different timesteps, comparing the vanilla SiT-XL/2 model and the same model trained using REPA. REPA consistently reduces the representation gap across different noise levels*
-
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2410_06940/figures/013_Table_5.jpg]]
 *Table 5: Ablation study for λ*
 
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2410_06940/figures/050_Figure_38.jpg]]
 *Figure 38: PCA visualization of layer-wise features of SiT-XL/2 and SiT-XL/2+REPA*
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2410_06940/figures/004_Figure_4.jpg]]
-*Figure 4: REPA improves visual scaling. We compare the images generated by two SiT-XL/2 models during the first 400K iterations, with REPA applied to one of the models. Both models share the same noise, sampler, and number of sampling steps, and neither uses classifier-free guidance*
-
-
 
 ## 定位与知识库关联
 
@@ -408,8 +372,6 @@ REPA的核心思想——将预训练视觉表示蒸馏到生成模型中——�
 - 不同目标编码器的数据集差异对性能的影响（Table 6）在分析中未展开，可能影响公平性判断
 
 **公平性说明**：所有实验均严格遵循DiT和SiT的官方实现设置，使用相同的批量大小（256）、学习率和评估协议，确保与基线的公平比较。
-
-
 
 ## 原文 PDF
 

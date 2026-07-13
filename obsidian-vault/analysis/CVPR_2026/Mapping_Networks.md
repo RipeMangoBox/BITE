@@ -52,8 +52,6 @@ claims:
 
 从方法谱系来看，映射网络区别于传统的端到端参数训练范式，通过**可训练潜在向量 + 固定映射网络 + 复合映射损失**的三元架构，实现了参数生成与任务优化的解耦。其核心创新在于权重调制机制和包含稳定性、平滑性、对齐性三项正则的映射损失函数，为极低参数量的高效训练开辟了新路径。
 
-
-
 深度神经网络在计算机视觉、自然语言处理等领域的成功，建立在海量可训练参数之上。一个标准的训练范式是直接在高维参数空间 $\mathbb{R}^P$ 中优化损失函数：
 
 $$
@@ -77,8 +75,6 @@ $$
 即网络学习的是一个从低维流形 $\mathcal{M}$ 到输出空间 $\mathcal{V}$ 的映射，而非在整个参数空间中漫游。
 
 基于此，本文提出一个根本性问题：**能否用一个紧凑的低维潜在向量直接参数化整个目标网络的权重空间，并在极低可训练参数数量下实现竞争性甚至更优的性能？** 这需要回答两个子问题：(1) 是否存在从低维潜在空间到高维权重空间的理论保证？(2) 如何设计实用的映射机制和训练策略来实现这一理论？本文的映射网络（Mapping Networks）正是对这一问题的系统性回答。
-
-
 
 ## 核心方法与创新机理
 
@@ -116,8 +112,6 @@ $$\mathcal{L}_{map} = \mathcal{L}_{\mathrm{task}} + \lambda_{\mathrm{st}} \cdot 
 
 **训练策略**提供两种变体以适应不同规模的目标网络：单潜在向量训练（SLVT）为整个目标网络学习一个共享潜在向量，实现最大程度的参数压缩；逐层训练（LWT）则为每层学习独立的潜在向量，以缓解大型网络下的显存瓶颈。这种设计使方法在不同任务规模下均能保持可行性。
 
-
-
 映射网络（Mapping Networks）的核心思路是用一个紧凑的、可训练的低维潜在向量替代高维权重空间，通过一个固定的映射网络将其“解码”为目标网络的完整参数，从而将可训练参数量压缩数百倍。整个框架由四个关键模块串联而成，形成一个“潜在向量 → 映射网络 → 目标网络 → 复合损失”的前向与优化闭环。
 
 ### 模块关系与数据流
@@ -151,12 +145,8 @@ $$\mathcal{L}_{map} = \mathcal{L}_{\mathrm{task}} + \lambda_{\mathrm{st}} \cdot 
 
 整体而言，映射网络将传统“高维参数空间中的梯度下降”转化为“低维潜在空间中的优化问题”，在极低可训练参数数量下实现了竞争性甚至更优的性能。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2130_https_arxiv_org_abs_2602_19134/figures/003_Figure_3.jpg]]
 *Figure 3: General Architecture for Mapping Networks*
-
-
 
 ### 核心模块
 
@@ -167,9 +157,6 @@ $$\mathcal{L}_{map} = \mathcal{L}_{\mathrm{task}} + \lambda_{\mathrm{st}} \cdot 
 
 **2. 映射网络（含权重调制）**
 映射网络本身是一个固定权重的神经网络，其权重在初始化后不再通过梯度更新。核心创新在于**权重调制机制**：映射网络的每一层权重通过潜在向量 $z$ 的元素进行加法调制。如 Figure 4 所示，对于映射网络中第 $i$ 个神经元连接到第 $j$ 个目标参数的权重 $w_{ij}$，调制过程为：
-
-![[assets/figures/papers/paper_list_l2130_https_arxiv_org_abs_2602_19134/figures/004_Figure_4.jpg]]
-*Figure 4: Process of modulation of Mapping weights and training of latent vector z from epoch p to p+1*
 
 $$w_{ij} \leftarrow w_{ij} + \alpha z_i, \quad \forall j = 1,2,\dots,P$$
 
@@ -218,11 +205,6 @@ $$g(u) = \psi(u) \varphi(u) + (1 - \psi(u)) \theta^*$$
 
 该定理的实践意义在于：它证明了用极低维潜在向量参数化整个高维权重空间在理论上是可行的，为后续的映射网络架构设计提供了严格的数学保证。Figure 2 中参数快照的 PCA 和 t-SNE 投影进一步从经验层面支撑了权重流形假设——各层参数在训练过程中确实驻留在低维、平滑的区域内演化。
 
-![[assets/figures/papers/paper_list_l2130_https_arxiv_org_abs_2602_19134/figures/002_Figure_2.jpg]]
-*Figure 2: Parameter update snapshots showing distinct parameter manifolds in CNN evolution*
-
-
-
 ## 实验与关键发现
 
 ### 核心实验设计逻辑
@@ -269,9 +251,6 @@ Ours†变体（使用逐层训练LWT）进一步将MNIST准确率推至**99.67%
 
 在Celeb-DF微调场景中，映射网络以**2048**参数微调ResNet50，达到**95.10%**准确率，仅比全参数微调的ResNet50（25M参数）低**0.13%**（Table 5）。这一结果具有重要实践意义：**映射网络可作为参数高效微调（PEFT）的替代方案，在保持性能的同时将可训练参数减少四个数量级**。
 
-![[assets/figures/papers/paper_list_l2130_https_arxiv_org_abs_2602_19134/figures/009_Table_5.jpg]]
-*Table 5: Fine Tuning ResNet50 via Mapping Networks*
-
 ---
 
 ### 消融实验：因果机制的严格验证
@@ -317,19 +296,6 @@ Table 8表明，映射网络可与低秩分解（LRD）和90%剪枝结合：Ours
 
 ![[assets/figures/papers/paper_list_l2130_https_arxiv_org_abs_2602_19134/figures/011_Table_6.jpg]]
 *Table 6: Ablation of Mapping Loss on FashionMNIST dataset*
-
-![[assets/figures/papers/paper_list_l2130_https_arxiv_org_abs_2602_19134/figures/012_Table_7.jpg]]
-*Table 7: Robustness Study of Mapping CNN*
-
-![[assets/figures/papers/paper_list_l2130_https_arxiv_org_abs_2602_19134/figures/013_Table_8.jpg]]
-*Table 8: Imapct of Add Ons on Mapping Network*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2130_https_arxiv_org_abs_2602_19134/figures/001_Figure_1.jpg]]
-*Figure 1: State of the Existing Works and Ours in this field*
-
-
 
 ## 定位与知识库关联
 
@@ -404,8 +370,6 @@ Table 8 显示 Mapping Networks 可以与低秩分解（LRD）和 90% 剪枝结�
 ### 5. 知识库定位总结
 
 Mapping Networks 在参数高效深度学习领域占据了一个独特位置：它不是在训练后压缩模型，而是**在训练前压缩搜索空间**。其核心贡献——权重流形假设的实验验证和映射定理的理论支撑——为理解深度网络参数空间的本质结构提供了新视角。但由于缺乏在大规模模型上的验证和系统的开销分析，该方法目前更适合作为中小规模任务上的参数高效替代方案，其在 LLM/LVM 时代的适用性仍有待探索。
-
-
 
 ## 原文 PDF
 

@@ -51,8 +51,6 @@ claims:
 
 实验表明，该方法在行人重识别基准Market-1501上达到88.6% mAP（较基线提升3.2%），在CUHK03-NP上达到76.6% mAP（提升2.5%）；在人脸验证任务上，平均准确率达79.07%，超越NegFaceDiff基线0.94%。消融研究进一步验证了动态样本选择（DSS）与三项奖励组件均独立贡献正向增益，其中DSS带来2.2%的验证准确率提升。在RFW种族偏差评估中，该方法在四个种族子集上均取得最优验证准确率（平均69.78%），表明其有效缓解了跨种族偏差。
 
-
-
 ### 隐私敏感身份识别中的数据稀缺困境
 
 行人重识别（Person ReID）与人脸验证等身份识别任务在现代视觉系统中扮演着核心角色，然而其发展长期受制于一个根本性矛盾：**高质量训练数据的获取与隐私保护、版权监管之间的尖锐冲突**。真实场景中，身份标注数据涉及个人隐私，受到GDPR等法规的严格约束，同时版权限制进一步收窄了可用的数据来源。这导致了一个典型的恶性循环——真实数据稀缺使得生成模型质量低下，而低质量的合成数据又无法有效缓解下游任务的数据短缺，系统性能因此陷入瓶颈。
@@ -77,8 +75,6 @@ claims:
 - **动态样本选择**：在下游训练中，基于前瞻虚拟更新筛选高效用合成样本，进一步提升数据利用效率与模型泛化能力。
 
 Figure 1 直观对比了传统方法与本文方法的范式差异：前者仅依赖特定数据的有限变化，后者则通过通用先验的适应实现多样性与任务效用的双重提升。
-
-
 
 ## 核心方法与创新机理
 
@@ -130,8 +126,6 @@ $$\Delta l = l_{\mathrm{id}}(\boldsymbol{w}', \hat{\boldsymbol{x}}) - l_{\mathrm
 
 综上，三个changed slots的协同运作构成了从“通用先验锚定→任务奖励引导→高效样本筛选”的完整创新链条，使方法在Market-1501上达到**88.6% mAP（+3.2%）**，在CUHK03-NP上达到**76.6% mAP（+2.5%）**，并在人脸验证公平性评估中于RFW四个种族子集上均取得最优结果。
 
-
-
 该方法将隐私敏感身份识别中的数据稀缺问题建模为一个**强化引导的合成数据生成过程**，其核心思路是打破“真实数据稀缺 → 生成模型质量低下 → 无法有效缓解数据短缺”的恶性循环。框架由三个顺序衔接的阶段构成，形成一条从通用先验适应到任务驱动优化的完整管线。
 
 **第一阶段：冷启动适应 (Cold-Start Adaptation)。** 将大规模预训练的扩散Transformer（**DiT**, Peebles & Xie, ICCV 2023）对齐到目标域。具体操作为：替换预训练DiT的类别嵌入头为目标域特定的身份标签嵌入，冻结骨干网络，仅对去噪头在有限目标样本上进行轻量微调。这一阶段为后续优化建立了语义基础，使生成器具备初步的身份条件生成能力。
@@ -144,8 +138,6 @@ $$\Delta l = l_{\mathrm{id}}(\boldsymbol{w}', \hat{\boldsymbol{x}}) - l_{\mathrm
 
 ![[assets/figures/papers/paper_list_l921_https_arxiv_org_abs_2604_07884/figures/001_Figure_1.jpg]]
 *Figure 1: Pipeline comparison. (a) Existing methods rely solely on specific data, resulting in limited diversity and low utility of synthesized images. (b) We adapt broad, general-domain priors to the target domain, improving both diversity and task utility*
-
-
 
 本方法将合成数据生成形式化为一个三阶段的强化学习问题，核心在于将通用生成先验通过任务感知的奖励信号适配到目标域。整体框架包含三个顺序模块：冷启动初始化、多目标奖励驱动优化和动态样本选择。
 
@@ -209,8 +201,6 @@ $$\Delta l = l_{\mathrm{id}}({\pmb{w}}', \hat{\pmb{x}}) - l_{\mathrm{id}}({\pmb{
 
 $\Delta l$ 越小，表明该合成样本与当前优化方向的兼容性越高。系统从候选池中选择 $\Delta l$ 最小的样本构成精炼批次进行实际参数更新，确保梯度步受高效用样本主导，稳定训练并提升泛化能力。消融实验显示，引入动态样本选择使人脸验证准确率提升 **2.2%**，验证了该机制的独立贡献。
 
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -253,14 +243,6 @@ $\Delta l$ 越小，表明该合成样本与当前优化方向的兼容性越高
 
 论文未系统报告失败案例或负面结果。从方法设计推断，潜在风险包括：(1) 冷启动阶段若目标域样本极少，类别原型估计可能不稳定，影响语义一致性奖励的可靠性；(2) 多目标奖励的权重需人工设定，跨任务迁移时可能需重新调参。以上推断需在后续实验或复现中验证。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l921_https_arxiv_org_abs_2604_07884/figures/004_Figure_2.jpg]]
-*Figure 2: Comparisons with the baseline on Market-1501 generation. Real reference images are randomly selected from training set, where certain identity classes have only a few samples. While the baseline DiT benefits from external ImageNet pretraining to introduce moderate diversity, our RL-based fine-tuning further enhances intra-class variability, generating more diverse yet identity-consistent images*
-
-
-
-
 ## 定位与知识库关联
 
 ### 1. 方法谱系与基线关系
@@ -301,8 +283,6 @@ $\Delta l$ 越小，表明该合成样本与当前优化方向的兼容性越高
 3. **生成器与下游任务的联合优化**：当前框架中，生成器优化和下游模型训练是解耦的两个阶段（先 RL 微调生成器，再训练下游模型）。是否可以将二者纳入端到端的联合优化框架，使生成器直接接收下游模型性能的反馈信号，值得进一步研究。
 
 4. **公平性与偏差的深层机制**：Table 3 显示本方法在 RFW 四个种族子集上均取得最优验证准确率，平均 69.78%，表明其有效缓解了跨种族偏差。但该公平性提升的深层机制尚不明确——是通用先验本身降低了偏差，还是多目标奖励中的分布覆盖项起了关键作用？这一问题需要更细致的消融分析。
-
-
 
 ## 原文 PDF
 

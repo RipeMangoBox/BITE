@@ -54,8 +54,6 @@ claims:
 
 **方法定位**：GeoRelight 属于基于扩散模型的几何感知重光照方法，区别于仅输出重光照图像的端到端像素映射方法（如 IC-Light、NeuralGaffer）和依赖辐射提示的 ControlNet 方法（如 **DiLightNet**, Zeng et al., SIGGRAPH 2024）。其核心创新在于将重光照、内蕴分解与三维重建统一于单一扩散框架，并以 iNOD 表示和混合数据策略支撑多任务联合学习。
 
-
-
 ### 问题背景
 
 图像重光照旨在将单张图像中的人物置于全新的光照环境下，生成逼真的外观。这一任务在电影制作、增强现实和虚拟试穿等应用中具有重要价值。然而，真实感重光照不仅需要改变全局色调，还要求精确再现与三维几何紧密耦合的局部光照效应——包括阴影投射、褶皱高光和遮挡关系。这些效应本质上由物体的三维形状决定，因此高质量的几何重建与重光照是相互依存的任务。
@@ -78,8 +76,6 @@ claims:
 GeoRelight的出发点是打破上述分离范式，其核心洞察为：**重光照与几何重建是互促的任务**。精确的几何提供遮挡边界和局部表面朝向，为光照传输计算提供物理约束；而外观中的明暗变化则通过shape-from-shading机制为几何细节提供反向监督。通过在统一框架中联合建模两者，模型可以从多模态信号中提取互补信息，同时从合成数据和真实数据中学习物理约束与真实感。
 
 此外，现有方法在训练数据策略上也存在局限：纯合成数据虽提供完美标签，但缺乏真实感；而真实光照舞台数据虽保真度高，却存在照明偏压（如LED阵列导致的暗偏压）。GeoRelight通过战略性混合训练数据弥合这一合成-真实域差距，使得模型在保持物理精度的同时生成自然均衡的光照效果。
-
-
 
 ## 核心方法与创新机理
 
@@ -118,8 +114,6 @@ iNOD 的核心优势在于：作为密集的2D图像表示，天然兼容VAE的�
 
 训练采用两阶段策略：先在合成数据上训练 30K 步以建立物理先验，再进行 10K 步混合数据训练以弥合域差距。模态开关掩码使得模型可在不同数据源上灵活切换训练模式（如对 In-the-Wild 数据仅监督重光照和几何，不监督反射率），实现了多源数据的有效联合利用（Table 1）。
 
-
-
 GeoRelight 将单目人像的重光照与几何重建统一建模为一个**条件多模态生成任务**，其核心架构建立在视频潜扩散变换器（Video Latent Diffusion Transformer, DiT）之上。模型接收一幅在未知光照下拍摄的输入图像 $\tilde{\mathbf{I}}$ 和目标环境光照 $\mathbf{E}$，同时生成重光照图像 $\mathbf{I}$、内蕴反射率 $\mathbf{a}$、法线图 $\mathbf{n}$、语义分割掩码 $\mathbf{s}$ 以及 3D 几何表示——等距归一化正射深度图（iNOD）。框架的关键设计是将视频扩散模型中的时间维度重新赋予语义，改造为模态维度 $M$，使同一 DiT 骨干能够并行处理多种异质输出。
 
 ### 条件机制与多模态流
@@ -150,12 +144,8 @@ GeoRelight 采用两阶段训练，以弥合合成数据与真实场景之间的
 
 模态开关掩码在此发挥关键作用：对于缺乏完整真值的真实数据，模型仅将可用模态设为条件（掩码为 1），而将重光照图像作为唯一的去噪目标（掩码为 0），从而在统一的架构下灵活利用多源异构数据。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2508_https_arxiv_org_abs_2604_20715/figures/003_Figure_3.jpg]]
 *Figure 3: The GeoRelight Pipeline. GeoRelight processes up to five target modalities, using cswitch to signal which ones are targets and conditions (the figure shows one specific usecase). It is guided by a global image condition*
-
-
 
 ### 3.1 多模态扩散Transformer框架
 
@@ -184,22 +174,6 @@ iNOD的核心优势在于：等距缩放保留了相对3D几何关系，正射�
 ### 3.4 战略性混合数据训练
 
 为弥合合成数据与真实数据的域差距，GeoRelight采用三阶段混合训练策略（见Table 1）：首先在**合成数据**上预训练30K步，利用其完美的全模态标注学习物理约束；随后引入**光照舞台数据**（Light Stage）和自动标注的**自然场景数据**（In-the-Wild），通过模态开关掩码灵活选择各数据源可用的监督信号——例如，自然场景数据仅有输入图像而无配对光照，则仅对重光照模态施加损失。这种设计使模型同时从合成数据的物理精确性和真实数据的视觉真实感中获益。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2508_https_arxiv_org_abs_2604_20715/figures/002_Figure_2.jpg]]
-*Figure 2: iNOD: A Distortion-Free and VAE-Friendly Geometry Representation. Standard Point Maps (top-left) become noisy when VAE-encoded, and anisotropically Normalized Depth (topright) severely distorts the 3D shape*
-
-![[assets/figures/papers/paper_list_l2508_https_arxiv_org_abs_2604_20715/figures/004_Figure_4.jpg]]
-*Figure 4: Our Strategic Mixed-Data Training Sources. We combine (a) fully-labeled Synthetic data, (b) Light Stage data with paired lighting, and (c) In-the-wild data. We use our synthetic data pre-trained model to auto-label intrinsics for (b) and (c)*
-
-![[assets/figures/papers/paper_list_l2508_https_arxiv_org_abs_2604_20715/figures/016_Figure_11.jpg]]
-*Figure 11: Processed Environment Illumination from Light-Stage. From the 3-dimensional LED positions, we project it to a latlong image to model the environement map*
-
-![[assets/figures/papers/paper_list_l2508_https_arxiv_org_abs_2604_20715/figures/018_Figure_13.jpg]]
-*Figure 13: Limitation of Point Map in Latent Space. As a popular geometry representation [33, 36] in image sapce, point map shows strong limitation in latent space. Although visually the point map looks similar before and after VAE, the boundary lost huge precision (please zoom in) and it contains much noise after VAE*
-
-
 
 ## 实验与关键发现
 
@@ -255,18 +229,8 @@ GeoRelight同时输出反射率（albedo）和法线（normal）等内蕴属性�
 
 3. **分布外主体**：极端姿态、严重遮挡或高度非朗伯材质（如镜面、金属衣物）可能导致性能下降或伪影。模型在合成数据上训练，对真实世界中复杂材质的泛化能力仍有提升空间。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2508_https_arxiv_org_abs_2604_20715/figures/005_Table_1.jpg]]
-*Table 1: Strategic training for mixing synthetic and real data*
-
 ![[assets/figures/papers/paper_list_l2508_https_arxiv_org_abs_2604_20715/figures/012_Table_5.jpg]]
 *Table 5: Albedo and Normal disentanglement evaluation. Geo-Relight achieves state-of-the-art albedo and normal estimation*
-
-![[assets/figures/papers/paper_list_l2508_https_arxiv_org_abs_2604_20715/figures/014_Figure_9.jpg]]
-*Figure 9: Benefit of In-the-Wild Data. Using only Synth uncovers gaps in the data like the lack of mixed colored beards. Adding Dome data fixes that but produces unrealistic brightness (middle) due to the unnatural LED activation (either very sparse or fully lit) in light stage captures. Adding large-scale ITW data corrects this bias, yielding balanced and realistic lighting (right)*
-
-
 
 ## 定位与知识库关联
 
@@ -323,8 +287,6 @@ GeoRelight 的框架设计为以下方向留下了探索空间：
 - **材质与物体类别的泛化**：当前框架聚焦于人物主体，能否扩展至包含非朗伯材料和复杂几何的广泛物体类别？这需要更大规模、更多样化的多模态标注数据。
 - **替代传感模态的融合**：能否利用事件相机等替代传感模式，在保持时域一致性的同时提升对快速运动和极端光照的鲁棒性？
 - **模态扩展的灵活性**：框架的模态开关掩码机制理论上支持任意模态的组合，未来可探索加入材质参数（如粗糙度、金属度）或语义分割等额外模态，进一步提升物理一致性。
-
-
 
 ## 原文 PDF
 

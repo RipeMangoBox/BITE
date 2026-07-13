@@ -55,8 +55,6 @@ claims:
 
 **局限与展望**：当前方法依赖全景图质量，复杂遮挡和极小物体的交互可能不完整；分层分解依赖预训练模型精度，边界或会出现错误；长距离探索仍受限于视频扩散的生成质量。未来方向包括融合真实扫描数据提升几何精度、支持动态元素与静态世界的无缝结合，以及扩展到城市甚至行星级世界生成。
 
-
-
 ### 问题背景：从2D生成到3D世界的鸿沟
 
 近年来，文本到图像和文本到视频的生成模型取得了显著进展，能够创造出视觉上高度逼真的2D内容。然而，将这些能力拓展到**沉浸式、可探索、可交互的3D世界**的生成，仍然是一个开放且极具挑战性的问题。一个理想的3D世界生成系统需要同时满足三个核心需求：**视觉多样性**（生成丰富、多样的场景外观）、**几何一致性**（确保从不同视角观察时场景结构稳定、无撕裂或漂移）以及**对象交互性**（场景中的物体能够被独立识别和操作，以支持物理交互和游戏逻辑）。
@@ -81,8 +79,6 @@ claims:
 上述瓶颈揭示了一个根本性的矛盾：2D生成模型拥有强大的视觉先验和多样性，但缺乏几何一致性；3D表示具备几何一致性，却受限于数据规模和对象不可分离的表示。**HunyuanWorld 1.0的核心动机在于，寻找一个能够统一2D生成多样性与3D世界几何一致性的中间表示，从而在保持高效渲染和对象交互性的同时，从图像或文本生成沉浸式3D世界。**
 
 具体而言，本文试图回答一个关键问题：能否设计一种世界代理（world proxy），使其既能够充分利用成熟的2D扩散模型来保证视觉质量和多样性，又能够被有效地转换为具有语义分层结构的3D表示，以支持交互和探索？这一动机直接引出了本文的核心技术方案——以全景图作为世界代理，结合语义分层网格表示与层对齐深度重建，实现从2D生成到3D世界的跨越。
-
-
 
 ## 核心方法与创新机理
 
@@ -119,8 +115,6 @@ HunyuanWorld 1.0 的核心创新在于通过**全景图世界代理**将2D生成
 ### 创新机制的内在关联
 
 上述创新并非孤立存在，而是形成了一条因果链条：全景代理解决了2D到3D的多样性传递瓶颈；语义分层网格在此基础上实现了对象的可分离性；层对齐深度估计保证了跨层几何一致性；而长距离扩展与系统效率优化则使该框架具备实际可探索性。这一设计使得HunyuanWorld 1.0 在图像到世界生成任务上，BRISQUE低至36.2（对比DimensionX的45.2），CLIP-I达到84.5，验证了代理表示与分层重建策略的有效性。
-
-
 
 HunyuanWorld 1.0 是一个**分阶段生成框架**，其核心思想是**以全景图作为世界代理**，将 2D 生成模型的多样性与 3D 世界的几何一致性统一起来。框架的输入可以是单张场景图像或文本描述，输出为语义分层、可交互的 3D 网格世界（Fig. 2）。
 
@@ -174,8 +168,6 @@ HunyuanWorld 1.0 的 Pipeline 设计在多个关键槽位上区别于现有方�
 | 全景边界处理 | 朴素生成，可见接缝 | 高程感知增强 + 循环去噪 | 消除全景边界伪影 |
 
 这一框架的瓶颈在于：全景图质量直接决定下游重建的上限，复杂遮挡和极小物体的分层分解仍依赖预训练模型的精度，极端长距离探索可能产生漂移。
-
-
 
 HunyuanWorld 1.0 采用分阶段生成框架，以全景图作为统一的世界代理，将2D生成的多样性与3D世界的几何一致性桥接起来。其核心流水线由以下关键模块构成：
 
@@ -231,8 +223,6 @@ HunyuanWorld 1.0 采用分阶段生成框架，以全景图作为统一的世界
 ---
 
 **关于公式推导的说明**：经验证分析，本文提供的材料中未包含需要推导的关键公式。论文的方法核心在于架构设计与工程实现，若后续版本补充了扩散模型的数学形式化或深度对齐的目标函数，需进一步核实原文。
-
-
 
 ## 实验与关键发现
 
@@ -298,8 +288,6 @@ HunyuanWorld 1.0 的评估沿“全景代理—世界重建”两级展开：先
 
 在系统效率方面，HunyuanWorld 1.0 采用 XAtlas-based UV 参数化方案，在保持 UV 质量的同时消除渲染接缝，网格压缩管线实现约 80% 的体积缩减。结合模型推理加速，整个生成管线可在消费级 GPU 上完成从条件输入到可交互 3D 世界的端到端生成，具体推理时间需参考原文效率分析表（当前分析 JSON 未提供详细计时数据）。
 
-### 补充图表
-
 ![[assets/figures/papers/HunyuanWorld_1.0_Generating_Immersive_Explorable_and_Interactive_3D_Worlds_f93ed723fa57/figures/009_Figure_6.jpg]]
 *Figure 6: Qualitative comparisons for image-to-panorama generation (World Labs). Left: panoramic images generated from the same input image. Right: Four perspectively rendered views. Figure 7: Qualitative comparisons for image-to-panorama generation (Tanks and Temples). Left: panoramic images generated from the same input image. Right: Four perspectively rendered views*
 
@@ -311,26 +299,6 @@ HunyuanWorld 1.0 的评估沿“全景代理—世界重建”两级展开：先
 
 ![[assets/figures/papers/HunyuanWorld_1.0_Generating_Immersive_Explorable_and_Interactive_3D_Worlds_f93ed723fa57/figures/008_Figure_5.jpg]]
 *Figure 5: Visual results of text-to-panorama generation by HunyuanWorld 1.0. Table 2: Quantitative comparisons for text-to-panorama generation*
-
-![[assets/figures/papers/HunyuanWorld_1.0_Generating_Immersive_Explorable_and_Interactive_3D_Worlds_f93ed723fa57/figures/016_Table_3.jpg]]
-*Table 3: Quantitative comparisons for image-to-world generation*
-
-![[assets/figures/papers/HunyuanWorld_1.0_Generating_Immersive_Explorable_and_Interactive_3D_Worlds_f93ed723fa57/figures/017_Table_4.jpg]]
-*Table 4: Quantitative comparisons for text-to-world generation*
-
-![[assets/figures/papers/HunyuanWorld_1.0_Generating_Immersive_Explorable_and_Interactive_3D_Worlds_f93ed723fa57/figures/010_Figure_8.jpg]]
-*Figure 8: 岱宗夫如何？齐鲁青未了。造化钟神秀，阴阳割昏晓。荡胸生层云，决眦入归鸟。会当凌绝顶，一览众山小。非写实风格。 Majestic Mount Tai—eternal green across lands. Creation's might carves dawn from dark. Clouds surge through soul; birds vanish in twilight's glow. Scale its summit: all peaks shrink to stones beneath. Nonrepresentational style. Figure 8: Qualitative comparisons for text-to-panorama generation (case 1). Left: panoramic images generated from the text at the bottom. Right: Four perspectively rendered views*
-
-![[assets/figures/papers/HunyuanWorld_1.0_Generating_Immersive_Explorable_and_Interactive_3D_Worlds_f93ed723fa57/figures/012_Figure_10.jpg]]
-*Figure 10: Visual results of text-to-world generation by HunyuanWorld 1.0*
-
-![[assets/figures/papers/HunyuanWorld_1.0_Generating_Immersive_Explorable_and_Interactive_3D_Worlds_f93ed723fa57/figures/013_Figure_11.jpg]]
-*Figure 11: Visual results of image-to-world generation by HunyuanWorld 1.0*
-
-![[assets/figures/papers/HunyuanWorld_1.0_Generating_Immersive_Explorable_and_Interactive_3D_Worlds_f93ed723fa57/figures/014_Figure_12.jpg]]
-*Figure 12: Qualitative comparisons for image-to-world generation. For each case, we render three perspective views from the generated 3D scenes*
-
-
 
 ## 定位与知识库关联
 
@@ -369,8 +337,6 @@ HunyuanWorld 1.0 通过引入**全景图像作为世界代理**，将2D生成模
 - **规模扩展**：该框架能否扩展到城市级甚至行星级世界生成？分层表示的内存效率优势在大规模场景下是否依然成立？
 - **具身智能先验**：生成的世界先验能否加速具身智能和自主导航的训练？分层对象表示是否能为机器人操作提供更精细的交互先验？
 - **评估体系完善**：当前评估依赖无参考图像质量指标（BRISQUE、NIQE、Q-Align）和CLIP分数，可能未能完全反映3D世界的几何一致性和交互性，需要建立更全面的3D世界生成评估基准。
-
-
 
 ## 原文 PDF
 

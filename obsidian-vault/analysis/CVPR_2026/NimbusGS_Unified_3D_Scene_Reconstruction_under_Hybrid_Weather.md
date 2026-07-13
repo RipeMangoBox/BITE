@@ -52,8 +52,6 @@ NimbusGS 针对这一瓶颈，提出在三维高斯泼溅框架内对天气效�
 
 实验表明，NimbusGS 在单一和混合天气条件下均取得领先性能：在雾天场景上，PSNR 平均高出第二名基线 4.64 dB，SSIM 高出 0.067（Table 1）；在雨天场景上，PSNR 领先 2.54 dB（Table 2）；在雾+雨+雪混合场景上，PSNR 达到 22.25 dB，显著超越复原+重建管线 OR+3DGS 的 20.09 dB（Table 4）。消融实验进一步验证了 CSM 对连续介质建模的关键作用、PLM 对颗粒效应分离的必要性，以及 GGS 对远距离几何重建的实质性提升。
 
-
-
 三维场景重建是计算机视觉与图形学中的基础任务，其目标是从多视角图像中恢复场景的几何结构与外观信息。近年来，以**3D Gaussian Splatting (3DGS)**（Kerbl et al., ACM TOG 2023）为代表的显式辐射场方法，凭借其高效的渲染速度和高质量的几何重建能力，已成为该领域的主流范式。然而，现有方法通常假设输入图像是在晴朗、均匀光照条件下采集的，当面对雾、雨、雪等恶劣天气条件时，其重建性能会急剧退化。
 
 恶劣天气对三维重建的挑战源于两类本质上不同的物理退化机制。第一类是**连续介质衰减**，如雾霾引起的散射与吸收，它沿视线方向累积性地降低对比度并引入视点一致的空气光效应。第二类是**离散颗粒扰动**，如雨滴和雪花，它们在图像平面上形成视点依赖的瞬态遮挡和反射。现有工作大多针对单一退化类型设计专用解决方案——例如**SeaSplat**（Yang et al., ICRA 2025）和**WaterSplatting**（Li et al., 3DV 2025）聚焦水下/雾天场景，**DerainNeRF**（Li et al., ICRA 2024）和**RainyScape**（Lyu et al., ACM MM 2024）专门处理雨痕去除——缺乏对连续介质衰减与视点依赖离散粒子的**联合物理建模**。
@@ -61,8 +59,6 @@ NimbusGS 针对这一瓶颈，提出在三维高斯泼溅框架内对天气效�
 这一方法缺口在**混合天气条件**下尤为突出。真实世界中，雾、雨、雪往往同时或交替出现，形成复杂的复合退化。当单一退化模型被强行应用于混合场景时，场景几何与天气效应之间缺乏可分离的物理约束，导致优化过程中几何学习不稳定，产生漂浮伪影和结构失真。此外，恶劣天气下能见度不均还会引发**远距离梯度不平衡**问题：近处区域因信号较强而获得充足的梯度更新，而远处区域因衰减严重而几乎无法驱动高斯点的稠密化，进一步加剧了几何重建的不完整性。
 
 针对上述瓶颈，NimbusGS提出了一种统一的物理驱动框架，核心思路是将天气退化解耦为**视点一致的连续传输场**和**视点相关的颗粒残余**，在三维高斯泼溅框架中实现场景几何与天气效应的可分离优化。同时，引入**几何引导的梯度缩放机制**，依据深度、投影半径和重建误差自适应调整梯度，显著改善远距离区域的几何重建完整性。这一设计使得NimbusGS能够在雾、雨、雪及任意混合组合下，以单一模型实现鲁棒的三维重建。
-
-
 
 ## 核心方法与创新机理
 
@@ -116,8 +112,6 @@ $$\mathcal{L} = (1 - \lambda_{\mathrm{r}}) \|I_{\mathrm{in}} - I_{\mathrm{deg}}\
 
 **创新总结**：NimbusGS 的方法创新并非简单的模块堆砌，而是通过**物理驱动的退化分解**（CSM + PLM）将天气效应从场景表示中解耦，再通过**几何自适应的优化策略**（GGS + 两阶段训练）解决恶劣天气特有的优化困难。这一设计使得单一框架在雾、雨、雪及混合天气条件下均显著超越专用基线方法。
 
-
-
 NimbusGS 提出了一种统一的退化渲染模型，将混合天气条件下的三维场景重建问题形式化为对清晰场景渲染、连续介质衰减和视点依赖颗粒效应的联合估计。其核心思想在于：输入退化图像 $I_{\mathrm{deg}}$ 可分解为三个物理可解释分量的叠加——
 
 $$I_{\mathrm{deg}} = {\hat{I}} \cdot T + P + R$$
@@ -147,12 +141,8 @@ $$\mathcal{L} = (1 - \lambda_{\mathrm{r}}) \|I_{\mathrm{in}} - I_{\mathrm{deg}}\
 
 整体而言，NimbusGS 的管线设计实现了从“输入退化图像 → 几何初始化 → 颗粒效应分离 → 连续散射估计 → 联合退化渲染 → 自监督优化”的闭环，在无需成对清晰数据的情况下，统一处理雾、雨、雪及其混合组合的天气退化。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2553_https_arxiv_org_abs_2603_27228/figures/001_Figure_1.jpg]]
 *Figure 1: We propose NimbusGS, a unified framework for 3D reconstruction under diverse and hybrid weather conditions. It jointly addresses continuous medium effects (haze, H), particulate degradations (snow, S; rain, R), and their mixed combinations. Panel (a) presents visual comparisons across weather types, while panel (b) summarizes metric profiles over seven single and hybrid settings*
-
-
 
 NimbusGS 的核心设计思路是将混合天气退化分解为两类物理上可区分的效应：视点一致的连续介质衰减和视点依赖的离散颗粒扰动。基于这一分解，方法在三维高斯泼溅框架中引入三个关键模块——连续散射建模（CSM）、颗粒层建模（PLM）和几何引导梯度缩放（GGS），并通过两阶段训练策略实现稳定优化。
 
@@ -211,15 +201,11 @@ $$\mathcal{L} = (1 - \lambda_{\mathrm{r}}) \|I_{\mathrm{in}} - I_{\mathrm{deg}}\
 
 其中 $\lambda_{\mathrm{r}}$ 平衡 L1 和 SSIM 损失，$\mathcal{L}_{\mathrm{TV}}$ 为全变分正则项，约束消光场的空间平滑性。损失项消融（Table 7）显示，移除暗通道先验损失 $\mathcal{L}_{\mathrm{DCP}}$ 后 PSNR 从 22.25 骤降至 17.32，说明物理先验正则对收敛至关重要。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2553_https_arxiv_org_abs_2603_27228/figures/013_Figure_7.jpg]]
 *Figure 7: Qualitative ablation of Particulate Layer Modeling. Best viewed zoomed in*
 
 ![[assets/figures/papers/paper_list_l2553_https_arxiv_org_abs_2603_27228/figures/015_Figure_9.jpg]]
 *Figure 9: Qualitative ablation of Geometry-Guided Gradient Scaling. Best viewed zoomed in*
-
-
 
 ## 实验与关键发现
 
@@ -260,30 +246,8 @@ Table 9 报告了 H+R+S 设置下的模型复杂度与运行时间对比。Nimbu
 
 论文明确指出，NimbusGS 在**稀疏视图设置**下存在性能下降。当输入视图稀疏时，去除颗粒残余会暴露缺乏外观线索的遮挡区域，模型缺少足够先验来恢复这些区域的几何与纹理，导致重建不完整。这一局限性指向一个开放挑战：稀疏视图下的几何补全问题仍需进一步研究。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2553_https_arxiv_org_abs_2603_27228/figures/003_Table_1.jpg]]
-*Table 1: Quantitative comparisons on hazy scenes. The best and second-best scores are color-encoded for clarity*
-
 ![[assets/figures/papers/paper_list_l2553_https_arxiv_org_abs_2603_27228/figures/004_Figure_3.jpg]]
 *Figure 3: Qualitative results on hazy scenes. Best viewed zoomed in*
-
-![[assets/figures/papers/paper_list_l2553_https_arxiv_org_abs_2603_27228/figures/005_Table_2.jpg]]
-*Table 2: Quantitative comparisons on rainy scenes. The best and second-best scores are color-encoded for clarity*
-
-![[assets/figures/papers/paper_list_l2553_https_arxiv_org_abs_2603_27228/figures/007_Figure_4.jpg]]
-*Figure 4: Qualitative results on rainy scenes. Best viewed zoomed in*
-
-![[assets/figures/papers/paper_list_l2553_https_arxiv_org_abs_2603_27228/figures/009_Figure_5.jpg]]
-*Figure 5: Qualitative results on snowy scenes. Best viewed zoomed in*
-
-![[assets/figures/papers/paper_list_l2553_https_arxiv_org_abs_2603_27228/figures/011_Figure_6.jpg]]
-*Figure 6: Qualitative results on hybrid-weather scenes (haze, rain, and snow). Best viewed zoomed in*
-
-![[assets/figures/papers/paper_list_l2553_https_arxiv_org_abs_2603_27228/figures/017_Table_7.jpg]]
-*Table 7: Ablation of loss terms. Best results are marked in bold*
-
-
 
 ## 定位与知识库关联
 
@@ -316,8 +280,6 @@ NimbusGS 的设计假设场景退化可由连续散射场与颗粒残余层的�
 3. **暗通道先验的取舍。** 消融实验（Table 7）显示，移除暗通道先验损失 $L_{\mathrm{DCP}}$ 导致 PSNR 从 22.25 dB 骤降至 17.32 dB，表明该先验在训练早期对几何初始化至关重要。然而，论文同时指出暗通道先验基于自然图像统计假设，可能在后期优化中偏向欠曝光解。如何在训练过程中动态调整该先验的权重，或寻找更鲁棒的替代先验，是一个值得深入的方向。
 
 4. **实时应用场景的优化。** 尽管渲染速度保持实时，但训练阶段的额外开销限制了 NimbusGS 在需要快速部署的场景（如自动驾驶在线建图）中的适用性。如何通过模型蒸馏或轻量化消光场表示来降低训练成本，是走向实际部署的关键问题。
-
-
 
 ## 原文 PDF
 

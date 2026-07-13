@@ -56,8 +56,6 @@ claims:
 - 用户研究中，84.28% 的参与者偏好 DiffusionHarmonizer 的效果优于第二强基线（Table 4）。
 - 消融实验证实，多尺度感知损失是抑制单步训练高频伪影的关键（Figure 5），而数据管线的每一部分都提供了不可替代的监督信号（Table 6, Figure 6）。
 
-
-
 神经渲染技术（如 3D Gaussian Splatting 和 NeRF）已能从多视图图像中重建驾驶场景，并支持在新视角、新轨迹下进行逼真模拟。然而，这类神经重建的渲染结果存在两个关键缺陷，严重阻碍了其在自动驾驶仿真中的实际应用：
 
 **渲染伪影与视觉退化**。神经重建在新视角下的渲染不可避免地产生模糊、闪烁、几何畸变和纹理缺失等伪影。这些伪影源于重建模型对未观测区域的泛化不足，以及渲染过程中的数值不稳定。当模拟车辆沿不同于训练轨迹的路径行驶时，这些退化尤为明显，直接破坏了仿真的视觉可信度。
@@ -67,8 +65,6 @@ claims:
 现有解决方案存在明显缺口。通用图像编辑模型（如 **SDEdit** 基于 Stable Diffusion 3、**InstructPix2Pix**）和视频编辑模型（如 **Wan-Video V2V** 基于 WAN 2.1）虽然具备一定的增强能力，但它们依赖多步随机去噪，推理速度慢且难以保证帧间时序一致性，无法满足在线模拟的实时性要求。专用 harmonization 方法（如 **VHTT** 基于视频三重变换器、**Ke et al.** 预测可解释滤波器）仅能调整前景物体的色调以匹配背景，既无法修复背景的渲染伪影，也无法生成与场景一致的阴影，其功能范围远不足以覆盖神经渲染仿真的全部需求。
 
 因此，本文的核心动机在于：**构建一个统一的在线增强框架，能够同时修复神经渲染的伪影、协调前景与背景的外观、并合成场景一致的阴影与光照效果，且满足实时推理的严苛约束**。这要求方法不仅具备强大的图像生成能力，还需在单步推理中保持时序连贯性，而现有方法无一能同时满足这些条件。
-
-
 
 ## 核心方法与创新机理
 
@@ -115,11 +111,6 @@ $$\mathcal{L}_{\mathrm{perc}} = \mathbb{E}_{k} \left[ \sum_{l} \lambda_{l} \big\
 5. **资产重插入**：将动态物体重新合成到不同背景中，训练阴影生成和色调协调。
 
 消融实验（Table 6, Figure 6）表明，移除任一数据源均导致 FID 上升约 3-4 点：去除伪影校正数据则模型无法修复重建错误，去除阴影数据则无法合成逼真阴影，去除外观数据则色调协调失败。这证实了五部分数据提供了**不可替代的互补监督信号**，是 DiffusionHarmonizer 在色调协调、阴影生成和伪影校正三个子任务上统一超越专用方法的根本原因。
-
-
-
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2602_24096/figures/001_Figure_1.jpg]]
-*Figure 1: DiffusionHarmonizer on Driving Scenes. Our method transforms artifact-prone neural-rendered frames into temporally coherent simulations, improving their realism by jointly correcting shadows, lighting, appearance discrepancies and reconstruction artifacts*
 
 DiffusionHarmonizer 的核心流水线由两条对称路径构成：**合成数据管线**（上方）负责生成大规模、多样化的配对训练样本，**单步时序增强模型**（下方）则将这些样本作为监督信号，将带有伪影的神经渲染帧实时转换为时序一致的逼真仿真帧。
 
@@ -183,8 +174,6 @@ $$\mathcal{L}_{\mathrm{total}} = \lambda_{l_2} \mathcal{L}_{l_2} + \lambda_{perc
 
 整个过程为确定性前馈，无需迭代去噪，在单 GPU 上即可实现 30 FPS 的实时推理。
 
-
-
 ### 单步确定性增强器
 
 DiffusionHarmonizer 的核心是将预训练的多步扩散模型改造为确定性单步增强器。具体而言，给定退化帧 $I_t$，其增强过程为：
@@ -224,8 +213,6 @@ $$\mathcal{L}_{\mathrm{temp}} = \frac{1}{|\Omega|} \sum_{x \in \Omega} [ \hat{I}
 $$\mathcal{L}_{\mathrm{total}} = \lambda_{l_{2}} \mathcal{L}_{l_{2}} + \lambda_{perc} \mathcal{L}_{\mathrm{perc}} + \lambda_{temp} \mathcal{L}_{\mathrm{temp}}$$
 
 其中 $\lambda_{temp}=1$ 仅对时序批次激活，非时序批次中 $\lambda_{temp}=0$。这一混合训练策略使模型同时利用图像配对数据和视频时序数据，避免对强时序线索的过拟合（Eq. (6), Sec 3.3）。
-
-
 
 ## 实验与关键发现
 
@@ -285,20 +272,6 @@ DiffusionHarmonizer 针对的核心瓶颈是：神经重建渲染（如 3DGS）�
 4. **数据管线构建成本**：训练依赖大规模定制合成数据管线（约 35 万帧），构建成本较高，且不能直接从真实世界无配对数据中学习。PBR 阴影与现实域之间存在 gap，论文建议通过域适应或在线微调缩小这一差距。
 5. **基座模型规模未探索**：模型基于 Cosmos 0.6B 预训练扩散模型，更大规模基座模型的潜力尚未探索，这可能限制性能上限。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2602_24096/figures/007_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2602_24096/figures/019_Figure_13.jpg]]
-*Figure 13: Comparison with Ground Truth on Holdout Datasets. Our model’s predictions closely match the ground-truth real-world captures, producing faithful, physically plausible results suitable for online simulation systems*
-
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2602_24096/figures/005_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2602_24096/figures/014_Figure_8.jpg]]
-*Figure 8: User Study Interface. We show our study instructions and interface. Evaluators are shown the input image and two predictions (ours and a baseline) and asked to select the more realistic result, with prediction order randomized to avoid bias*
-
-
-
 ## 定位与知识库关联
 
 ### 与通用图像/视频编辑方法的对比
@@ -325,8 +298,6 @@ DiffusionHarmonizer 与当前主流的通用图像编辑和视频编辑方法存
 4. **模型压缩与独立性**：是否可以通过知识蒸馏或直接训练，避免依赖预训练扩散模型，从而减少模型体积（当前约 0.74B 参数）并避免潜在的基础模型版权和许可问题？
 5. **高度动态场景**：如何处理多个快速移动物体的同时插入，此时光流估计不可靠、时序信息因严重遮挡而失效？是否需要引入物体级别的跟踪或运动补偿机制？
 6. **评估体系完善**：当前评估主要依赖 FID/FVD 等分布层面指标和用户研究，缺乏对物理真实性（如阴影方向一致性、光照物理正确性）的定量度量，未来需要建立更细粒度的评估基准。
-
-
 
 ## 原文 PDF
 

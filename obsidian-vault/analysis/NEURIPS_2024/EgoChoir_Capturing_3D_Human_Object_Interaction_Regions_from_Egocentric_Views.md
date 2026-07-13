@@ -196,14 +196,6 @@ pipeline 中存在两条关键的信息依赖路径：
 
 消融实验验证了这些依赖关系的必要性：移除 3D 可供性特征 $\mathbf{F}_a$ 导致接触 F1 从 0.76 降至 0.66，并出现过度预测和时间不一致现象（Figure 7b）；移除语义特征 $\mathbf{F}_s$ 或区域性交叉注意力 $f_{ca}$ 同样造成性能下降（Table 2）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1791_EgoChoir_Capturing_3D_Human_Object_Interaction_Regions_from_Egocentric_V/figures/003_Figure_3.jpg]]
-*Figure 3: Method. EgoChoir first employs modality-wise encoders to extract features, in which the motion encoder is pre-trained by minimizing the distance between visual disparity and motion disparity. Then, it takes them to excavate the object interaction concept and subject intention, modeling the affordance and contact through parallel cross-attention with gradient modulation*
-
-![[assets/figures/papers/paper_list_l1791_EgoChoir_Capturing_3D_Human_Object_Interaction_Regions_from_Egocentric_V/figures/001_Figure_1.jpg]]
-*Figure 1: EgoChoir takes egocentric frames and head motion from head-mounted devices, along with the 3D object, to capture 3D interaction regions, including human contact and object affordance. The human motion is just visualized for intuitive observation of contact, yet it is not utilized by EgoChoir*
-
 EgoChoir 的核心架构围绕“物体交互概念挖掘 → 主体交互意图建模 → 梯度自适应调制”三条主线展开，通过平行交叉注意力（Parallel Cross-Attention）将物体几何、视觉外观和头部运动三类异质线索协调融合，最终联合输出 3D 人体接触与物体可供性。
 
 ### 3.1 问题形式化
@@ -260,11 +252,6 @@ $$\mathcal{L} = \mathcal{L}_a + \mathcal{L}_c + \mathcal{L}_s$$
 
 其中 $\mathcal{L}_s$ 为交互语义交叉熵损失，$\mathcal{L}_a$ 和 $\mathcal{L}_c$ 均为 Dice 损失与 Focal 损失的组合（$\alpha=0.25, \gamma=2$），精确表达式见论文 Eq. (5)。该组合损失在正负样本极度不均衡的接触/可供性预测中有效缓解类别不平衡问题。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1791_EgoChoir_Capturing_3D_Human_Object_Interaction_Regions_from_Egocentric_V/figures/002_Figure_2.jpg]]
-*Figure 2: The subject intention, conveyed through synergistic visual appearances and head movements, along with the object interaction concept revealed by its structure and functionality, pre-formulate an interaction body image, which enables interaction regions to be envisioned*
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -320,19 +307,11 @@ Table 3 显示，将头部运动替换为全身运动可进一步提升性能�
 
 EgoChoir 与基线的对比在以下方面保持了公平性：数据集训练/测试划分保证场景几乎不重叠，泛化性评估可靠；LEMON 基线实际享有更丰富的输入信息（exocentric 估计的人体姿态），而 EgoChoir 仅使用头部运动；部分基线依赖场景分割图等额外模块，EgoChoir 不需要此类预处理。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1791_EgoChoir_Capturing_3D_Human_Object_Interaction_Regions_from_Egocentric_V/figures/007_Figure_6.jpg]]
 *Figure 6: Qualitative Results. Contact vertices are colored yellow, and 3D object affordance are colored red, with the depth of red representing the affordance probability. Note: for intuitive visualization, the contact GT of body interactions are visualized on posed humans (last row) from GIMO [113]. Please zoom in for a better visualization and refer to the Sup. Mat. for video results*
 
-![[assets/figures/papers/paper_list_l1791_EgoChoir_Capturing_3D_Human_Object_Interaction_Regions_from_Egocentric_V/figures/010_Figure_8.jpg]]
-*Figure 8: Analysis. (a) The changing interaction contents correspond to dynamic 3D object affordances*
-
 ![[assets/figures/papers/paper_list_l1791_EgoChoir_Capturing_3D_Human_Object_Interaction_Regions_from_Egocentric_V/figures/013_Table_5.jpg]]
 *Table 5: Metrics of LEMON and our method for each interaction category. Prec. indicates Precision, wrap. is wrapgrasp*
-
-![[assets/figures/papers/paper_list_l1791_EgoChoir_Capturing_3D_Human_Object_Interaction_Regions_from_Egocentric_V/figures/012_Table_4.jpg]]
-*Table 4: The collected 12 different interactions with 18 different objects. Obj. indicates objects, Int. denotes interactions, wrap. is wrapgrasp and Refrige. is Refrigerator*
 
 ## 定位与知识库关联
 

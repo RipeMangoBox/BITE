@@ -61,8 +61,6 @@ claims:
 
 当前工作的主要局限包括：数据集质量受限于所使用的编辑模型能力，复杂编辑任务的样本比例和模型表现仍有提升空间，验证模型的跨任务泛化性未经检验，以及基准规模有限可能无法完全代表真实世界编辑指令的多样性。
 
-
-
 图像编辑作为视觉内容创作的核心任务，正经历从传统工具向基于扩散模型的指令驱动编辑范式的深刻转变。用户通过自然语言指令即可实现对图像中物体、场景乃至复杂语义关系的修改，这极大地降低了创作门槛。然而，这一范式的高效落地依赖于大规模、高质量的对齐数据，即“源图像-编辑指令-目标图像”三元组。
 
 当前图像编辑数据集面临**规模与质量的双重困境**。一方面，人工标注虽能保证高质量的对齐，但成本高昂且难以扩展，无法满足数据驱动模型日益增长的规模需求。另一方面，现有的自动化数据流水线（如 **InstructPix2Pix**、**SEED-Data-Edit**、**UltraEdit**、**ImgEdit**、**NHR-Edit**）虽能实现大规模数据生成，却普遍存在以下结构性缺陷：
@@ -74,8 +72,6 @@ claims:
 上述困境的根本原因在于**缺乏一个统一、高效且语义感知的后验证机制**。传统像素级度量（如 SSIM）无法区分“微小有效编辑”与“完全无编辑”之间的语义差异——它会对包含细微编辑的图像给出高相似度分数，而对无编辑样本反而降低分数，这恰恰与编辑验证的需求背道而驰。同时，依赖 GPT-4o 等大规模 API 的方案虽具备语义理解能力，却面临推理成本高、吞吐量受限、且无法针对编辑任务进行专门优化的难题。
 
 基于此，本文的核心动机是：**能否将原本依赖大型模型的后验证任务蒸馏为一个紧凑的专家模型，通过统一失败检测与指令重描述的双任务设计，在可控的计算成本下实现可扩展的高质量数据制造？** 这一思路直接推动了 UnicEdit-10M 数据集和 Qwen-Verify 专家模型的诞生，旨在打破图像编辑数据领域长期存在的规模-质量壁垒。
-
-
 
 ## 核心方法与创新机理
 
@@ -104,8 +100,6 @@ $$\mathcal{L}_{\mathrm{D}^2\mathrm{PO}} = -\mathbb{E}_{(c_v, p_w, p_l) \sim \mat
 与 **SEED-Data-Edit**、**UltraEdit** 等依赖多工具链分段调用的方案不同，UnicEdit 采用端到端编辑模型（FLUX.1-Kontext、Qwen-Image-Edit）直接生成编辑图像，从根本上消除了工具链间的错误传播。这一设计简化了流水线结构，使后验证能够作用于完整的编辑结果而非中间产物，进一步保障了数据质量。
 
 三个创新点形成协同效应：端到端编辑提供干净的数据基础，统一后验证实现全面的质量把控，小型专家模型则使这一流程在低成本下可规模化运行——这正是 UnicEdit 突破“规模-质量”壁垒的因果机制。
-
-
 
 UnicEdit-10M 的数据构建采用**三阶段流水线**架构，将图像编辑数据的生产从传统的多工具链分段调用转变为一个端到端、质量可控的系统。该流水线的核心设计理念是通过**统一后验证**机制，在保证高吞吐量的同时突破规模与质量的双重困境。
 
@@ -144,15 +138,8 @@ UnicEdit-10M 的数据构建采用**三阶段流水线**架构，将图像编辑
 
 这种设计使得 UnicEdit-10M 在 VIEScore Overall（8.0768）和 Aesthetic 分数上均优于使用 GPT-4o API 的 GPT-Image-Edit-1.5M（7.7451），同时人脸一致性达到 0.89，远超后者的 0.30，直接验证了统一后验证对数据保真度的显著提升。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l798_https_arxiv_org_abs_2512_02790/figures/001_Figure_1.jpg]]
-*Figure 1: UnicEdit-10M covers 22 edit tasks spanning basic and complex edits, with a unified post-verification stage that filters failures and refines instructions to yield high-quality triplets. We also introduce UnicBench with fine-grained metrics for comprehensive evaluation*
-
 ![[assets/figures/papers/paper_list_l798_https_arxiv_org_abs_2512_02790/figures/004_Figure_3.jpg]]
 *Figure 3: Data curation pipeline with three stages: (1) data preparation, (2) image editing, (3) post verification performing failed edits filtration and recaption*
-
-
 
 ### 统一后验证框架
 
@@ -201,13 +188,6 @@ $$\mathrm { S c o r e } = \left( \prod _ { m \in \mathcal { M } } m \right) ^ { 
 
 其中 $\mathcal{M}$ 为适用指标集合：基本编辑任务取 $\{IF, NC, VQ\}$，复杂编辑任务额外加入推理准确性 $RA$，即 $\{IF, NC, VQ, RA\}$。该设计避免了算术平均对低分维度的掩盖效应，使评估更具诊断性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l798_https_arxiv_org_abs_2512_02790/figures/005_Figure_4.jpg]]
-*Figure 4: Post-verification examples of the expert model. Base denotes Qwen2.5-VL-7B; SFT denotes Base model after Stage-1 SFT; Ours denotes the dual-task expert model Qwen-Verify*
-
-
-
 ## 实验与关键发现
 
 ### 数据集质量对比：统一后验证的规模-质量突破
@@ -229,20 +209,11 @@ UnicEdit-10M 在数据质量上显著优于现有开源和闭源数据集。如 
 
 Table 4 汇总了主流模型在 UnicBench 上的综合表现。闭源模型中，**GPT-Image-1** 以 Overall-EN 8.3546 分领先，Seedream 4.0 以 8.0428 分居次（差距 0.3118）。开源模型中，**Qwen-Image-Edit** 取得 7.7273 分，而 InstructPix2Pix 仅为 2.9221 分，差距悬殊。
 
-![[assets/figures/papers/paper_list_l798_https_arxiv_org_abs_2512_02790/figures/008_Table_4.jpg]]
-*Table 4: Overall performance of different model on UnicBench. The performance of open-source and closed-source models is separately marked with the best performance in bold, and the second best underlined*
-
 细粒度分析揭示了关键瓶颈：几乎所有模型在 **RA（推理准确性）** 维度上的得分远低于 IF（指令遵循）、NC（非编辑一致性）和 VQ（视觉质量）。以 Figure 11 中复杂编辑子任务（如视角变换、文本修改、知识推理）为例，RA 得分普遍处于低位，表明当前模型在需要空间推理和语义理解的编辑上存在系统性缺陷。这验证了 UnicBench 作为诊断工具的价值：传统评估指标（如 VIEScore）无法暴露此类细粒度能力差异。
-
-![[assets/figures/papers/paper_list_l798_https_arxiv_org_abs_2512_02790/figures/020_Figure_11.jpg]]
-*Figure 11: Performance of four evaluation dimensions for each sub-task. The top row shows results for EN tasks, and the bottom row shows results for CN tasks. All results are evaluated by GPT-4.1*
 
 ### Qwen-Verify 专家模型验证：小模型超越大模型
 
 Table 5 展示了后验证专家模型 Qwen-Verify 与基线的准确性对比。在三个验证类别上，Qwen-Verify 均超越 72B 规模的通用大模型 Qwen2.5-VL-72B：Normal 类别 6.32 vs 5.25，No Edit 类别 9.80 vs 9.60，Hallucination 类别 6.22 vs 6.12。这证明通过专门化训练，7B 小模型可在特定验证任务上超越通用大模型，同时大幅降低计算成本。
-
-![[assets/figures/papers/paper_list_l798_https_arxiv_org_abs_2512_02790/figures/009_Table_5.jpg]]
-*Table 5: Performance of post-verification expert model*
 
 消融实验进一步揭示了 D²PO 训练阶段的关键作用：加入 D²PO 偏好对齐后，Hallucination 准确性从仅 SFT 的 5.47 提升至 6.22（Table 5），表明偏好优化能有效减少模型在验证时的幻觉倾向。此外，与像素级度量 SSIM 的对比（Fig. 6）表明，SSIM 对微小有效编辑给出高相似度分数，而对无编辑样本却可能降低分数，缺乏语义感知能力。这从反面证明了训练语义感知验证模型的必要性。
 
@@ -256,13 +227,6 @@ Table 5 展示了后验证专家模型 Qwen-Verify 与基线的准确性对比�
 ### 公平性说明与局限
 
 需要注意的是，UnicBench 的所有评估均基于 GPT-4.1 或 Qwen2.5-VL-72B 作为 VLM 评判器，可能引入评判器自身的偏好偏差。RA 指标依赖推理点（reasoning points）的完备性，若推理点覆盖不全，评分可能存在变异性。此外，基准规模（1100 样本）有限，复杂编辑任务的样本比例仍有提升空间，模型在空间推理和文本修改等任务上的表现仍不理想。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l798_https_arxiv_org_abs_2512_02790/figures/018_Figure_10.jpg]]
-*Figure 10: Overall score of each model on the sub-tasks in UnicBench, for EN (left) and CN (right) instructions. All results are evaluated by GPT-4.1*
-
-
 
 ## 定位与知识库关联
 
@@ -316,8 +280,6 @@ UnicBench 的评估体系在以下方面提供了独特的诊断能力：
 2. **验证框架的跨任务泛化**：能否将统一后验证框架扩展至视频编辑、3D 编辑等更广泛的视觉生成任务，以低资源实现高质量数据生产？
 3. **无模型评估方法**：当前评估仍依赖 VLM 评判器，如何设计更客观、无模型的自动化评估方法，特别是针对推理准确性？
 4. **数据分布与真实场景的对齐**：数据集源图像来自内部高美学得分库，可能过度代表特定风格或分布，未见低光照等困难场景的显式覆盖。如何在保持质量的同时扩大数据分布的覆盖面？
-
-
 
 ## 原文 PDF
 

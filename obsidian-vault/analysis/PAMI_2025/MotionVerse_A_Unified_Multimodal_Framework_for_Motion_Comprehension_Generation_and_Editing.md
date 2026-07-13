@@ -82,8 +82,6 @@ MotionVerse属于“统一多模态运动框架”这一新兴范式。与**Moti
 
 尽管MotionVerse在统一性上取得突破，仍需注意以下局限：统一架构在个别指标（如T2M的FID）上略逊于单任务专用模型（如MoMask），多任务学习与单任务专精之间仍需权衡；T5-Large相比T5-Base未带来显著增益，表明当前任务规模可能已饱和；评估限于公开数据集，未在真实交互或机器人场景中验证。开放问题包括：延迟并行策略能否自适应调整延迟量、模态隔离效果能否用梯度冲突等量化指标进一步验证、框架能否扩展至音频和场景上下文等更多模态。
 
-
-
 ### 问题背景
 
 人类运动理解与生成是计算机视觉和图形学中的核心问题，涉及文本到运动生成、运动到文本描述、运动预测、运动编辑、运动反应生成等多样化任务。这些任务在电影制作、游戏开发、虚拟现实和人机交互等领域具有广泛的应用前景。近年来，大语言模型（LLM）的兴起为统一处理多种运动相关任务提供了新的范式——将连续运动序列离散化为运动令牌，使其能够像自然语言一样被LLM理解和生成。
@@ -105,8 +103,6 @@ MotionVerse属于“统一多模态运动框架”这一新兴范式。与**Moti
 针对上述缺口，本文提出**MotionVerse**——一个统一的多模态框架，旨在以端到端的方式同时处理单人和交互式场景下的运动理解、生成与编辑任务。核心动机是：**通过多流离散表示与模态隔离架构，使LLM能够在不互相干扰的前提下统一处理多种运动相关任务**。
 
 具体而言，MotionVerse引入了三个关键设计：采用**残差向量量化（RVQ）**生成多流运动令牌，以层次化方式保留运动细节；设计**延迟并行建模策略**，在控制计算复杂度的同时有效捕获流间依赖；构建**模态隔离的双塔架构**，为运动和文本分别分配独立的参数空间，从根本上缓解模态干扰。这一设计使得单一模型能够覆盖8类运动任务，在多个基准上取得有竞争力的结果，为通用运动智能提供了新的技术路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -155,8 +151,6 @@ $$x' = h + \mathrm{FFN}(\mathrm{LN}(x, \theta_{\mathrm{ln2}}^{\mathrm{u}}); \the
 ### 4. 任务特定运动塔：缓解多任务间干扰
 
 在多任务指令微调阶段，MotionVerse 引入了**任务特定的运动塔（TMT）**，为每个子任务（文本到运动、运动到文本、运动预测、运动编辑等）分配独立的输出头。消融实验（**Tables 12-14**）显示，移除 TMT（wo-TMT）会导致各子任务性能一致下降，尤其在运动反应和编辑任务上退化最为明显，验证了任务隔离对统一多任务框架的必要性。
-
-
 
 MotionVerse 是一个以多流离散运动令牌和模态隔离架构为核心的统一框架，旨在让大语言模型（LLM）在单人和多人场景下同时胜任运动理解、生成和编辑等多类任务。框架由三个关键组件构成，并通过三阶段训练流水线完成端到端学习。
 
@@ -215,8 +209,6 @@ $$h = x + \mathrm{MHSA}(\mathrm{LN}(x, \theta_{\mathrm{ln1}}^{\mathrm{u}}); \the
 
 ![[assets/figures/papers/paper_list_l1801_MotionVerse_A_Unified_Multimodal_Framework_for_Motion_Comprehension_Gene/figures/004_Figure_3.jpg]]
 *Figure 3: Architecture of the proposed MotionVerse framework: Integrating Textural and Multi-stream Motion Tokens via Modality-Aware Autoregressive Transformers (Three-Stream Example)*
-
-
 
 MotionVerse 由三个核心模块构成：残差向量量化运动标记器、延迟并行LLM骨干网络、以及模态隔离的Motion-Fusion模块。以下逐一展开其设计逻辑与关键公式。
 
@@ -303,18 +295,11 @@ MotionVerse采用三阶段渐进训练策略：
 
 > **消融证据**：Tables 12-14显示，移除任务特定运动塔（wo-TMT）导致各子任务性能一致下降，尤其在运动反应和编辑任务上退化明显，表明TMT有效缓解了多任务间的干扰。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1801_MotionVerse_A_Unified_Multimodal_Framework_for_Motion_Comprehension_Gene/figures/001_Figure_1.jpg]]
 *Figure 1: Multi-stream motion token modeling strategies. We illustrate 3 quantization levels as an example. Here, mlt denotes the t-th token in the l-th motion stream. These motion tokens can be flattened or interleaved in various ways, resulting in a new sequence with either 1 or 4 parallel streams and steps s1, s2, . . . , sm. The special token −1 denotes empty positions within the pattern*
 
 ![[assets/figures/papers/paper_list_l1801_MotionVerse_A_Unified_Multimodal_Framework_for_Motion_Comprehension_Gene/figures/002_Figure_2.jpg]]
 *Figure 2: Potential architecture variants of the Motion-Fusion module. (a) Prototype: Direct fine-tuning of a pretrained LLM. (b) Low-Rank Adaptation (LoRA): injecting low-rank matrices into multi-head self-attention layers. (c) Mixture-of-Experts (MoE): Duplicating each Feed-Forward Network (FFN) for the motion modality. (d) Modality-Isolated Architecture (MIS): Duplicating each transformer block for the motion modality*
-
-![[assets/figures/papers/paper_list_l1801_MotionVerse_A_Unified_Multimodal_Framework_for_Motion_Comprehension_Gene/figures/005_Figure_4.jpg]]
-*Figure 4: Architecture of Residual Vector Quantization Variation Autoencoder (RVQ-VAE), which discretizes continuous motions into L token sequences*
-
-
 
 ## 实验与关键发现
 
@@ -381,25 +366,6 @@ Tables 12-14 同时对比了 T5-Base 和 T5-Large 作为 LLM 主干。T5-Large �
 - **Figure 3** 的架构全景图揭示了从 RVQ-VAE 令牌化到延迟并行 LLM 再到双塔输出的完整数据流，是理解整个框架的关键。
 - **Table 1** 的任务覆盖对比表明，MotionVerse 是首个同时支持 8 类单人/双人运动任务的统一框架，而此前方法最多覆盖 3-4 类。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1801_MotionVerse_A_Unified_Multimodal_Framework_for_Motion_Comprehension_Gene/figures/007_Table_3.jpg]]
-*Table 3: Quantitative evaluation results of text-to-motion (T2M) task on MotionX dataset*
-
-![[assets/figures/papers/paper_list_l1801_MotionVerse_A_Unified_Multimodal_Framework_for_Motion_Comprehension_Gene/figures/008_Table_4.jpg]]
-*Table 4: Quantitative evaluation results of the interactive text-to-motion (I-T2M) task on InterHuman and InterX dataset*
-
-![[assets/figures/papers/paper_list_l1801_MotionVerse_A_Unified_Multimodal_Framework_for_Motion_Comprehension_Gene/figures/009_Table_5.jpg]]
-*Table 5: Quantitative evaluation results of motion-to-text (M2T) task on MotionX, and interactive motion-to-text (I-M2T) task on InterHuman and InterX datasets*
-
-![[assets/figures/papers/paper_list_l1801_MotionVerse_A_Unified_Multimodal_Framework_for_Motion_Comprehension_Gene/figures/013_Table_7.jpg]]
-*Table 7: Quantitative evaluation results of the motion reaction (React) task on InterHuman and InterX datasets*
-
-![[assets/figures/papers/paper_list_l1801_MotionVerse_A_Unified_Multimodal_Framework_for_Motion_Comprehension_Gene/figures/014_Table_8.jpg]]
-*Table 8: Quantitative evaluation results of the motion editing (Edit) task on MotionFix dataset*
-
-
-
 ## 定位与知识库关联
 
 ### 核心瓶颈与因果机制
@@ -440,8 +406,6 @@ MotionVerse处于“统一运动基础模型”这一新兴技术路线的关键
 4. **超长序列扩展性**：当生成时间跨度极大的运动序列时，延迟并行策略的线性注意力假设是否仍然成立？是否需要引入记忆压缩或分块自回归机制？
 
 5. **三阶段训练的最优配比**：令牌器训练、对齐预训练、指令微调三个阶段的数据比例和任务采样策略是否存在最优设计？论文未对此进行系统消融，该方向可能蕴含进一步的性能提升空间。
-
-
 
 ## 原文 PDF
 

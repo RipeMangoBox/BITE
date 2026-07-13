@@ -57,8 +57,6 @@ claims:
 
 **方法定位：** AIGB-Pearl位于生成式自动竞价与离线强化学习的交叉点。与DiffBid等纯生成式方法相比，它引入了评估器驱动的策略搜索机制；与CQL、IQL等离线RL方法相比，它保留了生成式规划的条件采样能力，并通过同步耦合技术实现更紧的Lipschitz约束估计。
 
-
-
 ### 自动竞价与生成式规划
 
 在线广告自动竞价的核心是在预算约束下最大化广告主的累计价值。该问题可形式化为一个马尔可夫决策过程（MDP）：
@@ -98,8 +96,6 @@ $$
 - **理论问题**：能否为上述“评估-优化”循环提供次优性上界，从理论上认证安全探索的范围？
 
 这些问题的解决，将使得生成式自动竞价方法从“被动模仿”走向“主动改进”，在保持离线学习安全性的同时获得持续的性能提升。
-
-
 
 ## 核心方法与创新机理
 
@@ -150,11 +146,6 @@ $$\hat{W}_1(y_1, y_2; \theta) = \sum_t \|\mu_\theta(s_{1:t}^1, y_1, t) - \mu_\th
 
 消融实验（Table 4）量化了各创新的贡献：KL 约束单独贡献约 +1.1% GMV，Lipschitz 约束贡献约 +1.8% GMV，二者联合使用使 AIGB-Pearl 在真实世界 A/B 测试中相比最强基线 DiffBid 实现 +3.00% GMV 提升（Table 2）。
 
-
-
-![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_kMuQBgPIdg/figures/021_Figure_10.jpg]]
-*Figure 10: Learning curves of cumulative rewards between offline RL with bootstrapping method and AIGB-Peral under 10 seeds*
-
 AIGB-Pearl 的整体 pipeline 围绕“生成式规划器 + 轨迹评估器”的双模块交互架构展开，核心思想是将离线强化学习中的保守策略搜索思想注入生成式自动竞价框架，使规划器在离线数据集邻近的认证区域内安全地提升生成轨迹的质量。
 
 ### 模块组成与交互关系
@@ -183,8 +174,6 @@ AIGB-Pearl 的整体 pipeline 围绕“生成式规划器 + 轨迹评估器”�
 - **Lipschitz 连续性约束**：限制规划器条件分布对输入条件 $y$ 变化的 Wasserstein 距离敏感度，由超参数 $L_p$ 控制。
 
 这两个约束共同定义了离线数据集附近的一个“认证邻域”（certified neighborhood），在此区域内评估器保持高准确度，规划器可以安全地进行评分最大化探索，且理论上有次优性差距上界保证（Theorem 3, Eq.9）。图 1 给出了该约束评分最大化机制的原理示意，图 2 展示了评估器与规划器的完整交互架构。
-
-
 
 ### 3.1 问题形式化：从行为克隆到评分最大化
 
@@ -262,8 +251,6 @@ $$
 
 即仅需计算两条件下生成均值序列的逐步差异之和。该技术是满足Lipschitz约束的关键工程实现，代价是限制了模型方差的灵活性。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验结论
@@ -285,9 +272,6 @@ AIGB-Pearl在模拟与真实世界实验中一致地取得了SOTA性能。在模
 
 在离线数据集**未覆盖的广告主**（4k个）上的A/B测试中，AIGB-Pearl相比DiffBid仍取得+3.32%的GMV提升，相比Decision Transformer（DT）提升+3.08%（Table 3）。这表明KL-Lipschitz约束有效控制了外推风险，使模型在OOD条件下仍能生成可靠轨迹。
 
-![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_kMuQBgPIdg/figures/005_Table_3.jpg]]
-*Table 3: Generalization performance in real-world A/B tests with unseen advertisers against AIGB methods, involving 4k advertisers over 19 days*
-
 ### 消融研究：约束机制的有效性
 
 消融实验直接验证了两个核心约束的独立贡献（Table 4，6k广告主，8天A/B测试）：
@@ -303,9 +287,6 @@ AIGB-Pearl在模拟与真实世界实验中一致地取得了SOTA性能。在模
 ### 评估器可靠性分析
 
 轨迹评估器的质量是方法有效性的前提。在模拟实验中，评估器在OOD轨迹上的排序准确率AUC达到**85.5%**；在真实世界实验中，OOD数据的AUC为**75.1%**（Table 5，5折交叉验证）。这一结果表明评估器在外推条件下仍保持较高的排序一致性，但其绝对准确率（SMAPE）在无LLM嵌入时约为38%，说明**绝对评分精度仍有较大提升空间**——这是当前方法的一个瓶颈。
-
-![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_kMuQBgPIdg/figures/010_Table_5.jpg]]
-*Table 5: Evaluator accuracy for simulated and real-world experiments. Results are reported for training data and OOD data evaluated using 5-fold cross-validation*
 
 评估器训练的消融显示：联合使用点式损失（point-wise loss）和成对损失（pair-wise loss）可同时降低SMAPE并提高AUC（Table 9, Table 10）；引入预训练大语言模型生成的语义嵌入（LLM embedding）加速了评估器收敛并进一步降低SMAPE（Fig. 9）。
 
@@ -323,25 +304,12 @@ KL约束强度$\delta_K$的调优结果显示存在明显的**探索-安全权�
 
 在多策略数据收集场景（即离线数据来自多个不同质量的竞价策略）中，AIGB-Pearl仍保持一致的性能优势（Table 11）。这表明方法能够有效处理离线数据中的多模态分布，KL约束在此场景下起到了防止模型向单一模式坍缩的作用。
 
-![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_kMuQBgPIdg/figures/030_Table_11.jpg]]
-*Table 11: Empirical performance with multiple data-collection policies*
-
 ### 失败模式与局限
 
 1. **评估器绝对精度瓶颈**：在无LLM嵌入时SMAPE约38%，即使加入嵌入后仍有改进空间。评估器的绝对误差会通过评分最大化被放大，限制最终的策略改进幅度。
 2. **超参数依赖**：$\delta_K$和$L_p$需离线调优，缺乏在线自适应机制。实际部署中，数据分布漂移可能导致预设超参数不再最优。
 3. **同步耦合的方差假设**：同步耦合技术要求规划器使用固定方差以得到更紧的Wasserstein上界，这限制了生成模型的表达能力。
 4. **理论界的紧致性**：次优性差距上界（Theorem 3）中的常数$\delta_M$在实验中难以直接观测和估计，理论保证的实际指导意义受限。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_kMuQBgPIdg/figures/016_Table_6.jpg]]
-*Table 6: Settings of the simulated experiments*
-
-![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_kMuQBgPIdg/figures/017_Table_7.jpg]]
-*Table 7: Settings of the real-world experiments*
-
-
 
 ## 定位与知识库关联
 
@@ -396,8 +364,6 @@ AIGB-Pearl 提供了形式化的次优性差距上界（Theorem 3），这在生
 - 评估器在非平稳环境下的鲁棒性如何维持？是否需要在线更新机制？
 - 能否将 AIGB-Pearl 的保守探索框架应用于其他生成式序列决策问题（如推荐系统、库存管理）？
 - 是否存在更紧的理论界，能够更精确地刻画评分最大化与真实性能改进之间的关系？
-
-
 
 ## 原文 PDF
 

@@ -62,8 +62,6 @@ claims:
 
 **局限与展望**：当前方法依赖单目点云估计，在严重遮挡或低纹理场景下空间注释质量可能下降；人类手部动作与机器人执行器之间仍存在具身差距。未来可探索将范式扩展至全身人形机器人、融合大规模机器人数据，以及在互联网视频上扩展自动标注流水线。
 
-
-
 ### 视觉语言动作模型的空间接地困境
 
 机器人操作的核心挑战在于将自然语言指令与视觉观测映射为物理世界中的可执行动作。视觉语言动作模型（VLA）的出现为这一任务提供了统一的端到端范式：给定视觉输入 $v$ 和语言指令 $l$，模型直接预测动作块 $\mathbf{a}_t = f_{\mathrm{VLA}}(v, l)$。然而，现有VLA模型普遍存在一个根本性瓶颈——它们仅使用2D视觉输入，缺乏将2D感知与3D物理动作空间有效接地的能力。这种2D-3D鸿沟导致模型在需要精确空间推理的任务上表现脆弱，泛化性严重受限。
@@ -85,8 +83,6 @@ claims:
 本工作的关键洞察在于：**人类演示视频天然包含丰富的2D视觉与3D物理动作对应关系**。当人类执行操作任务时，手部在3D空间中的运动轨迹与相机捕捉到的2D视觉观测之间存在确定性的几何映射——通过相机投影方程 $(u, v) = \Pi \big( K [R | t] (x, y, z)^\top \big)$ 可精确描述。这意味着，如果能从大规模人类视频中自动提取3D视觉注释和3D动作注释，就可以在不依赖任何机器人数据的前提下，为VLA模型注入空间理解先验。
 
 基于这一洞察，本文提出**空间感知VLA预训练范式**（Spatial-Aware VLA Pretraining），其核心思想是：在预训练阶段利用人类演示视频对视觉-物理空间进行显式对齐，使模型学会将2D视觉观测接地到3D物理动作空间，从而在下游机器人任务中实现更鲁棒的视觉-动作对齐。这一范式的实例化模型VIPA-VLA通过双编码器架构和两阶段预训练，系统性地弥合了2D感知与3D动作之间的鸿沟。
-
-
 
 ## 核心方法与创新机理
 
@@ -120,8 +116,6 @@ VIPA‑VLA 将空间感知能力的获取与具体机器人任务的策略学习
 
 综上，VIPA‑VLA 通过**双编码器融合、视觉‑物理对齐预训练、离散运动 token 化**三个 changed slots，在不增加机器人数据成本的前提下，为 VLA 模型赋予了可泛化的 3D 空间理解能力，在 LIBERO（单视图 92.4%）、RoboCasa（45.8%）及真实机器人任务上均取得显著提升。
 
-
-
 VIPA-VLA 的整体框架围绕一个核心命题展开：**在预训练阶段显式地对齐 2D 视觉空间与 3D 物理动作空间，从而为 VLA 模型注入空间感知能力**。该框架由三个递进阶段构成，如图 1 所示。
 
 ### 数据根基：从人类视频中提取视觉-物理对齐监督
@@ -130,9 +124,6 @@ VIPA-VLA 的整体框架围绕一个核心命题展开：**在预训练阶段显
 
 - **Hand3D-visual**：通过融合单目点云估计（Cut3R）、物体定位与手部姿态注释，生成约 300K 条 3D 视觉 VQA 指令-回答对（Table 1）。这些数据将 2D 图像中的物体、手部与场景元素之间的空间关系转化为自然语言描述，涵盖空间关系判断、任务完成状态、手部运动与相机运动四类问题（Figure 3）。
 - **Hand3D-action**：从人类手部轨迹中提取 3D 运动监督，生成约 1M 条运动-指令对（Table 2）。具体而言，将 1m³ 物理空间量化为 $K=1024$ 个离散运动 token，并将 3D 腕部轨迹转化为运动 token 三元组，为后续的动作先验学习提供监督信号。
-
-![[assets/figures/papers/paper_list_l2647_https_arxiv_org_abs_2512_13080/figures/004_Figure_3.jpg]]
-*Figure 3: Examples of Hand3D-visual*
 
 ### 第一阶段：3D 视觉预训练
 
@@ -174,11 +165,6 @@ VIPA-VLA 的整体框架围绕一个核心命题展开：**在预训练阶段显
 ### 公平性说明
 
 整个预训练过程**完全使用人类视频数据，未涉及任何机器人数据**，确保与从零开始训练的 VLA 方法在数据成本上可比。下游后训练阶段，VIPA-VLA 与基线模型采用相同的扩散动作头和训练配置，控制变量仅在于预训练阶段的有无及其质量。
-
-### 补充图表
-
-
-
 
 VIPA-VLA 的核心架构由五个模块串联构成，其设计目标是将 2D 语义感知与 3D 空间理解显式融合，并通过离散运动 token 桥接视觉-语言推理与连续动作生成。
 
@@ -245,13 +231,6 @@ $$\mathcal{D} = \{ \mathrm{right/left\ if\ } |\hat{x}| > \gamma, \mathrm{up/down
 ---
 
 **模块间因果链条**：双编码器提取语义与空间特征 → 交叉注意力融合层产生空间感知的视觉 token → LLM 基于融合特征进行视觉-语言-动作联合推理，预测离散运动 token → DiT 动作头以 LLM 条件向量为引导，通过流匹配生成连续动作块。两阶段预训练按“先对齐视觉空间，再注入动作先验”的顺序逐步赋予模型 3D 空间理解能力。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2647_https_arxiv_org_abs_2512_13080/figures/002_Figure_2.jpg]]
-*Figure 2: Overview of the Hand3D-visual. By integrating point cloud estimation, object localization, and hand pose annotations from human manipulation videos, we bridge 2D visual observations with 3D physical action space to provide visual-physical aligment supervision for VLA models*
-
-
 
 ## 实验与关键发现
 
@@ -332,9 +311,6 @@ Table 7 的消融实验系统性地量化了空间感知预训练和双编码器
 
 Table 8 和 Figure 8 通过 Hand3D-test 数据集对模型的 3D 空间理解能力进行独立评估，指标包括方向得分（Direction Score，满分 3）和距离误差（Distance Error，单位：米）。
 
-![[assets/figures/papers/paper_list_l2647_https_arxiv_org_abs_2512_13080/figures/015_Table_8.jpg]]
-*Table 8: Evaluation of 3D spatial understanding*
-
 ![[assets/figures/papers/paper_list_l2647_https_arxiv_org_abs_2512_13080/figures/016_Figure_8.jpg]]
 *Figure 8: Comparison between VIPA-VLA-PT and InternVL3.5 on Hand3D-test. Left: histogram of direction scores; Right: histogram of distance errors*
 
@@ -361,16 +337,6 @@ Figure 7 对比了 VIPA-VLA 与 InternVL3.5 在真实机器人任务上的典型
 1. **空间定位偏差**：InternVL3.5 在抓取阶段频繁出现末端执行器与目标物体的空间错位，而 VIPA-VLA 的失败更多出现在接触后的精细操作阶段，表明预训练主要改善了接近与定位阶段的空间接地。
 2. **长程任务累积误差**：在多步骤任务（如 Put-Three-Obj）中，VIPA-VLA 的整任务成功率虽显著优于基线（10% vs. 0%），但绝对成功率仍较低，反映出从人类手部动作到机器人执行器的具身差距在长程任务中会累积放大。
 3. **遮挡与低纹理场景**：受限于单目点云估计（Cut3R）在严重遮挡或低纹理条件下的质量下降，部分场景中空间注释的噪声可能导致预训练收益减弱——该限制需在后续工作中通过多目融合或更强的深度估计基础模型来缓解。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2647_https_arxiv_org_abs_2512_13080/figures/010_Table_5.jpg]]
-*Table 5: Success rates (%) of VIPA-VLA v.s. baseline models on real robot tasks. Results are shown as sub-task / whole-task success rates*
-
-![[assets/figures/papers/paper_list_l2647_https_arxiv_org_abs_2512_13080/figures/011_Table_6.jpg]]
-*Table 6: Success rates (%) of VIPA-VLA v.s. baseline models on real robot tasks with unseen environments. Results are shown as sub-task / whole-task success rates*
-
-
 
 ## 定位与知识库关联
 
@@ -417,8 +383,6 @@ VIPA-VLA的核心贡献在于填补了当前视觉-语言-动作模型（VLA）�
 3. **自动注释流水线的扩展性**：在海量互联网视频上扩展Hand3D数据自动标注流水线的可行性及其对VLA模型泛化性的影响。这需要解决域偏移（互联网视频与机器人视角差异）和注释质量控制问题。
 
 4. **空间理解的深层评估**：Table 8和Figure 8显示VIPA-VLA-PT在3D方向评分（1.82/3 vs. 1.22/3）和距离误差（0.12m vs. 0.18m）上优于InternVL3.5基线，但绝对方向评分仍不完美。如何进一步提升空间理解的精度和鲁棒性，是一个开放的技术挑战。
-
-
 
 ## 原文 PDF
 

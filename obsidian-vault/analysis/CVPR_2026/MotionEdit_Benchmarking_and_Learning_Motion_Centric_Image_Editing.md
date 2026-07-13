@@ -52,8 +52,6 @@ claims:
 
 在方法定位上，MotionNFT 属于**强化学习驱动的扩散模型后训练**方法，其核心创新在于将光流几何对齐信号量化为可优化的奖励函数，与 MLLM 语义奖励以 0.5:0.5 的权重组合使用（Table 4），从而在不增加推理开销的前提下，显著提升模型对运动指令的空间理解与编辑忠实度。
 
-
-
 ### 图像编辑的现状与运动编辑的缺位
 
 图像编辑技术近年来取得了显著进展，基于扩散模型（Diffusion Models）和流匹配模型（Flow Matching Models）的方法在语义理解与生成质量上不断刷新记录。然而，现有研究与实践几乎全部聚焦于**静态外观编辑**——改变对象的颜色、纹理、风格或替换背景元素，而忽视了另一类普遍且关键的编辑需求：**运动编辑（Motion Editing）**。运动编辑要求模型根据自然语言指令，改变图像中主体的动作、姿态、空间位置或与环境的交互关系，例如“让猫从桌上跳下来”、“使舞者抬起左臂”。这类编辑不仅需要理解语义内容，更要求模型具备**空间变换推理能力**，能够准确执行指令所描述的运动轨迹与幅度。
@@ -73,8 +71,6 @@ claims:
 
 - **数据层面**：构建 **MotionEdit 数据集**，这是首个大规模、高质量的运动编辑数据集。通过视频驱动的数据挖掘管线，从动态视频序列中自动提取帧对并生成运动编辑指令，确保样本具有显著的、自然的运动变化，涵盖姿态变换、位移运动、视角变化、主体-物体交互及主体间交互等六类运动模式。
 - **方法层面**：提出 **MotionNFT（Motion-guided Negative-aware Fine-Tuning）** 后训练框架。其核心洞察在于：**通过光流奖励直接量化预测运动与真实运动的几何对齐程度，能够在不牺牲一般编辑能力的前提下，显著提升模型对运动指令的空间理解能力和编辑忠实度**。MotionNFT 将光流对齐信号作为奖励函数引入 DiffusionNFT 训练框架，通过计算输入-编辑图像与输入-真实目标图像间的光流一致性（幅度、方向、运动幅度正则化），显式地指导模型学习正确的运动变换，从而弥补了纯语义奖励无法捕捉几何精度的固有局限。
-
-
 
 ## 核心方法与创新机理
 
@@ -132,8 +128,6 @@ MotionNFT 对 DiffusionNFT 框架的核心改造集中于**奖励函数的组成
 
 这些局限指向未来的研究方向：融合物理或运动学先验（如关节约束、场景深度）以改进复杂姿态编辑的合理性；引入更强的身份嵌入机制以实现高保真身份保持；以及探索对极端运动条件更鲁棒的几何对齐度量。
 
-
-
 MotionNFT 是一个面向运动中心化图像编辑的后训练框架，其核心思想是将光流几何对齐信号显式引入扩散模型的奖励微调过程。该框架建立在 **DiffusionNFT**（一种面向流匹配模型的负感知微调方法）之上，通过扩展其奖励函数，使模型在训练中不仅接收语义质量反馈，还获得关于运动方向与幅度的几何指导。
 
 ### 模块架构与数据流
@@ -166,15 +160,8 @@ MotionNFT 的整体管线由四个关键模块串联构成，形成“生成—�
 
 - **训练稳定性**：如 Figure 9 和 Figure 10 所示，仅使用 MLLM 奖励的训练在约 150 步后运动对齐分数（MAS）开始退化，而 MotionNFT 的 MAS 持续上升，表明光流奖励有效防止了对语义信号的过拟合。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2_MotionEdit_Benchmarking_and_Learning_Motion_Centric_Image_Editing_motion20v2/figures/005_Figure_4.jpg]]
-*Figure 4: MotionEdit’s data construction pipeline. We segment raw videos, extract frame pairs, and automatically filter them using annte Int ose MLLM data quality judge. For all kept pairs, we use a MLLM rewrite module to generate clean, motion-focused editing instructions. Our“Make Doraemon and the boy turn their bodies and heads to face each other “Change the character's pose: straighten body from a slight crouch to an upright, “Have the female dental professional turn aw pipeline enables scalable construction of high-quality motion editing data and can be extended to much larger video corpora*
-
 ![[assets/figures/papers/paper_list_l2_MotionEdit_Benchmarking_and_Learning_Motion_Centric_Image_Editing_motion20v2/figures/009_Figure_7.jpg]]
 *Figure 7: MotionNFT’s Reward Scoring pipeline. For each sampled model-edited image, we measure the alignment between the input-generated optical flow and the input-ground truth optical flow, obtaining the final reward score*
-
-
 
 ### 基座模型：基于流匹配的编辑框架
 
@@ -260,8 +247,6 @@ $$\mathrm{MAS} = 100.00 \cdot \left(1 - \mathrm{clip}\left(\frac{\mathcal{D}_{\m
 
 其中 $\mathcal{D}_{\mathrm{ovl}} = \alpha \mathcal{D}_{\mathrm{mag}} + (1 - \alpha) \mathcal{D}_{\mathrm{dir}}$ 为幅度与方向一致性的加权组合偏差，$d_{\mathrm{min}}$ 和 $d_{\mathrm{max}}$ 为数据集层面的归一化边界。若预测光流为零（即模型完全未执行运动编辑），MAS 直接赋值为 0。该指标将光流对齐程度映射到 0–100 分，分数越高表示运动编辑越忠实于真实目标。
 
-
-
 ## 实验与关键发现
 
 本章节系统评估 MotionNFT 在 MotionEdit-Bench 上的运动编辑性能，并通过消融实验验证光流运动奖励与 MLLM 语义奖励的互补机制。
@@ -302,8 +287,6 @@ $$\mathrm{MAS} = 100.00 \cdot \left(1 - \mathrm{clip}\left(\frac{\mathcal{D}_{\m
 
 这些失败模式揭示了当前运动编辑方法在空间分配精度和身份保持机制上的根本局限，也为后续研究指明了改进方向。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2_MotionEdit_Benchmarking_and_Learning_Motion_Centric_Image_Editing_motion20v2/figures/008_Table_1.jpg]]
 *Table 1: Quantitative results on MOTIONEDIT-BENCH. Among existing methods, Step1X-Edit and BAGEL achieve the strongest motionediting performance, while diffusion-based editors such as AnyEdit and MagicBrush perform poorly across both generative and discriminative metrics. FLUX.1 Kontext and Qwen-Image-Edit models trained with MotionNFT yields the best overall results: for both models, applying MotionNFT boosts all generative metrics, MAS and pairwise win rate*
 
@@ -318,23 +301,6 @@ $$\mathrm{MAS} = 100.00 \cdot \left(1 - \mathrm{clip}\left(\frac{\mathcal{D}_{\m
 
 ![[assets/figures/papers/paper_list_l2_MotionEdit_Benchmarking_and_Learning_Motion_Centric_Image_Editing_motion20v2/figures/011_Table_2.jpg]]
 *Table 2: Results on ImgEdit-Bench [37] MotionNFT not only preserves, but oftentimes boosts general editing performances*
-
-![[assets/figures/papers/paper_list_l2_MotionEdit_Benchmarking_and_Learning_Motion_Centric_Image_Editing_motion20v2/figures/012_Table_3.jpg]]
-*Table 3: Comparison to training with MLLM-based reward [15] only. Incorporating MotionNFT yields noticeable improvements MLLM-scored Overall editing quality, optical flow-based Motion Alignment Score, and the pairwise Win Rate across all models*
-
-![[assets/figures/papers/paper_list_l2_MotionEdit_Benchmarking_and_Learning_Motion_Centric_Image_Editing_motion20v2/figures/019_Figure_13.jpg]]
-*Figure 13: We compare MotionNFT against state-of-the-art baselines: UniWorld-V1 [15], BAGEL [7], and FLUX.1 Kontext [Dev] [14]. Red circles highlight failure regions. Baseline models exhibit different failure modes like editing inertia (e.g., failing to change the lion’s pose in row 2), or motion misalignment (e.g., raising the robot’s right arm instead of left arm in row 5). While baselines often struggle to execute challenging motion edits, MotionNFT achieves superior geometric grounding, accurately following semantic instructions and maintaining high motion fidelity to the ground truth*
-
-![[assets/figures/papers/paper_list_l2_MotionEdit_Benchmarking_and_Learning_Motion_Centric_Image_Editing_motion20v2/figures/023_Figure_14.jpg]]
-*Figure 14: We conduct selective case studies of MotionNFT against leading closed-source commercial baselines: Nano-Banana [8], GPT-Image-1 [22], Seedream [26], and Hunyuan Image [3]. Red circles highlight failure regions where baselines exhibit spatial inertia (e.g., failing to displace the car in the bottom row) or structural hallucination (e.g., generating an artifact “foot” in the second row). While commercial models generally maintain high visual quality, they frequently struggle to ground complex motion changes or maintain visual consistency. MotionNFT accurately follows these dynamic instructions, ensuring geometric alignment with the ground truth*
-
-![[assets/figures/papers/paper_list_l2_MotionEdit_Benchmarking_and_Learning_Motion_Centric_Image_Editing_motion20v2/figures/007_Figure_6.jpg]]
-*Figure 6: Comparison of motion difference between before- and post-edit images in different datasets [2, 33, 38–40]. Our MO-TIONEDIT dataset achieves the most significant motion changes*
-
-![[assets/figures/papers/paper_list_l2_MotionEdit_Benchmarking_and_Learning_Motion_Centric_Image_Editing_motion20v2/figures/022_Figure_15.jpg]]
-*Figure 15: Additional failure cases of our model and closed-source commercial models. We observe that instructions involving multiple involving and non-involving subjects (e.g. the orca example in row 1, which requires complex 3D spatial edit) remain challenging for all evaluated methods. Current models, including ours and commercial baselines, struggle to correctly generate accurate and targeted motions on the correct subject part with the correct direction and magnitude in challenging scenarios*
-
-
 
 ## 定位与知识库关联
 
@@ -383,8 +349,6 @@ MotionNFT 的有效性已在以下条件下得到验证：
 4. **光流鲁棒性**：光流奖励对快速运动、运动模糊、大位移等极端情形的鲁棒性还有待探索。这直接关系到方法在实际应用中的可靠性。
 
 5. **模型架构迁移**：MotionNFT 当前仅验证了 Flow Matching 架构，其在其他生成范式（如自回归模型、GAN）上的适用性尚不明确。
-
-
 
 ## 原文 PDF
 

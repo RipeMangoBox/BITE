@@ -87,8 +87,6 @@ MotionPro 在细粒度和目标级运动控制两个维度上均取得显著提�
 - 未对比更近期的视频扩散模型（如 CogVideoX），在更强基线上的提升有待验证。
 - 多独立运动物体场景下的信号分工机制尚未深入探索。
 
-
-
 图像到视频（I2V）生成旨在从单张静态参考图像出发，合成一段具有自然动态的视频。随着扩散模型在视频生成领域的快速发展，I2V的视觉质量已取得显著提升，但**精确的运动控制**仍然是一个核心瓶颈——用户不仅希望视频“动起来”，更希望视频中的运动与指定的轨迹精确对齐，同时能够区分运动的主体类别（物体运动 vs. 相机运动）。
 
 ### 现有方法的缺口：高斯滤波轨迹的模糊性
@@ -110,8 +108,6 @@ MotionPro 在细粒度和目标级运动控制两个维度上均取得显著提�
 - **运动掩码（Motion Mask）**：基于光流幅度的时序平均值进行阈值化，生成二进制掩码，显式标识视频中发生运动的区域。该掩码从全局视角强调运动区域，帮助模型区分物体运动与相机运动——例如，当整个画面都在运动时，掩码覆盖全图，暗示相机运动；当仅局部区域有运动时，掩码仅覆盖该区域，暗示物体运动。
 
 通过将区域级轨迹（提供局部精确的运动细节）与运动掩码（提供全局的运动区域标识）联合作为控制条件，MotionPro 实现了从“模糊控制”到“精确互补控制”的范式转变，为细粒度和目标级运动控制提供了统一的解决方案。
-
-
 
 ## 核心方法与创新机理
 
@@ -151,8 +147,6 @@ $$\mathcal{W}' = \mathcal{W} + \Delta\mathcal{W} = \mathcal{W} + AB^T$$
 
 消融实验（Section 6.4）直接验证了核心创新的因果作用：移除区域级轨迹（MotionPro$^{-traj}$）使 FVD 从 59.88 升至 73.7；移除运动掩码（MotionPro$^{-mask}$）使 FVD 升至 66.2，证明两个信号缺一不可。在 MC-Bench 上，MotionPro 的 MD-Img 和 MD-Vid 分别领先 **DragAnything** 1.82 和 2.78，人类评估中运动质量偏好率高达 75%（细粒度）和 68.75%（目标级），远超基线方法。
 
-
-
 ![[assets/figures/papers/paper_list_l35_MotionPro_A_Precise_Motion_Controller_for_Image_to_Video_Generation/figures/002_Figure_2.jpg]]
 *Figure 2: An overview of (a) our MotionPro for controllable I2V generation and (b) pipeline of motion condition generation. During training, MotionPro first extracts the proposed region-wise trajectory and motion mask on the input video as the control signals. The multiscale features are then learnt on these signals by a motion encoder, and further injected into the 3D-UNet of SVD in a feature modulation manner. Meanwhile, LoRA layers are integrated into all attention modules in the transformer blocks to improve the optimization of motiontrajectory alignment. In the inference stage, the region-wise trajectory and motion mask are first derived from the user provided trajectory and brushed region, and...*
 
@@ -169,8 +163,6 @@ $$h_s' = GN(h_s) \cdot \gamma_s + \beta_s + h_s$$
 **推理阶段**，区域级轨迹和运动掩码由用户提供的轨迹线与涂抹区域推导而来，经相同的运动编码器与特征调制通路注入 3D-UNet，校准视频去噪过程，最终生成与输入控制信号精确对齐的视频。
 
 整个 pipeline 的核心设计逻辑在于：区域级轨迹负责局部精确采样，运动掩码负责全局运动类别标识，二者通过自适应特征调制实现松耦合但互补的控制，避免了传统高斯滤波轨迹带来的细节模糊与运动歧义问题。
-
-
 
 MotionPro 的核心设计围绕三个关键模块展开：运动条件生成、自适应特征调制与高效微调策略。以下逐一剖析其技术细节与公式含义。
 
@@ -234,8 +226,6 @@ $$\mathcal{W}' = \mathcal{W} + \Delta \mathcal{W} = \mathcal{W} + A B^T$$
 
 其中 $A$ 和 $B$ 为低秩矩阵。这种策略在保持基座模型泛化能力的同时，显著提升了运动-轨迹对齐精度，且仅引入极少可训练参数。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -278,13 +268,6 @@ MotionPro 在细粒度运动控制和目标级运动控制两个设定下均展�
 MotionPro 对运动掩码的形状变化具有较强的鲁棒性：训练时掩码由 DOT 光流阈值化生成（并非精确标注），推理时即使使用不同形状的掩码区域，生成质量仍保持稳定（Figure 10）。这一特性源于训练阶段引入的掩码随机丢弃机制，使模型学会从非精确掩码中提取运动区域信息。
 
 然而，该方法的运动条件质量受限于外部光流追踪模型 DOT 的精度。在包含遮挡、快速运动或纹理稀疏的复杂场景中，DOT 估计的光流可能存在误差，进而影响区域级轨迹和运动掩码的准确性。此外，运动掩码基于光流幅度阈值化（阈值为 1）生成，可能遗漏平滑或微小的运动区域，且边界精度有限。论文未在更强基线（如 CogVideoX）上进行对比验证，其在更近期视频扩散模型上的增益幅度仍有待确认。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l35_MotionPro_A_Precise_Motion_Controller_for_Image_to_Video_Generation/figures/008_Figure.jpg]]
-*Figure: Input Control MOFA-Video DragAnything MotionPro*
-
-
 
 ## 定位与知识库关联
 
@@ -345,8 +328,6 @@ MotionPro 的训练条件（区域级轨迹和运动掩码）完全依赖 DOT �
 3. **与文本提示的语义融合**：能否将区域级轨迹控制与文本提示进一步结合，实现更语义化的运动生成（如“让这只鸟沿弧形轨迹飞翔，同时翅膀扇动”）？这需要在运动编码器中引入跨模态对齐机制。
 
 4. **实时交互式控制**：当前推理流程需要用户提供轨迹和掩码，能否实现画笔式实时交互，让用户在生成过程中动态调整运动条件？这对运动编码器的推理效率提出更高要求。
-
-
 
 ## 原文 PDF
 

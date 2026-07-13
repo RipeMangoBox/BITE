@@ -55,8 +55,6 @@ claims:
 
 方法的主要局限包括：继承自现有T2T3D范式的对扩散模型质量的依赖、训练目标方差大导致对提示工程敏感，以及相似提示在摊销训练中可能坍缩为相同场景。开放问题指向更大规模提示集的设计、更强生成器骨干的需求，以及摊销训练与更高质量三维表示（如纹理网格）结合的可能性。
 
-
-
 ### 文本到三维生成：从逐提示优化到摊销推理
 
 文本到三维（Text-to-3D, T2T3D）物体的自动生成在游戏、影视、虚拟现实等领域有广泛需求。近期工作，尤其是**DreamFusion**（Poole et al., 2022），利用预训练的文本到图像扩散模型作为先验，通过分数蒸馏采样（Score Distillation Sampling, SDS）优化神经辐射场（NeRF），首次实现了从任意文本提示直接生成三维物体的能力，无需任何三维训练数据。
@@ -76,8 +74,6 @@ ATT3D 的核心思想是**将逐提示优化转化为多提示联合训练的摊
 - **用户侧前馈推理阶段**：训练完成后，对于任意新提示，模型可在**不到1秒内、单张消费级GPU上**生成准确的三维物体，无需任何额外优化。
 
 这一范式转变的动机源于一个简单观察：如果逐提示优化需要4小时/提示，那么优化100个提示需要400小时；而摊销训练通过共享计算，可以在远小于该总时间的预算内完成，且获得向未见提示泛化的额外收益。
-
-
 
 ## 核心方法与创新机理
 
@@ -110,8 +106,6 @@ ATT3D 的核心创新在于将文本到三维（Text-to-3D）的优化范式从*
 ### 创新机制的本质
 
 上述三个变更槽位共同支撑了一个核心洞察：**通过同时优化大量提示，共享的 NeRF 生成模型学会分解并重用三维组件**（如动物身体、道具、材质），从而以更低的总计算量覆盖多提示，并天然具备向未见组合提示的泛化能力。这一机制在实验中得到验证：仅使用 12.5% 的提示训练时，ATT3D 对未见提示的生成质量已超过逐提示优化在全部提示上的效果（Figure 6 右, Figure 8）。
-
-
 
 ATT3D 将文本到三维（TT3D）的生成过程拆分为两个阶段：**离线摊销优化**与**前馈式快速推理**。其核心思想是用一个共享的映射网络（超网络）替代 DreamFusion 等逐提示独立优化的范式，使模型在大量文本提示上联合训练，从而摊销优化成本并实现跨提示的知识共享。
 
@@ -155,12 +149,8 @@ $$m\left( (1-\alpha) \pmb c_1 + \alpha \pmb c_2 \right)$$
 
 为保证对比的公平性，摊销训练与逐提示训练采用完全相同的 NeRF 渲染实现和 SDS 损失，网络架构也保持一致（仅映射网络的引入方式不同）。所有对比均以每个提示的平均渲染帧数作为计算预算单位，消除了 GPU 数量和批大小差异的影响。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l36_https_arxiv_org_abs_2306_07349/figures/001_Figure_1.jpg]]
 *Figure 1: Our method initially trains one network to output 3D objects consistent with various text prompts. After, when we receive an unseen prompt, we produce an accurate object in \< 1 second, with 1 GPU. Existing methods re-train the entire network for every prompt, requiring a long delay for the optimization to complete. Further, we can interpolate between prompts for user-guided asset generation (Fig. 3). We include a project webpage with an overview and videos*
-
-
 
 ### 两阶段文本到三维管道
 
@@ -243,8 +233,6 @@ $$\hat{\epsilon} = \epsilon_{\mathrm{uncond.}} + (1-\alpha)\omega_1\epsilon_{\ma
 - **谱归一化**：去除谱归一化将导致训练数值不稳定和无法收敛，是摊销训练成功的关键稳定技术。
 - **Dirichlet插值权重**：插值权重 $\alpha$ 的浓度参数 $\kappa$ 影响生成结果——小 $\kappa$ 聚焦端点（保持原始提示特征），大 $\kappa$ 聚焦中点（融合两个提示特征）。训练早期选择 $\kappa$ 对最终结果有决定性影响。
 
-
-
 ## 实验与关键发现
 
 ### 核心定量结果：摊销训练在任何计算预算下均优于逐提示优化
@@ -270,12 +258,6 @@ ATT3D的核心优势在于将文本到三维（TT3D）的优化过程从“每�
 ![[assets/figures/papers/paper_list_l36_https_arxiv_org_abs_2306_07349/figures/028_Figure.jpg]]
 
 ![[assets/figures/papers/paper_list_l36_https_arxiv_org_abs_2306_07349/figures/029_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l36_https_arxiv_org_abs_2306_07349/figures/030_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l36_https_arxiv_org_abs_2306_07349/figures/032_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l36_https_arxiv_org_abs_2306_07349/figures/034_Figure.jpg]]
 
 ### 泛化能力与组件重用机制
 
@@ -303,19 +285,6 @@ ATT3D在DF411提示集（411个提示，超过DF27十倍以上）上的训练结
 - **对提示工程敏感**：继承自SDS训练范式，训练目标方差大，对提示措辞敏感。
 - **未训练插值时的退化**：未专门进行插值摊销训练的模型在插值嵌入上生成质量下降，需额外训练才能获得Figure 3所示的平滑过渡效果。
 - **更大规模提示集的需求**：当前提示集规模尚不足以测试摊销训练的极限，需要更大规模、以物体为中心的提示集进行进一步验证。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l36_https_arxiv_org_abs_2306_07349/figures/003_Figure.jpg]]
-*Figure: Rendered frames from ATT3D with text embedding (1 − α)c1 + αc2 for α ∈ [0, 1]*
-
-![[assets/figures/papers/paper_list_l36_https_arxiv_org_abs_2306_07349/figures/008_Figure.jpg]]
-*Figure: Testing prompt for Amortized 50% split, at 4800*
-
-![[assets/figures/papers/paper_list_l36_https_arxiv_org_abs_2306_07349/figures/018_Figure.jpg]]
-*Figure: Finetuning iteration Various strategies on “a pig wearing medieval armor holding a blue balloon” Amortized*
-
-
 
 ## 定位与知识库关联
 
@@ -369,8 +338,6 @@ ATT3D 处于 **文本到三维生成** 与 **摊销优化** 的交叉点。其�
 - **组合泛化**：通过摊销训练隐式学习语义组件的分解与组合，与组合式生成模型的研究方向相关。
 
 从方法谱系看，ATT3D 是从“优化式生成”向“前馈式生成”过渡的代表性工作，为后续的快速文本到三维方法（如基于扩散先验的直接三维生成模型）提供了重要的中间范式。
-
-
 
 ## 原文 PDF
 

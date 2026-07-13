@@ -79,8 +79,6 @@ MIDAS通过将有害关键词的平均暴露位置从48.44%推迟到64.53%，并
 
 该方法目前仅在静态多图像场景下验证，尚未探索长时程视频或流式输入中的行为；游戏模板设计依赖人工经验，可能引入认知偏差；在强防御（如ShieldLM）下成功率下降至约48.81%，表明输入过滤仍有一定抑制作用。
 
-
-
 多模态大模型（MLLM）通过融合视觉与文本输入，展现出强大的跨模态理解和生成能力，其生成过程可形式化为 $r = \Gamma(i, t)$ 及自回归分布 $p_{\Theta}(z \mid i, t) = \prod_{k=1}^{|z|} p_{\Theta}(z_k \mid z_{<k}, r)$。然而，这种跨模态融合机制在拓展模型能力边界的同时，也引入了新的安全脆弱面——攻击者可通过精心构造的视觉-文本联合输入，诱导模型生成被禁止的有害内容。
 
 当前针对MLLM的越狱攻击方法主要沿两条路径展开：**单图像视觉提示**（如FigStep, Gong et al., 2025；SI-Attack, Zhao et al., 2025b）和**跨模态语义操纵**（如HADES, Li et al., 2024b；VisCRA, Sima et al., 2025；HIMRD, Teng et al., 2024）。这些方法的核心思路是将有害语义嵌入视觉通道，试图绕过以文本为主的安全过滤器。然而，它们存在一个共同的结构性缺陷：**有害语义在单一模态（单张图像或孤立视觉线索）中过于集中，模型的安全注意力能够在浅层推理阶段便被激活并阻断攻击**。即便VisCRA引入了单图像掩码与分步推理，其推理链长度仍然有限（平均仅419.64 tokens），有害关键词在生成序列中的平均暴露位置仅为48.44%，安全机制有充足时间介入。
@@ -88,8 +86,6 @@ MIDAS通过将有害关键词的平均暴露位置从48.44%推迟到64.53%，并
 更深层的瓶颈在于：**MLLM的安全对齐在面对多步跨模态推理时，其安全注意力会随着推理链的延长而滑移**。现有方法未能有效利用这一特性——它们或依赖单图像、或仅进行浅层推理扩展，无法迫使模型进入长时间的结构化推理状态，从而无法突破对齐较强的闭源模型（如GPT-4o、Gemini-2.5-Pro）的安全防护。这一缺口在强防御设置下尤为突出：当部署防御性系统提示时，VisCRA对Gemini-2.5-Pro的攻击成功率（ASR）仅剩5.36%。
 
 上述分析揭示了一个关键的可控因素：**通过将有害语义分解并分散到多个图像中，利用游戏式视觉推理模板强制模型进行长时间的结构化推理，从而延迟有害内容的暴露并降低安全注意力，是提升越狱成功率的核心机制**。MIDAS正是围绕这一洞察展开设计——将有害查询拆分为风险子单元，隐藏于看似无害的视觉谜题中，结合人格驱动的文本重构诱导模型逐步融合并重建恶意意图，利用自回归生成惯性在安全机制反应前输出有害内容。
-
-
 
 ## 核心方法与创新机理
 
@@ -128,11 +124,6 @@ MIDAS 的核心创新在于将越狱攻击从“单模态集中暴露”重构�
 ### 创新协同的实证验证
 
 五个 changed slots 的协同效应在强防御场景下尤为突出：在最强防御系统提示（System Prompt 3）下，MIDAS 对 Gemini-2.5-Pro 仍保持 67.26% 的 ASR，而 VisCRA 仅剩 5.36%（Table 8）。跨评判一致性实验（Table 12）使用四个独立评判模型（GPT-5-nano、Gemini-2.5-FT、Qwen3、DeepSeek-R1）验证了结果的稳健性，排除单一评判偏差的干扰。
-
-
-
-![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_tXsE2wKPvx/figures/002_Figure_2.jpg]]
-*Figure 2: Pipeline of MIDAS. (1) Text Process: extract risk-bearing units, decompose them into subunits, and replace them with placeholders; (2) Image Process: embed the subunits into multiple benign-looking puzzle images that enforce step-by-step reasoning; (3) Model Output: the model decodes puzzle fragments, reconstructs the hidden semantics, and generates harmful responses under persona-driven reasoning guidance*
 
 ![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_tXsE2wKPvx/figures/001_Figure_1.jpg]]
 *Figure 1: Overview. (a) Compared to text-only (T) and text+image (T+I) attacks that are blocked by safety filters, our proposed MIDAS leverages Game-based Visual Reasoning (GVR) to bypass defenses and induce harmful outputs. (b) Examples of visual reasoning puzzles used in our MIDAS. (c) Our proposed MIDAS achieves significantly higher Attack Success Rate (ASR) and Harmfulness Rating (HR) than other baselines*
@@ -182,8 +173,6 @@ MIDAS 的流水线可细化为五个功能模块，各模块之间存在严格�
 **冗余比约束**：设关键词数量为 $k$，图像数量为 $H$，强制要求冗余比 $\rho = H/k \geq 2$，确保每个风险词至少被分割到两张图像中。超参数敏感性分析（Figure 3）表明，在 $(k=3, H=6)$ 时取得最优的 ASR 与 HR 权衡，这也是后续所有实验的默认配置。
 
 **游戏式推理的核心地位**：消融实验（Table 5）提供了决定性证据——移除游戏式视觉推理后，ASR 从 80% 骤降至 22%，证明该模块是框架中最关键的组件。相比之下，将多图像分散替换为单图像处理后 ASR 降至 50%，移除角色驱动诱导后降至 59%，影响虽显著但不及游戏推理剧烈。
-
-
 
 ### 3.1 问题形式化与越狱目标
 
@@ -241,8 +230,6 @@ $$\bar{R} = \left[\hat{S}(i_1), \hat{S}(i_2), \dots, \hat{S}(i_H)\right]$$
 
 模型在文本占位符处依次填充解码结果，利用自回归生成惯性在安全机制反应前输出完整有害内容。这一多步结构化推理驱动的重构过程是延迟有害语义暴露的核心机制——消融实验证实，移除游戏式视觉推理后，ASR从80%骤降至22%（Table 5），验证了该模块的决定性作用。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -287,20 +274,12 @@ Table 5 展示了在 AdvBench 上逐步移除 MIDAS 各组件的效果，完整 
 
 **推理链延长效应（Table 6）**：MIDAS 将有害关键词的平均暴露位置从 VisCRA 的 48.44% 推迟到 64.53%，平均推理长度从 419.64 tokens 延长至 3195.30 tokens（约 7.6 倍）。这表明 MIDAS 通过游戏式视觉推理强制模型进入更长、更结构化的推理轨迹，有害语义仅在生成的后期阶段才被揭示，从而在安全机制反应前完成有害输出。
 
-![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_tXsE2wKPvx/figures/010_Table_6.jpg]]
-*Table 6: Comparison of keyword exposure position and reasoning length on the HADES benchmark*
-
 **LlamaGuard 安全性评估（Figure 4a）**：使用 LlamaGuard 对输入和输出进行安全性分类，结果显示 MIDAS 的输入被一致判定为安全，而输出则被判定为有害，证明该攻击能有效绕过基于输入过滤的安全检测。
 
 **防御鲁棒性（Table 7, Table 8, Figure 4b）**：
 - 在 ShieldLM 外部过滤防御下，MIDAS 的 ASR 从 99.16% 降至 48.81%，但仍显著高于 VisCRA 的 7.50%。
 - 在 Self-Reminder 内部自校正防御下，MIDAS 保持 70.83% ASR，而 VisCRA 仅 10.83%。
 - 在三种不同强度的防御系统提示下（Table 8），MIDAS 对 Gemini-2.5-Pro 的 ASR 分别为 85.71%、81.82% 和 67.26%，而 VisCRA 在最严格提示下仅剩 5.36%。MIDAS 的 ASR 相对下降幅度远小于 VisCRA，证明多图像分散策略对防御提示具有更强的鲁棒性。
-
-![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_tXsE2wKPvx/figures/021_Table_8.jpg]]
-*Table 8: ASR comparison under different defensive system prompts*
-
-![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_tXsE2wKPvx/figures/018_Table_7.jpg]]
 
 ### 游戏模板与复杂度分析
 
@@ -312,22 +291,12 @@ Table 5 展示了在 AdvBench 上逐步移除 MIDAS 各组件的效果，完整 
 
 Table 12 使用 GPT-5-nano、Gemini-2.5-FT、Qwen3 和 DeepSeek-R1 四个独立评判模型对 GPT-4o 和 GPT-5-Chat 上的攻击结果进行评估。尽管不同评判器的绝对评分因严格度不同而略有波动，MIDAS 在所有评判器下均一致超越所有基线方法，确认实验结果不受单一评判偏差影响。
 
-![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_tXsE2wKPvx/figures/025_Table_12.jpg]]
-*Table 12: Cross-judge evaluation results attacking GPT-4o and GPT-5-Chat. While absolute scores vary slightly due to different judge strictness, MIDAS consistently outperforms all baselines across every evaluator, confirming that our results are robust to the choice of judge*
-
 ### 失败模式与局限性
 
 - **强外部过滤**：在 ShieldLM 防御下 ASR 降至约 48.81%，表明基于输入的过滤仍对 MIDAS 有一定抑制作用，部分有害查询在输入阶段即被拦截。
 - **极高复杂度模板**：CAPTCHA 模板的 ASR 相对较低（87.76%），过高的感知难度可能导致模型解码失败，反而降低攻击成功率。
 - **静态图像场景限制**：方法仅在静态多图像场景下验证，未探索长时程视频或流式输入中的行为，该场景下的有效性需要手动验证。
 - **评判偏差**：尽管进行了跨评判验证，绝对评分仍可能受评判模型严格度的影响，不同评判器间的绝对数值不可直接横向对比。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_tXsE2wKPvx/figures/020_Table_7.jpg]]
-*Table 7: ASR comparison between VisCRA and our MIDAS under different defense mechanisms. MIDAS demonstrates significantly higher robustness against both external filtering and internal self-correction*
-
-
 
 ## 定位与知识库关联
 
@@ -366,8 +335,6 @@ MIDAS 的知识贡献可分解为三个相互强化的机制，每个机制都�
 2. **过程感知防御**：当前防御（ShieldLM、Self-Reminder）主要依赖输入过滤或输出自检。能否开发推理过程感知的监控机制，在中间状态检测有害意图的重构趋势，而非仅靠静态筛查？
 3. **模板自动优化**：游戏模板的难度和多样性目前依赖人工设计。能否自动搜索最优模板配置以最大化攻击效果，同时保持对安全过滤器的隐蔽性？
 4. **动态多阶段防御**：面对迟滞性语义重构攻击，如何设计动态、多阶段防御体系，在推理链的不同节点设置检查点，同时避免对正常多步推理任务的过度干扰？
-
-
 
 ## 原文 PDF
 

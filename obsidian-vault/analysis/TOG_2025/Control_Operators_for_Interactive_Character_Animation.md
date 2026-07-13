@@ -59,8 +59,6 @@ claims:
 
 方法定位上，Control Operators 属于**控制编码自动化框架**，区别于手工特征工程的整体式控制器设计，也不同于强化学习中的策略网络条件化方案。它通过有监督学习将多任务控制变量整合进单一网络，在方法谱系中填补了“非技术用户可组合、可复用的控制编码原语”这一空白。
 
-
-
 交互式角色动画是游戏与虚拟现实领域的核心技术，其目标是根据用户实时输入生成自然、响应迅速的角色运动。近年来，基于神经网络的控制器在运动质量与多样性上取得了显著进展，但在实际生产落地中面临一个根本性瓶颈：**控制输入的设计高度依赖定制化的特征工程与专用网络架构**。每当设计师希望添加新的控制模式（如从轨迹跟随切换到移动到目标，或引入风格化运动），通常需要重新设计输入特征、调整网络结构并重新训练整个模型。这种控制设计与神经网络的深度耦合，使得非技术用户（如动画师、游戏设计师）难以独立扩展和组合多种行为，迭代成本极高。
 
 现有工业界的主流方案各有局限。**Motion Matching**（Büttner and Clavet 2015; Clavet 2016）通过最近邻搜索从动画数据库中选取片段，运动真实感强，但控制逻辑与数据检索紧密绑定，扩展新行为需要大量手工标注与规则调整。**Animation Blueprints**（Unreal 2022a）提供了可视化的动画逻辑编排能力，但本质上仍是状态机或流程图的变体，面对复杂、连续的多行为融合时，状态爆炸和过渡设计成为瓶颈。学术界基于学习的控制器虽然能生成高质量运动，但其控制接口往往是整体设计的——一个网络对应一组固定的控制信号，缺乏模块化和可复用性。
@@ -68,8 +66,6 @@ claims:
 本文的核心洞察在于：**将控制问题分解为一组有限的语义操作符，并自动生成对应的可训练神经网络模块**，可以实现控制意图与网络结构的解耦。具体而言，Control Operators 框架允许用户以类似逻辑和语义操作的方式组合控制操作符（如 Null, Bool, Encode, And, Or, Set, Array 等），系统自动将这些操作符映射为背后的神经网络原语（线性层、注意力机制、拼接等），从而在不要求用户具备机器学习知识的前提下，构建支持多技能、多控制模式的交互式角色控制器。用户只需通过蓝图脚本定义控制模式，网络架构便随之自动生成，无需手动设计输入层或特征编码流程。
 
 该框架与具体控制器架构无关，论文已成功将其应用于两种前沿方案：基于片段的 Learned Motion Matching 变体，以及基于 Flow Matching 的自回归模型。实验表明，Control Operators 不仅能够学习将语义相似的控制意图（如向左转的轨迹与置于左侧的目标）映射到相同的控制编码空间，还展现出跨任务风格泛化能力——仅在轨迹跟随任务上训练的特定风格，可自动泛化到移动到目标任务中。用户研究进一步证实，本文系统在可扩展性上显著优于 Motion Matching 和 Animation Blueprints，运动真实感与 Motion Matching 相当，为非技术用户的交互式角色动画设计提供了一条可行的解耦路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -119,8 +115,6 @@ Control Operators 的自动编码网络展现出超出显式设计的泛化特�
 
 尽管 Control Operators 大幅降低了控制设计的门槛，其当前形式仍存在若干局限：训练时间较长（最复杂控制器约 20 小时），缺乏对运动加速度、响应时间等动力学特性的直接精确控制，且用户仍需理解基本的操作符语义。如何进一步缩短训练迭代周期、开发更精细的模型调节机制，以及将操作符扩展至空间信息（如高度图的卷积操作符），是值得探索的开放方向。
 
-
-
 ![[assets/figures/papers/paper_list_l22_https_doi_org_10_1145_3763319/figures/002_Figure_2.jpg]]
 *Figure 2: Visual Overview of Control Operators. Here we show visual illustrations of our Basic Operators and examples of Control Operators defined in terms of other Control Operators*
 
@@ -153,8 +147,6 @@ Control Operators 框架将交互式角色动画控制器的设计问题，从�
 3. **映射运行时控制**：将游戏输入（如摇杆、目标点、风格选择）映射为控制变量，驱动实时动画生成。
 
 这一流程将控制设计的复杂性封装在操作符的组合逻辑中，而网络训练和推理的细节对用户完全透明。控制编码器网络的内存和计算开销极小（$<0.63\text{ MB}$，$<0.025\text{ ms}$），相对于主生成网络可忽略不计（Table 3），确保了运行时的实时性。
-
-
 
 ### 控制操作符体系
 
@@ -260,8 +252,6 @@ $$\mathcal{L}_{\theta_{\mathcal{V}'}} = \mathbb{E}_{f, \tilde{\mathbf{z}}} \left
 
 消融实验表明，蒸馏为单步后几乎不影响运动质量，同时推理时间从 2.890 ms 降至 0.784 ms。控制编码器网络的内存占用（<0.63 MB）和计算开销（<0.025 ms）相对主网络可忽略不计。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -276,9 +266,6 @@ $$\mathcal{L}_{\theta_{\mathcal{V}'}} = \mathbb{E}_{f, \tilde{\mathbf{z}}} \left
 *Table 1: Evaluations of common motion artifacts. We compare the performance of our method, Latent Auto-Regressive Flow-Matching (LAFM), to versions with the following components removed: Layer Normalization (LayerNorm), the Auto-Encoder Latent space (Latent), and Skip-Connections (Skip). This comparison is performed on our Internal Dataset, and the 100STYLE dataset. Statistics were computed from 100 randomly selected frames, each used to generate 20 auto-regressive rollouts lasting 20 seconds, starting from that initial frame. Measurements are taken without procedural adjustments applied*
 
 **推理效率**。Table 3 展示了各网络模块的内存占用和运行时间。蒸馏后的单步 Flow-Matching 模型的每帧推理时间仅为 0.784 ms，相比 4 步集成推理的 2.890 ms 减少了约 73%，且几乎不影响运动质量。控制编码器网络 C 的内存开销极小（<0.63 MB），CPU 评估时间 <0.025 ms，相对主网络可忽略不计。
-
-![[assets/figures/papers/paper_list_l22_https_doi_org_10_1145_3763319/figures/017_Table_3.jpg]]
-*Table 3: Memory usage and evaluation time of the different networks used as well as the total memory usage and the average per-frame runtime cost of different controller systems. Since the Control Encoder Network C size varies depending on the controls used we report the largest size used. Note that the learned motion matching Projector Network P is only evaluated every 8 frames*
 
 **用户研究**。Fig. 11 展示了本系统与 Motion Matching 和 Animation Blueprints 在五项指标上的 Likert 5 点量表评分分布。用户对本系统在可扩展性（scalability）上的评分显著优于两个基线，运动真实感（motion realism）与 Motion Matching 相当，验证了控制操作符在降低设计门槛的同时保持了高质量运动生成能力。
 
@@ -325,8 +312,6 @@ $$\mathcal{L}_{\theta_{\mathcal{V}'}} = \mathbb{E}_{f, \tilde{\mathbf{z}}} \left
 **动力学特性的间接控制**。系统缺乏对运动加速度、响应时间等动力学特性的直接精确控制，设计师仍需依赖经验调整控制参数。
 
 **操作符学习成本**。尽管框架大幅降低了控制设计门槛，用户仍需理解基本的操作符语义（如 And, Or, Optional 等），存在一定的学习曲线。
-
-
 
 ## 定位与知识库关联
 
@@ -391,8 +376,6 @@ Control Operators 通过 Optional、Either、Set、Array 等操作符统一处�
 4. **运行时安全介入**：在已部署的控制器中，是否能在异常情况下（如检测到不稳定运动）动态回退到安全策略，而无需重新训练整个网络？
 
 5. **跨任务风格泛化的边界**：实验表明，仅在轨迹跟随任务上训练的 Mummy 风格可泛化到移动到目标任务（Fig. 13），但这种泛化的边界条件尚不明确——当任务差异增大（如从移动任务泛化到坐下交互）时，风格迁移是否仍然有效？
-
-
 
 ## 原文 PDF
 

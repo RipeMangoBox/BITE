@@ -52,8 +52,6 @@ PlannerRFT 针对上述瓶颈提出了一个**闭环强化微调框架**，其�
 
 方法层面，PlannerRFT 属于**扩散规划器的强化微调范式**，与现有基于规则的 PDM-Closed、基于学习的 PlanTF/PLUTO 等方法形成互补。其技术路线融合了分类器引导扩散、策略梯度优化和 GPU 并行仿真三个技术分支，为生成式规划器的闭环自进化提供了新的技术路径。
 
-
-
 自动驾驶中的运动规划任务要求系统在高维、多模态的行为空间中做出安全且高效的决策。近年来，扩散模型因其强大的多模态生成能力而被引入规划领域，形成了以 **Diffusion Planner** 为代表的一类生成式规划器。这类方法通过去噪过程从高斯噪声中逐步恢复出符合场景约束的轨迹，在模仿学习（IL）范式下展现出了有竞争力的开环性能。
 
 然而，当扩散规划器被部署到闭环交互环境中时，一个根本性的瓶颈逐渐暴露：**模式崩溃（modality collapse）与场景不自适应**。如图 1(a) 所示，原生扩散规划器在去噪采样时倾向于生成高度集中的轨迹簇，缺乏足够的行为多样性。这使得在强化微调（Reinforcement Fine-Tuning, RFT）过程中，候选轨迹组无法有效覆盖行为空间，导致探索效率低下、优化信号不稳定。另一方面，以 **DiffusionDrive** 为代表的锚点（anchor）方法虽然通过固定锚点噪声引入了多样性，但其探索方向是场景无关的（scenario-agnostic），容易产生与驾驶上下文脱节的噪声交互（图 1(b)），同样难以稳定地利用奖励信号进行策略改进。
@@ -63,8 +61,6 @@ PlannerRFT 针对上述瓶颈提出了一个**闭环强化微调框架**，其�
 此外，闭环 RFT 的规模化部署还面临仿真效率的工程挑战。原生 nuPlan 仿真器的串行架构难以支撑大规模 on-policy rollout 的吞吐需求，这进一步制约了扩散规划器在闭环优化中的样本效率。PlannerRFT 通过引入 GPU 并行的 **nuMax** 仿真器，将仿真速度提升约 10 倍，为闭环 RFT 提供了基础设施支撑。
 
 综上，本文的动机源于一个清晰的因果链条：扩散规划器在闭环 RFT 中因模式崩溃和场景不自适应而无法有效利用奖励信号 → 去噪过程中的探索机制是调控这一瓶颈的关键环节 → 通过可学习的策略引导去噪，有望在保持稳定性的同时注入场景自适应的多模态性，从而显著提升闭环安全性与效率。
-
-
 
 ## 核心方法与创新机理
 
@@ -106,8 +102,6 @@ PlannerRFT 的核心技术贡献是**策略引导去噪**，它由三个紧密�
 
 这些 changed slots 并非独立改进，而是围绕“闭环高效探索”这一核心目标形成的耦合系统：策略引导去噪提供多模态候选轨迹，生存奖励提供细粒度优化信号，GRPO+PPO 双支优化分别调整轨迹分布和探索行为，nuMax 提供计算可行性保障。消融实验（Table 2）表明，移除策略引导（无引导/均匀/固定探索）会导致轨迹多样性-性能的失衡，验证了各组件间的强耦合关系。
 
-
-
 PlannerRFT 围绕 **闭环强化微调** 这一核心目标，将扩散规划器从纯模仿学习范式提升为可在线自我优化的策略。整个 pipeline 由三个关键阶段串联而成：**引导去噪采样**、**闭环仿真评估**与**双分支策略优化**，它们构成一个完整的生成–评估–优化循环（Figure 2）。
 
 ![[assets/figures/papers/paper_list_l912_https_arxiv_org_abs_2601_12901/figures/002_Figure_2.jpg]]
@@ -137,12 +131,8 @@ PlannerRFT 围绕 **闭环强化微调** 这一核心目标，将扩散规划器
 
 > **注意**：nuMax 当前使用 log-replay 而非 IDM 反应式交通模型，这可能降低交互仿真的真实度；在高度反应式场景中部署时需考虑该差异。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l912_https_arxiv_org_abs_2601_12901/figures/003_Figure_3.jpg]]
 *Figure 3: Illustration of nuMax. (a) Scenario cache: nuPlan scenarios are preprocessed and cached for fast loading during largescale RL rollouts; (b) LQR tracker and scorer: vehicle kinematics and reward computation are calibrated to match nuPlan; and (c) Distributed RL training pipeline: enables communication between PyTorch DistributedDataParallel (DDP) workers and the JAX-based simulator*
-
-
 
 PlannerRFT 的核心技术架构围绕**策略引导去噪（Policy-Guided Denoising）** 展开，由以下关键模块协同构成。
 
@@ -210,13 +200,6 @@ $$
 
 - **轨迹优化**：采用 GRPO（Group Relative Policy Optimization）微调 DiT 的轨迹分布，组大小 8 在性能与计算成本间取得最优平衡（Table A5）。
 - **探索优化**：采用 PPO 结合 GAE 优化探索策略的长期回报，使 $\eta$ 的采样分布随训练逐步收敛至高效探索区域。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l912_https_arxiv_org_abs_2601_12901/figures/007_Figure_5.jpg]]
-*Figure 5: Visualization of Different Exploration Policies. (a) Without guidance: denoising from random noise. (b) Uniform exploration policy*
-
-
 
 ## 实验与关键发现
 
@@ -296,27 +279,8 @@ PlannerRFT 以 **Diffusion Planner**作为 IL 预训练基座，在 nuPlan 数�
 3. **灾难性遗忘风险**：仅用碰撞场景微调会导致常规场景严重退化（Table 3），需精心设计数据分布。
 4. **视觉规划器泛化未验证**：当前工作聚焦于特权场景信息的轨迹级规划器，在相机输入的视觉运动规划器上的适用性仍是开放问题。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l912_https_arxiv_org_abs_2601_12901/figures/005_Table_1.jpg]]
 *Table 1: Closed-loop Planning Results on nuPlan Dataset. The highest and the second-best results of each benchmark are denoted by bold and underline*
-
-![[assets/figures/papers/paper_list_l912_https_arxiv_org_abs_2601_12901/figures/009_Table_4.jpg]]
-*Table 4: Ablations of the GRPO reward type and reward horizon*
-
-![[assets/figures/papers/paper_list_l912_https_arxiv_org_abs_2601_12901/figures/010_Table_5.jpg]]
-*Table 5: Ablations of the maximum guidance offset λ on the Test14-hard Reactive benchmark*
-
-![[assets/figures/papers/paper_list_l912_https_arxiv_org_abs_2601_12901/figures/011_Figure_6.jpg]]
-*Figure 6: Closed-loop performance of safety metrics during training under different exploration policy. Score denotes the nuPlan aggregate score, NC refers to No at-fault Collisions, DAC represents Drivable Area Compliance, and TTC indicates Time-to-Collision. Our adaptive exploration policy achieves consistently higher performance and stability across all metrics compared to fixed, uniform, and unguided exploration baselines*
-
-![[assets/figures/papers/paper_list_l912_https_arxiv_org_abs_2601_12901/figures/004_Figure_4.jpg]]
-*Figure 4: Qualitative Comparison of Pretrained Planner and RFT Planner. In each frame shot, the simulation position and planning trajectory are marked as orange, the ground-truth position and ground-truth trajectory recorded in the driving log are marked as gray and blue, respectively*
-
-![[assets/figures/papers/paper_list_l912_https_arxiv_org_abs_2601_12901/figures/016_Table.jpg]]
-*Table: A3. Closed-loop Planning Results on nuPlan Val14, Test14-hard, and Test14 benchmarks. “Diffusion PlannerDPM” employs the official 10-step DPM-solver. “Diffusion PlannerDDIM” employs a 5-step DDIM sampler, identical to that used in PlannerRFT. Table A4. Ablation on Guidance Type. Results are reported on the Test14-random reactive benchmark*
-
-
 
 ## 定位与知识库关联
 
@@ -365,8 +329,6 @@ PlannerRFT 的核心区分点在于：它是首个将**闭环强化微调**与**
 3. **自适应超参数**：引导偏移 $\lambda_{\text{lat}}, \lambda_{\text{lon}}$（Table 5 消融显示最优值分别为 2.0 和 1.5）和微调数据构成目前依赖人工调参。是否可以通过元学习或自动调参方法实现场景自适应调节？
 4. **探索策略的进一步优化**：当前探索策略输出 Beta 分布参数，是否可以通过更丰富的动作空间（如时变引导尺度、多模态混合分布）进一步提升探索效率？
 5. **与其他 RL 算法的兼容性**：PlannerRFT 采用 GRPO + PPO 双支路优化，是否可以从 PPO 切换到其他策略梯度方法（如 SAC、TD3）以获得更好的样本效率或稳定性？
-
-
 
 ## 原文 PDF
 

@@ -52,8 +52,6 @@ SimULi 针对这一瓶颈提出了一个因果性解决方案：**因子化3D高
 
 该方法在方法谱系中处于 3D 高斯溅射与多传感器联合仿真的交汇点。与 **SplatAD**（统一高斯表示，仅支持针孔相机）和 **NeuRAD**（Tonderski et al., CVPR 2024，基于 NeRF 的联合表示）不同，SimULi 通过因子化表示解耦传感器特性；与 **3DGUT**（Wu et al., CVPR 2025，支持畸变相机但无激光雷达）相比，SimULi 扩展了激光雷达渲染能力并引入自动瓦片策略。其自动瓦片策略无需手工启发即可适应任意旋转激光雷达模型，这一能力在先前的 SplatAD 中需要针对每种传感器单独设计。
 
-
-
 自动驾驶系统的闭环仿真与感知模型训练，高度依赖对多模态传感器数据的高保真重建与实时渲染。激光雷达（LiDAR）与相机是当前自动驾驶感知栈的两大核心传感器，前者提供精确的三维几何信息，后者捕获丰富的视觉外观。然而，现有方法在同时处理这两种模态时，始终面临一个根本性瓶颈：**无法在实时渲染的前提下，同时支持任意相机模型（如鱼眼镜头、卷帘快门）与激光雷达数据的高质量合成**。这一瓶颈迫使现有方案必须在某一模态的精度上做出妥协。
 
 具体而言，当前主流的传感器仿真方法可大致分为两类。第一类是基于神经辐射场（NeRF）的方法，如 **UniSim**（Yang et al., CVPR 2023）和 **NeuRAD**（Tonderski et al., CVPR 2024）。这类方法能够联合建模相机与激光雷达数据，但其体积渲染机制依赖逐射线采样，渲染速度极慢，难以满足实时仿真的需求。第二类是基于3D高斯泼溅（3DGS）的方法，如 **SplatAD**（Hess et al., CVPR 2025），通过光栅化渲染大幅提升了速度。然而，SplatAD 将相机与激光雷达信息编码到同一组高斯粒子中，并仅支持针孔相机模型，无法处理鱼眼镜头和卷帘快门等复杂相机效应。此外，其激光雷达瓦片策略依赖手工启发式规则，无法泛化到不同型号的旋转激光雷达传感器。
@@ -63,8 +61,6 @@ SimULi 针对这一瓶颈提出了一个因果性解决方案：**因子化3D高
 在渲染效率方面，激光雷达的测量模式具有高度不规则性：不同型号的传感器（如Waymo使用的64线激光雷达与PandaSet使用的旋转激光雷达）在仰角分布上差异显著。若采用等距瓦片进行光栅化，大量瓦片将不包含任何有效射线，造成严重的计算浪费。现有方法需要为每种传感器单独设计瓦片划分策略，缺乏通用性。
 
 在上述背景下，**SimULi** 提出了一个统一的实时传感器仿真框架，其核心动机是通过**因子化表示**打破跨传感器不一致性带来的精度瓶颈，并通过**自动化瓦片策略**与**无迹变换相机渲染**实现对任意传感器配置的实时支持。该方法不追求在单一表示中融合两种模态，而是让相机与激光雷达各自拥有独立的高斯粒子集，再通过几何锚定损失进行耦合，从而在保持实时渲染的前提下，同时提升两种模态的合成质量。
-
-
 
 ## 核心方法与创新机理
 
@@ -100,8 +96,6 @@ $$\mathcal{L}_{anchor} = \frac{1}{n} \sum_{i \in G_c}^{n} \| \mu_i - NN(\mu_i, G
 - **渲染速度**：相机渲染达 156.90 MP/s（SplatAD 的 3.1 倍），激光雷达渲染同样领先（Table 1）
 - **重建质量**：Waymo Interp 上 PSNR 30.15 dB，超越 SplatAD 2.33 dB（Table 1）；PandaSet 上 PSNR 29.76 dB，超越 SplatAD 1.18 dB（Table 3）
 - **参数效率**：SimULi 全局高斯数量上限为 4M，低于 SplatAD 的 5M，却同时实现了更快渲染与更高精度
-
-
 
 SimULi 的整体流程围绕一个核心设计展开：**将相机与激光雷达信息编码到两个独立的 3D 高斯粒子集中**，通过最近邻锚定损失进行耦合，从而在统一的动态场景图下实现跨模态的实时渲染与联合优化。
 
@@ -168,8 +162,6 @@ $$\mathcal { L } _ { \mathrm { r e g } } : = \mathcal { L } _ { \mathrm { e n t 
 ### 模块关系总结
 
 整个框架的模块间关系可概括为：场景图分解为表示提供可控性基础 → 因子化高斯集独立编码各模态信息 → 相机渲染器（基于无迹变换）和激光雷达渲染器（自动瓦片+射线剔除）并行工作 → 锚定损失实现跨模态几何耦合 → 多任务重建损失与正则化项联合驱动优化。这一设计使得 SimULi 在使用比 SplatAD 更少的高斯粒子（4M vs 5M）的条件下，实现了 1.5–20 倍的渲染加速和高达 40% 的误差降低。
-
-
 
 ### 1. 场景表示：因子化3D高斯
 
@@ -246,8 +238,6 @@ $$\mathcal{L}_{reg} := \mathcal{L}_{entropy} + \mathcal{L}_{TV} + \lambda_{drift
 
 包含熵正则（鼓励激光雷达高斯的二值不透明度）、总变分正则、身份漂移惩罚、尺度正则和透明度正则。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设计
@@ -291,19 +281,6 @@ SimULi 在三个主流自动驾驶仿真基准上进行了评估：**Waymo Inter
 3. **锚定损失计算开销**：K 最近邻计算增加约 14 分钟训练时间；减小 K 值或定制 CUDA 内核可缓解。
 4. **非旋转激光雷达扩展**：自动瓦片策略理论上可推广至方位和仰角两维，但尚未实现。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2510_12901/figures/003_Figure.jpg]]
-*Figure: (b) Elevation angle to tile map (c) Beam count per tile*
-
-![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2510_12901/figures/010_Figure_7.jpg]]
-*Figure 7: PandaSet. SimULi renders the fastest by >10×. Compared to other joint camera-LiDAR methods, ours provides the sharpest LiDAR renderings, especially near vehicles. Figure 8: Waymo Dynamic. As in Fig. 7, SimULi renders the fastest (as measured on an A40 GPU) and compares favorably to camera-LiDAR and LiDAR-only (Zhou et al., 2025) baselines*
-
-![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2510_12901/figures/019_Figure_10.jpg]]
-*Figure 10: Beam Divergence. We show a representative example where LiDAR divergence causes “bloating” (top-left) that our filter removes (top-right). We crucially omit the opacity compensation used in prior work (Steiner et al., 2025; Yu et al., 2024) as it blends foreground and background objects, adversely affecting the recovered street lamp geometry (bottom)*
-
-![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2510_12901/figures/007_Table_1.jpg]]
-*Table 1: Waymo Interp. SimULi renders the fastest, outperforms all baselines by >2dB PSNR, and gives better depth reconstruction than LiDAR-only LiDAR-RT (Zhou et al., 2025). with $\lambda _ { p h o t o }$ = 0 . 8 , $\lambda _ { S S I M }$ = 0 . 2 , $\lambda _ { d i s t }$ = 0 . 0 1 , $\lambda _ { i n t }$ = 0 . 1 , and $\lambda _ { r d }$ = 0 . 0 5 . Camera losses only require rendering and backpropagating through particles in $G _ { c }$ (and LiDAR losses through $G _ { l }$ )
 
 ![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2510_12901/figures/009_Table_2.jpg]]
 *Table 2: Waymo Dynamic. As with static reconstruction (Table 1), we render the fastest and report best or next-best results across every camera and LiDAR metric. we enforce smoothness across our affine color transformations A and background, and regularize Gaussian scale and opacity as in MCMC (Kheradmand et al., 2024). We provide details in Sec. D*
@@ -319,14 +296,6 @@ SimULi 在三个主流自动驾驶仿真基准上进行了评估：**Waymo Inter
 
 ![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2510_12901/figures/014_Table_6.jpg]]
 *Table 6: LiDAR Tiling (MR/s)*
-
-![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2510_12901/figures/018_Table_7.jpg]]
-*Table 7: Ray-based Culling. We measure kernel run times in milliseconds. Our filtering incurs a small constant time cost offset by improvements to the subsequent sort and render operations*
-
-![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2510_12901/figures/022_Table_8.jpg]]
-*Table 8: LiDAR Projection. We compare our LiDAR projection strategy to linearization and Monte Carlo sampling alternatives. Our results are near-identical to Monte Carlo sampling despite projecting far fewer points per Gaussian*
-
-
 
 ## 定位与知识库关联
 
@@ -385,8 +354,6 @@ SimULi 对SplatAD的突破在于**因子化表示**：将相机高斯集 $G_c$ �
 4. **非刚性动态建模。** 将现有的非刚性物体建模方案（如可变形高斯）集成到因子化框架中，需要处理相机高斯与激光雷达高斯的独立变形以及锚定关系的动态维护，这涉及表示层面的非平凡设计。
 
 5. **自动瓦片策略的进一步泛化。** 将基于CDF的自动瓦片从旋转激光雷达推广到任意扫描模式的传感器，需要在方位-仰角二维空间上设计高效的瓦片划分算法，并验证其在不同传感器上的负载均衡效果。
-
-
 
 ## 原文 PDF
 

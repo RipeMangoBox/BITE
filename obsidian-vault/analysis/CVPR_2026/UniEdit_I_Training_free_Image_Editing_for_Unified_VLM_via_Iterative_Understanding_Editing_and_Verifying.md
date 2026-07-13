@@ -52,8 +52,6 @@ claims:
 
 实验表明，UniEdit-I 在 GEdit-Bench 基准上达到领先水平，无需微调即超越多个大规模预训练编辑模型（如 **GPT-4o**、**Step1X-Edit**、**BAGEL**）。CLIP语义空间产生的中间图像比VAE空间显著更干净（Artifact Score 8.10 vs 5.35），且反馈信号更稳定（标准差 0.025 vs 0.063）。结合对齐动态与完成感知的动态增益策略在所有指标上取得最高分数（SQ: 7.16, PQ: 7.40, O: 7.06），97.6%的样本在首次迭代中即收敛，验证了闭环机制的高效性。主要局限在于文本编辑任务性能显著偏低（G_SC=4.000, G_O=4.495），受限于基础VLM的固有能力。
 
-
-
 图像编辑是视觉内容创作的核心需求。近年来，统一视觉语言模型（Unified VLM）的快速发展使得单一模型能够同时处理视觉理解与生成任务，为图像编辑提供了新的范式。然而，**当前统一VLM在图像编辑任务中面临一个根本性的表征鸿沟**：模型的高层语义理解依赖语言对齐的编码器（如CLIP），而图像生成则依赖像素空间的自编码器（如VAE），两个特征空间并不对齐。这种不对齐导致编辑过程中的中间表征容易出现视觉伪影和语义漂移。
 
 具体而言，现有方法存在两个关键缺口：
@@ -65,8 +63,6 @@ claims:
 **本文动机**源于一个核心洞察：将VLM从后置评估者转变为编辑过程的主动引导者。VLM天然具备跨模态对齐能力，能够理解图像语义并评估编辑意图的满足程度。如果能在语义空间中构建一个**自校正闭环**，让VLM实时监控编辑轨迹并根据语义反馈动态调整编辑强度，就有可能在无需任何训练的情况下实现与意图对齐的高质量编辑。
 
 基于此，UniEdit-I提出三个关键转变：将编辑空间从像素/VAE空间迁移至**CLIP语义潜在空间**，从根本上消除表征鸿沟；引入**理解-编辑-验证（UEV）迭代闭环**，使VLM在每个验证点（每k=5步）评估中间结果并产生全局对齐分数$s_t$和任务完成分数$p_t$；设计**动态增益机制**，根据语义对齐改进量$\Delta s_t$和任务完成度$p_t$自适应调整编辑强度$\alpha_t$，实现早停和精准控制。
-
-
 
 ## 核心方法与创新机理
 
@@ -96,8 +92,6 @@ $$\alpha_t = \alpha_{\mathrm{base}} \cdot \sigma(\kappa_1 \Delta s_t) \cdot (1 -
 UniEdit-I 处于**免训练统一 VLM 图像编辑**这一新兴方向的交叉点。与需要大规模编辑数据训练的模型（如 **Step1X-Edit** 、**BAGEL** ）或依赖专有大规模预训练的 **GPT-4o** 不同，UniEdit-I 完全免训练、免架构修改，仅通过推理时的闭环控制实现编辑能力。其技术路线继承了 FlowEdit 的语义轨迹编辑思想，但通过表征空间迁移和动态反馈机制实现了质的提升——将 VLM 从被动的后置评估者转变为编辑过程的主动引导者，利用 VLM 自身的跨模态对齐能力在语义空间中通过自校正闭环动态调整编辑轨迹。
 
 **局限性提示**：当前方法的文本编辑任务性能显著低于其他类型（G_SC=4.000, G_O=4.495，见 Table 5），这主要受限于底层统一 VLM 在文本生成与精确修改方面的固有能力，而非编辑框架本身的设计缺陷。此外，方法继承自基础 VLM 的语义理解能力，对于 VLM 覆盖范围之外的罕见概念或细粒度属性可能表现不佳，这一点需要在实际应用中予以关注。
-
-
 
 UniEdit-I 提出首个免训练的闭环图像编辑框架，使统一视觉语言模型（VLM）在不修改架构、不进行微调的条件下获得图像编辑能力。其核心是一个**理解–编辑–验证（Understanding–Editing–Verifying, UEV）**迭代循环，全程运作于 VLM 的 CLIP 语义潜在空间，而非传统的像素空间或 VAE 潜在空间（Figure 1）。
 
@@ -129,8 +123,6 @@ UniEdit-I 提出首个免训练的闭环图像编辑框架，使统一视觉语�
 
 相较于需要大规模训练的 VLM 编辑模型（如 **GPT-4o**、**Step1X-Edit**、**BAGEL**），UniEdit-I 完全免训练，仅依赖冻结 VLM 的跨模态对齐能力即可实现有竞争力的编辑质量（GEdit-Bench Overall Score 7.06 vs GPT-4o 7.53）。
 
-
-
 UniEdit‑I 的核心由三个闭环模块构成：**理解（Understanding）**、**编辑（Editing）** 和 **验证（Verifying）**，全部运行在统一 VLM 的 CLIP 语义潜在空间中，无需任何训练或架构修改。
 
 ### 4.1 理解模块：结构化提示生成
@@ -149,9 +141,6 @@ UniEdit‑I 的核心由三个闭环模块构成：**理解（Understanding）**
 ### 4.2 编辑模块：CLIP 语义空间中的轨迹编辑
 
 编辑模块将 FlowEdit 框架从像素/VAE 空间迁移到 CLIP 语义潜在空间，从根本上解决了中介图像产生鬼影和伪影的问题（Figure 2）。
-
-![[assets/figures/papers/paper_list_l2353_https_arxiv_org_abs_2508_03142/figures/002_Figure_2.jpg]]
-*Figure 2: (a) In pixel space, intermediate outputs exhibit a superposition of source and target content, resulting in visible ghosting and unnatural transitions.(b) In semantic space, intermediate states are clean and realistic, with coherent structure and no artifacts, leading to a natural and faithful final result*
 
 **噪声共享探针构造。** 在 CLIP 空间中，源图像和目标图像的噪声共享探针分别定义为：
 
@@ -194,16 +183,6 @@ UniEdit‑I 的性能增益可归因于两条因果链路：
 
 2. **动态增益→编辑精度**：结合对齐动态与完成感知的完整增益策略在所有指标上达到最优（SQ: 7.16, PQ: 7.40, O: 7.06，Table 3），证明自适应强度控制是避免欠编辑与过编辑的关键。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2353_https_arxiv_org_abs_2508_03142/figures/004_Figure_4.jpg]]
-*Figure 4: Semantic trajectory editing in CLIP space(right to*
-
-![[assets/figures/papers/paper_list_l2353_https_arxiv_org_abs_2508_03142/figures/006_Figure_6.jpg]]
-*Figure 6: Edited Image Verification. Evaluates alignment between the target prompt and the intermediate edited image, provides automatic consistency scores and corrective feedback, and determines whether to stop early or continue the editing loop*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -243,15 +222,9 @@ Table 3 系统比较了不同增益调度策略在 CLIP 空间和动态编辑窗
 
 Table 4 统计了 GEdit-Bench-EN 上样本的收敛分布：**97.6% 的样本在第一次迭代中即收敛**（即验证模块判定编辑完成并触发早停），仅 2.4% 的样本需要第二次迭代。这一数据有力证明了闭环机制的高效性——VLM 验证模块能够在绝大多数情况下准确判断编辑完成时机，避免不必要的迭代开销。每 k=5 步进行一次验证的频率在精度与效率之间取得了良好平衡。
 
-![[assets/figures/papers/paper_list_l2353_https_arxiv_org_abs_2508_03142/figures/012_Table_4.jpg]]
-*Table 4: Convergence distribution over GEdit-Bench-EN*
-
 ### 任务类型性能分析
 
 Table 5 按任务类型细分了 GEdit-Bench 的性能，揭示了方法的能力边界：
-
-![[assets/figures/papers/paper_list_l2353_https_arxiv_org_abs_2508_03142/figures/013_Table_5.jpg]]
-*Table 5: GEdit Categorize Results*
 
 - **强项任务**：主体添加（G_SC=7.000, G_O=7.495）、颜色更改（G_SC=7.500, G_O=7.495）、背景更改（G_SC=6.500, G_O=7.495）等涉及全局或局部语义替换的任务表现优异，验证了语义空间编辑在保持结构一致性的同时实现内容变换的能力。
 - **弱项任务**：文本编辑任务性能显著低于其他类型（G_SC=4.000, G_O=4.495）。论文明确指出，这一瓶颈主要源于底层统一 VLM 的预训练表示空间对文本生成与精确修改的固有限制，而非编辑框架本身的问题。这暗示未来需要增强 VLM 的文本渲染能力或引入专门的文本处理模块。
@@ -263,15 +236,8 @@ Table 5 按任务类型细分了 GEdit-Bench 的性能，揭示了方法的能�
 3. **非单调语义进展的处理**：当前动态增益假设编辑过程中语义对齐单调改善（$\Delta s_t > 0$ 时增大增益），但在精细修整等场景中可能出现短暂倒退。论文未明确讨论此类情况下的增益行为，这需要进一步验证。
 4. **评估基准单一性**：当前仅在 GEdit-Bench 上进行评估，其在更多样化场景和数据集上的泛化性有待进一步验证。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2353_https_arxiv_org_abs_2508_03142/figures/005_Figure_5.jpg]]
-*Figure 5: UniEdit-I outperforms FlowEdit variants by adapting both intensity and duration. (a) Source image; (c–f) FlowEdit with fixed gain*
-
 ![[assets/figures/papers/paper_list_l2353_https_arxiv_org_abs_2508_03142/figures/007_Figure_7.jpg]]
 *Figure 7: Qualitative comparisons. We compare UniEdit-I with recent unified VLMs across various editing tasks*
-
-
 
 ## 定位与知识库关联
 
@@ -345,8 +311,6 @@ UniEdit-I 在图像编辑方法谱系中占据**免训练、闭环语义引导**
 - **相对于像素/VAE空间方法**：在CLIP语义空间中进行编辑，从根本上解决了表征鸿沟导致的伪影和反馈不稳定问题
 
 其方法论贡献在于证明了**VLM的跨模态对齐能力可以被重新定位为编辑过程的主动引导信号**，而非仅作为后置评估工具。这一洞察为未来免训练多模态编辑方法提供了新的设计范式。
-
-
 
 ## 原文 PDF
 

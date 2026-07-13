@@ -55,8 +55,6 @@ claims:
 
 **局限与展望**：SimVLM对全新游戏机制（如冰冻效果）的泛化能力有限；框架依赖固定PDDL域模板，向连续动作空间或开放环境的扩展仍需人工调整；GenVLM的迭代上限为4轮，EW分数不收敛时可能保留错误文件。未来方向包括提升对复杂物理动态的泛化、探索与其他形式化规划语言的兼容性。
 
-
-
 视觉语言模型（VLMs）在跨模态理解方面取得了显著进展，但将其直接应用于长期视觉规划任务时，仍面临根本性的瓶颈：**VLMs在精细空间细节感知和正确生成形式化规划域文件方面的局限性，导致规划失败率居高不下**。具体而言，现有方法存在以下关键缺口：
 
 1. **空间推理能力不足**：通用VLM在理解复杂空间关系、预测动作执行后果时容易出现幻觉或细节丢失。直接使用未经微调的VLM（如GPT-4o）进行场景描述和动作模拟，其输出在精确字符串匹配率上表现有限，难以支撑后续的符号化规划。
@@ -66,8 +64,6 @@ claims:
 3. **感知与符号推理脱节**：现有方法要么依赖纯符号规划器（需要人工提供精确的PDDL文件），要么完全依赖端到端的VLM推理，缺乏将视觉感知结果自动、可靠地转化为形式化规划规范的桥梁。这种脱节导致系统在面对未见过的视觉外观或环境布局时泛化能力严重受限。
 
 针对上述缺口，**VLMFP**的动机在于：通过将视觉规划任务分解为两个专业化阶段——一个专注于感知与动作模拟的VLM（SimVLM），另一个专注于符号推理与PDDL文件生成优化的VLM（GenVLM）——来系统性克服单一VLM的局限性。SimVLM通过微调增强空间推理能力，为GenVLM提供精确的场景描述和动作执行参考；GenVLM则利用大规模知识生成PDDL文件，并通过仿真一致性反馈进行迭代优化，从而实现从视觉观测到可执行形式化规划的无缝转换。
-
-
 
 ## 核心方法与创新机理
 
@@ -112,10 +108,6 @@ VLMFP的创新不仅体现在性能提升上，还表现在**多层面的泛化�
 - 框架依赖固定的PDDL域模板，扩展到完全开放或非栅格化环境时可能需要人工调整。
 - GenVLM的迭代优化最大轮次为4，当EW分数无法收敛时，返回的PDDL文件可能仍存在错误。
 
-
-
-![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_7tlLpQpGlx/figures/001_Figure_1.jpg]]
-
 VLMFP 将形式化视觉规划分解为两个协同的 VLM 角色，构建了一条从像素到 PDDL 的闭环流水线（图 1）。其核心洞察是：直接让单一 VLM 同时处理空间感知与符号规划会导致两个环节的误差级联——感知模型难以捕获精确的空间关系，而生成模型缺乏对规划域语义的校验能力。VLMFP 通过引入 SimVLM（仿真视觉语言模型）和 GenVLM（生成视觉语言模型）的职责分离，切断了这一误差链路。
 
 ### 流水线模块与数据流
@@ -137,8 +129,6 @@ VLMFP 将形式化视觉规划分解为两个协同的 VLM 角色，构建了一
 SimVLM 和 GenVLM 的分工对应了人类解决视觉规划问题的两个认知阶段：**感知模拟**与**符号抽象**。SimVLM 经过 430k 数据点的微调（基于 Qwen2-VL-7B），专门强化了空间关系描述和动作后果预测能力，其输出是结构化自然语言而非直接可执行代码——这降低了感知阶段的生成难度。GenVLM 则利用大规模预训练知识处理符号推理，其任务被限定为“根据精确的场景描述生成 PDDL 文件并响应反馈”，而非从原始像素直接跳跃到形式化语言。
 
 消融实验（表 3）揭示了三个组件的因果重要性：移除预筛检使平均成功率降至 47.5%，复杂领域（如 Sokoban、Overcooked）受影响尤为严重；移除反馈机制使平均成功率降至 61.1%；而移除更新阶段对复杂领域是灾难性的，Sokoban、Package 的成功率几乎归零。这表明迭代反馈回路是框架在复杂约束下保持鲁棒性的核心机制，而非可有可无的增强。
-
-
 
 ### 双VLM架构
 
@@ -176,8 +166,6 @@ $$m_{\mathrm{EW}}(\hat{d},\hat{p}) = 2\bigg(\Big(\frac{1}{T_{\max}}\sum_{T=1}^{T
 2. **GenVLM初始生成**：基于 $n_d$、$i_p$、$n_p$ 生成候选PDDL文件 $f_d^{(0)}, f_p^{(0)}$。
 3. **预设筛检（Prescreening）**：过滤语法错误或结构无效的PDDL文件，确保仅有效文件进入一致性检查。消融实验表明，移除此模块使平均成功率从70.0%降至47.5%（Table 3）。
 4. **仿真一致性检查与迭代更新**：比较SimVLM与PDDL环境的执行结果，计算EW分数并生成自然语言反馈 $s$，驱动GenVLM更新PDDL文件。移除反馈机制使成功率降至61.1%，移除更新阶段则对复杂领域（Sokoban、Package、Printer、Overcooked）造成灾难性影响，成功率几乎归零（Table 3）。
-
-
 
 ## 实验与关键发现
 
@@ -234,27 +222,8 @@ VLMFP在2个3D规划任务（MultiRob和Assembly）上进一步验证了框架�
 
 3. **SimVLM感知失败**：在遇到全新环境动态（如Rule5的冰冻效果）时，SimVLM的动作模拟完全失效，导致后续所有步骤崩溃。这是当前框架最根本的泛化边界。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_7tlLpQpGlx/figures/011_Table_6.jpg]]
 *Table 6: String matching rate (%) comparison across four metrics on 6 grid world domains*
-
-![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_7tlLpQpGlx/figures/012_Table_7.jpg]]
-*Table 7: String matching rate (%) for 4 SimVLM output types on 6 grid world domains, with LLaVA-NeXT-7B as the base model*
-
-![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_7tlLpQpGlx/figures/013_Table_8.jpg]]
-*Table 8: String matching rate (%) for 4 SimVLM output types on 6 grid world domains, with PaliGemma2-10B as the base model*
-
-![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_7tlLpQpGlx/figures/014_Table_9.jpg]]
-*Table 9: The mean of string matching rate (%) for 4 SimVLM output types on 6 grid world domains across 3 seeds*
-
-![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_7tlLpQpGlx/figures/015_Table_10.jpg]]
-*Table 10: The standard deviation of string matching rate (%) for 4 SimVLM output types on 6 grid world domains across 3 seeds*
-
-![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_7tlLpQpGlx/figures/017_Table_11.jpg]]
-*Table 11: Dataset and Task statistics for six grid world domains*
-
-
 
 ## 定位与知识库关联
 
@@ -295,8 +264,6 @@ VLMFP相对于CodePDDL的关键改进在于引入了**闭环反馈机制**：Sim
 2. **框架能否扩展到连续动作空间或精细操作任务？** 当前框架依赖PDDL的离散动作表示，扩展到连续控制需要与运动规划器或基于采样的规划方法集成，这涉及不同形式化语言（如PDDL+）的选择。
 3. **如何减少GenVLM在复杂约束下的生成错误？** 更强的基座VLM（如GPT-5）可能部分缓解这一问题，但根本性改进可能需要引入约束求解器作为验证器，或使用程序合成技术确保生成PDDL的语义正确性。
 4. **框架是否适用于其他形式化规划语言？** VLMFP的双VLM架构原则上与PDDL无关——SimVLM提供环境仿真，GenVLM生成形式化规范。扩展到RDDL（用于随机规划）或HTN（用于层次规划）需要重新设计输出格式和验证机制，但核心的仿真-优化循环可以保留。
-
-
 
 ## 原文 PDF
 

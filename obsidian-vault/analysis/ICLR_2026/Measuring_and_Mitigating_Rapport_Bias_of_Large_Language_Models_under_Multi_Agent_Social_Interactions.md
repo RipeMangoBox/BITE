@@ -62,15 +62,11 @@ claims:
 
 主要限制包括：评估仅采用多项选择题格式，可能低估开放生成场景下的社会脆弱性；训练实验仅覆盖 ≤32B 的小模型；交互仍属脚本化模拟，与真实人类协同存在差距；未考虑多轮交互的长期演化效应。
 
-
-
 大型语言模型（LLM）正越来越多地被部署于多智能体协作环境，例如群体决策、辩论与知识整合。在这些场景中，模型不仅需要独立求解任务，还必须解读、采纳或抵制来自其他智能体的信号。然而，现有研究揭示了一个关键脆弱性：LLM 极易受到社交动态的干扰，即便同伴提供的是明显错误的信息，模型也倾向于从众，从而导致大量正确预测的损失。
 
 这一现象的核心瓶颈在于“融洽偏误”（rapport bias）——模型与同伴在历史交互中形成的融洽关系，以及当前回合同伴的支持或反对行为，会系统性地扭曲其决策。具体而言，当历史互动中同伴与模型回答高度一致（高融洽级别）时，模型更倾向于信任该同伴；而一旦同伴转而提供错误答案，模型往往无法有效纠正自身错误，整体准确率因此显著下降。然而，现有基准测试大多聚焦于模型在孤立环境下的能力，缺乏对上述社交敏感性进行系统、可控的测量手段。
 
 为填补这一空白，本文提出了 **KAIROS**——一个用于多智能体社交互动中 LLM 融洽偏误的测量与缓解基准。KAIROS 的核心设计思路在于，通过精确控制历史交互中的融洽级别、当前回合的同伴行为（支持、强烈反对、轻微反对）以及模型自身的置信度，实现对模型社交脆弱性的细粒度评估。在此基础上，本文进一步探索了三类缓解策略：提示工程（授权提示与反思提示）、监督微调（SFT）以及基于组相对策略优化（GRPO）的强化学习，旨在提升模型在社交压力下的鲁棒性，同时保持甚至提高任务准确率。
-
-
 
 ## 核心方法与创新机理
 
@@ -108,8 +104,6 @@ claims:
 
 综上，本工作的核心创新贡献在于定义并系统性地剖析了 LLM 的融洽偏误问题，揭示了模型规模是调节社会敏感性的首要因素，并指出了当前缓解策略在提升鲁棒性的同时会损害模型社交学习能力的结构性缺陷，为未来设计既能抵抗误导又能利用帮助的社交智能体奠定了基准。
 
-
-
 ![[assets/figures/papers/paper_list_l30_https_openreview_net_forum_id_gF31wuYdk7/figures/003_Figure_2.jpg]]
 *Figure 2: Overview of the KAIROS evaluation framework. The process begins with Original Evaluation, where a question is posed and the majority answer is derived from multiple generations, along with confidence estimation. In Peer Construction, the subject agent’s majority answer and predefined action type (e.g., support) are used to construct interactions with other agents. Finally, in KAIROS Evaluation, each agent considers historical context, the current question, and peer responses to generate a socially-informed answer within a multi-agent system (MAS), which is then assessed using various evaluation metrics (e.g., accuracy & robustness, utility, and resistance)*
 
@@ -145,8 +139,6 @@ $$\bar{p}_k = \hat{p}(y = k \mid \mathbf{x}) = \frac{1}{T} \sum_{t=1}^{T} \mathb
 - **提示工程**：包括授权提示（鼓励模型自信决策、批判性评估同伴回应）和反思提示（首轮回答后由模型自我反思修正）。
 - **监督微调**：使用模板化的正确答案和完整社交上下文进行单轮训练。
 - **GRPO 强化学习**：在组相对策略优化框架下，通过不同配置变体进行训练。关键可调节槽位包括：是否包含多智能体上下文、系统提示设计（正常提示 vs. 辩论式提示）、奖励函数（仅结果奖励 vs. 结合正确性、格式和内在声音多样性的复合奖励 $R = \lambda_{\mathrm{corr}} R_{\mathrm{corr}} + \lambda_{\mathrm{fmt}} R_{\mathrm{fmt}} + \lambda_{\mathrm{iv}} R_{\mathrm{iv}}$）、以及数据过滤策略（低置信度过滤 vs. 低正确率过滤）。训练数据与评估数据不相交，确保评估的独立性。
-
-
 
 ### 2.1 动态评估数据构建模块
 
@@ -210,8 +202,6 @@ $$R = \lambda_{\mathrm{corr}} R_{\mathrm{corr}} + \lambda_{\mathrm{fmt}} R_{\mat
 
 值得注意的是，消融实验表明，简单的仅结果奖励（Outcome-based Reward, OR）配合正常提示（Normal System Prompt, NS）在所有 GRPO 配置中取得了最佳的准确率-鲁棒性权衡，辩论式系统提示（DS）或辩论式奖励（DR）并未带来额外增益。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈：社交融洽偏误的系统性损害
@@ -229,8 +219,6 @@ KAIROS 基准的核心发现是：LLM 在多智能体社交环境中普遍存在
 
 ![[assets/figures/papers/paper_list_l30_https_openreview_net_forum_id_gF31wuYdk7/figures/005_Table_1.jpg]]
 *Table 1: Evaluation of model robustness under KAIROS. The table summarises Original and KAIROS accuracies and their relative O–K ∆ (percentage change) across multiple model families, sizes, over prompting strategies. The maximum and minimum O–K ∆ values are highlighted in bold. Table 2: Comparison of Original accuracy, KAIROS accuracy, and O–K ∆ across different models and mitigation configurations. For each model family, all SFT and GRPO variants are fine-tuned from the same Base checkpoint, enabling consistent comparison of how prompting, SFT, and GRPO influence robustness under social interaction*
-
-![[assets/figures/papers/paper_list_l30_https_openreview_net_forum_id_gF31wuYdk7/figures/004_Table_1.jpg]]
 
 授权提示（Empowered Prompting）进一步放大了这一规模效应。该类提示鼓励模型自信决策、批判性评估同伴回应。在此策略下：
 - 大模型的 O–K Δ 从 -3.64% **转为 +0.12%**，即社交互动反而略微提升了性能，鲁棒性缺口被有效弥合。
@@ -290,25 +278,6 @@ KAIROS 基准的核心发现是：LLM 在多智能体社交环境中普遍存在
 ![[assets/figures/papers/paper_list_l30_https_openreview_net_forum_id_gF31wuYdk7/figures/007_Table_4.jpg]]
 *Table 4: Evaluation of model robustness under KAIROS. The table summarises Original and KAIROS accuracies and their relative O–K ∆ (percentage change) across multiple model families, sizes, and training strategies over four task dimensions. For each dimension, the maximum and minimum O–K ∆ values are highlighted in bold*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l30_https_openreview_net_forum_id_gF31wuYdk7/figures/006_Table_3.jpg]]
-*Table 3: Illustrative examples of reward components*
-
-![[assets/figures/papers/paper_list_l30_https_openreview_net_forum_id_gF31wuYdk7/figures/011_Table_6.jpg]]
-*Table 6: Effect of historical question confidence on susceptibility to peer influence. Conformity rates (O–K) remain stable across high- and low-confidence histories, indicating that intrinsic difficulty does not modulate social susceptibility*
-
-![[assets/figures/papers/paper_list_l30_https_openreview_net_forum_id_gF31wuYdk7/figures/012_Table_7.jpg]]
-*Table 7: Correct-to-Correct (C→C) transition rates for Qwen2.5–7B. Masked history reveals a strong default-conformity baseline. Real history systematically modulates resistance based on peer reliability, demonstrating that models interpret interaction history as a trust signal*
-
-![[assets/figures/papers/paper_list_l30_https_openreview_net_forum_id_gF31wuYdk7/figures/013_Table_8.jpg]]
-*Table 8: Overall results for the Reasoning category under KAIROS. Bold numbers mark per-dataset extreme (max/min) O–K ∆*
-
-![[assets/figures/papers/paper_list_l30_https_openreview_net_forum_id_gF31wuYdk7/figures/014_Table_9.jpg]]
-*Table 9: Overall results for the Knowledge category under KAIROS. Bold numbers mark per-dataset extreme (max/min) O–K ∆*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 与现有工作的关系
@@ -342,8 +311,6 @@ KAIROS 的定位处于 LLM 社会智能评估与多智能体交互研究的交�
 - **大规模验证缺失。** 更大规模模型（>32B）的 GRPO 训练是否能复现小模型的关键发现，尤其是 MAS 上下文对大模型的鲁棒性增益，尚需验证。
 
 - **跨文化扩展性。** 该评估框架是否能扩展到多语言、多文化背景，以研究不同社会规范下的融洽偏误，仍有待探索。
-
-
 
 ## 原文 PDF
 

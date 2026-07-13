@@ -54,8 +54,6 @@ claims:
 
 **方法谱系与知识库定位**：ResCa属于扩散模型推理加速中的**令牌减少**（token reduction）路线，但其技术路径与现有方法形成本质差异。与**ToCa**的直接缓存复用不同，ResCa通过残差引导实现了去噪方向的更新；与**ToMeSD**的合并策略不同，ResCa保持了每个令牌的独立轨迹自洽性；与**TaylorSeer**（Liu et al., ICCV 2025）的泰勒外推预测不同，ResCa利用代理令牌的真实去噪信息进行校正，避免了纯预测带来的误差累积；与**ClusCa**（Zheng et al., ACM MM 2025）的缓存与空间相似性线性加权不同，ResCa通过多阶残差的置信度加权实现了更精细的方向性修正。ResCa为扩散模型加速提供了“以计算换精度”之外的新思路——通过挖掘轨迹间的结构相似性，以极小的代理计算代价换取全局的高质量模拟去噪。
 
-
-
 扩散Transformer（Diffusion Transformer, DiT）已成为高质量文本到图像和文本到视频生成的主流架构，但其推理计算开销巨大——单张图像生成通常需要数十次模型前向传播，每次前向都需处理全部令牌（token），导致GFLOPs和延迟居高不下。以FLUX.1-dev为例，原始50步去噪的GFLOPs高达3719.5T，延迟达25.82秒（Table 1），严重制约了实际部署。
 
 为降低计算成本，现有方法主要沿两条路径探索：**令牌缓存（token caching）** 和**令牌合并（token merging）**。缓存方法（如**ToCa**, Zou et al., ICLR）直接复用前一时间步的缓存特征，形成“非更新”（non-updated）的去噪方向；合并方法（如**ToMeSD**, Bolya & Hoffman, CVPRW 2023）将相似令牌合并后复用混合特征，形成“非自洽”（non-self）的去噪方向。如Figure 1所示，这两种策略均偏离了原始去噪轨迹，导致生成质量下降。此外，**TaylorSeer**（Liu et al., ICCV 2025）尝试用泰勒外推预测特征，但未解决方向自洽性问题；**ClusCa**（Zheng et al., ACM MM 2025）通过缓存与空间相似性的线性加权混合，仍受限于非自洽与非更新的根本矛盾。
@@ -65,8 +63,6 @@ claims:
 本文的动机源于一个关键观察：**沿相似去噪轨迹的令牌，其多阶残差具有高度可复用性**。Figure 2的预备实验揭示了两层洞察：（1）基于历史去噪轨迹的聚类（trajectory-based clustering）比基于当前特征的聚类（feature-based clustering）能更准确地定位相似残差——轨迹聚类后的簇内一阶残差L2距离显著更小（Figure 2c）；（2）低阶残差（1阶、2阶）比0阶特征本身具有更高的可复用性，且历史残差距离越小，未来残差的复用价值越高（Figure 2d, 2e）。这提示我们：**可以用少量“代理令牌”的真实去噪残差，引导其他“驱动令牌”的模拟去噪**，从而在保持方向自洽和更新的同时大幅减少计算量。
 
 基于此，本文提出**ResCa（Residual Caching）**，核心思路是：在每个轨迹聚类簇内仅对一个代理令牌执行真实去噪，利用其计算得到的多阶残差作为方向性修正项，通过隐式ODE更新驱动令牌，实现高质量的模拟去噪（Figure 1d）。该方法在FLUX上实现了高达5.5×的GFLOPs加速，同时保持接近无损的生成质量（Image Reward 0.9958 vs. 原始0.9898）。
-
-
 
 ## 核心方法与创新机理
 
@@ -93,8 +89,6 @@ $$d_{t-1} = d_t + \sum_{m=1}^{M} \frac{1}{m!} \hat{\mathcal{F}}^{(m)}(d_{t-1})$$
 ### 创新总结
 
 ResCa 的方法论突破在于：**将扩散Transformer加速的核心矛盾从“计算-质量权衡”重新定义为“自洽性-更新性权衡”**。通过代理令牌的多阶残差引导与隐式ODE模拟，ResCa 首次在 token 减少框架下实现了同时满足自洽和更新的去噪轨迹，为扩散模型加速提供了新的理论视角和实践方案。这一范式在 FLUX 文本到图像生成和 HunyuanVideo 文本到视频生成任务上均验证了其有效性，最高实现 **6.19× FLOPs 加速**（Table 2）。
-
-
 
 ResCa 的推理流程以**密集/稀疏时间步交替调度**为核心，将去噪过程划分为两个阶段，并通过**时序增强轨迹聚类（TETC）** 与**代理驱动去噪模拟（PDDS）** 两个关键模块协同完成高质量加速生成。
 
@@ -139,8 +133,6 @@ ResCa 的推理流程以**密集/稀疏时间步交替调度**为核心，将去
 ### 数据流总结
 
 整个框架的数据流可概括为：密集时间步缓存所有令牌特征 → TETC 基于历史轨迹聚类 → 稀疏时间步选取代理令牌 → 代理令牌真实去噪产生多阶残差 → PDDS 利用残差引导驱动令牌隐式更新。这一设计使得驱动令牌的更新方向既保持了与自身历史轨迹的**自洽性**，又通过代理残差获得了**方向性修正**，从而在显著降低计算量的同时维持生成质量。
-
-
 
 ResCa 将扩散Transformer的去噪过程划分为**密集时间步（Dense Timesteps）** 与**稀疏时间步（Sparse Timesteps）** 两个阶段，并围绕“轨迹聚类”与“代理引导模拟”两个核心机制构建加速框架。
 
@@ -197,13 +189,6 @@ $$d_{t-1} = \frac{4}{3} d_t - \frac{1}{3} d_{t+1} + \frac{2}{3} \hat{\mathcal{F}
 
 ResCa 的关键创新在于用**代理令牌的多阶残差作为方向性修正项**，替代了传统缓存方法中直接复用过期特征或合并方法中破坏自洽性的做法。置信度加权机制确保了对齐度高的代理残差获得更大权重，而对齐度低时则退化为依赖驱动令牌自身的历史残差，从而在加速与质量之间取得平衡。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l923_https_openaccess_thecvf_com_content_CVPR2026_html_Fang_ResCa_Residual_Ca/figures/001_Figure_1.jpg]]
-*Figure 1: Illustration of denoising trajectories. Solid and dashed line denotes the realized and the target trajectories. (a) Original trajectory. (b) Caching: reuse the previous step*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -229,15 +214,9 @@ ResCa 在 FLUX.1-dev 上进行了系统评估，对比方法包括 ToCa、ToMeSD
 ![[assets/figures/papers/paper_list_l923_https_openaccess_thecvf_com_content_CVPR2026_html_Fang_ResCa_Residual_Ca/figures/006_Table_2.jpg]]
 *Table 2: Quantitative comparison in text-to-video generation for HunyuanVideo on VBench. Best results are highlighted in bold*
 
-![[assets/figures/papers/paper_list_l923_https_openaccess_thecvf_com_content_CVPR2026_html_Fang_ResCa_Residual_Ca/figures/007_Figure_5.jpg]]
-*Figure 5: Qualitative comparison in text-to-video generation on HunyuanVideo. ResCa generates high-quality, semantically aligned videos, while others suffer from issues such as misplaced bottle caps, missing water splash details, and missing drumstick objects*
-
 #### 类别条件图像生成（DiT-XL/2 on ImageNet）
 
 在 DiT-XL/2 上的类别条件生成任务中（Table 3），ResCa-IE 在 N=5 时取得 **2.59 的 FID**，优于 ToCa（2.77）、ToMeSD（3.15）、TaylorSeer（2.82）和 ClusCa（2.67），同时实现约 2.5× 加速。
-
-![[assets/figures/papers/paper_list_l923_https_openaccess_thecvf_com_content_CVPR2026_html_Fang_ResCa_Residual_Ca/figures/009_Table_3.jpg]]
-*Table 3: Quantitative comparison in class-to-image generation for DiT-XL/2 on ImageNet. Best results are highlighted in blod*
 
 ### 消融实验
 
@@ -256,9 +235,6 @@ Table 4 消融了残差阶数对生成质量的影响。仅使用 0 阶（特征
 
 Figure 7 对比了基于特征的聚类与基于轨迹的聚类（TETC）的生成效果。TETC 在视觉质量和语义一致性上均优于特征聚类，验证了 **沿去噪轨迹的时序增强相似度** 能更准确地找到具有相似残差行为的令牌组。这一结果与 Figure 2(c) 的预备实验一致：轨迹聚类使簇内一阶残差的成对 L2 距离更小。
 
-![[assets/figures/papers/paper_list_l923_https_openaccess_thecvf_com_content_CVPR2026_html_Fang_ResCa_Residual_Ca/figures/010_Figure_7.jpg]]
-*Figure 7: Visual comparisons of clustering methods*
-
 ### 关键图表结论
 
 - **Table 1**：ResCa 在 FLUX 上以 5.5× GFLOPs 加速实现接近无损的生成质量，Image Reward 在部分配置下甚至超越原始模型。
@@ -266,8 +242,6 @@ Figure 7 对比了基于特征的聚类与基于轨迹的聚类（TETC）的生�
 - **Figure 6**：簇数量 K 是质量-效率的核心调节旋钮，K 增大提升质量但降低加速比。
 - **Table 4**：多阶残差是 ResCa 性能的关键来源，2 阶残差相比 0 阶带来显著质量增益。
 - **Figure 7**：轨迹聚类（TETC）在生成质量上一致优于特征聚类，是方法有效性的基础组件。
-
-
 
 ## 定位与知识库关联
 
@@ -329,8 +303,6 @@ ResCa对扩散模型加速领域的知识贡献可分解为三个层面：
 4. **对非DiT架构的泛化性**：ResCa的核心假设——沿相似轨迹的token具有可复用的低阶残差——是否在UNet架构或其他生成范式（如自回归模型）中成立，论文未提供证据。这一假设的普适性需要进一步验证。
 
 5. **与蒸馏/量化方法的兼容性**：ResCa属于推理时的token减少方法，与模型蒸馏、权重量化等正交加速技术是否可以叠加使用，叠加后的累积质量损失如何，论文未涉及。
-
-
 
 ## 原文 PDF
 

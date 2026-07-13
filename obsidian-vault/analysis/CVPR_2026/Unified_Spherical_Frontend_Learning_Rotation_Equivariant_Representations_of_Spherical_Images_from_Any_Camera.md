@@ -56,8 +56,6 @@ claims:
 
 **主要结果概览。** 在MNIST分类、PANDORA目标检测和Stanford 2D-3D-S语义分割三个任务上，USF均展现出显著的旋转鲁棒性优势：球形模型在无旋转增强训练的条件下，随机旋转测试性能几乎不变，而平面模型均出现大幅下降。在零镜头镜头泛化实验中，球形模型在未见过的镜头类型上性能退化明显小于平面模型，但尚未完全消除跨镜头差距。
 
-
-
 ### 广角感知的几何困境
 
 现代视觉系统越来越多地部署在自动驾驶、机器人、AR/VR等需要大视场（FoV）感知的场景中，广角、鱼眼和全景相机因此成为标配。然而，这些相机引入的严重光学畸变给基于卷积神经网络（CNN）的视觉处理带来了根本性挑战。
@@ -77,8 +75,6 @@ claims:
 本文的核心洞察是：**旋转等变性不应通过数据增强来“学习”，而应通过架构设计来“保证”**。如果所有操作——从输入重采样到卷积、池化——都在单位球面的几何空间中进行，并且卷积核仅依赖于测地距离（而非像素坐标），那么模型对任意SO(3)旋转自然等变，无需任何旋转增强即可保持稳定的预测。
 
 基于这一思想，本文提出**统一球面前端（Unified Spherical Frontend, USF）**，一个将任意相机模型拍摄的图像统一映射到球面、并在空间域执行旋转等变处理的通用管线。USF通过解耦的位置采样与数值插值实现镜头无关的球面重采样，通过仅距离加权的球形卷积核从构造上保证旋转等变性，同时借助几何缓存机制使高分辨率球面处理在计算上可行。这一设计使得现代视觉架构（如YOLOv11、DeepLab v3、UNet）只需将其平面卷积/池化层替换为球面对应层，即可获得镜头无关且天然旋转等变的感知能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -112,16 +108,11 @@ $$x_o = \mathcal{K}_{\mathrm{pool}}(\mathcal{X}_i, \mathbf{p}_o) = f_{\mathrm{po
 
 最根本的范式转变在于：平面CNN依赖大量旋转数据增强来近似旋转鲁棒性，而USF通过将**所有操作（重采样、卷积、池化）提升到球面空间进行**，从架构层面实现旋转等变。这一设计使得模型在训练时无需任何旋转增强，即可在随机旋转测试下保持性能稳定——语义分割mIoU仅下降0.69%，而平面模型骤降22.90%（Table 4）。
 
-
-
 **统一球面前端（Unified Spherical Frontend, USF）** 提出了一套从任意标定相机到任意下游架构的球面处理管线，其核心设计理念是将所有视觉操作——重采样、卷积、池化——提升到单位球面 $\mathbb{S}^2$ 上执行，从而在架构层面实现 SO(3) 旋转等变性，而非依赖数据增强。
 
 ### 管线总览
 
 USF 的完整处理流程由六个阶段构成（见 Figure 3），各模块解耦设计，几何计算与特征计算完全分离：
-
-![[assets/figures/papers/paper_list_l2615_https_arxiv_org_abs_2511_18174/figures/003_Figure_3.jpg]]
-*Figure 3: Unified Spherical Frontend. (i) A planar image and its lens normal map can be combined to form a (ii) spherical image. Cameras with different lenses produce spatially varying densities and distributions of pixels when projected onto the sphere. Thus, it is crucial to perform (iii) resampling before (iv) feeding into the backbone composed of spherical convolution and pooling layer. Optionally, the results can be (v) resampled back into the raw projected spherical image pixel locations, and (vi) unproject back to the planar image for downstream integration*
 
 1. **球面投影（Spherical Projection）**：给定标定相机的内参和畸变模型，将平面图像坐标 $\mathbf{u} \in \mathbb{R}^2$ 映射为单位球面上的射线方向 $\mathbf{p_u} \in \mathbb{S}^2$，形成球面图像。不同镜头类型（针孔、鱼眼、全景等）投影后在球面上的点密度和空间分布差异显著。
 
@@ -166,12 +157,8 @@ $$x_o = \mathcal{K}_{\mathrm{pool}}(\mathcal{X}_i, \mathbf{p}_o) = f_{\mathrm{po
 $$x_o = K_{\mathrm{conv}}(\mathcal{X}_i, \mathbf{p}_o) = \sum_{k \in \mathcal{N}(\mathbf{p}_o)} x_k \omega_k$$
 其邻域由固定核大小在图像坐标空间定义，无法反映物理空间中的真实邻近关系——这是由高斯绝妙定理保证的：任何二维投影都会引入畸变。USF 通过将所有操作提升到球面空间，从根本上解决了这一瓶颈：邻域由测地距离定义，卷积核通过仅依赖距离的径向权重保证旋转等变，使得模型在未见过的旋转和镜头类型下仍能保持稳定性能。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2615_https_arxiv_org_abs_2511_18174/figures/001_Figure_1.jpg]]
 *Figure 1: Unified Spherical Representation. From any camera to any architecture: a unified spherical pipeline for modern vision*
-
-
 
 ### 3.1 从平面到球面：统一投影与重采样
 
@@ -179,9 +166,6 @@ USF 的核心前提是将任意标定相机的图像提升到单位球面 $\math
 
 - **位置采样**：从原始投影点集中选择具有近均匀空间分布的新位置，支持 Goldberg 多面体、HEALPix、斐波那契格等多种策略（Figure 4）。
 - **数值插值**：在新采样位置通过邻域聚合和局部加权计算特征值。插值采用径向基函数（RBF）核，权重仅依赖于测地距离：
-
-![[assets/figures/papers/paper_list_l2615_https_arxiv_org_abs_2511_18174/figures/004_Figure_4.jpg]]
-*Figure 4: Spherical Sampling Methods. Various location sampling strategies produce different levels of uniformity across the sphere. The bottom row displays point distributions with higher uniformity compared to coarser Goldberg polyhedron discretizations*
 
 $$x_o = \sum_{k \in \mathcal{N}(\mathbf{p}_o)} \omega_k \cdot x_k$$
 
@@ -252,8 +236,6 @@ USF 的旋转等变性来源于两个架构层面的设计：
 
 这使得 USF 无需在训练时进行旋转数据增强，即可在测试时面对任意随机旋转保持稳定性能——这是与依赖数据增强强行学习旋转不变性的平面 CNN 之间的**因果性差异**，而非仅仅是性能指标的提升。
 
-
-
 ## 实验与关键发现
 
 ### 旋转等变性验证：MNIST分类
@@ -303,9 +285,6 @@ USF的另一核心优势是镜头无关性。**Table 5** 展示了零镜头镜�
 
 球形模型显著缩小了跨镜头性能差距，但**未能完全消除**性能下降。这表明球面重采样虽然统一了不同镜头的几何表示，但镜头间在分辨率分布、视场覆盖密度等方面的差异仍对特征学习构成挑战。**Table 7**（全数据集镜头适应性测试）提供了更全面的补充结果。
 
-![[assets/figures/papers/paper_list_l2615_https_arxiv_org_abs_2511_18174/figures/018_Table_7.jpg]]
-*Table 7: Semantic Segmentation Full-dataset Lens Adaptability Test. Random Rotation is disabled*
-
 ### 消融研究：位置采样与核参数化
 
 **Table 6** 对关键超参数进行了系统消融：
@@ -329,21 +308,8 @@ USF的另一核心优势是镜头无关性。**Table 5** 展示了零镜头镜�
 
 4. **标定依赖**：框架假定已知精确的相机内参和镜头畸变模型，未考虑标定误差或动态畸变场景下的鲁棒性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2615_https_arxiv_org_abs_2511_18174/figures/007_Table_2.jpg]]
-*Table 2: MNIST Classification Results. All models are trained without random rotation. L denotes embedding levels*
-
-![[assets/figures/papers/paper_list_l2615_https_arxiv_org_abs_2511_18174/figures/009_Table_4.jpg]]
-*Table 4: Semantic Segmentation Results on Stanford 2D-3D-S*
-
-![[assets/figures/papers/paper_list_l2615_https_arxiv_org_abs_2511_18174/figures/008_Table_3.jpg]]
-*Table 3: Object Detection Results on PANDORA Dataset*
-
 ![[assets/figures/papers/paper_list_l2615_https_arxiv_org_abs_2511_18174/figures/011_Table_6.jpg]]
 *Table 6: Ablation Study on Hyperparameters. Random rotation is disabled during training*
-
-
 
 ## 定位与知识库关联
 
@@ -391,8 +357,6 @@ USF的旋转等变性建立在两个关键前提之上：
 2. 能否通过开发定制CUDA核使球面算子在运行时间上超越平面实现，达成实际加速？
 3. USF能否扩展到多相机系统（如环视相机）的拼接与融合，以及视频序列中的时空旋转等变建模？
 4. 在无标定或弱标定条件下，如何从图像本身学习或估计球面投影映射，使USF摆脱对精确内参的依赖？
-
-
 
 ## 原文 PDF
 

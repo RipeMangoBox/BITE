@@ -51,8 +51,6 @@ claims:
 
 在 CountBench 基准上的实验表明，NUMINA 在不同规模的 Wan 系列模型上均稳定提升计数准确率：Wan2.1-1.3B 上从 42.3% 提升至 49.7%（+7.4%），Wan2.2-5B 上从 47.8% 提升至 52.7%（+4.9%），Wan2.1-14B 上从 53.6% 提升至 59.1%（+5.5%），同时在语义对齐（CLIP Score）和时序一致性（TC）指标上也获得提升或维持（表1）。跨架构验证（CogVideoX-5B）和用户偏好研究进一步支持了方法的有效性与实用性。
 
-
-
 ### 文本到视频生成中的数字-视觉错位
 
 文本到视频（T2V）扩散模型在生成语义丰富、时序连贯的视频方面取得了显著进展，但在精确遵循文本中的数字约束方面仍存在根本性困难。当提示中包含明确的数量描述（如“三只狗在草地上奔跑”），模型生成的视频中对象实例数往往与文本指定的数量不一致——这一现象被称为**数字-视觉错位**。
@@ -74,8 +72,6 @@ claims:
 本文的核心发现是：**扩散Transformer的自注意力和交叉注意力头中自然蕴含着可提取的实例级空间结构信息**，无需借助外部模型或重新训练。如 **Figure 4** 所示，不同自注意力头捕捉到多样化的空间模式，其中部分头部展现出显著的实例可分离性——这为从模型内部构建可计数的语义布局提供了可能。
 
 基于这一洞察，本文提出**NUMINA**，一个无需训练的“识别-引导”框架，直接从注意力图中提取显式的实例布局，并通过布局精炼和引导生成实现精确的数量控制。该方法的动机在于：与其依赖外部信号纠正生成结果，不如从扩散模型自身的内部表征中挖掘计数线索，从而在保持生成质量和时序一致性的前提下，显著提升数字-视觉对齐精度。
-
-
 
 ## 核心方法与创新机理
 
@@ -107,8 +103,6 @@ NUMINA的核心创新在于揭示并系统性地利用了扩散Transformer内部
 
 值得注意的是，NUMINA的布局构建完全基于模型内部的注意力信号，而非依赖外部检测器。消融实验证实，基于注意力的布局构建方法优于使用**GroundingDINO**等外部检测器的方案（CountAcc 49.7% vs 47.5%，见Table 2），表明模型内部表征比外部视觉模型更适配扩散潜在空间中的实例结构。此外，整个框架是训练无关的，不需要输入视频、空间掩码或辅助重布局网络，可直接应用于现成的预训练模型。
 
-
-
 NUMINA 采用一种免训练的“识别—引导”两阶段范式（identify-then-guide），在不修改扩散模型权重的前提下，将文本中的精确数字约束转化为可执行的视觉布局信号，进而引导生成过程产生正确数量的对象实例。图3给出了完整的流水线概览。
 
 ### 两阶段范式
@@ -121,12 +115,8 @@ NUMINA 采用一种免训练的“识别—引导”两阶段范式（identify-t
 
 整个框架的核心洞察在于：扩散 Transformer 的自注意力和交叉注意力头天然包含可提取的实例级空间结构信息，无需求助外部检测器或重新训练即可转化为显式的计数信号。这一原则贯穿于流水线的两个阶段——布局构建完全依赖模型内部注意力特征，布局引导也仅通过修改注意力计算中的偏置项或预 softmax 分数来实现，保持了方法的免训练特性和跨架构可迁移性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2362_https_arxiv_org_abs_2604_08546/figures/003_Figure_3.jpg]]
 *Figure 3: The pipeline of our NUMINA follows a two-phase paradigm. Given a text prompt containing numerals, we first perform the numerical misalignment identification to extract explicitly countable layouts from attention maps. Based on the layout, we further conduct a refinement and a layout-guided generation for the numerically aligned video generation*
-
-
 
 NUMINA 遵循“识别-引导”两阶段范式，无需训练、无需外部模型，完全基于扩散Transformer内部注意力图实现数字-视觉对齐。其核心由五个模块串联构成。
 
@@ -194,15 +184,11 @@ $$\mathcal{C}(c) = \mathcal{C}_o + \mathcal{C}_c + \lambda \mathcal{C}_t$$
 
 这种引导机制直接作用于扩散Transformer的交叉注意力计算，无需修改模型权重，也无需外部检测器或重布局网络。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2362_https_arxiv_org_abs_2604_08546/figures/002_Figure_2.jpg]]
 *Figure 2: Visualization of the cross-attention maps corresponding to different texts in the prompt. The highlighted areas represent a stronger level of attention between the pixels and the text*
 
 ![[assets/figures/papers/paper_list_l2362_https_arxiv_org_abs_2604_08546/figures/004_Figure_4.jpg]]
 *Figure 4: The PCA visualization of self-attention maps for Wan2.1-1.3B. (a) Different attention heads naturally capture diverse spatial patterns. (b) We select the head with the highest instance separability for countable layout construction*
-
-
 
 ## 实验与关键发现
 
@@ -234,9 +220,6 @@ NUMINA在CountBench基准上的计数准确率（CountAcc）实现了跨模型�
 
 NUMINA引入的额外计算开销主要体现在预生成阶段的注意力提取。在Wan2.1-1.3B上，挂钟时间从基线的约350秒增至501秒（Table 5）。但与推理加速方法EasyCache集成后，时间可降至355秒，同时CountAcc仅微降至49.4%，展示了方法的实用部署潜力。
 
-![[assets/figures/papers/paper_list_l2362_https_arxiv_org_abs_2604_08546/figures/012_Table_5.jpg]]
-*Table 5: Additional time and VRAM cost*
-
 超参数稳定性方面，语义重叠阈值λ在{4, 8, 16}范围内CountAcc分别为49.3%、49.7%、49.5%；注意力提取时间步t⋆和层ℓ⋆的选择在合理范围内均保持稳定性能（Table 10, Figure 7），降低了实际使用中的调参负担。
 
 ![[assets/figures/papers/paper_list_l2362_https_arxiv_org_abs_2604_08546/figures/008_Figure_7.jpg]]
@@ -247,25 +230,6 @@ NUMINA引入的额外计算开销主要体现在预生成阶段的注意力提�
 Figure 9揭示了一个典型失败模式：当自注意力头过度聚焦于对象的显著局部特征（如鹦鹉的头部）时，布局构建阶段会将单个对象的头部与身体分离，导致实例过度分割。这种错误在布局精炼阶段无法被纠正（因为删除最小区域会移除部分身体，而添加操作会引入虚假实例），最终导致不可恢复的生成错误。这一失败模式指向方法的根本局限——基于原始注意力的布局构建缺乏整体感知分组能力，当对象具有高度纹理化的局部特征时容易产生碎片化。
 
 此外，论文明确指出方法尚未在极高密度实例场景（如数十或数百个对象）下验证，完全实现任意数字的精确视频生成仍是一个开放挑战。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2362_https_arxiv_org_abs_2604_08546/figures/007_Figure_6.jpg]]
-*Figure 6: The per-numeral accuracies for Wan2.1-1.3B*
-
-![[assets/figures/papers/paper_list_l2362_https_arxiv_org_abs_2604_08546/figures/009_Table_2.jpg]]
-*Table 2: Ablation on the layout construction method*
-
-![[assets/figures/papers/paper_list_l2362_https_arxiv_org_abs_2604_08546/figures/010_Table_4.jpg]]
-*Table 4: Ablation on the self-attention head selection strategy*
-
-![[assets/figures/papers/paper_list_l2362_https_arxiv_org_abs_2604_08546/figures/011_Table_3.jpg]]
-*Table 3: Ablation on the components of the layout refinement cost*
-
-![[assets/figures/papers/paper_list_l2362_https_arxiv_org_abs_2604_08546/figures/019_Table_11.jpg]]
-*Table 11: Ablation on object addition or removal*
-
-
 
 ## 定位与知识库关联
 
@@ -353,8 +317,6 @@ NUMINA 的核心贡献在于**发现并系统利用扩散 Transformer 中注意�
 - **方法类**：训练无关的注意力引导方法
 - **技术贡献**：注意力头选择机制、可计数布局构建、保守布局精炼、布局引导生成
 - **关键发现**：扩散 Transformer 的自注意力和交叉注意力头自然包含可提取的实例级空间结构信息
-
-
 
 ## 原文 PDF
 

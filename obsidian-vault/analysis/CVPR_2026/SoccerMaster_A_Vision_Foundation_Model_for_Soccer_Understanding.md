@@ -54,8 +54,6 @@ SoccerMaster 是首个足球专用的视觉基础模型，其核心思路是通�
 
 **方法定位**：SoccerMaster 属于监督多任务视觉基础模型，其预训练策略在方法谱系上区别于通用自监督模型（如 DINOv3）和通用视觉-语言模型（如 SigLIP 2），也不同于仅做语义对齐的足球专用模型（如 MatchVision）。它通过联合优化检测、关键点回归、分类和对比学习目标，将空间感知与语义推理统一于单一框架，为领域基础模型的构建提供了可复用的范式。
 
-
-
 足球作为全球最受欢迎的运动之一，其海量的视频数据催生了对自动化视觉理解的巨大需求。从运动员检测与跟踪、场地注册、事件分类到评论生成，足球场景涉及的任务横跨精细空间感知与高层语义推理两个层面，且二者深度耦合——例如，准确识别“进球”事件不仅需要检测球员与球门的位置关系，还需理解动作序列的时序语义。
 
 然而，现有足球视觉理解方法长期处于**任务孤立**的状态：空间感知任务（如检测、场地注册）依赖专用检测器，语义推理任务（如事件分类、评论生成）则使用独立的分类或视觉-语言模型。这些“专家模型”各自为战，无法共享表征，导致：
@@ -74,8 +72,6 @@ SoccerMaster 是首个足球专用的视觉基础模型，其核心思路是通�
 - **架构与训练策略**：如何设计一个既能提取帧内空间细节、又能建模跨帧运动语义的视觉编码器，并在多任务联合优化中平衡空间与语义目标？
 
 针对上述挑战，本文提出 **SoccerMaster**——首个足球专用的视觉基础模型，并配套 **SoccerFactory** 自动标注管线以解决数据瓶颈。SoccerMaster 通过监督多任务预训练策略，在约 745 万帧的大规模数据集上联合优化运动员检测与识别、场地关键点与线条检测、事件分类和视觉-语言对齐四类任务，使得单一模型能够习得多粒度的足球表征，仅需轻量微调即可适配下游应用。
-
-
 
 ## 核心方法与创新机理
 
@@ -115,8 +111,6 @@ SoccerFactory 三阶段管线（Figure 2）的核心机制是：
 
 三个 changed slots 构成一个**协同创新体系**：自动标注管线提供大规模空间监督，时空编码器提供多粒度表征能力，多任务联合优化使两者相互增强。最终表现为：一个模型仅需轻量微调，即可在相机校准（FS 86.8 vs. PnlCalib 78.6）、多目标跟踪（端到端设置下唯一模型）、评论生成（BLEU@1 31.3 vs. MatchVision 30.9）等下游任务上达到最优或竞争力水平（Table 4-6）。
 
-
-
 SoccerMaster 的核心设计动机源于一个关键瓶颈：现有足球视觉理解方法依赖孤立的、任务特定的专家模型，无法在单一框架内统一精细空间感知（如运动员检测、场地注册）与高级语义推理（如事件分类、评论生成）。为打破这一局限，SoccerMaster 通过**监督多任务预训练策略**，在共享的视觉编码器上同时学习空间细节（场地几何、运动员位置）和时间动态语义（事件、评论文本对齐），使得一个模型可以胜任从检测到描述的多种足球理解任务，且仅需轻量微调即可适配下游应用。
 
 ### 整体流程与模块关系
@@ -151,16 +145,6 @@ $$
 多任务预训练是 SoccerMaster 的核心创新点。消融实验（Table 12）揭示了一个重要的容量-性能权衡：在紧凑模型上，多任务训练使视觉-语言对齐 top-1 从 32.6% 提升至 36.8%，但运动员检测 AP@50 下降了 6.3 个百分点；而在全尺寸模型上，这一检测性能下降被消除，同时保持了语义任务的增益。这表明共享表征的学习效果与模型容量密切相关，全尺寸模型能更好地容纳多粒度知识的共存。
 
 此外，SoccerFactory 自动标注数据的引入对空间感知任务贡献显著——在紧凑模型上，加入自动标注后运动员检测 AP@50 提升 4.3 点，mAP 提升 7.3 点（Table 7），证明了大规模自动标注在缓解空间监督稀缺方面的有效性。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2141_https_arxiv_org_abs_2512_11016/figures/005_Figure_3.jpg]]
-*Figure 3: SoccerMaster Architecture. (a) The architecture of SoccerMaster, which encodes both soccer videos and images through spatial and temporal attention modules to generate semantically rich representations. (b) The pretraining tasks and downstream adaptations of SoccerMaster across both spatial perception and semantic understanding tasks*
-
-![[assets/figures/papers/paper_list_l2141_https_arxiv_org_abs_2512_11016/figures/016_Figure_4.jpg]]
-*Figure 4: Qualitative Results of SoccerFactory. Comparison between our predictions (left) and ground truth annotations (right) on the SoccerNet-GSR test set. Our pipeline demonstrates robust performance across diverse scenarios*
-
-
 
 ### 视觉编码器：空间与时空注意力的混合架构
 
@@ -232,17 +216,7 @@ $$
 
 其中 $\mathcal{L}_{\mathrm{a}}$ 为运动员检测与识别损失，$\mathcal{L}_{\mathrm{k}}$ 和 $\mathcal{L}_{\mathrm{l}}$ 分别为关键点和线条检测损失，$\mathcal{L}_{\mathrm{e}}$ 为事件分类损失，$\mathcal{L}_{\mathrm{con}}$ 为视觉-语言对比损失。各损失权重 $\lambda$ 的具体配置见原文 Table 10。
 
-![[assets/figures/papers/paper_list_l2141_https_arxiv_org_abs_2512_11016/figures/013_Table_10.jpg]]
-*Table 10: Loss Weights for Multi-task Training*
-
 这一多任务目标的核心机理在于：空间感知任务（检测、场地注册）迫使编码器保留精细的几何与位置信息，而语义推理任务（事件分类、视觉-语言对齐）要求编码器提取高层时序动态和语义概念。两者在共享编码器中相互约束，使得学到的表征兼具空间精度和语义丰富性——这正是 SoccerMaster 能够以轻量微调适配多种下游任务的根本原因。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2141_https_arxiv_org_abs_2512_11016/figures/002_Figure_2.jpg]]
-*Figure 2: Automated Data Curation Pipeline. Our pipeline processes input videos through three stages: (i) field registration establishes geometric correspondences between image and canonical pitch coordinates via keypoint detection; (ii) tracking and identification transforms frames into athlete trajectories through detection, role and team classification, and ReID-based tracking; and (iii) post-processing refinement improves tracking accuracy through SAM2-based segmentation and ensures temporal consistency via majority voting*
-
-
 
 ## 实验与关键发现
 
@@ -314,14 +288,6 @@ SoccerMaster 在下游任务上仅需轻量微调即可达到最优或竞争力�
 - **Table 7**：自动标注数据对运动员检测的贡献为 +4.3 AP@50，是空间感知性能的关键驱动因素。
 - **Table 12**：多任务预训练在紧凑模型上存在检测-对齐权衡，全尺寸模型可克服此问题。
 
-![[assets/figures/papers/paper_list_l2141_https_arxiv_org_abs_2512_11016/figures/004_Table_2.jpg]]
-*Table 2: Pretraining Dataset Composition. Our pretraining dataset comprises approximately 7.45M frames across 248.3K video segments, with 2.75M frames for spatial perception tasks and 4.71M frames for semantic reasoning tasks (sampled at 1FPS)*
-
-![[assets/figures/papers/paper_list_l2141_https_arxiv_org_abs_2512_11016/figures/010_Table_7.jpg]]
-*Table 7: Ablation Study on the Impact of Automatically Generated Spatial Annotations*
-
-
-
 ## 定位与知识库关联
 
 ### 从任务孤立到统一预训练：SoccerMaster 的方法谱系
@@ -371,8 +337,6 @@ Table 12 和 Appendix D 的消融实验揭示了一个关键权衡：在紧凑�
 3. **效率与精度的架构权衡**：如何在统一的前向传播中兼顾高分辨率裁剪（球衣号码识别所需）与全局上下文（事件理解所需），同时保持计算效率，是一个有待解决的架构设计问题。
 
 4. **关系推理的引入**：守门员分类的失败表明，纯前馈的视觉编码可能缺乏跨实例比较的能力。引入显式的关系推理模块（如比较队服颜色、空间位置关系）可能是一个有效的改进方向。
-
-
 
 ## 原文 PDF
 

@@ -68,8 +68,6 @@ SurgCoT 基准通过两个关键设计干预模型的推理路径：
 
 SurgCoT 区别于现有外科 VQA 基准的核心特征在于：它是首个覆盖 7 个外科专业、支持视频级到帧级多粒度标注、并提供显式时空定位监督的链式推理基准。与仅覆盖单一专业或帧级任务的 **SurgVLM-Bench**（Zeng et al., arXiv 2025）等基准不同，SurgCoT 通过五元组标注和渐进式条件推理链，将外科视频理解从“识别”推向“推理”，为评估 MLLMs 的时空因果推理能力提供了标准化测试平台。
 
-
-
 ### 外科视频理解的范式局限
 
 外科视频理解是迈向智能手术辅助的关键技术环节。近年来，多模态大语言模型（MLLMs）在通用视频理解任务上取得了显著进展，但其在外科场景中的应用仍面临根本性瓶颈。现有的外科视频问答基准，如 **Surgical-VQA**（Seenivasan et al., MICCAI 2022）、**Cholec80-VQA**（Seenivasan et al., MICCAI 2022）、**SSG-VQA**（Yuan et al., IJCARS 2024）和 **SurgVLM-Bench**（Zeng et al., arXiv 2025），普遍将评估局限于帧级或短片段级的单项任务——例如手术阶段识别、器械检测或工具计数。这些基准的标注协议通常采用“问题-选项-答案”三元组形式，缺乏对跨时序因果关系的建模和对细粒度时空推理的统一评估框架。
@@ -81,8 +79,6 @@ SurgCoT 区别于现有外科 VQA 基准的核心特征在于：它是首个覆�
 外科视频中的时空推理本质上是一个多级依赖的诊断链：手术建议必须建立在已确认的病变位置之上，而病变位置的确认又依赖于对病理类型和手术阶段的全局把握。然而，现有基准将这一隐式推理过程压缩为单一的端到端问答，既无法追踪模型的推理路径，也无法定位推理失败的具体环节。
 
 SurgCoT 的核心动机正是填补这一空白。该工作引入了一个结构化的三阶段渐进推理框架，将诊断任务分解为“全局视频理解（Q1）→ 条件片段分析（Q2）→ 细粒度帧定位（Q3）”的层级化子问题序列。同时，通过五元组标注协议（问题→选项→知识→线索→答案），在每个推理阶段显式注入临床背景知识（Knowledge）和视频时空证据（Clue），将隐式推理过程转化为可审核、可追溯的级联推理链。这一设计不仅为评估 MLLMs 的链式思维能力提供了基准，也为引导模型执行透明推理提供了结构化干预手段。
-
-
 
 ## 核心方法与创新机理
 
@@ -117,8 +113,6 @@ $$
 
 综上，SurgCoT 通过**五元组标注 + 三级级联推理 + 内置时空证据**的组合设计，将外科视频理解从“端到端答案映射”升级为“可干预、可审核的链式推理”，为评估和提升 MLLMs 在复杂动态场景中的时空认知能力提供了新的基准范式。
 
-
-
 SurgCoT 基准的构建围绕一个**结构化三阶段渐进推理框架**与配套的**五元组标注协议**展开，其核心目标是将外科视频诊断中隐式的链式思维过程显式化、可审核化。图 2 给出了完整的构建流水线，包含四个关键模块：数据处理、三阶段推理与五元组标注、VQA 生成和质量控制。
 
 ### 数据处理模块
@@ -150,18 +144,11 @@ $$
 
 基于上述框架，系统通过**本体驱动的模板化生成**方式，在五种时空推理任务（详见实验部分）上批量构建带干扰项的 VQA 对，最终生成 19,345 个主问题与 59,177 个子问题。所有标注经过**双轮人机验证**与多标准一致性检查，确保逻辑正确性和时空标注的准确性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2749_https_arxiv_org_abs_2604_20319/figures/001_Figure_1.jpg]]
 *Figure 1: SurgCoT comprises 2,841 surgical videos across 7 specialties and 35 procedures, with 19,345 main questions and 59,177 sub-questions. SurgCoT advances beyond frame-level tasks (e.g., phase/tool recognition) by introducing a three-stage, five-tuple annotation protocol (Question→Option→Knowledge→Clue→Answer) to scaffold chain-of-thought reasoning. The framework’s efficacy stems from its multi-stage reasoning structure and the synergistic interaction between the Knowledge field, which supplies contextual background, and the Clue field, which provides targeted spatiotemporal evidence, jointly enabling hierarchical reasoning*
 
 ![[assets/figures/papers/paper_list_l2749_https_arxiv_org_abs_2604_20319/figures/003_Figure_2.jpg]]
 *Figure 2: Construction pipeline of SurgCoT benchmark*
-
-![[assets/figures/papers/paper_list_l2749_https_arxiv_org_abs_2604_20319/figures/004_Figure_3.jpg]]
-*Figure 3: Statistics of SurgCoT: 2,841 videos, 19,345 questions, and 59,177 sub-questions across 35 procedures and 7 specialties*
-
-
 
 ### 三级渐进式推理框架
 
@@ -209,8 +196,6 @@ $$
 - $\mathbb{A}i$：第 $i$ 阶段输出的答案，其中 $\mathbb{A}1$ 和 $\mathbb{A}2$ 分别作为下一阶段的条件约束
 
 该公式揭示了 SurgCoT 的核心机制：推理链的每一步不仅依赖视觉输入和选项，还通过显式注入 Knowledge 和 Clue 来引导模型注意力，同时利用前序答案 $\mathbb{A}i$ 实现跨阶段的因果约束——这从根本上区别于传统 VQA 中“单步映射”的推理模式。
-
-
 
 ## 实验与关键发现
 
@@ -271,12 +256,8 @@ Figure 4 通过典型案例展示了 SurgCoT 框架如何将错误推理逐步�
 - **中间推理步骤的脆弱性**：Q2 阶段的准确率骤降现象暗示，当前 MLLMs 的链式推理能力并非真正意义上的因果推理，而更多依赖表层模式匹配。一旦中间步骤出错，后续推理极易发生级联崩溃。
 - **跨专业的泛化差异**：不同外科专业间的性能波动较大，部分罕见手术类型上的准确率显著低于常见手术，说明模型的领域知识覆盖仍不均衡。具体跨专业性能数据需查阅原文详细表格进行手动验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2749_https_arxiv_org_abs_2604_20319/figures/002_Table_1.jpg]]
 *Table 1: Comparison of surgical benchmarks. Our SurgCoT uniquely spans 7 surgical specialties with multi-level annotations (video/- clip/frame), supporting hierarchical spatiotemporal reasoning with localization supervision and clinician-derived reference standards*
-
-
 
 ## 定位与知识库关联
 
@@ -329,8 +310,6 @@ SurgCoT 揭示的核心开放问题是：当前 MLLMs 在具备完整知识和�
 2. **链式推理的可靠性**：即使模型在子问题上表现提升，中间步骤的性能下降（Table 3）表明推理链存在断裂风险——如何保证长程依赖的稳定性？
 
 这些问题超出了基准本身的范围，需要模型架构层面的创新来回应。
-
-
 
 ## 原文 PDF
 

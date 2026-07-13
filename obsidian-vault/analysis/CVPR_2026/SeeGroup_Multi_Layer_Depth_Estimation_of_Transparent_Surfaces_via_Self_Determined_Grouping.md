@@ -64,8 +64,6 @@ SeeGroup 属于**多层深度估计**方法，直接对标 Wen et al.（ICCV 202
 
 在合成数据上，SeeGroup 的逐层深度指标（AbsRel, RMS）略弱于 Multi-head (DA v2)，可能影响单纯追求逐层精度的应用场景。模型在某些模糊区域仍可能预测出多余的不存在层（过度预测），覆盖损失仅能部分缓解。此外，当前训练仅基于合成数据集，对真实世界复杂光照和材质的泛化性能仍有待验证。如何动态决定各像素的实际层数（而非固定最大层数）也是值得探索的方向。
 
-
-
 ### 透明表面的多层深度歧义
 
 透明物体（如玻璃窗、透明容器）广泛存在于日常和工业场景中，其光学特性对深度感知系统构成了根本性挑战。与不透明表面不同，透明表面不会完全遮挡其后的物体——来自不同深度的光线经透射、折射后同时进入相机，使得单个像素位置可能对应多个物理上有效的深度值。如图1所示，沿相机光轴的每一次介质转换（如空气-玻璃、玻璃-空气）都定义了一个独立的深度层，这些层共同构成了该像素的**多层深度**（multi-layer depth）。
@@ -89,8 +87,6 @@ SeeGroup 属于**多层深度估计**方法，直接对标 Wen et al.（ICCV 202
 2. **递归分解模块**：通过迭代地从特征图中分离主导组件，让网络自行学习如何将场景特征分配到不同的深度层，而非依赖固定的多分支结构。
 
 通过消除预定义分组策略带来的归纳偏置，SeeGroup 能够学习到更连贯、更锐利的多层深度图，在真实场景基准上取得了显著的性能提升。
-
-
 
 ## 核心方法与创新机理
 
@@ -136,8 +132,6 @@ $$\mathbf{C}_i = D(\mathbf{F}_{i-1}), \quad \mathbf{F}_i = \mathbf{F}_{i-1} - \b
 
 在 LayeredDepth 真实场景基准上，SeeGroup 将四元组相对深度准确率从 61.34% 提升至 70.09%（+14.26% 相对增益），且在 15 个评估指标中的 14 个上取得最优（Table 1），为多层深度估计建立了新的技术范式。
 
-
-
 SeeGroup 的整体流程围绕一个核心设计展开：**让模型自确定多层深度的分组方式**，而非依赖预定义的深度排序或固定分支结构。图 3 展示了该流程的三个主要阶段。
 
 **特征提取 → 递归分解 → 强度函数预测**
@@ -157,13 +151,6 @@ SeeGroup 的整体流程围绕一个核心设计展开：**让模型自确定多
 **推理时的深度提取**：训练完成后，推理阶段从强度函数 $\pmb{\Lambda}$ 中检测峰值作为各层的预测深度，过滤间距小于 0.02 的重复峰值，最后按深度升序排列输出有序深度序列。需要注意的是，排序仅发生在推理后处理阶段，训练过程中完全不涉及层序约束。
 
 **输入输出流总结**：输入单张 RGB 图像 → 骨干网络输出特征图 $\mathbf{F}_0$ → 递归分解模块迭代输出 $n$ 个特征组件 → 强度预测器输出 $n$ 组 Laplace 参数 → max-mixture 合成强度函数 → 峰值检测与排序输出多层深度图。整个流程端到端可微，训练仅依赖置换不变的强度损失、组件覆盖损失和梯度匹配损失（详见 3.4 节）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2093_https_openaccess_thecvf_com_content_CVPR2026_html_Wen_SeeGroup_Multi_Lay/figures/003_Figure_3.jpg]]
-*Figure 3: The overall pipeline of SeeGroup. Starting from a feature map extracted by a backbone encoder, a recurrent decomposition module generate a sequence of self-determined feature components. Then these components are mapped to an intensity function over depth, which is parameterized as a max mixture of Laplace functions*
-
-
 
 SeeGroup 的核心由三个紧密协作的模块构成：**递归分解模块**将骨干特征迭代分离为自确定的特征组件；**强度函数预测器**将每个组件映射为深度轴上的 Laplace 强度贡献，并通过 max-mixture 形成整体深度强度分布；**置换不变训练目标**则在不强制层序的前提下优化该分布，使模型学会自确定分组。
 
@@ -231,16 +218,6 @@ $$
 
 其中超参数设置为 $\lambda_{\text{int}} = 1.0$、$\lambda_{\text{cov}} = 0.1$、$\lambda_{\text{gm}} = 1.0$。消融实验证实，三损失组合在验证集上达到 69.03% 的四元组准确率（All Q），而仅用强度损失时骤降至 55.90%（Table 2），验证了覆盖约束和梯度匹配对自确定分组训练的关键作用。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2093_https_openaccess_thecvf_com_content_CVPR2026_html_Wen_SeeGroup_Multi_Lay/figures/002_Figure_2.jpg]]
-*Figure 2: Two example grouping strategies to group multi-layer depth into several depth maps. The best grouping strategy is highly scene-dependent and may very by regions of the image*
-
-![[assets/figures/papers/paper_list_l2093_https_openaccess_thecvf_com_content_CVPR2026_html_Wen_SeeGroup_Multi_Lay/figures/001_Figure_1.jpg]]
-*Figure 1: Definition of multi-layer depth. Figure reproduced from [46]. (a) Each transition in medium along the camera ray defines a distinct layer. (b) Depth on i-th layer is the distance along the z-axis from the i-th layer to the camera*
-
-
-
 ## 实验与关键发现
 
 SeeGroup 在真实场景多层深度基准 LayeredDepth 上进行了系统评估，并从架构设计、强度参数化和损失函数三个维度展开了消融实验，以验证自确定分组策略的有效性。
@@ -282,12 +259,8 @@ SeeGroup 在真实场景多层深度基准 LayeredDepth 上进行了系统评估
 
 已知的失效模式包括：模型在极端模糊或高透明度区域仍可能预测出多余的不存在层（过度预测）。尽管 $L_{cov}$ 已部分缓解该问题，但在视觉证据极弱的像素处，强度函数可能出现虚假峰值。此外，当前训练仅依赖合成数据，在真实世界复杂光照和材质多样性下的泛化边界尚需进一步验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2093_https_openaccess_thecvf_com_content_CVPR2026_html_Wen_SeeGroup_Multi_Lay/figures/008_Table_4.jpg]]
 *Table 4: We report the total number of parameters (#Param), the number of parameters excluding the pretrained encoder (#Param w/o enc), CPU time and GPU time per forward pass, and FLOPs for all three architectures. Our Recurrent Decomposition Module (RD) uses the fewest parameters among them*
-
-
 
 ## 定位与知识库关联
 
@@ -345,8 +318,6 @@ $$\mathcal{L}_{\text{int}} = -\sum_{i=1}^{m} \log \max_j \mathbf{L}_j(d_i)$$
 2. **过度预测的根治**：覆盖损失仅能部分抑制虚假层，在高透明度或极端光照条件下仍可能失效。是否需要引入对抗训练或物理先验来更根本地约束组件数量？
 3. **真实场景泛化**：如何将自确定分组策略扩展到更多样的真实世界透明场景（弯曲玻璃、多层叠加），并降低对合成数据的依赖？域适应或自监督微调可能是可行路径。
 4. **与其他模态的融合**：偏振成像、ToF传感器等模态可提供额外的层分离线索，自确定分组框架是否能自然融合这些信号？
-
-
 
 ## 原文 PDF
 

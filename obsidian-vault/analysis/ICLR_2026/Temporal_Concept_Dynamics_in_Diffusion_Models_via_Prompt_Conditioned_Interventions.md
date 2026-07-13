@@ -56,8 +56,6 @@ PCI 揭示的核心发现是：**概念插入成功概率随去噪时间呈非�
 
 PCI 的计算开销较高（需在所有推理步上插断），且不存在适用于所有概念的单一最优 CIS 值；推荐 $[0.5, 0.7]$ 作为普适编辑窗口，但特定概念仍可能需微调。如何降低 CIS 曲线计算成本、自动确定概念级编辑截止点，以及从单概念 CIS 预测多概念联合插入行为，是尚待解决的开放问题。
 
-
-
 扩散模型已成为文本到图像生成的核心范式，但我们对模型内部的概念形成过程仍知之甚少：一个语义概念究竟是在去噪轨迹的哪个时间点从噪声中“结晶”出来的？一旦形成，它又在何时变得不可再被外部干预所改变？这些问题不仅关乎我们对生成模型机理的基本理解，更直接影响文本驱动图像编辑等下游应用的可控性与可靠性。
 
 现有研究多从静态视角评估扩散模型的生成结果。无论是通过 CLIPScore、LPIPS 等感知指标衡量编辑后的图像质量，还是利用注意力图修改扩散轨迹的方法（如 **NTI+P2P**，Mokady et al., 2023；**Stable Flow**，Avrahami et al., CVPR 2025），它们都关注“编辑后图像是否包含目标概念”这一最终状态，却忽略了去噪过程中概念的时间动态——概念是何时被模型锁定的？不同概念类别的锁定时序是否存在系统性差异？这些问题在现有文献中缺乏系统性的实证研究。
@@ -67,8 +65,6 @@ PCI 的计算开销较高（需在所有推理步上插断），且不存在适�
 本文的核心动机正是填补这一空白。我们提出一个根本性问题：**能否通过系统性地干预去噪轨迹，来测量概念在扩散时间中的形成与锁定动态？** 为此，我们设计了一个轻量、无需训练、模型无关的分析框架——**Prompt-Conditioned Intervention (PCI)**。其核心思想是在去噪过程的不同时间步切换文本提示条件，观察目标概念是否能被成功插入最终图像，从而绘制出概念插入成功率（Concept Insertion Success, CIS）沿时间的变化曲线。这条曲线天然地揭示了一个概念从“可自由插入”到“已被锁定不可再干预”的转变过程，为理解扩散模型中的概念时间动态提供了可量化的分析工具。
 
 通过这一框架，我们能够在多个主流扩散模型（SD 2.1、SDXL、SD 3.5、FLUX.1-dev）上，对涵盖全局场景因素（时间、天气、季节、风格、颜色）、人类属性（年龄、性别）和配件细节等数十个细粒度概念类别进行大规模分析，从而揭示概念锁定的普遍规律及其对编辑实践的指导意义。
-
-
 
 ## 核心方法与创新机理
 
@@ -93,8 +89,6 @@ PCI 将概念存在判定重构为**大型视觉语言模型（LVLM）的视觉�
 3. **可扩展性**：VQA 问题模板可随概念类别灵活定制（Table A1），覆盖从具体物体到抽象属性的广泛概念空间。
 
 这两个 changed slots 共同构成了 PCI 的方法论核心：**CIS 曲线提供了概念时间动态的量化表征，而 VQA 判定机制确保了该表征的语义可靠性与测量鲁棒性**。二者结合，使得扩散模型去噪轨迹中“概念何时形成、何时锁定”这一原本隐式的过程，首次获得了可测量、可比较、可操作的实证基础。
-
-
 
 ![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_ABjaSsrYPD/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the PCI framework. A base prompt P _ { b } is used as conditioning for generation, altered to the concept prompt P _ { c } at time t _ { s } . The generated images are evaluated through VQA to determine concept presence and aggregated across seeds to obtain CIS across the diffusion trajectory*
@@ -157,8 +151,6 @@ PCI 与现有文本驱动图像编辑方法的关键差异体现在两个维度�
 - **VQA 模型鲁棒性**：Qwen-3B、Qwen-7B、LLaVA-OneVision-7B、SmolVLM-2B 四种 LVLM 的 CIS 轨迹高度一致。
 - **种子预算充分性**：$k=100$ 个种子足以生成稳定的 CIS 轨迹，增加种子不会明显提高覆盖度。
 - **提示鲁棒性**：在动物、手工制品、常见动作三个子类别上，五种语义等价的提示改写下，CIS 时序模式与锁定行为保持一致（Table C1）。
-
-
 
 ### 整体框架
 
@@ -228,8 +220,6 @@ $$\hat{\boldsymbol{\epsilon}}_\theta = (1+\omega)\boldsymbol{\epsilon}_\theta(\m
 
 在文本驱动图像编辑任务中，编辑触发机制为：将用户指定的 CIS 概率映射到 CIS 曲线上最接近的对应时间步 $t_s$，然后执行 PCI。论文发现 $[\tau_{50}, \tau_{70}]$ 区间（即 CIS 概率 0.5–0.7 对应的时间窗口）是实现语义插入与内容保留最佳平衡的编辑窗口。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：概念锁定时序的非递减规律
@@ -237,10 +227,6 @@ $$\hat{\boldsymbol{\epsilon}}_\theta = (1+\omega)\boldsymbol{\epsilon}_\theta(\m
 PCI 框架在五个生成模型（SD 2.1、SDXL、SD 3.5、PixArt-alpha XL、FLUX.1-dev）上揭示了概念插入成功概率 C(τ) 随去噪时间呈经验性非递减规律——概念一旦在某个时间步变得可插入，该能力不会在更晚的时间步丧失。这一单调性构成了所有后续分析的基础。
 
 概念类别之间呈现出清晰的时序分层（图 3、图 D1）：
-
-
-![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_ABjaSsrYPD/figures/003_Figure_3.jpg]]
-*Figure 3: CIS reveals cross-concept and cross-architecture differences. CIS for $\tau _ { 5 0 }$ and $\bullet \tau _ { 7 0 }$ across multiple concept categories and diffusion models
 
 - **全局场景因素锁定最早且过渡最急剧**：时间（time of day）、天气（weather）、季节（season）、风格（style）、颜色（color）等概念在去噪早期即锁定，其 τ₅₀ 和 τ₇₀ 值显著高于其他类别，且带宽 W₇₀₅₀ = τ₇₀ − τ₅₀ 极窄，表明这些概念的决定窗口短而脆——一旦错过极窄的时间窗口，插入成功率急剧下降。
 
@@ -259,7 +245,6 @@ PCI 框架在五个生成模型（SD 2.1、SDXL、SD 3.5、PixArt-alpha XL、FLU
 ### CIS 引导的编辑窗口：τ₅₀ 到 τ₇₀ 的最优平衡
 
 将 CIS 分析应用于文本驱动图像编辑，实验表明 [τ₅₀, τ₇₀] 区间是实现语义插入与内容保留最佳平衡的编辑窗口（图 5）。定量比较（表 1）证实了这一结论：
-
 
 ![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_ABjaSsrYPD/figures/007_Table_1.jpg]]
 *Table 1: Quantitative comparison of editing methods. We report $\mathrm { C L I P } _ { i m g }$ (content preservation), $\mathrm { C L I P } _ { t x t }$ (semantic alignment), and ${ \mathrm { C L I P } } _ { d i r }$ (directional consistency). Higher $\mathrm { C L I P } _ { i m g } ^ { - }$ indicates better preservation, while higher $\mathrm { C L I P } _ { t x t }$ and $\mathrm { C L I P } _ { d i r }$ indicate stronger concept insertion
@@ -294,11 +279,6 @@ PCI-τ₅₀ 在所有三项 CLIP 指标上均优于 NTI+P2P（Mokady et al., 20
 3. **CDS 指标受限**：概念删除成功率（Concept Deletion Success, CDS）因回推效应等不稳定因素，未作为主要分析指标，其解释能力受限（图 A2、A3）。
 4. **LVLM 评估偏见**：VQA 评估可能继承训练数据中的偏见，对抽象或主观概念可能产生跨文化差异，需在应用中注意。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_ABjaSsrYPD/figures/031_Figure_28.jpg]]
-*Figure 28: Figure D1: CIS reveals cross-concept and cross-architecture differences. CIS for $\bullet \tau _ { 5 0 }$ and • $\tau _ { 7 0 }$ across multiple concept categories and diffusion models
-
 ![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_ABjaSsrYPD/figures/054_Figure_51.jpg]]
 *Figure 51: Figure D7: Comparison of editing performance across NTI-P2P, Stable-Flow, and our PCI method at τ60. PCI produces edits that are semantically stronger, more spatially localized, and better aligned with the target concept while preserving non-edited regions*
 
@@ -307,9 +287,6 @@ PCI-τ₅₀ 在所有三项 CLIP 指标上均优于 NTI+P2P（Mokady et al., 20
 
 ![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_ABjaSsrYPD/figures/030_Table_3.jpg]]
 *Table 3: Table C1: Overview of the prompt variations. For the selected subcategories, we construct a total of five prompts: the original base prompt (shown in bold) and four semantically consistent paraphrased variants used to assess prompt robustness*
-
-
-
 
 ## 定位与知识库关联
 
@@ -354,8 +331,6 @@ PCI 的适用边界由以下几个维度界定：
 1. 能否在保持分辨率的前提下大幅降低 CIS 曲线计算的时间成本，使其适用于实时编辑场景？
 2. 如何自动为不同概念和上下文确定一个可靠的单值 CIS 编辑截止点，而无需用户手动调参？
 3. 多概念交互中，哪些机制决定了联合插入窗口的延迟或提前？能否从单概念 CIS 预测多概念组合的插入时序？消融实验已发现少数组合（如 female + sketch）会显著将插入窗口后移，体现非组合式的交互效应（Fig. D4），但这一现象的规律尚未被系统建模。
-
-
 
 ## 原文 PDF
 

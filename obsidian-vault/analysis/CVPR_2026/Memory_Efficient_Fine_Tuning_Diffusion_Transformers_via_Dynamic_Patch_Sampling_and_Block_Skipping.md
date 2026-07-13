@@ -51,15 +51,11 @@ claims:
 
 实验结果表明，在FLUX模型上，DiT-BlockSkip以30%的跳过比和256×256训练分辨率取得了与全分辨率LoRA（512×512）高度接近的主体与文本保真度（DINO 0.7194 vs 0.7324，CLIP-I 0.8036 vs 0.8146），同时训练内存从35.99 GiB降至20.78 GiB；当跳过比提升至50%时，内存进一步降至10.42 GiB，降幅达71%。在SANA模型上，该方法以30%跳过比在CustomConcept101数据集上取得了最高的CLIP-I（0.7826），且训练内存仅3.10 GiB，相比LoRA的8.35 GiB降低62.9%。消融实验证实，动态块采样优于固定缩放，残差特征预计算是块跳过机制有效性的关键使能因素，而跳过中间层块会导致主体身份严重丢失，验证了中层块对个性化信息编码的核心作用。
 
-
-
 扩散变换器（Diffusion Transformer, DiT）已成为文生图领域的主流架构，其规模化扩展带来了显著的生成质量提升。然而，当用户希望将预训练DiT个性化微调至特定主体时——例如通过DreamBooth范式注入新概念——内存消耗问题变得极为突出。核心瓶颈在于：微调过程必须保留完整的前向/反向传播计算图和整个基础模型参数。即使采用参数高效微调（PEFT）方法（如LoRA）大幅削减可训练参数量，反向传播仍需流经全部Transformer块，导致激活内存和参数内存开销居高不下。当训练分辨率提升至512×512甚至1024×1024时，这一矛盾进一步激化——在FLUX上，标准LoRA微调需占用约36 GiB GPU内存，严重限制了普通用户的可用性。
 
 现有内存优化策略各自存在明显缺口。**梯度检查点**（Gradient Checkpointing）以计算换内存，但额外的前向重计算显著拖慢训练速度。**LoRA-FA**仅减少优化器状态内存，无法缓解激活内存压力。**LISA**（源于LLM领域）通过逐层随机激活释放内存，但直接迁移至DiT会导致性能退化。**HollowedNet**在U-Net架构上通过层跳过实现内存节约，但其层选择策略无法有效识别DiT中对主体身份至关重要的中间层块，适配后性能下降严重。这些方法的共同局限在于：它们或仅作用于单一内存组分，或缺乏对DiT架构特性的针对性设计，难以在内存效率与个性化保真度之间取得令人满意的平衡。
 
 本文的核心洞察源于一项关键观察：在DiT的交叉注意力层中，**中间层块对主体身份编码起着决定性作用**。当对连续14个中间层块的交叉注意力进行掩码时，生成图像中的主体完全消失，语义距离达到最大（Figure 3）。相比之下，掩码浅层或深层块的影响相对轻微。这一发现揭示了一个因果机制——主体特定信息主要驻留在DiT的中间表示层，而浅层和深层块承载的更多是通用视觉特征或高频细节。基于此，本文提出**DiT-BlockSkip**，通过两个协同机制直击内存瓶颈：**动态块采样**根据扩散时间步自适应调整训练分辨率，同时捕获全局结构与局部细节；**块跳过与残差特征预计算**仅微调关键块，并利用预存储的残差特征补偿跳过块的信息损失，从而在将训练内存降低71%的同时，保持与全模型微调相当的主体保真度。
-
-
 
 ## 核心方法与创新机理
 
@@ -99,8 +95,6 @@ DiT-BlockSkip 的核心创新在于**从传统“减少可训练参数”转向�
 
 **与基线的本质差异**：HollowedNet 虽也使用层跳过和残差预计算，但其源于 U-Net，无法有效识别 DiT 中的关键块，导致性能显著下降（Table 2）；LISA、LoRA-FA 等仅减少优化器内存或部分参数，未触及激活内存瓶颈。DiT-BlockSkip 通过**识别并保留关键中层块 + 残差补偿跳过块**，实现了内存与保真度的帕累托改进。
 
-
-
 DiT-BlockSkip 的整体 pipeline 由三个核心模块串联构成：**动态块采样（Dynamic Patch Sampling）**、**基于交叉注意力掩码的块选择与残差预计算（Block Selection & Residual Feature Precomputation）**，以及**未跳过块的 LoRA 微调（Fine-Tuning Unskipped Blocks with LoRA）**。图 2 给出了完整的流程示意。
 
 **输入与预处理**。给定一张高分辨率参考图像（如 FLUX 的 512×512 或 SANA 的 1024×1024），动态块采样模块首先根据当前扩散时间步 $t$ 决定裁剪块的大小，然后将裁剪后的块缩放至固定的低分辨率（FLUX 为 256×256，SANA 为 512×512）。这一设计使得模型在高噪声阶段（$t$ 大）学习主体的全局结构，在低噪声阶段（$t$ 小）关注局部细节，而无需改变实际训练分辨率。
@@ -111,12 +105,8 @@ DiT-BlockSkip 的整体 pipeline 由三个核心模块串联构成：**动态块
 
 **内存降低的因果链路**。该 pipeline 从三个层面压缩训练内存：（1）动态块采样降低前向/反向传播中的激活内存；（2）块跳过通过卸载参数减少参数内存和优化器状态内存；（3）残差预计算使得跳过块无需反向传播，进一步削减激活内存。消融实验表明，仅动态采样将 FLUX 训练内存从 35.99 GiB 降至 30.48 GiB，仅 50% 块跳过降至 12.85 GiB，二者结合进一步降至 10.42 GiB（Table 12），验证了各模块独立且协同的内存削减效果。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l899_https_arxiv_org_abs_2603_20755/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed method. (a) The dynamic patch sampling applies different patch sizes for each diffusion timestep, enabling the model to learn both global structure and fine-grained details depending on the noise level. Cropped patches of various sizes are resized to the same fixed resolution*
-
-
 
 DiT-BlockSkip 围绕两条因果链路降低 DiT 微调的内存瓶颈：**动态块采样**从输入端压缩训练分辨率，**块跳过与残差特征预计算**从模型端削减前向/反向传播中的参数与激活内存。两条链路协同作用，使训练内存在 FLUX 上从 LoRA 的 35.99 GiB 降至 10.42 GiB（50% 跳过比），降幅约 71%。
 
@@ -157,15 +147,8 @@ $$f_{i+l}' = f_i' + \Delta f_{i, i+l} = f_i' + (f_{i+l} - f_i)$$
 
 仅对保留的中间块注入 LoRA 可调参数，使用条件流匹配损失进行微调。预计算残差特征从存储加载并与更新后的特征相加，作为后续块的输入。整个流程中，动态块采样降低前向/反向激活内存，块跳过削减参数内存与优化器状态，残差预计算弥补信息损失——三者协同实现了内存与保真度的 Pareto 改进。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l899_https_arxiv_org_abs_2603_20755/figures/009_Figure_6.jpg]]
 *Figure 6: Qualitative ablation results of (a) dynamic patch sampling and (b) skipped block positions*
-
-![[assets/figures/papers/paper_list_l899_https_arxiv_org_abs_2603_20755/figures/010_Figure_7.jpg]]
-*Figure 7: Qualitative ablation results of block skipping with and without residual features*
-
-
 
 ## 实验与关键发现
 
@@ -217,25 +200,6 @@ $$f_{i+l}' = f_i' + \Delta f_{i, i+l} = f_i' + (f_{i+l} - f_i)$$
 3. **模型架构泛化性**：当前验证仅限于 FLUX 和 SANA 两个 DiT 架构，对其他 DiT 变体（如 PixArt-σ）的适用性有待验证。HollowedNet 从 U-Net 适配至 DiT 后性能显著下降（**Table 1**），暗示块跳过策略对架构特性敏感。
 
 4. **设备端部署未验证**：尽管训练内存大幅降低，实际移动/IoT 设备上的部署可行性尚未演示，ROM 与 VRAM 的协同优化仍是开放问题。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l899_https_arxiv_org_abs_2603_20755/figures/007_Table_2.jpg]]
-*Table 2: Ablation study on FLUX*
-
-![[assets/figures/papers/paper_list_l899_https_arxiv_org_abs_2603_20755/figures/005_Figure_4.jpg]]
-*Figure 4: Comparison of memory and TFLOPS*
-
-![[assets/figures/papers/paper_list_l899_https_arxiv_org_abs_2603_20755/figures/013_Table_6.jpg]]
-*Table 6: Detailed training memory comparison and TFLOPs with baselines based on FLUX. Inference resolution is 1024 × 1024*
-
-![[assets/figures/papers/paper_list_l899_https_arxiv_org_abs_2603_20755/figures/019_Table_12.jpg]]
-*Table 12: Memory usage with dynamic patch sampling and block skipping applied*
-
-![[assets/figures/papers/paper_list_l899_https_arxiv_org_abs_2603_20755/figures/008_Table_3.jpg]]
-*Table 3: User preference on subject fidelity and text fidelity*
-
-
 
 ## 定位与知识库关联
 
@@ -289,8 +253,6 @@ DiT-BlockSkip 的核心定位是在扩散变换器（DiT）的个性化微调场
 4. **关键块识别的自动化**：当前块选择依赖预先的交叉注意力掩码分析和语义距离优化（Eq. 2, Algorithm 1），能否将该过程自动化并适应不同的个性化任务，而无需针对每个新主体或新模型重复分析？这直接关系到方法的实际部署便捷性。
 
 5. **预计算开销的进一步压缩**：残差特征预计算需要完整前向传播一次，能否通过部分前向传播或特征压缩技术进一步降低预计算阶段的内存和时间开销？
-
-
 
 ## 原文 PDF
 

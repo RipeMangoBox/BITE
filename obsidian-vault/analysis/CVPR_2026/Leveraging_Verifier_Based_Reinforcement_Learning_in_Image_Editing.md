@@ -58,8 +58,6 @@ claims:
 
 消融实验进一步揭示：SFT 阶段同时保留“思考”（Think）与“验证”（Verify）模块可获得最优性能；GCPO 在仅使用约 1 万人类偏好对（不到 SFT 数据的 1%）的情况下，仍能稳定提升约 4.9 个百分点，说明增益主要来源于人类对齐质量而非数据量；模型从 3B 扩展至 7B 时呈现出良好的可扩展趋势。此外，RL-RRM 作为奖励信号比仅 SFT 的 RRM 更为严格和鲁棒，能有效纠正编辑模型在微调中产生的幻觉问题（如错误修改未指定的属性）。
 
-
-
 图像编辑任务要求模型在保留源图像无关区域的同时，精确执行用户指令所描述的局部修改。近年来，随着扩散模型和流匹配模型的快速发展，图像编辑的生成质量取得了显著进步。然而，**编辑结果与人类意图之间的精确对齐**仍然是一个核心挑战——模型常常出现属性泄露（如修改衬衫颜色时意外改变帽子颜色）、指令遵循不完整，或生成不符合物理规律的视觉伪影。
 
 ### 现有奖励模型的根本缺陷
@@ -79,8 +77,6 @@ claims:
 Edit-R1 的提出源于一个关键洞察：**编辑指令天然可分解为一组可独立验证的原则**。例如，“将红色衬衫改为蓝色，保持其他元素不变”这条指令，可以拆解为三个原则：（1）衬衫颜色应变为蓝色（遵循修改要求）；（2）除衬衫外的所有元素应保持不变（保持约束）；（3）编辑结果应保持整体视觉质量（质量约束）。
 
 基于这一洞察，Edit-R1 将奖励模型从“整体打分器”重构为“推理验证器”：它首先将编辑指令分解为可验证的原则集合，然后对每条原则逐一进行链式思维推理和核验，最终聚合为结构化、可解释的细粒度奖励。这一范式转变使得奖励信号不仅更准确地对齐人类偏好，还能为下游编辑模型的优化提供可操作的反馈。
-
-
 
 ## 核心方法与创新机理
 
@@ -106,8 +102,6 @@ Edit-R1 为推理奖励模型设计了独特的两阶段训练流程，以同时
 ### 方法谱系与知识库定位
 
 从奖励模型的设计谱系来看，Edit-R1 的 RRM 是目前唯一同时具备以下三项推理增强特性的图像编辑奖励模型：**显式使用可验证原则（as verifier）**、**链式思维推理（thinks）**、**强化学习对齐（RL）**。相较于仅依赖 VLM 整体评分的 Seed-1.5-VL、Seed-1.6-VL，以及编辑专用的 EditScore，Edit-RRM 在建模范式上实现了从“评分”到“验证”的跨越。在训练策略上，相较于传统的单一阶段 SFT，Edit-R1 引入的 GCPO 算法通过组间对比机制有效利用了人类偏好数据，为奖励模型的 RL 训练提供了新的范式参考。
-
-
 
 Edit-R1 的整体框架围绕一个核心组件——**基于验证器的推理奖励模型（Verifier-based Reasoning Reward Model, RRM）**——构建，并将其作为下游图像编辑模型强化学习的训练信号。该框架包含三个逻辑阶段：（1）将编辑指令分解为可独立验证的原则集合；（2）通过冷启动监督微调（SFT）与群体对比偏好优化（GCPO）两阶段训练，得到一个能生成可解释、细粒度奖励的 RRM；（3）利用训练好的 RRM 作为非可微奖励信号，通过 GRPO 算法优化下游编辑模型。
 
@@ -160,12 +154,8 @@ $$A_i = \frac{\tau_i - \mathrm{mean}(\{\tau_i\})}{\mathrm{std}(\{\tau_i\}) + \ep
 
 该设计的核心优势在于：奖励模型不再是黑盒的整体打分器，而是一个可解释的推理验证器，其输出的逐原则评分不仅为编辑模型提供了细粒度的训练信号，也使得整个优化过程具有可审计的透明度。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2690_https_arxiv_org_abs_2604_27505/figures/001_Figure_1.jpg]]
 *Figure 1: Our framework: from verifier-based reasoning reward model (RRM) to downstream. (a) Verifier as a reasoning reward model. The RRM decomposes an instruction into verifiable principles and scores an edited image against them in a single pass. (b) Reward benchmark performance. Our final 7B model, trained with SFT and GCPO (RL-RRM), reaches 82.22% accuracy, surpassing the Seed-VLM baseline. Each training component contributes to the performance gain. (c) Downstream application. Using our 7B RL-RRM as a reward signal significantly improves the performance of FLUX.Kontext [5] across multiple editing categories during post-training*
-
-
 
 ### 两阶段奖励模型训练管线
 
@@ -209,15 +199,8 @@ $$A_i = \frac{\tau_i - \mathrm{mean}(\{\tau_i\})}{\mathrm{std}(\{\tau_i\}) + \ep
 
 原则分解模块将模糊的编辑指令转化为可验证的检查清单，为 CoT 推理提供了结构化锚点；外部验证模块通过筛选高质量推理轨迹，确保 SFT 冷启动数据的可靠性；GCPO 模块则利用人类偏好对中的对比信号，使 RRM 的评分分布更精准地对齐人类判断。这三个模块形成递进依赖：原则分解质量决定 CoT 推理的上限，外部验证过滤低质轨迹保障 SFT 基础能力，GCPO 在此基础上注入人类对齐信号，最终使 7B RL-RRM 在内部基准上达到 82.2% 的准确率，显著超越 Seed-1.5-VL（79.3%）和编辑专用模型 EditScore（65.9%）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2690_https_arxiv_org_abs_2604_27505/figures/004_Figure_2.jpg]]
 *Figure 2: The Training pipeline of Verifier-based Reasoning Reward Model (RRM). Top (Cold-Start SFT): Given an edit instruction and a source image, we generate large-scale quadruple data (instruction, source image, principles, edited image) and employ VLM pools to generate numerous reasoning traces and use another VLM to select the thinking COT with the highest accuracy to build SFT data and cold-start the Reasoning Reward Model (RRM). Bottom (GCPO): For each human-labeled preference pair, the reward model generates N thinking-score candidates per image. We compute a win/loss ratio reward by pairwise comparing every candidate in the preferred group against all candidates in the non-preferred group. T...*
-
-![[assets/figures/papers/paper_list_l2690_https_arxiv_org_abs_2604_27505/figures/010_Figure_5.jpg]]
-*Figure 5: Illustration of the Verifier-based Reasoning Reward Model (RRM) inference process. (a) shows the input quadruple, which includes the source image, the edit instruction, and the decomposed principles for evaluation. (b) shows the final summary output from the RRM, containing the score for each principle and the final comprehensive score for the edited image*
-
-
 
 ## 实验与关键发现
 
@@ -251,16 +234,8 @@ $$A_i = \frac{\tau_i - \mathrm{mean}(\{\tau_i\})}{\mathrm{std}(\{\tau_i\}) + \ep
 
 **已知局限**。（1）RRM的CoT推理过程需要离散文本生成，导致奖励信号不可微，无法直接用于基于梯度的策略优化，当前仅能通过GRPO等非梯度方法间接利用。（2）GCPO依赖人工标注偏好对（约10k），数据采集成本较高；虽性能提升显著，但更低数据量下的极限性能尚不明确。（3）当前实验仅在FLUX.Kontext和Qwen-Edit两款编辑模型上验证了有效性，在其他架构（如GAN-based编辑器或视频编辑任务）上的泛化性有待进一步探索。（4）奖励模型对原则分解的初始质量敏感——若Seed-VLM生成的原则集合不准确，可能影响后续评分的可靠性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2690_https_arxiv_org_abs_2604_27505/figures/002_Table_1.jpg]]
 *Table 1: Comparison of reward models, highlighting reasoning capabilities. We categorize methods by their foundational characteristics (Task, Modeling Paradigm, etc.) and their support for advanced Reasoning Ability components: explicit use of principles(“as verifier”), Chain-of-Thought (“thinks”), and reinforcement learning. A checkmark (✓) denotes support. Edit-RRM (Ours) is unique in integrating all three reasoning-enhancing features within a generative, point-wise framework for visual tasks*
-
-![[assets/figures/papers/paper_list_l2690_https_arxiv_org_abs_2604_27505/figures/005_Figure_3.jpg]]
-*Figure 3: Training dynamics of RRMs. a, SFT Loss, showing model convergence and scalability. b, SFT evaluation accuracy for the RRMs, showing steady improvement. c, Weighted advantage during GCPO training. The weighted advantage is defined as*
-
-![[assets/figures/papers/paper_list_l2690_https_arxiv_org_abs_2604_27505/figures/006_Figure_4.jpg]]
-*Figure 4: Training dynamics of editing model optimization with different RRMs. The first row shows the training reward, and the second row shows the evaluation reward. Here, SFT-RRM denotes a reward model trained without GCPO, while RL-RRM denotes its counterpart trained with GCPO. First column: our SFT-RRM (7B) produces a reward signal that is as stable and effective as the Seed-1.5-VL. Second column: the SFT-RRM 7B exhibits stronger scalability, providing more reliable supervision and yielding better performance than the SFT-RRM 3B. Third and fourth columns: refining the RRM with GCPO results in consistently higher evaluation rewards, indicating that the RRM trained with GCPO acts as a stricter and...*
 
 ![[assets/figures/papers/paper_list_l2690_https_arxiv_org_abs_2604_27505/figures/007_Table_2.jpg]]
 *Table 2: Accuracy on our internal benchmark. T, V, and T+V denote Think, Verify, and Think+Verify, respectively*
@@ -270,17 +245,6 @@ $$A_i = \frac{\tau_i - \mathrm{mean}(\{\tau_i\})}{\mathrm{std}(\{\tau_i\}) + \ep
 
 ![[assets/figures/papers/paper_list_l2690_https_arxiv_org_abs_2604_27505/figures/009_Table_4.jpg]]
 *Table 4: Comparison of our RRM against the baseline on the EditReward benchmark. All results are for 7B models*
-
-![[assets/figures/papers/paper_list_l2690_https_arxiv_org_abs_2604_27505/figures/011_Table_5.jpg]]
-*Table 5: Human evaluation using the GSB protocol. Higher is better*
-
-![[assets/figures/papers/paper_list_l2690_https_arxiv_org_abs_2604_27505/figures/012_Figure.jpg]]
-*Figure: [Text Change] Remove the text 'FREE'. [Material Alter] Turn the puppy into clay*
-
-![[assets/figures/papers/paper_list_l2690_https_arxiv_org_abs_2604_27505/figures/016_Figure.jpg]]
-*Figure: Source Winner Loser*
-
-
 
 ## 定位与知识库关联
 
@@ -335,8 +299,6 @@ Edit-R1 开辟了基于验证器的推理奖励模型新范式，以下开放问
 - **推理效率与准确率的权衡**：RRM 的 CoT 推理长度与评估准确率之间存在何种量化关系？是否存在更高效的推理格式（如结构化 JSON 输出）或推理压缩策略，在保持可解释性的同时降低推理成本？
 
 - **从验证到生成的可解释性传递**：RRM 内部已具备对编辑结果逐原则验证的能力，如何将这种结构化验证信号反馈到编辑模型的生成过程中，使编辑模型本身具备可解释、可控的编辑能力，是提升系统整体透明度的关键方向。
-
-
 
 ## 原文 PDF
 

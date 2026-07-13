@@ -221,8 +221,6 @@ $$
 
 消融实验验证了此优先级设计的有效性：将风格或轨迹提升为主条件（w Pri. $f_s$ / w Pri. $f_t$）均导致多项指标下降（Table 3）；将辅条件融合机制替换为简单拼接（w Con.）或 AdaIN（w AdaIN）也无法取得同等均衡的风格转移效果。这证实了“内容为主、轨迹与风格为辅”的 AdaLN-Zero 注入策略是实现高质量任意运动风格迁移的关键因果机制。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2_MCM_LDM_Arbitrary_Motion_Style_Transfer_with_Multi_condition_Motion_Late/figures/003_Figure_3.jpg]]
 *Figure 3: Method overview. We have two components: (1) The Multi-condition Extraction obtains content features $f _ { c }$ and trajectory features $f _ { t }$ from the content motion, while the style features $f _ { s }$ are obtained from the style motion. (2) MCM-LDM contains forward process and denosing process. The condition features guide the denoising process through Multi-condition Denoiser*
 
@@ -269,8 +267,6 @@ MCM-LDM在HumanML3D测试集上取得了最优的运动质量与风格表现平�
 1.  **轨迹条件依赖性**：当前方法仅在给定轨迹时发挥作用，无法自主生成新轨迹。对于需要轨迹创造的应用场景（如路径驱动的运动生成），模型缺乏生成能力。
 2.  **分布外泛化**：模型在HumanML3D上训练，对于超出训练时长或动作类型的序列，风格迁移质量可能下降。实验未报告在分布外数据上的测试结果，这一点需要手动验证。
 3.  **环境交互缺失**：模型未建模与环境的物理交互（如地面反作用力、物体接触），在复杂场景下可能出现物理不合理性。FSF指标虽优于基线，但1.28的绝对值仍表明存在轻微脚滑动，说明轨迹学习式保留尚未完全消除该问题。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2_MCM_LDM_Arbitrary_Motion_Style_Transfer_with_Multi_condition_Motion_Late/figures/007_Table_2.jpg]]
 *Table 2: Ablation study. The results validate the importance of StyleRemover in ${ \mathcal { E } } _ { c o n }$ . , pre-trained MotionCLIP in $\mathcal { E } _ { s t y }$ , and trajectory condition $f _ { t }$ to our approach. Table 3. Experiments of four guidance strategies in $E _ { \theta }$ . ‘w Con.’ and ‘w AdaIN’ represent the fusion mechanisms of concatenation and AdaIN for incorporating the secondary conditions into $E _ { \theta }$ . ‘w Pri. $f _ { s }$ { ' } an$d ^ \ast \mathrm { _ { w } }$ Pri. $f _ { t } ^ { \mathrm { ~ , ~ } }$ respectively represent treating style or trajectory as a primary condition*

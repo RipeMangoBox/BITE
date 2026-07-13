@@ -50,8 +50,6 @@ claims:
 
 在 ScanQA 和 SQA3D 等三维问答与密集字幕基准上，Fase3D 以显著更低的计算代价取得了与编码器基线相当的性能。消融实验进一步证实，基于FFT的上下文增强器单独能将 CIDEr 提升 **6.93**，与超点池化结合后提升可达 **10.87**，验证了频域全局建模的关键作用。当前方法主要在 ScanNet 数据集上验证，尚未扩展到更广泛的多模态输入或更大规模三维语料库，这些方向仍有待探索。
 
-
-
 ### 三维场景理解的多模态大模型需求
 
 三维场景理解在具身智能、增强现实和人机交互等领域扮演着关键角色。与二维视觉相比，三维数据以无序、稀疏的点云形式呈现，天然缺乏规则的网格结构，这给视觉-语言对齐带来了根本性挑战。近年来，大型多模态模型（LMM）在二维视觉-语言任务上取得了显著进展，研究者开始将这一范式迁移到三维领域，构建能够对三维场景进行问答、密集字幕生成和视觉定位的三维大型多模态模型（3D LMM）。
@@ -73,8 +71,6 @@ claims:
 ### Fase3D 的定位
 
 基于上述动机，本文提出 **Fase3D**——首个面向场景级三维数据的无编码器大型多模态模型。Fase3D 完全移除了传统的三维视觉编码器，转而采用一套基于傅里叶变换的轻量级标记化流水线：通过超点（superpoint）标记化将点云压缩为紧凑的标记集合，利用空间填充曲线（SFC）序列化赋予无序点云以空间一致性的一维结构，再通过 FFT 驱动的上下文增强器实现高效的全局特征混合。这一设计使得 Fase3D 的视觉标记化阶段仅需 10.54M 激活参数和 2.04G FLOPs，效率较编码器基线提升超过一个数量级，同时在下游任务上保持了具有竞争力的性能。
-
-
 
 ## 核心方法与创新机理
 
@@ -100,8 +96,6 @@ Fase3D 的第三个 **changed slot** 在于 LLM 适配层的设计。传统方�
 
 值得注意的是，Fase3D 的创新存在明确的边界条件。首先，所有实验仅在 ScanNet v2 数据集上验证，尚未在更广泛的三维场景语料库上检验泛化能力。其次，当前的空间填充曲线序列化策略为手工选择（希尔伯特、Z-order 等），缺乏自适应或可学习的序列化机制，可能对某些场景并非最优。此外，Fase3D 尚未与 RGB 图像等多模态输入融合，限制了在纹理丰富场景中进一步提升性能的潜力。这些边界为后续研究提供了清晰的改进方向：自适应序列化策略、多模态傅里叶增强、以及更大规模三维预训练。
 
-
-
 Fase3D 提出了一套**完全移除专用三维视觉编码器**的流水线，直接以原始点云作为输入，通过四个核心模块将其转化为紧凑的三维标记序列，最终由冻结的大语言模型（LLM）完成三维场景理解与推理。图 2 展示了从点云到语言输出的完整数据流。
 
 ### 流水线概览
@@ -123,15 +117,8 @@ Fase3D 提出了一套**完全移除专用三维视觉编码器**的流水线，
 
 > **注意**：当前流水线仅在 ScanNet v2 数据集（1,201 训练场景 / 312 验证场景）上验证，尚未在更广泛的三维场景语料库上测试泛化能力。空间填充曲线的选择（希尔伯特、Z-order 等）为手工指定，缺乏自适应机制。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2233_https_arxiv_org_abs_2602_23153/figures/001_Figure_1.jpg]]
-*Figure 1: Fase3D’s contribution overview. Mainstream 3D LMMs are based on computationally-heavy scene encoders to extract geometric features before alignment with the LLM. In contrast, our method (Fase3D) employs a lightweight Fourier-based tokenizer to process raw point clouds directly and introduces Fourier-augmented LoRA adapters, which infuse global frequency-aware context into the LLM without additional computational overhead*
-
 ![[assets/figures/papers/paper_list_l2233_https_arxiv_org_abs_2602_23153/figures/002_Figure_2.jpg]]
 *Figure 2: The Fase3D pipeline. A lightweight tokenizer (•) produces M superpoint tokens, which are refined by an FFT-based context enhancer (•). A graph is then constructed, and a token-merging block (•) compresses the tokens into*
-
-
 
 Fase3D 的核心设计理念是将三维点云处理建模为空间域与频率域之间的合成——在序列化的超点上利用 FFT 进行全局上下文混合，从而近似自注意力，构建无视觉编码器的高效三维大型多模态模型。其流水线包含五个关键模块。
 
@@ -199,12 +186,8 @@ $$
 
 其中 $m_t$ 用于屏蔽非回答部分的前缀和提示 token，仅对有效回答部分计算损失。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2233_https_arxiv_org_abs_2602_23153/figures/013_Figure.jpg]]
 *Figure: A. Visualization of our SFC-based kNN graph construction via window voting. We show two representative examples of curveguided neighbor selection*
-
-
 
 ## 实验与关键发现
 
@@ -254,29 +237,11 @@ Table 5 对比了不同 LLM 骨干下的性能。Fase3D 在 OPT-1.3B 和 Qwen2.5
 ![[assets/figures/papers/paper_list_l2233_https_arxiv_org_abs_2602_23153/figures/003_Table_1.jpg]]
 *Table 1: Question answering results on ScanQA [2] and SQA3D [33]. #Param/FLOP: number of activated parameters and Floating Point Operation count required for the encoding/tokenization stage. Best result is in bold. Second best result is underlined*
 
-![[assets/figures/papers/paper_list_l2233_https_arxiv_org_abs_2602_23153/figures/005_Table_2.jpg]]
-*Table 2: Dense captioning results on ScanRefer and Nr3D. #Param/FLOP: number of activated parameters and Floating Point Operation count required for the encoding/tokenization stage. Best result in bold. Second best result is underlined*
-
 ![[assets/figures/papers/paper_list_l2233_https_arxiv_org_abs_2602_23153/figures/006_Table_3.jpg]]
 *Table 3: Ablation study of vision embedding modules. Point (downsampled raw point tokens), Superpoint (superpoint pooling), FFT (lightweight FFT-based context enhancer)*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2233_https_arxiv_org_abs_2602_23153/figures/004_Figure_3.jpg]]
 *Figure 3: Qualitative results and comparisons between Fase3D, PerLA [35], and LL3DA [6] on the ScanQA [2] dataset*
-
-![[assets/figures/papers/paper_list_l2233_https_arxiv_org_abs_2602_23153/figures/008_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l2233_https_arxiv_org_abs_2602_23153/figures/010_Table.jpg]]
-*Table: B. Effect of the number of SFC curves $n _ { C }$ in multi-curve serialization on ScanQA (val). Table C. Ablation study on the number of LLM’s input tokens. Table D. Effect of two-stage training on ScanQA validation*
-
-![[assets/figures/papers/paper_list_l2233_https_arxiv_org_abs_2602_23153/figures/011_Table.jpg]]
-*Table: A. Ablation study on the number of LLM’s LoRA layers*
-
-![[assets/figures/papers/paper_list_l2233_https_arxiv_org_abs_2602_23153/figures/012_Table.jpg]]
-*Table: E. Effect of different token selection / merging strategies on ScanQA validation performance. All models are trained from scratch on the ScanQA training split, without any pre-training*
-
-
 
 ## 定位与知识库关联
 
@@ -335,8 +300,6 @@ Fase3D 的三项关键设计构成了其独特的方法定位：
 4. **标记合并的下游扩展**：当前基于图的标记合并策略主要服务于 LMM 输入压缩，是否能够支持更高级的感知任务（如实例分割、开放词汇对象发现）？这需要验证合并后的标记是否保留了足够的实例级判别信息。
 
 5. **与更大 LLM 的扩展性**：当前实验主要基于 3B 和 1.3B 规模的 LLM，Fase3D 的轻量标记化设计在更大 LLM（如 7B、13B）上的性能增益和效率优势是否保持，需要进一步验证。论文虽报告了 Vicuna-1.5-7B 的结果，但未提供完整的效率对比数据。
-
-
 
 ## 原文 PDF
 

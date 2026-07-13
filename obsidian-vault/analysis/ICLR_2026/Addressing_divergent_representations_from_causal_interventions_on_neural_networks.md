@@ -52,8 +52,6 @@ claims:
 
 实验表明：在合成数据集上，纯 CL 损失训练的对齐函数相比仅用行为损失的 DAS，**EMD（Earth Mover’s Distance）从 0.032 降至 0.007，同时 IIA 保持在 0.9988**；在 LLM 的 Boundless DAS 设置中，合适的 CL 权重可在不损害 IIA 的前提下降低分歧。线性回归分析进一步确认，训练过程中的因果轴 EMD 与 OOD 的 IIA 呈显著反相关（系数 -0.34，R²=0.73，p<0.001），为“降低分歧有助于提升干预可靠性”提供了定量证据。
 
-
-
 ### 因果干预在神经网络解释中的角色
 
 现代神经网络的可解释性研究高度依赖**因果干预**技术来验证关于内部表征的机制性假设。这些干预方法——包括激活修补、分布式对齐搜索（DAS）等——通过对网络中间层表示进行反事实操纵，观察模型行为变化，从而推断特定子空间是否编码了特定的因果变量。然而，一个根本性的问题长期被忽视：**干预所产生的表示是否仍然位于模型自然分布的支撑集上？**
@@ -84,8 +82,6 @@ $$\mathcal{N}(\psi, X) = \{ v \in \mathbb{R}^d \mid \forall x \in X, \psi(x + v)
 面对上述问题，本文的核心动机是：**在保持因果干预有效性的前提下，系统性地减少表示分歧，从而提升干预结果对网络自然机制解读的可靠性**。
 
 具体而言，本文借鉴并修改了 Grant (2025) 提出的**对比潜在损失**，将其作为辅助训练目标引入 DAS 的对齐函数训练中。该损失通过拉近干预表示与具有相同因果变量值的自然表示之间的距离，引导干预表示回归自然分布流形。进一步，本文提出仅在因果子空间上施加该损失，以针对性减少最可能有害的分歧成分，并在分布外泛化任务上验证其效果。
-
-
 
 ## 核心方法与创新机理
 
@@ -122,8 +118,6 @@ $$\mathcal{L}_{\mathrm{CL}}' = \sum_{i=1}^{n} \mathcal{L}_{\mathrm{CL}}^{\mathrm
 ### 创新本质总结
 
 上述两个 changed slots 共同构成了一个“分歧最小化”的干预训练范式：通过 $\mathcal{L}_{\mathrm{CL}}$ 引入表示分布的先验约束，再通过因果子空间定位将约束聚焦于行为相关的维度。这一设计不改变 DAS 的互换干预机制本身，也不修改模型的冻结权重，而是**在训练对齐函数时附加了一个分布正则化项**，使学到的对齐函数天然倾向于产生更接近自然分布的干预表示，从而降低激活隐藏通路或触发潜伏行为变化的风险。
-
-
 
 本工作的核心流程围绕一个基本问题展开：因果干预产生的表示与模型自然分布之间的“表示分歧”是否可控，以及如何在不损害干预准确率的前提下降低有害分歧。整体框架由四个逻辑层构成：**分歧诊断**、**无害性判定**、**分歧缓解训练**、以及**因果子空间约束**。
 
@@ -172,8 +166,6 @@ $$
 $$
 
 实验表明，这种针对性约束在分布外（OOD）任务上带来了更高的 IIA（Figure 3F），且训练 EMD 与 OOD IIA 之间存在显著的反相关关系（$R^2 = 0.73$, $p < 0.001$，附录 A.6），定量验证了“降低有害分歧可提升干预泛化能力”这一核心假设。
-
-
 
 ### 对齐函数与互换干预
 
@@ -228,8 +220,6 @@ $$\hat{h}^{\mathrm{var}_i} = \mathcal{A}^{-1}\big(D_{\mathrm{var}_i} \mathcal{A}
 $$\mathcal{L}_{\mathrm{CL}}' = \sum_{i=1}^{n} \mathcal{L}_{\mathrm{CL}}^{\mathrm{var}_i}$$
 
 与全空间 CL 损失相比，该修改版在合成 OOD 任务上取得了更高的 IIA（Figure 3F）。附录 A.6 的线性回归进一步证实，训练过程中的因果轴 EMD 与 OOD 的 IIA 显著反相关（系数 $-0.34$，$R^2 = 0.73$，$p < 0.001$），表明降低因果子空间内的分歧是提升干预泛化能力的关键机制。
-
-
 
 ## 实验与关键发现
 
@@ -306,14 +296,10 @@ $$\mathcal{L}_{\mathrm{CL}}' = \sum_{i=1}^{n} \mathcal{L}_{\mathrm{CL}}^{\mathrm
 
 4. **零空间之外的分歧不可穷举验证**：理论分析指出，任何位于行为零空间之外的分歧都可能是“有害的”，但在实践中不可能对所有输入上下文进行穷举测试来确认其无害性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_cZrTMqYVL6/figures/005_Figure_4.jpg]]
 *Figure 4: A number of additional divergence measures to demonstrate the difference between the natural and intervened distributions. Each is labeled by its y-axis. Each metric is computed over a random sample of natural vectors to simulate the natural manifold, and a sampled set of intervened or natural vectors for which to measure the distance from the natural distribution. We refer to this distribution as the "compared" distribution. The sampled intervened and natural vectors are always the "ground-truth pair" described at the beginning of Appendix A.1. Nearest Cosine Distance: refers to the cosine distance to the nearest sample in the natural manifold. Multiple sampes in the compared distribution...*
 
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_cZrTMqYVL6/figures/004_Table.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -372,8 +358,6 @@ $$\mathcal{L}_{\mathrm{CL}}' = \sum_{i=1}^{n} \mathcal{L}_{\mathrm{CL}}^{\mathrm
 3. **扩展到复杂架构**：修改后的 CL 损失能否推广到更深、更宽的网络以及更多的因果变量，同时保持计算可行？
 4. **与其他可解释性方法的结合**：表示分歧最小化能否与 SAE 等方法互补，进一步提升干预的可靠性？
 5. **潜伏行为变化的系统检测**：如何高效地在所有可能上下文中发现潜伏的行为变化，而非仅依赖有限采样？
-
-
 
 ## 原文 PDF
 

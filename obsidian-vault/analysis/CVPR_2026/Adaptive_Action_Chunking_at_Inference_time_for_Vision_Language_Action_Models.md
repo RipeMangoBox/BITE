@@ -59,8 +59,6 @@ claims:
 
 消融实验进一步验证了自适应选择的必要性：不同固定块大小在不同任务子集上的最优值差异显著（Table 7），而增加并行采样数 $N$ 可持续提升性能，$N=20$ 在成功率与推理延迟（约 20 ms）间取得良好平衡（Table 4）。AAC 的主要局限在于需要并行采样引入额外计算开销，且熵估计的准确性依赖采样数量，在极端实时场景或强分布外任务上的绝对性能仍有提升空间。
 
-
-
 视觉-语言-动作（VLA）模型近年来在机器人操作任务中取得了显著进展。这类模型通常将视觉观测和语言指令作为输入，直接输出一系列未来动作，即**动作块（action chunk）**。通过一次推理生成多个未来动作，VLA 模型能够实现相对稳定的闭环控制，同时保持可接受的推理频率。
 
 然而，动作块大小的选择面临一个根本性的权衡：**较大的块**能够提供更强的时间一致性和更平滑的运动轨迹，但会降低机器人对环境变化的反应速度；**较小的块**则能够增强反应性，但可能牺牲动作的连贯性。当前主流的 VLA 模型——如 **GR00T N1.5** 和 **π0.5**——均采用固定的动作块大小，该超参数通常通过经验调参确定，并在整个任务执行过程中保持不变。
@@ -70,8 +68,6 @@ claims:
 上述观察揭示了一个核心瓶颈：**固定动作块大小无法根据不同任务和不同执行阶段动态平衡模型的反应性与时间一致性**，导致整体性能受限。这一瓶颈在需要长序列执行和精确操作的任务中尤为突出。
 
 针对这一问题，本文提出了一种推理时自适应动作分块策略——**Adaptive Action Chunking (AAC)**。AAC 的核心思想是：利用模型并行采样生成的动作分布熵作为不确定性的代理信号，在推理时动态选择最优的动作块大小。具体而言，在高熵（高不确定性）时刻减小块大小以增强反应性，在低熵（高置信度）时刻增大块大小以提升时间一致性。该方法无需额外训练或架构修改，可直接应用于任何基于扩散动作头的 VLA 模型，在多个仿真和真实世界基准上均实现了一致的性能提升。
-
-
 
 ## 核心方法与创新机理
 
@@ -112,8 +108,6 @@ AAC 属于**推理时优化（inference-time optimization）**范畴，其创新
 - **不确定性感知的执行调度**：首次将动作熵引入执行窗口的自适应调节，使 VLA 模型具备了类似人类的「谨慎-果断」行为切换能力。定性分析显示，AAC 产生的块大小与人类直觉高度一致——搬运阶段块大小较大，精细操作阶段块大小较小（Figure 3）。
 - **轻量高效**：仅需 20 个并行采样即可有效估计动作熵，额外推理延迟约 20 ms（Table 4），在性能提升与计算开销之间取得了良好平衡。
 
-
-
 AAC（Adaptive Action Chunking）是一种纯推理时策略，无需额外训练或修改模型架构，即可嵌入任意基于扩散动作头的 VLA 模型。其核心思想是：**以动作熵作为不确定性的代理信号，在每个决策时刻自适应地选择最优动作块大小 $h^*$，从而在单一 episode 内动态平衡策略的反应性与时间一致性**。
 
 ### 算法总览
@@ -144,8 +138,6 @@ AAC 的整体流程如 Figure 2 所示，包含四个顺序执行的模块：
 ### 与固定块基线的对比
 
 传统的固定动作块策略（如 GR00T N1.5）在整个 episode 中使用恒定的执行视野 $h$，其取值需在部署前通过大量实验手动调优。Figure 1 揭示了这一做法的根本缺陷：不同任务对块大小的最优需求不一致，且同一任务的不同执行阶段也可能需要不同的块大小。AAC 通过将块大小选择转化为推理时的数据驱动决策，消除了对手动调参的依赖，并实现了任务级和阶段级的自适应。
-
-
 
 AAC 的核心设计理念是将动作熵作为不确定性的代理信号，在推理时动态选择最优的动作块大小，从而在反应性与时间一致性之间取得自适应平衡。整个算法由四个关键模块串联构成，无需额外训练或修改模型架构。
 
@@ -223,16 +215,6 @@ AAC 的公式体系体现了三个关键设计原则：
 2. **差分结构定位最优块大小**：$\overline{E}_{h+1} - \overline{E}_h$ 的峰值天然对应“不确定性骤增”的边界，恰好是需要切换为更小块的临界点。
 3. **幅度约束防止过度保守**：$\xi$ 下界确保在低不确定性场景下不会退化为逐步执行，维持了动作分块带来的时间一致性优势。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2369_https_arxiv_org_abs_2604_04161/figures/001_Figure_1.jpg]]
-*Figure 1: Effects of action chunk sizes. At inference-time, the success rates of the GR00T N1.5 [2] on different tasks of Robo-Casa Kitchen [28] are highly related to the action chunk size. It can be observed that it is difficult and sub-optimal to empirically set a fixed value for various manipulation tasks*
-
-![[assets/figures/papers/paper_list_l2369_https_arxiv_org_abs_2604_04161/figures/004_Figure_3.jpg]]
-*Figure 3: Rollout of chunk sizes from AAC. The derived chunk sizes align with human intuitions with respect to different semantic phases: a large chunk size is observed during the transportation stage, while a small chunk size appears at the critical manipulation stage*
-
-
-
 ## 实验与关键发现
 
 ### 核心问题与实验逻辑
@@ -304,8 +286,6 @@ AAC 的公式体系体现了三个关键设计原则：
 
 所有对比实验均使用相同的预训练权重和微调数据，确保基线模型与 AAC 之间的唯一差异在于推理时的块大小选择策略。真实世界实验在相同硬件和环境下进行，消除了系统偏差。AAC 不涉及任何额外训练或架构修改，因此对比是严格公平的。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2369_https_arxiv_org_abs_2604_04161/figures/003_Table_1.jpg]]
 *Table 1: Main Results on RoboCasa and LIBERO Benchmarks. We report the success rate (%) for various subsets and the overall average. Our AAC achieves the best or competitive results across both benchmarks. Bolded entries indicate the highest success rates*
 
@@ -317,20 +297,6 @@ AAC 的公式体系体现了三个关键设计原则：
 
 ![[assets/figures/papers/paper_list_l2369_https_arxiv_org_abs_2604_04161/figures/008_Table_4.jpg]]
 *Table 4: Success rates (%) on LIBERO and inference-time under different numbers of samples for estimating action entropy*
-
-![[assets/figures/papers/paper_list_l2369_https_arxiv_org_abs_2604_04161/figures/009_Table_5.jpg]]
-*Table 5: Success rates (%) on real-world applications*
-
-![[assets/figures/papers/paper_list_l2369_https_arxiv_org_abs_2604_04161/figures/006_Figure_4.jpg]]
-*Figure 4: Distribution of chunk size decisions from AAC. We show the chunk size distribution of episodes on the first task of LIBERO-Spatial: ”Pick up the black bowl next to the cookie box and place it on the plate”. The heatmap indicates the frequency of different chunk sizes at different decision timesteps. The red curve shows the mean chunk size at different observation timesteps*
-
-![[assets/figures/papers/paper_list_l2369_https_arxiv_org_abs_2604_04161/figures/010_Figure_5.jpg]]
-*Figure 5: Execution examples for real-world tasks using AAC. Videos of complete execution trajectories will be publicly available*
-
-![[assets/figures/papers/paper_list_l2369_https_arxiv_org_abs_2604_04161/figures/011_Figure_6.jpg]]
-*Figure 6: AAC improves action accuracy and safety. Left: the gripper collided with the table. Right: the gripper reached an appropriate lowest point*
-
-
 
 ## 定位与知识库关联
 
@@ -367,8 +333,6 @@ AAC 的有效性建立在以下前提之上：
 - **跨范式的泛化**：如何将自适应块策略扩展到非扩散策略（如自回归 Transformer 策略）或基于模型的控制器？
 - **安全约束的显式集成**：在多模态任务或人机协同场景下，自适应块大小策略是否需要额外的安全约束（如最小反应频率保障）？Figure 6 展示了 AAC 在真实场景中提升了安全性，但这一优势目前是隐式的，缺乏理论保证。
 - **时序依赖性的利用**：当前熵度量基于边缘分布，若能引入动作序列的联合熵或互信息，可能进一步提升块大小选择的准确性，尤其在长序列任务（如 LIBERO-Long）中。
-
-
 
 ## 原文 PDF
 

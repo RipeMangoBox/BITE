@@ -77,8 +77,6 @@ claims:
 
 该方法属于**实验设计优化**范式，核心调控变量是刺激先验分布，通过信息差距的解析计算指导最优实验参数选择。与传统单上下文解码分析相比，该框架将区分两种概率编码假说的问题转化为一个可优化的信息论目标，为神经科学实验设计提供了原则性指导。框架的局限性在于依赖最优解码器假设和已知生成模型，且主要针对两上下文高斯先验设计进行了验证；扩展到更复杂的先验族、混合编码假说或其他感觉模态仍需进一步研究。
 
-
-
 感觉系统需要处理来自外部世界的不确定信息。当观察者接收到的感觉信号存在噪声时，大脑如何编码这种不确定性，是计算神经科学中的一个核心问题。目前存在两种主要的竞争性假说：**似然编码假说**与**后验编码假说**。
 
 **似然编码假说**认为，早期感觉神经群体编码的是刺激的似然函数 $L(\theta) \equiv p(x|\theta)$，即给定隐变量世界状态 $\theta$ 时观察到神经反应 $x$ 的概率。后验分布的计算被推迟到下游脑区，通过整合似然函数与先验知识来完成。该假说的典型代表是概率群体编码（Ma et al., 2006）。
@@ -88,8 +86,6 @@ claims:
 区分这两种假说对于理解大脑计算架构至关重要，因为它直接关系到先验知识是在感觉处理的早期阶段还是晚期阶段被整合。然而，传统实验设计面临一个根本性瓶颈：**在单一上下文、均匀先验的实验范式下，似然函数与后验分布在数学上仅相差一个常数因子，因此无法通过解码神经反应来区分两种编码格式**。这一困境使得该领域的核心争论长期悬而未决。
 
 本文提出的核心洞见是：通过**操纵刺激先验分布在上下文间的变化**，可以暴露神经群体编码的统计结构。具体而言，当实验包含两个具有不同刺激先验分布的上下文时，似然编码群体与后验编码群体对相同刺激的反应将产生系统性差异。利用信息论工具——**信息差距**——可以量化这种差异，并指导实验设计以最大化两种假说之间的可区分性。
-
-
 
 ## 核心方法与创新机理
 
@@ -132,8 +128,6 @@ claims:
 
 信息差距的存在依赖于一个根本条件：在后验编码群体上，仅当两个不同上下文下的观测产生相同的后验分布时（即 $p^A(\theta|x_j) = p^B(\theta|x_k)$），似然解码器才会产生混淆，从而贡献信息差距。这一条件等价于 $p^A(\theta) \cdot p(x_j|\theta) \propto p^B(\theta) \cdot p(x_k|\theta)$。通过操纵上下文先验 $p^A(\theta)$ 和 $p^B(\theta)$ 的差异，可以控制满足该条件的观测对数量，进而调节信息差距的大小。这正是框架将“先验操纵”作为核心因果旋钮的理论基础。
 
-
-
 ### 核心问题与因果杠杆
 
 该框架的核心目标是解决一个长期困扰感觉神经科学的方法论瓶颈：在单上下文实验中，似然编码假说（神经群体编码似然函数$L(\theta) \equiv p(x|\theta)$）与后验编码假说（神经群体直接编码后验分布$p(\theta|x)$）在解码层面无法区分。传统实验设计使用均匀先验，导致两种假说下的神经反应在统计上不可区分——这一结论在Allen Visual Coding数据集上得到了直接验证：在169个包含超过300试次的记录中，似然解码器与后验解码器的交叉熵性能差异仅为$0.0024 \pm 0.064$，与零无显著差异（$p=0.63$）。
@@ -171,8 +165,6 @@ $$\Delta_{\mathrm{P}}^{\mathrm{info}} := \mathbb{E}_{p(x_i,c)} \left[ D_{\mathrm
 ### 输入输出流
 
 框架的输入端包括：（1）任务设计规范——上下文数量、各上下文的刺激先验分布族及其参数；（2）假设的神经编码模型——似然编码或后验编码；（3）神经群体的生成模型——包括调谐曲线形态、噪声结构等。输出端包括：（1）理论信息差距值，量化给定设计下两种假说的可区分性；（2）最优任务参数推荐，指导实际实验设计；（3）解码器性能差异的经验验证结果。框架还支持将行为数据（通过心理测量曲线估计的被试先验偏差）纳入信息差距计算（Figure 10），以更真实地反映实验条件下的期望差异。
-
-
 
 ### 问题设定与核心量
 
@@ -234,8 +226,6 @@ $$
 
 消融实验表明：降低放电率或增加噪声会减慢信息差距的收敛速度，但最终收敛到相同理论值（Figure 12）；随机采样导致方向覆盖不完整同样减缓收敛（Figure 13A）；较少试次（3k vs 30k）减慢收敛（Figure 13B）；结果对离散化分辨率（0.25° vs 1°）鲁棒（Figure 13C）。这些因素影响实验可行性但不改变理论预测的有效性。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：信息差距准确预测解码器性能差异
@@ -268,8 +258,6 @@ $$
 
 **重尾分布失效**（Figure 6）：当上下文先验采用学生t分布（$\nu=3$）或柯西分布时，后验编码的信息差距在整个参数空间内几乎为零。原因在于重尾先验与高斯似然函数卷积后，产生的后验分布不对称，大幅减少了满足 Eq. 4 的可混淆观测对 $(x_j, x_k)$ 数量（Figure 16）。这使得最优似然解码器能够轻易区分上下文，从而消除了后验编码的信息差距。
 
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_doxBjZ88H3/figures/006_Figure_6.jpg]]
-*Figure 6: Information gap landscape suggests heavy tailed distributions are not ideal stimulus prior distributions for differentiating coding hypotheses. A) Using student’s t-distribution with degrees of freedom $\nu$ = 3 as stimulus priors (left), information gap under medium contrast stimuli as a function of task parameters (separation d and standard deviations σ) for both the likelihood coding hypothesis (middle) and the posterior coding hypothesis (right) shows decreased information gap with minimal overlap compared to task design with Gaussian context priors. B) Same for Cauchy distribution as stimulus priors with task parameters separation d and scale $\gamma$
 
 **薄尾分布同样失效**（Figure 17, 18）：广义正态分布等薄尾先验同样导致后验不对称，使后验编码信息差距趋于零。因此，高斯先验因其对称性和适中的尾部形态，成为区分两种编码假说的理想选择。
 
@@ -300,22 +288,6 @@ $$
 ### 混合编码假说的理论边界
 
 框架进一步分析了混合编码假说（即神经群体同时编码似然和后验信息）的情形。在此假设下，无论似然解码器还是后验解码器都能提取完整的概率信息，因此信息差距为零（Figure 11）。这意味着，若真实神经编码为混合模式，本框架将无法检测到任何差异——这是一个重要的理论边界，需在实际应用中予以注意。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_doxBjZ88H3/figures/010_Figure_10.jpg]]
-*Figure 10: The information gap computation can incorporate behavior data by estimating the subject’s biased prior from its psychometric curve*
-
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_doxBjZ88H3/figures/014_Figure_14.jpg]]
-*Figure 14: Information gap landscapes when using student’s t-distribution with degrees of freedom $\nu$ = 3 as context priors. A) Information gap as a function of task parameters (d: separation between context priors, and $\sigma { : }$ context prior standard deviations) for both the likelihood coding hypothesis (top) and the posterior coding hypothesis (bottom) when presented with high contrast stimuli. B) Same for medium contrast stimuli and C) for low contrast stimuli
-
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_doxBjZ88H3/figures/015_Figure_15.jpg]]
-*Figure 15: Information gap landscapes when using Cauchy distribution as context priors. A) Information gap as a function of task parameters (d: separation between context priors, and $\gamma \colon$ context prior scales) for both the likelihood coding hypothesis (top) and the posterior coding hypothesis (bottom) when presented with high contrast stimuli. B) Same for medium and C) low contrast stimuli
-
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_doxBjZ88H3/figures/018_Figure_18.jpg]]
-*Figure 18: Thin tailed context priors, when integrated with Gaussian likelihood function, lead to asymmetric posterior distributions, limiting the pairs of identical posteriors satisfying Eq. 12 that would cause imperfect likelihood decoders on posterior-coding populations*
-
-
 
 ## 定位与知识库关联
 
@@ -373,8 +345,6 @@ $$
 4. **跨模态泛化**：框架在视觉方向辨别任务上进行了验证，其在其他感觉模态（听觉频率辨别、触觉振动检测）下的适用性和最优设计参数尚待探索。
 
 5. **非高斯似然与相关噪声**：在更复杂的生成模型（如非高斯似然函数、神经元间相关噪声）下，信息差距的解析计算是否仍然可行？定点迭代求解最优似然解码器（Eq. 5）的收敛性在更广泛条件下需要验证。
-
-
 
 ## 原文 PDF
 

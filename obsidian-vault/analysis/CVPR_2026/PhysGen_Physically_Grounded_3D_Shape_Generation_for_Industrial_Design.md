@@ -63,8 +63,6 @@ PhysGen 提出了一个统一的物理感知 3D 形状生成框架，其核心�
 
 **局限与开放问题**：当前验证集中在汽车气动设计，训练依赖昂贵的 CFD 仿真数据，交替迭代策略导致推理时间较长（单次约 210 秒）。未来方向包括推广至热传导、电磁场等非气动物理场，处理多目标物理优化的权衡，以及在缺乏高保真仿真数据时利用物理先验实现弱监督生成。
 
-
-
 三维形状生成技术近年来取得了显著进展，但在工业设计这一高要求领域，现有方法暴露出一个根本性缺陷：**缺乏物理知识**。主流生成模型能够产出视觉上合理的几何形状，却无法保证其在物理世界中的可行性——生成的车轮可能与车身相交，座椅腿可能断裂或不稳定，气动外形可能产生宽大的湍流尾迹，导致极低的气动效率（Figure 1）。这种“形似而神不似”的生成结果，使得模型难以直接服务于对功能性和安全性有严格要求的工业设计流程。
 
 造成这一瓶颈的深层原因在于，现有三维生成范式将形状建模为纯粹的几何问题。无论是基于占用场（Occupancy Field）的隐式表征，还是以图像为条件的流匹配（flow matching）生成，其优化目标都局限于几何保真度，完全忽略了形状在物理环境中承受的力、产生的压力场以及由此决定的功能性能。当生成结果需要满足气动阻力、结构稳定性等物理约束时，这些方法天然地力不从心。
@@ -72,8 +70,6 @@ PhysGen 提出了一个统一的物理感知 3D 形状生成框架，其核心�
 一种朴素的补救思路是“先生成、后优化”：先用生成模型产出形状，再通过物理仿真进行后优化调整。然而，这种两阶段策略存在不可逆的几何畸变风险——物理优化可能将形状推离数据流形，产生扭曲的表面，且无法通过后续的生成步骤恢复（Figure 3）。这揭示了物理约束与形状先验之间的深层张力：**单独施加物理优化会破坏几何合理性，而纯粹的生成模型又无视物理可行性**。
 
 PhysGen 的动机正是弥合这一裂隙。其核心洞察在于：**将形状与物理信息联合编码到统一潜在空间，并在生成过程中交替进行流匹配更新与物理精炼，可以在不牺牲几何合理性的前提下显著提升物理性能**。这一思路将物理知识从外挂约束升级为生成过程的内在引导，为工业级三维形状生成开辟了新的技术路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -109,8 +105,6 @@ Figure 6 的消融实验揭示了这一交替策略的因果瓶颈：纯物理�
 
 一个意料之外的创新收益是物理信息对深度歧义的缓解。从单张真实图像生成 3D 形状时，不同随机噪声会产生前视宽度不一致的形状（Figure 5 中红色与橙色车辆）。引入物理引导后，不同初始化生成的形状（蓝色与绿色）收敛到一致的前视宽度，倒角距离从 20.98 降至 2.38（Table 3）。这表明阻力系数约束充当了隐式的跨视角正则化器，迫使生成形状在不可见维度上满足物理一致性。
 
-
-
 PhysGen 的整体框架围绕一个核心矛盾展开：**如何在保持形状流形合理性的前提下，将物理约束注入生成过程**。现有方案通常将生成与物理优化割裂为两阶段（先生成、后优化），这种串行范式极易在物理精炼阶段破坏几何结构且无法恢复（见 Table 1 和 Figure 3）。PhysGen 的解决方案是将物理知识内化到生成动力学中，构建一个统一的、交替迭代的物理引导生成管线。
 
 ### 核心流水线
@@ -143,8 +137,6 @@ $$F_s = \sum_{i=1}^{V} p_i \mathbf{n}_{s,i} A_i, \quad s \in \{x, y, z\}$$
 ### 条件注入与输入输出
 
 生成过程支持可选的图像条件（如草图或单视图真实照片），通过 DINO 特征提取后经交叉注意力注入 DiT 的每个 Transformer 块（见 Figure B）。无条件生成则直接从随机噪声出发。最终输出为符合目标物理属性（如指定阻力系数 $d_{\mathrm{tar}}$）的三维网格，以及对应的表面压力分布。
-
-
 
 PhysGen 的核心架构由两个紧密耦合的模块构成：**形状-物理联合变分自编码器（SP‑VAE）** 与 **物理引导的交替生成流程**。前者将几何与物理属性压缩到统一潜在空间，后者在此空间中通过流匹配与物理精炼的交替迭代，生成既符合形状先验又满足物理约束的三维模型。
 
@@ -209,19 +201,6 @@ $$\mathcal{L} = \lambda_x \mathcal{L}_x + \lambda_y \mathcal{L}_y + \lambda_z \m
 ![[assets/figures/papers/paper_list_l2566_https_arxiv_org_abs_2512_00422/figures/015_Figure_6.jpg]]
 *Figure 6: Visualization of generation with physical refinement and flow-matching updates, shown in terms of mesh geometry and surface pressure. Starting from a physically imperfect initialization (a), physical refinement improves physical objectives but introduces distortions (b). Adding flow-matching updates restore geometric plausibility but lead to non-uniform pressure (c). Alternating the two produces refined geometry and more uniform pressure, improving both visual quality and aerodynamic performance (d)*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2566_https_arxiv_org_abs_2512_00422/figures/018_Figure.jpg]]
-*Figure: A. Overview of the SP-VAE shape encoder-decoder. The encoder fuses uniform and salient surface points via bidirectional cross-attention and self-attention to produce a latent code. The decoder predicts an SDF field from query points using crossattention and reconstructs the mesh via marching cubes*
-
-![[assets/figures/papers/paper_list_l2566_https_arxiv_org_abs_2512_00422/figures/019_Figure.jpg]]
-*Figure: B. Diffusion Transformer (DiT) architecture. Noised latent and timestep embeddings form the input token sequence, while optional DINO-based conditioning is injected via cross-attention in each block. Each DiT block applies self-attention, cross-attention, and an MLP to produce the final velocity prediction*
-
-![[assets/figures/papers/paper_list_l2566_https_arxiv_org_abs_2512_00422/figures/004_Figure_3.jpg]]
-*Figure 3: Qualitative comparison of post-optimization and our unified generation. SP-VAE + TripOptimizer produces distorted shapes and fails to recover them, whereas our alternating method restores plausible surfaces closer to the ground truth*
-
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -247,9 +226,6 @@ PhysGen 的实验围绕 **DrivAerNet++** 数据集展开，该数据集包含丰
 #### 目标阻力系数引导
 
 PhysGen 允许用户指定目标阻力系数 $d_{\text{tar}}$ 来引导生成。**Table 2** 量化了这一引导的效果：
-
-![[assets/figures/papers/paper_list_l2566_https_arxiv_org_abs_2512_00422/figures/006_Table_2.jpg]]
-*Table 2: Shape accuracy under target drag coefficient*
 
 - **F-score** 从无物理引导的 74.03 提升至 **89.65**（+21.09%）
 - **Chamfer Distance** 从 27.08 降至 **20.99**（−22.68%）
@@ -283,9 +259,6 @@ PhysGen 的 SP‑VAE 不仅服务于生成，其本身也是一个强大的联�
 
 ![[assets/figures/papers/paper_list_l2566_https_arxiv_org_abs_2512_00422/figures/010_Table_5.jpg]]
 *Table 5: Performance comparison on drag coefficient estimation*
-
-![[assets/figures/papers/paper_list_l2566_https_arxiv_org_abs_2512_00422/figures/011_Table_6.jpg]]
-*Table 6: Performance comparison on pressure field prediction*
 
 这些结果表明，联合编码形状与物理信息不仅没有造成任务冲突，反而通过多任务学习实现了相互促进。
 
@@ -347,15 +320,8 @@ PhysGen 的 SP‑VAE 不仅服务于生成，其本身也是一个强大的联�
 
 4. **领域聚焦**：当前验证集中在汽车气动设计，向飞机、船舶等领域的推广需要额外的数据收集和验证实验。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2566_https_arxiv_org_abs_2512_00422/figures/003_Table_1.jpg]]
-*Table 1: Unified generation vs. post-optimization*
-
 ![[assets/figures/papers/paper_list_l2566_https_arxiv_org_abs_2512_00422/figures/012_Table_7.jpg]]
 *Table 7: Ablation study on the training strategy of SP-VAE*
-
-
 
 ## 定位与知识库关联
 
@@ -399,8 +365,6 @@ PhysGen 的 SP‑VAE 将形状（SDF）与物理场（压力、阻力）联合�
 2. **多目标帕累托优化**：如何在阻力最小化与下压力最大化等冲突目标间进行可控权衡？当前加权损失方案缺乏对帕累托前沿的显式探索。
 3. **潜在空间偏差**：形状与物理的联合编码是否会在潜在空间中引入隐式偏差，导致某些物理合理但几何罕见的样本难以生成？
 4. **弱监督扩展**：在缺乏高保真 CFD 数据时，能否利用物理先验（如 Navier‑Stokes 方程的弱形式）实现自监督或物理信息网络（PINN）风格的训练？
-
-
 
 ## 原文 PDF
 

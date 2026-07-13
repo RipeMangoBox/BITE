@@ -62,8 +62,6 @@ DMS 属于黑盒 QD 算法，在 MAP-Elites 风格的存档和 CMA-ES 发射器�
 
 在涵盖线性投影（LP）、Arm Repertoire、三角形排列（TA）和潜在空间插值（LSI）的多个域中，DMS 在 QD 分数和覆盖率上全面优于 CMA-MAE 及其他基线（Table 1）。在高维场景中优势尤为显著：10 维 LP (Sphere) 上 QD 分数从 608.53 提升至 6,409.50，覆盖率从 6.95% 提升至 89.21%；10 维 LP (Rastrigin) 上 QD 分数从 246.55 提升至 5,138.81，覆盖率从 2.98% 提升至 88.19%。在 LSI (Hiker) 域中，DMS 能够根据风景图像测度生成与之匹配的登山者图像（Figure 2），展示了该方法在“质量多样性扩散模型”（QDDM）域中的潜力。消融实验进一步确认了空点机制的关键作用：去除空点会导致折扣模型在未探索区域误输出高值，使性能崩溃（Figure 11）。
 
-
-
 质量多样性（Quality Diversity, QD）优化的目标是在一个解空间中同时追求解的高目标值（质量）和测度空间中的广泛覆盖（多样性）。近年来，黑盒 QD 算法在机器人控制、程序生成、图像生成等领域取得了显著进展，但其可扩展性始终受限于测度空间的维度。大多数经典 QD 算法——如 **MAP-Elites**（Mouret & Clune, 2015）及其变体 **MAP-Elites (line)**（Vassiliades & Mouret, 2018）——依赖对测度空间的显式网格划分来维护存档，当测度维度升高时，网格单元数量呈指数爆炸，使得这种离散化策略在计算上不可行。
 
 **CMA-MAE**（Fontaine & Nikolaidis, 2023）通过引入折扣函数（discount function）和 CMA-ES 发射器，将 QD 优化重新表述为直接最大化存档改进（archive improvement）：
@@ -81,8 +79,6 @@ $$t_e \gets (1-\alpha) t_e + \alpha f(\boldsymbol{\theta}')$$
 **DDS**（Lee et al., 2024）通过核密度估计替代折扣函数，实现了纯多样性优化，在覆盖率上表现优异，但其目标值较低，因为它放弃了质量优化的引导。
 
 本文的核心动机在于：**离散的直方图折扣函数是高维 QD 优化的瓶颈**。当测度相近的解无法获得有区分度的改进值时，CMA-ES 发射器失去了有效的排序信号，导致探索崩溃。一个自然的解决方案是将折扣函数从离散单元映射转变为平滑的连续表示——这正是本文提出 Discount Model Search (DMS) 的出发点。
-
-
 
 ## 核心方法与创新机理
 
@@ -103,8 +99,6 @@ DMS 的核心创新在于将 CMA-MAE 中**离散的直方图折扣函数替换�
 **为什么这两个改变在高维测度空间中至关重要？**
 
 线性投影（LP）测度函数将解向量划分为 $k$ 个块并对每块分量求和，其输出服从 Irwin-Hall 分布（Figure 12）。当测度维度 $k$ 增大时，该分布迅速向中心集中，导致解在测度空间中的分布产生严重畸变——绝大多数解落入极少数单元。CMA-MAE 的离散直方图在此情况下无法提供有意义的改进信号，而 DMS 的平滑折扣模型天然具备跨单元插值能力，使相近但不同测度的解获得有区分的折扣值，从而维持有效的探索引导。空点机制则进一步确保模型不会在未探索区域“猜测”出高折扣值，避免搜索过早收敛到已探索区域的局部最优。
-
-
 
 DMS 的整体工作流程围绕两个交替进行的阶段展开：**发射器搜索**与**折扣模型训练**，二者共享一个 MAP-Elites 风格的存档。
 
@@ -146,8 +140,6 @@ DMS 的完整迭代循环可概括为以下步骤：
 - **空点机制的必要性**：消融实验表明，若取消耗折扣模型训练中的空点（$n_{\text{empty}}=0$），折扣模型会在未探索区域产生任意高值，使发射器误认为测度空间已被完全探索，导致 QD 分数和覆盖率大幅崩溃。仅需添加少量空点（≥10）即可恢复高性能。
 - **存档学习率 $\alpha$**：控制目标优化与探索之间的平衡。$\alpha \to 0$ 时 DMS 退化为纯单目标优化，覆盖度极低；$\alpha$ 在 0.1 附近通常取得最佳综合性能。
 
-
-
 ### 问题瓶颈与改进信号
 
 DMS 的核心目标是解决 CMA-MAE 在高维测度空间中的畸变失效问题。在 CMA-MAE 中，存档改进值定义为：
@@ -185,8 +177,6 @@ DMS 在每个迭代中交替执行两个阶段：
 
 MAP-Elites 风格存档保留每个测度单元中已发现的最佳解（Algorithm 1 lines 14-16）。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与 DMS 的应对机制
@@ -202,9 +192,6 @@ DMS 通过将折扣函数从离散直方图替换为**由神经网络参数化�
 Table 1 汇总了所有算法在所有域中的 QD 分数和覆盖率。DMS 在绝大多数基准上显著优于所有基线方法，尤其是在高维测度空间中优势极为明显。
 
 
-![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_m6Hv0yZO3n/figures/005_Table_1.jpg]]
-*Table 1: Mean QD Score $\mathrm { ( ^ { 6 6 } O D ^ { 7 } ) }$ and Coverage ($^ { 6 6 } \mathrm { C o v } ^ { 7 }$ ) for each algorithm in each domain
-
 **线性投影（LP）域：**
 - 在 2D LP (Sphere) 中，DMS 的 QD 分数达到 6,978.20，相比 CMA-MAE 的 6,327.90 提升 650.30；覆盖率从 80.95% 提升至 95.89%。
 - **10D LP (Sphere) 中差距急剧扩大**：DMS 的 QD 分数为 6,409.50，而 CMA-MAE 仅为 608.53（提升约 5,800）；覆盖率从 6.95% 跃升至 89.21%。这直接印证了平滑折扣模型对高维畸变的克服能力。
@@ -218,7 +205,6 @@ Table 1 汇总了所有算法在所有域中的 QD 分数和覆盖率。DMS 在�
 
 **计算时间：** Table 2 显示，在基准域中 DMS 的挂钟时间明显长于 CMA-MAE（如 2D LP Sphere 中 397.83s vs 121.13s），主要来自折扣模型的训练开销。但在 QDDM 域中，由于解评估（如渲染或 StyleGAN 生成）占主导，时间差异大幅缩小（TA MNIST 中 489.90s vs 495.95s）。MAP-Elites 系列算法速度最快但性能最差。
 
-
 ![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_m6Hv0yZO3n/figures/006_Table_2.jpg]]
 *Table 2: Computation (wallclock) time (in seconds) of each algorithm in each domain. We show the mean and standard error of the mean over 20 trials for the benchmark domains and 5 trials for the QDDM domains*
 
@@ -227,13 +213,11 @@ Table 1 汇总了所有算法在所有域中的 QD 分数和覆盖率。DMS 在�
 **存档学习率 $\alpha$ 的影响（Figure 9）：**
 $\alpha$ 控制目标优化与探索之间的平衡。当 $\alpha \to 0$ 时，折扣模型几乎不更新，DMS 退化为纯单目标优化，覆盖率极低。随着 $\alpha$ 增大，覆盖率和 QD 分数同步提升，在 $\alpha \approx 0.1$ 附近通常达到最优。这一行为与 CMA-MAE 中的阈值更新机制一致。
 
-
 ![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_m6Hv0yZO3n/figures/028_Figure_9.jpg]]
 *Figure 9: Mean and standard error of the mean of QD Score and Coverage when varying the archive learning rate α in DMS in the benchmark domains. Highlighted lines indicate results from the main paper in Table 1. Mean over 20 trials*
 
 **空点训练机制的关键作用（Figure 10, Figure 11）：**
 空点（empty points）是 DMS 中一个看似微小但至关重要的设计。当 $n_{\text{empty}} = 0$（不添加空点）时，折扣模型在未探索区域会输出**任意高值**（Figure 11），导致发射器错误地认为整个测度空间已被充分探索，即使存档几乎为空。这使 QD 分数和覆盖率大幅崩溃。只需添加少量空点（$\ge 10$），折扣模型就能在未探索区域保持低值输出，性能即可恢复至正常水平。Figure 8 展示了正常训练中折扣模型从初始的 $f_{\text{min}}$ 全域低值，逐步在已探索区域升高、未探索区域维持低值的演变过程。
-
 
 ![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_m6Hv0yZO3n/figures/023_Figure_8.jpg]]
 *Figure 8: Progression of the archive and discount model in DMS in the 2D LP (Sphere) benchmark. The left heatmap shows the archive, while the right heatmap shows the discount model. To plot the discount model, we computed its output at points in a 200 × 200 grid in measure space. The discount model heatmap also shows the dataset $\mathcal { D } _ { A }$ of points on a given iteration — blue circles indicates points created with solutions from the emitters, and yellow triangles indicate empty points. On Iteration 0, the discount model initializes to output $f _ { m i n }$ everywhere. On Iteration 250, as the emitters begin to populate the archive, the discount model begins to output higher values in areas...*
@@ -253,25 +237,10 @@ $\alpha$ 控制目标优化与探索之间的平衡。当 $\alpha \to 0$ 时，�
 - 在 TA (MNIST) 中 DMS 的目标分数略微落后于 CMA-MAE，提示折扣模型的平滑性可能引入噪声，在需要精细目标优化的场景中需进一步研究。
 - 所有实验均统一了每轮迭代生成的解的数量，以保证公平比较。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_m6Hv0yZO3n/figures/003_Figure_1.jpg]]
 *Figure 1: (a): One failure mode of CMA-MAE. On a flat objective f , solutions $\pmb { \theta } _ { 1 }$ and $\pmb { \theta } _ { 2 }$ fall in the same archive cell based on their measures, resulting in identical discount values from the discount function $f _ { A }$ . \ ( $\mathbf { b } ) { \mathrm { : } }$ : In our proposed DMS, the discount model provides a smooth discount function that assigns distinct discount values to $\pmb { \theta } _ { 1 }$ and $\pmb \theta _ { 2 }$ . , showing that $\pmb { \theta } _ { 2 }$ has greater archive improvement than $\theta _ { 1 }$ \ $\mathrm { \bar { ( } } \Delta _ { 2 }$ \ > $\Delta _ { 1 }$ ) and thus providing a stronger signal to guide search. (c): Number of unique cells where...
-
-![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_m6Hv0yZO3n/figures/008_Table_3.jpg]]
-
-![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_m6Hv0yZO3n/figures/010_Table_4.jpg]]
-
-![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_m6Hv0yZO3n/figures/012_Table_5.jpg]]
-
-![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_m6Hv0yZO3n/figures/024_Table_3.jpg]]
-*Table 3: Welch’s one-way ANOVA results in each domain. All p-values are less than 0.001*
 
 ![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_m6Hv0yZO3n/figures/025_Table_4.jpg]]
 *Table 4: Pairwise comparisons (Games-Howell test) of the QD Score of each algorithm*
-
-
-
 
 ## 定位与知识库关联
 
@@ -310,8 +279,6 @@ DMS 的核心因果旋钮是将折扣函数的表示从**离散单元直方图**
 - 能否用更轻量级的平滑模型（如核方法或高斯过程）替代神经网络，以减少训练开销并降低外推风险？
 - 在没有手工测度函数的情况下，如何利用更多样化的模态（文本、音频等）来定义测度空间？
 - 如何设计适用于 QDDM 域的可微 QD 方法，使梯度信息能同时优化目标函数和测度空间覆盖？
-
-
 
 ## 原文 PDF
 

@@ -59,8 +59,6 @@ claims:
 
 DC-SFT以极简的修改——仅需在训练前过滤掉困难样本——实现了对RL泛化能力的超越，同时保留了SFT的训练稳定性和计算效率，为VLM后训练提供了一种高性价比的数据中心范式。
 
-
-
 ### 视觉-语言模型后训练的现状与困境
 
 视觉-语言模型（VLM）的训练通常遵循“预训练 → 监督微调（SFT） → 强化学习（RL）”的三阶段范式。在这一范式中，后训练阶段（SFT与RL）对提升模型的指令遵循能力和任务表现至关重要。然而，近年来一个令人困惑的经验现象逐渐浮现：**在相同的基础模型和数据条件下，基于RL的后训练方法往往展现出比SFT更强的分布外（OOD）泛化能力**，但其背后的根本原因一直缺乏系统性的解释。
@@ -99,8 +97,6 @@ $$A^{k} = \frac{r(x, y^{k}) - \mathrm{mean}(\{r(x, y^{k})\mid k=1,2,\ldots,G\})}
 
 这一设计的动机直接来源于对RL工作机制的逆向工程：既然RL的泛化优势源自对困难样本的隐式忽略，那么显式地剔除这些样本，SFT理应能够复现甚至超越RL的泛化表现。同时，由于DC-SFT本质上仍是标准SFT，它天然规避了RL训练的诸多痛点——如奖励设计、策略崩溃、高计算开销（需在线采样多响应）和训练不稳定性（Figure 3），从而在效率与稳定性上具备显著优势。
 
-
-
 ## 核心方法与创新机理
 
 ### 1. 从隐式过滤到显式筛选：重新定义SFT的数据使用方式
@@ -129,8 +125,6 @@ DC-SFT相对于标准SFT的唯一核心改动集中在**训练数据筛选策略
 这看似反直觉的设计背后有坚实的因果机制支撑。实验揭示了一个关键瓶颈：**困难样本在训练全程产生显著更大的梯度范数**（Figure 6），导致模型更新被这些样本主导。虽然这带来了分布内（ID）性能的提升，却迫使模型过拟合到训练域特有的虚假相关性上，严重损害分布外（OOD）泛化能力。仅用hard样本训练Qwen2.5-VL-7B时，ImageNet-R准确率骤降**14.07%**（Table 1），这一现象直接验证了困难样本是OOD性能崩溃的主要诱因。
 
 DC-SFT通过**显式控制困难样本的比例**来调节过拟合程度。消融实验表明，即使仅混入**5%的hard样本**，OOD性能（ImageNet-R）也会下降**3.74%**（Figure 5），揭示了困难数据对泛化的高度敏感性。SFT-EM（保留easy+medium）在Qwen2.5-VL-7B上实现了**62.10%的OOD平均准确率**，超越GRPO的59.48%达**+2.62%**（Table 2），证明显式筛选可以比RL的隐式过滤做得更好——因为RL的过滤效果受限于奖励信号的质量和组归一化的精度，而DC-SFT的显式分类更为直接和可控。
-
-
 
 DC-SFT 的核心流程可以概括为“先诊断、后过滤、再微调”的三阶段流水线，其设计目标是将 RL 训练过程中隐式的数据筛选机制显式化，从而在标准 SFT 范式下复现甚至超越 RL 的泛化能力。
 
@@ -173,13 +167,6 @@ DC-SFT 的流水线设计本质上将 GRPO 的隐式过滤机制（通过组内�
 
 - **训练效率**：DC-SFT 无需在线采样多个响应、计算奖励和优势函数，训练时间相比 GRPO 加速 3.2×–4.9×（Figure 4）。
 - **训练稳定性**：显式过滤避免了 RL 训练中常见的奖励波动和策略崩溃问题，DC-SFT 的性能曲线更为平滑（Figure 3）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2668_https_arxiv_org_abs_2602_10815/figures/001_Figure_1.jpg]]
-*Figure 1: (a) RL implicitly focuses updates on medium-difficulty samples that yield high reward variance. (b) ID and OOD performance after SFT on data subsets of varying difficulty levels*
-
-
 
 ### 3.1 监督微调（SFT）损失
 
@@ -241,15 +228,8 @@ DC-SFT将上述隐式过滤机制显式化为数据预处理步骤。其核心�
 
 **关键机制**：hard样本在训练全程产生显著更大的梯度范数（Figure 6），导致其主导训练动态并引发对训练域虚假特征的过拟合。DC-SFT通过前置过滤截断了这一有害梯度信号的来源，从而在保持ID性能提升的同时保护OOD泛化能力。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2668_https_arxiv_org_abs_2602_10815/figures/002_Figure_2.jpg]]
 *Figure 2: (a) Illustrative examples of the data difficulty taxonomy. (b) Illustrative examples of generalization evaluation benchmarks for image classification (top) and visual grounding (bottom)*
-
-![[assets/figures/papers/paper_list_l2668_https_arxiv_org_abs_2602_10815/figures/010_Figure_6.jpg]]
-*Figure 6: Gradient norms observed during SFT training on data subsets of varying difficulty*
-
-
 
 ## 实验与关键发现
 
@@ -300,25 +280,9 @@ DC-SFT将上述隐式过滤机制显式化为数据预处理步骤。其核心�
 
 除图像分类和视觉定位外，作者还在多模态推理基准上评估了DC-SFT。**Table 6** 显示，在MMMU、MathVista等多个推理任务的平均准确率上，SFT-M达到55.32%，优于标准SFT的53.88%，且与GRPO（55.44%）基本持平。这表明困难样本过滤策略不仅适用于感知类任务的泛化，对推理能力同样具有正向影响。
 
-![[assets/figures/papers/paper_list_l2668_https_arxiv_org_abs_2602_10815/figures/012_Table_6.jpg]]
-*Table 6: Reasoning performance (%) of models built using different post-training paradigms. We only assess multiple-choice questions to ensure an objective evaluation. Bolded indicates the best*
-
 ### 局限性
 
 当前实验验证主要基于Qwen2.5-VL和MiniCPM-V-4两种架构，且模型规模限制在≤7B参数。该方法在更大规模模型（如30B+）及其他VLM架构（如InternVL、LLaVA）上的有效性尚待验证。此外，数据难度的定义依赖于特定的采样温度（0.9）和组大小（G=8），该定义对超参数的敏感性缺乏系统讨论。OOD泛化评估也仅限于图像分类和视觉定位两项任务，在其他视觉-语言任务上的适用性未知。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2668_https_arxiv_org_abs_2602_10815/figures/003_Table_1.jpg]]
-*Table 1: ID and OOD (gray background) performance (%) after SFT on data subsets of varying difficulty levels. The baseline denotes the performance of the initialized model without subsequent fine-tuning. Performance changes exceeding 1% are highlighted in color*
-
-![[assets/figures/papers/paper_list_l2668_https_arxiv_org_abs_2602_10815/figures/004_Figure_3.jpg]]
-*Figure 3: Performance curves of different post-training paradigms using Qwen2.5-VL-7B as the backbone*
-
-![[assets/figures/papers/paper_list_l2668_https_arxiv_org_abs_2602_10815/figures/011_Figure_5.jpg]]
-*Figure 5: The impact of hard data ratio on OOD performance*
-
-
 
 ## 定位与知识库关联
 
@@ -355,8 +319,6 @@ DC-SFT将上述隐式过滤机制显式化为数据预处理步骤。其核心�
 4. **困难样本的潜在价值**：Figure 5 显示仅混入 5% 的困难样本即可导致 OOD 性能显著下降（ImageNet-R 降低 3.74%），但完全剔除困难样本是否意味着模型失去了处理边缘情况的能力？引入少量困难样本作为对抗训练信号，是否能在不严重损害 OOD 的同时增强模型鲁棒性？
 
 5. **与 RL 的深层关系**：DC-SFT 证明 RL 的泛化优势可被 SFT 复现，但 RL 的探索机制（在线采样生成多样响应）是否在数据筛选之外还提供了其他隐性收益（如响应多样性、策略熵正则化）？这些因素在更大规模实验中是否变得重要？
-
-
 
 ## 原文 PDF
 

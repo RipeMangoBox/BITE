@@ -57,8 +57,6 @@ REArtGS++ 通过两个核心机制突破上述瓶颈：
 
 **方法定位**：REArtGS++属于基于3D高斯泼溅的可泛化关节重建方法，继承自REArtGS（Wu et al., NeurIPS 2025）的几何约束框架，但通过螺旋运动建模与时间连续正则化实现了对任意关节类型与未观测状态的有效泛化，区别于PARIS（Liu et al., ICCV 2023）、DTA（Weng et al., CVPR 2024）等基于神经隐式场的方法，以及ArtGS（Liu et al., ICLR 2025）等依赖关节先验的3DGS方法。
 
-
-
 ### 问题背景：无先验关节物体的可泛化重建
 
 从多视角RGB图像重建未见过的关节物体（articulated objects）是三维视觉与机器人操作中的核心任务。给定任意两个不同状态下的多视角RGB图像，系统需要同时估计物体的部件分割、关节参数（轴方向、轴位置、运动类型与幅度），并生成任意中间状态的部件级动态表面重建。这一问题的难点在于：关节类型未知（旋转、平移或螺旋）、部件数量与几何结构各异，且训练阶段从未见过该物体实例，要求方法具备强泛化能力。
@@ -80,8 +78,6 @@ REArtGS++ 通过两个核心机制突破上述瓶颈：
 2. **时间连续几何正则化**：将3D高斯压缩为平面高斯以获得准确的法向与深度估计，进而利用泰勒一阶展开将法向-深度一致性约束从离散状态推广到整个连续时间区间，为关节运动提供有效的时间几何约束，显著提升未观测状态的动态重建质量。
 
 通过这两个机制，REArtGS++在仅使用两状态多视角RGB图像（无深度监督）的条件下，实现了对未见关节物体的部件级动态重建与精确关节参数估计。
-
-
 
 ## 核心方法与创新机理
 
@@ -129,8 +125,6 @@ $$\mathcal{L}_{\mathrm{geo}} = (1 - \nabla\mathbf{I}(t_0)) \left( \|\bar{\mathbf
 
 上述三项创新并非孤立存在，而是形成因果链条：**平面高斯**提供可靠的法向与深度估计基础，**解耦螺旋运动**定义连续时间上的刚体变换，**泰勒展开几何约束**则将前两者的输出耦合为覆盖整个运动区间的一致性正则化信号。这一“表征-运动-约束”三位一体的设计，使得 REArtGS++ 在仅两状态RGB监督下即可实现高质量部件级动态重建与任意关节类型的参数估计。
 
-
-
 REArtGS++ 的整体流程如图 2 所示，其核心目标是：**仅以任意两个状态的 RGB 多视角图像为输入，在不依赖任何外部模型或深度真值的条件下，联合优化部件分割、关节参数与平面高斯表征，最终实现未见关节物体的高质量部件级动态重建与精确关节参数估计**。
 
 ### 输入与输出
@@ -169,15 +163,8 @@ $$\mathcal{L} = \lambda_{\mathrm{render}} \mathcal{L}_{\mathrm{render}} + \lambd
 
 相比 REArtGS（NeurIPS 2025），REArtGS++ 在三个关键槽位上进行了系统性改进：(1) 关节运动建模从依赖类型先验的旋转/平移扩展为解耦螺旋运动，消除了对关节类型的假设；(2) 高斯表征从标准 3D 椭球压缩为平面高斯，使法向与深度估计从有偏变为准确无偏；(3) 引入基于泰勒展开的时间连续几何约束，填补了 REArtGS 缺乏未观测状态正则化的空白。这三个改进形成因果链：平面高斯提供可靠的几何估计基础 → 解耦螺旋运动提供无先验的运动表达能力 → 时间几何约束将离散监督泛化到连续运动区间。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l39_https_arxiv_org_abs_2511_17059/figures/002_Figure_2.jpg]]
 *Figure 2: Framework of REArtGS++. Our method jointly optimizes part segmentation, joint parameters and planar Gaussians using multi-view RGB images from arbitrary two states, and achieves high-quality part-level mesh reconstruction of any states and accurate joint parameter estimation for an unseen articulated object. “Diff.” denotes the difference approximation*
-
-![[assets/figures/papers/paper_list_l39_https_arxiv_org_abs_2511_17059/figures/001_Figure_1.jpg]]
-*Figure 1: Given multi-view RGB images at arbitrary two different states of an unseen articulated objects, our method achieves high-quality part-level dynamic reconstruction and joint parameter estimation, without any external models*
-
-
 
 REArtGS++ 的核心管线由五个紧密耦合的模块构成，围绕“平面高斯→部件分割→解耦螺旋运动→时间几何约束→局部投票”的联合优化环路展开。整体框架如 Figure 2 所示。
 
@@ -245,8 +232,6 @@ $$ \mathcal{L} = \lambda_{\mathrm{render}} \mathcal{L}_{\mathrm{render}} + \lamb
 
 其中 $\mathcal{L}_{\mathrm{render}}$ 为 L1 + D-SSIM 渲染损失（Eq. 2），$\mathcal{L}_{\mathrm{center}}$ 约束部件中心不远离物体。所有参数——高斯属性、部件分割、关节参数——通过该目标端到端联合优化。优化完成后，动态高斯 $\mathcal{G}^j$ 在任意时刻 $t$ 的位置由 Eq. 5 更新，部件网格通过 $\max(\mathcal{G}_i = m_j)$ 选择提取（Eq. 15）。
 
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -287,13 +272,8 @@ REArtGS++ 在 PARIS 与 ArtGS-Multi 两个基准上均取得最优或次优的�
 
 2. **相机位姿对齐要求**：方法假设两状态间的相机位姿精确对齐，但在真实捕获数据中通常无法直接满足。当前框架未包含相机位姿联合优化，限制了在完全无标定真实数据上的直接应用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l39_https_arxiv_org_abs_2511_17059/figures/003_Table_1.jpg]]
 *Table 1: Quantitative results on PARIS dataset. We implement all methods without depth supervision for fair comparison. Axis Pos results are measured by mm. ”-” indicates the object containing only prismatic joints. We highlight best and second best results*
-
-![[assets/figures/papers/paper_list_l39_https_arxiv_org_abs_2511_17059/figures/005_Table_2.jpg]]
-*Table 2: Quantitative results on ArtGS-Multi dataset with additional 2 objects exhibiting screw joints. Due to the large number of parts, we report the average metric for all movable parts. We implement all methods without depth supervision for fair comparison. Part motion error for screw objects is decomposed by translation|rotation. Axis Pos results are measured by mm. ‘-’ indicates the object contains only prismatic joints. We highlight best and second best results*
 
 ![[assets/figures/papers/paper_list_l39_https_arxiv_org_abs_2511_17059/figures/011_Table_3.jpg]]
 *Table 3: Ablation of key componets. We report the average results on ArtGS-Multi and 2 screw-joint objects. Axis Pos results are measured by mm. “GS” and “dis” denote Gaussians and distance respectively*
@@ -304,19 +284,8 @@ REArtGS++ 在 PARIS 与 ArtGS-Multi 两个基准上均取得最优或次优的�
 ![[assets/figures/papers/paper_list_l39_https_arxiv_org_abs_2511_17059/figures/004_Figure_3.jpg]]
 *Figure 3: The qualitative results of dynamic surface reconstruction at start state and end state on ArtGS-Multi dataset. We show both part segmentation and surface meshes for best comparison. The red arrows represent joints*
 
-![[assets/figures/papers/paper_list_l39_https_arxiv_org_abs_2511_17059/figures/007_Figure_4.jpg]]
-*Figure 4: The qualitative results of dynamic surface reconstruction at start state and end state on PARIS dataset. We show both articulated modeling and surface meshes for best comparison*
-
-![[assets/figures/papers/paper_list_l39_https_arxiv_org_abs_2511_17059/figures/006_Figure_5.jpg]]
-*Figure 5: The qualitative results of dynamic surface reconstruction at start state and end state on PARIS dataset. We show both articulated modeling and surface meshes for best comparison*
-
-![[assets/figures/papers/paper_list_l39_https_arxiv_org_abs_2511_17059/figures/008_Figure_6.jpg]]
-*Figure 6: Qualitative results for the ablation of voting and geometric regularization. We use segmentation rendering results for intuitive visualization*
-
 ![[assets/figures/papers/paper_list_l39_https_arxiv_org_abs_2511_17059/figures/010_Figure_7.jpg]]
 *Figure 7: Qualitative results of part-level surface reconstruction at both start and end states on real-world objects*
-
-
 
 ## 定位与知识库关联
 
@@ -372,8 +341,6 @@ REArtGS++ 相对于基线方法在四个关键设计槽位上做出了实质性�
 - **与基础模型结合**：当前方法从零开始优化，未来可探索利用预训练的分割或深度估计模型提供初始化或弱监督。
 - **单目/稀疏视角扩展**：当前依赖多视角输入，向单目或稀疏视角的泛化是实用化的关键瓶颈。
 - **动态场景扩展**：方法假设静态背景与独立运动的关节物体，向多物体交互场景的扩展需要引入物体间遮挡与碰撞建模。
-
-
 
 ## 原文 PDF
 

@@ -97,8 +97,6 @@ Elastic3D在立体视频生成方法谱系中占据独特位置：
 
 **局限性与待验证点**：模型对极端视差（基线>63mm）的泛化较弱；单一标量视差条件在动态场景（如变焦镜头）中可能产生歧义；隐式几何学习偶尔导致平坦表面的轻微“波浪”深度幻觉。这些需要在实际部署中结合场景特点进行验证。
 
-
-
 立体视频（Spatial Video）正随着Apple Vision Pro、Meta Quest等设备的普及而成为沉浸式内容消费的核心媒介。然而，立体内容的创作仍然高度依赖专业双摄设备，导致高质量3D视频供给严重不足。单目转立体（mono-to-stereo）视频转换——从普通单视点视频生成对应的右眼视图——因此成为极具实用价值的研究方向。
 
 ### 现有方法的瓶颈
@@ -122,8 +120,6 @@ Elastic3D在立体视频生成方法谱系中占据独特位置：
 - **左视图引导的VAE解码器恢复高频细节**：设计一个包含极线交叉注意力机制的引导解码器 $\mathcal{D}'$，在解码阶段直接从输入左视图 $V_L$ 的多尺度特征中提取高频信息并注入右视图重建过程，有效绕过标准VAE的压缩瓶颈，显著缓解双眼竞争。
 
 通过这三项设计的协同，Elastic3D在多个在野数据集上实现了对传统扭曲方法和免扭曲基线的全面超越，同时保持了直观的用户控制能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -159,8 +155,6 @@ $$h_i'(p) = h_i(p) + \mathcal{A}_{\mathrm{epipolar}}(h_i(p), g_i)$$
 
 Elastic3D 的三个 changed slots 形成了协同增效的创新闭环：免扭曲生成消除了几何伪影的源头，视差条件赋予了跨场景的可控泛化能力，引导解码器则弥补了潜在扩散模型固有的细节损失。这一组合使得模型在 AVP 数据集上以 **25.9 PSNR / 0.196 LPIPS** 全面超越所有基线（Tab. 5），同时保持了从零噪声单步前馈的推理效率。
 
-
-
 Elastic3D 是一个直接、免扭曲（warping-free）的前馈立体视频转换框架。给定一段左眼视频 $V_L \in \mathbb{R}^{N \times H \times W \times 3}$，系统通过三个级联模块一次性生成对应的右眼视频 $\hat{V}_R$，全程无需显式深度估计或像素重投影。
 
 **Pipeline 总览**
@@ -194,12 +188,8 @@ $$
 - **视差条件注入**：标量 $\delta = \mathrm{P}_{50}(D_{LR}^0)$（首帧左右视差图的中值）通过可学习的令牌 $\tau(\delta)$ 注入合成网络，使用户能以直观、连续的方式控制立体效果强度。消融实验表明，该条件在分布外数据集（iPhone Spatial Video）上贡献了 +3.8 dB PSNR 的跨基线泛化增益（Tab. 1）。
 - **引导解码的模块化设计**：$\mathcal{D}'$ 与 $f_\theta$ 分开训练，可即插即用地提升其他方法（如 M2SVid）的性能——替换其标准解码器后，LPIPS 降低 16%，Matchability 误差下降 44%（Tab. 4）。当前受限于 GPU 内存，联合训练尚不实用，但模块化设计为未来的端到端优化保留了空间。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2473_https_arxiv_org_abs_2512_14236/figures/002_Figure_2.jpg]]
 *Figure 2: Inference Pipeline.A frozen VAE Encoderε computes the latent code*
-
-
 
 ### 整体推理管线
 
@@ -231,9 +221,6 @@ $$\delta = \mathrm{P}_{50}(D_{LR}^0)$$
 
 该标量通过傅里叶特征编码后注入合成网络，作为控制立体强度的直观旋钮（Figure 3）。训练时，通过对真实视差图 $D_{LR}^0$ 随机缩放因子 $s$ 并前向扭曲生成新的右视图真值，使模型学习视差条件的连续响应。
 
-![[assets/figures/papers/paper_list_l2473_https_arxiv_org_abs_2512_14236/figures/003_Figure_3.jpg]]
-*Figure 3: The strength of the stereo effect can be controlled by varying the parameter δ that acts as a conditioning for the median disparity of the generated video (see Sec. 4.2)*
-
 ### 模块三：引导解码器 $\mathcal{D}'$ 与极线注意力
 
 标准 VAE 解码器仅从潜在表示 $\hat{z}_R$ 重建图像，受限于压缩瓶颈，高频细节严重丢失（Figure 4）。引导解码器 $\mathcal{D}'$ 通过极线交叉注意力机制，直接从输入左视图 $V_L$ 提取多尺度特征并注入解码过程。
@@ -246,8 +233,6 @@ $$\delta = \mathrm{P}_{50}(D_{LR}^0)$$
 $$h_i'(p) = h_i(p) + \mathcal{A}_{\mathrm{epipolar}}(h_i(p), g_i)$$
 
 $\mathcal{A}_{\mathrm{epipolar}}$ 沿核极线执行一维交叉注意力：以 $h_i(p)$ 为查询，仅在 $p$ 对应的极线上与 $g_i$ 的特征进行注意力计算。这一设计将 16 位注意力矩阵的显存需求从 128 GB 降至 256 MB，使高分辨率特征融合成为可能。引导解码器独立于合成网络训练，可即插即用地提升其他基线方法（如 M2SVid）的细节恢复能力。
-
-
 
 ## 实验与关键发现
 
@@ -310,27 +295,8 @@ Table 9 的配对人类感知研究中，参与者在 Elastic3D 与 M2SVid 的�
 ![[assets/figures/papers/paper_list_l2473_https_arxiv_org_abs_2512_14236/figures/019_Table_9.jpg]]
 *Table 9: ResultsofPairwiseHumanPerceptionStudy.PrtcipantscomparedElastic3Dagainsttwoothermethods: M2SVidandEye2Eye. The table shows the number oftimes (%of total for each row)each method was preferred,orifthey were rated as equal*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2473_https_arxiv_org_abs_2512_14236/figures/007_Table_5.jpg]]
 *Table 5: State-of-the-art comparison on the Apple Vision Pro Spatial Video dataset [22]. The baseline of the dataset is similar to during training while the content is out-of-distribution*
-
-![[assets/figures/papers/paper_list_l2473_https_arxiv_org_abs_2512_14236/figures/008_Table_3.jpg]]
-*Table 3: Reconstruction results on Stereo4D[23],where the VAE is applied on the ground truth right views*
-
-![[assets/figures/papers/paper_list_l2473_https_arxiv_org_abs_2512_14236/figures/009_Table_4.jpg]]
-*Table 4: ．Impact of our guided-VAE decoder*
-
-![[assets/figures/papers/paper_list_l2473_https_arxiv_org_abs_2512_14236/figures/011_Table_6.jpg]]
-*Table 6: State-of-the-art comparison on the Stereo4D [23] test set*
-
-![[assets/figures/papers/paper_list_l2473_https_arxiv_org_abs_2512_14236/figures/012_Table_7.jpg]]
-*Table 7: State-of-the-art comparison on the iPhone portion of Spatial Video dataset [22].Both calibration and video content are out-of-distribution*
-
-![[assets/figures/papers/paper_list_l2473_https_arxiv_org_abs_2512_14236/figures/023_Table_12.jpg]]
-*Table 12: Model Latency Comparison.Runtimes are measured for generating a video of 16 frames with a resolution of 512 × 512. All evaluations were performed on an NVIDIA H10o GPU.“Monodepth”and“Warp”denote the time taken for depth estimation and geometric warping,respectively*
-
-
 
 ## 定位与知识库关联
 
@@ -389,8 +355,6 @@ Elastic3D 的核心设计假设决定了其适用范围和局限性：
 4. **弱几何先验融合**：是否可以在免扭曲框架中引入弱几何先验（如平面一致性约束、极线几何正则化），以减少几何幻觉，同时保持免扭曲的灵活性？
 5. **端到端联合训练**：在更好的硬件条件下，联合训练 UNet 和引导解码器能否实现端到端优化的质量收益？当前模块化设计的性能上限在哪里？
 6. **与其他基线的即插即用集成**：Tab. 4 已证明引导解码器对 M2SVid 有即插即用增益（LPIPS 降低，Matchability 误差下降 44%）。这一模块能否泛化到更广泛的立体生成框架中，成为通用组件？
-
-
 
 ## 原文 PDF
 

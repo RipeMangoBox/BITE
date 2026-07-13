@@ -52,8 +52,6 @@ claims:
 
 UniPR以端到端并行架构、PASR表示与立体几何约束，在**真实尺度保持、形状比例精度与推理效率**三个维度同步突破现有方法，为对象级真实到仿真感知提供了新的基线范式。
 
-
-
 对象级真实到仿真（Real-to-Sim）感知与重建是机器人、具身智能和增强现实等领域的核心任务。其目标是从真实世界的传感器观测中，同时检测场景中的多个物体，并恢复它们在三维空间中的精确位置、姿态和几何形状，从而构建可供下游仿真引擎直接使用的数字孪生。这一任务面临三重根本性挑战：**多目标并行处理**、**真实尺度恢复**，以及**形状比例的准确保持**。
 
 当前主流方法采用模块化流水线架构，将任务拆解为检测、分割、形状重建和姿态估计四个独立阶段，再通过后处理将各模块的输出拼合（Figure 2）。这种设计导致三个系统性缺陷：
@@ -67,8 +65,6 @@ UniPR以端到端并行架构、PASR表示与立体几何约束，在**真实尺
 从系统效率看，现有图像到3D模型仍需依赖外部的2D检测器和分割器提供精确的边界框与掩码，本质上仍是模块化流程的延伸，且每个物体的重建需独立执行完整的前向推理，全场景处理耗时可达数十秒甚至数分钟。
 
 上述瓶颈共同指向一个核心矛盾：**模块化设计割裂了感知与重建的信息流，使得网络无法利用立体几何约束和全图上下文来联合优化检测、姿态与形状**。因此，构建一个统一的端到端框架，直接从原始立体图像对中并行输出多个物体的真实尺度3D形状与6D姿态，成为突破现有方法上限的关键方向。这正是UniPR工作的核心动机——通过将姿态与形状在观测空间中联合编码，利用立体几何消除尺度模糊，实现单次前向传播即可完成全场景的感知与重建。
-
-
 
 ## 核心方法与创新机理
 
@@ -119,8 +115,6 @@ PASR 的解决方案是**直接在观测空间中联合编码物体的姿态与�
 
 尽管创新显著，UniPR 仍存在明确边界：① 无内置纹理生成模块，需依赖外部模型（Hunyuan3D-Paint-v2.1）进行纹理合成；② 对拓扑高度复杂的物体（如 mug 的手柄）需额外部分感知细化步骤（Table 9），未完全实现端到端；③ 依赖标定立体相机，单目分支性能显著下降（Table 4），限制了在单目传感器上的直接应用。当前训练和主要评测基于合成数据集 LVS6D，真实场景泛化能力虽在少数示例中验证（Figure 12），但缺乏大规模真实数据评估，这一点需要读者注意。
 
-
-
 UniPR 是一个端到端的统一前向网络，直接从单张立体图像对中并行检测多个物体并重建其具有真实尺度的 3D 几何。与传统的“检测→分割→形状重建→姿态估计”模块化流水线（Figure 2）不同，UniPR 将感知与重建统一在一个网络中，使信息可以在各组件间无缝流动，从根本上消除了模块间误差累积的问题。
 
 ![[assets/figures/papers/paper_list_l2618_https_arxiv_org_abs_2603_19616/figures/002_Figure_2.jpg]]
@@ -154,13 +148,6 @@ UniPR 是一个端到端的统一前向网络，直接从单张立体图像对�
    - 训练时使用 BCE 重建损失 $\mathcal{L}_{\text{recon}}$ 和 KL 散度损失 $\mathcal{L}_{\text{kl}}$（衡量预测分布与真值分布之间的差异）联合优化。
 
 整个流程的输入仅为一张立体图像对，输出为场景中所有物体的类别、6D 姿态、真实尺度和高质量 3D 网格，无需任何预定义的边界框、分割掩码或姿态真值。这种端到端设计使得 UniPR 在全场景推理速度上相比逐对象处理的模块化基线（如 Trellis）可实现约 100 倍的加速（Table 1）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2618_https_arxiv_org_abs_2603_19616/figures/019_Figure_10.jpg]]
-*Figure 10: Illustration of SAM 3D Object test result*
-
-
 
 UniPR 是一个单次前向网络，直接以立体图像对为输入，并行推理场景中多个物体的位置、物理尺度和姿态感知的 3D 形状。其核心架构由五个模块级联构成，每个模块解决“统一感知与重建”中的一个关键子问题。
 
@@ -223,12 +210,8 @@ $$\mathcal{L}_{kl} = \frac{1}{C_{kl}} \sum_{j=1}^{C_{kl}} \frac{1}{2} \left( \fr
 
 PASR 解码器在球形体素空间而非传统立方体素空间中预测占用值。这一设计选择增强了训练稳定性：球体坐标系天然适配旋转物体的表示，避免了立方体素空间在物体旋转时产生的边界伪影。消融实验（Table 5）表明，球形体素空间使 Hard 子集 AP 从 0.677 提升至 0.752。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2618_https_arxiv_org_abs_2603_19616/figures/007_Figure_5.jpg]]
 *Figure 5: Qualitative pose-aware shape reconstruction results on LVS6D dataset. The results highlight the key role of PASR in simplifying rotation prediction, as it eliminates the ambiguity caused by different canonical definitions for categories with similar geometry*
-
-
 
 ## 实验与关键发现
 
@@ -290,27 +273,8 @@ Figure 6从三个维度验证了PASR的生成能力：(a) 同类别形状生成�
 
 5. **场景范围限制**：当前仅针对桌面级物体操作场景，未扩展到大规模环境或动态场景。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2618_https_arxiv_org_abs_2603_19616/figures/004_Table_1.jpg]]
-*Table 1: Quantitative comparison on reconstruction. Both Trellis and HunYuan2.1 require perfect 2D bounding boxes, segmentation masks, and poses as inputs, whereas our method operates in an end-to-end manner directly from stereo images. Here, CD denotes the Chamfer Distance, SPE refers to the Shape Proportion Error, and inference time is measured in seconds per object and per scene*
-
 ![[assets/figures/papers/paper_list_l2618_https_arxiv_org_abs_2603_19616/figures/008_Table_4.jpg]]
 *Table 4: Ablation study results. The results underscore the critical role of PASR in enabling large-vocabulary object detection and pose-aware shape reconstruction, as well as the importance of the stereo design for achieving accurate geometric recovery*
-
-![[assets/figures/papers/paper_list_l2618_https_arxiv_org_abs_2603_19616/figures/006_Figure_4.jpg]]
-*Figure 4: Qualitative shape reconstruction results compared with image-to-3D models. The results demonstrate the accurate preservation of shape proportions achieved by our proposed UniPR across various objects in the LVS6D dataset*
-
-![[assets/figures/papers/paper_list_l2618_https_arxiv_org_abs_2603_19616/figures/015_Table_8.jpg]]
-*Table 8: Fairness comparison on input modalities and reconstruction metrics. Our method demonstrates superior geometric consistency and shape proportion accuracy compared to Trellis, regardless of the input modality*
-
-![[assets/figures/papers/paper_list_l2618_https_arxiv_org_abs_2603_19616/figures/010_Table_5.jpg]]
-*Table 5: Ablation on spherical voxel space. We conduct this experiment with shape decoder utilizing spherical and cubic voxel space. This experiment is conducted only on the hard subset of LVS6D, as most re-normalized objects are included in this subset*
-
-![[assets/figures/papers/paper_list_l2618_https_arxiv_org_abs_2603_19616/figures/014_Table_7.jpg]]
-*Table 7: The ablation of KL-based supervision. The results demonstrate the importance of KL-based supervision for utilizing the pretrained VAE model*
-
-
 
 ## 定位与知识库关联
 
@@ -393,8 +357,6 @@ UniPR 在以下知识节点上做出了可验证的贡献：
 4. **时序扩展与动态场景**：UniPR 处理单帧立体对，能否扩展至多帧序列或视频立体输入，以实现时序一致的3D感知与跟踪？这需要解决跨帧对象关联与运动建模问题。
 
 5. **大规模场景的层次化扩展**：当前基于全局 Tri‑Plane View 的场景编码能否通过层次化或稀疏化策略扩展至房间级甚至建筑级环境，同时保持实时推理能力？
-
-
 
 ## 原文 PDF
 

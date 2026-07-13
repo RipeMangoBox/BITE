@@ -56,8 +56,6 @@ claims:
 
 在方法谱系上，SeDiR属于**基于重建的统一异常检测**范式，与MC3D-AD等统一模型形成直接对比，同时与BTF、M3DM、PatchCore、CPMF、IMRNet、Reg3D-AD、Group3AD、R3D-AD、ISMP、PO3AD等类别专用方法构成完整的基准参照系。其关键区分在于：首次将语义解耦作为统一异常检测的核心设计原则，而非依赖记忆库或伪异常生成。
 
-
-
 ### 3D异常检测的范式演进
 
 工业视觉检测正从二维图像向三维点云快速迁移。点云天然携带精确的几何信息，对光照、视角和表面纹理变化不敏感，因而在制造缺陷检测中展现出独特优势。当前3D异常检测的主流方法可归为两类范式：
@@ -94,8 +92,6 @@ Figure 2 的t-SNE可视化与定量分析直接验证了这一机制：在MC3D-A
 
 在此范式下，本文提出SeDiR框架，通过三个互补模块——CFGT、C3L和GGD——系统性地解决ICE问题，使统一模型在保持部署效率的同时，达到甚至超越类别专用模型的检测精度。
 
-
-
 ## 核心方法与创新机理
 
 SeDiR 的核心创新在于将统一多类别 3D 异常检测重新定义为**语义条件重建**问题，并围绕“先建立语义身份，再执行重建”这一洞察，设计了三个相互协同的模块，系统性地解决了统一模型中普遍存在的**类别间特征纠缠（ICE）**瓶颈。
@@ -129,8 +125,6 @@ SeDiR 的核心创新在于将统一多类别 3D 异常检测重新定义为**�
 ### 4. 局限性
 
 尽管语义解耦设计带来了显著的跨类别稳定性提升，SeDiR 并非在每个类别上都超越 MC3D-AD，反映了类别感知泛化与类别特定特化之间的固有权衡。此外，C3L 依赖类别标签进行对比学习，在完全无标签的开放类别场景中不可直接迁移。计算开销方面，SeDiR 的 FLOPs 为 508.25G，略高于 MC3D-AD 的 439.21G（Table S1），存在进一步优化的空间。
-
-
 
 SeDiR 将统一 3D 异常检测重新表述为**语义条件重建**问题，其核心流程分为两个阶段：**语义解耦表征学习**与**语义解耦重建**（Figure 3）。给定一个输入点云，系统首先建立其类别语义身份，再在该语义的指导下进行几何重建，从而避免因类别间特征纠缠（ICE）导致的语义不一致输出。
 
@@ -186,8 +180,6 @@ $$
 $$
 
 推理时，异常评分基于重建误差：对逐点 L2 距离进行归一化与高斯平滑后，取最大值作为物体级异常分数 $S_{\mathrm{obj}}$，逐点分数则直接用于异常定位。这一流程确保了模型在统一的架构下，对多类别输入均能产生语义一致、几何精确的重建，从而给出可靠的异常判断。
-
-
 
 SeDiR 的核心由三个模块串联构成：**多尺度全局特征聚合（CFGT）**、**类别条件对比解耦（C3L）** 以及 **几何引导解码器（GGD）**。三者共同实现“先建立语义身份，再执行几何重建”的范式，从根本上缓解统一模型中的类别间特征纠缠（ICE）问题。
 
@@ -245,13 +237,6 @@ $$\mathbf{S}_p = \mathrm{Gauss}_{k_g,\sigma}\Big(\mathrm{Norm}\big(\|\hat{\mathb
 
 其中 $k_g$ 和 $\sigma$ 为高斯核参数。逐点分数 $\mathbf{S}_p$ 同时用于异常区域定位。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2435_https_arxiv_org_abs_2603_25159/figures/004_Figure_4.jpg]]
-*Figure 4: Overview of the Geometry-Guided Decoder (GGD). Geometric priors*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -264,9 +249,6 @@ Table 1 报告了 Real3D-AD 数据集 12 个类别上的物体级 AUROC 对比�
 *Table 1: Quantitative comparison of AUROC (%) at the object levels on Real3D-AD across 12 categories. The best and second-best results are highlighted in bold and underline, respectively. Methods in the upper block are trained and evaluated in the single-category setting, while methods in the lower block use a unified model for the multi-category setting across all 12 categories*
 
 Table 3 给出的点级异常定位结果中，SeDiR 平均 P-AUROC 达到 **80.6%**（Table S9 提供逐类别详情），较 MC3D-AD（76.8%）提升 **+3.8%**。定位能力在统一模型中排名第二，仅次于依赖记忆库的 ISMP（82.0%），表明语义解耦对细粒度重建误差度量的正向作用，但记忆库方法在逐点判别上仍具一定优势。
-
-![[assets/figures/papers/paper_list_l2435_https_arxiv_org_abs_2603_25159/figures/008_Table_3.jpg]]
-*Table 3: Comparison of mean point-level AUROC (%) on Real3D-AD and Anomaly-ShapeNet datasets. The detailed per-category results are provided in the supplementary*
 
 #### Anomaly-ShapeNet 数据集
 
@@ -308,18 +290,9 @@ Table 5 拆解了 C3L 的三个损失项。监督对比损失 $\mathcal{L}_{\mat
 
 Table 7 比较了不同全局 token 生成策略。**自适应上下文 token（ACT）** 的分类准确率达 **97.3%**，远超 mean pooling（78.1%）和 max pooling（77.3%），证明 ACT 对类别语义具有强辨别力。Table S8 和 Figure S1 的 t-SNE 可视化进一步确认：ACT 学习到的全局 token 在 Real3D-AD（12 类）和 Anomaly-ShapeNet（40 类）上均形成清晰分离的簇，而 mean/max pooling 的特征分布则高度重叠。
 
-![[assets/figures/papers/paper_list_l2435_https_arxiv_org_abs_2603_25159/figures/012_Table_7.jpg]]
-*Table 7: Comparison of different global token strategies*
-
-![[assets/figures/papers/paper_list_l2435_https_arxiv_org_abs_2603_25159/figures/021_Table_S.8.jpg]]
-*Table S.8: Category prediction accuracy with different global representations*
-
 #### GGD 几何引导策略
 
 Table 6 对比了三种几何信息融入方式：Mask（掩码）、Gate（门控）和 Bias（偏置）。直接以几何偏置 $\mathbf{B}_{\mathrm{geo}}$ 加入注意力 logits 的 Bias 策略优于 Mask 和 Gate，验证了在注意力计算中显式注入局部几何先验（法向、曲率变化）对重建质量最为有效。
-
-![[assets/figures/papers/paper_list_l2435_https_arxiv_org_abs_2603_25159/figures/011_Table_6.jpg]]
-*Table 6: Comparison of different guidance strategies in GGD*
 
 #### 超参数消融
 
@@ -329,9 +302,6 @@ Table 6 对比了三种几何信息融入方式：Mask（掩码）、Gate（门�
 
 Table S1 比较了计算开销。SeDiR 的 FLOPs 为 508.25G，略高于 MC3D-AD（439.21G），增量主要来自多分辨率编码与几何偏置计算。
 
-![[assets/figures/papers/paper_list_l2435_https_arxiv_org_abs_2603_25159/figures/013_Table_S.1.jpg]]
-*Table S.1: Comparison of computational cost*
-
 公平性方面，所有方法均仅在正常样本上训练，数据划分与评估协议一致。SeDiR 并非在每个类别上都超越 MC3D-AD，但跨类别方差显著更低，表现更稳定。这反映了类别感知泛化与类别特定特化之间的固有权衡：语义解耦统一模型牺牲了个别类的极致优化，换取了整体鲁棒性和部署的简洁性。
 
 ### 方法局限性
@@ -340,8 +310,6 @@ Table S1 比较了计算开销。SeDiR 的 FLOPs 为 508.25G，略高于 MC3D-AD
 2. **计算开销**：相比 MC3D-AD，FLOPs 增加约 15.7%，在资源受限的工业边缘设备上需进一步轻量化。
 3. **点级定位上限**：点级 AUROC 仍次于 ISMP 等记忆库方法，表明单纯依赖重建误差的逐点度量在细粒度异常边界刻画上存在改进空间。
 4. **对类别标签的依赖**：C3L 依赖类别标签进行监督对比学习，在完全无标签的开放类别场景中无法直接迁移，限制了方法在未知异常类别检测中的适用性。
-
-
 
 ## 定位与知识库关联
 
@@ -383,8 +351,6 @@ SeDiR 处于**类别专用模型与统一模型的交叉地带**。它继承了�
 - **开集扩展**：将类别级解耦扩展到实例级或开集（未见过类别）的3D异常检测是否可行？这需要突破 C3L 对类别标签的依赖。
 - **跨任务迁移**：语义解耦与重建的联合框架是否可用于其他需要类别感知的三维点云任务（如部分分割、补全）？
 - **几何偏置鲁棒性**：需要在更多非理想扫描数据（含噪声、遮挡、旋转）下验证 GGD 中几何偏置的有效性和鲁棒性。
-
-
 
 ## 原文 PDF
 

@@ -80,8 +80,6 @@ MoRe建立在**前馈式多视图重建**的范式之上，直接继承自Dust3R
 
 MoRe的性能严重依赖运动掩码标注的质量；当前前馈架构难以捕捉超出训练时间窗口的极长时依赖和复杂动态交互；在极快、非刚性运动或严重运动模糊场景下，注意力对齐可能失效。未来方向包括：减少对高质量运动标注的依赖（如自监督运动解耦）、扩展前馈架构以捕获更长时序依赖、显式建模遮挡与外观剧变以消除重建伪影。
 
-
-
 ### 动态4D重建：从静态先验到运动感知的范式缺口
 
 从视频序列中同时恢复相机姿态与场景三维几何是计算机视觉的核心问题。近年来，基于Transformer的前馈式重建方法（如 **VGGT**、**DUSt3R**、**Spann3R**、**CUT3R**）在静态场景上取得了令人瞩目的进展——它们无需逐场景优化，仅通过单次前向传播即可从图像中直接回归深度图、点云和相机参数，在ScanNet、Co3Dv2等静态基准上展现出接近甚至超越传统优化方法的精度。然而，这些方法的成功建立在一个隐含假设之上：**场景是静止的**。
@@ -105,8 +103,6 @@ MoRe的性能严重依赖运动掩码标注的质量；当前前馈架构难以�
 具体而言，MoRe在训练阶段引入**运动掩码**作为辅助监督信号，通过一种名为“注意力强制”（attention-forcing）的策略，显式引导相机token的注意力分布偏向静态区域。在推理时，模型无需运动掩码作为输入，仅凭训练中习得的注意力偏好即可自然抑制对动态物体的依赖。同时，MoRe设计了**分组因果注意力**（grouped causal attention）——帧内保留全注意力以维持空间一致性，帧间施加因果约束以支持流式处理——并通过轻量的**BA-like全局token聚合**补偿因果注意力带来的长程信息损失。
 
 这一设计使得MoRe在保持实时推理效率（KITTI上30 FPS，**Table 5**）的同时，在多个动态数据集上全面超越现有流式方法：Sintel上ATE降至0.1474（**Table 1**），Abs Rel降至0.254（**Table 2**），并在Co3Dv2静态场景上以91.42 AUC@30验证了其泛化能力（**Table 6**）。
-
-
 
 ## 核心方法与创新机理
 
@@ -145,8 +141,6 @@ $$\mathbf{C}_{t}^{\mathrm{opt}} = \mathrm{Attn}( \mathbf{Q}_{t}^{\mathrm{cam}}, 
 | 全局一致性 | 流式方法无额外全局优化步骤 | BA-like token 聚合，利用全序列缓存特征优化相机姿态 | Table 3, Eq. (5), Figure 5 |
 
 这三项创新协同作用：注意力强制训练赋予模型运动感知能力，分组因果注意力保障流式推理的时空一致性，BA-like 聚合弥补因果注意力的长程信息损失，最终在实时效率下实现高质量的动态 4D 重建。
-
-
 
 MoRe 是一个前馈式 4D 重建 Transformer，专为流式（streaming）输入设计，在单目前向推理中联合预测每帧的深度图、相机姿态、动态点云图和运动掩码。其整体 pipeline 围绕三个核心设计展开：**运动感知的注意力强制训练**、**分组因果注意力机制**以及**类光束平差的全局 token 聚合**，在保持实时推理效率的前提下实现了动态场景中运动与静态结构的高效解耦。
 
@@ -188,12 +182,8 @@ $$
 
 值得注意的是，MoRe 的运动解耦能力完全通过训练阶段的注意力强制策略获得——运动掩码仅在训练时作为监督信号引导注意力分布，推理阶段无需任何运动先验。这种“训练时注入先验、推理时零额外成本”的设计，使得模型在保持实时流式处理能力的同时，显著提升了对动态场景的鲁棒性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l57_https_arxiv_org_abs_2603_05078/figures/002_Figure_2.jpg]]
 *Figure 2: Method Overview. During training, an attention-forcing mechanism aligns the attention weights with ground-truth motion masks, enabling the model to effectively disentangle dynamic motion from static scene structure. For streaming reconstruction task, MoRe is based on a causal transformer where global attention is replaced by aggregated causal attention*
-
-
 
 ### 3.1 问题形式化：从静态重建到运动感知流式重建
 
@@ -298,27 +288,14 @@ $$
 
 训练时，对于原始相机 token，计算从早期帧到后期帧的相对变换损失时，早期帧 token 的梯度被截断；对于 BA-like 聚合中复制的相机 token，则保留完整梯度流，以稳定训练过程。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l57_https_arxiv_org_abs_2603_05078/figures/004_Figure_4.jpg]]
-*Figure 4: Grouped Causal Attention. Unlike traditional causal attention, our design allows image tokens within the same frame to attend to each other regardless of their ordering. This formulation enables the model to preserve causal temporal reasoning while maintaining spatial consistency within each frame*
-
 ![[assets/figures/papers/paper_list_l57_https_arxiv_org_abs_2603_05078/figures/005_Figure_5.jpg]]
 *Figure 5: Streaming Inference pipeline. Leveraging causal attention, our model can efficiently process streaming input in an online manner. To enhance camera pose accuracy, we apply a bundleadjustment-like post-processing step after the entire sequence has been processed. Specifically, for each frame, we duplicate the camera token and perform inference again using the previously cached key-value pairs*
-
-
 
 ## 实验与关键发现
 
 ### 核心实验结果
 
 MoRe 在多个动态场景基准上进行了零样本评估，涵盖相机姿态估计、视频深度估计和推理效率。Table 1 和 Table 2 汇总了主要结果。
-
-![[assets/figures/papers/paper_list_l57_https_arxiv_org_abs_2603_05078/figures/007_Table_1.jpg]]
-*Table 1: Camera Pose Estimation on Sintel [3], TUM-dynamics [33], Bonn [27], and ScanNet [5] datasets. FA refers to full attention*
-
-![[assets/figures/papers/paper_list_l57_https_arxiv_org_abs_2603_05078/figures/009_Table_2.jpg]]
-*Table 2: Video Depth Estimation on Sintel [3], TUM-dynamics [33], Bonn [27] and kitti [12]*
 
 **相机姿态估计**：在动态数据集 Sintel 上，MoRe 流式模型（streaming）取得 ATE 0.1474，显著优于其他流式方法（Stream3R 0.2135，CUT3R 0.2630），并超越了全注意力静态基线 VGGT（0.1715）。当使用全注意力（FA）变体时，ATE 进一步降至 0.0877，为所有对比方法中的最优结果。在 Bonn 和 TUM-dynamics 数据集上，MoRe FA 的 ATE（0.0138 / 0.0115）与顶尖全注意力方法 π³ 基本持平，而流式版本（0.0211 / 0.0260）虽略有退化，仍保持竞争力。在静态数据集 Co3Dv2 上，MoRe FA 的 AUC@30 达到 91.42，超过 VGGT 的 88.59（Table 6），表明运动感知设计并未损害静态场景下的泛化能力。
 
@@ -366,21 +343,8 @@ Figure 10 的注意力图可视化直接揭示了注意力强制策略的效果�
 
 所有对比实验在相同数据集和评估协议下进行，流式方法统一采用因果注意力推理，全注意力方法使用完整序列上下文，计算资源均为 NVIDIA A800。训练数据涵盖大规模多样静态与动态场景，未见过的动态数据集用于零样本评估，保证了泛化能力的公平比较。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l57_https_arxiv_org_abs_2603_05078/figures/010_Table_4.jpg]]
 *Table 4: Ablation on Video Depth Estimation*
-
-![[assets/figures/papers/paper_list_l57_https_arxiv_org_abs_2603_05078/figures/016_Table_7.jpg]]
-*Table 7: Ablation on Loss Function for Motion Alignment*
-
-![[assets/figures/papers/paper_list_l57_https_arxiv_org_abs_2603_05078/figures/013_Table_5.jpg]]
-*Table 5: Inference speed comparison (FPS), tested on KITTI [12]*
-
-![[assets/figures/papers/paper_list_l57_https_arxiv_org_abs_2603_05078/figures/014_Table_6.jpg]]
-*Table 6: Camera Pose Estimation Comparison on Co3Dv2 [30]*
-
-
 
 ## 定位与知识库关联
 
@@ -415,8 +379,6 @@ MoRe 的架构直接继承自以 **VGGT** 为代表的全注意力前馈重建�
 5. **部分运动场景的注意力强制稳定性。** 当仅有部分场景区域运动或存在多个运动物体时，注意力强制策略的表现是否仍然稳定，以及如何进一步优化损失设计以适应更复杂的运动模式，仍需系统验证。
 
 > **注意：** 上述基线方法的具体作者、会议和年份信息在当前分析中未提供完整元数据，建议手动补充以增强知识库定位的准确性。例如，Stream3R、CUT3R、Spann3R 等方法的出版信息需从原始论文中核实。
-
-
 
 ## 原文 PDF
 

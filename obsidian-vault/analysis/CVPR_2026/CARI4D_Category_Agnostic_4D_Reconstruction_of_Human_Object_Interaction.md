@@ -51,8 +51,6 @@ CARI4D的核心思路是**将多种基础模型的预测对齐以获得鲁棒初
 
 方法局限在于：严重依赖FoundationPose初始化，当发生严重遮挡或快速运动时可能出现翻转180°的姿态错误且难以纠正；未显式回归手指关节，在精细操控场景中手指姿态可能不真实。
 
-
-
 ### 问题背景
 
 从单目RGB视频中重建人与物体的4D交互，是计算机视觉领域的一项基础性挑战。该任务要求同时恢复人体的三维姿态与形状、物体的几何与六自由度位姿，并在整个视频序列上保持时空一致性。这种重建能力对于具身智能、增强现实、人机协作等应用至关重要，因为智能系统需要理解人与周围物体如何在三维空间中实时交互。
@@ -81,8 +79,6 @@ CARI4D的核心思路是**将多种基础模型的预测对齐以获得鲁棒初
 ### 关键证据预览
 
 实验结果表明，这一思路在定量和定性层面均取得了显著提升。在分布内BEHAVE数据集上，CARI4D的联合网格Chamfer距离（CD-c）为9.23 cm，相比VisTracker的14.22 cm降低了35%以上（Table 1）。在未见过的InterCap数据集上零样本泛化时，CD-c为12.88 cm，显著优于VisTracker的20.17 cm，相对提升超过36%（Table 2）。消融实验进一步验证了各模块的独立贡献：动态姿态假设选择将物体Chamfer距离从原始FoundationPose的1565.42 cm大幅降至16.85 cm（Table 3），接触感知联合优化将物体加速度误差从3.78 cm/s²降至0.38 cm/s²，证明了物理约束对时序平滑度的关键作用。
-
-
 
 ## 核心方法与创新机理
 
@@ -117,8 +113,6 @@ $$L = \lambda_c L_c + \lambda_{\mathrm{j2d}} L_{\mathrm{j2d}} + \lambda_m L_m + 
 其中接触损失 $L_c = \sum_i d(\mathbf{J}_i^h, \mathbf{O}_i') \cdot \mathbf{c}_i$ 惩罚手部关节与物体点云的距离，加速度损失 $L_{\mathrm{acc}} = ||\mathbf{x}_i - 2\mathbf{x}_{i-1} + \mathbf{x}_{i-2}||_2^2$ 抑制时序抖动。消融实验表明，联合优化将物体加速度误差Acc-o从3.78 cm/s²大幅降至0.38 cm/s²（Table 3 row e vs f），显著提升运动平滑度和接触一致性（参见Figure 6的漂浮/穿透对比）。
 
 **因果链路总结**：度量尺度恢复（Slot 1-2）提供几何一致的初始化 → 渲染-比较范式（Slot 3-4）实现类别无关的接触推理 → 物理约束优化（Slot 5）保证时空一致性。五个slot层层递进，共同构成了从单目视频到零样本4D重建的完整技术路径。
-
-
 
 CARI4D 的总体目标是从一段单目 RGB 视频中重建出度量尺度下的人和物体的 4D 交互——即恢复每一帧的人体姿态、物体姿态，并保持时空上一致的接触关系。整个流水线采用**自底向上的初始化 + 数据驱动的交互细化 + 物理约束的联合优化**三步范式，核心设计意图是**将多种基础模型的预测对齐到一个统一的度量空间，再通过渲染-比较范式学习一个类别无关的接触推理网络，最终用接触感知的优化满足物理一致性**。
 
@@ -165,8 +159,6 @@ Figure 2 给出了完整的流水线概览，四个核心模块依次为：
 ### 设计逻辑与因果链
 
 整个流水线的设计遵循一条清晰的因果链：**基础模型的原始预测处于不同坐标系、含有噪声且忽略接触交互 → 通过度量尺度对齐和动态姿态选择获得鲁棒初始化 → CoCoNet 学习类别无关的交互细化与接触推理 → 接触感知优化施加物理约束和时序平滑 → 得到空间和时间一致的 4D 重建**。这一链条使得方法能够在**不依赖物体模板和固定类别**的前提下，实现零样本泛化。
-
-
 
 CARI4D 的核心流水线由四个关键模块串联而成，每个模块解决一个特定的子问题，最终实现从单目 RGB 视频到度量尺度 4D 人-物交互重建的端到端流程（Figure 2）。
 
@@ -236,12 +228,8 @@ $$
 ![[assets/figures/papers/paper_list_l1010_https_arxiv_org_abs_2512_11988/figures/007_Figure_6.jpg]]
 *Figure 6: Importance of contacts. Without our contact-aware optimization, the model does not properly handle the fine-grained hand-object interaction, leading to floating object or penetration errors. (Purple balls indicate contact predictions.)*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1010_https_arxiv_org_abs_2512_11988/figures/011_Figure_7.jpg]]
 *Figure 7: CoCoNet architecture. Here b, t, h, w denote batch size, temporal window size, image height and width respectively. We follow a render-and-compare paradigm, hence RGB a and RGB b denote the image from input observation and rendering respectively, same for xyz map and mask (human and object stacked together)*
-
-
 
 ## 实验与关键发现
 
@@ -289,8 +277,6 @@ Figure 11揭示了两个典型失败场景：
 
 Figure 3和Figure 4分别展示了BEHAVE和InterCap上的定性对比。CARI4D重建的物体网格形状完整、姿态准确，而InterTrack仅输出噪声点云，VisTracker†虽使用重建网格但跟踪精度不足。Figure 5展示了在野生互联网视频上的泛化能力，CARI4D在物体姿态、接触预测和整体一致性方面均优于PICO、InterTrack和VisTracker。Figure 6通过消融可视化证明了接触感知优化的重要性：无优化时手与物体之间出现漂浮或穿透，优化后交互贴合自然。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1010_https_arxiv_org_abs_2512_11988/figures/006_Table_1.jpg]]
 *Table 1: Evaluation results on BEHAVE [3] dataset (unit: cm). Our method significantly outperforms previous instance-specific VisTracker [57] and category-specific InterTrack [11]*
 
@@ -299,26 +285,6 @@ Figure 3和Figure 4分别展示了BEHAVE和InterCap上的定性对比。CARI4D�
 
 ![[assets/figures/papers/paper_list_l1010_https_arxiv_org_abs_2512_11988/figures/010_Table_3.jpg]]
 *Table 3: Ablation studies. Our proposed initialization (c) is better than running vanilla (a, b) NLF [37] and FoundationPose (FP [52]). Our contact reasoning model trained with the proposed alignment (e) further improves the accuracy. Joint optimization (f) improves smoothness and contact consistency (see Fig. 6)*
-
-![[assets/figures/papers/paper_list_l1010_https_arxiv_org_abs_2512_11988/figures/012_Figure_8.jpg]]
-*Figure 8: Sensitivity analysis of UniDepth and FoundationPose errors on the final performance*
-
-![[assets/figures/papers/paper_list_l1010_https_arxiv_org_abs_2512_11988/figures/009_Table_4.jpg]]
-*Table 4: Oracle study. Trained on estimated depth, our model also allows input with ground truth depth or object mesh and achieves slightly better results*
-
-![[assets/figures/papers/paper_list_l1010_https_arxiv_org_abs_2512_11988/figures/013_Table_5.jpg]]
-*Table 5: Average runtime (minutes) to process one video of 300 frames. Our method is much faster than baselines while being more accurate*
-
-![[assets/figures/papers/paper_list_l1010_https_arxiv_org_abs_2512_11988/figures/015_Table_6.jpg]]
-*Table 6: Performance of our method per interaction type*
-
-![[assets/figures/papers/paper_list_l1010_https_arxiv_org_abs_2512_11988/figures/008_Figure_5.jpg]]
-*Figure 5: Generalization to in-the-wild videos. Prior methods predict noisy shape (InterTrack [59]), flipped object pose (Vis-Tracker [57], † with our object reconstruction) or wrong contacts and object position (PICO [10]). Our method generalizes better overall. (Purple balls indicate contact predictions.)*
-
-![[assets/figures/papers/paper_list_l1010_https_arxiv_org_abs_2512_11988/figures/017_Figure_11.jpg]]
-*Figure 11: Failure case examples. Our method focuses on full body interaction and the detailed hand poses are not handled, which can be important for fine-grained object manipulation task (top row). Our method thus failed to reconstruct realistic finger poses for holding the plate. Under highly dynamic motion and extreme occlusion (bottom row), FoundationPose predicts flipped object pose for initialization. Such large rotation error is not able to be corrected by our refinement process in subsequent steps, leading to inaccurate reconstruction in the end*
-
-
 
 ## 定位与知识库关联
 
@@ -380,8 +346,6 @@ CARI4D 的适用边界由其设计选择直接决定：
 3. **更复杂的交互推理**：在训练数据更加多样化的条件下，CoCoNet 能否学习躯干接触、多人协作等更复杂的交互模式？当前的双接触标签输出可扩展为多部位接触预测，但需要相应的标注数据支持。
 
 4. **端到端训练的可能性**：当前流水线是模块化的，各基础模型独立运行。能否将部分模块（如深度对齐、姿态选择）纳入可微分框架，实现端到端的联合训练，进一步提升整体性能？
-
-
 
 ## 原文 PDF
 

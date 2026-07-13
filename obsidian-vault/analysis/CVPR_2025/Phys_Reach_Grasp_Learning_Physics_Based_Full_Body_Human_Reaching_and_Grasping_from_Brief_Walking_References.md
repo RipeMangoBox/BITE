@@ -52,8 +52,6 @@ claims:
 
 **主要结果**：在简单场景下，Phys Reach Grasp 达到 99.8% 的抓取成功率和 88.8% 的目标成功率；相比之下，全链路 PPO 基线（Fullbody PPO）的目标成功率仅为 0.01%（Table 2）。在复杂场景下，抓取成功率和目标成功率分别达到 69.7% 和 55.8%。消融实验证实，特征对齐模块使目标成功率从 69.1% 提升至 88.8%，主动数据增强策略中结合成功率和判别器得分的方案显著优于随机策略（69.1% vs. 51.0%）。
 
-
-
 高质量全身人-物交互动作捕捉数据的获取成本极高、制作周期漫长，导致可用数据不仅稀缺，还存在严重的分布偏差。这一瓶颈直接限制了数据驱动方法在多样化场景和未知物体条件下生成伸手抓取动作的能力。与此同时，单纯依赖运动学插值生成的抓取动作缺乏物理真实性，无法反映人类自然的运动模式，难以满足物理仿真对动态平衡、肢体协调等底层运动特性的要求。
 
 现有工作大多沿两条路径展开：一类是基于对抗模仿学习的运动合成方法，如 **AMP**（Peng et al., TOG 2021）和 **ASE**（Peng et al., TOG 2022），它们能从运动捕捉数据中学习逼真的运动策略，但运动空间受限于训练数据的分布，难以泛化到未见过的任务；另一类方法如 **CALM**（Tessler et al., SIGGRAPH 2023）通过条件隐变量指导角色运动，但仍需要与目标任务相关的参考数据。当目标任务是全身伸手抓取、而可用的真实数据仅包含简短行走动作时，上述方法均面临运动空间覆盖不足与任务成功率低下的双重困境——实验表明，直接使用标准PPO训练的全链路策略（Fullbody PPO）在简单场景中的目标成功率仅为0.01%，几乎完全无法完成任务。
@@ -61,8 +59,6 @@ claims:
 本文的核心动机在于回答一个根本性问题：**能否仅利用极易获取的简短行走动作捕捉数据，生成多样化、物理可行的全身伸手抓取运动？** 这一设想的可行性源自一个关键的先导发现：在对抗模仿学习框架中，运动批评家网络的浅层特征对真实运动数据（行走与伸手）表现出较低的FID值，且t-SNE投影呈现明显的聚类现象，而深层特征中这一跨任务的相似性消失。这表明，浅层网络捕捉了可迁移的局部运动特性——如肢体协调模式、动态平衡策略等——它们在不同任务间共享，可作为正则化生成动作的强先验。
 
 基于这一洞察，本文提出 **Phys Reach Grasp** 框架，通过“主动数据生成”与“浅层特征对齐”两大机制，将行走数据中的自然运动模式迁移至伸手抓取任务，在极少量真实数据的条件下实现高成功率和运动自然度。
-
-
 
 ## 核心方法与创新机理
 
@@ -101,8 +97,6 @@ $$r^{feats} = -\sum_{f_i} w_{f_i} d_{f_i}^{ma} \mathbb{1}(d_{f_i}^{ma} > \mathrm
 ### 创新总结
 
 两个 changed slots 形成协同效应：主动数据生成策略扩展了低层策略可处理的任务空间，而局部特征对齐机制则确保扩展后的运动空间仍保持人类运动的自然模式。这一组合使得 Phys Reach Grasp 在简单场景中实现了 **99.8% 抓取成功率**和 **88.8% 目标成功率**，而简单全链路 PPO 基线（Fullbody PPO）的目标成功率仅为 0.01%（Table 2），凸显了仅靠强化学习无法完成任务，必须借助行走先验的关键结论。
-
-
 
 ### 核心瓶颈与设计动机
 
@@ -143,13 +137,6 @@ $$r^{feats} = -\sum_{f_i} w_{f_i} d_{f_i}^{ma} \mathbb{1}(d_{f_i}^{ma} > \mathrm
 - **输入**：简短行走动作捕捉数据（MoCap）作为唯一真实运动先验。
 - **数据流**：行走数据 → 低层策略训练（构建初始技能空间）→ 高层策略训练（执行抓取任务）→ 主动数据生成（识别困难任务并扩充数据集）→ 低层策略微调 + 局部特征对齐（扩展运动空间并正则化自然度）→ 下一轮高层策略训练。此迭代过程持续至性能收敛。
 - **输出**：多样化、物理可行的全身伸手抓取运动，在简单场景中达到 99.8% 抓取成功率和 88.8% 目标成功率，在复杂场景中达到 69.7% 抓取成功率和 55.8% 目标成功率（Table 2）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1744_Phys_Reach_Grasp_Learning_Physics_Based_Full_Body_Human_Reaching_and_Gra/figures/001_Figure_1.jpg]]
-*Figure 1: In this work, we design a framework that generates diverse, physically feasible full-body human reaching and grasping motions using only brief walking MoCap data*
-
-
 
 Phys Reach Grasp 框架围绕四个核心模块构建，形成一个多轮迭代的训练流水线（Figure 4）。以下逐一展开各模块的关键设计与公式。
 
@@ -192,9 +179,6 @@ $$W_j = s_0 + w_{succ} \frac{\max_i sr_i - sr_j}{\max_i sr_i - \min_i sr_i} + w_
 
 先导实验（Table 1, Figure 3）揭示了一个关键洞察：运动批评家网络的浅层特征在真实运动数据（行走与伸手）之间呈现低FID值和t-SNE聚类，而深层特征这一现象消失。这表明浅层特征捕捉了跨任务可迁移的真实运动特性（如肢体协调、动态平衡等局部运动模式）。
 
-![[assets/figures/papers/paper_list_l1744_Phys_Reach_Grasp_Learning_Physics_Based_Full_Body_Human_Reaching_and_Gra/figures/004_Figure_3.jpg]]
-*Figure 3: t-SNE plots of features extracted at different levels of the critic network: There is clear clustering within the MoCap data in shallow layers and this phenomenon is less evident in deeper layers*
-
 基于此，局部特征对齐模块在低层策略微调时，强制生成动作的浅层特征分布与行走数据的特征分布对齐。对于第 $i$ 个浅层特征 $f_i(\mathbf{s},\mathbf{z})$，计算其相对于行走特征分布的马氏距离：
 
 $$d_{f_i}^{ma} = \sqrt{(f_i(\mathbf{s},\mathbf{z}) - \mu_i)(\sigma_i + \epsilon \mathbb{I})^{-1}(f_i(\mathbf{s},\mathbf{z}) - \mu_i)}$$
@@ -205,13 +189,6 @@ $$r^{feats} = -\sum_{f_i} w_{f_i} d_{f_i}^{ma} \mathbb{1}(d_{f_i}^{ma} > \mathrm
 
 该奖励函数的设计兼顾了两方面需求：一方面通过马氏距离惩罚将异常运动拉回自然分布，另一方面通过阈值机制保留特征变化的合理空间，避免生成动作千篇一律。特征提取器同时接收运动状态和隐变量 $\mathbf{z}$ 作为输入，确保对齐约束与技能选择相关联。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1744_Phys_Reach_Grasp_Learning_Physics_Based_Full_Body_Human_Reaching_and_Gra/figures/002_Figure_2.jpg]]
-*Figure 2: Comparison of our modified critic architecture*
-
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与因果机制
@@ -219,9 +196,6 @@ $$r^{feats} = -\sum_{f_i} w_{f_i} d_{f_i}^{ma} \mathbb{1}(d_{f_i}^{ma} > \mathrm
 本研究试图解决的核心瓶颈在于：高质量全身交互运动捕捉数据获取成本极高，而仅依赖运动学插值生成的抓取动作缺乏物理真实性与人类自然运动模式。论文提出的因果机制是，利用行走数据中可迁移的浅层局部运动特征（如肢体协调、动态平衡）作为正则化约束，通过主动数据生成策略扩展动作空间，并在低层策略微调中施加浅层特征对齐奖励，将行走的自然运动模式传递至抓取动作。
 
 先导实验为此提供了关键证据。Table 1 显示，在浅层（f0），真实行走与真实伸手数据之间的 FID（2.3531）远低于真实伸手与生成伸手之间的 FID（2.4671），且接近真实伸手训练集与测试集之间的参考 FID（0.1750）。随着网络加深，这一差距急剧扩大，表明深层特征已丧失跨任务的通用性。Figure 3 的 t-SNE 可视化进一步印证：浅层特征在真实运动捕捉数据中形成明显聚类，而深层特征中该现象消失。这确立了浅层特征作为可迁移运动先验的理论基础。
-
-![[assets/figures/papers/paper_list_l1744_Phys_Reach_Grasp_Learning_Physics_Based_Full_Body_Human_Reaching_and_Gra/figures/003_Table_1.jpg]]
-*Table 1: Quantitative Results of Pilot Study: In the shallower layers, the FID difference between the MoCap data is relatively small, compared to that between the MoCap and generated datasets. As feature extraction moves to deeper layers, the FID value increases significantly compared to the reference FID between training and test datasets*
 
 ### 主实验结果
 
@@ -272,8 +246,6 @@ Table 3 展示了与同期工作的自然度对比结果。所提方法在运动
 
 4. **公平性说明**：所有方法均在同一物理仿真环境、相同人形模型和 PPO 训练框架下评估。消融实验中控制训练轮次和其他超参数保持一致，仅改变所研究的模块。用户研究采用随机化盲评方式，自动评估指标使用统一的提示词和评分标准。
 
-
-
 ## 定位与知识库关联
 
 ### 1. 方法谱系：从运动模仿到跨任务先验迁移
@@ -317,8 +289,6 @@ Phys Reach Grasp 的核心技术路径建立在物理角色动画与技能发现
 3. **跨任务泛化能力验证。** 本方法在伸手抓取任务上得到验证，但其技术路线——从行走数据中提取可迁移运动先验——理论上可泛化至其他需要全身协调的人-物交互任务，如搬运、开门、坐下等。这些任务与行走的运动学重叠程度各异，系统性验证将有助于刻画该方法的真实适用边界。
 
 4. **Sim-to-Real 迁移与实时对齐。** 在真实人形机器人上部署时，需要解决仿真动力学偏差、传感器噪声和实时性约束。浅层特征对齐的马氏距离计算（Eq. 5）需要预先提取行走特征的均值 $\mu_i$ 和协方差 $\sigma_i$，真实场景中这些统计量可能因机器人硬件差异而偏移，需要发展在线自适应或域随机化策略来弥合这一差距。
-
-
 
 ## 原文 PDF
 

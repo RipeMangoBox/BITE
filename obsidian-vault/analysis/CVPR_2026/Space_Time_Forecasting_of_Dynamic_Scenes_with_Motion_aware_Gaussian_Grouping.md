@@ -52,8 +52,6 @@ claims:
 
 > **项目页面**：https://slime0519.github.io/mogaf
 
-
-
 ### 动态场景时空预测的核心挑战
 
 从单目视频中预测动态场景的未来状态是计算机视觉与图形学中长期存在的难题。任务要求模型不仅理解场景的几何结构与外观，还要捕捉物体在时间维度上的运动规律，并在未观测的未来时间步上生成物理一致、视觉逼真的渲染结果。近年来，基于神经辐射场（NeRF）和3D高斯泼溅（3DGS）的隐式与显式表示在静态场景重建和新视角合成中取得了突破性进展，但将其直接推广到动态场景的时空外推时，面临一个根本性瓶颈：**表示单元的运动独立性导致空间运动不连贯与长期轨迹漂移**。
@@ -80,8 +78,6 @@ claims:
 - **分组运动预测**：为每个运动组训练独立的轻量级Transformer编码器，而非使用单一全局预测器。结合掩码运动建模训练策略和自回归滚动预测，模型能够以物体为单位外推未来运动轨迹，显著降低预测复杂度并提升长期稳定性。
 
 通过将“运动分组”作为连接重建与预测的桥梁，MoGaF在物理一致性与光度保真度之间取得了更优的平衡，为动态场景的长期时空预测提供了新的范式。
-
-
 
 ## 核心方法与创新机理
 
@@ -127,8 +123,6 @@ $$\mathcal{L}_{\mathrm{group}}^{(k)} = \mathcal{L}_{\mathrm{pred}}^{(k)} + \lamb
 
 三个 changed slot 形成因果闭环：**运动感知分组**提供物体级结构先验 → **分组约束优化**在物体级别强制刚性与非刚性运动一致性 → **分组轻量预测器**在物理一致的运动表示基础上进行外推。这一设计直接回应了核心瓶颈——独立高斯运动导致的长期预测中空间运动不连贯与轨迹漂移。消融实验证实了该因果链的有效性：移除分组优化和分组预测后，3D 跟踪误差显著增加（EPE 从 0.245 升至 0.296，Table 7a）。
 
-
-
 MoGaF 的整体管线构建于 4DGS 表示之上，包含三个核心阶段，如图 2 所示。给定一段动态视频，方法首先从 4DGS 重建中获取规范空间的高斯原语及其运动基系数，随后依次执行：**运动感知高斯分组**、**分组约束优化**、**分组运动预测**，最终渲染出未来时刻的新视角图像。
 
 ### 输入输出与模块关系
@@ -152,13 +146,6 @@ MoGaF 的整体管线构建于 4DGS 表示之上，包含三个核心阶段，�
 - **Table 7b**：运动感知高斯分组相比朴素静态分组扩展（Gaga-4D）将 mPSNR 从 15.31 提升至 15.51，表明分组质量直接影响预测性能。
 
 > 注：GSPred-SoM 与 ODE-GS-SoM 是将原始 GSPred 的 GCN 预测架构和 ODE-GS 的神经 ODE 预测器重新实现到 SoM 骨干上的公平比较基线，因为原始版本未使用深度、点跟踪等数据驱动先验。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l45_https_arxiv_org_abs_2602_21668/figures/003_Figure_2.jpg]]
-*Figure 2: Overall pipeline of MoGaF. Given a video, MoGaF generates future frames of the scene. To achieve realistic forecasting, our method builds on 4DGS representation and proceeds as follows: (1) Gaussian Grouping: Gaussians are clustered into motion-consistent object groups, with each group labeled as rigid or non-rigid using grounded 2D segmentation. (2) Group-wise Optimization: Grouped Gaussians are refined with rigidity-aware motion constraints: rigid groups are guided by a shared SE(3) transform, while non-rigid groups are regularized with local motion smoothness. (3) Group-wise Forecasting: For each group, a lightweight Transformer-based forecaster extrapolates Gaussian trajectories beyond...*
-
-
 
 MoGaF 的整体管线建立在 4DGS 表示之上，由三个核心模块串行构成：(1) 运动感知高斯分组，(2) 分组约束优化，(3) 分组运动预测。以下逐一展开各模块的关键公式与变量含义。
 
@@ -189,9 +176,6 @@ $$C_p = \sum_{i=1}^{N} c_i \alpha_i T_i \mathcal{N}(\pmb{x}_p | \pmb{\mu}^{2D}, 
 $$G_{t}^{(k)} = \{ g \in \mathcal{G} \mid \operatorname{Proj}(g_t) \in M_t^{(k)} \}$$
 
 但这种方式忽略了运动一致性，导致分组不完整。MoGaF 的混合方法通过引入运动一致性约束和跨帧配准，产生更完整的运动感知分组（见 Figure 3）。
-
-![[assets/figures/papers/paper_list_l45_https_arxiv_org_abs_2602_21668/figures/004_Figure_3.jpg]]
-*Figure 3: Result of Gaussian grouping. Compared to a (a) simple extension of 3DGS grouping [26] and (b) single-frame mask–based region growing, our hybrid approach produces complete and reliable motion-aware Gaussian groups*
 
 ### 模块二：分组约束优化
 
@@ -235,12 +219,8 @@ $$\mathcal{L}_{\mathrm{group}}^{(k)} = \mathcal{L}_{\mathrm{pred}}^{(k)} + \lamb
 
 训练中引入掩码运动建模策略（受 NLP 掩码语言建模启发），对运动序列施加连续时间跨度的掩码，增强预测器对不完整观测的鲁棒性（消融实验表明移除掩码训练会导致 D-NeRF 上 PSNR 从 25.87 降至 24.68）。推理阶段采用自回归滚动预测，逐步外推未来帧的高斯运动参数。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l45_https_arxiv_org_abs_2602_21668/figures/013_Figure_9.jpg]]
 *Figure 9: Overview of the forecaster. (a) Training stage: The forecaster is trained for each Gaussian group*
-
-
 
 ## 实验与关键发现
 
@@ -269,18 +249,9 @@ Figure 4 的定性对比显示，MoGaF 在预测帧中保持了更清晰的物�
 
 Table 2 报告了 D-NeRF 数据集上 60% 观察比例的结果。MoGaF 取得 **PSNR 23.37**，显著优于 **GSPred**（21.78，+1.59）；SSIM 0.9147 vs 0.9011，LPIPS 0.0746 vs 0.0919。Table 5 补充了 80% 观察比例下的结果，趋势一致。Figure 5 的定性结果验证了 MoGaF 在合成场景中对非刚性形变（如人物姿态变化）的预测更加稳定。
 
-![[assets/figures/papers/paper_list_l45_https_arxiv_org_abs_2602_21668/figures/008_Table_2.jpg]]
-*Table 2: Forecasting results on D-NeRF dataset. We use 60% of the frames as training and predict the remaining 40%*
-
-![[assets/figures/papers/paper_list_l45_https_arxiv_org_abs_2602_21668/figures/007_Figure_5.jpg]]
-*Figure 5: Forecasting results on D-NeRF dataset. We render extrapolated future frames. Note that in Obs. Timesteps, the first and second columns show renderings reconstructed from training views at the first and last observed timesteps, respectively*
-
 #### 长期预测
 
 Figure 6 展示了 iPhone 数据集上的长期外推结果。在观察窗口结束后，MoGaF 能够持续生成物理上合理的未来帧，而基线方法随时间推移迅速累积漂移误差。Figure 11 提供了更多长期预测的定性示例。
-
-![[assets/figures/papers/paper_list_l45_https_arxiv_org_abs_2602_21668/figures/009_Figure_6.jpg]]
-*Figure 6: Long-term forecasting results on iPhone dataset. (a) shows GT views from test cameras at the observed timesteps, and (b) presents the forecasted renderings for timesteps beyond the observations. Note that t denotes the timestep of the last observed frame*
 
 ### 消融实验
 
@@ -306,9 +277,6 @@ Table 3（下）在 D-NeRF 数据集上评估了掩码运动建模训练策略�
 
 Table 6 在 iPhone 数据集上比较了 MoGaF 与 **SoM** 骨干的场景插值性能。MoGaF 在保持与 SoM 可比的光度保真度的同时，提供了更精确的 3D 跟踪。Figure 10 展示了测试视角下的定性新视角合成结果，验证了分组约束优化不会损害重建质量。
 
-![[assets/figures/papers/paper_list_l45_https_arxiv_org_abs_2602_21668/figures/016_Table_6.jpg]]
-*Table 6: Quantitative evaluation results on scene interpolation. We compare tracking and photometric performance against SoM [37] on iPhone dataset [10]*
-
 ### 失败模式与局限性
 
 1. **4DGS 重建依赖**：方法建立在预训练的 4DGS 表示之上，预测质量受限于重建保真度。当初始重建无法恢复未观测的几何结构时，后续分组和预测均会受到影响；严重的运动优化失败会级联传播到预测阶段。
@@ -317,8 +285,6 @@ Table 6 在 iPhone 数据集上比较了 MoGaF 与 **SoM** 骨干的场景插值
 ### 公平性说明
 
 为确保公平比较，实验将 **GSPred** 的 GCN 预测架构和 **ODE-GS** 的神经 ODE 预测器重新实现到 SoM 骨干上（得到 GSPred-SoM 和 ODE-GS-SoM），因为原始版本未使用深度、点跟踪等数据驱动先验。所有方法共享相同的 4DGS 重建基础，差异仅在于运动优化和预测策略。
-
-
 
 ## 定位与知识库关联
 
@@ -346,8 +312,6 @@ MoGaF的有效性建立在以下前提之上：
 2.  **物理交互的引入**：现有分组独立预测的范式无法处理物体间的碰撞与交互。如何扩展框架以加入物理约束（例如基于接触动力学的惩罚项）或构建物理感知的高斯表示，是提升预测物理合理性的重要方向。
 
 此外，从方法谱系的角度看，MoGaF的掩码运动建模策略借鉴了自然语言处理中的掩码语言建模思想（**BERT**），将其适配到时序运动序列上以增强预测器的鲁棒性。这一跨领域迁移在D-NeRF数据集上的消融实验中得到验证（移除掩码训练导致PSNR从25.87降至24.68），但其有效性边界——例如掩码策略在不同运动频率场景下的泛化能力——仍有待进一步探索。
-
-
 
 ## 原文 PDF
 

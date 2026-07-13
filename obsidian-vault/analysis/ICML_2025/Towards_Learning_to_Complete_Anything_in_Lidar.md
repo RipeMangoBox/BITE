@@ -55,8 +55,6 @@ claims:
 - 零样本识别性能受限于底层 CLIP 的表示能力，长尾类别（行人、骑行者）与全监督方法差距显著；伪标签覆盖受限于相机视锥范围（约 28%），实例标签无法到达完全遮挡或相机未观测区域。
 - 模型性能与伪标签质量高度耦合，CRF 细化、时域聚合窗口（T_fw=32, T_bw=8）和原型数目（C ∈ {6, 18, 50, 100}）均存在收益递减的饱和点，需根据数据集特性权衡计算开销。
 
-
-
 激光雷达场景补全（Scene Completion）旨在从稀疏的单帧点云中重建完整的 3D 场景几何与语义，是自动驾驶感知的核心任务之一。现有方法在语义场景补全（SSC）和全景场景补全（PSC）上取得了显著进展，例如 **LMSCNet**（Roldao et al., 2020）、**JS3CNet**（Yan et al., 2021）、**SCPNet**（Xia et al., 2023）以及当前最先进的 **PaSCo**（Cao et al., 2024）。然而，这些方法共享一个根本性瓶颈：**它们依赖封闭集的人工标注进行全监督训练**。
 
 具体而言，这一瓶颈体现在三个层面：
@@ -76,8 +74,6 @@ claims:
 - **测试时零样本分类**：通过计算预测 CLIP 特征与用户指定文本提示的余弦相似度，实现对任意语义类别词表的零样本识别。
 
 这一框架使 CAL 在 SemanticKITTI 上以零样本设置达到 13.12 PQ† 和 13.09 mIoU，显著超越自建零样本基线 LODE+SAL（7.74）和 LiDiff+SAL（7.35），并达到全监督 PaSCo 约 50% 的性能水平（Table 1）。更重要的是，CAL 首次展示了从无标签数据中学习通用物体补全能力的可行性，为开放世界激光雷达感知开辟了新路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -109,8 +105,6 @@ CAL 的核心突破在于**完全摆脱对封闭集人工标注的依赖**，通
 | 形状先验 | 依赖语义标注隐式学习 | 伪语义原型聚类显式引导 | Tab. 6, Appx. B.2 |
 
 这些创新共同使 CAL 在零样本设定下达到全监督方法 **PaSCo** 约 44‑50% 的性能（SemanticKITTI: 13.12 PQ† vs 26.49; SSCBench‑KITTI360: 8.57 PQ† vs 19.53, Tab. 1），同时显著超越自建零样本基线 **LODE+SAL**（7.74 PQ†）和 **LiDiff+SAL**（7.35 PQ†）（Tab. 2）。
-
-
 
 ![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2504_12264/figures/003_Figure_3.jpg]]
 *Figure 3: CAL model architecture and training pipeline. The backbone consists of a sparse encoder and a dense 3D convolutional block. We estimate scene-level occupancy using a multiscale sparse generative decoder that consists of decoder blocks D , two occupancy heads B _ { o } and B _ { s } , , and a pseudo-semantic head (S) at each scale L. The Transformer decoder then predicts segmentation masks over the completed scene and regresses CLIP features*
@@ -157,8 +151,6 @@ $$\mathcal{L}_{\mathrm{total}} = \lambda_{\mathrm{occ}} \mathcal{L}_{\mathrm{occ
 ### 模块关系与信息流
 
 整体信息流可概括为：**伪标签引擎从多模态序列中挖掘形状‑语义先验 → 伪标签对驱动补全模型训练 → 模型学习从单帧稀疏观测到完整形状的映射 → 测试时仅需单帧激光雷达即可完成零样本补全与识别**。伪标签引擎和补全模型在训练阶段是串行的（先离线生成伪标签，再训练模型），在推理阶段补全模型独立运行，无需 RGB 图像或时序信息。
-
-
 
 ### 任务形式化
 
@@ -226,8 +218,6 @@ $$PQ = SQ \times RQ$$
 
 即分割质量（SQ）与识别质量（RQ）的乘积。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设计
@@ -265,20 +255,11 @@ CAL 在零样本（Zero‑Shot, ZS）和语义先知（Semantic Oracle, SO）两
 
 **覆盖范围分析**（Table 5）揭示了伪标签的根本局限：相机视锥范围内的实例标签仅覆盖约 28% 的体素网格（SemanticKITTI 28.04%，SSCBench‑KITTI360 27.38%）。360° 激光雷达聚合虽提升了二值占用覆盖，但实例级标签仍受限于相机可见区域。
 
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2504_12264/figures/010_Table_5.jpg]]
-*Table 5: Coverage analysis. Coverage of mask pseudo-labels (w/o CRF, Label) and binary occupancy (w/o 360◦ aggr., Occ.)*
-
 #### 模型组件消融
 
 Table 6 剖析了 CAL 模型各模块的贡献。最关键的发现是**伪语义头 S 的引入**：将 S 加入训练使模型性能从 4.81 PQ† 急剧跃升至 16.08 PQ†（SO 设定）。这表明通过对 CLIP 特征进行原型聚类形成伪类别分组，能有效引导网络学习物体形状先验，是 CAL 从噪声伪标签中提取信号的核心机制。相比之下，二值占用头 $B_o$ 使用部分覆盖（$B_o^{pc}$）或全覆盖（$B_o^{fc}$）标签训练的影响相对温和。
 
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2504_12264/figures/013_Table_6.jpg]]
-*Table 6: CAL model ablations. We analyze the contribution of CAL’s key design choices and components: training B _ { o } with partial coverage ( B _ { o } ^ { p c } ) or with full coverage ( B _ { o } ^ { f c } ) , introducing S, and adding B _ { s } . Introducing S provides a significant improvement, likely due to its implicit semantic regularization. Training with full coverage ( B _ { o } ^ { f c } ) and B _ { s } further improve performance. bility with the camera frustums (Sec. 3.1). CRF improves this coverage by 1.9× on SSCBench-KITTI360 and 2.5× on SemanticKITTI. Similarly, binary occupancy coverage benefits from full Lidar scan aggregation, improving coverage from 37.36% to 99.96% on Semanti...*
-
 **CLIP 原型数目 C** 的鲁棒性分析（Table 7）表明，在 $C \in \{6, 18, 50, 100\}$ 范围内性能稳定，但极端取值 $C=1$（丧失分组能力）或 $C=500$（过度碎片化）会导致明显退化。这一发现验证了伪语义分组对形状先验学习的必要性，同时说明该方法对超参数不敏感。
-
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2504_12264/figures/012_Table_7.jpg]]
-*Table 7: Number of CLIP prototypes. We evaluate SSC/PSC performance on SemanticKITTI when varying the number of CLIP prototypes C. We observe similar performance with C $\in {6, 18, 50, 100}$, indicating general robustness to C. Extreme cases ( C = 1 and C = 5 0 0 ) result in performance degradation*
 
 #### 数据质量消融
 
@@ -295,19 +276,6 @@ Table 12 和 Table 13 分别展示了在 SemanticKITTI 和 SSCBench‑KITTI360 �
 4. **计算效率瓶颈**：伪标签引擎涉及视频分割、跨帧掩膜传播、CRF 细化等密集计算步骤。虽然 CRF 可部分补偿短跟踪窗口（Table 11），但整体效率仍有优化空间，限制了在大规模数据集或实时系统中的应用。
 
 5. **评估场景有限**：当前验证仅覆盖 SemanticKITTI 和 KITTI‑360 两个数据集，尚未在更多样化的场景或传感器配置下测试跨域泛化能力。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2504_12264/figures/014_Table_8.jpg]]
-*Table 8: Pseudo-labeling engine configuration with dataset-specific parameters for SemanticKITTI and KITTI360*
-
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2504_12264/figures/015_Table_9.jpg]]
-*Table 9: Pseudo-labeling engine ablations using CLIP semantics. This table presents an analysis on the key parameters of the pseudo-label aggregation process: the number of frames for tracking T _ { f w } and T _ { b w } , as well as the stride, w*
-
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2504_12264/figures/016_Table_10.jpg]]
-*Table 10: Pseudo-label evaluation restricted to the areas in the voxel grid for which we have pseudo-labels. Analysis of the accuracy of pseudo-labels on the SemanticKITTI (Behley et al., 2019) validation set. The full-grid eval setting refers to evaluating our pseudo-labels using the usual PSC evaluation with respect to the GT. The masked-voxel eval setting refers to excluding the voxels for which we don’t have any pseudo-labels during PSC evaluation*
-
-
 
 ## 定位与知识库关联
 
@@ -371,8 +339,6 @@ CAL 的识别能力完全依赖 CLIP 特征的质量。对于长尾或罕见类�
 5. **跨传感器与纯视觉扩展**：CAL 框架依赖校准的多模态传感器设置。能否将其扩展到纯相机输入的场景补全任务，或适配不同的激光雷达-相机配置？这需要解决深度估计和跨模态对齐的额外挑战。
 
 6. **从“补全”到“理解”的闭环**：当前 CAL 将补全和识别解耦为顺序步骤（先补全形状，再用 CLIP 特征分类）。是否存在端到端的联合优化方案，使补全过程能够感知语义信息，从而提升对语义模糊区域的补全质量？
-
-
 
 ## 原文 PDF
 

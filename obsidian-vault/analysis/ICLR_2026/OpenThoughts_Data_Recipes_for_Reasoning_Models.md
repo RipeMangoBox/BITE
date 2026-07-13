@@ -57,15 +57,11 @@ claims:
 
 基于上述发现构建的 **OpenThinker3-7B** 在 AIME 2025、LiveCodeBench 和 GPQA Diamond 上分别达到 53.3%、51.7% 和 53.7%，相较 DeepSeek-R1-Distill-Qwen-7B 分别提升约 18.8、21.0 和 20.5 个百分点（Table 1），在 12 个任务的综合平均上领先 12.4 个百分点，成为当前同规模开源推理模型中的最优方案。
 
-
-
 大规模推理模型（如 OpenAI o1、DeepSeek-R1）在数学、编程和科学等复杂推理任务上展现出显著能力，但其训练通常依赖专有数据集和闭源配方。这种封闭性使社区难以复现、改进或理解这些模型的行为，形成了一个核心瓶颈：**缺乏公开、可复现的SFT数据配方阻碍了推理模型的开放研究**。
 
 已有若干开源努力试图填补这一空白。例如，**AM-1.4M** 和 **Nemotron Nano (NemoNano-1M)** 提供了大规模SFT推理数据集，而 **s1.1** 和 **LIMO** 则通过精心筛选的小规模数据集展示了数据质量的重要性。然而，这些工作仍存在明显缺口：它们要么未系统揭示数据管道各环节对下游性能的因果影响，要么在数据规模与质量的权衡上缺乏可控实验支撑。
 
 本文的动机在于：通过系统性地解剖SFT数据管道的每一步——问题收集、来源混合、问题过滤、去重、多答案采样、答案过滤和教师模型选择——以超过1000次受控实验量化每个决策的影响，从而构建一个完全开源、可复现且性能领先的推理模型数据配方。核心假设是：**通过精细的数据工程，可以在远小于闭源方案的计算成本下，训练出超越更大规模蒸馏模型的推理模型**。
-
-
 
 ## 核心方法与创新机理
 
@@ -104,8 +100,6 @@ OpenThoughts3 的核心贡献在于通过 **1000+ 次受控消融实验**，系�
 
 > **注意**：上述结论均在 **Qwen-2.5-7B-Instruct**（Yang et al., 2024b）基础模型上验证，迁移到其他基础模型或更大规模（如 32B）时结论可能不同（例如验证策略在 7B 有害而在 32B 有益）。
 
-
-
 ![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_7xjoTuaNmN/figures/011_Figure_3.jpg]]
 *Figure 3: The OpenThoughts3-1.2M Full Data Pipeline*
 
@@ -137,8 +131,6 @@ OpenThoughts3 的数据配方探索围绕一个六阶段实验管道展开，旨
 
 **证据强度**：管道各阶段的消融结论均来自 1,000+ 次受控实验，核心发现（如 Top 2 混合优于 Top 16、不过滤答案优于过滤、QwQ-32B 优于 DeepSeek-R1）在 Table 3–Table 7 中有直接数据支撑，置信度普遍在 0.9–0.95。需注意的是，所有结论均基于 Qwen-2.5-7B-Instruct 这一特定基础模型，迁移到其他基础模型或更大规模（如 32B）时，部分结论可能不成立（例如验证策略在 7B 有害而在 32B 有益）。
 
-
-
 ### 数据管道关键模块
 
 OpenThoughts3 的数据管道由六个顺序模块构成（Figure 2），每个模块均通过严格的控制变量消融实验进行优化：
@@ -169,8 +161,6 @@ $$\mathrm{indel}_{\mathrm{sim}} = 100 \times \frac{\mathrm{LCS}_{\mathrm{length}
 - 结果归一化到 0–100 区间，用于衡量两个文本的插入-删除相似度。
 
 该公式在去污染流程（附录 C）中用于检测训练集与评估集之间的重叠，算法真阴性率达 99.6%，有效防止数据泄露。
-
-
 
 ## 实验与关键发现
 
@@ -220,36 +210,14 @@ Table 7 揭示了反直觉的发现：基准表现更弱的 QwQ-32B 作为教师
 
 **计算成本**：标注 1.2M 数据约需 22,000 H100 GPU 小时，对部分研究者构成复现障碍。此外，所有管道设计选择均在 Qwen-2.5-7B-Instruct 上优化，迁移到其他基础模型的效果可能不一致。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_7xjoTuaNmN/figures/023_Table_15.jpg]]
 *Table 15: Comparison of OpenThoughts with and without proof-based questions. Throwing out proof-based questions harms performance overall by 5.6 points on average*
 
 ![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_7xjoTuaNmN/figures/025_Figure_8.jpg]]
 *Figure 8: Claude 3.7 accuracy improves consistently with larger thinking-token budgets across three benchmarks. Each panel plots mean accuracy (markers) and ±1 standard error (error bars) over multiple independent runs (5 for AIME 24, 3 for LCB and GPQA Diamond). The horizontal axes are logarithmic in the number of thinking tokens; the answer budget is 1 024 tokens for AIME 24 and 4 096 tokens for LCB and GPQA Diamond and is not counted in the thinking tokens budget. AIME 24: accuracy rises from a no-thinking baseline of 18.0% (red diamond) to 51.3% when the model is allowed 62 976 thinking tokens. LCB: performance climbs steadily from 60.5% to 70.4% at 28 672 thinking tokens. GPQA Diamond: accuracy...*
 
-![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_7xjoTuaNmN/figures/027_Table_19.jpg]]
-*Table 19: Scores for switching the science annotator from R1 to Claude. Table 20: Scores for switching the annotator from Gemini to R1 or Claude*
-
-![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_7xjoTuaNmN/figures/036_Table_27.jpg]]
-*Table 27: Comparison of model performance under different finetuning setups. Table 28: Comparison of OpenThinker3-7B to teacher models. We see that DeepSeek-R1 is empirically the best model overall and our actual teacher model, QwQ-32B, is empirically worse. Phi-4-Reasoning-Plus performs empirically poorly on code evaluations since it outputs code without code tags which Evalchemy marks as incorrect*
-
 ![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_7xjoTuaNmN/figures/052_Table_34.jpg]]
 *Table 34: Full Ablation for Code Question Source Mixing*
-
-![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_7xjoTuaNmN/figures/054_Table_37.jpg]]
-*Table 37: Full Ablation for Code Question Filtering*
-
-![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_7xjoTuaNmN/figures/056_Table_40.jpg]]
-*Table 40: Full Ablation for Code Deduplication and Multiple Sampling*
-
-![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_7xjoTuaNmN/figures/058_Table_43.jpg]]
-*Table 43: Full Ablation for Code Question-Answer Filtering*
-
-![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_7xjoTuaNmN/figures/060_Table_46.jpg]]
-*Table 46: Full Ablation for Teacher Model for Code*
-
-
 
 ## 定位与知识库关联
 
@@ -318,8 +286,6 @@ OpenThoughts3 的完整数据管道（Figure 2, Figure 3）包含以下模块：
 6. **泛化机理**：蒸馏推理模型泛化能力欠缺的深层机理是什么？是否需要更接近 RL 阶段的训练方法来弥补？
 7. **证明类问题的验证**：是否可以设计更有效的验证方法来处理证明类问题（当前验证方法对此类问题效果较差）？
 8. **训练范式的迁移性**：推理数据配方的结论在连续预训练或强化学习设置下是否仍然成立？
-
-
 
 ## 原文 PDF
 

@@ -61,8 +61,6 @@ ContextIF 提出了一条不同于上述范式的技术路径：**不直接更�
 
 在 LLaMA3-8B-Instruct 骨干上，ContextIF 在四个指令遵循基准上均取得显著提升：IFEval 平均分从 77.11 提升至 83.35（+6.24），Multi-IF Turn3 准确率从 43.92 提升至 53.51（+9.59），FollowBench SSR 从 62.90 提升至 69.37（+6.47），LiveBench 得分从 46.70 提升至 59.90（+13.20）。值得注意的是，ContextIF 生成的上下文质量超越了基于 GPT-4o 生成的上下文（IFEval 83.35 vs. 82.77），且模型在 MMLU、BBH、GSM8K、HumanEval 四项通用能力基准上平均提升 +1.3%，有效避免了灾难性遗忘。在 Mistral-7B 骨干上的跨架构验证进一步证实了方法的模型无关性。
 
-
-
 ### 指令遵循的现实瓶颈
 
 大语言模型（LLM）在各类自然语言处理任务中展现了强大的能力，但在精确遵循用户指令方面仍面临严峻挑战。现实场景中的用户查询往往包含多种隐式或显式的约束条件——例如内容限制、风格要求、格式规范等——模型需要准确识别并满足所有这些约束，而非仅生成语义通顺的回复。这一能力差距在复杂多约束场景下尤为突出，直接限制了 LLM 在实际部署中的可靠性。
@@ -82,8 +80,6 @@ ContextIF 提出了一条不同于上述范式的技术路径：**不直接更�
 本文的核心洞察是：将上下文生成本身建模为一个可优化的问题。如果能训练一个专门的生成器，针对任意用户查询自动产出结构严谨、语义对齐的高质量上下文（包括约束摘要与平行演示示例），并将该上下文注入冻结的目标模型进行推理，就可以同时获得上下文学习的强泛化性和强化学习驱动的优化能力。
 
 基于这一动机，ContextIF 提出了一种**基于强化学习的自动上下文生成框架**。该框架冻结目标 LLM 的参数，仅训练一个独立的策略模型来生成任务特定的上下文，通过多维度的上下文奖励信号（格式奖励与约束奖励）进行优化，从而在保持模型通用能力的前提下，显著提升指令遵循性能。
-
-
 
 ## 核心方法与创新机理
 
@@ -123,8 +119,6 @@ $$\mathcal{R}_{\mathrm{constraint}} = r_{\mathrm{sum}} + r_{\mathrm{demoq}} + r_
 
 这三个槽位的改变共同构成了一个因果闭环：策略模型生成上下文 → 复合奖励评估上下文质量 → GRPO 优化策略模型 → 更高质量的上下文提升目标模型指令遵循能力。这一机制的核心洞察在于：**通过强化学习自动生成任务特定的高质量上下文，可以使小型模型（8B）实现与大型模型（70B）相当的指令遵循性能**——ContextIF-8B 在 IFEval 上达到 83.35，接近 LLaMA3-70B-Instruct 的 83.89（Table 1），同时保留了通用能力。
 
-
-
 ![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_IuscGSmfEf/figures/002_Figure_2.jpg]]
 *Figure 2: An overview of the ContextIF framework. (a) The policy model, trained with GRPO, generates a constraint and demonstration context block based on a user query. This output is then evaluated by reward model to compute the final RL signal. (b) The Format Reward provides a binary signal for structural correctness. (c) The Constraint Reward provides a fine-grained score based on the semantic quality of the summary and the demonstration, guiding the policy toward generating task-optimal context for instruction-following*
 
@@ -152,8 +146,6 @@ ContextIF 的整体工作流围绕一个核心机制展开：**冻结目标模�
 ### 输入输出流
 
 整个流程可概括为：用户查询 → 策略模型生成结构化上下文块（含约束摘要与并行演示）→ 奖励模型评估上下文质量（格式+语义）→ GRPO 更新策略模型 → 冻结的目标模型基于增强提示进行推理。这种设计使得上下文生成过程通过强化学习持续优化，引导策略模型产出结构正确且语义对齐的上下文，从而显著提升小型模型的指令遵循性能。
-
-
 
 ### 3.1 上下文展开 (Context Rollout)
 
@@ -257,16 +249,11 @@ $$
 2. **冻结目标模型**：策略模型独立于目标模型进行训练，避免了直接微调带来的灾难性遗忘问题，同时使方法具有即插即用的特性。
 3. **组内相对优化**：GRPO 通过组内归一化消除绝对奖励尺度的噪声，使优化信号更鲁棒，无需额外的价值网络。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
 
 ContextIF在四个指令遵循基准测试上对LLaMA3-8B-Instruct基础模型实现了全面且显著的提升（Table 1）。在IFEval上，平均分从77.11提升至83.35（+6.24），逼近LLaMA3-70B-Instruct（83.89）的水平。在多轮对话场景Multi-IF的Turn3准确率上，提升幅度最大，从43.92跃升至53.51（+9.59），表明生成的上下文有助于模型在长程交互中维持约束一致性。在FollowBench的SSR指标上提升6.47分，在LiveBench的指令遵循子集上提升13.20分，后者尤为突出，说明ContextIF对动态、真实场景指令具有更强的适应能力。
-
-![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_IuscGSmfEf/figures/003_Table_1.jpg]]
-*Table 1: Evaluation results of different models on IFEval, Multi-IF, FollowBench (SSR), and LiveBench datasets. P and I stand for Prompt and Instruction levels, respectively. S and L represent Strict and Loose metrics for IFEval. For LiveBench, we only report the performance on the subset of instruction-following data*
 
 与同期SFT/DPO方法的对比进一步验证了ContextIF的优势。在Multi-IF Turn3上，ContextIF-8B（53.51）显著高于**SPAR-8B**（Cheng et al., 2024）的51.32和**UltraIF-8B**（An et al., 2025）的44.84。值得注意的是，SPAR和UltraIF均直接更新目标模型参数，而ContextIF冻结目标模型，仅训练上下文生成器，却取得了更优的指令遵循性能。
 
@@ -306,24 +293,9 @@ Table 5将ContextIF应用于Mistral-7B骨干网络，验证了方法的架构无
 
 Table 6显示，当使用不同的评判模型（LLaMA3-70B和Qwen-2.5-72B）评估IFEval时，ContextIF-8B的得分保持在约83.4%，远高于基线的77.11%，说明性能增益并非对特定评判模型的过拟合。Table 7的效率对比表明，ContextIF在推理时引入的上下文生成开销可控，且性能显著优于同等计算预算下的直接RL基线（Table 8），后者在相同4k查询和奖励信号下训练，但性能明显落后，验证了上下文生成作为优化中介的有效性。
 
-![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_IuscGSmfEf/figures/011_Table_6.jpg]]
-*Table 6: Performance consistency across different judge models on the IFEval benchmark*
-
-![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_IuscGSmfEf/figures/012_Table_7.jpg]]
-*Table 7: Efficiency comparison between ContextIF and leading baselines*
-
-![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_IuscGSmfEf/figures/013_Table_8.jpg]]
-*Table 8: Comparison between ContextIF and a compute-matched Direct-RL baseline. Both models are trained using the same 4k queries and identical reward signals*
-
 ### 失败模式与局限
 
 尽管整体表现优异，ContextIF仍存在以下局限：首先，训练数据中约束类型的多样性受限，在极端新颖的约束条件下，策略模型生成的上下文可能不够精确；其次，上下文生成过程引入固定的token开销，增加了推理成本；第三，策略模型的生成质量受限于其参数量（实验中为8B），对于高度复杂的指令，生成的约束摘要和演示示例可能不够优化；最后，评估主要依赖自动评判和规则指标，缺乏大规模人类评估来验证生成上下文在主观质量上的表现。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_IuscGSmfEf/figures/007_Table_4.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -366,8 +338,6 @@ ContextIF 在谱系中的定位是**一个独立的上下文生成优化层**。
 - **多模态与智能体场景的延伸**：ContextIF 的核心思想——通过强化学习优化任务特定的上下文生成——是否能够扩展到多模态指令遵循或基于智能体的复杂交互场景？在这些场景中，上下文的形式可能从纯文本扩展为视觉示例、工具调用轨迹或环境反馈的组合，奖励信号的设计也将面临新的挑战。
 
 - **动态上下文作为通用泛化工具**：论文提出的一个宏观问题是“如何将动态生成的上下文作为通用工具，进一步推进大语言模型的泛化能力”。ContextIF 在指令遵循任务上的成功验证了这一范式的可行性，但其背后的原理——通过外部化、可优化的辅助信息来增强冻结模型的推理能力——可能具有更广泛的适用性，例如在数学推理、代码生成或安全对齐等任务中。
-
-
 
 ## 原文 PDF
 

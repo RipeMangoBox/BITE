@@ -59,8 +59,6 @@ claims:
 
 **方法定位**：本方法属于不确定性估计与3D目标检测的交叉领域，通过轻量级EDL头替代传统热图头，在不增加推理开销的前提下实现多层级不确定性量化，并与**FocalFormer3D**（Chen et al., ICCV 2023）和**DeformFormer3D**（Zhu et al., ICLR 2021）等主流检测器架构兼容。相较于**MC-Dropout**（Gal & Ghahramani, ICML 2016）、**Deep Ensembles**（Lakshminarayanan et al., NeurIPS 2017）、**BatchEnsemble**（Wen et al., ICLR 2020）、**Masksembles**（Durasov et al., CVPR 2021）和**Packed-Ensembles**（Laurent et al., ICLR 2023）等采样式或集成式不确定性基线，本方法在OOD检测、错误框识别和漏检发现三项任务上均取得显著提升，且计算效率更高。
 
-
-
 ### 3D目标检测的不确定性困境
 
 现代自动驾驶系统依赖3D目标检测器感知周围环境，然而现有检测器普遍缺乏高效可靠的不确定性估计机制。这一缺口在三个关键场景中尤为突出：
@@ -100,8 +98,6 @@ claims:
 
 该方法的核心优势在于**单次前向传播即可获得类别概率、定位信息及不确定性**，计算开销几乎等同于标准检测器，使其具备在实时自动驾驶系统中部署的可行性。
 
-
-
 ## 核心方法与创新机理
 
 本工作的核心创新在于将**证据深度学习（Evidential Deep Learning, EDL）**引入3D目标检测的不确定性估计，以极低的计算开销实现单次前向传播中的多层次不确定性量化。与传统采样式方法（MC-Dropout、Deep Ensembles等）需要多次推理不同，本方法仅需**修改检测器的热图头（heatmap head）**即可同时输出目标存在概率与不确定性。
@@ -130,8 +126,6 @@ EDL热图头输出的逐网格逐类不确定性通过**层级聚合**服务于�
 相较于需要 $N$ 次前向传播的Deep Ensembles或MC-Dropout，本方法仅需**单次前向传播**，额外计算开销仅来自热图头输出维度的翻倍（$2C$ 替代 $C$）和轻量级漏检头。这一特性使其天然适用于实时自动驾驶系统，同时在下游自动标注管线中（Tab. 4），基于不确定性筛选伪标签可使下游检测器mAP提升约1%、NDS提升1-2%。
 
 **需要人工验证的点**：漏检头 $\mathcal{M}^{\text{miss}}$ 的具体架构细节（层数、通道数等）在原文中未明确给出，仅描述了其输入为拼接向量 $[\mathbf{e}_i, \mathbf{p}_i, \mathbf{u}_i]$，需查阅代码仓库确认。
-
-
 
 本文提出一种基于证据深度学习（Evidential Deep Learning, EDL）的3D目标检测不确定性估计框架，其核心设计理念是：**在保持单次前向传播的低计算开销前提下，使检测器同时输出目标存在概率及其对应的不确定性**。该框架由以下关键模块构成：
 
@@ -172,12 +166,8 @@ $$
 
 > **局限性提示**：当前框架仅更新检测器的热图头部分，骨干网络和BEV编码器未参与端到端的不确定性学习；场景级和框级不确定性聚合依赖手动设计的平均/最小值操作，可能并非最优策略。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l81_https_arxiv_org_abs_2410_23910/figures/001_Figure_1.jpg]]
 *Figure 1: 3D Object Detection Uncertainty Estimation Framework. Our Evidential Deep Learning approach jointly generates heatmap probabilities for objects within Bird’s Eye View and their corresponding uncertainty values, which allows us to detect several critical problems within autonomous driving, namely (left) identifying out-of-distribution scenes (e.g., with bad weather conditions), (middle) erroneous predicted boxes, and (right) missed objects (e.g., missed grey and white cars in the image). The uncertainty estimates guide selective human verification, leading to improvements in detection metrics (e.g., mean Average Precision (mAP) and nuScenes Detection Score (NDS))*
-
-
 
 ### 方法总览
 
@@ -235,15 +225,8 @@ $$\mathbf{p}_i^{\mathrm{miss}} = \mathcal{M}^{\mathrm{miss}}([\mathbf{e}_i, \mat
 
 该模块专门用于发现检测器遗漏的目标。其具体架构细节在原文中未完整披露，需要手动验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l81_https_arxiv_org_abs_2410_23910/figures/002_Figure_2.jpg]]
 *Figure 2: Model architecture with EDL Heatmap Head. We replace the standard heatmap head with an Evidential Deep Learning (EDL) head, which predicts both object presence probabilities and uncertainty by outputting*
-
-![[assets/figures/papers/paper_list_l81_https_arxiv_org_abs_2410_23910/figures/003_Figure_3.jpg]]
-*Figure 3: Uncertainty at different levels. (a) Scene-level uncertainty aggregates uncertainty values across all BEV cells in a scene to produce an overall uncertainty score, which help detect OOD scenes. (b) Box-level uncertainty focuses on each predicted bounding box’s uncertainty using ROI pooling, allowing for the identification of poorly localized bounding boxes*
-
-
 
 ## 实验与关键发现
 
@@ -287,24 +270,14 @@ OOD检测实验以nuScenes（分布内）与Waymo（分布外）构成跨数据�
 3. **漏检头架构未充分披露**：$\mathcal{M}^{\text{miss}}$的具体网络结构、超参数选择及训练细节未在原文中详细说明，复现该模块需要额外工程探索。
 4. **PR-AUC偏低**：错误框检测和漏检目标检测的PR-AUC绝对数值较低，反映任务固有的极端类别不平衡。实际部署时需结合具体业务阈值进行校准。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l81_https_arxiv_org_abs_2410_23910/figures/004_Table_1.jpg]]
 *Table 1: Scene OOD detection ROC- and PR-AUCs evaluation. The best result in each category is in bold and the second best is in bold. Ours outperforms the second-best on average by 0.09 ROC-AUC & 0.16 PR-AUC, respectively*
 
 ![[assets/figures/papers/paper_list_l81_https_arxiv_org_abs_2410_23910/figures/006_Table_2.jpg]]
 *Table 2: Detection of erroneous boxes ROC- and PR-AUCs evaluation. The best result in each category is in bold and the second best is in bold. Ours outperforms the second-best on average by 0.06 ROC-AUC & 0.02 PR-AUC, respectively*
 
-![[assets/figures/papers/paper_list_l81_https_arxiv_org_abs_2410_23910/figures/007_Figure_5.jpg]]
-*Figure 5: ROC and PR curve evaluation for the detection of erroneous boxes. ROC and PR curves for the erroneous box detection task using the uncertainty measure in Section 4.3. A higher position of the curve indicates a better ability of the uncertainty measure to detect erroneous boxes predicted by the model. Our uncertainty measure outperforms baselines across various setups*
-
 ![[assets/figures/papers/paper_list_l81_https_arxiv_org_abs_2410_23910/figures/008_Table_3.jpg]]
 *Table 3: Missed object detection evaluation. The best result in each category is in bold and the second best is in bold. Ours outperforms others by a significant margin*
-
-![[assets/figures/papers/paper_list_l81_https_arxiv_org_abs_2410_23910/figures/009_Table_4.jpg]]
-*Table 4: NuScenes auto-labeling results. We compare our uncertainty-based verification method against two baselines: standard training on the smaller training set and auto-labeling without uncertainty-based verification. FT represents training on the entire dataset, which we consider as an upper bound for quality. The results show that our approach consistently outperforms both baselines, achieving higher mAP and NDS scores across all configurations, with significant relative improvements over the auto-labeling without uncertainty baseline, as shown in the “Imp, %” column*
-
-
 
 ## 定位与知识库关联
 
@@ -347,8 +320,6 @@ OOD检测实验以nuScenes（分布内）与Waymo（分布外）构成跨数据�
 3. **DeformFormer表现差异的根因**：为何DeformFormer在场景OOD检测中显著弱于FocalFormer？是否因为FocalFormer的多阶段热图细化过程天然适合EDL的二阶分布建模？这一问题对方法的通用性至关重要。
 
 4. **漏检头的最优设计**：$\mathcal{M}^{\text{miss}}$ 的架构空间（层数、输入特征组合、与主检测头的参数共享策略）尚未被系统探索，其最优配置可能因检测器架构和数据集而异。
-
-
 
 ## 原文 PDF
 

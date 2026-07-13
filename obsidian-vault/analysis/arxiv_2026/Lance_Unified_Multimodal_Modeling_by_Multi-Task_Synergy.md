@@ -52,8 +52,6 @@ Lance 的核心主张是：**多任务协同不是能力的简单叠加，而是
 
 消融实验进一步验证了关键设计：移除MaPE导致生成、编辑和理解性能全面下降（如GEdit从6.86降至6.30）；理解数据与多任务生成数据的合理混合（6:4）能带来最优的跨任务协同增益。
 
-
-
 多模态大模型正处于从“单一任务专精”向“统一多任务协同”演进的关键节点。当前的主流范式呈现出两条清晰的路径：一是以扩散模型和流匹配为核心的专用生成模型，如**Stable Diffusion**、**FLUX**（Black Forest Labs, 2024）、**Sora**等，在图像/视频生成质量上不断刷新记录；二是以自回归语言模型为骨干的多模态理解模型，如**LLaVA**系列、**Qwen2.5-VL**等，在视觉问答、感知推理等任务上表现卓越。然而，这两类模型在架构设计、训练目标和表征需求上存在根本性分歧，导致“理解”与“生成”长期处于割裂状态。
 
 ### 核心瓶颈：视觉表征需求的根本性错位
@@ -79,8 +77,6 @@ Lance 的核心主张是：**多任务协同不是能力的简单叠加，而是
 在位置编码层面，Lance进一步引入**模态感知旋转位置编码（MaPE）**，通过在时序维度上为异构视觉token组（如语义ViT token、干净VAE latent token、噪声VAE latent token）分配不同的位置偏移，显式区分其模态身份，减轻位置歧义对跨任务对齐的干扰。
 
 在训练层面，Lance采用**四阶段多任务训练范式**（预训练PT→继续训练CT→监督微调SFT→强化学习RL），配合能力导向的目标函数和自适应数据调度，逐步构建从基础能力到高级协同的完整能力栈。
-
-
 
 ## 核心方法与创新机理
 
@@ -120,8 +116,6 @@ Lance的训练范式从单阶段或任务覆盖不全的基线方案转变为**�
 ### 创新点的系统协同
 
 上述三个创新并非孤立设计，而是形成了系统性的协同关系：双流MoE提供了理解与生成解耦的**容量基础**，MaPE确保异构token在共享序列中的**位置无歧义**，分阶段多任务训练则通过数据调度最大化**跨任务迁移**。这种“解耦通路 + 统一上下文 + 协同训练”的组合策略，使得Lance仅以3B激活参数就在图像生成（GenEval 0.90、DPG-Bench 84.67）、视频生成（VBench 85.11）、图像编辑（GEdit-Bench 7.30）和视频理解（MVBench 62.0）等任务上全面超越现有开源统一模型。
-
-
 
 Lance 的整体设计围绕一个核心矛盾展开：**多模态理解需要高层语义特征，而多模态生成需要保留纹理、几何与时序的低层连续特征**。为解决这一表征需求的根本性错位，Lance 采用“共享上下文 + 解耦通路”的架构策略——所有模态的 token 被组织进统一的交错序列以实现联合上下文学习，但理解与生成分别由独立的专家子网处理，从而避免任务间干扰。
 
@@ -171,18 +165,8 @@ $$\mathcal{L} = \lambda_u \mathcal{L}_{\text{UND}} + \lambda_g \mathcal{L}_{\tex
 
 > **注意**：$\lambda_u$ 和 $\lambda_g$ 的具体取值在提供的部分证据中未明确给出，需查阅完整论文的 Section 3.2 或训练配置部分进行确认。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2605_18678/figures/009_Figure_6.jpg]]
 *Figure 6: Overview of Lance. Given multi-task inputs spanning X2T, X2I, and X2V, Lance encodes all input tokens into a unified MaPE-enhanced multimodal context sequence. The dual-expert backbone performs generalized 3D causal attention over the shared context and produces task-specific hidden states, which are further decoded by an LM head for autoregressive next-token prediction and by a flow head for velocity prediction in the visual latent space*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2605_18678/figures/013_Figure_8.jpg]]
-*Figure 8: System prompts for understanding tasks. Red placeholders denote user-provided text and visual inputs*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2605_18678/figures/014_Figure_9.jpg]]
-*Figure 9: System prompts for generation tasks. Red placeholders denote user-provided text and visual inputs*
-
-
 
 Lance 的核心架构围绕三个关键设计展开：**统一多模态上下文序列**、**双流混合专家骨干**和**模态感知旋转位置编码**。以下逐一展开其公式化定义与变量含义。
 
@@ -233,8 +217,6 @@ MaPE 通过在时序维度上为每个模态组 $m_i$ 引入固定偏移来解�
 $$\mathbf{p}_{t,h,w}^{(m_i)} = \hat{\mathbf{p}}_{t,h,w}^{(m_i)} + [i \cdot \Delta_t, 0, 0] = [\hat{t}_{t,h,w}^{(m_i)} + i \cdot \Delta_t, \hat{h}_{t,h,w}^{(m_i)}, \hat{w}_{t,h,w}^{(m_i)}]$$
 
 其中 $i$ 为模态组索引，$\Delta_t$ 为预定义的时序偏移步长。这一设计使得不同模态组的 token 在位置空间中彼此分离，从而缓解异构视觉 token 之间的干扰，提升跨任务上下文对齐。消融实验证实，移除 MaPE 会导致生成、编辑和理解性能全面下降（如 GEdit 从 6.86 降至 6.30，见 Table 10）。
-
-
 
 ## 实验与关键发现
 
@@ -293,27 +275,11 @@ Figure 13展示了图像和视频生成性能随训练token数增长的扩展曲
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2605_18678/figures/034_Table_10.jpg]]
 *Table 10: Ablation on Modality-Aware Rotary Positional Encoding (MaPE). We report GenEval for image generation, GEdit for image editing, VBench for video generation, and MVBench for video understanding*
 
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2605_18678/figures/029_Figure_13.jpg]]
-*Figure 13: Scaling behavior of image and video generation performance with increasing training tokens. We report DPG-Bench for image generation and VBench for video generation across different training token budgets*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2605_18678/figures/018_Table_6.jpg]]
-*Table 6: Video generation results on VBench. † refers to methods using LLM rewriters. Bold: best results among unified models. Underline: second-best among unified models*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2605_18678/figures/024_Table_7.jpg]]
-*Table 7: Image editing results on GEdit-Bench. Bold: best results among unified models. Underline: second-best among unified models*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2605_18678/figures/025_Table_8.jpg]]
-*Table 8: Video understanding results on MVBench. Bold: best results among unified models. Underline: second-best among unified models*
-
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2605_18678/figures/017_Figure_10.jpg]]
 *Figure 10: T2I qualitative comparison. Instructions that are correctly reflected in our results but missed or incorrectly rendered by some baseline models are highlighted in red*
 
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2605_18678/figures/023_Figure_11.jpg]]
 *Figure 11: T2V qualitative comparison. Instructions that are correctly reflected in our results but missed or incorrectly rendered by some baseline models are highlighted in red*
-
-
 
 ## 定位与知识库关联
 
@@ -346,8 +312,6 @@ MaPE 的消融实验证实了其有效性，但其作用机制仍有深入空间
 更广泛的开放问题是：多任务协同的收益是否可推广到当前任务空间之外？Lance 目前覆盖文本、图像、视频三种模态的理解与生成，但未涉及音频、3D、代码等模态。如果将这些模态纳入统一序列，现有的双流架构和 MaPE 设计是否仍能有效运作？跨模态协同的收益是否会随模态数量增加而递减或饱和？这需要后续工作在更丰富的模态组合上进行验证。
 
 最后，Lance 的训练扩展性曲线（Figure 13）显示图像和视频生成性能在预训练早期快速提升后增速减缓，但论文未报告理解任务的扩展行为。理解与生成是否遵循相同的扩展规律？在更大训练预算下，双流架构是否会遇到某一通路的瓶颈？这些问题的答案将决定 Lance 架构范式的长期可扩展性。
-
-
 
 ## 原文 PDF
 

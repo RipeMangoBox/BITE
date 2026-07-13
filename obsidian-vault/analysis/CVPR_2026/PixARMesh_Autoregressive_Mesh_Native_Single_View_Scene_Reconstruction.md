@@ -115,8 +115,6 @@ $$\mathcal{L}_{\mathrm{ce}} = -\sum_{t=1}^{T} \log p_{\theta}(s_t \mid s_{<t}, \
 
 框架的模块化设计使其能够适配不同的网格生成基础模型（BPT或EdgeRunner），但推理速度受自回归解码制约——单场景重建需4.5–6.7分钟（A100 GPU）。此外，性能对上游感知模型的精度高度敏感：使用真值深度可将物体级F-Score从81.64%提升至86.66%（Table 4），而提供真值实例分割对场景级F-Score的提升最大（从33.55%升至46.15%，Table 5），表明深度估计和分割质量是当前系统的两大瓶颈。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2569_https_arxiv_org_abs_2603_05888/figures/002_Figure_2.jpg]]
 *Figure 2: Pipeline overview. Given an RGB image, we use pretrained models to extract the depth point cloud and image features for both the target object i and the global scene. These local and global cues are fed into the Pixel-Aligned PC-Encoder to produce the fused latent code, which is then aggregated into a single latent vector via cross-attention. This latent vector conditions the Transformer Decoder, which predicts the object’s pose followed by its mesh token sequence*
 
@@ -209,8 +207,6 @@ PixARMesh在3D-FRONT数据集上与多个SOTA方法进行了定量对比（Table
 ### 失败模式分析
 
 综合消融结果和论文披露的限制，PixARMesh的主要失败模式包括：（1）**遮挡严重或深度估计误差大的区域**，点云输入本身存在几何缺失，即使像素对齐特征也无法完全补偿，导致重建网格出现拓扑错误或缺失部件；（2）**实例分割遗漏**，被遗漏的物体完全不会出现在重建场景中，这是场景级F-Score对分割质量高度敏感的根本原因；（3）**极端拓扑结构**，基础网格生成模型（EdgeRunner/BPT）的固定分辨率量化可能在细长结构或复杂拓扑上产生退化；（4）**背景结构缺失**，PixARMesh仅重建前景物体，忽略墙壁、地板等平面背景，生成的场景在视觉上不完整。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2569_https_arxiv_org_abs_2603_05888/figures/004_Table_2.jpg]]
 *Table 2: Ablation study on joint pose-mesh modeling*

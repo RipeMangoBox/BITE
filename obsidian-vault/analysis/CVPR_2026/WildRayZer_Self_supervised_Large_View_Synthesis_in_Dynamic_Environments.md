@@ -158,8 +158,6 @@ WildRayZer 在 RayZer 静态渲染器之上引入运动感知能力，构建了�
 
 输入视图的所有标记沿序列维度拼接，使运动估计器能够利用多视图一致性区分相机运动与物体运动——这是单视图方法无法实现的关键能力。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2630_https_arxiv_org_abs_2601_10716/figures/001_Figure_1.jpg]]
 *Figure 1: Our self-supervised WildRayZer learns to render static novel views from dynamic images without any 3D or GT mask supervision. It extends the state-of-the-art self-supervised large view synthesis model RayZer to dynamic environments by adding a learned motion mask estimator and a masked 3D scene encoder*
 
@@ -250,8 +248,6 @@ $$\mathcal{L} = \mathcal{L}_{\text{masked}} + \lambda_{\text{mask}} \cdot \mathr
 | $\mathrm{MSE}_M = \frac{\sum_{i,j} (I_{ij} - \hat{I}_{ij})^2 M_{ij}}{\sum_{i,j} M_{ij}}$ | 掩蔽 MSE 损失 | Supp B.2 |
 | $\mathcal{L} = \mathcal{L}_{\text{masked}} + \lambda_{\text{mask}} \cdot \mathrm{BCE}(M_{\text{pred}}, M_{\text{target}})$ | 联合训练总损失 | Supp Eq.2 |
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2630_https_arxiv_org_abs_2601_10716/figures/004_Figure_3.jpg]]
 *Figure 3: Pseudo Motion Mask Pipeline. We fuse SSIM- and DINO-based dissimilarity into a saliency map, cluster DINO patch features to vote for dynamic patches, then refine the coarse patch mask to pixel resolution via morphological smoothing, smallcomponent removal, and GrabCut [65]*
 
@@ -310,8 +306,6 @@ WildRayZer 的训练与评估在两个互补的数据集上进行：**D-RE10K** 
 | 表 4 | 自监督运动掩码在稀疏视图下的 mIoU 和 Recall 超越现成监督/自监督分割方法 |
 | 表 5 | 复制-粘贴增强 + 伪掩码联合使用使 DAVIS mIoU 从 3.4 提升至 31.0 |
 | 图 8 | 失败模式：部分掩码、大物体遮挡、背景补全不完整 |
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2630_https_arxiv_org_abs_2601_10716/figures/005_Table_2.jpg]]
 *Table 2: Main Results on Novel View Synthesis. We report mean performance for 2, 3, 4 input views on D-RE10K (left, static regions only) and D-RE10K-iPhone (right, full-image fidelity). Metrics are PSNR ↑, SSIM ↑, and LPIPS ↓. Cells highlighted in red, orange, and yellow denote the best, second, and third results respectively. SAV denotes Segment Any Motion in Videos [21]*

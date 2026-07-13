@@ -56,8 +56,6 @@ claims:
 
 **方法定位**：RCOT 在约束最优传输（如 Liu et al., 2022 的熵约束 OT）基础上增加了分类约束 $H(S|Y) \le C$，并将训练目标扩展为 MSE + 率项 + Wasserstein-1 感知损失 + 交叉熵分类损失的联合优化，从而在统一框架下同时处理跨域重建、压缩效率和下游任务性能。当前闭式解限于伯努利和高斯分布，推广到更一般分布以及大规模真实图像压缩中的高效训练仍是开放问题。
 
-
-
 ### 经典率失真理论的跨域局限
 
 经典率失真理论为数据压缩提供了坚实的数学基础，其核心目标是在给定码率约束下最小化源信号与重建信号之间的失真。然而，这一理论框架隐含了一个关键假设：重建信号的分布与源信号的分布一致。在许多实际场景中，这一假设并不成立。例如，当输入是受噪声污染的退化图像时，期望的输出是干净的高质量图像，二者分属不同的分布域。这种**跨域映射**需求超出了经典率失真理论的建模能力。
@@ -77,8 +75,6 @@ claims:
 上述缺口指向一个根本性的理论瓶颈：**如何在一个统一的数学框架内，同时处理跨域映射、压缩率约束和下游分类性能约束？** 这要求我们超越经典率失真理论和现有最优传输框架，寻找一种能够联合优化重建保真度、压缩效率和分类精度的新范式。
 
 本文的核心动机正是填补这一空白。作者观察到，跨域有损压缩本质上可以形式化为一个**带约束的最优传输问题**：在源分布 $p_X$ 和目标分布 $p_Y$ 之间寻找一个传输计划，使其在满足压缩率约束和分类损失约束的前提下，最小化期望失真。这一形式化不仅统一了率、失真和分类三个维度，还为推导理论边界和设计实用算法提供了严格的数学基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -109,8 +105,6 @@ $$\mathcal{L} = \mathbb{E}[\|X-\tilde{Y}\|^2] + \lambda_p W_1(p_Y, p_{\tilde{Y}}
 ### 理论可解释性的突破
 
 在伯努利（Theorem 2）和高斯（Theorem 4）信源下，本工作导出了**闭式 DRC 函数**，明确给出失真-率-分类的三重边界。实验估计的 DRC 曲线与闭式理论曲线高度吻合（Figure 17），验证了框架的理论一致性。这一可解释性是以往基于深度学习的压缩方法所不具备的。
-
-
 
 ![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_mUIGdUTtk2/figures/005_Figure_5.jpg]]
 *Figure 5: Experimental architecture: a stochastic autoencoder with classifier and WGAN discriminator, conditioned on shared randomness U*
@@ -164,8 +158,6 @@ $$\mathcal{L} = \mathbb{E}[\|X - \tilde{Y}\|^2] + \lambda_p W_1(p_Y, p_{\tilde{Y
 ### 理论保证与实验验证的闭环
 
 理论部分在伯努利（Theorem 2）和高斯（Theorem 4）信源下导出了闭式的失真-率-分类（DRC）函数，揭示了三个约束之间的显式边界。实验通过从闭式分布中抽样估算经验 DRC 曲线，与理论预测高度吻合（Figure 17），验证了框架的数学一致性。在真实图像任务（MNIST 超分辨、SVHN/CIFAR-10/ImageNet/KODAK 去噪）中，系统表现出符合理论预期的行为：更高的码率持续改善重建质量和分类精度，且通过调节分类约束强度可在率-失真平面上刻画清晰的等率线（Figure 16）。
-
-
 
 ### 问题形式化：从经典最优传输到约束最优传输
 
@@ -235,8 +227,6 @@ $$\mathcal{L} = \mathbb{E}[\|X-\tilde{Y}\|^2] + \lambda_p W_1(p_Y, p_{\tilde{Y}}
 
 整个流水线的理论根基在于定理 1 的解耦原理：$U$ 使传输确定化，量化与熵瓶颈处理压缩，判别器和分类器分别施加感知与分类约束。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设定
@@ -251,14 +241,12 @@ $$\mathcal{L} = \mathbb{E}[\|X - \tilde{Y}\|^2] + \lambda_p W_1(p_Y, p_{\tilde{Y
 
 **KODAK 高斯去噪 ($\sigma=25$) 对比。** Table 15 给出了与经典基线的全面比较。RCOT 在感知质量指标上取得一致优势：LPIPS 达到 0.1987，优于 BM3D（0.2235）和 DeCompress（0.2168）；DISTS 为 0.1638，低于 DeCompress（0.1967）和 BM3D（0.2109）；感知指数 PI 为 2.1670，显著优于 BM3D（2.6503）和 OTDenoising（2.7093）。这些结果表明，引入分类约束并未损害感知重建质量，反而在感知-失真权衡上获得了更优解。
 
-
 ![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_mUIGdUTtk2/figures/067_Table_15.jpg]]
 *Table 15: Comparison of denoising performance on the KODAK dataset with Gaussian noise $\mathcal { N }$ ( 0 , $\sigma ^ { 2 }$ ) , $\sigma = \bar { 2 5 }$ . Best values are in bold and second-best values are underlined
 
 **跨任务率-失真-精度权衡。** Table 11–12 展示了 MNIST 超分辨和 SVHN 去噪的细粒度定量结果。在 MNIST 4× 超分辨中，当率从 0.15 bpp 增至 1.36 bpp 时，MSE 从 0.0064 降至 0.0051，分类准确率从 0.8404 升至 0.9670。SVHN 去噪 ($\sigma=20$) 呈现类似趋势：率从 0.12 bpp 增至 2.71 bpp 时，准确率从 0.6130 升至 0.8292。Figure 6 的可视化结果进一步证实，低率下重建仅捕获粗略结构，高率下细节和清晰度显著提升。
 
 **RDC 函数与等率线。** Figure 16 绘制了 MNIST 和 SVHN 上的率-失真-分类（RDC）函数，并在 $R(D,C)$ 平面上叠加等率线。该可视化清晰揭示了固定率约束下失真与分类性能之间的明确权衡边界：在任一固定率下，降低失真必然牺牲分类精度，反之亦然，且该边界随率增大向外扩展。
-
 
 ![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_mUIGdUTtk2/figures/058_Figure_16.jpg]]
 *Figure 16: The RDC functions on the MNIST and SVHN datasets, together with the equi-rate lines plotted on R ( D , C ) , highlight the tradeoff between distortion and classification performance at any fixed rate constraint*
@@ -267,27 +255,16 @@ $$\mathcal{L} = \mathbb{E}[\|X - \tilde{Y}\|^2] + \lambda_p W_1(p_Y, p_{\tilde{Y
 
 Tables 1–5 系统考察了分类损失权重 $\lambda_c$ 对率-失真-精度三元权衡的调控作用。核心发现如下：
 
-
 ![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_mUIGdUTtk2/figures/044_Table_3.jpg]]
 *Table 3: Performance across λ values for denoising on CIFAR-10 with Gaussian noise, ${ \mathcal { N } }$ ( 0 , $\sigma ^ { 2 }$ ) with σ = 25 (Fig. 8(a), Fig. 8(b))
 
-![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_mUIGdUTtk2/figures/045_Table_4.jpg]]
-*Table 4: Performance across λ values for denoising on ImageNet with Gaussian noise, ${ \mathcal { N } }$ ( 0 , $\sigma ^ { 2 }$ ) with σ = 25 (Fig. 8(d), Fig. 8(e))
-
-![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_mUIGdUTtk2/figures/046_Table_5.jpg]]
-*Table 5: Performance across λ values for denoising on KODAK with Gaussian noise, ${ \mathcal { N } }$ ( 0 , $\sigma ^ { 2 }$ ) with σ = 25 (Fig. 10)
 
 **MNIST 超分辨（Table 1）。** $\lambda_c=0$（无分类约束）时准确率最高（0.9670），MSE 最低（0.0055），但率也最高（1.36 bpp）。$\lambda_c=1000$ 时准确率降至 0.8404，MSE 略升至 0.0064，率大幅降至 0.15 bpp。$\lambda_c=50000$ 时准确率崩溃至 0.3477，表明过度强调分类约束会破坏重建质量。存在一个最优权衡区间（$\lambda_c \in [100, 1000]$），在此区间内率显著降低而精度损失可控。
-
 
 ![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_mUIGdUTtk2/figures/042_Table_1.jpg]]
 *Table 1: Performance across λ values for 4× super-resolution on MNIST (Fig. 7(a), Fig. 7(b))*
 
 **SVHN 去噪（Table 2）。** $\lambda_c=200$ 时达到最佳折衷：MSE 最低（0.0048），准确率 0.7702，率 0.5237 bpp。$\lambda_c$ 继续增大至 20000 时，准确率骤降至 0.2000，MSE 升至 0.0141，表明分类约束过强时系统会牺牲重建保真度来满足分类条件，反而损害整体性能。
-
-
-![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_mUIGdUTtk2/figures/043_Table_2.jpg]]
-*Table 2: Performance across λ values for denoising on SVHN with Gaussian noise, ${ \mathcal { N } }$ ( 0 , $\sigma ^ { 2 }$ ) with σ = 25 (Fig. 7(d), Fig. 7(e))
 
 **CIFAR-10/ImageNet/KODAK 去噪（Tables 3–5）。** 趋势一致：适中的 $\lambda_c$（CIFAR-10 上约 50–100，ImageNet 上约 5–50，KODAK 上约 100）可在保持可接受失真的前提下有效降低率并维持分类精度；$\lambda_c$ 过大时所有指标均恶化。
 
@@ -306,18 +283,6 @@ Figure 17 将伯努利分布（Theorem 2）和高斯分布（Theorem 4）下的�
 ### 修复任务的扩展验证
 
 Tables 7–8 和 Figures 12–13 展示了 SVHN 修复（inpainting）任务的结果。有监督设定下（Table 7），率从 0.04 bpp 增至 1.19 bpp 时准确率从 0.4840 升至 0.8190，MSE 从 0.0328 降至 0.0109。无监督设定下（Table 8）呈现类似趋势，尽管缺乏干净目标，自监督模型仍能在更高率下产生更连贯的数字结构和更高分类精度。这表明 RCOT 框架对不同的退化类型（去噪、超分辨、修复）和不同的监督范式（有监督、无监督）均具有泛化能力。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_mUIGdUTtk2/figures/048_Table_7.jpg]]
-*Table 7: Supervised inpainting on SVHN across λ values (Figure 12)*
-
-![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_mUIGdUTtk2/figures/049_Table_8.jpg]]
-*Table 8: Unsupervised inpainting on SVHN across λ values (Figure 13)*
-
-![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_mUIGdUTtk2/figures/050_Table_8.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -367,8 +332,6 @@ RCOT 处于**信息论、最优传输和深度学习**的交叉点：
 - 在信息论侧，它将 Shannon 的率失真函数推广为率－失真－分类函数（DRC），并进一步引入感知约束（DRPC），提供了单字母表征（Theorem 3, 5）。
 - 在最优传输侧，它将经典 Monge-Kantorovich 问题扩展为带信息论约束的传输问题，揭示了传输计划、压缩率和分类不确定性之间的内在耦合。
 - 在深度学习侧，它提供了一个原则性的损失设计框架：MSE 失真 + Wasserstein 感知损失 + 交叉熵分类损失，三者通过拉格朗日松弛统一优化。
-
-
 
 ## 原文 PDF
 

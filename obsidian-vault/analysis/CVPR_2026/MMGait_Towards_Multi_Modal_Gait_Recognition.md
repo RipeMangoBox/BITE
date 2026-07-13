@@ -63,8 +63,6 @@ claims:
 
 **局限与开放问题**：MMGait 未实现严格的帧级跨传感器时间同步；OmniGait 将 3D 点云投影为深度图，损失了部分原始几何结构；换装场景下的性能缺口仍是核心挑战。未来方向包括直接建模原始 3D 点云、联合优化跨模态对齐与协变量鲁棒性，以及在更复杂的现实部署中验证泛化能力。
 
-
-
 ### 步态识别的多模态机遇与瓶颈
 
 步态识别作为一种远距离、非受控的生物特征识别技术，在安防监控、嫌疑人追踪和身份认证等场景中具有独特优势。然而，现有步态识别研究长期受限于单一或少数传感器的数据范式——绝大多数基准数据集仅覆盖RGB相机采集的轮廓（silhouette）序列，少数工作延伸至LiDAR点云或深度图，但始终缺乏一个能够系统性覆盖异构传感器、支持统一建模的大规模多模态平台。
@@ -93,8 +91,6 @@ claims:
 1. **大规模多模态基准**：构建了覆盖5类传感器、12种模态的MMGait数据集，为异构步态识别研究提供了统一的评估平台。
 2. **全模态识别任务定义**：首次形式化Omni Multi-Modal Gait Recognition任务，支持任意模态间的双向检索与融合。
 3. **统一基线OmniGait**：提出轻量、可扩展的统一框架，在单模态、跨模态和多模态场景下均展现出竞争力。
-
-
 
 ## 核心方法与创新机理
 
@@ -159,8 +155,6 @@ $$L_{\mathrm{total}} = \frac{1}{2} ( L_{\mathrm{cross-triplet}} + L_{\mathrm{ce}
 
 OmniGait仅使用**9.96M参数**即可支撑全部9种图像化模态的单模态识别、任意模态对之间的跨模态检索以及多模态融合任务（Table 9）。这一参数量远低于为每对模态训练独立双流模型的总开销，证明了统一框架在可扩展性上的显著优势。
 
-
-
 OmniGait 的整体设计遵循“模态特定编码 → 自适应跨模态融合 → 共享表示学习”的三阶段流水线，目标是以单一模型统一处理单模态识别、跨模态检索与多模态融合三类任务。其核心逻辑在于：让每种模态保留自身物理特性的同时，通过共享骨干网络将所有模态的特征映射到同一个嵌入空间，从而消除为每一对模态单独训练模型的开销。
 
 **输入层**：OmniGait 当前支持 9 种图像化模态（包括 RGB 图像、轮廓、红外、事件、投影深度图等），所有模态统一缩放至 64×64 分辨率，以序列形式送入模型。
@@ -217,13 +211,6 @@ $$
 
 **当前局限**：OmniGait 目前将 3D 点云投影为深度图以纳入统一图像框架，这一操作损失了部分原始几何结构；此外，统一模型在 4D 雷达和 3D 姿态等稀疏或结构化模态上的单模态性能仍明显弱于专用模型。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1069_https_arxiv_org_abs_2604_15979/figures/009_Figure_5.jpg]]
-*Figure 5: Overview of the OmniGait framework, including modalspecific encoding, adaptive cross-modal fusion, and shared representation learning to flexibly handle single-modal, cross-modal, and multi-modal gait recognition*
-
-
-
 OmniGait 框架围绕一个核心洞察展开：**模态特定浅层编码保留物理特性，共享深层骨干学习跨模态不变表示，轻量门控融合实现自适应互补**。整个框架由三个关键模块串联构成，其整体结构如 **Figure 5** 所示。
 
 ### 模态特定编码器
@@ -278,8 +265,6 @@ $$L_{\mathrm{total}} = \frac{1}{2} \left( L_{\mathrm{cross-triplet}} + L_{\mathr
 
 上述三个模块形成一条清晰的因果链：**模态特定编码器 $\to$ 自适应门控融合 $\to$ 共享骨干 $\to$ 统一嵌入空间**。这一链条解释了 OmniGait 为何能以仅 9.96M 参数（Table 9）同时支撑单模态识别、跨模态检索和多模态融合三类任务：浅层编码器保留了各模态的物理特异性，门控融合按需组合互补信息，共享骨干则将异构表征映射到同一度量空间，使任意模态对之间的检索无需额外适配。
 
-
-
 ## 实验与关键发现
 
 ### 数据集与基准构建
@@ -303,15 +288,9 @@ MMGait 数据集覆盖 **5 类传感器**（RGB 相机、事件相机、红外�
 
 Table 3 报告了基于轮廓和姿态的主流方法在 MMGait 上的性能。基于轮廓的 **GaitBase** 在换衣（CL）条件下取得最高 Rank-1（61.0%），而基于姿态的 **DeepGaitV2-P3D** 在正常（NM）条件下达到 98.7%。这一对比揭示了不同模态表征在不同协变量下的互补优势：轮廓对衣着变化更鲁棒，姿态在正常行走时判别力更强。
 
-![[assets/figures/papers/paper_list_l1069_https_arxiv_org_abs_2604_15979/figures/005_Table_3.jpg]]
-*Table 3: Baseline performance of silhouette- and pose-based gait recognition methods on MMGait. Results are reported in %. Bold numbers indicate the best performance within each modality*
-
 #### 新兴模态：多传感器分析
 
 Table 4 展示了各新兴模态的单模态识别结果。核心发现：
-
-![[assets/figures/papers/paper_list_l1069_https_arxiv_org_abs_2604_15979/figures/007_Table_4.jpg]]
-*Table 4: Recognition performance across diverse and emerging gait sensing modalities. Results are reported in %. Bold numbers indicate the best performance within each sensor type*
 
 - **结构型模态在跨服装条件下优势显著**：LiDAR 点云在 CL 条件下 Rank-1 达 76.6%，红外图像达 78.8%，远超 RGB 图像（60.7%）和轮廓（61.0%）。这表明深度几何信息和热辐射信息对衣着变化具有天然鲁棒性。
 - **RGB 衍生模态在正常条件下表现最优**：RGB 图像和轮廓在 NM 条件下分别达到 99.7% 和 98.5%，但在 CL 条件下急剧退化，暴露了外观特征对衣着的敏感性。
@@ -320,9 +299,6 @@ Table 4 展示了各新兴模态的单模态识别结果。核心发现：
 ### 跨模态检索
 
 Table 5 和 Figure 4 报告了以 RGB 为中心的跨模态检索结果。采用双流框架（模态特定浅层编码器 + 共享深层骨干），联合优化交叉熵损失与跨模态三元组损失。
-
-![[assets/figures/papers/paper_list_l1069_https_arxiv_org_abs_2604_15979/figures/006_Table_5.jpg]]
-*Table 5: RGB-Centered Cross-Modal Retrieval. Results are reported in %*
 
 核心瓶颈：**跨模态检索面临严峻的跨服装退化**。五类传感器双向检索的平均 Rank-1 从 NM 的 55.5% 骤降至 CL 的 28.4%。具体而言：
 - RGB(轮廓) → 红外(轮廓) 在 NM 下可达 95.7%，但 CL 下仅 45.3%。
@@ -366,9 +342,6 @@ Table 8 报告了 OmniGait 在统一框架下的多模态融合性能。与专�
 - RGB(RGB 图像) + 轮廓提升 +19.8%，体现了统一框架内模态间协同的潜力。
 - 融合增益的模式与专用模型一致：传感器间融合 > 传感器内融合。
 
-![[assets/figures/papers/paper_list_l1069_https_arxiv_org_abs_2604_15979/figures/010_Table_8.jpg]]
-*Table 8: OmniGait performance under intra- and inter-sensor settings. Green numbers denote improvement over the baseline*
-
 #### 跨模态检索对比
 
 Figure 6 对比了 OmniGait 统一模型与独立训练的双流模型在跨模态检索上的性能。OmniGait 通过共享批次归一化（所有单模态和融合特征在同一批次中处理），使 BatchNorm 层学习跨模态统计量，在 NM 和 BG 条件下优于独立双流模型。但在 CL 条件下优势缩小，说明**统一批次归一化对协变量鲁棒性的帮助有限**，CL 场景仍是核心挑战。
@@ -376,9 +349,6 @@ Figure 6 对比了 OmniGait 统一模型与独立训练的双流模型在跨模�
 ### 跨数据集零样本迁移
 
 Table 10 报告了 OmniGait 在 SUSTech1K 数据集上的零样本迁移结果（仅在 MMGait 训练，不做微调）。融合模型在跨数据集场景下仍保持正向增益，验证了 OmniGait 学习到的多模态互补策略具有一定的泛化性，而非对 MMGait 特定分布过拟合。
-
-![[assets/figures/papers/paper_list_l1069_https_arxiv_org_abs_2604_15979/figures/016_Table_10.jpg]]
-*Table 10: Cross-dataset evaluation on SUSTech1K. OmniGait is trained on MMGait and directly evaluated without fine-tuning*
 
 ### 消融与效率分析
 
@@ -392,8 +362,6 @@ Table 10 报告了 OmniGait 在 SUSTech1K 数据集上的零样本迁移结果�
 2. **稀疏模态建模不足**：4D 雷达和 3D 姿态在统一框架中的性能显著弱于专用模型，将点云投影为深度图损失了原始几何结构，且共享骨干难以同时适配稠密和稀疏表征。
 3. **统一模型内的模态间性能不均衡**：强模态（RGB、轮廓）接近专用模型，弱模态（4D 雷达、3D 姿态）差距明显，全模态联合训练可能引入负迁移。
 4. **时间同步精度受限**：MMGait 未在异构传感器间实施严格的帧级时间同步（仅序列级对齐），可能影响需要精确时序对齐的跨模态融合方法。此点需在后续版本中手动验证实际影响程度。
-
-
 
 ## 定位与知识库关联
 
@@ -448,8 +416,6 @@ OmniGait仅需**9.96M参数**即可支撑9种模态的单模态、跨模态和�
 3. **现实部署泛化性**：OmniGait在MMGait受控采集环境下的有效性已初步验证（包括零样本迁移至SUSTech1K，Table 10），但在动态背景、人群遮挡等更复杂现实场景中的泛化能力尚需进一步验证。
 
 4. **模态间性能差异的缩小**：是否可通过预训练-微调范式或语言引导（如文本描述步态属性）进一步降低统一模型中模态间的性能差距，使稀疏模态也能受益于丰富模态的知识迁移？
-
-
 
 ## 原文 PDF
 

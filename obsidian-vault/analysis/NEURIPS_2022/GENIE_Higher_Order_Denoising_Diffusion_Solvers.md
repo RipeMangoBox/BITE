@@ -51,8 +51,6 @@ claims:
 
 GENIE的局限性在于仅探索了二阶方法，三阶TTM在少步数时反而不如二阶；此外，它仍运行在生成ODE框架内，无法像蒸馏方法那样实现单步生成。尽管如此，GENIE为扩散模型的快速采样提供了一条高效的高阶求解路径，其轻量级设计使其易于集成到现有预训练模型中。
 
-
-
 扩散模型已成为高维连续数据生成建模的核心范式，其生成过程通常被形式化为一个逆向随机微分方程（SDE）或与之等价的概率流常微分方程（Probability Flow ODE）。在实际部署中，概率流ODE因其确定性采样特性而备受青睐，然而，**该ODE在高维数据下的高效求解构成了根本性瓶颈**。
 
 现有的一阶求解器，如 **DDIM**（Song et al., ICLR 2021）所采用的Euler方法，在求解该ODE时需要大量小步长才能保证生成质量。其根本原因在于：一阶方法仅利用ODE向量场的当前值进行线性外推，**无法捕捉向量场的局部曲率**，导致每一步的截断误差随步长增大而急剧累积。如 Figure 1 所示，一阶方法在曲率显著的区域会偏离真实ODE轨迹，迫使采样过程必须采用保守的小步长策略，从而大幅增加了函数评估次数（NFE）和推理延迟。
@@ -62,8 +60,6 @@ GENIE的局限性在于仅探索了二阶方法，三阶TTM在少步数时反而
 **本文的核心动机在于填补这一方法学空白**：能否在不改变预训练一阶得分网络的前提下，显式引入ODE的高阶导数信息，从而构造一个真正意义上的高阶求解器，在更少的NFE下实现更精确的生成轨迹？这一思路面临的关键挑战在于——高阶导数（尤其是Jacobian-向量积，JVP）的计算成本在深度神经网络中通常极为高昂。
 
 GENIE的突破性洞察在于：**利用自动微分从预训练的一阶得分网络中提取二阶JVP，并将其蒸馏到一个轻量级预测头部**，从而在几乎不增加推理计算成本的情况下，实现二阶截断泰勒方法（TTM）对生成ODE的求解。这一设计使得GENIE能够以二阶精度捕捉ODE的局部曲率，允许显著更大的求解步长，同时保持对任意预训练扩散模型的即插即用兼容性。
-
-
 
 ## 核心方法与创新机理
 
@@ -102,8 +98,6 @@ $$k_{\psi} = -\frac{1}{\gamma_t}k_{\psi}^{(1)} + \frac{\gamma_t}{1+\gamma_t^2}k_
 
 与基于线性多步法的二阶求解器（如**S-PNDM**、**F-PNDM**，Liu et al., ICLR 2022）不同，GENIE直接使用高阶得分信息（蒸馏后的JVP）进行生成建模，而非通过有限差分或其他近似方式间接利用历史梯度信息。在相同低NFE设置下，GENIE始终提供更低的FID（Figure 5），验证了显式高阶导数建模相对于隐式多步方法的优势。
 
-
-
 GENIE 是一个基于二阶截断泰勒方法（Truncated Taylor Method, TTM）的扩散模型快速采样框架。其核心思路是将扩散模型的标准概率流 ODE（DDIM ODE）从一阶 Euler 求解提升为二阶求解，从而在更大的步长下保持高精度生成，大幅减少所需的函数评估次数（NFE）。
 
 ### Pipeline 总览
@@ -139,13 +133,6 @@ $$d_{\gamma_t}\epsilon_{\theta} = \frac{1}{\sqrt{\gamma_t^2+1}} \frac{\partial \
 这些项通过自动微分从 ε_θ 中精确计算，然后蒸馏到 k_ψ 中。这种设计使得 GENIE 在推理时无需执行昂贵的二阶自动微分，仅需一次额外的轻量级前向传播（开销在 CIFAR-10 上约 1.5%），即可获得二阶精度。
 
 **与一阶方法的本质区别**：DDIM（Song et al., ICLR 2021）等一阶求解器仅使用 ε_θ 的当前值进行线性外推，无法捕捉 ODE 梯度场的局部曲率。GENIE 通过引入高阶梯度项，使单步更新能够适应梯度场的变化方向（见 Figure 1 的示意对比），从而在相同步长下显著降低局部截断误差（LTE）和全局截断误差（GTE）（见 Figure 14、Figure 15 的定量验证）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2210_05475/figures/001_Figure_1.jpg]]
-*Figure 1: Our novel Higher-Order Denoising Diffusion Solver (GENIE) relies on the second truncated Taylor method (TTM) to simulate a (re-parametrized) Probability Flow ODE for sampling from denoising diffusion models. The second TTM captures the local curvature of the ODE’s gradient field and enables more accurate extrapolation and larger step sizes than the first TTM (Euler’s method), which previous methods such as DDIM [58] utilize*
-
-
 
 ### 一阶基座：DDIM 概率流 ODE 的重参数化
 
@@ -203,8 +190,6 @@ GENIE 的完整采样管线由三个模块串联构成：
 
 需要注意的是，$k_{\psi}$ 的训练需要在全精度下进行，因为混合精度下计算 $\partial \epsilon_{\theta} / \partial t$ 时会出现数值不稳定（NaN），这是该方法的一个实际工程限制。
 
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -261,27 +246,11 @@ AFS 和去噪步骤作为超参数被统一应用于所有比较方法，选择�
 - GENIE 仍然运行在生成 ODE 框架内，无法像基于蒸馏的方法（如 Progressive Distillation）那样实现单步或极少步数生成。
 - 预测头部的额外训练增加了流程复杂度，且需要全精度训练以避免数值不稳定。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2210_05475/figures/010_Figure_7.jpg]]
-*Figure 7: Classifier-free guidance for the ImageNet classes Pembroke Welsh Corgi (263) and Streetcar (829)*
-
-![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2210_05475/figures/008_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2210_05475/figures/012_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2210_05475/figures/013_Table.jpg]]
-
 ![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2210_05475/figures/017_Table_4.jpg]]
 *Table 4: Model hyperparameters and training details. The CIFAR-10 model is taken from Song et al. [57]; all other models are trained by ourselves*
 
 ![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2210_05475/figures/021_Table_6.jpg]]
 *Table 6: Unconditional CIFAR-10 generative performance, measured in Recall (higher values are better). All methods use the same score model checkpoint*
-
-![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2210_05475/figures/022_Table_7.jpg]]
-*Table 7: Unconditional CIFAR-10 generative performance (measured in FID) using our GENIE and DDIM [58] with different striding schedules using exponents $\rho \in \{$ 1 . 5 , 2 . 0 , 2 . 5 $\}$
-
-
 
 ## 定位与知识库关联
 
@@ -322,8 +291,6 @@ GENIE 的有效性建立在以下关键假设和技术边界之上：
 - **无 AD 的高阶学习目标**：能否开发不依赖自动微分的高阶得分匹配目标，直接学习 JVP，从而避免蒸馏过程中的 AD 计算开销和数值不稳定问题？
 - **高阶导数在 SDE 中的引入**：GENIE 目前基于确定性 ODE，如何将高阶导数引入随机采样（SDE）框架，以同时获得更好的覆盖度和样本质量？
 - **高阶方法的根本瓶颈**：三阶及以上 TTM 无法提供一致收益的原因是什么？是模型难以准确学习高阶导数（容量瓶颈），还是优化过程本身的不稳定性（优化瓶颈）？这需要从数值分析和学习理论两个角度进行深入研究。
-
-
 
 ## 原文 PDF
 

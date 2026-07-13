@@ -243,8 +243,6 @@ $$\mathcal{L}_{\mathrm{on\text{-}policy}} = \mathbb{E}_{i, \mathbf{t}} \left[ \m
 
 在推理时，backbone 基于含噪历史 KV-cache 维持时序一致的隐空间轨迹，refiner（单步因果模型）基于干净历史 KV-cache 恢复高保真细节，两者均使用分块因果注意力掩码进行自回归滚动。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1839_LPM_Video_based_Character_Performance_Model/figures/008_Figure_6.jpg]]
 *Figure 6: | Online LPM architecture. The generator DiT accepts noise inputs, streaming control signals (text, speak/listen audio), and identity reference images conditioned on noisy-history KV caches to produce renoised latents. The refiner DiT then recovers the final clean video chunks conditioned on clean-history KV caches. Both stages use chunk-wise causal attention masks for autoregressive rollout*
 
@@ -300,28 +298,11 @@ LPM 1.0的评估围绕自建的**LPM-Bench**展开，该基准覆盖5个场景�
 
 **语义验证模型**在listen_dialogue与conversation边界存在过预测（25.4%误判率），可能导致训练数据中倾听对话片段被错误标注为对话，影响模型对倾听行为的建模精度。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1839_LPM_Video_based_Character_Performance_Model/figures/010_Figure_8.jpg]]
-*Figure 8: | Human preference evaluation (G/S/B) of Base LPM (720P) versus Kling-Avatar-2, OmniHuman-1.5 and Wan2.1-I2V on LPM-Bench. Overall measures which video appears more like a real person. The four diagnostic dimensions evaluate pairwise preference along specific axes*
-
-![[assets/figures/papers/paper_list_l1839_LPM_Video_based_Character_Performance_Model/figures/012_Figure_10.jpg]]
-*Figure 10: | Absolute score distributions (1–5 Likert) of Base LPM (720P) on LPM-Bench across Speak, Listen, and Conversation. Legend shows per-dimension means*
-
-![[assets/figures/papers/paper_list_l1839_LPM_Video_based_Character_Performance_Model/figures/013_Figure_11.jpg]]
-*Figure 11: | Human preference evaluation (G/S/B) of Online LPM (480P) versus LiveAvatar and SoulX on LPM-Bench. Each video pair is evaluated by three independent raters. The Overall axis uses an arena-style realism judgment, while the remaining axes separately evaluate motion dynamics, identity consistency, text controllability, and audio-video synchronization. Online LPM is strongly preferred to LiveAvatar across all dimensions, and is preferred overall to SoulX despite SoulX’s advantage on identity consistency*
-
-![[assets/figures/papers/paper_list_l1839_LPM_Video_based_Character_Performance_Model/figures/015_Figure_13.jpg]]
-*Figure 13: | Human preference evaluation (G/S/B) of Base LPM (480P) and Online LPM (480P) across three performance scenarios: (a) Speak, (b) Listen, and (c) Conversation. The online model remains competitive in terms of motion dynamics and identity consistency, while text controllability and audio-video synchronization aspects are similar*
-
 ![[assets/figures/papers/paper_list_l1839_LPM_Video_based_Character_Performance_Model/figures/018_Figure_14.jpg]]
 *Figure 14: | Ablation on emotion references of Base LPM. With all other inputs fixed, adding emotion reference images improves the preservation of fine-grained identity-related expression cues, including smiling style, dental appearance, and subtle facial micro-expressions. In contrast, without emotion references, these person-specific expressive details are less faithfully preserved*
 
 ![[assets/figures/papers/paper_list_l1839_LPM_Video_based_Character_Performance_Model/figures/004_Table_1.jpg]]
 *Table 1: | Frame-level results for speak-versus-listen classification after re-ranking and idle merging on 2K manually annotated test clips (1K clips each from Domain 1 and Domain 2). The left block shows the confusion matrix: entries are frame counts with column-normalized percentages in parentheses (equivalent to per-class recall on the diagonal). The right block reports per-class precision and F1 score. Summary metrics appear in the bottom row of each domain. Pred.: predicted label; GT: ground truth; Acc.: accuracy*
-
-![[assets/figures/papers/paper_list_l1839_LPM_Video_based_Character_Performance_Model/figures/005_Table_2.jpg]]
-*Table 2: | F1 scores of the six-category semantic verification model. Gemini serves as the closed-source baseline; Qwen3-Omni is fine-tuned on domain-specific conversational data. Metrics cover the five primary classes (excluding unknown). Δ denotes the absolute improvement of Qwen3-Omni over Gemini. Abbreviations: L_dlg = Listen_dialogue, L_nondlg = Listen_nondialogue*
 
 ## 定位与知识库关联
 

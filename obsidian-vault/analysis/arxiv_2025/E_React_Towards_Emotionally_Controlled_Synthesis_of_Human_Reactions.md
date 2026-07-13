@@ -52,8 +52,6 @@ claims:
 
 **方法定位**：E-React属于扩散模型驱动的双人交互运动生成方法，其核心贡献在于将半监督情感表征学习与对称交互扩散架构相结合，首次实现了对反应运动的情感可控合成。与**MDM**（Tevet et al., 2023）等通用扩散运动模型、**InterGen**（Liang et al., 2024b）等双人交互框架以及**ReMoS**（Ghosh et al., 2024）、**ReGenNet**（Xu et al., 2024b）等专门的反应生成方法相比，E-React的关键区别在于：以概率化情感先验替代离散情感嵌入，以对称共享权重的扩散架构替代独立编码器设计，从而在交互保真度与情感表现力之间取得更好的平衡。
 
-
-
 ### 人类反应生成：从动作建模到情感表达
 
 在人类交互中，非语言行为——尤其是身体动作——承载着丰富的情感与社交信号。当一个人发起动作（演员），另一个人会自然地做出回应（反应者），这种反应不仅受空间交互约束的影响，还深受情感状态的驱动。因此，生成逼真的人类反应运动，需要同时满足两个核心条件：**空间交互的一致性**和**情感表达的准确性**。
@@ -76,8 +74,6 @@ claims:
 2. **在保持交互约束的同时实现情感控制**——设计一种架构，使演员的运动信息干净地传递到生成过程，而情感信号则作为引导条件，在不破坏空间关系的前提下调控反应风格。
 
 本文提出的 **E-React** 框架正是围绕这两个动机展开：通过半监督情感先验网络从稀缺标注中学习概率化的情感表征，再通过对称的演员-反应者扩散架构，将情感嵌入与空间交互约束统一在去噪过程中，从而首次实现面向情绪控制的人类反应合成。
-
-
 
 ## 核心方法与创新机理
 
@@ -125,8 +121,6 @@ $$L_{total} = L_{rc} + L_{react} + L_{bone} + L_{smooth} + L_{foot} + L_{emo}$$
 - **损失项**：去除 $L_{react}$ 或 $L_{emo}$ 均导致 FID 上升和 ACC 下降，证实了情感约束与反应约束的不可或缺（Table 7）。
 
 最终，E-React 在 Inter-X-e 数据集的情感条件反应生成任务中，FID 低至 1.94，ACC 达 0.86，用户研究表明其生成的反应与真实动作几乎无法区分（得分 83 vs GT 87），远超其他基线方法。
-
-
 
 E-React 的整体框架围绕一个核心洞察构建：**在短时序窗口内，同一运动序列的不同片段承载着一致的情感特征**。基于此，方法通过两条协同主线——情感先验学习与对称扩散生成——实现对反应运动的情感可控合成。
 
@@ -177,13 +171,6 @@ $$L_{emo} = \frac{(\hat{e}_{emo} - \mu)^2}{2\sigma^2}$$
 - **对称架构与清洁演员运动**：不同于将演员运动编码为外部条件向量的做法，对称架构让演员与反应者共享网络参数，演员运动始终保持未加噪状态，仅通过交叉注意力传递空间关系。这既保留了 3D 空间交互的精确性，又避免了演员运动加噪引入的干扰。
 
 图 2 展示了完整的框架概览，图 3 则详细说明了半监督训练中标注数据与无标注数据的协同利用方式。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1680_E_React_Towards_Emotionally_Controlled_Synthesis_of_Human_Reactions/figures/012_Figure_5.jpg]]
-*Figure 5: Illustration of the emotion annotation process*
-
-
 
 E-React 框架的核心由两个紧密耦合的模块构成：**半监督情感先验网络**与**对称 Actor-Reactor 扩散模型**。前者从有限标注的运动数据中解耦出连续的情感表示，后者则在该情感嵌入的引导下，以空间一致的方式生成反应运动。
 
@@ -261,13 +248,6 @@ $$ \mathcal{L}_{emo} = \frac{(\hat{e}_{emo} - \mu)^2}{2\sigma^2} $$
 
 其余损失项包括：$\mathcal{L}_{rc}$（重建损失）、$\mathcal{L}_{bone}$（骨骼长度约束）、$\mathcal{L}_{smooth}$（运动平滑性）、$\mathcal{L}_{foot}$（足部接触一致性），共同保障生成运动的物理合理性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1680_E_React_Towards_Emotionally_Controlled_Synthesis_of_Human_Reactions/figures/003_Figure_3.jpg]]
-*Figure 3: Illustration of the semi-supervised training process. For motion sequences with emotional annotations, we employ ground-truth label to supervise the predicted results. For unlabeled motion data, we first generate multiple shorter motion clips through repeated sampling, and then train the model using emotion consistency constraints across these clips*
-
-
-
 ## 实验与关键发现
 
 ### 任务定义与评估协议
@@ -341,9 +321,6 @@ E-React聚焦于**情感条件的人类反应生成**：给定演员运动序列
 
 #### 损失函数贡献（Table 7）
 
-![[assets/figures/papers/paper_list_l1680_E_React_Towards_Emotionally_Controlled_Synthesis_of_Human_Reactions/figures/011_Table_7.jpg]]
-*Table 7: Ablation results of our proposed loss terms*
-
 逐一去除各损失项的消融表明，**反应损失 $L_{react}$** 和 **情感损失 $L_{emo}$** 对性能贡献最为关键。去除 $L_{react}$ 导致 FID 上升，因为模型失去了对演员-反应者空间关系的显式约束；去除 $L_{emo}$ 则使 ACC 显著下降，证明情感损失是维持生成反应情感一致性的核心机制。
 
 ---
@@ -351,12 +328,6 @@ E-React聚焦于**情感条件的人类反应生成**：给定演员运动序列
 ### 用户研究：人类感知验证
 
 用户研究分为两部分（Table 9, Table 10）：
-
-![[assets/figures/papers/paper_list_l1680_E_React_Towards_Emotionally_Controlled_Synthesis_of_Human_Reactions/figures/017_Table_10.jpg]]
-*Table 10: User study Part.1: The number of times each method’s reaction is selected*
-
-![[assets/figures/papers/paper_list_l1680_E_React_Towards_Emotionally_Controlled_Synthesis_of_Human_Reactions/figures/016_Table_9.jpg]]
-*Table 9: User study Part.2: Results demonstrating consistency between our model predictions and human emotional judgments*
 
 - **偏好选择**（Table 10）：参与者被要求从真实动作和多个方法生成的反应中选择最自然的一个。E-React 生成的反应被选择次数为 **83**，与真实动作（GT）的 **87** 几乎无法区分，远超其他基线方法。
 - **情感一致性**（Table 9）：参与者判断生成反应所表达的情感是否与指定情感一致。E-React 在情感一致性评分上表现优异，表明生成的反应不仅运动质量高，且情感表达准确、可被人类感知。
@@ -372,9 +343,6 @@ E-React聚焦于**情感条件的人类反应生成**：给定演员运动序列
 3. **交互类型受限**：目前仅处理两人交互场景，尚未扩展到多人或人-物交互。
 4. **情感控制粒度粗**：情感控制依赖预定义的 7 类高斯先验，无法实现情感强度的连续调节或情感混合。
 
-![[assets/figures/papers/paper_list_l1680_E_React_Towards_Emotionally_Controlled_Synthesis_of_Human_Reactions/figures/009_Table_5.jpg]]
-*Table 5: The number of samples for different emotions in our Inter-X-e dataset*
-
 ---
 
 ### 开放问题
@@ -384,8 +352,6 @@ E-React聚焦于**情感条件的人类反应生成**：给定演员运动序列
 3. 能否将情感-反应框架推广到多人交互、人-物交互等多智能体动态场景？
 4. 如何实现情感强度的连续控制或情感混合，使反应生成更加细腻自然？
 5. 多模态控制信号的融合仍是一个开放挑战，特别是在有限数据下如何有效结合文本、语音和情感。
-
-
 
 ## 定位与知识库关联
 
@@ -437,8 +403,6 @@ E-React 揭示的开放问题指向以下研究方向：
 **连续情感控制**：如何实现情感强度的连续控制或情感混合，使反应生成更加细腻自然？从离散高斯先验到连续情感空间的映射是一个关键挑战。
 
 **多模态信号融合**：多模态控制信号的融合仍是一个开放挑战，特别是在有限数据下如何有效结合文本、语音和情感。E-React 目前仅使用情感标签和运动数据，未来可探索文本描述、语音语调等多模态情感线索的整合。
-
-
 
 ## 原文 PDF
 

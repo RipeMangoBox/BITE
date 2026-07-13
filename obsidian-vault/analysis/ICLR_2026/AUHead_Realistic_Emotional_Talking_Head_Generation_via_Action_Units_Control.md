@@ -46,8 +46,6 @@ claims:
 
 AUHead（ICLR 2025）提出了一种基于面部动作单元（Action Units, AU）控制的两阶段情感说话头生成框架。该方法的核心创新在于：利用大型音频语言模型（Audio Language Model, ALM）从原始音频中解耦出细粒度的AU序列，再通过AU驱动的可控扩散模型合成情感丰富、身份一致且音唇同步的说话头视频。在MEAD和CREMA数据集上的定量实验以及用户研究均表明，AUHead在情感表达、视频质量和音唇同步方面全面超越了现有最先进方法。
 
-
-
 现有音频驱动说话头生成方法在情感控制方面存在根本性瓶颈：它们通常依赖粗粒度的情感标签（如“快乐”、“悲伤”）或隐式情感编码，无法捕捉语音中嵌入的微妙情感线索，导致生成的面部表情生硬、不自然。具体而言，现有方法面临以下挑战：
 
 - **粗粒度情感控制**：使用离散情感类别或简单嵌入，无法表达同一情感类别内的强度差异和混合情感。
@@ -55,8 +53,6 @@ AUHead（ICLR 2025）提出了一种基于面部动作单元（Action Units, AU�
 - **音频-视觉鸿沟**：音频信号与面部运动之间存在复杂的非线性映射，直接端到端学习难以捕捉精细的肌肉运动模式。
 
 AUHead的因果旋钮（causal knob）在于：将面部动作单元（AU）作为音频与视觉之间的结构化中间表示。AU源自Facial Action Coding System (FACS)（Ekman & Friesen, 1978），提供了一套标准化的面部肌肉运动描述框架。通过ALM从音频中解耦出AU序列，并用其显式控制扩散模型的生成过程，AUHead实现了细粒度、可解释的情感控制。
-
-
 
 ## 核心方法与创新机理
 
@@ -71,8 +67,6 @@ AUHead的核心洞察在于：利用大型音频语言模型（ALM）的语音�
 5. **AU-视觉交叉注意力**：在扩散模型骨干中插入零初始化的交叉注意力层，实现AU嵌入与视觉潜在之间的跨模态交互。
 6. **AU解耦引导策略**：推理时分别用引导尺度s^AU和s^H控制AU和其他条件（如音频、运动先验）的强度，实现情感表达与视觉质量的最佳平衡。
 
-
-
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__image_and_video_generation__b001_dmzlAUkulz_AUHead_Realis/figures/001_Figure_1.jpg]]
 *Figure 1: Framework comparison between existing talking head generation and our AUHead. (a) Direct generation from audio and portrait. (b) Our method: audio understanding via ALM, and then generation.*
 
@@ -81,8 +75,6 @@ AUHead采用两阶段框架（Figure 2）：
 **Stage 1: ALM AU解耦**：以Audio-Qwen-Chat（Chu et al., 2023）为骨干，通过LoRA（Hu et al., 2022）微调，使其具备从音频中生成AU序列的能力。输入为原始音频，输出为24维AU序列（5 fps）。该阶段采用空间-时间AU分词和CoT机制，将AU预测转化为语言建模任务。
 
 **Stage 2: AU驱动可控生成**：以预训练的扩散模型（Hallo V1（Xu et al., 2024）或MEMO（Zheng et al., 2024））为骨干，通过AU表示模块、上下文感知AU嵌入和AU-视觉交叉注意力机制，将AU序列注入生成过程。输入为参考图像、音频和AU序列，输出为情感丰富、身份一致的说话头视频。
-
-
 
 ### 5.1 潜在扩散模型
 
@@ -127,8 +119,6 @@ AU适配器采用零初始化（zero-initialization）以确保训练稳定性�
 $$\hat{\epsilon} = \mathcal{L}_{\boldsymbol{\theta}}(z_t, \boldsymbol{\phi}, \mathbf{c}^{\mathrm{AU}}) + s^H \cdot [ \mathcal{L}_{\boldsymbol{\theta}}(z_t, \mathbf{c}^H, \boldsymbol{\phi}) - \mathcal{L}_{\boldsymbol{\theta}}(z_t, \boldsymbol{\phi}, \boldsymbol{\phi}) ] + s^{\mathrm{AU}} \cdot [ \mathcal{L}_{\boldsymbol{\theta}}(z_t, \mathbf{c}^H, \mathbf{c}^{\mathrm{AU}}) - \mathcal{L}_{\boldsymbol{\theta}}(z_t, \mathbf{c}^H, \boldsymbol{\phi}) ] \quad \text{(Section 3.4)}$$
 
 其中$s^{\mathrm{AU}}$和$s^H$分别控制AU和其他条件（如音频、运动先验）的引导强度。实验表明，最优的AU引导尺度为3.5（Figure 3），在此尺度下视觉质量（FID）与情感表达（Emotion ACC, MAE）达到最佳平衡。
-
-
 
 ## 实验与关键发现
 
@@ -182,12 +172,8 @@ Figure 4展示了AUHead与SOTA方法在MEAD和CREMA上的定性比较。AUHead�
 
 Figure 7展示了AUHead在10秒序列上的泛化能力，涵盖线稿素描、油画肖像和真实人脸三种视觉风格，验证了模型在不同输入域下的鲁棒性。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__image_and_video_generation__b001_dmzlAUkulz_AUHead_Realis/figures/014_Table_5.jpg]]
 *Table 5: Explanation of redefined AUs from the FEAFA+ dataset.*
-
-
 
 ## 定位与知识库关联
 
@@ -202,8 +188,6 @@ AUHead在音频驱动说话头生成方法谱系中占据独特位置：
 **与多模态大语言模型方法的关系**：OmniHuman-1.5等方法利用多模态大语言模型进行引导，AUHead则专注于利用音频语言模型（ALM）的语音理解能力进行AU解耦，为情感控制提供了更精细、更可解释的解决方案。
 
 **知识库定位**：AUHead的核心贡献在于将面部动作单元（AU）这一心理学和计算机视觉领域的成熟概念引入音频驱动说话头生成任务，通过ALM实现从音频到AU的自动解耦，并通过可控扩散模型实现AU驱动的细粒度情感控制。该方法在情感表达的可控性、可解释性和生成质量之间取得了新的平衡，为情感说话头生成领域提供了新的技术路径。
-
-
 
 ## 原文 PDF
 

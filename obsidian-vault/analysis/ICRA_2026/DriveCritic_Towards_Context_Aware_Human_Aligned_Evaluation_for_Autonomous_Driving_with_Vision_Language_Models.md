@@ -70,8 +70,6 @@ $$\mathrm{EPDMS} = \left( \prod_{m \in \mathcal{M}_{\mathrm{pen}}} s_m \right) \
 
 DriveCritic 在方法谱系中处于**基于 VLM 的评估器**这一新兴方向，区别于传统规则化指标和纯监督学习分类器。其核心贡献在于证明了通过精心设计的偏好数据集和两阶段强化学习训练，VLM 可以被塑造为与人类高度对齐的驾驶评估器。然而，当前方法仍面临若干局限：数据集仅覆盖 NAVSIM 中的两种特定场景模式，泛化性有待验证；偏好标注由单一专家完成，可能存在主观偏差；VLM 推理的计算成本远高于规则化指标，制约大规模部署。
 
-
-
 自动驾驶系统的闭环评估高度依赖开环指标来筛选候选规划器，因为在真实世界中穷举测试每一种驾驶场景既不安全也不经济。然而，当前最先进的开环评估指标——扩展预测驾驶模型得分（EPDMS，Cao et al., CoRL 2025）——虽然通过组合安全惩罚项与轨迹质量子分数实现了多维度量化，却暴露了一个根本性的“语境盲点”：它无法理解驾驶行为的上下文合理性。
 
 这一缺陷的实证证据来自人类专家轨迹在EPDMS上的得分分析。如Table I所示，人类驾驶员在NAVSIM的navtrain和navtest两个子集上的EPDMS总分分别仅为0.92和0.90，远未达到理论满分。进一步拆解子分数发现，自车进度（EP）和车道保持（LK）两项指标明显偏低——navtrain上EP为0.88、LK为0.90，navtest上EP为0.87、LK为0.87。这意味着，即使是经验丰富的人类驾驶员所执行的安全、高效轨迹，也会被规则化指标系统性地“扣分”。
@@ -83,8 +81,6 @@ Figure 1中的动机示例直观地展示了这一矛盾：轨迹A为与相邻�
 这种评估与人类判断的严重不一致带来了两个连锁风险：其一，在开环评测阶段，真正符合人类偏好的规划器可能被规则化指标错误地淘汰；其二，以EPDMS为优化目标的规划器可能学会“应试”行为——刻意避免任何触发惩罚的动作，即使这些动作在真实驾驶中是必要且安全的。
 
 因此，本文的核心动机在于：构建一个能够像人类专家一样综合视觉场景信息与符号化指标、做出上下文感知偏好判断的评估器，从而填补规则化指标在“语境理解”上的根本性缺口。
-
-
 
 ## 核心方法与创新机理
 
@@ -130,8 +126,6 @@ EPDMS 输出单一连续标量分数，无法解释评估依据。DriveCritic �
 DriveCritic 的四项核心改变构成了一条完整的创新链条：**多模态输入提供上下文信息，VLM 骨干提供常识推理能力，两阶段训练实现人类偏好对齐，结构化输出保证可解释性与客观性**。这一链条使得评估器能够内化安全、进度与社会规范的复杂权衡，从而在成对偏好测试中以 76.0% 的准确率远超 EPDMS（41.4%）和零样本 VLM（48.0%）。
 
 **需要手动验证的点**：当前数据集仅覆盖 NAVSIM 中的两种特定场景类型（车道-进度权衡与纯进度对比），模型在更广泛驾驶场景下的泛化能力尚未验证；偏好标注由单一领域专家完成，标注准则的普适性有待多评分者间信度分析确认。
-
-
 
 DriveCritic 的整体框架围绕一个核心洞察构建：**利用视觉语言模型（VLM）的常识推理能力，将驾驶场景的视觉与符号线索映射到人类偏好，是克服规则化指标“语境盲点”的关键**。该框架将自动驾驶轨迹评估重新定义为一个**成对偏好判断任务**，并通过精心设计的多模态输入和两阶段训练，使 VLM 评估器能够内化安全、进度与社会规范的复杂权衡。
 
@@ -187,8 +181,6 @@ DriveCritic 的整体框架围绕一个核心洞察构建：**利用视觉语言
 
 当前框架的主要局限包括：数据集仅覆盖 NAVSIM 中两种特定场景（车道-进度权衡与纯进度对比），泛化性尚未在更多数据集上验证；偏好标注由单一领域专家完成，可能存在个人主观偏差；模型缺乏时序上下文，无法处理需要时序推理的动态场景；VLM 推理的计算成本远高于规则化指标，大规模部署时面临算力与能耗瓶颈。
 
-
-
 ### 规则化基线的结构缺陷：EPDMS 公式解析
 
 当前开环评估的 SOTA 指标 **EPDMS**（Extended Predictive Driver Model Score，Cao et al., CoRL 2025）采用乘积-加权混合结构：
@@ -227,8 +219,6 @@ DriveCritic 的训练分为两个关键阶段，消融实验（Table V）证明�
 $$\mathrm{RR} = \frac{1}{|D|} \sum_{i=1}^{|D|} \mathbb{I}[y^i = \hat{y}^{\bar{i}}]$$
 
 其中 $y^i$ 为原始顺序下的预测标签，$\hat{y}^{\bar{i}}$ 为交换 A/B 轨迹位置后的预测标签。该指标衡量模型是否过度依赖轨迹呈现顺序而非轨迹本身的质量。DriveCritic 的 RR 达到 81.8%，表明模型在绝大多数情况下保持了评估的客观性。
-
-
 
 ## 实验与关键发现
 
@@ -287,8 +277,6 @@ Table I 提供了理解规则化指标局限性的关键证据：人类专家轨
 
 4. **计算成本约束**：微调需 16 块 A100 GPU，推理需完整 VLM 前向传播。相比规则化指标的毫秒级计算，VLM 评估器的部署成本高出数个数量级，制约了大规模闭环评测中的实时应用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2510_13108/figures/004_Table.jpg]]
 *Table: II: Trajectory sampling pattern for the two focused case studies. Each sampled trajectory pair consists of the human trajectory and a vocabulary trajectory that matches the sub-scores pattern. The other subscores of the sampled trajectories are perfect. TABLE III: Number of trajectory pairs by split and data source. Case 1: lane-progress trade-off; Case 2: progress-only contrast*
 
@@ -303,8 +291,6 @@ Table I 提供了理解规则化指标局限性的关键证据：人类专家轨
 
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2510_13108/figures/008_Table.jpg]]
 *Table: VI: Robustness under trajectory-position flip on the DriveCritic test set. “No-flip acc.” and “flip acc.” are the standard accuracies before and after swapping the trajectory order. RR denotes robustness rate as defined above*
-
-
 
 ## 定位与知识库关联
 
@@ -345,8 +331,6 @@ $$\mathrm{EPDMS} = \left( \prod_{m \in \mathcal{M}_{\mathrm{pen}}} s_m \right) \
 **时序推理能力的融入。** 如何有效融合时序信息以处理动态场景？可能的方案包括：输入连续帧的视频而非静态图像；引入时序位置编码或记忆机制；或显式建模交通参与者的运动预测作为评估的辅助输入。
 
 **评估标准的可解释性。** DriveCritic生成的推理文本提供了评估的可解释性，但如何系统验证推理的正确性和完整性？如何确保模型不是因为“学会了说正确的话”而非“真正理解了场景”才做出正确判断？这需要设计更具挑战性的反事实测试和推理忠实度评估方法。
-
-
 
 ## 原文 PDF
 

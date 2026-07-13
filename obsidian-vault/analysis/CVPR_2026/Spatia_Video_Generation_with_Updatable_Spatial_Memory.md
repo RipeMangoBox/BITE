@@ -55,8 +55,6 @@ Spatia 提出了一种显式的、可更新的空间记忆机制来解决上述�
 
 目前该方法仍存在若干局限：空间记忆质量高度依赖点云估计精度；动静态解耦在复杂动态场景下可能失效；框架主要面向静态场景背景，在全动态场景中的适用性有待验证。后续研究可探索将空间记忆机制扩展到完全动态的4D场景，以及与更强的基础视频生成模型结合以进一步提升视觉质量与可控性。
 
-
-
 视频生成领域近年来取得了显著进展，大规模基础模型如 **Veo** (Google, 2024)、**Sora** (OpenAI, 2024)、**Kling** (Kuaishou, 2024) 和 **Hailuo** (MiniMax, 2024) 已展现出令人印象深刻的视觉质量。然而，现有模型面临一个核心瓶颈：由于视频数据的高维度特性，它们难以有效编码长时间历史信息，导致空间和时间一致性不足，尤其在需要重复访问同一场景位置时缺乏持久空间记忆。
 
 当前的方法可大致分为两类，各有其固有局限。静态场景生成模型如 **WonderJourney** (Yu et al., CVPR 2024)、**WonderWorld** (Yu et al., arXiv 2024) 和 **Voyager** 专注于生成场景的静态外观，但无法处理动态实体。另一方面，基础视频生成模型如 **VideoCrafter2**、**EasyAnimate**、**Allegro** (Zhou et al., arXiv 2024)、**CogVideoX-I2V** (Yang et al., arXiv 2024) 和 **Wan2.1** (Wan Team, arXiv 2025) 虽能生成动态内容，却通常缺乏持久记忆机制——它们仅依赖前一视频片段作为上下文，无法在长序列生成中维持空间一致性。
@@ -64,8 +62,6 @@ Spatia 提出了一种显式的、可更新的空间记忆机制来解决上述�
 近期一些工作开始探索空间记忆视频生成，如 **SEVA** (Zhou et al., arXiv 2025)、**VMem** (Li et al., arXiv 2025) 和 **ViewCrafter** (Yu et al., arXiv 2024)，试图在生成过程中引入某种形式的场景记忆。但这些方法尚未系统性地解决动静态解耦问题，也未充分利用三维几何信息作为生成条件。
 
 Spatia 的核心动机正是填补这一空白：通过显式维护一个三维场景点云作为持久空间记忆，并在每一轮生成中基于该记忆进行条件控制，实现静态场景与动态实体的解耦。其关键洞察在于利用视觉 SLAM 估计场景点云作为几何锚点，结合检索到的参考帧和投影场景视频，为视频生成提供几何一致的空间引导，同时通过动静态解耦保留动态内容的生成能力。这种设计使得模型能够在长序列、多视角、闭环等场景下保持稳健的空间一致性，并为 3D 交互式编辑等应用提供了基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -99,8 +95,6 @@ Spatia 利用 SAM2 对动态实体进行跟踪与分割，在更新空间记忆�
 
 Spatia 在 WorldScore 基准上取得平均分 69.73，显著优于最强基线 Voyager 的 66.08（Table 1）；在闭环评估中，PSNR_C 达 19.38，匹配准确率达 0.698，远超所有基线（Table 3），有力支撑了空间记忆机制的有效性。然而，该方法存在以下已知局限：点云估计精度直接影响生成质量，低质量几何重建会降低空间一致性；动静态解耦依赖 SAM2 分割，在复杂动态场景或运动模糊下可能失效；当前框架主要面向静态场景背景，对全动态场景的长序列记忆能力尚待验证；点云密度与存储开销之间存在权衡，实时编辑场景下可能面临效率挑战。
 
-
-
 Spatia 将视频生成重新定义为一个**多模态条件生成问题**，其核心创新在于引入并持续维护一个显式的三维场景点云作为**持久空间记忆**。整个框架围绕“估计—条件—生成—更新”的闭环展开，将静态场景几何与动态内容生成解耦。
 
 ### 训练阶段
@@ -126,9 +120,6 @@ $${V} = {T}^N \cup {P}^M \cup {C}^O$$
 
 推理阶段采用**迭代交互式**流程（见 Figure 4），将空间记忆的维护与用户控制紧密结合：
 
-![[assets/figures/papers/paper_list_l2596_https_arxiv_org_abs_2512_15716/figures/009_Figure_4.jpg]]
-*Figure 4: Illustration of the Spatia inference process. At the first iteration, the user provides an initial image, from which Spatia estimates the initial 3D scene point cloud. The user then specifies a text instruction and a camera path based on the estimated scene, producing a projection video along the desired trajectory that conditions the generation of clip-1. In subsequent iterations, two steps are performed: (1) Spatia updates the spatial memory (3D scene point cloud) using all previously generated frames via MapAnything [42]; and (2) the user specifies a new text instruction and camera path based on the updated scene. Spatia then takes the reference frames (generated as described in Section...*
-
 1. **初始化**：用户提供初始图像，Spatia 通过 MapAnything 估计初始三维场景点云，作为空间记忆的起点。
 
 2. **迭代生成**：在每一轮迭代中，用户基于当前场景点云指定文本指令和相机轨迹。系统沿该轨迹渲染场景投影视频，结合检索到的参考帧和上一轮生成的前序视频片段，通过训练好的条件生成网络产生新的视频片段。
@@ -137,12 +128,8 @@ $${V} = {T}^N \cup {P}^M \cup {C}^O$$
 
 这一闭环设计使得 Spatia 能够在长序列生成中持续保持空间一致性——当相机轨迹回到初始视点时，生成的最终帧与初始图像在几何和外观上高度吻合，这是传统无记忆模型无法实现的。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2596_https_arxiv_org_abs_2512_15716/figures/007_Figure_3.jpg]]
 *Figure 3: we then generate view-specific scene point cloud sequences for both the target and preceding clips. (b) The most spatially relevant frames are then retrieved from the candidate-frame set as reference frames. (c) The spatial conditions obtained from (a) and (b) guide the video generation process. The detailed network architecture is provided in Figure 3*
-
-
 
 Spatia 的核心架构围绕“可更新的三维空间记忆”展开，将长视频生成转化为一个多模态条件生成问题。整个框架由四个关键模块串联而成，并通过 Flow Matching 训练范式统一优化。
 
@@ -158,9 +145,6 @@ Spatia 的核心架构围绕“可更新的三维空间记忆”展开，将长�
 
 Spatia 的生成主干基于 **Wan2.2** 架构，并在每个网络块中引入并行的 **ControlNet** 块以融合场景点云条件。具体而言，每个网络块由 1 个 ControlNet 块与 4 个主块并行构成（Figure 3），ControlNet 块接收场景投影视频作为输入，其输出特征以加法方式注入主块，实现几何条件与生成主干的深度融合。文本指令、参考帧和前序视频则作为常规条件信号输入主块。
 
-![[assets/figures/papers/paper_list_l2596_https_arxiv_org_abs_2512_15716/figures/008_Figure_3.jpg]]
-*Figure 3: Illustration of a single network block composed of one ControlNet [115] block operating in parallel with four main blocks. Detailed definitions of all token types are provided in Figure 2*
-
 ### 3.4 Flow Matching 训练
 
 模型训练采用 Flow Matching 范式，优化目标为最小化网络预测速度 $\mathbf{v}_t$ 与真实速度 $\mathbf{u}_t$ 之间的均方误差：
@@ -172,8 +156,6 @@ $$\mathcal{L} = \mathbb{E}_{t, \mathbf{x}_0, \boldsymbol{X}_T} \left\| \mathbf{v
 ### 3.5 推理阶段的空间记忆更新
 
 推理过程（Figure 4）以迭代交互方式展开。首轮迭代中，用户提供初始图像，Spatia 据此估计初始三维场景点云；用户随后指定文本指令和基于场景估计的相机轨迹，生成对应的投影视频作为条件，产出第一个视频剪辑。在后续迭代中，Spatia 利用所有已生成帧通过 MapAnything 更新全局点云，用户基于更新后的场景指定新的指令和相机路径，模型以上一轮生成的视频剪辑、检索到的参考帧以及新的投影视频为条件，生成下一段视频。这一闭环更新机制确保了长序列生成中的几何一致性。
-
-
 
 ## 实验与关键发现
 
@@ -216,27 +198,11 @@ Spatia 在多个基准上进行了系统评估，覆盖视觉质量、空间记�
 
 Spatia 的性能高度依赖点云估计精度。当 MapAnything 在低纹理区域或复杂几何结构下产生低质量重建时，投影视频的几何引导作用减弱，生成视频的空间一致性随之下降。动静态解耦基于 SAM2 分割，在运动模糊、遮挡或复杂动态场景下可能出现分割失败，导致动态伪影污染静态记忆。此外，当前框架主要针对静态场景背景设计，对完全动态的 4D 场景（如大规模人群、流体运动）的长序列记忆能力尚未验证，这是从“静态记忆”迈向“通用时空记忆”的关键挑战。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2596_https_arxiv_org_abs_2512_15716/figures/010_Table_1.jpg]]
 *Table 1: Visual quality comparison on the WorldScore benchmark. The final Static and Dynamic world scores are computed by aggregating all relevant metrics. The Average score represents the mean of the static and dynamic world scores. Static scene generation models cannot handle dynamic entities, while foundation video generation models typically lack persistent memory mechanisms*
 
 ![[assets/figures/papers/paper_list_l2596_https_arxiv_org_abs_2512_15716/figures/011_Table_2.jpg]]
 *Table 2: Evaluation on RealEstate. We reproduce the results of all baseline methods using their default configurations and evaluate them on the same test samples to ensure a fair comparison*
-
-![[assets/figures/papers/paper_list_l2596_https_arxiv_org_abs_2512_15716/figures/015_Table_4.jpg]]
-*Table 4: Impact of incorporating scene projection videos and reference frames on spatial memory modeling. The “Camera Control” metric is adopted from the WorldScore benchmark*
-
-![[assets/figures/papers/paper_list_l2596_https_arxiv_org_abs_2512_15716/figures/016_Table_5.jpg]]
-*Table 5: Effects of using different numbers of reference frames*
-
-![[assets/figures/papers/paper_list_l2596_https_arxiv_org_abs_2512_15716/figures/012_Table_6.jpg]]
-*Table 6: Memory mechanisms ensure spatial consistency and preserve visual quality in long-horizon generation*
-
-![[assets/figures/papers/paper_list_l2596_https_arxiv_org_abs_2512_15716/figures/014_Table_7.jpg]]
-*Table 7: Impact of point cloud density on visual quality. Metrics are computed between the generated videos and the ground-truth videos on the RealEstate test set*
-
-
 
 ## 定位与知识库关联
 
@@ -272,8 +238,6 @@ Spatia 的设计假设决定了其最佳应用场景与能力边界：
 2. **与更强基础模型的结合**：当前 Spatia 基于 Wan2.2 架构，若能结合更大规模的 DiT 基础模型（如 Sora、Veo 等），有望进一步提升视觉质量与可控性，但需要解决大规模点云条件注入的效率问题。
 3. **实时交互优化**：3D 感知编辑中的交互延迟问题如何通过增量式 SLAM、稀疏点云表示或异步更新策略来优化，以支持更流畅的用户体验。
 4. **空间记忆的泛化性**：当前空间记忆在闭环评估中表现优异，但其在开放域、长距离探索场景下的泛化能力——特别是当新生成区域与已有记忆产生几何冲突时的一致性维护——仍需进一步研究。
-
-
 
 ## 原文 PDF
 

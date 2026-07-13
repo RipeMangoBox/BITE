@@ -56,8 +56,6 @@ claims:
 
 实验表明，DiverseGRPO在多个骨干模型（SD3.5-M、Flux.1-dev）和奖励模型（PickScore、HPSv3）上均取得显著提升：在匹配质量分数下，语义多样性提升13%～18%，FID指标降低约23%。消融实验证实，两个模块协同作用才能达到最优的质量-多样性平衡。
 
-
-
 ### 文本到图像生成中的奖励微调
 
 以扩散模型和流匹配为基础的文本到图像生成模型在图像质量和文本对齐方面取得了显著进展。为进一步提升生成结果与人类偏好的契合度，研究者引入了基于人类反馈的强化学习（RLHF）和直接偏好优化（DPO）等对齐技术。其中，**Flow-GRPO**（Liu et al., arXiv 2025）将组相对策略优化（GRPO）适配到流匹配框架中，通过奖励模型对生成样本打分，利用组内标准化计算优势函数，并结合KL散度正则化约束策略更新，成为当前图像生成领域奖励微调的代表性基线方法。
@@ -89,8 +87,6 @@ $$\frac{d w_{k}}{d t} = w_{k} \left( \bar{r}_{k} - \mathbb{E}_{j} \left[ \bar{r}
 
 基于这两点洞察，DiverseGRPO旨在通过分布级创新奖励和结构感知正则化的协同设计，在不牺牲生成质量的前提下重建质量-多样性的帕累托前沿。
 
-
-
 ## 核心方法与创新机理
 
 DiverseGRPO 的核心创新在于识别并修复了标准 GRPO 训练中导致模式坍缩的两个结构性缺陷：**奖励信号的单样本短视**和**正则化策略的去噪动态失配**。方法通过两个相互协同的模块——分布级创新奖励（Distributional Creativity Bonus）和结构感知正则化（Structure-Aware Regularization）——在保持甚至提升图像质量的同时，将语义多样性提升了 13%～18%。
@@ -121,8 +117,6 @@ DiverseGRPO 将正则化策略从“均匀 KL 散度施加于所有去噪步”�
 
 DiverseGRPO 处于 **GRPO 微调图像生成模型** 的方法谱系中，与 Flow-GRPO（Liu et al., arXiv 2025）构成直接继承与改进关系。相较于其他缓解模式坍缩的方法（如增加噪声注入、温度调节、或使用多样性正则化项），DiverseGRPO 的独特之处在于：(1) 通过谱聚类将多样性显式建模为分布级奖励，而非隐式的正则化项；(2) 根据去噪轨迹动态调整正则化预算，而非静态施加约束。方法在多个骨干模型（SD3.5-M, Flux.1-dev）和奖励模型（PickScore, HPSv3）上验证了泛化性，但尚未扩展到文本或视频生成等多模态任务。
 
-
-
 DiverseGRPO 在 Flow-GRPO（Liu et al., arXiv 2025）的基础上引入两个关键模块，构成一个两阶段的多样性保护训练流水线。其核心设计理念是：**模式坍缩并非奖励优化的必然结果，而是单样本奖励的分布盲区和均匀KL正则化对去噪动态的失配共同导致的**。因此，流水线从“奖励信号”和“正则化策略”两个维度同时介入，重新平衡探索-利用关系。
 
 整体训练流程如下：
@@ -137,12 +131,8 @@ DiverseGRPO 在 Flow-GRPO（Liu et al., arXiv 2025）的基础上引入两个关
 
 两个模块的协同作用通过消融实验得到验证：单独使用任一模块均无法达到最优的质量-多样性帕累托前沿，只有 **SA-Reg + Creativity Reward** 的组合才能同时实现多样性提升和质量保持（Fig. 5(a)）。训练过程中，DiverseGRPO 的多样性下降速度显著慢于 Flow-GRPO 基线，且因探索奖励的存在，后期仍能持续生成稀有多样样本（Fig. 6, Fig. 7）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2670_https_arxiv_org_abs_2512_21514/figures/001_Figure_1.jpg]]
 *Figure 1: (a) Image generation models trained with GRPO suffer from mode collapse (similar faces, camera angles, etc.), which limits their applicability in creative scenarios. (b) The proposed DiverseGRPO method achieves higher diversity while maintaining comparable quality. (c) DiverseGRPO successfully maintains a healthier level of diversity across the entire duration of training, while the baseline method suffers from a premature collapse. (d) In the Inception feature space, DiverseGRPO generates images that cover a significantly broader range of semantic features, effectively mitigating mode collapse*
-
-
 
 DiverseGRPO 在标准 Flow-GRPO 框架（Liu et al., arXiv 2025）的基础上，针对模式坍缩的两个根本原因——单样本奖励缺乏分布视角、均匀 KL 正则化忽视去噪动态——引入了两个关键模块：**分布级创新奖励（Distributional Creativity Bonus）** 和 **结构感知正则化（Structure-Aware Regularization）**。
 
@@ -208,12 +198,8 @@ $$\mathcal{L}_{\mathrm{reg}}(t) = \begin{cases} \frac{\|\bar{\mathbf{x}}_{t+\Del
 
 两个模块从不同维度解决模式坍缩问题：**创新奖励**通过分布级信号重新平衡探索-利用，防止模型过早收敛到少数高奖励模式；**SA-Reg** 通过时空调度保护多样性关键期，防止早期去噪阶段的模式灭绝。两者协同实现了在不牺牲质量前提下重建质量-多样性的帕累托前沿。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2670_https_arxiv_org_abs_2512_21514/figures/003_Figure_3.jpg]]
 *Figure 3: DiverseGRPO employs two primary strategies to mitigate mode collapse: (a) A distributional creativity bonus mechanism based on semantic grouping. It begins by applying spectral clustering to images generated from the same caption, then assigns exploratory rewards according to cluster size to encourage the emergence of novel visual modes. (b) Structure-aware regularization imposes stronger constraints during the initial denoising stages to preserve sample diversity, while gradually relaxing the penalty in later stages to enhance the effectiveness of reward optimization*
-
-
 
 ## 实验与关键发现
 
@@ -273,16 +259,6 @@ Figure 4 的定性对比展示了基线方法与 DiverseGRPO 在生成多样性�
 2. **超参数敏感性：** β 和 K 需要针对具体骨干网络和奖励模型进行调整，且饱和后的边际收益受限。方法缺乏自动确定最优聚类簇数的机制，可能影响对不同提示复杂度的适应性。
 3. **任务范围限制：** 当前验证仅限于图像生成的 GRPO 训练框架，尚未扩展到文本或视频等多模态生成任务。方法在更广泛生成场景中的有效性仍有待检验。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2670_https_arxiv_org_abs_2512_21514/figures/006_Figure.jpg]]
-*Figure: (a) Contribution of each module (b) Creativity reward coefficient (c) Structure-aware regularization steps*
-
-![[assets/figures/papers/paper_list_l2670_https_arxiv_org_abs_2512_21514/figures/002_Figure_2.jpg]]
-*Figure 2: Analysis of the reasons for mode collapse: (Left) Policy model collapse into high-reward modes due to single sample reward modeling. (Right) Conventional regularization neglects the dominant role of early-stage denoising in preserving diversity*
-
-
-
 ## 定位与知识库关联
 
 ### 基线关系与差异化定位
@@ -312,8 +288,6 @@ DiverseGRPO 的验证范围覆盖了两种主流骨干模型（SD3.5-M 和 Flux.
 1. 如何自动确定最优聚类簇数以适应不同提示的视觉模式数量？当前方法依赖预设参数，而不同 prompt 的语义模式数量天然存在差异。
 2. 探索奖励能否与更精细的任务特定美学奖励（如风格一致性、构图质量）进一步集成，形成更全面的奖励信号？
 3. 在大规模生产环境下，该方法对实时生成的延迟和资源消耗的实际影响如何？这决定了其从研究到部署的可迁移性。
-
-
 
 ## 原文 PDF
 

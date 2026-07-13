@@ -56,8 +56,6 @@ claims:
 
 **主要结果**：在 PHOENIX14T 测试集上，FGDM 的 WER 降至 70.70%，较此前最优的扩散方法 **Sign-IDD**（Tang et al., AAAI 2025）降低 8.45%，同时 BLEU-4 达到 9.67% 的新 SOTA。消融实验表明，引入 Focal 阶段使 WER 相对基线降低 5.85%，叠加 SCG 后进一步降至 9.06%，验证了各组件的独立贡献。在 USTC-CSL 数据集上，FGDM 同样在两个划分方案上全面超越现有方法。
 
-
-
 手语生成（Sign Language Production, SLP）旨在将口语文本自动转化为连续的手语姿态序列，是打破聋人与听人之间沟通壁垒的关键技术。典型的 SLP 流程包含两个串联子任务：文本到注释（Text-to-Gloss, T2G）和注释到姿态（Gloss-to-Pose, G2P）。其中 G2P 负责将离散的手语注释序列映射为连续、自然的人体关键点坐标，其生成质量直接决定最终手语的可懂度与自然度。本文聚焦于 G2P 这一核心环节。
 
 当前 G2P 方法面临两个相互关联的瓶颈。其一，现有工作普遍采用全局建模策略——无论是自回归框架（如 **Progressive Transformer**，Saunders et al., ECCV 2020）还是扩散框架（如 **Sign-IDD**，Tang et al., AAAI 2025；**G2P-DDM**，Xie et al., AAAI 2024），均以整个姿态序列为单元进行生成，忽略了对关节级别细粒度依赖的显式建模。这导致生成姿态的局部细节（如手指形态、手腕角度）容易失真，尤其在快速过渡或复杂手势中表现明显。其二，主流方法仅依赖回归损失（L1/L2）进行监督，缺乏有效的跨模态语义对齐机制，使得生成姿态虽在数值上接近真值，却在语义层面与目标注释序列产生偏差。
@@ -65,8 +63,6 @@ claims:
 上述问题的根源在于：G2P 任务本质上要求模型同时掌握“局部关节协同”与“全局序列连贯”两个层次的依赖结构，而现有方法将二者混杂在单一建模过程中，造成全局偏差对局部细节的淹没效应。此外，扩散模型虽然展现出优异的生成多样性，但其随机采样特性在没有语义约束的情况下，难以保证生成结果与输入注释的严格对应。
 
 针对这些缺口，本文提出**分层扩散模型（Focal-General Diffusion Model, FGDM）**，核心动机是将 G2P 分解为两个阶段：先通过 Focal 阶段建模关节级空间-时间依赖，再通过 General 阶段实现全局序列的连贯聚合。同时引入**语义一致性引导（Semantic Consistent Guidance, SCG）**，在扩散训练过程中注入基于 CTC 对齐的跨模态语义监督，在不牺牲生成多样性的前提下显著提升语义保真度。
-
-
 
 ## 核心方法与创新机理
 
@@ -122,8 +118,6 @@ $$\mathcal{L} = \mathcal{L}_{joint} + \lambda \cdot \mathcal{L}_{bone} + \gamma 
 
 值得注意的是，当前语义掩码生成器 $\mathcal{MG}(\cdot)$ 仅采用简单的线性层实现，其表达能力有限，可能无法充分挖掘 gloss 特征中的语义信息。此外，FGDM 目前仅针对 G2P 子任务设计，尚未涵盖从文本到姿态的完全端到端建模。
 
-
-
 FGDM 的核心设计理念是将姿态去噪过程分解为“先局部关节建模、再全局序列聚合”的两个阶段，并引入跨模态语义一致性引导，从而克服现有 G2P 方法因全局偏差导致的局部细节失真和语义不一致问题。
 
 ### 两阶段去噪范式
@@ -150,15 +144,8 @@ SCG 的独特之处在于，它在扩散训练过程中首次引入了跨模态�
 
 整个框架的创新点在于：通过 Focal–General 两阶段设计改变了去噪网络的依赖结构，使模型能够先关注局部关节的精确建模，再聚合为全局连贯序列；同时通过 SCG 将语义信号注入扩散训练，实现了跨模态的细粒度对齐。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l989_https_openaccess_thecvf_com_content_CVPR2026_html_Yu_Focal_General_Diffu/figures/002_Figure_2.jpg]]
 *Figure 2: Overall pipeline of FGDM during training and inference. In training, the noisy sequence*
-
-![[assets/figures/papers/paper_list_l989_https_openaccess_thecvf_com_content_CVPR2026_html_Yu_Focal_General_Diffu/figures/001_Figure_1.jpg]]
-*Figure 1: Top: Illustration pipeline of SLP, including T2G and G2P. T2G converts text into glosses, while G2P maps each gloss to its corresponding pose sequence and generates smooth transitions to ensure naturalness. This work primarily focuses on G2P. Bottom: Comparison with existing methods on the challenging PHOENIX14T [5] dataset. Our approach achieves new SOTA results across all metrics on both DEV and TEST sets*
-
-
 
 ### 1. 两阶段去噪框架
 
@@ -228,13 +215,6 @@ $$X_{t'} = \sqrt{\bar{a}_{t'}} \cdot \hat{X}_0 + \sqrt{1 - \bar{a}_{t'} - \sigma
 
 消融实验（Table 3）证实，引入 Focal 阶段后 DEV 上 BLEU-1 提升至 28.09%，WER 降低 -4.43%/-5.85%；叠加 SCG 后 WER 进一步降低至 -8.78%/-9.06%（较基线），验证了两阶段去噪与语义引导的协同增益。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l989_https_openaccess_thecvf_com_content_CVPR2026_html_Yu_Focal_General_Diffu/figures/003_Figure_3.jpg]]
-*Figure 3: Illustration of ASGCN. Taking the i-th frame as an example, ASGCN constructs a frame-wise adaptive adjacency matrix by integrating (a) contextual correlations*
-
-
-
 ## 实验与关键发现
 
 ### 核心主张与证据强度
@@ -276,18 +256,10 @@ Table 4 展示了 Focal 阶段层数 $L_1$ 和 General 阶段层数 $L_2$ 的消
 
 Figure 4 对比了 FGDM 与 PT、Sign-IDD 的生成质量。在放大区域 (a)–(c) 中，FGDM 生成的手部细节更自然且与 GT 姿态一致；即使在 GT 不准确的情况下（如 (b)(c)），FGDM 仍能产生逼真结果。Figure 5 进一步对比了有无 Focal 阶段的生成效果，验证了 Focal 阶段对局部细节建模的贡献。
 
-![[assets/figures/papers/paper_list_l989_https_openaccess_thecvf_com_content_CVPR2026_html_Yu_Focal_General_Diffu/figures/009_Figure_4.jpg]]
-*Figure 4: Qualitative comparison of generation quality with previous methods on PHOENIX14T. We compare FGDM with PT [31] and Sign-IDD [41], together with the corresponding gloss sequence, raw images, and ground truth (GT) poses. Panels (a)–(c) present zoomedin regions where FGDM generates more natural and GT-consistent hand details. Even when the GT is inaccurate (as in (b) (c)), FGDM still produces realistic results, demonstrating its superior performance*
-
-![[assets/figures/papers/paper_list_l989_https_openaccess_thecvf_com_content_CVPR2026_html_Yu_Focal_General_Diffu/figures/010_Figure_5.jpg]]
-*Figure 5: Qualitative comparison of generation quality without and with the Focal stage (w/o Focal vs. w/ Focal). Hand details are enlarged for better observation*
-
 ### 已知局限
 
 1. 语义掩码生成器 $\mathcal{MG}(\cdot)$ 目前仅使用线性层实现，表达能力有限，可能无法充分挖掘语义信息来指导图结构。
 2. 方法仅针对 G2P 子任务，尚未涵盖文本到姿态的完全端到端建模，实际部署时需依赖上游 T2G 模块的质量。
-
-
 
 ## 定位与知识库关联
 
@@ -330,8 +302,6 @@ FGDM 的适用边界受以下因素制约：
 2. **语义掩码生成网络的增强**：能否设计更强大的语义掩码生成网络（如引入注意力机制或图神经网络），以进一步提升关节级建模精度，是直接的技术延伸方向。
 
 3. **端到端扩展**：将 FGDM 的 Focal–General 范式扩展至完整的文本到姿态生成流程，实现 T2G 与 G2P 的联合优化，是向实用化迈进的关键步骤。
-
-
 
 ## 原文 PDF
 

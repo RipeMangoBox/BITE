@@ -54,8 +54,6 @@ claims:
 
 在三个基准数据集上的实验表明，FAGS取得了具有竞争力的定量结果：在合成D-NeRF数据集上平均PSNR达到**42.76 dB**，较最优基线Grid4D（Xu et al., arXiv 2024）提升**0.49 dB**（Table 1）；在真实场景Neu3D和HyperNeRF数据集上同样表现优异（Table 2、Table 3）。消融实验证实，移除FDGK后PSNR从42.76降至42.11，验证了频率区分高斯核对性能的关键贡献（Table 4）。时间运动功率谱分析进一步表明，FAGS将更多高斯集中到高频运动带，从机制层面验证了其捕捉高频运动的能力（Figure 11）。
 
-
-
 动态场景的新视角合成是计算机视觉与图形学中的核心挑战，其目标是从一组稀疏的多视角视频中重建出随时间变化的三维场景，并支持任意时刻、任意视角的高质量渲染。近年来，以三维高斯溅射（3D Gaussian Splatting, 3DGS）为代表的显式辐射场方法在静态场景渲染中取得了突破性进展，其通过一组可微的三维高斯原语进行高效的光栅化渲染，在速度和质量上均大幅超越基于隐式神经辐射场的方法。然而，将3DGS从静态场景拓展至动态场景时，一个根本性的瓶颈逐渐显现：**高频渲染细节与高频运动建模之间存在严重的频谱冲突**。
 
 这一冲突的根源在于标准高斯核的固定不透明度衰减机制。在3DGS中，每个高斯的透明度 $\alpha_i$ 由其不透明度 $o_i$ 和固定的指数衰减函数共同决定（Eq. 1）。为捕捉场景中的高频外观细节（如锐利边缘、纹理变化），系统需要大量高斯在空间上密集重叠，通过精细的叠加来逼近复杂的光场变化。当场景引入时间维度后，这些密集堆叠的高斯必须由变形网络统一驱动，以产生连贯的运动轨迹。这就迫使变形网络同时承担两项相互矛盾的任务：既要维持足够的高斯密度以再现高频外观，又要协调这些高斯的集体运动以避免视觉伪影。由于网络优化天然倾向于平滑、低频的解空间，变形网络往往会偏向于产生均匀的低频运动轨迹，从而导致新视角下出现严重的运动模糊——这正是现有变形驱动的4D重建方法（如 **DeformGS**（Yang et al., CVPR 2024）、**Grid4D**（Xu et al., arXiv 2024））普遍面临的困境。
@@ -69,8 +67,6 @@ Figure 1 直观地揭示了这一问题：基线方法中，标准高斯核为�
 2. **频率感知的运动建模**：在变形网络中注入高频傅里叶特征，使网络能够显式捕捉每个高斯的周期性高频运动分量，同时通过频率感知门控机制抑制低频区域的非必要运动，实现精细且稳定的动态建模。
 
 通过将频率维度的显式解耦引入高斯溅射框架，FAGS旨在同时提升动态场景的高频细节保真度和运动建模精度，为4D重建提供一种频谱平衡的新范式。
-
-
 
 ## 核心方法与创新机理
 
@@ -91,8 +87,6 @@ FAGS 通过三个协同的 changed slots 打破这一瓶颈：
 除常规的 L1 和 SSIM 损失外，FAGS 增加了傅里叶频率损失 $\mathcal{L}_{\mathrm{fre}}$（Eq. 9），直接约束渲染图像与真实图像在频域振幅谱上的一致性，强化对高频细节的优化。
 
 消融实验（Table 4）定量验证了上述 changed slots 的关键作用：完整模型在 D-NeRF 上取得 PSNR 42.76；移除 FDGK 后降至 42.11；进一步移除高频傅里叶嵌入和频率感知门控均导致性能持续下降。时间运动功率谱可视化（Figure 11）进一步证实 FAGS 将更多高斯集中在高频带，有效捕捉了高频运动。
-
-
 
 FAGS 的整体设计遵循一个核心原则：**在 4D 重建的渲染与运动建模两个关键环节中，显式解耦高频与低频分量**。如图 3 所示，框架由两条互补的流水线构成——上方的 **频率区分高斯核（FDGK）** 负责渲染端的频域分化，下方的 **傅里叶变形网络（FDN）** 负责运动建模端的频域解耦，二者通过共享的高斯表示协同工作。
 
@@ -126,17 +120,10 @@ FDN 接收规范空间坐标 **(x, y, z)** 和时间 **t**，通过两路编码�
 - **渲染阶段**：FDGK 根据 λ、β 计算自适应 alpha 值，通过 alpha blending（Eq. 1）合成像素颜色
 - **输出**：任意时刻、任意视角的渲染图像
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_UZ00ac4eqA/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of Frequency-Aware Gaussian Splatting. Top: Gaussians are initialized in a canonical state and progressively differentiate into low- and high-frequency types during optimization, fitting low-frequency smooth regions and high-frequency details, respectively. Bottom: Coordinates*
 
-
-
 FAGS 的核心设计围绕一个关键矛盾展开：**变形驱动的 4D 重建中，高频外观细节与高频运动轨迹对高斯核提出了相互冲突的要求**。标准 3DGS 中所有高斯共享固定的指数衰减 alpha 函数（Eq. 1），要捕捉锐利边缘和纹理细节，必须依赖大量高斯在空间上密集重叠——这反过来使变形网络难以精确控制每个高斯的独立运动，最终导致网络偏向学习平滑、低频的全局运动，在新视角下产生运动模糊（见 Figure 1(a)）。FAGS 通过三个相互配合的模块——**频率区分高斯核（FDGK）**、**傅里叶变形网络（FDN）** 和 **频率感知门控**——将“表现力”与“运动建模”在频率维度上显式解耦。
-
-![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_UZ00ac4eqA/figures/001_Figure_1.jpg]]
-*Figure 1: Analysis of high-frequency details and motion. (a) Baseline: Standard Gaussian kernels require dense overlapping to capture high-frequency details, which complicates deformation control and biases the network toward smooth, low-frequency trajectories, resulting in motion blur. (b) Our ?? = 1 method: Gaussians in high- and low-frequency regions are differentiated, enabling the deformation ?? = 2 Ours network to capture high-frequency motion on top of global low-frequency deformations, allowing each Gaussian to follow its own fine-grained dynamics*
 
 ### 3.1 基础渲染公式
 
@@ -164,9 +151,6 @@ $$\psi ( g ) = \left\{ \begin{array} { l l } { \frac { 0 . 5 + \lambda - 0 . 5 \
 - **中间区间** $[p_l, p_r]$ 的斜率由 $\lambda$ 决定：$\lambda > 0$ 使斜率大于 1，高斯趋向高频锐利核；$\lambda < 0$ 使斜率小于 1，高斯趋向低频平滑核。
 - **边界参数 $\beta$** 控制中间区间的宽度，独立于 $\lambda$ 调节高斯从锐利到平滑的过渡范围，使高斯能专门化为不同类型。
 - 两端区间通过连续性约束保证函数平滑，且整体 alpha 值被稳定在可控范围内。
-
-![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_UZ00ac4eqA/figures/002_Figure_2.jpg]]
-*Figure 2: Adaptive alpha modulation function of the frequencydifferentiated Gaussian kernel. The piecewise activation function*
 
 通过联合优化 $\lambda$ 和 $\beta$，FDGK 使高斯在训练过程中自动分化为高频和低频类型：高频高斯用锐利衰减捕捉纹理边缘，低频高斯用平滑衰减覆盖均匀区域，**减少了对密集重叠的依赖**，从而为变形网络释放了运动建模的自由度。
 
@@ -208,8 +192,6 @@ $$\mathcal{L}_{\mathrm{fre}} = \| I_{\mathrm{amp}}' - I_{\mathrm{amp}} \|_1$$
 
 **模块间的因果链条**：FDGK 通过自适应 alpha 调制减少高斯重叠依赖 → 为变形网络释放运动建模自由度 → FDN 用傅里叶嵌入显式注入高频时变信息 → 频率感知门控 $\eta$ 自适应调节变形强度，抑制低频区域的非必要运动 → 傅里叶频率损失在频域强化高频细节优化。四个模块协同实现了“高频外观”与“高频运动”的频率解耦，从根本上缓解了标准 3DGS 在 4D 重建中的频谱冲突。
 
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -244,9 +226,6 @@ FAGS 在合成与真实世界动态场景数据集上均取得领先性能，验
 
 消融可视化（Figure 8）进一步显示，移除 FDGK 后运动模糊明显加重，移除 HFE 后高频运动区域（如快速旋转的关节）出现拖影，与定量结果一致。
 
-![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_UZ00ac4eqA/figures/011_Figure_8.jpg]]
-*Figure 8: Ablation study visualization results on D-Nerf dataset*
-
 ### 关键机制验证
 
 **高斯频率分化过程**（Figure 7）：训练过程中，可学习参数 λ 和 β 的分布逐步分化为两个峰，分别对应高频锐利核和低频平滑核；频率感知门控 η 的分布也呈现双峰，表明网络自动识别动态与静态高斯并施加差异化变形强度。这一自组织分化是 FAGS 有效性的微观基础。
@@ -261,21 +240,8 @@ FAGS 在合成与真实世界动态场景数据集上均取得领先性能，验
 
 论文未明确报告失败案例或局限性分析。基于方法设计，可推断以下潜在风险需手动验证：（1）FDGK 的分段线性调制函数引入额外可学习参数 λ 和 β，在稀疏视角或极短序列下可能导致分化不稳定；（2）傅里叶频率损失依赖 FFT 振幅谱的 L1 损失，对光照突变或非周期性运动可能引入频域伪影；（3）FAGS 以 Grid4D 为变形骨干，继承了 4D 哈希编码在极长序列上的内存开销问题。以上推断需在实际部署中进一步确认。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_UZ00ac4eqA/figures/015_Figure_11.jpg]]
-*Figure 11: Temporal Motion Power Spectrum of Gaussians*
-
-![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_UZ00ac4eqA/figures/012_Figure_7.jpg]]
-*Figure 7: Distributions of frequency-differentiated parameters*
-
 ![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_UZ00ac4eqA/figures/013_Figure_9.jpg]]
 *Figure 9: Qualitative results on the Mip360-NeRF 3D dataset*
-
-![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_UZ00ac4eqA/figures/014_Figure_10.jpg]]
-*Figure 10: Qualitative comparisons on the motion-blur dataset*
-
-
 
 ## 定位与知识库关联
 
@@ -353,8 +319,6 @@ $$\mathcal{L}_{\mathrm{fre}} = \| I_{\mathrm{amp}}' - I_{\mathrm{amp}} \|_1$$
 2. **与模糊感知方法的互补性**：FAGS从频率域预防运动模糊，BARD-GS从图像域处理模糊。两者在原理上互补，但联合使用的效果和兼容性尚未探索。
 
 3. **扩展到更复杂的变形拓扑**：当前方法假设变形是连续且可微的，对于拓扑变化（如物体出现/消失、断裂）的场景，频率感知门控和傅里叶嵌入是否仍然有效，需要进一步研究。
-
-
 
 ## 原文 PDF
 

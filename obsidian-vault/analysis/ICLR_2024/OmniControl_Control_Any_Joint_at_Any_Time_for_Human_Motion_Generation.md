@@ -52,8 +52,6 @@ claims:
 
 **主要结果**：在 HumanML3D 数据集上，OmniControl 的骨盆控制平均误差相比最先进的 GMD 降低了 79.2%（0.0338 vs 0.1439），FID 相比 PriorMDM 降低了 54.1%（0.218 vs 0.475），脚部滑动比率降低了 39.0%。消融实验表明，移除空间引导会导致控制精度急剧恶化（Avg. err. 从 0.0385 升至 0.4137），而移除真实感引导则使 FID 从 0.310 恶化至 0.692，充分验证了两个模块的必要性。
 
-
-
 ### 问题背景：文本条件人体动作生成
 
 从自然语言描述生成逼真的人体动作序列是计算机视觉与图形学中的核心挑战。近年来，基于扩散模型的方法在该任务上取得了显著进展，代表性工作包括 **MDM**（Tevet et al., 2023）及其变体 **PriorMDM**（Shafir et al., 2024）。这些模型采用“相对姿态表示”——每个关节的位置以骨盆为参考系进行编码，骨盆自身则相对于前一帧定义——在纯文本到动作（text-to-motion）任务上展现出良好的生成质量。
@@ -79,8 +77,6 @@ OmniControl 的核心动机源于一个关键洞察：**空间约束的精确满
 - **真实感引导（Realism Guidance）**：空间引导仅作用于受控关节，无法保证非受控关节的运动连贯性。为此，OmniControl 引入一个可训练的 Transformer 副本（通过零初始化线性层连接到原运动扩散模型的各注意力层），输出特征残差以隐式调整全身所有关节，从而在控制精度与运动自然度之间取得有效平衡。
 
 这一“混合引导”设计使得 OmniControl 成为首个能够以单一模型实现对任意关节、任意时刻进行灵活空间控制的方法，同时保持生成动作的逼真度与物理合理性。
-
-
 
 ## 核心方法与创新机理
 
@@ -149,8 +145,6 @@ $$\pmb{\mu}_t = \pmb{\mu}_t - \tau \nabla_{\pmb{\mu}_t} G(\pmb{\mu}_t, \pmb{c})$
 
 这种从“输入端局部 inpainting”到“输出端全局梯度扰动 + 可训练全身修正”的范式转换，使得 OmniControl 首次实现了单一模型对任意关节、任意时刻、任意稀疏度的空间控制，同时保持生成运动的真实感。
 
-
-
 OmniControl 的整体 pipeline 围绕一个核心设计展开：**在扩散模型的去噪过程中，通过“空间引导 + 真实感引导”的混合策略，将任意关节、任意时刻的稀疏空间控制信号融入文本条件的人体动作生成**。图 2 给出了该框架的完整概览。
 
 ### 输入与输出
@@ -204,12 +198,8 @@ OmniControl 的 pipeline 由以下四个关键模块串联而成，数据流遵�
 
 两者作用于同一扩散均值 $\boldsymbol{\mu}_t$，在每一个去噪步中依次施加影响，最终使生成的动作既贴合控制信号，又保持自然的运动模式。这种“分析梯度 + 学习残差”的混合范式是 OmniControl 在稀疏、多关节控制场景下取得显著性能提升（骨盆控制平均误差相比 GMD 降低 79.2%，FID 相比 PriorMDM 降低 54.1%）的核心架构创新。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1899_OmniControl_Control_Any_Joint_at_Any_Time_for_Human_Motion_Generation/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of OmniControl. Our model generates human motions from the text prompt and spatial control signal. At the denoising diffusion step, the model takes the text prompt and a noised motion sequence*
-
-
 
 OmniControl 的核心由三个关键模块构成：**运动扩散模型 M**、**空间引导（Spatial Guidance）** 和 **真实感引导（Realism Guidance）**。三者协同工作，在保持运动自然度的前提下实现对任意关节、任意时刻的精确空间控制。
 
@@ -277,16 +267,6 @@ $$f_n = o_n \mathcal{F}(c_n)$$
 
 二者共同构成了混合引导（Hybrid Guidance）机制，在控制精度与运动自然度之间取得有效平衡。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1899_OmniControl_Control_Any_Joint_at_Any_Time_for_Human_Motion_Generation/figures/003_Figure_3.jpg]]
-*Figure 3: Detailed illustration of our proposed spatial guidance. The spatial guidance can effectively enforce the controlled joints to adhere to the input control signals*
-
-![[assets/figures/papers/paper_list_l1899_OmniControl_Control_Any_Joint_at_Any_Time_for_Human_Motion_Generation/figures/004_Figure_4.jpg]]
-*Figure 4: Detailed illustration of our proposed realism guidance. The realism guidance outputs the residuals w.r.t. the features in each attention layer of the motion diffusion model. These residuals can directly perturb the whole-body motion densely and implicitly*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -322,15 +302,9 @@ Table 3 报告了 HumanML3D 测试集上的消融结果，明确了空间引导�
 
 Figure 7 展示了空间控制信号密度对各项指标的影响。随着控制关键帧数量从 1 增加到 196，OmniControl 的 FID 和 Foot skating ratio 保持稳定甚至略有改善，而 MDM 和 PriorMDM 则显著恶化。这一对比凸显了混合引导架构对稀疏信号的鲁棒性：真实感引导通过空间编码器 $\mathcal{F}$ 对无控制帧进行掩码（$f_n = o_n \mathcal{F}(c_n)$），使模型能感知有效控制信号的位置，避免对缺失约束的过度拟合。
 
-![[assets/figures/papers/paper_list_l1899_OmniControl_Control_Any_Joint_at_Any_Time_for_Human_Motion_Generation/figures/010_Figure_7.jpg]]
-*Figure 7: Varying the density of spatial signal. The performance is reported on pelvis control on the HumanML3D dataset with the x-axis in logarithmic scale. All metrics are the lower the better*
-
 ### 推理效率与超参数权衡
 
 Figure 6 展示了空间引导超参数 $T_s$、$K_e$、$K_l$ 对推理时间与 Avg. Error 的权衡关系。论文采用的默认设置（$K_e=10, K_l=500, T_s=10$）在精度与效率之间取得了合理平衡：早期扩散步（$t > T_s$）仅进行 10 次迭代，后期精细去噪阶段（$t \leq T_s$）进行 500 次迭代。这种动态迭代策略（式 (4)）避免了在整个去噪过程中均匀分配计算资源。
-
-![[assets/figures/papers/paper_list_l1899_OmniControl_Control_Any_Joint_at_Any_Time_for_Human_Motion_Generation/figures/009_Figure_6.jpg]]
-*Figure 6: Balancing inference time and Avg. Error by varying Ts*
 
 然而，Table 5 的推理时间分解显示，OmniControl 的总体推理时间约为 121 秒，其中空间引导的大量迭代和模型前向传播是主要瓶颈。这一延迟使其难以满足实时交互需求，构成了方法的主要局限之一。
 
@@ -347,18 +321,8 @@ Figure 6 展示了空间引导超参数 $T_s$、$K_e$、$K_l$ 对推理时间与
 
 3. **全局表示的性能代价**：Table 6 显示，直接使用全局姿态表示进行纯文生动作时，FID 从相对表示的 0.544 升至 3.537，性能严重下降。Figure 8 进一步展示了全局表示下模型产生的失败案例——人体姿态出现不合理扭曲。这说明 OmniControl 仍依赖相对表示作为内部特征空间，仅在空间引导阶段进行全局坐标转换，两种表示之间的切换可能引入模式混淆。
 
-![[assets/figures/papers/paper_list_l1899_OmniControl_Control_Any_Joint_at_Any_Time_for_Human_Motion_Generation/figures/013_Figure_8.jpg]]
-*Figure 8: With global pose representation, the model cannot produce reasonable human poses on the HumanML3D dataset*
-
 ![[assets/figures/papers/paper_list_l1899_OmniControl_Control_Any_Joint_at_Any_Time_for_Human_Motion_Generation/figures/014_Table_6.jpg]]
 *Table 6: Text-to-motion evaluation on the HumanML3D (Guo et al., 2022a) dataset. Comparison between relative presentation (Guo et al., 2022a) and global representation (Liang et al., 2024)*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1899_OmniControl_Control_Any_Joint_at_Any_Time_for_Human_Motion_Generation/figures/008_Figure_5.jpg]]
-*Figure 5: Visual comparisons of the ablation designs, our full model, and the baseline GMD*
-
-
 
 ## 定位与知识库关联
 
@@ -408,8 +372,6 @@ OmniControl 处于**扩散模型引导（Diffusion Guidance）** 与**人体运�
 3. **多关节冲突消解**：当多个关节同时被控制且约束不一致时，空间引导的梯度可能相互对抗。需要研究是否可通过引入关节优先级权重、约束松弛机制或基于物理的协调损失来调和冲突。
 4. **多人物交互扩展**：该方法的核心组件（全局坐标转换 + 分析梯度引导）在概念上可扩展到多人物场景，但需要解决人物间相对坐标定义、碰撞避免以及计算复杂度随人物数量线性增长的问题。
 5. **控制信号自动生成**：在下游应用（如场景交互、VR 操控）中，手动指定空间控制信号成本高昂。如何从场景几何、交互意图或自然语言描述中自动推断合理的空间约束，是实现该方法大规模应用的关键前提。
-
-
 
 ## 原文 PDF
 

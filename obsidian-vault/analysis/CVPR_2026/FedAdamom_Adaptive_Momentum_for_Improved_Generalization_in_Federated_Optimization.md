@@ -52,15 +52,11 @@ claims:
 
 实验验证了理论分析的有效性。在 CIFAR-10/100 和 Tiny-ImageNet 上（100 客户端、5% 参与率、Dir(0.3) 数据划分），FedAdamom 分别达到 **88.93%**、**57.58%** 和 **47.38%** 的准确率，显著优于 FedAdam 及其他基线方法。在 FEMNIST、CelebA 和 Shakespeare 等真实联邦数据集上，FedAdamom 同样保持了领先优势。损失景观可视化和逃逸速率实验进一步证实，FedAdamom 收敛到的极小值比 FedAdam 和 FedAvgM 更平坦，且其对数逃逸时间与尖锐度的关系符合 $\mathcal{O}(k^{-1})$ 的理论预测。
 
-
-
 联邦学习在数据异构场景下，服务器端优化器的选择对模型泛化性能具有决定性影响。以 **FedAvg**（McMahan et al., AISTATS 2017）为代表的经典方法在服务器端执行 SGD 更新，能够稳定收敛到平坦极小值，从而获得良好的泛化能力。为加速收敛，**FedAdam**（Reddi et al., ICLR 2021）等自适应优化方法被引入联邦学习框架，通过在服务器端引入自适应学习率机制（利用梯度二阶矩 $v_t$ 调整步长，即 $\eta \cdot m_t / (\sqrt{v_t}+\epsilon)$）显著提升了收敛速度。
 
 然而，自适应学习率机制在加速收敛的同时引入了一个被忽视的代价：它削弱了算法对平坦极小值的偏好。如 Figure 1 所示，在数据异构程度较高（Dirichlet 分布参数 $\alpha$ 较小）的条件下，FedAdam 倾向于收敛到比 FedAvg 更尖锐的极小值，导致泛化性能下降。这一现象的扩散理论分析揭示，FedAdam 从尖锐极小值逃逸到平坦极小值的平均逃逸时间满足 $\log(\tau_{FedAdam}) = \mathcal{O}(H_{ae}^{-1/2})$，而 FedAvg 的逃逸时间为 $\log(\tau_{FedAvg}) = \mathcal{O}(H_{ae}^{-1})$。自适应学习率分母中的 $1/\sqrt{v_t}$ 项改变了鞍点附近的扩散动力学，使得逃逸时间对 Hessian 特征值 $H_{ae}$ 的依赖从线性减弱为平方根关系，从而破坏了平坦极小值选择能力。
 
 这一瓶颈的因果机制在于：自适应优化器的自适应对象是学习率，而学习率的自适应缩放直接干预了参数在损失景观中的扩散行为。一个自然的替代思路是将自适应从学习率转移到动量超参数上——动量本身不影响极小值选择（FedAvgM 的逃逸时间同样为 $\mathcal{O}(H_{ae}^{-1})$），但能有效加速鞍点逃离。基于这一洞察，本文提出 **FedAdamom**，通过构造参数级自适应动量系数 $\beta_{1,t} = (1 - v_t/\bar{v}_t) \cdot \text{Clip}(0,1-\epsilon)$，在保持与 FedAvg 一致的平坦极小值选择能力的同时，获得与自适应方法相当的收敛速度。
-
-
 
 ## 核心方法与创新机理
 
@@ -101,8 +97,6 @@ FedAdamom 的设计在理论上获得了双重保障：
 2. **收敛性保证**（Convergence Theorem）：在非凸联邦学习设定下，FedAdamom 的收敛上界为 $\mathcal{O}\left(\frac{L\Theta_0}{\sqrt{sKT}} + \frac{\beta_{1,max}}{1-\beta_{1,max}}\left(\frac{\sigma_l^2}{KT} + \frac{\sigma_g^2}{T} + \Psi\right)\right)$，与已知自适应联邦方法的收敛率相匹配，未因改变自适应对象而牺牲收敛速度。
 
 这种"收敛速度与泛化性能兼得"的特性，使得 FedAdamom 在保持自适应方法快速收敛优势的同时，显著提升了模型的泛化能力。
-
-
 
 FedAdamom 遵循标准联邦优化（FEDOPT）框架，其核心创新在于将服务器端的自适应机制从**学习率**迁移至**动量系数**，从而在保持快速收敛的同时恢复平坦极小值偏好。整体流程分为三个顺序模块：
 
@@ -155,8 +149,6 @@ FedAdamom 通过将自适应从分母（学习率缩放）移至分子（动量�
 - 模型更新 $x_{t+1} = x_t + \eta m_t$ 保持标准动量 SGD 形式，逃逸时间恢复为 $\mathcal{O}(H_{ae}^{-1})$（Theorem 4），与 FedAvg 一致
 
 这一设计使得 FedAdamom 在收敛速度上匹配自适应方法，在泛化性能上匹配 FedAvg，实现了两者长期以来被认为不可兼得的权衡突破。
-
-
 
 ### 问题建模：联邦优化框架
 
@@ -234,8 +226,6 @@ $$\frac{1}{T}\sum_{t=0}^{T-1}\mathbb{E}\|\nabla f(x_t)\|^2 \leq \mathcal{O}\left
 
 其中 $\Theta_0 = f(x_0) - f^*$ 为初始最优间隙，$L$ 为光滑性常数，$\sigma_l^2$ 和 $\sigma_g^2$ 分别为本地和全局梯度方差，$\beta_{1,max}$ 为自适应动量系数的上界，$\Psi$ 为与数据异构相关的项。该收敛率与已知自适应联邦方法匹配，证明自适应动量机制不损害理论收敛速度。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈验证：自适应学习率如何损害泛化
@@ -295,15 +285,11 @@ Table 2 展示了 FedAdamom 对 $\beta_2$（二阶矩衰减系数）的敏感性
 - 当前实验覆盖图像分类和文本下一词预测，尚未在语音识别、推荐系统等联邦学习典型应用上验证；
 - FedAdamom 在结合客户端差分隐私、梯度压缩或异步更新等实用约束下的表现仍是开放问题。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2123_https_openaccess_thecvf_com_content_CVPR2026_html_Hou_FedAdamom_Adaptive/figures/002_Table_1.jpg]]
 *Table 1: Moderate-scale: 100 clients, 5% participation*
 
 ![[assets/figures/papers/paper_list_l2123_https_openaccess_thecvf_com_content_CVPR2026_html_Hou_FedAdamom_Adaptive/figures/009_Table_3.jpg]]
 *Table 3: Results on the realistic datasets involving feature skewness and data imbalance between clients*
-
-
 
 ## 定位与知识库关联
 
@@ -370,8 +356,6 @@ FedAdamom 的理论分析基于准平衡假设和低温近似，其适用边界�
 4. **异步与掉线鲁棒性**：在客户端频繁掉线或异步通信的联邦环境中，服务器端 $v_t$ 的估计可能因陈旧更新而产生偏差。如何设计稳健的 $v_t$ 更新机制，或引入衰减因子来降低陈旧更新的影响，是实际部署中需要解决的问题。
 
 5. **通信效率的进一步优化**：自适应动量带来的额外稳定性是否允许更大的本地更新步数 $K$，从而进一步降低通信轮次？这需要在收敛性理论与通信-计算权衡中进行更深入的分析。
-
-
 
 ## 原文 PDF
 

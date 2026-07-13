@@ -72,8 +72,6 @@ SpecTemp在多个基准上实现了精度与效率的双重提升：
 
 这些结果表明，通过将密集感知卸载到轻量级草案模型，SpecTemp在保持甚至提升推理质量的前提下，有效缓解了长视频理解中的效率瓶颈。
 
-
-
 ### 长视频理解的效率困境
 
 多模态大语言模型（MLLM）在视频理解任务中取得了显著进展，但其处理长视频的能力仍受制于一个根本性瓶颈：**不断增长的多模态上下文长度**。当前主流范式——可称为“thinking-with-frames”——要求模型在推理过程中同时承载视频帧的密集视觉token和逐步展开的推理轨迹。随着视频时长增加，预填充阶段的计算开销急剧膨胀，直接拖慢推理速度并推高显存占用。
@@ -103,8 +101,6 @@ SpecTemp的提出旨在回答一个核心问题：**能否在不牺牲推理精�
 3. **双模型协同强化学习训练**：提出冷启动监督微调（SFT）与分组相对策略优化（GRPO）相结合的训练范式，并设计IoU奖励与视觉信息增益奖励，分别引导目标模型的时序定位能力和草案模型的帧选择质量。
 
 后续章节将详细展开SpecTemp的技术方案、实验验证及其在短视频与长视频基准上的性能表现。
-
-
 
 ## 核心方法与创新机理
 
@@ -142,8 +138,6 @@ SpecTemp引入了一种**层次化的测试时扩展框架**，其核心改变�
 ### 与基线方法的本质区别
 
 相较于**VideoChat-R1.5**（Yan et al., 2025）代表的thinking-with-frames范式——其中单个大型MLLM需在持续增长的多模态上下文中同时进行感知与推理——SpecTemp通过推测性解耦，在仅使用14.5帧时即超越Qwen2.5-VL-7B的16帧性能（Video-Holmes +12.0%），同时将推理延迟从4.1秒降至3.7秒。当扩展至58.1帧时，精度超越VideoChat-R1.5，速度提升23%（Table 2）。
-
-
 
 SpecTemp 提出了一种**双模型协同的推测性时序推理框架**，其核心思想是将传统“思考-帧”范式中耦合的密集视觉感知与高层时序推理解耦，分别交由一个轻量级草案 MLLM 和一个强大的目标 MLLM 完成。这种设计直接回应了 Figure 1(d) 揭示的效率瓶颈：在 Qwen2.5-VL-7B 上，超过 90% 的视觉 token 注意力分数低于 10⁻³，大量计算被浪费在信息量极低的帧上。
 
@@ -183,13 +177,6 @@ SpecTemp 采用**两阶段优化**策略（第 3.3 节）：
 - **双模型协同 GRPO 强化学习**：采用分组优势函数和 KL 惩罚项（β = 0.04）联合优化目标模型和草案模型（公式 6）。目标模型的奖励由格式正确性、答案准确性和预测证据段与真实区域的时间 IoU 组成（公式 7）；草案模型的奖励由格式正确性和视觉信息增益组成（公式 8-9），后者鼓励选择与问题相关且与已选帧冗余度低的帧。
 
 这种推测-验证的协同设计，使得目标模型始终仅需处理稀疏的关键帧，从而在保持推理质量的同时将视觉 token 数量和上下文长度控制在较低水平，从根本上缓解了传统范式的效率瓶颈。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2112_https_arxiv_org_abs_2512_00805/figures/003_Figure_3.jpg]]
-*Figure 3: Overview of data generation pipeline and composition*
-
-
 
 ### 3.1 双模型推测-验证框架
 
@@ -260,8 +247,6 @@ $$ R _ { \mathrm { v i s u a l } } = \mathrm { S i m } _ { \mathrm { C L I P } }
 
 该奖励机制引导草案模型在密集帧中选出既与问题相关又彼此互补的关键帧，使目标模型能以最少视觉 token 获得最充分的时序证据。
 
-
-
 ## 实验与关键发现
 
 ### 1. 主实验结果
@@ -285,9 +270,6 @@ Table 2 展示了在五个长视频基准上的表现。SpecTemp 在 14.5 帧配
 #### 极端长程检索
 
 Figure 8 展示了 V-NIAH（Visual Needle-In-A-Haystack）评测结果。在 2000 帧视频中插入单帧视觉问题，SpecTemp 在所有深度位置均保持超过 80% 的检索准确率，证明其迭代推测机制能够有效定位远距离关键帧，而非受限于固定的均匀采样窗口。
-
-![[assets/figures/papers/paper_list_l2112_https_arxiv_org_abs_2512_00805/figures/016_Figure_8.jpg]]
-*Figure 8: V-NIAH performance across frame counts and needle depths*
 
 ### 2. 消融实验
 
@@ -316,29 +298,17 @@ Table 5 表明，冷启动 SFT 后接双模型协同 GRPO 强化学习，在 Lon
 
 Table 6 显示，最大迭代次数 T_max=3 在准确率（57.5%）和延迟（2.3 秒）之间达到最佳平衡。T_max=1 时准确率降至 54.8%，说明单轮推测不足以充分探索长视频时序结构；T_max=5 时准确率仅微增至 57.8%，但延迟升至 3.1 秒，边际收益递减。
 
-![[assets/figures/papers/paper_list_l2112_https_arxiv_org_abs_2512_00805/figures/011_Table_6.jpg]]
-*Table 6: Ablation study on maximum iteration number*
-
 #### 奖励组件
 
 Table 7 评估了奖励函数各组件的作用。同时使用 IoU 奖励和视觉信息增益奖励的组合达到最佳性能。移除 IoU 奖励（仅使用答案正确性和格式奖励）导致目标模型预测的证据段时间区域精度下降，进而影响草案模型的帧选择质量。移除视觉信息增益奖励则使草案模型倾向于选择冗余帧，降低关键帧的判别力。
-
-![[assets/figures/papers/paper_list_l2112_https_arxiv_org_abs_2512_00805/figures/013_Table_7.jpg]]
-*Table 7: Ablation study on reward components. We evaluate the contribution of IoU reward*
 
 #### 帧分配策略
 
 Table 8 在 16 帧和 64 帧固定预算下探索了初始化帧数与每轮迭代帧数的分配方案。默认配置 10+2×3 在 16 帧预算下实现 57.5% LongVideoBench 准确率和 47.0% Video-Holmes 准确率。过度倾斜初始化帧（如 14+1×2）会压缩迭代探索空间，降低长程定位能力；过度倾斜迭代帧（如 6+3×3）则因初始上下文不足而损害推理起点质量。
 
-![[assets/figures/papers/paper_list_l2112_https_arxiv_org_abs_2512_00805/figures/014_Table_8.jpg]]
-*Table 8: Ablation study on frame allocation strategies (Initial+Per-Iter×Max-Iter) under fixed budgets of 16 and 64 frames. We report accuracy (%) and inference latency*
-
 ### 3. 效率分析
 
 Figure 4 分解了推理延迟的组成。传统 thinking-with-frames 范式中，LLM 预填充阶段需处理全部视觉 token 和推理轨迹，构成主要延迟瓶颈。SpecTemp 将密集采样（1fps）委托给 3B 草案模型，目标 7B 模型仅需处理稀疏代表帧，预填充 token 数量大幅减少，总延迟降至 2.3 秒。这一架构决策的深层逻辑在于：**90% 以上视觉 token 的注意力分数低于 10^-3（Figure 1d），对推理贡献极小，却线性推高预填充成本**。
-
-![[assets/figures/papers/paper_list_l2112_https_arxiv_org_abs_2512_00805/figures/006_Figure_4.jpg]]
-*Figure 4: Inference latency breakdown. SpecTemp achieves the lowest latency (2.3s) by delegating dense sampling to the draft model*
 
 ### 4. 失败模式与局限性
 
@@ -348,8 +318,6 @@ Figure 4 分解了推理延迟的组成。传统 thinking-with-frames 范式中�
 - **草案选择的语义盲区**：草案模型的视觉奖励基于 CLIP 相似度（公式 8），可能忽略需要细粒度语义理解的帧（如文本密集的场景文字），导致关键信息遗漏。
 - **训练成本**：两阶段 SFT+RL 在 16 块 H100 GPU 上完成，论文未探索参数高效微调方案以降低 RL 阶段的计算开销。
 - **极端长度未验证**：V-NIAH 仅测试至 2000 帧，对于小时级或更长视频的推理能力尚需进一步验证。
-
-
 
 ## 定位与知识库关联
 
@@ -399,8 +367,6 @@ SpecTemp 在以下条件下表现出色：
 ### 知识库定位总结
 
 SpecTemp 在“高效长视频推理”这一细分方向上占据了一个独特位置：它既不同于纯压缩方法（牺牲信息保真度换取速度），也不同于纯推理增强方法（增加推理链长度但忽略视觉 token 冗余）。其核心创新在于**用计算不对称性换取效率**——让轻量级草案模型承担密集感知的计算开销，让目标模型专注于高质量推理。这一设计在当前“thinking-with-frames”范式遭遇效率瓶颈的背景下，提供了一个可验证的解决方案，并在多个基准上同时实现了精度提升和延迟降低。
-
-
 
 ## 原文 PDF
 

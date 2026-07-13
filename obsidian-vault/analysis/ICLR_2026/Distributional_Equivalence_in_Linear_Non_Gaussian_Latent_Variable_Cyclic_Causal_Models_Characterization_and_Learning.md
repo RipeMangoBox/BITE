@@ -70,8 +70,6 @@ claims:
 
 当前方法依赖OICA估计混合矩阵的精度，在样本量有限或非高斯性较弱时性能可能受限。理论上，边缘秩约束和等价性刻画目前仅适用于线性非高斯模型，向非线性或非参数设定的推广仍是开放问题。此外，等价类在最坏情况下可能包含指数级数量的图，实际应用中需结合稀疏性先验或额外约束来压缩搜索空间。
 
-
-
 ### 潜变量因果发现的核心瓶颈
 
 从观测数据中恢复因果结构是因果推断的基石问题。当系统中存在未观测的潜在混杂因子时，问题难度急剧上升——我们不仅需要推断观测变量之间的因果关系，还必须同时处理潜变量与观测变量之间、以及潜变量之间的未知结构。现有潜变量因果发现方法普遍依赖强结构假设来使问题可解：**PO-LiNGAM**（Jin et al., 2024）要求潜变量遵循纯测量模型（每个潜变量有一组专属的观测子节点），**LaHiCaSl**（Xie et al., 2024）则依赖层次化的潜变量结构和广义独立噪声（GIN）条件，且这些方法通常假设因果图为有向无环图（DAG）。
@@ -97,8 +95,6 @@ $$\min(|Z|,|Y|) - \rho_{\mathcal{G}}(Z,Y) = |V| - \max(|Z|,|Y|) - r_{\mathcal{G}
 **Table 2** 将本文的贡献置于更广阔的方法谱系中：在完全观测无环设定下，等价性由 Markov 等价类刻画；在含潜变量的无环设定下，Trek-separation 和 mDAG 提供了高斯情形下的刻画；而本文首次在线性非高斯、含潜变量且允许循环的设定下，建立了基于路径秩/边缘秩的等价性刻画，并给出了等价类的可遍历变换表征（**Theorem 3**：通过可容许的边添加/删除和至多一次循环反转即可遍历整个等价类），以及简洁的 solid/dashed 边表示（**Theorem 4**）。
 
 基于这些理论结果，本文提出了 **glvLiNG** 算法，该算法无需任何结构假设，从 OICA 估计的混合矩阵出发，通过两阶段列增广过程恢复因果图，并输出完整的分布等价类。这填补了潜变量因果发现工具箱中长期缺失的一块：一种通用的、不依赖结构假设的方法，能够处理任意的潜变量结构和反馈循环。
-
-
 
 ## 核心方法与创新机理
 
@@ -157,19 +153,12 @@ $$\mathrm{bases}_{\mathcal{G}}(L \cup \{X_i\}) = \pi(\mathrm{bases}_{\mathcal{H}
 
 需注意的边界：当前理论仅适用于线性非高斯模型，向非线性或高斯系统的推广仍是开放问题；等价类遍历在最坏情况下可能包含指数级数量的图，实际应用需结合稀疏性先验。
 
-
-
 ![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_b8TlYh6PN6/figures/005_Table_1.jpg]]
 *Table 1: A side-by-side comparison between path ranks and edge ranks*
 
 ![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_b8TlYh6PN6/figures/014_Table_2.jpg]]
 *Table 2: A side-by-side overview of representative works on equivalence characterizations across different settings using different approaches. The final column summarizes this work’s contributions*
 
-![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_b8TlYh6PN6/figures/002_Figure_2.jpg]]
-*Figure 2: An illustration of path ranks, edge ranks, and their duality. Left: a digraph G with vertices V partitioned to Y , C, and Z, shown by different colors. The path rank $\rho _ { \mathcal { G } }$ ( Z , ${ \bar { Y } } ) \bar { = }$ 2 , with C being a min-cut. Right: the dual edge rank $\overset { \cdot } { r _ { \mathcal { G } } ( V \backslash Y , V \backslash Z ) }$ = 4 . , given by the maximum bipartite matching from V $\backslash$ Z to V $\backslash$ Y , i.e., from Y $\cup$ C to Z $\cup$ C , , with four matched edges highlighted in red. Four corresponding nonzero entries placed on diagonal, also in red, confirm mrank ( $Q _ { V \backslash Y , V \backslash Z } ^ { ( \mathcal { G } ) }$ ) = 4 One may examin...
-
-![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_b8TlYh6PN6/figures/007_Figure_5.jpg]]
-*Figure 5: Left: An example distributional equivalence class consisting of 10 digraphs. Right: Transitions among these digraphs, where solid edges indicate edge additions or deletions, and dashed edges indicate cycle reversals*
 
 本节给出 glvLiNG 算法的整体 pipeline 及其背后的设计逻辑。算法将分布等价类的恢复分解为三个顺序步骤，每个步骤对应一个核心理论结果，形成从数据到等价类表征的完整通路。
 
@@ -203,8 +192,6 @@ $$\mathrm{bases}_{\mathcal{G}}(L \cup \{X_i\}) = \pi(\mathrm{bases}_{\mathcal{H}
 ### 与现有方法的根本差异
 
 现有潜变量因果发现方法（如 PO-LiNGAM、LaHiCaSl）普遍依赖强结构假设：PO-LiNGAM 基于测量模型假设潜变量仅通过观测变量的指示模式体现，LaHiCaSl 依赖层次潜变量结构和 GIN 条件，且通常假设无环。这些方法仅输出单个点估计（因果图），不考虑等价类。glvLiNG 则无任何结构假设，允许潜变量之间及潜变量与观测变量之间的任意因果结构和循环，并输出完整的分布等价类表征。这一能力来源于对分布等价性本身的完整刻画——知道什么可以被识别，才能设计通用的识别方法。
-
-
 
 ### 关键公式与变量含义
 
@@ -298,8 +285,6 @@ glvLiNG 算法由四个核心模块串联而成，每个模块对应上述理论
 
 从恢复的单个图出发，依据定理3的可容许操作（边添加/删除、循环反转）通过 BFS/DFS 遍历整个等价类。定理3保证：任意两个等价图可通过一系列可容许的边添加/删除和至多一次循环反转相互转换。最终输出定理4定义的 solid/dashed 边表示：solid 边在所有等价图中均出现，dashed 边在至少一个等价图中出现。
 
-
-
 ## 实验与关键发现
 
 ### 主结果
@@ -307,7 +292,6 @@ glvLiNG 算法由四个核心模块串联而成，每个模块对应上述理论
 #### 结构误设下的鲁棒性优势
 
 现有潜变量因果发现方法普遍依赖强结构假设，例如 **PO-LiNGAM**（Jin et al., 2024）基于测量模型，**LaHiCaSl**（Xie et al., 2024）基于层次潜变量模型和GIN条件，二者均假设图无环。当真实模型违反这些假设时，两类基线方法均倾向于产生过度稀疏的图，并错误识别超过一半的边（Table 5）。相比之下，glvLiNG 无需任何结构假设，允许潜变量之间及潜变量与观测变量之间的任意因果结构和循环，因而在结构误设场景下展现出根本性的鲁棒性优势。
-
 
 ![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_b8TlYh6PN6/figures/017_Table_5.jpg]]
 *Table 5: Algorithms are provided with their oracle tests, that is, for them to directly query oracle generalized independent noise (GIN) conditions from the digraph. When the number of their identified latent variables is fewer than truth, we simply add isolated latent variables into the result. When the identified number of latents is larger (which seems not happened), we planned to choose the removal that leads to best result. Finally, the best possible result is reported, i.e., we choose the digraph in the ground-truth equivalence class that is closer to their output as the truth. The latent variables are viewed as unlabeled*
@@ -320,14 +304,12 @@ glvLiNG 算法由四个核心模块串联而成，每个模块对应上述理论
 
 在 oracle OICA 秩模式下，glvLiNG 的图构造速度远超精确求解基线 MILP。以 n=5, ℓ=1, avgdeg=1 为例，glvLiNG 的运行时间仅为 0.015 ± 0.005 秒，而 MILP 需要 0.045 ± 0.013 秒（差距约 3 倍）。当问题规模增大至 n=10 时，glvLiNG 可在 5 秒内完成求解，而 MILP 在 n>5 后即需要数小时，差距呈指数级扩大（Table 4）。
 
-
 ![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_b8TlYh6PN6/figures/016_Table_4.jpg]]
 *Table 4: Running time comparison between our glvLiNG algorithm and a mixed integer linear programming (MILP) baseline for constructing digraphs that satisfy the rank constraints of oracle OICA mixing matrices. Ground-truth graphs are generated from the Erdos–Rényi model with total ˝ number of vertices n and average in-degree avgdeg, with ℓ vertices randomly designated as latent. Each entry reports the mean and standard deviation over 50 models (when completed); empty entries indicate runs that did not finish within 10 minutes. All times are reported in seconds. Experiments were run on an Apple M4 chip*
 
 #### 等价类规模量化
 
 Table 3 给出了不同规模下分布等价类的统计。以 n=5、前 2 个顶点为潜变量为例，在 480,640 个不可约模型中，仅存在 783 个分布等价类，表明等价类具有显著的压缩效应——大量看似不同的图结构实际上在观测分布上不可区分。
-
 
 ![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_b8TlYh6PN6/figures/015_Table_3.jpg]]
 *Table 3: For different numbers of vertices n and latent vertices l, we report the total number of weakly connected digraphs with n vertices, the subset that are irreducible when the first l vertices are latent (both with and without L-isomorphic variants), and the corresponding numbers of distributional equivalence classes they fall into. The final two columns present statistics on how irreducible digraphs (both ut L-isomorphic variants) are distributed among those equiv*
@@ -341,7 +323,6 @@ glvLiNG 的 Phase 1（潜变量出边恢复）承担了主要的计算负载，�
 #### OICA 估计质量的影响
 
 glvLiNG 的性能依赖于过完备独立成分分析（OICA）对混合矩阵的估计精度。在稀疏图中（低平均入度），OICA 估计误差可能导致 glvLiNG 的 SHD 略逊于利用结构假设的基线方法；但在稠密图中，glvLiNG 因其无结构假设的优势表现更优。这一现象在 Figure 7 中随样本量变化的曲线上清晰可见：当样本量不足时，OICA 的估计噪声成为性能瓶颈。
-
 
 ![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_b8TlYh6PN6/figures/018_Figure_7.jpg]]
 *Figure 7: Simulation results comparing glvLiNG with existing methods with varying sample size N (the global x-axis), and each subplot shows a setting under a specific number of total variables n, number of latent variables $\ell$ , and the average in-degree d. Mean and standard deviation of SHD are calculated from 25 random irreducible models*
@@ -362,8 +343,6 @@ glvLiNG 的性能依赖于过完备独立成分分析（OICA）对混合矩阵�
 - **Table 2**：将本文贡献置于跨设定的等价性刻画谱系中，表明本文首次在含潜变量和循环的线性非高斯模型中建立了完整的分布等价性图形判据。
 - **Figure 7**：随样本量变化的 SHD 曲线揭示了 glvLiNG 与基线方法的交叉现象——稀疏图中基线方法在小样本下占优，稠密图中 glvLiNG 始终领先，反映了结构假设与数据效率之间的权衡。
 - **Figure 8**：在股票市场真实数据上，glvLiNG 输出的等价类以 solid/dashed 边的形式呈现，solid 边表示在所有等价图中必然出现的边，dashed 边表示至少在一个等价图中存在的边，为实际应用中的因果解释提供了可操作的确定性/不确定性区分。
-
-
 
 ## 定位与知识库关联
 
@@ -407,8 +386,6 @@ Table 2系统性地梳理了等价性刻画工作在不同设定下的进展，�
 3. **非线性推广**：在非线性/非参数设定下，如何可靠地检验和利用秩约束（或更广义的约束）进行潜变量因果发现？
 4. **表示增强**：能否在等价类表示中融入类似Meek规则的额外约束，以进一步压缩表示的冗余并增强可解释性？
 5. **干预扩展**：如何将本框架扩展到干预分布等价类和参数的可识别性，从而指导实验设计？
-
-
 
 ## 原文 PDF
 

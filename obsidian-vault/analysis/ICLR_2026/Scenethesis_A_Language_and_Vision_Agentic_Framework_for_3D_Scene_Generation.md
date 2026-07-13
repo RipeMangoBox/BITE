@@ -114,11 +114,6 @@ Scenethesis 是一种无需训练的 Agentic 流水线，将 LLM 的语言规划
 
 > **需要手动验证**：流水线中各模块间的具体接口协议（如场景图的数据格式、优化器与判断模块之间的信息传递细节）在现有证据中未充分展开，建议结合论文正文 Section 3 进行确认。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l61_https_openreview_net_forum_id_SzhezVoaNB/figures/012_Figure_8.jpg]]
-*Figure 8: Illustration of collision avoidance and stability maintenance. The solid-line circle indicates the 3D object’s current position, while the dotted-line circle marks its anticipated position. The black dot represents the centroid of the target object, the purple dots indicate surface nodes with negative SDF values, and the red point*
-
 Scenethesis 的核心创新在于将 LLM 的语言规划能力与视觉基础模型的空间先验相耦合，并通过 SDF（有符号距离场）约束建立一个端到端的物理感知优化回路。整个流水线由四个关键模块串联而成，如 Figure 2 所示。
 
 ### 粗场景规划
@@ -144,9 +139,6 @@ $$\{ p ( x , y ) , \tilde { p } ( x , y ) \} _ { i } ^ { m } = \mathrm { R o M a
 #### SDF 碰撞与稳定性约束
 
 姿态对齐后的布局仍可能存在碰撞和不稳定问题。Scenethesis 引入三个基于 SDF 的损失函数进行精细优化（Section 3.3.2, Figure 3）：
-
-![[assets/figures/papers/paper_list_l61_https_openreview_net_forum_id_SzhezVoaNB/figures/003_Figure_3.jpg]]
-*Figure 3: Collision avoidance and stability maintenance*
 
 **平移碰撞损失**（Eq. 2）：当物体表面采样点 ${\bf v}_i \in {\bf V}^-$（SDF 值为负，表示穿透到其他物体内部）时，沿该点到物体质心的方向 ${\bf u}_i$ 将其推出碰撞区域：
 
@@ -176,8 +168,6 @@ $$\mathcal { L } = \lambda _ { p } \mathcal { L } _ { p o s e } + \lambda _ { c 
 
 优化完成后，GPT‑5 判断模块对生成场景进行闭环验证（Section 3.4），从三个维度打分：物体类别准确性、物体朝向对齐度、整体空间一致性。任一项低于阈值时触发重新规划与优化。72% 的场景在首轮优化后通过判断，经自检修复后成功率提升至 91%（Appendix B.3）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l61_https_openreview_net_forum_id_SzhezVoaNB/figures/008_Table_3.jpg]]
 *Table 3: Outdoor Scene Qualitative Evaluation*
 
@@ -187,17 +177,11 @@ $$\mathcal { L } = \lambda _ { p } \mathcal { L } _ { p o s e } + \lambda _ { c 
 
 Scenethesis 在文本-图像对齐的三个指标上均取得最优结果（Table 1）。CLIP 得分达 30.71，超过 **Holodeck** (Yang et al., 2024c) 的 28.32；BLIP 得分 77.17，大幅领先 **SceneTeller** 的 51.99（+25.18）；VQA 得分 0.8269，优于 **LayoutGPT** 的 0.8052。这一优势源于视觉基础模型提供的图像引导与语义对应：LLM 粗规划给出物体类别和层次关系后，图像生成和场景图构建为后续优化提供了密集的空间先验，使最终渲染视角与文本描述高度一致。
 
-![[assets/figures/papers/paper_list_l61_https_openreview_net_forum_id_SzhezVoaNB/figures/004_Table_1.jpg]]
-*Table 1: Quantitative evaluation on text–image alignment and spatial quality (↑ higher is better). Spatial quality preference measures GPT-5 and human preference for Ours over baselines*
-
 空间质量偏好方面，GPT-5 和人类评估者均显著偏好 Scenethesis 的输出。该评估将 Scenethesis 与各基线方法成对比较，统计偏好胜率——Scenethesis 在所有对比中均获胜，表明其生成的场景在整体布局合理性上具有一致优势。
 
 ### 物理合理性与可交互性
 
 物理合理性是 Scenethesis 相比现有方法的核心突破点。在室内场景上（Table 2），Scenethesis 的对象级碰撞率（Col-O）仅 0.8%，远低于 **Holodeck** 的 6.1%；对象级不稳定率（Inst-O）为 3.20%，同样优于 Holodeck 的 7.00%。场景级指标上，Col-S 为 6%，Inst-S 为 16.67%，均显著低于对比方法。这一结果的因果机制在于：基于网格表面采样点的 SDF 碰撞检测（Eq. 2-3）能够发现包围盒无法捕捉的细粒度穿透，而稳定性约束（Eq. 4）驱动物体底面与支撑表面紧密接触，系统性地消除了漂浮和穿模。
-
-![[assets/figures/papers/paper_list_l61_https_openreview_net_forum_id_SzhezVoaNB/figures/007_Table_2.jpg]]
-*Table 2: Physical-plausibility and interactivity results*
 
 可交互性评估进一步验证了物理合理性的实际意义。Scenethesis 的 Reach 指标达 0.94，Walk 指标达 0.96（Table 2），意味着在生成场景中，虚拟角色可以自然地到达物体并自由行走，不会因碰撞或不当放置而被阻挡。相比之下，基线方法因碰撞和布局混乱，可交互性显著降低。
 
@@ -226,9 +210,6 @@ Figure 7 的可视化消融直观展示了这一渐进式改进：从原始布�
 ### 精细化放置与层次空间关系
 
 Scenethesis 的一个关键能力是处理长尾空间关系——尤其是“内部”关系。Figure 6 显示，Holodeck 仅能将小物体置于架子顶部，而 Scenethesis 可将包、酒瓶、鞋子、花瓶等精确放入架子的不同隔层内。这一能力源于场景图层次结构：LLM 规划时指定了“架子-隔层-物体”的父子关系，物理优化阶段则按层次顺序迭代施加约束，确保子物体的 SDF 采样点在其父物体的包围空间内进行碰撞检测。
-
-![[assets/figures/papers/paper_list_l61_https_openreview_net_forum_id_SzhezVoaNB/figures/009_Figure_6.jpg]]
-*Figure 6: Scenethesis precisely places small objects (e.g., bag, wine bottle, shoes, vase) within shelf compartments rather than only on top (Holodeck)*
 
 ### 自检式闭环修复
 

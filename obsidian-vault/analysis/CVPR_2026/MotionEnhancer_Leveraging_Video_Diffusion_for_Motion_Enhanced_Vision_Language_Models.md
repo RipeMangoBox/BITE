@@ -51,8 +51,6 @@ claims:
 
 **主要结果**：MotionEnhancer 在 MotionBench 和 FAVOR-Bench 两个运动理解基准上一致提升多种 VLM 的性能——Qwen2.5-VL 3B 提升 +3.04，7B 提升 +4.23，InternVL3-8B 提升 +2.81。消融实验证实 MHS 与 MTTI 互补，联合使用带来最大增益。
 
-
-
 ### 视觉语言模型的运动理解困境
 
 视觉语言模型（VLM）近年来在视频理解任务上取得了显著进展，能够处理复杂的时空推理问题。然而，现有 VLM 在细粒度运动理解（motion understanding）方面仍存在根本性不足——模型往往能够正确回答“发生了什么”，却难以精确捕捉“如何发生的”这一层面的时间动态细节。
@@ -97,8 +95,6 @@ $$A^{VDM}(t,s,f) \approx p_\phi(v_{s,f} \mid t, \mathbf{z}_k)$$
 
 基于上述分析，MotionEnhancer 的核心动机是：**在不修改 VLM 架构、不引入额外训练参数的前提下，通过将 VLM 的文本-视觉注意力与 VDM 的运动先验进行对齐，从根本上弥合判别式分布与证据寻求分布之间的鸿沟，从而显著提升 VLM 的运动理解能力。**
 
-
-
 ## 核心方法与创新机理
 
 ### 问题瓶颈：VLM 的判别式分布忽略了运动细节
@@ -138,8 +134,6 @@ VDM 的不同 Transformer 注意力头对运动的敏感度差异显著。Motion
 
 相比于 **Motion-Sight**（Du et al., arXiv 2025）等先前运动增强方法，MotionEnhancer 的关键差异在于：它不依赖额外的运动标注数据或专门的运动编码器，而是从已有的视频扩散模型中“免费”蒸馏运动先验。相比于 **TE Fusion**（Hong et al., CVPR 2025）等时间建模方法，MotionEnhancer 不修改 VLM 的时序融合机制，而是通过注意力对齐在表征层面注入运动敏感性。这种“即插即用”的设计使其具有极强的通用性——可适配不同的 VLM（Qwen2.5-VL 3B/7B、InternVL3-8B）和 DiT 类 VDM，无需任何架构修改。
 
-
-
 MotionEnhancer 的整体 pipeline 围绕一个核心思想展开：将视频扩散模型（VDM）中自然编码的运动先验，通过注意力对齐的方式注入到视觉语言模型（VLM）的监督微调过程中，从而增强 VLM 对细粒度时间动态的理解能力。整个框架由四个主要阶段构成，形成一条从运动先验提取到注意力对齐的完整数据流。
 
 **输入与输出。** 框架的输入包括一个视频 $\mathbf{V}$（由 $F$ 帧组成）和对应的文本描述 $t$。输出是经过微调的 VLM，其文本-视觉交叉注意力分布被显式地向 VDM 的证据寻求分布 $p(\mathbf{V}|t)$ 对齐，从而获得更强的运动敏感性。
@@ -156,15 +150,11 @@ MotionEnhancer 的整体 pipeline 围绕一个核心思想展开：将视频扩�
 
 **关键设计特性。** 整个 pipeline 中，VDM 保持完全冻结，MHS 和 MTTI 均为无参数模块，不引入任何额外可训练参数或架构修改。这使得 MotionEnhancer 可以适配不同的 VLM（如 Qwen2.5-VL 3B/7B、InternVL3-8B）和 DiT 类 VDM，具有良好的通用性和即插即用特性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2328_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_MotionEnhancer_Leve/figures/001_Figure_1.jpg]]
 *Figure 1: (A) High-level overview of MotionEnhancer, which incorporates motion priors from the VDM as guidance during supervised fine-tuning of the VLM for improved motion understanding. (B) Observation of VDM attention. We observe distinct patterns in the attention maps across different transformer heads and text tokens in the VDM, which motivates our refinement of motion-centric attention*
 
 ![[assets/figures/papers/paper_list_l2328_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_MotionEnhancer_Leve/figures/002_Figure_2.jpg]]
 *Figure 2: Framework of MotionEnhancer. Our method leverages motion priors distilled from a powerful VDM as auxiliary supervision to enhance the motion understanding capability of a VLM through attention alignment. Attention maps extracted from the VDM during DDIM sampling are filtered by the Motion-sensitive Head Selection (MHS) and Motion-salient Text Token Identification (MTTI) modules to identify motion-relevant attentions. The resulting text-to-vision attentions are then used to guide the VLM during supervised fine-tuning*
-
-
 
 ### 3.1 理论动机：从判别式分布到证据寻求分布
 
@@ -264,8 +254,6 @@ $$
 
 其中 $\lambda$ 为平衡超参数。训练时 VLM 的视觉塔、融合层和 LLM 主干均参与更新，而 VDM 保持冻结。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验结果
@@ -307,8 +295,6 @@ $$\mathcal{L}_{\mathrm{MSE}} = ||\mathrm{Aligner}(A_{\mathrm{VLM}}) - A_{\mathrm
 
 该方法不修改 VLM 架构，可适配不同的 VLM 和 DiT 类 VDM，具有良好的通用性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2328_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_MotionEnhancer_Leve/figures/003_Table_1.jpg]]
 *Table 1: Quantitative results of MotionBench. * denotes results we reproduced using their open-source code, while other results are taken from the original benchmark*
 
@@ -320,8 +306,6 @@ $$\mathcal{L}_{\mathrm{MSE}} = ||\mathrm{Aligner}(A_{\mathrm{VLM}}) - A_{\mathrm
 
 ![[assets/figures/papers/paper_list_l2328_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_MotionEnhancer_Leve/figures/006_Figure_3.jpg]]
 *Figure 3: Qualitative examples of MotionEnhancer. (More examples can be found in supplementary materials.)*
-
-
 
 ## 定位与知识库关联
 
@@ -358,8 +342,6 @@ MotionEnhancer 的因果操作由此明确：通过将 VLM 的文本-视觉注�
 3. **多 VDM 集成与自适应选择**：不同 VDM 在运动建模上可能存在互补性（如某些模型更擅长精细动作，另一些更擅长大幅运动）。能否设计自适应选择机制，根据输入视频的运动特性动态选择最合适的 VDM 先验来源？
 
 4. **理论收敛性**：当前理论分析揭示了 $p(t|V)$ 与 $p(V|t)$ 的分布不匹配，但注意力对齐损失 $\mathcal{L}_{\mathrm{MSE}}$ 的引入如何影响 VLM 原有表征空间的收敛性质，仍需更深入的理论刻画。
-
-
 
 ## 原文 PDF
 

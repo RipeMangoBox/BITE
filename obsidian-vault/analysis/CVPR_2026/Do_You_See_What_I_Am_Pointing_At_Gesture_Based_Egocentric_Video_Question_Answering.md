@@ -57,8 +57,6 @@ claims:
 
 **关键局限**：HINT依赖WiLoR的关键点估计，在运动模糊、遮挡或手部不可见时可靠性下降；快速视角移动可导致目标跟踪失败；合成数据与真实场景间仍存领域差距。
 
-
-
 ### 自我中心视频理解中的指示性瓶颈
 
 自我中心视频理解是具身智能与增强现实的核心技术支柱。随着**Meta Ray-Ban**等AI眼镜的普及，用户期望设备能像人类同伴一样，理解“这个”“那个”等指示代词所指代的具体物体。然而，当前最先进的多模态大语言模型（MLLM）在这一场景下暴露出系统性缺陷：如**Figure 1**所示，即使是**GPT-4o**和**Qwen3-VL-32B**这样的旗舰模型，在面对“这两个锅是什么颜色？”的简单问题时，仍会错误地回答颜色不同，而实际上两个锅都是黑色的。模型未能利用视频中的指向手势来消解“这两个”的指代歧义。
@@ -85,8 +83,6 @@ claims:
 现有的一些自我中心视频理解专用模型（如**EgoGPT**）或视觉指令特化模型（如**ViSpeak**）同样未针对手势语义进行设计，它们或聚焦于第三人称视角的动作识别，或将手部区域仅作为一般视觉特征处理。**VGLLM-QA**等3D几何理解模型虽能处理空间关系，但缺乏对指向意图的显式建模。
 
 本文的核心动机由此明确：**在现有MLLM架构中引入一条轻量级的手势意图编码通路，以极小的计算开销赋予模型解析指向手势的能力**。这一思路不要求重新训练庞大的视觉编码器或语言模型，而是通过一个即插即用的适配器模块，将现成的3D手部关键点估计结果转化为模型可理解的手势令牌，从而实现手势语义与视觉语义的协同推理。
-
-
 
 ## 核心方法与创新机理
 
@@ -134,8 +130,6 @@ Table 4 比较了多种手势编码方式：视觉提示（在帧上画箭头）
 
 HINT 的性能受限于 WiLoR 的 3D 手部关键点估计质量。在运动模糊、遮挡或手部不在视野内时，关键点不可靠，导致手势令牌缺失或编码错误。快速视角移动也可能导致目标物体跟踪失败。此外，方法目前仅利用单手关键点信息，未显式建模物体边界框或分割，可能限制了更精确的指向意图解析。
 
-
-
 HINT 的整体设计遵循**双流并行处理、序列交错融合**的范式，旨在以极低的令牌开销为现有多模态大语言模型（MLLM）注入显式的指向手势理解能力。其核心思想是：不从零训练一个专用模型，而是在冻结的视觉编码器和语言模型之间，插入一条轻量级的手势意图通路，将每帧的 3D 手部关键点转化为单个“手势意图令牌”（Hand Intent Token），并与视觉令牌交错排列，使 LLM 在自回归解码时能够同时关注视觉外观与手势的时空动态。
 
 ### 1. 双流输入架构
@@ -182,12 +176,8 @@ $$p(X_{\mathfrak{a}} \mid V, X_{\mathfrak{q}}, H) = \prod_{i=1}^{L} p(x_i \mid V
 
 其中，仅步骤③的关键点适配器需要训练，其余模块（视觉编码器、WiLoR、LLM）均保持冻结或作为现成工具使用。这种“插件式”设计使 HINT 可以无缝适配多种 MLLM 骨架——论文在 LLaVA-OneVision-7B、InternVL3-8B 和 InternVL3-14B 三个不同规模的模型上验证了其有效性，均取得一致且显著的性能提升。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1059_https_arxiv_org_abs_2603_12533/figures/006_Figure_6.jpg]]
 *Figure 6: HINT overall architecture. HINT uses an additional adapter to model the 3D location and movement of the hand directly*
-
-
 
 HINT 的整体架构（Figure 6）由两条并行流组成：标准视觉流和新增的手势意图流。视觉流沿用现有 MLLM 的视觉编码器与投影器，从均匀采样的 32 帧视频中提取视觉令牌 $V_t$。手势意图流是 HINT 的核心创新，包含三个关键模块。
 
@@ -211,15 +201,11 @@ $$p(X_{\mathfrak{a}} \mid V, X_{\mathfrak{q}}, H) = \prod_{i=1}^{L} p(x_i \mid V
 
 **关键设计选择**。消融实验（Table 4）对比了多种手势意图编码方式：学习型关键点适配器在 Reference 任务上达到 75.0%，显著优于视觉提示（如画箭头）和文本输入坐标等替代方案。这表明让模型自主学习如何处理几何手势信息，比通过视觉或文本通道间接提供更为有效。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1059_https_arxiv_org_abs_2603_12533/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of EGOPOINTVQA. Left: EGOPOINTVQA includes questions with deictic pronouns requiring gesture understanding, either identifying single pointed objects (top) or tracking multiple references across frames (bottom). Right: State-of-the-art models, including GPT-4o [20] and Qwen3-VL-32B [37], fail to resolve the question with pointing gestures, incorrectly stating the two pots have different colors despite both being black. Zoomed circles highlight the pointed objects*
 
 ![[assets/figures/papers/paper_list_l1059_https_arxiv_org_abs_2603_12533/figures/002_Figure_2.jpg]]
 *Figure 2: Task taxonomy and examples from EGOPOINTVQA. EGOPOINTVQA includes six subsets of questions regarding the properties of a pointed object. Each example shows egocentric video frames and a question using deictic references. Tasks include reference (object identification), counting (number of same objects), spatial (location and relative depth), temporal (order of multiple gestures), attribute (object properties), and feedback (object function). All questions require resolving deictic references through visual grounding of pointing gestures. The pointed objects are highlighted with red circles for visualization purposes*
-
-
 
 ## 实验与关键发现
 
@@ -263,8 +249,6 @@ $$p(X_{\mathfrak{a}} \mid V, X_{\mathfrak{q}}, H) = \prod_{i=1}^{L} p(x_i \mid V
 
 这些失败模式指明了未来的改进方向：提升手部姿态估计在退化条件下的鲁棒性，以及引入显式的物体跟踪机制来增强手势-物体关联。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1059_https_arxiv_org_abs_2603_12533/figures/007_Table_1.jpg]]
 *Table 1: Performance of different MLLMs on the EGOPOINTVQA test set. We report multiple-choice accuracy (%). HINT (highlighted in light blue) consistently improves its corresponding open-source backbones and outperforms all compared baselines. Task categories are Reference (Refer.), Temporal, Spatial, Counting (Count), Attribute (Attr.), and Feedback (Feed.). The random baseline reflects the varying number of answer choices across tasks*
 
@@ -273,26 +257,6 @@ $$p(X_{\mathfrak{a}} \mid V, X_{\mathfrak{q}}, H) = \prod_{i=1}^{L} p(x_i \mid V
 
 ![[assets/figures/papers/paper_list_l1059_https_arxiv_org_abs_2603_12533/figures/017_Table_10.jpg]]
 *Table 10: Ablation study on the effect of hand gestures. Performance comparison on our dataset with and without the pointing hand visible in the video frames. The significant drop in performance across all tasks in the ‘w/o Hand’ setting confirms that the pointing gesture is essential for identifying the target*
-
-![[assets/figures/papers/paper_list_l1059_https_arxiv_org_abs_2603_12533/figures/011_Table_4.jpg]]
-*Table 4: Different methods of hand intent modeling. We compare different methods to encode the user’s hand pose. Our HINT with learning keypoint adapter outperforms alternative representations, such as visual prompts and textual inputs*
-
-![[assets/figures/papers/paper_list_l1059_https_arxiv_org_abs_2603_12533/figures/009_Table_3.jpg]]
-*Table 3: Impact of training dataset. We vary the usage of synthetic and real videos in the training set. Using a synthetic dataset to complement a real dataset yields the best result*
-
-![[assets/figures/papers/paper_list_l1059_https_arxiv_org_abs_2603_12533/figures/010_Table_5.jpg]]
-*Table 5: Impact of hand detection confidence threshold τ on HINT. The threshold τ controls a trade-off between filtering noisy detections and retaining valid pointing gestures. A value of 0.5 achieves the best overall performance*
-
-![[assets/figures/papers/paper_list_l1059_https_arxiv_org_abs_2603_12533/figures/012_Table_6.jpg]]
-*Table 6: Impact of input frames. We compare uniform 32-frame input with keyframes manually selected as oracle, where each pointing gesture is most clearly visible (one frame per gesture). y Even with this oracle advantage, Reference drops by 4.8/3.0pp (8B/14B) compared to uniform 32-frame input*
-
-![[assets/figures/papers/paper_list_l1059_https_arxiv_org_abs_2603_12533/figures/016_Table_9.jpg]]
-*Table 9: Human performance on EGOPOINTVQA. We report the average accuracy of 5 human participants, each evaluating the full test set (672 questions)*
-
-![[assets/figures/papers/paper_list_l1059_https_arxiv_org_abs_2603_12533/figures/015_Figure_7.jpg]]
-*Figure 7: Representative failure cases on EGOPOINTVQA. (a)- (b): baseline MLLM failures due to saliency bias and temporal confusion, respectively. (c)-(d): remaining HINT failures caused by unreliable hand keypoints and rapid viewpoint drift*
-
-
 
 ## 定位与知识库关联
 
@@ -337,8 +301,6 @@ HINT 的有效性受以下条件约束：
 - **显式物体关联**：结合物体检测或跟踪模块，在架构层面显式建模“哪只手在指哪个物体”，可能进一步提升精细指向任务的表现。
 - **领域自适应**：如何进一步缩小合成到真实的领域差距，例如通过更逼真的仿真渲染或域随机化策略，是实用化部署的关键。
 - **人类水平差距**：Table 9 显示人类在该数据集上的平均准确率达到 95.9%，而当前最佳 HINT-14B 仅 68.1%，存在约 28 个百分点的显著差距，表明指示性自我中心视频问答仍是一个远未解决的开放挑战。
-
-
 
 ## 原文 PDF
 

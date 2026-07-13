@@ -199,8 +199,6 @@ $$\mathcal{L}_{all} = \mathcal{L}_{dm} + \lambda_{inter} \cdot \mathcal{L}_{inte
 
 推理时，ReGenNet 从纯高斯噪声 $\boldsymbol{x}_T^{1:N}$ 出发，在给定行动者序列的条件下，通过 DDIM 采样逐步去噪。得益于方向注意掩码，模型可在仅 5 个采样步骤（约 0.76 ms/帧）下完成高质量生成（Table 7），实现低延迟的在线反应合成。
 
-### 补充图表
-
 ReGenNet 的核心由一个**条件扩散模型**与一个**堆叠 Transformer 解码器**构成，辅以显式交互损失，实现从任意行动者动作到反应者动作的在线生成。
 
 ### 1. 扩散框架与前向过程
@@ -328,8 +326,6 @@ Figure 3展示了ReGenNet在多种交互场景下的生成结果。模型能够�
 
 ![[assets/figures/papers/paper_list_l1724_ReGenNet_Towards_Human_Action_Reaction_Synthesis/figures/004_Table_2.jpg]]
 *Table 2: Comparison to state-of-the-arts on the online, unconstrained setting for human action-reaction synthesis on NTU120-AS. ± indicates 95% confidence interval, → means that closer to Real is better. Bold indicates best result and underline indicates second best*
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l1724_ReGenNet_Towards_Human_Action_Reaction_Synthesis/figures/013_Figure_3.jpg]]
 *Figure 3: Visualization of human action-reaction synthesis results. Blue for actors and Orange for reactors*

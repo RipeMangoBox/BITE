@@ -52,8 +52,6 @@ claims:
 
 本工作确立了轨迹预测作为长时多目标跟踪关键组件的方法定位，表明在BEV空间中的生成式运动推理能够有效替代复杂的表观匹配，为遮挡鲁棒跟踪开辟了新范式。
 
-
-
 ### 问题背景：长期遮挡——多目标跟踪的阿喀琉斯之踵
 
 多目标跟踪（MOT）的核心挑战之一是目标在长时间遮挡后重新出现时的身份关联。在MOTChallenge数据集中，约**19.4%的轨迹会经历超过2秒的遮挡**，而现有最先进的跟踪器在遮挡时长超过3秒时几乎完全失效——**仅能成功关联不到10%的丢失轨迹**（Figure 1b）。这意味着，尽管近年来跟踪器在整体指标上取得了显著进步，但其在长时遮挡场景下的鲁棒性仍然是明显的短板。
@@ -77,8 +75,6 @@ claims:
 - **少量但多样化的预测样本**足以大幅缩小关联时的搜索空间，从而显著提升长时遮挡下的身份保持能力。
 
 基于这一动机，本文提出**QuoVadis**——一种将轨迹预测引入多目标跟踪的通用框架，通过数据驱动的单应性变换将单目检测提升至BEV空间，并在该空间中对丢失轨迹进行长时预测与匹配，从而系统性地桥接长期遮挡。
-
-
 
 ## 核心方法与创新机理
 
@@ -114,8 +110,6 @@ $$c_{ij} = \left( \Delta_{\mathrm{IoU}} + \max\left( \tau_{L_2} - \Delta_{L_2}, 
 
 **核心洞见总结**：QuoVadis 的核心洞见在于，通过数据驱动单应性变换将检测提升至BEV空间，并在该空间中利用少量但覆盖多模态的生成式轨迹预测，能够有效替代复杂的表观匹配，显著桥接长时遮挡。消融实验（Table 1）揭示了一个反直觉的发现：**预测损失（FDE/ADE）的最优并非带来最好跟踪性能**——使用3个生成器的多模态预测（MG-GAN）在FDE并非最优的情况下获得了最高HOTA（54.52）和AssA（54.80），而移除社会交互模块对跟踪影响甚微。这表明对于跟踪而言，**少量多样化的预测**比精确的轨迹回归或复杂的交互建模更为关键。
 
-
-
 QuoVadis 的核心思路是将长期遮挡下的多目标跟踪重新表述为**鸟瞰视图（BEV）空间中的轨迹预测问题**。其整体流水线由三个松耦合但顺序依赖的模块构成，输入为单目视频帧与现成检测器的 2D 边界框，输出为跨长时遮挡的鲁棒轨迹关联。
 
 ### 模块关系与数据流
@@ -134,16 +128,6 @@ QuoVadis 的核心思路是将长期遮挡下的多目标跟踪重新表述为**
 - **BEV 空间作为运动推理空间**：将运动预测从像素空间提升至 BEV 空间是方法的核心操作。即使在 BEV 中仅使用线性 Kalman 滤波器，其端点匹配召回率也远超像素空间的同类预测（Figure 4），因为 BEV 空间中的运动模式更符合物理规律且不受透视畸变影响。
 - **少量多样化预测优于大量单一预测**：实验表明，3 个生成器的多模态预测（MG-GAN）在跟踪性能上优于 20 个样本的单一 GAN（Table 1），说明覆盖运动多模态的多样性比预测精度本身对跟踪更重要。
 - **表观模型作为辅助验证**：轨迹预测大幅缩小了关联搜索空间，但引入表观阈值过滤仍能有效抑制错误关联，在实践中提升跟踪鲁棒性（Table 2）。
-
-![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2210_07681/figures/001_Figure.jpg]]
-*Figure: (a) Illustration of our method. (b) ID recall*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2210_07681/figures/002_Figure_2.jpg]]
-*Figure 2: Our method: we bridge long-term occlusions by (a) localizing object tracks in BEV via estimated homography and (b) forecasting future trajectories for lost tracks. We (d) continually aim to match these inactive track predictions with new object detections and remove incorrect predictions under a visibility constraint (c)*
-
-
 
 ### 3.1 数据驱动单应性估计模块
 
@@ -191,8 +175,6 @@ $$c_{ij} = \left( \Delta_{\mathrm{IoU}} + \max\left( \tau_{L_2} - \Delta_{L_2}, 
 
 此外，模块利用投影的地面掩码（见 Figure 2c）实施可见性约束：若预测位置落入已知的遮挡区域（如建筑物后方），则暂时保留该预测；若预测位置处于可见但无检测对应的区域，则判定为错误预测并予以滤除。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置与公平性说明
@@ -206,9 +188,6 @@ QuoVadis 的训练与评测遵循严格的可复现原则。轨迹预测网络**
 #### 长时遮挡关联能力的根本性突破
 
 Figure 1b 揭示了当前跟踪器的核心瓶颈：**现有先进跟踪器仅能成功关联不到 10% 的超过 3 秒的遮挡**。这一发现直接定义了长时多目标跟踪的真正难点——当遮挡时长超过 3 秒，基于表观相似度和线性运动模型的传统关联策略几乎完全失效。QuoVadis 通过在 BEV 空间中进行长时轨迹预测，将超过 3 秒遮挡的 ID 召回率提升至约 60%，实现了约 50 个百分点的飞跃（置信度 0.85）。
-
-![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2210_07681/figures/004_Figure.jpg]]
-*Figure: (a) Overall recall (BEV and pixel-space). (b) Recall wrt. different occlusion lengths*
 
 #### MOT17/MOT20 测试集表现
 
@@ -270,19 +249,6 @@ Table 4 展示了在 MOT17 验证集动态场景（排除 MOT17-05）上的结�
 - 如何设计新的预测评价指标，使其与下游跟踪性能（HOTA/IDSW）更好对齐？
 - 是否可能通过端到端学习联合优化深度估计、单应性回归与轨迹预测，以减少模块间误差累积？
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2210_07681/figures/012_Figure_6.jpg]]
-*Figure 6: Demonstration of horizon and linearization threshold for sequence image. Linearization of homography transformation is necessary to prevent enormous distances in the transformed coordinates and unrealistic velocities*
-
-![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2210_07681/figures/013_Figure_7.jpg]]
-*Figure 7: Demonstration of prediction for MG-GAN in BEV and Kalman filter in pixel space*
-
-![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2210_07681/figures/003_Figure_3.jpg]]
-*Figure 3: We estimate the homography H for a sequence by reconstructing a 3D point cloud using a monocular depth estimator. We obtain ground image-to-point-cloud correspondences using a semantic segmentation model that masks ground pixels as needed to estimate the homography matrix. With the estimated homography matrix, we transform the bottom points of bounding boxes to 2D BEV coordinates*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 核心问题与因果机制
@@ -339,8 +305,6 @@ Table 4 展示了在 MOT17 验证集动态场景（排除 MOT17-05）上的结�
 4. **非行人目标与完全动态场景的泛化**：该方法在车辆跟踪、动物跟踪以及完全由移动摄像头拍摄的场景（如车载视角）下的适应性如何？是否需要重新训练预测模型或调整单应性估计策略？
 
 5. **端到端联合优化的可能性**：是否可能通过端到端学习联合优化深度估计、单应性回归与轨迹预测，以减少模块间误差累积，同时保持对任意底层跟踪器的即插即用特性？
-
-
 
 ## 原文 PDF
 

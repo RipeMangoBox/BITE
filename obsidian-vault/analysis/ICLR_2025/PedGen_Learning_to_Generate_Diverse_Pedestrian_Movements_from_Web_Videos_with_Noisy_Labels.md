@@ -50,8 +50,6 @@ claims:
 
 实验表明，PedGen在CityWalkers验证集上显著超越 **MDM**（Tevet et al., 2022）、**HumanMac**（Chen et al., 2023a）、**TRUMANS**（Jiang et al., 2024）等基线方法，并在Waymo和CARLA数据集上实现零样本泛化（Table 1）。消融研究揭示：自动异常标签过滤带来aADE改善2.9%，将部分标签作为额外训练数据进一步改善5.8%；目标点是最重要的上下文因素，单独提供即可使aADE降低72.9%，同时使用场景、人体形状和目标点三种上下文因素达到最低生成误差（Table 2）。分离速度与旋转令牌、加入轨迹损失和几何损失均对最终性能有正向贡献（Table 3）。
 
-
-
 ### 问题背景：从网络视频中学习行人运动生成
 
 生成逼真且多样化的人体运动是计算机视觉与图形学中长期存在的核心挑战。近年来，数据驱动的方法在受控实验室或固定场景下取得了显著进展，但这些方法普遍依赖高质量的运动捕捉数据，获取成本高昂且场景覆盖有限。与此同时，互联网上存在海量的行人视频，其中蕴含着丰富的运动模式、多样的身体形态和真实的城市场景——若能有效利用这些数据，将极大地推动上下文感知的行人运动生成技术的发展。
@@ -78,8 +76,6 @@ claims:
 2. **3D场景感知的上下文编码**：将2D深度图与语义分割图通过单目几何反投影提升为3D局部体素表示，融合行人身体形状与目标位置，为扩散去噪网络提供丰富的3D场景理解，从而生成与真实环境几何和语义一致的多样化行人运动。
 
 通过在自建的大规模网络视频数据集**CityWalkers**（含104,192个训练样本，覆盖多样化的真实城市场景与行人运动）上的系统验证，以及在Waymo真实场景和CARLA仿真环境上的零样本泛化测试，PedGen旨在证明：即使训练标签含有显著噪声与缺失，条件扩散模型仍能生成逼真、多样化且贴合3D环境的行人运动。
-
-
 
 ## 核心方法与创新机理
 
@@ -111,12 +107,7 @@ $$\mathcal{L}(\pmb{x}, \hat{\pmb{x}}) = \mathbb{E}_{k \in [1, K], (\pmb{x}, \pmb
 
 其中 $\mathcal{L}_{\mathrm{traj}}$ 是轨迹损失，约束生成运动的全局路径与真值一致；$\mathcal{L}_{\mathrm{geo}}$ 是基于前向运动学的几何损失，惩罚脚部滑动、关节异常等物理不一致。消融显示，两项额外损失均有独立正向贡献，全部组件组合达到最优（Table 3b）。
 
-
-
 PedGen 的整体设计围绕一个核心矛盾展开：如何从大规模网络视频中学习上下文感知的行人运动生成，同时应对伪标签不可避免的噪声与缺失。为此，PedGen 构建了一条从含噪标签清洗到条件扩散生成的完整流水线，其架构与数据流可概括为四个耦合阶段（参见 Figure 3）。
-
-![[assets/figures/papers/paper_list_l1904_PedGen_Learning_to_Generate_Diverse_Pedestrian_Movements_from_Web_Videos/figures/004_Figure_3.jpg]]
-*Figure 3: Our method. We discard the anomaly labels with an iterative automatic label filtering procedure and add the partial labels to training data. We then train PedGen with a Context Encoder to represent crucial context factors. The scene context is obtained by lifting the 2D depth and semantic labels to the 3D space and converting them into a local voxel representation. The encoded scene context is combined with other context factors, including the body shape and the goal to get the context embedding c. The context embedding c and the timestep embedding k are then used to guide the Denoising Transformer to predict the clean motion from the noised one. We use a learnable motion mask embedding m t...*
 
 **阶段一：自动标签过滤与部分标签利用。** 原始 CityWalkers 数据集的伪标签由预训练预测器生成，包含两类噪声——异常标签（严重偏离物理真实的运动）和部分标签（因遮挡或跟踪失败导致的时间步缺失）。PedGen 采用迭代式重建误差驱动的无监督异常检测策略：先用当前干净子集训练模型，再对全量数据计算重建误差，将误差显著偏高的样本标记为异常并移除，随后用更新后的子集重新训练，如此迭代两轮即可达到最优性能（Table 6）。对于部分标签，PedGen 引入可学习的运动掩码嵌入 $m$，替换缺失时间步的输入令牌，使模型能从这些不完整样本中提取有效运动模式。消融实验表明，仅移除异常标签即可使 aADE 改善 2.9%，而将部分标签作为额外训练数据进一步带来 5.8% 的增益（Table 2a）。
 
@@ -131,8 +122,6 @@ $$\mathcal{L}(\pmb{x}, \hat{\pmb{x}}) = \mathbb{E}_{k \in [1, K], (\pmb{x}, \pmb
 **推理流程。** 给定场景上下文和（可选的）目标点，PedGen 从随机噪声出发，通过迭代去噪生成 SMPL 运动参数序列 $\{t_t, \phi_t, \pmb{\theta}_t, \beta\}$。当给定目标点 $t_T$ 时，模型额外计算速度缩放因子 $\lambda = (t_T - t_1) / \hat{t}_T$，以确保生成轨迹精确收敛至目标位置。
 
 整个流水线的核心洞察在于：通过将 2D 场景提升至 3D 体素表示并融合多源上下文，再辅以迭代标签清洗和部分标签掩码机制，条件扩散模型即使在大规模含噪数据上也能学习到逼真、多样化且与 3D 环境一致的行人运动。
-
-
 
 PedGen 的整体架构围绕条件扩散框架构建，其核心设计目标是从含噪网络视频标签中学习上下文感知的行人运动生成。方法由四个紧密协作的模块构成，并在运动表示、损失函数和上下文编码层面引入了若干关键公式。
 
@@ -191,8 +180,6 @@ $$\mathcal{P}_{\mathrm{local}} = \left\{ \mathbf{p} \in \mathcal{P} \ \vert \ \V
 $$\lambda = (t_T - t_1) / \hat{t_T}$$
 
 其中 $\hat{t_T}$ 为模型预测的终点位置，通过缩放预测速度使累积位移与目标位移一致（Appendix C）。
-
-
 
 ## 实验与关键发现
 
@@ -291,30 +278,11 @@ PedGen 展现出优异的零样本泛化能力：
 - **Table 3b**：分离速度/旋转令牌、轨迹损失和几何损失均对性能有正向贡献，所有组件组合达到最优。
 - **Figure 5**：定性展示了上下文因素的消融效果——缺少场景上下文导致穿墙，缺少目标点导致方向不可控，三者结合生成自然且场景一致的运动。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1904_PedGen_Learning_to_Generate_Diverse_Pedestrian_Movements_from_Web_Videos/figures/008_Table.jpg]]
-*Table: (a) Evaluation of training with noisy labels. We evaluate PedGen with no context trained with or without anomaly and partial labels*
-
-![[assets/figures/papers/paper_list_l1904_PedGen_Learning_to_Generate_Diverse_Pedestrian_Movements_from_Web_Videos/figures/009_Table.jpg]]
-*Table: (b) Evaluation of the context factors. We evaluate PedGen conditioned on each context factor, including the surrounding environment (scene), the pedestrian’s own characteristics (human), and the goal points (goal)*
-
 ![[assets/figures/papers/paper_list_l1904_PedGen_Learning_to_Generate_Diverse_Pedestrian_Movements_from_Web_Videos/figures/010_Table_3.jpg]]
 *Table 3: Ablation experiment results. We ablate on the training data of PedGen (a) and the PedGen model’s key components (b) on the CityWalkers validation set*
 
 ![[assets/figures/papers/paper_list_l1904_PedGen_Learning_to_Generate_Diverse_Pedestrian_Movements_from_Web_Videos/figures/005_Figure_4.jpg]]
 *Figure 4: Visualizations of the generated pedestrian movements. The top row shows results in real scenes from the CityWalkers dataset, the middle row shows results in the real-world Waymo test set, and the bottom row shows results in simulated scenes from the CARLA test set*
-
-![[assets/figures/papers/paper_list_l1904_PedGen_Learning_to_Generate_Diverse_Pedestrian_Movements_from_Web_Videos/figures/001_Figure_1.jpg]]
-*Figure 1: Pedestrian Movement Generation. Our method can generate diverse pedestrian movements in real-world (top row) and simulated (bottom row) urban environments*
-
-![[assets/figures/papers/paper_list_l1904_PedGen_Learning_to_Generate_Diverse_Pedestrian_Movements_from_Web_Videos/figures/011_Figure_6.jpg]]
-*Figure 6: Pedestrian movement prediction in Waymo. We predict long-term pedestrian movements using PedGen*
-
-![[assets/figures/papers/paper_list_l1904_PedGen_Learning_to_Generate_Diverse_Pedestrian_Movements_from_Web_Videos/figures/019_Figure_12.jpg]]
-*Figure 12: Samples of 4D pedestrian movement labels in CityWalkers. The text descriptions of the movements from top left to bottom right are: walking down stairs (pink), turning and lifting baggage up steps (light green), walking up stairs (dark purple), turning around with phone in hand (sky blue), moving hands to hip (dark green), wiping seats and tables (red), jumping and skipping around (yellow), taking photo and standing up (light purple)*
-
-
 
 ## 定位与知识库关联
 
@@ -377,8 +345,6 @@ PedGen 的适用范围和局限可从以下四个维度界定：
 4. **多活动类型统一建模**：当前方法是否适用于更剧烈的非步行行为（如跑步、跳跃、上下楼梯），以及如何统一建模多种活动类型的上下文条件生成？CityWalkers 数据集中已包含部分非步行行为（Figure 12），但模型在这些类别上的表现尚未被系统评估。
 
 5. **物理仿真集成**：是否可以将 PedGen 与物理仿真器（如 CARLA）形成闭环，利用仿真反馈进一步优化生成运动的物理合理性？这类似于强化学习中 sim-to-real 的思路，但需要解决生成模型与仿真器之间的可微分接口问题。
-
-
 
 ## 原文 PDF
 

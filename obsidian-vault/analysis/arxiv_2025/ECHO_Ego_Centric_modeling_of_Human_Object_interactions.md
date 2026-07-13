@@ -159,13 +159,8 @@ $$(\hat{\mathcal{H}},\hat{\mathcal{O}},\hat{\mathcal{I}}) := (\hat{\mathcal{H}},
 
 框架最终输出完整的全身人体运动序列（以 SMPL-X 姿态参数表示）、物体在头部中心坐标系下的 SE(3) 轨迹，以及逐帧的接触序列。这三者共同构成物理一致的长期人-物交互重建结果。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1678_ECHO_Ego_Centric_modeling_of_Human_Object_interactions/figures/003_Figure_3.jpg]]
 *Figure 3: ECHO overview. ECHO requires just head and hand tracking and and object class, to predict Human, Object, and Interaction. The input tokens are composed of condition, and of either observed modality, or noise for*
-
-![[assets/figures/papers/paper_list_l1678_ECHO_Ego_Centric_modeling_of_Human_Object_interactions/figures/002_Figure_2.jpg]]
-*Figure 2: Representation. ECHO operates in a perframe head-centric coordinate system*
 
 ![[assets/figures/papers/paper_list_l1678_ECHO_Ego_Centric_modeling_of_Human_Object_interactions/figures/001_Figure_1.jpg]]
 *Figure 1: ECHO. Inferring complex interactions from sparse wearable signals is challenging. ECHO is the first method to jointly recover full-body Human-Object Interaction sequences (top) solely from sparse 3-point tracking. Our flexible framework supports various inference modes (bottom), leveraging partial or intermittent observations (shown in red) of human pose, object trajectory, or contact dynamics*
@@ -278,20 +273,6 @@ Fig. 5展示了ECHO与基线方法在多样化交互场景下的定性对比。E
 4. **手部细节不足**：模型未显式建模手-物细节接触，精细手部姿态可能不够准确——这从Table 1中手部相关指标的改善幅度相对较小可间接印证。
 
 需要手动验证的是：论文中未提供在完全未知物体类别上的零样本泛化实验，上述第1点局限的严重程度需结合实际部署场景评估。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1678_ECHO_Ego_Centric_modeling_of_Human_Object_interactions/figures/007_Table_1.jpg]]
-*Table 1: Comparison with baselines on BEHAVE and OMOMO. ECHO demonstrates better performance for human-object interaction modeling and competitive motion modeling quality*
-
-![[assets/figures/papers/paper_list_l1678_ECHO_Ego_Centric_modeling_of_Human_Object_interactions/figures/011_Table_5.jpg]]
-*Table 5: Ablation study on BEHAVE. Evaluating the impact of ECHO components proves the usefulness of guidance, smooth inpainting, usage of three modalities, and training with AMASS data*
-
-![[assets/figures/papers/paper_list_l1678_ECHO_Ego_Centric_modeling_of_Human_Object_interactions/figures/009_Table_3.jpg]]
-*Table 3: Evaluation of ECHO with noise simulation. We demonstrate the robustness of ECHO to intermittent hand tracking by randomly dropping a percentage of the input. The model maintains stable performance even with significant missing hand tracking data, confirming its resilience to sensor noise*
-
-![[assets/figures/papers/paper_list_l1678_ECHO_Ego_Centric_modeling_of_Human_Object_interactions/figures/005_Figure_5.jpg]]
-*Figure 5: Qualitative results of ECHO. Our method accurately reconstructs humanobject interactions across diverse scenarios. In contrast, competing methods often fail to capture correct contact dynamics, leading to artifacts such as object penetration or floating. For dynamic visualizations, please refer to the supplementary video*
 
 ![[assets/figures/papers/paper_list_l1678_ECHO_Ego_Centric_modeling_of_Human_Object_interactions/figures/006_Figure_6.jpg]]
 *Figure 6: \ Fig. 6: Qualitative results of ECHO. We demonstrate generalization to novel motion and objects from the Aria Digital Twin [65]; RGB is included for reference*

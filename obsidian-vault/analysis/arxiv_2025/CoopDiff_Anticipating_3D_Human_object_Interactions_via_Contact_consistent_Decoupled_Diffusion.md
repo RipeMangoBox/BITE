@@ -50,8 +50,6 @@ claims:
 
 在 BEHAVE 和 Human-Object Interaction 两个标准数据集上的实验表明，CoopDiff 显著优于先前最优方法 **InterDiff**（Xu et al., ICCV 2023）。在 BEHAVE 数据集上，人体关节位置误差（MPJPE-H）从 140 降至 123（↓12.1%），物体平移误差（Trans.Err.）从 123 降至 106（↓13.8%），旋转误差（Rot.Err.）从 226 降至 200（↓11.5%）；尤为突出的是，穿透率（Pene.）从 164 大幅降至 94（↓42.7%），表明 CoopDiff 生成的交互在物理真实性上具有质的提升。消融实验进一步验证了解耦建模、接触注入、一致性约束以及人驱动交互模块各自的有效性，逐步叠加这些组件后所有指标持续改善。
 
-
-
 ### 问题背景
 
 3D人-物交互（Human-Object Interaction, HOI）预测任务旨在根据历史观测，预测未来一段时间内人体和物体在三维空间中的运动轨迹。这一任务在机器人操作、虚拟现实、人机协作等场景中具有重要应用价值。然而，准确预测人-物交互面临一个核心挑战：**人体与物体的运动模式存在本质差异**。如Figure 1所示，人体关节高度结构化，不同关节的运动轨迹复杂且多样化；而物体通常仅涉及刚性平移和旋转，运动模式相对简单。这种动力学特性的显著差异使得联合建模两者变得困难。
@@ -70,8 +68,6 @@ claims:
 1. **解耦建模**：将人体和物体运动预测分解为两个独立分支，使每个分支专注于各自独特的运动模式。
 2. **接触作为桥梁**：将人-物接触点作为共享锚点，同时注入两个分支，通过接触一致性约束对齐两者的预测，确保运动协调一致。
 3. **人驱动交互**：将人体动态作为条件控制引入物体分支，模拟真实世界中“人操纵物体”的交互模式，进一步提升交互真实感。
-
-
 
 ## 核心方法与创新机理
 
@@ -100,8 +96,6 @@ $$L_{consistency} = \sum_{i=1}^{T_p+T_f} M_i \odot \| \hat{C}_H^i - \hat{C}_O^i 
 $$L_{all} = \lambda_H L_{human} + \lambda_O L_{object} + \lambda_C L_{consistency}$$
 
 此外，CoopDiff 采用了非对称的接触聚合设计——物体分支提前聚合接触信息，而人体分支不聚合——以适应二者不同的动态特性。消融实验（Table 4）证实，该非对称结构优于人体对齐或物体对齐的对称变体。
-
-
 
 CoopDiff 的整体框架围绕一个核心洞察构建：**人体与物体在运动模式上存在本质差异**——人体关节高度结构化且运动多样，而物体仅涉及刚性平移与旋转（见 Figure 1）。为应对这一差异，CoopDiff 采用**双分支扩散架构**，将人体运动与物体运动解耦至两个独立分支进行建模，同时以**人-物接触点作为共享锚点**桥接两个分支，确保运动预测的一致性。
 
@@ -143,8 +137,6 @@ $$L_{\text{all}} = \lambda_H L_{\text{human}} + \lambda_O L_{\text{object}} + \l
 
 框架在接触信息的聚合方式上采用了**非对称结构**：物体分支提前聚合接触特征，而人体分支不做额外聚合。消融实验（Table 4）表明，这种非对称设计优于人体对齐或物体对齐的对称变体，验证了适应人体与物体各自动态特性差异的必要性。
 
-
-
 ### 3.1 数据表示
 
 在介绍核心模块之前，首先明确运动预测任务的数据表示。给定观测到的人-物交互（HOI）历史序列，模型需要预测未来的人体和物体运动。
@@ -156,9 +148,6 @@ $$L_{\text{all}} = \lambda_H L_{\text{human}} + \lambda_O L_{\text{object}} + \l
 ### 3.2 人体动力学分支
 
 人体动力学分支采用基于 Transformer 解码器的扩散模型架构，专门建模人体关节的高度结构化运动（Figure 3(a)）。
-
-![[assets/figures/papers/paper_list_l1677_CoopDiff_Anticipating_3D_Human_object_Interactions_via_Contact_consisten/figures/003_Figure_3.jpg]]
-*Figure 3: Contact-aware human and object dynamics branch*
 
 **模块设计**：预测器 $\mathcal{D}_H$ 接收加噪后的人体运动与接触点的拼接向量 $[h_t, C_t]$ 作为输入，结合扩散时间步 $t$ 和人体条件编码 $\mathcal{E}_H(y_H)$（包含历史运动信息），通过 $L$ 层 Transformer 解码器逐步去噪，最终恢复干净的人体运动 $h_0$ 和人体侧接触点 $C_0$。
 
@@ -196,9 +185,6 @@ $$L_{consistency} = \sum_{i=1}^{T_p+T_f} M_i \odot \| \hat{C}_H^i - \hat{C}_O^i 
 
 人驱动交互模块（Human-driven Interaction Module, HIM）将人体动力学知识显式注入物体运动建模，模拟真实场景中“人操控物体”的交互模式（Figure 4）。
 
-![[assets/figures/papers/paper_list_l1677_CoopDiff_Anticipating_3D_Human_object_Interactions_via_Contact_consisten/figures/004_Figure_4.jpg]]
-*Figure 4: The Human-driven Interaction Module (HIM). The modules Z in gray represent the Fully-Connected (FC) layers whose weights and bias are initialized to zeros*
-
 **模块设计**：HIM 构造为物体动力学模型的可训练副本。具体而言，将人体分支 Transformer 解码器各层的中间特征提取出来，通过零初始化的全连接层（FC layer）$Z$ 进行线性变换后，逐层注入到 HIM 对应层的中间特征中。这种设计使得物体运动预测能够感知人体动态变化，从而生成更协调的交互运动。
 
 ### 3.6 整体训练损失
@@ -208,8 +194,6 @@ $$L_{consistency} = \sum_{i=1}^{T_p+T_f} M_i \odot \| \hat{C}_H^i - \hat{C}_O^i 
 $$L_{all} = \lambda_H L_{human} + \lambda_O L_{object} + \lambda_C L_{consistency} \quad \text{(Eq.4)}$$
 
 其中 $\lambda_H$、$\lambda_O$、$\lambda_C$ 分别为人体动力学损失、物体动力学损失和接触一致性损失的权重系数。三个损失项共同优化，确保人体运动精度、物体运动精度以及二者之间的交互一致性。
-
-
 
 ## 实验与关键发现
 
@@ -253,9 +237,6 @@ CoopDiff 在两个标准基准数据集上均取得了最优性能，尤其在�
 
 Figure 5 将 CoopDiff 的接触一致性建模与 CHOIS、HOI-Diff 以及直接对齐最近邻人-物点的方法进行了对比。CoopDiff 通过跨分支共享接触锚点并施加一致性约束，在接触区域实现了更连贯的人-物动态，优于其他接触引导方法。
 
-![[assets/figures/papers/paper_list_l1677_CoopDiff_Anticipating_3D_Human_object_Interactions_via_Contact_consisten/figures/008_Figure_5.jpg]]
-*Figure 5: Comparisons of our contact consistency modeling against other contact-guided approaches, including CHOIS (Li et al. 2024a), HOI-Diff (Peng et al. 2025), and direct alignment of the nearest human-object points1*
-
 ### 关键图表结论汇总
 
 | 图表 | 核心结论 |
@@ -267,17 +248,9 @@ Figure 5 将 CoopDiff 的接触一致性建模与 CHOIS、HOI-Diff 以及直接�
 | Figure 6 | 定性展示 CoopDiff 减少穿透、漂浮等不真实交互 |
 | Figure 8 | HIM 模块促进接触区域真实交互，减少轻微穿透 |
 
-![[assets/figures/papers/paper_list_l1677_CoopDiff_Anticipating_3D_Human_object_Interactions_via_Contact_consisten/figures/006_Table_4.jpg]]
-*Table 4: Analysis of the asymmetric structure on BEHAVE dataset. CoopDiff with asymmetric structure outperforms human-aligned and object-aligned symmetric variants*
-
-![[assets/figures/papers/paper_list_l1677_CoopDiff_Anticipating_3D_Human_object_Interactions_via_Contact_consisten/figures/012_Figure_8.jpg]]
-*Figure 8: Visual analysis on mitigating unrealistic interactions. With our contact-consistent modeling, humans and objects exhibit more coherent dynamics near the contact regions. The HIM module further promotes realistic interactions, which reduces slight penetration and facilitates achieving authentic contact. The red dots denote visible contact points outputted by CoopDiff*
-
 ### 公平性说明
 
 所有方法在相同的标准基准数据集（BEHAVE 和 HOI）上使用统一的训练/测试划分和评估指标进行对比，确保比较的公平性。
-
-
 
 ## 定位与知识库关联
 
@@ -338,8 +311,6 @@ CoopDiff的核心贡献在于**将HOI运动预测从“联合建模”范式推�
 - **人驱动交互模块**：通过将人体动态作为条件控制注入物体分支，实现了非对称的交互引导，这与真实世界中人类通常作为操控者的角色一致。
 
 在HOI预测的知识图谱中，CoopDiff位于**扩散生成模型**与**物理感知交互建模**的交叉点，连接了运动预测、接触建模和交互真实感三个研究方向。其解耦-桥接框架为后续研究提供了可扩展的架构模板——例如，可替换分支内部的生成模型类型，或引入更精细的接触物理约束。
-
-
 
 ## 原文 PDF
 

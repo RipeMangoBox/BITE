@@ -50,8 +50,6 @@ WHAM（World-grounded Humans with Accurate Motion）针对这一瓶颈，提出�
 
 在多个野外基准测试中，WHAM取得了全面的最优结果。在3DPW数据集上，WHAM（ViT）的PA-MPJPE达到35.9 mm，较单帧SOTA方法HMR2.0降低8.5 mm，加速度误差（Accel）更是从18.1 m/s²降至6.6 m/s²。在EMDB 2的全局轨迹估计中，WHAM的W-MPJPE100仅为354.8 mm，而DPVO+HMR2.0的组合高达2231.4 mm；足部滑动指标（FS）从TRACE的370.7 mm骤降至4.4 mm，抖动量（Jitter）亦从2987.6降至22.5。消融实验证实，特征集成、2D-to-3D预训练、相机角速度以及轨迹细化四个关键组件对最终性能均有显著贡献。此外，WHAM以约200 fps的核心推理速度运行，在精度与效率之间取得了突出平衡。
 
-
-
 从单目视频中恢复准确、平滑且世界坐标系一致的3D人体运动是计算机视觉的核心挑战之一，在AR/VR、运动分析、人机交互等领域具有广泛应用。近年来，基于单帧图像的人体姿态与形状（HPS）估计方法取得了长足进步，代表性工作如 **HMR2.0** 和 **CLIFF** 等在标准基准上实现了令人印象深刻的每帧精度。然而，这些方法逐帧独立预测，缺乏时间一致性约束，导致输出运动存在明显抖动，加速度误差（Accel）普遍高达 18–31 m/s²。
 
 为引入时间平滑性，视频类方法如 **TCMR**、**GLoT** 等利用时序上下文建模，有效降低了加速度误差。但它们面临两个关键瓶颈：**第一**，现有视频方法在每帧精度指标（如 MPJPE、PA-MPJPE）上仍普遍弱于单帧方法，说明时间建模尚未有效转化为姿态估计精度提升；**第二**，绝大多数方法在相机坐标系中估计人体运动，当相机本身发生运动时，无法恢复人体在真实世界中的全局轨迹。
@@ -61,8 +59,6 @@ WHAM（World-grounded Humans with Accurate Motion）针对这一瓶颈，提出�
 综合来看，现有方法的核心缺口在于：**难以在动态相机下同时实现全局坐标系中准确、平滑且无足部滑动的3D人体运动估计，且视频方法的准确率普遍低于单帧方法**。这暴露了两个深层问题：一是如何有效融合运动上下文与视觉外观信息以提升姿态估计精度，二是如何在缺乏绝对位置观测的情况下，利用足部接触等物理先验约束全局轨迹。
 
 WHAM 正是针对上述缺口提出的解决方案。其核心动机在于：利用大规模运动捕捉数据（AMASS）生成的合成2D关键点序列预训练运动先验，再通过特征集成器融合图像上下文以提升精度，同时引入相机角速度辅助的轨迹解码与接触感知细化，从根本上解决足部滑动问题，实现在线、高效且准确的全局3D人体运动重建。
-
-
 
 ## 核心方法与创新机理
 
@@ -103,8 +99,6 @@ $$
 
 与 **TCMR** 等使用双向 RNN 的方法不同，WHAM 采用**单向 RNN** 架构，使其能以 200 fps 的核心速度进行在线推理，显著快于基于优化的 **SLAHMR**（<0.1 fps）。这使 WHAM 成为首个同时满足高精度、全局一致性、物理合理性和实时性要求的 3D 人体运动重建方法。
 
-
-
 WHAM 采用在线推理架构，以视频帧序列为输入，端到端输出相机坐标系下的精确 3D 人体姿态与形状，以及世界坐标系下的全局轨迹。其核心设计遵循“运动上下文与视觉上下文融合”的理念，通过单向循环神经网络实现逐帧递归预测，避免了对未来帧的依赖，从而支持实时应用。
 
 ### 输入与预处理
@@ -131,11 +125,6 @@ WHAM 的整体流水线由七个核心模块串联构成，数据流严格遵循
 ### 训练策略
 
 WHAM 采用两阶段训练方案（Figure 3）。第一阶段在 AMASS 运动捕捉数据集上进行 2D-to-3D 提升预训练：从 AMASS 生成合成 2D 关键点序列，训练运动编码器 $E_M$ 和局部运动解码器 $D_M$，使模型学习从 2D 关键点到 3D 姿态的映射。第二阶段在真实视频数据集（3DPW、MPI-INF-3DHP、Human3.6M、InstaVariety）上微调，引入冻结权重的图像编码器和关键点检测器，训练特征集成器 $F_I$ 并联合微调运动编码器与解码器。这种策略有效缓解了真实视频标注数据稀缺的问题，同时保留了大规模运动捕捉数据中的运动先验。
-
-![[assets/figures/papers/paper_list_l18_WHAM_Reconstructing_World_grounded_Humans_with_Accurate_3D_Motion_motion20v2/figures/003_Figure_3.jpg]]
-*Figure 3: WHAM’s Two-Stage Training Scheme. During pretaining, we generate synthetic 2D keypoint sequences from AMASS [32] and train a motion encoder and decoder on the generated data (top). We then leverage video datasets with ground truth SMPL parameters, for which there is much less data. We use the fixedweight pre-trained image encoder and keypoints detector ( ) to extract image features and 2D keypoints. In this stage, we train the feature integration network while fine-tuning the motion encoder and motion/trajectory decoders, marked (bottom)*
-
-
 
 WHAM 采用在线推理架构，通过单向循环神经网络（RNN）对视频帧进行逐帧处理，递归地预测 SMPL 参数、相机平移和全局运动参数。其核心设计围绕三个关键模块展开：运动上下文提取、运动-图像特征融合，以及接触感知的全局轨迹估计。
 
@@ -177,8 +166,6 @@ $$\tau^{(t)} = \sum_{i=0}^{t-1} \Gamma^{(i)} v^{(i)}$$
 
 接触感知细化显著减少了足部滑动现象：在 EMDB 2 基准上，移除该模块后足部滑动指标 FS 从 4.4 mm 上升至 6.5 mm（见 Table 4）。需要指出的是，当前接触估计仅考虑足部，无法处理手部支撑等身体其他部位的接触场景，这是 WHAM 的一个已知局限。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能验证
@@ -189,9 +176,6 @@ WHAM 在多个基准数据集上全面验证了其每帧精度与全局轨迹估
 *Table 1: Quantitative comparison of state-of-the-art models on the 3DPW [49], RICH [10], and EMDB [16] datasets. Ordering of per-frame and temporal methods is done separately by descending MPJPE on EMDB (except for PACE). For testing on EMDB, we follow the protocol of EMDB 1 [16]. Parenthesis denotes the number of body joints used to compute MPJPE and PA-MPJPE, and ∗ denotes models trained with the 3DPW training set. Bold numbers denote the most accurate method in each column. Accel is in*
 
 在全局轨迹估计方面，Table 3 展示了 EMDB 数据集上的定量结果。WHAM (w/ DPVO) 的 W-MPJPE100 为 354.8 mm，相比 DPVO+HMR2.0 组合的 2231.4 mm 降低了 1876.6 mm；轨迹抖动 (Jitter) 从 TRACE 的 2987.6 (10m/s³) 降至 22.5，降幅达 2965.1；足部滑动 (Foot Sliding) 从 TRACE 的 370.7 mm 降至 4.4 mm，降幅达 366.3 mm。这些指标的显著改善表明，接触感知轨迹细化策略有效消除了全局运动中的足部滑动伪影，而相机角速度的引入为轨迹解码器提供了关键的相机运动先验。
-
-![[assets/figures/papers/paper_list_l18_WHAM_Reconstructing_World_grounded_Humans_with_Accurate_3D_Motion_motion20v2/figures/007_Table_3.jpg]]
-*Table 3: Global motion estimation accuracy on EMDB [16]*
 
 Figure 4 的定性对比进一步印证了定量结果：与 TCMR、GLoT 等视频方法相比，WHAM 重建的人体姿态在像素对齐精度和时序平滑性上均表现出明显优势。Figure 5 和 Figure 6 则聚焦于全局轨迹估计，显示 WHAM 在动态相机场景下能够生成与真值高度一致的全局运动路径，而 TRACE 和 SLAHMR 则出现明显的轨迹漂移和足部滑动。
 
@@ -221,22 +205,13 @@ Table 4 的系统消融实验揭示了 WHAM 各核心组件的贡献机制：
 
 Table 2 的数据集消融实验表明，引入 BEDLAM 合成数据集进行训练可进一步提升精度，验证了数据多样性对模型泛化能力的积极影响。
 
-![[assets/figures/papers/paper_list_l18_WHAM_Reconstructing_World_grounded_Humans_with_Accurate_3D_Motion_motion20v2/figures/006_Table_2.jpg]]
-*Table 2: Dataset ablation experiments on 3DPW [49]. R denotes the use of real datasets and B denotes BEDLAM*
-
 ### 推理效率
 
 Table 5 报告了 WHAM 各模块的逐帧计算时间。核心推理管线（不含预处理）达到约 200 fps，显著快于基于优化的 SLAHMR（<0.1 fps）。这一效率优势源于 WHAM 采用单向 RNN 实现在线推理，避免了全局优化或双向时间建模带来的计算开销。
 
-![[assets/figures/papers/paper_list_l18_WHAM_Reconstructing_World_grounded_Humans_with_Accurate_3D_Motion_motion20v2/figures/011_Table_5.jpg]]
-*Table 5: Per-frame computation time (running time) of each module in WHAM. We present this both as frames per second (fps) and milliseconds (ms)*
-
 ### 失败模式与局限性
 
 Figure 8 展示了 WHAM 在全局运动估计中的典型失败案例。分析表明，WHAM 在以下场景中存在明显局限：
-
-![[assets/figures/papers/paper_list_l18_WHAM_Reconstructing_World_grounded_Humans_with_Accurate_3D_Motion_motion20v2/figures/013_Figure_8.jpg]]
-*Figure 8: Failure cases of WHAM in global motion estimation*
 
 1. **未覆盖的运动模式**：当输入视频包含 AMASS 数据集中未涵盖的活动（如滑板、骑自行车）时，全局轨迹估计出现显著偏差。这是因为运动编码器在预训练阶段未学习到此类运动的 2D-to-3D 映射关系，导致运动特征质量下降，进而影响轨迹解码器的预测精度。
 
@@ -249,13 +224,6 @@ Figure 8 展示了 WHAM 在全局运动估计中的典型失败案例。分析�
 ### 实验公平性说明
 
 为确保公平比较，所有标记 ∗ 的方法（包括 WHAM）均使用了 3DPW 训练集进行训练。各基线方法均按照其原始论文的评估协议在标准基准上测试，未对测试数据进行额外微调。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l18_WHAM_Reconstructing_World_grounded_Humans_with_Accurate_3D_Motion_motion20v2/figures/012_Figure_7.jpg]]
-*Figure 7: Qualitative comparison between WHAM and after removal of contact-aware trajectory refinement (w/o traj. ref.)*
-
-
 
 ## 定位与知识库关联
 
@@ -311,8 +279,6 @@ WHAM 在以下条件下表现优越：
 2. 能否利用更丰富的场景信息（如稠密 3D 重建或单目深度估计）进一步提升全局一致性？
 3. 接触感知细化能否从足部扩展到全身接触点（手、膝盖、臀部），以支持更广泛的交互场景？
 4. 在完全没有相机角速度信息的情况下，WHAM 的轨迹估计能否通过纯视觉线索保持鲁棒？
-
-
 
 ## 原文 PDF
 

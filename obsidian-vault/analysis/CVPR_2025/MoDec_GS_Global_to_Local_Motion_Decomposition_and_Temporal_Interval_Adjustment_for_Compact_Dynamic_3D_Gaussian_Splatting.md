@@ -57,8 +57,6 @@ claims:
 
 MoDec-GS 在**方法谱系**上继承并改进了锚点式 3DGS 表示（Scaffold-GS），将静态锚点扩展为动态规范骨架，并通过两级 hexplane 变形场与可学习锚点动态参数，实现了紧凑且表达力强的动态场景建模。其局限性在于，对单目视频中薄且高细节纹理的物体（如 HyperNeRF 的 broom 场景）表示能力仍有限，这是当前基于 3DGS 方法的共有挑战。
 
-
-
 ### 动态场景重建的存储与质量困境
 
 三维高斯泼溅（3D Gaussian Splatting, 3DGS）在静态场景的新视角合成中取得了显著成功，但其向动态场景的扩展面临根本性挑战。现有动态3DGS方法——如**4DGS**、**Deformable 3DGS**和**SC-GS**——在真实世界视频中遭遇一个核心瓶颈：**全局刚性运动与局部非刚性变形往往同时存在且相互叠加**，而单一变形场或固定的时间分段策略难以同时高效捕捉这两种性质迥异的运动模式。
@@ -84,8 +82,6 @@ MoDec-GS的出发点在于一个关键洞察：**全局运动主要由物体的�
 ### 预期目标
 
 通过上述设计，MoDec-GS旨在实现一个三赢目标：**在显著降低模型存储的同时保持或提升渲染质量，并维持实时渲染能力**。初步实验表明，在iPhone数据集上MoDec-GS相比质量第二好的SC-GS，PSNR提升0.7 dB，同时存储减少94%（从232.4 MB降至18.37 MB），验证了这一技术路线的可行性。
-
-
 
 ## 核心方法与创新机理
 
@@ -125,8 +121,6 @@ MoDec-GS 采用 Scaffold-GS 的锚点表示替代典型 3DGS 的逐高斯属性�
 
 值得注意的是，两阶段变形仅带来微小的推理速度下降（约 0.9 FPS，从 24.7 降至 23.8），保持了实时渲染能力（Tab. 7），验证了该设计方案在实际部署中的可行性。
 
-
-
 ![[assets/figures/papers/paper_list_l10_MoDec_GS_Global_to_Local_Motion_Decomposition_and_Temporal_Interval_Adju/figures/005_Figure_4.jpg]]
 *Figure 4: Qualitative results comparison on three datasets [16, 49, 64]. The yellow boxes highlight areas where the proposed method achieves notable visual quality improvements, and the storage for the corresponding sequence is displayed below each rendered patch*
 
@@ -151,8 +145,6 @@ MoDec-GS 的整体 pipeline 围绕“全局-局部分解运动”（Global-to-Lo
    在训练过程中，TIA 动态管理各 Local CS 的时间覆盖范围。初始时段时间区间均匀分配；随着训练进行，TIA 累积每个区间内位置梯度的 Frobenius 范数 $g_c^{\mathrm{acc}}$，并据此评估运动复杂度。对于梯度积累高于阈值（$\mu + \tau_{\mathrm{TIA}} \cdot \sigma$）的区间，TIA 通过调整规范时间列表 $T_c$ 收缩其时间跨度，使运动复杂的片段获得更细粒度的局部模型表达，而运动简单的片段则分配更宽的时间区间，从而最大化模型容量的利用效率。
 
 **输入输出流总结**：输入为单目视频的时间戳和相机参数；Global CS 提供静态锚点表示，经 GAD 变形为 Local CS，再经 LGD 变形为目标时刻的 3D 高斯；最终通过可微光栅化渲染出对应视角的图像。TIA 在训练期间持续优化各 Local CS 的时间边界，无需外部运动数据。
-
-
 
 MoDec-GS 的核心设计思想是将复杂动态场景的运动分解为全局与局部两个层级，并通过自适应的时间分段策略实现紧凑建模。其系统架构包含以下关键模块。
 
@@ -218,8 +210,6 @@ $$
 
 GAD 与 LGD 的分工具有明确的因果逻辑：全局刚性运动在锚点层面被高效吸收后，残存的局部运动幅度小且方向分散，恰好适合逐高斯的显式变形。消融实验证实了这一设计的有效性——单独使用 GAD 可将存储减少约 52% 而质量仅轻微下降；加入 LGD 后 PSNR 从 14.12 提升至 14.48；再叠加 TIA 后达到最终 14.60 PSNR，且未增加存储（Table 3）。两阶段变形仅带来约 0.9 FPS 的微小推理开销（Table 7）。
 
-
-
 ## 实验与关键发现
 
 ### 核心结果：质量与存储的双重突破
@@ -261,33 +251,12 @@ Figure 9 对 cut-lemon 场景的光流可视化直接揭示了 GLMD 的工作机
 
 尽管 MoDec-GS 在多数场景中表现优异，但在 HyperNeRF 的 broom 场景中出现明显模糊（Figure 10）。该场景包含薄而高细节纹理的扫帚，模型无法充分表示其精细几何与纹理。这是当前基于 3DGS 方法的共有局限——高斯原语对细薄结构的表达能力不足。论文计划未来通过整合纹理/alpha 映射或层次金字塔特征来增强表示能力。
 
-![[assets/figures/papers/paper_list_l10_MoDec_GS_Global_to_Local_Motion_Decomposition_and_Temporal_Interval_Adju/figures/018_Figure_10.jpg]]
-*Figure 10: Failure case: HyperNeRF-broom. In the face of challenges in reconstructing dynamic scenes from monocular video, there are limitations in adequately representing thin and highly intricate textured objects*
-
 ### 公平性说明
 
 训练与渲染速度比较中，MoDec-GS 使用 RTX A6000 GPU，而对比方法（如 4DGS）使用 RTX 3090，两者内存带宽存在差异（Table 4 caption 已声明）。虽不影响质量与存储的核心结论，但速度对比的精确量化需在相同硬件上进一步验证。
 
 ![[assets/figures/papers/paper_list_l10_MoDec_GS_Global_to_Local_Motion_Decomposition_and_Temporal_Interval_Adju/figures/009_Table_4.jpg]]
 *Table 4: Performance comparison with a NeRF-extension framework, including training and rendering speed. Averaged over 536×960 HyperNeRF’s vrig datasets [49]. The performance numbers of [11, 19, 26, 48, 49] are sourced from [60]. The training times and run times reported in [60] were measured on an NVIDIA RTX 3090 GPU, while our framework was tested on an RTX A6000 GPU. Please note that the A6000 GPU has approximately 20 % lower memory bandwidth compared to that of the RTX 3090*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l10_MoDec_GS_Global_to_Local_Motion_Decomposition_and_Temporal_Interval_Adju/figures/003_Figure.jpg]]
-*Figure: canonical time ???? Anchor at Global CS Anchor deformation to Local CS for modeling global motion Gaussian deformation for modeling local motion \label {eq:dynamics masking} x_{v'},y_{v'},z_{v'} = (x_v, y_v, z_v)& + M(d_G)\cdot (\Delta x,\Delta y,\Delta z) \\ f_{v'} f_v &+ \Delta f \cdot \sigma (d_L), o_{v'} o_v o s_{v'} s_v s (d_L). resenting a complex motion of 3D Gaussians,a global movement over time intervals can be more effciently handled through deformation of anchor itself.In contrast,subtle motions of individual 3D Gaussians within a time interval can be effectively addressed by explicit deformation of each Gaussian*
-
-![[assets/figures/papers/paper_list_l10_MoDec_GS_Global_to_Local_Motion_Decomposition_and_Temporal_Interval_Adju/figures/012_Table_5.jpg]]
-*Table 5: Performance comparison on D-NeRF dataset. The results were averaged over all sequences in the dataset, and the values for the comparison method were taken from [25]*
-
-![[assets/figures/papers/paper_list_l10_MoDec_GS_Global_to_Local_Motion_Decomposition_and_Temporal_Interval_Adju/figures/013_Table_6.jpg]]
-*Table 6: Performance comparison on PanopticSports dataset. Results for the comparison method were sourced from [22]*
-
-![[assets/figures/papers/paper_list_l10_MoDec_GS_Global_to_Local_Motion_Decomposition_and_Temporal_Interval_Adju/figures/014_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l10_MoDec_GS_Global_to_Local_Motion_Decomposition_and_Temporal_Interval_Adju/figures/016_Table_9.jpg]]
-*Table 9: Quantitative results comparison on (a) iPhone [16], (b) HyperNeRF [49], (c) Nvidia [64] datasets. Red and blue denote the best and second best performances, respectively. Each block element of 5-performance denotes (PSNR(dB)↑ / SSIM↑ [59] / LPIPS↓ [65] / tOF↓ [7] Storage(MB)↓). For iPhone dataset, the masked metrics are used. For Nvidia monocular dataset, tOF values are not computed since the test views are sparsely distributed along the temporal axis*
-
-
 
 ## 定位与知识库关联
 
@@ -340,8 +309,6 @@ MoDec-GS 基于 **Scaffold-GS** [40] 的锚点-神经高斯架构，但将其从
 3. **TIA 超参数的自适应**：TIA 训练中使用的阈值 $\tau_{TIA}$ 和步长 $s_{TIA}$ 是否对数据敏感，能否实现完全自适应的调整，尚需进一步研究。
 
 4. **训练效率优化**：是否可以通过分阶段优化（如先冻结全局变形后精调局部变形）来压缩训练时间，是一个具有工程价值的开放方向。
-
-
 
 ## 原文 PDF
 

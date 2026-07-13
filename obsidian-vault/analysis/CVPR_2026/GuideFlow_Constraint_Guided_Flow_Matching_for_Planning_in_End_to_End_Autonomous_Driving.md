@@ -50,8 +50,6 @@ claims:
 
 在 NavSim Navhard 测试分割上，GuideFlow 以 **EPDMS 43.0** 创下新的 SOTA（无评分器版本为 27.1，仍具竞争力）；在 Bench2Drive 上取得 75.21 Driving Score 和 51.36% Success Rate；在 ADV-NuScenes 对抗场景下平均碰撞率仅 0.73%。消融实验证实，显式约束模块与能量模型的协同作用是性能提升的关键来源。
 
-
-
 端到端自动驾驶旨在直接从传感器输入映射到规划轨迹，省去传统模块化流水线中的中间表示与人工规则。近年来，以模仿学习为核心的端到端规划器（如 **UniAD** (Hu et al., CVPR 2023)、**VAD** (Jiang et al., ICCV 2023)、**SparseDrive** (Sun et al., arXiv 2024)）在开环评测中取得了显著进展，但其核心瓶颈日益凸显：**模仿学习使用的 L2 回归损失天然倾向于拟合专家轨迹的“平均模式”，导致多模态轨迹分布的模式坍塌**——模型在十字路口、动态交互等需要多样化决策的场景中，只能生成单一、保守的轨迹，丧失了对复杂交通情境的应对能力。
 
 为缓解模式坍塌，近期工作转向生成式规划范式。**DiffusionDrive** (Liao et al., arXiv 2024)、**GoalFlow** (Xing et al., 2025)、**HE-Drive** (Wang et al., 2024) 等方法利用扩散模型或流匹配从高斯先验中采样轨迹，通过多模态生成能力覆盖更丰富的驾驶行为。然而，这些生成式规划器存在一个关键缺口：**生成过程缺乏显式的安全约束**。模型虽然能产生多样化的候选轨迹，但无法保证这些轨迹满足碰撞避免、车道保持、道路边界等物理可行性和安全性要求。约束仅以隐式方式编码在训练数据中，导致推理时生成的轨迹可能违反交通规则或进入不可行区域。
@@ -61,8 +59,6 @@ claims:
 GuideFlow 的核心动机由此确立：**在流匹配生成过程中直接施加显式硬约束，并统一训练流匹配与能量模型（EBM），实现约束满足的自主优化**。具体而言，GuideFlow 提出三种约束生成策略——约束速度场（CVF）、约束流状态（CF）、能量模型精炼（RFE）——在采样的不同阶段干预生成过程，使轨迹从高斯噪声出发，逐步收敛到既多样化又满足安全约束的解空间。此外，GuideFlow 引入基于奖励的激进程度条件信号（RAS），使模型在推理时可灵活切换激进与保守驾驶风格，进一步增强了规划的可控性。
 
 这一设计理念的核心洞察在于：**显式约束引导的流匹配同时缓解模式坍塌并保证安全约束；EBM 统一训练使模型能够自主在数据流形上发现符合约束的解**。通过在生成过程中注入硬约束，而非依赖后处理筛选或隐式编码，GuideFlow 在保持多模态生成能力的同时，从根本上提升了轨迹的可行性与安全性。
-
-
 
 ## 核心方法与创新机理
 
@@ -109,8 +105,6 @@ $$v_{\theta}^{\mathrm{guide}}(x_t, t, c, \gamma) = (1 - \gamma) v_{\theta}(x_t, 
 ### 4. 驾驶风格控制：从无调制到奖励条件化
 
 先前方法缺乏对驾驶风格的显式控制。GuideFlow 引入 **RAS (Reward as Style Condition)** 模块，利用 NavSim 的激进程度分数（EP，定义为沿车道中心线单位时间行驶距离，值域 [0,1]）作为条件信号，在推理时控制轨迹风格。消融实验显示 RAS 使 EP 从 79.6 升至 82.3，但 EPDMS 下降 0.8，揭示了安全与效率之间的权衡——这一 trade-off 本身正是风格可控性的体现。
-
-
 
 GuideFlow 是一种基于流匹配的端到端自动驾驶规划器，其核心设计理念是将显式安全约束直接嵌入轨迹生成过程，从而在保证多模态多样性的同时满足物理可行性与安全性要求。整体架构如图 2 所示，由以下模块级联构成：
 
@@ -167,12 +161,8 @@ GuideFlow 引入基于奖励的激进程度条件信号（RAS），将 NavSim �
 - **模式坍塌**：模仿学习（如 **UniAD** Hu et al., CVPR 2023；**VAD** Jiang et al., ICCV 2023）使用 L2 损失直接回归专家轨迹，导致多模态分布坍缩为均值。GuideFlow 从高斯先验出发，通过流匹配生成多样化候选，结合分类器自由引导保持多模态性。
 - **约束缺失**：生成式规划器（如 **DiffusionDrive** Liao et al., arXiv 2024）虽能采样多模态轨迹，但缺乏显式约束，常产生违反交通规则的轨迹。GuideFlow 通过 CVF、CF、RFE 三级约束机制，在生成过程中直接保证轨迹的物理可行性与安全性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2516_https_arxiv_org_abs_2511_18729/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of GuideFlow with prior methods. (a) Imitative E2E Planners [14, 19, 36, 38], which directly imitate expert trajectories using an L2 loss, are susceptible to the inherent mode collapse problem in imitation learning. (b) Generative E2E Planners [27, 41]. These methods sample future trajectories directly from a learned distribution but lack explicit generation constraints, often resulting in traffic violations. (c) GuideFlow directly guides the generative process with explicit constraints, ensuring the sampled trajectories satisfy specific requirements*
-
-
 
 GuideFlow 的规划管线由三个核心模块构成：感知条件速度场生成器、分类器自由引导、以及安全约束采样过程。其核心创新在于将显式安全约束直接嵌入流匹配生成过程，而非依赖隐式约束编码。
 
@@ -244,13 +234,6 @@ $$\boldsymbol{x}^{(k+1)} = \boldsymbol{x}^{(k)} + v_\boldsymbol{\theta}(\boldsym
 
 GuideFlow 引入基于 NavSim 的激进程度分数 EP（Ego Progress），定义为自车沿车道中心线单位时间行驶距离，取值范围 $[0, 1]$。EP 作为条件信号输入分类器自由引导框架，使模型在推理时可通过调节条件值控制轨迹的驾驶风格——高 EP 对应激进驾驶，低 EP 对应保守驾驶。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2516_https_arxiv_org_abs_2511_18729/figures/003_Figure_3.jpg]]
-*Figure 3: Three strategies of Constrained Generation, which include Constraining the Velocity Field (CVF), Constraining the Flow States (CF) and Refining the Flow by EBM (RFE)*
-
-
-
 ## 实验与关键发现
 
 ### 主要结果
@@ -297,27 +280,17 @@ GuideFlow 在多个闭环与开环评测基准上均取得领先性能，核心�
 
 4. **EBM 训练的收敛性**：能量模型引导（RFE）的有效性依赖于 EBM 训练的收敛质量。论文未详细分析 EBM 在不同场景下的能量景观特性，其在极端边界场景中是否会发生坍缩仍需进一步研究。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2516_https_arxiv_org_abs_2511_18729/figures/004_Table_1.jpg]]
 *Table 1: Planning results on the NavSim[7] Navhard split. ∗ denotes results reproduced with the official code repository or official checkpoint. The Scorer configuration is aligned with GTRS-Dense [24]. † refers to the adjustment of the trajectory scoring strategy during inference. Further details can be found in the Appendix*
 
 ![[assets/figures/papers/paper_list_l2516_https_arxiv_org_abs_2511_18729/figures/005_Table_2.jpg]]
 *Table 2: Planning results of E2E-AD Methods on the Bench2Drive [17] datasets. ∗ represents the model benefits from expert feature distillation [16]*
 
-![[assets/figures/papers/paper_list_l2516_https_arxiv_org_abs_2511_18729/figures/006_Table_3.jpg]]
-*Table 3: Planning results on the NuScenes [2] and ADV-NuScenes [43] validation dataset. C.R denotes the Collision Rate. ∗ denotes results reproduced with the official checkpoint*
-
 ![[assets/figures/papers/paper_list_l2516_https_arxiv_org_abs_2511_18729/figures/008_Table_5.jpg]]
 *Table 5: Ablation studies of different modules in GuideFlow over NavSim [7] HavHard Split, Bench2Drive [17], NuScenes [2] and ADV-NuScenes [43]. “EP” stands for Ego Progress subscore. “CVF” denotes “Constraining the Velocity Field” module, “CF” denotes “Constraining the Flow State”, “RFE” denotes “Refining the Flow by EBM” and “RAS” denotes “Reward as Style Condition”*
 
 ![[assets/figures/papers/paper_list_l2516_https_arxiv_org_abs_2511_18729/figures/009_Figure_4.jpg]]
 *Figure 4: Visual comparison between DiffusionDrive [27] and our GuideFlow across multiple driving scenarios. GuideFlow generates trajectories that exhibit improved adherence to lane follow, smoother maneuver transitions, and stronger compliance with safety constraints such as collision avoidance and road boundary preservation*
-
-![[assets/figures/papers/paper_list_l2516_https_arxiv_org_abs_2511_18729/figures/010_Table_6.jpg]]
-*Table 6: The hyper-parameter λ, kc and K effects on GuideFlow’s performance for the NavSim Dataset*
-
-
 
 ## 定位与知识库关联
 
@@ -363,8 +336,6 @@ GuideFlow 的适用边界由以下因素界定：
 4. **多模态与约束的深层关系**：流匹配从高斯先验出发生成多样化轨迹，约束机制可能在某些场景下过度限制多样性。如何在约束满足与多模态保持之间建立更精细的平衡机制？
 
 5. **跨域迁移能力**：当前框架在模拟器上验证，向真实世界的迁移涉及域差异、传感器噪声和动态环境不确定性。约束建模的鲁棒性在真实场景中是否成立，需要实车验证。
-
-
 
 ## 原文 PDF
 

@@ -50,8 +50,6 @@ LiDAR语义分割在自动驾驶、机器人导航等安全关键应用中扮演
 
 **主要结果**：在合成域到真实域（Synth4D-KITTI → SemanticKITTI/nuScenes）的单源域泛化实验中，LiDOG分别达到44.18 mIoU和37.14 mIoU，较源域模型提升+19.49和+16.52 mIoU，全面超越Mix3D、CoSMix、IBN等数据增强与域泛化基线（Table 1）。在真实域到真实域（SemanticKITTI → nuScenes）方向，LiDOG获得34.88 mIoU，提升+8.35 mIoU（Table 3）。特征可视化（Figure 4）进一步证实，BEV辅助任务有效缩小了不同域间道路类别的特征分布差异。消融实验表明，BEV特定投影与监督任务对泛化能力的贡献显著优于简单添加额外3D分割头（Figure 6）。
 
-
-
 ### 问题定义：LiDAR语义分割的域泛化
 
 LiDAR语义分割是自动驾驶与机器人感知的核心任务，其目标是为点云中的每个点赋予语义类别标签。现有方法通常在单一域内进行训练和评估，即训练集和测试集来自相同的数据分布。然而，实际部署中，模型需要面对与训练数据截然不同的目标域——不同的传感器类型（如Velodyne 64线束 vs 32线束）、不同的扫描点密度、不同的地理环境与道路布局。这些域偏移导致模型性能急剧下降，例如，仅在SemanticKITTI上训练的模型迁移到nuScenes时，mIoU从域内的48.49骤降至26.53，降幅约22个百分点。这一现象揭示了LiDAR语义分割模型在跨域条件下的脆弱性，也催生了LiDAR语义分割域泛化（Domain Generalization for LiDAR Semantic Segmentation, DG-LSS）这一新问题设定：模型仅在源域数据上训练，无需访问目标域数据，却需要在目标域上取得良好的分割性能。
@@ -73,8 +71,6 @@ LiDAR语义分割是自动驾驶与机器人感知的核心任务，其目标是
 不同域的LiDAR点云虽然在3D空间中的点分布、密度和采样模式差异显著，但在鸟瞰视角（Bird's-Eye View, BEV）下，其几何外观更为相似。Figure 3直观展示了这一现象：SemanticKITTI和nuScenes的原始点云差异明显，但投影为BEV图像后，道路、建筑物等语义布局呈现出高度一致的几何结构。这一观察揭示了BEV语义布局作为跨域不变表征的潜力——如果模型能够在BEV视角下准确预测语义布局，其3D骨干网络将被迫提取对域偏移不敏感的特征。
 
 基于这一洞察，本文提出**LiDOG**，通过在3D稀疏卷积编码器-解码器网络上附加一个密集2D BEV语义分割的辅助训练任务，将3D特征沿高度轴投影为BEV特征并同时优化3D和BEV损失。这一设计使BEV语义布局作为辅助监督信号，正则化3D骨干网络，从而在不引入目标域信息的前提下，显著提升模型的跨域泛化能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -99,8 +95,6 @@ LiDOG 的核心创新在于为 3D 稀疏卷积语义分割网络引入一个**�
 ### 与现有方法的本质区别
 
 现有域泛化方法主要依赖数据增强（如 Mix3D、PointCutMix、CoSMix）或域对齐技术（如 IBN、RobustNet），这些方法要么在输入空间进行操作，要么仅调整归一化统计量。LiDOG 的创新在于**从表示空间的结构出发**，利用 BEV 视角的几何一致性作为归纳偏置，使模型在训练过程中主动学习域不变特征。这种设计无需目标域数据、无需域标签，也不依赖任何域间对应关系，是一种纯源域训练的域泛化方法。
-
-
 
 LiDOG 的整体设计围绕一个核心思想展开：在标准的 3D 稀疏卷积语义分割网络上，附加一个密集的 2D 鸟瞰图（BEV）语义预测辅助任务，通过联合优化 3D 与 BEV 损失，强制骨干网络学习对传感器配置、扫描分辨率和场景几何变化具有鲁棒性的特征表示。
 
@@ -140,12 +134,6 @@ $$L_{tot} = \frac{1}{2} (L^{BEV} + L^{3D})$$
 
 整体数据流可概括为：**点云 → 3D 体素化 → 稀疏 3D 编码器-解码器 → {稀疏 3D 分割头, BEV 投影 → 密集 2D 解码器} → 联合损失优化**。其中，3D 骨干是信息瓶颈，BEV 投影充当域不变特征学习的“正则化器”，而两个解码头分别提供 3D 视角和鸟瞰视角的语义监督信号。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2304_11705/figures/002_Figure_2.jpg]]
-*Figure 2: LiDOG overview. We encode our input LiDAR scan $P _ { j }$ using the 3D backbone $g ^ { 3 D }$ to learn the occupied voxels’ feature representations $F ^ { 3 D }$ . (Upper branch - main task) We apply a sparse segmentation head on $F ^ { 3 D }$ and supervise with 3D semantic labels, $\mathcal { V } _ { j } ^ { 3 D }$ . (Lower branch - auxiliary task) We project those features along the height-axis to obtain a dense 2D bird’s-eye (BEV) view features $F ^ { B E V }$ , and apply several 2D convolutional layers to learn the 2D BEV representation. We supervise the BEV auxiliary task by using BEV-view of semantic labels, $\mathcal { V } _ { j } ^ { B E \bar { V } }$ . We train jointly on both $\dot { L ^ { 3 D...$
-
-
 
 LiDOG的整体架构围绕一个核心假设展开：不同域的LiDAR点云在鸟瞰视角（BEV）下的几何外观比原始3D点云更相似（Figure 3）。基于此，方法在标准3D稀疏卷积编码器-解码器网络之上，附加了一个密集2D BEV语义预测的辅助训练任务，通过联合优化迫使3D骨干网络学习跨域不变的特征表示。以下按流水线模块逐一说明。
 
@@ -184,8 +172,6 @@ $$L_{tot} = \frac{1}{2} (L^{BEV} + L^{3D})$$
 ### 关键设计消融证据
 
 消融实验（Figure 6）证实了BEV辅助分支的独特作用：若将BEV解码器替换为额外的3D分割头（Double），性能显著低于LiDOG，表明泛化能力的提升源于BEV特定的投影和预测任务，而非简单的多解码器集成。此外，BEV预测区域大小（Figure 7）和BEV图像分辨率（Figure 8）的消融表明，50m×50m区域与全分辨率在多数设置下为最优配置。
-
-
 
 ## 实验与关键发现
 
@@ -227,9 +213,6 @@ LiDOG 的核心干预机制是：在 3D 稀疏卷积编码器-解码器网络基
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2304_11705/figures/008_Table_3.jpg]]
 *Table 3: SemanticKITTI→nuScenes, single-source. We train our model on SemanticKITTI and evaluate it on the nuScenes dataset. LiDOG improves over the source model by +8.35 mIoU. Lower bound (red): a model trained on the source domain with-out the help of DG techniques. Upper bound (blue): model directly trained on the target data*
 
-![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2304_11705/figures/009_Table_4.jpg]]
-*Table 4: nuScenes→SemanticKITTI, single-source. We train our model on nuScenes and evaluate it on the SemanticKITTI dataset. LiDOG improves over the source model by +11.67 mIoU. Lower bound (red): a model trained on the source domain with-out the help of DG techniques. Upper bound (blue): model directly trained on the target data*
-
 ---
 
 ### 关键消融实验
@@ -265,8 +248,6 @@ Figure 4 的 t-SNE 可视化提供了 BEV 辅助任务作用机制的直接证�
 尽管 LiDOG 在绝大多数类别上取得显著改善，但 **terrain（地形）** 类别在多个实验中表现欠佳，改善有限甚至下降。例如在多源实验中，terrain 的 IoU 提升远低于 road 或 sidewalk。这一失败模式的根源在于 BEV 投影的**垂直方向类别重叠**问题：terrain 和 vegetation（植被）在垂直方向上经常共存于同一 BEV 网格单元中，投影操作将多个高度层的信息压缩为单一像素，导致两个类别在 BEV 语义布局中混淆。当前的简单高度轴投影无法区分这种垂直重叠，辅助监督信号对 terrain 类反而可能引入噪声。
 
 此外，当前方法仅在单个 LiDAR 帧上进行训练和评估，未利用多帧累加或时间一致性信息。在动态物体密集或点云极度稀疏的场景中，单帧 BEV 语义布局的监督质量可能下降。同时，方法要求所有域共享相同的封闭集类别，无法处理开放集域泛化或类别分布变化的实际需求。
-
-
 
 ## 定位与知识库关联
 
@@ -319,8 +300,6 @@ BEV辅助任务的作用机制在于：3D骨干网络为了同时满足3D稀疏�
 4. **时序融合**：是否可以通过多帧时序融合或自监督预训练进一步提升跨域鲁棒性？时序一致性可能提供额外的域不变约束。
 
 5. **自适应超参数**：在计算和内存资源受限时，BEV辅助任务的超参数（如BEV分辨率、区域大小）最优选择如何自适应确定？元学习或神经架构搜索可能是潜在解决方案。
-
-
 
 ## 原文 PDF
 

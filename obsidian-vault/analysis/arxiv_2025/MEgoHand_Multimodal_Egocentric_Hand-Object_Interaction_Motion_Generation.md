@@ -56,8 +56,6 @@ MEgoHand 的核心洞察是：**第一人称手-物交互生成可以通过“�
 
 该方法的主要局限在于：对关节物体的复杂动态耦合（如剪刀剪切）泛化不足；度量深度在跨域场景下对相机参数剧烈变化较为敏感；当前仅支持右手交互，尚未扩展到双手场景。
 
-
-
 第一人称手-物交互运动生成是具身智能与增强现实的核心能力，目标是从自我中心视角的感知输入中预测未来手部运动序列。该任务面临三重结构性困难：
 
 **视角退化与感知歧义。** 第一人称相机的视点随佩戴者运动而剧烈变化，同时引入自遮挡、透视畸变和ego运动噪声。单帧RGB图像缺乏显式的3D空间信息，使得从二维观测推断三维手部姿态本身就是一个病态问题。
@@ -67,8 +65,6 @@ MEgoHand 的核心洞察是：**第一人称手-物交互生成可以通过“�
 **多模态融合与开环误差累积。** 现有工作多将文本作为抽象指令嵌入，缺乏对复杂手-物交互语义的深层理解。同时，开环预测框架在长序列生成中会逐步累积姿态误差，导致手部漂移和穿透。
 
 上述瓶颈共同指向一个核心矛盾：高质量的手-物交互生成需要精确的空间推理和语义理解，但第一人称视角的感知退化与物体先验的泛化限制使得现有方法难以兼顾精度与通用性。MEgoHand 的动机正是打破这一僵局——通过引入视觉语言模型（VLM）进行运动先验推断、结合单目深度估计实现与物体无关的空间推理，并采用基于DiT的流匹配进行闭环预测，从而构建一个无需显式物体建模的统一生成框架。
-
-
 
 ## 核心方法与创新机理
 
@@ -110,8 +106,6 @@ MEgoHand 的核心创新在于将第一人称手-物交互生成从“依赖显�
 
 四个 changed slots 形成了一条完整的因果链：**VLM 提供语义先验 → 深度估计提供空间推理 → DiT 流匹配实现闭环生成 → TOF 保证时序平滑**。这一链条使得 MEgoHand 在无需任何物体模型或接触图的前提下，相比前 SOTA LatentAct 实现了 MRE 降低 86.9%、MPJPE-PA 降低 71.2% 的显著提升。
 
-
-
 MEgoHand 的整体推理管线可概括为 **“高层语义推理 + 低层运动生成 + 时序平滑解码”** 的双级架构，其输入输出流如下：
 
 1. **输入**：任务文本描述 $\mathcal{T}$、当前时刻的视觉观测 $\mathcal{V}_k$（RGB 图像）以及初始手部参数 $h_k \in \mathbb{R}^{109}$（MANO 参数向量，拼接手指旋转 $\theta$、形状 $\beta$、手腕旋转 $r$ 和平移 $t$）。
@@ -125,11 +119,6 @@ MEgoHand 的整体推理管线可概括为 **“高层语义推理 + 低层运�
 为支撑上述管线，作者构建了统一的多模态数据集管线：通过 **Inverse MANO Retargeting Network** 将各数据集的异构关节点标注统一恢复为 MANO 参数，并通过 **Virtual RGB-D Renderer** 合成与 RGB 对齐的深度图，最终形成覆盖 3.35M 帧 RGB-D、24K 条交互轨迹、1.2K 物体的训练集。
 
 > **证据强度说明**：上述模块关系与数据流在 Section 3.1–3.3 及 Figure 2 中有明确描述（置信度 0.95）；Inverse MANO Retargeting 与 Virtual RGB-D Renderer 的数据统一作用见 Section 4（置信度 0.9）。具体模块名称与骨干网络选择均来自原文锚点，无推测成分。
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2505_16602/figures/002_Figure_2.jpg]]
-*Figure 2: During inference, the system prompt and task instruction are encoded using a frozen VLM tokenizer. At each timestep, an RGB image is processed by a pretrained depth estimator to obtain a metric depth map. The RGB and depth images are then combined and encoded into a visual embedding, which—together with the text embedding—is input to the frozen VLM. A DiT-based motion generator receives this multimodal representation along with the initial hand parameters to predict relative future hand motion. During training, the depth encoder, VLM vision encoder, and DiT head are finetuned*
-
-
 
 ### 问题形式化
 
@@ -200,16 +189,6 @@ $$\mathcal{L}_{\mathrm{inv}} = \sigma \mathcal{L}_1 + (1-\sigma) \mathcal{L}_2$$
 
 对于缺少深度标注的数据集，MEgoHand 利用 MANO 模型和已知相机参数，将逆向重定向恢复的手部网格投影到图像平面，合成与 RGB 对齐的深度图。渲染时采用最近表面保留策略 $D[v,u] = \min(D[v,u], Z_c^{(i)})$，确保深度图中只保留离相机最近的手部表面。这一步骤使所有训练数据统一为 RGB-D-文本-姿态四元组格式，最终构建了包含 335 万帧、2.4 万条交互轨迹、覆盖 1200 个物体的多模态数据集。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2505_16602/figures/012_Figure_2.jpg]]
-*Figure 2: Illustration for smoothing predicted transformations*
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2505_16602/figures/015_Figure_4.jpg]]
-*Figure 4: Colorbars indicate the absolute depth values (unit: m). The depth values of all depth frames fall within [0, 2]*
-
-
-
 ## 实验与关键发现
 
 ### 评估设置
@@ -243,12 +222,6 @@ Table 1 展示了五个域内数据集的平均结果。MEgoHand 在所有指标
 ### 跨域零样本迁移
 
 Table 2 展示了在未见过数据集上的零样本泛化能力。MEgoHand 相比最强基线 LatentAct-Diff 取得一致且显著的提升：
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2505_16602/figures/007_Table_2.jpg]]
-*Table 2: Average metrics of out-of-domain evaluation across 2 datasets: ARCTIC and HOLO. The unit for MRE is radians, and the remaining metrics are measured in centimeters*
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2505_16602/figures/016_Table_2.jpg]]
-*Table 2: Average metrics across evaluation (TACO, HOI4D, H2O, HOT3D, OakInk2) and testing datasets (ARCTIC, HOLO). The unit for MRE is radians; the remaining metrics are measured in centimeters*
 
 - **ARCTIC**：MPJPE 7.358 cm vs. 10.98 cm，降低 **33.9%**。
 - **HOLO**：MPJPE 5.775 cm vs. 9.550 cm，降低 **29.8%**（与论文声明一致）。
@@ -299,11 +272,6 @@ Figure A.3 展示了 TOF 平滑解码策略对轨迹抖动的抑制效果：在 
 | Figure 4 | 域内和跨域数据集上 MPJPE 的直观对比 |
 | Figure 5/6 | 手部网格投影定性对比，MEgoHand 与物体交互区域更吻合 |
 
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2505_16602/figures/006_Figure_4.jpg]]
-*Figure 4: The evaluation of our two methods and two baseline variants on five in-domain (H2O, HOI4D, HOT3D, OAKINK2, TACO) and two cross-domain datasets (ARCTIC, HOLO), using MPJPE as metric (unit: cm, lower is better)*
-
-
-
 ## 定位与知识库关联
 
 ### 与现有基线的关键差异
@@ -341,8 +309,6 @@ MEgoHand 与先前第一人称手部运动生成方法的核心分歧在于**是
 2. **跨域深度鲁棒性**。如何缓解度量深度在跨域时的相机参数敏感性？可能的路径包括：在深度编码器中引入相机参数条件化、采用深度归一化策略消除绝对尺度依赖、或联合优化深度估计与运动生成的域自适应训练。
 
 3. **双手交互扩展**。将框架从单手扩展到双手需要解决的核心问题包括：VLM 如何同时推理双手的任务角色分配、DiT 如何生成双手的协调运动序列、以及 TOF 如何在双手间保持相对位姿的一致性。
-
-
 
 ## 原文 PDF
 

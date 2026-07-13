@@ -82,7 +82,6 @@ StableMotion 在方法谱系中处于**条件扩散生成**与**自监督运动�
 
 当前方法仍需人工标注或启发式算法提供初始质量指示变量，尤其对细微伪影的检测尚未完全自动化。软阈值设定（如 $\tau=0.5$）和软修复调度是启发式设计，可能对不同类型的动作或伪影并非最优。扩散模型采样的固有随机性有时仍会导致次优结果，尽管集成策略有所缓解。未来方向包括：开发自动化的质量标注技术以减少人工依赖，探索测试时分类器引导以改善内容保留与保真度的权衡，以及将该框架扩展到面部动作或交互数据等其他运动类型的清理任务。
 
-
 ### 问题背景：运动数据中的真实伪影
 
 动作捕捉（mocap）数据是动画制作、游戏开发和运动分析的核心资产。然而，在真实生产环境中采集的原始动作数据普遍存在各种伪影（artifacts），包括：
@@ -118,8 +117,6 @@ StableMotion 在方法谱系中处于**条件扩散生成**与**自监督运动�
 
 这种方法论转变使得运动清理模型可以在真实生产数据上端到端训练，从根本上降低了数据准备成本，同时保持了与有监督方法相当甚至更优的清理效果。
 
-
-
 ## 核心方法与创新机理
 StableMotion的核心创新在于将运动清理重新定义为一种**质量可控的条件生成问题**，从而彻底绕过了传统方法对配对干净-损坏数据的依赖。其关键洞察在于：通过引入帧级质量指示变量（QualVar）并设计生成-判别联合训练框架，模型既能评估运动质量，又能根据指定的质量水平生成运动——这使得模型可以直接从混合质量的原始数据中学习清理能力，而无需任何配对监督。
 
@@ -151,7 +148,6 @@ StableMotion采用统一的扩散框架，联合执行两个任务（Section 5.2
 
 这一范式转换的核心价值在于：**将数据需求从“昂贵配对”降级为“廉价标注”**——质量指示变量可通过人工标注或启发式算法获取，而无需构建成对的干净-损坏运动数据。消融实验表明，移除QualVar后模型性能显著下降（足滑率从3.60%升至6.37%，Table 6），验证了该设计的关键性。
 
-
 StableMotion 的核心思路是将运动清理重新定义为一种**质量可控的条件生成问题**。传统方法依赖配对的干净-损坏数据训练有监督模型，而 StableMotion 通过引入帧级质量指示变量（QualVar），使模型能够直接从混合质量的原始运动捕捉数据中学习清理能力，无需任何配对数据。
 
 ### 框架总览
@@ -179,9 +175,6 @@ StableMotion 框架包含以下关键模块，形成完整的训练-推理流水
 **4. 自适应清理模块（测试时）**
 如 Figure 3 所示，该模块通过蒙特卡洛采样估计每帧的软质量标签 $\bar{\mathbf{h}}^i$，并根据软修复调度函数确定每帧的修复起始步数：
 
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2505_03154/figures/003_Figure_3.jpg]]
-*Figure 3: To improve preservation of motion content, we propose an adaptive cleanup technique using soft motion quality evaluation and soft motion inpainting. A simple Monte Carlo method is used to estimate soft quality labels h¯ from the predicted QualVar h, which approximates the severity of artifacts in each frame. Then, we design a soft inpainting strategy that inpaints corrupted frames by initializing the denoising process for each frame $\mathbf { m } ^ { i }$ at different diffusion steps $\mathbf { t } _ { \mathrm { s o f f } } ^ { i }$ . When correcting frames with subtle artifacts (i.e. low $\bar { \mathbf { h } } ^ { i } ) _ { : }$ , the inpainting process is initialized at later denoising steps...
-
 $$
 \mathbf{t}_{\mathrm{soft}}^{i} = \begin{cases} 
 T \sin \frac{\pi}{2} \min(1, 2\bar{\mathbf{h}}^{i} - 1 + \tau), & \text{if } \bar{\mathbf{h}}^{i} \geq \tau \\
@@ -201,7 +194,6 @@ $$
 **推理阶段**：给定一段损坏的运动序列，模型首先通过质量指示变量预测模块识别损坏帧及其严重程度，然后通过自适应清理模块为每帧确定修复步数，最后由质量条件运动生成模块在高质量指示变量的引导下生成修复后的运动。质量感知集成进一步从多个候选结果中择优输出。
 
 这种生成-判别统一的设计使得 StableMotion 能够在不依赖配对数据的情况下，从混合质量数据中自动学习运动清理能力，实现了训练数据需求与清理性能之间的根本性突破。
-
 
 ### 3.1 问题形式化与扩散基础
 
@@ -266,7 +258,6 @@ $$\mathbf { t } _ { \mathrm { s o f t } } ^ { i } = \left\{ \begin{array} { l l 
 
 ---
 
-
 ### 1. 标签是二值标签吗？
 
 **在训练阶段，它是二值标签（Binary Labels）** 。
@@ -295,10 +286,7 @@ $$\mathbf { t } _ { \mathrm { s o f t } } ^ { i } = \left\{ \begin{array} { l l 
 
 - 为了在受控环境中进行定量评估，研究人员通过预设的逻辑代码（如论文附录中的 Python 损坏函数）主动对干净的数据集进行污染（加入高斯噪声、超平滑、速度缩放等） ，在代码运行的同时，**系统会自动将受到污染的区间在 Mask（掩码）中标记为 1**，从而直接获得精确的地面真值（Ground Truth）二值标签 。
 
-
 ----
-
-
 
 ## 实验与关键发现
 ### 核心定量结果
@@ -369,25 +357,6 @@ Table 8 和 Table 9 展示了模型在未见域数据上的泛化能力：
 4. **扩散采样随机性**：扩散模型固有的随机性有时仍会导致次优结果，尽管质量感知集成在一定程度上缓解了这一问题。
 5. **评估公平性**：使用的伪影检测算法为专有系统，可能对某些伪影类型不敏感；且所有基线方法使用同一模型预测的破损帧标签，可能导致其他方法在检测阶段处于不利地位。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2505_03154/figures/008_Table_1.jpg]]
-*Table 1: Performance of the StableMotion on SoccerMocap. A proprietary artifact detection algorithm is used to evaluate motion quality before and after cleanup. FS Dist measures the severity of foot skating. Pops Rate quantifies the frequency of jittery transitions and motion pops. Frozen Rate captures the frequency of over-smoothed transitions and frozen frames. StableMotion provides a highly effective method for training motion cleanup models directly on raw, corrupted datasets in real-world scenarios*
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2505_03154/figures/012_Table_2.jpg]]
-*Table 2: Quantitative comparison on BrokenAMASS. Results are averaged over three random seeds and reported with standard deviations. The best performing model is highlighted, and underlines denote the second-best. “→” means that values closer to the ground truth are better. Methods marked with “*” use ground-truth quality labels to identify frames for cleanup. Our method effectively removes motion artifacts while also preserving the original motion content*
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2505_03154/figures/014_Table_3.jpg]]
-*Table 3: Quantitative comparison on PopDanceSet. Results are averaged over three random seeds and reported with standard deviations. The best performing model is highlighted*
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2505_03154/figures/004_Figure_5.jpg]]
-*Figure 5: The quality-aware ensemble leverages the diversity of diffusion models and the dual functionality of generate-discriminate models to boost motion cleanup performance. This approach ensembles diverse candidate motions by selecting the highest-quality motion based on predicted motion quality scores, leading to more consistent and higher-quality results than performing a single pass of the cleanup model*
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2505_03154/figures/009_Figure_8.jpg]]
-*Figure 8: Locomotion clips in BrokenAMASS before and after cleanup by our model. Our method demonstrates strong performance in cleaning up dynamic locomotion behaviors, producing natural foot and body movements while preserving the global trajectory*
-
-
-
 ## 定位与知识库关联
 ### 1. 与现有工作的关系
 
@@ -424,8 +393,6 @@ $$\mathbf{t}_{\mathrm{soft}}^{i} = \begin{cases} T \sin \frac{\pi}{2} \min(1, 2\
 3. **长时一致性增强**：在需要极长时序一致性的应用（如灵巧操作动画、多人交互场景）中，如何增强模型的长期一致性？当前框架以帧级质量变量为核心，缺乏显式的长时依赖建模。
 
 4. **跨模态扩展**：该生成-判别联合框架能否扩展到其他非运动数据的清理任务，如面部动作捕捉数据的抖动修复或手物交互数据的物理合理性校正？核心挑战在于如何定义适用于不同模态的质量指示变量。
-
-
 
 ## 原文 PDF
 ![[paperPDFs/SIGGRAPH_ASIA_2025/StableMotion_Training_Motion_Cleanup_Models_with_Unpaired_Corrupted_Data.pdf]]

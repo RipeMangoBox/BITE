@@ -54,8 +54,6 @@ MAGICIAN针对上述瓶颈提出了两个核心突破：
 
 在Macarons++基准上，MAGICIAN的最终覆盖率达到0.919，相较贪心方法MACARONS的0.819**绝对提升10个百分点**（相对提升12.2%）；AUC从0.647提升至0.721。在Matterport3D数据集上，该方法在轮式机器人和无人机两种设置下均取得最优，覆盖率分别达到85.45%和96.83%。消融实验表明，增大束搜索宽度和前瞻步数可带来AUC 6.3%、最终覆盖率9.3%的绝对提升，验证了长期规划的有效性。
 
-
-
 主动三维建图（Active 3D Mapping）要求自主机器人通过主动选择观测视角，在未知环境中高效、完整地重建场景表面。该任务的核心挑战在于：机器人必须在有限的步数预算内，从海量候选视角中规划出一条最大化表面覆盖的探索轨迹。近年来，基于学习的主动建图方法（如**MACARONS**、**SCONE**、**ActiveGamer**等）在单步视角选择上取得了显著进展，但其规划策略普遍存在一个根本性瓶颈——**缺乏长期规划能力**。
 
 ### 现有方法的缺口：贪心策略与计算瓶颈
@@ -82,8 +80,6 @@ $$
 ### 本文动机
 
 综上，MAGICIAN旨在解决主动建图中的两个核心问题：**如何克服贪心规划的短视性**，以及**如何使长期规划的计算开销可控**。通过将覆盖增益计算重构为体积渲染、并利用3D高斯泼溅实现前馈加速，该方法在保持实时性的同时，显著提升了探索效率和最终建图完整性。
-
-
 
 ## 核心方法与创新机理
 
@@ -126,8 +122,6 @@ Imagined Gaussians 的另一个关键特性是**状态独立性**：在束搜索
 - **长期规划 vs 贪心**：将束搜索宽度从 1 增至 10、前瞻步数从 1 增至 10 时，AUC 提升 **6.3%**，最终覆盖率提升 **9.3%**，验证了长期规划的有效性。
 - **计算效率**：25 倍加速（0.002 秒 vs 0.05 秒）使束搜索在计算上可行，是长期规划得以实现的基础。
 
-
-
 MAGICIAN 是一个面向主动三维建图的长期轨迹规划框架，其核心设计围绕一个关键瓶颈展开：**现有方法采用贪心单步次最佳视角选择，缺乏对长期累积覆盖增益的建模能力，导致探索效率低、重复路径多；同时，传统基于蒙特卡洛采样的覆盖增益估算速度过慢（每次约 0.05 秒），无法支撑大量候选轨迹的实时评估。**
 
 针对这一瓶颈，MAGICIAN 引入了一个因果调控变量——**利用预训练神经占用网络的先验来预测未知区域的几何结构，并将覆盖增益计算重构为体积渲染过程**，从而通过 3D 高斯泼溅（Imagined Gaussians）实现快速前馈渲染评估（每次约 0.002 秒），使得在束搜索中高效优化长期轨迹的累积覆盖增益成为可能。
@@ -167,8 +161,6 @@ MAGICIAN 的完整数据流如下：RGB-D 观测 → 占用模型预测占用场
 
 Imagined Gaussians 带来的计算加速是使长期规划可行的关键。将覆盖增益估算从蒙特卡洛采样（MACARONS 方法，每次约 0.05 秒）转变为体积渲染（每次约 0.002 秒），实现了 **25 倍加速**。这一量级的效率提升使得束搜索能够在合理时间内评估大量候选轨迹（$N_b=10$，$N_d=10$ 时需评估数百个候选位姿），从而将规划视野从单步贪心扩展到多步前瞻优化。
 
-
-
 MAGICIAN 的核心方法论围绕三个紧密耦合的模块展开：**神经占用预测模型**提供场景几何先验，**Imagined Gaussians 生成与渲染**实现高效覆盖增益估算，**束搜索规划器**利用前两个模块在长期轨迹空间中进行优化搜索。以下逐一剖析各模块的设计逻辑与关键公式。
 
 ### 神经占用预测模型
@@ -176,9 +168,6 @@ MAGICIAN 的核心方法论围绕三个紧密耦合的模块展开：**神经占
 该模块的职责是在探索过程中持续预测整个场景的占用概率场，为后续的覆盖增益计算提供几何先验。模型架构遵循先前工作的多层 Transformer 设计，先在 ShapeNet 上预训练，再在三维场景数据上微调。其输入为当前已观测到的点云和对应的相机位姿，输出为空间中任意点的占用概率 $\hat{\sigma}(\mathbf{x}|\mathbf{C}_t)$，表示在已知历史观测 $\mathbf{C}_t$ 的条件下点 $\mathbf{x}$ 被表面占据的置信度。
 
 这一预测能力是长期规划的关键——即使在尚未观测的区域，模型也能基于已看到的局部结构推断出合理的几何假设，从而避免盲目探索。Figure 4 展示了随着探索推进，Imagined Gaussians 逐渐与真实网格对齐的演化过程，验证了占用预测的可靠性。
-
-![[assets/figures/papers/paper_list_l2057_https_arxiv_org_abs_2603_22650/figures/004_Figure_4.jpg]]
-*Figure 4: Evolution of Imagined Gaussians Compared with Ground Truth Mesh. The brighter the Gaussians, the higher their predicted occupancy. As exploration progresses (from left to right), our Imagined Gaussians increasingly align with the ground truth mesh, demonstrating improved environmental modeling*
 
 ### 表面覆盖增益的形式化
 
@@ -227,9 +216,6 @@ $$w_{\text{depth}}(\mathbf{p}) = \min\left(1, \left(\frac{D(\mathbf{p})}{D_{\tex
 
 这一计算流程（Figure 3 示意）将每次覆盖增益评估的时间从 MACARONS 蒙特卡洛方法的约 0.05 秒降至约 0.002 秒，实现 **25 倍加速**，为束搜索中的大量候选轨迹评估提供了实时可行性。
 
-![[assets/figures/papers/paper_list_l2057_https_arxiv_org_abs_2603_22650/figures/003_Figure_3.jpg]]
-*Figure 3: Computing coverage gain with Imagined Gaussians. During beam search, we evaluate candidate poses by rendering novelty maps from the Imagined Gaussians to compute the coverage gain. The corresponding depth maps are then used to update the novelty γˆ of Gaussians within a depth tolerance*
-
 ### 束搜索长期规划
 
 规划模块的目标是在离散动作空间中优化长期轨迹的累积覆盖增益：
@@ -241,8 +227,6 @@ $$G(\tau) = \sum_{i=1}^{N_d} G(\mathbf{c}_{t+i})$$
 束搜索以增量方式构建候选轨迹：从当前位姿出发，每一步扩展所有可能的动作（如前进、左转、右转），对每个候选位姿通过 Imagined Gaussians 渲染计算覆盖增益，并更新对应束的新颖性状态（将已观测区域的 $\hat{\gamma}$ 置零），仅保留累积增益最高的 $N_b$ 条束继续扩展。最终选择累积覆盖增益最高的轨迹执行前 $N_f$ 步，随后触发下一轮重规划。
 
 消融实验证实，将束宽 $N_b$ 从 1 增至 10、前瞻步数 $N_d$ 从 1 增至 10 时，AUC 绝对提升 6.3%，最终覆盖率绝对提升 9.3%，有力验证了长期规划相对于贪心单步选择的显著优势。值得注意的是，即使仅在贪心设置下（$N_b = N_d = 1$），MAGICIAN 的体积渲染方法仍比 MACARONS 的蒙特卡洛方法在 AUC 上高出 5.2%，在最终覆盖率上高出 10.9%，表明覆盖增益估算精度的提升本身即带来可观的性能增益。
-
-
 
 ## 实验与关键发现
 
@@ -273,9 +257,6 @@ Table 2 展示了Macarons++数据集上的核心对比结果。MAGICIAN在AUC指
 
 Table 4 展示了MP3D数据集上的结果。在轮式机器人设置下，MAGICIAN达到 **85.45%** 的完成率（Comp.），超过NBP的79.38%达 **+6.07个百分点**；在无人机设置下达到 **96.83%**，超过ActiveGamer的95.32%。值得注意的是，MP3D上的MAGICIAN直接使用预训练模型，未在室内场景上进行额外微调，而部分基线方法需要场景特定的微调——这体现了预训练占用模型的强泛化能力。
 
-![[assets/figures/papers/paper_list_l2057_https_arxiv_org_abs_2603_22650/figures/011_Table_4.jpg]]
-*Table 4: Evaluation results on the MP3D dataset. Our method consistently outperforms existing approaches under various robot and action-space settings*
-
 #### 重建质量评估
 
 Table 3 展示了基于探索轨迹采集的100张RGB图像进行新视角合成和网格重建的定量结果。MAGICIAN在所有指标上均达到最优，包括PSNR、SSIM、LPIPS（渲染质量）以及Chamfer Distance、Normal Consistency（几何精度）。Figure 5 和 Figure 6 的定性对比直观展示了MAGICIAN轨迹带来的重建完整性优势——其他方法的重建结果常出现孔洞和噪声，而MAGICIAN能覆盖整个场景表面，生成完整准确的面片网格。
@@ -283,18 +264,9 @@ Table 3 展示了基于探索轨迹采集的100张RGB图像进行新视角合成
 ![[assets/figures/papers/paper_list_l2057_https_arxiv_org_abs_2603_22650/figures/007_Figure_6.jpg]]
 *Figure 6: Qualitative comparison of novel view synthesis (top row) and surface reconstruction (bottom row) in outdoor and indoor scenes. For each method, we show RGB Gaussian splatting renderings and normal maps of reconstructed meshes after applying Mesh-Inthe-Loop Gaussian Splatting [20] on 100 images collected along the trajectory. The trajectories computed with our method produce more accurate and complete reconstructions, resulting in better rendering quality and preventing holes in reconstructed surfaces*
 
-![[assets/figures/papers/paper_list_l2057_https_arxiv_org_abs_2603_22650/figures/009_Table_3.jpg]]
-*Table 3: Evaluation of novel-view rendering and mesh reconstruction on large-scale real-world scanned scenes. Our method achieves the best performance across all metrics*
-
-![[assets/figures/papers/paper_list_l2057_https_arxiv_org_abs_2603_22650/figures/005_Figure_5.jpg]]
-*Figure 5: 3D reconstructions obtained with our trajectories. We show Gaussian splatting renderings (top row) and normal maps of the reconstructed meshes (bottom row) after applying Mesh-In-the-Loop Gaussian Splatting [20] on 100 RGB images collected along our trajectories. The trajectories output by our method cover the entire scene surfaces, resulting in complete and accurate surface meshes*
-
 #### 鲁棒性分析
 
 Figure 9 展示了各方法在不同场景和随机初始位姿下最终覆盖率的标准差。MAGICIAN的覆盖率标准差始终保持在较低水平，表明其对初始条件具有较强的鲁棒性，而其他方法则表现出更大的波动。在位姿噪声测试中（$\sigma = 0.5\text{m}$ 平移，$3^\circ$ 旋转），MAGICIAN的AUC仅下降0.28个百分点，覆盖率下降1.12个百分点，进一步验证了对位姿不确定性的鲁棒性。
-
-![[assets/figures/papers/paper_list_l2057_https_arxiv_org_abs_2603_22650/figures/016_Figure_9.jpg]]
-*Figure 9: Standard deviation of the final coverage across different methods and scenes. Our method achieves consistently low values for this metric, indicating strong robustness to random starting poses, whereas other methods exhibit much larger variability*
 
 ### 消融实验
 
@@ -338,8 +310,6 @@ Table 9 消融了用于占用场查询的代理点采样密度。1×密度（原
 3. **动作空间离散化**：束搜索在离散动作空间上运行高效，但连续高维动作空间（如空中机器人的3D轨迹规划）下的扩展性尚待验证。当前离散化策略在无人机设置下仍取得了有竞争力的结果，但更复杂的机动能力可能带来额外增益。
 
 4. **全局结构先验的局限**：占用模型基于局部几何特征预测，在极度稀疏观测时可能无法提供可靠的全局结构先验。这在大型开放场景或结构高度对称的环境中尤为明显，可能导致探索路径的全局次优性。
-
-
 
 ## 定位与知识库关联
 
@@ -402,8 +372,6 @@ MAGICIAN 的有效性建立在一组明确假设之上，这些假设同时界�
 4. **连续动作空间的扩展。** 将束搜索扩展到连续高维动作空间（如空中机器人的 6-DoF 轨迹规划）而不丧失计算效率，是一个开放挑战。可能的路径包括：在连续空间中采样候选动作并结合学习型价值函数剪枝，或使用模型预测控制（MPC）框架将“想象高斯”渲染作为可微分的代价函数。
 
 5. **多智能体协同探索。** 当前方法针对单智能体设计。在多智能体场景中，如何协调多个“想象高斯”状态、避免探索冗余并最大化集体覆盖效率，是自然延伸方向。
-
-
 
 ## 原文 PDF
 

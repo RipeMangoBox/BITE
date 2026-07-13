@@ -51,8 +51,6 @@ claims:
 
 实验结果表明，PPA在多个IAA和IQA基准数据集上取得了具有竞争力的表现。在PARA、BAID和SPAQ数据集上，PPA达到最优性能（PARA上SRCC 0.913/PLCC 0.942，SPAQ上SRCC 0.945/PLCC 0.952），在其他数据集上与最佳结果的差距控制在4%以内。人工评估进一步验证了PPA在低层感知属性（如对焦、色彩、对比度、曝光）上的提示-图像一致性显著优于CLIP-IQA和UniQA等基线方法。消融实验证实，动态学习提示权重相比固定均匀分布带来约5%的平均性能增益，且特征空间的分数可分离性在训练后显著提升。
 
-
-
 图像美学评估（IAA）与图像质量评估（IQA）是计算机视觉中的两个核心任务，分别关注图像的审美吸引力和技术质量。随着社交媒体和用户生成内容的爆炸式增长，对图像进行自动化、多维度的评分需求日益迫切。然而，这两个任务长期以来被作为独立问题处理，缺乏统一的评估框架。
 
 现有方法可大致分为两类。第一类以**NIMA**（Talebi and Milanfar, IEEE TIP 2018）和**MUSIQ**（Ke et al., ICCV 2021）为代表，采用端到端的卷积神经网络直接回归美学或质量分数。这类方法虽然评分精度较高，但输出的是单一维度的固定分数，无法根据不同的评估维度（如“对焦清晰度”“色彩和谐度”“构图平衡性”）提供可解释的、可控的评估结果。第二类方法借助视觉-语言模型（VLM）实现文本提示驱动的评估，如**CLIP-IQA**（Wang et al., AAAI 2023）利用CLIP的跨模态对齐能力，通过反义文本对（如“Good photo/Bad photo”）计算零样本质量分数；**UniQA**（Zhou et al., arXiv 2024）则进一步通过跨任务预训练实现了提示条件下的评分操控。
@@ -60,8 +58,6 @@ claims:
 然而，基于提示的方法面临一个根本性瓶颈：**提示灵活性与评分精度之间的尖锐矛盾**。固定提示模型（如CLIP-IQA使用单一反义词对）虽然无需额外标注，但丧失了按需调整评估维度的能力；而可操控提示模型（如UniQA）的性能高度依赖于提示级或属性级文本标注的质量与数量，这类细粒度标注成本极高，难以大规模获取。这导致现有方法无法在保持高精度评分的同时，实现任意文本提示下的可控评估。
 
 本文的核心动机正是打破这一僵局。我们观察到，文本提示本质上可以视为一个隐变量——不同的提示捕捉了图像在特定语义维度上的不同侧面，而任务（如“美学评估”或“质量评估”）则定义了这些侧面的聚合方式。基于这一洞见，本文提出**概率性提示自适应（Probabilistic Prompt Adaptation, PPA）**框架，将评分预测建模为提示的混合模型：模型动态推断每个提示在给定图像内容和任务上下文下的适应性权重，并通过边缘化所有提示得到最终的任务评分。这一机制从原理上解耦了提示灵活性与评分精度——训练仅需（任务，图像，分数）三元组，无需任何提示级标注；推理时则可接受任意文本提示，实现可控的多维度评估。
-
-
 
 ## 核心方法与创新机理
 
@@ -92,8 +88,6 @@ PPA的核心洞察在于：通过将文本提示作为隐变量并对其边缘�
 **与相关工作的本质差异**
 
 与**GAMMA**（Zhou et al., ACM MM 2025）的专家混合方法不同，PPA的“专家”是自然语言提示，具有天然的语义可解释性。与**MUSIQ**（Ke et al., ICCV 2021）的多尺度Transformer架构不同，PPA的创新不在于骨干网络设计，而在于概率化的提示自适应机制，这使得单一模型能够同时处理IAA和IQA任务，并在保持感知一致性的前提下灵活响应多样化的评估标准。
-
-
 
 PPA 的整体架构如图 2 所示，由两个核心模块构成：**提示特定评分（Prompt-Specific Scoring）** 和**任务特定评分（Task-Specific Scoring）**。前者负责在任意文本提示下对图像进行可控评分，后者将前者纳入一个概率混合框架，在仅有任务级监督的条件下学习提示的动态适应性权重，从而实现高精度的统一评估。
 
@@ -147,15 +141,11 @@ $$
 
 整个框架的因果调节点在于：**将文本提示视为隐变量，建模其适应性为条件于图像内容和任务上下文的概率分布**。这从机制上解耦了提示灵活性与评分精度——提示特定评分保证任意文本的可控性，而任务边缘化训练保证高精度，二者通过动态推断的提示权重实现统一。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2335_https_openaccess_thecvf_com_content_CVPR2026_html_Hara_Probabilistic_Pro/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed method PPA for IAA/IQA score prediction. The proposed framework consists of prompt-specific scoring, which predicts a score s from an image x and a text prompt t, and task-specific scoring, which encompasses the former and predicts s from an image x and a task c. In prompt-specific scoring, an image x and a text prompt t are embedded using the CLIP encoders, and a prompt-conditioned score distribution*
 
 ![[assets/figures/papers/paper_list_l2335_https_openaccess_thecvf_com_content_CVPR2026_html_Hara_Probabilistic_Pro/figures/001_Figure_1.jpg]]
 *Figure 1: The proposed framework PPA provides a unified, textdriven approach to evaluating image aesthetics and visual quality. Each row illustrates examples of score predictions for antonymous text pairs, showing that PPA can flexibly adjust its evaluation according to nuanced textual instructions. This flexibility allows a single model to handle both IAA and IQA tasks while maintaining perceptual consistency across diverse prompts and evaluation criteria. All example images are sampled from the Open Images Dataset [30]*
-
-
 
 ### 3.1 整体架构
 
@@ -216,8 +206,6 @@ $$\mathbb{E}_{p(s|x,c)}[s] = \sum_{t \in \mathcal{T}_{\text{samp}}} \bar{s}_{\th
 
 这一机制从因果层面解耦了提示灵活性与评分精度：提示选择模型 $p_{\phi}$ 负责动态推断任务与图像相关的提示权重，而提示特定评分模块 $\bar{s}_{\theta}$ 保持高精度评分能力，二者通过边缘化无缝融合。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能
@@ -248,30 +236,11 @@ Table 6通过轮廓系数（SS）和类间/类内方差比（BW）量化了特�
 
 **提示池规模的影响。** Table 8显示，使用260个提示（80个属性专用提示+180个非属性提示）时性能最优。继续增加提示数量反而导致性能下降，说明当前LLM生成的提示池存在语义冗余，过多的相似表达引入了噪声而非有效信息增益。这一发现与前述抽象美学提示上的失败模式相互印证，共同指向提示池语义丰富度的瓶颈。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2335_https_openaccess_thecvf_com_content_CVPR2026_html_Hara_Probabilistic_Pro/figures/003_Table_1.jpg]]
-*Table 1: Human evaluation results for prompt–image consistency for CLIP and UniQA. Each cell shows the number of times each method was preferred in the format “PPA / Baseline (pvalue)”. Cells highlighted in blue indicate cases where the proposed method is significantly superior at the 5% significance level, while those highlighted in pink indicate cases where the baseline is significantly superior*
-
-![[assets/figures/papers/paper_list_l2335_https_openaccess_thecvf_com_content_CVPR2026_html_Hara_Probabilistic_Pro/figures/005_Table_2.jpg]]
-*Table 2: Comparison of the SRCC and PLCC improvements after training between image groups that match or do not match each attribute in AADB. The higher value in each row indicates greater performance gain and is highlighted in bold*
-
-![[assets/figures/papers/paper_list_l2335_https_openaccess_thecvf_com_content_CVPR2026_html_Hara_Probabilistic_Pro/figures/006_Table_3.jpg]]
-*Table 3: Comparison of the SRCC and PLCC improvements after training between image groups that match or do not match each attribute in SPAQ. The higher value in each row indicates greater performance gain and is highlighted in bold*
-
 ![[assets/figures/papers/paper_list_l2335_https_openaccess_thecvf_com_content_CVPR2026_html_Hara_Probabilistic_Pro/figures/007_Figure_4.jpg]]
 *Figure 4: t-SNE visualization of image features before and after training. Images are divided into three groups based on their annotated scores (top, middle, and bottom). After training, the feature space exhibits clearer separation according to score levels*
 
-![[assets/figures/papers/paper_list_l2335_https_openaccess_thecvf_com_content_CVPR2026_html_Hara_Probabilistic_Pro/figures/011_Table_6.jpg]]
-*Table 6: Comparison of feature-space alignment before and after training on AADB and SPAQ datasets using the Silhouette Score (SS) and the Between/Within-Class Variance Ratio (BW)*
-
 ![[assets/figures/papers/paper_list_l2335_https_openaccess_thecvf_com_content_CVPR2026_html_Hara_Probabilistic_Pro/figures/012_Table_7.jpg]]
 *Table 7: Ablation study on the effect of weight learning, task conditioning, and image conditioning*
-
-![[assets/figures/papers/paper_list_l2335_https_openaccess_thecvf_com_content_CVPR2026_html_Hara_Probabilistic_Pro/figures/010_Table_8.jpg]]
-*Table 8: Ablation study on the number of prompts, attributespecific prompts, and non-attribute prompts*
-
-
 
 ## 定位与知识库关联
 
@@ -313,8 +282,6 @@ PPA 的优势场景和局限性可从以下维度界定：
 3. **零样本与跨任务泛化**：当前评估仅限于固定任务集上的训练和测试。PPA 的概率化提示自适应机制在零样本或跨任务迁移场景下的泛化能力尚未被验证，这是评估其作为通用评估框架潜力的关键未解问题。
 
 4. **特征空间可解释性的深化**：虽然 t-SNE 可视化和类间/类内方差比分析（Table 6）表明 PPA 训练后特征空间具有更强的分数可分性，但提示权重 $p_{\phi}(t \mid x, c)$ 的学习过程与特征空间结构之间的因果关系仍需更深入的理论分析。
-
-
 
 ## 原文 PDF
 

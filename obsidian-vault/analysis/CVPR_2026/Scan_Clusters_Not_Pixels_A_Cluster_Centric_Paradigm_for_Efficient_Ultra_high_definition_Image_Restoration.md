@@ -50,8 +50,6 @@ claims:
 
 在五个UHD恢复任务（低光增强、去雨、去模糊、去雾、去雪）上，C2SSM均取得了新的最优结果。例如，在UHD-LOL4K低光增强数据集上达到39.61 dB PSNR，超过先前最优方法MixNet 0.39 dB。所提扫描策略的FLOPs仅为0.407G，远低于MambaIRv2等代表性方法，验证了聚类中心扫描范式在效率与性能上的双重优势。
 
-
-
 ### 超高清图像恢复的困境
 
 随着4K/8K显示设备的普及，超高清（Ultra-High-Definition, UHD）图像恢复已成为计算机视觉领域的核心挑战之一。UHD图像通常包含数百万乃至数千万像素，其恢复任务——包括低光增强、去雨、去模糊、去雾和去雪——不仅要求模型具备强大的全局上下文建模能力，还必须能够在消费级GPU的显存限制下完成全分辨率处理。
@@ -71,8 +69,6 @@ claims:
 本文的核心洞察在于：自然图像具有显著的结构冗余与语义汇聚特性。一幅UHD图像的高维特征空间并非均匀分布，而是呈现出明显的聚类结构——大量像素共享相似的语义属性，可以被压缩为少数具有代表性的语义中心。这意味着，全局依赖关系建模的基本单元完全可以从“数百万像素”缩减为“少量聚类中心”，从而在保持全局感受野的同时，将计算复杂度降低数个数量级。
 
 基于这一洞察，本文提出了**C2SSM**（Cluster-Centric State Space Model），从根本上改变了SSM在UHD图像恢复中的应用范式：不再逐像素扫描，而是将特征分布蒸馏为稀疏的语义聚类中心，仅在中心间进行全局推理，再通过概率相似性分布将中心级上下文扩散回所有像素。这一“扫描聚类而非像素”的策略，使得在消费级GPU上对UHD图像进行高效全分辨率建模成为可能。
-
-
 
 ## 核心方法与创新机理
 
@@ -141,8 +137,6 @@ SCFM与CCSM并行部署于解码器中，共同实现空间-通道的全局特�
 
 消融实验（Table 8）提供了决定性证据：移除CCSM后，UHD-LOL4K上的PSNR从完整模型的39.61 dB骤降至35.87 dB，降幅高达3.74 dB，充分证明聚类中心扫描策略是不可或缺的核心创新。同时，SCFM的移除也导致性能衰减，验证了双路径设计的必要性。效率对比（Table 10）进一步表明，C2SSM的扫描策略FLOPs仅为0.407G，远低于MambaIRv2等代表性方法，真正实现了高效的全分辨率全局建模。
 
-
-
 C2SSM 采用**非对称编码器-解码器架构**，其核心设计理念是将全局依赖建模的基本单元从像素置换为少量可学习的语义聚类中心，从而在保持全分辨率处理能力的同时，将计算和内存开销压缩至消费级GPU可承受的范围。
 
 ### 架构总览
@@ -169,12 +163,8 @@ C2SSM 采用**非对称编码器-解码器架构**，其核心设计理念是将
 
 这种非对称设计的关键优势在于：编码器不执行任何全局扫描，将计算资源集中于解码器；而解码器中的CCSM仅对 $n$ 个聚类中心（默认 $n=4$）而非 $H \times W$ 个像素执行SSM扫描，使得全局建模的复杂度从 $O(C \cdot H^2 W^2)$ 降至 $O(C \cdot n^2)$，在4K分辨率下实现了数量级的效率提升（FLOPs仅为0.407G，远低于MambaIRv2等代表性方法）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l929_https_arxiv_org_abs_2602_21917/figures/002_Figure_2.jpg]]
 *Figure 2: The overview of our proposed C2SSM. C2SSM employs an asymmetric U-Net architecture whose decoder integrates the Cluster-Centric Scanning Module and Spatial-Channel Feature Modulator to achieve spatial-channel global feature coupling*
-
-
 
 C2SSM的核心创新在于将全局依赖建模的基本单元从像素替换为少量可学习的语义聚类中心，并围绕这一思想构建了**聚类中心扫描模块（Cluster-Centric Scanning Module, CCSM）**和**空间-通道特征调制器（Spatial-Channel Feature Modulator, SCFM）**两个关键组件。
 
@@ -254,13 +244,6 @@ $$\pmb{F}_{out} = \mathrm{Conv}(W_s \cdot \pmb{F}_{in}) + \mathrm{Conv}(W_c \cdo
 
 C2SSM采用非对称U-Net架构：编码器仅包含前馈网络（FFN）以降低计算量，解码器则集成CCSM和SCFM，实现空间-通道的全局特征耦合。消融实验表明，移除CCSM会导致UHD-LOL4K上的PSNR从39.61 dB骤降至35.87 dB，而移除SCFM同样造成明显的性能衰减，验证了双路径设计的必要性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l929_https_arxiv_org_abs_2602_21917/figures/001_Figure_1.jpg]]
-*Figure 1: The scanning strategies in existing Mamba-based methods and our proposed method. (a) Vmamba [19] employs a Z-shaped scan path that incurs VRAM bottlenecks when processing UHD images due to its full-pixel scanning. (b) EfficientVMamba [23] reduces scanning costs by omitting sampling steps, this compromises global modeling accuracy. (c) The proposed cluster-centric scanning strategy*
-
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -310,27 +293,8 @@ C2SSM 在五个超高清恢复任务上均取得最优结果，关键指标如�
 
 UHD‑LL 与 UHD‑Snow 数据集上，摘要中声称的提升幅度与表内实际差值存在明显出入，建议读者以原始表格数据为准，并关注后续版本是否修正相关表述。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l929_https_arxiv_org_abs_2602_21917/figures/006_Table_2.jpg]]
 *Table 2: Comparison of quantitative results on UHD-LL dataset [17]*
-
-![[assets/figures/papers/paper_list_l929_https_arxiv_org_abs_2602_21917/figures/004_Table_3.jpg]]
-*Table 3: Comparison of quantitative results on 4K-Rain13k dataset [1]*
-
-![[assets/figures/papers/paper_list_l929_https_arxiv_org_abs_2602_21917/figures/008_Table_4.jpg]]
-*Table 4: Comparison of quantitative results on 4K-RealRain dataset [1]*
-
-![[assets/figures/papers/paper_list_l929_https_arxiv_org_abs_2602_21917/figures/009_Table_5.jpg]]
-*Table 5: Comparison of quantitative results on UHD-Blur dataset [29]*
-
-![[assets/figures/papers/paper_list_l929_https_arxiv_org_abs_2602_21917/figures/010_Table_7.jpg]]
-*Table 7: Comparison of quantitative results on UHD-Snow dataset [31]*
-
-![[assets/figures/papers/paper_list_l929_https_arxiv_org_abs_2602_21917/figures/012_Table_9.jpg]]
-*Table 9: Ablation study of the number of centers*
-
-
 
 ## 定位与知识库关联
 
@@ -372,8 +336,6 @@ EfficientVMamba 尝试通过省略采样步骤来降低扫描成本，但这以�
 3. **与其他高效架构的融合**：C2SSM 的聚类中心扫描模块（CCSM）作为一个即插即用的全局建模组件，是否可以与基于 Transformer 或卷积的高效 UHD 架构（如 UHDformer）融合以产生协同增益，有待验证。
 
 4. **数据不一致性问题**：论文在 UHD-LL 数据集上声称超越 MixNet 0.19 dB，但实际表中值差为 0.09 dB；在 UHD-Snow 数据集上声称优于 UHDDIP 1.5 dB，但实际表中值差为 0.89 dB。这些数据描述与表格数值之间的不一致需要作者澄清，可能影响对方法在对应任务上增益幅度的判断。
-
-
 
 ## 原文 PDF
 

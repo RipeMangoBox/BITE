@@ -57,8 +57,6 @@ claims:
 
 **方法定位：** Trace Anything 处于动态三维重建、点跟踪与运动表示的交叉点。与 **CoTracker3+VGGT**（先二维跟踪再提升至三维）和 **SpaTrackerV2**（前馈式稀疏三维点跟踪）不同，Trace Anything 直接预测密集的、参数化的连续三维轨迹，不依赖外部深度估计或二维跟踪器。相较于 **MonsT3R**、**St4RTrack** 和 **POMATO** 等动态重建方法，它以轨迹场替代逐帧点云加后验对应，从根本上简化了动态场景的表示与推理流程。
 
-
-
 ### 动态场景建模的核心瓶颈
 
 从视频中恢复三维运动结构是计算机视觉的基础问题，广泛应用于机器人操作、自动驾驶和增强现实。现有的动态场景重建方法普遍采用**逐帧分离的点云表示**：先对每一帧独立估计深度或点云，再通过光流或二维点跟踪建立跨帧对应关系。这一范式存在两个根本性缺陷：
@@ -93,8 +91,6 @@ Trace Anything 处于动态三维重建、点跟踪和视频深度估计三个�
 3. **连续建模**：通过参数化曲线（B样条）实现时间维度的连续表示，支持任意时刻的轨迹查询与外推。
 
 这一设计使得 Trace Anything 在自建轨迹场基准上以 **EPE_mix 0.234** 超越最佳基线 **St4RTrack***（0.264），同时推理时间仅需 **2.3 秒**，比后者的 21.7 秒快近 10 倍（Table 1）。在图像对输入场景下，该方法同样以 **EPE_mix 0.135** 显著优于 **POMATO*** 的 0.175（Table 2），展示了从稀疏观测重建稠密运动的能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -140,8 +136,6 @@ $$\mathbf{x}_{i,u,v}(t) = \sum_{k=0}^{D-1} \mathbf{P}_{i,u,v}^{(k)} \phi_k(t)$$
 
 上述创新点的核心证据（Table 1 的精度与速度对比、Table 3 的消融实验）置信度较高（0.95–0.98），但需注意：Trace Anything 使用自建的合成数据集（10K+ 视频）进行训练，而部分基线使用了额外的 Kubric、ScanNet 或真实标注数据，这可能影响性能对比的公平性。此外，参数曲线受限于控制点数量，对于高频往复运动或极长序列，表达能力可能下降，这是该表示的内在局限。
 
-
-
 Trace Anything 的整体流水线遵循“一次前馈，全局推理”的设计原则，将任意长度的视频帧序列直接映射为密集的轨迹场，无需额外的深度估计器、光流计算或迭代式全局对齐。其核心架构由四个级联模块构成：**图像编码器（Image Encoder）**、**融合 Transformer（Fusion Transformer）**、**控制点预测头（Control Point Head）** 以及 **曲线求值模块（Curve Evaluation）**，整体结构见 Figure 3。
 
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_BqaChqppVh/figures/003_Figure_3.jpg]]
@@ -162,8 +156,6 @@ $$\mathbf{x}_{i,u,v}(t) = \sum_{k=0}^{D-1} \mathbf{P}_{i,u,v}^{(k)} \phi_k(t)$$
 **推理效率。** 整个流水线仅需一次前馈传播即可完成所有帧的轨迹场估计。Table 1 显示，Trace Anything 的推理时间仅为 2.3 秒，比基于多阶段优化的最佳基线 St4RTrack*（21.7 秒）快近 10 倍。Figure 6 进一步揭示了各阶段推理时间随帧数的变化规律，表明融合 Transformer 的计算开销随帧数呈亚线性增长，体现了架构的可扩展性。
 
 > **需注意**：论文未详细披露融合 Transformer 的具体层数、注意力头数及 token 维度等架构超参数，上述描述基于 Section 3.2 和 Figure 3 的公开信息。如需完整的网络规格，建议查阅补充材料或代码仓库。
-
-
 
 Trace Anything 的核心思想是将视频建模为一个**轨迹场（Trajectory Field）**——一种从帧索引与像素坐标到连续三维轨迹的密集映射。该映射由四个关键模块串联实现：图像编码器、融合 Transformer、控制点预测头以及 B 样条曲线求值器。以下逐一展开其设计逻辑与关键公式。
 
@@ -206,13 +198,6 @@ $$\mathbf { x } _ { i , u , v } ( t ) = \sum _ { k = 0 } ^ { D - 1 } \mathbf { P
 $$\mathcal { L } _ { \mathrm { t r a j - c o n f } } = \frac { 1 } { | \Omega | } \sum _ { ( i , j ) } \sum _ { ( u , v ) \in \Omega } \Big [ \hat { \Sigma } _ { i \to j } ( u , v ) \ell _ { i \to j } ( u , v ) + \alpha \log \hat { \Sigma } _ { i \to j } ( u , v ) \Big ]$$
 
 其中 $\ell_{i \to j}(u,v)$ 为预测位置与真值之间的欧氏距离平方，$\hat{\Sigma}_{i \to j}(u,v)$ 为预测的逆方差权重，$\alpha$ 控制正则化强度。整体损失还包含时间一致性、静态正则化、刚性保持和对应关系四项辅助损失，共同约束轨迹场的物理合理性。消融实验表明，移除静态正则化项 $\mathcal{L}_{\text{static}}$ 会导致静态区域误差显著上升（EPE_sta 从 0.218 升至 0.273，Table 3），验证了其对动静区域分离的关键作用。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_BqaChqppVh/figures/011_Figure.jpg]]
-*Figure: A: 2D Example illustrating D control points and N frame evaluations. A parametric curve (blue) defined by D = 4 control points (black squares) is evaluated at N = 6 timestamps corresponding to video frames (red dots)*
-
-
 
 ## 实验与关键发现
 
@@ -264,33 +249,14 @@ Trace Anything 在自建轨迹场基准上全面超越现有方法。**Table 1**
 2. **曲线容量限制**：对于高频往复运动或极长序列，固定控制点数的 B-spline 可能表达能力不足，需裁剪窗口或下采样，性能随之衰减。
 3. **密集预测的精度边界**：作为首次密集逐像素轨迹场估计尝试，其精度可能不如专门设计的稀疏三维跟踪方法；结合稀疏跟踪的精细化估计是未来方向。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_BqaChqppVh/figures/008_Table_3.jpg]]
 *Table 3: Ablation study on loss terms. CA is reported in*
-
-![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_BqaChqppVh/figures/004_Figure_4.jpg]]
-*Figure 4: Video-based trajectory field estimation on DAVIS (Perazzi et al., 2016). Trace Anything predicts trajectory fields that can yield dynamic point cloud sequences and dense 3D trajectories, while remaining robust to complex non-rigid motion and occlusions*
-
-![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_BqaChqppVh/figures/006_Figure_5.jpg]]
-*Figure 5: Image-pair-based trajectory field estimation (goal-conditioned manipulation) on Bridge (Walke et al., 2023). Given an initial and a goal image, Trace Anything predicts a trajectory field that interpolates the 3D motion of both the robot arm and manipulated objects. We further show the projected 2D trajectories (see Section E.3 and Figure J for details)*
-
-![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_BqaChqppVh/figures/009_Figure_6.jpg]]
-*Figure 6: Stage-wise runtime vs. number of input frames*
 
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_BqaChqppVh/figures/026_Table.jpg]]
 *Table: E: Quantitative results on 3D tracking. Best in bold, second-best underlined*
 
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_BqaChqppVh/figures/027_Table.jpg]]
 *Table: F: Ablation study on Trace Anything benchmark. CA is reported in 1 $0 ^ { - 2 }$ and SDD in 10−3. Best in bold, second-best underlined*
-
-![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_BqaChqppVh/figures/031_Table.jpg]]
-*Table: G: Curve-fitting accuracy. Optimal fitting of various parametric curves (linear, Bezier, B- ´ spline) to complex real-world 3D trajectories from TAPVid-3D (Koppula et al., 2024). A cubic B-spline with D=10 control points achieves the lowest error, outperforming state-of-the-art 3D tracking methods, indicating that curve capacity is not the limiting factor*
-
-![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_BqaChqppVh/figures/010_Figure_8.jpg]]
-*Figure 8: Spatio-temporal fusion. The trajectory field can be leveraged to fuse observations of the dynamic entity across different frames into a canonical frame*
-
-
 
 ## 定位与知识库关联
 
@@ -327,8 +293,6 @@ Trace Anything 的适用边界由其设计选择和技术特性共同决定。
 ### 4. 知识库定位
 
 Trace Anything 在知识库中的定位可概括为：**首次将密集轨迹场确立为视频的四维表示原语**。它连接了三个原本相对独立的研究方向——动态三维重建、三维点跟踪和参数曲线建模——并在交叉点上提出了统一的解决方案。其核心贡献不在于单项技术的突破，而在于表示范式的转换：将“重建后跟踪”的多阶段流水线压缩为“轨迹即表示”的单阶段前馈推理。这一转换使 Trace Anything 成为后续研究（如轨迹场驱动的神经渲染、机器人操作规划）的基础设施级工作，其自建基准和开源代码（如有）将为该方向的标准化评估提供支撑。
-
-
 
 ## 原文 PDF
 

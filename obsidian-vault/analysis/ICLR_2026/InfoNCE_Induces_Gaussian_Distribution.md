@@ -54,8 +54,6 @@ claims:
 
 本文的理论是渐近的（$d \to \infty$），且依赖对齐平台期和薄壳集中的假设，未从优化动力学角度证明这些条件必然成立。有限负样本效应也未被纳入分析。这些限制指出了未来工作的方向：从SGD动力学直接推导高斯性，以及为非渐近情形提供有限样本保证。
 
-
-
 对比学习（contrastive learning）已成为自监督表示学习的主流范式，其核心机制是通过InfoNCE损失函数拉近正样本对（positive pairs）的表示，同时推开负样本对（negative pairs）的表示。这一范式在视觉和语言领域催生了CLIP、DINO等强基线模型，其下游泛化能力已被广泛验证。然而，一个根本性的理论问题长期悬而未决：**InfoNCE训练产生的表示服从何种概率分布？**
 
 该问题的核心瓶颈在于：对比学习表示的分布特性缺乏机理解释，这直接阻碍了对其统计性质的严格分析。具体而言，现有工作虽已揭示InfoNCE优化过程中对齐（alignment）与均匀性（uniformity）的张力（Wang & Isola, 2020），但尚未回答以下问题：表示本身是否具有某种可表征的分布结构？若存在，该结构从何而来？
@@ -65,8 +63,6 @@ claims:
 为回答这一问题，论文从InfoNCE的总体极限（population limit）入手，建立了从数据增强温和度（augmentation mildness）到球面均匀分布、再到渐近高斯投影的完整推导路径。其关键洞察在于：数据增强的温和度——通过Hirschfeld-Gebelein-Rényi（HGR）最大相关性量化——限制了正对对齐的可达上界，并在特定条件下推动表示分布向单位球面上的均匀分布演化；而高维球面均匀分布在固定低维投影上，由Maxwell-Poincaré球形中心极限定理保证收敛到高斯分布。
 
 这一理论框架的意义在于：它将对比学习中分散的经验观察——薄壳集中、坐标正态性、白化增强均匀性——统一到一个连贯的数学图像中，为后续的表示质量分析、异常检测、不确定性量化等下游任务提供了概率基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -121,8 +117,6 @@ $$J(f) = \Phi(\mu) - \alpha \mathbb{E}_{(u,v)\sim\pi}[u\cdot v] + \beta\,\mathrm
 | 理论路径 | 单一 | 对齐平台期路径 + 正则化路径，双线互补 |
 
 需要指出的是，本文的理论证明是渐近的（$d \to \infty$），未提供有限维度的精确偏差界；对齐平台期和薄壳集中作为推导中的关键假设，其必然性未从优化动力学角度得到证明。这些构成了当前理论框架的主要局限。
-
-
 
 本文提出一个理论框架，用于解释对比学习（InfoNCE）为何在表示空间中诱导出高斯结构。该框架的核心逻辑链由四个模块组成，从数据增强的温和度出发，经由对齐上限和均匀性优化，最终通过高维几何的概率定理导出渐近高斯性。
 
@@ -180,8 +174,6 @@ $$J(f) = \Phi(\mu) - \alpha \mathbb{E}_{(u,v)\sim\pi}[u\cdot v] + \beta\,\mathrm
 - **输出**：表示 $z = f(x)$ 的低维投影渐近服从高斯分布 $\mathcal{N}(0, r_0^2 I_k)$。
 
 该框架的理论保证是渐近的（$d \to \infty$），未给出有限维度的精确偏差。对齐平台期和薄壳集中作为关键假设，其是否在训练中必然达成尚未从优化动力学角度得到证明。总体 InfoNCE 分析假设无限负样本（$N \to \infty$），实际有限批次效应未纳入分析。这些限制在解读框架结论时需特别注意。
-
-
 
 ### 总体InfoNCE损失函数
 
@@ -247,8 +239,6 @@ $$J(f) = \Phi(\mu) - \alpha \mathbb{E}_{(u,v)\sim\pi}[u\cdot v] + \beta\,\mathrm
 
 整个推导的因果逻辑为：**增强温和度 $\eta_2$ → 对齐上界受限 → 训练使对齐饱和（平台期假设）→ 优化压力转向 $\Phi(\mu)$ → $\mu$ 趋近球面均匀分布 $\sigma$ → 球形CLT导出投影高斯性 → 薄壳集中将结论推广至未归一化表示**。正则化路径则绕过平台期假设，通过KL散度直接引导分布向截断高斯收敛。
 
-
-
 ## 实验与关键发现
 
 ### 合成数据实验：薄壳集中与高斯性诊断
@@ -309,18 +299,9 @@ Table 2 将分析扩展到大规模预训练模型。自监督模型（CLIP、DI
 
 Figure 6 进一步比较了不同模型的薄壳集中程度。对比学习方法（CLIP、DINO）的半径分布比有监督模型（DenseNet、ResNet）更紧致，CV 更低，与 Table 1 和 Table 2 中的范数集中指标一致。
 
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_BlSH7gNQSq/figures/008_Figure_6.jpg]]
-*Figure 6: Thin-shell concentration across pretrained models. Radius distributions of representations from supervised models (DenseNet, ResNet) and contrastive models (CLIP, DINO). All models exhibit thin-shell concentration, with contrastive methods showing tighter clustering (lower CV, Eq. (20))*
-
 ### 白化增强均匀性
 
 Figures 9 和 10 分析了白化（whitening）对表示均匀性的影响。对于未归一化表示（Figure 9），白化显著将负样本对的余弦相似度分布推向零附近，增强了均匀性。对于已归一化的表示（Figure 10），白化仍能提供适度但一致的改善——归一化表示本身已接近均匀分布，白化进一步优化了这一性质。这一实验间接支持了均匀性是 InfoNCE 优化的核心驱动力之一。
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_BlSH7gNQSq/figures/012_Figure_9.jpg]]
-*Figure 9: Whitening and uniformity: unnormalized representations. Cosine similarity histograms of negatives for CLIP (image, text) and DINO, before (raw) and after whitening. Unnormalized representations benefit from whitening, with distributions pushed closer to zero, reflecting enhanced uniformity. The y-axis (“Density”) represents the relative count in each bin (normalized by the total number of samples) rather than the probability density function*
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_BlSH7gNQSq/figures/013_Figure_10.jpg]]
-*Figure 10: Whitening and uniformity: normalized representations. Cosine similarity histograms of negatives for CLIP (image, text) and DINO, before (normalized) and after whitening. Normalized representations are already close to uniform; whitening provides a modest but consistent improvement*
 
 ### 实验证据的局限性
 
@@ -329,12 +310,6 @@ Figures 9 和 10 分析了白化（whitening）对表示均匀性的影响。对
 - **有限维度偏差未量化**：理论结果是渐近的（$d \to \infty$），Table 1 和 Table 2 中的高斯性诊断虽然接近正态接受范围，但并非完美匹配。论文未给出有限维度下的精确偏差估计。
 - **对齐平台期的因果性未证明**：Figure 2 展示了对齐先达到平台期、均匀性后改善的现象，但这仅是对训练动态的观察，并未从优化动力学角度证明这一顺序必然发生。
 - **有限批次效应未纳入**：所有实验均使用有限批次大小，而总体 InfoNCE 分析假设 $N \to \infty$。Table 1 中不同批次大小的结果可部分反映批次大小的影响，但未系统分析有限负样本带来的偏差。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_BlSH7gNQSq/figures/009_Figure.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -389,8 +364,6 @@ Figures 9 和 10 分析了白化（whitening）对表示均匀性的影响。对
 4. **有限负样本的非渐近理论**：能否为有限批次大小 $N$ 的情况提供非渐近的高斯近似保证？这在 $N$ 相对于维度 $d$ 较小（即信息瓶颈情况）时尤为重要。
 
 5. **白化与高斯性的关系**：Figure 9和Figure 10显示白化可以进一步增强表示的均匀性，这是否意味着白化操作使表示更接近理论预测的渐近高斯分布？白化与InfoNCE目标之间的理论联系值得深入探索。
-
-
 
 ## 原文 PDF
 

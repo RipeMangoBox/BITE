@@ -72,8 +72,6 @@ claims:
 
 当前方法仍存在若干局限：（1）仅以2D关键点热图为输入，未利用Part Affinity Fields等肢体连接信息；（2）仅输出身体关键点，缺少手部和面部细节；（3）训练过程未融入时序或空间运动先验，仅在推理时进行简单时序过滤；（4）高度依赖前端2D关键点估计质量。未来方向包括融合2D肢体关联特征、引入参数化人体模型与时序运动先验，以及在更大规模动态场景中维持实时性与鲁棒性。
 
-
-
 多视角3D人体姿态估计是计算机视觉与图形学交叉领域的核心问题，其目标是从一组已标定的多视角图像中恢复场景中所有个体的精确三维骨骼姿态。这一技术在角色动画、自由视点视频合成、运动分析等应用中具有广泛需求。然而，当场景中多个个体发生近距离交互（如拥抱、握手、双人舞蹈）时，现有方法面临两类根本性挑战。
 
 **第一重挑战来自2D观测层面的歧义。** 近距离交互导致严重的个体间遮挡（inter-person occlusion），使得单视角2D关键点检测器难以准确区分属于不同个体的身体部位。如图2所示，当两人紧密接触时，2D关键点的归属变得高度模糊——同一个图像位置可能同时对应两个个体的不同关节。
@@ -83,8 +81,6 @@ claims:
 **第三重挑战来自数据层面的约束。** 真实场景的多视角3D姿态标注成本极高，现有数据集（如Panoptic、CHI3D、Hi4D）在相机配置、场景规模、交互类型上差异显著（图3），导致在某一数据集上训练的模型难以泛化到其他配置。这意味着，若要部署到新环境（如篮球场），通常需要重新采集并标注该场景的真实数据，这在实际应用中几乎不可行。
 
 上述三重挑战共同构成了本文的核心研究动机：**如何设计一种既能消除近距离交互下的特征歧义，又能摆脱对真实标注数据依赖的多视角多人3D姿态估计方法？** 本文提出的CloseMoCap系统正是围绕这一核心问题展开。
-
-
 
 ## 核心方法与创新机理
 
@@ -116,8 +112,6 @@ CloseMoCap 将传统的单阶段特征体积到关键点概率体积的直接回
 
 CloseMoCap 的输入仅为2D关键点热图，而非原始图像。这一设计使得网络训练完全摆脱对真实多视角图像的依赖：只需利用已知的3D姿态数据和相机参数，即可合成多视角2D热图-3D姿态对进行训练（Section 3.4, Fig. 7）。该方法在CHI3D数据集上以94.30%的3DPCK@50mm大幅超越所有基线方法，在Hi4D数据集上更以零训练样本取得最低MPJPE=20.28mm和最高PCK@50=98.29%（Table 1, Table 2），充分证明了其强大的跨数据集泛化能力。
 
-
-
 CloseMoCap 的整体 pipeline 遵循“2D 感知 → 3D 中心估计 → 条件体积构建 → 两阶段 3D 回归”的递进结构，其核心设计目标是**在近距离人体交互场景下消除特征歧义，并实现完全脱离真实标注数据的训练**。
 
 系统输入为**多视角同步图像及已知的相机参数**（内参 $\mathbf{K}_v$、外参 $\mathbf{R}_v, \mathbf{t}_v$），输出为场景中所有个体的 3D 骨架关键点坐标。整个流程如 Fig. 4 所示，包含以下关键模块：
@@ -136,13 +130,6 @@ CloseMoCap 的整体 pipeline 遵循“2D 感知 → 3D 中心估计 → 条件�
 这一 pipeline 的关键创新在于：**将个体区分问题转化为条件信号输入问题**。通过锚点引导体积，网络在回归阶段明确知晓“目标个体在空间中的位置”以及“其他个体的干扰区域”，从而在特征高度相似的近距离场景中有效消除歧义。两阶段设计则将“场景理解”（HEM 的全局热图清理）与“个体定位”（KLM 的条件回归）解耦，使网络能更稳健地处理多人遮挡。
 
 训练时，系统完全使用**合成数据**：从 CMU MoCap 中采样多人 3D 骨架，进行随机旋转、平移和“unpose”变换（Fig. 5），再通过已知相机参数渲染为多视角 2D 热图。损失函数联合监督 3D 热图（Focal Loss）和关键点坐标（L1 Loss），如 Eq. 8 所示。这种纯合成训练策略使模型无需任何真实图像-3D 姿态配对数据，即可泛化到不同数据集、相机配置和场景规模（如篮球场，Fig. 12）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1809_Shuai_et_al_Reconstructing_Close_Human_Interactions_from_Multiple_Views/figures/001_Figure_1.jpg]]
-*Figure 1: Our system is designed to recover the 3D poses of individuals engaging in close-range interactions, utilizing input from multiple calibrated cameras. We introduce a novel learning-based approach that effectively handles occlusions and interactions between individuals at close quarters. The standout feature of our system, which allows it to be trained without real data, enables the system to handle various scenes, camera configurations, and number of individuals. Our system facilitates a broad range of real applications, such as character animation (top-right) and free-viewpoint video synthesis (bottom-right)*
-
-
 
 CloseMoCap 的核心是一个**3D条件体积网络**，它接收多视角2D关键点热图，输出场景中每个个体的3D姿态。整个管线由三个紧密耦合的模块组成：特征体积构建、两阶段姿态估计网络，以及合成数据训练策略。以下按模块拆解其数学形式与设计逻辑。
 
@@ -176,15 +163,9 @@ $$\mathbf{Z}_{o}^{i} = \max_{k} \mathbf{Z}^{k} \tag{3}$$
 
 此外，为消除人体全局旋转对特征体积的影响，系统对2D热图施加了**“unpose”变换**：将估计的躯干部分旋转到标准空间后再构建特征体积（见 Fig. 5），使网络专注于局部姿态差异。
 
-![[assets/figures/papers/paper_list_l1809_Shuai_et_al_Reconstructing_Close_Human_Interactions_from_Multiple_Views/figures/005_Figure_5.jpg]]
-*Figure 5: Coordinate transformation in 3D pose estimation. We apply "unpose" operation to the estimated torso part (marked by the pink line in (a)), which is transformed into a standard space thus reducing the influence of global rotation*
-
 ### 3.3 两阶段姿态估计网络
 
 传统方法（如 VoxelPose）直接从特征体积回归关键点概率体积。CloseMoCap 将其重构为两阶段设计（见 Fig. 6）：
-
-![[assets/figures/papers/paper_list_l1809_Shuai_et_al_Reconstructing_Close_Human_Interactions_from_Multiple_Views/figures/006_Figure_6.jpg]]
-*Figure 6: Two-stage design. This image highlights the main difference between our approach and the previous methods in the field. Given the feature volume obtained through multiple viewpoints (a), the previous methods directly estimate the keypoint probability volume (b) of a target person. In contrast, we propose a two-stage method. The first Heatmap Estimation Module focuses on identifying and filtering out the noise present in the input feature volume and outputs a cleaned response volume of all individuals (c), while the second Keypoint Localization Module leverages the cleaned response volume and the conditional inputs to acquire the desired keypoint probability volume for each individual. This...*
 
 **第一阶段：3D热图估计模块 (HEM)**
 从关键点特征体积 $\mathbf{F}^i$ 预测一个“清理后”的全体3D热图 $\hat{\mathbf{H}}^i$，过滤掉噪声和歧义响应：
@@ -213,13 +194,6 @@ CloseMoCap 的另一个关键设计是**完全使用合成数据训练**，无�
 $$L^{i} = \lambda \mathrm{FocalLoss}(\hat{\mathbf{H}}^{i}, \mathbf{H}^{i}) + \frac{1}{J} \sum_{j} |\hat{\mathbf{y}}_{j}^{i} - \mathbf{y}_{j}^{i}| \tag{8}$$
 
 其中 $\mathbf{H}^i$ 是由真值3D姿态生成的监督热图，$\mathbf{y}_j^i$ 是真值关键点坐标。消融实验证实（Table 4），移除3D热图监督后MPJPE从18.78mm升至24.53mm，PCK@50从97.12降至91.58，表明中间热图监督对网络收敛至关重要。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1809_Shuai_et_al_Reconstructing_Close_Human_Interactions_from_Multiple_Views/figures/002_Figure_2.jpg]]
-*Figure 2: Challenges in pose estimation with close proximity. This image highlights that when two individuals are in close proximity, it becomes difficult to obtain accurate 2D pose estimates due to heavy inter-person occlusion and keypoint association ambiguity. Moreover, in learning-based methods that directly regress 3D poses from feature volumes, the similarity in constructed volumes due to their spatial closeness complicates keypoint distinction for regression networks*
-
-
 
 ## 实验与关键发现
 
@@ -277,16 +251,6 @@ Fig. 11对比了本方法与关联式方法的定性结果：传统自顶向下�
 
 ![[assets/figures/papers/paper_list_l1809_Shuai_et_al_Reconstructing_Close_Human_Interactions_from_Multiple_Views/figures/015_Figure_11.jpg]]
 *Figure 11: Qualitative comparison with association-based methods. This figure compares the efficacy of our method and two pose estimation methods at varying interaction distances. We render skeletons using the viewpoint of the image in the first row. The traditional top-down method MV-Pose performs well at long distances but fails at close range. The bottom-up method 4DA excels at close range, though it still fails to reconstruct some keypoints as shown in the red circle. In contrast, our method accurately reconstructs poses in this complex scenario, outperforming the other two methods*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1809_Shuai_et_al_Reconstructing_Close_Human_Interactions_from_Multiple_Views/figures/010_Table_3.jpg]]
-*Table 3: Evaluation on Panoptic [Joo et al. 2015]. We report Average Precision (AP) with thresholds of 25, 50, and 100mm, where the higher values indicate better performance. Ours is trained using synthetic data, while Ours* is trained using heatmaps generated from images*
-
-![[assets/figures/papers/paper_list_l1809_Shuai_et_al_Reconstructing_Close_Human_Interactions_from_Multiple_Views/figures/012_Figure_9.jpg]]
-*Figure 9: Evaluation on Hi4D [Yin et al. 2023] with tight thresholds. We report 3DPCKs with a tight threshold from 0 to 100mm. The results show that our method outperforms others by a large margin even in tight thresholds. The notations of methods follow those in Tab. 2*
-
-
 
 ## 定位与知识库关联
 
@@ -353,8 +317,6 @@ CloseMoCap 的有效性建立在以下关键假设之上，这些假设定义了
 **（4）扩展至更大规模动态场景的实时处理。** 在篮球场等大尺度、多人的动态场景中（如Fig. 12所示），如何维持系统的实时性和鲁棒性是一个开放挑战。这涉及：自适应体积范围调整（根据个体在场景中的分布动态调整体积大小和位置）、计算效率优化（稀疏体积表示、级联分辨率）、以及多人场景的并行化处理策略。
 
 **（5）减少对多视角的依赖。** 消融实验（Table 5）表明，视角数从8减至4时MPJPE从19.22mm增至28.85mm，性能下降明显。探索如何在更少视角（如2-3个）下维持可接受的精度，将扩展方法的实际部署范围。这可能涉及更强的时序先验、场景几何约束、或与单目人体姿态估计方法的融合。
-
-
 
 ## 原文 PDF
 

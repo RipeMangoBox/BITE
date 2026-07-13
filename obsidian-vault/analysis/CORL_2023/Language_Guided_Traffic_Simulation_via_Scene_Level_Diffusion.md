@@ -64,8 +64,6 @@ claims:
 
 在 nuScenes 数据集上的闭环仿真实验表明，CTG++ 在 8 项不同规则设置中**全面超越**最强基线 CTG：在 GPT 生成的“保持距离”规则下，失败率从 0.343 降至 0.173（**降低 49.6%**），场景级真实感偏差从 0.342 降至 0.331。消融实验进一步揭示了方法有效性的因果机制：移除相对几何边信息导致失败率升至 0.227，而使用场景中心坐标替代智能体中心坐标则使失败率飙升至 0.886，验证了**智能体中心建模**和**交互编码**对闭环仿真鲁棒性的关键作用。定性结果表明，CTG++ 在满足查询约束的同时不会牺牲其他方面的质量（如保持车道、轨迹平滑性），而 CTG 则常因过度优化单一规则而引入碰撞或偏离道路。
 
-
-
 ### 问题背景
 
 交通仿真在自动驾驶系统的开发与验证中扮演着关键角色，它为感知、预测和规划模块提供了安全、可复现且成本可控的测试环境。一个理想的交通仿真系统需要同时满足两个核心需求：**高保真的真实感**（生成的车辆轨迹与真实驾驶行为分布一致）和**灵活的可控性**（能够根据用户意图生成符合特定规则或场景的轨迹）。
@@ -79,8 +77,6 @@ claims:
 ### 本文动机
 
 针对上述缺口，CTG++ 的核心动机是**同时实现高保真场景级真实感与基于自然语言的灵活可控性**。具体而言，本文试图回答两个关键问题：（1）如何将单智能体扩散模型升级为**场景级联合建模**，使生成的轨迹天然包含多智能体交互？（2）如何利用大规模语言模型（LLM）的代码生成能力，将用户的自然语言查询**自动转化为可微损失函数**，从而绕过对领域专业知识的需求，同时避免训练昂贵的多模态模型？
-
-
 
 ## 核心方法与创新机理
 
@@ -108,8 +104,6 @@ CTG++ 针对现有交通生成方法的根本瓶颈——无法同时提供高�
 ### 两个创新的协同效应
 
 这两个创新并非孤立存在，而是产生了重要的协同效应。定性对比（Figure 4）显示，对于“车辆 A 始终保持与车辆 B 10-30 米距离”和“车辆 A 应与车辆 B 碰撞”等查询，CTG++ 和 CTG 的语言接口均能生成符合查询的轨迹，但 CTG++ 不会牺牲道路保持和平滑性等其他方面的真实感，而 CTG 则会出现碰撞或偏离道路的副作用。这表明**场景级联合建模提供的交互感知能力，使语言引导的生成在满足用户意图的同时，仍能维持场景级的一致性**——这是单智能体独立建模所无法实现的。
-
-
 
 CTG++ 的整体框架围绕一个核心瓶颈展开：**现有交通生成方法无法同时提供高保真真实感和无需领域专业知识的灵活可控性**。为解决这一问题，CTG++ 将单智能体独立扩散模型升级为场景级联合建模，并引入大规模语言模型将自然语言查询转化为可微损失函数，从而在测试时通过迭代优化实现语言引导的可控生成。
 
@@ -140,8 +134,6 @@ CTG++ 的整体框架围绕一个核心瓶颈展开：**现有交通生成方法
 *Figure 1: Overview of CTG++. A user query, predefined APIs, and examples are passed to GPT4, which generates a differentiable loss to guide CTG++ for query-compliant trajectories*
 
 该管线的一个显著优势是**测试时可控性**：扩散模型本身仅需训练一次以学习真实交通分布，之后对于任意新的用户查询，只需调用 GPT-4 生成新的损失函数，即可在采样阶段实现零样本的灵活控制。
-
-
 
 ### 3.1 问题形式化与轨迹表示
 
@@ -209,8 +201,6 @@ $$p_{\theta}(\tau_a^{k-1} \vert \tau^k, \mathbf{c}) \approx \mathcal{N}(\tau_a^{
 
 该过程通过投影梯度下降实现，在保持生成轨迹真实感的同时，逐步引导其满足用户指定的规则。与 CTG 需要领域专家手工设计信号时序逻辑损失函数不同，CTG++ 的控制接口完全由 LLM 自动构建，大幅降低了使用门槛。
 
-
-
 ## 实验与关键发现
 
 ### 评估设置与指标
@@ -232,17 +222,8 @@ $$p_{\theta}(\tau_a^{k-1} \vert \tau^k, \mathbf{c}) \approx \mathcal{N}(\tau_a^{
 
 在 STL 规则下的对比同样显著。以“速度限制”规则为例（Figure A2），CTG++ 不仅实现了更低的规则违反，还避免了 CTG 中出现的车辆间碰撞。在“目标速度”规则下（Figure A3），虽然 CTG 在速度满足度上略优，但其导致车辆与横穿车辆碰撞并驶离道路，而 CTG++ 保持了闭环稳定性。在“无碰撞”规则下（Figure A4），CTG++ 与 BITS+opt 均完美满足规则，但 BITS+opt 生成了高度曲折、不真实的轨迹作为满足规则的代价，而 CTG++ 保持了轨迹的平滑性和真实感。
 
-![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2306_06344/figures/009_Figure.jpg]]
-*Figure: (a) CTG++ speed limit (0.037) (b) CTG speed limit (0.041)*
-
 ![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2306_06344/figures/010_Figure.jpg]]
 *Figure: A2: Qualitative comparison between CTG++ and CTG under speed limit STL rule (the numbers in parentheses represent rule violations). CTG++ achieves lower rule violation than CTG. Besides, CTG involves collision between the blue vehicle and the green vehicle. (a) CTG++ target speed (0.213) (b) CTG target speed (0.163) Figure A3: Qualitative comparison between CTG++ and CTG under target speed STL rule (the numbers in parentheses represent rule violations). Although CTG achieves a bit better target speed rule satisfaction, it involves a vehicle collides with crossing vehicles and then goes off-road*
-
-![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2306_06344/figures/011_Figure.jpg]]
-*Figure: (a) CTG++ no collision (0) (b) BITS+opt no collision (0)*
-
-![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2306_06344/figures/013_Figure.jpg]]
-*Figure: (a) CTG++ stop sign + no off-road (0, 0) (b) CTG stop sign + no off-road (0.732, 0)*
 
 **Table 3** 进一步提供了三次运行下的均值与标准差对比。CTG++ 在所有 8 项设置中均显著优于 CTG——失败率和场景级真实感偏差的差值均大于两者标准偏差之和，验证了结果的统计显著性和可复现性。
 
@@ -276,21 +257,11 @@ Figure 4 展示了语言引导的轨迹生成定性对比。对于“车辆 A �
 
 4. **新查询类型的人工成本**：框架目前通过少量示例扩展功能，但需要为每种新类型的复杂查询人工设计额外的辅助函数和样例，尚未实现完全自动化的零样本泛化。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2306_06344/figures/005_Table_1.jpg]]
 *Table 1: Quantitative results of CTG++ and the baselines under GPT-generated rules and STL rules*
 
 ![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2306_06344/figures/012_Figure.jpg]]
 *Figure: A4: Qualitative comparison between CTG++ and BITS+opt under no collision STL rule (the numbers in parentheses represent rule violations). Both methods satisfies the rule perfectly as no collision happens. However, BITS+opt have highly curvy, unrealistic trajectories as the cost of satisfying the rule. (a) CTG++ no off-road (0) (b) CTG no off-road (0) Figure A5: Qualitative comparison between CTG++ and CTG under no off-road STL rule (the numbers in parentheses represent rule violations). Both methods satisfies the rule perfectly as no off-road happens. However, CTG lead to multiple collisions among the pink vehicle and vehicles that are stationary*
-
-![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2306_06344/figures/006_Table_2.jpg]]
-*Table 2: Ablation study of CTG++ features*
-
-![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2306_06344/figures/015_Table_3.jpg]]
-*Table 3: Quantitative results (mean with standard deviation of three runs) of CTG++ and the strongest baselines CTG under GPT-generated rules and STL rules. We highlight the winning method that is significantly better than the other (i.e., if the values of the two methods differ by at least the sum of their standard deviations)*
-
-
 
 ## 定位与知识库关联
 
@@ -345,8 +316,6 @@ Figure 4 展示了语言引导的轨迹生成定性对比。对于“车辆 A �
 4. **多模态输入扩展**：如何将框架推广到多模态输入（如事故报告文本+现场图像），以生成更逼真的碰撞重建场景？这需要解决视觉特征与语言指令的融合问题。
 
 5. **更大规模场景验证**：当前实验限于 nuScenes 的 100 个验证场景，在更大规模、更高密度、更多样化的交通场景（如 Waymo Open Dataset、交互路口）上的泛化能力有待验证。
-
-
 
 ## 原文 PDF
 

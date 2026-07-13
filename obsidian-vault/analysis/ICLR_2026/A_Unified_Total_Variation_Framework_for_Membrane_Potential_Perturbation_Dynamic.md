@@ -53,8 +53,6 @@ claims:
 
 综合来看，MPPD‑TV‑ℓ₁ 通过将膜电位扰动纳入严格的 TV‑ℓ₁ 理论框架，既给出了对已有启发式方法的统一解释，又实现了鲁棒性的实质性提升。当前工作主要基于 LIF 神经元推导，在图像分类任务上验证，将其扩展到更一般的脉冲神经元模型及真实场景中的神经形态系统，是下一步值得探索的问题。
 
-
-
 脉冲神经网络（SNN）在功耗和计算效率上具有天然优势，但其对抗扰动时的鲁棒性提升仍是一个关键挑战。近期研究引入膜电位扰动动态（MPPD）作为正则化手段来约束网络对输入扰动的敏感性。作者发现，原本被用于正则化的MPPD（丢弃神经元重置部分后）在数学上等价于总变分（TV），即
 
 $$\epsilon_i^l[t] = \lambda \epsilon_i^l[t-1] + \sum_j w_{ij}^l \,\Delta s_j^{l-1}[t]$$
@@ -68,8 +66,6 @@ $$\epsilon_i^l[t] = \lambda \epsilon_i^l[t-1] + \sum_j w_{ij}^l \,\Delta s_j^{l-
 $$\int_{\Theta} \big|\nabla_{(\mathrm{i},\mathrm{t})} v(i,t,x)\big| \,\mathrm{d}\mu$$
 
 （公式(23)）。ℓ₁惩罚对应更大的 L¹ 函数空间，理论上对带有尖锐边界的对抗扰动具有更强的鲁棒信号重建能力（“Based on the coarea formula, TV‑ℓ1 performs better than TV‑ℓ2 in robust signal reconstruction”）。通过这一变革，MPPD‑TV‑ℓ₁ 能够更自然地贴合脉冲网络的稀疏动态，在抑制扰动的同时保持关键的块状特征，从而在清洁准确率和对抗鲁棒性之间达到更优的平衡。后续实验证据也表明，在 CIFAR‑10/100 和 Tiny ImageNet 上，MPPD‑TV‑ℓ₁ 在多种攻击下均与现有方法相比具备显著优势。
-
-
 
 ## 核心方法与创新机理
 
@@ -108,8 +104,6 @@ $$
 
 综上，MPPD‑TV‑ℓ₁ 的核心创新在于用一个更强的 ℓ₁ TV 范数替代原有 ℓ₂ 惩罚，并配以变分定义、支配不等式和闭式次梯度的完整理论铺陈，将 MPPD 从一个启发式正则化提升为一个与 SNN 稀疏脉冲动态内在统一的鲁棒泛函。
 
-
-
 该框架将脉冲神经网络中的膜电位扰动动态（MPPD）重新表述为统一的总变分（TV），并据此构建了以 ℓ₁ 范数为正则化惩罚的训练管道。管道由四个核心模块串联而成：LIF 神经元前向传播、MPPD 计算、TV‑ℓ₁ 正则化注入损失、以及基于时空反向传播（STBP）与次梯度的权重更新。输入为干净的图像样本或对抗样本，输出为鲁棒分类结果，管道内部的数据流如下图所示（示意）：
 
 1. **LIF 神经元前向传播**  
@@ -144,8 +138,6 @@ $$
    由于 TV‑ℓ₁ 项不可微，管道利用其闭式次梯度（命题 5，式 (26)）进行参数更新。对每个权重 $w(i,j(i))$，次梯度为 $\operatorname{sign}(\cdots) \cdot \sum_{k=0}^{t-1} \lambda^k \nabla_{(\mathrm{j},\mathrm{t})} s(j,t-k,x)$ 在时间‑神经元维度的积分，该公式可直接嵌入基于替代梯度的 STBP 框架（式 (6)），实现端到端的鲁棒训练。理论分析（定理 4，式 (24)）证明膜电位的 ℓ₁‑TV 被脉冲的 ℓ₁‑TV 与权重 1‑范数的乘积所控制，从而保证了梯度的稳定性，实验证据表明该方法在训练中具有最快的梯度衰减和最低的梯度范数（Figure A1）。
 
 通过以上四个模块，MPPD‑TV‑ℓ₁ 框架将扰动动态的启发式处理替换为有理论保证的 TV‑ℓ₁ 正则化，输入为图片和扰动方向，输出为干净与对抗样本的准确率。整个管道在 VGG11 和 WRN16 等架构下，对 CIFAR‑10/100 及 Tiny ImageNet 数据集的多数攻防场景均表现出优于 TV‑ℓ₂ 基线和无 TV 基线的鲁棒性（Table 1, Table 2）。
-
-
 
 现有膜电位扰动动态（MPPD）正则化依赖丢弃神经元重置的启发式处理，其本质为平方全变分（TV-ℓ₂）框架；该框架对应的函数空间较小，对尖锐对抗噪声的鲁棒性不足。本文的因果调节器是将惩罚项由平方和（ℓ₂）替换为绝对值全变分（ℓ₁），借助共面积公式获得更大的 L¹ 函数空间，从而更贴合脉冲网络的稀疏动态并有效抑制扰动。下面给出支撑这一调节的核心模块及关键公式，变量含义随公式解释。
 
@@ -233,12 +225,9 @@ $\operatorname{sign}(\cdot)$ 为绝对值函数在非零处的导数，零处取
 - 次梯度公式 (26) 是论文的推导结果，为训练提供了可实现性；梯度稳定性（图 A1）进一步验证了 TV‑ℓ₁ 的低梯度范数特性。  
 - 需注意，本框架仅基于 LIF 神经元推导，对其余脉冲神经元模型的适用性尚待验证。
 
-
-
 ## 实验与关键发现
 
 我们在 CIFAR‑10/100 和 Tiny ImageNet 三个基准上，采用 VGG11 与 WRN16 两种架构，系统比较了 MPPD‑TV‑ℓ₁ 与多种 SNN 鲁棒训练方法的表现，包括 MPPD‑TV‑ℓ₂、Non‑MPPD 以及具有固有鲁棒性或使用对抗训练的 SNN‑BP、HIRE‑SNN、SNN‑RAT、FEEL、SR 等（Table 1、Table 2）。MPPD‑TV‑ℓ₁ 在所有数据集和攻击类型（APGD、FGSM、PGD⁷/¹⁰/²⁰/⁴⁰、CW 以及 AutoAttack）下均取得了最优或极具竞争力的对抗准确率，且在清洁样本上未出现明显退化。例如，在 CIFAR‑10 上 VGG11 的清洁准确率达到 92.230%，在 Tiny ImageNet 上 WRN16 的清洁准确率为 52.990%，均优于同类方法。值得注意的是，即使仅加入高斯扰动（Gaussian Perturbation），MPPD‑TV‑ℓ₁ 依然保持了最高的鲁棒准确率，表明该方法不仅能防御有目的对抗攻击，对一般性有害噪声也同样有效。
-
 
 ![[assets/figures/papers/iclr26_0004_LDo9numrx6_A_Unified_Total_Variation_Framework_for_Membrane/figures/001_Table_1.jpg]]
 *Table 1: Classification accuracies (%) of different methods on CIFAR 10 and CIFAR 100*
@@ -249,7 +238,6 @@ $\operatorname{sign}(\cdot)$ 为绝对值函数在非零处的导数，零处取
 ### 正则化强度与消融分析
 
 我们在 AT 训练方案下对 MPPD‑TV‑ℓ₁ 的正则化系数 α 进行了消融（Table 3）。从 α=0（等价于 Non‑MPPD）到 α=4.0，最优鲁棒窗口出现在 α=2.5~3.0 附近，该范围内各攻击下的准确率均显著优于 α=0 的基线。例如，CIFAR‑10 上 α=3.5 时清洁准确率为 84.01%，比 α=0 时的 83.47% 提升 0.54 个百分点，且在 PGD 系列攻击下的提升更为明显。这表明通过控制总变分惩罚强度，可以有效平衡清洁精度与鲁棒性，而取消惩罚（α=0）则会导致对抗鲁棒性急剧下降。
-
 
 ![[assets/figures/papers/iclr26_0004_LDo9numrx6_A_Unified_Total_Variation_Framework_for_Membrane/figures/003_Table_3.jpg]]
 *Table 3: Classification accuracies (%) of $\mathbf { M P P D - T V - } \boldsymbol { \ell } _ { 1 }$ with different regularization strengths
@@ -264,8 +252,6 @@ $\operatorname{sign}(\cdot)$ 为绝对值函数在非零处的导数，零处取
 
 需要指出的是，当前验证均基于 LIF 神经元模型和图像分类任务，所得到的理论框架是否能直接迁移至 Izhikevich、HH 等更复杂的脉冲神经元模型仍需实验确认。此外，虽然已覆盖 CIFAR 和 Tiny ImageNet，但在更大规模数据集（如 ImageNet‑1K）上的可扩展性以及在实际神经形态硬件上的在线训练效率尚未涉及。目前也未测试该方法对补丁攻击、物理域攻击等非 ℓp 型对抗威胁的鲁棒性，这些方向可作为后续研究重点。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0004_LDo9numrx6_A_Unified_Total_Variation_Framework_for_Membrane/figures/007_Figure_1.jpg]]
 *Figure 1: Accuracies and actual TV values of $\mathbf { M P P D - T V - } \boldsymbol { \ell } _ { 1 }$ (α = 1) and Non-MPPD (α = 0)
 
@@ -274,9 +260,6 @@ $\operatorname{sign}(\cdot)$ 为绝对值函数在非零处的导数，零处取
 
 ![[assets/figures/papers/iclr26_0004_LDo9numrx6_A_Unified_Total_Variation_Framework_for_Membrane/figures/009_Figure_5.jpg]]
 *Figure 5: Figure A1: $\ell _ { 2 }$ norms of gradients for different methods with WRN16 architecture and AT training scheme on Tiny ImageNet*
-
-
-
 
 ## 定位与知识库关联
 
@@ -298,8 +281,6 @@ MPPD‑TV‑ℓ₁ 的研究起点是对现有膜电位扰动动态正则化的�
 2. **对抗攻击深度**：系统研究模型在面对 patch 攻击、物理攻击以及针对 TV 正则化专门构造的自适应攻击时的行为，厘清其鲁棒性上限与可能的失效模式。
 3. **硬件‑算法协同**：评估 TV‑ℓ₁ 正则化在神经形态硬件（如 Loihi、TrueNorth）上进行原位训练的可行性与能效优势，利用其稀疏梯度特性进一步降低功耗。
 4. **模型与模态泛化**：将 TV‑ℓ₁ 框架扩展至其他脉冲编码方式（时间编码、群体编码）和非视觉模态（语音、事件相机数据），测试其作为通用神经形态计算鲁棒性基石的潜力。
-
-
 
 ## 原文 PDF
 

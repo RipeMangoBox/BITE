@@ -51,8 +51,6 @@ SparseRL 将预训练语言模型视为**随机策略**，将代码生成步骤�
 
 在 SuiteSparse 矩阵集的 SpMV 任务上，SparseRL 相比现有方法编译率提升 20%，生成代码平均运行速度提升 30%；相比 NVIDIA 官方库 cuSPARSE 在 V100 上平均性能提升 **1.42 倍**（A100 上 1.44 倍）。消融实验证实预训练阶段贡献约 8.5 个 pass@1000 点，RL 阶段贡献约 3.75 点，正弦嵌入显著优于线性投影和可学习嵌入策略。方法在 SpMM 任务上也展现出泛化能力，在 A100 上相比 Sputnik 取得 **2.32 倍**加速比。
 
-
-
 稀疏矩阵运算——尤其是稀疏矩阵-向量乘法（SpMV）和稀疏矩阵-矩阵乘法（SpMM）——是科学计算、图分析和深度学习等领域的核心计算瓶颈。与稠密矩阵不同，稀疏矩阵的非零元素分布极不规则，导致其执行模式高度依赖输入数据的结构特征。为每一种稀疏模式手工编写高性能CUDA内核不仅耗时巨大，而且难以泛化，因此自动化生成稀疏CUDA代码成为一个极具吸引力的研究方向。
 
 然而，现有代码生成方法在这一任务上面临三重根本性困难。**第一，监督学习的目标函数与性能目标错位。** 主流的监督微调（SFT）方法以最小化token级交叉熵损失为目标，其本质是最大化参考代码的似然。这种目标函数无法区分语义正确但执行效率迥异的不同实现——一段通过编译且计算结果正确的代码，其运行时间可能相差数倍，但交叉熵损失对此完全无感知。**第二，稀疏矩阵的模态鸿沟。** 稀疏矩阵的结构化信息（非零元素的行列索引）与自然语言提示之间存在根本的表示差异。将稀疏模式简单地转换为文本描述会丢失关键的拓扑信息，使模型难以捕获非零元素的分布规律和内存访问模式。**第三，执行效率缺乏反馈信号。** 传统的监督学习流程在训练时仅依赖静态的代码-注释对，完全隔离于编译器与执行器的运行时反馈，导致模型无法感知生成代码在实际硬件上的性能表现。
@@ -60,8 +58,6 @@ SparseRL 将预训练语言模型视为**随机策略**，将代码生成步骤�
 针对上述缺口，现有工作进行了初步探索。**CodeRL**（Le et al., 2022）和**PPOCoder**（Shojaee et al., 2023）将强化学习引入代码生成，但它们的奖励信号主要来自编译正确性和功能测试，缺乏对执行效率的直接优化，且仍依赖自然语言提示作为输入。**cuSPARSE**（Naumov et al., 2010）作为NVIDIA官方稀疏计算库，通过手工优化实现了可靠的性能，但其覆盖的稀疏模式有限，无法为任意矩阵结构提供定制化内核。**TVM-S**（Chen et al., 2018）通过编译器自动调优生成稀疏代码，但其搜索空间受限于预定义的调度模板，难以发现超越手工设计的优化策略。
 
 本文的核心动机在于：**将预训练语言模型视为一个可优化的随机策略，通过深度强化学习直接从编译器与执行器的反馈中学习，使模型能够同时优化代码的正确性与执行效率。** 这一思路的关键洞见是：编译结果（通过/失败）、功能测试（正确/错误）和执行时间（相对基线的加速比）构成了一个天然的奖励信号源，可以弥合训练目标与部署性能之间的鸿沟。同时，通过用稀疏矩阵非零元素行列索引的正弦嵌入替代自然语言提示，可以消除模态差异，使模型直接感知稀疏结构，从而生成针对特定矩阵模式定制的高效CUDA内核。
-
-
 
 ## 核心方法与创新机理
 
@@ -100,8 +96,6 @@ SparseRL 在解码过程中集成了**CUDA 语法/语义动态验证机制**：�
 3. **PPO 强化学习优化**：以分层奖励为优化目标，通过 PPO 算法进一步优化模型，直接追求编译正确性与执行效率。
 
 消融实验（Table 2）表明，三阶段完整流程获得最佳 pass@1000（49.25），而去掉预训练阶段降至 40.75，去掉 RL 阶段降至 45.50，验证了各阶段的必要性。
-
-
 
 ![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_VdLEaGPYWT/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our method to optimize pretrained LMs for sparse CUDA code generation. (a) At pre-training stage, additional CUDA code is used to augment the LM. (b) At supervised finetuning (SFT) stage, the LM is finetuned for the Sparse CUDA code generation. (c) At RL stage, the actor and critic networks are first initialized from the finetuned LM, and then updated based on the reward of RL. The reward function is composed of correctness and efficiency rewards*
@@ -153,8 +147,6 @@ $$\mathcal{L}_{ce}(\theta) = -\sum_t \log p_\theta(\hat{y}_t|\hat{y}_{1:t-1}, X)
 | 解码控制 | 标准自回归解码 | 动态语法/语义检查，错误时提前终止 |
 
 这种设计将优化目标从“模仿参考代码”转变为“生成高效代码”，使模型能够探索监督学习中无法触及的性能空间。
-
-
 
 ### 3.1 任务形式化与监督微调目标
 
@@ -214,8 +206,6 @@ $$
 
 在 RL 阶段，SparseRL 集成了动态 CUDA 语法/语义检查机制：解码过程中实时验证生成代码的语法正确性，一旦检测到错误（如未闭合的括号、无效的 CUDA 关键字等）即提前终止生成，避免在无效序列上浪费计算资源。该机制不仅加速了 RL 的探索效率，也间接提升了有效样本的生成比例。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与因果机制
@@ -228,15 +218,7 @@ SparseRL 的核心干预是**将生成问题从监督学习重构为深度强化
 
 **Table 1** 汇总了各方法在 SuiteSparse SpMV 和 SpMM 任务上的正确性与编译率。SparseRL+Qwen2.5-14B 在 SpMV 上取得 pass@1000 = 49.25、编译率（CR）= 57.50，相较 CodeRL+CodeT5-770M 的 36.50 / 39.50 分别提升 +12.75 和 +18.00 个百分点。值得注意的是，SparseRL 即使搭载较小的 CodeT5-770M 骨干，其 pass@1000（48.75）和 CR（56.50）仍显著超过参数量大得多的开源模型（如 Qwen3-14B 的 28.75 / 47.50），表明框架设计而非模型容量是性能提升的主因。
 
-
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_VdLEaGPYWT/figures/003_Table_1.jpg]]
-*Table 1: Correct functionality (pass@k) and Compilation Rates (CR) under k = 1000*
-
 **Figure 3** 展示了 SpMV 在 V100 和 A100 上的 GFLOPS 分布。SparseRL 在 V100 上相对 cuSPARSE 取得平均 1.42× 加速比，相对 TVM-S 为 1.82×；在 A100 上分别为 1.44× 和 1.86×。箱线图显示 SparseRL 的性能优势在中等稀疏度矩阵上尤为突出，但在极高稀疏度（>99.9% 零值）的尾部分布中，cuSPARSE 手工优化核仍保持优势（详见失败模式分析）。与同为 RL-based 方法的 CodeRL 和 PPOCoder 相比，SparseRL 在 V100 上分别实现 3.27× 和 3.42× 的 GFLOPS 提升，验证了分层奖励与稀疏嵌入的联合效应。
-
-
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_VdLEaGPYWT/figures/004_Figure_3.jpg]]
-*Figure 3: Performance (GFLOPs) of SpMV across SuiteSparse Matrices on (a) V100 (b) A100 GPUs*
 
 **Figure 4** 将评估扩展至 SpMM 任务（稀疏矩阵-稠密矩阵乘法）。在 column=8 设置下，SparseRL 在 A100 上相对 Sputnik 取得平均 2.32× 加速比，相对 CodeRL 达 6.80×；column=32 时加速比分别为 1.22× 和 4.50×。column 数增大时加速比收窄，可能因为稠密矩阵列维度增加后，计算密集度上升，掩盖了稀疏访存优化的相对收益。
 
@@ -244,12 +226,10 @@ SparseRL 的核心干预是**将生成问题从监督学习重构为深度强化
 
 **Table 2** 系统拆解了三阶段训练流程的贡献。完整流程（Pretrain+SFT+PPO）的 SpMV pass@1000 为 49.25，去掉预训练后骤降至 40.75（-8.50），编译率从 57.50 降至 48.75，证实 CUDA 代码增强预训练对注入并行编程与硬件优化先验知识不可或缺。仅 SFT 而无 RL 的配置 pass@1000 为 45.50（-3.75），说明 RL 阶段的执行效率奖励信号能进一步推动模型超越监督模仿的上限。仅 RL 而无 SFT 的配置 pass@1000 仅 30.25，表明 SFT 提供的“暖启动”策略对稳定 RL 探索至关重要。
 
-
 ![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_VdLEaGPYWT/figures/006_Table_2.jpg]]
 *Table 2: Ablation comparison between the three phases (Pre-training/SFT/RL)*
 
 **Table 3（及 Table 11）** 对比了三种稀疏矩阵嵌入策略。正弦嵌入在 SparseRL+CodeT5-770M 上取得 pass@1000 = 48.75，显著优于线性投影（44.50）和可学习嵌入（43.25）。正弦嵌入的优势源于其归纳偏置——通过三角函数捕获行列索引的连续位置关系，使模型能泛化到训练中未见过的矩阵维度范围，而可学习嵌入在索引值外推时失效。
-
 
 ![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_VdLEaGPYWT/figures/007_Table_3.jpg]]
 *Table 3: Ablation study of sparse matrix embedding on correct functionality (pass@k) and Compilation Rates (CR) under k = 1000*
@@ -258,27 +238,19 @@ SparseRL 的核心干预是**将生成问题从监督学习重构为深度强化
 
 **Table 4 和 Table 5** 考察了关键超参数的敏感度。效率奖励缩放因子 $r_{\mathrm{eff}}$ 在 0.5–2.0 范围内，pass@1000 波动不超过 2 个点，最优值为 1.0；内存惩罚系数 $r_{\mathrm{penalty}}$ 在 0.1–0.5 范围内表现稳健，0.3 时取得最佳编译率与性能平衡。这组结果表明奖励函数设计具有良好的超参数鲁棒性。
 
-
 ![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_VdLEaGPYWT/figures/009_Table_4.jpg]]
 *Table 4: Impact of Varying $r _ { \mathrm { e f f } }$ (Fixed $r _ { \mathrm { p e n a l t y } }$ = 0 . 3 )
 
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_VdLEaGPYWT/figures/010_Table_5.jpg]]
-*Table 5: Impact of Varying $r _ { \mathrm { p e n a l t y } }$ (Fixed $r _ { \mathrm { e f f } }$ = 1 . 0 )
 
 ### 与其他方法的对比
 
 **Table 6–8** 将 SparseRL 与开源模型、闭源模型及 LLM4EFFI 等竞争工作进行了多维度对比。在 pass@5 设定下，SparseRL 生成正确代码的相对 cuSPARSE 加速比（1.42×）显著优于 Qwen3-14B（0.89×）和 DeepSeek-R1（0.95×），说明通用 LLM 即使具备推理能力，仍缺乏稀疏计算的领域知识。与 LLM4EFFI 的对比（Table 8）进一步表明，SparseRL 在 pass@1 的正确率与加速比上均占优。
-
-
 
 ![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_VdLEaGPYWT/figures/013_Table_7.jpg]]
 *Table 7: Correct functionality (pass@k) and performance (Speedup vs. cuSPARSE) comparison for correct generated program on pass@5*
 
 ![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_VdLEaGPYWT/figures/012_Table_6.jpg]]
 *Table 6: Correct functionality (pass@k) and Performance (Speedup vs. cuSPARSE) comparison for correct generated program on pass@5*
-
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_VdLEaGPYWT/figures/014_Table_8.jpg]]
-*Table 8: Results of correct functionality (pass@k) and performance evaluated by speedup. Correctly generated code on pass@1 is used to evaluate the speedup compared with cuSPARSE*
 
 **Table 9** 在 DLMC 数据集上验证了跨数据分布的泛化能力，SparseRL 的 GFLOPS 持续领先 TVM-S 和 cuSPARSE。**Table 10** 展示了 SparseRL 框架在不同 LLM 骨干（CodeT5、Qwen2.5-14B、LLaMA 3 70B）上的即插即用能力，其中 Qwen2.5-14B 取得最佳综合表现。
 
@@ -299,16 +271,6 @@ SparseRL 的核心干预是**将生成问题从监督学习重构为深度强化
 - **Table 4–5**: 超参数敏感度（$r_{\mathrm{eff}}$ 和 $r_{\mathrm{penalty}}$）
 - **Table 6–8**: 与开源/闭源模型及竞争工作的对比
 - **Table 17**: 失败案例（高度不规则矩阵上 cuSPARSE 仍占优）
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_VdLEaGPYWT/figures/011_Figure_6.jpg]]
-*Figure 6: PPO diagnostics (KL, entropy, value loss, reward) over training*
-
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_VdLEaGPYWT/figures/028_Table.jpg]]
-*Table: 1. SparseRL on Closed-Source Outputs. Feeding GPT-5/Claude-Sonnet-4 kernels into SparseRL’s RL loop (reward: efficiency + correctness by off-policy GRPO) improves runtime by 28–35% on 100 test matrices: 2. Controlled Open-Source Comparison. On LLaMA 3 70B (matching closed-source scale)*
-
-
 
 ## 定位与知识库关联
 
@@ -347,8 +309,6 @@ SparseRL 的优势区间集中在**中等稀疏度、具有可学习结构模式
 **RL 算法选择**：论文尝试了 PPO、GRPO 和 Reinforce++，最终选择 PPO 的理由是“性能已经足够好”（Section 5.4）。但 GRPO 的 pass@1000 仅比 PPO 低 0.7%（48.9 vs. 49.3），且 GRPO 无需价值网络，训练开销更低。是否存在更优的 RL 算法组合（如离线 RL 或基于模型的 RL）以进一步压缩训练时间，值得探索。
 
 **可读性与可维护性**：论文在 Appendix A.20 中报告了可读性测试，但未在主文中详细展开。生成代码的可维护性对于实际部署至关重要，这一维度的评估尚不充分。
-
-
 
 ## 原文 PDF
 

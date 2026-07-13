@@ -55,8 +55,6 @@ MEGA 的关键设计包括三个层面。在**表示层**，通过冻结的 Mesh
 
 需要指出的是，MEGA 对极端姿态的泛化仍存在局限——当输入姿态与训练分布差异较大时，模型会产生高多样性但误差较大的预测（Fig. 9），这提示了不确定性估计在实际部署中的重要性。此外，模型不重建面部细节，在一定程度上限制了其在需要面部信息的应用中的适用性。
 
-
-
 从单张 RGB 图像恢复三维人体网格（Human Mesh Recovery, HMR）是计算机视觉中的基础任务，在动作捕捉、虚拟现实、人机交互等领域有广泛应用。然而，该任务本质上是一个病态问题：二维图像中蕴含的深度信息不足，导致同一张图像可能对应多个在二维投影上看似合理、但在三维空间中差异显著的人体姿态（Figure 1）。这种深度歧义构成了单图像 HMR 的核心瓶颈。
 
 现有方法大致分为两类。一类是确定性单输出方法，如 **FastMETRO**、**PARE**、**CLIFF**、**HMR2.0** 等，它们直接从图像回归到单一的三维网格或 SMPL 参数，追求预测精度，但无法表达预测的不确定性，在面对遮挡或歧义场景时缺乏鲁棒性。另一类是概率多输出方法，如基于正态化流的 **ProHMR**、基于扩散模型的 **Diff-HMR**、以及基于评分假设的 **ScoreHypo** 等，它们试图通过生成多个候选姿态来覆盖歧义空间。然而，这些方法往往面临精度与多样性之间的权衡：增加多样性通常以牺牲单个预测的准确性为代价，导致即便采样多个输出，其最佳预测的精度仍不及确定性方法。
@@ -64,8 +62,6 @@ MEGA 的关键设计包括三个层面。在**表示层**，通过冻结的 Mesh
 **VQ-HPS** 是近期一项与 MEGA 最相关的工作，它首次将人体网格离散化为 token 序列，并将 HMR 形式化为分类任务——预测每个 token 的类别索引。这一范式避免了直接回归连续姿态参数时的不稳定问题，但 VQ-HPS 仍然是一个单输出方法，且其训练仅依赖图像-网格对，未能充分利用大规模无图像标注的动作捕捉数据。
 
 MEGA 的提出正是为了解决上述困境：**能否在保持高精度确定性预测的同时，赋予模型可控的随机生成能力，从而在单一框架内同时应对精度需求和深度歧义？** 这一动机催生了三个关键设计方向：（1）将人体网格完全离散化为 token 序列，使 HMR 转化为生成式建模问题；（2）引入自监督掩码预训练，在不依赖图像的情况下从动作捕捉数据中学习人体网格的先验分布；（3）设计统一的掩码条件生成框架，在推理时既能单次前向传播完成确定性预测，又能通过迭代采样产生多样化输出。
-
-
 
 ## 核心方法与创新机理
 
@@ -102,8 +98,6 @@ MEGA 依赖冻结的 **Mesh-VQ-VAE** 将规范空间人体网格编码为 $N=54$
 
 这些创新共同构成了 MEGA 的核心贡献：通过掩码生成式建模统一了精度与多样性，在确定性模式下达到 SOTA 精度（3DPW PVE 81.6 mm，EMDB PVE 107.9 mm），在随机模式下提供可控的多样化预测。
 
-
-
 MEGA 是一个基于编码器-解码器 Transformer 架构的掩码生成式自编码器，其核心思想是将人体网格恢复转化为离散 token 序列的条件生成问题。整体 pipeline 由三个关键阶段串联而成：**网格 token 化 → 条件生成 → 网格解码**。
 
 ### 输入输出流
@@ -127,15 +121,11 @@ MEGA 的训练分为两个阶段，共享同一 Transformer 架构（12 层编�
 
 值得注意的是，Mesh-VQ-VAE 在整个流程中保持冻结，仅作为 token 编解码的确定性桥梁，MEGA 本身不直接操作连续网格顶点，而是完全在离散 token 空间中进行生成建模。这种设计将生成任务从高维连续空间压缩到低维离散空间，既降低了学习难度，也为自监督预训练和随机采样提供了天然的概率框架。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l19_MEGA_Masked_Generative_Autoencoder_for_Human_Mesh_Recovery_motion20v2/figures/001_Figure_1.jpg]]
 *Figure 1: Human mesh recovery from a single image is an ill-posed problem due to depth ambiguity. Probabilistic approaches have aimed to address this by generating multiple predictions, but diversity often sacrifices accuracy. Introducing MEGA, our HMR model based on masked generative modeling achieves state-of-the-art performance on in-the-wild benchmarks in single- and multi-output settings. Given a single image, MEGA can make predictions that all look accurate given the 2D cues but correspond to diverse 3D interpretations*
 
 ![[assets/figures/papers/paper_list_l19_MEGA_Masked_Generative_Autoencoder_for_Human_Mesh_Recovery_motion20v2/figures/002_Figure_2.jpg]]
 *Figure 2: MEGA is a masked generative model based on an encoder-decoder Transformer architecture. During the self-supervised pretraining stage, MEGA is trained to predict human mesh tokens from partially visible inputs using motion capture data without paired image data. During the supervised training stage for HMR, the model is trained to predict randomly masked human mesh tokens conditioned on image embeddings. For both training stages, only the cross-entropy loss is used on the predicted mesh tokens. At test time, in stochastic inference mode, we start from a fully masked sequence of tokens and iteratively sample human mesh tokens conditioned on input image embeddings. In deterministic inference m...*
-
-
 
 MEGA 的核心架构围绕“离散 token 序列的条件生成”展开，由三个关键模块串联构成：**Mesh-VQ-VAE** 提供网格的离散 token 表示，**图像特征提取器** 提供条件信息，**编码器-解码器 Transformer** 执行掩码生成建模。以下逐一解析其设计逻辑与关键公式。
 
@@ -209,16 +199,6 @@ $$A \times (1 - \frac{t}{T})$$
 
 整个训练流程（自监督预训练 + 监督 HMR 训练）仅使用**交叉熵损失**作用于被预测的网格 token 上，外加旋转和相机参数的监督损失。这种简洁的损失设计得益于将连续网格重建问题完全委托给冻结的 Mesh-VQ-VAE，MEGA 只需专注 token 分类。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l19_MEGA_Masked_Generative_Autoencoder_for_Human_Mesh_Recovery_motion20v2/figures/003_Figure_3.jpg]]
-*Figure 3: Prediction process iterations. We visualize the predictions for intermediate steps in stochastic mode. All masked tokens are replaced by the first token of the codebook, corresponding to index 0*
-
-![[assets/figures/papers/paper_list_l19_MEGA_Masked_Generative_Autoencoder_for_Human_Mesh_Recovery_motion20v2/figures/010_Figure_6.jpg]]
-*Figure 6: Random mesh generations. We use MEGA pre-trained in a self-supervised fashion to generate random human meshes*
-
-
-
 ## 实验与关键发现
 
 ### 确定性模式下的主结果
@@ -264,24 +244,8 @@ MEGA 在确定性推理模式下（单次前向传播，取所有 token 预测�
 
 此外，尽管 MEGA 采用非参数 token 表示，重构的网格在极端样本上偶尔仍不符合人体形态学约束。模型不重建面部细节也限制了其在需要面部信息的应用场景中的使用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l19_MEGA_Masked_Generative_Autoencoder_for_Human_Mesh_Recovery_motion20v2/figures/006_Table_3.jpg]]
 *Table 3: Evaluation in stochastic mode. We compare MEGA to the SOTA probabilistic methods on the multi-output HMR task using standard metrics (see Sec. 4.1) given in mm and the relative improvement (Imp) in %. ‡ uses an HRNet backbone; all other methods use a ResNet-50 backbone*
-
-![[assets/figures/papers/paper_list_l19_MEGA_Masked_Generative_Autoencoder_for_Human_Mesh_Recovery_motion20v2/figures/008_Table_4.jpg]]
-*Table 4: Comparison between deterministic and stochastic generation modes. In stochastic mode, we evaluate the mean mesh obtained with different sample sizes on 10% of the 3DPW [84] dataset, and we provide its distance to the deterministic prediction (Dist. to det.). We also report the standard deviation of the predictions. All metrics are in mm*
-
-![[assets/figures/papers/paper_list_l19_MEGA_Masked_Generative_Autoencoder_for_Human_Mesh_Recovery_motion20v2/figures/012_Figure_8.jpg]]
-*Figure 8: Visualization of the predictions diversity. We visualize the standard deviation of the 3D location of each vertex. Bluish regions in the mesh indicate low standard deviation, while reddish areas signify higher standard deviation*
-
-![[assets/figures/papers/paper_list_l19_MEGA_Masked_Generative_Autoencoder_for_Human_Mesh_Recovery_motion20v2/figures/013_Figure_9.jpg]]
-*Figure 9: Failure cases. In failure cases, it is worth noting that our model predicts very diverse results, which can be interpreted as high uncertainty*
-
-![[assets/figures/papers/paper_list_l19_MEGA_Masked_Generative_Autoencoder_for_Human_Mesh_Recovery_motion20v2/figures/009_Figure_5.jpg]]
-*Figure 5: Error distribution. We visualize the distribution of the MPJPE in mm on the 3DPW dataset*
-
-
 
 ## 定位与知识库关联
 
@@ -345,8 +309,6 @@ MEGA 的方法论创新中最具区分度的是其自监督预训练策略。与
 5. **不确定性驱动的自适应选择**：如何根据不确定性（如顶点方差，Figure 8）自动选择最佳预测，以在实际应用中平衡精度和多样性？
 
 6. **端到端训练**：当前 Mesh-VQ-VAE 是冻结的，端到端微调整个 pipeline 是否能进一步提升重构质量？
-
-
 
 ## 原文 PDF
 

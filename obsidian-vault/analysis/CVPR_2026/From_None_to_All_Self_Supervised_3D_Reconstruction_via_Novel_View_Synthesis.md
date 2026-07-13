@@ -53,8 +53,6 @@ claims:
 
 **方法定位**：NAS3R属于自监督3D高斯散点重建方法，与pixelSplat、MVSplat等监督方法以及SelfSplat、SPFSplat等自监督方法相比，其核心差异在于完全消除了对真值相机参数和预训练先验的依赖（见Table 1），通过局部到全局的深度提升范式和掩码解码器实现了从随机初始化的稳定端到端训练。
 
-
-
 ### 三维重建与新视角合成的范式演进
 
 从一组无约束二维图像恢复三维场景几何并合成任意新视角，是计算机视觉的核心问题。近年来，以3D高斯散点（3D Gaussian Splatting, 3DGS）为代表的显式表示方法，凭借其高保真渲染质量和实时推理速度，迅速成为新视角合成（Novel View Synthesis, NVS）的主流范式。然而，这一范式的成功高度依赖于两个关键前提：**精确的相机位姿**和**已知的相机内参**。主流监督方法如**pixelSplat**、**MVSplat**和**NoPoSplat**，均在训练和推理阶段要求提供真值相机外参和内参，这严重限制了其在真实无约束场景中的适用性。
@@ -77,8 +75,6 @@ claims:
 
 这两个设计的组合，使得NAS3R能够在没有任何3D监督或预训练先验的条件下，从随机初始化稳定收敛，实现了真正的“从无到全”自监督三维重建。
 
-
-
 ## 核心方法与创新机理
 
 NAS3R的核心创新在于通过两个关键设计——**深度引导的局部到全局高斯提升范式**与**掩码解码器**——破解了自监督3D重建中“鸡与蛋”式的联合优化困境，使得网络能够从随机初始化出发，仅依靠2D光度一致性损失端到端地学习几何、相机与外观，无需任何3D标注、预训练先验或真实相机内参。
@@ -100,8 +96,6 @@ NAS3R将这一范式彻底重构为**局部到全局**的生成路径：模型�
 ### 统一的可微分渲染优化
 
 上述所有组件——高斯参数（中心、旋转四元数、尺度、不透明度、球谐系数）、相机外参和内参——均通过一个支持梯度回传至相机参数的CUDA-based 3DGS渲染器进行端到端优化。训练仅使用目标视图的MSE+LPIPS光度一致损失（γ=0.05），无任何显式3D监督。这一简洁而统一的优化框架是NAS3R能够从“无”到“全”的基础。
-
-
 
 NAS3R 是一个完全自监督的三维重建框架，其核心设计目标是在无任何真值标注（无相机位姿、无内参、无深度）且无预训练先验的条件下，从无约束多视图图像中联合推断显式三维场景表示与相机参数。框架的训练与推理流程如 Figure 2 所示，整体遵循“编码—跨视图交互—几何/相机联合预测—可微分渲染—光度监督”的闭环范式。
 
@@ -145,12 +139,8 @@ NAS3R 的训练流水线由以下核心模块串联构成：
 
 - **掩码注意力机制**：通过显式控制跨视图信息流，确保上下文视图的高斯重建仅基于上下文视图自身的信息，而不会从目标视图“偷看”到答案。这一约束是消除训练初期“鸡与蛋”困境的关键——若上下文重建能访问目标视图信息，模型将倾向于学习恒等映射而非真正的三维理解。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2492_https_arxiv_org_abs_2603_27455/figures/001_Figure_1.jpg]]
 *Figure 1: NAS3R is a self-supervised framework that requires no ground-truth annotations and no pretrained priors during training, and jointly infers 3D Gassian parameters, camera intrinsics and extrinsics and depth maps, also enabling high-quality novel view synthesis*
-
-
 
 NAS3R 的训练流水线由五个核心模块串联构成，所有模块从随机初始化开始，仅通过目标视图的光度一致性损失端到端联合优化。整体架构如 Figure 2 所示。
 
@@ -209,8 +199,6 @@ $$G^{v} = \mathrm{MaskedDecoder}(\mathcal{F}^{v}, \mathcal{F}^{1:K})$$
 ### 3.7 可微分 3DGS 渲染器
 
 NAS3R 采用基于 CUDA 的可微分 3D Gaussian Splatting 渲染器，支持对相机位姿、内参和高斯参数的反向传播梯度。渲染器接收上下文视图的高斯原语和目标视图的预测相机参数，生成渲染图像 $\hat{\mathcal{I}}_{\mathcal{T}}$，并与真值目标图像计算 $\mathcal{L}_{\mathrm{render}}$，梯度回传至所有模块实现端到端联合优化。
-
-
 
 ## 实验与关键发现
 
@@ -294,33 +282,11 @@ Table 1系统对比了各方法在训练和推理阶段对真值位姿、真值�
 
 4. **非朗伯表面处理不足**：镜面反射、透明物体等违反朗伯假设的表面，光度一致性损失可能提供误导性梯度，导致几何和外观的联合估计失败。当前方法未包含针对此类表面的特殊处理机制。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2492_https_arxiv_org_abs_2603_27455/figures/002_Table_1.jpg]]
-*Table 1: Training and inference requirements of different methods. Training columns indicate the need for ground-truth camera poses and intrinsics, while inference columns indicate whether contextview camera parameters are required as model inputs*
-
 ![[assets/figures/papers/paper_list_l2492_https_arxiv_org_abs_2603_27455/figures/004_Table_2.jpg]]
 *Table 2: Performance comparison of in-domain and out-of-domain two-view novel view synthesis for models trained with no supervised 3D priors. The best results among self-supervised methods are highlighted. ∗ indicates the variants with random initialization*
 
-![[assets/figures/papers/paper_list_l2492_https_arxiv_org_abs_2603_27455/figures/007_Table_3.jpg]]
-*Table 3: Performance comparison of two-view pose estimation (AUC, %) on RE10K, ACID and DL3DV datasets. All NVS models are trained on RE10K with no supervised 3D priors. ∗ indicates the SPFSplat variant trained with random initialization*
-
-![[assets/figures/papers/paper_list_l2492_https_arxiv_org_abs_2603_27455/figures/009_Table_4.jpg]]
-*Table 4: Comparison of two-view depth estimation results on BlendedMVS dataset*
-
 ![[assets/figures/papers/paper_list_l2492_https_arxiv_org_abs_2603_27455/figures/015_Table_10.jpg]]
 *Table 10: Ablation on progressive interval curriculum on RE10K*
-
-![[assets/figures/papers/paper_list_l2492_https_arxiv_org_abs_2603_27455/figures/011_Table_8.jpg]]
-*Table 8: Performance on novel view synthesis and pose estimation with varying number of input views*
-
-![[assets/figures/papers/paper_list_l2492_https_arxiv_org_abs_2603_27455/figures/014_Table_7.jpg]]
-*Table 7: Performance on NVS and pose estimation (ScanNet++) and depth estimation (BlendedMVS) with increasing training data*
-
-![[assets/figures/papers/paper_list_l2492_https_arxiv_org_abs_2603_27455/figures/013_Table_9.jpg]]
-*Table 9: Self-supervised pretraining improves downstream finetuning. Supervised finetuning from self-supervised pretrained weights (3) outperforms both self-supervised learning (1) and supervised training from scratch (2) on BlendedMVS*
-
-
 
 ## 定位与知识库关联
 
@@ -365,8 +331,6 @@ NAS3R相对于上述基线的方法论突破可归纳为两个因果性设计选
 3. **动态场景与复杂材质**：当前方法主要针对静态场景设计，扩展到动态物体、透明/反射表面等复杂情况需要新的建模和优化策略。
 
 4. **与预训练先验的协同**：Table 5和Table 6显示，当NAS3R接受真值内参（NAS3R-I）或与监督先验结合时，性能可进一步提升（如RE10K上PSNR达24.238，接近监督方法MVSplat的24.012）。如何在保持自监督灵活性的同时，选择性地利用可用的弱先验信息，是一个有实践价值的方向。
-
-
 
 ## 原文 PDF
 

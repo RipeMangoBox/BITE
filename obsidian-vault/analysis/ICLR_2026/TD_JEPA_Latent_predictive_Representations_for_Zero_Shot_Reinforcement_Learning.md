@@ -52,8 +52,6 @@ claims:
 
 实验覆盖 ExoRL 和 OGBench 共 13 个数据集、65 个任务，涵盖运动、导航与操作场景，同时支持本体感受与像素输入。在 DMCRGB 上平均回报达 $628.8 \pm 5.5$，DMC 上达 $661.2 \pm 6.3$，OGBenchRGB 成功率为 $41.34 \pm 0.45$，OGBench 为 $37.98 \pm 0.77$，整体匹配或超越所有基线。改进概率分析表明 TD-JEPA 相对 FB 和 HILP 具有统计显著的提升。消融实验进一步确认：直接建模策略后继测度优于仅建模行为策略动力学，分离编码器的非对称变体优于对称变体，且预训练表示在微调时能大幅提升样本效率，冻结表示常足以实现快速适应。
 
-
-
 ### 问题背景：无监督零样本强化学习
 
 强化学习（RL）智能体在部署时往往需要快速适应多样化的下游任务，而传统RL方法通常需要为每个新任务从头训练或依赖密集的在线交互与奖励信号，这在实际应用中代价高昂。无监督零样本RL旨在解决这一瓶颈：其核心思路是在无奖励、无任务的离线数据上预训练一组可复用的表示与策略，使得智能体在测试时仅需接收任务描述（如目标状态或奖励函数），即可在不进行额外学习的情况下直接输出近似最优策略。
@@ -95,8 +93,6 @@ TD-JEPA的提出正是为了突破这一瓶颈。其核心动机是通过将时�
 - **分离状态与任务编码器**：显式训练独立的 $\phi$（状态编码器）和 $\psi$（任务编码器），允许二者在维度和结构上非对称，提升表示灵活性。
 
 通过这一设计，TD-JEPA在潜在空间中同时实现了后继特征学习和策略优化，使得零样本RL可以简化为简单的回归与内积最大化，无需对比损失或在线采样。
-
-
 
 ## 核心方法与创新机理
 
@@ -148,11 +144,6 @@ $$\nabla_\psi \mathcal{L}_{\mathrm{TD-JEPA}}(\psi, T_z, \phi) = \nabla_\psi \mat
 - **线性奖励假设**：零样本策略检索仅支持任务编码器 $\psi$ 定义的线性奖励函数空间 $r(s) = \psi(s)^{\top} z_r$，对非线性奖励结构的泛化能力受限。
 - **离线偏差**：在离线学习场景下，行为策略偏差可能影响预测器对未访问区域的估计精度，需额外行为克隆正则化辅助。
 
-
-
-![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_SzXDuBN8M1/figures/003_Figure_2.jpg]]
-*Figure 2: Probabilities of improvement: how likely is method X to outperform method Y on a random domain? We report symmetrized 95% simple bootstrap confidence intervals. Dotted lines surround matches in which the improvement is statistically significant*
-
 TD-JEPA 的整体训练流程如图 1 所示，其核心思想是：**在潜在空间中同时学习状态编码器、任务编码器、策略条件多步预测器以及一组参数化策略，使预测器逼近后继特征，从而在零样本 RL 中直接通过回归和内积最大化实现策略优化。**
 
 ### 模块组成与数据流
@@ -201,8 +192,6 @@ $$z_r = \arg\min_z \mathbb{E}_{(s,r) \sim \mathcal{D}_{\text{rsd}}}[(r - \psi(s)
 ### 理论支撑
 
 定理 3 表明，在最优预测器下，TD-JEPA 对 $\phi$ 和 $\psi$ 的梯度与用于后继测度逼近的非潜在预测 TD 损失的梯度完全一致。这建立了潜在预测 TD 学习与后继测度 TD 学习之间的形式化联系，为方法的正确性提供了理论保证。
-
-
 
 ### 3.1 核心模块架构
 
@@ -277,8 +266,6 @@ $$\widehat{\mathcal{L}}_{\mathrm{REG}}(\phi) = \frac{1}{2B(B-1)} \sum_{i\neq j} 
 
 该正则项鼓励特征间余弦相似度趋近于零，同时约束特征范数。
 
-
-
 ## 实验与关键发现
 
 ### 主结果：零样本RL基准性能
@@ -330,8 +317,6 @@ TD-JEPA 的核心是非对比损失（基于潜在预测的 TD 学习），而 *
 
 **Table 2** 和 **Figure 7** 系统消融了编码器和预测器的隐藏层数。结果显示，编码器深度对性能的影响具有领域特异性：
 
-![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_SzXDuBN8M1/figures/007_Table_2.jpg]]
-
 ![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_SzXDuBN8M1/figures/016_Figure_7.jpg]]
 *Figure 7: Zero-shot performance of TD-JEPA in antmaze-ln (top) and antmaze-ls (bottom) as the number of hidden layers in the encoders and predictors varies (from 0 to 4 and from 1 to 4, respectively)*
 
@@ -344,15 +329,9 @@ TD-JEPA 的核心是非对比损失（基于潜在预测的 TD 学习），而 *
 
 **Figure 4** 展示了零样本策略在离线（上）和在线（下）微调下的归一化性能曲线。以 TD-JEPA 零样本策略初始化（蓝线和黄线）大幅提升了样本效率，且冻结预训练表示（虚线）通常足以实现快速适应。**Figure 6** 补充了仅加载编码器权重或仅冻结卷积层的微调结果，进一步验证了预训练表示的可迁移性。
 
-![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_SzXDuBN8M1/figures/006_Figure_4.jpg]]
-*Figure 4: Normalized performance of zero-shot policies when fine-tuned offline (top) or online (bottom). Initializing the agent to zero-shot solutions (blue and yellow lines) results in sample-efficient learning; frozen representations (dashed) are often expressive enough to enable fast adaptation*
-
 #### 数据量与训练步长
 
 **Figure 11** 和 **Figure 12** 展示了不同数据集大小（1M、2M、3M 步）下的性能变化。TD-JEPA 在所有数据规模下均保持优势，且性能随数据量增加而提升，表明其离线学习框架具有良好的数据扩展性。
-
-![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_SzXDuBN8M1/figures/022_Figure_11.jpg]]
-*Figure 11: Average performance over all DMC walker and quadruped tasks for varying dataset sizes and number of training steps (1M, 2M, or 3M)*
 
 ### 失败模式与局限
 
@@ -361,9 +340,6 @@ TD-JEPA 的核心是非对比损失（基于潜在预测的 TD 学习），而 *
 3. **线性奖励假设**：零样本策略检索基于 $\psi(s)^\top z_r$ 的线性奖励分解，仅支持任务编码器 ψ 张成的线性奖励函数空间，对非线性奖励结构的任务泛化能力有限。
 4. **真实机器人验证缺失**：当前实验全部在模拟器（ExoRL 和 OGBench）上进行，在大规模真实机器人数据集上的表现尚未验证。
 5. **计算效率**：非对称 TD-JEPA 虽性能更优，但训练速度慢于对称变体（**Table 4**），在资源受限场景下需权衡。
-
-![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_SzXDuBN8M1/figures/026_Table_6.jpg]]
-*Table 6: Orthonormal regularization ranges for each algorithm. (nav) and (man) indicate navigation and manipulation domains, respectively*
 
 ### 关键图表结论总结
 
@@ -377,13 +353,6 @@ TD-JEPA 的核心是非对比损失（基于潜在预测的 TD 学习），而 *
 | **Figure 5 (右)** | 非对比损失在零样本 RL 中优于对比损失 |
 | **Table 2/Figure 7** | 编码器深度影响具有领域特异性，需独立调节 |
 | **Figure 11/12** | TD-JEPA 随数据量增加性能持续提升 |
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_SzXDuBN8M1/figures/025_Table_5.jpg]]
-*Table 5: Architectural (top) and training (bottom) hyperparameters*
-
-
 
 ## 定位与知识库关联
 
@@ -465,8 +434,6 @@ $$M^{\pi_z} \approx \phi T_z \psi^{\mathsf{T}}$$
 | **TD-JEPA** | 策略条件多步TD潜在预测 | 分离 $\phi$/$\psi$ | TD预测MSE | 离线 |
 
 TD-JEPA是首个将潜在预测TD学习与多策略后继测度逼近建立理论联系的方法（Section 4），其非对比本质使其在大规模离线场景下具有潜在的计算优势，但正交正则化的调参敏感性和线性奖励空间的限制仍是实际部署中需要关注的边界条件。
-
-
 
 ## 原文 PDF
 

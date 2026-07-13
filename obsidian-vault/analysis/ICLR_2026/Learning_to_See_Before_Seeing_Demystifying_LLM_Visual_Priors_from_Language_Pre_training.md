@@ -235,8 +235,6 @@ MLE-Bench（Multi-Level Existence Bench）提供了按目标物体相对像素�
 
 3. **研究范围局限**：当前实验仅覆盖静态图像理解，未探索视频、三维场景等动态模态的视觉先验。此外，预训练文本中的社会偏见可能通过视觉先验传递到下游多模态模型，形成有害的视觉刻板印象，这一问题有待系统研究。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_pfw176o1YJ/figures/016_Figure_10.jpg]]
 *Figure 10: Qualitative impact of reasoning-centric data on visual reasoning tasks. The plot shows how varying the proportion of different reasoning-centric data categories in the pre-training mix impacts metrics of visual reasoning quality. Results indicate that more reasoning data leads to more coherent and detailed visual reasoning*
 

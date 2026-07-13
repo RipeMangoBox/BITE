@@ -135,8 +135,6 @@ $$\theta^{*} = \arg\min_{\theta} \, L_{2}\big(x_{\mathrm{refined}}^{c}, R(T^{\ma
 - **输出**：可进行多视角体渲染的带纹理三维肖像，覆盖头、颈、肩区域。  
 - **运行效率**：在单张 NVIDIA RTX 4090 上约需 0.5 小时生成一个三维肖像；在 12 GB 显存的 RTX 3080Ti 上约需 1.5 小时，相比部分基线方法具有更低的硬件门槛。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l6_Portrait3D_Text_Guided_High_Quality_3D_Portrait_Generation_Using_Pyramid_motion20v/figures/004_Figure_4.jpg]]
 *Figure 4: The 3D portrait generation pipeline of Portrait3D. The*
 

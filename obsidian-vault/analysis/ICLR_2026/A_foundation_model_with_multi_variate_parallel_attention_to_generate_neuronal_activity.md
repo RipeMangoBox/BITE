@@ -51,8 +51,6 @@ claims:
 
 实验结果表明，MVPFormer 在三个 iEEG 癫痫检测数据集上显著超越了当前 SOTA 基线 Brant-2：在 SWEC 数据集上平均 Kappa 值达到 0.61（Brant-2 为 0.08），在 MAYO 数据集上 Episodic f1 达到 0.36（Brant-2 为 0.19）。在 Brain TreeBank 的四个语音解码任务中，MVPFormer 在音高和音量任务上达到 SOTA，在起始和语音任务上仅次于 PopT。此外，在经典时间序列预测基准（ETTh1、ETTh2、Weather）上，MVPFormer 也匹配或超越了现有注意力模型的性能。消融实验证实，完整 MVPA 在多数情况下优于任何单一组件，且生成式预训练对性能有显著贡献（Kappa 从 0.61 降至 0.52）。
 
-
-
 颅内脑电图（iEEG）是神经科学和临床癫痫诊疗中的关键数据模态，但其多变量时间序列特性给深度学习模型带来了根本性挑战。与自然语言或图像数据不同，iEEG 信号由多个电极通道同步采集，每个通道记录局部神经活动。**不同受试者乃至不同手术植入方案下的电极布局（通道数量、空间位置）高度异构**，这导致传统深度神经网络在处理此类数据时面临严重的泛化困难。
 
 现有方法主要分为两类。一类是专门为脑电信号设计的 Transformer 模型，如 BrainBERT、Brant-2 和 PopT。这些模型通常采用标准自注意力机制（vanilla attention），并依赖绝对位置编码（`S`）来标记时间或空间位置。然而，标准自注意力将 2D 时空网格展平为 1D 序列，其计算复杂度为 `O(T^2 × C^2)`，当通道数 `C` 和时间步数 `T` 均较大时，计算开销巨大。更重要的是，**绝对位置编码要求输入具有固定的通道数量和顺序**，这使得模型无法直接应用于通道布局不同的新受试者，即缺乏跨受试者的零样本泛化能力。另一类是通用时间序列预测模型（如 PatchTST、TimesFM、TimeMixer），它们虽然在某些场景下有效，但并未针对 iEEG 信号的通道异构性和时空耦合特性进行专门设计。
@@ -62,8 +60,6 @@ claims:
 这一设计直接改变了两个关键模块。其一，注意力机制从“query 与 key 的绝对位置交互”变为“query 与 key 的相对距离交互”，如公式 (1)-(3) 所示。其二，计算复杂度从标准注意力的 `O(T^2 × C^2)` 降低为 `O(T^2 × C̄ + T × C^2)`，其中 `C̄` 是局部窗口内的通道数（`C̄ << C`），这使得模型能够处理更长的上下文（在 A100 GPU 上有效上下文长度超过 10,000）。此外，作者还引入了基于小波编码的连续嵌入空间和对比学习生成式预训练目标，以进一步提升模型对神经活动动态的建模能力。
 
 简而言之，本文的动机源于 iEEG 数据固有的通道异构性这一现实瓶颈。MVPA 通过将注意力分解为内容、时间和通道三个组件，从根本上绕过了对固定通道布局的依赖，为构建可泛化的神经活动基础模型提供了新的技术路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -110,8 +106,6 @@ MVPFormer 的完整流水线包括：
 
 **局限性**：尽管性能卓越，该创新仍存在局限。根据 Chinchilla 缩放定律，当前 SWEC iEEG 数据集规模（9328 小时）不足以完全训练 MVPFormer-S（75M 参数），更不用说 MVPFormer-M（1.2B 参数）。此外，模型性能在不同受试者间存在显著差异，少数受试者是大部分不一致的来源，其潜在原因尚不明确。
 
-
-
 ![[assets/figures/papers/iclr26_0002_5M1YOW3bRq_A_foundation_model_with_multi-variate_parallel_a/figures/002_Figure_2.jpg]]
 *Figure 2: MVPFormer architecture and forward pass. iEEG signals are segmented in time and space, encoded via a wavelet-based encoder, and arranged into a 2D embedding grid. These continuous embeddings are processed by MVPA to model temporal, spatial, and content-based dependencies. MVPFormer predicts the next-in-time embedding while reducing similarity to confounders from the same or other subjects. Notched in the bottom right is the resulting cosine similarity with the true target and the confounders after training. The two-step target is the signal twice removed in the future*
 
@@ -129,8 +123,6 @@ MVPFormer 的完整 pipeline 围绕一个核心洞察构建：多变量时间序
 **解码器与输出**：MVPFormer 基于 Llama2 架构，包含并行的 MVPA 注意力块和 MLP 块。在预训练阶段，模型使用对比损失（公式 5）预测未来时间步的嵌入表示，增加输出与真实目标之间的余弦相似度，同时降低与混淆目标（来自同受试者或其他受试者）的相似度。在下游任务微调时，解码器输出后接一个简单的线性分类头。
 
 **数据流与模块关系**：信号 → 小波编码 → 2D 嵌入网格 → MVPA 注意力（内容+时间+通道） → Llama2 解码器 → 对比预测头（预训练）/线性分类头（微调）。关键设计约束是：MVPA 的三个注意力组件在训练过程中各自学习不同的依赖模式——通道注意力收敛为对角结构（邻近通道相关性更强），时间注意力收敛为局部聚焦（邻近时间片段关联更强），内容注意力则处理跨时空的语义匹配。
-
-
 
 MVPFormer 的核心创新在于 **多变量并行注意力（Multi-Variate Parallel Attention, MVPA）**，它通过将标准自注意力分解为三个并行的组件——内容、时间和通道——来解耦多变量时间序列中语义、时间动态与空间结构这三个维度。该设计直接针对 iEEG 等临床数据中通道数可变、缺乏固定空间布局的核心瓶颈。
 
@@ -184,8 +176,6 @@ t_{drop} = c_{drop} = 1 - \sqrt{1 - r_{drop}}
 $$
 其中 $r_{drop}$ 是常规丢弃率。该公式确保整体丢弃的元素数量与常规丢弃相同，但丢弃的是整个通道或整个时间步，而非随机片段。
 
-
-
 ## 实验与关键发现
 
 ### 主结果：iEEG癫痫检测与语音解码
@@ -223,8 +213,6 @@ MVPFormer在三个iEEG癫痫检测数据集上展现了显著的性能提升。�
 3. **噪声鲁棒性**：当信噪比降至30dB时，Kappa骤降至0.12，表明模型对信号质量高度敏感。
 4. **数据规模瓶颈**：根据Chinchilla定律，当前9328小时数据不足以完全训练75M参数的MVPFormer-S，更遑论1.2B参数的MVPFormer-M。这限制了更大规模模型的潜力释放。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0002_5M1YOW3bRq_A_foundation_model_with_multi-variate_parallel_a/figures/005_Table_3.jpg]]
 *Table 3: Results on the time-series forecasting task. We report the mean-squared error (MSE) and mean-absolute error (MAE) averaged over all forecasting lengths*
 
@@ -233,8 +221,6 @@ MVPFormer在三个iEEG癫痫检测数据集上展现了显著的性能提升。�
 
 ![[assets/figures/papers/iclr26_0002_5M1YOW3bRq_A_foundation_model_with_multi-variate_parallel_a/figures/007_Table_5.jpg]]
 *Table 5: Ablation of the components of MVPA on the time-series forecasting task. We report the mean-squared error (MSE) and mean-absolute error (MAE) averaged over all forecasting lengths*
-
-
 
 ## 定位与知识库关联
 
@@ -247,8 +233,6 @@ MVPFormer 的核心创新——多变量并行注意力（MVPA）——直接回
 **适用边界与局限性。** 第一，数据规模瓶颈。根据 Chinchilla 缩放定律，当前 SWEC iEEG 数据集（9328 小时，68 名受试者）远不足以完全训练 MVPFormer-S（75M 参数），更不用说 MVPFormer-M（1.2B 参数）。这直接限制了模型潜力的释放。第二，受试者间变异性。模型性能在不同受试者间差异显著，少数受试者是大部分不一致的来源，其潜在原因尚不明确。第三，对绝对空间信息的依赖。SWEC 数据集不包含通道在大脑中的绝对位置信息，这虽然保护了隐私，但也意味着 MVPA 无法利用此类信息——当任务需要精确的空间定位时（如 Brain TreeBank 的 onset 任务），模型性能可能受限。第四，噪声鲁棒性。当信噪比降至 30dB 时，模型 Kappa 值骤降至 0.12。第五，跨临床环境泛化。在 FNUSA 数据集上，MVPFormer 与 Brant-2 表现持平（Episodic F1 均为 0.46，Table 29），表明在某些临床环境下其优势不显著。
 
 **开放问题。** 1) LLM 领域的缩放定律是否适用于 MVPA 这种架构和 iEEG 这种数据？2) 受试者间性能差异的潜在来源是什么——是数据质量、病理特征差异，还是模型对特定信号模式的偏好？3) ictal（发作期）和 interictal（发作间期）状态之间的精确关系是什么？这不仅是模型问题，也是神经科学领域持续讨论的基本问题。4) 将 SWEC iEEG 数据集公开后，是否会增加整体数据可用性并解锁进一步的模型缩放潜力？这些问题的回答将决定 MVPA 方向能否从“特定任务上的显著提升”走向“通用神经信号基础模型的可行路径”。
-
-
 
 ## 原文 PDF
 

@@ -52,8 +52,6 @@ I2I-Bench 包含 **1000 条精心设计的提示**，系统覆盖 **10 个任务
 
 在基准测试中，**Qwen-Image-Edit-2509** 以归一化总分 0.813 领跑单图像编辑，而 **Nano-Banana** 以 0.636 在多图像编辑中表现最佳。模型能力随任务认知复杂度升高而下降的趋势明显，尤其在物理合理性（最高仅 0.537）和世界知识与推理（多图像编辑中最低仅 0.038）等维度上，现有模型仍有巨大提升空间。
 
-
-
 图像编辑模型近年来经历了爆发式发展，从早期的GAN到扩散模型，再到基于多模态大模型（LMM）的指令驱动编辑，模型能力边界不断拓展。然而，评估方法的演进速度远滞后于模型本身，形成日益加剧的“评估赤字”。
 
 ### 现有评估基准的结构性缺陷
@@ -77,8 +75,6 @@ I2I-Bench 包含 **1000 条精心设计的提示**，系统覆盖 **10 个任务
 I2I-Bench在评估方法论上位于自动化评估基准和人类对齐研究的交汇点。与纯LMM评估方法（如**LMM4Edit**）相比，I2I-Bench通过引入专家模型解决了LMM在精确感知维度上的固有弱点——消融实验显示，纯LMM基线在美学质量评估上甚至出现负相关（ρ=-0.0643），而I2I-Bench的混合管道达到0.9889。与传统自动指标（PSNR/LPIPS）相比，I2I-Bench通过LMM的语义理解能力覆盖了后者完全无法触及的高层编辑意图评估。
 
 在知识库定位上，I2I-Bench贡献了一个包含1000条精心设计提示、10个任务类别、30个解耦评估维度的结构化评估框架，以及配套的大规模人类偏好验证数据。这套体系不仅服务于现有模型的横向比较，更通过揭示模型在物理合理性、多语言文本渲染、抽象逻辑推理等维度的普遍失败模式，为下一代编辑模型的研发提供了明确的改进方向。
-
-
 
 ## 核心方法与创新机理
 
@@ -122,8 +118,6 @@ I2I-Bench 将评估从粗粒度的整体质量判断，解耦为 **30 个细粒�
 
 I2I-Bench 内置了**成对比较人工标注协议**，对自动化评估进行大规模对齐验证。每维度约 85 项成对比较，采用 20% 随机抽样和 10% 错误率阈值的质量控制。结果表明，I2I-Bench 在所有 30 个维度上均与人类偏好保持高度一致，且显著优于现有基准 LMM4Edit（Table 6），为自动化评估的可靠性提供了实证基础。
 
-
-
 I2I-Bench 是一个由三个核心组件构成的综合基准套件，其设计遵循“任务定义→模型执行→混合评估→人类验证”的闭环流程（Figure 1）。
 
 ![[assets/figures/papers/paper_list_l756_https_arxiv_org_abs_2512_04660/figures/001_Figure_1.jpg]]
@@ -137,12 +131,8 @@ I2I-Bench 是一个由三个核心组件构成的综合基准套件，其设计�
 
 整个框架的输入为编辑提示和原始图像，经编辑模型生成编辑图像后，各维度评估管道并行或串行地输出归一化分数，最终汇聚为模型在各维度及任务类别上的能力画像。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l756_https_arxiv_org_abs_2512_04660/figures/002_Figure_2.jpg]]
 *Figure 2: Visualization of the 10 task categories in the I2I-Bench Prompt Suite. The left half shows 5 single-image editing (SE) tasks, from “Object Manipulation” to “World Knowledge & Reasoning”. The right half shows 5 multi-image editing (ME) tasks, illustrating increasing complexity from “Basic Combination” to “Combination + Reasoning”*
-
-
 
 ### 关键评估维度与混合评估管道
 
@@ -206,8 +196,6 @@ $$\text{Win Ratio} = \frac{\text{胜场数} \times 1 + \text{平局数} \times 0
 
 该指标用于与自动化评估分数进行皮尔逊相关性分析，验证混合评估设计的有效性。质量控制方面，采用 20% 随机抽样和 10% 错误率阈值确保标注可靠性。
 
-
-
 ## 实验与关键发现
 
 ### 主结果：单图像与多图像编辑基准
@@ -251,33 +239,14 @@ I2I-Bench的核心创新在于其混合评估范式——将专用“专家”�
 
 4. **固定提示集的分布偏差**：1000条提示虽经精心设计，但作为静态集合，无法保证覆盖真实世界中编辑请求的长尾分布。某些任务类别（如文本渲染、世界知识）的提示配额（见Table 4和Table 5）可能不足以充分压力测试模型的极限能力。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l756_https_arxiv_org_abs_2512_04660/figures/003_Table_1.jpg]]
 *Table 1: Results of the single-image editing benchmark. All scores are normalized; higher is better. Best scores are highlighted*
 
 ![[assets/figures/papers/paper_list_l756_https_arxiv_org_abs_2512_04660/figures/004_Table_2.jpg]]
 *Table 2: Results of the multi-image editing benchmark. All scores are normalized; higher is better. Best scores are highlighted*
 
-![[assets/figures/papers/paper_list_l756_https_arxiv_org_abs_2512_04660/figures/005_Figure_3.jpg]]
-*Figure 3: Capability radar charts for the evaluated models on key dimensions. (a) Foundational Quality & Fidelity (SE models). (b) Task Execution & Advanced Capabilities (SE models). (c) Foundational Quality & Fidelity (ME models). (d) Task Execution & Advanced Capabilities (ME models)*
-
 ![[assets/figures/papers/paper_list_l756_https_arxiv_org_abs_2512_04660/figures/006_Table_3.jpg]]
 *Table 3: Human Preference Alignment and Ablation Study. This table presents the Pearson correlation (ρ) coefficients between I2I-Bench automated metrics and human preferences (Win Ratio). The results show extremely high consistency across all 30 dimensions, strongly validating the reliability of our evaluation methodology. The table also presents an ablation study comparing our hybrid I2I-Bench pipeline vs. a Pure LMM-Baseline (general LMM VQA-5level), which validates our hybrid design*
-
-![[assets/figures/papers/paper_list_l756_https_arxiv_org_abs_2512_04660/figures/007_Figure_4.jpg]]
-*Figure 4: Performances of top-performing SE and ME models on common dimensions across task categories. (1) The performance of Qwen-Image-Edit-2509 (SE) as task cognitive complexity increases. (2) The performance of nano-banana (ME) varies across complex combination tasks*
-
-![[assets/figures/papers/paper_list_l756_https_arxiv_org_abs_2512_04660/figures/009_Figure_5.jpg]]
-*Figure 5: Performance comparison between Single-Image Editing (SE) and Multi-Image Editng (ME) tasks for Qwen-Image-Edit-2509 and Omnigen2 on shared dimensions*
-
-![[assets/figures/papers/paper_list_l756_https_arxiv_org_abs_2512_04660/figures/010_Table_5.jpg]]
-*Table 5: Prompt Quota for Multi-Image Editing (ME) Dimensions*
-
-![[assets/figures/papers/paper_list_l756_https_arxiv_org_abs_2512_04660/figures/011_Table_4.jpg]]
-*Table 4: Prompt Quota for Single-Image Editing (SE) Dimensions*
-
-
 
 ## 定位与知识库关联
 
@@ -323,8 +292,6 @@ I2I-Bench 在该谱系中的定位是 **首个覆盖单图像与多图像编辑�
 - **专家模型的可替代性**：当前混合框架中的专用工具（Q-Insight、ArtiMuse等）能否被更统一、更通用的方法替换以降低系统复杂度，同时不牺牲与人类偏好的对齐度？
 - **跨模态泛化**：该基准的层次化评估思想如何泛化到视频编辑、3D内容编辑等新兴任务？多帧时序一致性、三维几何合理性等维度的自动化评估仍待探索。
 - **基准的可持续更新**：随着编辑模型能力提升，固定的1000条提示集可能逐渐饱和。如何设计动态更新的提示生成机制，使其持续反映真实世界的编辑需求分布？
-
-
 
 ## 原文 PDF
 

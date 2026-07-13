@@ -50,8 +50,6 @@ NanoSD 的核心思路是通过**硬件感知的网络手术**将 SD 1.5 的 U�
 
 在方法定位上，NanoSD 并非针对单一任务的轻量模型，而是一个**可插拔的边缘高效扩散骨干**：它可直接替换 OSEDiff、S3Diff、Diff‑Plugin、OSDFace、DiffBIR、Marigold 等框架中的原始扩散模型，以极低的计算代价保留甚至提升原有恢复性能。实验表明，NanoSD 在 Qualcomm NPU 上实现 12–27 ms 延迟、130–315 M 参数的 Pareto 最优族，其中 Model 2 以 27 ms 延迟、315 M 参数、taFID 10 取得最佳平衡。在下游任务中，Nano‑OSEDiff 在 DIV‑2K Val 上以更低 MACs 取得 PSNR 24.29，超越 Edge‑SD‑SR 等轻量方案；Nano‑OSDFace 将 OSDFace 的 MACs 降低约 5.1 倍（2465 G → 479 G），同时在真实人脸数据集上保持竞争力；Nano‑Diff‑Plugin 在 RealBlur‑J 上 FID 降低 29.76，MACs 减少 9.4 倍。与 SD 1.5 教师的 LPIPS 为 0.57、嵌入余弦相似度 0.84，远优于直接回归的 U‑Net 基线（LPIPS 1.92，相似度 0.41），证明生成先验得到良好保留。消融研究进一步确认，移除深层低分辨率块（E4–Mid–D4）使参数从 565 M 降至 309 M，延迟仅从 46 ms 降至 41 ms，生成质量几乎无变化，验证了深层块对边缘效率贡献甚微。跨平台测试在 Apple A17 Pro Neural Engine 上复现了与 Qualcomm NPU 高度一致的相对延迟排序，表明搜索产生的架构具有跨加速器鲁棒性。
 
-
-
 ### 扩散模型在图像恢复中的兴起与边缘部署困境
 
 扩散模型已成为图像恢复领域的主流范式。以 **Stable Diffusion 1.5（SD 1.5）** 为代表的潜在扩散模型通过在压缩潜空间中进行迭代去噪，展现出强大的生成先验，能够有效处理超分辨率、去模糊、去噪、人脸修复等多种低层视觉任务。然而，这类模型的推理过程依赖于庞大的 U‑Net 去噪器和变分自编码器（VAE），其全量参数规模高达约 860 M，在边缘设备上的计算开销极为高昂，难以满足实时性要求。
@@ -79,8 +77,6 @@ NanoSD 的核心思路是通过**硬件感知的网络手术**将 SD 1.5 的 U�
 - **多目标贝叶斯优化**：以教师对齐的 FID（taFID）、设备延迟和参数量为优化目标，利用期望超体积改进（EHVI）准则搜索 Pareto 最优的块组合，从而在生成保真度与边缘效率之间取得最优折中。
 
 通过上述设计，NanoSD 能够在 Qualcomm NPU 上实现低至 27 ms 的推理延迟，同时将参数规模压缩至 315 M，并在超分辨率、人脸修复、去模糊等多种任务上展现出与全量模型相当甚至更优的性能。
-
-
 
 ## 核心方法与创新机理
 
@@ -115,8 +111,6 @@ $$\mathcal{L}_{\mathrm{distill}}^{(i,j)} = \|O_S - O_T\|_2^2$$
 $$\operatorname*{min}_{\mathbf{z}} \left( f_{\mathrm{FID}}(\mathbf{z}), \ f_{\mathrm{latency}}(\mathbf{z}) \right)$$
 
 从 Pareto 前沿选出的架构（如 Model 2：315 M 参数、27 ms 延迟、taFID 10）在生成保真度与硬件效率之间达到了最优平衡，同时证明参数减少与硬件效率之间并非线性相关——这一发现对边缘部署具有重要的工程指导意义。
-
-
 
 NanoSD 的核心目标是将 Stable Diffusion 1.5 的生成先验压缩至边缘 NPU 可实时运行的规模，并保持对多种图像恢复任务的泛化能力。其 pipeline 由五个关键模块串联而成，形成“分解—蒸馏—搜索—压缩—对齐”的闭环。
 
@@ -172,21 +166,11 @@ $$\mathcal{L}_{\mathrm{align}} = \|U_s(\alpha z_s + \sigma_t \epsilon, t, c) - U
 
 整个 pipeline 的输入是低质图像（或文本提示），经学生 VAE 编码为潜变量，由搜索得到的高效 U‑Net 在潜空间进行去噪/恢复，最后经学生 VAE 解码输出恢复图像。各模块之间的关系是严格串行的：U‑Net 架构搜索依赖于 VAE 提供的潜空间，VAE 蒸馏在 U‑Net 冻结后进行，端到端对齐则统一校正两者的协同误差。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l903_https_arxiv_org_abs_2601_09823/figures/002_Figure_2.jpg]]
-*Figure 2: Overview of the NanoSD framework. (a) Baseline SD 1.5 U–Net architecture, shown with skip connections removed for readability. (b) Hardware-aware search space construction: for each of the six retained stages (three encoders and three decoders), we derive shape-preserving residual/attention variants that are profiled on the target edge device for latency and parameter cost. (c) Featurewise generative distillation: each candidate block is distilled independently from its corresponding SD 1.5 teacher block using an*
-
-
-
 NanoSD 的核心设计围绕一个硬件感知的架构搜索与蒸馏流水线展开，其关键模块包括：U‑Net 形状保持分解、逐块生成式蒸馏、多目标贝叶斯优化，以及后续的 VAE 蒸馏与端到端扩散对齐。
 
 ### U‑Net 形状保持分解
 
 NanoSD 从 Stable Diffusion 1.5 的全量 U‑Net 出发，首先移除 Encoder‑4、Middle、Decoder‑4 三个深层低分辨率阶段（Section 3.1），理由在于这些块虽然贡献大量参数，但在低空间分辨率下操作，对边缘 NPU 的实际延迟影响甚微（消融实验证实，重新引入 E4‑‑Mid‑‑D4 使参数从 309 M 增至 565 M，延迟仅从 41 ms 升至 46 ms，生成质量几乎无变化；Figure 10）。保留的六个阶段（E1–E3 编码器、D3–D1 解码器）各自被分解为若干形状保持的块变体，例如 R、RA、RAR、RRA 等注意力‑残差序列组合。这些变体保持输入/输出张量形状不变，从而可独立替换对应位置的教师块，构成包含 32,768（即 $4 \times 4 \times 4 \times 8 \times 8 \times 8$）种候选架构的离散搜索空间，并在目标 NPU 上进行逐块延迟与参数量测量（Table 7），确保搜索空间直接反映真实硬件特性。
-
-![[assets/figures/papers/paper_list_l903_https_arxiv_org_abs_2601_09823/figures/016_Table_7.jpg]]
-*Table 7: Latency profiling of 30 surrogate U–Net blocks on Qualcomm SM8750 NPU (Samsung S25 Ultra). We report the measured perblock latency for all hardware-aware alternatives generated via network surgery. Although all variants preserve tensor shapes and remain accuracy-compatible after feature wise distillation, they exhibit substantial diversity in hardware cost, with several alternatives achieving 3-8× lower latency than the original SD 1.5 blocks. These measurements form the basis of the hardware-aware search space used in our Pareto optimization*
 
 ### 逐块生成式蒸馏（FwGD）
 
@@ -229,8 +213,6 @@ $$\mathcal{L}_{\mathrm{align}} = \|U_s(\alpha z_s + \sigma_t \epsilon, t, c) - U
 
 这一端到端微调步骤有效修复了逐块蒸馏引入的分布偏移，使 NanoSD 在 LPIPS 和嵌入余弦相似度上显著优于未对齐的 U‑Net 基线（LPIPS 0.57 vs. 1.92，相似度 0.84 vs. 0.41；Table 6）。
 
-
-
 ## 实验与关键发现
 
 ### 硬件感知搜索与 Pareto 最优架构
@@ -267,13 +249,7 @@ NanoSD 的核心价值主张是“在极致压缩的同时保留 SD 1.5 的生�
 - NanoSD 与 SD 1.5 的 LPIPS 为 0.57，嵌入余弦相似度为 0.84；
 - 相比之下，回归式 U‑Net 基线的 LPIPS 高达 1.92，相似度仅 0.41。
 
-![[assets/figures/papers/paper_list_l903_https_arxiv_org_abs_2601_09823/figures/014_Table_6.jpg]]
-*Table 6: Perceptual distance measured using LPIPS and embedding-space similarity via CLIP embeddings between SD 1.5 outputs and other competitive models. Our results demonstrate that NanoSD maintains significantly closer proximity to SD 1.5 than the regressionbased U-Net baseline. This quantitative evidence indicates robust preservation of SD 1.5’s generative prior in the distilled NanoSD model*
-
 这一差距表明，NanoSD 的逐块生成蒸馏策略有效保留了潜空间的结构化先验，而非简单地拟合像素级映射。Figure 8 的潜空间插值实验提供了定性佐证：在随机种子之间，NanoSD 与 SD 1.5 均展现出平滑的生成过渡，确认了流形结构的保持。
-
-![[assets/figures/papers/paper_list_l903_https_arxiv_org_abs_2601_09823/figures/013_Figure_8.jpg]]
-*Figure 8: Latent-space interpolation between two random seeds for both SD 1.5 and NanoSD. The results demonstrate smooth transitions in the generated outputs along the interpolation trajectories for both models. This observation confirms that NanoSD preserves a wellstructured latent manifold, maintaining consistency with the generative prior learned by SD 1.5*
 
 ### 超分辨率任务上的效率与精度权衡
 
@@ -288,12 +264,6 @@ NanoSD 的核心价值主张是“在极致压缩的同时保留 SD 1.5 的生�
 
 在人脸恢复任务上（Table 3），Nano‑OSDFace 以 479 G MACs 取得与 OSDFace（2465 G MACs）可比的恢复质量，计算量减少约 5.1×。在多个底层视觉任务（去雪、去雾、去模糊、去雨）上（Table 4），Nano‑Diff‑Plugin 在 RealBlur‑J 上以 17120 G MACs 取得 FID 52.41，而原始 Diff‑Plugin 需要 160640 G MACs 且 FID 为 82.17——效率提升 9.4× 的同时质量大幅领先。
 
-![[assets/figures/papers/paper_list_l903_https_arxiv_org_abs_2601_09823/figures/005_Table_3.jpg]]
-*Table 3: Quantitative comparison of different methods on synthetic CelebA-Test [15] dataset. The best, second-best and third-best results are highlighted in red, blue, and green colors, respectively. Refer to Supplemental for detailed analysis*
-
-![[assets/figures/papers/paper_list_l903_https_arxiv_org_abs_2601_09823/figures/009_Table_4.jpg]]
-*Table 4: Quantitative comparison of different methods on various low-level vision tasks. The best, second-best and third-best results are highlighted in red, blue, and green colors, respectively*
-
 在单目深度估计任务上（Table 5），Nano‑Marigold 在 NYUv2 上的 AbsRel 为 7.2，相比 Marigold 的 6.9 略有退化，但模型尺寸缩小约 90%。这一结果表明，生成先验的压缩在密集预测任务上存在一定的保真度损失，属于可预期的权衡。
 
 ### 关键消融与失败模式
@@ -307,8 +277,6 @@ NanoSD 的核心价值主张是“在极致压缩的同时保留 SD 1.5 的生�
 ### 实验公平性说明
 
 所有延迟测量均在 Qualcomm SM8750 NPU 上使用 8‑bit 权重和 16‑bit 激活进行，反映真实边缘部署条件。taFID 是相对保真度指标，衡量与 SD 1.5 教师分布的距离，而非绝对图像质量，因此不能直接与其他方法的 FID 对比。不同基线的推理步数可能不同（如 DiffBIR 使用 50 步，OSEDiff 仅需 1 步），报告的计算量按原始配置给出。
-
-
 
 ## 定位与知识库关联
 
@@ -372,8 +340,6 @@ NanoSD 的设计和验证范围界定了以下适用条件：
   - 该方法能否推广至 DiT（Diffusion Transformer）架构的轻量化？
   - 在多任务联合训练场景下，NanoSD 的生成先验是否会因任务特定微调而退化？
   - 搜索空间中的块变体设计是否可自动化（如通过神经架构搜索生成形状保持变体），而非依赖手工枚举？
-
-
 
 ## 原文 PDF
 

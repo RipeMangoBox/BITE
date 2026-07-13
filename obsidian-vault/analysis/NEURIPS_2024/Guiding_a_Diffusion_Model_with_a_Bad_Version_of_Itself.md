@@ -53,8 +53,6 @@ claims:
 
 在 ImageNet-512 上，Autoguidance 将 EDM2-S 的 FID 从 2.56 降至 1.34，创造了新的纪录；在 ImageNet-64 上，FID 从 1.58 降至 1.01。二维玩具示例直观展示了 Autoguidance 的优势：它消除了离群点，同时保留了分布的所有分支，而 CFG 则丢弃了整个分支。
 
-
-
 ### 扩散模型的内在困境：低概率区域的离群样本
 
 扩散模型通过概率流常微分方程（Probability Flow ODE）从纯噪声逐步演化生成数据样本：
@@ -91,8 +89,6 @@ $$
 
 这种“用较差版本自身引导自身”的思路，为扩散模型的质量控制提供了一种全新的范式：不需要额外的条件信号，不需要任务转换，仅通过模型容量和训练程度的退化即可获得解耦的质量提升。
 
-
-
 ## 核心方法与创新机理
 
 Autoguidance 的核心创新在于**重新定义了扩散模型引导信号的来源**：将传统 CFG 中使用的“无条件模型”替换为一个**能力较差的同任务模型**（即主模型自身的“劣化版本”）。这一改变看似简单，却从根本上解决了 CFG 长期存在的任务偏差（task discrepancy）问题。
@@ -127,8 +123,6 @@ $$\nabla_{\mathbf{x}} \log p_w(\mathbf{x}|\mathbf{c};\sigma) = \nabla_{\mathbf{x
 | 任务偏差 | 存在（条件 vs. 无条件） | 不存在（任务完全一致） |
 
 这一创新使得 autoguidance 在 ImageNet-512 上将 EDM2-S 的 FID 从 2.56 降至 1.34，创造了新的纪录，同时 FDDINOv2 从 68.64 降至 36.67，表明生成质量与多样性的双重提升。
-
-
 
 Autoguidance 的核心思想是利用一个质量较差的模型版本作为引导信号，对高质量主模型的生成过程进行校正。其整体 pipeline 围绕扩散模型的概率流 ODE 展开，通过线性外推两个去噪器的输出来实现引导。
 
@@ -178,12 +172,8 @@ $$D_w(\mathbf{x};\sigma,\mathbf{c}) := D_{\mathrm{m}}(\mathbf{x};\sigma,\mathbf{
 
 其中 $D_{\mathrm{m}}$ 是主模型，$D_{\mathrm{c}}$ 和 $D_{\mathrm{u}}$ 分别是条件和无条件引导模型，$w_i$ 为各自的引导权重。这为灵活调节图像质量与文本/类别对齐提供了统一的框架。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_bg6fVPVs3s/figures/002_Figure_1.jpg]]
 *Figure 1: A fractal-like 2D distribution with two classes indicated with gray and orange regions. Approximately 99% of the probability mass is inside the shown contours. (a) Ground truth samples drawn directly from the orange class distribution. (b) Conditional sampling using a small denoising diffusion model generates outliers. (c) Classifier-free guidance*
-
-
 
 ### 问题背景：扩散模型的基础框架
 
@@ -259,12 +249,8 @@ $$D_w(\mathbf{x};\sigma,\mathbf{c}) := D_{\mathrm{m}}(\mathbf{x};\sigma,\mathbf{
 
 其中 $w_{\mathrm{u}}$ 和 $w_{\mathrm{c}}$ 分别控制 CFG 和 autoguidance 的引导强度。该公式允许在单个采样过程中同时利用两种引导机制的优势。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_bg6fVPVs3s/figures/011_Figure_9.jpg]]
 *Figure 9: Progression of implied learned densities during sampling over various σ in a setup similar to Figure 2. Contours of the corresponding ground truth distributions are also shown. (a) Main model density*
-
-
 
 ## 实验与关键发现
 
@@ -336,13 +322,6 @@ Autoguidance 与 CFG 可以协同工作。在 DeepFloyd IF 文本到图像模型
 4. **验证范围有限**：目前仅在 EDM2 架构和 DeepFloyd IF 上进行了验证，尚未在其他扩散模型架构或更大规模的文本到图像系统上进行广泛测试。
 5. **理论分析不足**：对 autoguidance 有效性的解释依赖于隐式假设和直观分析，缺乏严格的数学证明。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_bg6fVPVs3s/figures/010_Figure_7.jpg]]
-*Figure 7: Sweep over guidance weight w using EDM2-S on ImageNet-512. The optimal EMA length was searched separately for the three methods and two metrics (FID and*
-
-
-
 ## 定位与知识库关联
 
 ### 与 Classifier-Free Guidance 的关系
@@ -398,8 +377,6 @@ Autoguidance 需要额外训练一个引导模型，这引入了计算开销。�
 - autoguidance 的引导思想能否推广到其他生成范式（如 GAN、VAE、flow-based models）？在这些框架中，“较差版本”应如何定义？
 - 除了降低容量和训练时间，是否还有其他更有效的退化方式（如结构化剪枝、权重量化、知识蒸馏的中间产物）？
 - 能否设计一种**无需训练额外模型的自引导方法**，例如通过在推理时注入噪声、腐蚀权重或使用早期去噪步的预测作为引导信号？
-
-
 
 ## 原文 PDF
 

@@ -57,8 +57,6 @@ claims:
 
 在覆盖名人、艺术风格、角色等**超过 2,000 个概念**的大规模实验中，ETC 在用户研究中取得了**最低的目标概念保留率（CRSt）和最高的图像质量评分（QS）**，调和指标 $H_0$ 显著优于 CPE、MACE、UCE 等基线方法。在 50 位名人的小规模精确评估中，ETC 达到 $H_0 = 0.943$ 的最优表现。消融实验验证了 tMM 优于 GMM、AOT 优于直接代理映射、结构化噪声在 NIR 中优于全秩/低秩噪声等关键设计选择。
 
-
-
 文本到图像扩散模型（如 Stable Diffusion、FLUX）能够根据自然语言描述生成高质量图像，但其强大的生成能力也带来了版权侵犯、肖像权滥用和有害内容生成等风险。例如，模型可以轻易生成名人肖像、模仿受版权保护的艺术风格，或创建特定虚构角色。因此，**概念擦除**（concept erasure）——在不影响无关概念生成质量的前提下，移除模型对特定概念的生成能力——成为安全部署扩散模型的关键技术。
 
 ### 现有方法的瓶颈
@@ -80,8 +78,6 @@ claims:
 - **防移除鲁棒性**：构建一种机制，使得擦除模块被移除后模型输出被破坏而非恢复，从根本上抵御白盒攻击。
 
 ETC 的核心洞察在于：概念嵌入在上下文变化下呈现**低秩重尾分布**，利用 Student's t 混合模型（tMM）可有效建模该分布，从而从高概率区域采样目标嵌入、低概率区域采样锚嵌入，实现无锚点的精确擦除。
-
-
 
 ## 核心方法与创新机理
 
@@ -135,8 +131,6 @@ $$\mathcal{L}_{\mathrm{NIR}} = \| W_{\mathrm{cor.}} (\mathbf{MoEraser}(f) + f) -
 
 Figure 4 直观展示了效果：损坏权重后模型无法正常生成图像，必须依赖 MoEraser 恢复。Table 6 的消融表明，结构化噪声在保留剩余概念方面优于全秩和低秩噪声。这一设计使得**移除模块即损坏模型**，从根本上提高了白盒攻击下的鲁棒性。
 
-
-
 ETC（Erasing Thousands of Concepts）的整体流程由四个核心阶段构成，形成一条从概念嵌入建模到鲁棒擦除模块部署的完整流水线。框架的输入为目标概念集（如名人、艺术风格、角色）和预训练的文本到图像扩散模型，输出是一个经过微调的擦除模块，该模块插入模型的文本嵌入投影层之后，在推理时实时将目标概念映射为匿名概念，同时保持无关概念的生成质量。
 
 **阶段一：概念分布建模（tMM Concept Distribution Modeler）**。对每个目标概念，首先通过模板提示词（如“a photo of [concept]”）从扩散模型的文本编码器提取嵌入向量，经PCA降维至低秩子空间后，拟合Student's t分布混合模型（tMM），以捕捉概念嵌入在上下文变化下的重尾分布特性（见Eq.(1)）。该阶段输出每个概念的概率密度函数，为后续采样提供精确的分布描述。
@@ -148,13 +142,6 @@ ETC（Erasing Thousands of Concepts）的整体流程由四个核心阶段构成
 **阶段四：MoEraser训练与NIR鲁棒化**。擦除模块MoEraser采用混合专家（MoE）架构，每个专家为GLU激活的前馈网络，通过Top-K路由机制自适应处理异构领域的概念（见Figure 5a）。训练分两步：首先以擦除损失（Eq.(5)）训练模块，使目标嵌入经过残差连接后逼近映射嵌入，同时保持锚嵌入不变；随后进入噪声注入-恢复（NIR）阶段，向文本嵌入投影矩阵注入沿目标主成分方向的结构化噪声以破坏生成能力（Eq.(6)），再冻结预训练模块作为教师，微调MoEraser使其在损坏权重下仍能恢复原始输出（Eq.(7)）。NIR训练后的模块与模型权重深度耦合，一旦移除模块，模型将无法正常生成图像（见Figure 4），从而抵御白盒移除攻击。
 
 整个流水线的输出是一个轻量级的MoEraser模块，可直接插入扩散模型的文本嵌入投影层之后，在推理时以极小的计算开销实现数千概念的精确擦除。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2219_https_arxiv_org_abs_2604_16481/figures/002_Figure_1.jpg]]
-*Figure 1: Concept distribution modeling and mapping. (Top) Concept embeddings from templates are modeled with a Student’s t-distribution Mixture Model (tMM). Embeddings in highprobability regions serve as target embeddings (ftar), while those in low-probability regions serve as anchoring embeddings (fanc). (Bottom) The target concept distribution is mapped to a merged distribution via Affine Optimal Transport (AOT)*
-
-
 
 ### 3.1 概念分布建模：Student's t混合模型（tMM）
 
@@ -233,18 +220,8 @@ $$\mathcal{L}_{\text{NIR}} = \| W_{\text{cor.}} (\mathbf{MoEraser}(f) + f) - W_{
 
 消融实验（Table 6）证实，结构化噪声（沿主成分方向）在保留剩余概念能力上优于全秩噪声和低秩噪声，验证了NIR设计的有效性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2219_https_arxiv_org_abs_2604_16481/figures/006_Figure_5.jpg]]
 *Figure 5: MoEraser architecture and training. (a) A MoE with GLU experts scales to heterogeneous domain concepts; training maps*
-
-![[assets/figures/papers/paper_list_l2219_https_arxiv_org_abs_2604_16481/figures/003_Figure_2.jpg]]
-*Figure 2: Qualitative results: tMM vs. GMM. Distributions for “Emma Watson” are fitted with a Student-t Mixture Model (tMM) and a Gaussian Mixture Model (GMM). From each, we sample embeddings from high-probability cumulative intervals (0.05, 0.1) and low-probability intervals (0.9, 0.95), then generate images using SDv1.4. GMM preserves strong concept presence even for low-probability samples, whereas tMM attenuates it proportionally to probability. Degrees of freedom for each tMM are set to 2*
-
-![[assets/figures/papers/paper_list_l2219_https_arxiv_org_abs_2604_16481/figures/004_Figure_3.jpg]]
-*Figure 3: Qualitative rationale for AOT. We formulate the distributions of “Chris Evans, “Tom Cruise,” “Leonardo DiCaprio,” and “Chris Hemsworth,” as*
-
-
 
 ## 实验与关键发现
 
@@ -298,9 +275,6 @@ ETC 的评估面临一个核心矛盾：自动化指标（如 CLIP Score）在�
 
 #### NIR 噪声结构（Table 6）
 
-![[assets/figures/papers/paper_list_l2219_https_arxiv_org_abs_2604_16481/figures/011_Table_6.jpg]]
-*Table 6: Ablation on noise structure in NIR. We compare fullrank, low-rank, and structured (Ours) noise within the NIR process. While all noise types cause similar fidelity degradation to target concepts without MoEraser, structured noise yields superior preservation of remaining concepts after restoration*
-
 **Table 6** 对比了全秩、低秩和结构化噪声在 NIR 中的效果。三种噪声在移除 MoEraser 后对目标概念的破坏程度相近，但结构化噪声（沿目标主成分方向注入）在保留剩余概念上显著优于全秩/低秩噪声。这解释了为何 ETC 选择 $W_{\mathrm{cor.}} = W_{\mathrm{proj.}} + \alpha_{\mathrm{noise}} \cdot e p_{\mathrm{tar}}^{\top}$ 的注入方式——它精准破坏目标相关通路，最小化对无关概念的附带损伤。
 
 ### 失败模式与局限性
@@ -312,18 +286,8 @@ ETC 的评估面临一个核心矛盾：自动化指标（如 CLIP Score）在�
 3. **安全关键领域泛化未验证**：实验聚焦于版权/肖像权敏感概念（名人、风格、角色），对暴力、仇恨等显式安全内容的有效性尚待独立研究。
 4. **KID 指标的轻微劣势**：在 50 位名人擦除中，ETC 的 KID 略高于 CPE（0.14 vs 0.08），提示在极端保留要求下可能需要额外校准。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2219_https_arxiv_org_abs_2604_16481/figures/007_Table_2.jpg]]
 *Table 2: Quantitative results across diverse domains using SDv1.4 (Top) and SDv3.5 (Bottom). We report the user study “Yes” rate for concept preservation (CRS) and image quality (QS) for both target and remaining concepts on three domains - Celebrities, Artistic Styles, and Characters. To jointly evaluate target concept removal and preservation of remaining concepts, we provide the harmonic mean metric H0. Numbers in parentheses indicate the number of concepts. ↑ / ↓ indicates that higher/lower values correspond to better performance*
-
-![[assets/figures/papers/paper_list_l2219_https_arxiv_org_abs_2604_16481/figures/008_Table_3.jpg]]
-*Table 3: Quantitative results on 50 celebrity concepts erasure. We used GCD accuracy in percentage (ACCt for target and ACCr for remaining concepts) and harmonic mean*
-
-![[assets/figures/papers/paper_list_l2219_https_arxiv_org_abs_2604_16481/figures/001_Table_1.jpg]]
-*Table 1: Property comparison of concept erasing methods*
-
-
 
 ## 定位与知识库关联
 
@@ -377,8 +341,6 @@ ETC是唯一同时满足“可扩展至数千概念”、“无需锚概念”�
 4. **超大规模效率**：在数万概念规模下，tMM的逐概念拟合、AOT的分布间映射、MoEraser的专家路由是否仍能保持可接受的训练与推理效率？是否需要引入层次化概念分组或分布式训练策略？
 
 5. **tMM超参数自适应**：当前tMM的自由度ν和成分数k可能需针对每个概念独立优化，是否存在数据驱动的自适应选择策略，或跨概念的参数共享机制？
-
-
 
 ## 原文 PDF
 

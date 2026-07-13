@@ -50,8 +50,6 @@ claims:
 
 从方法谱系看，TraceRL 属于扩散模型后训练方法，区别于传统的随机掩码微调（random masking）和半自回归微调（semi-autoregressive fine-tuning），其关键创新在于**轨迹对齐的强化学习目标**和**扩散原生价值模型**的引入，为扩散大语言模型的推理能力提升提供了新的范式。
 
-
-
 ### 扩散语言模型的推理困境
 
 扩散语言模型（Diffusion Language Models, DLMs）作为自回归模型之外的另一条生成范式，通过迭代去噪过程生成文本。其训练目标通常为证据下界（ELBO），在完全随机掩码的条件下优化模型从任意噪声状态恢复原始序列的能力：
@@ -79,8 +77,6 @@ $$q ( x _ { t } \mid x _ { 0 } ) = \prod _ { i } \Bigl ( ( 1 - t ) \delta _ { x 
 2. **训练稳定性的需求**：扩散模型的迭代生成特性使得传统的奖励信号难以提供细粒度的过程监督。引入基于扩散的价值模型，有望在提供过程奖励的同时增强训练稳定性，从而支撑轨迹感知的强化学习范式。
 
 这两点动机共同指向了 TraceRL 框架的设计原点：通过轨迹感知的强化学习，将推理轨迹信息系统性地融入 DLMs 的后训练过程。
-
-
 
 ## 核心方法与创新机理
 
@@ -112,8 +108,6 @@ TraceRL 的设计对全注意力（full-attention）和块注意力（block-atte
 
 这些 changed slots 共同解释了 TraDo-4B-Instruct 在 MATH500 上以静态采样取得 75.6% 准确率、相较 SDAR-4B-Chat（70.2%）实现 +5.4 个百分点提升的因果路径：轨迹对齐确保了优化方向与推理行为一致，扩散式价值模型降低了训练方差并提供了密集的过程监督，而块大小放大进一步释放了推理效率与精度的权衡空间。
 
-
-
 ![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_KNAyc9DMe3/figures/001_Figure_1.jpg]]
 *Figure 1: Trajectory illustration (left) and TraceRL overview (right, see details in Section 4). Right panel is an example of TraceRL with shrinkage parameter s = 2 , , sequence length L = 6 , and block size B = 3 (when using block diffusion). We aggregate s consecutive steps to perform trajectoryaware reinforcement learning. Integers inside the squares indicate trajectory information*
 
@@ -143,8 +137,6 @@ TraceRL 的完整 pipeline 由三个核心模块串联构成（Figure 1 右半�
 TraceRL 的一个关键特性是其**架构无关性**：同一套框架可同时适用于全注意力 DLM 和块注意力 DLM。对于块扩散模型，训练目标可被切片为 $B'$ 大小的训练块以支持高效并行训练；此外，TraceRL 还支持在推理时使用较小 block size（如 $B=4$）进行 rollout，而在训练时适配更大的 block size（如 $B=8$），从而在保持采样效率的同时提升训练效果（Table 3 表明此策略可在 MATH500 上达到 67.7% 准确率）。
 
 > **注意**：关于收缩参数 $s$ 的具体选取策略以及扩散价值模型相比标准价值网络的计算开销，原文未给出定量分析，需结合附录或后续工作进一步确认。
-
-
 
 ### 扩散语言模型基础
 
@@ -197,14 +189,11 @@ $$\mathcal{T}_{value}(\theta_v) = \frac{1}{2} \mathbb{E}_{\tau} \left[ \frac{1}{
 - **收缩参数 $s$ 的影响**：较小 $s$ 值使优化更紧密地跟随推理轨迹，性能更优。$s=1$ 在 MBPP 上取得最高准确率 37.0，但每步 GPU 耗时最高（3.7 A100 小时/步）；$s=4$ 最快（2.1 GPU 小时/步）但准确率最低。
 - **块大小适配**：TraceRL 可将推理时的块大小从 $B=4$ 扩展至 $B=8$，避免直接扩大块大小导致的性能下降（MATH500 上从 67.4 降至 60.2），适配后恢复至 67.7。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
 
 TraceRL 在数学推理与代码生成任务上均取得了显著的性能提升。在 MATH500 基准上，**TraDo-4B-Instruct** 以静态采样达到 75.6% 的准确率，较基线 **SDAR-4B-Chat**（70.2%）提升 **+5.4 个百分点**（Table 2）。更大规模的 **TraDo-8B-Instruct** 在动态采样下进一步将 MATH500 准确率推至 78.5%，而采用长思维链（long-CoT）的 **TraDo-8B-Thinking** 更达到 87.4%。
-
 
 ![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_KNAyc9DMe3/figures/003_Table_2.jpg]]
 *Table 2: The main benchmark results across different math and coding tasks. “Static” denotes static sampling, and “Dynamic” denotes dynamic sampling. The long-CoT model TraDo-8B-Instruct is evaluated using dynamic sampling with threshold 0.9*
@@ -216,7 +205,6 @@ TraceRL 在数学推理与代码生成任务上均取得了显著的性能提升
 ### 轨迹对齐的因果机制
 
 TraceRL 的核心设计在于将训练目标与模型自身的推理轨迹对齐。Table 1 的实证分析揭示了这一机制的关键性：
-
 
 ![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_KNAyc9DMe3/figures/002_Table_1.jpg]]
 *Table 1: We explore how effectively different methods tune the model to learn CoT reasoning and thereby improve reasoning accuracy under non-CoT prompts. 2000 datapoints were generated using Qwen2.5 models and filtered for quality. l denotes the length of each step in the complete trace.$^ { \ast \epsilon } \times m ^ { \prime \prime }$ indicates that we apply m independent random maskings to augment the dataset for a fair comparison. “Token forward” denotes the number of tokens processed by the model, representing computational load/time. “Token trained” refers to the number of tokens directly contributing to the optimization objective. We report accuracy on MATH500. The block-attention model used h...
@@ -234,14 +222,12 @@ TraceRL 的核心设计在于将训练目标与模型自身的推理轨迹对齐
 - **过程奖励集成**：价值模型天然支持轨迹级过程奖励（process reward），使用 GAE 参数 $(\gamma, \lambda) = (0.99, 1)$ 时，训练曲线上升更快且最终准确率更高（Figure 5b，约 0.630 vs 0.623）。
 - **消融对比**：Figure 3 显示，带有价值模型的 TraceRL（红色曲线）在块扩散模型的数学任务上始终优于无价值模型版本（黄色曲线），验证了价值函数在策略优化中的引导作用。
 
-
 ![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_KNAyc9DMe3/figures/005_Figure_3.jpg]]
 *Figure 3: RL method ablations on block diffusion models for math RL tasks. The red and yellow curves represent TraceRL with and without a value model, respectively. The blue curve corresponds to training with a random masking objective in each block, similar to the semi-autoregressive approach. The green curve represents training with an additional complementary mask within block*
 
 ### 块大小自适应
 
 TraceRL 支持在不牺牲性能的前提下扩大推理块大小，从而提升采样效率。Table 3 展示了这一能力：
-
 
 ![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_KNAyc9DMe3/figures/010_Table_3.jpg]]
 *Table 3: Adapting block size from B = 4 to 8 on reasoning tasks with TraceRL. Reported values are accuracies of these baselines under dynamic sampling with threshold 0.9*
@@ -268,13 +254,8 @@ TraceRL 在收敛速度上展现出优势。Figure 4 的训练曲线表明，在
 - 在 LiveCodeBench-V2 上，扩散模型的绝对准确率（25.9%）仍低于部分自回归基线，表明代码生成任务上仍有提升空间。
 - 缺乏对推理错误类型（如逻辑断裂、计算错误、幻觉）的分类分析，无法判断 TraceRL 具体改善了推理链的哪些环节。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_KNAyc9DMe3/figures/009_Figure_5.jpg]]
 *Figure 5: Comparison of training with and without a value model. (a) Incorporating a value model reduces training fluctuations during training. This experiment is conducted on SDAR-4B-Chat. (b) A value model enables integration of trajectory-level process rewards, yielding faster optimization than relying solely on outcome rewards. This is conducted on SDAR-1.7B-Chat*
-
-
-
 
 ## 定位与知识库关联
 
@@ -319,8 +300,6 @@ TraceRL 处于**扩散语言模型（Diffusion Language Models, DLMs）后训练
 ### 4. 知识库定位总结
 
 TraceRL 在 DLM 后训练谱系中占据**轨迹感知 RL** 这一新兴节点，填补了从“随机掩码微调”到“推理轨迹对齐优化”的方法空白。其核心贡献在于证明了**训练目标与推理轨迹的显式对齐**是提升 DLM 推理能力的关键杠杆。当前证据强度较高（Table 2 的多基准验证、Figure 5 的方差分析、Table 3 的块大小扩展实验），但适用边界和开放问题表明该方法仍处于实验室验证阶段，距离通用部署尚有距离。
-
-
 
 ## 原文 PDF
 

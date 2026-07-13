@@ -58,8 +58,6 @@ claims:
 
 **局限与开放问题**：KeyChain 依赖人工构造的 UUID 链，其分布外泛化能力尚待验证；当前方法主要在问答任务上验证，对长文档摘要等开放生成任务的收益有待探索；超长上下文（>128K）下的推理模式泛化边界仍不明确。
 
-
-
 大语言模型（LLM）的上下文窗口已扩展至百万Token级别，但**有效利用长上下文进行高级推理**仍然是尚未解决的核心挑战。当前模型在长上下文场景中面临一个双重瓶颈：既需要跨文档的精确检索能力，又需要基于检索结果进行深度多跳推理。然而，现有的强化学习推理方法（如DeepSeek-R1等）主要针对短上下文设计，缺乏高质量、高难度的长上下文训练数据，导致模型难以在长上下文中习得可靠的推理行为。
 
 具体而言，问题的根源在于**训练数据的构造方式**。标准的多跳问答（Multi-hop QA）数据集虽然包含推理需求，但其上下文通常较短，且问题直接暴露给模型，模型可以通过语义捷径（如关键词匹配）而非真正的链式推理来作答。当这些数据被直接扩展至长上下文时，模型往往将检索与推理过程纠缠在一起，缺乏显式的规划步骤，导致错误频繁发生（Figure 1(b)）。
@@ -67,8 +65,6 @@ claims:
 此外，现有的长上下文训练方法（如QwenLong-L1，Wan et al., 2025）主要依赖从强推理模型（如DeepSeek-R1）进行知识蒸馏，而非通过强化学习直接诱导模型自身的长上下文推理能力。这种方法受限于教师模型的能力边界，且无法产生超越蒸馏源的涌现行为。
 
 LoongRL的核心动机在于：**通过精心设计的数据合成方法，将短多跳QA转化为需要逐步追踪链式关系的高难度长上下文任务，并利用强化学习直接训练模型，使其自发涌现出结构化的长上下文推理模式**。这一思路的关键洞察是：如果在训练数据中强制要求模型执行“追踪—检索—推理”的完整链条，模型将不得不放弃语义捷径，从而习得可泛化的推理策略。
-
-
 
 ## 核心方法与创新机理
 
@@ -112,13 +108,8 @@ LoongRL采用基于GRPO的强化学习，并结合多阶段课程设计：
 
 在KeyChain数据上进行GRPO训练，能够**稳定诱导出“计划-检索-推理-复查”的涌现推理模式**（Figure 1(a)）：模型首先生成明确的计划将问题分解为子步骤，然后逐步检索相关信息，进行推理，并主动复查中间结果。这一模式具有**跨长度泛化能力**——在16K上下文上训练的模型，可有效处理128K的长上下文推理任务（Table 4），且LoongRL-7B在Needle-in-a-Haystack基准上达到完美的100%检索准确率（Figure 3）。
 
-
-
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_o29E01Q6bv/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our KeyChain data construction*
-
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_o29E01Q6bv/figures/001_Figure_1.jpg]]
-*Figure 1: Model trajectories on long-context multi-hop QA with and without KeyChain RL data. (a) With KeyChain data, model exhibits an emergent plan–retrieve–reason–recheck thinking pattern, improving reasoning reliability and can generalize to longer contexts. (b) Without KeyChain data, reasoning and retrieval are entangled, the model often lacks an explicit planning step and does not deeply reason over retrieved information, frequently leading to errors. Reasoning steps are marked in blue and retrieval steps in orange*
 
 LoongRL 的整体框架围绕一个核心因果机制展开：**通过 KeyChain 数据合成方法将短多跳 QA 转化为高难度长上下文推理任务，再利用 GRPO 强化学习在多阶段课程下训练，诱导模型涌现出“计划-检索-推理-复查”的结构化推理模式**。该框架由三个关键模块串联构成，形成从数据构造到策略优化的完整闭环。
 
@@ -156,8 +147,6 @@ LoongRL 的整体框架围绕一个核心因果机制展开：**通过 KeyChain 
 - **规则化奖励验证**：放弃 LLM-as-a-judge，采用双向子串匹配，在严格性与容错性之间取得平衡。
 
 > **注意**：KeyChain 数据依赖人工构造的 UUID 链，其与真实世界长上下文推理多样性的分布外泛化能力尚待进一步验证；当前训练上下文限制在 16K，在极端 128K 上的性能可能未达上限。
-
-
 
 ### 3.1 KeyChain 数据构造
 
@@ -203,16 +192,11 @@ $$
 
 训练超参数：GRPO 组大小 $G=8$，学习率 $1\times10^{-6}$，rollout 温度 0.6，top-p=0.95，最大输出长度 4096 tokens。Figure 4 显示响应长度随训练稳步增长，反映模型逐步扩展检索与推理链；多阶段课程持续提供学习信号，防止性能饱和。
 
-
-
 ## 实验与关键发现
 
 ### 主要结果：长上下文推理的跨越式提升
 
 LoongRL在长上下文多跳推理任务上取得了显著且一致的性能跃升。在LongBench v1的长上下文推理子集上，**LoongRL-7B**将基座模型**Qwen2.5-7B-Instruct**的平均准确率从48.9%提升至72.4%，绝对提升达**+23.5个百分点**；**LoongRL-14B**则从53.1%提升至74.2%，绝对提升**+21.1个百分点**（Table 2）。这一结果使7B/14B规模的模型直接达到了与前沿大模型**o3-mini**（74.5%）和**DeepSeek-R1**（74.9%）可比的水平，同时显著超越了基于蒸馏的**R1-Distill-Qwen-7B/14B**以及更大规模的**QwenLong-L1-32B**。
-
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_o29E01Q6bv/figures/004_Table_2.jpg]]
-*Table 2: Results of LoongRL and frontier LLMs on long-context reasoning and general short tasks. LoongRL delivers frontier-level long-context reasoning at much smaller scales (7B/14B), rivaling o3-mini and DeepSeek-R1, while preserving general short-context abilities across all scales*
 
 在更具挑战性的长上下文生成基准HELMET上，LoongRL同样展现出强大的泛化能力。**LoongRL-7B**的平均得分从基线的22.8跃升至44.8（+22.0），**LoongRL-14B**从40.5提升至49.0（+8.5），在RAG、引用生成和长文档摘要等任务上均大幅领先同尺寸基线（Table 3）。这证明KeyChain数据诱导的推理模式不仅适用于抽取式QA，也能迁移至生成式长上下文任务。
 
@@ -222,9 +206,6 @@ LoongRL在长上下文多跳推理任务上取得了显著且一致的性能跃�
 ### 跨长度泛化：16K训练，128K推理
 
 一个关键发现是LoongRL展现出的卓越长度泛化能力。所有模型仅在**16K上下文长度**上进行RL训练，但推理时可直接扩展至128K。在NarrativeQA基准上，**LoongRL-7B**在32K-64K区间达到57.2%准确率，较基线的42.4%提升14.8个百分点（Table 4）。在RULER-128K上，**LoongRL-14B**达到79.92%准确率，显著优于**Qwen2.5-14B-Instruct**的73.57%，在所有14B-32B级别模型中表现最优（Table 8）。
-
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_o29E01Q6bv/figures/006_Table_4.jpg]]
-*Table 4: While being trained only on 16K, LoongRL generalizes impressively to context up to 128K*
 
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_o29E01Q6bv/figures/026_Table_8.jpg]]
 *Table 8: RULER benchmark results across different context lengths. For QwQ, QwenLong, Qwen2.5 model series, we report their YaRN variants for 64k and 128k*
@@ -256,22 +237,9 @@ Needle-in-a-Haystack实验进一步验证了这一泛化能力：**LoongRL-7B**�
 
 通过分析不同训练阶段的模型响应（Table 10），可以清晰观察到推理能力的逐步涌现过程：早期阶段模型主要进行简单的检索和直接回答；随着训练推进，模型开始展现显式的**规划**行为（将问题分解为子步骤）、**逐步检索**（按UUID链逐跳追踪）、**深度推理**（综合多跳信息得出结论）以及**主动复查**（验证中间结果的正确性）。这一“计划-检索-推理-复查”模式在KeyChain数据训练的模型上稳定涌现（Figure 1a），而未经KeyChain训练的模型则表现出检索与推理纠缠、缺乏显式规划、频繁出错的模式（Figure 1b）。
 
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_o29E01Q6bv/figures/029_Table_10.jpg]]
-*Table 10: Example responses of LoongRL-14B at different RL training steps, showing how retrieval, reasoning, rechecking, and planning behaviors evolve over training*
-
 ### 失败模式与局限
 
 尽管LoongRL取得了显著进展，仍需注意以下局限：首先，KeyChain数据依赖人工构造的UUID链式结构，其分布外泛化能力——特别是面对真实世界中更复杂、非链式的长上下文推理场景——尚待进一步验证。其次，训练上下文长度限制在16K，虽已展现出色的128K泛化能力，但在极端超长上下文（>128K）上的性能上限尚未探明。此外，当前方法主要在问答任务上验证，对于长文档摘要、多轮对话等更开放的长上下文生成任务，收益程度仍需更多实验支持。最后，长序列RL rollout的计算成本较高，可能限制其在更大规模模型和更长训练上下文上的直接扩展。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_o29E01Q6bv/figures/003_Table_1.jpg]]
-*Table 1: Data recipe for long-context RL training*
-
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_o29E01Q6bv/figures/025_Table_7.jpg]]
-*Table 7: Comparison of LoongRL models with other baselines on the LongBench-v2 benchmark, grouped by Difficulty, Length, and Task Type*
-
-
 
 ## 定位与知识库关联
 
@@ -333,8 +301,6 @@ LoongRL 处于**长上下文推理**与**强化学习驱动的推理涌现**的�
 - **小模型的前沿性能**：7B/14B 模型即可接近或达到 o3-mini、DeepSeek-R1 等大模型的长上下文推理水平，为资源受限场景提供了可行方案。
 
 与现有工作的关系上，LoongRL 可视为对 **DeepSeek-R1 蒸馏路线**（Guo et al., 2025）的补充和超越：蒸馏提供短推理能力，而 KeyChain + GRPO 提供长上下文推理的结构化模式。与 **QwenLong-L1**（Wan et al., 2025）相比，LoongRL 以更小的模型规模和更低的训练上下文长度实现了更高的长上下文推理性能，展示了数据驱动方法相对于纯蒸馏方法的优势。
-
-
 
 ## 原文 PDF
 

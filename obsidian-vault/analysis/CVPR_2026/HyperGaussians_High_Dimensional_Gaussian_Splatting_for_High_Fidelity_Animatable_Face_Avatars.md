@@ -125,8 +125,6 @@ HyperGaussians 的核心设计理念是对 3DGS 原语进行高维扩展，使�
 
 整个流水线的数据流可以概括为：FLAME 参数 → MLP 潜变量预测 → HyperGaussians 条件化 → 等效 3D 高斯属性 → 可微光栅化 → 渲染图像。HyperGaussians 以即插即用的方式集成到现有方法中，训练时间仅增加约 1%（约 30 分钟），渲染帧率保持在 300 FPS 以上，实现了表达能力与计算效率的平衡。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2507_02803/figures/002_Figure_2.jpg]]
 *Figure 2: We propose an expressive extension to 3D Gaussians, dubbed HyperGaussians, and plug them into existing methods for face avatars, FlashAvatar [70] and GaussianHeadAvatar [71]. FlashAvatar modulates 3D Gaussian primitives with expression-dependent offsets ∆. We make a single modification to the pipeline: plugging HyperGaussians (Sec. 3.2) in between the MLP output and the rasterization, which modifies the offsets ∆ in higher dimensions. Instead of directly predicting offsets ∆, we predict a latent zψ that conditions HyperGaussians. Without any other modifications or hyperparameter tuning, this simple change leads to a performance boost in rendering high-frequency details in the final avatar (...*
 
@@ -174,13 +172,8 @@ $$\sigma = \log\det\Sigma_{a|b} = -2\operatorname{tr}\log L_{11}$$
 
 其中 $L_{11}$ 为 $\boldsymbol{\Lambda}_{aa}$ 的 Cholesky 分解因子。该度量反映形变预测的置信度，语义结构（如面部高变形区域）可自发涌现。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2507_02803/figures/003_Figure_3.jpg]]
 *Figure 3: Benchmark Results on conditioning for ∼15k Hyper-Gaussians with attribute dimension*
-
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2507_02803/figures/008_Figure_7.jpg]]
-*Figure 7: Geometric interpretation of Gaussian conditioning on two examples with large (left) and small (right) uncertainty at different realizations of*
 
 ## 实验与关键发现
 
@@ -245,19 +238,6 @@ Figure 4展示了自驱动场景下的定性对比。HyperGaussians在以下三�
 
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2507_02803/figures/013_Table_3.jpg]]
 *Table 3: Quantitative comparison with GHA and NDGS in the multi-view setting. Notice that NDGS is unable to match the improvements of HyperGaussians in terms of PSNR and LPIPS, and performs only marginally better on SSIM. This highlights the limited capabilities of NDGS due to its reduced degrees of freedom*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2507_02803/figures/009_Table_2.jpg]]
-*Table 2: Differences to the most closely related works. GaussianAvatars [57] and SuRFHead [31] deform 3D Gaussians based on an underlying FLAME mesh [38] without local embeddings or dynamic inputs like facial expressions. SplattingAvatar [60] optimizes local embeddings, but the Gaussian properties are not dependent on expressions or pose. MonoGaussianAvatar [10], FlashAvatar [70], and GaussianHeadAvatar [71] predict expression-dependent offsets to the Gaussian properties, but their lack of local context leads to blurry or distorted results, see comparison in the main paper. Our proposed representation (HGS) attaches high-dimensional Gaussians to the mesh and optimizes learnable local embeddings for...*
-
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2507_02803/figures/011_Figure_9.jpg]]
-*Figure 9: Comparison with NDGS integrated into FlashAvatar. The limited degrees of freedom in NDGS lead to misalignments of thin structures and edges. The numbers show PSNR, SSIM*
-
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2507_02803/figures/015_Figure_11.jpg]]
-*Figure 11: Qualitative comparison for varying latent dimensionalities. We find that HyperGaussians are robust towards different latent dimensions. A latent dimension of 8 performs best, but we already observe an improvement for a single latent dimension (n = 1) over the vanilla 3DGS variant*
-
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2507_02803/figures/005_Figure.jpg]]
 
 ## 定位与知识库关联
 

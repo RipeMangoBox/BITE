@@ -260,8 +260,6 @@ Table 3 评估了三种常见的后处理防御策略对 PROMPTMINER 的影响�
 
 3. **运行时间开销**：当前评估集中于图像质量和文本对齐指标，未充分考量两阶段优化（特别是 VLM 迭代搜索）带来的运行时间开销，实际部署时需权衡效率与效果。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2195_https_openaccess_thecvf_com_content_CVPR2026_html_Li_PROMPTMINER_Black_B/figures/004_Figure_3.jpg]]
 *Figure 3: Visualization of generated images compared with target image*
 

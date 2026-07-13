@@ -57,8 +57,6 @@ claims:
 - **人类评估验证**：用户研究中，D2-Align在细节保持（61.7%偏好率）和图文对齐（52.2%）上大幅领先基线；在风格多样性（37.3%）和身份多样性（35.2%）上也获得最高偏好率，而Flow-GRPO在影调多样性上仅获7.7%偏好率，严重坍塌。
 - **方向向量的可迁移性**：学习到的方向修正向量可作为即插即用组件嵌入DanceGRPO等现有方法，在人类偏好和多样性指标上均带来一致提升，验证了方法的通用性。
 
-
-
 ### 扩散强化学习中的偏好模式坍塌
 
 文本到图像扩散模型（如FLUX）在生成高质量图像方面取得了显著进展，但如何使生成结果与人类偏好对齐仍是一个核心挑战。基于强化学习的微调方法（RLHF）通过最大化预定义奖励模型的分数来优化生成器，已成为对齐的主流范式。然而，这一范式暴露了一个关键瓶颈：**奖励模型本身存在固有偏好偏差**，当生成器过度优化该奖励信号时，会收敛到单一的高奖励模式，严重损害生成多样性。
@@ -85,8 +83,6 @@ claims:
 2. **阶段2（引导对齐）**：冻结学习到的 $b_v^*$，利用该向量构造引导文本嵌入并计算修正后的奖励信号，优化生成器使其远离模式坍塌，同时保持高生成质量。
 
 通过这种奖励信号的**方向性解耦**，D2-Align使优化目标更贴合真实人类偏好，打破了偏好与多样性之间的固有权衡，在保持甚至提升人类偏好分数的同时，显著增强了生成多样性。
-
-
 
 ## 核心方法与创新机理
 
@@ -137,8 +133,6 @@ $$R_{\mathrm{guided}}(x_0, c; b_v^*) = \mathrm{score}(e_{\mathrm{img}}, \tilde{e
 3. **方向向量收敛迅速且稳定**：$b_v$ 在约2000步训练后其修正效果即变得显著且鲁棒，此后模型性能大幅提升（Figure 7左），验证了两阶段解耦设计的收敛特性。
 
 4. **通用可迁移性**：将学习到的 $b_v$ 嵌入DanceGRPO框架后，其在人类偏好与多样性指标上均获得提升（Table 6, Table 7），表明方向修正向量可作为即插即用的模块迁移至其他RL对齐方法。
-
-
 
 D2-Align 采用**两阶段解耦框架**，核心思想是在奖励模型的连续文本嵌入空间中学习一个方向修正向量 $\mathbf{b}_v \in \mathbb{R}^d$，通过系统性调整奖励信号来抵消奖励模型的固有偏差，从而在不牺牲生成质量的前提下保持生成多样性。
 
@@ -196,12 +190,8 @@ $$\mathcal{L}_{\text{stage2}}(\theta) = \mathbb{E}_{c \sim \mathcal{D}, \mathbf{
 - **阶段2 输出**：优化后的生成器参数 $\theta^*$，在给定提示下生成高保真且多样化的图像。
 - **推理**：仅使用阶段2优化后的生成器，无需额外的方向修正计算，推理开销与标准扩散生成一致。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2705_https_arxiv_org_abs_2512_24146/figures/001_Figure_1.jpg]]
 *Figure 1: D2-Align breaks the trade-off between human preference and generative diversity, mitigating Preference Mode Collapse (PMC). The top-right plot shows that while baselines struggle with a trade-off—either achieving low diversity or low preference—D2- Align, achieves a state of both higher diversity and higher human preference. The qualitative examples below illustrate this phenomenon. For the same set of varied prompts, baseline methods exhibit severe PMC, generating homogeneous outputs for identity, style, layout, and tone. D2-Align successfully preserves diversity, generating distinct and high-quality images that align with each individual prompt. See Supp. for detail prompts*
-
-
 
 ### 2.1 问题建模与奖励信号
 
@@ -265,13 +255,6 @@ $$\mathcal{L}_{\mathrm{stage2}}(\theta) = \mathbb{E}_{c \sim \mathcal{D}, \pmb{x
 
 一个自然的问题是：能否通过手动选择离散词汇（如 “realistic”）来替代学习连续方向向量？D²-Align 的消融实验（Figure 7 右）明确回答了这一问题：学习到的方向向量 $\pmb{b}_v$ 在所有评估指标上一致优于手动选择的离散词汇基线，且全面优于未修正的原始奖励信号。这验证了在连续嵌入空间中学习修正方向的必要性——离散词汇的语义空间过于粗糙，无法精确抵消奖励模型的细微偏差。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2705_https_arxiv_org_abs_2512_24146/figures/003_Figure_3.jpg]]
-*Figure 3: Correcting the Reward Signal via Prompt Perturbation. An image generated for a minimalism prompt is instead oily and overly-rendered. This style mismatch is identified by a human (low score), but the reward model assigns a high score due to its intrinsic bias. We counteract this by perturbing the prompt with descriptors like ”Realistic” to produce a more accurate reward signal aligned with human preference*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果：人类偏好对齐与语义一致性
@@ -289,9 +272,6 @@ D2-Align 在人类偏好对齐、语义一致性和准确性三个维度上均�
 
 Table 2 展示了在 DivGenBench 基准上四种多样性指标的定量评估。D2-Align 在身份多样性（IDS）上取得 **0.251** 的最低分数（越低表示多样性越高），优于 SRPO 的 0.259。在艺术风格覆盖（ASC）、空间分布指数（SDI）和影调方差得分（PVS）上，D2-Align 同样保持领先。
 
-![[assets/figures/papers/paper_list_l2705_https_arxiv_org_abs_2512_24146/figures/009_Table_2.jpg]]
-*Table 2: Quantitative Evaluation of Generative Diversity on DivGenBench. We compare the FLUX and other advanced methods, showcasing performance under two distinct reward configurations and four metrics, i.e., Identity Divergence Score (IDS), Artistic Style Coverage (ASC), Spatial Dispersion Index (SDI), and Photographic Variance Score (PVS). Ranking is performed independently for each reward configuration among the RLbased methods. The best score is shown in bold, and the secondbest score is underlined*
-
 这一优势的因果机制在于两阶段框架的解耦设计：阶段1在冻结生成器的条件下学习方向修正向量 $b_v$，该向量在连续嵌入空间中系统性抵消奖励模型对特定风格（如过度光滑、油亮渲染）的固有偏好；阶段2利用修正后的引导奖励 $R_{\mathrm{guided}}$ 优化生成器，使其远离单一高奖励模式，从而在保持高奖励的同时维持生成多样性。
 
 Figure 5 的训练效率对比曲线进一步印证了这一机制的有效性：D2-Align 在更少的训练步数内达到更高的奖励分数，而 DanceGRPO 和 Flow-GRPO 需要超过 250 步才能达到类似性能水平。这表明方向修正不仅提升了最终效果，还显著加速了收敛过程。
@@ -303,15 +283,9 @@ Figure 5 的训练效率对比曲线进一步印证了这一机制的有效性�
 
 Figure 8 展示了 HPDv2 上的人类偏好评估结果。D2-Align 在细节保留（Detail Preservation）维度上以 **61.7%** 的压倒性优势领先，而 SRPO 仅为 16.5%，差距高达 45.2 个百分点。这一巨大差异揭示了 PMC 的核心表现：基线方法在追求高奖励分数时牺牲了图像细节，产生过度渲染或概念遗忘等问题。D2-Align 通过修正奖励信号的方向性偏差，使生成器不再向损害细节的“捷径”模式坍塌。
 
-![[assets/figures/papers/paper_list_l2705_https_arxiv_org_abs_2512_24146/figures/014_Figure_8.jpg]]
-*Figure 8: Human Preference Evaluation on HPDv2. We conducted a user study comparing*
-
 在图文对齐（Image-Text Alignment）维度上，D2-Align 获得 52.2% 的偏好率，同样位居第一。综合偏好（Overall Preference）达到 48.2%，显著优于所有基线。
 
 Figure 9 的多样性人类偏好评估进一步验证了 D2-Align 在打破偏好-多样性权衡方面的能力。在风格多样性（Style Diversity）上，D2-Align 获得 **37.3%** 的偏好率，而 SRPO 仅约 23%；在身份多样性（Identity Diversity）上，D2-Align 获得 35.2%，同样大幅领先。值得注意的是，DanceGRPO 和 Flow-GRPO 在某些多样性维度上的评分甚至低于基座模型 FLUX，这直接证明了现有 RL 对齐方法存在严重的 PMC 问题——优化过程不仅未能提升多样性，反而使其恶化。
-
-![[assets/figures/papers/paper_list_l2705_https_arxiv_org_abs_2512_24146/figures/015_Figure_9.jpg]]
-*Figure 9: Human Preference on Diversity (DivGenBench). We evaluated user preferences across four key diversity dimensions: Identity, Style, Layout, and Tonal. The results reveal a severe PMC in existing RL baselines (DanceGRPO, Flow-GRPO), which often score lower than the Base Model (FLUX), particularly in Tonal and Style diversity. In contrast*
 
 ### 消融实验
 
@@ -330,12 +304,6 @@ Figure 7 系统消融了 D2-Align 的关键组件和超参数。
 
 Table 6 和 Table 7 展示了将学习到的方向向量 $b_v$ 嵌入 DanceGRPO 后的性能变化。结果表明，引入 $b_v$ 后 DanceGRPO 在人类偏好对齐、语义一致性和生成多样性上均获得了全面提升。这一通用性实验证明，$b_v$ 捕获的修正方向具有可迁移性，能够作为插件式组件增强其他 RL 对齐方法，进一步验证了方向解耦策略的有效性。
 
-![[assets/figures/papers/paper_list_l2705_https_arxiv_org_abs_2512_24146/figures/016_Table_6.jpg]]
-*Table 6: Comprehensive Quantitative Evaluation of Metrics for Human Preference Alignment and Semantic Consistency. We compare FLUX, DanceGRPO, and DanceGRPO incorporated with our learned*
-
-![[assets/figures/papers/paper_list_l2705_https_arxiv_org_abs_2512_24146/figures/017_Table_7.jpg]]
-*Table 7: Quantitative Evaluation of Generative Diversity on DivGenBench. We compare FLUX, DanceGRPO, and Dance-GRPO enhanced with our learned bv. All RL-based methods utilize HPS-v2.1 as the reward model. We report Identity Divergence Score (IDS), Artistic Style Coverage (ASC), Spatial Dispersion Index (SDI), and Photographic Variance Score (PVS). Ranking is performed between the RL-based methods. The best score is shown in bold*
-
 ### 失败模式与局限
 
 定性对比（Figure 6、Figure 10-15）揭示了基线方法的典型失败模式：DanceGRPO 和 Flow-GRPO 在风格维度上倾向于生成油亮、过度渲染的“塑料感”图像，在身份维度上出现面部特征同质化，在布局维度上缺乏空间变化，在影调维度上饱和度和亮度分布集中。这些失败模式正是 PMC 的直接表现——模型收敛到奖励模型偏好的狭窄高奖励区域。
@@ -344,8 +312,6 @@ Table 6 和 Table 7 展示了将学习到的方向向量 $b_v$ 嵌入 DanceGRPO 
 *Figure 6: Qualitative Comparison of*
 
 D2-Align 有效缓解了上述问题，但论文未报告方向向量 $b_v$ 在不同奖励模型（非 CLIP 基）上的迁移性实验，也未讨论当奖励偏差随时间动态变化时的适应策略。这些开放性问题的答案需要进一步研究验证。
-
-
 
 ## 定位与知识库关联
 
@@ -414,8 +380,6 @@ D2-Align 在扩散模型 RLHF 对齐方法谱系中占据了一个独特位置�
 - **相对于提示工程方法**（手动添加离散词汇）：D2-Align 在连续嵌入空间中学习修正方向，突破了离散词汇表的表达能力上限，在所有评估指标上一致优于手动基线（Figure 7 right）。
 
 该方法的核心贡献在于**首次将奖励偏差建模为嵌入空间中的可学习方向**，并通过两阶段解耦框架实现了偏好对齐与多样性保持的协同优化，为 RLHF 中的模式坍塌问题提供了结构化的解决方案。
-
-
 
 ## 原文 PDF
 

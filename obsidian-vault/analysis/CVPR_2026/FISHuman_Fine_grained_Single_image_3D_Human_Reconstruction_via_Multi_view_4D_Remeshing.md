@@ -49,8 +49,6 @@ FISHuman针对上述瓶颈，提出两条核心思路弥合单图像与显式3D�
 
 在2K2K和Sizer数据集上，FISHuman在所有几何与外观指标上均显著优于PSHuman、Human3Diffusion等前沿方法。例如，在2K2K上CD由1.133降至0.817，PSNR由23.03提升至24.49。消融实验证实，跨模态对齐和4D重网格化两个模块对重建质量具有关键作用。在人物与物体交互、罕见背视等挑战场景下，FISHuman借助3D感知视频模型生成连贯新视角，几何与纹理均优于PSHuman，后者则产生明显畸变。
 
-
-
 ### 问题背景：单图像三维人体重建的挑战
 
 从单张自然图像中重建细粒度、可动画化的三维人体化身，是计算机视觉与图形学领域的长期目标。该任务要求从极度稀疏的输入中同时恢复高保真几何与逼真外观，其核心困难在于：单张图像仅捕获某一视角下的二维投影，而人体表面高度非刚性、自遮挡严重、且服装与配饰形态千变万化，使得从二维到三维的逆映射本质上高度病态。
@@ -79,8 +77,6 @@ FISHuman针对上述瓶颈，提出两条核心思路弥合单图像与显式3D�
 
 通过这一“生成-重建”协同设计，FISHuman 旨在突破现有方法在几何精度、纹理保真度和泛化能力上的上限，实现从单张自然图像到可直接动画、可编辑的高质量三维化身。
 
-
-
 ## 核心方法与创新机理
 
 FISHuman 的核心创新在于针对单图像三维人体重建中“多视图先验不一致”这一瓶颈，构建了一套从生成到重建的完整解耦方案。其关键思路可归纳为两个递进层面。
@@ -92,8 +88,6 @@ FISHuman 的核心创新在于针对单图像三维人体重建中“多视图�
 **创新二：4D 重网格化与统一 UV 表示。** 传统方法将多视图法线直接用于静态可微渲染重建，相当于对不一致监督信号做“硬平均”，容易产生表面裂纹和拓扑错误。FISHuman 提出 4D 重网格化模块，将规范网格优化与视角相关的动态变形场解耦：全局共享的规范几何通过连续显式重网格化更新，而各视角的像素级不一致被转化为顶点变形偏移（$\delta x_i = \Psi_d(\gamma(x_c), \gamma(i))$），由 MLP 预测。这使模型能够跟踪同一顶点在不同视角下的位置变化，将“监督冲突”转化为“几何弹性”，从而在保持拓扑一致性的前提下重建精确、无裂纹的几何。在此基础上，统一 UV 表示利用变形网格间的拓扑一致性，在规范 UV 空间整合所有视角的外观信息，辅以总变分平滑，消除逐视角纹理平均带来的模糊。
 
 **创新三：跨模态对齐与几何重建的协同。** 这两个模块并非孤立运作，而是形成正向反馈：跨模态对齐的 RGB-法线序列为 4D 重网格化提供了强耦合、结构一致的多模态监督；4D 重网格化产出的干净几何又为统一 UV 纹理学习提供了可靠的投影基础。消融实验（Table 2）证实，移除跨模态对齐（w/o CMA）导致 PSNR 从 24.49 降至 23.14，移除 4D 重网格化（w/o 4DR）则降至 23.87，且在夸张姿态下出现表面裂纹和面部细节模糊（Figure 8），验证了两模块对重建质量的关键作用。
-
-
 
 FISHuman 的整体流程以单张自然场景人体图像为输入，输出具有精细几何与逼真纹理的可驱动三维化身。框架由两大核心组件串联构成：**3D感知双流视频扩散Transformer** 与 **动态三维人体雕刻方法**（含4D重网格化模块和统一UV表示学习），如图2所示。
 
@@ -113,12 +107,8 @@ FISHuman 的整体流程以单张自然场景人体图像为输入，输出具�
 
 整个管线的数据流可概括为：**单张RGB图像 → 条件信号提取 → 双流视频扩散生成多视角RGB+法线 → 4D重网格化联合优化规范几何与视角变形 → 统一UV纹理优化 → 带纹理的可驱动三维化身**。两阶段设计将“生成空间一致的多视角引导”与“从不一致监督中恢复一致几何和纹理”解耦，使得模型在复杂姿态和自遮挡场景下仍能保持鲁棒的重建质量。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1023_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_FISHuman_Fine_grai/figures/002_Figure_2.jpg]]
 *Figure 2: Method Overview. Given a single-view human image, FISHuman reconstructs the corresponding fine-grained 3D avatar by generating cross-modally aligned RGB and normal frames using the proposed 3D-aware dual-stream video diffusion transformer. With the generated sequences, we perform 4D Remeshing that explicitly decouples the optimization of the 3D canonical mesh and view-dependent per-vertex deformation field, effectively mitigating 3D inconsistencies of the multi-view guidance. A unified UV representation is updated on the deformed meshes to integrate valid appearance across all perspectives*
-
-
 
 FISHuman通过三个紧密协作的模块弥合单图像与显式三维表示之间的鸿沟：**3D感知双流视频扩散Transformer**生成空间一致的多模态多视角先验；**4D重网格化模块**将像素级不一致转化为视角依赖的顶点变形；**统一UV表示学习**在共享拓扑上聚合所有视角的有效外观。
 
@@ -184,12 +174,8 @@ $$L _ { t e x } = L _ { r g b } + \lambda _ { t v } L _ { t v }$$
 
 三个模块形成闭环协作：双流视频扩散模型生成空间一致的多模态多视角引导（RGB+法线序列）；4D重网格化利用法线序列优化规范几何，同时将视角不一致转化为顶点变形；统一UV表示在变形网格上整合RGB序列的外观信息，反馈提升纹理质量。消融实验证实，移除跨模态对齐（w/o CMA）导致PSNR从24.49降至23.14，移除4D重网格化（w/o 4DR）使PSNR降至23.87且在夸张姿态下出现表面裂纹（Table 2, Figure 8），验证了各模块对重建质量的关键作用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1023_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_FISHuman_Fine_grai/figures/003_Figure_3.jpg]]
 *Figure 3: Illustration of model architecture. (a) Dual-stream diffusion transformer. (b) Cross-modal DiT block*
-
-
 
 ## 实验与关键发现
 
@@ -231,16 +217,6 @@ Figure 5 展示了人物-物体交互和罕见背视等挑战性场景下的对�
 1. **生成器的 2D 监督瓶颈**：视频扩散 Transformer 仅依赖 2D 像素级损失，缺少显式 3D 约束。在极端复杂场景（如严重遮挡、罕见服饰）下可能产生空间不对齐的多视图输出。4D 重网格化可部分缓解该问题，但无法从根本上消除生成阶段的 3D 不一致。
 2. **推理效率**：完整流程耗时约 7 分钟（视频模型约 5 分钟 + 4D 重网格化约 2 分钟），远未达到实时应用要求。
 3. **数据覆盖范围**：训练数据仅包含 1559 个高质量扫描，在极端人物风格或稀有着装上的泛化能力有待进一步验证。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1023_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_FISHuman_Fine_grai/figures/005_Figure_4.jpg]]
-*Figure 4: Visual comparison with SOTA methods on both arbitrary-pose and canonical-pose 3D human reconstruction. Given in-the-wild inputs, our method outperforms baselines in generating (1) plausible novel views with reasonable poses, and (2) fine-grained geometry and photorealistic appearance akin to real-world individuals. Please zoom in for better inspection*
-
-![[assets/figures/papers/paper_list_l1023_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_FISHuman_Fine_grai/figures/001_Figure_1.jpg]]
-*Figure 1: We present FISHuman, a method for generating fine-grained 3D humans from single in-the-wild images. Top: FISHuman enables high-fidelity and ultra-photorealistic textured human reconstruction under arbitrary and standard poses. Bottom: The generated avatars showcase practical applications in direct animation and 3D editing. Please zoom in for better inspection*
-
-
 
 ## 定位与知识库关联
 
@@ -290,8 +266,6 @@ FISHuman 的关键突破在于**改变了对多视图不一致的处理方式**�
 3. **动态场景扩展。** 4D重网格化模块天然支持视角依赖的变形建模，理论上可扩展至时序动态人体重建（如视频输入），但论文未探索这一方向。
 
 4. **跨域泛化验证。** 在非真实感渲染角色、极端体型（如儿童、特殊身材比例）上的性能缺乏系统评估，这是实际部署前需要填补的空白。
-
-
 
 ## 原文 PDF
 

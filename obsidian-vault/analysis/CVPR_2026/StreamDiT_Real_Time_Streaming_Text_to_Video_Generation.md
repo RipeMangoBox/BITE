@@ -56,8 +56,6 @@ claims:
 
 **方法定位**：StreamDiT 处于流式视频生成与 DiT 架构的交汇点，通过“缓冲流匹配 + 变时间嵌入 + 窗口注意力 + 分段蒸馏”四位一体的设计，首次在 DiT 范式下实现了高质量实时流式 T2V 生成，并支持无限时长流式输出与交互式提示词导航。
 
-
-
 ### 文本到视频生成中的“实时”困境
 
 近年来，基于扩散模型（Diffusion Models）和流匹配（Flow Matching）的文本到视频（T2V）生成取得了显著进展，能够产出高保真、时序连贯的视频内容。然而，这些模型大多采用**离线批处理范式**：用户输入提示词后，需等待完整视频生成完毕才能观看，整个过程通常耗时数十秒甚至数分钟。这种“先完成、后播放”的模式，从根本上阻断了实时交互的可能性——用户无法在生成过程中介入、引导或修改视频走向。
@@ -83,8 +81,6 @@ StreamDiT 的提出源于一个关键洞察：**流式生成不应是训练后�
 
 StreamDiT 通过在流匹配框架中引入**移动缓冲区**和**混合分块训练**策略，统一了均匀噪声、对角线噪声等多种去噪方案，使模型能够泛化到流式推理场景。配合**变时间嵌入**和**窗口注意力**的架构改进，以及**分段多步蒸馏**的加速策略，最终在 4B 参数规模下实现了 512p 分辨率、16 FPS 的实时流式文本到视频生成，且质量显著优于现有流式基线方法。
 
-
-
 ## 核心方法与创新机理
 
 StreamDiT 的核心创新在于将标准流匹配（Flow Matching）从“全量批处理”范式重构为“移动缓冲区渐进去噪”范式，并通过三个关键改造槽位（changed slots）实现这一转变。这些改造并非孤立的技术点，而是围绕一个统一的因果机制：**让模型在训练中学会处理逐帧不同的噪声等级，从而在推理时能够以分块流式的方式逐步生成视频，同时保持与全注意力模型相近的质量**。
@@ -108,8 +104,6 @@ StreamDiT 的蒸馏策略针对分块结构进行了专门设计。教师模型�
 ### 创新点之间的因果关联
 
 上述四个改造槽位构成了一个紧密耦合的创新链条：**变时间嵌入**使模型能够处理逐帧差异化的噪声等级，这是**缓冲流匹配**训练的架构前提；**混合分块训练**让模型在多种分块配置下均能泛化，为流式推理提供了灵活性；**窗口注意力**降低了计算复杂度，使流式推理在硬件上可行；**分段多步蒸馏**则将推理步数压缩至极致，最终实现实时性能。四个改造相互依赖，缺一不可——如果仅替换注意力机制而不改变时间条件和训练框架，模型将无法在流式场景下保持一致性；如果仅改变训练框架而不进行蒸馏，推理延迟将无法满足实时要求。
-
-
 
 StreamDiT 构建了一条从文本提示到实时视频流的完整生成管线，其核心设计围绕**缓冲流匹配（Buffered Flow Matching）** 训练框架与**变时间嵌入 DiT 骨干网络**展开，并通过多步蒸馏实现推理加速。整个系统由五个关键模块串联而成，形成“文本编码 → 潜变量初始化 → 缓冲区分块去噪 → 潜变量解码 → 流式输出”的处理链路。
 
@@ -141,8 +135,6 @@ StreamDiT 构建了一条从文本提示到实时视频流的完整生成管线�
 
 ![[assets/figures/papers/paper_list_l2225_https_arxiv_org_abs_2507_03745/figures/002_Figure_2.jpg]]
 *Figure 2: Illustration of StreamDiT partitioning. We partition the buffer to K reference frames and N chunks. Each chunk has c frames and s micro denoising steps*
-
-
 
 ### 3.1 缓冲流匹配（Buffered Flow Matching）
 
@@ -203,19 +195,6 @@ $$\tau_i \sim \mathrm{Uniform}\left( \left[ \frac{T}{N} \cdot (i-1), \frac{T}{N}
 
 为达到实时性能，StreamDiT 采用**分段多步蒸馏**策略。教师模型使用分块方案 $c=2, s=16, N=8$ 进行推理（共 128 微步），蒸馏后将每个分段的 $s$ 个微步压缩为 1 步，并移除分类器自由引导（CFG），最终将总采样步数降至 8 步。蒸馏后模型在单张 H100 GPU 上实现 512p 分辨率 16 FPS 的实时流式生成。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2225_https_arxiv_org_abs_2507_03745/figures/004_Figure_3.jpg]]
-*Figure 3: StreamDiT with varying time embedding and window attention. We modified the standard adaLN DiT with varying time embeddings applied to scale and shift modulations*
-
-![[assets/figures/papers/paper_list_l2225_https_arxiv_org_abs_2507_03745/figures/005_Figure_4.jpg]]
-*Figure 4: Illustration of window partitioning: regular windows and shifted windows*
-
-![[assets/figures/papers/paper_list_l2225_https_arxiv_org_abs_2507_03745/figures/016_Figure_12.jpg]]
-*Figure 12: Denoising trajectory change with text guidance update: As denoising progresses toward the final stages, it becomes increasingly difficult to deviate from the outcome dictated by the original text guidance*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -270,19 +249,6 @@ $$\tau_i \sim \mathrm{Uniform}\left( \left[ \frac{T}{N} \cdot (i-1), \frac{T}{N}
 ![[assets/figures/papers/paper_list_l2225_https_arxiv_org_abs_2507_03745/figures/007_Table_2.jpg]]
 *Table 2: VBench quality metrics of our evaluation. Our models outperform others, and our distilled model is close to our teacher model*
 
-![[assets/figures/papers/paper_list_l2225_https_arxiv_org_abs_2507_03745/figures/008_Figure_5.jpg]]
-*Figure 5: Human evaluations of our method compared with others, where our model shows higher win rates across all axes*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2225_https_arxiv_org_abs_2507_03745/figures/013_Figure_9.jpg]]
-*Figure 9: Interactive video streaming. The user can enter prompts to navigate the video generation on the fly*
-
-![[assets/figures/papers/paper_list_l2225_https_arxiv_org_abs_2507_03745/figures/012_Figure_8.jpg]]
-*Figure 8: Infinite streaming. We generate a 5-minute video to demonstrate the potential for infinite streaming*
-
-
-
 ## 定位与知识库关联
 
 ### 与现有流式生成方法的关系
@@ -328,8 +294,6 @@ StreamDiT 的适用边界由其设计选择直接决定：
 4. **动态分块策略**：混合分块训练中的分块方案是否需要根据视频内容动态调整？例如，高运动场景可能需要更小的 chunk size 以保证运动质量，而静态场景可以使用更大的 chunk size 以提升效率。
 
 5. **高帧率扩展**：该方法能否扩展到高分辨率、高帧率（如 60 FPS）的实时生成？这需要在窗口注意力和缓冲流匹配框架中重新平衡计算复杂度与生成质量。
-
-
 
 ## 原文 PDF
 

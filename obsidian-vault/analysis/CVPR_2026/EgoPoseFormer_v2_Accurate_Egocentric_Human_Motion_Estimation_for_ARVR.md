@@ -59,8 +59,6 @@ claims:
 
 方法的局限性在于半监督流程依赖私有无标注数据集，完全可复现性受限；在更多样化设备上的泛化能力尚需进一步验证。
 
-
-
 ### 自我中心人体运动估计的兴起
 
 增强现实（AR）与虚拟现实（VR）设备——如 **Apple Vision Pro** 、**Meta Quest 3** 以及 **Momentum** 等——正在快速普及，驱动了对精确、实时、以自我为中心（egocentric）人体运动估计技术的迫切需求。这类技术旨在仅凭头戴设备（HMD）搭载的多视角相机和惯性测量单元（IMU）信号，实时重建穿戴者的全身3D姿态。其应用场景涵盖虚拟化身驱动、远程临场交互、运动分析以及沉浸式游戏体验。
@@ -86,8 +84,6 @@ claims:
 - **数据效率突破**：设计基于不确定性蒸馏的半监督自动标注系统（Auto-Labeling System），利用大规模无标注数据提升模型泛化能力，突破标注数据的瓶颈。
 
 这些设计使EPFv2在EgoBody3M基准上实现了MPJPE 4.02cm（较EgoBody3M和EgoPoseFormer分别降低22.4%和15.4%），同时将时间一致性指标MPJVE分别降低22.2%和51.7%，且模型推理延迟仅0.8ms，适合实时VR/AR部署。
-
-
 
 ## 核心方法与创新机理
 
@@ -145,8 +141,6 @@ $$
 
 其中不确定性蒸馏损失 $\mathcal{L}_{\mathrm{uncertainty}} = || s_T - s_S ||$ 强制学生模仿教师对每个关节的预测不确定性分布，实现更有效的知识迁移。该系统的关键洞察在于：教师模型不仅提供伪标签，还传递了其对伪标签质量的**置信度估计**，使学生能够自适应地关注可靠样本。在 EGO-ITW-70M 无标注数据集上的实验表明，ALS 将手腕 MPJPE 进一步降低 11.7%，且轻量模型（MobileNetv4-S）从中获益比例更大（Figure 6），验证了该方案对部署友好型模型的适配性。
 
-
-
 EPFv2 构建了一个端到端可微的双阶段 Transformer 解码器架构，用于从多视角自我中心图像序列中估计精确的三维人体姿态。整个 pipeline 围绕一个核心设计理念展开：**用单一整体查询（single holistic query）替代传统的逐关节查询**，从而将计算量与关键点数量解耦，同时保持丰富的姿态表示能力。
 
 ### 输入流定义
@@ -200,8 +194,6 @@ EPFv2 的关键改进之一是实现了**完整的端到端梯度流动**。与 
 
 ![[assets/figures/papers/paper_list_l1061_https_arxiv_org_abs_2603_04090/figures/004_Figure_4.jpg]]
 *Figure 4: Overview of the mixture training in auto-labeling system. We adopt a stronger teacher model for pesudo labeling and apply an uncertainty distillation loss to facilitate the knowledge transfer. The teacher model is pre-trained with the labeled dataset*
-
-
 
 ### 3.1 整体架构与查询设计
 
@@ -261,13 +253,6 @@ $$\mathcal{L}_{\mathrm{uncertainty}} = || s_T - s_S ||$$
 
 该机制使教师模型的知识（包括对预测可靠性的估计）传递给学生模型。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1061_https_arxiv_org_abs_2603_04090/figures/010_Figure_8.jpg]]
-*Figure 8: Our simplified multi-view cross-attention module built on standard attention. A single holistic query attends to all view features using conditioned positional encoding in a batch manner, enabling more efficient and scalable spatial fusion. V denotes the number of views. Learnable layers are highlighted in red, with naming aligned to Tab. 3*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -308,34 +293,15 @@ EPFv2 的设计在效率上具有显著优势。Table 3 对比了不同空间注
 
 与 EgoBody3M 的 LSTM 融合方案相比，EPFv2 在仅比较姿态估计头（假设共享 backbone）的情况下，显著降低了参数量和 FLOPs（Table 4）。端到端推理延迟方面，完整模型在 GPU 上仅需 **0.8 ms**（Table 5），满足实时 VR 设备的部署需求。
 
-![[assets/figures/papers/paper_list_l1061_https_arxiv_org_abs_2603_04090/figures/012_Table_4.jpg]]
-*Table 4: Efficiency Comparison with EgoBody3M. We compare only the pose estimation heads, assuming a shared backbone. EPFv2 significantly reduces parameter count and FLOPs, demonstrating the efficiency of its streamlined transformer design*
-
-![[assets/figures/papers/paper_list_l1061_https_arxiv_org_abs_2603_04090/figures/013_Table_5.jpg]]
-*Table 5: Latency measurement of EPFv2*
-
 ### 编码器容量与时间序列长度的影响
 
 Table 8 显示，更强的图像 backbone 能持续提升姿态估计精度。例如，使用 DINOv3-B 替代轻量 backbone 可带来显著增益，表明自我中心视角下强大的视觉特征提取对克服遮挡和自相似外观至关重要。
-
-![[assets/figures/papers/paper_list_l1061_https_arxiv_org_abs_2603_04090/figures/014_Table_8.jpg]]
-*Table 8: Comparison across different image backbones. Larger backbones, such as DINOv3-B, significantly improve pose estimation accuracy, demonstrating the benefit of strong visual features in egocentric settings*
 
 Table 7 分析了时间序列长度的影响：仅使用 2 帧会导致性能严重退化，而将窗口扩展至 16 帧能提供稳定且更优的精度。论文默认使用 16 帧以与 EgoBody3M 基线公平对比。
 
 ### 失败模式与局限性
 
 尽管 EPFv2 在整体指标上表现优异，其自动标注系统的性能增益依赖于大规模私有无标注数据集 **EGO-ITW-70M**，这在一定程度上限制了社区完全复现半监督流程的能力。此外，模型的鲁棒性主要基于 EgoBody3M 的受控场景验证，在更多样化设备（如不同相机布局的头显）上的泛化表现尚待进一步证明。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1061_https_arxiv_org_abs_2603_04090/figures/008_Figure_6.jpg]]
-*Figure 6: ALS effectiveness in in-domain scaling. As more unlabeled data is used, both students achieve improved accuracy. Notably, the MobileNetv4-S-based model benefits more proportionally from ALS despite having lower model capacity, indicating the pipeline’s suitability for lightweight deployment models*
-
-![[assets/figures/papers/paper_list_l1061_https_arxiv_org_abs_2603_04090/figures/009_Figure_7.jpg]]
-*Figure 7: Deformable stereo attention module used in EPFv1 [65]. Each joint query independently attends to sampled image features via learned offsets and attention weights. Outputs from different views are sequentially fused using an MLP. This design introduces the specialized component with higher development complexity [64] and suboptimal hardware utilization. B, J, C, numpts, and h denote batch size, number of joints, feature channels, reference points, and attention heads, respectively. Learnable layers are highlighted in red, with layer names matching Tab. 3*
-
-
 
 ## 定位与知识库关联
 
@@ -386,8 +352,6 @@ EPFv2的自动标注系统（Auto-Labeling System, ALS）遵循半监督学习�
 2. **多任务统一查询**：单一整体查询能否同时支撑姿态估计、动作识别、场景理解等异构任务，还是需要引入任务特定的查询解耦机制？
 3. **跨设备零样本迁移**：模型在不同头显设备（如Quest 3 vs. Vision Pro）之间的零样本迁移能力如何？是否需要设备特定的微调或域适应策略？
 4. **实时部署的全栈优化**：尽管推理延迟已低至0.8ms（GPU），但在移动端NPU上的量化部署、与SLAM/渲染管线的协同优化等工程问题仍是落地的关键瓶颈。
-
-
 
 ## 原文 PDF
 

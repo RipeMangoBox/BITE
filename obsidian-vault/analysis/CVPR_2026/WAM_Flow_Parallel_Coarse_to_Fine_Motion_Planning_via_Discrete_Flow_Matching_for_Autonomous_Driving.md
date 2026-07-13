@@ -52,8 +52,6 @@ claims:
 
 WAM-Flow 的并行粗到细范式为 VLA 规划提供了一种兼顾效率与安全的新路径，但其评估仍以仿真为主，Sim-to-Real 的泛化、多模态传感器融合以及长尾场景覆盖仍是后续研究需要解决的关键问题。
 
-
-
 ### 端到端自动驾驶的范式演进
 
 端到端自动驾驶旨在将传感器输入直接映射为车辆控制信号或未来轨迹，从而绕过传统模块化管线中的信息瓶颈。近年来，视觉-语言-动作（VLA）模型在该领域展现出显著潜力——它们利用大规模预训练的多模态骨干网络，将驾驶场景编码为统一表示，再解码出可执行的动作序列。然而，现有 VLA 规划器在解码策略上几乎清一色采用**自回归生成范式**：逐 token 预测未来轨迹坐标，每个 token 的生成依赖于前序 token，形成严格的因果依赖链。
@@ -84,8 +82,6 @@ WAM-Flow 的并行粗到细范式为 VLA 规划提供了一种兼顾效率与安
 
 WAM-Flow 正是围绕这三个维度展开：将规划任务建模为**离散流匹配**问题，实现全并行双向去噪；设计**度量对齐数值分词器**，通过三重态排序损失将数值距离注入嵌入空间；采用**仿真引导 GRPO** 强化学习，在行为克隆的基础上进一步对齐安全、进度和舒适度目标。三者协同，构成了从“生成什么”到“如何生成”再到“为何这样生成”的完整闭环。
 
-
-
 ## 核心方法与创新机理
 
 WAM-Flow 围绕“将 VLA 规划从自回归解码迁移到并行粗到细生成”这一主线，在三个关键维度上对现有范式进行了系统性改造：
@@ -103,8 +99,6 @@ WAM-Flow 围绕“将 VLA 规划从自回归解码迁移到并行粗到细生成
 现有方法大多仅依赖对数似然（行为克隆）进行监督训练，无法直接优化闭环安全性和驾乘质量。WAM-Flow 在监督流匹配预训练后，引入**仿真引导 GRPO** 进行强化对齐：利用 NAVSIM 仿真器提供复合奖励 $R(\tau)$，其中安全项（碰撞、可行驶区域）以连乘形式施加硬约束，性能项（进度、TTC、舒适度）以加权求和形式引导优化。GRPO 采用组相对策略优化目标，通过裁剪和 KL 正则稳定更新，避免策略崩溃。消融显示，大规模 VQA 预训练贡献 **+3.3 PDMS**（83.4 → 86.7），仿真引导 GRPO 最终将 PDMS 推至最高的 90.3（**+3.6 PDMS**），且最优奖励权重配置为 EP:TTC:Comfort = 5:5:2，最优 GRPO 组大小为 3。
 
 三项创新的协同关系清晰：离散流匹配赋予模型并行粗到细的生成能力，度量对齐分词器保证数值标记的几何保真度，GRPO 将开环模仿学习与闭环安全需求对齐——三者缺一不可，共同支撑了 WAM-Flow 在 NAVSIM-v1（PDMS 90.3）、NAVSIM-v2（EPDMS 84.7）和 nuScenes（平均碰撞率 0.23%）上的全面领先。
-
-
 
 WAM-Flow 将自车轨迹规划重新定义为**离散流匹配（Discrete Flow Matching, DFM）** 问题，构建了一个视觉-语言-动作（VLA）模型，以**并行、双向去噪**替代传统自回归模型的逐 token 因果解码。整体流程如 Figure 2 所示，系统接收三种模态输入，输出覆盖未来 4 秒的 8 个路径点（waypoint）轨迹。
 
@@ -153,8 +147,6 @@ WAM-Flow 将自车轨迹规划重新定义为**离散流匹配（Discrete Flow M
 ### 推理灵活性
 
 推理时，WAM-Flow 通过控制去噪步数实现**计算-精度权衡**：1 步去噪在 NAVSIM-v1 上取得 89.1 PDMS，推理速度达 ReCogDrive 的 4.67 倍；5 步去噪进一步提升至 90.3 PDMS，延迟与 ReCogDrive 持平。这种并行粗到细机制赋予了 VLA 模型前所未有的灵活部署能力。
-
-
 
 WAM-Flow 将自车轨迹规划转化为结构化 token 空间上的离散流匹配问题，其核心由三个相互协作的模块构成：度量对齐数值分词器、离散流匹配去噪头、以及仿真引导的 GRPO 对齐模块。
 
@@ -238,8 +230,6 @@ $$
 
 其中 $r_i^k(\theta)$ 为当前策略与参考策略的概率比，$D_{\mathrm{KL}}$ 项防止策略偏离参考模型过远。消融表明，GRPO 组大小设为 $G=3$ 时达到最优 PDMS 90.3，相较无 GRPO 的基线提升 **3.6 点**。
 
-
-
 ## 实验与关键发现
 
 ### 闭环规划主结果
@@ -312,28 +302,6 @@ Figure 4 展示了 WAM-Flow 与基线方法在 NAVSIM 上的轨迹对比。在�
 
 综上，WAM-Flow 在闭环规划基准上的领先优势由多组件协同贡献，消融实验提供了清晰的因果链。但 Sim-to-Real 差距和长尾鲁棒性是需要进一步验证的关键风险点。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2627_https_arxiv_org_abs_2512_06112/figures/005_Table_1.jpg]]
-*Table 1: Comparison on NAVSIM-v1 with closed-loop metrics. Abbreviation: Diff.(Diffusion), Comf.(Comfort), Cam (Camera), L (LiDAR)*
-
-![[assets/figures/papers/paper_list_l2627_https_arxiv_org_abs_2512_06112/figures/011_Table_4.jpg]]
-*Table 4: Comparison on NAVSIM-v2 with extended metrics*
-
-![[assets/figures/papers/paper_list_l2627_https_arxiv_org_abs_2512_06112/figures/016_Table_7.jpg]]
-*Table 7: End-to-end motion planning performance on the nuScenes [4] dataset. We sort previous methods according to the average collision rate. Abbreviation: Diff.(Diffusion), AR (autoregressive), DFM (discrete flow matching)*
-
-![[assets/figures/papers/paper_list_l2627_https_arxiv_org_abs_2512_06112/figures/006_Table_2.jpg]]
-*Table 2: Ablation on GRPO group size*
-
-![[assets/figures/papers/paper_list_l2627_https_arxiv_org_abs_2512_06112/figures/007_Table_3.jpg]]
-*Table 3: Ablation on different weight of Simulator-Guided reward. The default weight is 5:5:2 for Navsim simulator, and we adjust the scale of each weight by 4× to obtain the new weight*
-
-![[assets/figures/papers/paper_list_l2627_https_arxiv_org_abs_2512_06112/figures/013_Figure_6.jpg]]
-*Figure 6: Impact of pre-training epochs. We perform SFT after pre-training on 6.5M data, and then calculate PDMS*
-
-
-
 ## 定位与知识库关联
 
 ### 与现有范式的关键差异
@@ -376,8 +344,6 @@ WAM-Flow 处于 VLA 规划、离散扩散模型和强化学习对齐三个研究
 5. **长尾分布覆盖**：现有基准（NAVSIM、nuScenes）主要覆盖常规驾驶场景，可能未充分包含真实驾驶中的长尾分布（如极端天气、罕见交通参与者行为）。模型在这些场景下的安全性需要额外验证。
 
 6. **计算-精度的理论最优**：WAM-Flow 展示了 1 步到 5 步去噪的性能单调提升，但最优步数与场景复杂度的自适应选择机制尚未建立。学习一个轻量级的步数预测器，或设计基于不确定性的早停策略，可进一步优化推理效率。
-
-
 
 ## 原文 PDF
 

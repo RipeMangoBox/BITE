@@ -70,8 +70,6 @@ X-Portrait 提出了一条根本不同的技术路径：**以隐式跨身份运�
 
 方法的主要局限在于：当预训练重演网络对极端表情（如嘴唇内翻、鼓腮）完全失效时，X-Portrait 的运动传递能力随之受限（Figure 5）；此外，模型目前不支持手势动画，且推理速度（24帧约30秒，A10 GPU）距离实时应用仍有差距。开放问题包括如何将手势纳入框架、如何消除偶发的时序抖动伪影、以及能否摆脱对预训练重演网络的依赖实现端到端训练。
 
-
-
 肖像动画旨在从单张静态参考图像和一段驾驶视频中合成逼真且富有表现力的动态肖像。该技术在虚拟化身驱动、影视制作和远程通信等领域具有广泛应用前景。然而，现有方法在该任务上面临两个核心瓶颈：**运动表达力的损失**与**身份外貌的泄漏**。
 
 当前主流方法普遍依赖显式运动表征作为中间桥梁。基于3D关键点的方法（如 **Face Vid2Vid**，Wang et al., CVPR 2021）和密集姿态图方法将面部动态压缩为稀疏或结构化的运动信号，再将其注入生成器。这种显式解耦虽然在概念上清晰，却不可避免地造成两方面损失：其一，稀疏关键点难以完整编码微表情（如单眼眨眼、撇嘴）和极端头部姿态的丰富动态信息，导致运动表达力不足；其二，显式运动表征在传递过程中容易将驾驶者的外貌特征（如脸型、五官比例）混入生成结果，造成严重的身份漂移——即所谓的外貌泄漏。
@@ -79,8 +77,6 @@ X-Portrait 提出了一条根本不同的技术路径：**以隐式跨身份运�
 扩散模型在图像和视频生成领域展现出强大的先验能力，为肖像动画提供了新的可能。一些早期工作（如 **FADM**，Zeng et al., CVPRW 2023）尝试将扩散模型引入该任务，但仍沿用关键点或属性标签作为运动条件，未能从根本上突破显式表征的局限。核心矛盾在于：**如何在准确传递驾驶视频中全部运动信息的同时，严格保持参考图像的身份特征？**
 
 X-Portrait 的动机正是针对这一矛盾提出隐式运动控制范式。该方法的核心洞察是：利用预训练潜在扩散模型（Stable Diffusion 1.5）作为生成骨干，通过跨身份 ControlNet 直接从原始 RGB 驾驶帧学习身份解耦的运动信号，从而绕开显式运动表征的信息瓶颈。同时，针对微表情等局部细微运动难以被全局注意力充分捕获的问题，引入基于局部补丁的辅助注意力机制加以增强。这一设计旨在实现运动表达力与身份保持之间的平衡——这是此前方法未能有效解决的关键缺口。
-
-
 
 ## 核心方法与创新机理
 
@@ -114,8 +110,6 @@ X-Portrait 摒弃了传统的面部关键点或姿态图，转而使用一个预
 
 X-Portrait 在肖像动画领域首次将**预训练潜在扩散模型（Stable Diffusion 1.5）**作为生成骨干，通过跨身份 ControlNet 实现隐式运动控制。与同期基于扩散的方法如 **FADM**（Zeng et al., CVPRW 2023）和 **MagicDance** 相比，X-Portrait 的独特优势在于完全不依赖任何显式运动表征，而是让模型从跨身份 RGB 图像对中自主学习运动与身份的分离——这一设计从根本上解决了外貌泄漏问题，同时释放了极端表情和大范围姿态的传递能力。
 
-
-
 ![[assets/figures/papers/paper_list_l29_X_Portrait_Expressive_Portrait_Animation_with_Hierarchical_Motion_Attent/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of X-Portrait . For the task of portrait animation, X-Portrait leverages a frozen pre-trained LDM as a rendering backbone, and incorporates three auxiliary trainable modules for disentangled control of appearance ${ \mathcal { R } }$ , motion C and temporal smoothness M. Specifically, R extracts the source appearance and background context from a reference image $I _ { S }$ , and C derives the motion of head pose and facial expression from a driving frame $I _ { D }$ . During training, we leverage a pre-trained network $\mathcal { F }$ to generate cross-identity control images $I _ { C }$ as conditional input to our control modules C. To better capture subtle expressions, we enhance the atte...
 
@@ -134,8 +128,6 @@ $$I_C = \mathcal{F}(I_{S'}, I_D)$$
 **时序模块 $\mathcal{M}$** 采用时序 Transformer 结构，保证生成帧间的时间连贯性。训练时，对 $I_C$ 和 $I_C^l$ 施加随机异构缩放，进一步减少驾驶图像的身份信息泄漏。
 
 推理阶段，模型采用提示漫游策略增强时序平滑性，并利用潜在一致性模型加速去噪过程。不同于从随机噪声出发，推理时对源图像 $I_S$ 施加前向扩散过程获得初始化噪声，为生成提供结构引导。整个流程支持直接以原始驾驶视频帧作为输入，无需任何预处理步骤。
-
-
 
 ### 3.1 生成骨干：冻结的潜在扩散模型
 
@@ -170,8 +162,6 @@ $$I_C = \mathcal{F}(I_{S'}, I_D)$$
 ### 3.6 时序模块 $\mathcal{M}$
 
 时序模块 $\mathcal{M}$ 采用时序 Transformer 架构，对连续帧间的潜在表示进行建模，保证生成视频的时间连贯性。推理阶段进一步结合提示漫游（prompt traveling）策略与潜在一致性模型（LCM）加速采样，24 帧生成约需 30 秒（A10 GPU）。
-
-
 
 ## 实验与关键发现
 
@@ -217,15 +207,11 @@ Figure 5 展示了 X-Portrait 的典型失败案例。当预训练重演网络 $
 - **Figure 3**：视觉消融直观展示了外貌泄漏（a）、局部细节丢失（b）和身份漂移（c）的退化模式，与定量结果高度一致。
 - **Figure 5**：失败案例揭示了当前方法对预训练重演网络 $\mathcal{F}$ 的依赖性——这是系统性能的上限瓶颈。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l29_X_Portrait_Expressive_Portrait_Animation_with_Hierarchical_Motion_Attent/figures/010_Figure.jpg]]
 *Figure: (a)*
 
 ![[assets/figures/papers/paper_list_l29_X_Portrait_Expressive_Portrait_Animation_with_Hierarchical_Motion_Attent/figures/011_Figure_1.jpg]]
 *Figure 1: (a) is the result of X-Portrait with a single reference image from (b), while (c) with both reference images. X-Portrait seamlessly accommodates multiple images as reference, producing animations with better captured personalized appearance traits in (c). Please find the differences in hair, ear and face shape. Figure 2: User study example. A and B represent synthesized outputs from different methods*
-
-
 
 ## 定位与知识库关联
 
@@ -264,8 +250,6 @@ X-Portrait 揭示的方法论方向——利用扩散模型从RGB信号中隐式
 4. **高分辨率下的身份保持**：现有评估均在256×256分辨率下进行。在512×512或更高分辨率下，身份保持和运动精度的变化趋势尚不明确——更高分辨率可能暴露当前方法在细节纹理保持方面的不足，也可能为微表情传递提供更精细的空间。
 
 5. **跨风格泛化的理论理解**：X-Portrait 在写实照片、素描、动漫等多种风格间展现出良好的泛化能力（Figure 4），但其内在机制尚缺乏理论解释。理解扩散先验如何在不同视觉域之间建立运动对应关系，可能为通用人物动画提供更坚实的方法论基础。
-
-
 
 ## 原文 PDF
 

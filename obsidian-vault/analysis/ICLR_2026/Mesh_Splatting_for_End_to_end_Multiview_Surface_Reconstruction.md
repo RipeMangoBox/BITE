@@ -205,8 +205,6 @@ $$\mathbf{c} = \mathbf{c}_{d} + \mathbf{s} \odot \Phi_{s}( \mathbf{f}_{s}, \omeg
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_PSgps4JXTb/figures/009_Figure_7.jpg]]
 *Figure 7: Qualitative ablations. Hybrid topology control (DMTet + Continuous Remeshing) captures global topology and fine details more reliably than using either component alone*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_PSgps4JXTb/figures/002_Figure_2.jpg]]
 *Figure 2: Comparison between regular meshes and soft mesh*
 
@@ -253,8 +251,6 @@ Mesh Splatting 在标准对象级多视角表面重建基准上取得具有竞�
 - 自适应重新网格化策略（在平坦区域保持各向同性面片，在线缆状区域生成狭长三角形）是否能解决细结构丢失问题？
 - 自适应层带宽或层次化软化是否能支持大规模场景的高效重建？
 - 结合更先进的材质/光照模型后，能否进一步减少对显式着色监督的依赖，实现纯图像驱动的端到端优化？
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_PSgps4JXTb/figures/010_Table_4.jpg]]
 *Table 4: Ablation metrics*

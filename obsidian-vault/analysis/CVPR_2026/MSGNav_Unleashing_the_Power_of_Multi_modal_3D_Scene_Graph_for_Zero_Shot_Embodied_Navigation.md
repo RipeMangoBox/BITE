@@ -231,8 +231,6 @@ Table 9展示了不同VLM后端对MSGNav性能的影响。GPT-4o作为默认VLM�
 - **模块协同产生累积增益**：KSS、AVU、CLR、VVD四个模块各自针对效率、词汇覆盖、决策一致性和最终精度四个维度，叠加后产生显著的协同效应。
 - **零样本范式超越训练型方法**：MSGNav无需任何导航训练数据，仅依赖预训练VFMs和VLM，在GOAT-Bench上超越训练型SOTA方法MTU3D，展示了基础模型驱动的零样本导航范式的巨大潜力。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2641_https_arxiv_org_abs_2511_10376/figures/007_Table_3.jpg]]
 *Table 3: Component ablation experiment across the first episode of each scene on the “Val Unseen” split of GOAT-Bench. The first row without any module, which represents our baseline model 3D-Mem [43] results. “VVD”, “AVU”, and “CRV” represent the Visibility-based Viewpoint Decision module, Adaptive Vocabulary Update module, and Closed-loop Reasoning and Verification module*
 

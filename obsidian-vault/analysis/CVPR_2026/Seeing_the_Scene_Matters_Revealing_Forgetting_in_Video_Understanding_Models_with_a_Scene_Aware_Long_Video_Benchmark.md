@@ -57,8 +57,6 @@ claims:
 
 Scene-RAG的局限性在于引入额外离线预处理开销（46分钟视频约需277秒），且长程遗忘问题尚未完全解决——在开源模型上的提升绝对值仍较小。该方法在更长视频（数小时级）上的扩展性以及与长上下文模型集成的潜力，仍有待进一步探索。
 
-
-
 ### 长视频理解的层次性困境
 
 视频理解任务天然存在信息粒度的层次结构。如图2所示，视频信息可划分为帧、片段、场景和视频四个层级：帧级信息聚焦单帧内的主体细节，片段级信息引入时序但仅能描述对象的客观行为，场景级信息整合大量片段内容形成完整的叙事事件，而视频级信息则由因果逻辑串联多个相关场景构成完整的故事线。现有长视频理解基准和模型主要围绕帧级或片段级推理展开，忽视了场景级理解这一关键中间层。
@@ -74,8 +72,6 @@ Scene-RAG的局限性在于引入额外离线预处理开销（46分钟视频约
 ### 动机：从帧级检索到场景级记忆
 
 现有检索增强生成（RAG）方法在视频理解中的应用——如Video-RAG——基于帧级相似度检索，虽能改善短程和长程推理，但在中程距离上表现挣扎（Figure 1）。其根本原因在于：帧级检索割裂了视频的语义连贯性，无法捕获场景内的事件完整性。这一观察驱动了本文的核心动机：**将视频组织为语义连贯的场景片段，构建以场景为粒度的多模态记忆库，并通过查询驱动的动态检索机制按需提供相关上下文**，从而系统性缓解长程遗忘问题。
-
-
 
 ## 核心方法与创新机理
 
@@ -118,8 +114,6 @@ Scene-RAG的创新设计在两类任务上得到验证：
 
 尽管Scene-RAG在场景级推理上取得进展，其创新仍存在边界：在开源模型上的提升绝对值较小（SceneBench约1.4%），长程遗忘问题并未完全解决。此外，场景分块引入的离线预处理开销（46分钟视频约需277秒）限制了实时应用场景的适用性。
 
-
-
 Scene-RAG 的核心设计理念是将长视频组织为语义连贯的**场景**（scene）单元，而非均匀的帧或片段序列，并围绕这些场景构建可检索的外部记忆，以缓解现有视觉语言模型（MLLM）在长程上下文推理中的遗忘问题。整个框架由三个串行阶段构成，形成一条从视频预处理到答案生成的完整流水线。
 
 **阶段一：场景分块（Scene Tiling）。** 输入一段长视频，Scene-RAG 首先不依赖固定时长切割，而是通过 Total Variation L1 正则化对相邻帧的视觉相似度序列进行去噪，产生分段常数近似，其平台区域对应语义连贯的场景段。具体而言，给定帧间相似度序列 $s_t$，求解如下优化问题：
@@ -138,8 +132,6 @@ $$\operatorname*{min}_{x \in \mathbb{R}^n} \frac{1}{2} \sum_{t=1}^{n} (x_t - s_t
 *Figure 4: Comparison of Scene-RAG with traditional RAGs working on video understanding tasks. Scene-RAG first aggregates long-range visual scenes via scene tiling, stores aligned visual–audio evidence, and retrieves task-relevant segments conditioned on user queries*
 
 值得注意的是，Scene-RAG 是一个**模型无关**的检索增强框架，可与不同的骨干 MLLM（如 LongVA、Long-LLaVA、LLaVA-OneVision-7B）配合使用，仅通过替换记忆构建与检索模块即可适配。
-
-
 
 Scene-RAG 的核心设计动机源于一个关键观察：现有视觉语言模型在长视频理解中面临严重的长程上下文遗忘，难以有效聚合跨场景的语义信息以完成复杂推理。其因果调节变量在于模型是否具备以场景为单位的动态记忆构建与检索能力。基于此，Scene-RAG 将视频组织为语义连贯的场景片段，并通过检索增强生成机制按需提供相关场景记忆，从而缓解长程遗忘。
 
@@ -185,13 +177,6 @@ $$k = \mu_x + \alpha \sigma_x$$
 
 消融实验（Table 5）证实了三个组件的独立贡献：在 SceneBench 上，完整 Scene-RAG 得分 54.4，移除任一组件后性能均有下降（无组件基线 53.3）。超参数分析（Table 8）进一步表明，降低场景检测灵敏度 $\alpha$ 至 0.5 会导致 VideoMME 性能下降 1.2，过短的 $L_{\min}=2\text{s}$ 也会轻微降低性能（下降 0.5），验证了场景分块粒度对整体效果的关键影响。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l826_https_arxiv_org_abs_2603_27259/figures/002_Figure_2.jpg]]
-*Figure 2: We divide video information into frame, clip, scene, and video levels. For frame-level information, it focuses mainly on describing the details of the subject within the frame. Clip-level information includes temporal information but can only describe the objective behavior of objects. Scene-level information contains a lot of clip-level information and forms a complete scenario event, while video consists of a lot of scene-level content, with related scenes forming a logical storyline based on cause and effect. For convenience of quantification, we use two minutes to distinguish between clip and scene levels*
-
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -236,33 +221,14 @@ SceneBench 包含 2,485 个视频（平均时长 1,978 秒）和 8,903 个问答
 ![[assets/figures/papers/paper_list_l826_https_arxiv_org_abs_2603_27259/figures/006_Table_2.jpg]]
 *Table 2: Benchmark results on the SceneBench. “Frame Count” indicates the number of frames used as input. Comm.: Comment*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l826_https_arxiv_org_abs_2603_27259/figures/001_Figure_1.jpg]]
-*Figure 1: Longer SceneQA distances lead to lower accuracy. Video-RAG [31] improves the baseline in short- and longrange settings but struggles in the mid-range, while our Scene-RAG achieves consistent gains, especially for mid- and long-term reasoning. Curves are smoothed using a rolling mean. Results use Qwen2.5-VL [2]. Solid markers denote actual measurements; curves are cubic-spline interpolations for visual clarity*
-
 ![[assets/figures/papers/paper_list_l826_https_arxiv_org_abs_2603_27259/figures/007_Table_3.jpg]]
 *Table 3: Performance of different MLLMs on the SceneBench benchmark. The average improvement of Scene-RAG is ∼1.40% in average*
-
-![[assets/figures/papers/paper_list_l826_https_arxiv_org_abs_2603_27259/figures/008_Table_4.jpg]]
-*Table 4: Performance of different MLLMs on the Video-MME [14]*
-
-![[assets/figures/papers/paper_list_l826_https_arxiv_org_abs_2603_27259/figures/009_Table_5.jpg]]
-*Table 5: Scene-RAG ablation study on SceneBench and MLVU [71]. Each column indicates whether the corresponding modality or component is used. Results are reported with an additional Gain column showing improvements over the no-RAG baseline*
 
 ![[assets/figures/papers/paper_list_l826_https_arxiv_org_abs_2603_27259/figures/014_Table_8.jpg]]
 *Table 8: Ablation over SceneTiling*
 
 ![[assets/figures/papers/paper_list_l826_https_arxiv_org_abs_2603_27259/figures/004_Figure_3.jpg]]
 *Figure 3: Statistical overview of our SceneBench benchmark. (A) Distribution of scene lengths. (B) Distribution of task counts. (C) Distribution of SceneQA and SceneQA-Audio length duration proportion over the full video*
-
-![[assets/figures/papers/paper_list_l826_https_arxiv_org_abs_2603_27259/figures/011_Figure_5.jpg]]
-*Figure 5: QA Accuracy Across Frame Lengths. Performance of SceneQA and SceneQA-Audio across different input frame lengths (16, 32, 64, and 128 frames). While SceneQA shows slight improvement with longer inputs, SceneQA-Audio performance peaks at moderate frame lengths and slightly declines for longer sequences*
-
-![[assets/figures/papers/paper_list_l826_https_arxiv_org_abs_2603_27259/figures/012_Table_7.jpg]]
-*Table 7: Runtime latency breakdown (video Length: 2,767s)*
-
-
 
 ## 定位与知识库关联
 
@@ -303,8 +269,6 @@ SceneBench 在长视频理解基准谱系中占据独特位置。Table 1 的系�
 3. **场景分块的精确过滤参数**：Scene Tiling 中用于过滤短段的精确 ε 参数未明确给出，这影响方法的可复现性和在不同视频风格上的调优策略。
 
 4. **与长上下文模型的深度集成**：当前 Scene-RAG 以外部记忆形式叠加于骨干模型，未来是否可以将场景级记忆直接融入模型的长上下文窗口或训练目标中，实现更紧耦合的场景感知推理，仍是一个开放的研究问题。
-
-
 
 ## 原文 PDF
 

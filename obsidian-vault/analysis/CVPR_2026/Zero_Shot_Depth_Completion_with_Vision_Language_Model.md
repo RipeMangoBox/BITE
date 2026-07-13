@@ -51,8 +51,6 @@ claims:
 
 在七个零样本基准测试中，该方法使用稀疏深度监督即可取得最高17.3%的相对提升。消融实验验证了各组件的因果贡献：零初始化卷积的软融合策略相比直接拼接在IBims-1上降低RMSE 7mm；同时引入掩码提示与深度值文本提示在VOID 150上带来稳定的误差递减（RMSE从0.204降至0.185）。该框架开辟了利用VLM文本指令实现稠密几何推理的新范式，其局限性在于反射表面附近深度估计不够可靠，且VLM自回归解码仍带来较大的推理延迟。
 
-
-
 ### 任务定义与核心挑战
 
 深度补全旨在从稀疏深度测量和对应的RGB图像中恢复稠密的深度图。该任务在自动驾驶、机器人导航、增强现实等三维感知场景中具有关键作用。其核心挑战在于：稀疏深度点仅覆盖场景中极小比例的像素（通常不足1%），模型必须从极度稀疏的几何线索中推断出完整、平滑且几何一致的场景结构。
@@ -68,8 +66,6 @@ claims:
 视觉语言模型（VLM）在跨模态语义理解和指令遵循方面展现出强大能力，已有工作（如**DepthLM**）将逐像素深度估计转化为语言建模任务，证明了文本监督范式的可行性。这启发了一个关键问题：**能否利用VLM的语言理解能力，将稀疏深度转化为精确的文本指令，从而显式地指导模型进行几何推理？**
 
 本文的核心动机在于：将深度补全重新定义为**文本驱动的像素级几何推理任务**。具体而言，通过将稀疏深度转化为二值掩码文本提示（0表示需预测区域，1表示需保留区域），并结合具体的深度值描述，使VLM能够根据语言指令精确控制补全过程。这一范式转变使得模型仅需稀疏深度即可进行文本监督微调，无需任何稠密真值深度图，从而在根本上解耦了训练数据依赖与零样本泛化之间的矛盾。
-
-
 
 ## 核心方法与创新机理
 
@@ -100,8 +96,6 @@ claims:
 ### 创新边界与待验证问题
 
 尽管SDIM在零样本泛化上表现突出，其当前实现仍存在若干局限：推理依赖VLM的自回归解码，虽比Marigold-DC快65倍，但延迟仍高于传统前馈网络；在玻璃等反射表面附近深度估计不够可靠（见Figure 6）；目前仅基于3B参数的**Qwen2.5-VL**进行验证，更大规模模型的表现尚待探索。此外，该VLM驱动框架能否有效扩展至其他稠密预测任务（如表面法线估计），以及如何设计更轻量的解码策略以进一步提升推理速度，是值得关注的开放问题。
-
-
 
 本文提出一种**基于视觉语言模型（VLM）的零样本深度补全框架**，其核心创新在于将深度补全重新定义为**文本驱动的像素级几何推理任务**。该框架以预训练的VLM为骨干，通过**稀疏深度注入机制（Sparse Depth Injection Mechanism, SDIM）**将稀疏深度测量无缝集成到VLM的视觉-语言管道中，使模型能够根据语言指令精确控制“哪里需要预测、哪里需要保留”，从而在无需稠密真值监督的情况下实现强大的零样本泛化。
 
@@ -135,16 +129,6 @@ claims:
 ### 关键设计：零初始化卷积的软融合
 
 在视觉分词阶段，本文采用**零初始化卷积**而非直接拼接来实现RGB与稀疏深度的融合。消融实验（Table 5）证实，这种软融合策略在VOID 150上相比硬融合降低RMSE达7mm，证明逐步注入深度先验对于保持VLM预训练视觉表征的完整性至关重要。具体而言，初始稀疏深度特征提取使用零初始化卷积 $\mathcal{F}_{\tau_2}^z$，预嵌入阶段再次使用零初始化卷积 $\mathcal{F}_c^z$，形成**渐进式深度信息注入**机制。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2432_https_openaccess_thecvf_com_content_CVPR2026_html_Yan_Zero_Shot_Depth_Co/figures/003_Figure_3.jpg]]
-*Figure 3: Overview of our method. It extends VLM [1] to the depth completion task via a sparse depth injection mechanism (SDIM). SDIM first performs a soft fusion between the sparse depth and the RGB image using convolutions with zero initialization. Then, the sparse depth is transformed into textual representations that prompt the model on where to predict and what to preserve. Meanwhile, for one image pixel, we query its distance to the camera. Finally, these textual representations derived from the sparse depth are employed to fine-tune the model, producing per-pixel depth descriptions and the final dense depth prediction*
-
-![[assets/figures/papers/paper_list_l2432_https_openaccess_thecvf_com_content_CVPR2026_html_Yan_Zero_Shot_Depth_Co/figures/002_Figure_2.jpg]]
-*Figure 2: Framework comparisons. (a) Most previous depth completion studies emphasize task-specific architectural designs, while (b) recent works concentrate on zero-shot inference with the aid of depth foundation models. Differently, (c) we introduce text instructions based on VLM, offering a new perspective on depth completion*
-
-
 
 ### 3.1 稀疏深度注入机制（SDIM）总览
 
@@ -222,8 +206,6 @@ $$\mathbf{D} = \mathcal{T}_{j=1}^{hw}(\mathbf{A}_j) \tag{5}$$
 
 其中 $\mathbf{A}_j$ 为第 $j$ 个像素的注意力输出，$\mathcal{T}$ 为从文本中解析数值的操作。该重建过程将VLM的自回归文本生成能力转化为结构化的稠密几何输出，实现了从稀疏测量到稠密预测的端到端推理。
 
-
-
 ## 实验与关键发现
 
 ### 实验设置
@@ -288,24 +270,11 @@ Table 4 在 IBims-1 上对比了各方法的参数量、推理时间和显存占
 
 Figure 6 展示了方法在**玻璃等反射表面**附近的失败案例。在这些区域，稀疏深度测量本身可能不可靠（如 LiDAR 在玻璃表面的反射异常），导致文本提示中的深度值信息存在误差，进而影响补全质量。这一局限性源于稀疏深度输入的质量，而非 VLM 框架本身的设计缺陷。
 
-![[assets/figures/papers/paper_list_l2432_https_openaccess_thecvf_com_content_CVPR2026_html_Yan_Zero_Shot_Depth_Co/figures/011_Figure_6.jpg]]
-*Figure 6: Failure cases of our approach near glass surfaces*
-
 ### 开放问题
 
 1. 该 VLM 驱动框架能否有效扩展至其他稠密预测任务（如表面法线估计）？
 2. 如何设计更轻量、高效的 VLM 架构或解码策略以进一步提升推理速度？
 3. 在完全没有稠密真值的情况下，如何利用更大规模的多模态数据增强泛化能力？
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2432_https_openaccess_thecvf_com_content_CVPR2026_html_Yan_Zero_Shot_Depth_Co/figures/004_Figure_4.jpg]]
-*Figure 4: Qualitative results on four benchmarks comparing CFormer [74], OGNI-DC [75], Marigold-DC [47], and our approach*
-
-![[assets/figures/papers/paper_list_l2432_https_openaccess_thecvf_com_content_CVPR2026_html_Yan_Zero_Shot_Depth_Co/figures/001_Figure_1.jpg]]
-*Figure 1: Visual comparisons of zero-shot depth completion under different sparsity levels. Our VLM-driven approach leverages textual instructions derived from sparse depth inputs to guide the completion process. Compared with previous state-of-the-art methods such as BPNet [44], our model consistently produces plausible and geometrically reliable depth predictions*
-
-
 
 ## 定位与知识库关联
 
@@ -346,8 +315,6 @@ Figure 6 展示了方法在**玻璃等反射表面**附近的失败案例。在�
 - **轻量化与高效解码**：探索更轻量的VLM架构或非自回归解码策略，以在保持文本指令优势的同时降低推理延迟。这可能涉及知识蒸馏、推测解码或混合视觉-文本分支的早期退出机制。
 
 - **无真值条件下的规模化泛化**：在完全无稠密真值的情况下，如何利用更大规模的多模态数据（如互联网视频、合成数据）增强泛化能力？本文的真值监督实验（Ours w/ GT）表明，使用真值深度进行文本监督可在VOID 500、VOID 1500和DDAD上分别取得13.3%、10.1%和9.7%的RMSE相对提升，揭示了数据质量对性能的显著影响。
-
-
 
 ## 原文 PDF
 

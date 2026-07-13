@@ -57,8 +57,6 @@ claims:
 2. **前向模型选择产生方向性差异**：自由空间传播在 GS-PINN 上显著优于傅里叶全息，但这一趋势在经典 GS 算法上恰好相反，暗示神经网络与迭代算法对前向模型的敏感模式存在本质区别。
 3. **复合指标框架**为解决 FMH 引发的参数复杂度问题提供了结构化方案，但其权重系数（α, β, γ）需根据具体应用场景手动设定，通用性仍有待验证。
 
-
-
 ### 计算机生成全息图与相位恢复
 
 计算机生成全息图（Computer-Generated Holography, CGH）通过计算光的衍射传播，在目标平面上重建期望的光场分布，其核心挑战在于**相位恢复**——即从已知的目标振幅反推出空间光调制器（SLM）上所需的相位分布。经典方法中，Gerchberg-Saxton（GS）算法通过在前向传播与反向传播之间交替施加振幅约束，以迭代方式逼近可行解。然而，GS 算法的收敛速度与最终精度高度依赖于初始相位选择，且其迭代过程缺乏对物理先验的显式利用。
@@ -90,8 +88,6 @@ claims:
 
 通过这一框架，本文旨在为 CGH 领域的物理启发神经网络研究提供**可复现的敏感性分析工具**和**公平的基准测试标准**，从而推动鲁棒且可泛化的相位恢复方法发展。
 
-
-
 ## 核心方法与创新机理
 
 本工作的核心创新并非提出一种全新的相位恢复网络架构，而是**为 GS‑PINN 类方法建立了一套系统性的全局敏感性评估框架**，解决了该类方法在跨硬件配置下性能不可比、泛化能力不明的根本瓶颈。其关键创新体现在两个紧密耦合的 **changed slots** 上。
@@ -119,8 +115,6 @@ $$\Upsilon = \alpha (\Upsilon_{\mathrm{gsw}}) + \beta (\Upsilon_{\mathrm{gm}}) +
 这一复合指标的核心价值在于：它直接回应了“同一模型在不同前向模型配置下性能不一致”这一参数复杂性问题。例如，Figure 10 的小提琴图显示，自由空间传播前向模型在 GS‑PINN 上的 PSNR 显著优于傅里叶全息（Wilcoxon signed‑rank test，$p=2.03\times10^{-169}$），而 GS 算法本身却呈现完全相反的趋势——傅里叶全息显著优于自由空间传播（$p<2.36\times10^{-168}$）。若仅用单一 PSNR 指标评估，这些因前向模型选择而产生的性能反转将被掩盖，而复合指标通过整合多维度信息，使跨配置的公平比较成为可能。
 
 > **公平性说明**：复合指标的权重 $(\alpha, \beta, \gamma)$ 需根据具体实验需求手动设定，论文未提供通用的自动确定方法，这可能在实际应用中引入一定的主观性。此外，GS‑加权指标的有效性依赖于 GS 算法本身作为基线的普适性——当 GS 算法在某些配置下表现不佳时，该维度的参考价值可能受限。
-
-
 
 本工作构建了一套面向 GS-PINN 前向模型超参数（FMH）的全局敏感性评估框架，其核心目标并非提出新的相位恢复网络，而是为不同硬件配置下的 CGH 方法建立一个可比较、可复现的基准测试体系。整体 pipeline 由五个功能模块串联而成，形成“初始化—传播—迭代优化—敏感性量化—复合评估”的闭环。
 
@@ -179,13 +173,6 @@ $$ \Upsilon = \alpha (\Upsilon_{\mathrm{gsw}}) + \beta (\Upsilon_{\mathrm{gm}}) 
 
 输入目标图像 → 相位初始化网络预测初始相位 → 前向模型（傅里叶或 ASM）传播至全息平面 → GS 迭代展开进行无监督优化 → 输出重建全息图及精度指标 → Sobol 敏感性分析量化各超参数贡献 → 复合指标综合评定模型性能。整个 pipeline 在 h_inner、h_mid、h_outer 三个超参数区域分别执行，以揭示超参数影响在不同参数尺度下的变化规律。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l23_Enhancing_3D_Human_Motion_Prediction_with_Gaze_informed_Affordance_in_3D/figures/001_Figure_1.jpg]]
-*Figure 1: GS-Physics Inspired Neural Network (GS-PINN) with Phase Initialization, Wavefront and Phase Adjustment Neural networks (Algorithm 2). The laser constraints consist of a linearly polarized beam with uniform amplitude, and the ’star’ symbol represents the formation of a complex wavefront*
-
-
-
 ### 前向模型与超参数空间
 
 GS-PINN 的相位恢复性能高度依赖于前向模型及其超参数（FMH）的选择，这是本研究的核心瓶颈。框架中涉及两种前向传播模型：
@@ -201,9 +188,6 @@ $$\Psi_{\mathrm{Fourier}}(\Gamma(\mathbf{x},\mathbf{y})) = \gamma \mathcal{F}(\G
 $$\Psi_{\mathrm{ASM}}(\Gamma(\mathbf{x},\mathbf{y})) = \widetilde{\mathcal{F}}[\Gamma(\mathbf{u},\mathbf{y}) \mathrm{H}(\lambda, \Delta x, M, d)]$$
 
 该模型包含四个超参数：波长 $\lambda$、传播距离 $d$、SLM 像素间距 $\Delta x$ 和像素分辨率 $M$。这些 FMH 构成了敏感性分析的输入空间（Fig. 2）。
-
-![[assets/figures/papers/paper_list_l23_Enhancing_3D_Human_Motion_Prediction_with_Gaze_informed_Affordance_in_3D/figures/002_Figure_2.jpg]]
-*Figure 2: Forward Models (FM) and Forward Model Hyperparameters (FMH). For Fourier holography SLM pixel-resolution is the FMH (Eq. 1). For free space propagation wavelength of light, propagation distance, SLM pixel-resolution and pixel-pitch are the FMH (Eq. 2)*
 
 ### GS-PINN 训练框架
 
@@ -245,16 +229,6 @@ $$\Upsilon = \alpha ( \Upsilon _ { \mathrm { g s w } } ) + \beta ( \Upsilon _ { 
 
 敏感性分析在归一化超参数空间的三个区域进行：h_inner、h_mid 和 h_outer（Fig. 3）。采样采用 Saltelli 扩展的 Sobol 序列准随机采样方法。对于 h_mid 区域，$N=1024$ 生成 10240 个 FMH 配置（$k=4$ 参数）；对于 h_outer 和 h_inner，$N=256$ 各产生 2560 个实验配置。三个参考点的具体超参数取值见 TABLE I。
 
-![[assets/figures/papers/paper_list_l23_Enhancing_3D_Human_Motion_Prediction_with_Gaze_informed_Affordance_in_3D/figures/003_Figure_3.jpg]]
-*Figure 3: Normalized hyperparameter space with Inner, Mid and Outer points. Sampling for SA was performed using Saltelli’s extension of Sobol’s sequence [59]–[61]. For hmid*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l23_Enhancing_3D_Human_Motion_Prediction_with_Gaze_informed_Affordance_in_3D/figures/005_Figure_5.jpg]]
-*Figure 5: FMH-induced parameter complexity and the composite metric. Top panel represents the inconsistency in performance of different algorithms for similar set of FMH configurations, complicating benchmarking. In the bottom panel, the composite metric addresses variability in model performance across similar FMH configurations, enabling more reliable benchmarking*
-
-
-
 ## 实验与关键发现
 
 ### 实验设置与前向模型超参数空间
@@ -292,9 +266,6 @@ Fig. 12 进一步揭示了 SLM 像素分辨率与 GS-PINN 性能之间的具体�
 
 值得注意的是，这一趋势在 GS 算法上完全相反：**傅里叶全息在 GS 迭代算法上的性能显著优于自由空间传播**（Fig. 11, $p < 2.36 \times 10^{-168}$）。这种前向模型在神经网络与经典算法上的“性能反转”现象，构成了本研究揭示的一个关键洞察——前向模型的选择对物理启发神经网络的影响机制与对传统迭代算法的影响机制截然不同，简单的“算法迁移”假设并不成立。
 
-![[assets/figures/papers/paper_list_l23_Enhancing_3D_Human_Motion_Prediction_with_Gaze_informed_Affordance_in_3D/figures/011_Figure_11.jpg]]
-*Figure 11: GS algorithm: Forward model comparison (1024 FMH configurations Fig. 4) with respect to PSNR accuracy. Violin plots (medians in dotted black lines, with extremes and mean values) show that Fourier holography Eq. 1 consistently outperforms free space propagation Eq. 2 for all iterations. Wilcoxon signed-rank test (one-sided, alternative: “greater”) confirmed significant differences (p < 0.025, marked *) include: (i) iteration 1 : W =523961, p=2.36e−168, n=1024, (ii) iteration 5 : W =524385*
-
 ### 主结果三：复合评估指标与参数复杂度
 
 FMH 配置的多样性导致不同算法在同一组超参数配置下的性能排序出现不一致，使得跨配置的公平基准比较变得困难（Fig. 5 上层面板）。为此，论文引入了一个复合评估指标：
@@ -304,9 +275,6 @@ $$\Upsilon = \alpha \Upsilon_{\mathrm{gsw}} + \beta \Upsilon_{\mathrm{gm}} + \ga
 其中 $\Upsilon_{\mathrm{gsw}}$ 为 GS-加权指标（衡量相对于 GS 算法基线的性能提升），$\Upsilon_{\mathrm{gm}}$ 为泛化指标（衡量跨 FMH 配置的性能一致性），$\Upsilon_{\mathrm{r}}$ 为鲁棒性指标（衡量对超参数扰动的恢复能力）。该复合指标通过加权汇总三个维度的性能得分，解决了因 FMH 配置不同而导致的模型性能不可比问题，为不同 CGH 配置下的统一基准建立了标准。
 
 Fig. 14 的参数复杂度分析显示，GS-PINN 与 GS 算法在 PSNR 上存在相关性，但这种相关性受到 FMH 配置的显著调制，进一步验证了引入复合指标的必要性。
-
-![[assets/figures/papers/paper_list_l23_Enhancing_3D_Human_Motion_Prediction_with_Gaze_informed_Affordance_in_3D/figures/014_Figure_14.jpg]]
-*Figure 14: Parameter complexity analysis for GS-PINN and the GS algorithm, evaluated using the PSNR accuracy function Eq. 5a. Models are labeled as*
 
 ### 消融与稳定性分析
 
@@ -324,12 +292,8 @@ Fig. 14 的参数复杂度分析显示，GS-PINN 与 GS 算法在 PSNR 上存在
 4. **复合指标权重的主观性**：$\alpha$、$\beta$、$\gamma$ 的设定缺乏通用确定方法，需要根据具体 CGH 应用场景手动调整，可能引入评估偏差。
 5. **GS 基线依赖**：GS-加权指标 $\Upsilon_{\mathrm{gsw}}$ 依赖于 GS 算法本身在前向模型上的性能表现，当 GS 算法作为基线不普适时，复合指标的公平性可能受影响。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l23_Enhancing_3D_Human_Motion_Prediction_with_Gaze_informed_Affordance_in_3D/figures/027_Figure_20.jpg]]
 *Figure 20: Visualization of network performance using the mean squared error (MSE) loss function for hmid FMH across different forward models. The first two columns (black-bordered) correspond to free space propagation, while the last two columns (bluebordered) represent Fourier holography. The upper triangular region in each panel shows the original image, while the lower triangular region displays the GS-PINN output. To ensure comparability, the outputs in the second and fourth columns are scaled to match the mean intensity of the corresponding original images. Performance metrics-including PSNR, SSIM, and accuracy*
-
-
 
 ## 定位与知识库关联
 
@@ -383,8 +347,6 @@ GS 算法的关键局限在于其对前向模型超参数（FMH）的敏感性�
 2. 自由空间传播与傅里叶全息在 GS-PINN 与 GS 算法上表现出的相反趋势，是否存在统一的物理解释（例如与模型容量和信息瓶颈相关）？
 3. 当使用更多采样点或更大超参数范围时，$S_1$ 和 $S_2$ 指数能否变得稳定，从而揭示更精细的参数交互效应（如像素分辨率与波长的耦合对重建质量的非线性影响）？
 4. 该敏感性分析框架能否直接推广到其他类型的物理启发神经网络（如基于衍射神经网络的波前整形），或需要针对不同物理前向模型进行适配？
-
-
 
 ## 原文 PDF
 

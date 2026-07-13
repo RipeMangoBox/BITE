@@ -48,8 +48,6 @@ claims:
 
 本文提出 **α-Flow**，一种用于改进少步流匹配生成模型（MeanFlow）训练的统一框架。核心发现是：MeanFlow的训练目标可分解为**轨迹流匹配（L_TFM）**和**轨迹一致性（L_TC）**两个分量，两者在优化过程中梯度高度负相关（余弦相似度通常低于-0.4），导致优化冲突和收敛缓慢。α-Flow通过引入超参数α，将轨迹流匹配（α=1）、Shortcut Model（α=1/2）和MeanFlow（α→0）统一在一个损失函数族中，并采用从α=1退火到α→0的课程学习策略，有效解耦了冲突目标。在ImageNet-1K 256×256上，α-Flow-XL/2+以1-NFE达到FID 2.58，2-NFE达到FID 2.15，均显著优于MeanFlow基线。
 
-
-
 ### 1 少步生成模型的发展
 
 少步扩散和流匹配模型旨在通过少量函数评估（NFE）实现高质量生成。现有方法包括：
@@ -70,8 +68,6 @@ $\mathcal{L}_{\mathtt{MF}}(\theta) = \underbrace{\mathbb{E}_{t,r,z_t} \left[ \| 
 - **轨迹一致性损失（L_TC）**：强制模型输出在时间上的一致性。
 
 梯度分析（Figure 3a）显示，L_TFM和L_TC的梯度在训练过程中高度负相关，余弦相似度通常低于-0.4。这种梯度冲突导致MeanFlow训练收敛缓慢，且需要75%的训练计算量用于边界情况监督（r=t），这并非MeanFlow的主要关注点。
-
-
 
 ## 核心方法与创新机理
 
@@ -101,8 +97,6 @@ $\mathcal{L}_{\alpha}(\theta) \triangleq \underset{t,r,z_t}{\mathbb{E}} \left[ \
 
 从MeanFlow的自适应损失推导出α-Flow的自适应损失权重：$\bar{\omega} = \bar{\alpha} / (||\bar{\Delta}||_2^2 + c)$。
 
-
-
 α-Flow的训练框架包含以下模块：
 
 | 模块 | 角色 | 证据锚点 |
@@ -113,8 +107,6 @@ $\mathcal{L}_{\alpha}(\theta) \triangleq \underset{t,r,z_t}{\mathbb{E}} \left[ \
 | α调度器 (Sigmoid函数) | 控制α从1到0的退火过程 | Section 4.2 |
 
 训练算法（Algorithm 1）在每个迭代中采样t、r，从调度器获取α，然后根据α是否等于0选择使用L_MF或L_α。
-
-
 
 ### 1 MeanFlow损失分解
 
@@ -145,8 +137,6 @@ $\lim_{\alpha\to 0} \boldsymbol{u}_{\theta,\alpha}^*(\boldsymbol{z}_t, r, t) = \
 $\left\| \nabla_\theta \mathcal{L}_\alpha(\theta) - \nabla_\theta \mathcal{L}_{\mathrm{MF}}(\theta) \right\|_2 \leq \alpha \cdot C_1 \mathbb{E}_{t,r} \left[ \frac{1}{2} L_2 (t-r)^2 + C_2 (t-r) \right]$
 
 该上界与α线性相关，当α→0时消失。
-
-
 
 ## 实验与关键发现
 
@@ -193,8 +183,6 @@ $\left\| \nabla_\theta \mathcal{L}_\alpha(\theta) - \nabla_\theta \mathcal{L}_{\
 - 平衡类采样（每类50个样本，共1000类）可将FID降低多达10%，但FDD和FCD几乎不受影响。
 - 论文建议社区从FID转向与人类感知更相关的指标，如FDD和FCD。
 
-
-
 ## 定位与知识库关联
 
 ### 1 与现有方法的关系
@@ -231,8 +219,6 @@ $\left\| \nabla_\theta \mathcal{L}_\alpha(\theta) - \nabla_\theta \mathcal{L}_{\
 
 ### 实验与分析
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_generative_models_diffusion__generative_models_and_autoencoders__b001_adacb4JTIv_AlphaFlo/figures/007_Table_1.jpg]]
 *Table 1: Class-conditional generation on ImageNet-256×256. The table reports the results for few-step diffusion/flow matching-based methods trained from scratch.$^ { \ ' } \times 2 ^ { \ ' }$ indicates that FACM requires roughly twice the computation per epoch compared to other methods. For a direct ”epochto-epoch comparison,” α-Flow-XL/2, MeanFlow-XL/2 and FACM-XL/2 are each trained for 240 epochs. α-Flow-XL/2+ is a fine-tuned version of α-Flow-XL/2, trained for extra 60 epochs with a batch size of 1024. † FID scores are evaluated with the balanced class sampling (see Appendix J).*
 
@@ -246,8 +232,6 @@ $\left\| \nabla_\theta \mathcal{L}_\alpha(\theta) - \nabla_\theta \mathcal{L}_{\
 
 ![[assets/figures/papers/iclr26_generative_models_diffusion__generative_models_and_autoencoders__b001_adacb4JTIv_AlphaFlo/figures/014_Table_3.jpg]]
 *Table 3: Configurations on ImageNet 256 256. B/2-non-cfg is our ablation and analysis model in the main text.*
-
-
 
 ## 原文 PDF
 

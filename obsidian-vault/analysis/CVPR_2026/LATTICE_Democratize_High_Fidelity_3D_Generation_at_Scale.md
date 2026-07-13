@@ -57,8 +57,6 @@ claims:
 
 **方法定位**：LATTICE在方法谱系上属于**半结构化潜在扩散生成**，连接了VecSet的高效压缩与结构化体素的空间感知。与Trellis (SLAT)等稀疏体素方法不同，VoxSet保留VecSet的交叉注意力压缩机制，仅通过体素查询注入结构；与CLAY、Michelangelo、TripoSG、Step1X-3D等VecSet基线相比，核心差异在于将无结构序列转化为可定位的半结构化序列。
 
-
-
 ### 3D生成模型的规模化困境
 
 近年来，大规模2D图像与视频扩散模型取得了令人瞩目的进展，其成功很大程度上得益于潜在空间的结构化特性——潜在向量与像素/体素网格保持空间对应关系，使得扩散生成器能够利用位置信息进行高效的去噪建模。然而，3D生成领域在追求规模化时却面临一个根本性瓶颈：**高效率的潜在表示与可定位的结构信息之间存在尖锐矛盾**。
@@ -76,8 +74,6 @@ claims:
 直观上，体素网格似乎能解决上述问题——体素天然提供规则的空间结构。但传统体素表示的高计算成本使其不适合大规模生成。本文提出一个关键洞察：**生成器所需的并非完整的稠密体素，而仅仅是测试时可用的粗粒度空间锚点**。这一观察催生了VoxSet表示：将VecSet中的点查询替换为体素查询（voxel queries），使每个潜在向量锚定在一个粗体素网格的中心。这样，VoxSet既保留了VecSet的压缩效率，又为扩散生成器提供了显式的空间位置指导，实现了“半结构化”的潜在空间。
 
 基于VoxSet，LATTICE采用两阶段流水线：第一阶段利用现成模型生成粗体素结构锚点，第二阶段在该结构引导下生成精细几何细节。这种“结构→细节”的解耦策略，使得扩散器只需专注于“放置什么内容”，而“何处放置”由已知的体素坐标提供，从而显著降低了生成难度，并展现出VecSet所不具备的**测试时缩放能力**——训练时使用6144个token的模型，在推理时可直接扩展到30720个token并持续获得质量提升（Figure 2）。
-
-
 
 ## 核心方法与创新机理
 
@@ -107,8 +103,6 @@ LATTICE将生成过程解耦为两个阶段：
 2. **VoxSet细节生成**：在粗体素结构指导下，使用整流流扩散变换器（DiT）配合RoPE位置嵌入，去噪生成VoxSet潜在向量，再通过SDF解码器重建高保真几何。这一阶段决定“放置什么内容”。
 
 这种解耦设计使得LATTICE能够以纯Transformer架构、低成本渐进训练实现强大的测试时缩放，缩小了3D生成与2D扩散模型在质量和可扩展性上的差距。消融实验（Figure 10, Section 4.3）表明，体素查询替代点查询显著减少伪影，查询抖动训练优于固定分辨率训练（Table 3），向DiT添加RoPE位置嵌入加速收敛并提升生成质量。模型缩放实验（Figure 12）进一步证实：VoxSet架构从0.6B扩展到4.5B持续产生更精细的几何，而VecSet模型则表现饱和——这直接验证了“可定位性”是3D扩散生成规模化的关键瓶颈。
-
-
 
 LATTICE 采用**两阶段粗到细（coarse-to-fine）生成流水线**，其核心是将“何处放置内容”与“放置什么内容”解耦：第一阶段生成稀疏的粗体素结构锚点，第二阶段在该结构引导下生成高保真几何细节。整个系统围绕一种新的半结构化潜在表示 **VoxSet** 构建，该表示将 3D 资产压缩为一组锚定在粗体素网格上的潜在向量，从而在扩散生成过程中显式注入空间位置信息。
 
@@ -146,15 +140,8 @@ VoxSet 是 LATTICE 的核心创新，其设计动机源于对现有 VecSet 方�
 
 > **注意**：当前流水线专注于几何生成，未包含纹理或材质生成模块。完整的 PBR 资产创建需额外步骤。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2533_https_arxiv_org_abs_2512_03052/figures/003_Figure_3.jpg]]
-*Figure 3: LATTICE system: At its core is a novel VoxSet representation, enabling scalable 3D modeling from 0.6B to 4.5B*
-
 ![[assets/figures/papers/paper_list_l2533_https_arxiv_org_abs_2512_03052/figures/005_Figure_5.jpg]]
 *Figure 5: LATTICE Model Architecture: it features a two-stage coarse-to-fine pipeline and a novel VoxSet VAE and DiT*
-
-
 
 LATTICE的核心在于将3D潜在表示从无结构的**VecSet**升级为半结构化的**VoxSet**，并围绕这一表示构建了可定位的扩散生成流水线。以下逐一拆解关键模块及其公式。
 
@@ -186,19 +173,6 @@ $$\epsilon \sim U\left[-\frac{1}{2R}, \frac{1}{2R}\right]$$
 - **第二阶段：VoxSet细节生成。** 在粗体素网格约束下，DiT+RoPE去噪生成VoxSet潜在向量，再由SDF解码器重建精细几何。该阶段确定“放置什么内容”。
 
 两阶段设计将结构定位与细节生成解耦，使得第二阶段可专注于高保真几何建模，同时支持测试时通过增加体素分辨率（token数量）来持续提升细节质量。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2533_https_arxiv_org_abs_2512_03052/figures/004_Figure_4.jpg]]
-*Figure 4: Illustrations of different latent representations and different query types*
-
-![[assets/figures/papers/paper_list_l2533_https_arxiv_org_abs_2512_03052/figures/002_Figure_2.jpg]]
-*Figure 2: Illustration of test-time scaling in our model. The model is trained with up to 6,144 tokens, but is evaluated under different token counts at test time, showing notable improvements*
-
-![[assets/figures/papers/paper_list_l2533_https_arxiv_org_abs_2512_03052/figures/006_Figure_6.jpg]]
-*Figure 6: Illustration of model/training and test scaling effects*
-
-
 
 ## 实验与关键发现
 
@@ -276,18 +250,8 @@ Figure 13展示了测试时形状token数量缩放的效果，这是VoxSet区别
 ![[assets/figures/papers/paper_list_l2533_https_arxiv_org_abs_2512_03052/figures/015_Figure_12.jpg]]
 *Figure 12: Illustration of the effect of model scaling (in parameters) on performance. VecSet models show limited improvement as parameters increase, whereas larger VoxSet models produce finer and more detailed results*
 
-![[assets/figures/papers/paper_list_l2533_https_arxiv_org_abs_2512_03052/figures/016_Figure_13.jpg]]
-*Figure 13: Illustration of the effect of test-time scaling (in shape tokens) on model performance. VecSet models exhibit limited gains as the number of tokens increases, showing early saturation. In contrast, VoxSet models consistently benefit from higher token counts, producing finer details and demonstrating stronger scaling capability. * indicates the token count used during training*
-
-![[assets/figures/papers/paper_list_l2533_https_arxiv_org_abs_2512_03052/figures/012_Figure_11.jpg]]
-*Figure 11: User study of our method against competitors showing win rate (%) across Overall, Subject, and Scene categories*
-
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2533_https_arxiv_org_abs_2512_03052/figures/008_Figure_8.jpg]]
 *Figure 8: Visual comparison of geometry generation against several state-of-the-art open-source methods*
-
-
 
 ## 定位与知识库关联
 
@@ -343,8 +307,6 @@ LATTICE的两阶段流水线（先粗结构后精细几何）与**Hunyuan3D-2**�
 4. **更本质的结构注入方式**：除RoPE位置嵌入外，是否有更本质的方法将局部结构信息注入生成过程，以进一步提升测试时缩放效果？这一问题指向3D生成表示理论的深层突破。
 
 5. **端到端一体化**：当前两阶段设计存在级联误差风险，能否将粗结构生成与精细几何生成统一为端到端的单阶段模型，同时保持VoxSet的可定位性优势？
-
-
 
 ## 原文 PDF
 

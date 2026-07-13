@@ -53,8 +53,6 @@ claims:
 
 **主要结果**：在RealSR和DRealSR等真实场景数据集上，GDPO-SR相较于基模型NAOSD在全参考指标（PSNR提升0.21–0.23 dB）和无参考感知指标（MANIQA、MUSIQ）上均取得一致提升；相较于OSEDiff等单步方法，FID降低11.36，LPIPS降低0.0246，展现出更优的纹理重建质量与感知真实感。
 
-
-
 图像超分辨率（Super-Resolution, SR）旨在从低分辨率（LR）输入重建高分辨率（HR）图像。随着Stable Diffusion等大规模预训练扩散模型的发展，基于扩散的真实图像超分辨率（Real-ISR）方法在生成逼真纹理方面取得了显著进展。然而，这类方法通常依赖多步迭代去噪，推理速度慢、计算开销大，严重制约了实际部署。
 
 为克服效率瓶颈，**一步扩散模型**（如OSEDiff）应运而生，通过将多步去噪压缩为单步推理，大幅降低了延迟。但这类确定性映射方法存在一个根本性缺陷：输出缺乏随机性与多样性，模型对同一LR输入仅能产生唯一结果。这种“一对一的映射”使得基于采样的偏好优化技术难以直接应用——强化学习（RL）算法需要多样化的候选样本来计算相对优势并指导策略更新。
@@ -62,8 +60,6 @@ claims:
 与此同时，现有的RL优化方法在ISR任务中也面临各自的局限。**Diffusion-DPO**将直接偏好优化（DPO）扩展到扩散模型，通过像素级约束实现精细的偏好对齐，但它依赖预先构建的离线偏好对，不仅数据采集成本高，而且无法利用在线生成样本的多样性进行探索。**GRPO**（Group Relative Policy Optimization）则采用群体相对优势进行在线优化，效率更高，但其仅计算全局图像似然，忽略局部细节分布，导致在ISR任务中保真度指标（如PSNR）反而退化。
 
 上述困境揭示了一个核心瓶颈：**单步生成式ISR模型缺乏可控的输出多样性，而现有RL算法在精度与效率之间难以兼顾**。这引出了一个关键研究问题：能否在保持一步推理效率的前提下，为模型注入可控的随机性，并设计一种同时利用像素级约束与群体相对优势的偏好优化策略，使模型在真实场景ISR中实现更清晰、更丰富的纹理重建？
-
-
 
 ## 核心方法与创新机理
 
@@ -119,8 +115,6 @@ $$R_i = \rho_s \sum_{f \in \mathcal{G}_{FR}} \frac{s_i^f}{|\mathcal{G}_{FR}|} + 
 
 上述四个changed slot并非孤立存在，而是构成了一个紧密耦合的创新体系：NAOSD为偏好优化提供了必要的输出多样性（没有它，GDPO将退化为对单一样本的无效优化）；不等时步策略在引入多样性的同时守住了保真度的下限（没有它，噪声注入将导致性能退化）；GDPO损失函数将群体相对优势与像素级约束结合，实现了高效且精细的偏好学习（没有它，优化信号要么依赖离线数据，要么缺乏局部细节）；ARF则为整个优化过程提供了内容自适应的奖励信号（没有它，优化方向可能偏离人类感知偏好）。这一协同效应使得GDPO-SR在无需大量离线偏好数据的情况下，在真实场景ISR中实现了更清晰、更丰富的纹理重建。
 
-
-
 GDPO-SR 的整体框架由两个核心阶段构成：**优势计算（Advantage Calculation）** 与 **策略优化（Policy Optimization）**。两个阶段协同工作，使单步生成式真实图像超分辨率模型能够在不依赖大量离线偏好数据的情况下，通过在线生成的多样化样本进行偏好学习。
 
 ### 阶段一：优势计算
@@ -173,12 +167,8 @@ $$\mathcal{L}_{GDPO} = - \mathbb{E}_{x_0 \sim \mathcal{D}, x_t \sim q(x_t|x_0)} 
 
 这种设计使得 GDPO-SR 在继承 Diffusion-DPO 像素级精度优势的同时，获得了 GRPO 在线群体优化的效率，无需预先收集大量偏好对即可在真实场景 ISR 中实现更清晰、更丰富的纹理重建。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2679_https_arxiv_org_abs_2603_16769/figures/002_Figure_2.jpg]]
 *Figure 2: The framework of GDPO, which consists of two core stages: (a) advantage calculation and (b) policy optimization. Firstly, we employ a pre-trained one-step Real-ISR model as the reference model to generate a group of diverse outputs by injecting different random noises. Subsequently, we compute the advantage A for each sample by evaluating its reward with our designed attribute-aware reward functions and converting these rewards into group-relative advantages. In the policy optimization stage, we feed these samples along with noises into both the policy model and the reference ISR model, and update the parameters of the policy ISR model by minimizing the proposed GDPO loss, steering it to fa...*
-
-
 
 ### 噪声感知一步扩散模型（NAOSD）
 
@@ -262,15 +252,8 @@ $$\mathcal{L}_{GDPO} = - \mathbb{E}_{x_0 \sim \mathcal{D}, x_t \sim q(x_t|x_0)} 
 | (8) | 群体相对优势 | 组内标准化，正优势驱动学习，负优势抑制 |
 | (9) | GDPO 损失函数 | 优势加权像素级去噪差异，联合优化保真度与感知质量 |
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2679_https_arxiv_org_abs_2603_16769/figures/003_Figure_3.jpg]]
-*Figure 3: The structure of NAOSD, which uses the*
-
 ![[assets/figures/papers/paper_list_l2679_https_arxiv_org_abs_2603_16769/figures/004_Figure_4.jpg]]
 *Figure 4: The pipeline of calculating smooth and detailed regions*
-
-
 
 ## 实验与关键发现
 
@@ -326,8 +309,6 @@ Figure 5展示了与基于SD的真实ISR方法的视觉对比。GDPO-SR在砖墙
 3. **t_add的手动调节**：生成能力的控制参数t_add需要根据场景手动调整以获得保真度与真实感的最佳平衡，缺乏自适应机制。
 4. **退化泛化性**：当前仅在有限种类的真实退化场景上验证，对更复杂、更未见过的退化的泛化能力有待进一步研究。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2679_https_arxiv_org_abs_2603_16769/figures/007_Table_3.jpg]]
 *Table 3: Quantitative comparison with DP2O-SR on real-world datasets. The best results are highlighted in red*
 
@@ -336,23 +317,6 @@ Figure 5展示了与基于SD的真实ISR方法的视觉对比。GDPO-SR在砖墙
 
 ![[assets/figures/papers/paper_list_l2679_https_arxiv_org_abs_2603_16769/figures/011_Table_6.jpg]]
 *Table 6: Ablation studies on ARF on the RealSR dataset*
-
-![[assets/figures/papers/paper_list_l2679_https_arxiv_org_abs_2603_16769/figures/013_Table_7.jpg]]
-*Table 7: Ablation studies on Group Size on the RealSR dataset*
-
-![[assets/figures/papers/paper_list_l2679_https_arxiv_org_abs_2603_16769/figures/009_Table_4.jpg]]
-*Table 4: Comparison of mode size, running-time and FLOPs*
-
-![[assets/figures/papers/paper_list_l2679_https_arxiv_org_abs_2603_16769/figures/016_Table_9.jpg]]
-*Table 9: Ablation studies on FR metrics on the RealSR dataset*
-
-![[assets/figures/papers/paper_list_l2679_https_arxiv_org_abs_2603_16769/figures/017_Table_10.jpg]]
-*Table 10: The impact of*
-
-![[assets/figures/papers/paper_list_l2679_https_arxiv_org_abs_2603_16769/figures/018_Table_11.jpg]]
-*Table 11: Ablation study on sample generation methods on the Real-ISR dataset. Arrows denote if higher (↑) or lower (↓) values represent better performance*
-
-
 
 ## 定位与知识库关联
 
@@ -407,8 +371,6 @@ GDPO-SR的基模型NAOSD本身就是一个关键创新。传统单步扩散模�
 3. **样本生成效率的提升。** 当前通过注入不同随机噪声生成群体样本，是否存在更高效的多样性生成策略？例如，在潜在空间中进行结构化扰动或学习多样性先验，可能进一步降低计算开销。
 
 4. **更大规模预训练模型的潜力。** 论文提及利用更大规模、更先进的预训练扩散模型（如FLUX）可能进一步突破性能上限。这涉及一个更根本的问题：更强的生成先验能否降低对偏好优化的依赖，还是两者之间存在互补关系？
-
-
 
 ## 原文 PDF
 

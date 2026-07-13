@@ -59,8 +59,6 @@ claims:
 
 SVSM在RealEstate10K和DL3DV上均取得新SOTA，且推理速度显著优于LVSM，为视图合成Transformer的高效缩放提供了新范式。
 
-
-
 ### 问题背景：视图合成中的计算瓶颈
 
 新视图合成（Novel View Synthesis, NVS）的目标是从一组已知相机姿态的上下文图像 $\mathfrak{C}$ 中，渲染出任意目标视角下的场景外观：
@@ -97,8 +95,6 @@ LVSM decoder-only架构虽然在双目重建（$V_C=2$）上达到了领先性�
 此外，针对多视图场景（$V_C > 2$），本文进一步引入**PRoPE（Projected Rotary Position Embedding）相对相机注意力机制**，通过在注意力计算前将特征规范化到目标坐标系，确保相机位姿信息在深层编码器-解码器瓶颈中不丢失，从而使SVSM在多视图设置中恢复与LVSM等同的缩放能力。
 
 Figure 1 直观展示了核心动机的实现结果：在RealEstate10K数据集上，SVSM的Pareto前沿相比LVSM左移约3倍——即在相同渲染质量下，所需训练计算量仅为原来的1/3，同时保持几乎相同的缩放曲线斜率与曲率。
-
-
 
 ## 核心方法与创新机理
 
@@ -138,8 +134,6 @@ encoder-decoder架构在双目（$V_C=2$）设置下表现优异，但在多视�
 ### 辅助创新：深度稳定的残差缩放
 
 为支持不同深度模型的公平缩放比较，SVSM在每个残差分支上乘以 $1/\sqrt{L}$（$L$ 为层数），以抑制深层网络的梯度/激活方差膨胀。该设计并非性能提升的关键来源，但保证了缩放实验中不同深度配置的训练稳定性，是缩放定律可靠拟合的技术前提。
-
-
 
 本文提出**可缩放视图合成模型（Scalable View Synthesis Model, SVSM）**，一种面向新视图合成（Novel View Synthesis, NVS）的编码器-解码器Transformer架构。其核心设计目标是在保持与现有decoder-only方法相同缩放行为的前提下，显著降低训练和推理的计算成本。
 
@@ -185,12 +179,8 @@ MLP计算量从乘积关系降为加和关系，注意力计算量也从二次�
 
 训练损失为MSE与感知损失的加权和：$\mathcal{L} = \mathbf{MSE}(I_T, \tilde{I}_T) + \lambda \cdot \mathbf{Perceptual}(I_T, \tilde{I}_T)$，其中 $\lambda = 0.5$。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2586_https_arxiv_org_abs_2602_21341/figures/002_Figure_2.jpg]]
 *Figure 2: Architectures of the current SOTA, the decoder-only LVSM [10] (a) and SVSM (ours, b). Our cross-attention based decoder enables parallel rendering of multiple target views after a single scene encoding. Each target view is decoded independently given the shared scene representation, but the cross-attention allows these independent decodings to be executed in parallel*
-
-
 
 ### 3.1 新视图合成问题的形式化
 
@@ -260,12 +250,8 @@ $$\mathcal{L} = \mathbf{MSE}(I_T, \tilde{I}_T) + \lambda \cdot \mathbf{Perceptua
 
 **公式体系小结**：SVSM 的核心创新不在于引入新的数学形式，而在于通过架构重构（encoder-decoder + 交叉注意力）改变了计算复杂度对 $V_T$ 的依赖关系——从 LVSM 的乘积耦合 $\propto V_T(V_C+1)$ 降为加法耦合 $\propto V_T + V_C$，从而释放了通过调节 $V_T$ 实现计算最优缩放的自由度。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2586_https_arxiv_org_abs_2602_21341/figures/009_Figure_6.jpg]]
 *Figure 6: Multiview PRoPE. We find that multiview projective RoPE embeddings [13, 14, 18] are critical for our model to scale with compute and data in the multiview setting*
-
-
 
 ## 实验与关键发现
 
@@ -313,19 +299,8 @@ $$\mathcal{L} = \mathbf{MSE}(I_T, \tilde{I}_T) + \lambda \cdot \mathbf{Perceptua
 
 当前缩放定律建立在相对较小的姿态标注数据集上，训练样本包含场景重复，尚不清楚在更大规模、无重复数据上的缩放行为是否会改变。未对编码器与解码器的参数分配比例进行详尽研究，不同上下文视图数下可能存在更优的编解码器宽度/深度配置。主要测试于室内/室外静态场景，未在动态场景或需要处理反射、透明等复杂效果的场景上验证缩放定律。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2586_https_arxiv_org_abs_2602_21341/figures/001_Figure_1.jpg]]
-*Figure 1: Scaling Laws for View Synthesis Transformers. Evaluated on RealEstate10K [34], our SVSM exhibits a 3× more compute-optimal Pareto frontier than LVSM while retaining the same scaling behavior (similar slope and curvature everywhere)*
-
-![[assets/figures/papers/paper_list_l2586_https_arxiv_org_abs_2602_21341/figures/003_Figure_3.jpg]]
-*Figure 3: Effective Batch Size. Training loss (smoothed with a rolling-average) and test PSNR measured throughout training across various paired B and*
-
 ![[assets/figures/papers/paper_list_l2586_https_arxiv_org_abs_2602_21341/figures/005_Table_1.jpg]]
 *Table 1: Stereo*
-
-![[assets/figures/papers/paper_list_l2586_https_arxiv_org_abs_2602_21341/figures/010_Figure_7.jpg]]
-*Figure 7: Multiview Scaling Behavior. Conducted on DL3DV [15]. (a) For*
 
 ![[assets/figures/papers/paper_list_l2586_https_arxiv_org_abs_2602_21341/figures/011_Table_4.jpg]]
 *Table 4: Multiview*
@@ -335,17 +310,6 @@ $$\mathcal{L} = \mathbf{MSE}(I_T, \tilde{I}_T) + \lambda \cdot \mathbf{Perceptua
 
 ![[assets/figures/papers/paper_list_l2586_https_arxiv_org_abs_2602_21341/figures/007_Table_3.jpg]]
 *Table 3: Parameter and Data Scaling Coefficients. As regressed from the plots in Fig. 4, we find power law coefficients for scaling models and data with respect to compute*
-
-![[assets/figures/papers/paper_list_l2586_https_arxiv_org_abs_2602_21341/figures/013_Figure_9.jpg]]
-*Figure 9: Fixed-size Latent Scaling Experiments. Conducted on Objaverse [4]. (a) For VC =8, SVSM and LVSM decoder-only scale equally while SVSM’s frontier is shifted by 5× on the compute axis. (b) When a fixed latent bottleneck is used, SVSM-fixed and LVSM encoder-decoder scale equally, but significantly worse than the unbottlenecked designs. SVSM again maintains a superior pareto frontier*
-
-![[assets/figures/papers/paper_list_l2586_https_arxiv_org_abs_2602_21341/figures/004_Figure_4.jpg]]
-*Figure 4: Data and Model Scaling Plots. While our model (blue) is optimal when sufficient data is available, decoderonly LVSM (red) performs better with less data. The Pareto frontier analysis shows that our model is more data-hungry. Our model is also less parameter-efficient, although the gap closes as we increase the training compute. However, with sufficient data and compute, our model (blue) is overall superior in terms of training compute-optimality and rendering speed*
-
-![[assets/figures/papers/paper_list_l2586_https_arxiv_org_abs_2602_21341/figures/017_Figure_10.jpg]]
-*Figure 10: Linear Power Scaling Laws. We fit scaling laws onto sections of the Pareto-frontiers of the model families. We see that both models have approximately the same slope in each of their corresponding sections, indicating equal scaling*
-
-
 
 ## 定位与知识库关联
 
@@ -424,8 +388,6 @@ SVSM的核心贡献在于将视图合成Transformer的缩放问题从“如何�
 | 缩放系数 | $a \neq b$ | $a \approx b$ |
 
 该工作为视图合成Transformer的缩放研究建立了可复现的基准和理论框架，但其缩放定律的普适性——尤其是在更大规模、无重复数据上的表现——仍需后续工作验证。
-
-
 
 ## 原文 PDF
 

@@ -314,25 +314,17 @@ LGD 的核心动机在于现有蒸馏方法存在严重信息冗余。为量化�
 3. **代理分类器域差异。** 可学习性引导依赖代理分类器的梯度信号，若代理分类器与扩散模型存在域差异，可能影响生成质量。论文未对此进行系统分析。
 4. **超参数敏感性缺失。** 关键超参数（如可学习性权重 ω、引导强度 λ、偏离引导强度 γ）的敏感性分析置于补充材料，公开版本中缺少可直接引用的定量结论。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2689_https_openaccess_thecvf_com_content_CVPR2026_html_Chan_Santiago_Learnabi/figures/004_Table_1.jpg]]
 *Table 1: Comparison across distilled IPC budgets on Nette and Woof evaluated on different network architectures. Mean±std accuracy; best per row in bold. IGD, MGD3, and LGD used a pretrained DiT as the diffusion backbone*
 
 ![[assets/figures/papers/paper_list_l2689_https_openaccess_thecvf_com_content_CVPR2026_html_Chan_Santiago_Learnabi/figures/007_Table_2.jpg]]
 *Table 2: ImageNet-1K: Performance comparison over ResNet-18 with state-of-the-art dataset distillation methods*
 
-![[assets/figures/papers/paper_list_l2689_https_openaccess_thecvf_com_content_CVPR2026_html_Chan_Santiago_Learnabi/figures/005_Figure_4.jpg]]
-*Figure 4: Incremental training dynamics of DiT and our method. (a-b) show the training loss across successive data increments*
-
 ![[assets/figures/papers/paper_list_l2689_https_openaccess_thecvf_com_content_CVPR2026_html_Chan_Santiago_Learnabi/figures/008_Table_3.jpg]]
 *Table 3: Cross-Architecture Evaluation on ImageNette*
 
 ![[assets/figures/papers/paper_list_l2689_https_openaccess_thecvf_com_content_CVPR2026_html_Chan_Santiago_Learnabi/figures/006_Figure_5.jpg]]
 *Figure 5: Learning-dynamics visualization of original and distilled samples. Each point shows a sample’s mean and standard deviation of ground-truth class probability across training (50 epochs). Top-left points are easy (high*
-
-![[assets/figures/papers/paper_list_l2689_https_openaccess_thecvf_com_content_CVPR2026_html_Chan_Santiago_Learnabi/figures/010_Figure_6.jpg]]
-*Figure 6: In-distribution and learning-dynamics analysis of distilled datasets. Each point represents a sample described by its groundtruth (GT) class probability from the reference model (x-axis, measuring in-distribution likelihood*
 
 ## 定位与知识库关联
 

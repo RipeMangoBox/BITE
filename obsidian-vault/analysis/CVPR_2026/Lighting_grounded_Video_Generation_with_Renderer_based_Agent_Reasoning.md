@@ -51,8 +51,6 @@ claims:
 
 方法谱系上，LiVER 延续了 **CameraCtrl**（He et al., ICLR 2025）等工作的可控视频生成路线，但将条件模态从文本描述和2D轨迹拓展为**光照约束的场景代理**，并采用三阶段训练策略（条件通路训练→联合LoRA微调→光照多样性扩展）来稳定收敛。与 **VideoFrom3D**（Kim et al., SIGGRAPH Asia 2025）等3D场景视频生成方法相比，LiVER 的差异化在于显式引入基于物理的渲染通道，而非仅依赖图像-视频扩散的互补先验。在知识库定位上，该方法处于3D感知视频生成与物理渲染的交叉地带，为可控视频合成提供了新的光照维度。
 
-
-
 可控视频生成旨在根据用户提供的条件信号（如文本描述、相机轨迹、边界框等）合成视觉上真实且结构上一致的视频序列。近年来，以扩散模型（Diffusion Models）为核心的视频生成方法取得了显著进展，能够生成具有丰富语义和时序连贯性的视频内容。然而，当用户需求从“生成一段视频”升级为“精确控制场景的物理属性”时，现有方法暴露出一个根本性瓶颈：**光照建模的缺失**。
 
 现有可控视频生成方法主要关注两个维度的控制——**场景布局**与**相机运动**。例如，**CameraCtrl**（He et al., ICLR 2025）和**MotionCtrl**（Wang et al., SIGGRAPH 2024）通过注入2D轨迹或相机参数来实现对视频中对象位置和视角变化的控制；**VideoFrom3D**（Kim et al., SIGGRAPH Asia 2025）则利用3D场景表示来提供几何基础的引导。这些方法虽然在一定程度上实现了对“物体在哪里”和“相机怎么动”的控制，但都隐含地忽略了一个关键问题：**光照如何影响场景的外观**。
@@ -62,8 +60,6 @@ claims:
 本文的核心动机源于一个关键洞察：**光照应当被建模为场景的统一物理属性之一，而非视频生成的事后修饰**。如果将光照分解为可渲染的2D通道（漫反射、粗糙GGX、光滑GGX），并将其作为显式条件信号注入视频扩散模型，就有可能在保持预训练生成先验的同时，实现对光照行为的精确操控。这一思路将光照控制从“隐式学习”转变为“显式引导”，使得模型能够理解材质响应、阴影方向和反射强度等物理线索，从而生成光照真实、布局忠实、相机轨迹精确对齐的视频序列。
 
 基于上述动机，本文提出**LiVER（Lighting-grounded Video Generation with Renderer-based Agent Reasoning）**，一个基于渲染器代理推理的光照约束视频生成框架。LiVER通过三个核心设计填补了现有方法的缺口：（1）引入渲染器代理（Renderer-based Agent），从文本提示中推理出3D场景、HDR光照环境和相机轨迹；（2）利用基于物理的渲染器生成光照约束的场景代理（Scene Proxy），包含漫反射、粗糙GGX和光滑GGX三个2D通道；（3）通过轻量级编码器和适配器模块，将这些物理线索注入预训练视频扩散模型，实现场景布局、相机轨迹与物理光照的解耦控制。
-
-
 
 ## 核心方法与创新机理
 
@@ -96,8 +92,6 @@ $$z' = z + \alpha \cdot z^y$$
 3. **光照多样性扩展**（Lighting Diversity Expansion）：在合成数据（LiVER-Syn）上进一步训练，增强模型对不同光照条件的泛化能力。
 
 消融实验证实，跳过第一阶段直接从联合训练开始会导致输出几乎静止、质量严重退化；仅用真实数据而不用合成数据则会产生错误且均匀的照明效果。这表明分阶段训练策略不仅是工程优化，更是实现光照解耦控制的必要条件——模型需要先“学会看光照”，再“学会用光照”，最后“学会适应不同光照”。
-
-
 
 LiVER 的整体设计围绕一个核心洞察展开：**将光照建模为场景的统一物理属性**，并通过渲染器代理将3D场景的几何、材质与光照信息压缩为2D渲染通道，作为条件信号注入预训练视频扩散模型，从而实现对场景布局、相机轨迹与物理光照的解耦控制。
 
@@ -138,12 +132,8 @@ $$z' = z + \alpha \cdot z^{y}$$
 
 LiVER 处于**3D感知可控视频生成**与**物理光照建模**的交叉点。相较于仅依赖2D轨迹或边界框的方法（如 **CameraCtrl** (He et al., ICLR 2025)、**MotionCtrl** (Wang et al., SIGGRAPH 2024)），LiVER 通过显式3D场景代理引入了几何精确的布局与相机控制；相较于 **VideoFrom3D** (Kim et al., SIGGRAPH Asia 2025) 等3D场景视频生成方法，LiVER 进一步将光照从隐式生成结果提升为显式可控的物理条件，实现了对阴影、反射和环境光遮蔽等光照效果的独立操控。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2537_https_arxiv_org_abs_2604_07966/figures/001_Figure_1.jpg]]
 *Figure 1: Overall framework. (1) A renderer-based agent produces a coarse geometric layout, camera trajectory, and a High Dynamic Range (HDR) environment map. (2) Physically-based rendering generates a lighting-grounded scene proxy containing diffuse, rough, and glossy materials with shading signals. (3) These physical cues are injected into a video diffusion model to synthesize photorealistic sequences with accurate lighting behavior, faithful scene layout, and precisely aligned camera trajectory*
-
-
 
 LiVER 的核心设计思路是将物理光照建模为显式条件信号，通过渲染器代理（Renderer-based Agent）将 3D 场景属性转换为 2D 光照通道，再注入预训练视频扩散模型，实现对场景布局、相机轨迹和光照行为的解耦控制。整个流水线由四个关键模块构成。
 
@@ -181,15 +171,11 @@ $$
 
 为确保稳定收敛，LiVER 采用分阶段训练方案：(1) **Conditional Pathway Training**：仅训练代理编码器和条件编码器，冻结扩散骨干；(2) **Joint LoRA Fine-tuning**：联合微调 LoRA 层与条件模块；(3) **Lighting Diversity Expansion**：在合成数据（LiVER-Syn）上扩展光照多样性。消融实验表明，直接从联合训练开始会导致输出几乎静止、质量严重退化，验证了分阶段策略的必要性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2537_https_arxiv_org_abs_2604_07966/figures/003_Figure_3.jpg]]
 *Figure 3: Pipeline of LiVER. Given a text prompt T , our Scene Agent parses object categories, spatial relations, and coarse geometry to construct an initial 3D scene. The Camera Agent infers a camera trajectory consistent with the described viewpoint and scene semantics, producing the camera condition*
 
 ![[assets/figures/papers/paper_list_l2537_https_arxiv_org_abs_2604_07966/figures/002_Figure_2.jpg]]
 *Figure 2: Our data annotation pipeline for LiVER-Real. We process each video to reconstruct its 3D geometry and estimate its HDR environment map. These are then used to render three pixel-aligned lighting representations (Diffuse, Glossy GGX, Rough GGX), which are concatenated to form the final conditioning input*
-
-
 
 ## 实验与关键发现
 
@@ -233,24 +219,14 @@ LiVER 在自建数据集 **LiVERSet** 上进行评估，该数据集包含超过
 - **动态光照扩展。** 方法目前处理静态 HDR 环境图，将其扩展到动态光照效果（如移动光源、时变天空模型）将显著提升应用范围，但需解决时序光照一致性和计算开销的平衡问题。
 - **多物体交互。** 在保持高质量光照控制的同时支持更复杂的多物体物理交互（如碰撞、堆叠），需要更精细的场景图建模和渲染策略，这是从“场景漫游”向“场景交互”演进的核心瓶颈。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2537_https_arxiv_org_abs_2604_07966/figures/004_Table_1.jpg]]
 *Table 1: Quantitative comparison with state-of-the-art methods. Our method consistently outperforms the baselines. †Only compare first 16 frames*
-
-![[assets/figures/papers/paper_list_l2537_https_arxiv_org_abs_2604_07966/figures/008_Table_2.jpg]]
-*Table 2: Percentage of samples in which each method is selected as the most preferred solution*
 
 ![[assets/figures/papers/paper_list_l2537_https_arxiv_org_abs_2604_07966/figures/005_Figure_4.jpg]]
 *Figure 4: Qualitative comparison with state-of-the-art controllable video generation models. In each block, each row corresponds to one video, and frames are arranged from left to right in temporal order. The top row shows the results of each comparison method, followed by ours, with the ground truth (GT) shown in the final row*
 
-![[assets/figures/papers/paper_list_l2537_https_arxiv_org_abs_2604_07966/figures/006_Figure_5.jpg]]
-*Figure 5: By manipulating the HDR environment map, our model produces continuous and physically consistent lighting variations. We show the diffuse, glossy, and rough GGX components of the scene proxy (top three rows) and the corresponding synthesized outputs (bottom). Lighting changes are reflected in shading and reflections while geometry and materials remain stable*
-
 ![[assets/figures/papers/paper_list_l2537_https_arxiv_org_abs_2604_07966/figures/007_Figure_6.jpg]]
 *Figure 6: Qualitative results of our ablation study*
-
-
 
 ## 定位与知识库关联
 
@@ -289,8 +265,6 @@ LiVER 开辟了物理光照约束视频生成这一新方向，同时留下了�
 **泛化至非刚性物体与室外场景**。当前实验主要集中于刚性物体的室内/产品级场景。方法能否泛化至包含非刚性变形（如布料、流体）和复杂室外光照（如天空模型、体积光散射）的场景，仍需验证。
 
 **计算效率优化**。三阶段训练策略（Conditional Pathway Training → Joint LoRA Fine-tuning → Lighting Diversity Expansion）虽然对稳定收敛至关重要（消融实验表明直接从联合训练开始会导致输出几乎静止），但增加了训练复杂度。能否通过更高效的训练策略或架构设计减少阶段数，同时保持生成质量？
-
-
 
 ## 原文 PDF
 

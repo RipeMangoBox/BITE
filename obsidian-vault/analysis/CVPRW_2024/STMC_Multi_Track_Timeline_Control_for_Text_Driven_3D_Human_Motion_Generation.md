@@ -139,8 +139,6 @@ STMC在去噪过程的每一步执行以下模块化操作（参见Figure 3）�
 - **空间组合**：单区间内多个文本（Figure 2c）
 - **多轨时间线控制**：任意重叠区间的多文本集合（Figure 2d），是前三者的泛化形式
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2401_08559/figures/002_Figure_2.jpg]]
 *Figure 2: Text-driven motion synthesis tasks: Our framework generalizes (a) traditional text-to-motion synthesis given one text and one duration, (b) temporal composition given a sequence of texts for non-overlapping intervals, and (c) spatial composition given a set of texts for a single interval. (d) Multi-track timeline control uses a set of texts for arbitrary intervals, allowing fine-grained control over the timings of several complex actions*
 
@@ -253,8 +251,6 @@ MDM-SMPL作为STMC的推荐去噪模型，采用SMPL pose参数（6D旋转表示
 4. **轨道扩展瓶颈**：现有验证主要限于两轨时间线，扩展到更多轨道时组合复杂度急剧上升，当前方法尚未在该场景下充分验证。
 
 5. **长时序泛化未验证**：实验仅在较短时长（<20秒）和3个提示的简单时间线上进行，长时序和密集组合场景的泛化性仍是开放问题。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2401_08559/figures/007_Figure.jpg]]
 *Figure: Resolving unassigned timeframes SINC heuristic*

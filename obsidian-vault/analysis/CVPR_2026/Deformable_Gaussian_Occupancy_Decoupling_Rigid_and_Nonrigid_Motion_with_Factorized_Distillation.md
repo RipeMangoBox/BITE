@@ -53,8 +53,6 @@ claims:
 
 **局限与展望**：当前方法仅在训练时利用短时序（最多 8 帧），推理时依赖单帧，可能难以捕捉更长时序依赖；性能依赖于外部模型（Grounded-SAM、Metric3D、VGGT）生成的伪标签和特征质量。未来可探索更长序列、多模态输入及大规模预训练以提升四维泛化能力。
 
-
-
 三维占用预测旨在从多视角图像中恢复场景的完整三维几何与语义表示，是自动驾驶感知系统的核心任务之一。该任务要求模型对三维空间中的每个体素同时预测其是否被占据以及所属语义类别，为下游的规划与控制提供稠密的环境理解。
 
 ### 现有方法的瓶颈
@@ -76,8 +74,6 @@ claims:
 2. **因子化四维特征蒸馏（Factorized Feature Distillation, FFD）**：从VGGT基础模型中分解蒸馏跨相机和跨帧的时空特征，将多视角一致性和时序连续性注入高斯特征空间，为变形提供稳定的先验引导。
 
 通过上述设计，DeGO在不增加推理成本的前提下（推理时仅需单帧多视图图像），在Occ3D-NuScenes数据集上实现了弱监督设定下的最优性能：相比先前最佳方法**GaussianFlowOcc**，整体mIoU绝对提升1.78（相对提升10.9%），人体相关指标HCM提升13.5%。
-
-
 
 ## 核心方法与创新机理
 
@@ -123,8 +119,6 @@ DeGO 的第三个关键设计在于**训练与推理的时序不对称性**：�
 解耦变形与因子化蒸馏并非独立运作，而是形成正向反馈循环：VGGT 蒸馏提供的四维时空特征为变形模块提供了稳定的运动先验，使刚性掩码能够更准确地判断每个高斯应采用的运动模式；反过来，准确的运动解耦使蒸馏特征的对齐更加精准，减少了静态背景中的噪声干扰。Table 2 的消融实验完整展示了这一协同效应：基线 → +DGD（+43.4%）→ +FFD（+4.4%），两个模块的叠加带来了远超各自独立贡献的总体性能提升。
 
 在主实验（Table 1）中，DeGO 在 Occ3D-NuScenes 上达到 **18.05 mIoU**，相比先前最佳弱监督方法 GaussianFlow* 绝对提升 **1.78**（相对提升 10.9%），在人体相关指标 HCM 上更是取得 **13.5%** 的相对提升，验证了运动解耦与四维蒸馏在安全关键场景中的实际价值。
-
-
 
 DeGO 构建了一个统一的**可变形高斯占用预测框架**，其核心设计在于将动态三维场景的建模分解为两个协同模块：**解耦高斯变形**（Decoupled Gaussian Deformation，DGD）与**因子化特征蒸馏**（Factorized Feature Distillation，FFD）。整个 pipeline 的输入输出流如图2所示（Figure 2）。
 
@@ -175,13 +169,6 @@ $$p_{\mathrm{occ}}(\mathbf{x}, t) = \sigma(\mathbf{w}_{\mathrm{occ}} \mathbf{f}_
 训练阶段利用多帧（最多 8 帧）增强时间一致性，而推理时仅需单帧多视图图像，不引入额外时间输入，保证了与现有弱监督方法同等的推理效率。总损失函数组合了语义损失、深度损失、蒸馏损失和变形正则化损失（含 L2 正则项 $\mathcal{L}_{\mathrm{reg}}$ 与掩码二值化项 $\mathcal{L}_{\mathrm{mask}}$），实现端到端的弱监督优化。
 
 > **注意**：蒸馏应用于高斯 Transformer 层（而非图像编码器）效果最佳，投影维度 32 为最优配置（Table 6, Table 7）。跨相机与跨帧注意力在蒸馏中相互增强，共同贡献了 4.4% 的 mIoU 提升（Table 5）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_Deformable_Gaussia/figures/001_Figure_1.jpg]]
-*Figure 1: Overview of our deformable Gaussian occupancy framework. We enable Gaussians to adaptively model rigid and nonrigid motion. Deformable Gaussians evolve through both nonrigid deformation and offsets, while rigid Gaussians use only offset updates. Foundation-model distillation provides cross-camera and cross-frame guidance, yielding more accurate occupancy prediction via temporal consistency*
-
-
 
 ### 问题形式化
 
@@ -242,8 +229,6 @@ $$\mathcal{L}_{\mathrm{distil}} = \frac{1}{|\mathcal{V}||\Omega|} \sum_{v \in \m
 $$\mathcal{L}_{\mathrm{seg}} = \frac{1}{|\mathcal{V}||\Omega|} \sum_{v \in \mathcal{V}} \sum_{u \in \Omega} \mathrm{CE}\big(\hat{y}_v(u), y_v^{\mathrm{pseudo}}(u)\big)$$
 
 深度损失使用 Metric3D 生成的伪深度标签。值得注意的是，蒸馏损失应用于高斯 Transformer 特征而非图像编码器特征时效果最佳，投影维度 32 为最优配置（Table 6, Table 7）。
-
-
 
 ## 实验与关键发现
 
@@ -328,24 +313,11 @@ Table 6和Table 7进一步优化蒸馏配置：
 ![[assets/figures/papers/paper_list_l2_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_Deformable_Gaussia/figures/004_Table_2.jpg]]
 *Table 2: Ablation of the deformation module and different foundation-model distillation settings*
 
-![[assets/figures/papers/paper_list_l2_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_Deformable_Gaussia/figures/005_Table_3.jpg]]
-*Table 3: Impact of the number of deformed frames*
-
-![[assets/figures/papers/paper_list_l2_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_Deformable_Gaussia/figures/006_Table_6.jpg]]
-*Table 6: Impact of different teacher layers on distillation*
-
 ![[assets/figures/papers/paper_list_l2_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_Deformable_Gaussia/figures/007_Table_4.jpg]]
 *Table 4: Ablation on different parameters in deformation module*
 
 ![[assets/figures/papers/paper_list_l2_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_Deformable_Gaussia/figures/009_Table_5.jpg]]
 *Table 5: Ablation on cross-camera and cross-frame distillation*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_Deformable_Gaussia/figures/008_Table_7.jpg]]
-*Table 7: Ablation on the projection dimension in the teacherstudent alignment module*
-
-
 
 ## 定位与知识库关联
 
@@ -387,8 +359,6 @@ DeGO 在现有高斯占用框架上改动了三个核心槽位：
 3. **在线学习与教师解耦**：蒸馏过程依赖 VGGT 教师的离线推理，计算开销较大。如何避免教师模型的计算瓶颈，实现轻量化的在线蒸馏或自蒸馏，是将方法推向实时自动驾驶系统的关键挑战。
 
 4. **刚性掩码的可解释性**：当前刚性掩码通过二值化损失约束趋近 0/1，但其学习到的刚性与非刚性区域划分是否与人类语义一致（例如，是否真正将行人归为非刚性、车辆归为刚性），尚未进行定性分析。这一可解释性问题对于安全关键应用尤为重要。
-
-
 
 ## 原文 PDF
 

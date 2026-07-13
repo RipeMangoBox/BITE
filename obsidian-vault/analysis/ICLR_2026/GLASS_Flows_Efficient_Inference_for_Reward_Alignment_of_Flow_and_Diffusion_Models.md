@@ -72,8 +72,6 @@ GLASS 流可无缝集成到任何基于 SDE 的推理时对齐算法中，无需
 
 GLASS 流在方法谱系中处于**高效 ODE 采样**与**随机 SDE 采样**的交汇点。它概括了 DDIM（当内部步数 $M=1$ 时退化为 DDIM），同时通过可调节的 $\rho$ 参数扩展了转移核空间。与需要重新训练或微调的奖励对齐方法不同，GLASS 流是一种纯推理时技术，可即插即用于任何预训练的流匹配或扩散模型。
 
-
-
 ### 流匹配与扩散模型的推理瓶颈
 
 流匹配（Flow Matching）和扩散模型已成为生成式建模的核心范式，其标准推理过程可概括为：从高斯噪声 $X_0 \sim p_0$ 出发，沿学到的边际向量场 $u_t(x_t)$ 模拟常微分方程（ODE）$\frac{\mathrm{d}}{\mathrm{d}t} X_t = u_t(X_t)$，最终得到 $X_1 \sim p_{\text{data}}$。该过程是**确定性的**——给定初始噪声，ODE 采样产生唯一输出。
@@ -106,8 +104,6 @@ $$p^{r}(z) = \frac{1}{Z^{r}} p_{\text{data}}(z) \exp(r(z))$$
 GLASS 流的解决方案源于一个理论洞察：在高斯条件概率路径 $p_t(x_t|z) = \mathcal{N}(x_t; \alpha_t z, \sigma_t^2 I_d)$ 的框架下，转移核 $p_{t'|t}$ 的采样可以分解为两个相关高斯测量的条件期望计算。通过引入**充分统计量** $S(\mathbf{x}) = \frac{\mu^T \Sigma^{-1} \mathbf{x}}{\mu^T \Sigma^{-1} \mu}$，可以将两个相关测量 $(x_t, \bar{x}_s)$ 合成为一个等效测量，从而利用预训练流匹配模型的去噪器 $D_t(x)$ 来计算条件期望，**无需任何额外训练**。
 
 这一洞察使得在 ODE 内部构建一个“流匹配子模型”成为可能：该子模型以随机高斯噪声为初始条件（保证随机性），通过一个精心构造的 GLASS 速度场 $u_s(\bar{x}_s | x_t, t)$ 进行演化（保证效率），最终输出转移样本 $x_{t'}$。通过引入可调节的相关性参数 $\rho$，GLASS 流还超越了 DDPM 采样的固定相关性结构，为不同任务提供了灵活的探索空间。
-
-
 
 ## 核心方法与创新机理
 
@@ -147,11 +143,6 @@ $$u_s(\bar{x}_s | x_t, t) = w_1(s) \bar{x}_s + w_2(s) D_{\mu(s),\Sigma(s)}(x_t, 
 ### 创新总结
 
 GLASS流通过三个环环相扣的创新——可调节转移核、内部ODE流匹配、充分统计量变换——实现了对现有方法的系统性改进：用预训练ODE模型高效采样SDE转移，消除了效率与随机性之间的根本权衡。该方法可无缝集成到任何基于SDE的推理时对齐算法中（如序贯蒙特卡洛、价值函数估计、奖励引导），无需额外训练成本。
-
-
-
-![[assets/figures/papers/paper_list_l32_https_openreview_net_forum_id_vH7OAPZ2dR/figures/001_Figure_1.jpg]]
-*Figure 1: GLASS Flows overview. Left: Sampling transition $p _ { t ^ { \prime } | t } ( x _ { t ^ { \prime } } | x _ { t }$ ) with GLASS Flows. Initial Gaussian samples $\bar { x } _ { s = 0 }$ are evolved from inner time s = 0 to s = 1 via the velocity field $u _ { s } ( \bar { x } _ { s } | x _ { t }$ , t ) that is obtained by transforming a pre-trained flow matching model. Right: Reward alignment with GLASS Flows improves text-image alignment
 
 GLASS流（GLASS Flows）的核心目标是为预训练流匹配和扩散模型提供一种高效的转移采样方法，以替代传统基于随机微分方程（SDE）的马尔可夫转移采样。其整体框架围绕一个关键思想展开：**通过构造一个内部流匹配模型，利用确定性常微分方程（ODE）模拟随机转移，从而消除ODE的效率与SDE的随机性之间的传统权衡**。
 
@@ -204,8 +195,6 @@ GLASS流可以无缝嵌入三类推理时奖励对齐方法，仅需将原有的
 - **奖励引导**：在GLASS速度场上添加适当缩放的奖励梯度项，实现无需重新训练的奖励引导。
 
 所有应用均无需额外训练，仅使用预训练模型的前向传播，且总神经网络评估次数（NFEs）与基线方法保持公平可比。
-
-
 
 ### 方法总览
 
@@ -282,8 +271,6 @@ GLASS流通过三个接口服务于推理时奖励对齐：
 - **价值函数估计**：用GLASS流从后验 $p_{1|t}$ 采样以估计 $V_t(x_t) = \log \mathbb{E}_{z \sim p_{1|t}(\cdot|x_t)}[\exp(r(z))]$
 - **奖励引导**：在GLASS速度场上叠加奖励函数的梯度项，实现引导采样
 
-
-
 ## 实验与关键发现
 
 ### 核心性能验证
@@ -292,16 +279,7 @@ GLASS流在三个关键维度上展现了相对于现有方法的显著优势：
 
 **低步数下的采样效率优势**。在后验采样实验中，GLASS流在低模拟步数（M）下相比DDPM采样（SDE）显著降低了FID（Figure 2 Middle，Figure 4）。当时间步t较小时（如t=0.05、0.15），后验分布不确定性大，DDPM采样需要大量步数才能获得合理重建，而GLASS流在M=2或M=4时即可实现低FID（Figure 11，Figure 12）。当t接近1时（如t=0.7），后验不确定性低，两种方法均表现良好，但GLASS流在极低步数下仍保持优势（Figure 13）。这一结果直接验证了核心主张：GLASS流消除了ODE与SDE之间的效率-随机性权衡。
 
-![[assets/figures/papers/paper_list_l32_https_openreview_net_forum_id_vH7OAPZ2dR/figures/012_Figure_4.jpg]]
-*Figure 4: Detailed results for fig. 2 (Middle). Comparing the performance of sampling the posterior p _ { 1 | t } via GLASS Flows (Ours) and SDE (DDPM) sampling. Ablate over different times t and sampling steps. GLASS Flows achieve significantly lower FID for lower number of sampling steps than DDPM sampling*
-
-![[assets/figures/papers/paper_list_l32_https_openreview_net_forum_id_vH7OAPZ2dR/figures/024_Figure_11.jpg]]
-*Figure 11: Posterior recovery for t = 0 . 0 5 for various number of simulation steps M . As one can see, GLASS Flows achieve significantly better performance for low M than the SDE/DDPM sampling. 32*
-
 **价值函数估计的准确性**。在价值函数$V_t(x)$估计任务中，GLASS流在低步数下与真实值（200个蒙特卡洛样本，M=200）的相关性显著高于DDPM采样（Figure 2 Right，Figure 5）。这表明GLASS流生成的转移样本更准确地反映了后验分布的结构，为后续的搜索类奖励对齐方法提供了更可靠的价值估计基础。
-
-![[assets/figures/papers/paper_list_l32_https_openreview_net_forum_id_vH7OAPZ2dR/figures/013_Figure_5.jpg]]
-*Figure 5: Detailed results for fig. 2 (Right). Comparing the performance of estimating the value function V _ { t } ( x ) via sampling the posterior p _ { 1 | t } via GLASS Flows (Ours) and SDE (DDPM) sampling via correlation. Experiment performed for different times t and sampling steps M . GLASS Flows achieve significantly higher correlation for lower number of steps than DDPM sampling. Ground truth is measured via 200 samples with 200 simulation steps of ODE/SDE*
 
 **Feynman-Kac引导的序贯蒙特卡洛性能**。Table 1展示了GLASS流结合Feynman-Kac引导（FKS）在多个奖励模型上的表现。FKS-GLASS（ρ=0.4）在CLIP、Pick、HPSv2和ImageReward四个奖励模型上均取得了最高或次高的奖励分数，同时在GenEval benchmark上也获得最优综合得分。值得注意的是，所有方法使用相同粒子数N=8和400次神经网络评估（NFEs），确保了公平比较。
 
@@ -355,16 +333,6 @@ Table 5展示了奖励引导的实验结果。GLASS引导在四个奖励模型�
 
 4. **任务范围验证有限**：当前实验仅限于文本到图像生成任务，在视频生成、分子设计等其他模态上的适用性有待验证。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l32_https_openreview_net_forum_id_vH7OAPZ2dR/figures/009_Table_2.jpg]]
-*Table 2: Improving GLASS-FKS using gradient guidance. ImageReward (IR) and GenEval results. Note: benchmarks are slightly different to table 1 as image resolution was decreased*
-
-![[assets/figures/papers/paper_list_l32_https_openreview_net_forum_id_vH7OAPZ2dR/figures/022_Figure_9.jpg]]
-*Figure 9: Inference-time reward alignment results on PartiPrompts benchmark. For each reward model (Clip, Pick, HPSv2, ImageReward), we run reward alignment with difference methods and evaluate across all reward models (i.e. this gives us 16 = 4 × 4 values). Left: We take the 16 values, rank the methods, and take the average rank. Right: We take the average normalized reward value (normalized via min and max observed)*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 与基线方法的谱系关系
@@ -388,8 +356,6 @@ GLASS流的核心贡献在于**重新定义了扩散/流模型的转移采样范
 **已识别的局限性。** （1）相关性参数ρ需要手动选择，最优值依赖于模型和任务：FLUX模型上恒定ρ=0.4表现最佳（Figure 7），但尚无自动选取机制。（2）奖励引导方法涉及梯度反向传播时面临显存瓶颈，限制了大分辨率图像的直接应用。（3）当前仅在文本到图像生成任务上验证，在其他模态（视频生成、分子设计）上的适用性未知。（4）理论基础假设完美训练和零离散化误差，实际中离散化误差可能影响性能，尤其在极端低步数下。
 
 **开放问题。** （1）能否自动学习或动态调整GLASS转移的相关性参数ρ，使其适应不同任务和数据分布？（2）GLASS流能否应用于其他依赖SDE采样的下游任务，如奖励微调（reward fine-tuning）或图像编辑？（3）在视频生成、分子构象采样等更复杂的数据类型上，GLASS流的有效性如何？（4）能否将GLASS流与更复杂的搜索方法（如树搜索、蒙特卡洛树搜索）深度结合，形成端到端可优化的推理时对齐方案？（5）GLASS流的充分统计量构造依赖于高斯假设，对于非高斯条件路径的模型，如何扩展该方法？
-
-
 
 ## 原文 PDF
 

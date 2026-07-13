@@ -56,15 +56,11 @@ claims:
 
 方法存在已知局限：服装细节（如领带）可能出现不一致，需要更详细的提示词来维持；尽管可通过滑动窗口生成长视频，但缺乏全局信息交换机制，在极长视频场景下仍非完美。
 
-
-
 扩散模型在文本到图像生成领域的突破性进展，使得从自然语言描述自动合成高质量视觉内容成为现实。然而，当任务从单幅图像扩展到多幅图像序列或视频时，一个核心瓶颈浮现：**预训练扩散模型无法在整个序列中维持人物身份、服装和场景的一致性**，尤其当内容涉及复杂细节或大幅度运动时。这一瓶颈直接阻碍了扩散模型在漫画创作、故事可视化、长视频生成等实际应用中的落地。
 
 现有工作试图从两个方向缓解该问题。一类方法如 **IP-Adapter**（Ye et al., 2023）、**PhotoMaker**（Li et al., 2023a）和 **InstantID**（Wang et al., 2024）通过引入额外的身份编码器或适配模块，将参考图像的主体特征注入生成过程。这些方法通常需要针对特定主体进行训练或微调，且在处理多主体交互或大幅度姿态变化时，一致性仍会退化。另一类方法如 **SEINE**（Chen et al., 2023）和 **SparseCtrl**（Guo et al., 2023）专注于视频帧间的过渡生成，但它们在图像潜空间中直接预测中间帧的运动，当首尾帧之间的运动幅度较大时，生成的过渡帧容易出现内容断裂或伪影。
 
 上述方法的共同局限在于：它们要么依赖额外的训练参数来绑定主体特征，要么在表达能力受限的潜空间中进行运动建模，缺乏一种**训练自由且能灵活插入预训练模型**的机制来建立跨图像的特征交互。StoryDiffusion 正是针对这一缺口，提出了两个互补的模块——Consistent Self-Attention 和 Semantic Motion Predictor——分别从跨图像注意力共享和语义空间运动预测两个维度，在不增加训练负担的前提下实现长程图像与视频的一致性生成。
-
-
 
 ## 核心方法与创新机理
 
@@ -111,8 +107,6 @@ $$V_i = \mathrm{CrossAttention}(V_i, \mathrm{concat}(T, P_i), \mathrm{concat}(T,
 ### 两项创新的协同关系
 
 Consistent Self‑Attention 和 Semantic Motion Predictor 并非孤立模块，而是形成了一条完整的“一致图像 → 平滑视频”生成链路：前者保证多幅图像中主体的身份、服装和场景高度一致；后者在这些一致图像之间生成运动自然、过渡平滑的视频帧。两者共同构成了 StoryDiffusion 从文本故事到主体一致漫画再到长视频的端到端生成能力。
-
-
 
 StoryDiffusion 的整体框架由两个解耦但协同的模块构成，分别对应**主体一致的图像序列生成**与**平滑过渡视频生成**两个阶段。其核心设计思想是：在不引入额外训练参数的条件下，通过修改预训练扩散模型中自注意力的键值来源来建立跨图像的特征交互，从而维持生成内容的主体一致性；在此基础上，将首尾帧映射到语义空间进行运动预测，以处理大幅度动作变化并生成连贯的视频过渡。
 
@@ -164,15 +158,8 @@ $$Loss = \mathrm{MSE}(G, O)$$
 
 两个阶段的数据流是串行的：第一阶段利用 Consistent Self-Attention 生成主体一致的图像序列，第二阶段以这些图像作为条件帧，通过 Semantic Motion Predictor 在语义空间中预测运动轨迹，最终由视频扩散模型解码为连贯的过渡视频。两个模块可以独立使用，也可以端到端串联。Consistent Self-Attention 还可与外部 ID 控制模块（如 PhotoMaker）或姿态控制模块（如 ControlNet）结合，在引入额外条件的同时仍保持主体一致性。
 
-### 补充图表
-
 ![[assets/figures/papers/StoryDiffusion_08e33f41766b/figures/002_Figure_2.jpg]]
 *Figure 2: The Pipeline of StoryDiffusion to generating subject-consistent images. To create subjectconsistent images to describe a story, we incorporate our Consistent Self-Attention into the pretrained text-to-image diffusion model. We split a story text into several prompts and generate images using these prompts in a batch. Consistent Self-Attention builds connections among multiple images in a batch for subject consistency*
-
-![[assets/figures/papers/StoryDiffusion_08e33f41766b/figures/003_Figure_3.jpg]]
-*Figure 3: The pipeline of our method for generating transition videos for obtaining subjectconsistent images, as described in Sec. 3.1. To effectively model the character’s large motions, we encode the conditional images into the image semantic space for encoding spatial information and predict the transition embeddings. These predicted embeddings are then decoded using the video generation model, with the embeddings serving as control signals in cross-attention to guide the generation of each frame*
-
-
 
 StoryDiffusion 的核心由两个模块构成：**Consistent Self-Attention**（用于主体一致图像生成）和 **Semantic Motion Predictor**（用于过渡视频生成）。两者均以训练自由（training-free）或轻量训练的方式运作，无需对预训练扩散模型进行全量微调。
 
@@ -246,12 +233,8 @@ $$Loss = \mathrm{MSE}(G, O)$$
 
 **设计优势**：在语义空间而非潜空间预测运动，使模型能处理更大的动作幅度，同时 CLIP 编码器提供的丰富语义先验有助于生成更稳定的过渡帧。
 
-### 补充图表
-
 ![[assets/figures/papers/StoryDiffusion_08e33f41766b/figures/009_Figure_6.jpg]]
 *Figure 6: Ablation study. (a) Evaluations of the impact of different sampling rates in Consistent Self-Attention. (b) We explore the introduction of external control IDs to govern the generation of characters. Our StoryDiffusion can generate consistent images that conform to the ID images*
-
-
 
 ## 实验与关键发现
 
@@ -285,9 +268,6 @@ Table 1 报告了两项核心指标：**Text-Image Similarity**（文本-图像�
 
 Table 3 报告了用户研究结果。在主体一致图像生成方面，**72.8%** 的受试者更偏好 StoryDiffusion 的结果；在过渡视频生成方面，这一比例达到 **82.0%**。用户研究从主观感知层面验证了定量指标所反映的趋势——训练自由的跨图像注意力机制和语义空间运动预测确实带来了可感知的质量提升。
 
-![[assets/figures/papers/StoryDiffusion_08e33f41766b/figures/010_Table_3.jpg]]
-*Table 3: User Study on subject-consistent image generation and transition video generation*
-
 ### 消融实验
 
 **采样率的影响。** Consistent Self-Attention 中的采样率（sampling rate）控制从批次内其他图像中采样的 token 比例。Figure 6(a) 展示了不同采样率下的生成效果：采样率设为 0.3 时，跨图像交互不足，无法有效维持主体一致性；采样率设为 0.5 时，能在对扩散过程影响最小的前提下实现稳定的一致性保持。因此，**0.5 被设定为默认采样率**。
@@ -307,16 +287,6 @@ Table 3 报告了用户研究结果。在主体一致图像生成方面，**72.8
 ### 小结
 
 StoryDiffusion 的核心实验结论可归纳为：通过修改自注意力中键-值的来源（从批次内其他图像采样并拼接），以训练自由的方式实现了跨图像的主体一致性；通过将运动预测迁移到语义空间，有效处理了大幅度动作的过渡视频生成。定量指标、定性对比和用户研究三方证据均支持这一设计的有效性，而消融实验进一步明确了采样率等关键超参数的作用边界。
-
-### 补充图表
-
-![[assets/figures/papers/StoryDiffusion_08e33f41766b/figures/004_Figure.jpg]]
-*Figure: Unwrapping a birthday gift Folding origami paper into shapes*
-
-![[assets/figures/papers/StoryDiffusion_08e33f41766b/figures/011_Figure_8.jpg]]
-*Figure 8: Generation results of our Consistent Self-Attention combined with ControlNet*
-
-
 
 ## 定位与知识库关联
 
@@ -366,8 +336,6 @@ StoryDiffusion 处于**训练自由的主体一致图像生成**与**基于语�
 4. **多模态条件扩展**：Semantic Motion Predictor 当前仅以首尾帧图像为条件，是否可以扩展到更多模态的条件输入，如文本动作描述、音频节奏信号或草图轨迹？
 
 5. **计算资源可行性**：Consistent Self-Attention 的批次内跨图像交互增加了自注意力计算的 token 数量，Semantic Motion Predictor 则需要额外的 CLIP 编码和 Transformer 推理。在计算资源有限的设备上，这些模块的可行性如何？是否存在轻量化替代方案？
-
-
 
 ## 原文 PDF
 

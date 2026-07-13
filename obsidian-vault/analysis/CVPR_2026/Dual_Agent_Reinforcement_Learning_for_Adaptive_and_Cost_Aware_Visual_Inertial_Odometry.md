@@ -55,8 +55,6 @@ claims:
 
 **方法定位**：该方法在方法谱系上属于**学习型调度与融合**范式，区别于传统filter-based（如MSCKF、ROVIO）、optimization-based（如OKVIS、VINS-MONO、DM-VIO、ORB-SLAM3）以及纯学习型VO/VIO（如DPVO、DROID-VO、iSLAM）方法。其独特之处在于将RL引入VIO的计算调度与自适应融合环节，而非替代核心状态估计器，从而在保持精度的同时显著降低计算开销。
 
-
-
 视觉-惯性里程计（VIO）是机器人导航与增强现实的核心模块，通过融合相机与惯性测量单元（IMU）数据实现高精度位姿估计。然而，现代VIO系统面临一个根本性瓶颈：**视觉-惯性束调整（VIBA）的高计算开销**。传统框架中，视觉前端与惯性融合被紧密耦合为单一的VIBA优化块（Figure 1a），这导致在资源受限平台上难以实时运行，迫使系统在精度与效率之间做出艰难取舍。
 
 现有方法在这一权衡上各有侧重。基于滤波的方法（如 **MSCKF**、**ROVIO**）计算轻量但精度受限；基于优化的方法（如 **OKVIS**、**VINS-MONO**、**DM-VIO**、**ORB-SLAM3**）精度较高，但VIBA的CPU耗时可达数十甚至上百毫秒；基于学习的方法（如 **DPVO**、**DROID-VO**、**iSLAM**）将计算迁移至GPU，提升了吞吐量，却引入了显著的显存占用与功耗问题。这些方法共同暴露了一个结构性问题：**系统缺乏对“何时运行视觉前端”和“以多大权重信任视觉输出”这两个关键决策的灵活控制**，导致计算资源在运动平缓或视觉信息冗余时被无差别消耗。
@@ -64,8 +62,6 @@ claims:
 本文的核心动机在于：将VIO中的调度与融合问题**重新建模为序列决策任务**。直觉上，并非每一帧都需要完整的视觉处理——当IMU传播已足够可靠时，跳过VO计算可以大幅节省资源；同样，融合权重应根据运动动态和视觉质量自适应调整，而非采用固定策略。这一视角将VIO从“被动优化”转变为“主动决策”，为突破VIBA瓶颈提供了新的可能性。
 
 为此，本文提出**双智能体强化学习VIO框架**（Figure 1b）：一个**选择智能体**基于高频IMU信号预先决定是否激活VO流水线，从源头规避冗余计算；一个**融合智能体**学习上下文依赖的融合策略，自适应地权衡IMU预测与VO观测。通过轻量级RL策略，系统能够在精度、吞吐量与显存之间实现更优的帕累托前沿——在统一评估中达到最佳平均ATE，同时速度提升最高1.77倍且GPU显存占用更低。
-
-
 
 ## 核心方法与创新机理
 
@@ -128,8 +124,6 @@ $$r_k = -\|\mathbf{p}_k - \mathbf{p}_{gt}\|_2^2 - \lambda \mathrm{Tr}(\boldsymbo
 - **精度-效率-内存的全面权衡优势**：在统一GPU评估中，所提方法达到最佳平均ATE，速度比DPVO快1.77倍（39 FPS vs ~22 FPS），且GPU显存占用比DROID-VO降低45.2%（4.37 GB vs 7.98 GB）（Table 4），置信度0.98。
 - **组件互补性验证**：消融实验（Table 9）表明，移除IMU偏差编码器导致ATE大幅上升（EuRoC: 0.092→0.279），移除选择智能体则主要降低效率（FPS从39降至21），验证了各组件的互补作用，置信度0.98。
 
-
-
 本文提出的双智能体强化学习VIO框架将传统紧耦合的视觉-惯性束调整（VIBA）解耦为四个独立模块，从根本上缓解了VIBA在资源受限平台上难以实时运行的瓶颈。如 **Figure 1** 所示，传统框架依赖单一、计算昂贵的VIBA块，而本框架通过引入两个轻量级RL智能体——选择智能体和融合智能体——实现了计算资源与精度的灵活权衡。
 
 ![[assets/figures/papers/paper_list_l2715_https_arxiv_org_abs_2511_21083/figures/001_Figure_1.jpg]]
@@ -150,8 +144,6 @@ $$r_k = -\|\mathbf{p}_k - \mathbf{p}_{gt}\|_2^2 - \lambda \mathrm{Tr}(\boldsymbo
    $$p_k = \mathbf{W}_p p_k^{\mathrm{VO}} + (\mathbf{I} - \mathbf{W}_p) p_k^I, \quad v_k = \mathbf{W}_v v_k^{\mathrm{VO}} + (\mathbf{I} - \mathbf{W}_v) v_k^I$$
 
 **输入输出流**：系统以原始IMU测量（角速度、加速度）和相机图像为输入。IMU数据经偏差校正和预积分后，同时供给选择智能体（用于调度决策）和融合智能体（用于状态传播）。当选择智能体激活VO模块时，图像帧经视觉前端处理后输出VO位姿和置信度，送入融合智能体与IMU预测进行自适应融合，最终输出全局一致的位姿估计。这一解耦设计使视觉前端的计算开销与融合策略相互独立，实现了精度-效率-内存的灵活权衡。
-
-
 
 ### 系统架构总览
 
@@ -190,9 +182,6 @@ VO调度被建模为**马尔可夫决策过程（MDP）**。选择智能体仅�
 $$R_{\mathrm{episode}} = \frac{A}{\mathrm{ATE} + \epsilon} - B \cdot N_f$$
 
 其中 $A$ 为精度权重，$B$ 为VO调用成本权重，$N_f$ 为序列中VO调用次数，$\epsilon$ 防止除零。该奖励鼓励低ATE（高精度）和少量VO调用（高效率），$A$ 和 $B$ 的比例决定了精度-效率权衡的偏好（Figure 8 展示了偏好热图）。
-
-![[assets/figures/papers/paper_list_l2715_https_arxiv_org_abs_2511_21083/figures/015_Figure_8.jpg]]
-*Figure 8: Reward preference over the accuracy weight A and VOcost weight B on a EuRoC example*
 
 ---
 
@@ -238,19 +227,12 @@ $\sigma_k^{\mathrm{imu}}$ 为IMU残差标准差，$c_k^{\mathrm{vo}}$ 为VO置�
 
 初始化阶段将世界坐标系与初始IMU体坐标系对齐，设置 $\mathbf{p}_0^w = 0$，z轴对齐测量重力 $\mathbf{g}$。通过滑动窗口关键帧（Figure 3）收集IMU预积分，构建线性约束估计尺度 $s$ 和初始速度：
 
-![[assets/figures/papers/paper_list_l2715_https_arxiv_org_abs_2511_21083/figures/003_Figure_3.jpg]]
-*Figure 3: Visual summary of initialization*
-
 $$\mathbf{R}_{c_k}^w \mathbf{p}_{vo}^{(k,k+1)} s - \Delta t_k \mathbf{I} \mathbf{v}_{b_k}^w = \mathbf{R}_{b_k}^{w\top} \boldsymbol{\alpha}_{k,k+1} - \frac{1}{2} \mathbf{g}^w \Delta t_k^2 - (\mathbf{R}_{c_{k+1}}^w - \mathbf{R}_{c_k}^w) \mathbf{t}_{bc}$$
 
 该约束将IMU传播位置与缩放后的VO平移关联，通过最小二乘求解尺度和速度初值。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2715_https_arxiv_org_abs_2511_21083/figures/010_Figure_6.jpg]]
 *Figure 6: Ablation study for the Select Agent (a) ATE vs. skip ratio comparing our IMU-only prior scheduling, fixed skipping, heuristic gating, and the RL-gating(KF) baseline (b) Throughput under a 50% skip target: IMU-only prior scheduling attains higher FPS than RL-gating(KF) with only a marginal ATE increase*
-
-
 
 ## 实验与关键发现
 
@@ -344,30 +326,14 @@ RL融合策略显著优于传统融合方法，验证了学习自适应权重的
 5. 引入长时序上下文到置信度估计以进一步减少漂移的潜力。
 6. 建立反馈机制，在长时间缺失视觉时利用IMU状态重新初始化VO后端。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2715_https_arxiv_org_abs_2511_21083/figures/004_Table_1.jpg]]
 *Table 1: Comparison with traditional CPU-based monocular visual-inertial odometry systems on the EuRoC MAV dataset. We report the SE(3)-aligned RMSE ATE (m). The Scale Error (%) row for our method reports the percentage error of our initial scale estimation*
 
 ![[assets/figures/papers/paper_list_l2715_https_arxiv_org_abs_2511_21083/figures/009_Table_4.jpg]]
 *Table 4: Efficiency and resource comparison with SOTA GPU-based VO/VIO methods on the EuRoC MAV dataset. We report SE(3)- aligned RMSE ATE (m) for VIO, Sim(3) for VO, average throughput (FPS), and peak GPU VRAM usage (GB)*
 
-![[assets/figures/papers/paper_list_l2715_https_arxiv_org_abs_2511_21083/figures/005_Table_3.jpg]]
-*Table 3: CPU-side breakdown per keyframe on EuRoC. BA/VIBA runs on CPU for all methods*
-
-![[assets/figures/papers/paper_list_l2715_https_arxiv_org_abs_2511_21083/figures/018_Table_9.jpg]]
-*Table 9: Cumulative contribution of each component. Removing a component from the full system (ALL) degrades accuracy or efficiency*
-
 ![[assets/figures/papers/paper_list_l2715_https_arxiv_org_abs_2511_21083/figures/011_Table_5.jpg]]
 *Table 5: Ablation study on the Adaptive Fusion Agent*
-
-![[assets/figures/papers/paper_list_l2715_https_arxiv_org_abs_2511_21083/figures/006_Table_2.jpg]]
-*Table 2: Comparison with traditional CPU-based monocular visual–inertial odometry systems on the TUM-VI dataset. We report SE(3)-aligned RMSE ATE (m). For each scene type, the value is the average over the three corresponding sequences (1–3); full per-sequence results are provided in the Appendix D*
-
-![[assets/figures/papers/paper_list_l2715_https_arxiv_org_abs_2511_21083/figures/012_Table_6.jpg]]
-*Table 6: Robustness to visual degradations on EuRoC MH 04. 5% / 10% of images are replaced by blurred, noise-corrupted versions*
-
-
 
 ## 定位与知识库关联
 
@@ -413,8 +379,6 @@ RL融合策略显著优于传统融合方法，验证了学习自适应权重的
 4. **主动失效恢复**：能否设计能够检测VO退化（如模糊、弱纹理）并主动触发重初始化或回退到纯惯性模式的智能体？
 5. **长时序上下文建模**：引入更长时序的上下文信息到置信度估计中，以进一步减少漂移的潜力。
 6. **IMU驱动的VO重初始化**：建立反馈机制，在长时间缺失视觉时利用累积的IMU状态重新初始化VO后端，形成闭环恢复。
-
-
 
 ## 原文 PDF
 

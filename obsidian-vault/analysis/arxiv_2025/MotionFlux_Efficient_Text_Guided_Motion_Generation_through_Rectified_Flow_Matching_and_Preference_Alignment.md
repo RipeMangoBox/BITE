@@ -51,8 +51,6 @@ claims:
 
 在HumanML3D数据集上，MotionFlux全面超越现有方法：Ultra版本以**5毫秒**生成一个运动序列，比MDM（24秒）快约4800倍，同时取得最优FID（0.078）和R-Precision Top-1（0.536）。定性分析表明，MotionFlux在“左右”、“瞥视”等细粒度语义事件上的对齐能力显著优于MotionLCM和MDM。在线TAPO训练可持续降低FID并提升语义得分，而离线固定数据集训练在第二次迭代后即出现性能饱和，验证了在线自我改进策略的有效性。
 
-
-
 文本驱动的三维人体运动生成旨在根据自然语言描述合成逼真的动作序列，在动画制作、游戏开发、虚拟现实及人机交互等领域具有广泛应用前景。然而，该任务长期面临两大核心瓶颈。
 
 **瓶颈一：语义对齐不精确。** 复杂语言描述（如“先向左走两步，然后向右瞥一眼”）包含细粒度的空间关系、时序逻辑和动作细节，现有方法难以将这些语义精确映射到动态运动序列上。基于扩散模型的方法（如 **MDM**，Tevet et al., 2022b；**MotionDiffuse**，Zhang et al., 2024；**MLD**，Chen et al., 2023）虽然生成质量较高，但缺乏显式的语义偏好优化机制，对关键语义事件（如“左右”、“瞥视”）的对齐能力不足。
@@ -62,8 +60,6 @@ claims:
 上述双重瓶颈的根源在于：扩散模型的随机采样范式天然存在速度-质量权衡，且训练目标（噪声预测）与最终评价标准（语义一致性）之间存在不一致。因此，亟需一种既能大幅减少采样步数，又能系统性地提升文本-运动语义对齐的生成框架。
 
 本文提出**MotionFlux**，核心动机是通过两个关键设计突破上述瓶颈：（1）引入**修正流匹配（rectified flow matching）**，将生成过程建模为从噪声到运动潜在表示的确定性直线ODE轨迹，使极少数步（1~5步）采样即可产出高质量运动；（2）构建**TAPO（TMR++ Aligned Preference Optimization）**自监督偏好对齐框架，利用跨模态检索模型TMR++作为内部奖励函数，自动构造在线偏好对并进行直接偏好优化，无需人工标注即可持续强化细粒度语义一致性。这一组合使得MotionFlux在生成速度上比MDM快约4800倍（单序列推理仅需5ms），同时在语义对齐精度上全面超越现有方法。
-
-
 
 ## 核心方法与创新机理
 
@@ -115,8 +111,6 @@ $$\mathcal{L}_{\mathrm{TAPO}} = \mathcal{L}_{\mathrm{DPO-FM}} + \alpha \mathcal{
 
 定性分析（图 4）显示，MotionFlux 在“左右”、“瞥视”等细粒度语义事件上的对齐能力显著优于 MotionLCM 和 MDM，验证了 TAPO 框架在强化语义一致性方面的有效性。
 
-
-
 MotionFlux 采用**两阶段训练流水线**，将文本到运动生成分解为表示学习与偏好对齐两个递进阶段，如图2所示。
 
 **第一阶段：表示学习。** 框架首先利用一个预训练的VAE（冻结参数）将原始运动序列压缩到潜在空间，同时使用FLAN-T5文本编码器提取语义条件。潜在运动表示与文本条件共同输入一个混合Transformer骨干网络——由1个多模态DiT块（MMDiT）和2个标准DiT块组成（共约43M参数）——作为向量场估计器，在修正流匹配框架下学习从噪声到目标运动的确定性直线传输路径。该阶段仅使用流匹配损失 $\mathcal{L}_{FM}$ 进行训练，使模型具备高速生成能力。
@@ -125,15 +119,11 @@ MotionFlux 采用**两阶段训练流水线**，将文本到运动生成分解�
 
 **推理流程。** 如图3所示，采样时从高斯噪声 $\boldsymbol{x}_0$ 出发，沿学习到的速度场 $\boldsymbol{v}(\boldsymbol{x}, t \mid \boldsymbol{c}; \theta)$ 使用欧拉方法进行ODE积分，仅需1~5步即可得到潜在运动表示，再经VAE解码器重建为原始运动序列。整个管线从文本输入到运动输出形成端到端的高速生成系统。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2508_19527/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of MotionFlux. In the first stage, we begin by utilizing a pre-trained VAE (with frozen parameters) to compress the raw motion sequence*
 
 ![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2508_19527/figures/001_Figure_1.jpg]]
 *Figure 1: We propose MotionFlux, a rectified flow matching-based motion generation framework that employs preference optimization for semantic alignment. In our visualization, darker colors denote later times, and red text highlights key events*
-
-
 
 MotionFlux 的生成能力建立在两个核心模块之上：**确定性修正流匹配（Rectified Flow Matching）** 提供高速采样基础，而 **TAPO 偏好对齐框架** 则在不依赖人工标注的前提下持续提升语义一致性。以下分别阐述其机理与关键公式。
 
@@ -179,12 +169,8 @@ $$\mathcal{L}_{\mathrm{TAPO}} = \mathcal{L}_{\mathrm{DPO-FM}} + \alpha \mathcal{
 
 向量场估计器采用混合 Transformer 设计：**1 个 MMDiT 块**负责文本与运动潜在表示的鲁棒多模态融合，**2 个 DiT 块**进行高效时序推理，总参数量约 43M。文本条件由 FLAN-T5 编码器提取，运动序列经预训练 VAE（Transformer 架构，参数冻结）压缩至潜在空间后再送入向量场估计器。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2508_19527/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of the sampling pipeline employed in our rectified-flow–based text-to-motion framework*
-
-
 
 ## 实验与关键发现
 
@@ -216,8 +202,6 @@ Figure 4展示了MotionFlux与MotionLCM、MDM在细粒度语义对齐上的可�
 
 **公平性限制**：所有定量比较主要基于HumanML3D单一数据集，缺少在KIT、BABEL等其他常用运动数据集上的系统验证。TMR++作为自动奖励模型可能继承其潜在偏差，偏好对齐效果受限于该检索模型的判别能力。此外，FID、R-Precision等自动评测指标可能无法完全捕捉真实人类感知的语义一致性和自然度，这些结果需在实际交互场景中进一步验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2508_19527/figures/004_Table_1.jpg]]
 *Table 1: Comparison of text-conditional motion synthesis on the HumanML3D (Guo et al. 2022a) dataset. We compute the suggested metrics following (Guo et al. 2022a). The evaluation is repeated 20 times for each metric and the average is reported with a 95% confidence interval*
 
@@ -226,8 +210,6 @@ Figure 4展示了MotionFlux与MotionLCM、MDM在细粒度语义对齐上的可�
 
 ![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2508_19527/figures/007_Figure_5.jpg]]
 *Figure 5: Trajectory of FID and TMR++ scores over training iterations. Offline training peaks by the second iteration with rising FID, while online training continues to improve, showing lower FID and higher TMR++ scores*
-
-
 
 ## 定位与知识库关联
 
@@ -270,8 +252,6 @@ MotionFlux 则从根本上改变了生成路径的几何性质：它放弃随机
 4. **离线与在线对齐的深层机制。** 实验显示离线 TAPO 在第二次迭代后性能饱和（FID 上升），而在线训练持续改进（Figure 5）。这一现象背后的深层原因——是数据分布偏移还是过优化效应——值得进一步的理论分析。
 
 5. **跨数据集泛化与真实场景验证。** 在 KIT、BABEL 等数据集上的系统评估，以及包含人类主观评价的用户研究，将是验证 MotionFlux 实际价值的关键步骤。
-
-
 
 ## 原文 PDF
 

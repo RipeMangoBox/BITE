@@ -55,8 +55,6 @@ claims:
 
 方法定位上，PPL 属于**基于图像重建的自监督姿态估计**范式，但其核心创新在于将姿态先验从隐式网络参数中解耦为显式的结构化表示，并通过分层记忆蒸馏实现可学习化。与 AutoLink（He et al., CVPR 2022）等无先验方法相比，PPL 引入了可学习的类别拓扑约束；与 STT（Schmidtke et al., ICCV 2021）等使用人工先验的方法相比，PPL 无需任何预定义模板，实现了完全数据驱动的先验获取。
 
-
-
 姿态估计是计算机视觉中的基础任务，旨在从图像中定位物体或人体的关键点。现有的主流方法通常依赖大量人工标注的关键点数据进行监督训练，但标注成本高昂，且难以覆盖所有物体类别。因此，无监督姿态估计——即从无标注图像中自动发现并定位关键点——成为一个重要但极具挑战的研究方向。
 
 ### 核心瓶颈：类别姿态先验的缺失
@@ -90,8 +88,6 @@ Figure 1 以示意图形式展示了这一挑战与PPL的解决思路：给定�
 
 这一设计将无监督姿态估计从“隐式学习”推进到“显式先验学习”，为提升精度、可解释性和鲁棒性开辟了新路径。
 
-
-
 ## 核心方法与创新机理
 
 PPL 的核心创新在于**从无标注图像中以完全自监督的方式蒸馏出显式、可解释的类别姿态先验**，并利用该先验引导姿态变换与迭代推理。相较于现有方法，PPL 在以下三个关键维度实现了根本性改变：
@@ -113,8 +109,6 @@ PPL 的核心创新在于**从无标注图像中以完全自监督的方式蒸�
 现有方法仅通过单次前向传递输出估计姿态。PPL 引入**迭代推理策略**：将重建图像 $I_{recon}$ 反馈为输入，利用分层记忆检索校正关键点，逐步优化姿态估计。在遮挡场景下，该策略的效果尤为显著——4 次迭代即可将 L2 误差大幅降低，接近无遮挡水平（Figure A4, A5）。这一能力源于记忆库中存储的原型姿态组成部分：即使输入图像存在大面积遮挡，模型仍能从记忆中检索合理的结构信息完成姿态推断（Figure 4a），尽管在极端遮挡下仍可能失败（Figure A2）。
 
 **总结**：PPL 的三项 changed slots 形成了完整的创新闭环——分层记忆存储原型结构，先验蒸馏提取通用知识，迭代推理利用先验校正不确定性。这一设计使得 PPL 在 Human3.6m、Taichi 和 CUB-200-2011 等数据集上全面超越所有无监督基线（Table 1），且其学习到的先验优于人工定义的固定先验（Table 2）。
-
-
 
 ![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_hPY2jwJzZ4/figures/003_Figure_2.jpg]]
 *Figure 2: Overview of our proposed Pose Prior Learner (PPL). We first distill the keypoint prior from the hierarchical memory M. Features of the image I and the embedding of the keypoint prior are concatenated to predict the affine transformation parameters. The keypoint prior is transformed and their pair-wise links are modulated with the connectivity prior W to obtain the combined link heatmap S. The concatenation of the link heatmap S and the reference image I _ { r e f } is decoded to produce the reconstructed image I _ { r e c o n } . The sg symbol represents the stopping gradient operation. The red arrows indicate the gradient flows during backpropagation based on image reconstruction. See Sect...*
@@ -158,8 +152,6 @@ PPL 联合优化四个损失函数：
 - **关键点配置重建损失** $L_{kr}$：确保记忆检索解码后的关键点与原始估计一致。
 
 消融实验（Table A3）表明，移除边界损失会导致训练不稳定；将感知损失替换为像素级 MSE 使误差从 2.56 升至 2.84；使用单记忆库（PPL-1MemBank）的误差为 2.72，显著劣于分层记忆的 2.56。这验证了各损失组件和分层记忆结构对整体性能的因果贡献。
-
-
 
 ### 姿态先验表示
 
@@ -229,8 +221,6 @@ $$L_{kr} = \| T'_{\text{recon}} - T' \|_2 + \| G - G' \|_2$$
 
 推理阶段（Figure 3），PPL采用迭代自回归策略：将上一轮重建图像 $I_{\text{recon}}$ 作为新一轮输入，重新估计姿态 $T'$，经分层记忆 $\mathcal{M}$ 检索校正后输出 $T'_{\text{recon}}$。原始图像 $I$ 始终作为参考图像。默认使用4次迭代，实验表明迭代推理在遮挡场景下显著降低L2误差，接近无遮挡水平（Figure A4, A5）。
 
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -273,12 +263,8 @@ Table A3系统消融了损失组件和记忆结构对性能的影响：
 
 Figure A8展示了预测关键点的语义一致性：相同颜色的关键点在人体不同姿态下保持一致的语义对应（如头部、手部、脚部），尽管训练完全无监督，PPL仍隐式学习到了稳定的语义结构。Table A5进一步展示了先验的迁移价值：在遮挡图像分类任务中，使用PPL先验的ResNet-50在遮挡条件下的分类准确率显著优于无先验基线，表明学习到的姿态先验可泛化至下游任务。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_hPY2jwJzZ4/figures/028_Figure_24.jpg]]
 *Figure 24: (a) Keypoint configuration reconstruction. (b) Memory distillation. Figure A6: Retrieval and distillation of the proposed hierarchical memory in our PPL. (a) The hierarchical memory M is trained to reconstruct the keypoints $T _ { r e c o n } ^ { \prime } . T ^ { \prime }$ is encoded into m tokens by the MLP-Mixer blocks M I $X _ { e n c }$ . Each token $g _ { i }$ retrieves its closest vector $g _ { i } ^ { \prime }$ in memory bank $b _ { i }$ . The resulting m vectors are decoded by the MLP-Mixer M I $X _ { d e c }$ into the reconstructed keypoints $T _ { r e c o n } ^ { \prime }$ . The green arrows indicate the gradient flows during backpropagation based on the reconstruction of keypoint configuration...
-
-
 
 ## 定位与知识库关联
 
@@ -317,8 +303,6 @@ PPL 的适用性受以下因素制约：
 - **更强主干网络的整合。** 当前特征提取器 $\phi_{enc}$ 基于标准 CNN，能否整合 Vision Transformer 等更强主干以提升先验学习精度？
 - **减少对参考图像的依赖。** 能否通过生成式填充或上下文编码器替代参考图像，实现完全单张图像的自监督姿态估计？
 - **先验的迁移与复用。** 学习到的类别先验能否推广到更多下游任务？Table A5 初步展示了先验在遮挡图像分类上的迁移效果，但更广泛的任务（如动作识别、场景理解）仍需验证。
-
-
 
 ## 原文 PDF
 

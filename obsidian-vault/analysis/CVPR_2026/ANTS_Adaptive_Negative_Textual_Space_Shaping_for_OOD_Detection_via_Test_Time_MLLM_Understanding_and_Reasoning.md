@@ -166,8 +166,6 @@ ANTS 处于**零样本 OOD 检测**与**多模态大模型推理**的交叉点�
 
 > **注意**：以上基线引用信息来自分析 JSON，建议在正式撰写时核实原始文献的确切发表信息。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2044_https_arxiv_org_abs_2509_03951/figures/003_Figure_3.jpg]]
 *Figure 3: The overall framework of our ANTS. ANTS framework consists of in three stages: (1) caching negative images and visually similar ID classes mined from historical test images; (2) shaping two negative textual spaces by prompting an MLLM with the cached data to generate expressive negative sentences and visually similar labels; and (3) performing online evaluation of the test image using an adaptively weighted combination of these textual spaces*
 
@@ -238,8 +236,6 @@ $$S_{ada}(\pmb{v}) = \lambda S_{ens}(\pmb{v}) + (1 - \lambda) S_{vsnl}(\pmb{v}) 
 $$\lambda = F\left( \frac{1}{|\mathcal{X}_{neg}|} \sum_{\pmb{v} \in \mathcal{X}_{neg}} S_{ens}(\pmb{v}), \frac{1}{|\mathcal{X}_{neg}|} \sum_{\pmb{v} \in \mathcal{X}_{neg}} S_{vsnl}(\pmb{v}) \right) \tag{14}$$
 
 其中归一化函数 $F(a,b) = \frac{1-a}{(1-a)+(1-b)} \in (0,1)$。当负图像上 ENS 分数较低（表明为远 OOD）时，$\lambda$ 趋近于 1，ENS 主导决策；反之当 VSNL 分数较低时，$\lambda$ 趋近于 0，VSNL 主导决策。这一机制使 ANTS 能够自适应地应对远 OOD 与近 OOD 的混合场景。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2044_https_arxiv_org_abs_2509_03951/figures/001_Figure_1.jpg]]
 *Figure 1: T-SNE visualization of the ID and OOD image features, the text features of NegLabel [19], EOE [4], OOD ground-truth, and the expressive negative sentences (ENS) of ANTS. We select ImageNet and SUN as the ID and OOD datasets, respectively. NegLabel and EOE lack a good understanding of OOD images, resulting in a greater distance between the OOD images and the text features. In contrast, our ANTS utilizes the MLLMs to understand OOD images during ENS generation, reducing the distance between ENS and OOD images and improving OOD detection performance*

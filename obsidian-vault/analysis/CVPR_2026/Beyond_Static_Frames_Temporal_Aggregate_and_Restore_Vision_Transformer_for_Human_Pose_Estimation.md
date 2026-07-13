@@ -56,8 +56,6 @@ claims:
 
 **证据强度**：上述结论由多组消融实验和跨基准对比支持，置信度较高；但方法未显式强制帧间时间一致性，在严重遮挡场景下可能仍存在轻微的时间不一致，需在实际部署中关注。
 
-
-
 ### 问题背景：视频人体姿态估计的时序挑战
 
 人体姿态估计的目标是从图像或视频中精确地定位人体关键点的空间坐标。在静态图像领域，基于Vision Transformer（ViT）的方法已取得显著进展，通过强大的全局上下文建模能力实现了高精度关键点定位。然而，当这些方法被直接逐帧应用于视频时，一个根本性的瓶颈暴露出来：**它们将每一帧视为独立的静态图像，完全忽略了帧与帧之间固有的时间连贯性**。
@@ -86,8 +84,6 @@ claims:
 4. **特征还原**：将聚合的时间线索无缝融入当前帧的特征表示，而非直接从中回归关键点，确保增强后的特征仍能充分利用原有的解码器设计。
 
 这一动机直接催生了本文提出的**TAR-ViTPose**（Temporal Aggregate-and-Restore Vision Transformer），其核心创新在于**关节中心时间聚合（JTA）** 与**全局恢复注意力（GRA）** 两个模块的协同设计：JTA通过可学习的关节查询令牌和掩码感知交叉注意力实现帧间关节特征的精确对齐与聚合；GRA则将聚合的时间信息注入当前帧的特征序列，恢复全局上下文，最终通过原有的轻量解码器生成鲁棒且准确的姿态估计结果。
-
-
 
 ## 核心方法与创新机理
 
@@ -124,8 +120,6 @@ TAR‑ViTPose 的核心创新在于将视频时序建模以**即插即用**的�
 ### 创新本质的因果机制
 
 上述四个槽位改动共同构成了一个因果链：**时间聚合（JTA）→ 关节级对齐（掩码感知注意力）→ 上下文恢复（GRA）→ 鲁棒解码**。其中，掩码感知注意力是精度增益的关键杠杆——消融实验表明，引入掩码感知注意力可额外带来 **+1.4 mAP** 的提升（Table 6）；而 GRA 则是防止信息瓶颈的结构性保障，缺失时将导致性能崩溃。该因果链使得 TAR‑ViTPose 在 PoseTrack2017/2018/2021 三个基准上均取得最优性能，同时保持 **413 fps** 的高推理效率（Table 3）。
-
-
 
 TAR‑ViTPose 在单帧基线 **ViTPose** 之上构建了一个即插即用的时间建模流水线，其核心思想是：**以当前帧的姿态估计为目标，显式聚合相邻帧的时间线索，并将增强后的时空表示恢复到当前帧的特征序列中**。整个流水线由五个模块串联而成，形成“编码→聚合→恢复→解码→掩码生成”的闭环。
 
@@ -193,15 +187,8 @@ $$
 
 相较于逐帧独立处理的 ViTPose（Fig. 1a），TAR‑ViTPose 的唯一改动是在 ViT 编码器与轻量解码器之间插入了 JTA + GRA 时间建模模块（Fig. 1b）。这一设计使得任何 ViTPose 变体（ViT‑S/B/L/H）均可无缝升级为视频姿态估计模型，无需修改编码器或解码器的任何参数。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1009_https_arxiv_org_abs_2603_05929/figures/001_Figure_1.jpg]]
-*Figure 1: Comparison between the baseline ViTPose pipeline (a) and our TAR-ViTPose (b). (a) ViTPose adopts a ViT encoder to extract latent features from the input image, which are then fed into a lightweight decoder to regress keypoint heatmaps. (b) Our method enhances the current-frame representation by aggregating temporal cues from adjacent frames, achieving plug-and-play temporal modeling within the original ViTPose architecture*
-
 ![[assets/figures/papers/paper_list_l1009_https_arxiv_org_abs_2603_05929/figures/002_Figure_2.jpg]]
 *Figure 2: The pipeline of the proposed Temporal Aggregate-and-Restore Vision Transformer (TAR-ViTPose). The objective is to estimate the human pose of the current frame*
-
-
 
 TAR‑ViTPose 的核心思想是在 ViT 编码器之后插入一个即插即用的时间建模模块，利用相邻帧的时间线索增强当前帧的特征表示，而不是改变原有的编码器‑解码器结构。该模块由两个关键子模块组成：**Joint‑centric Temporal Aggregation (JTA)** 和 **Global Restoring Attention (GRA)**。
 
@@ -265,12 +252,8 @@ $$
 
 其中 $G_i^j(t)$ 为第 $j$ 个关键点的高斯热图真值。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1009_https_arxiv_org_abs_2603_05929/figures/010_Figure_4.jpg]]
 *Figure 4: Visualization of attention heatmaps for joint query tokens with (b) and without (a) mask-aware attention. Given a current frame Xi(t) and a neighboring frame Xi(t −T ), we visualize the attention heatmaps of three different joint query tokens with respect to the features of Xi(t − T ). See Supp. Material for more*
-
-
 
 ## 实验与关键发现
 
@@ -289,13 +272,7 @@ TAR‑ViTPose 在三个主流视频姿态估计基准上均取得当前最优性
 ![[assets/figures/papers/paper_list_l1009_https_arxiv_org_abs_2603_05929/figures/011_Table_7.jpg]]
 *Table 7: Comparison with the ViTPose baseline (mAP) on Pose-Track2018 val. set*
 
-![[assets/figures/papers/paper_list_l1009_https_arxiv_org_abs_2603_05929/figures/012_Table_8.jpg]]
-*Table 8: Comparison with the ViTPose baseline (mAP) on Pose-Track21 val. set*
-
 效率方面，TAR‑ViTPose 在 NVIDIA A6000 上以 ViT‑S 骨干实现 **413 fps**，约为 DSTA（52 fps）的 8 倍，且显著快于其他视频姿态估计方法（Table 3）。该效率优势源于其即插即用设计：时间模块仅作用于 ViT 编码器输出的潜在特征，无需修改编码器或解码器的推理路径。
-
-![[assets/figures/papers/paper_list_l1009_https_arxiv_org_abs_2603_05929/figures/006_Table_3.jpg]]
-*Table 3: Runtime frame rate (FPS), measured on an A6000. All methods utilize the same two auxiliary frames as in [24]*
 
 ### 消融实验
 
@@ -314,9 +291,6 @@ TAR‑ViTPose 在三个主流视频姿态估计基准上均取得当前最优性
 ### 定性分析
 
 Figure 3 展示了 TAR‑ViTPose 与 ViTPose、DCPose、DSTA、Poseidon 在遮挡、运动模糊和散焦等挑战场景下的对比。TAR‑ViTPose 在这些困难情况下产生更稳定、更准确的姿态预测，而单帧方法 ViTPose 及部分视频方法在模糊或遮挡区域出现明显错误预测（红色实线圆圈标注）。更多定性结果见 Figure 5，涵盖 PoseTrack 数据集和野外视频，进一步验证了方法在复杂姿态和极端条件下的鲁棒性。
-
-![[assets/figures/papers/paper_list_l1009_https_arxiv_org_abs_2603_05929/figures/004_Figure_3.jpg]]
-*Figure 3: Qualitative comparison of a) our TAR-ViTPose, b) ViT-Pose [41], c) DCPose [24], d) DSTA [14], and e) Poseidon [27], featuring challenges such as occlusion, motion blur, and defocus. The first two columns are from the PoseTrack datasets, while the last two columns are from in-the-wild videos. Inaccurate predictions are marked with red solid circles. Zoom in for clarity*
 
 ### 失败模式与局限性
 
@@ -339,16 +313,6 @@ Figure 3 展示了 TAR‑ViTPose 与 ViTPose、DCPose、DSTA、Poseidon 在遮�
 
 ![[assets/figures/papers/paper_list_l1009_https_arxiv_org_abs_2603_05929/figures/007_Table_4.jpg]]
 *Table 4: Ablation of different temporal modeling strategies*
-
-![[assets/figures/papers/paper_list_l1009_https_arxiv_org_abs_2603_05929/figures/009_Table_5.jpg]]
-*Table 5: Effect of JTA and GRA in our temporal modeling*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1009_https_arxiv_org_abs_2603_05929/figures/019_Table_14.jpg]]
-*Table 14: Different number of auxiliary frames. ‘-’ indicates previous frames while ‘+’ indicates subsequent frames*
-
-
 
 ## 定位与知识库关联
 
@@ -379,8 +343,6 @@ TAR‑ViTPose 的适用边界受以下因素制约：
 2. **复杂运动模式鲁棒性**：在快速动作、密集人群遮挡、大幅度姿态变化等更具挑战的运动模式下，当前关节查询令牌的对齐精度是否仍然可靠，需要进一步验证。
 3. **跨任务泛化能力**：JTA/GRA 的“聚合‑恢复”范式本质上是一种通用的时空特征增强策略，其是否可推广到其他视频密集预测任务（如视频目标分割、动作识别、视频超分辨率）是一个值得探索的开放问题。
 4. **掩码感知注意力的替代方案**：当前掩码依赖解码热图的阈值二值化，这一过程引入了解码器预测质量的依赖。是否存在更直接的空间引导机制（如可学习的空间先验或基于特征的注意力偏置）值得研究。
-
-
 
 ## 原文 PDF
 

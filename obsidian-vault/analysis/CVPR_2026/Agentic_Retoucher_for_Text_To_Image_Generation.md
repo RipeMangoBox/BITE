@@ -60,8 +60,6 @@ claims:
 
 这些结果验证了“感知-推理-动作”闭环架构在AIGC图像后处理中的有效性，为构建具备自主纠错能力的生成系统提供了新的范式。
 
-
-
 文本到图像（T2I）生成模型近年来取得了显著进展，能够根据自然语言描述合成高保真、多样化的视觉内容。然而，即使是最先进的T2I模型，其输出中仍频繁出现局部失真与不合理之处，典型问题包括肢体畸形（如多指、关节错位）、面部结构异常、文字渲染错误以及物体间交互关系违背物理常识等。这些细粒度缺陷严重损害了生成内容的可用性与可信度，尤其在对视觉精度要求较高的应用场景（如广告创意、影视概念设计）中尤为突出。
 
 当前应对生成后失真的主流方案存在明显局限。一方面，基于视觉语言模型（VLM）的直接修复方法试图通过文本指令引导图像编辑，但VLM在空间定位能力上存在严重不足——如Figure 1左侧所示，即使给出明确的区域提示，现有VLM仍频繁产生幻觉，无法准确标定失真位置，更难以提供合理的诊断推理。另一方面，基于掩码的传统修复（inpainting）方法需要人工精确标注待修复区域，不仅依赖大量人力，且缺乏对失真类型的语义理解，无法自主判断“何处需要修复”以及“如何修复”。两类方法的共同瓶颈在于：**缺乏对局部失真的自主感知与修复能力，无法形成闭环的检测-诊断-修正流程**。
@@ -69,8 +67,6 @@ claims:
 更深层的问题在于，生成后修正本质上是一个需要精细空间感知与上下文推理的复杂决策过程。人类专家在面对AIGC图像失真时，会经历“观察定位→分析诊断→选择工具并执行修复”的认知循环，而现有方法要么跳过了定位与诊断环节（直接修复），要么将各环节割裂为孤立模块，缺乏统一的自主决策框架。
 
 针对上述缺口，本文提出**Agentic Retoucher**，一个层次化的决策驱动框架。其核心动机在于：**将生成后修正重新建模为类似人类专家的“感知-推理-动作”闭环过程**，使模型能够自主地发现、理解并修正小尺度失真，同时保持全局一致性。具体而言，该框架通过三个协同智能体——上下文感知的失真定位、与人类偏好对齐的细粒度诊断、以及自适应工具选择的局部修复——形成自我纠正的迭代循环，从根本上解决VLM幻觉不可靠与修复策略单一的问题。
-
-
 
 ## 核心方法与创新机理
 
@@ -103,8 +99,6 @@ $$\mathcal{L}_{\mathrm{sal}} = \alpha \mathcal{L}_{\mathrm{MSE}}(S, \hat{S}) + (
 $$\mathcal{L}_{\mathrm{GRPO}} = \mathbb{E}_{(q,o)}[\min(r_t \hat{A}_t, \mathrm{clip}(r_t, 1-\varepsilon, 1+\varepsilon) \hat{A}_t) - \beta D_{\mathrm{KL}}[\pi_{\theta}||\pi_{\mathrm{ref}}]]$$
 
 消融实验（Table 5）证实注意力模块与 KLD 损失的组合带来最佳显著性预测，二者互补——仅保留其一均导致 AUC-Judd、NSS 下降。这一闭环设计使得 Agentic Retoucher 在 GenBlemish-27K 上将 plausibility 从 44.21 提升至 47.10，overall 从 47.15 提升至 49.27，并在人类评估中获得 83.2% 的偏好率（48.8% 显著更好 + 34.4% 稍好），仅 4.2% 的基线被认为显著更好（Table 2）。
-
-
 
 Agentic Retoucher 将生成后修正重新定义为类似人类专家的 **感知-推理-动作** 闭环过程（Figure 3）。该框架由三个协作代理构成：感知代理（Perception Agent）、推理代理（Reasoning Agent）和动作代理（Action Agent），三者形成一个自我纠正的迭代循环。
 
@@ -139,12 +133,8 @@ $$I_{t+1} = \Phi_{\mathrm{act}}(I_t, \{M_i \lor D_i\}), \quad t \leftarrow t+1$$
 
 现有视觉语言模型在 AIGC 图像的失真定位上存在严重幻觉——即使给出明确的区域提示，仍无法准确识别手部、面部等局部缺陷（Figure 1 左）。Agentic Retoucher 通过将感知（精确定位）、推理（语义诊断）与动作（自适应修复）解耦并形成闭环，弥补了 VLM 在空间定位和失真推理上的不可靠性，实现了从“检测-诊断-修正”的完整自主修正流程。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2161_https_arxiv_org_abs_2601_02046/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of GenBlemish-27K. The figure illustrates (a) the dual-layer distortion taxonomy with six high-level dimensions and twelve fine-grained categories, (b) the distribution of localized distortion types, (c) the human-AI collaborative annotation pipeline, and (d) representative formatted samples with pixel-level masks and textual descriptions, highlighting how GenBlemish-27K enables fine-grained localization and reasoning over diverse text-to-image distortions*
-
-
 
 ### 框架总览与迭代闭环
 
@@ -182,13 +172,6 @@ $$\mathcal{L}_{\mathrm{GRPO}} = \mathbb{E}_{(q,o)}[\min(r_t \hat{A}_t, \mathrm{c
 
 动作代理不固定使用单一修复工具，而是依据感知代理的掩码输出和推理代理的诊断描述，在工具库中自适应选择 VLM 引导修复（如 Qwen-Edit、Gemini 2.5 Flash Image）或掩码引导修复（如 Flux-fill、SD-inpainting）。这种动态规划策略使得同一框架可兼容多种修复后端，且无论使用何种单一工具，结合感知与推理后均能显著超越直接使用该工具的基线（Table 1）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2161_https_arxiv_org_abs_2601_02046/figures/001_Figure_1.jpg]]
-*Figure 1: Left: Existing VLMs hallucinate and fail to localize distortions in AIGC-images, even with explicit region cues, whereas our method accurately localizes distorted regions and provides reasonable diagnoses. Right: Each before-after pair shows the distorted image and the result refined by our Agentic Retoucher, including diverse distortion artifacts across text, hand, face, and interaction*
-
-
-
 ## 实验与关键发现
 
 ### 主实验定量结果
@@ -215,9 +198,6 @@ Table 2 展示了随机双盲人类评估结果：83.2% 的测试样本被评定
 
 Table 3 报告了上下文感知感知代理在失真显著性预测上的定量结果。该方法在所有指标上达到 SOTA：AUC-Judd = 0.9336，NSS = 1.2087，显著优于 **RichHF**（Liang et al., CVPR 2024）和通用 VLM。定性可视化（Figure 5）进一步表明，该方法生成的显著图比 RichHF 和 GLM4.1V 更锐利、上下文感知更强，能够准确定位肢体、面部、文字等小尺度失真区域。
 
-![[assets/figures/papers/paper_list_l2161_https_arxiv_org_abs_2601_02046/figures/005_Table_3.jpg]]
-*Table 3: Quantitative evaluation of the Context-Aware Perception Agent on distortion-aware saliency prediction. Higher AUC-Judd, NSS, CC, SIM and lower KLD indicate better context perception*
-
 ### 推理代理评估与消融
 
 Table 4 展示了人类对齐推理代理在三个 VLM 骨干上的诊断准确率及训练策略消融。经渐进式对齐（SFT→GRPO）后，三个骨干均达到最高准确率：Qwen2.5-VL 80.10%，GLM-4.1V 79.26%，Ovis2.5 80.62%。
@@ -241,8 +221,6 @@ Figure 4 展示了跨多样化提示的修复定性比较。白色边界框标�
 ### 失败模式与局限
 
 当前分析中未提供系统性的失败模式记录。从方法设计推断，潜在局限包括：感知代理对未见失真类型的泛化能力尚待验证；迭代修正过程收敛于 2-3 轮，但极端失真可能需要更多轮次或超出工具库能力；GRPO 对齐依赖人类偏好数据质量，偏好标注偏差可能影响诊断准确性。以上推断需对照论文原文手动确认。
-
-
 
 ## 定位与知识库关联
 
@@ -289,8 +267,6 @@ Agentic Retoucher 在文本到图像生成的后处理研究谱系中，占据**
 - **区别于直接使用VLM进行修复的范式**（如 Qwen-Edit、Gemini 2.5 Flash Image）：通过引入感知代理弥补VLM的空间定位缺陷，通过GRPO对齐缓解VLM的幻觉问题，将VLM的角色从“直接执行者”转变为“被引导的诊断者”。
 
 - **训练范式定位**：感知代理采用监督学习（MSE+KLD混合损失），推理代理采用“SFT初始化 + GRPO强化”的渐进式人类偏好对齐，动作代理采用工具库调度的规则/学习混合策略。这种分阶段、分代理的训练策略在AIGC后处理领域属于较新的尝试，其“SFT→GRPO”的渐进路径（Table 4 消融显示单独SFT或GRPO均不如组合）为后续工作提供了可参考的训练范式。
-
-
 
 ## 原文 PDF
 

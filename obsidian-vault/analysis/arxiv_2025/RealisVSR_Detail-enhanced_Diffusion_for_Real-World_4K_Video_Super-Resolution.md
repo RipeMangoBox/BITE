@@ -54,8 +54,6 @@ RealisVSR通过三个关键因果调节因素破解上述瓶颈：**（1）** �
 
 值得注意的是，该方法仍存在若干局限：训练数据为自收集的50K 4K视频对，可能引入场景分布偏差；依赖Wan2.1预训练模型（约1.6B参数），对部署硬件要求较高；退化管道为两阶合成退化，尚未完整覆盖真实世界中传感器噪声、非均匀模糊等复杂退化组合。这些方面需在后续研究中进一步验证与改进。
 
-
-
 ### 真实世界视频超分的核心矛盾
 
 视频超分辨率（VSR）旨在从低质量视频中恢复高分辨率细节，在安防监控、影视修复、移动摄影等领域具有广泛需求。然而，当目标分辨率提升至4K级别时，现有方法面临一个根本性矛盾：**高频细节恢复与时空一致性之间的权衡**。传统GAN方法通常能生成锐利纹理，但容易引入时序闪烁和伪影；而基于扩散模型的新范式虽然具有更强的生成能力，却在真实世界复杂退化场景下暴露出三个关键瓶颈。
@@ -77,8 +75,6 @@ RealisVSR通过三个关键因果调节因素破解上述瓶颈：**（1）** �
 3. **提出高频校正损失（HR-Loss）**，结合小波分解和HOG特征显式增强高频分量的恢复。
 
 这一组合策略的核心洞察在于：**将先进的视频扩散先验与无噪声条件注入和频域感知损失相结合，可以在大幅减少训练数据（仅需STAR的25%）的同时，恢复真实世界4K视频中的高频细节并保持时序一致性。**
-
-
 
 ## 核心方法与创新机理
 
@@ -108,8 +104,6 @@ $$\mathbf{X}_{i}^{\text{main}} = \mathbf{X}_{i}^{\text{main}} + \gamma \cdot \ma
 ### 创新的协同效应
 
 三个 changed slot 并非孤立生效。Wan2.1 的视频先验为 CPC 的无噪声注入提供了稳定的时序基底，使条件信号不会被运动不一致性污染；CPC 抑制伪影后，HR-Loss 对高频分量的显式约束才能真正转化为纹理细节的增强，而非被伪影所消耗。这一协同效应的直接证据是：仅需 50K 训练视频对（约为 STAR 的 25%），RealisVSR 即在 SPMCS 上以 PSNR 27.36 dB 显著超越最佳基线 RealViformer（25.60 dB），同时在时间一致性指标 $E_{\text{warp}}$ 上达到 0.81，较 STAR（2.00）降低 60%。
-
-
 
 RealisVSR 的整体流程围绕三个核心设计展开：**强大的视频扩散先验**、**无噪声条件注入**和**频域感知的损失函数**。给定一段低质量（LQ）视频，系统首先通过基础模型将其压缩到潜空间，再利用一致性保留控制网络（CPC）将退化视频的条件信息注入去噪过程，最终解码为高细节的4K超分输出。
 
@@ -150,8 +144,6 @@ $$\mathcal{L}_{\mathrm{HR}} = \mathcal{L}_{\mathrm{WLF}} + \mathcal{L}_{\mathrm{
 
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2507_19138/figures/002_Figure_2.jpg]]
 *Figure 2: The framework of the proposed RealisVSR*
-
-
 
 RealisVSR 的核心架构由三个关键模块协同构成：**Wan2.1 视频扩散先验**、**一致性保留控制网络（CPC）** 和 **高频校正损失（HR-Loss）**。三者分别解决时序一致性、条件注入伪影和高频细节恢复三大瓶颈。
 
@@ -202,8 +194,6 @@ $$\mathcal{L}_{\text{HOG}} = \mathbb{E}\left[ \left\| \nabla_{\theta, m}(\boldsy
 $$\mathcal{L}_{\text{HR}} = \mathcal{L}_{\text{WLF}} + \mathcal{L}_{\text{HOG}} + \mathcal{L}_{\text{REC}} \tag{6}$$
 
 消融实验（Table 3）表明，CPC 模块将基准 PSNR 从 26.54 提升至 27.24 以上；单独加入 HOG 损失（CPC+HOG）进一步提升至 27.33；组合小波与 HOG 损失的全模型达到最优 PSNR 27.36、SSIM 0.8169。Table 5 进一步验证了小波高频权重 $\{1.0, 2.0, 2.0, 2.0\}$ 为最优配置，权重过高反而导致质量下降。
-
-
 
 ## 实验与关键发现
 
@@ -262,16 +252,6 @@ Table 4对比了扩散基方法的资源消耗。RealisVSR仅需50K训练视频�
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2507_19138/figures/008_Table_5.jpg]]
 *Table 5: The effect of weights*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2507_19138/figures/001_Figure_1.jpg]]
-*Figure 1: Visual comparisons of RealisVSR with the leading VSR methods in 4K-target video super-resolution scenarios. Compared to the state-of-the-art VSR models, e.g., Upscale-A-Video (Zhou et al. 2024), RealViformer (Zhang and Yao 2024), STAR (Xie et al. 2025). We achieve more sophisticated detail enhancement and better consistency. (Zoom-in for best view)*
-
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2507_19138/figures/006_Figure_4.jpg]]
-*Figure 4: Qualitative comparison of temporal consistency with the existing video super-resolution methods. We assess a row and track changes over time on Vid4 (Liu and Sun 2014). (Zoom-in for best view)*
-
-
-
 ## 定位与知识库关联
 
 ### 在视频超分辨率方法谱系中的位置
@@ -311,8 +291,6 @@ RealisVSR 处于**基于扩散模型的真实世界视频超分辨率**这一前
 4. **评估基准建设**：RealVideo-4K数据集的发布能否推动更真实的4K超分研究？需要设计更准确的无参考/全参考指标，以更好反映超分结果的纹理保真度和真实感，弥补当前DOVER等指标对伪影不敏感的缺陷。
 
 5. **CPC机制的理论分析**：移除噪声潜变量注入为何能抑制伪影？这一现象在其他条件生成任务（如视频修复、编辑）中是否同样有效，其理论原因是否需要从扩散模型的条件引导理论角度进行更深入的分析？
-
-
 
 ## 原文 PDF
 

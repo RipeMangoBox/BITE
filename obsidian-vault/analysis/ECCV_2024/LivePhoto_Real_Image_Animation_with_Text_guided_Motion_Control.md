@@ -57,8 +57,6 @@ claims:
 
 **局限性**：当前实现基于 Stable Diffusion v1.5，输出分辨率仅为 256×256；运动强度采用离散化 10 级表示，可能无法覆盖所有运动幅度需求。与商业产品相比，LivePhoto 在视频平滑度和空间分辨率上仍有差距，论文推测这源于训练数据规模和超分辨率后处理的差异。
 
-
-
 将静态图像转化为动态视频是视觉内容创作中的核心需求，但现有方案在运动控制能力上存在显著瓶颈。文本驱动的图像动画任务面临一个根本性困难：**文本指令天然缺乏对运动速度和幅度的精确描述能力**。例如，“一只熊在跳舞”这样的提示既可以对应缓慢摇摆，也可以对应剧烈扭动，这种文本到运动映射的高度歧义使得模型难以稳定生成符合预期的运动。
 
 更棘手的是，文本中往往混杂着内容描述（如“一只棕色的熊”）和运动描述（如“在跳舞”）。当内容描述与输入图像的信息冲突时，模型倾向于整体抑制文本的影响，导致运动指令被一并忽略——用户写了“挥手”，模型却输出一个几乎静止的视频。这一现象的本质是**文本嵌入中内容语义与运动语义的耦合**，现有方法缺乏有效机制将两者解耦并分别处理。
@@ -66,8 +64,6 @@ claims:
 从方法层面审视，当前主流方案可分为两类。一类是以 **VideoComposer**（Wang et al., NeurIPS 2023）为代表的学术方法，它通过组合式条件控制实现了基本的图像到视频生成，但在运动幅度控制上仍依赖文本的模糊描述。另一类是商业产品如 **GEN-2**（Runway, 2023）和 **Pikalabs**（PikaLabs, 2023），它们虽然在图像一致性和视频平滑度上表现出色，但其运动控制能力同样受限于文本输入的固有歧义。开源项目如 **I2VGEN-XL**、**AnimateDiff-I2V** 和 **Talesofai** 则普遍面临身份保持困难或运动生成不足的问题。
 
 上述缺口指向一个明确的研究动机：**能否引入一种显式的运动强度控制机制，将运动幅度从文本歧义中解放出来，同时设计一种文本重加权策略，让模型学会区分“该看什么”和“该怎么动”？** LivePhoto 正是沿着这一思路展开，通过运动强度参数化和自适应文本重加权两个核心模块，在保持图像内容一致性的前提下大幅提升了文本运动控制的精确性。
-
-
 
 ## 核心方法与创新机理
 
@@ -97,8 +93,6 @@ Figure 3 和 Figure 6 的权重可视化直接证实了这一机制的有效性�
 
 值得注意的是，LivePhoto 在图像一致性（3.6/5）上略低于商业产品 GEN-2（3.7）和 Pikalabs（3.9），论文推测这源于商业产品在训练数据规模、超分辨率后处理等方面的资源优势，而非方法设计层面的缺陷。这也意味着，当前创新在运动控制与图像保真度之间取得了有利的权衡——以微小的保真度代价换取了大幅领先的运动可控性。
 
-
-
 ![[assets/figures/papers/paper_list_l45_LivePhoto_Real_Image_Animation_with_Text_guided_Motion_Control/figures/002_Figure_2.jpg]]
 *Figure 2: Overall pipeline of LivePhoto. Besides taking the reference image and text as input, LivePhoto leverages the motion intensity as a supplementary condition. The image and the motion intensity (from level 1 to 10) are obtained from the ground truth video during training and customized by users during inference. The reference latent is first extracted as local content guidance. We concatenate it with the noise latent, a frame embedding, and the intensity embedding. This 10-channel tensor is fed into the UNet for denoising. During inference, we use the inversion of the reference latent instead of the pure Gaussian to provide content priors. At the top, a content encoder extracts the visual toke...*
 
@@ -115,8 +109,6 @@ $$\tilde{\mathbf{z}}_T^n = \boldsymbol{\alpha}^n \cdot \mathrm{Inv}(\mathbf{r}_0
 其中 $\boldsymbol{\alpha}^n$ 从首帧到末帧线性衰减。这一操作为初始帧提供了强外观先验，与内容编码器协同作用，大幅提升了帧间身份一致性（Table 1：DINO 从 82.3 提升至 90.8，CLIP 从 91.7 提升至 95.2）。
 
 **训练与推理流程。** 训练阶段，运动强度由真实视频的 SSIM 计算得到，文本重加权模块与运动模块同步学习。推理阶段，用户提供任意参考图像、文本指令和可选的运动强度等级（默认等级 5），模型在零样本设定下生成动画视频。整个 pipeline 中，Stable Diffusion 的基础权重和 DINOv2 编码器保持冻结，仅运动模块、文本重加权模块和内容编码器的线性投影层参与训练。
-
-
 
 LivePhoto 在 Stable Diffusion v1.5 的文本到视频扩散框架基础上，围绕“文本到运动的歧义性”这一核心瓶颈，引入了三个关键设计：**参考图像内容引导**、**运动强度参数化**和**文本重加权**。以下逐一拆解其机理与公式。
 
@@ -166,8 +158,6 @@ $$\operatorname{SSIM}(\mathbf{x}, \mathbf{y}) = l(\mathbf{x}, \mathbf{y})^{\alph
 具体实现：在冻结的 CLIP 文本编码器之后，附加三层 Transformer 编码器和一个逐帧线性层。对于每个文本 token，线性层输出一个标量，经 Sigmoid 激活后作为权重与原始嵌入相乘。训练过程中，该模块通过端到端优化自动学习哪些 token 对运动控制更关键。Figure 3 的可视化表明，在“a baby dinosaur is waving its hand”中，“waving”获得了最高权重，验证了模块的有效性。
 
 消融实验（Table 2）量化了运动强度引导与文本重加权的独立贡献：移除运动强度引导导致 DINO 从 90.8 降至 90.3、CLIP 从 95.2 降至 94.8；移除文本重加权导致 DINO 降至 90.1、CLIP 降至 93.9。文本重加权的降幅更大，表明其对帧一致性的影响更为显著——这与“文本歧义是核心瓶颈”的论断一致。
-
-
 
 ## 实验与关键发现
 
@@ -226,17 +216,11 @@ Figure 8 展示了 LivePhoto 与 I2VGEN-XL、AnimateDiff-I2V 和 Talesofai 等�
 
 以下问题需要后续工作验证或用户自行评估：运动强度估计是否应与文本语义动态绑定，使不同动作描述自动映射到合理强度范围；文本重加权模块在长尾或复合运动描述上的泛化能力；LivePhoto 能否扩展到 16 帧以上并保持时序一致性；当用户输入图像与训练数据分布差异较大时，强度引导是否仍然有效。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l45_LivePhoto_Real_Image_Animation_with_Text_guided_Motion_Control/figures/001_Figure.jpg]]
-
 ![[assets/figures/papers/paper_list_l45_LivePhoto_Real_Image_Animation_with_Text_guided_Motion_Control/figures/005_Table_1.jpg]]
 *Table 1: Quatitative analysis for image content guidance. We assess frame consistency using DINO and CLIP scores. The content encoder and prior inversion bring steady improvements*
 
 ![[assets/figures/papers/paper_list_l45_LivePhoto_Real_Image_Animation_with_Text_guided_Motion_Control/figures/011_Table_3.jpg]]
 *Table 3: Results of user study. We let annotators rate from four perspectives: Image consistency $\mathbf { \Pi } ( \mathbf { C } _ { \mathrm { i m a g e } }$ ) evaluates the capability to maintain the identity of the reference image. Text consistency $\mathbf { \Pi } ( \mathbf { C } _ { \mathrm { t e x t } }$ ) measures the adherence to the textual descriptions in directing motion. Content quality $\mathbf { \Pi } ( \mathbf { Q } _ { \mathrm { c o n t } }$ ) focuses on the interframe coherence and resolutions. Motion quality $\mathbf { \Omega } ( \mathbf { Q } _ { \mathrm { m o t } }$ ) evaluates appropriateness of motions
-
-
 
 ## 定位与知识库关联
 
@@ -314,8 +298,6 @@ LivePhoto 适用于以下场景：
 3. **与商业产品的差距弥合**：如何在不损失文本运动控制能力的前提下，通过超分辨率后处理或更大规模训练缩小与商业产品在视频平滑度和分辨率上的差距？
 4. **长序列扩展**：LivePhoto 能否扩展到更长序列（如 64 帧或更多）并保持时序一致性？先验反转机制中的线性衰减系数 $\alpha^n$ 在长序列下是否需要重新设计？
 5. **跨分布泛化**：运动强度估计依赖训练视频的 SSIM 分布，当用户输入图像（如医学图像、遥感图像）与训练数据分布差异较大时，强度引导是否仍然有效？
-
-
 
 ## 原文 PDF
 

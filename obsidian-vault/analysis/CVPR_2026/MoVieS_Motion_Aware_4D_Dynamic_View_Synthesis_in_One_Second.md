@@ -54,8 +54,6 @@ MoVieS 针对这一瓶颈提出了**动态 Splatter Pixel 表征**：将动态�
 - **3D 点跟踪**：在 Aria 数字孪生数据集上，3D 跟踪终点误差降至 **0.2153**，准确率 δ⁰.⁰⁵ 达到 **52.05%**（Table 3）。
 - **多任务协同**：消融实验证实，联合训练运动估计与新视图合成显著优于单独训练任一任务，验证了多任务协同的关键作用（Table 6）。
 
-
-
 ### 动态视图合成：从逐场景优化到前馈重建
 
 从稀疏或单目视频中重建可自由导航的 4D 动态场景，是计算机视觉和图形学的核心挑战，直接支撑着增强现实、自动驾驶仿真和沉浸式媒体等应用。传统方法依赖逐场景优化——对每个场景单独运行基于 NeRF 或 3D Gaussian Splatting 的优化管线，虽然能够产生高质量结果，但通常需要数分钟到数小时的训练时间，难以满足实时交互需求。
@@ -77,8 +75,6 @@ MoVieS 针对这一瓶颈提出了**动态 Splatter Pixel 表征**：将动态�
 本文的核心洞察在于：**动态场景可以被解构为静态高斯原语和可学习的变形场**，通过共享的特征骨干和时间自适应运动头，在单一模型内统一外观重建、几何预测和 3D 运动跟踪。这一设计使得三个任务能够相互增强——运动估计为视图合成提供时序一致性约束，视图合成损失反过来监督运动学习的质量，而深度估计则为两者提供稳定的 3D 空间参考。
 
 在此框架下，MoVieS 旨在回答一个关键问题：**能否在保持前馈推理速度（亚秒级）的前提下，实现动态场景的高质量视图合成和精确的 3D 运动跟踪？** 为此，MoVieS 对每个像素对齐的高斯原语显式施加时间条件的运动监督，并通过联合优化驱动多任务一致性，从而在动态视图合成基准上以 0.93 秒的单场景推理时间达到 18.46 mPSNR，速度比此前方法快数个数量级。
-
-
 
 ## 核心方法与创新机理
 
@@ -123,8 +119,6 @@ $$\mathcal{L}_{\mathrm{motion}} := \lambda_{\mathrm{pt}} \mathcal{L}_{\mathrm{pt
 
 消融实验（Table 5）证明，同时使用两种运动损失在 Aria 数字孪生数据集上将 3D 点跟踪 EPE 降至 0.2153，$\delta_{0.05}$ 提升至 52.05%，优于单独使用任一损失。更关键的是，联合训练运动估计与新视图合成（完整 MoVieS）在 DyCheck 上的 mPSNR 达 18.46，显著优于仅训练 NVS 或仅训练运动的变体（Table 6），验证了多任务协同对两个方向的共同促进作用——这一因果机制是 MoVieS 区别于“先估计运动再合成视图”分离式方案的本质差异。
 
-
-
 MoVieS 提出了一种统一的多任务前馈框架，将动态场景的外观重建、几何预测与 3D 运动跟踪集成在单一模型中。其核心设计思路是：将动态场景解构为**静态像素对齐的高斯原语（splatter pixel）** 和**时间相关的变形场**，通过共享的 Transformer 特征骨干与三个解耦的预测头，在单次前向传播中同时输出深度图、新视图渲染所需的高斯属性，以及任意查询时刻的 3D 运动位移。
 
 **输入与共享编码**
@@ -161,12 +155,8 @@ $$\mathcal{L} := \lambda_{\mathrm{d}} \mathcal{L}_{\mathrm{depth}} + \lambda_{\m
 
 其中深度损失 $\mathcal{L}_{\mathrm{depth}}$ 由预测深度与真值的 MSE 及其空间梯度的 L1 损失组成；渲染损失 $\mathcal{L}_{\mathrm{rendering}}$ 包含像素级 MSE 和 LPIPS 感知损失；运动损失 $\mathcal{L}_{\mathrm{motion}}$ 进一步分解为点对点 L1 项和内部距离分布保持项，共同监督 3D 位移的回归质量。消融实验证实，三者联合训练能产生显著的多任务协同增益——在 DyCheck 动态基准上，完整 MoVieS 的 mPSNR 达到 18.46，远优于仅训练静态或仅训练运动的变体。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l16_https_openaccess_thecvf_com_content_CVPR2026_html_Lin_MoVieS_Motion_Awar/figures/001_Figure_1.jpg]]
 *Figure 1: Overview. MoVieS consists of a shared image encoder, an attention-based feature backbone (Sec. 3.2.1), and three heads (Sec. 3.2.2) to jointly model appearance, geometry and motion. Motion head is time-conditioned to model dynamic content with respect to several query timestamps. Normalized XYZ values in the 3D space of motion maps are treated as RGB channels for visualization. Time-varying Gaussian attributes are omitted and point clouds with color and identity Gaussian attributes are visualized here for brevity*
-
-
 
 ### 动态 Splatter Pixel 表示
 
@@ -232,13 +222,6 @@ $$
 
 特征骨干中，输入帧的时间戳 $t_i \in [0,1]$ 通过正弦位置编码生成时间 token，与图像 token 和相机 token 拼接后送入基于 **VGGT** 几何预训练注意力块的 Transformer 骨干进行跨帧交互。运动头则通过 AdaLN 接收查询时间戳 $t_q$ 的正弦编码，使模型能够在任意查询时刻预测运动，而非仅局限于输入帧时刻。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l16_https_openaccess_thecvf_com_content_CVPR2026_html_Lin_MoVieS_Motion_Awar/figures/002_Figure_2.jpg]]
-*Figure 2: Motion Head. Given M query timesteps, the proposed motion head is conditioned via adaptive layer normalization (AdaLN) and predicts 3D displacements for each input pixel. After rasterization using the M corresponding query-time cameras, output images in shape*
-
-
-
 ## 实验与关键发现
 
 ### 4.1 实验设置
@@ -284,9 +267,6 @@ MoVieS 在八个异构数据集上进行大规模联合训练（Table 1），覆
 
 Figure 5 展示了 MoVieS 预测的运动图在未经过任何任务特定微调的情况下，可直接应用于**场景流估计**和**运动物体分割**两个下游任务。这得益于运动头输出的逐像素 3D 位移图天然编码了场景的运动信息——位移的幅值对应场景流强度，位移的聚类模式自然分离出运动物体与静态背景。这一零样本迁移能力表明 MoVieS 学到的运动表征具有良好的通用性。
 
-![[assets/figures/papers/paper_list_l16_https_openaccess_thecvf_com_content_CVPR2026_html_Lin_MoVieS_Motion_Awar/figures/011_Figure_5.jpg]]
-*Figure 5: Zero-shot Applications. Predicted motion maps from our model can be directly applied to downstream tasks, such as (a) scene flow estimation and (b) moving object segmentation, in a zero-shot manner, without any task-specific fine-tuning or supervision*
-
 ### 4.6 局限性与失效模式
 
 尽管 MoVieS 在多个基准上表现出色，以下局限性值得关注：
@@ -297,27 +277,14 @@ Figure 5 展示了 MoVieS 预测的运动图在未经过任何任务特定微调
 4. **挑战性材质与遮挡**：论文未专门验证模型在透明、反射或严重遮挡区域的运动建模能力。这些区域的视觉特征模糊或缺失，可能导致运动预测失败——这一点需要在实际部署中手动验证。
 5. **长序列与拓扑变化**：当前实验集中在短时视频片段，模型对于更长序列的在线点跟踪能力、以及面对拓扑断裂或碎片化等复杂形变的泛化表现，仍是开放问题。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l16_https_openaccess_thecvf_com_content_CVPR2026_html_Lin_MoVieS_Motion_Awar/figures/005_Table_2.jpg]]
 *Table 2: Evaluation on Novel View Synthesis. The best , second best and third best results are highlighted for clarity. † indicates our reimplemented version of GS-LRM [91]. “Ours (static)” refers to our method pretrained solely on static datasets without the motion head. The same camera parameters are provided for all methods for fair comparison*
-
-![[assets/figures/papers/paper_list_l16_https_openaccess_thecvf_com_content_CVPR2026_html_Lin_MoVieS_Motion_Awar/figures/006_Table_3.jpg]]
-*Table 3: Evaluation on 3D Point Tracking. The best , second best and third best results are highlighted for clarity. † denotes combining a depth estimation model [6]. All methods are given the same camera information for unprojecting 3D tracked points*
 
 ![[assets/figures/papers/paper_list_l16_https_openaccess_thecvf_com_content_CVPR2026_html_Lin_MoVieS_Motion_Awar/figures/010_Table_6.jpg]]
 *Table 6: Ablation Study on the synergy of motion estimation and novel view synthesis (NVS)*
 
 ![[assets/figures/papers/paper_list_l16_https_openaccess_thecvf_com_content_CVPR2026_html_Lin_MoVieS_Motion_Awar/figures/009_Table_5.jpg]]
 *Table 5: Ablation study on motion supervision*
-
-![[assets/figures/papers/paper_list_l16_https_openaccess_thecvf_com_content_CVPR2026_html_Lin_MoVieS_Motion_Awar/figures/008_Table_4.jpg]]
-*Table 4: Ablation study on camera conditioning*
-
-![[assets/figures/papers/paper_list_l16_https_openaccess_thecvf_com_content_CVPR2026_html_Lin_MoVieS_Motion_Awar/figures/004_Figure_3.jpg]]
-*Figure 3: Novel View Synthesis for Dynamic Scenes. Given a monocular video, we compare synthesized novel views of different methods. Invisible regions are rendered as black or white, depending on the implementation. More results are in the supplementary material*
-
-
 
 ## 定位与知识库关联
 
@@ -360,8 +327,6 @@ MoVieS 的提出打开了一个新的研究空间，但同时也留下了若干�
 - **跨域泛化能力**：训练数据虽覆盖多个领域，但极端运动（如高速旋转、剧烈变形）和罕见动态场景（如流体、烟雾）的泛化表现尚未得到系统验证。扩大数据规模和多样性，或引入物理先验约束，是提升鲁棒性的潜在路径。
 
 **总体定位**：MoVieS 在前馈视图合成与动态场景建模的交叉点上，通过“静态基元 + 时间条件变形场”的统一表示和“外观-几何-运动”联合训练范式，首次实现了亚秒级的 4D 动态视图合成与 3D 点跟踪。它在方法谱系中处于静态前馈重建模型（DepthSplat, GS-LRM）向通用 4D 场景理解模型演进的关键节点，其解耦的预测头设计和多任务协同训练策略为后续工作提供了可复用的架构模板。
-
-
 
 ## 原文 PDF
 

@@ -56,8 +56,6 @@ claims:
 
 **主要结果：** 在 ScanNet v2、SUN RGB-D、S3DIS 三个室内基准上，H^2A^2 以仅几何坐标输入，一致超越强基线 **TR3D**（Rukhovich et al., ICIP 2023）：ScanNet v2 mAP@0.25 由 72.9 提升至 77.5（+4.6），S3DIS mAP@0.5 由 51.7 提升至 59.3（+7.6）。在 3RScan 上的零样本泛化实验进一步验证了方法的迁移能力（mAP@0.25: 50.7 vs 47.6）。消融实验确认 SF-KS 与 NGH 各自贡献显著，且模块可迁移至 **FCAF3D**（Rukhovich et al., ECCV 2022）框架并带来一致提升。
 
-
-
 ### 室内3D目标检测的现状与瓶颈
 
 室内3D目标检测旨在从点云输入中定位并识别物体，是场景理解、机器人导航等应用的基础任务。现有方法主要分为两类：基于霍夫投票的方法（如 **VoteNet**，Qi et al., ICCV 2019）、基于混合几何基元的方法（如 **H3DNet**，Zhang et al., ECCV 2020）、基于Transformer的方法（如 **GroupFree3D**，Liu et al., ICCV 2021），以及近年来表现出更强性能的anchor-free稀疏体素检测器（如 **FCAF3D**，Rukhovich et al., ECCV 2022；**TR3D**，Rukhovich et al., ICIP 2023）。
@@ -83,8 +81,6 @@ claims:
 2. **范数梯度均一化（NGH）**：通过归一化并动态重加权各任务梯度范数，缓解多源联合优化中的梯度冲突，使训练过程更加稳定高效。
 
 这两个机制分别从**特征感知**和**优化策略**两个层面，系统性地解决了统一室内3D检测中的同质/异质特征建模与多源训练协同问题。
-
-
 
 ## 核心方法与创新机理
 
@@ -151,8 +147,6 @@ $$s_k = \frac{M_t}{n_k + \varepsilon}, \quad \tilde{g}_k^p = s_k g_k^p$$
 
 SF-KS 与 NGH 形成**特征-优化协同**：SF-KS 在结构层面分离同质/异质信号，提升特征质量；NGH 在优化层面平衡多源梯度，保障训练稳定性。两者共同解决了统一室内3D检测中“共享什么、保留什么、如何稳定学习”的核心问题。
 
-
-
 H^2A^2 的整体架构建立在一个稀疏3D CNN骨干网络之上，核心目标是**在统一的多场景联合训练框架中，自适应地分离并增强跨场景同质几何特征，同时保留场景特异性的异质特征**。整个pipeline由三个关键组件构成：MinkResNet骨干、结构特征感知核选择模块（SF-KS）和范数梯度均一化算法（NGH），如 Figure 2 所示。
 
 ![[assets/figures/papers/paper_list_l2518_https_openaccess_thecvf_com_content_CVPR2026_html_Xie_H2A2_Homogeneity_A/figures/002_Figure_2.jpg]]
@@ -170,13 +164,6 @@ H^2A^2 的整体架构建立在一个稀疏3D CNN骨干网络之上，核心目�
 **检测头**：骨干网络输出的多层级特征送入**多级检测头**，基于深度对齐的点云管道回归有向3D边界框及类别（Section 3.1）。
 
 整个pipeline的信息流可概括为：点云 → MinkResNet（含SF-KS增强的稀疏卷积层）→ 多级特征 → 检测头 → 3D边界框；同时，NGH在反向传播时介入共享参数的梯度更新，确保多场景联合训练的稳定性。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2518_https_openaccess_thecvf_com_content_CVPR2026_html_Xie_H2A2_Homogeneity_A/figures/001_Figure_1.jpg]]
-*Figure 1: Explaining the homogenized spatial responses induced by similar structural patterns across different objects in varied scene. (a)(f) represent the convolution kernel offset representation induced by boundary structures; (b)(d)(e) represent the offset representation induced by planar structures; (c) represents the kernel offset representation induced by linear structures*
-
-
 
 H^2A^2 的核心由两个模块构成：结构特征感知核选择（SF-KS）与范数梯度均一化（NGH）。SF-KS 嵌入稀疏卷积层，负责分离并增强同质/异质特征；NGH 作用于反向传播，缓解多数据源联合训练中的梯度冲突。
 
@@ -248,19 +235,6 @@ $$\bar{g}^p = \frac{1}{K} \sum_{k=1}^K \tilde{g}_k^p$$
 | $\Psi = \frac{1}{K(K-1)} \sum_{i \neq j} \frac{2 n_i n_j}{n_i^2 + n_j^2 + \varepsilon}$ | $n_i$: 第 $i$ 秩梯度范数; $\Psi$: 范数相似性 | 衡量秩间梯度失衡程度 |
 | $\tilde{g}_k^p = s_k g_k^p, \ s_k = \frac{M_t}{n_k+\varepsilon}$ | $s_k$: 缩放因子; $M_t$: 目标范数 | 对齐梯度范数，保留方向 |
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2518_https_openaccess_thecvf_com_content_CVPR2026_html_Xie_H2A2_Homogeneity_A/figures/003_Figure_3.jpg]]
-*Figure 3: Illustration of the task-aware linear modulation process, where a modulation function takes the scene embedding as input to generate modulation parameters*
-
-![[assets/figures/papers/paper_list_l2518_https_openaccess_thecvf_com_content_CVPR2026_html_Xie_H2A2_Homogeneity_A/figures/004_Figure_4.jpg]]
-*Figure 4: The kernel prototype vector queries the scene point cloud features to measure their similarity, thereby obtaining the structural consistency posterior*
-
-![[assets/figures/papers/paper_list_l2518_https_openaccess_thecvf_com_content_CVPR2026_html_Xie_H2A2_Homogeneity_A/figures/005_Figure_5.jpg]]
-*Figure 5: Two-case schematic for NGH. Black: original rank gradients; red: naive mean; blue: result after norm-based homogenization (directions preserved). NGH activates only when Ψ*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -321,8 +295,6 @@ TLM 在所有数据集上均优于 w/o TLM 和 LA，验证了通道级仿射调�
 
 4. **多场景扩展性未知**：当前联合训练仅涉及三个数据集（对应三个 GPU rank），当扩展到更多场景（>3）时，SF-KS 的核选择空间和 NGH 的梯度平衡策略的可扩展性尚未验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2518_https_openaccess_thecvf_com_content_CVPR2026_html_Xie_H2A2_Homogeneity_A/figures/008_Figure_6.jpg]]
 *Figure 6: Visualization of 3D detection results. Compared with TR3D*
 
@@ -331,11 +303,6 @@ TLM 在所有数据集上均优于 w/o TLM 和 LA，验证了通道级仿射调�
 
 ![[assets/figures/papers/paper_list_l2518_https_openaccess_thecvf_com_content_CVPR2026_html_Xie_H2A2_Homogeneity_A/figures/010_Table_4.jpg]]
 *Table 4: Ablation study of Task-aware Linear Modulation (TLM) on ScanNet v2, SUN RGB-D and S3DIS datasets*
-
-![[assets/figures/papers/paper_list_l2518_https_openaccess_thecvf_com_content_CVPR2026_html_Xie_H2A2_Homogeneity_A/figures/012_Figure_7.jpg]]
-*Figure 7: Visualization of t-SNE from learned homogeneous and Heterogeneous features with our proposed*
-
-
 
 ## 定位与知识库关联
 
@@ -378,8 +345,6 @@ H^2A^2 直接构建于 **TR3D**（Rukhovich et al., ICIP 2023）的 anchor-free 
 - **室外场景泛化**：室内场景中有效的“线-面-角”几何基元在室外是否仍然构成主要的同质特征？可能需要重新定义结构原型以适应更大尺度、更稀疏的室外几何模式。
 
 - **与 Foundation Model 的融合**：近期 3D 视觉基础模型（如 PointLLM、Uni3D）展现出强大的场景理解能力，H^2A^2 的场景嵌入和结构原型能否与这些预训练表示结合，进一步提升跨场景泛化？
-
-
 
 ## 原文 PDF
 

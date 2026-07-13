@@ -79,8 +79,6 @@ UNICBench 通过以下机制实现统一评估：
 
 这些发现揭示了 MLLM 在计数任务上的**性能天花板**和**模态特异性弱点**，为后续改进提供了明确的诊断方向。
 
-
-
 ### 计数任务的核心地位与模态泛化困境
 
 计数是视觉理解、文档分析、音频事件检测等众多领域的基石任务，其本质是从非结构化数据中提取可量化的语义信息。然而，当前多模态大语言模型（MLLM）的评估体系存在一个显著盲区：计数能力通常被淹没在通用问答或视觉定位等复合评测中，缺乏一个跨模态、标准化、难度分层的统一基准。这导致两个关键问题悬而未决——**不同模态下计数错误的根源是否同构？模型在基础感知计数与需要语义筛选、去重、推理的复杂计数之间，性能衰减的拐点在哪里？**
@@ -102,8 +100,6 @@ UNICBench 通过以下机制实现统一评估：
 3. **大规模模型覆盖**：在统一协议下评估45个最先进MLLM，涵盖闭源与开源模型，从InternVL3.5-241B-A28B到Gemini-2.5-Pro-Thinking、GPT-5-mini等，形成迄今最大规模的跨模态计数能力全景图。
 
 通过这一设计，UNICBench不仅提供了模型排名的“体检报告”，更试图揭示计数能力的长尾错误模式、模态特异的失败机制，以及思维链推理在高难度样本上的真实增益边界。
-
-
 
 ## 核心方法与创新机理
 
@@ -137,8 +133,6 @@ UNICBench 设计了跨模态统一的 JSON 问答与证据格式，要求标注�
 
 这些诊断性发现超越了简单的性能排名，为后续改进提供了明确的指向——例如，音频计数需要改进事件分割架构，文本计数需要增强长文档的跨段落语义去重能力，图像计数需要突破高密度场景的表征瓶颈。
 
-
-
 UNICBench 构建了一套端到端的统一评估流水线，将多模态计数任务标准化为可比较的评测范式。整个框架围绕四个核心模块展开：多源数据收集、统一 QA-证据模式构建、能力与难度标注、以及标准化评估协议执行。
 
 **多源数据收集** 模块汇聚了图像、文本、音频三个模态的计数数据。图像样本来自 FSC147、NWPU-MOC、CARPK、JHU-CROWD++、UCF-QNRF 等经典计数数据集；文本样本为自建语料，涵盖 LaTeX 公式、代码片段、长文档等多种结构复杂类别；音频样本则来源于 DESED 和 AliMeeting 等事件检测与会议场景数据集。这种跨模态、跨来源的数据汇聚策略，确保了基准在计数场景上的广泛覆盖。
@@ -155,8 +149,6 @@ UNICBench 构建了一套端到端的统一评估流水线，将多模态计数�
 **标准化评估协议** 是流水线的执行末端。所有模型在统一配置下运行：系统提示固定、最大输出 token 数 4096、温度设为 0.0（不支持温度调节的模型使用默认值并在结果中注明）、超时时间 120 秒。答案提取器针对不同模型的包裹格式（如 `<think>`、`<answer>`、`<begin of box>` 等标签）做了适配，以减少格式偏差。评估指标包括成功率（Success Rate）、平均绝对误差（MAE）、均方误差（MSE）以及多级容错命中率（HitRate@100%/90%/80%），从输出鲁棒性、数值精度和近似能力三个维度全面刻画模型表现。
 
 流水线的输入是原始多模态数据与计数问题，输出是 45 个 MLLM 在三个模态赛道上的标准化性能剖面。这一设计使得不同模态、不同模型的结果可以直接横向对比，同时保留了按能力层级和难度分层下钻分析的能力。
-
-
 
 UNICBench 本身是一个统一评估基准，而非提出新模型架构，因此其“核心模块”体现为构建标准化评估管线的四个功能模块，以及配套的度量公式体系。
 
@@ -197,8 +189,6 @@ $$\mathrm{HitRate}@(1-\tau) = \frac{1}{N} \sum_{i=1}^N \mathbf{1}_i^{(\tau)}$$
 
 **能力层级的形式化定义**：上述 L1-L3 的数学表述不仅是分类标签，更直接对应了任务难度的递增——L1 仅需感知存在性，L2 需理解语义属性并过滤，L3 需多步推理与聚合。实验一致表明，MAE 和 MSE 从 L1 到 L3 单调递增，验证了该分类法的有效性。
 
-
-
 ## 实验与关键发现
 
 UNICBench对45个最先进MLLM在图像、文本、音频三个模态上进行了系统性评估。所有模型使用统一的系统提示、固定随机种子、标准化分割与解码参数（temperature=0.0, max tokens=4096），答案提取器针对不同模型的包裹格式（如`<think>`/`<answer>`/`<begin of box>`）做了适配，以减少格式偏差。评估指标包括Success Rate（可解析数值预测的样本比例）、MAE/MSE、以及在不同容错阈值（0%、10%、20%）下的Hit Rate。
@@ -214,9 +204,6 @@ UNICBench对45个最先进MLLM在图像、文本、音频三个模态上进行�
 *Figure 4: Distribution of prediction error on image modality. Whiskers and outliers indicate extreme failures—long whiskers or many outliers show a model makes severe errors on some samples (e.g., rare classes, label noise, or collapse cases). Such frequent extreme errors can substantially increase MAE/MSE even when the median error looks small.The model ordering is consistent with that in Table 2*
 
 误差随难度单调递增。从L1（感知级）到L2（语义级）再到L3（推理级），MAE和MSE持续攀升（Figure 22），验证了分层分类法的有效性。Figure 4的箱线图进一步显示，长须和大量离群点表明模型在部分样本上出现严重错误（如稀有类别、标签噪声或模型崩溃），这些极端失败即使在中位误差较小时也能大幅推高MAE/MSE。
-
-![[assets/figures/papers/paper_list_l2214_https_arxiv_org_abs_2603_00595/figures/034_Figure_22.jpg]]
-*Figure 22: Performance across difficulty levels in the image modality. Models perform best on Pattern-level (L1) samples, degrade on Semantic-level (L2), and show the largest errors on Reasoning-level (L3) samples, demonstrating the expected progression of counting difficulty*
 
 消融分析显示，提高图像分辨率对超高密度场景的提升有限，存在表征瓶颈——模型无法仅通过增加像素来克服密集场景中的目标重叠与遮挡问题。
 
@@ -238,16 +225,10 @@ UNICBench对45个最先进MLLM在图像、文本、音频三个模态上进行�
 ![[assets/figures/papers/paper_list_l2214_https_arxiv_org_abs_2603_00595/figures/009_Table_4.jpg]]
 *Table 4: Benchmark results on the audio-modality counting track. Metrics are: SuccessRate (%), Hit rates (@100%/@90%@80%), MAE/MSE for Overall, per-difficulty, and per-capability. MSE values are shown in scientific notation with one decimal. A “-” indicates that no valid values were obtained for this statistical dimension*
 
-![[assets/figures/papers/paper_list_l2214_https_arxiv_org_abs_2603_00595/figures/010_Figure_6.jpg]]
-*Figure 6: Error-type analysis on the audio modality. Models that refuse or fail to produce numeric outputs more often avoid counting those errors in MAE (but are penalized in SuccessRate)*
-
 ![[assets/figures/papers/paper_list_l2214_https_arxiv_org_abs_2603_00595/figures/036_Figure_25.jpg]]
 *Figure 25: Audio modality accuracy comparison. Overall accuracy of audio-capable models under Exact Match, 10% error, and 20% error thresholds. Audio counting shows lower precision due to temporal ambiguity and variable acoustic patterns*
 
 Gemini-2.5-Pro-Thinking在音频赛道取得64.0%的Success Rate，而Voxtral-mini高达99.8%，显示出专用音频模型在格式遵从性上的优势。从L1到L3，MAE和MSE持续增加（Figure 26），时间推理是音频计数的主要挑战。类别级分析（Figure 32）显示，环境声音相对容易，而对话语音产生不成比例的大误差，原因在于语音中的事件分割（如说话人转换、重叠语音）是类别性失败的主要来源。
-
-![[assets/figures/papers/paper_list_l2214_https_arxiv_org_abs_2603_00595/figures/043_Figure_32.jpg]]
-*Figure 32: Category-level MAE heatmap for audio counting. Environmental sounds are relatively easier, while conversational speech produces disproportionately large errors*
 
 ### 跨模态对比：统一基准揭示的共性瓶颈
 
@@ -257,19 +238,6 @@ Gemini-2.5-Pro-Thinking在音频赛道取得64.0%的Success Rate，而Voxtral-mi
 *Figure 7: Modality comprehensive comparison. The figure illustrates cross-modal distributions among image, text, and audio, comparing sample and question counts, average values, difficulty types, and count distributions*
 
 综合三个赛道的结果，当前MLLM在计数任务上的核心瓶颈并非数值输出格式或基本感知，而是**缺乏跨模态的通用推理能力**。模型在L1基础计数上表现尚可，但在需要语义筛选、去重和推理的L2/L3任务以及高密度、长文档、时间重叠等困难样本上出现大量长尾错误。这一发现为未来MLLM的计数能力改进指明了方向：单纯提升感知精度或输出格式控制不足以解决问题，需要增强跨模态的语义理解和多步推理机制。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2214_https_arxiv_org_abs_2603_00595/figures/008_Figure_5.jpg]]
-*Figure 5: Prediction vs. ground truth scatter. Each point is one sample. The upper-right green box highlights a small set of extreme high-count samples where the thinking mode defeated non-thinking mode, which drives most of the overall MAE gap*
-
-![[assets/figures/papers/paper_list_l2214_https_arxiv_org_abs_2603_00595/figures/042_Figure_30.jpg]]
-*Figure 30: Category-level MAE heatmap for text-based counting. Categories differ widely in structural complexity, causing substantial variation in numerical deviation*
-
-![[assets/figures/papers/paper_list_l2214_https_arxiv_org_abs_2603_00595/figures/039_Figure_28.jpg]]
-*Figure 28: Category-level MAE heatmap for image-based counting. Rows denote categories and columns correspond to models. Darker colors represent larger numerical deviations*
-
-
 
 ## 定位与知识库关联
 
@@ -306,8 +274,6 @@ UNICBench 的评估协议通过固定系统提示、统一分割、固定温度�
 2. **音频时间推理**：音频事件计数中的时间重叠和背景噪声导致类别性失败（Figure 25），而非轻微偏差，如何通过改进模型架构解决？
 3. **长文档语义聚合**：长文档中跨段落、跨页面的语义去重和聚合计数仍面临巨大挑战（Figure 30），未来方向是什么？
 4. **混合推理架构**：能否设计一种融合符号推理与神经网络的混合计数方法，以减少 L3 推理级任务中的系统性错误？
-
-
 
 ## 原文 PDF
 

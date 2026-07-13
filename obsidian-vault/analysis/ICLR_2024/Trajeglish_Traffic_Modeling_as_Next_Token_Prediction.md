@@ -49,8 +49,6 @@ claims:
 
 在 **Waymo Sim Agents 测试基准**上，Trajeglish 在真实感元指标上超越先前最佳方法 **3.3%**，交互指标提升 **9.9%**，成为该基准上首个基于离散序列建模的方法。分词层面，k-disks 在词汇量仅为 384 时即达到 **1.18 厘米**的期望离散化误差，远优于 k-means（6.13 厘米）和网格基线。在仅初始化一个时间步的全自主设定下，Trajeglish 的碰撞率显著低于忽略时间步内交互的基线，验证了步内条件建模对于闭环仿真的关键作用。
 
-
-
 ### 问题背景：闭环多智能体交通仿真
 
 自动驾驶系统的安全验证依赖高保真的闭环交通仿真。其核心挑战在于生成**多智能体未来轨迹**，这些轨迹不仅需要在个体层面符合运动学约束，更必须在**场景层面保持全局一致性**——即所有智能体的行为要彼此协调、避免碰撞，并共同服从地图拓扑的约束。Waymo Sim Agents Benchmark 正是为此设立的标准化测试，通过“真实感元指标”（Realism Meta Metric）和“交互指标”（Interaction Metric）量化生成轨迹的逼真度。
@@ -74,8 +72,6 @@ claims:
 - **GPT 式编码器-解码器架构**：在时间维度上自回归地预测下一个动作标记，同时在每个时间步内通过**因果掩码**暴露已选动作，实现时间步内的交互条件建模。
 
 这些设计使 Trajeglish 成为首个在 Waymo Sim Agents 基准上使用离散序列建模的方法，并在真实感元指标上超越先前最佳方法 3.3%，交互指标提升 9.9%（参见 Table 1）。
-
-
 
 ## 核心方法与创新机理
 
@@ -110,8 +106,6 @@ $$p(s_t^1, \ldots, s_t^N \mid s_{<t}, c) = \prod_{n=1}^{N} p(s_t^n \mid s_{<t}, 
 在训练策略上，Trajeglish 引入了**噪声分词增强**：通过 softmax 核分布采样添加噪声标记作为输入，而预测目标仍为最小距离标记（Sec A.2）。这一技巧缓解了教鞭强制训练与自回归采样之间的分布偏移问题，进一步提升了闭环仿真质量。
 
 综上，Trajeglish 的创新并非单一技术点的改进，而是**表示层（k-disks 分词）、建模层（时间步内因果条件）与架构层（GPT 式序列建模）** 的协同重构，三者共同构成了一个完整的离散序列交通建模范式。
-
-
 
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2312_04535/figures/015_Figure_15.jpg]]
 *Figure 15: Tokenization method comparison Average corner distance for trajectories tokenized with a vocabulary of 384 with template sets derived using different methods*
@@ -152,8 +146,6 @@ $$
 ### 训练策略的关键改进
 
 在训练阶段，Trajeglish 采用一种**噪声分词增强**策略（Sec A.2）：输入给解码器的历史动作标记并非来自精确分词目标，而是从 softmax 核分布中采样得到，而预测目标仍为最小距离标记。这一设计使模型在训练期间即暴露于推理时可能出现的累积误差，增强了闭环滚动的鲁棒性。
-
-
 
 Trajeglish 由两个核心组件构成：一个将连续轨迹离散化为运动标记的**分词策略**，以及一个在多智能体标记序列上进行下一个标记预测的**自回归 Transformer 架构**。以下分别阐述这两个模块的设计逻辑与关键公式。
 
@@ -212,14 +204,11 @@ p(s_1^1, ..., s_T^N \mid c) = &\prod_{t=1}^{T} \prod_{n=1}^{N} p\big(s_t^n \mid 
 
 训练时采用**噪声分词增强**（Sec A.2）：输入给解码器的动作标记并非精确分词结果，而是从 softmax 核分布中采样的噪声标记，而预测目标仍为最小距离标记。这一策略增强了模型对推理时累积误差的鲁棒性。此外，可选的**航向平滑器**（Heading Smoother, Sec A.5）作为后处理模块，从分词轨迹中恢复更精确的原始航向角。
 
-
-
 ## 实验与关键发现
 
 ### 主结果：Waymo Sim Agents 基准
 
 Trajeglish 在 Waymo Open Motion Dataset (WOMD) Sim Agents 测试基准上取得最优结果，其真实感元指标（Realism meta metric）达到 0.5339，较先前最佳方法提升 3.3%。交互指标（Interactive metrics）达到 0.5811，提升幅度达 9.9%（Table 1）。该方法是该基准上首个采用离散序列建模的模型，超越了包括 **Wayformer**（Nayakanti et al., 2022）、**MTR+++**（Shi et al., 2023）和 **Joint-Multipath++**（Varadarajan et al., 2021）在内的多个成熟运动预测模型。
-
 
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2312_04535/figures/008_Table_1.jpg]]
 *Table 1: WOMD Sim Agents Test*
@@ -227,7 +216,6 @@ Trajeglish 在 Waymo Open Motion Dataset (WOMD) Sim Agents 测试基准上取得
 ### 分词策略消融
 
 k-disks 分词模板在词汇量 |V|=384 时达到 1.18 厘米的期望离散化误差，显著优于 k-means 的 6.13 厘米和网格基线（Table 2; Fig. 6）。k-disks 通过迭代最小角距离优化模板集，使离散化误差接近厘米级保真度，且训练集与验证集上的标记频率分布高度一致（Fig. 5），表明模板未过拟合训练数据。
-
 
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2312_04535/figures/005_Figure_5.jpg]]
 *Figure 5: Token frequency We plot the frequency that each token appears in the validation and training sets. Note that we sort the tokens by their frequency for each class individually for the ID. Increasing the vocabulary size increases the resolution but also results in a longer tail. The distribution of actions on the training set and validation set match closely*
@@ -242,7 +230,6 @@ k-disks 分词模板在词汇量 |V|=384 时达到 1.18 厘米的期望离散化
 - **全自主设定下的碰撞率**：当仅初始化一个时间步时，Trajeglish 的碰撞率显著低于“no intra”基线，且该优势在车辆类别上尤为突出（Fig. 9）。随着初始化历史步数增加（≥4步），两者差距缩小，说明时间步内交互在缺乏历史信息时最为关键。
 - **负对数似然分析**：在预测某智能体下一动作时，模型通过条件化同时间步内已选动作获得预测能力增益，且该增益随智能体顺序后移而累积（Fig. 10）。
 
-
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2312_04535/figures/010_Figure_9.jpg]]
 *Figure 9: Full Autonomy Collision Rate Vehicle collision rate is shown on top and pedestrian collision rate is shown on bottom. From left to right, we seed the scene with an increasing number of initial actions from the recorded data. Trajeglish models the log data statistics significantly better than baselines when seeded with only an initial timestep, as well as with longer initialization*
 
@@ -253,37 +240,13 @@ k-disks 分词模板在词汇量 |V|=384 时达到 1.18 厘米的期望离散化
 
 在部分控制场景下，Trajeglish 的 minADE 指标随初始化历史步数增加而改善。当仅提供单步初始化时，考虑时间步内交互的模型与“no intra”基线之间存在显著性能差距；随初始化步数增至 4 步以上，两者趋于收敛（Fig. 8; Fig. 18）。这表明时间步内交互建模的核心价值在于稀疏历史条件下的闭环仿真。
 
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2312_04535/figures/009_Figure_8.jpg]]
-*Figure 8: Partial control ADE Left shows the ADE for the vehicles selected for evaluation under partial control, but for rollouts where the agents are fully autonomous. Right shows the ADE for the same vehicles but with all other agents on replay. When agents controlled by Trajeglish go first in the permutation order, they behave similarly to the no intra model. When they go last, they utilize the intra-timestep information to produce interaction more similar to recorded logs, achieving a lower ADE*
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2312_04535/figures/020_Figure_18.jpg]]
-*Figure 18: Full Autonomy minADE As we seed the scene with a longer initialization, the no-intra model and our model converge to similar values, and all models improve. When initialized with only a single timestep, the performance gap between models that take into account intra-timestep interaction and models that do not is significant*
-
 ### 分词误差与碰撞率
 
 语义分词性能分析显示，k-disks 分词后的碰撞率与原始数据分布高度一致（Fig. 16），验证了离散化过程未引入额外的碰撞偏差，为闭环仿真中的碰撞评估提供了可靠基础。
 
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2312_04535/figures/016_Figure_16.jpg]]
-*Figure 16: Semantic Tokenization Performance We plot the probability that the bounding box of an agent has non-zero overlap with another agent in the scene for each timestep. The collision rate for the raw data is shown in black*
-
 ### 训练效率与数据规模
 
 Trajeglish 的训练数据规模（以 token 数计）与自然语言数据集可比（Table 5），训练效率分析表明模型在约 1B token 后性能仍持续提升（Table 6; Fig. 11），暗示进一步扩展数据规模可能带来额外增益。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2312_04535/figures/012_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2312_04535/figures/014_Figure_14.jpg]]
-*Figure 14: K-disk expected discretization error Average corner distance for each of the k-disk vocabularies of sizes 128, 256, 384, and 512*
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2312_04535/figures/021_Figure_19.jpg]]
-*Figure 19: Partial control collision rate We plot the collision rate as a function of rollout time when the traffic model controls only one agent while the rest are on replay. We expect this collision rate to be higher than the log collision rate since the replay agents do not react to the dynamic agents. We note that the collision rate decreases significantly just by placing the agent last in the order, showing that the model learns to condition on the actions of other agents within a single timestep effectively. Figure 20: Context Length We plot the negative log-likelihood (NLL) when we vary the context length at test-time relative to the NLL at full context. Matching with intuition, while pedestria...*
-
-
-
 
 ## 定位与知识库关联
 
@@ -327,8 +290,6 @@ Trajeglish 的离散序列建模范式与上述连续回归方法形成根本性
 ### 知识库定位
 
 Trajeglish 将 GPT 风格的序列建模范式成功迁移到多智能体交通仿真领域，其核心贡献在于证明了**小词汇量离散分词 + 时间步内因果条件建模**的组合可以有效解决高维连续轨迹的交互生成问题。该方法桥接了自然语言处理中的下一个标记预测范式与自动驾驶中的多智能体轨迹生成，为后续研究开辟了将大规模语言模型架构直接应用于物理世界交互建模的技术路径。
-
-
 
 ## 原文 PDF
 

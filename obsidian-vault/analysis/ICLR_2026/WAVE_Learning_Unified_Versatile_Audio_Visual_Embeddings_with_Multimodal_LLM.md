@@ -53,15 +53,11 @@ claims:
 
 **方法定位**：WAVE 属于基于 MLLM 的统一嵌入学习范式，区别于 LamRA、GME、CAFe 等仅处理视觉-文本的嵌入 LLM，首次将音频与同步音视频纳入统一表示空间。其技术路线融合了多模态对比学习与指令微调，在方法谱系中处于“通用多模态嵌入大模型”节点。
 
-
-
 多模态嵌入旨在将不同模态的数据映射到统一的向量空间，使语义相似的样本彼此靠近，从而支撑跨模态检索、问答等下游任务。近年来，基于大语言模型的嵌入方法在文本与图像领域取得了显著进展，但其焦点长期局限于静态视觉模态，对音频及同步音视频流的统一建模关注不足。这一缺口导致现有方案难以构建真正通用的音视频嵌入空间——当任务需要同时理解画面中的动作、场景以及与之同步的语音、环境声时，缺乏统一表示的模型往往顾此失彼。
 
 具体而言，当前方法面临三重瓶颈。其一，音频模态的嵌入建模严重滞后于视觉。主流多模态LLM嵌入工作（如**LamRA 7B** (Liu et al., 2025a)、**GME 7B** (Zhang et al., 2024)、**CAFe 7B** (Yu et al., 2025a)）主要围绕视频-文本检索展开，对音频-文本检索、音视频跨模态检索的支持极为有限。其二，即使部分模型能够处理视频输入，其嵌入提取策略也普遍采用标准last-token pooling——仅从LLM的最后一层隐藏状态中取出EOS对应的表示作为最终嵌入。这种单层池化丢弃了中间层的丰富语义信息，限制了嵌入的表达能力。其三，现有训练范式通常以单一模态对的对比学习为主，缺乏跨模态、多任务的联合训练机制，导致模型无法在检索与问答等异质任务间实现知识迁移。
 
 WAVE的动机正是填补上述空白：构建一个同时覆盖文本、音频、视频的统一嵌入空间，使任意模态之间均可进行语义检索与推理。为实现这一目标，WAVE在架构上引入层次化特征融合策略，聚合LLM所有层的last-token状态；在输入侧采用双音频编码器设计，分别捕捉语音和通用音频事件；在训练侧实施多模态多任务联合训练，融合检索式对比学习与指令感知的问答训练。这种“全层融合+双路音频+联合训练”的组合机制，构成了WAVE突破单一模态嵌入范式的核心因果路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -86,8 +82,6 @@ WAVE的核心创新在于将多模态大语言模型（MLLM）的嵌入能力从
 联合训练的核心因果效应在于**跨模态知识迁移**。Table 6的消融实验显示，联合训练在8项任务中的7项上优于独立训练（如MMEB-v2-Video Overall: 59.0 vs 58.2），验证了多模态多任务协同对通用嵌入空间的正向塑造作用。
 
 更进一步，WAVE利用MLLM的指令遵循能力生成**指令感知嵌入**。在视频QA任务中，使用分离问题提示（separate questions）产生的嵌入平均得分72.5，远超通用提示的51.8（Table 5），证实模型能够根据文本指令动态调整嵌入的语义焦点。Figure 2的热力图直观展示了同一视频在不同提示下生成的嵌入与不同概念文本嵌入的余弦相似度差异，揭示了指令感知嵌入的可控语义聚焦能力。
-
-
 
 WAVE 的整体架构围绕一个核心设计原则展开：将多模态大语言模型（MLLM）转化为一个统一的嵌入提取器，使其能够为文本、图像、音频和视频四种模态生成可互检索的向量表示。图1展示了完整的端到端信息流。
 
@@ -142,8 +136,6 @@ $$\mathcal{L}_{\mathsf{QA}_i} = -\log \frac{\exp(\sin(e_{s_i}, e_{t_i}) / \tau)}
 
 温度参数 $\tau$ 统一设置为 0.01。整个训练在 192 块 H20 GPU 上进行一个 epoch，总耗时约 36 小时，学习率为 $2 \times 10^{-5}$。
 
-
-
 ### 3.1 统一嵌入提取流程
 
 WAVE 的核心设计目标是从文本、视觉、音频及音视频同步流中提取统一的嵌入表示。其嵌入提取流程由以下关键模块构成：
@@ -186,8 +178,6 @@ $$\mathcal{L}_{\mathrm{QA}} = \frac{1}{N} \sum_{i=1}^{N} \mathcal{L}_{\mathrm{QA
 
 WAVE 的关键能力之一是生成指令感知嵌入：同一视频在不同文本提示下产生不同的嵌入表示。对于多模态输入，文本提示始终作为指令输入 LLM，引导模型关注与任务相关的语义维度。这一机制使 WAVE 在视频 QA 任务上展现出显著优势——使用分离问题提示的嵌入平均得分 72.5，远超通用提示的 51.8（Table 5），验证了指令条件对嵌入语义的调控作用。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -196,21 +186,15 @@ WAVE在视频、音频及音视频多模态嵌入任务上均展现出显著优�
 
 **视频嵌入基准。** 在MMEB-v2-Video整体得分上，WAVE以59.9分大幅领先最强基线**Seed-1.6-Embedding**的55.3分（+4.6），并远超其他视频嵌入LLM基线如**LamRA 7B**（Liu et al., 2025a）、**GME 7B**（Zhang et al., 2024）和**CAFe 7B**（Yu et al., 2025a）（Table 3）。在LoVR主题到片段检索任务上，WAVE的R@25达到66.0，优于LamRA 7B的60.2（+5.8），进一步验证其跨视频理解能力。
 
-
 ![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_MiV3WXDYJb/figures/004_Table_3.jpg]]
 *Table 3: Results of video embedding benchmarks. Models are evaluated on the video track of MMEB-v2 and LoVR*
 
 **音频与音视频嵌入基准。** 在音频-文本检索（A-RET）上，WAVE在AudioCaps数据集上R@1达到44.2，超过**Mei et al., 2024**的42.2（+2.0）；在Clotho数据集上R@1达25.6，较基线21.5提升4.1个点（Table 4）。在更具挑战性的音视频检索（AV-RET）任务上，WAVE在VGGSound上R@1为25.0，相较encoder-only检索基线的10.3提升14.7个点；在MusicCaps上R@1为20.4，相较基线8.6提升11.8个点。这些结果表明双音频编码器设计（Whisper-based语音编码器 + BEATs通用音频编码器）有效捕获了环境声与音乐等非语音信息。
 
-
 ![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_MiV3WXDYJb/figures/005_Table_4.jpg]]
 *Table 4: Results of audio and audio-visual embedding benchmarks. Different tasks are evaluated, including audio retrieval (A-RET), audio-visual retrieval (AV-RET) and audio QA (A-QA)*
 
 **视频问答（QA）基准。** WAVE在MMEB-v2视频QA任务上的表现尤其突出。当使用分离问题提示（separate questions）生成指令感知嵌入时，平均得分达到72.5，远超通用提示（common prompt）下的51.8，并显著优于Seed-1.6-Embedding的60.9（+11.6）（Table 5）。这一结果直接验证了WAVE的指令感知嵌入机制：MLLM骨干根据不同的文本提示动态调整语义焦点，从而为每个问题生成任务特定的嵌入表示。
-
-
-![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_MiV3WXDYJb/figures/006_Table_5.jpg]]
-*Table 5: Results of different models on MMEB-v2 video QA data, including Video-MME (Fu et al., 2025), MVBench (Li et al., 2024), NExT-QA (Xiao et al., 2021), EgoSchema (Mangalam et al., 2023), and ActivityNetQA (Yu et al., 2019). In the case of “w/ separate questions”, each question is used as a different prompt*
 
 ### 消融实验
 
@@ -220,18 +204,12 @@ WAVE在视频、音频及音视频多模态嵌入任务上均展现出显著优�
 
 **层次化特征融合策略。** Table 7对比了不同嵌入提取方法。全层last-token融合（MLP fusion）在音视频条件下的视频检索平均得分为56.1，相较仅使用最后一层池化（last layer pooling）的54.7提升约1.4%。这一结果表明，聚合LLM所有层的last-token状态能够同时保留低层感知线索与高层语义推理信息，而轻量级两层MLP-GELU融合模块有效压缩并整合了这些多层次特征。此外，音频信息的引入将纯视觉条件下的检索得分从54.7提升至56.1，验证了音视频联合建模的增益。
 
-
-![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_MiV3WXDYJb/figures/008_Table_7.jpg]]
-*Table 7: Results of embedding extraction methods on the MMEB-v2 video retrieval data, including MSR-VTT, VATEX, MSVD, DiDeMo, and YouCook2. Note that videos in MSR-VTT, VATEX, and YouCook2 are paired with audio. “V” and “A+V” refer to visual-only and audio-visual, respectively*
-
 **双音频编码器设计。** Table 9的消融显示，采用双编码器（语音编码器 + BEATs音频编码器）相比仅使用单一语音编码器，在音频检索和音视频检索上均有明显提升。BEATs编码器专门捕获通用音频事件特征（如环境声、音乐），弥补了语音编码器对非语音音频理解的不足。
-
 
 ![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_MiV3WXDYJb/figures/011_Table_9.jpg]]
 *Table 9: Results of using dual speech and audio encoders and using a speech encoder only. Video retrieval (V-RET), audio retrieval (A-RET), and audio-visual retrieval (AV-RET) are evaluated here*
 
 **图像训练数据的影响。** Table 10表明，在训练中加入图像数据不仅大幅提升图像检索性能，对视频检索也有轻微增益。这说明静态图像与动态视频之间存在可迁移的视觉表征知识。
-
 
 ![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_MiV3WXDYJb/figures/012_Table_10.jpg]]
 *Table 10: Comparison of results for training with and without image data. We evaluate text-toimage retrieval (Liu et al., 2021) on the VisualNews dataset and text-to-video retrieval on MMEBv2-Video*
@@ -250,18 +228,8 @@ WAVE在视频、音频及音视频多模态嵌入任务上均展现出显著优�
 
 - **Table 7**：层次化融合策略的因果证据，全层MLP融合优于传统最后一层池化。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_MiV3WXDYJb/figures/002_Table_1.jpg]]
 *Table 1: An overview of training tasks and data. Four tasks are trained for our models: video-text retrieval, video-QA, video-autio retrieval and audio-text retrieval*
-
-![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_MiV3WXDYJb/figures/003_Table_2.jpg]]
-*Table 2: Details of the evaluation benchmarks. We formulate all tasks as “query-to-target” retrieval*
-
-![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_MiV3WXDYJb/figures/009_Table_8.jpg]]
-*Table 8: Results of video-to-text, audio-to-text and audio-to-video retrieval. Corresponding reference models and their scores are also provided*
-
-
 
 ## 定位与知识库关联
 
@@ -303,8 +271,6 @@ WAVE 构建于 **Qwen2.5-Omni 7B**（Xu et al., 2025）之上，继承了其 TMR
 3. **层次化融合的可泛化性**：WAVE 的全层 last-token 融合策略是否能泛化到更大规模的 MLLM 或更多模态（如 3D 点云、触觉）？融合模块的结构（当前为两层 MLP-GELU）是否需要随模型规模调整？
 
 4. **细粒度对齐的精度缺口**：指令感知嵌入与通用嵌入在细粒度多模态对齐任务（如指代表达理解、时序定位）上的性能差异尚未被系统评估，这可能是 WAVE 框架的下一个重要验证方向。
-
-
 
 ## 原文 PDF
 

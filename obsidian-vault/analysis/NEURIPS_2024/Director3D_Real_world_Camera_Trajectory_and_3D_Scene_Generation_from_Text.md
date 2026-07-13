@@ -49,8 +49,6 @@ Director3D 的核心洞察在于将真实世界多视角数据建模为相机轨
 
 在 T3Bench 基准上，Director3D 取得 BRISQUE 32.3、NIQE 4.35、CLIP-Score 85.5，显著优于 **ProlificDreamer**（Wang et al., 2023）等基线方法。消融实验验证了场景特定相机轨迹与 SDS++ 各组件的关键作用。该方法为真实世界文本到3D场景生成提供了新的方法论范式。
 
-
-
 ### 文本到3D生成的演进与瓶颈
 
 近年来，文本到3D生成技术取得了显著进展。以**DreamFusion**（Poole et al., ICLR 2023）为代表的Score Distillation Sampling（SDS）方法，通过利用预训练的2D扩散模型作为先验，实现了从文本描述到3D资产的生成。后续工作如**Magic3D**（Lin et al., CVPR 2023）、**ProlificDreamer**（Wang et al., 2023）等进一步提升了生成质量与保真度。然而，这些方法的成功主要局限于**物体级别**的生成——它们通常依赖预定义的、环绕物体的固定相机轨迹（如环绕物体的半球面采样），并假设场景是封闭的、有界的。
@@ -74,8 +72,6 @@ Director3D的核心洞察在于：**将真实世界多视角数据建模为相�
 - **细节精炼**需要利用2D扩散先验，但必须适应真实世界场景的复杂性和无界特性。
 
 基于这一洞察，Director3D设计了三个协同工作的核心组件：Cinematographer（轨迹扩散Transformer）负责生成自适应相机轨迹，Decorator（高斯驱动的多视角潜在扩散模型）负责生成像素对齐的初始3D高斯场景，Detailer（SDS++损失）负责通过密集相机插值渲染与2D扩散先验精炼细节。这一框架首次实现了从文本描述到真实世界3D场景（含自适应相机轨迹）的端到端生成。
-
-
 
 ## 核心方法与创新机理
 
@@ -132,8 +128,6 @@ Director3D 在文本到 3D 生成领域的方法谱系中占据独特位置：
 
 **待验证点**：由于缺乏部分 baseline 方法的完整引用信息（如 DreamScene 的准确引用），上述谱系定位中个别方法的对比需结合原始文献进一步确认。
 
-
-
 Director3D 将真实世界文本到3D场景生成建模为**图像序列与相机轨迹在文本条件下的联合分布**学习问题，并通过三个解耦模块分治该联合分布：$p((\mathcal{X}, \mathcal{C}) \mid y)$。
 
 ### 核心设计动机
@@ -143,9 +137,6 @@ Director3D 将真实世界文本到3D场景生成建模为**图像序列与相�
 ### 三阶段流水线
 
 整体框架（Figure 1）由三个功能互补的模块串联构成：
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2406_17601/figures/001_Figure_1.jpg]]
-*Figure 1: Given textual descriptions, Director3D employs three key components: the Cinematographer generates the camera trajectories, the Decorator creates the initial 3D scenes, and the Detailer refines the details*
 
 | 模块 | 角色 | 输入 | 输出 | 关键作用 |
 |------|------|------|------|----------|
@@ -177,8 +168,6 @@ Director3D 将真实世界文本到3D场景生成建模为**图像序列与相�
 ### 已知局限
 
 该框架存在两个结构性的限制：其一，GM-LDM 支持的视角范围有限，导致生成场景的可探索视角广度受限；其二，开放世界泛化依赖额外的 SDS++ 精炼过程，降低了整体效率。论文指出，引入更广泛的多视角数据集可能缓解对精炼器的依赖，但当前尚无法完全消除这一环节。
-
-
 
 Director3D 将真实世界多视角数据建模为图像序列与相机轨迹在文本条件下的联合分布 $p((\mathcal{X}, \mathcal{C}) | y)$，并通过三个核心模块分治求解：Cinematographer（轨迹生成）、Decorator（场景初始化）和 Detailer（细节精炼）。
 
@@ -260,12 +249,8 @@ $$\hat{\epsilon}_{\mathrm{trg}} = \omega_{\mathrm{cfg}} \cdot ( \epsilon_{\theta
 
 这些消融实验（置信度 0.95）证实了 SDS++ 各组件对生成质量均有独立且不可替代的贡献。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2406_17601/figures/005_Figure_5.jpg]]
 *Figure 5: Left: Architecture of GM-LDM. The model is fine-tuned from a 2D LDM with minor modifications, performing rendering-based denoising for generating initial 3D Gaussians. Right: Pipeline of calculating SDS++ loss, which refines the 3D Gaussians with the original 2D LDM*
-
-
 
 ## 实验与关键发现
 
@@ -311,26 +296,8 @@ Director3D 在 T3Bench 基准上的定量评估结果如 Table 1 所示。该方
 - **效率瓶颈**：为达到开放世界泛化能力，需要额外的 SDS++ 精炼过程（1000 次迭代），降低了框架的整体效率。引入更广泛的多视角数据集可能缓解此问题。
 - **复杂提示处理**：对于组合式、长文本描述或涉及精确数量、铰接物体的提示，生成成功率下降，表明模型在细粒度语义理解方面仍有提升空间。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2406_17601/figures/002_Figure_2.jpg]]
-*Figure 2: Multi-view image results rendered with the generated camera trajectories and 3D scenes*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2406_17601/figures/006_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2406_17601/figures/010_Figure_9.jpg]]
-*Figure 9: Generation results with diversity*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2406_17601/figures/011_Figure_11.jpg]]
-*Figure 11: More multi-view image results*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2406_17601/figures/012_Figure.jpg]]
-*Figure: A blue and white china cup on a saucer*
-
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2406_17601/figures/003_Figure_3.jpg]]
 *Figure 3: Left: Comparison of the simplified camera trajectory distributions between synthetic and real-world multi-view datasets. Right: Pipeline and models of Director3D*
-
-
 
 ## 定位与知识库关联
 
@@ -400,8 +367,6 @@ Director3D 处于文本到3D生成、多视角扩散模型和3D高斯溅射三�
 - **评估层面**：在 T3Bench 上建立了新的性能基准，为后续真实世界文本到3D场景生成研究提供了参考。
 
 该方法可作为后续研究的基础框架，特别是在以下方向具有扩展潜力：(a) 引入更强的多视角先验以消除精炼步骤；(b) 扩展至动态场景或交互式生成；(c) 结合大规模预训练模型提升开放世界泛化能力。
-
-
 
 ## 原文 PDF
 

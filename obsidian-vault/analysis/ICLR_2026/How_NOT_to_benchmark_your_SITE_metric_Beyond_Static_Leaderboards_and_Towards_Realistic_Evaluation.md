@@ -73,8 +73,7 @@ claims:
 
 本文不提出新的SITE方法或框架，而是构建了一个**基准评估框架**，用于系统性地诊断现有SITE基准的缺陷。该框架包含以下核心组件：
 
-1. **模型动物园分析**：对标准基准中的模型进行排序分布可视化（![[assets/figures/papers/e7bdcb2e-34f4-4257-a7a9-cb582373753d/figures/009_Figure_3.jpg]]
-*Figure 3: Visualization of the ranking distribution of models in the standard benchmark(ordered by fine tuned performance). The models at the top occupy the first ranks in most datasets. Table 1: Comparison of transferability estimations, computed by weighted Kendall’s tau, for a static ranking versus SITE metrics on the standard benchmark. The static ranking achieves the highest $\tau _ { w }$ overall*
+1. **模型动物园分析**：对标准基准中的模型进行排序分布可视化（
 
 ），揭示静态性能层级的存在。
 2. **静态排序启发式**：定义一个不依赖目标数据的基线方法，仅根据模型在多个数据集上的历史平均性能进行排序，作为基准琐碎性的探针。
@@ -138,17 +137,13 @@ $$
 ![[assets/figures/papers/e7bdcb2e-34f4-4257-a7a9-cb582373753d/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of Source Independent Transferability Estimation (SITE): Given a set of pretrained models (on the left), a SITE metric computes a score T _ { m } based on extracted features on a target dataset. The scores T _ { m } are used to rank the pre-trained models according to their transferability*
 
-展示了标准基准中模型的排序分布，清晰地揭示了静态层级：ViT-B/16始终占据顶部位置，而ResNet-50始终位于底部。![[assets/figures/papers/e7bdcb2e-34f4-4257-a7a9-cb582373753d/figures/010_Figure_4.jpg]]
-*Figure 4: Heatmap correlation of $\Delta _ { A c c }$ and $\Delta _ { T }$
+展示了标准基准中模型的排序分布，清晰地揭示了静态层级：ViT-B/16始终占据顶部位置，而ResNet-50始终位于底部。
 
-的热力图进一步展示了Δ_Acc与Δ_T之间的弱相关性。相比之下，![[assets/figures/papers/e7bdcb2e-34f4-4257-a7a9-cb582373753d/figures/012_Figure_5.jpg]]
-*Figure 5: Visualization of the ranking distribution of models in the improved benchmark. Most of the models share top spots and no model is always top or bottom rank*
+的热力图进一步展示了Δ_Acc与Δ_T之间的弱相关性。相比之下，
 
-显示Meta-Album基准的排序分布更加分散，模型性能范围有重叠，因此更具挑战性。![[assets/figures/papers/e7bdcb2e-34f4-4257-a7a9-cb582373753d/figures/013_Figure_6.jpg]]
-*Figure 6: Heatmap correlation of $\Delta _ { A c c }$ and $\Delta _ { T }$ for Top-4 Models
+显示Meta-Album基准的排序分布更加分散，模型性能范围有重叠，因此更具挑战性。
 
-和![[assets/figures/papers/e7bdcb2e-34f4-4257-a7a9-cb582373753d/figures/014_Figure_7.jpg]]
-*Figure 7: Heatmap correlation of $\Delta _ { A c c }$ and $\Delta _ { T }$ for Bottom-4 models
+和
 
 分别展示了顶部4个和底部4个模型的Δ热力图，进一步证实了保真度问题。
 

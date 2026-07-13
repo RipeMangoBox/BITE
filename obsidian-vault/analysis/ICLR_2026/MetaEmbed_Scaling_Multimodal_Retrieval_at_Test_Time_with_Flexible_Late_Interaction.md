@@ -260,8 +260,6 @@ METAEMBED 在 Qwen2.5-VL、PaliGemma 和 Llama-3.2-Vision 三种不同 VLM 骨�
 
 此外，MMEB 基准的 IND/OOD 划分存在已知缺陷——ObjectNet 与 ImageNet 共享 113 个类别，导致 train-test 类别重叠，可能高估模型的泛化能力。因此，METAEMBED 报告的 OOD 指标应谨慎解读，更严格的跨域评估仍有待开展。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_yKDqg9HwZX/figures/004_Table_2.jpg]]
 *Table 2: NDCG@5 (%) results on the ViDoRe v2 benchmark, which covers 7 tasks on visual document retrieval. “Syn” denotes synthetic data, “Mul” indicates multilingual tasks, and “Bio” refers to biomedical domains*
 

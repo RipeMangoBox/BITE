@@ -46,8 +46,6 @@ claims:
 
 在极端压缩场景下（如仅保留教师模型1.6%参数的1.3M学生模型），传统OutKD方法完全失效（FID高达96.64），而本文方法在CelebA 64×64上取得了**15.73**的FID，性能提升逾80点。该框架在不同架构（UNet、DiT、MMDiT）、不同任务（无条件生成、文生图）及不同压缩策略（剪枝、深度缩减）下均展现出一致的稳定性和有效性，为轻量化扩散模型的训练提供了一种简单、稳定且高效的解决方案。
 
-
-
 扩散模型已在图像生成（Dhariwal & Nichol, NeurIPS 2021）、文本到图像合成（Rombach et al., CVPR 2022）等任务中取得显著成果，但其庞大的参数量和推理成本严重阻碍了实际部署。知识蒸馏（Knowledge Distillation, KD）是压缩扩散模型的主流策略之一，其核心思想是让轻量学生网络模仿强大教师网络的输出或中间特征。
 
 然而，现有KD方法在扩散模型压缩中面临两个根本性瓶颈：
@@ -59,8 +57,6 @@ claims:
 **OutKD与FeatKD的优化冲突。** 尽管同时使用OutKD和FeatKD直觉上应带来互补收益，但实验表明二者的直接组合往往导致收敛不稳定甚至性能倒退（Table 1中OutKD+FeatKD在多项设置下劣于单独微调）。这表明两种蒸馏信号在优化过程中存在冲突，需要更精细的协调机制。
 
 基于上述观察，本文提出两个核心动机：第一，需要一种能够自适应分解蒸馏目标、缓解容量差距带来的不稳定性的方法；第二，需要一种能够感知空间误差分布、提供局部自适应引导的机制。这直接催生了LIFT（线性回归参数化蒸馏目标）和PLACE（基于误差分组的局部自适应修正）两个技术组件。
-
-
 
 ## 核心方法与创新机理
 
@@ -119,8 +115,6 @@ $$
 - **跨任务验证**：方法在 LSUN-Bedroom 256×256（Table 1）、Stable Diffusion 2.1 / SD3 文生图（Table 2）、ImageNet DiT 类条件生成（Table 3）上均取得最优，表明 LIFT+PLACE 对扩散模型架构和任务具有通用性。
 - **需注意的限制**：论文未提供在大规模文本-图像模型（如 SDXL、Flux）上的验证；PLACE 的分组数 $K$ 需作为超参调节，其敏感性未充分讨论。
 
-
-
 LIFT 与 PLACE 共同构成一个面向轻量化扩散模型的知识蒸馏框架，其核心设计思路是将传统输出级蒸馏损失分解为可独立调控的“粗粒度对齐”与“细粒度精修”两个子目标，从而在师生容量差距极大时仍能保持稳定收敛。框架的整体流程如图 4 所示，包含三个关键阶段：误差诊断、LIFT 参数化蒸馏、以及 PLACE 空间自适应增强。
 
 **误差诊断与分解。** 框架首先通过线性回归分析师生输出之间的统计差异。对于给定时间步 $t$ 下的教师噪声预测 $\epsilon^{\mathcal{T}}$ 与学生噪声预测 $\epsilon^{\mathcal{S}}$，拟合线性模型 $\epsilon^{\mathcal{T}} \approx \beta_0 + \beta_1 \cdot \epsilon^{\mathcal{S}}$，其中回归系数由普通最小二乘（OLS）给出：$\beta_1 = \mathbf{Cov}[\epsilon^{\mathcal{T}}, \epsilon^{\mathcal{S}}] / \mathrm{Var}[\epsilon^{\mathcal{S}}]$，$\beta_0 = \mathbb{E}[\epsilon^{\mathcal{T}}] - \beta_1 \mathbb{E}[\epsilon^{\mathcal{S}}]$。该分析将蒸馏误差显式分解为两类：
@@ -143,13 +137,6 @@ $$\mathcal{L} = \lambda_{diff} \mathcal{L}_{diff} + \lambda_{\mathrm{LIFT}} \mat
 其中 $\mathcal{L}_{diff} = ||\epsilon^{\mathcal{T}} - \epsilon^{\mathcal{S}}||_2^2$ 为标准扩散损失，$\mathcal{L}_{\mathrm{LIFT}}$ 为上述参数化蒸馏损失，$\mathcal{L}_{\mathrm{FeatKD}}$ 为经过维度对齐后的中间特征 L2 损失。该框架可无缝替换现有蒸馏方法中的 OutKD 损失（如 **TinyFusion** 的蒸馏管线），仅需将输出级损失替换为 LIFT 与 PLACE，其余模块（如掩码表示损失）保持不变。
 
 **适用场景。** 该框架已在像素空间扩散模型（CelebA 64×64、LSUN Bedroom 256×256）、文本到图像扩散模型（Stable Diffusion v2.1、Stable Diffusion 3-Medium）以及 ImageNet 类条件 DiT 上得到验证，覆盖 U-Net 与 MMDiT 两种主流架构，在 30% 至 90% 的剪枝率范围内均表现出稳定的收敛性和一致的性能提升。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l894_https_arxiv_org_abs_2605_19729/figures/004_Figure_4.jpg]]
-*Figure 4: Overview of LIFT and PLACE. LIFT parameterizes KD via linear regression, regularizing*
-
-
 
 ### 3.1 蒸馏误差分解：Coarse-Easy 与 Fine-Hard
 
@@ -218,8 +205,6 @@ $$\mathcal{L} = \lambda_{diff} \mathcal{L}_{diff} + \lambda_{\mathrm{LIFT}} \mat
 - **LIFT 损失** $\mathcal{L}_{\mathrm{LIFT}}$：包含 Coarse 正则项与自适应加权的 Fine 残差项（PLACE 中为分组聚合形式）。
 - **特征蒸馏损失** $\mathcal{L}_{\mathrm{FeatKD}}$：教师与学生中间特征的 L2 距离（经维度对齐）。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -256,9 +241,6 @@ Table 3 报告了在 DiT 架构上的结果。以 TinyFusion 为基线（使用 
 - 在 DiT-D7 学生上，本文方法 FID 显著优于 TinyFusion。
 - Table 7 进一步表明：更大的教师容量对 TinyFusion 造成 FID 恶化，而本文方法在更强教师下持续受益，与像素空间扩散观察一致。
 
-![[assets/figures/papers/paper_list_l894_https_arxiv_org_abs_2605_19729/figures/014_Table_7.jpg]]
-*Table 7: Effects of teacher capacity in DiT. We compare the TinyFusion baseline with our method when distilling a DiT-D7 student from two teachers of different capacities. As in pixel-space diffusion, larger teachers degrade FID for TinyFusion, whereas our LIFT and PLACE provide consistent improvements, with a slightly larger gain when distilling from the stronger teacher. Bold indicates the best performance for each teacher used in distillation, and † denotes metrics reported in [6]*
-
 ### 消融实验
 
 #### LIFT 与 PLACE 的组件贡献
@@ -276,12 +258,6 @@ Table 8 对完整目标函数（Eq. (8)）的各组件进行消融，所有学�
 
 Table 5 与 Table 6 固定学生容量（1.3M，90% 剪枝），变化教师容量：
 
-![[assets/figures/papers/paper_list_l894_https_arxiv_org_abs_2605_19729/figures/011_Table_5.jpg]]
-*Table 5: Effect of teacher capacity. (90% pruned student for CelebA). Conventional KD fails to converge or yields suboptimal results. In contrast, our method achieves the best performance and most stable convergence with the strongest teacher*
-
-![[assets/figures/papers/paper_list_l894_https_arxiv_org_abs_2605_19729/figures/013_Table_6.jpg]]
-*Table 6: All of the above models use a fixed size of the student model (1.3M). For OutKD and OutKD+FeatKD, larger teachers result in higher FID means and larger FID variances. When distilled from the strongest teacher, LIFT and PLACE achieve the lowest FID mean and standard deviation. Values in bold correspond to those reported in Tab. 1*
-
 - OutKD 和 OutKD+FeatKD 在更大教师下 FID 均值升高、方差增大，表现出“容量差距诅咒”。
 - 本文方法从更强教师中稳定获益：最强教师下 FID 均值最低、方差最小，表明 LIFT 和 PLACE 有效解耦了容量差距带来的优化困难。
 
@@ -291,14 +267,8 @@ Table 7 在 DiT 上重复该实验，结论一致：更大教师对 TinyFusion �
 
 Table 4 比较了不同权重调度策略对 FID 的影响。本文采用基于 Coarse 损失的自适应权重 $w = 1 - \min(1, \mathcal{L}_{\mathrm{coarse}})$（见 part_006），该策略在训练过程中动态抑制 Fine-Hard 精炼对 FeatKD 的干扰：
 
-![[assets/figures/papers/paper_list_l894_https_arxiv_org_abs_2605_19729/figures/010_Table_4.jpg]]
-*Table 4: FID comparison under different w schedulers. where i and I denote the current and total training iterations. All of student models distilled from the strongest 78.7M-teacher*
-
 - 固定权重或简单线性调度均不如自适应调度。
 - Figure 6(b) 展示了自适应权重随训练进程的变化曲线，验证了其“粗对齐优先、细精炼逐步介入”的行为。
-
-![[assets/figures/papers/paper_list_l894_https_arxiv_org_abs_2605_19729/figures/009_Figure_6.jpg]]
-*Figure 6: (a) Numerical labels indicate FID at each iteration. Decreasing of gradient norm demonstrates stable convergence of our method. (b) We compare our adaptive weight*
 
 ### 收敛性分析
 
@@ -321,8 +291,6 @@ Figure 6(a) 展示了扩散损失梯度范数的收敛曲线。本文方法的�
 | Table 8 | Coarse 损失与 PLACE 分组缺一不可 |
 | Figure 6 | 自适应权重实现平滑收敛，避免梯度冲突 |
 | Figure 3 | 空间非均匀误差客观存在，PLACE 可缓解但未根除 |
-
-
 
 ## 定位与知识库关联
 
@@ -369,8 +337,6 @@ Figure 6(a) 展示了扩散损失梯度范数的收敛曲线。本文方法的�
 ### 知识库定位
 
 本工作可定位于**扩散模型压缩与加速**方向下的**知识蒸馏子领域**，具体贡献属于**蒸馏目标函数设计**这一技术路线。与传统 OutKD 和 FeatKD 形成互补而非替代关系——论文的最终目标函数仍保留扩散损失和 FeatKD 损失，LIFT/PLACE 替代的是 OutKD 的角色。这一设计哲学与近年将传统 KD 损失重新参数化以提高蒸馏效率的趋势一致，其通过统计矩显式对齐实现稳定收敛的思路，为极端压缩场景下的扩散模型蒸馏提供了新的基线。
-
-
 
 ## 原文 PDF
 

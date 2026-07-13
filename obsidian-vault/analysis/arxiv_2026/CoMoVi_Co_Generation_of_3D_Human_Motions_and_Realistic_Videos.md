@@ -59,8 +59,6 @@ claims:
 
 **局限与展望**：当前框架仅支持单人原地运动生成，推理速度较慢（约15分钟生成5秒视频），且3D运动伪标签可能引入标注误差。未来工作将探索多人交互场景、推理加速以及更敏感的人体运动质量评估指标。
 
-
-
 ### 3D人体运动与视频生成的耦合困境
 
 生成逼真且可控的3D人体运动与视频是计算机视觉与图形学领域的核心挑战，在虚拟数字人、影视制作、游戏开发等应用中具有广泛需求。然而，当前研究在两个关键维度上存在显著瓶颈：
@@ -87,8 +85,6 @@ claims:
 - **联合优化**：如何通过损失函数设计，强化2D潜在表示与3D运动参数之间的对齐，确保协同生成的一致性？
 
 CoMoVi正是针对上述问题提出的协同生成框架，其核心思路是通过**融合法向与语义的2D运动表示**桥接模态差异，并采用**双分支扩散模型**实现特征交互，使运动生成与视频生成在单一去噪循环中同步进行、相互增强。
-
-
 
 ## 核心方法与创新机理
 
@@ -138,15 +134,10 @@ $$\mathcal{L}^{\mathrm{smpl}} = \frac{1}{F-1} \sum_{i=1}^{F-1} \left\| \pmb{m}_{
 - CoMoVi 在自建数据集上运动 FID 达到 **0.349**，显著优于 Go-to-Zero-7B 的 1.641（Table 2）；
 - 在 VBench 视频评估中，CoMoVi 在所有指标上均优于 I2V 基线（Table 3），且无需任何外部运动参考。
 
-
-
 CoMoVi 的目标是从一张起始人物图像 $s_0$ 和一段运动文本描述 $\delta_p$ 出发，同步协同生成 3D 人体运动序列 $\{\mathbf{m}_i \in \mathbb{R}^{J \times 3}\}_{i=0}^{F}$ 和 RGB 视频序列 $\{\mathbf{s}_i \in \mathbb{R}^{H \times W \times 3}\}_{i=0}^{F}$。其整体 pipeline（Fig. 3）由两大核心模块串联而成：**2D 人体运动表示编码器**与**双分支视频扩散模型**。
 
 ![[assets/figures/papers/paper_list_l47_https_arxiv_org_abs_2601_10632v2/figures/003_Figure_3.jpg]]
 *Figure 3: Pipeline overview of CoMoVi. Our method consists of an effective 2D human motion representation (Sec. 3.2) to encode 3D motion information in pixel space, and a dual-branch diffusion model extended from Wan2.2-I2V-5B to coordinate 2D motion and RGB video sequence denoising process with 3D-2D cross-attention modules to concurrently generate 3D human motion (Sec. 3.3)*
-
-![[assets/figures/papers/paper_list_l47_https_arxiv_org_abs_2601_10632v2/figures/016_Figure_3.jpg]]
-*Figure 3: Prompt instruction for Qwen2.5-VL [103] to analyze the first frame of video*
 
 **2D 人体运动表示编码器**负责桥接 3D 运动与 2D 视频之间的模态鸿沟。它将初始 3D SMPL 网格 $m_0$ 渲染为一幅融合顶点法向与身体部件语义的单一 RGB 图像 $k_0$（Sec. 3.2）。该表示在像素空间中同时编码了 3D 几何信息（法向）和结构语义（身体部件），使预训练的 2D 视频扩散模型能够直接“理解”运动结构，而无需额外的投影适配。
 
@@ -175,13 +166,6 @@ $$
 其中 $\mathcal{L}^{\mathrm{motion}}$ 和 $\mathcal{L}^{\mathrm{video}}$ 均为流匹配损失（Flow Matching Loss），$\mathcal{L}^{\mathrm{smpl}}$ 监督预测的 SMPL 参数与真值之间的均方误差，强化 2D 潜在表示与 3D 结构之间的对齐。消融实验表明，引入 $\mathcal{L}^{\mathrm{smpl}}$ 可将视频主体一致性（SC）从 0.951 提升至 0.955（Table 4）。
 
 **输入输出流总结**：起始图像 $s_0$ 与文本描述 $\delta_p$ 作为条件输入双分支扩散模型；2D 运动表示编码器将初始 SMPL 网格 $m_0$ 渲染为 $k_0$ 并送入运动分支；两条分支在去噪过程中通过零线性层持续交互；3D-2D 交叉注意力模块从融合特征中解码出 3D 运动序列；最终同步输出 RGB 视频帧和对应的 3D 人体运动。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l47_https_arxiv_org_abs_2601_10632v2/figures/002_Figure_2.jpg]]
-*Figure 2: Different paradigms of motion video co-generation*
-
-
 
 ### 2D人体运动表示：法向-语义融合编码
 
@@ -228,15 +212,6 @@ $\mathcal{L}^{\mathrm{smpl}}$ 为SMPL参数回归损失，通过均方误差监�
 $$\mathcal{L}^{\mathrm{smpl}} = \frac{1}{F - 1} \sum_{i = 1}^{F - 1} \| \pmb{m}_{i} - \mathrm{GT}(\pmb{m}_{i}) \|_{2}^{2} \tag{8}$$
 
 该损失项强化了2D潜在表示与3D结构之间的对应关系。消融实验显示，移除 $\mathcal{L}^{\mathrm{smpl}}$ 后视频主体一致性从0.955降至0.951，证实了3D正则化对视频生成质量的促进作用。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l47_https_arxiv_org_abs_2601_10632v2/figures/004_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l47_https_arxiv_org_abs_2601_10632v2/figures/005_Figure_5.jpg]]
-*Figure 5: We observe that significant appearance shifts occur when directly applying pretrained VDM on our 2D motion representation*
-
-
 
 ## 实验与关键发现
 
@@ -307,18 +282,8 @@ Table 4 系统消融了 2D 运动表示形式和模型架构的贡献，结论�
 - **Fig. 6, 8**：定性结果中，CoMoVi 的运动和视频在结构一致性与时序连贯性上明显优于级联范式和纯 I2V 基线。
 - **Fig. 9**：消融可视化清晰展示不同表示和架构对“起身伸展”动作的质量影响。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l47_https_arxiv_org_abs_2601_10632v2/figures/011_Figure_8.jpg]]
 *Figure 8: Qualitataive comparison of human video generation with SoTA open-souce I2V models [84, 107], and a baseline composed of SoTA T2M [18] and motion-driven video generation model [118]*
-
-![[assets/figures/papers/paper_list_l47_https_arxiv_org_abs_2601_10632v2/figures/006_Table_1.jpg]]
-*Table 1: Comparison of CoMoVi-Dataset with existing datasets. “*": We only count real-world data*
-
-![[assets/figures/papers/paper_list_l47_https_arxiv_org_abs_2601_10632v2/figures/017_Figure_4.jpg]]
-*Figure 4: Prompt instruction for Gemini2.5-Pro to caption human motion in videos*
-
-
 
 ## 定位与知识库关联
 
@@ -382,8 +347,6 @@ CoMoVi 当前存在以下明确局限：
 ### 知识库定位总结
 
 CoMoVi 在知识库中的核心贡献在于：**首次证明了 3D 人体运动与 2D 视频可以在单一扩散去噪循环中相互增强**。其方法论桥梁——融合法向与语义的 2D 运动表示——有效对齐了两模态的特征空间，使视频预训练模型的泛化能力得以反哺运动生成，同时运动的结构一致性先验约束了视频生成。这一协同生成范式为后续的多模态人体生成研究提供了新的技术路线。
-
-
 
 ## 原文 PDF
 

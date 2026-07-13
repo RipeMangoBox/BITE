@@ -139,22 +139,11 @@ $$L_{\mathrm{audio-diffusion}} = \mathbb{E}_{z_0, z_1, \ldots, z_T} \left[ \sum_
 
 **框架总览**见 Figure 1，**时空编码架构**见 Figure 2，**扩散过程**见 Figure 3，**音频特征提取与集成**见 Figure 4，**音频驱动扩散过程可视化**见 Figure 5。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1829_DanceFusion_A_Spatio_Temporal_Skeleton_Diffusion_Transformer_for_Audio_D/figures/002_Figure_1.jpg]]
-*Figure 1: Overview of DanceFusion Framework*
-
-![[assets/figures/papers/paper_list_l1829_DanceFusion_A_Spatio_Temporal_Skeleton_Diffusion_Transformer_for_Audio_D/figures/013_Figure.jpg]]
-*Figure: 1 7 4 10 19 21 24 27 (a)*
-
 DanceFusion 框架由三个核心模块构成：**层次化时空 VAE 编码器**、**掩码嵌入机制**、以及**音频条件扩散模型**。其设计目标是在骨架关节数据存在缺失的情况下，实现音频同步的舞蹈动作重建与生成。
 
 ### 层次化时空 VAE 编码器
 
 框架采用层次化 Transformer 结构构建 VAE 编码器，分两级捕获骨架序列的时空特征（Figure 1, Figure 2）：
-
-![[assets/figures/papers/paper_list_l1829_DanceFusion_A_Spatio_Temporal_Skeleton_Diffusion_Transformer_for_Audio_D/figures/001_Figure_2.jpg]]
-*Figure 2: Spatio-Temporal Encoding*
 
 1. **空间 Transformer 编码器**：在每一帧内，对 137 个关节坐标进行自注意力建模，捕获人体姿态的空间配置关系。
 2. **时间 Transformer 编码器**：在帧序列维度上执行自注意力，捕获动作的时序动态演化。
@@ -198,9 +187,6 @@ $$L_{\mathrm{KL}} = -\frac{1}{2} \sum_{i=1}^{D} (1 + \log(\sigma_i^2) - \mu_i^2 
 
 在 VAE 潜在空间中，DanceFusion 集成扩散模型以迭代精炼运动序列（Figure 3, Figure 5）：
 
-![[assets/figures/papers/paper_list_l1829_DanceFusion_A_Spatio_Temporal_Skeleton_Diffusion_Transformer_for_Audio_D/figures/004_Figure_3.jpg]]
-*Figure 3: Diffusion Process*
-
 ![[assets/figures/papers/paper_list_l1829_DanceFusion_A_Spatio_Temporal_Skeleton_Diffusion_Transformer_for_Audio_D/figures/005_Figure_5.jpg]]
 *Figure 5: Visualization of the audio-driven diffusion process, highlighting the evolution of the motion sequence in synchronization with the audio*
 
@@ -219,8 +205,6 @@ $$L_{\mathrm{audio-diffusion}} = \mathbb{E}_{z_0, z_1, \ldots, z_T} \left[ \sum_
 ### 训练流程
 
 训练分两阶段进行（Section 4.3.3）：先预训练 VAE 以准确重建输入骨架序列，再联合训练扩散模型与音频条件分支，实现音频驱动的舞蹈动作生成。
-
-### 补充图表
 
 ## 实验与关键发现
 
@@ -280,10 +264,6 @@ Figure 6 和 Figure 11（附录）提供了四种配置的重建序列定性对�
 DanceFusion 在舞蹈动作生成领域的方法谱系中处于**时空建模 + 扩散精炼**的交叉位置。其层次化 Transformer VAE 继承了时序建模中空间-时间解耦编码的思想，但通过引入关节级二值掩码 $M_{t,j}$（公式 5-6），将适用场景从完备数据拓展到了**不完备骨架数据**这一实际瓶颈。扩散模型部分则借鉴了音频驱动运动生成的范式，音频特征提取遵循 FineDance 的方法论，但在潜在空间中执行迭代去噪，而非直接从音频映射到动作序列。
 
 与直接回归或单步生成的方法相比，DanceFusion 的扩散精炼机制（公式 7 和 9）提供了时序一致性的理论保证——每一步去噪都在修正运动轨迹的局部不连贯性。掩码机制与扩散模型的结合形成了一个完整的“缺失补偿-迭代精炼”闭环，这是本工作的核心方法贡献。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1829_DanceFusion_A_Spatio_Temporal_Skeleton_Diffusion_Transformer_for_Audio_D/figures/009_Table.jpg]]
 
 ## 定位与知识库关联
 

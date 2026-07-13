@@ -69,8 +69,6 @@ Saliency-R1 提出了一种**基于显著性图对齐奖励的强化学习框架
 - **可解释性**：在指向游戏（Pointing Game）评估中，能量-PG 和 PG 指标分别提升 10.82% 和 14.14%（Table 3）；人类评估中解释质量评分从基模型的 3.6 显著提升至 4.5（p<0.05）。
 - **消融实验**：仅使用显著性奖励的 Saliency-R1-pure 变体平均准确率仅比完整 Saliency-R1 低 0.6%，表明显著性奖励本身即可提供有效训练信号（Figure 4）。
 
-
-
 视觉语言模型（VLMs）在复杂推理任务中展现出巨大潜力，近期研究进一步引入思维链（Chain-of-Thought, CoT）机制，使模型能够生成显式的中间推理步骤，从而提升多模态理解的准确性与可解释性。然而，一个关键瓶颈逐渐浮现：**VLMs在推理过程中存在过度依赖文本线索、忽视视觉证据的倾向**。模型生成的CoT可能表面上逻辑自洽，但实际上并不忠实于图像内容——其注意力可能聚焦于与问题无关的图像区域，甚至完全未有效利用视觉信息。这种“不忠实的推理”（unfaithful reasoning）直接导致幻觉现象，削弱了模型在视觉中心任务上的可靠性。
 
 现有可解释性方法试图通过可视化模型的注意力分布来揭示其决策依据，但面临多重缺口。基于梯度的方法（如Grad-CAM）或基于注意力的方法（如Attention Rollout）通常需要额外的反向传播或前向计算，计算开销大，难以集成到大规模训练流程中。更为关键的是，这些方法大多停留在“事后解释”层面，**缺乏将可解释性信号反馈到模型训练中的机制**，无法从根本上约束模型在推理时真正关注视觉证据。
@@ -78,8 +76,6 @@ Saliency-R1 提出了一种**基于显著性图对齐奖励的强化学习框架
 本文的动机源于一个核心观察（Figure 1）：即使模型最终给出了正确答案，其推理过程中关注的图像区域也可能截然不同——忠实的推理聚焦于与问题相关的关键区域，而不忠实的推理则游移于无关背景甚至完全忽略图像。这一洞察驱动了一个自然的问题：**能否设计一种高效的显著性图方法，不仅可视化从视觉到推理再到答案的信息流，更将其作为奖励信号嵌入强化学习过程，从而强制模型在推理时聚焦于正确的视觉证据？**
 
 Saliency-R1正是沿着这一思路展开：通过基于logits分解的高效显著性图计算，以思维令牌为瓶颈的注意力滚动机制，以及将显著性图与人工标注边界框的对齐分数作为GRPO奖励，构建了一个端到端的“可解释性驱动训练”框架，旨在同时提升VLM推理的忠实性与可解释性。
-
-
 
 ## 核心方法与创新机理
 
@@ -121,8 +117,6 @@ $$\mathrm{Alignment.Score} = \frac{\sum_{i \in \mathrm{Bounding~Box}} \mathrm{Sa
 
 通过 GRPO 优化，模型被引导在推理时将其注意力集中到与问题相关的关键图像区域。消融实验表明，仅使用显著性奖励的 Saliency-R1-pure 变体在 9 个 VQA 基准上的平均准确率仅比完整 Saliency-R1 低 0.6%，而替换为原始注意力聚合的 Saliency-R1-attn 或去掉注意力滚动的 Saliency-R1-think 变体均出现性能下降，验证了所提方法的有效性。
 
-
-
 Saliency-R1 的整体框架由三个紧密耦合的模块构成，形成一条“显著性感知推理—显著性图聚合—强化学习对齐”的闭环流水线。其核心设计理念是：**通过高效计算模型在推理过程中对图像区域的注意力分布，并将其与人工标注的语义边界框对齐，从而以强化学习的方式引导模型聚焦于与问题相关的视觉证据**。
 
 ### 流水线总览
@@ -149,11 +143,6 @@ Saliency-R1 的整体框架由三个紧密耦合的模块构成，形成一条�
 ### 设计动机
 
 如 Figure 1 所示，即使模型最终给出了正确答案，其推理过程（思维链）可能关注的是图像中与问题无关的区域，这种“不忠实”的推理过程容易导致幻觉。Saliency-R1 通过将显著性图对齐度纳入奖励函数，直接作用于模型的推理行为，使其在生成思维链时主动聚焦于视觉证据所在的区域，从而提升推理的忠实性和可解释性。
-
-![[assets/figures/papers/paper_list_l2665_https_arxiv_org_abs_2604_04500/figures/001_Figure_1.jpg]]
-*Figure 1: Main motivation of this work. Different thinking processes might focus on distinct regions of an image, even if they arrive at the correct answer. Unfaithful thinking processes either focus on irrelevant parts of the image or fail to consider the image*
-
-
 
 Saliency-R1 方法由三个核心模块构成，分别解决显著性图生成、全局聚合和强化学习对齐问题。
 
@@ -206,8 +195,6 @@ $$\mathcal{R}_{\mathrm{overall}} = \mathcal{R}_{\mathrm{accuracy}} + \mathcal{R}
 $$\mathcal{I}_{\mathrm{GRPO}}(\theta) = \mathbb{E}_{[q \sim \mathcal{D}, \{o_i\}_{i=1}^G \sim \pi_{\theta_{\mathrm{old}}}(\cdot|q)]} \frac{1}{G} \sum_{i=1}^G \left( M_i - \beta \mathbb{D}_{\mathrm{KL}}(\pi_\theta \| \pi_{\mathrm{ref}}) \right)$$
 
 其中 $G$ 为每组采样数量，$M_i$ 为截断优势函数，$\beta$ 控制 KL 散度惩罚强度，$\pi_{\mathrm{ref}}$ 为参考策略。通过联合优化准确性、格式规范性和显著性对齐，模型在保持答案正确性的同时，显著提升推理过程的忠实性和可解释性。
-
-
 
 ## 实验与关键发现
 
@@ -282,16 +269,11 @@ $$
 
 **Table 8** 将 Saliency‑R1 与专门设计的幻觉消除方法（如 **MFP‑3B**）进行对比。Saliency‑R1 在 POPE 等幻觉检测基准上达到或超越专用方法的性能，同时保持通用 VQA 能力不退化，体现了显著性对齐奖励在“治本”层面的优势——通过强化正确的视觉关注模式，而非仅仅抑制幻觉输出。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2665_https_arxiv_org_abs_2604_04500/figures/004_Table_2.jpg]]
 *Table 2: Effective Performance Compared to the SOTA Model. Our models are based on Qwen2.5-VL-7B-Instruct and Qwen2.5-VL-BB-Instruct. The reported performance of the base models are evaluated by lmms-eval [89]*
 
 ![[assets/figures/papers/paper_list_l2665_https_arxiv_org_abs_2604_04500/figures/003_Table_1.jpg]]
 *Table 1: Faithfulness experiment results. We use Qwen2.5-VL-3B-Instruct for experiments. Our saliency map technique achieves comparable or better faithfulness to SOTA methods regarding the deletion and insertion metrics. We leave the results on GranDf dataset in the Appendix. The best metric is bold and the second best metric is underlined*
-
-![[assets/figures/papers/paper_list_l2665_https_arxiv_org_abs_2604_04500/figures/012_Table_3.jpg]]
-*Table 3: Evaluation of Interpretability. We calculate the energy-PG and PG metric on the test set of saliency-r1-8k dataset*
 
 ![[assets/figures/papers/paper_list_l2665_https_arxiv_org_abs_2604_04500/figures/011_Figure_4.jpg]]
 *Figure 4: Ablation Studies. Top: Average metrics on 9 VQA benchmarks. Bottom: Metrics on MME*
@@ -299,22 +281,8 @@ $$
 ![[assets/figures/papers/paper_list_l2665_https_arxiv_org_abs_2604_04500/figures/024_Table_9.jpg]]
 *Table 9: Full Results of Ablation Studies. The best metric is bold and the second best is underlined*
 
-![[assets/figures/papers/paper_list_l2665_https_arxiv_org_abs_2604_04500/figures/014_Table_5.jpg]]
-*Table 5: Counterfactual test results. We inject Gaussian noise with different σ to the foreground and background of the images, and prompt the model to answer visual questions*
-
 ![[assets/figures/papers/paper_list_l2665_https_arxiv_org_abs_2604_04500/figures/015_Table_6.jpg]]
 *Table 6: Robustness Benchmark. We compare Saliency-R1 with base model on several benchmarks that show the robustness and generalizability of the method. We inject Gaussian noise with different σ to the images of POPE and MME*
-
-![[assets/figures/papers/paper_list_l2665_https_arxiv_org_abs_2604_04500/figures/017_Table_8.jpg]]
-*Table 8: Comparison with hallucination-reduction baselines*
-
-![[assets/figures/papers/paper_list_l2665_https_arxiv_org_abs_2604_04500/figures/013_Table_4.jpg]]
-*Table 4: Faithfulness experiment results. We use Qwen2.5-VL-3B-Instruct for experiments. Our saliency map technique achieves comparable or better faithfulness to SOTA methods regarding the deletion and insertion metrics. The best metric is bold and the second best metric is underlined*
-
-![[assets/figures/papers/paper_list_l2665_https_arxiv_org_abs_2604_04500/figures/016_Table_7.jpg]]
-*Table 7: Throughput analysis. We report the average time to generate one saliency map using the saliency-r1-8k dataset*
-
-
 
 ## 定位与知识库关联
 
@@ -395,8 +363,6 @@ $$\mathrm{Alignment.Score} = \frac{\sum_{i \in \mathrm{Bounding~Box}} \mathrm{Sa
 4. **规模化扩展**：该方法如何扩展到更大规模的视觉语言模型（如Qwen-VL-30B或闭源模型）？计算效率优势在大模型上是否依然成立？
 
 5. **多模态推理泛化**：该方法是否能有效泛化到多轮对话、视频理解或具身交互等更复杂的视觉推理场景？思维令牌瓶颈机制在这些场景中是否需要重新设计？
-
-
 
 ## 原文 PDF
 

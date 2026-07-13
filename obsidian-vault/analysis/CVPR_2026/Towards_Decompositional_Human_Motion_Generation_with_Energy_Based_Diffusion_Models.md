@@ -203,8 +203,6 @@ DEMOGEN 的核心思想是将人体动作生成重新表述为**组合式能量�
 
 整体框架的设计使得 DEMOGEN 在无需分解动作真值的情况下，通过能量组合训练范式学习概念级分解，为动作生成提供了结构化的语义理解和重组能力。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l13_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_Towards_Decompos/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our approach. We propose DEMOGEN, a compositional training paradigm that facilitates decompositional motion generation via an energy-based diffusion model. We learn to decompose the holistic motion into K concepts. The energy functions of these concepts are aggregated to form the*
 

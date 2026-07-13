@@ -56,8 +56,6 @@ claims:
 
 **方法定位：** SemanticGAN 属于生成式分割范式，基于 StyleGAN2 架构，训练过程完全依赖对抗损失（双判别器 $D_r$ 保证图像真实性，$D_m$ 强制图文对齐），无需逐像素交叉熵损失。推理时通过测试时潜在空间反演推断标签，而非单步前向传播。该方法当前适用于人脸、医学影像等单模态数据，尚未扩展到复杂街景等场景，且测试时优化导致推理速度较慢。
 
-
-
 语义分割是计算机视觉的核心任务，旨在为图像中的每个像素赋予类别标签。传统方法依赖判别式模型直接学习从图像到标签的映射 $p(y|x)$，这需要大量逐像素标注的数据。然而，获取高质量像素级标注极其昂贵，尤其在医学影像等专业领域，标注成本更为高昂。这一瓶颈严重制约了语义分割技术在标注稀缺场景下的应用。
 
 现有半监督学习方法试图通过利用大量无标注数据来缓解标注压力，但其核心范式仍然是判别式的。典型方法如 **Mean Teacher**（Tarvainen & Valpola, NeurIPS 2017）通过一致性正则化约束模型对扰动输入输出一致预测，**AdvSSL**（Hung et al., 2018）引入对抗训练以利用无标注数据，**Guided Collaborative Training (GCT)**（Ke et al., 2020）则通过协同训练策略提升半监督性能。这些方法虽然在域内数据上取得了一定进展，但在域外数据上的泛化能力仍然有限——当测试数据分布与训练数据分布存在差异时，判别式模型的性能往往急剧下降。
@@ -67,8 +65,6 @@ claims:
 本文的核心动机在于：**将语义分割从判别式范式重构为生成式范式**。作者提出，通过生成对抗网络直接建模图像与标签的联合分布 $p(x,y)$，可以同时解决标注稀缺和域外泛化两大难题。其关键洞察是：当生成模型学会生成逼真图像时，其内部特征表示已经自然地编码了丰富的语义信息；只需在生成器中添加轻量级的标签输出分支，即可实现半监督语义分割。更重要的是，由于生成器在连续潜在空间中平滑训练，模型天然具备对未见域数据的强泛化能力——即使面对与训练数据视觉差异极大的输入，生成式先验仍能引导模型输出合理的分割结果。
 
 这种范式转换带来了根本性的方法差异：训练时不再依赖逐像素标注损失，而是通过对抗训练迫使生成器同时生成逼真图像和准确标签；推理时也不采用单步前向传播，而是通过测试时潜在空间反演，将输入图像投影到生成器的潜在流形上，再从中解码出对应的分割掩码。这一设计使得模型能够以极少量标注样本（如仅9个胸部X光标注）实现超越全监督基线的性能，并在极端域外数据上展现出令人瞩目的泛化能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -129,8 +125,6 @@ $$\mathcal{L}_{\text{reconst}}(x, x^*) = \mathcal{L}_{\text{LPIPS}}(x, x^*) + \l
 | **标注需求** | 大量标注数据 | 少量标注 + 大量无标注数据 |
 | **域外泛化** | 依赖数据增强，效果有限 | 生成式先验天然支持强域外泛化 |
 
-
-
 SemanticGAN 将语义分割重构为**生成式条件采样问题**，核心思想是直接建模图像与标签的联合分布 $p(x,y)$，而非传统判别式模型所学习的条件分布 $p(y|x)$。其整体 pipeline 由四个核心模块构成，形成训练与推理两条协同的数据流。
 
 ### 训练流程
@@ -179,8 +173,6 @@ $$\mathcal{L}_{\mathrm{reconst}}(x, x^*) = \mathcal{L}_{\mathrm{LPIPS}}(x, x^*) 
 - **推理时**：输入单张图像 $x^*$ → 编码器初始化 $w^+_{\text{init}}$ → 迭代优化重建目标 → 生成器输出对应分割掩码。
 
 这种设计将生成模型的平滑潜在空间先验引入分割任务——生成器在连续 $\mathcal{W}^+$ 空间中被训练以生成逼真图像，其内部特征表示已编码丰富的语义信息，因此即使面对域外图像，只要能在潜在空间中找到合理的重建点，就能推断出语义一致的分割结果。
-
-
 
 ### 3.1 生成器架构 (Generator G)
 
@@ -247,8 +239,6 @@ $$\mathcal { L } _ { \mathrm { r e c o n s t } } ( x , x ^ { * } ) = \mathcal { 
 
 **关键机制**：整个推理过程无需前向传播的判别模型，而是通过生成模型的潜在空间反演，利用生成器学习到的联合分布 $p(x,y)$ 推断标签。这一设计使得模型在域外数据上表现出强泛化能力，因为生成器在连续潜在空间中的平滑训练天然提供了正则化先验。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验结果
@@ -295,8 +285,6 @@ SemanticGAN 在多个医学影像与人脸分割基准上，以极少标注样�
 - 生成式平滑先验对精细结构分割精度的影响如何量化与缓解？
 - 最优标注/未标注数据比例的理论或经验规律是什么？
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2104_05833/figures/005_Table.jpg]]
 
 ![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2104_05833/figures/010_Table_5.jpg]]
@@ -307,8 +295,6 @@ SemanticGAN 在多个医学影像与人脸分割基准上，以极少标注样�
 
 ![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2104_05833/figures/011_Table_6.jpg]]
 *Table 6: Synthesize Annotated Images to Train a Task Model vs Our Method. Numbers are mIoU. DeepLab-real denotes supervised training of a DeepLab model using 150 labeled real examples. Ours-sim denotes training DeepLab using only the 20k synthetic dataset. Ours-mix means training DeepLab using both the synthetic and 150 labeled real examples. div denotes sampling without applying the truncation trick [44], which results in more diverse but less visually appealing images; tru means applying the truncation trick with factor of 0.7. Ours denotes performing segmentation directly with our generative segmentation method*
-
-
 
 ## 定位与知识库关联
 
@@ -352,8 +338,6 @@ SemanticGAN 在多个医学影像与人脸分割基准上，以极少标注样�
 2. **推理加速**：如何通过知识蒸馏或一次性编码器直接预测标签，避免测试时迭代优化，实现实时分割？
 3. **精细度权衡**：生成式先验的平滑性与精细结构分割精度之间的定量关系尚待研究
 4. **最优数据配比**：标注/未标注数据的最优比例如何确定，以在标注成本与性能之间取得平衡？消融实验（Table 5）已初步表明增加无标注数据比增加标注数据更有效，但系统性的理论指导仍缺失
-
-
 
 ## 原文 PDF
 

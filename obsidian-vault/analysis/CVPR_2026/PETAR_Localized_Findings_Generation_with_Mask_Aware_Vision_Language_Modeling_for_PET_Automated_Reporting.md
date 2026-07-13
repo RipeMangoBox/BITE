@@ -145,8 +145,6 @@ $$\tilde{c} = c + \triangle c,\quad \tilde{r} = r + \triangle r,\quad \triangle 
 
 **数据流的因果逻辑**：Mask 的引入解决了“在哪里看”的问题，使视觉编码具有空间选择性；CT 模态的加入补充了“周围是什么”的解剖上下文；聚焦提示则回答了“细节是什么”，三者协同作用，将原本被全局下采样淹没的微小病灶信息重新注入表征空间。消融实验证实了这一设计的有效性：仅添加 Mask 即可使 GREEN 分数提升 +0.017；加入 CT 后语义一致性指标（BERTScore）进一步提升；而引入 Focal Prompt 带来的增益最为显著——CIDEr 从 0.134 跃升至 0.397，GREEN 从 0.060 升至 0.226，证明聚焦机制对细粒度描述至关重要（Table 3）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2333_https_arxiv_org_abs_2510_27680/figures/004_Figure_3.jpg]]
 *Figure 3: Overview of the proposed framework. The left panel illustrates the overall architecture, which integrates PET, CT, and lesion mask inputs through 3D convolutional image projectors and an M3D-CLIP backbone. The resulting multi-modal visual tokens are fused and spatially pooled before being passed to a Phi3-4B language model that generates clinically grounded text descriptions conditioned on visual features and textual prompts. The right panel details the Image Encoder design, where modality-specific projectors (for PET, CT, and mask inputs) map each input into a shared latent space. These embeddings are subsequently processed by a ViT encoder to produce modality-aligned visual tokens for dow...*
 
@@ -294,8 +292,6 @@ PETAR-4B 在内部测试集上的三项评分达到 3.7–3.9，与人类报告�
 4. **多病灶场景的鲁棒性**：当存在多个解剖邻近的病灶时，聚焦提示与全局描述的融合策略是否足够稳健，尚缺乏系统性验证。
 
 5. **评估指标鸿沟**：自动评估指标与临床专家偏好之间的偏差（GREEN 相关系数仅 0.592，BLEU 仅 0.214）表明，当前的自动评估范式尚不能可靠替代人工评估，需要探索新的临床对齐评估方法。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2333_https_arxiv_org_abs_2510_27680/figures/005_Table_2.jpg]]
 *Table 2: Comparison of selected models on the PETARSeg-11k test set. The ”(finetuned)” indicates the model was trained on PETARSeg-11k*

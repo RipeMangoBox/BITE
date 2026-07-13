@@ -80,8 +80,6 @@ claims:
 
 消融实验进一步验证了各组件的独立贡献：DGAE 单独带来 +0.94% 的提升，DQW 额外贡献 +1.14%，两者合计使 DGPO 较 GRPO 提高 +2.18%；MQR 在 DGPO 基础上再提升 +2.27%，其中子问题重写策略的增益最大（+1.63%）。跨模型尺度（1.5B、3B、7B）和跨模型系列（Qwen2.5-Math、Qwen2.5、DeepSeek-Math）的实验一致表明 MathForge 的最优性，验证了方法的泛化能力。
 
-
-
 ### 数学推理的强化学习范式
 
 大语言模型在数学推理任务上的能力提升，已从监督微调（SFT）转向基于强化学习的后训练阶段。其中，**GRPO**（Group Relative Policy Optimization, Shao et al., 2024）作为一种无需价值模型的强化学习算法，通过组内相对优势估计替代传统 critic 网络，显著降低了训练开销，成为当前数学推理 RLVR（Reinforcement Learning from Verifiable Rewards）的主流范式。
@@ -113,8 +111,6 @@ $$\sum_{i=1}^G |\hat{A}_{\mathrm{GR},i}| = 2G\sqrt{p(1-p)}$$
 2. **数据层面**：提出 **MQR**（Multi-Aspect Question Reformulation），在不改变原始答案的前提下，通过添加故事背景、引入抽象术语、嵌套子问题三种策略系统性地增加问题难度，为 RLVR 训练提供更具挑战性的样本。
 
 两者的协同构成了一个正向循环：MQR 提供更难的训练数据，DGPO 确保这些难题获得充分的更新幅度，共同驱动模型在复杂推理任务上的突破。
-
-
 
 ## 核心方法与创新机理
 
@@ -165,8 +161,6 @@ $$\lambda_s = B_{\mathrm{v}} \cdot \frac{\exp(D_s / T)}{\sum_{s=1}^{B_{\mathrm{v
 ### 协同闭环
 
 MathForge 将 DGPO 与 MQR 结合，构建了一个正反馈循环：MQR 生成更难但可解的问题，DGPO 通过难度平衡的优势估计和显式加权确保这些难题获得充分的训练信号。在 Qwen2.5-Math-7B 上，MathForge 达到 42.17% 的平均基准分（+4.56% over GRPO），在 AIME24（+3.64）、MATH500（+7.75）、Minerva（+5.60）、Olympiad（+5.34）上均取得一致最优（Table 1）。该优势在 1.5B、3B、7B 及不同模型系列（Qwen、DeepSeek）上均稳定复现（Table 2），验证了方法的通用性。
-
-
 
 MathForge 是一个面向强化学习式推理验证（RLVR）的“数据–算法”协同框架，由两个正交且互补的组件构成：**难度感知组策略优化（DGPO）** 和 **多方面问题改写（MQR）**。二者的关系并非简单叠加，而是形成一条“更难数据 → 更强算法”的正反馈闭环：MQR 系统性提升训练问题的内在难度，DGPO 则从优化器层面纠正 GRPO 对困难问题的隐式压制，使模型能有效利用这些高难度样本。
 
@@ -246,8 +240,6 @@ DGPO 的损失函数（Eq. 3）在有效问题上进行 token 级平均，避免
 
 DGPO 和 MQR 各自独立有效（DGPO 较 GRPO 提升 2.18%，MQR 提升 3.43%），但二者联合（MathForge）达到 42.17% 的平均基准分，较 GRPO 基线提升 4.56 个百分点（Table 1）。这种协同并非简单的增益叠加：DGPO 的难度感知机制使模型能更有效地利用 MQR 生成的高难度样本，而 MQR 提供的更丰富训练信号又反过来放大了 DGPO 的优势。在 1.5B、3B、7B 及不同模型系列上，MathForge 均一致取得最优结果（Table 2），验证了框架的泛化性。
 
-
-
 ### 问题定位：GRPO 优势估计的难度失衡
 
 GRPO 的核心机制是通过组内相对优势估计（Group Relative Advantage Estimation, GRAE）替代传统的价值模型，其优势函数为：
@@ -305,8 +297,6 @@ MQR（Multi-Aspect Question Reformulation）通过三个方面系统性增加问
 $$\mathcal{I}_{\mathrm{DGPO}}(\theta) = \mathbb{E}\left[\{q_s\}_{s=1}^B \sim \mathcal{D}, \{o_{si}\}_{i=1}^G \sim \pi_{\theta_{\mathrm{old}}}(\cdot \vert q_s)\right] \frac{1}{\sum_{s=1}^{B_v} \sum_{i=1}^G |o_{si}|} \sum_{s=1}^{B_v} \lambda_s \sum_{i=1}^G \sum_{t=1}^{|o_{si}|} \left\{ \min\left[ I_{sit}(\theta) \hat{A}_{\mathrm{DG}, si}, \mathrm{clip}\left(I_{sit}(\theta), 1-\varepsilon, 1+\varepsilon\right) \hat{A}_{\mathrm{DG}, si} \right] \right\}$$
 
 其中 $I_{sit}(\theta)$ 为 token 级重要性采样比，损失仅在有效问题（$B_v$）上平均，避免无效问题引起的梯度波动。
-
-
 
 ## 实验与关键发现
 
@@ -368,15 +358,9 @@ Table 6 进一步验证 MQR 的增益源于数据质量而非数据量：将原�
 
 DGPO 的 DGAE 和 DQW 作为即插即用的增强模块，可与现有策略优化方法叠加。Table 4 显示，将 DGPO 集成到 GPG、DAPO、GSPO 上分别带来 +0.99%、+1.97%、+1.61% 的平均提升（置信度 0.95）。其中 **DAPO+DGPO** 达到 39.91%，超越单独 DGPO 的 39.79%，表明难度感知机制与长度惩罚、异步 PPO 等设计存在正向协同。
 
-![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_nfURupkdRJ/figures/004_Table_4.jpg]]
-*Table 4: Synergistic results of DGPO with other policy optimization methods trained on the MATH dataset using Qwen2.5-Math-7B*
-
 ### 多模态扩展验证
 
 在几何推理多模态任务 GEOQA-8k 上使用 Qwen2.5-VL-3B-Instruct（Table 5），DGPO 达到 59.95%，较 GRPO 基线（57.43%）提升 **+2.52%**，较 Dr.GRPO（58.09%）和 DAPO（59.02%）均有显著优势（置信度 0.95）。这表明难度平衡优势估计在非纯文本推理场景同样有效。
-
-![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_nfURupkdRJ/figures/005_Table_5.jpg]]
-*Table 5: Comparative results of methods trained on the GEOQA-8k dataset using Qwen2.5-VL-3B-Instruct in the multimodal domain*
 
 ### 训练动态分析
 
@@ -392,21 +376,11 @@ Figure 1 展示了 DGPO 与 GRPO 在 MATH500 上的训练动态：DGPO 的输出
 3. **温度非自适应**：DQW 的温度 $T=2.0$ 为固定超参，其最优值可能随训练阶段和模型规模变化，缺乏自适应调节机制
 4. **奖励粒度限制**：所有实验均使用 0/1 二进制奖励，DGAE 对更细粒度奖励函数的理论适用性虽有证明，但缺乏充分实证
 
-![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_nfURupkdRJ/figures/012_Table_8.jpg]]
-*Table 8: Comparative results of MQR using varying reformulator models on the MATH dataset*
-
 ### 待验证问题
 
 - 困难感知权重在极长训练中是否会导致模型遗忘简单任务（灾难性遗忘）？
 - 能否将 MQR 的重写过程内化到 RL 训练循环中，实现数据难度与策略能力的同步进化？
 - 该方法在 70B+ 规模模型和更复杂推理任务（如竞赛级证明）上的扩展性尚待检验。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_nfURupkdRJ/figures/013_Table_9.jpg]]
-*Table 9: Hyperparameter settings trained on the MATH dataset using varying base models*
-
-
 
 ## 定位与知识库关联
 
@@ -462,8 +436,6 @@ MathForge 将 DGPO 和 MQR 组合为一个“更难数据–更强算法”的�
 - **数据与策略的同步进化。** 能否将 MQR 的重写过程内化到 RL 训练循环中，使问题难度随策略能力的提升而动态调整，实现数据生成与策略优化的在线协同？
 - **更大规模的扩展性。** 该方法在 70B+ 模型和更复杂推理任务（如竞赛级证明、研究级问题求解）上的扩展性如何？当前实验最大仅覆盖 7B 模型。
 - **难度度量的替代方案。** DQW 使用负平均奖励作为难度代理，在训练初期模型能力较弱时，该信号可能噪声较大。是否存在更鲁棒的难度度量方式（如基于模型置信度、响应熵或外部难度标注）？
-
-
 
 ## 原文 PDF
 

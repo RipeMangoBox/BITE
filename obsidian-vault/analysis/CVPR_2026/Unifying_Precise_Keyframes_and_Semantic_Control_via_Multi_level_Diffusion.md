@@ -72,8 +72,6 @@ claims:
 
 当前方法在文本语义与关键帧约束严重冲突时可能难以生成满意过渡，需人工调整条件；推理阶段的 DDIM 反演增加了计算开销，限制了实时交互应用；模型仅在 HumanML3D 数据集上验证，对高动态动作（如杂技）的泛化能力尚待检验。未来方向包括自动冲突检测与调解、引入物理模拟约束，以及扩展至多人交互和物体操作场景。
 
-
-
 ### 问题背景：文本条件运动插补的双重困境
 
 运动生成是计算机视觉与图形学交叉领域的关键任务，其目标是根据用户指定的控制信号合成自然的人体运动序列。在众多控制模态中，**文本条件运动插补**（text-conditioned motion in-betweening）因其直观性和表现力而备受关注：用户通过自然语言描述期望的运动语义（如“捡起箱子后高举过头顶走向目标”），同时以稀疏关键帧（keyframes）指定特定时刻的姿态约束，系统则负责生成连接这些关键帧的平滑过渡运动。
@@ -104,8 +102,6 @@ claims:
 
 这一框架在 HumanML3D 测试集上实现了关键帧误差为 0.000 的严格遵循（Table 1），同时在语义一致性指标（R-Precision Top 3 达 0.803）上超越现有最优方法，证明了语义表达与空间控制可以兼得。
 
-
-
 ## 核心方法与创新机理
 
 本工作的核心创新在于提出了一套**多层级扩散框架**，通过训练时的结构化引导与推理时的硬约束精炼，首次在文本条件运动插补任务中同时实现了**零关键帧误差**与**高层语义对齐**，解决了现有方法普遍存在的“关键帧偏差”与“低层语义控制不足”的双重瓶颈（Figure 2）。
@@ -131,8 +127,6 @@ claims:
 ### 创新性总结
 
 上述三个changed slots并非孤立改进，而是存在深层因果关联：**多层级引导**为语义-空间对齐提供了结构化训练信号，使模型在生成阶段就能产出接近约束的运动；**轨迹-姿态精炼**则在推理阶段将“接近”提升为“精确”，通过硬约束操作消除了剩余偏差。这种“训练期软引导 + 推理期硬满足”的协同设计，是本方法在HumanML3D测试集上实现零关键帧误差（Table 1）与最优语义一致性（R-Precision Top 3 = 0.803, FID = 0.023）的根本原因。
-
-
 
 本文提出的**多层扩散框架（Multi-level Diffusion Framework）**旨在解决文本条件运动插补中一个核心瓶颈：如何将文本语义与关键帧的时空约束有效对齐，从而同时满足语义准确性和精确空间控制。框架将这一复杂任务解耦为四个协同模块，形成从条件编码、多层引导到推断精炼的完整管线（Figure 3）。
 
@@ -173,8 +167,6 @@ claims:
 整个管线的数据流可概括为：**条件编码**将文本和关键帧转化为特征 → **局部引导**与**全局引导**在扩散去噪的每一步分别从帧级和序列级调节运动生成 → 扩散输出预测运动 $\hat{\mathbf{x}}_0$ → **推断精炼**对预测运动进行根轨迹校正和姿态强制替换，输出最终运动 $\bar{\mathbf{x}}_0$。
 
 这种“训练时多层软引导 + 推断时硬约束精炼”的设计，是本方法在关键帧误差上实现 0.000 cm（Table 1）的根本原因，同时也保证了语义一致性指标（R-Precision Top 3 达 0.803）处于最优水平。
-
-
 
 本方法的核心是一个**多层级扩散框架**，其设计围绕一个瓶颈：如何将文本高层语义与关键帧的精确时空约束有效对齐。框架通过四个协同模块实现这一目标：条件编码、局部引导、全局引导和推断精炼。
 
@@ -234,21 +226,11 @@ $$\bar{\mathbf{x}}_0 = \mathbf{K} \odot \mathbf{m}_{\mathbf{K}} + \tilde{\mathbf
 
 消融实验证实了这一设计的有效性：仅使用局部+全局引导时，关键帧误差为 0.667 cm 且根位置误差非零；加入轨迹精炼后根误差消除至 0.000，但姿态误差仍存；最终加入姿态精炼后，关键帧误差和所有子指标均降至 0.000（Table 4）。定性对比进一步表明，均匀分配根误差会产生滑动伪影，而本方法的比例分配策略在保证空间精度的同时保持了自然的脚部接触模式（Figure 6）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2_https_cvpr_thecvf_com_virtual_2026_poster_38659/figures/001_Figure_1.jpg]]
-*Figure 1: Our method enables motion generation (a) and editing (b) interactively with precise spatio-temporal control. (a) Text-conditioned Motion In-betweening: Given textual descriptions, keyframes (orange), and sparse keyjoint signals (orange spheres), our method can generate motions (blue) that strictly satisfy the spatio-temporal constraints and align well with textual semantics. (b) Semantics-preserving Motion Editing: Given the source motion generated from (a) and a keyframe (orange) specifying the local modifications (e.g., placing the character on the ground and lowering the hands in the last frame), our method produces coherent edited motions, comprising modified segments (pink) that satisf...*
-
 ![[assets/figures/papers/paper_list_l2_https_cvpr_thecvf_com_virtual_2026_poster_38659/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of our text-conditioned motion in-betweening method. Given a text prompt, a set of keyframes, and a keyframe mask, our model generates a motion sequence that aligns with spatio-temporal constraints and motion semantics derived from text and keyframes. The framework consists of four components: (a) Condition Encoding encodes text and keyframe inputs; (b) Local Guidance incorporates keyframe embedding with noisy motion feature to guide local transitions around keyframes; (c) Global Guidance integrates text and keyframe features to modulate global motion dynamics; and (d) Inference Refinement enforces precise spatial adherence through trajectory and pose refinement. Here, (cf) and (ct...*
 
-![[assets/figures/papers/paper_list_l2_https_cvpr_thecvf_com_virtual_2026_poster_38659/figures/004_Figure_4.jpg]]
-*Figure 4: Keyframe Transformer Encoder. This module concatenates the keyframe embeddings $\mathbf { e } _ { k }$ with a learnable token and adds positional encoding (PE) to indicate temporal order. The keyframe mask mK is applied to filter out masked embeddings, and the resulting sequence is subsequently processed by the Transformer. The output corresponding to the learnable token serves as the compact keyframe feature for global guidance*
-
 ![[assets/figures/papers/paper_list_l2_https_cvpr_thecvf_com_virtual_2026_poster_38659/figures/006_Figure_5.jpg]]
 *Figure 5: Qualitative results of text-conditioned motion in-betweening. We visualize the keyframe constraints as orange frames, the corresponding generated keyframes in pink, and the generated transitions as blue frames. Our method strictly adheres to the constraints, exhibiting perfect overlap between the targets (orange) and generations (pink), whereas other methods display non-negligible spatial deviations (orange boxes) and semantic inconsistencies (blue boxes). Please refer to the supplementary video for the complete motion sequences*
-
-
 
 ## 实验与关键发现
 
@@ -292,9 +274,6 @@ Table 4 系统性地量化了各组件的独立贡献，揭示了多层级引导
 
 Table 5 评估了基于关键帧的运动编辑性能，包括局部姿态编辑和全局轨迹编辑，修改 1–5 个随机关键帧。本方法在空间精度（关键帧误差）、运动质量（FID）和语义保持度（SS Similarity）上均优于基于优化的 DNO 方法。这得益于 DDIM 反演与固定点迭代策略：反演将原始运动映射到扩散模型的隐空间，编辑后的关键帧通过推断精炼强制满足新约束，而未修改段落的语义得以完整保留。
 
-![[assets/figures/papers/paper_list_l2_https_cvpr_thecvf_com_virtual_2026_poster_38659/figures/010_Table_5.jpg]]
-*Table 5: Quantitative evaluation on the keyframe-based motion editing with 1–5 randomly selected keyframe modifications, evaluated on local pose and global trajectory editing*
-
 ### 失败模式与局限
 
 尽管本方法在定量指标上表现出色，但仍存在以下局限：
@@ -302,16 +281,6 @@ Table 5 评估了基于关键帧的运动编辑性能，包括局部姿态编辑
 1. **语义-约束冲突**：当文本语义与关键帧约束存在严重冲突时（例如文本描述“跳跃”但关键帧指定蹲姿），模型可能难以生成令人满意的过渡。此时需要用户手动调整条件以消除歧义。
 2. **推断效率**：推断精炼过程（特别是运动编辑中的 DDIM 反演和固定点迭代）增加了生成时间，可能不适用于实时交互场景。
 3. **数据域泛化**：当前模型仅在 HumanML3D 数据集上验证，其在其他运动风格（如舞蹈、杂技）或高度动态动作上的泛化能力尚未证明，需要进一步评估。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2_https_cvpr_thecvf_com_virtual_2026_poster_38659/figures/011_Figure_6.jpg]]
-*Figure 6: Ablation results on trajectory refinement. Without refinement, the generated keyframes deviate from the keyframe constraints; imputation alone introduces jitters between transitions (blue) and generated keyframes (pink); and uniformly distributing the root position error across frames leads to drifting artifacts. In contrast, our trajectory refinement aligns the root trajectory with the keyframe constraints while minimizing foot skating artifacts*
-
-![[assets/figures/papers/paper_list_l2_https_cvpr_thecvf_com_virtual_2026_poster_38659/figures/002_Figure_2.jpg]]
-*Figure 2: Limitations of previous text-conditioned motion inbetweening methods. The artist specifies the intended motion semantics through text and keyframes (orange), with keyframes 2–4 (from right) indicating three distinct stages: “picking up”, “carrying overhead”, and “walking to the target”. However, existing approaches [9] exhibit two critical limitations: (a) Lacking lowlevel semantic control, as the generated transition (blue) redundantly performs the “picking up” action after the timing set by the keyframe, and fails to maintain the keyframe-specified “carrying overhead” pose while walking. (b) Lacking precise keyframe adherence, demonstrated by the generated motion at the constrained frame...*
-
-
 
 ## 定位与知识库关联
 
@@ -360,8 +329,6 @@ Table 5 评估了基于关键帧的运动编辑性能，包括局部姿态编辑
 3. **多人交互与物体操作**：在更复杂的多人交互或物体操作场景中，本方法的严格关键帧遵循策略是否依然适用？多人场景涉及角色间相对约束，物体操作涉及手-物接触约束，这些对轨迹精炼和姿态填补提出了新的挑战。
 
 4. **实时性能优化**：能否通过蒸馏、一步生成或缓存策略将推断精炼过程加速至实时，以支持交互式创作工具？这需要在精度与速度之间寻找新的平衡点。
-
-
 
 ## 原文 PDF
 

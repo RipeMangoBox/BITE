@@ -49,8 +49,6 @@ claims:
 
 在方法谱系上，ETGS属于**物理驱动显式神经渲染**的范式：它继承3DGS的显式点基元与快速光栅化管线，但将高斯属性集从光学颜色（球谐系数）替换为热力学参数（$C_i, h_i, Q_i(t), T_i(t)$），并通过积分因子法与谐波展开推导出一阶线性ODE的闭式温度解，实现了物理一致性与计算效率的统一。与NTR-Gaussian（隐式热力学+数值积分）、4DGS（数据驱动变形场）等动态基线相比，ETGS在精度-效率帕累托前沿上占据显著优势。
 
-
-
 ### 热场景重建的现实需求与挑战
 
 动态热场景的三维重建在工业检测、建筑热诊断、夜视增强等领域具有重要应用价值。与常规RGB图像不同，热红外图像记录的是场景的温度辐射信息，其像素强度直接反映物体的表面温度。因此，热场景重建的核心目标不仅是恢复三维几何结构，更要准确捕捉场景中随时间演化的温度场分布。
@@ -72,8 +70,6 @@ claims:
 上述分析揭示了一个关键瓶颈：**现有动态重建方法要么完全忽略热力学过程，要么以高昂的计算代价和精度损失为代价来融入物理约束**。这引出了一个自然的问题：能否将热力学方程以显式、解析的方式直接嵌入高斯表示，从而在保持静态方法效率的同时实现物理一致的动态温度场重建？
 
 本文的动机正是基于这一洞察。我们注意到，在合理的简化假设下（一阶热交换、谐波热源激发），热传导过程可以用一阶线性常微分方程描述，且该方程存在闭式解析解。这意味着，如果我们将热力学参数作为高斯基元的显式属性，并利用解析解直接计算任意时刻的温度，就可以完全绕过数值积分，实现物理驱动的高效动态重建。这一思路将热力学从“需要求解的约束”转变为“可直接计算的属性”，从根本上消除了隐式-数值方案的计算瓶颈。
-
-
 
 ## 核心方法与创新机理
 
@@ -121,8 +117,6 @@ $$\mathcal{L}_{total} = (1-\lambda) \mathcal{L}_1 + \lambda \mathcal{L}_{D-SSIM}
 
 **需要人工验证的点**：论文未明确说明 $T_{env}$ 是全局共享超参数还是可学习变量，这一细节影响模型的物理自由度，建议核对原文 Section 3.2 的具体实现。
 
-
-
 ETGS 的整体框架由四个顺序耦合的模块构成：**热高斯场构建** → **热力学演化模块** → **动态热渲染器** → **训练与优化**。其核心设计思想是将一阶热传导物理方程直接嵌入显式高斯表示，使每个高斯基元携带可学习的热力学参数，并通过闭式解析解在任意时刻高效计算温度，从而将动态热重建问题转化为一个端到端可微的优化过程。
 
 ### 模块关系与数据流
@@ -157,12 +151,8 @@ $$\mathcal{L}_{\text{total}} = (1-\lambda) \mathcal{L}_1 + \lambda \mathcal{L}_{
 
 值得注意的是，各高斯的温度演化在物理方程层面是独立建模的，但渲染后的热场通过高斯重叠与密集监督实现隐式耦合。这一设计牺牲了高斯间显式热传导的物理完备性，换取了极高的计算效率——这是当前框架的一个核心权衡。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_P2Nw2LMkjH/figures/002_Figure_2.jpg]]
 *Figure 2: Method Overview. ETGS directly incorporates thermal physics modeling into the explicit Gaussian scene representation. The temperature of each Gaussian consists of two components: an exponential term*
-
-
 
 ### 3.1 热高斯场构建
 
@@ -227,8 +217,6 @@ $$\mathcal{L}_{total} = (1-\lambda) \mathcal{L}_1 + \lambda \mathcal{L}_{D-SSIM}
 - **频率数 $K$ 的平衡**：消融实验表明，$K$ 从 8 增至 64 时性能改善迅速饱和，$K=24$ 在精度与计算开销间取得良好平衡，超过 32 后 PSNR 改善小于 0.2 dB（Table 4）。
 - **高斯间耦合机制**：各高斯元的温度演化被独立建模，但渲染出的热场通过高斯重叠和密集监督隐式耦合，无需显式建模高斯间热传导即可捕捉场景级热分布。
 
-
-
 ## 实验与关键发现
 
 ### 核心定量结果与效率优势
@@ -273,25 +261,6 @@ ETGS 在自建的 Rapid Heat Dynamics (RHD) 数据集上进行了系统评估，
 4. **数据覆盖有限**：RHD 数据集涵盖的场景和热过程仍有限，缺乏移动热源、更强环境扰动等更复杂情况，模型的泛化边界尚待进一步验证。
 
 以上局限性的验证置信度中等（基于方法设计分析，非直接实验验证），建议在实际部署前针对目标场景进行专项评估。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_P2Nw2LMkjH/figures/001_Figure_1.jpg]]
-*Figure 1: Our method achieves high-quality rendering of dynamic thermal scenes with efficiency comparable to static methods (Kerbl et al. (2023); Yu et al. (2024)). The key to this performance is the novel explicit modeling of dynamic thermal Gaussians based on thermodynamics, which significantly speeds up scene optimization and synthesis of new views, while achieving state-of-the-art quality*
-
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_P2Nw2LMkjH/figures/003_Figure_3.jpg]]
-*Figure 3: Pixel-aligned RGB-IR acquisition platform. (a) All devices are mounted on a rigid frame to ensure stability. (b) Response bands of the RGB and IR cameras: The RGB camera uses the IMX585 chip (response band 300-800nm), and the IR camera uses an uncooled vanadium oxide (VOx) microbolometer sensor (response band 8-14µm). (c) Optical principle of pixel-level alignment: A piece of coated glass (coating materials: zinc sulfide, silver) is mounted within the black frame. Visible light passes through the glass and enters the front RGB CMOS, while infrared light is reflected by the glass and reaches the side IR CMOS. The two imaging paths share the same incident light beam, which is split into diffe...*
-
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_P2Nw2LMkjH/figures/004_Figure_4.jpg]]
-*Figure 4: Alignment Error Verification. (a) Average alignment error for each of the 20 RGB-IR image pairs. The overall average error is 0.4869 pixels, reaching sub-pixel accuracy. (b) Comparison of checkboard corner detection results. The RGB camera corners (blue circles) and the IR camera corners (red crosses) almost coincide*
-
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_P2Nw2LMkjH/figures/011_Table_5.jpg]]
-*Table 5: Each scene of the Rapid Heat Dynamics Dataset*
-
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_P2Nw2LMkjH/figures/013_Table_7.jpg]]
-*Table 7: Complete calculation cost*
-
-
 
 ## 定位与知识库关联
 
@@ -345,8 +314,6 @@ ETGS 的设计假设划定了明确的适用边界：
 ### 5. 知识库定位总结
 
 ETGS 在知识库中的定位可概括为：**将物理 ODE 的闭式解嵌入显式基元表示的开创性尝试**。它证明了在特定条件下（一阶线性动力学 + 谐波激励），物理一致性可以与静态方法的效率兼容。这一范式——将可解析求解的物理方程直接“烘焙”进场景表示——可能启发其他物理驱动重建任务（如流体可视化、声学场重建），前提是找到对应的闭式动力学模型。对于需要超越一阶线性的复杂场景，ETGS 提供了效率上界参考，但需要新的数值或近似方案来突破其适用边界。
-
-
 
 ## 原文 PDF
 

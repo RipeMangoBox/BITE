@@ -59,15 +59,11 @@ claims:
 
 **方法局限**：当前对参数合并为何能显著提升泛化性缺乏完整的理论解释，合并系数 α 需在验证集上手动调节，且实验仅在基于 π0 架构的 VLA 策略上验证，泛化到其他架构尚待探索。
 
-
-
 通用机器人策略的微调面临一个核心困境：标准微调方法（Task-FT）在使用少量目标演示数据时，会导致策略严重过拟合。如图 4 所示，随着训练步数增加，策略在非目标任务上的通用能力急剧下降，甚至在微调数据中的分布内（ID）场景也开始退化。更关键的是，微调后的策略无法将预训练获得的通用知识迁移到目标任务的未见变体（OOD）上——例如新的物体位置、实例、视角或光照条件——在 ID 与 OOD 性能之间存在巨大鸿沟。
 
 这一瓶颈的根源在于，标准微调以行为克隆损失（公式 1）在窄分布的目标数据上优化参数，导致参数空间偏离预训练模型所编码的通用知识区域，从而丧失泛化性。即使采用协同微调（Co-FT，混合预训练数据与目标数据）或低秩适配（LoRA）等正则化手段，过拟合问题仍难以根除——精心调节学习率和训练步数同样会陷入过拟合（Fig. 16）。
 
 现有微调范式本质上是在“适应目标任务”与“保留通用能力”之间做不可调和的权衡，缺乏一个简洁而有效的机制来同时兼顾两者。本文的动机正是填补这一缺口：能否在权重空间中找到一个既保留预训练模型泛化能力、又具备目标任务专长的解决方案，且不增加任何推理成本？
-
-
 
 ## 核心方法与创新机理
 
@@ -130,8 +126,6 @@ $$\tilde{\theta}_n = (1 - \alpha) \cdot \tilde{\theta}_{n-1} + \alpha \cdot \the
 - 实验仅在基于π0架构的VLA策略上进行，泛化到其他架构（如扩散策略）尚待验证
 - 对模型合并为何能显著提升泛化性缺乏完整的理论解释，目前多基于线性模式连通性的经验假设
 
-
-
 ![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_uWJwQ5SZoM/figures/001_Figure_1.jpg]]
 *Figure 1: Naive approaches for finetuning of generalist policies narrowly improve target task performance on settings seen in the finetuning data, but fail to generalize or retain generality beyond the target task. We propose a simple solution: by averaging the generalist policy before and after finetuning, in weight space, we obtain finetuned policies that (1) significantly improve generalization ability to unseen variations of the target task, and (2) retain generalist capabilities on non-target tasks. Our approach RETAIN is a simple solution for robust policy finetuning*
 
@@ -183,8 +177,6 @@ $$\tilde{\theta}_n = (1 - \alpha) \cdot \tilde{\theta}_{n-1} + \alpha \cdot \the
 
 整体推理流程为：给定观测图像 $s_t$ 和任务指令 $T$，视觉编码器提取特征后送入语言模型主干进行跨模态融合，动作专家根据融合表示生成动作 $a_t$。RETAIN **不改变推理管线**，仅在部署前通过权重空间插值生成最终策略参数，因此不增加任何推理时延或计算开销。
 
-
-
 ### 问题形式化
 
 给定预训练通用策略 $\pi_{\boldsymbol{\theta}_{\text{pre}}}$ 和一个包含少量演示数据的目标任务数据集 $\mathfrak{D}_{\eta}$，微调的目标是使策略适应新任务。标准的行为克隆损失函数定义为：
@@ -225,8 +217,6 @@ RETAIN 支持两种微调范式：
 
 实验一致表明，Co-FT 结合模型合并（RETAIN-co-FT）在所有评估设置中均优于仅使用模型合并（RETAIN-task-FT）（Fig. 7, 8），说明在微调阶段保留对预训练数据的接触有助于维持权重空间中的线性连通性。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与因果机制
@@ -249,12 +239,10 @@ RETAIN通过一个简洁的因果控制变量解决此问题：微调后策略�
 
 **LIBERO仿真环境实验**（Fig. 8）：三个任务的平均OOD性能上，RETAIN-co-FT均优于所有基线方法（如Co-FT约70%，RETAIN-co-FT约85%），趋势与DROID实验一致。值得注意的是，LIBERO上的OOD提升幅度小于DROID，这一差异的原因尚需进一步分析。
 
-
 ![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_uWJwQ5SZoM/figures/010_Figure_8.jpg]]
 *Figure 8: RETAIN results averaged over the three LIBERO tasks. Similar trend as Fig. 7*
 
 **预训练数据量扩展性**（Fig. 9）：RETAIN的性能随预训练数据量增加而显著提升。使用DROID-All + PI（最大预训练数据量）训练的模型，其OOD性能接近ID性能水平，表明更大规模的预训练数据为参数合并提供了更丰富的泛化知识基础。
-
 
 ![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_uWJwQ5SZoM/figures/011_Figure_9.jpg]]
 *Figure 9: RETAIN performs better on OOD tasks when the pretrained generalist policy is trained on more data. OOD performance is averaged across three plates scenes*
@@ -265,14 +253,12 @@ RETAIN通过一个简洁的因果控制变量解决此问题：微调后策略�
 
 **模态特定合并分析**（Fig. 11）：对视觉编码器、语言模型主干、动作专家分别设置合并系数（α_v, α_l, α_a）的网格搜索显示，语言模型参数α_l对OOD性能的影响最大。更重要的是，仅合并语言模型参数（α_a=α_v=1, α_l<1）即可达到与合并全部参数相似的OOD性能（Fig. 11右），这大幅简化了实际部署中的超参数搜索空间。
 
-
 ![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_uWJwQ5SZoM/figures/016_Figure_11.jpg]]
 *Figure 11: Language model parameters have the most influence in modality-specific merging. Left: Merged model’s OOD performance over a grid search of $\alpha _ { a } , \alpha _ { v } , \alpha _ { l }$ , , and $\alpha _ { l }$ has the most impact. Middle: OOD performance of $\alpha _ { a }$ and $\alpha _ { v }$ averaged over different $\alpha _ { l }$ . , and higher values are better. Right: Merging only the language model parameters ( $\alpha _ { a } = \alpha _ { v }$ = 1 , $\alpha _ { l }$ < 1 ) performs similarly to merging all parameters
 
 **合并系数敏感性**（Fig. 10）：在LIBERO的不同OOD类型（位置变化、位置+干扰物变化、背景变化）上，OOD性能随α的变化曲线显示，位置变化类OOD对α最敏感，在α≈0.5时性能提升最为显著。在DROID任务上，α在0.5左右普遍表现良好（Section A.8.1）。
 
 **连续技能合并**（Fig. 12）：RETAIN能够连续合并多个技能而不遗忘先前能力。在顺序学习两个任务（Plates→Whiteboard）时，RETAIN在所有任务和评估类型上均显著优于顺序Co-FT，证明参数合并策略天然支持持续学习场景。
-
 
 ![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_uWJwQ5SZoM/figures/017_Figure_12.jpg]]
 *Figure 12: RETAIN enables continual adaptation to a sequence of two skills. Evaluation results show the performance of the final policy after sequentially finetuning on two tasks, evaluated on different scenes. OOD performance averaged across two test scenes*
@@ -282,28 +268,6 @@ RETAIN通过一个简洁的因果控制变量解决此问题：微调后策略�
 ### 失败模式与局限性
 
 尽管RETAIN显著提升了OOD鲁棒性，部分场景下策略仍可能因动作执行不精确或语义理解错误而失败（Fig. 24, 25）。此外，合并系数α需要针对每个任务和场景在验证集上手动调节，缺乏自动选择的启发式方法。当前实验仅在基于π0架构的VLA策略上进行，泛化到其他架构（如扩散策略）尚待验证。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_uWJwQ5SZoM/figures/028_Table_1.jpg]]
-
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_uWJwQ5SZoM/figures/029_Table_1.jpg]]
-*Table 1: Subtasks and cumulative score for the whiteboard task. Table 2: Subtasks and cumulative scoring for the plates task*
-
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_uWJwQ5SZoM/figures/030_Table_3.jpg]]
-*Table 3: DROID Generalist evaluation tasks grouped by scene (Scenes 1-4). Each task contains associated trial counts, randomization details, and evaluation rubrics*
-
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_uWJwQ5SZoM/figures/031_Table_4.jpg]]
-*Table 4: DROID Generalist evaluation tasks grouped by scene (Scenes 5-8). Each task contains associated trial counts, randomization details, and evaluation rubrics*
-
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_uWJwQ5SZoM/figures/032_Table_5.jpg]]
-*Table 5: DROID Generalist evaluation tasks grouped by scene (Scene 9). Each task contains associated trial counts, randomization details, and evaluation rubrics*
-
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_uWJwQ5SZoM/figures/044_Table_7.jpg]]
-*Table 7: Training hyperparameters for task-FT on DROID whiteboard*
-
-
-
 
 ## 定位与知识库关联
 
@@ -339,8 +303,6 @@ RETAIN 在方法层面属于模型合并（model merging）范式，与自然语
 4. **学习范式扩展**：是否可以将 RETAIN 扩展到在线强化学习或交互式模仿学习场景，在探索与利用的循环中动态调整合并系数？
 5. **多任务累积效应**：当连续合并更多任务（$N > 2$）时，迭代合并公式 $\tilde{\theta}_n = (1 - \alpha) \cdot \tilde{\theta}_{n-1} + \alpha \cdot \theta_{\mathrm{ft},n}$ 是否仍能保持稳定？是否存在遗忘累积效应？
 6. **预训练数据质量与合并效果的关系**：Figure 9 显示更多预训练数据显著提升 RETAIN 的 OOD 性能，但数据质量、多样性与合并效果之间的定量关系尚未被系统研究。
-
-
 
 ## 原文 PDF
 

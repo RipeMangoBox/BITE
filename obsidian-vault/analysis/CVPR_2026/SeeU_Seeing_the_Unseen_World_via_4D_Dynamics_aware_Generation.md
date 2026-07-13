@@ -59,8 +59,6 @@ claims:
 
 SeeU 的主要局限在于依赖上游几何模块（相机位姿估计、跟踪、深度预测）的质量，对纹理稀疏或薄结构的场景性能下降（Figure 9），且在极端快速运动或多物体交互场景下仍可能产生伪影（Figure 10）。这些限制指出了未来在提升上游模块鲁棒性和处理更复杂动态方面的研究方向。
 
-
-
 ### 问题背景：从2D投影理解动态世界的根本困难
 
 人类视觉系统天然具备从稀疏的2D视网膜投影中推断三维结构和运动的能力。然而，对于当前的计算机视觉模型而言，从单目2D视频帧中恢复精确的3D几何与物理轨迹仍然极具挑战性。这一困难的核心根源在于**投影过程的本质信息损失**——当三维世界被投影到二维图像平面时，深度信息、遮挡关系以及场景的完整空间结构都被不可逆地压缩了。
@@ -88,8 +86,6 @@ SeeU的核心洞察在于：**在4D世界（3D空间+时间）中，上述被2D�
 ### 方法定位：统一框架下的多任务覆盖
 
 值得注意的是，现有方法通常仅针对特定子任务设计：例如**InterpAny**（Zhong et al., ECCV 2024）仅支持视频帧插值，**Cosmos Predict2.5**仅支持未来帧预测，而**ReCamMaster**（Bai et al., ICCV 2025）和**GCD**则专注于相机可控的视频生成。SeeU的目标是在一个统一的4D动力学框架下，同时覆盖过去重建、中间插值、未来预测以及新视角生成等全时间范围和全空间范围的任务，从而实现对动态场景的更完整理解与生成能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -120,8 +116,6 @@ SeeU相对于现有基线的方法差异可归纳为以下四个关键改变槽�
 
 上述创新点的证据强度总体较高：核心改变槽位均有明确的公式、消融实验和可视化支撑（Table 3, Figure 7, Figure 8）。与基线的定量对比（Table 1, Table 2）覆盖了时间维度（过去/插值/未来）和空间维度（Dolly/Tilt/Pan）的多个指标，且SeeU在几乎所有设置下均取得最优或次优结果。值得注意的是，某些基线仅针对特定子任务（如InterpAny仅支持插值，Cosmos仅支持未来预测），而SeeU在统一框架下覆盖全时间范围，这一泛化能力本身也体现了4D建模范式的优势。
 
-
-
 SeeU 遵循一个 **2D→4D→2D** 的三阶段学习框架，其核心创新在于将动态场景的建模从2D像素空间显式提升到4D（3D空间+时间）表示空间，从而解耦相机运动、前景运动和背景结构，并在连续时间上学习物理一致的动力学。
 
 ### 三阶段流水线
@@ -146,16 +140,6 @@ SeeU 遵循一个 **2D→4D→2D** 的三阶段学习框架，其核心创新在
 ### 模块间的依赖关系
 
 Stage 1 为 Stage 2 提供初始的离散4D表示（相机位姿、前景高斯属性），Stage 2 在此基础上学习连续动力学，Stage 3 则依赖 Stage 2 输出的演化后4D场景进行重投影和视频修复。三个阶段的训练顺序进行，上游模块的质量直接影响下游性能——例如，Stage 1 的相机估计和前景分割精度决定了 C4DD 可学习的运动空间上限，而 C4DD 的平滑性和外推能力又约束了 Stage 3 生成内容的几何一致性。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2593_https_arxiv_org_abs_2512_03350/figures/002_Figure_2.jpg]]
-*Figure 2: Projection and the entanglement of camera and scene motions make recovering accurate 3D geometry and physical trajectories directly from 2D frames particularly challenging; however, these quantities can usually be described in the 4D world explicitly, easily, and elegantly*
-
-![[assets/figures/papers/paper_list_l2593_https_arxiv_org_abs_2512_03350/figures/001_Figure_1.jpg]]
-*Figure 1: From sparse 2D frames, we learn vanilla and continuous 4D dynamics to better understand scenes and generate unseen worlds across novel times and viewpoints, while enforcing physically plausible motion and consistent 3D geometry*
-
-
 
 ### 2D→4D 动态场景重建
 
@@ -185,9 +169,6 @@ $$\hat{\mathbf{B}}_t = \sum_{j=1}^M N_{j,d}(t) \mathbf{q}_j$$
 
 其中 $\mathbf{q}_j$ 为可学习控制点，$N_{j,d}(t)$ 为 $d$ 阶 B 样条基函数。论文采用三次 B 样条（$d=3$），设置 8 个控制点。B-spline 的局部支撑性和固有平滑性为连续动力学提供了强归纳偏置——消融实验中将其替换为 MLP 后，PSNR 从 21.08 骤降至 17.54（Table 3），且运动基的时间平滑性显著恶化（Figure 7、Figure 8）。
 
-![[assets/figures/papers/paper_list_l2593_https_arxiv_org_abs_2512_03350/figures/011_Figure_7.jpg]]
-*Figure 7: The C4DD with MLP variant (b) predicts motion bases with reduced temporal smoothness and physical consistency, confirming the advantageous inductive bias of spline priors (a) for continuous dynamics*
-
 ![[assets/figures/papers/paper_list_l2593_https_arxiv_org_abs_2512_03350/figures/012_Figure_8.jpg]]
 *Figure 8: Visual comparison on C4DD Architectures. The C4DD with spline constrains (a) has better smoothness and physical consistency (both camera pose and foreground dynamics)*
 
@@ -204,8 +185,6 @@ $$\mathcal{L}_{\mathrm{phys}} = \mathbb{E}_{\tau_{\mathrm{ex}}(t)} \Big[ \| \ope
 ### 4D→2D 时空上下文修复生成
 
 第三阶段将习得的连续 4D 场景在目标时刻和视角下重投影为 2D 骨架帧，并生成对应的修复遮罩（inpainting mask）以标记未观测或不确定区域。随后，一个微调的 **VACE** 视频生成器接收三类上下文先验完成修复：(1) 由 VLM 提取的场景语义描述作为结构化提示；(2) 重投影帧作为视觉锚点；(3) 修复遮罩界定生成区域。Context Encoder 将这些先验编码为上下文嵌入并注入预训练视频生成器，最终输出时空一致的完整视频帧。这一设计使得 4D 骨架负责几何与运动一致性，而视频生成器仅需填充外观细节，实现了结构控制与外观生成的解耦。
-
-
 
 ## 实验与关键发现
 
@@ -267,11 +246,6 @@ Figure 10的鲁棒性评估显示，在极端快速运动、多物体交互和�
 
 更根本的局限性在于：SeeU的2D→4D重建阶段依赖单目视频，仅能处理有限的视角变化，对于大范围遮挡恢复缺乏多视角信息的补充。此外，框架尚未扩展到长时间视频或多场景交互的动态建模。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2593_https_arxiv_org_abs_2512_03350/figures/005_Table_1.jpg]]
-*Table 1: Quantitative comparison on unseen temporal generation. Metrics are averaged across all scenes. The extrapolation windows (past and future) each covers 6.67% of the sequence duration. Best values are shown in bold. Note that C-LPIPS is not lower-better; it should be close to the reference value*
-
 ![[assets/figures/papers/paper_list_l2593_https_arxiv_org_abs_2512_03350/figures/006_Table_2.jpg]]
 *Table 2: Quantitative comparison on unseen spatial generation. Lower Epipolar Error (EE) and higher Epipolar Inlier Ratio (EIR) indicate better 3D geometric consistency, and higher CLIP-V refers to higher scene consistency*
 
@@ -280,14 +254,6 @@ Figure 10的鲁棒性评估显示，在极端快速运动、多物体交互和�
 
 ![[assets/figures/papers/paper_list_l2593_https_arxiv_org_abs_2512_03350/figures/009_Figure_6.jpg]]
 *Figure 6: Visual comparisons on unseen spatial generation. SeeU exhibits strong 3D awareness and scene consistency*
-
-![[assets/figures/papers/paper_list_l2593_https_arxiv_org_abs_2512_03350/figures/013_Figure_9.jpg]]
-*Figure 9: SeeU’s performance degrades on inputs containing thin structures or lacking texture, reflecting the inherent limitations of existing base models*
-
-![[assets/figures/papers/paper_list_l2593_https_arxiv_org_abs_2512_03350/figures/014_Figure_10.jpg]]
-*Figure 10: Robustness evaluations (please zoom in)*
-
-
 
 ## 定位与知识库关联
 
@@ -366,8 +332,6 @@ SeeU 的性能受限于上游几何模块（MegaSaM 相机估计、TAPIR 跟踪�
 4. **计算效率**：三阶段流水线的推理效率是否满足实时或近实时应用需求？是否存在端到端联合优化的可能性？
 
 5. **与基础模型的深度整合**：当前4D→2D阶段依赖微调的视频生成器（VACE）进行上下文修复。是否存在更紧密的整合方式，使4D动力学直接指导扩散模型的去噪过程？
-
-
 
 ## 原文 PDF
 

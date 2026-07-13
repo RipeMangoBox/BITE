@@ -54,8 +54,6 @@ claims:
 
 在Toys4K数据集上的实验表明，MeshFlow在Chamfer Distance和Hausdorff Distance两项指标上均达到最优，同时**推理速度比最快的自回归方法快18倍**（约1.2秒/物体），且推理时间仅随网格大小线性增长。定性结果进一步显示，自回归方法常因提前终止产生不完整几何，而MeshFlow能高效生成几何完整的高质量网格。
 
-
-
 ### 3D网格生成的核心挑战
 
 3D网格是计算机图形学与视觉计算中的基本形状表示，广泛应用于游戏、影视、工业设计和具身智能等领域。生成高质量、拓扑合理的三角网格面临双重挑战：既要精确建模顶点在连续空间中的几何位置，又要正确恢复离散的边与面连接关系。这一离散-连续混合特性使网格生成天然比图像或点云生成更为困难。
@@ -83,8 +81,6 @@ claims:
 2. **并行潜空间生成**：采用整流流扩散变换器（Rectified Flow DiT）在MeshVAE的紧凑连续潜空间中并行生成所有顶点和边的潜码，从根本上消除自回归的序列依赖。推理时间仅随网格大小线性增长，而非二次方增长。
 
 这一设计使MeshFlow在生成速度上比最快的自回归方法快18倍，同时以仅$n_v/4$个潜向量（压缩比0.014，比最紧凑的令牌化方案少16倍）实现高精度重建，在Toys4K数据集上取得了最低的Chamfer Distance和Hausdorff Distance。
-
-
 
 ## 核心方法与创新机理
 
@@ -140,8 +136,6 @@ $$\mathcal{L}_{\mathrm{CFM}}(\theta) = \mathbb{E}_{t,\mathbf{x}_0,\epsilon} \Ver
 
 **质量与速度的兼得**：在 Toys4K 点云条件网格生成任务中（Table 2），MeshFlow 取得了最低的 Chamfer Distance（2.45，×100）和 Hausdorff Distance（6.40，×100），同时保持最快的推理速度。定性对比（Figure 7）显示，自回归方法常因提前终止而产生不完整几何，而 MeshFlow 的并行生成机制天然避免了这一问题，能够稳定输出完整、高质量的三角网格。
 
-
-
 MeshFlow 的整体管线由三个核心模块串联构成：**MeshVAE 编码器**将离散网格压缩为紧凑的连续潜表示，**整流流扩散变换器**（Rectified Flow DiT）在该潜空间中并行生成全部潜码，**MeshVAE 解码器**与后处理步骤从生成的潜码中恢复完整的三角网格。图 Figure 3 展示了这一端到端流程：输入网格经 MeshVAE 编码为潜向量 $z$，生成器以点云特征和顶点数量为条件采样潜码 $\hat{z}$，最终解码还原为网格。
 
 ![[assets/figures/papers/paper_list_l2261_https_openaccess_thecvf_com_content_CVPR2026_html_Li_MeshFlow_Efficient/figures/004_Figure_3.jpg]]
@@ -180,8 +174,6 @@ $$\mathcal{L}_{\mathrm{CFM}}(\theta) = \mathbb{E}_{t, \mathbf{x}_0, \epsilon} \l
 $$F = \left\{ \{f_1, f_2, f_3\} : \{f_1, f_2\}, \{f_2, f_3\}, \{f_3, f_1\} \in E \right\}$$
 
 由于生成结果可能残留少量边界孔洞，MeshFlow 实现了一个启发式后处理步骤：检测仅属于一个三角面的边界边，将其组织为 $k$-gon 环，并对 $k < 5$ 的环进行三角化修补。
-
-
 
 MeshFlow 的生成管线由两大核心模块构成：MeshVAE 将离散网格压缩为紧凑的连续潜表示，整流流扩散变换器在该潜空间中进行高效并行生成。以下逐一剖析各模块的设计动机、关键公式与变量含义。
 
@@ -251,12 +243,8 @@ $$\mathcal{L}_{\mathrm{CFM}}(\theta) = \mathbb{E}_{t, \mathbf{x}_0, \epsilon} \l
 
 生成器采用 Diffusion Transformer（DiT）架构，以预训练点云编码器提取的特征令牌和顶点数量为条件。推理时从纯噪声出发，沿学习到的向量场进行 ODE 积分，并行生成全部潜码，再经 MeshVAE 解码器恢复为完整网格。与自回归方法的序列依赖不同，该过程的推理时间仅随网格大小**线性增长**，从根本上突破了二次复杂度瓶颈。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2261_https_openaccess_thecvf_com_content_CVPR2026_html_Li_MeshFlow_Efficient/figures/003_Figure_2.jpg]]
 *Figure 2: Data Statistics Visualization. (Left) Distribution of vertices and faces, showing that the face count is roughly double the vertex count. (Right) Impact of reduced quantization resolution, illustrating that lower resolution leads to increased geometric errors and face collapse*
-
-
 
 ## 实验与关键发现
 
@@ -272,18 +260,9 @@ $$\mathcal{L}_{\mathrm{CFM}}(\theta) = \mathbb{E}_{t, \mathbf{x}_0, \epsilon} \l
 ![[assets/figures/papers/paper_list_l2261_https_openaccess_thecvf_com_content_CVPR2026_html_Li_MeshFlow_Efficient/figures/006_Figure_5.jpg]]
 *Figure 5: Qualitative comparisons with other mesh encoders. AR-based methods necessitate mesh quantization. Our MeshVAE works in continuous space, enabling the faithful preservation of the fine details in the input mesh*
 
-![[assets/figures/papers/paper_list_l2261_https_openaccess_thecvf_com_content_CVPR2026_html_Li_MeshFlow_Efficient/figures/008_Figure_6.jpg]]
-*Figure 6: Reconstruction results of our MeshVAE. Our MeshVAE faithfully retains the topological information of the input geometry within the continuous latent space. Please refer to the supplementary for more results*
-
 ### 4.2 点云条件网格生成
 
 在 Toys4K 数据集上的点云条件网格生成任务中，MeshFlow 取得了所有方法中最低的 Chamfer Distance（**CD 2.45**，×100）和 Hausdorff Distance（**HD 6.40**，×100），如 Table 2 所示。Figure 7 的定性对比揭示了自回归方法的两大失效模式：推理时间显著更长，且频繁出现提前终止（early stopping），导致生成不完整的几何。相比之下，MeshFlow 的扩散变换器并行生成所有顶点和边，推理时间恒定且仅随网格大小线性增长，生成速度比最快的自回归方法快 **18 倍**，单物体推理仅约 **1.2 秒**。
-
-![[assets/figures/papers/paper_list_l2261_https_openaccess_thecvf_com_content_CVPR2026_html_Li_MeshFlow_Efficient/figures/011_Table_2.jpg]]
-*Table 2: Quantitative comparison of shape-conditioned mesh generation on the Toys4K dataset. The CD and HD are scaled by a factor of 100. To ensure consistency, we adopted the “Inf. Time” calculation used by FastMesh, which reports the average inference time of a batch of multiple objects. Notably, processing a single object with AR-based methods often requires 6→ the reported time, whereas our method maintains a constant runtime*
-
-![[assets/figures/papers/paper_list_l2261_https_openaccess_thecvf_com_content_CVPR2026_html_Li_MeshFlow_Efficient/figures/009_Figure_7.jpg]]
-*Figure 7: Qualitative comparisons with baseline methods for mesh generation conditioned on a point cloud. The AR-based methods require significantly longer inference and frequently encounter early stopping, which often results in incomplete geometry. In contrast, our diffusion-based method generates high-quality meshes efficiently*
 
 需要指出的是，Table 2 中的推理时间采用了与 FastMesh 一致的批处理平均计算方式。然而，自回归方法处理单个物体实际需要报告时间的 6 倍，而 MeshFlow 保持恒定运行时间——这意味着实际部署场景下 MeshFlow 的速度优势更为显著。
 
@@ -301,8 +280,6 @@ Table 3 给出了 MeshVAE 不同设计选择的消融结果。在令牌下采样
 - **边界孔洞**：生成的网格可能包含少量小孔洞或边界缺陷。当前方法依赖启发式后处理——检测仅属于一个三角面的边界边，形成 k 边形环，并对 $k < 5$ 的环进行三角化修复。这一后处理步骤并非端到端可学习，在复杂边界情况下可能失效。
 - **评价指标盲区**：当前使用的 Chamfer Distance 和 Hausdorff Distance 主要衡量几何误差，缺乏对网格拓扑质量（如翻转法线、非流形边、孔洞数量）的自动度量，可能导致指标与视觉质量之间的不一致。
 - **纹理缺失**：方法目前仅专注于几何生成，未包含纹理或 UV 映射生成，无法直接输出带纹理的完整资产。
-
-
 
 ## 定位与知识库关联
 
@@ -351,8 +328,6 @@ MeshFlow 的适用边界受以下因素约束：
 3. **纹理协同生成**：如何在当前框架中集成UV映射生成，实现几何与纹理的协同生成？这需要将UV坐标纳入潜空间表示，并处理UV图集切割与几何拓扑的一致性约束。
 
 4. **拓扑质量度量**：如何设计能够自动评估网格拓扑质量的度量指标？理想的指标应能检测翻转法线、孔洞边界、非流形边和自交面，为生成模型的训练和评估提供更全面的反馈信号。
-
-
 
 ## 原文 PDF
 

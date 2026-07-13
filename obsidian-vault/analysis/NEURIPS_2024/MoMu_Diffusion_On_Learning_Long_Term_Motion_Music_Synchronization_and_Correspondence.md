@@ -193,8 +193,6 @@ $$\hat{\epsilon}_{\theta_a}(z_a(t), t, z_m) = \epsilon_{\theta_a}(z_a(t), t, \em
 
 这一设计使得 MoMu-Diffusion 能够支持三种生成模式：**跨模态生成**（运动→音乐、音乐→运动）、**多模态联合生成**（同时生成运动与音乐）以及**变长序列生成**，在统一的框架下实现了长时间、节拍同步且多样化的运动-音乐合成。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1914_MoMu_Diffusion_On_Learning_Long_Term_Motion_Music_Synchronization_and_Co/figures/003_Figure_2.jpg]]
 *Figure 2: An overview of the proposed MoMu-Diffusion framework. MoMu-Diffusion contains two integral components: a bidirectional contrastive rhythmic Variational Autoencoder (BiCoR-VAE) designed to learn the aligned latent space, and a Transformer-based diffusion model responsible for sequence generation. This framework is adept at facilitating both cross-modal and multi-modal joint generations, offering a robust approach to the integrated synthesis of motion and music*
 
@@ -308,13 +306,7 @@ MoMu-Diffusion在三个互补维度上接受检验：**节拍匹配精度**（BC
 
 生成质量方面（Figure 3），MoMu-Diffusion在FAD指标上显著优于LORIS，同时保持了更高的Diversity分数。这意味着模型并非通过牺牲多样性来换取质量提升，而是在两者之间取得了更好的平衡。
 
-![[assets/figures/papers/paper_list_l1914_MoMu_Diffusion_On_Learning_Long_Term_Motion_Music_Synchronization_and_Co/figures/005_Figure_3.jpg]]
-*Figure 3: Motion-to-music with generation quality metrics: FAD↓ and Diversity↑*
-
 长序列场景是检验模型可扩展性的试金石。在Floor Exercise数据集的25s和50s变体上（Table 3），MoMu-Diffusion的优势进一步扩大：25s条件下BCS达到66.6（LORIS为58.8，+7.8），50s条件下BCS为62.7（LORIS为52.9，+9.8）。在Figure Skating数据集上（Table 4），F1从62.7提升至69.0（+6.3）。这些结果直接验证了核心洞察——基于Transformer的扩散架构能够有效捕捉长序列中的时序依赖，而节奏对比学习确保了即使在长时间跨度下，节拍对齐也不会漂移。
-
-![[assets/figures/papers/paper_list_l1914_MoMu_Diffusion_On_Learning_Long_Term_Motion_Music_Synchronization_and_Co/figures/006_Table_3.jpg]]
-*Table 3: Results on the Floor Exercise dataset with beat-matching metrics*
 
 ### 音乐到运动生成：质量与同步的协同提升
 
@@ -326,9 +318,6 @@ MoMu-Diffusion在三个互补维度上接受检验：**节拍匹配精度**（BC
 *Table 6: It is observable that MoMu-Diffusion reports better FID, Mean KLD, and Diversity scores on both the AIST++ and BHS Dance datasets. It demonstrates that MoMu-Diffsuion can generate more realistic and high-quality motion sequences while maintaining the capability of diverse generations. We further present a qualitative example of music-to-motion beat-matching in Figure 5. We can find the kinematic beats of synthesized motion are highly associated with the reference musical beats. Additionally, the generated dance exhibits a high degree of diversity, encompassing lateral movements, rotations, squats, and so on*
 
 人类评估（Figure 6）提供了主观维度的佐证：在运动到音乐和音乐到运动两个方向上，MoMu-Diffusion在同步性、质量和整体偏好三个维度上均获得最高评分。
-
-![[assets/figures/papers/paper_list_l1914_MoMu_Diffusion_On_Learning_Long_Term_Motion_Music_Synchronization_and_Co/figures/013_Figure_6.jpg]]
-*Figure 6: Results of human evaluation on motion-to-music and music-to-motion generations*
 
 ### 消融实验：逐组件验证设计选择
 
@@ -346,9 +335,6 @@ MoMu-Diffusion在三个互补维度上接受检验：**节拍匹配精度**（BC
 
 论文展示了三类失败案例及修正结果（Figure 7），揭示了方法的边界条件：
 
-![[assets/figures/papers/paper_list_l1914_MoMu_Diffusion_On_Learning_Long_Term_Motion_Music_Synchronization_and_Co/figures/017_Figure_7.jpg]]
-*Figure 7: Three failure cases and the corrected results*
-
 1. **骨骼长度异常**：生成的骨骼长度偶尔偏离合理范围，需要阈值后处理修正，但后处理无法完全消除该问题。这表明运动VAE在解码阶段对运动学约束的隐式学习仍不完善。
 2. **节奏对齐在极端长序列中退化**：虽然50s序列的结果仍优于基线，但相比25s序列的指标已有明显下降，说明Transformer的全局建模能力在超长序列上仍面临挑战。
 3. **预处理误差累积**：模型依赖OpenPose关键点提取和mel-spectrogram转换，这些预处理步骤的误差可能在下游任务中被放大，构成端到端性能的隐性上限。
@@ -362,8 +348,6 @@ MoMu-Diffusion在三个互补维度上接受检验：**节拍匹配精度**（BC
 
 ![[assets/figures/papers/paper_list_l1914_MoMu_Diffusion_On_Learning_Long_Term_Motion_Music_Synchronization_and_Co/figures/016_Table_10.jpg]]
 *Table 10: Ablation study of the cross-guidance step*
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l1914_MoMu_Diffusion_On_Learning_Long_Term_Motion_Music_Synchronization_and_Co/figures/002_Table_1.jpg]]
 *Table 1: Comparison with the state-of-the-art audio-visual generation works, including but not limited to motion-music generation*

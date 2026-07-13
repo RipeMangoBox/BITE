@@ -147,14 +147,6 @@ $$c_i^* = \arg\max_{c_{t,j}, t \le i} f(y_{t,j}, x_{\text{user}})$$
 
 RAISE 不依赖固定的迭代次数或分数阈值，而是采用双重停止信号：分析器的“结束”判定（主需求满足）与校验器的 True 判定（所有需求满足）。当两者同时触发时，循环终止，输出全局最优候选 $c^*$ 对应的图像 $y^*$。这一机制使计算资源天然向困难提示倾斜——简单提示快速收敛，复杂提示获得更多轮精化，从而在性能与效率之间取得帕累托最优（见 Table 6 和 Figure 4）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2339_https_arxiv_org_abs_2603_00483/figures/013_Figure_6.jpg]]
-*Figure 6: System prompt for the analyzer agent analyzer*
-
-![[assets/figures/papers/paper_list_l2339_https_arxiv_org_abs_2603_00483/figures/014_Figure_9.jpg]]
-*Figure 9: System prompt for the verifier agent verifier*
-
 ### 3.1 需求驱动的自适应缩放
 
 RAISE 将文本到图像生成形式化为一个**需求驱动的自适应进化过程**。其核心控制变量是分析器输出的决策变量 $d_i^{\mathrm{analyzer}}$，它决定当前轮次是否终止缩放。这一机制使得计算量能够根据提示的语义复杂度动态分配——简单提示快速收敛，困难提示获得更多精化轮次。
@@ -277,9 +269,6 @@ RAISE 作为即插即用框架，在不同基础扩散模型和 VLM 上均表现
 ![[assets/figures/papers/paper_list_l2339_https_arxiv_org_abs_2603_00483/figures/008_Table_4.jpg]]
 *Table 4: Evaluation with different base DMs (FLUX.1-dev [18], FLUX.1-schnell [18], SANA-1.5 4.8B [46]) on GenEval [11]. The best and second best results are bolded and underlined. “Avg. #Samples Generated” and “Avg. #Calls VLM” indicate efficiency*
 
-![[assets/figures/papers/paper_list_l2339_https_arxiv_org_abs_2603_00483/figures/009_Table_5.jpg]]
-*Table 5: Evaluation of RAISE with different base VLMs [1, 12, 38] on GenEval [11]. The best and second best results are bolded and underlined. “Avg. #Samples Generated” and “Avg. #Calls VLM” indicate efficiency. denotes proprietary models, denotes fine-tuned open-source models, and denotes frozen open-source models that do not require any additional fine-tuning*
-
 ### 失败模式与局限
 
 尽管 RAISE 在整体指标上表现优异，分析中仍存在可识别的局限：
@@ -288,13 +277,8 @@ RAISE 作为即插即用框架，在不同基础扩散模型和 VLM 上均表现
 - **系统提示的手工设计**：分析器、重写器和校验器的系统提示为固定模板（Figure 6–9），未针对特定风格或领域优化，在需要特定领域知识的场景下可适应性有限。
 - **工具依赖性**：视觉工具（检测、深度估计）的性能直接影响验证精度，在遮挡严重或小目标场景下可能产生误导性证据，需人工核查。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2339_https_arxiv_org_abs_2603_00483/figures/010_Table_6.jpg]]
 *Table 6: Efficiency comparison on GenEval [11]. RAISE consistently achieves the highest GenEval score across budgets (Max #Samples = 8, 16, 32). At 32 samples, it requires 41.9% fewer samples generated and 88.6% fewer VLM calls on average than the second-best method*
-
-![[assets/figures/papers/paper_list_l2339_https_arxiv_org_abs_2603_00483/figures/011_Table_7.jpg]]
-*Table 7: Quantitative comparison of RAISE on the GenEval benchmark [11] against diffusion models, unified multimodal models, training-free inference-time scaling, and training-based reflection tuning methods. The best and second results are bolded and underlined, respectively; category-best methods are also bolded. “Avg. #Samples Generated” and “Avg. #Calls VLM” indicate efficiency, and the last row shows RAISE ’s adaptive allocation of more computation to harder categories such as “Colors”, “Position”, and “Attribute Binding”*
 
 ## 定位与知识库关联
 

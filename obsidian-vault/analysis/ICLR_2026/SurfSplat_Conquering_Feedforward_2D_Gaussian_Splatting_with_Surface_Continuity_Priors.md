@@ -51,8 +51,6 @@ claims:
 
 **方法谱系与知识库定位**：SurfSplat 延续了前馈式高斯溅射的研究脉络，与 **PixelSplat**（Charatan et al., 2024）、**MVSplat**（Chen et al., 2024b）、**TranSplat**（Zhang et al., 2025）、**HiSplat**（Tang et al., 2024）和 **DepthSplat**（Xu et al., 2024b）等方法构成直接比较。区别于上述方法使用 3D 高斯椭球体且由网络直接预测旋转与尺度，SurfSplat 转而采用 2D 高斯面元，并通过几何推导获得旋转与各向异性尺度，从表示层面引入表面连续性归纳偏置。在编码器设计上，SurfSplat 与 DepthSplat 共享相同的双路骨干网络（单目分支使用 Depth Anything V2 的 ViT，多视图分支使用轻量 ResNet 与 Swin Transformer 构建代价体），保证了对比的公平性——标准分辨率下指标相当，而高分辨率下优势显著，说明性能提升源于所提出的表面连续性先验与强制 Alpha 混合，而非编码器或训练技巧的差异。
 
-
-
 ### 问题背景：前馈式新视角合成中的几何-外观解耦困境
 
 从稀疏输入图像中重建三维场景并实现逼真的新视角合成（Novel View Synthesis, NVS）是计算机视觉与图形学的核心任务之一。近年来，基于前馈式高斯溅射（Feedforward Gaussian Splatting）的方法因其高效的推理速度和可泛化的场景表示能力而受到广泛关注。这类方法通过一个可学习的映射 $f_{\theta}$，将稀疏的输入图像及对应的相机参数直接映射为每个像素的高斯原语属性：
@@ -78,8 +76,6 @@ $$f _ { \theta } : \{ ( I ^ { v } , \mathbf { k } ^ { v } , \mathbf { T } ^ { v 
 2. **强制 Alpha 混合（Forced Alpha Blending）**：对预测的不透明度进行上界裁剪（$\tau_{\text{opa}} < 1$），并在累积不透明度超过阈值 $\tau_{\alpha}$ 时对渲染输出进行归一化补偿。这一策略防止模型陷入“完全不透明高斯”的局部最优，确保所有深度层的高斯均参与梯度传播和训练，从而维持多视图间的空间对齐。
 
 通过将 2D 高斯面元（2D Gaussian Surfels, 2DGS）作为场景表示基元，并联合上述两项创新，SurfSplat 能够在稀疏输入条件下重建出几何连续、纹理逼真的三维表面，尤其在高分辨率渲染场景下展现出显著优势。
-
-
 
 ## 核心方法与创新机理
 
@@ -140,8 +136,6 @@ $$C = \begin{cases} C, & \bar{\alpha} < \tau_\alpha, \\ \frac{C}{\bar{\alpha}}, 
 
 SurfSplat 采用与 **DepthSplat** (Xu et al., 2024b) 相同的编码器骨干和训练设置。在标准 256×256 分辨率下，SurfSplat-L 的 PSNR 为 27.537 dB，与 DepthSplat 的 27.504 dB 基本持平（Table 1）；但在 1024×1024 HRRC 下，SurfSplat-L 达到 24.897 dB，领先 DepthSplat 8.512 dB。这一对比表明，性能增益完全来源于提出的表面连续性先验和强制 alpha 混合，而非编码器容量或训练技巧的差异。
 
-
-
 SurfSplat 是一个前馈式 2D 高斯溅射框架，其核心目标是从稀疏输入视图直接预测连续、几何一致的 3D 场景表示。图 2 给出了模型的整体架构。系统接收 $V$ 张已知相机内外参的输入图像，经双路编码器提取特征后，由 2D U-Net 回归中间属性，最终通过高斯处理器将中间属性转化为标准的 2D 高斯原语参数，用于可微分渲染。
 
 ### 输入输出映射
@@ -172,12 +166,8 @@ SurfSplat 是一个前馈式 2D 高斯溅射框架，其核心目标是从稀疏
 
 > 注：本文未提供代码链接，上述架构描述基于论文文本与图 2、图 3 的说明。部分实现细节（如 U-Net 的具体层数、特征维度）需查阅原文或代码以确认。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_o1sF4XaFdY/figures/002_Figure_2.jpg]]
 *Figure 2: Illustration for model architecture. Given sparse input images, our dual-path encoder processes them through both single-view and multi-view branches. The fused features are passed through a U-Net to predict intermediate attributes, including depth, scale multipliers, and appearance components. Finally, these intermediates are converted into standard Gaussian attributes using our surface continuity prior and forced alpha blending strategy*
-
-
 
 ### 前馈高斯预测框架
 
@@ -199,9 +189,6 @@ $$f _ { \theta } : \{ ( I ^ { v } , \mathbf { k } ^ { v } , \mathbf { T } ^ { v 
 ### 表面连续性先验
 
 这是 SurfSplat 的核心创新模块（Figure 3）。其基本洞察是：真实场景的可见几何主要由平滑表面构成，图像空间中相邻像素对应的3D点可推导出局部表面朝向和尺度，从而为2D高斯提供几何连贯的初始化。
-
-![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_o1sF4XaFdY/figures/003_Figure_3.jpg]]
-*Figure 3: Illustration for Gaussian processor. We visualize how image-space neighboring pixels are transformed into Gaussians aligned on a continuous surface via the surface continuity prior. To prevent opacity collapse and preserve 3D alignment, we apply a forced alpha-blending strategy that reduces opacities, ensuring that spatially occluded Gaussians still contribute during rendering*
 
 **旋转估计**：在图像空间的 $3\times3$ 邻域内，利用右向和下向 Sobel 滤波得到两个切向量：
 
@@ -239,8 +226,6 @@ $$C = \sum _ { i \in \cal N } c _ { i } \alpha _ { i } \prod _ { j = 1 } ^ { i -
 $$C = \left\{ { \begin{array} { l l } { C , } & { \alpha < \tau _ { \alpha } , } \\ { \frac{C}{\overline{\alpha}} , } & { \alpha \geq \tau _ { \alpha } , } \end{array} } \right.$$
 
 该策略确保所有深度层的高斯均参与训练并保持梯度贡献，使模型在优化过程中不会陷入局部最优，从而实现连续且无偏的表面重建。消融实验（Table 4）表明，同时移除表面连续性先验和强制alpha混合后，1024×1024 HRRC PSNR 从 24.535 降至 18.563（w/o FAB,SCP），验证了二者协同的必要性。
-
-
 
 ## 实验与关键发现
 
@@ -290,14 +275,6 @@ SurfSplat进一步训练了高分辨率版本（256×448输入，表7），在�
 
 SurfSplat的贡献揭示了一个更深层的问题：**前馈式重建中，几何先验的显式注入比网络容量的增加更为关键。** 在编码器骨干和训练设置完全相同的情况下，仅通过改变高斯原语类型（3D→2D）和引入表面连续性约束，就在高分辨率下获得了8.5 dB以上的提升。这暗示未来工作的方向可能不在于更大的模型，而在于更精巧的几何归纳偏置设计——例如，如何将表面连续性先验扩展到时序维度以实现4D重建，或如何消除对已知位姿的依赖以实现真正的单目前馈重建。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_o1sF4XaFdY/figures/005_Table_1.jpg]]
-*Table 1: Novel view synthesis performance on the RealEstate10k dataset*
-
-![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_o1sF4XaFdY/figures/006_Table_2.jpg]]
-*Table 2: Novel view synthesis performance on the ACID dataset*
-
 ![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_o1sF4XaFdY/figures/008_Table_4.jpg]]
 *Table 4: Ablations study on various components*
 
@@ -307,22 +284,11 @@ SurfSplat的贡献揭示了一个更深层的问题：**前馈式重建中，几
 ![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_o1sF4XaFdY/figures/010_Figure_6.jpg]]
 *Figure 6: Normal and mesh comparison with DepthSplat*
 
-![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_o1sF4XaFdY/figures/004_Figure_4.jpg]]
-*Figure 4: Multi-resolution rendering of 3D scenes. We visualize rendered images and depth maps at three resolutions: ×1 (blue box)*
-
-![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_o1sF4XaFdY/figures/007_Table_3.jpg]]
-*Table 3: Cross datasets performance*
-
 ![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_o1sF4XaFdY/figures/011_Table_5.jpg]]
 *Table 5: Quantitative performance comparison on high-resolution DL3DV dataset*
 
 ![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_o1sF4XaFdY/figures/012_Table_6.jpg]]
 *Table 6: Ablations study on hyperparameter sensitivity*
-
-![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_o1sF4XaFdY/figures/013_Table_7.jpg]]
-*Table 7: Quantitative performance of the high-resolution model*
-
-
 
 ## 定位与知识库关联
 
@@ -369,8 +335,6 @@ SurfSplat 的适用边界由以下约束条件定义：
 3. **表面连续性先验能否推广到动态场景**？当前方法假设场景是静态的，表面连续性先验基于图像空间邻域关系推导。对于动态场景（如包含运动物体的视频），如何在时序维度上扩展该先验，实现时空一致的表面重建，是一个值得探索的方向。
 
 4. **HRRC 指标能否成为前馈式重建的标准评估协议**？SurfSplat 提出的高分辨率渲染一致性（HRRC）指标有效暴露了传统指标无法捕捉的几何空洞和稀疏性问题。其在 DL3DV 高分辨率数据集上的排序与原生评估结果一致（Table 5），初步验证了其可靠性。但该指标是否应被社区广泛采纳作为几何质量的代理指标，仍需更多独立验证和标准化讨论。
-
-
 
 ## 原文 PDF
 

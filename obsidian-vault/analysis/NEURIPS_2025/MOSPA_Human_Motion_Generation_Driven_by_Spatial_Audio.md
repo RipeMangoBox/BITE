@@ -53,8 +53,6 @@ claims:
 
 **主要结果**：在 SAM 数据集上，MOSPA 的 FID 达到 7.981，显著优于最强基线 EDGE 的 13.993（降低 6.012）；R-precision Top1 达到 0.937（EDGE 为 0.886）；多样性指标（Diversity 23.575、APD 53.915）均接近真实运动分布。消融实验表明，运动风格条件的引入是性能提升的关键因素（移除后 FID 升至 10.930），MFCC 与 Tempogram 的组合使用也显著优于单一特征。用户调研进一步验证了 MOSPA 在意图对齐、运动质量和真实相似度三个维度上的优势。
 
-
-
 ### 问题背景
 
 空间音频（Spatial Audio）是一种携带声源方向、距离和环境反射信息的多通道音频信号，在虚拟现实、增强现实、游戏和影视制作中已被广泛采用。人类对空间音频的自然反应不仅是听觉感知，更包含丰富的身体运动——例如转头朝向声源、后退远离突然的巨响、或随环绕音乐律动。然而，现有的人体运动生成研究主要集中在两个范式：**音乐到舞蹈生成**（如 **EDGE** (Tseng et al., CVPR 2023)、**POPDG** (Luo et al., CVPR 2024)、**Bailando** (Siyao et al., CVPR 2022)）和**语音到手势生成**。这些方法处理的都是单声道或普通音频信号，完全忽视了空间音频中编码的空间特征对运动的驱动作用。
@@ -78,8 +76,6 @@ claims:
 - **方法设计**：提出**MOSPA**框架，通过提取双耳空间音频特征（MFCC、Tempogram、RMS能量），并将其与声源位置、运动风格共同作为条件，利用扩散模型建模条件分布，实现空间响应的多样化运动生成。
 
 这一任务填补了空间音频感知与人体运动生成之间的空白，为虚拟人交互、机器人空间感知等下游应用提供了新的技术路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -111,8 +107,6 @@ MOSPA将条件信号从“仅音频特征”扩展为三元组：**音频特征 
 ### 运动表示的空间感知增强
 
 运动表示从传统关节旋转扩展为**全局位置 + 局部6D旋转 + 速度**的300维向量（Sec 4.1），使模型能够显式建模人体在空间中的位移和朝向变化，这对于“走向声源”或“远离声源”等空间响应运动至关重要。
-
-
 
 MOSPA 是一个基于扩散模型的概率生成框架，将空间音频驱动的运动生成建模为条件分布学习问题。其核心思路是：将双耳空间音频分解为语义、时空和能量三类特征，并与声源位置、运动风格共同作为条件信号，引导一个编码器-仅Transformer从噪声中逐步重建干净的运动序列。
 
@@ -150,15 +144,6 @@ $$\mathcal{L} = \lambda_{data}\mathcal{L}_{data} + \lambda_{geo}\mathcal{L}_{geo
 ### 与基线方法的关键差异
 
 现有音乐/语音驱动方法（如 **EDGE** (Tseng et al., CVPR 2023)、**POPDG** (Luo et al., CVPR 2024)、**LODGE** (Li et al., CVPR 2024)、**Bailando** (Siyao et al., CVPR 2022)）使用单声道音频特征，缺少空间信息编码。MOSPA 在三个关键槽位上做了替换：音频特征从单声道 Mel 频谱改为双耳空间特征（MFCC + Tempogram + RMS）；条件信号增加了声源位置和运动风格；融合机制引入了随机掩码与残差特征融合，而非简单的拼接或交叉注意力。这些改动使模型能够响应声源的空间位置变化，生成方向性和风格可控的运动。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_X2r9D46kvI/figures/020_Figure.jpg]]
-*Figure: B10: The feature extractor framework consists of a motion autoencoder co-trained with two Bi-GRU modules functioning as feature extractors (condition encoder and motion encoder). A reconstruction loss is applied between the ground-truth motions x and the decoded motions $\mathbf { x }$ ^ ${ \prime }$ produced by the motion autoencoder. Additionally, a contrastive loss operates on the extracted condition features c and motion features m*
-
-![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_X2r9D46kvI/figures/003_Figure.jpg]]
-
-
 
 MOSPA 是一个基于扩散的概率生成框架，其核心思想是将空间音频分解为语义、时空和能量三类特征，并与声源位置、运动风格共同作为条件信号，引导扩散模型从噪声中重建与空间音频高度对齐的人体运动序列。
 
@@ -208,12 +193,8 @@ $$APD(M) = \frac{1}{N(N-1)}\sum_{i=1}^{N}\sum_{j=1}^{N}\left(\sum_{t=1}^{L}\|\ma
 
 其中 $N$ 为样本数，$L$ 为序列长度，$\mathbf{s}_t^i$ 为第 $i$ 个样本在时刻 $t$ 的运动特征。该指标用于衡量生成运动的多样性，值越接近真实运动分布越好。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_X2r9D46kvI/figures/006_Figure_5.jpg]]
 *Figure 5: The framework of MOSPA. We perform diffusion-based motion generation given spatial audio inputs. Specifically, Gaussian noise is added to the clean motion sample*
-
-
 
 ## 实验与关键发现
 
@@ -277,22 +258,6 @@ MOSPA 在 SAM 数据集上与四个主流基线进行了系统对比：**EDGE**�
 ![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_X2r9D46kvI/figures/007_Figure_6.jpg]]
 *Figure 6: Qualitative comparison of state-of-the-art methods for the spatial audio-to-motion task. We visualize motion results from five cases. MOSPA produces high-quality movements that closely correspond to the input spatial audio. We provide Expected Motion as a description for reference*
 
-![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_X2r9D46kvI/figures/010_Figure_7.jpg]]
-*Figure 7: User study results. MOSPA outperforms other methods in intent alignment, motion quality, and similarity to ground truth. The bar chart shows the vote distribution across methods*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_X2r9D46kvI/figures/002_Table_1.jpg]]
-*Table 1: Statistics of the SAM dataset. The SAM dataset encompasses 27 common daily spatial audio scenarios, over 20 reaction types excluding the motion genres, and 49 reaction types (see details in Appendix A). The number of subjects covered in SAM is 12, where 5 of them are female and the remaining 7 are male. It is also the first dataset to incorporate spatial audio information, annotated with Sound Source Location (SSL). The total duration of the dataset exceeds 34K seconds*
-
-![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_X2r9D46kvI/figures/004_Figure_3.jpg]]
-*Figure 3: Spatial audio-driven human motion data collection setup*
-
-![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_X2r9D46kvI/figures/013_Figure_9.jpg]]
-*Figure 9: Spatial audio-driven physically simulated humanoid robot control based on [34]. Descriptions of expected motion are provided for reference*
-
-
-
 ## 定位与知识库关联
 
 ### 任务定位与基线关系
@@ -326,8 +291,6 @@ MOSPA 的适用边界受以下因素制约：
 - **场景感知引入**：如何引入虚拟环境的场景信息，使生成的运动与场景约束保持一致。
 
 这些方向指向从“音频-运动对齐”向“音频-运动-环境协同”的演进路径，需在数据集构建和模型架构两个层面进行突破。
-
-
 
 ## 原文 PDF
 

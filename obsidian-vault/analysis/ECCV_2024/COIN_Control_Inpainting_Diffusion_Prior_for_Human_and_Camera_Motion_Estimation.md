@@ -50,8 +50,6 @@ COIN 通过两项核心创新突破上述瓶颈。在扩散先验层面，COIN �
 
 在 RICH、EMDB 和 HCM 三个数据集上，COIN 显著超越现有方法。相较于 SOTA 方法 **PACE**（Kocabas et al., 3DV 2024），COIN 在 HCM 上的世界关节位置误差（W-MPJPE）降低 44%，在 RICH 上降低 33%。与同期工作 **WHAM**（Shin et al., CVPR 2024）相比，COIN 在 RICH 上提升 49%，在 EMDB 上提升 7%。消融实验进一步验证：控制采样使 W-MPJPE 降低 570.5 mm（69.3%），软修复使 PA-MPJPE 降低 4.7 mm，人-场景关系损失使 W-MPJPE 从 273.0 mm 降至 254.5 mm。
 
-
-
 从动态相机视频中同时恢复全局人体运动和相机运动是计算机视觉中的一个核心挑战。当相机本身在运动时，视频中的二维观测同时包含了人体运动和相机运动的耦合效应，使得二者的解耦变得极为困难。这一问题在滑板、跑酷等大幅度位移场景中尤为突出——即便局部身体姿态相对稳定，个体的全局位置也可能发生剧烈变化。
 
 现有方法在处理此类分布外运动时暴露出明显的脆弱性。当前最优的全局人体与相机运动估计方法 **PACE**（Kocabas et al., 3DV 2024）和同期工作 **WHAM**（Shin et al., CVPR 2024）在滑板等场景中会灾难性地失败，无法正确恢复人体轨迹或行走方向（见图1）。
@@ -63,8 +61,6 @@ COIN 通过两项核心创新突破上述瓶颈。在扩散先验层面，COIN �
 **相机尺度的优化缺乏独立约束。** 在动态相机场景下，相机尺度的估计完全依赖于全局人体运动的重投影误差。当人体运动估计本身不准确时，尺度优化极易陷入失败——二者形成了一种脆弱的耦合关系，缺乏解耦的约束信号。
 
 针对上述缺口，**COIN** 提出了两个核心改进方向：其一，通过控制-修复评分蒸馏采样（COIN-SDS）生成与视频观测一致的高质量运动先验；其二，引入人-场景深度关系损失，利用场景点云提供的独立几何约束来正则化相机尺度，从而解耦尺度优化与人体运动估计之间的相互干扰。
-
-
 
 ## 核心方法与创新机理
 
@@ -101,8 +97,6 @@ $$\mathcal{L}_{\mathrm{HSR}} = -\frac{1}{|\mathcal{P}|} \sum_{i=1}^{T} \sum_{p \
 ### 创新总结
 
 COIN 的四项核心创新形成了一个互补体系：COIN-SDS 提供高质量运动先验，动态控制确保先验与优化协同进化，软修复在保持观测一致性的同时最大化先验效用，人-场景关系损失则为相机尺度提供独立约束。这一体系使 COIN 在 RICH 和 HCM 数据集上分别以 33% 和 44% 的幅度超越 SOTA 方法 PACE（Kocabas et al., 3DV 2024），并在 EMDB 数据集上以 7% 的优势超越同期工作 WHAM（Shin et al., CVPR 2024）。
-
-
 
 COIN 将动态相机下的人体与相机运动估计建模为一个**全局联合优化问题**，其核心思想是通过控制-修复扩散先验（COIN-SDS）提供高质量伪真值运动，并利用人-场景深度关系损失解耦相机尺度与人体运动之间的歧义。
 
@@ -175,8 +169,6 @@ $$
 *Figure 2: Overview. Given a video with a moving camera, we recover the global human motion H and camera motion C using an iterative optimization framework. We propose a novel Control-Inpainting SDS loss (LCOIN-SDS) to leverage motion diffusion models as a prior. COIN-SDS is designed such that the sampled motions from the motion prior are consistent with video observations. We achieve this by controlling and constraining the sampling process of the motion diffusion model through novel control and softinpainting branches. We also propose a novel human-scene relation loss $\left( \mathcal { L } _ { \mathrm { { H S R } } } \right$) to encourage consistency among the human motion, camera motion, and scene f...
 
 消融实验验证了各模块的关键作用：移除 $\mathcal{L}_{\mathrm{HSR}}$ 使 RICH 数据集上的 W-MPJPE 从 254.5 mm 升至 273.0 mm；移除控制采样使 W-MPJPE 增加 570.5 mm（69.3%），相机 ATE-S 增加 167.9 mm（30.3%）；移除软修复使 PA-MPJPE 增加 4.7 mm（见 Table 1, Table 4）。
-
-
 
 ### 3.1 扩散先验的 SDS 基础
 
@@ -256,8 +248,6 @@ $$\mathcal{L}_{\mathrm{HSR}} = -\frac{1}{|\mathcal{P}|} \sum_{i=1}^{T} \sum_{p \
 
 **因果机制总结：** COIN-SDS 通过多步 DDIM 去噪（Eq. 5-6）提升伪真值质量，通过动态控制信号（Eq. 7）确保运动与观测对齐，通过软修复（Eq. 8-9）保持高置信度区域的一致性；人-场景关系损失（Eq. 13）则为相机尺度提供了独立于人体运动的几何约束，解耦了两者之间的相互影响。
 
-
-
 ## 实验与关键发现
 
 ### 全局人体运动估计
@@ -279,18 +269,9 @@ COIN 在三个公开数据集上全面评估了全局人体运动估计性能，
 
 在 **HCM** 数据集上（Table 3），COIN 相比 PACE 在 W-MPJPE 上实现了 44% 的改进。Table 7 的消融实验再次验证了各模块的有效性。
 
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2408_16426/figures/005_Table_3.jpg]]
-*Table 3: Global human motion estimation on the HCM dataset*
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2408_16426/figures/013_Table_7.jpg]]
-*Table 7: Global human motion estimation on the HCM dataset*
-
 ### 相机运动估计
 
 Table 4 报告了 HCM 数据集上的相机运动估计结果。控制采样将相机轨迹误差 ATE-S 降低了 167.9 mm（30.3%），表明 COIN-SDS 生成的伪真值运动质量对相机优化同样至关重要。人-场景关系损失通过引入场景深度约束，为相机尺度提供了独立于人体运动的优化信号，有效缓解了尺度模糊问题。
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2408_16426/figures/006_Table_4.jpg]]
-*Table 4: Camera motion estimation on the HCM dataset*
 
 ### 关键消融发现
 
@@ -316,18 +297,9 @@ Figure 3 展示了 COIN 与 PACE、WHAM 的定性对比。在滑板场景中（F
 
 Table 6 比较了 SLAM 与 ParticleSfM 在 EMDB 收敛子集上的初始化效果。结果表明，ParticleSfM 在部分序列上提供了更可靠的相机初始化，但 COIN 的联合优化框架能够在一定程度上容忍初始化的不完美。
 
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2408_16426/figures/012_Table_6.jpg]]
-*Table 6: SLAM vs. ParticleSfM on the converged subset of the EMDB dataset*
-
 ### 失败模式与局限
 
 尽管 COIN 在多个数据集上大幅领先现有方法，其性能仍依赖于 SLAM 或 ParticleSfM 初始化的基本可靠性。当初始化完全失败时，联合优化的收敛性可能受到影响。此外，当前方法使用离线优化框架，尚不支持实时估计。如何通过少步 DDIM 采样实现实时联合人体-相机扩散模型估计，仍是一个开放问题。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2408_16426/figures/010_Table.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -392,8 +364,6 @@ COIN 的核心因果链可拆解为两个相互增强的机制：
 3. **实时性**：联合人-相机扩散模型是否可通过少步 DDIM 采样实现实时估计？这是一个有前景的方向。
 4. **多阶段优化的收敛性**：当 ParticleSfM 无法收敛时，多阶段优化的处理策略尚不明确。
 5. **掩膜设计细节**：基于 2D 关键点置信度分数的掩膜 $\mathbf{M}$ 的确切公式需查阅补充材料或代码确认。
-
-
 
 ## 原文 PDF
 

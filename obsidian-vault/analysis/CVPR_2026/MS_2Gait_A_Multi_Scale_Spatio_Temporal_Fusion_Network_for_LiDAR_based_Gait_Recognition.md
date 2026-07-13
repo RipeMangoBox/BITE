@@ -52,8 +52,6 @@ claims:
 
 在方法谱系上，MS²Gait 继承了激光雷达步态识别中直接处理原始点云的范式（区别于基于剪影的 **GaitSet**（Chao et al., AAAI 2019）和深度图投影方法 **SimpleView**（Goyal et al., ICML 2021）），并在空间建模上超越了 **PointNet++**（Qi et al., NeurIPS 2017）的局部聚合范式，在时序建模上取代了 **LidarGait++** 的池化压缩策略，为点云步态识别建立了新的多尺度时空融合基线。
 
-
-
 ### 步态识别：从二维到三维的演进
 
 步态识别旨在通过个体的行走模式进行身份鉴别，具有远距离、非侵入、难以伪装等独特优势。长期以来，该领域由二维模态主导——基于轮廓的方法（如 **GaitSet**，Chao et al., AAAI 2019；**GaitBase**，Fan et al., CVPR 2023）在受控环境下取得了显著进展。然而，二维方法对光照变化、衣着遮挡和视角偏移高度敏感，其跨场景泛化能力存在根本性瓶颈。
@@ -77,8 +75,6 @@ claims:
 2. **时间层面**：提出基于相似度的时序增强Transformer（STET），以多样性驱动的关键帧选择替代均匀采样，以多尺度余弦相似度聚合替代等权池化，使模型能够自适应地聚焦于信息丰富的步态相位，并抑制异常帧的影响。
 
 Figure 1 对比了传统方法与MS^2Gait在空间和时间特征提取上的本质差异：传统方法的空间交互局限于局部邻域，时间建模采用粗粒度池化；MS^2Gait则通过跨区域信息传播和自适应时序加权，实现了对步态时空结构的精细刻画。
-
-
 
 ## 核心方法与创新机理
 
@@ -146,8 +142,6 @@ $$\hat{f}_m = f_{i_m} + \sigma(\mathrm{MLP}(f_{i_m})) \odot f_m^{\mathrm{enhance
 
 三个 changed slots 形成因果链路：**软注意力 + 跨区域交互**使空间特征包含远距离身体部位的协调信息；**几何感知对齐**确保多尺度特征在统一空间坐标系下融合；**多样性驱动的多尺度时序聚合**自适应处理步态周期的时间异质性。这一设计使 MS²Gait 在 SUSTech1K 正常子集上达到 **93.5%** Rank-1 准确率（较 LidarGait++ 提升 **+2.4%**），在 Free-Gait 上达到 **83.1%**，均超越先前最优方法。
 
-
-
 MS^2Gait 的整体流程可形式化为一个端到端的映射：输入一帧原始点云步态序列 $P_o$，输出用于识别的最终特征 $F_{\mathrm{final}}$。其核心计算图由三个模块级联构成：
 
 $$F_{\mathrm{final}} = \mathcal{T}\left(\mathcal{G}\left(\left[\mathcal{H}_i(P_o)\right]_{i=1}^4\right)\right)$$
@@ -164,15 +158,8 @@ $$F_{\mathrm{final}} = \mathcal{T}\left(\mathcal{G}\left(\left[\mathcal{H}_i(P_o
 
 **数据流概要。** 整体信息流为：原始点云序列 → 四层 HSFE（含跨层/跨集交互） → GMFF 几何对齐与拼接 → 逐帧池化 → STET 多样性选帧与多尺度相似度聚合 → Transformer 编码 → 最终步态嵌入。消融实验表明，四种 Mixing 策略贡献了最大的性能增益，其中 Inter-Set Mixing 通过反向信息传播恢复被遮挡点特征，在服装子集（+10.7%）和雨伞子集（+7.7%）上提升尤为显著；STET 则使模型在帧丢失实验中退化幅度远小于先前最优方法 LidarGait++，验证了其对时间异质性的鲁棒性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1073_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_MS2Gait_A_Multi_Sca/figures/002_Figure_2.jpg]]
 *Figure 2: MS2Gait Network Architecture. The proposed*
-
-![[assets/figures/papers/paper_list_l1073_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_MS2Gait_A_Multi_Sca/figures/001_Figure_1.jpg]]
-*Figure 1: Comparison of traditional and MS2Gait’s spatial and temporal feature extraction methods*
-
-
 
 MS²Gait 的整体流程可形式化为：
 
@@ -205,9 +192,6 @@ $g_3$ 为值变换 MLP。该机制使模型自适应地关注信息量更大的�
 - **Inter-Layer Mixing**：跨层级的特征混合。
 
 Figure 4 展示了特征传播链：脚部特征经 Mixing 迭代逐步传播至腿部区域，最终到达髋部，实现下肢完整信息交换。
-
-![[assets/figures/papers/paper_list_l1073_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_MS2Gait_A_Multi_Sca/figures/004_Figure_4.jpg]]
-*Figure 4: Feature mixing chain in HSFE. Mixing iterations propagate foot features through leg regions to the hip, enabling full lower-body information exchange*
 
 ### 2. 几何感知多分辨率特征融合（GMFF）
 
@@ -243,19 +227,6 @@ $$\hat{f}_m = f_{i_m} + \sigma(\mathrm{MLP}(f_{i_m})) \odot f_m^{\mathrm{enhance
 
 其中 $\sigma$ 为 sigmoid 函数，$\odot$ 为逐元素乘。最后，增强后的关键帧序列经位置编码和 Transformer 编码器捕获长程时序依赖，输出最终步态表征。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1073_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_MS2Gait_A_Multi_Sca/figures/003_Figure_3.jpg]]
-*Figure 3: Four complementary interaction strategies in HSFE, jointly boosting cross-scale spatial semantics*
-
-![[assets/figures/papers/paper_list_l1073_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_MS2Gait_A_Multi_Sca/figures/005_Figure_5.jpg]]
-*Figure 5: Design of the interpolation-based feature alignment module. Features from the first two layers are geometrically aligned to the output of layer 3 after hierarchical sampling*
-
-![[assets/figures/papers/paper_list_l1073_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_MS2Gait_A_Multi_Sca/figures/006_Figure_6.jpg]]
-*Figure 6: Similarity-based aggregation. Coherent frames within phases receive high weights, while outliers are suppressed, yielding robust representations across varying conditions*
-
-
-
 ## 实验与关键发现
 
 ### 主实验：SUSTech1K 与 Free‑Gait 上的性能对比
@@ -279,9 +250,6 @@ MS^2Gait 在两个大规模 LiDAR 步态数据集上均取得最优结果。在 
 
 帧丢失实验用于检验时序模块对不完整序列的鲁棒性（Figure 8）。在不同丢帧率下，MS^2Gait 在所有评估指标上的性能退化幅度均显著小于 LidarGait++，证明 **STET 模块的多尺度余弦相似度聚合与多样性驱动关键帧选择能够有效应对步态序列的时间异质性**。这一优势源于 STET 不依赖固定长度的时序压缩，而是通过自适应关键帧数量 $K = \max(K_{\min}, \min(K_{\max}, \lfloor \alpha \cdot T \rfloor))$ 和基于特征空间最大‑最小不相似度的帧选择机制，在序列不完整时仍能保留具有判别力的时序结构。
 
-![[assets/figures/papers/paper_list_l1073_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_MS2Gait_A_Multi_Sca/figures/008_Figure_8.jpg]]
-*Figure 8: Robustness to Temporal Heterogeneity. Performance under varying frame dropout rates on FreeGait. MS2Gait exhibits smaller degradation across all metrics than LidarGait++, showing superior robustness to incomplete temporal sequences*
-
 ### 跨域评估与计算效率
 
 跨域评估（Figure 7）显示，MS^2Gait 在 SUSTech1K 与 Free‑Gait 之间存在点云密度差异的情况下仍表现出相对稳健的性能，表明 GMFF 模块的几何感知多分辨率特征对齐有助于缓解域间密度偏移的影响。计算效率方面（Table 3），尽管 MS^2Gait 引入了多种交互策略和 Transformer 编码，其推理成本仍处于可接受范围，具体数值需查阅原表。
@@ -295,8 +263,6 @@ MS^2Gait 在两个大规模 LiDAR 步态数据集上均取得最优结果。在 
 
 ![[assets/figures/papers/paper_list_l1073_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_MS2Gait_A_Multi_Sca/figures/013_Figure_9.jpg]]
 *Figure 9: Feature activation visualization. Compared to Point-Net++ baseline, our method progressively focuses on discriminative gait-relevant regions while suppressing irrelevant objects*
-
-
 
 ## 定位与知识库关联
 
@@ -338,8 +304,6 @@ MS^2Gait 相对于 LidarGait++ 等基线，在三个关键设计槽位上做出�
 - Inter-Set Mixing 通过反向信息传播恢复被遮挡点特征，这一机制在更极端的遮挡条件（如多人交互、大范围环境遮挡）下的有效性边界尚未探明。
 - 多样性驱动的关键帧选择（公式 7 的贪心 max-min 策略）在理论上可能偏好异常帧，其对步态周期完整性的保证缺乏理论分析。
 - 该方法目前仅在两套 LiDAR 数据集上验证，向其他三维传感器（如 ToF 相机、毫米波雷达点云）的迁移能力未知。
-
-
 
 ## 原文 PDF
 

@@ -54,8 +54,6 @@ claims:
 
 **主要结果**：在视觉质量与视图同步指标上，帧维度条件显著优于通道条件（FVD 122.74 vs 187.94）和视图条件（Matched Pixels 906.03K vs 521.10K）。配合高质量多摄像机同步渲染数据集（136K 视频、40 个场景、122K 条相机轨迹）和混合训练策略（T2V/I2V/V2V），模型在相机准确性、外观一致性和时序同步方面均取得领先性能。
 
-
-
 ### 问题背景：相机控制下的视频重生成
 
 给定一段单目源视频，用户希望以全新的相机轨迹“重拍”该视频——即生成一段保持源视频外观一致性和时序同步的新视频，同时精确遵循用户指定的目标相机运动。这一任务被称为**相机控制的视频重生成**（camera-controlled video re-generation），在影视创作、虚拟现实和视频编辑等领域有广泛应用前景。
@@ -83,8 +81,6 @@ claims:
 为支撑这一方法，本文还构建了首个大规模、高质量的**多摄像机同步视频数据集**，使用Unreal Engine 5渲染引擎生成136K视频，涵盖40个高保真3D场景、13.6K动态场景和122K不同相机轨迹，为相机控制视频生成提供了系统性的训练和评估基础。
 
 **动机总结**：ReCamMaster旨在通过帧维度条件机制和高质量渲染数据集，解决现有方法在视频条件策略和数据规模上的双重不足，实现外观一致、时序同步且相机精确可控的视频重生成。
-
-
 
 ## 核心方法与创新机理
 
@@ -126,8 +122,6 @@ ReCamMaster 将视频条件从“通道维度”或“视图维度”切换为�
 - 帧维度拼接使输入令牌数量加倍，增加了计算和内存开销。如何在不损失性能的前提下降低这一成本，是后续优化的开放问题。
 - 模型在真实世界视频上的泛化性能仍需进一步验证，因为训练数据完全来自渲染引擎，域隙不可避免。
 - 模型继承自预训练 T2V 模型的手部生成缺陷（尤其在人物特写时）尚未解决（Figure 11）。
-
-
 
 ReCamMaster 的整体 pipeline 围绕一个核心设计展开：**将源视频的相机重拍摄问题建模为条件视频生成任务**。给定一段源视频 $V_s$ 和一条新的目标相机轨迹，模型需要生成一段在目标视角下、与源视频保持外观一致性和时序同步的新视频 $V_t$。这一目标的实现依赖于三个关键模块的协同：**视频压缩与重建的 3D VAE**、**基于 Rectified Flow 的 Transformer 去噪骨干网络**，以及本文核心的**帧维度条件注入机制**。
 
@@ -171,15 +165,8 @@ $$z_t = (1 - t) z_0 + t \epsilon$$
 
 推理阶段，用户提供源视频和目标相机轨迹，模型通过迭代去噪生成目标视频。目标相机轨迹可通过手动设计或从源视频中估计获得，支持匀速和变速（通过指数插值函数控制）两种运动模式。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1494_https_arxiv_org_abs_2503_11647/figures/011_Figure_7.jpg]]
 *Figure 7: Overview of the base text-to-video generation model. Figure 8. Rendered multi-camera synchronized dataset*
-
-![[assets/figures/papers/paper_list_l1494_https_arxiv_org_abs_2503_11647/figures/003_Figure_3.jpg]]
-*Figure 3: Overview of ReCamMaster. Left: The training pipeline of ReCamMaster. A latent diffusion model is optimized to reconstruct the target video Vt, conditioned on the source video V _ { s } , , target camera pose camt, and target prompt pt. Right: Comparison of different video condition techniques. (a) Frame-dimension conditioning used in our paper; (b) Channel-dimension conditioning used in baseline methods [5, 45]; (c) View-dimension conditioning in [3]. We omit the text prompt p _ { t } in (a)-(c) for simplicity*
-
-
 
 ### 3D VAE 编解码与 Rectified Flow 框架
 
@@ -231,8 +218,6 @@ $$L_{i} = L_{start} + (L_{end} - L_{start}) \cdot \left( \frac{1 - \exp(-a \cdot
 
 其中 $L_{start}$ 和 $L_{end}$ 为起止位置，$f$ 为总帧数。参数 $a > 0$ 时运动先快后慢，$a < 0$ 时先慢后快，$a = 0$ 退化为匀速运动。该公式在附录 C 中给出，用于构造训练数据中的多样化相机轨迹。
 
-
-
 ## 实验与关键发现
 
 ### 主结果：与 SOTA 方法的定量对比
@@ -260,8 +245,6 @@ Table 3 对视频条件策略进行了严格消融，这是本文最核心的实
 
 帧维度拼接在 FVD 上较通道拼接降低 65.20，较视图注意力降低 71.73；在 Matched Pixels 上分别提升 384.93K 和 332.11K。Figure 5 的定性对比揭示了失败机制：通道维度条件导致严重伪影和内容不一致，视图维度条件则出现异步动态——两者均无法有效利用预训练 T2V 模型的 3D 自注意力进行跨视频交互。帧维度拼接通过将源视频和目标视频令牌沿帧维度合并，使 3D 自注意力能同时处理两个视频的时空关系，从而实现了外观一致性和时序同步的根本性突破。
 
-![[assets/figures/papers/paper_list_l1494_https_arxiv_org_abs_2503_11647/figures/001_Figure.jpg]]
-
 ### 训练策略与数据质量消融
 
 Table 4 对训练策略进行了系统性消融。基线模型（仅使用 V2V 训练）的 FVD 为 171.80。引入 T2V/I2V/V2V 混合训练后，FVD 降至 122.74（降低 49.06），验证了以 20% 概率丢弃源视频帧（替换为噪声）统一多任务训练的有效性。仅微调 3D 注意力层和相机编码器，冻结其他参数，在保持基础模型生成能力的同时实现了最佳性能。
@@ -282,13 +265,6 @@ Figure 11 可视化了典型失败案例，揭示了两个系统性缺陷：
 2. **小物体生成失败**：场景中尺寸较小的物体（如远处行人、细小道具）在生成过程中容易丢失或变形。
 
 此外，帧维度拼接使输入令牌数量加倍，显著增加了计算和内存开销。训练数据完全由 Unreal Engine 5 渲染生成，尽管努力模拟真实世界，域隙仍然存在，在真实野外视频上的泛化能力需进一步验证。模型推理时依赖用户提供精确的目标相机轨迹，这一要求在真实应用中通常难以满足。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1494_https_arxiv_org_abs_2503_11647/figures/002_Figure_2.jpg]]
-*Figure 2: Illustration of the dataset construction process. We build the multi-camera synchronized training dataset by rendering in Unreal Engine 5. This is achieved using 3D environments, characters, animations collected from the internet, and our designed massive camera trajectories*
-
-
 
 ## 定位与知识库关联
 
@@ -342,8 +318,6 @@ ReCamMaster 系统比较了三种视频条件策略（Figure 3, Table 3）：
 3. 模型如何处理超出训练分布的极端摄像机轨迹（如大角度旋转、快速变焦）？
 4. 变速轨迹参数 $a$（Eq. 7 中的指数衰减系数）对最终生成质量有何定量影响？
 5. 在真实世界视频的摄像机内参估计不准确时，模型性能如何退化？是否需要引入内参估计模块或鲁棒性增强策略？
-
-
 
 ## 原文 PDF
 

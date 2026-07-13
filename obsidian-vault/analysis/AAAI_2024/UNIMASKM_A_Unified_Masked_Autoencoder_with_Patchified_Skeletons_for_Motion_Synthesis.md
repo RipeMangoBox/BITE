@@ -146,8 +146,6 @@ UNIMASK-M 的主干由五个紧密衔接的模块组成，形成“分解 → �
 ![[assets/figures/papers/paper_list_l1819_UNIMASKM_A_Unified_Masked_Autoencoder_with_Patchified_Skeletons_for_Moti/figures/002_Figure_2.jpg]]
 *Figure 2: UNIMASK-M architecture. Let a human motion X and its respective binary mask M. We first interpolate*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1819_UNIMASKM_A_Unified_Masked_Autoencoder_with_Patchified_Skeletons_for_Moti/figures/001_Figure_1.jpg]]
 *Figure 1: Unified architecture for different human motion synthesis tasks. Green and purple skeletons denote a known skeleton joint, while light red and green represents our model prediction over a masked joint*
 
@@ -196,11 +194,6 @@ UNIMASK-M 采用标准 ViT 自注意力机制构建编码器和解码器。与�
 
 需注意，这两个模块**仅在 Human3.6M 预测任务中使用**。在 LaFAN1 运动内插任务中，DCT 反而严重降低性能（L2Q 从 0.57 升至 0.68），因为该数据集的运动更复杂、周期性更低；TempMLP 则导致过拟合，对性能无助或有害。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1819_UNIMASKM_A_Unified_Masked_Autoencoder_with_Patchified_Skeletons_for_Moti/figures/004_Figure_3.jpg]]
-*Figure 3: Mixed embedding strategy. The mixed embeddings are obtained by summing (i) a masking token to identify the masked patches*
-
 ## 实验与关键发现
 
 ### 核心实验结果
@@ -241,25 +234,11 @@ UNIMASK-M 在多项运动合成任务上展现出竞争力或领先的性能，�
 
 5. **基线比较的公平性**：不同方法的计算平台、训练轮次等实现细节未统一，且部分基线（如 CrossViT）需适配到运动完成任务，其适配方式可能影响比较公平性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1819_UNIMASKM_A_Unified_Masked_Autoencoder_with_Patchified_Skeletons_for_Moti/figures/005_Table_1.jpg]]
 *Table 1: Quantitative comparison of MPJPE error in 3D human motion forecasting for Human3.6M dataset. Here, bold denotes the best result at each time-horizon*
 
 ![[assets/figures/papers/paper_list_l1819_UNIMASKM_A_Unified_Masked_Autoencoder_with_Patchified_Skeletons_for_Moti/figures/007_Table_2.jpg]]
 *Table 2: Quantitative comparison of MPJPE error in 3D human motion forecasting when the observed sequence has 20% joints occluded in Human3.6M dataset*
-
-![[assets/figures/papers/paper_list_l1819_UNIMASKM_A_Unified_Masked_Autoencoder_with_Patchified_Skeletons_for_Moti/figures/009_Table_3.jpg]]
-*Table 3: Quantitative evaluation of human motion inbetweening on LAFAN1 dataset. A lower score is better. Here, bold indicates the best result. Note that we trained a different model for the 50 and 70 transition frames for both (Oreshkin et al. 2022) and ours*
-
-![[assets/figures/papers/paper_list_l1819_UNIMASKM_A_Unified_Masked_Autoencoder_with_Patchified_Skeletons_for_Moti/figures/011_Table_4.jpg]]
-*Table 4: MPJPE error of UNIMASK-M in Human3.6M dataset under different training masking probabilities*
-
-![[assets/figures/papers/paper_list_l1819_UNIMASKM_A_Unified_Masked_Autoencoder_with_Patchified_Skeletons_for_Moti/figures/012_Table_5.jpg]]
-*Table 5: Performance of our UNIMASK-M under different configurations in the inbetweening task and the LaFan1 dataset (Harvey et al. 2020a)*
-
-![[assets/figures/papers/paper_list_l1819_UNIMASKM_A_Unified_Masked_Autoencoder_with_Patchified_Skeletons_for_Moti/figures/013_Figure_8.jpg]]
-*Figure 8: MPJPE millimeter error of the motion forecasting task of UNIMASK-M under different patch granularity*
 
 ![[assets/figures/papers/paper_list_l1819_UNIMASKM_A_Unified_Masked_Autoencoder_with_Patchified_Skeletons_for_Moti/figures/006_Figure_5.jpg]]
 *Figure 5: Comparison of the motion forecasting task. Predicted skeletons are shown in red and blue*

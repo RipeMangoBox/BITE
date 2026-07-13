@@ -54,8 +54,6 @@ OmniZip 正是针对这一瓶颈提出的统一轻量级方案。其核心洞察
 
 **方法定位**：OmniZip 属于“学习型统一无损压缩器”这一新兴类别。与基于 LLM 的方案相比，它以数百倍小的模型规模实现了可竞争甚至更优的压缩效率；与经典通用压缩器相比，它在所有测试模态上均取得大幅领先。该方法在方法谱系中处于**轻量级自回归预测 + 稀疏模态路由**的交汇点，为多模态数据的高效统一压缩提供了新的技术路径。
 
-
-
 ### 多模态无损压缩的现实需求
 
 现实世界的数据天然是多模态的——图像、文本、语音、基因序列、数据库记录等以不同统计特性共存。无损压缩作为信息存储与传输的基础技术，长期依赖针对单一模态设计的专用算法：**PNG**、**FLIF**、**JPEG-XL** 服务于图像，**FLAC** 服务于语音，**gzip**、**bzip2**、**zstd** 等通用工具虽能处理多种格式，却无法充分捕捉各模态的内在结构。这种“一种模态一个压缩器”的格局带来两个直接后果：软件栈的维护成本随模态数量线性增长，且边缘设备上部署多个压缩引擎会挤占本已紧张的存储与计算资源。
@@ -71,8 +69,6 @@ OmniZip 正是针对这一瓶颈提出的统一轻量级方案。其核心洞察
 ### 本文动机与核心思路
 
 OmniZip 正是针对这一瓶颈而提出。其设计哲学是：**通过可逆的统一分词和模态感知的稀疏专家路由，让一个小型预测模型同时高效地处理多种模态的统计特性，无需针对每种模态部署不同的压缩器。** 具体而言，OmniZip 在轻量级 RWKV 骨干中引入模态路由的混合专家（MoE）机制，对自回归预测模型的关键模块进行稀疏门控，使模型在推理速度和多种模态的压缩效果之间取得最佳平衡。最终，OmniZip 在 CLIC-M、TouchandGo、enwik9、LibriSpeech 和 WikiSQL 等数据集上分别比 gzip 提高了 42%、57%、62%、42% 和 53% 的压缩效率，同时在 MacBook CPU 和 iPhone NPU 上达到约 1MB/s 的推理速度，验证了“轻量统一压缩”这一技术路线的可行性。
-
-
 
 ## 核心方法与创新机理
 
@@ -116,8 +112,6 @@ $$\mathcal{L} = -\sum q \log p + \lambda \frac{1}{T} \sum_{j=1}^{T} \left( \log 
 
 OmniZip 的本质创新在于：将多模态无损压缩问题转化为“在统一令牌空间中进行模态感知的自回归预测”问题。通过模态路由 MoE 在上下文建模和前馈处理两个关键环节注入模态特异性，使得一个参数量仅为 4.8M–38M 的轻量模型（Table 2）能够在图像、文本、语音、基因序列、数据库等多种模态上同时超越专用压缩器和通用压缩器 gzip（压缩效率提升 30%–62%），并在 MacBook CPU 和 iPhone NPU 上达到约 1MB/s 的推理速度。
 
-
-
 OmniZip 的整体设计遵循“统一分词 → 自回归概率预测 → 熵编码”的经典无损压缩范式，但其核心创新在于将这一流程从单一模态推广到多模态，并通过轻量级的混合专家（MoE）机制实现模态感知的建模。
 
 ### 三阶段压缩流水线
@@ -143,8 +137,6 @@ OmniZip 的整体设计遵循“统一分词 → 自回归概率预测 → 熵�
 ### 模型变体
 
 OmniZip 提供了 S（4.8M 参数，3.88M MACs）、M（38M 参数，18.2M MACs）和 L 三种规模（Table 2），以适配不同算力平台。在 MacBook CPU 和 iPhone NPU 上均可达到约 1 MB/s 的推理速度（Abstract），验证了其在边缘设备上的实用性。
-
-
 
 OmniZip 的核心架构由三个紧密协同的模块构成：模态统一分词器、基于 RWKV 的预测模型（嵌入模态路由 MoE），以及算术编码器。其压缩目标是最小化实际码长与理论下界之间的差距，该下界由预测概率分布的熵给出。
 
@@ -192,27 +184,11 @@ $$\mathcal{L} = -\sum q \log p + \lambda \frac{1}{T} \sum_{j=1}^{T} \left( \log 
 
 此外，OmniZip 采用重参数化训练策略：训练时在模型中增加额外分支以提升容量，推理前将这些分支合并回主干，从而在不增加推理开销的前提下提升模型性能。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l906_https_arxiv_org_abs_2602_22286/figures/004_Figure_3.jpg]]
-*Figure 3: One block of OmniZip’s predictive model. The model stacks N such blocks in total. Built on a lightweight RWKV7 backbone, it incorporates two modality-routing MoE modules for contextual learning and feedforward processing*
-
-![[assets/figures/papers/paper_list_l906_https_arxiv_org_abs_2602_22286/figures/014_Figure_8.jpg]]
-*Figure 8: Illustration of the reparameterization training strategy*
-
-
-
 ## 实验与关键发现
 
 ### 核心性能：多模态压缩效率
 
 OmniZip 在图像、文本、语音等 7 种模态的 16 个数据集上进行了全面评估。与通用压缩器 **gzip** 相比，OmniZip 在所有模态上均实现了显著提升：在自然图像数据集 CLIC-M 上，OmniZip-L 达到 2.273 bits/Byte，较 gzip 的 3.947 bits/Byte 降低 42%；在触觉图像数据集 TouchandGo 上，OmniZip-L 达到 0.987 bits/Byte，降幅达 57%；在文本数据集 enwik9 上，OmniZip-L 达到 0.980 bits/Byte，降幅达 62%；在语音数据集 LibriSpeech 上，OmniZip-L 达到 3.810 bits/Byte，降幅达 42%；在数据库数据集 WikiSQL 上，OmniZip-L 达到 0.787 bits/Byte，降幅达 53%（Table 3、Table 4）。
-
-![[assets/figures/papers/paper_list_l906_https_arxiv_org_abs_2602_22286/figures/006_Table_3.jpg]]
-*Table 3: Lossless compression results on image-like (natrual image, medical image, and tactile) datasets. Multi-modal compressors (except ours) are shown in gray. ∗ denotes pretrained LLMs, † indicates that some results are reprodeced by us. ′ indicates compression speeds measured on a MacBook CPU, and ‡ denotes speeds on an A100 GPU (batch size 128). Other unmarked values are taken from their papers*
-
-![[assets/figures/papers/paper_list_l906_https_arxiv_org_abs_2602_22286/figures/007_Table_4.jpg]]
-*Table 4: Lossless compression results on text-like (natural text, gene sequence, database) and speech datasets. Multi-modal compressors (except ours) are shown in gray. ∗ denotes pretrained LLMs, † indicates that some results are reprodeced by us. ′ indicates compression speeds measured on a MacBook CPU, and ‡ denotes speeds on an A100 GPU (batch size 128). Other values are taken from their papers*
 
 在图像类数据集上，OmniZip-S（4.8M 参数）即已超越 gzip 约 30%，例如在 Kodak 上达到 3.307 bits/Byte（gzip 为 4.349 bits/Byte），在 TouchandGo 上达到 1.338 bits/Byte（gzip 为 2.298 bits/Byte）。随着模型规模增大，OmniZip-M 和 OmniZip-L 进一步拉大与经典压缩器的差距，并在多数数据集上接近或超越专用压缩器如 **PNG**、**FLIF**、**JPEG-XL** 以及基于学习的压缩器 **L3C**、**DLPR** 等（Table 3）。
 
@@ -226,9 +202,6 @@ Figure 4 展示了基于学习的多模态压缩器在模型参数量与压缩�
 ### 推理速度与跨平台部署
 
 OmniZip 的轻量化设计使其在多种硬件平台上均可达到实用级别的推理速度。在 MacBook Pro CPU 上，OmniZip-S 的压缩速度约为 1 MB/s 量级；在 iPhone 17 Pro 的 NPU 上同样达到约 1 MB/s；在 NVIDIA A100 GPU 上则可通过批处理进一步提升吞吐量（Figure 5）。具体而言，Table 1 显示 RWKV-7 骨干网络（0.2M 参数）在 MacBook CPU 上可达 2292 KB/s，而 3.2M 参数版本为 856 KB/s，验证了 RWKV 架构在轻量级自回归建模中的速度优势。
-
-![[assets/figures/papers/paper_list_l906_https_arxiv_org_abs_2602_22286/figures/009_Figure_5.jpg]]
-*Figure 5: OmniZip’s inference speed across various platforms (CPU of MacBook Pro, NPU of iPhone17 Pro, and GPU of NVIDIA A100) and batch sizes (1, 16, 128, 512, 1024)*
 
 ### 消融实验
 
@@ -257,9 +230,6 @@ Table 7 探索了路由模块的配置参数，包括路由应用的层数、专
 
 Figure 6 展示了 OmniZip-S 在不同模态下各层路由模块的专家使用分布。结果显示，不同模态在上下文学习模块和前馈模块中呈现出差异化的专家偏好模式：例如图像类数据倾向于激活某些特定专家，而文本类数据则偏好另一些专家。这种模态特异的专家利用模式验证了模态路由 MoE 机制的有效性——路由器确实学会了根据输入模态动态分配计算资源，而非退化为均匀使用所有专家。
 
-![[assets/figures/papers/paper_list_l906_https_arxiv_org_abs_2602_22286/figures/010_Figure_6.jpg]]
-*Figure 6: Expert usage of OmniZip-S across blocks and routing modules. Each bar shows the expert usage percent (%) for a modality in a routing module (context learning or feedforward)*
-
 ### 调整后的压缩性能
 
 考虑到部分对比方法（尤其是基于大语言模型的方法）模型规模远大于 OmniZip，Table 9 和 Table 10 提供了计入模型存储开销后的调整压缩性能。即使在此公平比较下，OmniZip 仍展现出竞争力，进一步验证了轻量级设计在多模态无损压缩场景中的实用价值。
@@ -267,8 +237,6 @@ Figure 6 展示了 OmniZip-S 在不同模态下各层路由模块的专家使用
 ### 实验注意事项
 
 需要指出，论文中的主要结果以 bits/Byte 单次报告，未提供多次运行的置信区间或标准差，统计显著性无法直接判断。部分基线结果由作者复现（以 † 标记），可能存在实现差异带来的偏差。此外，推理速度测量虽覆盖多种硬件，但未提供详细的功率或能耗分析，实际部署的总成本评估需进一步验证。
-
-
 
 ## 定位与知识库关联
 
@@ -309,8 +277,6 @@ OmniZip 的方法论贡献可解构为三个相互耦合的模块：
 - 能否设计**动态模态发现机制**，使模型在推理时自动识别并适应新模态，而无需重新训练？
 - 在**更严格的嵌入式约束**（如 MCU 级设备，内存 < 1MB）下，当前 MoE 路由的开销是否仍可接受？
 - 模态路由的专家专业化现象（Figure 6 显示不同模态确实激活不同专家）是否暗示可以**按需卸载**非活跃专家以进一步压缩模型体积？
-
-
 
 ## 原文 PDF
 

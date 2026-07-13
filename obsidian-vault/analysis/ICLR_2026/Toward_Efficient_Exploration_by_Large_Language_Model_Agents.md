@@ -61,8 +61,6 @@ claims:
 
 **局限性**：方法在状态-动作空间较大且转移函数随机性较强的MDP中，LLM的规划能力不足会导致遗憾退化；依赖于手工设计的先验分布；计算成本较高；后验更新LLM存在信息遗忘或错误更新的风险。
 
-
-
 ### 现有LLM智能体在探索任务中的瓶颈
 
 当前基于大型语言模型（LLM）的智能体设计——包括**Reflexion**（Shinn et al., 2024）、**ICRL**（Monea et al., 2024）和**ICPI**（Brooks et al., 2023）——在面对需要高效探索的决策任务时表现出根本性不足。这些方法的核心缺陷在于缺乏结构化的探索机制：它们要么依赖LLM的随机性进行隐式探索（如ICRL从重播缓冲区随机采样经验作为上下文），要么通过自我反思产生口头指导来改善决策（如Reflexion），要么依赖上下文学习进行贪婪策略迭代（如ICPI）。在稀疏奖励或需要深度探索的环境中，这类隐式探索策略难以有效平衡探索与利用，导致智能体过早收敛到次优行为或完全无法发现高奖励区域。
@@ -78,8 +76,6 @@ claims:
 ### 核心贡献
 
 本文的核心贡献在于将PSRL分解为三个由LLM实现的子程序：**后验采样LLM**（根据当前后验生成关于真实MDP的合理假设）、**最优样本策略LLM**（在给定状态下按采样MDP执行最优动作）和**后验更新LLM**（根据完整轨迹更新智能体的知识与不确定性）。通过这种显式实现，LLM-PSRL在自然语言任务中复现了经典PSRL的探索优势，同时扩展了经典算法在非结构化环境中的应用范围。
-
-
 
 ## 核心方法与创新机理
 
@@ -126,8 +122,6 @@ LLM-PSRL将PSRL的三个核心计算步骤分配给三个专门的LLM（Figure 2
 
 尽管创新显著，该方法仍存在明确局限：在状态-动作空间较大且转移随机性较强的MDP中，LLM的规划能力不足会导致遗憾退化（Figure 14）；方法依赖手工设计的先验分布；当前仅适用于有限视界的情节任务。这些边界条件需要在后续研究中进一步验证和突破。
 
-
-
 ![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_M3vwnscpL2/figures/001_Figure_1.jpg]]
 *Figure 1: Abstractly, an RL algorithm is an ordered sequence of steps. Existing approaches for LLM agent design (left) orchestrate some number of LLMs to implicitly induce a RL algorithm. In contrast, this paper advocates for a novel agent design principle (right) whereby an existing RL algorithm is explicitly implemented by outsourcing individual steps to distinct LLMs*
 
@@ -165,8 +159,6 @@ Figure 3 以 Wordle 游戏为例，展示了 LLM 生成的后验分布（上）�
 4. 后验更新 LLM 利用 $\tau_k$ 更新后验分布，进入下一情节。
 
 该设计的关键在于，后验采样 LLM 的温度参数 $\kappa_{\text{sampling}}$ 是控制探索行为的核心旋钮：$\kappa_{\text{sampling}} \leq 1$ 时趋向贪婪，$\kappa_{\text{sampling}} > 1$ 时更接近经典汤普森采样的探索分布。这一机制使得 LLM-PSRL 在 5 臂伯努利好赌中能以 $\kappa_{\text{sampling}}=1.2$ 取得低于经典汤普森采样的累计遗憾（Figure 4），验证了显式实现经典算法子程序的设计原则的有效性。
-
-
 
 ### 问题形式化与评估指标
 
@@ -215,8 +207,6 @@ $$\alpha_0 = \frac{1}{|S|}$$
 $$\min_{\pi \in \Delta(\mathcal{A})} \frac{\mathbb{E}_{a\sim\pi}[\rho(a)]^2}{\mathbb{E}_{a\sim\pi}[I(a)]}$$
 
 其中 $\rho(a)$ 为选择动作 $a$ 的期望单步遗憾，$I(a)$ 为选择该动作获得的信息增益。该目标函数最小化期望遗憾平方与信息增益之比，使智能体优先选择那些以较小遗憾代价换取较大信息量的动作。在11臂信息动作好赌任务中，LLM-IDS展现出优于LLM-PSRL的指导性探索能力。
-
-
 
 ## 实验与关键发现
 
@@ -268,8 +258,6 @@ Figure 13揭示了GPT-4o版PSRL失败的原因：当LLM缺乏对确定性转移�
 
 成本方面（Table 1），不同领域的单次试验资金成本差异显著：5臂伯努利好赌约$0.11，组合锁约$0.50，Wordle约$0.75，RiverSwim约$1.00。Tables 2-5详细记录了各LLM子程序在不同领域的令牌使用统计。RiverSwim消耗令牌最多（每情节约6200个总令牌），主要因为其后验更新LLM需要处理更复杂的转移函数不确定性。
 
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_M3vwnscpL2/figures/021_Table_1.jpg]]
-
 ### 信息导向采样的初步探索
 
 作为扩展，论文初步探索了LLM实现信息导向采样（LLM-IDS）的可能性。在11臂信息动作好赌任务中（Figure 16, Figure 17），LLM-IDS在需要指导性探索的场景下优于LLM-PSRL。在组合锁环境中（Figure 18），LLM-IDS同样展现出优势。LLM-IDS最小化目标函数：
@@ -291,18 +279,6 @@ $$\min_{\pi \in \Delta(\mathcal{A})} \frac{\mathbb{E}_{a\sim\pi}[\rho(a)]^2}{\ma
 4. **计算成本**：每次试验需要大量API调用，限制了大规模试验的可行性。
 
 5. **适用范围**：当前仅适用于有限视界的情节任务，向无限视界及连续控制环境扩展需要解决更严峻的表示和规划挑战。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_M3vwnscpL2/figures/022_Table_2.jpg]]
-
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_M3vwnscpL2/figures/023_Table_3.jpg]]
-
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_M3vwnscpL2/figures/024_Table_4.jpg]]
-
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_M3vwnscpL2/figures/025_Table_5.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -360,8 +336,6 @@ LLM-PSRL保留了PSRL的算法骨架（Algorithm 1），但将三个核心子程
 5. **范式收敛性**：随着LLM能力的持续提升，是否会出现更简洁的隐式探索方法，还是显式实现经典算法的范式将持续受益于更强的LLM？实验已表明，将底层模型从GPT-4o升级为o1-mini对LLM-PSRL的改进远大于对基线方法的改进（Figure 6），暗示显式实现范式可能具有更好的能力扩展性。
 
 6. **不确定性量化验证**：如何系统地验证和改进LLM在实现算法子程序时的准确性和不确定性量化能力，是确保该方法在实际部署中可靠性的前提。
-
-
 
 ## 原文 PDF
 

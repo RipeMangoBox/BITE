@@ -53,8 +53,6 @@ claims:
 
 在 CrossTask 和 COIN 数据集上的目标条件视觉规划实验中，GeoWorld 相比 V-JEPA 2 取得了约 3%（T=3）和 2%（T=4）的成功率提升。消融实验表明，SFT 与 GRL 发挥互补作用——SFT 稳定短期预测，GRL 增强长时域 rollout 一致性，二者结合在 T=8 长时域规划中达到 13.81 的成功率，远超 V-JEPA 2 的 4.95。定性分析显示，GeoWorld 产生的能量景观具有清晰的结构化特征，其潜在空间的 Gromov δ-双曲性分布更集中，验证了学习到的表示具有更强的树状层次几何特性。
 
-
-
 ### 预测世界模型与视觉规划
 
 基于模型的视觉规划旨在让智能体在潜在空间中模拟未来状态，从而选择最优动作序列。近年来，以 V-JEPA 2 为代表的预测型世界模型（predictive world models）取得了显著进展：它们通过冻结的视觉编码器将观测映射到欧几里得潜在空间，再利用动作条件预测器进行多步前向推演，并借助交叉熵方法（CEM）在能量景观上搜索最优动作。这种“编码-预测-规划”的流水线避免了像素级生成的高昂成本，在 CrossTask 和 COIN 等过程规划基准上展现了竞争力。
@@ -88,8 +86,6 @@ GeoWorld 并非重新设计世界模型的编码器或规划器，而是**在现
 | 多步优化 | 仅监督微调（教师强制 + rollout） | 加入几何强化学习（GRL），通过双曲能量最小化优化预测器 |
 
 通过这两个变更，GeoWorld 在不改变编码器架构、不引入额外策略网络的前提下，为预测世界模型赋予了层次感知的几何先验。
-
-
 
 ## 核心方法与创新机理
 
@@ -129,8 +125,6 @@ V-JEPA 2 的多步预测仅依赖监督微调（教师强制加两步 rollout）
 
 这三个改变槽位并非孤立存在，而是形成了一条完整的因果链条：双曲表示空间提供了层次化编码的基础，双曲测地距离将这种几何结构转化为结构化的能量景观，而 GRL 则通过能量最小化和测地一致性正则化充分利用了这一结构化景观进行长时域优化。三者共同实现了从“在欧几里得空间中预测”到“在双曲流形上规划”的范式转换。
 
-
-
 GeoWorld 是一个几何世界模型，其核心设计理念是将预测世界模型的潜在动力学从欧几里得空间迁移到双曲流形上，从而在能量景观中自然编码状态间的层次结构与几何关系。整个框架由四个关键模块串联构成，形成“编码→投影→预测→规划”的闭环管线。
 
 ### 管线概览
@@ -155,12 +149,8 @@ GeoWorld 的训练分为两个阶段：
 - **能量景观的几何约束**：通过将能量成本定义为双曲测地距离并加入三角不等式正则化，GeoWorld 产生的能量景观具有结构化和曲率感知特性（见 Figure 2），相比欧几里得空间的 V-JEPA 2 能量景观更有利于长时域规划。
 - **冻结编码器策略**：消融实验表明，全微调编码器仅带来 0.3–0.8% 的成功率提升，冻结编码器足以捕获任务相关的层次结构，同时保持计算效率。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2602_23058/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of GeoWorld. Our geometric world model integrates Hyperbolic JEPA for geometry-preserving latent dynamics and Geometric Reinforcement Learning for geodesic-consistent multi-step refinement. Together with energy-based planning using CEM, GeoWorld enables stable and geometry-aware long-horizon visual planning*
-
-
 
 GeoWorld 的核心架构由四个关键模块串联构成，形成从视觉观测到双曲空间规划的完整闭环。
 
@@ -220,15 +210,8 @@ $$(a_t^*)_{t=1}^T = \arg\min_{(\hat{a}_t)_{t=1}^T} d_{\mathbb{H}}(P((\hat{a}_t)_
 
 CEM 超参数与 V-JEPA 2-AC 保持一致（$N=800$，$K=80$，$I=10$），保证对比的公平性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2602_23058/figures/002_Figure_2.jpg]]
 *Figure 2: Energy landscape comparison for V-JEPA 2 [3] and GeoWorld. We visualize the energy by sweeping two orthonormal tangent-space directions (∆x, ∆y) around a reference latent state. GeoWorlds yields a structured, curvature-aware energy landscape that better reflects geometric structure and hierarchical relations among latent states and improves energy-based planning. For more details see Appendix 4*
-
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2602_23058/figures/008_Figure_2.jpg]]
-*Figure 2: Geometric effects and curvature dynamics: (a) Poincaré disk geodesics connecting x and y under different curvatures K. As the curvature K becomes less negative (i.e., closer to 0), the hyperbolic distance between x and y increases, and the geodesic paths bend less and shift closer toward the origin. (b) Geodesic patterns induced by different boundary anchor points. Varying the anchor location produces a characteristic geodesic fan in the Poincaré disk. (c) As the curvature becomes less negative, the space flattens and the distance between x and y decreases. (d) Learnable curvature c during supervised training, showing a gradual decrease from its initialization and convergence to a stable va...*
-
-
 
 ## 实验与关键发现
 
@@ -308,25 +291,6 @@ GeoWorld 在两个标准的过程规划基准上进行了评估：**CrossTask**�
 3. **任务范围受限**：所有实验限于目标条件视觉规划（CrossTask 和 COIN），尚未在具身环境或需要物理交互的任务中验证。
 4. **单层双曲空间的表达力**：可学习曲率收敛至单一值（约 0.3），可能无法充分捕获数据中异构的层次关系（如不同子任务具有不同的分支因子），乘积空间或其他混合几何结构可能提供更强的表达能力。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2602_23058/figures/011_Table_5.jpg]]
-*Table 5: SR of long horzion planning on CrossTask [88] videos*
-
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2602_23058/figures/012_Table_4.jpg]]
-*Table 4: Ablation of discount factor γ and the regularization weight beta in Geometric Reinforcement Learning (GRL) for visual planning with videos on CrossTask [88]*
-
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2602_23058/figures/010_Table_3.jpg]]
-*Table 3: Ablation of weighting hyperparameter λ in Supervised Fine-Tuning (SFT) Only for visual planning with videos on CrossTask [88]*
-
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2602_23058/figures/006_Figure_1.jpg]]
-*Figure 1: Gromov δ-hyperbolicity on CrossTask [88]*
-
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2602_23058/figures/001_Figure_1.jpg]]
-*Figure 1: Energy-based planning by GeoWorld. The diagram shows a Replace Memory Chip task from the COIN dataset [71], where GeoWorld plans actions by following geodesics over a hyperbolic energy landscape rather than generating pixels*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 与现有预测世界模型的关系
@@ -368,8 +332,6 @@ GeoWorld 的独特优势在于将双曲几何的层次表示能力与基于能�
 3. **异构层次关系的建模**：当前使用单一曲率 $c$ 的 Poincaré 球模型，但现实任务可能包含不同粒度的层次关系。是否可以将可学习曲率与其他几何结构（如乘积空间 $\mathbb{B}^{n_1}_{c_1} \times \mathbb{B}^{n_2}_{c_2}$）结合以处理异构层次？
 4. **实时规划效率**：CEM 规划需要 N=800 个采样轨迹，在双曲空间中计算测地距离的开销高于欧几里得距离。如何在保持几何优势的同时降低规划计算成本？
 5. **与 LLM 的融合**：LLM 提供高层任务分解，GeoWorld 提供底层几何规划，两者的结合可能产生更强的长时域规划能力，但接口设计（离散符号与连续双曲表示的对接）仍待探索。
-
-
 
 ## 原文 PDF
 

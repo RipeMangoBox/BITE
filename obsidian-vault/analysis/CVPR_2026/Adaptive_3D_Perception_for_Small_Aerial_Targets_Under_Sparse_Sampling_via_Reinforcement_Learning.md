@@ -53,8 +53,6 @@ claims:
 
 **主要结果**：在MMAUD V2/V3跨地点评测中，A3PRL 实现总体RMSE 1.17 m，相比无RL版本（1.45 m）相对提升约19%，相比无监督基线U3DTE（1.76 m）提升约34%。在自建LiDAR-RTK平台上，RTK参考RMSE从U3DTE的2.30 m降至1.55 m。消融实验证实，逐步引入跟踪连续性、接受率和前景密度等无标签观测可将RMSE从2.80 m持续降至2.12 m，完整5D动作空间进一步降至1.17 m，验证了每个组件的必要性。
 
-
-
 ### 问题背景：稀疏采样下小型空中目标感知的挑战
 
 小型空中目标（Small Aerial Targets, SATs）——如消费级无人机、物流配送无人机——在现代空域安全、城市空中交通管理等场景中日益重要。然而，对这类目标进行鲁棒的三维检测与跟踪面临一个根本性瓶颈：**长距离稀疏LiDAR点云导致固定参数检测器系统性崩溃**。如图2所示，当无人机处于慢速飞行时，LiDAR回波已丧失几何结构；当无人机高速飞行或处于高空时，点云极度稀疏，回波与背景噪声难以区分。
@@ -76,8 +74,6 @@ claims:
 本文的核心洞察是：**稀疏LiDAR的时空分布本身携带着可用于自适应的信息**。具体而言，时序色散签名（Temporal Dispersion Signature, TDS）能够编码点云在滑动窗口内的时空紧致度与帧稀疏度，这些统计量天然反映了场景的稀疏程度和目标运动状态。若能将稀疏度、前景接受率和跟踪连续性等**无标签统计量**作为反馈信号，驱动感知流水线参数在线调整，便可形成一个**无需测试时标签的自适应闭环系统**。
 
 基于这一洞察，本文提出A3PRL——一个基于强化学习的自适应三维感知框架。RL策略以无标签稠密统计量为状态，输出5维连续动作（体素缩放 $\Delta x_t$、TDS检测阈值 $\theta_T$、VC检测阈值 $\theta_V$、关联门控 $\tau_{\mathrm{gate}}$ 和动态评分分位数 $q$），实时调节感知流水线，使系统在点密度剧烈波动的条件下保持鲁棒。这一设计将感知问题重新定义为**主动感知问题**：检测器不再是固定函数，而是由策略根据场景动态配置的可调模块。
-
-
 
 ## 核心方法与创新机理
 
@@ -136,8 +132,6 @@ $$r_t = -\big(\lambda_1 \varepsilon_t + \lambda_2 (1 - \xi_t) + \lambda_3 |\rho_
 
 模块消融（Table 4）进一步表明，移除 TDS 头导致最大误差增加至 2.84 m，证实了时序色散签名在稀疏场景下的关键作用。
 
-
-
 A3PRL 将稀疏 LiDAR 点云下的空中小目标感知建模为一个闭环自适应优化问题。其核心思路是：感知流水线的关键参数（体素分辨率、检测阈值、关联门控等）不再由人工静态设定，而是由一个轻量级强化学习策略根据当前场景的稀疏度与跟踪状态实时调节，从而在点密度剧烈波动的条件下维持稳定的检测-跟踪性能。
 
 ### 系统闭环结构
@@ -173,15 +167,8 @@ RL 策略的观测状态 $s_t^{\mathrm{inf}}$ 完全由无标签统计量构成�
 
 在训练阶段，策略通过 PPO 在 MMAUD V1 的噪声增强数据上学习，并引入真实 LiDAR 噪声域随机化（模拟户外太阳干扰）以提升跨域泛化能力。部署时，对策略输出的连续动作施加指数移动平均，确保参数的自适应调整平滑稳定，避免单帧抖动对流水线造成冲击。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2713_https_openaccess_thecvf_com_content_CVPR2026_html_Yuan_Adaptive_3D_Perce/figures/003_Figure_3.jpg]]
 *Figure 3: Local-window sparse LiDAR streams are voxelized into spatiotemporal tensors. Candidate SATs are proposed by TDS and VC heads, fused through adaptive scoring, and tracked via lightweight association for stable trajectory estimation. The RL policy learns from perception observations to dynamically adjust voxelization and scoring parameters*
-
-![[assets/figures/papers/paper_list_l2713_https_openaccess_thecvf_com_content_CVPR2026_html_Yuan_Adaptive_3D_Perce/figures/002_Figure_2.jpg]]
-*Figure 2: Conventional LiDAR detectors handle static or large, slow-moving objects well [13], but fail on agile UAVs [61]. Even slow flights lose geometric structure, while fast or high-altitude UAVs yield sparse echoes indistinguishable from background noise*
-
-
 
 ### 问题形式化与闭环自适应框架
 
@@ -239,8 +226,6 @@ $$\hat{\mathbf{x}}_{t \mid t-1} = \mathbf{F} \hat{\mathbf{x}}_{t-1}, \quad \Sigm
 
 策略 $\pi_\phi$ 的观测空间由三类无标签稠密统计量构成：**跟踪连续性** $\xi_t$（衡量当前轨迹的时间连贯性）、**前景接受率** $\rho_t$（SPRT 接受的前景体素比例）和 **前景密度** $\bar{s}_F$（前景区域的平均帧稀疏度）。这些统计量无需测试时真值标签，形成闭环自监督信号。消融实验证实，逐步引入这三类观测可将 RMSE 从 2.80 m 降至 2.12 m，验证了每个组件的必要性。
 
-
-
 ## 实验与关键发现
 
 ### 跨域泛化主结果
@@ -292,8 +277,6 @@ $$\hat{\mathbf{x}}_{t \mid t-1} = \mathbf{F} \hat{\mathbf{x}}_{t-1}, \quad \Sigm
 3. **域随机化的覆盖盲区**：训练阶段使用MCD真实LiDAR噪声增强以模拟太阳干扰，但未涵盖雨雾衰减、多径反射等极端条件。在未见过的强背景干扰下，前景密度s̄_F的估计偏差可能导致策略误判稀疏度。
 4. **奖励函数对GT轨迹的依赖**：训练时需GT轨迹计算几何误差ε_t，这限制了策略在完全无标签新场景的持续学习能力。未来可探索自监督替代信号（如点云重投影一致性）以解除此约束。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2713_https_openaccess_thecvf_com_content_CVPR2026_html_Yuan_Adaptive_3D_Perce/figures/005_Table_1.jpg]]
 *Table 1: Cross-venue evaluation on MMAUD [61]: train on V1 and test on unseen V2/V3 subsets collected at different locations and platforms. This setting stresses generalization of the adaptive LiDAR policy beyond the training venue*
 
@@ -308,14 +291,6 @@ $$\hat{\mathbf{x}}_{t \mid t-1} = \mathbf{F} \hat{\mathbf{x}}_{t-1}, \quad \Sigm
 
 ![[assets/figures/papers/paper_list_l2713_https_openaccess_thecvf_com_content_CVPR2026_html_Yuan_Adaptive_3D_Perce/figures/008_Table_5.jpg]]
 *Table 5: Per-frame runtime of the online adaptive loop on our deployment setup. The average latency is 51.2 ms and the*
-
-![[assets/figures/papers/paper_list_l2713_https_openaccess_thecvf_com_content_CVPR2026_html_Yuan_Adaptive_3D_Perce/figures/007_Table_3.jpg]]
-*Table 3: Effect of policy MLP depth on MMAUD V2/V3*
-
-![[assets/figures/papers/paper_list_l2713_https_openaccess_thecvf_com_content_CVPR2026_html_Yuan_Adaptive_3D_Perce/figures/001_Figure_1.jpg]]
-*Figure 1: Conceptual illustrations of representative small aerial target scenarios. From guided delivery drones landing [49] to ensure airliner safety [1], robust SATs detection and tracking are essential*
-
-
 
 ## 定位与知识库关联
 
@@ -359,8 +334,6 @@ A3PRL 的设计假设和评估范围定义了其当前适用边界：
 - **学习化检测头**：将手工设计的 TDS/VC 头替换为轻量学习化检测器（如 PointNet 变体或稀疏卷积），并由 RL 策略调控其置信度阈值，可能进一步提升判别力。但需权衡训练数据需求和泛化性。
 - **边缘部署优化**：在微控制器或 NPU 上部署 RL 策略（当前为浅层 MLP，Table 3 显示 2-3 层即可），并量化/剪枝前端体素化模块，以支持 50+ Hz 的实时处理。
 - **极端条件鲁棒性**：在真实暴雨、浓雾、强光干扰等条件下系统评估，并探索域随机化策略（如更激进的点丢弃和噪声注入）是否足以覆盖这些退化模式。
-
-
 
 ## 原文 PDF
 

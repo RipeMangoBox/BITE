@@ -77,8 +77,6 @@ Cosmos Policy 的核心差异在于：**以潜在帧注入实现多模态统一�
 - 移除辅助损失使 LIBERO 平均成功率从 98.5% 降至 97.0%（-1.5 点）；
 - 从随机初始化训练则进一步降至 94.6%（-3.9 点），证实预训练视频先验的关键作用。
 
-
-
 机器人操作策略学习长期面临一个核心矛盾：**如何有效利用大规模预训练模型中的先验知识，同时保持策略架构的简洁性与通用性**。近年来，视频生成模型在捕捉复杂物理世界动态和时空先验方面展现出强大能力，但将其转化为机器人策略的过程仍然繁琐且割裂。
 
 ### 现有方法的瓶颈
@@ -94,8 +92,6 @@ Cosmos Policy 的核心差异在于：**以潜在帧注入实现多模态统一�
 针对上述问题，Cosmos Policy 提出一个根本性的简化思路：**将机器人动作、未来状态和价值统一编码为潜在帧，直接注入预训练视频扩散模型的潜在序列中，通过单一的去噪学习目标实现策略、世界模型和价值函数的联合训练，无需任何架构改动**。
 
 这一设计基于一个核心洞察：预训练视频扩散模型的去噪得分匹配机制天然适合捕捉复杂高维动作分布——这正是机器人操作中多模态动作建模所需要的。通过潜在帧注入实现多模态统一建模，同一模型可以同时充当策略（生成动作）、世界模型（预测未来状态）和价值函数（评估状态价值），并支持基于模型的规划来进一步提升任务成功率。
-
-
 
 ## 核心方法与创新机理
 
@@ -131,8 +127,6 @@ Cosmos Policy 提出**潜在帧注入（Latent Frame Injection）** 机制（Fig
 
 当前创新存在以下边界：模型仅预测单个未来时间步的状态和价值，未探索多步预测与更深层次规划；基于模型的规划推理延迟较高（N=8 搜索约 4.9 秒），难以直接用于高频动态任务；世界模型和价值函数的精炼依赖策略 rollout 数据，外推能力有限。这些局限指向了未来优化的方向——推理加速、多步预测扩展和更高效的探索策略。
 
-
-
 ![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_wPEIStHxYH/figures/002_Figure_2.jpg]]
 *Figure 2: The latent diffusion sequence of Cosmos Policy. We illustrate latent frame injection—the primary mechanism for adapting the pretrained Cosmos-Predict2 into a policy that can predict robot actions, future states, and values without architectural changes. First, raw images are tokenized into latent frames (first row). Then, additional modalities are inserted directly into the latent frame sequence of the video diffusion model (second row). The model is then tasked to denoise the noised latent frames conditioned on the clean frames (third row). See Section 4.1 for more details. (Note: For simplicity, this figure does not depict certain implementation details; see Figure 8 for a more detailed v...*
 
@@ -167,8 +161,6 @@ pipeline 由四个关键模块串联，数据流贯穿始终：
 - **单阶段后训练**：与多阶段方法（先微调视频模型再训练独立动作模块）不同，Cosmos Policy 仅在机器人演示数据上做单阶段微调，直接产出可部署的策略。
 - **零架构改动**：所有模态适配通过潜在帧注入完成，原始 Cosmos-Predict2 的 Transformer 去噪网络和 VAE 编解码器保持不变。
 - **预训练至关重要**：从随机初始化训练（无视频模型先验）导致 LIBERO 平均成功率下降 3.9 个百分点（Table 4），验证了预训练时空先验的核心作用。
-
-
 
 ### 潜在帧注入：零架构改动的多模态适配
 
@@ -225,8 +217,6 @@ $$V^{\pi}(s) = \mathbb{E}_{\tau \sim \pi} \left[ \gamma^{H-t} R(s_H, a_H) \mid s
   增加高噪声水平的采样权重，以提升动作预测精度（Figure 9）。
 - **单步去噪**：仅使用 1 步去噪推理时，RoboCasa 平均成功率仍达 66.4%，推理延迟从 0.61 秒降至 0.16 秒（约 4× 加速），验证了模型在低步数下的鲁棒性（Table 5）。
 
-
-
 ## 实验与关键发现
 
 Cosmos Policy 在三个层级上进行了系统验证：两个模拟基准（LIBERO、RoboCasa）、一个真实世界双臂操作基准（ALOHA），以及基于模型的规划消融。所有实验均在固定初始条件下评估，并使用相同数量的真人演示进行微调（RoboCasa 仅 50 条，远低于对比方法的 300+ 条），确保数据公平。
@@ -235,12 +225,10 @@ Cosmos Policy 在三个层级上进行了系统验证：两个模拟基准（LIB
 
 **LIBERO 基准**（Table 1）涵盖四个任务套件（Spatial、Object、Goal、Long），Cosmos Policy 取得 **98.5%** 的平均成功率，超过所有对比方法，包括微调后的 VLA 模型 CogVLA（97.4%）和 FLARE（97.2%）。在 Object 套件上达到 100% 成功率，在最具挑战性的 Long 套件上以 97.6% 领先第二名 2.2 个百分点。结果基于每套件 500 次试验 × 3 个随机种子，共 6000 次试验。
 
-
 ![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_wPEIStHxYH/figures/004_Table_1.jpg]]
 *Table 1: LIBERO simulation benchmark results. Success rates (SR) across four LIBERO benchmark task suites (Liu et al., 2024). Cosmos Policy success rates are averaged over 500 trials for each suite (10 tasks × 50 episodes) and three random seeds (6000 trials total). Our method achieves highest performance overall, even outperforming fine-tuned state-of-the-art vision-language-action (VLA) models. Table 2: RoboCasa simulation benchmark results. Success rates (SR) across 24 kitchen manipulation tasks (Nasiriany et al., 2024). Cosmos Policy success rates are averaged over 50 trials for each task and three random seeds (3600 trials total). Our method achieves a state-of-the-art average success rate of 6...*
 
 **RoboCasa 基准**（Table 2）包含 24 个厨房操作任务。Cosmos Policy 以 **67.1%** 的平均成功率取得最优，略高于 FLARE（66.4%）和 GR00T-N1.5+HAMLET（66.4%）。关键优势在于数据效率：Cosmos Policy 仅使用 **50 条演示** 进行训练，而 FLARE 需要 300 条，GR00T-N1.5 需要 500 条，Diffusion Policy 需要 3000 条。结果基于每任务 50 次试验 × 3 个随机种子，共 3600 次试验。
-
 
 ![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_wPEIStHxYH/figures/005_Table_2.jpg]]
 
@@ -264,19 +252,13 @@ Cosmos Policy 取得 **93.6%** 的平均综合得分（Table 3），优于所有
 
 在两项最具挑战性的 ALOHA 任务（put candies in bowl、put candy in ziploc bag）的困难初始状态下，基于模型的规划（$V(s')$ 方案）相比基础无规划策略平均提高 **12.5 分**（Figure 7）。规划流程为：策略生成 N 个候选动作块 → 世界模型预测每个候选的未来状态 → 价值函数评估未来状态价值 → 选择最高价值状态对应的动作执行，并采用"多数平均"聚合提高鲁棒性。
 
-
 ![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_wPEIStHxYH/figures/009_Figure_7.jpg]]
 *Figure 7: Model-based planning results. We evaluate the base Cosmos Policy on challenging initial states for the last two ALOHA robot tasks, and compare it with two planning variants (model-based and model-free). We find that the model-based variant ( V ( $s ^ { \prime }$ ) ) leads to highest overall performance*
 
 世界模型的精炼对规划效果至关重要（Figure 6）：基础 Cosmos Policy 的世界模型仅用演示数据训练，可能无法预测错误（如自封袋滑块脱手）；利用策略 rollout 数据精炼后，世界模型能更准确地预测失败结果，从而使规划器能够规避这些失败。当前规划推理延迟较高（8×H100 GPU 上 N=8 搜索约 4.9 秒），限制了其在高频动态任务中的应用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_wPEIStHxYH/figures/006_Figure_4.jpg]]
 *Figure 4: Real-world ALOHA robot evaluation results. We evaluate state-of-the-art policies on a suite of four tasks and measure the score, which represents average percent completion of each task. Cosmos Policy achieves highest overall score, outperforming all other methods in three of four tasks*
-
-
-
 
 ## 定位与知识库关联
 
@@ -339,8 +321,6 @@ Cosmos Policy 的核心洞察在于：**预训练视频扩散模型的去噪得�
 4. Cosmos Policy 的联合建模范式能否扩展到更广泛的具身任务，如结合自然语言指令的复杂多步规划？当前模型使用 T5-XXL 文本嵌入作为条件，但尚未充分利用语言理解能力进行指令跟随。
 
 5. 在更多样、更具挑战性的真实场景（包括人机交互、动态障碍物避碰）中，统一视频扩散模型作为策略、世界模型和价值函数的方法是否依然保持优势？这需要更大规模的真实世界评估和鲁棒性测试。
-
-
 
 ## 原文 PDF
 

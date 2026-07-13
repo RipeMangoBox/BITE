@@ -58,8 +58,6 @@ claims:
 
 **方法定位**：NextFlow-RL属于针对VAR架构的RL微调方法，其两阶段分解框架具有理论可迁移性，但目前仅在文本渲染和人类偏好两类奖励函数上完成验证。代码已开源（https://github.com/ByteVisionLab/NextFlow）。
 
-
-
 ### 视觉自回归生成的兴起与强化学习微调的机遇
 
 视觉自回归（Visual Autoregressive, VAR）生成模型近年来取得了显著进展。与传统的扩散模型（如 **FLUX.1 dev** (Black Forest Labs, 2024)、**SD3.5 Large** (Esser et al., 2024)）不同，VAR 模型采用“下一尺度预测”（next-scale prediction）的范式，从粗粒度到细粒度逐步生成图像令牌，在推理效率和生成质量之间展现出独特的优势。**NextFlow** 作为该范式下的代表性模型，通过将视觉生成重新表述为序列建模问题，为文本到图像的生成任务提供了新的技术路径。
@@ -83,8 +81,6 @@ claims:
 现有的 RL 微调方法（包括标准 GRPO 及其变体）均未针对 VAR 的这一结构特性进行专门设计。它们隐式地假设所有时间步具有同质的语义粒度和相似的任务结构，因此在面对异步策略冲突时表现次优。实验证据（Figure 2）表明，在部分前缀尺度上进行监督式 RL 训练，其效果反而优于全尺度训练——这一反直觉的现象直接印证了跨尺度策略冲突的存在。
 
 本文的核心动机在于：**能否在不改变 KL 正则化 RL 问题在 VAR 策略族内的最优解的前提下，为训练过程提供更密集、更低方差的反馈，并平衡跨尺度的梯度贡献？** 这一问题的解决将为 VAR 模型的 RL 微调开辟一条稳定且高效的路径，使其能够充分发挥在文本渲染、偏好对齐等任务上的潜力。
-
-
 
 ## 核心方法与创新机理
 
@@ -122,8 +118,6 @@ $$k_t = \frac{1}{(h_t \times w_t)^\alpha}$$
 | 信用分配掩码 | 无掩码 | MP：奖励驱动的时空反向传播掩码 |
 
 这三个组件形成闭环：VMR 提供更低方差的密集反馈，PANW 平衡跨步梯度，MP 精确分配令牌级信用。三者协同工作，使得 NextFlow-RL 在 CVTG-2K 上将 Word Accuracy 从 0.5536 提升至 0.7841（+41.6%），在 HPSv2 上将整体评分从 8.43 提升至 10.64（+26.2%），同时训练过程保持稳定。
-
-
 
 NextFlow‑RL 的整体管线围绕 **两阶段 GRPO** 展开，核心目标是在不改变 KL 正则化问题最优解的前提下，将 VAR 生成的全序列 RL 优化分解为前缀与后缀两个独立训练的阶段，从而缓解异步策略冲突。管线由三个协同模块构成：**VMR（价值即中期回报）**、**PANW（每步权重归一化）** 和 **MP（掩码传播）**，它们共同作用于预训练的 NextFlow 骨干网络之上。
 
@@ -168,14 +162,9 @@ NextFlow‑RL 的整体管线围绕 **两阶段 GRPO** 展开，核心目标是�
 
 NextFlow‑RL 以预训练的 **NextFlow** 作为初始策略，在其基础上叠加上述三个模块。相较于标准的全序列 GRPO（vanilla GRPO），两阶段分解使每个阶段内的令牌长度保持可比，显著缓解了因令牌数量剧烈波动导致的异步策略冲突（见 **Figure 2** 的训练曲线对比）。消融实验证实，VMR、PANW 和 MP 各自独立贡献于性能提升，且组合使用时效果最优。
 
-
-
 ### 3.1 异步策略冲突的形式化诊断
 
 VAR（Visual Autoregressive）生成过程可形式化为一个确定性马尔可夫决策过程（MDP）。在每个时间步 $t$，模型基于当前状态 $\mathbf{s}_t$（已生成的部分图像）采样动作 $\mathbf{a}_t$（新增的令牌网格），并确定性地转移至 $\mathbf{s}_{t+1}$。核心瓶颈在于：**不同时间步的查询令牌数量波动剧烈**——从粗粒度到细粒度尺度跨越数个数量级（参见 Figure 1），导致任务相似性剧烈变化，产生异步策略冲突。在RL优化时，这种异质性使得标准的GRPO方法无法稳定地为不同尺度分配信用，训练不稳定且次优。
-
-![[assets/figures/papers/paper_list_l2205_https_arxiv_org_abs_2601_02256/figures/001_Figure_1.jpg]]
-*Figure 1: The number of query tokens across different timesteps in VAR generation fluctuates significantly, leading to varying task similarities and potential policy conflicts during RL optimization*
 
 ### 3.2 KL正则化RL的最优解
 
@@ -232,9 +221,6 @@ $$k _ { t } = \frac { 1 } { ( h _ { t } \times w _ { t } ) ^ { \alpha } } \tag{9
 
 为精确聚焦影响终末奖励的关键令牌，MP（Mask Propagation）利用奖励反馈构建空间注意力掩码，并沿多尺度层次结构反向传播（Figure 4）。
 
-![[assets/figures/papers/paper_list_l2205_https_arxiv_org_abs_2601_02256/figures/004_Figure_4.jpg]]
-*Figure 4: Our token masks are propagated in reverse through the model’s multi-scale hierarchy, moving from finer to coarser feature scales*
-
 具体流程：
 1. **初始掩码构建**：从直接决定奖励的输出组件（如文本渲染区域）生成初始二元掩码。
 2. **反向传播**：将掩码从精细尺度逐层传播至粗糙尺度，利用VAR架构中固有的尺度间空间对应关系。
@@ -251,12 +237,8 @@ $$k _ { t } = \frac { 1 } { ( h _ { t } \times w _ { t } ) ^ { \alpha } } \tag{9
 
 三者共同作用于GRPO框架，使NextFlow-RL在CVTG-2K上相较NextFlow基线将 Word Accuracy 从 0.5536 提升至 0.7841，NED 从 0.7816 提升至 0.9081（Table 1）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2205_https_arxiv_org_abs_2601_02256/figures/002_Figure_2.jpg]]
 *Figure 2: Comparison of training curves between vanilla GRPO and GRPO with VMR across varying prefix scales*
-
-
 
 ## 实验与关键发现
 
@@ -310,8 +292,6 @@ VMR 的蒙特卡洛估计器使用 K 个在线样本的终末奖励进行风险�
 
 **架构依赖性**：方法的理论分析基于 VAR 特有的多尺度自回归结构。对于标准自回归模型（逐令牌生成）或扩散模型（迭代去噪），异步策略冲突的表现形式和 VMR 的分解策略需要重新设计。论文明确将这一迁移性问题列为开放问题。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2205_https_arxiv_org_abs_2601_02256/figures/007_Table_1.jpg]]
 *Table 1: Quantitative results on the CVTG-2K dataset. Bold denotes the best performance, underline denotes the second-best for each metric. Seedream 3.0 and GPT Image 1 are highlighted as proprietary/closed-source systems*
 
@@ -323,20 +303,6 @@ VMR 的蒙特卡洛估计器使用 K 个在线样本的终末奖励进行风险�
 
 ![[assets/figures/papers/paper_list_l2205_https_arxiv_org_abs_2601_02256/figures/010_Table_4.jpg]]
 *Table 4: Ablation studies on Mask Propagation (MP) and alternating training schemes*
-
-![[assets/figures/papers/paper_list_l2205_https_arxiv_org_abs_2601_02256/figures/011_Table_5.jpg]]
-*Table 5: Ablation on K, evaluated at step 300*
-
-![[assets/figures/papers/paper_list_l2205_https_arxiv_org_abs_2601_02256/figures/012_Figure_7.jpg]]
-*Figure 7: Ablations on training configurations. Left: varying decay exponent α; Right: enabling/disabling MP*
-
-![[assets/figures/papers/paper_list_l2205_https_arxiv_org_abs_2601_02256/figures/013_Table_6.jpg]]
-*Table 6: Related tokens corresponding to different prefix resolutions are provided. Note that the method also supports varying aspect ratios*
-
-![[assets/figures/papers/paper_list_l2205_https_arxiv_org_abs_2601_02256/figures/014_Figure_8.jpg]]
-*Figure 8: Distributions over the number of text-rendering regions (1, 2, 3, 4, 5, and*
-
-
 
 ## 定位与知识库关联
 
@@ -399,8 +365,6 @@ VMR 的蒙特卡洛估计器使用 K 个在线样本的终末奖励进行风险�
 **实验基准贡献**：在CVTG-2K文本渲染和HPSv2人类偏好两个基准上建立了新的SOTA，为VAR模型的RL微调提供了强基线。与闭源系统（如**GPT Image 1**, OpenAI 2025）的对比（Table 1）表明，NextFlow-RL在文本渲染任务上已接近甚至超越部分商业系统。
 
 **后续工作锚点**：本文的开放问题（自动选择$m$、多阶段分解、跨架构迁移）为后续研究提供了明确方向。特别是将VMR框架推广至扩散模型或视频生成模型，可能催生新的跨架构RL优化方法。
-
-
 
 ## 原文 PDF
 

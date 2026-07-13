@@ -62,8 +62,6 @@ claims:
 
 值得注意的是，GPG 当前尚未在超大模型（>70B）上进行验证，其长期训练中去除分布约束的稳定性以及 AGE 机制在极端奖励分布下的鲁棒性仍有待进一步探索。
 
-
-
 ### 推理任务中的强化学习范式
 
 大语言模型在数学推理、几何推理、视觉推理等复杂任务上的能力提升，日益依赖于强化学习（RL）驱动的后训练优化。其核心目标可形式化为最大化期望累积奖励：
@@ -102,8 +100,6 @@ $$\nabla_\theta \mathcal{I}(\theta) = \mathbb{E}_{\pi_\theta} \left[ \nabla_\the
 - **方差控制**：引入有效样本比例阈值 $\beta_{th}$ 和重采样机制，当有效样本不足时累积并重新采样，确保梯度估计的可靠性。
 
 通过这一设计，GPG在显著降低训练资源消耗的同时，在单模态数学推理、多模态视觉推理、几何推理、细粒度分类和推理定位等广泛任务上一致超越了GRPO等现有方法。
-
-
 
 ## 核心方法与创新机理
 
@@ -160,8 +156,6 @@ PPO和GRPO均使用**KL散度约束**或裁剪机制来限制策略更新幅度�
 
 GPG是唯一同时去除全部四个冗余组件的方案（Table 2），在保持训练稳定性的同时实现了显著的性能提升和资源节约。
 
-
-
 ![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_inccdtfx8x/figures/006_Table_2.jpg]]
 *Table 2: Comparison of reinforcement learning algorithms (in reasoning) with various components*
 
@@ -207,8 +201,6 @@ GPG 不依赖 KL 散度约束来限制策略更新幅度，其训练稳定性来
 - **AGE 的重缩放机制**避免了因无效样本比例波动导致的梯度幅度剧烈变化。
 
 值得注意的是，消融实验表明**引入 KL 散度约束反而会损害 GPG 的性能**，这进一步验证了去除分布约束的合理性——GPG 直接优化原始 RL 目标的设计使其无需额外的策略正则化。
-
-
 
 ### 问题形式化与策略梯度基础
 
@@ -271,8 +263,6 @@ $$\hat{A}_{i,t}^{\mathrm{GRPO}} = R(o_i) - \frac{1}{G} \sum_{j=1}^G R(o_j)$$
 
 GPG 与之关键区别在于：（1）去除标准差归一化以避免引入偏差；（2）结合 AGE 校正无效样本带来的梯度估计偏差。消融实验证实，无 AGE 的 GPG（$F_{norm}=1, \alpha=1$）平均分仅 43.9%，未显著优于 GRPO 的 43.7%；加入 AGE 后提升至 48.3%（Table 1），说明 AGE 是性能提升的决定性组件。
 
-
-
 ## 实验与关键发现
 
 ### 一、主实验结果
@@ -280,9 +270,6 @@ GPG 与之关键区别在于：（1）去除标准差归一化以避免引入偏
 GPG 在单模态数学推理、几何推理、视觉推理、推理定位及细粒度分类等任务上均一致优于 GRPO，且训练资源消耗更低。
 
 **数学推理（Qwen2.5-Math-7B）。** 在 AIME24、MATH-500、AMC23、Minerva、OlympiadBench 五个基准上，GPG 的最优配置（$F_{\text{norm}}=1$，$\alpha = B/(B-M)$，$\beta_{th}=0.6$）取得平均分 48.3，较 GRPO 的 43.7 提升 +4.6 个百分点（Table 1）。值得注意的是，若仅去除归一化偏差（$F_{\text{norm}}=1$，$\alpha=1$）而不引入精确梯度估计（AGE），GPG 仅得 43.9，未显著超越 GRPO，这表明 AGE 是性能增益的关键来源。
-
-![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_inccdtfx8x/figures/003_Table_1.jpg]]
-*Table 1: We utilize a basic Math Reasoning setting 1 of SimpleRL from open-r1 (Face, 2025), using only the MATH-lighteval dataset to facilitate rapid experimental validation. Specifically, we remove the format reward and only enable the accuracy reward for simplicity. Table 1: Math reasoning results on Qwen2.5-Math-7B model. †: reproduction use the released code*
 
 **1.5B 蒸馏模型。** 在 DeepSeek-R1-Distill-Qwen-1.5B 上，GPG-RS1 取得平均 pass@1 55.7，优于基于 GRPO 的 Open-RS1（53.1），提升 +2.6（Table 3）。
 
@@ -296,22 +283,11 @@ GPG 在单模态数学推理、几何推理、视觉推理、推理定位及细�
 
 **几何推理。** 在 GEOQA 测试集上，GPG 取得准确率 51.33，较 GRPO 的 47.48 提升 +3.85（Table 5）。
 
-![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_inccdtfx8x/figures/011_Table_5.jpg]]
-*Table 5: Geometry reasoning results on GEOQA. GPG is better than GRPO. Table 7: Visual reasoning results on CV-Bench (Tong et al., 2024), which shows GPG training on base model has overall better performance over GRPO and the base model*
-
-![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_inccdtfx8x/figures/009_Table_5.jpg]]
-
 **视觉推理。** 在 CV-Bench 上，GPG 取得总分 76.15，较 GRPO 的 59.47 提升 +16.68（Table 7），在计数、关系、深度、距离等子维度上全面领先。
 
 **推理定位。** 在 LISA 基准上，GPG 的 mIoU_test 达 51.8，较 GRPO 的 37.6 提升 +14.2（Table 8）。
 
-![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_inccdtfx8x/figures/012_Table_8.jpg]]
-*Table 8: Reasoning grounding results on LISA (Lai et al., 2024). GPG surpasses GRPO in reasoning grounding*
-
 **细粒度分类。** 在四个少样本分类数据集上，GPG 平均准确率 89.0，较 GRPO 的 81.9 提升 +7.1（Table 6）。
-
-![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_inccdtfx8x/figures/010_Table_6.jpg]]
-*Table 6: 4-shot Results on Four Fine-grained Classification Datasets. GPG shows consistently better results than GRPO on 4 classification datasets*
 
 **与 DAPO 对比。** 在 Qwen-7B Math 上，GPG 以更简单的架构（无价值模型、无参考模型、无 KL 约束）取得平均分 57.7，优于 DAPO 的 56.0，且训练数据量和计算开销更低（Table 9）。
 
@@ -354,11 +330,6 @@ GPG 在单模态数学推理、几何推理、视觉推理、推理定位及细�
 - **Table 2**：GPG 是唯一同时去除价值模型、参考模型、替代损失和策略约束的方法，实现了 RL 训练流程的最大简化。
 - **Figure 4**：在 AIME24 案例中，GPG 生成的推理过程比 GRPO 更全面、准确，定性展示了方法对推理质量的提升。
 
-![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_inccdtfx8x/figures/002_Figure_1.jpg]]
-*Figure 1: Performance comparison on unimodal reasoning tasks, with extended validation on multimodal reasoning. (Top) GPG achieves substantial performance gains over state-of-the-art (SOTA) baselines across diverse mathematical benchmarks, demonstrating its core effectiveness for linguistic reasoning. (Bottom) The method also generalizes robustly to multi-modal settings, outperforming other RL methods and further validating its broad applicability*
-
-
-
 ## 定位与知识库关联
 
 ### 与现有RL方法的谱系关系
@@ -394,8 +365,6 @@ GPG的定位是这一简化过程的终点：它同时移除了价值模型、�
 4. **多任务与多模态泛化**：GPG的组内归一化假设奖励信号具有可比性，在奖励尺度差异巨大的多任务场景下，是否需要引入任务特定的归一化策略？
 
 5. **与过程奖励的兼容性**：当前GPG仅使用最终奖励信号（one-step estimation），能否扩展到使用过程奖励模型（PRM）的场景，以提供更细粒度的优势估计？
-
-
 
 ## 原文 PDF
 

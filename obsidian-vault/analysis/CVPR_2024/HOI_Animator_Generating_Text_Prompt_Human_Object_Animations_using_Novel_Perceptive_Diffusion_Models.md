@@ -52,8 +52,6 @@ claims:
 
 **方法定位**：HOIAnimator 属于**解耦式双流扩散生成**范式，与单一人-物共享 Transformer 的扩散基线（如 MDM, Tevet et al., ICLR 2023）形成鲜明对比，其核心创新在于通过显式的跨实体通信机制和接触场先验，将物理约束融入扩散去噪过程。
 
-
-
 ### 人-物交互动画生成的核心瓶颈
 
 生成逼真的人-物交互（Human-Object Interaction, HOI）动画是计算机视觉与图形学中的一项基础性挑战。其关键难点在于：一段可信的交互动画必须同时精确建模三个相互耦合的要素——**人体的运动轨迹**、**物体的动态响应**，以及两者之间**微妙且符合物理规律的接触与力交互**。现有方法往往只能孤立地处理人或物，缺乏对交互动态的显式建模，导致生成的动画出现穿透、滑步或交互语义错位等失真现象。
@@ -79,8 +77,6 @@ claims:
 - **约束**：设计交互接触场（Interaction Contact Field, ICF），以概率分布的形式显式建模接触可能性，综合物体可供性、人类意图和人体工程学信息，为生成过程提供物理层面的引导信号。
 
 这一设计使得模型能够从文本描述中更忠实地还原动态交互，而非仅仅生成“看起来合理”的并置运动。
-
-
 
 ## 核心方法与创新机理
 
@@ -134,8 +130,6 @@ $$\hat{\boldsymbol{x}}_{hum} = \boldsymbol{G}^H \big( E_{hoi}(x_{hum}), E_{text}
 ### 创新协同效应
 
 三个 changed slots 并非孤立创新，而是形成因果闭环：**PDM 提供解耦的生成空间，PMP 建立跨实体通信，ICF 注入物理约束**。完整配置在 BEHAVE 数据集上取得了 Top-3 精度 0.781、FID 0.623 的最优结果（Table 2），且穿透度指标（0.643）相比 InterGen（0.613）提升 3%，证明联合创新在语义匹配、运动质量和物理真实性三个维度均带来增益。
-
-
 
 HOIAnimator 的整体框架围绕一个核心洞察展开：**将文本驱动的人-物交互（HOI）动画生成分解为两条独立的扩散流，并通过显式的感知通信与接触场引导实现双向适配**。如图3所示，pipeline 由两大关键组件构成：感知扩散模型（Perceptive Diffusion Models, PDM）和交互接触场（Interaction Contact Field, ICF）。
 
@@ -206,12 +200,8 @@ $$\mathbf{o} = Attn(\mathbf{Q}, \mathbf{K}, \mathbf{V}) = softmax(\frac{\mathbf{
 
 消融实验（Table 2）验证了这一框架中各模块的因果作用：完整配置在 Top-3 精度（0.781）、FID（0.623）和穿透度（0.643）三项指标上均取得最优。移除 ICF 导致出现明显的不真实穿透；移除 PMP 后虽能保持人与物体的空间排布，但缺乏真实的交互动感；使用单一扩散模型替代 PDM 则整体性能全面下降。这些证据共同表明，PDM 的解耦设计、PMP 的双向通信和 ICF 的物理引导三者缺一不可。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1717_HOI_Animator_Generating_Text_Prompt_Human_Object_Animations_using_Novel/figures/003_Figure_3.jpg]]
 *Figure 3: Method overview. We propose the HOIAnimator with two key parts: (1) Perceptive Diffusion Models (PDM). This part combines the movements of both people and objects in the animation, making sure they move together in a realistic way. (2) Interaction Contact Field (ICF). The ICF provides the clues that humans and objects interact and contact each other (Training phase of HOIAnimator)*
-
-
 
 ### 统一动画表示
 
@@ -298,8 +288,6 @@ $$\mathbf{Q} = \mathbf{W}^Q \hat{\mathbf{D}}_o, \quad \mathbf{K} = \mathbf{W}^K 
 
 PDM、PMP 与 ICF 三者形成闭环协同：PMP 实现人体与物体扩散模型间的双向信息交换，使两个分支在去噪过程中保持运动协调；ICF 则以接触概率分布的形式提供物理约束，通过交叉注意力嵌入到隐空间中。消融实验（Table 2）表明，完整配置在 Top-3 精度（0.781）、FID（0.623）和穿透度（0.643）上均取得最优结果，移除任一组件均导致性能下降——移除 ICF 后出现明显的不真实穿透，移除 PMP 后缺乏真实的交互动感，替换为单一扩散模型（w/o PDM）后整体性能降低。
 
-
-
 ## 实验与关键发现
 
 ### 实验设置
@@ -341,9 +329,6 @@ Figure 6 展示了 HOIAnimator 与基线方法的定性对比。对于给定的�
 
 Figure 7 报告了用户研究结果。参与者在观看不同方法生成的动画后，从交互真实感、语义一致性和整体质量三个维度进行评分。HOIAnimator 在各项评分上均获得最高比例的高分评价，进一步验证了其在人-物交互动画生成任务上的主观优势。
 
-![[assets/figures/papers/paper_list_l1717_HOI_Animator_Generating_Text_Prompt_Human_Object_Animations_using_Novel/figures/008_Figure_7.jpg]]
-*Figure 7: User study. The color bars in the figure indicate the percentage of the scores. The X-axis represents the number of participants*
-
 ### 失败模式与局限性
 
 尽管 HOIAnimator 在 BEHAVE 基准上取得了领先性能，论文也明确指出以下局限：
@@ -354,16 +339,6 @@ Figure 7 报告了用户研究结果。参与者在观看不同方法生成的�
 4. **计算开销**：ICF 的预训练扩散模型与主生成模型的联合推理增加了计算负担，论文未讨论实时性表现，实际部署时可能存在延迟问题。
 
 > **注意**：关于 ICF 在更复杂物理先验下的泛化能力，以及在动态场景数据集上的鲁棒性，论文仅作为开放问题提出，尚无实验证据支持，需进一步验证。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1717_HOI_Animator_Generating_Text_Prompt_Human_Object_Animations_using_Novel/figures/001_Figure_1.jpg]]
-*Figure 1: Our HOIAnimator excels in turning text descriptions into realistic animations of human-object interactions. It’s adept at depicting a variety of actions, such as bending, lifting boxes, and picking up bags, with believable contact between the human and the objects*
-
-![[assets/figures/papers/paper_list_l1717_HOI_Animator_Generating_Text_Prompt_Human_Object_Animations_using_Novel/figures/002_Figure_2.jpg]]
-*Figure 2: Navigating the complexity of HOIAnimator. (A): the ‘static’ interaction is depicted with a stationary office chair, showcasing a human sitting on the chair. (B): the ‘dynamic’ interaction portrays both the human and the object in motion, exemplified by the act of holding an object. (C): Arrows denote forces and trajectories involved in HOI*
-
-
 
 ## 定位与知识库关联
 
@@ -417,8 +392,6 @@ HOIAnimator 在以下条件下展现出较强的生成能力：
 5. **跨场景鲁棒性**：在更广泛的真实场景数据集（如与动态场景结合）上，方法是否仍能保持鲁棒性，需要更多样化的评测基准来验证。
 
 需要注意的是，上述开放问题均来自论文自身的讨论，目前尚无后续工作直接解决这些局限。若需了解该方向的最新进展，建议追踪基于物理的交互生成和神经辐射场/3D 高斯泼溅与扩散模型结合的相关工作。
-
-
 
 ## 原文 PDF
 

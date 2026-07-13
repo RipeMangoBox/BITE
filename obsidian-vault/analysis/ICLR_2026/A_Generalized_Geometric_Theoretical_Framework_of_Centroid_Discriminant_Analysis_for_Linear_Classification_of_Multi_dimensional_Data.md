@@ -49,8 +49,6 @@ claims:
 
 CDA将校正限制在由CDB1和CDB2张成的二维平面上，通过迭代旋转和贝叶斯优化（或斐波那契搜索）高效逼近最优判别方向。其训练时间复杂度为O(NM + N log N)，显著低于LDA和SVM。在27个真实数据集（涵盖标准图像、医学图像和化学性质）上，CDA的多类AUROC平均排名约为3.3，优于LDA（~4.0）、SVM（~3.8）和逻辑回归（~4.5），并在17/27的数据集中进入前两名（Figure 2b, 2c）。在大规模单细胞小鼠脑数据上，CDA-Fibonacci在AUROC和训练速度上均优于fast SVM（Figure 2f, 2g）。此外，通过核方法扩展的核CDA在SVHN、ClinTox等挑战性数据集上进一步提升了性能（Table 1）。
 
-
-
 线性分类器在大规模数据分析中面临一个核心矛盾：高精度方法（如线性判别分析 LDA、支持向量机 SVM）的计算成本过高，而低复杂度方法（如最小距离分类器 MDC）的预测性能又过于有限。LDA 的训练时间复杂度为 $O(NM^2 + M^3)$，SVM 为 $O(N^3)$，在样本数 $N$ 或特征数 $M$ 增长时，这一成本变得难以承受。相比之下，MDC 的复杂度仅为 $O(NM)$，但其判别能力严重不足，仅依赖两类质心的连线方向，忽略了数据的协方差结构和边界分布。
 
 现有方法之间的性能-效率鸿沟促使研究者思考：是否存在一条中间路径，既能在计算上接近 MDC 的轻量级，又能在分类精度上逼近甚至超越 LDA 和 SVM？本文的核心动机正是填补这一空白。
@@ -60,8 +58,6 @@ CDA将校正限制在由CDB1和CDB2张成的二维平面上，通过迭代旋转
 基于这一理论洞察，作者将校正限制在由两个特殊方向（CDB1 和 CDB2）张成的二维平面上，通过迭代旋转和贝叶斯优化来高效逼近最优判别方向，从而提出了**质心判别分析（Centroid Discriminant Analysis, CDA）**。CDA 的训练时间复杂度仅为 $O(NM + N \log N)$，远低于 LDA 和 SVM，同时其性能在 27 个真实数据集上的多类 AUROC 平均排名约为 3.3，优于 LDA（约 4.0）、SVM（约 3.8）和逻辑回归 LR（约 4.5）。在大规模单细胞数据上，CDA-Fibonacci 变体在 AUROC 和训练速度上均优于 fast SVM。
 
 因此，本文的动机可概括为：**利用 GDA 几何理论框架，设计一种在计算复杂度和分类精度之间取得更优平衡的线性分类器，使低复杂度的质心方法通过少量几何校正获得接近甚至超越高复杂度方法的性能**。
-
-
 
 ## 核心方法与创新机理
 
@@ -82,8 +78,6 @@ CDA将校正限制在由CDB1和CDB2张成的二维平面上，通过迭代旋转
 *   消融实验证实，非均匀权重的广义质心、样本权重偏移策略和贝叶斯优化旋转是CDA性能提升的三个关键组件（Section 4.1）。
 
 **局限性** 方面，CDA目前仅支持二分类，多类任务需借助ECOC等外部策略；核CDA在大规模数据上存在可扩展性瓶颈；其收敛证明未提供全局最优性保证。
-
-
 
 ![[assets/figures/papers/iclr26_0002_bp9DOHb1mk_A_Generalized_Geometric_Theoretical_Framework_of/figures/012_Figure_4.jpg]]
 *Figure 4: The GDA theoretical framework in 2 dimensions showing how the relation between LD and CDB0 evolves under specific conditions. (a) The relations between LD and CDB0 proceeding from the general case to different special cases under the conditions shown along each arrow. (b) The specific expressions of LD in terms of CDB0 and corrections corresponding to each case in column (a). (c) Binary classifications models of LD (blue dashed) and CDB0 (black solid) on different 2D data corresponding to each case in column (a). The lines show the direction instead of the unit vector of the discriminants. LD: Linear Discriminant; CDB0: Centroid Discriminant Basis 0. γ denotes a generic normalizing factor*
@@ -107,8 +101,6 @@ CDA（质心判别分析）的完整pipeline围绕一个核心思想构建：任
 **模块间数据流**：CDB0 → [SWU → CDB2 → BO旋转 → 新CDB1] → 循环直至终止。每次旋转后，CDA的判别向量保持GDA一般形式：`w_CDA^(n) = γ(w_CDB0 + C_1 w_CDB0)`，其中`C_1 = ∏ⁿ A_cda - I`是几何校正算子。多类预测时，采用ECOC一对一的hinge-loss方案将二分类扩展为多分类。
 
 **时间复杂度**：CDA的训练时间复杂度为O(NM + N log N)，最坏情况下为二次复杂度，远低于LDA的O(NM²+M³)和SVM的O(N³)。这使得CDA在大规模数据集上具有显著的可扩展性优势。
-
-
 
 ### 几何判别分析（GDA）框架
 
@@ -154,8 +146,6 @@ $$ps = (F_{\mathrm{score}}^{\mathrm{pos}} + F_{\mathrm{score}}^{\mathrm{neg}} + 
 
 其中，$F_{\mathrm{score}}$ 是精确率与召回率的调和均值，$AC_{\mathrm{score}} = 2 \times TPR \times TNR / (TPR + TNR)$ 是平衡准确率指标。该指标对正负类不平衡具有鲁棒性。
 
-
-
 ## 实验与关键发现
 
 ### 主结果：性能与效率的平衡
@@ -192,8 +182,6 @@ CDA的性能提升由三个关键组件共同驱动：（1）非均匀权重的�
 
 CDA存在以下已知失败模式：（1）当前仅支持二分类，多类任务依赖ECOC策略，引入额外计算开销；（2）核CDA的O(N²)复杂度在大规模数据集上存在可扩展性瓶颈；（3）在椭圆分布且存在异常值的情况下，CDA性能可能下降，但对数变换可缓解此问题；（4）贝叶斯优化的采样次数随迭代次数增长，最坏情况下可能导致二次时间复杂度。此外，CDA的收敛证明依赖于目标序列的单调性和有界性，但未提供全局最优性保证。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0002_bp9DOHb1mk_A_Generalized_Geometric_Theoretical_Framework_of/figures/021_Table_2.jpg]]
 *Table 2: Dataset description*
 
@@ -202,8 +190,6 @@ CDA存在以下已知失败模式：（1）当前仅支持二分类，多类任�
 
 ![[assets/figures/papers/iclr26_0002_bp9DOHb1mk_A_Generalized_Geometric_Theoretical_Framework_of/figures/033_Table_4.jpg]]
 *Table 4: Multiclass AUROC for CDA with different BO sampling schemes*
-
-
 
 ## 定位与知识库关联
 
@@ -250,8 +236,6 @@ CDA的适用边界由其设计假设和实验验证共同界定：
 4. **样本权重策略的迁移性**：CDA的非均匀样本权重更新策略是否可推广到加权LDA或其他线性分类器以提升性能？这可能是连接GDA框架与传统方法的一座桥梁。
 
 5. **与深度特征提取器的结合**：CDA与ResNet-18等预训练特征提取器的结合在SVHN上展示了潜力（Table 19），但在视频、3D点云等更复杂任务上的表现尚待探索。
-
-
 
 ## 原文 PDF
 

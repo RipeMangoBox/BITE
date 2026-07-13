@@ -59,8 +59,6 @@ claims:
 
 值得注意的是，CompGen 的性能依赖于多模态奖励模型（如 LLaVA-v1.6-13B）的评估品质，且目前仅在 1B 参数以下的模型上验证；在更大规模模型上的 scaling 特性及合成数据生成的计算开销仍需进一步探索。
 
-
-
 文本到图像（T2I）生成模型近年来取得了显著进展，但在**组合生成**（compositional generation）方面仍暴露出系统性弱点。具体表现为：对象遗漏（object omission）、属性错误绑定（attribute misbinding）、空间与语义关系混乱（relational confusion），以及数量计数不准确（counting errors）。这些缺陷并非偶然，而是源于现有训练范式缺乏专门针对组合能力的训练信号与难度递进机制。
 
 现有方法大致分为三类，但均未能从根本上解决上述瓶颈：
@@ -72,8 +70,6 @@ claims:
 上述方法的共同局限在于：**缺乏对组合难度的量化建模与自适应训练调度**。具体而言，现有工作既未系统定义“什么样的文本-图像对在组合意义上更难”，也未设计从易到难的课程学习机制来逐步强化模型的组合子能力（对象存在、属性绑定、关系理解、数量计数）。
 
 本文的核心动机正是填补这一空白。我们提出 **CompGen**——一个基于合成课程的组合强化学习框架。其核心洞察在于：**将组合复杂性分解为场景图（scene graph）的结构化因子，并以此为准则构建自适应合成课程，使 T2I 模型无需依赖真实图像或修改架构即可系统提升组合生成性能**。具体而言，CompGen 通过场景图的节点数、平均属性密度和平均关系连通性三个可量化因子来定义组合难度，并利用强化学习（GRPO）在从易到难的课程调度下逐步掌握组合子能力。这一数据驱动、课程引导的范式为 T2I 组合生成问题提供了新的解决路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -119,8 +115,6 @@ CompGen 引入了三种课程调度策略（随机、易到难、高斯采样）
 
 **总结**：CompGen 的四项 changed slots 构成了一个闭环系统：以场景图难度度量为准则合成可控课程数据，以细粒度组合奖励为优化信号，以课程化 GRPO 为训练范式，以难度调度策略控制学习进程。这一设计使 T2I 模型在不依赖真实图像、不修改架构的前提下，系统性地提升了组合生成性能。
 
-
-
 CompGen 框架采用“合成课程构建 + 课程化强化学习训练”两阶段范式，在不依赖真实图像、不修改模型架构的条件下系统提升文本到图像模型的组合生成能力。其核心思路是：**利用场景图的结构化特性量化组合难度，并通过自适应采样生成难度可控的合成训练数据，进而以细粒度组合奖励信号驱动强化学习，使模型在从易到难的课程中逐步掌握对象存在、属性绑定、关系理解与数量计数等组合子能力**。
 
 ### 两阶段流水线
@@ -161,8 +155,6 @@ $$\operatorname{Diff}(\mathcal{G}) = \|\mathcal{O}\| \cdot \max\left(1, \frac{\|
 ### 训练数据与适用范围
 
 CompGen 框架在实验中构建了 10K 合成样本，均匀分布于难度等级 1 至 10，并成功应用于扩散架构 Stable-Diffusion-1.5 和自回归架构 SimpleAR-SFT 两种不同生成范式的 T2I 模型。在五个组合生成基准（GenEval、DPG、TIFA、T2I-CompBench、DSG）上，Stable-Diffusion-1.5 的平均准确率从 54.90% 提升至 66.62%（+11.72 pp），SimpleAR-SFT 从 63.66% 提升至 71.27%（+7.61 pp）（Table 1），验证了该框架的架构无关性和有效性。
-
-
 
 CompGen 框架的核心技术路径由三个紧密耦合的模块构成：**难控场景图生成器**、**细粒度组合奖励模型**以及**课程化 GRPO 优化器**。这三个模块共同实现了“从场景图难度量化到合成课程构建，再到组合能力强化学习”的闭环。
 
@@ -236,16 +228,6 @@ $$\mathcal{J}_{\mathrm{C-GRPO}}(\theta) = \mathbb{E}_T \left[ \frac{1}{G} \sum_{
 
 实验（Figure 5）表明，易到难和高斯调度在训练步数增加时持续提升性能，而随机采样较早饱和，验证了课程递进对组合能力 scaling 的关键作用。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2344_https_arxiv_org_abs_2511_18378/figures/003_Figure_3.jpg]]
-*Figure 3: An illustrated example of scene graph corresponding to a specific difficulty level*
-
-![[assets/figures/papers/paper_list_l2344_https_arxiv_org_abs_2511_18378/figures/009_Figure_6.jpg]]
-*Figure 6: An illustrated example of scene graph complexity (Left), sample binary questions generated from the scene graph (with “Yes” answers) (Middle), and corresponding input text and output image pairs (Right)*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -261,9 +243,6 @@ CompGen 在两个不同架构的 T2I 模型上均带来显著且一致的组合�
 *Figure 1: Overall performance of our CompGen, indicating that CompGen achieves state-of-the-art performance among models of the same scale*
 
 定性对比（Figure 4）进一步揭示了 CompGen 的优势模式：在包含多对象、复杂属性修饰和空间关系约束的提示词上，SD-1.5、SD-2.1、SDXL 和 Lumina-Next 等强基线模型频繁出现对象遗漏（蓝色标注错误）、属性绑定错误（棕色）、关系混淆（绿色）和计数偏差（紫色），而 CompGen 在这些维度上展现出更一致的忠实生成能力。
-
-![[assets/figures/papers/paper_list_l2344_https_arxiv_org_abs_2511_18378/figures/006_Figure_4.jpg]]
-*Figure 4: Qualitative comparison of our CompGen with other strong text-to-image generation models (SD1.5, SD2.1, SDXL, and Lumina-Next). Within each prompt, we color the elements for which at least one model makes an error: the object in blue, the attribute in brown, the relationship in green, and the count in purple. O , A , R , C denote Object, Attribute, Relationship, and Count, respectively. A indicates correct generation, while a indicates an error. Additional examples appear in Appendix J*
 
 ### 关键消融与因果分析
 
@@ -305,22 +284,11 @@ $$\operatorname{Diff}(\mathcal{G}) = \|\mathcal{O}\| \cdot \max\left(1, \frac{\|
 - **Figure 5**：易到难和高斯调度展现持续 scaling 潜力，随机采样较早饱和。
 - **Table 6 / Table 7**：自适应 MCMC 采样和最小初始化策略是高质量课程数据生成的关键设计选择。
 
-![[assets/figures/papers/paper_list_l2344_https_arxiv_org_abs_2511_18378/figures/007_Figure_5.jpg]]
-*Figure 5: Scaling trend of CompGen with different curriculum scheduling strategies*
-
-![[assets/figures/papers/paper_list_l2344_https_arxiv_org_abs_2511_18378/figures/010_Table_4.jpg]]
-*Table 4: Investigation on reward function using Stable-Diffusion-1.5 as backbone. Our adopted model is highlighted in yellow . The best performance is marked in red*
-
 ![[assets/figures/papers/paper_list_l2344_https_arxiv_org_abs_2511_18378/figures/011_Table_6.jpg]]
 *Table 6: Comparison of sampling efficiency and graph diversity using different sampling methods. The proposed method is marked with yellow background. The best performance is marked in red. SR denotes Success Rate, and NTD denotes Node Type Diversity*
 
 ![[assets/figures/papers/paper_list_l2344_https_arxiv_org_abs_2511_18378/figures/012_Table_5.jpg]]
 *Table 5: Investigation on different data difficulty distributions using Stable-Diffusion-1.5 with 10K training data. The data distribution we adopted is marked with yellow background. The best performance for each benchmark is marked in red. “Skew-easy” means training on easier instances, “Skew-difficult” means harder ones, and “Uniform” means training on a balanced mix of difficulties*
-
-![[assets/figures/papers/paper_list_l2344_https_arxiv_org_abs_2511_18378/figures/013_Table_7.jpg]]
-*Table 7: Analysis of different initialization strategies for the prior graph. The default setting used in our approach is marked with yellow background. The best performance is marked in red. SR denotes Success Rate, and NTD denotes Node Type Diversity*
-
-
 
 ## 定位与知识库关联
 
@@ -358,8 +326,6 @@ CompGen 的有效性已在以下条件下得到验证：
 **规模扩展的未知性。** CompGen 仅在 1B 参数以下的模型上验证，其在更大规模扩散模型（如 SDXL、Flux）或其他生成任务（如文本到视频）上的 scaling 行为尚待研究。训练阶段额外的 MCMC 采样与 LLM 调用也带来较标准微调更高的计算开销。
 
 **数据多样性的增强空间。** 当前合成课程仅利用场景图结构化信息，未来可引入真实世界图像统计分布或开放域知识图谱，进一步增强课程数据的多样性和真实性。
-
-
 
 ## 原文 PDF
 

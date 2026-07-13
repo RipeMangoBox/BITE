@@ -52,8 +52,6 @@ claims:
 
 在四个数学与逻辑推理基准（GSM8K、MATH500、Countdown、Sudoku）上，SPG显著超越先前最优方法：在序列长度256设定下，GSM8K准确率提升3.6%，MATH500提升2.6%，Countdown提升18.4%，Sudoku提升27.0%。在编码任务HumanEval和MBPP上，SPG亦分别取得1.9%和4.7%的Pass@1增益。消融实验证实，混合似然估计（ELBO+EUBO）与块状掩码策略是性能提升的关键因素，且SPG在多种解码策略下均表现出强泛化性。
 
-
-
 掩码扩散语言模型（Masked Diffusion Language Model, MDLM）通过逐步去噪生成文本，其训练依赖于最大化证据下界（ELBO）。然而，当将这类模型应用于强化学习（RL）后训练时，一个根本性瓶颈浮现：**扩散语言模型（dLLM）的真实对数似然 $\log \pi_\theta(x|c)$ 不可计算**，因为其生成过程涉及对大量潜在变量路径的积分。
 
 标准的策略梯度方法（如 REINFORCE）要求计算 $\nabla_\theta \log \pi_\theta(x|c)$，但这在 dLLM 中无法直接获得。现有 RL 方法（如 **D1**（Zhao et al., 2025）、**WD1**（Tang et al., 2025））转而使用 ELBO 作为代用似然。ELBO 是真实对数似然的下界，这意味着：
@@ -64,8 +62,6 @@ claims:
 此外，现有方法在蒙特卡洛估计中普遍采用**随机掩码**策略来生成扰动样本。然而，dLLM 在实际推理时通常采用块状解码（block-wise decoding）或半自回归解码，随机掩码生成的训练分布与推理分布之间存在**分布不匹配**，进一步降低了策略梯度估计的准确性。
 
 上述两个问题构成了当前 dLLM 强化学习后训练的核心瓶颈：**似然估计偏差**与**训练-推理分布错位**。本文的动机正是针对这两个缺口，提出一种能够有效利用负奖励信号、同时对齐训练与推理分布的策略梯度方法。
-
-
 
 ## 核心方法与创新机理
 
@@ -115,8 +111,6 @@ $$
 
 综上，SPG 通过**夹层似然估计**和**块状掩码**这两个 changed slots，在不增加计算开销的前提下（每次梯度更新约 0.49–0.51 分钟，8×A100），系统性解决了 dLLM 中似然不可算导致的策略梯度偏差问题，在数学推理（GSM8K +3.6%、MATH500 +2.6%、Countdown +18.4%、Sudoku +27.0%）和代码生成（HumanEval +1.9%、MBPP +4.7%）任务上均取得显著提升（Table 1, Table 2）。
 
-
-
 ![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_18j5Q49GwN/figures/005_Figure_2.jpg]]
 *Figure 2: The training process of SPG for MDLM. Left: From a prompt c, we generate responses $\{ \bar { \pmb { x } ^ { j } } \} _ { j = 1 } ^ { g }$ . We then maximize a lower bound on the likelihood $\pi _ { \pmb { \theta } } ( \bar { \pmb x } ^ { j } \mid \bar { \pmb c }$ ) for high-reward responses while minimizing an upper bound for low-reward ones. Right: The upper/lower bound of likelihood is estimated via Monte Carlo using a block-wise masking strategy, where a random block is selected for masking, with earlier blocks kept clean and later blocks fully masked. The example shows a sequence of length 9 with a block size of 3, where the current generation block is highlighted in yellow
 
@@ -162,8 +156,6 @@ $$\tilde{\mathcal{L}}_{\mathrm{Mix}}(x|c;\theta) = \omega\cdot\tilde{\mathcal{L}
 | 策略更新 | 梯度 | 更新后的策略参数 $\theta$ |
 
 该方法的关键设计决策——夹层估计与块状掩码——共同解决了扩散语言模型 RL 训练中的两个核心瓶颈：不可算似然下的有效梯度估计，以及训练-推断分布失配。
-
-
 
 ### 问题形式化：组相对优势目标
 
@@ -237,8 +229,6 @@ SPG 的完整训练迭代（Algorithm 1）包含四个步骤：
 2. **块状掩码生成**：对每个完成序列，采用块状掩码策略生成 $m$ 个扰动样本用于蒙特卡洛估计。
 3. **夹层目标构建与梯度计算**：根据优势正负分别选择 ELBO 或混合损失（EUBO+ELBO）构建 SPG 目标，计算梯度。
 4. **策略更新**：使用计算得到的梯度更新策略参数 $\theta$。
-
-
 
 ## 实验与关键发现
 
@@ -340,12 +330,8 @@ SPG 的完整训练迭代（Algorithm 1）包含四个步骤：
 | Figure 6 | SPG在多种推理策略下均大幅超越基线，展示强泛化性 |
 | Table 14 | 有偏紧上界优于无偏松上界，偏差代价小于方差代价 |
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_18j5Q49GwN/figures/032_Table_11.jpg]]
 *Table 11: Ablations on the masking strategies in Monte Carlo estimation. Our block-wise masking strategy leads to consistent improvement to random masking on both benchmarks*
-
-
 
 ## 定位与知识库关联
 
@@ -438,8 +424,6 @@ $$g_{\omega,k} = ((1-\omega)w(t,z_t) + \omega\rho_{\beta}) \partial_{\theta_k}\l
 5. **长序列与大规模扩展**：在更长的序列生成（>512 tokens）或更大规模模型（>8B参数）上，SPG的扩展性与稳定性如何？块状掩码策略的块大小是否需要随序列长度动态调整？
 
 6. **与其他对齐技术的协同**：SPG与偏好优化方法（如LLaDA-1.5使用的VRPO）是否存在互补性？两者能否在统一框架下结合？
-
-
 
 ## 原文 PDF
 

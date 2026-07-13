@@ -77,8 +77,6 @@ TransPhase 首次将周期性相位表征与扩散模型结合，在统一的相
 
 当前框架依赖两片段对的训练监督，对三个以上连续语义片段的组合或非相邻片段间的相位传播尚未充分验证。相位混合权重 $r$ 由启发式三次曲线定义，缺乏数据驱动的自适应机制。此外，模型在更大规模运动数据集（如 AMASS）上的泛化能力仍需检验。未来工作可探索基于分数或势能的扩散变体、可学习的相位混合参数，以及与物理约束（如 PhysDiff）的结合。
 
-
-
 ### 问题背景
 
 生成符合文本描述的长时人体运动序列在动画制作、虚拟现实和具身智能等领域具有重要应用价值。随着扩散模型在运动生成领域取得显著进展，研究者逐渐从生成单一短动作转向合成由多个语义片段组合而成的长运动。然而，现有方法在组合多个语义片段时，普遍面临一个核心瓶颈：**过渡区域产生突兀伪影**，例如脚滑动（foot skating）、突然转向或不自然的姿态突变。
@@ -102,8 +100,6 @@ TransPhase 首次将周期性相位表征与扩散模型结合，在统一的相
 3. **可扩展框架**：通过相位混合机制动态融合语义预测与过渡预测，使框架可线性扩展至任意数量的运动片段，同时适用于组合生成、运动内插和长时生成三种任务。
 
 这一设计的关键洞察在于：**在周期性相位潜空间内进行双条件并行扩散，可以同步实现语义对齐和相位平滑过渡**，从根本上解决原始空间中过渡建模的局限性。
-
-
 
 ## 核心方法与创新机理
 
@@ -154,8 +150,6 @@ TransPhase 的模块化设计使其可**线性扩展**：每增加一个运动�
 - **混合权重的启发式设计**：$r = (k/K)^3$ 虽经消融验证有效，但缺乏数据驱动或任务感知的自适应机制，可能非全局最优。
 - **数据集泛化性**：所有实验基于 BABEL-TEACH 数据集，在 AMASS 等更大规模运动数据集上的表现需进一步检验。
 
-
-
 TransPhase 框架的核心设计动机源于一个关键瓶颈：现有运动生成模型在组合多个语义片段时，直接在原始运动空间建模，忽略了运动内在相位的动态连续性，导致过渡区域频繁出现脚滑动、突然转向等突兀伪影。为解决这一问题，框架将可变长运动片段统一编码到**周期性相位潜空间**中，并通过双条件并行扩散机制，在去噪过程中同步实现语义对齐与相位平滑过渡。
 
 ### 整体流水线
@@ -185,15 +179,10 @@ TransPhase 的模块化设计支持线性扩展至多种任务场景（如图 Fi
 - **运动内插**：在给定的前后段之间生成过渡运动，TPDM 双向引入相邻片段的相位动态，可选 SPDM 实现条件内插（对应 Figure 4 流水线）。
 - **长时运动生成**：通过堆叠更多的 SPDM/TPDM 模块，框架可直接扩展至任意数量的运动片段，实现超长序列（如 168 分钟）的并行生成。
 
-![[assets/figures/papers/paper_list_l1920_TransPhase_Deep_Compositional_Phase_Diffusion_for_Long_Motion_Sequence_G/figures/001_Figure_1.jpg]]
-*Figure 1: Our Compositional Phase Diffusion framework produces high-quality composite motion sequences with smooth transitions and semantic alignment. (a) Compositional generation involves synthesizing multiple motion segments of varying lengths simultaneously, ensuring smooth transitions between segments. (b) Motion inbetweening allows users to select segments (in blue and yellow) and create conditional or unconditional bridging motions. (c) Long-term motion generation is achieved by scaling the framework with additional modules, enabling the parallel denoising of a larger number of motion segments. The rainbow color indicates time progression*
-
 ![[assets/figures/papers/paper_list_l1920_TransPhase_Deep_Compositional_Phase_Diffusion_for_Long_Motion_Sequence_G/figures/003_Figure_3.jpg]]
 *Figure 3: Illustration of the phase diffusion pipeline for the compositional motion generation task. SPDMs and TPDMs guide the denoising of motion segments through semantic information and the phase dynamics information from adjacent motions, respectively. The denoised results are combined via phase mixing and either diffused back to step*
 
 所有 SPDM 和 TPDM 均以 $\epsilon$-模型实现，训练过程遵循标准扩散框架的 L1 损失。这种统一的相位潜空间表征与双条件扩散机制的协同，构成了 TransPhase 在组合运动生成、运动内插和长时生成三大任务上取得一致优越性能的架构基础。
-
-
 
 TransPhase 框架由三个核心模块构成：**动作中心周期性自编码器（ACT-PAE）**、**语义相位扩散模块（SPDM）** 和 **过渡相位扩散模块（TPDM）**。三者协同工作，在统一的相位潜空间内完成语义对齐与过渡平滑的双重目标。
 
@@ -250,16 +239,6 @@ $$
 
 > **注意**：消融实验（Sec 4.4）验证了上述 $r = (k/K)^3$ 策略为最优配置，且 SPDM 与 TPDM 中引入帧级 token 能显著提升对参数级 token 的去噪性能。复合位置编码（Comp-PE）与混合时间窗（mixT）对可变长度运动编码至关重要，详见附录 A.2。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1920_TransPhase_Deep_Compositional_Phase_Diffusion_for_Long_Motion_Sequence_G/figures/002_Figure_2.jpg]]
-*Figure 2: Module detail of TPDM and SPDM. (a) The TPDM uses the clean phase latents from the adjacent segment*
-
-![[assets/figures/papers/paper_list_l1920_TransPhase_Deep_Compositional_Phase_Diffusion_for_Long_Motion_Sequence_G/figures/004_Figure_4.jpg]]
-*Figure 4: The phase diffusion pipeline for the motion inbetweening tasks. The inbetweening motion*
-
-
-
 ## 实验与关键发现
 
 ### 核心实验设计
@@ -314,9 +293,6 @@ Table 3 报告了 60、120、180 帧三种过渡长度下的结果。TransPhase 
 
 Table 4 的结果表明，在引入文本条件（如“bend arms up”）后，TransPhase 在 60 帧和 120 帧过渡长度下取得最佳**运动真实感**（Smt.FID）和**文本对齐**（MMD）：
 
-![[assets/figures/papers/paper_list_l1920_TransPhase_Deep_Compositional_Phase_Diffusion_for_Long_Motion_Sequence_G/figures/011_Table_4.jpg]]
-*Table 4: Quantitative results for Conditional Motion Inbetweening (CMIB) on the BABEL-TEACH [12] test set. We report the performance of various methods under the settings of transition lengths at 60, 120, and 180 frames. Bold and underline indicates the best and the second-best result*
-
 - 在 60 帧过渡中，Smt.FID=0.389，相比 CMB（Kim et al., 2022）的 0.693 降低 43.9%，相比 MDM 的 0.694 降低 43.9%。这表明**在相位潜空间中进行语义条件去噪比在原始空间生成过渡片段更精确**。
 - 在 120 帧过渡中，TransPhase 的 Smt.FID=0.679 仍保持领先，但优势缩小。这可能是因为更长的过渡需要更强的语义约束，而 SPDM 的 CLIP 文本嵌入在长时序上的条件强度有限。
 
@@ -344,15 +320,8 @@ Table 4 的结果表明，在引入文本条件（如“bend arms up”）后，
 
 4. **物理约束的缺失**：虽然 TPDM 通过相位对齐减少了脚滑动等伪影，但 TransPhase 未显式引入物理约束（如接触力、地面穿透惩罚）。在极端过渡场景（如从跑步到突然停止）中，生成的过渡可能仍存在微小的物理不合理性。与 PhysDiff 等物理约束扩散模型的结合是潜在的改进方向。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1920_TransPhase_Deep_Compositional_Phase_Diffusion_for_Long_Motion_Sequence_G/figures/008_Figure_6.jpg]]
 *Figure 6: Visualization of the UMIB with 120 transition frames: preceding motion in blue, transitioning motion in green, and succeeding motion in yellow*
-
-![[assets/figures/papers/paper_list_l1920_TransPhase_Deep_Compositional_Phase_Diffusion_for_Long_Motion_Sequence_G/figures/010_Figure_7.jpg]]
-*Figure 7: Visualization of the CMIB with 120 transition boundary frames conditioned with bend arms up: preceding motion in blue, transitioning motion in green, and succeeding motion in yellow*
-
-
 
 ## 定位与知识库关联
 
@@ -407,8 +376,6 @@ TransPhase 的方法论创新在于完成了一次**表征空间的范式转换*
 3. **非周期性动作的扩展**：ACT-PAE 的正弦参数化天然适用于周期性或准周期性动作（如行走、跑步），但对于非周期性动作（如跳跃、投掷）的相位表征质量如何？是否需要在相位潜空间中引入非周期性的补充编码通道？
 
 4. **物理约束集成**：在保留相位平滑优势的前提下，如何将物理约束（如 PhysDiff 的物理引导机制）嵌入相位扩散过程？物理约束可能在相位潜空间中有其对应的表达形式，而非仅在解码后的原始运动空间施加。
-
-
 
 ## 原文 PDF
 

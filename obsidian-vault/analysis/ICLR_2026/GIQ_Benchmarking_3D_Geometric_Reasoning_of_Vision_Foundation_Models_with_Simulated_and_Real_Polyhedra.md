@@ -52,8 +52,6 @@ GIQ（Geometric IQ Test）基准数据集针对这一瓶颈，构造了涵盖224
 
 GIQ的方法定位在于：它不是提出新的模型架构，而是构建了一个精确可控的几何推理探针集，通过四项核心任务——单目三维重建、三维对称检测、心理旋转测试和零样本形状分类——系统诊断视觉基础模型的几何理解边界。这一基准填补了现有三维理解评估中缺乏精确几何属性标注的关键空白。
 
-
-
 三维几何理解是视觉智能的核心支柱之一。人类能够毫不费力地从单一二维图像中推断物体的三维结构、对称性和空间关系——这种能力在数学、工程、建筑乃至日常物体操作中至关重要。然而，当前视觉基础模型是否真正具备这种几何推理能力，仍然是一个悬而未决的问题。
 
 现有视觉模型在标准三维理解基准上取得了令人瞩目的进展，但这掩盖了一个深层缺陷：**这些模型缺乏对对象内在几何属性的显式理解**。具体而言，对称性、凸性、面结构等基本几何概念并未被模型以可泛化的方式编码。这一瓶颈在训练分布之外的多面体上尤为突出——即使是最基本的柏拉图立体（如立方体、正四面体），最先进的单目重建算法也难以准确重建。前沿视觉语言助手在简单的Catalan和Johnson固体以及非凸形状上的零样本分类准确率低于20%，暴露出其显式几何推理能力的严重不足。
@@ -61,8 +59,6 @@ GIQ的方法定位在于：它不是提出新的模型架构，而是构建了�
 这一缺口的根源在于现有基准的局限性。主流三维理解数据集多聚焦于日常有机物体或场景，其几何属性混杂且难以精确标注，无法系统性地解耦和诊断模型的几何推理能力。多面体作为几何学中最基础、最精确的结构，其对称群、凸性、面类型和复合关系具有严格的数学定义，天然适合作为几何智能的“智商测试”。
 
 本文的动机由此明确：**构造一个精确标注几何属性的多面体基准，以系统性地诊断视觉基础模型中的几何推理缺口**。通过控制形状复杂度（从简单柏拉图立体到复杂非凸星形和复合体）和图像呈现条件（合成渲染与真实纸质模型在不同环境中的拍摄），GIQ基准旨在回答一个根本问题：当代视觉模型究竟在多大程度上“理解”三维几何，而非仅仅从统计关联中隐式编码表面特征？
-
-
 
 ## 核心方法与创新机理
 
@@ -97,8 +93,6 @@ GIQ 的核心洞察在于：**视觉编码器（如 DINOv2）的嵌入空间中�
 
 不同于 Objaverse-XL 等追求规模扩张的三维数据集，或 BLINK 等多任务视觉基准，GIQ 的独特价值在于其**诊断性而非竞赛性**定位：通过严格控制的几何复杂度梯度，精确定位模型在“理解形状本身”这一基础能力上的断裂点，而非衡量其在分布内物体上的综合表现。这一设计使其成为研究几何智能缺口的有效探针，而非又一个排行榜。
 
-
-
 ![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_Uf8X57bQIr/figures/002_Figure_2.jpg]]
 *Figure 2: Summary of polyhedral groups in GIQ, highlighting group names, counts of distinct 3D shapes (in parentheses), and representative examples. Platonic, Archimedean, and Catalan solids are convex, while Kepler-Poinsot polyhedra and compounds represent special cases of stellations; consequently, the sum of group counts (238) exceeds the 224 unique shapes in the dataset. The categorization presented here is arbitrary: polyhedra possess numerous properties allowing various groupings; we selected this set as a representative example*
 
@@ -132,8 +126,6 @@ GIQ基准的设计遵循一条从**形状定义→数据生成→任务评估**�
 
 整个流水线的输出是一组多维度的性能剖面，揭示了从隐式对称编码（如DINOv2在四重旋转对称检测上达93%准确率）到显式几何推理（如前沿VLM在加泰兰和约翰逊固体上分类准确率低于20%）之间的能力断层，从而指向核心瓶颈：**当前模型缺乏对内在几何属性的深层显式理解**。
 
-
-
 GIQ 基准的评估体系围绕四个核心几何推理任务构建，每个任务均通过标准化的数据处理与评估协议确保可比性。
 
 ### 任务流水线模块
@@ -164,14 +156,11 @@ $$0.5 \cdot \frac{\mathrm{TP}}{P} + 0.5 \cdot \frac{\mathrm{TN}}{N}$$
 
 其中 TP/TN 分别为真阳性/真阴性数量，P/N 分别为正/负样本总数。该指标等价于灵敏度和特异度的算术平均。
 
-
-
 ## 实验与关键发现
 
 ### 4.1 单目三维重建：基础几何形状的普遍失败
 
 我们首先评估了当前最先进的单目三维重建方法在GIQ基准上的零样本表现。选取的三类代表性方法——**Shap-E** (Jun & Nichol, 2023)、**Stable Fast 3D** (Boss et al., 2025) 和 **OpenLRM** (He & Wang, 2023)——均在广泛的三维数据集上经过了大规模预训练。然而，如表1所示，这三种方法在GIQ的核心测试样例上均表现出显著的、系统性的重建失败。
-
 
 ![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_Uf8X57bQIr/figures/004_Table_1.jpg]]
 *Table 1: Monocular 3D reconstruction results. Each method reconstructs a 3D shape from the input image, which we visualize by rendering the output from selected viewpoints. Rows depict pairs of synthetic and wild images of a cube (platonic solid), great dodecahedron (Kepler-Poinsot solid), and small cubicuboctahedron (uniform nonconvex solid)*
@@ -188,7 +177,6 @@ $$\mathcal{L} = -\frac{1}{N} \sum_{i=1}^{N} \sum_{c=1}^{C} \left[ w_c y_{i,c} \l
 
 图3（左）展示了对比结果。**DINOv2** (Oquab et al., 2023) 在四重旋转对称检测上达到了高达93%的平衡准确率，显著优于 **CLIP** (Radford et al., 2021) 和 **SigLIP** (Zhai et al., 2023)。这一发现表明，尽管DINOv2未经过显式的三维几何训练，其图像嵌入中已隐式编码了与三维旋转对称性高度相关的特征，且这种编码具备从合成域到真实域的鲁棒迁移能力。然而，在中心点反射对称和五重旋转对称的检测上，所有模型的性能均有所下降，暗示隐式编码对特定对称类型的敏感度存在差异。
 
-
 ![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_Uf8X57bQIr/figures/006_Figure_3.jpg]]
 *Figure 3: Left: Balanced accuracy ( 0 . 5 $\cdot \frac { \mathrm { T P } } { P }$ + 0 . 5 $\cdot \frac { \mathrm { T N } } { N }$ ) for linear probing of 3D symmetry detection using embeddings from different featurizers. The linear classifier is trained only on synthetic images (Syn), and evaluated on real-world (Wild) images for detecting three symmetry types: central point reflection, 5-fold rotation, and 4-fold rotation. Right: Mental Rotation Test accuracy using non-linear probes. Top models (e.g., SigLIP) match the human average (∼69%, green dotted line), though 68% of human participants still outperformed the best model
 
@@ -204,7 +192,6 @@ $$\mathcal{L} = -\frac{1}{N} \sum_{i=1}^{N} \sum_{c=1}^{C} \left[ w_c y_{i,c} \l
 
 图4(a)展示了各类别的分类准确率。核心发现如下：
 
-
 ![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_Uf8X57bQIr/figures/005_Figure_4.jpg]]
 
 1. **简单形状上的灾难性失败**：即使在Catalan和Johnson固体这类相对简单的凸多面体上，所有视觉语言模型的准确率均低于20%。对于非凸形状（如星形和复合体），性能进一步恶化。
@@ -215,13 +202,8 @@ $$\mathcal{L} = -\frac{1}{N} \sum_{i=1}^{N} \sum_{c=1}^{C} \left[ w_c y_{i,c} \l
 
 图4(b)的定性错误分析揭示了系统性的失败模式：模型频繁错误识别面几何（如将三角形面误判为四边形）、错误判断凸性（将非凸形状分类为凸形状），以及无法解析复合结构（将多个相互穿插的多面体组件识别为单一实体）。这些错误模式直接印证了核心瓶颈——当前基础模型缺乏对对象内在几何属性的深层显式理解，其视觉推理停留在外观匹配层面，而非基于几何原理的结构化分析。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_Uf8X57bQIr/figures/001_Figure_1.jpg]]
 *Figure 1: Samples of synthetic and real 3D solids from our GIQ dataset. A subset of the 224 real polyhedra included in our dataset, illustrating their variety in complexity, class, and colors. (bottom left) Simulated solids from Mitsuba Physically Based Renderer. (bottom right) Real polyhedra constructed from paper, placed in different realistic backgrounds*
-
-
-
 
 ## 定位与知识库关联
 
@@ -272,8 +254,6 @@ GIQ 的发现引出若干待解决的关键问题：
 3. **显式几何表示的设计空间**：存在哪些有效的显式几何表示（如面-边图、对称群标签、组合结构描述）或辅助训练策略，可以显著提升模型对复杂结构（如复合体、非凸形状）的识别和推理能力？
 
 4. **基准的域扩展路径**：未来如何扩展此类基准以涵盖更广泛的视觉域，如真实世界自然场景中的物体，同时保持精确的几何标注？这需要在受控性与生态效度之间寻找新的平衡点。
-
-
 
 ## 原文 PDF
 

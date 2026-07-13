@@ -52,8 +52,6 @@ NOOUGAT 针对上述瓶颈提出了一个统一框架，核心调控变量是**�
 
 主要实验结果验证了统一框架的有效性：在 DanceTrack 上，NOOUGAT 在线模式 AssA 超越 Hybrid-SORT **2.3 点**，离线模式额外提升 **3.8 点**；在 SportsMOT 上，在线 AssA 超越 DiffMOT **9.2 点**，离线再提升 **8.7 点**。消融实验进一步证实，ALT 层在线匹配的 HOTA（64.6）显著优于匈牙利算法（62.1），且替代 SUSHI 启发式拼接后 IDF1 从 72.0 提升至 76.6。这些结果表明，消除手工设计的匹配与拼接启发式、代之以统一的 GNN 关联学习，是连接在线与离线跟踪的关键路径。
 
-
-
 多目标跟踪（MOT）的核心挑战在于跨帧关联检测，以形成一致的轨迹。根据应用场景的时延要求，现有方法被划分为两个几乎互不交叠的范式：**在线跟踪**与**离线跟踪**。在线跟踪器逐帧处理，每帧到来时立即将当前检测与历史轨迹进行匹配，通常依赖匈牙利算法等启发式匹配策略，以满足实时性要求。离线跟踪器则相反，可访问整个视频序列，通过将视频切分为重叠的子片段，在各片段内独立生成局部轨迹，再通过启发式拼接（如线性规划）将这些片段轨迹融合为全局轨迹。这两种范式长期共享一个根本性瓶颈：**核心关联与融合步骤均依赖手工设计的启发式规则**，缺乏数据驱动的灵活性与鲁棒性。
 
 这一瓶颈在三个层面制约着现有方法。第一，启发式匹配（如基于IoU或外观相似度的匈牙利算法）仅使用固定的浅层线索，无法动态适应不同场景和时延上下文中的最相关特征。第二，离线方法中广泛采用的滑动窗口子片段划分（如步幅为窗口大小的一半）导致每一帧被多次处理，产生大量冗余计算。第三，在线与离线方法在架构上相互割裂，无法在同一个框架内灵活调节时延与精度的权衡——部署场景若从实时帧级处理切换到批处理模式，往往需要更换完全不同的跟踪器。
@@ -61,8 +59,6 @@ NOOUGAT 针对上述瓶颈提出了一个统一框架，核心调控变量是**�
 针对上述缺口，**NOOUGAT** 提出了一种统一架构，其核心动机是消除对启发式匹配和拼接的依赖，使同一模型能够覆盖从在线（逐帧）到离线（全序列批处理）的完整时延谱系。该架构的关键设计是一个可调节的处理步长 $T$：当 $T=1$ 时，模型以在线方式逐帧关联；当 $T$ 增大（如 $T=256$）时，模型获得更丰富的时序上下文，性能随之提升，同时以更高的延迟换取精度（见 Figure 2）。这种灵活性使得 NOOUGAT 成为首个通过统一公式满足多样化部署时延需求的多目标跟踪架构。
 
 与现有方法相比，NOOUGAT 在动机层面的核心区分点在于：**用完全可学习的 GNN 关联层替代所有手工启发式**。在线模式下，这替代了匈牙利匹配；离线模式下，这替代了子片段间的启发式拼接。由此，关联过程变为数据驱动的端到端学习，模型能够自动发现不同时序上下文中最重要的关联线索，从而在多个基准上取得显著提升——在线模式下 DanceTrack 的 AssA 超越 **Hybrid-SORT**（Yang et al., AAAI 2024）2.3 点，SportsMOT 上超越 **DiffMOT**（Lv et al., CVPR 2024）9.2 点（Table 1, Table 2）。
-
-
 
 ## 核心方法与创新机理
 
@@ -118,8 +114,6 @@ $$\operatorname{VDC}(T_i, T_j) = \cos^{-1} \left( \frac{ \overrightarrow{T}_{i, 
 
 NOOUGAT的核心创新可归纳为三个changed slots：**序列划分方式**从重叠滑动窗口变为非重叠子片段；**跨片段关联方法**从启发式匹配/拼接变为完全可学习的ALT GNN层；**处理步长T**从固定窗口变为可调节的控制参数。这三个改变的协同作用使得同一个框架能够灵活适应从实时到批处理的各种部署场景，并在多个基准上取得了显著的性能提升。
 
-
-
 NOOUGAT 的核心设计思想是用**统一的、完全可学习的框架**替代在线跟踪中手工设计的匹配启发式与离线跟踪中手工设计的拼接启发式。如图 1 所示，传统在线跟踪器（1a）对每一帧执行启发式匹配，而传统离线跟踪器（1b）将视频划分为重叠子片段，分别生成轨迹后再用启发式方法拼接——这带来了大量冗余计算。NOOUGAT（1c）通过两个关键机制消除了这两类启发式：**非重叠子片段划分**与**自回归长期关联（ALT）层**，从而在同一个架构内灵活支持从逐帧在线到批处理离线的全部延迟需求。
 
 ### 处理流水线
@@ -150,15 +144,11 @@ NOOUGAT 通过调节两个关键参数实现从在线到离线的连续切换：
 
 整体输入为视频帧序列的检测结果（边界框、置信度、ReID 特征），输出为全局一致的身份标签分配。流水线无需任何手工设计的匹配阈值、拼接规则或轨迹生命周期管理——所有关联决策均由 ALT 层以数据驱动的方式学习得到。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l76_https_arxiv_org_abs_2509_02111/figures/002_Figure_1.jpg]]
 *Figure 1: (1a) Online trackers using heuristic matching. (1b) Offline trackers using heuristics to stitch overlapping subclips. (1c) Our NOOUGAT architecture eliminates the need for matching and stitching heuristics, and unifies online and offline in a single flexible framework*
 
 ![[assets/figures/papers/paper_list_l76_https_arxiv_org_abs_2509_02111/figures/004_Figure_3.jpg]]
 *Figure 3: Overview of of NOOUGAT. Our Global GNN module auroregressively connects past and incoming frames. It learns association across various temportal contexts in a data-driven manner, enabling both online and offline operation*
-
-
 
 NOOUGAT 的核心由三个关键模块构成：**非重叠子片段划分**、**GNN 层级局部轨迹生成**，以及**自回归长期关联（ALT）层**。这三个模块协同工作，消除了传统在线跟踪器中的启发式匹配和离线跟踪器中的启发式拼接，实现统一的在线/离线跟踪框架。
 
@@ -219,8 +209,6 @@ $$\operatorname{VDC}(T_i, T_j) = \cos^{-1} \left( \frac{ \overrightarrow{T}_{i, 
 - **在线模式**：使用指数移动平均（EMA）对轨迹的 ReID 特征进行时序聚合，满足实时递推要求。
 - **离线模式**：直接平均轨迹内所有检测的 ReID 特征，利用完整时序信息获得更稳定的外观表征。
 
-
-
 ## 实验与关键发现
 
 NOOUGAT 在 DanceTrack、SportsMOT、MOT17、MOT20、BEE24 和 VETRA 等六个基准上进行了全面评估。所有主要对比方法均使用相同的 YOLOX 检测器和 ResNet50-SBS ReID 模型，并采用固定置信度阈值 0.65（而非序列特定阈值），以确保公平性。
@@ -249,26 +237,12 @@ NOOUGAT 在 DanceTrack、SportsMOT、MOT17、MOT20、BEE24 和 VETRA 等六个�
 
 在线模式下，NOOUGAT 的关联速度约为 12 FPS（不含检测），对于需要 >30 FPS 的实时应用可能仍需优化。离线模式下，关联速度可达 340 FPS（Table 9-10）。处理步长 T 提供了延迟与精度之间的连续可调旋钮：T=1 时延迟最低，T=256 时精度最高（Figure 2）。
 
-![[assets/figures/papers/paper_list_l76_https_arxiv_org_abs_2509_02111/figures/003_Figure_2.jpg]]
-*Figure 2: Impact of the number of incoming frames on DanceTrack val. Performance improves steadily from 1 to 256 frames, demonstrating NOOUGAT’s ability to scale with temporal context and adapt to diverse application requirements*
-
 ### 失败模式与局限性
 
 1. **检测质量依赖：** ALT 层依赖于 GNN 层级生成的局部轨迹质量。若检测器严重缺失（如漏检），初始轨迹断开可能传播至后续关联，导致身份碎片化。
 2. **低帧率场景未量化：** 虽然定性结果表明 NOOUGAT 能恢复长期遮挡（Figure 5），但论文未提供极低帧率（<1 FPS）或严重遮挡场景下的量化恢复率与遮挡时长关系。
 3. **在线速度瓶颈：** 12 FPS 的关联速度限制了在需要实时响应的部署场景中的直接应用，尽管可通过增加 T 提高吞吐，但会增加延迟。
 4. **MOTA 权衡：** 在 MOT17/MOT20 上离线 MOTA 低于部分基线，暗示固定置信度阈值导致召回不足的问题在检测-跟踪分离框架中尤为突出。
-
-![[assets/figures/papers/paper_list_l76_https_arxiv_org_abs_2509_02111/figures/010_Figure_5.jpg]]
-*Figure 5: Oracle VS model performance on SportsMOT val set. SORT-based methods retain inactive tracks for very short timespans (usually 30 frames), and often rely on additional heuristics to recover lost tracks. Our model naturally learns to recover from long-term occlusions*
-
-### 补充图表
-
-
-![[assets/figures/papers/paper_list_l76_https_arxiv_org_abs_2509_02111/figures/007_Table_2.jpg]]
-*Table 2: Results on the SportsMOT test set. Methods in the red block share the same detections*
-
-
 
 ![[assets/figures/papers/paper_list_l76_https_arxiv_org_abs_2509_02111/figures/011_Table_5.jpg]]
 *Table 5: Comparison of our online ALT layer with the Hungarian algorithm on the DanceTrack val set*
@@ -281,8 +255,6 @@ NOOUGAT 在 DanceTrack、SportsMOT、MOT17、MOT20、BEE24 和 VETRA 等六个�
 
 ![[assets/figures/papers/paper_list_l76_https_arxiv_org_abs_2509_02111/figures/013_Table_8.jpg]]
 *Table 8: Ablations of our training parameters on the DanceTrack val set*
-
-
 
 ## 定位与知识库关联
 
@@ -331,8 +303,6 @@ NOOUGAT 的因果控制旋钮有二：**非重叠子片段大小 T**（处理步
 3. **端到端联合训练**：如果使用端到端检测器（如 DETR 系列），统一训练是否可进一步提升性能并缓解检测缺失对关联的级联影响？
 4. **多摄像机扩展**：NOOUGAT 的自回归关联框架能否扩展到多摄像机 3D 跟踪设置（如自动驾驶场景），处理跨摄像机轨迹融合？
 5. **极端数据稀缺**：在 VETRA 等场景，能否通过合成数据增强进一步利用模型的数据驱动学习能力？
-
-
 
 ## 原文 PDF
 

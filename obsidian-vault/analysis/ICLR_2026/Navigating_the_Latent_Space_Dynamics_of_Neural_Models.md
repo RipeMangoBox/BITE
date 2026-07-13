@@ -60,8 +60,6 @@ claims:
 
 **证据强度**：核心理论（定理 1）给出了局部收缩条件下向量场与得分函数的关系，附录提供了完整证明；所有实验现象在多个模型和数据集上一致复现。需要手动验证的是：该框架对非收缩性自编码器（如 VQ-VAE 中的离散潜在空间）的适用边界尚未充分讨论。
 
-
-
 自编码器（Autoencoder, AE）及其变体——从去噪自编码器、变分自编码器到掩码自编码器——在生成建模、表征学习和视觉基础模型中扮演着核心角色。然而，这些模型内部潜在空间的结构特性，尤其是编码器-解码器映射的动力学行为，长期以来未被系统性地揭示。
 
 **核心发现：潜在向量场的自然涌现。** 本文揭示了一个被忽视的普遍现象：对于任意给定的自编码器架构，其编码器 $E$ 与解码器 $D$ 的组合映射 $f(\mathbf{z}) = E \circ D(\mathbf{z})$ 在潜在空间中定义了一个向量场。通过反复迭代 $\mathbf{z}_{t+1} = f(\mathbf{z}_t)$，该向量场自然涌现，无需任何额外训练。这一发现将自编码器的潜在空间从一个静态的表征容器重新定义为一个具有内在动力学结构的动态系统。
@@ -74,8 +72,6 @@ claims:
 - 向量场的轨迹信息能否为分布偏移检测、无数据权重探测等下游任务提供新的信号？
 
 **本文动机。** 基于上述观察，本文旨在建立一个统一的动力学框架来理解自编码器的潜在空间行为，并探索其在现代大规模模型中的普适性与应用价值。核心假设是：训练目标（如均方误差重建损失 $\mathcal{L}_{MSE}(\mathbf{x}) = \sum_{\mathbf{x} \in X} \| \mathbf{x} - F_{\Theta}(\mathbf{x}) \|_2^2$ 及其变体）隐式地促进了映射 $f$ 的收缩性，从而在潜在空间中形成了稳定的吸引子结构。本文通过系统的理论分析与跨模型实验，验证这一框架的解释力与实用潜力。
-
-
 
 ## 核心方法与创新机理
 
@@ -106,8 +102,6 @@ claims:
 
 > **注意**：论文未提供与特定命名 baseline 方法的直接对比表格，上述性能优势基于 Figure 5 中与 KNN 基线的比较。若需与其他 OOD 检测方法（如 Mahalanobis 距离、重构误差基线）的完整对比，请参见附录 Table 1。
 
-
-
 本文提出了一种将任意自编码器（AE）隐式表征为**潜在向量场**的分析框架，无需额外训练或修改模型权重。整个框架围绕一个核心映射展开：
 
 $$f(\mathbf{z}) = E \circ D(\mathbf{z})$$
@@ -128,8 +122,6 @@ $$\frac{\partial \mathbf{z}}{\partial t} = f(\mathbf{z}) - \mathbf{z}$$
 - **吸引子分析**：吸引子被视为网络权重中存储信息的压缩表示。通过记忆系数 $\operatorname{mem}(\mathbf{z}^*) = \min_{\mathbf{x} \in \mathcal{X}_{train}} \cos(D(\mathbf{z}^*), \mathbf{x})$ 和轨迹评分 $\operatorname{score}(\mathbf{z}) = \frac{1}{N} \sum_{\mathbf{z}_i \in \pi(\mathbf{z})} d(\bar{\mathbf{z}}_i, \bar{\mathbf{Z}}_{train}^*)$，框架可量化模型的记忆-泛化权衡及分布偏移检测能力。
 
 该框架的普适性在于：它不依赖特定架构或训练范式，仅利用AE固有的编码-解码循环即可揭示其隐式几何结构。
-
-
 
 ### 核心模块：从自编码器到隐向量场
 
@@ -194,8 +186,6 @@ $$\| \mathbf{x} - F(\mathbf{x}) \|_2^2 \leq \underbrace{\| \mathbf{x} - D(\Pi(E(
 
 其中 $\Pi$ 是将编码投影到最近吸引子的映射，$L_D$ 为解码器的 Lipschitz 常数。第一项为原型误差（吸引子能否表示输入），第二项为覆盖误差（隐编码能否被吸引子覆盖）。这一分解定量解释了瓶颈维度 $k$ 如何通过控制吸引子数量来调节记忆与泛化的权衡。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：吸引子字典的无数据权重信息探测
@@ -248,9 +238,6 @@ Figure 3 从训练动态角度补充了这一图景：
 3. **吸引子收敛的理论保证**：论文假设了局部收缩性，但未提供 Jacobian 谱范数的实证测量来量化不同模型和训练阶段的收缩程度。这导致“何时吸引子可靠”缺乏可操作的判据。
 4. **Figure 7 为样本级展示**：Laion2B 重构可视化仅展示 5 个随机样本，定量统计（如 FID、LPIPS）缺失，需手动补充验证。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_Zunww3FHPU/figures/001_Figure_1.jpg]]
 *Figure 1: Latent dynamics of AEs. Latent vector fields induced by autoencoders with bottleneck k = 2, trained on MNIST, with $\mathbf { z } _ { 0 } \sim \mathcal { U }$ [ - 8 , 8 ] . Models with different initializations are shown. Colors (viridis colormap) represent vector norms ranging from violet (low) to yellow (high). The shape of the latent manifold identifies with the encoder’s support. White regions indicate where the vector field vanishes, revealing attractors aligned with high-density areas of the data distribution
 
 ![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_Zunww3FHPU/figures/009_Figure.jpg]]
@@ -259,25 +246,8 @@ Figure 3 从训练动态角度补充了这一图景：
 ![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_Zunww3FHPU/figures/012_Figure.jpg]]
 *Figure: (a) 256 atoms (b) 1024 atoms (c) 2048 atoms*
 
-![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_Zunww3FHPU/figures/014_Figure_10.jpg]]
-*Figure 10: Histograms from OOD detections*
-
-![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_Zunww3FHPU/figures/016_Figure_12.jpg]]
-*Figure 12: Latent trajectories in masked autoencoders are contractive.: we plot norms of the latent residuals across iterations in a ViTMAE model (a) and norms of embeddings across iterations (b)*
-
-![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_Zunww3FHPU/figures/017_Figure_13.jpg]]
-*Figure 13: Generalization increase ranks of attractors matrix: entropy rank as a function of the bottleneck dimension (left) and during training, as a function of the number of epochs (right). Transitioning from memorization to generalization*
-
-![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_Zunww3FHPU/figures/020_Figure_16.jpg]]
-*Figure 16: SSL models induce well-behaved latent vector fields: For latent space iterations in DINOv2 and SigLIP2, we plot norm of residuals in output space (a);latent residuals norms (b); and norms of embeddings across iterations (c)*
-
-![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_Zunww3FHPU/figures/021_Figure_17.jpg]]
-*Figure 17: LLM models can induce well-behaved latent vector fields: For latent space iterations in Qwen3-0.6B and SmolLM2-1.7b, we plot the latent residuals norms(a); and norms of embeddings across iterations (b)*
-
 ![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_Zunww3FHPU/figures/006_Table.jpg]]
 *Table: (a) FPR and AUROC scores*
-
-
 
 ## 定位与知识库关联
 
@@ -306,8 +276,6 @@ Figure 3 从训练动态角度补充了这一图景：
 2. **吸引子形成动力学**：训练过程中吸引子如何从初始的单一原点吸引子（Figure 3a）分裂并稳定为多个吸引子？噪声吸引子收敛至训练吸引子的速率与哪些因素相关？
 3. **向非自编码器模型的推广**：如何将潜在向量场框架推广至深度分类器或自监督模型？论文建议在输出空间研究残差 $F(\mathbf{x}) - y$，但这一方向尚未被实验验证。
 4. **吸引子作为字典的稀疏编码能力**：论文展示了吸引子作为字典在无数据样本恢复中的有效性（Figure 4），但吸引子字典的理论完备性（如等距约束、相干性）及其与学习理论中泛化界的关联尚未被探索。
-
-
 
 ## 原文 PDF
 

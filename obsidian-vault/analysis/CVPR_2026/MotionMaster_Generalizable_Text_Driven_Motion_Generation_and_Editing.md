@@ -54,8 +54,6 @@ claims:
 
 **方法定位**：MotionMaster属于**基于MLLM微调的统一运动生成-编辑框架**，区别于基于扩散的MDM（Tevet et al., ICLR 2023）、基于离散令牌自回归的T2M-GPT（Zhang et al., CVPR 2023）和MotionGPT（Jiang et al., NeurIPS 2023）、基于掩码建模的MMM（Pinyoanuntapong et al., CVPR 2024）等从零训练或分离式方案。其核心差异在于：以大规模多级标注数据为燃料，将预训练MLLM的语义先验注入运动生成，并通过统一的运动-语言令牌空间和联合训练策略，实现生成与编辑的互惠增强。
 
-
-
 ### 问题背景：文本驱动的三维人体运动生成
 
 文本驱动的三维人体运动生成旨在根据自然语言描述合成逼真的人体动作序列，在动画制作、虚拟现实、人机交互等领域具有广泛应用。该任务的核心挑战在于建立自然语言语义与人体运动动力学之间的精确映射，同时保证生成运动的物理合理性、时序连贯性以及与文本指令的语义一致性。
@@ -73,8 +71,6 @@ claims:
 ### 核心动机
 
 针对上述瓶颈，MotionMaster的核心动机在于：**通过微调预训练多模态大语言模型，将其已编码的动作语义先验注入运动生成过程，从而以统一框架实现文本到运动生成和文本引导运动编辑的零样本泛化。** 这一思路的关键洞察是：预训练MLLM中蕴含的丰富语义知识和长程依赖建模能力，是突破数据规模限制、实现复杂动作组合和精细局部控制的高效途径。为此，需要构建大规模、多级语义标注的运动数据集，设计兼顾局部精度与全局一致性的运动表示，并通过联合训练和语义平衡策略充分释放MLLM的泛化潜力。
-
-
 
 ## 核心方法与创新机理
 
@@ -116,8 +112,6 @@ MotionMaster 的核心创新并非单一技术的突破，而是通过**数据�
 
 上述四个 changed slots 形成闭环：MotionGB 提供的大规模多级语义数据为 MLLM 微调提供了基础；FSQ 局部标记化使运动令牌与语言令牌在共享嵌入空间中的对齐更为紧凑高效；联合训练与语义平衡则充分利用了数据和架构的潜力。最终，MotionMaster 在多动作时序组合语义一致性上相对现有 SOTA 提升 **41.6%**，在身体部位空间组合准确率上提升 **20.8%**，在 OOD 单动作生成上提升 **26.8%**，验证了这一协同设计的有效性。
 
-
-
 MotionMaster 构建了一个端到端的统一框架，将文本驱动的运动生成与运动编辑整合在单个自回归模型中。该框架的核心思路是：**通过微调预训练多模态大语言模型（MLLM），将其固有的动作语义先验和长程推理能力注入运动生成任务**，而非从头训练专用模型。
 
 ### 框架总览
@@ -154,12 +148,8 @@ MotionMaster 构建了一个端到端的统一框架，将文本驱动的运动�
 ![[assets/figures/papers/paper_list_l18_https_openaccess_thecvf_com_content_CVPR2026_html_Jiang_MotionMaster_Gen/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of MotionGB construction pipeline. (a) 400 hours of raw motion data are collected from open-source motion capture databases, video sources, and proprietary recordings. (b) After manual verification and cleaning, each sequence is annotated with multilevel motion descriptions generated via Gemini [56]. (c) The dataset is expanded to 10,000 hours through three augmentation strategies: temporal concatenation (combining sequential actions), body-part concatenation (merging movements from different body parts), and finegrained motion adjustment (applying parametric modifications to create editing pairs)*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l18_https_openaccess_thecvf_com_content_CVPR2026_html_Jiang_MotionMaster_Gen/figures/001_Figure.jpg]]
 *Figure: (a) End-to-end sequential text-to-motion generation*
-
-
 
 ### 3.1 局部运动特征提取与坐标变换
 
@@ -231,12 +221,8 @@ $$p_i \propto \rho_i^{-\alpha}$$
 
 其中 $\alpha$ 控制重平衡强度。这一机制使训练过程更均匀地覆盖语义多样的动作，是模型获得零样本泛化和复杂动作组合能力的关键训练策略。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l18_https_openaccess_thecvf_com_content_CVPR2026_html_Jiang_MotionMaster_Gen/figures/004_Figure_3.jpg]]
 *Figure 3: Overview of MotionMaster. (a) The FSQ-based motion tokenizer encodes joint positions into localized features, quantizes them into discrete tokens, and supervises reconstruction via a loss computed in global coordinates. (b) For text-to-motion generation, the finetuned MLLM autoregressively decodes motion tokens conditioned on a text prompt. (c) For text-guided editing, the original motion is provided as additional context, and the MLLM selectively modifies the relevant tokens while preserving the remainder of the sequence*
-
-
 
 ## 实验与关键发现
 
@@ -285,8 +271,6 @@ MotionMaster 在运动生成与编辑两大任务上均取得了全面领先。*
 ![[assets/figures/papers/paper_list_l18_https_openaccess_thecvf_com_content_CVPR2026_html_Jiang_MotionMaster_Gen/figures/008_Table_3.jpg]]
 *Table 3: Motion tokenizer evaluation on MotionGB-test. Our tokenizer achieves the best joint position accuracy across both local and global metrics. Lower values indicate better performance*
 
-
-
 ## 定位与知识库关联
 
 ### 1. 方法谱系：从扩散模型到预训练MLLM的运动生成演进
@@ -331,8 +315,6 @@ MotionMaster 对知识库的增量贡献可归纳为四个相互依赖的组件�
 - **实时交互场景**：当前框架的自回归生成 + IK 后处理流程是否满足实时交互的延迟要求，论文未讨论。
 - **细粒度物理合理性**：虽然全局重建损失防止了轨迹漂移，但足部滑动、地面穿透等物理约束并未显式建模，IK 求解器的物理合理性边界需要更系统的评估。
 - **多模态扩展**：MLLM 原生支持图像输入，但论文未探索“图像/视频 + 文本”联合条件生成的可能性，这是预训练 MLLM 路线的天然优势所在。
-
-
 
 ## 原文 PDF
 

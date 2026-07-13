@@ -49,8 +49,6 @@ claims:
 
 在人类评估中，PKL与人类对检测错误危险性的判断一致性达**79%**，显著优于NDS的21%。合成噪声实验表明，PKL与NDS总体相关，但PKL对方向误差更敏感，反映了规划任务的实际需求。漏检与虚假正例的敏感性分析进一步验证了PKL的惩罚模式符合安全直觉：靠近自车且位于行驶路径上的物体被赋予更高权重。
 
-
-
 ### 问题背景：感知评估与驾驶安全的脱节
 
 自动驾驶系统的感知模块（如3D目标检测器）是下游规划与控制任务的基础。然而，长期以来，感知模型的评估主要依赖通用检测指标，如**mAP（mean Average Precision）**。这类指标对所有检测错误一视同仁——无论是一个停在路边的虚假正例，还是一个突然出现在自车前方的虚假正例，mAP 都会给予相同的惩罚。这种“一刀切”的评估方式忽略了一个关键事实：**错误的严重性取决于上下文**。
@@ -82,8 +80,6 @@ NDS 在 mAP 基础上整合了多种真阳性错误度量（如平移误差、�
 > “The core idea behind our metric is to isolate the task of object detection and measure the impact the produced detections would induce on the downstream task of driving.”
 
 通过这种方式，PKL 将感知评估与驾驶任务直接对齐，使得评估结果能够反映检测错误对下游安全性的真实影响。在后续的人类评估中（Table 2），PKL 在判断哪种检测错误更危险的问题上与人类判断的一致性达到 **79%**，显著优于 NDS 的 21%，验证了该方法与人类安全直觉的高度吻合。
-
-
 
 ## 核心方法与创新机理
 
@@ -121,8 +117,6 @@ PKL 的自适应加权能力得到了多维度验证：
 ### 方法创新总结
 
 PKL 的核心创新不在于提出更复杂的检测评估公式，而在于**改变了评估的范式**：从“检测器输出与真值有多像”转变为“检测器输出对下游驾驶任务有多大影响”。这一范式转换通过一个可训练的神经规划器实现，该规划器隐式地学习了对驾驶任务至关重要的感知特征，从而自动产生上下文感知的错误加权。这种方法避免了手工设计指标时不可避免的遗漏和偏差，为自动驾驶感知评估提供了一种更具任务对齐性的解决方案。
-
-
 
 PKL（Planning KL-Divergence）度量框架的核心思想是：**将感知评估问题转化为下游任务影响度量问题**。具体而言，它不直接比较检测框与真值框的几何差异，而是测量检测器输出对自动驾驶规划任务产生的实际影响。这一思想源于一个关键观察：并非所有检测错误对驾驶安全具有同等威胁——例如，路边停放的虚假正例与自车正前方的虚假正例，在传统指标（如mAP）中被同等惩罚，但实际危险性截然不同（Figure 1）。
 
@@ -174,8 +168,6 @@ PKL框架的可靠性建立在以下假设之上：
 
 这些假设构成了PKL框架的固有边界，也指明了后续改进方向。
 
-
-
 ### 问题形式化：将感知误差建模为下游任务的影响
 
 PKL 的核心思想是将目标检测任务孤立出来，测量检测输出对下游驾驶任务产生的影响。论文将自动驾驶系统建模为一个在离散时间步上运行的智能体集合。设 $s_t$ 为 $t$ 时刻的传感器观测，$A$ 为目标检测器，将传感器数据映射为检测结果：$A: S \to O$。在理想情况下，检测器能输出真值检测 $o_t^*$，系统状态的联合分布为 $P$；在实际情况下，检测器输出含噪检测 $A(s_{\leq t})$，联合分布退化为 $Q$。PKL 通过 KL 散度度量这两个分布之间的差异：
@@ -220,8 +212,6 @@ $$\mathrm{NDS} = \frac{1}{2} \left[ \mathrm{mAP} + \frac{1}{|TP|} \sum_{mTP \in 
 
 局部 NDS 通过仅对每个场景片段中存在真值框的类别计算 AP 来近似全局 NDS。论文验证了该局部近似是全局 NDS 的合理蒙特卡洛估计（Figure 6），从而使得 PKL 与 NDS 的逐场景对比成为可能。
 
-
-
 ## 实验与关键发现
 
 ### 规划器训练与消融实验
@@ -250,8 +240,6 @@ PKL的核心优势在于根据物体的距离、速度等上下文信息自适�
 
 **公平性注意事项**：PKL度量的公平性依赖于规划器的质量。若规划器存在偏差或未考虑某些安全因素（如对特定类别物体的系统性忽略），评估结果可能不公正。此外，AMT工人可能不完全理解假阳性/假阴性的技术含义，引入评估噪声。PKL目前仅在nuScenes数据集上验证，泛化到其他环境或传感器配置的能力未知，需进一步验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2004_08745/figures/004_Figure_3.jpg]]
 *Figure 3: PKL takes into account context, unlike NDS The carefully manually designed NDS metric [5] (left) is largely invariant to the location and speed of the objects that the object detector misses. PKL on the other hand penalizes missed detections of faster moving vehicles that are closer to the ego car. PKL is consistent with human intuition on which objects are most critical for safe driving as supported by Table 2. Table 1. Planner performance Dropout, loss clipping, and loss function weighting are techniques for fighting class imbalance and overfitting. We show that on nuScenes val, the combination of these techniques along with treating labeled objects as ego vehicles results in the best Top...*
 
@@ -260,8 +248,6 @@ PKL的核心优势在于根据物体的距离、速度等上下文信息自适�
 
 ![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2004_08745/figures/007_Figure_6.jpg]]
 *Figure 6: “Local” NDS NDS is a global metric similar to BLEU [19]. We show that over all of the MEGVII detections on the nuScenes validation set, our local approximation of NDS is a decent monte carlo estimate of the global NDS*
-
-
 
 ## 定位与知识库关联
 
@@ -317,8 +303,6 @@ $$\mathrm{PKL}(A) = \sum_{0 < \Delta \leq T} D_{KL} \big( p_{\theta} \big( x_{t+
 PKL代表了感知评估方法论的一个范式转换：从“静态几何匹配”到“动态任务驱动评估”。在自动驾驶感知评估的知识谱系中，PKL填补了传统检测指标（mAP/NDS）与全闭环仿真评估之间的空白——它比传统指标更具任务相关性，又比全闭环仿真更低成本、更易复现。
 
 该方法与后续的“任务驱动感知评估”研究方向（如基于预测的评估、基于规划的评估）形成知识关联，但PKL的独特贡献在于：首次将KL散度框架系统地应用于检测评估，并通过人类研究验证了其与人类安全判断的一致性。然而，其依赖特定规划器、缺乏闭环验证和跨域泛化证据的特点，使其目前更适合作为辅助评估工具而非替代性标准。
-
-
 
 ## 原文 PDF
 

@@ -50,8 +50,6 @@ ReactDance 提出了一种**分层有限标量量化（Hierarchical Finite Scala
 
 在 DD100 测试集（平均长度 2066 帧）上，ReactDance 取得 **FID_k 5.57**，较此前最佳的专用反应舞蹈模型 Duolando（27.68）降低 22.11；交互质量指标 FID_cd 降至 14.17，平均推理时间仅 1.75 秒，**在保真度、交互质量与效率三个维度均显著超越所有对比方法**（Table 1）。消融实验进一步证实：移除 HFSQ 或渐进掩码策略会导致生成 FID 恶化并引入空间交互错误（Table 2, Figure 6, Figure 7）；扩大训练步长或舍弃 BLC 的相位对齐机制则使交互指标急剧下降（Table 3, Table 6），验证了分层表示与并行采样策略对长期连贯性的关键作用。
 
-
-
 ### 问题定义：反应舞蹈生成
 
 反应舞蹈生成（Reactive Dance Generation, RDG）要求根据领舞者的运动序列与音乐输入，生成与之空间协调、时间同步的反应者舞蹈。与单人舞蹈生成或文本驱动的动作合成不同，RDG的核心挑战在于**双向人际动态的精准建模**——反应者不仅需要保持自身动作的物理合理性与音乐节奏对齐，更必须在每一帧与领舞者维持恰当的空间关系与交互语义。
@@ -69,8 +67,6 @@ ReactDance 提出了一种**分层有限标量量化（Hierarchical Finite Scala
 本工作的动机源于对舞蹈编舞本质的观察：专业编舞者并非逐帧设计动作，而是遵循**从粗到细的层次化组合**与**模块化连贯性**原则——先确定身体姿态与空间占位（粗粒度结构），再填充关节动态与节奏细节（细粒度表现），最终将动作片段无缝拼接为长序列。然而，现有生成范式将上述多层语义压缩至扁平潜空间，或用自回归方式逐段生成，既丧失了层次化表达带来的解耦优势，又因串行推断牺牲了效率与长程连贯性。
 
 ReactDance正是为了填补这一鸿沟而提出：通过构建**分层表示**来显式解耦粗/细运动语义，并设计**并行采样机制**来突破序列长度的限制，从而在单一框架内同时实现高保真空间交互与连贯长序列生成。
-
-
 
 ## 核心方法与创新机理
 
@@ -125,8 +121,6 @@ $$
 
 上述三个 changed slots 并非孤立改进，而是形成了一条清晰的因果链路：**HFSQ 提供多尺度解耦的潜空间**，使扩散模型能够分层建模从姿态到动态的运动语义；**BLC 并行采样**利用 DSW 训练赋予解码器的相位无关过渡能力，在该潜空间上实现高效且连贯的长序列生成；**LDCFG** 则在这一分层潜空间上施加多尺度引导，独立调控粗、细层级的条件响应强度。三者协同，使得 ReactDance 在 DD100 测试集（平均长度 2066 帧）上以 1.75 秒的平均推理时间取得 5.57 的 FID_k，显著超越专用 RDG 模型 **Duolando**（Siyao et al., 2024）的 27.68（Table 1），同时将 MPJPE 从 174.54 降至 132.99，验证了分层表示对高保真与高效率生成的决定性作用。
 
-
-
 ReactDance 是一个两阶段扩散框架，以领舞者运动 $\mathbf{M}_L$ 与音乐特征 $\mathbf{c}$ 为条件，生成高保真、长序列的反应者舞蹈（**Figure 4**）。其核心设计遵循“层次化表示—扩散生成—并行采样”的流水线，通过解耦粗/细运动语义，同时提升空间交互精度与长期时间连贯性。
 
 ![[assets/figures/papers/reactdance_tag_link_fix_20260602/figures/004_Figure_4.jpg]]
@@ -165,8 +159,6 @@ $$\mathcal{P}_i = \sin\left(\frac{\pi (i \bmod T)}{T}\right) \oplus \cos\left(\f
 
 **数据流路径：** 领舞者运动经交叉注意力注入扩散 Transformer → 音乐特征经 FiLM 调制扩散过程 → 随机噪声在 HFSQ 潜空间逐步去噪为 $\mathcal{V}$ → HFSQ 解码器将 $\mathcal{V}$ 重建为反应者运动组件 → 组件组合为最终舞蹈序列。
 
-
-
 ReactDance 采用两阶段框架：首先训练一个带分层有限标量量化（HFSQ）瓶颈的自编码器，将反应者运动压缩为分层潜表示；随后在该潜空间上训练一个条件扩散模型，以领舞者运动和音乐为条件进行去噪生成。以下按流水线顺序阐述关键模块及其核心公式。
 
 ---
@@ -181,8 +173,6 @@ ReactDance 采用两阶段框架：首先训练一个带分层有限标量量化
 
 HFSQ 是本文的核心表示创新，其设计借鉴神经音频编解码器中的残差量化思想，但消除了码本坍缩问题，同时增强了多尺度运动表现力（Figure 2）。具体而言，编码器输出的特征被分为 $G$ 组，每组经历 $R$ 个残差阶段（本文取 $G=2, R=2$）：
 
-![[assets/figures/papers/reactdance_tag_link_fix_20260602/figures/002_Figure_2.jpg]]
-*Figure 2: Motion HFSQ overview. The proposed motion HFSQ learns to progressively encode motion sequence into a hierarchical representation $\mathcal { V } = \left\{ \hat { v } _ { g , r } \right\} _ { g = 1 , r = 1 } ^ { G , R }$ and reconstructs motions via a grouped residual architecture. Building on FSQ, HFSQ eliminates codebook collapse while enhancing multi-scale motion expressiveness through grouped residual quantization, which integrates coarse-to-fine motion semantics
 
 **级联残差量化过程**（Section 3.2）：
 
@@ -268,12 +258,8 @@ $$\hat{\pmb{x}}_0^r = (1 + s_r) \mathcal{G}_{\theta}(\pmb{x}_t^r, t, \pmb{c}, \m
 
 其中 $s_r$ 为第 $r$ 层的引导强度，$\emptyset$ 表示空条件。与标准 CFG 使用单一全局尺度不同，LDCFG 允许对粗粒度层（控制整体姿态）和细粒度层（控制局部动态）施加不同的引导权重。实验表明，设置 $S=[1.2, 1.2]$ 可获得保真度与交互质量的最优平衡（Table 4），且该机制可进一步扩展为对身体部位（下肢、上肢、全局）施加差异化引导，实现细粒度艺术控制（Figure 8）。
 
-### 补充图表
-
 ![[assets/figures/papers/reactdance_tag_link_fix_20260602/figures/009_Figure_6.jpg]]
 *Figure 6: Qualitative comparison for the HFSQ ablation. While our full model maintains correct spatial relationships, the model trained without HFSQ (using an RVQ-VAE) fails to capture precise inter-personal dynamics, resulting in incorrect relative distancing and mismatched hand interactions (highlighted in red circles)*
-
-
 
 ## 实验与关键发现
 
@@ -323,30 +309,11 @@ ReactDance在DD100测试集（平均序列长度2066帧）上进行了全面评�
 2. **层级语义可解释性不足**：HFSQ的各残差层缺乏显式语义标签，难以将特定层直接对应到“姿态”“动力”等编舞概念，降低了可控性的直观程度。
 3. **极端长度与节奏变化**：固定4倍下采样率对节奏变化剧烈的舞蹈风格可能非最优；在远超训练窗口长度的极端序列上，块间连贯性仍需进一步验证。
 
-### 补充图表
-
 ![[assets/figures/papers/reactdance_tag_link_fix_20260602/figures/007_Table_2.jpg]]
 *Table 2: Ablation study of HFSQ tokenizer and the Progressive Masking (PM)*
 
-![[assets/figures/papers/reactdance_tag_link_fix_20260602/figures/011_Table_4.jpg]]
-*Table 4: Solo and Duet metrics with diverse Layer-Decoupled Classifier-Free Guidance (LDCFG) weights. Best and second-best results are in bold and underline, respectively*
-
-![[assets/figures/papers/reactdance_tag_link_fix_20260602/figures/014_Table_5.jpg]]
-*Table 5: Scalability Analysis of Residual Stages R. While higher R marginally improves reconstruction, R = 2 achieves the best generation quality (FID) and the optimal trade-off between performance and cost*
-
 ![[assets/figures/papers/reactdance_tag_link_fix_20260602/figures/015_Table_6.jpg]]
 *Table 6: Full Ablation of Dense Sliding Window Stride (s). Jitter measures boundary discontinuity*
-
-![[assets/figures/papers/reactdance_tag_link_fix_20260602/figures/016_Table_7.jpg]]
-*Table 7: Hand Motion Analysis. ReactDance effectively filters out high-frequency artifacts inherent in the dataset, significantly outperforming Duolando in motion stability (lower Jitter)*
-
-![[assets/figures/papers/reactdance_tag_link_fix_20260602/figures/017_Table_8.jpg]]
-*Table 8: Ablation of Conditioning Inputs. Results indicate that the leader’s motion is crucial for structural interaction, while music is essential for fine-grained interactive realism*
-
-![[assets/figures/papers/reactdance_tag_link_fix_20260602/figures/006_Figure_5.jpg]]
-*Figure 5: Qualitative comparison of reactive dance generation. Given the same leader motion, Duolando produces unnatural head rotations and GestureLSM shows uncoordinated interactions. InterGen’s motion collapses into unrealistic jitter when generalizing beyond its training horizon. In contrast, our model generates a fluid and coherent reactive motion*
-
-
 
 ## 定位与知识库关联
 
@@ -403,8 +370,6 @@ ReactDance 瞄准**反应舞蹈生成（Reactive Dance Generation, RDG）**这�
 3. **层级语义解耦：** 能否为 HFSQ 的各个残差层赋予明确且可解释的运动语义（如“姿态”“动力”“接触”等），以提升可控性和可编辑性？
 4. **自适应时间压缩：** 是否需要自适应的时间压缩策略以应对节奏变化剧烈的舞蹈风格？Table 5 显示残差阶段数 R=2 在重建质量、生成 FID 与训练成本间取得最佳平衡，但时间维度的自适应尚未探索。
 5. **可扩展性自动调节：** 在更大规模、更多样化的数据集上，HFSQ 的分组数目 G 和残差阶段 R 应如何自动调节以实现最优表示？当前 G 和 R 为手工设定。
-
-
 
 ## 原文 PDF
 

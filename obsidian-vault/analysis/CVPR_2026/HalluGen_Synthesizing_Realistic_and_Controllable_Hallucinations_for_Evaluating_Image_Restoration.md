@@ -141,11 +141,6 @@ HalluGen 生成的幻觉数据直接支撑两个下游任务：（1）**无参�
 ![[assets/figures/papers/paper_list_l753_https_arxiv_org_abs_2512_03345/figures/020_Figure_13.jpg]]
 *Figure 13: Network architecture of reference-free hallucination detector. Prediction and measurement images are fed into the model, applied low-pass filter to remove high-frequency noise and then classified using a simple CNN architecture such as ResNet50*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l753_https_arxiv_org_abs_2512_03345/figures/001_Figure_1.jpg]]
-*Figure 1: Circular dependency in hallucination evaluation and our proposed HalluGen solution. Top: Reliable hallucination analysis requires labeled data, but obtaining labels demands expert annotation with high disagreement. Bottom: HalluGen breaks this loop by generating controllable hallucinations with automatic labels, enabling systematic benchmarking, and perceptual studies across domains*
-
 ### 3.1 幻觉的形式化定义
 
 图像复原任务可统一建模为逆问题：观测图像 $y$ 由真值 $x$ 经前向退化算子 $\mathcal{A}$ 并叠加噪声 $n$ 产生：
@@ -299,22 +294,8 @@ SHAFE的局限体现在两个方面（Figure 11）：（1）低通滤波设计�
 ![[assets/figures/papers/paper_list_l753_https_arxiv_org_abs_2512_03345/figures/003_Table_1.jpg]]
 *Table 1: Comparisons of perceptual realism and semantic deviation of HalluGen and other baselines. For HalluGen, FID is low, comparable to DPS, confirming realism, while segmentation IoU within hallucinated regions drops sharply across different feature extractors, verifying semantic deviation*
 
-![[assets/figures/papers/paper_list_l753_https_arxiv_org_abs_2512_03345/figures/004_Table_2.jpg]]
-*Table 2: Hallucination taxonomy compliance of HalluGen using Mean Squared Error within masked region. Intrinsic sustains high measurement loss while extrinsic maintains low measurement loss despite semantic errors in image space. This validation confirms HalluGen faithfully generates both taxonomy types*
-
-![[assets/figures/papers/paper_list_l753_https_arxiv_org_abs_2512_03345/figures/007_Figure_4.jpg]]
-*Figure 4: Controllability of HalluGen. Left: Severity increases with gradient strength γ. Middle: Severity scales linearly with number of patches while FID stays low. Right: Stable realism across patch sizes (16×16 – 64×64). HalluGen provides fine-grained control over severity, spatial extent, and granularity while preserving realism*
-
 ![[assets/figures/papers/paper_list_l753_https_arxiv_org_abs_2512_03345/figures/011_Table_3.jpg]]
 *Table 3: Comprehensive hallucination benchmark across metrics. Comparison of pixel- and feature-based metrics on effect size (discrimination), AUC (detection), Sharpenss Bias Curve (sharpness bias), and severity correlation (spearman rank correlation). The rightmost column shows AUC on raw predictions with manually labeled (binary) hallucinations. Baseline metrics show weak hallucination sensitivity, whereas SHAFE improve detection and interpretability. FPR/FNR are calculated using the optimal threshold from AUC curve*
-
-![[assets/figures/papers/paper_list_l753_https_arxiv_org_abs_2512_03345/figures/012_Table_4.jpg]]
-*Table 4: Reference-free hallucination detection. CNN trained only on HalluGen; thresholds selected on validation*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l753_https_arxiv_org_abs_2512_03345/figures/002_Figure_2.jpg]]
-*Figure 2: Existing metrics fail to penalize hallucinations. Across MVTec AD (left) and BraTS (right), PSNR, SSIM, and LPIPS assign higher scores to hallucinated predictions than to slightly blurred but correct images, reflecting a bias toward perceptual sharpness over correctness*
 
 ## 定位与知识库关联
 

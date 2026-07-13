@@ -51,8 +51,6 @@ claims:
 
 **核心结论**：在三个真实世界长视距任务上，HAMLET 平均成功率达到 76.4%，相比 GR00T N1.5 基线提升 47.2%；在 LIBERO 基准上将先前最佳结果从 95.6% 提升至 97.6%；在 SimplerEnv-Bridge 上基于 CogACT 骨干网络提升 11.4%。消融实验表明，记忆模块是核心增益来源，时间对比学习初始化对性能有持续贡献。该方法在扩散型和自回归型 VLA 上均展现出有效性。
 
-
-
 ### 视觉-语言-动作模型的单帧瓶颈
 
 视觉-语言-动作模型（VLA）通过将预训练视觉-语言模型（VLM）与机器人动作预测相结合，在通用机器人操控任务中取得了显著进展。然而，当前主流 VLA 模型（如 **GR00T N1.5**、**π0**、**OpenVLA** 等）在决策时仅依赖当前时刻的单帧观测和任务指令，其核心范式可概括为：
@@ -92,8 +90,6 @@ HAMLET 的核心洞察是：历史信息的利用不应以牺牲 VLA 的单帧�
 
 这一设计使 HAMLET 在保持单帧输入效率的同时，有效利用了历史上下文，将预训练 VLA 切换为历史感知策略。
 
-
-
 ## 核心方法与创新机理
 
 HAMLET 的核心创新在于将预训练的单帧视觉-语言-动作模型（VLA）切换为历史感知策略，而无需修改原始 VLA 的骨干网络。其关键洞察是：通过引入可学习的 **moment tokens** 和轻量级 **记忆模块**，以极小的计算代价将历史信息压缩为紧凑特征并选择性聚合到动作预测中，从而突破当前 VLA 仅依赖单帧观测的根本瓶颈。
@@ -126,8 +122,6 @@ HAMLET 的决定性优势在于**以极低成本赋予单帧 VLA 历史感知能
 
 **需注意的局限**：尽管 HAMLET 在扩散型 VLA（GR00T N1.5、CogACT）上验证良好，其在自回归式 VLA（如 OpenVLA 或 π0-FAST 的原始架构）上的直接适用性尚需进一步验证；时间对比学习初始化引入了额外训练成本；记忆模块在大规模多任务数据上的可扩展性尚未充分探索。
 
-
-
 ![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_KcJ9U0x6kO/figures/002_Figure_2.jpg]]
 *Figure 2: An overview of HAMLET. Building on a pre-trained VLA, HAMLET adds two key components: moment tokens, appended to the VLM input and initialized with time-contrastive learning to capture task-relevant representations at each timestep, and a lightweight memory module that aggregates these tokens across timesteps for history-aware action prediction*
 
@@ -159,8 +153,6 @@ HAMLET 是一个面向预训练视觉-语言-动作模型（VLA）的微调框�
 区别于直接将多帧图像拼接输入 VLA 的朴素方案，HAMLET 通过 moment tokens 和记忆模块实现了“单帧输入、多帧利用”的效果。多帧基线需要成倍增加 VLM 的推理计算量，且可能引入分布外视觉特征损害泛化能力；而 HAMLET 的记忆模块仅在轻量级 Transformer 中处理紧凑的 token 序列，推理延迟和显存开销极低（历史长度 4 时仅增加 1.02 倍延迟），同时保持了原始 VLA 的泛化特性。
 
 > **注意**：HAMLET 的 moment tokens 长度、记忆模块层数、历史长度等超参数默认设置为 4、2 层 Transformer 和 4，这些取值在实验中表现稳定，但更彻底的架构搜索是否为最优解仍属开放问题。
-
-
 
 HAMLET 在预训练 VLA 的基础上引入两个互补组件：**moment tokens** 和**记忆模块**，二者协同实现从单帧到历史感知策略的切换。
 
@@ -209,8 +201,6 @@ $$[\mathbf{a}_t, \mathbf{a}_{t+1}, \ldots, \mathbf{a}_{t+k-1}] = \mathcal{A}_\ps
 
 移除记忆模块导致最大性能下降（65.4% → 63.4%），证明记忆模块是 HAMLET 的核心组件（Table 5a）。注意力可视化进一步揭示：记忆模块在需要回忆特定历史时刻（如遮挡物体曾出现的位置）时，会显著提高对该时间步的注意力权重（Figure 4b, Figure 9），验证了选择性聚合机制的有效性。
 
-
-
 ## 实验与关键发现
 
 ### 4.1 核心瓶颈验证：历史依赖性任务
@@ -219,7 +209,6 @@ $$[\mathbf{a}_t, \mathbf{a}_{t+1}, \ldots, \mathbf{a}_{t+k-1}] = \mathcal{A}_\ps
 
 HAMLET 的核心因果杠杆在于：通过极低计算代价将预训练的单帧 VLA 转化为历史感知策略，直接解决上述瓶颈。在三个真实世界长视距任务上，HAMLET 的平均成功率达到 **76.4%**，相比 GR00T N1.5 基线（29.2%）提升 **47.2%**（Table 1）。值得注意的是，朴素多帧基线（Multi-frame baseline）仅取得 31.9%，与单帧基线几乎持平，说明简单堆叠历史帧不仅无法有效利用时序信息，反而可能引入干扰。
 
-
 ![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_KcJ9U0x6kO/figures/004_Table_1.jpg]]
 *Table 1: Real-world evaluation results. We report the success rate (%, over 24 trials per task) on three real-world tasks: partial success rates for columns (PnP Once, Cover Cube, Stage Cube), and ‘Success’ for full completion. Bold and underline indicate the best and runner-up results, respectively*
 
@@ -227,12 +216,10 @@ HAMLET 的核心因果杠杆在于：通过极低计算代价将预训练的单�
 
 **RoboCasa Kitchen 与 LIBERO。** Table 2 展示了基于 GR00T N1.5 骨干网络的全面对比。在 RoboCasa Kitchen 上，HAMLET 在三种数据规模（30/100/300 demonstrations）下均取得最优或次优结果，其中 100-demo 设置下达到 **65.4%**，相比基线提升 2.8%。在 LIBERO 基准上，HAMLET 将先前最佳结果从 95.6% 推升至 **97.6%**。这一结果尤其值得关注：LIBERO 任务已接近性能饱和，但历史感知能力仍能带来显著增益，证明即使在看似马尔可夫的任务中，微妙的时序依赖依然存在。
 
-
 ![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_KcJ9U0x6kO/figures/005_Table_2.jpg]]
 *Table 2: Simulation benchmark results on GR00T N1.5. We compare HAMLET with baseline methods on RoboCasa Kitchen and LIBERO. For RoboCasa Kitchen, we report the average success rate (%) across 24 tasks with models trained using 30, 100, or 300 demonstrations per task. For LIBERO, each metric is the average success rate (%) across 10 tasks per suite, with training performed jointly on all suites. All the results are reproduced by us, except for those of GR00T N1 on RoboCasa Kitchen. Bold and underline indicate best and runner-up results, respectively*
 
 **SimplerEnv-Bridge 与骨干网络通用性。** Table 3 展示了 HAMLET 在 CogACT 骨干上的迁移效果。HAMLET 将 CogACT 的平均完全成功率从 52.1% 提升至 **63.5%**（+11.4%），在所有四个 WidowX 任务上均取得最优。这验证了 HAMLET 的设计不依赖于特定 VLA 架构——无论是扩散策略（GR00T N1.5、CogACT）还是自回归模型（OpenVLA、π₀-FAST，见 Table 14），均可通过即插即用的方式获得历史感知能力。
-
 
 ![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_KcJ9U0x6kO/figures/006_Table_3.jpg]]
 *Table 3: Simulation benchmark results on CogACT. We compare HAMLET with baseline methods on the SimplerEnv-Bridge benchmark. Each metric reports the success rate (%) on four WidowX tasks in SimplerEnv, with separate reporting for grasp success and full success. ‘Avg.’ denotes the average full success rate (%) across the four tasks, and all CogACT results are faithfully reproduced by us. Bold and underline indicate best and runner-up results, respectively. default, we use moment tokens of length 4, a 2-layer Transformer as the memory module, and a history length of 4. Full hyperparameters and implementation details are provided in Section A.3*
@@ -240,7 +227,6 @@ HAMLET 的核心因果杠杆在于：通过极低计算代价将预训练的单�
 ### 4.3 消融实验与机制分析
 
 **组件贡献。** Table 5 的消融实验揭示了各组件的因果贡献。移除记忆模块导致最大性能下降（65.4% → 63.4%），证明记忆模块是核心组件。移除时间对比学习（TCL）初始化持续降低性能（65.4% → 64.8%），而将 moment tokens 简单拼接而不经过记忆模块（Moment Concat.）仅取得 62.7%，甚至低于无记忆的基线变体（63.1%），说明无选择性的历史聚合反而有害。
-
 
 ![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_KcJ9U0x6kO/figures/010_Table_5.jpg]]
 *Table 5: Ablation study. Average success rate (%) on RoboCasa (100 demos) when selectively enabling different components of HAMLET. Moment Concat. concatenates all moment tokens without a memory module, whereas the Transformer-based memory yields the best overall performance. (a) Component analysis*
@@ -255,20 +241,12 @@ HAMLET 的核心因果杠杆在于：通过极低计算代价将预训练的单�
 
 HAMLET 的核心设计原则之一是以极小计算代价换取历史感知能力。Table 4 的效率分析表明：在历史长度 4 的设置下，HAMLET 的推理延迟仅为基线的 **1.02 倍**，峰值内存为 **1.07 倍**；而朴素多帧基线在相同历史长度下延迟达 3.58 倍，内存达 3.61 倍。当历史长度扩展至 8 时，HAMLET 仍保持 1.07 倍延迟和 1.17 倍内存，多帧基线则飙升至 7.06 倍和 7.14 倍。这一效率优势源于 moment tokens 的紧凑表示——仅需 4 个 token 即可压缩单帧信息，而非处理完整的多帧视觉序列。
 
-
 ![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_KcJ9U0x6kO/figures/009_Table_4.jpg]]
 *Table 4: Efficiency analysis. Average latency and peak memory usage measured on RoboCasa datasets. Both metrics are computed at each timestep within an episode and then averaged. For fair comparison, memory for original VLA parameters is excluded, except for the memory module in HAMLET. All measurements were on an NVIDIA A100 GPU. ↓ indicates lower values are better*
 
 ### 4.5 跨数据集泛化
 
 Table 6 验证了记忆模块的表示可迁移性。在 LIBERO 上预训练的记忆模块迁移至 RoboCasa 后，仍能取得 **64.5%** 的成功率，接近在 RoboCasa 源域训练的 65.4%。这一结果表明，记忆模块学习到的历史聚合策略具有跨 embodiment 和跨任务场景的泛化能力，而非过拟合于特定数据分布。
-
-
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_KcJ9U0x6kO/figures/011_Table_6.jpg]]
-*Table 6: (b) Moment token length*
-
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_KcJ9U0x6kO/figures/013_Table_6.jpg]]
-*Table 6: Generalization of memory module. The memory module is trained with the dataset left of the arrow. A LIBERO-pretrained module provides gains for manipulation on RoboCasa, identifying that the learned memory representations can generalize across embodiment datasets*
 
 ### 4.6 失败模式与局限性
 
@@ -277,25 +255,7 @@ Table 6 验证了记忆模块的表示可迁移性。在 LIBERO 上预训练的�
 1. **极长视距任务。** Table 13 的 Pick-and-Place Three Times 任务（需连续完成三次抓放循环）中，HAMLET 的成功率（54.2%）虽显著优于基线（25.0%），但绝对性能仍有限，表明当前历史长度（T=4）可能不足以覆盖超长时序依赖。
 2. **TCL 训练成本。** Table 8 显示，HAMLET 需额外的 TCL 预训练阶段，增加了训练时间开销（尽管推理效率几乎不受影响）。
 
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_KcJ9U0x6kO/figures/018_Table_8.jpg]]
-*Table 8: Modification cost across different VLA types. We report three metrics: model parameters, inference time, and training time. All inference was conducted on a single NVIDIA A100 GPU. Training was performed on 4 NVIDIA H200 GPUs, except for GR00T N1.5, whose VLM backbone was frozen during training and was therefore trained on 4 NVIDIA A100 GPUs*
-
 3. **自回归 VLA 的适配。** Table 14 显示 HAMLET 在 OpenVLA 和 π₀-FAST 上同样有效，但作者指出当前设计主要针对扩散型 VLA 优化，自回归模型的 token 序列结构可能需要更精细的适配策略。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_KcJ9U0x6kO/figures/012_Table_7.jpg]]
-*Table 7: (c) Memory architecture*
-
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_KcJ9U0x6kO/figures/017_Table_7.jpg]]
-*Table 7: Dataset statistics for real-world tasks. For each real-world dataset, we present the mean, maximum, and standard deviation of frame counts per episode. These statistics provide a basis for determining an appropriate maximum timestep limit during evaluation*
-
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_KcJ9U0x6kO/figures/019_Table_9.jpg]]
-*Table 9: Full results on RoboCasa Kitchen with different dataset size*
-
-
-
-
 
 ## 定位与知识库关联
 
@@ -344,8 +304,6 @@ HAMLET 的适用边界由以下因素界定：
 3. **统一 VLA 适配方案**：能否设计统一方案同时适用于扩散型和自回归型 VLA，减少对特定架构的适配成本？
 
 4. **更长时间跨度任务**：HAMLET 在更长时间跨度、更复杂场景（如整个家庭环境中的连贯操作）中的表现如何？当前的历史窗口长度为 4 个动作块，更长的依赖关系是否仍能被有效捕获？
-
-
 
 ## 原文 PDF
 

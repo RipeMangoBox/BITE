@@ -52,8 +52,6 @@ claims:
 
 **主要结果**：FastGHA在所有指标上均优于基线方法——在Ava-256数据集上PSNR达22.5（Avat3r为20.7），LPIPS降至0.23（Avat3r为0.33）；在Nersemble数据集上PSNR达24.0（GPAvatar为20.8）。动画速度达62 FPS（4视图输入），较Avat3r的8 FPS提升近8倍。消融实验证实，预训练VAE权重、几何损失、每高斯特征和DINOv3语义编码器均为关键设计要素，移除任一项均导致质量显著下降。
 
-
-
 ### 问题背景：从少样本图像重建可动画的3D头像
 
 高质量、可实时驱动的3D头像重建是计算机视觉与图形学中的核心问题，在虚拟现实、远程通信和数字人等领域有广泛应用。传统方法通常依赖多视图立体匹配或昂贵的光场采集设备，难以在消费级场景中推广。近年来，3D高斯泼溅（3D Gaussian Splatting, 3DGS）的兴起为高效、高保真的场景重建提供了新的技术路线，而前馈式（feed-forward）方法则试图通过神经网络直接从少量输入图像中推理3D表示，避免逐实例优化，从而在泛化性和推理速度上取得突破。
@@ -78,8 +76,6 @@ claims:
 此外，FastGHA改变了几何先验的使用方式：VGGT点图不再作为网络输入，而是转化为训练时的正则化损失（$L_{geo}$），监督渲染深度与VGGT预测深度的一致性。这避免了推理阶段的误差传播，同时保留了几何先验对训练过程的约束作用。
 
 综上，FastGHA的设计动机可以概括为：通过架构解耦和先验重构，在保持高保真重建的同时实现实时动画，解决现有前馈式3D高斯头像方法在效率与精度之间的权衡困境。
-
-
 
 ## 核心方法与创新机理
 
@@ -131,8 +127,6 @@ $$\mathcal{L}_{geo} = ||D_{out} - D_{gt}||_1$$
 
 这三项创新共同构成了 FastGHA 的技术护城河：解耦的表情变形实现实时动画，正则化的几何监督保证重建精度，冻结的预训练特征提供强泛化能力。三者协同使得 FastGHA 在 Ava-256 和 Nersemble 数据集上全面超越 Avat3r 和 GPAvatar 等基线方法（Table 1: PSNR 分别领先 +1.8 dB 和 +3.2 dB）。
 
-
-
 FastGHA 采用两阶段流水线：首先从少样本输入图像重建一个不含表情的**规范高斯头像**，随后通过一个轻量级**变形网络**根据表情码驱动动画。其核心设计在于将表情建模与几何监督解耦——表情驱动不再嵌入交叉注意力模块，而是交由一个独立作用于每个高斯点的逐点 MLP；几何先验也不再作为网络输入，而是转化为训练时的正则化损失。
 
 ### 输入与多视图特征提取
@@ -177,8 +171,6 @@ $$I = \mathcal{R}(\mathcal{G}_f^c + \delta_{\mathbf{z}}, \mu)$$
 ### 训练与推理效率
 
 整个流水线端到端训练，总损失为 RGB L1、SSIM、VGG 感知损失、轮廓损失和几何损失的加权和。训练在 4 块 H800 GPU 上约需 4 天（400k 步）。推理时，重建阶段耗时不到 1 秒；动画阶段，变形 MLP 的轻量设计使得 4 视图输入下可达 **62 FPS**，而 Avat3r 仅 8 FPS（Table 2），实现了真正的实时动画。
-
-
 
 FastGHA 的整体流程可分解为四个关键模块：多视图特征提取、规范高斯重建、轻量级变形MLP与可微渲染。以下逐一阐述其设计逻辑与核心公式。
 
@@ -243,12 +235,6 @@ $$\mathcal{L} = \mathcal{L}_{RGB} + \lambda_{SSIM}\mathcal{L}_{SSIM} + \lambda_{
 
 权重配置为 $\lambda_{SSIM}=1$，$\lambda_{sil}=1$，$\lambda_{perc}=0.5$，$\lambda_{geo}=0.5$。移除 $\mathcal{L}_{geo}$ 将导致 PSNR 下降约 0.14 dB 并出现 3D 不一致伪影（Table 3: 21.132 vs 21.274），验证了该正则化对几何一致性的贡献。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l80_https_openreview_net_forum_id_E7VL9Zl1Nc/figures/009_Figure.jpg]]
-
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -293,26 +279,8 @@ Figure 5和Table 2揭示了输入视图数量对性能的影响规律。由于Fa
 2. **极端姿态与表情**：Figure 8展示了大姿态和大表情下的动画效果，但在完全侧面或大仰角等极端视角下，动画质量仍有提升空间。
 3. **区域限制**：当前方法仅支持头部区域重建与动画，未扩展至完整上半身或手部等复杂动态区域。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l80_https_openreview_net_forum_id_E7VL9Zl1Nc/figures/010_Figure_7.jpg]]
 *Figure 7: Ablation study showing the importance of each of our design decisions*
-
-![[assets/figures/papers/paper_list_l80_https_openreview_net_forum_id_E7VL9Zl1Nc/figures/016_Figure_9.jpg]]
-*Figure 9: More qualitative ablation of our design choices*
-
-![[assets/figures/papers/paper_list_l80_https_openreview_net_forum_id_E7VL9Zl1Nc/figures/006_Figure_4.jpg]]
-*Figure 4: Qualitative reconstruction comparison on Nersemble held-out subjects*
-
-![[assets/figures/papers/paper_list_l80_https_openreview_net_forum_id_E7VL9Zl1Nc/figures/007_Figure_5.jpg]]
-*Figure 5: Analysis on the different number of input views. Two inputs means the first two in the top row, three inputs means the first three, four inputs adds the first image in the bottom row, and so on*
-
-![[assets/figures/papers/paper_list_l80_https_openreview_net_forum_id_E7VL9Zl1Nc/figures/012_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l80_https_openreview_net_forum_id_E7VL9Zl1Nc/figures/017_Figure_10.jpg]]
-*Figure 10: Qualitative comparison with one-shot methods*
-
-
 
 ## 定位与知识库关联
 
@@ -369,8 +337,6 @@ FastGHA 的适用边界由以下因素界定：
 - **极端条件下的泛化**：在极端视角和极端表情下的动画质量提升，可能需要更丰富的训练数据增强策略或更具表达能力的变形网络设计。
 
 - **与优化式方法的融合**：当前方法完全依赖前馈推理，若能结合轻量级的测试时优化（如在推理时对几何损失进行少量迭代），可能进一步提升重建精度而不显著牺牲速度。
-
-
 
 ## 原文 PDF
 

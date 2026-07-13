@@ -61,8 +61,6 @@ claims:
 
 然而，该方法存在若干已知局限：2DGS拟合仍需大量GPU预处理时间；从头训练GS编码器收敛极差，必须依赖RGB教师模型；在医学图像等细粒度任务上性能显著下降。这些局限也指向了开放问题：**能否设计具有原生归纳偏置的GS-native Transformer架构以摆脱对RGB教师的依赖？如何利用2DGS的可变密度特性实现自适应token分配？**
 
-
-
 ### 大规模视觉-语言模型的数据传输瓶颈
 
 视觉-语言模型（VLMs）和对比语言-图像预训练模型（如CLIP）已成为多模态理解的核心范式，但其训练和推理依赖于海量高分辨率RGB图像。在边缘-云协同场景中，密集RGB图像的传输构成了显著能效瓶颈：以224×224×3的原始像素表示为例，单张图像即需约150KB的未压缩数据量，大规模预训练数据集（如DataComp-12.8M）的传输与加载成本极高。据Scope3方法论估算，数字内容传输的碳排放强度已达每GB约0.06 kWh，而当前多模态模型的数据吞吐量仍在持续增长。
@@ -86,8 +84,6 @@ claims:
 ### 本文的切入路径
 
 GaussianVision的核心洞察在于：2DGS的稀疏各向异性高斯分布天然适配图像的语义结构——高斯点密度隐含编码了区域重要性，其位置与协方差参数携带空间布局信息，而颜色参数保留了外观线索。通过设计专用的GS stem（含对数变换、傅里叶特征、归一化及Perceiver交叉注意力重采样器）和两阶段蒸馏-适应训练策略，可将这些压缩参数映射到与冻结RGB ViT兼容的嵌入空间，从而在不重新训练视觉编码器骨干的前提下实现高效视觉-语言对齐。
-
-
 
 ## 核心方法与创新机理
 
@@ -144,8 +140,6 @@ GaussianVision 的贡献在于**首次系统性地验证了压缩高斯表示可
 - **对 RGB 教师的依赖**：两阶段训练策略意味着该方法本质上是 RGB 预训练模型的一种压缩适应方案，而非独立的表示学习范式。
 - **预处理成本**：即使经过 CUDA 加速，400 点配置处理 12.8M 图像仍需约 25.6 GPU 小时，对于更大规模数据集的可扩展性有待验证。
 
-
-
 GaussianVision 的核心思路是用紧凑的二维高斯泼溅（2DGS）参数替代原始 RGB 像素作为视觉编码器的输入，从而在保持视觉-语言对齐能力的同时大幅压缩图像表示。整个 pipeline 由三个逻辑阶段串联而成：**2DGS 拟合与压缩**、**GS Stem 嵌入映射**、以及**两阶段 CLIP 适应训练**，如图 1 所示。
 
 **阶段一：图像到高斯表示的压缩。** 给定一张输入图像，首先通过 2DGS 拟合模块将其表示为一组稀疏的二维各向异性高斯。每个高斯由 8 个参数描述：二维位置 $\pmb{\mu}_i$、协方差矩阵 $\pmb{\Sigma}_i$ 和颜色 $\mathbf{c}_i$。图像重建遵循标准的二维高斯泼溅公式：
@@ -167,13 +161,6 @@ $$\mathrm{Compression} = \frac{224 \times 224 \times 3 \times 18}{N_{\mathrm{GS}
 **阶段三：两阶段 CLIP 适应训练。** 直接从头训练 GS 编码器收敛极差，因此采用从预训练 RGB ViT 迁移知识的策略。第一阶段为 **RGB→GS 蒸馏**：冻结 RGB 教师 ViT，仅训练 GS Stem，以 MSE 损失对齐 GS 学生与 RGB 教师的 L2 归一化 CLS 嵌入，训练 2 个 epoch。第二阶段为 **参数高效 CLIP 适应**：解冻约 9.7% 的 CLIP 参数（GS Stem、前两个 Transformer block、最终归一化与投影层），使用标准 CLIP 对比损失在 DataComp-12.8M 数据集上进行训练。文本编码器保持冻结。
 
 整个框架的输入是经过 2DGS 拟合的高斯参数，输出是可与文本嵌入进行对比对齐的视觉特征。值得注意的是，该 pipeline 并非端到端可微：2DGS 拟合作为预处理步骤独立完成，拟合后的高斯参数被保存并作为后续训练阶段的固定输入——这一设计使得大规模预处理的计算开销（例如 400 点配置需约 25.6 GPU 小时处理 12.8M 图像）与 CLIP 训练解耦。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2391_https_arxiv_org_abs_2509_22615/figures/001_Figure_1.jpg]]
-*Figure 1: (a) Illustration of 2D Gaussian Splatting (2DGS) for image fitting. Each image is represented as a sparse mixture of anisotropic Gaussians parameterized by position, covariance, and color. Summing contributions from all splats reconstructs the original image (with a minor and configurable degradation loss), enabling compact, spatially adaptive representations. (b) 2DGS adaptation of contrastive language-image pre-training (CLIP). (c) Architecture of an autoregressive visual language model (VLM). (d) Architecture of our 2DGSadapted CLIP pipeline: a splat-aware stem embeds a configurable number of Gaussian points using Fourier features, log scaling, normalization layers, and projections. Thes...*
-
-
 
 ### 2D高斯泼溅图像重建公式
 
@@ -221,9 +208,6 @@ $$s_{b,n} = \underbrace{ 0.2126 |R_{b,n}| + 0.7152 |G_{b,n}| + 0.0722 |B_{b,n}| 
 
 当某个高斯的亮度分数 $s_{b,n}$ 低于预设阈值 $\tau_{\mathrm{th}}$ 时，该高斯被剪枝移除。实验表明（Figure 4），从较大的高斯预算（1600-3136点）开始拟合再剪枝，比直接使用小预算获得更高的最终PSNR——大预算模型可支持更高的剪枝率而重建质量损失极小。
 
-![[assets/figures/papers/paper_list_l2391_https_arxiv_org_abs_2509_22615/figures/004_Figure_4.jpg]]
-*Figure 4: Trade-off between pruning ratio and reconstruction degradation for different Gaussian budgets (400–3136 points), evaluated over 100 Mini-ImageNet samples per configuration. Each marker represents a single hyperparameter setting, while the surrounding shaded KDE envelopes summarize the empirical distribution of ∆PSNR for each model size: models with larger initial Gaussian budgets (1600–3136) consistently support higher pruning ratios with minimal loss, while smaller models are more sensitive to sparsification*
-
 ---
 
 ### 压缩比计算公式
@@ -269,18 +253,8 @@ GaussianVision采用**两阶段训练**以高效迁移RGB预训练知识：
 
 这种设计使GS编码器能够继承RGB ViT的语义理解能力，同时仅需微调少量参数即可适应压缩表示的特性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2391_https_arxiv_org_abs_2509_22615/figures/002_Figure_2.jpg]]
-*Figure 2: Speedup results achieved by our CUDA kernels compared to the [41] baseline, following our batch-aware implementation. Speedups are presented for various batch sizes and Gaussian counts for image resolutions of 224x224. For a batch size of 4096 and 400 Gaussian points per image, we observe a 90.3X speedup compared to the baseline*
-
 ![[assets/figures/papers/paper_list_l2391_https_arxiv_org_abs_2509_22615/figures/003_Figure_3.jpg]]
 *Figure 3: Visualization of reconstruction results for random vs. structured initialization (Ours) for 2DGS fitting for a fixed number of iterations (3000): structured initialization accelerates convergence and achieves higher perceptual quality than random initialization. This is consistent across various compression ratios (ie, numbers of Gaussian points per image) especially for more aggressive compression ratios*
-
-![[assets/figures/papers/paper_list_l2391_https_arxiv_org_abs_2509_22615/figures/005_Figure_5.jpg]]
-*Figure 5: Visualization of Gaussian splats and reconstructed images for a 3136-point GS fit (2000 iterations). Left*
-
-
 
 ## 实验与关键发现
 
@@ -361,16 +335,6 @@ GS编码器的训练采用两阶段策略：**Stage 1蒸馏**将GS stem对齐到
 - 附录中提供了RGB 98 token微调结果作为更公平的token效率基线
 - 所有模型使用相同的DataComp-12.8M数据集和Open CLIP标准超参数，ViT-B/16采用宽度512的Small变体以控制计算成本
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2391_https_arxiv_org_abs_2509_22615/figures/020_Table_5.jpg]]
-*Table 5: Zero-shot classification accuracy across datasets. For each dataset, the best score (across all models and token counts) is shown in bold, and the second-best is underlined*
-
-![[assets/figures/papers/paper_list_l2391_https_arxiv_org_abs_2509_22615/figures/021_Table_6.jpg]]
-*Table 6: Relative accuracy table with bold marking the best per row and underline marking the second-best per row*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 方法谱系：从像素到高斯参数的视觉表示迁移
@@ -426,8 +390,6 @@ $$\hat{I}(x,y) = \sum_{i=1}^n \mathbf{c}_i \exp\left\{ -\frac{1}{2} \left( \begi
 4. **端到端边缘-云优化**：当前2DGS拟合和CLIP训练是解耦的，能否通过更先进的量化或熵编码方案进一步减小传输带宽，实现从边缘设备到云端的高效联合学习？
 
 **需要人工验证的方面：** 论文未提供GS表示在**视频数据**或**多帧时序输入**上的适用性分析，也未讨论2DGS拟合过程对图像分辨率变化的敏感性（所有实验基于224×224分辨率）。这些边界条件需要后续工作验证。
-
-
 
 ## 原文 PDF
 

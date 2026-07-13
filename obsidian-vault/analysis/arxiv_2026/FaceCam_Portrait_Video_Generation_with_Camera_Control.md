@@ -54,8 +54,6 @@ claims:
 
 **主要结果**：在 Ava-256 静态多视角基准上，FaceCam 在 PSNR（15.85 vs. 10.32）、SSIM（0.7208 vs. 0.5816）和身份保留 ArcFace（0.8574 vs. 0.7014）上均显著优于最强基线。在自然场景动态相机评估中，FaceCam 在保持高相机正确性（97.00）的同时，身份相似度（83.94 vs. 78.92）和视觉质量（Imaging Quality 73.49 vs. 69.05）全面领先。消融实验证实，合成相机运动和多镜头拼接是模型获得连续角度变化能力的关键，移除其中任一策略都会导致相机正确性或身份保留的显著下降。
 
-
-
 ### 单目人像视频中的相机控制需求
 
 人像视频的相机控制旨在从单一源视频出发，按给定的相机轨迹生成新视角下的目标视频。形式化地，给定源视频 $V^s$ 和目标相机轨迹 $C^t$，任务目标是生成 $V^t = \text{FaceCam}(V^s, C^t)$，使得 $V^t$ 在保持人物身份与动态的同时，精确遵循 $C^t$ 所定义的视角变化。这一能力在直播重摄、影视后期、虚拟主播等场景中具有广泛需求。
@@ -81,8 +79,6 @@ $$u = \frac{f_x x_c}{z_c} + c_x, \quad v = \frac{f_y y_c}{z_c} + c_y$$
 ### 从静态多视角到连续相机轨迹的数据生成挑战
 
 即使拥有了正确的相机表示，训练模型实现平滑的连续相机轨迹控制仍面临数据瓶颈。现有大规模视频数据多为静态相机拍摄，缺乏显式的相机运动标注。FaceCam 为此设计了两种训练数据生成策略——**合成相机运动**与**多镜头拼接**——从静态多视角数据中构造出具有连续轨迹和离散视角切换的训练样本，使模型能够学习从单一源帧到任意目标相机姿态的映射。这一数据策略是连接静态表示与动态生成能力的关键桥梁。
-
-
 
 ## 核心方法与创新机理
 
@@ -127,8 +123,6 @@ FaceCam 的关键洞察在于：**图像空间中的点对应关系足以在未�
 ### 推理管线的解耦设计
 
 推理时，FaceCam 使用一个**与输入视频无关的代理 3D 头部模型**（FaceLift 生成的 3D Gaussian Head），沿目标相机轨迹渲染后检测关键点作为条件信号。消融实验（Table 3）证实，更换不同身份的代理头部对结果影响可忽略（ArcFace 在 84.45–84.74 之间），说明关键点表示成功将相机位姿与头部身份/表情解耦。
-
-
 
 FaceCam 的整体框架围绕一个核心设计展开：**将相机控制问题转化为图像空间的点对应条件注入问题**，从而绕过传统基于外参或3D重建方法中固有的尺度模糊与估计误差。系统由四个关键模块串联构成，覆盖从数据准备到最终视频生成的完整流程。
 
@@ -197,13 +191,6 @@ FaceCam 的训练数据生成包含三种关键增强策略（Figure 4），共�
 
 消融研究表明，代理3D头部的身份和表情选择对最终生成结果影响可忽略（ArcFace 在 84.45–84.74 之间波动，相机正确性保持 97.00），验证了关键点条件信号对代理头部的不敏感性（Table 3, Fig. 8）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2603_05506/figures/001_Figure_1.jpg]]
-*Figure 1: FaceCam generates portrait videos with precise camera control from a single input video and a target camera trajectory. We introduce scale-aware camera conditioning that represents the target camera via rendered facial landmarks, enabling accurate camera pose control. Our approach preserves subject identity and motion while maintaining high visual quality. Project page: https:// weijielyu.github.io/FaceCam*
-
-
-
 FaceCam 的核心设计围绕一个关键洞察展开：**图像空间中的点对应关系足以在未标定尺度下表征相机运动**。基于此，方法构建了三个紧密耦合的模块——尺度感知的相机表示、相机条件注入机制、以及训练数据生成策略——共同解决了单目人像视频中尺度模糊导致的几何失真问题。
 
 ### 尺度感知的相机表示
@@ -243,22 +230,9 @@ $$z_{t - \Delta t} = z_t - \Delta t \, v_\theta(z_t, t, \mathbf{c})$$
 
 此外，还对源视频施加尺度和颜色增强以提升数据多样性（Fig. 4）。消融实验表明，移除合成相机运动会降低轨迹平滑性；移除多镜头拼接则使模型完全无法改变相机角度（Table 3, Fig. 9）。
 
-![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2603_05506/figures/005_Figure_4.jpg]]
-*Figure 4: Training data generation examples. The source video is applied with scale and color augmentation to increase data diversity, while the target video is augmented with all three types to train the model’s camera control capability*
-
 ### 推理管线
 
 推理时，FaceCam 使用一个与输入视频无关的**代理 3D 高斯头部模型**（由 FaceLift 生成），沿目标相机轨迹渲染代理视频，再通过 MediaPipe 提取每帧关键点作为相机条件信号。这一设计解耦了相机控制与源视频身份，消融实验证实代理头部选择对结果影响可忽略（ArcFace 84.45–84.74，相机正确性均为 97.00，Table 3）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2603_05506/figures/002_Figure.jpg]]
-*Figure: (A) Scale-ambiguous camera representation. Existing camera control methods [1, 3, 21, 47] encode camera using extrinsic parameters. In monocular capture, metric depth is unobservable, the scene is determined only up to a global similarity with unknown scale and translation. Hence, the same image admits infinitely many 3D configurations, making re-rendering from a target pose underdetermined and leading to drift and poor controllability*
-
-![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2603_05506/figures/003_Figure.jpg]]
-*Figure: (B) Scale-aware camera representation. Instead of extrinsics, we encode the camera via image-space point correspondences. With at least seven 2D correspondences, the fundamental matrix between two uncalibrated views can be estimated, and with known intrinsics the relative pose is recovered up to a global scale. Portrait videos naturally provide such correspondences through facial landmarks, so we use rasterized 2D landmark maps—renderings of 3D facial landmarks from the anchor frame—as the camera representation. This face-tailored, scale-aware encoding is easy to visualize and enables deterministic, high-precision control of the apparent camera pose*
-
-
 
 ## 实验与关键发现
 
@@ -304,9 +278,6 @@ Table 3 和 Figure 9 系统消融了训练数据生成策略和代理 3D 头部�
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2603_05506/figures/012_Table_3.jpg]]
 *Table 3: Ablation study. We conduct ablation studies to quantify the impact of different training data components on the final performance of our model. We also vary the choice of proxy head and show that this selection has negligible effect on the generated results*
 
-![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2603_05506/figures/014_Figure_9.jpg]]
-*Figure 9: Ablation study on training data generation. Without Synthetic Camera Motion, the model often produces inaccurate camera trajectories with discontinuous or abrupt changes. Without Multi-shot Stitching, the model cannot learn to change camera angles along a trajectory. With both strategies applied but without in-the-wild videos (w/o In-the-wild Videos), the model generates correct camera motion and angle changes, but the lighting remains tied to the training distribution and fails to generalize to real-world illumination, leading to inconsistencies with the source video. Our full model provides accurate camera control and high image quality with lighting and appearance consistent with the sou...*
-
 #### 合成相机运动（Synthetic Camera Motion）
 
 移除合成相机运动后，相机正确性从 97.00 降至 **96.00**，ArcFace 从 83.94 降至 **81.19**。更关键的是，生成轨迹出现不连续或突变（Figure 9），说明合成相机运动对轨迹平滑性至关重要。该策略通过在静态多视角数据中插值生成连续相机轨迹，弥补了真实数据中相机运动稀疏的不足。
@@ -323,9 +294,6 @@ Table 3 和 Figure 9 系统消融了训练数据生成策略和代理 3D 头部�
 
 更换不同的代理 3D 头部对结果影响可忽略：ArcFace 在 84.45–84.74 之间波动，相机正确性均为 97.00（Table 3）。Figure 8 进一步验证，代理头部的身份和表情不影响最终生成结果。这证明 FaceCam 的关键点条件信号仅编码相机姿态和尺度信息，与代理头部的个体特征解耦。
 
-![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2603_05506/figures/011_Figure_8.jpg]]
-*Figure 8: Different choices of proxy 3D head. We select two additional proxy 3D heads with different identities and corresponding facial landmark detections, and conduct an ablation study showing that the proxy’s identity and expression do not affect the final generation results*
-
 ### 失败模式与局限性
 
 1. **后视图盲区**：FaceCam 无法处理相机旋转到头部后方的视角，因为人脸关键点在该角度下不可见。这是基于关键点对应的表示方法的固有限制。
@@ -339,8 +307,6 @@ Table 3 和 Figure 9 系统消融了训练数据生成策略和代理 3D 头部�
 - **Table 2**：在自然场景中，FaceCam 以 83.94 的 ArcFace 和 73.49 的 Imaging Quality 显著优于基线，同时保持 97.00 的相机正确性，证明了方法的实用鲁棒性。
 - **Table 3 + Figure 9**：多镜头拼接是相机角度控制的关键使能因素（移除后正确性下降 11 点），合成相机运动保障轨迹平滑性，自然场景数据提供域泛化能力——三者缺一不可。
 - **Figure 5/6**：定性对比直观展示了基线方法的典型失败模式：ReCamMaster 的姿态漂移和 TrajectoryCrafter 的几何失真，与 FaceCam 的稳定输出形成鲜明对比。
-
-
 
 ## 定位与知识库关联
 
@@ -390,8 +356,6 @@ FaceCam 的设计决定了其适用边界：
 3. **实时推理的可行性**：模型蒸馏或轻量化骨干能否在保持相机控制精度的同时实现实时推理？这需要在效率与可控性之间找到平衡点。
 
 4. **相机表示的理论完备性**：关键点对应关系在遮挡、大角度旋转等极端条件下的信息完备性如何？是否存在需要额外条件信号（如可见性掩码）的场景？
-
-
 
 ## 原文 PDF
 

@@ -54,8 +54,6 @@ claims:
 
 VLIC 也存在若干局限：VLM 在候选重建高度相似时可能产生幻觉（丧失自一致性）；基于编辑距离的文本可读性奖励会导致模型退化为审查所有可读文本；方法依赖强大的闭源 VLM，其可用性和推理成本可能限制广泛复现。尽管如此，VLIC 为利用 VLM 的感知能力指导压缩模型训练开辟了一条可行路径。
 
-
-
 图像压缩是数字视觉通信的基础技术，其核心挑战在于以尽可能低的比特率重建出符合人类感知的高质量图像。传统压缩方法（如JPEG、BPG）依赖像素级失真度量（均方误差MSE、峰值信噪比PSNR）指导编解码器设计，但这些度量与人类视觉感知的对齐程度有限——两张PSNR相近的图像，在人类眼中可能呈现截然不同的感知质量。
 
 近年来，基于深度学习的感知度量（如LPIPS、DISTS）在一定程度上弥补了这一鸿沟，它们通过预训练网络的特征空间距离来近似人类判断。然而，这些度量本质上仍是固定函数的代理，无法灵活捕捉人类感知的全部维度，例如对文本可读性、人脸细节、纹理自然度等特定视觉属性的敏感度。
@@ -66,8 +64,6 @@ VLIC 也存在若干局限：VLM 在候选重建高度相似时可能产生幻�
 2. **训练稳定性瓶颈**：即使将VLM判断转化为奖励信号，单独使用该信号进行偏好优化可能导致模型在像素对齐度量（如PSNR）上退化，或在高度相似的候选重建上因VLM幻觉而产生错误引导。
 
 本文提出 **VLIC（Vision-Language Models for Image Compression）**，一个基于扩散自编码器的图像压缩框架，通过扩散直接偏好优化（Diffusion DPO）将VLM的二元偏好判断与LPIPS感知度量集成，对压缩模型进行后训练，从而在保持像素对齐能力的同时显著提升人类感知对齐质量。该方法的动机源于一个核心洞察：VLM能够零样本复现人类对视觉相似性的二元判断，将其作为奖励信号与现有感知度量协同使用，可以引导扩散压缩模型生成更符合人类偏好的重建结果。
-
-
 
 ## 核心方法与创新机理
 
@@ -109,12 +105,7 @@ VLIC 采用 **在线 Diffusion DPO 训练**，在训练过程中定期刷新偏�
 
 **创新本质总结**：VLIC 并未重新设计压缩架构，而是在扩散自编码器的后训练阶段引入 VLM 作为“感知评判器”，通过 Diffusion DPO 将不可微的二元偏好信号转化为可优化的梯度。这一思路将压缩模型的对齐问题从“设计更好的感知损失函数”转变为“利用强大的多模态模型直接提供人类对齐的偏好信号”，为图像压缩的感知质量提升开辟了新路径。
 
-
-
 VLIC 的整体 pipeline 围绕“压缩-采样-评判-优化”闭环构建，将视觉语言模型（VLM）的二元偏好判断转化为扩散自编码器的训练信号。系统由五个核心模块串联而成，形成端到端的可训练压缩框架，如 **Figure 3** 所示。
-
-![[assets/figures/papers/paper_list_l808_https_arxiv_org_abs_2512_15701/figures/003_Figure_3.jpg]]
-*Figure 3: Method. An original image is encoded to a one-dimensional discrete latent code via an encoder. The discrete code is entropy coded by an auto-regressive language model. The diffusion decoder samples two reconstructions conditioned on the latent code, which are ranked via a VLM. The resulting preference is used to train the full diffusion autoencoder via Diffusion DPO [47]*
 
 **编码与量化**：原始图像首先通过一个 Transformer 编码器被压缩为一维离散潜在码。与基线方法 FlowMo 不同，VLIC 将查找无关量化（LFQ）替换为有限标量量化（FSQ），以改善码本利用和训练稳定性。这一阶段产生紧凑的离散表示，为后续的熵编码和扩散解码提供基础。
 
@@ -135,8 +126,6 @@ $$L(\theta) = L_{\mathrm{DDPO}}(\theta) + \lambda_{\mathrm{Flow}} L_{\mathrm{Flo
 **推理策略**：模型在 256×256 分辨率的 ImageNet 上训练，但通过零样本平铺推理（tiled inference with MultiDiffusion）支持任意分辨率输入。平铺时需设置合适的重叠边距（论文使用 8 像素），以在扩散过程中传递块间信息，避免边界伪影。
 
 整个框架的核心创新在于用 VLM 的零样本二元判断替代传统的手工感知损失，并通过 Diffusion DPO 将其直接注入压缩模型的后训练过程，而非蒸馏为独立的感知网络。这种设计使得压缩模型能够捕捉到像素级度量难以表达的人类视觉偏好维度（如人脸、文本、纹理的保真度），同时保持了端到端训练的一致性和可扩展性。
-
-
 
 ### 系统流水线
 
@@ -181,13 +170,6 @@ $$r_A = \sum_{i=1}^n r_A^i, \quad r_B = \sum_{i=1}^n r_B^i$$
 
 其中 $r_A^i$、$r_B^i$ 为第 $i$ 次随机种子下 VLM 对图像 A、B 的二元评分。Figure 5 表明，随着集成种子数增加，VLM 在 BAPPS 基准上与人类判断的一致性单调提升。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l808_https_arxiv_org_abs_2512_15701/figures/012_Figure_7.jpg]]
-*Figure 7: Tiled inference for arbitrary resolutions. From top to bottom: Original image, tiling strategy, reconstructed image. The margin size (we use 8 pixels in this work) must be large enough to communicate information between patches during diffusion to avoid unsightly border artifacts, but not so large as to waste BPP*
-
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -206,9 +188,6 @@ VLIC 的训练分为预训练与后训练两个阶段。预训练阶段在 Image
 
 VLIC 在多个基准上达到有竞争力或最先进的性能，尤其在 MS-COCO 上表现突出——该数据集包含大量文本、人脸等人类敏感特征（Figure 4）。Table 1 直接量化了 VLM 奖励的增益：在 MS-COCO 上，使用 VLM+LPIPS 联合后训练的 VLIC 相比仅使用 LPIPS 后训练，Human Elo 在 0.07 bpp 下提升 +20（838→858），在 0.21 bpp 下提升 +9（1103→1112）。值得注意的是，LPIPS 指标在两个码率点上几乎未变（0.274 vs. 0.274；0.168 vs. 0.169），表明 VLM 奖励带来的感知质量提升无法被 LPIPS 自身捕获，这恰恰印证了 VLM 作为补充评判器的价值。
 
-![[assets/figures/papers/paper_list_l808_https_arxiv_org_abs_2512_15701/figures/005_Table_1.jpg]]
-*Table 1: Importance of VLM. At multiple BPP (prior to entropy coding), post-training with the VLM + LPIPS objective provides gains over post-training the compression model with LPIPS alone*
-
 ![[assets/figures/papers/paper_list_l808_https_arxiv_org_abs_2512_15701/figures/004_Figure_4.jpg]]
 *Figure 4: Quantitative Evaluation on Image Compression Datasets. Overall, VLIC achieves competitive or state-of-the-art performance. VLIC performs particularly well on perceptual metrics and particularly well on MS-COCO, which contains a high percentage of images with human-relevant characteristics such as text and faces*
 
@@ -223,9 +202,6 @@ Table 2 提供了 VLM 与人类判断对齐的基准证据。Gemini 2.5-Flash �
 
 ![[assets/figures/papers/paper_list_l808_https_arxiv_org_abs_2512_15701/figures/006_Table_2.jpg]]
 *Table 2: Human 2AFC benchmarks. Gemini 2.5-Flash can replicate human judgments on 2AFC datasets zero-shot. †Number taken from paper*
-
-![[assets/figures/papers/paper_list_l808_https_arxiv_org_abs_2512_15701/figures/008_Figure_5.jpg]]
-*Figure 5: Scaling self-ensembling. The VLM becomes more predictive of human judgment on BAPPS [23] as test-time compute (number of VLM seeds) is scaled*
 
 ### 奖励设计消融
 
@@ -254,16 +230,6 @@ Table 3 的消融实验揭示了奖励设计中各组件的因果贡献：
 ### 开放问题
 
 基于上述分析，若干方向值得进一步探索：VLM 的感知评判能力在医学影像、遥感等非自然场景图像上是否同样可靠；能否将 VLM 的细粒度视觉理解（如对象识别、文本可读性）定制为特定任务的压缩奖励并安全地避免退化；如何在保持人类对齐的前提下降低 VLM 集成的计算开销；该方法能否借助时序 VLM 判断扩展到视频压缩；以及 VLM 后训练思路能否与更先进的扩散自编码器架构结合以持续提升压缩感知质量。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l808_https_arxiv_org_abs_2512_15701/figures/007_Figure_6.jpg]]
-*Figure 6: Failure modes. VLMs can hallucinate an incorrect ranking when the images are highly similar, such as in this case when the VLM fails to be self-consistent when the order of reconstructed images is reversed*
-
-![[assets/figures/papers/paper_list_l808_https_arxiv_org_abs_2512_15701/figures/013_Figure_8.jpg]]
-*Figure 8: Censoring readable text. A failure case of an edit-distance based reward on readable text determined by the VLM causes the model to degenerate to censoring all readable text in the images*
-
-
 
 ## 定位与知识库关联
 
@@ -308,8 +274,6 @@ VLIC 采用的 Diffusion DPO 源自大语言模型对齐领域的 DPO 范式，�
 ---
 
 **需要手动验证的内容**：部分基线方法（PerCo、PO-ELIC、HFD）未公开代码或完整重建结果，论文中的定量比较可能存在评估偏差；HiFiC 等方法的作者/年份/会议元数据在提供的分析中缺失，建议查阅原论文补充完整引用信息。
-
-
 
 ## 原文 PDF
 

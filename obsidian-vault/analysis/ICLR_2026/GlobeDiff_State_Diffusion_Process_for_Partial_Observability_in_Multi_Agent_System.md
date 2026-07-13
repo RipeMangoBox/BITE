@@ -54,8 +54,6 @@ GlobeDiff 将状态推断重新定义为**条件生成任务**。其核心思路
 
 **方法定位**：GlobeDiff 属于 CTDE（集中训练、分散执行）范式下的生成式状态推断方法，通过条件扩散模型桥接局部观测与全局状态之间的信息鸿沟，为下游策略网络提供高保真的全局上下文，而不依赖复杂的显式通信协议。
 
-
-
 ### 多智能体部分可观测性的核心困境
 
 多智能体强化学习（MARL）在现实场景中面临一个根本性挑战：**部分可观测性**。每个智能体只能通过自身有限的传感器获取局部观测，而无法直接访问环境的完整全局状态。这种信息缺失在合作型多智能体任务中尤为致命——智能体需要在无法感知队友位置、敌方动向和全局态势的条件下做出协调决策。
@@ -81,8 +79,6 @@ GlobeDiff 将状态推断重新定义为**条件生成任务**。其核心思路
 - **去中心化执行**：仅依赖局部信息完成推断，不依赖训练时的全局状态访问。
 
 这一重新定义直接指向**条件扩散模型**——扩散过程天然具备建模复杂多模态分布的能力，其逐步去噪机制能够隐式捕获一对多映射的精细结构。GlobeDiff 正是基于这一动机，将扩散模型引入多智能体状态推断，通过潜在变量 $z$ 作为模态选择器，结合变分推断对齐先验与后验分布，为去中心化策略执行提供高保真的全局状态推断。
-
-
 
 ## 核心方法与创新机理
 
@@ -123,8 +119,6 @@ $$\mathbb{E} \left[ \| \hat{s} - s \|^2 \right] \leq 2 W_2^2 (p_{\theta, \phi}(s
 ### 与等容量基线的决定性对比
 
 一个关键的公平性验证来自 Table 1：在 SMAC-v2 (PO) 的 zerg 5v5、protoss 5v5、terran 5v5 等九个任务上，GlobeDiff 的胜率均显著高于参数量匹配的 Vanilla MAPPO (Large)（约 13.5–14M 参数）。这排除了“性能提升仅来自更大模型容量”的替代解释，证明**显式生成式建模本身**——而非参数预算——是性能增益的根本来源。
-
-
 
 ![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_96g2BRsYZX/figures/001_Figure_1.jpg]]
 *Figure 1: The overall framework of GlobeDiff. During the execution phase, we first construct auxiliary local observations x and then infer the global state sˆ using GlobeDiff. Agents make decisions based on the inferred global state sˆ*
@@ -177,8 +171,6 @@ $$s^{k-1} = \frac{1}{\sqrt{\alpha^k}} \left( s^k - \frac{\beta^k}{\sqrt{1 - \ove
 
 等参数实验（Table 1）提供了决定性证据：与参数量匹配的 Vanilla MAPPO (Large)（约 13.5–14M）相比，GlobeDiff 在所有 9 个测试任务上均取得显著更高的胜率，证明单纯增加模型容量无法替代显式生成模块。可视化结果（Figure 5）进一步显示，GlobeDiff 推断的全局状态与真实状态的 Voronoi 多边形结构高度相似，且随训练推进持续改善。
 
-
-
 GlobeDiff 将部分可观测条件下的全局状态推断重新定义为条件生成问题，其核心架构由四个功能模块构成，通过潜在变量 $z$ 和扩散过程显式建模从局部观测到全局状态的一对多映射。
 
 ### 辅助观测构建
@@ -225,8 +217,6 @@ $$\mathbb{E} \left[ \| \hat{s} - s \|^2 \right] \leq 2 W_2^2 (p_{\theta, \phi}(s
 $$\mathbb{E} \left[ \| \hat{s} - \mu_j(x) \|^2 \right] \leq C_1 K \delta^2 + C_2 \varepsilon_{KL} + 2 \max_i \text{Tr}(\Sigma_i(x)) + \mathcal{O} \left( e^{-D^2 / (8 \sigma_{max}^2)} \right)$$
 
 该界将误差分解为扩散步数 $K$、KL 逼近误差 $\varepsilon_{KL}$、模态内协方差迹以及模态间分离度 $D$ 的函数，为扩散步数和先验网络训练质量提供了理论指导。
-
-
 
 ## 实验与关键发现
 
@@ -297,18 +287,6 @@ Figure 5 展示了 GlobeDiff、VAE 和 MLP 推断的全局状态与真实状态�
 
 4. **环境泛化性未验证**：所有实验均在修改后的 SMAC 环境（移除敌方类型和生命值信息）上进行，对真实世界部分可观测任务（如自动驾驶、机器人集群）的泛化能力缺乏实证。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_96g2BRsYZX/figures/027_Table_2.jpg]]
-*Table 2: Hyper-parameters for MAPPO*
-
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_96g2BRsYZX/figures/028_Table_3.jpg]]
-*Table 3: Hyper-parameters for prior network $p _ { \phi }$ and posterior network $q _ { \psi }$
-
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_96g2BRsYZX/figures/029_Table_4.jpg]]
-*Table 4: Hyper-parameters for Generative methods*
-
-
 
 ## 定位与知识库关联
 
@@ -371,8 +349,6 @@ $$\mathbb{E}[\|\hat{s} - s\|^2] \leq 2 W_2^2(p_{\theta,\phi}(s|x), p(s|x)) + 4 \
 4. **潜在变量的语义可解释性**：Figure 11对潜在变量 $z$ 进行了初步的定性分析，但其语义含义仍不清晰。能否通过解耦表示学习或监督信号注入，使 $z$ 的不同维度对应可解释的全局状态模态（如“进攻阵型”vs“防守阵型”）？
 
 5. **与通信方法的融合**：GlobeDiff目前仅将通信作为辅助输入的拼接，未充分利用通信的结构化信息。能否将扩散模型的去噪过程与图神经网络通信机制结合，在推断全局状态的同时优化通信效率？
-
-
 
 ## 原文 PDF
 

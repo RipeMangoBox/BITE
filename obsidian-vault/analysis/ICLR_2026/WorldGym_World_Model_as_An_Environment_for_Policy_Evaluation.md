@@ -67,8 +67,6 @@ WorldGym在多项关键指标上验证了其作为评估环境的有效性：
 - **OOD泛化测试**：通过编辑初始图像或修改语言指令，WorldGym可便捷地测试策略在分布外任务和环境上的表现，并成功揭示了策略对物体形状依赖、2D/3D混淆等弱点（Figure 8-13）。
 - **长期稳定性**：在40步rollout中，生成视频的平均LPIPS始终低于0.2，表明视觉误差不会爆炸式累积（Figure 17）。
 
-
-
 ### 机器人策略评估的现实困境
 
 机器人学习面临一个核心瓶颈：**如何高效、可靠地评估策略性能**。真实世界的物理实验是最直接的评价方式，但其成本高昂、难以复现，且无法规模化——每一次策略迭代都需要重新部署机器人、重置环境、执行数百次试验，严重制约了机器人学习的发展速度。
@@ -92,8 +90,6 @@ WorldGym在多项关键指标上验证了其作为评估环境的有效性：
 - **高效并行**：通过将扩散生成时域与策略的动作块大小对齐，实现可变长度的并行帧生成，显著提升长序列rollout的推理效率。
 
 这一框架旨在以极低成本获得与真实世界高度相关的策略性能估计，同时保持策略之间的相对排名，使研究者能够在无需物理机器人的情况下，快速迭代和比较不同策略。
-
-
 
 ## 核心方法与创新机理
 
@@ -121,8 +117,6 @@ WorldGym 的核心创新在于将策略评估从物理世界迁移至**生成式
 
 传统评估依赖人工观察或手工启发式规则判定任务成功。WorldGym 将世界模型生成的 rollout 视频输入视觉语言模型（GPT-4o），由 VLM 根据语言指令自动判断成功/失败，并支持部分积分（partial credit）。在 RT-1 真实视频上的验证显示，该奖励模型达到**高真阳率（0.81）和极低假阳率（0.03）**（Table 3），保障了评估的可靠性。所有策略使用相同的 VLM 提示和奖励机制，避免了因评估标准差异造成的不公。
 
-
-
 ![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_hidBHy1CAw/figures/001_Figure_1.jpg]]
 
 WorldGym 将机器人策略评估重新表述为一个**基于生成式世界模型的闭环仿真问题**。其核心 pipeline 由三个相互耦合的模块构成：世界模型（World Model）、策略 Rollout 循环与 VLM 奖励评估，三者协同工作，仅需一张初始观测图像和一条语言指令即可完成对任意策略的性能估计。
@@ -146,8 +140,6 @@ $$\hat{\rho}(\pi) = \mathbb{E}\left[\hat{R}([o_0, \ldots, o_H], g) \mid s_0, g \
 ### 设计逻辑
 
 该框架的根本假设是：尽管任务和策略层出不穷，物理世界遵循统一的物理规律。因此，一个在多样化数据上训练的世界模型即可泛化地评估任意策略在任意任务上的表现，避免了为每个策略单独建模动力学的困难。整个评估流程可在单 GPU 上一小时内完成，仅需每项任务的初始图像，无需真实机器人硬件。
-
-
 
 ### 问题形式化
 
@@ -183,8 +175,6 @@ $$\hat { \rho } ( \pi ) = \mathbb { E } [ \hat { R } ( [ o _ { 0 } , \ldots , o 
 
 长期 rollout 的视觉误差不会爆炸：在 40 步生成中，平均 LPIPS 始终低于 0.2（Figure 17），确保生成视频在整个仿真过程中保持视觉合理性。这一特性得益于 Diffusion Forcing 的序列建模能力和大规模多样化训练数据——使用 Bridge V2（相比 V1）训练的世界模型在所有像素级指标（MSE、LPIPS、SSIM）上均有显著提升。
 
-
-
 ## 实验与关键发现
 
 ### 核心评估指标与策略排名保真度
@@ -196,7 +186,6 @@ WorldGym作为策略评估环境的根本有效性，取决于其能否复现真
 **平均成功率偏差。** 三种策略在WorldGym中的平均成功率与真实世界仅相差 **3.3%**（Figure 4b）。具体而言，OpenVLA在真实世界成功率为70.6%，世界模型中为67.4%；Octo分别为20.0%和23.8%；RT-1-X分别为14.1%和13.5%。更重要的是，三种策略的相对排名在世界模型中完全保持：OpenVLA > Octo > RT-1-X。这一排名的稳定性是WorldGym作为评估工具的核心价值——即使绝对数值存在小幅偏差，只要排序可靠，就能支持模型选择和迭代决策。
 
 **版本与训练动态的敏感性。** WorldGym能够区分同一策略系列中不同版本和尺寸的模型。Figure 6显示，更大/更新的Octo和OpenVLA版本在世界模型中获得更高的成功率。Figure 7进一步验证了训练过程中的评估一致性：从头训练基于视频的策略和扩散策略时，WorldGym评估的成功率随训练步数增加而单调上升。这意味着WorldGym不仅适用于最终模型的横向对比，也可用于训练过程中的检查点选择。
-
 
 ![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_hidBHy1CAw/figures/006_Figure_6.jpg]]
 *Figure 6: Per-Task Success Rates: Real World vs World Model*
@@ -221,7 +210,6 @@ WorldGym的独特价值在于，它能够以极低成本测试策略在分布外
 
 **OOD语言指令。** Table 1展示了四项修改语言指令后的Bridge任务结果。OpenVLA在所有任务上均优于RT-1-X和Octo，尤其在“将锅移到台面上”这一最具挑战性的任务上（Bridge数据集中不存在将物体移出水槽的轨迹），OpenVLA成功8次，而Octo仅2次。这一优势归因于OpenVLA更强的语言模型骨干。
 
-
 ![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_hidBHy1CAw/figures/018_Table_1.jpg]]
 
 **OOD视觉场景。** 通过图像编辑模型（Nano Banana）在初始帧中添加未见物体，可测试策略的视觉泛化能力。Figure 8的颜色分类实验显示，OpenVLA完美辨别红/蓝纸片（成功率100%），而其他策略接近随机水平（约50%）。Figure 9进一步揭示，OpenVLA对物体的选择主要依赖形状而非颜色：当胡萝卜和橙子同时出现时，策略抓取距离更近的物体；但将胡萝卜颜色编辑为红色后，策略正确选择了橙子。
@@ -238,8 +226,6 @@ WorldGym的独特价值在于，它能够以极低成本测试策略在分布外
 
 所有策略评估遵循严格的公平性协议：使用相同的真实世界初始帧，每任务随机初始物体位置，试验次数一致（10次）；OOD测试中初始图像通过同一编辑模型生成，确保编辑一致性；所有策略使用相同的VLM提示和奖励机制。这些措施排除了因评估条件差异导致的不公平比较。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_hidBHy1CAw/figures/004_Figure_4.jpg]]
 
 ![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_hidBHy1CAw/figures/007_Table_5.jpg]]
@@ -247,9 +233,6 @@ WorldGym的独特价值在于，它能够以极低成本测试策略在分布外
 
 ![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_hidBHy1CAw/figures/020_Figure_12.jpg]]
 *Figure 12: OOD Distraction Examples. We use Nano Banana (Google, 2025) to add distractions to every image of the OpenVLA Bridge task suite. The resulting change in mean success rates can be seen in Figure 13. Figure 13: Effect of OOD Distractors. We use an image editing model to add distractor objects to the Bridge evaluation suite, finding that RT-1- X drops in performance by 51%, Octo by 83%, and OpenVLA by 41.5%, making OpenVLA the most robust to distractors. See Table 7 for details*
-
-
-
 
 ## 定位与知识库关联
 
@@ -288,8 +271,6 @@ WorldGym在评估环境类型上实现了根本性转变。传统方法依赖真
 WorldGym目前聚焦于桌面级操作任务和固定相机视角场景。其是否能泛化到更复杂的操作任务（如灵巧操作、长序列任务）和移动操作场景，仍需验证。此外，世界模型作为生成式环境，其自身的评估偏差如何随任务难度、策略分布偏移等因素变化，尚未有系统性分析。
 
 一个更具野心的方向是将WorldGym从评估工具升级为训练环境。初步实验表明，在RL微调过程中WorldGym评估的成功率随训练步数增加而提升，暗示其可能作为策略优化的奖励信号源。但生成环境中的策略优化是否会导致对抗性利用世界模型的视觉缺陷，是一个需要警惕的风险。
-
-
 
 ## 原文 PDF
 

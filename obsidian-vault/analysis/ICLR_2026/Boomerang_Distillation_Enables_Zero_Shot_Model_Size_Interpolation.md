@@ -46,11 +46,7 @@ claims:
 
 本文提出 **Boomerang Distillation**（回旋镖蒸馏），一种能够零样本（zero-shot）生成任意中间尺寸语言模型的高效方法。核心思想是：首先将大型教师模型通过层剪枝（layer pruning）初始化为一个小型学生模型，然后使用包含余弦距离对齐损失的蒸馏目标训练该学生模型；训练完成后，通过将学生层替换为对应的教师层块（student patching），无需任何额外训练即可生成一系列尺寸和性能平滑插值的中间模型。实验表明，该方法在多个模型族（Qwen3、Pythia、Llama-3.2）上均有效，相比朴素层剪枝和随机初始化蒸馏基线显著更优，且计算开销仅为独立蒸馏每个中间模型的 1/14.53 至 1/19.17。
 
-
-
 现有方法为每个模型尺寸独立训练，成本高昂且只能提供粗粒度的尺寸选项，无法在部署时灵活适应多样化的硬件约束。例如，标准知识蒸馏（Hinton et al., 2015）和模型族构建方法（Muralidharan et al., 2024）需要为每个目标尺寸单独训练一个模型。层剪枝方法（如 LaCo、ShortGPT）虽然可以快速生成小模型，但性能随层数减少急剧下降，尤其在生成任务上。本文旨在解决这一瓶颈：**如何在不重新训练的情况下，从单一训练过程获得任意中间尺寸的高性能模型？**
-
-
 
 ## 核心方法与创新机理
 
@@ -60,9 +56,6 @@ Boomerang Distillation 的核心洞察是：在教师权重初始化和对齐蒸
 2. **对齐蒸馏**：在标准知识蒸馏损失基础上，加入每层余弦距离对齐损失，确保学生层输出接近对应教师块输出。
 3. **学生修补（Student Patching）**：训练后，将学生层替换为对应的教师层块，零样本生成中间尺寸模型。
 
-
-
-
 ![[assets/figures/papers/iclr26_generative_models_diffusion__generative_models_and_autoencoders__b001_4ZU8v4s3IR_Boomeran/figures/001_Figure_1.jpg]]
 *Figure 1: Figure 1: Overview of boomerang distillation. ➀ In this example, the student model is initialized by dropping layers from the pretrained teacher model. ➁ The teacher model is distilled into the student model with cross-entropy loss, knowledge distillation loss, and cosine distance loss (Equation 1). ➂ After training the student model, a block of teacher layers corresponding to a student layer is inserted back into the model to get the zero-shot interpolated model.*
 
@@ -71,8 +64,6 @@ Boomerang Distillation 包含三个步骤（Figure 1）：
 1. **学生初始化（Student Initialization）**：将教师模型的 N 个 Transformer 层划分为 M 个连续块，取每块第一层初始化学生模型，保持嵌入层和 LM 头不变。
 2. **知识蒸馏（Knowledge Distillation）**：使用交叉熵、KL 散度和余弦距离损失的联合目标训练学生模型，使其输出和隐藏状态与教师对齐。
 3. **学生修补（Student Patching）**：将蒸馏后的学生层替换为对应的教师层块，零样本生成中间尺寸模型；嵌入层和 LM 头根据首尾层来源选择。
-
-
 
 ### 5.1 学生初始化
 
@@ -115,15 +106,11 @@ $$(\theta_S^{(1)}, \dots, \theta_S^{(i-1)}, b^{(i)}, \theta_S^{(i+1)}, \dots, \t
 
 嵌入层和 LM 头根据首尾层来源选择：若首层来自学生，则使用学生嵌入层；若首层来自教师，则使用教师嵌入层；LM 头同理。
 
-
-
 ## 实验与关键发现
-
 
 ### 6.1 主要结果
 
 **Table 1** 列出了所有使用的教师和学生模型的参数规模。**Table 2** 列出了训练超参数。
-
 
 ![[assets/figures/papers/iclr26_generative_models_diffusion__generative_models_and_autoencoders__b001_4ZU8v4s3IR_Boomeran/figures/012_Table_1.jpg]]
 *Table 1: Table 1: The sizes of the initialized student models after pruning the layers from the teacher model. We note that the Pythia models do not employ weight tying, so their train and inference parameters are equivalent. On the other hand, the Qwen and Llama models weight tie their embedding layers and LM heads, so their inference-time parameters are higher than their training parameters. This is because both the embedding layer and LM head are used during inference.*
@@ -132,7 +119,6 @@ $$(\theta_S^{(1)}, \dots, \theta_S^{(i-1)}, b^{(i)}, \theta_S^{(i+1)}, \dots, \t
 *Table 2: Table 2: Hyperparameters used to train the student model. We choose the training hyperparameters to align with the values used in Pythia training (Biderman et al., 2023) and set the KLDiv and cosine distance weights such that the cross entropy, KLDiv, and cosine distance loss are approximately equal in magnitude at the beginning of training.*
 
 **Figure 2** 展示了 Boomerang Distillation 在 Qwen3-4B-Base 上的主要结果：插值模型的分类准确率和生成准确率在学生和教师之间平滑插值，一致优于朴素层剪枝和随机初始化蒸馏基线。
-
 
 ![[assets/figures/papers/iclr26_generative_models_diffusion__generative_models_and_autoencoders__b001_4ZU8v4s3IR_Boomeran/figures/002_Figure_2.jpg]]
 *Figure 2: Qwen3-4B-Base Distilled models Pruned models Interpolated models*
@@ -164,7 +150,6 @@ $$(\theta_S^{(1)}, \dots, \theta_S^{(i-1)}, b^{(i)}, \theta_S^{(i+1)}, \dots, \t
 
 **Table 3** 显示 Boomerang Distillation 相比独立蒸馏每个中间模型可节省 14.53-19.17 倍 FLOPS。
 
-
 ![[assets/figures/papers/iclr26_generative_models_diffusion__generative_models_and_autoencoders__b001_4ZU8v4s3IR_Boomeran/figures/036_Table_3.jpg]]
 *Table 3: Table 3: Boomerang distillation provides significant computational speedup compared to individually distilling intermediate models. For Qwen3-4B-Base, Pythia-2.8B, and Llama-3.2-3B, we report the FLOPS required to individually distill each intermediate model versus boomerang distillation for the same number of training tokens (2.1B tokens). We can reduce FLOPs by 19.17x for Qwen, 17.01x for Pythia, and 14.53x for Llama using boomerang distillation.*
 
@@ -188,13 +173,8 @@ $$(\theta_S^{(1)}, \dots, \theta_S^{(i-1)}, b^{(i)}, \theta_S^{(i+1)}, \dots, \t
 - 计算效率分析仅关注 FLOPS，未考虑内存占用或能耗。
 - 学生模型训练使用 The Pile 数据集，其潜在偏见可能影响下游任务性能。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_generative_models_diffusion__generative_models_and_autoencoders__b001_4ZU8v4s3IR_Boomeran/figures/040_Table_4.jpg]]
 *Table 4: Table 4: Hyperparameters used to create LaCo models in Figures 7, 19, 22, 34, and 38*
-
-
-
 
 ## 定位与知识库关联
 
@@ -216,8 +196,6 @@ Boomerang Distillation 位于以下研究方向的交叉点：
 - 能否在不保留教师权重在内存中的情况下实现同等性能和稳定性？
 - Boomerang Distillation 在大规模 LLM 上使用大量 token 预算蒸馏时的表现如何？
 - 能否扩展到其他模态（如视觉 Transformer、语音模型）？
-
-
 
 ## 原文 PDF
 

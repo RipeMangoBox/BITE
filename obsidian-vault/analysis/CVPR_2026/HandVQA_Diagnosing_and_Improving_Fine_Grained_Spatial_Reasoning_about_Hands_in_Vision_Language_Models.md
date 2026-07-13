@@ -55,8 +55,6 @@ claims:
 
 **知识库定位**：HandVQA填补了VLM评估体系中精细3D空间推理的空白。不同于现有的通用VQA基准（如VQAv2、GQA）或手部姿态估计数据集（如FreiHAND、InterHand2.6M），HandVQA将3D几何真值转化为语言推理任务，架起了视觉感知与空间语言理解之间的桥梁。其方法论与**MPGD**（He et al., CVPR 2023）等基于图的手部建模工作形成互补——前者关注视觉编码的精度，而HandVQA关注的是VLM对空间关系的语义理解与推理能力。
 
-
-
 手部是人类与世界交互的核心媒介，理解手部姿态所蕴含的精细空间关系——关节的弯曲角度、指尖之间的距离、手指间的相对位置——对于手势识别、手-物交互理解、抓取规划等下游任务至关重要。然而，当前主流的视觉语言模型（VLMs）在这类细粒度空间推理上表现出系统性的缺陷。
 
 一个关键瓶颈在于：现有VLMs的预训练数据以自然图像和通用图文对为主，缺乏对手部三维几何结构的显式建模。模型往往依赖表面的视觉统计模式进行“猜测”，而非基于真实的几何关系进行推理。这种缺陷在距离相关的判断上尤为突出：基础模型在距离问题上的准确率甚至显著低于随机猜测水平（例如LLaVA和Qwen的准确率低于33.3%，而随机基线为33.3%），暴露了模型对空间度量近乎盲目的状态。
@@ -66,8 +64,6 @@ claims:
 现有的手部理解工作大多集中在纯视觉模型（如HaMeR）的三维姿态估计上，而缺乏将三维几何知识注入到视觉语言模型的训练资源。这使得VLMs在需要结合视觉感知和语言推理的手部场景中，始终存在一个从“看到”到“理解”的鸿沟。
 
 本文的动机正是弥合这一鸿沟：通过构建一个大规模、可控的诊断基准，系统评估并提升VLMs对手部三维空间关系的理解能力。该基准将手部姿态估计分解为角度、距离和三个轴向的相对位置共五个子任务，使模型能够习得可迁移的三维空间意识，并在无需任务特定训练的情况下泛化到下游应用。
-
-
 
 ## 核心方法与创新机理
 
@@ -98,8 +94,6 @@ HandVQA的核心因果链条在于：**通过在几何基础的空间推理任�
 ### 与现有工作的本质差异
 
 与纯视觉姿态估计方法（如**HaMeR**）不同，HandVQA不直接回归3D坐标，而是通过语言媒介让VLM理解空间关系；与现有VQA基准不同，HandVQA的问答对完全由3D几何确定性生成，避免了人工标注的歧义性和规模限制。这种“几何→语言”的映射机制，使得模型习得的是可解释、可迁移的空间推理能力，而非特定数据集的统计相关性。
-
-
 
 HandVQA 的核心贡献在于构建了一条**确定性、可扩展的自动生成管线**，将归一化的 3D 手部关节坐标转化为解剖学上可解释的视觉问答对。该管线不依赖任何语言模型生成问题或答案，从而避免了幻觉和语义漂移，确保了基准的纯几何属性与可控性。
 
@@ -138,12 +132,8 @@ HandVQA 管线的设计不仅服务于诊断，更构成了一个**空间感知�
 ![[assets/figures/papers/paper_list_l2395_https_arxiv_org_abs_2603_26362/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of HandVQA’s transfer effect. Fine-tuning a base Vision-Language Model (VLM) on HandVQA teaches it explicit 3D hand geometry and joint-level spatial reasoning. The resulting Spatial-Aware VLM exhibits zero-shot generalization to novel downstream tasks: both image-based gesture recognition and video-based hand-object interaction recognition. Spatial-Aware VLM achieves consistent accuracy gains without task-specific training*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2395_https_arxiv_org_abs_2603_26362/figures/008_Figure_4.jpg]]
 *Figure 4: The map of the hand skeleton used in our HandVQA benchmark generation pipeline*
-
-
 
 ### 3.1 手部姿态归一化
 
@@ -187,15 +177,8 @@ $$\Gamma = \{ \gamma _ { n } | \psi _ { n } \in \Psi , n { = } 1 , 2 , { \ldots 
 
 下游微调采用 LoRA 适配器，秩 $r=8$，缩放因子 $\alpha=32$，作用于模型所有线性层，学习率设为 $1 \times 10^{-4}$。这一轻量级微调策略在保持基座模型通用能力的同时，有效注入了从 HandVQA 习得的 3D 空间几何知识。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2395_https_arxiv_org_abs_2603_26362/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of HandVQA Question Format. This figure illustrates the structure of our benchmark, which divides hand pose estimation into five sub-tasks: Angle, Distance, and Relative Position along X, Y, and Z axes. A hand image with annotated joint indices (top left) supports multiple-choice questions per task type, derived from 3D joint coordinates and the correct answers are shown in green*
-
-![[assets/figures/papers/paper_list_l2395_https_arxiv_org_abs_2603_26362/figures/004_Table_1.jpg]]
-*Table 1: Pose descriptor categorization with conditions and illustration*
-
-
 
 ## 实验与关键发现
 
@@ -205,16 +188,7 @@ $$\Gamma = \{ \gamma _ { n } | \psi _ { n } \in \Psi , n { = } 1 , 2 , { \ldots 
 
 在角度子任务上，基础模型的表现普遍接近或略高于随机猜测水平（三选一，随机基线 33.3%）。LLaVA 在 InterHand2.6M 上仅取得 40.08% 的准确率（Table 2）。更严峻的是距离子任务：LLaVA 基线的准确率暴跌至 16.20%，DeepSeek 为 14.90%，Qwen 为 20.75%，三者均远低于随机猜测的 33.3% 基线（Table 2）。这意味着基础模型在判断手部关节点之间的距离关系时，不仅没有几何理解，反而被某种系统性偏差所误导。
 
-![[assets/figures/papers/paper_list_l2395_https_arxiv_org_abs_2603_26362/figures/005_Table_2.jpg]]
-*Table 2: Angle and Distance Results for all three models. The best, second-best, and third-best models for each dataset in each metric are highlighted as Gold , Silver , and Bronze , respectively*
-
 相对位置子任务呈现出明显的不对称性。在 X 轴（左右）方向上，LLaVA 基础模型仅取得 49.72% 的准确率，接近随机水平（Table 3）；Y 轴（上下）和 Z 轴（前后）方向的表现虽稍好，但混淆矩阵（Figure 11–13）显示模型存在强烈的预测偏向——例如在 Z 轴上几乎所有基础模型都倾向于预测 "in front of"（Figure 13）。角度混淆矩阵（Figure 8）进一步证实了这一现象：三种基础模型几乎将所有样本预测为 "bent slightly inward"，无论真实标签是什么，表明模型依赖的是表层语言统计而非视觉几何。
-
-![[assets/figures/papers/paper_list_l2395_https_arxiv_org_abs_2603_26362/figures/006_Table_3.jpg]]
-*Table 3: Relative Position Results for all three models. The best, second-best, and third-best models for each dataset are highlighted as Gold , Silver and Bronze , respectively*
-
-![[assets/figures/papers/paper_list_l2395_https_arxiv_org_abs_2603_26362/figures/013_Figure_8.jpg]]
-*Figure 8: Angle confusion matrix across three VLMs. All models frequently predict “bent slightly inward” regardless of ground truth, revealing a strong prediction bias. Each model also follows a consistent preference ordering in its outputs, indicating difficulty in distinguishing fine-grained joint angles*
 
 ![[assets/figures/papers/paper_list_l2395_https_arxiv_org_abs_2603_26362/figures/018_Figure_11.jpg]]
 *Figure 11: Relative Position X confusion matrix comparison between base and fine-tuned VLMs. The base models exhibit near-random predictions between “at the*
@@ -227,9 +201,6 @@ $$\Gamma = \{ \gamma _ { n } | \psi _ { n } \in \Psi , n { = } 1 , 2 , { \ldots 
 
 混淆矩阵的对比直观展示了微调的效果。角度混淆矩阵（Figure 9）显示，微调后模型的对角线对齐显著增强，"bent slightly inward" 的主导偏差被有效抑制。距离混淆矩阵（Figure 10）中，"close to" 的预测偏差大幅减少，但 "spread from" 与 "spread wide from" 之间仍存在一定混淆，提示离散类别边界可能不足以完全捕捉感知上的连续过渡。相对位置 X 轴（Figure 11）的左右判别能力从接近随机提升至近乎完美。
 
-![[assets/figures/papers/paper_list_l2395_https_arxiv_org_abs_2603_26362/figures/015_Figure_9.jpg]]
-*Figure 9: Angle confusion matrix across three fine-tuned VLMs. Fine-tuning significantly reduces the dominant bias toward “bent slightly inward” observed in the base models, resulting in stronger alignment along the diagonal. The models exhibit improved discrimination across angle categories, particularly for “bent inward” and “straight”, although some residual confusion remains between adjacent angle classes, indicating that fine-grained distinctions are still challenging*
-
 ![[assets/figures/papers/paper_list_l2395_https_arxiv_org_abs_2603_26362/figures/016_Figure_10.jpg]]
 *Figure 10: Distance confusion matrix comparison between base and fine-tuned VLMs. The base models exhibit a strong bias toward predicting “close to” across multiple ground-truth categories, leading to a skewed prediction distribution. In contrast, fine-tuning produces a more balanced distribution with increased alignment along the diagonal, indicating improved discrimination between distance categories. However, residual confusion persists between “spread from” and “spread wide from”, suggesting continued difficulty in distinguishing fine-grained spatial separations*
 
@@ -238,9 +209,6 @@ $$\Gamma = \{ \gamma _ { n } | \psi _ { n } \in \Psi , n { = } 1 , 2 , { \ldots 
 ### 零样本迁移：从空间推理到语义理解
 
 HandVQA 微调所习得的 3D 空间意识能够零样本迁移至完全不同的下游任务，无需任何任务特定的训练。在 **HaGRID** 手势识别任务上，LLaVA 微调模型取得 69.58% 的准确率，相较于基础模型的 57.42% 提升了 12.16 个百分点（Table 4）。在 **H2O** 手-物交互识别任务上，Qwen 微调模型取得 82.89% 的准确率，相较于基础模型的 80.26% 提升了 2.63 个百分点（Table 4）。这一迁移效应表明，HandVQA 注入的并非简单的模式匹配，而是可泛化的 3D 几何理解——模型学会了从手部关节的空间配置中推断手势语义和交互类型。
-
-![[assets/figures/papers/paper_list_l2395_https_arxiv_org_abs_2603_26362/figures/007_Table_4.jpg]]
-*Table 4: Zero-shot generalization results. HandVQA fine-tuning strengthens 3D spatial reasoning, yielding higher accuracy (%) on gesture and hand–object interaction recognition*
 
 ### 统一基准微调与跨数据集泛化
 
@@ -251,8 +219,6 @@ HandVQA 微调所习得的 3D 空间意识能够零样本迁移至完全不同�
 ### 失败模式与校准问题
 
 微调后的模型在置信度校准方面存在系统性欠置信问题——模型倾向于给出低于实际准确率的置信度估计。这一现象需要在部署时予以关注，尤其是在需要可靠不确定性估计的安全关键应用中。此外，角度任务的剩余混淆（最佳仅 74.35%）和距离任务中 "spread from" 与 "spread wide from" 的持续混淆，指向了固定阈值离散化方法的固有局限：连续姿态空间的硬边界划分可能无法与人类感知的类别边界对齐。
-
-
 
 ## 定位与知识库关联
 
@@ -316,8 +282,6 @@ HandVQA 处于以下几个研究脉络的交汇点：
 5. **角度推理的突破**：是否存在更具表现力的提示方式、训练策略或视觉编码器改进方案，以根本克服剩余的角度混淆？
 
 6. **领域自适应**：如何弥合第三人称与第一人称视角之间的领域鸿沟，实现更稳健的跨数据集泛化？
-
-
 
 ## 原文 PDF
 

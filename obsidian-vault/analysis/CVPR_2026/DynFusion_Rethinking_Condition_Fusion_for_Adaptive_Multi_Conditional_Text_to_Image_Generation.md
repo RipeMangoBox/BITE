@@ -82,8 +82,6 @@ DynFusion 在四个多条件任务上进行了全面验证：
 
 消融实验进一步验证了各组件的必要性：移除 CAM 的自适应门控（退化为均匀激活）导致 FID 升高；替换 DMMA 为标准多模态注意力不仅增加计算量，还降低了生成质量；移除 Fusion-LoRA 使 FID 从 4.53 升至 5.93。条件激活动态可视化（Figure 4）直观展示了深度条件在去噪早期主导、边缘条件在后期激增、主题和背景在中段活跃的阶段依赖模式，为自适应门控的有效性提供了机理解释。
 
-
-
 ### 问题背景
 
 文本到图像生成模型在近两年取得了显著进展，从早期的单文本提示生成逐步演化为支持多种视觉条件（如空间布局、深度图、边缘图、主体图像）的可控生成。这一趋势的核心驱动力在于：真实世界的创作需求往往需要同时满足几何结构、语义内容和外观风格等多维约束，单一条件已难以胜任复杂的设计场景。然而，当多个异构条件——例如一张主体参考图、一张深度图、一张 Canny 边缘图——同时注入扩散模型时，**条件干扰**与**控制不一致**成为制约生成质量的关键瓶颈。
@@ -107,8 +105,6 @@ DynFusion 在四个多条件任务上进行了全面验证：
 ### 待验证的开放问题
 
 尽管本文在四个多条件任务上取得了全面的定量与定性优势，以下问题仍需进一步探索：条件激活模式在不同骨干架构（如 SD3 vs. FLUX）上的可迁移性；当条件数量扩展至四个以上时，动态门控是否会遭遇组合爆炸或稀疏度不稳定；以及在小规模数据集上习得的门控策略对未见过的新模态条件的泛化能力。这些问题将直接影响该范式向更广泛的多模态生成任务的推广。
-
-
 
 ## 核心方法与创新机理
 
@@ -140,8 +136,6 @@ DynFusion 在去噪分支中引入 **Fusion-LoRA**——一个低秩适配模块
 
 上述三个 changed slots 并非孤立运作，而是形成闭环协同：CAM 决定“何时用哪些条件”，DMMA 保证“用到的条件互不干扰”，Fusion-LoRA 修正“动态切换带来的分布偏移”。这一协同使得 DynFusion 在不增加计算开销的前提下（Table 1 显示其参数量、FLOPs 和推理速度均优于现有方法），在四个多条件任务上全面超越基线——例如 Subject-Insertion 的 FID 达 4.53，Subject-Depth 的 SSIM 达 0.56，均为最优。
 
-
-
 DynFusion 的核心设计动机源于一个关键观察：在多条件可控扩散生成中，异构条件（如几何深度图、语义边缘图、外观参考图）在去噪过程的不同阶段具有显著不同的重要性，但现有方法普遍采用静态统一注入策略，导致条件间相互干扰、控制不一致，严重限制设计场景下的保真度与可控性。
 
 为此，DynFusion 提出了一套**数据驱动的自适应条件融合框架**，其核心流水线由三个协同模块构成，围绕“何时激活哪些条件”这一核心问题展开：
@@ -158,12 +152,8 @@ $$\mathcal{L}_{\theta} = \mathcal{L}_{\mathrm{diff}} + \alpha \cdot \mathcal{L}_
 
 图 3 展示了 DynFusion 的整体框架：前向过程中，CAM 基于噪声嵌入生成条件激活指令；训练过程中，注意力掩码与 Gumbel 噪声被整合到多模态注意力的 Softmax 计算中，实现端到端训练。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2308_https_openaccess_thecvf_com_content_CVPR2026_html_Fang_DynFusion_Rethink/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of our proposed DynFusion framework. (a) During forward process, the CAM generates instructions based on the noise embeddings to activate the optimal condition combination. (b) During training, we incorporate the attention mask with gumbel noise into the softmax calculation of multi-modal attention to filter out the invalid conditions, thus enabling end-to-end training*
-
-
 
 DynFusion 的核心由三个模块构成：条件适配模块（CAM）、解耦多模态注意力（DMMA）和 Fusion-LoRA。三者协同实现“在什么时间步、在网络的哪一层、激活哪些条件”的动态决策。
 
@@ -223,15 +213,8 @@ $$
 
 稀疏度损失鼓励 CAM 输出稀疏的条件激活模式，实验表明 50% 稀疏度取得最佳 FID（4.77），过度稀疏或全激活均导致性能下降（Table 5）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2308_https_openaccess_thecvf_com_content_CVPR2026_html_Fang_DynFusion_Rethink/figures/002_Figure_2.jpg]]
-*Figure 2: Comparison of different schemes dealing with multiple conditions. (a) Aggregating various visual conditions into a highly consistent control signal in the temporal domain. (b) Noise representation acquires spatial modal knowledge in the latent space through multi-modal attention. (c) We employ dynamic condition fusion to precisely match the current demands*
-
 ![[assets/figures/papers/paper_list_l2308_https_openaccess_thecvf_com_content_CVPR2026_html_Fang_DynFusion_Rethink/figures/004_Figure_4.jpg]]
 *Figure 4: Visualization of denoising step at steps 5, 10, 15, 20 and 25, where each pair includes the generated result and condition activation distribution. Subject, background, depth, canny are used to guide image generation*
-
-
 
 ## 实验与关键发现
 
@@ -270,21 +253,8 @@ Figure 4 可视化了去噪过程中不同时间步下的条件激活动态，�
 
 论文未显式报告失败案例或局限性分析。从条件激活动态 (Figure 4) 可推断，当条件类型组合发生显著变化（例如引入全新模态）时，CAM 学得的阶段依赖性可能失效，需要重新训练或微调。此外，稀疏度消融 (Table 5) 表明门控策略对稀疏度超参数敏感，实际部署时需针对任务进行调优。以上推断需手动验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2308_https_openaccess_thecvf_com_content_CVPR2026_html_Fang_DynFusion_Rethink/figures/011_Table_2.jpg]]
 *Table 2: Quantitative ablation of adaptive condition fusion strategy on Subject-Insertion task. “Uniform” means activating all conditions uniformly. “Sole” and “Free” indicate selecting the conditions with softmax and sigmoid function, respectively*
-
-![[assets/figures/papers/paper_list_l2308_https_openaccess_thecvf_com_content_CVPR2026_html_Fang_DynFusion_Rethink/figures/010_Table_4.jpg]]
-*Table 4: Quantitative ablation of Fusion-LoRA component on Subject-Insertion task. Fusion-LoRA is capable of modulating different quantities and combinations of conditional signals, thereby providing better assistance in generating*
-
-![[assets/figures/papers/paper_list_l2308_https_openaccess_thecvf_com_content_CVPR2026_html_Fang_DynFusion_Rethink/figures/006_Figure_6.jpg]]
-*Figure 6: Qualitative comparison on Subject-Insertion generation*
-
-![[assets/figures/papers/paper_list_l2308_https_openaccess_thecvf_com_content_CVPR2026_html_Fang_DynFusion_Rethink/figures/001_Figure_1.jpg]]
-*Figure 1: Demonstrations of DynFusion’s versatile capabilities. (a) Controllable image generation under a single visual condition (e.g., subject-driven generation and spatially-aligned tasks). (b) Multi-conditional controllable generation. Compared with single-conditional generation, it improves the image quality, controllability and flexibility. Meanwhile, proposed dynamic condition fusion performs better than uniform strategy by eliminating condition redundancies. (c) Visualization results under more conditions. (d) Quantitative results of our DynFusion. We simultaneously improved both the generation effect and efficiency*
-
-
 
 ## 定位与知识库关联
 
@@ -330,8 +300,6 @@ DynFusion 的核心突破在于将条件融合从“静态统一”转变为“�
 4. **跨模态与跨任务迁移**：多条件自适应融合范式能否直接扩展到视频生成（时间维度的条件动态变化）、3D 生成（多视角条件一致性）或图像编辑（局部条件与全局条件的协调）？这需要重新审视 DMMA 中“条件令牌间无信息交换”的设计是否仍然适用。
 
 5. **稀疏度与质量的帕累托前沿**：Table 5 显示 50% 稀疏度取得最佳 FID，但这是否是任务无关的最优值？能否设计自适应稀疏度调度器，根据任务复杂度和条件冲突程度动态调整稀疏度目标？
-
-
 
 ## 原文 PDF
 

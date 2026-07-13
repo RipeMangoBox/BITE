@@ -209,9 +209,6 @@ $$
 
 该梯度存在三个关键瓶颈：**（1）高内存**——需存储完整 T 步计算图，内存复杂度 O(T)；**（2）稀疏优化**——仅在轨迹末端更新一次参数；**（3）梯度消失**——乘积项 ∏ ∂π_θ/∂x_s^θ 随 t 增大趋近于零（见 Figure 3 实证），导致早期步骤优化不足。
 
-![[assets/figures/papers/paper_list_l1873_Efficient_Motion_Diffusion_Model_for_Fast_High_Quality_Human_Motion_Gene/figures/003_Figure_3.jpg]]
-*Figure 3: Gradient norm with respect to denoising steps. Here, dim(·) denotes the gradient dimension. Detailed settings are provided in App. B.1*
-
 EasyTune 通过两步设计破解上述瓶颈：
 
 **第一步：Step-level 目标函数。** 将优化目标从轨迹末端奖励改为每个去噪步骤的奖励期望：
@@ -294,8 +291,6 @@ EasyTune 在 HumanML3D 和 KIT-ML 两个标准基准上均实现了显著的性�
 ![[assets/figures/papers/paper_list_l1873_Efficient_Motion_Diffusion_Model_for_Fast_High_Quality_Human_Motion_Gene/figures/013_Table.jpg]]
 *Table: S1: Hyperparameters for EasyTune and baseline methods*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1873_Efficient_Motion_Diffusion_Model_for_Fast_High_Quality_Human_Motion_Gene/figures/007_Table_1.jpg]]
 *Table 1: Comparison of fine-tuning methods on HumanML3D. Arrows , , and indicate that higher, lower, and closer to real values are better. Bold and underline denote the best and second-best results. MLD baseline follows the implementation of (Dai et al., 2024)*
 
@@ -305,20 +300,8 @@ EasyTune 在 HumanML3D 和 KIT-ML 两个标准基准上均实现了显著的性�
 ![[assets/figures/papers/paper_list_l1873_Efficient_Motion_Diffusion_Model_for_Fast_High_Quality_Human_Motion_Gene/figures/010_Table_4.jpg]]
 *Table 4: Evaluation on text-motion retrieval benchmark, HumanML3D and KIT-ML. The column “Noise” indicates whether the method can handle noisy motion from the denoised process*
 
-![[assets/figures/papers/paper_list_l1873_Efficient_Motion_Diffusion_Model_for_Fast_High_Quality_Human_Motion_Gene/figures/011_Figure_8.jpg]]
-*Figure 8: Comparison of models fine-tuned with and without SPL*
-
 ![[assets/figures/papers/paper_list_l1873_Efficient_Motion_Diffusion_Model_for_Fast_High_Quality_Human_Motion_Gene/figures/018_Table.jpg]]
 *Table: S4: Ablation study on step-level reward reweighting strategies for EasyTune. The baseline is MLD*
-
-![[assets/figures/papers/paper_list_l1873_Efficient_Motion_Diffusion_Model_for_Fast_High_Quality_Human_Motion_Gene/figures/024_Figure.jpg]]
-*Figure: (a) Memory Usage for Key Stages (b) Memory Growth per Denoising Step Figure S5: Comprehensive memory analysis of EasyTune and existing fine-tuning methods. We report the memory usage of key stages (model loading, prompt encoding, denoising, VAEbased motion decoding, and reward computation with backpropagation), as well as the full memory trajectory during optimization. EasyTune achieves lower peak memory while maintaining high utilization, benefiting from the O(1) memory growth of the denoising process*
-
-![[assets/figures/papers/paper_list_l1873_Efficient_Motion_Diffusion_Model_for_Fast_High_Quality_Human_Motion_Gene/figures/025_Table.jpg]]
-*Table: S9: Computational overhead comparison. We report the training time and TFLOPs required to reach different reward scores. Total time is measured in seconds on a single NVIDIA RTX A6000 GPU. “-” indicates the method could not reach that reward level within a reasonable training budget*
-
-![[assets/figures/papers/paper_list_l1873_Efficient_Motion_Diffusion_Model_for_Fast_High_Quality_Human_Motion_Gene/figures/014_Table.jpg]]
-*Table: S2: Performance comparison between EasyTune with and without KL-regularized*
 
 ## 定位与知识库关联
 

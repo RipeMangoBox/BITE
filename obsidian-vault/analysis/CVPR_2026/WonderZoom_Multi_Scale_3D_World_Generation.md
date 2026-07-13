@@ -230,8 +230,6 @@ $$\mathcal{L} = 0.8 L_1 + 0.2 L_{\mathrm{D-SSIM}}$$
 2. **累积计算开销**：虽然单次新尺度生成耗时约9.3秒（与单尺度方法相当），但多次逐步变焦的总耗时可能较大，且非实时，限制了交互式探索的流畅性。
 3. **多模型依赖**：方法需要调用多个现成模型（超分、视频扩散、深度估计）和优化过程，系统复杂度较高，可能影响鲁棒性和部署便捷性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2631_https_arxiv_org_abs_2512_09164/figures/004_Table_1.jpg]]
 *Table 1: Quantitative comparison. “CS” denotes CLIP score, “CIQA” denotes CLIP-IQA+, “QIQA” denotes Q-align IQA, “QIAA” denotes Q-align IAA, and “Time” measures the time used in generating a new-scale scene*
 

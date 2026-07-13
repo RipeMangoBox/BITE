@@ -46,8 +46,6 @@ claims:
 
 在 ImageNet 256×256 上，MPDiT-XL 以 59.3 GFLOPs 达到 FID 2.05，计算量仅为 DiT/SiT 的约 8.8%；在 ImageNet 512×512 上，以 228.4 GFLOPs 达到 FID 2.47，计算量约为 DiT/SiT 的 8.7%。消融实验表明，多 patch 设计可降低最多 50% 的 GFLOPs，FNO 时间嵌入带来约 4 个点的 FID 提升。
 
-
-
 扩散模型已在图像生成领域取得显著进展，其中基于 Transformer 的扩散主干网络（如 DiT）凭借可扩展性和灵活性展现出强大潜力。然而，现有 DiT 架构在计算效率与生成质量之间仍存在明显张力。
 
 **核心瓶颈**在于传统的单尺度补丁（patch）标记化策略。DiT 将输入图像统一划分为固定大小的补丁，所有 Transformer 块在相同分辨率的标记序列上操作。这种设计迫使模型在全部深度上以相同粒度处理视觉信息，导致两个相互矛盾的问题：较大的补丁虽然计算高效，但丢失了精细的局部纹理；较小的补丁能保留细节，却使自注意力的计算复杂度随序列长度平方增长，显著增加了计算开销。
@@ -57,8 +55,6 @@ claims:
 此外，现有方法在时间嵌入和条件注入方面也存在改进空间。传统 DiT 使用简单的线性层处理正弦时间特征，难以充分捕捉扩散过程中时间步之间的平滑过渡关系；条件信息（如类别标签）的注入方式也较为单一，限制了模型对条件信号的利用效率。
 
 **本文动机**正是针对上述缺口，提出一种从粗到细的层次化 Transformer 架构，使模型能够在早期块中使用大补丁高效捕获全局上下文，在后期块中通过上采样模块将大补丁标记扩展为更多的小补丁标记以细化局部细节。同时，引入基于傅里叶神经算子（FNO）的时间嵌入模块，以更平滑地建模时间步之间的过渡关系。这一设计在保持生成质量的同时，显著降低了计算成本。
-
-
 
 ## 核心方法与创新机理
 
@@ -105,8 +101,6 @@ MPDiT 还引入了两个辅助创新：
 
 整体而言，MPDiT 通过**层次化多尺度架构**这一主线创新，配合 FNO 时间嵌入、多 token 条件注入等辅助改进，在 ImageNet 256×256 上以 **50% 的 GFLOPs 削减**实现了 **cfg FID 2.05** 的优异性能，验证了“全局-局部”解耦设计的有效性。
 
-
-
 MPDiT 的整体架构遵循一种**由粗到细的全局-局部处理范式**，其核心思想是将标准各向同性 DiT 的单一分辨率 patch 序列替换为两级层次化 token 流。整个 pipeline 由三个主要功能阶段串联而成：**大 patch 嵌入与全局编码**、**上采样模块**、以及**小 patch 精细解码**。
 
 具体而言，输入潜变量图像首先通过一个**大 patch 嵌入模块**被切分为较大的 patch（例如 $p=4$ 而非标准的 $p=2$），从而大幅减少输入 token 数量。这些大 patch token 经过前 $(N-k)$ 个 DiT 块，在低分辨率空间高效捕获全局上下文和粗粒度结构信息。
@@ -117,12 +111,8 @@ MPDiT 的整体架构遵循一种**由粗到细的全局-局部处理范式**，
 
 整个架构的信息流可概括为：**输入潜变量 → 大 patch 嵌入 → (N-k) 个全局 DiT 块 → 上采样模块 → k 个局部 DiT 块 → 输出预测速度**。这种全局-局部的层次化设计使得模型在保持生成质量的同时，将计算量（GFLOPs）降低了最多 50%。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l900_https_arxiv_org_abs_2603_26357/figures/002_Figure_2.jpg]]
 *Figure 2: Architecture of MPDiT, which consists of (a) the Global-Local MultiPatch Diffusion Transformer, (b) DiT Block with shared time embedding, (c) The Upsample Module and (d) The FNO Time Embedding*
-
-
 
 ### 3.1 训练框架：流匹配目标
 
@@ -156,8 +146,6 @@ $$T_{cls} = \text{reshape}(E_{cls}[c], (m, D))$$
 
 标准 DiT 在每个 Transformer Block 中独立使用自适应实例归一化（AdaIN）注入条件和时间信息。MPDiT 将 AdaIN 操作前置为共享模块：先将类别嵌入与时间嵌入合并，统一施加 AdaIN，再将结果分发至各 Block。此设计使参数量从 130M 降至约 90M，减少约 30%，同时保持了生成质量。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -176,9 +164,6 @@ ImageNet 512×512 的结果见 Table 8 和 Table 9，MPDiT 在该分辨率下同
 
 ![[assets/figures/papers/paper_list_l900_https_arxiv_org_abs_2603_26357/figures/010_Table_8.jpg]]
 *Table 8: Quantitative results of ImageNet 512 with*
-
-![[assets/figures/papers/paper_list_l900_https_arxiv_org_abs_2603_26357/figures/011_Table_9.jpg]]
-*Table 9: Performace of different MPDiT-XL variants on ImageNet 512*
 
 ![[assets/figures/papers/paper_list_l900_https_arxiv_org_abs_2603_26357/figures/012_Figure_3.jpg]]
 *Figure 3: Qualitative Result of Imagenet 512 with cfg=4*
@@ -209,27 +194,8 @@ ImageNet 512×512 的结果见 Table 8 和 Table 9，MPDiT 在该分辨率下同
 
 3. **失败模式与局限**：当全部 block 使用大 patch（k=0）时，计算量最低但 FID 显著恶化，表明后期的小 patch 精修对细节生成不可或缺。此外，论文主要在 class-conditional 生成场景下验证，未涉及 text-to-image 等更复杂的条件生成任务。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l900_https_arxiv_org_abs_2603_26357/figures/005_Table_3.jpg]]
 *Table 3: Ablation on MPDiT components. All models are trained for 80 epochs under the same settings. Note that in the second row (shared AdaIN), we still apply AdaIN to the combined class and time embeddings as original DiT*
-
-![[assets/figures/papers/paper_list_l900_https_arxiv_org_abs_2603_26357/figures/006_Table_4.jpg]]
-*Table 4: Ablation on k value for MPDiT. † means that DiT with Shared AdaIN, multitokens class and FNO time embedding*
-
-![[assets/figures/papers/paper_list_l900_https_arxiv_org_abs_2603_26357/figures/007_Table_5.jpg]]
-*Table 5: Ablation on the time embedding module. We vary the number of Linear layers and MixedFNO blocks. The traditional time embedding applies two Linear layers to sinusoidal time features, whereas the proposed FNO time embedding uses three MixedFNO blocks operating on grid-based time features*
-
-![[assets/figures/papers/paper_list_l900_https_arxiv_org_abs_2603_26357/figures/008_Table_6.jpg]]
-*Table 6: Ablation on number of class tokens m*
-
-![[assets/figures/papers/paper_list_l900_https_arxiv_org_abs_2603_26357/figures/009_Table_7.jpg]]
-*Table 7: Ablation on design of Upsample Block. r is the mlp ratio*
-
-![[assets/figures/papers/paper_list_l900_https_arxiv_org_abs_2603_26357/figures/001_Figure_1.jpg]]
-*Figure 1: The generated samples from MPDiT-XL with the cfg-scale w = 3 at epoch 160*
-
-
 
 ## 定位与知识库关联
 
@@ -272,8 +238,6 @@ MPDiT 的架构建立在 **DiT**（Peebles & Xie, ICCV 2023）的基础之上，
 4. **视频生成的适用性**：全局到局部的多 patch 设计天然适合视频的时空层次结构。在视频扩散 Transformer 中，时空 patch 的层次化策略如何设计？时间维度和空间维度的 patch 粒度是否需要独立控制？
 
 5. **FNO 时间嵌入的理论解释**：消融实验表明 FNO 时间嵌入带来约 4 个 FID 点的提升，但其工作机制尚缺乏深入的理论分析。频域操作是否有助于解耦不同频率的时间动态？这种优势在更长的采样步数或不同的噪声调度下是否保持？
-
-
 
 ## 原文 PDF
 

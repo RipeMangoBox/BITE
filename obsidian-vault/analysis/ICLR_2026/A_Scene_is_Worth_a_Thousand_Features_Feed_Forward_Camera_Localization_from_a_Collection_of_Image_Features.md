@@ -51,8 +51,6 @@ claims:
 
 **主要结果**：在Wayspots数据集上，FastForward达到0.17m的中位平移误差和1.8°的平均中位旋转误差，优于所有无需场景训练的基线方法（如Reloc3r的0.19m/2.0°）；在Indoor6数据集上达到91.5%的10cm/10°阈值接受率，超越MASt3R（87.0%）；在7-Scenes数据集上达到90.2%的接受率，比MASt3R高17.9个百分点。关键消融实验表明，尺度归一化将Cambridge Landmarks数据集上的10cm/10°准确率从1.8%提升至26.7%。在效率方面，FastForward的映射准备仅需3秒（图像检索），定位延迟0.5秒，远低于SCR方法的5-25分钟和SfM方法的数小时。
 
-
-
 视觉定位的核心瓶颈在于**映射准备时间**与**定位精度**之间的权衡。现有方法可归为三类：基于结构的SfM方法（如COLMAP）需要数小时甚至数天进行特征三角化；场景坐标回归（SCR）方法（如ACE、GLACE）虽提升效率，仍需5-25分钟的场景特定训练；相对位姿回归（RPR）方法（如Reloc3r、MASt3R）虽无需映射准备，但精度不足且依赖启发式尺度恢复。这种“准备-精度”的零和博弈限制了视觉定位在需要快速部署场景（如增强现实、机器人导航）中的实际应用。
 
 FastForward的核心洞察在于：**将场景表示为一组锚定在3D空间中的稀疏图像特征集合，并通过单次前馈传递直接预测查询图像的3D坐标**。具体而言，该方法从多张已知位姿的映射图像中随机采样N个特征（室外3000个，室内1500个），为每个特征融合射线编码（编码相机位置和视线方向），再通过Transformer解码器中的自注意力和交叉注意力机制，同时更新查询特征和映射特征。最终，DPT查询头从更新后的查询特征预测像素级3D坐标，经PnP-RANSAC求解器获得绝对位姿。
@@ -60,8 +58,6 @@ FastForward的核心洞察在于：**将场景表示为一组锚定在3D空间�
 这一设计带来三个关键优势。第一，**消除场景特定训练**：映射准备仅需3秒（图像级全局描述符检索），远低于SCR的5-25分钟和SfM的数小时。第二，**尺度无关性**：通过将映射位姿归一化到单位球内（以参考图像为原点，最大平移为1），网络在归一化空间预测坐标后乘以场景尺度因子恢复度量尺度——消融实验表明，该归一化将Cambridge Landmarks数据集上的10cm,10°准确率从1.8%提升至26.7%。第三，**前馈式推理**：查询定位延迟仅0.5秒，且映射特征数量固定，GPU内存需求不随场景规模增长。
 
 实验证据支持该方法的有效性：在Wayspots数据集上，FastForward达到0.17m中位平移误差和1.8°中位旋转误差，优于所有无需场景训练的基线方法（如Reloc3r的0.19m/2.0°）；在Indoor6数据集上，91.5%的10cm,10°阈值接受率超越MASt3R（87.0%）。然而，在RIO10数据集上，FastForward的接受率（40.6%）低于MASt3R（45.1%），表明在动态场景或复杂室内环境中仍有改进空间。此外，该方法依赖图像检索系统选择映射图像，检索失败（如视角变化过大）可能导致精度下降——随机或均匀采样策略可作为鲁棒替代方案，但精度略逊于检索策略。
-
-
 
 ## 核心方法与创新机理
 
@@ -82,8 +78,6 @@ FastForward 的核心创新在于将场景表示从传统的显式结构（SfM�
 **证据强度**：上述创新点均有明确的实验验证。在Wayspots数据集上，FastForward达到0.17m的中位平移误差和1.8°的中位旋转误差，优于所有无需场景训练的基线方法（Table 1）。在Indoor6数据集上，FastForward达到91.5%的10cm,10°阈值接受率，优于所有对比方法（Table 3）。映射时间仅需3秒，定位延迟0.5秒，远低于SCR方法（5-25分钟）和SfM方法（数小时）（Table 1）。
 
 **失败模式**：FastForward在RIO10数据集上的10cm,10°接受率（40.6%）低于MASt3R（45.1%），表明在动态场景或复杂室内环境中仍有改进空间。此外，方法依赖图像检索系统选择映射图像，检索失败（如视角变化过大）可能导致定位精度下降。当前方法使用PnP-RANSAC作为最终位姿求解器，增加了额外延迟（约0.1秒），未来可探索直接位姿预测头。
-
-
 
 FastForward 的 pipeline 是一个完全前馈式的视觉定位系统，其核心设计是将场景表示为从多张已知位姿的映射图像中随机采样的稀疏特征集合，并通过单次前馈传递直接预测查询图像的 3D 坐标，从而消除场景特定训练和全局对齐步骤。
 
@@ -113,8 +107,6 @@ FastForward 的 pipeline 是一个完全前馈式的视觉定位系统，其核�
 **关键设计机制：**
 -   **随机采样**：从映射图像中随机采样特征而非使用所有特征，使得 GPU 内存和计算量恒定，不随场景规模线性增长。
 -   **检索辅助**：虽然随机/均匀采样策略无需映射准备时间且精度与检索策略相当，但默认使用图像检索系统选择与查询最相关的 top-K 张映射图像，将全局定位问题转化为局部小尺度问题。
-
-
 
 ### 场景表示与归一化
 
@@ -170,8 +162,6 @@ $$\ell^{\mathrm{Conf}} = \sum_{v \in \{Q, M\}} \sum_{i \in D} C_i \ell^{\mathrm{
 
 整个定位延迟约 0.5 秒，远低于需要场景特定训练的 SCR 方法（5-25分钟）和 SfM 方法（数小时）。
 
-
-
 ## 实验与关键发现
 
 ### 主结果：定位精度与效率的权衡
@@ -221,12 +211,8 @@ FastForward的映射准备时间仅需3秒（用于构建检索索引），定�
 
 FastForward与基线方法在相同硬件（V100 GPU）上比较，但不同方法的实现细节可能影响公平性。MASt3R和Reloc3r使用相同的ViT编码器初始化，但FastForward冻结编码器权重，仅训练解码器和头部，而MASt3R可能进行全模型微调。这解释了为何MASt3R在RIO10上略优——全模型微调使其能够更好地适应特定场景的数据分布。此外，E5+1 (ALKD-LG) 的延迟包含特征提取和RANSAC求解，而FastForward的延迟包含特征提取、解码器前向和PnP求解，两者计算流程不同，直接比较延迟需考虑具体实现细节。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0003_rmDA02o8MV_A_Scene_is_Worth_a_Thousand_Features_Feed-Forwar/figures/009_Table_6.jpg]]
 *Table 6: Results on Wayspots dataset (Brachmann et al., 2023). We provide the median rotation errors and the accuracy under the 10cm, 10° threshold. Additionally, we include the average median translation error and the mapping preparation time for each of the methods. ACE and GLACE train a network for each scene in Wayspots, while Reloc3r and FastForward compute a retrieval index that runs in 3 seconds for a Wayspots scene on a V100 GPU. In contrast to Reloc3r, FastForward obtains a comparable accuracy to SCR methods while reducing their mapping time. In addition, FastForward achieves the lowest rotation error. Best results in bold for the Unseen category*
-
-
 
 ## 定位与知识库关联
 
@@ -266,8 +252,6 @@ FastForward 的关键因果机制在于：将场景表示从“显式几何结�
 5. **传感器泛化性**：论文仅在标准针孔相机图像上验证。FastForward 在鱼眼、全景等非传统相机模型上的表现尚未探索，其射线编码和尺度归一化设计是否需要适配，需要手动验证。
 
 **需要手动验证的要点：** 论文声称“随机和均匀采样策略无需映射准备时间且精度与检索策略相当”（Table 7），但该实验仅在 Wayspots 数据集上执行，且场景规模较小（20张映射图像）。在大规模场景或分布不均匀的映射图像集合中，该结论是否成立，需要独立复现验证。
-
-
 
 ## 原文 PDF
 

@@ -59,8 +59,6 @@ claims:
 
 **证据强度与局限**：上述增益在多次试验中具有统计显著性，且通过参数计数匹配消融实验排除了容量扩充的混淆效应。然而，CompSLOT 在组合泛化的 substitutivity（属性替换）维度上改进不显著，提示 ViT 特征在应对属性变化时存在固有限制。此外，当前概念学习阶段与持续学习分类目标为分离式训练，尚未实现端到端联合优化，可能限制整体潜力。
 
-
-
 持续学习（Continual Learning, CL）的核心挑战在于，模型在顺序学习新任务时如何避免灾难性遗忘。近年来，大规模预训练基础模型（Foundation Models, FMs）为持续学习提供了强大的特征表示能力，催生了一批基于提示（prompt-based）和基于表示（representation-based）的持续学习方法。然而，这些方法存在一个共同的深层瓶颈：**它们依赖高维特征空间中的直接比较进行分类，忽略了图像中跨任务共享的底层概念组合**。
 
 具体而言，现有方法——无论是基于提示的 **CPrompt**（Gao et al., 2024），还是基于原型分类器的 **ADAM+adapter**（Zhou et al., 2025）与随机投影分类器 **RanPAC**（McDonnell et al., 2023）——均将图像编码为单一的全局表示（如 ViT 的 [CLS] token），并在该高维空间中度量类别相似性。这种策略虽然利用了预训练特征的判别力，却无法显式建模图像中不同视觉概念（如物体部件、纹理、形状）的解耦组合关系。当新任务引入与旧任务共享底层概念但组合方式不同的类别时，模型缺乏对概念级共享的感知，导致两个后果：一是灾难性遗忘加剧，因为分类边界仅在高维流形上被覆盖而非基于可迁移的概念单元；二是组合泛化能力弱，模型难以将已知概念重组以识别未见过的概念组合。
@@ -70,8 +68,6 @@ claims:
 本文的核心动机正是填补这一空白：**能否引入概念级组合性理解作为方法无关的插件，使任何基于 FM 的持续学习器在不显著增加参数的前提下，利用跨任务的概念共享来同时提升稳定性和组合泛化能力？** 为此，我们提出 CompSLOT，通过无监督对象中心学习（Slot Attention）从冻结或微调的 ViT 特征中提取解耦的概念表示，并将样本间概念相似度蒸馏到分类器的 logits 中，引导模型基于概念组合而非纯高维特征进行决策。
 
 初步实验（Figure 2）验证了这一动机的可行性：在连续组合重建任务中，Slot Attention 模块提取的概念表示在任务间几乎不发生遗忘，其重建损失矩阵在不同任务上保持高度一致，表明概念提取本身对任务序列不敏感，为后续的概念引导持续学习奠定了基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -106,8 +102,6 @@ $$d_{i,j}^s = \frac{\sin_+(s_i^p, s_j^p)}{\sum_{x_k \in B} \sin_+(s_i^p, s_k^p)}
 ### 方法无关的即插即用特性
 
 上述三个模块中，概念提取与原语选择阶段（Slot Attention + Primitive Selection）作为独立的概念学习前端，对所有持续学习算法开放共享，无需针对特定方法调整。原语-逻辑对齐模块仅需访问基线的输出 logits，以正则化项形式注入训练目标。实验覆盖了基于提示（CPrompt）、基于表示（ADAM+adapter、RanPAC、EASE）、基于模型混合（CoFiMA）及基于回放（FOSTER\*、DER\*、MEMO\*）等多种范式的持续学习方法，CompSLOT 均带来一致的性能增益（Table 1, Table 7, Table 8），其中 ADAM+adapter 在 CGQA 上 AA 提升达 +7.55 个百分点，验证了其方法无关的通用性。
-
-
 
 ![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_22hBwIf7OC/figures/027_Figure_12.jpg]]
 *Figure 12: Line charts of different hyperparameters in slot attention architecture. (a) Alignment Coeff*
@@ -145,8 +139,6 @@ $$d_{i,j}^s = \frac{\sin_+(s_i^p, s_j^p)}{\sum_{x_k \in B} \sin_+(s_i^p, s_k^p)}
 ### 管线总结
 
 整个框架的数据流可概括为：输入图像经冻结 ViT 提取 patch 特征 → Slot Attention 分解为 $K$ 个解耦 slot → Primitive Selection 加权聚合为类别相关原语 → 原语相似度通过 $L_a$ 蒸馏至分类器 logits。概念学习阶段（前两步）独立于持续学习算法，原语-逻辑对齐阶段（第三步）以即插即用方式嵌入任意基线的训练损失中。
-
-
 
 ### 概念提取：Slot Attention 模块
 
@@ -187,8 +179,6 @@ $$d_{i,j}^s = \frac{\sin_+(s_i^p, s_j^p)}{\sum_{x_k \in B} \sin_+(s_i^p, s_k^p)}
 $$L_{tr} = L_{ce} + \beta L_a$$
 
 $\beta$ 控制概念知识蒸馏的强度。消融实验表明，$\beta$ 在适中范围内（CPrompt 上 $\beta \approx 2$）提升准确率，但过大会导致性能下降；min-max 归一化在计算 $d^s$ 时优于 softmax 归一化，能提供更清晰的监督信号。
-
-
 
 ## 实验与关键发现
 
@@ -244,29 +234,8 @@ Figure 2 的连续组合重建实验揭示了 CompSLOT 抵抗遗忘的深层原�
 
 尽管 CompSLOT 在多数组合泛化维度上表现优异，但在 substitutivity（属性替换）维度上改进不显著。这揭示了 ViT 特征在应对属性变化时的固有限制——即使通过概念分解，模型仍难以灵活重组属性以应对未见组合。此外，当前概念学习阶段与持续学习分类目标是分离训练的，尚未实现端到端联合优化，这可能限制了整体潜力的充分释放。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_22hBwIf7OC/figures/004_Figure.jpg]]
-*Figure: (a) 10-10 tasks*
-
-![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_22hBwIf7OC/figures/014_Figure.jpg]]
-*Figure: T0 a) Concept sim T1 Vanilla With plugin c) Feature sim*
-
-![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_22hBwIf7OC/figures/016_Figure.jpg]]
-*Figure: a) Images c) Feature sim*
-
-![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_22hBwIf7OC/figures/020_Figure.jpg]]
-*Figure: (a) Primitive Loss Coefficient*
-
-![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_22hBwIf7OC/figures/021_Figure_11.jpg]]
-*Figure 11: Radars of different hyperparameters in slot representation learning*
-
-![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_22hBwIf7OC/figures/006_Table.jpg]]
-
 ![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_22hBwIf7OC/figures/008_Table_3.jpg]]
 *Table 3: Detail hyperparameters for concept learning stage in our main experiments*
-
-
 
 ## 定位与知识库关联
 
@@ -315,8 +284,6 @@ CompSLOT 与两类直接操作概念的持续学习工作形成对比：
 5. **开放世界与跨域泛化**：CompSLOT 的概念组合泛化能力在真实世界开放集、跨域持续学习场景下的表现如何？当前验证仅限于 CGQA、COBJ、ImageNet-R 等受控基准，未见域偏移或开放类别的实验证据。
 
 6. **概念可解释性的量化**：Figure 4 和 Figure 9 提供了概念学习的可视化证据，但缺乏系统性的概念纯度、概念解耦度等量化指标。如何客观度量学到的 slots 是否真正对应语义概念，而非仅仅是空间分割的产物？
-
-
 
 ## 原文 PDF
 

@@ -77,8 +77,6 @@ claims:
 
 当前研究主要受限于MANBENCH的多选问答范式，尚未覆盖开放式生成或真实多智能体对话场景。防御策略的有效性高度依赖具体提示措辞，且模型层防御的泛化能力仅在有限模型和领域上初步验证。研究聚焦于英文任务和西方文化背景，跨语言、跨文化情境下的集体记忆偏差仍有待探索。未来的关键方向包括：开发不依赖领域先验知识的通用防御机制（如引入独立批评智能体进行交叉验证），探索通过强化学习使LLM内生获得对集体认知偏差的免疫力，以及在更复杂的多轮渐进式说服攻击下评估现有防御的鲁棒性。
 
-
-
 ### 多智能体系统的集体认知脆弱性
 
 基于大语言模型（LLM）的多智能体系统在协作推理、知识整合和复杂决策中展现出巨大潜力。然而，这类系统在群体交互过程中可能面临一种尚未被充分探索的风险：集体认知偏差。当多个智能体通过社会交互共享信息时，虚假或误导性的叙事是否能够系统性覆盖个体原本正确的知识，并最终固化为群体的长期错误信念？
@@ -103,8 +101,6 @@ claims:
 - **RQ3**：如何有效缓解多智能体系统中的曼德拉效应？
 
 通过构建专门的基准测试MANBENCH，设计多种社会影响交互协议，并在13个主流LLM上进行大规模实验，本文旨在揭示多智能体系统集体认知偏差的深层机制，并提出提示层和模型层两级的防御策略。
-
-
 
 ## 核心方法与创新机理
 
@@ -150,8 +146,6 @@ MANBENCH的核心方法论贡献在于构建了一个**可控、可量化的集�
 - 提示层防御的有效性高度依赖于具体措辞，且可能被对抗性构建的虚假叙事绕过。
 - 模型层防御仅在Llama 3.1-8B和医学领域（MedMCQA）上初步验证，跨模型、跨领域的泛化能力未知。
 - 实验聚焦于英文任务和西方文化背景知识，跨语言、跨文化情境下的集体记忆偏差规律尚待探索。
-
-
 
 ![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_yIoMqDes7O/figures/002_Figure_2.jpg]]
 *Figure 2: An overview of the five interaction protocols, where the Generic Group involves undifferentiated agents forming a simple social consensus, and the Role-based Group consists of agents with distinct, strategic roles. The Short-term timescale measures immediate, in-context response, while the Long-term timescale assesses whether beliefs persist after memory consolidation and retrieval*
@@ -240,8 +234,6 @@ RS 测量角色化叙事的即时影响，RL 测量其长期固化效果。实�
 
 整个框架的核心因果链路为：**交互协议中的社会影响机制（组组成 × 记忆时间尺度）→ 虚假叙事覆盖正确记忆 → 现实偏移率 $\sigma^{P}$ 量化效应强度**。群体规模调节效应强度：一般组中效应随智能体数量增加而饱和（约 7 个智能体），角色基础组呈倒 U 型（6 个智能体时达峰，超过 9 个后因“怀疑诱发警觉”而减弱）。模型规模并非线性保护因素——Claude 系列从 72.0%（Haiku）降至 39.6%（Sonnet），但 Qwen3 系列从 89.3%（8B）升至 92.2%（235B），出现逆向缩放。
 
-
-
 ### 任务策展与领域分类
 
 MANBENCH从**BIG-Bench Hard（BBH）**中选取并分类20个多选问答任务，构建包含**4,838个问题**的数据集。任务按知识属性划分为四个领域：
@@ -315,20 +307,16 @@ $$\sigma_{max} = \frac{|(\mathcal{Q}_{\times}^{GS} \cup \mathcal{Q}_{\times}^{GL
 
 **监督微调（Supervised Fine-Tuning, SFT）**基于两类数据集：**韧性集**来自认知锚定和来源审查提示下成功防御曼德拉效应的推理链，**合作集**包含正确引导（纠正性引导）和知识丰富（丰富性引导）两种合作场景。通过在平衡数据集上微调，使模型内生地获得对社会操控的抵抗力，同时维持正常协作能力（Section 5.2, D.2）。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：曼德拉效应的普遍性与强度
 
 MANBENCH基准测试的核心结论是：**所有评估的大语言模型（LLM）在多智能体交互中均表现出对曼德拉效应的系统性脆弱性**。在基线协议（B）下，模型独立回答的错误率（Err^B）相对较低；然而，一旦引入社会影响协议，错误率显著攀升。Table 2 的数据清晰地描绘了这一趋势：GPT-5 在基线下的错误率仅为 17.63%，但在角色基础短期协议（RS）下飙升至 41.59%；开源模型 Qwen3-235B 的脆弱性更为突出，其错误率从 25.48% 跃升至 74.75%。这表明，即使是当前最先进的大模型，其内部知识表征也无法在群体交互中有效抵御精心构建的虚假共识。
 
-
 ![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_yIoMqDes7O/figures/004_Table_2.jpg]]
 *Table 2: Results (%) of error rate E $\boldsymbol { \Sigma } \boldsymbol { \Sigma } ^ { P }$
 
 为剥离模型先验知识不足的混淆，研究采用**现实偏移率（σ^P）** 这一核心指标，专门量化“原本正确却被社会影响覆盖”的记忆改写比例。Table 3 的结果揭示了不同模型在记忆改写深度上的显著差异：GPT-5 在 RS 协议下的短期偏移率（σ^RS）为 31.03%，意味着近三分之一的正确记忆被即时颠覆；而 Llama3.1-8B 的这一比率高达 99.47%，几乎完全丧失了对其初始正确知识的坚持。这确立了因果瓶颈：**社会交互协议中的叙事植入机制，能够系统性地覆盖 LLM 智能体的正确先验知识，形成集体错误信念。**
-
 
 ![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_yIoMqDes7O/figures/005_Table_3.jpg]]
 *Table 3: Reality shift rate $\sigma ^ { P }$ (%)*
@@ -358,13 +346,9 @@ MANBENCH基准测试的核心结论是：**所有评估的大语言模型（LLM�
 Table 4 按四个知识领域分解了基线错误率与现实偏移率，揭示了一个关键发现：**即使是基线知识牢固的领域，也无法抵御社会影响。** 历史/时间/事件领域（σ^RS=58.74%）和误解/社会认知领域（σ^RS=52.67%）由于本身具有叙事性和模糊性，成为曼德拉效应的重灾区。然而，通识知识领域尽管基线错误率最低（Err^B=13.46%），其短期现实偏移率仍达到 48.02%，表明社会共识压力足以覆盖相当比例的常识性正确知识。领域专业知识（如医学、物理）的偏移率最高（σ^RS=67.46%），这可能是因为此类知识对智能体而言本身具有较高认知负荷，使其更易依赖外部“专家”角色的虚假背书。
 
 
-![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_yIoMqDes7O/figures/007_Table_4.jpg]]
-*Table 4: Baseline error rate ( $\mathtt { E r r } ^ { B }$ ) and reality shift rate ( $\sigma ^ { P }$ ) across knowledge domains. (%)
-
 **模型规模并非线性防御**
 
 Figure 4 呈现了一个反直觉的发现：简单地扩大模型参数规模，并不能保证更强的曼德拉效应抵抗力。在 Claude 系列中，从 Claude 3.5 Haiku 到 Claude 4 Sonnet，最大现实偏移率（σ_max）确实从 72.0% 下降至 39.6%，显示出规模带来的正向收益。然而，在 Qwen3 系列中，出现了**逆向缩放**现象：Qwen3-8B 的 σ_max 为 89.3%，而更大的 Qwen3-235B 反而升至 92.2%。这表明，模型架构、训练数据与对齐策略的综合作用，而非单纯的参数量，决定了模型对社会认知操控的易感性。这一发现对“更大即更强”的朴素假设提出了重要质疑。
-
 
 ![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_yIoMqDes7O/figures/008_Figure_4.jpg]]
 *Figure 4: Results (%) of maximal reality shift rate $\sigma _ { m a x }$ across model series*
@@ -374,7 +358,6 @@ Figure 4 呈现了一个反直觉的发现：简单地扩大模型参数规模�
 **提示层防御：认知锚定与来源审查**
 
 Figure 5 展示了两种提示级防御策略在 GPT-4o 上的效果。在无防御基线中，RS 协议下的现实偏移率高达 56.0%。应用**认知锚定**（要求智能体优先基于内部知识独立判断，再批判性分析外部输入）后，σ^RS 骤降至 17.0%，降幅达 39 个百分点。**来源审查**（将智能体角色切换为信息侦探，分析叙事结构与可信度）同样有效，将 σ^RS 降至 25.2%。在长期协议（RL）下，两种防御的效果趋于收敛，均将偏移率从 33.6% 压制至约 15%。这表明，提示层干预能够在即时响应阶段显著增强智能体的认知韧性，且对防止长期信念固化同样有效。
-
 
 ![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_yIoMqDes7O/figures/009_Figure_5.jpg]]
 *Figure 5: Results (%) of reality shift rate $\sigma ^ { P }$ before (Base) and after applying the defense methods (cognitive anchoring and source scrutiny)*
@@ -392,26 +375,6 @@ Figure 6 的消融实验揭示了模型层防御（SFT）的关键权衡。仅�
 3.  **模型层防御的泛化未知**：SFT 防御仅在 Llama3.1-8B 和医学领域（MedMCQA）上进行了初步验证。其在其他模型架构（如 MoE、状态空间模型）和更广泛知识领域上的迁移效果，缺乏实验支撑。
 4.  **先验知识混淆**：基线智能体自身的知识水平存在差异。高基线错误率的模型在受社会影响后表现出的高错误率，可能部分源于先验知识不足而非纯粹的记忆改写。尽管 σ^P 指标已试图剥离此混淆，但在基线错误率极高的模型上，其解释力仍受限制。
 5.  **文化偏差未控制**：研究聚焦于英文任务和西方文化背景知识。曼德拉效应本身与集体记忆和文化语境深度绑定，跨语言、跨文化情境下的效应强度与防御策略有效性，是当前研究的盲区。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_yIoMqDes7O/figures/011_Table_5.jpg]]
-*Table 5: The domain, description, and quantities of the 20 selected tasks from the BIG-bench dataset*
-
-![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_yIoMqDes7O/figures/012_Table_6.jpg]]
-*Table 6: Details of all models we used in our experiments*
-
-![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_yIoMqDes7O/figures/013_Table_7.jpg]]
-*Table 7: Role composition and interaction sequence for each group size from N=1 to N=15. Role abbreviations are: E (Error Conclusion Initiator), D (Detail Support Provider), G (Group Consensus Reinforcer), A (Authority Endorser), Q (Questioning Compromiser)*
-
-![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_yIoMqDes7O/figures/014_Table_8.jpg]]
-*Table 8: Agent names used in the prompts*
-
-![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_yIoMqDes7O/figures/015_Table_9.jpg]]
-*Table 9: Domains, tasks, and corresponding expert roles used in the prompts*
-
-
-
 
 ## 定位与知识库关联
 
@@ -482,8 +445,6 @@ MANBENCH并非提出新的模型架构或训练范式，而是构建了一套**�
 5. **架构差异**：曼德拉效应在不同LLM架构（如MoE、状态空间模型）上是否存在系统性差异？论文观察到Qwen3系列出现逆向缩放（8B的89.3%升至235B的92.2%），而Claude系列则随规模改善（72.0%降至39.6%），这一现象的根本原因值得深入探究。
 
 6. **下游影响量化**：如何量化评估社会交互导致的记忆篡改对下游决策的具体影响？当前指标仅衡量知识层面的偏移，未追踪错误信念如何传播并影响后续行动。
-
-
 
 ## 原文 PDF
 

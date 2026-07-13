@@ -56,8 +56,6 @@ claims:
 
 主要实验结果显示，当前最先进的Web智能体在Ego2Web上表现最佳的为**Browser Use with Gemini-3-Flash**（成功率58.6%），与理论最优性能（oracle）之间仍存在约40%的显著差距。这一结果表明，第一人称视觉感知驱动的Web操作仍是一个极具挑战性的开放问题，现有智能体在物体误识别和时间顺序理解方面存在突出短板。
 
-
-
 ### 第一人称视觉理解与Web操作的脱节
 
 随着多模态大语言模型（MLLM）和Web智能体的快速发展，AI系统在数字环境中的自主操作能力取得了显著进步。以**WebVoyager**（He et al., 2024）和**VisualWebArena**（Koh et al., 2024）为代表的基准测试，已经能够评估智能体基于网页截图执行在线任务的能力。与此同时，以**EgoSchema**（Mangalam et al., 2023）和**EgoThink**（Cheng et al., 2024）为代表的视频推理数据集，则专注于评估模型对第一人称视频的纯视觉理解能力。
@@ -82,8 +80,6 @@ claims:
 2. **量化能力鸿沟**：通过系统评估揭示当前最先进Web智能体在真实世界视觉接地任务上的真实表现，为后续研究提供明确的改进方向。
 3. **建立可靠评估**：设计能够整合视频证据的自动评估框架，在保证与人类判断高度一致（约84%一致率）的前提下，降低人工评估成本并提升可重复性。
 
-
-
 ## 核心方法与创新机理
 
 Ego2Web 的核心创新在于将**第一人称视频感知**与**在线 Web 任务执行**首次系统性地结合，构建了一个连接物理世界与数字世界的基准测试。与现有工作相比，这一创新体现在三个关键维度的根本性改变上。
@@ -103,8 +99,6 @@ Ego2Web 的核心创新在于将**第一人称视频感知**与**在线 Web 任�
 ### 创新效果的因果验证
 
 消融实验（Table 5）揭示了上述创新的因果效应：当移除视频输入、仅提供文本描述时，智能体成功率从 **48.2%** 骤降至 **23.6%**；完全移除视觉信号后，成功率仅为 **4.4%**。这表明精细的时空视觉线索对于任务完成具有不可替代的驱动作用，也验证了 Ego2Web 所引入的第一人称视频感知维度构成了当前智能体的核心能力瓶颈。
-
-
 
 Ego2Web构建了一个连接物理世界视觉感知与数字Web操作的完整流水线，其核心由**数据生成**、**智能体执行**与**自动评估**三个相互衔接的阶段组成。
 
@@ -143,12 +137,8 @@ Ego2Web采用**模型-人工协作的半自动流水线**来合成视觉锚定�
 
 该框架的核心优势在于**显式建模视觉证据与动作之间的一致性**，而非仅依赖文本轨迹或最终响应。实验表明，Ego2WebJudge与人类判断的一致性达到约84%（GPT-4o版本），显著优于WebVoyager（74.7%）和WebJudge（78.4%）等先前方法。这一改进主要源于其对第一人称视频中视觉信号的有效利用，减少了先前评估器常见的误判模式。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l818_https_arxiv_org_abs_2603_22529/figures/001_Figure_1.jpg]]
 *Figure 1: | In this paper, we propose Ego2Web, a new benchmark introducing a novel web-agent task grounded in users’ real-world visual surroundings. The tasks span diverse domains, like e-commerce, media retrieval, knowledge lookup, and local/maps services. Given an egocentric video and an instruction, the agent must first perform spatio-temporal grounding to identify the relevant visual cue (e.g., the fourth snack picked up in the video), and then execute corresponding web actions based on both the grounded visual evidence and the instruction*
-
-
 
 ### 任务形式化定义
 
@@ -198,12 +188,8 @@ $$O = Ego2WebJudge(I, \nu, A, S)$$
 
 Ego2WebJudge与人类判断的一致性达到约84%（GPT-4o版本），显著优于WebVoyager评估（74.7%）和WebJudge（78.4%），验证了融合视频证据对评估可靠性的关键作用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l818_https_arxiv_org_abs_2603_22529/figures/004_Figure_3.jpg]]
 *Figure 3: | Left: Overview of the semi-automatic data generation pipeline proposed in our Ego2Web. We first build video profiles via a frozen MLLM that converts video clips into structured captions, then prompt an LLM to automatically generate web task instructions. Human annotators are required to verify and refine generated tasks to ensure quality. Right: A detailed view of our proposed automatic evaluation method, Ego2WebJudge, for the egocentric video grounded web agent tasks*
-
-
 
 ## 实验与关键发现
 
@@ -246,20 +232,6 @@ Ego2Web在6个代表性Web智能体上进行评估，涵盖多模态原生模型
 
 这些失败模式与消融实验中“无视觉输入SR仅4.4%”的发现相互印证：视觉感知能力是任务成功的必要条件，但当前智能体的视觉理解精度远未达到可靠水平。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l818_https_arxiv_org_abs_2603_22529/figures/005_Figure.jpg]]
-*Figure: (a) Task type distribution of Ego2Web. (b) Distribution of website domains in Ego2Web*
-
-![[assets/figures/papers/paper_list_l818_https_arxiv_org_abs_2603_22529/figures/009_Table_2.jpg]]
-*Table 2: | Success Rate (SR) measured by human evaluation and Ego2WebJudge using different Multimodal LLMs*
-
-![[assets/figures/papers/paper_list_l818_https_arxiv_org_abs_2603_22529/figures/010_Table_3.jpg]]
-*Table 3: | Fine-grained Success Rate (SR) per task domain across different models, evaluated by Ego2WebJudge with Gemini-2.5 Pro*
-
-![[assets/figures/papers/paper_list_l818_https_arxiv_org_abs_2603_22529/figures/011_Table_4.jpg]]
-*Table 4: | Agreement Rate (AR) between human evaluation and automatic evaluation methods across agents*
-
 ![[assets/figures/papers/paper_list_l818_https_arxiv_org_abs_2603_22529/figures/012_Table_5.jpg]]
 *Table 5: | Ablation studies on the impact of video perception in our Ego2Web task. We report the Successful Rate (SR). We use Gemini-3.1-Pro to generate structured and detailed captions to represent an egocentric video. The experiment is conducted with Browser-Use (Gemini-3-Flash) and evaluated with Ego2WebJudge (Gemini-2.5-Pro)*
 
@@ -268,14 +240,6 @@ Ego2Web在6个代表性Web智能体上进行评估，涵盖多模态原生模型
 
 ![[assets/figures/papers/paper_list_l818_https_arxiv_org_abs_2603_22529/figures/013_Figure_6.jpg]]
 *Figure 6: | Visualization of a web agent (BU-Gemini-3-Flash) failure case. The agent is required to identify the second picked-up sauce from the egocentric video and retrieve its product page. The agent incorrectly identifies the target item due to temporal misunderstanding and fails to verify the required information on the webpage*
-
-![[assets/figures/papers/paper_list_l818_https_arxiv_org_abs_2603_22529/figures/014_Table_6.jpg]]
-*Table 6: | Mapping from task categories to representative websites in Ego2Web, along with the number of tasks per category*
-
-![[assets/figures/papers/paper_list_l818_https_arxiv_org_abs_2603_22529/figures/015_Figure_7.jpg]]
-*Figure 7: | Example of egocentric video in Ego2Web, the detailed captions generated by Gemini-3.1-pro are listed above*
-
-
 
 ## 定位与知识库关联
 
@@ -331,8 +295,6 @@ Ego2Web 的设计决定了其适用范围存在以下边界：
 3. **在真实世界应用中，如何平衡在线评估的生态效度和可重复性**？可能的方案包括定期快照网站状态、构建静态镜像，或设计对动态内容鲁棒的评估指标。
 
 4. **如何针对性地加强智能体在物体误识别和时间顺序误解方面的能力**？这可能需要专门的训练数据或推理时干预策略，例如引入显式的时序推理模块或多帧对比验证机制。
-
-
 
 ## 原文 PDF
 

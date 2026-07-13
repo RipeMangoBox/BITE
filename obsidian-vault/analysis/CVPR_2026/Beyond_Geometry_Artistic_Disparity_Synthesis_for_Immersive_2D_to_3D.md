@@ -78,8 +78,6 @@ Art3D处于**2D转3D**与**立体视觉**的交叉点，但其定位与现有工
 
 该工作为初步探索，仅在25部3D电影数据上训练，泛化到任意2D内容仍有待检验。艺术风格评估依赖拟合参数 $(s, t)$ 的统计分布，尚未建立公认的感知质量指标。此外，最终渲染需依赖外部翘曲和修补，非端到端解决方案。
 
-
-
 ### 2D转3D的范式困境：几何精度与艺术表达的冲突
 
 将2D内容转换为沉浸式3D体验是视觉计算领域的长期目标。当前主流方法——包括**Depth-Anything-V2**（Yang et al., arXiv 2024）、**StereoCrafter**（Zhao et al., arXiv 2024）和**Eye2Eye**（Geyer et al., arXiv 2025）——均遵循**几何重建范式**：它们以估计物理精确的视差图或深度图为目标，追求像素级几何精度。然而，这一范式在面向消费级沉浸式体验时暴露出根本性缺陷：它忽视了专业3D电影制作中至关重要的**艺术意图**。
@@ -91,8 +89,6 @@ Art3D处于**2D转3D**与**立体视觉**的交叉点，但其定位与现有工
 本文提出一个范式级转变：**将视差图视为艺术表达的载体，而非物理精度的描述**。这一洞察源于对专业3D电影制作流程的观察——导演通过调整全局深度风格（尺度$s$与偏移$t$）和局部雕刻效果（特定对象的弹出感）来引导观众的注意力与情感体验。因此，2D转3D的目标不应是估计几何真值，而应是从专业3D电影数据中**学习电影立体风格先验**，合成符合艺术惯例的视差图。
 
 基于此，本文提出**Art3D**——一种艺术化视差合成框架。其核心设计原则是**双路径解耦**：通过间接监督机制将艺术视差蓝图分离为全局线性参数$(s, t)$（建模导演宏观意图）和局部逐像素修复参数$(v_s, v_t)$（实现“艺术笔触”般的强调效果），从而在保持底层几何结构的前提下注入电影级立体风格。这一设计使得模型能够稳定学习全局风格一致性，同时灵活雕刻局部弹出效果，最终实现从“几何正确”到“艺术沉浸”的跨越。
-
-
 
 ## 核心方法与创新机理
 
@@ -123,8 +119,6 @@ Art3D的核心洞察在于：**视差图本质上是艺术表达的载体，而�
 
 **证据强度说明**：范式层面的创新主要通过概念对比（Table 2）和方法设计论证，缺乏与其他艺术化方法的直接定量比较（因该范式尚未有其他工作），但消融实验和用户测试为changed slots的有效性提供了强证据（$p<0.01$ 量级）。数据来源仅限于25部3D电影，泛化到更广泛艺术风格的能力仍需验证。
 
-
-
 Art3D 框架的核心设计理念是将 2D 转 3D 从“几何精度估计”重新定位为“艺术化视差合成”。整个 pipeline 由五个功能模块串联而成，其中仅 CameraNet 参与训练，其余组件在数据构建阶段冻结使用，体现了“几何画布 + 艺术笔触”的解耦思想。
 
 **输入与输出流。** 系统接收单张 2D 左视图作为输入，最终输出虚拟右视差图 $\hat{d}^R$，配合原始左视图通过标准翘曲技术即可合成虚拟右视图，形成立体对。
@@ -146,12 +140,8 @@ Art3D 框架的核心设计理念是将 2D 转 3D 从“几何精度估计”重
 
 **关键设计决策。** 框架选择冻结 DepthNet 和 StereoNet，仅训练轻量的 CameraNet（架构见 Table 1），这一设计将几何理解与艺术表达解耦：几何画布提供稳定的空间锚点，CameraNet 则专注于学习从 3D 电影数据中提取的艺术风格先验，而非估计物理真值。双路径掩码机制是实现风格一致性与局部表现力兼顾的关键因果旋钮——消融实验表明，去除 $L_{Art}$ 后全局风格 $s$ 的标准差从 0.009 升至 0.018（Table 3），而去除局部路径则导致弹出效果缺失（Figure 3）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2443_https_arxiv_org_abs_2603_05906/figures/002_Figure_2.jpg]]
 *Figure 2: Art3D Framework. Our pipeline takes a 2D Left View as input. 1. Geometric Feature Extraction (Frozen): ‘DepthNet’ extracts geometric features and the inverse depth map, ‘geometric canvas (iz)’. 2. Artistic Blueprint & Masks (Frozen, Data Construction Stage): During the data construction stage (no training or inference required), ‘StereoNet’ estimates the target artistic blueprint*
-
-
 
 Art3D 框架的核心并非端到端的视差估计，而是一种**双路径监督下的艺术化视差合成**机制。其设计哲学在于：将视差图视为艺术表达的载体，而非物理几何的精确描述。整个流水线由五个功能模块构成，其中仅 CameraNet 参与训练，其余均为冻结或数据构建阶段的预处理组件。
 
@@ -211,13 +201,6 @@ CameraNet 输出的虚拟右视差图 $\hat{d}^R$ 与原始左视图结合，通
 
 > **注意**：以上公式完全来自论文提供的分析数据，未进行任何外推或猜测。若需验证公式编号与原文的精确对应关系，请参照论文 Sec.3.3 和 Sec.3.4 的原始表述。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2443_https_arxiv_org_abs_2603_05906/figures/001_Figure_1.jpg]]
-*Figure 1: Artistic ambiguity in 3D film production. The same scene can exhibit distinct 3D perceptions under different artistic directions. To illustrate this, we simulate various 3D production choices and visualize their effects. From left to right, the three columns show the left view, right view, and the resulting red–cyan anaglyph (best viewed when zoomed in). Comparing the first and second rows, variations in the stereo camera’s baseline b and focal length f lead to different disparities, reflecting differences in the Mastery of Global Depth. The second and third rows show zero-plane ambiguity, where the perceived depth reference shifts from the foreground cow to the distant forest, often due to...*
-
-
-
 ## 实验与关键发现
 
 ### 范式对比与实验设置
@@ -268,8 +251,6 @@ $$\mathrm{DDC-IoU} = \frac{\mathcal{T}(\hat{d}^{iz}) \cap \mathcal{T}(d^{L})}{\m
 
 这些局限表明，Art3D作为范式探索是成功的，但距离实用的通用2D转3D工具仍有工程和评估层面的差距需要填补。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2443_https_arxiv_org_abs_2603_05906/figures/004_Table_2.jpg]]
 *Table 2: Comparison of 2D-to-3D Conversion Paradigms*
 
@@ -281,14 +262,6 @@ $$\mathrm{DDC-IoU} = \frac{\mathcal{T}(\hat{d}^{iz}) \cap \mathcal{T}(d^{L})}{\m
 
 ![[assets/figures/papers/paper_list_l2443_https_arxiv_org_abs_2603_05906/figures/007_Figure_3.jpg]]
 *Figure 3: Qualitative analysis of Sculpting of Local Effects on 2D inputs. Row 1: Input image. Row 2: Ours*
-
-![[assets/figures/papers/paper_list_l2443_https_arxiv_org_abs_2603_05906/figures/009_Table_5.jpg]]
-*Table 5: User Study: Art3D vs. Depth-Anything-V2 (Geometriconly, N = 50 videos, 25 participants)*
-
-![[assets/figures/papers/paper_list_l2443_https_arxiv_org_abs_2603_05906/figures/008_Figure_4.jpg]]
-*Figure 4: Analysis of Geometric Consistency via DDC-IoU. Each row presents three independent samples. For each sample, the Anaglyph 3D view is shown on top. Below it, the corresponding right disparity map*
-
-
 
 ## 定位与知识库关联
 
@@ -327,8 +300,6 @@ Table 2 从监督信号、优化目标和输出性质三个维度系统对比了
 3. **动态场景与实时应用**：当前工作在静态帧上验证，扩展到视频序列时需考虑时域一致性。此外，CameraNet虽轻量（Table 1），但整个管线的实时性尚未评估。
 
 4. **风格迁移与控制**：模型目前隐式学习训练数据的平均风格。能否引入显式的风格条件（如导演风格标签、电影时期），实现可控的艺术风格迁移？
-
-
 
 ## 原文 PDF
 

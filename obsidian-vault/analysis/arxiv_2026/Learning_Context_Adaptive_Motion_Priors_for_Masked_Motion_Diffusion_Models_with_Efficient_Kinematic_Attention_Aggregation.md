@@ -54,8 +54,6 @@ MMDM在多个公开基准上取得最优结果：在Shelf和Campus数据集上�
 
 MMDM的主要局限性在于扩散逆过程仍需数百步迭代，单次评估耗时超过7小时，难以满足实时应用需求；此外，不同任务（补全、细化、插值）目前需要分别微调，尚未统一为单一模型。未来工作可探索更高效的采样策略以压缩推理时间，以及设计统一的端到端框架来覆盖多样化运动生成任务。
 
-
-
 从多视角视频中重建准确的三维人体运动是计算机视觉领域的长期挑战，其核心瓶颈在于**遮挡**——当人体关节被自身、他人或环境遮挡时，二维姿态估计器提供的观测信息变得稀疏、含噪且不可靠，导致三维重建结果出现严重失真。这一问题的本质是**从部分、低质量观测中推断完整、高质量运动序列**的生成式重建任务。
 
 现有方法在面对这一挑战时存在明显的结构性缺口。**掩码自编码器（Masked Autoencoders, MAE）** 能够从可见关节重建被掩码的关节，但其设计假设输入是“干净”的，无法处理观测中的噪声与不确定性。**运动扩散模型**则擅长从噪声中逐步去噪生成高质量运动，但其标准范式要求以完整运动序列作为输入，无法直接利用部分观测进行条件生成。换言之，MAE缺乏对噪声的鲁棒性，扩散模型缺乏对部分输入的条件化能力，二者各执一端，未能形成统一框架。
@@ -65,8 +63,6 @@ MMDM的主要局限性在于扩散逆过程仍需数百步迭代，单次评估�
 本文的动机正是弥合上述缺口：**能否设计一种生成式重建框架，同时具备（1）对部分、含噪输入的条件化能力，（2）对关节级结构与姿势级动态的高效融合能力？** 为此，我们提出**运动学注意力聚合（Kinematic Attention Aggregation, KAA）** 机制，通过可学习聚合令牌在结构注意力与时间注意力之间建立桥梁，迭代地深度编码关节间的空间关系与时间依赖，从而提取上下文自适应的运动先验。在此基础上，我们将KAA嵌入掩码扩散范式，构建**掩码运动扩散模型（Masked Motion Diffusion Model, MMDM）**，以未掩码的高质量观测为条件，对掩码噪声输入进行条件逆扩散生成，实现从部分到完整的运动重建。
 
 如图1所示，MMDM突破了传统MAE与运动扩散模型的各自局限：它不再要求输入是干净完整的，而是能够利用部分高质量数据条件生成缺失运动，在运动补全、细化与插值等多样化任务中展现统一的生成能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -112,8 +108,6 @@ MMDM的主要局限性在于扩散逆过程仍需数百步迭代，单次评估�
 3. **自适应掩码策略**（任务适配）：根据输入质量动态调整掩码，增强模型对真实遮挡场景的鲁棒性。
 
 这三个changed slots共同赋予了MMDM从部分、低质量数据中提取上下文自适应运动先验的能力，使其在运动补全、细化和插值等任务上均取得了显著优于现有方法的性能。
-
-
 
 MMDM 的设计动机源于一个核心瓶颈：**传统掩码自编码器（MAE）无法处理噪声输入，而运动扩散模型需要完整输入且计算复杂**，二者均无法在部分含噪观测条件下生成高质量人体运动。为填补这一空白，MMDM 将**掩码扩散范式**与**运动学注意力聚合（KAA）**机制融合为一个统一的生成式重建框架，其整体架构如 Figure 1 所示。
 
@@ -161,8 +155,6 @@ MMDM 的输入输出流根据下游任务灵活调整，无需改变核心网络
 | 扩散与掩码的结合 | MAE 不涉及扩散；**GMD**（ICCV 2023）、**MDM** 等扩散模型需完整输入进行去噪 | 将扩散过程嵌入 MAE 解码器，以未掩码部分为条件对掩码噪声输入进行条件逆扩散生成 |
 
 这种设计使 MMDM 能够同时利用部分高质量数据的条件信息与扩散模型的生成能力，在运动补全、细化与插值任务上均取得了最优性能（详见实验部分 Table II–V）。
-
-
 
 ### 3.1 运动学注意力聚合（KAA）机制
 
@@ -222,13 +214,6 @@ $$\mathbf{d}_{k-1}^{q} = E_{\phi}(\mathbf{d}^{p} \oplus \mathbf{d}_k^{q} \oplus 
 
 KAA 是 MMDM 性能提升的**因果旋钮**：它通过可学习聚合令牌将关节级空间结构信息注入姿势级表示，再经时间注意力建模时序依赖，使编码器能够提取任务特定的上下文自适应运动先验。这一设计使得模型无需改变网络结构即可适应运动补全、细化与插值等任务——区别仅在于掩码策略和损失函数的作用范围。消融实验表明，扩散目标从预测噪声切换为预测信号时性能几乎不变（Shelf 上 PCP 98.47 vs 98.48），说明性能增益主要来自 KAA 的表示学习能力，而非扩散目标的特定选择。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l90_https_arxiv_org_abs_2603_07697/figures/004_Figure_2.jpg]]
-*Figure 2: Illustration of the reverse diffusion process in the proposed Masked Motion Diffusion Model (MMDM). It begins at iteration*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -268,25 +253,11 @@ KAA 是 MMDM 性能提升的**因果旋钮**：它通过可学习聚合令牌将
 3. **极端遮挡鲁棒性**：当输入 2D 姿态面临严重漏检或误检时，仅依赖部分观测关节的条件生成仍可能产生不合理姿态。
 4. **外部引导无效**：GMD 的强调投影与密集梯度传播技术对 MMDM 几乎无增益，暗示 KAA 本身已隐含类似的空间加权能力，但这一假设需进一步验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l90_https_arxiv_org_abs_2603_07697/figures/007_Table.jpg]]
 *Table: II MOTION CAPTURE PERFORMANCE ON SHELF AND CAMPUS DATASETS USING THE PCP (%) METRIC. “A-N” CORRESPONDS TO THE n-TH ACTOR, WHILE ‘AVG’ DENOTES THE AVERAGE PCP. ‘†’ INDICATES THE CORRECTED VALUE. BOLD INDICATES THE BEST PERFORMANCE; UNDERLINED INDICATES THE SECOND-BEST*
 
-![[assets/figures/papers/paper_list_l90_https_arxiv_org_abs_2603_07697/figures/008_Table.jpg]]
-*Table: III MOTION CAPTURE PERFORMANCE ON THE BUMOCAP (BU) AND BUMOCAP-X (BU-X) DATASETS. AVERAGE PCP (%), PRECISION (%), RECALL (%), AND MPJPE (MM) ARE REPORTED*
-
 ![[assets/figures/papers/paper_list_l90_https_arxiv_org_abs_2603_07697/figures/009_Table.jpg]]
 *Table: IV QUANTITATIVE COMPARISONS FOR THE MOTION REFINEMENT TASK ON THE SHELF DATASET. WE REPORT THE RESULTS BEFORE AND AFTER REFINEMENT, WITH THE INCREMENTAL CHANGE ∆ (%)*
-
-![[assets/figures/papers/paper_list_l90_https_arxiv_org_abs_2603_07697/figures/011_Table.jpg]]
-*Table: V MOTION IN-BETWEENING RESULTS ON THE BABEL-TEACH DATASET. THE PERFORMANCE OF THE 30-FRAME TRANSITION IS REPORTED. MDM⋆ AND $\mathbf { M D M }$ _ ${ \star$ $\star }$ REPRESENT TWO MDM VARIANTS. 10×, 50×, 100× DENOTE RESULTS UNDER DDIM SAMPLING *
-
-![[assets/figures/papers/paper_list_l90_https_arxiv_org_abs_2603_07697/figures/012_Table.jpg]]
-*Table: VI MOTION REFINEMENTS RESULTS ON THE SHELF DATASET USING “MOCAP” DATA. 5× AND 10× DENOTE THE SPEED-UP RATIOS UNDER DDIM SAMPLING *
-
-![[assets/figures/papers/paper_list_l90_https_arxiv_org_abs_2603_07697/figures/013_Figure_6.jpg]]
-*Figure 6: Computational complexity and motion in-betweening performance of each model are evaluated on the BABEL-TEACH dataset [55] using the L2P metric. The size of the circle indicates the number of parameters, with a larger area representing a greater number*
 
 ![[assets/figures/papers/paper_list_l90_https_arxiv_org_abs_2603_07697/figures/010_Figure_5.jpg]]
 *Figure 5: Ablation study for the motion refinement task. We report the average PCP on the Shelf dataset [51]. The line graphs depict: (a) horizontal axis for the fine-tune masking patterns, with lines showing pre-train masking patterns; (b) horizontal axis for fine-tune masking ratios, with lines showing pre-train masking ratios; (c) horizontal axis for diffusion steps*
@@ -296,11 +267,6 @@ KAA 是 MMDM 性能提升的**因果旋钮**：它通过可学习聚合令牌将
 
 ![[assets/figures/papers/paper_list_l90_https_arxiv_org_abs_2603_07697/figures/006_Figure_4.jpg]]
 *Figure 4: Qualitative comparisons for motion in-betweening task. Motion sequences are sampled into key poses at a fixed ratio. Grey segments illustrate preceding and succeeding parts, while the transitioning part is color-coded from yellow to purple in a rainbow gradient, indicating the chronological order. We emphasize the joint trajectories of the pelvis, elbows, shoulders, knees, and four end-effectors. Our model generates trajectories that are closest to the ground truth, whereas other methods suffer from issues such as over-smoothing and jitter*
-
-![[assets/figures/papers/paper_list_l90_https_arxiv_org_abs_2603_07697/figures/016_Figure_1.jpg]]
-*Figure 1: Demonstration for the reserve diffusion process at k time step. Green and blue skeletons denote the ground truth and the prediction, respectively. The masked joints are first sampled from a normal distribution and iteratively denoised*
-
-
 
 ## 定位与知识库关联
 
@@ -345,8 +311,6 @@ MMDM的核心创新——**运动学注意力聚合（KAA）**——在方法谱
 3. **KAA与空间加权的内在关系**：强调投影为何对MDM有效而对MMDM几乎无增益？这是否暗示KAA本身已隐含了类似的空间加权能力？需要进一步的机制分析。
 4. **极端条件下的鲁棒性**：当输入2D姿态估计面临严重漏检或误检时，自适应掩码策略的鲁棒性如何进一步提升？是否需要引入不确定性建模或贝叶斯推断？
 5. **跨数据集泛化**：Table IV显示使用不同2D姿态估计器（AlphaPose、SimCC、OpenPose）时性能波动很小，表明模型对2D输入源具有较强的泛化性。但这种泛化性在更大规模、更多样化的运动数据上是否仍然成立，尚需验证。
-
-
 
 ## 原文 PDF
 

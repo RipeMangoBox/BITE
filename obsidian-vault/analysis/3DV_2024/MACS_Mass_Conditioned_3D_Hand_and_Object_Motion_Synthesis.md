@@ -56,15 +56,11 @@ claims:
 
 MACS在方法谱系中定位于**物理感知的运动生成**，将扩散模型的生成能力与物理约束相结合，为后续探索物体物理属性与人类操作行为之间的关系提供了新的视角。
 
-
-
 三维手-物体交互运动合成是计算机视觉与图形学中的核心问题，旨在生成逼真的手部动作序列以操作目标物体。该技术在机器人学习、增强现实和虚拟化身动画等领域具有广泛的应用前景。然而，现有方法普遍存在一个关键缺陷：**忽略了物体的物理属性，特别是质量**。
 
 真实世界中，人类操作物体的方式高度依赖于物体质量——轻物体可以用指尖捏取，重物体则需要整个手掌支撑并伴随更缓慢、更谨慎的运动策略。当前的合成方法由于缺乏对质量这一物理量的显式建模，生成的动作往往缺乏物理合理性，表现为统一化的抓取模式和运动速度，无法反映不同质量条件下应有的行为差异。
 
 MACS（Mass Conditioned 3D Hand and Object Motion Synthesis）是首个将物体质量作为显式条件引入三维手-物体运动合成的方法。其核心动机在于：**质量是影响手-物体交互模式的关键物理量**。通过在级联扩散模型中显式建模质量条件，并利用合成的接触标签进行优化，MACS使生成的手部动作和抓取方式能够自动适应不同质量的物体——轻物体时接触集中于指尖，重物体时接触扩展至整个手掌区域。该方法即使在训练中未见过的物体形状上，也能根据给定的质量值生成合理的操作行为，展现出一定的泛化能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -95,8 +91,6 @@ MACS 的核心创新在于首次将**物体质量**作为显式物理条件引�
 
 三个 changed slots 形成了一条完整的因果链：**质量条件** → 扩散模型生成质量适应的关节运动和对象轨迹 → **ConNet** 预测质量敏感的接触区域 → **几何损失与接触损失** 在训练和拟合阶段强化物理约束。这条因果链使 MACS 在用户研究中获得 6.01±2.08 的真实感评分，显著优于 VAE（5.10±2.24）和 VAEGAN（4.54±2.39）基线（Table 6），并且对训练中未见过的物体形状也展现出一定的质量条件化泛化能力（Figure 8）。
 
-
-
 MACS 采用**级联扩散模型**架构，将质量条件化的三维手-物体运动合成分解为两个顺序阶段：对象轨迹生成与手部运动合成，最后通过拟合优化输出与物体物理交互的手部网格。图 2 展示了完整的 pipeline 结构。
 
 ### 输入与输出定义
@@ -123,12 +117,8 @@ MACS 采用**级联扩散模型**架构，将质量条件化的三维手-物体�
 
 TrajDiff 的输出直接作为 HandDiff 的条件输入，形成**轨迹→手部**的级联依赖。ConNet 与 HandDiff 并行训练，但其预测的接触概率 $\mathbf{b}$ 仅在拟合优化阶段使用。这种设计使得手部运动策略和接触模式均受质量条件 $m$ 的显式控制，从而在合成中反映不同质量下的自然操作行为——轻物体倾向于指尖接触，重物体则使用整个手掌支撑（图 7 左）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1656_MACS_Mass_Conditioned_3D_Hand_and_Object_Motion_Synthesis/figures/002_Figure_2.jpg]]
 *Figure 2：质量条件驱动的物体轨迹、接触与手部运动两阶段生成框架。*
-
-
 
 ### 整体框架
 
@@ -196,16 +186,11 @@ $$\mathbf{r} = R(\bar{\Phi}_{\text{fix}}, m, d_{\text{user}})$$
 
 $$\mathcal{L}_{\text{ratio}} = \| \mathbf{r} - \hat{\mathbf{r}} \|_2^2 + \| \mathbf{r}_{\text{vel}} - \hat{\mathbf{r}}_{\text{vel}} \|_2^2 + \| \mathbf{r}_{\text{ac.}} - \hat{\mathbf{r}}_{\text{acc}} \|_2^2 + \mathcal{L}_{one}$$
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1656_MACS_Mass_Conditioned_3D_Hand_and_Object_Motion_Synthesis/figures/013_Figure_7.jpg]]
 *Figure 7：不同质量条件改变手掌与指尖的接触区域。*
 
-
 ![[assets/figures/papers/paper_list_l1656_MACS_Mass_Conditioned_3D_Hand_and_Object_Motion_Synthesis/figures/007_Figure_6.jpg]]
 *Figure 6：用户输入轨迹的处理与质量条件控制流程。*
-
-
 
 ## 实验与关键发现
 
@@ -245,7 +230,6 @@ MACS的核心目标是验证质量条件化能否使合成的手-物体交互运
 
 5. **数据采集成本高**：依赖有标记的3D手部和物体运动数据，采集过程需要专业动捕设备和标记物（Figure 5），限制了方法向更大规模、更多样化场景的扩展。
 
-
 ### 开放问题
 
 基于上述局限，作者提出了若干值得进一步探索的方向：
@@ -256,22 +240,14 @@ MACS的核心目标是验证质量条件化能否使合成的手-物体交互运
 - 能否从观察到的操作视频中反向预测物体质量，从而为自监督学习提供监督信号？
 - 整合摩擦、肌肉力等额外物理因素能否在不显著增加模型复杂度的前提下提升合成质量？
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1656_MACS_Mass_Conditioned_3D_Hand_and_Object_Motion_Synthesis/figures/011_Table_6.jpg]]
 *Table 6：用户研究中的感知运动质量比较。*
-
-
 
 ![[assets/figures/papers/paper_list_l1656_MACS_Mass_Conditioned_3D_Hand_and_Object_Motion_Synthesis/figures/006_Table_2.jpg]]
 *Table 2：完整模型及消融版本的物理合理性比较。*
 
-
 ![[assets/figures/papers/paper_list_l1656_MACS_Mass_Conditioned_3D_Hand_and_Object_Motion_Synthesis/figures/005_Figure_4.jpg]]
 *Figure 4：不同物体质量产生不同支撑方式与抓取姿态。*
-
-
-
 
 ## 定位与知识库关联
 
@@ -320,8 +296,6 @@ MACS 的适用性受限于以下关键边界条件：
 4. **从观察到预测的闭环**：能否从观察到的操作动作中反推物体质量，进而用于自监督或弱监督学习，是一个具有应用价值的方向。这涉及逆物理推理与运动生成的联合建模。
 
 5. **实时推理能力**：当前框架需要离线训练多个网络并进行拟合优化，推理速度可能无法满足实时交互应用的需求。网络架构的轻量化或端到端训练策略值得探索。
-
-
 
 ## 原文 PDF
 

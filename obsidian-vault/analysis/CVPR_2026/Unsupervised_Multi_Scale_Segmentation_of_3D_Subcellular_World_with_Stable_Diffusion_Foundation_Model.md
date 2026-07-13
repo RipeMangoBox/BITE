@@ -159,8 +159,6 @@ $$\mathrm{DiversityScore}(I) = \mathrm{std}(\pmb{\sigma}), \quad \pmb{\sigma} = 
 - **输出**：全断层图的膜分割二值掩码（通过训练后的UNet推理）以及大分子三维坐标列表（通过训练后的DeepETPicker推理）。
 - **中间产物**：四等份图像集 $\mathbb{S}_4$、多层亲和矩阵 $\mathcal{A}$、优化特征向量 $X$、聚集特征图、多尺度二值掩码、CellPose分解后的膜掩码与大分子掩码。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2621_https_openaccess_thecvf_com_content_CVPR2026_html_Uddin_Unsupervised_Mul/figures/001_Figure_1.jpg]]
 *Figure 1: Our unsupervised segmentation pipeline with visual examples. (a) Selecting information-rich slabs from a tomogram and preprocessing the slabs. (b) Split the slabs into quarters. (c) Optimize eigenvector features of the quarter images from Stable Diffusion foundation model (d) Create feature image for the quarter images using the eigenvectors (e) Obtaining multiscale unsupervised segmentation mask from the feature image, splitting the multiscale mask to membrane and macromolecule masks (f) train a supervised UNet with predicted unsupervised membrane masks as ground truth (g) Use the trained UNet to infer membrane masks for other slabs in the tomogram. (h) Train a DeepETPicker [9] model with...*
 
@@ -306,8 +304,6 @@ $$\mathcal{P} = \{ I_{ij} \in \mathbb{R}^{p\times p} \mid i = 0, s, 2s, \dots, H
 - **零标注 vs. 有监督**：无监督方法不依赖任何人工标注，避免了标注偏见和跨域标注成本，在公平性上具有天然优势。
 - **伪标签驱动训练**：无监督生成的伪标签用于训练标准有监督模型（UNet、DeepETPicker），而非自训练同一模型，保证了与有监督基线在模型架构和训练流程上的可比性。
 - **跨域泛化验证**：在额外数据集上的测试，揭示了有监督方法因训练域偏差导致的失效，而无监督方法保持稳定，凸显了其在真实应用场景中的鲁棒性优势。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2621_https_openaccess_thecvf_com_content_CVPR2026_html_Uddin_Unsupervised_Mul/figures/005_Table_1.jpg]]
 *Table 1: Dice score comparison between two training methods for membrane segmentation on VPP S. Pombe cellular cryo-ET datasets. The higher score indicates better segmentation*

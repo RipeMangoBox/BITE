@@ -52,8 +52,6 @@ claims:
 
 **主要结果**：在DAVIS数据集上，LMP的运动保真度（Motion Fidelity）达到0.90，显著优于DMT的0.85；帧一致性（Frame Consistency）达0.96，图文对齐（Image-Text Alignment）和PickScore也分别以25.68和20.69领先DMT的23.60和18.95。消融实验证实，去除FBDM后运动保真度骤降至0.77，去除ASM后帧一致性降至0.93，验证了前景-背景分离和外观抑制的关键作用。在图像到视频任务中，LMP成功实现了运动模式与目标主体初始位置、尺寸的解耦。
 
-
-
 ### 问题背景：视频生成中的运动控制困境
 
 近年来，基于扩散模型（Diffusion Models）的视频生成取得了显著进展，尤其是基于扩散Transformer（Diffusion Transformer, DiT）架构的模型（如CogVideoX-5B）在文本到视频（T2V）和图像到视频（I2V）任务中展现出强大的生成能力。然而，一个核心瓶颈依然存在：**仅依赖文本提示难以实现对生成视频中运动模式的精细控制**。文本描述天然具有模糊性——"一个人跑步"无法精确指定跑步的步频、幅度或轨迹——这使得用户无法将一段参考视频中的特定运动模式迁移到新的生成内容中。
@@ -87,8 +85,6 @@ $$A = softmax([Q^p, Q^v][K^p, K^v]^\top / \sqrt{d_k}), \quad h = A \cdot [V^p, V
 ### 本文动机
 
 基于上述分析，本文提出**LMP（Leveraging Motion Prior）**框架，旨在充分利用DiT架构的统一注意力特性，通过三个核心模块——前景-背景解耦（FBDM）、重加权运动传递（RMTM）和外观分离（ASM）——在冻结的CogVideoX-5B模型上实现零样本运动迁移，同时支持文本到视频和图像到视频两种设置。
-
-
 
 ## 核心方法与创新机理
 
@@ -148,8 +144,6 @@ $$h' = h - \beta \cdot \nabla \mathcal{L}$$
 
 这些创新共同构成了一个完整的零样本运动控制框架，在冻结的CogVideoX-5B模型上实现了即插即用的运动迁移，无需任何微调或额外训练。
 
-
-
 LMP（Leveraging Motion Prior）是一个面向基于扩散Transformer（DiT）架构视频生成模型的零样本运动传递框架。其核心设计动机在于：当前DiT模型（如**CogVideoX-5B**）仅依赖文本提示难以实现精细的运动控制，而现有的零样本运动迁移方法均基于UNet架构，无法在冻结的DiT模型上即插即用地完成运动注入。LMP利用MM-DiT统一自注意力中token的全局视野，在不修改预训练模型参数的前提下，将参考视频的运动信息作为附加token参与目标视频的去噪生成过程，同时通过外观抑制机制防止参考主体特征泄漏。
 
 ### 整体流水线
@@ -192,12 +186,8 @@ LMP的推理过程在预训练的MM-DiT去噪主干网络（CogVideoX-5B，参�
 
 整个框架的关键优势在于：所有模块均作用于注意力计算和隐藏状态层面，无需微调预训练DiT模型的任何参数，实现了真正的零样本即插即用运动控制。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2505_14167/figures/001_Figure_1.jpg]]
 *Figure 1: Our LMP framework enables DiT-based video generation models to produce target videos that reference the motion from a reference video in both text-to-video and image-to-video settings. The green dashed box indicates the reference image*
-
-
 
 LMP 框架在冻结的 **CogVideoX-5B** 预训练 DiT 模型上工作，其核心由三个即插即用的模块构成：**前景-背景解耦模块（FBDM）**、**重加权运动传递模块（RMTM）** 和 **外观分离模块（ASM）**。三个模块按去噪阶段依次介入：在去噪步 $t \in [0, T_1]$ 内执行 FBDM 与 RMTM，使目标视频获取参考运动；在 $t \in [T_2, T_3]$ 内执行 ASM，抑制参考视频主体外观对目标视频的泄漏（图3、算法1）。
 
@@ -264,16 +254,6 @@ $$\mathcal{L} = \mathbb{E}_{\mathbf{z}_0, c, \epsilon \sim \mathcal{N}(0, I), t}
 
 其中 $\epsilon_{\theta}$ 为冻结的 DiT 去噪网络，$\mathcal{M}_{ref}$ 通过 FBDM、RMTM 和 ASM 三个模块在推理过程中动态注入，无需对模型参数进行任何微调。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2505_14167/figures/002_Figure_2.jpg]]
-*Figure 2: The core idea of our FBDM. We achieve disentanglement of the foreground and background by utilizing textvideo attention maps and video-text attention maps*
-
-![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2505_14167/figures/010_Figure_9.jpg]]
-*Figure 9: Attention maps of reference video and target video*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -325,8 +305,6 @@ Fig. 9通过可视化参考视频和目标视频的注意力图，直观验证�
 
 这些局限为后续研究指明了方向：多主体运动解耦、自适应外观分离阈值、以及更鲁棒的运动评估指标。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2505_14167/figures/009_Table_1.jpg]]
 *Table 1: Quantity results on baseline method and SOTA method and ours. Higher values indicate better performance*
 
@@ -335,11 +313,6 @@ Fig. 9通过可视化参考视频和目标视频的注意力图，直观验证�
 
 ![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2505_14167/figures/007_Figure_7.jpg]]
 *Figure 7: Quality comparison results on different methods in image-to-video setting. The green dashed box indicates the reference image*
-
-
-
-
-
 
 ## 定位与知识库关联
 
@@ -408,8 +381,6 @@ LMP 处于**零样本视频运动迁移**与**DiT 架构视频生成**的交叉�
 - **重加权注入与外观抑制的组合策略**：通过 λ 加权控制运动传递强度和梯度下降抑制外观泄漏，形成了一套完整的运动-外观解耦方案。
 
 该方法可被视为 DiT 时代对 UNet 时代零样本运动迁移方法的继承与升级，其技术路线对后续 DiT 架构的零样本可控生成研究具有参考价值。
-
-
 
 ## 原文 PDF
 

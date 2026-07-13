@@ -60,8 +60,6 @@ claims:
 
 MAPS的核心优势在于：无需修改模型架构、不增加训练数据或参数量，仅通过模块感知的正则化调度即可实现一致的ID保持与OOD增益，且计算效率优于双编码器等替代方案。
 
-
-
 ### 视觉-语言-动作模型的泛化困境
 
 视觉-语言-动作（VLA）模型通过在大规模视觉-语言模型（VLM）预训练权重上进行动作微调，将语义理解与物理交互能力相融合。典型的VLA策略可形式化为 $\pi_{\theta}(a_t \mid o_t, x)$，其中观测 $o_t$ 经视觉编码器 $f_v$ 提取特征，语言指令 $x$ 经语言编码器 $f_l$ 编码，两者通过多模态融合模块 $f_m$ 生成策略嵌入 $z_t = f_m([f_v(o_t), f_l(x)])$，最终由动作头映射为具体动作。
@@ -79,8 +77,6 @@ MAPS的核心优势在于：无需修改模型架构、不增加训练数据或�
 ### MAPS的核心动机
 
 上述分析揭示了一个关键矛盾：**预训练VLM的组件对泛化的重要性呈层次化分布，但现有方法要么采用粗糙的冻结策略，要么施加无差别的统一约束**。MAPS的核心洞察在于：将固有的统一邻近度约束替换为从视觉到语言线性递减的层级化调度，使底层视觉层强保留预训练表征，而高层语言层灵活适应动作空间。这一设计无需额外参数或数据，可无缝集成到现有VLA训练流程中，在保持分布内（ID）性能的同时显著提升OOD泛化能力（最高达+30%）。
-
-
 
 ## 核心方法与创新机理
 
@@ -123,8 +119,6 @@ MAPS 的创新性还体现在其极致的轻量化：
 - **架构无关**：可适配任何视觉编码器、语言模型或动作分词策略，已验证支持 MiniVLA-OFT、OpenVLA-OFT、MiniVLA-VQ 等多种 backbone。
 
 消融实验（Table 6）进一步验证了线性调度的优越性：在 $\lambda_{\max}=0.5$ 时，线性调度在 LIBERO-90 上取得 ID 88 / OOD 4.75，优于余弦调度和常量调度。与双编码器方法（Dual-Encoder）和权重插值相比，MAPS 在无额外参数的情况下获得了最高的 ID 和 OOD 性能（Table 7）。
-
-
 
 MAPS 的整体设计围绕一个核心矛盾展开：VLA 模型在动作微调阶段，需要同时保留预训练 VLM 的泛化表征，又必须适应特定的机器人操控任务。全参数微调导致各模块权重无差别地偏离预训练初始化，造成灾难性遗忘——视觉几何先验和语义对齐被破坏，分布外（OOD）泛化能力急剧退化。MAPS 的解决思路是将这一矛盾转化为一个可控的调度问题：**让不同模块以不同的“邻近度”贴近其预训练权重**。
 
@@ -181,8 +175,6 @@ Figure 3 的权重偏离分布验证了这一机制的有效性：MAPS 微调后
 - **Vanilla 全参数微调**：无任何邻近度约束，所有模块可自由偏离预训练权重，导致视觉表征被破坏（Figure 1 绿色虚线）。
 - **L2-SP / 统一 SPD**：使用单一全局 $\lambda$，对所有模块一视同仁，无法体现 VLM 组件的层次化重要性（Figure 1 橙色点划线）。
 - **MAPS**：将 $\lambda$ 从一个全局超参数扩展为**模块索引的线性函数**，在无额外参数、无额外数据的前提下，实现了从视觉到语言的递减保护梯度。
-
-
 
 ### 问题形式化：VLA 动作微调中的灾难性遗忘
 
@@ -253,8 +245,6 @@ $$\theta_t = \widetilde{\theta}_t - \lambda_k r_t (\widetilde{\theta}_t - \theta
 
 MAPS 的线性调度虽简洁有效，但**并非最优调度形式的理论保证**。当前 $\lambda_{\max}$ 需针对不同 backbone 单独调节，自动化程度有限。更复杂的动态调度函数（如基于梯度信号的逐层自适应）仍是开放方向。此外，MAPS 在饱和任务（如 Laptop ID）上提升不显著，表明当任务过简单时，强约束可能限制必要的适应能力。
 
-
-
 ## 实验与关键发现
 
 ### 瓶颈诊断：VLA微调中的灾难性遗忘
@@ -310,36 +300,14 @@ MAPS 作为轻量级即插即用方法，不引入额外参数、辅助网络或
 ![[assets/figures/papers/paper_list_l2402_https_arxiv_org_abs_2511_19878/figures/016_Table_8.jpg]]
 *Table 8: Configurations for Each Model and Benchmark*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2402_https_arxiv_org_abs_2511_19878/figures/003_Table_1.jpg]]
 *Table 1: Comparison of freezing or robust fine-tuning (RFT) different parts of VLA on SimplerEnv’s ID and OOD tasks (details in Sec. 5.1). Early L and Last L denote early and the last language layers. and \ represent freeze and full fine-tune*
 
 ![[assets/figures/papers/paper_list_l2402_https_arxiv_org_abs_2511_19878/figures/004_Table_2.jpg]]
 *Table 2: Comparison of freezing different parts of VLA on LIBERO. Early L and Last L denote early and the last language layers. and \ represent freeze and full fine-tune*
 
-![[assets/figures/papers/paper_list_l2402_https_arxiv_org_abs_2511_19878/figures/006_Table_3.jpg]]
-*Table 3: SimplerEnv Results. ID includes 4 tasks following SimplerEnv-Bridge setup. OOD evaluation suites include Visual, Novel Object, and Novel Category. ∗ model checkpoints borrowed from original papers. † models pretrained from scratch on SimplerEnv*
-
-![[assets/figures/papers/paper_list_l2402_https_arxiv_org_abs_2511_19878/figures/009_Table_4.jpg]]
-*Table 4: LIBERO Results. ∗ models borrowed from [17]. † models pretrained from scratch on LIBERO-90. ‡ models finetuned on LIBERO-90*
-
-![[assets/figures/papers/paper_list_l2402_https_arxiv_org_abs_2511_19878/figures/010_Table_5.jpg]]
-*Table 5: Franka Results*
-
-![[assets/figures/papers/paper_list_l2402_https_arxiv_org_abs_2511_19878/figures/015_Table_7.jpg]]
-*Table 7: Dual Encoders vs. MAPS on LIBERO using MiniVLA-VQ*
-
-![[assets/figures/papers/paper_list_l2402_https_arxiv_org_abs_2511_19878/figures/008_Figure_5.jpg]]
-*Figure 5: CALVIN Results. MAPS improves success rates across all action horizons (25% for MiniVLA-OFT and 3% for OpenVLA-OFT) and average length (+0.7 for MiniVLA-OFT and +0.1 for OpenVLA-OFT)*
-
-![[assets/figures/papers/paper_list_l2402_https_arxiv_org_abs_2511_19878/figures/011_Figure_6.jpg]]
-*Figure 6: Franka Detailed Results. Top Left: Success rates for the Blocks ID Easy/Hard tasks. Top Right: Success rates for the Blocks OOD Easy/Hard tasks. Bottom Left: Average number of tries per success across all Franka tasks. Bottom Right: Success rates for the Cups ID/OOD tasks*
-
 ![[assets/figures/papers/paper_list_l2402_https_arxiv_org_abs_2511_19878/figures/002_Figure_2.jpg]]
 *Figure 2: Qualitative comparison of freezing configurations for LIBERO-90 task ”put the bowl on the plate” (left to right: full finetuning (FFT), freeze VLM, freeze language, freeze vision). FFT fails most, targetting the cabinet instead of the bowl. Freezing VLM/language/vision preserves 2D localization of the bowl but impairs depth reasoning. When vision is frozen, the policy can grasp the bowl but fails to accurately place it on the plate*
-
-
 
 ## 定位与知识库关联
 
@@ -418,8 +386,6 @@ MAPS 的适用边界和局限性需要在以下维度审慎评估：
 4. **反向指导预训练**：MAPS 揭示的模块重要性层次（DINOv2 > SigLIP > 语言层）是否可以反向用于指导 VLA 预训练过程？例如，在预训练阶段就对视觉层施加更强的表征学习目标，可能使下游微调更加鲁棒。
 
 5. **更广泛的 OOD 鲁棒性边界**：在更极端的分布偏移（如仿真到真实的大幅域间隙、全新机器人形态）下，MAPS 的层级化约束是否仍然有效？视觉先验的保留是否存在一个“保护过度”的临界点，超过该点反而会限制模型对新视觉特征的适应？
-
-
 
 ## 原文 PDF
 

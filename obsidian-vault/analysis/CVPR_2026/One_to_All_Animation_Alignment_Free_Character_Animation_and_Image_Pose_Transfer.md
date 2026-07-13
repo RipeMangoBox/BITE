@@ -64,8 +64,6 @@ claims:
 
 **局限性与开放问题**：14B 模型推理需 65 GB 显存且单次推理超过 7 分钟，限制了消费级部署；图像与视频训练数据的最佳混合比例尚未充分探索；当前仅依赖 2D 姿态序列，无法独立控制摄像机运动。这些方向为后续工作留下了明确的改进空间。
 
-
-
 ### 问题定义与核心瓶颈
 
 角色动画（character animation）的目标是，给定一张参考图像（提供角色身份与外观）和一段驱动视频（提供运动姿态），生成该角色执行驱动视频中动作的连贯视频。这一任务在虚拟数字人、影视制作、社交媒体内容生成等领域有广泛应用。
@@ -97,8 +95,6 @@ claims:
 - **统一的个性化生成框架**：同一模型支持跨尺度视频动画（可使用重定向或原始驱动姿态）、跨尺度图像姿态迁移，以及时序连贯的长视频生成（见 Figure 1），无需针对不同任务设计独立架构。
 
 这一设计使得 One-to-All Animation 在空间错位场景下，相比现有 SOTA 方法展现出显著鲁棒性，为对齐自由的角色动画开辟了新路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -136,8 +132,6 @@ One-to-All Animation 的核心创新在于将角色动画问题从根本上重�
 ### 创新协同效应
 
 上述四个创新点并非孤立设计，而是形成了一条因果链路：**Outpainting 训练创造了对遮挡鲁棒的学习需求 → 专用参考提取器和 HRFA 满足了这一需求 → 身份鲁棒姿态控制防止了模型走“捷径”过拟合骨骼 → Token Replace 将鲁棒性扩展到长视频场景**。分阶段训练策略（先训练参考提取，再联合训练姿态控制，Table 6 证实 Ref → Ref+Pose 策略 SSIM 最优）进一步验证了这一协同设计的必要性。
-
-
 
 One-to-All Animation 将角色动画与图像姿态迁移统一为**对齐自由的个性化视频生成**问题。其核心设计哲学是：将训练重构为自我监督的 outpainting 任务，使模型学会从任意空间布局的参考图像中恢复被遮挡区域并保留身份信息，从而在推理时无需参考-驱动帧之间的空间对齐或骨骼匹配。
 
@@ -190,15 +184,8 @@ $$\mathcal{L}_{\mathrm{RF}} = \|v_{t} - u_{t}\|^{2}, \quad u_{t} = \varepsilon -
 | 面部增强 + 参考引导姿态控制联合使用 | 单独使用面部增强会破坏训练稳定性（SSIM 从 0.773 降至 0.748），两者协同使 SSIM 提升至 0.795（Table 3） | 强（定量消融） |
 | Token Replace 而非静态上下文 | 无过渡机制时 FVD 为 355.2，Token Replace 降至 297.9（Table 3） | 强（定量消融） |
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1075_https_arxiv_org_abs_2511_22940/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of the proposed framework. We introduce outpainting preprocess to handle diverse body proportions through facecentered random masking during training and pose-guided translation at inference. The driving poses are encoded and refined via referenceguided pose control to preserve facial identity despite skeletal mismatch. Reference features are progressively injected through hybrid reference fusion attention, supporting variable resolutions and dynamic sequence lengths*
-
-![[assets/figures/papers/paper_list_l1075_https_arxiv_org_abs_2511_22940/figures/001_Figure_1.jpg]]
-*Figure 1: We introduce One-to-All Animation, a unified framework for pose-driven personalized generation. Unlike prior methods that require both spatially-aligned references and pose retargeting, our framework supports: (1) cross-scale video animation with either retargeted or original driving motion, (2) cross-scale image pose transfer, and (3) temporally coherent long video generation*
-
-
 
 ### 3.1 Outpainting 预处理：从空间对齐到统一遮挡输入
 
@@ -229,9 +216,6 @@ $$\mathrm{Attention}(\mathrm{Q}', \mathrm{K}', \mathrm{V}') = \mathrm{softmax}\l
 $$\mathbf{z}_{\mathrm{fusion}}' = \mathrm{Attention}(\mathrm{Q}, \mathrm{K}, \mathrm{V}) + \mathrm{Attention}(\mathrm{Q}', \mathrm{K}', \mathrm{V}') \tag{6}$$
 
 消融实验（Figure 8）证实，Reference Extractor 在遮挡区域重建和身份细节保留上明显优于 IP-Adapter 和直接使用 I2V 骨干作为参考提取器的方案。
-
-![[assets/figures/papers/paper_list_l1075_https_arxiv_org_abs_2511_22940/figures/010_Figure_8.jpg]]
-*Figure 8: Qualitative comparison of different reference feature extraction methods in the first training stage*
 
 ### 3.3 身份鲁棒姿态控制
 
@@ -264,13 +248,6 @@ $$\mathbf{x}_t = (1 - t)\mathbf{x}_0 + t\boldsymbol{\varepsilon} \tag{10}$$
 $$\mathcal{L}_{\mathrm{RF}} = \|v_{t} - u_{t}\|^{2} \tag{11-12}$$
 
 训练采用两阶段策略：第一阶段仅训练参考特征注入（Ref → Ref+Pose），第二阶段加入姿态控制。消融实验（Table 6）证实该分阶段策略（SSIM 0.773）优于先姿态后参考或联合训练方案。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1075_https_arxiv_org_abs_2511_22940/figures/014_Figure_9.jpg]]
-*Figure 9: Qualitative ablation of Identity-Robust Pose Control*
-
-
 
 ## 实验与关键发现
 
@@ -308,9 +285,6 @@ Figure 7 展示了与当前 SOTA 方法 **Wan-Animate** 的用户偏好对比。
 
 Figure 8 对比了不同参考特征提取方案的定性效果。专用的 **Reference Extractor** 在遮挡区域重建和身份细节保留上明显优于 **IP-Adapter** 和直接使用 I2V Backbone 的方案。Table 3 的定量消融显示，移除 Reference Extractor 后 SSIM 从 0.773 降至 0.748，FVD 从 297.9 升至 355.2，证实了该组件对生成质量的核心贡献。
 
-![[assets/figures/papers/paper_list_l1075_https_arxiv_org_abs_2511_22940/figures/011_Table_3.jpg]]
-*Table 3: Ablation study on model components. Experiments are conducted on the TikTok benchmark using 14B model*
-
 #### 身份鲁棒姿态控制
 
 Table 4 针对 100 对错位图像-视频对的消融表明，完整的身份鲁棒姿态控制方案（面部区域增强 + 参考引导姿态控制）使 CSIM 达到 0.8172。单独移除面部增强或参考引导后，CSIM 分别降至 0.7934 和 0.8016，APD-body 也出现劣化。Figure 9 的定性对比进一步显示，去除这些组件会导致面部身份信息丢失或姿态跟随不准确。
@@ -324,15 +298,9 @@ Table 3 还揭示了一个关键交互效应：仅添加面部区域增强会破
 
 Table 3 中，完整的 Token Replace 策略在 TikTok 上取得 FVD 297.9，显著优于无长视频过渡机制的变体（FVD 355.2）。Figure 10 的定性对比展示了三种策略的差异：无过渡方案产生明显的片段边界跳变，静态上下文方案引入身份漂移，而 Token Replace 实现了平滑的片段间过渡。
 
-![[assets/figures/papers/paper_list_l1075_https_arxiv_org_abs_2511_22940/figures/013_Figure_10.jpg]]
-*Figure 10: Comparison of long video generation strategies. substantial improvements*
-
 #### 训练阶段设计
 
 Table 6 对比了不同的训练阶段策略。**Ref → Ref+Pose** 的分阶段训练方案（先训练参考特征提取，再加入姿态控制）取得最优 SSIM 0.773，优于先姿态后参考（SSIM 0.748）或联合训练（SSIM 0.758）。这表明渐进式引入训练信号有助于模型稳定收敛。
-
-![[assets/figures/papers/paper_list_l1075_https_arxiv_org_abs_2511_22940/figures/021_Table_6.jpg]]
-*Table 6: Ablation on training stage design. All methods evaluated on TikTok benchmark using 14B model*
 
 #### HRFA 中 RoPE 设计
 
@@ -347,8 +315,6 @@ Figure 13 展示了一个关键失败模式：在 HRFA 的交叉注意力中保�
 3. **数据混合比例未充分探索**：不同任务（视频动画 vs. 图像姿态迁移）需使用不同数据比例训练的 checkpoint，尚未找到统一的泛化最优配比。
 
 4. **摄像机运动控制缺失**：本方法仅依赖 2D 姿态序列作为运动信号，无法独立控制摄像机轨迹，相机运动只能通过角色位置隐式表达。
-
-
 
 ## 定位与知识库关联
 
@@ -396,8 +362,6 @@ Figure 13 展示了一个关键失败模式：在 HRFA 的交叉注意力中保�
 ### 知识库贡献总结
 
 本方法对角色动画领域的核心贡献在于**证明了通过训练范式重构（自监督 outpainting + 身份鲁棒姿态控制）可以消除对齐依赖**，而非仅仅在现有框架上做增量改进。这一洞察具有方法论的迁移价值：对于其他需要从“参考-目标”对中学习外观迁移的任务（如虚拟试衣、面部重演），类似的遮挡预训练和身份-结构解耦策略可能同样有效。
-
-
 
 ## 原文 PDF
 

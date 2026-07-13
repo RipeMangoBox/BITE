@@ -58,8 +58,6 @@ claims:
 
 这些结果表明，通过可执行环境与强化学习的结合，开源模型能够在生物医学代码推理任务上实现数量级的性能跃升，为隐私保护、可负担的医疗AI智能体发展提供了可行的技术路径。
 
-
-
 ### 生物医学数据科学的编码推理困境
 
 生物医学数据科学正面临一个关键瓶颈：**开源大型语言模型（LLM）在需要代码生成、执行与验证的复杂任务上，表现显著落后于商业API模型**。对29个LLM的基准测试揭示了两类模型之间存在巨大的性能鸿沟（Figure 1），这一差距在生物医学软件工程和预测建模等任务上尤为突出。尽管商业模型性能优越，但其闭源特性、高昂的推理成本和潜在的数据隐私风险，严重限制了在真实临床环境中的部署。
@@ -83,8 +81,6 @@ claims:
 - 成功和失败的代码轨迹均可作为训练信号：正例提供模仿学习目标，负例（含错误信息）为偏好优化和强化学习提供对比数据。
 
 基于这一洞察，本文提出了**MedAgentGym**——一个面向生物医学代码推理的可扩展智能体训练环境，以及在其上训练的**Med-Copilot**系列模型。该框架旨在系统性地回答一个核心问题：能否通过统一的交互式训练环境，让开源模型在生物医学编码推理任务上达到甚至超越商业API模型的水平？
-
-
 
 ## 核心方法与创新机理
 
@@ -123,8 +119,6 @@ MedAgentGym 引入了**结果验证器（Outcome Verifier）**，训练一个输
 - **预定义工具集限制灵活性**：在 MIMIC-III 任务上为 GPT-4 代理提供预定义函数工具集反而导致性能下降（Figure 11），表明不受约束时 LLM 能生成更贴合上下文的代码。
 
 综上，MedAgentGym 通过“可执行沙箱 + POMDP 交互 + 两阶段 RL 训练 + 轨迹验证器”的组合创新，系统性地弥合了开源模型与商业 API 在生物医学代码推理上的性能鸿沟。
-
-
 
 ![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_jHDZEUgS4r/figures/005_Figure_2.jpg]]
 *Figure 2: Overview of MedAgentGym. MedAgentGym contains a comprehensive suite of coding-centric biomedical data science tasks with an interactive execution environment for LLM agents*
@@ -170,8 +164,6 @@ $$r = \exp(l_y) / (\exp(l_y) + \exp(l_n))$$
 ### 数据流与模块关系
 
 整个系统的数据流可概括为：**任务实例 → Docker 沙箱执行 → 轨迹采样（正/负样本）→ SFT 预热 → RL 精炼（DPO/PPO/GRPO）→ 验证器评估**。各模块之间形成反馈闭环：沙箱环境产生的执行结果和错误信息直接驱动 RL 的奖励计算，验证器的预测概率则指导推理时的采样策略和训练时的自我改进。这种“执行—反馈—学习”的一体化设计是 MedAgentGym 区别于现有静态基准的核心特征。
-
-
 
 ### 3.1 编码推理的形式化与验证函数
 
@@ -225,8 +217,6 @@ $$r = \frac{\exp(l_y)}{\exp(l_y) + \exp(l_n)}$$
 
 GRPO训练的超参数配置为：KL散度正则化系数 $\beta = 1 \times 10^{-3}$，学习率 $1 \times 10^{-5}$。值得注意的是，对重复动作施加额外惩罚反而导致性能下降（从62.17%降至56.98%），因为抑制了有益的自我调试行为（Table 13）。
 
-
-
 ## 实验与关键发现
 
 ### 零样本基准测试：商业API与开源LLM之间的巨大鸿沟
@@ -234,7 +224,6 @@ GRPO训练的超参数配置为：KL散度正则化系数 $\beta = 1 \times 10^{
 在MedAgentGym的8个分布内数据集上对29个LLM进行零样本评估（Table 3），结果揭示了两个关键发现。**第一，商业API模型与开源模型之间存在系统性性能差距**。表现最强的商业模型gpt-4.1平均得分达到70.15%，而最优开源模型Qwen3-32B仅取得48.19%，差距超过20个百分点。即使是较小规模的商业模型（如gpt-4o-mini），其性能也普遍优于同等甚至更大规模的开源模型。**第二，结构化任务与开放式任务之间存在显著难度差异**。LLM在数据库查询、医学计算等结构化任务上表现相对稳定，但在生物信息学工程（BioCoder）和预测建模（EHRSHOT）等需要复杂代码生成与调试的开放式任务上急剧下降——gpt-4.1在EHRSHOT上取得87.93%准确率，而绝大多数开源模型在该任务上的得分低于10%。
 
 值得注意的是，**医学推理专用LLM（如HuatuoGPT-o1-7B）在代码密集型任务上普遍弱于其基础模型**，仅在知识密集型任务上略有优势。这表明现有医学推理模型的语言能力提升并未有效迁移到可执行代码生成场景。Figure 1以排行榜形式直观呈现了这一性能鸿沟，突显了构建隐私保护、可负担的开源生物医学编码智能体的紧迫性。
-
 
 ![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_jHDZEUgS4r/figures/002_Figure_1.jpg]]
 *Figure 1: Overview of (a) task-specific and (b) overall leaderboard evaluation in MedAgentGym. The results show the (a) performance variations across biomedical data science tasks and (b) large gaps between proprietary and open-source (OSS) LLMs, highlighting the need for continued development of privacy-preserving, affordable LLM agents, especially for complex code-based biomedical reasoning tasks such as biomedical software engineering and predictive modeling*
@@ -260,7 +249,6 @@ Med-Copilot采用两阶段微调范式：首先在2,137条gpt-4.1-mini生成的�
 
 在4个外部/分布外数据集上（Table 5），Med-Copilot-14B（GRPO）取得47.02%平均得分，较其骨干模型（27.92%）提升+19.10个百分点，验证了训练环境所培养的代码推理能力具有一定的任务迁移性。但需注意，分布外性能仍显著低于分布内（71.42% vs 47.02%），说明模型对特定生物医学数据格式和任务模式存在一定程度的过拟合。
 
-
 ![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_jHDZEUgS4r/figures/014_Table_5.jpg]]
 *Table 5: External test set results on MedAgentGym*
 
@@ -269,7 +257,6 @@ Med-Copilot采用两阶段微调范式：首先在2,137条gpt-4.1-mini生成的�
 **调试功能的必要性**（Figure 6）：移除交互式调试（debug）能力后，模型在所有任务上的性能均显著下降。编译时和运行时错误被系统性地转换为统一自然语言格式的反馈，使LLM能够理解错误并进行迭代修正——这一机制是代码生成成功率的关键保障。
 
 **SFT预热对DPO至关重要**（Table 10）：直接进行DPO而不经过SFT预热，7B和14B模型的平均得分分别比SFT+DPO低约5-6个百分点。SFT阶段提供的成功轨迹先验为后续偏好优化建立了有效的策略起点，单独DPO因缺乏正向引导而难以收敛到高质量策略。
-
 
 ![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_jHDZEUgS4r/figures/028_Table_10.jpg]]
 *Table 10: Effect of SFT stage in two-stage finetuning framework. Table 10 shows the effect of the initial SFT stage during agentic RL finetuning. Although DPO alone slightly underperforms compared to SFT, combining an initial SFT warm-up with subsequent DPO further improves overall results by leveraging their complementary strengths*
@@ -288,13 +275,8 @@ Med-Copilot采用两阶段微调范式：首先在2,137条gpt-4.1-mini生成的�
 
 对最强模型gpt-4.1的错误类型分布（Figure 7）分析表明，**循环相关错误（loop-related errors）**是最主要的失败模式——模型在调试过程中陷入反复生成相似错误代码的循环，无法有效跳出局部策略空间。其次为**领域知识错误**，如Figure 15所示，基线模型在染色体拷贝数计算任务中错误地将女性X染色体数硬编码为2，未能考虑非整倍体场景（如四倍体肿瘤细胞）；经过DPO训练的模型则正确实现了与倍性参数成比例的动态缩放。Figure 16进一步揭示了语义正确性错误：基线模型在代谢网络质量守恒的线性规划任务中生成了语法合理但语义错误的代码（使用Python列表而非LinearExpr对象），GRPO训练后的模型则准确使用了优化库的API约束。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_jHDZEUgS4r/figures/026_Figure_13.jpg]]
 *Figure 13: Med-Copilot SFT performance on MedAgentGym across various backbone LLMs*
-
-
-
 
 ## 定位与知识库关联
 
@@ -361,8 +343,6 @@ MedAgentGym的设计围绕一个核心因果假设：**将生物医学数据科�
 4. **深层知识约束**：除了基于执行结果的验证外，如何融入更深层的生物医学知识约束（如生理学合理性、临床指南合规性）以进一步提高代码生成质量？Figure 15和Figure 17的案例显示，即使代码可执行，仍可能存在领域概念错误（如错误使用过时的MDRD公式而非2021 CKD-EPI标准）。
 
 5. **预定义工具集的影响**：Figure 11显示提供预定义工具集反而导致GPT-4代理性能下降，表明不受限时LLM能生成更灵活的代码。如何在提供领域知识辅助与保持代码灵活性之间取得平衡，是值得进一步研究的问题。
-
-
 
 ## 原文 PDF
 

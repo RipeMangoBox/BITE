@@ -74,8 +74,6 @@ SAMI 包含三个关键组件：
 
 FineMoGen 属于**扩散模型驱动的文本-运动生成**方法，其架构沿用了 MotionDiffuse 和 ReMoDiffuse 的 Transformer + 扩散范式，但在注意力机制层面进行了根本性重构。与 ReMoDiffuse 采用的混合高效注意力（MEA）相比，SAMI 将全局模板计算从单一的全局聚合解耦为空间与时间两个独立维度的建模，并引入 MoE 增强特征提取的适应性。该方法在方法谱系中填补了**细粒度时空可控运动生成**的空白，是首个同时支持零样本与全监督场景下细粒度生成与编辑的框架。
 
-
-
 ### 问题背景：文本驱动运动生成的粒度瓶颈
 
 文本驱动的人体运动生成旨在根据自然语言描述合成逼真的三维运动序列，在游戏、影视、虚拟人等领域具有广泛应用。近年来，扩散模型和自回归方法的引入显著提升了该任务的生成质量，代表性工作包括**MDM**（Tevet et al., ICLR 2023）、**MotionDiffuse**（Zhang et al., arXiv 2022）、**T2M-GPT**（Zhang et al., CVPR 2023）以及基于检索增强的**ReMoDiffuse**（Zhang et al., arXiv 2023）等。然而，这些方法存在一个共同的根本性局限：它们仅能接受粗粒度的全局文本描述（如“一个人向前走并挥手”），无法根据细粒度描述合成具有时空一致性的复杂运动序列。
@@ -103,8 +101,6 @@ FineMoGen 属于**扩散模型驱动的文本-运动生成**方法，其架构�
 3. **引入混合专家机制**：通过在注意力模块中引入稀疏激活的混合专家（MoE），自适应地提取不同身体部位和时间段的细粒度特征，进一步提升模型对复杂条件组合的处理能力。
 
 4. **实现交互式编辑**：借助大型语言模型（LLM）修改细粒度描述，实现零样本的交互式运动编辑，使用户能够通过自然语言指令对生成序列进行迭代修改。
-
-
 
 ## 核心方法与创新机理
 
@@ -137,8 +133,6 @@ SAMI模块是FineMoGen架构的“因果旋钮”，它通过三个相互协同�
 ### 创新点总结
 
 FineMoGen的创新之处不在于发明了全新的生成范式，而在于**对扩散模型中注意力机制的根本性重构**。它将一个全局混合的注意力模板，解耦为空间独立、时间独立且由MoE驱动的精细化组件，从而将细粒度文本描述与运动生成之间的映射关系从“黑箱关联”转变为“显式组合”。这一设计使得模型在零样本设定下，于时序和空间组合任务上的准确率远超所有基线方法，证明了其核心创新的有效性。
-
-
 
 FineMoGen 的整体 pipeline 围绕“细粒度时空描述 → 运动生成 → 交互式编辑”三条主线构建，如 **Figure 2** 所示。系统由六个核心模块串联而成，形成端到端的可控运动合成与编辑闭环。
 
@@ -178,8 +172,6 @@ FineMoGen 通过集成 **ChatGPT-4** 实现了零样本运动编辑能力。用�
 ### 数据流总结
 
 整个 pipeline 的数据流可概括为：**细粒度描述矩阵 → CLIP + 可训练 Transformer → 文本特征矩阵 → SAMI 增强的 Motion Transformer（同时接受噪声运动序列输入）→ 去噪后运动序列**。编辑分支则为：**用户自然语言指令 → LLM 修改描述矩阵 → 重新生成**。
-
-
 
 FineMoGen 的核心架构建立在扩散模型之上，其生成网络由多个结构相同的 **Motion Transformer** 块堆叠而成。每个块的核心是本文提出的 **时空混合注意力（Spatio-Temporal Mixture Attention, SAMI）** 模块，辅以前馈网络（FFN）。SAMI 的设计目标是从全局注意力模板的构建方式入手，显式解耦空间与时间维度的细粒度约束。
 
@@ -238,15 +230,8 @@ $$\mathbf{x}_t := \sqrt{\bar{\alpha}_t} \mathbf{x}_0 + \sqrt{1 - \bar{\alpha}_t}
 
 其中 $\bar{\alpha}_t = \prod_{s=1}^t (1 - \beta_s)$，$\epsilon \sim \mathcal{N}(0, \mathbf{I})$。逆向过程为 50 步去噪，训练目标是最小化预测初始序列与真实值之间的均方误差。训练时以 10% 的概率随机掩码文本条件，以增强模型的零样本泛化能力。
 
-### 补充图表
-
-![[assets/figures/papers/motion_editing_inpainting_20260603_finemogen/figures/001_Figure_1.jpg]]
-*Figure 1: FineMoGen is a motion diffusion model that can accept fine-grained spatio-temporal descriptions. The synthesized motion sequences are natural and consistent with the given conditions. With the assistance of Large Language Model (LLM), users can interactively edit the generated sequence*
-
 ![[assets/figures/papers/motion_editing_inpainting_20260603_finemogen/figures/002_Figure_2.jpg]]
 *Figure 2: An overview of FineMoGen. As for the motion generation task, the fine-grained descriptions are first processed by a text encoder. A text feature matrix can be acquired, and then sent to a diffusion model-based motion generative network to generate corresponding motion sequence. For the editing purpose, LLM is used to interact with users and modify the fine-grained description accordingly*
-
-
 
 ## 实验与关键发现
 
@@ -313,12 +298,8 @@ FineMoGen通过LLM辅助实现了零样本交互式运动编辑。用户以自�
 - **零样本组合泛化**：FineMoGen在未见过组合标注的情况下，显著超越专门设计的基线方法，验证了SAMI结构先验的泛化能力。
 - **LLM+扩散模型的编辑范式**：通过在文本空间进行编辑操作，避免了运动空间编辑的常见伪影，为交互式运动生成提供了新的技术路径，但LLM编辑器的鲁棒性仍需改进。
 
-### 补充图表
-
 ![[assets/figures/papers/motion_editing_inpainting_20260603_finemogen/figures/008_Table_4.jpg]]
 *Table 4: Ablation study on HuMMan-MoGen test set. All methods use zero-shot setting, it means that they are not trained on the temporal composition data*
-
-
 
 ## 定位与知识库关联
 
@@ -362,8 +343,6 @@ FineMoGen的适用场景具有明确的边界条件：
 2. **跨域泛化**：FineMoGen在HuMMan-MoGen上的细粒度组合能力是否能迁移到更复杂的运动类别（如双人交互、竞技体育）仍待探索。
 3. **评估体系完善**：细粒度运动生成需要新的评估指标，能够分别衡量空间一致性（各身体部位协作的自然度）和时间一致性（动作阶段过渡的流畅性），而非仅依赖全局统计指标。
 4. **手部与面部扩展**：将手部动作和面部表情纳入细粒度生成框架，是实现完整虚拟人运动合成的必要步骤，但会显著增加表示维度和标注成本。
-
-
 
 ## 原文 PDF
 

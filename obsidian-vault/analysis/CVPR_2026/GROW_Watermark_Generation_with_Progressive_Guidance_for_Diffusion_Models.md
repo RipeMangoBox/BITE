@@ -51,8 +51,6 @@ claims:
 
 实验表明，GROW在提取速度上较反演方法提升近100倍（0.24 s vs. >20 s，Table 3），同时在MS‑COCO数据集上保持与无 watermark 图像相当的视觉质量（FID=12.32，PSNR=27.54，SSIM=0.85）。消融实验进一步验证了渐进式引导的必要性：若将水印一次性注入最终潜变量，图像质量将灾难性下降（FID=157.8，PSNR=11.36，SSIM=0.19），充分说明“生长”策略是平衡不可感知性与鲁棒性的关键。
 
-
-
 扩散模型正以前所未有的速度渗透到创意产业中，但随之而来的深度伪造滥用与版权归属问题使得**内容溯源**成为不可回避的技术需求。数字水印作为溯源的核心手段，其理想形态是在不损害生成质量的前提下，将可验证的身份信息不可见地“缝入”图像纹理之中。
 
 当前主流的扩散模型水印范式可归为两类：**后处理水印**与**初始噪声水印**。后处理方法（如 **DwtDctSvd** (Shih, CRC Press 2017)、**Hidden** (Zhu et al., ECCV 2018)）在生成完成后对图像施加变换，虽实现简单，但水印与生成过程解耦，容易在后续压缩或编辑中丢失。初始噪声水印（如 **Tree-Ring** (Wen et al., arXiv 2023)、**RingID** (Ci et al., ECCV 2024)、**Gaussian Shading** (Yang et al., CVPR 2024)、**WIND** (Arabi et al., arXiv 2024)）则将水印信号注入扩散模型的初始噪声，利用去噪过程的“被动散射”将信号隐式保留在最终图像中。这一范式虽在不可感知性上表现优异，却存在一个**致命瓶颈**：水印提取必须依赖昂贵的DDIM反演过程，将图像逆向映射回初始噪声空间才能解码信号。这一反演步骤的计算开销极大，单张图像提取耗时超过20秒，使其在大规模、实时部署场景中几乎不可用。
@@ -62,8 +60,6 @@ claims:
 这正是 **GROW** 的出发点。GROW 将水印嵌入重新定义为**渐进式引导任务**：在扩散模型的迭代去噪过程中，通过频率域梯度引导逐步调整预测的干净潜变量，使水印信号在图像逐步清晰化的同时自然“生长”出来。这一范式转换带来了双重收益——一方面，水印与图像内容在生成过程中深度融合，视觉质量得以保留；另一方面，提取时只需对最终潜变量进行DCT变换并检测系数符号，**彻底消除了对DDIM反演的依赖**，将提取速度提升了近100倍（0.24秒 vs >20秒，Table 3）。
 
 Figure 1 直观对比了两种范式的本质差异：初始噪声水印依赖“被动散射+昂贵反演”，而GROW的渐进式引导实现了“主动生长+无反转提取”。这一从“印制”到“生长”的视角转换，为训练免水印的实用化部署打开了新的可能。
-
-
 
 ## 核心方法与创新机理
 
@@ -89,8 +85,6 @@ $$\mathcal{E}^{\mathrm{guided}} = \frac{1}{\sqrt{1 - \bar{\alpha}_t}} (\mathbf{z
 **方法谱系与知识库定位。** GROW属于训练免水印方法，但与现有工作形成明确分界：初始噪声方法（Tree-Ring、RingID、Gaussian Shading、**WIND** (Arabi et al., arXiv 2024)）依赖反演提取；后处理方法（**DwtDctSvd** (Shih, CRC Press 2017)、**Hidden** (Zhu et al., ECCV 2018)）在生成后添加水印，可能被重生成攻击绕过。GROW通过“渐进式引导”在生成过程中嵌入，兼具训练免的灵活性和无反转的高效性，在方法谱系中开辟了新的技术路径。
 
 **已知局限。** 当前GROW对随机比例拉伸的鲁棒性较弱，水印容量受限于静态DCT频域结构（当前16位）。如何用可学习的、抗攻击的表示空间替代静态DCT域，以提升水印容量和安全性，是值得探索的开放问题。
-
-
 
 GROW 将水印嵌入从传统的一次性“静态印制”转变为在扩散模型去噪过程中的“渐进式动态生长”。其整体流程由三条相互协作的管线构成：目标信号生成、渐进式引导嵌入、以及无反转提取。
 
@@ -121,13 +115,8 @@ $$\mathbf{S}(u,v) = \begin{cases} \alpha \cdot (2w_i - 1) & \text{if } \mathbf{M
 
 整个框架的输入输出关系清晰：输入为文本提示 $c$、秘密消息 $W$ 和密钥 $K$；输出为带有水印的图像及其可提取的消息。生成端额外引入的水印开销仅为 0.17 秒，而提取端仅需 0.24 秒——相比依赖 DDIM 反演的初始噪声方法（如 Tree-Ring 需超过 20 秒）实现了近 100 倍的加速（Table 3）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l883_https_openaccess_thecvf_com_content_CVPR2026_html_Luo_GROW_Watermark_Gen/figures/002_Figure_2.jpg]]
 *Figure 2: The overall framework of our proposed method, GROW. (a) Watermark generation: A secret message W is first converted into a bit sequence w. The watermark w is embedded into the target frequency domain at the positions defined by a mask M, which is generated from a secret key K. During the iterative denoising process, we compute a loss between the DCT of the predicted clean latent*
-
-
-
 
 GROW将水印嵌入重新定义为一种**渐进式引导**过程，而非传统的一次性注入。其核心由三个模块串联构成：目标信号生成、渐进式引导嵌入、无反转提取。
 
@@ -179,8 +168,6 @@ $$
 
 整个提取流程仅需单次VAE编码和一次DCT变换，在Tesla T4 GPU上耗时仅0.24秒/图，相比Tree-Ring等依赖DDIM反演的方法（>20秒/图）实现了近100倍的加速。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与评估逻辑
@@ -228,9 +215,6 @@ $$
 ![[assets/figures/papers/paper_list_l883_https_openaccess_thecvf_com_content_CVPR2026_html_Luo_GROW_Watermark_Gen/figures/005_Table_1.jpg]]
 *Table 1: Comparison of different watermarking methods across datasets. For imperceptibility metrics (PSNR, SSIM, FID, LPIPS), we report the performance on clean images. For robustness, we report the M-ACC (%) under various attacks. Best results are in bold, second best are underlined*
 
-![[assets/figures/papers/paper_list_l883_https_openaccess_thecvf_com_content_CVPR2026_html_Luo_GROW_Watermark_Gen/figures/007_Table_3.jpg]]
-*Table 3: Time efficiency comparison (format: total generation time/watermark overhead and extraction time). All times are measured in seconds per image on a single Tesla T4 GPU. Our method avoids costly inversion, enabling fast watermark extraction*
-
 ![[assets/figures/papers/paper_list_l883_https_openaccess_thecvf_com_content_CVPR2026_html_Luo_GROW_Watermark_Gen/figures/010_Table_4.jpg]]
 *Table 4: Quantitative comparison of image quality for the progressive guidance ablation study*
 
@@ -242,16 +226,6 @@ $$
 
 ![[assets/figures/papers/paper_list_l883_https_openaccess_thecvf_com_content_CVPR2026_html_Luo_GROW_Watermark_Gen/figures/009_Figure_6.jpg]]
 *Figure 6: A visual comparison using prompts from the MS-COCO dataset. (a)Non-watermarked image. (b) Watermarked image by GROW. (c) One-step method*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l883_https_openaccess_thecvf_com_content_CVPR2026_html_Luo_GROW_Watermark_Gen/figures/004_Figure_4.jpg]]
-*Figure 4: Visual comparisons of different methods using various prompts, including Hidden, Tree-Ring, WIND, and our GROW*
-
-![[assets/figures/papers/paper_list_l883_https_openaccess_thecvf_com_content_CVPR2026_html_Luo_GROW_Watermark_Gen/figures/003_Figure_3.jpg]]
-*Figure 3: Watermarked image is attacked by different noise, including (a) with watermark, (b) Rotation 75°, (c) JPEG 25, (d) Random Crop 25%, (e) GauBlur r=4, (f) Noise σ=0.05, (g) Brightness factor=6 and (h) Adversarial Attack s=0.5*
-
-
 
 ## 定位与知识库关联
 
@@ -303,8 +277,6 @@ GROW的方法论定位在于**将水印嵌入从一次性静态“印制”转�
 ### 知识库定位
 
 GROW在扩散模型水印领域引入了“渐进式引导”这一新范式，填补了训练免方法与免反演提取之间的空白。其核心贡献不在于提出全新的水印编码方案，而在于**重新设计了水印与扩散生成过程的交互时序和机制**——将水印从生成前的静态输入转变为生成中的动态约束。这一思路与扩散模型中的classifier guidance和classifier-free guidance形成方法论呼应，但将其应用目标从语义控制转向了隐式信号嵌入。
-
-
 
 ## 原文 PDF
 

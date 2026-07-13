@@ -59,8 +59,6 @@ claims:
 
 该框架的局限性在于：依赖离散压缩质量，码书大小有限可能导致信息丢失；MI 估计仅提供平均意义下的洞察，不能解释单个输入；分析限于相对比较，无法给出绝对规划分数；实验限于较小规模模型（GPT-3 Small 及 0.3B 参数）。待解决的问题包括如何将分析扩展到更大规模模型和思维链等提示策略下的规划动态。
 
-
-
 语言模型在生成文本时是否进行了“内部规划”——即在输出当前词之前，提前计算未来多步的信息——是理解其推理能力的关键问题。然而，直接回答这一问题面临双重困难：一方面，模型的隐藏状态是高维连续向量，难以直接解读；另一方面，现有的分析方法存在严重的混淆因素。
 
 当前主流的分析范式依赖于**探针（probing）**：在冻结的模型隐藏状态上训练线性或非线性分类器/回归器，以预测某些目标属性（如未来词或句法标签），并将探针的准确率或误差作为信息存在的证据。但这一范式存在根本性缺陷：探针本身具有学习能力，可能从噪声中提取模型并未显式编码的信息，也可能因目标属性的边际分布复杂性不同而产生误导性的得分差异。此外，探针方法需要针对每一对“源状态-目标属性”单独训练，分析成本随变量组合数线性增长，难以自动化地探索模型内部的计算结构。
@@ -74,8 +72,6 @@ claims:
 3. **计算历史组织**：预测决策依赖的计算信息如何在层和位置维度上分布？是集中于最后几层和最近位置，还是分散在更早的计算块中？
 
 本文的动机正是针对这一瓶颈，提出一个基于信息论和离散表示的自动化分析框架，以绕过探针方法的混淆因素，系统性地回答上述三个问题。
-
-
 
 ## 核心方法与创新机理
 
@@ -113,8 +109,6 @@ $$I(Z_A; Z_B) = \sum_{z_a \in \mathcal{Z}_A} \sum_{z_b \in \mathcal{Z}_B} p(z_a,
 
 需要明确指出：框架的洞察力受限于 VQ-VAE 压缩质量——码书大小有限，必然导致信息丢失；互信息估计仅提供平均意义下的聚合洞察，无法解释单个输入；分析限于相对比较，不能给出绝对规划分数。此外，当前实验限于 GPT-3 Small 及 0.3B 参数规模，向更大模型的扩展需要额外的数据与计算资源投入。
 
-
-
 ![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_dqGWQdFdTC/figures/001_Figure_1.jpg]]
 *Figure 1: The proposed method. Step 1 (training): For a frozen LM M, hidden states from selected transformer blocks $G _ { S }$ are passed through a VQ-VAE encoder, which maps each block to a latent vector and then to a discrete codebook index $Z _ { S }$ ~ $\in$ ~ [ K ] , providing coarse summaries of internal computations. Step 2 (analysis): For two sets of hidden-state blocks, $G _ { S _ { A } }$ and $G _ { S _ { B } }$ , we apply the trained encoder and codebook to the dataset to obtain discrete variables $Z _ { A }$ and $Z _ { B }$ and collect their empirical co-occurrence counts. Step 3: Using these statistics, we estimate joint and marginal distributions p ( $z _ { a } , z _ { b }$ ) , p ( $z _ { a }$ ) , and p...*
 
@@ -141,8 +135,6 @@ $$\mathrm{nMI}(Z_A; Z_B) = \frac{I(Z_A; Z_B)}{\mathcal{T}_{\max}}$$
 其中 $\mathcal{T}_{\max}$ 为同一实验分析中所有 MI 计算的最大值。这一归一化使得跨实验的 MI 值具有可比性，但框架本身不提供绝对的规划分数，仅支持相对排序分析。此外，框架还支持条件互信息分析，用于评估特定计算块在已知其他块信息后的增量贡献。
 
 该框架的关键优势在于：对同一类表示的 VQ-VAE 只需训练一次，即可复用于所有后续的 MI 估计，避免了传统探针方法（probing）需要针对每对变量单独训练监督探针的繁琐流程，同时也消除了探针学习能力差异带来的混淆因素。
-
-
 
 ### 方法流水线总览
 
@@ -212,8 +204,6 @@ $$\mathrm{nMI}(Z_A; Z_B) = \frac{I(Z_A; Z_B)}{\mathcal{T}_{\max}}$$
 
 探针方法存在两重混淆：探针自身的学习能力会放大或掩盖真实的信息量，且探针得分受目标变量边际复杂性的影响。$\nu$-information 虽可衡量以某函数族可提取的信息，但对尺度敏感，在简单验证实验中即失效（Figure 20）。本文的离散码 + Shannon MI 方案通过压缩消除表示维度的干扰，并通过归一化实现稳健的相对比较。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：规划视野由任务性质决定
@@ -280,28 +270,6 @@ Table 1 汇总了关键结果：
 
 4. **模型规模限制**：所有实验限于 GPT-3 Small（约 125M 参数）和 0.3B 参数模型，未验证在大规模模型上的适用性。虽然 Figure 17 在 0.3B 模型上复现了 CFG 的 nMI 衰减趋势，但更大模型的规划行为可能有所不同。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_dqGWQdFdTC/figures/016_Table_2.jpg]]
-*Table 2: nMI over Block and Layer for the Token Generated at $\tau$ = 0*
-
-![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_dqGWQdFdTC/figures/017_Table_3.jpg]]
-*Table 3: nMI over Block and Layer for the Token Generated at $\tau$ = 1*
-
-![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_dqGWQdFdTC/figures/018_Figure_12.jpg]]
-*Figure 12: Heatmap of normalized mutual information over block and layer indices for $\tau$ = 0 , 1 , 2 . Please refer to the caption of 4*
-
-![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_dqGWQdFdTC/figures/019_Table_5.jpg]]
-*Table 5: nMI over Block and Layer for the Token Generated at = 3*
-
-![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_dqGWQdFdTC/figures/020_Table_6.jpg]]
-*Table 6: nMI over Block and Layer for the Token Generated at $\tau$ = 4*
-
-![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_dqGWQdFdTC/figures/021_Figure_13.jpg]]
-*Figure 13: Heatmap of normalized mutual information over block and layer indices for $\tau$ = 3 , 4 , 5 . Please refer to the caption of 4*
-
-
-
 ## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
@@ -351,8 +319,6 @@ Xu et al. 提出的 ν-information 是另一种信息度量，旨在衡量给定
 4. **思维链下的规划动态**：在 Chain-of-Thought 等逐步推理策略下，内部规划视野和分支意识如何动态变化？模型是否在生成中间步骤时重新规划？
 
 5. **从诊断到改进**：如何将发现的内部表征特征（如分支意识、规划视野）用于改进模型训练或解释性？例如，能否通过正则化鼓励更长的规划视野？
-
-
 
 ## 原文 PDF
 

@@ -71,8 +71,6 @@ SceneAdapt 属于**基于扩散模型的场景感知运动生成方法**，但�
 
 在自定义评估集上，SceneAdapt 相比 MDM 基线显著降低碰撞指标（**CFR**: 0.256 vs. 0.316；**MMP**: 0.208 vs. 0.319），同时保持文本对齐能力（**RP@3**: 0.792 vs. 0.798）和运动质量（**FID**: 0.497 vs. 0.479），证实了框架在场景感知与语义保真度之间的有效平衡。消融实验进一步验证了插值适应阶段和稀疏调制设计的必要性：移除阶段一直接训练场景感知模型导致 FID 从 0.497 飙升至 7.08，RP 从 0.791 降至 0.598；将 CaKey 替换为全局调制则使插值 FID 从 0.036 升至 17.44。
 
-
-
 ### 问题背景：文本驱动的人体运动生成
 
 文本驱动的人体运动生成旨在从自然语言描述中合成逼真的三维人体动作序列。近年来，基于扩散模型的方法在这一领域取得了显著进展，其中**MDM**（Motion Diffusion Model）等预训练文本-动作扩散模型能够从大规模文本-动作数据集（如HML3D）中学习到丰富的语义运动先验，生成语义多样且自然的人体运动。
@@ -96,8 +94,6 @@ SceneAdapt 属于**基于扩散模型的场景感知运动生成方法**，但�
 上述困境的本质在于：**语义丰富性**与**场景一致性**分别由两类分离的数据集提供，而直接合并或联合训练无法解决分布不匹配问题。
 
 SceneAdapt的核心动机正是利用这两类数据集的互补性——文本-动作数据集提供语义多样性，场景-动作数据集提供几何约束——通过一种无需三元组数据的自适应策略，将场景感知能力注入预训练的文本-动作扩散模型，从而在保持原始语义生成能力的前提下，实现场景一致的运动生成。
-
-
 
 ## 核心方法与创新机理
 
@@ -143,8 +139,6 @@ $$\hat{x}_0 = \mathcal{D}_\theta(x_t, t, \mathcal{Q}_{text}, \mathcal{Q}_{scene}
 ### 核心洞察总结
 
 SceneAdapt的根本洞察在于：**将场景感知建模为插值任务中的附加条件，可以桥接分离的数据集（文本-动作和场景-动作），在不损害原始语义生成能力的前提下将场景几何信息注入扩散模型**。这一策略使得模型在场景感知文本生成中，相比MDM基线大幅降低碰撞指标（CFR: 0.256 vs 0.316, MMP: 0.208 vs 0.319），同时保持文本对齐（RP@3: 0.792 vs 0.798）（Table 1）。
-
-
 
 SceneAdapt 采用两阶段自适应策略，将场景几何约束注入预训练的文本-动作扩散模型（MDM），而无需昂贵的文本-场景-动作三元组数据。其核心思想是将场景感知建模为运动插值（motion inbetweening）任务中的附加条件，从而桥接语义丰富但无场景的文本-动作数据集与场景-动作数据集，在不损害原始文本-动作生成能力的前提下实现场景一致性运动生成。
 
@@ -200,8 +194,6 @@ Stage 2 的训练冻结 CaKey 层，仅优化 SceneCo 层和 Voxel ViT。此时�
 - **训练输入**：Stage 1 接受运动序列及关键帧掩码；Stage 2 接受场景体素、运动序列及关键帧掩码。
 - **推理输入**：文本描述、3D 场景体素，可选的目标姿态（作为极端稀疏的关键帧）。
 - **输出**：与场景几何一致且语义对齐文本的完整人体运动序列。
-
-
 
 SceneAdapt 的核心架构由四个关键模块构成，它们以两阶段自适应的方式协同工作，将场景几何约束注入预训练的文本-动作扩散模型。
 
@@ -272,8 +264,6 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{t2m}} + \lambda_{\mathrm{joints}} \mathcal{
 
 其中权重设置为 $\lambda_{\mathrm{joints}}=1$，$\lambda_{\mathrm{vel}}=100$。
 
-
-
 ## 实验与关键发现
 
 ### 主结果：场景感知文本驱动运动生成
@@ -319,9 +309,6 @@ SceneAdapt 的核心目标是保持预训练文本-动作模型的语义丰富�
 
 #### CaKey 组件设计（Table 6）
 
-![[assets/figures/papers/paper_list_l1694_SceneAdapt_Scene_aware_Adaptation_of_Human_Motion_Diffusion/figures/014_Table_6.jpg]]
-*Table 6: Ablation study on motion inbetweening designs. Sparse Mod. indicates whether sparse modulation is used. Adaptive denotes whether the source latent is provided as input to the modulator. Time emb. specifies whether time embedding is provided as input to the modulator. Modulator describes how*
-
 CaKey 的稀疏调制设计是其插值性能的核心：
 - **移除稀疏调制**（全局调制）：FID 从 0.036 飙升至 17.44，MJPE(All) 恶化十余倍。这说明仅调制关键帧是保留非关键帧区域运动自然度的必要条件。
 - **移除上下文感知**（不提供源潜变量）：FID 升至 0.112，MJPE(All) 升至 0.0722，性能明显退化。
@@ -329,17 +316,11 @@ CaKey 的稀疏调制设计是其插值性能的核心：
 
 #### 关键帧步长的影响（Table 3, Fig. 6a）
 
-![[assets/figures/papers/paper_list_l1694_SceneAdapt_Scene_aware_Adaptation_of_Human_Motion_Diffusion/figures/008_Table_3.jpg]]
-*Table 3: Scene-awareness results on TRUMANS for inbetweening. to more effectively exploit scene inparser keyframe settings*
-
 阶段2训练时采用更稀疏的关键帧（更大步长）可迫使模型更依赖场景信息：
 - 随着关键帧步长增加，场景感知指标（CFR、MMP）呈改善趋势。
 - Fig. 6a 展示了不同步长下场景感知与文本对齐的权衡曲线：更稀疏的关键帧使模型在相同 $w_s$ 下获得更好的场景一致性，但极端稀疏可能损害插值精度。
 
 #### 场景表示方式（Table 4）
-
-![[assets/figures/papers/paper_list_l1694_SceneAdapt_Scene_aware_Adaptation_of_Human_Motion_Diffusion/figures/010_Table_4.jpg]]
-*Table 4: Effect of Scene Rep*
 
 **块级（patch）场景嵌入优于全局类别嵌入**：
 - 使用 Voxel ViT 提取的块级特征在场景感知指标上全面优于全局池化表示。
@@ -356,9 +337,6 @@ CaKey 的稀疏调制设计是其插值性能的核心：
 Fig. 9 展示了各方法在碰撞帧上的每帧最大穿透深度分布。SceneAdapt 不仅减少了碰撞帧数，还显著降低了穿透深度：大部分碰撞帧的穿透深度集中在较小值域，而 MDM 和 AffordMotion 的分布尾部更长。Table 7 的穿透统计进一步量化了这一优势，SceneAdapt 在平均穿透深度和最大穿透深度上均优于对比方法。
 
 ### 目标姿态条件扩展（Fig. 5）
-
-![[assets/figures/papers/paper_list_l1694_SceneAdapt_Scene_aware_Adaptation_of_Human_Motion_Diffusion/figures/007_Figure_5.jpg]]
-*Figure 5: Goal pose conditioned scene-aware text-to-motion generation. Interpreting the goal pose as an extremely sparse keyframe, SceneAdapt produces sceneconsistent motion conditioned on text, scene, and goal pose. Goal poses are in yellow*
 
 将目标姿态视为极端稀疏的关键帧，SceneAdapt 可自然地扩展为目标姿态条件的场景感知生成。Fig. 5 展示了模型在给定目标姿态（黄色标记）时，能生成坐下、伸手等与场景几何一致的运动。这为功能性目标导向的运动生成提供了可行路径，尽管当前方法尚未显式建模场景语义关系。
 
@@ -378,16 +356,6 @@ SceneAdapt 处于**预训练模型自适应**与**场景感知运动生成**的�
 - **参数高效自适应**：CaKey 层的稀疏调制设计借鉴了 ControlNet 的条件注入思想，但通过关键帧掩码实现了更精细的控制，避免了 LoRA 等低秩自适应方法的性能退化（Table 2 中 LoRA 的 FID 为 0.278，远高于 CaKey 的 0.036）。
 - **场景感知生成**：与 **AffordMotion**（利用场景几何和文本生成交互运动）、**DNO**（基于梯度引导的优化方法）、**HUMANISE cVAE**（合成数据训练）等方法相比，SceneAdapt 的核心差异在于**无需三元组数据**，通过解耦数据集和两阶段自适应实现场景感知注入。
 - **运动插值**：CondMDI 等方法也探索了扩散模型的插值能力，但 CaKey 通过上下文感知的稀疏调制在精度和自然度上实现了显著提升。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1694_SceneAdapt_Scene_aware_Adaptation_of_Human_Motion_Diffusion/figures/009_Figure_6.jpg]]
-*Figure 6: Ablation Studies. Each dot represents a certain*
-
-![[assets/figures/papers/paper_list_l1694_SceneAdapt_Scene_aware_Adaptation_of_Human_Motion_Diffusion/figures/001_Figure_1.jpg]]
-*Figure 1: Motivation. (a) Distribution of motion embeddings of HML3D [14] and sceneaware datasets [23, 49] visualized via PCA. Scene-aware datasets show narrower distributions than HML3D, indicating lower semantic coverage. (b) Models trained on HML3D capture diverse action semantics but lack scene-awareness, penetrating the obstacles. (c) Models trained on scene-aware datasets satisfy scene constraints, but fail to follow text prompts because the datasets contain limited semantic motion diversity*
-
-
 
 ## 定位与知识库关联
 
@@ -440,8 +408,6 @@ SceneAdapt 瞄准的是场景感知人体运动生成中的一个结构性数据
 ### 方法定位总结
 
 SceneAdapt 在场景感知运动生成领域占据了一个独特的方法论位置：它**不是**从头训练的场景感知模型，也**不是**纯推理时的优化方法，而是**基于预训练模型的两阶段自适应框架**。这种方法论介于“数据驱动训练”和“测试时优化”之间，通过插值代理任务实现了跨数据域的知识迁移。其核心贡献在于证明了：在无法获取三元组数据的情况下，通过精心设计的自适应策略（稀疏关键帧调制 + 场景条件交叉注意力 + 先验保持损失），可以将几何约束注入预训练语义模型，同时保留原始生成能力。这一思路对更广泛的“预训练模型领域自适应”问题具有启示意义——当目标域数据稀缺但存在与源域共享底层结构的代理任务时，分阶段自适应可能是比直接微调更有效的策略。
-
-
 
 ## 原文 PDF
 

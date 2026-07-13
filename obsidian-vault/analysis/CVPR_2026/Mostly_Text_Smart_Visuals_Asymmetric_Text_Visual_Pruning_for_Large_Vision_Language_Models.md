@@ -54,8 +54,6 @@ claims:
 
 **方法谱系与知识库定位**：ATV-Pruning属于**激活感知的权重剪枝**范畴，其重要性评分机制沿袭Wanda的权重幅度与输入激活范数乘积（Eq. 1），但创新性地将激活统计的估计对象从“所有token”替换为“模态感知校准集”。与TAMP等面向LVLM的剪枝方法相比，ATV-Pruning首次明确解耦了文本与视觉模态在校准中的角色，并引入块自适应视觉选择机制。该方法不依赖权重更新（区别于SparseGPT的Hessian近似），也不依赖跨模态统计对齐（区别于TAMP），在保持简洁性的同时实现了显著的性能增益。当前局限包括：视觉漂移计算引入约1.35倍额外前向开销；全局缩放因子α需针对不同模型手动设定；仅针对LLM骨干的线性层进行剪枝，未覆盖视觉编码器等模块。
 
-
-
 ### 大型视觉语言模型的部署瓶颈
 
 大型视觉语言模型（LVLM）在视觉问答、图像描述等多模态任务上取得了显著进展，但其庞大的参数规模带来了高昂的推理延迟与显存占用，严重制约了实际部署。权重剪枝作为一种有效的模型压缩技术，通过移除冗余连接来降低计算和存储成本，已在纯语言模型（LLM）上得到广泛验证。然而，将剪枝技术直接迁移至LVLM面临一个根本性挑战：**文本与视觉两种模态在剪枝敏感度上存在本质差异**，而现有方法普遍忽视了这一模态异质性。
@@ -79,8 +77,6 @@ claims:
 ### 研究动机与核心思路
 
 上述发现揭示了一个清晰的因果机制：**文本路径对剪枝高度敏感，必须用文本token校准；视觉路径高度冗余，仅需少量关键视觉token即可维持性能。** 基于此，本文提出**非对称文本-视觉剪枝（ATV-Pruning）**：在校准池构建中采用非对称策略——**保留所有文本token以保证语言能力不退化，同时通过块自适应的视觉漂移机制从各层中选取少量显著视觉token**，从而在保持性能的前提下实现大幅剪枝。这一设计从根本上解决了模态无关校准池导致的文本侧退化问题，为LVLM的高效部署提供了新的技术路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -123,8 +119,6 @@ $$\mathbf{I}_{ij} = |\mathbf{W}_{ij}| \cdot \|\mathbf{X}_{j}\|_{2}$$
 
 ATV-Pruning 的三个 changed slots 构成了一条因果链：**非对称校准池构建**（保留全部文本 token + 筛选显著视觉 token）→ **块自适应视觉选择**（以视觉漂移为信号动态分配预算）→ **模态感知激活统计估计**（仅在筛选后的子集上计算重要性分数）。这一链条使得 ATV-Pruning 在 LLaVA-NeXT 8B 上以 50% 稀疏度取得 94.00% 的平均保留率（超越最强基线 TAMP 的 92.67%），在 60% 稀疏度下取得 77.01%（超越 SparseGPT 的 76.24%），验证了非对称策略在保持文本能力的同时大幅剪枝视觉冗余的有效性。
 
-
-
 ATV-Pruning 的整体流程围绕一个核心矛盾展开：文本路径对剪枝高度敏感，而视觉路径高度冗余。基于此，方法将剪枝过程解耦为三个顺序执行的模块，形成“统计收集 → 校准集构建 → 权重剪枝”的流水线。
 
 ### 模块关系与数据流
@@ -145,12 +139,8 @@ ATV-Pruning 的整体流程围绕一个核心矛盾展开：文本路径对剪�
 
 Algorithm 1 给出了完整的 ATV-Pruning 流程：遍历校准样本 → 前向传播收集视觉漂移 → 计算块平均显着性与预算 K → 选取 Top-K 视觉 token → 构建模态感知校准集 → 按 Wanda 重要性分数逐层剪枝。该流程将所有文本 token 与自适应视觉子集统一为校准集，驱动后续的权重重要性评估与裁剪。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l768_https_arxiv_org_abs_2603_16001/figures/004_Figure_3.jpg]]
 *Figure 3: Overview of ATV-Pruning; Color intensity reflects the degree of visual saliency. Blocks with higher visual saliency keep more salient visual tokens, with all text tokens*
-
-
 
 ATV-Pruning 建立在激活感知权重剪枝框架 Wanda 之上，其核心创新在于构建模态感知的校准集，以替代传统模态无关的校准池。整个方法流程由三个关键模块串联而成：模态感知校准集构建、块自适应视觉选择、以及激活感知权重剪枝（Algorithm 1）。
 
@@ -194,15 +184,11 @@ $$\mathcal{V}_{\mathrm{sub}} = \mathrm{TopK}_v(\{s_{v}\}, K)$$
 
 该策略使视觉表征更新剧烈的 block 保留更多视觉 token，而视觉处理较浅的 block 仅保留少量 token，实现块自适应的预算分配。消融实验（Table 3）表明，去除块自适应性（固定每块预算）使平均保留率从 98.56% 降至 98.24%，随机选择则降至 97.50%，验证了视觉漂移信号和自适应分配的有效性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l768_https_arxiv_org_abs_2603_16001/figures/002_Figure_2.jpg]]
 *Figure 2: Modality decoupling via MoT probe. For each Transformer block, the QKV and FFN layers are replicated into visual and textual pathways, which process their respective token types. Independent pruning masks are derived for each pathway using activation statistics from text-only, image-only, or mixed calibration pools. This setup enables controlled comparison of modalityspecific pruning sensitivity*
 
 ![[assets/figures/papers/paper_list_l768_https_arxiv_org_abs_2603_16001/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of the divergent statistical characteristics across different modalities, manifesting as: (a) activation representation: the textual and visual activations occupy distinct clustered regions in the representation space (t-SNE visualization); and (b) pruning importance: the pruning masks derived from the text-only and visual-only calibration data exhibit a broad IoU distribution (taking 50% sparsity level as an example)*
-
-
 
 ## 实验与关键发现
 
@@ -222,9 +208,6 @@ $$\mathcal{V}_{\mathrm{sub}} = \mathrm{TopK}_v(\{s_{v}\}, K)$$
 - **50% 稀疏度**：ATV-Pruning 平均保留率达 **94.00%**，超过最强基线 TAMP（92.67%）1.33 个百分点。在 MME 基准上，ATV-Pruning 取得 1801.51 分，比 SparseGPT（1742.80）高出 58.71 分。
 - **60% 稀疏度**：ATV-Pruning 平均保留率 **77.01%**，优于 SparseGPT（76.24%）和 TAMP（75.49%）。在 OKVQA 上，ATV-Pruning（11.13）比 TAMP（6.73）高出 4.40 个百分点，差距尤为显著。
 - **跨模型泛化**：在 Qwen2-VL (7B) 60% 稀疏度下，ATV-Pruning 取得 85.65% 平均保留率，超过 SparseGPT（85.30%）。**Table A6** 进一步验证了在 LLaVA-OneVision 和 Qwen2.5-VL 上的优势。
-
-![[assets/figures/papers/paper_list_l768_https_arxiv_org_abs_2603_16001/figures/010_Table_2.jpg]]
-*Table 2: Table A6. Additional pruning results for LLaVA-OneVision and Qwen2.5-VL at 60% unstructured sparsity, serving as an extension of “Table 2”. Best results are highlighted in green*
 
 **关键趋势**：随着稀疏度从 50% 升至 60%，所有方法的性能均显著下降，但 ATV-Pruning 的退化幅度最小——这表明非对称校准策略在极端稀疏度下具有更强的鲁棒性。
 
@@ -259,30 +242,14 @@ $$\mathcal{V}_{\mathrm{sub}} = \mathrm{TopK}_v(\{s_{v}\}, K)$$
 4. **结构化剪枝探索不足**：虽在 **Table A5** 中验证了半结构化剪枝（2:4/4:8）的有效性，但未深入探索块剪枝或通道剪枝等更硬件友好的模式。
 5. **极端稀疏度退化**：60% 稀疏度下平均保留率降至 77.01%，部分基准（如 OKVQA）性能损失较大，说明非对称策略在极高稀疏度下仍有改进空间。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l768_https_arxiv_org_abs_2603_16001/figures/003_Table_1.jpg]]
 *Table 1: Sensitivity analysis of both modality pathways across different calibration token sources, benchmarks, and sparsity*
 
 ![[assets/figures/papers/paper_list_l768_https_arxiv_org_abs_2603_16001/figures/005_Table_2.jpg]]
 *Table 2: Comparison results with state-of-the-art approaches on nine benchmarks under unstructured, uniform pruning. The official metric for each benchmark and average performance retention (denoted as Average) across all benchmarks, are reported to evaluate the performance of pruned models. Best results are highlighted in green*
 
-![[assets/figures/papers/paper_list_l768_https_arxiv_org_abs_2603_16001/figures/006_Table_3.jpg]]
-*Table 3: Discussion on selection strategy of visual tokens. All methods select the same total number of visual tokens for calibration. “Adaptive” indicates whether the visual-token budget is dynamically distributed across blocks. Our default configuration achieves the best overall retention*
-
 ![[assets/figures/papers/paper_list_l768_https_arxiv_org_abs_2603_16001/figures/007_Figure_4.jpg]]
 *Figure 4: Ablation study about global scaling factor*
-
-![[assets/figures/papers/paper_list_l768_https_arxiv_org_abs_2603_16001/figures/008_Table_4.jpg]]
-*Table 4: Pruning efficiency analysis, on LLaVA-NeXT (8B) at 50% sparsity. Time (s): wall-clock pruning time in seconds; Rel. time: pruning time relative to Wanda; Gain (pp): average performance gain in percentage points (pp), taken from Tab. 2*
-
-![[assets/figures/papers/paper_list_l768_https_arxiv_org_abs_2603_16001/figures/009_Figure_5.jpg]]
-*Figure 5: Effect of textual token selection under varied retained ratios during calibration, with the default visual token subset of ATV-Pruning. Removing text tokens consistently harms the performance, highlighting their necessity for stable pruning*
-
-![[assets/figures/papers/paper_list_l768_https_arxiv_org_abs_2603_16001/figures/011_Figure.jpg]]
-*Figure: A6. Trend of ATV-Pruning’s block-wise Visual Drift and Adaptive Token Allocation on LLaVA-NeXT (8B) with $\alpha = 1$.0. The left y-axis measures the average visual drift per block. The right y-axis indicates the corresponding average number of visual tokens selected per sample. The trend illustrates the blockadaptive nature of our method: more tokens are retained in layers where visual representations undergo significant updates*
-
-
 
 ## 定位与知识库关联
 
@@ -291,8 +258,6 @@ $$\mathcal{V}_{\mathrm{sub}} = \mathrm{TopK}_v(\{s_{v}\}, K)$$
 **适用边界与约束。** 该方法的设计与验证聚焦于以下边界条件：(1) **模型架构**：面向 LVLM 的 LLM 骨干网络（如 LLaVA-NeXT、Qwen2-VL、LLaVA-OneVision、Qwen2.5-VL），剪枝仅作用于 LLM 骨干的线性层，视觉编码器等模块未被纳入剪枝范围；(2) **剪枝模式**：主要验证了无结构化均匀稀疏度剪枝，附录中虽展示了半结构化剪枝（2:4/4:8）的可行性，但未深入探索其他结构化剪枝模式；(3) **校准数据**：所有方法统一使用 128 个 ShareGPT4V 样本进行校准，评估采用 lmms-eval 统一协议；(4) **超参数依赖**：全局缩放因子 $`\alpha`$ 需要针对不同模型手动设定（LLaVA-NeXT 使用 $`\alpha=1`$，Qwen2-VL 使用 $`\alpha=1.5`$），缺乏自动适应机制。
 
 **局限性与开放问题。** 首先，ATV-Pruning 为收集视觉漂移统计信息引入了额外的前向传播开销，约为 Wanda 的 1.35 倍（99.6 秒 vs 73.7 秒），虽然仍远优于 SparseGPT 的 666.0 秒和 TAMP 的 1418.4 秒，但进一步降低该延迟仍是工程优化方向。其次，全局缩放因子 $`\alpha`$ 的手动调参限制了方法在不同模型间的即插即用性，设计自适应的 $`\alpha`$ 调整策略是一个值得探索的方向。此外，非对称策略目前仅针对文本-视觉双模态设计，是否可扩展到涉及视频、音频等其他模态的多模态模型尚待验证。最后，将 ATV-Pruning 与量化、视觉 token 剪枝等压缩技术结合能否产生叠加效益，以及在更大规模模型（>30B）上的泛化性，均为论文未覆盖的开放问题。
-
-
 
 ## 原文 PDF
 

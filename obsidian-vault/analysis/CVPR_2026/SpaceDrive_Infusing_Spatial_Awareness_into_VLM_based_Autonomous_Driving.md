@@ -49,8 +49,6 @@ SpaceDrive针对上述瓶颈提出了统一的3D位置编码方案。其核心�
 
 在nuScenes开环评测中，SpaceDrive+取得了VLM方法中最优的L2误差（0.32 m）、碰撞率（0.23%）和交叉率（1.27%）；在Bench2Drive闭环评测中，驾驶得分达到78.02，成功率55.11%，位列VLM方法第二。消融实验表明，向视觉token注入空间位置编码后，L2误差降低0.63，碰撞率降低2.08%，交叉率降低4.14%；统一位置编码同时作用于视觉和文本坐标流时，无论是否使用ego状态，规划性能均得到提升。此外，正弦-余弦编码器因平移不变性优于全学习MLP编码器，且方法对深度噪声具有鲁棒性。
 
-
-
 ### 端到端自动驾驶的范式演进
 
 端到端（End-to-End, E2E）自动驾驶旨在将传感器输入直接映射为规划轨迹，省去传统模块化管线中的中间表征与人工规则设计。近年来，视觉语言模型（Vision-Language Model, VLM）凭借其强大的场景理解与常识推理能力，被逐步引入E2E规划任务，衍生出以**OmniDrive**、**ORION**、**DriveVLM**、**EMMA**和**RDA-Driver**为代表的VLM基规划器。这些方法将多视图图像、文本指令和自车状态拼接为统一token序列，交由VLM自回归生成驾驶决策与轨迹坐标。
@@ -76,8 +74,6 @@ SpaceDrive针对上述瓶颈提出了统一的3D位置编码方案。其核心�
 上述瓶颈指向一个核心洞察：**Transformer架构天然适合处理token之间的位置关系**。如果能将3D空间关系显式编码为统一的位置编码输入，VLM便能在保持通用视觉-语言对齐的基础上，直接进行3D空间推理。
 
 基于此，SpaceDrive提出了一种空间感知的VLM驾驶框架，其核心思想是：**将空间信息视为显式的位置编码（Positional Encoding, PE），而非文本数字token**。具体而言，SpaceDrive引入统一的3D正弦-余弦位置编码，同时作用于视觉token的补充信息和文本中的数字坐标替换，并采用回归式解码器替代分类式语言头来直接预测连续坐标。这一改动使VLM能够在统一的位置编码空间内显式关联2D语义特征与3D空间位置，从而准确索引视觉语义并进行联合空间推理——这种统一表达避免了任务特定嵌入的碎片化，为VLM增强3D空间智能提供了一种通用范式。
-
-
 
 ## 核心方法与创新机理
 
@@ -118,8 +114,6 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{LM}} + \mathcal{L}_{\mathrm{reg.}}(\hat{\ma
 ---
 
 **总结**：SpaceDrive 的三个 changed slots 构成了一个自洽的创新闭环——统一的 PE 编码器将空间信息提升为 VLM 可直接操作的基础原语，显式加和注入使视觉 token 获得度量空间感知，回归解码器则弥补了语言模型在数值预测上的先天不足。这一设计范式使 VLM 在保持通用视觉-语言对齐的基础上，无需引入稠密 BEV 表示即可实现精确的 3D 空间推理与轨迹规划。
-
-
 
 SpaceDrive 的整体框架围绕一个核心设计原则展开：**将空间信息显式编码为统一的三维位置编码（Positional Encoding, PE），替代传统 VLM 规划器中基于文本数字 token 的隐式坐标传递**。该框架在基础 VLM（默认 Qwen2.5-VL-7B）之上引入三个关键扩展模块——深度估计器、PE 编码器和 PE 解码器，形成从感知到规划的端到端空间感知推理链路。
 
@@ -175,15 +169,11 @@ $$\mathcal{L} = \mathcal{L}_{\text{LM}} + \mathcal{L}_{\text{reg.}}(\hat{\mathbf
 
 **Figure 2** 完整展示了上述流程：多视图图像经视觉编码和深度估计双路处理后，在 PE 编码器处汇合，统一的空间编码同时增强视觉 token 和替换文本坐标 token，最终由扩展词汇表的语言头与 PE 解码器协同输出规划轨迹。消融实验（Table 3）证实，向视觉 token 注入空间 PE 使 L2 误差降低 0.63、碰撞率降低 2.08%、交叉率降低 4.14%；统一作用于视觉和文本坐标流的编码进一步提升了规划性能。值得注意的是，该框架**不依赖稠密 BEV 特征**——实验表明统一的 PE 编码已足以支撑 VLM 导向的自动驾驶三维空间建模。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2418_https_arxiv_org_abs_2512_10719/figures/002_Figure_2.jpg]]
 *Figure 2: SpaceDrive framework. Beyond the base VLM, a frozen depth estimator predicts dense metric depths from surround-view images, which are projected into 3D coordinates and encoded by a universal PE encoder to augment visual tokens with spatial cues. BEV coordinates in text prompts are encoded by the same PE encoder, replacing the original coordinate tokens and preceded by the PE indicator ⟨IND⟩. At the output stage, the recognized PE is passed through a PE decoder to obtain the final coordinates for trajectory planning*
 
 ![[assets/figures/papers/paper_list_l2418_https_arxiv_org_abs_2512_10719/figures/001_Figure_1.jpg]]
 *Figure 1: Spatial awareness in VLM-based end-to-end autonomous driving. (a) Constrained by insufficient 3D pre-training and discrete token-wise encoding, existing end-to-end planners based on the VLM struggle to precisely ground, associate, and predict 3D spatial positions, limiting their planning capabilities. (b) Our proposed SpaceDrive planner introduces a unified 3D coordinate encoding to replace the original VLM’s textual digit tokens and augment visual features, achieving explicit association with 2D perspective semantics to enhance joint spatial reasoning for E2E planning. Compared to current VLM-based methods, it achieves state-of-the-art driving capability in the nuScenes open-loop evaluatio...*
-
-
 
 SpaceDrive 的核心设计围绕一个统一的空间坐标表达——**3D正弦-余弦位置编码（PE）**——展开，该编码同时作用于视觉流和文本流，使VLM能够在统一的坐标空间内进行显式的3D空间推理。整个框架由七个关键模块串联构成。
 
@@ -239,8 +229,6 @@ $$\mathcal{L} = \mathcal{L}_{LM} + \mathcal{L}_{reg.}(\hat{\mathbf{c}}, \mathbf{
 
 其中 $\mathcal{L}_{LM}$ 是作用于所有文本输出的标准语言建模损失，$\mathcal{L}_{reg.}$ 是作用于所有坐标输出的Huber回归损失。这种联合优化使得模型在保持VLM通用视觉-语言对齐能力的同时，获得精确的3D空间推理与轨迹预测能力。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -251,15 +239,9 @@ SpaceDrive 以 Qwen2.5-VL-7B 为基础 VLM，使用 LoRA（rank=16）微调语�
 
 Table 1 给出了 nuScenes 上的开环规划结果。SpaceDrive+ 在纯 VLM 方法中达到最优：L2 误差 0.32 m，碰撞率 0.23%，交叉率 1.27%。与最强基线 OmniDrive-Q++（L2 0.33 / 碰撞 0.30% / 交叉 3.00%）相比，交叉率下降尤为显著（-1.73 个百分点），表明统一空间位置编码有效减少了轨迹与道路拓扑的语义冲突。值得注意的是，SpaceDrive 未使用 BEV 特征，仅凭统一 PE 注入即达到这一性能，验证了显式 3D 空间编码足以替代稠密 BEV 表征的核心主张。
 
-![[assets/figures/papers/paper_list_l2418_https_arxiv_org_abs_2512_10719/figures/003_Table_1.jpg]]
-*Table 1: Open-loop planning results on nuScenes [4]. SpaceDrive+ denotes the adoption of the ego planner input. Methods categorized as Hybrid Paradigm simultaneously stack traditional and VLM-based approaches, and are thus incomparable. Results are highlighted in bold and underline for the best and second-best performance among VLM-based methods, respectively. All results in this table follow the evaluation protocol of OmniDrive [61] and ORION [12]. More methods based on other metrics are provided in the supplementary materials*
-
 ### 闭环规划结果（Bench2Drive）
 
 Table 2 报告了 Bench2Drive 闭环仿真结果。SpaceDrive+ 取得 78.02 的 Driving Score 和 55.11% 的 Success Rate，在 VLM 方法中位列第二（仅次于 SimLingo）。在闭环设定下，模型需连续输出轨迹并应对动态环境，这对空间推理的稳定性提出了更高要求。附录 C.2 的对比实验进一步揭示：纯文本数字输出的 VLM 模型（如 OmniDrive-L）在闭环中轨迹退化为近似直线且方向振荡，这为第 4.2 节的分析提供了强实证支撑——基于逐位分类的数字坐标输出从根本上不适合闭环驾驶。
-
-![[assets/figures/papers/paper_list_l2418_https_arxiv_org_abs_2512_10719/figures/004_Table_2.jpg]]
-*Table 2: Closed-loop planning results on Bench2Drive [25]. Results are highlighted in bold and underline for the best and secondbest performance among VLM-based methods, respectively*
 
 ### 位置编码消融实验
 
@@ -295,9 +277,6 @@ Table C 消融了深度估计器的影响。在测试时注入深度噪声（±2
 
 Table E 的 LoRA rank 消融显示，rank=16 在参数效率和规划精度间达到最优平衡（L2 1.80，碰撞 1.88%，交叉 4.21%）；更高秩虽增加可学习参数，但碰撞和交叉率反而恶化，提示过拟合风险。Table 6 验证了 SpaceDrive 的范式通用性：将其迁移至 LLaVA 和 Qwen-VL 等不同 VLM 基础模型，均能稳定工作并取得竞争性性能。
 
-![[assets/figures/papers/paper_list_l2418_https_arxiv_org_abs_2512_10719/figures/009_Table_6.jpg]]
-*Table 6: SpaceDrive based on different VLM foundations*
-
 ### 反事实推理与定性分析
 
 Table B 的反事实推理对比表明，SpaceDrive 在无 ego 状态输入下仍保持较高的精确率和召回率，说明其空间推理能力不依赖于自车状态捷径。Figure 3 展示了闭环场景中 SpaceDrive+ 绕行骑行者的多步规划过程——绿色路径点平滑避开红色标记的骑行者，验证了统一 PE 编码在动态避障中的有效性。
@@ -311,19 +290,6 @@ Table B 的反事实推理对比表明，SpaceDrive 在无 ego 状态输入下�
 2. 方法依赖预训练深度估计器提供 3D 几何先验，在极端深度误差或零样本场景下的性能未经验证。
 3. 仅采用 LoRA rank=16 微调，可能限制模型对复杂长尾场景的拟合能力。
 4. 未引入多帧时序记忆机制，历史 ego 状态仅通过固定长度窗口 PE 注入，可能不足以捕获需要长期依赖的动态交互（如频繁变道或走走停停的拥堵场景）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2418_https_arxiv_org_abs_2512_10719/figures/013_Table.jpg]]
-*Table: E. Ablation of LoRA rank. Learn. Par. is the abbreviation for the number of LoRA parameters when selecting Qwen2.5-VL-7B as the base VLM. Table F. Ablation of PE frequency*
-
-![[assets/figures/papers/paper_list_l2418_https_arxiv_org_abs_2512_10719/figures/015_Table.jpg]]
-*Table: G. Ablation of regression loss. Table H. Robustness to Depth Estimation Errors*
-
-![[assets/figures/papers/paper_list_l2418_https_arxiv_org_abs_2512_10719/figures/012_Table.jpg]]
-*Table: C. Ablation of depth estimator. Table D. Ablation of pooling strategy*
-
-
 
 ## 定位与知识库关联
 
@@ -380,8 +346,6 @@ SpaceDrive代表了**第三阶段：统一显式空间编码**。其关键架构
 4. **上游推理能力反哺**：在端到端模型直接生成规划轨迹之外，这种显式的3D空间感知能否反向提升VLM在场景问答、风险预估等上层推理任务中的性能？
 
 5. **归一化因子优化**：如何量化归一化因子 $\alpha_{PE}$ 的最优范围，并将其推广到不同深度估计器和分辨率配置？Table 5的消融显示PE归一化对语义合理性有显著影响（仅2421/5119输出样本语义合理），但最优策略仍待系统探索。
-
-
 
 ## 原文 PDF
 

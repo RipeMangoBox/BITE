@@ -52,8 +52,6 @@ claims:
 
 **方法定位**：DiffGrasp属于**条件扩散模型驱动的全身人体-物体交互生成**范式，与两阶段扩散管线（OMOMO系列）形成直接对比，同时区别于单帧抓取生成（COOP）和纯身体运动生成（IMoS）等方法。其技术路线体现了“联合建模替代分治建模”的设计哲学，并通过接触感知损失与推理引导的协同，在有限训练数据下实现了精细接触生成。
 
-
-
 在虚拟现实、具身智能与人机交互等应用中，生成自然、真实的全身抓取运动序列是一个关键且极具挑战的问题。理想的抓取生成系统需要同时满足三个层面的要求：**时间连续性**（运动序列在时序上平滑连贯）、**接触真实性**（手部与物体之间形成精确且稳定的接触）以及**身体-手部协调性**（身体姿态与双手动作在空间上协调一致）。
 
 现有方法在这三个维度上存在结构性缺陷。以 **OMOMO**（Li et al., 2023）为代表的两阶段方法将生成过程拆解为“先预测手部位置，再生成全身姿态”的流水线——其后续变体 OMOMO-V2 和 OMOMO-V3 虽分别扩展了手部姿态输出和独立的手部姿态预测网络，但本质上仍是分阶段、分部件的分离建模范式。这种设计导致两个核心问题：其一，身体与双手的运动分布在训练中被割裂，模型无法捕捉两者之间的联合依赖关系，生成的抓取序列在身体-手部协调性上表现薄弱；其二，OMOMO 系列方法**完全忽略手指姿态的建模**，仅输出手部全局位置而缺乏精细的手指-物体接触，使得生成的抓取在接触真实性上严重不足——在 GRAB 数据集上，OMOMO 的 F1 分数仅为 0.0090，几乎无法形成有效接触。另一类方法如 **COOP** 则聚焦于单帧静态抓取姿态生成，在给定物体运动序列的条件下缺乏时间连续性，无法直接应用于动态抓取场景。
@@ -61,8 +59,6 @@ claims:
 上述方法暴露出的根本瓶颈在于：**现有框架无法在统一模型内同时建模身体与双手在两个空间尺度（全身尺度与手指尺度）上的复杂运动**，导致生成的抓取序列在时间连续性、接触真实性和身体-手部协调性三者之间难以兼得。
 
 针对这一瓶颈，**DiffGrasp** 提出了一种根本性的范式转换：将分阶段/分部件的建模策略替换为**单个条件扩散模型联合建模身体、双手与物体运动**。其核心洞察在于，单一扩散模型足以捕捉高自由度全身姿态与物体运动之间的复杂联合分布，从而在端到端的框架内一次性生成包含精细手指姿态的全身抓取序列。这一设计从结构上消除了分离建模带来的信息割裂问题，为同时实现时间连续性、接触真实性与身体-手部协调性提供了统一的生成基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -103,8 +99,6 @@ DiffGrasp 在训练阶段引入了两类**接触感知损失**：
 ### 4. 创新点之间的关系
 
 上述三个创新点构成了一个递进的因果链条：**统一扩散模型**提供了学习全身-物体联合分布的基础能力；**接触感知损失**在训练阶段将物体的空间信息注入网络，使其初步具备感知接触的能力；**推理阶段引导**则在不增加训练负担的前提下，对生成结果进行轻量级优化，弥补扩散模型在接触细节上的不足。三者共同作用，使 DiffGrasp 在 GRAB 数据集上将 Hands JPE 从 OMOMO 的 31.28 降至 20.99，F1 分数从 0.0090 提升至 0.7840，实现了全身抓取合成性能的跨越式提升。
-
-
 
 DiffGrasp 的核心设计是将“身体运动—双手抓取—物体运动”三个高自由度组件统一在一个条件扩散模型内联合建模，替代以往方法中分阶段、分部件的预测管线。整体管线由**条件编码、Transformer 去噪、SMPL‑X 重建和推理阶段引导**四个模块串联而成，形成端到端的全身抓取序列生成框架（Figure 2）。
 
@@ -150,11 +144,6 @@ DiffGrasp 的核心设计是将“身体运动—双手抓取—物体运动”�
 ### 数据流总结
 
 整体数据流可概括为：**物体运动/形状/人体身份 → 条件编码 → Transformer 去噪预测全身姿态与腕部平移 → SMPL‑X 重建 → 接触感知损失监督训练 + 推理引导优化**。这一闭环设计使 DiffGrasp 能够在一个统一的扩散框架内同时捕捉身体运动、双手精细操作和物体运动之间的复杂联合分布，从而生成具有时间连续性、接触真实性和身体‑手部协调性的全身抓取序列。
-
-### 补充图表
-
-
-
 
 DiffGrasp 将全身抓取序列生成建模为一个**条件扩散模型**，其核心由三个功能模块构成：条件编码器、Transformer 去噪器以及推理阶段的三种数据驱动引导。整个框架以统一的扩散过程一次性预测全身 SMPL-X 姿态参数和双手腕部相对物体的平移量，从而替代传统方法的多阶段分离建模。
 
@@ -207,13 +196,6 @@ $$\tilde{x}_0 = \hat{x}_0 - \eta \Sigma_n \nabla_{\hat{x}_n} \mathcal{G}(\hat{x}
 - **脚步穿透引导** $\mathcal{G}_{Feet}$：惩罚身体顶点穿越地面（$z<0$），保证脚-地面接触。
 
 三种引导组合使用：$\mathcal{G} = \mathcal{G}_{Feet} + \mathcal{G}_{GS} + \mathcal{G}_{HO}$。消融实验证实，加入引导后模型在 Hands JPE、F1 等综合指标上达到最优（Table 2），且定性上姿态更自然、穿透更少。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1663_DiffGrasp_Whole_Body_Grasping_Synthesis_Guided_by_Object_Motion_Using_a/figures/003_Figure_3.jpg]]
-*Figure 3: Illustration of Grasp Stabilization Guidance*
-
-
 
 ## 实验与关键发现
 
@@ -282,33 +264,17 @@ DiffGrasp在两个主要的全身抓取数据集上进行评估：**GRAB**（Tah
 
 尽管DiffGrasp在定量和定性上均大幅领先基线，仍存在以下失败模式（**Figure 6**）：
 
-![[assets/figures/papers/paper_list_l1663_DiffGrasp_Whole_Body_Grasping_Synthesis_Guided_by_Object_Motion_Using_a/figures/008_Figure_6.jpg]]
-*Figure 6: Limitations. Our method may generate selfpenetration (a) or unrealistic poses (b) in some cases*
-
 1. **人体网格自穿透**：生成结果中可能出现手部穿透身体其他部位的情况。当前引导策略仅约束手-物体接触和脚-地面穿透，缺乏人体自穿透约束。
 2. **不真实抓取姿态**：部分情况下手部或手指姿态扭曲，不符合物理合理性。这源于训练数据中缺乏显式的物理约束（如力反馈、稳定性条件）。
 3. **身体位移受限**：受现有数据集限制（GRAB和ARCTIC中抓取动作以站立/坐姿为主），DiffGrasp无法在抓取过程中生成行走等大范围身体位移，生成的人体姿态趋向于静态。这一局限性是数据驱动的固有瓶颈，而非方法设计缺陷。
 
 这些失败模式指出了未来工作的方向：如何在推理引导中引入人体自穿透约束，以及如何将物理约束显式纳入训练或引导流程。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1663_DiffGrasp_Whole_Body_Grasping_Synthesis_Guided_by_Object_Motion_Using_a/figures/004_Table_1.jpg]]
-*Table 1: Comparative experimental results on GRAB (Taheri et al. 2020) dataset and ARCTIC (Fan et al. 2023) dataset*
-
 ![[assets/figures/papers/paper_list_l1663_DiffGrasp_Whole_Body_Grasping_Synthesis_Guided_by_Object_Motion_Using_a/figures/005_Figure_4.jpg]]
 *Figure 4: Qualitative Results of Comparison Experiments. Our model (DiffGrasp) generates more realistic results, with more hand-object contact and less penetration*
 
 ![[assets/figures/papers/paper_list_l1663_DiffGrasp_Whole_Body_Grasping_Synthesis_Guided_by_Object_Motion_Using_a/figures/006_Table_2.jpg]]
 *Table 2: Ablation study results on GRAB (Taheri et al. 2020) dataset*
-
-![[assets/figures/papers/paper_list_l1663_DiffGrasp_Whole_Body_Grasping_Synthesis_Guided_by_Object_Motion_Using_a/figures/007_Figure_5.jpg]]
-*Figure 5: Qualitative Results of Ablation Study. In this figure, Full is the abbreviation for Full loss, R. is the abbreviation for Recon, and I. is the abbreviation for Inter*
-
-![[assets/figures/papers/paper_list_l1663_DiffGrasp_Whole_Body_Grasping_Synthesis_Guided_by_Object_Motion_Using_a/figures/016_Figure.jpg]]
-*Figure: A13: Comparison of the ability of different methods to adapt to large movements of objects. Our model (DiffGrasp) can generate more realistic results. The results in this figure are similar to those in Figure S6, highlighting the importance of our proposed two contact-aware loss terms. Additionally, the comparison shows that OMOMOs struggles to grasp objects that are out of reach*
-
-
 
 ## 定位与知识库关联
 
@@ -380,8 +346,6 @@ DiffGrasp 在全身抓取合成领域占据“**统一条件扩散模型**”这
 5. **自适应引导**：当前引导策略的高度手工设定（学习率、迭代次数）能否由网络自适应学习，减少人工调参负担？
 
 **注**：本文未提供具体的会议/期刊发表信息（venue 和 year 均为 null），上述方法定位基于论文内容本身的技术分析。
-
-
 
 ## 原文 PDF
 

@@ -56,8 +56,6 @@ claims:
 
 **方法定位：** NoiseCLR 属于扩散模型可解释方向发现方法，与基于 GAN 的 LatentCLR、GANspace、SeFa 等方法形成跨范式对比，同时与 Diffusion-Pullback、Concept Sliders 等扩散模型方向发现/编辑方法直接竞争。相较于依赖文本引导的 Prompt2Prompt 和基于语义掩码的 SEGA，NoiseCLR 在无监督设定下实现了更解耦、更高保真度的编辑。
 
-
-
 扩散模型，特别是以 Stable Diffusion 为代表的文本到图像生成模型，在图像合成领域已展现出卓越的能力。然而，如何对这些模型进行精确的语义编辑仍然是一个开放挑战。核心瓶颈在于：**扩散模型缺少一种无需文本提示或标注数据即可无监督发现可解释编辑方向的方法**。这一缺口在难以构想提示词的领域（如艺术风格、时尚设计、医学影像）尤为突出。
 
 现有编辑方法主要依赖文本提示来指定编辑意图。例如，基于语义的编辑方法 **SEGA** 和 **Composable Diffusion** 需要用户提供精确的文本描述来引导编辑过程；**Prompt2Prompt** 和 **Cycle-Diffusion** 等方法则通过修改交叉注意力图或反演过程来实现编辑，但仍需文本条件作为语义锚点。这些方法的共同局限在于：当用户无法用语言准确描述期望的编辑效果时（如某种特定的艺术笔触、微妙的年龄变化），系统的可用性急剧下降。
@@ -67,8 +65,6 @@ claims:
 这种“要么需要文本提示，要么发现方向稀少”的困境，实质上源于一个更深层的机制性问题：扩散模型的去噪过程在高维噪声空间中运行，而语义信息如何在该空间中编码和分离，此前并未被充分理解和利用。
 
 NoiseCLR 正是在这一背景下提出的。其核心动机是回答一个根本性问题：**能否在不依赖任何文本提示或标注的条件下，从少量无标签图像中自动发现丰富、解耦、可解释的编辑方向？** 这一目标的实现将使得扩散模型编辑能力拓展到那些难以用语言描述的语义维度，从而在艺术创作、设计迭代、医学图像分析等场景中释放新的可能性。
-
-
 
 ## 核心方法与创新机理
 
@@ -105,8 +101,6 @@ $$\bar{\epsilon}_\theta(x_t, L) = \sum_{i=1}^{|L|} \lambda_i (\epsilon_\theta(x_
 - **vs. Diffusion-Pullback**：该方法在噪声空间上使用对比学习，发现了比 Diffusion-Pullback 多得多的细粒度方向（见 Supplementary Section S.1.3 及 Fig. S.10），后者仅能发现极少数粗粒度方向。
 - **vs. GAN 潜空间发现方法（LatentCLR、GANspace、SeFa）**：NoiseCLR 将对比学习从 GAN 的潜空间迁移到扩散模型的噪声预测空间，利用扩散模型更强的生成能力和多时间步特性，实现了跨域泛化编辑（见 Figure 5 和 Fig. S.9）。
 - **vs. 文本驱动编辑方法（Prompt2Prompt、Cycle-Diffusion、SEGA）**：NoiseCLR 完全不依赖文本提示，在 LPIPS 保真度指标上全面优于 Prompt2Prompt（Age: 0.18 vs. 0.28, Mustache: 0.12 vs. 0.22, Race: 0.15 vs. 0.24, Gender: 0.21 vs. 0.25，见 Table S.4）。
-
-
 
 NoiseCLR 的整体 pipeline 围绕一个核心洞察构建：**以学习方向为条件与无条件噪声预测之差（特征分歧）编码了语义编辑信息**。基于此，方法通过对比学习目标在多个时间步的噪声预测差异上鼓励同一方向编辑相似、不同方向编辑相异，从而在无任何标注的情况下发现解耦的语义方向。
 
@@ -148,15 +142,8 @@ $$\bar{\epsilon}_\theta(x_t, c, d_e) = \tilde{\epsilon}_\theta(x_t, c) + \lambda
 - **编辑时间步控制编辑粒度**：消融实验证实，从 $t=0.5T$ 开始应用编辑可实现解耦编辑；粗结构编辑（如年龄、种族）需要更早的时间步区间 $[0.9T, 0.8T]$；精细结构编辑（如眼镜）则需要手动选择合适的时间步区间。
 - **训练效率**：单领域（人脸）训练约需 7 小时学习 100 个方向；零样本编辑仅需约 5 秒（单张 NVIDIA L40 GPU）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2312_05390/figures/005_Figure_5.jpg]]
 *Figure 5: Editing results on various domains. To demonstrate the generalizability of our method across different domains, we provide editing results on artistic paintings, cats and cars. As demonstrated from in the editing results, our method is able to learn and apply latent directions from various domains using a single diffusion model*
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2312_05390/figures/001_Figure_1.jpg]]
-*Figure 1: NoiseCLR. We propose an unsupervised approach to identify interpretable directions in text-to-image diffusion models, such as Stable Diffusion [31]. Our method finds semantically meaningful directions across various domains like faces, cats, and art. NoiseCLR can apply multiple directions either within a single domain (a) or across different domains in the same image (b, c) in a disentangled manner. Since the directions learned by our model are highly disentangled, there is no need for semantic masks or user-provided guidance to prevent edits in different domains from influencing each other. Additionally, our method does not require fine-tuning or retraining of the diffusion model, nor does...*
-
-
 
 ### 扩散模型基础
 
@@ -218,8 +205,6 @@ $$\bar{\epsilon_\theta}(x_t, d_e) = \epsilon_\theta(x_t, \phi) + \lambda_e (\eps
 
 整个流程可概括为：**扩散前向过程**对无标签图像加噪获得 $x_t$ → **方向学习模块**通过对比损失优化 $K$ 个方向向量 $d_k$，使特征分歧 $\Delta \epsilon_k^n$ 在方向内相似、方向间相异 → 对于新图像，**DDIM 反演模块**将真实图像映射为 $x_T$（仅真实图像编辑需要）→ **编辑集成模块**将方向条件化的噪声差异叠加到逆向扩散的噪声预测中，实现单方向或多方向的解耦编辑。
 
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -261,17 +246,11 @@ Fig. 8 展示了与 Cycle-Diffusion、SEGA、Composable Diffusion 和 Unsupervis
 2. **精细编辑的时间步依赖**：眼镜等精细结构编辑需要手动选择合适的时间步区间，缺乏自动化机制。
 3. **预训练模型偏差继承**：方法依赖 Stable Diffusion 和 CLIP，可能继承并放大其中的人口统计学偏差。例如，种族编辑方向可能被滥用于生成偏见内容或深度伪造。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2312_05390/figures/016_Figure.jpg]]
 *Figure: Input*
 
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2312_05390/figures/017_Figure.jpg]]
-
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2312_05390/figures/013_Table.jpg]]
 *Table: S.4. LPIPS metric which measures how well the similarity to the original image distribution is maintained (lower is the better). Our method is able to achieve lower LPIPS than the other methods, indicating greater coherence while performing the edits*
-
-
 
 ## 定位与知识库关联
 
@@ -338,8 +317,6 @@ NoiseCLR 定位于**扩散模型可解释性与可控编辑**的交叉领域，�
 - **监督范式**：从文本监督/标注依赖 → 完全无监督
 - **编辑粒度**：从粗粒度属性 → 细粒度语义（口红、眼镜等）
 - **跨域能力**：从单域 GAN → 共享潜空间的多域扩散模型
-
-
 
 ## 原文 PDF
 

@@ -163,8 +163,6 @@ $$
 - **成对对比优化范式**：将训练自由的GRPO从组内相对评估泛化为成对对比设置，摆脱了对标量奖励和真实标注的依赖，仅靠CLIP感知对齐与LLM定性推理即可驱动经验积累。
 - **可迭代经验库**：经验库 $\mathcal{E}$ 在多个CKE周期中持续更新，使冻结的LLM在自反思中逐步获取3D几何先验，无需任何微调。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2366_https_arxiv_org_abs_2604_08042/figures/001_Figure_1.jpg]]
 *Figure 1: Top: Prior works typically rely on pre-trained diffusion models as 3D priors. Bottom: Our work performs training-free 3D sketch generation by refining an LLM’s spatial reasoning*
 
@@ -224,11 +222,6 @@ $$o = p_{\boldsymbol{\theta}}(o \mid \mathcal{T}, \mathcal{E})$$
 
 其中 $\boldsymbol{\theta}$ 为冻结的 LLM 参数，$\mathcal{T}$ 为新颖文本提示。该过程无需任何梯度更新，完全通过上下文学习实现从经验中蒸馏 3D 几何先验。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2366_https_arxiv_org_abs_2604_08042/figures/013_Figure_9.jpg]]
-*Figure 9: Full System Prompt. Raw text input provided to the LLM, combining role definition, strict syntax constraints (code-only output), coordinate system rules, and a few-shot example (“A benz car”) to guide 3D sketch generation*
-
 ## 实验与关键发现
 
 ### 核心瓶颈与方法定位
@@ -267,28 +260,17 @@ $$o = p_{\boldsymbol{\theta}}(o \mid \mathcal{T}, \mathcal{E})$$
 
 3DrawAgent在方法谱系中处于**训练自由LLM驱动3D生成**与**对比强化提示优化**的交汇点。与依赖扩散模型先验的 **Diff3DS**（基于得分蒸馏采样优化有理Bézier曲线）和 **Dream3DVG**（双分支框架结合3D高斯喷溅引导）不同，3DrawAgent将3D几何先验的获取完全外包给LLM的自反思过程。与2D草图代理 **SketchAgent** 相比，其核心突破在于将绘制空间从平面坐标扩展至3D Bézier曲线，并引入可迭代更新的经验库机制。该方法为开放域3D内容创建提供了一种无需真实标注、低计算门槛的新范式，其对比经验优化思路可迁移至其他缺乏绝对标注的开放式生成任务。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2366_https_arxiv_org_abs_2604_08042/figures/004_Table_2.jpg]]
 *Table 2: Ablation study on the core components of our CKE pipeline. We report CLIP-S on the ModelNet40 test set. The Base model (Epoch 0) has no experience. Our method achieves strong results even without ground truth and benefits from a group size of K = 5*
 
 ![[assets/figures/papers/paper_list_l2366_https_arxiv_org_abs_2604_08042/figures/003_Table_1.jpg]]
 *Table 1: Comparison results on Text-to-3D (category- and fine-grained) and Image-to-3D generation. “-”: not reported*
 
-![[assets/figures/papers/paper_list_l2366_https_arxiv_org_abs_2604_08042/figures/011_Figure_7.jpg]]
-*Figure 7: User Study Results. Percentage of user preference votes. 3DrawAgent (46.66%) is the most preferred method, showing a clear advantage over Dream3DVG (36.67%) and Diff3DS (16.67%) in terms of combined semantic and geometric quality*
-
 ![[assets/figures/papers/paper_list_l2366_https_arxiv_org_abs_2604_08042/figures/008_Table_3.jpg]]
 *Table 3: Cost comparison with single objects*
 
 ![[assets/figures/papers/paper_list_l2366_https_arxiv_org_abs_2604_08042/figures/010_Table_5.jpg]]
 *Table 5: Comparison of CKE against Random Selection. We report the*
-
-![[assets/figures/papers/paper_list_l2366_https_arxiv_org_abs_2604_08042/figures/012_Figure_8.jpg]]
-*Figure 8: Visual Examples of Common Failure Modes. Despite our experience bank’s guidance, 3DrawAgent encounters challenges with strict geometric connectivity and handling semantic ambiguity in complex structures. Key issues include (a) disconnected junctions where strokes should intersect, (b) floating components, and (c) visual clutter when managing ambiguous topological constraints*
-
-![[assets/figures/papers/paper_list_l2366_https_arxiv_org_abs_2604_08042/figures/007_Figure_6.jpg]]
-*Figure 6: Impact of Stroke Constraints on 3D Abstraction across Categories. We evaluate the model’s generation capability under varying Bezier curve budgets (rows from 8 to 128) across diverse categories: Bench, Chair, Plant, and Person. At minimal budgets (8 curves), the model performs high-level semantic abstraction, producing skeletal representations (e.g., a stick figure for the person or a simple stem for the plant). As the budget increases to 32–64 curves, structural details emerge, such as the pot geometry for the plant or parallel slats for the furniture. At 128 curves, the sketches evolve into dense wireframes. This demonstrates the model’s versatility in adapting its planning strategy from...*
 
 ## 定位与知识库关联
 

@@ -54,8 +54,6 @@ claims:
 
 **局限与开放问题**：CineGPT的训练依赖手动构建的约1000条相机轨迹数据集，规模较小，可能限制模型泛化能力；锚点确定依赖辐射场训练时的多视角输入图像作为先验；当前方法假设场景为静态，尚未处理动态对象或动态环境下的相机控制。
 
-
-
 在视觉内容创作中，相机控制是决定叙事表达和视觉质量的核心环节。无论是电影拍摄、虚拟现实体验还是3D场景渲染，相机轨迹的设计直接影响观众的注意力引导和空间感知。然而，现有相机控制方法存在一个根本性瓶颈：**用户必须手动提供相机轨迹，且缺乏将轨迹与具体3D场景对象绑定的机制**。这意味着创作者不仅需要具备专业的相机操作知识，还必须逐帧指定相机的旋转、平移和内参，无法通过自然语言直接描述拍摄意图。
 
 近年来，辐射场表示（如NeRF、3D Gaussian Splatting）的进展使得高质量新视角合成成为可能，但相机路径的生成仍主要依赖手工设计或启发式规则。一些工作尝试通过语言嵌入在辐射场中定位语义区域（如**LERF**），或基于3D分割结果放置相机（如**SA3D**），但这些方法仅能确定静态的相机位置，无法生成符合复杂语言指令的连续相机轨迹，更无法实现“围绕花瓶旋转并逐渐拉近”这类需要时序动作组合的拍摄操作。
@@ -63,8 +61,6 @@ claims:
 上述缺口揭示了一个因果调控瓶颈：**文本到轨迹的生成能力缺失**与**场景锚点绑定机制缺失**共同构成了当前系统的关键限制。具体而言：(1) 相机轨迹是连续高维信号，如何将其转化为可被语言模型处理的离散表示，并实现文本条件的自回归生成，是一个未被充分探索的问题；(2) 即使生成了轨迹，如何将其精确放置到辐射场中的目标对象位置（如“聚焦于桌上的红色杯子”），需要将语言语义与3D空间坐标可靠对齐，而现有方法在此环节的精度严重不足。
 
 ChatCam正是在这一背景下提出的。其核心动机是通过对话式AI赋能相机控制，使用户能够以自然语言交互的方式描述拍摄意图，由系统自动生成精确、可控的相机轨迹并渲染视频。这一目标的实现依赖于三个关键洞察：(1) 将相机轨迹离散化为token序列，利用GPT架构实现文本到轨迹的自回归生成；(2) 借助CLIP相似度与梯度优化在辐射场中定位锚点，使生成轨迹与场景对象对齐；(3) 由LLM代理进行任务规划、原子轨迹调用与仿射变换拼接，完成符合复杂语言指令的相机操作。
-
-
 
 ## 核心方法与创新机理
 
@@ -101,8 +97,6 @@ $$c_{t+1} = c_t - \eta \nabla_c \mathcal{L}_{\mathrm{anchor}}(c_t)$$
 
 三个 changed slots 并非孤立运作，而是形成了因果闭环：CineGPT 解决了“生成什么轨迹”的问题，Anchor Determinator 解决了“轨迹放在哪里”的问题，LLM 代理则解决了“如何组合执行”的问题。这种分工使得 ChatCam 在用户研究中以 84.9% 的视觉质量偏好和 67.9% 的文本对齐偏好显著领先于 SA3D、LERF 等基线方法（Table 1），并能在定性对比中避免将相机移动至物体内部等不合理位置（Figure 6）。
 
-
-
 ChatCam 的整体设计围绕一个核心瓶颈展开：现有相机控制方法无法根据自然语言自动生成相机轨迹，且缺乏将轨迹与具体 3D 场景对象绑定的机制。为解决这一问题，ChatCam 构建了一个以 **LLM 代理（GPT-4）为中枢、CineGPT 与 Anchor Determinator 为双工具** 的对话式相机控制系统。其核心洞察在于：将相机轨迹离散化为 token 序列，利用 GPT 架构实现文本到轨迹的自回归生成；同时借助 CLIP 相似度与梯度优化在辐射场中定位锚点，使生成轨迹与场景对象对齐；再由 LLM 代理进行任务规划、原子轨迹调用与仿射变换拼接，完成符合复杂语言指令的相机操作。
 
 ### 输入输出流
@@ -130,11 +124,7 @@ ChatCam 的整体设计围绕一个核心瓶颈展开：现有相机控制方法
 - **为什么需要 LLM 代理？** 消融实验（Table 1）表明，将 GPT-4 替换为 LLaMA-2 后轨迹准确性下降，说明更强的语言模型在任务分解与工具调用中更有效。LLM 代理的存在使得系统能够处理“围绕桌子旋转一圈，然后推近到花瓶”这类需要多步原子操作组合的复杂指令。
 - **为什么需要 Anchor Determinator？** 移除该模块后，平移均方误差从 5.3 升至 16.2，旋转均方误差从 2.9 升至 8.5（Table 1），证明场景锚点对轨迹放置精度至关重要。没有锚点机制，生成的轨迹无法与场景中的具体对象对齐，导致相机可能移动到不合理位置（如穿入物体内部，见 Figure 6 的定性对比）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l94_https_arxiv_org_abs_2409_17331/figures/002_Figure.jpg]]
-
-
 
 ChatCam 的核心由三个功能模块构成：**CineGPT**（文本条件轨迹生成）、**Anchor Determinator**（场景锚点确定）和 **LLM Agent**（任务规划与工具编排）。三者通过 LLM 代理的观察-推理-规划流程协同工作，将自然语言指令转化为与具体 3D 场景对象对齐的相机轨迹。
 
@@ -182,12 +172,8 @@ LLM Agent（基于 GPT-4）作为系统的中央协调器，负责解析用户�
 
 三个模块的协同构成了 ChatCam 的核心因果链路：LLM Agent 提供高层任务分解能力，CineGPT 提供文本到轨迹的生成能力，Anchor Determinator 提供轨迹与场景对象的空间绑定能力。消融实验（Table 1）证实了这一链路的关键性——移除 Anchor Determinator 后，平移 MSE 从 5.3 升至 16.2，旋转 MSE 从 2.9 升至 8.5，验证了场景锚点对轨迹放置精度的决定性作用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l94_https_arxiv_org_abs_2409_17331/figures/005_Figure_3.jpg]]
 *Figure 3: (a) CineGPT. We quantize camera trajectories to sequences of tokens and adopt a GPTbased architecture to generate the tokens autoregressively. Learning trajectory and language jointly, CineGPT is capable of text-conditioned trajectory generation. (b) Anchor Determination. Given a prompt describing the image rendered from an anchor point, the anchor selector chooses the best matching input image. An anchor refinement procedure further fine-tunes the anchor position*
-
-
 
 ## 实验与关键发现
 
@@ -220,8 +206,6 @@ ChatCam 在轨迹精度、视觉质量和文本对齐度三个维度上均展现
 2. **场景先验依赖**：锚点确定流程需要辐射场训练时的多视角输入图像作为 CLIP 相似度计算的候选集，这意味着系统无法直接应用于仅有单张图像或缺乏预重建的场景。
 3. **动态场景未覆盖**：当前方法假设场景为静态，尚未涉及动态对象或动态光照条件下的相机控制，这在实际应用（如拍摄移动人物）中可能构成限制。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l94_https_arxiv_org_abs_2409_17331/figures/009_Figure_6.jpg]]
 *Figure 6: Qualitative comparisons. Our approach avoids moving the camera to unreasonable positions such as inside objects, obtaining videos with better visual effects, and aligning best with input texts*
 
@@ -230,8 +214,6 @@ ChatCam 在轨迹精度、视觉质量和文本对齐度三个维度上均展现
 
 ![[assets/figures/papers/paper_list_l94_https_arxiv_org_abs_2409_17331/figures/008_Figure_5.jpg]]
 *Figure 5: Qualitative results on human-centric scenes. Visualizations of our generated trajectories from input text descriptions and the frames in the final rendered video. Our method performs effectively in scenes with multiple humans*
-
-
 
 ## 定位与知识库关联
 
@@ -282,8 +264,6 @@ ChatCam的适用边界受以下因素制约：
 - **多模态交互深化：** 当前系统以文本为主要交互模态，引入草图、示例视频或手势等多模态输入，可能进一步提升相机控制的直观性和精确度。
 
 - **实时性与效率优化：** 锚点确定的梯度优化过程在推理时可能引入额外延迟，研究更高效的锚点定位策略（如直接回归或检索增强）对交互式应用至关重要。
-
-
 
 ## 原文 PDF
 

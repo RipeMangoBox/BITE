@@ -53,8 +53,6 @@ claims:
 
 **方法定位**：StereoWorld 属于“基于扩散模型的端到端立体视频生成”范式，区别于传统的多阶段扭曲-修补路线。它通过改造预训练视频 DiT（Diffusion Transformer）架构，在 Rectified Flow 框架下联合优化 RGB 与深度速度场，实现了从单目视频到高质量立体视频的直接映射。
 
-
-
 立体视频（Stereoscopic video）是沉浸式视觉体验的核心载体，广泛应用于 3D 电影、扩展现实（XR）头显及各类立体显示设备。然而，立体内容的制作长期受限于高昂的专业拍摄成本与复杂的后期处理流程——传统方案需要双摄像机精确同步、严格的基线校准（IPD 对齐）以及繁重的后期立体校正。将海量的单目视频自动转换为高质量立体视频，因此成为一个兼具学术价值与产业需求的关键问题。
 
 现有的单目转立体视频方法主要遵循一条**多阶段管道**：首先利用单目深度估计模型预测场景深度，继而通过图像扭曲（warping）生成右眼视图，最后依赖修补（inpainting）网络填充扭曲产生的空洞与遮挡区域。**GenStereo**（Qiao et al., arXiv 2025）与 **SVG** 等无需训练的基线方法，以及经微调的 **StereoCrafter**（Zhao et al., arXiv 2024），均属于这一范式。然而，这一管道存在根本性瓶颈：**深度估计、扭曲与修补三个阶段各自独立优化，破坏了视频数据的自然分布，缺乏端到端的几何与视觉一致性约束**，导致生成的右眼视图普遍存在纹理失真、色彩偏移和立体伪影。尤其在非重叠区域——水平相机平移引入的左右视图不可见部分——扭曲-修补策略几乎无法产生可信的内容，因为仅靠视差信息无法约束这些区域的生成。
@@ -64,8 +62,6 @@ claims:
 上述分析指向一个明确的因果调控点：**将单目视频扩散模型改造为端到端的立体生成器，使其在统一的生成框架内显式学习立体几何对应关系**。本文的核心洞察在于：预训练视频扩散模型的 3D 时空注意力机制天然具备融合多视角信息的能力——若将左右视图的潜在表示沿帧维度拼接，模型便能在去噪过程中自动建立跨视角的时空关联。在此基础上，引入视差监督（强制像素级立体对应）与深度监督（补偿非重叠区域的几何缺失），可形成完整的几何感知正则化，使模型端到端地生成具有高几何一致性和视觉保真度的右眼视图。
 
 > **需人工验证**：关于 GenStereo、SVG 和 StereoCrafter 的具体技术细节（如深度估计主干网络、修补策略等），本文未提供详细对比分析，上述总结基于论文对“多阶段管道”的概括性描述，建议查阅原始文献以确认各方法的精确差异。
-
-
 
 ## 核心方法与创新机理
 
@@ -106,8 +102,6 @@ StereoWorld 的解决方案是**将左右视图的 VAE 潜在表示沿帧维度�
 | 高分辨率长视频 | 通常受限于低分辨率 | 时空拼接策略（时间分段 + 空间瓦片） |
 
 消融实验（Table 3, Figure 8）证实：去除视差监督后几何精度大幅下降（EPE 和 D1-all 均变差），去除深度监督则降低非重叠区域的生成质量；完整模型在所有指标上取得最佳性能，验证了视差与深度监督的互补性。
-
-
 
 StereoWorld 旨在将预训练的单目视频扩散模型改造为一个端到端的立体视频生成器。其核心设计思路是：**将左右视图的潜在表示沿帧维度拼接，使预训练模型的 3D 时空注意力能够自然地融合跨视角信息，同时引入几何感知的正则化策略来显式约束立体几何的一致性。**
 
@@ -150,12 +144,8 @@ $$\mathcal { L } = \mathcal { L } _ { \mathrm { r g b } } + \mathcal { L } _ { \
 
 现有主流方法（如 **GenStereo**（Qiao et al., arXiv 2025）、**SVG**、**StereoCrafter**（Zhao et al., arXiv 2024））普遍采用多阶段管道：先估计深度图，再通过扭曲（warping）生成右视图，最后用修补（inpainting）填充空洞。这种范式破坏了视频的自然分布，容易引入纹理失真、色彩偏移和立体伪影。StereoWorld 的端到端扩散框架则从根本上避免了这一问题——模型直接学习从单目视频到立体视频的条件分布，无需显式的深度估计或扭曲操作，从而在视觉质量和几何一致性上取得了显著提升。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2604_https_arxiv_org_abs_2512_09363/figures/003_Figure_2.jpg]]
 *Figure 2: Overall framework of StereoWorld. Before training, we use Video Depth Anything [9] and Stereo Any Video [24] to obtain the depth maps*
-
-
 
 ### 3.1 基础扩散框架
 
@@ -199,9 +189,6 @@ $$\mathcal { L } _ { \mathrm { 1 1 } } = \mathbb { E } [ | \hat { b } _ { \mathr
 
 水平相机平移会引入左右视图之间的非重叠区域（如前景物体边缘的遮挡区域），视差监督对此类区域完全失效（参见 Figure 3）。为补偿这一几何缺失，StereoWorld 额外引入深度监督：利用 **Video Depth Anything** 预提取右视图深度图 $D_r$ 作为伪真值，约束模型在生成 RGB 的同时预测一致的深度信息。
 
-![[assets/figures/papers/paper_list_l2604_https_arxiv_org_abs_2512_09363/figures/004_Figure_3.jpg]]
-*Figure 3: Non-overlapping regions between stereo views. Horizontal camera translation introduces non-overlapping content, which disparity supervision alone cannot constrain, motivating the use of depth-based supervision*
-
 #### 3.3.3 双分支 DiT 架构
 
 为实现 RGB 与深度的解耦学习，StereoWorld 复制了最后若干层 DiT 模块的权重，形成两个专用分支：
@@ -230,17 +217,9 @@ $$\mathcal { L } = \mathcal { L } _ { \mathrm { r g b } } + \mathcal { L } _ { \
 
 - **时间分段**（Figure 4）：训练时以概率 $p$ 将噪声潜在变量的前若干帧替换为真值帧，模拟推理时的分段引导；推理时将长视频分割为有时间重叠的段，前一段的最后若干帧用于引导下一段，确保时序一致性。
 
-![[assets/figures/papers/paper_list_l2604_https_arxiv_org_abs_2512_09363/figures/005_Figure_4.jpg]]
-*Figure 4: Temporal tiling strategy. During training, the first few frames of noisy latents are replaced with ground-truth frames with a probability p. During inference, long videos are split into overlapping segments, with the last frames of the previous segment used to guide the next, ensuring temporal consistency*
-
 - **空间瓦片**（Figure 5）：推理时将高分辨率潜在表示分割为空间重叠的瓦片，各瓦片独立去噪后，在重叠区域融合拼接回原始尺寸，有效缓解显存压力。
 
-![[assets/figures/papers/paper_list_l2604_https_arxiv_org_abs_2512_09363/figures/006_Figure_5.jpg]]
-*Figure 5: Spatial tiling strategy. During inference, highresolution videos are encoded into latents, which are split into overlapping tiles. Each tile is denoised independently, and then the tiles are stitched back to the original size with overlapping regions fused before decoding*
-
 > **注意**：论文未详细公开时空拼接策略中超参数（如重叠比例、瓦片尺寸）的具体取值，也未讨论段间过渡在极端运动场景下的平滑性量化评估，该部分细节需手动验证。
-
-
 
 ## 实验与关键发现
 
@@ -297,8 +276,6 @@ StereoWorld 在所有主观维度上均获得最高评分，尤其在双目一�
 - **图 7**：时间维度的定性对比，展示时序一致性优势。
 - **图 8**：消融实验的定性对比，直观展示视差偏移和结构感知的差异。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2604_https_arxiv_org_abs_2512_09363/figures/008_Figure_6.jpg]]
 *Figure 6: Qualitative comparisons with state-of-the-art methods. It shows that our method achieves the best generation quality, preserving fine details while maintaining strong visual consistency with the left view. Crucially, our method achieves far better text rendering quality than all baselines*
 
@@ -311,13 +288,8 @@ StereoWorld 在所有主观维度上均获得最高评分，尤其在双目一�
 ![[assets/figures/papers/paper_list_l2604_https_arxiv_org_abs_2512_09363/figures/011_Table_3.jpg]]
 *Table 3: Ablation on geometry-aware regularization. The full model achieves the best overall performance*
 
-![[assets/figures/papers/paper_list_l2604_https_arxiv_org_abs_2512_09363/figures/012_Table_4.jpg]]
-*Table 4: Results of Human evaluation with metrics: Stereo Effect (SE), Visual Quality (VQ), Binocular Consistency (BC), and Temporal Consistency (TC)*
-
 ![[assets/figures/papers/paper_list_l2604_https_arxiv_org_abs_2512_09363/figures/002_Table_1.jpg]]
 *Table 1: Comparison of the stereo datasets. Existing datasets are generally not IPD-aligned (e.g., Spring, VKITTI2), while datasets that are IPD-aligned are not publicly available (e.g., 3D Movies). Our StereoWorld is the first large-scale, IPD-aligned dataset*
-
-
 
 ## 定位与知识库关联
 
@@ -370,8 +342,6 @@ StereoWorld 在所有主观维度上均获得最高评分，尤其在双目一�
 5. **运动遮挡鲁棒性**：当左右视图存在显著运动遮挡（如前景物体快速横穿画面）时，当前框架的几何推理能力如何？是否需要引入显式的遮挡推理模块？
 
 6. **版权与伦理合规**：大规模影视数据的收集和使用涉及版权问题，如何在保证训练数据规模的同时建立合规的数据获取和授权机制，是推动该技术走向实际应用的重要前提。
-
-
 
 ## 原文 PDF
 

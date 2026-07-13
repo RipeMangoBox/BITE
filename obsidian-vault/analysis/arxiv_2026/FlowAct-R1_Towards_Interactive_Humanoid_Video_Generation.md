@@ -60,8 +60,6 @@ claims:
 
 **证据强度**：核心性能指标（FPS/TTFF）和用户偏好结果均有明确的定量支撑，置信度较高；消融实验（记忆修复、自强制训练、多阶段蒸馏）进一步验证了各组件的有效性，但部分消融的详细量化数据需结合原文确认。
 
-
-
 实时交互式人形视频生成旨在根据音频、文本等驱动信号，流式合成具有自然行为的高保真虚拟人物视频，在数字人直播、虚拟助手、在线教育等场景中需求迫切。该任务的核心瓶颈在于：**现有方法难以同时满足流式生成、低延迟交互和全身行为的高保真生动性**，普遍存在视觉质量与实时响应之间的根本性权衡，且长视频的时序一致性难以维持。
 
 早期工作如 **Neural Voice Puppetry**（Thies et al., ECCV 2020）仅聚焦于音频驱动的面部重现，缺乏全身控制能力。**INFP**（Zhu et al., arXiv 2024）虽支持流式交互式头部生成，但同样局限于面部区域。近期涌现的全身人形视频生成方法在质量上取得显著进展，却牺牲了实时性：**Omnihuman-1.5**（Jiang et al., arXiv 2025）仅能生成最长30秒的非流式视频；**KlingAvatar 2.0**（Kling Team et al., arXiv 2025）将时长扩展至5分钟，但仍为离线全序列生成范式；**LiveAvatar**（Huang et al., arXiv 2025）首次尝试实时流式音频驱动人形生成，但在运动自然度、唇音同步精度和帧结构稳定性方面仍有明显不足。
@@ -73,8 +71,6 @@ claims:
 3. **行为规划缺失**：现有方法缺乏对人物动作的显式高层规划，难以在长时间流播中维持行为的自然过渡和生动性。
 
 本文提出 **FlowAct-R1**，一个面向实时交互式人形视频生成的统一框架。其核心动机在于：通过**分块扩散强制**策略将全序列扩散Transformer改造为流式自回归架构，利用**自强制训练**弥合推理差距，同时引入**多模态大语言模型驱动动作规划**和**多阶段蒸馏**，在480p分辨率下实现25fps稳定实时生成（首帧延迟约1.5秒），并维持无限时长流播中的身份一致性与行为自然性。
-
-
 
 ## 核心方法与创新机理
 
@@ -114,8 +110,6 @@ FlowAct-R1 的核心创新在于通过**分块扩散强制（chunkwise diffusion
 
 上述创新共同构成了一条从“离线全序列扩散”到“在线流式自回归扩散”的完整技术路线，其核心洞察在于：**通过分块扩散强制与自强制训练的配合，将扩散模型的生成质量优势与自回归模型的流式能力统一，再通过蒸馏和系统优化将推理成本压缩至实时可用的量级**。这一方案在方法谱系中填补了“实时流式全身人形视频生成”的空白——Table 1 的系统对比显示，FlowAct-R1 是唯一同时具备流式生成、实时推理、全身控制、强泛化性和生动行为过渡能力的框架。
 
-
-
 FlowAct-R1 的整体框架围绕“分块自回归扩散 + 结构化记忆 + 多阶段蒸馏”三条主线组织，将原本面向全序列生成的扩散 Transformer 改造为支持无限时长流式推理的实时交互系统。框架分为训练与推理两大阶段（图2），其核心瓶颈在于：**流式生成要求模型在仅看到过去帧的条件下预测未来，而标准扩散模型训练时却依赖完整序列的双向注意力**。FlowAct-R1 通过假因果注意力（pseudo-causal attention）和自强制训练弥合这一差距，同时引入记忆修复机制抑制长时流播中的误差累积。
 
 ### 训练阶段
@@ -149,15 +143,11 @@ FlowAct-R1 的整体框架围绕“分块自回归扩散 + 结构化记忆 + 多
 
 > **需注意**：关于 MLLM 动作规划的具体实现细节（如预测频率、动作空间定义）以及记忆修复的触发策略，原文未提供充分的定量消融证据，相关性能归因需结合补充材料进一步验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2601_10103/figures/003_Figure_2.jpg]]
 *Figure 2: Overview of the FlowAct-R1 framework. It consists of training and inference stages: training integrates converting base full-attention DiT to streaming AR model via autoregressive adaptation, joint audio-motion finetuning for better lip-sync and body motion, multi-stage diffusion distillation; inference adopts a structured memory bank (Reference/Long/Short-term Memory, Denoising Stream) with chunkwise autoregressive generation and memory refinement. Complemented by system-level optimizations, it achieves 25fps real-time 480p video generation (TTFF 1.5s) with vivid behavioral transitions*
 
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2601_10103/figures/001_Figure_1.jpg]]
 *Figure 1: We present FlowAct-R1, a novel framework that enables lifelike, responsive, and high-fidelity humanoid video generation for seamless real-time interaction*
-
-
 
 ### 2.1 分块扩散强制（Chunkwise Diffusion Forcing）
 
@@ -222,8 +212,6 @@ $$\mathcal{L}_{\text{DMD}} = D_{KL}(q_{\text{student}}(\mathbf{z}) \| p_{\text{t
 
 > **注意**：本文未提供具体公式的完整 LaTeX 源码，上述公式为基于方法描述的逻辑还原，需以原论文正式版本为准进行验证。
 
-
-
 ## 实验与关键发现
 
 ### 实时性能与系统效率
@@ -264,8 +252,6 @@ Table 1 给出了与现有 SOTA 人形视频生成方法的整体能力对比。
 
 论文明确指出的主要局限并非技术瓶颈，而是伦理风险：该技术可能被滥用以制造欺骗性或有害内容。作者声明将通过访问控制和负责任部署来缓解这一风险。技术层面的失败模式（如极端姿态下的身份漂移、复杂音频场景下的唇音失配等）在已有材料中未展开讨论，需要手动验证。
 
-
-
 ## 定位与知识库关联
 
 FlowAct-R1 处于人形视频生成从“离线全序列合成”向“实时流式交互”跃迁的关键节点。其核心贡献并非单一模块的创新，而是通过**分块扩散强制（chunkwise diffusion forcing）** 将扩散Transformer改造为流式自回归架构，同时以多阶段蒸馏和系统优化将推理成本压缩至可实时运行的量级，从而在**流式、实时、全身控制、泛化性与生动性**五个维度上首次实现全面覆盖（见 Table 1）。
@@ -301,8 +287,6 @@ FlowAct-R1 将去噪步骤压缩至 **3 NFE**（chunk-size=3, micro-step=1, 无 
 - **极端长时一致性**：虽然记忆修复策略缓解了累积伪影，但在数小时级别的连续流播中，身份漂移和运动模式退化是否可控尚无定量评估。
 - **多模态动作规划的鲁棒性**：MLLM 动作规划依赖音频和参考图像推断后续行为，在音频歧义或场景突变时的鲁棒性未经验证。
 - **更高分辨率的实时性**：当前 480p 25fps 的指标能否线性扩展至 720p 或 1080p 尚不明确，系统优化的瓶颈分析缺失。
-
-
 
 ## 原文 PDF
 

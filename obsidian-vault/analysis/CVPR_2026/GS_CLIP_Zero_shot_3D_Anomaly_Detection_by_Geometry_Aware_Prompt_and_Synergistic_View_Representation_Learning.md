@@ -66,8 +66,6 @@ GS-CLIP 属于“基于2D视觉-语言模型适配的3D异常检测”方法簇�
 **局限与开放问题**  
 当前方法仍依赖多视角2D投影间接理解3D异常，未能直接利用3D原生表示；两阶段训练及多视角渲染引入额外计算开销，在实时性要求高的工业场景中可能存在效率瓶颈。未来可探索更直接的三维原生表示与模态融合方法。
 
-
-
 ### 问题设定：从无监督到零样本的范式迁移
 
 传统的三维异常检测（Unsupervised 3D Anomaly Detection, U3DAD）遵循“每类一个模型”的范式：对每个目标类别单独收集正常样本进行训练，测试时只能检测已见过的类别。这一设定在实际工业部署中面临两个根本性约束：（1）为每个新产品线采集和标注足够的正常样本成本高昂；（2）模型缺乏对全新类别异常的泛化能力，无法应对快速迭代的生产需求。
@@ -96,8 +94,6 @@ GS-CLIP的动机正是打破这一局限：**通过显式地将三维几何先�
 - **视觉侧**：并行处理渲染图和深度图，通过协同精炼模块深度融合双流特征，使视觉表示同时具备纹理感知和几何感知能力。
 
 这两个设计直接回应了现有方法的两大缺陷：几何先验提示弥补了投影损失的信息，双流协同融合克服了单模态的不完整性。后续章节将详细展开这一框架的技术实现与实验验证。
-
-
 
 ## 核心方法与创新机理
 
@@ -134,8 +130,6 @@ GS-CLIP 的核心创新在于将三维几何先验显式注入 CLIP 的文本-�
 ### 创新点的因果链条
 
 上述两个 changed slots 形成了清晰的因果链条：几何感知提示赋予 CLIP 对三维结构异常的语义理解，协同双流视觉编码提供全面的视觉证据，二者通过文本-视觉相似度匹配实现精确的异常检测。消融实验证实，移除协同精炼模块 (SRM)、形状提示 (SP) 或缺陷提示 (DP) 中任一部分均导致性能下降（Table 4，置信度 0.95），验证了各创新模块的必要性。
-
-
 
 GS‑CLIP 采用**两阶段学习策略**，将三维几何先验注入 CLIP 的文本与视觉分支，并在多视角二维投影上完成零样本异常检测。其核心设计围绕两条因果链路展开：**(1) 几何感知的文本提示生成**——从点云中提取全局形状与局部缺陷信息，动态构造富含三维结构语义的提示；**(2) 协同视图表示学习**——并行处理渲染图像与深度图像，通过双向注意力深度融合双流特征，获得对几何异常更敏感的视觉表示。
 
@@ -191,8 +185,6 @@ $$L_{con} = 1 - \frac{1}{v} \sum_{i=1}^{v} \langle G_i, \bar{G} \rangle$$
 
 ![[assets/figures/papers/paper_list_l2393_https_arxiv_org_abs_2602_19206/figures/003_Figure_3.jpg]]
 *Figure 3: The overall architecture of GS-CLIP. The framework is optimized through a two-stage learning strategy. In stage 1, we generate text prompts embedded with geometric priors using a 3D feature extractor and a Geometric Defect Distillation Module. In stage 2, we design a synergistic architecture that processes rendered images and a LoRA-optimized depth image branch in parallel. The features from both branches are deeply fused by the Synergistic Refinement Module and finally compared with the text prompts to compute similarity for classification and segmentation*
-
-
 
 GS-CLIP 通过两阶段学习框架实现零样本3D异常检测：阶段一从点云中提取几何先验并动态生成文本提示；阶段二构建双流视觉编码与协同精炼模块进行跨模态融合。本节聚焦关键模块的设计与核心公式。
 
@@ -266,16 +258,6 @@ $$\mathcal{L}_{stage2} = \mathcal{L}_{cla} + \mathcal{L}_{seg} + \alpha L_{con}$
 
 > **需人工验证**：论文中 $\alpha$ 的具体取值、$d_{pn}$ 和 $d_e$ 的维度数值、以及 LoRA 的秩配置等超参数细节，在提供的分析材料中未明确给出，建议查阅原文实验设置部分确认。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2393_https_arxiv_org_abs_2602_19206/figures/002_Figure_2.jpg]]
-*Figure 2: Example of the complementarity of rendered and depth images in anomaly detection. In the top row, the depth map effectively ignores surface texture interference to clearly show the dent D:\大学\3D工业缺陷检测$\data\mvtec$_3d$\cookie\test\hole$\2d_rendering\000 anomaly; in the bottom row, the rendered image better captures the D:\大学\3D工业缺陷检测$\data\mvtec$_3d$\bagel\test\contamination$\2d_rendering\001 slight protrusion with insignificant depth change through lighting and shadow variations*
-
-![[assets/figures/papers/paper_list_l2393_https_arxiv_org_abs_2602_19206/figures/008_Figure_5.jpg]]
-*Figure 5: Parameters in GDDM*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -333,16 +315,6 @@ GS-CLIP在四个大规模公开数据集上进行了全面的零样本3D异常�
 
 方法依赖在通用图像-文本对上预训练的CLIP模型，其视觉-语言对齐可能隐含预训练数据中的偏差。在特定工业场景（如特殊材质、极端光照）中，这种偏差可能影响异常判断的公平性和一致性。此外，GDDM中的正常原型记忆库在辅助数据上构建，其代表性受限于辅助数据的多样性和质量。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2393_https_arxiv_org_abs_2602_19206/figures/004_Table_1.jpg]]
-*Table 1: Zero-shot 3D anomaly detection results. O-AUROC (O-R), O-AP (O-A) at object-level and P-AUROC (P-R), P-PRO (P-P) at point-level metrics are presented. Best results are in bold, second-best are underlined*
-
-![[assets/figures/papers/paper_list_l2393_https_arxiv_org_abs_2602_19206/figures/001_Figure_1.jpg]]
-*Figure 1: Comparison of task settings between traditional Unsupervised 3D Anomaly Detection (U3DAD) and Zero-shot 3D Anomaly Detection (ZS3DAD). U3DAD is trained on positive (normal) samples and tested on samples of the same categories; ZS3DAD is trained on auxiliary, annotated data and tested on unseen target categories*
-
-
-
 ## 定位与知识库关联
 
 ### 任务设定与问题边界
@@ -391,8 +363,6 @@ GS‑CLIP 在零样本 3D 异常检测知识库中的定位如下：
 - **技术路线**：属于“CLIP 驱动的零样本工业异常检测”这一研究脉络，将 2D 视觉-语言模型的开放词汇能力拓展至 3D 领域。
 - **核心贡献**：首次在文本提示中显式注入从点云提取的三维几何先验（全局形状 + 局部缺陷），并设计渲染图-深度图协同融合架构，实现了对几何结构异常的语义感知。
 - **与上下游关系**：上游依赖 CLIP 预训练权重和 PointNet++ 点云编码器；下游可服务于工业质检中的零样本缺陷检测、跨品类迁移等应用场景。其几何感知提示生成机制对后续 3D 多模态异常检测研究具有参考价值。
-
-
 
 ## 原文 PDF
 

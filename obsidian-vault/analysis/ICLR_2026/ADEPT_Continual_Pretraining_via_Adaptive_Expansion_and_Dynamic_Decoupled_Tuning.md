@@ -54,8 +54,6 @@ claims:
 
 在数学和医疗两个领域的持续预训练实验中，ADEPT仅调优约15%的参数，在目标领域基准上相比全参数微调（PT-Full）提升最高达5.58%，在通用基准上提升最高达5.76%，同时显著缩短训练时间。消融实验证实，选择性层扩展和动态解耦调优两个阶段均对性能有实质性贡献，且重要性引导的选择策略优于均匀扩展策略。
 
-
-
 大规模语言模型（LLM）的领域适应通常通过持续预训练（Continual Pretraining, CPT）实现，即在通用基座模型上利用领域语料进行二次训练。然而，CPT面临一个根本性瓶颈：**通用知识与领域知识在模型参数中高度纠缠**，导致领域学习过程中不可避免地损害模型的通用能力，即灾难性遗忘。
 
 ### 功能专门化：被忽视的结构性事实
@@ -83,8 +81,6 @@ ADEPT的核心洞察是：**有效的持续预训练应当遵循LLM内在的功�
 
 这一思路将CPT从“全局妥协”转变为“结构化适应”：通用知识在冻结的关键层和低学习率单元中得到保护，领域知识则通过扩展层的高学习率单元进行定向注入，两者在结构上实现解耦。
 
-
-
 ## 核心方法与创新机理
 
 ADEPT 的核心创新在于将“在哪里扩展容量”与“如何分配学习强度”这两个持续预训练（CPT）中的关键决策，统一为对**通用能力重要性**的显式建模与利用。传统 CPT 方法（如 **PT-Full** 全参数微调、**Llama-Pro** 统一插入新层）采用“一刀切”的扩展与更新策略，忽略了 LLM 内部不同层和参数单元对通用能力的功能专门化，导致领域知识与通用知识高度纠缠，引发灾难性遗忘与容量不足。
@@ -110,8 +106,6 @@ $$\mathrm{lr}_{U} = 2 \cdot (1 - I_{\mathrm{unit}}) \cdot \mathrm{lr}_{\mathrm{b
 ### 创新本质
 
 ADEPT 的 changed slots 揭示了其方法论跃迁：**层扩展策略**从“均匀插入”变为“重要性引导的选择性复制”，**参数更新粒度**从“统一学习率”变为“单元级不对称学习率”，**训练动态**从“静态更新”变为“周期性重要性探测与学习率自适应”。这三个维度的协同，使 ADEPT 在仅调优约 15% 参数的情况下，在数学和医疗领域的领域基准上平均超越全参数 CPT 最高 5.58%，同时在通用基准上最高提升 5.76%，实现了领域吸收与通用保持的有效平衡。
-
-
 
 ADEPT 的整体流程围绕一个核心洞察展开：大语言模型的不同层和参数单元对通用能力的贡献存在显著异质性，因此有效的持续预训练应当**选择性扩展通用关键度最低的层**，并在扩展层内**对参数单元进行解耦优化**，从而在吸收领域知识的同时保护通用能力。
 
@@ -169,8 +163,6 @@ $$\mathcal{L} = -\sum_{t=1}^{T} \log P(x_t \mid x_{<t}; \Theta)$$
 
 ADEPT 的关键创新在于将**容量分配**（选择性层扩展）与**学习动态**（单元级解耦调优）统一在一个重要性驱动的框架下，使两者协同工作：扩展阶段从结构上隔离通用关键区域，调优阶段从优化上保护通用关键参数。消融实验（Table 2）证实，移除任一阶段均会导致性能显著下降，且移除阶段一的影响更大，验证了自适应容量分配的核心地位。
 
-
-
 ### 3.1 通用能力引导的选择性层扩展（Stage 1）
 
 ADEPT 的第一阶段解决**在何处扩展模型容量**的问题。其核心操作流程如下：
@@ -224,8 +216,6 @@ $$\mathcal{L} = -\sum_{t=1}^{T} \log P(x_t \mid x_{<t}; \Theta)$$
 
 消融实验（Table 2）进一步验证了上述设计的必要性：移除 Stage-1（选择性层扩展）导致通用和领域性能均大幅下降，其影响程度大于移除 Stage-2（动态解耦调优）；将重要性引导的选择替换为均匀扩展（等同于 LLaMA-Pro 策略）同样导致性能显著降低。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -271,21 +261,8 @@ Table 6 对比了医疗领域各方法的训练时间：ADEPT 在保持最优性
 3. **领域泛化未充分验证**：当前实验仅覆盖数学和医疗两个领域，在代码、多语言等差异更大的领域上，层重要性分布和最优扩展策略可能不同，需进一步研究。
 4. **多领域合并的简单化**：多个领域特定扩展层合并时仅使用简单加权平均，尚未探索更优的融合方法以构建统一的领域增强模型。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_vcWDDfA4Ev/figures/002_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_vcWDDfA4Ev/figures/021_Figure_8.jpg]]
-*Figure 8: Kernel Density Estimation of activations for Qwen3-8B-Base, showing that our layer extension strategy enables clear parameter decoupling. We expand layers 26, 28, 29, and 30*
-
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_vcWDDfA4Ev/figures/046_Figure_16.jpg]]
 *Figure 16: Importance visualization for Llama3-8B-Base across Math and Medical domains, with and without calibration*
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_vcWDDfA4Ev/figures/047_Figure.jpg]]
-*Figure: (a) Llama3-8B-Base on Math (raw importance) (c) Llama3-8B-Base on Medical (raw importance)*
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_vcWDDfA4Ev/figures/048_Figure.jpg]]
-*Figure: (a) Qwen3-1.7B-Base on Math (raw importance) (c) Qwen3-1.7B-Base on Medical (raw importance)*
 
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_vcWDDfA4Ev/figures/049_Figure_17.jpg]]
 *Figure 17: Importance visualization for Qwen3-1.7B-Base across Math and Medical domains, with and without calibration*
@@ -293,16 +270,8 @@ Table 6 对比了医疗领域各方法的训练时间：ADEPT 在保持最优性
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_vcWDDfA4Ev/figures/050_Figure_18.jpg]]
 *Figure 18: Importance visualization for Qwen3-4B-Base across Math and Medical domains, with and without calibration*
 
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_vcWDDfA4Ev/figures/051_Figure.jpg]]
-*Figure: (a) Qwen3-4B-Base on Math (raw importance) (c) Qwen3-4B-Base on Medical (raw importance)*
-
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_vcWDDfA4Ev/figures/052_Figure_19.jpg]]
 *Figure 19: Importance visualization for Qwen3-8B-Base across Math and Medical domains, with and without calibration*
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_vcWDDfA4Ev/figures/053_Figure.jpg]]
-*Figure: (a) Qwen3-8B-Base on Math (raw importance) (c) Qwen3-8B-Base on Medical (raw importance)*
-
-
 
 ## 定位与知识库关联
 
@@ -339,8 +308,6 @@ ADEPT处于**架构扩展**（Architecture Expansion）与**参数高效微调**
 **多领域扩展的合并策略。** 当需要为多个领域分别训练扩展层时，如何科学地组合这些领域特定的扩展层以获得统一的领域增强模型，目前仅采用简单加权平均，尚未探索更优的融合方法（如基于任务相关性的动态路由或门控机制）。
 
 **理论保证的实践差距。** 虽然附录F.1和F.2提供了选择性扩展和逆比例学习率分配的最小化遗忘上界的理论证明，但这些上界依赖于重要性估计的准确性——当重要性估计存在偏差时，理论保证的有效性会相应减弱。
-
-
 
 ## 原文 PDF
 

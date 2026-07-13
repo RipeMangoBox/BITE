@@ -49,8 +49,6 @@ claims:
 
 在涵盖六个自发微表情数据集（CASME, CASME II, SAMM, MMEW, 4DME, CASME3）的留一数据集交叉验证协议下，DiffME 生成的顶点帧在 AU 预测指标（UF1/ACC）上接近真实顶点帧性能，且在不同 CFG 强度尺度下表现稳定。消融实验证实，ADDE 与 CARM 构成级联依赖关系，任一模块缺失均导致模型退化为基础潜在扩散模型，输出质量显著恶化。DiffME 还引入基于视觉语言模型（VLM）与深度学习模型（DLM）的标准化评估方案，以替代传统人工编码，增强评估的客观性与可复现性。
 
-
-
 微表情（Micro-Expressions, MEs）是一种短暂、微弱且往往非自主的面部运动，通常持续仅 1/25 至 1/3 秒。作为情感计算和心理学研究中的关键线索，微表情在测谎、临床诊断和人机交互等场景中具有重要价值。然而，微表情数据的采集与标注极为困难——其低强度、短时程和稀疏发生特性使得大规模、高质量标注数据集的构建成本高昂，这严重制约了数据驱动的微表情分析与识别研究。
 
 ### 现有方法的缺口
@@ -76,8 +74,6 @@ claims:
 2. **实现精细可控生成**：将生成任务形式化为从起始帧（onset frame）和 21 维连续 AU 强度向量预测顶点帧（apex frame），该向量涵盖 12 个 AU 及其面部侧化信息，支持对强度和双侧对称性的独立调节。配合自监督的 AU-Decomposed Deformation Estimator（ADDE）估计各 AU 的生理强度上限，以及概率强度感知扩散（PITD）中的分类器自由引导（CFG）作为“强度滑块”，DiffME 实现了前所未有的控制粒度。
 
 3. **建立标准化评估方案**：引入基于视觉语言模型（VLM）和深度学习模型（DLM）的自动评估协议，替代传统人工编码，增强评估的客观性、可复现性和可扩展性，为微表情生成方法的公平比较奠定基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -115,8 +111,6 @@ $$f_{\mathrm{ID-ME}} = \mathrm{Att}(Q, K_{\mathrm{id}}, V_{\mathrm{id}}) + \beta
 
 上述四个创新点并非孤立存在，而是形成了一条完整的因果链路：ADDE 为 CARM 提供 AU 特定的形变表示和强度边界；CARM 基于 CPM 结构先验对 AU 关系进行建模，输出协调后的 AU 表示；这些表示作为条件输入**概率强度感知过渡扩散（PITD）**框架，通过解耦交叉注意力和 ID-Net 实现身份保持的可控生成；在推理阶段，通过分类器自由引导（CFG）的外推机制 $\tilde{\varepsilon}_\theta = \varepsilon_\theta + \lambda_{\mathrm{ME}} (\varepsilon_{\mathrm{ME}} - \varepsilon_\theta)$ 实现强度滑块式的精细调控。消融实验表明，移除 ADDE 或 CARM 中任一模块均会导致模型退化为基础潜在扩散模型，输出质量明显恶化，验证了这一协同设计的必要性。
 
-
-
 DiffME 将微表情生成形式化为一个条件图像合成任务：给定起始帧 $F_{\text{onset}}$ 和一个细粒度的 AU 强度控制向量 $\mathbf{I}_{\text{con}} \in \mathbb{R}^{21}$，预测对应的顶点帧 $\hat{F}_{\text{apex}}$。其中 $\mathbf{I}_{\text{con}}$ 涵盖 12 个按面部侧化解耦的 AU，支持对强度和双侧对称性的精细调控。整个框架由三个核心模块串联构成，形成“自监督运动解耦—结构先验建模—强度感知扩散生成”的级联管线。
 
 **AU-Decomposed Deformation Estimator (ADDE)** 作为管线前端，以起始-顶点帧对为输入，通过自监督运动编码器估计形变场 $\mathcal{T}_{F_{\text{onset}}F_{\text{apex}}}$。它将 AU 相关的关键点区域转化为高斯热力图，进而提取每个 AU 特定的局部雅可比矩阵，并通过 Frobenius 范数估计各 AU 的强度上限 $\mathbf{I}_{\max} \in \mathbb{R}^{21}$。这一强度边界从可观测样本分布中习得，为后续生成提供生理上限约束，防止生成的运动超越解剖学合理范围（图 3）。
@@ -141,18 +135,11 @@ $$\tilde{\varepsilon}_\theta(x_t, t, f_{\text{id}}, f_{\text{ME}}) = \varepsilon
 
 **输入输出流总结**：起始帧经预训练面部编码器提取身份嵌入 $f_{\text{id}}$；同时 ADDE 从训练数据中自监督估计各 AU 的强度上限 $\mathbf{I}_{\max}$；用户指定的目标强度向量 $\mathbf{I}_{\text{con}}$ 与 $\mathbf{I}_{\max}$ 共同约束 CARM，产出结构化 AU 条件表示 $f_{\text{ME}}$；$f_{\text{id}}$ 和 $f_{\text{ME}}$ 通过解耦交叉注意力注入 PITD 的主 UNet，ID-Net 并行提供身份先验，最终在潜在空间中解码生成顶点帧。三个模块形成紧耦合依赖：移除 ADDE 将使 CARM 无法工作，移除 CARM 则破坏 PITD 的强度估计，导致模型退化为基础潜在扩散模型，输出质量显著恶化。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1651_DiffME_Component_Process_Model_Induced_Controllable_Micro_Expression_Gen/figures/004_Figure_4.jpg]]
 *Figure 4: Overview of our Probabilistic Intensity-aware Transition Diffusion (PITD) pipeline. Left: Given onset image and target AU intensities, we extract identity embedding from a pretrained face encoder, and derive structured symmetry-aware AU representations via CARM. These two streams are fused through decoupled cross-attention to condition the primary UNet. A parallel UNet, ID-Net, is conditioned solely on the identity embedding to impose a strong identity constraint, ensuring identity preservation while the main UNet renders the desired ME. Right: Empirical AU correlation graph that informs the structural prior of CARM. For clarity, only edges with absolute correlation above 0.1 are displayed*
 
-![[assets/figures/papers/paper_list_l1651_DiffME_Component_Process_Model_Induced_Controllable_Micro_Expression_Gen/figures/001_Figure_1.jpg]]
-*Figure 1: Motivation of our method. Prior approaches rely on motion transfer or coarse AU control, resulting in inflexible generation or non-ME dynamics. They are typically evaluated manually, which is subjective and non-reproducible. In contrast, DiffME enables fine-grained, lateral control and introduce vision-language models (VLMs) and deep learning models (DLMs) for objective and scalable evaluation*
-
 ![[assets/figures/papers/paper_list_l1651_DiffME_Component_Process_Model_Induced_Controllable_Micro_Expression_Gen/figures/002_Figure_2.jpg]]
 *Figure 2: Comparison of previous methods and our method. Top: Transfer-based methods restrict synthesis to fixed AU combinations. GAN-based methods fail to control intensities, causing affective incoherence. Bottom: Our method estimates intensity bounds in self-supervised manner and then models AU patterns guided by CPM to ensure affective and anatomical coherence*
-
-
 
 DiffME 围绕三个核心模块构建：**AU‑Decomposed Deformation Estimator (ADDE)** 负责自监督运动解耦与强度边界估计；**CPM‑Guided AU Relational Module (CARM)** 将组件过程模型的结构先验注入 AU 关系建模；**Probabilistic Intensity‑aware Transition Diffusion (PITD)** 则通过解耦交叉注意力与身份拷贝网络实现可控生成。三个模块形成因果链条——ADDE 为 CARM 提供 AU 特定的雅可比表示与强度上界，CARM 输出结构化的 AU 条件信号，PITD 在此条件下完成从起始帧到顶点帧的扩散生成。
 
@@ -194,15 +181,11 @@ $$\tilde{\varepsilon}_\theta(x_t, t, f_{\mathrm{id}}, f_{\mathrm{ME}}) = \vareps
 
 其中 $\varepsilon_\theta$ 为联合条件预测噪声，$\varepsilon_{\mathrm{ME}}$ 为仅以 ME 特征为条件的预测噪声。通过调节 $\lambda_{\mathrm{ME}}$，用户可在不改变 AU 组合的前提下连续控制生成表情的强度——较小的 $\lambda_{\mathrm{ME}}$ 趋向于保留起始帧的中性状态，较大的值则增强表情幅度。但需注意，过大的 $\lambda_{\mathrm{ME}}$ 会引入视觉伪影，这是 CFG 外推固有的局限性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1651_DiffME_Component_Process_Model_Induced_Controllable_Micro_Expression_Gen/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of the AU-Decomposed Deformation Estimator (ADDE). Given an onset–apex frame pair, ADDE employs a self-supervised motion encoder to estimate deformation fields*
 
 ![[assets/figures/papers/paper_list_l1651_DiffME_Component_Process_Model_Induced_Controllable_Micro_Expression_Gen/figures/005_Figure_5.jpg]]
 *Figure 5: Visualization of ADDE in self-supervised image reconstruction. (a) Onset frame with AU annotations indicating micro-expression dynamics to appear in the upcoming (b) apex frame. (c) Reconstructed result of the apex frame. (d) Gaussian heatmap computed based on landmarks*
-
-
 
 ## 实验与关键发现
 
@@ -249,8 +232,6 @@ Figure 5 展示了 ADDE 的自监督重建能力：从起始帧（a）到真实�
 - 将起始帧作为潜在空间条件输入，可能引入轻微的空间细节退化。
 - 当前依赖手工选取的 MediaPipe 关键点和经验性 AU 相关图，限制了在更不受约束场景下的可扩展性。
 - 过大的 CFG 尺度会产生视觉伪影，需要在强度控制与生成质量之间进行权衡。
-
-
 
 ## 定位与知识库关联
 
@@ -303,8 +284,6 @@ DiffME 处于**可控面部生成**与**情感计算**的交叉点，其知识�
 - **自监督运动解耦**：ADDE 的自监督形变估计和强度边界推导，为无需显式运动标注的面部运动建模提供了新思路。
 
 *注：由于分析中未提供论文的具体发表年份和会议信息，上述定位中的时间线比较需手动核实。*
-
-
 
 ## 原文 PDF
 

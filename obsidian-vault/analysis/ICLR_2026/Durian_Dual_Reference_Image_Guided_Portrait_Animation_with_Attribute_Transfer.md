@@ -78,8 +78,6 @@ Durian 提出了一套**自重建训练范式**来解决上述瓶颈。其核心
 
 开放问题包括：框架能否扩展到非面部属性（如服装）并保持零样本泛化？能否端到端地学习更鲁棒的跨身份形状保持？多属性组合质量是否随属性数量增加而显著下降？
 
-
-
 肖像动画生成旨在根据驱动信号（如面部关键点序列）使静态肖像图像动起来，同时保持人物身份的一致性。近年来，基于扩散模型的方法（如 **LivePortrait** (Guo et al., 2024)、**X-Portrait** (Xie et al., 2024)、**MegActor-Σ** (Yang et al., 2025)）在生成高质量、时间连贯的肖像动画方面取得了显著进展。然而，这些方法通常假设动画前后的属性（如发型、眼镜、胡须）保持不变，缺乏对肖像面部属性进行灵活迁移与编辑的能力。
 
 与此同时，图像属性编辑与迁移领域涌现出多种方法。基于提示的编辑方法（PbE）可生成合成发型等属性，而 **HairFusion** (Chung et al., 2025)、**StableHair** (Zhang et al., 2025) 等专注于发型迁移，**TriplaneEdit** (Bilecen et al., 2024) 则支持眼镜等属性的编辑。但这些方法存在一个共同的瓶颈：它们将属性迁移和动画生成视为两个独立的串行阶段——先编辑属性再驱动动画，这不仅导致流程繁琐，更在两个阶段之间引入了身份不一致和运动失真的累积误差。
@@ -87,8 +85,6 @@ Durian 提出了一套**自重建训练范式**来解决上述瓶颈。其核心
 更深层的困境在于，跨身份属性迁移本质上缺乏成对的训练数据。我们无法获得“同一个人在不同属性下的同一动作”的真实配对，这使得直接从单一视频中学习身份与属性的解耦变得极为困难。现有方法要么依赖合成数据，要么在推理时进行复杂的优化，难以在保持身份一致性的同时实现高质量的属性迁移。
 
 针对上述问题，本文提出 **Durian**，一种双参考图像引导的肖像动画与属性迁移框架。Durian 的核心动机在于：**将属性迁移与动画生成统一到单个扩散模型的前向过程中，并通过自重建训练范式规避对成对数据的依赖**。具体而言，Durian 利用同一视频的两帧构建伪配对——一帧作为属性参考，另一帧作为身份参考——并配合互补掩码策略，强制模型在去噪过程中分离并重组身份与属性信息。这一设计使得模型能够直接从无标注的野生视频中学习，同时天然支持多属性组合与属性插值，无需额外训练。
-
-
 
 ## 核心方法与创新机理
 
@@ -133,9 +129,6 @@ $$\bar{\mathbf{F}}_{t}^{\tau,l} = \text{SA}(\mathbf{F}_{t}^{\tau,l}, \mathbf{F}_
 - **多属性组合**：将多个属性特征沿宽度维拼接后输入空间注意力，实现单次前向传播组合多种属性（如发型+眼镜+胡须+帽子）；
 - **属性插值**：对两个属性参考的特征进行线性加权混合 $\bar{\mathbf{F}}_t^{\tau,l} = (1-\alpha)\bar{\mathbf{F}}_t^{\tau,l,1} + \alpha\bar{\mathbf{F}}_t^{\tau,l,2}$，实现平滑的属性过渡，甚至适用于眼镜、帽子等刚性物体。
 
-
-
-![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_tz5GRv9Vzu/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of Training Pipeline. Given an attribute-masked portrait image $\tilde { \mathbf { I } } _ { \mathrm { p o r t } }$ and an attribute-only image $\tilde { \mathbf { I } } _ { \mathrm { a t t r } }$ , Durian synthesizes a portrait animation with the transferred attribute. These inputs are constructed by randomly sampling two frames from a training video and applying the estimated masks. A sequence of facial keypoints $\{ k _ { \tau } \} _ { \tau = 1 } ^ { F }$ is extracted from the video to guide the motion. During generation, spatial features from PRNet and ARNet are fused via spatial attention into the DNet, ensuring identity preservation and attribute consistency in the synthesized video
 
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_tz5GRv9Vzu/figures/003_Figure_3.jpg]]
@@ -179,8 +172,6 @@ Durian 采用基于肖像视频的自重建训练策略，避免了对成对跨�
 $$\mathbf{M}_{\mathrm{port}}^{\mathrm{infer}} = \mathbf{M}_{\mathrm{port}}^{\mathrm{init}} \cup \bigcup_{k=1}^{N_{\mathrm{attr}}} \mathbf{M}_{\mathrm{attr}}^{\mathrm{align},k}$$
 
 模型天然支持零样本多属性组合与属性插值，无需额外训练。
-
-
 
 ### 双参考网络架构
 
@@ -269,8 +260,6 @@ $$
 
 跨身份推理时，属性图像与目标肖像的姿态和形状可能存在显著不匹配。Durian 引入 **Face Aligner** 模块，利用轻量级图像到 3D 化身模型（Chu & Harada, 2024）估计对齐后的属性掩码，替代训练时的原始分割掩码，有效缓解因未对齐导致的生成伪影。该模块仅用于推理，不参与训练。
 
-
-
 ## 实验与关键发现
 
 ### 实验设置
@@ -335,8 +324,6 @@ Figure 7 展示了属性插值能力：通过对两个属性参考的空间注�
 4. **属性类别受限**：当前支持的属性主要限于分割掩码可覆盖的区域（头发、胡子、眼镜、帽子），难以直接迁移年龄、疤痕等复杂语义属性。
 
 这些失败模式为后续改进提供了明确方向：引入光照归一化或自适应外观融合模块、增强对遮挡的鲁棒性、探索超越分割掩码的属性表示方式。
-
-
 
 ## 定位与知识库关联
 
@@ -423,8 +410,6 @@ Durian 的训练策略是整个方法的知识论核心。其瓶颈在于：**�
 4. **推理效率与交互性**：扩散模型的迭代去噪过程限制了实时交互的可能性。能否通过一致性蒸馏或对抗性加速将 Durian 的推理时间压缩到交互式应用的阈值内？
 
 5. **域外泛化**：模型依赖预训练扩散先验，在极端非真实感风格（如高度抽象卡通）上虽有一定泛化，但仍可能出现结构破坏。如何在不牺牲真实感性能的前提下强化风格泛化能力，是一个开放的设计挑战。
-
-
 
 ## 原文 PDF
 

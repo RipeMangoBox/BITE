@@ -57,8 +57,6 @@ claims:
 
 **方法定位**：PromptDepth 属于前馈式可提示密集预测模型，介于单任务深度估计器（如 Depth Anything V2）与通用视觉基础模型（如 SAM）之间，以统一架构覆盖多类几何-实例任务，专为具身智能的低延迟需求设计。
 
-
-
 三维视觉感知是具身智能系统在复杂环境中执行导航、抓取与交互任务的核心能力。理想的具身视觉模型需要同时回答两个问题：**场景的几何结构是什么**（全景深度），以及**场景中的物体在哪里、彼此如何区分**（实例级深度）。然而，现有方案在这两个需求之间陷入了根本性的权衡。
 
 一方面，以 **MiDaS**（Ranftl et al., TPAMI 2020）、**DPT**（Ranftl et al., ICCV 2021）和 **Depth Anything V2**（Yang et al., NeurIPS 2024）为代表的单目深度估计模型在零样本几何重建上取得了显著进展，但它们输出的全景深度图缺乏实例区分能力，无法直接服务于目标导向的交互任务。另一方面，以 **SAM**（Kirillov et al., 2023）为代表的提示式分割模型擅长实例级掩码生成，却与几何深度估计彼此割裂——将二者简单组合意味着需要串联多个大模型，导致推理延迟急剧上升，难以满足具身平台对实时性的严苛要求。
@@ -70,8 +68,6 @@ claims:
 3. **数据稀缺**：真实世界中同时具备高精度几何标注和实例标注的数据极为稀少，而现有合成数据集往往缺少几何与实例的严格对齐，难以支撑联合训练。
 
 **PromptDepth** 的动机正是打破上述僵局。其核心假设是：如果能够设计一个**可提示的统一解码器**，根据任务令牌和用户提示灵活生成不同类型的深度图，并辅以专门设计的损失函数和正则化策略来调和几何与实例任务之间的冲突，那么仅使用大规模合成数据训练的单一模型就有望在多个密集预测任务上同时达到领先水平，且推理延迟远低于多模型组合方案。这一思路将具身三维视觉从“多模型串联”推向“单模型可提示”的新范式。
-
-
 
 ## 核心方法与创新机理
 
@@ -113,8 +109,6 @@ $$\mathcal{L}_{gram} = |\mathbf{X}_{G}^{T} \cdot \mathbf{X}_{G} - \mathbf{X}_{S}
 
 相比基于序列聚合或迭代优化的高延迟方案（如 SAM 与深度模型的组合），PromptDepth 仅需**单次前馈推理**，在单目模式下延迟低至 **39ms**（RTX 4090），同时保持优于 SAM+Depth Anything V2 组合的分割精度（Table 5）。这一效率优势使其特别适用于算力有限的具身智能平台。
 
-
-
 PromptDepth 是一个前馈神经网络，最多接收两帧对应的图像作为输入，输出与深度相关的多种密集预测图，包括全景深度、实例深度和视频目标跟踪深度。其核心设计目标是在具身智能平台上实现统一、低延迟的三维场景理解与交互式实例感知。
 
 ### 输入输出规范
@@ -150,13 +144,6 @@ PromptDepth 的流水线由四个核心模块串联构成，各模块职责分�
 整个流水线的数据流如图 3 所示：视觉编码器并行处理输入图像，提示编码器处理交互信号，二者在 PromptDPT 中汇合。任务令牌作为“开关”，控制解码器输出不同类型的深度图，而无需额外的计算开销或模型分支。这种设计使得 PromptDepth 能够在单次前馈推理中完成从场景级深度到实例级深度的灵活切换，为实时具身应用提供了统一的几何感知基础。
 
 > **注意**：本节描述的模块关系基于论文 Section 3.1-3.2 的公开描述，部分实现细节（如级联块内部的具体注意力配置）需参考原文获取完整信息。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2278_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_PromptDepth_Effic/figures/002_Figure_2.jpg]]
-*Figure 2: PromptDepth features a cascaded two-way transformer designed to manage interactions ranging from various purpose, thereby facilitating adaptable and interactive dense prediction tasks*
-
-
 
 ### 视觉编码器与提示编码器
 
@@ -210,15 +197,8 @@ $$\mathcal{L}_{gram} = \big| X_{G}^{T} \cdot X_{G} - X_{S}^{T} \cdot X_{S} \big|
 
 消融实验证实，仅使用标准联合训练（无 $\mathcal{L}_{gram}$）会导致训练崩溃，而同时引入 $\mathcal{L}_{ilds}$ 和 $\mathcal{L}_{gram}$ 可在深度估计和交互分割上均取得最优性能（Table 4, Figure 5）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2278_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_PromptDepth_Effic/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of cascaded two-way transformer data flow*
-
-![[assets/figures/papers/paper_list_l2278_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_PromptDepth_Effic/figures/004_Figure_4.jpg]]
-*Figure 4: We study the reacts of proposed ILDS. Dense map levels show significant distribution variability between panoptic depth (middle top) and instanced depth (middle bottom), the latter having substantial zeros for background. ILDS adaptively balances weights based on the smoothed distribution (plot) from the depth frequency (histogram) and generates weights for each map (right). Note that multiple instances are visualized here due to merging batched instances*
-
-
 
 ## 实验与关键发现
 
@@ -244,9 +224,6 @@ PromptDepth 在仅使用合成数据训练的条件下，于五个真实世界�
 *Table 5: Latency (ms) and Metrics comparison. All latency tests on RTX 4090 GPU with data type of float32*
 
 Table 3 展示了零样本视频目标跟踪的半监督评估结果，PromptDepth 通过将深度有效区域（$d > 0$）的预测掩码作为前景，在多个序列上取得了可观的 J&F-Mean 指标，验证了统一框架在跟踪任务中的迁移能力。
-
-![[assets/figures/papers/paper_list_l2278_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_PromptDepth_Effic/figures/007_Table_3.jpg]]
-*Table 3: Semi-supervised Evaluation of zero-shot video object tracking using J&F-Mean metrics. We sample the predicted mask from the valid depth region where d >ˆ 0 as the foreground*
 
 ### 消融实验：ILDS 损失与 Gram Anchoring 是联合训练的关键
 
@@ -276,13 +253,6 @@ Table 5 下半部分详细列出了各模块的延迟分解。在单目模式下
 1. **域差异**：模型仅使用合成数据训练，在部分未见真实场景中可能出现深度边界模糊或实例分割不完整的情况，需要在实际部署中结合少量真实数据微调。
 2. **长期跟踪能力缺失**：当前模型输入限于两帧，对于遮挡后重识别等需要长期记忆的跟踪任务尚未探索，限制了其在复杂长时间操作中的应用。
 3. **细粒度 3D 重建任务未覆盖**：尚未验证在关键点跟踪和密集特征匹配等更细粒度 3D 重建任务中的性能，这些任务对特征分辨率和时序一致性提出了更高要求。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2278_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_PromptDepth_Effic/figures/011_Figure_6.jpg]]
-*Figure 6: Visualized comparison on real-time embodies manipulation scenario*
-
-
 
 ## 定位与知识库关联
 
@@ -358,8 +328,6 @@ PromptDepth 处于**单目/立体深度估计**、**交互式分割**与**视频
 - **同级竞争者**：Depth Anything V2（单目深度）、VDA（立体深度）、SAM（交互分割）。
 - **潜在下游**：具身操作（抓取、导航）、实时 3D 场景理解、视频目标跟踪系统。
 - **核心贡献**：首次证明通过**提示式统一解码器 + 实例几何联合训练**，可以在单一前馈网络中实现多任务密集预测，且仅需合成数据即可达到零样本 SOTA。
-
-
 
 ## 原文 PDF
 

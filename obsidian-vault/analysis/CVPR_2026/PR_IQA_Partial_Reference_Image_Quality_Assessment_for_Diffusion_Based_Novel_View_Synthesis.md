@@ -68,8 +68,6 @@ PR-IQA属于**部分参考图像质量评估（Partial-Reference IQA）**方法�
 
 PR-IQA在三个标准数据集上全面超越现有CR-IQA基线。以DINOv2特征相似度为评估目标时，在Mip-NeRF 360上PLCC达到0.555（PuzzleSim为0.304），在Tanks and Temples上达到0.573（PuzzleSim为0.351），在RealEstate10K上达到0.453（PuzzleSim为0.410）。以SSIM为目标时同样显著优于CrossScore等基线（Table 1）。消融实验确认，部分质量图是模型最关键输入，其移除导致的性能下降甚至超过移除参考图像（Table 2）。在质量感知3DGS重建任务中，PR-IQA指导的训练在PSNR、SSIM、LPIPS上均优于其他IQA方法，验证了质量图在下游应用中的实际有效性（Table 3）。
 
-
-
 ### 问题背景：扩散生成伪GT的“不可见”缺陷
 
 稀疏视图三维重建与新颖视图合成（Novel View Synthesis, NVS）的核心挑战在于输入视图数量极度有限。近年来，基于扩散模型的视图生成器（如ViewCrafter）能够从稀疏输入中生成大量伪真值（pseudo-GT）视图，为3D重建提供稠密的监督信号。然而，这些扩散生成的伪GT视图并非完美——它们经常包含难以检测的光度不一致（如模糊、伪影）和几何不一致（如结构扭曲、错位），如图1(a)所示。
@@ -104,8 +102,6 @@ PR-IQA在三个标准数据集上全面超越现有CR-IQA基线。以DINOv2特�
 2. **质量补全网络**：设计三流编码器-解码器架构，以参考条件交叉注意力机制为核心，将查询图像、参考图像和部分质量图三路信息进行多尺度融合，最终输出全图密集质量图$Q$。
 
 通过这一设计，PR-IQA能够在**无真值监督**的条件下，实现对扩散生成视图全图质量的准确评估，突破传统CR-IQA无法评估非重叠区域的盲区，并在下游质量感知3DGS重建中提供可靠的像素级置信度指导。
-
-
 
 ## 核心方法与创新机理
 
@@ -148,8 +144,6 @@ PR-IQA的核心创新在于将跨视图质量评估重新定义为一个**质量
 
 上述三个创新形成了紧密的因果链条：部分质量图提供了可靠的几何锚点（消融实验证实去除部分质量图导致的性能下降甚至大于去除参考图像），参考条件交叉注意力实现了跨视图证据的高效传播，双重过滤策略则将质量评估有效转化为下游重建的监督信号。这一链条使PR-IQA在Mip-NeRF 360、Tanks and Temples和RealEstate10K三个数据集上，OursDINOv2的PLCC分别达到0.555、0.573、0.453，均大幅超越所有交叉参考基线（PuzzleSim最高仅0.351），并在质量感知3DGS的PSNR、SSIM、LPIPS上全面优于其他IQA方法（Table 3）。
 
-
-
 PR-IQA 的整体 pipeline 由两个核心阶段串联构成：**部分质量图生成** 与 **全图质量补全**，并在下游任务中扩展为 **质量感知的 3DGS 训练** 流程（Figure 1）。
 
 ![[assets/figures/papers/paper_list_l2574_https_arxiv_org_abs_2604_04576/figures/001_Figure_1.jpg]]
@@ -190,12 +184,8 @@ $$Q = \mathrm{Dec}(F_q^3)$$
 
 该策略有效抑制了扩散生成伪 GT 中的光度与几何不一致对重建的负面影响，使 3DGS 能够聚焦于可靠区域进行优化。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2574_https_arxiv_org_abs_2604_04576/figures/008_Figure_5.jpg]]
 *Figure 5: Detailed architecture of the proposed model. The network employs an encoder–decoder design featuring cross- and self-attention modules, query fusion, and mask-aware pixel-shuffle downsampling. Key specifications, including stage-wise block counts, attention heads, and the status of component sharing (frozen vs. trainable), are explicitly annotated*
-
-
 
 PR-IQA 的核心创新在于将跨视图质量评估重新定义为**质量补全问题**：首先利用多视图几何约束在重叠区域计算可靠的部分质量锚点，再通过参考条件交叉注意力网络将质量评估传播至全图。整个流程由三个关键模块串联构成。
 
@@ -278,12 +268,8 @@ $$\mathcal{L}_{\mathrm{total}} = \sum_{k=1}^{|\mathcal{Z}_{\mathrm{train}}|} \le
 
 其中 $\lambda_{\mathrm{dssim}} = 0.2$。消融实验（Table 13）表明，二值掩码与软加权策略（$W(p) = Q(p)$ 直接作为损失权重）的重建性能相当，验证了 PR-IQA 质量图提供的监督信号具有鲁棒性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2574_https_arxiv_org_abs_2604_04576/figures/002_Figure_2.jpg]]
 *Figure 2: (a) Overview of the PR-IQA pipeline. The framework operates in two stages. First, we warp DINOv2 features from the reference*
-
-
 
 ## 实验与关键发现
 
@@ -364,28 +350,6 @@ Table 3报告了不同IQA方法指导3DGS训练的重建质量。PR-IQA指导的
 
 Table 16报告了PR-IQA各组件及3DGS优化的平均运行时间和内存占用。部分质量图生成（VGGT推理+特征变形）和网络推理构成主要计算开销，但整体仍在可接受范围内，适合作为预处理步骤集成到现有管线中。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2574_https_arxiv_org_abs_2604_04576/figures/003_Table_1.jpg]]
-*Table 1: Quantitative comparisons of predicted quality maps from IQA methods against GT quality maps (PLCC ↑, SRCC ↑). Red, orange, and yellow cells denote the 1st, 2nd, and 3rd best methods per column (with rankings computed excluding FR settings†), and gray cells indicate identity cases where the IQA prediction matches the GT quality map*
-
-![[assets/figures/papers/paper_list_l2574_https_arxiv_org_abs_2604_04576/figures/006_Table_2.jpg]]
-*Table 2: Ablation on architectural components: attention block design and auxiliary inputs. PLCC ↑ and SRCC ↑ are measured against DINOv2-SIM*
-
-![[assets/figures/papers/paper_list_l2574_https_arxiv_org_abs_2604_04576/figures/007_Table_3.jpg]]
-*Table 3: Quantitative comparison of IQA-guided 3DGS across IQA methods. PSNR ↑, SSIM ↑, and LPIPS ↓ are averaged over scenes. Red, orange, yellow mark 1st–3rd per column, excluding FR-based baselines†*
-
-![[assets/figures/papers/paper_list_l2574_https_arxiv_org_abs_2604_04576/figures/014_Figure_6.jpg]]
-*Figure 6: Impact of the number of reference views on IQA performance. We plot the PLCC and SRCC against the number of reference images used for evaluation. FR-IQA baselines are indicated by constant horizontal lines. The results are shown for (a) DINOv2 and (b) SSIM targets. In both scenarios, our model achieves the highest correlation among learned metrics (CrossScore, PuzzleSim) and demonstrates robustness even with a single reference image*
-
-![[assets/figures/papers/paper_list_l2574_https_arxiv_org_abs_2604_04576/figures/020_Table_12.jpg]]
-*Table 12: Ablation on the masking threshold τ for 3DGS training. We evaluate the impact of the pixel retention rate τ on reconstruction quality. We compare aggressive*
-
-![[assets/figures/papers/paper_list_l2574_https_arxiv_org_abs_2604_04576/figures/010_Table_5.jpg]]
-*Table 5: List of evaluation scenes. We enumerate the specific scenes and sequence IDs selected from the Mip-NeRF 360, Tanks and Temples, and RealEstate10K datasets used for our experimental benchmarks*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 问题定位：从交叉参考到部分参考的范式迁移
@@ -458,8 +422,6 @@ PR-IQA 的训练目标来源于 FR-IQA 指标（DINOv2 特征相似度或 SSIM�
 4. **多参考融合策略**：Figure 7 探索了四种质量图融合策略（Max、Min、Median、Mean），但最优策略是否随场景特性（如重叠率、纹理复杂度）自适应变化？是否存在学习式的融合机制？
 
 5. **计算效率与实时性**：Table 16 报告了各模块的计算成本，但PR-IQA在实时或交互式应用场景（如在线3D重建）中的可行性仍需进一步优化。
-
-
 
 ## 原文 PDF
 

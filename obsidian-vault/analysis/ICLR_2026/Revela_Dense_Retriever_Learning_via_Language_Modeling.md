@@ -60,15 +60,11 @@ Revela 提出了一种全新的自监督训练范式：**通过语言建模来�
 
 在方法谱系上，Revela 位于自监督检索器训练的前沿，与 **REPLUG**（Shi et al., 2024）利用冻结语言模型困惑度进行蒸馏、**Contriever**（Izacard et al., 2022）通过对比学习生成伪查询-文档对等方案形成鲜明对比。Revela 的创新在于将检索器训练与语言建模目标统一，使检索器成为语言模型跨文档推理的有机组成部分，而非独立优化的外部模块。
 
-
-
 密集检索器在开放域问答、代码搜索、法律信息检索等场景中已成为核心组件。然而，训练高性能密集检索器通常依赖大量人工标注的查询-文档对，这在专业领域（如代码、法律）以及需要复杂推理的场景中成本高昂且难以扩展。现有的自监督方法试图绕过这一瓶颈，但各有局限：**Contriever**（Izacard et al., 2022）通过对比学习利用文档内部结构生成伪查询-文档对，其性能在域外场景下衰减明显；**REPLUG**（Shi et al., 2024）使用冻结语言模型的困惑度作为跨文档相似度监督信号，但检索器不参与语言模型训练，梯度信号间接且稀疏；**E5-PT**（Wang et al., 2022）虽性能强劲，却依赖数百万弱监督文本对和大量计算资源。
 
 上述方法的共同缺陷在于：检索器的优化目标与语言模型的语义理解能力相互割裂。语言模型中的下一个token预测（Next-Token Prediction, NTP）隐式地捕捉文本内部的依赖关系，但这种能力从未被直接用于建模文本块之间的宏观相关关系。
 
 Revela的动机正源于此：**能否将语言模型的自监督NTP目标转化为检索器的训练信号？** 核心洞察是，如果将NTP的上下文从单个序列内部扩展到同一批次中的其他文档，并让检索器计算的相似度来决定跨文档注意力的权重，那么检索器就可以通过语言模型的梯度信号进行端到端优化——无需任何显式查询-文档对。这一思路将检索器训练从“构造伪监督信号”的范式转变为“让检索器参与语言建模”的范式，从根本上解耦了对标注数据的依赖。
-
-
 
 ## 核心方法与创新机理
 
@@ -103,8 +99,6 @@ Revela的训练数据构建极为简洁：将原始文本按文档切分成块�
 ### 因果机制总结
 
 Revela的核心因果链条可概括为：**语言模型的NTP目标隐式捕捉文本内部依赖 → 通过批次内注意力将这种依赖扩展至跨文档的宏观关系 → 检索器计算的相似度作为注意力权重，将文档相关性信息注入语言建模过程 → NTP损失的梯度反向传播至检索器，驱动其学习有效的文档表征**。这一设计使得检索器训练与语言建模形成了闭环，无需任何外部标注信号。
-
-
 
 ![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_e7pAjJZJWb/figures/001_Figure_1.jpg]]
 *Figure 1: The framework of Revela. The retriever’s in-batch similarity scores are used as in-batch attention weights inside transformer blocks. The retriever is trained by optimizing the language modeling objective, i.e., NTP. The related patterns in red and purple sequences are highlighted in bold and underline. An example of training dynamics is illustrated at App. A*
@@ -154,8 +148,6 @@ Revela 仅需原始文本作为训练数据。具体做法是将文档切分成�
 - **困惑度蒸馏基线（REPLUG）**：使用冻结语言模型的困惑度作为跨文档相似度的监督信号，检索器训练与 LM 训练分离。Revela 则实现检索器与 LM 的联合更新。
 - **有监督/弱监督基线（E5 系列）**：依赖大规模标注查询-文档对或半结构化文本对进行训练。Revela 完全消除了对配对数据的依赖，仅使用原始文本即可达到甚至超越其性能。
 
-
-
 ### 3.1 训练目标的范式转换
 
 Revela的核心创新在于将密集检索器的训练目标从传统的对比学习或蒸馏范式，彻底转换为语言模型的下一个token预测（Next-Token Prediction, NTP）目标。这一转换的数学基础体现在对条件概率建模范围的扩展上。
@@ -204,8 +196,6 @@ Revela框架的关键工程特性在于**检索器与语言模型的端到端联
 
 在具体实现层面，批次内注意力的计算通过**文档复制与注意力掩码调整**来高效完成。具体而言，将批次内的文档复制一份，其中一份用于标准自注意力的计算（产生 $\mathrm{e}_i^l$），另一份用于跨文档注意力的计算（产生 $\mathrm{b}_i^l$），并通过精心设计的注意力掩码确保：自注意力路径仅关注文档内部的前缀token，跨文档注意力路径仅关注其他文档的全部token，二者互不干扰。这种实现方式使得Revela可以直接复用现有Transformer架构的注意力算子，降低了工程集成的复杂度。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现
@@ -214,22 +204,15 @@ Revela在三个性质迥异的基准上验证了其有效性：领域专用的�
 
 在CoIR基准上，Revela3B（3B参数）的平均nDCG@10达到60.1%，超越了有监督的7B参数模型**E5-Mistral-7B-Instruct**（57.3%），提升2.8个百分点（Table 1）。值得注意的是，Revela的训练完全不需要查询-文档对，而E5-Mistral依赖大规模指令微调数据。在相似规模下，Revela0.5B（56.1%）比弱监督的**E5-PT**（46.4%）高出9.7个百分点，显示出方法本身的有效性而非单纯依赖模型规模。
 
-
 ![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_e7pAjJZJWb/figures/003_Table_1.jpg]]
 *Table 1: Performance on CoIR (nDCG@10, %). Gray indicates supervised models. Bold marks the highest score among non-API models in each row. Columns marked † used code-related pairs during pre-training. The results of APIs are collected from Li et al. (2025). Without query-document pairs, Revela3B surpasses larger supervised models and proprietary APIs, averaged across 10 tasks*
 
 在BRIGHT复杂推理基准上，Revela3B的nDCG@10达到20.1%，显著超过E5-PT的13.1%（+7.0个百分点），并超越了多个专有嵌入API（Figure 3左，Table 8）。这表明语言建模目标隐式捕捉的跨文档依赖关系能够有效迁移到需要深层语义理解的检索任务中。
 
-
-
-![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_e7pAjJZJWb/figures/004_Figure_3.jpg]]
-*Figure 3: Performance on BRIGHT (left) and BEIR (right) (nDCG@10, %). Results for Revela are shown in opaque bars, while all other models are represented by transparent bars. On BRIGHT, Revela3B surpasses E5-Mistral, a supervised retriever with more parameters, and properties APIs. On BEIR, Revela achieves similar performance with E5-PT with much less data and compute. Please refer to Tab. 7 and Tab. 8 in App. B.6 for the per-task results*
-
 ![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_e7pAjJZJWb/figures/014_Table_8.jpg]]
 *Table 8: Performance on BRIGHT (nDCG@10, %). Bold marks the best performance. The results of BM25, E5-Mistral and APIs are taken from BRIGHT (Hongjin et al., 2025)*
 
 在BEIR通用基准上，Revela3B的nDCG@10为45.6%，与E5-PT持平，但**训练数据量减少约1000倍，计算量减少约10倍**（Figure 3右，Table 7）。这一数据效率优势源于Revela无需构造伪查询-文档对，仅利用原始文本的语言建模信号即可学习有效的文档表示。
-
 
 ![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_e7pAjJZJWb/figures/013_Table_7.jpg]]
 *Table 7: Performance of unsupervised/self-supervised retriever models on BEIR datasets (nDCG@10, %). Bold marks the best score per dataset among unsupervised methods*
@@ -237,10 +220,6 @@ Revela在三个性质迥异的基准上验证了其有效性：领域专用的�
 ### 与Contriever的受控对比
 
 在相同LM骨干（LLaMA-3.2-1B）和相同训练数据的严格受控实验中，Revela在BEIR和CoIR上均优于经典的对比学习自监督方法**Contriever**（Izacard et al., 2022）（Table 2）。具体而言：
-
-
-![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_e7pAjJZJWb/figures/005_Table_2.jpg]]
-*Table 2: Revela vs. Contriever Performance*
 
 - 使用Wikipedia数据训练时，Revela-wiki1B在BEIR上达到42.7%（Contriever-wiki1B为42.4%），在CoIR上达到53.2%（Contriever为50.3%）。
 - 使用代码语料训练时，差距进一步拉大：Revela-code1B在BEIR上为39.6%，而Contriever-code1B仅为32.3%。
@@ -250,7 +229,6 @@ Revela在三个性质迥异的基准上验证了其有效性：领域专用的�
 ### 批次大小的影响
 
 批次大小是Revela的关键超参数，直接影响批次内交叉注意力的信息丰富度。实验表明，**Revela的性能随批次大小增加而单调提升**（Figure 4, Table 11, Table 12）：
-
 
 ![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_e7pAjJZJWb/figures/006_Figure_4.jpg]]
 *Figure 4: Performance comparison on CoIR and BEIR with different batch sizes. For both benchmarks, Revela performance generally scales with batch size*
@@ -263,7 +241,6 @@ Revela在三个性质迥异的基准上验证了其有效性：领域专用的�
 ### 语言模型规模的影响
 
 通过固定检索器规模、变化LM规模进行消融实验（Figure 5, Table 13, Table 14），发现**LM规模对领域专用任务的增益显著，对通用任务影响有限**：
-
 
 ![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_e7pAjJZJWb/figures/007_Figure_5.jpg]]
 *Figure 5: Performance comparison on CoIR and BEIR using various combinations of retrievers and LMs. For code retrieval tasks, larger LMs can yield greater gains in retriever performance*
@@ -298,23 +275,6 @@ Revela展现出良好的域适应能力。在Wikipedia和代码语料的混合�
 3. **长文档处理**：训练时文档被截断至160 tokens，对于需要长距离依赖的检索任务可能信息不足。论文未探索更长的上下文窗口或稀疏注意力机制。
 
 4. **模态限制**：当前仅在文本模态上验证，向多模态数据的泛化能力尚未研究。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_e7pAjJZJWb/figures/009_Table_3.jpg]]
-*Table 3: CoIR Benchmark Tasks. The superscripts present the type of the tasks. The abbreviation of the tasks is noted in the parentheses, presented in Table 1*
-
-![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_e7pAjJZJWb/figures/010_Table_4.jpg]]
-*Table 4: BRIGHT Benchmark Tasks. Abbreviations and descriptions*
-
-![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_e7pAjJZJWb/figures/011_Table_5.jpg]]
-*Table 5: Baseline retrievers, LMs (Revela’s backbone), CodeRAG-Bench datasets, and evaluation benchmarks with their HuggingFace URLs and licenses*
-
-![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_e7pAjJZJWb/figures/012_Table_6.jpg]]
-*Table 6: Embedding models and their reference URLs*
-
-
-
 
 ## 定位与知识库关联
 
@@ -361,8 +321,6 @@ Revela 的性能优势在不同领域呈现**非均匀分布**：
 **多模态泛化**：现有验证仅限于文本模态。将"通过语言建模训练检索器"的范式扩展到图像、音频等多模态数据，需要重新设计跨模态的批次内注意力机制和相似度计算方式，目前尚无明确路径。
 
 **规模扩展的边界**：虽然实验显示性能随批次大小和模型规模提升（Figure 4），但更大规模（如 7B+ 参数）下的收益递减规律、联合训练中 LM 能力保留的上限、以及注意力机制的稀疏化需求，仍是开放的研究方向。
-
-
 
 ## 原文 PDF
 

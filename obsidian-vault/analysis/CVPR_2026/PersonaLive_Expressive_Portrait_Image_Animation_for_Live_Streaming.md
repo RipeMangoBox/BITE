@@ -55,8 +55,6 @@ claims:
 
 **主要结果**：在交叉重演基准 LV100 上，PersonaLive 以仅4步采样取得 FVD 520.6、tLP 12.83，优于扩散基线；在单张 NVIDIA H100 GPU 上推理速度达15.82 FPS，延迟仅0.253秒，相比现有扩散方法实现7–22倍加速，首次将扩散式人像动画推进到实时流式直播所需的性能区间。
 
-
-
 ### 人像动画的现实需求与技术挑战
 
 实时人像动画旨在通过驱动信号（如另一段视频或面部运动参数）操控静态肖像照片，生成逼真且时序连贯的说话头视频。这一技术在虚拟直播、视频会议、数字人交互等场景中具有广泛的应用前景。然而，面向**实时流式直播**的人像动画对系统提出了极为苛刻的要求：不仅需要生成高质量、身份保持、表情精准的视频帧，还必须在**极低延迟**下实现**持续不间断**的长视频输出。
@@ -80,8 +78,6 @@ PersonaLive的提出源于一个关键观察：**在人像动画的去噪过程�
 此外，为消除分块重叠带来的冗余与曝光偏差，需要设计一种**原生流式生成范式**，使模型能够在推理时持续输出干净帧，而非依赖后处理拼接。这要求训练策略能够模拟推理时的自回归过程，使模型学会纠正自身预测误差；同时需要一种机制来抑制长视频中的时序漂移。
 
 基于以上洞察，PersonaLive以**实时流式直播**为目标，从三个层面重构人像动画管线：(1) 采用混合隐式运动信号实现富有表现力的运动控制；(2) 通过外观蒸馏将采样步数压缩至4步；(3) 提出自回归微块流式生成范式，配合滑窗训练与历史关键帧机制，实现低延迟、时序稳定的长视频生成。
-
-
 
 ## 核心方法与创新机理
 
@@ -128,8 +124,6 @@ $$d = \min_{i=0,1,\ldots} \| m_f - m_i \|_2$$
 
 上述三个创新并非孤立存在，而是形成了一条因果链路：混合隐式运动控制提供了富有表现力且鲁棒的运动表示，使去噪过程的结构布局能在极早步骤确定，从而为外观蒸馏的压缩提供了可能性；而蒸馏带来的 4 步高效采样，又为微块流式生成的低延迟实时推理提供了计算基础。三者协同实现了从“高延迟分块离线生成”到“低延迟流式实时生成”的范式跃迁。
 
-
-
 PersonaLive 的完整动画生成流程可形式化为一个自回归流式映射：给定参考图像 $I_R$ 和驱动视频序列 $\{I_D^i\}_{i=1}^{S}$，模型逐帧输出动画帧 $\mathcal{A}_i$：
 
 $$\mathcal{A}_i = \mathcal{D}\big(\mathcal{M}(I_D^i),\; \mathcal{R}(I_R)\big),\quad i=1,2,\dotsc,S$$
@@ -163,15 +157,11 @@ $$\mathcal{L}_{distill} = \mathcal{L}_2(\hat{x}, x^{gt}) + \lambda_{lpips}\mathc
 
 此外，首个去噪窗口的初始化采用运动插值策略（图 4），通过在驱动运动的起始段进行平滑插值来避免冷启动时的运动突变，保证流式输出从第一帧起即具备时序连贯性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1076_https_arxiv_org_abs_2512_11253/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the three-stage pipeline of PersonaLive. (a) Image-level hybrid motion training: Learns expressive motion control using implicit facial representations and 3D implicit keypoints. (b) Fewer-step appearance distillation: Eliminates appearance redundancy in the denoising process, improving inference efficiency without compromising visual quality. (c) Micro-chunk streaming video generation: An autoregressive micro-chunk paradigm, equipped with sliding training and historical keyframes, enables low-latency and temporally coherent real-time video generation*
 
 ![[assets/figures/papers/paper_list_l1076_https_arxiv_org_abs_2512_11253/figures/001_Figure_1.jpg]]
 *Figure 1: An overview of generated portraits and inference speed of PersonaLive. PersonaLive produces high-quality, temporally stable portrait animations over long sequences, while achieving real-time streaming performance with substantially lower latency than prior diffusion-based approaches*
-
-
 
 ### 3.1 流式动画的形式化定义
 
@@ -199,9 +189,6 @@ $$k_d = s_d \cdot k_{c,s} R_d + t_d$$
 
 核心洞察在于：人像动画的去噪轨迹中，运动与结构布局在最初的去噪步即已基本确定，后续大量迭代主要用于外观细节的逐步细化（见 Figure 3）。基于这一观察，PersonaLive 提出少步外观蒸馏策略，将冗余的外观细化过程压缩为紧凑的采样计划。
 
-![[assets/figures/papers/paper_list_l1076_https_arxiv_org_abs_2512_11253/figures/003_Figure_3.jpg]]
-*Figure 3: The denoising trajectory without CFG [16]*
-
 **蒸馏目标** 采用混合损失函数，结合像素级重建、感知相似度和对抗训练：
 
 $$\mathcal{L}_{distill} = \mathcal{L}_2 ( \hat{x}, x^{gt} ) + \lambda_{lpips} \mathcal{L}_{lpips} ( \hat{x}, x^{gt} ) + \lambda_{adv} \mathcal{L}_{adv} ( \hat{x} )$$
@@ -227,19 +214,6 @@ $$\mathcal{W}_s = \{ C_s^1, C_s^2, \dots, C_s^N \}, \quad C_s^n = \{ z_i^{t_n} \
 $$d = \min_{i=0,1,\ldots} \| m_f - m_i \|_2$$
 
 当距离超过阈值 $\tau$ 时，当前帧被标记为关键帧，其外观特征被存入历史库并作为辅助参考注入后续生成，从而约束衣物等无运动信号区域的时序一致性。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1076_https_arxiv_org_abs_2512_11253/figures/004_Figure_4.jpg]]
-*Figure 4: Motion interpolation for the first denoising window initialization*
-
-![[assets/figures/papers/paper_list_l1076_https_arxiv_org_abs_2512_11253/figures/011_Figure_10.jpg]]
-*Figure 10: The implicit 3D keypoints used in our hybrid motion control*
-
-![[assets/figures/papers/paper_list_l1076_https_arxiv_org_abs_2512_11253/figures/012_Figure_11.jpg]]
-*Figure 11: Effect of implicit 3D keypoints and facial motion embedding*
-
-
 
 ## 实验与关键发现
 
@@ -271,8 +245,6 @@ PersonaLive 在自重演（self-reenactment）、交叉重演（cross-reenactmen
 
 图 8 展示了域外肖像的失败案例。当参考图像超出训练域（如卡通角色或动物）时，模型会产生模糊或畸形的眼睛与嘴巴。这是因为混合运动信号和外观蒸馏均在真人面部数据上训练，缺乏对非真人面部结构的泛化能力。此外，当前框架未显式利用连续帧间的时间冗余，未来可进一步压缩推理延迟或支持更长的去噪窗口。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1076_https_arxiv_org_abs_2512_11253/figures/006_Table_1.jpg]]
 *Table 1: Quantitative comparisons. Numbers in red and blue indicate the best and the second-best results, respectively. tLP multiplied by 10−3. All speed measurements are conducted on a single NVIDIA H100 GPU. * LivePortrait [11] is a frame-wise method using GAN. While it runs significantly faster than diffusion-based approaches, its generated portraits often lack fine-grained details*
 
@@ -284,14 +256,6 @@ PersonaLive 在自重演（self-reenactment）、交叉重演（cross-reenactmen
 
 ![[assets/figures/papers/paper_list_l1076_https_arxiv_org_abs_2512_11253/figures/009_Table_2.jpg]]
 *Table 2: Ablation study on micro-chunk streaming generation*
-
-![[assets/figures/papers/paper_list_l1076_https_arxiv_org_abs_2512_11253/figures/010_Figure_7.jpg]]
-*Figure 7: Ablation study on the core components of the microchunk streaming generation paradigm*
-
-![[assets/figures/papers/paper_list_l1076_https_arxiv_org_abs_2512_11253/figures/008_Figure_8.jpg]]
-*Figure 8: Failure cases. Some details of our method may fail when the given reference images are out of the training domain*
-
-
 
 ## 定位与知识库关联
 
@@ -323,8 +287,6 @@ PersonaLive 的有效性建立在以下前提之上：
 2. **如何提升域外肖像的泛化能力？** 当前失败案例集中在非真人面部，可能需要域适应策略或更大规模的多样化训练数据。
 3. **少步蒸馏的极限在哪里？** 4步采样已取得显著加速，能否进一步压缩至2步甚至1步？这需要在蒸馏损失设计和对抗训练策略上进行更深入的探索。
 4. **滑窗训练策略的通用性。** 该策略通过模拟推理时的自回归误差积累来缓解曝光偏差，这一思路是否适用于其他自回归生成任务（如文本到视频、音频生成）值得验证。
-
-
 
 ## 原文 PDF
 

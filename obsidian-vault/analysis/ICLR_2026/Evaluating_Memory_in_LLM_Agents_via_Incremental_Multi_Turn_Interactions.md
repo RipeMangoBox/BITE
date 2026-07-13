@@ -66,15 +66,11 @@ claims:
 - **选择性遗忘**：多跳场景（FactConsolidation-MH）所有方法准确率不超过7%，HippoRAG-v2仅以7.0%略高于GPT-4.1-mini的5.0%（Table 3）。
 - **骨干模型影响**：RAG代理升级骨干模型收益微弱，而智能体记忆代理（如MIRIX）从更强骨干中获益显著，展示出更大的潜力空间（Table 4）。
 
-
-
 大规模语言模型（LLM）正从单轮问答系统演化为需要持续与用户交互的智能体（Agent），而记忆能力是实现这一转变的核心瓶颈。一个合格的记忆智能体不仅需要存储历史信息，更必须在多轮交互中动态更新知识、检索相关片段、整合长程依赖，并在新旧事实冲突时做出正确取舍。然而，现有评估体系存在明显缺口：长上下文基准（如Needle-in-a-Haystack）侧重单次输入的全量检索，无法模拟增量式信息涌入的真实场景；而现有的记忆QA基准又缺乏对“选择性遗忘”等关键维度的覆盖，导致不同记忆架构的优势与短板难以被系统比较。
 
 从方法层面看，当前记忆智能体主要分为三类：长上下文模型（Long-Context Agents）将完整对话历史直接送入上下文窗口，依赖模型自身的注意力机制进行隐式检索与推理；检索增强生成代理（RAG Agents）将历史信息存入外部存储，在回答时按需检索相关内容；智能体记忆架构（Agentic Memory）则引入迭代式的检索-推理循环，通过显式的记忆更新与决策流程管理信息。这三类方法在信息获取方式、更新策略和推理深度上存在本质差异，但缺乏统一的评测框架来揭示它们在真实多轮场景下的能力边界。
 
 本文的核心动机在于填补这一评估空白。作者提出 **MemoryAgentBench**，将现有长上下文数据集重构为增量多轮交互格式，并新增 EventQA 和 FactConsolidation 两个数据集，覆盖四项互补的记忆核心能力：**准确检索（Accurate Retrieval, AR）**、**测试时学习（Test-Time Learning, TTL）**、**长程理解（Long-Range Understanding, LRU）** 和**选择性遗忘（Selective Forgetting, SF）**。这四项能力构成了记忆智能体从信息定位到知识冲突消解的完整能力谱系（见图1），任何单一维度的缺失都会导致实际部署中的严重失效。通过在此基准上对三类记忆方法进行大规模对比，本文旨在回答一个根本性问题：是否存在一种统一的记忆机制，能够同时胜任全部四项核心任务？
-
-
 
 ## 核心方法与创新机理
 
@@ -108,8 +104,6 @@ MemoryAgentBench 将记忆智能体的能力需求分解为四个正交维度：
 
 这种分维度的诊断框架直接指向了核心瓶颈：**没有一种单一的智能体架构能在所有记忆能力上领先**，未来需要设计混合机制以覆盖全部维度的记忆需求。这一洞察为后续研究提供了清晰的能力图谱和优化方向。
 
-
-
 MemoryAgentBench 将记忆智能体的评估统一为一个**增量多轮对话管道**。其核心设计理念是：将原本用于长上下文一次性评估的数据集重构为多个对话块，以时间顺序逐步输入智能体，从而模拟记忆系统在持续信息流下的“吸收—检索—推理”完整循环。
 
 ### 输入标准化
@@ -140,8 +134,6 @@ $$c_{1}, c_{2}, \cdots, c_{n} \text{ (chunks)}, \quad q_{1}, q_{2}, \cdots, q_{m
 ### 评估覆盖维度
 
 该管道并非仅测试单一能力，而是系统性地覆盖了记忆智能体应当具备的四项互补核心能力：**准确检索**、**测试时学习**、**长程理解**和**选择性遗忘**。通过统一管道、标准化提示模板和一致的评估协议，性能差异可归因于记忆机制本身，而非提示工程或评估条件的不一致。
-
-
 
 ### 数据集标准化格式
 
@@ -178,14 +170,11 @@ MemoryAgentBench 覆盖的三类智能体共享一个抽象的记忆流水线，
 
 这些参数构成了记忆智能体性能的关键调节旋钮，其在不同能力维度上的权衡效应是未来设计混合记忆机制的重要依据。
 
-
-
 ## 实验与关键发现
 
 ### 总体性能对比：四种核心能力的权衡
 
 Table 3 汇总了所有代理类型在 MemoryAgentBench 四项核心能力上的表现。最核心的发现是：**没有任何一种单一架构能在全部维度上领先**，不同记忆范式之间存在显著的能力权衡。
-
 
 ![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_DT7JyQC3MR/figures/005_Table_3.jpg]]
 *Table 3: Overall Performance Comparison. In the absence of a specified model, All RAG agents and commercial memory agents use GPT-4o-mini as the backbone. Thus we highlight the performance of GPT-4o-mini as the reference. FC-SH and FC-MH mean FactConsolidation Single Hop and FactConsolidation Multi Hop, respectively. Best viewed in colors*
@@ -200,7 +189,6 @@ RAG 代理在准确检索类别上普遍优于其骨干模型 GPT-4o-mini（总�
 
 Table 5 进一步放大了这一问题的严峻性。推理模型 o4-mini 在短上下文（6K）的 FactCon-SH 任务上可达 100.0 的完美准确率，在 FactCon-MH 上亦能达到 80.0；但当上下文扩展至 32K 时，两项任务的准确率分别断崖式下跌至 61.0 和 14.0。GPT-4o 同样呈现类似趋势：FactCon-MH 从 28.0（6K）降至 10.0（32K）。这一现象表明，**长程冲突消解并非单纯由模型推理能力不足所致，而是上下文长度增加后信息定位与冲突识别机制的系统性失效**。
 
-
 ![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_DT7JyQC3MR/figures/010_Table_5.jpg]]
 *Table 5: Performances of reasoning models on the dataset FactConsolidation*
 
@@ -212,7 +200,6 @@ Table 5 进一步放大了这一问题的严峻性。推理模型 o4-mini 在短
 
 **骨干模型升级的差异化收益。** Table 4 比较了四种代表性记忆代理在三种不同骨干 LLM 下的表现，揭示了一个关键洞察：**RAG 代理从更强骨干模型中获益微弱，而 Agentic 记忆代理则展现出显著的潜力空间**。当骨干从 GPT-4o-mini 升级至 GPT-4.1-mini 时，RAG 代理的性能提升有限；但 MIRIX 等 Agentic 记忆方法在更强骨干下获得了大幅增益。这表明，融入迭代推理的记忆架构对模型的基础能力更为敏感，未来更强大的模型可能释放这类方法的更大潜力。
 
-
 ![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_DT7JyQC3MR/figures/009_Table_4.jpg]]
 *Table 4: Performance comparison on three different backbone LLMs and four representative memory agents. We choose one dataset from every competency to evaluate agent performance*
 
@@ -222,36 +209,14 @@ Table 5 进一步放大了这一问题的严峻性。推理模型 o4-mini 在短
 
 在计算延迟方面，长上下文模型虽在性能上领先，但其推理延迟随上下文增长而线性增加。RAG 代理在记忆构建阶段需额外时间开销，但查询执行效率较高。Agentic 记忆代理因涉及多轮迭代检索与推理，查询执行延迟最高。这构成了性能、效率与成本之间的三维权衡空间，需要根据实际应用场景进行选择。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_DT7JyQC3MR/figures/003_Table_1.jpg]]
 *Table 1: A comparison between MemoryAgentBench and existing long-term memory QA benchmarks. #Q denote the total number of questions. Context depth is defined as the number of tokens in the history. *Not reported in the paper, based on our approximation. The context depth of StoryBench is not reported in paper. We compare these datasets in terms of their ability to comprehensively and effectively evaluate the each capability dimension that we propose. We also compare prior work in terms of their evaluation coverage of memory agents—specifically, whether they provide comprehensive assessments across different categories of memory methods: Long-Context Agents (LCA), RAG Agents, and Agentic Memory (AM)*
 
 ![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_DT7JyQC3MR/figures/004_Table_2.jpg]]
 *Table 2: Overview of evaluation datasets. We select datasets that cover various important long-context capabilities. In the table, we underline the datasets we constructed ourselves. AvgL.: Average Context Length (measured using the GPT-4o-mini model’s tokenizer)*
 
-![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_DT7JyQC3MR/figures/011_Table_6.jpg]]
-*Table 6: Datasets categorized by the specific aspects of evaluation. Here 1K is 1024*
-
 ![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_DT7JyQC3MR/figures/014_Table_7.jpg]]
 *Table 7: Overall performance comparison on the datasets for TTL. All RAG agents and commercial memory agents use GPT-4o-mini as the backbone*
-
-![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_DT7JyQC3MR/figures/015_Table_8.jpg]]
-*Table 8: Performance comparison on different datasets and chunk sizes. Here we choose chunk sizes from {512, 1024, 2048, 4096} and we use k=10 for RAG-based methods. Table 9: Performance comparison on different retrieve number*
-
-![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_DT7JyQC3MR/figures/016_Table_9.jpg]]
-
-![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_DT7JyQC3MR/figures/017_Table_10.jpg]]
-*Table 10: Performance comparison on different context length*
-
-![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_DT7JyQC3MR/figures/018_Table_11.jpg]]
-*Table 11: Computational latency (in seconds) comparison on Long-Context Agents*
-
-![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_DT7JyQC3MR/figures/019_Table_12.jpg]]
-*Table 12: Computational latency (in seconds) comparison on RAG based agents. M.C. means Memory Construction and Q.E. means Query Execution. *Indicates that the time is obtained through estimation*
-
-
-
 
 ## 定位与知识库关联
 
@@ -305,8 +270,6 @@ MemoryAgentBench 的评估框架和结论存在以下明确的适用边界：
 4. **在线评估范式的建立**：能否在完全在线的交互式场景中评估测试时学习能力，而不仅限于分阶段离线评估？这将更真实地反映记忆智能体在持续部署环境中的表现。
 
 5. **多模态记忆能力的定义与评估**：针对多模态输入的记忆智能体，四项核心能力的定义和评价标准应如何扩展？这需要构建新的数据集和评估协议。
-
-
 
 ## 原文 PDF
 

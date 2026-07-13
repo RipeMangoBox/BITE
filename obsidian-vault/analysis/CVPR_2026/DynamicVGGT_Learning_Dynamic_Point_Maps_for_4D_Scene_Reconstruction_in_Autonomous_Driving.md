@@ -71,15 +71,11 @@ DynamicVGGT 针对上述瓶颈，提出了一套统一的前馈四维重建框�
 
 DynamicVGGT 依赖冻结的 VGGT 骨干，可能限制端到端适应新场景的能力；常速度运动假设仅适用于短时序片段；真实数据中的稀疏 LiDAR 噪声虽经深度蒸馏缓解，仍会导致一定的性能退化。这些局限为后续研究指明了方向：更灵活的动态运动模型、更鲁棒的真实数据训练策略，以及骨干网络的自适应解冻机制。
 
-
-
 自动驾驶系统对环境的精确感知是安全决策的基础。近年来，前馈3D重建方法取得了显著进展，其中**VGGT**（Wang et al., CVPR 2025）通过交替注意力机制在静态场景中实现了高质量的多视图几何重建。然而，真实驾驶场景本质上是动态的——车辆、行人等运动物体持续改变其空间位置，形成了静态几何向动态4D理解的关键缺口。
 
 现有前馈3D模型面临一个根本性瓶颈：**缺乏对动态场景的时间建模能力**。这些模型仅预测当前帧的点图，无法捕捉跨帧的运动信息与长程时序依赖。当场景中存在显著运动时，静态模型不仅丢失了运动物体的轨迹信息，其几何重建质量也会因时序不一致而退化。**StreamVGGT**（Zhuo et al., arXiv 2025）尝试将时序注意力引入VGGT框架，但其设计面向室内场景，缺乏对自动驾驶中大规模运动、稀疏观测和复杂动态的针对性建模。
 
 DynamicVGGT正是针对这一瓶颈而提出。其核心动机在于回答一个关键问题：**能否在不依赖显式相机外参对齐的前提下，让前馈模型直接学习动态场景的几何与运动？** 为此，该方法引入统一的动态点图（Dynamic Point Maps, DPM）表示，在共享规范坐标系中联合预测当前与未来点图，使模型通过时序对应隐式学习动态表征。同时，通过运动感知时间注意力（MTA）模块和动态3D高斯泼溅头（DGSHead），模型得以显式建模帧间运动信息，从而突破从静态几何到动态运动的因果屏障。
-
-
 
 ## 核心方法与创新机理
 
@@ -133,8 +129,6 @@ $$\mathcal{L}_{\mathrm{distill}} = \|D_{g,v,t} - \mathrm{sg}(D_{v,t}^{\mathrm{pm
 
 上述四个 changed slots 形成了一条清晰的因果链：**MTA 模块**提供时序特征基础 → **FPH** 实现隐式运动学习 → **DGSHead** 细化显式动态几何 → **深度蒸馏** 保障真实数据训练稳定性。消融实验（Table 4）验证了这一链路：从 VGGT 基线出发，添加时序注意力和未来点预测头将 KITTI 精度从 1.489 降至 0.927，完整性从 0.690 降至 0.600；引入 DGSHead 后精度进一步提升至 0.901，法向一致性提升至 0.939。
 
-
-
 DynamicVGGT 的整体管线围绕**动态点图（Dynamic Point Map, DPM）** 这一统一几何表示展开，将静态多视图三维感知扩展为端到端的前馈四维重建，无需显式相机外参对齐或稠密场景标注。其核心设计遵循一条清晰的因果链：**共享坐标系的点图对 → 运动感知时间注意力 → 隐式/显式运动联合建模 → 动态高斯渲染**。
 
 ### 输入输出与模块拓扑
@@ -167,13 +161,6 @@ DynamicVGGT 的整体管线围绕**动态点图（Dynamic Point Map, DPM）** �
 ### 证据强度评估
 
 上述框架设计的有效性由消融实验（Table 4）提供强证据支持：从 VGGT 基线出发，添加时间注意力与未来点预测头使 KITTI 精度从 1.489 降至 0.927、完整性从 0.690 降至 0.600；进一步引入 DGSHead 将精度提至 0.901、法向一致性提至 0.939。这些结果直接验证了 MTA 模块与双头设计（隐式+显式运动建模）的因果贡献，证据置信度较高。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2603_08254/figures/001_Figure_1.jpg]]
-*Figure 1: DynamicVGGT extends static multi-view 3D perception to dynamic 4D reconstruction by enabling 3D Gaussian rendering and adaptively modeling motion across multiple temporal scales without explicit camera extrinsic alignment*
-
-
 
 DynamicVGGT 的核心架构由四个关键模块构成，其设计围绕一个统一的动态点图（Dynamic Point Map, DPM）表示展开。整体框架如图 Figure 2 所示：给定多视图图像序列，模型首先通过冻结的 DINOv2 骨干网络提取各视图的 Patch Token 和 Camera Token，同时初始化可学习的 Motion Token 以编码时序先验。随后，空间交替注意力（AA）模块与运动感知时间注意力（MTA）模块并行处理这些 Token，分别建模帧内几何与帧间运动。最后，时序增强特征 $TA$ 分别送入未来点预测头（FPH）和动态 3D 高斯泼溅头（DGSHead），完成隐式与显式的动态建模。
 
@@ -245,13 +232,6 @@ $$\mathcal{L}_{\mathrm{distill}} = \|D_{g,v,t} - \mathrm{sg}(D_{v,t}^{\mathrm{pm
 
 其中 $\mathrm{sg}(\cdot)$ 为停止梯度操作。该策略有效缓解了点云稀疏性带来的深度不平滑和点图粗糙问题（见 Figure 4）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2603_08254/figures/003_Figure_3.jpg]]
-*Figure 3: Dynamic task formulation. We formulate dynamic point maps by designing two complementary tasks that model point-wise motion over time. The Future Point Head learns implicit motion through inter-frame point consistency, while the Dynamic 3D Gaussian Splatting Head provides explicit motion supervision via scene flow to refine dynamic geometry*
-
-
-
 ## 实验与关键发现
 
 ### 点图重建主结果
@@ -289,21 +269,11 @@ Table 4的系统消融揭示了各组件的因果贡献。以VGGT为起点，�
 2. **常速度运动假设的边界**：高斯运动建模采用常速度假设（$\mu_{i,t+\delta} = \mu_{i,t} + \delta \cdot \nu_{i,t}$），仅适用于短时序片段。对于长程或非刚性运动场景，该假设可能不够精确。
 3. **稀疏LiDAR噪声残留**：深度蒸馏策略虽缓解了稀疏LiDAR带来的噪声影响，但无法完全消除。在极端稀疏区域，深度图与点云质量仍会出现退化（Figure 4），这在实际部署中需额外注意。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2603_08254/figures/005_Table_1.jpg]]
 *Table 1: Point Map Reconstruction on KITTI and Waymo(val). KITTI uses monocular input with every 3 consecutive frames per camera. Waymo uses 3 frames (stride 4) from FRONT, SIDE LEFT, and SIDE RIGHT cameras, totaling 9 images per group*
 
 ![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2603_08254/figures/009_Table_4.jpg]]
 *Table 4: Ablation study. We evaluate ablated variants of DynamicVGGT on point map estimation over KITTI and Waymo (val). KITTI uses monocular input with three consecutive frames, while Waymo uses 3 frames (stride 4) from the FRONT, SIDE LEFT, and SIDE RIGHT cameras, yielding 9 images per sample. Metrics include Accuracy (Acc.), Completeness (Comp.), Normal Consistency (NC)*
-
-![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2603_08254/figures/010_Figure_6.jpg]]
-*Figure 6: Scene Reconstruction and Novel View Synthesis. Given input frames 0, 2, and 4, DynamicVGGT reconstructs the corresponding scenes and synthesizes novel views for the next frame. For both KITTI and Waymo, multi-view inputs are used; for Waymo, we visualize the front-camera results due to limited view overlap. The model achieves high-quality reconstruction and realistic novel view generation across dynamic driving scenes*
-
-![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2603_08254/figures/008_Table_3.jpg]]
-*Table 3: Monocular and MVS depth estimation*
-
-
 
 ## 定位与知识库关联
 
@@ -342,8 +312,6 @@ DynamicVGGT 的设计假设和训练策略决定了其适用范围存在明确�
 **动态与静态的联合优化平衡。** DynamicVGGT 通过未来点预测头学习隐式运动，通过 DGSHead 学习显式运动，两者共享时间增强特征 $TA_{v,t}$。然而，静态区域和动态区域对时间注意力的需求可能存在冲突——静态区域需要抑制时间扰动以保持几何一致性，动态区域则需要增强时间敏感度以捕捉运动细节。当前设计未显式区分动静区域，如何在特征层面实现动静解耦是值得深入研究的开放问题。
 
 **计算效率与实时性。** 论文未报告推理延迟或计算开销数据。考虑到方法在 VGGT 基础上增加了 MTA 模块、DGSHead 和未来点预测头，且涉及两阶段训练流程，其实时部署的可行性需要进一步验证。对于自动驾驶等对延迟敏感的应用，模型轻量化或推理加速是必要的后续工作。
-
-
 
 ## 原文 PDF
 

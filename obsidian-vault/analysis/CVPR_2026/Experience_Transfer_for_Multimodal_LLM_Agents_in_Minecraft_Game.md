@@ -50,8 +50,6 @@ claims:
 
 在 Minecraft 的从零学习设定下，Echo 在物品解锁进度上实现了 **1.3×–1.7×** 的加速，并展现出爆发式的连锁解锁现象——在中期阶段短时间内快速解锁多个相似物品。消融实验进一步验证了各迁移维度的因果贡献：移除属性轴导致 Recipe 类任务成功率下降约 11%，移除程序轴使 Crafting Chain 类任务下降约 12%，移除功能轴几乎使 Functional Equivalence 任务失效。这些结果表明，显式的多维知识分解是跨任务迁移的关键使能因素，而非简单的记忆容量扩展。
 
-
-
 ### 多模态LLM代理的泛化困境
 
 基于多模态大语言模型（MLLM）的具身代理在开放世界任务中展现出强大的感知与规划能力，但其跨任务泛化能力仍面临根本性瓶颈。传统MLLM代理将记忆视为被动存储仓库——仅保存原始轨迹或技能片段，在遇到新任务时缺乏结构化的经验迁移机制。这导致代理在每个新任务上几乎从零开始学习，效率低下且难以形成累积的知识增长。
@@ -73,8 +71,6 @@ claims:
 2. **上下文内类比学习（In-Context Analogy Learning, ICAL）**：将ICL从被动检索升级为主动的类比推理过程——代理主动从CSD记忆库中检索相关经验，通过多维语义相似度匹配识别可迁移模式，归纳生成潜在新任务的假设，并在执行后验证其有效性。
 
 通过这一设计，Echo 使代理能够在任务间实现类比推理驱动的知识迁移，从而加速学习并产生爆发式的物品解锁现象（Figure 2）。后续章节将详细阐述CSD的构建方式、ICAL的工作流程，以及两者如何协同实现结构化经验迁移。
-
-
 
 ## 核心方法与创新机理
 
@@ -120,8 +116,6 @@ Echo 将 ICL 从被动检索升级为主动过程：代理从 CSD 记忆库中�
 - **消融验证**：移除属性轴导致 Recipe 类任务成功率下降约 11%；移除过程轴导致 Crafting Chain 任务下降约 12%；移除功能轴几乎使 Functional Eq. 任务失效（下降约 9%），证明各维度对特定任务类型具有不可替代的贡献（Figure 7）。
 - **类比推理**：个案研究（Figure 9）展示了 ICAL 如何通过功能相似性将制作木镐的经验迁移到制作石镐，验证了“识别模式并适应”的核心机制。
 
-
-
 Echo 的整体框架遵循经典的感知—记忆—规划—验证—执行循环，其核心创新在于将传统被动式上下文学习（ICL）转变为主动的上下文内类比学习（ICAL），并引入五个显式的迁移维度来结构化记忆与跨任务泛化。图 6 展示了该迭代框架的全貌：系统采用三层架构（感知层、决策层、执行层），与短期和长期记忆系统交互，支撑结构化的 ICAL 和基于案例的知识迁移。
 
 ### 核心循环与模块关系
@@ -140,12 +134,8 @@ Echo 的整体框架遵循经典的感知—记忆—规划—验证—执行循
 
 系统的输入是环境的多模态观测 $x_t$（视觉、文本、交互信号），经 CSD 压缩为可比较的语义快照后，进入记忆检索与 ICAL 规划流程。输出为层次化的动作计划 $\pi_t$，交由执行器在环境中执行。整个循环持续迭代，使代理能够在从零开始的设定下，通过主动检索、适应和复用结构化经验，实现跨任务的加速学习与爆发式解锁。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2388_https_arxiv_org_abs_2604_05533/figures/006_Figure_6.jpg]]
 *Figure 6: Overview of our iterative framework. The system performs perception, memory retrieval, planning, verification, and execution in a loop. A three-layer architecture (perception, decision, execution) interacts with short- and long-term memory to support structured ICAL and case-based transfer*
-
-
 
 ### 上下文状态描述符（CSD）与五维迁移轴
 
@@ -165,9 +155,6 @@ CSD 将视觉、文本和交互信号压缩为紧凑、可比较的语义快照�
 ### 结构化上下文内类比学习（ICAL）
 
 传统方法（如 DEPS、JARVIS-1）将上下文内学习（ICL）视为被动过程——从记忆库中检索少量样本以辅助当前目标的子任务序列生成。Echo 则将 ICL 重新定义为**主动的上下文内类比学习（In-Context Analogy Learning, ICAL）**过程（见 Figure 5 的工作流程）：
-
-![[assets/figures/papers/paper_list_l2388_https_arxiv_org_abs_2604_05533/figures/005_Figure_5.jpg]]
-*Figure 5: ICL-based analogical learning workflow using the CSD memory bank*
 
 1. **任务选择**：从 CSD 记忆库中主动检索潜在的新任务。
 2. **示例检索**：基于五维 CSD 组件计算多维语义相似度，检索 top-K 最相关历史经验。
@@ -217,24 +204,14 @@ $$
 
 这种轴-任务特异性表明，五维分解并非冗余设计，而是针对不同任务类型提供了互补的迁移信号。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2388_https_arxiv_org_abs_2604_05533/figures/001_Figure_1.jpg]]
-*Figure 1: Conceptual illustration of Echo. The agent learns from experience and discovers transferable patterns, enabling interpretable analogy-based reasoning and cross-task generalization. In some classical methods, such as DEPS [44] and JARVIS-1 [45], ICL is mainly used to retrieve few-shots from the memory bank to assist in generating sub-task sequences for the current goal. Echo, on the other hand, treats ICL learning as an active process — it proactively retrieves potentially new tasks from the memory bank for validation and execution*
-
 ![[assets/figures/papers/paper_list_l2388_https_arxiv_org_abs_2604_05533/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of motivation and Problem Framework. (a) Traditional MLLM-based agents struggle to generalize across complex real-world environments due to different state transitions and causal relations (hard to transfer) and may exhibit unstable control arising from hallucinations. (b) The proposed Structured In-Context Learning framework introduces a unified CSD that decomposes environmental knowledge into five explicit transfer dimensions*
-
-
 
 ## 实验与关键发现
 
 ### 主要结果
 
 Echo 在 Minecraft 从零学习的设定下，于多类任务上展现出对现有记忆增强代理的显著优势。Table 1 报告了不同方法在 Recipe、Functional Eq.、Crafting Chain 和 Utility Blocks 四类任务上的 Success@0→10 与 Success@0→30 指标。在 Recipe 类任务中，Echo 的 8-shot 变体在 Bed 任务上达到 92.5% 成功率，较 **JARVIS-1**（Wang et al., IEEE TPAMI 2024）的 87.5% 提升 5.0 个百分点；在 Shield 任务上达到 87.5%，较 JARVIS-1 的 80.0% 提升 7.5 个百分点。即便在 2-shot 的极低示例设定下，Echo 仍保持竞争力（Bed 任务 92.5%），表明其类比推理机制在样本稀疏时依然有效。
-
-![[assets/figures/papers/paper_list_l2388_https_arxiv_org_abs_2604_05533/figures/007_Table_1.jpg]]
-*Table 1: From-scratch learning in Minecraft (Success@0→10 / Success@0→30). Higher is better. Results are averaged over worlds, map variants, and resource configurations. v denotes full model; u denotes component disabled*
 
 Figure 2 从物品解锁进度的角度揭示了 Echo 的核心行为特征——**爆发式解锁**（burst-like chain-unlocking）。在迭代步数达到中期阶段时，Echo 的独特物品解锁数急剧攀升，解锁速度较 **MP5**（Qin et al., CVPR 2024）、**Voyager**（Wang et al., TMLR 2024）、**JARVIS-1** 和 **MrSteve**（Park et al., ICLR 2025）等基线方法快 1.3×–1.7×。这一现象源于 ICAL 在识别到任务间的模式相似性后，能够将已掌握的知识快速泛化到相邻任务，形成连锁解锁效应。
 
@@ -270,11 +247,6 @@ Figure 8 的持续学习曲线进一步验证了上述机制。在 30 个训练�
 3. **功能等价迁移的粒度限制**：Figure 9 的个案研究展示了从木镐到石镐的成功迁移，但这种迁移依赖于功能轴的显式编码。当任务间的功能相似性较弱或需要跨域类比时（如从工具制作迁移到建筑建造），当前框架的迁移能力可能受限。
 4. **持续学习中的记忆管理**：Figure 8 显示 Echo 在后期回合的成功率增长趋于平缓。随着 CSD 记忆库的持续膨胀，检索相关范例的计算开销和噪声引入风险可能增加，如何在长期运行中高效维护记忆库以避免灾难性遗忘仍是开放问题。
 
-![[assets/figures/papers/paper_list_l2388_https_arxiv_org_abs_2604_05533/figures/010_Figure_9.jpg]]
-*Figure 9: Transferring from a wooden pickaxe to a stone pickaxe*
-
-
-
 ## 定位与知识库关联
 
 ### 与现有工作的关系
@@ -306,8 +278,6 @@ Echo 的设计基于以下核心假设，这些假设同时界定了其适用边
 **跨域迁移的泛化性。** 五维框架在 Minecraft 中的有效性已通过消融实验验证（Figure 7），但这些维度是否可直接应用于 Minecraft 以外的真实世界物理任务仍是开放问题。真实环境中的迁移可能涉及更复杂的物理约束、安全约束和社会规范，这些维度未必能被当前五轴框架充分覆盖。
 
 **与主动探索的融合。** MP5 所研究的主动探索问题与 Echo 的经验迁移能力在理论上互补——前者解决“何时获取新信息”，后者解决“如何复用已有信息”。将两者融合，构建既能主动探索又能高效迁移的统一代理框架，是一个值得探索的方向。
-
-
 
 ## 原文 PDF
 

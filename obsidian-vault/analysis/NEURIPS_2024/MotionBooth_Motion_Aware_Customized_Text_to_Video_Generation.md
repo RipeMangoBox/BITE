@@ -61,8 +61,6 @@ claims:
 
 **局限与展望**：该方法在处理非动物物体上的动物运动时可能出现严重变形，无法处理多主体复杂交互，极端相机运动速度下存在平铺效应。未来方向包括扩展到多主体场景、利用更丰富的运动控制信号（如光流、骨架）、以及减少对精确主体掩码的依赖。
 
-
-
 ### 问题背景：定制化视频生成的兴起
 
 随着扩散模型在图像生成领域的巨大成功，文本到视频（Text-to-Video, T2V）生成近年来取得了长足进步。大型预训练T2V模型能够根据文本描述生成逼真的视频内容。然而，用户往往不仅希望生成通用场景，还希望将特定的个性化主体（如自己的宠物、特定玩具等）植入生成的视频中，并让其按照指定的方式运动。这一需求催生了**定制化视频生成**（customized video generation）这一研究方向。
@@ -95,8 +93,6 @@ claims:
 
 简而言之，MotionBooth 旨在回答一个核心问题：**如何在不破坏预训练T2V模型视频生成先验的前提下，实现精确且免训练的主体和相机运动控制？**
 
-
-
 ## 核心方法与创新机理
 
 MotionBooth 的核心创新在于**将主体定制化视频生成中的三大瓶颈——背景过拟合、运动控制缺失、相机运动僵化——转化为三个可解耦的“改变槽位”（changed slots）**，并通过训练期损失重构与推理期免训练操控的组合策略逐一突破。
@@ -125,11 +121,6 @@ MotionBooth 的核心创新在于**将主体定制化视频生成中的三大瓶
 ### 创新之间的因果耦合关系
 
 上述三个改变槽位并非独立运作，而是形成**因果链条**：STCA 损失建立了主体令牌与空间位置的绑定（训练期），这使免训练的交叉注意力编辑能够精确控制主体运动（推理期）；同时，视频保持损失保护了预训练模型的运动先验，使潜空间偏移模块能够利用该先验生成连贯的相机运动。若移除任一环节，整个系统的控制精度和生成质量都会显著下降（Table 3 消融实验）。
-
-
-
-![[assets/figures/papers/paper_list_l11_MotionBooth_Motion_Aware_Customized_Text_to_Video_Generation/figures/001_Figure_1.jpg]]
-*Figure 1: Motion-aware customized video generation results of MotionBooth. Our method animates a customized object with controllable subject and camera motions*
 
 MotionBooth 提出了一套统一的运动感知定制视频生成框架，其核心设计围绕一个关键瓶颈展开：**预训练 T2V 模型在主体微调过程中极易过拟合背景并丧失视频生成能力**，导致生成结果中运动匮乏或背景严重退化。为解决这一问题，MotionBooth 将整个流程划分为两个阶段——**主体学习阶段**和**免训练推理控制阶段**——分别通过损失增强训练和潜空间/注意力操纵来实现主体保真度、视频质量与运动可控性的三重平衡。
 
@@ -176,8 +167,6 @@ MotionBooth 提出了一套统一的运动感知定制视频生成框架，其�
 | 相机运动控制 | 需训练专用模块（如 CameraCtrl） | 免训练潜空间偏移 |
 
 这种设计使得 MotionBooth 在保持主体外观保真度的同时，无需任何额外训练即可灵活控制主体和相机运动，且实验表明其相机控制精度甚至超越了需要大规模数据训练的 **CameraCtrl**（Table 2）。
-
-
 
 ### 3.1 问题形式化与框架概览
 
@@ -269,8 +258,6 @@ $$\begin{array} { r l } & { { \mathbf{h} } _ { x } = { \mathrm { SampleHorizonta
 
 Table 2 的定量结果表明，该免训练方法在 Flow error 和 FVD 上均显著优于需要大规模训练的 **CameraCtrl**（Flow error：0.190 vs 1.683；FVD：905.40 vs 1468.53，基于 Zeroscope），验证了潜空间偏移作为相机控制机制的有效性。
 
-
-
 ## 实验与关键发现
 
 ### 实验设置
@@ -285,7 +272,6 @@ MotionBooth 基于两个公开的预训练文本到视频（T2V）扩散模型�
 
 Table 1 展示了在 Zeroscope 和 LaVie 两个骨干模型上的定量对比。MotionBooth 在所有指标上均优于现有基线方法。
 
-
 ![[assets/figures/papers/paper_list_l11_MotionBooth_Motion_Aware_Customized_Text_to_Video_Generation/figures/006_Table_1.jpg]]
 *Table 1: Quantitative comparison for motion-aware customized video generation*
 
@@ -299,14 +285,12 @@ Table 1 展示了在 Zeroscope 和 LaVie 两个骨干模型上的定量对比。
 
 Table 2 展示了相机运动控制的定量对比。MotionBooth 的免训练潜空间偏移方法显著优于需要大规模数据训练的 CameraCtrl 和 AnimateDiff。
 
-
 ![[assets/figures/papers/paper_list_l11_MotionBooth_Motion_Aware_Customized_Text_to_Video_Generation/figures/007_Table_2.jpg]]
 *Table 2: Quantitative comparison for camera movement control*
 
 在 Zeroscope 骨干上，MotionBooth 的 Flow error 仅 **0.190**，而 CameraCtrl 高达 1.683，降低了 **1.493**；FVD 为 **905.40**，CameraCtrl 为 1468.53，降低了 563.13。在 LaVie 骨干上，MotionBooth 的 Flow error 为 0.296，FVD 为 **723.26**，同样大幅领先。这些结果表明，训练自由的潜空间偏移不仅能精确控制相机运动，还能保持更高的视频质量，而训练方法（如 CameraCtrl）可能因引入额外模块而损害生成质量。
 
 定性结果（Figure 6、Figure 7）进一步印证：MotionBooth 生成的主体外观保持度高，主体运动与文本描述一致，相机运动平滑自然；而基线方法常出现主体变形、运动匮乏或背景退化等问题。
-
 
 ![[assets/figures/papers/paper_list_l11_MotionBooth_Motion_Aware_Customized_Text_to_Video_Generation/figures/008_Figure_6.jpg]]
 *Figure 6: Qualitative comparison of customizing objects and controlling their motions. Figure 7: Qualitative comparison of camera motion control. Lines and points are used to help the readers track the camera movement more easily*
@@ -317,7 +301,6 @@ Table 2 展示了相机运动控制的定量对比。MotionBooth 的免训练潜
 
 Table 3 系统消融了三个核心训练损失项在 LaVie 上的贡献：
 
-
 ![[assets/figures/papers/paper_list_l11_MotionBooth_Motion_Aware_Customized_Text_to_Video_Generation/figures/009_Table_3.jpg]]
 *Table 3: Ablation study for training technologies. “mask” means subject region loss. “STCA” means subject token cross-attention loss. “video” means video preservation loss. “w/ class video” means utilizing class-specific videos in video preservation loss. The results are evaluated on LaVie*
 
@@ -325,10 +308,6 @@ Table 3 系统消融了三个核心训练损失项在 LaVie 上的贡献：
 - **移除 STCA 损失（w/o STCA）**：Flow error 显著上升，主体运动控制能力下降。Figure 4 的可视化显示，无 STCA 时交叉注意力图分散，无法聚焦于主体位置；加入 STCA 后注意力图与主体掩码精确对齐。
 - **移除视频保持损失（w/o video）**：视觉质量严重退化。Figure 3 的定性案例表明，仅使用主体区域损失会导致背景过平滑且缺乏多样性；加入视频保持损失后，模型恢复了生成丰富动态背景的能力。
 - **使用类别特定视频（w/ class video）**：相比使用通用视频数据，性能略有下降，说明通用视频的多样性对保持视频生成先验更为有效。
-
-
-![[assets/figures/papers/paper_list_l11_MotionBooth_Motion_Aware_Customized_Text_to_Video_Generation/figures/003_Figure_3.jpg]]
-*Figure 3: Case study on subject learning. “Region” indicates subject region loss. “Video” indicates video preservation loss. The images are extracted from generated videos*
 
 ![[assets/figures/papers/paper_list_l11_MotionBooth_Motion_Aware_Customized_Text_to_Video_Generation/figures/004_Figure_4.jpg]]
 *Figure 4: Case study on subject token cross-attention maps. (b) and (c) are visualization of cross-attention maps on token$s ^ { 6 6 } [ \mathrm { V } ] ^ { , , }$ and “dog”*
@@ -365,24 +344,8 @@ Figure 9 展示了 MotionBooth 的典型失败案例，结合分析可知主要�
 5. **主体掩码依赖**：训练需要精确的主体掩码（手动或自动获取），增加了实际应用的成本和复杂度。
 6. **潜空间语义连续性假设**：相机控制依赖于潜在空间在空间维度上的语义连续性，在某些场景（如复杂纹理或非均匀背景）下该假设可能不成立，导致填充区域不协调。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l11_MotionBooth_Motion_Aware_Customized_Text_to_Video_Generation/figures/014_Figure_12.jpg]]
-*Figure 12: Up Right A playful puppy frolicking in flowers (g) Examples of controlling both subject and camera (h) Comparison of latent shift and text guidance to motion. control camera motion. Figure 12: More qualitative results*
-
-![[assets/figures/papers/paper_list_l11_MotionBooth_Motion_Aware_Customized_Text_to_Video_Generation/figures/019_Table_6.jpg]]
-*Table 6: More ablation studies. (a) Ablation of controlling single (b) Ablation of masking the training (c) Ablation of the latent filling motion type. images. method in latent shift*
-
 ![[assets/figures/papers/paper_list_l11_MotionBooth_Motion_Aware_Customized_Text_to_Video_Generation/figures/021_Figure_15.jpg]]
 *Figure 15: More qualitative results of our MotionBooth*
-
-![[assets/figures/papers/paper_list_l11_MotionBooth_Motion_Aware_Customized_Text_to_Video_Generation/figures/015_Table_4.jpg]]
-*Table 4: Comparison with More Baselines. (a) Comparison of the latent shift method and text (b) Comparison of subject motion control with more guidance for camera motion control. baselines*
-
-![[assets/figures/papers/paper_list_l11_MotionBooth_Motion_Aware_Customized_Text_to_Video_Generation/figures/016_Table.jpg]]
-
-
-
 
 ## 定位与知识库关联
 
@@ -436,8 +399,6 @@ MotionBooth 的能力边界受限于以下约束：
 - 如何减少对精确主体掩码的依赖，实现完全自动化的训练流程？
 - 是否可能通过在线学习或测试时自适应来增强模型在极端运动条件下的鲁棒性？
 - 如何降低同时启用主体和相机控制时的推理延迟，使方法更适用于实时应用场景？
-
-
 
 ## 原文 PDF
 

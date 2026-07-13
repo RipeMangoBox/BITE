@@ -56,8 +56,6 @@ FAPE-IR 的核心洞察在于，图像复原的本质是一个频率感知问题
 
 在涵盖六类退化任务的统一评估中，FAPE-IR 取得了**最优或次优性能**：在去雨、去雾、去雪等天气相关任务上，PSNR 提升约 6–8 dB（Table 1）；在超分辨率任务上，PSNR 从 26.87 dB 提升至 28.53 dB（Table 2）。消融实验证实，频率感知文本路由（Freq-U）与 FIR 频谱路由器（Freq-G）对性能至关重要——二者耦合后，URHI 基准上的 PSNR 从 25.03 dB 跃升至 29.71 dB（Table 4）。模型同时展现出对混合退化（雾+雨、低光混合等）的强零样本泛化能力。
 
-
-
 ### 全合一图像复原的演进瓶颈
 
 图像复原旨在从退化的观测中恢复出干净图像，传统方法通常为每种退化类型（去雨、去雾、去模糊、超分辨率等）训练独立模型。然而，现实场景中退化类型往往未知且可能复合出现，这催生了**全合一图像复原（All-in-One Image Restoration, AIO-IR）**——用单一统一模型处理多种退化。
@@ -76,8 +74,6 @@ FAPE-IR 的核心洞察在于，图像复原的本质是一个频率感知问题
 - **执行**：由扩散模型根据规划动态激活频带专家，实现高效且无冲突的复原。
 
 这一设计从根本上解决了“盲路由”问题——模型不再猜测该用什么分支，而是通过语义理解做出可追溯的决策，同时通过频带专家分工实现参数高效的专业化。此外，通过引入对抗训练和频率正则化，FAPE-IR进一步抑制了扩散模型常见的伪影，并强制专家在各自频带内形成专长。
-
-
 
 ## 核心方法与创新机理
 
@@ -104,8 +100,6 @@ FAPE-IR 摒弃了统一模型中常用的 flow-matching 微调目标，转而采
 - **频率正则化项** $\mathcal{L}_{\mathrm{freq}} = \mathrm{mean}\big[||\mathcal{H}_g(y_{\mathrm{low}})||_2^2 + ||\mathcal{L}_g(y_{\mathrm{high}})||_2^2\big]$ 惩罚低频专家的高频输出和高频专家的低频输出，强制频带专长化。
 
 总损失 $\mathcal{L}_{\mathrm{Total}} = \mathcal{L}_{\mathrm{adv}} + \gamma \mathcal{L}_{\mathrm{freq}}$ 将语义级保真度约束与频带专业化约束统一，既抑制了扩散模型常见的伪影，又促进了专家之间的功能分化。消融实验证实，去除任一损失项均导致性能下降（Figure 13），验证了四项损失相互补充的机制。
-
-
 
 FAPE-IR 采用**规划–执行**范式，将全合一图像复原分解为两个耦合阶段：**频率感知规划器**与**频带专业化执行器**，如图 2 所示。其核心思想是：先“理解”退化图像的语义与频谱特性，再“执行”针对性的频带复原，从而统一语义理解与像素级重建。
 
@@ -136,8 +130,6 @@ FAPE-IR 摒弃了统一模型中常用的 flow-matching 微调目标，转而采
 
 如图 1 所示，现有 AIO-IR 方法主要分两类：(a) 使用任务特定提示词的多分支映射（如 **PromptIR**, NeurIPS 2023）；(b) 基于任务路由或聚类的方法（如 **MoCE-IR**, CVPR 2025）。FAPE-IR 的独特之处在于：将 MLLM 的语义理解能力引入退化分析，生成显式、可解释的频率感知计划，进而通过频带专家分工实现高效复原——这是首次在 AIO-IR 中实现理解与生成的端到端统一。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2485_https_arxiv_org_abs_2511_14099/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed FAPE-IR framework*
 
@@ -146,8 +138,6 @@ FAPE-IR 摒弃了统一模型中常用的 flow-matching 微调目标，转而采
 
 ![[assets/figures/papers/paper_list_l2485_https_arxiv_org_abs_2511_14099/figures/018_Figure_12.jpg]]
 *Figure 12: Qualitative results of training our framework with a standard flow-matching (FM) objective on real-world super-resolution. Although the FM-trained variant can sharpen some structures, it also introduces severe artifacts and unrealistic high-frequency details (e.g., distorted edges and hallucinated textures), which motivates our final design choices for FAPE-IR*
-
-
 
 FAPE-IR 采用“规划—执行”范式，将图像复原分解为频率感知规划器（Frequency-aware Planner）与基于扩散的执行器（Diffusion-based Executor）两大核心模块（Figure 2）。规划器负责理解退化语义并生成结构化的频率感知复原计划，执行器则依据该计划动态调度频带专家完成像素级重建。
 
@@ -204,8 +194,6 @@ $$\mathcal{L}_{\mathrm{Total}} = \mathcal{L}_{\mathrm{adv}} + \gamma \mathcal{L}
 
 其中 $\gamma$ 为频率正则化权重。四项损失（MSE、LPIPS、对抗、频率正则化）相互补充：消融实验（Figure 13）表明，移除任一损失项均导致性能下降，验证了该组合设计的必要性。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -228,33 +216,11 @@ FAPE-IR在六个经典退化任务系列上进行了统一评估，与多种AIO-
 
 尽管FAPE-IR在多数任务上表现优异，仍存在若干局限性。首先，在去噪和低光增强任务上，PSNR略低于最优方法，但SSIM和感知指标更优，表明模型倾向于保真度与感知质量的平衡而非单纯追求像素误差。其次，在真实世界超分辨率的无参考IQA指标上有时弱于对比方法，推测由于SR真实图像的统计特性与现有NR-IQA模型不匹配。Figure 12展示了使用标准flow-matching目标训练时的失败案例——虽然能锐化部分结构，但引入了严重伪影和不真实的高频细节（如扭曲边缘和幻觉纹理），这验证了对抗训练替换flow-matching的必要性。此外，模型推理内存占用较高（38.92G），部署于资源受限平台存在挑战。现有训练数据未能覆盖所有混合退化类型，零样本泛化能力虽有验证（Figure 9展示了雾+雨/雪、低光混合等复合退化结果），但仍有提升空间。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2485_https_arxiv_org_abs_2511_14099/figures/004_Table_1.jpg]]
 *Table 1: Unified comparison across six AIO-IR task series. Each series shows five metrics (PSNR↑, SSIM↑, LPIPS↓, FID↓, DISTS↓). The best results are highlighted in red, and the second-best results are shown in blue*
 
 ![[assets/figures/papers/paper_list_l2485_https_arxiv_org_abs_2511_14099/figures/005_Table_2.jpg]]
 *Table 2: Unified comparison across SR task series. Each series shows five metrics. The best results are marked in red, and the second-best results are shown in blue*
-
-![[assets/figures/papers/paper_list_l2485_https_arxiv_org_abs_2511_14099/figures/011_Table_4.jpg]]
-*Table 4: Ablation on URHI benchmark. Qwen: remove Qwen2.5- VL; Freq-U: remove frequency-aware text router; Freq-G: remove FIR spectral router; r: LoRA rank in expert combos*
-
-![[assets/figures/papers/paper_list_l2485_https_arxiv_org_abs_2511_14099/figures/019_Figure_13.jpg]]
-*Figure 13: Hyperparameter sensitivity analysis of the four loss weights α, β, λ, and γ on URHI and BSD68-15*
-
-![[assets/figures/papers/paper_list_l2485_https_arxiv_org_abs_2511_14099/figures/020_Table_7.jpg]]
-*Table 7: Ablation on BSD68-15 benchmark. Qwen: remove Qwen2.5-VL; Freq-U: remove frequency-aware text router; Freq-G: remove FIR spectral router; r: LoRA rank in expert combos*
-
-![[assets/figures/papers/paper_list_l2485_https_arxiv_org_abs_2511_14099/figures/006_Table_3.jpg]]
-*Table 3: Complexity comparison. All methods are evaluated on 512 × 512 inputs, and inference is measured on an H200 GPU. Param (G) denotes the inference memory footprint*
-
-![[assets/figures/papers/paper_list_l2485_https_arxiv_org_abs_2511_14099/figures/009_Figure_5.jpg]]
-*Figure 5: High-frequency–dominant tasks (derain/desnow/deblur/denoise): FAPE-IR preserves fine structures and textures with less ringing/oversharpening. Please zoom in for details*
-
-![[assets/figures/papers/paper_list_l2485_https_arxiv_org_abs_2511_14099/figures/012_Figure_9.jpg]]
-*Figure 9: Compound degradations (haze+rain/snow; low-light mixtures): FAPE-IR removes low-frequency artifacts, preserves details, and reduces cross-artifacts. Please zoom in for details*
-
-
 
 ## 定位与知识库关联
 
@@ -327,8 +293,6 @@ Table 3显示FAPE-IR推理内存占用为38.92G，推理时间1.57s（H200 GPU�
 4. **效率优化空间**：在保持性能的前提下，探索轻量级MLLM替代Qwen2.5-VL、更高效的MoE路由策略（如top-1稀疏化）、或知识蒸馏方案，以降低推理内存占用。
 
 5. **频带专家数量的可扩展性**：当前设计仅使用两个频带专家（高频/低频），是否可以通过引入更多中间频带专家（如中频纹理专家）进一步提升细粒度复原能力？这需要在专家专业化与路由稳定性之间寻找新的平衡。
-
-
 
 ## 原文 PDF
 

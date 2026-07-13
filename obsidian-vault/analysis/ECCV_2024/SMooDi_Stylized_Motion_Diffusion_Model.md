@@ -54,8 +54,6 @@ claims:
 
 **方法定位** SMooDi 属于**基于扩散模型的运动风格化方法**，在方法谱系中位于“文本到运动生成”与“运动风格迁移”的交汇点。与为每种风格单独训练模型或依赖有限风格迁移流水线的方案不同，它通过微调预训练文本到运动模型来注入风格条件，在保留广泛内容生成能力的同时学习多种运动风格。
 
-
-
 ### 问题背景
 
 文本驱动的三维人体运动生成近年来取得了显著进展，用户可以通过自然语言描述生成多样化的运动序列。然而，现实应用不仅要求运动在语义上匹配文本内容，还期望运动表现出特定的风格特征——例如“僵尸般行走”、“优雅地舞蹈”或“疲惫地坐下”。这种**风格化运动生成**（stylized motion generation）的需求广泛存在于动画制作、游戏开发和虚拟人交互等场景中。
@@ -79,8 +77,6 @@ claims:
 3. **避免串行误差**：将风格化生成整合到统一的扩散去噪框架中，消除了文本生成与风格迁移两阶段之间的误差累积。
 
 SMooDi 是首个将预训练文本到运动模型适配为风格化生成模型的工作，为风格可控的运动生成开辟了新的技术路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -132,8 +128,6 @@ $$
 
 SMooDi 的创新链条可概括为：**风格适配器提供结构基础 → 双重风格引导实现从粗到细的风格控制 → 先验保留损失防止内容能力退化**。三者缺一不可：去除适配器使 FID 恶化约 80.46%（Table 3），去除分类器基础引导使 SRA 崩溃，去除先验保留损失则导致内容生成能力瓦解。这一设计使 SMooDi 成为首个在单一模型中同时实现多样化内容生成与多种风格控制的文本到运动框架。
 
-
-
 SMooDi 的整体 pipeline 建立在对预训练文本到运动潜在扩散模型（MLD）的定制化微调之上。其核心设计思想是：**冻结基础生成骨架，通过外部风格条件模块注入风格控制信号**，从而在保留广泛内容生成能力的同时学习多种运动风格。
 
 ### 输入输出流
@@ -174,16 +168,11 @@ $$\mathcal{L}_{all} = \mathcal{L}_{std} + \lambda_{pr} \mathcal{L}_{pr} + \lambd
 
 消融实验证实，同时去除 $\mathcal{L}_{pr}$ 和 $\mathcal{L}_{cyc}$ 会导致 FID 从 1.609 恶化至 5.996（降幅超过 229%），出现严重的“内容遗忘”现象，验证了先验保留策略的必要性。
 
-
-
 SMooDi 的核心架构由两个关键模块构成：**风格适配器**（Style Adaptor）和**双通路风格引导机制**。前者负责将参考风格序列的条件信息注入预训练的文本到运动扩散模型，后者则在推理阶段通过互补的引导策略精确控制生成运动的风格表现力。
 
 ### 风格适配器
 
 风格适配器的设计遵循 ControlNet 范式，其目标是使冻结的预训练运动潜在扩散模型（MLD）能够接收额外的风格条件，同时不破坏原有的文本到运动生成能力。具体结构如下（参见 Fig. 3）：
-
-![[assets/figures/papers/paper_list_l1879_SMooDi_Stylized_Motion_Diffusion_Model/figures/003_Figure_3.jpg]]
-*Figure 3: Detailed illustration of our proposed style adaptor. The style adaptor is connected to the motion diffusion model via zero linear layer. The output of the style adaptor from each Transformer encoder is added to the motion diffusion model to steer the predicted noise towards the target style*
 
 - **可训练副本**：风格适配器是 MLD 中 Transformer Encoder 的一个可训练副本。它接收由风格编码器（一个单层 Transformer）编码的风格嵌入，并在各层输出风格相关的残差特征。
 - **零初始化连接**：适配器的每一层输出通过一个线性层连接到 MLD 对应层的注意力模块。该线性层的权重和偏置均初始化为零，确保训练初期适配器不对预训练模型产生扰动，从而保证训练稳定性。
@@ -250,15 +239,8 @@ $$
 
 消融实验证实，同时去除 $\mathcal{L}_{pr}$ 和 $\mathcal{L}_{cyc}$ 会导致 FID 从 1.609 恶化至 5.996（恶化 229% 以上），出现严重的“内容遗忘”现象（Table 3）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1879_SMooDi_Stylized_Motion_Diffusion_Model/figures/004_Figure_4.jpg]]
-*Figure 4: Visual illustrations of the classifier-free and clasifier-based style guidance. (a) and (b) respectively show the classifier-free content and style guidance; (c) displays the initial stylized motion resulting from the combination of (a) and (b); (d) illustrates the refined stylized motion modified by the classifier-based style guidance*
-
 ![[assets/figures/papers/paper_list_l1879_SMooDi_Stylized_Motion_Diffusion_Model/figures/013_Figure_8.jpg]]
 *Figure 8: Visual pipeline of the cycle prior-preservation loss*
-
-
 
 ## 实验与关键发现
 
@@ -301,22 +283,6 @@ Table 5 报告了推理时间对比。SMooDi 全模型的平均每句推理时�
 *Table 5: Inference time. We report the Average Inference Time per Sentence (AITS) in seconds for baselines and each submodule of ours on stylized text2motion tasks*
 
 此外，SMooDi 继承了预训练扩散模型的脚部滑动问题（Table 1 中 foot skating ratio 为 1.582），且基于分类器的风格引导依赖 100STYLE 训练的分类器，当内容文本与运动风格数据集分布差异较大时（如“坐下”等非运动类动作），引导效果可能下降。这些局限性指向了未来引入物理约束或真感引导的改进方向。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1879_SMooDi_Stylized_Motion_Diffusion_Model/figures/007_Table.jpg]]
-*Table: (a) Evaluation on HumanML3D dataset (b) Evaluation on Xia dataset*
-
-![[assets/figures/papers/paper_list_l1879_SMooDi_Stylized_Motion_Diffusion_Model/figures/009_Figure_6.jpg]]
-*Figure 6: Visual comparisons of the ablation designs and our full model*
-
-![[assets/figures/papers/paper_list_l1879_SMooDi_Stylized_Motion_Diffusion_Model/figures/010_Figure_7.jpg]]
-*Figure 7: User Study on two stylized motion generation tasks*
-
-![[assets/figures/papers/paper_list_l1879_SMooDi_Stylized_Motion_Diffusion_Model/figures/017_Figure_11.jpg]]
-*Figure 11: A visual example showing conflicts between content text and style motion in a specific body part*
-
-
 
 ## 定位与知识库关联
 
@@ -361,8 +327,6 @@ SMooDi 的技术骨架继承自 **MLD（Motion Latent Diffusion Model）**，后
 3. **物理约束集成**：引入物理约束或真感引导（realism guidance）是否能进一步消除脚部滑动并提升运动质量？这将使 SMooDi 更适用于游戏、动画等对物理真实感要求较高的应用场景。
 
 4. **条件域泛化**：风格适配器的设计是否可推广到其他条件域（如骨骼结构、环境约束、交互物体）以实现更通用的条件运动生成？这涉及将“风格”概念从运动特征拓展到更广泛的条件表征空间。
-
-
 
 ## 原文 PDF
 

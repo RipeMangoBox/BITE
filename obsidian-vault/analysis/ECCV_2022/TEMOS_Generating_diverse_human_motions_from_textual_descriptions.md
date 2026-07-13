@@ -74,8 +74,6 @@ TEMOS通过两个关键设计同时解决上述问题。在解码策略上，它
 
 TEMOS的性能受限于KIT数据集的规模和词汇丰富度，对未见描述和复杂动作的泛化能力有限。模型未显式建模脚-地面接触与物理约束，可能导致脚步滑动等伪影。此外，Transformer的二次复杂度使其难以直接扩展到数分钟级别的长序列运动。这些局限指向若干开放方向：显式物理约束的整合、运动时长的自动估计、长序列场景下的效率优化，以及更能反映人类感知的多样化评价指标设计。
 
-
-
 从自然语言描述生成人体运动序列，是连接视觉感知与语言理解的重要交叉问题，在动画制作、虚拟角色控制和人机交互等场景中有广泛应用。该任务的核心挑战在于，自然语言天然具有模糊性和多义性——同一句描述（如“一个人走向桌子”）可以对应多种合理的运动实现，而人类观察者能够接受这些变体。
 
 然而，现有方法在处理这种“一对多”映射时存在两个根本性瓶颈。**第一，确定性映射导致输出单一**。以 **JL2P**（Ahuja & Morency, 2019）和 **Ghosh et al.**（2021）为代表的先前工作，将文本到运动的生成建模为确定性函数：给定文本输入，模型输出唯一确定的运动序列。这种设计无法捕捉语言描述内在的歧义性，用户无法获得多个合理候选来满足不同场景需求。**第二，自回归逐帧解码造成长期漂移**。主流方法采用循环神经网络（RNN）或自回归Transformer逐帧预测未来姿态，每一帧的误差会在序列中累积传播，导致生成的运动在长时间跨度上偏离合理分布，甚至陷入静止姿态（“冻结”现象）。
@@ -83,8 +81,6 @@ TEMOS的性能受限于KIT数据集的规模和词汇丰富度，对未见描述
 上述两个瓶颈的叠加效应尤为严重：确定性模型缺乏对运动分布的整体建模，而逐帧解码又使局部误差无法被全局上下文校正。这导致生成的运动在**语义一致性**（是否符合文本描述）和**物理真实感**（是否自然流畅）两个维度上均难以令人满意。
 
 TEMOS的提出正是针对这两大缺陷。其核心动机在于：**将序列整体建模为单个潜在向量，并通过非自回归的Transformer解码器一次性生成完整运动，从而同时解决多样性与长期连贯性问题**。具体而言，该方法引入变分自编码器（VAE）框架，在文本与运动的共享潜在空间中施加概率分布约束，使解码器能够通过随机采样为同一文本生成多个语义一致但细节不同的运动变体。这一设计从因果机制上切断了逐帧误差累积的路径，并将“一对多”映射显式地编码进模型结构。
-
-
 
 ## 核心方法与创新机理
 
@@ -107,8 +103,6 @@ TEMOS 的核心创新在于通过**非自回归的 Transformer 解码器一次�
 ### 架构设计的因果机制
 
 上述三个 changed slots 并非孤立改进，而是通过统一的架构设计形成因果闭环：**冻结 DistilBERT 提供稳定的文本语义表示**，**Transformer 编码器将其映射到变分潜在空间**，**非自回归解码器从采样的潜在向量一次性生成完整序列**。其中，Transformer 的全局自注意力机制是解决长期依赖的核心，VAE 的随机采样是赋予多样性的关键，而冻结语言模型则是保证跨模态泛化的稳定锚点。三者缺一不可——消融实验表明，移除任一组件（如去掉 KL 损失项或运动编码器分支）都会导致性能退化，尽管退化幅度远小于将 Transformer 降级为 GRU。
-
-
 
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2204_14109/figures/002_Figure_2.jpg]]
 *Figure 2: Method overview: During training, we encode both the motion and text through their respective Transformer encoders, together with modal-specific learnable distribution tokens. The encoder outputs corresponding to these tokens provide Gaussian distribution parameters on which the KL losses are applied and a latent vector z is sampled. Reconstruction losses on the motion decoder outputs further provide supervision for both motion and text branches. In practice, our word embedding consists of a variational encoder that takes input from a pre-trained and frozen DistilBERT [48] model. Trainable layers are denoted in green, the inputs/outputs in brown. At test time, we only use the right branch,...*
@@ -155,8 +149,6 @@ TEMOS 的整体框架围绕一个核心设计展开：在**文本与运动两个
 ### 局限性与开放问题
 
 框架存在若干已知局限：KIT 数据集规模有限且词汇不丰富，限制了模型对未见描述的泛化能力；Transformer 的二次复杂度使得直接扩展到数分钟的长序列运动成本过高；未显式建模脚-地面接触，可能导致脚步滑动。这些指向后续工作可探索的方向，包括显式物理约束的整合、运动时长的自动估计，以及面向长序列的架构优化。
-
-
 
 ### 流水线模块
 
@@ -206,8 +198,6 @@ $$\mathrm{AVE}[j] = \frac{1}{N} \sum_{n \in N} \| \sigma[j] - \hat{\sigma}[j] \|
 
 衡量生成运动方差与真实运动方差之间的差异，反映模型是否捕捉到了动作的动态变化范围。
 
-
-
 ## 实验与关键发现
 
 ### 主要定量结果
@@ -222,9 +212,6 @@ TEMOS 在 KIT Motion-Language 数据集上与三个先前最先进方法进行�
 ### 用户感知研究
 
 论文通过两项用户研究（Figure 3）评估了生成运动的语义匹配度和真实感。在语义对应性研究中，用户被要求判断两个生成样本中哪一个更符合输入文本描述，结果显示 TEMOS 相比 Lin et al. 获得 **90.5%** 的偏好率，相比 JL2P 和 Ghosh et al. 也均显著领先。在真实感研究中（不展示文本描述），TEMOS 同样优于所有先前方法。
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2204_14109/figures/004_Figure_3.jpg]]
-*Figure 3: (b) Which motion is more realistic? Fig. 3: Perceptual study: (a) We ask users which motion corresponds better to the input text between two displayed samples generated from model A vs model B. (b) We ask other users which motion is more realistic without showing the textual description. We report the percentage for which the users show a preference for A. The red dashed line denotes the 50% level (equal preference). On the left of both studies, our generations from TEMOS were rated better than the previous work of Lin et al. [30], JL2P [2], and Ghosh et al. [14]. On the right of both studies, we compare against the ground truth (GT) and see that our motions are rated as better than the GT...*
 
 更引人注目的是，在与真实数据（GT）的直接比较中，TEMOS 的生成结果在 **15.5%** 的情况下被认为语义匹配度优于真实数据，在 **38.5%** 的情况下被认为真实感优于真实数据；而 Ghosh et al. 的对应比例仅为 8.5% 和 5.5%。这一结果说明 TEMOS 的生成质量在感知层面已达到甚至部分超越真实运动数据的水平。
 
@@ -269,27 +256,8 @@ Figure 4 的定性比较展示了 TEMOS 相对于先前方法的视觉质量优�
 4. **物理约束缺失**：未显式建模脚与地面的接触，可能导致脚步滑动；缺乏物理约束的整合，生成的运动在某些情况下可能违背物理规律。
 5. **时长依赖人工指定**：模型需要外部给定运动时长参数 $F$，无法自动估计适宜的运动持续时间。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2204_14109/figures/011_Table.jpg]]
-*Table: A.1: Batch size: We see that the performance is the best for either a small batch size (=8) or a bigger batch size (=32). We were unable to use a higher batch size due to the GPU memory limit*
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2204_14109/figures/012_Table.jpg]]
-*Table: A.2: Weight of the KL losses ( \lambda _ { \bf K L } ) and the embedding loss (λE): The results are influenced more by changes in λE than in λKL, but otherwise if the values are not too low, the performances are similar. Note that the control row \lambda _ { \mathrm { K L } } = 1 0 ^ { - 5 } , \lambda _ { \mathrm { E } } = 1 0 ^ { - 5 } is repeated in each block*
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2204_14109/figures/013_Table.jpg]]
-*Table: A.3: Number of layers and heads in all Transformers: While our results are slightly better for larger models, we observe that the performance is not very sensitive to changes in the number of layers and heads in Transformers*
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2204_14109/figures/014_Table.jpg]]
-*Table: A.4: Number of layers and heads in the Transformer of the text encoder only: We fix the Transformer layers and heads of the motion encoder and motion decoder to 6 (as in the other experiments), but we only change the number of layers and heads of the text encoder (the one on top of DistilBert). The results suggest that training a light model on top of the language model still gives descent results, but adding more layers helps*
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2204_14109/figures/015_Table.jpg]]
-*Table: A.5: Language model: We experiment with language models larger than DistilBERT and do not observe significant changes in the performance*
-
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2204_14109/figures/016_Table.jpg]]
 *Table: A.6: Correspondence between the SMPL-H joints and the MMM framework joints*
-
-
 
 ## 定位与知识库关联
 
@@ -336,8 +304,6 @@ TEMOS 留下了一系列有待后续工作探索的问题：
 - **评估指标改进**：如何量化多样性与真实感，并设计更能反映人类感知的评价指标？当前的 APE/AVE 指标主要衡量与单一 ground truth 的偏差，无法充分评估生成多样性。用户感知研究（Figure 3）虽然提供了有价值的补充，但成本高昂且难以标准化。
 
 需要指出的是，TEMOS 在用户感知研究中甚至在某些情况下被评价为优于真实数据（15.5% 的语义匹配偏好和 38.5% 的真实感偏好，见 Figure 3），这一反直觉结果可能源于 KIT 数据集中真实运动本身存在噪声或不够自然，而非 TEMOS 真的超越了物理真实——该点需要结合数据集质量进行审慎解读。
-
-
 
 ## 原文 PDF
 

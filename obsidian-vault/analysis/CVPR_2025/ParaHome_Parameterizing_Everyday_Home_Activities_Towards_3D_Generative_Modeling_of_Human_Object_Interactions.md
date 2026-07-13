@@ -51,8 +51,6 @@ ParaHome 系统通过一套异构捕获方案解决了上述问题。其核心�
 
 最终，ParaHome 将人体（采用 SMPL-X 参数化模型）与物体（包含关节状态）统一表示为一个结构化的时空状态序列，并辅以文本描述。这一参数化体系为下游的生成式建模奠定了坚实基础。在验证实验中，混合 ParaHome 与 HumanML3D 数据训练的扩散模型（MDM）在文本条件运动生成任务上显著超越了 **TEMOS**（Petrovich et al., ECCV 2022）和 **T2M**（Guo et al., CVPR 2022），RPrecision top3 达到 0.73。在物体引导的运动合成任务中，加入初始相对空间线索可将全局关节位置误差降低约 30%。系统层面的评估也证实，3D 立方体标记的跟踪成功率远优于传统表面标记方案（1.0 vs 0.76–0.93），手部校准后的平均指尖位置误差仅为 11 毫米。
 
-
-
 **核心瓶颈：现有HOI数据集在自然家庭环境中无法同时捕获高精度人体全身运动、精细手部运动和物体轨迹，也缺乏统一参数化表示与文本描述，制约了生成式建模研究。**
 
 ### 问题背景
@@ -84,8 +82,6 @@ ParaHome 系统通过一套异构捕获方案解决了上述问题。其核心�
 
 > **注意**：ParaHome系统依赖70台同步RGB相机和可穿戴IMU设备，设置成本较高；数据集覆盖38名参与者和22个物体，规模仍有限。这些限制在后续章节中有详细讨论。
 
-
-
 ## 核心方法与创新机理
 
 ParaHome 的核心创新在于构建了一套异构感知系统与统一参数化框架，解决了现有 HOI 数据集在自然家庭环境中同时捕获高精度全身运动、精细手部运动和物体轨迹的根本瓶颈。其关键创新点体现在以下四个 changed slots 上：
@@ -116,8 +112,6 @@ ParaHome 设计了两阶段的参数化校准：
 在文本条件运动生成任务中，现有模型（如 **MDM** (Tevet et al., arXiv 2022)）仅使用 HumanML3D 训练，缺乏精细手部运动和 HOI 上下文。ParaHome 将自身数据与 HumanML3D 混合训练 MDM，在 RPrecision top3 上达到 **0.73**，显著优于仅用 HumanML3D 的 **0.68**，并超越 **TEMOS** (Petrovich et al., ECCV 2022) 的 0.38 和 **T2M** (Guo et al., CVPR 2022) 的相应指标（Table 2）。
 
 **因果分析**：ParaHome 数据补充了 HumanML3D 缺失的 HOI 交互模式和手部细节，使模型学会了更丰富的人-物空间关系。Table 3 进一步表明，在物体引导运动合成中加入初始相对空间线索 $\mathbf{S}_{p\to o}(t)$ 可将全局关节位置误差降低约 **30%**，验证了统一参数化框架对生成式建模的结构性支撑作用。
-
-
 
 ParaHome 的总体目标是将家庭场景中的人-物交互（HOI）统一参数化，为三维生成式建模提供结构化数据。系统围绕一个核心状态表示构建，将时刻 $t$ 的场景信息组织为：
 
@@ -168,13 +162,6 @@ $$\operatorname*{min}_{\mathcal{M}^h,\mathcal{H}} \lambda_t \mathcal{L}_{tip} + 
 
 整个 pipeline 的关键设计决策在于：**3D ArUco 立方体标记**替代传统表面标记，在交互遮挡下实现了 1.0 的跟踪成功率（表面标记仅 0.76–0.93）；**异构系统校准**（身体+手部）确保了多尺度运动在统一坐标系下的高精度一致性。这两个设计共同构成了系统能够鲁棒捕获复杂家庭 HOI 数据的因果核心。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1742_ParaHome_Parameterizing_Everyday_Home_Activities_Towards_3D_Generative_M/figures/001_Figure_1.jpg]]
-*Figure 1: Our system captures the detailed 3D movements of the human body, hands, and diverse objects, along with text descriptions*
-
-
-
 ParaHome 系统的核心在于将异构传感器数据统一到一致的时空坐标系中，并参数化表达人、物、环境的交互状态。其技术路线围绕三个关键环节展开：**HOI 状态参数化**、**物体运动解算**、以及**多传感器空间对齐**。
 
 ### HOI 状态参数化
@@ -220,16 +207,6 @@ $$\operatorname*{min}_{\mathcal{M}^h,\mathcal{H}} \lambda_t \mathcal{L}_{tip} + 
 ![[assets/figures/papers/paper_list_l1742_ParaHome_Parameterizing_Everyday_Home_Activities_Towards_3D_Generative_M/figures/005_Figure_5.jpg]]
 *Figure 5: An example of SMPL-X shape parameter fitting. (Left) Projected keypoints, mask and rendered SMPL-X with the optimized shape parameter. (Right) Rendered SDF within 5cm to visualize an affordance information using optimized SMPL-X*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1742_ParaHome_Parameterizing_Everyday_Home_Activities_Towards_3D_Generative_M/figures/003_Figure_3.jpg]]
-*Figure 3: (Left) Scanned 3D models in ParaHome system. (Right) Articulation state of 3D models. Blue bars show the object-specific parameters*
-
-![[assets/figures/papers/paper_list_l1742_ParaHome_Parameterizing_Everyday_Home_Activities_Towards_3D_Generative_M/figures/004_Figure_4.jpg]]
-*Figure 4: (Left) Before/After Body Calibration, Orange: forward kinematic output, Blue: RGB Triangulated Result (Right) Hand Calibration Protocol and Before/After Calibration Protocol*
-
-
-
 ## 实验与关键发现
 
 ### 系统评估：跟踪鲁棒性与校准精度
@@ -270,9 +247,6 @@ Table 3 报告了物体引导运动合成任务的定量结果。该任务给定
 
 以冰箱（Refrigerator）场景为例，加入S_p_tp后，全局关节平均位置误差（MPE glb-joints）从 **9.26 cm 降至 6.57 cm**；抽屉（Drawer）场景中，误差从 **9.92 cm 降至 5.88 cm**。这一结果表明，仅依赖物体运动轨迹不足以唯一确定人体运动——初始的人-物相对姿态提供了关键的歧义消除信息。Figure 9（右）展示了从物体轨迹生成人体运动的定性结果，生成的运动在时序上与物体运动协调一致。Figure 9（左）进一步展示了潜在空间插值的能力，表明扩散模型学习到的运动表示具有良好的连续性和语义可解释性。
 
-![[assets/figures/papers/paper_list_l1742_ParaHome_Parameterizing_Everyday_Home_Activities_Towards_3D_Generative_M/figures/010_Figure_9.jpg]]
-*Figure 9: (Left) A sampled example of latent interpolation result. Right most is a sequence generated from the interpolated noise. (Right) Generated body motion(lower) given object motion trajectory from 0 to T(upper)*
-
 ### 失败模式与局限性
 
 尽管系统在跟踪和生成任务上表现优异，但仍存在若干明确的失败模式：
@@ -283,11 +257,6 @@ Table 3 报告了物体引导运动合成任务的定量结果。该任务给定
 4. **生成精细度不足**：扩散模型生成的手部动作精细度是否足以满足高精度接触任务（如拧瓶盖）仍需验证，当前实验仅针对相对简单的物体（冰箱、抽屉）。
 5. **合成RGB真实性**：Figure 6 展示的合成RGB图像虽可用于下游任务，但其真实性有限，可能影响基于视觉的评估指标。
 6. **校准自动化程度低**：身体和手部校准需要专门的捕获阶段和人工辅助（如校准立方体的精确放置），难以实现完全自动化。
-
-![[assets/figures/papers/paper_list_l1742_ParaHome_Parameterizing_Everyday_Home_Activities_Towards_3D_Generative_M/figures/006_Figure_6.jpg]]
-*Figure 6: (Left) Examples of synthesized RGB images using Para-Home data. (upper) Rendered depth images of ParaHome data. (lower) Synthesized RGB image using text annotation, depth, 2D keypoints. (Right) HOI Reconstruction using synthesized RGB*
-
-
 
 ## 定位与知识库关联
 
@@ -340,8 +309,6 @@ ParaHome 的核心贡献不在于提出全新的生成模型架构，而在于�
 5. **数据集多样性与公平性**：当前数据集在性别、年龄、文化背景上的多样性不足，是否会导致模型在特定人群上表现退化？这需要在数据集扩展时进行系统性的偏差评估。
 
 6. **系统效率与成本优化**：如何将当前系统扩展为更高效、更低成本的方案？可能的路径包括减少相机数量并用神经渲染补全视角，或用单目/双目SLAM替代部分多视角重建功能。
-
-
 
 ## 原文 PDF
 

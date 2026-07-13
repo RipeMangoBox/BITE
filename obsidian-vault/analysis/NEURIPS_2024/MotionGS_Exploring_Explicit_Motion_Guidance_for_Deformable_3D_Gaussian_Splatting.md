@@ -55,8 +55,6 @@ MotionGS 针对上述问题提出了一个核心洞察：**从混合光流中剥
 
 > **⚠️ 注意**：NeRF-DS 和 HyperNeRF 方法使用基于 AlexNet 的 LPIPS，而 MotionGS 等使用基于 VGG 的 LPIPS，因此 LPIPS 数值不完全可比。
 
-
-
 动态场景的新视角合成是计算机视觉与图形学中的核心挑战。近年来，以 3D 高斯溅射（3D Gaussian Splatting, 3DGS）为代表的显式场景表示方法在静态场景渲染中展现出高质量、实时性的优势。然而，将其扩展到动态场景时，主流方案——如 **Deformable-3DGS**（Yang et al., arXiv 2023）——引入可变形场来建模高斯原语随时间的位置、旋转和缩放变化，却面临一个根本性瓶颈：**优化过程仅依赖光度重建损失，缺少对物体运动本身的显式约束**。
 
 这一缺口的后果是严重的。当物体运动不规则、场景动态复杂时，纯外观驱动的优化极易陷入局部最优，导致几何形变不准确、渲染出现漂浮伪影。直觉上，光流作为像素级的运动信号，似乎可以天然地填补这一空白——直接用它监督 3D 高斯的位移即可。但事实恰恰相反：**直接使用未解耦的光流作为监督，性能反而低于基线**（Table 3：PSNR 23.37 vs 基线 23.61）。原因在于，光流是相机运动与物体运动的混合产物，相机自运动（ego-motion）引入的噪声会严重误导高斯变形，使监督信号本身成为歧义来源。
@@ -64,8 +62,6 @@ MotionGS 针对上述问题提出了一个核心洞察：**从混合光流中剥
 这揭示了一个更深层的因果机制：**要有效利用运动先验，必须将相机运动成分从光流中剥离**，得到仅由物体运动引起的“运动流”（motion flow），才能为 3D 高斯的变形提供纯净、直接的监督。在此基础上，相机位姿本身的估计误差（通常来自 COLMAP）也会传播到运动流的计算中，进一步放大不准确性，因此相机位姿的联合优化同样是提升鲁棒性的关键环节。
 
 综上，本文 **MotionGS** 的核心动机是：**为可变形 3D 高斯溅射引入显式、解耦的运动引导**，通过光流解耦模块分离运动流与相机流，并辅以相机位姿细化模块交替优化场景与位姿，从而突破现有方法在复杂动态场景中的性能上限。
-
-
 
 ## 核心方法与创新机理
 
@@ -100,8 +96,6 @@ $$\mathcal{L}_{\mathrm{flow}} = \| sg(F_{t, t+1}^M) - F_{t, t+1}^G \|$$
 - **冻结位姿，优化高斯**：恢复标准的高斯场与变形网络训练。
 
 这一设计使得位姿误差不再被“固化”到场景表示中。消融实验表明，在运动流监督基础上叠加相机位姿细化（+ motion flow guidance + camera pose refinement），PSNR 进一步提升至 24.54，达到最佳性能。
-
-
 
 ![[assets/figures/papers/paper_list_l11_MotionGS_Exploring_Explicit_Motion_Guidance_for_Deformable_3D_Gaussian_S/figures/002_Figure_2.jpg]]
 *Figure 2: The overall architecture of MotionGS. It can be viewed as two data streams: (1) The 2D data stream utilizes the optical flow decoupling module to obtain the motion flow as the 2D motion prior; (2) The 3D data stream involves the deformation and transformation of Gaussians to render the image for the next frame. During training, we alternately optimize 3DGS and camera poses through the camera pose refinement module*
@@ -151,8 +145,6 @@ $$\mathcal{L} = \mathcal{L}_{\text{baseline}} + \lambda \mathcal{L}_{\text{flow}
 
 整体而言，2D 流为 3D 变形提供了显式、解耦的运动约束，而位姿细化模块则从源头降低了误差传播，三者形成闭环，共同提升了动态场景重建的精度。
 
-
-
 MotionGS 在可变形 3DGS 基线（**Deformable-3DGS**, Yang et al., arXiv 2023）之上引入两个关键模块：**光流解耦模块** 和 **相机位姿细化模块**，并定义了高斯流的渲染与监督机制。
 
 ### 光流解耦模块
@@ -198,8 +190,6 @@ $$\mathcal{L}_{\mathrm{flow}} = \| sg(F_{t, t+1}^M) - F_{t, t+1}^G \|$$
 $$\mathcal{L} = \mathcal{L}_{\mathrm{baseline}} + \lambda \mathcal{L}_{\mathrm{flow}}$$
 
 其中 $\lambda$ 为流损失权重，在 NeRF-DS 数据集上设为 0.5，在 HyperNeRF 上设为 0.1。
-
-
 
 ## 实验与关键发现
 
@@ -262,19 +252,6 @@ Figure 5 和 Figure 6 分别展示了 NeRF-DS 和 HyperNeRF 数据集上的定�
 2. **稀疏视角失效**：如 DyNeRF 所示，固定稀疏视角下渲染深度不可靠，导致方法性能退化。
 3. **光流估计器依赖**：运动先验的质量受限于所选光流网络，更换估计器会直接影响最终效果。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l11_MotionGS_Exploring_Explicit_Motion_Guidance_for_Deformable_3D_Gaussian_S/figures/001_Figure_1.jpg]]
-*Figure 1: (a) Gaussian flow under different supervision. We model Gaussian flow under the supervision of optical flow and motion flow respectively. The latter can produce a more direct description of object motion, thereby effectively guiding the deformation of 3D Gaussians. (b) The decoupling of optical flow. We decouple the optical flow into motion flow which is only related to object motion and camera flow which is only related to camera motion*
-
-![[assets/figures/papers/paper_list_l11_MotionGS_Exploring_Explicit_Motion_Guidance_for_Deformable_3D_Gaussian_S/figures/013_Table_5.jpg]]
-*Table 5: Max GPU memory usage comparison across different models*
-
-![[assets/figures/papers/paper_list_l11_MotionGS_Exploring_Explicit_Motion_Guidance_for_Deformable_3D_Gaussian_S/figures/014_Table_6.jpg]]
-*Table 6: FPS, number of 3D Gaussians and storage on the NeRF-DS dataset per scene*
-
-
-
 ## 定位与知识库关联
 
 ### 方法在动态场景重建中的定位
@@ -312,8 +289,6 @@ $$( \mu + \Delta \mu , r + \Delta r , s + \Delta s ) = \mathscr { D } ( \mu , r 
 2. **更鲁棒的通用运动先验**：当前方法依赖现成光流网络（GMFlow）提供运动先验，在极小运动或纹理缺失场景中光流估计本身可能失败。如何构建更稳定、通用的运动先验（如改进自监督流损失、融合多帧时序信息）是提升方法鲁棒性的关键。
 
 3. **方法模块的可迁移性**：论文指出光流解耦和位姿细化模块不依赖于特定的变形网络设计，可应用于类似的变形基 3DGS 方法。这一主张的实际迁移效果和泛化范围尚待后续工作验证。
-
-
 
 ## 原文 PDF
 

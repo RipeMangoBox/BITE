@@ -160,8 +160,6 @@ DSO-Net采用“预训练-微调”范式，整体流程分为两个阶段：**�
 
 这一设计将传统方法的“子空间拟合+外推”转化为“全空间映射+插值”，从根本上提升了开放词汇动作生成的泛化能力。
 
-### 补充图表
-
 ![[assets/figures/papers/DSONet_Textual_Decomposition_Then_Sub-Motion-Space_Scattering_for_Open-Vocabular_aab01d075189/figures/003_Figure_2.jpg]]
 *Figure 2: The architecture of our entire framework. The overall pipeline adopts discrete generative modeling. 1) In the Motion Pre-Training stage (left blue part), we use the Residual VQ-VAE (RVQ) model, which designs a base layer and R residual layers to learn layer-wise codebooks. By tokenizing the motion sequence into multi-layer discrete tokens, we learn the large-scale motion priors. 2) In the Motion Fine-tuning stage (right green part), we first leverage the large language model(LLM) and the fine-grained description conversion algorithm we design (only used in training stage) to perform texutal decomposition, which convert the raw text of a motion into the atomic texts. Then, for the base layer...*
 
@@ -257,8 +255,6 @@ DSO-Net 在域内数据集 HumanML3D 和两个开放域数据集 Idea400、Mixam
 2. **部位划分的刚性**：当前固定将身体划分为脊柱、左右上下肢和轨迹六个部位。对于涉及手指、面部表情等更细粒度部位的动作，或需要动态调整部位粒度的场景，该划分方式可能不足。
 
 3. **组合复杂度上限**：当原子动作数量过多或部位间交互过于复杂时，CFF 模块的交叉注意力机制可能面临信息瓶颈，导致部分原子语义在融合过程中被稀释。
-
-### 补充图表
 
 ![[assets/figures/papers/DSONet_Textual_Decomposition_Then_Sub-Motion-Space_Scattering_for_Open-Vocabular_aab01d075189/figures/009_Figure_5.jpg]]
 *Figure 5: Qualitative results compared with previous state-of-the-arts*

@@ -71,8 +71,6 @@ claims:
 
 尽管效果显著，3DGM仍面临若干挑战：物体阴影的分割不够精确，大面积持久遮挡物可能导致过拟合，远距离小物体的分割精度有限，以及无法处理大幅度的光照和季节变化。这些局限指向了未来的研究方向——阴影感知的环境映射、时序信息整合、自适应阈值设计，以及4D表示对长期一致性的支持。
 
-
-
 自动驾驶和移动机器人系统依赖精确的3D环境地图实现定位、规划与导航。传统建图方法通常假设环境是静态的，但真实世界中充斥着行人、车辆等临时性动态物体——这些物体在不同时间遍历同一区域时出现和消失，对构建持久环境表示构成根本性挑战。
 
 现有解决方案存在显著瓶颈。主流方法依赖人工标注的分割模型或LiDAR传感器来过滤动态物体：前者需要昂贵的大规模像素级标注，且跨场景泛化能力有限；后者增加了硬件成本和系统复杂度。在纯视觉、无标注条件下，如何有效分离持久环境结构与临时物体，仍是一个悬而未决的问题。
@@ -82,8 +80,6 @@ claims:
 然而，将这一直觉转化为可操作的计算框架面临多重技术挑战。首先，需要一种能够同时表示3D几何与外观的表示方法，支持可微分渲染以进行端到端优化。其次，需要设计鲁棒的特征表示，使其对光照、天气等环境变化具有不变性，同时能敏锐捕捉临时物体的出现。最后，需要一种机制来挖掘渲染残差中的空间信息，将像素级的不一致性转化为精确的物体分割掩码。
 
 本文提出3D Gaussian Mapping (3DGM)，将多趟遍历环境建图形式化为鲁棒可微分渲染问题——将环境像素视为内点（inliers），物体像素视为外点（outliers）。通过蒸馏去噪DINOv2特征到3D高斯泼溅框架中，并结合新颖的特征残差挖掘策略，3DGM首次在无需LiDAR和人工监督的条件下，同时实现了3D环境高斯地图的构建和2D临时性物体分割。
-
-
 
 ## 核心方法与创新机理
 
@@ -119,8 +115,6 @@ $$\mathcal{L} = \sum_t \mathcal{L}_{rgb}(\mathbf{M}_t \odot \mathbf{I}_t(\boldsy
 
 上述三个创新并非孤立存在，而是形成了一条**因果链**：特征蒸馏提供判别性信号→残差挖掘定位外点→鲁棒损失保护内点优化。这种协同使得3DGM能够在无LiDAR、无标注的条件下，同时输出高质量的3D环境地图和2D暂时性物体分割，突破了现有方法对人工标注和昂贵传感器的依赖。
 
-
-
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2405_17187/figures/001_Figure_1.jpg]]
 *Figure 1: A high-level diagram of 3D Gaussian Mapping (3DGM). Given multitraverse RGB videos, 3DGM outputs a Gaussian-based environment map (EnvGS) and 2D ephemerality segmentation (EmerSeg) for the input images. Note that the proposed framework is LiDAR-free and self-supervised*
 
@@ -141,8 +135,6 @@ $$\mathcal{L} = \sum_t \mathcal{L}_{rgb}(\mathbf{M}_t \odot \mathbf{I}_t(\boldsy
 其中 $\mathbf{M}_t$ 为 EmerSeg 提取的暂时性掩码。通过屏蔽外点像素，环境高斯得以专注于学习持久场景结构，从而在渲染时自动“擦除”临时物体。
 
 **流水线整体流程**如 Figure 2 所示：多趟遍历 RGB 图像经 COLMAP 初始化后，先通过联合 RGB 与特征渲染训练初始环境高斯；随后利用特征残差挖掘生成暂时性掩码；最后在掩码引导下进行鲁棒优化，产出最终的环境高斯和分割结果。三个模块相互增强——更好的特征蒸馏带来更精确的掩码，更精确的掩码又反哺更干净的环境重建。
-
-
 
 ### 总体框架
 
@@ -209,8 +201,6 @@ $$
 
 这些改进槽位共同构成了 3DGM 的技术贡献：通过将鲁棒优化、自监督特征蒸馏和空间残差挖掘有机结合，首次在 3DGS 框架下实现了无需人工标注的多遍历环境与物体分解。
 
-
-
 ## 实验与关键发现
 
 ### 实验设置与基准
@@ -265,9 +255,6 @@ $$
 
 **Table 3** 比较了不同方法在新视角合成任务上的表现。EnvGS 的 LPIPS 为 **0.213**，优于 VanillaNeRF（0.423）、RobustNeRF（0.266）和原始 3DGS（0.255）。在 SSIM 指标上，EnvGS（0.806）与使用预训练 SegFormer 掩码的 3DGS+SegFormer（0.806）持平，表明无监督掩码质量已接近监督模型的水平。
 
-![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2405_17187/figures/009_Table_3.jpg]]
-*Table 3: Quantitative evaluation of novel view synthesis. We set test/training views as 1/8. Pixels corresponding to transient objects are removed in the evaluations since we do not have ground truth background pixels in these regions occluded by transient objects*
-
 **Figure 6** 的定性渲染对比进一步证实：EnvGS 能有效移除暂时性物体及其阴影，在某些情况下甚至优于配备预训练模型的 3DGS+SegFormer。
 
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2405_17187/figures/008_Figure_6.jpg]]
@@ -288,27 +275,8 @@ $$
 
 附录 Figure V 中标注了部分失败案例，包括阴影误分割和远距离物体遗漏等典型问题。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2405_17187/figures/017_Figure.jpg]]
-*Figure: VII: IoU performance over iterations for different feature resolutions (110×180 and 140×210) and corresponding visualizations of ephemerality masks and feature residuals. Visualizations at various iterations (500 to 10000) illustrate that higher iterations lead to more detailed and accurate segmentation. The results highlight the efficiency of the 110×180 resolution and the fast convergence of our method for effective segmentation*
-
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2405_17187/figures/021_Figure.jpg]]
 *Figure: XI: Comparison of ephemerality masks and feature residuals using different versions of the DINO model. The figure includes raw and denoised versions of DINOv1 and DINOv2, as well as raw and denoised versions of DINOv2 with a registration module (DINOv2-Register). Denoising enhances the quality of feature residuals, while registration does not yield notable gains*
-
-![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2405_17187/figures/034_Figure.jpg]]
-*Figure: XXIII: Visualizations of neural rendering in Mapverse-nuPlan*
-
-![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2405_17187/figures/036_Figure.jpg]]
-*Figure: XXV: Failure cases when faced with large and enduring occluders. Figure XXVI: Failure cases when faced with small and long-range objects*
-
-![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2405_17187/figures/010_Table.jpg]]
-*Table: I: Details of the Mapverse Dataset*
-
-![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2405_17187/figures/033_Table.jpg]]
-*Table: II: Quantitative rendering results in Mapverse-nuPlan. We set test/training views as 1/8. Pixels corresponding to transient objects are removed in the evaluations since we do not have ground truth background pixels in these regions occluded by transient objects*
-
-
 
 ## 定位与知识库关联
 
@@ -368,8 +336,6 @@ $$\mathcal{L} = \sum_t \mathcal{L}_{rgb}(\mathbf{M}_t \odot \mathbf{I}_t(\boldsy
 ### 5. 在知识库中的定位
 
 3DGM 在自动驾驶建图领域的方法谱系中占据了一个独特位置：它**首次在纯视觉、无 LiDAR、无人工标注的条件下，实现了 3D 环境高斯与 2D 暂时性物体掩码的联合无监督生成**。相较于依赖 LiDAR 的建图方法，3DGM 降低了传感器成本；相较于依赖监督分割的方法，它消除了标注负担和跨域泛化问题；相较于现有无监督分割方法（STEGO、CAUSE），它在自动驾驶场景中取得了显著的性能提升（IoU 提升 21.36 个百分点，89.8% 相对改进）。其核心贡献——特征残差挖掘策略与鲁棒优化损失的结合——为后续研究提供了一个可扩展的自监督框架，但面向大规模、跨季节、全天候的实际部署，仍需解决上述开放问题。
-
-
 
 ## 原文 PDF
 

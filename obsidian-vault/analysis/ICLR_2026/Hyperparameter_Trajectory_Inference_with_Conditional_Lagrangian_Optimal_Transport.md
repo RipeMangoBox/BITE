@@ -54,8 +54,6 @@ claims:
 
 **主要结果**：在多个 HTI 应用场景中，完整 CLOT 方法一致优于所有基线。在二维半圆条件轨迹推断任务上，CLOT 的负对数似然（NLL）较恒等度量基线降低 106.375（Table 1）；在癌症治疗策略代理任务中，平均 PPO 奖励达到 102.49，优于 NLOT 的 98.72（Table 2）；在 ETTm2 分位数回归代理任务中，预测区间与真实区间高度吻合（Figure 3），MSE 达到 0.608（Table 5）。消融实验证实，学习度量和势能偏置各自贡献显著，且在数据稀疏设置下 CLOT 的性能退化最小，验证了归纳偏置在困难插值区域的关键作用。
 
-
-
 超参数调整是深度学习落地的核心瓶颈之一：不同超参数配置（如正则化系数、分位数水平、奖励权重）会诱导出截然不同的模型行为，而穷举训练所有配置的计算代价往往不可接受。现有应对策略大致分为两类：一是训练少量锚点模型后对输出进行简单插值；二是使用条件生成模型（如条件流匹配）直接推断中间配置的条件分布。然而，这两类方法共享一个根本性缺陷——它们对超参数驱动下的输出动力学缺乏结构性建模。
 
 具体而言，当超参数变化时，神经网络输出的演化轨迹通常嵌入在低维流形上，并遵循某种高效路径（最小作用量原理）。简单的逐点插值或无条件流匹配忽略了这一几何结构，在复杂、非欧几里德的超参数动力学下容易生成不可行的代理路径——例如穿越低密度区域的“捷径”，或违反物理约束的跳跃。现有方法无法有效处理条件信息，且缺乏将数据流形结构和动力学先验编码进推断过程的机制。
@@ -65,8 +63,6 @@ claims:
 为此，本文提出**神经条件拉格朗日最优传输（Neural Conditional Lagrangian Optimal Transport, CLOT）**方法。其核心洞察是：通过学习一个条件拉格朗日函数——包含数据依赖的势能项和基于可学习度量的动能项——将最小作用量原理和流形假设编码为归纳偏置，引导推断路径穿越数据密集区并遵循高效传输路径。该方法联合学习拉格朗日成本函数、最优传输映射与测地线，从而构建可泛化的代理模型。
 
 与现有工作的关键差异在于：**Pooladian et al. (2024)** 提出的神经拉格朗日最优传输（NLOT）仅处理无条件设定，且使用固定特征值的度量参数化（仅适用于二维）。本文将其扩展为条件最优传输框架，引入数据依赖的势能项 $\hat{\mathcal{U}}(q|x) = \alpha \log(\hat{p}(q|x) + \epsilon)$ 以施加密集遍历偏置，并设计基于特征分解和Givens旋转的可学习度量 $G_{\theta_G}$，支持任意维度且避免退化解。这些改进使得CLOT能够在稀疏锚点下可靠地推断条件概率路径，并在多个HTI应用场景中一致优于条件流匹配（CFM, Lipman et al., 2023）、度量流匹配（MFM, Kapusniak et al., 2024）等基线方法。
-
-
 
 ## 核心方法与创新机理
 
@@ -108,8 +104,6 @@ CLOT 通过极小-极大优化框架联合学习拉格朗日成本函数（由�
 
 这一范式将“学习传输成本”与“学习传输路径”统一为单一优化问题，使得代理模型在推理时可直接根据条件 $x$ 和目标超参数 $\lambda$ 生成对应的输出分布样本，而无需重新训练或访问原始训练过程。
 
-
-
 本文提出的**神经条件拉格朗日最优传输（Neural CLOT）**方法，将超参数轨迹推断（HTI）形式化为一个条件轨迹推断（CTI）任务：给定一组在离散超参数值 $\lambda \in \Lambda_{\text{obs}}$ 上训练得到的神经网络输出分布 $\{p_{\theta_\lambda}(y|x)\}_{\lambda \in \Lambda_{\text{obs}}}$，目标是学习超参数 $\lambda$ 诱导的连续动态 $\lambda \mapsto p_{\theta_\lambda}(y|x)$，从而构建一个可泛化的代理模型，在推理时实现超参数的连续调整。
 
 CLOT 的核心瓶颈在于：现有方法（如条件流匹配）在复杂、非欧几里德的超参数动力学下，简单插值会生成不可行的代理路径。CLOT 通过将**最小作用量原理**和**流形假设**编码为归纳偏置，引导推断路径穿越数据密集区并遵循高效传输路径，从而解决这一瓶颈。
@@ -146,8 +140,6 @@ CLOT 的核心瓶颈在于：现有方法（如条件流匹配）在复杂、非
 $$\min_{\theta_G} \sum_k \mathbb{E}_x \left[ \max_{\theta_{g,k}} \mathbb{E}_{y_k \sim \mu_k(\cdot|x)} [g_{\theta_{g,k}}^c(y_k|x)] + \mathbb{E}_{y_{k+1} \sim \mu_{k+1}(\cdot|x)} [g_{\theta_{g,k}}(y_{k+1}|x)] \right]$$
 
 其中 c-变换 $g_{\theta_{g,k}}^c(y_k|x)$ 的计算通过传输映射网络 $T_{\theta_T,k}$ 暖启动，并利用测地线网络 $S_{\theta_S}$ 高效近似拉格朗日成本函数，避免了嵌套优化。
-
-
 
 ### 条件轨迹推断问题形式化
 
@@ -223,8 +215,6 @@ $$\mathcal{L}_{\text{path}}(\theta_S) = \mathbb{E}\left[ \mathcal{S}(q_\varphi |
 
 条件信息 $x$ 通过 FiLM 层注入所有网络（$g_{\theta_{g,k}}$、$T_{\theta_{T,k}}$、$S_{\theta_S}$、$G_{\theta_G}$）的第一层激活值，实现条件动态建模。推理时，对目标超参数 $t^*$，先归一化到局部参数 $s^* = (t^* - t_k) / (t_{k+1} - t_k)$，再通过测地线网络输出路径参数并求值 $\bar{\hat{y}}_{t^*} = q_\varphi(s^*)$，从而获得任意超参数下的代理输出。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置与评估维度
@@ -235,8 +225,6 @@ $$\mathcal{L}_{\text{path}}(\theta_S) = \mathbb{E}\left[ \mathcal{S}(q_\varphi |
 
 在半圆CTI任务中（Figure 1, Table 1），完整方法（$K_\theta - \hat{\mathcal{U}}$）在保留时间点$t \in \{0.25, 0.75\}$上取得NLL $-0.662 \pm 0.046$，相比恒等度量无偏置基线（$K_I$）的$105.713 \pm 2.42$，提升超过106个单位。CD指标上，完整方法达到$0.016 \pm 0.001$，而$K_I$为$0.323 \pm 0.003$，降低约95%。视觉检查（Figure 1）显示，完整方法的推断轨迹正确遵循半圆几何结构，在条件间保持清晰分离，而消融模型出现路径交叉或偏离数据流形的现象。
 
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_P5B97gZwRb/figures/001_Figure_1.jpg]]
-*Figure 1: Dots represent true samples from the temporal process across t $\in$ [ 0 , 1 ] , lines represent model estimated trajectories from t = 0 $\mathrm { t o }$ t = 1 Each condition has a distinct colour
 
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_P5B97gZwRb/figures/002_Table_1.jpg]]
 *Table 1: NLL and CD at t $\in {0.25, 0.75}$*
@@ -284,23 +272,6 @@ $$\mathcal{L}_{\text{path}}(\theta_S) = \mathbb{E}\left[ \mathcal{S}(q_\varphi |
 - **Figure 5**: 稀疏性消融研究，展示不同锚点密度下的奖励退化。
 - **Table 7**: 度量参数化$G_{\theta_G}$的消融实验（2D任务）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_P5B97gZwRb/figures/005_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_P5B97gZwRb/figures/009_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_P5B97gZwRb/figures/012_Table_8.jpg]]
-*Table 8: Hyperparameters for semicircle experiments in §5.1*
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_P5B97gZwRb/figures/013_Table_9.jpg]]
-*Table 9: Hyperparameters for our surrogate models in the cancer therapy experiment in §5.2.1 and §5.2.3*
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_P5B97gZwRb/figures/014_Table_10.jpg]]
-*Table 10: Hyperparameters for the direct surrogate model in the cancer therapy experiment in §5.2.1*
-
-
-
 ## 定位与知识库关联
 
 ### 技术谱系与基线关系
@@ -340,8 +311,6 @@ $$\mathcal{L}_{\text{path}}(\theta_S) = \mathbb{E}\left[ \mathcal{S}(q_\varphi |
 4. **通用动态系统推断**：条件拉格朗日最优传输框架的核心思想——通过学习能量函数和度量来编码动力学偏置——能否推广到更一般的动态系统推断任务，如物理系统建模、细胞轨迹推断等？这需要验证框架在不同类型动力学先验下的泛化能力。
 
 5. **势能偏置的自适应校准**：如何根据数据分布特性自动调整势能偏置的强度系数 $\alpha$，避免在密度均匀区域过度约束路径或在密度差异极大区域产生偏置失效？
-
-
 
 ## 原文 PDF
 

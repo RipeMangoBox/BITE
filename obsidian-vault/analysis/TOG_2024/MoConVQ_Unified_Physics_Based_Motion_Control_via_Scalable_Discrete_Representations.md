@@ -52,8 +52,6 @@ MoConVQ 针对上述瓶颈，提出了一个统一的、基于物理的运动控
 
 **方法谱系与知识库定位：** MoConVQ 建立在 VAE（Kingma & Welling, 2014）和 VQ-VAE（van den Oord et al., 2017）的基础之上，与同样采用世界模型作为可微模拟器的物理运动生成工作（Won et al., 2022; Yao et al., 2022）最为接近。其关键区别在于用离散码本替代连续潜在空间，并通过残差量化扩展容量，使得运动表示天然具备语义聚类特性，便于后续与 GPT 类自回归模型及大语言模型（LLM）集成。在下游任务中，它与运动学方法 **HybrIK**（Li et al., 2021）、**SimPoE**（Yuan et al., 2021）形成互补，与文本到动作方法 **MDM**（Tevet et al., 2023）、**T2MGPT**（Zhang et al., 2023b）等形成对比。
 
-
-
 在计算机图形学与机器人学中，让物理仿真角色从大规模运动数据中学习多样化的运动技能是一个长期挑战。传统基于物理的角色控制方法通常需要为每一类运动手工设计奖励函数，并额外进行强化学习（RL）训练。这种“一类运动、一套奖励、一次训练”的范式使得系统难以扩展到大规模、非结构化的运动数据集上，也阻碍了统一运动控制框架的构建。
 
 现有工作的核心瓶颈在于**运动表示的可扩展性与语义可解释性不足**。连续潜在变量模型（如标准VAE）虽然能够压缩运动数据，但其潜在空间缺乏结构化语义，且对输入噪声极为敏感——在引入中等高斯噪声时，连续VAE的跟踪性能急剧下降，而离散表示几乎不受影响。另一方面，无模型RL方法依赖不可微的物理仿真器，训练效率低下，难以处理包含数十小时运动示例的大规模数据集。
@@ -67,8 +65,6 @@ MoConVQ的核心动机是：**能否设计一种统一的运动表示与训练�
 2. **基于模型的强化学习训练**。联合训练一个可微世界模型来近似黑箱物理仿真器，使整个解码过程可微，从而支持端到端训练。这使得大规模生成式神经网络能够在超过20小时的运动数据上高效训练。
 
 这种设计使得MoConVQ能够在统一的框架下覆盖四大应用场景（Figure 1）：运动跟踪、交互控制、文本到动作生成，以及与大语言模型（LLM）的集成。
-
-
 
 ## 核心方法与创新机理
 
@@ -102,8 +98,6 @@ $$\hat{\mathbf{a}}^t = \pi(\hat{\mathbf{s}}^t, \mathbf{u}^t), \quad \hat{\mathbf
 - **纯解码器任务**（如交互控制、文本生成动作）：训练一个独立的高层任务策略，根据特定条件（操纵杆输入、文本描述等）自回归地生成潜在码序列。
 
 这种统一范式的关键在于：所有任务共享同一个预训练的物理解码器，运动技能被封装在离散码本中，任务策略只需学习“何时调用哪个运动技能”的组合逻辑，而非从头学习物理控制。这从根本上消除了手工奖励设计的依赖，使得框架能够以统一的方式支持运动跟踪、交互控制、文本到动作生成和 LLM 集成等四种截然不同的应用场景。
-
-
 
 ![[assets/figures/papers/paper_list_l40_https_arxiv_org_abs_2310_10198/figures/001_Figure_1.jpg]]
 *Figure 1: (d) LLM Integration Fig. 1. We present a method for learning discrete motion representation from a large-scale unstructured motion dataset for physics-based characters. The framework allows various applications, including those shown in this figure, to be accomplished in a unified fashion*
@@ -140,8 +134,6 @@ MoConVQ 的统一接口支持两类下游任务配置：
 - **纯解码器任务**（如交互控制、文本到动作生成、LLM 集成）：训练独立的高层任务策略，根据特定条件（操纵杆输入、文本描述、LLM 规划）直接生成潜在码序列，无需编码器参与。
 
 这种设计使得 MoConVQ 成为一个通用运动生成平台：相同的预训练编解码器可服务于多种应用，避免了传统方法中为每类运动手工设计奖励函数并重新训练 RL 策略的繁琐流程。
-
-
 
 ### 整体流水线
 
@@ -215,14 +207,11 @@ $$ \mathcal{L}_{\mathrm{reg}} = \sum_t w_1 \| \hat{\mathbf{a}}^t - \bar{\mathbf{
 
 与硬性 EMA 后处理不同，此软约束将平滑性纳入优化目标，在保持运动自然度的同时避免过度平滑。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
 
 MoConVQ在超过20小时的大规模无结构运动数据集上进行训练，数据来源包括AMASS和LaFAN（Table 1）。训练采用基于模型的强化学习方法，联合训练一个可微世界模型来近似黑盒物理仿真器，从而使得整个解码过程可微，支持端到端的梯度优化。动作正则化采用指数移动平均（EMA）作为软约束，平滑因子β=0.8在实践中取得合理的视觉效果。
-
 
 ![[assets/figures/papers/paper_list_l40_https_arxiv_org_abs_2310_10198/figures/006_Table_1.jpg]]
 *Table 1: Motion dataset. LaFAN is from [Harvey et al. 2020], the other datasets are from AMASS [Mahmood et al. 2019]*
@@ -231,20 +220,14 @@ MoConVQ在超过20小时的大规模无结构运动数据集上进行训练，�
 
 在Human3.6M数据集上，MoConVQ与多个基线方法进行了定量比较（Table 2）。在PA-MPJPE指标上，MoConVQ达到69.3 mm，MPJPE为125.6 mm。需要指出的是，对比的基线方法（HybrIK、PhysCap、SimPoE）中，HybrIK为纯运动学方法，未引入物理约束；MoConVQ的核心优势在于生成物理正确性，而非单纯的追踪精度。在HDM05数据集上，MoConVQ的MPBPE为6.3 cm。
 
-
 ![[assets/figures/papers/paper_list_l40_https_arxiv_org_abs_2310_10198/figures/008_Table_2.jpg]]
 *Table 2: Evaluation on Human3.6M dataset. The baseline methods are HybrIK [Li et al. 2021], PhysCap [Shimada et al. 2020], and SimPoE [Yuan et al. 2021]*
 
 运动质量评估（Table 3）进一步验证了物理正确性：MoConVQ生成的运动平滑度e_smooth达到3.4，加速度变化Accel为5.1，表明模型能够产生物理合理、无明显抖动的运动序列。
 
-
-![[assets/figures/papers/paper_list_l40_https_arxiv_org_abs_2310_10198/figures/009_Table_3.jpg]]
-*Table 3: Motion quality evaluation on Human3.6M dataset*
-
 ### 文本到动作生成
 
 在HumanML3D测试集上，MoConVQ的文本到动作生成变体T2M-MoConGPT与多个最先进方法进行了比较（Table 4）。在R-precision Top1指标上，T2M-MoConGPT达到0.367，FID为0.254。作为参考，经过角色骨架重定向处理的Ground Truth运动（GT Retargeted）的R-precision Top1为0.440——这一差距表明重定向过程本身引入了系统性精度损失，构成了当前方法的性能上界约束。对比的基线方法包括基于扩散模型的MDM（Tevet et al., 2023）、基于GPT的T2MGPT（Zhang et al., 2023b）等运动学方法，MoConVQ在生成物理正确运动的同时，在语义匹配精度上与运动学方法仍存在差距。
-
 
 ![[assets/figures/papers/paper_list_l40_https_arxiv_org_abs_2310_10198/figures/016_Table_4.jpg]]
 *Table 4: Comparison with the state-of-the-art text-to-motion generation methods. We compute the metrics following [Guo et al. 2022a] on the test set of HumanML3D. Metrics for Hier [Ghosh et al. 2021], MDM [Tevet et al. 2023], TM2T [Guo et al. 2022b], and T2MGPT [Zhang et al. 2023b] has been reported in their papers. To demonstrate the effect of the retargeting process, we retarget the ground truth motion to our character and then retarget it back, the results are shown in the row of GT (Retargeted). Fig. 12. Prompt used for in-context learning with an LLM*
@@ -252,7 +235,6 @@ MoConVQ在超过20小时的大规模无结构运动数据集上进行训练，�
 ### 消融实验
 
 **向量量化的鲁棒性**是最关键的消融发现。在HDM05测试集上，当对输入运动引入中等强度的高斯噪声时，连续VAE模型的跟踪性能急剧下降，而MoConVQ的性能几乎不受影响（Figure 17）。这一结果表明，向量量化对运动数据中的噪声具有极强的鲁棒性——离散码本的量化操作天然地抑制了噪声在潜在空间中的传播，使得模型在真实世界的噪声条件下（如不完美的姿态估计输入）依然能够稳定运行。
-
 
 ![[assets/figures/papers/paper_list_l40_https_arxiv_org_abs_2310_10198/figures/020_Figure_17.jpg]]
 *Figure 17: (a) Clean motion data (b) Motion data corrupted by adding Gaussian noise $\epsilon \sim { \cal N }$ ( 0 , 0 . 1 ) Fig. 17. Tracking error of different motion representations on the same test set from HDM05 [Müller et al. 2007]. We test three models: i) The continuous VAE model with KL regularization, ii) Our MoConVQ model with 8 VQ layers, and iii) Our MoConVQ model with only the VQ layer. The curves represent kernel density estimations
@@ -280,22 +262,7 @@ MoConVQ在超过20小时的大规模无结构运动数据集上进行训练，�
 - **Figure 5**：MoConVQ的典型学习曲线显示，模型在训练初期快速收敛，随后进入稳定的精细化阶段，验证了基于模型的RL方法在大规模运动数据上的训练效率。
 - **Figure 9**：操纵杆控制信号的响应曲线表明，角色能够准确跟踪用户输入的目标速度和方向，验证了交互控制配置（decoder-only）的有效性。
 
-![[assets/figures/papers/paper_list_l40_https_arxiv_org_abs_2310_10198/figures/013_Figure_9.jpg]]
-*Figure 9: Control signals and responses. The control signals are input using a joystick, allowing the user to set the target speed and direction of movement. The upper portion of the figure shows the change in the character’s speed in response to user input. The lower portion illustrates the change in direction of movement following user input*
-
 - **Figure 10**：MoConGPT的无条件生成展示了从相同初始状态出发，通过随机采样产生多样化、平滑的运动类型和轨迹，验证了离散运动表示作为生成式运动先验的潜力。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l40_https_arxiv_org_abs_2310_10198/figures/007_Figure_6.jpg]]
-*Figure 6: Physics-based human pose estiamtion by tracking the results of HybrIK [Li et al. 2021]*
-
-![[assets/figures/papers/paper_list_l40_https_arxiv_org_abs_2310_10198/figures/014_Figure_11.jpg]]
-*Figure 11: (d) "a man is kicking with right leg" Fig. 11. Physics-based text-to-motion generation using T2M-MoConGPT*
-
-
-
-
 
 ## 定位与知识库关联
 
@@ -355,8 +322,6 @@ MoConVQ 的核心贡献在于将物理运动控制统一为**“编码-解码”
 - **LLM 闭环控制：** 如何将环境交互反馈纳入大语言模型的推理循环，使 LLM 能根据仿真结果动态调整动作序列？这涉及将物理仿真状态转化为 LLM 可理解的文本或 token 表示。
 
 - **多模态与多智能体扩展：** 框架能否扩展至多智能体协作场景，以及更丰富的多模态输入（如音乐、语音）驱动？离散码的紧凑性可能使其成为连接不同模态的自然接口。
-
-
 
 ## 原文 PDF
 

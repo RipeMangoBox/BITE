@@ -57,8 +57,6 @@ claims:
 
 **主要结果**：在 **AMUSE** 基准的六项任务上，RAFT 使开源模型 Qwen3-Omni 在最具挑战性的 Agentic 评估模式下取得显著提升——对话摘要 BLEU 从 45.08 提升至 54.54（+9.46），跨场景叙事链接准确率从 46.07% 提升至 57.26%（+11.19），相对准确率提升最高达 39.52%。消融实验证实，反思优化、对齐损失和时间正则化三者缺一不可，其中反思项对解决多说话人歧义贡献最大；移除音频或视频模态均导致性能大幅下降，表明多说话人推理高度依赖多模态信息。
 
-
-
 ### 问题背景：多说话人场景中的视听理解困境
 
 现实世界中的多说话人对话——会议、访谈、社交聚会——天然是多模态的：语音信号承载语义与说话人身份，视觉信号提供面部、唇动与空间线索，而文本转录则记录语言内容。人类在这些场景中能够无缝地整合多模态信息，持续跟踪说话人身份、理解对话流、并在时间维度上定位关键事件。然而，当前的多模态大语言模型（MLLMs）在这些能力上存在根本性缺陷。
@@ -95,8 +93,6 @@ RAFT（Reasoning Alignment Framework for Temporal and Multimodal Coherence）正
 - **Selective Reasoning Adaptation (SRA)**：一种参数高效的选择性更新策略，仅更新负责跨模态推理的参数层，在数据效率和参数效率之间取得平衡。
 
 实验表明，RAFT在AMUSE基准上实现最高**39.52%的相对准确率提升**，并在全部六个任务上一致优于PPO、DPO和GRPO等主流优化方法，验证了agentic对齐范式在多说话人理解中的有效性。
-
-
 
 ## 核心方法与创新机理
 
@@ -144,8 +140,6 @@ $$\mathcal{L}_{\mathrm{temp}} = \sum_t \left( \| f_a(t) - f_v(t) \|_2^2 + \gamma
 
 与PPO、DPO、GRPO等方法的对比实验（Table 19）表明，RAFT在全部六个AMUSE任务上均取得最优性能。差异根源在于：PPO/DPO依赖外部偏好信号，在多说话人场景中难以定义全局的“好回答”；GRPO虽引入组内相对比较，但仍缺乏对感知一致性的直接约束。RRO通过感知代理提供**可解释、可归因的细粒度反馈**，使模型明确知道错误来源（是认错了人还是搞混了时间），而非仅接收一个整体评分。
 
-
-
 RAFT 的整体流程围绕“计划—行动—反思”（Plan–Act–Reflect）的代理式推理循环构建，将多说话人视听理解显式分解为三个顺序阶段，并在训练时引入内在感知奖励与选择性参数适配，形成端到端对齐框架。
 
 ### 输入与输出定义
@@ -192,12 +186,8 @@ $$\tilde{\nabla}_{\theta_i} \mathcal{L} = \begin{cases} \nabla_{\theta_i} \mathc
 
 RAFT 支持三种递进的评估协议（见图 2）：Zero-Shot（仅原始输入）、Guided（提供外部工具输出的结构化线索）和 Agentic（模型自主发现并调用工具）。Agentic 模式是最具挑战性的设置——模型需隐式学习工具选择策略，在无任何显式提示的情况下完成 Plan–Act–Reflect 循环。消融实验表明，工具选择正确率是 Agentic 性能的关键瓶颈（见 Table 17），而 RAFT 的反思机制正是缓解这一瓶颈的核心手段。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l813_https_arxiv_org_abs_2512_16250/figures/005_Figure_3.jpg]]
 *Figure 3: RAFT framework for agentic multimodal reasoning. Given a dialogue-rich video, the model uses perception tools to extract multimodal cues. RAFT integrates SRA and RRO within a Reason–Act–Feedback loop, using perceptual consistency to refine temporal and speaker-grounded responses. RAFT ( ) module operates only during training. Dotted arrow shows that RRO passively uses perceptual feedback for reward computation rather than active control of the tools*
-
-
 
 RAFT 框架将多说话人理解建模为 **计划-行动-反思（Plan-Act-Reflect）** 的 agentic 流程，并通过四个核心模块实现多模态对齐与因果推理：结构化推理对齐、反思奖励优化、时间接地正则化、选择性推理适配。
 
@@ -264,8 +254,6 @@ $$\tilde{\nabla}_{\theta_i} \mathcal{L} = \begin{cases} \nabla_{\theta_i} \mathc
 
 消融实验（Figure 6）证实，移除任一模块均导致性能下降，其中 RRO 的反思项对解决多说话人歧义贡献最大。与 PPO、DPO、GRPO 等优化方法的对比（Table 19）进一步表明，RAFT 在所有六个 AMUSE 任务上均取得更优性能，验证了内在感知奖励与选择性适配器组合的有效性。
 
-
-
 ## 实验与关键发现
 
 ### 整体性能提升
@@ -279,14 +267,8 @@ RAFT在AMUSE基准的六个任务上为开源多模态大语言模型带来了�
 - **Speaker Temporal Grounding (STG)**：Temporal IoU从48.56提升至54.04（+5.48）（Table 5）。
 - **Cross-scene Narrative Linking (CSNL)**：准确率从46.07%提升至57.26%（+11.19），人类评判的连贯性得分从5.82提升至7.11（Table 5）。
 
-![[assets/figures/papers/paper_list_l813_https_arxiv_org_abs_2512_16250/figures/006_Table_3.jpg]]
-*Table 3: Audio-Visual Dialogue Summarization results. While closed-source models such as GPT-4o achieve strong zero-shot and guided performance, open-source MLLMs benefit substantially from RAFT training*
-
 ![[assets/figures/papers/paper_list_l813_https_arxiv_org_abs_2512_16250/figures/007_Table_4.jpg]]
 *Table 4: Performance comparison on AV Speaker Association, Next Speaker Prediction, and Speaker Re-identification tasks. Consistent performance gains for Qwen-based models after RAFT fine-tuning. Agt w/R: Agentic evaluation with RAFT finetuning*
-
-![[assets/figures/papers/paper_list_l813_https_arxiv_org_abs_2512_16250/figures/008_Table_5.jpg]]
-*Table 5: Performance on Speaker Temporal Grounding and Cross-scene Narrative Linking tasks. Human-Judged Coherence is scaled between 0-10. RAFT yields substantial gains in temporal precision and narrative coherence, especially for open-source MLLMs such as Qwen3-Omni. Ag w/R: Agentic evaluation with RAFT finetuning*
 
 论文在Introduction中声称的“最高39.52%相对准确率提升”指向的是某些具体模型-任务组合下的相对增益（例如CSNL任务上Qwen3-Omni从46.07%到57.26%，相对提升约24.3%；更小的基线模型可能获得更大的相对提升）。整体而言，RAFT对开源模型的赋能效果尤为突出，使其在多个任务上逼近甚至超越闭源模型**GPT-4o**的Zero-Shot/Guided表现。
 
@@ -309,12 +291,6 @@ RAFT在AMUSE基准的六个任务上为开源多模态大语言模型带来了�
 
 - 在Qwen3-Omni上，SRA仅使用LoRA十分之一的可训练参数量，即达到同等或更高的AMUSE平均得分（Table 15 / Figure 10）。
 - 参数效率曲线（Figure 10）显示，SRA在极低参数预算下即迅速收敛至高性能区间，而LoRA需要更大的参数规模才能匹配。
-
-![[assets/figures/papers/paper_list_l813_https_arxiv_org_abs_2512_16250/figures/024_Table_15.jpg]]
-*Table 15: Performance vs. trainable parameter budget. SRA matches or exceeds LoRA with an order of magnitude fewer parameters*
-
-![[assets/figures/papers/paper_list_l813_https_arxiv_org_abs_2512_16250/figures/025_Figure_10.jpg]]
-*Figure 10: Average AMUSE score vs. fraction of trainable parameters for LoRA and SRA on Qwen3-Omni. RAFT with SRA achieves higher performance at significantly lower parameter budgets*
 
 这一结果验证了选择性梯度掩码策略 $\tilde{\nabla}_{\theta_i} \mathcal{L}$ 的有效性——多说话人推理能力的提升并不需要对整个模型进行全参数或全层微调，精准更新跨模态交互层即可实现高效对齐。
 
@@ -341,16 +317,6 @@ RAFT在全部六个AMUSE任务上均优于**PPO**（Schulman et al., 2017）、*
 
 ![[assets/figures/papers/paper_list_l813_https_arxiv_org_abs_2512_16250/figures/032_Table_19.jpg]]
 *Table 19: Comparison of RAFT with PPO, DPO, and GRPO across AMUSE tasks on Qwen3-Omni. We report task-specific metrics. B@4: BLEU score*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l813_https_arxiv_org_abs_2512_16250/figures/004_Figure_2.jpg]]
-*Figure 2: Evaluation Protocols. Zero-Shot, Guided, and Agentic where MLLMs reason over raw input, use auxiliary cues (e.g., faces, transcripts), or invoke external tools (e.g., Whisper, Pyannote, InsightFace)*
-
-![[assets/figures/papers/paper_list_l813_https_arxiv_org_abs_2512_16250/figures/002_Table_1.jpg]]
-*Table 1: Comparison of multi-speaker audio-visual benchmarks. AMUSE uniquely integrates temporal, causal, and identitybased reasoning within overlapping multi-speaker settings. Unlike prior datasets focused on perception-only tasks, AMUSE aligns audio-visual perception with structured reasoning to benchmark agentic, human-like understanding of multi-party discourse*
-
-
 
 ## 定位与知识库关联
 
@@ -419,8 +385,6 @@ RAFT的性能边界受以下因素制约：
 3. **重叠语音的根本性处理**：当前框架将重叠语音的挑战留给感知工具和模型推理共同承担，但Figure 11表明这一策略存在上限。是否需要将语音分离作为可微分模块嵌入训练流程，而非作为黑盒工具调用，是一个架构层面的开放选择。
 
 4. **长程跨场景叙事**：CSNL任务涉及跨视频片段的叙事链接，当前RAFT主要依赖单片段内的时序建模。对于需要跨多个对话场景进行人物关系推理的复杂叙事，是否需要引入外部记忆机制或图结构推理，值得探索。
-
-
 
 ## 原文 PDF
 

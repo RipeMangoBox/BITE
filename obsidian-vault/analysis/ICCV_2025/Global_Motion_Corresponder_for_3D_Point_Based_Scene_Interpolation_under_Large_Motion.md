@@ -59,8 +59,6 @@ claims:
 
 **局限性**：方法假设输入的两个时间步的三维高斯重建质量较高；训练涉及多阶段和多个超参数；目前仅支持两个已知状态间的插值与外推，尚未扩展到连续多帧序列。
 
-
-
 ### 问题背景：三维场景插值中的大运动挑战
 
 三维场景插值（3D scene interpolation）旨在从两个已知时间步的多视角观测中，生成连续、平滑的中间状态渲染。这项任务在视觉特效、动态场景重建和自由视点视频中具有重要应用价值。近年来，基于三维高斯泼溅（3D Gaussian Splatting, 3DGS）的方法因其高效的渲染能力和显式的点云表示而受到广泛关注。然而，现有方法普遍依赖一个隐含假设：相邻时间步之间的运动幅度较小，因此可以通过**局部最近邻匹配**来建立点对应关系，进而推断运动轨迹。
@@ -86,8 +84,6 @@ Figure 1 清晰地揭示了这一假设的脆弱性：当帧间运动较小时�
 - 在建立全局对应的同时保持局部运动的一致性（局部刚性）。
 
 本文提出 **Global Motion Corresponder (GMC)**，核心思想是：**用可学习的一元势场（unary potential field）预测每个高斯的 SE(3) 变换，将两个时间步的高斯点对齐到一个共享规范空间（shared canonical space），从而将点对应问题转化为规范空间中的最近邻匹配问题**。这一设计从根本上绕开了局部搜索的局限，使得即使在大幅度全局运动下也能建立正确的对应关系。同时，通过引入 PCA 降维的 DINO 语义特征和局部等距损失，GMC 在语义平滑性和局部刚性之间取得了平衡，实现了鲁棒的大运动插值乃至外推。
-
-
 
 ## 核心方法与创新机理
 
@@ -130,8 +126,6 @@ DINO 特征提供了语义感知能力，使网络能够区分外观相似但语
 
 GMC 的四项创新形成了一套完整的因果链条：**DINO 语义特征**提供高层判别信息 → **一元势场 MLP** 学习 SE(3) 映射 → **共享规范空间**实现隐式对齐 → **能量损失 + 局部等距损失**联合优化确保对应质量和运动平滑性。这套机制使得 GMC 在合成全局运动场景上以 SI-FID 224.42 和 SI-MPED 16.47 显著优于 Dynamic Gaussian（283.53 / 824.50），并在真实世界全局运动场景上保持了类似的优势。
 
-
-
 GMC 的整体管道围绕一个核心思想展开：**用可学习的一元势场（Unary Potential Field）取代直接的点对点匹配，将两个时间步的高斯点云映射到一个共享规范空间（Shared Canonical Space）中完成对齐**。该方法不依赖真实运动轨迹，仅需两个时刻的多视角图像即可实现大运动下的场景插值与外推。其工作流程如图 Figure 4 所示，可分为四个阶段。
 
 ![[assets/figures/papers/paper_list_l44_https_arxiv_org_abs_2508_20136/figures/004_Figure_4.jpg]]
@@ -158,8 +152,6 @@ $$\mathcal{L}_{\mathrm{E}} = \sum_{g_i \in \mathcal{G}_0} \min_{g_j \in \mathcal
 **阶段四：运动插值与外推。** 利用学到的 SE(3) 变换，计算每个高斯从 $t=0$ 到 $t=1$ 的相对变换，并对旋转部分使用 SLERP 插值、平移部分使用线性插值，生成任意中间时刻 $t \in (0,1)$ 的运动状态。外推则通过 $t < 0$ 或 $t > 1$ 实现。
 
 **输入输出流总结：** 输入为两个时刻的多视角图像；输出为连续时间轴上任意时刻的新视角渲染图像。中间产物包括预训练的 3DGS 模型、PCA-DINO 特征、学到的 SE(3) 变换场，以及规范空间中的点对应关系。
-
-
 
 ### 问题建模：直接匹配的困境
 
@@ -231,8 +223,6 @@ $$\mathcal{L}_{\mathrm{render}} = \beta \mathcal{L}_{\mathrm{RGB}}(\pmb{I}_0, \h
 
 其中 $\beta$ 用于平衡两个时间步的渲染贡献，$\hat{\pmb{I}}_0, \hat{\pmb{I}}_1$ 为渲染图像。
 
-
-
 ## 实验与关键发现
 
 ### 实验设置与评估指标
@@ -257,10 +247,6 @@ Table 1 报告了 8 个合成全局运动场景（Ball、Boat、Butterfly、Car�
 ![[assets/figures/papers/paper_list_l44_https_arxiv_org_abs_2508_20136/figures/024_Figure.jpg]]
 
 ![[assets/figures/papers/paper_list_l44_https_arxiv_org_abs_2508_20136/figures/025_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l44_https_arxiv_org_abs_2508_20136/figures/027_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l44_https_arxiv_org_abs_2508_20136/figures/029_Figure.jpg]]
 
 ### 合成局部运动场景的结果
 
@@ -290,12 +276,6 @@ Table 4 的消融研究系统性地验证了各模块的贡献。完整模型在
 
 GMC 的变换学习机制还带来了一个额外收益：通过联合优化渲染损失，GMC 能改善 3DGS 在稀疏视图下的重建质量。Table 5 报告了稀疏-密集视图设置（起始状态 100 视图，终止状态 10 或 5 视图）的结果，GMC 在 PSNR、SSIM 和 LPIPS 上均显著优于 vanilla 3DGS。Table 6 进一步验证了在稀疏-稀疏视图设置（双方均仅有 5-10 个训练视图）下的改进。Figure 8 的定性结果展示了这一提升的视觉效果。
 
-![[assets/figures/papers/paper_list_l44_https_arxiv_org_abs_2508_20136/figures/012_Table_5.jpg]]
-*Table 5: Novel View Synthesis for Sparse-Dense View Setting. For the synthetic scenes, the start state has 100 dense training views, while the end state has 10 sparse training views. For real-world scenes (Shoe, tapeline, and Box), the end state has 5 sparse training views. The results are reported as the mean value of test views for each scene*
-
-![[assets/figures/papers/paper_list_l44_https_arxiv_org_abs_2508_20136/figures/014_Table_6.jpg]]
-*Table 6: Novel View Synthesis in Sparse + Sparse View Setting. For the scenes Car and Microwave, both states have 10 training views; for Box, both states have 5 training views. The results are reported as the mean value of test views for each scene*
-
 ### 失败模式与局限性
 
 尽管 GMC 在大运动场景中表现出色，其性能仍受以下因素制约：
@@ -303,14 +283,6 @@ GMC 的变换学习机制还带来了一个额外收益：通过联合优化渲�
 - **对初始重建质量的依赖**：GMC 假设输入的两个时间步的 3DGS 重建是高质量的。稀疏或噪声输入会降低对应质量，进而影响插值效果。
 - **超参数敏感性**：训练涉及多个阶段和超参数（α 逐步增大、k 近邻数量、能量项权重 w 等），可能需要针对新场景进行一定调整。
 - **两帧限制**：当前方法仅限于在两个已知状态之间进行插值和外推，未处理连续多帧或高度动态的长序列。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l44_https_arxiv_org_abs_2508_20136/figures/017_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l44_https_arxiv_org_abs_2508_20136/figures/010_Table.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -352,8 +324,6 @@ GMC 的变换学习机制还带来了一个额外收益：通过联合优化渲�
 4. **规范空间与高斯参数的一体化**：共享规范空间的学习目前与高斯参数的优化是分离的。是否可以进一步耦合以提升紧凑性和端到端的可训练性，是一个值得探索的方向。
 
 5. **评估指标的局限性**：所有评估基于预定义的平滑性指标（SI-FID、SI-EMD、SI-MPED），由于缺乏真实运动轨迹，无法评估轨迹的绝对准确性。这意味着 GMC 的“正确性”实际上是“视觉平滑性”的代理，而非几何真值的验证。
-
-
 
 ## 原文 PDF
 

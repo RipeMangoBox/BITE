@@ -51,8 +51,6 @@ claims:
 
 实验表明，在混合边界问题中，BVC 在等时间预算下获得远优于逐点 WoSt 的平滑解和梯度（Fig. 5, Fig. 7），密集网格评估时因样本复用而效率急剧提升。方法对低质量几何具有天然鲁棒性，且支持渐进式评估和输出敏感的子域聚焦计算。在纯 Dirichlet 问题上，BVC 方差高于专用双向方法（Qi et al., Computer Graphics Forum 2022），但在混合边界场景中无可比拟；在 Dirichlet 主导的高频边界条件下，缓存策略效率下降。针对奇异 Green 函数引起的边界伪影，BVC 引入基于积分分裂的无偏校正策略（式 8），在消除伪影的同时避免偏差。
 
-
-
 偏微分方程（PDE）是计算机图形学与几何处理中描述物理现象的核心工具。许多视觉计算任务——从流体模拟、热传导到曲面参数化——最终都归结为在复杂几何域上求解椭圆型方程。本文关注一类混合边界条件的屏蔽泊松方程：
 
 $$
@@ -84,8 +82,6 @@ $$
 其中 $G$ 为自由空间 Green 函数。该表达式的关键在于：**一旦边界上的未知量——Dirichlet 边界上的法向导数 $\partial u / \partial n$ 和 Neumann 边界上的解 $u$——被确定，任意内部点 $x$ 的解便可仅通过积分（而非随机行走）计算**。而 WoS/WoSt 恰好能够在单个边界点处估计这些未知量。
 
 由此，本文的核心动机自然浮现：**仅在边界随机采样点上通过少量随机行走估计未知边界数据并缓存，随后利用 BIE 对所有内部评估点进行廉价的蒙特卡洛积分估计。** 这一“边界值缓存”（Boundary Value Caching, BVC）策略将随机行走的次数与内部评估点数量解耦，使密集评估的计算代价大幅降低，同时继承点估计器的无偏性、渐进性、输出敏感性及对低质量几何的鲁棒性。
-
-
 
 ## 核心方法与创新机理
 
@@ -130,8 +126,6 @@ $$\int_{\partial R} \left.\frac{\partial G}{\partial n}\right|_c (x,z) u(z) \,dz
 
 值得注意的是，BVC作为通用缓存策略，在纯Dirichlet问题上的方差高于专用方法（如**Qi et al. 2022**的双向WoS，Computer Graphics Forum 2022），但在混合边界问题中无可比拟。此外，在Dirichlet主导的高频边界条件问题中，缓存策略效率下降，原因包括随机行走路径变短、未对BIE奇异函数进行重要性采样，以及法向导数估计的噪声影响增大（Fig. 16 bottom row）。
 
-
-
 BVC 的整体工作流围绕“边界采样—点估计—缓存复用—积分求值”四个阶段构建，其核心思想是将随机行走的计算负载从每个内部评估点转移到少数边界样本上，并通过边界积分方程（BIE）实现样本的高效复用。
 
 **输入与预处理。** 方法接受混合边值问题定义（式1），包含 Dirichlet 边界 $\partial\Omega_D$ 上的已知解 $g$、Neumann 边界 $\partial\Omega_N$ 上的已知法向导数 $h$、源项 $f$ 以及常数 $\sigma$。对于内部求解，需构造一个闭合区域，其边界由 Neumann 边界 $\partial\Omega_N$ 和偏移 Dirichlet 边界 $\partial\Omega_D^l$（$l > \varepsilon$）组成（Figure 9），以确保边界样本落在 $\varepsilon$-壳层之外。若仅关注子域 $\mathcal{R} \subset \Omega$，则可仅在 $\partial\mathcal{R}$ 上采样，实现输出敏感计算（Figure 8）。
@@ -153,12 +147,8 @@ BVC 的整体工作流围绕“边界采样—点估计—缓存复用—积分�
 
 **输出。** 最终输出为所有评估点上的解 $u(x_k)$ 和梯度 $\partial u/\partial x(x_k)$ 的蒙特卡洛估计值。整个流程不引入除 WoSt 点估计器本身可控偏差（$\varepsilon$-壳终止）之外的任何额外偏差，同时大幅降低了总随机行走次数（Fig. 1）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l51_https_arxiv_org_abs_2302_11825/figures/013_Figure_14.jpg]]
 *Figure 14: For Dirichlet problems, our method o en has higher variance than Qi et al. [2022]’s specialized approach for these boundary conditions*
-
-
 
 ### 边界积分表示与缓存估计框架
 
@@ -226,8 +216,6 @@ $$
 
 BVC支持渐进式评估：通过生成新的缓存并将贡献累加到现有估计中（Algorithm 1函数UpdateSolution），用户可在任意时刻获得当前最佳估计。更重要的是，方法天然支持**输出敏感**的局部评估——用户可定义感兴趣的子域 $R \subset \Omega$，仅在其边界 $\partial R$ 上生成和缓存样本，从而将计算聚焦于特定区域（Figure 8），无需像传统边界元方法（BEM）那样进行全局求解。
 
-
-
 ## 实验与关键发现
 
 ### 主要结果
@@ -252,8 +240,6 @@ BVC 在混合边界条件问题上的核心优势体现在**样本复用带来�
 
 所有与逐点估计器的比较均在等时间预算下进行，确保计算资源公平分配。与 BEM 的比较侧重于网格质量对求解精度的影响。与 Qi et al. 2022 的比较限定于纯 Dirichlet 问题，BVC 在该设定下并非最优，但其通用性使其在混合边界问题中无可替代。需注意，主要结果的评估依赖定性视觉质量而非定量误差指标，原因在于测试场景缺少解析解或高精度参考解。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l51_https_arxiv_org_abs_2302_11825/figures/007_Figure_7.jpg]]
 *Figure 7: Our gradients have considerably less noise compared to pointwise estimates as they use known values for 𝜕𝑢/𝜕𝑛 on the Neumann boundary to evaluate Equation (5). In contrast, WoSt gradients become noisier away from the Dirichlet boundary as estimation requires longer random walks*
 
@@ -262,8 +248,6 @@ BVC 在混合边界条件问题上的核心优势体现在**样本复用带来�
 
 ![[assets/figures/papers/paper_list_l51_https_arxiv_org_abs_2302_11825/figures/016_Figure_17.jpg]]
 *Figure 17: Top: Se ing the 𝑙 ofset parameter to 0.1 × 𝜀 efectively sets each Dirichlet boundary sample’s 𝜕𝑢/𝜕𝑛 estimate to zero, as balls centered at each sample point are contained entirely inside the epislon shell—this biases the solution estimate inside the domain. Bias diminishes with increasing ofset values. Bo om: Smaller values of the bound 𝑐 for 𝜕𝐺/𝜕𝑛 in Equation (8) suppress singular artifacts near the boundary but biases interior estimates without our correction strategy, shown here on a model scaled to fit inside a unit sphere*
-
-
 
 ## 定位与知识库关联
 
@@ -314,8 +298,6 @@ BVC 与 BEM 的**关键分水岭**在于：BEM 将计算负载集中于全局线
 3. **混合策略**：是否可将双向 WoS（Qi et al. 2022）整合到缓存框架中，在纯 Dirichlet 区域自动切换至更高效的专用估计器？
 4. **自适应参数调节**：如何自动设置钳位参数 *c*，以及如何借鉴虚拟点光源（VPL）文献中的技术自适应调节奇异函数校正？
 5. **域分解与复杂拓扑**：如何在蒙特卡洛框架下设计域分解策略，有效处理薄特征和复杂拓扑域？
-
-
 
 ## 原文 PDF
 

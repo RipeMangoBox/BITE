@@ -55,8 +55,6 @@ claims:
 
 FlashVSR首次将单步蒸馏、流式训练范式与局部约束稀疏注意力统一于扩散式VSR，为实时高分辨率视频增强提供了可行路径。项目代码与模型将开源。
 
-
-
 ### 扩散模型在视频超分辨率中的潜力与瓶颈
 
 视频超分辨率（Video Super-Resolution, VSR）旨在从低分辨率（Low-Resolution, LR）视频帧中重建高保真的高分辨率（High-Resolution, HR）输出，是视频增强、云游戏、流媒体传输等应用中的核心任务。近年来，扩散模型凭借其强大的生成先验，在图像和视频恢复中展现出卓越的感知质量，但其高昂的计算开销和推理延迟严重制约了实际部署，尤其是在需要实时处理的流式场景中。
@@ -88,8 +86,6 @@ FlashVSR的关键洞察在于识别了VSR与视频生成之间的本质差异。
 - **端到端效率优化**：设计轻量条件解码器，大幅降低VAE解码的计算瓶颈，同时保持重建质量。
 
 这些目标共同驱动了FlashVSR的三阶段蒸馏框架和配套的系统优化策略，使其成为首个面向实时流式处理的单步扩散VSR方法。
-
-
 
 ## 核心方法与创新机理
 
@@ -139,8 +135,6 @@ $$\mathcal { L } = \Vert x _ { \mathrm { p r e d } } - x _ { \mathrm { g t } } \
 
 上述四个 changed slots 并非孤立优化，而是形成正向耦合：单步蒸馏降低去噪步数，并行训练消除串行依赖，稀疏注意力压缩单步计算量，TC Decoder 加速像素空间重建。最终，FlashVSR 在单张 A100 上以 **17 FPS** 处理 768×1408 视频，峰值显存仅 **11.13 GB**（SeedVR2-3B 为 52.88 GB），节省约 **78.9%**，首次将扩散式 VSR 推至实时流式处理的门槛。
 
-
-
 FlashVSR 的整体框架围绕**三阶段蒸馏**构建，将预训练视频扩散模型逐步转化为可实时流式推理的单步超分辨率系统。图 2 给出了端到端的训练与推理流程。
 
 ### 核心设计理念
@@ -167,15 +161,8 @@ $$z_t = G_{\mathrm{one}}(\mathrm{LR}_t, \epsilon_t; \mathrm{KV}_{<t})$$
 
 单步模型 $G_{\mathrm{one}}$ 以当前 LR 帧和噪声隐变量为输入，利用缓存的键值对 $\mathrm{KV}_{<t}$ 整合历史上下文，生成当前帧的高分辨率隐变量 $z_t$，再经 TC Decoder 解码为最终输出帧。KV-cache 在后期层传递干净特征，隐式维持时间一致性，无需显式输入历史预测帧。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l873_https_arxiv_org_abs_2510_12747/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the three-stage training pipeline of FlashVSR, covering video–image joint SR training, adaptation with block-sparse causal attention for streaming inference, and distributionmatching one-step distillation combined with reconstruction supervision*
-
-![[assets/figures/papers/paper_list_l873_https_arxiv_org_abs_2510_12747/figures/012_Figure_7.jpg]]
-*Figure 7: Illustration of the sink attention effect in specific attention heads*
-
-
 
 ### 三阶段蒸馏流水线
 
@@ -239,18 +226,11 @@ $$
 
 其中 $z_t$ 为当前帧的预测隐变量，$\mathrm{LR}_t$ 为当前低分辨率帧，$\epsilon_t$ 为噪声，$\mathrm{KV}_{<t}$ 为缓存的历史键值对。此设计使训练和推理均可仅依赖低分辨率帧和噪声隐变量，支持高效的并行训练，同时将前瞻延迟从传统分块方法的约 80 帧降至仅 8 帧。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l873_https_arxiv_org_abs_2510_12747/figures/004_Figure_4.jpg]]
 *Figure 4: Training pipeline of the TC Decoder*
 
 ![[assets/figures/papers/paper_list_l873_https_arxiv_org_abs_2510_12747/figures/011_Figure_6.jpg]]
 *Figure 6: Architecture of the Causal LR Projection-In Layer*
-
-![[assets/figures/papers/paper_list_l873_https_arxiv_org_abs_2510_12747/figures/003_Figure_3.jpg]]
-*Figure 3: Locality-Constrained Sparse Attention. Left: At ultra-high resolutions, performing inference beyond the trained positional encoding range produces artifacts (e.g., repetition or blur). Restricting each query to a local attention window keeps the positional encoding range consistent between training and inference, thereby preventing artifacts. Right: Two local window rules, namely boundary-preserved and boundary-truncated, are illustrated. The final sparse attention mask is computed within these local masks*
-
-
 
 ## 实验与关键发现
 
@@ -269,9 +249,6 @@ FlashVSR 在多个合成与真实世界基准上进行了定量评估，涵盖 Y
 流式处理模式下，FlashVSR 的前瞻延迟仅为 **8 帧**，而传统分块方法（如 STAR 的 32 帧，其他方法的约 80 帧）需等待完整片段才能输出，这使得 FlashVSR 更适合在线应用场景。
 
 用户研究（Table 7）采用盲评 GSB 测试，覆盖五个单步 VSR 模型在 32 个测试集（含真实与 AIGC 退化视频）上的表现。FlashVSR 在总体质量、视频保真度和视频质量三个维度上均获得最高偏好分数，验证了其感知质量优势。
-
-![[assets/figures/papers/paper_list_l873_https_arxiv_org_abs_2510_12747/figures/018_Table_7.jpg]]
-*Table 7: User study results (GSB scores, in %) for five one-step VSR models on 32 test sets, including both real-world and AIGC-degraded videos. Higher values indicate stronger user preference*
 
 ### 消融实验
 
@@ -295,21 +272,8 @@ FlashVSR 在多个合成与真实世界基准上进行了定量评估，涵盖 Y
 
 5. **训练资源消耗**：三阶段蒸馏流程需 32 张 A100 GPU 和数天训练时间，对资源受限的研究者构成一定门槛。模型压缩（量化、剪枝）与轻量化架构设计是未来降低训练和部署成本的方向。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l873_https_arxiv_org_abs_2510_12747/figures/007_Table_3.jpg]]
-*Table 3: Sparse vs. Full Attention*
-
 ![[assets/figures/papers/paper_list_l873_https_arxiv_org_abs_2510_12747/figures/008_Table_4.jpg]]
 *Table 4: Ablation of tiny conditional decoder*
-
-![[assets/figures/papers/paper_list_l873_https_arxiv_org_abs_2510_12747/figures/010_Table_5.jpg]]
-*Table 5: Ablation of Locality-constrained Attention. Both Boundary-Truncated and Boundary-Preserved outperform Global Attention across all metrics. Best in red, second-best in blue*
-
-![[assets/figures/papers/paper_list_l873_https_arxiv_org_abs_2510_12747/figures/013_Table_6.jpg]]
-*Table 6: Quantitative results of different KV-cache eviction strategies on the REDS dataset*
-
-
 
 ## 定位与知识库关联
 
@@ -389,8 +353,6 @@ FlashVSR 的适用边界和局限可从以下几个维度审视：
 6. **多帧融合上限**：当前流式设计仅缓存 8 帧历史信息，更长的时间窗口（如 16 或 32 帧）是否能带来质量增益？增益的边际递减点在哪里？
 
 7. **跨退化类型泛化**：在不同于 RealBasicVSR 退化管线的真实世界退化（如压缩伪影、传感器噪声）上，模型的鲁棒性如何？是否需要退化感知的条件注入？
-
-
 
 ## 原文 PDF
 

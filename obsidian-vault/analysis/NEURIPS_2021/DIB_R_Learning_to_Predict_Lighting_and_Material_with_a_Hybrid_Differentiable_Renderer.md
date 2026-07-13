@@ -50,8 +50,6 @@ claims:
 
 实验表明，在合成金属车数据集上，MC 着色在光照 NCC 指标上达到 **0.074**，相比 SH 基线（0.220）提升约 3 倍；在光滑车数据集上，SG 着色能正确解耦反射与光照，预测的反照率图中无白色高光残留。在真实图像（StyleGAN 生成图像和 LSUN 汽车）上，DIB-R++ 同样展现出方向性高光和干净纹理的预测能力，验证了框架的跨域泛化性。
 
-
-
 从单张图像中恢复三维几何、材质和光照是计算机视觉与图形学中的核心逆问题。该问题的关键在于，观测到的像素颜色是几何、表面反射属性和环境光照三者耦合的结果，要从中解耦出各自独立的成分极具挑战性。
 
 近年来，基于可微渲染的单图像三维重建方法取得了显著进展。以 **DIB-R**（Chen et al., NeurIPS 2019）为代表的光栅化可微渲染器，通过将前向渲染过程完全可微化，使得从图像空间梯度反向传播到三维属性成为可能。然而，这类方法在材质与光照建模上存在一个关键瓶颈：它们通常采用朗伯特（Lambertian）漫反射表面假设，并将环境光照表示为低频的球面谐波（Spherical Harmonics, SH）系数。这种简化虽然保证了计算的稳定性和效率，却无法处理真实世界中普遍存在的非朗伯特高光反射——例如金属表面的镜面高光或光滑漆面的光泽反射。其直接后果是，材质与光照的解耦质量不佳：镜面反射成分往往被错误地吸收进漫反射反照率纹理中，而光照估计也因缺乏高频建模能力而严重模糊。
@@ -59,8 +57,6 @@ claims:
 这一瓶颈的因果机制在于：朗伯特表面模型从根本上抹去了视角依赖的反射信息，使得渲染方程中唯一可优化的光照项被迫去解释所有非漫反射的像素变化，从而导致材质与光照的纠缠。要从单张图像中有效分离高光材质与光照，必须在渲染管线中引入支持视角依赖反射的物理着色模型，并相应地升级光照表示以捕获高频环境细节。
 
 本文提出的 **DIB-R++** 正是针对上述缺口而设计。其核心动机是：通过在光栅化渲染器基础上引入基于物理的着色模型——具体而言，采用简化的 Disney BRDF 以支持镜面反射率、粗糙度和金属度等材质参数，并分别提供蒙特卡洛重要性采样（MC）和球面高斯解析积分（SG）两种着色策略——使得混合可微渲染框架能够在保留光栅化效率的同时，支持高光BRDF和环境光照的建模。这为从单张图像中联合推理几何、反射属性和光照提供了必要的表达力，从而有望在无三维监督的条件下显著提升解耦质量。
-
-
 
 ## 核心方法与创新机理
 
@@ -96,8 +92,6 @@ DIB-R++ 的核心洞察在于：将光栅化的几何处理效率与基于物理
 ### 5. 方法定位
 
 DIB-R++ 并非对现有可微渲染管线的全面替代，而是在光栅化渲染器基础上的一次**着色层升级**。其核心贡献在于证明了：即使不引入完整的光线追踪，仅通过延迟着色阶段的物理模型增强，也能显著提升材质-光照解耦质量。这一思路为后续工作提供了清晰的扩展方向——在保持光栅化效率的同时，通过更丰富的材质先验或间接光照建模进一步提升解耦精度。
-
-
 
 DIB-R++ 采用**延迟着色（deferred shading）**范式，将可微渲染拆分为两个解耦的阶段：光栅化阶段与着色阶段。这一设计使几何生成与光照计算在梯度流上保持独立，从而允许在光栅化管线中引入基于物理的着色模型，而不牺牲几何优化的可微性。
 
@@ -135,15 +129,11 @@ MC 着色与 SG 着色并非并列的备选方案，而是针对不同反射特�
 
 这种“混合”设计是 DIB-R++ 的核心创新点——它不是简单地替换着色器，而是根据目标表面的反射特性灵活选择最合适的近似策略，从而在单张图像逆渲染任务中同时处理从漫反射到高光的广泛外观。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2111_00140/figures/001_Figure_1.jpg]]
 *Figure 1: Overview. Given a 3D mesh M, we employ (a) a rasterization-based renderer to obtain diffuse albedo, surface normals and mask maps. In the shading pass (b), we then use these buffers to compute the incident radiance by sampling or by representing lighting and the specular BRDF using a spherical Gaussian basis. Depending on the representation used in (c), we can recover a wide gamut of specular/glossy appearances (d)*
 
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2111_00140/figures/007_Figure_6.jpg]]
 *Figure 6: Results on real imagery from the StyleGAN-generated dataset (cars and white female faces). Our method can recover a meaningful decomposition as opposed to [62], as shown by cleaner texture maps and directional highlights (e.g., car windshield). Even when using monochromatic lighting on faces, our method can correctly predict the specular highlights on the forehead and none in the hair, while SH produces dark artifacts*
-
-
 
 DIB‑R++ 将渲染过程拆分为两个阶段：**光栅化阶段** 与**着色阶段**，构成一个基于延迟着色的混合可微渲染框架。
 
@@ -201,8 +191,6 @@ $$\mathcal{L}(\vartheta) = \alpha_{\mathrm{im}} \mathcal{L}_{\mathrm{im}}(\tilde
 
 四项损失分别为：渲染图像与真值的 L1 损失、掩膜 IoU 损失、感知损失以及形状参数的 Laplacian 平滑正则项。通过该损失函数，网络无需 3D 监督即可从单张图像中解耦几何、高光材质与环境光照。
 
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -245,8 +233,6 @@ Figure 8 展示了 SG 着色方法在解耦质量上的直接应用收益：得�
 ### 实验公平性说明
 
 所有方法在相同的合成数据集和相近的超参数设置下训练。基线方法 DIB-R with RGB SH 是原始 DIB-R 在光照建模上的自然扩展（将标量 SH 系数替换为 RGB SH），对比公平。MC 和 SG 变体共享相同的光栅化阶段和预测网络架构，差异仅在于着色模型的选择，消融结论可靠。
-
-
 
 ## 定位与知识库关联
 
@@ -296,8 +282,6 @@ DIB-R++ 的适用性受以下因素制约：
 - **真实图像泛化**：当前方法在 StyleGAN 生成数据集上训练，向自然真实图像的跨域泛化仍需进一步验证和改进。
 
 **注**：论文中未提供具体的发表会议/年份信息，上述分析基于已验证的分析数据和原文证据。若需补充完整的文献元数据，建议手动核实原始论文的出版信息。
-
-
 
 ## 原文 PDF
 

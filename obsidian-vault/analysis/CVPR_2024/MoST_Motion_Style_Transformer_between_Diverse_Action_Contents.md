@@ -74,8 +74,6 @@ MoST 属于**基于 Transformer 的显式风格解耦与注意力调制**范式�
 - 仅在小型动捕数据集（Xia、BFA）上验证，未在更大规模或野外数据集上测试。
 - 未探索少样本或零样本场景下的风格迁移能力。
 
-
-
 ### 运动风格迁移的核心挑战
 
 运动风格迁移（Motion Style Transfer）旨在将源运动的“风格”注入目标运动，同时保持目标运动的“内容”（即动作类别）不变。这一任务在角色动画、游戏开发和电影制作中具有重要应用价值。然而，现有方法面临一个根本性瓶颈：**它们无法在不同内容的运动之间有效迁移风格**。当风格运动与内容运动的动作类型不同时（例如，将“出拳”的风格迁移到“踢腿”上），先前方法往往产生严重扭曲或完全失败的结果。
@@ -109,8 +107,6 @@ MoST 属于**基于 Transformer 的显式风格解耦与注意力调制**范式�
 - **风格解耦损失（$L_D$）**：最小化使用相同风格但不同内容风格运动时生成结果的差异，强制网络将风格与内容分离。这解决了“隐式解耦不可靠”的问题。
 
 此外，MoST 在输入嵌入中引入全局平移和速度标记，通过注意力机制与身体部位特征交互，直接生成包含一致全局运动的输出，从而消除了对后处理全局平移的依赖；同时引入基于物理的脚部接触正则项（$R_{foot}$），间接促进合理的脚-地接触，减少滑步和漂浮现象。
-
-
 
 ## 核心方法与创新机理
 
@@ -150,8 +146,6 @@ $$L_{phy} = \lambda_{vel} R_{vel} + \lambda_{acc} R_{acc} + \lambda_{foot} R_{fo
 
 **需要手动验证的点**：Table 1 中与其他基线方法（Park et al., PACMCGIT 2021; Wen et al., CVPR 2021）的完整定量对比数值在提供的证据中缺失，仅确认 MoST 取得了最低的 CC 和 SC++。建议查阅原文获取精确数值以完善对比论述。
 
-
-
 MoST的整体框架由三个核心模块构成：**Siamese运动编码器（E）**、**部位感知风格调制器（PSM）** 和**运动生成器（G）**，三者协同完成从任意内容运动到任意风格运动的迁移，无需任何启发式后处理。
 
 ### 输入输出流
@@ -185,8 +179,6 @@ PSM接收三个输入——内容运动的内容特征 $C^C$（由 $Y^C$ 经实�
 
 ![[assets/figures/papers/paper_list_l3_MoST_Motion_Style_Transformer_between_Diverse_Action_Contents/figures/002_Figure_2.jpg]]
 *Figure 2: (a) Overall framework of MoST comprising Siamese motion encoders E, motion generator ${ \mathcal { G } }$ , and part-attentive style modulator (PSM). PSM modulates style feature $S ^ { S }$ under the condition of both contents of content motion and style motion, i.e., $\dot { C } ^ { C }$ and $C ^ { S } . \mathcal { G }$ generates final output motion with content dynamics feature $Y ^ { C }$ and the modulated style feature $\tilde { S } ^ { S }$ . (b) Detailed operations in PSM*
-
-
 
 ### 整体框架
 
@@ -257,15 +249,8 @@ $$L_{phy} = \lambda_{vel} R_{vel} + \lambda_{acc} R_{acc} + \lambda_{foot} R_{fo
 
 其中 $R_{foot}$ 惩罚接地帧的脚部速度，间接促进合理的脚部接触，替代了先前方法中启发式后处理的需求。但需注意，该损失无法完全消除脚部滑动问题（见局限性）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l3_MoST_Motion_Style_Transformer_between_Diverse_Action_Contents/figures/003_Figure_3.jpg]]
-*Figure 3: Description of evaluation metrics, using easy-to-recognize label notations. Note that our model uses only motion data*
-
 ![[assets/figures/papers/paper_list_l3_MoST_Motion_Style_Transformer_between_Diverse_Action_Contents/figures/005_Figure_4.jpg]]
 *Figure 4: Qualitative results in Xia [30] and BFA [1] datasets. Please refer to the red indications. (1) Our method better reflects the style of old in comparison to other existing methods, accurately representing both the bent upper body and leg. (2) Other methods fail to preserve the content of punch, instead, they result in peculiar leg movements or body twists. On the other hand, our result accurately depicts strutting punch, where the upper body leans backward. (3) The results of [1] and [14] do not exhibit a kick, instead, their arm moves. [20] yields twisted leg movements. (4) Unlike our method, others fail to preserve the content of punch, resulting in vibrations in static poses or twists*
-
-
 
 ## 实验与关键发现
 
@@ -305,21 +290,11 @@ MoST 在 Xia 数据集 上进行了定量评估，采用内容一致性（CC）�
 
 所有对比方法均使用相同的运动表示和训练/测试分割。Table 1 中与其他方法的完整数值对比因论文文本省略而部分缺失，但原文明确指出 MoST 在 CC 和 SC++ 上均取得最低值，尤其在内容不同的运动对上优势显著。部分定量结论主要依赖消融实验的内部对比，缺少与所有基线方法在相同指标上的完整数值矩阵，这一点需读者在引用时注意核实。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l3_MoST_Motion_Style_Transformer_between_Diverse_Action_Contents/figures/006_Figure_7.jpg]]
-*Figure 7: Cross-attention maps of PSM. The highest column ( ) indicates the body part in the style motion from which the style originates. The highest element ( ) pinpoints the body part in the content motion that will receive the style. Traj. refers to global translation. The symbols and are indicators related to traj*
-
 ![[assets/figures/papers/paper_list_l3_MoST_Motion_Style_Transformer_between_Diverse_Action_Contents/figures/007_Table_2.jpg]]
 *Table 2: Ablation study for verifying the proposed $L _ { D }$ , , and PSM on Xia dataset [30]. $L _ { p r e }$ and $L _ { p h y }$ are applied by default*
 
 ![[assets/figures/papers/paper_list_l3_MoST_Motion_Style_Transformer_between_Diverse_Action_Contents/figures/001_Figure_1.jpg]]
 *Figure 1: Frequent failure cases in existing methods: (a) A result of MotionPuzzle [14] replicating style motion. (b) A result of Aberman et al. [1] showing complete failure with twisted motion. The character for the visualization is sourced from Mixamo [13]*
-
-![[assets/figures/papers/paper_list_l3_MoST_Motion_Style_Transformer_between_Diverse_Action_Contents/figures/010_Figure_6.jpg]]
-*Figure 6: Visualization of $S ^ { S }$ and $\tilde { S } ^ { S }$ spaces projected through t-SNE for all 56 ( $M ^ { C } ) \times$ 5 6 ( $M ^ { S }$ ) motion pairs in the test set*
-
-
 
 ## 定位与知识库关联
 
@@ -376,8 +351,6 @@ MoST 相对于基线方法的改进并非简单的模块堆砌，而是针对瓶
 4. **多模态条件风格控制**：MoST 的框架是否能够结合文本描述、音乐节奏或情感标签等附加条件，实现多模态驱动的风格迁移？这将使模型从“运动到运动”的迁移扩展为“条件到运动”的生成，大幅拓宽应用场景。
 
 5. **与大规模运动生成模型的融合**：随着运动生成基础模型的发展，MoST 的风格解耦与调制机制能否作为插件模块嵌入到更大的预训练模型中，实现零样本风格迁移？这需要验证 PSM 的跨注意力机制在更大规模异构数据上的鲁棒性。
-
-
 
 ## 原文 PDF
 

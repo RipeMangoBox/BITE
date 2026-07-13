@@ -54,15 +54,11 @@ claims:
 
 主要实验结果验证了该方法的有效性：在 ImageNet-1K IPC=10 设置下，HIERAMP 在 ResNet-18 上达到 **47.6%** 的 Top-1 准确率，超越此前最佳方法 CaO2 约 1.5 个百分点；在 CIFAR-10 上达到 **44.3%**，超越 D3HR 约 3.0 个百分点。消融实验进一步揭示：粗尺度放大增加了令牌多样性与覆盖率，细尺度放大则使注意力更集中——这种阶段特异性的放大机制是性能提升的关键。此外，HIERAMP 在保持生成保真度（FID 与 VAR 基线接近）的同时，仅引入极小的计算开销（延迟增加约 0.008 s/img），且具备良好的跨架构泛化能力。
 
-
-
 数据集蒸馏旨在将大规模数据集压缩为极少量合成样本，使下游模型在这些样本上训练后能逼近在全量数据上的性能。近年来，基于生成模型的数据集蒸馏方法取得了显著进展，其核心思路是利用预训练生成器合成信息密度更高的蒸馏图像。然而，现有方法普遍存在一个关键瓶颈：**它们仅关注蒸馏数据与真实数据在全局分布层面的相似性，未能捕捉对象语义的层次性**——从粗粒度的整体布局到细粒度的部件细节。这一缺失导致蒸馏数据缺乏对下游分类任务至关重要的判别性语义，限制了性能的进一步提升。
 
 视觉自回归模型（Visual Autoregressive Model, VAR）提供了一种天然契合语义层次结构的生成范式。如图 1 顶部所示，VAR 的生成过程从粗到细逐步构建图像：早期尺度（粗尺度）负责建立场景的整体结构与布局，后期尺度（细尺度）则补充纹理、边缘等局部细节。这一过程与人类视觉认知中"先整体后局部"的层次化理解高度一致。然而，标准 VAR 模型在自回归解码时对所有空间位置一视同仁，并未显式利用这种层次化语义特性来增强生成样本的判别力。
 
 HIERAMP 的核心洞察在于：**如果能在 VAR 各尺度上识别语义显著区域，并在自回归生成过程中对这些区域施加注意力放大，就能引导模型聚焦于对分类更有意义的语义特征，从而在不显式优化全局分布相似度的前提下，显著提升蒸馏数据的下游分类性能**。具体而言，粗尺度的注意力放大使令牌分布更均匀多样，增加了合成样本的全局结构变化；细尺度的注意力放大则使注意力更集中，强化了局部判别性细节。这种由粗到细的层次化放大策略，将 VAR 的生成结构优势转化为数据集蒸馏的性能增益。
-
-
 
 ## 核心方法与创新机理
 
@@ -86,8 +82,6 @@ HIERAMP并非对所有尺度施加统一的放大强度，而是将9个尺度划
 
 值得注意的是，类别令牌本身对准确率无显著增益（Table 7：有类别令牌45.9% vs 无类别令牌45.6%），其价值纯粹在于**为放大提供语义引导信号**。这一消融结果证实HIERAMP的性能提升完全来自注意力放大机制对语义层次性的利用，而非模型容量的简单增加。
 
-
-
 HIERAMP 的整体 pipeline 围绕一个预训练的视觉自回归模型（VAR）构建，通过注入可学习的类别令牌并对其产生的语义显著性图进行注意力放大，实现由粗到细的层次化语义增强。整个框架由三个核心模块串联而成，形成“语义感知→显著性定位→注意力引导生成”的闭环。
 
 **输入与输出流**：给定目标类别标签，系统首先将其映射为类别嵌入 $s$，作为 VAR 逐尺度自回归生成的起始条件。VAR 按照从粗到细的 $N$ 个尺度依次生成图像令牌序列 $r_1, r_2, \dots, r_N$，每个尺度 $n$ 的令牌 $r_n$ 通过 VQ-VAE 的码书与解码器最终还原为图像。HIERAMP 在此生成过程中插入语义引导，输出的蒸馏图像在保持生成保真度的同时，显著增强了判别性语义特征。
@@ -104,8 +98,6 @@ HIERAMP 的整体 pipeline 围绕一个预训练的视觉自回归模型（VAR�
 3. **由粗到细自回归放大**（Section 3.4，Figure 2-right，Algorithm 1）：在每个尺度的自回归解码过程中，从显著性图 $m_n$ 中选取 Top-$\rho_n\%$ 的显著位置构成集合 $S_n$，生成二进制掩码 $a_n$。随后，在所有查询对该尺度键的注意力 logits 中，为 $S_n$ 中的位置施加正偏置 $\beta_n$：$\tilde{L}_n^{(h)} = L_n^{(h)} + \beta_n \mathbf{1}_{L_k^n+1} a_n^{\top}$。这一操作将注意力概率质量向语义重要区域集中，引导解码器聚焦于判别性特征的生成。放大调度按阶段分组——粗尺度（1-3）强调全局物体布局，中尺度（4-6）补充结构信息，细尺度（7-9）细化纹理细节——各阶段使用不同的 $(\rho_n, \beta_n)$ 参数配置。
 
 三个模块的协同机制可概括为：VAR 提供层次化生成骨架，类别令牌在各尺度捕获语义显著性，放大模块利用该显著性信号偏置自回归解码的注意力分布，从而在不修改生成模型结构、不显式优化全局分布相似度的前提下，显著提升蒸馏数据的下游分类性能。Figure 2 完整展示了这一框架的左右两翼——左侧为尺度受限的类别令牌注意力掩码设计，右侧为多尺度语义特征放大的执行流程。
-
-
 
 ### 整体框架
 
@@ -172,13 +164,6 @@ $$\tilde{L}_n^{(h)} = L_n^{(h)} + \beta_n \mathbf{1}_{L_k^n+1} a_n^{\top} \quad 
 | $a_n$ | 显著位置二进制掩码 |
 | $\tilde{L}_n^{(h)}$ | 放大后的注意力logits |
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2684_https_arxiv_org_abs_2603_06932/figures/001_Figure_1.jpg]]
-*Figure 1: Top: The visual autoregressive model constructs coarse scene structure and gradually complements details from coarse to fine scales. The class token highlights regions that express object-related semantics (the second row). Bottom: HIERAMP identifies important semantic regions and refines the hierarchical structure and details in an autoregressive manner. The images after amplification demonstrate more diverse components and richer class-related details*
-
-
-
 ## 实验与关键发现
 
 ### 核心性能对比
@@ -236,39 +221,20 @@ HIERAMP 的核心设计空间在于**放大阶段的选择**和**各阶段放大
 
 **Table 5** 和 **Figure 6** 展示了 HIERAMP 在 DiT（Diffusion Transformer）骨干上的初步泛化。加入层次化放大后，DiT 生成的蒸馏数据在下游分类上取得一致提升，且定性结果显示物体更突出、语义结构更清晰。这暗示由粗到细的语义放大思想可能超越 VAR 架构，适用于更广泛的生成模型家族，但需注意目前仅在 DiT 上验证，大规模扩散 UNet 实验尚缺。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2684_https_arxiv_org_abs_2603_06932/figures/003_Table_1.jpg]]
 *Table 1: Top-1 accuracy comparison with four SOTA methods. As in RDED [40], all methods adopt ResNet-18 as the teacher and are trained on both ResNet-18 and ResNet-101. ‘–’ denotes missing results in the original paper*
-
-![[assets/figures/papers/paper_list_l2684_https_arxiv_org_abs_2603_06932/figures/006_Table_3.jpg]]
-*Table 3: Effect of amplification combination across different stages on ImageNet-1K, IPC=10. Amp. indicates the amplification number, while*
 
 ![[assets/figures/papers/paper_list_l2684_https_arxiv_org_abs_2603_06932/figures/004_Table_4.jpg]]
 *Table 4: Ablation on amplification strength across stages on ImageNet-1K, IPC=10. Each row shows a different setting of Coarse-Mid-Fine (C-M-F) amplification numbers and accuracy*
 
-![[assets/figures/papers/paper_list_l2684_https_arxiv_org_abs_2603_06932/figures/007_Figure_3.jpg]]
-*Figure 3: Impact of attention amplification strategy on token entropy and coverage on ImageNet-1K, IPC=50. The histogram shows the percentage of classes whose codebook token entropy and coverage increased, decreased, or remained unchanged after amplifying different stages. Amplifying attention at coarse and mid scales promotes diversity, while fine-scale amplification can concentrate attention*
-
 ![[assets/figures/papers/paper_list_l2684_https_arxiv_org_abs_2603_06932/figures/005_Table_2.jpg]]
 *Table 2: Cross-architecture performance on ImageNet-1K, IPC=10*
-
-![[assets/figures/papers/paper_list_l2684_https_arxiv_org_abs_2603_06932/figures/013_Table_7.jpg]]
-*Table 7: Effect of class tokens on top-1 accuracy on ImageNet-1K. Models with and without class tokens show comparable performance across different IPC settings*
 
 ![[assets/figures/papers/paper_list_l2684_https_arxiv_org_abs_2603_06932/figures/010_Table_5.jpg]]
 *Table 5: Quantitative comparison of the DiT backbone before and after applying HIERAMP*
 
 ![[assets/figures/papers/paper_list_l2684_https_arxiv_org_abs_2603_06932/figures/011_Table_8.jpg]]
 *Table 8: Inference latency comparison with DDIM-based method on ImageNet-Woof*
-
-![[assets/figures/papers/paper_list_l2684_https_arxiv_org_abs_2603_06932/figures/014_Table_9.jpg]]
-*Table 9: Latency and peak memory for VAR-based distillation with incremental modules*
-
-![[assets/figures/papers/paper_list_l2684_https_arxiv_org_abs_2603_06932/figures/015_Figure_6.jpg]]
-*Figure 6: Qualitative comparison of the DiT backbone before and after applying HIERAMP*
-
-
 
 ## 定位与知识库关联
 
@@ -318,8 +284,6 @@ HIERAMP 的核心机制建立在 VAR 模型的由粗到细生成特性之上。�
 4. **理论形式化**：粗尺度放大增加令牌多样性、细尺度放大集中注意力的机制（Figure 3），目前主要基于经验观察（令牌熵和覆盖率指标）。是否可以通过信息论或注意力流的角度进行更深入的理论分析？
 
 5. **与提示工程/条件生成的结合**：类别令牌的设计本质上是一种隐式条件注入。未来可探索将文本描述、属性标签等多模态条件与层次化放大结合，进一步提升蒸馏数据的可控性和判别性。
-
-
 
 ## 原文 PDF
 

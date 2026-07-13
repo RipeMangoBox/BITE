@@ -249,9 +249,6 @@ $$\hat{\mathcal{L}}_D := \frac{A}{D^{\alpha}} + E$$
 
 通过插值计算一种配方匹配另一种配方损失所需的有效数据量D'，论文得出以下数据效率提升（Figure 6和Figure 7）：
 
-![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_ck0aZTAnwK/figures/009_Figure_6.jpg]]
-*Figure 6: Scaling the seed token count for single models. We first consider the best loss of the standard recipe tuning epochs and parameters (red points, right). We then consider the best loss of the regularized recipe by fitting parameter scaling laws across four token counts (left) and taking their asymptotes (purple points, right). We fit data-scaling laws (red and purple lines) to extrapolate performance as seed token count increases*
-
 ![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_ck0aZTAnwK/figures/010_Figure_7.jpg]]
 *Figure 7: Scaling the seed token count for ensembles. Left: For fixed parameter and token count, we fit a power law in K , with hyperparameters optimized for the asymptote. Middle: We take the asymptote of the left 16 laws and fit a power law to measure how the asymptote changes in N . Right: We take the asymptote of the middle 4 laws and fit a power law to measure how the asymptote of asymptotes changes in D. At all token counts, we find over 2 $\times$ and 5 $\times$ 5× data efficiency wins over the regularized and standard recipes respectively
 
@@ -316,20 +313,6 @@ $$\hat{\mathcal{L}}_D := \frac{A}{D^{\alpha}} + E$$
 7. **架构搜索的有限性**：模型架构搜索仅限于密集模型和初步的MoE测试（Table 9-10），其他架构（如扩散语言模型、状态空间模型）的效果未知。
 
 8. **持续预训练的差异**：在持续预训练（CPT）场景下，权重衰减不发挥同样的正面作用（Table 6-7），表明方法的适用边界需要进一步界定。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_ck0aZTAnwK/figures/016_Figure_11.jpg]]
-*Figure 11: Tuned hyperparameters for regularized scaling. We show the optimal hyperparameters tuned seperately for each parameter and token count. We find that as parameter count increases, optimal weight decay goes up, optimal epoch count goes down, and optimal learning rate goes down. We find the trends for weight decay and epoch count hold when token count decreases*
-
-![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_ck0aZTAnwK/figures/019_Figure_13.jpg]]
-*Figure 13: Loss trajectories for different weight decays. We compare the best run with default weight decay (8 epochs, 1e-3 learning rate, 0.1 weight decay) and the best run with tuned weight decay (16 epochs, 3e-3 learning rate, 1.6 weight decay) for 200M tokens and 300M parameters. We find that loss for runs with high weight decay decreases much more slowly at the start of training, but quickly decreases near the end of training*
-
-![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_ck0aZTAnwK/figures/020_Figure_14.jpg]]
-*Figure 14: Train losses for epoching and parameter scaling. Left: Increasing epoch count results in train loss decreasing while validation loss starts increasing. Right: Increasing parameter count does not always decrease loss, potentially due to optimal epoch count changing (8, 8, 4, 4). Train loss monotonically goes down when restricted to 4 epochs*
-
-![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_ck0aZTAnwK/figures/023_Figure_17.jpg]]
-*Figure 17: Single model and asymptote loss when varying epoch count and weight decay for different model sizes, token counts, and learning rates. We display an extended version of Figure 15 for 200M tokens with 150M, 300M (sub-optimal and optimal LR), and 600M parameter models. For these settings, the “double epoch, half weight decay” heuristic correctly predicts the best ensemble. This heuristic is consistent with all of our parameter and token counts except for our most over-parameterized setting*
 
 ![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_ck0aZTAnwK/figures/026_Figure_19.jpg]]
 *Figure 19: Effect of regularization on overfitting for downstream benchmarks. Downstream benchmarks also reflect the benefit of heavy regularization on performance. The effect of overfitting on downstream benchmarks (right) appears at twice the epoch count compared to validation loss (left)*

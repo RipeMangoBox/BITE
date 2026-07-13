@@ -54,8 +54,6 @@ claims:
 
 **局限与展望**：当前验证仅基于ShapeLLM-Omni单一架构，方法的通用性有待在其他3D表示（如网格、点云）上检验。奖励模型组合依赖特定模型，可能引入偏好偏差。未来方向包括将Hi-GRPO扩展至更大规模3D数据集，以及探索对抗性奖励以增强生成多样性与物理合理性。
 
-
-
 ### 文本到3D生成中的强化学习困境
 
 强化学习（RL）在文本生成和图像生成领域已展现出显著的价值——在文本生成中，RL能够诱导模型产生显式的文本推理（textual reasoning）；在2D自回归生成中，RL主要改善token级别的生成质量。然而，在文本到3D生成任务中，RL的应用仍处于几乎空白的状态。这一现状背后的核心瓶颈在于：**3D生成任务具有更高的空间复杂度和全局一致性要求**，现有的RL策略无法直接迁移，且缺乏能够评估模型内隐推理能力的基准。
@@ -81,8 +79,6 @@ Figure 1 清晰展示了这一跨模态的差异：左侧对比了RL在文本、
 3. **奖励模型集成**：构建包含HPS v2.1、UnifiedReward、Qwen2.5-VL（2D LMM）和ShapeLLM（3D LMM）的专家奖励集成，分别评估全局对齐和局部细化。
 
 最终，基于这些策略构建的AR3D-R1成为首个RL增强的3D自回归模型，旨在回答一个根本性问题：**我们是否已经准备好将RL应用于文本到3D生成？**
-
-
 
 ## 核心方法与创新机理
 
@@ -124,8 +120,6 @@ AR3D-R1 系统对比了 GRPO、**DAPO**（Yu et al., 2025）和 **GSPO**（Yang 
 
 **证据强度**：上述创新点的核心证据（Table 4-6, Table 2-3）置信度在 0.9-0.95 之间，均来自论文内部消融实验和基准对比。需注意所有RL训练均基于 ShapeLLM-Omni 单一架构，扩展至其他3D生成模型（如扩散模型 Trellis）的通用性有待验证。
 
-
-
 AR3D-R1 的整体框架围绕一个核心洞察构建：**3D 自回归生成天然具有从全局几何到局部纹理的层次化进展**。基于此，方法将强化学习训练解耦为粗到细的分层过程，使策略优化与3D生成的固有结构对齐。
 
 ### Pipeline 总览
@@ -161,12 +155,8 @@ $$\mathbf{KL}_{i,t}^{(k)} = \frac{\pi_{\mathrm{ref}}(y_{i,t}^{(k)}|\mathbf{y}_{i
 
 消融实验表明，token级平均损失优于序列级操作，动态采样带来 +0.6 CLIP 的稳定提升，而完全移除 KL 惩罚会导致性能下降（Table 2）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2201_https_arxiv_org_abs_2512_10949/figures/009_Figure_6.jpg]]
 *Figure 6: Framework of Hi-GRPO. In Step 1, we instruct the model to generate high-level semantic reasoning based on the 3D prompt, and use it together with the prompt to produce a coarse 3D shape. In Step 2, conditioned on the 3D prompt and the high-level semantic CoT, the model generates low-level visual reasoning focused on local appearance details, which is used to produce the refined 3D object*
-
-
 
 ### 分层生成范式与Hi-GRPO框架
 
@@ -221,13 +211,6 @@ Hi-GRPO相较于基础GRPO（Shao et al., 2024）引入了四项关键技术改�
 
 这些改进源自对DAPO（Yu et al., 2025）和GSPO（Yang et al., 2025）等GRPO变体的系统分析，最终组合形成了适合3D层次化生成的最佳RL配置。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2201_https_arxiv_org_abs_2512_10949/figures/013_Figure_9.jpg]]
-*Figure 9: Results of Different Steps during Inference*
-
-
-
 ## 实验与关键发现
 
 ### 4.1 实验设置与基准
@@ -276,8 +259,6 @@ Hi-GRPO相较于基础GRPO（Shao et al., 2024）引入了四项关键技术改�
 4. **物理合理性未评估：** 未对生成3D资产的物理合理性（如结构稳定性）或多模态一致性（如纹理与光照匹配）进行评估。
 5. **λ 敏感性：** Hi-GRPO 中步骤2奖励回传权重 $\lambda$ 的敏感性和自适应调整策略尚未系统研究。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2201_https_arxiv_org_abs_2512_10949/figures/012_Table_4.jpg]]
 *Table 4: Quantitative Comparison on Text-to-3D Generation Benchmarks. (KD is reported ×100. †: evaluated using shaded images of PBR meshes.)*
 
@@ -289,23 +270,6 @@ Hi-GRPO相较于基础GRPO（Shao et al., 2024）引入了四项关键技术改�
 
 ![[assets/figures/papers/paper_list_l2201_https_arxiv_org_abs_2512_10949/figures/015_Table_6.jpg]]
 *Table 6: Quantitative comparisons using Toys4k for Different RL Paradigms*
-
-![[assets/figures/papers/paper_list_l2201_https_arxiv_org_abs_2512_10949/figures/003_Table_1.jpg]]
-*Table 1: Quantitative comparisons using Toys4k for Different Reward Models. HPS refers to HPS v2.1, which outputs human preference rewards. Unified denotes UnifiedReward-2.0- Qwen7B, which jointly evaluates aesthetic quality and prompt alignment*
-
-![[assets/figures/papers/paper_list_l2201_https_arxiv_org_abs_2512_10949/figures/006_Table_3.jpg]]
-*Table 3: Effectiveness of textual reasoning. We employ HPS V2.1 as the reward and adopt GRPO*
-
-![[assets/figures/papers/paper_list_l2201_https_arxiv_org_abs_2512_10949/figures/007_Figure_4.jpg]]
-*Figure 4: MME-3DR Benchmark Analysis. Left: MME-3DR contains 249 complex 3D objects across five categories. Right: We compare the performance of ShapeLLM-Omni, the SOTA model Trellis, and our RL-enhanced model on MME-3DR and Toys4K. Using CLIP Score as the metric, the results highlight the importance of implicit reasoning ability*
-
-![[assets/figures/papers/paper_list_l2201_https_arxiv_org_abs_2512_10949/figures/011_Figure_8.jpg]]
-*Figure 8: Qualitative Comparison of Text-to-3D Models*
-
-![[assets/figures/papers/paper_list_l2201_https_arxiv_org_abs_2512_10949/figures/004_Figure_3.jpg]]
-*Figure 3: Effects of Scaling Strategies. We examine the effects of data scaling and training iteration scaling strategies on clip score*
-
-
 
 ## 定位与知识库关联
 
@@ -364,8 +328,6 @@ AR3D-R1的有效性建立在以下条件之上，超出这些边界时性能可�
 **λ权重的自适应**：Hi-GRPO中分层奖励权重λ的敏感性和自适应调整策略。当前λ是固定的，但不同提示对全局结构和局部纹理的侧重不同，自适应的λ可能进一步提升性能。
 
 **多模态一致性的评估**：如何将纹理-光照一致性、物理合理性等更全面的3D质量维度纳入RL奖励体系？这需要开发新的奖励模型或评估协议。
-
-
 
 ## 原文 PDF
 

@@ -76,8 +76,6 @@ IMS3 由两个互补模块构成：
 
 消融实验证明，IM 微调与 S³ 采样的组合带来显著增益：单独使用 IM 为 38.7%，单独使用 S³ 为 37.4%，而两者结合达到 41.8%，验证了两个互补策略的必要性。1−σ 余弦相似度损失在 IM 微调中显著优于 L1 和 L2 损失，表明分布感知的对齐方式对反演对齐至关重要。
 
-
-
 ### 数据集蒸馏的范式与瓶颈
 
 数据集蒸馏（Dataset Distillation）旨在将大规模原始数据集 $\mathcal{D}_r$ 压缩为极小规模的合成数据集 $\mathcal{D}_s$（$M \ll N$），使得在 $\mathcal{D}_s$ 上训练的模型能够逼近在原始数据上的性能。近年来，基于扩散模型（diffusion models）的蒸馏方法凭借强大的生成先验，在合成数据的视觉质量和信息丰富度上取得了显著进展，成为该领域的主流范式。
@@ -93,8 +91,6 @@ IMS3 由两个互补模块构成：
 本文的关键洞察在于：**DDIM 反演（DDIM inversion）过程存在内在的数值不稳定性**。具体而言，DDIM 反演将真实图像映射为逐时间步的噪声潜在序列 $\mathbf{z}_t^{\mathrm{inv}}$，但 Euler 近似引入的累积误差使得反演轨迹天然偏离高密度区域，向低密度区域漂移。这一现象在传统生成任务中被视为需要克服的缺陷，但本文首次将其**重新定位为可利用的正面引导信号**——通过主动对齐去噪潜在与反演潜在，可以引导扩散模型扩展其分布覆盖范围，从而缓解分布聚合问题。
 
 基于这一动机，本文提出 **ImS³（Inversion-Matching + Selective Subgroup Sampling）** 框架，通过两个互补策略同时解决分布覆盖不足和判别多样性弱的问题：**Inversion-Matching（IM）微调**利用反演不稳定性将模型推向低密度区域，**Selective Subgroup Sampling（S³）** 则在采样阶段通过质心驱动的子组选择提升类间可分离性。
-
-
 
 ## 核心方法与创新机理
 
@@ -125,8 +121,6 @@ $$\mathcal{L}_{\mathrm{S}^3}(\mathbf{g}) = \alpha \sum_{i=1}^{C} \log(1 - \sigma
 ### 关键设计选择与消融验证
 
 消融实验（Table 4）证实了 IM 与 S³ 的互补性：在 ImageWoof IPC=10 设置下，单独使用 IM 为 38.7%，单独使用 S³ 为 37.4%，二者结合达到 41.8%，较 DiT 基线（34.2%）提升 7.6 个百分点。损失函数消融（Table 7）进一步表明，$1-\sigma$ 余弦相似度损失优于 L1（38.7%）和 L2（39.0%），验证了分布感知对齐的有效性。超参数分析（Figure 3）显示平衡的 $\alpha$ 和 $\beta$ 取值取得最优性能，印证了代表性与判别性之间的内在权衡。
-
-
 
 ImS³ 的整体流程由两个互补阶段构成，分别解决扩散数据集蒸馏中的分布覆盖不足与判别多样性弱这两个核心瓶颈。如图 Figure 2 所示，第一阶段**Inversion‑Matching (IM) 微调**对预训练扩散模型进行参数高效微调，利用 DDIM 反演的不稳定性将生成分布推向低密度区域；第二阶段**Selective Subgroup Sampling (S³)** 在采样阶段以训练自由的方式从候选子组中筛选出兼具代表性与类间可分离性的合成样本，构建最终蒸馏数据集。
 
@@ -163,8 +157,6 @@ $$\mathcal{L}_{\mathrm{S}^3}(\mathbf{g}) = \alpha \sum_{i=1}^{C} \log(1 - \sigma
 两个阶段在逻辑上串行、功能上互补。IM 微调在**生成侧**扩展分布覆盖，使扩散模型能够合成低密度区域的样本；S³ 在**选择侧**从扩展后的候选池中筛选判别性最优的子组。消融实验（Table 4）证实：单独使用 IM 或 S³ 均能带来性能提升，但两者联合使用产生更大的增益——在 ImageWoof IPC=10 上，IM+S³ 达到 41.8%，而仅用 IM 为 38.7%、仅用 S³ 为 37.4%（基线 DiT 为 34.2%），验证了覆盖扩展与判别筛选的协同必要性。
 
 整个框架中，IM 微调需要访问真实图像以计算反演潜在，S³ 需要少量真实样本以计算类质心（对真实数据的依赖程度将在后续章节的消融实验中进一步分析）。最终输出的蒸馏数据集可直接用于下游分类器的标准训练，无需任何特殊适配。
-
-
 
 ImS³ 由两个互补的核心模块构成：**Inversion-Matching (IM) 微调**与**Selective Subgroup Sampling (S³)**。前者在微调阶段利用扩散反演的不稳定性将生成模型推向低密度区域，后者在采样阶段通过质心驱动的子组选择提升合成数据集的判别多样性。
 
@@ -270,8 +262,6 @@ $$
 
 IM 微调与 S³ 之间存在因果互补关系：IM 微调扩展了扩散模型的分布覆盖范围，为 S³ 提供了更丰富多样的候选样本池；S³ 则从这些扩展后的候选中筛选出最具判别力的子组，将分布覆盖的优势转化为下游分类性能的提升。消融实验（Table 4）证实：在 ImageWoof IPC=10 设置下，单独使用 IM 达到 38.7%，单独使用 S³ 达到 37.4%，而两者结合（ImS³）达到 41.8%，验证了双模块协同的必要性。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -290,9 +280,6 @@ ImS³ 在多个基准上系统性地超越了现有扩散型数据集蒸馏方�
 
 ![[assets/figures/papers/paper_list_l2686_https_arxiv_org_abs_2603_13960/figures/009_Table_5.jpg]]
 *Table 5: Performance comparison on ImageNet-100 under different IPC and backbone settings. Results are Top-1 accuracy*
-
-![[assets/figures/papers/paper_list_l2686_https_arxiv_org_abs_2603_13960/figures/016_Table_12.jpg]]
-*Table 12: ImageNet-1K results (IPC=10)*
 
 跨架构泛化实验（Table 11）表明，ImS³ 生成的蒸馏数据在 ConvNet、ResNet-18、ResNet-101、VGG-11 和 MobileNetV2 等多种架构上均取得最优或次优结果，证实合成数据具有良好的架构无关判别特征。
 
@@ -325,29 +312,10 @@ ImS³ 在多个基准上系统性地超越了现有扩散型数据集蒸馏方�
 
 3. **子组池大小 G 的手动调整。** G 的最优值随 IPC 和数据集特征变化（Figure 6），需要针对不同设置手动调整，增加了超参数选择的工程负担。
 
-![[assets/figures/papers/paper_list_l2686_https_arxiv_org_abs_2603_13960/figures/014_Figure_6.jpg]]
-*Figure 6: Effect of subgroup pool size G under different IPC settings on ImageWoof. A moderate increase in G provides richer intra-class variation and improves selection quality, especially in low-IPC regimes. However, excessively large pools introduce redundant or noisy candidates, which destabilizes selection and leads to degraded performance*
-
 4. **任务范围限制。** 当前验证仅覆盖图像分类任务，尚未探索在文本-图像多模态蒸馏、目标检测或分割等跨任务场景的泛化能力。IM 微调对扩散模型生成分布的修改是否会影响其他下游任务的合成质量，仍需进一步研究。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2686_https_arxiv_org_abs_2603_13960/figures/007_Table_4.jpg]]
 *Table 4: Ablation study of IM and*
-
-![[assets/figures/papers/paper_list_l2686_https_arxiv_org_abs_2603_13960/figures/012_Table_7.jpg]]
-*Table 7: Ablation study of different similarity losses used in the IM on ImageWoof and ImageNette under*
-
-![[assets/figures/papers/paper_list_l2686_https_arxiv_org_abs_2603_13960/figures/006_Figure_3.jpg]]
-*Figure 3: Heatmap of classification accuracy under different combinations of α and*
-
-![[assets/figures/papers/paper_list_l2686_https_arxiv_org_abs_2603_13960/figures/010_Figure_5.jpg]]
-*Figure 5: Validation accuracy under different matching strengths. Performance of our method across a range of matching coefficients*
-
-![[assets/figures/papers/paper_list_l2686_https_arxiv_org_abs_2603_13960/figures/013_Table_8.jpg]]
-*Table 8: Ablation study on feature extractors for centroid selection on ImageWoof. Top-1 accuracy (%)*
-
-
 
 ## 定位与知识库关联
 
@@ -399,8 +367,6 @@ ImS³ 与上述方法的本质区别在于：**首次从扩散反演的动力学
 3. **可微分子组选择**：S³ 的贪婪搜索能否用可微分的可学习路由网络替代？使子组选择过程联合优化，并自适应地调整候选池大小，避免手动调参和局部最优问题。
 4. **极端低 IPC 下的判别增强**：在 IPC=1 的极端压缩场景下，S³ 的子组多样性优势消失，如何进一步增强单样本的判别能力？可能需要探索将类间区分信息直接注入到单样本生成过程中的新机制。
 5. **与训练时蒸馏方法的融合**：IM 微调本质上改变了扩散模型的采样分布，这是否能与基于元学习或梯度匹配的训练时蒸馏方法（如 MTT、DC）结合，在合成数据上进一步优化下游任务性能？
-
-
 
 ## 原文 PDF
 

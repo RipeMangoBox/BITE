@@ -52,8 +52,6 @@ claims:
 
 实验结果表明，RLR在文本到图像和文本到视频的微调任务上均显著优于现有基线。在HPD v2基准上，RLR微调的SD1.4模型在PickScore和AES指标上分别达到21.38和6.65，相比AlignProp提升+2.21和+0.63（Table 2）；在VBench视频生成评估中，RLR以84.63的加权平均分超越所有基线（Table 3）。消融实验证实，移除HO或ZO组件均会导致性能显著下降，验证了组合方法的必要性（Table 5）。训练曲线进一步显示，RLR在后期训练中持续提升奖励分数，而截断BP方法则出现明显的模型崩溃（Figure 5）。
 
-
-
 扩散模型（Diffusion Models, DMs）通过一个递归的去噪过程将随机噪声逐步转化为高质量样本，其生成能力已在图像、视频等多个领域得到验证。然而，将预训练扩散模型进一步微调以对齐人类偏好或特定奖励信号时，面临一个根本性的梯度估计困境。
 
 扩散模型的生成链可形式化为 $x_0 = \phi_{1:T}(x_T, z_{1:T}; \theta)$，其中每一步 $x_{t-1} = \phi_t(x_t, z_t; \theta)$ 依赖参数 $\theta$ 和随机噪声 $z_t$。微调的目标是最大化生成样本的期望奖励：
@@ -71,8 +69,6 @@ $$\max_{\theta} \mathbb{E}[R(x_0)] = \max_{\theta} \mathbb{E}_{z_{1:T}}[R(\phi_{
 $$\min_{G \in \mathcal{G}} \operatorname{Var}(G) \quad \text{s.t.} \quad \nabla_{\theta} \mathbb{E}[R(x_0)] = \mathbb{E}[G], \quad \mathcal{C}(G) \leq \mathcal{B}$$
 
 本文的动机正是弥合这一偏差-方差-成本的三元权衡缺口：既不接受截断BP的偏差风险，也不忍受RL方法的高方差低效，而是通过重组扩散链的计算图，在局部引入精确梯度信息，在其余部分采用无偏的低成本估计，从而在给定内存预算下逼近最小方差无偏估计的理论下界。
-
-
 
 ## 核心方法与创新机理
 
@@ -113,8 +109,6 @@ $$h^{*} = \min\left\{\left\lfloor \frac{\mathcal{B} - \mathcal{B}_z (T-1)}{\math
 | **多尺度能力** | 弱（仅捕获后期特征） | 间接 | 通过 $j$ 采样显式建模 |
 
 Figure 5的奖励曲线直接印证了这一差异：RLR在训练后期持续提升奖励，而AlignProp发生模型坍塌、奖励骤降。消融实验（Table 5）进一步证实，移除HO和ZO（退化为单步BP）或仅移除ZO（退化为有偏估计）均导致性能大幅下降，验证了三组件协同的必要性。
-
-
 
 ![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_AZ6lqcvHLX/figures/010_Figure_6.jpg]]
 *Figure 6: The framework of Diffusive Chain-of-Thought. The DM generates images in a multi-scale manner: earlier steps for low-resolution features and later steps for high-resolution features. If a specific scale has deficiencies, we utilize the HO estimator to enhance the corresponding steps*
@@ -178,8 +172,6 @@ $$h^{*} = \min\left\{\left\lfloor \frac{\mathcal{B} - \mathcal{B}_z (T-1)}{\math
 ### 6. 理论保证
 
 RLR估计器具有严格的无偏性（Theorem 6.3）：$\nabla_{\theta} \mathbb{E}[R(x_0)] = \mathbb{E}[G_{\text{RLR}}]$，且在 $L$-平滑奖励函数下具有 $\mathcal{O}(1/\sqrt{K})$ 的收敛速率（Theorem 6.4）。消融实验（Table 5）证实：移除HO和ZO组件（仅保留单步BP）导致性能大幅下降；移除ZO使估计器变为有偏，表现不及完整RLR，验证了无偏性和组合结构的必要性。
-
-
 
 ### 问题形式化
 
@@ -253,8 +245,6 @@ $$\nabla_{\theta} \mathbb{E}[R(x_0)] - \mathbb{E}[\nabla_{\theta} R(x_0)_{\text{
 
 该偏差项随截断步数减少而增大，是导致模型崩溃的根本原因（Figure 3）。FO 与 ZO 的方差关系为 $\operatorname{Var}(\nabla_{\theta} R(x_0)) \leq \operatorname{Var}(R(x_0) \nabla \ln f(z))$，说明 FO 天然具有更低方差，RLR 通过 FO + HO 的组合在关键步上利用了这一优势。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与因果机制
@@ -280,13 +270,7 @@ $$\nabla_{\theta} \mathbb{E}[R(x_0)] - \mathbb{E}[\nabla_{\theta} R(x_0)_{\text{
 
 **Table 3** 展示了在 VBench 基准上的文本到视频生成评估。RLR 的加权平均得分达到 **84.63**，超过所有基线方法，包括 **VADER**（83.45）、**T2V-Turbo**、**DOODL** 以及闭源方法 **Pika** 和 **Gen-2**。特别地，RLR 在动态程度（Dynamic Degree）和美学质量（Aesthetic Quality）指标上以较大幅度领先，证明其在视频生成的时序一致性和视觉质量方面具有显著优势。
 
-![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_AZ6lqcvHLX/figures/007_Table_3.jpg]]
-*Table 3: Text2Video Generation Evaluation on the Vbench. The weighted average is calculated by assigning a weight of 1 to all metrics, except for the Dynamic Degree metric, which is assigned a weight of 0.5*
-
 **Table 10** 提供了 VBench 的完整自动评估指标，涵盖质量维度和语义维度，进一步验证了 RLR 在多个子指标上的稳健表现。
-
-![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_AZ6lqcvHLX/figures/022_Table_10.jpg]]
-*Table 10: Automatic evaluation on VBench. (a) Quality dimensions and total score*
 
 ### 消融实验
 
@@ -311,12 +295,6 @@ $$\nabla_{\theta} \mathbb{E}[R(x_0)] - \mathbb{E}[\nabla_{\theta} R(x_0)_{\text{
 
 **Table 6** 和 **Table 7** 分别报告了 Text2Image 实验的内存占用和时间复杂度。RLR 通过 ZO 组件将大部分步骤的内存开销降至极低水平（0.24GB/步），仅在局部 HO 子链上付出较高的内存成本（8GB/步），实现了在有限预算下的最优配置。相比需要全链反向传播的方法，RLR 在保持无偏性的同时显著降低了峰值内存需求。
 
-![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_AZ6lqcvHLX/figures/018_Table_6.jpg]]
-*Table 6: Memory cost of Text2Image experiments on SD 1.4*
-
-![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_AZ6lqcvHLX/figures/019_Table_7.jpg]]
-*Table 7: Time complexity of Text2Image experiments on SD 1.4*
-
 ### 失败模式与局限性
 
 1. **子链长度 h 的确定**：最优 h 依赖于对内存预算和方差特性的估计（见公式 $h^{*}$），实践中可能需要启发式调整，尤其在硬件配置变化时。
@@ -324,18 +302,8 @@ $$\nabla_{\theta} \mathbb{E}[R(x_0)] - \mathbb{E}[\nabla_{\theta} R(x_0)_{\text{
 3. **大规模模型的扩展性**：计算时间仍随 h 线性增长，在十亿参数级扩散模型上的开销需要进一步评估。
 4. **子链起点 j 的选择**：当前基于梯度范数的重要性采样策略在多数任务中有效，但对于需要精确控制多尺度生成的任务（如 DCoT），需要人工指定 j 的采样范围，自适应机制尚不完善。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_AZ6lqcvHLX/figures/005_Table_1.jpg]]
-*Table 1: Comparison of gradient estimators*
-
-![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_AZ6lqcvHLX/figures/011_Table_4.jpg]]
-*Table 4: Experiment results for Diffusive Chainof-Thought*
-
 ![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_AZ6lqcvHLX/figures/016_Figure_10.jpg]]
 *Figure 10: Qualitative examples for DCoT prompts*
-
-
 
 ## 定位与知识库关联
 
@@ -398,8 +366,6 @@ $$\operatorname{Var}(RLR) \leq \sum_{t} \operatorname{Var}(g_t) + 2 \sum_{t \neq
 - 如何自适应地为不同任务和提示词选择子链起始点j的分布，而非依赖固定的梯度范数重要性采样？
 - 在更大规模模型上，FO+HO+ZO的内存分配策略是否需要重新优化？
 - 将DCoT的多尺度提示分解思想推广到其他生成任务（如3D生成、音频生成）的可行性。
-
-
 
 ## 原文 PDF
 

@@ -117,8 +117,6 @@ EMER 将多模态情感识别从传统的封闭集分类重新定义为**可解�
 
 **证据强度说明**：上述模块关系在 Figure 2 和 Figure 4 中有明确的可视化呈现，消歧模块和两步策略的效果由 Table 3 和 Figure 5 的消融实验支撑（置信度 0.95–0.98）。数据集仅 332 个样本且标注过程依赖 GPT 系列模型，泛化性需进一步验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1045_https_arxiv_org_abs_2306_15401/figures/001_Figure_2.jpg]]
 *Figure 2: Pipeline of generating multimodal descriptions EMER(Multi)*
 
@@ -222,8 +220,6 @@ Table 8报告了各模型在BLEU-1/4、METEOR、ROUGE-L等传统文本匹配指�
 4. **跨语言公平性存疑**：同义词分组和标签提取均依赖GPT-3.5，其在中文上的分组一致性可能弱于英文，且跨语言标签对齐方法（翻译+重叠率计算）引入了不可控的语义损失。
 
 5. **基线能力边界**：所有开源MLLM均以7B权重运行，未进行针对情感任务的微调或提示工程优化，部分模型（如VideoChat、Otter）不支持音频输入，这使比较的公平性受到模态覆盖度的限制。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l1045_https_arxiv_org_abs_2306_15401/figures/005_Table_3.jpg]]
 *Table 3: Main results on emotion recognition. We consider language influence and report results for descriptions in distinct languages. The values in the gray column are used for the final ranking*

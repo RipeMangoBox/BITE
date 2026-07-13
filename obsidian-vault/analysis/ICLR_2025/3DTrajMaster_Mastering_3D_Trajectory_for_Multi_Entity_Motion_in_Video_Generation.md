@@ -50,8 +50,6 @@ claims:
 
 **局限**：当前方法仅控制实体全局轨迹，缺乏对细粒度局部运动（如跳舞、手势）的直接控制能力；实体间交互（碰撞、交流）尚未建模；评估仅局限于人类实体（因缺少开放世界4D动物姿态估计器），且训练数据实体数量上限为3个。
 
-
-
 ### 问题背景
 
 视频生成领域近年来取得了显著进展，文本到视频（T2V）模型已经能够生成视觉质量较高的视频内容。然而，当需要对视频中实体的运动进行精确控制时，现有方法面临根本性挑战：**真实世界中物体的运动本质上是三维的**，包含位置变化和朝向旋转，而当前的可控生成技术几乎完全依赖二维控制信号。
@@ -75,8 +73,6 @@ claims:
 这一选择面临两个关键挑战。第一，**如何将3D运动信息注入预训练的视频扩散模型而不破坏其生成先验**。视频扩散模型通常在大规模真实视频上训练，其内部表征与3D运动信号之间存在模态鸿沟。第二，**如何获取大规模、高质量的3D运动-视频配对数据**。真实视频数据集缺乏精确的3D轨迹标注，且存在严重的类别不平衡问题（如 Figure S10 所示，人类实体占比过高），无法支撑模型学习通用的3D运动控制能力。
 
 为应对这些挑战，本文设计了三个互补的技术组件：一个即插即用的3D运动基础对象注入器，通过门控自注意力机制建立实体与轨迹的一一对应；一个基于合成数据的训练范式，利用Unreal Engine构建360°运动数据集；以及域适应器和退火采样策略，缓解合成数据带来的域偏移问题。这些设计共同构成了 **3DTrajMaster** 的核心技术路线。
-
-
 
 ## 核心方法与创新机理
 
@@ -123,8 +119,6 @@ claims:
 
 这些创新并非孤立存在，而是形成了因果链条：6DoF 表示使 3D 运动控制成为可能，但要求精确的实体-轨迹对应；合成数据解决了标注问题，却引入了域偏移；域适应器和退火采样则弥合了这一差距，最终在 TransErr 0.398 m、RotErr 0.277° 的精度（Table 2）下保持了可接受的视频质量。
 
-
-
 ![[assets/figures/papers/paper_list_l27_3DTrajMaster_Mastering_3D_Trajectory_for_Multi_Entity_Motion_in_Video_Ge/figures/002_Figure_2.jpg]]
 *Figure 2: 3DTrajMaster Framework. Given a text prompt consisting of N entities $\{ \mathbf { e } _ { n } \} _ { n = 1 } ^ { N }$ , 3DTrajMaster (a) is able to generate the desired video with entity motions that conform to the input entity-wise pose sequences $\langle \mathbf { \check { P } } _ { n } \rangle _ { n = 1 } ^ { N }$ . Specifically, it involves two training phases. First, it utilizes a domain adaptor to mitigate the negative impact of training videos. Then, an object injector module is inserted after the 2D spatial self-attention layer to integrate paired entity prompts and 3D trajectories. (b) Details of the object injection process. The entities are projected into latent embeddings through t...
 
@@ -161,8 +155,6 @@ $$\mathcal{L}(\boldsymbol{\theta}_2) = \mathbb{E}_{\mathbf{x}, \mathbf{c}, \bold
 推理时，通过降低 LoRA 缩放系数 $\alpha$（最优值为 0.4）来削弱 UE 风格，从而在保证视频质量的同时实现高精度 3D 运动控制。
 
 **退火采样推理**。在推理阶段，3DTrajMaster 采用退火条件采样策略（Algorithm 1）：前 $T_c$ 步注入轨迹条件以确定实体的整体运动轨迹，后续步骤仅依赖基础 T2V 先验生成高质量视觉细节。这一策略有效平衡了运动控制精度与视频质量，是完整 pipeline 中不可或缺的推理环节。
-
-
 
 ### 3.1 问题形式化与扩散先验
 
@@ -211,8 +203,6 @@ $$\mathcal { L } ( \theta _ { 2 } ) = \mathbb { E } _ { \mathbf { x } , \mathbf 
 ### 3.4 退火采样策略
 
 推理阶段采用退火条件采样：前 $T_c$ 步注入轨迹条件以确定整体运动轨迹，后续步骤仅依赖基础 T2V 先验生成细节纹理。该策略通过调节条件注入的时长来平衡运动控制精度与视觉质量。消融显示，省略退火采样使 FVD 从 1546.15 升至 1841.64，而旋转误差仅从 0.277° 轻微变化至 0.265°，验证了该策略对视觉质量的关键作用（Table 3）。最优退火时间步 $T_c = 25$（Table R8）。
-
-
 
 ## 实验与关键发现
 
@@ -270,21 +260,14 @@ Table R12 的用户调查结果进一步验证了 3DTrajMaster 的感知优势�
 3. **合成-真实域差距**：尽管域适应器有效缓解了 UE 风格，模型在处理高度逼真的现实世界视频时可能仍存在域偏移。
 4. **缺乏局部运动控制**：当前方法仅控制全局轨迹（位置和朝向），无法处理细粒度局部运动（如跳舞、挥手）和实体间交互（如碰撞、交流），这是后续研究的重要方向。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l27_3DTrajMaster_Mastering_3D_Trajectory_for_Multi_Entity_Motion_in_Video_Ge/figures/013_Figure.jpg]]
 *Figure: Pexelsand Pixabay Figure S1O: Entity Distribution Over 60 Classes in Artgrid, Pixabay,and Pexels*
 
 ![[assets/figures/papers/paper_list_l27_3DTrajMaster_Mastering_3D_Trajectory_for_Multi_Entity_Motion_in_Video_Ge/figures/015_Table.jpg]]
 *Table: R8: Ablation Study on Annealed Timestep T _ { c }*
 
-![[assets/figures/papers/paper_list_l27_3DTrajMaster_Mastering_3D_Trajectory_for_Multi_Entity_Motion_in_Video_Ge/figures/003_Figure_3.jpg]]
-*Figure 3: Dataset Construction Illustration. We correlate (a) collected 3D assets with (b) GPT- generated 3D trajectories on (c) diverse 3D UE platforms, positioning(d) 12 evenly distributed surrounding cameras to capture the object motions in video format*
-
 ![[assets/figures/papers/paper_list_l27_3DTrajMaster_Mastering_3D_Trajectory_for_Multi_Entity_Motion_in_Video_Ge/figures/004_Table_1.jpg]]
 *Table 1: Fine Control Comparison with Multi-Entity Input*
-
-
 
 ## 定位与知识库关联
 
@@ -350,8 +333,6 @@ Table R12 的用户调查结果进一步验证了 3DTrajMaster 的感知优势�
 3. **真实视频训练的桥接：** 如何将当前仅限于合成数据的训练扩展到利用大规模真实视频？关键在于获取或推断真实视频中的3D轨迹监督信号——这可能需要借助单目3D重建、多视角几何或自监督学习技术。
 
 4. **自适应条件调度：** 退火采样和域适应器之间的相互作用是否可以通过更自适应的方式动态调整？例如，根据当前去噪步的预测不确定性或实体运动的复杂度，自动调节条件注入强度，以在不同场景下自动平衡质量和控制精度。
-
-
 
 ## 原文 PDF
 

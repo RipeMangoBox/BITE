@@ -57,8 +57,6 @@ claims:
 - 用户偏好研究中，评分者对 DCM 的偏好一致超过 72%，远高于 LCM 和 PCM。
 - 推理延迟与 LCM、PCM 几乎相同（均在 121 秒左右，双 A100 GPU），未引入额外推理开销。
 
-
-
 ### 视频扩散模型的加速困境
 
 扩散模型已成为文本到视频生成的主流范式，其核心在于通过一个常微分方程（ODE）轨迹逐步从纯噪声中恢复出高保真视频。前向过程将干净数据 $\pmb{x}_0$ 逐步加噪至 $\pmb{x}_t$：
@@ -93,8 +91,6 @@ $$\mathcal{L}_{DM} = \mathbb{E}_{\pmb{x}, \epsilon \sim \mathcal{N}(0,1), t} \le
 
 基于上述观察，本文的核心动机是：**通过架构解耦来消除一致性蒸馏中的优化冲突**。具体而言，将 ODE 轨迹分割为语义合成与细节精修两个阶段，分别训练专门的去噪专家，使每个专家只需专注于单一类型的学习目标。同时，通过参数高效的设计（冻结共享基座、仅添加轻量适配层）来控制额外开销，并辅以针对性损失函数（时间一致性损失、GAN 损失）分别增强两个专家的输出质量。
 
-
-
 ## 核心方法与创新机理
 
 DCM 的核心创新在于对一致性蒸馏过程中**优化冲突**的识别与解耦。作者通过可视化训练动态（图 2(b)）发现，高噪声与低噪声样本对应的损失贡献与梯度范数存在显著差异——这导致单一学生模型（VCM）在同时学习语义布局/运动和细节细化时陷入优化冲突，难以收敛到最优解，最终损害视频的时序一致性与细节质量。
@@ -116,8 +112,6 @@ DCM 的核心创新在于对一致性蒸馏过程中**优化冲突**的识别与
    分割边界 $\kappa=37$ 并非随意设定，而是基于相邻时间步 L1 距离分析选定的最优分割点（图 10），确保语义与细节阶段在噪声水平上具有清晰的界限。
 
 这些改动协同作用，使 DCM 在仅 4 步采样下即达到 VBench 总分 83.83，与原始 50 步 HunyuanVideo 相当，且显著优于 LCM（80.33）和 PCM（80.83），同时推理延迟几乎不变（Table 1）。用户偏好研究（Table 2）中评分者对 DCM 的偏好率一致超过 72%，进一步佐证了创新设计的实际收益。
-
-
 
 DCM 的整体训练流程分为两个解耦的阶段：语义学习阶段与细节学习阶段，分别对应 ODE 轨迹上高噪声与低噪声的两个子区间。其核心思想源于对一致性蒸馏训练动态的诊断——图 2(b) 显示，高噪声样本与低噪声样本在损失值和梯度范数上存在显著差异，表明单一学生模型（VCM）在同时学习语义布局/运动与细节细化时面临优化冲突，这是导致收敛困难与生成质量下降的根本瓶颈。
 
@@ -157,13 +151,6 @@ DCM 的整体训练流程分为两个解耦的阶段：语义学习阶段与细�
 | 轨迹分割 | 全轨迹训练 | $\kappa=37$ 分割高/低噪声区间 | Figure 10 展示 $\kappa$ 敏感性 |
 
 整体框架通过解耦优化避免了高噪声与低噪声样本之间的梯度冲突，同时以参数高效的方式控制额外开销，使得 DCM 在 4 步推理下即可实现与教师模型相当的质量，且每步推理延迟与 LCM、PCM 几乎相同（表 1）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2506_03123/figures/004_Figure_4.jpg]]
-*Figure 4: The training process of DCM consists of two stages. In the semantic learning stage, we train SemE on high-noise samples with consistency loss and temporal coherence loss as the learning objectives. In the detail learning stage, we initialize DetE with the weights of SemE and introduce a set of time-dependent layers and LoRA. DetE is then trained on low-noise samples, where only the newly added layers and LoRA are updated. The learning objectives in this stage include consistency loss, GAN loss, and Feature Matching loss*
-
-
 
 ### 问题背景：一致性蒸馏中的优化冲突
 
@@ -255,11 +242,6 @@ $$\mathcal{L}_D = \mathbb{E}_{\mathbf{x}, t_n} [f_D(\Omega(\mathbf{x}_{fake}))] 
 
 $\kappa$ 的选择直接影响两个专家的任务划分。DCM 基于相邻时间步之间的 L1 距离来确定最优分割点，默认 $\kappa=37$。Figure 10 展示了不同 $\kappa$ 取值对性能的影响，验证了该选择的合理性。
 
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2506_03123/figures/010_Figure_10.jpg]]
-*Figure 10: Impact of different κ*
-
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈验证：高噪声与低噪声样本的优化冲突
@@ -290,30 +272,14 @@ DCM 的设计动机源于对一致性蒸馏训练动态的细致诊断。图 2(b
 
 尽管 DCM 在 4 步采样下取得了优异表现，但当采样步数进一步减少至 2 步时，合成质量出现显著下降，无法产生令人满意的结果。这表明当前的双专家蒸馏范式在极低步数场景下仍面临挑战。此外，现有实验主要在 HunyuanVideo 和 CogVideoX 两个教师模型上进行验证，其在更广泛的视频扩散模型上的泛化能力尚待确认。GAN 训练的不稳定性在更长视频或更复杂场景下是否会影响整体性能，也需进一步评估。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2506_03123/figures/006_Table_1.jpg]]
 *Table 1: Comparison of efficiency and visual quality of different methods. The latency of HunyuanVideo was measured on two A100 GPUs, and that of CogVideoX on a single A100 GPU*
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2506_03123/figures/009_Table_2.jpg]]
-*Table 2: User preference study. The numbers represent the percentage of raters who favor the videos synthesized by our method*
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2506_03123/figures/008_Table_3.jpg]]
-*Table 3: Impact of different components of our method*
 
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2506_03123/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of visual results between our DCM (4 steps), the original HunyuanVideo, and other competing methods (left). Comparison of latency and VBench score across different methods (right). Latency is measured on two A100 GPUs under the video synthesis configuration of 129 frames at 1280 × 720 resolution*
 
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2506_03123/figures/007_Figure_6.jpg]]
 *Figure 6: Visual quality comparison of different methods. Differences are highlighted in boxes*
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2506_03123/figures/011_Figure_7.jpg]]
-*Figure 7: Impact of optimization decoupling and parameterefficient distillation*
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2506_03123/figures/012_Figure_8.jpg]]
-*Figure 8: Impact of temporal coherence loss*
-
-
 
 ## 定位与知识库关联
 
@@ -370,8 +336,6 @@ DCM 的有效性已在 HunyuanVideo 和 CogVideoX 两个教师模型上得到验
 3. **时间一致性损失的优化空间**：当前 $L_{TC}$ 仅使用固定帧间隔 $l$，其设计空间（如多尺度帧间隔、可学习的时序对齐策略）仍有探索潜力。
 
 4. **GAN 训练的规模化稳定性**：随着视频长度和分辨率的增加，细节专家的 GAN 训练是否需要引入额外的稳定化技术（如自适应判别器增强、梯度惩罚），是一个待验证的工程问题。
-
-
 
 ## 原文 PDF
 

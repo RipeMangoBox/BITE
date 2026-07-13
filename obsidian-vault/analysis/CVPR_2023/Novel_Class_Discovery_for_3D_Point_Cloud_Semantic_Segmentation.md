@@ -50,8 +50,6 @@ claims:
 
 在SemanticPOSS和SemanticKITTI两个基准数据集上，NOPS均显著优于专门为3D点云改编的基线方法EUMS†（Zhao et al., CVPR 2022）。SemanticPOSS上平均新类mIoU达到21.40，相较EUMS†提升6.5个点；SemanticKITTI上平均新类mIoU达到22.84，提升5.8个点。消融实验进一步证实，逐步引入在线聚类、不确定性筛选和类别平衡队列能够持续提升新类分割性能，验证了各组件的协同有效性。
 
-
-
 点云语义分割是自动驾驶、机器人导航等三维场景理解任务的核心技术。然而，现实世界中物体类别不断涌现，完全依赖人工标注的闭集训练范式难以持续扩展。新类发现（Novel Class Discovery, NCD）旨在利用已标注基类的知识，从未标注数据中自动发现并分割出新语义类别，从而降低标注成本并提升模型的开放世界适应能力。
 
 当前NCD研究主要集中在2D图像领域。以**EUMS**（Zhao et al., CVPR 2022）为代表的2D方法，通过离线K-Means聚类生成伪标签并结合自训练，在图像语义分割新类发现上取得了显著进展。然而，将这些方法迁移至3D点云面临三个根本性挑战：
@@ -63,8 +61,6 @@ claims:
 **第三，批次内类别缺失与长尾分布。** 3D点云场景中，不同类别的点数差异悬殊（如地面点远超行人点），且单个训练批次内难以保证所有新类均出现。这种批次级的类别缺失和不平衡，使得传统基于批次内统计的聚类方法极易产生退化解——将所有点分配给同一类别。
 
 上述挑战共同指向一个核心瓶颈：**在3D点云语义分割的新类发现中，如何在无需离线全量聚类、不依赖前景/背景假设的条件下，实现高质量且计算可行的在线新类学习？** 本文正是围绕这一问题展开，提出了在线伪标签分配策略NOPS（NOvel Point Segmentation），通过最优传输聚类、类别平衡队列与不确定性自适应筛选的协同设计，首次实现了面向3D点云的高效新类语义分割。
-
-
 
 ## 核心方法与创新机理
 
@@ -106,8 +102,6 @@ NOPS 采用多个新类分割头与过聚类头（$o=3$）协同训练，输出 
 
 消融实验（Figure 4）系统验证了各组件的独立贡献：仅使用在线聚类（NP，无预训练）即可在新类上达到 20.26 mIoU；加入不确定性筛选（NP+）提升至 20.63；再引入类别平衡队列（NP++）达到 20.90；完整 NOPS 取得最佳性能。这证实了三个创新点之间存在正向协同效应。
 
-
-
 NOPS的整体pipeline围绕“双视图增强—共享特征提取—在线伪标签分配—双头预测—交换一致性优化”构建，核心设计目标是摆脱离线全量聚类对前景/背景假设和巨大内存的依赖，转而在每个批次内通过最优传输在线产生高质量的软伪标签。
 
 ### 数据流与模块关系
@@ -137,12 +131,6 @@ $$\mathcal{L}(\mathcal{X}) = \ell(\hat{\mathcal{V}}', \tilde{\mathcal{V}}'') + \
 EUMS†的pipeline（Figure 6）采用“预训练—全数据集下采样—离线K-Means聚类—微调”的串行流程：先用基类点预训练 $f_\xi$ 和 $f_b$，再对所有场景的新类点随机下采样并提取特征，在全量特征上执行K-Means产生硬伪标签，最后插入新分割头 $f_c$ 进行微调。这一流程在3D场景中面临两个根本性困难：①每个场景可能包含多个新类，离线聚类无法利用场景级上下文；②点云规模巨大，全量聚类内存消耗极高。
 
 NOPS将上述离线串行流程重构为在线并行架构：伪标签生成与特征学习在同一批次内交替进行，无需预训练阶段，也不依赖前景/背景显著性假设。消融实验证实，逐步加入在线聚类（NP, 20.26 mIoU）、不确定性筛选（NP+, 20.63 mIoU）和类别平衡队列（NP++, 20.90 mIoU）能持续提升新类分割性能，完整NOPS取得最优（Figure 4）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2303_11610/figures/002_Figure_2.jpg]]
-*Figure 2: Overview of NOPS. We random augment the input point cloud twice and extract point-level features $\mathcal { F }$ with the shared model $f _ { \xi } . \mathcal { F }$ are used to obtain pseudo-labels in the online pseudo-labelling. We forward $\mathcal { F }$ to a novel $f _ { n }$ and a base $f _ { b }$ segmentation layer to output the novel and base predictions, respectively. We optimise our network by minimising a global objective function based on cross entropy
-
 
 
 NOPS 的核心由三个紧密协作的模块构成：**在线伪标签分配**、**类别平衡队列**和**不确定性感知筛选**。它们共同解决了将 2D 新类发现方法迁移到 3D 点云时面临的关键瓶颈——离线 K-Means 聚类伪标签质量差、内存消耗巨大，且难以应对批次内类别缺失与长尾分布。
@@ -184,8 +172,6 @@ $$\phi : ( { \mathcal { F } } _ { n } , { \hat { \mathcal { V } } } _ { n } ) \t
 $$\mathcal { L } ( \mathcal { X } ) = \ell ( \hat { \mathcal { V } } ^ { \prime } , \tilde { \mathcal { V } } ^ { \prime \prime } ) + \ell ( \hat { \mathcal { V } } ^ { \prime \prime } , \tilde { \mathcal { V } } ^ { \prime } )$$
 
 其中 $\hat{\mathcal{V}}$ 为模型预测。该损失强制两个增强视图在伪标签空间下保持一致性，驱动特征提取器 $f_\xi$ 和类原型 $\boldsymbol{\mathsf{P}}$ 的联合学习。基类分割头 $f_b$ 则使用真实标注计算标准交叉熵损失，二者联合优化实现基类知识的保持与新类结构的发现。
-
-
 
 ## 实验与关键发现
 
@@ -234,23 +220,6 @@ $$\mathcal { L } ( \mathcal { X } ) = \ell ( \hat { \mathcal { V } } ^ { \prime 
 
 4. **队列机制的固定容量**：类别平衡队列$Z_q$的容量是固定的超参数，其最优值可能随数据集规模和类别分布变化，目前缺乏自适应的容量调整机制。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2303_11610/figures/010_Figure_5.jpg]]
-*Figure 5: Histograms representing the number of points belonging to each class in SemanticKITTI [4] and SemanticPOSS [24]. Each class has been assigned the colour of the split in which it has to be considered novel (unlabelled)*
-
-![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2303_11610/figures/003_Table_1.jpg]]
-*Table 1: SemanticKITTI splits, is defined as $\mathrm { K I T T I } { - n } ^ { i }$ , where n is the number of novel classes and i is the split index*
-
-![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2303_11610/figures/004_Table_2.jpg]]
-*Table 2: SemanticPOSS splits, defined as $\mathrm { P O S S } { - n ^ { i } }$ , where n is the number of novel classes and i is the split index*
-
-![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2303_11610/figures/005_Table_3.jpg]]
-*Table 3: Novel class discovery results on SemanticPOSS. NOPS outperforms EUMS† on three out of four splits. Full supervision: model trained with labels for base and novel classes. EUMS†: baseline described in Sec. 4. Highlighted values are the novel classes in each split*
-
-![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2303_11610/figures/006_Table_4.jpg]]
-*Table 4: Novel class discovery results on SemanticKITTI. NOPS outperforms EUMS† on all four splits. Full supervision: model trained with annotations for base and novel classes. EUMS†: baseline described in Sec. 4. Highlighted values are the novel classes in each split*
-
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2303_11610/figures/009_Table_5.jpg]]
 *Table 5: Ablation study showing how different values of p affect the performance on SemanticPOSS. The lower p is, the less severe the selection of the features, resulting in better performances for $\mathrm { P O S S – 4 } ^ { 0 }$ . Differently, POSS-33 benefits from an higher value of p, which leads to a more vigorous filtering of the features. POSS- $3 ^ { 1 }$ and POSS-32 show the best performances with p = 0.5*
 
@@ -265,8 +234,6 @@ $$\mathcal { L } ( \mathcal { X } ) = \ell ( \hat { \mathcal { V } } ^ { \prime 
 
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2303_11610/figures/019_Figure_14.jpg]]
 *Figure 14: Qualitative comparison on SemanticKITTI from KITTI-43. EUMS† [41] outputs are completely or partially wrong for the novel classes. NOPS improves the performance by providing correct and more homogeneous predictions*
-
-
 
 ## 定位与知识库关联
 
@@ -311,8 +278,6 @@ NOPS的有效性建立在两个前提之上，这些前提也构成了其适用�
 3. **极端类别不平衡的损失设计。** 3D点云中类别频率差异可达数个数量级（如SemanticKITTI中“道路”与“摩托车手”的点数之比），当前简单的等权交叉熵损失在极端不平衡下可能失效。如何设计对长尾分布鲁棒的聚类损失，是提升新类发现质量的关键。
 
 4. **点云特有的几何先验利用。** NOPS当前仅依赖点级特征进行聚类，未显式利用3D空间中的几何连续性、法向量或局部邻域结构。将这些几何先验融入聚类过程，可能进一步提升伪标签质量，尤其是在几何结构清晰但外观相似的类别上。
-
-
 
 ## 原文 PDF
 

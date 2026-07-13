@@ -154,11 +154,6 @@ $$
 
 这条 pipeline 的核心洞察是：**利用任务文本语义驱动对高维气象数据的自适应注意力**。传统方法将 4D 数据压缩为 3 通道 RGB 图像，丢失了垂直结构、时序演变和变量间的物理关联，导致模型对快速强天气过程（尤其是冰雹等罕见类别）基本失效。MMLM 通过三个模块分别解决“何时关注”（DTGF）、“何处关注”（TGS）和“关注哪些物理量”（TGCA），使模型能直接处理原始 4D 数据并聚焦于与查询相关的关键时空尺度和物理变量，从而在保留关键细节的同时抑制冗余通道和无关区域的干扰。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2745_https_arxiv_org_abs_2508_06859/figures/001_Figure_1.jpg]]
-*Figure 1: Conceptual illustration for severe weather event prediction using the Meteorological Multimodal Large Model (MMLM)*
-
 MeteorPred的核心在于三个可插拔的时空-通道注意力模块：**DTGF**（动态时序门控融合）、**TGS**（文本驱动高斯空间掩码）和**TGCA**（文本驱动通道注意力）。它们分别从时间、空间和垂直维度向多模态大模型注入气象先验，使其能够直接处理4D原始气象数据（时间×气压层×经纬度×变量），而非将其粗暴压缩为3通道RGB图像。
 
 ### DTGF：动态时序门控融合
@@ -219,25 +214,11 @@ $$\mathbf{Y} = \mathbf{X} \cdot \mathrm{Sigmoid}\big(\mathrm{Softmax}(\mathbf{V}
 
 三个模块的输出经拼接后，通过一个可学习的3D卷积与MLP融合层（Fusion Layer）整合为统一的视觉表示，再输入LLM骨干网络（如Qwen2.5-VL-7B-Instruct）进行文本解码。消融实验（Table 3）证实，三个模块联合工作时所有指标达到最优，且模块间存在互补性——例如DTGF与TGS的组合能进一步改进区域识别精度。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2745_https_arxiv_org_abs_2508_06859/figures/016_Figure_7.jpg]]
-*Figure 7: Examples of TGCA’s Weight distribution patterns. Each subplot represents a type of severe weather event*
-
-![[assets/figures/papers/paper_list_l2745_https_arxiv_org_abs_2508_06859/figures/014_Figure_8.jpg]]
-*Figure 8: Examples of DTGF’s weights difference distribution patterns.Each subplot represents a type of severe weather event. The positive bar indicates higher weights for red warnings. The negative bar indicates higher weights for blue warnings*
-
 ## 实验与关键发现
 
 ### 实验设置概览
 
 实验基于作者构建的 **MP-Bench** 数据集，该数据集以2023年中国气象局发布的强天气预警文本为核心，对齐ERA5再分析数据中的5种物理变量（温度、纬向风、经向风、比湿、位势高度），覆盖37个垂直气压层（1000 hPa至1 hPa），每条样本包含预警发布时刻起12小时窗口的原始四维气象场（时间×气压层×纬度×经度）。评测任务分为四类：多选题主类（MC-main）、多选题子类（MC-sub）、判断题（T/F）、区域选择（RSW）和全国强天气描述（NSW），其中NSW采用GPT-4o作为评判器，依据气象专家制定的细粒度评分标准进行0–5分评估。训练集为2023年中国数据，测试集包含2024年中国数据及NOAA美国子集。基线模型使用仅3个气压层（1000 hPa、850 hPa、500 hPa）的关键变量压缩为3通道RGB图像进行微调；MMLM则使用完整185通道（37层×5变量）并结合DTGF、TGS、TGCA三个模块。训练超参数与评估参数详见 Table 8 与 Table 9。
-
-![[assets/figures/papers/paper_list_l2745_https_arxiv_org_abs_2508_06859/figures/020_Table_8.jpg]]
-*Table 8: Model Training Parameters*
-
-![[assets/figures/papers/paper_list_l2745_https_arxiv_org_abs_2508_06859/figures/021_Table_9.jpg]]
-*Table 9: Model Evaluation Parameters*
 
 ### 主实验结果
 

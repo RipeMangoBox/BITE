@@ -61,8 +61,6 @@ claims:
 
 **方法定位**：该方法属于基于预训练T2V扩散模型的一次性运动定制范式，通过参数高效微调（LoRA）和分阶段解耦训练，在单参考视频条件下实现运动迁移。其即插即用设计支持与现有图像定制方法（如Dreambooth）及多运动组合的灵活集成。
 
-
-
 ### 文本到视频生成与运动定制的困境
 
 近年来，基于扩散模型的文本到视频（Text-to-Video, T2V）生成取得了显著进展，用户只需提供一段文本描述即可获得一段视频。然而，单纯的文本提示难以精确控制视频中的运动模式——比如让一个角色做出特定的舞蹈动作、或让摄像机以特定的轨迹运镜。这催生了“运动定制”（Motion Customization）的需求：给定一个参考视频，将其中的运动模式提取出来，并迁移到由新文本描述的新主体、新场景中。
@@ -90,8 +88,6 @@ claims:
 
 通过这种分阶段的训练策略，Customize-A-Video在运动保真度与生成多样性之间取得了突破性平衡，支持将同一运动迁移到不同主体、组合多个运动模式，甚至与现有的图像定制方法协同工作。
 
-
-
 ## 核心方法与创新机理
 
 ### 问题瓶颈
@@ -115,8 +111,6 @@ Customize-A-Video 的核心创新在于通过**分阶段解耦训练**，将空�
 ### 核心洞察
 
 上述两个 changed slots 共同实现了一个简洁而强大的因果机制：**通过将空间外观吸收与时间运动学习在训练阶段解耦，即使在只有一个参考视频的条件下，T-LoRA 也能学习到纯净的运动表征，在推理时与任意新外观文本提示结合，生成既忠实于原始运动又具备丰富多样变化的视频。** 定量证据支持这一洞察：在 LOVEU-TGVE-2023 子集（53 个视频）上，带有文本倒置外观吸收器的配置在文本对齐（CLIPScore 32.632）和时序一致性（LPIPS 0.160）上均优于 MotionDirector；用户研究中，双吸收器配置在运动保真度（3.72/5）和运动多样性（3.72/5）上均显著领先。
-
-
 
 ![[assets/figures/papers/paper_list_l39_Customize_A_Video_One_Shot_Motion_Customization_of_Text_to_Video_Diffusi/figures/011_Figure_8.jpg]]
 *Figure 8: Additional generation results of our method*
@@ -155,8 +149,6 @@ Customize-A-Video 的核心目标是从**单个参考视频**中提取运动模�
 -   **输出**：一段包含目标运动、但具备全新外观和帧间多样性的视频。
 
 该框架的核心洞见在于**通过分阶段训练实现空间与时间信号的因果解耦**。消融实验（Fig. 4）强有力地证实了这一点：若在空间注意力层上额外添加 LoRA，会严重干扰运动建模，导致生成结果保留大量原始外观；而完全不使用外观吸收器时，T-LoRA 仍会学习到部分空间信息，限制了新外观的生成能力。
-
-
 
 ### 基础模型与扩散损失
 
@@ -205,8 +197,6 @@ $$L_{\Delta \theta_T} = \mathbb{E}_{x^{1...F}, \epsilon, t} [\| \epsilon - \epsi
 **双吸收器协同**：S-LoRA擅长捕获局部纹理细节，文本倒置擅长语义层面的外观表征。两者组合（Dual AA）达到最佳的空间清除效果，生成的视频同时清晰展现新主体和背景，在用户研究中运动保真度与多样性均达3.72分（Table 2, Sec. 4.1）。
 
 **无序帧训练与裁剪策略**：外观吸收器在绕过时间层的无序帧上训练，本质退化为图像生成任务。为防止过拟合全局结构，采用裁剪训练（patch training），将帧随机裁剪为局部块，最优裁剪比例在0.33至0.67之间（Appendix A.2）。
-
-
 
 ## 实验与关键发现
 
@@ -259,18 +249,11 @@ $$L_{\Delta \theta_T} = \mathbb{E}_{x^{1...F}, \epsilon, t} [\| \epsilon - \epsi
 
 **Figure 5** 展示了两个扩展应用场景：左侧将 T-LoRA 与已有的预训练 S-LoRA 结合，实现外观与运动的双重定制；右侧同时加载两个 T-LoRA 模块（慢跑 + 推拉变焦），验证了残差连接设计使多运动组合成为可能。**Figure 6** 进一步验证了与 DDIM 反转结合的精确帧级编辑，以及使用第三方 Dreambooth UNet 作为外观吸收器的兼容性，表明方法具有良好的模块化扩展能力。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l39_Customize_A_Video_One_Shot_Motion_Customization_of_Text_to_Video_Diffusi/figures/015_Figure.jpg]]
 *Figure: B*
 
 ![[assets/figures/papers/paper_list_l39_Customize_A_Video_One_Shot_Motion_Customization_of_Text_to_Video_Diffusi/figures/016_Figure.jpg]]
 *Figure: C D*
-
-![[assets/figures/papers/paper_list_l39_Customize_A_Video_One_Shot_Motion_Customization_of_Text_to_Video_Diffusi/figures/018_Figure_12.jpg]]
-*Figure 12: An example question in the human user study. Participants are asked to rate each algorithm’s output videos from 1 to 5 stars*
-
-
 
 ## 定位与知识库关联
 
@@ -314,8 +297,6 @@ Customize-A-Video 在预训练 T2V 扩散模型（基于 ModelScope）的基础�
 - 如何使方法更好地兼容快速演进的新一代视频生成基础模型，支持更多样的时间注意力形式
 - 能否设计自动化的调优策略，根据视频内容自适应确定最优训练轮数，减少手动调整需求
 - 在复杂运动、长视频和相机剧烈运动场景下，如何保持运动保真度和外观一致性的平衡
-
-
 
 ## 原文 PDF
 

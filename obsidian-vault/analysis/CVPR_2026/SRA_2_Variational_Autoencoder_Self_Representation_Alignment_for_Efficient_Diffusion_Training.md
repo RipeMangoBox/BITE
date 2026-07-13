@@ -212,8 +212,6 @@ Table 5 对比了 REPA、**SRA**（Jiang et al., arXiv 2025）和 SRA 2 的训�
 
 当前实验未报告明确的失败模式，但存在以下需手动验证的点：在极高分辨率或极端域外场景下，预训练 VAE 特征的信息丰富度是否仍足以提供有效引导，尚缺乏实验证据。此外，SRA 2 在视频生成、3D 生成等缺乏成熟预训练 VAE 的领域是否有效，仍为开放问题。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l935_https_arxiv_org_abs_2601_17830/figures/006_Table_2.jpg]]
 *Table 2: FID comparison across training iterations for accelerated alignment methods. All experiments are conducted on ImageNet (256×256) with a batch size of 256 and without CFG*
 

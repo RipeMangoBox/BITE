@@ -69,8 +69,6 @@ NeoVerse在方法谱系中处于**重建引导的视频生成**范式，其关�
 
 NeoVerse对缺乏3D结构的2D内容（如卡通）处理能力有限，可能生成错误的3D轮廓；与多数视频扩散模型类似，偶尔难以生成清晰文字；其高斯插值依赖线性运动假设，在高度非线性运动场景下可能偏离实际（见Figure S1及附录讨论）。
 
-
-
 4D世界建模旨在从视觉输入中重建动态3D场景并支持自由视点渲染，是计算机视觉与图形学交叉领域的核心挑战。近年来，以3D高斯泼溅（3DGS）和视频扩散模型为代表的生成式方法取得了显著进展，但其实际部署仍受制于两个根本性瓶颈。
 
 **数据可扩展性瓶颈。** 现有4D重建与生成方法大多依赖昂贵的多视图数据或需要已知相机姿态的离线预处理流程。例如，基于NeRF或3DGS的方法通常需要从多视角图像或RGB-D序列中离线重建场景表示，再以此作为生成模型的条件输入。这类管线不仅计算开销大，更关键的是难以利用互联网上巨量的野生单目视频——这些视频天然包含丰富的动态场景先验，却因缺乏姿态标注和多视图约束而被现有方法排除在外。
@@ -80,8 +78,6 @@ NeoVerse对缺乏3D结构的2D内容（如卡通）处理能力有限，可能�
 上述瓶颈共同指向一个核心问题：**如何构建一个能够从大规模野生单目视频中高效学习的4D世界模型，使其既具备可扩展的训练范式，又能在退化渲染条件下生成高质量的新视点视频？**
 
 NeoVerse正是针对这一问题提出。其核心洞察在于：将高效的前馈式4D重建与在线退化模式模拟相结合，使得视频生成模型能够直接从野生单目视频中学习“退化→高质量”的映射，从而绕开传统方法的重计算预处理和有限数据约束。这一设计使得模型能够从约1M视频片段的训练数据中学习丰富的动态场景先验，在静态重建、动态重建和新视图生成三个任务上均取得显著提升。
-
-
 
 ## 核心方法与创新机理
 
@@ -117,8 +113,6 @@ NeoVerse 的核心创新在于通过**无姿态前馈式4DGS重建**与**在线�
 | 训练数据生成 | 离线预处理（深度估计等）或静态多视图数据 | 在线单目退化模拟，直接从野生视频创建训练对 |
 
 这些 slot 级别的改变共同构成了 NeoVerse 的方法论突破：将4D世界模型的训练范式从“重计算、小数据”转向“轻计算、大数据”，从而在静态重建（VRNeRF PSNR 20.73 vs AnySplat 18.02）、动态重建（ADT PSNR 32.56 vs 4DGT 30.09）和新视图生成（VBench 主观一致性 88.43 vs TrajectoryCrafter 83.02）三个任务上均取得显著提升。
-
-
 
 NeoVerse 的整体流程由两大核心阶段构成：**无姿态前馈式 4DGS 重建** 与 **退化渲染条件引导的视频生成**。系统输入为一段野生单目视频，输出为在新视角下时空一致的高质量视频。
 
@@ -169,16 +163,6 @@ NeoVerse 的训练分为两个阶段：
 2. **生成模型训练**：在重建模型的基础上，进行在线重建与退化模拟，将退化渲染作为条件输入生成模型，原始视频作为目标，训练控分支。
 
 推理时，系统对输入视频进行稀疏关键帧重建、插值、新视角退化渲染，最终通过生成模型输出时空一致的高质量新视角视频。整个流程的总推理时间约 20 秒（11 个关键帧），显著快于 TrajectoryCrafter 的 146 秒（Table 3）。
-
-### 补充图表
-
-![[assets/figures/papers/NeoVerse_Enhancing_4D_World_Model_with_in-the-wild_Monocular_Videos_full_rerun_20260609/figures/001_Figure_1.jpg]]
-*Figure 1: Illustration of NeoVerse. NeoVerse reconstructs 4D Gaussian Splatting (4DGS) from monocular videos in a feed-forward manner. These 4DGS can be rendered from novel viewpoints to provide degraded rendering conditions for generating high-quality and spatial-temporally coherent videos*
-
-![[assets/figures/papers/NeoVerse_Enhancing_4D_World_Model_with_in-the-wild_Monocular_Videos_full_rerun_20260609/figures/002_Figure_2.jpg]]
-*Figure 2: Framework of NeoVerse. In the reconstruction part, we propose a pose-free feed-forward 4DGS reconstruction model (Sec. 3.1) with bidirectional motion modeling. The degraded renderings in novel viewpoints from 4DGS are input to the generation model as conditions. During training, the degraded rendering conditions are simulated from monocular videos (Sec. 3.2), and the original videos themselves serve as targets*
-
-
 
 ### 3.1 无姿态前馈式4DGS重建
 
@@ -231,13 +215,6 @@ $$\mathcal{L}_{\mathrm{gen}} = \mathbb{E}_{x_{1}, x_{0}, c_{\mathrm{render}}, c_
 
 其中 $x_1$ 为目标视频，$x_0$ 为噪声，$c_{\mathrm{render}}$ 为退化渲染条件（包含RGB、深度图、掩码和Plücker嵌入），$c_{\mathrm{text}}$ 为文本条件，$v_t$ 为校正流速度场。训练时仅训练新增的控制分支，冻结生成模型主干。
 
-### 补充图表
-
-![[assets/figures/papers/NeoVerse_Enhancing_4D_World_Model_with_in-the-wild_Monocular_Videos_full_rerun_20260609/figures/003_Figure_3.jpg]]
-*Figure 3: Training pairs with degradation simulation*
-
-
-
 ## 实验与关键发现
 
 ### 核心性能验证
@@ -270,13 +247,7 @@ NeoVerse 在静态场景重建上展现出显著优势，即使不依赖真实�
 
 NeoVerse 在新视图视频生成任务上实现了质量与效率的双重突破。在 VBench 基准的 400 个测试案例（100 个未见野生视频 × 4 种相机轨迹）上，NeoVerse 使用 11 个关键帧即取得 **主体一致性 88.43**，比 **TrajectoryCrafter**（YU et al., ICCV 2025）的 83.02 高出 5.41；**背景一致性 92.27**，领先 3.69（Table 3）。在美学质量（44.55 vs. **ReCamMaster** 44.29）和成像质量（59.75 vs. ReCamMaster 58.87）上也保持优势。
 
-![[assets/figures/papers/NeoVerse_Enhancing_4D_World_Model_with_in-the-wild_Monocular_Videos_full_rerun_20260609/figures/007_Table_3.jpg]]
-*Table 3: VBench results for novel view generation. We randomly collect 100 unseen in-the-wild videos, each with 4 different camera trajectories, resulting in a total of 400 test cases. For a fair comparison of inference time, we resize all videos to 336 × 560 resolution and report the average results over all test cases. The runtime evaluation is conducted on an A800 GPU*
-
 更关键的是推理效率：NeoVerse 总耗时仅 **20 秒**（A800 GPU, 336×560 分辨率），而 TrajectoryCrafter 需要 146 秒，加速约 7.3 倍。这得益于前馈式重建避免了昂贵的逐场景优化，以及稀疏关键帧策略大幅降低了渲染计算量。Figure 4 的定性对比显示，在大相机运动（“左摇”、“右移”）下，NeoVerse 在保持精确相机控制的同时生成质量更高，黄色框标注的伪影明显少于对比方法。
-
-![[assets/figures/papers/NeoVerse_Enhancing_4D_World_Model_with_in-the-wild_Monocular_Videos_full_rerun_20260609/figures/006_Figure_4.jpg]]
-*Figure 4: Generation with large camera motions on challenging in-the-wild videos. We compare our method against other related work on “Pan left” (left) and “Move right” (right) cases. Our NeoVerse achieves better generation quality while maintaining precise camera controllability. Yellow boxes highlight artifacts*
 
 ### 消融实验
 
@@ -302,13 +273,6 @@ Figure S1 展示了 NeoVerse 的两类典型失败案例：
 2. **文字生成**：与多数视频扩散模型类似，NeoVerse 偶尔难以生成清晰正确的文字，这是当前生成模型的共性瓶颈。
 
 此外，高斯插值依赖线性运动假设，在高度非线性运动场景下可能偏离实际轨迹。训练数据规模因计算资源限制仅约 1M 视频片段（Table S1），更大规模训练可能进一步提升性能。当前生成模型仅冻结主干并训练控制分支，可能限制了对极端退化情况的适应能力。
-
-### 补充图表
-
-![[assets/figures/papers/NeoVerse_Enhancing_4D_World_Model_with_in-the-wild_Monocular_Videos_full_rerun_20260609/figures/018_Figure.jpg]]
-*Figure S1: Failure cases. Top: Text generation failure. Bottom: Novel view generation on 2D data.*
-
-
 
 ## 定位与知识库关联
 
@@ -361,8 +325,6 @@ NeoVerse 的适用边界由以下假设和约束定义：
 4. **数据筛选与增强**：如何更有效地利用大规模野生视频，是否需要更好的数据筛选和增强策略以提升训练效率，是进一步扩展数据规模的前提。
 
 5. **生成模型微调**：当前仅训练控分支的策略是否限制了生成质量上限，未来是否应在更大规模数据上微调生成模型主干以进一步提升相机控制精度和生成质量。
-
-
 
 ## 原文 PDF
 

@@ -133,8 +133,6 @@ DiffSHEG 的训练在固定长度片段上进行，不依赖历史帧。为实�
 
 这一损失设计兼顾了扩散生成的质量、动作的动态平滑性以及最终重建的准确性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1846_DiffSHEG_A_Diffusion_Based_Approach_for_Real_Time_Speech_driven_Holistic/figures/002_Figure_2.jpg]]
 *Figure 2: DiffSHEG framework overview. Left: Audio Encoders and UniEG-Transformer Generator. Given an audio clip, we encode the audio into a low-level feature Mel-Spectrogram and a high-level HuBERT feature. An audio encoder learns a mid-level representation of speech. The audio features are concatenated with other optional temporal conditions and then fed into the UniEG Transformer Denoiser. The denoising block fuses the conditions with noisy motion at diffusion step t and feeds it into style-aware transformers to get the predicted noises. The uni-directional condition flow is enforced from expression to gesture for joint distribution learning. Right: The detailed architecture of style-aware Transfo...*
 

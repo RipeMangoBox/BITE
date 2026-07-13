@@ -56,8 +56,6 @@ claims:
 
 **局限与开放问题**：在 OCR 密集型和代码重建任务上仍落后于大参数量模型，Chart-to-Python 任务性能较低，需要代码对齐监督和更大模型容量。结构-细节分离范式能否泛化到其他视觉推理任务，以及如何自动生成更高质量的结构图像，仍是待探索的问题。
 
-
-
 图表和表格是人类视觉推理的核心载体，广泛存在于金融报告、学术论文、商业仪表盘等场景中。理解这类结构化视觉内容需要同时处理两个层面的信息：**全局结构**（坐标轴、网格、布局关系）和**局部细节**（数值、图例、标签）。然而，现有视觉语言模型（VLM）在处理图表表格任务时，普遍将这两种信号混杂在统一的视觉编码过程中，未能显式分离结构线索与细粒度细节，导致数值读取错误和不可靠的生成输出。
 
 这一瓶颈在多个公开基准上已有体现。通用VLM如 **Qwen2.5-VL-7B**（Bai et al., arXiv 2025）和 **Ovis2-8B**（Lu et al., arXiv 2024）在图表推理任务上表现平平，而专门的图表VLM如 **ChartAst-13B**（Meng et al., arXiv 2024）和 **ChartVLM-8B**（Xia et al., IEEE TIP 2025）虽然有所改进，但仍未从根本上解决结构-细节耦合问题。这些方法的核心缺陷在于：单头视觉编码器将原始图像的所有信息压缩为统一的嵌入表示，使得模型难以区分“这是条形图的高度”与“这个条形的数值是42.7”这两种性质迥异的视觉信号。
@@ -67,8 +65,6 @@ claims:
 此外，即使获得了分离的视觉表示，现有VLM在生成阶段仍存在另一个缺口：标准交叉熵损失或通用偏好优化（如DPO）对数值关键词缺乏专门强化，导致模型在输出数字时熵值过高、容易产生幻觉。这一观察指向了第二个关键操控变量——**数值偏好学习**：通过对数值token和比较关键词（如“大于”“最高”）进行加权对比学习，并施加低熵正则化，可以显著稳定数值生成。
 
 本文的动机正是基于上述两个缺口：**（1）视觉编码阶段缺乏结构-细节分离机制；（2）生成优化阶段缺乏针对数值准确性的专门偏好学习。** 为此，我们提出Twin-T，一种两阶段图表表格专家VLM，通过双头图像编码器实现结构与细节的分离与柔性融合，并利用MINT偏好学习强化数值关键词准确性和文本-视觉对齐，从而系统性地提升图表表格任务的可靠性。
-
-
 
 ## 核心方法与创新机理
 
@@ -101,8 +97,6 @@ Twin-T 的核心创新在于将图表表格理解任务分解为**结构信号�
 ### 创新点三：TwintVQA综合基准
 
 除模型创新外，本文还构建了**TwintVQA基准**，覆盖17种图表类型、11种任务类型、3种数据格式（Image、LaTeX、Python），并包含短/中/长三种问答长度分布。这一基准填补了现有图表表格评测在任务多样性和格式覆盖上的空白，为结构-细节分离方法的有效性提供了细粒度验证平台。
-
-
 
 Twin-T 是一个面向图表与表格任务的**两阶段专家视觉语言模型（VLM）**，其核心设计围绕一个关键瓶颈展开：现有 VLM 在分析图表表格时未能显式分离结构线索与细粒度细节，导致数值读取错误和生成不可靠。Twin-T 通过**双头图像编码器**实现结构与细节的分离与柔性融合，并利用 **MINT 偏好学习** 强化数值关键词准确性和文本-视觉对齐，从而显著提升答案可靠性。
 
@@ -140,8 +134,6 @@ Twin-T 是一个面向图表与表格任务的**两阶段专家视觉语言模�
 ### 因果机制与证据强度
 
 消融实验（Table 5）表明，移除双头编码器导致总体性能下降约 5%，证实结-细分离是关键设计。Table 6 进一步揭示 MINT 各组件的因果效应：移除数值关键词偏好使数值准确性（NK Acc）显著下降（1B: -2.70%, 7B: -5.90%）；移除低熵正则化导致数值位置熵大幅上升（1B: +8.10%, 7B: +3.80%）；移除文本-视觉证据匹配使匹配度（Match）下降最为明显（1B: -8.20%, 7B: -6.00%）。这些证据共同表明，结构-细节分离与数值-视觉对齐是 Twin-T 性能增益的核心来源。
-
-
 
 Twin-T 的核心设计围绕一个因果瓶颈展开：**现有 VLM 在图表表格任务中未能显式分离结构线索与细粒度细节，导致数值读取错误和不可靠的生成**。为此，Twin-T 引入两条关键创新路径——双头图像编码器实现结构-细节分离与柔性融合，以及 MINT 偏好学习强化数值关键词准确性和文本-视觉对齐。整个方法分为两个训练阶段，其工作流如 Figure 2 所示。
 
@@ -236,8 +228,6 @@ Table 6 的消融实验为各组件的有效性提供了决定性证据：
 
 总体而言，MINT 偏好学习从三个维度——数值准确性、生成稳定性和视觉对齐——协同提升了图表表格任务的可靠性。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -292,24 +282,8 @@ Twin-T 在多个图表表格基准上取得了领先或极具竞争力的表现�
 
 实验证据链完整且一致：双头编码器实现的结构-细节分离是性能提升的**瓶颈突破点**（移除后降 ~5%），MINT 偏好学习通过数值加权、熵正则和视觉匹配三个互补机制**精细化生成质量**（各项消融均有显著退化）。二者协同使 Twin-T 在图表表格理解任务上以小规模参数取得领先结果。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2751_https_openaccess_thecvf_com_content_CVPR2026_html_Bao_Twin_T_TwintVQA_A/figures/008_Table_4.jpg]]
-*Table 4: Stage ablation experiments on Twin-T. “w/o TwintVQA”: aggregate over public benchmarks excluding TwintVQA*
-
-![[assets/figures/papers/paper_list_l2751_https_openaccess_thecvf_com_content_CVPR2026_html_Bao_Twin_T_TwintVQA_A/figures/005_Table_2.jpg]]
-*Table 2: Performance of VLMs across task types and question-answering lengths on our TwintVQA benchmark*
-
-![[assets/figures/papers/paper_list_l2751_https_openaccess_thecvf_com_content_CVPR2026_html_Bao_Twin_T_TwintVQA_A/figures/007_Table_3.jpg]]
-*Table 3: Performance of different VLMs across chart-table types on our TwintVQA benchmark*
-
-![[assets/figures/papers/paper_list_l2751_https_openaccess_thecvf_com_content_CVPR2026_html_Bao_Twin_T_TwintVQA_A/figures/006_Figure_4.jpg]]
-*Figure 4: We examine how α, τ , and λ affect the Twin-T’s performance. “w/o TwintVQA” denotes the aggregate score over all public benchmarks, excluding our TwintVQA*
-
 ![[assets/figures/papers/paper_list_l2751_https_openaccess_thecvf_com_content_CVPR2026_html_Bao_Twin_T_TwintVQA_A/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of our TwintVQA benchmark. It covers 17 image types (e.g., bar, pie, line, bubble, heatmap, radar, donut, sankey, scatter, rose, box, waterfall, stacked, candle, gantt, composite, table) and 11 task types across 3 data formats (Image, LaTeX, Python), including Table→ LaTeX (T2L), Chart→Python (C2P), Image / LaTeX / Python Analysis and Summary (IA / LA / PA and IS / LS / PS), Multiple Choice (MC), Numerical QA (NQA), and Open QA (OQA). The right panel shows the length distribution for questions and answers with three bands: Short (0, 256], Medium (256, 1024], and Long (1024, 4096] tokens. Zoom in for more details*
-
-
 
 ## 定位与知识库关联
 
@@ -348,8 +322,6 @@ Table 6的MINT模块消融揭示了各损失项的独立贡献：移除数值关
 Chart-to-Python的性能瓶颈指向一个更深层的问题：当前的结构-细节分离是在视觉嵌入空间进行的，而代码生成需要将视觉结构映射为程序语法结构。这可能需要一个跨模态的结构对齐机制，而非仅在视觉端进行分离。论文的MINT框架尚未覆盖这一跨模态结构映射，这是未来工作的明确方向。
 
 自动结构图像生成的质量与效率平衡也值得关注。Canny作为手工设计的边缘检测器，虽然计算高效且无需训练，但其固定参数（双阈值）可能不是所有图表类型的最优选择。是否可以通过轻量可学习的结构提取器替代Canny，在保持高效的同时提升结构图像的质量，是一个开放的设计选择。
-
-
 
 ## 原文 PDF
 

@@ -50,8 +50,6 @@ claims:
 
 **方法定位**：VIMCAN属于视觉-惯性融合姿态估计中的混合架构路线，在时序建模层采用状态空间模型（Mamba）替代Transformer，在多模态融合层采用交叉注意力替代简单的特征拼接或自注意力。相较于纯视觉Mamba方法（如PoseMamba，Huang et al., AAAI 2025），VIMCAN通过引入惯性模态和交叉注意力融合实现了显著的精度提升；相较于GCN-Transformer融合方法，VIMCAN在精度和效率上均取得领先。
 
-
-
 三维人体姿态估计是计算机视觉与机器人领域的核心任务，在运动分析、人机交互、增强现实等场景中具有广泛应用。纯视觉方法虽能提供丰富的空间信息，但在遮挡、快速运动或光照变化下容易出现关节漂移甚至失效；惯性传感器（IMU）则不受视觉退化影响，能稳定捕捉肢体的旋转与加速度，却难以提供绝对位置约束。因此，**视觉-惯性融合**成为提升姿态估计鲁棒性与精度的关键路径。
 
 然而，现有的视觉-惯性融合方法面临一个根本性瓶颈：**基于Transformer的架构在处理长序列时具有二次计算复杂度**，导致实时推理的内存占用和延迟急剧上升。以 **Wang's GCN-Transformer**（Wang et al., Robotics Comput. Integr. Manuf. 2025）为代表的融合方法，在序列长度增加时峰值内存呈超线性增长（见Figure 1），严重限制了其在资源受限设备上的部署能力。另一方面，纯Mamba方法（如 **PoseMamba**，Huang et al., AAAI 2025）虽然具备线性复杂度，但在多模态融合中捕捉跨模态空间依赖关系的能力不足——Mamba的扫描机制擅长序列建模，却缺乏对视觉与惯性特征之间显式的空间对齐与交互推理。
@@ -59,8 +57,6 @@ claims:
 这一困境揭示了领域内的一个核心矛盾：**效率与精度在多模态长序列建模中难以兼得**。Transformer的Self-Attention能灵活建模全局空间依赖，但计算代价高昂；Mamba高效却缺乏跨模态空间推理的机制。本文的动机正是打破这一折衷——**能否设计一种混合架构，既保留Mamba的线性复杂度优势，又引入Cross-Attention来补偿跨模态空间推理的缺失？**
 
 VIMCAN的核心洞察在于：将Mamba的高效时序处理与Cross-Attention的跨模态空间推理解耦并协同工作。Mamba负责各模态内部的时空特征提取，保证整体计算效率；Cross-Attention则以视觉特征为Query、惯性特征为Key/Value，显式建立跨模态的空间对应关系，弥补纯Mamba在融合阶段的语义对齐缺陷。这一混合设计使得VIMCAN在TotalCapture数据集上达到**17.2 mm MPJPE**（GT 2D输入），同时推理内存远低于GCN-Transformer基线（Figure 1），在长序列场景下吞吐量显著提升，为视觉-惯性姿态估计的实时部署提供了新的技术路线。
-
-
 
 ## 核心方法与创新机理
 
@@ -116,8 +112,6 @@ VIMCAN的贡献在于证明了**线性复杂度的状态空间模型可以替代
 - 在更多样化的运动场景和复杂遮挡下，混合Mamba-Cross-Attention架构的鲁棒性如何？
 - 如何开发自适应标定或在线标定技术以减少对预标定的依赖？
 
-
-
 VIMCAN 的整体架构遵循“双流特征提取 → 分组交叉注意力融合 → 全局时空建模 → 姿态回归”的流水线，其核心设计思想是将 Mamba 的高效序列建模能力与 Cross-Attention 的跨模态空间推理能力相结合，在保持线性复杂度的同时实现高性能的视觉-惯性融合姿态估计。
 
 ### 输入表示
@@ -170,16 +164,6 @@ $$\mathcal{L}_{\mathrm{Total}} = \lambda_{\mathrm{MPJPE}} \cdot \mathcal{L}_{\ma
 
 **架构优势总结**：VIMCAN 的混合设计使模型在保持线性计算复杂度的同时，兼具 Mamba 的长序列高效处理能力和 Cross-Attention 的跨模态空间推理能力。如图 1 所示，VIMCAN 在长序列推理时的峰值内存使用远低于基于 GCN-Transformer 的融合方法，且吞吐量更高，验证了该架构在实时推理场景下的效率优势。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1039_https_arxiv_org_abs_2605_07552/figures/002_Figure_2.jpg]]
-*Figure 2: The framework of VIMCAN*
-
-![[assets/figures/papers/paper_list_l1039_https_arxiv_org_abs_2605_07552/figures/003_Figure_3.jpg]]
-*Figure 3: Illustration of skeleton topology and group components*
-
-
-
 ### 整体架构概览
 
 VIMCAN 的完整框架如 **Figure 2** 所示，由四个核心阶段构成：视觉特征提取、惯性特征提取、跨模态融合、全局时空建模与姿态回归。模型接收 $J=17$ 个 2D 关键点坐标（视觉分支）和 $I=6$ 个 IMU 的四元数测量值（惯性分支）作为输入。IMU 按人体部位划分为 $G=5$ 组：躯干、左臂、右臂、左腿、右腿（**Figure 3**）。
@@ -231,13 +215,6 @@ $$\mathcal{L}_{\mathrm{Total}} = \lambda_{\mathrm{MPJPE}} \cdot \mathcal{L}_{\ma
 
 其中 $\mathcal{L}_{\mathrm{MPJPE}}$ 为平均每关节位置误差（L2 距离），$\mathcal{L}_{\mathrm{N-MPJPE}}$ 为经尺度因子 $s$ 对齐后的归一化 MPJPE 损失，$\mathcal{L}_{\mathrm{V}}$ 为速度一致性损失（相邻帧关节位移的 L2 误差），$\mathcal{L}_{\mathrm{TC}}$ 为时序一致性损失（约束预测加速度的平滑性）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1039_https_arxiv_org_abs_2605_07552/figures/005_Figure_5.jpg]]
-*Figure 5: The architecture of Cross-Mamba module*
-
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -273,9 +250,6 @@ VIMCAN 在两个主流人体姿态估计基准上进行了全面评估：**Total
 ![[assets/figures/papers/paper_list_l1039_https_arxiv_org_abs_2605_07552/figures/001_Figure_1.jpg]]
 *Figure 1: The comparison of peak memory usage during inference for a GCN-Transformer-based model [29] and the proposed VIMCAN. The peak memory usage at different lengths of input sequence. The x-axis denotes sequence length, and the y-axis represents peak memory usage (lower is better, in MB). The circles indicate the GCN-Transformer-based model, while the stars denote VIMCAN. The size of Symbol reflects the memory I/O throughput, illustrating computational efficiency during on-device inference*
 
-![[assets/figures/papers/paper_list_l1039_https_arxiv_org_abs_2605_07552/figures/013_Table_7.jpg]]
-*Table 7: The comparison for computational efficiency on Total-Capture testing set. P1: Average MPJPE (mm). #Params.: Number of parameters. Peak: Peak Memory (MB). FPS: Frames Per Second*
-
 VIMCAN 的核心优势在于**线性计算复杂度**带来的高效率。在 TotalCapture 测试集上：
 
 - **VIMCAN-B** 参数量 7.3M，峰值内存 **423 MB**，帧率 **128 FPS**，P1 31.2 mm。
@@ -295,18 +269,12 @@ VIMCAN 的核心优势在于**线性计算复杂度**带来的高效率。在 To
 
 #### 分组与骨架感知扫描（Table 4）
 
-![[assets/figures/papers/paper_list_l1039_https_arxiv_org_abs_2605_07552/figures/009_Table_4.jpg]]
-*Table 4: The ablation study for grouping and skeleton-aware scanning on TotalCapture testing set. #G: Number of groups for body parts. Skel.: Whether to use a skeleton-aware scanning schema or not. P1: Average MPJPE. #Params.: Number of parameters. Peak: Peak Memory (MB)*
-
 消融实验验证了分组策略和骨架感知扫描的有效性：
 
 - 分组数 #G 从 1 增至 5，P1 逐步降低，验证了按身体部位分组的合理性。
 - 骨架感知扫描（Skel.）的引入进一步降低了 P1，同时参数量和峰值内存基本不变，说明该设计以零额外成本提升了时空建模质量。
 
 #### 融合策略对比（Table 5）
-
-![[assets/figures/papers/paper_list_l1039_https_arxiv_org_abs_2605_07552/figures/010_Table_5.jpg]]
-*Table 5: The ablation study for fusion strategies on TotalCapture test set. M: Methods. PM: PoseMamba (vision-only) [10], SA: Self-Attention (vision-only with Self-Attention module), CM: Cross-Mamba (visual-inertial Mamba-based fusion), CA: Cross-Attention (visual-inertial fusion with Cross-Attention module). P1: Average MPJPE*
 
 这是验证 VIMCAN 核心设计的关键消融：
 
@@ -333,8 +301,6 @@ VIMCAN 的核心优势在于**线性计算复杂度**带来的高效率。在 To
 *Figure 6: The qualitative analysis of VIMCAN. The green dashed lines denote the ground truth, and other colored lines represent the predictions*
 
 Figure 6 展示了 VIMCAN 预测姿态与真值的对比，绿色虚线表示真值，其他颜色线条表示预测结果。在快速运动和自遮挡场景下，VIMCAN 的预测仍能紧密跟随真值，尤其在四肢末端关节的定位上表现出色，这得益于惯性传感器对快速运动的捕捉能力和 Cross-Attention 对空间依赖的精确建模。
-
-
 
 ## 定位与知识库关联
 
@@ -371,8 +337,6 @@ VIMCAN 的设计空间中有三个被消融实验验证的关键选择：
 1. **标定依赖性：** 如何开发自适应标定或在线标定技术，使 VIMCAN 类方法摆脱对预标定的依赖，实现真正的即插即用？
 2. **极端场景鲁棒性：** 在更复杂的遮挡（如多人交互、手持物体遮挡 IMU 佩戴部位）和多样化运动（如极限运动、舞蹈旋转）下，混合 Mamba-Cross-Attention 架构的鲁棒性尚未被充分验证。
 3. **IMU 数量与布局优化：** 当前 6 IMU 的布局是固定的，是否存在更优的传感器配置（如更少 IMU 或不同佩戴位置）能在精度与成本间取得更好平衡？这一方向尚未被系统探索。
-
-
 
 ## 原文 PDF
 

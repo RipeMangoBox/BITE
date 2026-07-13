@@ -60,8 +60,6 @@ claims:
 
 **决定性证据**：消融实验表明，移除参考图像误差 $E_{\mathrm{img}}$ 会导致所有指标大幅下降，证实交叉片段条件误差是长视频崩溃的主要驱动因素；随着错误回收强度（LoRA α）降低，一致性等指标持续单调下降，证实主动纠正自身错误对稳定长视频至关重要。天真的视频扩展（复制片段、乒乓回放）虽然可以愚弄一致性指标，但动态性降为零，而 SVI 在所有指标间取得了真实平衡。
 
-
-
 ### 视频生成范式的演进与瓶颈
 
 扩散变换器（Diffusion Transformer, DiT）的规模化扩展推动了视频生成领域的快速发展。当前主流的视频生成范式可归纳为两类：**视频生成 DiT** 与**视频恢复 DiT**。
@@ -82,8 +80,6 @@ claims:
 ### 本文动机
 
 本文从一个新的视角出发：**将 DiT 自身产生的误差作为监督信号进行闭环回收**，迫使模型在训练过程中主动学习识别并纠正自身错误。这一思路的核心洞察在于：与其被动地容忍误差累积，不如在训练阶段就模拟测试时的误差污染环境，让模型学会在误差存在的条件下仍然指向干净的生成目标。通过这种“错误回收”（Error Recycling）机制，可以在不增加推理成本的前提下，弥合训练与测试的假设差距，实现稳定、非循环的无限长度视频生成。
-
-
 
 ## 核心方法与创新机理
 
@@ -126,8 +122,6 @@ SVI 与现有长视频生成方法存在根本性差异。**StreamingT2V** 和 *
 
 消融实验进一步验证了各 changed slots 的必要性。移除参考图像误差 $E_{\mathrm{img}}$ 导致所有指标大幅下降（Table 4），证实交叉片段条件误差是长视频崩溃的主要驱动因素。降低 LoRA 的 $\alpha$ 值（减弱错误回收强度）导致指标单调下降（Table 7），证明性能提升源于主动纠正自身错误而非其他因素。自生成误差优于人工图像增强（颜色偏移、模糊、锐化），结合两者反而引起冲突（Table 6），表明模型自身误差具有独特分布，无法用简单数据增强替代。
 
-
-
 ![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_X96Ei9n34a/figures/024_Figure_10.jpg]]
 *Figure 10: Overview of the proposed end-to-end automatic pipeline, which is able to generate infinite short films from user-given keywords. This engine is used to generate the prompt streams according to a specific storyline for our creative video generation benchmarks*
 
@@ -161,8 +155,6 @@ SVI 的 pipeline 由四个核心模块串联成一个闭环循环，如图 3 所
 - **参考图像误差 $E_{\mathrm{img}}$**：通过对 $E_{\mathrm{vid}}$ 跨时间步均匀采样得到，用于模拟跨片段条件信号（即上一片段的最后一帧）的退化。消融实验表明，移除该项会导致所有指标大幅下降，是驱动长视频崩溃的决定性因素。
 
 通过上述闭环设计，SVI 在不改变推理架构、不增加推理成本的前提下，赋予了 DiT 主动纠错和稳定自回归生成的能力。
-
-
 
 ### 问题形式化：训练-测试假设差距
 
@@ -238,8 +230,6 @@ $$
 
 其中 $V_t^{\mathrm{rcy}} = X_{\mathrm{vid}}^{\mathrm{rcy}} - X_{\mathrm{noi}}^{\mathrm{rcy}}$ 始终指向干净潜在变量，与当前状态和历史轨迹的正确性无关。这一设计使 DiT 在自回归生成中能够主动纠正误差，而非被动适应退化输入。为保持用户灵活性，仅训练 LoRA 参数，冻住基础 DiT 权重。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -248,21 +238,9 @@ SVI 在通用视频生成、音频驱动说话脸和骨骼驱动舞蹈三个主�
 
 **通用视频生成。** 表 1 报告了一致场景、创意场景和超长一致场景下的定量结果。在一致视频生成中，SVI-Shot 取得 **93.52% 的主体一致性**和 **95.33% 的背景一致性**，分别超出最强基线 FramePack 5.05 和 3.37 个百分点；在成像质量上领先 5.16 个百分点。当场景扩展至超长一致生成（50 片段），Wan 2.1 和 FramePack 的主体一致性分别下降 7.03 和 13.71 个百分点，而 SVI-Shot 仅下降 **0.63 个百分点**，达到 **97.50%**，同时保持了令人满意的动态程度。在创意视频生成中，SVI-Shot 在一致性、美学质量和动态性三个维度取得了最佳平衡，没有出现其他方法为追求一致性而牺牲动态性的情况。
 
-![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_X96Ei9n34a/figures/005_Table_1.jpg]]
-
-![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_X96Ei9n34a/figures/010_Table_1.jpg]]
-*Table 1: Generic video generation with diverse settings. Bold, Underline highlights the highest, second highest, respectively. For more details on metrics, see (Huang et al., 2024b). Table 2: Audio-conditioned long talk*
-
 **音频驱动长对话。** 表 2 显示，SVI-Talk 在唇音同步指标 Sync-C 上达到 **6.12**，远超 Wan 2.1 的 0.21 和 MultiTalk 的 3.35，提升幅度达 5.91。这表明错误回收微调有效抑制了长对话中条件误差的累积，保持了跨片段的唇形一致性。
 
-![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_X96Ei9n34a/figures/006_Table_2.jpg]]
-
 **骨骼驱动长舞蹈。** 表 3 显示，SVI-Dance 在 PSNR 上达到 **20.01**，比专用方法 UniAnimate-DiT 的 18.97 提升 1.04；在 SSIM 和 LPIPS 上也取得最优或次优结果。这验证了 SVI 框架对结构化控制信号的兼容性。
-
-![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_X96Ei9n34a/figures/007_Table_3.jpg]]
-
-![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_X96Ei9n34a/figures/011_Table_3.jpg]]
-*Table 3: Skeleton-conditioned long dance*
 
 **VBench 标准基准。** 在 VBench 长视频生成（50 片段）上（表 11），SVI 的主体一致性达到 **96.24%**，比 Wan 2.1 的 76.11% 提升 20.13 个百分点，背景一致性和运动平滑度也全面领先，证明了方法在标准评测体系下的有效性。
 
@@ -276,8 +254,6 @@ SVI 在通用视频生成、音频驱动说话脸和骨骼驱动舞蹈三个主�
 *Table 4: Ablation study on each error term*
 
 **天真扩展方法的对比。** 表 5 探索了简单的视频扩展策略（复制片段、乒乓回放）。这些方法可以**愚弄一致性指标**——乒乓回放甚至取得了异常高的一致性分数——但动态性降低为 0%，完全丧失了视频的时序变化。SVI 在一致性、质量和动态性之间取得了真实平衡，没有通过牺牲运动来换取表面的一致。
-
-![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_X96Ei9n34a/figures/009_Table_5.jpg]]
 
 ![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_X96Ei9n34a/figures/025_Table_5.jpg]]
 *Table 5: Exploring naive video extension methods. The best is highlighted in red (abnormally large)*
@@ -313,8 +289,6 @@ SVI 在通用视频生成、音频驱动说话脸和骨骼驱动舞蹈三个主�
 1. **色彩偏移**：当测试图像的风格与训练数据分布差异较大时，SVI 可能出现色彩偏移现象，这源于错误回收微调的数据依赖。
 2. **复杂场景转换**：跨镜头的主体一致性在剧烈场景变化中仍有提升空间，特别是当主体经历大幅度姿态变化或遮挡时。
 3. **域外泛化**：模型对于极端风格或训练分布外内容的泛化能力有限，需要扩大训练数据规模和多样性来改善。
-
-
 
 ## 定位与知识库关联
 
@@ -365,8 +339,6 @@ SVI 的适用边界已通过多领域验证得到初步界定：
 2. **训练数据规模与多样性**：如何扩大训练数据规模和多样性，以纠正色彩偏移并提升域外泛化能力？当前 SVI 采用 LoRA 微调（秩 64 以上即可提供足够纠错能力，Table 9），参数高效的特性为大规模数据训练提供了可行性，但数据策展策略仍需进一步研究。
 
 3. **评价指标的可靠性**：天真的视频扩展方法（复制片段、乒乓回放）可以愚弄一致性指标（Table 5，一致性高但动态性降为 0%），这提示当前评价体系存在盲区。SVI 在一致性、质量、动态性等多个维度取得了平衡，但更鲁棒的评估方法仍是领域共同面临的挑战。
-
-
 
 ## 原文 PDF
 

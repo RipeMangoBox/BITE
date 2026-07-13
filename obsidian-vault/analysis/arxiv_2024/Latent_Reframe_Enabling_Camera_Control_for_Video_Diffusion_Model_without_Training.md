@@ -53,8 +53,6 @@ claims:
 
 **主要结果**：在 10 个提示词与 80 个 RealEstate10K 姿态的基准测试中，Latent-Reframe 在 FID（60.18）和 FVD（509.11）指标上均显著优于 CameraCtrl，平移误差（5.52）为所有方法中最低，旋转误差（2.29）与 MotionCtrl 接近且优于 CameraCtrl（Table 1）。消融实验证实，时间感知点云相比静态点云能更好地捕捉动态变化（Figure 4），在 25 个去噪步骤中选择第 8 步执行重帧可在点云精度与修复效果之间取得最佳平衡（Figure 5）。
 
-
-
 视频扩散模型在文本到视频生成领域已取得显著进展，但生成过程中的摄像机视角仍难以精确控制。用户往往希望生成的视频不仅能忠实于文本描述，还能沿着指定的摄像机轨迹（如平移、旋转或复杂组合运动）展开画面，这在电影预览、虚拟场景漫游等应用中至关重要。
 
 现有摄像机控制方法主要依赖**微调（fine-tuning）**范式。这些方法将摄像机姿态嵌入注入扩散模型的 UNet 去噪网络，通过额外的配对视频-姿态数据集进行训练。代表性工作包括 **MotionCtrl**（Wang et al., SIGGRAPH 2024）和 **CameraCtrl**，它们能够在训练后实现一定程度的视角控制。然而，这一范式存在三个根本性瓶颈：
@@ -66,8 +64,6 @@ claims:
 上述瓶颈的核心在于：**摄像机控制的实现被绑定在训练阶段**，迫使方法在控制精度与生成质量之间做出妥协。一个自然的问题是：能否绕过微调，直接在预训练模型的推理过程中注入摄像机控制？
 
 Latent-Reframe 正是基于这一动机提出的。其核心洞察是：预训练视频扩散模型在去噪过程的中间阶段，其潜在表示已编码了足够的场景三维结构与外观信息。如果能在此时将部分去噪的潜在代码“重新取景”（reframe），使其对齐目标摄像机姿态，就能在不触碰模型参数的前提下实现视角控制。这一思路将摄像机控制从**训练时注入**转变为**采样时操作**，从根本上规避了数据依赖与分布破坏问题。
-
-
 
 ## 核心方法与创新机理
 
@@ -90,8 +86,6 @@ Latent-Reframe 的核心洞察在于：**预训练视频扩散模型的中间潜
 重帧操作不可避免地会因视角变化产生遮挡区域（空白像素）。为此，方法引入了**潜在空间修复**机制：通过遮罩 $m$ 区分已知区域和未知区域，对已知区域施加较轻噪声（噪声水平降低 3 步），对未知区域通过 DDIM 反向去噪生成内容，再将两者混合（Eq. 4）。这一设计使得预训练扩散模型自身成为“修复器”，在保留已知区域结构的同时和谐地填补空白，无需额外的修复网络。消融实验（Figure 6）证实，降低 3 步噪声能在模糊与条带伪影之间取得最佳平衡。
 
 综上，Latent-Reframe 的创新本质在于：**将摄像机控制从“学习条件映射”重新定义为“潜在空间中的 3D 几何操作 + 修复”**，从而在无需训练的前提下，实现了与训练型方法相当甚至更优的控制精度与生成质量。
-
-
 
 Latent-Reframe 的整体 pipeline 围绕一个核心思想展开：**在预训练视频扩散模型的去噪过程中途，对部分去噪的潜在表示进行“重帧”（reframing），从而实现无需训练的摄像机控制**。整个框架由四个串行模块构成，形成一条从潜在代码到视角可控视频的完整推理链路。
 
@@ -133,8 +127,6 @@ Latent-Reframe 的整体 pipeline 围绕一个核心思想展开：**在预训�
 - **无需训练的方法**：Latent-Reframe 独树一帜，通过在采样阶段对潜在代码进行几何重帧，完全避免了训练开销和分布破坏问题。其核心因果机制在于：预训练视频扩散模型的中间潜在表示已编码足够的场景三维与外观信息，在此阶段通过时间感知点云进行重帧，可直接控制摄像机运动，同时保留生成质量。
 
 在定量对比中（**Table 1**），Latent-Reframe 在 FID（60.18）和 FVD（509.11）上均显著优于 CameraCtrl，在平移误差（TransErr 5.52）上达到最优，旋转误差（RotErr 2.29）与 MotionCtrl 接近，验证了无需训练方案的有效性。
-
-
 
 Latent-Reframe 的核心操作发生在预训练视频扩散模型的去噪过程中途，由三个紧密耦合的模块构成：近似干净视频估计、时间感知点云提取与重帧、以及潜在空间修复。以下逐一展开其机理与关键公式。
 
@@ -183,15 +175,8 @@ $$z_{t-1}' = m \odot z_{t-1}^{\mathrm{known}} + (1 - m) \odot z_{t-1}^{\mathrm{u
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2412_06029/figures/005_Figure_5.jpg]]
 *Figure 5: Comparison between diffusion steps to apply Latent-Reframe. Using diffusion step 8 out of 25 allows for the reconstruction of high-precision point clouds while leaving enough room for latent space inpainting and harmonization*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2412_06029/figures/006_Figure_4.jpg]]
 *Figure 4: Comparison between the time-aware and time-static point clouds. Time-aware point cloud can capture more temporal dynamics of the video, For instance, the motion of the human face (row 1 and 2) and wave (row 3 and 4) are more prominent using time-aware point cloud, both are marked with red bounding boxes*
-
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2412_06029/figures/009_Figure_8.jpg]]
-*Figure 8: Denoising time line of Latent-Reframe. Here, the diffusion step for latent reframing is set to 8, and the noise reduction step is set to 3*
-
-
 
 ## 实验与关键发现
 
@@ -236,16 +221,6 @@ Latent-Reframe 在去噪过程的中途执行潜在重帧，步数的选择直�
 - **复杂动态场景鲁棒性不足**：对于极深遮挡或高度动态的场景，当前方法的鲁棒性有限，生成质量可能显著下降。
 
 这些失败案例提示，该方法在遮挡处理与 3D 重建精度方面仍有提升空间，需要人工核验极端场景下的实际表现。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2412_06029/figures/003_Figure_3.jpg]]
-*Figure 3: Visual comparison with state-of-the-art methods. The proposed Latent-Reframe can generate videos following the given camera trajectory without training. The video quality and the camera pose accuracy are comparable with the compared training-based methods. AnimateDiff is the pre-trained text-to-video diffusion model used by all the compared method. Only Latent-Reframe can keep the learned video distribution of AnimateDiff*
-
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2412_06029/figures/010_Table_2.jpg]]
-*Table 2: Detail hyperparameter settings*
-
-
 
 ## 定位与知识库关联
 
@@ -293,8 +268,6 @@ Latent-Reframe 的完整管线由四个模块串联而成，每个模块在知�
 1.  **更强的几何重建基座**：能否通过更先进的点云或三维重建模型（如 DUSt3R、MASt3R 等）进一步提高控制精度和生成质量？这是对管线中几何提取模块的直接升级。
 2.  **跨架构泛化**：该方法的核心思想——在去噪中途对潜在表示进行结构化操纵——是否可以推广到其他潜在扩散模型架构（如 DiT）或其他生成任务（如图像编辑、多视角合成）？
 3.  **大范围遮挡的修复策略**：如何处理大范围摄像机运动或极端遮挡带来的大面积未知区域，是该方法走向实际应用需要解决的关键工程问题。
-
-
 
 ## 原文 PDF
 

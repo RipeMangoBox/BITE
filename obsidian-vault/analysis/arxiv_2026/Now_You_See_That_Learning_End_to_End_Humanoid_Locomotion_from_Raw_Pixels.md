@@ -51,8 +51,6 @@ claims:
 
 在统一的RDT-Bench基准上，本文方法实现了**平均98.9%的成功率**和仅**5.8%的功率衰减率**，大幅超越现有最佳方法Humanoid Parkour Learning（71.0%成功率，30.9%功率衰减率）。消融实验进一步揭示了各组件的关键贡献：移除所有深度增强导致成功率骤降至43.0%、功率衰减率飙升至70.9%，证实感知噪声是核心瓶颈；而多评论家架构相比单评论家提升成功率17个百分点，蒸馏损失中的降噪与KL正则化相比纯行为克隆提升12.9个百分点。
 
-
-
 仿人机器人要实现真正的自主部署，必须具备在复杂非结构化地形中仅凭机载视觉传感器进行鲁棒运动的能力。与四足机器人相比，仿人机器人因更高的质心、更小的支撑多边形和更严格的足部放置约束，对地形感知的精度和鲁棒性提出了更苛刻的要求。然而，当前绝大多数仿人运动学习方法仍然依赖特权高度扫描（height scan）或外部运动捕捉系统，无法在真实世界中仅凭视觉独立运行。
 
 ### 现有视觉仿人运动方法的缺口
@@ -70,8 +68,6 @@ claims:
 上述缺口的本质可归结为一个核心瓶颈：**仿真到现实的深度感知噪声导致细粒度运动任务性能下降，且跨异构地形的统一策略训练存在目标冲突**。具体而言，当深度图像中的噪声模式与训练分布不一致时，策略的足部放置决策出现系统性偏差，在楼梯和间隙等需要厘米级精度的任务上尤为致命。消融实验证实，完全移除深度增强后成功率骤降至43.0%，功率衰减率飙升至70.9%（TABLE IV），直接验证了感知噪声是性能退化的首要因素。
 
 本文的动机在于：**通过综合立体深度增强、视觉感知蒸馏和地形特定多评论家强化学习，使仿人机器人可以直接从原始深度图像学习鲁棒且通用的运动技能**。这一思路的核心假设是，若能高保真地仿真真实深度传感器的噪声特性，并通过专门设计的蒸馏损失将噪声不变性注入视觉编码器，则策略可以在不依赖任何真实世界微调的情况下实现从仿真到现实的零样本迁移。
-
-
 
 ## 核心方法与创新机理
 
@@ -111,8 +107,6 @@ claims:
 ### 创新协同效应
 
 三个创新的协同关系体现在：**深度增强管道**为蒸馏提供了逼真的噪声分布，使降噪目标能够学习有效的噪声不变表征；**多评论家架构**为教师策略提供了高质量的运动先验，确保蒸馏目标的可靠性；**视觉感知蒸馏**则将这些先验稳健地迁移到仅依赖深度图像的部署策略。三者共同作用，使最终策略在RDT-Bench上实现98.9%平均成功率、5.8%功率衰减率，远超现有最佳方法 **Humanoid Parkour Learning** 的71.0%成功率和30.9%功率衰减率（TABLE IV）。
-
-
 
 本文提出一个两阶段训练框架，使仿人机器人能够直接从原始深度图像学习跨异构地形的端到端运动技能。框架的核心设计逻辑围绕一个瓶颈展开：**仿真到现实的深度感知噪声**会严重破坏细粒度运动控制（如精确落足、楼梯踏步），而单一策略在跨地形训练时面临目标冲突。为解决这一问题，框架通过三条因果链路协同工作：（1）高保真深度传感器仿真弥合感知差距；（2）地形特定的多评论家/多鉴别器架构缓解任务冲突；（3）带去噪和KL正则化的视觉感知蒸馏实现鲁棒的策略迁移。
 
@@ -159,12 +153,8 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{behavior}} + \lambda_{\mat
 
 在真实部署时，仅运行学生策略，深度图像由机器人搭载的立体相机实时获取。框架在RDT-Bench上实现了平均98.9%的成功率和仅5.8%的功率衰减率，远超现有最佳方法**Humanoid Parkour Learning**（Zhuang et al., CoRL 2024）的71.0%成功率和30.9%功率衰减率。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l59_https_arxiv_org_abs_2602_06382/figures/001_Figure_1.jpg]]
 *Figure 1: Overview. Our end-to-end vision-based humanoid locomotion policy enables robust traversal across diverse challenging terrains, including high stones, long staircases (both ascending and descending), debris fields, gaps with varying heights, trolleys, high platforms, grid holes, and platform-slope-gap combinations. All behaviors emerge from a single unified policy trained with raw depth images*
-
-
 
 本文方法采用两阶段训练框架：第一阶段在仿真中利用高度扫描（height scan）作为特权观测，训练教师策略；第二阶段通过视觉感知行为蒸馏，将教师策略迁移至仅依赖深度图像的学生策略，实现端到端的像素到动作控制。整个框架由三个核心模块构成：高保真深度传感器仿真、特权强化学习、视觉感知行为蒸馏。
 
@@ -246,12 +236,8 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{behavior}} + \lambda_{\mat
 
 消融实验表明，纯行为克隆（BC Only）的平均功率衰减率从5.8%升至17.7%，验证了降噪和KL正则化对鲁棒性的关键贡献。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l59_https_arxiv_org_abs_2602_06382/figures/005_Figure_3.jpg]]
 *Figure 3: Visualization of the depth augmentation pipeline. Starting from clean left and right depth images, the pipeline sequentially applies: (1) stereo fusion, (2) random convolution, (3) Gaussian noise, (4) Perlin noise, (5) scale randomization, (6) zero pixel failures, (7) max pixel failures, (8) depth clipping and spatial cropping to produce realistic depth observations for sim-to-real transfer*
-
-
 
 ## 实验与关键发现
 
@@ -317,36 +303,14 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{behavior}} + \lambda_{\mat
 3. **单仿真器评估**：尽管采用CycleGAN注入真实噪声，所有评估仍在单一仿真器内进行，缺乏在不同物理引擎间的泛化验证。
 4. **地形类别扩展性**：多评论家架构需要为每类地形训练专用网络，当地形类别大幅增加时，训练成本将线性增长。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l59_https_arxiv_org_abs_2602_06382/figures/012_Figure_6.jpg]]
 *Figure 6: t-SNE visualization of the depth encoder’s latent space across six terrain types. Each terrain forms a distinct cluster, demonstrating effective terrain-specific representation learning despite realistic sensor noise*
-
-![[assets/figures/papers/paper_list_l59_https_arxiv_org_abs_2602_06382/figures/022_Figure_7.jpg]]
-*Figure 7: Cross-platform deployment on Unitree G1 humanoid robot ascending outdoor stairs. The policy transfers zero-shot from training on a different platform with different depth sensor, demonstrating the generality of the learned depth representations*
-
-![[assets/figures/papers/paper_list_l59_https_arxiv_org_abs_2602_06382/figures/008_Table.jpg]]
-*Table: IV: Performance on RDT-Bench across four terrain configurations. SR: Success Rate (%), P: Average Power $( \times 1$ $0 ^ { 1 }$ $\mathbb { W } ) ,$ PDR: Power Degradation Ratio (%). All methods are evaluated under CycleGAN-augmented realistic depth noise. Results report $\mathrm { m e a n }$ _ ${ \pm$ $\mathrm { s t d } }$ over 5 random seeds. Best results are in bold, second best are underlined. ↓ indicates lower is better*
-
-![[assets/figures/papers/paper_list_l59_https_arxiv_org_abs_2602_06382/figures/010_Table.jpg]]
-*Table: V: Ablation study on depth augmentation components. Each row removes one component from the full pipeline. Results report $\mathrm { m e a n }$ _ ${ \pm$ $\mathrm { s t d } }$ over 5 random seeds*
-
-![[assets/figures/papers/paper_list_l59_https_arxiv_org_abs_2602_06382/figures/011_Table.jpg]]
-*Table: VI: Ablation study on multi-critic and multi-discriminator architecture. Stairs column reports the average of ascending (99.2%) and descending (98.6%) configurations. Results report mean±std over 5 random seeds*
 
 ![[assets/figures/papers/paper_list_l59_https_arxiv_org_abs_2602_06382/figures/014_Table.jpg]]
 *Table: VII: Ablation study on distillation loss components. Results report mean $\pm$ $\mathrm { s t d }$ over 5 random seeds*
 
-![[assets/figures/papers/paper_list_l59_https_arxiv_org_abs_2602_06382/figures/009_Figure_5.jpg]]
-*Figure 5: Real-world deployment sequences demonstrating stair traversal. Top row: ascending stairs with anticipatory leg lifting. Bottom row: descending stairs with controlled foot placement. The policy executes smooth gait patterns without any real-world fine-tuning*
-
-![[assets/figures/papers/paper_list_l59_https_arxiv_org_abs_2602_06382/figures/013_Table.jpg]]
-*Table: VIII: Real-world deployment success rates across 15 trials per scenario*
-
 ![[assets/figures/papers/paper_list_l59_https_arxiv_org_abs_2602_06382/figures/002_Table.jpg]]
 *Table: I: Comparison of perceptive humanoid locomotion methods. Representation indicates the terrain perception approach. Noise Modeling indicates the comprehensiveness of depth sensor simulation. Long-Term Deploy indicates drift-free operation capability. Fine Locomotion indicates support for precise movements like stair climbing. Extreme Parkour indicates support for dynamic maneuvers across challenging obstacles*
-
-
 
 ## 定位与知识库关联
 
@@ -391,8 +355,6 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{behavior}} + \lambda_{\mat
 4. **长期部署的漂移问题**。当前方法未显式处理长期部署中传感器漂移和累计误差。是否可以通过在线自监督微调或视觉-惯性融合来缓解这一问题？
 
 5. **跨机器人形态的迁移**。深度增强管道和蒸馏框架是否可推广至四足机器人或其他形态的腿式机器人？跨形态迁移中的感知表征对齐问题尚待研究。
-
-
 
 ## 原文 PDF
 

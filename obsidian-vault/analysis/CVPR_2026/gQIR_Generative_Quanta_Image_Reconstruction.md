@@ -53,8 +53,6 @@ gQIR 提出将大规模文本‑图像扩散模型的语义与结构先验适配
 
 **方法定位**：gQIR 属于生成式先验驱动的计算成像方法，首次将互联网规模预训练的 Stable Diffusion 扩散先验系统性地适配到量子爆发重建任务，在方法谱系上连接了扩散模型蒸馏、多帧爆发融合与单光子成像三个领域。
 
-
-
 ### 单光子成像：速度与保真度的两难
 
 单光子雪崩二极管（Single-Photon Avalanche Diode, SPAD）传感器具备纳秒级时间分辨率，可在 10k–100k fps 的极端帧率下捕获光子到达事件。然而，这种极速能力以严重的光子饥饿为代价：每个像素在微秒级曝光窗口内仅能记录极少的光子，输出为二值伯努利事件——要么检测到至少一个光子（1），要么完全黑暗（0）。SPAD 的成像过程可形式化为：
@@ -94,8 +92,6 @@ $$x_{lq} = \frac{1}{N} \sum_{i=1}^{N} M_{\pi} \left[ Bern(1 - e^{-\alpha \cdot x
 
 这一设计使得 gQIR 能够在光子饥饿与极端运动并存的条件下，同时获得高保真度与感知质量，并在多个基准上显著超越现有方法（Table 2, Table 3）。
 
-
-
 ## 核心方法与创新机理
 
 gQIR 的核心创新在于将大规模文本‑图像扩散模型的语义与结构先验系统性地适配到量子爆发成像的极端退化场景，通过**三阶段模块化架构**和四个关键设计槽位（changed slots），突破了传统方法在稀疏光子、强噪声与帧间运动下的瓶颈。
@@ -130,8 +126,6 @@ Figure 5 直观展示了这一差异：光流对齐后的简单平均在场景�
 
 四项 changed slots 构成了一条因果链：**扩散先验**提供丰富的语义与纹理知识储备；**潜在空间对齐**确保编码器在极端噪声下不崩溃并将量子帧映射到有意义的潜在空间；**对抗蒸馏**将迭代先验转化为高效的单步生成器；**潜在空间注意力融合**在保持先验优势的同时实现运动感知的时空一致性。这一设计使得 gQIR 能够在传统方法失效的极端条件下（3 位纳米爆发、100k fps 高速运动）同时获得高保真度与感知质量。
 
-
-
 gQIR 提出一个**模块化三阶段框架**，将大规模文本‑图像生成先验（Stable Diffusion）适配到单光子雪崩二极管（SPAD）量子爆发重建的极端稀疏‑噪声‑运动场景。其核心设计逻辑是：**先对齐潜在空间以稳定编码 → 再蒸馏扩散先验以增强感知质量 → 最后在潜在空间进行运动感知时空融合以恢复时序一致性**。
 
 ### 三阶段流水线
@@ -151,16 +145,6 @@ gQIR 提出一个**模块化三阶段框架**，将大规模文本‑图像生�
 2. **爆发序列输入**：多帧纳米爆发 $X_{lq}$ → S1 编码器逐帧编码 → 多帧潜在编码 → S3 FusionViT 时空融合 → 融合潜在编码 → S2 LoRA U‑Net → 解码器 → 时序一致的 RGB 爆发序列。
 
 三阶段可独立训练，S1 提供稳定潜在表示，S2 注入生成先验，S3 恢复跨帧一致性，形成从“光子饥饿”到“可信视觉内容”的完整映射链。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2513_https_arxiv_org_abs_2602_20417/figures/002_Figure_2.jpg]]
-*Figure 2: Overview of gQIR. Three-stage framework for quanta burst reconstruction: (S1) a quanta-aligned VAE for joint denoising and demosaicing of SPAD nano-bursts, (S2) an adversarially finetuned LoRA [18] latent U-Net initialized with stable diffusion [47] weights for perceptual enhancement, and (S3) a latent burst FusionViT for motion-aware spatio-temporal fusion of burst of nano-burst inputs*
-
-![[assets/figures/papers/paper_list_l2513_https_arxiv_org_abs_2602_20417/figures/001_Figure_1.jpg]]
-*Figure 1: gQIR: Photorealistic single image and burst reconstruction from ultra–high-speed color SPADs. Our pipeline reconstructs high-quality RGB images from 3-bit color-SPAD CFA nano-bursts (left) and merges SPAD photon cubes into temporally consistent bursts (right). From photon-starved inputs captured at 10k–50k fps in extreme, out-of-domain scenes, gQIR recovers sharp textures, accurate color, and coherent structure by leveraging a generative prior. For burst sequences up to 100k fps, FusionViT aligns and dynamically merges quanta latents, outperforming traditional and learning-based methods in both fidelity and perceptualness under motion*
-
-
 
 ### 3.1 图像形成模型
 
@@ -185,9 +169,6 @@ $$x_{lq} = \frac{1}{N} \sum_{i=1}^{N} M_{\pi} \left[ Bern(1 - e^{-\alpha \cdot x
 $$\mathcal{L}_{lsa} = \| \mu_{\phi^*}(x_{lq}) - \mu_{\phi}(x_{gt}) \|_2^2$$
 
 LSA 损失是防止编码器灾难性遗忘的关键——消融实验（Table 4, Figure 4）表明，缺失 LSA 时编码器退化为输出恒定值，PSNR/SSIM/ManIQA 均显著下降。
-
-![[assets/figures/papers/paper_list_l2513_https_arxiv_org_abs_2602_20417/figures/004_Figure_4.jpg]]
-*Figure 4: Encoder collapse under predegradation removal loss [34, 70]. The encoder*
 
 **像素空间与感知监督**：解码后的重建图像还需在像素空间和 VGG-19 特征空间与真值对齐：
 
@@ -231,13 +212,6 @@ $$\mathcal{L}_{fusion} = \| \mathcal{F}(\mu_{\phi^*}(X_{lq})) - \mu_{\phi}(x_{gt
 
 消融实验（Table 5）证实，阶段三在提高保真度的同时显著抵消了阶段二引入的内容漂移，提供了最佳的保真-稳定性权衡。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2513_https_arxiv_org_abs_2602_20417/figures/005_Figure_5.jpg]]
-*Figure 5: Dynamic spatio-temporal latent burst merging. Naive averaging of flow-aligned burst latents yields blur under scene motion. FusionViT instead adaptively weights latents by motion and proximity to the reference, producing a sharper output*
-
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -247,9 +221,6 @@ $$\mathcal{L}_{fusion} = \| \mathcal{F}(\mu_{\phi^*}(X_{lq})) - \mu_{\phi}(x_{gt
 ### 单帧重建：感知质量与保真度权衡
 
 Table 1 报告了 3 位纳米爆发输入的单帧 RGB 重建结果。微调后的 Restormer 与 NAFNet 由于优化目标偏向低失真，获得了更高的 PSNR，但代价是严重的过度平滑——高频纹理和远距离深度平面中的结构几乎被抹除。gQIR 的单帧输出（仅使用阶段 1+2）在 MUSIQ 感知质量指标上达到 42.038，显著优于传统去噪基线（Restormer 约 40.x），与 Figure 3 的定性对比一致：gQIR 保留了更清晰的面部特征和纹理细节，这得益于训练集中包含 FFHQ 人脸数据的生成先验。
-
-![[assets/figures/papers/paper_list_l2513_https_arxiv_org_abs_2602_20417/figures/007_Table_1.jpg]]
-*Table 1: Fidelity and perceptual quality of 3-bit nano-burst input single RGB frame reconstruction. Fine-tuned Restormer and NAFNet attain higher PSNR due to optimization for lower distortion [2], leading to oversmoothing, while gQIR achieves higher perceptual quality, consistent with visual results in Fig. 3*
 
 ![[assets/figures/papers/paper_list_l2513_https_arxiv_org_abs_2602_20417/figures/003_Figure_3.jpg]]
 *Figure 3: Qualitative comparison – single 3-bit frame reconstructions. Conventional finetuned baselines over-smooth high-frequency structures, especially in distant depth planes and textured regions, whereas gQIR preserves sharper details and more faithful facial features, benefitting from the inclusion of FFHQ faces [24] in the training set*
@@ -287,9 +258,6 @@ Table 5 的逐阶段消融揭示了三个阶段的贡献与代价：
 - **阶段 1+2**：对抗蒸馏显著增强感知真实感，但引入了轻微的内容漂移——这是因为阶段 2 在训练中更强调感知质量，在帧间仅有微小运动的高速序列中会削弱运动线索。
 - **阶段 1+2+3**：FusionViT 的时空融合在提高保真度的同时有效抵消了阶段 2 引入的漂移，实现了保真度与时间稳定性的最佳权衡。
 
-![[assets/figures/papers/paper_list_l2513_https_arxiv_org_abs_2602_20417/figures/011_Table_5.jpg]]
-*Table 5: Ablation: All stages – fidelity versus temporal stability. Stage 2 improves fidelity over Stage 1 but slightly increases content drift, while Stage 3 provides the best overall trade-off between reconstruction quality and temporal stability*
-
 ### 真实 SPAD 原型验证
 
 Figure 8 展示了在 1Mpx 被动式彩色 SPAD 原型上以 6k fps 采集的二值爆发重建结果。尽管合成训练数据与真实传感器噪声特性之间存在域偏移，gQIR 仍能恢复合理的色彩和结构，初步验证了方法的实用性。但需注意，该评估仅为定性展示，缺乏大规模真实 SPAD 基准上的定量验证。
@@ -304,8 +272,6 @@ Figure 8 展示了在 1Mpx 被动式彩色 SPAD 原型上以 6k fps 采集的二
 3. **PPP 泛化受限**：未将每像素光子数显式建模为条件信号，导致极端低光（PPP ≤ 1）或不同传感器增益下泛化能力受限。
 4. **域偏移风险**：依赖大规模合成数据训练，在真实 SPAD 噪声特性下的鲁棒性尚未充分验证。
 5. **文本重建能力**：Figure 7 的补充分析表明，采用 SD3.5 的 VAE（4 倍潜在空间）可显著改善文字可读性，暗示当前 SD2.1 版本在精细文字重建上存在不足。
-
-
 
 ## 定位与知识库关联
 
@@ -354,8 +320,6 @@ gQIR 的方法谱系可追溯至三个技术脉络的交汇点：
 4. **超快帧率效率。** 在 >100k fps 的超快帧率下，如何平衡生成质量与计算效率？FusionViT 的窗口注意力机制提供了效率基础，但三阶段流水线的整体延迟仍需优化。
 
 5. **可信度与可解释性。** 生成式先验在量化科学测量任务中如何保证可信度？可能需要引入不确定性量化机制或物理约束的生成过程。
-
-
 
 ## 原文 PDF
 

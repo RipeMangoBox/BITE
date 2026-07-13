@@ -51,8 +51,6 @@ HAD的核心思路是：利用预训练前馈新视角合成网络（LVSM）的�
 
 实验表明，HAD在域内（DL3DV）和跨域（MipNeRF360）数据集上均显著优于现有方法：相比最直接的扩散先验辅助基线**Difix3D**（Wu et al., CVPR 2025），PSNR分别提升0.78 dB和0.69 dB，SSIM与LPIPS也全面改善。幻觉评分网络无需微调即可泛化到视频扩散模型**GenFusion**（Wu et al., CVPR 2025），带来+0.23 dB PSNR的增益。消融研究验证了预训练多视图编码器对幻觉评分的核心作用，以及单阶段训练策略的简洁有效性。
 
-
-
 三维场景从稀疏视角输入进行重建是计算机视觉中的核心挑战。近年来，3D Gaussian Splatting（3DGS）凭借其高效的显式点基元表示和可微光栅化渲染，成为高质量新视角合成的主流框架。然而，当输入视角极度稀疏（例如仅3–9张图像）时，3DGS的优化过程因观测信息严重不足而难以收敛到真实场景几何与外观，渲染质量急剧下降。
 
 为了弥补这一信息缺口，研究者开始引入扩散先验（diffusion prior）作为额外的监督信号。其基本思路是：利用预训练的图像或视频扩散模型，以当前3DGS渲染的粗糙图像为条件，生成视觉质量更高、细节更丰富的“增强视图”，并将这些增强视图作为伪真值（pseudo ground-truth）加入3DGS的训练损失中。**Difix3D**（Wu et al., CVPR 2025）和**GenFusion**（Wu et al., CVPR 2025）是该方向的代表性工作，分别在图像扩散先验和视频扩散先验的辅助下取得了显著的性能提升。
@@ -82,8 +80,6 @@ HAD的核心思路是：利用预训练前馈新视角合成网络（LVSM）的�
 3. **多采样融合**：从不同输入视图条件化扩散模型生成多个增强版本，逐像素选择幻觉分数最低的像素进行融合，有效降低幻觉比例。
 
 通过这一“感知–掩码–融合”的闭环机制，HAD首次在扩散辅助三维重建中实现了对幻觉内容的显式建模与主动抑制，为稀疏视角重建的保真度提升开辟了新的技术路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -117,8 +113,6 @@ $$
 
 三个创新形成闭环：幻觉评分网络提供像素级可靠性信号，使单阶段训练成为可能，同时为多采样融合提供逐像素选择依据；多采样融合进一步降低幻觉比例，减轻评分网络的负担。这种协同使得 HAD 在 DL3DV 上相比 Difix3D 提升 0.78 dB PSNR，在跨域 MipNeRF360 上提升 0.69 dB，且幻觉评分网络无需微调即可泛化到视频扩散模型 **GenFusion**（+0.23 dB PSNR），展现出模型无关的通用性。
 
-
-
 HAD 的整体训练流程围绕一个核心矛盾展开：扩散先验在增强稀疏视角三维重建时，会不可避免地引入与输入视图不一致的“幻觉”内容（如虚假纹理和几何），这些内容虽然在视觉上逼真，却严重损害重建的保真度。HAD 通过**幻觉感知的损失掩码机制**，在 3DGS 优化过程中阻止这些不可靠信息进入三维模型。
 
 ### 数据流与模块关系
@@ -147,8 +141,6 @@ HAD 的整体训练流程围绕一个核心矛盾展开：扩散先验在增强�
 - **输出**：优化后的 3DGS 场景表示 $\Phi$，可从任意新视角渲染出高保真且幻觉受控的图像
 
 整体框架的核心洞察在于：利用在大规模 3D 数据上预训练的前馈新视角合成网络（LVSM）的编码器作为多视图理解骨干，来检测扩散生成图像中的幻觉内容——这种 3D-aware 的特征表示是准确识别几何不一致性的关键。
-
-
 
 ### 3.1 问题建模与训练目标
 
@@ -219,12 +211,8 @@ $$\tilde{\mathbf{i}}[i] = \tilde{\mathbf{i}}_{\mathcal{G}}^{k^*}[i], \quad k^* =
 
 幻觉分数图 $\mathbf{s}$ 通过阈值 $\tau = 0.9$ 二值化为掩码 $\mathbf{m}$：分数高于阈值的像素被标记为幻觉区域并在损失计算中排除。这一硬掩码机制直接阻断了幻觉像素的梯度回传，防止不可靠的监督信号影响3DGS参数更新。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2258_https_arxiv_org_abs_2605_16873/figures/014_Figure_6.jpg]]
 *Figure 6: Overview of hallucination scoring network – The network predicts a pixel-wise hallucination score map s for a hallucinated novel view*
-
-
 
 ## 实验与关键发现
 
@@ -262,9 +250,6 @@ HAD 的幻觉评分网络展现出令人瞩目的零样本泛化能力：
 - **视频扩散模型**（Table 8）：将幻觉评分网络直接应用于 GenFusion 的视频扩散先验，无需任何微调，即带来 **+0.23 PSNR** 的提升。Figure 7 展示的掩码示例表明，网络能准确识别视频扩散生成图像中的幻觉区域。
 - **多视图扩散模型**（Figure 9）：同样无需微调即可泛化至多视图扩散 SVC，进一步验证了幻觉评分网络学习到的是跨扩散范式的通用幻觉模式。
 
-![[assets/figures/papers/paper_list_l2258_https_arxiv_org_abs_2605_16873/figures/012_Table_8.jpg]]
-*Table 8: Improving GenFusion [43] via HAD. We demonstrate that our hallucination scoring network generalizes to video diffusion models without fine-tuning, effectively masking hallucinated pixels and improving reconstruction quality. We test it on DL3DV [25]*
-
 ### 幻觉模式分析
 
 Figure 4 揭示了扩散辅助 3DGS 管线中幻觉的累积放大机制：Difix3D（图像扩散）和 GenFusion（视频扩散）在迭代增强 3DGS 渲染的过程中，初始 3DGS 输出中的轻微瑕疵（如小型漂浮物或几何畸变）会被扩散先验逐步放大，最终演化为肉眼可见的幻觉。这表明幻觉并非一次性引入，而是在迭代优化中持续累积——这正是 HAD 从训练起始即使用幻觉掩码的关键动机。
@@ -279,27 +264,8 @@ Figure 4 揭示了扩散辅助 3DGS 管线中幻觉的累积放大机制：Difix
 3. **数据分布依赖**：幻觉评分网络在 DL3DV 上训练，虽展现出强泛化性，但在显著不同的数据分布下评分精度可能下降。
 4. **表示扩展性**：当前仅验证了 3DGS 表示，在 NeRF 等其他 3D 表示上的有效性尚未测试。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2258_https_arxiv_org_abs_2605_16873/figures/003_Table_1.jpg]]
 *Table 1: Quantitative comparison of different methods on DL3DV [25]. Best, second, and third results are highlighted in 1st , 2nd , and 3rd , respectively. (↑: higher is better, ↓: lower is better). Note that ours* denotes a variant following the twophase 3DGS optimization strategy of Difix3D, enabling a fair comparison between diffusion priors with and without hallucination awareness. We denote*
-
-![[assets/figures/papers/paper_list_l2258_https_arxiv_org_abs_2605_16873/figures/005_Table_2.jpg]]
-*Table 2: Quantitative comparison of different methods on Mip-Nerf360 [3]. Note the results of Genfusion and FSGS are from Genfusion [43]*
-
-![[assets/figures/papers/paper_list_l2258_https_arxiv_org_abs_2605_16873/figures/006_Table_3.jpg]]
-*Table 3: Impact of different components*
-
-![[assets/figures/papers/paper_list_l2258_https_arxiv_org_abs_2605_16873/figures/008_Table_4.jpg]]
-*Table 4: Number of versions in multi-sampling strategy*
-
-![[assets/figures/papers/paper_list_l2258_https_arxiv_org_abs_2605_16873/figures/009_Table_5.jpg]]
-*Table 5: Fusion methods in multi-sampling strategy. We compare two approaches: (1) ArgMin: selecting pixels with the lowest hallucination score; (2) Weighted Average: computing the weighted mean*
-
-![[assets/figures/papers/paper_list_l2258_https_arxiv_org_abs_2605_16873/figures/007_Table_7.jpg]]
-*Table 7: The performance of our method in dense view setting (24 views)*
-
-
 
 ## 定位与知识库关联
 
@@ -354,8 +320,6 @@ HAD的有效性已在以下条件下得到验证，但其适用边界同样明�
 4. **幻觉评分的自监督学习**：当前幻觉评分网络需要配对的真值图像进行监督训练。能否利用多视图一致性约束（如不同增强版本间的差异）进行自监督或弱监督训练，降低对标注数据的依赖？
 
 5. **计算效率优化**：多采样策略的K次推理开销能否通过共享去噪步骤或渐进式融合来降低？这直接关系到方法的实际部署可行性。
-
-
 
 ## 原文 PDF
 

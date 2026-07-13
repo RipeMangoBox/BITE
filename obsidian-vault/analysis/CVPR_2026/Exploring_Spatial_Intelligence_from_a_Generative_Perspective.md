@@ -70,8 +70,6 @@ claims:
 
 当前验证仅基于单一架构（BAGEL），合成环境多样性有限，真实场景操作依赖 3D 重建精度。开放问题包括：生成式训练能否在无理解标签的情况下提升更复杂的全局空间推理？模型是否真正建立了隐式 3D 世界模型，还是仅实现了表层的图像级模仿？以及该方法能否扩展到动态交互场景以连接具身智能。
 
-
-
 ### 空间智能的定义缺口：从理解到生成
 
 空间智能（Spatial Intelligence）长期以来被多模态模型社区视为一项核心能力，但现有工作几乎完全从“理解”的角度对其进行定义与评估。典型的空间理解基准——如目标定位、空间关系判断、视角推理等——衡量的是模型对静态场景中空间结构、物体关系与相机位姿的解析能力。然而，这种单向的评估范式忽略了一个关键维度：**生成式空间智能（Generative Spatial Intelligence, GSI）**，即模型是否能够根据明确的空间指令，对视觉场景进行物理上合理的、受约束的编辑与操作。
@@ -89,8 +87,6 @@ claims:
 近年来，统一多模态模型（如 BAGEL、Emu3.5、JanusPro）将图像理解与生成整合到单一架构中，通过自注意力机制实现感知与生成模块的深度交互。这类模型为生成式空间智能提供了理想的技术载体：它们天然支持图像编辑任务，且其内部表征可能同时编码了场景的语义与空间信息。
 
 然而，一个悬而未决的假设是：**在精确的合成空间编辑数据上进行微调，能否迫使统一模型学习物理上合理的 3D 空间变换，从而增强其内部空间表征？** 这一假设构成了论文的因果调节变量（causal knob）。如果成立，它将意味着生成式训练可以成为空间智能的强化路径，而不仅仅是评估手段。论文通过构建 GSI-Bench 基准和 GSI-Syn 合成训练数据集，对这一假设进行了系统性验证。
-
-
 
 ## 核心方法与创新机理
 
@@ -138,8 +134,6 @@ GSI-Bench 位于空间智能评估与生成式模型训练的交汇点，其方�
 - **合成到真实的域间隙**：GSI-Syn 的合成环境（AI2-THOR、Mesa-Task）在视觉多样性和物理真实度上有限，GSI-Real 上的增益（+7.83 分）虽显著但低于合成域增益（+22.15 分），表明域间隙仍是影响迁移效果的关键因素。
 - **空间理解增益的幅度有限**：OmniSpatial 上仅提升 0.52 个百分点，提示生成式训练对特定空间推理子能力的迁移机制仍需深入分析。
 
-
-
 GSI-Bench 的构建围绕一个核心任务展开：**空间接地的图像编辑**（Spatially Grounded Image Editing）。给定输入图像 $\mathcal{I}$ 和一条明确的空间编辑指令 $\mathcal{T}$，统一多模态模型 $f$ 需要生成符合指令的目标图像 $\mathcal{I}^{\prime}$，即 $\mathcal{I}^{\prime} = f(\mathcal{I}, \mathcal{T})$。这一任务形式化的关键在于，每一条编辑指令背后都对应着一个潜在的 3D 场景变换，迫使模型在生成过程中隐式地推理物体的空间关系、相机视角和物理可行性。
 
 ### 场景建模与操作定义
@@ -167,12 +161,8 @@ GSI-Bench 的评估不依赖参考编辑图像，而是从四个维度自动量�
 
 在基准之外，GSI-Syn 同时作为训练数据，用于验证“以生成促理解”的核心假设。方法以统一多模态模型 **BAGEL**（Deng et al., arXiv 2025）为基础，该模型原生支持图像编辑，其感知与生成模块通过自注意力机制实现深度交互。训练集从 GSI-Syn 中采样包含移动、旋转、缩放、删除、视角变换等多样化空间操作的三元组 $(\mathcal{I}, \mathcal{T}, \mathcal{I}^{\prime})$，对 BAGEL 进行微调，迫使模型学习物理上合理的 3D 空间变换，从而内化鲁棒的空间表征。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2479_https_arxiv_org_abs_2604_20570/figures/001_Figure_1.jpg]]
 *Figure 1: We introduce GSI Bench, a benchmark for grounded spatial intelligence that spans both real-world and synthetic scenes. GSI Bench evaluates a diverse set of spatial editing skills across multiple domains. By incorporating fine-grained evaluation protocols covering instruction compliance, spatial accuracy, edit locality, and appearance consistency, GSI Bench enables rigorous assessment of spatial reasoning in image-editing models. We further show that fine-tuning with GSI-Syn significantly boosts models’ spatial understanding and generalization across all subsets of the benchmark*
-
-
 
 ### 任务形式化
 
@@ -181,9 +171,6 @@ GSI-Bench 将生成式空间智能操作化为**空间接地的图像编辑任�
 $$\mathcal{I}^{\prime} = f(\mathcal{I}, \mathcal{T})$$
 
 为形式化七种空间操作（移动、放置、旋转、容纳、视角变换、删除、缩放，见 Table 1），每个视觉场景被建模为其潜在 3D 结构。场景 $\mathcal{S}$ 由 $N$ 个物体和相机组成：
-
-![[assets/figures/papers/paper_list_l2479_https_arxiv_org_abs_2604_20570/figures/002_Table_1.jpg]]
-*Table 1: Spatial operation taxonomy*
 
 $$\mathcal{S} = \{\mathcal{O}_{i}\}_{i=1}^{N} \cup \{\mathcal{C}\}$$
 
@@ -242,8 +229,6 @@ $$(\mathcal{I}, \mathcal{T}, \mathcal{S}_{\mathrm{src}}, \Phi_{\mathrm{3D}}, \ma
 
 实验选择 BAGEL（Deng et al., arXiv 2025）作为基础模型，该模型原生支持图像编辑，并通过自注意力机制实现感知与生成模块的深度交互。训练集从 GSI-Syn 中构建，涵盖移动、旋转、缩放、删除、视角变换等多样化空间操作类型。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -299,8 +284,6 @@ $$(\mathcal{I}, \mathcal{T}, \mathcal{S}_{\mathrm{src}}, \Phi_{\mathrm{3D}}, \ma
 
 实验结果引出了若干待验证的深层问题：生成式空间训练能否在无需理解标签的情况下直接提升更复杂的全局空间推理（如路径规划、多步导航）？模型在编辑过程中是否真正建立了隐式 3D 世界模型，还是仅通过图像层次模仿实现了表面上的空间合规？这些问题指向了生成式空间智能研究的下一步方向。
 
-
-
 ## 定位与知识库关联
 
 ### 与基线工作的关系
@@ -348,8 +331,6 @@ GSI-Bench 所提出的生成式空间智能增强方法，建立在统一多模�
 4. **向动态场景与具身智能的扩展**：如何将生成式空间智能从静态图像编辑扩展到动态场景和交互任务，实现与具身智能的更紧密连接，是该方法走向实际应用的重要方向。
 
 5. **合成到真实域间隙的系统性弥合**：除增强 3D 重建精度外，域随机化、真实场景增强等策略是否能进一步缩小域间隙，值得系统研究。
-
-
 
 ## 原文 PDF
 

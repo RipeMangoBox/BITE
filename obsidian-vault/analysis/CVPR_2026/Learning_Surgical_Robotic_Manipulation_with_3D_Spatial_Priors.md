@@ -51,8 +51,6 @@ claims:
 
 在真实手术机器人上，SST 在取钉、打结和离体胆囊解剖三个任务上均达到或超越了现有最优方法（如 **SRT** (Kim et al., arXiv 2024)、**SRT-H** (Kim et al., Science Robotics 2025)）的成功率。消融实验表明，在 Surgical3D 上微调几何变换器是成功的关键：取消微调后取钉任务成功率从 10/10 骤降至 2/10；所提出的 MSFC 设计也显著优于仅使用最后一层特征或独立多层连接器的方案。此外，微调后的几何变换器无需任务特定训练即可从内窥镜图像中准确提取三维结构信息，验证了空间先验学习的有效性。
 
-
-
 ### 手术机器人自主操作的核心瓶颈
 
 让手术机器人在真实临床场景中自主完成精细操作，是医疗AI领域的长期目标。近年来，模仿学习在手术机器人操作中展现出巨大潜力，但其泛化能力始终受限于一个根本性问题：**缺乏有效的三维空间感知能力**。手术操作的本质是在三维空间中精确控制器械与组织的交互关系——抓取点的深度、缝合针的朝向、解剖层面的曲率，这些三维几何线索直接决定了动作的成败。
@@ -70,8 +68,6 @@ claims:
 本文的核心洞察是：**如果能让策略直接从立体内窥镜图像中提取出富含三维几何信息的潜在表征，并将其与机器人的动作空间精确对齐，就有可能在仅依赖标准立体视觉的条件下实现精准的仿人操作**。这意味着不需要显式重建完整的三维场景，也不需要额外的腕部摄像头，而是让策略“内化”三维空间理解能力。
 
 为实现这一目标，本文提出 **Spatial Surgical Transformer (SST)**，其核心思路是两步走：首先，构建一个大规模合成立体视觉数据集（Surgical3D），利用其精确的三维标注来微调一个强大的几何变换器（基于MASt3R），使其学会从内窥镜图像中提取多尺度的三维潜在嵌入；然后，通过一个轻量级的多级空间特征连接器（MSFC）将这些嵌入高效融合，送入以内窥镜坐标系为中心的策略解码器，直接预测相对动作序列。这种设计使得三维空间先验的学习与操作策略的训练解耦但又协同——几何变换器负责“看懂”三维结构，策略解码器负责“用好”三维信息。
-
-
 
 ## 核心方法与创新机理
 
@@ -117,8 +113,6 @@ SST的因果调节器（Causal Knob）在于：**通过从立体内窥镜图像�
 
 三个Changed Slot并非孤立改进，而是形成了一条完整的因果链：**Surgical3D微调的几何变换器**提供了可靠的三维空间先验来源；**MSFC**确保了这些多尺度三维信息被有效提取和压缩；**内窥镜中心动作空间**则使这些空间先验能直接指导动作生成。Figure 5的中间三维重建结果从定性角度佐证了这一点：微调后的几何变换器无需任务特定训练，即可从内窥镜图像中准确提取三维结构信息，为下游策略提供了坚实的空间基础。
 
-
-
 SST 的整体流水线分为两个阶段：**三维空间先验的获取**与**基于先验的策略学习**。
 
 **第一阶段**在离线的 Surgical3D 合成数据集上，以三维重建为目标对几何变换器（基于 MASt3R 的 ViT-Large）进行微调，使其从立体内窥镜图像中学会提取富含三维几何线索的潜在嵌入。该阶段完成后，几何变换器的权重被冻结，不再参与后续策略训练的梯度更新。
@@ -127,15 +121,8 @@ SST 的整体流水线分为两个阶段：**三维空间先验的获取**与**�
 
 整个框架的输入为立体内窥镜图像与本体感知状态，输出为左右手术器械的相对位姿动作，无需腕部摄像头、显式三维重建或外部跟踪设备。图 2 给出了完整的流水线示意。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2640_https_arxiv_org_abs_2603_03798/figures/001_Figure_1.jpg]]
-*Figure 1: We present Spatial Surgical Transformer (SST), a visuomotor policy that empowers surgical robots with spatial intelligence through learned 3D spatial priors. The policy leverages a geometry transformer finetuned on the proposed Surgical3D Dataset to extract robust 3D latent embeddings from stereo endoscopic inputs, coupled with a multi-level spatial feature connector that integrates multi-level 3D latent embeddings capturing both fine-grained details and global context into the policy decoder. We implement SST on a real surgical robot equipped with a stereo endoscopic camera manipulator (ECM) and two patient-side manipulators (PSMs), and evaluate it across three distinct real-world surgical...*
-
 ![[assets/figures/papers/paper_list_l2640_https_arxiv_org_abs_2603_03798/figures/002_Figure_2.jpg]]
 *Figure 2: Pipeline of Our Method. Top: The geometry transformer is first finetuned on the proposed Surgical3D dataset using a 3D reconstruction objective, enabling the extraction of robust 3D latent embeddings from endoscopic images. Bottom: The geometry transformer is then frozen, while the remaining components are trained to learn surgical manipulation policies with spatial priors from collected demonstrations. A multi-level spatial feature connector (MSFC) is trained to aggregate 3D latent embeddings from multiple geometry transformer blocks and aligns them with the robot’s action space. An endoscope-centric policy decoder generates relative robot actions in the endoscope frame, guided by the lear...*
-
-
 
 ### 3.1 几何变换器的微调目标
 
@@ -180,15 +167,8 @@ $$L_{MSE} = MSE(\hat{a}_{t}, \pi_{\theta}(o_{t}, x_{t}))$$
 
 其中 $\pi_{\theta}$ 为参数化的策略网络，$o_t$ 为立体内窥镜观测，$x_t$ 为机器人本体感知状态（关节角度等），$\hat{a}_{t}$ 为从演示数据中提取的真值相对动作。整个策略解码器由 12 层 Transformer 解码器层构成（隐藏维度 768），以几何变换器冻结后的潜在嵌入作为交叉注意力的键值对输入。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2640_https_arxiv_org_abs_2603_03798/figures/003_Figure_3.jpg]]
 *Figure 3: Left: Samples from our Surgical3D dataset. We utilize diverse 3D surgical assets to generate highly realistic and varied synthetic surgical scenes. Right: The figure illustrates the reconstruction results from MASt3R under three finetuning configurations. (a) One example of a stereo endoscopic image captured in a real in-vivo surgical scene, used as input. (b) The original MASt3R fails to reconstruct both the patient-side manipulator (PSM) and the organ surface. (c) When finetuned solely on synthetic data, the organ reconstruction remains coarse and the PSM geometry is still incomplete. (d) When finetuned on a combination of synthetic and real data, the model achieves more accurate reconstr...*
-
-![[assets/figures/papers/paper_list_l2640_https_arxiv_org_abs_2603_03798/figures/009_Figure_6.jpg]]
-*Figure 6: Alternative Designs of Spatial Connectors. (a) Last-Layer Feature Connector. (b) Multi-Layer Separate Connector*
-
-
 
 ## 实验与关键发现
 
@@ -247,15 +227,8 @@ Figure 5 展示了微调后的几何变换器在不同任务步骤中生成的�
 
 此外，本文未报告在活体场景下的评估结果，离体实验到临床部署的泛化能力仍需进一步验证。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2640_https_arxiv_org_abs_2603_03798/figures/005_Figure.jpg]]
-*Figure: (a) Peg Pickup (b) Knot Tying (c) Ex-vivo Gallbladder Dissection*
-
 ![[assets/figures/papers/paper_list_l2640_https_arxiv_org_abs_2603_03798/figures/004_Figure_4.jpg]]
 *Figure 4: Visualization of Experimental Settings. Yellow and blue arrows denote the approximate motion directions of the right and left arms, respectively. Top: Peg pickup task. A total of 180 trajectories were collected, with roughly 120 in the green region and 60 in the blue region for training. Test1 and Test2 correspond to evaluations in these respective areas. Middle: Knot tying task. The suture tail was randomly positioned within the blue region during data collection, and evaluations were performed under the same condition. (b1) and (b3) show the grasping and looping actions. Bottom: Ex-vivo gallbladder dissection task. Grasp points on the gallbladder were sampled from varying positions within...*
-
-
 
 ## 定位与知识库关联
 
@@ -290,8 +263,6 @@ SST 的有效性建立在以下几个关键假设之上，这些假设也划定�
 - **动态场景的鲁棒性**：SST 在准静态手术场景中表现优异，但真实手术中常涉及组织变形、出血、烟雾等动态干扰。几何变换器在这些条件下的三维嵌入质量如何变化，论文未给出系统性评估。
 - **从合成到真实的泛化上限**：Figure 3 的定性结果显示，仅在合成数据上微调的几何变换器对真实场景的器官重建仍较粗糙，混合真实数据后才显著改善。这暗示 Surgical3D 的域间隙尚未完全弥合，更大规模、更多样化的真实手术数据收集可能是进一步提升泛化能力的必要条件。
 - **与基础模型的进一步整合**：SST 目前将三维空间先验与动作预测直接耦合。一个值得探索的方向是将几何变换器提取的空间嵌入与手术语言模型（如手术报告生成、指令理解）结合，实现语言引导的空间推理——这与 SRT-H 的语言条件模仿学习形成互补而非替代关系。
-
-
 
 ## 原文 PDF
 

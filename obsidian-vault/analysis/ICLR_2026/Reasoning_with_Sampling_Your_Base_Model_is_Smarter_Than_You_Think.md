@@ -59,8 +59,6 @@ claims:
 
 这些结果表明：基模型的推理能力远超常规采样所展现的水平，通过恰当的采样策略即可释放，无需昂贵的强化学习后训练。
 
-
-
 ### 推理能力的“隐性”瓶颈
 
 大型语言模型（LLM）在数学、编程等推理任务上展现出了令人瞩目的能力，但这一能力的释放高度依赖后训练阶段，尤其是强化学习（RL）微调。当前主流的推理范式存在一个显著的矛盾：**基模型本身具备强大的潜在推理能力，但标准的自回归采样策略无法有效将其激发。** 具体而言，直接对基模型进行采样（包括低温度采样）所得到的单次（pass@1）性能远低于经过 RL 后训练的模型，这导致了一种普遍认知——必须通过昂贵的 RL 训练来“注入”推理能力。
@@ -83,8 +81,6 @@ claims:
 
 这一动机直接引出了本文的核心技术路径：**幂分布采样**（Power Sampling）——通过将采样目标从原始分布 $p$ 替换为尖锐化的幂分布 $p^\alpha$（$\alpha > 1$），并利用 MCMC 算法迭代地重新采样和接受/拒绝候选序列，实现对高质量推理路径的有效搜索。该方法完全训练无关，仅依赖基模型自身的似然计算，因此在理论上避免了 RL 后训练所带来的多样性丧失和域外退化问题。
 
-
-
 ## 核心方法与创新机理
 
 本工作的核心创新在于**完全绕过强化学习后训练，仅通过推理时的采样策略设计，使基模型释放出被常规采样方式掩盖的潜在推理能力**。其关键突破可归纳为两个层面的“changed slots”：目标分布的重定义，以及采样算法的根本性变革。
@@ -105,8 +101,6 @@ $$A(\mathbf{x}, \mathbf{x}^i) = \min\left\{1, \frac{p^\alpha(\mathbf{x}) \cdot q
 
 上述两个变更的组合产生了一个令人瞩目的结果：在完全不需要训练数据、奖励模型或策略梯度更新的前提下，幂采样在单次推理性能上**匹配甚至超越 GRPO 后训练模型**（**GRPO**, Shao et al., 2024）。这挑战了“基模型推理能力必须通过 RL 后训练才能充分释放”的既有认知。其本质机制在于，幂分布采样本身就是一种隐式的“test-time search”——它利用基模型对序列整体的似然评估，在推理时进行迭代优化，而 GRPO 则将类似的优化过程固化到了模型参数中。后者的代价是**牺牲了生成多样性**（Figure 5 显示 GRPO 的 pass@k 曲线显著低于基模型），而幂采样在提升单次性能的同时，完整保留了基模型的多样性，使其 pass@k 表现严格优于 GRPO 和基模型。
 
-
-
 Power Sampling 的整体框架围绕一个核心目标展开：从基模型（base model）的原始分布 $p$ 出发，通过无需训练的推理时采样策略，逼近一个经过尖锐化（sharpened）的目标分布 $p^\alpha$（$\alpha > 1$）。该框架的输入是预训练或指令微调后的自回归语言模型，输出是单条推理序列，整个流程由三个关键模块串联而成。
 
 **目标分布定义**：框架首先将推理任务的目标分布定义为幂分布 $p^\alpha$（$\alpha=4.0$）。这一选择的因果机制在于，幂运算会放大高似然序列与低似然序列之间的相对权重——若 $p(\mathbf{x}) > p(\mathbf{x}')$，则 $\frac{p(\mathbf{x})^\alpha}{p(\mathbf{x}')^\alpha} > \frac{p(\mathbf{x})}{p(\mathbf{x}')}$。更重要的是，幂分布在 token 级别的条件分布会偏向那些“未来路径少但质量高”的 token，而非“未来路径多但质量低”的 token，这与低温采样（low-temperature sampling）的行为有本质区别（见 Proposition 1 和 Observation 1）。这一设计隐式地纠正了推理中的“关键 token”错误，构成了整个方法的理论基石。
@@ -118,8 +112,6 @@ Power Sampling 的整体框架围绕一个核心目标展开：从基模型（ba
 **输入输出流**：整个流程以基模型的一次普通自回归采样为起点，生成初始序列。随后，在分块循环中，对每个块执行 MCMC 迭代——提议分布生成候选 token 子序列，MH 接受概率基于基模型似然进行筛选。最终输出一条经过幂分布校正的完整推理序列。值得注意的是，该流程是“单次”（single-shot）的：尽管涉及多次前向传播（约 8.84 倍 token 开销），但接受/拒绝决策完全依赖基模型自身的似然，无需外部奖励信号或验证器，最终产出的仍是一条序列。
 
 三个模块的依赖关系清晰：目标分布定义“采样什么”，MCMC 引擎决定“如何采样”，分块渐进策略解决“如何高效采样”。这一设计使得 Power Sampling 在保持基模型多样性的同时，将采样质量提升至与 RL 后训练相当甚至更优的水平。
-
-
 
 ### 幂分布：推理的尖锐化目标
 
@@ -174,8 +166,6 @@ $$\mathbb{E}_{\mathrm{tokens}} = N_{\mathrm{MCMC}} \sum_{k=1}^{\lceil T/B \rceil
 
 实际测量中，推理计算量约为基模型的 **8.84 倍** tokens（$N_{\text{MCMC}}=10$ 步），但总体成本与 GRPO 单轮训练（16 个 rollouts）相当。
 
-
-
 ## 实验与关键发现
 
 ### 主结果：单次推理性能对比
@@ -206,15 +196,9 @@ Figure 5 展示了 MATH500 上的 pass@k 性能曲线（k 从 1 到 64）。Powe
 ![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_Vsgq2ldr4K/figures/010_Figure_8.jpg]]
 *Figure 8: Pass@k performance on HumanEval (Qwen2.5-Math-7B)*
 
-![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_Vsgq2ldr4K/figures/011_Figure_9.jpg]]
-*Figure 9: Pass@k performance on GPQA (Qwen2.5-Math-7B)*
-
 ### 似然与置信度分布分析
 
 Figure 4 对比了基模型、Power Sampling 和 GRPO 在 MATH500 上生成序列的对数似然和模型置信度分布。GRPO 的生成序列集中在最高似然和最高置信度区域，而 Power Sampling 的分布紧随其后，同样偏向高似然区域，但保留了一定的分布宽度。这与准确率的提升呈正相关：幂分布采样通过 MCMC 接受/拒绝机制，隐式地筛选出那些在当前 token 选择上具有更高质量未来路径的序列，而非简单追求局部似然最大化。
-
-![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_Vsgq2ldr4K/figures/006_Figure_4.jpg]]
-*Figure 4: Base model (Qwen2.5-Math-7B) likelihoods and confidences for MATH500 responses. Left: We plot the log-likelihoods (relative to the base model) of original, power sampling, and GRPO responses over MATH500. Right: We do the same but for confidences relative to the base model. We observe that GRPO samples from the highest likelihood and confidence regions with power sampling close behind, which correlates with higher empirical accuracy*
 
 模型置信度定义为序列上各 token 分布负熵的均值：
 
@@ -246,20 +230,8 @@ Table 2 展示了 HumanEval 上的典型案例：Phi-3.5-mini-instruct 的 GRPO 
 ![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_Vsgq2ldr4K/figures/014_Table_5.jpg]]
 *Table 5: MATH500 comparison between our sampling algorithm and GRPO for Qwen2.5-Math-7B. Here is an example where GRPO gets an incorrect answer, while our sampling algorithm succeeds. Our sample answer uses a distinct method altogether*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_Vsgq2ldr4K/figures/001_Figure_1.jpg]]
-*Figure 1: Our sampling algorithm can match and outperform RL-posttraining. Left: we compare our sampling algorithm (ours) against the base model (base) and RL-posttraining (GRPO) on three verifiable reasoning tasks (MATH500, HumanEval, GPQA). Right: we compare them on an unverifiable general task (AlpacaEval2.0). Our algorithm achieves comparable performance to GRPO within the posttraining domain (MATH500) but can outperform on out-of-domain tasks such as HumanEval and AlpacaEval*
-
-![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_Vsgq2ldr4K/figures/012_Table.jpg]]
-
 ![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_Vsgq2ldr4K/figures/013_Table_4.jpg]]
 *Table 4: HumanEval comparison on Phi-3.5-mini-instruct*
-
-![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_Vsgq2ldr4K/figures/009_Figure_7.jpg]]
-*Figure 7: Pass@k performance on MATH500 (Qwen2.5-Math-7B)*
-
-
 
 ## 定位与知识库关联
 
@@ -327,8 +299,6 @@ Table 2 展示了 HumanEval 上的典型案例：Phi-3.5-mini-instruct 的 GRPO 
 4. **非推理任务适用性**：在创意写作、对话生成等多样性要求高的任务上，幂分布的“尖锐化”倾向是否会产生负面影响？是否可以通过调整 $\alpha$ 或提议分布温度来平衡质量与多样性？
 
 5. **理论分析深化**：Proposition 1 揭示了低温度采样与幂分布采样的本质区别，但幂分布采样为何在推理任务中优于低温度采样的理论机制（特别是“未来路径规划”效应）仍需更严格的形式化分析。
-
-
 
 ## 原文 PDF
 

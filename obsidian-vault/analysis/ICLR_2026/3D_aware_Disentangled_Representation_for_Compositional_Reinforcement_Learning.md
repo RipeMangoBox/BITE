@@ -51,15 +51,11 @@ claims:
 
 主要结果验证了该方法的有效性：在Clevr3D数据集上，方法在FG-ARI（0.942 vs 0.365）、解耦性D（0.867 vs 0.140）等指标上显著优于OSRT，同时PSNR相当（31.11 vs 31.57）。在IsaacGym3D的GCRL任务中，结合BT策略的方法在分布内（ID）设置下成功率达0.967 ± 0.017，组合泛化（CG）设置下为0.895 ± 0.011，分布外（OOD）设置下为0.828 ± 0.099，均大幅超越基线。在视角泛化实验中，方法在OOD单视图设置下仍保持0.758 ± 0.021的成功率，证明了其视角无关的3D感知能力。消融实验进一步表明，块级解耦质量（DCI指标）直接正向影响GCRL性能，且方法可使用次优掩码（如DINO背景掩码+运动学智能体掩码）进行训练，性能与使用GT掩码相当，增强了实际部署的可行性。
 
-
-
 现有基于2D图像的对象中心表示（如DLPv2、SNeRL）在机器人操作任务中面临两个根本瓶颈：一是缺乏3D感知能力，无法处理视角变化和遮挡；二是对象属性与相机位姿之间存在纠缠，导致在组合泛化和分布外场景中性能严重退化。尽管OSRT等3D对象中心表示方法通过光场解码器实现了新视角合成，但其每个对象仅由一个单一槽向量表示，未对属性进行显式分解，因此解耦性能极差（FG-ARI仅0.365，解耦度D仅0.140），这从根本上限制了其在目标条件强化学习中的泛化能力——当场景中出现训练时未见过的属性组合时，策略无法准确匹配当前状态与目标状态中的对象。
 
 本文的核心动机是：**通过将对象表示分解为可解释的属性块（如形状、颜色、大小、位置），并利用块级交叉注意力机制，实现3D感知的、视角无关的、可组合的对象表示，从而突破现有方法在组合泛化和视角泛化上的性能天花板。** 具体而言，作者提出3D block-slot注意力机制，将每个对象槽进一步分解为M个属性块，每个块通过概念记忆（prototype memory）进行独立更新；同时设计混合槽注意力架构——对前景对象使用块-槽注意力，对背景和智能体槽使用标准槽注意力——以避免训练崩溃。在策略层面，块变换器（Block Transformer）策略在匹配的对象之间进行块级交叉注意力，而非传统对象级交叉注意力，从而稳定地匹配当前状态与目标状态之间的对象属性。
 
 该方法的因果机制在于：属性块的显式分解使得模型能够独立编码和操作每个对象的形状、颜色、大小和位置信息，而块级交叉注意力则允许策略在对象匹配时直接关注具体属性的差异，而非模糊的对象整体。这一设计直接解决了现有方法中“对象属性纠缠导致组合泛化失败”的核心问题——当训练集中红色方块和蓝色球体已出现，但红色球体是未见组合时，模型可以通过独立匹配颜色块和形状块来正确识别目标对象，而非依赖整体对象表示的相似度。
-
-
 
 ## 核心方法与创新机理
 
@@ -77,8 +73,6 @@ claims:
 
 **核心洞察**在于：通过将对象表示分解为可解释的属性块，并利用块级交叉注意力策略，可以稳定地匹配当前状态与目标状态之间的对象属性，从而实现高效的组合泛化和视角无关的强化学习。消融实验（Table 13）直接验证了这一因果链：高DCI（解耦性、完整性、信息性）模型在所有泛化设置（ID、CG、CG同色、OOD）中的成功率均显著优于低DCI模型，证明**块级解耦质量是GCRL性能的直接瓶颈**。
 
-
-
 ![[assets/figures/papers/iclr26_0001_GE0IFoDx8a_3D-aware_Disentangled_Representation_for_Composi/figures/001_Figure_1.jpg]]
 *Figure 1: Overall structure of our method: Our proposed pipeline consists of two steps: representation learning and policy training. (a) Pre-training 3D block-slot encoder: The object slots are further decomposed into blocks of attributes. Then, the slot-mixer decoder mixes the object-centric representation to generate images at a query view. (b) Policy training with block transformer policy: We utilize the 3D block-slot encoder to extract a structured representation for the current observation and the goal image. The decomposed latent embedding serves as the input and the goal tokens, respectively, for our block transformer of the policy architecture*
 
@@ -95,8 +89,6 @@ claims:
 预训练后的3D Block-Slot编码器提取当前观测和目标图像的解耦表示。策略网络的核心是**块级交叉注意力**（block-wise cross-attention）：在匹配的对象之间，对属性块进行交叉注意力计算 $\mathbf{H}_n = \text{CrossAttn}(\mathbf{z}_{o_n}^s, \mathbf{z}_{o_n'}^g)$，再通过池化注意力得到 $\mathbf{h}_n$（公式8）。这区别于基线方法（如EIT）的对象级交叉注意力——块级操作能稳定匹配当前与目标状态中对应的对象属性，避免因对象排列不变性导致的匹配错误（Figure 2）。最终输出通过自注意力和MLP生成动作和Q值（公式9）。策略中仅使用前景块和智能体槽，因为背景信息在机器人操作任务中通常包含噪声。
 
 **模块关系与数据流**：SRT Encoder → 3D Block-Slot注意力（混合架构）→ Slot Mixer解码器（训练时重建损失）→ 预训练编码器冻结 → 块变换器策略（块级交叉注意力）。输入为多视图图像（表示学习阶段）或单/多视图（策略推理阶段），输出为对象级解耦表示（表示学习）或动作（策略）。
-
-
 
 ### 3D Block-Slot 表示学习
 
@@ -188,14 +180,11 @@ $$
 - **块数量**（Table 11）：从4增加到16可提高解耦性能（D从0.322升至0.447），但FG-ARI略有下降，表明需要平衡分解粒度与对象分割质量。
 - **原型数量**（Table 12）：从8增加到32可显著提高解耦性能（D从0.023升至0.480）和PSNR（从22.43升至25.33），说明更多的概念记忆有助于更精细的属性编码。
 
-
-
 ## 实验与关键发现
 
 ### 3D感知与解耦表示质量
 
 论文的核心实验首先验证了3D block-slot表示在对象分解和属性解耦上的优势。在Clevr3D和IsaacGym3D数据集上，该方法与强基线OSRT进行了对比。**Table 1**显示，在Clevr3D上，所提方法的FG-ARI达到0.942，而OSRT仅为0.365，提升超过0.577。解耦性(D)从0.140跃升至0.867，完整性(C)从0.083提升至0.789，信息性(I)从0.452提升至0.844。值得注意的是，在PSNR指标上，所提方法(31.11)与OSRT(31.57)几乎持平，仅下降0.46 dB。这一模式表明，3D block-slot注意力机制在不牺牲新视角合成质量的前提下，极大地改善了场景分解和属性解耦。**Figure 7**的定性结果进一步佐证了这一点：该方法对前景对象、背景和智能体组件的分离效果显著优于OSRT。
-
 
 ![[assets/figures/papers/iclr26_0001_GE0IFoDx8a_3D-aware_Disentangled_Representation_for_Composi/figures/003_Table_1.jpg]]
 *Table 1: 3D awareness with novel-view synthesis and decomposition performance: Our method outperforms OSRT across FG-ARI, disentanglement (D), completeness (C), and informativeness (I), while achieving comparable PSNR. The results indicate that our approach improves object decomposition and effectively disentangles information into latent vectors, while maintaining 3D-aware representation*
@@ -216,7 +205,6 @@ $$
 
 **Table 3**评估了策略在不同视角设置下的泛化能力。所提方法在OOD单视图设置下仍保持0.758 ± 0.021的成功率，仅比ID多视图的0.802 ± 0.028下降约5.5%。这一结果验证了3D block-slot表示能够以视角无关的方式捕获3D对象信息。相比之下，OSRT w/EIT在OOD单视图下仅为0.288 ± 0.122，DLPv2 w/EIT为0.133 ± 0.058。值得注意的是，所提方法在OOD单视图(0.758)上的表现甚至优于其自身在OOD多视图(0.676)上的表现，这一反直觉现象可能源于单视图评估中随机性的减少，但论文未提供详细解释，需人工核实。
 
-
 ![[assets/figures/papers/iclr26_0001_GE0IFoDx8a_3D-aware_Disentangled_Representation_for_Composi/figures/007_Table_3.jpg]]
 *Table 3: Success rate of view-generalization: Our model, which leverages a pre-trained 3D blockslot representation and a block transformer (BT), effectively captures 3D object information in a viewpoint-agnostic manner and achieves state-of-the-art performance across diverse generalization settings. We evaluate generalization in goal-conditioned RL tasks under four viewpoints settings: ID Multi-View (in-distribution multi-view), ID Single-View (in-distribution single-view), OOD Multi-View (out-of-distribution multi-view), and OOD Single-View (out-of-distribution single-view). Results are computed over 400 randomly sampled goals per seed, with all reported metrics averaged over three random seeds*
 
@@ -232,8 +220,6 @@ $$
 
 **非对象中心基线的对比**：**Table 9**显示，基于VAE的MLP策略在ID设置下成功率仅为0.042 ± 0.015，在OOD下为0.000 ± 0.000，远低于所提方法。这表明对象中心表示对于多对象操作任务至关重要。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0001_GE0IFoDx8a_3D-aware_Disentangled_Representation_for_Composi/figures/006_Figure_4.jpg]]
 *Figure 4: Evaluation scenarios for compositional and out-of-distribution generalization: Composition generalization environments consist of objects with properties during training, but novel in their combinations. Out of such unseen combinations, we separately evaluate cases with objects of the same color when the factorization of attributes is unsuccessful. Out-of-distribution environments use objects with colors that were not present in the training set. Table 2: Performance of goal-conditioned RL: Our proposed 3D block-slot representation, combined with a block transformer (BT) policy, can effectively interpret goal conditions and exhibit superior performance in various scenarios. We compare the p...*
 
@@ -242,9 +228,6 @@ $$
 
 ![[assets/figures/papers/iclr26_0001_GE0IFoDx8a_3D-aware_Disentangled_Representation_for_Composi/figures/011_Table_5.jpg]]
 *Table 5: Hyperparameters of DLPv2 used in our experiments*
-
-
-
 
 ## 定位与知识库关联
 
@@ -257,8 +240,6 @@ $$
 **局限与开放问题**有三。第一，当前方法不支持动态或一对多的匹配场景，限制了在更复杂环境中的适用性。第二，3D block-slot表示编码了类似语言标记的语义，如何将其与视觉-语言-动作（VLA）框架结合，实现更高级的推理和规划，是重要的未来方向。第三，方法依赖多视图输入进行表示学习，且解耦质量受块数量和原型数量等超参数影响（Table 11和Table 12显示，增加块数量从4到16可提高D从0.322至0.447，但FG-ARI略有下降；增加原型数量从8到32可显著提高D从0.023至0.480和PSNR从22.43至25.33），需要仔细调优。次优掩码实验（Table 15）表明，使用DINO背景掩码和运动学智能体掩码训练的模型，其GCRL性能与使用GT掩码的模型相当，这为减少对仿真GT掩码的依赖提供了可行路径，但在真实世界场景中如何更鲁棒地获取次优掩码仍需进一步研究。
 
 **证据强度评估**：主要性能比较（Table 1, 2, 3）基于3个随机种子、每种子400个随机采样目标，统计量充分。消融实验（Table 11-15）覆盖了块数量、原型数量、解耦质量、掩码损失权重、次优掩码等关键设计维度，证据链完整。但部分定性分析（如K-means聚类和特征重要性矩阵）的量化支撑较弱，需要手动验证其在不同数据集上的可重复性。
-
-
 
 ## 原文 PDF
 

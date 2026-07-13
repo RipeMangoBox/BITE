@@ -55,8 +55,6 @@ claims:
 
 **方法谱系与知识库定位**：GTR-Turbo属于**自持式RL训练**方法，其核心创新——以模型合并构建免费教师——与以下工作形成对比：原始**GTR**依赖外部API教师提供思维校正；**RL4VLM**（Zhai et al., NeurIPS 2025）直接将PPO应用于原始环境奖励，缺乏过程监督机制；基于静态模型的KL正则化自改进方法无法稳定提升性能（Figure 6消融实验）。在模型合并技术层面，GTR-Turbo采用**TIES合并**（Yadav et al., NeurIPS 2024），通过修剪、符号选举和选择性平均有效避免了参数干扰，相比简单线性平均显著提高了教师质量（Figure 8）。
 
-
-
 ### 多轮VLM智能体的“思维崩溃”困境
 
 以视觉语言模型（VLM）为基座的智能体在交互式决策任务中展现出巨大潜力，但通过强化学习（RL）对其进行多轮训练时面临一个核心瓶颈：**环境奖励稀疏且缺乏过程监督**。在典型的VLM智能体RL训练中，智能体仅在回合结束时收到标量奖励信号（如任务成功/失败），这导致其内部推理过程（thought）逐渐退化为重复、不连贯的模板化输出——这一现象被称为“思维崩溃”（thought collapse）。
@@ -78,8 +76,6 @@ $$
 本文的核心动机在于回答一个根本性问题：**能否在不依赖任何外部大模型的情况下，为VLM智能体的RL训练提供高质量的思维过程监督？**
 
 直觉上，RL训练过程中不断产生的历史模型检查点蕴含着智能体在不同训练阶段积累的经验和知识。如果能够有效聚合这些历史检查点，就有可能得到一个性能优于当前智能体、且更为稳定的“教师模型”——该教师与当前智能体同源，无需额外训练，也不产生API调用成本。这一洞察构成了**GTR-Turbo**的核心假设：**合并历史检查点可以隐式地聚合过去的经验，得到一个在损失面更平滑、表现更好的模型，从而作为“免费教师”替代昂贵的外部API，实现高效、自主的Agentic VLM训练。**
-
-
 
 ## 核心方法与创新机理
 
@@ -103,8 +99,6 @@ GTR-Turbo 的解决方案是**将 RL 训练过程中保存的历史检查点通�
 ### 创新的本质：经验聚合与过程监督的内化
 
 从机制层面看，GTR-Turbo 的创新可以理解为**将外部知识注入转化为内部经验聚合**。合并检查点隐式地聚合了 RL 探索过程中的多样化经验，在损失面上形成了一个更优的“重心”。这个同源教师通过 SFT 或 KL 约束向当前智能体传递思维层面的过程监督，既抑制了 RL 训练中常见的“思维崩溃”现象（**Figure 14** 的推理分数评测证实了这一点），又保留了智能体在动作空间的探索自由度——**Figure 7** 的消融实验表明，仅指导思维部分优于同时指导思维和动作，因为后者限制了模型探索，而探索正是 GTR-Turbo 自我进化的关键驱动力。
-
-
 
 GTR-Turbo 的核心思想是用RL训练过程中自然产生的历史检查点，通过模型合并技术构建一个“免费”的教师模型，替代原始GTR框架中昂贵的外部API教师（如GPT-4o），为Agentic VLM的强化学习训练提供思维层面的过程监督。整个框架由五个关键模块串联而成，形成闭环的自我进化训练流程。
 
@@ -143,13 +137,6 @@ GTR-Turbo提供两种可选的思维指导机制，在计算效率与指导精�
 原始GTR框架（图1）依赖外部API模型（如GPT-4o）作为“校正器”，在每一步RL中评估并修正智能体的思维内容。这一设计导致两个根本性瓶颈：（1）**计算开销巨大**——使用GPT-4o训练15,000步需约4天时间和约150美元API费用（Table 1）；（2）**扩展性受限**——依赖第三方API意味着训练速度和成本不受自主控制，且存在服务可用性风险。
 
 GTR-Turbo通过将教师模型**内部化**和**自主化**，彻底消除了对外部API的依赖。合并检查点模型不仅完全免费，而且作为同源教师，其输出分布与当前智能体天然兼容，避免了跨模型分布差异引入的噪声。这一设计使得训练时间减半、计算成本降低约60%（Table 4），同时最终性能超越原始GTR（Points24成功率53.5% vs. 44.5%）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2394_https_arxiv_org_abs_2512_13043/figures/004_Figure_3.jpg]]
-*Figure 3: Overview of the GTR-Turbo framework. Beyond the GTR training of VLM agents (Figure 1), GTR-Turbo stores historical checkpoints and merges them into a teacher model (blue region), and then incorporates the PPO update (orange region) with thought guidance by minimizing either SFT loss (green region) or KL divergence (purple region), enabling flexible, scalable, and self-guided agentic RL training*
-
-
 
 ### 3.1 原始GTR框架的瓶颈
 
@@ -208,13 +195,6 @@ $$
 
 GTR-Turbo框架通过**Guidance Variant Selector**在SFT损失与KL散度惩罚之间灵活切换。SFT变体直接传递教师思维，训练更稳定；KL变体仅需并行推理，将总训练时间降至RL4VLM水平（约为GTR的一半），成本降低约60%（表4）。两种变体均通过PPO更新模块将思维指导与动作优化联合进行，实现自主、可扩展的Agentic VLM训练。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2394_https_arxiv_org_abs_2512_13043/figures/003_Figure_2.jpg]]
-*Figure 2: The performance comparison of the merged checkpoint and the current checkpoint on Points24. We adopt the Qwen2.5-VL-7B as the base model and highlight that model merging leads to a stronger and more stable agent*
-
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -255,9 +235,6 @@ Figure 5 的训练曲线显示，GTR-Turbo完全依靠自身的探索、经验�
 
 Table 4 给出了不同方法的计算时间和成本对比。GTR-Turbo的KL变体将总训练时间降至与RL4VLM相当的水平，约为GTR的一半；SFT变体虽然仍需要教师模型的自回归生成，但已通过本地推理替代外部API调用，显著降低了额外开销。总体而言，GTR-Turbo在Points24上实现了 **54%** 的成功率，而额外成本仅为约100美元（主要为额外GPU部署开销），相比GTR的150美元API成本，实际可降低约60%的计算开支。
 
-![[assets/figures/papers/paper_list_l2394_https_arxiv_org_abs_2512_13043/figures/009_Table_4.jpg]]
-*Table 4: Computation Time and Cost Comparison. GTR-Turbo has comparable or even superior performance to GTR with significantly shorter training time and lower monetary cost. Reported costs account only for additional overhead (excluding the base cost of agent training) and may fluctuate with market conditions. P24 - Points24, ALF - ALFWorld, SR - task success rate, * - Estimation based on the deployment cost of an additional GPU*
-
 **Table 4** 清晰对比了各方法在Points24和ALFWorld上的训练时间、成本与成功率。
 
 #### Android-in-the-Wild：GUI任务扩展
@@ -277,9 +254,6 @@ Figure 6 对比了GTR-Turbo与使用静态初始模型作为KL参考的自改进
 
 Figure 8 展示了TIES合并与简单线性平均的效果差异。TIES通过修剪、符号选举和选择性平均，有效避免了参数干扰，提升了教师模型质量，进而改善了整体训练收益。线性平均虽然简单，但在处理不同检查点间的参数冲突时表现较差。
 
-![[assets/figures/papers/paper_list_l2394_https_arxiv_org_abs_2512_13043/figures/012_Figure_8.jpg]]
-*Figure 8: Performance comparison with and without TIES merging. The results demonstrate the robustness of TIES in the merging process, effectively enhancing the quality of the teacher model and improving the overall training gains*
-
 #### 指导范围：仅思维 vs 思维+动作
 
 Figure 7 对比了两种指导范围。仅对思维部分施加指导的效果优于同时指导思维和动作，原因在于后者限制了模型的探索自由度——而探索正是GTR-Turbo自演化的关键过程。
@@ -291,15 +265,9 @@ Figure 7 对比了两种指导范围。仅对思维部分施加指导的效果�
 
 Figure 9 比较了多种KL估计方法。所有输出非负值的方法均能提升性能，其中**裁剪方法（clipping）**效果最优，因为它能控制KL值的幅度，实现更细粒度的更新和更好的稳定性。前向KL的表现略逊于逆向KL，证实了逆向KL的模式搜索（mode-seeking）优势。
 
-![[assets/figures/papers/paper_list_l2394_https_arxiv_org_abs_2512_13043/figures/013_Figure_9.jpg]]
-*Figure 9: Comparison among different KL estimation methods. All methods with non-negative output can achieve increased performance. The clipping method yields the best results, as it controls the magnitude of the KL value, leading to finer-grained updates and improved stability. The slightly lower result of forward KL proves the mode-seeking advantage of reverse KL*
-
 #### 权重分配策略
 
 Figure 10 展示了不同权重分配方法的效果。简单的SMA（算术平均）已能产生强劲性能，而EMA在平衡参数 **α=0.5** 时效果最佳。α的平衡选择对于发挥EMA的优势至关重要。
-
-![[assets/figures/papers/paper_list_l2394_https_arxiv_org_abs_2512_13043/figures/014_Figure_10.jpg]]
-*Figure 10: Comparing different weights assignment methods. Simple SMA already yields strong performance. A balanced choice of α is critical for realizing the benefit of EMA*
 
 #### 合并频率的鲁棒性
 
@@ -312,8 +280,6 @@ Figure 14 的推理分数评测显示，GTR-Turbo在训练过程中能够维持�
 ### 局限性与待验证问题
 
 尽管GTR-Turbo在多个基准上展现了显著优势，仍存在以下局限：需要额外GPU部署合并教师模型，存在硬件依赖；合并频率和EMA平滑系数等超参数需手动调整，暂无自适应机制；所有实验基于7B/8B规模VLM，在更大模型上的扩展性未知；在更复杂的真实世界视觉决策环境中的泛化能力有待验证。
-
-
 
 ## 定位与知识库关联
 
@@ -358,8 +324,6 @@ GTR-Turbo 的切入点是**替换教师模型的来源**：将外部 API 教师�
 4. **多智能体与多任务扩展。** 该框架是否可以扩展到多智能体系统（多个智能体共享合并教师）或需要密集奖励的多任务 RLVR 训练中？合并教师的“知识聚合”特性在多任务场景下可能具有天然优势，但尚待验证。
 
 5. **合并策略的进一步优化。** 当前使用 TIES-Merging 对所有历史检查点等权或 EMA 加权合并。是否存在基于检查点质量（如验证集奖励）的选择性合并策略，能进一步提升教师质量？
-
-
 
 ## 原文 PDF
 

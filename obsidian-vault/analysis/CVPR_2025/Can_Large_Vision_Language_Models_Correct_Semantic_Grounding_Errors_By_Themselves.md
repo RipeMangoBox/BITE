@@ -100,8 +100,6 @@ claims:
 
 开放问题包括：如何提升VLM遵循显式反馈的能力？如何设计更可靠的反馈生成机制？自校正能否扩展到更复杂的视觉推理任务？
 
-
-
 ### 问题背景：大型视觉语言模型的语义基础能力
 
 大型视觉语言模型（VLMs）在图像描述、视觉问答等任务中展现了强大的多模态理解能力，但其在**语义基础**（semantic grounding）——即将图像中的特定区域准确映射为对应的语义类别文本——这一基础任务上的表现仍远未达到可靠水平。语义基础要求模型在给定图像 $\mathbf{x}$、感兴趣区域 $\mathbf{r}_i$ 和文本提示 $\mathbf{q}$ 的条件下，输出描述该区域语义类别的文本 $\mathbf{\sigma}_{0_i} = \mathbf{VLM}(\mathbf{x}, \mathbf{r}_i, \mathbf{q})$（Section 3.1）。这一能力是视觉推理、具身智能等下游应用的关键前提，但现有VLMs在此任务上错误率居高不下，成为实际部署的核心瓶颈。
@@ -122,8 +120,6 @@ claims:
 3. **迭代自校正能否稳定提升语义基础准确性？** 在无神谕（oracle）反馈的真实场景下，自校正框架是否有效且不会造成性能倒退？
 
 这些问题的回答将为VLMs的自我改进能力提供基础性理解，并为无需额外训练即可提升多模态理解性能开辟新路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -152,8 +148,6 @@ claims:
 ### 创新4：无需外部工具的闭环自校正
 
 整个框架形成了一个**闭环的自校正系统**：Base Predictor生成初始预测 → VLM Verifier生成二元反馈 → Feedback Integrator将反馈集成到下一轮预测 → 迭代循环直至收敛。这一设计使得VLM仅依靠自身能力即可实现语义基础准确性的持续提升，无需任何外部工具或先知反馈。在COCO数据集上，GPT-4o使用该框架将准确性从39.49%提升至47.92%（+8.43，Table 5），LLaVA-1.5在ADE20k上从35.86%提升至40.29%（+4.43，Table 4），验证了闭环自校正的可行性。
-
-
 
 本文提出的语义基础自校正框架围绕一个核心操作变量展开：**将复杂的生成式修正任务分解为更简单的二元验证任务**，并利用同一VLM作为验证器生成反馈，通过迭代对话循环引导模型修正预测，全程无需外部工具、领域内数据或模型微调。
 
@@ -189,8 +183,6 @@ claims:
 - **神谕验证**：作为性能上界，证明VLM具备接收和利用反馈的能力，但实际增益受限于反馈集成效率和模型遵循指令的能力。
 
 本框架在两者之间开辟了新路径：用VLM自身生成可靠的二元反馈替代不可靠的内在反思，同时避免依赖外部先知，实现了无需监督的自校正闭环。
-
-
 
 ### 语义基础的形式化定义
 
@@ -239,8 +231,6 @@ Table 2 的消融实验表明，零样本 CoT 与视觉标记的组合是最有�
 
 三者构成递进的研究层次：神谕类别标签反馈揭示模型遵循显式指令的能力上限（Table 1 显示 LLaVA-1.5 提升至 94.8 但未达 100%，暴露约 25% 的指令遵循失败率）；神谕二元反馈验证二元信号本身的有效性；VLM 自生成反馈则检验框架在无外部工具条件下的实际可行性。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设计
@@ -268,9 +258,6 @@ LLaVA-1.5在仅获得神谕二元反馈（无额外提示技术）的条件下�
 在如何向VLM呈现二元反馈的消融实验中，零样本思维链（Zero-shot CoT）文本提示与视觉标记（Visual Marks）的组合策略效果最优，相对基础预测平均提升7.45个准确率点。单独使用零样本CoT或视觉标记的增益均低于组合策略，表明**文本引导与视觉注意力引导具有互补效应**——前者帮助模型理解反馈语义并规划修正步骤，后者将模型注意力聚焦于待修正区域。
 
 #### 反馈质量对比（Table 3）
-
-![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2404_06510/figures/006_Table_3.jpg]]
-*Table 3: VLMs can provide high-quality grounding feedback for themselves (higher F _ { 1 } scores). Compared to intrinsic selfcorrection, VLM binary verification achieves at least 10 points higher in feedback quality. Additionally, we find that visual prompting techniques should be tailored to the specific VLMs, e . g . , ViP-LLaVA prefers visual marks. We bold the best performances of each VLM*
 
 VLM二元验证生成的反馈质量（F1分数）相较内在自校正（Intrinsic Self-Correction）平均高出10个点以上。以LLaVA-1.5为例，内在自校正的反馈F1仅为51.12，而采用RoI裁剪的VLM二元验证将F1提升至61.71（+10.59）。这一结果验证了本文的核心设计理念：**将复杂的生成式修正分解为简单的二元验证任务，显著提升了反馈的可靠性**。
 
@@ -315,28 +302,11 @@ GPT-4o在ADE20k上的成本-性能权衡曲线显示，VLM验证自校正在t=1�
 - **Table 4 & Table 5**：VLM验证自校正在所有模型上持续提升性能，而内在自校正普遍导致退化；神谕上界与VLM验证间的差距指明了反馈质量和反馈利用两大改进方向。
 - **Figure 4**：单轮自校正已捕获大部分增益，为计算资源受限场景提供轻量级部署依据。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2404_06510/figures/014_Figure_14.jpg]]
 *Figure 14: ViP-LLaVA qualitative results in ADE20k. We visualize the predictions of ViP-LLaVA at time steps from 0 to 2. Intrinsic self-correction fails to identify which predictions are correct/incorrect, while VLM binary verification and Noise-free feedback provide explicit signal on each region, leading to a better chance of correction. Note that we draw multiple samples in the VLM forward pass, therefore, leading to slightly different results even when the image and query are the same (See Appendix G). For the sake of visualization, we put a bright ID on each object and highlight the incorrect predictions in red and the correct predictions in green*
 
 ![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2404_06510/figures/017_Figure_15.jpg]]
 *Figure 15: CogVLM qualitative results in COCO. We visualize the predictions of CogVLM at time steps from 0 to 2. For the sake of visualization, we put a bright ID on each object and highlight the incorrect predictions in red and the correct predictions in green*
-
-![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2404_06510/figures/018_Figure.jpg]]
-*Figure: t=1*
-
-![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2404_06510/figures/021_Figure.jpg]]
-*Figure: t=1*
-
-![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2404_06510/figures/004_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2404_06510/figures/007_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2404_06510/figures/011_Table_7.jpg]]
-*Table 7: Accuracy of the VLMs binary feedback Accfeedback. We find that intrinsic self-correction often improves accuracy in VLMs with lower base prediction performance due to imbalanced oracle binary feedback*
-
-
 
 ## 定位与知识库关联
 
@@ -396,8 +366,6 @@ GPT-4o在ADE20k上的成本-性能权衡曲线显示，VLM验证自校正在t=1�
 5. **自适应收敛判断**：最优自校正轮次因模型和数据集而异（GPT-4o在3轮后趋势稳定，LLaVA-1.5需5轮），如何在没有神谕的情况下自动判断收敛？
 
 6. **方法协同效应**：自校正与微调、架构改进或外部工具结合能否产生协同效应，进一步缩小与神谕上界的差距？
-
-
 
 ## 原文 PDF
 

@@ -71,8 +71,6 @@ SkillMimic 针对上述瓶颈提出了一个统一的数据驱动框架。其核
 
 SkillMimic 属于**基于强化学习的物理角色动画**与**人-物交互模仿**的交叉领域。与依赖技能特定奖励的传统方法（如 DeepMimic）不同，SkillMimic 通过统一的乘积奖励设计实现了技能无关（skill-agnostic）的学习。与基于对抗性模仿的 AMP 系列方法相比，SkillMimic 显式引入了接触图监督，有效避免了运动学局部最优问题。在高层任务层面，SkillMimic 提供的交互技能先验相较于 ASE 的运动先验具有更强的任务相关性，使复杂交互任务的策略学习成为可能。
 
-
-
 ### 人-物交互技能学习的核心挑战
 
 让物理仿真环境中的人形代理掌握复杂的物体交互技能，是具身智能领域的长期目标。篮球运动因其高度动态的全身协调、精细的手-球接触以及多样化的技能类型（如运球、投篮、上篮），成为检验交互技能学习能力的理想试验场。然而，传统方法在学习此类技能时面临两个根本性瓶颈。
@@ -102,8 +100,6 @@ SkillMimic 的提出正是为了填补上述缺口。其核心动机是：**如�
 2. **接触图（Contact Graph）与接触图奖励（CGR）**：将场景中的接触关系建模为图结构，节点表示身体部位或物体，边表示两者是否接触。通过最小化仿真与参考之间的接触图状态误差（$E_{\mathrm{cg}} = \frac{1}{N} \sum_{t=1}^{N} \mathrm{MSE}(s_t^{cg}, \hat{s}_t^{cg})$），策略获得了明确的接触监督信号，从而有效避免了运动学局部最优解。
 
 通过这两个机制，SkillMimic 首次实现了在统一框架下学习多种篮球交互技能——包括运球、投篮、上篮和捡球——并支持技能间的灵活切换与组合，为后续的高层任务学习提供了可重用的技能先验。
-
-
 
 ## 核心方法与创新机理
 
@@ -153,8 +149,6 @@ SkillMimic 采用单一交互技能（IS）策略，通过输入技能标签（o
 
 上述三项创新共同构成了 SkillMimic 的方法论核心：乘积奖励提供全局优化约束，接触图奖励提供局部接触精度，技能条件化实现多技能的规模化学习。三者缺一不可，消融实验已充分证明了每一项的独立贡献。
 
-
-
 SkillMimic 的系统设计遵循**数据驱动、技能无关、可扩展**的核心原则，旨在通过统一的模仿学习框架，使物理仿真人形机器人从 HOI 运动数据中学习多样化的篮球交互技能。整个 pipeline 由三个紧密衔接的模块构成，如图 Figure 3 所示。
 
 ![[assets/figures/papers/paper_list_l1749_SkillMimic_Learning_Reusable_Basketball_Skills_from_Demonstrations/figures/003_Figure_3.jpg]]
@@ -182,12 +176,8 @@ IS 策略是 SkillMimic 的核心低层控制器，其训练流程如下：
 
 整体信息流可概括为：**真实世界捕获 → HOI 片段数据集 → IS 策略（RL 模仿学习 + 统一乘积奖励 + 接触图监督）→ 多技能策略 → HLC（任务级调度）→ 复杂任务执行**。这一设计使得 SkillMimic 能够完全摒弃针对特定技能的手工奖励函数，在统一配置下以纯数据驱动的方式掌握几乎涵盖所有基础篮球技能的动作库（Figure 6）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1749_SkillMimic_Learning_Reusable_Basketball_Skills_from_Demonstrations/figures/001_Figure_1.jpg]]
 *Figure 1: We propose a novel approach that for the first time enables physically simulated humanoids to learn a variety of basketball interaction skills from Human-Object Interaction (HOI) data, including but not limited to shooting (blue), retrieving (red), and turnaround layup (yellow). Once acquired, these interaction skills can be composed to accomplish complex tasks, such as consecutive scoring (green)*
-
-
 
 SkillMimic 的系统框架由三个核心模块构成：HOI 数据收集与预处理、交互技能策略训练、以及高层控制器。其中，交互技能策略训练是整个方法的核心，其关键在于一个统一的 HOI 模仿奖励设计与接触图建模。
 
@@ -241,18 +231,11 @@ $$E_{\mathrm{cg}} = \frac{1}{N} \sum_{t=1}^{N} \mathrm{MSE}(s_t^{cg}, \hat{s}_t^
 
 在完成交互技能策略的训练后，SkillMimic 引入一个高层控制器来复用已学技能以完成复杂的长程任务。高层控制器以当前 HOI 状态和任务观测 $\mathbf{h}_t$ 为输入，输出一个离散的技能标签，该标签作为预训练 IS 策略的输入，驱动人形执行相应的交互技能。通过这种方式，复杂的任务被分解为一系列技能的组合与切换，显著降低了高层任务的学习难度。例如，在 Scoring 任务中，仅需约 3 小时的 RTX 4090 GPU 训练即可获得表现良好的高层控制器。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1749_SkillMimic_Learning_Reusable_Basketball_Skills_from_Demonstrations/figures/004_Figure_4.jpg]]
 *Figure 4: We propose the Contact Graph (CG) to model general contacts within an explicitly defined scene. The node stores a binary value that denotes whether it contacts other nodes. Each edge stores a binary value indicating whether the two connected nodes are in contact. The node definition is unified for a certain scene and shared between diverse interactive skills. For example, we define three nodes: hands, hands-exclusive body, and ball, to form a simple CG to model contacts for diverse basketball skills*
 
 ![[assets/figures/papers/paper_list_l1749_SkillMimic_Learning_Reusable_Basketball_Skills_from_Demonstrations/figures/005_Figure_5.jpg]]
 *Figure 5: The HOI imitation falls into kinematic local-optimal solutions without Contact Graph Reward (CGR): (b) use the head to help control the ball; (e) use the wrist to contact the ball; (h) fail to catch the object; (k) support the table to keep balance. In comparison, the guidance of CGR effectively yields precise interactions, as shown in (c, f, i, l)*
-
-![[assets/figures/papers/paper_list_l1749_SkillMimic_Learning_Reusable_Basketball_Skills_from_Demonstrations/figures/002_Figure_2.jpg]]
-*Figure 2: Concept of SkillMimic. We define an interaction skill as a set of Human-Object Interaction (HOI) state transitions that align with the intended skill semantics. These state transitions can be derived from captured HOI motion clips. If a simulated humanoid can manipulate objects such that the resulting HOI state transitions closely match those of the reference, we consider the humanoid to have successfully learned the interaction skill*
-
-
 
 ## 实验与关键发现
 
@@ -308,26 +291,8 @@ PPO（从零开始训练）和 ASE（使用运动先验，Peng et al., TOG 2022�
 ![[assets/figures/papers/paper_list_l1749_SkillMimic_Learning_Reusable_Basketball_Skills_from_Demonstrations/figures/010_Figure_8.jpg]]
 *Figure 8: Pickup generalization performance with different training data scales. First number: clips; second: success rate. In each test, 1000 balls are randomly placed within 1 to 5 meters away from the center. Yellow dots indicate successful pickups and green dots represent failures. See Sec. 4.2 for details*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1749_SkillMimic_Learning_Reusable_Basketball_Skills_from_Demonstrations/figures/009_Table_2.jpg]]
 *Table 2: Success rates across four typical basketball skills in BallPlay-M. Our method significantly outperforms variant methods that use imitation reward styles of DeepMimic and AMP*
-
-![[assets/figures/papers/paper_list_l1749_SkillMimic_Learning_Reusable_Basketball_Skills_from_Demonstrations/figures/008_Figure_7.jpg]]
-*Figure 7: Demonstration of the pickup skill learned from 40 HOI motion clips. Yellow denotes the initial frame. Left: The humanoid picks up a stationary ball effortlessly. Middle: The humanoid intercepts a ball with random velocity. Right: The humanoid adjusts after missing the ball initially (the frame in blue) and successfully retrieves it on the second attempt, showcasing the potential for learning robust and generalizable skills through extensive data collection*
-
-![[assets/figures/papers/paper_list_l1749_SkillMimic_Learning_Reusable_Basketball_Skills_from_Demonstrations/figures/012_Figure_9.jpg]]
-*Figure 9: Our method supports training a single IS policy under a unified configuration to acquire various interaction skills. These interaction skills can be flexibly switched, as illustrated in (a), where yellow denotes shot, blue denotes pickup, and green denotes turnaround layup. Complex, long-horizon tasks can be easily achieved by training a high-level controller (HLC) to manage switching of the learned interaction skills: (b) scoring from random positions (c) dribbling to target locations, and (d) dribbling along an expanding radius*
-
-![[assets/figures/papers/paper_list_l1749_SkillMimic_Learning_Reusable_Basketball_Skills_from_Demonstrations/figures/006_Figure_6.jpg]]
-*Figure 6: Simulated humanoids exhibit comprehensive basketball skills. SkillMimic can teach humanoids a wide range of basketball skills using the same configuration in a purely data-driven manner, covering almost all fundamental basketball skills. Keyframes are placed in chronological order from left to right*
-
-![[assets/figures/papers/paper_list_l1749_SkillMimic_Learning_Reusable_Basketball_Skills_from_Demonstrations/figures/011_Figure.jpg]]
-*Figure: (a) Manual Control (b) Scoring (c) Heading (d) Circling*
-
-![[assets/figures/papers/paper_list_l1749_SkillMimic_Learning_Reusable_Basketball_Skills_from_Demonstrations/figures/007_Figure.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -383,8 +348,6 @@ SkillMimic 在 HOI 模仿学习的方法谱系中占据“统一数据驱动 HOI
 3. **数据效率提升：** 在有限 HOI 数据下如何提升技能鲁棒性？数据增强、运动生成模型或 few-shot 适应是否可行？
 4. **语言/语义条件控制：** 如何融合更细粒度的控制条件（如自然语言指令“用左手运球绕过障碍物”），实现更灵活的人机交互控制？
 5. **多智能体扩展：** 如何将框架扩展至多人协作/对抗场景（如传球、防守），同时保持接触监督的有效性？
-
-
 
 ## 原文 PDF
 

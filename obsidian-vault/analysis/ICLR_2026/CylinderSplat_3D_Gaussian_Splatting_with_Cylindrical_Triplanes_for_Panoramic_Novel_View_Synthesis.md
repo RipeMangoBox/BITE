@@ -50,8 +50,6 @@ claims:
 
 实验表明，CylinderSplat在多个基准上取得领先性能。在Matterport3D两视图重建中，WS-PSNR达到23.76，较此前最优方法OmniScene（Wei et al., 2025）提升+1.01 dB；在更具挑战性的单视图设定下，领先幅度扩大至+1.63 dB。消融研究进一步验证了圆柱Triplane相对于笛卡尔和球面三平面的显著优势，以及RGB检索机制、课程训练策略等设计的关键作用。在宽基线真实场景（20–30m）中，CylinderSplat比OmniScene领先+3.95 dB WS-PSNR，展现出在极端稀疏视角下的鲁棒性。
 
-
-
 ### 全景新视角合成的挑战
 
 全景图像因其360°×180°的广阔视场，在虚拟现实、房产展示和场景理解等领域具有重要应用。然而，从稀疏甚至单张全景输入合成高质量的新视角全景图像，仍是一项极具挑战的任务。核心难点在于：全景投影固有的扭曲几何、宽基线带来的大面积遮挡，以及室内场景常见的曼哈顿世界结构，使得传统针孔相机的重建方法难以直接迁移。
@@ -73,8 +71,6 @@ claims:
 - **体积分支**引入圆柱三平面表示，通过交叉平面注意力和三平面-图像注意力，补全遮挡区域的几何与外观。
 
 这种设计使得方法在单视图和稀疏多视图输入下，均能实现高几何一致性的全景新视角合成。
-
-
 
 ## 核心方法与创新机理
 
@@ -112,8 +108,6 @@ CylinderSplat 采用 **UniK3D** 作为深度先验，替代 PanSplat 和 Splatte
 ### 创新点的协同效应
 
 上述创新并非孤立存在，而是形成了系统性的协同：圆柱三平面为体积分支提供了高效的几何表示空间，使得遮挡补全成为可能；双分支架构将可见区域的高精度重建与遮挡区域的几何推理解耦，避免相互干扰；RGB检索机制弥补了体积分支在颜色细节上的不足；课程训练策略确保了两个分支的平稳融合。这一协同在宽基线真实场景（Kansas 数据集，20-30m基线）中得到最极致的体现：CylinderSplat 相比 OmniScene 领先 +3.95 dB WS-PSNR（Table 13），性能差距随基线增大而扩大，验证了圆柱三平面在极端稀疏视角下的结构性优势。
-
-
 
 CylinderSplat 提出了一种**双分支前馈架构**，用于从单张或稀疏全景图像中重建3D高斯场景表示并合成新视角。整个框架围绕一个核心洞察构建：**圆柱坐标系天然契合全景图像的环绕几何特性**，能够更高效地编码曼哈顿世界中的扭曲和遮挡区域。
 
@@ -171,15 +165,8 @@ $$\mathcal{L}_{\text{render}} = \|\hat{I} - I_{\text{gt}}\|_1 + 0.05 \cdot \math
 
 对于多摄像机设置，CylinderSplat 支持两种三平面初始化策略：**联合初始化**适用于静态场景，所有摄像机共享初始三平面；**独立初始化**适用于动态或宽基线场景，每台摄像机独立初始化。框架根据场景特性动态选择，以在几何一致性和灵活性之间取得平衡。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_lEzkct87Uy/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of our CylinderSplat framework. Our method uses a dual-branch architecture trained via a three-stage curriculum. The pixel branch uses a multi-view attention mechanism to generate high-quality Gaussians for well-observed regions. The volume branch is designed to fill the gaps by lifting features into our cylindrical triplane representation, thereby completing the scene geometry robustly. The outputs from both branches are then unified for a final render*
-
-![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_lEzkct87Uy/figures/001_Figure_1.jpg]]
-*Figure 1: This paper introduces CylinderSplat, a feed-forward panoramic 3D Gaussian Splatting (3DGS) framework for panoramic novel view synthesis from single (left) or sparse (right) input views*
-
-
 
 ### 3.1 双分支架构总览
 
@@ -237,15 +224,8 @@ $$\mathcal{L}_{\text{render}} = \|\hat{I} - I_{\text{gt}}\|_1 + 0.05 \cdot \math
 
 其中 $\hat{I}$ 为渲染全景图，$I_{\text{gt}}$ 为真值，$\hat{D}$ 为渲染深度，$D_{\text{ref}}$ 为 DepthAnywhere 生成的参考深度。三阶段课程训练策略先独立优化像素分支和体积分支，最后联合微调，避免端到端训练的局部最优问题（Table 4, row 7）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_lEzkct87Uy/figures/002_Figure_2.jpg]]
 *Figure 2: Visualization of the Triplane representation in (a) Cartesian, (b) Spherical, and (c) Cylindrical coordinate systems. (d) The corresponding unit volume elements for each system*
-
-![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_lEzkct87Uy/figures/020_Figure_10.jpg]]
-*Figure 10: Visualizing the advantages of the cylindrical Triplane. (a) The shape of the sampling volumes for each coordinate system when fitting a typical synthetic scene, highlighting their geometric alignment. (b) Feature distribution during Triplane initialization. At this stage, panoramic feature point clouds are projected onto the Triplane surfaces. The Cartesian system suffers from heavy point overlap, where many distinct 3D feature points are projected to the same grid cells. In contrast, the spherical and cylindrical systems achieve a much more even distribution of features. (c) Projection patterns for Triplane-to-Image Attention. We visualize how sample points from each Triplane’s volume proj...*
-
-
 
 ## 实验与关键发现
 
@@ -265,9 +245,6 @@ CylinderSplat 在两视图重建任务上全面超越现有前馈全景重建方
 *Table 3: Quantitative comparison for the twoview reconstruction task on the 360Loc dataset*
 
 多视图扩展实验（Table 5）显示，当输入视图从 2 增至 4 时，CylinderSplat 性能持续提升且始终保持领先，证明框架对视图数量的良好可扩展性。
-
-![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_lEzkct87Uy/figures/010_Table_5.jpg]]
-*Table 5: Multi-view results on 360Loc, extending beyond the initial two-view (1.4m baseline) setup to include 3-view and 4-view configurations*
 
 ### 消融研究
 
@@ -292,15 +269,9 @@ Table 4 在 Matterport3D（2.0m 基线）上系统性拆解了各模块的贡献
 
 Table 13 在 Kansas 数据集（基线 20-30m）上进行了极端宽基线测试。CylinderSplat 取得 WS-PSNR 领先 OmniScene +3.95 dB 的巨大优势。这一结果表明，基于成本体积的方法在极端宽基线下因匹配失效而产生严重空洞和伪影，而圆柱 Triplane 的体积补全机制从根本上规避了稠密匹配的脆弱性。然而，论文也指出在此极端条件下渲染结果仍存在一定模糊，细节恢复能力有限。
 
-![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_lEzkct87Uy/figures/023_Table_13.jpg]]
-*Table 13: Quantitative comparison on wide-baseline real-world scenarios. We report results on the Kansas dataset (extreme 20m–30m baseline) and 360Loc dataset with increasing baselines (4.5m and 3.0m). Our method consistently outperforms baselines, with the performance gap widening as the difficulty increases*
-
 ### 效率分析
 
 Table 6 对比了各方法的参数量和推理时间。CylinderSplat 参数量最小，端到端推理（高斯生成 + 全景渲染）速度最快。这得益于圆柱三平面将存储复杂度从 $O(N^3)$ 降至 $O(N^2)$，以及直接全景光栅化器避免了立方体贴图分解的额外开销。
-
-![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_lEzkct87Uy/figures/012_Table_6.jpg]]
-*Table 6: Comparison of Model Complexity and Efficiency. ”Inference Time” measures the end-to-end latency for a single forward pass that outputs Gaussians and renders them into one panorama*
 
 ### 几何精度验证
 
@@ -315,13 +286,6 @@ Table 7 在 Matterport3D 上使用真实深度进行几何精度评估。Cylinde
 3. **高斯冗余。** 当前简单串联像素分支和体积分支的高斯点，存在冗余高斯，论文未探索更高级的融合策略（如深度引导修剪）以减少冗余并提升无缝补全质量。
 
 > **需人工验证：** 以上失败模式来自论文自述的局限性讨论，具体失败案例的定量统计和可视化需查阅原文 Figures 及补充材料确认。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_lEzkct87Uy/figures/013_Figure_7.jpg]]
-*Figure 7: Ablation study visualizations on Matterport3D (leftmost column is ground truth). Among the different coordinate systems for the Triplane, the Cartesian version shows significant distortion, and the spherical version struggles with distant rooms. Our cylindrical Triplane performs best. While the pixel branch is highquality in visible areas, combining it with the Triplane branch improves reconstruction of distant regions*
-
-
 
 ## 定位与知识库关联
 
@@ -359,8 +323,6 @@ CylinderSplat 与现有方法的核心差异体现在三个层面：
 - 能否将方法扩展为显式处理动态场景，例如引入运动掩码或时序建模来抑制瞬态物体的影响？
 - 在非曼哈顿弯曲结构（如森林、圆顶建筑）中，是否存在比圆柱Triplane更通用的表示形式？自适应坐标系选择是否可行？
 - 极宽基线场景下的细节恢复瓶颈是否可以通过引入生成式先验或超分辨率模块来缓解？
-
-
 
 ## 原文 PDF
 

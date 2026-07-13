@@ -53,8 +53,6 @@ claims:
 
 **主要结果**：在nuScenes数据集上的删除、替换、插入和重定位四项编辑任务中，RecEdit-Drive在图像质量（FID）和视频时间一致性（FVD）指标上均一致优于现有方法（如 **Tune-A-Video** (Wu et al., ICCV 2023)、**Text2Video-Zero** (Khachatryan et al., ICCV 2023)、**Fastvideoedit** (Zhang et al., WACV 2025)、**Rerender a Video** (Yang et al., SIGGRAPH Asia 2023) 等）。消融实验进一步验证了SFW、SCM和噪声替换三个模块各自对空间结构精度、时空一致性和背景保真度的关键贡献。
 
-
-
 自动驾驶场景的视觉编辑正从感知工具向数据增强与闭环仿真基础设施演进。对采集到的真实驾驶视频进行可控编辑——例如删除、替换、插入或重新放置动态物体——能以极低成本扩展长尾场景覆盖，提升下游3D目标检测器的鲁棒性。然而，实现这一目标面临双重挑战：**编辑后的前景物体必须在任意视角下保持几何结构稳定，同时跨帧的背景与前景融合必须维持时空一致性**。
 
 现有视频编辑方法主要沿两条技术路线展开。以 **Tune-A-Video**（Wu et al., ICCV 2023）、**Text2Video-Zero**（Khachatryan et al., ICCV 2023）、**Fastvideoedit**（Zhang et al., WACV 2025）和 **Rerender a Video**（Yang et al., SIGGRAPH Asia 2023）为代表的方案，依赖2D结构先验（如深度图、草图）或稀疏时空注意力来约束编辑过程。但2D先验本质上缺乏对三维几何的显式建模，当相机视角变化或物体发生空间位移时，编辑结果容易出现几何不稳定和结构漂移。另一类方法尝试引入单视点3D重建（如 **Vggt** 或 **SV3D**（Voleti et al., ECCV 2024））来提供结构引导，但单视点重建所能提供的多视角信息有限，难以有效约束动态3D物体在视频序列中的空间变化和跨帧一致性。
@@ -67,8 +65,6 @@ claims:
 2. **时空协同建模（Spatiotemporal Collaborative Modeling, SCM）**：引入高斯交叉视图注意力机制，以软掩码权重策略建模相邻帧之间的前景-背景协同关系，增强跨帧时空一致性，消除边界伪影。
 
 此外，RecEdit-Drive还设计了一种**背景噪声替换策略**，在去噪早期阶段用前向扩散过程的背景噪声替换预测背景，从而为前景编辑提供正确的背景结构参考。该方法仅需一段视频序列、单张参考图像和每帧的3D边界框，即可实现高保真、时空一致的自动驾驶场景编辑。
-
-
 
 ## 核心方法与创新机理
 
@@ -99,8 +95,6 @@ RecEdit-Drive 的 **SCM 模块** 引入了**高斯交叉视图注意力机制**�
 | 背景保持 | 无显式机制 | 早期去噪阶段背景噪声替换（NR） |
 
 三个模块的协同作用构成了完整的“3D重建引导”编辑范式：SFW 提供精确的空间结构，SCM 确保时空一致性，NR 保护背景完整性。消融实验（Table 2）证实，完整模型在所有指标（FID、FVD、PSNR、LPIPS 及下游 3D 检测指标 mRecall、mATE、mAOE）上均优于去除任一模块的配置。
-
-
 
 RecEdit-Drive 的整体编辑流程围绕“3D 重建先验注入扩散模型”这一核心思想构建，通过空间特征扭曲（Spatial Feature Warping, SFW）和时空协同建模（Spatiotemporal Collaborative Modeling, SCM）两个关键模块，实现对自动驾驶场景中动态物体的精确 3D 结构控制与跨帧时空一致性保持。其输入仅需一段视频序列、一张参考图像以及每帧对应的 3D 边界框，即可完成插入、删除、替换和重定位等多种编辑操作。
 
@@ -138,8 +132,6 @@ Figure 1 展示了 RecEdit-Drive 的完整架构，清晰呈现了深度编码�
 
 ![[assets/figures/papers/paper_list_l2578_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_RecEdit_Drive_3D_Re/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of RecEdit-Drive. We utilize a depth encoder to extract positional information from depth maps obtained from 3D bounding boxes, and use a pretrained image encoder [42] to provide contextual features. These features are then fed into the ResBlock and attention modules within the diffusion-based video editing model. In spatial feature warping (SFW), multiple relevant novel viewpoints obtained from SV3D and masks*
-
-
 
 RecEdit-Drive 围绕三个关键模块构建：**空间特征扭曲（SFW）**、**时空协同建模（SCM）** 和 **背景噪声替换（NR）**，三者协同解决自动驾驶场景编辑中动态物体的空间结构控制与跨帧一致性问题。
 
@@ -215,19 +207,6 @@ $$
 
 其中 $\bar{z}_{n,t}^{\mathrm{B}}$ 为前向扩散过程的背景噪声，$z_{n,t}^{\mathrm{F}}$ 为预测的前景潜在特征。在后期去噪阶段（$t \leq T/2$）关闭噪声替换，使模型在已建立的正确背景结构上完成细节生成。消融实验表明，缺少 NR 时背景结构会逐渐退化，影响编辑质量。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2578_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_RecEdit_Drive_3D_Re/figures/002_Figure_2.jpg]]
-*Figure 2: Detailed architecture of Spatial Feature Warping. We utilize multiple relevant reference-view latent features*
-
-![[assets/figures/papers/paper_list_l2578_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_RecEdit_Drive_3D_Re/figures/003_Figure_3.jpg]]
-*Figure 3: Detailed architecture of Spatiotemporal Collaborative Modeling. We model the spatiotemporal correlation between each frame*
-
-![[assets/figures/papers/paper_list_l2578_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_RecEdit_Drive_3D_Re/figures/004_Figure_4.jpg]]
-*Figure 4: The illustration of Noise Replace. During the early denoising stage(t*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -262,9 +241,6 @@ Table 3 对比了不同 3D 结构先验提取方法的效果。SFW 在 FID、FVD
 ![[assets/figures/papers/paper_list_l2578_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_RecEdit_Drive_3D_Re/figures/009_Table_3.jpg]]
 *Table 3: Ablation study on the generation of 3D structural priors*
 
-![[assets/figures/papers/paper_list_l2578_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_RecEdit_Drive_3D_Re/figures/010_Figure_7.jpg]]
-*Figure 7: Visual comparison of 3D structural priors extracted from different methods for guiding scene editing*
-
 ### 下游任务验证
 
 Table 4 报告了编辑数据用于下游 3D 目标检测任务的效果。在 Repositioning 和 Replacement 两种编辑策略下，使用 RecEdit-Drive 增强的训练数据均能提升检测性能。所有数据增强策略均基于相同的 50% nuScenes 训练子集生成，确保了公平比较。这一结果表明 RecEdit-Drive 的编辑结果不仅视觉质量高，而且保持了足够的场景结构真实性，能够有效支撑自动驾驶感知模型的训练。
@@ -278,13 +254,6 @@ Table 4 报告了编辑数据用于下游 3D 目标检测任务的效果。在 R
 - 极端视角变化或严重遮挡场景下，SFW 依赖的可见面筛选和单应性变换可能失效，导致特征 warp 误差增大。
 - SCM 仅建模相邻帧的时空关系，对于长程时序依赖（如物体跨越多帧的连续运动）可能约束不足。
 - SV3D 生成的 21 视图是否在所有场景下提供足够的视角覆盖密度，增加视图数量是否会进一步提升编辑质量，尚未有定量分析。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2578_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_RecEdit_Drive_3D_Re/figures/005_Figure_5.jpg]]
-*Figure 5: Visual comparison of RecEdit-Drive and other methods for the Deletion, Replacement, Insertion, and Reposition tasks. Red contours indicate the bounding boxes in the Insertion and Reposition tasks*
-
-
 
 ## 定位与知识库关联
 
@@ -341,8 +310,6 @@ RecEdit-Drive 位于**3D 感知引导的视频编辑**与**自动驾驶数据增
 - **自动驾驶数据增强**：将视频编辑作为数据增强工具，通过物体重定位和替换生成多样化训练样本，提升下游 3D 检测模型的性能。
 
 该方法为自动驾驶场景下的可控视频编辑提供了一个新的基线范式，其“3D 先验 + 扩散模型”的融合思路可启发后续工作在更多动态场景编辑任务中引入显式几何约束。
-
-
 
 ## 原文 PDF
 

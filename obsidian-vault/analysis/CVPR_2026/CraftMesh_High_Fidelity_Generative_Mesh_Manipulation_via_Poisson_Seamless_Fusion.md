@@ -337,8 +337,6 @@ CraftMesh 将泊松融合的计算域从三维体积（复杂度 O(n³)）降至
 3. **非实时性能**：约 6 分钟的总处理时间限制了在交互式创作场景中的直接应用，需要进一步优化泊松求解效率或探索更轻量的融合策略。
 4. **表示局限性**：当前方法仅针对显式网格表示设计，未验证对神经辐射场（NeRF）、3D 高斯泼溅（3DGS）等其他三维表示的支持，限制了框架的适用范围。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2186_https_openaccess_thecvf_com_content_CVPR2026_html_Hu_CraftMesh_High_Fide/figures/001_Figure_1.jpg]]
 *Figure 1: Mesh editing results produced by CraftMesh. CraftMesh is a versatile 3D mesh editing framework that enables users to perform text-based and drag-based editing, and delivers high-quality outputs even in challenging editing scenarios*
 

@@ -62,8 +62,6 @@ claims:
 
 在数学推理基准 AIME 2024 和 AIME 2025 上，CoT‑Pass@K 揭示了 RLVR 后模型（DAPO‑Qwen‑32B）与基座模型（Qwen2.5‑32B）之间显著且持续的差距，而传统 Pass@K 曲线在高采样数 K 下趋于重叠。在代码推理基准 LiveCodeBench 多个版本上，经 RLVR 训练的 AceReason‑Nemotron‑7B 相比其蒸馏前身 DeepSeek‑R1‑Distill‑Qwen‑7B 展现出明显的 Pass@K 提升。训练动态分析表明，早在训练初期，答案正确时推理链也正确的比例 P(CC|CA) 即开始提升，且仅使用 RLVR 模型生成的推理链进行监督微调（SFT）即可在测试集上复现 RLVR 模型的 Pass@1 性能，印证了推理链内在质量的根本提升。
 
-
-
 ### 推理能力评估的隐性危机
 
 近年来，基于可验证奖励的强化学习（RLVR）在提升大语言模型推理能力方面取得了显著进展。然而，一个根本性的问题始终悬而未决：当仅以最终答案的正确性作为奖励信号时，模型究竟是在学习“正确地推理”，还是仅仅在“更准确地猜测”？
@@ -85,8 +83,6 @@ claims:
 3. **实证层面**：通过大规模推理链验证、训练动态分析以及 SFT 迁移实验，系统性地展示 RLVR 如何从根本上提升推理链的内在质量，而非仅仅优化采样策略。
 
 这一研究路径的核心洞察在于：**预训练 LLM 内部蕴含的知识与逻辑先验，与 GRPO 算法的优势归一化机制之间存在着未被充分认识的协同效应**。理解并利用这一效应，不仅有助于更准确地评估 RLVR 的真实能力，也为设计更高效的推理增强方法提供了新的理论指引。
-
-
 
 ## 核心方法与创新机理
 
@@ -121,8 +117,6 @@ $$P(\mathcal{T}_{\mathrm{Ans}}(a_i)=1 \mid \mathcal{T}_{\mathrm{CoT}}(c_i)=1) = 
 | **理论框架** | 缺乏对 RLVR 工作机制的严格解释 | 基于逻辑先验假设的定理 1，证明 GRPO 梯度自然偏向正确推理链 | 理论创新：形式化因果旋钮 |
 | **推理链质量评估** | 无独立于奖励信号的评估手段 | SFT‑based CoT Quality Assessment，以 SFT 后的泛化性能作为推理链质量的代理指标 | 方法论创新：解耦奖励与推理质量 |
 | **适用对象** | 主要关注蒸馏模型 | 同时覆盖基座模型与蒸馏模型，证明 RLVR 对基座模型的隐式激励效果 | 范式迁移：扩展 RLVR 的适用范围 |
-
-
 
 本文的研究框架围绕一个核心命题展开：**仅利用答案正确性作为奖励信号的强化学习（RLVR），能否隐式地激励基座大模型产生正确的中间推理链？** 为回答这一问题，作者构建了一个“理论分析—指标设计—实证验证”三位一体的研究管线，其模块关系与数据流如下。
 
@@ -174,8 +168,6 @@ $$P(\mathcal{T}_{\mathrm{Ans}}(a_i)=1 \mid \mathcal{T}_{\mathrm{CoT}}(c_i)=1) = 
 ### 适用边界与局限
 
 该框架的有效性依赖于两个关键前提：① **逻辑先验假设**（$\alpha > \beta$）在预训练 LLM 中成立；② 奖励信号可被程序化验证（数学整数答案、代码执行结果）。当基座模型的先验存在严重偏差，或任务无法提供可靠的可验证奖励时，框架的隐式激励机制可能失效。此外，LLM‑as‑a‑CoT‑Judge 的可靠性受验证器模型偏差影响，尽管多重验证策略可部分缓解，但无法完全消除系统误差。
-
-
 
 ### 问题建模与符号定义
 
@@ -255,8 +247,6 @@ CoT‑Pass@K 的实现依赖 LLM‑as‑a‑CoT‑Judge 验证系统。使用 De
 
 三种策略构成 CoT‑Pass@K 图中的阴影区域，反映了验证不确定性的范围。使用不同验证器（DS‑8B、gpt‑oss‑20b、gpt‑oss‑120b）得到的趋势高度一致，验证了该系统的鲁棒性。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：RLVR 扩展了基座模型的推理边界
@@ -300,16 +290,11 @@ Figure 4 展示了 DAPO 训练过程中，训练集上答案正确率 P(CA) 与�
 
 Figure 5 展示了 AIME 2024 和 2025 上不同训练检查点的 Pass@K 与 CoT‑Pass@K 泛化曲线。RLVR 训练早期（步骤数较少时），模型在测试集上的 Pass@K 和 CoT‑Pass@K 即开始提升，表明推理能力的泛化改善与训练集上的奖励优化几乎同步发生。这一观察与定理 1 的“训练分布上的优化动力学”一致，但泛化本身仍仅由经验证据支持，理论上尚未提供形式化保证。
 
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_jGbRWwIidy/figures/005_Figure_5.jpg]]
-*Figure 5: The evolution of Pass@K (the top row) and CoT-Pass@K (the bottom row) performance on AIME 2024 and 2025 for different model checkpoints during the DAPO training*
-
 ---
 
 ### 推理链质量评估：SFT 实验的因果证据
 
 为进一步排除 RLVR 模型的高 CoT‑Pass@K 可能来自“强化学习阶段的搜索或采样策略”而非推理链本身质量提升的替代解释，作者设计了 SFT 评估实验（Figure 6）。核心思路是：从同一基座模型 **Qwen2.5‑32B** 出发，仅使用不同来源的推理链数据进行监督微调，以测试集 Pass@1 和 CoT‑Pass@K 作为推理链质量的代理指标。
-
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_jGbRWwIidy/figures/006_Figure_6.jpg]]
 
 Figure 6(a) 显示，随着 RLVR 训练步数增加，使用对应检查点推理链进行 SFT 的模型在 AIME 测试集上的 Pass@1 单调提升，并最终追平 DAPO‑Qwen‑32B 自身的 Pass@1 性能。Figure 6(b) 进一步表明，仅使用 RLVR 模型生成的推理链进行 SFT，即可在 CoT‑Pass@K 上接近复现 RLVR 模型的表现，而使用基座模型自身推理链的 SFT 效果远逊于此。这一结果提供了强因果证据：**RLVR 从根本上提升了推理链的内在质量，而非仅改变了推理时的采样分布**。
 
@@ -333,13 +318,6 @@ Table 1 对比了基座模型与 RLVR 模型在 DAPO‑17k 训练集上正确与
 尽管 RLVR 展现出显著的推理能力提升，训练动态分析揭示了明确的瓶颈。Figure 4 显示，在 DAPO 训练后期，当 P(CA) 趋近 1 时，GRPO 优势估计中的组内方差消失，导致部分训练问题不再提供有效梯度信号。然而此时 P(CC|CA) 中位数仅约 0.7，意味着仍有约 30% 的正确答案伴随着错误推理链。**现有二元答案奖励机制无法进一步消除这些残留的错误推理链**，因为它们在奖励空间上与正确推理链不可区分。这一饱和现象构成了当前 RLVR 方法的根本性局限。
 
 此外，在 MATH‑500 和 AMC23 等可能存在训练数据污染的基准上，基座模型的高 Pass@K 使得评估 RLVR 的真正增益变得困难。这提示需要开发更健壮、更少受数据污染影响的评估基准。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_jGbRWwIidy/figures/023_Figure_23.jpg]]
-*Figure 23: (c) Generalization performance on AIME 2024 across different training steps*
-
-
 
 ## 定位与知识库关联
 
@@ -396,8 +374,6 @@ $$\mathbb{E}[\hat{A}(y_i) \mid \mathcal{T}_{\mathrm{CoT}}(c_i)=1] > 0, \quad \ma
 5. **数学与代码任务的差异**：数学推理需要 CoT‑Pass@K 才能观察到的推理能力提升，与代码推理中 Pass@K 直接体现提升的差异，其深层原因是什么？是否与任务结构和验证方式有关？
 6. **污染检测与基准健壮性**：如何区分基座模型在基准上的表现源于真正推理能力还是训练数据记忆？需要开发更健壮的评估基准。
 7. **轻量级验证器设计**：能否设计轻量级且高可靠性的推理链验证器（尤其针对非结构化、长链条的数学推理），以降低评估成本并提高规模？
-
-
 
 ## 原文 PDF
 

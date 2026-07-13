@@ -51,15 +51,11 @@ claims:
 
 在 R2R-CE 和 RxR-CE 基准上的实验表明，HSGM 在零样本设置下分别达到 **47.9%** 和 **41.8%** 的成功率（SR），超越所有现有零样本方法，甚至优于多个监督方法。消融实验进一步验证了各层地图与解耦策略的关键贡献：完整 HSGM 地图相比仅 BEV 基线提升 5.0% SR，移除子任务分解机制导致 SR 下降 8.9%，而移除结构化 CoT 提示更使 SR 骤降 17.0%。
 
-
-
 视觉语言导航（Vision-Language Navigation, VLN）要求智能体在真实3D环境中，根据自然语言指令自主移动至目标位置。近年来，视觉语言模型（VLM）的飞速发展使零样本导航成为可能——智能体无需在特定环境上训练，即可泛化到新场景。然而，当前VLM在VLN中存在一个根本性的瓶颈：**语义-几何鸿沟（semantic-geometric gap）**。
 
 具体而言，VLM擅长从2D图像中提取语义信息，但缺乏对3D几何的深入理解。这导致两个关键失效模式：其一，VLM难以将指令中的语义锚点（如“走到沙发旁”）可靠地与3D空间中的位置对齐；其二，VLM不擅长将高层规划转化为可执行的低层动作序列（如“左转15度，前进0.5米”）。现有零样本方法多依赖VLM直接从RGB图像预测动作，或基于简单的2D语义图做决策，在复杂环境中导航可靠性不足。
 
 本文的核心洞察是：**将3D几何信息通过结构化地图可视化呈现，让VLM仅负责语义层面的路径点选择，而将几何计算完全交由经典规划算法处理**。这一解耦策略从根本上规避了VLM的几何推理缺陷，同时保留了其在语义理解上的优势。为落实这一洞察，本文提出HSGM（Hierarchical Semantic-Geometric Map），一种无需训练即可弥合2D-3D鸿沟的分层语义-几何地图框架。
-
-
 
 ## 核心方法与创新机理
 
@@ -87,8 +83,6 @@ HSGM的性能提升并非来自更强的VLM或更多训练数据，而是来自*
 - **结构化CoT提示**引导VLM按照“当前状态→子任务目标→候选路径点分析→最优选择”的链条进行推理，确保决策过程可解释且一致。
 
 消融实验直接验证了这一因果链条：完整HSGM地图（几何+语义+决策）相比仅BEV基线，成功率从46.0%提升至51.0%（+5.0%）；移除结构化CoT提示后，成功率骤降至34.0%（-17.0%）；移除子任务分解机制导致成功率下降8.9%。这些结果表明，**HSGM的每一项设计都在弥补VLM与3D世界之间的语义-几何鸿沟**。
-
-
 
 HSGM 的整体框架围绕一个核心设计原则构建：**将高层语义推理与低层几何执行彻底解耦**。如图2所示，系统由四个串行阶段组成，形成一条从自然语言指令到最终动作序列的完整闭环。
 
@@ -119,15 +113,8 @@ HSGM 的整体框架围绕一个核心设计原则构建：**将高层语义推�
 
 框架内嵌了**双重确认机制**：对于最终子任务，VLM需连续两次输出 `STOP` 才能终止导航，防止过早停止。当某一子任务的步数超出限制时，智能体**自动回溯**至上一子任务重新执行，形成闭环纠错能力。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2179_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Bridging_the_2D_3D/figures/001_Figure_1.jpg]]
-*Figure 1: Our proposed Hierarchical Semantic-Geometric Map (HSGM). The 3D environment is modeled via three maps: Geometry, Semantic, and Decision. It is then rasterized into a 2D BEV Map and projected as visual prompts onto the agent’s view, serving as the structured visual input for the VLM*
-
 ![[assets/figures/papers/paper_list_l2179_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Bridging_the_2D_3D/figures/002_Figure_2.jpg]]
 *Figure 2: Framework Overview. (1) A LLM decomposes the user instruction into a sequence of subtasks. (2) The agent’s sensor data (RGB-D, pose) is used to dynamically construct the 3D Hierarchical Semantic-Geometric Map. (3) The HSGM is rasterized into a 2D BEV map and projected onto the front view of the agent as visual input for the VLM. (4) The VLM performs CoT reasoning to select a waypoint, and the*
-
-
 
 HSGM 框架围绕一个核心洞察展开：**将 3D 几何信息转化为 VLM 可理解的 2D 视觉表征，让 VLM 仅负责高层语义选择，底层路径规划完全交由经典 A* 算法执行**。这一解耦设计使 VLM 彻底规避了其固有的几何推理缺陷。以下依次阐述关键模块与核心公式。
 
@@ -211,8 +198,6 @@ $$P_{\mathrm{obs}} \cap \mathrm{Cyl}(p_c, r, h) = \emptyset$$
 | $\mathcal{M}_{\mathrm{dec}} = \{G, A_{\mathrm{curr}}\}$ | 决策地图定义 | 决策地图 |
 | $P_{\mathrm{obs}} \cap \mathrm{Cyl}(p_c, r, h) = \emptyset$ | 路径点圆柱体占用检查 | 决策地图 |
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -256,9 +241,6 @@ $$P_{\mathrm{obs}} \cap \mathrm{Cyl}(p_c, r, h) = \emptyset$$
 ![[assets/figures/papers/paper_list_l2179_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Bridging_the_2D_3D/figures/005_Figure_3.jpg]]
 *Figure 3: Impact of Subtask Decomposition on Success Rate by Instruction Token Count*
 
-![[assets/figures/papers/paper_list_l2179_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Bridging_the_2D_3D/figures/007_Table_4.jpg]]
-*Table 4: Effectiveness of the Automatic Backtracking Mechanism. The table shows the percentage of episodes where backtracking was triggered (Trigger Rate) and the success rate of those recovered episodes (Recovery SR)*
-
 ### 关键图表结论
 
 - **Table 1**：HSGM 以零样本设定在 R2R-CE (47.9% SR) 和 RxR-CE (41.8% SR) 上均超越所有零样本方法及部分监督方法。
@@ -278,12 +260,8 @@ $$P_{\mathrm{obs}} \cap \mathrm{Cyl}(p_c, r, h) = \emptyset$$
 2. **静态环境假设**：A* 低层控制器基于预构建的全局路径点图执行，无法感知或规避移动障碍物。在动态环境中，该机制可能导致碰撞或路径阻塞。
 3. **子任务分解质量**：指令分解由 LLM 一次性完成，若初始分解不合理（如子任务粒度过粗或遗漏关键步骤），VLM 高层规划器缺乏在线修正分解的能力，会导致整条轨迹失败。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2179_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Bridging_the_2D_3D/figures/008_Figure_4.jpg]]
 *Figure 4: Navigation visualization of HSGM*
-
-
 
 ## 定位与知识库关联
 
@@ -320,8 +298,6 @@ HSGM的有效性依赖于以下前提条件，这些条件定义了其适用边�
 2. **端到端表征学习的融合**：HSGM的解耦规划策略能否与可学习的场景表征相结合？例如，用可训练的编码器替代手工设计的BEV栅格化，可能进一步提升长轨迹导航中的泛化能力。
 3. **动态环境扩展**：对于移动障碍物或动态环境，纯几何A*规划如何扩展以保持鲁棒性？可能的路径包括引入局部重规划模块，或在决策地图中编码动态置信度。
 4. **跨具身迁移**：HSGM的地图构建逻辑是否可泛化到不同形态的机器人平台（如四足机器人、无人机）？这需要验证可导航区域定义和路径点采样策略的跨平台适应性。
-
-
 
 ## 原文 PDF
 

@@ -79,8 +79,6 @@ claims:
 
 本文的实验均在125B令牌语料上完成，接近Chinchilla最优，但更大规模语料下推理任务的最优稀疏度可能向更稀疏配置移动。此外，实验仅基于Mixtral架构，未探索QK-norm、共享专家等最新变体，结论的跨架构泛化性有待验证。开放问题包括：万亿令牌级别下最优TPP和稀疏度的变化规律、纯逻辑推理任务上的定量关系、以及能否设计动态调整稀疏度的预训练策略以兼顾记忆与推理能力。
 
-
-
 ### 缩放定律在MoE推理任务中的失效
 
 大语言模型的缩放定律（Scaling Laws）揭示了模型性能与参数规模、训练数据量之间的幂律关系，这一规律为密集模型的资源分配提供了可靠指导。然而，当模型架构从密集转向混合专家（Mixture-of-Experts, MoE）时，传统的缩放定律在推理任务上出现了系统性失效。
@@ -108,8 +106,6 @@ $$sparsity = 1 - \frac{Top\text{-}k}{Experts}$$
 2. **每参数训练令牌数（TPP, Total Tokens per Parameter）**：即训练数据总量与总参数规模的比值。该指标刻画了每个参数获得的“学习机会”密度，对推理性能具有非单调影响——在TPP约20时达到峰值。
 
 通过这两个维度，本文旨在建立MoE推理任务的最优稀疏度选择原则，为后续的MoE架构设计与训练资源配置提供理论指导。
-
-
 
 ## 核心方法与创新机理
 
@@ -150,8 +146,6 @@ $$sparsity = 1 - \frac{Top\text{-}k}{Experts}$$
 
 这一发现将稀疏度选择的重要性从单纯的推理效率问题，提升为**影响推理能力上限的预训练结构决策**。
 
-
-
 本工作构建了一套系统性的实验流水线，旨在揭示混合专家（MoE）语言模型中稀疏度与推理能力之间的非单调关系。整体框架围绕“预训练—评估—干预—验证”四个阶段展开，核心目标是分离出影响推理任务性能的关键控制变量：**活跃FLOPs**与**每参数令牌数（TPP）**。
 
 ### 流水线总览
@@ -177,8 +171,6 @@ $$sparsity = 1 - \frac{Top\text{-}k}{Experts}$$
 ### 关键控制逻辑
 
 流水线的设计围绕一个核心因果旋钮展开：**在固定计算预算下，活跃参数数量（由宽度 $d$ 和 top-k 共同决定）与总参数数量（由 $E$ 决定）的组合，即稀疏度，决定了推理性能的走向**。通过保持活跃FLOPs不变而仅改变稀疏度配置（IsoFLOP分析），或固定活跃参数而改变密度（$k/E$ 比率），流水线能够解耦总参数规模与活跃计算量对推理能力的独立贡献。
-
-
 
 ### MoE层的前向计算
 
@@ -231,8 +223,6 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{CE}} + \alpha \mathcal{L}_{\mathrm{LB}} + \
 
 此外，**每参数训练令牌数**（Total Tokens per Parameter, TPP）作为连接训练预算与模型规模的关键指标，定义为训练语料总令牌数除以模型总参数数。该指标在后续分析中被证明是决定推理任务性能峰值位置的核心变量。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：预训练损失与推理能力的非单调鸿沟
@@ -280,9 +270,6 @@ Figure 7 展示了总令牌每参数（Total Tokens per Parameter, TPP）对不�
 
 为检验结论的跨任务泛化性，研究在代码生成基准上进行了验证。Figure 8 显示，HumanEval和MBPP展现出与数学推理任务相似的模式：在固定活跃参数数量下，当活跃参数较小时，更高稀疏度持续提升性能；但当活跃参数较大时，最优配置同样向更密集的模型偏移。这与记忆任务（TriviaQA、HellaSwag）的单调趋势形成鲜明对比，表明**推理任务（包括数学推理和代码生成）共享相似的稀疏度敏感性机制**。
 
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_XFw2EPRUUR/figures/009_Figure_8.jpg]]
-*Figure 8: At fixed active parameter counts, higher sparsity (lower density) consistently improves performance, but at larger active parameter counts, HumanEval and MBPP shift their optima back toward dense models. Accuracy against the ratio of active experts k to total experts E for a fixed active parameter budget. In the left two tasks (TriviaQA, HellaSwag), increasing sparsity consistently raises accuracy across all active parameter budgets, in contrast, in the right two tasks (HumanEval, MBPP), once active parameter counts become large, this trend reverses and denser models begin to outperform their sparser counterparts. Dashed segments mark the inverse-scaling regime that starts at the black circ...*
-
 ### 关键消融研究
 
 **训练令牌预算扩展**：将训练令牌从125B扩展到1T（固定d=2048, E=16, k=2），TriviaQA和HellaSwag性能大幅提升，但GSM8K和GSM-Plus改善微弱（Table 4）。这表明单纯增加训练数据量无法从根本上改变推理任务对稀疏度的敏感性，最优TPP的存在可能在不同数据规模下保持稳健。
@@ -303,25 +290,8 @@ Figure 7 展示了总令牌每参数（Total Tokens per Parameter, TPP）对不�
 
 4. **推理任务的细粒度分类缺失**：研究将数学推理和代码生成归为“推理任务”，但未区分纯粹逻辑推理、符号推理等子类型，不同类型的推理能力可能对稀疏度有不同的最优区间。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_XFw2EPRUUR/figures/001_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_XFw2EPRUUR/figures/003_Figure_2.jpg]]
-*Figure 2: For GSM8K and GSM-Plus, once the training loss drops below a certain point, the task loss starts to increase. Results of scaling total parameters by increasing the number of experts, with model width and top-k held constant. For TriviaQA and HellaSwag, the task loss falls monotonically as training loss decreases. By contrast, GSM8K and GSM-Plus show a U-shaped trend: task loss declines with training loss only until a threshold, beyond which further reductions in training loss hurt task performance. That threshold moves lower as active parameter count increases, models with more active parameters achieve a lower optimal task loss. No such active parameters dependence appears for TriviaQA, He...*
-
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_XFw2EPRUUR/figures/007_Figure.jpg]]
-*Figure: d=1024,k=2 d=1024,k=4 d=1024,k=8 d=1024,k=16 before GRPO after GRPO*
-
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_XFw2EPRUUR/figures/014_Figure.jpg]]
-
 ![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_XFw2EPRUUR/figures/015_Figure_10.jpg]]
 *Figure 10: Comparison of GSM8K accuracy for models fine-tuned with GRPO on different training datasets (left: GSM8K, right: MATH 500). Performance decline is consistently observed across different training datasets*
-
-![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_XFw2EPRUUR/figures/016_Figure_11.jpg]]
-*Figure 11: GSM8K accuracy of model (d=1024) across different shot counts. Because few shot performance is unstable and dropped significantly for models with a small number of experts, zero shot is used for Test-Time Compute*
-
-
 
 ## 定位与知识库关联
 
@@ -363,8 +333,6 @@ Figure 7 展示了总令牌每参数（Total Tokens per Parameter, TPP）对不�
 3. **推理任务的数据效率机制**：为什么推理任务在TPP≈20时达到峰值？这一数值是否与训练数据的推理密度、专家容量或路由熵有关？其背后的理论机制值得深入探究。
 
 4. **跨模态推理的适用性**：在视觉推理、多模态数学等场景下，MoE的稀疏度-推理关系是否呈现类似规律？活跃FLOPs是否同样可作为跨模态推理能力的统一指标？
-
-
 
 ## 原文 PDF
 

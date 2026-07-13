@@ -51,8 +51,6 @@ claims:
 
 **主要结果**：在CelebV-HQ基准上，语音驱动视频生成的FID达到6.818，FVD为93.81，Sync-C为5.210，全面超越AniPortrait、Echomimic、Hallo3等基线。消融实验表明，引入3DMM和描述作为中间表示的完整思维链在所有指标上超越直接生成基线，且统一多任务模型的表现优于多个专科模型组成的集成系统，验证了共享表示与联合训练带来的正向迁移。
 
-
-
 ### 数字人系统的碎片化困境
 
 数字人（Digital Human）生成旨在从文本、语音等控制信号中合成逼真的人类形象与行为，涵盖语音合成、面部动画、谈话视频生成等多个子任务。当前的主流范式是通过“专科模型集成”来应对不同模态的生成需求——例如，用独立的文本到语音模型、语音到面部动画模型、以及动画到视频渲染模型串联工作。这种拼凑式架构存在三个深层矛盾：
@@ -76,8 +74,6 @@ claims:
 - **统一多模态语言模型**：将描述、脚本、语音、动画、图像、语义视频等七种模态通过模态特定令牌器统一到共享词汇表，由原生自回归语言模型在72项同步任务上联合预训练，学习全局联合分布，从根本上消除专科模型间的分布不匹配。
 - **语义视频重参数化**：用保留结构动态的语义标签序列替代RGB视频令牌，实现4倍令牌压缩，同时将纹理细节的恢复交由下游扩散模型完成，解耦“结构推理”与“纹理生成”。
 - **模态思维链推理**：引入“Thinking in Modality”策略，将模糊的跨模态生成分解为逐步生成3DMM形状、表情、语义标签、自然语言描述等中间模态的链式过程，以显式结构先验逐步细化生成结果，缓解端到端映射的不确定性。
-
-
 
 ## 核心方法与创新机理
 
@@ -142,8 +138,6 @@ $$\mathcal { D } = \{ d ^ { t } \mid d \in D _ { \mathrm { v a r } } ^ { t } , t
 - **统一多任务模型**在所有指标上优于专科模型集成，证明了共享表示与联合训练带来的正向迁移（Sec 4.4，置信度0.95）。
 - 在CelebV-HQ上，语音驱动视频生成的**FID达到6.818，FVD为93.81，Sync-C为5.210**，全面超越AniPortrait、Echomimic、Hallo3等基线（Table 1，置信度0.98）。
 
-
-
 Archon 的整体流水线由四个核心模块串联构成，形成从多模态输入到高保真数字人输出的端到端生成系统：
 
 1. **模态特定令牌器（Modality-Specific Tokenizers）**：将描述、脚本、语音、动画（含3DMM形状/表情/姿态参数）、图像、语义视频等七种模态分别编码为离散整数令牌，统一映射到共享词汇表中。其中，图像令牌器采用预训练的 **MAGVITv2**；形状、表情和姿态参数通过因果卷积的残差矢量量化VAE（VQVAE）独立离散化，码本配置分别为形状（8层×512码）、表情（8层×2048码）、姿态（6层×512码）。视频则通过语义视频重参数化——将RGB视频替换为保留结构动态、丢弃冗余纹理的离散语义标签序列——实现约4倍令牌压缩。
@@ -156,15 +150,8 @@ Archon 的整体流水线由四个核心模块串联构成，形成从多模态�
 
 整体数据流为：**多模态原始信号 → 模态令牌器离散化 → 结构化提示输入语言模型 → 自回归生成目标令牌序列 → 令牌解离散化（视频令牌则经扩散模型上采样）→ 最终多模态输出**。该设计使模型天然支持任意模态子集的条件生成与任意模态编辑。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l984_https_openaccess_thecvf_com_content_CVPR2026_html_Bao_Archon_A_Unified_M/figures/002_Figure_2.jpg]]
 *Figure 2: Pipeline. We use modality tokenizers to tokenize description, script, speech, animation, image and semantic video into discrete tokens. These tokens are arranged in a structured format and input to the language model for multimodal reasoning. The synthesized tokens are detokenized into raw modalities. For synthesizing high-quality video, we employ a semantic-driven video diffusion model to synthesize high-quality video conditioned on image and semantic segmentations*
-
-![[assets/figures/papers/paper_list_l984_https_openaccess_thecvf_com_content_CVPR2026_html_Bao_Archon_A_Unified_M/figures/001_Figure_1.jpg]]
-*Figure 1: Archon. We propose a novel unified multimodal model that performs cross-modal generation among a wide range of modalities, including description, script, speech, animation, semantic video, image, and video. Furthermore, we introduce the concept of Thinking in Modality to reduce ambiguity during cross-modal transitions and enhance generation quality. Our model inherently supports conditional generation across arbitrary sets of modalities, enabling any modality editing throughout the entire multimodal input space*
-
-
 
 Archon 的整体流水线由四个核心模块构成（Fig. 2）：(1) 模态特定离散令牌器，(2) 语言模型骨干，(3) 语义驱动视频扩散解码器，(4) “模态思维”推理策略。以下聚焦关键模块的设计原理与核心公式。
 
@@ -211,8 +198,6 @@ $$ \{ d _ { \mathrm { s p h } } , d _ { \mathrm { i m g } } \} \to [ d _ { \math
 ![[assets/figures/papers/paper_list_l984_https_openaccess_thecvf_com_content_CVPR2026_html_Bao_Archon_A_Unified_M/figures/003_Figure_3.jpg]]
 *Figure 3: Thinking in Modality. We show the results of speechto-video generation with different thinking strategies. The videos generated from chain 2 contain less distortion (e.g., blurry appearance and undefined textual symbols) and exhibit closer identity alignment with the ground truth*
 
-
-
 ## 实验与关键发现
 
 ### 4.1 实验设置
@@ -254,14 +239,6 @@ Table 3 报告了语音驱动视频生成任务上的消融实验结果，核心
 ### 4.5 整体多模态生成与编辑能力
 
 Figure 4 展示了给定任意单一模态输入时，Archon 的整体多模态生成与理解能力。Figure 5 展示了灵活的任意模态编辑能力——用户可以修改任意选定的模态，同时保持其他模态不变。这些定性结果体现了统一模型在跨模态条件生成和细粒度编辑上的通用性，但论文未提供对应的定量指标，该部分结论需结合视觉示例进行主观评估。
-
-![[assets/figures/papers/paper_list_l984_https_openaccess_thecvf_com_content_CVPR2026_html_Bao_Archon_A_Unified_M/figures/004_Figure_4.jpg]]
-*Figure 4: Multimodal Generation. We show holistic modality generation and understanding given an arbitrary modality as input*
-
-![[assets/figures/papers/paper_list_l984_https_openaccess_thecvf_com_content_CVPR2026_html_Bao_Archon_A_Unified_M/figures/005_Figure_5.jpg]]
-*Figure 5: Modality-specific Editing. We show flexible any modality editing to modify an arbitrarily chosen modality while maintain the others untouched. The icons on the top show the modalities used in the example, and the highlighted icons are the ones that are edited*
-
-
 
 ## 定位与知识库关联
 
@@ -333,8 +310,6 @@ Archon 的设计使其特别适用于以下场景：
 3. **实时推理可行性**：逐步生成链虽然提升了质量，但也增加了推理步数。在需要实时交互的数字人应用中，如何在思维链深度与推理延迟之间取得平衡，论文未给出定量分析。
 
 4. **评估指标的完备性**：当前主要依赖 FID、FVD、Sync-C 等自动指标。对于数字人生成的“整体性”（holistic quality）——如多模态间的一致性、身份保持的长期稳定性——仍缺乏被广泛接受的评估协议。
-
-
 
 ## 原文 PDF
 

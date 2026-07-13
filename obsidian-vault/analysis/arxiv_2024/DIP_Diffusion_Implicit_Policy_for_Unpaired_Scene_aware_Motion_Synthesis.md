@@ -57,8 +57,6 @@ claims:
 - 在 HumanML3D 文本到运动基准上，CLoSD 全面超越 MoConVQ：FID **1.798** vs 3.279，物理穿透指标 **0.022** vs 0.249（Table 3）。
 - 消融实验证实，移除闭环或取消跟踪控制器微调会导致任务成功率骤降（开环坐下仅 0.19，起身 0.23），验证了闭环与微调的必要性（Table 1）。
 
-
-
 ### 问题背景
 
 生成逼真、可控的三维人体运动是计算机图形学与具身智能的核心挑战之一。该问题的难点在于需要同时满足两个往往相互冲突的需求：**语义丰富性**——能够根据自然语言描述生成多样化、符合意图的运动；以及**物理真实性**——运动必须遵守物理定律，能够与环境中的物体产生合理的接触与交互。
@@ -78,8 +76,6 @@ claims:
 本文的核心动机是**弥合数据驱动的运动学运动生成与基于物理的角色控制之间的鸿沟**。作者观察到，运动扩散模型具有强大的规划能力，而物理仿真控制器能够保证执行的真实性——二者的结合恰好可以实现优势互补。关键问题在于：如何让扩散模型以足够快的速度运行，使其能够作为物理控制回路的在线组件，同时保持生成质量？
 
 CLoSD的解决方案是构建一个**闭环的规划-执行系统**，其中扩散规划器（Diffusion Planner, DiP）与物理跟踪控制器构成实时反馈回路。通过将扩散步数大幅压缩至10步、采用自回归在线规划策略，DiP能够以3500 fps（175倍实时）的速度生成40帧运动计划，使扩散模型首次能够作为物理仿真控制器的实时通用规划器运行。这种设计将文本驱动的语义丰富性与物理仿真的逼真度统一于单一框架，实现了“用文本描述意图，用物理保证执行”的多任务角色控制范式。
-
-
 
 ## 核心方法与创新机理
 
@@ -105,8 +101,6 @@ CLoSD 的另一关键创新在于将 RL 跟踪控制器（基于 PHC）置于闭
 
 CLoSD 处于**运动扩散生成**与**物理角色控制**的交叉地带。在运动生成侧，其自回归扩散规划继承了 MDM 的扩散框架，但通过极低步数和闭环反馈实现了从离线生成到在线控制的范式转换。在物理控制侧，其跟踪控制器建立在 **PHC**（通用运动跟踪策略）之上，但通过闭环微调弥合了规划运动与物理执行之间的鸿沟。相较于 **UniHSI**（Xiao et al., ICLR 2024）——使用 LLM 指定目标位置但无文本风格控制的多任务物理控制器，CLoSD 同时提供了文本语义理解和精细空间目标控制。相较于 **MoConVQ**（Yao et al., TOG 2024）——利用 VQ 潜在空间进行统一物理运动控制但不支持细粒度物体交互，CLoSD 在 HumanML3D 基准上实现了全面超越（FID 1.798 vs 3.279，R-precision Top1 0.381 vs 0.309），同时物理正确性指标显著改善（穿透率 0.022 vs 0.249，Table 3）。
 
-
-
 CLoSD 构建了一个**闭环规划-执行系统**，将实时运动扩散模型与物理仿真跟踪控制器耦合，同时接受文本语义与空间目标作为任务接口。其核心思想在于：运动扩散模型不再作为离线生成器使用，而是充当在线通用规划器，通过自回归和极低扩散步数实现实时响应，并借助仿真状态反馈实现闭环修正，从而将文本驱动的语义丰富性与物理逼真度统一于一个框架。
 
 系统由三个核心模块构成流水线，如图 Figure 2 所示：
@@ -123,8 +117,6 @@ CLoSD 构建了一个**闭环规划-执行系统**，将实时运动扩散模型
 **任务条件接口**方面，CLoSD 统一了文本和空间目标两种模态：文本提示通过 CLIP 编码提供语义控制，目标位置通过可适配关节目标（adaptable joint targets）、朝向角度（heading angle）和有效性标记（validity flag）提供空间约束。DiP 在去噪过程中额外施加几何目标损失 $\mathcal{L}_{\mathrm{target}}$，强制生成序列的末端帧关节位置和身体朝向到达指定目标，从而将语义意图与空间精度统一于同一规划框架。
 
 **在线微调**是闭环系统发挥全部潜力的关键。CLoSD 在闭环中固定 DiP，使用 PPO 对跟踪控制器进行多任务同时微调，仅使用原始 PHC 奖励函数，未引入额外奖励工程。消融实验表明，取消微调会导致坐下成功率从 **0.86 降至 0.32**，起身成功率从 **0.98 降至 0.50**，验证了闭环微调对弥合“规划运动”与“物理可执行运动”之间差距的必要性。
-
-
 
 ### 3.1 扩散运动先验
 
@@ -168,8 +160,6 @@ DiP生成的运动计划由基于PHC的RL跟踪控制器执行。控制器输入
 
 任务序列的自动切换由一个简单的状态机管理。每个任务在完成时发出信号（例如，坐下任务在骨盆到达沙发坐垫区域时标记完成），状态机据此切换文本提示和目标位置，实现无人工干预的连续多任务执行。
 
-
-
 ## 实验与关键发现
 
 ### 核心任务成功率：闭环与微调的决定性作用
@@ -211,15 +201,11 @@ DiP在推理速度上实现了数量级突破。仅需**10步扩散**即可生�
 
 这些局限指向了未来工作的方向：引入第一人称视觉作为闭环输入以实现感知驱动的通用控制，将规划拓展至分层架构（战略-战术-执行），以及根据运动速度动态调整规划与控制频率。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1668_DIP_Diffusion_Implicit_Policy_for_Unpaired_Scene_aware_Motion_Synthesis/figures/006_Figure_4.jpg]]
 *Figure 4: Comparisons of the getup task. The pelvis target is marked in cyan. CLoSD is able to get up successfully with a human-like motion. Before fine-tuning on object interaction with the closed-loop, it was able to sit but struggled to get up. The open-loop baseline struggles with any interaction with the sofa due to the lack of re-planning. UniHSI (Xiao et al., 2024) was designed to minimize contact-point distance and thus lifts the pelvis instead of getting up from the sofa*
 
 ![[assets/figures/papers/paper_list_l1668_DIP_Diffusion_Implicit_Policy_for_Unpaired_Scene_aware_Motion_Synthesis/figures/003_Figure_3.jpg]]
 *Figure 3: (Left) CLoSD generates versatile text-prompted physics-based motions. The SMPLcompatible physics model is rendered with the SMPL mesh. (Right) CLoSD can perform a sequence of RL tasks (see the web page video). Task transitions are user-specified via interactively changing the text, or via a state machine, with transitions on a task done signal*
-
-
 
 ## 定位与知识库关联
 
@@ -266,8 +252,6 @@ CLoSD 直接继承了 **MDM**（Human Motion Diffusion Model）的扩散生成�
 2. **分层规划架构**：能否将规划拓展到更长时间尺度，实现分层规划（战略、战术、执行），使角色具备长期任务推理能力？
 3. **自适应循环速率**：可否根据运动速度动态调整规划与控制的频率，从而在慢速运动中节省计算，在快速运动中提高响应？
 4. **长序列稳定性**：如何进一步减少长序列生成中的偶发伪影，提高持续交互的稳定性？
-
-
 
 ## 原文 PDF
 

@@ -162,8 +162,6 @@ $$\mathbf{F}_{\mathrm{vid}} \leftarrow \mathbf{F}_{\mathrm{vid}} + \mathrm{Attn}
 
 训练阶段使用光流对应关系 $C^r_{\text{flow}}$，推理阶段使用深度对应关系 $C^r_{\text{depth}}$，二者之间存在天然的精度差异——光流对应关系通常比深度对应关系更粗糙、噪声更大。然而，这种差异反而成为一种自监督正则化：训练时模型被迫学习对噪声鲁棒的映射能力，从而在推理阶段面对更平滑的深度对应关系时表现出更强的泛化性。这一机制是 Scaling4D 能够利用大规模单目视频进行有效训练的核心原因。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2587_https_openaccess_thecvf_com_content_CVPR2026_html_Cai_Scaling4D_Pushing/figures/001_Figure_1.jpg]]
 *Figure 1: We introduce Scaling4D, a framework for Video Novel View Synthesis (VNVS). Given a monocular source video (first row) and novel poses (second row), Scaling4D generates the novel view video (third row). By reformulating VNVS as a correspondence-guided generation task, our approach bridges the training-inference gap present in previous methods and enables scalable training on large-scale monocular videos, substantially improving the visual quality and robustness of the synthesized results*
 
@@ -213,19 +211,8 @@ $$
 
 其中 $\mathbf{Q}_{\text{vid}}, \mathbf{K}_{\text{vid}}, \mathbf{V}_{\text{vid}}$ 为视频特征的查询、键、值投影，$\mathbf{Q}_{\text{cor}}, \mathbf{K}_{\text{cor}}, \mathbf{V}_{\text{cor}}$ 为控制令牌的对应投影。通过对两组投影直接求和，VNVS Block 在单个注意力操作中实现了视频内容与控制信号的跨模态交互，将几何对应关系无缝注入生成过程，同时保持基础模型的预训练权重冻结，仅训练 Correspondence Projector 和 VNVS Block 的新增参数。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2587_https_openaccess_thecvf_com_content_CVPR2026_html_Cai_Scaling4D_Pushing/figures/002_Figure_2.jpg]]
-*Figure 2: This example demonstrates the essential difference between inpainting and novel view synthesis. In the novel view, the area inside the red box should show the back of the person, but the inpainting result incorrectly fills it with background pixels*
-
 ![[assets/figures/papers/paper_list_l2587_https_openaccess_thecvf_com_content_CVPR2026_html_Cai_Scaling4D_Pushing/figures/004_Figure_4.jpg]]
 *Figure 4: Overview of our synthetic data pipeline, including compositional scene layouts, procedural character generation, obstacle-aware camera trajectories, and storage of RGB images, depth maps, and camera matrices*
-
-![[assets/figures/papers/paper_list_l2587_https_openaccess_thecvf_com_content_CVPR2026_html_Cai_Scaling4D_Pushing/figures/005_Figure_5.jpg]]
-*Figure 5: Network structure of our method. The trainable modules include the Correspondence Projector and the VNVS Block*
-
-![[assets/figures/papers/paper_list_l2587_https_openaccess_thecvf_com_content_CVPR2026_html_Cai_Scaling4D_Pushing/figures/009_Figure_8.jpg]]
-*Figure 8: Visual comparison between flow-based and depth-based correspondence on a static scene. The strong alignment effectively bridges the training-inference gap*
 
 ## 实验与关键发现
 
@@ -278,14 +265,6 @@ Scaling4D 的核心设计之一是使用光流对应关系训练、深度对应�
 2. **合成数据的局限性**：合成数据虽能提供精确的对应关系监督，但其多样性和真实性有限，模型在合成数据上的过拟合可能损害在真实场景下的泛化性。
 3. **上游模型依赖**：整个 pipeline 对多个预训练模型（光流、深度、语言编码器）存在耦合依赖，任一上游模型的误差都会传播至最终生成结果。
 4. **极端场景鲁棒性不足**：在含有剧烈非刚体形变、透明物体或镜面反射的场景下，基于光流和深度的对应关系可能失准，导致生成质量下降。这一问题在论文中被列为开放问题，需要进一步研究。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2587_https_openaccess_thecvf_com_content_CVPR2026_html_Cai_Scaling4D_Pushing/figures/012_Figure_9.jpg]]
-*Figure 9: Scalability analysis of different metrics with respect to the training data volume. The x-axis represents the amount of training data, while the y-axis shows the corresponding metric scores on the testing set*
-
-![[assets/figures/papers/paper_list_l2587_https_openaccess_thecvf_com_content_CVPR2026_html_Cai_Scaling4D_Pushing/figures/006_Figure.jpg]]
-*Figure: Target Trajectory GEN3C ReCamMaster-Wan*
 
 ## 定位与知识库关联
 

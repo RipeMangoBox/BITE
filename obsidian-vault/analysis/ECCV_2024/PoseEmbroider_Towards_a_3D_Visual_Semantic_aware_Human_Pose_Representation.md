@@ -61,8 +61,6 @@ PoseEmbroider 是一个基于 Transformer 的多模态融合框架。与传统�
 
 在 BEDLAM-Script 验证集上，PoseEmbroider 在多模态检索任务中达到 **74.6%** 的总 mRecall，优于最佳单输入 Aligner 基线（72.4%）。在姿态指令生成任务（BEDLAM-Fix）上，完全基于3D姿态输入的 R@1 达到 **43.1%**，相比 Aligner 基线（31.8%）提升 36%。在 SMPL 回归中，PoseEmbroider 允许融合可选文本提示，将仅图像输入的 pa-MPJPE 从 49mm 降至 **44mm**（提升约 11%）。消融实验证实，Transformer 聚合、模态特定重投影损失、以及单/双输入联合训练三项设计各自贡献了显著的性能增益。
 
-
-
 三维人体姿态理解是计算机视觉的核心问题之一，其应用涵盖动作识别、人机交互、虚拟试衣和运动分析等领域。然而，完整地理解一个三维人体姿态本质上是一个多模态挑战：图像提供了视觉外观和场景上下文，三维关节旋转编码了精确的空间几何，而自然语言描述则捕捉了语义属性和细粒度属性（如“左臂弯曲”、“躯干前倾”）。这三种模态各自构成了同一抽象“人体姿态”概念的部分观测——类似于从不同角度照射三维物体所产生的影子，每个影子都揭示了物体的某些特征，但单独一个永远无法完整描述物体本身（Fig. 1）。
 
 当前主流方法通常将这些模态视为独立的信息源，或试图将它们强制对齐到一个共享的联合嵌入空间。例如，**ImageBind**（Girdhar et al., CVPR 2023）风格的对齐器通过成对或三元组对比损失，将不同模态的特征映射到同一空间进行检索。然而，这种直接对齐策略存在两个根本性局限：其一，它要求模态间的精确匹配，但在现实场景中，图像、三维姿态和文本往往只能获得部分配对数据，难以构建完整的三元组；其二，将所有模态压缩到同一空间可能导致模态特定信息的丢失，尤其是当不同模态的语义粒度差异较大时，细粒度或不常见的姿态难以被有效区分。
@@ -70,8 +68,6 @@ PoseEmbroider 是一个基于 Transformer 的多模态融合框架。与传统�
 更关键的是，现有视觉-语义模型产生的姿态嵌入分辨率不足。由于训练数据规模和模态覆盖的限制，这些嵌入在区分高度相似但语义不同的姿态时表现乏力——例如，“右手举过头顶”与“右手举至肩高”在纯视觉或纯三维空间中可能差异微小，但语义上却有本质区别。这一瓶颈直接制约了下游任务（如姿态检索、姿态指令生成和三维人体重建）的性能上限。
 
 PoseEmbroider 的核心动机正是突破上述局限：与其强制不同模态对齐到同一空间，不如将它们视为互补的部分观测，通过一个灵活的聚合机制将这些信息“刺绣”（embroider）成一个更丰富、多模态感知的姿态嵌入。这一嵌入空间不仅融合了视觉、三维和语义信息，还具备处理缺失模态的鲁棒性——当仅有图像或仅有三维姿态时，模型仍能生成有意义的表示。这种设计使得下游任务可以无缝利用多种信息源，而无需模态间的精确匹配。
-
-
 
 ## 核心方法与创新机理
 
@@ -104,8 +100,6 @@ PoseEmbroider 的第三个关键创新在于其**训练策略的完备性**：�
 ### 因果机制总结
 
 上述三个创新构成了一个完整的因果链条：**Transformer 聚合器**提供了灵活的信息融合能力（+1.6% mRecall vs. MLP 融合），**模态特定对比学习**保留了各模态的判别性特征（+1.5% mRecall），而**多组合训练策略**则最大化了对部分模态输入的鲁棒性（+7% mRecall）。三者协同作用，使得 PoseEmbroider 在多模态检索（总 mRecall 74.6% vs. Aligner 72.4%）、姿态指令生成（R@1 提升 36%）和 SMPL 回归（pa-MPJPE 降低 10.2%）等下游任务中均取得显著提升。
-
-
 
 PoseEmbroider 的核心设计思想是将图像、3D 姿态和文本三种模态视为同一抽象“人体姿态”概念在不同视角下的部分观测（类比于三维物体在不同光照下的投影），通过 Transformer 将这些互补信息“刺绣”成一个统一的、多模态感知的姿态嵌入空间。该框架由四个主要模块级联构成：**预训练模态编码器**、**模态特定筛选层**、**PoseEmbroider Transformer** 和**模态特定重投影头**，整体架构如 Figure 2 所示。
 
@@ -142,8 +136,6 @@ $$\mathcal{L} = \sum_{G \in S} \sum_{\mathcal{M}_G} \mathcal{L}_c(m, \hat{m}_G)$
 ### 信息流总结
 
 整体信息流可概括为：**多模态原始数据 → 冻结编码器提取 → 可学习筛选层压缩 → Transformer 全局 token 聚合 → 重投影至各模态空间 → 单模态对比损失反向传播**。训练完成后，冻结的 PoseEmbroider 可为任意模态组合生成统一的姿态嵌入，直接用于下游检索、生成或回归任务。
-
-
 
 ### 整体框架
 
@@ -185,15 +177,11 @@ $$\mathcal{L} = \sum_{G \in S} \sum_{\mathcal{M}_G} \mathcal{L}_c(m, \hat{m}_G)$
 
 Aligner 基线（Girdhar et al., CVPR 2023 的 ImageBind 风格方法）采用 MLP 投影头将各模态映射到联合嵌入空间，直接在该空间计算成对或三元组对比损失。双输入扩展版本通过平均融合多模态特征后执行对比损失。PoseEmbroider 与之有两个核心差异：（1）使用 Transformer 替代简单的平均融合进行信息聚合，消融实验表明这带来 1.6% 的 mRecall 提升（Table 1, row 6 vs. row 7）；（2）在模态特定重投影空间而非联合空间计算对比损失，进一步提升 1.5% mRecall（Table 1, row 7 vs. row 8）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l3_https_www_ecva_net_papers_eccv_2024_papers_ECCV_html_8959_ECCV_2024_pape/figures/006_Figure_5.jpg]]
 *Figure 5: The pose instruction generation model. We train the model on pairs of poses (pA, pB) and use our frozen PoseEmbroider to encode them. These two embeddings are fused with TIRG [63], whose output is used to condition an auto-regressive transformer text decoder via cross-attentions. At test time, the trained model can be directly applied on poses, images or a mix of both*
 
 ![[assets/figures/papers/paper_list_l3_https_www_ecva_net_papers_eccv_2024_papers_ECCV_html_8959_ECCV_2024_pape/figures/008_Figure_6.jpg]]
 *Figure 6: Instruction generations on real-world images using the PoseEmbroider pose representation. The text model was trained using the frozen PoseEmbroider embeddings of 3D poses only. The generated text is shown below each image pairs*
-
-
 
 ## 实验与关键发现
 
@@ -234,8 +222,6 @@ SMPL回归任务验证PoseEmbroider表示在3D人体重建中的实用性。回�
 
 4. **真实世界泛化差距**：尽管姿态指令生成在真实图像上展现出一定的零样本迁移能力，但SMPL回归在3DPW上的误差仍较高，表明合成到真实的域差距尚未被多模态表示充分弥合。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l3_https_www_ecva_net_papers_eccv_2024_papers_ECCV_html_8959_ECCV_2024_pape/figures/003_Table_1.jpg]]
 *Table 1: Multi-modal retrieval results. Models are trained on BEDLAM-Script and evaluated on its validation set. The total mRecall is the average of single and dual, corresponding to the average over all single- and dual-query retrieval tasks respectively. V, P, and T refer to the visual (image), pose and text modalities respectively. The aligner trained on single-input only ( rst row) corresponds to the idea of [14, 24]*
 
@@ -244,11 +230,6 @@ SMPL回归任务验证PoseEmbroider表示在3D人体重建中的实用性。回�
 
 ![[assets/figures/papers/paper_list_l3_https_www_ecva_net_papers_eccv_2024_papers_ECCV_html_8959_ECCV_2024_pape/figures/009_Table_3.jpg]]
 *Table 3: SMPL regression results for different representations and inputs. The regression head is trained solely on BEDLAM-Script, with frozen image-based features of the Aligner/PoseEmbroider models. We report the pa-MPJPE in mm with the ground truth pose, on BEDLAM-Script (validation set) and 3DPW [47] (test set)*
-
-![[assets/figures/papers/paper_list_l3_https_www_ecva_net_papers_eccv_2024_papers_ECCV_html_8959_ECCV_2024_pape/figures/001_Figure_1.jpg]]
-*Figure 1: Motivation. Comprehending a complex 3D object in a 2D world is not simple. Having access to several of its shadows, obtained by lighting it under different angles, can help better understand it. Similarly, we collect several multi-modal (and naturally partial) observations of the human pose (the shadows), and try to create an enriched pose embedding (the 3D object). This embedding is derived from 3D joint rotations, pictures of humans and pose descriptions, then further used in downstream applications requiring human pose understanding*
-
-
 
 ## 定位与知识库关联
 
@@ -295,8 +276,6 @@ PoseEmbroider 在多模态人体理解领域占据了一个独特的方法论位
 3. **额外模态的纳入**：将深度图、2D 关键点、IMU 信号等模态纳入框架，是否能进一步提升对遮挡、模糊或罕见姿态的理解能力？这需要评估新模态的信息增益与架构扩展成本之间的权衡。
 
 此外，一个论文未明确讨论但值得关注的问题是：当前方法在 BEDLAM-Script 上的性能提升（+2.2% 总 mRecall）虽然一致且消融充分，但绝对提升幅度相对有限。这是否意味着在现有数据规模下，架构创新的收益已接近饱和？扩大训练数据后，PoseEmbroider 与 Aligner 的差距是会放大（表明架构优势在更大数据下更显著）还是缩小（表明 Aligner 的简单范式在充足数据下同样有效），仍是一个需要实证检验的开放问题。
-
-
 
 ## 原文 PDF
 

@@ -226,8 +226,6 @@ $$\mathcal{L}_{total} = \mathcal{L}_{TW-MSE} + \lambda \cdot I_{poison} \cdot \m
 | $\lambda$ | 对比损失平衡系数 |
 | $I_{poison}$ | 投毒样本指示函数 |
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2361_https_arxiv_org_abs_2602_21977/figures/010_Figure_6.jpg]]
 *Figure 6: Semantic similarity comparison. MasqLoRA shows a sharp semantic collapse on the trigger “cool” at both Text Encoder and U-Net levels, unlike Benign LoRA which closely tracks the base model*
 
@@ -272,8 +270,6 @@ NSFW后门攻击场景（表2）进一步验证了方法的泛化能力。在多
 3. **NSFW评估的度量误差**：NSFW后门实验依赖外部AI评判器，自动度量可能引入系统性偏差，实际攻击效果需人工审核验证。
 
 4. **无防御评估**：论文未测试任何现有防御机制（如模型检测、输入过滤）对MasqLoRA的有效性，攻击的鲁棒性边界尚不明确。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2361_https_arxiv_org_abs_2602_21977/figures/005_Table_1.jpg]]
 *Table 1: Comparison of backdoor effectiveness, functionality preservation, and model impact. Results are shown for SD v1.5 and SDXL 1.0*

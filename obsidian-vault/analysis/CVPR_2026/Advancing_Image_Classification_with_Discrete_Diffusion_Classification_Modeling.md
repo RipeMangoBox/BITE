@@ -58,8 +58,6 @@ DiDiCM 提供两种推理变体：**DiDiCM-CP** 在类别概率空间上进行�
 
 DiDiCM 的方法论定位介于扩散生成模型与判别式分类器之间：它借鉴了连续时间离散扩散的分数匹配框架，但将生成式扩散中存在的可处理性障碍转化为分类任务中的秩一结构优势，为高不确定性场景下的图像分类开辟了新的技术路径。
 
-
-
 ### 分类任务中的不确定性瓶颈
 
 图像分类是计算机视觉的核心任务，其标准范式是通过深度神经网络直接预测类别后验分布 $P(\mathbf{c}|\mathbf{y})$。然而，这一范式隐含假设训练数据充足且观测质量理想。当图像分辨率降低、训练数据稀缺或增强策略受限时，标准分类器面临严重的不确定性——输入信息不足以唯一确定类别标签，而交叉熵损失训练的分类器缺乏对预测置信度的显式建模能力，导致性能急剧退化。
@@ -92,8 +90,6 @@ DiDiCM 的动机源于一个朴素的问题：**如果分类器可以“反复�
 2. **设计两种推理策略**：DiDiCM-CP（扩散类别概率）与 DiDiCM-CL（扩散离散类别标签），在计算复杂度与内存开销之间提供灵活权衡。
 3. **构建 DiDiRN 架构**：在 ResNet 骨干中嵌入轻量级扩散条件模块，以最小架构改动支持扩散过程的步数和噪声标签条件。
 4. **验证有效性**：在 ImageNet 上系统验证 DiDiCM 在不同不确定性设置下的性能优势，尤其在高不确定性场景下相比标准分类器实现显著提升（Table 1，最高提升 13.1% Top‑1 精度）。
-
-
 
 ## 核心方法与创新机理
 
@@ -144,8 +140,6 @@ DiDiCM 提供两种互补的推理模式，在计算与内存之间灵活权衡�
 | **推理过程** | 单次前向传播 | 多步逆扩散迭代去噪 |
 
 其本质是将分类问题重新定义为**从均匀噪声分布向类别后验分布的逆扩散过程**，通过分数匹配显式建模并逐步消解预测不确定性。这一框架在最困难的不确定性条件下（56×56 分辨率、25% 训练数据）带来了 **Top-1 精度 +13.06%、Top-5 精度 +13.80%** 的显著提升（Table 1），而在低不确定性条件下（224×224、全量数据、强增强）保持与标准分类器相当的精度（Top-1: 80.40 vs. 80.42），证明了该创新的有效性并非以牺牲常规性能为代价。
-
-
 
 DiDiCM 将图像分类重新定义为**从均匀噪声分布到类别后验分布的逆扩散过程**。其核心洞察在于：分类器需要建模的并不是单一类别，而是给定图像 $y$ 下的完整后验分布 $P(\mathbf{c} \mid \mathbf{y})$。标准分类器以交叉熵损失直接预测该类分布，在高不确定性场景（如低分辨率、数据稀缺）下缺乏对不确定性的显式建模能力，导致性能显著下降。DiDiCM 通过引入离散扩散机制，将这一不确定性逐步“去噪”，从而在推理时获得更可靠的后验估计。
 
@@ -198,8 +192,6 @@ DiDiCM 提供两种推理模式，在计算与内存之间提供灵活权衡：
 | 逆扩散模拟器 | 逐步恢复后验分布 | 初始均匀分布、分数预测器 | $p_\theta(\mathbf{c}_0 \mid \mathbf{y})$ |
 
 训练时，前三个模块联合优化 DiDiCM 损失；推理时，逆扩散模拟器驱动整个去噪过程，每步调用一次分数预测网络。实验表明，仅需 **2 步扩散（2 NFEs）**，DiDiCM‑CP 即可在 56×56 分辨率全量 ImageNet 上达到接近理论上限的 Top‑1 精度（Figure 4b），验证了框架的高效性。
-
-
 
 ### 问题形式化：分类作为条件后验估计
 
@@ -310,12 +302,8 @@ DiDiRN 在 ResNet-50 骨干上扩展（Figure 3），保留其核心图像处理
 
 相比标准 ResNet-50，DiDiRN 的输入从单一的图像 $y$ 扩展为三元组 $(y, c_t, t)$，输出从类别 logits 变为分数向量 $s_\theta(y, c_t, t)$。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2067_https_openaccess_thecvf_com_content_CVPR2026_html_Belhasin_Advancing_Ima/figures/002_Figure_2.jpg]]
 *Figure 2: An illustration of our DiDiCM-CP showing the evolution of the top-5 class label probabilities over time for three images, demonstrating different classification challenges*
-
-
 
 ## 实验与关键发现
 
@@ -364,12 +352,8 @@ DiDiCM 的推理需要多次顺序模型评估（NFEs），Figure 4b 展示了 N
 ![[assets/figures/papers/paper_list_l2067_https_openaccess_thecvf_com_content_CVPR2026_html_Belhasin_Advancing_Ima/figures/001_Figure_1.jpg]]
 *Figure 1: ImageNet Top-5 Accuracy: DiDiCM vs. standard classifiers. DiDiRN-50 (comparable to ResNet-50) and ResNet-50 are both trained using the state-of-the-art recipe [46]. DiDiCM shows superior top-5 accuracy across all uncertainty settings*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2067_https_openaccess_thecvf_com_content_CVPR2026_html_Belhasin_Advancing_Ima/figures/005_Figure_4.jpg]]
 *Figure 4: (a) DiDiCM (8 steps) vs. standard classifiers under varying uncertainty (see Appendix F for augmentation policy). (b) NFEs vs. top-1 accuracy for DiDiCM-CP, DiDiCM-CL, and the standard classifier at resolution 56 using the full training set. Numbers indicate the sample count used. Red markers denote the best-performing DiDiCM-CP and DiDiCM-CL results*
-
-
 
 ## 定位与知识库关联
 
@@ -412,8 +396,6 @@ DiDiCM 的优势场景与局限边界清晰：
 3. **不确定性泛化**：DiDiCM 在自然损坏（如 ImageNet-C）、对抗扰动、分布外检测等场景下的鲁棒性如何？当前实验仅覆盖分辨率、数据量和增强策略三个维度。
 4. **大规模类别**：DiDiCM-CP 对极大规模类别（如 K > 10⁶）时，O(K²) 的转移矩阵内存开销是否仍然可行？DiDiCM-CL 是否能提供可行的替代方案？
 5. **与其他扩散分类器的定量比较**：当前工作未给出与 Li et al. (2023) 等扩散生成分类器的直接定量比较，这一空白需要补充以明确 DiDiCM 在扩散分类方法谱系中的相对优势。
-
-
 
 ## 原文 PDF
 

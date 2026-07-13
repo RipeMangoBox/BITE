@@ -52,15 +52,11 @@ claims:
 
 主要结果方面，HyperEF 在所有缺失率下均超过现有方法，尤其是在 IEMOCAP6 缺失率 0.6 时精度提升 4.0%（Table 1）；MHGAT 条件扩散恢复的特征与原始特征在分布上更一致，MMD 更低且恢复误差更小（Table 3）；基于熵的判别层不确定性作为第二解耦方向，显著优于其他解耦策略并带来最高精度（Table 4）。在方法谱系中，HyperEF 区别于 **GCNet**（Lian et al., TPAMI 2023）的图补全、**IMDer**（Wang et al., NeurIPS 2023）的无引导扩散恢复、**SDR-GNN**（Fu et al., KBS 2025）的谱域重建以及 **MMIN**（Zhao et al., ACL/IJCNLP 2021）的缺失模态想象，通过超图条件扩散与双重证据融合实现了缺失模态下更强的鲁棒性。
 
-
-
 多模态情感识别（Multimodal Emotion Recognition, MER）旨在融合文本、语音和视觉等多源信号以实现精准的情感推断，是构建共情式对话系统的核心技术之一。然而，真实场景中模态缺失普遍存在——摄像头遮挡、语音噪声、文本转录失败等因素导致某一或多个模态不可用，严重破坏语义一致性并引入多维不确定性，使传统融合方法性能急剧退化。
 
 现有缺失模态处理方法可归为三类：(1) **缺失模态想象**，如 **MMIN**（Zhao et al., ACL/IJCNLP 2021）直接生成缺失特征，但缺乏对高阶语义关系的显式建模；(2) **图补全网络**，如 **GCNet**（Lian et al., TPAMI 2023）利用图结构传播信息，但图结构仅能编码成对关系，难以捕捉模态内、模态间及对话上下文的复杂多元交互；(3) **扩散模型恢复**，如 **IMDer**（Wang et al., NeurIPS 2023）借助扩散过程重建缺失模态，但采用无引导生成，恢复结果与对话语义的一致性不足。此外，现有方法在融合阶段普遍采用等权策略或仅基于空位（vacuity）的简单不确定性估计，未能同时解耦特征源和判别层的不确定性，导致模态冲突难以有效缓解。
 
 上述缺口指向一个核心瓶颈：**缺失模态导致语义不一致与多维不确定性建模不足，严重削弱多模态情感识别性能**。本文提出 **HyperEF**（Hypergraph Diffusion and Evidence Fusion based Emotion Recognition），以超图引导的条件扩散与双重证据融合两大机制应对该挑战。其核心洞见在于：超图结构能够同时编码模态内、模态间及对话上下文的高阶交互；将其作为条件嵌入扩散模型，并配合细粒度的双重不确定性估计，可在缺失模态下实现鲁棒且可解释的融合。
-
-
 
 ## 核心方法与创新机理
 
@@ -86,8 +82,6 @@ $$\hat{\epsilon}_\theta(\mathbf{x}_t, C) = \epsilon_\theta(\mathbf{x}_t, \mathca
 
 **创新协同效应。** 三条创新并非孤立——MHGAT 提取的高阶语义条件不仅指导扩散模型生成语义一致的特征，其输出的节点表示同时服务于后续的 DCEF 融合；DCEF 中的特征源不确定性直接依赖扩散模型的恢复质量，形成从恢复到评估的闭环。这一协同设计使 HyperEF 在所有缺失率下均超过现有方法，尤其在 IEMOCAP6 缺失率 0.6 时精度提升 4.0%（Table 1）。
 
-
-
 HyperEF 的整体 pipeline 由四个核心模块串联构成：**单模态特征提取 → 掩码超图注意力条件扩散 → 双重证据融合 → 情感分类**。图 Figure 2 给出了端到端的结构示意，左侧为整体框架，右侧展开各模块的数学符号与数据流。
 
 ![[assets/figures/papers/paper_list_l840_https_openaccess_thecvf_com_content_CVPR2026_html_Qiu_Beyond_Missing_Mod/figures/002_Figure_2.jpg]]
@@ -107,8 +101,6 @@ HyperEF 的整体 pipeline 由四个核心模块串联构成：**单模态特征
 两者组合为通用集的质量 $m(\Omega) = \gamma \cdot m_d(\Omega) + m_s(\Omega)$，重新分配各类别的信度 $m(k) = (1 - m(\Omega)) P_k$，最终通过迭代的 Dempster-Shafer 理论（DST）规则融合所有模态的证据，输出融合后的情感类别概率。
 
 **关键设计意图**：整个 pipeline 的信息流呈现“恢复—评估—融合”的级联逻辑。MHGAT 条件扩散解决“缺失模态恢复的语义一致性问题”，DCEF 解决“恢复后特征与原始特征之间的冲突与不确定性量化问题”，两者协同使得框架在任意缺失率下都能维持鲁棒的融合决策。
-
-
 
 HyperEF 围绕两个核心模块构建：**MHGAT 条件扩散（MHGAT-Conditioned Diffusion）** 负责缺失模态的语义一致性恢复，**双通道证据融合（Dual Channel Evidence Fusion, DCEF）** 负责不确定性感知的多模态融合。以下逐模块展开关键公式与变量含义。
 
@@ -192,12 +184,8 @@ $$(m_1 \oplus m_2)(A) = \frac{\sum_{B \cap C = A} m_1(B) m_2(C)}{1 - \sum_{B \ca
 
 融合完成后取信度最高的类别作为最终预测。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l840_https_openaccess_thecvf_com_content_CVPR2026_html_Qiu_Beyond_Missing_Mod/figures/005_Figure_3.jpg]]
 *Figure 3: Aggregation process of MHGAT and visualization of attention assigned to each node and edge*
-
-
 
 ## 实验与关键发现
 
@@ -231,21 +219,11 @@ Table 3 从恢复误差（MSE）和分布差异（MMD）两个维度量化了缺
 2. **双重不确定性解耦是鲁棒融合的关键**：特征源不确定性（基于扩散最后时间步的噪声预测误差）与判别层不确定性（基于分类熵）捕获了不同层面的冲突信号，二者的证据级融合在所有解耦策略中取得最优性能。
 3. **vacuity 约束不可或缺**：移除 vacuity 损失导致性能崩溃，证实了在缺失模态场景下显式建模证据量对防止过自信错误预测至关重要。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l840_https_openaccess_thecvf_com_content_CVPR2026_html_Qiu_Beyond_Missing_Mod/figures/004_Table_2.jpg]]
 *Table 2: Performance and cost of MHGAT and Transformer encoder on MDLE and IEMOCAP4 at missing rates 0.3 and 0.5*
 
-![[assets/figures/papers/paper_list_l840_https_openaccess_thecvf_com_content_CVPR2026_html_Qiu_Beyond_Missing_Mod/figures/007_Table_4.jpg]]
-*Table 4: Performance of different disentanglement strategies on MELD with a missing rate of 0.3*
-
 ![[assets/figures/papers/paper_list_l840_https_openaccess_thecvf_com_content_CVPR2026_html_Qiu_Beyond_Missing_Mod/figures/008_Table_5.jpg]]
 *Table 5: Ablation study on IEMOCAP4 and MELD with a 0.3 missing rate at different target function switches*
-
-![[assets/figures/papers/paper_list_l840_https_openaccess_thecvf_com_content_CVPR2026_html_Qiu_Beyond_Missing_Mod/figures/001_Figure_1.jpg]]
-*Figure 1: An example of multimodal dialogue (a) and the semantic inference process of text utterance u3 (b)*
-
-
 
 ## 定位与知识库关联
 
@@ -294,8 +272,6 @@ DCEF 的双重不确定性解耦是该工作的另一差异化贡献。特征源
 2. **不确定性解耦的理论基础：** DCEF 将特征源不确定性与判别层不确定性线性组合，但两者可能存在非线性交互。是否存在更优的组合方式（如基于互信息的加权）是开放问题。
 
 3. **超图结构的动态学习：** 当前超图结构（上下文边 + 多模态边）是预定义的。是否可以通过端到端学习动态构建超边，使图结构自适应于对话内容和缺失模式，是一个值得探索的方向。
-
-
 
 ## 原文 PDF
 

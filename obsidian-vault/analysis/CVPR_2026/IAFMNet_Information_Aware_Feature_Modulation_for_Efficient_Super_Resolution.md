@@ -49,8 +49,6 @@ claims:
 
 实验表明，IDM 成功捕获了误差图中高亮的纹理区域（Figure 2），验证了其作为重建难度代理的有效性。在 Manga109 ×2 任务上，引入子流形稀疏卷积（SSConv）仅额外增加 6 GFLOPs 即带来 0.26 dB 的提升；完整模型在 Urban100 ×2 上取得 32.52 dB PSNR，较无 IDM 引导的基线提升 0.22 dB。IAFMNet 在多个公开基准上以更低的参数量和计算量，实现了优于 **CARN-M**（Ahn et al., ECCV 2018）、**IMDN**（Hui et al., ACM MM 2019）、**ShuffleMixer**（Sun et al., NeurIPS 2022）、**SAFMN**（Sun et al., ICCV 2023）等代表性轻量级 SR 方法的性能-复杂度权衡。
 
-
-
 单图像超分辨率（SISR）旨在从低分辨率观测中恢复高分辨率图像，是底层视觉领域的经典病态逆问题。随着深度学习的普及，大量高性能SR模型相继涌现，但其庞大的参数量和计算开销严重限制了在资源受限设备上的部署。因此，轻量级高效超分方法成为近年来的研究热点。
 
 现有高效超分方法在设计上主要沿两条路径演进：一是通过精巧的卷积模块设计（如通道分裂、信息蒸馏、特征重参数化）来压缩模型体积；二是引入空间自适应调制或注意力机制，使网络对不同区域产生差异化的响应。代表性的轻量级基线包括基于信息蒸馏的 **IMDN**（Hui et al., ACM MM 2019）、采用高效卷积混合的 **ShuffleMixer**（Sun et al., NeurIPS 2022）、空间自适应调制的 **SAFMN**（Sun et al., ICCV 2023），以及自调制特征聚合的 **SMFANet**（Zheng et al., ECCV 2024）等。
@@ -60,8 +58,6 @@ claims:
 该问题的本质在于缺乏一个有效的**区域重要性度量**来指导计算资源的差异化分配。传统方法通常依赖梯度算子（如 Sobel、Laplacian）生成边缘图作为先验，但这些手工设计的算子仅能捕获局部强度变化，无法从信息论角度刻画区域的编码难度与重建价值（见 Figure 7 对比）。因此，如何以无监督方式学习一个能准确反映像素级重建难度的信息密度信号，并据此实现计算资源的硬分配与特征响应的软调制，成为突破现有高效SR性能瓶颈的关键切入点。
 
 IAFMNet 正是从这一动机出发，首次从信息密度视角审视退化特征增强问题，提出以无监督信息熵损失驱动的像素级信息密度图（IDM）作为核心调控信号，协同引导稀疏卷积的显式计算分配与仿射变换的隐式特征重校准，从而在有限计算预算下实现重建质量的显著提升。
-
-
 
 ## 核心方法与创新机理
 
@@ -111,8 +107,6 @@ $$\mathbf{F}_{\mathrm{local}} = \mathrm{DWConv}(S(\mathrm{Conv}_{1\times1}(\math
 
 三个 changed slots 形成闭环协同：**IDE 提供空间重要性先验 → IGRA 根据该先验进行硬性计算分配 → ARM 利用同一先验进行软性特征调制**。这种“硬分配+软调制”的双分支设计，使 IAFMNet 在 Urban100（×2）上相比无 IDM 引导的基线提升 **+0.22 dB** PSNR（32.52 vs. 32.30），同时保持计算效率。
 
-
-
 IAFMNet 的整体架构遵循轻量级超分辨率网络的主流设计范式，但其核心创新在于引入了**信息密度图（Information Density Map, IDM）** 作为全局引导信号，驱动双分支特征增强模块进行区域自适应的计算分配与特征调制。整个 pipeline 由四个关键阶段构成：浅层特征提取、信息密度估计、信息引导特征增强、以及图像重建。
 
 ### 网络结构总览
@@ -155,12 +149,8 @@ $$\mathcal{L} = \mathcal{L}_1 + \lambda \mathcal{L}_{IE}$$
 
 其中 $\mathcal{L}_1$ 为像素级 L1 重建损失，$\mathcal{L}_{IE}$ 为信息熵损失，$\lambda$ 为平衡权重。所有模型在 DF2K 数据集上以标准协议训练（$64 \times 64$ LR 图像块，随机翻转和旋转），测试集采用 Set5、Set14、BSD100、Urban100 和 Manga109，评估指标为 Y 通道 PSNR/SSIM。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l886_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_IAFMNet_Information/figures/003_Figure_3.jpg]]
 *Figure 3: Illustration of the proposed IAFMNet: (a) the overall network architecture, (b) the information density estimator, and (c) the information-guided feature enhancement module*
-
-
 
 IAFMNet 的核心设计围绕一个中心假设展开：图像不同区域的重建难度由其信息密度决定，计算资源应当向高信息密度区域倾斜。本章从信息论视角出发，依次阐述信息密度估计器（IDE）、信息引导特征增强模块（IFEM）及其内部的两个互补分支——信息引导资源分配（IGRA）与仿射重校准模块（ARM）。
 
@@ -177,9 +167,6 @@ $$p_{\hat{F}_i}(\hat{F}_i \mid \mu_i, \theta_i) = \Phi\left(\frac{\hat{F}_i + \f
 $$\mathcal{L}_{IE} = \sum_i -\log_2 p_{\hat{F}_i}(\hat{F}_i \mid \mu_i, \theta_i)$$
 
 该损失以完全无监督的方式驱动 IDE 学习：无需任何显式标注，网络通过最小化自身特征的编码代价，自动发现哪些区域包含难以压缩的纹理与边缘信息。Figure 2 的可视化证实了这一点：由 $\mathcal{L}_{IE}$ 训练得到的 $\theta$ 图与基线模型的重建误差图高度吻合，说明 IDE 确实捕获了真正的重建困难区。Figure 7 进一步表明，与传统 Sobel、Laplacian 等梯度算子相比，IDM 能有效凸显被简单边缘检测器忽略的信息丰富纹理。
-
-![[assets/figures/papers/paper_list_l886_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_IAFMNet_Information/figures/002_Figure_2.jpg]]
-*Figure 2: Illustration of the difference map (d) between the HR image and the SR image (b) reconstructed by baseline f(·) on Urban100. The estimated IDM θ in (e), obtained via*
 
 ![[assets/figures/papers/paper_list_l886_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_IAFMNet_Information/figures/009_Figure_7.jpg]]
 *Figure 7: Visual comparison of the proposed Information Density Map (IDM) with traditional gradient-based operators (Sobel and Laplacian). The IDM effectively highlights information-rich textures that are often overlooked by simple edge detectors*
@@ -222,15 +209,8 @@ $$\mathcal{L} = \mathcal{L}_1 + \lambda \mathcal{L}_{IE}$$
 
 其中 $\lambda$ 为平衡两项损失的权重系数。$L_1$ 损失保证重建图像与真值的像素级一致性，$\mathcal{L}_{IE}$ 则驱动 IDE 无监督地学习信息密度分布，无需任何额外的密度标注。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l886_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_IAFMNet_Information/figures/004_Figure_4.jpg]]
-*Figure 4: Illustration of the proposed information-aware sparse convolution module*
-
 ![[assets/figures/papers/paper_list_l886_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_IAFMNet_Information/figures/005_Figure_5.jpg]]
 *Figure 5: Visualization of progressive feature enhancement via IDM-guided sparse allocation and soft modulation*
-
-
 
 ## 实验与关键发现
 
@@ -259,24 +239,11 @@ Figure 2 提供了 IDM 有效性的直接证据：基线模型重建的 SR 图�
 
 尽管 IDM 能有效定位信息密集区域，其基于编码成本的度量标准并不完全等价于人眼感知重要性——某些高编码代价区域可能对应噪声或非结构化纹理，导致资源分配并非总是感知最优。此外，硬阈值掩膜 $T(\theta, k)$ 引入的二元决策在低稀疏阈值下可能截断部分低频结构信息，表现为平坦区域的过度平滑或块状伪影。该问题在 ×4 大放大因子下更为突出，因为此时输入 LR 图像中的可用信息本就极度匮乏，稀疏卷积可能进一步加剧信息丢失。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l886_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_IAFMNet_Information/figures/006_Table_1.jpg]]
 *Table 1: Comparison with SOTA lightweight SR methods on public benchmark datasets. Best results are colored with red*
 
 ![[assets/figures/papers/paper_list_l886_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_IAFMNet_Information/figures/007_Table_2.jpg]]
 *Table 2: Performance comparison against lightweight CNN- and ViT-based SR methods on public benchmark datasets. Best and second-best results are colored with red and blue*
-
-![[assets/figures/papers/paper_list_l886_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_IAFMNet_Information/figures/012_Table_5.jpg]]
-*Table 5: Ablation studies on different settings in ARM*
-
-![[assets/figures/papers/paper_list_l886_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_IAFMNet_Information/figures/013_Figure_8.jpg]]
-*Figure 8: Visual comparison of the ablation study results. Zoom in for better visualization*
-
-![[assets/figures/papers/paper_list_l886_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_IAFMNet_Information/figures/001_Figure_1.jpg]]
-*Figure 1: Performance and model complexity comparison on the Manga109 [22] dataset for ×4 super-resolution*
-
-
 
 ## 定位与知识库关联
 
@@ -315,8 +282,6 @@ IAFMNet 的核心贡献在于将**信息密度**作为显式引导信号引入�
 **软硬协同机制的进一步探索。** 当前的 IGRA（硬分配）和 ARM（软调制）以并行分支的方式协同工作，两者之间的信息交互仅通过共享的 IDM 实现。是否存在更紧密的耦合方式？例如，使用 ARM 的输出动态调整 IGRA 的稀疏阈值，或使用 IGRA 的稀疏选择结果反向指导 ARM 的调制强度——这可能在保持效率的同时进一步减少硬性阈值的信息丢失。
 
 **感知对齐的信息密度估计。** 当前 IDM 的优化目标完全基于信息论编码代价，与人眼感知存在偏差。一个值得探索的方向是将感知损失（如 LPIPS）或对抗损失引入 IDM 的学习过程，使信息密度图更准确地反映人眼关注的区域。这需要在编码代价的数学优雅性与感知对齐的经验有效性之间找到平衡。
-
-
 
 ## 原文 PDF
 

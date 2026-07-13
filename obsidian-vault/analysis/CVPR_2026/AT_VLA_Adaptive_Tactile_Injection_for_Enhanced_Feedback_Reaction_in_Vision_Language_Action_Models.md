@@ -182,8 +182,6 @@ $$\mathcal{L} = \mathcal{L}_{a} + \lambda_{1} \cdot \mathcal{L}_{g}$$
 
 图 2 给出了 AT‑VLA 的完整框架：触觉门控自适应地决定触觉 token 是否作为动作专家的条件输入；门控未激活时所有模态同频处理，激活后触觉信号以更高频率送入，实现快速精准的动作调整。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2030_https_arxiv_org_abs_2605_07308/figures/002_Figure_2.jpg]]
 *Figure 2: Framework of AT-VLA. The tactile gate adaptively determines whether tactile tokens should be used as conditional inputs for action generation within the Action Expert module. When the tactile gate is inactive, all input modalities of the Action Expert operate at the same frequency. When activated, the tactile signal is processed at a higher frequency to enable rapid and precise action adjustments*
 

@@ -52,8 +52,6 @@ claims:
 
 **方法定位**：G4Splat以**MAtCha**（Guédon et al., 2025）为骨架，继承其图表对齐初始化与稀疏视图训练目标，但在深度监督来源、可见性掩码估计、新视点选择策略、多视图修复一致性及结构损失计算五个关键环节进行了根本性改造，将平面几何约束系统性地注入生成重建管线，属于“几何引导的生成式3DGS”方法。
 
-
-
 ### 稀疏视图三维重建的核心挑战
 
 从少量输入图像恢复完整的三维场景是计算机视觉中的核心难题。当输入视图数量极度稀疏（如5～9张）时，场景的大部分区域在训练视图中不可见，系统必须同时完成两项任务：对已观测区域进行精确的几何与外观重建，以及对未观测区域进行合理的场景补全。这两个目标相互耦合——几何精度不足会导致补全区域出现漂浮伪影，而补全策略的不一致又会反向污染已观测区域的重建质量。
@@ -83,8 +81,6 @@ claims:
 - 利用场景中普遍存在的平面结构，从部分观测中推导出尺度精确的深度图，为稀疏视图重建提供强几何约束；
 - 将几何引导贯穿于可见性估计、新视图选择与扩散修复的全流程，显著减轻多视图不一致问题；
 - 在保持生成先验补全能力的同时，使重建结果在已观测和未观测区域均达到高质量几何与外观。
-
-
 
 ## 核心方法与创新机理
 
@@ -120,8 +116,6 @@ G4Splat 采用与 MAtCha 相同的总训练损失形式 $\mathcal{L}_{\mathrm{to
 ### 创新机制的协同效应
 
 上述改进并非孤立生效，而是形成正向反馈循环：平面感知深度图提供可靠的几何初始化 → 可见性网格准确识别缺失区域 → 平面感知新视点选择优化观测覆盖 → 几何引导修复生成一致内容 → 增强的结构损失约束训练过程。消融实验（Table 3）定量验证了这一协同效应：仅加入生成先验（GP）时 CD 为 10.60；补充平面感知几何建模（PM）后 CD 降至 6.61；再引入几何引导的生成管线（PP）后 PSNR 进一步提升至 23.90，证明各模块的叠加贡献。
-
-
 
 G4Splat 的整体流程围绕一个核心洞察展开：场景中普遍存在的平面结构可以从部分观测中可靠地推断完整平面的深度，结合全局平面融合可获得跨视图一致的尺度精确深度；将这种几何引导贯穿可见性估计、新视图选择与修复过程，可显著减轻多视图不一致，实现高质量的场景补全。
 
@@ -163,8 +157,6 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{rgb}} + \mathcal{L}_{\math
 
 ![[assets/figures/papers/paper_list_l83_https_openreview_net_forum_id_kdPmsMVhZf/figures/014_Table.jpg]]
 *Table: A2: Quantitative results of our method integrated with different diffusion models*
-
-
 
 G4Splat 的核心架构建立在 **MAtCha** (Guédon et al., 2025) 的图表对齐初始化与稀疏视图训练目标之上，通过三个关键模块注入几何引导：**平面感知几何建模**、**几何引导的生成管线**、以及**迭代训练循环**。整体训练损失沿用 MAtCha 的形式：
 
@@ -243,13 +235,6 @@ G4Splat 采用两阶段迭代训练（见 Figure 2）：
 
 > **证据强度说明**：上述模块的有效性由 Table 3 的消融实验系统验证——逐步加入生成先验 (GP)、平面感知几何建模 (PM) 与几何引导管线 (PP) 后，各项指标持续提升。Table A2 进一步表明，即使替换为较弱的扩散模型（如 ViewCrafter），几何引导管线仍能保持高质量重建，验证了方法的普适性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l83_https_openreview_net_forum_id_kdPmsMVhZf/figures/013_Figure.jpg]]
-*Figure: Incon. Results View1 Con. Results View2 (Ours) Figure A3: Training results with inconsistent (Incon.) vs. consistent (Con.) multi-view inpainting. Training Gaussian representations with inconsistent inpainting leads to black shadows in non-consistent regions, while our method significantly reduces such artifacts, yielding sharper and cleaner renderings*
-
-
-
 ## 实验与关键发现
 
 ### 实验设置
@@ -302,25 +287,6 @@ Figure 4 展示了主要定性对比：G4Splat 在观测区域与未观测区域
 
 Table 4 报告了各方法的运行时间对比。G4Splat 的完整管线在计算开销上有所增加，但通过下采样加速版本（Ours DS）可在保持显著性能优势的同时大幅降低时间成本，体现了方法在实际部署中的灵活性。
 
-![[assets/figures/papers/paper_list_l83_https_openreview_net_forum_id_kdPmsMVhZf/figures/009_Table_4.jpg]]
-*Table 4: Running time comparison*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l83_https_openreview_net_forum_id_kdPmsMVhZf/figures/005_Table_1.jpg]]
-*Table 1: Quantitative comparison from 5 input views. Our method significantly outperforms all baselines across both reconstruction and rendering metrics. Top-3 results are highlighted as the first , second and third*
-
-![[assets/figures/papers/paper_list_l83_https_openreview_net_forum_id_kdPmsMVhZf/figures/007_Table_2.jpg]]
-*Table 2: Quantitative comparison from 9 input views on Mip-NeRF 360*
-
-![[assets/figures/papers/paper_list_l83_https_openreview_net_forum_id_kdPmsMVhZf/figures/018_Figure.jpg]]
-*Figure: A7: Qualitative comparison using 9 input views on the Mip-NeRF 360 dataset. We present results for all 5 outdoor scenes in the dataset. Our method produces significantly fewer Gaussian floaters and less blurriness, while recovering higher-quality and smoother geometry. These results demonstrate that our approach also performs robustly on non-planar and less structured outdoor scenes*
-
-![[assets/figures/papers/paper_list_l83_https_openreview_net_forum_id_kdPmsMVhZf/figures/012_Table.jpg]]
-*Table: A1: Quantitative results on varying numbers of input views in the Replica dataset. Our method consistently outperforms baselines regardless of the number of input views*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 技术脉络与继承关系
@@ -368,8 +334,6 @@ G4Splat 对 MAtCha 的五项改造构成了一个因果闭环，其逻辑链条�
 4. **实时部署的加速。** 如何进一步减小几何引导管线带来的计算开销，使方法能更快速地部署于实时应用？可能的优化方向包括：平面提取的轻量化、可见性网格的稀疏化、以及新视图选择的近似搜索策略。
 
 5. **生成先验与几何约束的更深层融合。** 当前框架中，生成先验（扩散模型）和几何约束（平面深度）是串行协作的。能否在扩散模型的去噪过程中直接注入几何条件，使生成结果天然满足多视图几何一致性，而非在生成后再进行几何引导的选择与过滤？
-
-
 
 ## 原文 PDF
 

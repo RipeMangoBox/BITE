@@ -62,8 +62,6 @@ claims:
 
 **局限性**：方法假设背景辐射变化与物体信号不相关，在全局均匀升温场景下可能失效；低成本微测辐射热计在窄带滤光下灵敏度不足，难以检测低发射率物体的微小温差。
 
-
-
 ### 热成像的物理歧义：发射与反射的纠缠
 
 热像仪接收到的红外辐射并非单一来源。如Figure 1所示，每个像素的测量值由五个组分构成：物体自身辐射 $\Phi_s$、背景辐射经物体表面反射 $\Phi_b$、光学元件辐射 $\Phi_o$、传输路径辐射 $\Phi_t$，以及相机内部组件辐射 $\Phi_i$。在经过增益/偏置校正（Figure 7）消除光学与内部辐射后，单波段像素强度可简化为物体发射与背景反射的加权和：
@@ -94,8 +92,6 @@ $$I_m(t) = \epsilon_m U_m(T_o(t)) + (1-\epsilon_m) U_m(T_b(t))$$
 - **时域维度**：物体温度变化遵循热传导方程，呈平滑指数规律；而背景反射变化（如人员走动、设备启停）与物体温度演化不相关，常表现为突变。这一时域差异可提供额外的分离依据。
 
 本文的核心动机在于：**将双波段光谱比率与时域平滑/突变差异相结合，为原本欠定的发射-反射分离问题引入充分约束，从而在无需已知发射率或背景静止假设的条件下，逐像素估计物体发射率、物体温度与背景温度。**
-
-
 
 ## 核心方法与创新机理
 
@@ -130,8 +126,6 @@ $$\mathcal{L}_{\text{total}} = \gamma_1 \mathcal{L}_{\text{smooth}} + \gamma_2 \
 ### 4. 硬件层面的双窄带滤光方案
 
 与使用单个宽波段LWIR相机的传统方案不同，DBVT采用**双窄带滤光片**（8.5μm, 9.5μm, 10.6μm, 12.1μm）配合热像仪进行同步视频采集。波段选择经过发射率矩阵 $E$ 的条件数分析（Figure 9），确保数值稳定性。这一硬件设计使得光谱比率约束在物理上可测量，是算法创新的硬件基础。
-
-
 
 DBVT（Dual Band Thermal Videography）的整体流程围绕一个核心矛盾展开：在近环境温度下，物体自身热辐射与背景反射强度相当，且两者均随时间变化，传统方法依赖灰体假设或背景静止假设，无法有效解耦。DBVT通过**双波段光谱比率约束**与**时间动态差异先验**的组合，将这一高度欠定问题转化为可联合优化的系统。
 
@@ -192,13 +186,6 @@ $$\mathcal{L}_{\text{total}} = \gamma_1 \mathcal{L}_{\text{smooth}} + \gamma_2 \
 
 最终输出为每个像素的**时变物体温度** $T_o(t)$、**时变背景温度** $T_b(t)$，以及**双波段发射率** $\epsilon_1, \epsilon_2$。在真实视频实验中，未标定方法的物体温度估计误差仅为1.72%~5.34%，远低于朴素最小二乘的31.68%~45.5%（Figure 6）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2121_https_arxiv_org_abs_2509_11334/figures/001_Figure_1.jpg]]
-*Figure 1: Image formation in a thermal camera comprises of radiation from the object*
-
-
-
 ### 热成像辐射传输建模
 
 热像仪接收的辐射由五个组分构成：目标表面发射辐射 $\Phi_s$、背景反射辐射 $\Phi_b$、光学元件辐射 $\Phi_o$、传输路径辐射 $\Phi_t$ 以及相机内部组件辐射 $\Phi_i$（Figure 1）。经增益/偏置校正（Figure 7）消除光学元件与内部辐射后，目标表面出射的总辐射可表为发射与反射的加权和：
@@ -257,13 +244,6 @@ $$\mathcal{L}_{\text{total}} = \gamma_1 \mathcal{L}_{\text{smooth}} + \gamma_2 \
 - **$\mathcal{L}_{\text{Huber}}$**：归一化鲁棒数据保真项，移除后误差增加 11.3%；
 - **$\mathcal{L}_{\text{MSE}}$**：$k_2$ 残差比约束的重建损失，是最关键项，移除后误差增加 90.1%；
 - **$\mathcal{L}_{\text{noise}}$**：噪声正则化项，在低信噪比下显著有益，移除后误差增加 11.6%。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2121_https_arxiv_org_abs_2509_11334/figures/010_Figure_9.jpg]]
-*Figure 9: Condition numbers of emissivity matrix E in Eq. 15 for different spectral band pairs, averaged over materials in the spectral library [3, 21]*
-
-
 
 ## 实验与关键发现
 
@@ -343,18 +323,8 @@ $$\mathcal{L}_{\text{total}} = \gamma_1 \mathcal{L}_{\text{smooth}} + \gamma_2 \
 
 **Figure 9**给出了不同波段组合下发射率矩阵$\mathbf{E}$的条件数分析。条件数越低，双波段系统的数值稳定性越好。结果表明，8.5μm与12.1μm的组合在ECOSTRESS材料库上平均条件数最优，这与作者实验中选择的波段对一致。这一分析为未来多波段扩展提供了选带依据。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2121_https_arxiv_org_abs_2509_11334/figures/004_Figure_3.jpg]]
-*Figure 3: Spatial temperature errors*
-
-![[assets/figures/papers/paper_list_l2121_https_arxiv_org_abs_2509_11334/figures/005_Figure_5.jpg]]
-*Figure 5: Finger print versus Finger reflection: [Top] Separating finger prints on a glass plate that emit light (heat transport) from the reflection of the uniform background (light transport). [Bottom] Separating the reflection of the fingers (light transport) by the glass plate at constant room temperature (heat transport)*
-
 ![[assets/figures/papers/paper_list_l2121_https_arxiv_org_abs_2509_11334/figures/011_Figure_10.jpg]]
 *Figure 10: Comparison of our method with a recent BCP [9] technique to remove reflections, a naive multi-wavelength approach and a traditional dual-wavelength pyrometry technique [2, 39] using simulated thermal videos of different materials sourced from spectral library [3, 21]. For naive least squares, we run the optimization with five initializations and select one that achieved the least objective compared to ground truth (which we will not have access to at test time). At high noise levels, all methods have a large error as the problem is too under constrained. As noise decreases to more reasonable levels, our method performs significantly better. Note the log scale on the plots*
-
-
 
 ## 定位与知识库关联
 
@@ -418,8 +388,6 @@ DBVT 提供两种工作模式：
 2. **低成本硬件扩展**：当前方法依赖微测辐射热计在窄带滤光下的灵敏度。向更低成本、更多波段（如四波段）的硬件扩展，并实现实时视频处理，是工程上的关键挑战。
 
 3. **波段选择的自动化**：Figure 9 的条件数分析为波段选择提供了原则，但最优波段对依赖于材料类型。自适应波段选择策略（如根据场景初步估计后动态切换滤光片）可能进一步提升精度。
-
-
 
 ## 原文 PDF
 

@@ -54,8 +54,6 @@ claims:
 
 **局限与开放问题**：当前方法主要面向物体级点云，向大规模室外场景的迁移有待验证；处理极端稀疏或全新类别时，先验引导可能产生不完全合理的几何。此外，融合RGB等多模态信息能否进一步提升细节恢复和泛化能力，也是值得探索的方向。
 
-
-
 点云恢复（Point Cloud Restoration）旨在从退化观测中重建完整且几何精确的三维形状，是自动驾驶、机器人感知、数字孪生等领域的核心基础任务。现实中的退化形式多样且高度耦合——激光雷达扫描常同时存在遮挡、噪声、稀疏采样和密度不均等问题，这对恢复方法的鲁棒性提出了严苛要求。
 
 现有方法可大致分为两类范式（Figure 1）。**瓶颈特征方法**（如 **PCN** (Yuan et al., 3DV 2018)、**PoinTr** (Yu et al., CVPR 2021)、**SnowflakeNet** (Xiang et al., ICCV 2021)）将输入点云编码为单一全局特征向量，再从中解码完整形状。这一范式将信息压缩至瓶颈，不可避免地丢失细粒度几何细节，且在输入退化严重时，瓶颈特征本身被噪声污染，导致重建质量急剧下降。**种子/查询方法**（如 **SeedFormer** (Zhou et al., ECCV 2022)、**AnchorFormer** (Qiu et al., CVPR 2023)）从全局特征生成种子点或锚点，再通过粗到细解码恢复形状。尽管这类方法缓解了瓶颈压缩问题，但种子点仍从单一的全局特征中派生，当输入被严重遮挡或噪声干扰时，全局特征失真会直接传导至种子位置，使后续细化缺乏可靠的几何基础。
@@ -63,8 +61,6 @@ claims:
 更深层的瓶颈在于：上述方法缺少一种**抗噪声的中间实体**来桥接退化输入与完整输出之间的几何鸿沟。当输入点云残缺或含噪时，网络要么过度信赖不可靠的观测点，要么过度依赖从数据中学习的形状先验——前者导致重建结果被噪声牵制，后者则可能生成与观测不符的“幻觉”几何。因此，**如何自适应地平衡输入保真度与学习先验**，成为提升点云恢复鲁棒性的关键因果杠杆。
 
 PQDT 的核心洞察是引入**伪查询（Pseudo-Queries）**作为辅助中间实体——它们既是观测的代理，又是先验的载体，通过两阶段的生成与细化过程，在退化输入下为形状重建提供稳定的几何锚点。具体而言，**第一阶段（观察引导）**从编码输入中生成粗略但鲁棒的伪查询，稳定整体结构；**第二阶段（先验引导）**利用学习到的形状先验对伪查询进行细化，恢复细粒度细节。配合动态查询选择（Dynamic Query Selection, DQS）和稀疏几何嵌入（Sparse Geometric Embedding, SGE），PQDT 能够在保留观测可信部分的同时，智能地补充缺失几何，从而在多种退化类型和难度级别下实现一致的高质量恢复。
-
-
 
 ## 核心方法与创新机理
 
@@ -124,8 +120,6 @@ $$\mathrm{head} = \mathrm{softmax}\left( \frac{Q(K_f + K_r)^\top}{\sqrt{d_h}} \r
 
 消融实验（Table 3）验证了各创新模块的贡献：在基线模型A（仅使用输入特征直接解码）上增加伪查询与DQS（模型B）使CDℓ2降低0.17、F1提高0.012；进一步采用DETR-like解码器预测种子代理（模型C）继续提升性能；最终用几何嵌入替换原始坐标位置编码的完整PQDT达到最佳CDℓ2 0.818和F1 0.261。
 
-
-
 PQDT 的整体架构围绕“伪查询（pseudo-queries）作为抗噪声锚点”这一核心思想展开，通过双 Transformer 解码与自适应查询选择，在不同退化条件下平衡输入保真度与学习到的形状先验。图 2 展示了完整的 pipeline。
 
 给定一个不完整且含噪声的输入点云 $\mathcal{P}_{src}^f$，网络首先通过 **Transition-Down 模块** 提取多尺度局部特征，并将其降采样为粗点云 $\mathcal{P}_{src}^c$ 及对应特征 $\mathcal{F}_{src}^c$。随后，**几何嵌入编码器（GEE）** 利用稀疏几何嵌入自注意力对 $\mathcal{P}_{src}^c$ 进行编码，得到富含结构信息的特征表示。
@@ -154,15 +148,11 @@ $$\mathcal{H} = \mathbf{M}_{D_2} ( \mathcal{Q}, \mathcal{V} )$$
 
 整体而言，PQDT 通过“伪查询生成—动态选择—先验细化—代理预测—层级上采样”的级联设计，实现了从退化输入到高质量几何的鲁棒映射。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2264_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_PQDT_Pseudo_Query_D/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of PQDT. Given an incomplete and noisy input point cloud, local features are extracted via a transition-down module and translated by a dual transformer. Stage I generates pseudo-queries*
 
 ![[assets/figures/papers/paper_list_l2264_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_PQDT_Pseudo_Query_D/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of point cloud restoration paradigms. (a) Bottleneck feature–based methods directly decode the shape from a global latent code. (b) Seed-/query-based methods generate anchors or queries from the global feature for coarse-to-fine decoding. (c) Our PQDT introduces geometry-aware pseudo-queries as auxiliary entities and dual transformer decoding, achieving more faithful restorations with superior geometric fidelity*
-
-
 
 ### 3.1 双阶段伪查询生成与细化
 
@@ -240,16 +230,6 @@ $$
 
 多级监督确保从粗代理到精细输出的每一级均与真值几何对齐，是 PQDT 实现高几何保真度的重要保障。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2264_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_PQDT_Pseudo_Query_D/figures/003_Figure_3.jpg]]
-*Figure 3: Geometric-embedding self-attention block. Geometric attention head uses distance embedding (DE) and angular embedding (AE) from input point coordinates and regrouped as attention keys*
-
-![[assets/figures/papers/paper_list_l2264_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_PQDT_Pseudo_Query_D/figures/004_Figure_4.jpg]]
-*Figure 4: Dynamic Query Selection (DQS) module. Given the input coordinates*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -292,13 +272,8 @@ PQDT在多个基准数据集上全面超越现有方法，验证了伪查询双T
 
 所有对比方法均使用官方发布或原作者推荐的代码和配置，在相同数据集划分和评估协议下进行评测。ShapeNet-55/34采用标准的三难度划分（Simple/Moderate/Hard），PFS和ShapeNetCar-Occ遵循各自数据集的官方评估协议。指标计算统一使用CDℓ2（乘以1000）和F-Score@1%（PFS额外报告F-Score@0.5%）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2264_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_PQDT_Pseudo_Query_D/figures/005_Table_1.jpg]]
 *Table 1: Results of our method and state-of-the-art methods on ShapeNet-55/34. We report the results of all 55 categories, 34 seen categories and 21 unseen categories in three difficulty degrees. We use CD-S, CD-M and CD-H to represent the*
-
-![[assets/figures/papers/paper_list_l2264_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_PQDT_Pseudo_Query_D/figures/008_Table_2.jpg]]
-*Table 2: Results of our method and state-of-the-art methods on ShapeNet-Deform, ShapeNetCar-Occ and PFS dataset. We report the CDℓ2 (multiplied by 1000) under three difficulty setups of ShapeNet-Deform, and the average CDℓ2 and F-Score@1% of all three datasets. Additional F-Score@0.5% are reported for PFS dataset*
 
 ![[assets/figures/papers/paper_list_l2264_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_PQDT_Pseudo_Query_D/figures/010_Table_3.jpg]]
 *Table 3: Ablation study on ShapeNetCar-Occ. We report the results with different model designs including query generation (Query), seed prediction (Seed) and positional encoding (PE)*
@@ -308,11 +283,6 @@ PQDT在多个基准数据集上全面超越现有方法，验证了伪查询双T
 
 ![[assets/figures/papers/paper_list_l2264_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_PQDT_Pseudo_Query_D/figures/009_Figure_7.jpg]]
 *Figure 7: Qualitative evaluation on PFS. The color represent the Point-to-Surface distance (P2S) between generated point clouds and ground truth mesh, the maximum (red) is clamped with 2% of the radius of the object’s bounding sphere*
-
-![[assets/figures/papers/paper_list_l2264_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_PQDT_Pseudo_Query_D/figures/011_Figure_8.jpg]]
-*Figure 8: Attention maps from selected queries (red dot) visualized on key points (bottom row). Stage I attention maps show coarse pseudo-query exploration over the encoded latent structure. Stage II maps demonstrate localized, coherent attention aligned with the underlying surface, indicating effective query refinement. The color reflects the attention score after the Softmax operation in the last block of the decoder*
-
-
 
 ## 定位与知识库关联
 
@@ -354,8 +324,6 @@ PQDT 处于点云恢复（Point Cloud Restoration）的统一框架下，该框�
 2. **多模态融合：** 融合 RGB 图像等多模态信息是否能进一步提升细节恢复和跨域泛化能力？伪查询框架天然支持多源特征的交叉注意力聚合，这一方向值得探索。
 3. **查询数量自适应：** 当前 DQS 模块依赖固定的 Top-k 选择数量，能否根据输入退化程度动态调整查询规模，以在简单场景下降低计算冗余？
 4. **理论分析：** 伪查询作为抗噪声锚点的理论性质（如对输入扰动的 Lipschitz 连续性）尚未被形式化分析，这可能是理解其鲁棒性来源的关键。
-
-
 
 ## 原文 PDF
 

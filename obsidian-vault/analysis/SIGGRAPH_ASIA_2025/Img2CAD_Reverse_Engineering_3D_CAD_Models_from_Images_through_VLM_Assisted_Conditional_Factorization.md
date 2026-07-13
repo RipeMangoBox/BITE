@@ -52,8 +52,6 @@ claims:
 
 **主要结果**：与端到端基线DeepCAD-End2End相比，Img2CAD将平均Chamfer距离从0.3108降至0.1174（降低62.2%），分割准确率相对提升17.94%，mIoU提升19.03%（Table 1）。消融实验证实，层次Transformer设计、语义部分嵌入、流匹配损失和对称引导各自带来显著增益，其中流匹配损失对Chamfer距离改善最为关键，对称引导则将强连通分量数（#SCC）从1.49降至1.11，对称Chamfer距离从0.1145降至0.0756（Table 2, Table 3）。在任意视角输入下，方法同样保持可比性能（Table 4），并展示了在Pix3D数据集和Google家具图片上的泛化能力。
 
-
-
 从单张图像逆向重建三维CAD模型是计算机图形学与工业设计中的核心难题。与传统的网格或点云重建不同，CAD模型由离散的命令序列（如草图绘制、拉伸、切割）和连续的几何属性（如圆心坐标、半径、拉伸距离）构成，这带来了独特的组合复杂性：离散结构的微小错误会导致完全失效的几何输出，而连续属性的回归又高度依赖于离散结构的正确性。此外，单视角图像固有的信息缺失——遮挡、透视畸变、光照变化——进一步加剧了端到端学习的难度。
 
 现有方法主要采用端到端的神经网络直接回归完整的CAD命令序列。以 **DeepCAD-End2End** 为代表的基线将图像编码为隐特征后，联合预测离散命令类型和连续属性值。这种设计面临两个根本性瓶颈：**数据需求巨大**——模型必须从有限样本中同时学习结构推理与精确几何回归，泛化能力受限；**结构-属性耦合**——离散结构的预测误差会直接传导至属性回归，缺乏显式的错误隔离机制。实验表明，DeepCAD-End2End在椅子、桌子、柜子三类上的平均Chamfer距离高达0.3108，分割准确率和mIoU均显著不足（Table 1）。
@@ -61,8 +59,6 @@ claims:
 视觉语言大模型（VLM）的兴起为解决结构推理问题提供了新的可能。VLM在海量图文数据上预训练，具备强大的语义理解和部分分解能力，能够从单张图像中识别物体的语义部件及其拓扑关系。然而，VLM对连续几何属性的精确预测能力严重不足——它们可以告诉你“椅子有四条腿”，却难以给出每条腿的精确三维位置和尺寸（Fig. 6）。这一观察揭示了问题的本质：**离散结构与连续属性需要不同的推理能力，应当由不同的机制处理**。
 
 基于此，Img2CAD提出**条件分解策略**：将图像到CAD的逆向工程分解为两个条件化的子问题——首先由微调的VLM（Llama3.2）预测带有语义部分标签的离散CAD基础结构，然后由专用的层次Transformer网络（TrAssembler）条件于该结构预测连续属性。这种分解使得属性预测网络可以跨不同对象共享对应部分的属性学习模式（类似层间纤维一致性），大幅降低数据需求并提高泛化性（Fig. 4）。此外，引入流匹配损失和推理时对称引导，进一步解决属性回归的多模态分布问题和输出结构的对称性约束。
-
-
 
 ## 核心方法与创新机理
 
@@ -99,8 +95,6 @@ $$\mathbf{x}_t = \mathbf{x}_t - \lambda \frac{\partial \mathcal{L}_{\mathrm{sym}
 
 这一测试时优化将强连通分量数（#SCC）从 1.49 降至 1.11，对称 Chamfer 距离从 0.1145 降至 0.0756（Table 3），显著提升了输出结构的连接完整性和对称性。
 
-
-
 Img2CAD 将“单张图像→可编辑CAD程序”的逆向工程任务**条件分解**为两个子问题：首先预测全局离散基础结构，再以该结构为条件回归连续属性参数。这一分解策略的核心动机在于：离散命令序列（如草图类型、挤出操作类型）决定了CAD程序的拓扑骨架，而连续属性（如圆心坐标、半径、挤出距离、欧拉角）则决定了精确的几何形态——两者的组合复杂性是端到端学习的根本瓶颈。
 
 ### 两阶段流水线
@@ -123,12 +117,8 @@ Img2CAD 将“单张图像→可编辑CAD程序”的逆向工程任务**条件�
 
 该框架的关键洞察在于：VLM擅长从图像中提取通用离散结构和语义知识，但不擅长精确连续数值预测；而专门训练的Transformer网络在条件化结构下能够高效回归连续属性——二者分工协作，避免了端到端方法对海量配对数据的需求，同时提升了重建精度和泛化能力。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l43_https_arxiv_org_abs_2408_01437/figures/001_Figure_1.jpg]]
 *Figure 1: Img2CAD: a framework for reverse engineering 3D CAD models from single-view images. Our method leverages VLM to predict the discrete CAD program structure and then uses a semantic-conditioned transformer to predict the continuous attributes. This approach allows users to easily reconstruct and edit a CAD model from a single-view input image. We use OpenCasCade [Capgemini [n. d.]] to convert the CAD program back to a 3D mesh*
-
-
 
 Img2CAD 将图像到 CAD 的逆向工程分解为两个条件化子任务：离散结构预测与连续属性回归。其核心模块包括 VLM 离散结构预测器、TrAssembler 条件属性回归网络，以及推理时对称引导模块。
 
@@ -167,8 +157,6 @@ $$\mathbf{x}_t = \mathbf{x}_t - \lambda \nabla \log \mathcal{p}_{\mathrm{sym}}(t
 ### 关键设计决策的证据
 
 消融实验（Table 2）系统验证了各模块的必要性：层次 Transformer 设计（行 i→ii）相比扁平结构显著提升连接性和对称性指标；语义部分嵌入（行 iii）进一步改善性能；以流匹配损失替换前馈回归头（行 v）带来最大的 CD 改善；直接使用 VLM 端到端预测连续属性（行 vii）性能显著劣化，证实了 VLM 不适合连续属性预测的结论（Fig. 6 亦定性展示了 VLM 在连续属性预测上的失败案例）。
-
-
 
 ## 实验与关键发现
 
@@ -217,9 +205,6 @@ Table 4 展示了 Img2CAD 在任意视角输入下的性能。模型仅在正视
 ![[assets/figures/papers/paper_list_l43_https_arxiv_org_abs_2408_01437/figures/013_Figure_10.jpg]]
 *Figure 10: Example output visualizations given arbitrary-view inputs. Fig. 11. Example visualizations of reconstruction results from frontal and arbitrary-view inputs*
 
-![[assets/figures/papers/paper_list_l43_https_arxiv_org_abs_2408_01437/figures/011_Table_4.jpg]]
-*Table 4: Our model achieves comparable performance on arbitrary views. Results are averaged over categories*
-
 ### 6.5 失败模式与局限性
 
 Fig. 13 展示了典型失败案例，分析如下：
@@ -234,8 +219,6 @@ Fig. 8 对比了 Img2CAD 与各基线的重建可视化。Img2CAD 生成的 CAD 
 
 ![[assets/figures/papers/paper_list_l43_https_arxiv_org_abs_2408_01437/figures/014_Figure_12.jpg]]
 *Figure 12: Image to CAD results on Pix3D dataset*
-
-
 
 ## 定位与知识库关联
 
@@ -299,8 +282,6 @@ Img2CAD 的适用性受以下因素限制：
 3. **增强 VLM 的 3D 理解**：如何增强 VLM 的 3D 几何理解能力，以提高离散结构预测的准确性和完整性？
 4. **扩展 CAD 操作集**：如何将该方法扩展到更多日常对象类别和更复杂的 CAD 操作（如倒角、旋转、扫掠等）？
 5. **数据集质量**：如何量化并减少 GPT-4V 辅助数据集构建的标注噪声与偏差？
-
-
 
 ## 原文 PDF
 

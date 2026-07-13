@@ -61,8 +61,6 @@ claims:
 
 在紧密交互数据集**Hi4D**（8视角）上，AvatarPose的MPJPE达到32.10 mm，相比此前最优方法**MVPose**（Dong et al., CVPR 2019）的42.63 mm降低了10.53 mm（约24.7%）；在**CHI3D**（4视角）上，MPJPE为32.98 mm，显著优于所有对比方法。消融实验证实：移除RGB渲染损失会使MPJPE从29.37 mm飙升至78.40 mm；采用联合优化而非交替优化则导致MPJPE升至66.04 mm，验证了各设计组件的必要性。定性结果显示，AvatarPose在手臂交缠、拥抱等紧密接触场景下能准确恢复姿态，而现有方法常出现肢体错位或穿透。
 
-
-
 ### 问题背景：紧密交互场景中的人体姿态估计
 
 从多视角视频中估计多人的三维姿态与形状是计算机视觉中的一项基础任务，在运动捕捉、AR/VR、人机交互等领域具有广泛应用。然而，当场景中的人体发生**紧密交互**（如拥抱、握手、格斗等）时，该任务面临根本性的困难：严重的**遮挡**与**身体接触**导致二维关节检测器产生大量噪声或完全缺失，进而使得依赖2D检测作为中间表示的现有方法性能急剧下降。这一瓶颈构成了本工作的核心问题锚点。
@@ -85,8 +83,6 @@ claims:
 4. 通过**交替优化**策略——先学习化身、再固定化身优化姿态、最后进一步细化化身——可以在严重遮挡下逐步收敛到准确的姿态估计。
 
 简言之，AvatarPose的方法论动机是：**用个性化神经化身的渲染一致性替代2D关节检测的几何一致性，从而在紧密交互这一极端场景中实现鲁棒的三维姿态估计。**
-
-
 
 ## 核心方法与创新机理
 
@@ -129,8 +125,6 @@ $$\mathcal { L } _ { p a } ( \boldsymbol { \Theta } ) = \frac { 1 } { \mid S \mi
 | 优化模式 | 单阶段或联合优化 | 化身学习与姿态优化的交替迭代 |
 | 穿透处理 | 通常无显式约束 | 密度场级别的碰撞损失 |
 
-
-
 AvatarPose 的整体流程围绕一个核心思想展开：**为场景中的每个个体重建带纹理的隐式神经化身，并将其作为强个性化先验来优化 3D 姿态**。这一设计直接回应了紧密交互场景下的根本瓶颈——严重的遮挡与身体接触导致 2D 关节检测噪声大或缺失，使得依赖 2D 检测的 3D 姿态估计方法性能急剧下降。通过从像素级观测直接优化姿态，AvatarPose 绕过了对 2D 关节检测的依赖，转而利用化身提供的丰富几何与外观线索。
 
 整个 pipeline 由两个主要模块构成，并以交替优化的方式协同工作（Figure 2）：
@@ -163,8 +157,6 @@ $$\mathcal { L } _ { p a } ( \boldsymbol { \Theta } ) = \frac { 1 } { \mid S \mi
 这种"先学习化身，再用化身优化姿态"的双向依赖关系，使得 AvatarPose 在严重遮挡和接触场景下能够显著提升 3D 人体姿态估计的精度与鲁棒性。
 
 > **注意**：当前方法假设场景中人数已知且相对固定，且初始姿态估计的误差非常大时（例如方向完全相反），优化可能陷入局部最小值，提升效果有限。此外，化身模型目前未包含手部精细建模，这会影响握手、牵手等紧密交互场景的精度。
-
-
 
 ### 1. 多化身先验学习 (Multi-Avatar Prior Learning)
 
@@ -230,8 +222,6 @@ $$
 
 整个流程采用交替优化而非联合优化：先学习化身模型，再固定化身优化姿态，最后进一步细化化身。此策略循环 $N$ 步，关键优势在于避免了联合优化中接触区域产生伪影并导致姿态估计错误的问题——消融实验证实，联合优化的 MPJPE 升至 66.04 mm，而交替优化仅为 29.37 mm。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能对比
@@ -276,16 +266,6 @@ AvatarPose 在以下场景中存在性能退化：
 - **计算开销。** 训练化身和交替优化总计约需 11 分钟，难以满足实时运动捕捉需求。如何利用更轻量的神经表示（如三平面/张量分解）加速是待探索的问题。
 - **人数假设。** 当前方法假设场景中人数已知且相对固定，尚未扩展到人数动态变化的场景。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1757_AvatarPose_Avatar_guided_3D_Pose_Estimation_of_Close_Human_Interaction_f/figures/010_Figure_6.jpg]]
-*Figure 6: Ablation of Alternating Optimization. We show the results of rendered avatars and projections of the estimated 3D poses. Joint optimization suffers from artifacts around the contact part and in turn causes wrong pose estimations. In contrast, ours reconstructs both avatars and poses correctly*
-
-![[assets/figures/papers/paper_list_l1757_AvatarPose_Avatar_guided_3D_Pose_Estimation_of_Close_Human_Interaction_f/figures/009_Figure.jpg]]
-*Figure: GT Joint Opt Alternating Opt*
-
-
-
 ## 定位与知识库关联
 
 ### 方法对比与谱系定位
@@ -317,8 +297,6 @@ AvatarPose 的方法论突破在于**改变了姿态优化的目标函数**：�
 3. **动态人数扩展。** 分层体积渲染框架能否与在线实例检测/跟踪机制结合，处理人数动态变化或未知的开放场景？这需要解决化身模型的动态创建与销毁问题。
 
 4. **轻量化加速。** 能否利用更轻量的神经表示（如三平面分解、张量分解或高斯泼溅）替代当前的哈希编码辐射场，在保持渲染质量的同时大幅加速化身学习和姿态优化，以满足实时运动捕捉需求？
-
-
 
 ## 原文 PDF
 

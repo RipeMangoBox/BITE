@@ -51,8 +51,6 @@ AGILE将拼图求解建模为逐步代码交互过程：模型在每个步骤生
 
 实验结果表明，AGILE将2×2拼图平均准确率从9.5%提升至82.8%，Score从29.4%提升至89.0%。更重要的是，训练后模型在9个通用视觉基准上平均性能提升3.1%，其中HRBench4K提升4.2%、HRBench8K提升5.2%、VStarBench提升4.2%，验证了感知推理能力的有效泛化。消融实验进一步确认，去除Crop/Zoom操作后下游任务平均性能从63.9%降至63.5%，表明细粒度局部观察行为对获得鲁棒感知推理至关重要。
 
-
-
 ### 大视觉-语言模型的感知推理瓶颈
 
 大视觉-语言模型（VLMs）在图像描述、视觉问答等任务上取得了显著进展，然而当任务需要**全面的视觉理解**和**结构化的空间推理**时，现有模型的表现却大幅退化。一个令人警醒的发现是：即便是简单的2×2拼图任务，当前先进VLM的准确率仅为9.5%，几乎等同于随机猜测水平（Table 1, Qwen2.5VL-7B Cold-Start）。这一结果揭示了一个深层问题——现有VLM虽然能够识别物体和场景，但在需要细粒度视觉辨别、空间关系建模和多步推理整合的任务上，其底层感知机制存在根本性缺失。
@@ -84,8 +82,6 @@ AGILE的核心动机源于一个关键洞察：**拼图求解天然是一个需�
 
 正是基于上述动机，AGILE将拼图求解重新定义为**逐步代码交互过程**：模型在每一步生成Python代码调用预定义API（Swap、Observe、Crop、Zoom），环境执行代码并返回更新后的视觉观察。通过冷启动监督微调使模型掌握基本交互能力，再通过组相对策略优化（GRPO）驱动模型在探索与反馈中迭代增强感知与推理效率。最终目标不仅是让模型学会解拼图，更是通过这一结构化交互训练，从底层强化VLM的视觉感知机制，使其在一般视觉理解任务上获得可泛化的性能提升。
 
-
-
 ## 核心方法与创新机理
 
 AGILE的核心创新在于将**拼图求解**建模为一个**逐步代码交互的代理任务**，并通过**可编程合成数据**与**强化学习**的协同，从根本上改变了视觉-语言模型（VLM）感知与推理能力的获取方式。相较于现有VLM依赖静态多模态QA数据或单轮推理的范式，AGILE在四个关键维度上实现了系统性突破。
@@ -109,8 +105,6 @@ AGILE定义了一套**Python API驱动的动作空间**，使模型能够执行�
 $$R = \alpha \cdot R_{\mathrm{acc}} + \beta \cdot R_{\mathrm{format}} + \gamma \cdot R_{\mathrm{step}}$$
 
 其中步数奖励 $R_{\mathrm{step}}$ 在正确完成时按实际步数惩罚（$\lambda=-0.05$），错误时赋予最大步数惩罚，鼓励模型用最少有效步骤完成拼图。消融实验证实，移除步数奖励（$\gamma=0$）会导致VStarBench和MMVP性能明显下降（Table 6），验证了效率导向奖励对于培养高效交互策略的必要性。
-
-
 
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_3kouij8BWi/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the AGILE framework. (a) depicts the interaction process between the model and the external environment, together with the implementation of the GRPO algorithm; (b) shows the collection of high-quality jigsaw trajectory data; and (c) illustrates the model–environment interaction during the jigsaw rollout process*
@@ -138,8 +132,6 @@ AGILE 将拼图求解建模为**逐步代码交互过程**，其核心 pipeline 
 - **Zoom**：放大选定区域以检查细粒度纹理和边缘连续性
 
 这种代码驱动的交互设计使得环境能够返回精确的视觉反馈信号，为 GRPO 提供密集的训练奖励，驱动模型在探索与反馈中迭代增强感知和推理能力。消融实验表明，去除 Crop/Zoom 动作会导致下游任务平均性能下降约 0.4%（Table 8），验证了细粒度局部观察行为对鲁棒感知推理学习的关键作用。
-
-
 
 ### 3.1 交互环境与动作空间
 
@@ -196,21 +188,13 @@ $$
 
 RL训练数据通过可编程规则自动生成：从高分辨率自然图像、OCR文档图像、真实场景图像等多源数据中，将图像分割为 $m \times m$ 网格并随机打乱，自动生成大规模、难度可控的拼图实例。难度由初始正确块数 $N$ 控制（$N$ 越小，打乱程度越高，难度越大）。这种合成方式无需人工标注，理论上可无限扩展训练数据规模。
 
-
-
 ## 实验与关键发现
 
 ### 拼图任务性能：从随机猜测到高精度求解
 
 AGILE 将拼图求解从近乎随机猜测的水平提升至高精度完成，验证了交互式强化学习对感知与推理能力的根本性强化。Table 1 展示了 2×2 和 3×3 拼图设置下的准确率结果。
 
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_3kouij8BWi/figures/003_Table_1.jpg]]
-*Table 1: Jigsaw Acc result. LN indicates the difficulty level, where N denotes the initial number of correct pieces. A smaller N corresponds to a more scrambled jigsaw and higher difficulty. The best results are highlighted in bold, and the second-best results are underlined*
-
 在 2×2 拼图上，基座模型 Qwen2.5-VL-7B 经冷启动 SFT 后平均准确率仅为 **9.5%**，接近随机水平（25%），表明现有 VLM 缺乏基础的细粒度视觉辨别与空间关系推理能力。经 AGILE 交互式 RL 训练后，平均准确率跃升至 **82.8%**（+73.3 个百分点），在所有难度级别（L0–L7）上均大幅超越冷启动基线和 GPT-4o、Gemini-2.5-Pro 等闭源模型。Table 2 的 Score 指标同样印证这一趋势：平均 Score 从 29.4% 提升至 89.0%，说明模型不仅完成拼图，而且以更少的有效步骤完成。
-
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_3kouij8BWi/figures/004_Table_2.jpg]]
-*Table 2: Jigsaw Score result. LN indicates the difficulty level, where N denotes the initial number of correct pieces. A smaller N corresponds to a more scrambled jigsaw and higher difficulty. The best results are highlighted in bold, and the second-best results are underlined*
 
 在更具挑战性的 3×3 拼图上，冷启动 SFT 准确率降至 0.4%，而 AGILE 训练后达到 **20.8%**（+20.4 个百分点）。尽管绝对数值仍较低，但这一提升幅度表明交互式学习范式具备向更复杂空间推理任务扩展的潜力。当前 3×3 训练受限于上下文窗口长度，是性能进一步提升的主要瓶颈。
 
@@ -238,9 +222,6 @@ Table 8 显示，移除 Crop/Zoom 操作后，下游任务平均性能从 63.9% 
 
 Table 6 的奖励系数消融表明，移除步数奖励（γ=0）导致 VStarBench 和 MMVP 性能明显下降。步数惩罚（R_step）的设计机制是：正确完成时按实际步数惩罚（λ=−0.05），错误时赋予最大步数惩罚。这一设计鼓励模型以最少有效步骤完成拼图，抑制无意义的随机尝试行为，从而在 RL 过程中形成高效的观察-行动策略。值得注意的是，为防止模型在 RL 早期“破解”步数奖励，该惩罚仅在拼图正确完成时生效。
 
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_3kouij8BWi/figures/018_Table_6.jpg]]
-*Table 6: Ablation on Reward Coefficients. Sensitivity analysis of the weighting coefficients $\alpha , \beta$ , and γ in the total reward
-
 #### 冷启动数据规模消融：RL 是性能提升主因
 
 Table 10 显示，将冷启动 SFT 数据集从 1.6K 扩展至 2.4K 和 3.2K 仅带来微弱差异。同时，Table 8 表明完全去除专家轨迹、仅靠交互式 RL 训练仍可实现 +1.8% 的平均性能提升。这两项消融共同证明：主要性能增益源自 RL 过程中的交互探索与反馈，而非对闭源模型 Gemini 2.5 Pro 的蒸馏。
@@ -261,9 +242,6 @@ Figure 4 和 Table 9 的对比实验进一步凸显拼图任务的独特训练�
 
 Table 7 展示了课程学习的有效性：在 2×2 拼图 RL 之后引入 3×3 拼图课程 RL 训练，所有 9 个下游基准均获得进一步提升。这表明通过渐进式难度递增，模型可将从简单拼图学到的感知推理策略迁移至更复杂的空间配置任务。然而，当前 3×3 训练受限于上下文窗口长度，更大尺寸（4×4 及以上）的课程扩展需要先解决交互轨迹的上下文压缩问题。
 
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_3kouij8BWi/figures/019_Table_7.jpg]]
-*Table 7: Results of 3 $\times$ 3 Jigsaw RL Training*
-
 ### 注意力图可视化证据
 
 Figure 12 的注意力图对比为感知机制强化提供了直观证据：AGILE 训练后，模型在图像关键区域（如物体边界、纹理细节）的注意力显著增强，热力分布更加集中和精确。这一可视化结果与下游细粒度基准的性能提升相互印证，表明交互式拼图训练确实在底层视觉编码器层面强化了特征提取能力。
@@ -272,18 +250,8 @@ Figure 12 的注意力图对比为感知机制强化提供了直观证据：AGIL
 
 尽管 AGILE 在 2×2 拼图上取得显著成功，3×3 拼图准确率仍仅 20.8%，暴露出当前方法的两个核心局限：其一，多轮交互导致上下文长度急剧膨胀，在 3×3 设置下常超出模型最大窗口限制；其二，随着网格增大，动作空间组合爆炸使得 RL 探索效率下降。这些失败模式指向未来工作的关键方向——设计更高效的交互机制（如外部记忆模块、分层动作空间）以支持更大规模拼图的 RL 训练。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_3kouij8BWi/figures/016_Figure_11.jpg]]
 *Figure 11: Visualization of Wandb curves in jigsaw RL optimization*
-
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_3kouij8BWi/figures/014_Table_4.jpg]]
-*Table 4: Key hyperparameters for SFT*
-
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_3kouij8BWi/figures/015_Table_5.jpg]]
-*Table 5: Key hyperparameters for RL*
-
-
 
 ## 定位与知识库关联
 
@@ -339,8 +307,6 @@ AGILE 以 **Qwen2.5-VL-7B**（Bai et al., 2025）为基座模型进行全参数�
 4. **零样本迁移能力**：AGILE训练的模型是否能零样本迁移到需要结构化感知的其他任务（如图像修复、目标检索）？当前实验仅覆盖标准视觉理解基准，更广泛的迁移能力有待验证。
 
 5. **感知机制的可解释性**：注意力图可视化（Figure 12）提供了初步的定性证据，但拼图训练究竟改变了VLM视觉编码器的哪些表征特性，仍需更系统的机制分析。
-
-
 
 ## 原文 PDF
 

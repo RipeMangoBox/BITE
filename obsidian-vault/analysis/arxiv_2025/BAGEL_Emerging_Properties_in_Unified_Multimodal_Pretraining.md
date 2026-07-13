@@ -85,15 +85,11 @@ BAGEL 属于**统一多模态预训练模型**，采用 decoder-only Transformer
 
 模型在涉及特定 IP、复杂文本渲染、反事实场景、对象交换和去模糊等任务上表现不佳，与 GPT-4o 相比仍有明显差距（Figure 17）。MoT 架构如何随着参数和数据规模进一步扩展、如何更有效地评估需要强多模态推理的任务，以及如何通过强化学习或对抗训练进一步优化，仍是待探索的开放问题。
 
-
-
 多模态人工智能正朝着统一理解和生成的方向演进，但当前方法面临一个核心瓶颈：**理解任务与生成任务在优化目标上的根本冲突**。理解任务通常依赖语义级别的视觉编码器（如 ViT）提取高层特征，而生成任务需要保留低层像素细节的潜空间表示（如 VAE）。现有统一模型要么采用单一 Dense Transformer 同时处理两种任务，导致优化困难；要么引入 External Diffuser 将生成信息压缩为潜变量再注入，形成信息瓶颈，限制了长上下文跨模态交互与复杂推理能力。
 
 BAGEL 的核心洞察在于：**将理解与生成的参数完全解耦，同时保持共享自注意力，能够缓解优化冲突，并随着数据规模扩大涌现出自由形式视觉编辑、世界建模和多步推理等复杂能力**。为此，BAGEL 提出了 Mixture-of-Transformers (MoT) 架构，为理解专家和生成专家分配独立的完整参数副本，仅共享自注意力层，从而在无瓶颈的前提下实现长上下文跨模态交互。同时，BAGEL 采用大规模交错多模态数据（文本、图像、视频、网页）进行预训练，并引入推理增强数据，推动模型从基本理解和生成逐步涌现出更高级的智能编辑与推理能力。
 
 实验证据表明，MoT 架构在生成 MSE 损失和理解 CE 损失上均优于 Dense 和 MoE 变体，收敛更快且最终损失更低（Figure 3）。随着训练 token 从 0.18T 增长至 3.61T，模型在 IntelligentBench 上的智能编辑得分从约 15 提升至 45，呈现出明显的涌现曲线（Figure 7）。此外，Chain-of-Thought 推理将 IntelligentBench 得分从 44.9 进一步提升至 55.3，并显著提升其他多模态推理基准（Table 8, Table 6, Table 9, Table 10）。这些结果共同验证了 MoT 架构设计和大规模交错数据训练的有效性。
-
-
 
 ## 核心方法与创新机理
 
@@ -135,8 +131,6 @@ BAGEL 的数据构成策略与架构设计形成了协同闭环。传统统一�
 ### 涌现能力的因果链
 
 上述创新构成了一个因果闭环：MoT 架构缓解了优化冲突，使得模型能够在大规模交错数据上进行有效训练；随着训练 token 量增加，模型从基本理解和生成能力逐渐**涌现**出自由形式视觉编辑、世界建模和多步推理等复杂能力。Figure 7 的涌现曲线显示，模型的智能编辑能力随训练 token 增加从 15 提升至 45，呈现明显的相变特征。这一涌现现象的根本驱动力在于：参数解耦消除了任务间的负向干扰，而共享注意力保证了跨模态信息的无损传递，使得模型容量能够被充分释放用于学习复杂的多模态推理模式。
-
-
 
 BAGEL 是一个统一多模态预训练模型，其核心设计目标是在一个解码器框架内同时实现高质量的多模态理解与生成，并缓解两类任务间的优化冲突。为此，模型在架构、编码、注意力与训练流程上进行了系统性设计。
 
@@ -229,8 +223,6 @@ BAGEL 采用多阶段训练策略，各阶段的数据构成与优化目标逐�
 - **输入**：任意交错的文本与图像序列，支持单图/多图/视频帧等视觉输入。
 - **输出**：对于理解任务，模型自回归生成文本 token；对于生成任务，模型输出视觉 token 经 Rectified Flow 去噪后解码为图像。两类输出可在同一序列中交替出现，实现“思考辅助生成”——即先生成推理文本，再基于推理结果生成图像，显著提升复杂编辑与多步推理任务的性能（Table 8, Table 6）。
 
-
-
 ### 架构设计：Mixture-of-Transformers (MoT)
 
 BAGEL 的核心架构创新在于采用 **Mixture-of-Transformers (MoT)** 设计，将多模态理解与生成的参数完全解耦，同时通过共享自注意力实现无瓶颈的跨模态交互。如 Figure 2 所示，模型包含以下关键模块：
@@ -279,16 +271,6 @@ $$
 
 该配置在所有训练阶段统一使用，旨在抑制损失尖峰，确保训练的稳定性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2505_14683/figures/010_Figure_5.jpg]]
-*Figure 5: Loss curves of different data ratios. Ablation experiments are carried out on a 1.5B LLM. "1g1u" means that the sampling ratio for generation and understanding data is set at 1:1*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2505_14683/figures/011_Figure_6.jpg]]
-*Figure 6: Loss curves of different learning rates. Ablation experiments are carried out on a 1.5B LLM. The sampling ratio for generation and understanding data is set at 1:1*
-
-
-
 ## 实验与关键发现
 
 ### 核心架构消融：MoT 为何有效
@@ -336,18 +318,9 @@ Figure 8 和 Figure 9 的定性对比进一步展示了这一涌现过程：在�
 
 WISE 基准评估文本到图像生成中的复杂语义理解和世界知识（Table 6）。BAGEL 在使用 Chain-of-Thought 推理后达到 **0.70** Overall 分数，相比不使用 CoT 的 0.52 提升 **+0.18**，且显著优于所有对比的专用和统一模型。
 
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2505_14683/figures/018_Table_6.jpg]]
-*Table 6: Comparison of world knowledge reasoning on WISE. WISE examines the complex semantic understanding and world knowledge for T2I generation. ‘Gen. Only’ stands for an image generation model, and ‘Unified’ denotes a model that has both understanding and generation capabilities. **: Results of GPT-4o are tested by [92]*
-
 #### 图像编辑与智能编辑
 
 在 GEdit-Bench 上（Table 7），BAGEL 展现出竞争力的编辑能力。而在更具挑战性的 IntelligentBench 上（Table 8），BAGEL 以 **44.9** 分大幅超越专用编辑模型 Step1X-Edit 的 14.9 分（**+30.0**），并接近私有系统 Gemini 2.0 的表现。值得注意的是，GPT-4o 在 350 题中仅回答了 318 题，BAGEL 则能够处理全部问题。Figure 12 的定性对比显示，BAGEL 能有效处理需要多步推理和世界知识的复杂编辑案例，而 Step1X-Edit 则完全失败。
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2505_14683/figures/020_Table_7.jpg]]
-*Table 7: Comparison on GEdit-Bench. All metrics are reported as higher-is-better (↑). G_SC, G_PQ, and G_O refer to the metrics evaluated by GPT-4.1*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2505_14683/figures/021_Table_8.jpg]]
-*Table 8: Comparison on IntelligentBench. IntelligentBench examines complex reasoning ability in an image-editing context. ∗∗: Results are reported only on the subset of cases answered (some responses were rejected). GPT-4o answered 318 of 350 questions, while Gemini 2.0 answered 349 questions*
 
 #### 推理增强的跨任务增益
 
@@ -367,13 +340,6 @@ Chain-of-Thought 推理带来的增益不仅限于 WISE。Table 9 和 Table 10 �
 ### 模型规模效应
 
 Figure 16 展示了模型规模对生成质量的影响：更大的模型展现出更好的提示遵循能力和更高的图像质量。这暗示 MoT 架构具有良好的可扩展性，但具体的扩展规律仍需进一步研究。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2505_14683/figures/005_Table_1.jpg]]
-*Table 1: Data statistics for BAGEL. Since data are randomly sampled during pre-training, the dataset size does not directly correspond to the total number of seen tokens. Multimodal interleaved data is highlight in gray*
-
-
 
 ## 定位与知识库关联
 
@@ -441,8 +407,6 @@ BAGEL 的当前能力边界主要体现在以下方面（Figure 17 失败案例�
 4. **推理能力深化**：Chain-of-Thought 推理已带来显著提升（IntelligentBench 从 44.9 到 55.3，Table 8），但如何进一步激发模型的推理能力——例如通过强化学习优化推理路径——仍是开放问题。
 
 5. **安全与对齐**：当前训练流程未包含强化学习或对抗训练阶段，可能限制了模型在安全性、偏见控制和用户偏好对齐方面的表现。
-
-
 
 ## 原文 PDF
 

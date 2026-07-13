@@ -51,8 +51,6 @@ claims:
 
 在MS-COCO 2014验证集的无条件生成任务上，SEG（σ→∞）将FID从vanilla SDXL的129.496降至88.215，同时LPIPS偏离度仅为0.536，实现了质量与副效应减少的Pareto改进。在文本条件生成中，SEG同样显著优于无CFG的基线（FID: 26.169 vs. 53.423），且CLIP Score有所提升。
 
-
-
 ### 扩散模型引导的瓶颈
 
 扩散模型通过逐步去噪将随机噪声转换为高质量图像，其采样过程由反向随机微分方程（SDE）描述：
@@ -97,8 +95,6 @@ $$E ( \mathbf { A } ) : = \sum _ { i = 1 } ^ { H } \sum _ { j = 1 } ^ { W } E ^ 
 
 这一设计将无条件引导从启发式工程提升为具有明确数学基础的框架，为扩散模型的引导技术开辟了新的理论路径。
 
-
-
 ## 核心方法与创新机理
 
 SEG 的核心创新在于为扩散模型的无条件引导提供了一个**有理论可解释的操作机制**：将自注意力操作形式化为一个能量最小化步骤，通过高斯模糊降低该能量景观的曲率，并将曲率降低后的预测作为负向引导信号。这与现有无条件引导方法（**SAG**、**PAG**）形成根本性差异——后者依赖启发式扰动（模糊输入像素或替换为恒等注意力图），缺乏对引导效果的理论解释，且易产生细节平滑、颜色偏移等副作用。
@@ -130,8 +126,6 @@ $$E(\mathbf{A}) := \sum_{i=1}^{H}\sum_{j=1}^{W} E'(\mathbf{a}_{:(i,j)}), \quad E
 
 另一个关键创新在于**效果控制参数的重新分配**。在 CFG 和 PAG 中，引导强度（$\gamma_{\text{cfg}}$ 或 $\gamma_{\text{pag}}$）是唯一可调参数，增大引导尺度往往带来质量提升与副作用（如饱和、过饱和）的耦合。SEG 将控制权从引导尺度转移到高斯核标准差 $\sigma$：固定 $\gamma_{\text{seg}} = 3.0$（与 PAG 一致），通过增大 $\sigma$ 来持续改善图像质量（FID 和 CLIP Score），而无饱和现象（Table 2, Figure 6）。这种解耦使得 SEG 在无条件生成中实现了对 vanilla SDXL 的 **Pareto 改进**——FID 从 129.496 降至 88.215（$\sigma \to \infty$），同时 LPIPS 偏离度保持相似水平（Table 1）。
 
-
-
 Smoothed Energy Guidance (SEG) 是一种训练无关、条件无关的扩散模型引导方法。其核心思想是将自注意力操作重新解释为能量最小化步骤，通过高斯模糊降低注意力能量景观的曲率，并将平滑后的预测作为负向引导信号。整体框架由三个关键模块串联构成：高斯模糊查询模块、平滑得分网络、以及引导外推模块。
 
 **高斯模糊查询模块** 是整个流水线的入口。给定扩散模型中间层的查询矩阵 $\mathbf{Q}$ 和键矩阵 $\mathbf{K}$，标准自注意力权重通过 $\mathbf{A} = \text{softmax}(\mathbf{Q}\mathbf{K}^\top / \sqrt{d})$ 计算。SEG 在此处引入一个 2D 高斯滤波器 $G$，其标准差 $\sigma$ 是可调节的核心超参数。根据 Proposition 3.1，对注意力权重矩阵 $\mathbf{Q}\mathbf{K}^\top$ 进行高斯模糊等价于对查询矩阵 $\mathbf{Q}$ 进行模糊后再与 $\mathbf{K}$ 计算内积：$G \ast (\mathbf{Q}\mathbf{K}^\top) = (G \ast \mathbf{Q})\mathbf{K}^\top$。这一等价性使 SEG 避免了直接模糊整个 $HW \times HW$ 注意力矩阵的二次复杂度，只需对 $\mathbf{Q}$ 做空间卷积即可。
@@ -146,12 +140,8 @@ $$d\mathbf{x} = \big[\mathbf{f}(\mathbf{x}, t) - g(t)^2 \big(\gamma_{\text{seg}}
 
 **输入输出流**：输入为纯噪声 $\mathbf{x}_T \sim \mathcal{N}(0, \mathbf{I})$（无条件生成）或噪声加条件嵌入（条件生成）。在每个去噪步骤中，得分网络执行两次前向传播——一次使用原始注意力权重得到 $\mathbf{s}_\theta$，一次使用模糊查询得到 $\tilde{\mathbf{s}}_\theta$。两者经引导外推模块组合后更新 $\mathbf{x}_t$，最终输出生成的图像 $\mathbf{x}_0$。该流水线无需任何额外训练，可直接应用于预训练的 SDXL 等扩散模型，且与 CFG、ControlNet 等条件控制方法兼容（通过 Eq. (10) 联合引导）。Figure 7 直观展示了原始采样过程与 SEG 修改后采样过程的对比，包括注意力权重和对应能量景观的变化。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_JK728xy8G7/figures/008_Figure_7.jpg]]
 *Figure 7: Pipeline of SEG. (a) Original sampling process, self-attention weights, and the corresponding energy landscape. (b) Our modified sampling process with blurred queries where*
-
-
 
 ### 3.1 自注意力作为能量最小化
 
@@ -208,12 +198,8 @@ $$d\mathbf{x} = [\mathbf{f}(\mathbf{x}, t) - g(t)^2((1-\gamma_{\mathrm{cfg}}+\ga
 
 与 SAG 和 PAG 等基线方法不同，SEG 的引导效果不通过 $\gamma_{\mathrm{seg}}$ 调节，而是通过高斯核标准差 $\sigma$ 控制。增大 $\sigma$ 意味着更强的模糊程度、更低的能量曲率，从而产生更强的引导效应。消融实验证实：增大 $\gamma_{\mathrm{seg}}$ 并不普遍改善 FID 和 CLIP Score，而增大 $\sigma$ 倾向于持续提升样本质量且无饱和现象（Figure 6）。这一机制解耦了引导强度与质量退化风险，是 SEG 实现 Pareto 改进的关键。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_JK728xy8G7/figures/013_Figure_12.jpg]]
 *Figure 12: Comparison between query and key blur across different values of σ*
-
-
 
 ## 实验与关键发现
 
@@ -264,9 +250,6 @@ $$d \mathbf{x} = [ \mathbf{f} ( \mathbf{x} , t ) - g ( t )^{2} ( ( 1 - \gamma_{\
 
 Figure 15–19 展示了 SEG 与 CFG 组合的实验结果。SEG 在 CFG 的基础上进一步改善了图像的真实性和细节丰富度，表明两种引导机制具有互补性——CFG 利用条件信息进行引导，而 SEG 通过平滑能量景观提升无条件预测的质量。
 
-![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_JK728xy8G7/figures/016_Figure_15.jpg]]
-*Figure 15: Experiment on the combination of SEG and CFG*
-
 ### 定性对比：副效应的消除
 
 Figure 5 的定性对比揭示了 SEG 相对于 SAG 和 PAG 的关键优势：
@@ -286,13 +269,6 @@ Figure 5 的定性对比揭示了 SEG 相对于 SAG 和 PAG 的关键优势：
 2. **时序注意力未验证**：SEG 尚未在视频生成或多视图扩散模型的时序注意力机制上进行验证，其在时序维度上的行为仍是开放问题。
 3. **偏见放大风险**：论文明确指出，SEG 提升生成质量的同时，可能无意中放大基线模型中已存在的社会偏见或有害刻板印象。目前缺乏专门的公平性或偏见评估实验，这一风险需要在实际部署中谨慎对待。
 4. **计算开销**：虽然通过模糊查询矩阵（Proposition 3.1）避免了直接模糊注意力权重的二次复杂度，但额外的模糊操作和双前向传播（原始预测 + 平滑预测）仍会带来一定的计算开销。论文未提供详细的推理时间对比数据。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_JK728xy8G7/figures/002_Figure_2.jpg]]
-*Figure 2: Unconditional generation using SEG*
-
-
 
 ## 定位与知识库关联
 
@@ -341,8 +317,6 @@ $$d \mathbf { x } = [ \mathbf { f } ( \mathbf { x } , t ) - g ( t ) ^ { 2 } ( ( 
 - 对于不同结构（如DiT）或不同任务（如NLP中的注意力模型），SEG的能量曲率平滑框架是否具有普适性？
 - 能否设计更精细的能量函数或自适应模糊策略，以进一步解耦质量提升与副作用，并量化偏见放大的风险？
 - 在更广泛的扩散模型规模（从SD 1.5到SDXL再到更大模型）上，SEG的性能增益是否具有单调性？
-
-
 
 ## 原文 PDF
 

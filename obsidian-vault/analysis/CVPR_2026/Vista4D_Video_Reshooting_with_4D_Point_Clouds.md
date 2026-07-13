@@ -194,11 +194,6 @@ $$\mathcal{L} = \epsilon_{\theta}(\mathbf{X}_{t}^{\mathrm{tgt}}, \mathbf{X}^{\ma
 
 上述三个模块形成了一条清晰的因果链：**时间持久点云**解决了静态内容在不同帧间的几何一致性问题，使模型在目标相机与源视频帧重叠较少时仍能保持精确的相机控制；**深度伪影训练**弥合了训练-推理分布差异，使模型学会纠正不完美几何而非简单复制点云伪影；**上下文源视频条件化**（帧串联方式）相比交叉注意力注入具有更强的自适应性，能够在点云几何严重错误时依赖源视频的外观信息进行修补。消融实验证实，联合使用深度伪影训练与上下文源视频条件是模型鲁棒性的必要条件——单独移除任一项都会导致输出出现明显的几何伪影或时间抖动（Supplementary F.1）；而去除静态像素的时间持久性则会导致静态内容保留不佳和相机控制精度下降（Supplementary F.2）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2604_21915/figures/003_Figure_3.jpg]]
-*Figure 3: Multiview 4D reconstruction artifacts. (a) Double reprojection [7] first renders the target video point cloud in the source camera, then rerendering it in the target camera to create occluded regions for paired training, thus viewing the target video depth map from its frontal, artifact-free view. (b) In contrast, rendering the source video point cloud from the target camera with dynamic multiview data exposes non-frontal-view artifacts that better match real-world inference. The above source-target video pair is from MultiCamVideo [10] with 4D reconstruction by STream3R [11]*
-
 ![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2604_21915/figures/020_Figure_16.jpg]]
 *Figure 16: Model architecture. The above diagram shows the model architecture for Vista4D. The fire icon indicates trainable parameters. We build upon Wan2.1-T2V-14B [2], and we omit timestep conditioning, text prompt to token embedding, modulation, layer normalization, output unshuffle, and diffusion model denoising in the diagram for simplicity. All patchify layers are initialized from the base video model besides that of the point cloud render alpha mask, which is zero-initialized. The camera encoder is zero-initialized, and the projector after self-attention is initialized as the identity affine transformation*
 
@@ -242,9 +237,6 @@ Table 3 报告了视频保真度指标。Vista4D 在所有指标上一致优于�
 
 Table 4 报告了用户研究结果，这是对上述定量指标的最终验证。参与者在三个维度上进行偏好判断：
 
-![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2604_21915/figures/007_Table_4.jpg]]
-*Table 4: User study. Participants consistently perfer Vista4D over baselines on source video content preservation, camera control accuracy, and overall video fidelity. Bold indicates best results*
-
 - **内容保留**：Vista4D 获得 77.38% 的偏好，而最高基线 CamCloneMaster 仅 11.03%。
 - **相机控制精度**：Vista4D 获得 77.38% 的偏好，最高基线仅 11.03%。
 - **总体保真度**：Vista4D 获得 77.38% 的偏好，最高基线仅 11.03%。
@@ -265,9 +257,6 @@ Table 4 报告了用户研究结果，这是对上述定量指标的最终验证
 
 Table 5 报告了预处理和推理时间。预处理包括 Grounded SAM 2 分割和4D重建，推理为扩散模型的多步去噪过程。具体数值需查看原文表格，但整体流程在单次视频重拍任务中是可接受的，且4D点云构建为一次性开销，支持同一场景的多次重拍复用。
 
-![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2604_21915/figures/022_Table_5.jpg]]
-*Table 5: Preprocessing and inference time. With user-defined dynamic keywords, inference preprocessing involves segmentation (Grounding SAM 2) and 4D reconstruction*
-
 ### 失败模式与局限
 
 尽管 Vista4D 展现出显著的鲁棒性，论文明确指出了两个局限：
@@ -276,16 +265,8 @@ Table 5 报告了预处理和推理时间。预处理包括 Grounded SAM 2 分�
 
 2. **内容偏见与伦理问题**：作为基于大规模预训练视频扩散模型的方法，Vista4D 继承了训练数据中的内容偏见，并可能被用于生成误导性内容或侵犯隐私。在实际应用中需谨慎处理内容所有权和转换性使用等伦理问题。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2604_21915/figures/024_Figure_19.jpg]]
 *Figure 19: Ablation on depth artifacts and source video conditioning. We show ablation samples on training with depth artifacts (we simulate training without depth artifacts by always doing double reprojection for point cloud rendering [7]) and source video conditioning (comparing our in-context/frame-concatenated source video conditioning with no source video and source video injected via cross-attention). Both examples above show 4D reconstruction artifacts carrying over to all ablations, such as on the car (left) or the man’s arm and hand (right, highlighted by yellow boxes). Notably, though injecting the source video via cross-attention can at times correct point cloud artifacts, we find that cros...*
-
-![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2604_21915/figures/009_Figure_6.jpg]]
-*Figure 6: Robustness to segmentation failure. We simulate segmentation failure by not segmenting the tennis racket as dynamic. Vista4D is generally robust to these point cloud streaks as it utilizes the in-context-conditioned source video to correct the artifacts*
-
-![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2604_21915/figures/011_Figure_8.jpg]]
-*Figure 8: 4D scene recomposition. By directly editing the 4D point cloud, Vista4D can recompose 4D scenes from the source video or other inserted videos. Importantly, our method synthesizes physically plausible lighting when inserting a rhino lit by sunlight through leaves into an otherwise overcast scene*
 
 ## 定位与知识库关联
 

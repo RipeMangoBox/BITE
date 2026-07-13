@@ -57,8 +57,6 @@ claims:
 
 值得注意的是，方差缩减并不总能转化为下游指标的提升——在DMD中尽管梯度方差大幅降低，FID并未改善——这揭示了方差与收敛动力学之间更深层的关系，也是未来研究的重要方向。
 
-
-
 ### 扩散模型作为冻结教师
 
 扩散模型已成为高质量生成的核心组件，其训练目标通常表示为带权重 $w(t)$ 的期望形式：
@@ -110,8 +108,6 @@ $$
 
 这三项技术均不改变原始优化目标，实现简单，且相互补充。论文的目标是建立一个**计算感知的方差记账框架**，通过有效计算乘数（ECM）和相对效率（RE）等指标，量化每种技术在同等计算预算下的实际收益，并揭示方差缩减何时、为何能转化为下游性能提升——以及何时不能。
 
-
-
 ## 核心方法与创新机理
 
 CARV（Compute-Aware Variance-Reduction）的核心创新在于**将方差缩减的视角从“优化目标设计”转向“梯度估计器的采样结构”**，在不修改原始损失函数的前提下，通过三个互补的采样策略实现2–3倍的有效计算乘数。其关键洞察是：在文本到3D优化、一步蒸馏和数据归因等任务中，渲染、编码或生成器前向传播等上游操作的成本远高于去噪操作，因此可以通过**缓存昂贵的中间结果**并**对廉价的噪声采样进行重分配**来换取方差缩减。
@@ -159,8 +155,6 @@ $$\hat{\nabla}_{\boldsymbol{\theta}}^{\mathrm{reuse}} = \frac{1}{R} \sum_{r=1}^{
 
 该框架使得不同采样策略可以在**相等每轮计算成本**下进行公平比较，而非仅比较等迭代数的方差。所有实验均以wall-clock时间为成本度量，确保对比的公平性。
 
-
-
 CARV (Compute-Aware Variance-Reduction) 是一个在冻结扩散教师下进行无偏梯度估计的方差缩减框架。其核心思想是：将计算开销从昂贵的上游操作（渲染、编码、生成器前向传播）转移到廉价的噪声采样和去噪操作上，同时保持估计器的无偏性。框架由三个互补的技术模块和一个计算感知的方差记账系统构成。
 
 ### Pipeline 总览
@@ -195,8 +189,6 @@ CARV 包含一个计算感知的方差记账系统，用于公平比较不同采
 - **每渲染分层 vs. 全局分层**：当 $K > 1$ 时，每渲染分层利用层次结构降低渲染内方差，与计算重用自然组合；当 $K = 1$ 时，每渲染分层退化为均匀采样，此时应使用全局分层。
 - **重要性采样提议**：使用基于显式权重的启发式提议 $q(t) \propto p(t) w(t)$，该提议实现简单、几乎零额外开销，且能达到神谕最优提议方差缩减的 94–97%。
 - **计算重用倍数 $K$ 的选择**：最优 $K$ 取决于上游成本与去噪成本的比值。当渲染/编码成本远高于去噪时，增大 $K$ 带来显著增益；当上游成本可忽略时，较小的 $K$ 即可。
-
-
 
 ### 3.1 问题形式化：扩散期望的蒙特卡洛估计
 
@@ -314,8 +306,6 @@ CARV 的完整梯度估计流程（Algorithm 1）：
 
 三个模块（计算重用、重要性采样、分层采样）均为**无偏的即插即用替换**，不改变原始优化目标，仅替换采样策略。
 
-
-
 ## 实验与关键发现
 
 ### 核心方差缩减效果：SDS 文本到3D优化
@@ -324,12 +314,10 @@ CARV 在 SDS 文本到3D 优化中实现了显著的有效计算乘数（ECM）�
 
 **Table 2** 进一步分解了各技术的相对效率（RE，即等 $(R,K)$ 配置下与均匀采样的方差比）。重要性加权单独提供约 1.05–1.24× 的 RE，分层采样单独提供约 1.0–3.0× 的 RE（取决于 $K$），两者组合后在 $K \in \{2,4,8\}$ 的甜区提供额外约 25–31% 的增益。这一互补性在 **Figure 11** 中得到详细量化：以 $(R=1, K=4)$ 为例，计算重用使方差降至基线的约 50%，同时成本降至约 65%；叠加 IW 和分层后进一步压缩方差。
 
-
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2605_21489/figures/017_Figure_11.jpg]]
 *Figure 11: Quantifying variance reduction from hierarchical cost awareness with importance weighting (IW) and stratification (Strat.). Combined effect of IW, stratification, and compute reuse on variance and ECM. Left: Variance (MSE to the ground-truth gradient late in SDS training, equal to variance for unbiased estimators) versus compute. Colors: uniform, IW, Strat, IW+Strat (red); points annotated by ( R , K ) . Middle: ECM vs. the uniform $\bar { ( }$ R = 2 , K = 1 ) baseline. Best K = 8 rows reach $\sim$ 2 . 6 $\times$ (uniform), $\sim$ 3 . 0 $\times \mathrm { ( I W ) }$ ， $\sim$ 3 . 0 $\times$ (Strat.), ∼ 3.3× (IW+Strat). Right: ECM isolating IW/Strat gains at fixed ( R , K ) ${ \mathrm { : } }$ Strat $\sim$ 1 0...
 
 **Figure 5** 从方差-计算量曲线给出了更直观的视角：IW+Strat 的曲线始终位于均匀基线下方，在等计算量下方差更低，在等方差下所需计算量更少。底部面板直接给出 ECM 随计算量变化的趋势。
-
 
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2605_21489/figures/006_Figure_5.jpg]]
 *Figure 5: Quantifying variance reduction from IW and stratification (SDS). Top: Variance $\operatorname { \mathrm { ( t r } } ( \operatorname { C o v } ( \nabla _ { \pmb { \theta } }$ ) ) ) late in training) vs. compute. Colors: uniform baseline and IW+Strat. Points annotated by ( R , K ) . Bottom: Effective compute multiplier vs. uniform baseline. Lines trace ( $\dot { R _ { } }$ = 1 , K ) , peaking at (1, 8): $\mathrm { \sim }$ 2 . 6 $\times$ (uniform), ∼ 3.3× (IW+Strat). Ablations in App. Fig. 11; breakdowns in Tables 1, 2. Figure 6: Quantifying Changes in Data Attribution. Top: Gradient variance vs. evaluations per data point. Stratified sampling beats uniform sampling at an equal budget. Bottom: Mean co...
@@ -354,24 +342,20 @@ CARV 在 SDS 文本到3D 优化中实现了显著的有效计算乘数（ECM）�
 
 1. **权重启发式的重要性采样几乎达到神谕性能**：**Figure 23** 比较了均匀采样、权重启发式提议 $q(t) \propto p(t) w_{\text{SDS}}(t)$ 和不可行的理论最优提议。权重启发式实现了神谕提议方差缩减的 94–97%，且几乎零额外开销（Table 6）。
 
-
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2605_21489/figures/031_Figure_23.jpg]]
 *Figure 23: Importance Sampling Strategy Comparison: Weight-Based Heuristic versus Oracle. This figure compares three importance sampling approaches for parameter gradient estimation: uniform sampling (baseline), our weight-based importance sampling using q ( t ) $\propto$ p ( t ) $w _ { \mathrm { S D S } }$ ( t ) as described in Sec. 3.1.2, and the intractable oracle proposal $q ^ { \star }$ ( t ) $\propto$ p ( t ) \| $\nabla _ { \theta } \mathbf { \bar { f } }$ ( t ) \| that requires computing per-timestep gradient norms. L e f t ${ \mathrm { : } }$ Parameter gradient variance versus compute budget in milliseconds. Points are annotated by ( R , K ) configurations. M i d d l e { : } Effective compute multiplier i...
 
 2. **每渲染分层 vs. 全局分层**：当 $K>1$ 时，每渲染分层（Eq. 15）优于全局分层（Eq. 14），因为它利用了层次化结构减少渲染内方差；当 $K=1$ 时每渲染分层退化为均匀采样，此时全局分层是必要选择（App. Fig. 24）。
-
 
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2605_21489/figures/032_Figure_24.jpg]]
 *Figure 24: Comparing Per-Render and Global Stratification Strategies. This figure ablates two stratified sampling approaches: per-render stratification (Eq. 15), which stratifies timesteps independently within each render’s K re-noisings, versus global stratification (Eq. 14), which stratifies timesteps across all R $\times$ K samples in the batch. Left: Variance versus compute budget for uniform baseline (orange), global stratification (green), and per-render stratification (purple). Points are annotated by (R, K) configurations. Middle: Effective compute multiplier isolating the gain from stratification by comparing to uniform sampling at the same (R, K) configuration. Right: Effective compute multipl...*
 
 3. **计算重用的成本依赖性**：重去噪的增益高度依赖于上游操作（渲染/编码）与去噪操作的成本比值。当上游成本远大于去噪成本时，增大 $K$ 可显著提升效率；当上游成本可忽略时，最优 $K$ 较小（App. Fig. 21）。在 SDS 实验中，渲染成本占主导，因此 $K=8$ 附近为甜区。
 
-
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2605_21489/figures/027_Figure_21.jpg]]
 *Figure 21: Sensitivity of variance reduction to render-vs-denoise cost ratio. Analysis of Fig. 11 repeated with simulated cost $\boldsymbol { B } = \alpha \boldsymbol { R } + \boldsymbol { R } \boldsymbol { K }$ to isolate render cost. Top (α = 0): Render free; re-noising still reduces variance but benefit saturates ( K $\leq$ 2 ) . Bottom ( $\alpha$ = 1 ) $\colon$ Equal cost; higher K gives larger ECM as render amortization grows. Colors and annotations follow Fig. 11
 
 4. **提示词鲁棒性**：**Table 7** 的提示词消融显示，IW+Strat 在五个不同提示词下均以 $\bar{K}=8$ 为最优配置，表明该方法对提示词变化具有较好的鲁棒性。
-
 
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2605_21489/figures/033_Table_7.jpg]]
 *Table 7: Prompt ablation for variance reduction methods. Five prompts (emerald beetle, gold mask, mahogany piano, orchid pot, teddy bear). (a) ECM for IW+Strat by K; $\bar { \boldsymbol { K } } = \bar { \boldsymbol { 8 } }$ is optimal across prompts. (b) RE vs. uniform for IW+Strat; peak at K = 2 - 4 . (c) ECM for all methods at K = 8 ; rankings (IW+Strat > IW ≈ Strat > Uniform) are stable. (d) RE vs. uniform at K = 8 ; $\operatorname { I W }$ and Strat are complementary across prompts. (a) ECM by K (IW+Strat)
@@ -379,29 +363,6 @@ CARV 在 SDS 文本到3D 优化中实现了显著的有效计算乘数（ECM）�
 ### 公平性保障
 
 所有比较均在**相等的每轮计算成本（wall-clock time）**下进行。方差测量使用 Welford 在线算法，并与高样本参考值交叉验证以确保估计准确。所提方法均为**无偏估计器**，不改变原始优化目标，仅替换采样策略，因此性能提升完全归因于方差缩减而非目标函数的修改。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2605_21489/figures/015_Figure.jpg]]
-*Figure: Total Time (ms) Per-Iteration Compute (ms)*
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2605_21489/figures/019_Figure_13.jpg]]
-*Figure 13: Variance reduction across training, low classifier-free guidance $\left( \omega$ = 2 5 $\right$) . Analogous to Fig. 11, measured at three optimization checkpoints. Rows: training step 1000, 2000, and 9000. Left: variance vs. compute. Middle: effective compute multiplier vs. the uniform ( R = 2 , K = 1 ) baseline. Right: relative efficiency vs. uniform at matched ( R , K ) . Higher K wins more strongly early in training, when rendering is more expensive relative to denoising and re-noising amortizes that cost most efficiently; the gap closes in late training but variance reduction continues to dominate the uniform baseline at every checkpoint, demonstrating that the wins persist throughout opti...
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2605_21489/figures/020_Figure.jpg]]
-*Figure: Total Time (ms) Per-Iteration Compute (ms)*
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2605_21489/figures/022_Figure.jpg]]
-*Figure: Total Time (ms) Per-Iteration Compute (ms)*
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2605_21489/figures/030_Figure_22.jpg]]
-*Figure 22: Weight function closely tracks gradient magnitude across timesteps. We visualize empirical gradient norms as a function of timestep t during SDS optimization, alongside the proposal densities used for importance sampling (right axes). Left: Latent-space gradient contribution \| $w _ { \mathrm { S D S } }$ ( t ) $\mathbf { r }$ \|$_ { 2 }$ , where ${ \bf$ r } = $\hat { \epsilon } _ { \phi } ( { \bf$ z $} _ { t }$ , t , ${ \bf$ c } ; $\omega$ ) - $\epsilon$ is the noise prediction residual. Right: Full parameter gradient norm \| $\mathbf { f }$ ( t , $\pmb { \xi }$ ) \|$_ { 2 }$ aggregated over camera views, renders, and noise. The weight-based proposal q \ $\propto$ \ p ( t ) $w _ { \mathrm { S D S } }$ ( t ) closely...
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2605_21489/figures/035_Figure.jpg]]
-*Figure: Training Steps (×1000) Training Steps (×1000) Total Training Time (hours) Total Training Time (hours)*
-
-
-
 
 ## 定位与知识库关联
 
@@ -466,8 +427,6 @@ ECM/RE 的计算需要将每个估计器运行至收敛（Sec. 3.2），这在�
 5. **跨模态扩展**：在 4D 场景优化、音频生成、物理仿真等跨模态任务中扩展方差缩减，并评估在不同教师架构和预测参数化下的迁移效果。
 
 6. **最优配对分布的在线近似**：如何在不解决完整传输问题的情况下，在线近似 Sinkhorn 最优配对分布以进一步降低方差？
-
-
 
 ## 原文 PDF
 

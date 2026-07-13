@@ -64,8 +64,6 @@ MF-GIA 在图基础模型谱系中占据独特位置：与传统 GNN（如 **GCN
 
 在跨域少样本节点分类与边分类任务上，MF-GIA 展现出显著优势。以 5-shot 节点分类为例，在引文网络 Cora 上达到 63.98%，在电商图 ogbn-Products 上达到 22.61%，在合著网络 Physics 上达到 88.92%。在知识图谱边分类任务中，MF-GIA 在 FB15K237 上 1-shot 准确率达 98.77%，较 GraphAlign 提升 15.75 个百分点。消融实验证实，域嵌入驱动的特征对齐与标签对齐、DPAA 机制及 episodic 训练范式均为关键贡献因素。此外，MF-GIA 在不同特征编码（BoW、RoBERTa、LLaMa2-7B 等）下性能稳健，验证了其模态无关性。
 
-
-
 ### 图基础模型的上下文学习困境
 
 图基础模型（Graph Foundation Models, GFMs）旨在像大语言模型（LLMs）一样，通过预训练获得跨任务、跨领域的通用图理解能力。然而，现有 GFMs 在实现真正的上下文学习（In-Context Learning, ICL）时面临一个核心瓶颈：**难以同时满足三个基本条件**——无需后训练与参数更新（post-training-free）、跨域对齐（cross-domain alignment）和模态独立性（modality-free）。
@@ -97,8 +95,6 @@ MF-GIA 在图基础模型谱系中占据独特位置：与传统 GNN（如 **GCN
 这一动机的关键洞察在于 **梯度指纹（gradient fingerprint）**：从共享的固定初始化出发，对每个图进行单步梯度更新，得到的参数位移 $\Delta\theta_i = \theta_i - \theta_0$ 编码了该图的特征、标签与结构的联合分布特性。不同域的图因其内在属性的差异，会产生不同的梯度指纹；相似域的图则产生相近的指纹。这一机制使得梯度指纹可以作为**无外部监督的域描述符**，驱动后续的对齐过程。
 
 基于梯度指纹，MF-GIA 通过轻量级的域条件 FiLM 变换，将任意预编码的特征和本地标签 ID 投影到统一的语义空间，同时保持域内几何结构。配合双提示感知注意力（DPAA）和 episodic 预训练目标，模型学会在参数冻结的条件下，仅依靠少量支持示例进行跨域上下文推理。这一设计使得 MF-GIA 成为首个同时满足“无需后训练、跨域对齐、模态无关”三项准则的图上下文学习方法。
-
-
 
 ## 核心方法与创新机理
 
@@ -148,8 +144,6 @@ $$\min_\Phi \mathbb{E} \left[ -\frac{1}{|\mathcal{Q}|} \sum_{q \in \mathcal{Q}} 
 
 梯度指纹 → 域嵌入 → 域条件 FiLM（特征对齐 + 标签对齐）→ 统一语义空间 → DPAA 匹配 → 参数冻结推理。这一链条使 MF-GIA 成为首个在真正 ICL 三项准则上全部满足的方法，而所有基线方法至少缺失其中一项。
 
-
-
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_cDc95lucVL/figures/002_Figure_1.jpg]]
 *Figure 1: Overview of MF-GIA. (Left) Modality-free Alignment: The pretraining graphs are mapped to a unified space via domain-conditioned transformations. Domain descriptors e ensure similar domains occupy neighboring subspaces. (Middle) Episodic Pretraining: The model learns from m-way k-shot episodes using domain-aligned features and labels. The DPAA mechanism matches queries to classes using only prompts as context. (Right) In-context Prediction: For an unseen graph, the frozen model performs few-shot classification using the support set as a prompt*
 
@@ -183,8 +177,6 @@ MF-GIA 的整体 pipeline 围绕一个核心目标展开：让预训练模型在
 3. 通过 DPAA 匹配查询与支持示例，输出预测。
 
 这一流程实现了真正的 **post-training-free**：无需在任何目标任务上微调或学习提示，仅依靠支持集进行 in-context 适应。整个 pipeline 的输入是预编码的任意图数据（特征维度通过 SVD 统一至 $d_o$），输出是查询物品的类别预测，完全独立于底层模态。
-
-
 
 MF-GIA 的核心架构由四个紧密耦合的模块构成：域嵌入器（Domain Embedder）、特征对齐器（Feature Aligner）、标签对齐器（Label Aligner）和双提示感知注意力（DPAA）。这些模块协同工作，将任意预编码的图数据和本地标签 ID 投影到统一的语义空间，实现参数更新自由的少样本上下文推理。
 
@@ -258,8 +250,6 @@ $$\min_\Phi \mathbb{E}_{G_i \sim \mathcal{G}} \mathbb{E}_{\mathrm{episode} \sim 
 
 预训练完成后，所有参数 $\Phi$ 冻结。推理时仅需计算新图的梯度指纹、生成域嵌入、执行特征与标签对齐，再通过 DPAA 完成少样本匹配预测，全程无需任何参数更新。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -325,9 +315,6 @@ Table 8 展示了 MF-GIA 在 Cora 数据集上使用不同特征编码时的性�
 
 Table 10 显示，添加链接预测作为辅助预训练任务可进一步提升少样本准确率（例如 ogbn-Products 从 22.61% 提升至 24.59%）。这表明梯度指纹框架具有良好的可扩展性，能够兼容多任务预训练范式，结构信息的额外监督信号有助于域嵌入捕获更丰富的图拓扑特征。
 
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_cDc95lucVL/figures/015_Table_10.jpg]]
-*Table 10: Performance of MF-GIA with additional pretraining tasks (5-shot)*
-
 ### 失败模式与局限性
 
 尽管 MF-GIA 在跨域少样本场景下表现优异，仍存在以下已知局限：
@@ -336,25 +323,6 @@ Table 10 显示，添加链接预测作为辅助预训练任务可进一步提�
 2. **推理计算开销**：每个新图需额外进行一次反向传播以计算梯度指纹，虽然参数不更新，但相比纯前向方法仍有计算成本。
 3. **域分布偏移敏感性**：域嵌入的模板初始化和共享编码器可能对与预训练域完全不同的图分布敏感，在跨域泛化的边界处性能可能衰减。
 4. **任务覆盖范围**：当前仅在节点和边分类任务上验证，尚未探索图级别预测或生成任务，方法的通用性边界尚不明确。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_cDc95lucVL/figures/011_Figure_5.jpg]]
-*Figure 5: Pretraining curves of MF-GIA*
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_cDc95lucVL/figures/001_Table_1.jpg]]
-*Table 1: Comparison of methods with respect to the three main criteria of true ICL*
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_cDc95lucVL/figures/009_Table_5.jpg]]
-*Table 5: Effect of ICL scheme*
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_cDc95lucVL/figures/010_Table_6.jpg]]
-*Table 6: Dataset statistics*
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_cDc95lucVL/figures/014_Table_9.jpg]]
-*Table 9: Performance on MF-GIA with expressive dimension unification component*
-
-
 
 ## 定位与知识库关联
 
@@ -415,8 +383,6 @@ MF-GIA 采用完全 episodic 的元学习预训练范式，与推理时的少样
 - **任务扩展**：MF-GIA 的模态无关对齐机制能否扩展到图分类、链接预测以外的任务（如图生成、异常检测），并保持对异构模态的鲁棒性。
 
 - **谱理论连接**：梯度指纹与非欧结构的谱理论之间是否存在更深层的联系，能否指导更强大的对齐机制设计，值得进一步探索。
-
-
 
 ## 原文 PDF
 

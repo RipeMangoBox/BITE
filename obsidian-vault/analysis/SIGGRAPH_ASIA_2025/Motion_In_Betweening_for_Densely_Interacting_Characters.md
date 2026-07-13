@@ -269,13 +269,7 @@ $$\mathcal{L}_{\text{refine}} = \frac{1}{P} \sum^{P} (M_{\text{refine}}^{t+l} - 
 
 2. **交互建模（跨空间变换 + FiLM调制）**：去除交互建模后，重建性能下降约**20%**（Section 5.5）。定性结果（Fig. 9）显示角色之间出现严重穿透和不真实交互，说明跨空间相对表示和FiLM条件调制是产生物理合理交互的关键。
 
-![[assets/figures/papers/paper_list_l1810_Motion_In_Betweening_for_Densely_Interacting_Characters/figures/010_Figure_9.jpg]]
-*Figure 9: alitative comparison on interaction modeling. On the right, both characters exhibit significant penetration and unrealistic interactions*
-
 3. **交互周期性建模（周期性自编码器 + 对抗判别器）**：去除对抗判别器后，角色运动滑向关键姿势而缺乏真实交互行为（Fig. 14），表明成对关节距离动态的周期性编码和对抗训练对于维持长期交互模式至关重要。
-
-![[assets/figures/papers/paper_list_l1810_Motion_In_Betweening_for_Densely_Interacting_Characters/figures/015_Figure_14.jpg]]
-*Figure 14: alitative results without modeling interaction periodicity. The blue character is sliding to its keypose without interactive movement*
 
 ### 失败模式与局限性
 
@@ -286,18 +280,12 @@ $$\mathcal{L}_{\text{refine}} = \frac{1}{P} \sum^{P} (M_{\text{refine}}^{t+l} - 
 - **离线优化缺失**：系统不支持对已生成序列进行离线精细调整以实现更好的关键姿势对齐。
 - **时间控制缺失**：当前框架不支持中间插值的时间调节（如过渡快慢），因为这会显著增加建模复杂度。
 
-![[assets/figures/papers/paper_list_l1810_Motion_In_Betweening_for_Densely_Interacting_Characters/figures/016_Figure_15.jpg]]
-*Figure 15: Examples of deformed bones caused by long-term error accumulation*
-
 ### 重要图表结论
 
 - **Table 1**：完整方法在重建质量（L2P=0.192）、交互质量（判别器准确率=0.914）和FID（0.282）上全面领先，消融实验验证了运动细化器和交互建模的必要性。
 - **Fig. 8**：用户研究箱线图显示本方法评分与真实值相当，统计上显著优于所有基线，提供了最强的主观质量证据。
 - **Fig. 13/14**：消融可视化分别揭示了去除运动细化器导致的手部变形和去除交互周期性导致的滑移现象，为因果机制提供了直观证据。
 - **Fig. 5**：与Cross-Interaction Attention的对比直接暴露了简单注意力机制在长序列生成中的严重误差累积问题，反衬出跨空间解耦设计的优势。
-
-![[assets/figures/papers/paper_list_l1810_Motion_In_Betweening_for_Densely_Interacting_Characters/figures/007_Table_1.jpg]]
-*Table 1: antitative results compared with previous methods and ablated versions. All comparison methods and ablated networks are trained on Boxing dataset only*
 
 ## 定位与知识库关联
 

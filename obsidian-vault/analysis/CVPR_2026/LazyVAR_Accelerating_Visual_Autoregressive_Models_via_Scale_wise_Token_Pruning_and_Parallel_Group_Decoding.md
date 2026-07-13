@@ -56,8 +56,6 @@ claims:
 
 实验结果表明，LazyVAR 在 Infinity（Han et al., arXiv 2024）和 HART（Tang et al., arXiv 2024）两个基线模型上均实现了显著的推理加速与质量保持：在 GenEval 基准上，Infinity+LazyVAR 的推理时间从 1.38 s 降至 0.47 s（2.94× 加速），GenEval Overall 从 0.685 微升至 0.686；HART+LazyVAR 的推理时间从 0.80 s 降至 0.48 s（1.67× 加速）。在 MJHQ-30K 上，FID 仅从 9.80 微增至 9.83，几乎无质量损失（Table 1）。消融实验进一步验证了 UIGTP 剪枝准则和 PGD 并行策略各自的有效性，其中 PGD 在剪枝基础上额外贡献约 1.45× 加速，且质量几乎无损失（Table 7）。
 
-
-
 ### 视觉自回归模型的计算瓶颈
 
 视觉自回归（Visual Autoregressive, VAR）模型将传统自回归生成从“下一个令牌”转变为“下一个尺度”，通过多尺度令牌图逐级生成高分辨率图像。然而，这一范式面临两个根本性的计算挑战：
@@ -89,8 +87,6 @@ $$\hat{f}_k = \hat{f}_{k-1} + \mathrm{Interpolate}\big(r_k, (h_K, w_K)\big)$$
 ### 本文动机
 
 上述发现揭示了 VAR 模型大尺度推理中存在大量可被安全剪枝的冗余计算，且更新模式的可预测性为并行解码提供了近似依据。基于此，LazyVAR 提出了一种**无训练、即插即用**的加速方案：利用尺度级更新指标（Update Index）指导大尺度令牌剪枝，同时将更新微小的连续尺度编组实现并行解码，从而在几乎不损失生成质量的前提下大幅降低推理延迟。
-
-
 
 ## 核心方法与创新机理
 
@@ -129,8 +125,6 @@ UIGTP 与 PGD 并非独立运作，而是形成正向协同：UIGTP 削减了每
 
 与同期工作 **FastVAR**（Guo et al., arXiv 2025）相比，LazyVAR 的剪枝准则具有根本性差异。FastVAR 采用基于频率的 PTS 准则进行令牌选择，而 LazyVAR 的 Update Index 直接从相邻聚合潜特征的余弦相似度导出。消融实验（Table 8）显示，将 LazyVAR 的剪枝准则替换为 PTS 后，GenEval Overall 从 0.686 降至 0.665，表明更新驱动的剪枝准则在保持生成质量方面具有显著优势。这一差异的根源在于：Update Index 直接度量了令牌在潜空间中的实际更新幅度，与生成质量的关系更为紧密；而频率准则仅间接反映令牌的重要性，可能错误地剪除对细节生成关键的低频但持续更新的令牌。
 
-
-
 LazyVAR 是一种无训练、即插即用的 VAR 模型加速方法，其整体流程如 **Figure 4** 所示。该方法的核心思想是：在保持小尺度完整不变以维护生成图像的语义与结构完整性的前提下，对大尺度进行选择性令牌剪枝和并行组解码，从而大幅减少活跃令牌数量和串行解码步骤。
 
 ![[assets/figures/papers/paper_list_l892_https_openaccess_thecvf_com_content_CVPR2026_html_Mao_LazyVAR_Accelerati/figures/005_Figure_4.jpg]]
@@ -166,8 +160,6 @@ $$\tilde{r}'_{k+m} = \mathrm{Interpolate}\bigl(\hat{f}_{k-1}, (h_{k+m}, w_{k+m})
 - **分组策略与剪枝比例协同**：以 Infinity 模型为例，默认将尺度 10-13 编为一组（$p=4$），各尺度令牌保留比例分别为 $[20\%, 10\%, 5\%, 1\%]$；HART 模型则将尺度 12-13 编为一组，保留比例 $[30\%, 20\%]$。这种协同设计在加速比与生成质量之间取得了最优平衡。
 - **近似假设的合理性**：并行组解码的核心近似 $\tilde{r}_{k+m} \approx \tilde{r}'_{k+m}$ 依赖于相邻尺度聚合特征高度相似的观察——在大尺度上约 94% 令牌的余弦相似度超过 0.95（**Figure 2**），且 Update Index 的跨尺度 Spearman 相关显著（**Figure 3c**），为近似提供了实证支撑。
 
-
-
 LazyVAR 由两个核心模块构成：**尺度级令牌剪枝（Update Index Guided Token Pruning, UIGTP）** 和 **并行组解码（Parallel Group Decoding, PGD）**。二者共同作用于 VAR 模型的大尺度推理阶段，通过减少活跃令牌数量和打破串行依赖实现加速。
 
 ### 聚合潜特征与更新指标
@@ -185,9 +177,6 @@ $$
 $$
 
 该指标在空间维度上是逐令牌的：值越大，表示该令牌位置从尺度 $k-1$ 到 $k$ 的更新越显著。实证分析表明，在大尺度上约 94% 令牌的余弦相似度超过 0.95（Figure 2），且 Update Index 与生成图像补丁的像素方差存在显著 Spearman 秩相关（Figure 3b），说明模型在大尺度上优先更新高频细节令牌，而大部分令牌更新极小——这构成了剪枝的经验基础。
-
-![[assets/figures/papers/paper_list_l892_https_openaccess_thecvf_com_content_CVPR2026_html_Mao_LazyVAR_Accelerati/figures/003_Figure_2.jpg]]
-*Figure 2: Distribution of the cosine similarity between adjacent aggregated latent features across scales*
 
 ### 尺度级令牌剪枝（UIGTP）
 
@@ -219,8 +208,6 @@ $$
 
 在 **Infinity**（Han et al., arXiv 2024）上，剪枝从尺度 10 开始，尺度 10–13 编为一组，令牌保留率分别为 [20%, 10%, 5%, 1%]；在 **HART**（Tang et al., arXiv 2024）上，尺度 12–13 编组，保留率为 [30%, 20%]。两种配置均为无训练、即插即用，无需修改模型权重。
 
-
-
 ## 实验与关键发现
 
 ### 主要结果：推理速度与生成质量的权衡
@@ -238,9 +225,6 @@ LazyVAR 在两类 VAR 文本到图像模型上均实现了显著的推理加速�
 ![[assets/figures/papers/paper_list_l892_https_openaccess_thecvf_com_content_CVPR2026_html_Mao_LazyVAR_Accelerati/figures/008_Table_3.jpg]]
 *Table 3: Quantitative comparisons of FID and CLIP scores on several categories in the MJHQ-30K benchmark*
 
-![[assets/figures/papers/paper_list_l892_https_openaccess_thecvf_com_content_CVPR2026_html_Mao_LazyVAR_Accelerati/figures/011_Table_5.jpg]]
-*Table 5: Comprehensive quantitative evaluation on HPSv2.1*
-
 加速幅度的差异源于两个模型在大尺度上的相似性特性不同：Infinity 在大尺度上约 94% 令牌的余弦相似度超过 0.95（Figure 2），为激进剪枝提供了充分依据；HART 作为混合离散/连续模型，其聚合潜特征的相似性分布相对分散，因此仅对最后两个尺度进行剪枝和编组，加速比相应较低。
 
 ### 消融实验
@@ -255,27 +239,11 @@ LazyVAR 在两类 VAR 文本到图像模型上均实现了显著的推理加速�
 
 LazyVAR 的加速效果高度依赖于 VAR 模型在大尺度上的内部相似特性。对于相似性不足或架构差异较大的 VAR 变体，默认剪枝比例和分组策略可能需要重新调整，激进剪枝可能导致不可忽视的重建误差。此外，小尺度（尺度 1–8）必须完整保留以维持语义与结构的完整性，因此加速主要来源于大尺度阶段，对小尺度主导的模型加速空间有限。并行组解码在相邻尺度聚合特征相似性偏低时，近似输入可能引入额外的重建误差，这一问题在 HART 上已有所体现——其加速比（1.67×）显著低于 Infinity（2.94×）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l892_https_openaccess_thecvf_com_content_CVPR2026_html_Mao_LazyVAR_Accelerati/figures/009_Figure_5.jpg]]
-*Figure 5: Qualitative comparison among the original models and FastVAR baseline and our LazyVAR on 1024×1024 image generation*
-
 ![[assets/figures/papers/paper_list_l892_https_openaccess_thecvf_com_content_CVPR2026_html_Mao_LazyVAR_Accelerati/figures/014_Table_6.jpg]]
 *Table 6: Ablation on Pruning ratio. † indicates the default setting*
 
-![[assets/figures/papers/paper_list_l892_https_openaccess_thecvf_com_content_CVPR2026_html_Mao_LazyVAR_Accelerati/figures/012_Table_7.jpg]]
-*Table 7: Ablation on grouping strategy.† means the default setting*
-
-![[assets/figures/papers/paper_list_l892_https_openaccess_thecvf_com_content_CVPR2026_html_Mao_LazyVAR_Accelerati/figures/015_Table_8.jpg]]
-*Table 8: Ablation on Pruning criterion.† means the default setting*
-
 ![[assets/figures/papers/paper_list_l892_https_openaccess_thecvf_com_content_CVPR2026_html_Mao_LazyVAR_Accelerati/figures/013_Figure_6.jpg]]
 *Figure 6: Visualization of pruned tokens under different ratios*
-
-![[assets/figures/papers/paper_list_l892_https_openaccess_thecvf_com_content_CVPR2026_html_Mao_LazyVAR_Accelerati/figures/004_Figure_3.jpg]]
-*Figure 3: Investigation of the cosine similarity of aggregated latent features between adjacent scales in two families of VAR-based textto-image models, Infinity [22] and HART [55]. The text prompts are randomly sampled from a publicly available Midjourney v6 prompt dataset, with a total of 10,000 samples. In subfigure (b), Ours employs the cosine similarity of adjacent aggregated latent features as the pruning criterion, whereas PTS follows the approach proposed in FastVAR [21]*
-
-
 
 ## 定位与知识库关联
 
@@ -318,8 +286,6 @@ LazyVAR 的加速效果和适用性受以下边界条件约束：
 3. **与训练阶段加速的协同**：LazyVAR 是无训练的推理时加速方法，若与训练阶段的令牌压缩或高效注意力机制结合，是否存在协同增益或冲突？该方向尚未被探索。
 
 4. **理论误差界**：并行组解码以近似输入替代真实输入，其引入的误差在多大程度上受尺度间相似度约束？当前缺乏对近似误差与生成质量退化之间的理论分析。
-
-
 
 ## 原文 PDF
 

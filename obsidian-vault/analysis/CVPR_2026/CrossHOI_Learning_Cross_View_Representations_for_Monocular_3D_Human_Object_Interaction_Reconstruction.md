@@ -135,8 +135,6 @@ CrossHOI的整体流程围绕一个核心思想展开：**从单张RGB图像中�
 
 **关键设计选择。** 跨视角特征在初始重建和接触估计两个阶段均被引入，消融实验表明这种全阶段融合策略带来的增益最大。在顶点融合层面，双向交叉注意力（A↔B）在所有融合方向中表现最优，尤其在接触相关指标上提升显著，验证了双视角互补信息对于遮挡场景下接触推理的关键作用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1012_https_openaccess_thecvf_com_content_CVPR2026_html_Geng_CrossHOI_Learning/figures/002_Figure_2.jpg]]
 *Figure 2: Pipeline of the proposed CrossHOI. Image features*
 
@@ -237,8 +235,6 @@ Figure 7展示了CrossHOI与HOI-TG和CONTHO在BEHAVE和InterCap数据集上的�
 ### 失败模式与局限性
 
 尽管CrossHOI在两个基准数据集上取得了全面领先，论文仍指出了若干局限。首先，跨视角生成器的训练依赖多视角数据集（如BEHAVE、InterCap），在缺少多视角标注的场景下泛化能力有限。其次，物体重建仍然基于预定义的离散物体模板，无法处理未知类别或非刚性物体。此外，方法目前仅在室内固定物体的交互场景下验证，在开放世界、动态物体和复杂背景下的表现尚未评估。最后，虽然生成器本身是轻量的，但整体框架相比单视角方法增加了额外的特征生成与融合模块，实时性未作详细讨论，这在实际部署中可能需要进一步优化。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l1012_https_openaccess_thecvf_com_content_CVPR2026_html_Geng_CrossHOI_Learning/figures/004_Table_1.jpg]]
 *Table 1: Comparison of reconstruction quality*

@@ -121,8 +121,6 @@ S²AM3D 提出了一种**尺度可控、点提示驱动的三维点云部件分�
 
 **输出**：给定任意点提示 $p$ 和尺度 $s$，模型实时输出该尺度下对应部件的分割掩码，支持从精细零件到粗糙部件的连续粒度调控。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2092_https_openaccess_thecvf_com_content_CVPR2026_html_Su_S2AM3D_Scale_contro/figures/001_Figure_1.jpg]]
 *Figure 1: Paradigm comparison (left): Native 3D methods present limited generalization, and 2D-based methods fail in complex cases like occlusions. Our hybrid solution solves these issues. Performance Comparison (right): Our method reaches large-scale training performance with much less data and significantly outperforms previous methods at similar data scales*
 
@@ -243,8 +241,6 @@ Figure 7直观验证了连续尺度可控性：对同一提示点，当尺度s�
 3. **极端几何的鲁棒性。** 对于极度细长或严重遮挡的零件，2D先验本身可能失效，3D对比监督的补偿能力存在上限，此类场景下的分割一致性有待更系统的评估。
 
 > **注意：** 以上局限性的量化边界（如遮挡程度与性能退化的具体关系）在现有材料中未提供详细实验数据，建议读者在复现或应用时针对具体场景进行补充验证。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2092_https_openaccess_thecvf_com_content_CVPR2026_html_Su_S2AM3D_Scale_contro/figures/007_Table_2.jpg]]
 *Table 2: Quantitative comparison of full segmentation*

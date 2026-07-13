@@ -79,8 +79,6 @@ DIFFUGUARD在四个dLLM家族（LLaDA-8B-Instruct、Dream-v0-Instruct-7B、LLaDA
 
 框架对模型通用能力（MMLU、GSM8K、HumanEval）和推理速度的影响可忽略，实现了安全性与实用性的有效平衡。
 
-
-
 ### 扩散语言模型的解码范式与安全盲区
 
 离散扩散语言模型（dLLM）通过迭代去噪生成文本，其核心流程为：从全`[MASK]`序列开始，在每一步 $n$ 中并行预测所有掩码位置的候选token，再通过重掩码策略选择部分位置保留，其余位置重新掩码后进入下一步迭代：
@@ -113,8 +111,6 @@ DiffuGuard的核心洞察是：dLLM的安全瓶颈根植于解码策略，而非
 2. **块级审计与修复**（Block-level Audit and Repair）：利用模型内部表征偏差检测越狱攻击，并对不安全块执行引导式修正，阻断有害内容的跨块传播。
 
 该框架在四个dLLM家族（LLaDA-8B-Instruct、Dream-v0-Instruct-7B、LLaDA-1.5、MMaDA-8B-MixCoT）和六种越狱攻击方法上进行了验证，将平均ASR从47.9%降至14.7%（降低约33.2%），同时保持生成质量和推理速度几乎不受影响。
-
-
 
 ## 核心方法与创新机理
 
@@ -167,8 +163,6 @@ DIFFUGUARD的核心创新定位在于**不触及模型权重，仅改造解码�
 
 消融实验（Table 2）量化了两个槽位各自的贡献：移除Block-level Audit and Repair后，LLaDA-8B在PAD_AdvBench上的ASR从59.62%急剧上升至约90%，说明该模块是防御利用dLLM内在机制的攻击（如PAD、DIJA）的关键组件；移除Stochastic Annealing Remasking也会导致防御性能下降，尤其在预优化提示攻击（如AutoDAN）上表现明显。两个模块的互补性验证了从intra-step和inter-step双维度同时介入的必要性。
 
-
-
 ![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_zBPzxhso8M/figures/001_Figure_1.jpg]]
 *Figure 1: Left. The generation diagram of dLLMs; Middle. The unique vulnerabilities of dLLMs, including the intra-step and the inter-step level; Right. DIFFUGUARD framework achieves significant safety improvements while having minimal impact on model performance and inference latency*
 
@@ -206,8 +200,6 @@ $$\mathrm{SD}(p_0, p_{\text{origin}}) = 1 - \frac{\mathbf{h}_{\text{origin}} \cd
 
 整个pipeline的输入为提示$p_0$，输出为经过安全防护的生成文本。在每个生成步骤内，随机退火重掩码模块介入token保留决策；在每个块生成完成后，审计模块评估安全风险并决定是否触发修复。两个模块协同工作：随机退火从源头降低有害路径被选中的概率，审计修复则作为安全网捕获并纠正漏网的有害输出。
 
-
-
 DIFFUGUARD是一个训练无关的推理时防御框架，由两个正交模块构成，分别对应dLLM安全脆弱性的两个维度：**随机退火重掩码**（Stochastic Annealing Remasking）解决intra-step层面的贪婪选择偏差，**块级审计与修复**（Block-level Audit and Repair）阻断inter-step层面的有害内容跨块传播。
 
 ### 随机退火重掩码
@@ -241,14 +233,11 @@ $$\mathrm{Logits}'(\tilde{\tau}_i) = \begin{cases} -\infty & \text{if } \tilde{\
 
 消融实验（Table 2）证实：移除块级审计与修复模块后，LLaDA-8B在PAD_AdvBench上的ASR从59.62%急剧上升至约90%，说明该模块是防御利用dLLM内在机制攻击的关键组件；移除随机退火重掩码同样导致防御性能下降，但在AutoDAN等攻击上影响相对较小。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
 
 DIFFUGUARD在四个dLLM家族模型（LLaDA-8B-Instruct、Dream-v0-Instruct-7B、LLaDA-1.5、MMaDA-8B-MixCoT）和六种越狱攻击方法上进行了全面评估。综合来看，DIFFUGUARD将平均攻击成功率（ASR）从**47.9%降至14.7%**，降幅约33.2个百分点（Table 1）。
-
 
 ![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_zBPzxhso8M/figures/006_Table_1.jpg]]
 *Table 1: A Comprehensive Evaluation of DIFFUGUARD’s Safeguarding Performance. The table reports ASR(%), where bold and underline denote the best and the second-best values respectively*
@@ -263,7 +252,6 @@ DIFFUGUARD在四个dLLM家族模型（LLaDA-8B-Instruct、Dream-v0-Instruct-7B�
 
 Table 2的消融实验量化了两个核心模块各自的贡献：
 
-
 ![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_zBPzxhso8M/figures/009_Table_2.jpg]]
 *Table 2: Ablation study on the contribution of each component in DIFFUGUARD*
 
@@ -277,12 +265,10 @@ Table 2的消融实验量化了两个核心模块各自的贡献：
 
 Figure 6以雷达图展示了DIFFUGUARD对模型通用能力的边际影响。在MMLU、GSM8K、HumanEval等基准上，LLaDA和Dream模型应用DIFFUGUARD前后的性能几乎无衰减，同时PAD和WildJailbreak的防御成功率大幅提升。
 
-
 ![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_zBPzxhso8M/figures/007_Figure_6.jpg]]
 *Figure 6: Performance comparison of LLaDA (left) and Dream (right) across multiple metrics, such as safety and general capabilities, before and after applying DIFFUGUARD*
 
 **超参数α₀的敏感性**（Table 7）：较高的初始随机性α₀值可有效降低ASR，但需要在安全性与通用能力之间权衡。Dream模型在α₀=0.3时GSM8K准确率为76.35%，WildJailbreak ASR仅2.35%；当α₀增至0.5时，ASR进一步下降但通用能力开始出现可感知的退化。LLaDA模型对α₀的变化更为敏感，需要在更窄的范围内调参。
-
 
 ![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_zBPzxhso8M/figures/015_Table_7.jpg]]
 *Table 7: The impact of hyperparameter α0 on model safety and general capability*
@@ -310,31 +296,7 @@ Table 9评估了DIFFUGUARD对三种自适应攻击的鲁棒性：多采样攻击
 
 - **Figure 5（安全Token注入时机）**：在64步生成过程中，将“Sorry”注入第1步时ASR仅0.2%，延迟至第32步时ASR升至22.8%。早期干预相比中期干预可多降低ASR约22.6%，证实了安全干预的时机敏感性。
 
-![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_zBPzxhso8M/figures/005_Figure_5.jpg]]
-*Figure 5: ASR as a Function of the Safe Token Injection Step. The experiment was conducted over 64 generation steps, where we forcibly set the first position to “Sorry” at various steps (1, 2, 4, 8, 16, and 32) and recorded the final ASR*
-
 - **Figure 8（防御案例研究）**：在WildJailbreak攻击实例中，Vanilla模型直接输出有害化学物质列表，DIFFUGUARD则生成教育性拒绝回复；在PAD_AdvBench攻击实例中，Vanilla模型完全遵从恶意指令，DIFFUGUARD成功识别并阻断有害生成。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_zBPzxhso8M/figures/011_Table_3.jpg]]
-*Table 3: Hyperparameter Settings for Section 3.2*
-
-![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_zBPzxhso8M/figures/012_Table_4.jpg]]
-*Table 4: Hyperparameter Settings for Section 3.3*
-
-![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_zBPzxhso8M/figures/013_Table_5.jpg]]
-*Table 5: Generation hyperparameter settings for Section 5.2*
-
-![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_zBPzxhso8M/figures/014_Table_6.jpg]]
-*Table 6: DIFFUGUARD hyperparameter settings for Section 5.2*
-
-![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_zBPzxhso8M/figures/016_Table_8.jpg]]
-*Table 8: Comparison of λ and γ on model safety. All values are ASR (%)*
-
-
-
-
 
 ## 定位与知识库关联
 
@@ -370,8 +332,6 @@ DIFFUGUARD 与 Self-reminder 等提示级防御并非互斥关系——实验表
 **“Safety Tax” 现象。** MMaDA 系列表现出的推理能力增强训练削弱安全性的现象，说明复杂推理能力与安全性之间存在深层 trade-off。这一现象在多大程度上会泛化到其他推理增强型 dLLM，以及如何在训练阶段进行专门的安全对齐，仍是开放问题。
 
 **Dream 系列的安全迁移机制。** Dream 系列从 AR 模型（Qwen2.5-7B）继承安全对齐能力的机制能否被形式化并迁移到原生 dLLM 的训练中，对于提升整个 dLLM 家族的安全基线具有重要意义，但当前缺乏系统性研究。
-
-
 
 ## 原文 PDF
 

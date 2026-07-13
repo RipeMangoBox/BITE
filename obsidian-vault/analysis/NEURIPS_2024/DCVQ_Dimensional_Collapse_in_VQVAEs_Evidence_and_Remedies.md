@@ -59,8 +59,6 @@ claims:
 
 **局限与开放问题**：工作以实证为主，尚未提供维度塌缩的理论解释；验证限于图像域，能否推广至视频、蛋白质等其他模态有待探索；更优的子空间划分策略仍为开放问题。
 
-
-
 ### VQVAE的基本范式与隐忧
 
 向量量化变分自编码器（VQVAE）将连续编码器输出 $z$ 替换为码本中欧氏距离最近的条目 $\hat{z}$，训练目标为重建损失与承诺损失之和：
@@ -94,8 +92,6 @@ $$\mathrm{Effective Dim} = \min \left\{ d' : \sum_{j=1}^{d'} \lambda_{j} > 0.99 
 ### 本文动机
 
 上述发现指向一个核心洞察：**VQVAE的维度偏好是结构性的，而非偶然的训练产物**。直接对抗这一偏好（如秩正则化）已被证明无效。因此，本文提出一种根本性的策略转变——不再试图让模型适应高维空间，而是将高容量需求分解为多个低维子空间，在尊重维度偏好的前提下突破瓶颈。
-
-
 
 ## 核心方法与创新机理
 
@@ -139,8 +135,6 @@ DCVQ的有效性源于它**顺应而非对抗**量化过程的维度偏好。每
 
 计算开销方面，DCVQ的额外成本几乎可忽略：在总潜在维度匹配的条件下，其训练时间与标准VQVAE基本相同（Table 10），因为量化操作的计算量与总维度呈线性关系，与是否分割无关。
 
-
-
 DCVQ 在标准 VQVAE 的编码器-量化器-解码器流水线中，仅对量化环节做最小化结构改动，将原本的单一高维最近邻量化替换为“分而治之”的多子空间独立量化，其余模块完全继承 VQVAE 的设计。
 
 ### 模块构成与数据流
@@ -181,13 +175,6 @@ Figure 8 展示了这一分而治之的完整架构，Table 10 的消融实验�
 
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_pdf_fb28260ec5d8908f6f5be933299eb238f451d98d_pdf/figures/011_Figure_8.jpg]]
 *Figure 8: DCVQ divides the encoder output into multiple low-dimensional subspaces and quantizes each independently. The quantized subspaces are then merged via a direct sum (concatenation) and passed to the decoder. This divide-and-conquer strategy enables high total capacity while preserving the model’s preference for low-dimensional structure*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l16_https_openreview_net_pdf_fb28260ec5d8908f6f5be933299eb238f451d98d_pdf/figures/001_Figure_1.jpg]]
-*Figure 1: Illustration of dimensional collapse in VQVAEs. (a) Codebook entries lie in a lowdimensional subspace despite being in a high-dimensional embedding space. (b) Validation loss follows a U-shaped curve as a function of effective dimension, with the optimum at a low dimension*
-
-
 
 ### 问题建模：VQVAE 的量化与训练
 
@@ -233,16 +220,6 @@ $$\hat{z} = [\hat{z}^{1}, \hat{z}^{2}, \dots, \hat{z}^{N}] \in \bigoplus_{i=1}^{
 - **量化器数量 $N$**：增加 $N$ 可线性提升有效维度，且不损害重建质量（Figure 10），计算开销与匹配总维度的标准 VQVAE 几乎相同（Table 10）。
 - **与秩正则化的对比**：对编码器施加秩提升正则化（如 Barlow Twins、谱归一化）虽能提高有效维度，但系统性地增加了重建损失（Table 3），说明仅靠强制高秩输出无法替代 DCVQ 的分治策略——后者通过架构设计顺应而非对抗量化过程的维度收缩偏差。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l16_https_openreview_net_pdf_fb28260ec5d8908f6f5be933299eb238f451d98d_pdf/figures/009_Figure_7.jpg]]
-*Figure 7: Synthetic illustration of quantization bias via k-means clustering. (a) The ratio between centroid and data eigenvalues (log scale) shows that clustering preserves high-variance directions while attenuating low-variance ones. (b) A projection onto the first and last principal components confirms this effect visually: centroids (red) align with the high-variance axis, whereas variation along the low-variance direction is largely lost*
-
-![[assets/figures/papers/paper_list_l16_https_openreview_net_pdf_fb28260ec5d8908f6f5be933299eb238f451d98d_pdf/figures/007_Figure_6.jpg]]
-*Figure 6: Evolution of effective dimensionality over training steps for different background dimensions (d = 64, 128, 256). Top row: effective dimensionality of the codebook embeddings*
-
-
-
 ## 实验与关键发现
 
 ### 维度塌缩的实证证据
@@ -281,9 +258,6 @@ DCVQ在CIFAR-10和CelebA上与标准VQVAE的对比（Figure 9）显示：DCVQ在
 
 在ImageNet-256上与RQVAE的对比（Figure 10）中，当量化器数量N>16时，DCVQ-8d的rFID开始低于RQVAE，且有效维度持续线性增长。这表明DCVQ通过增加量化器数量，可以**线性扩展有效容量而不损害重建质量**。
 
-![[assets/figures/papers/paper_list_l16_https_openreview_net_pdf_fb28260ec5d8908f6f5be933299eb238f451d98d_pdf/figures/013_Figure_10.jpg]]
-*Figure 10: Effective dimension and reconstruction FID (rFID) across different quantizer counts. We vary the number of quantizers while keeping other hyperparameters, such as the dimensionality of each quantizer, fixed to study how reconstruction quality evolves*
-
 ### 计算开销与公平性
 
 计算开销对比（Table 10）表明，在匹配总潜在维度的前提下，DCVQ与标准VQVAE在CIFAR-10上的训练时间几乎相同，分而治之策略引入的额外开销可忽略。所有对比实验中，总潜在维度、码本大小、优化器和学习率等条件均保持一致（固定超参数配置见Table 4、Table 5），确保比较的公平性。
@@ -294,16 +268,6 @@ DCVQ在CIFAR-10和CelebA上与标准VQVAE的对比（Figure 9）显示：DCVQ在
 ### 局限与待验证问题
 
 本文的实证分析尚未为码本维度塌缩提供严格的理论解释，塌缩的深层原因——从优化动力学或信息论角度的形式化说明——仍是开放问题。此外，DCVQ仅在图像域上验证，其在视频、音频或蛋白质结构等其他模态上的适用性需要进一步探索。子空间的最优划分方式（如非均匀分割或学习式划分）也尚未被系统研究。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l16_https_openreview_net_pdf_fb28260ec5d8908f6f5be933299eb238f451d98d_pdf/figures/010_Table_3.jpg]]
-*Table 3: Validation reconstruction loss and effective dimension under different rank-promoting regularizers. Results are reported for CIFAR10 (CNN, f=4) and ImageNet-1k (ViT, f=16). For each regularizer, the lowest validation loss and the highest effective dimension are marked with “*”*
-
-![[assets/figures/papers/paper_list_l16_https_openreview_net_pdf_fb28260ec5d8908f6f5be933299eb238f451d98d_pdf/figures/004_Table_1.jpg]]
-*Table 1: Summary of hyperparameters explored in the large-scale controlled study*
-
-
 
 ## 定位与知识库关联
 
@@ -339,8 +303,6 @@ DCVQ的核心贡献在于首次系统性地揭示并解决了VQVAE中普遍存�
 2. **跨模态推广**：DCVQ的分而治之策略是否适用于视频生成（时间维度的分割）、蛋白质设计（结构维度的分割）等场景？
 3. **子空间优化**：是否存在自适应的子空间维度选择策略，或基于数据特性的非均匀划分方式？
 4. **与生成质量的关联**：当前主要评估重建质量（rFID），DCVQ对下游生成任务（如自回归建模、条件生成）的影响需要进一步探索。
-
-
 
 ## 原文 PDF
 

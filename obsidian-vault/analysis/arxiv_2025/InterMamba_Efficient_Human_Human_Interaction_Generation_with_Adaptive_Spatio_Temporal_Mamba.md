@@ -55,8 +55,6 @@ claims:
 
 尽管如此，该方法仍依赖扩散迭代过程，在细节交互表现、物理真实感和实时用户控制方面存在局限，为后续研究留下了开放问题。
 
-
-
 ### 问题背景
 
 生成逼真且多样化的人际交互运动是计算机视觉与图形学领域的核心挑战，在虚拟现实、人机交互、游戏角色动画和机器人学习等应用中具有广泛需求。与单人运动生成不同，人际交互生成要求模型同时理解两个个体的运动动力学及其复杂的时空耦合关系——例如握手、拥抱或舞蹈中的协调动作——这对序列建模能力提出了更高要求。
@@ -87,8 +85,6 @@ claims:
 
 这一设计理念首次将Mamba引入人际交互运动生成范式，旨在实现“更少参数、更快推理、更优质量”的三角平衡——最终InterMamba仅使用66M参数（InterGen的36%），平均推理时间降至0.57秒（InterGen的46%），同时在文本-运动对齐精度（R-Precision）和分布匹配度（MMDist）上实现显著提升。
 
-
-
 ## 核心方法与创新机理
 
 InterMamba 的核心创新在于**用线性复杂度的选择性状态空间模型（Mamba）替代传统 Transformer 骨干**，从根本上解决了人际交互生成中长序列建模的可扩展性瓶颈。其创新点可归纳为三个层次的“changed slots”：
@@ -116,8 +112,6 @@ InterMamba 通过三个模块的递进组合，实现了从独立运动到协同
 
 消融实验（Table 5）揭示了这一递进设计的因果机制：单独使用 Self-ASTM 可建立基础个体建模能力（R-Precision 0.371），但缺乏交互理解；加入 Cross-ASTM 后语义对齐提升（R-Precision 0.409），但运动质量下降（FID 增至 8.524）；进一步集成 LIIA 后，局部交互聚合有效平衡了生成质量与语义一致性，达到最优组合（R-Precision 0.705, FID 5.945）。
 
-
-
 InterMamba 的整体 pipeline 围绕 **基于扩散的运动生成框架** 与 **自适应时空 Mamba 骨干网络** 构建，将双人交互运动生成分解为个体运动建模、局部交互聚合与交叉交互建模三个递进阶段。图 4 展示了完整的架构概览。
 
 **输入与条件编码。** 系统接收文本描述作为条件信号，首先通过冻结的 CLIP-ViT-L/14 编码器将文本提示转化为语义特征嵌入，作为后续扩散去噪过程的条件 $c$。运动数据初始化为高斯噪声 $x_t$，与文本条件、时间步 $t$ 一同输入去噪网络。
@@ -139,15 +133,11 @@ $$\mathcal { L } _ { \mathrm { t } } = \mathbb { E } _ { x _ { 0 } , t } \left[ 
 
 **数据流总结：** 文本 → CLIP 编码器 → 条件嵌入 $c$；噪声 $x_t$ + $c$ + $t$ → Self-ASTM（个体特征提取）→ LIIA（局部交互聚合）→ Cross-ASTM（交叉交互建模）→ 预测 $\hat{x}_0$ → 迭代去噪 → 最终双人运动序列。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1687_InterMamba_Efficient_Human_Human_Interaction_Generation_with_Adaptive_Sp/figures/004_Figure_4.jpg]]
 *Figure 4: The framework of InterMamba. The key components include Self Adaptive Spatio-Temporal Mamba module (Self-ASTM), Cross Adaptive Spatio-Temporal Mamba module (Cross-ASTM), and Local Interaction Information Aggregation module (LIIA)*
 
 ![[assets/figures/papers/paper_list_l1687_InterMamba_Efficient_Human_Human_Interaction_Generation_with_Adaptive_Sp/figures/001_Figure_1.jpg]]
 *Figure 1: In this paper, we introduce an efficient human-to-human interaction generation method based on the Mamba framework, designed to achieve real-time, high-fidelity motion synthesis*
-
-
 
 InterMamba 的核心架构由三个关键模块构成：**自适应时空Mamba（ASTM）** 作为基础算子，**Self-ASTM** 与 **Cross-ASTM** 分别负责个体运动建模与交互关系建模，**局部交互信息聚合（LIIA）** 桥接二者。以下逐一推导各模块的核心公式与变量含义。
 
@@ -237,19 +227,6 @@ c_t = \text{LayerNorm}(\text{MSSM}_{\text{spat}}(\text{Conv}_{\text{spat}}(\text
 
 **因果机制总结**：Self-ASTM 建立个体运动基线（单独使用R-Precision 0.371, FID 5.918），LIIA 提取双人局部交互特征，Cross-ASTM 利用该交互特征通过MSSM调制SSM参数，使角色感知对方运动。消融实验（Table 5）表明：三者组合使R-Precision从0.371提升至0.705，同时维持竞争力FID 5.945，验证了模块间协同的有效性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1687_InterMamba_Efficient_Human_Human_Interaction_Generation_with_Adaptive_Sp/figures/003_Figure_3.jpg]]
-*Figure 3: The spatial and temporal scanning process, where the spatial SSM captures intra-frame joint relationships and the temporal SSM models inter-frame relationships*
-
-![[assets/figures/papers/paper_list_l1687_InterMamba_Efficient_Human_Human_Interaction_Generation_with_Adaptive_Sp/figures/005_Figure_5.jpg]]
-*Figure 5: (a) This figure illustrates the core module of the ASTM in Section 4.1 — — State Space Model (SSM). Given an input sequence*
-
-![[assets/figures/papers/paper_list_l1687_InterMamba_Efficient_Human_Human_Interaction_Generation_with_Adaptive_Sp/figures/006_Figure_6.jpg]]
-*Figure 6: The structure of Local Interaction Information Aggregation (LIIA) consists of AdaLN for adaptive normalization, followed by 1×1 and 3×3 convolutions for feature refinement and local interaction modeling*
-
-
-
 ## 实验与关键发现
 
 ### 核心性能对比
@@ -292,24 +269,11 @@ InterMamba 在 InterHuman 和 Inter-X 两个主流人际交互数据集上均展
 - **Table 5**：Self-ASTM + Cross-ASTM + LIIA 的组合取得最优 R-Precision，揭示了三个模块的协同效应：个体建模 → 交互感知 → 局部精炼的级联架构是有效的设计范式。
 - **Figure 8**：自适应参数随训练进程的动态变化，验证了模型自主学习时空贡献比例的能力。
 
-![[assets/figures/papers/paper_list_l1687_InterMamba_Efficient_Human_Human_Interaction_Generation_with_Adaptive_Sp/figures/002_Figure_2.jpg]]
-*Figure 2: This figure presents a comparative analysis of different methods on the Interhuman dataset in terms of R-Precision (Top-1) and inference time, with the bubble size indicating the number of model parameters. From the figure, our InterMamba and InterMamba (UltraLight), which are highlighted in a red dashed box, achieve superior performance compared to other methods*
-
-![[assets/figures/papers/paper_list_l1687_InterMamba_Efficient_Human_Human_Interaction_Generation_with_Adaptive_Sp/figures/012_Figure_8.jpg]]
-*Figure 8: As the training progresses, the variation process of the adaptive parameters α and β*
-
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1687_InterMamba_Efficient_Human_Human_Interaction_Generation_with_Adaptive_Sp/figures/007_Table_1.jpg]]
 *Table 1: The quantitative comparisons on the InterHuman [24] test set. We run all the evaluations 20 times. ± indicates a 95% confidence interval. ↑ (↓) indicates that a higher (lower) result corresponds to better performance, and → means the closer to ground-truth the better. Bold indicates the best result, and underline refers to the second best*
 
 ![[assets/figures/papers/paper_list_l1687_InterMamba_Efficient_Human_Human_Interaction_Generation_with_Adaptive_Sp/figures/008_Table_2.jpg]]
 *Table 2: The quantitative comparisons on the Inter-X [52] test set. We run all the evaluations 20 times. ± indicates a 95% confidence interval. Bold indicates the best result, and underline refers to the second best*
-
-![[assets/figures/papers/paper_list_l1687_InterMamba_Efficient_Human_Human_Interaction_Generation_with_Adaptive_Sp/figures/011_Table_3.jpg]]
-*Table 3: This table compares the computational complexity of our method with that of other approaches, based on three indicators: average inference time, parameters, and FLOPs. As shown in the table, our Inter-Mamba achieves the highest overall efficiency across all metrics*
-
-
 
 ## 定位与知识库关联
 
@@ -370,8 +334,6 @@ InterMamba 处于**基于扩散模型的文本驱动双人交互运动生成**�
 - **效率提升**：强。参数量（66M vs 182M）和推理时间（0.567s vs 1.233s）的对比数据确凿（Table 3），2.2 倍加速和 64% 参数缩减具有实际部署价值。
 - **生成质量**：中等偏强。在 InterHuman 上 R-Precision（0.475）和 MMDist（3.785）显著领先，但 FID（5.945）略差于 InterGen（5.918）；在 InterX 上 R-Precision 最优但 FID 明显落后。整体呈现“语义对齐强、分布匹配有波动”的特征。
 - **消融完整性**：强。对时空分支、自适应参数、各模块组合均进行了系统消融，且揭示了自适应参数对训练收敛的必要性（移除后模型无法收敛）。
-
-
 
 ## 原文 PDF
 

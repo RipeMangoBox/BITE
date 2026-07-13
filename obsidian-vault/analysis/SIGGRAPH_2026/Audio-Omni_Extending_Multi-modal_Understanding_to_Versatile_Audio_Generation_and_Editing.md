@@ -74,8 +74,6 @@ Audio-Omni 处于**多模态统一模型**与**音频生成扩散模型**的交�
 
 模型在复杂音频推理基准（如 MMAU）上仍落后于专用理解模型；零样本跨语言生成质量随语言与英语距离增加而下降；7.9B 参数量和 100 步 ODE 推理带来较大计算开销。开放问题包括：能否通过引入少量多语言数据缩小跨语言性能差距、能否将解耦架构推广至其他模态、如何开发更高效的采样策略、以及如何构建更细粒度的编辑指令数据集。
 
-
-
 音频作为人类感知世界的核心模态之一，涵盖了通用环境声、音乐和语音三大领域。近年来，多模态大语言模型（MLLM）在文本、图像和视频理解上取得了显著进展，但在音频领域，现有工作仍呈现出明显的碎片化特征：理解、生成与编辑三大能力通常由彼此独立的专有模型分别承担，缺乏一个能同时覆盖全部音频子域的端到端统一框架。
 
 具体而言，当前的统一模型存在以下结构性缺口：
@@ -87,8 +85,6 @@ Audio-Omni 处于**多模态统一模型**与**音频生成扩散模型**的交�
 **架构耦合导致优化困难。** 部分工作试图通过工具编排（tool orchestration）将理解模型与生成模型拼接，但这种松耦合方式无法进行端到端的联合优化，限制了模型在不同任务间的知识共享和协同提升。
 
 在上述背景下，Audio-Omni 的动机可归结为三个核心目标：第一，构建一个真正覆盖通用声、音乐、语音三大域的统一框架，同时具备理解、生成与编辑能力；第二，通过设计大规模混合数据管线解决编辑数据瓶颈；第三，采用解耦架构，使冻结的 MLLM 保留其多模态理解和涌现能力，同时仅训练生成模块以实现高效的多任务学习。这一设计路线旨在回答一个关键问题：能否让一个模型在保持专家级生成质量的同时，继承大语言模型的世界知识和跨语言推理能力，从而超越单一任务训练所能达到的泛化边界？
-
-
 
 ## 核心方法与创新机理
 
@@ -119,8 +115,6 @@ Audio-Omni的核心创新在于通过**解耦架构**与**混合条件机制**�
 ### 方法谱系与知识库定位
 
 Audio-Omni在方法谱系中处于**统一多模态理解-生成-编辑框架**的交汇点。其理解能力继承自**Qwen2.5-Omni**系列的全能模型路线，生成能力基于**Rectified Flow**（Liu et al., 2022）的扩散框架，编辑能力则通过自建AudioEdit数据集填补了领域空白。相对于**Ming-Omni**（仅覆盖语音理解与生成）、**Unified-IO2**（通用多模态但音频生成受限）、**MuMuLLaMA**（仅音乐域）等统一模型，Audio-Omni首次实现了三域全覆盖；相对于**Tango2**（专有T2A）、**MusicGen**（专有T2M）、**F5-TTS**（专有TTS）等专家模型，Audio-Omni在T2M和TTS上实现了超越，展现了统一框架的竞争力。
-
-
 
 Audio-Omni 采用**解耦架构**，将多模态理解与音频生成/编辑在模型层面分离，却通过精心设计的条件机制实现端到端联合训练。其核心设计哲学是：冻结一个强大的多模态大语言模型（MLLM）作为推理核心，以保留其预训练中积累的丰富世界知识与涌现能力；同时训练一个基于扩散变压器（DiT）的生成模块，专门负责音频的合成与编辑。
 
@@ -156,15 +150,11 @@ Audio-Omni 采用**解耦架构**，将多模态理解与音频生成/编辑在�
 
 这种解耦设计带来两个核心优势：其一，冻结的 MLLM 保留了多语言理解和上下文推理能力，使得仅用英语训练的生成模块能够展现出零样本跨语言生成、知识增强生成等涌现能力；其二，混合条件机制将“高层语义”与“低层信号”分离注入，使模型既能遵循复杂的语义指令，又能精确控制编辑的时间边界和音色特征，从而在统一框架下同时胜任理解、生成与编辑三大类任务。
 
-### 补充图表
-
 ![[assets/figures/papers/audio_omni_siggraph2026_20260622/figures/001_Figure_1.jpg]]
 *Figure 1: An overview of the Audio-Omni framework and its capabilities. (Top) Our decoupled architecture connects a frozen MLLM for understanding with a trainable DiT for audio synthesis via a feature projector. (Middle) A showcase of the model’s unified capabilities across understanding, generation, and editing. (Bottom) A demonstration of remarkable emergent abilities inherited from the MLLM*
 
 ![[assets/figures/papers/audio_omni_siggraph2026_20260622/figures/004_Figure_3.jpg]]
 *Figure 3: The Audio-Omni Framework. Our framework utilizes a decoupled design with two distinct conditioning streams to guide a trainable DiT backbone. The High-Level Semantic Features stream provides global, instructional guidance. It is formed by concatenating features from a frozen MLLM (MM Features) with character-level embeddings from a trainable Transcript Encoder. The Low-Level Signal Features stream offers precise, temporal guidance for editing and synchronization. It combines features from Synchformer and Mel Encoder. These two streams are injected into the DiT via different mechanisms: the high-level stream as context for cross-attention, and the low-level stream concatenated with the input...*
-
-
 
 ### 解耦架构总览
 
@@ -230,12 +220,8 @@ Table 7 和 Table A1 的消融表明，使用 MLLM 倒数第二层特征作为�
 
 这验证了冻结 MLLM 中间表示能有效传递跨模态知识，使仅用英语训练的生成模块具备零样本跨语言生成等涌现能力。
 
-### 补充图表
-
 ![[assets/figures/papers/audio_omni_siggraph2026_20260622/figures/009_Figure_4.jpg]]
 *Figure 4: 5.3.3 Inherited Abilities and Zero-Shot Capabilities. We further highlight several representative capabilities of Audio-Omni. The first two are emergent abilities inherited from the frozen MLLM’s world knowledge and in-context reasoning, while the latter two are enabled by our masking-based training strategy. We qualitatively showcase these in Figure 4*
-
-
 
 ## 实验与关键发现
 
@@ -282,8 +268,6 @@ Table A6报告了人类评估结果。在生成任务上，Audio-Omni的总体�
 - **推理效率瓶颈**：7.9B参数量配合100步ODE推理，对实时应用和边缘部署构成显著计算开销，需要更高效的采样策略（如蒸馏或减少步数）。
 - **编辑粒度限制**：当前编辑依赖参考音频的梅尔谱提示，尚不支持纯文本参数化的细粒度编辑指令（如“将背景音量降低3dB”），这限制了编辑的灵活性和精度。
 
-### 补充图表
-
 ![[assets/figures/papers/audio_omni_siggraph2026_20260622/figures/006_Table_3.jpg]]
 *Table 3: Quantitative results on multimodal generation benchmarks*
 
@@ -292,26 +276,6 @@ Table A6报告了人类评估结果。在生成任务上，Audio-Omni的总体�
 
 ![[assets/figures/papers/audio_omni_siggraph2026_20260622/figures/008_Table_5.jpg]]
 *Table 5: Ablation study on dataset composition for audio editing training*
-
-![[assets/figures/papers/audio_omni_siggraph2026_20260622/figures/011_Table_7.jpg]]
-*Table 7: Ablation study on the source of conditional features from the MLLM*
-
-![[assets/figures/papers/audio_omni_siggraph2026_20260622/figures/013_Table.jpg]]
-*Table: A2. Zero-shot cross-lingual text-to-audio generation results*
-
-![[assets/figures/papers/audio_omni_siggraph2026_20260622/figures/012_Table.jpg]]
-*Table: A1. Ablation study on different encoders. We evaluate the impact of different encoders for text-to-audio (T2A) and video-to-audio (V2A) tasks*
-
-![[assets/figures/papers/audio_omni_siggraph2026_20260622/figures/002_Table_1.jpg]]
-*Table 1: Statistics of our proposed audio editing dataset AudioEdit*
-
-![[assets/figures/papers/audio_omni_siggraph2026_20260622/figures/003_Figure_2.jpg]]
-*Figure 2: Overview of the hybrid pipeline for constructing our AudioEdit dataset. The pipeline consists of two parallel branches to ensure both data authenticity and scale. The Real Data Branch (left) mines editing pairs from real-world datasets (e.g., VGGSound) by first using an MLLM (Gemini) for category identification, followed by a dedicated segmentation model (SAM-Audio) for source separation. Concurrently, the Synthesis Data Branch (right) leverages the Scaper toolkit to programmatically generate a large volume of precisely annotated editing scenarios. This hybrid strategy yields a dataset that combines the acoustic fidelity of natural audio with the large-scale diversity needed for robust mode...*
-
-![[assets/figures/papers/audio_omni_siggraph2026_20260622/figures/014_Table.jpg]]
-*Table: A3. Detailed results on audio editing tasks. We report FAD/LSD for each task and their average. Table A4. Training data summary across tasks. Table A5. Detailed quantitative results on multimodal generation benchmarks with multiple metrics*
-
-
 
 ## 定位与知识库关联
 
@@ -366,8 +330,6 @@ Audio-Omni 打开的若干问题值得后续工作关注：
 4. **编辑可控性的维度扩展**：引入空间-时间掩码、强度滑块或参考音频嵌入作为额外的低层信号流，可能在不破坏统一框架的前提下提升编辑精度。
 
 5. **深度伪造风险的结构性缓解**：作者已识别语音转换和编辑技术的滥用风险，并要求用户接受责任条款。但技术层面的水印嵌入和检测方法仍需与生成模型协同设计，而非事后补救。
-
-
 
 ## 原文 PDF
 

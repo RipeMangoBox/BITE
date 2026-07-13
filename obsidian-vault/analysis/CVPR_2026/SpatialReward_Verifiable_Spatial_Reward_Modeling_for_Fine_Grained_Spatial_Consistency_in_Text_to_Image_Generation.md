@@ -55,15 +55,11 @@ claims:
 
 **方法定位**：SpatialReward属于**可验证奖励建模**范式，将细粒度空间评估从固定格式提示（如GenEval）扩展到自由格式提示，覆盖物体方向、深度顺序、文本放置及复杂多物体空间关系。与PickScore（NeurIPS 2023）、ImageReward（NeurIPS 2023）、HPSv2（arXiv 2023）等全局评分器相比，其核心差异在于**显式空间约束验证**而非隐式语义匹配。
 
-
-
 文本到图像（T2I）生成模型近年来取得了显著进展，能够根据自由形式的文本描述生成高质量、语义合理的图像。然而，现有模型在**细粒度空间一致性**方面仍存在根本性瓶颈：生成图像往往在全局语义上看似合理，却在物体定位、相对方向、深度顺序、文本放置等空间关系上频繁出错。例如，提示要求“左边的猫比右边的狗大”，模型可能生成大小关系颠倒的图像；要求“杯子上的文字是‘Hello’”，生成的文字可能错位或内容不符。
 
 这一瓶颈的根源在于当前主流的奖励模型（Reward Model）和评估指标的设计缺陷。以 **CLIP-L/14**（Radford et al., ICML 2021）、**PickScore**（Kirstain et al., NeurIPS 2023）、**ImageReward**（Xu et al., NeurIPS 2023）、**HPSv2**（Wu et al., arXiv 2023）为代表的奖励模型，以及 **UnifiedReward**（arXiv 2025）、**VisionReward**（arXiv 2024）等较新的方法，主要关注**全局语义对齐**和**整体视觉质量**，缺乏对物体定位、方向、深度顺序、排除约束等细粒度空间关系的显式验证能力。这导致强化学习（RL）训练过程中，生成模型接收到的反馈信号无法有效区分“空间正确”与“空间错误”的样本，从而难以针对性地优化空间一致性。
 
 从因果机制来看，问题的关键“控制旋钮”在于：**需要一个可验证的空间奖励模型，能够将自由形式的提示分解为结构化的空间约束，并基于准确的视觉证据进行逐条验证，最终为RL训练提供可靠的细粒度空间反馈**。SpatialReward正是围绕这一核心洞察展开设计，将规则化可验证奖励从逻辑推理领域扩展到视觉空间评估，通过提示分解、专家检测和链式推理三阶段协同工作，显著提升T2I模型的空间一致性，且奖励信号与人类判断高度相关（Spearman ρ达到0.63）。
-
-
 
 ## 核心方法与创新机理
 
@@ -97,8 +93,6 @@ SpatialReward 的创新性集中体现在其流水线的三个协同模块上（
 消融实验（Table 4）揭示了三个模块各自的关键贡献：移除专家检测阶段导致 GenEval 准确率从 95.2% 骤降至 70.3%，证实视觉证据锚定是不可或缺的；去除链式推理使 SpatRelBench 准确率从 37.1% 降至 27.9%，说明纯检测匹配无法处理复杂空间语义；移除排除约束使 SpatRelBench 进一步降至 25.9%，验证了负向约束建模的必要性。
 
 与人类判断的相关性评估（Table 3）进一步表明，SpatialReward 的 Spearman $\rho$ 达到 0.63，在所有对比奖励模型中最高，证明其细粒度空间评估与人类空间感知高度一致。
-
-
 
 SpatialReward 的整体设计围绕一个核心命题展开：**如何为文本到图像（T2I）生成模型提供可验证的细粒度空间反馈**。现有奖励模型（如 CLIP-L/14、ImageReward、PickScore 等）擅长评估全局语义对齐与整体视觉质量，却对物体定位、朝向、深度顺序、文本嵌入位置等空间关系“视而不见”。SpatialReward 通过一个多阶段可验证奖励管道，将自由形式的文本提示逐步转化为结构化空间约束，并在生成图像上进行逐条核验，最终输出一个与人类空间判断高度相关的奖励信号（Spearman ρ = 0.63）。
 
@@ -157,12 +151,8 @@ $$\mathcal{R}_{\mathrm{total}} = \sum_{c \in \mathcal{C}_{\mathrm{inc}}} \mathca
 
 需要注意的是，该管道的奖励质量高度依赖外部专家模型的精度。若目标检测器对特定类别或视角表现不佳，或 OCR 在艺术化字体上失效，可能导致不准确的奖励信号。此外，多阶段串联增加了计算开销，在实时或资源受限场景下可能成为瓶颈。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2151_https_arxiv_org_abs_2603_22228/figures/002_Figure_2.jpg]]
 *Figure 2: Overall framework of our approach. (a) Standard Flow-GRPO [40] reinforcement learning pipeline for text-to-image generation. (b) The proposed SpatialReward, which parses prompts into structured spatial and attribute constraints, verifies them on generated images via expert detection, and uses vision–language chain-of-thought reasoning to produce the final reward score*
-
-
 
 SpatialReward 采用三阶段可验证奖励管道，将自由形式的文本提示转化为结构化的空间约束，并通过专家检测与视觉语言推理生成可微分的奖励信号。整体框架如 Figure 2 所示。
 
@@ -223,13 +213,6 @@ $$\mathcal{R}_{\mathrm{total}} = \sum_{c \in \mathcal{C}_{\mathrm{inc}}} \mathca
 
 其中 $\mathcal{R}_{\mathrm{spatial}}^{+}(c)$ 和 $\mathcal{R}_{\mathrm{spatial}}^{-}(c)$ 分别对应包含约束和排除约束的链式推理奖励。该总奖励被集成到 Flow-GRPO 框架中，作为强化学习优化 T2I 模型的奖励信号。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2151_https_arxiv_org_abs_2603_22228/figures/008_Figure_5.jpg]]
-*Figure 5: Effect of CoT reasoning in spatial relations. CoT combines bounding boxes, orientation, and scene semantics, yielding correct classifications where detected-only matching fails*
-
-
-
 ## 实验与关键发现
 
 ### 瓶颈与核心实验设定
@@ -267,16 +250,11 @@ $$\mathcal{R}_{\mathrm{total}} = \sum_{c \in \mathcal{C}_{\mathrm{inc}}} \mathca
 3. **基准覆盖**：SpatRelBench主要覆盖常见物体和部分空间关系，可能无法完全代表所有复杂空间场景，评价指标依赖自动化检测流程，存在评估偏差风险。
 4. **审美退化**：Table 2中Aesthetic分数的轻微下降表明，当前奖励设计在空间一致性与审美质量之间存在权衡，需进一步优化。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2151_https_arxiv_org_abs_2603_22228/figures/004_Table_1.jpg]]
 *Table 1: Quantitative comparison of T2I generation models aligned with different reward models. Results are on GenEval(80-Obj) and SpatRelBench(1k-Obj), where parentheses indicate the number of object categories. S-Obj: Single object, T-Obj: Two objects, Cnt: Counting, Pos: Positions, Attr-C: Attribute (Color), P-Text: Position-Text OCR, C-Text: Counting-Text OCR, Cpx: Complex spatial relations, Ori: Orientation, 3DRel: 3D spatial relations, Overall: average score over all metrics in each dataset. Bold denotes the best score, and underline denotes the second best*
 
 ![[assets/figures/papers/paper_list_l2151_https_arxiv_org_abs_2603_22228/figures/009_Table_4.jpg]]
 *Table 4: Ablation results for SpatialReward. Scores (accuracy) are reported for GenEval, SpatRel: SpatialRelBench, and T2IComp: T2I-CompBench. T2I-CompBench values are averaged over its 2D and 3D spatial-consistency tasks*
-
-![[assets/figures/papers/paper_list_l2151_https_arxiv_org_abs_2603_22228/figures/007_Table_3.jpg]]
-*Table 3: Correlation and accuracy with human spatial-consistency judgments; accuracy measured at threshold τ = 0.8*
 
 ![[assets/figures/papers/paper_list_l2151_https_arxiv_org_abs_2603_22228/figures/001_Figure_1.jpg]]
 *Figure 1: Performance comparison of SD3.5-M [16] optimized via RL using SpatialReward versus Baseline Rewards*
@@ -286,8 +264,6 @@ $$\mathcal{R}_{\mathrm{total}} = \sum_{c \in \mathcal{C}_{\mathrm{inc}}} \mathca
 
 ![[assets/figures/papers/paper_list_l2151_https_arxiv_org_abs_2603_22228/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of SpatRelBench, depicting benchmark tasks and their data distribution (a), the construction pipeline (b), and the evaluation methodology (c) designed to assess spatial relation understanding in text-to-image models*
-
-
 
 ## 定位与知识库关联
 
@@ -330,8 +306,6 @@ SpatialReward 的工作为以下研究问题打开了空间：
 3. **抽象空间描述的鲁棒性**：面对“在晨雾中隐约可见的城堡”、“混乱中透出秩序”等高度抽象或主观的空间描述，当前基于检测和规则的验证机制可能失效。如何扩展可验证奖励范式以覆盖语义模糊的空间约束，是一个值得深入的方向。
 
 4. **与人类判断的对齐上限**：尽管 SpatialReward 在人类空间判断相关性上达到 Spearman ρ = 0.63，为对比模型中的最高值，但这一数值仍表明存在可观的未解释方差。进一步分析人类空间判断中不可建模的成分（如文化背景、个人偏好）将有助于设定自动化评估的合理期望上限。
-
-
 
 ## 原文 PDF
 

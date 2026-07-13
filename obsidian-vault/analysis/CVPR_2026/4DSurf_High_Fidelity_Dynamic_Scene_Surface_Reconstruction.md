@@ -68,8 +68,6 @@ claims:
 
 消融研究进一步验证了各模块的贡献：SDF流正则化与高斯速度场的组合使6个Hi4D场景的平均Overall从1.49降至1.02；重叠段分割策略进一步将指标推至0.67；而采用秩64的LoRA增量运动调整（IMT-64）在几乎不损失精度的情况下（Overall 0.70），有效控制了运动场参数的存储增长。在时间稳定性方面，4DSurf 的Overall标准偏差最低仅0.18，远优于 **Sparse2DGS** 的0.68和 **Dynamic-2DGS** 的1.19，充分证明了该方法在抑制表面抖动上的有效性。
 
-
-
 ### 动态表面重建的挑战
 
 从稀疏多视角视频中重建动态场景的高保真表面，是计算机视觉与图形学中长期存在的核心难题。该任务要求同时估计随时间变化的几何形状与外观，其难度在于：可用视角极其有限（通常仅4–6个摄像头），而场景中的物体可能经历大幅度的非刚性形变（如人体运动、交互动作）。现有方法在应对此类场景时暴露出两个关键瓶颈：
@@ -100,8 +98,6 @@ claims:
 
 通过在 CMU Panoptic 和 Hi4D 两个多人物体大形变数据集上的系统验证，4DSurf 在 Chamfer 距离指标上分别以 **49%** 和 **19%** 的优势超越现有最优方法，同时显著提升了重建表面的时间稳定性。
 
-
-
 ## 核心方法与创新机理
 
 4DSurf 的核心创新围绕一个因果机制展开：**利用高斯速度场导出 SDF 流，并将其与由渲染深度估计的 SDF 流对齐**，从而在动态高斯泼溅框架中强制表面演化的时间一致性。这一机制直接针对现有方法的瓶颈——大形变下的表面抖动和时间不一致——提供了系统性的解决方案。具体体现在以下三个关键设计变更上：
@@ -128,8 +124,6 @@ $$\frac{\partial s}{\partial t} = -(\boldsymbol{\omega} \times \hat{\mathbf{x}} 
 
 这三个变更槽位协同作用：速度场提供了运动与几何的解析关联，SDF 流正则化利用该关联约束时间一致性，段分割与 IMT 则确保该框架能扩展到任意长度的复杂动态序列。消融实验证实，仅引入高斯速度场和 SDF 流正则化即可将 6 个 Hi4D 场景的平均 Overall Chamfer 距离从 1.49 降至 1.02，进一步加入段分割策略后降至 0.67，验证了每个创新模块的独立贡献。
 
-
-
 4DSurf 的整体训练流程围绕**重叠段分割**展开，将长序列动态场景重建分解为多个可控的局部子问题，并通过**高斯速度场**与**SDF 流正则化**协同约束时间一致性。图 2(a) 给出了完整的 pipeline 示意。
 
 **序列分段与几何传递。** 输入为一组稀疏多视角视频。首先将整个序列划分为 $N$ 个重叠段，每段包含 $K+1$ 个时间步，其中相邻段共享一个虚拟时间步。第一段以前景掩码构建的视觉外壳点云作为高斯初始位置，后续段则从前一段的共享时间步继承几何信息，实现增量式传递。这种设计将每个段内的形变控制在较小范围内，有效缓解大形变场景下的误差累积。
@@ -144,12 +138,8 @@ $$\frac{\partial s}{\partial t} = -(\boldsymbol{\omega} \times \hat{\mathbf{x}} 
 
 各模块间的因果链路清晰：段分割将大形变拆解为局部小形变 → 速度场建模刚体运动 → SDF 流正则化保证表面光滑演化 → IMT 压缩多段存储 → TSDF 融合输出网格。这一设计使得 4DSurf 在稀疏视角、多物体大形变场景下仍能产出时间一致的高保真动态表面。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2603_28064/figures/002_Figure_2.jpg]]
 *Figure 2: Overview: (a) Overall Training Pipeline. We first divide the sequence into N segments, each containing K+1 timesteps with one overlapping virtual timestep. For the*
-
-
 
 ### 高斯速度场与变形建模
 
@@ -233,13 +223,6 @@ $$
 
 其中 $\mathcal{L}_{\mathrm{img}}$ 为光度损失，$\mathcal{L}_{\mathrm{n}}$ 为法向一致性损失，$\mathcal{L}_{\mathrm{d}}$ 为深度畸变损失，$\mathcal{L}_{\mathrm{flow}}$ 为 SDF 流正则化损失，$\mathcal{L}_{\mathrm{m}}$ 为掩码损失。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2603_28064/figures/003_Figure_3.jpg]]
-*Figure 3: Incremental Motion Tuning (IMT). After training the Gaussian Velocity Field of the*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -285,28 +268,12 @@ Table 5 和 Figure 7 分析了不同 LoRA 秩对重建精度和存储开销的�
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2603_28064/figures/012_Table_5.jpg]]
 *Table 5: Different LoRA ranks comparison on Hi4D dataset [54]. It shows the average of the three metrics (Acc, Comp, and Overall) in six scenes under different LoRA ranks*
 
-![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2603_28064/figures/008_Figure_7.jpg]]
-*Figure 7: LoRA rank and storage analysis on scene Backhug02. Left: As the number of segments increases, Ours wo IMT exhibits growing storage of Gaussian velocity fields, while Ours w IMT-{LoRA-rank} effectively curb the storage growth. Right: For different LoRA ranks, Ours w IMT maintains strong performance (even at rank 16), achieving competitive results to Ours wo IMT*
-
 ### 实验设置公平性说明
 
 所有实验均在 NVIDIA RTX 3090Ti 上完成，每段训练 30K 迭代（约 30 分钟）。基线方法使用作者公布的实现及推荐超参数。CMU Panoptic 使用 31 个训练视角，Hi4D 使用 8 个稀疏视角，评估时均采用标准 Chamfer Distance 计算流程，确保对比公平性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2603_28064/figures/004_Table_1.jpg]]
-*Table 1: CMU Panoptic [13] comparisons. We evaluate performance with Chamfer Distance (unit: mm). The top three results for each metric are highlighted with , and , respectively. Ours consistently achieves the best performance on the Overall metric*
-
-![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2603_28064/figures/005_Table_2.jpg]]
-*Table 2: Hi4D [54] comparisons. We evaluate performance using Chamfer Distance (unit: cm). The top three results for each metric are highlighted in , and , respectively. Ours significantly outperforms all baselines on the Overall metric*
-
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2603_28064/figures/006_Figure_4.jpg]]
 *Figure 4: Qualitative results on CMU Panoptic [13]. We compare our methods with three baselines (Dynamic-2DGS [55], Sparse2DGS [46], FreeTimeGS [43]) at two timesteps of the Band1 and Ian3 scene. Bounding boxes highlight major differences*
-
-![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2603_28064/figures/007_Figure_5.jpg]]
-*Figure 5: Qualitative results on Hi4D [54]. We compare our methods with three baselines (Dynamic-2DGS [55], Sparse2DGS [46], FreeTimeGS [43]) at two timesteps of the Basketball13 and Fight17 scene. Bounding boxes highlight major differences*
-
-
 
 ## 定位与知识库关联
 
@@ -358,8 +325,6 @@ Table 5 和 Figure 7 分析了不同 LoRA 秩对重建精度和存储开销的�
 3. **实时性潜力**：当前每段训练约 30 分钟（NVIDIA RTX 3090Ti），远未达到实时。段分割策略天然支持并行训练，但论文未探索这一方向。
 
 4. **与基于 NeRF 的方法的全面对比**：虽然包含了 Neural SDF-Flow 作为基线，但与 **NDR**（Cai et al., NeurIPS 2022）等 NeRF 动态重建方法的直接定量对比有限，仅在 CMU Panoptic 上与 Neural SDF-Flow 进行了比较。
-
-
 
 ## 原文 PDF
 

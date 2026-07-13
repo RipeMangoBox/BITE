@@ -51,8 +51,6 @@ Koopman算子理论为非线性动力学系统提供了一条通往线性化分�
 
 在方法定位上，InformationKoopman区别于传统的Koopman自编码器（如**KAE**，Pan et al., 2023）和核回归方法（如**KKR**，Bevanda et al., 2023），首次将互信息最大化与熵正则化引入Koopman表示学习。实验覆盖物理模拟（Lorenz 63、Kármán涡街、Dam Flow）、视觉控制（Planar、Pendulum、Cartpole）和图结构动力学（绳索、软体）三类任务，在5步及长程预测指标上均取得了最优或次优性能。消融实验进一步验证了三个正则项各自的关键作用：移除互信息正则化（α=0）导致时序一致性丢失，潜空间退化为无几何结构的散点；移除结构一致性（β=0）导致潜流形崩塌；移除冯·诺依曼熵正则化（γ=0）则使某些维度被抑制，有效维度降低。
 
-
-
 ### 问题背景：Koopman表示的根本张力
 
 非线性动力系统的长期预测与控制是科学计算与工程中的核心挑战。Koopman算子理论提供了一条优雅的路径：通过将非线性动力学提升到观测函数空间，系统演化在该空间中变为线性算子作用，从而可以用成熟的线性系统工具进行分析。具体而言，对于动力系统 $x_{n+1} = T(x_n)$，Koopman算子 $\mathcal{K}$ 作用在观测函数 $\phi$ 上，满足：
@@ -86,8 +84,6 @@ $$( \mathcal{K} \phi ) ( x ) = \phi ( T ( x ) )$$
 - **水填效应与维度保护**：最大化潜变量互信息会导致“水填分配”（water-filling），使谱权重集中在少数强模态上（Proposition 4）；而冯·诺依曼熵 $S(\rho) = -\mathrm{tr}(\rho \log \rho)$ 的正则化可以防止这种坍缩，维持表示的有效维度（Proposition 5）。
 
 基于以上分析，本文提出**InformationKoopman**——一个统一的信息论拉格朗日量框架，通过三个可调节的权重系数（$\alpha$ 控制时序一致性，$\beta$ 控制结构一致性，$\gamma$ 控制预测充分性）显式平衡简单性与表达性，从而在保持线性预测能力的同时，防止模式崩塌和不稳定。
-
-
 
 ## 核心方法与创新机理
 
@@ -123,8 +119,6 @@ $$\| \mathbb{E}_{q^{KR}}[x_{1:t} \mid x_0] - \mathbb{E}_p[x_{1:t} \mid x_0] \|_2
 | **InformationKoopman (本文)** | 信息论驱动的简单性-表达性平衡 | — |
 
 本文方法不依赖于特定动力学假设（如混沌），而是通过信息论原理提供了一种**通用的、可解释的**Koopman表示学习框架。实验表明，该方法在物理模拟（Lorenz 63、Kármán涡街、Dam Flow）、视觉控制（Pendulum、Cartpole）和图结构动力学（Rope、Soft）等多种任务上均取得了最优或次优性能，验证了信息论设计的跨域泛化能力。
-
-
 
 ![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_Szh0ELyQxL/figures/002_Figure_1.jpg]]
 *Figure 1: Information-theoretic Koopman framework. (a) Structure overview, (b) Information disentanglement with spectral interpretations, and (c) Water-filling effect of Mutual Information (MI) and von Neumann entropy (VNE) on spectral information allocation*
@@ -167,8 +161,6 @@ $$
 - **误差上界**（Proposition 2）：自回归预测的L2误差被逐步互信息差的上界所限定，即 $\| \mathbb{E}_{q^{KR}}[x_{1:t} \mid x_0] - \mathbb{E}_p[x_{1:t} \mid x_0] \|_2 \leq \bar{C} \sqrt{2 \sum (I(x_{n-1}; x_n) - I(z_{n-1}; z_n)) + \mathcal{E}}$。这表明信息在潜传播中的丢失直接导致预测误差的累积——因此最大化 $I(z_{n-1}; z_n)$ 是控制长期预测精度的根本手段。
 
 - **谱分配机制**（Proposition 4 & 5）：最大化潜变量互信息在有限方差约束下会产生“水填充分配”（water-filling）效应，将谱权重集中于少数时间相干模态；而冯·诺依曼熵正则化则对抗这一集中趋势，迫使谱权重在所有模态上保持正分布，从而维持潜空间的有效维度。Figure 1(c) 直观展示了这一对抗平衡：互信息倾向于将信息分配给少数主导方向，而冯·诺依曼熵则推动信息向更多方向扩散。
-
-
 
 ### 信息瓶颈视角下的Koopman表示学习
 
@@ -230,8 +222,6 @@ $$\operatorname*{max} \sum_n \Big[ \alpha I(z_n; \mathcal{P}_n) + \beta \mathbb{
 
 三个权重系数 $(\alpha, \beta, \gamma)$ 构成了调节表示简单性与表达性权衡的直接因果旋钮，其消融效果在摆锤任务中得到验证：$\alpha=0$ 导致时序结构丢失、潜空间退化为无几何结构的散点；$\beta=0$ 导致潜流形崩塌；$\gamma=0$ 则抑制某些维度，仅保留循环分量，有效维度显著降低。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与因果机制
@@ -285,28 +275,9 @@ Koopman表示学习面临的根本矛盾在于**表示简单性**（线性前向
 ![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_Szh0ELyQxL/figures/003_Figure_1.jpg]]
 *Figure 1: Proposition 3 (Information Disentanglement and Spectral Property) The mutual information I ( $\boldsymbol { z } _ { t } ; \boldsymbol { x } _ { t }$ ) can be disentangled into a summation of three distinct components, each with a spectral interpretation (see proof in Appendix F.4, see Figure 1(b))
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_Szh0ELyQxL/figures/008_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_Szh0ELyQxL/figures/013_Figure_9.jpg]]
-*Figure 9: Spectral behavior of the Koopman operator under different regimes. Left: Eigenvalues of K (orange dots) lie on the complex unit circle ( | $\lambda$ | = 1 ) , and those of $\textstyle { \mathcal { K } } ^ { n }$ with n = 7 (blue crosses) remain on the unit circle, indicating temporal coherence and preservation of information. Right: Eigenvalues of K lie strictly inside the complex unit circle ( | $\lambda$ | < 1 ) , and the spectrum of ${ \boldsymbol { \kappa } } ^ { \tilde { n } }$ contracts toward the origin as n increases, reflecting fast mixing and information dissipation
 
 ![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_Szh0ELyQxL/figures/029_Figure_21.jpg]]
 *Figure 21: Visualization of the von Neumann entropy regularization loss and the total training loss over epochs for the physical simulation tasks. The stable behavior of both the total loss and the von Neumann entropy loss indicates that our training procedure is numerically stable and robust across different systems*
-
-![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_Szh0ELyQxL/figures/010_Table_3.jpg]]
-*Table 3: Notations in the Main Text*
-
-![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_Szh0ELyQxL/figures/014_Table_4.jpg]]
-*Table 4: Spectral interpretation of information components in Koopman representation*
-
-![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_Szh0ELyQxL/figures/018_Table_5.jpg]]
-*Table 5: Model structures across experimental environments. Here, $\boldsymbol { \mathcal { K } } \boldsymbol { z } _ { t } + \boldsymbol { B } \boldsymbol { a } _ { t }$ denotes a controlled latent transition with linear control input $a _ { t }$ (Visual Inputs case). $\kappa$ ( A ) denotes an adjacencyconditioned Koopman operator, corresponding to a shared Koopman composition modulated by the adjacency matrix A (i.e., K(A) := A ⊗ K in graph environments; see Li et al. (2020, Page 4) for details)
-
-![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_Szh0ELyQxL/figures/023_Table_7.jpg]]
-*Table 7: Training time statistics for different models and tasks. Epoch times are reported as mean ± std (in seconds). For Ours, InfoNCE and entropy (von Neumann entropy) rows correspond to the total per-epoch computation. Notably, the overhead introduced by InfoNCE and von Neumann entropy is marginal, accounting for only a small percentage of the total training time*
-
 
 
 ## 定位与知识库关联
@@ -343,8 +314,6 @@ InformationKoopman 的核心推进在于**将上述方法的正则化策略统�
 3. **非线性观测函数与核方法**。当前分析假设编码器学习线性化观测函数 φ。能否将信息论分析推广到更一般的非线性观测函数族？核技巧（如 KKR 使用的核方法）是否能与信息论正则化结合，在保持线性前向的同时提升观测函数的表达力？
 
 4. **权重系数 α、β、γ 的自适应调节**。当前三个系数是固定超参数。是否存在基于数据特性的自适应调节策略？例如，根据动力学的时间尺度自动调整 α（时序一致性强度），或根据潜空间有效维度自动调整 γ（熵正则化强度）？
-
-
 
 ## 原文 PDF
 

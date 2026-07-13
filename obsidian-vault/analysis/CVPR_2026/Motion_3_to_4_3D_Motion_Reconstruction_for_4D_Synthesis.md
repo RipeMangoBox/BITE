@@ -53,8 +53,6 @@ claims:
 
 当前方法的主要局限在于：对参考网格质量较为敏感，且缺乏显式拓扑约束，导致在物体部件切分不清或后续帧发生显著拓扑变化时可能出现顶点粘连或重建失败。
 
-
-
 ### 问题背景：4D动态内容的生成困境
 
 从单目视频中重建动态3D内容——即4D合成——是计算机视觉与图形学中长期存在的核心挑战。该任务要求在仅给定一段二维视频的条件下，同时恢复物体的三维几何形状及其随时间演化的运动轨迹。这一问题的根本困难来自两个层面：
@@ -87,8 +85,6 @@ claims:
 3. **自然支持运动迁移**：形状与运动的解耦使得同一运动模式可以迁移到不同形状上，反之亦然。
 
 通过将运动合成表述为表面点与视频像素的对齐问题（*“taking motion synthesis as an alignment problem between surface points and video pixels”*），该方法无需后处理对齐即可获得时序一致的4D资产，为后续的几何生成与运动重建的协同优化奠定了基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -140,8 +136,6 @@ $$\mathcal{L} = \frac{1}{M T} \sum_{i=1}^{M}\sum_{t=1}^{T} \|\hat{\mathbf{X}}_t^
 - **运动迁移**：由于运动重建与形状生成相互独立，可以将从一段视频中提取的运动流应用到完全不同的静态网格上，实现对艺术家创作的静态 3D 资产的动画化（“Motion 3-to-4 is the only approach capable of converting artist-created static 3D meshes into dynamic 4D sequences”）。
 - **开放场景泛化**：将运动重建建模为表面到像素的对齐问题，使得方法对未见过的形状和运动模式具有较强的泛化能力，在真实拍摄视频和生成动画等开放场景中均能稳定工作（Figure 5）。
 
-
-
 Motion 3-to-4 将病态的 4D 生成问题分解为**静态 3D 形状生成**与**动态运动重建**两个可解耦的子任务，核心洞察在于：利用一个静态参考网格（可来自生成模型或用户提供）作为稳定的几何锚点，将单目视频的每帧运动估计转化为表面点与视频像素间的对应关系学习问题。框架由两大组件构成：运动潜变量学习（motion latent learning）与运动解码（motion decoding）。
 
 ### 输入输出流
@@ -172,12 +166,8 @@ Motion 3-to-4 将病态的 4D 生成问题分解为**静态 3D 形状生成**与
 - **表面-像素对齐范式**：将运动合成建模为表面点与视频像素的对齐问题，无需后处理对齐步骤，即可实现对可见与遮挡区域的完整几何恢复。
 - **与生成模型的解耦**：框架可与任意预训练 3D 生成器组合，实现从艺术家创建的静态网格到 4D 动态序列的转换，以及跨源的**运动迁移**（motion retargeting）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l9_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Motion_3_to_4_3D/figures/003_Figure_2.jpg]]
 *Figure 2: An overview of our Motion 3-to-4 framework for 4D synthesis. At the core of the framework is a motion–latent learning module consisting of a geometry encoder and a video encoder, which jointly process the input video and sampled points. The resulting latent tokens are decoded into a frame-wise 3D motion flow relative to the first video frame, producing temporally consistent 4D assets*
-
-
 
 Motion 3-to-4 框架将病态的4D生成问题分解为两个可解耦的组件——静态形状编码和动态运动重建——并围绕“运动潜在学习”与“运动解码”两大模块构建流水线。
 
@@ -228,8 +218,6 @@ $$
 
 其中 $M$ 为每帧采样的真值点数（$M=4096$），$T$ 为序列帧数。训练使用 12 帧序列，总 batch size 为 256，在 8 张 H100 GPU 上以学习率 $4\times10^{-4}$ 训练约 60k 步（约 1.5 天）。
 
-
-
 ## 实验与关键发现
 
 ### 实验设置
@@ -274,8 +262,6 @@ Motion 3-to-4 在 4D 生成方法谱系中占据独特位置。与 **L4GM** 的�
 
 核心洞见在于：通过将 4D 动态简化为“静态锚点 + 运动流”的表示，规避了对大规模 4D 动态训练数据的直接依赖，同时保留了完整的几何表达能力。这一思路与近年来的“解耦生成-重建”范式一脉相承，但首次将其系统性地应用于单目视频到 4D 的通用合成任务。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l9_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Motion_3_to_4_3D/figures/004_Table_2.jpg]]
 *Table 2: Quantitative evaluation on our Motion-80 set. Results are reported for both short and long sequences. “Ours w/m” denotes our method initialized with the ground-truth static mesh from the first frame. Thanks to the disentangled mesh representation and sceneflow–based motion modeling, our approach capable of transforming artist-created static 3D meshes into fully dynamic 4D sequences*
 
@@ -290,11 +276,6 @@ Motion 3-to-4 在 4D 生成方法谱系中占据独特位置。与 **L4GM** 的�
 
 ![[assets/figures/papers/paper_list_l9_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Motion_3_to_4_3D/figures/008_Figure_6.jpg]]
 *Figure 6: Motion Transfer Example. By disentangling 4D synthesis into 3D mesh generation and motion reconstruction, our framework can animate static articulated objects with motion retargeted from videos of different sources*
-
-![[assets/figures/papers/paper_list_l9_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Motion_3_to_4_3D/figures/001_Figure_1.jpg]]
-*Figure 1: From a single glance, Motion 3-to-4 unfolds: weaving time, shape, and movement into living 4D reality*
-
-
 
 ## 定位与知识库关联
 
@@ -338,8 +319,6 @@ Table 1 对上述方法在表征形式、运动建模方式、是否支持运动
 2. 能否引入拓扑先验（如骨架或分块结构）来缓解顶点粘连现象？
 3. 在缺乏参考网格时，如何更稳健地生成高质量首帧网格，避免误差向后传播？
 4. 该方法能否扩展至多对象交互或更复杂的动态场景？
-
-
 
 ## 原文 PDF
 

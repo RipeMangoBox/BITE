@@ -264,11 +264,6 @@ GEN3C 在多个任务维度上展现出显著优势，其性能提升的因果�
 
 4. **多视图输入的同步性假设**：当前多视图融合假设输入视图时间同步且相机位姿精确已知。当视图间存在时间差或位姿估计存在大范围误差时，不同视图的渲染视频将指向不一致的三维区域，最大池化融合可能选择错误的特征来源，导致生成结果中出现内容冲突。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2503_03751/figures/008_Figure.jpg]]
-*Figure: Up 1m Up 2m*
-
 ![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2503_03751/figures/011_Figure_8.jpg]]
 *Figure 8: Qualitative results on 3D editing for driving scene. We remove and modify the trajectory of cars from the original scene*
 
@@ -277,17 +272,6 @@ GEN3C 在多个任务维度上展现出显著优势，其性能提升的因果�
 
 ![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2503_03751/figures/016_Figure_11.jpg]]
 *Figure 11: Qualitative comparison on using different base models: Stable Video Diffusion (SVD) [4] v.s. Cosmos [1]. When having a more powerful video generation model, GEN3C is able to generate more realistic output with less artifacts. Note that the slight misalignment between the two results is due to the models using different video resolutions. Figure 12. Example of extreme NVS using Cosmos as the base model: the input view is the middle one, and our model is capable of rotating significantly to the left and right*
-
-![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2503_03751/figures/018_Figure_14.jpg]]
-*Figure 14: Illustration of rendered depth images and model outputs. Our model can fix the error in the depth projection (such as the orange handrail in the first image and the light in the second one), and generate realistic content in the missing regions (such as the inpainted railway)*
-
-![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2503_03751/figures/020_Figure_16.jpg]]
-*Figure 16: Comparison of different strategies for incorporating masking information into the model. (Left) the mask channel is concatenated to the latent as an additional channel. (Right) the mask values are applied directly to the latent through element-wise multiplication*
-
-![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2503_03751/figures/007_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2503_03751/figures/009_Figure_7.jpg]]
-*Figure 7: Qualitative results on novel view synthesis for driving scene. Our model can fill in the missing regions in the original video even when the deviation is large, while reconstruction-based baselines produce severe artifacts. Table 2. Quantitative results for two-views NVS. The two values in each table cell represent the interpolation and extrapolation results, respectively*
 
 ![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2503_03751/figures/010_Table_3.jpg]]
 *Table 3: Quantitative results of FID [18] for NVS on driving scene. GEN3C significantly outperforms the baselines, especially when generating novel views that are far away from the original trajectory*

@@ -59,8 +59,6 @@ claims:
 
 **方法谱系与知识库定位**：Mirage 区别于两类现有方案——纯文本推理基线（Zero-Shot、CoT SFT、GRPO 等）缺乏视觉想象能力，而统一多模态模型（如 **Anole**，Chern et al., 2024；**MVoT**，Li et al., 2025a）需生成完整图像，推理性能受限且计算开销大。Mirage 以紧凑的隐式向量替代显式图像生成，在相同数据量下实现更优性能，为多模态推理提供了一种高效、可扩展的中间表征方案。
 
-
-
 ### 多模态推理中的视觉想象瓶颈
 
 视觉语言模型（VLM）在多数基准测试中已展现强大能力，但在需要**空间推理**和**视觉想象**的任务上仍存在显著短板。这类任务要求模型在推理过程中对空间关系、物体移动或几何变换进行内部模拟——这一认知过程在人类中对应“心理意象”（Mental Imagery）：人们能够在脑海中构建并操作视觉表征，而无需实际看到图像。
@@ -85,8 +83,6 @@ claims:
 3. **核心机制**：当模型选择进行视觉推理时，生成一个特殊令牌，随后将其当前隐藏状态作为压缩视觉嵌入追加到上下文中，跳过语言投影层，直接进入后续推理。
 
 这种设计的关键优势在于：隐式令牌的维度远低于像素图像（实验中仅使用k=4个令牌向量），使模型能将容量集中在推理逻辑上，同时保留了视觉空间的表征能力。t-SNE可视化（Figure 7）证实，训练后的隐式令牌聚集在视觉嵌入子空间附近但略有分离，表明它们确实承载了视觉信息，同时保持了作为“推理中间件”的灵活性。
-
-
 
 ## 核心方法与创新机理
 
@@ -130,8 +126,6 @@ Mirage的训练策略是实现隐式视觉推理的关键使能技术：
 
 在GRPO强化学习阶段，Mirage以格式正确性和答案准确性为奖励信号，进一步对齐多模态推理轨迹。实验表明，加入RL后VSP空间推理性能额外提升约2%（Table 1），证明强化学习可以在监督微调基础上进一步优化交织推理的质量。
 
-
-
 Mirage 的整体框架围绕一个核心思想构建：在 VLM 的文本解码流中插入紧凑的**隐式视觉令牌**（latent visual tokens），使模型能够像人类“心理意象”一样进行多模态交织推理，而无需生成完整的像素级图像。整个系统由三个关键模块串联而成：**数据生成流水线**、**两阶段监督训练**和**可选的强化学习微调**。
 
 ### 数据生成流水线
@@ -168,8 +162,6 @@ $$ \mathcal{L}_{\text{visual}} = \ell_{\cos}\big(\hat{e}_j, g_\theta(o_{\text{pr
 
 推理时，Mirage 的输入为标准的多模态输入（文本指令与可选的视觉输入），输出为**文本与隐式视觉令牌交织的序列**。当模型判断需要“视觉思考”时，它会生成一个特殊令牌，随后将当前隐藏状态作为紧凑的视觉嵌入直接追加到上下文中，跳过语言投影层。这些隐式令牌在 t-SNE 可视化中聚集在视觉表示子空间附近但略有分离（Figure 7），与两阶段训练的设计意图一致——它们携带视觉信息，但已根据任务进行了适应性调整。最终，模型基于这些交织的隐式令牌和文本令牌生成答案，实现了无需外部解码器的多模态推理闭环。
 
-
-
 Mirage 框架的核心由三个训练模块构成，围绕“隐式视觉令牌”这一关键设计展开。
 
 **隐式视觉令牌机制。** 模型在解码过程中，当需要“视觉想象”时，生成一个特殊令牌，随后将当前隐藏状态作为紧凑的视觉嵌入直接追加到上下文中，跳过语言投影层。这一机制使模型能够在不生成像素级图像的情况下，进行文本与视觉特征交织的多模态推理。
@@ -196,15 +188,8 @@ $$r_{\mathrm{acc}}(\pmb{o}, \pmb{x}) = 1$$
 
 当最终答案正确时取1，否则为0。该阶段进一步对齐多模态推理轨迹与任务目标。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2325_https_arxiv_org_abs_2506_17218/figures/001_Figure_1.jpg]]
-*Figure 1: Multimodal Reasoning Examples. Mirage interleaves latent visual tokens, which represent compact imagery visual features, with explicit text tokens to solve diverse spatial reasoning multimodal tasks, boosting the reasoning performance without the full pixel-level image generation*
-
 ![[assets/figures/papers/paper_list_l2325_https_arxiv_org_abs_2506_17218/figures/010_Figure_7.jpg]]
 *Figure 7: Visualization of Latent Embeddings. We visualize our latent tokens along with text and image embeddings with t-SNE. Our latent tokens cluster near, yet just outside, the visual representation subspace, consistent with the two-stage training design*
-
-
 
 ## 实验与关键发现
 
@@ -221,9 +206,6 @@ Mirage在多个空间推理基准上均取得了一致且显著的提升。在VS
 
 ![[assets/figures/papers/paper_list_l2325_https_arxiv_org_abs_2506_17218/figures/005_Table_2.jpg]]
 *Table 2: Experimental Results on COMT, Jigsaw, and SAT tasks*
-
-![[assets/figures/papers/paper_list_l2325_https_arxiv_org_abs_2506_17218/figures/006_Table_3.jpg]]
-*Table 3: Experimental Results with Qwen2.5-VL 3B on COMT, Jigsaw, and SAT tasks*
 
 ### 消融研究
 
@@ -245,9 +227,6 @@ t-SNE可视化（Figure 7）为隐式令牌的行为提供了直观解释。隐�
 
 为验证合成辅助图像的质量，作者将辅助图像作为输入先验进行测试（Figure 6）。在零样本和微调设置下，使用辅助图像作为输入的模型性能均显著提升，表明生成的图像包含有效的空间信息，数据生成流程产出的多模态轨迹具有高质量。
 
-![[assets/figures/papers/paper_list_l2325_https_arxiv_org_abs_2506_17218/figures/008_Figure_6.jpg]]
-*Figure 6: Performance with Helper Images as Input Priors. We evaluate model accuracy using synthesized helper images under both zero-shot and fine-tuned settings. The results highlight the informativeness of the generated images and confirm their high data quality*
-
 ### 失败模式与局限
 
 尽管Mirage在空间推理上表现优异，但存在以下局限：
@@ -257,18 +236,8 @@ t-SNE可视化（Figure 7）为隐式令牌的行为提供了直观解释。隐�
 3. **隐式令牌容量限制**：k=8时性能显著下降，表明当前设计的表示能力有限，难以承载更复杂的视觉信息。
 4. **数据生成依赖特定工具**：辅助图像创建依赖任务特定的工具（如OpenAI Gym、视频生成模型），向新任务扩展可能需要额外工程。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2325_https_arxiv_org_abs_2506_17218/figures/007_Figure_4.jpg]]
 *Figure 4: Ablation Study of Training Stages on VSP Spatial Planning task. Both training stages work jointly to achieve better reasoning performance*
-
-![[assets/figures/papers/paper_list_l2325_https_arxiv_org_abs_2506_17218/figures/009_Figure_5.jpg]]
-*Figure 5: Ablation Study of Latent Size k and Loss Coefficient γ on VSP Spatial Reasoning. Our training pipeline remains robust and superior performance across different hyperparameters*
-
-![[assets/figures/papers/paper_list_l2325_https_arxiv_org_abs_2506_17218/figures/015_Table_5.jpg]]
-*Table 5: Data Example of VSP Spatial Planning*
-
-
 
 ## 定位与知识库关联
 
@@ -329,8 +298,6 @@ Mirage 直接对标的基线是当前VLM的主流推理范式——纯文本链�
 3. **训练轨迹质量提升**：开发更丰富的提示策略或策划更高质量的训练轨迹，以突破当前教师模型的质量上限，仍是未来工作的重要方向。
 
 4. **推理效率与质量的权衡**：隐式令牌的引入增加了序列长度，如何在保持推理质量的同时控制计算开销，尚未被系统研究。
-
-
 
 ## 原文 PDF
 

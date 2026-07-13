@@ -151,8 +151,6 @@ CondMDI 与两类推理时条件方法形成鲜明对比：
 
 CondMDI 通过训练时显式建模条件后验 $p_\theta(\mathbf{x}_{t-1} | \mathbf{x}_t, \mathbf{p}, \mathbf{c})$，在保持极低关键帧错误（0.1789）的同时，FID（0.1731）与无条件生成持平甚至更优，证明了训练时随机掩码是兼顾约束精度与运动质量的关键设计。
 
-### 补充图表
-
 CondMDI 将灵活的动作补间统一为掩码条件扩散生成任务。其核心架构基于 **GMD** (Karunratanakul et al., 2023) 的二阶段 UNet 扩散骨干，并在输入层和训练策略上进行了三项关键改造：根表示全局化、随机掩码训练、以及观测掩码拼接输入。
 
 ### 运动表示与根坐标全局化
@@ -301,8 +299,6 @@ CondMDI 首先在标准文本-动作生成任务上验证了其骨干网络的�
 
 ![[assets/figures/papers/CondMDI_Flexible_Motion_In-betweening_with_Diffusion_Models_cfe713ed727d/figures/004_Table_2.jpg]]
 *Table 2: Quantitative results for different keyframes on the HumanML3D test set. ?? ∈ {1, 5, 20} means number of keyframes randomly placed along the motion trajectory. Root Joint and VR Joints mean conditioning on the root joint trajectory and the head and both wrist joints repectively*
-
-### 补充图表
 
 ![[assets/figures/papers/CondMDI_Flexible_Motion_In-betweening_with_Diffusion_Models_cfe713ed727d/figures/008_Table_3.jpg]]
 *Table 3: Quantitative results for root-joint control on the HumanML3D test set. OmniControl (on all) means the model is trained on all joints*

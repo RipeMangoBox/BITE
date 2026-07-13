@@ -66,8 +66,6 @@ claims:
 
 综上，f-DAL 通过弥合域适应理论与对抗训练实践之间的鸿沟，以一个简洁的架构修正实现了对 DANN 及多种后续方法的显著超越，为 f 散度家族在域适应中的应用提供了坚实的理论支撑和实用的算法框架。
 
-
-
 ### 域适应中的理论与实践鸿沟
 
 无监督域适应（Unsupervised Domain Adaptation, UDA）旨在利用有标签的源域数据和无标签的目标域数据，训练一个在目标域上泛化良好的模型。其核心挑战在于源域与目标域之间的分布偏移。对抗性域适应方法，以 **DANN**（Ganin et al., 2016）为代表，通过特征提取器与域判别器之间的 min-max 博弈来学习域不变特征，已成为该领域的主流范式。
@@ -85,8 +83,6 @@ claims:
 3. **后续方法的补救式复杂化**：为弥补 DANN 的性能不足，后续工作引入了条件域判别（CDAN）、最大分类器差异（MCD）、边界差异度量（MDD）等复杂机制。这些方法虽取得了一定提升，但本质上是在修补理论-算法鸿沟的后果，而非从根源上重建理论与实践的桥梁。
 
 针对上述问题，本文的核心动机是：**能否将域适应泛化界推广至一般 $f$ 散度家族，并在此基础上设计一个与理论直接对应的简洁算法框架？** 若成功，则可消除长期以来理论与实践的脱节，使算法设计有据可依，无需依赖复杂的 ad-hoc 正则化即可实现性能的大幅提升。
-
-
 
 ## 核心方法与创新机理
 
@@ -142,12 +138,7 @@ f-DAL 对 DANN 最关键的**架构修正**在于将全局域判别器替换为*
 
 f-DAL 的创新本质在于：**通过将泛化界从 TV 散度推广至 f 散度家族，揭示了现有对抗域适应方法（DANN）在架构设计上的理论缺陷，并通过对域分类器进行“按类别化”这一简单而关键的修正，无需复杂正则化或额外超参数即可大幅提升性能。** 这一“理论驱动架构修正”的范式，使得 f-DAL 成为一个简洁、通用且理论自洽的域适应框架。
 
-
-
 f-DAL 的整体 pipeline 围绕一个**min-max对抗训练目标**构建，其核心模块关系与数据流如 **Figure 1** 所示。该框架将域适应问题形式化为三个神经网络的协同优化：特征提取器 $g$、源分类器 $\hat{h}$，以及一个与源分类器同拓扑的**按类别域分类器** $\hat{h}'$。
-
-![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2106_11344/figures/002_Figure_1.jpg]]
-*Figure 1: f-DAL framework. We interpret h : $\mathcal { X } \to \mathcal { Y }$ as the composition of two networks h = $\hat { h } \circ$ g . where g : $\mathcal { X } \mathcal { Z }$ and hˆ is a classifier operating in a representation space Z. Inspired by our bounds, we let $\hat { h } ^ { \prime }$ be a network of the same topology as hˆ. This is interpreted as a per-category domain classifier. Unlike us, Ganin et al. (2016) use a global domain-classifier or “discriminator”
 
 **输入流与模块职责**
 
@@ -178,8 +169,6 @@ f-DAL 与经典 DANN 的核心区别在于域分类器的设计（见 **Figure 1
 **推理流程**
 
 在推理阶段，仅需 $g$ 和 $\hat{h}$ 参与前向传播：目标域输入经 $g$ 提取特征后，由 $\hat{h}$ 输出类别预测。$\hat{h}'$ 在推理时不参与计算。
-
-
 
 ### 理论瓶颈与动机
 
@@ -265,8 +254,6 @@ $$d_{s,t} = \mathbb{E}_{x_s \sim p_s} \log \sigma \circ [\hat{h}' \circ g(x_s)]_
 | $\lambda^*$ | 理想联合风险，度量源和目标标签函数的最小联合误差 |
 | $p_s^z, p_t^z$ | 源/目标域在特征空间 $\mathcal{Z}$ 上的分布 |
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设计
@@ -338,33 +325,15 @@ Figure 7对比了f-DAL-JS与DANN在不同标签偏移程度下的鲁棒性。x�
 
 4. **散度选择依赖经验**：尽管Pearson χ²在多数任务中表现最优，但论文未提供自动选择最优f散度的机制。不同任务的最优散度可能不同，目前仍需人工尝试。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2106_11344/figures/011_Figure_5.jpg]]
-*Figure 5: Values of ˆ`(hˆ0, hˆ) for source and target on Digits M→ U. ˆ` ≈ $\phi ^ { \prime }$ ( 1 ) = 0 ; , which implies $p _ { \mathrm { s } } ^ { z } \approx p _ { \mathrm { t } } ^ { z }$ (see Proposition 1)
-
 ![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2106_11344/figures/003_Figure_2.jpg]]
 *Figure 2: Target Domain Loss on the Digits Datasets M→ U. Figure 3. t-SNE Visualization of the last layer features on the Digits Dataset M→ U*
-
-![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2106_11344/figures/001_Table_1.jpg]]
-*Table 1: Popular f-divergences, their conjugate functions and choices of a*
 
 ![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2106_11344/figures/008_Table_5.jpg]]
 *Table 5: Accuracy (%) on the Office-Home benchmark*
 
-![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2106_11344/figures/009_Table_6.jpg]]
-*Table 6: Accuracy on the Amazon Reviews data sets*
-
-![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2106_11344/figures/010_Table_7.jpg]]
-*Table 7: Accuracy on the Digits datasets*
-
-![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2106_11344/figures/012_Table_8.jpg]]
-*Table 8: Popular f-divergences, their conjugate functions and choices of g. We take $\hat { l }$ ( a , b ) = g ( $b _ { \mathrm { a r g m a x } a }$ )
 
 ![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2106_11344/figures/013_Table_9.jpg]]
 *Table 9: Accuracy represented in (%) with average and standard deviation on the Office-31 benchmark*
-
-
 
 ## 定位与知识库关联
 
@@ -425,8 +394,6 @@ $$d_{s,t} = \mathbb{E}_{p_s^z}[\hat{\ell}(\hat{h}',\hat{h})] - \mathbb{E}_{p_t^z
 5. **MCD 的理论修正验证。** f-DAL 框架对 MCD 提出的修正建议（按类别域分类器、损失约束）能否确实带来更强的算法？该方向尚未有实验验证。
 
 6. **标签偏移的内生处理。** 能否在 f 散度泛化界中显式建模标签分布偏移，从而设计出对标签偏移具有内生鲁棒性的算法？
-
-
 
 ## 原文 PDF
 

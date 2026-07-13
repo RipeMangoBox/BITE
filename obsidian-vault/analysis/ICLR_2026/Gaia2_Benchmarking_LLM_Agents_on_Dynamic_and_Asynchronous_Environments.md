@@ -66,8 +66,6 @@ Gaia2在方法谱系中处于从“静态最终答案验证”向“动态过程
 
 当前基准存在若干待解约束：顺序ReAct支架无法表达需要并发动作的时间敏感场景；验证器对等效写操作（如通过Messages还是Chat发送消息）的严格区分可能低估智能体的灵活性；Agent2Agent模式中协调开销可能抵消协作收益；推理模型丢弃中间推理步骤的设置可能非最优。开放问题包括：如何设计自适应计算策略以平衡效率与性能；如何通过并行编排建构建模并发操作；如何将标量验证奖励与偏好信号结合以处理主观任务；以及如何放宽验证器对等效动作的限制以更真实反映智能体实用性。
 
-
-
 ### 静态基准的饱和与隐忧
 
 大语言模型（LLM）智能体在现有基准上的表现已趋于饱和。以 **GAIA**（Mialon et al., 2023）为代表的早期工作，通过最终答案的精确匹配来评估智能体在 Web 环境中的多步推理能力，但其静态、同步的评估范式存在根本性局限：环境仅在智能体主动执行操作时才会发生变化，且评估仅关注最终结果，完全忽略了中间行为轨迹的正确性。类似地，**AppWorld**（Trivedi et al., 2024）和 **ToolSandbox**（Lu et al., 2025）引入了里程碑式的状态验证，但仍运行在同步、智能体驱动的环境中，无法暴露真实部署中的关键失败模式。
@@ -99,8 +97,6 @@ Gaia2在方法谱系中处于从“静态最终答案验证”向“动态过程
 
 正如 Figure 1 的预算缩放曲线所示，即便当前最强的模型（GPT-5 high 达到 42.1% pass@1），其性能也随预算增加迅速进入平台期，表明标准支架和现有模型仍缺少实现持续进步的关键要素。Gaia2 通过暴露这些隐藏的失败模式，为下一代实用智能体系统的发展提供了不可或缺的诊断工具。
 
-
-
 ## 核心方法与创新机理
 
 Gaia2的核心创新在于将**异步事件驱动的环境模拟**与**行动级细粒度验证**相结合，构建了一个能暴露真实部署中关键失败模式的评测框架。相较于现有基准，它在四个关键维度上实现了根本性的设计转变。
@@ -126,14 +122,6 @@ Gaia2的**Agent2Agent**机制支持主智能体通过消息传递与多个应用
 Gaia2引入**噪声分割**，在评估中系统性地注入工具异常（随机失败、签名变更）和无关环境事件（垃圾通知），并支持可配置的噪声强度。Claude 4 Sonnet在Gaia2-mini上从无噪声时的**31.2**降至高噪声时的**8.1**（Table 7），表明当前模型在鲁棒性方面存在显著短板，而此前基准无法量化这一维度。
 
 综上，Gaia2通过**行动级验证 × 异步模拟 × 多智能体协作 × 噪声注入**的四维创新，将LLM智能体评测从“静态问答正确率”推进至“动态环境适用性诊断”，为下一代实用智能体系统的开发提供了关键基础设施。
-
-
-
-![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_9gw03JpKK4/figures/002_Figure_2.jpg]]
-*Figure 2: ARE environments are event-based, time-driven simulations, that run asynchronously from the agent and the user. ARE environments allows playing scenarios, which typically contain tasks for the agent and verification logic. Whether initiated by agent or user, interactions happen through the same interfaces and can be either tool calls, or tool output/notification observations. Extensive simulation control and logging allow precise study of agents behavior*
-
-![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_9gw03JpKK4/figures/004_Figure_4.jpg]]
-*Figure 4: The seven core agent capabilities evaluated by the splits of Gaia2*
 
 ### 设计动机与核心瓶颈
 
@@ -187,8 +175,6 @@ Gaia2通过七个能力分割维度系统评估智能体（图4）：
 2. **运行过程**：环境异步演化，通知层选择性推送事件；智能体在ReAct循环中接收观察、推理、执行工具调用。
 3. **输出**：完整的行动轨迹日志，由ARE Verifier离线或在线进行行动级验证，生成二值成功/失败判定及细粒度诊断信息。验证聚焦于写操作，避免对探索策略的过度约束，同时使基准可直接用于基于可验证奖励的强化学习（RLVR）训练。
 
-
-
 ### 3.1 ARE 平台核心抽象
 
 Gaia2 构建于 **Agents Research Environments (ARE)** 平台之上，该平台为异步、事件驱动的智能体评测提供了五类核心抽象（Figure 2）：
@@ -232,8 +218,6 @@ $$ \sum \mathbb{1} \{ \text{scenario result} = \text{True} \land \text{scenario 
 
 该公式对每个最大预算值，统计成功完成且成本低于该预算的场景总数，用于绘制 Figure 1 中的预算-性能缩放曲线，揭示模型在不同成本约束下的能力上限与平台效应。
 
-
-
 ## 实验与关键发现
 
 ### 主结果：能力分化与根本权衡
@@ -264,9 +248,6 @@ Gaia2 在 7 个能力维度上对 14 个主流 LLM 进行了系统评测，所�
 
 **Table 1** 在 450 条人工标注轨迹上对比了 ARE Verifier 与纯 LLM 的 In-context Verifier：
 
-![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_9gw03JpKK4/figures/005_Table_1.jpg]]
-*Table 1: ARE Verifier and In-context Verifier on 450 hand-labeled validation trajectories*
-
 | 指标 | In-context Verifier | ARE Verifier |
 |------|---------------------|--------------|
 | Agreement | 0.72 | **0.98** |
@@ -274,9 +255,6 @@ Gaia2 在 7 个能力维度上对 14 个主流 LLM 进行了系统评测，所�
 | Recall | 0.83 | **0.95** |
 
 ARE Verifier 通过拓扑排序对比智能体写操作与 oracle 序列，强制执行一致性、因果性、时序性和完整性检查，其 0.99 的精确率和 0.98 的一致性为基准评测提供了可靠基础。**Table 5** 的补充实验表明，ARE Verifier 在不同后端模型上均保持高性能，验证了其鲁棒性。
-
-![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_9gw03JpKK4/figures/031_Table_5.jpg]]
-*Table 5: Evaluation of the ARE Verifier with different models on 450 hand-labeled trajectories*
 
 ### 关键消融实验
 
@@ -305,8 +283,6 @@ ARE Verifier 通过拓扑排序对比智能体写操作与 oracle 序列，强�
 
 **Table 3** 的跨模型 Agent2Agent 实验揭示了异质团队的价值：Claude 4 Sonnet 主智能体 + Claude 4 Sonnet 应用智能体达到 29.3% pass@1，而 Llama 4 Maverick 同质配对仅为 8.5%。当强主智能体搭配轻量执行者（Claude-main + Llama-app）时，得分为 18.3%，显著优于全轻量团队。**Figure 10** 进一步显示，增加协作者比例（提高 Agent2Agent ratio r）可改善 Llama 4 Maverick 的 pass@k 缩放规律，但未能改善 Claude 4 Sonnet 的成本归一化性能——强模型的协调开销可能抵消协作收益。
 
-![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_9gw03JpKK4/figures/023_Figure_10.jpg]]
-*Figure 10: Increasing the number of multi-agent collaborators in Gaia2 scenarios by increasing the Agent2Agent ratio $\bf \tilde { \epsilon } _ { r } ^ { \mathrm { - } }$ , improves pass@k scaling laws for Llama 4 Maverick, but does not improve token cost vs score tradeoffs with repeated sampling for Claude 4 Sonnet. Table 3: Probing cross-model collaboration in Gaia2-mini Agent2Agent scenarios: we evaluate pass@1 across main- vs app-agent pairings with Llama 4 Maverick and Claude 4 Sonnet in the fully collaborative Agent2Agent setting (r = 1). The results are averaged over three runs and presented with the standard error
 
 ### 主要失败模式
 
@@ -315,13 +291,6 @@ ARE Verifier 通过拓扑排序对比智能体写操作与 oracle 序列，强�
 3. **协作开销**：Agent2Agent 模式下，强模型（Claude 4 Sonnet）未能从增加协作者中获益，层级化分解的协调成本可能超过其收益。
 4. **探索-利用失衡**：性能与工具调用次数正相关，但预算缩放曲线的平台效应表明，单纯的探索增加无法突破性能上限。
 5. **验证器等效动作限制**：ARE Verifier 假定不存在等效的写操作路径（如通过 Messages 还是 Chat 发送消息被视为不同），可能低估了智能体的实际灵活性。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_9gw03JpKK4/figures/025_Table_4.jpg]]
-*Table 4: Pre-set notification policies in Mobile (Compressed)*
-
-
 
 ## 定位与知识库关联
 
@@ -376,8 +345,6 @@ Gaia2 相对于上述基准的方法创新可归纳为四个关键设计槽位�
 5. **等效动作的宽松验证**：如何放宽验证器对等效动作的严格限制，更真实地反映智能体的实用性？这需要在不牺牲验证可靠性的前提下，定义跨应用的功能等价性。
 
 6. **基础设施可靠性**：如何消除模型 API 的速率限制和宕机问题，提供可靠的基础设施以支持实时响应的代理系统？当前的 API 延迟和不可靠性是部署时间敏感智能体的实际障碍，而非模型能力问题。
-
-
 
 ## 原文 PDF
 

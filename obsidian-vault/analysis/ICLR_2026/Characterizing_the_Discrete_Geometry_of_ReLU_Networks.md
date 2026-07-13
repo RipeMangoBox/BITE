@@ -78,8 +78,6 @@ claims:
 
 **开放问题**：训练为何倾向于将数据点置入高邻居数区域？连通图直径等拓扑特性是否与泛化性能、鲁棒性或不确定性量化存在定量关联？能否利用这些几何性质指导架构搜索或数据增强？对于大规模网络，是否存在高效的近似估计算法？
 
-
-
 深度神经网络的表达能力与其在输入空间上诱导的几何分割密切相关。对于以ReLU为激活函数的全连接网络，每个神经元对应一个超平面（更准确地说，是弯曲超平面），这些超平面将输入空间 $\mathbb{R}^d$ 划分成若干个凸多面体区域，整体构成一个**多面体复形**（polyhedral complex）。每个区域内的所有点共享相同的激活模式（sign sequence），因此对应一个线性函数。理解这些区域的数目、形状和拓扑连接方式，对于揭示网络的表示能力、优化景观和泛化行为具有根本意义。
 
 ### 现有研究的局限
@@ -111,8 +109,6 @@ claims:
 
 这些发现为理解ReLU网络的几何正则性提供了新的视角，也为后续研究几何特性与泛化性能之间的定量关联奠定了基础。
 
-
-
 ## 核心方法与创新机理
 
 本工作对全连接ReLU网络所诱导的输入空间多面体剖分进行了拓扑视角下的系统刻画，其核心创新在于将研究焦点从传统的“区域总数上界”转移到**区域之间的连接关系**——即连通图的拓扑特性。这一视角转换揭示了三个此前未被充分理解的几何规律。
@@ -137,8 +133,6 @@ claims:
 
 现有关于ReLU网络多面体剖分的研究（如区域计数上界的推导）大多停留在“有多少区域”这一静态问题上。本工作的本质突破在于追问“区域之间如何连接”，并将答案提炼为与架构参数直接关联的紧致理论界。这一转变使得连通图的平均度数和直径成为可预测、可验证的几何量，而非仅仅是组合爆炸的副产品。
 
-
-
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_TgLW2DiRDG/figures/004_Figure_1.jpg]]
 *Figure 1: (a) An example ReLU network with a 2-dimensional input. (b) The corresponding polyhedral complex where region A has neighbors B, C, D, and E. (c) The connectivity graph where nodes represent regions and edges link neighboring regions (so region A has degree 4). (d) A histogram of the number of neighbors for each region, or equivalently the degrees of the connectivity graph*
 
@@ -159,8 +153,6 @@ claims:
 ### 模块间关系
 
 三个模块形成递进依赖：Algorithm 1 为实验提供可计算的连通图实例；理论结果（第3节）为实验观测提供上界与渐近行为预测；实验（第5节）在合成数据与真实数据上验证理论边界，并揭示训练数据分布与几何特性之间的关联（如含数据的区域平均邻居数更高）。管线中的关键计算瓶颈在于 SOLVELP 子程序——每个候选邻居都需求解一次线性规划，且总多面体数随网络规模指数增长，这直接限制了可处理网络的宽度与深度（实验中宽度 ≤ 16，深度 ≤ 4，输入维度 ≤ 5）。
-
-
 
 ### 多面体连通图的构建算法
 
@@ -221,8 +213,6 @@ $$
 
 该递推关系是证明平均度数上界（Theorem 3.4）和单调收敛性（Theorem 3.6, 3.7）的基石。通过逐层移除神经元并追踪各类细胞的消长，可以导出连通图平均度数的严格上界 $2d$，并证明随着神经元数量增加，平均度数单调趋近该上界。
 
-
-
 ## 实验与关键发现
 
 ### 5.1 理论边界的实证验证
@@ -256,8 +246,6 @@ Figure 4（右）和Table 1、Table 3进一步量化了这一趋势。平均度�
 
 Figure 5以对数尺度展示了直径估计值随理论上界 $O(m^\ell)$ 的变化关系。三个子图分别对应宽度 $m=4,8,16$，每个子图包含深度 $\ell=1$ 至 $4$ 的曲线。关键观察：
 
-![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_TgLW2DiRDG/figures/013_Figure_5.jpg]]
-*Figure 5: Connectivity graph diameter vs theoretical upper bound. At each distinct value of the theoretical upper bound (abscissa), the actual diameter of 5 network complexes was estimated as described in Section 5.1. Each pair of dotted lines also encloses all (non-estimated) values of the connectivity graph diameters from every experiment. Each subfgure shows networks with fxed width m and depth 1 $\leq \ell \leq$ 4 . The widths are 4 (left), 8 (middle), and 16 (right)
 
 1. **固定宽度下直径呈对数增长**：当 $m$ 固定时，实际直径随深度增加而增长，但增速远低于理论上界的指数增长，在对数尺度上近似线性。
 2. **维度无关性验证**：Figure 11将横轴替换为Theorem 3.8的下界 $\Omega(\ln(N_d)/\ln(n))$ 后，不同输入维度的数据点几乎完全重叠。这直观地证明了直径由网络架构（宽度和深度）主导，而非输入维度——尽管区域总数 $N_d$ 随 $d$ 指数增长。
@@ -269,8 +257,6 @@ Theorem 3.8提供了理论解释：直径上界 $O(m^\ell)$ 仅依赖最大宽�
 ### 5.2 真实数据上的几何特性
 
 本节在MNIST、CIFAR10和California Housing三个真实数据集上训练网络（架构与性能见Table 2），分析多面体区域的连通性、有界性及其与训练数据的关系。Table 2显示，MNIST网络测试准确率为0.90，AUC为0.99；CIFAR10准确率为0.52，AUC为0.91；CA Housing的 $R^2$ 为0.65，MSE为0.34。
-
-![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_TgLW2DiRDG/figures/015_Table_2.jpg]]
 
 #### 5.2.1 数据点倾向于高连通区域
 
@@ -322,8 +308,6 @@ Figure 12和Table 3提供了更全面的架构扫描结果（$d \in \{2,3,4,5\}$
 
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_TgLW2DiRDG/figures/027_Table_2.jpg]]
 *Table 2: Architecture, training hyperparameters, and performance of networks trained on real-world data. For the regression task, we report coeffcient of determination R ^ { 2 } and Mean Squared Error (MSE), while for the classifcation tasks, we report accuracy and Receiver Operating Characteristic Area Under the Curve (AUC) on the test set*
-
-
 
 ## 定位与知识库关联
 
@@ -382,8 +366,6 @@ Figure 12和Table 3提供了更全面的架构扫描结果（$d \in \{2,3,4,5\}$
 5. **架构设计指导**：能否利用平均度数的$2d$上界和直径的$O(m^\ell)$上界来指导神经架构搜索、网络剪枝或数据增强策略？例如，直径上界与深度$\ell$的指数依赖关系是否暗示深层网络在表示拓扑上存在根本性约束？
 
 6. **有界性与任务类型的关系**：Figure 7显示分类任务中含数据区域的无界比例更高，而回归任务中更低——这一差异是否反映了不同任务类型对决策边界几何的根本性不同需求？
-
-
 
 ## 原文 PDF
 

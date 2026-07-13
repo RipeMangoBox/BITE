@@ -50,8 +50,6 @@ MCBLT针对上述瓶颈，提出了一条**可泛化的早期多视图融合MTMC
 
 实验验证了MCBLT的有效性：在AICity'24数据集上取得SOTA结果（HOTA 81.22），在WildTrack数据集上同样取得SOTA（IDF1 95.6）。消融实验表明，全局合并块相比启发式匹配将HOTA提升4.42；2D-3D检测关联模块使WildTrack的IDF1从63.2跃升至93.4。在长达23,994帧的仓库场景中，MCBLT的HOTA仅从90.51下降4.58，而基于Kalman滤波的基线则骤降43.35，充分展示了其在长时跟踪中的卓越鲁棒性。
 
-
-
 多相机多目标（MTMC）三维跟踪旨在从多个同步且重叠的相机视图中，在三维世界坐标系下持续定位和识别所有感兴趣的目标。该任务在智能交通、安防监控、体育分析等领域具有广泛应用，其核心挑战在于如何有效融合多视图信息，并在长时间跨度内保持目标的身份一致性。
 
 现有MTMC方法可根据多视图信息融合的时机分为三类范式（Figure 1）。第一类为**后期多视图聚合**：在各相机上独立进行2D检测，随后仅依赖外观ReID特征进行跨视图关联。此类方法完全忽视了场景的几何约束，当相机视角差异大或目标外观相似时，关联可靠性急剧下降。第二类为**带几何投影的后期聚合**：在2D检测后引入相机标定信息，通过几何投影约束辅助跨视图匹配。尽管这在一定程度上利用了空间信息，但多视图融合仍发生在检测之后，未能充分利用原始多视图特征之间的互补性。第三类为**早期多视图聚合**：在特征层面直接融合多视图信息，统一推理三维目标。这类方法理论上更具优势，但现有工作（如**EarlyBird**）通常依赖特定场景的固定相机布局进行BEV检测，并结合Kalman滤波与启发式匹配完成跟踪，导致两个关键瓶颈：
@@ -61,8 +59,6 @@ MCBLT针对上述瓶颈，提出了一条**可泛化的早期多视图融合MTMC
 **瓶颈二：长时跟踪的关联鲁棒性不足。** 传统Kalman滤波依赖线性运动假设，在目标频繁遮挡、急停急转等非线性运动场景中容易发生漂移。同时，基于滑动窗口重叠的启发式轨迹匹配策略在处理跨越数千帧的长视频时，窗口间的身份断裂问题突出。实验表明，基于Kalman滤波的基线方法（BEV-KF）在AICity'24仓库场景中，当视频长度从1,000帧扩展到23,994帧时，HOTA指标从63.50骤降至20.15（下降43.35），充分暴露了传统方法在长时关联上的脆弱性（Table 6）。
 
 针对上述瓶颈，本文提出**MCBLT**（Multi-Camera Multi-Object 3D Tracking in Long Videos），一种基于早期多视图聚合的MTMC跟踪框架。其核心动机在于：通过在BEV空间中进行早期多视图特征融合，消除对固定相机布局的依赖，实现可泛化的三维检测；同时，以层级图神经网络在三维世界坐标下直接建模跟踪关联，并引入无需训练的全局合并块替代启发式匹配，从根本上提升长时跟踪的精度与鲁棒性。
-
-
 
 ## 核心方法与创新机理
 
@@ -118,8 +114,6 @@ BEV坐标原点的选择对检测器泛化性有显著影响。MCBLT将原点从
 
 **创新协同逻辑**：上述四个核心changed slots形成因果链条——BEV早期融合使检测器泛化且输出3D框→2D-3D关联获取高质量外观特征→3D空间GNN跟踪消除投影畸变→全局合并块实现超长时稳定关联。每个环节解决一个具体瓶颈，组合后产生超越各模块简单叠加的系统性增益。
 
-
-
 MCBLT 的整体 pipeline 采用 **早期多视图聚合（early multi-view aggregation）** 范式，将多相机输入统一到鸟瞰图（BEV）空间中进行 3D 检测与跟踪，从而消除对固定相机布局的依赖。如图 2 所示，框架由四个核心阶段串联构成：**BEV 空间 3D 检测**、**2D-3D 检测关联**、**ReID 特征提取** 以及 **层级 GNN 3D 跟踪**。
 
 ### 数据流与模块关系
@@ -150,12 +144,8 @@ MCBLT 的整体 pipeline 采用 **早期多视图聚合（early multi-view aggre
 
 框架的核心洞察在于将 **多视图融合前置到检测阶段**：通过 BEVFormer 式的空间-时序注意力机制，在早期就将多相机特征统一到场景级表示中。这不仅使检测器对相机布局变化具有天然泛化性，还为后续的 3D 跟踪提供了统一的坐标基准，避免了传统后期聚合方法中跨视图关联的级联误差。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2412_00692/figures/002_Figure_2.jpg]]
 *Figure 2: The overall framework of MCBLT. First, multi-view images at frame t are passed through the image backbone to obtain multiview image features. A spatial encoder is then introduced to aggregate multi-view image features to BEV features B _ { t } , followed by a temporal encoder to aggregate BEV features within a temporal window. A DETR-based decoder is utilized to obtain object detection results, which are in the format of 3D bounding boxes. To get reliable ReID features for the detected objects, a ReID feature extraction module is proposed, including a 2D ReID feature extractor and a 2D-3D detection association algorithm. Finally, SUSHI-3D is designed to achieve multi-object tracking in BEV...*
-
-
 
 ### 3.1 坐标系统与投影
 
@@ -213,8 +203,6 @@ $$h_i^{(l)} = \Phi(\{m_{(i,j)}^{(l)}\}_{j \in N_i})$$
 
 **全局合并块**：为实现长时跟踪，MCBLT 以近在线方式处理长序列（步长 $s$），但不使用滑动窗口重叠和启发式匹配。取而代之的是全局合并块，它将过去轨迹与新帧的预测直接关联，与层级 GNN 共享权重且无需额外训练，从根本上解决了长视频中身份断裂的问题。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能与SOTA对比
@@ -255,30 +243,8 @@ MCBLT在长视频场景中展现出显著优势。在AICity'24仓库场景的239
 
 MCBLT在NVIDIA A100上的端到端推理速度约为1.5 FPS（Table 11），暂不适合实时应用。在大规模场景中使用更大图像骨干（如V2-99）时受GPU显存限制。ReID特征在真实数据集WildTrack上的质量明显低于合成数据集AICity'24（Table 10），表明对真实噪声和光照变化的鲁棒性仍有提升空间。层级GNN跟踪流程为近在线方式，并非严格在线跟踪。
 
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2412_00692/figures/015_Table_10.jpg]]
-*Table 10: Evaluation on our ReID feature quality*
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2412_00692/figures/017_Table_11.jpg]]
-*Table 11: MCBLT model efficiency analysis*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2412_00692/figures/005_Figure.jpg]]
-*Figure: (a) Warehouse (b) Hospital (c) Retail store*
-
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2412_00692/figures/010_Table_4.jpg]]
 *Table 4: Ablation studies on the configurations of our multi-view object detector. The evaluation is done on the customized validation set of the AICity’24 dataset*
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2412_00692/figures/012_Table_8.jpg]]
-*Table 8: A comparison of detection results on the WildTrack dataset with re-centering and pre-training*
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2412_00692/figures/013_Table_7.jpg]]
-*Table 7: 3D object detection results with different detectors on a customized AICity’24 validation set*
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2412_00692/figures/016_Table_9.jpg]]
-*Table 9: A comparison of results on the WildTrack test set with our 2D-3D detection association algorithm*
-
-
 
 ## 定位与知识库关联
 
@@ -343,8 +309,6 @@ MCBLT 的层级 GNN 跟踪流程为**近在线（near-online）**方式，以步
 3. **跨域 ReID 鲁棒性**：如何进一步改进 ReID 特征提取（如引入域自适应或数据增强策略），以缩小合成数据与真实数据之间的性能差距，是提升真实场景性能的重要方向。
 
 4. **极端场景泛化**：在完全不同的室内环境（如多层建筑、非平面地面、极端光照条件）下，MCBLT 的泛化能力是否需要额外的场景自适应机制或在线标定策略，仍需进一步研究。
-
-
 
 ## 原文 PDF
 

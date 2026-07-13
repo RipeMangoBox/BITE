@@ -249,8 +249,6 @@ Table 4 比较了各方法的编辑操作时间。基于 NeRF 的表示天然比
 
 所有基线方法均按其原始代码或默认设置运行，并在相同视频片段上进行评估，确保比较的公平性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l37_DynVideo_E_Harnessing_Dynamic_NeRF_for_Large_Scale_Motion_and_View_Chang/figures/008_Figure_5.jpg]]
 *Figure 5: DynVideo-E network designs: (a) Editing Background model, (b) Original human-object model, (c) Editing human model*
 

@@ -58,8 +58,6 @@ claims:
 
 **主要局限**：未知小目标的检测召回仍是瓶颈；快速运动、大幅度变形及完全遮挡后的重识别几乎无法正确跟踪；长时关联在召回与精度之间难以取得更好平衡。未来方向包括利用多帧时序上下文改进检测、构建未知对象的鲁棒外观模型，以及利用大规模未标注视频数据。
 
-
-
 ### 闭世界跟踪的范式局限
 
 多目标跟踪（MOT）领域长期遵循**闭世界假设**：检测器与跟踪器仅对预定义的语义类别（如行人、车辆）进行定位与关联。这一范式在自动驾驶、视频监控等场景中取得了显著进展，但其根本局限在于——现实世界中大量“未知”对象（如婴儿车、滑板、动物等）被系统性忽略。Figure 1 直观对比了两类范式的输出差异：左侧为传统闭世界跟踪仅输出已知类别，右侧为本文方法能够同时跟踪训练集中未标注的对象。
@@ -79,8 +77,6 @@ claims:
 本文的核心洞察在于：**闭世界目标检测器通过其内置的 RPN 和目标/非目标分类器，天然具备向未知对象泛化的潜力——关键在于设计合适的评分机制与关联策略以充分释放这一潜力。**
 
 基于此洞察，本文提出 **OWTB（Open-World Tracking Baseline）**，将跟踪-检测范式分解为四个可控阶段（Figure 6）：(1) 提议生成、(2) 跨帧相似度估计、(3) 轨迹管理与关联、(4) 重叠消除。在每个阶段，OWTB 通过简单的设计选择——结合目标性与背景分数的提议排序、融合光流与外观特征的关联相似度——显著提升了未知目标的跟踪性能，同时保持了已知目标的竞争力。
-
-
 
 ## 核心方法与创新机理
 
@@ -108,8 +104,6 @@ OWTB 的核心操作是将提议评分从单一的“类别置信度”替换为
 
 OWTB 的三个 changed slots 均非全新算法模块——objectness/background 评分、光流 ReID 融合、离线轨迹合并皆为现有技术的重新组合。其真正的创新在于：**通过受控消融实验，首次量化了每个设计选择对未知目标跟踪性能的边际贡献**，从而将“闭世界检测器能否用于开放世界跟踪”这一模糊问题转化为“如何排序提议、如何计算相似度、如何管理轨迹”这三个可操作的工程决策。这一方法论贡献使得 OWTB 在 TAO-OW 验证集上以已知 OWTA 60.2、未知 OWTA 39.2 的成绩，分别超出 SORT 基线 13.6 和 5.3 个百分点（Table 3），同时保持了流水线的简洁性与可复现性。
 
-
-
 OWTB（Open-World Tracking Baseline）遵循经典的“检测-跟踪”（tracking-by-detection, TBD）范式，并将其分解为四个独立且可替换的阶段，如图6所示。该流水线以逐帧方式处理视频，最终输出每个目标在整个时间轴上的非重叠分割掩膜与身份标识。
 
 **阶段一：目标提议生成（Proposal Generation）**
@@ -130,12 +124,8 @@ OWTB（Open-World Tracking Baseline）遵循经典的“检测-跟踪”（track
 
 整个流水线的核心控制点在于：提议阶段的目标性（objectness）与背景（background）联合评分机制，以及关联阶段的运动-外观混合相似度计算。这两处设计是闭世界检测器泛化至开放世界未知目标的关键使能因素。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l36_https_arxiv_org_abs_2104_11221/figures/006_Figure_6.jpg]]
 *Figure 6: Open-world tracking baseline (OWTB) is inspired by tracking-by-detection pipeline: we (1) obtain object proposals, (2) compute cross-frame association scores, that are used to (3) form and manage tracks, and finally, (4) ensure that conflicts with tracks occupying same space-time volume are resolved*
-
-
 
 ### 开放世界跟踪精度（OWTA）
 
@@ -172,8 +162,6 @@ OWTB 遵循经典的检测-跟踪（tracking-by-detection）范式，将开放�
 - **提议评分**：算术平均优于几何平均或仅用单一分数，因为 `objectness` 和 `background` 分数在未知目标上提供互补信息。
 - **关联相似度**：光流提供运动线索，ReID 提供外观线索，二者互补。中间帧传播虽提升已知目标准确率（88.2），但损害未知目标准确率（65.9），故最终方案不使用中间帧。
 - **轨迹管理**：离线合并（Hung.+OffTM）在已知 OWTA 60.5 和未知 OWTA 40.2 上均优于纯在线匈牙利匹配（Table 4）。
-
-
 
 ## 实验与关键发现
 
@@ -213,22 +201,11 @@ $$\mathrm{OWTA}_{\alpha} = \sqrt{\mathrm{DetRe}_{\alpha} \cdot \mathrm{AssA}_{\a
 
 **知识迁移的边界。** 当前方法仅从已知类别迁移知识，未利用大规模未标注数据。当未知目标的外观、形状或运动模式与已知类别差异极大时，RPN 提议质量和 ReID 特征判别力均会显著下降。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l36_https_arxiv_org_abs_2104_11221/figures/007_Figure_7.jpg]]
-*Figure 7: Recall Analysis. Proposal generation recall vs number of proposals for different scoring methods at IoU threshold 0.5 for (left) known objects and (center) unknown objects. Right: Track recall at varying % objects correctly recalled: e.g., 50% detected means at least half of the track must be correctly localized*
-
 ![[assets/figures/papers/paper_list_l36_https_arxiv_org_abs_2104_11221/figures/009_Table_2.jpg]]
 *Table 2: Association Similarity Ablation. Top-1 accuracy on 1FPS proposal association classification for various approaches - see text. Best performing methods colored: 1st, 2nd, 3rd, 4th, 5th. The Inter. column indicates whether ‘intermediate frames’ were used. *Non open-world oracle (trained on unknown classes)*
 
-![[assets/figures/papers/paper_list_l36_https_arxiv_org_abs_2104_11221/figures/008_Table_1.jpg]]
-*Table 1: Recall/size Analysis. Recall for varying object sizes (1k proposals/image). While models work well for known objects, and large unknown objects, they struggle on smaller unknown objects*
-
 ![[assets/figures/papers/paper_list_l36_https_arxiv_org_abs_2104_11221/figures/010_Table_3.jpg]]
 *Table 3: Results of our OWTB on the TAO-OW val. and test set. We report results in terms of our proposed OWTA metric, and additionally compare methods in terms of Detection Recall (D.Re), Association Accuracy (A.Acc), Association Recall (A.Re) and Association Precision (A.Pr). On the val set we compare our final Open-World Tracking Baseline (OWTB) to previous SOTA trackers on TAO-OW val. For the test set, Unknown classes are the same as those present in the val set, while Unknown-Unknown classes are further unknown classes only present in the test set. *: Non open-world (trained on unknown classes), †: contains overlapping results*
-
-![[assets/figures/papers/paper_list_l36_https_arxiv_org_abs_2104_11221/figures/012_Table_5.jpg]]
-*Table 5: Results of our OWTB on closed-world benchmarks DAVIS Unsupervised (val) and KITTI-MOTS (test), compared to all previous published methods. *MOTSFusion additionally uses stereo-depth information*
 
 ![[assets/figures/papers/paper_list_l36_https_arxiv_org_abs_2104_11221/figures/013_Table_4.jpg]]
 *Table 4: Long-term tracking and Overlap removal. Ablation of various long-term tracking and overlap removal strategies on TAO-OW val. Hung.: Online Hungarian algorithm; KA: Online multi-step keep-alive strategy, OffTM: Offline tracklet merging. NO→T: Non-overlap first, and then track. T→NO: Track first, and then non-overlap*
@@ -238,8 +215,6 @@ $$\mathrm{OWTA}_{\alpha} = \sqrt{\mathrm{DetRe}_{\alpha} \cdot \mathrm{AssA}_{\a
 
 ![[assets/figures/papers/paper_list_l36_https_arxiv_org_abs_2104_11221/figures/005_Figure_5.jpg]]
 *Figure 5: TAO-OW classes. Word cloud showing known (left) and unknown (right) classes in our TAO-OW benchmark, with wordsize proportional to frequency*
-
-
 
 ## 定位与知识库关联
 
@@ -279,8 +254,6 @@ OWTB的有效性建立在以下前提之上：
 2. **未知对象的长期外观模型**：现有ReID特征在已知类别上训练，对未知对象的判别力有限且随时间退化。能否为从未见过的对象在线构建鲁棒的长期外观表征，是长时关联突破的关键。
 3. **大规模未标注视频的利用**：开放世界场景下存在海量未标注视频数据，如何通过自监督预训练或半监督微调提升检测和关联的泛化能力，是缩小已知-未知性能差距的潜在路径。
 4. **端到端开放世界跟踪**：当前TBD范式将检测与跟踪分离，限制了联合优化的可能性。设计端到端的开放世界跟踪器，使提议生成和关联学习能够协同适应未知对象，是一个架构层面的开放挑战。
-
-
 
 ## 原文 PDF
 

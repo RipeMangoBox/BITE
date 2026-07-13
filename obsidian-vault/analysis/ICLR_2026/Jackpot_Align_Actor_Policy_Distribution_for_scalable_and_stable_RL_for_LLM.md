@@ -69,8 +69,6 @@ claims:
 
 - **超参数鲁棒性**：拒绝阈值$\lambda=1.0$为稳健默认值，在0.8-1.2范围内性能变化不大；$C_1$在2-10范围内均表现稳定；Top-K=20可在极小开销下提供准确的归一化常数估计。
 
-
-
 ### 大语言模型强化学习的效率瓶颈
 
 将强化学习（RL）应用于大语言模型（LLM）的推理能力训练已成为提升模型数学、编程等复杂任务表现的重要范式。典型的RL训练流程交替执行两个阶段：**rollout阶段**由actor模型采样生成完整响应序列，**训练阶段**则利用这些序列计算策略梯度并更新模型参数。然而，这一范式面临严峻的效率挑战——rollout阶段的自回归生成过程消耗大量计算资源，其开销通常远超参数更新本身。
@@ -90,8 +88,6 @@ $$\mathcal{L}^{\mathrm{PPO}}(\theta) = \mathbb{E}_{x \sim P_{\mathrm{inf}}} \Big
 上述困境揭示了一个更深层的问题：**现有方法仅在损失函数层面被动修正分布不匹配，而未在数据生成源头主动缩小分布差距**。当actor的采样分布 $P_{\text{inf}}$ 与目标策略分布 $P_{\text{target}}$ 之间的KL散度过大时，任何基于重要性采样的后验修正都将面临方差-偏差的不可调和矛盾。
 
 Jackpot的动机正是打破这一僵局：**能否在rollout阶段以极低的额外开销主动调整actor的采样分布，使其逼近目标策略分布，从而从根源上缓解off-policy训练的稳定性问题？** 这一思路要求设计一种轻量级的分布对齐机制，既能有效缩小KL散度，又不显著牺牲采样效率（接受率），同时还需将修正无缝集成到标准PPO优化框架中。
-
-
 
 ## 核心方法与创新机理
 
@@ -156,8 +152,6 @@ $$\alpha_C(a) = \min\left(1, \frac{p_{\mathrm{target}}(a)}{\lambda \cdot p_{\mat
 
 4. **消融实验**（Table 6）：在BF16有更新延迟的训练中，完整的masking+reweighting方案（完整Jackpot）相比仅使用masking（OBRS rejection alone）在所有测试基准上均有显著提升，且避免了训练崩溃——例如AIME24从19.167提升至25.625，AMC从49.699提升至63.855。
 
-
-
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_5RATVAQGPx/figures/006_Figure_3.jpg]]
 *Figure 3: Illustration of JACKPOT Pipeline focusing on Optimal Budgeted Rejection Sampling (OBRS) and Reweighting Procedures*
 
@@ -206,8 +200,6 @@ $$\mathcal{L}_{ours}^{\mathrm{PPO}}(\theta) = \Big[ \min( Z \cdot \max(\lambda, 
 ### 关键设计优势
 
 整个 pipeline 无需额外采样轨迹，无需额外的 log-probability 计算，也无需修改 vLLM 等推理引擎。OBRS 掩码操作在 rollout 阶段以极低成本完成，top-k 收集和偏差校正均复用已有前向计算结果，额外计算开销控制在总计算量的 3% 以内。
-
-
 
 ### 3.1 最优预算拒绝采样 (OBRS)
 
@@ -282,8 +274,6 @@ $$\kappa = \frac{\hat{\bar{\alpha}}}{\frac{1}{B} \sum_{i=1}^{B} Z_{\mathrm{appro
 
 **阶段二（PPO 更新与重加权）**：在训练 batch 上计算 $Z_{\mathrm{approx}}$ 和校正因子 $\kappa$；对每个 token 计算 Jackpot 重要性权重 $w_{\mathrm{OBRS}} = Z \cdot \max(\lambda, p_{\mathrm{new}}/p_{\mathrm{inf}})$；将 stop-gradient 后的权重乘以标准 PPO 截断损失，完成梯度更新。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与因果验证
@@ -291,9 +281,6 @@ $$\kappa = \frac{\hat{\bar{\alpha}}}{\frac{1}{B} \sum_{i=1}^{B} Z_{\mathrm{appro
 LLM强化学习训练中，rollout阶段的计算开销使得提高actor-policy更新比（即多次策略更新对应一次rollout）成为提升效率的关键手段。然而，当actor的采样分布与当前策略分布出现偏离时，传统的截断重要性采样（TIS）方法面临稳定性与性能的固有权衡——截断阈值过小会引入偏差，过大则无法有效抑制分布偏移带来的方差爆炸。**JACKPOT**通过最优预算拒绝采样（OBRS）直接调整actor的采样分布，从根源上缩小分布KL散度，而非仅在损失函数层面进行事后修正。
 
 **Figure 1** 展示了这一因果机制的决定性证据：在极端off-policy场景下（Qwen3-1.7B-Base rollout训练Qwen3-8B-Base），无对齐方法（pink）的KL散度剧烈飙升并迅速崩溃；TIS方法（green）虽然延迟了崩溃，但KL散度仍持续增长且性能远逊于on-policy基线（purple）；而JACKPOT（yellow）将KL散度维持在低位，并稳定收敛至接近on-policy的性能水平。这直接验证了分布对齐是稳定训练的必要条件，而OBRS是实现这一对齐的有效因果杠杆。
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_5RATVAQGPx/figures/002_Figure_1.jpg]]
-*Figure 1: RL training requires actor-policy maintaining strong probability distribution alignment. When actor and policy aren’t aligned, they will result in training collapse. Here we show training setting use a Qwen3-1.7B-Base model training rollout to train a Qwen3-8B-Base model policy. Without any alignment procedures, training collapses (pink). Prior method TIS (green) also show significant gap towards Qwen3-8B-Base on-policy baseline (purple), while collapsing, using TIS sees KL divergence also violently increasing. Our proposed method, Jackpot (yellow) maintains small KL divergence between actor and policy model probability distribution, while showing stable and competitive training convergence...*
 
 ### 主实验结果
 
@@ -324,36 +311,17 @@ LLM强化学习训练中，rollout阶段的计算开销使得提高actor-policy�
 
 **Top-K近似的效率-精度权衡。** **Table 9** 表明，k=20可在仅增加<3%计算开销的情况下提供足够准确的归一化常数Z估计。将k增大至40并未带来进一步性能提升，验证了Top-K并集近似的高效性。
 
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_5RATVAQGPx/figures/018_Table_9.jpg]]
-*Table 9: Effect of top-k on benchmark performance. Numbers are pass@1 accuracy*
-
 **C₁超参数的不敏感性。** **Table 7** 显示，C₁在2–10范围内均表现稳定，对最终性能不敏感，进一步降低了方法的使用门槛。
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_5RATVAQGPx/figures/016_Table_7.jpg]]
-*Table 7: Effect of $C _ { 1 }$ on benchmark performance. Experiment Setup: Model: Qwen3-4B-Base, ${ \bf$ C } 2 = { } 3.0, threshold c { = } 1 . 0 , response limit: 8k, mini-batch/train-batch: 64/2048, PPO clip: 0.4/0.7, 100k examples. Numbers are pass@1 accuracy*
 
 ### 极端场景下的鲁棒性
 
 **FP8量化不稳定性恢复。** **Table 5** 和 **Figure 4(b)** 展示了JACKPOT在FP8 on-policy训练中的独特价值：由于KV缓存的FP8量化引入数值不稳定性，vanilla基线出现训练崩溃；而仅应用OBRS masking（无损失重加权）即可恢复正常训练，证明OBRS对分布对齐的独立贡献——即便在名义上的on-policy设置中，量化误差引入的分布偏移也足以破坏训练。
 
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_5RATVAQGPx/figures/014_Table_5.jpg]]
-*Table 5: FP8 on-policy training (no staleness). Best scores before crash for the vanilla baseline*
-
 **双模型架构不匹配。** **Figure 4(c)** 和 **Table 2** 展示了最极端的off-policy场景：使用Qwen2.5-1.5B-MATH进行rollout，训练Qwen2.5-3B-Base。在这种架构和规模均不匹配的设置下，Vanilla GRPO和TIS均出现性能崩溃，而JACKPOT不仅保持了稳定训练，还在MATH-500上提升了12%的准确率。这验证了OBRS从“完全异质的输出响应中过滤有用token”的假设——即使rollout模型与训练模型差异巨大，OBRS仍能识别并保留对策略学习有价值的token。
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_5RATVAQGPx/figures/008_Table_2.jpg]]
-*Table 2: AMC22&23 results of two model training using various methods across the training steps. Mean@k/Pass@k*
 
 ### 失败模式与局限性
 
 尽管JACKPOT在多种off-policy场景下展现了显著的稳定性和性能优势，但需注意以下几点：（1）在极端架构不匹配的双模型训练中，JACKPOT虽能“击败基线并展现早期希望”，但距离on-policy性能仍有差距，表明分布对齐并非万能解药；（2）当前实验均在数学推理领域进行，方法在其他任务类型（如对话、代码生成）上的泛化性尚待验证；（3）OBRS的接受率虽在高初始KL下仍保持≈95%，但接受率与分布对齐程度之间的精确理论关系及其对最终策略质量的影响机制仍需进一步研究。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_5RATVAQGPx/figures/005_Figure_2.jpg]]
-*Figure 2: OBRS calibration results across three views: (a) per-token probability-ratio clipping pulls the model distribution toward the target, (b) acceptance remains high (≈ 95%) even at large initial $\mathrm { K L }$ , , and (c) overall KL is reduced by roughly an order of magnitude*
-
-
 
 ## 定位与知识库关联
 
@@ -408,8 +376,6 @@ $$\mathcal{L}_{\mathrm{ours}}^{\mathrm{PPO}}(\theta) = \mathbb{E}_{x \sim P_{\ma
 3. **多轮对话中的分布漂移**：在多轮交互场景中，分布偏移不仅来自模型更新延迟，还来自对话上下文的动态变化。Jackpot的OBRS机制是否能有效处理这种复合偏移，需要进一步研究。
 
 4. **与推测解码的协同**：推测解码（speculative decoding）同样涉及draft模型与target模型之间的分布匹配问题，Jackpot的OBRS框架是否能应用于此场景以提升推测解码的接受率，是一个有趣的技术交叉点。
-
-
 
 ## 原文 PDF
 

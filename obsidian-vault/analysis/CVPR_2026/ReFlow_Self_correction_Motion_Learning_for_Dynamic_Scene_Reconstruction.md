@@ -52,8 +52,6 @@ ReFlow的核心洞察是：准确的3D运动应当天然地解释视频帧间的
 
 实验表明，ReFlow在Nvidia Monocular和Nerfies-HyperNeRF两个基准上均取得最优PSNR/SSIM/LPIPS，超越MoDec-GS等最新方法。消融研究证实，在基线4DGS上直接加入自校正流匹配即可带来+0.64dB的PSNR提升；结合完整初始化、静动态分离和相机流匹配后，整体提升达+2.39dB（PSNR从25.81提升至28.20）。与使用外部光流监督的变体相比，自校正方法在复杂运动场景中PSNR高出4.61dB，验证了外部运动先验在特定场景下可能提供误导信号。
 
-
-
 ### 动态场景重建的核心瓶颈
 
 从单目视频重建4D动态场景是计算机视觉中的基础挑战。现有方法面临两个紧密耦合的瓶颈：
@@ -77,8 +75,6 @@ ReFlow建立在4D Gaussian Splatting（4DGS）框架之上，但针对上述两�
 3. **自校正流匹配**：通过全流匹配（Full Flow Matching）监督全局运动，通过相机流匹配（Camera Flow Matching）约束静态区域仅由相机运动驱动，两者互补提供完整的运动自校正信号。
 
 后续章节将详细展开各模块的设计原理、技术实现与实验验证。
-
-
 
 ## 核心方法与创新机理
 
@@ -134,8 +130,6 @@ $$\mathcal{L} = \mathcal{L}_{baseline} + \lambda_{ff}\mathcal{L}_{fullflow}(I_1,
 
 三个 changed slots 之间存在递进式依赖关系：完整规范空间初始化为分离式建模提供了结构化的起点，分离式建模又为区域化流匹配约束提供了施加对象。消融实验（Table 3）量化了这一协同效应：在基线 4DGS（PSNR 25.81）上逐步叠加各模块，PSNR 从 26.45（仅全流匹配，+0.64dB）→ 26.60（+规范空间初始化，+0.79dB）→ 27.00（+静动态分离，+1.19dB）→ 27.85（+全流匹配，+2.04dB）→ 最终 28.20（+相机流匹配，+2.39dB），验证了各组件独立贡献且正向叠加。
 
-
-
 ReFlow 的整体设计遵循“先构建完整静态/动态初始化，再解耦建模，最后通过自校正流匹配实现运动学习”的三阶段流水线，如图 3 所示。整个框架的输入为单目视频序列及其对应的相机位姿，输出是支持新视角渲染和动态场景重建的 4D 高斯表示。
 
 ### 流水线概览
@@ -164,15 +158,8 @@ $$
 
 该方法引入了适度的计算开销：训练时间增加约 30%，GPU 显存占用增加 1–2 GB（Table 4），主要来自流渲染和规范空间构建的额外计算。渲染速度（FPS）较基线下降约 10–20%，模型大小增加 20–50 MB，但推理阶段无额外计算负担。此外，整体性能受限于几何基础模型在物体出现/消失或拓扑变化场景下的可靠性（如图 9 所示的失败案例），这是当前流水线的一个结构性瓶颈。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l40_https_arxiv_org_abs_2604_01561/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of ReFlow. We start by constructing a complete canonical space(Sec. 3.2.1), which includes both static and dynamic components, ensuring a reliable 3D scene initialization. Next, we disentangle these elements using spatial and spatiotemporal feature planes(Sec. 3.2.2), providing a structured representation that separately handles static and dynamic regions. This preparation allows us to introduce targeted motion constraints(Sec. 3.3): Full Flow supervises motion across the entire scene, while Camera Flow enforces consistency in static regions, enabling the self-correction learning mechanism for accurate 3D motion reconstruction*
-
-![[assets/figures/papers/paper_list_l40_https_arxiv_org_abs_2604_01561/figures/001_Figure_1.jpg]]
-*Figure 1: Typical Challenges in monocular dynamic scene reconstruction. Top: Incomplete initialization for dynamic regions: the initial 3D structure from SfM often misses dynamic components and initializes Gaussians without separating static points (green) from dynamic points (red), leading to an entangled and incomplete representation. Bottom: To compensate, existing methods frequently resort to external dense motion guidance to constrain and stabilize the reconstruction of dynamic regions*
-
-
 
 ReFlow 的核心创新在于将动态场景重建从“依赖外部运动先验”转变为“从视频自身学习运动”，其技术路线围绕三个关键模块展开：完整规范空间构建、分离式静动态建模、以及自校正流匹配机制。以下逐一剖析各模块的设计逻辑与数学表达。
 
@@ -276,19 +263,6 @@ $$
 
 其中 $\lambda_{ff}$ 和 $\lambda_{cf}$ 为平衡系数。全流匹配为整个场景提供全局运动监督，相机流匹配则锁定静态区域的结构稳定性——两者形成互补的自校正信号，驱动 3D 运动学习，全程无需任何外部运动先验。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l40_https_arxiv_org_abs_2604_01561/figures/004_Figure_4.jpg]]
-*Figure 4: Self-correction flow matching mechanism. (a) Different Motion and Flow in the 4D Scene. Static areas move only due to camera motion (camera flow), while dynamic areas involve both camera and object motion (full flow). Accurate motion learning requires region-specific flow supervision. (b) Self-correction flow matching. We apply full flow to warp the entire image from state t1 to state*
-
-![[assets/figures/papers/paper_list_l40_https_arxiv_org_abs_2604_01561/figures/002_Figure_2.jpg]]
-*Figure 2: Motivation of Self-correction Flow Matching. (a) We start with a simple observation: 2D observations, such as the shifting balloon, are caused by 3D motion. Accurate reconstructed 3D Motion should naturally align with these visible changes. (b) Unlike previous methods that use external motion priors to supervise 3D motion, we instead uses raw video as motion supervision through a self-correction flow matching mechanism to directly align predicted 3D motion projections with 2D frame differences*
-
-![[assets/figures/papers/paper_list_l40_https_arxiv_org_abs_2604_01561/figures/011_Figure_8.jpg]]
-*Figure 8: Illustration of the computation of Full Flow (top-left) and Camera Flow (bottom-right)*
-
-
-
 ## 实验与关键发现
 
 ### 核心发现：自校正流匹配的有效性
@@ -358,16 +332,6 @@ Figure 10 可视化了训练过程中自校正流匹配的逐步收敛过程。�
 ![[assets/figures/papers/paper_list_l40_https_arxiv_org_abs_2604_01561/figures/015_Figure_10.jpg]]
 *Figure 10: Visualization of our self-correction flow matching progress across training iterations, using the DynamicFace sequence from the Nvidia Monocular dataset [18]. Each row shows results at different training iterations: 300 (top row), 1000 (second row), 5000 (third row), and 7000 (bottom row). The columns present: Left column*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l40_https_arxiv_org_abs_2604_01561/figures/005_Table_1.jpg]]
-*Table 1: Quantitative comparison on Nvidia Monocular dataset. We report PSNR/SSIM/LPIPS per scene; the last block shows the mean across all available scenes (including dynamicFace when available)*
-
-![[assets/figures/papers/paper_list_l40_https_arxiv_org_abs_2604_01561/figures/009_Table_2.jpg]]
-*Table 2: Quantitative comparison on Nerfies-HyperNeRF dataset [45, 46]. We highlight the best and second best results*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 方法继承与基线对照
@@ -414,8 +378,6 @@ ReFlow 在 4DGS 基线上进行了三个关键槽位的替换：
 4. **多模态运动监督的融合**：虽然 ReFlow 证明了纯视频监督的可行性，但在某些场景下，稀疏的外部运动先验（如语义关键点匹配）可能提供互补信息。如何在不引入错误传播的前提下选择性融合多模态信号，是一个开放的设计问题。
 
 5. **实时或近实时的自校正重建**：当前方法的训练时间开销限制了其在实时应用中的部署。通过流渲染的近似计算、规范空间构建的增量更新等工程优化，有望将自校正机制推向在线场景。
-
-
 
 ## 原文 PDF
 

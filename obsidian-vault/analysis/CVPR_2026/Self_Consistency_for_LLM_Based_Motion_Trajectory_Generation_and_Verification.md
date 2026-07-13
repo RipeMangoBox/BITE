@@ -59,8 +59,6 @@ claims:
 - **轨迹验证**：在 2240 对轨迹的验证数据集上，自洽性方法相比 VLM 基线（GPT-5）精度提升 11.8%，F1 分数提升 5.6%（达到 84.6）。
 - **已知正确变换群（oracle）时**，验证 F1 可达 85.6，进一步验证了框架的上界性能。
 
-
-
 ### 问题背景：LLM 驱动的运动图形生成
 
 运动图形动画广泛存在于信息可视化、用户界面和数字叙事中，其核心往往由描述物体运动路径的几何轨迹构成。近年来，大语言模型（LLM）展现出从自然语言提示直接生成运动图形代码的能力——用户只需描述期望的运动形状（如“画一个五角星”或“生成一个抛物线轨迹”），LLM 即可输出可执行的动画程序。这一范式大幅降低了运动图形创作的门槛。
@@ -88,8 +86,6 @@ $$d_W(t_1, t_2) = \min_{w \in W} \frac{1}{n} \sum_{i=1}^{n} \| w(t_{1,i}) - t_{2
 基于这一形式化，本文提出了一套完整的无监督流程：对 LLM 进行多样性采样生成多条轨迹，利用几何变换群层次结构对轨迹进行聚类，自动选择最合适的变换群，并从最大簇中选取原型作为自洽生成结果。该框架同时可自然地扩展为验证器——通过检查查询轨迹是否能加入最大簇来判断其有效性。
 
 在生成任务上，该方法将 GPT-4.1 和 GPT-5 的准确率分别提升 4–6 个百分点；在验证任务上，相比 VLM 基线提高了 11% 的精确率和 5.6% 的 F1 分数。
-
-
 
 ## 核心方法与创新机理
 
@@ -128,8 +124,6 @@ $$d_W(t_1, t_2) = \min_{w \in W} \frac{1}{n} \sum_{i=1}^{n} \| w(t_{1,i}) - t_{2
 
 上述四个 changed slots 构成一条完整的因果链：**多样性采样**提供统计基础 → **变换不变距离**定义几何一致性 → **层次变换群选择**自动适配提示的几何约束 → **成员检测**实现可校准的验证。这一链条将 LLM 的自洽性从离散符号空间推广到连续几何空间，为视觉生成中的无监督质量提升提供了新的方法论框架。
 
-
-
 本工作提出了一套面向LLM运动轨迹生成与验证的无监督自洽性框架。其核心流程可概括为四个阶段：**多样性采样 → 变换不变聚类 → 变换群选择 → 原型选择与验证**。图1给出了该流程的全局概览。
 
 **输入与输出。** 系统的输入为一条自然语言提示（如“绘制一个五角星形轨迹”），输出端则根据任务分为两种模式：（1）**生成模式**下，返回一条自洽性最高的运动轨迹作为最终生成结果；（2）**验证模式**下，接收一条查询轨迹，返回其是否属于提示所描述的形状族的二值判断。
@@ -145,12 +139,8 @@ $$d_W(t_1, t_2) = \min_{w \in W} \frac{1}{n} \sum_{i=1}^{n} \| w(t_{1,i}) - t_{2
 
 **关键设计决策。** 框架的核心洞察在于将视觉提示映射为一个原型轨迹与一个几何变换群（李群）的组合——即同一形状族内的轨迹可通过群内扭曲相互转换。这一形式化使得“一致性”不再依赖脆弱的身份匹配，而是通过变换不变距离来度量。变换群层次结构（刚性 → 相似性 → 仿射 → 投影）为系统提供了从严格到宽松的多粒度一致性判断能力，而自动群选择机制则使整个流程在无监督设定下保持端到端的可用性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l27_https_openaccess_thecvf_com_content_CVPR2026_html_Ma_Self_Consistency_fo/figures/001_Figure_1.jpg]]
 *Figure 1: Complex motion graphics animations are often composed of trajectories in the form of geometric shapes (left). While LLMs can generate motion graphics animations from a prompt describing the shape of an object’s trajectory, the resulting animation does not always follow the prompt specification (right, motions move from blue to red). We present a self-consistency method that enables more accurate LLM-based trajectory generation without supervision and show that it can be used for trajectory verification. We ask the LLM to generate multiple trajectory samples, cluster the samples using a hierarchy of geometric transformation groups, and choose the largest cluster as the most self-consistent s...*
-
-
 
 ### 问题形式化：形状族与变换不变距离
 
@@ -188,15 +178,11 @@ $$d_W(t_1, t_2) = \min_{w \in W} \frac{1}{n} \sum_{i=1}^{n} \| w(t_{1,i}) - t_{2
 
 **模块6：验证器**。给定查询轨迹 $t$，计算其与原型在选定变换群下的距离 $d_W$，若低于阈值 $\tau$ 则判定为有效输出，即 $t \in \mathcal{F}(o, W)$。这本质上是一个形状族成员检测器，将 VLM 直接二分类替换为基于几何一致性的判定，解决了 VLM 的校准问题。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l27_https_openaccess_thecvf_com_content_CVPR2026_html_Ma_Self_Consistency_fo/figures/002_Figure_2.jpg]]
 *Figure 2: We define a shape family*
 
 ![[assets/figures/papers/paper_list_l27_https_openaccess_thecvf_com_content_CVPR2026_html_Ma_Self_Consistency_fo/figures/003_Figure_3.jpg]]
 *Figure 3: Hierarchy of Lie transformation groups and shape families they induce. Each node represents a transformation group and depicts a prototype square-shaped trajectory o as well as other trajectories w(o) within the corresponding shape family*
-
-
 
 ## 实验与关键发现
 
@@ -230,8 +216,6 @@ VLM 基线的高召回率、低精确率模式表明，VLM 倾向于将大量轨
 
 **方法局限**：当 LLM 生成的轨迹分布不满足假设（例如无法形成多数簇）时，方法可能失效。此外，当前框架假设每个提示对应的形状族可由单个原型和单个几何变换群描述，不支持同时包含多个不相交形状族的提示（如七角星存在 {7/2} 和 {7/3} 两种无法相互变换的形态）。论文指出，这一问题可通过简单的多簇扩展缓解，但未在实验中验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l27_https_openaccess_thecvf_com_content_CVPR2026_html_Ma_Self_Consistency_fo/figures/004_Figure_4.jpg]]
 *Figure 4: We present clustering results on LLM-generated samples from three example prompts in our dataset. Each trajectory has a ground truth label on the upper right. Clusters colored green are the chosen largest clusters, and we note that their sizes vary, sometimes less than half of the total number of trajectories (middle). In the pentagon case, failed samples (Cluster 2–4) appear visually distinct from the true ones, while some of the failed deltoids (Cluster 4–8) look closer to the correct one with their triangular forms. The rightmost parabola is a skewed one that would have been grouped into the largest cluster under the affine warp*
 
@@ -240,11 +224,6 @@ VLM 基线的高召回率、低精确率模式表明，VLM 倾向于将大量轨
 
 ![[assets/figures/papers/paper_list_l27_https_openaccess_thecvf_com_content_CVPR2026_html_Ma_Self_Consistency_fo/figures/006_Table_1.jpg]]
 *Table 1: Motion trajectory generation experiment (see Sec. 5.2). We evaluate the accuracy of LLM-generated motion trajectories (GPT-4.1 and GPT-5) under different decoding strategies. Under different decision criteria for selecting a transformation group W , our self-consistency approach improves upon the baseline alternative of directly generating a single sample (LLM-Direct)*
-
-![[assets/figures/papers/paper_list_l27_https_openaccess_thecvf_com_content_CVPR2026_html_Ma_Self_Consistency_fo/figures/007_Figure_5.jpg]]
-*Figure 5: F1 scores across different numbers of sampled trajectories N . Decision criteria performances stabilize after N = 10*
-
-
 
 ## 定位与知识库关联
 
@@ -314,8 +293,6 @@ VLM 基线的高召回率、低精确率模式表明，VLM 倾向于将大量轨
 
 - 能否将变换群从参数化李群扩展到更灵活的非参数变形模型（如薄板样条），以覆盖更广泛的形状族？
 - 在 LLM 采样分布严重偏离时，能否引入主动采样策略（如基于当前聚类结果引导后续采样）来提高多数簇的形成概率？
-
-
 
 ## 原文 PDF
 

@@ -52,8 +52,6 @@ claims:
 
 **主要结果**：在ShapeNet数据集上，H2MM的FID达到10.39，相较于DiffGS的12.87降低了2.48。消融实验表明，角度噪声缩放因子 $\Lambda_c$ 是生成质量的关键保障（移除后FID从10.12恶化至14.26），而渐进式逐层生成策略进一步将FID降至9.73。
 
-
-
 ### 3D 生成中的语义结构瓶颈
 
 3D 内容生成近年来取得了显著进展，扩散模型与高斯泼溅（Gaussian Splatting）的结合已成为主流范式。然而，现有方法在生成过程中普遍忽略了一个关键问题：**3D 物体的部件语义具有天然的层次结构**。一个物体由多个部件组成，每个部件又包含子部件，这种从粗到细的语义层次应当被生成模型显式建模。
@@ -71,8 +69,6 @@ claims:
 本文的核心洞察在于：**在双曲空间中，半径与角度分别承载着不同性质的语义信息，必须在扩散过程中区别对待**。半径方向的扰动对应于跨层次的语义迁移（如从“椅子”到“扶手”），而角度方向的扰动对应于同层次内的语义变异（如不同风格的扶手）。分离这两类噪声，并根据双曲几何的局部缩放因子自适应调整角度噪声的强度，是在扩散过程中保持层次结构完整性的关键。
 
 基于这一洞察，本文提出 **Hierarchical Hyperbolic Mixture Model (H2MM)** 与配套的 **Hyperbolic Diffusion** 框架，将 3D 生成从欧几里得空间迁移到双曲流形上，通过解耦的径向-角度噪声注入和基于 Möbius 运算的高阶扩散求解器，实现在扩散生成全过程中对部件语义层次结构的保持。
-
-
 
 ## 核心方法与创新机理
 
@@ -92,8 +88,6 @@ claims:
 具体而言，H2MM 从根隐变量 $\mathbf{z} \in \mathbb{R}^{768}$ 出发，通过 44 层解码器（含双曲注意力与双曲 MLP 分裂）将高斯原语层次化划分为 128 个部件，形成树形混合结构。在扩散过程中，径向噪声与角度噪声被显式解耦，并通过缩放因子 Λc 根据半径自动调整角度噪声的幅度，从而匹配双曲几何的指数增长规律。逆向采样时，HDM-Solver 利用 Möbius 加法与标量乘法直接在 Poincaré 球上执行三阶 ODE 更新，其正确性由切空间欧拉更新与指数映射的等价性保证（Eq. 8）。
 
 这一设计使得生成过程天然保持“半径控层次、角度控变化”的语义解耦，为后续的部件级编辑与渐进式生成提供了几何基础。
-
-
 
 本文提出的**分层双曲混合模型（H2MM）**与**双曲扩散**框架，旨在将3D生成从欧几里得空间迁移到双曲空间，从而在扩散过程中保持语义层次结构的完整性。整个pipeline由四个核心模块串联构成：**树扫描网络**、**H2MM解码器**、**测地线扩散过程**和**双曲扩散模型求解器（HDM-Solver）**。
 
@@ -124,8 +118,6 @@ $$\mathrm{Exp}_{\mathbf{z}_{t}}(\mathbf{x}_{t-\Delta t}) \equiv \mathbf{z}_{t} \
 ### 输入输出流总结
 
 整个pipeline的输入为全局隐变量 $\mathbf{z}$（无条件生成）或条件信号（文本/图像条件生成），经过H2MM解码器生成层次化高斯混合参数，再通过双曲扩散过程进行采样，最终输出3D高斯原语表示。渐进式逐层生成策略（消融实验显示可将FID从15.92降至9.73）进一步提升了输出质量。
-
-
 
 ### 树扫描网络：基于最小生成树的特征聚合
 
@@ -169,13 +161,6 @@ $$\mathrm{Exp}_{\mathbf{z}_t}(\mathbf{x}_{t-\Delta t}) \equiv \mathbf{z}_t \oplu
 
 其中 $\oplus$ 为 Möbius 加法，$\otimes$ 为 Möbius 标量乘法。这一等价性使得高阶 ODE 求解器（如论文中的三阶 HDM-Solver-3）可以完全在双曲流形上以闭式 Möbius 运算实现，避免了反复的指数/对数映射带来的数值误差和计算开销。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2536_https_openaccess_thecvf_com_content_CVPR2026_html_Yang_Learning_Hierarch/figures/001_Figure_1.jpg]]
-*Figure 1: Visualization of noise injection in a polar-like space*
-
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与因果机制
@@ -185,9 +170,6 @@ $$\mathrm{Exp}_{\mathbf{z}_t}(\mathbf{x}_{t-\Delta t}) \equiv \mathbf{z}_t \oplu
 ### 主实验结果
 
 在 ShapeNet 数据集上，H2MM 搭配双曲扩散取得了 **FID 10.39**，相较基线 **DiffGS** 的 12.87 降低了 2.48（Table 7）。该结果直接验证了双曲表示与解耦噪声注入对生成质量的提升。Table 7 同时给出了计算复杂度对比，表明 H2MM 在保持竞争力的推理效率下实现了更优的生成保真度。
-
-![[assets/figures/papers/paper_list_l2536_https_openaccess_thecvf_com_content_CVPR2026_html_Yang_Learning_Hierarch/figures/008_Table_7.jpg]]
-*Table 7: Complexity analysis of different methods on ShapeNet dataset*
 
 ### 消融实验
 
@@ -233,25 +215,9 @@ Figure 1 直观对比了各向同性高斯噪声与解耦径向/角度噪声在�
 ![[assets/figures/papers/paper_list_l2536_https_openaccess_thecvf_com_content_CVPR2026_html_Yang_Learning_Hierarch/figures/010_Figure_3.jpg]]
 *Figure 3: Visualization of unconditional generation and H2MM*
 
-![[assets/figures/papers/paper_list_l2536_https_openaccess_thecvf_com_content_CVPR2026_html_Yang_Learning_Hierarch/figures/011_Figure_4.jpg]]
-*Figure 4: Visualization of class-conditioned generation*
-
-![[assets/figures/papers/paper_list_l2536_https_openaccess_thecvf_com_content_CVPR2026_html_Yang_Learning_Hierarch/figures/013_Figure_5.jpg]]
-*Figure 5: Visualization of complex text-to-3D generation*
-
-![[assets/figures/papers/paper_list_l2536_https_openaccess_thecvf_com_content_CVPR2026_html_Yang_Learning_Hierarch/figures/014_Figure_6.jpg]]
-*Figure 6: Visualization of image-to-3D generation*
-
 ### 失败模式与局限
 
 当前分析未提供明确的失败案例或局限讨论。从实验设计推断，H2MM 的层次深度和分裂策略需针对不同数据集手工调整，这可能限制其在新类别上的即插即用能力。此外，双曲扩散求解器（HDM-Solver-3）的高阶 ODE 采样虽在 Table 7 中效率可接受，但在实时应用场景下的推理延迟仍需进一步验证。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2536_https_openaccess_thecvf_com_content_CVPR2026_html_Yang_Learning_Hierarch/figures/002_Table_1.jpg]]
-*Table 1: Details of each dataset*
-
-
 
 ## 定位与知识库关联
 
@@ -302,8 +268,6 @@ Figure 1 直观对比了各向同性高斯噪声与解耦径向/角度噪声在�
 *   该框架在更复杂的多物体场景或动态场景中的扩展性尚未讨论。
 *   双曲空间的维度选择与物体语义层次深度之间的关系缺乏理论分析。
 *   当前实验集中在ShapeNet等合成数据集，在真实扫描数据上的泛化能力需要进一步验证。
-
-
 
 ## 原文 PDF
 

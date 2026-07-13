@@ -247,8 +247,6 @@ DyNFL 的组合神经场表示支持丰富的场景编辑操作。Figure 8 展�
 
 DyNFL 在合成未见视角的移动车辆时存在困难，需要学习先验来补全缺失的强度与射线丢弃模式信息。方法依赖预先追踪的边界框和轨迹，当边界框不精确时性能会下降。训练时间约 7–16 小时，推理每帧约 2–7 秒，无法满足实时应用需求。场景编辑能力仅限于刚体运动假设，无法处理非刚性变形。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2312_05247/figures/022_Figure_13.jpg]]
 *Figure 13: Visualization of scene editing capabilities. We showcase 3 kinds of scene editing capabilities including vehicle removal(left), trajectory manipulation(middle) and vehicle insertion(right). The first row represents the original scenes, the second row demonstrates the scenes after editing. All points are color-coded by the intensity values(0 0.25)*
 

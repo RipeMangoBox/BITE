@@ -55,8 +55,6 @@ claims:
 
 **方法定位**：S4MC 属于基于伪标签的半监督分割方法，继承自 FixMatch 的置信度过滤范式，并在 UniMatch 的基础上通过空间上下文建模实现改进。其边际上下文细化机制可视为一种即插即用的伪标签后处理模块，不改变主干网络结构。
 
-
-
 语义分割的标注成本极高——像素级标签需要专业标注员为每张图像的每个像素分配类别，这使得大规模全监督训练在多数应用场景中难以实现。半监督语义分割旨在同时利用少量精确标注图像和大量未标注图像，在降低标注依赖的同时逼近全监督性能，因而成为密集预测领域的研究热点。
 
 当前半监督分割的主流范式建立在**伪标签自训练**之上：教师模型对未标注图像生成预测，将高置信度像素的类别作为伪标签，用于训练学生模型。代表性方法如 **FixMatch**（Sohn et al., NeurIPS 2020）采用固定阈值过滤低置信度预测，**UniMatch**（Yang et al., CVPR 2023）在此基础上引入特征级和图像级强增强，取得了当前最优性能。
@@ -68,8 +66,6 @@ claims:
 本文的核心洞察是：**将孤立像素的预测替换为相邻像素组的联合概率，可以放大类别差异并抑制错误传播**。直观上，若某像素的类别预测不确定，但其邻域像素对该类别有高置信度，则联合考虑这些像素应能提升该像素的置信度。这一思想通过**事件联合概率**的形式化建模——计算“至少一个相邻像素属于某类别”的概率——实现了伪标签置信度的重新评估，从而在**不降低标签质量的前提下放松传播阈值**，显著增加可用训练信号。
 
 具体而言，本文提出 **S4MC**，在教师-学生框架中嵌入**边际上下文细化模块**，利用邻域像素的边际信息重新计算每个像素的类别概率，并结合**动态分位数阈值调整（DPA）**策略，使模型在训练早期就能生成更多且更高质量的伪标签（见 Figure 4），有效缓解确认偏差，突破低标注场景下的性能瓶颈。
-
-
 
 ## 核心方法与创新机理
 
@@ -116,8 +112,6 @@ Table 8 的消融实验清晰揭示了两个 changed slots 各自的贡献与交
 
 S4MC 的创新高度依赖**空间相干性假设**——即相邻像素大概率属于同一类别。这一假设在自然图像的分割任务中成立，但在医学影像等纹理复杂、边界模糊的领域可能失效，需要手动验证。此外，当前方法采用固定形状的方形邻域，未利用物体的结构信息（如分割区域或超像素），这构成了进一步改进的空间。
 
-
-
 S4MC 沿用半监督语义分割中经典的**教师-学生框架**，并在此基础上引入两个关键改进：**动态分区阈值调整 (DPA)** 与**边际上下文细化模块**。整体 pipeline 如下：
 
 ### 1. 双网络结构与 EMA 更新
@@ -160,12 +154,8 @@ $$p_c(x_{j,k}^i \cup x_{\ell,m}^i) \leq p_c(x_{j,k}^i) + p_c(x_{\ell,m}^i) - p_c
 
 该框架的核心因果机制在于：**利用分割图中天然的像素空间相关性，将孤立像素的置信度评估替换为邻域联合概率评估，从而在不降低伪标签精度的前提下大幅增加可用训练信号，缓解低标注比例下的过拟合与确认偏差**。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2308_13900/figures/015_Figure.jpg]]
 *Figure: A.2: Qualative results of our method comparison to UniMatch baseline over COCO with 1/32 of the labeled examples. The segmentation map Left to right: Ground Truth, UniMatch prediction, S4MC Prediction*
-
-
 
 ### 教师-学生框架与损失函数
 
@@ -231,8 +221,6 @@ $$\tilde{p}_c(x_{j,k}^i) = p_c(x_{j,k}^i) + \beta_{\ell,m}\big[p_c(x_{\ell,m}^i)
 
 细化后的概率 $\tilde{p}_c$ 用于计算 margin 置信度 $\kappa_{\mathrm{margin}}$，进而决定伪标签的分配。这一设计的因果机制在于：当邻域像素对同一类别具有较高置信度时，联合概率显著高于单像素概率，使原本处于阈值边缘的正确预测得以通过筛选；反之，孤立的高置信度噪声则难以从邻域获得支持，从而被有效抑制。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -281,12 +269,6 @@ S4MC 在三个主流语义分割基准上均取得一致且显著的提升，验
 
 Figure 4 从训练过程角度揭示了 S4MC 的作用机制：
 
-![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2308_13900/figures/004_Figure_4.jpg]]
-*Figure 4: (b) Accuracy of the pseudo labels. S4MC produces more quality pseudo labels during the training process, most notably at the early stages. Figure 4: pseudo label quantity and quality on PASCAL VOC 12 (Everingham et al., 2010) with 366 labeled images using our margin (5) confidence function. The training was performed using S4MC; metrics with and without S4MC were calculated*
-
-![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2308_13900/figures/020_Figure.jpg]]
-*Figure: (a) The spatial agreement as we define in in 9 compared between different variations of Unimatch and S4MC. (b) The spatial agreement, compared between different variations of (Yang et al., 2023) and S4MC over time. Figure F.1: Spatial agreement analysis off diffrent methods on PASCAL VOC 12 using ResNet-101 backbone*
-
 - **伪标签数量（Figure 4a）**：S4MC 在整个训练过程中通过阈值的像素比例始终高于无细化版本，尤其在训练早期差异显著。这说明边际上下文细化有效放松了伪标签传播的阈值约束。
 - **伪标签质量（Figure 4b）**：尽管通过阈值的像素更多，S4MC 的伪标签精度反而更高，尤其在训练早期。这直接验证了核心洞察——利用邻域像素的联合概率可以放大类别差异并抑制错误传播，缓解确认偏差。
 
@@ -305,33 +287,17 @@ Figure 1 提供了单类（Cat）的定性示例：红色方框标注的像素�
 
 3. **小规模标注数据的偏差放大**：在半监督场景下，模型仅使用少量标注数据，这些数据可能无法充分代表整体分布中的长尾类别或边缘案例。S4MC 虽然通过伪标签扩展了训练信号，但伪标签的质量仍受限于标注数据的初始偏差，可能在某些类别上持续表现不佳。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2308_13900/figures/005_Table_1.jpg]]
 *Table 1: Comparison between our method and prior art on the PASCAL VOC 12 val (1,464 original annotated images out of 10,582 in total) under different partition protocols using ResNet-101 backbone. The caption describes the share of the training set used as labeled data and the actual number of labeled images. * denotes reproduced results using official implementation. ± denotes the standard deviation over three runs*
 
 ![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2308_13900/figures/006_Table_2.jpg]]
 *Table 2: Comparison between our method and prior art on the PASCAL VOC 12 val (1,464 original annotated images out of 10,582 in total) under different partition protocols using ResNet-50 backbone. The caption describes the share of the training set used as labeled data*
 
-![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2308_13900/figures/007_Table_3.jpg]]
-*Table 3: Comparison between our method and prior art on the augmented PASCAL VOC 12 val dataset under different partitions, utilizing additional unlabeled data from Hariharan et al. (2011) (total of 10,582 training images, 9,118 weakly annotated) and using ResNet-101 backbone. We included the number of labeled images in parentheses for each partition ratio. * denotes reproduced results using official implementation*
-
 ![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2308_13900/figures/008_Table_4.jpg]]
 *Table 4: Comparison between our method and prior art on the Cityscapes val dataset (total of 2,976 training images) under different partition protocols using ResNet-101 backbone. Labeled and unlabeled images are selected from the Cityscapes training dataset. For each partition protocol, the caption gives the share of the training set used as labeled data and the number of labeled images. * denotes reproduced results using official implementation*
 
-![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2308_13900/figures/009_Table_5.jpg]]
-*Table 5: Comparison between our method and prior art on COCO (Lin et al., 2014) val (total of 118,336 training images) on different partition protocols using Xception-65 backbone. For each partition protocol, the caption gives the share of the training set used as labeled data and the number of labeled images. * denotes reproduced results using official implementation*
-
-![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2308_13900/figures/010_Table_6.jpg]]
-*Table 6: The effect of α0, the initial proportion of confidence pixels for the Pascal VOC 12 with 1/4 labeled data and ResNet-101 backbone*
-
 ![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2308_13900/figures/012_Table_8.jpg]]
 *Table 8: Ablation study on the different components of S4MC on top of UniMatch for the augmented Pascal VOC 12 with 1 / 2 labeled data and ResNet-101 backbone. PLR is the pseudo label refinement module and DPA is dynamic partition adjustment*
-
-![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2308_13900/figures/013_Table_9.jpg]]
-*Table 9: Evaluation of Boundary IoU (Cheng et al., 2021) comparing models trained with UniMatch+S4MC and with FixMatch using 183 (1/1024) annotated images on COCO, both uses Xception-65 backbone as in Table 5*
-
-
 
 ## 定位与知识库关联
 
@@ -386,8 +352,6 @@ S4MC 的有效性建立在两个核心假设之上，这些假设同时定义了
 - **与强增强策略的协同**：S4MC 目前与 CutMix-Seg 等增强策略的集成显示了初步协同效应，但更深入的机制分析（例如细化如何影响增强样本的伪标签质量）仍有待探索。
 
 > **注意**：上述开放问题部分来自论文自身的讨论，部分基于方法局限性的合理推演。关于医学影像等域外应用的结论，论文仅提出了担忧而未提供实验证据，需要后续工作验证。
-
-
 
 ## 原文 PDF
 

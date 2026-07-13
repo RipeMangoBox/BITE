@@ -59,8 +59,6 @@ claims:
 
 该框架在保持VLM语言能力的同时，大幅增强了自动驾驶所需的空间感知与规划能力，为VLM在具身智能场景中的应用提供了新的范式。
 
-
-
 ### 自动驾驶中的视觉语言模型困境
 
 视觉语言模型（VLM）凭借其强大的常识推理与泛化能力，正被越来越多地引入自动驾驶领域，用于处理风险目标感知、运动预测、轨迹规划等多类任务。然而，一个根本性瓶颈始终存在：**VLM 本身缺乏跨视角的 3D 几何建模能力**。在自动驾驶场景中，车辆通常搭载多视角相机，场景理解高度依赖精确的空间感知——目标的相对位置、运动方向、距离与碰撞风险等，而这些恰是 VLM 所不擅长的。
@@ -85,8 +83,6 @@ claims:
 3. **显式编码相机参数**：将相机内外参显式嵌入融合过程，实现 2D 像素与 3D 空间的几何对齐，确保注入的几何特征具有空间一致性。
 
 这一思路最终凝结为 **VGGDrive** 框架——通过即插即用的 **跨视角 3D 几何使能器（CVGE）** 和层次化自适应注入机制，将冻结的 VGGT 模型生成的跨视角几何特征深度注入 VLM，在保持语言能力的同时，大幅提升多任务驾驶性能。
-
-
 
 ## 核心方法与创新机理
 
@@ -146,8 +142,6 @@ VGGDrive的核心洞察在于**解耦基础LLM的层级结构，将成熟的3D�
 
 这种差异化提升模式直接验证了核心主张：VGGDrive赋予VLM的是**几何定位能力**，而非通用语言能力的提升。在需要精确空间感知的任务上，性能飞跃；在依赖语义理解的描述任务上，VLM原有能力得以完整保留。
 
-
-
 VGGDrive的整体架构围绕一个核心设计原则展开：**将冻结的视觉三维基础模型的跨视角几何建模能力，以即插即用的方式深度注入到基础视觉语言模型（VLM）的解码过程中**，从而赋予VLM原本不具备的空间感知与几何定位能力。
 
 ### 架构总览
@@ -183,15 +177,8 @@ $$L_{CE} = - \sum_{t=1}^{T} \log p_{\theta}(y_t | y_{<t}, \{I_c\}_{c=1}^{C}, L)$
 - **相机参数显式编码**：将相机内外参通过齐次变换矩阵$T_i^{img2lidar}$显式编码到$K$和$V$中，使几何融合过程具备空间感知能力，是实现跨视角几何定位的关键。
 - **残差连接的必要性**：消融实验（Table 7, ID-4）表明，移除残差连接会导致性能显著下降，证明在LLM内部注入时必须保留原始隐藏状态的通路，以维护语言模型的稳定性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2428_https_arxiv_org_abs_2602_20794/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of VGGDrive. Specifically, the frozen visual 3D foundation model (VGGT [39]) extracts geometrically consistent 3D features V 3d through cross-view analysis, while the base VLM is decomposed into multiple decoder layers. The proposed CVGE sequentially integrates the shared 3D features V 3d with the 2D visual representations V 2di , injecting them V 3di through a hierarchical adaptive mechanism, thereby establishing geometric grounding and enabling deep enhancement of the VLM architecture*
-
-![[assets/figures/papers/paper_list_l2428_https_arxiv_org_abs_2602_20794/figures/001_Figure_1.jpg]]
-*Figure 1: Existing relevant paradigms vs. our VGGDrive. (a) The VLA paradigm for trajectory planning. (b) Two existing paradigms for integrating 3D foundation models (VGGT [39]) with VLMs: VGGT-Dist [11] and VGGT-Add [48]. (c) Our VG-GDrive, which leverages the VGGT model to profoundly empower the basic VLM with cross-view geometric grounding capabilities, thereby handling diverse autonomous driving tasks*
-
-
 
 VGGDrive 的核心架构由三个模块构成：基础视觉语言模型（Base VLM）、层次化自适应注入机制（Hierarchical Adaptive Injection Mechanism）和跨视角三维几何使能器（CVGE）。其设计目标是将冻结的 VGGT 三维基础模型提取的跨视角几何一致性特征，通过即插即用的方式深度注入 VLM 的解码过程，赋予模型几何定位能力。
 
@@ -253,8 +240,6 @@ $$PDMS = NC \times DAC \times \left( \frac { 5 \times EP + 5 \times TTC + 2 \tim
 
 该指标集成了五个子维度：无过失碰撞（NC）、可行驶区域遵循（DAC）、碰撞时间（TTC）、舒适度（C）和自我进展（EP），通过加权平均综合评估轨迹规划的质量与安全性。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现
@@ -274,9 +259,6 @@ VGGDrive 在五个自动驾驶基准上一致且显著地提升了基础 VLM 的
 
 ![[assets/figures/papers/paper_list_l2428_https_arxiv_org_abs_2602_20794/figures/007_Table_4.jpg]]
 *Table 4: The performance comparison on the OmniDrive dataset [42] focuses on caption-related tasks in which base VLMs excel*
-
-![[assets/figures/papers/paper_list_l2428_https_arxiv_org_abs_2602_20794/figures/008_Table_5.jpg]]
-*Table 5: Performance comparison on nuScenes open-loop planning, with metrics from BEV-Planner’s reproduced results [30]*
 
 ### 集成方案对比：CVGE 的不可替代性
 
@@ -299,25 +281,13 @@ Table 6 的消融实验对比了 VGGT 与 VLM 的四种集成方式，直接验�
 
 Table 7 对 VGGDrive 的核心组件进行了消融。移除残差连接（ID-4）导致性能显著下降，证明在 LLM 内部注入时保持原始隐藏状态的残差路径至关重要——它防止了几何特征的注入破坏原有的语义流。单层注入实验（Figure S1 及 Section B）显示，仅在某一解码层注入 3D 特征即可将 PDMS 提升至约 88，而全层自适应注入进一步达到最优 88.76，验证了层次化注入机制的累积增益。
 
-![[assets/figures/papers/paper_list_l2428_https_arxiv_org_abs_2602_20794/figures/010_Table_7.jpg]]
-*Table 7: Ablation Study of the Main Components of VGGDrive*
-
-![[assets/figures/papers/paper_list_l2428_https_arxiv_org_abs_2602_20794/figures/015_Figure_S.1.jpg]]
-*Figure S.1: Ablation analysis of closed-loop trajectory planning performance on the NAVSIM dataset when cross-view 3D geometric empowerment and adaptive injection are applied to individual decoding layers of the LLM*
-
 ### 3D 专家模型选择
 
 Table 8 对比了不同 3D 基础模型作为几何特征提取器的效果。VGGT 在所有指标上均优于 DUSt3R 等替代方案，验证了 VGGT 跨视角几何特征的质量优势。这一选择是 VGGDrive 性能的底层保障——劣质的几何特征即使经过精心设计的融合机制，也无法带来实质性的空间感知提升。
 
-![[assets/figures/papers/paper_list_l2428_https_arxiv_org_abs_2602_20794/figures/012_Table_8.jpg]]
-*Table 8: Ablation Study of the 3D Expert Model*
-
 ### 效率与性能权衡
 
 Table 9 对 CVGE 的超参数进行了灵敏度分析。缩放因子 $s=4$ 在效率与性能间取得良好平衡；将注意力头数增至 $h=8$ 可进一步略微提升性能，但计算开销相应增加。这为实际部署中的精度-延迟权衡提供了参考依据。
-
-![[assets/figures/papers/paper_list_l2428_https_arxiv_org_abs_2602_20794/figures/013_Table_9.jpg]]
-*Table 9: Further Ablation Analysis on the Navsim Benchmark*
 
 ### 失败模式与局限
 
@@ -325,8 +295,6 @@ Table 9 对 CVGE 的超参数进行了灵敏度分析。缩放因子 $s=4$ 在�
 - **描述类任务增益微弱**：OmniDrive 上仅 0.21 的提升表明，几何定位注入对纯语义任务几乎无贡献，但也不会造成性能退化。
 - **极端场景的可靠性未验证**：论文未提供在极端天气、照明条件或域外场景下的评估，VGGT 的几何特征质量在这些条件下是否依然可靠需要进一步验证。
 - **计算开销**：CVGE 的层次化交叉注意力机制引入了额外计算成本，Table 6 中的推理速度数据（需查阅原文具体数值）表明其相比简单融合方案存在一定延迟增加。
-
-
 
 ## 定位与知识库关联
 
@@ -385,8 +353,6 @@ $$x_i = X_i + X_i', \quad i = 1, ..., n$$
 4. **能力干扰**：跨视角几何定位的注入是否会削弱 VLM 的原有常识推理能力，尤其在需要语义先验的复杂交互场景中？如何量化并缓解这种潜在的能力干扰？
 
 5. **端到端训练**：当前 VGGT 保持冻结，若将其部分解冻进行端到端微调，是否能进一步提升几何特征与 VLM 的适配度，同时避免灾难性遗忘？
-
-
 
 ## 原文 PDF
 

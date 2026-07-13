@@ -56,8 +56,6 @@ claims:
 
 在方法谱系上，ICG和TSG处于推断时引导技术的交汇点：ICG延续了CFG的条件-无条件混合范式，但将无条件分支的获取方式从“训练时准备”转变为“推断时构造”；TSG则开辟了全新的引导信号来源——时间嵌入扰动，使引导机制不再依赖任何条件信息，从而扩展了CFG类技术的适用范围。
 
-
-
 扩散模型通过逐步去噪从高斯噪声中生成高质量样本，其核心是学习数据分布的得分函数 $\nabla_{z_t} \log p_t(z_t)$。条件扩散模型进一步引入条件信息 $y$（如类别标签、文本描述），学习条件得分 $\nabla_{z_t} \log p_t(z_t | y)$，以实现可控生成。然而，条件模型直接生成的样本往往在保真度与多样性之间存在权衡，引导（guidance）技术应运而生。
 
 **现有方法缺口**：无分类器引导（Classifier-Free Guidance, CFG）（Ho & Salimans, 2022）是当前最广泛使用的引导方法。它通过混合条件模型和无条件模型的输出来放大条件信号：
@@ -78,8 +76,6 @@ $$D_{\text{CFG}}(z_t, t, y) = D(z_t, t, y_{\text{null}}) + w \left( D(z_t, t, y)
 $$\nabla_{z_t} \log p_t(z_t | \hat{y}) \approx \nabla_{z_t} \log p_t(z_t)$$
 
 基于这一原理，本文提出**独立条件引导（Independent Condition Guidance, ICG）**，用独立于 $z_t$ 的随机条件向量（如高斯噪声）替代无条件模型输出，从而在纯条件模型上直接实现CFG等效效果。进一步，本文发现对时间步骤嵌入施加高斯扰动可以产生类似CFG的引导信号，由此提出**时间步引导（Time-step Guidance, TSG）**，将引导能力扩展到无条件模型，且不依赖任何特定网络架构。
-
-
 
 ## 核心方法与创新机理
 
@@ -118,8 +114,6 @@ $$\nabla_{z_t} \log \hat{p}_t(z_t) = \nabla_{z_t} \log p_t(z_t) + \frac{1 - w_{\
 ### 方法的互补性
 
 ICG 和 TSG 作用于扩散模型的不同组件——前者操控条件向量，后者操控时间嵌入——因此二者天然兼容。实验表明，联合使用 ICG 和 TSG 可以进一步提升生成质量，验证了两种引导机制的互补性。
-
-
 
 本文提出两种无需额外训练的引导方法，均可在推理阶段直接应用于预训练扩散模型，无需修改训练目标或模型权重。两种方法共享一个核心思想：通过构造一个“参考输出”来模拟无引导时的预测，然后利用条件输出与参考输出之间的差异形成引导信号，从而提升生成质量。
 
@@ -204,19 +198,12 @@ ICG 和 TSG 作用于模型的不同输入维度——ICG 修改条件向量，T
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_b3CzCCCILJ/figures/015_Table_7.jpg]]
 *Table 7: Effectiveness of CADS on ICG*
 
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_b3CzCCCILJ/figures/016_Figure_9.jpg]]
-*Figure 9: Similar to CFG, ICG is compatible with CADS, and CADS can be used to increase the diversity of ICG at higher guidance scales. Samples are generated from the DiT-XL/2 model*
-
 ### 计算成本与适用范围
 
 两种方法的共同代价是每步采样需要两次模型前向传播，计算量约为标准采样的两倍，这与 CFG 一致。ICG 适用于任何条件扩散模型，TSG 适用于任何使用时间步嵌入的扩散模型（包括无条件模型）。两种方法均在 Stable Diffusion、DiT、EDM 等多种架构上验证有效。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_b3CzCCCILJ/figures/002_Figure_1.jpg]]
 *Figure 1: Comparison between CFG and ICG for (a) Stable Diffusion (Rombach et al., 2022) and (b) DiT-XL/2 (Peebles & Xie, 2022). Both CFG and ICG significantly improve the image quality of the baseline. Also note the similarity between the outputs of CFG and ICG, confirming our theoretical analysis in Section 4*
-
-
 
 ### 3.1 标准无分类器引导（CFG）的瓶颈
 
@@ -287,14 +274,9 @@ $$\nabla_{z_t} \log \hat{p}_t(z_t) = \nabla_{z_t} \log p_t(z_t) + \frac{1 - w_{\
 
 该式表明TSG在原始得分函数上添加了一个**时间导数项**，其作用类似于沿采样轨迹施加额外驱动力。直观上（Figure 10）：使用较低时间步的嵌入会导致过度去噪（输出过软），使用较高时间步的嵌入会导致去噪不足（输出含噪），TSG同时利用两个方向的差异来改善输出质量。
 
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_b3CzCCCILJ/figures/017_Figure_10.jpg]]
-*Figure 10: Intuition behind TSG: Using lower time steps for guidance causes excessive noise removal (soft outputs), while higher time steps cause insufficient noise removal (noisy images). TSG employs both directions to improve output quality*
-
 ### 3.4 模块关系与计算代价
 
 ICG和TSG均可独立使用，也可组合（Table 4验证了两者的兼容性）。两者共享相同的计算特征：每步采样需要**两次模型前向传播**，计算成本约为标准采样的两倍，与标准CFG一致。这是当前方法的主要局限之一。
-
-
 
 ## 实验与关键发现
 
@@ -334,33 +316,17 @@ ICG 和 TSG 与 CFG 共享一个根本性局限：每步采样需两次模型前
 
 图 1 定性展示了 Stable Diffusion 和 DiT‑XL/2 上 CFG 与 ICG 的生成对比，两者在视觉质量上高度相似，印证了 ICG 可有效复现 CFG 行为的理论分析。图 6 展示了 TSG 对无条件生成和条件生成的定性改善：在 DiT‑XL/2 类别条件生成和 Stable Diffusion 文本条件生成上，TSG 均显著提升了图像的清晰度和结构一致性。图 10 提供了 TSG 的直观解释——使用较低的时间步嵌入会导致过度去噪（输出模糊），使用较高的时间步嵌入则导致去噪不足（输出含噪），TSG 通过双向利用这一差异来提升输出质量。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_b3CzCCCILJ/figures/003_Table_1.jpg]]
-*Table 1: Quantitative comparison between CFG and ICG. ICG is able to achieve similar metrics to standard CFG by extracting the unconditional score from the conditional model itself*
-
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_b3CzCCCILJ/figures/005_Figure_3.jpg]]
 *Figure 3: Comparison of CFG and ICG during training of a DiT model on ImageNet. Compared to standard CFG with label dropping, using ICG with a purely conditional model achieves better FID across all checkpoints. This indicates that the iterations spent on the CFG objective could be better allocated to training the conditional score, ultimately leading to a better model*
 
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_b3CzCCCILJ/figures/006_Figure_4.jpg]]
-*Figure 4: Behavior of ICG as the guidance scale increases. Similar to CFG, ICG trades diversity (lower recall) for quality (higher precision) at higher guidance scales*
-
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_b3CzCCCILJ/figures/009_Table_3.jpg]]
 *Table 3: Quantitative comparison between the baseline sampling of the diffusion models and sampling with TSG. TSG significantly boosts quality (lower FID) across various setups*
-
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_b3CzCCCILJ/figures/010_Figure_7.jpg]]
-*Figure 7: Behavior of TSG as the guidance scale increases for DiT-XL/2. Similar to CFG, TSG also significantly improves FID by trading diversity (recall) with quality (precision)*
-
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_b3CzCCCILJ/figures/011_Table_4.jpg]]
-*Table 4: Compatibility of ICG and TSG*
 
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_b3CzCCCILJ/figures/014_Table_5.jpg]]
 *Table 5: Ablation on the choice of independent condition in ICG*
 
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_b3CzCCCILJ/figures/018_Table_8.jpg]]
 *Table 8: Comparison between TSG and other guidance methods. TSG achieves better quality compared to SAG and PAG while requiring no specific assumption about the underlying architecture of the diffusion model*
-
-
 
 ## 定位与知识库关联
 
@@ -426,8 +392,6 @@ $$\nabla_{z_t} \log \hat{p}_t(z_t) = \nabla_{z_t} \log p_t(z_t) + \frac{1 - w_{\
 4. **与先进采样器的协同**：结合更先进的采样算法（如DPM-Solver、高阶ODE求解器）是否能进一步提升ICG/TSG的性能或降低计算开销？
 
 5. **最优超参数的自动化**：TSG的 $s$、$\alpha$ 和应用层选择目前依赖手动调参。是否存在理论指导或自动化搜索策略来确定这些超参数？
-
-
 
 ## 原文 PDF
 

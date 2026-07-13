@@ -53,8 +53,6 @@ claims:
 
 该方法将扩散生成简化为“ViT + x-prediction”的自包含范式，揭示了预测目标选择对高维生成的决定性作用，为未来生成模型的设计提供了新的方法论视角。
 
-
-
 ### 扩散模型的预测范式
 
 扩散模型和流匹配模型已成为视觉生成的主流方法。这类模型的核心思想是：将数据逐渐加噪至纯噪声，再学习一个神经网络来逆转这一过程。形式上，给定干净图像 $\mathbf{x}$ 和噪声 $\mathbf{\epsilon}$，噪声样本通过线性插值构造：
@@ -111,8 +109,6 @@ $$\mathcal{L} = \mathbb{E}_{t,\mathbf{x},\mathbf{\epsilon}} \| \mathbf{v}_{\thet
 2. **架构可以极简**：纯ViT + 低秩瓶颈嵌入即可胜任，无需复杂的多尺度U-Net或潜在空间映射。
 3. **流形假设是理论根基**：这一设计选择有深刻的几何直觉支撑，而非经验性的技巧堆砌。
 
-
-
 ## 核心方法与创新机理
 
 ### 1. 预测目标的根本转变：从噪声/速度回归到干净图像直接预测
@@ -161,8 +157,6 @@ $$\mathcal{L} = \mathbb{E}_{t,\mathbf{x},\boldsymbol{\epsilon}} \| \mathbf{v}_{\
 
 这些创新共同构成了一个**极简但高效的生成范式**：通过回归“去噪”本意（x-prediction）并配合低秩瓶颈设计，使普通 ViT 能够在大块高维像素上有效生成，无需潜在空间、预训练或辅助损失，在 ImageNet 256×256 上以 JiT-G/16 取得 FID 1.82，优于 DiT-XL/2 的 2.27（Table 7）。
 
-
-
 JiT（Just image Transformers）的整体设计遵循一个核心原则：**让扩散模型回归“去噪”本意**，即网络直接预测干净图像（x-prediction），而非噪声或速度。基于流形假设——自然图像仅占据高维像素空间中的一个低维流形——该方法使网络只需关注低维流形上的信息，从而摆脱高维信息瓶颈的束缚。
 
 ### Pipeline 总览
@@ -191,12 +185,8 @@ JiT 的生成 pipeline 由五个核心模块串联而成，形成从原始像素
 
 **纯 ViT 架构**使 JiT 无需依赖 VAE tokenizer 或潜在空间，直接在原始像素块上操作。计算量与序列长度（patch 数量）线性相关，避免了多尺度方法中分辨率翻倍时的二次增长，使得跨分辨率扩展（256→512→1024）自然高效。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2511_13720/figures/004_Figure_3.jpg]]
 *Figure 3: The “Just image Transformer” (JiT) architecture: simply a plain ViT [13] on patches of pixels for x-prediction*
-
-
 
 ### 预测空间与损失空间的解耦
 
@@ -243,9 +233,6 @@ JiT 的完整生成流水线由以下模块串联构成：
 
 1. **图像分块与低秩瓶颈嵌入**：将输入图像划分为大块（如 $16 \times 16$ 像素，每块 768 维），通过两级线性层嵌入至 Transformer 维度。第一级将 768 维压缩至瓶颈维度 $d'$（如 128 维），第二级扩展至隐藏维度。这一低秩设计符合流形假设——自然图像仅占据高维像素空间中的低维流形，瓶颈迫使网络丢弃冗余信息。消融实验（Figure 4）表明，$d'$ 在 32 至 512 范围内均可提升 FID 约 1.3，即使极端瓶颈（16 维）仍能生成合理图像。
 
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2511_13720/figures/007_Figure_4.jpg]]
-*Figure 4: Bottleneck linear embedding. Results are for JiT-B/16 on ImageNet 256×256. A raw patch is 768-dim (16×16×3) and is embedded by two sequential linear layers with an intermediate bottleneck dimension d′*
-
 2. **Transformer 编码器**：标准 ViT 架构，集成 adaLN-Zero 时间/类别条件注入、SwiGLU 激活函数、RMSNorm 归一化、RoPE 位置编码及 qk-norm 注意力归一化。所有 JiT 模型保持相同的序列长度（$16 \times 16$ tokens），使计算量与分辨率解耦。
 
 3. **x 预测头**：线性层将每个 token 映射回干净图像块 $\mathbf{x}_\theta$。
@@ -253,16 +240,6 @@ JiT 的完整生成流水线由以下模块串联构成：
 4. **速度转换与 v-loss 计算**：由 $\mathbf{x}_\theta$ 通过式 (6) 转换为 $\mathbf{v}_\theta$，与真实速度 $\mathbf{v}$ 计算 L2 损失。
 
 5. **ODE 求解器采样**：从随机噪声出发，通过 50 步 Heun 方法求解 $d\mathbf{z}_t/dt = \mathbf{v}_\theta$ 生成最终图像。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2511_13720/figures/001_Figure_1.jpg]]
-*Figure 1: The Manifold Assumption [4] hypothesizes that natural images lie on a low-dimensional manifold within the highdimensional pixel space. While a clean image x can be modeled as on-manifold, the noise ϵ or flow velocity v (e.g., v = x − ϵ) is inherently off-manifold. Training a neural network to predict a clean image (i.e., x-prediction) is fundamentally different from training it to predict noise or a noised quantity (i.e., ϵ/v-prediction)*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2511_13720/figures/003_Figure_2.jpg]]
-*Figure 2: Toy Experiment: d-dimensional (d = 2) underlying data is “buried” in a D-dimensional space, by a fixed, random, column-orthogonal projection matrix. In the D-dim space, we train a simple generative model (5-layer ReLU MLP with 256-dim hidden units). The projection matrix is unknown to the model, and we only use it for visualizing the output. In this toy experiment, with the observed dimension D increasing, only x-prediction can produce reasonable results*
-
-
 
 ## 实验与关键发现
 
@@ -312,22 +289,9 @@ Table 10 的消融揭示了预条件器在高维生成中的危害。EDM 预条�
 
 Table 6 展示了 JiT 从 B 到 G 规模的扩展性：在 256×256 上，FID 从 JiT-B/16 的 8.62 单调降至 JiT-G/16 的 1.82；在 512×512 上，JiT-H/32 取得 1.71 FID。Table 12 的跨分辨率实验表明，在 512 分辨率训练的模型下采样到 256 分辨率仍具竞争力，体现了该范式的灵活性。
 
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2511_13720/figures/010_Table_6.jpg]]
-*Table 6: Scalability on ImageNet 256×256 and 512×512, evaluated by FID-50K. All models have the same sequence length of 16×16, and thus the models at 512 resolution have nearly the same compute as their 256 counterparts. Settings: the same as Tab. 5*
-
 ### 公平性说明
 
 JiT 的对比遵循严格的自包含原则：不使用 VAE tokenizer、分类器引导外的预训练网络、感知损失或对抗损失。部分结果使用 CFG 间隔（Kynkäänniemi et al.）改善 FID，但主表同时提供直接 CFG 结果作为参考。所有模型保持相同的 16×16 序列长度和相似参数量，确保跨分辨率对比的公平性。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2511_13720/figures/011_Table_7.jpg]]
-*Table 7: Reference results on ImageNet 256×256. FID [21] and IS [53] of 50K samples are evaluated. The “pre-training” columns list the external models required to obtain the results (note that the perceptual loss [77] uses a pre-trained VGG classifier [56]). The parameters include the generator and tokenizer decoder (used at inference-time), but exclude other pre-trained components. The Giga-flops are measured for a single forward pass (not counting the tokenizer) and are roughly proportional to the computational cost of an iteration during both training and inference (for the multi-scale method [6], we measure the finest level)*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2511_13720/figures/013_Table_8.jpg]]
-*Table 8: Reference results on ImageNet 512×512. JiT has an aggressive patch size and can use small compute to achieve strong results. Notations are similar to Tab. 7*
-
-
 
 ## 定位与知识库关联
 
@@ -365,8 +329,6 @@ JiT 的核心主张——在高维像素空间直接预测干净图像（x-predi
 3. **扩展到其他数据模态。** 流形假设的普适性意味着 x-prediction 的范式可能适用于文本、音频、蛋白质结构等“自然数据”。但不同模态的流形结构差异巨大，ViT 架构也需要相应调整。
 4. **计算效率的进一步优化。** 虽然 JiT 避免了 VAE tokenizer 的额外开销，但纯 ViT 在原始像素上的自注意力计算仍随序列长度二次增长。结合稀疏注意力或线性注意力机制能否在保持质量的前提下降低计算成本？
 5. **预条件器的失效原因。** Table 10 显示 EDM 和线性预条件器在 x-prediction 下导致严重质量下降。论文将此归因于预条件器混合了不同噪声水平的信息，破坏了 x-prediction 的“去噪”本质。但这一解释尚停留在直觉层面，更深入的理论分析——例如从优化景观或梯度方差的角度——仍有待展开。
-
-
 
 ## 原文 PDF
 

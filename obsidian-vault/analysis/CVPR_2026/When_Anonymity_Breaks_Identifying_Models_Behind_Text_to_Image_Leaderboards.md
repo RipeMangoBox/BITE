@@ -54,8 +54,6 @@ claims:
 
 这一方法的方法论定位值得关注：它并非依赖复杂的模型指纹提取或有监督训练，而是利用了现代预训练图像编码器（如ViT/CLIP）天然具备的表征能力——不同模型因训练数据、架构和规模的差异，在生成图像中表现出稳定且独特的风格、构图、色彩等高级特征，这些特征在嵌入空间中自然形成低类内方差、高类间分离的聚类结构。攻击的成本极低，每个模型仅需10张参考图像即可达到与30张几乎相同的准确率，单次去匿名化的API调用成本约$1.08，具有极强的实用性。这一发现对当前T2I排行榜的匿名机制提出了严峻挑战，也为设计更健壮的匿名化防御指明了方向。
 
-
-
 ### 文生图排行榜的匿名性困境
 
 基于众包投票的文生图（T2I）排行榜已成为评估生成模型质量的主流范式。其核心流程如Figure 1(a)所示：排行榜平台向多个匿名模型发送相同提示，收集生成的图像后交由人类投票者进行偏好比较，最终根据投票结果对模型进行排名。为了保障评价的公正性，模型的身份必须对投票者完全匿名——这一前提假设构成了排行榜可信度的基石。
@@ -78,8 +76,6 @@ claims:
 基于这一发现，本文提出了**IT-Emb**（Inference-Time Embedding-based Deanonymization Attack）——一种无需训练、无需控制提示、仅需少量黑盒API查询的去匿名化攻击方法。该方法的核心思路是：为每个候选模型构建参考嵌入的质心，然后将排行榜图像的嵌入与各质心进行最近邻匹配。实验表明，该方法在22个模型的280个提示上达到了90.86%的Top-1准确率，远超所有基线方法（+36%），且仅需每个模型10张参考图像即可达到近乎相同的攻击效果。
 
 这一结果暴露了当前T2I排行榜匿名机制的根本性安全漏洞：匿名性在嵌入空间聚类面前形同虚设。本文由此出发，系统性地研究攻击的有效性边界、影响因素（特别是提示级别的可区分性）以及可能的防御策略。
-
-
 
 ## 核心方法与创新机理
 
@@ -108,8 +104,6 @@ claims:
 当攻击者仅能访问目标模型API而无法查询其他模型时，传统方法通常需要训练二分类器来区分目标模型与“其他”。本文提出了一种更简洁的**基于α-分位数类内距离的阈值检测机制**：利用目标模型参考样本的类内距离分布，取α-分位数$\lambda_{\alpha} = \mathrm{quantile}_{\alpha}(\| x_i - c \|_2)$作为决策阈值，测试嵌入与质心的距离小于该阈值则判定来自目标模型。
 
 这一机制的巧妙之处在于，它仅依赖目标模型自身的统计特性，无需访问任何其他模型即可实现高精度的一对多检测。在α=0.80的设置下，该方法达到了0.926的准确率和0.977的AUC（Table 2），证明了模型嵌入空间的类内紧致性足以支撑仅基于单侧信息的可靠检测。
-
-
 
 本文提出的去匿名化攻击框架建立在一个核心观察之上：**不同T2I模型在相同提示下生成的图像，在预训练图像编码器的嵌入空间中会形成高度可区分的聚类**。这一观察构成了整个攻击管道的理论基础——攻击者无需控制提示内容、无需收集训练数据，仅需利用模型间天然的“风格指纹”即可实现高精度模型识别。
 
@@ -163,12 +157,8 @@ $D(i)$ 越高，表示该提示下各模型生成图像的嵌入聚类越分离�
 
 该管道的核心优势在于**完全无需训练**——质心计算和最近邻分类均为无参过程，且参考图像数量需求极低（$k=10$ 即可饱和），使得攻击成本极低（单样本去匿名化约需$1.08，见论文第7节成本分析）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2360_https_openaccess_thecvf_com_content_CVPR2026_html_Naseh_When_Anonymity_B/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of our setting: (a) voting-based leaderboard and (b) adversarial deanonymization pipeline leveraging model-specific clustering in embedding space*
-
-
 
 ### 攻击管道总览
 
@@ -217,18 +207,11 @@ $$\lambda_{\alpha} = \mathrm{quantile}_{\alpha}(\| x_i - c \|_2)$$
 
 作为对攻击的缓解措施，论文提出在图像发布前施加对抗性扰动。防御者查询所有其他模型以相同提示生成图像，选择嵌入距离最远的图像作为扰动目标，在 $\ell_\infty$ 约束下对原始图像施加小幅扰动（$\varepsilon \in \{2, 4, 8\}$），使扰动后嵌入偏离源模型簇。该防御以图像质量损失为代价换取匿名性保护。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2360_https_openaccess_thecvf_com_content_CVPR2026_html_Naseh_When_Anonymity_B/figures/002_Figure_2.jpg]]
 *Figure 2: Model-specific generation patterns for a fixed prompt, showing low intra-model diversity and clear inter-model differences*
 
 ![[assets/figures/papers/paper_list_l2360_https_openaccess_thecvf_com_content_CVPR2026_html_Naseh_When_Anonymity_B/figures/005_Figure_3.jpg]]
 *Figure 3: Deanonymization success rate across bins of distinguishability scores. Higher scores correspond to greater success*
-
-![[assets/figures/papers/paper_list_l2360_https_openaccess_thecvf_com_content_CVPR2026_html_Naseh_When_Anonymity_B/figures/006_Figure_4.jpg]]
-*Figure 4: Embeddings for two prompts with high (left, D(i) = 1.00) and low (right, D(i) = 0.19) distinguishability, showing clear separation versus overlap among model generations*
-
-
 
 ## 实验与关键发现
 
@@ -284,18 +267,11 @@ Table 3展示了对抗性后处理防御在不同扰动预算ε下的效果。�
 
 论文对攻击的经济可行性进行了量化。在所有商业模型上生成一张图像的总成本约$1.08，因此去匿名化一个排行榜样本的总成本约为$1.08 × I。以k=10为例，每个样本的识别成本仅约$10.80，考虑到排行榜投票通常涉及数百至数千张图像，完整攻击的总成本在可接受范围内，进一步凸显了当前匿名机制的安全漏洞。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2360_https_openaccess_thecvf_com_content_CVPR2026_html_Naseh_When_Anonymity_B/figures/003_Table_1.jpg]]
 *Table 1: Deanonymization performance for different attack categories: inference-time fingerprinting (IT-FP), training-based classifiers (Classifier), and our inference-time embedding-based method (IT-Emb)*
 
-![[assets/figures/papers/paper_list_l2360_https_openaccess_thecvf_com_content_CVPR2026_html_Naseh_When_Anonymity_B/figures/007_Figure_5.jpg]]
-*Figure 5: Deanonymization accuracy vs. number of generations k per (prompt, model) pair. Curves show mean Top-1 to Top-5 accuracy over five runs with one-standard-deviation error bars.The dashed line indicates the random-guess baseline of 1/22 4.55%*
-
 ![[assets/figures/papers/paper_list_l2360_https_openaccess_thecvf_com_content_CVPR2026_html_Naseh_When_Anonymity_B/figures/008_Table_3.jpg]]
 *Table 3: Attack accuracy before and after adversarial postprocessing under different perturbation budgets ✏*
-
-
 
 ## 定位与知识库关联
 
@@ -342,8 +318,6 @@ $$D(i) = \frac{1}{|\mathcal{C}|} \sum_{M_j \in \mathcal{C}} \mathbb{I}[\mathrm{f
 4. **攻击与策略性投票的结合**：在多轮投票和实时排行榜环境中，攻击者如何将去匿名化能力与策略性投票结合，以最大化排名操纵效果？这涉及博弈论层面的分析，超出了单纯的技术攻防范畴。
 
 5. **防御的对抗鲁棒性**：当前的对抗性后处理防御假设防御者知道攻击者的编码器选择。如果攻击者使用不同的编码器或自适应攻击策略，防御的有效性是否会显著下降？这需要更系统的对抗鲁棒性评估。
-
-
 
 ## 原文 PDF
 

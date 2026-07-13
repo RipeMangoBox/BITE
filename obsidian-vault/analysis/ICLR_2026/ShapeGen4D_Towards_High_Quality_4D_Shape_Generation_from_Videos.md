@@ -53,8 +53,6 @@ claims:
 
 本报告后续章节将依次展开相关工作定位、方法细节、实验分析、消融研究以及局限与展望，为读者提供从问题动机到技术实现的完整图景。
 
-
-
 ### 问题背景：从视频生成4D内容的需求
 
 从单目视频重建动态3D内容（4D重建）是计算机视觉与图形学的核心挑战之一，其应用涵盖AR/VR、影视制作和数字孪生等场景。传统4D重建方法通常依赖多视图输入或深度传感器，而近年来，随着生成模型的快速发展，从单目视频直接生成动态3D资产（video-to-4D generation）成为新兴方向，旨在以更低的数据采集成本获得可编辑、可渲染的动态网格序列。
@@ -86,8 +84,6 @@ claims:
 2. **拓扑变化**：摆脱变形场的连续性约束，使模型能原生处理融合、撕裂等离散结构变化；
 3. **泛化能力**：充分利用大规模3D预训练先验，降低对4D训练数据的依赖。
 
-
-
 ## 核心方法与创新机理
 
 ShapeGen4D 的核心创新在于**将动态网格序列生成重新定义为帧间条件依赖的3D生成问题**，并通过对预训练3D生成模型的架构微调实现这一范式转换。区别于现有4D生成方法的优化脆弱性（SDS）、多阶段累计误差（多视图重建）或对变形网络的依赖，该方法直接继承大规模3D预训练模型的强泛化能力，隐式学习复杂运动模式，从而原生支持拓扑变化（如物体融合、撕裂、生长等，见 Figure 7）。
@@ -116,8 +112,6 @@ ShapeGen4D 的核心创新在于**将动态网格序列生成重新定义为帧�
 
 ShapeGen4D 通过微调而非黑盒扩展的方式，使扩散模型隐式学习运动模式，无需显式变形建模即可处理拓扑变化（Figure 7）。在 Objaverse 测试集上，基于 Step1X-3D 的 ShapeGen4D 相比基座模型 Chamfer 距离降低 10%（0.1356 → 0.1220），IoU 和 F-Score 分别提升 8% 和 12%（Table 1）。
 
-
-
 ShapeGen4D 提出了一种端到端的视频到4D形状生成框架，其核心思想是将动态网格序列的生成视为帧间条件依赖的3D生成问题。该方法并非在预训练3D模型之上外挂独立的变形网络，而是直接微调3D生成模型的内部架构，使其原生支持时间维度的建模。
 
 ### 输入输出流
@@ -141,16 +135,6 @@ ShapeGen4D 提出了一种端到端的视频到4D形状生成框架，其核心�
 ### 模块间依赖关系
 
 编码器与解码器构成对称的3D VAE结构，其潜在空间是扩散模型的操作域。时空扩散 Transformer 是生成的核心引擎，它在潜在空间中完成从纯噪声到结构化动态表示的映射，其输出经解码器还原为几何序列。姿态配准和纹理化作为后处理步骤，依次作用于解码后的网格序列，最终产出可渲染的动态资产。这两个后处理模块独立于生成主干，使得几何质量和纹理质量可以分别评估和优化。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_r9AJisFLLo/figures/002_Figure_2.jpg]]
-*Figure 2: ShapeGen4D employs a flow-based latent diffusion transformer to generate a sequence of meshes from an input video. (a) A 3D VAE encodes shapes into latents by cross-attending subsampled query points with a dense point cloud. To encode a sequence of animated assets, query points are subsampled from the first-frame point cloud and then propagated through the animation to obtain query points for subsequent frames—yielding temporally-aligned latents. The decoder maps these latents to signed distance fields, which are then converted into meshes via marching cubes. (b) The spatiotemporal diffusion transformer interleaves frozen dual/single-stream transformer blocks from the base 3D generative mod...*
-
-![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_r9AJisFLLo/figures/001_Figure_1.jpg]]
-*Figure 1: ShapeGen4D generates high-quality mesh sequences from input monocular videos*
-
-
 
 ShapeGen4D 的核心架构由三个紧密耦合的模块组成，共同实现从单目视频到动态网格序列的端到端生成。
 
@@ -184,12 +168,8 @@ $$\mathcal{Q}_t = w_t(\mathcal{Q}_1)$$
 
 解码器将去噪后的潜在序列映射为截断有符号距离场（TSDF），随后通过 Marching Cubes 算法转换为显式网格序列。由于编码阶段已实现时间对齐，解码器无需额外的时序一致性约束即可输出几何连贯的动态网格。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_r9AJisFLLo/figures/004_Figure_4.jpg]]
 *Figure 4: Qualitative comparison of noise sharing. The base 3D model generates object shapes in arbitrary orientations agnostic to the input image viewpoint, often causing pose changes across a sequence (e.g. the hippo in the first row). We observe that sharing noise across frames reduces flickering and further improves shape quality in challenging cases such as the flag example*
-
-
 
 ## 实验与关键发现
 
@@ -221,8 +201,6 @@ ShapeGen4D 在 Objaverse 留出测试集上进行了几何质量评估，并与�
 
 方法的主要局限性包括：（1）依赖预训练3D模型的质量，可能受其偏差影响；（2）纹理生成为独立离线步骤，在严重遮挡区域仍可能出现不一致；（3）训练数据来自 Objaverse 合成动画数据集，对真实视频的泛化性待验证；（4）全局姿态配准假设第一帧姿态可估计，若第一帧遮挡严重可能失败。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_r9AJisFLLo/figures/005_Table_1.jpg]]
 *Table 1: Quantitative comparison with baselines, evaluated on the held-out Objaverse test set*
 
@@ -232,21 +210,8 @@ ShapeGen4D 在 Objaverse 留出测试集上进行了几何质量评估，并与�
 ![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_r9AJisFLLo/figures/007_Figure_5.jpg]]
 *Figure 5: Qualitative comparison with baselines on the held-out Objaverse test set*
 
-![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_r9AJisFLLo/figures/008_Table_4.jpg]]
-*Table 4: Watertight vs. original query points*
-
-![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_r9AJisFLLo/figures/009_Table_5.jpg]]
-*Table 5: Baseline vs. MultiDiffusion*
-
-![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_r9AJisFLLo/figures/010_Figure_7.jpg]]
-*Figure 7: Topology Change Results. Our method can handle topology changes: emerging parts, tearing, growth, fusion and splitting, morphing, and object shattering. Each column shows the input view (left) and our reconstructed mesh (right) across three time steps*
-
 ![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_r9AJisFLLo/figures/011_Figure_8.jpg]]
 *Figure 8: Qualitative comparison of VAE reconstructions using query points from the watertight mesh versus the original mesh. The first column shows the input point clouds, while the second and third columns show the reconstructed surfaces when using KQV from the watertight mesh and Q directly from the original mesh. Both settings produce visually similar geometry across time*
-
-![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_r9AJisFLLo/figures/012_Figure.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -295,8 +260,6 @@ ShapeGen4D 的方法论核心在于“继承3D先验，扩展时空维度”。�
 - **时空3D VAE的可能性**：当前的时间一致性主要通过扩散模型中的时空注意力和噪声共享实现，VAE编解码阶段仍以逐帧处理为主。是否可以使用真正的时空3D VAE直接减少局部时间抖动，是一个值得研究的方向。
 
 - **真实视频的鲁棒性**：当前框架在Objaverse合成数据上验证，对真实户外视频（含复杂背景、动态光照、遮挡）的鲁棒性尚未系统评估。将方法迁移到真实场景可能需要改进条件编码模块或引入额外的鲁棒性训练策略。
-
-
 
 ## 原文 PDF
 

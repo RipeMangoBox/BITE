@@ -133,8 +133,6 @@ OpenDanceNet 是一个基于掩码建模的统一舞蹈生成框架，其核心�
 
 - **训练目标**：从仅预测运动令牌（自回归或扩散），转变为掩码联合预测——同时预测运动、2D 关键点、轨迹令牌，并通过辅助损失（$\mathcal{L}_{\text{traj}}$、$\mathcal{L}_{\text{kpts}}$、$\mathcal{L}_{\text{fk}}$、$\mathcal{L}_{\text{con}}$）强制对齐。随机模态级掩码策略进一步防止模型过度依赖某一模态，确保所有条件信号都被有效利用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l954_https_arxiv_org_abs_2506_07565/figures/005_Figure_4.jpg]]
 *Figure 4: Overview of OpenDanceNet, a masked-modeling-based dance generation framework. (a) We first train a Disentangled Dance Tokenizer (DDT) to quantize spatial signals (joint rotations, global trajectories, and 2D keypoints) into discrete tokens. (b) Then the Multimodal-Condition Transformer (MCT) is trained by randomly sampling subsets of control modalities and applying token-level masks over trajectories, 2D keypoints, and motion tokens, enabling the model to handle diverse condition combinations while generating coherent dance motions. (c) At inference time, OpenDanceNet supports arbitrary configurations of input conditions for flexible multimodal control, while Multi-Step Logit-Ranked Re-Mask...*
 
@@ -243,17 +241,6 @@ $$\mathcal{L}_{\mathrm{CE}}^{\mathrm{mask}} = - \mathbb{E}_{Z} \sum_{i \in \math
 
 ![[assets/figures/papers/paper_list_l954_https_arxiv_org_abs_2506_07565/figures/004_Figure_3.jpg]]
 *Figure 3: Comparison of processed OpenDanceSet, before filtered OpenDanceSet, and AIST++. After post-optimization and filtering, OpenDanceSet fits dance data distribution and achieves better physical performance*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l954_https_arxiv_org_abs_2506_07565/figures/010_Table_5.jpg]]
-*Table 5: Ablation on joint prediction mechanism. Traj indicates global trajectory condition*
-
-![[assets/figures/papers/paper_list_l954_https_arxiv_org_abs_2506_07565/figures/011_Table_6.jpg]]
-*Table 6: Ablation on multi-condition training*
-
-![[assets/figures/papers/paper_list_l954_https_arxiv_org_abs_2506_07565/figures/012_Table_7.jpg]]
-*Table 7: Ablation on loss functions on Transformer training*
 
 ## 定位与知识库关联
 

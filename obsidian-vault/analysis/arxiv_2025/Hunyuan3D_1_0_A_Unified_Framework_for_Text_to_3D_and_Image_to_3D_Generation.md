@@ -59,8 +59,6 @@ claims:
 
 **方法定位**：Hunyuan3D 1.0 属于前馈单视图到三维生成方法，与**SyncDreamer**（Liu et al., arXiv 2023）、**TripoSR**（Tochilkin et al., arXiv 2024）、**Wonder3D**（Long et al., arXiv 2023）、**OpenLRM**、**CRM**（Wang et al., arXiv 2024）、**LGM**（Tang et al., arXiv 2024）、**InstantMesh**（Xu et al., arXiv 2024）等同期工作形成对比，在生成速度与重建精度之间取得了显著优势。
 
-
-
 三维资产生成是计算机图形学与视觉计算的核心任务之一，其目标是从文本描述或单张图像中自动创建可供下游应用直接使用的三维网格模型。近年来，扩散模型在二维图像生成领域取得了革命性进展，研究者自然希望将这种强大的生成先验迁移到三维领域。然而，从二维生成跨越到三维生成面临着根本性的挑战：**二维扩散模型缺乏对三维几何一致性的内在理解**，而三维数据的稀缺性和高维特性又使得直接训练三维扩散模型极为困难。
 
 ### 现有方法的瓶颈
@@ -86,8 +84,6 @@ claims:
 3. **不可见区域的补偿**：通过**混合输入机制**，将无标定的输入图像作为辅助视图输入重建网络，弥补纯0度仰角轨道无法捕获的顶部和底部几何信息，有效改善凹陷等结构重建。
 
 在标准版本中，模型参数扩大3倍，在GSO和OmniObject3D数据集上将Chamfer Distance分别降至0.175和0.136，F-score@0.1提升至0.735和0.814，全面超越已有方法。这一性能提升验证了“大容量扩散先验+高效稀疏重建”技术路线的有效性，为实用级三维资产生成提供了可工程化的范式。
-
-
 
 ## 核心方法与创新机理
 
@@ -120,8 +116,6 @@ Hunyuan3D 1.0 的核心创新在于将单视图到三维生成的难题解耦为
 
 上述四项创新并非孤立存在：0度仰角位姿分布为自适应CFG提供了明确的视图距离度量基础，而自适应CFG又确保了0度仰角约束下各视图的纹理与几何一致性；混合输入弥补了0度仰角轨道的信息盲区，三平面超分辨率则进一步放大了重建网络从混合输入中提取细节的能力。这一耦合关系构成了Hunyuan3D 1.0 在约10秒内生成高质量三维网格的核心竞争力。
 
-
-
 Hunyuan3D 1.0 采用**两阶段解耦流水线**，将单视图到三维生成拆分为“多视图扩散生成”与“前馈稀疏重建”两个独立阶段，在约10秒内完成从单张图像到可直接使用的三维网格的全过程（Figure 2）。两个阶段之间以固定位姿的6张RGB图像为接口，避免了端到端隐式生成中速度与泛化性的矛盾。
 
 ### 阶段一：多视图扩散生成
@@ -141,8 +135,6 @@ Hunyuan3D 1.0 采用**两阶段解耦流水线**，将单视图到三维生成�
 ### 输入输出流
 
 整个流水线的输入为单张RGB图像（或文本提示），输出为带纹理的显式三角形网格。标准版模型采用SD-XL骨干，参数量约为轻量版及其他现有模型的3倍（Abstract）。纹理烘焙和UV展开作为独立后处理步骤额外耗时约15秒，不计入主流水线的约10秒生成时间。
-
-
 
 Hunyuan3D 1.0 的核心架构由两个解耦的阶段构成：多视图扩散模型与前馈稀疏重建模型。以下分别剖析各模块的设计逻辑与关键公式。
 
@@ -185,13 +177,6 @@ $$w_{t,v} = w_t \cdot \tau_v$$
 ### 三维表示与后处理
 
 重建模型采用NeuS提出的SDF作为隐式形状表示，通过Marching Cubes算法在推理时将隐式场转换为显式网格。生成网格后，系统通过UV展开提取纹理贴图，实现纹理烘焙，使输出资产可直接用于下游图形应用。
-
-### 补充图表
-
-![[assets/figures/papers/Hunyuan3D_1.0_A_Unified_Framework_for_Text-to-3D_and_Image-to-3D_Generation_6467c327e68f/figures/002_Figure_2.jpg]]
-*Figure 2: The overview of our Hunyuan3D 1.0. Given an input image, we first utilize a multi-view diffusion model to synthesize 6 novel Mix-up Attention views at fixed camera poses. Then we feed the generated multi-view images into a transformer-based sparse-view large reconstruction Row-wise Attention RRGmodel to reconstruct a high-quality 3D mesh. The whole image-to-3D generation process takes only around 10 seconds.(a) (b)*
-
-
 
 ## 实验与关键发现
 
@@ -249,11 +234,6 @@ Hunyuan3D 1.0 在两个标准基准上全面超越已有方法。在 GSO 数据�
 ![[assets/figures/papers/Hunyuan3D_1.0_A_Unified_Framework_for_Text-to-3D_and_Image-to-3D_Generation_6467c327e68f/figures/006_Figure_7.jpg]]
 *Figure 7: Adaptive CFG vs Fixed CFG*
 
-![[assets/figures/papers/Hunyuan3D_1.0_A_Unified_Framework_for_Text-to-3D_and_Image-to-3D_Generation_6467c327e68f/figures/008_Figure_8.jpg]]
-*Figure 8: Reconstruction on generated images only vs hybrid inputs*
-
-
-
 ## 定位与知识库关联
 
 Hunyuan3D 1.0 处于单视图/文本到三维生成从“优化式扩散”向“前馈式两阶段”范式迁移的关键节点。其核心思路——将生成解耦为多视图扩散与前馈稀疏重建——并非全新，但该方法在三个维度上对已有工作进行了系统性改进：**位姿分布设计**、**跨视图引导调度**、以及**混合输入重建**。
@@ -265,8 +245,6 @@ Hunyuan3D 1.0 处于单视图/文本到三维生成从“优化式扩散”向�
 **适用边界与局限。** 该方法的核心假设是：输入图像或文本描述的对象具有明确的几何实体，且主要视觉信息集中在 0° 仰角附近。对于扁平物体（如盘子）、严重自遮挡结构（如复杂机械内部）或需要顶部/底部精确重建的场景，0° 仰角轨道的覆盖不足可能成为瓶颈。混合输入在一定程度上缓解了这一问题，但当条件图像本身缺乏顶部/底部信息时，补偿效果有限。此外，标准版模型参数扩大 3 倍（采用 SD-XL 骨干）虽带来性能提升，但生成时间增至约 25 秒（不含 UV/纹理烘焙），对于实时交互式应用仍存在延迟。纹理烘焙和 UV 展开作为独立后处理步骤（额外约 15 秒），其质量与对几何形态的潜在影响未在论文中详细评估。
 
 **开放问题。** 自适应 CFG 的视图缩放系数 τ_v 目前采用手工设计（τ_front=1, τ_back=0.5），能否通过数据驱动方式自动学习最优引导强度，是一个值得探索的方向。混合输入中无标定条件图像相对于目标位姿的任意偏移如何处理，以及该策略是否适用于视频或多帧输入，论文未给出答案。三平面超分辨率层是否可推广至其他隐式表达（如三维高斯 Splatting）并同样获得细节增益，也有待验证。最后，模型训练高度依赖内部大规模三维数据集，其在完全开集物体类别或极端视角下的泛化能力尚未在公开基准上得到充分检验。
-
-
 
 ## 原文 PDF
 

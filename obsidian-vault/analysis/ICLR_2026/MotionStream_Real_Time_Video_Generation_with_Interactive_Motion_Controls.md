@@ -65,8 +65,6 @@ MotionStream在单张H100 GPU上实现了**实时交互速度**：480P分辨率�
 
 MotionStream属于**流式自回归视频生成**范式，区别于传统的离线扩散模型。其技术路线融合了运动控制视频生成、因果注意力机制和分布匹配蒸馏三个方向，在实时交互性和生成质量之间建立了新的权衡边界。该方法不依赖特定骨干网络规模，在Wan 2.1和Wan 2.2上均验证了有效性，且运动条件的引入未显著降低基础模型的生成能力（Table A4）。
 
-
-
 ### 运动条件视频生成：离线范式与实时交互的鸿沟
 
 运动条件视频生成（motion-conditioned video generation）旨在根据用户提供的运动轨迹（如点轨迹或光流）控制视频中对象的运动。这一能力在运动转移、拖拽式编辑、3D 相机控制等交互式应用中具有核心价值。然而，现有方法几乎全部采用**离线扩散范式**：它们以双向注意力机制并行处理完整视频序列，生成固定长度的视频。这种设计带来了两个根本性限制：
@@ -89,8 +87,6 @@ MotionStream的作者通过分析双向教师模型的自注意力图（Figure 3
 - **实现恒定速度的流式生成**：通过滚动KV缓存和固定块大小设计，使延迟和吞吐量在任意长度生成中保持恒定，从而真正支持实时交互。
 
 这一技术路线使得MotionStream在单张H100 GPU上达到480P分辨率下16.7 FPS、720P下10.4 FPS的生成速度（Table 1），而基线方法的速度远低于1 FPS，同时在运动转移和新视角合成任务上保持甚至超越了离线方法的生成质量。
-
-
 
 ## 核心方法与创新机理
 
@@ -144,8 +140,6 @@ $$s_{\mathrm{real}} = s_{\mathrm{base}} + w_t \cdot (f_{\phi}(c_t, c_m) - f_{\ph
 
 上述技术槽位的协同作用使得 MotionStream 在 480P 分辨率下达到 16.7 FPS（Wan 2.1-1.3B）和 720P 下 10.4 FPS（Wan 2.2-5B）的实时生成速度，同时在运动转移重建任务上保持与离线教师模型可比的质量（DAVIS PSNR 16.20, LPIPS 0.443），并在新视角合成任务上以 20 倍以上的速度优势超越专门的 3D 方法（如 **SEVA**、**ViewCrafter**）。
 
-
-
 ![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_v1DKz5Vxr7/figures/002_Figure_2.jpg]]
 *Figure 2: Model architecture and training pipeline. To build a teacher motion-controlled video model, we extract and randomly sample 2D tracks from the input video and encode them using a lightweight track head. The resulting track embeddings are combined with the input image, noisy video latents, and text embeddings as input to the diffusion transformer with bidirectional attention, which is then trained with a flow matching loss (top). We then distill a few-step causal diffusion model from the teacher through Self Forcing-style DMD distillation, integrating joint text-motion guidance into the objective, where autoregressive rollout with rolling KV cache and attention sink is applied during both tra...*
 
@@ -188,8 +182,6 @@ MotionStream 的整体流水线围绕一个核心矛盾展开：**离线双向�
 -   **瓶颈：VAE 解码成为吞吐量瓶颈** → **方案：Tiny VAE**，通过紧凑解码器设计将解码时间压缩至原来的十分之一以下。
 
 这一框架使得 MotionStream 能够从单张图像出发，在用户实时绘制的运动轨迹控制下，以交互式速度流式生成任意长度的视频，并支持运动转移、拖拽控制和 3D 相机控制等多种下游应用。
-
-
 
 ### 轨迹提取与编码（Track Head）
 
@@ -246,8 +238,6 @@ $$s_{\mathrm{real}} = s_{\mathrm{base}} + w_t \cdot (f_{\phi}(c_t, c_m) - f_{\ph
 
 推理时，学生模型以固定块大小（c3s1w1）逐块生成，利用滚动 KV 缓存和注意力槽维持恒定吞吐量，避免直接滑动窗口（c3s0w6）导致的延迟和吞吐量大幅波动（Figure 6）。学生模型使用 3 步生成最优，增加步数收益递减，减少至 2 步质量明显下降（Appendix C, Figure A2）。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -258,7 +248,6 @@ MotionStream 的实验围绕两个骨干网络展开：基于 Wan 2.1 的 1.3B �
 
 Table 1 报告了在 DAVIS 验证集和 Sora Demo 子集上的运动转移重建结果。MotionStream 的因果蒸馏学生模型在 480P 下以 16.7 FPS 生成，720P 下达到 10.4 FPS，而所有基线方法速度均远低于 1 FPS。在质量指标上，学生模型保持了较强的重建能力：DAVIS 上 PSNR 16.20、LPIPS 0.443、EPE 7.80，Sora 子集上 PSNR 16.67、LPIPS 0.360、EPE 4.21。相比最强的运动转移基线 ATI（Wang et al., 2025a，基于 Wan 2.1-14B），MotionStream 在 DAVIS 上 PSNR 提升 0.87、EPE 降低 9.61，在 Sora 子集上 PSNR 提升 0.63、EPE 降低 1.91，且 ATI 的模型规模是 MotionStream 的 10 倍以上。
 
-
 ![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_v1DKz5Vxr7/figures/004_Table_1.jpg]]
 *Table 1: Benchmark on Motion Transfer (Reconstruction)*
 
@@ -268,7 +257,6 @@ Table 1 报告了在 DAVIS 验证集和 Sora Demo 子集上的运动转移重建
 
 Table 2 展示了 MotionStream 在 LLFF 数据集上的新视角合成能力，这是一个模型未专门训练的任务，仅通过相机轨迹作为运动条件驱动。MotionStream 教师模型（1.3B）取得 PSNR 16.0、SSIM 0.42、LPIPS 0.21，显著优于专门的 3D 方法：相比 SEVA（Zhou et al., 2025b）PSNR 提升约 1.9，LPIPS 降低 0.08；相比 ViewCrafter（Yu et al., 2024）和 DepthSplat（Xu et al., 2025）也有明显优势。在速度方面，MotionStream 因果模型以 16.7 FPS 运行，而 DepthSplat 仅 1.40 FPS，速度提升超过 20 倍。这验证了运动条件框架的泛化能力：模型无需针对 3D 任务重新训练，仅通过改变输入轨迹即可实现相机控制。
 
-
 ![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_v1DKz5Vxr7/figures/006_Table_2.jpg]]
 *Table 2: Evaluation on Novel View Synthesis*
 
@@ -276,14 +264,12 @@ Table 2 展示了 MotionStream 在 LLFF 数据集上的新视角合成能力，�
 
 Table 3 对比了两种轨迹编码方式。正弦位置编码加可学习轨迹头（PE-Head）在 DAVIS 上取得 PSNR 16.29、EPE 7.09，Sora 上 PSNR 17.15、EPE 4.14，均优于基于 RGB-VAE 的编码方式（DAVIS PSNR 16.03、EPE 7.83）。更关键的是效率差异：PE-Head 编码耗时仅 24.8 ms，而 RGB-VAE 需要 1053 ms，加速约 40 倍。这一效率优势对实时流式生成至关重要——RGB-VAE 的编码开销本身就会使系统无法达到交互帧率。
 
-
 ![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_v1DKz5Vxr7/figures/007_Table_3.jpg]]
 *Table 3: Comparing track representation methods. Our sinusoidal PE with learnable track head outperforms RGB-VAE in both quality and efficiency, achieving 40× faster encoding critical for real-time streaming*
 
 ### 注意力机制消融
 
 Figure 6 和 Table 4 系统消融了稀疏注意力模式对长视频外推的影响。使用 Sora 子集中最长 241 帧的视频测试，核心发现如下：
-
 
 ![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_v1DKz5Vxr7/figures/008_Figure_6.jpg]]
 *Figure 6: Impact of Sparse Attention Patterns. Using longer clips (up to 241 frames) from the Sora subset, we ablate attention sink size and local window size in extrapolation scenarios. Having at least a single sink chunk is crucial, but more provides marginal benefit, while larger window sizes degrade performance as attending to long-past history allows errors to accumulate in context tokens*
@@ -299,7 +285,6 @@ Figure 6 和 Table 4 系统消融了稀疏注意力模式对长视频外推的�
 ### 引导策略消融
 
 Figure 4 和 Figure 5 分别从定量和定性角度消融了联合文本-运动引导。定量结果显示：纯文本引导（w_t=3.0, w_m=0）虽然视觉质量较好，但轨迹忠实度不足；纯运动引导（w_t=0, w_m=1.5）能精确跟随轨迹，但导致运动僵硬、缺乏自然动态。混合引导 w_t=3.0, w_m=1.5 在 PSNR、LPIPS 和 EPE 之间取得最佳平衡。定性对比（Figure 5）进一步揭示：纯运动引导下对象运动机械刻板，而文本引导即使面对不完美的轨迹也能保持自然运动和形状保持。混合引导结合了两者优势，既能忠实于用户指定的轨迹，又能维持自然的外观动态。
-
 
 ![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_v1DKz5Vxr7/figures/005_Figure_4.jpg]]
 *Figure 4: Quantitative ablation on guidance. We use Sora subset to ablate guidance strategies. Higher text guidance reduces overall metrics while motion guidance improves trajectory accuracy at the cost of visual quality (LPIPS). Figure 5: Qualitative ablation on guidance. Pure motion guidance produces rigid movements while text guidance enables natural motion and shape preservation even with imperfect tracks. Our Hybrid joint guidance balances these two*
@@ -329,28 +314,6 @@ Appendix C 的 Figure A2 显示，学生模型使用 3 步生成达到最佳质�
 4. **2D 轨迹的表达局限**：2D 轨迹表示难以编码完整的场景转换信息（如遮挡关系、深度变化），且注意力槽优先保持源特征，对新物体出现或持续场景变化的处理能力不足。
 
 这些局限性指向了未来的改进方向：动态注意力槽策略以自适应刷新锚帧、训练中的轨迹增强以模拟不完美用户输入、以及更大规模骨干网络以提升细节保留能力。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_v1DKz5Vxr7/figures/016_Figure.jpg]]
-*Figure: (a) Impact of Chunk Size and Sampling Steps in Throughput and Latency (b) LPIPS Over Varying Sampling Steps*
-
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_v1DKz5Vxr7/figures/009_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_v1DKz5Vxr7/figures/012_Table.jpg]]
-*Table: A1: Comparison of Causal VAE Models. We evaluate reconstruction quality on the Sora demo samples (resized to 81f×832×480) by encoding videos with the Full VAE encoder and decoding with different VAE variants. Our Tiny VAE achieves an order-of-magnitude faster decoding than Full VAEs while outperforming existing community implementations in reconstruction quality*
-
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_v1DKz5Vxr7/figures/013_Table.jpg]]
-*Table: A2: Evaluating Tiny VAE in Streaming Generation Setup. Using the same distilled student model, we ablate the impact of switching VAE from original Full VAE to Tiny VAE in Sora demo subset. It’s important to note that even after changing to Tiny VAE, our distilled models still outperform all other baselines and quality differences compared to Full VAEs are marginal while achieving 1.75× and 2.3× higher throughput*
-
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_v1DKz5Vxr7/figures/014_Table.jpg]]
-*Table: A3: VBench-I2V Results. We evaluate other baselines using VBench-I2V on Sora subset. While the results primarily depend on the choice of backbone, our models generally achieve high performance across all dimensions*
-
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_v1DKz5Vxr7/figures/018_Table.jpg]]
-*Table: A4: Impact of Motion Control on Generative Quality. We evaluate whether injecting motion control degrades the pretrained model’s capability by comparing against a larger, dedicated I2V baseline (Wan 2.1 14B I2V). We also report performance when motion conditions are dropped. Results indicate that adding motion conditioning does not significantly degrade the base model’s generative quality. While removing motion conditions introduces a slight quality drop as our models were not optimized for this setting, the output still adheres to the given text and image inputs*
-
-
-
 
 ## 定位与知识库关联
 
@@ -393,8 +356,6 @@ MotionStream 的流程在新视角合成任务上展现出意外的强泛化能�
 3. **源细节保持能力的扩展。** 在复杂场景、长文本提示或极端运动条件下，模型（尤其小容量骨干）难以保持源图像的精细细节。这一问题可能需要更大规模骨干网络（如 14B 级别）的验证，以及专门设计的细节保持损失或注意力约束。
 
 4. **3D 感知轨迹表示。** 2D 轨迹的表达力上限限制了场景变换的复杂度。将轨迹表示扩展到 3D（如结合深度估计的 2.5D 轨迹或稀疏 3D 点云轨迹）可能显著提升模型处理遮挡、视角变化和场景转换的能力，但也会引入额外的计算开销和标注需求。
-
-
 
 ## 原文 PDF
 

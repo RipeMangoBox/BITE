@@ -55,8 +55,6 @@ GUESS（**Grad**Ually **E**nriching **S**ynthe**s**is）提出了一种仿照人
 
 实验结果表明，GUESS在HumanML3D数据集上取得了**FID 0.109**的当时最优结果，相比第二好的方法T2M-GPT（FID 0.141）和MLD（FID 0.473）大幅领先，同时在R-Precision、MM Dist和Diversity三项指标上均达到最优。消融实验进一步证实，多尺度渐进生成（两级及以上尺度相比仅用S1，FID从0.334降至0.109）和动态多条件融合是性能提升的关键因素。定性可视化显示，级联生成策略显著缓解了单阶段生成中常见的身体关节抖动问题。
 
-
-
 文本驱动的人体动作生成旨在根据自然语言描述合成逼真的三维人体运动序列，在虚拟人、游戏、影视、人机交互等领域具有广泛应用前景。该任务的核心挑战在于**文本模态与人体运动模态之间存在巨大的语义和结构鸿沟**：文本是高度抽象、语义压缩的离散符号序列，而人体运动则是高维连续时空信号，包含数十个骨骼关节的精细旋转与位置变化。直接从文本描述一步生成完整运动序列极易导致关节抖动、语义不一致以及运动不自然等问题。
 
 早期方法主要采用循环神经网络（RNN）或Transformer构建文本到动作的序列到序列映射，如 **Seq2Seq**（Lin et al., NeurIPS 2018）、**Language2Pose**（Ahuja et al., 3DV 2019）、**Hier**（Ghosh et al., ICCV 2021）等。这些方法通常直接回归关节旋转或位置，缺乏对运动分布的有效建模，生成质量有限。随后，基于生成对抗网络（GAN）的方法如 **MoCoGAN**（Tulyakov et al., CVPR 2018）尝试将动作分解为内容与运动分支，但训练不稳定且多样性不足。
@@ -64,8 +62,6 @@ GUESS（**Grad**Ually **E**nriching **S**ynthe**s**is）提出了一种仿照人
 近年来，扩散模型在图像和视频生成领域取得突破性进展，并迅速被引入人体动作生成。**MDM**（Tevet et al., ICLR 2023）首次将去噪扩散概率模型应用于原始运动序列的直接生成，**MLD**（Chen et al., CVPR 2023）进一步将扩散过程迁移到潜在空间以提高效率，**T2M-GPT**（Zhang et al., CVPR 2023）则将生成建模为离散码本的序列预测。这些方法在生成质量上取得了显著进步，但它们普遍采用**单阶段生成范式**：一次性从噪声和文本条件合成所有关节的完整细粒度运动。这种“一步到位”的策略忽视了人体运动天然的层次化结构——躯干、四肢、末端关节的运动在空间精度和语义粒度上存在明显差异，单阶段生成难以同时兼顾全局稳定性和局部细节。
 
 GUESS的核心动机正源于此：**仿照人类从粗到细想象动作的认知过程**——当读到“一个人向前走并挥手”时，大脑首先勾勒出身体整体的移动轨迹和姿态轮廓，再逐步丰富手臂摆动、手指动作等细节。GUESS将这一直觉转化为**多尺度身体姿态表示与由粗到精的级联潜在扩散生成策略**，将人体动作抽象为从单节点躯干到22关节全身的多级骨骼图，先合成最粗粒度的稳定运动提示，再逐步注入文本条件和粗运动提示丰富细节，从而降低每一步的跨模态映射难度，缓解单阶段生成中的关节抖动与语义漂移问题。
-
-
 
 ## 核心方法与创新机理
 
@@ -133,8 +129,6 @@ $$\mathcal{L}_{\mathcal{V}} = \lambda_{mr}\sum_{i=1}^{4} \| \pmb{S}_i - \mathcal
 
 需要指出的是，GUESS 的渐进生成策略目前存在两个固有限制：一是对所有输入文本采用**固定的四个尺度和四个推理阶段**，无法根据文本描述的复杂度（如“一个人走路” vs “一个人一边走路一边挥手并转头”）自适应调整阶段数；二是渐进生成仅从**空间维度**（姿态由粗到细）展开，尚未探索时间维度的渐进式生成（如先合成低帧率关键帧再补全高帧率细节）。这些方向构成了后续研究的重要开放问题。
 
-
-
 GUESS 的整体设计遵循一个核心理念：**将文本到人体运动的跨模态生成问题分解为多个抽象层次，通过由粗到精的级联潜在扩散过程逐步合成目标运动**。这一设计直接回应了文本模态与精细骨骼关节运动之间存在的巨大语义鸿沟——单阶段方法试图一步跨越这一鸿沟，往往导致关节抖动和语义不一致。
 
 ### 三组件架构
@@ -181,8 +175,6 @@ GUESS 包含三个基本组件（见 Figure 2）：
 ### 局限与开放问题
 
 当前框架对所有输入文本采用固定的四级推理，尚未根据文本复杂度自适应调整阶段数。此外，渐进生成目前仅从空间维度展开（姿态由粗到细），时间维度的渐进生成（如先合成低帧率序列再补全细节）仍有待探索。
-
-
 
 GUESS 的核心架构由三个基本组件构成：多尺度姿态表示、运动编码模块和运动推理模块。其核心思想是将文本驱动的人体动作生成问题分解为多个抽象层次，通过级联潜在扩散模型逐步从粗到细丰富运动细节。
 
@@ -242,8 +234,6 @@ $$\mathcal{L}_{MI} = \mathbb{E}[\|\epsilon - \mathcal{R}_4(z_4^t, t, c)\|_2^2] +
 
 其中 $\epsilon$ 为前向过程中实际添加的噪声，去噪器的目标是精确预测该噪声。第一项对应最粗尺度的无条件（仅文本）去噪，后三项对应细尺度在粗运动引导下的去噪。通过联合优化四个尺度的噪声预测均方误差，模型学习到从文本到完整精细运动的渐进式映射。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -290,24 +280,10 @@ GUESS在三个基准数据集上进行了全面评测，覆盖文本到动作生
 
 所有对比实验均采用统一的评估协议（20次重复，95%置信区间），统一使用CLIP-ViT-L-14作为文本编码器，训练/测试数据划分与基准方法一致，结果具有可比性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1930_GUESS_GradUally_Enriching_SyntheSis_for_Text_Driven_Human_Motion_Generat/figures/006_Table_1.jpg]]
-
-![[assets/figures/papers/paper_list_l1930_GUESS_GradUally_Enriching_SyntheSis_for_Text_Driven_Human_Motion_Generat/figures/007_Table_2.jpg]]
-
-![[assets/figures/papers/paper_list_l1930_GUESS_GradUally_Enriching_SyntheSis_for_Text_Driven_Human_Motion_Generat/figures/008_Table_3.jpg]]
-
-![[assets/figures/papers/paper_list_l1930_GUESS_GradUally_Enriching_SyntheSis_for_Text_Driven_Human_Motion_Generat/figures/012_Table_4.jpg]]
 
 ![[assets/figures/papers/paper_list_l1930_GUESS_GradUally_Enriching_SyntheSis_for_Text_Driven_Human_Motion_Generat/figures/013_Figure_9.jpg]]
 *Figure 9: Visual comparison between*
-
-![[assets/figures/papers/paper_list_l1930_GUESS_GradUally_Enriching_SyntheSis_for_Text_Driven_Human_Motion_Generat/figures/015_Table_7.jpg]]
-
-![[assets/figures/papers/paper_list_l1930_GUESS_GradUally_Enriching_SyntheSis_for_Text_Driven_Human_Motion_Generat/figures/018_Table_6.jpg]]
-
-![[assets/figures/papers/paper_list_l1930_GUESS_GradUally_Enriching_SyntheSis_for_Text_Driven_Human_Motion_Generat/figures/019_Table_8.jpg]]
 
 ![[assets/figures/papers/paper_list_l1930_GUESS_GradUally_Enriching_SyntheSis_for_Text_Driven_Human_Motion_Generat/figures/011_Figure_8.jpg]]
 *Figure 8: User Study. Each bar indicates the preference rate of GUESS over other methods. The red line indicates the 50%*
@@ -317,8 +293,6 @@ GUESS在三个基准数据集上进行了全面评测，覆盖文本到动作生
 
 ![[assets/figures/papers/paper_list_l1930_GUESS_GradUally_Enriching_SyntheSis_for_Text_Driven_Human_Motion_Generat/figures/010_Figure_7.jpg]]
 *Figure 7: Diverse synthesized motion samples. We visualize two human motion generation results for each textual description. These qualitative evaluations indicate that GUESS generates realistic and diverse motions*
-
-
 
 ## 定位与知识库关联
 
@@ -387,8 +361,6 @@ GUESS 与 **MLD**（Chen et al., CVPR 2023）共享“在潜在空间执行扩�
 4. **跨尺度潜在空间的对齐学习。** 通过对比学习或知识蒸馏，在 VAE 训练阶段显式对齐不同尺度的潜在空间，可能减少级联去噪器学习隐式映射的负担，进一步提升生成质量。
 
 5. **更广泛的动作类型验证。** 在舞蹈、体育动作、手语等具有高度结构化或文化特定性的动作类型上验证多尺度抽象的有效性，并探索是否需要针对特定动作类型设计定制化的骨骼抽象层级。
-
-
 
 ## 原文 PDF
 

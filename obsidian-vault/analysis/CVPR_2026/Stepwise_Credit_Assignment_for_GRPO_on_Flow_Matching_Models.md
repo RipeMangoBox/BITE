@@ -216,9 +216,6 @@ $$
 
 其中均值和标准差在所有 $N$ 条轨迹和 $T$ 个步骤上联合计算。消融实验（Figure 9）证明联合归一化相比逐步归一化（每步独立标准化）显著加速收敛，因为它保留了早期增益的天然量级优势，使优化能聚焦于信息量更大的早期步骤。
 
-![[assets/figures/papers/paper_list_l2703_https_arxiv_org_abs_2603_28718/figures/015_Figure_9.jpg]]
-*Figure 9: Joint normalization preserves temporal structure and accelerates convergence. Reward vs. training iteration comparing joint normalization (global mean/std across all steps and trajectories) against per-step normalization (separate mean/std for each step)*
-
 ### 核心模块三：逐步策略梯度目标
 
 将逐步优势融入 GRPO 框架，得到每步的策略梯度目标：
@@ -238,8 +235,6 @@ x_{t-\Delta t} = \left(1 - (t - \Delta t)\right) \hat{x}_0(t) + \sqrt{(t - \Delt
 $$
 
 其中 $\sigma_t = \eta (t-\Delta t) \sqrt{1-t}$ 采用方差保持的噪声调度，$\epsilon \sim \mathcal{N}(0, I)$。当 $\sigma_t = 0$ 时退化为确定性 ODE。该模块与逐步信用分配相互独立——当两个方法均使用此 SDE 时，Stepwise-Flow-GRPO 仍保持样本效率优势（Figure 6），证明信用分配改进与采样改进是互补的。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2703_https_arxiv_org_abs_2603_28718/figures/012_Figure_7.jpg]]
 *Figure 7: Design variation comparison. Reward vs. training iteration for different formulations of stepwise credit assignment on GenEval with PickScore reward. The standard gain formulation from the main paper matches all alternatives, demonstrating that preserving the natural temporal structure of diffusion gains is the most effective credit assignment*
@@ -281,25 +276,11 @@ Table 2 提供了每训练迭代的时间分解。Stepwise-Flow-GRPO的主要额
 
 尽管Stepwise-Flow-GRPO在多数设置下表现优异，仍需注意以下局限：(1) 当使用大型VLM奖励模型（如7B UnifiedReward）时，中间奖励估计的计算成本显著增加；(2) 仅在SD3.5-Medium和10步去噪设置下验证，尚未测试更少步骤或更大模型（如SDXL、Flux）的效果；(3) 逐步奖励估计依赖Tweedie公式和多步ODE的准确性，在极端噪声水平下可能引入系统偏差；(4) 目前仅最大化单一标量奖励，未明确处理多个质量指标（如保真度与语义对齐）之间的潜在权衡；(5) 未探索长期RLHF训练中的遗忘问题。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2703_https_arxiv_org_abs_2603_28718/figures/008_Figure_4.jpg]]
-*Figure 4: Sample efficiency across reward functions. Stepwise-Flow-GRPO consistently outperforms Flow-GRPO in reward per training step across all settings, achieving both faster convergence and superior final performance in 3 out of 4 settings*
-
-![[assets/figures/papers/paper_list_l2703_https_arxiv_org_abs_2603_28718/figures/011_Table_1.jpg]]
-*Table 1: Final model quality on GenEval. Compositional generation performance for models trained with PickScore reward. Both methods substantially improve over the base model, with our method matching Flow-GRPO at cfg=1.0 and outperforming it across most categories at cfg=4.5, particularly in counting and spatial positioning*
-
 ![[assets/figures/papers/paper_list_l2703_https_arxiv_org_abs_2603_28718/figures/019_Figure_12.jpg]]
 *Figure 12: Extended GenEval training. GenEval overall score vs. wall-clock time for 400 GPU hour runs. Stepwise-Flow-GRPO achieves 0.87, substantially outperforming Flow-GRPO (0.72) and approaching state-of-the-art autoregressive models. The widening performance gap demonstrates that stepwise credit assignment provides increasing benefits at high performance levels*
 
-![[assets/figures/papers/paper_list_l2703_https_arxiv_org_abs_2603_28718/figures/020_Figure_13.jpg]]
-*Figure 13: UnifiedReward training. Reward vs. wall-clock time for 60 GPU hour run on GenEval using UnifiedReward-7b-v1.5. Stepwise-Flow-GRPO trains stably while Flow-GRPO diverges with this reward function, demonstrating superior robustness with complex VLM-based rewards*
-
 ![[assets/figures/papers/paper_list_l2703_https_arxiv_org_abs_2603_28718/figures/005_Figure_3.jpg]]
 *Figure 3: Qualitative results. We compare our Stepwise-Flow-GRPO with Flow-GRPO and observe better spatial reasoning, attribute binding, and counting performance*
-
-![[assets/figures/papers/paper_list_l2703_https_arxiv_org_abs_2603_28718/figures/009_Figure_6.jpg]]
-*Figure 6: Stepwise credit assignment remains effective with improved SDE. Reward versus training step when both methods use the DDIM-inspired SDE from Sec. 5.5. Stepwise-Flow-GRPO retains its sample efficiency advantage, demonstrating that the improvements in credit assignment and sampling are complementary*
 
 ## 定位与知识库关联
 

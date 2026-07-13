@@ -190,8 +190,6 @@ $$\bar{\mathbf{V}} = \mathbf{V}' + \mathrm{FFN}(\mathrm{Attn}(\mathbf{V}'W_Q, \m
 
 级联筛选与轻量运动编码的设计使 Motion-MLLM 在精度与效率间取得有利权衡。如表5所示，采用运动-视觉联合筛选（MV Filtering）相比最大覆盖采样（MC），在 ScanQA 上以更低的端到端延迟 $T$ 获得了更高的 CIDEr 得分，成本效益指标 CE 达到 1.02 s⁻¹，显著优于 Spatial-MLLM 的 0.67 s⁻¹。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2603_17980/figures/002_Figure_2.jpg]]
 *Figure 2: Architecture of Motion-MLLM. The \ and icons indicate trainable and frozen modules, respectively*
 
@@ -239,11 +237,6 @@ $$\bar{\mathbf{V}} = \mathbf{V}' + \mathrm{FFN}(\mathrm{Attn}(\mathbf{V}'W_Q, \m
 
 这种“双向→单向”的不对称设计确保了视觉标记在充分吸收运动信息的同时，保持对原始视觉内容的忠实性。消融实验证实，该设计相比简单的 Concat+MLP 融合方案在 ScanQA 上 EM 指标提升 10.6%（29.8% vs 19.2%），验证了跨帧运动引导信息传递机制的有效性（Tab. 6）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2603_17980/figures/003_Figure_3.jpg]]
-*Figure 3: Illustration of asymmetric cross-modal feature fusion*
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -279,9 +272,6 @@ VSI-Bench包含八个空间推理子任务，全面评估距离判断、尺寸�
 
 在ScanRefer视觉接地任务上（Table 4），Motion-MLLM以61.4% Acc@0.25（精炼后）超越所有2D输入模型，并超过部分3D输入模型如Video-3D LLM（58.1）。未精炼的Acc@0.25为33.7%，精炼后提升至61.4%，说明自运动增强的视觉特征为后续提议精炼提供了更准确的初始定位。在Scan2Cap密集字幕任务上，Motion-MLLM同样取得有竞争力的CIDEr 73.4，接近3D输入方法的水平。
 
-![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2603_17980/figures/007_Table_4.jpg]]
-*Table 4: Evaluation of 3D scene understanding tasks. For ScanRefer, scores include proposal refinement following SPAR [62]; “()” indicates the score without refinement*
-
 ### 效率与成本效益
 
 Table 5展示了不同采样策略下的延迟-精度权衡。Motion-MLLM的运动-视觉关键帧筛选（MV Filtering）在ScanQA上以端到端耗时T=0.98s达到EM 29.8%，成本效益指标CE（EM/T）为1.02 s⁻¹，显著优于Spatial-MLLM的最大覆盖采样（MC，CE=0.67）。在SQA3D上同样以更低延迟实现更高精度。Figure 5的帕累托前沿进一步表明，Motion-MLLM在延迟-精度曲线上始终位于其他方法的左上方，验证了级联筛选策略的效率优势。
@@ -307,17 +297,6 @@ Table 6的系统消融揭示了各组件的因果贡献：
 3. **关键帧阈值的手工设定**：级联筛选的门限（τ_d, τ_θ, τ_p, τ_v）为手工设定，虽经灵敏度分析验证鲁棒，但非自适应参数，在不同场景或传感器配置下可能需要重新调优。
 
 4. **模型规模未充分探索**：当前仅基于~4B参数的LLM主干，未评估扩展到更大模型（如7B、13B）时的增益曲线，无法判断自运动信息的价值是否随模型容量增加而递减。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2603_17980/figures/008_Table_5.jpg]]
-*Table 5: Cost-effectiveness comparison on ScanQA [3] and SQA3D [42]. “MC” represents the maximum coverage sampling [56, 68]. “MV Filtering” denotes the motion-visual keyframe filtering method we design. “T” represents the end-to-end time consumption*
-
-![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2603_17980/figures/009_Table_6.jpg]]
-*Table 6: Ablation study on ScanQA [3] and SQA3D [42]. “VGGT-only” corresponds to the Spatial-MLLM configuration. “Visual-based Sampling” filters frames purely based on visual criteria [56]. “Full MV Filtering” refers to evaluating all criteria on every frame. “Concat+MLP” concatenates the visual and egomotion tokens and uses an MLP to transform them into the embedding space. All rows except the “Qwen2.5-VL-3B” are fine-tuned with the same two-stage pipeline as full Motion-MLLM*
-
-![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2603_17980/figures/015_Figure_5.jpg]]
-*Figure 5: Latency-accuracy trade-off on ScanQA (left) and SQA3D (right). Each baseline polyline traces its frame-sampling configurations. Motion-MLLM uses MV-filtering*
 
 ![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2603_17980/figures/016_Figure_6.jpg]]
 *Figure 6: Qualitative examples on ScanQA [3]*

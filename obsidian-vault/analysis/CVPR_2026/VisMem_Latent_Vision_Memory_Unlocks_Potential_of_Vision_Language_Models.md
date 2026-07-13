@@ -51,8 +51,6 @@ claims:
 
 该方法在 12 个综合视觉基准上的实验表明，VisMem 相较 vanilla 模型平均提升 **11.0%**，在所有 15 个基线方法中排名第一。尤其在 MuirBench 的细粒度子任务上，计数、视觉检索和 grounding 分别提升 **+7.0%**、**+9.4%** 和 **+13.1%**；在 MV-Math 上更是取得了 **+22.5%** 的显著增益。此外，VisMem 展现出优异的跨域泛化能力（与全量训练数据差距仅约 2%）和灾难性遗忘抵抗能力（四阶段连续学习后 MMVet 性能保留 **72.1%**），并兼容多种基座模型（Qwen2.5-VL、LLaVA-OV-1.5、InternVL-3.5 等），在推理效率与性能之间取得了良好的平衡。
 
-
-
 ### 视觉语言模型的“视觉处理瓶颈”
 
 视觉语言模型（VLM）近年来在视觉问答、图像描述等任务上取得了显著进展，但在需要细粒度视觉理解、多步推理和长序列生成的高阶场景中，其性能仍远落后于文本端的能力。这一差距的根源并非视觉编码器提取特征的能力不足，而是自回归解码过程中存在一个系统性的**视觉处理瓶颈**：随着生成序列的增长，VLM 倾向于优先累积文本上下文，逐渐丢失对初始视觉证据的 grounding，同时缺乏上下文化的视觉语义经验来支撑复杂的推理链。简而言之，模型“看到”了图像，却无法在生成过程中持续“记住”并有效利用视觉信息。
@@ -81,8 +79,6 @@ VisMem 的核心动机源于一个认知科学洞见：人类在视觉推理时�
 
 这一设计使得 VisMem 能够在自回归生成过程中同时保持感知保真度和语义一致性，从根本上突破视觉处理瓶颈，而非仅仅在特定任务上“打补丁”。
 
-
-
 ## 核心方法与创新机理
 
 VisMem 的核心创新在于将认知心理学中的双重记忆理论内化为 VLM 潜在空间中的轻量级记忆系统，通过**非侵入式的词汇表扩展**和**基于强化学习的动态调用机制**，在不修改核心 VLM 参数的前提下，从根本上缓解了自回归解码过程中的“视觉处理瓶颈”。其关键创新点体现在以下三个 changed slots 上：
@@ -106,8 +102,6 @@ VisMem 采用基于 GRPO 的两阶段训练范式，分别优化记忆形成质�
 - **阶段二（记忆调用优化）**：冻结记忆组件，更新策略模型 $P$ 的部分参数 $\theta$，在最大化性能增量的同时引入两项惩罚——错误记忆类型惩罚 $p_{type}$ 和负回报调用惩罚 $p_{neg}$，引导模型学会在合适的时机调用合适的记忆类型。
 
 这种解耦训练策略使得记忆系统的形成能力和调用能力分别得到充分优化，避免了端到端训练中可能出现的耦合退化问题。消融实验表明，随机调用概率在 75% 时性能达到峰值，100% 全量调用反而导致性能下降，验证了动态调用机制的必要性和有效性。
-
-
 
 VisMem 的整体设计遵循“按需调用、双记忆协同”的原则，在不修改核心 VLM 参数的前提下，通过潜在空间中的轻量级记忆模块增强视觉处理能力。其 pipeline 由四个关键模块串联而成：**词汇表扩展** → **查询构建器** → **记忆形成器** → **记忆调用与插入**，最终无缝嵌入自回归解码流程。
 
@@ -161,15 +155,8 @@ $$\max_{\mathcal{P},\mathcal{M}} \mathbb{E}_{(I,V)\sim\mathcal{D},\tau\sim(\math
 
 这一设计使得 VisMem 能够以 **8.2%–43.8%** 的额外推理延迟为代价，在 12 个视觉基准上实现平均 **11.0%** 的性能提升，且兼容 Qwen2.5-VL、LLaVA-OV-1.5、InternVL-3.5 等多种基座模型。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2358_https_arxiv_org_abs_2511_11007/figures/002_Figure_2.jpg]]
 *Figure 2: The overview of our proposed VisMem*
-
-![[assets/figures/papers/paper_list_l2358_https_arxiv_org_abs_2511_11007/figures/001_Figure_1.jpg]]
-*Figure 1: Four primary paradigms for enhancing visual capabilities: (a) the direct training paradigm, (b) the image-level paradigm, (c) the token-level paradigm, and (d) the latent space paradigm. Our VisMem belongs to the last one, featuring latent vision memory*
-
-
 
 ### 问题形式化与自回归生成瓶颈
 
@@ -233,8 +220,6 @@ $$\max_{\theta} \mathbb{E}_{\tau\sim\mathcal{P}(\cdot|x,\mathbf{M}_{s/l})}[\Delt
 
 其中 $p_{type}$ 惩罚调用错误类型的记忆（如需要细粒度感知时却调用了长期语义记忆），$p_{neg}$ 惩罚产生负回报的调用（即调用记忆后性能反而下降），$\alpha$ 为平衡系数。这种设计促使模型形成稀疏而精准的记忆调用策略——实验表明，随机调用概率在 75% 时性能达到峰值，100% 全量调用反而导致性能下降。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果：12 基准上的全面领先
@@ -252,13 +237,7 @@ VisMem 在覆盖视觉理解、推理和生成三大能力的 12 个基准上，
 
 在 MuirBench 的 9 个子任务上（Table 5），VisMem 在计数（+7.0%）、视觉检索（+9.4%）和 grounding（+13.1%）等依赖细粒度视觉证据的任务上大幅领先第二名方法。值得注意的是，**仅使用短期记忆**在这些子任务上表现更优，而**仅使用长期记忆**在 MV-Math 上表现更佳——这直接验证了两种记忆的互补性：短期记忆编码丰富的感知细节，服务于定位与计数；长期记忆编码抽象语义，服务于数学推理中的概念关联。
 
-![[assets/figures/papers/paper_list_l2358_https_arxiv_org_abs_2511_11007/figures/011_Table_5.jpg]]
-*Table 5: Results on 9 selected subsets of MuirBench [57]. We compare our VisMem with the second and third best scored counterparts, and separately use the short or long latent memory to assess the improvements of each*
-
 在 LogicVista 的 10 个子集上（Table 6），VisMem 同样在推理技能和能力维度均保持领先，进一步证实记忆系统对逻辑推理的普适增益。
-
-![[assets/figures/papers/paper_list_l2358_https_arxiv_org_abs_2511_11007/figures/012_Table_6.jpg]]
-*Table 6: Results on 10 selected subsets (5 reasoning skills and 5 capabilities) of LogicVista [67]. We compare our VisMem with the second and third best scored counterparts, and separately use the short or long latent memory to assess the improvements of each*
 
 ### 消融实验：记忆组件与调用策略的因果验证
 
@@ -277,16 +256,10 @@ VisMem 在覆盖视觉理解、推理和生成三大能力的 12 个基准上，
 
 跨域泛化实验（Figure 3, Table 7）中，模型仅在 Visual CoT 和 Mulberry 两个数据集上训练，随后在四个未见基准上评估。VisMem 在所有未见基准上仍保持显著领先，与使用全量训练数据的性能差距仅约 2%。这得益于记忆模块的轻量化设计——LoRA 适配器仅学习如何从冻结的 VLM 中提取和注入视觉记忆，而非改变核心视觉-语言映射，因此对训练数据分布的过拟合风险更低。
 
-![[assets/figures/papers/paper_list_l2358_https_arxiv_org_abs_2511_11007/figures/004_Figure_3.jpg]]
-*Figure 3: Results of the cross-domain generalization study. Models are only trained on Visual CoT [42] and Mulberry [71]. Dashed bar indicates the results with full training data*
-
 ![[assets/figures/papers/paper_list_l2358_https_arxiv_org_abs_2511_11007/figures/013_Table_7.jpg]]
 *Table 7: Results of various models with full training datasets and partial datasets (Visual CoT [42] and Mulberry [71]), and evaluated across four benchmarks*
 
 四阶段连续学习实验（Figure 4, Table 8）进一步验证了 VisMem 对灾难性遗忘的抵抗力。经过四个阶段的序贯训练后，VisMem 在 MMVet 上保留 **72.1%** 的性能，优于 DeepEyes（68.4%）和 Mirage（67.0%）。原因在于记忆形成器 F_s/F_l 与策略模型 P 在两阶段训练中被解耦优化（Eq. 7-8），新任务训练主要更新记忆组件，对原有视觉理解能力的干扰较小。
-
-![[assets/figures/papers/paper_list_l2358_https_arxiv_org_abs_2511_11007/figures/006_Figure_4.jpg]]
-*Figure 4: Results of four-stage continual learning on MMVet [76]. Stage 0 only includes itself, while stage 1, 2, 3 sequentially train models on different additional training data combinations*
 
 ### 效率分析：性能-延迟的最优平衡
 
@@ -302,9 +275,6 @@ VisMem 在覆盖视觉理解、推理和生成三大能力的 12 个基准上，
 
 VisMem 在 9 个不同规模和来源的基座模型上均带来一致的性能提升（Table 2），包括 Qwen2.5-VL（3B/7B/32B）、LLaVA-OV-1.5（4B/8B）和 InternVL-3.5（4B/8B/14B/38B）。这验证了方法的模型无关性——记忆模块仅通过扩展词汇表和附加 LoRA 适配器实现，不依赖特定 VLM 架构。
 
-![[assets/figures/papers/paper_list_l2358_https_arxiv_org_abs_2511_11007/figures/005_Table_2.jpg]]
-*Table 2: Results on nine base models with various sizes and sources, including Qwen2.5-VL-3B/7B/32B [4], LLaVA-OV-1.5-4B/8B [1], InternVL-3.5-4B/8B/14B/38B [63]. ↑ indicates the performance enhancement compared with the base model*
-
 ### 失败模式与局限
 
 尽管整体性能领先，VisMem 仍存在以下不足：
@@ -313,8 +283,6 @@ VisMem 在 9 个不同规模和来源的基座模型上均带来一致的性能�
 - **计算成本**：引入的记忆模块带来 8.2%–43.8% 的额外延迟，在实时性要求极高的场景下可能成为瓶颈。记忆长度增大时成本进一步上升。
 - **训练资源需求**：两阶段 GRPO 训练需要 8 块 H200 GPU，对小型研究团队不够友好。
 - **任务覆盖**：论文未验证 VisMem 在视频理解或多模态交互任务上的效果，其通用性有待进一步检验。
-
-
 
 ## 定位与知识库关联
 
@@ -368,8 +336,6 @@ VisMem 的设计使其在以下场景中尤为有效：
 - **效率优化**：除 LoRA 外，是否存在其他参数高效方法（如量化、蒸馏）可进一步降低训练和推理成本，同时保持性能？
 
 **公平性说明**：论文未专门讨论公平性或社会偏见评估，主要聚焦于视觉能力的提升。在实际部署中，基座 VLM 的固有偏见可能通过记忆系统被保留或放大，需人工验证。
-
-
 
 ## 原文 PDF
 

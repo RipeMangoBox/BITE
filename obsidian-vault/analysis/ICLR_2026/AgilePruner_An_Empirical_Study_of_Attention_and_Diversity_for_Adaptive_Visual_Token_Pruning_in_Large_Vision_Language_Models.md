@@ -45,15 +45,11 @@ claims:
 
 本文《AgilePruner: An Empirical Study of Attention and Diversity for Adaptive Visual Token Pruning in Large Vision-Language Models》对大型视觉语言模型（LVLM）中视觉令牌剪枝的两种主流范式——基于注意力的剪枝与基于多样性的剪枝——进行了系统的实证研究。通过引入有效秩（erank）和注意力熵两个可量化的图像复杂度指标，论文揭示了不同剪枝策略在不同图像类型上的性能偏好，并发现保留令牌的多样性与幻觉频率之间存在正相关关系。基于这些发现，作者提出了AgilePruner，一种自适应阈值剪枝方法，能够根据图像复杂度动态调节注意力选择与多样性保留之间的平衡。在LLaVA-1.5-7B上，该方法在保留64个令牌时平均相对性能达到96.76%，在保留128个令牌时达到98.04%，同时将计算量降低约89%。
 
-
-
 大型视觉语言模型（LVLM）通常由视觉编码器（vision encoder）、模态投影器（modality projector）和大语言模型（LLM）组成。视觉编码器将输入图像转换为大量视觉令牌（例如LLaVA-1.5-7B使用576个令牌），这些令牌随后通过投影器与LLM的词嵌入空间对齐。处理大量视觉令牌带来了显著的计算开销，因此视觉令牌剪枝成为提升LVLM推理效率的关键技术。
 
 现有视觉令牌剪枝方法可分为三类：基于注意力的方法（如FasterVLM、PyramidDrop、SparseVLM）优先保留注意力分数高的令牌，但可能导致选择集中且重复；基于多样性的方法（如DivPrune、FPSPruner）基于特征相似性减少冗余，鼓励更广泛的覆盖，但可能忽略重要令牌；混合方法（如VisPruner、BAT、PruMerge+）尝试结合两种策略。
 
 然而，现有方法的实际行为缺乏系统表征。具体而言，以下关键问题尚未得到充分研究：不同剪枝方法在特征多样性保留程度上的差异；保留令牌的属性与幻觉倾向之间的关系；以及不同图像类型对不同剪枝策略的偏好。本文旨在填补这些空白。
-
-
 
 ## 核心方法与创新机理
 
@@ -66,8 +62,6 @@ claims:
 3. **自适应阈值剪枝模块**：设计了一种基于图像复杂度的动态相似性阈值公式，能够根据输入图像的erank自适应调整剪枝的激进程度。
 
 4. **跨模型架构的泛化验证**：在LLaVA-1.5-7B、LLaVA-1.5-13B、LLaVA-NeXT-7B和Qwen2.5-VL-7B等多种模型架构上验证了方法的有效性。
-
-
 
 AgilePruner的整体框架包含以下核心模块：
 
@@ -82,8 +76,6 @@ AgilePruner的整体框架包含以下核心模块：
 5. **模态投影器（Modality Projector）**：将视觉令牌与LLM词嵌入空间对齐。The vision encoder converts input images into visual tokens, and the projector aligns these tokens with the LLM's word-embedding space.
 
 6. **大语言模型（LLM）**：处理剪枝后的视觉令牌与文本令牌，生成响应。the LLM can effectively interpret and process visual information.
-
-
 
 ### 1 注意力熵（Attention Entropy）
 
@@ -120,8 +112,6 @@ $$\tau_i = \mathrm{order}_i \times \left( \frac{\mathrm{erank}_{\mathrm{input}}}
 通过协方差矩阵特征值谱计算的有效秩，降低计算复杂度：
 
 $$C = X X^\top, \quad S = \sqrt{\lambda(C)}, \quad p_i = \frac{S_i}{\sum_j S_j}, \quad \operatorname{erank}(X) = \exp\left(-\sum_i p_i \log p_i\right)$$
-
-
 
 ## 实验与关键发现
 
@@ -171,8 +161,6 @@ Table 4显示简单图像（OCR）的注意力熵为4.61，erank为78；复杂�
 
 在COCO-C的15种图像损坏类型下，erank表现出高度稳定性，平均偏差在严重度1时为2.78，严重度3时为4.11（Table 17）。改变全局空间结构的损坏（如zoom blur、frost、snow、elastic transform）产生中等偏大的erank偏差（4-7点），而局部像素级失真（如brightness、pixelation、JPEG compression）的偏差最小（1-2.5点）。
 
-
-
 ## 定位与知识库关联
 
 本文在视觉令牌剪枝方法谱系中占据独特位置。现有方法可分为三类：基于注意力的方法（FasterVLM、PyramidDrop、SparseVLM、VisionZip）优先保留高注意力令牌；基于多样性的方法（DivPrune、FPSPruner）最大化令牌间的几何分散度；混合方法（VisPruner、BAT、PruMerge+）尝试结合两种策略但使用固定比例。
@@ -189,8 +177,6 @@ AgilePruner的核心贡献在于：它不是提出一种全新的剪枝算子，
 
 ### 实验与分析
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_2NLkhPex1M_AgilePruner_An_/figures/002_Table_1.jpg]]
 *Table 1: Mean erank of retained 64 tokens on POPE.*
 
@@ -205,8 +191,6 @@ AgilePruner的核心贡献在于：它不是提出一种全新的剪枝算子，
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_2NLkhPex1M_AgilePruner_An_/figures/008_Table_4.jpg]]
 *Table 4: Attention entropy and erank on simple and complex image datasets. Simple images exhibit lower entropy and erank, while complex images show higher values, and the two pruning methods show contrasting performance between simple and complex images.*
-
-
 
 ## 原文 PDF
 

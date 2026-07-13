@@ -61,15 +61,11 @@ claims:
 
 本文的主要局限包括：文本生成模型易混淆姿态 A 和 B，对接触地面或蹲伏/躺卧等特殊姿态的处理能力不足，以及当前任务仅限于静态姿态对而尚未扩展到连续运动序列。
 
-
-
 3D人体姿态理解是计算机视觉的核心问题之一，而自然语言作为人类最自然的交互方式，正在成为姿态编辑与生成任务中日益重要的控制信号。然而，现有工作主要聚焦于从单张文本描述生成静态姿态（text-to-pose），却忽略了一个同样关键的场景：**当用户已经有一个初始姿态，希望用语言指令对其进行局部修正时，模型应当如何响应？**
 
 这一能力缺失的根源在于数据瓶颈——目前缺乏成对的3D姿态与描述其差异的自然语言数据。构建此类数据集面临双重挑战：其一，如何系统性地选取具有语义意义的姿态对；其二，如何以可扩展的方式生成精确描述两个姿态间差异的文本修饰指令。由于缺乏这样的数据，基于文本的姿态修正任务（text-based pose editing）及其反向任务——给定姿态对生成修正性文本（correctional text generation）——均无法得到有效研究。
 
 PoseFix正是针对这一空白而提出。其核心动机是：**通过构建首个大规模成对3D姿态与文本修正指令的数据集，使模型能够学习从“初始姿态 + 文本反馈”到“目标姿态”的映射，以及其逆向映射**。该数据集同时支持两项新任务：（1）文本引导的姿态编辑——根据初始姿态A和文本修饰指令生成修正后的姿态B；（2）修正文本生成——给定姿态对(A, B)，自动生成描述其差异的自然语言指令。这两项任务互为表里，共同构成了人与3D姿态之间更精细、更迭代的交互范式。
-
-
 
 ## 核心方法与创新机理
 
@@ -108,8 +104,6 @@ PoseFix 数据集的构建是使上述任务可行的关键瓶颈突破。此前
 - 自动注释管道的 paircodes/super-paircodes 分类体系是否足以覆盖真实场景中的姿态差异多样性，论文未提供与人工标注的语义覆盖度对比。
 - 数据集构建中的“缺失指令”现象（人工标注中隐含的、由运动链自然产生的变化）对模型学习的影响程度尚未量化。
 
-
-
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2309_08480/figures/011_Figure_6.jpg]]
 *Figure 6: Overview of our baseline for correctional text generation. The bottom part represents a standard auto-regressive transformer model: the next word is predicted from the previously generated tokens. The decoder outputs a distribution of probabilities over the vocabulary for each token. The top part represents the conditioning on the pose pair: the two pose embeddings are fused together into a set of “pose tokens”, further used for conditioning via prompting or via cross-attentions in the transformer. At inference, the modifier is generated iteratively using the greedy approach*
 
@@ -143,8 +137,6 @@ $$\mathcal{L}_{\mathrm{pose\ editing}} = \mathcal{L}_R(B, \hat{B}) + \mathcal{L}
 
 - **预训练**：先在自动注释数据上预训练，再在人工注释上微调。预训练对姿态编辑任务带来 +84% 的 ELBO 提升，效果远超数据增强。
 - **数据增强**：左右翻转（无预训练时 ELBO 平均提升 37%）、PoseMix（联合 PoseScript 数据）、PoseCopy（同姿态对+空文本）以及 InstructGPT 释义生成，均在无预训练条件下效果显著，预训练后增益有限。
-
-
 
 ### 文本引导姿态编辑基线
 
@@ -187,8 +179,6 @@ $$\mathcal{L}_{\mathrm{pose\;editing}} = \mathcal{L}_{R}(B, \hat{B}) + \mathcal{
 $$p(T_{l+1} \mid T_{1:l})$$
 
 推理阶段采用贪心解码策略，每次选择使负对数似然最小化的词元作为输出。
-
-
 
 ## 实验与关键发现
 
@@ -251,22 +241,8 @@ cVAE 基线在 PoseFix 测试集（1239 对）上的核心结论是：**初始�
 
 数据集构建过程中采取了多项公平性措施：姿态对的左右方向均在受试者参考系中定义，避免视角歧义；禁止使用距离度量以保证对体型尺寸的鲁棒性。人工标注任务对合格工人进行了资格筛选，并支付不低于加州最低工资标准的报酬。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2309_08480/figures/009_Figure.jpg]]
-
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2309_08480/figures/014_Figure.jpg]]
 *Figure: A1: Origin of the human-annotated poses in Pose-Fix. The top plot shows the proportion of poses in PoseFix that come from each sub-dataset in AMASS [38]. The lower plot shows the proportion of sequences, in each of the subdataset, that provided at least one pose to PoseFix*
-
-![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2309_08480/figures/017_Figure_5.jpg]]
-*Figure 5: Figure A4: Original poses B for the text-based pose editing task and PoseFix queries presented in Figure 5. Two views of the each pose are shown on the same ground plane. Pose A is shown in grey, pose B in purple.Test 0 / ID 8 Test 32 / ID 168 Test 703 / ID 3482*
-
-![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2309_08480/figures/018_Figure.jpg]]
-*Figure: Move your left hand to the right. Extend your right arm behind you. Figure A5: Original correctional feedback annotation for PoseFix pose pairs presented in Figure A5. Pose A is shown in grey, pose B in purple. Bring to the right. Figure A6: Robot teaching application. Kick your right leg over so it is horizontal. Bring your left leg so it is left hand should bangle. Figure A7: Effect of training with PoseCopy*
-
-![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2309_08480/figures/012_Table.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -301,8 +277,6 @@ PoseFix 在 3D 人体姿态的文本引导编辑这一新任务上建立了首�
 4. **动态序列扩展**：将文本引导的姿态修正从静态对扩展到时间序列，需要解决时序一致性和渐进式修正指令的生成与执行问题。
 
 5. **接触与物理约束**：当前模型缺乏对物理合理性（如地面接触、关节限制）的显式建模，如何将物理约束融入文本引导的姿态编辑是一个值得探索的方向。
-
-
 
 ## 原文 PDF
 

@@ -49,8 +49,6 @@ claims:
 
 为支撑这一评估范式，作者构建了 **HHMotion（Human-Humanoid Motion）数据集**，包含 1000 条运动序列、15 个动作类别，覆盖 11 种机器人模型与 10 名人类被试，并投入 30 名标注者、超 500 小时人工评分。该基准为类人运动生成与控制方法提供了首个标准化测试平台，相关代码与数据集已开源。
 
-
-
 ### 人形机器人运动的类人性评估困境
 
 人形机器人正从实验室走向家庭服务、工业协作等真实场景，其运动的自然度和类人性直接影响用户接受度和人机交互体验。然而，当前领域面临一个核心瓶颈：尽管许多机器人动作在表面观感上已相当流畅，人类观察者仍能轻易辨别其与真实人类动作的差异，尤其在跳跃、拳击、跑步等高频动态动作中，这种差异尤为显著——根据本研究构建的基准，跳跃类动作的人-机器人评分差异可达 **3.23 分**（0–5 量表，见 Table 2）。
@@ -74,8 +72,6 @@ claims:
 人工评估虽然可靠，但成本高昂且难以规模化。因此，本文进一步探索**自动化类人性评估模型**的可行性，将其形式化为一个从运动序列到标量分数的回归任务。这一设计背后的核心洞察是：人类对运动类人性的感知主要由运动学特征决定，这种感知可以通过数据驱动的时序回归模型有效建模。初步实验表明，一个结构简单的 **PTR-Net（Pose-Temporal Regression Network）** 即可在该任务上显著超越 Gemini 2.5 Pro 等大型多模态模型（MAE 0.5813 vs. 1.2682，Spearman's ρ 0.6841 vs. 0.2303，见 Table 3），验证了专用运动理解模型在该场景下的必要性。
 
 综上，本文的动机链条可概括为：**识别类人性评估的标准化缺失 → 提出纯运动学的运动图灵测试范式 → 构建标注基准 → 探索自动化回归模型**，为人形机器人运动生成与控制的研究提供一个可量化、可复现的评估锚点。
-
-
 
 ## 核心方法与创新机理
 
@@ -111,8 +107,6 @@ $$\mathcal{L} = \|\hat{s} - s^{*}\|_{2}^{2} + \lambda \mathcal{L}_{\mathrm{reg}}
 
 尽管 PTR-Net 在运动学层面有效建模了类人性，但其设计存在固有局限：（1）仅依赖 SMPL-X 骨架运动学，无法捕获肌肉动力学、接触力等更精细的类人特征；（2）模型在更广泛的新形态机器人上的分布外鲁棒性尚未充分验证；（3）当前评估未融合意图性、适应性、任务完成度等高层次类人性维度。这些局限指向了未来工作的关键方向：如何让自动评估模型超越运动学特征，形成更全面的类人性评估体系。
 
-
-
 该工作围绕**运动图灵测试（Motion Turing Test）** 构建了一套从数据采集、表示标准化、人工标注到自动评估的完整流水线。其核心设计动机是消除外观线索的干扰，将类人性判断严格限定在运动学层面。
 
 ### 统一表示与评估范式
@@ -140,15 +134,11 @@ $$\mathcal{L} = \|\hat{s} - s^{*}\|_{2}^{2} + \lambda \mathcal{L}_{\mathrm{reg}}
 
 图 3 展示了该流水线的完整概览：从机器人/人类视频采集开始，经 SMPL-X 转换后送入人工评分流程，最终产出量化的类人性评估结果。这一设计确保了评估标准的统一性和可复现性，为运动生成方法的优化提供了客观基准。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1045_https_arxiv_org_abs_2603_06181/figures/001_Figure_1.jpg]]
 *Figure 1: Motion Turing Test: Evaluators judge whether the pose sequence resembles human motion, focusing solely on motion without appearance cues*
 
 ![[assets/figures/papers/paper_list_l1045_https_arxiv_org_abs_2603_06181/figures/004_Figure_3.jpg]]
 *Figure 3: Overview of the human scoring pipeline, where all the humanoid robot and human motions are converted into SMPL-X poses and evaluated by human annotators. The resulting 0–5 scores quantitatively assess the human-likeness of each motion*
-
-
 
 PTR-Net 将类人性评估形式化为一个端到端的回归任务：给定一段运动序列 $\mathbf{X} \in \mathbb{R}^{T \times J \times C}$（$T$ 帧，$J$ 个关节，$C$ 维特征），模型学习映射函数 $s = f_{\theta}(\mathbf{X})$，输出标量分数 $s \in [0, 5]$。该方法的核心在于通过时序编码、空间-时间图卷积与注意力聚合三个模块，从纯运动学数据中提取判别性特征。
 
@@ -171,16 +161,6 @@ PTR-Net 将类人性评估形式化为一个端到端的回归任务：给定一
 $$\mathcal{L} = \|\hat{s} - s^{*}\|_{2}^{2} + \lambda \mathcal{L}_{\mathrm{reg}}$$
 
 其中 $\hat{s}$ 为预测分数，$s^{*}$ 为人类标注的真实分数。第一项为标准 L2 回归损失，驱动预测值逼近人类判断；第二项 $\mathcal{L}_{\mathrm{reg}}$ 为时序平滑正则项，惩罚相邻帧间预测分数的剧烈波动，从而提升评估的时序一致性。消融实验表明，全模型（含注意力池化与平滑正则）在误差降低与排序一致性之间达到了最优平衡。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1045_https_arxiv_org_abs_2603_06181/figures/008_Figure_7.jpg]]
-*Figure 7: Our proposed PTR-Net baseline consists of a temporal encoder, spatial-temporal graph convolution, and attention pooling, then uses a score regressor to predict the human-likeness score*
-
-![[assets/figures/papers/paper_list_l1045_https_arxiv_org_abs_2603_06181/figures/005_Figure_4.jpg]]
-*Figure 4: Human-likeness scoring rules used in evaluating motion clips on a 0–5 Likert scale, focusing solely on motion quality*
-
-
 
 ## 实验与关键发现
 
@@ -234,24 +214,8 @@ Table 2 按人类与真实人形机器人之间的类人性评分差异对动作
 - **主观标注偏差：** 类人性评分基于 25 名标注者的主观判断，虽经过一致性筛选（排除 5 名不一致者），但仍可能受文化背景和个人审美偏好的影响。不同文化群体对“自然动作”的认知差异尚未纳入考量。
 - **动作类别覆盖不全：** 15 个动作类别无法涵盖所有实际应用场景，特别是精细操作和复杂地形适应等任务中的运动模式。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1045_https_arxiv_org_abs_2603_06181/figures/010_Table_3.jpg]]
 *Table 3: Quantitative results for different models on the Motion Turing Test benchmark. “*” indicates VLM-based evaluation without task-specific training. Qwen3-VL-Plus (shot)* denotes that its results remain identical in DE/CGE/PED/DE-CoT/PA-CoT settings. “–” indicates invalid ρ due to constant outputs*
-
-![[assets/figures/papers/paper_list_l1045_https_arxiv_org_abs_2603_06181/figures/006_Figure_5.jpg]]
-*Figure 5: Overall distribution of motion human-likeness scores for human and humanoid motions (left) and human-likeness scores for humanoid in simulation and real scenarios (right)*
-
-![[assets/figures/papers/paper_list_l1045_https_arxiv_org_abs_2603_06181/figures/009_Figure_6.jpg]]
-*Figure 6: Representative SMPL-X sequences illustrate where humanoid robots perform poorly (upper part) and well (lower part)*
-
-![[assets/figures/papers/paper_list_l1045_https_arxiv_org_abs_2603_06181/figures/011_Figure_8.jpg]]
-*Figure 8: Four representative motion examples with PTR-Net predictions compared to human-annotated scores*
-
-![[assets/figures/papers/paper_list_l1045_https_arxiv_org_abs_2603_06181/figures/012_Figure_9.jpg]]
-*Figure 9: (a–b) Score distributions of human annotators and PTR-Net predictions for both human (imitating humanoid) and humanoid motions. (Bottom) Representative dance imitation pairs illustrating near-indistinguishable motion patterns*
-
-
 
 ## 定位与知识库关联
 
@@ -298,8 +262,6 @@ PTR-Net 的适用范围和局限可从数据、模型和评估三个维度界定
 3. **分布外鲁棒性的系统验证**：随着更多开源机器人模型和形态的出现，PTR-Net 在新运动学结构上的鲁棒性需要系统性的评估。模型是否需要对每个新机器人形态进行微调，还是能够通过零样本泛化保持性能，是一个关键的实践问题。
 
 4. **多维度评估体系的构建**：将类人性评分与任务完成度、能效、安全性等实际指标融合，形成更全面的机器人运动评估体系，是推动该领域从“看起来像人”走向“像人一样有效行动”的必经之路。
-
-
 
 ## 原文 PDF
 

@@ -75,8 +75,6 @@ ArtiFixer 提出了一套统一的框架，同时解决伪影修复和缺失内�
 
 ArtiFixer 虽达到交互式帧率，但仍慢于直接渲染神经场景表示；输出分辨率受骨干视频模型限制为 720p；在极长序列下的漂移和幻觉累积尚未量化评估。
 
-
-
 三维场景重建旨在从一组稀疏的二维观测图像中恢复完整的几何与外观信息。以 3D Gaussian Splatting（3DGS）为代表的显式神经表示方法，通过将场景建模为一组可微的高斯原色，实现了高质量、实时的新视角渲染。其渲染过程可描述为沿视线方向的前向后投射合成：
 
 $$C(\mathfrak{p}) = \sum_i c_i \prod_{k<i} (1 - \alpha_k)$$
@@ -92,8 +90,6 @@ $$C(\mathfrak{p}) = \sum_i c_i \prod_{k<i} (1 - \alpha_k)$$
 上述困境的核心在于**源分布初始化策略**：现有方法将退化渲染作为额外条件注入生成过程，但生成起点始终是纯高斯噪声。这一定义使得模型在未观测区域缺乏足够的结构约束，容易陷入模式崩塌；而在观测区域，噪声起点又过度依赖生成先验，难以精确保持与源图像的一致性。
 
 ArtiFixer 的动机正是打破这一僵局。其核心洞察在于：**即使高度退化的初始重建，当其渲染作为源分布的一部分并根据不透明度混合噪声时，足以同时约束生成过程并避免模式崩塌**。这一设计将退化渲染从“条件”提升为“起点”，使生成模型既能修复伪影，又能合理推断缺失内容，且该条件信号能有效支持蒸馏训练，从而简化整个流水线。
-
-
 
 ## 核心方法与创新机理
 
@@ -145,8 +141,6 @@ ArtiFixer 提供三个递进式变体，形成完整的三维重建增强流水�
 
 这一流水线设计的关键洞察在于：高度退化的三维重建虽然自身质量不佳，但其渲染结果作为不透明度混合的源分布时，足以同时约束生成过程并避免模式崩塌；而生成器产生的干净视图又可反哺三维表示，形成“重建→生成→重建”的闭环增强。
 
-
-
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2603_00492/figures/002_Figure_2.jpg]]
 *Figure 2: Method overview. We first train a bidirectional flow matching model that transports degraded RGB renderings into clean outputs. We encode the input RGB into latent space and mix with Gaussian noise using the rendered opacity maps to avoid mode collapse in unseen regions. We inject fine-grained opacity information and camera control along with optional clean reference views and a text prompt. In the second phase of our pipeline, we distill the teacher into an auto-regressive causal model via Self Forcing-style DMD distillation [Huang et al. 2025], which can be directly used to render novel views or used as pseudo-supervision to distill back into the underlying 3D representation*
 
@@ -184,8 +178,6 @@ ArtiFixer 的整体流水线围绕一个核心矛盾展开：如何让生成模�
 - **输入**：初始退化渲染序列（含对应相机位姿）、不透明度图、Plücker 射线图、0~12 张干净参考视图、可选文本提示。
 - **输出**：干净渲染序列（ArtiFixer）或增强后的 3DGS 重建（ArtiFixer3D/3D+）。
 - **关键约束**：退化渲染和干净渲染共享相同的相机轨迹；参考视图与目标视图的相机位姿通过 PRoPE 关联；文本提示在训练时以 10% 概率丢弃以支持无文本推理。
-
-
 
 ### 3DGS 渲染与退化渲染生成
 
@@ -245,8 +237,6 @@ $$T_{o} := T_{r} + f_{o}(\mathrm{PixelUnshuffle}(\mathbf{O}))$$
 
 ArtiFixer3D 将自回归模型生成的干净视图一次性蒸馏回 3DGS 表示，获得显式的多视角一致 3D 重建。ArtiFixer3D+ 在此基础上重新应用生成器，以恢复 3D 蒸馏过程中损失的锐度。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与因果机制
@@ -256,36 +246,25 @@ ArtiFixer3D 将自回归模型生成的干净视图一次性蒸馏回 3DGS 表�
 1. **不透明度感知噪声混合**：根据初始渲染的不透明度图，在低不透明度区域注入高斯噪声，将去噪起始点从纯噪声替换为混合分布 $\mathbf{z}_0 := \mathbf{O}_z \mathbf{z}_{deg} + (1 - \mathbf{O}_z) \boldsymbol{\epsilon}$。这在高不透明度区域保留已有观测的一致性，同时在未观察区域释放生成先验的创造能力，防止模式崩塌（Fig. 4）。
 2. **因果自回归蒸馏**：将双向流匹配教师模型蒸馏为因果学生模型，通过自回归生成支持任意长度视图序列，推理速度提升70倍（Table 5）。
 
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2603_00492/figures/012_Table_5.jpg]]
-*Table 5: Inference speed. Causal distillation yields a 70× speedup over the bidirectional Wan 2.1 backbones. ArtiFixer3D renders directly from 3DGUT. Additional configurations are reported in Table 7*
-
 ### 主实验结果
 
 **伪影去除**（Table 1）：在Nerfbusters和DL3DV基准上，ArtiFixer所有变体均以大幅度超越先前方法。ArtiFixer3D在Nerfbusters上达到PSNR 20.24，相比DIFIX3D+ 3DGS（18.51）提升1.73 dB；在DL3DV上达到20.14，相比DIFIX3D+ 3DGS（17.99）提升2.15 dB。ArtiFixer直接生成更锐利的渲染，ArtiFixer3D通过显式3D表示获得更好的源图像一致性但略模糊，ArtiFixer3D+重新应用生成器恢复锐度（Fig. 5）。
-
 
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2603_00492/figures/005_Table_1.jpg]]
 *Table 1: Artifact removal on Nerfbusters and DL3DV. All ArtiFixer variants outperform prior methods by a considerable margin, improving PSNR by 2 dB*
 
 **稀疏视图重建**（Table 2）：在Mip-NeRF 360的9视图设置下，ArtiFixer3D达到PSNR 20.24，相比3DGS（16.79）提升3.45 dB，在所有指标上全面超越现有稀疏视图方法。在极端的3视图场景中，ArtiFixer能从参考视图恢复正确几何，即使输入渲染完全不准确（Fig. 9）。
 
-
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2603_00492/figures/006_Table_2.jpg]]
 *Table 2: Sparse view reconstruction methods on the Mip-NeRF 360 dataset. We exceed existing work by a wide margin across every metric*
 
 **新内容生成**（Table 3）：在DL3DV的大面积未观察区域协议下，ArtiFixer3D+达到PSNR 20.15，比第二好的GenFusion（17.03）高出近3 dB。GenFusion的双向视频模型每次仅生成16帧，需要迭代蒸馏导致模糊结果；Gen3C的渲染虽锐利但常不尊重源内容且存在几何错误。ArtiFixer在高度退化区域仍能生成合理且一致的几何（Fig. 8）。
-
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2603_00492/figures/008_Table_3.jpg]]
-*Table 3: Novel content generation. We reconstruct DL3DV scenes following a protocol that creates large areas unobserved by training views. We outperform the next-best method (GenFusion) by almost 3 dB in PSNR*
 
 **多视角一致性**（Table 11）：通过MEt3R评估，所有ArtiFixer变种均超越基线，ArtiFixer3D因显式3D表示获得最佳一致性。
 
 ### 消融分析
 
 Table 4在Mip-NeRF 360上系统验证了关键设计选择：
-
 
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2603_00492/figures/010_Table_4.jpg]]
 *Table 4: Diagnostics. We evaluate reconstruction quality on Mip-NeRF 360. Denoising input renderings instead of conditioning via channel concatenation is crucial to producing outputs consistent with source images*
@@ -296,12 +275,10 @@ Table 4在Mip-NeRF 360上系统验证了关键设计选择：
 
 文本提示的影响（Table 6）：在稀疏设置（Mip-NeRF 360 3-view）下，VLM生成的提示带来微小增益（+0.14 dB）；在密集设置下影响可忽略。这表明ArtiFixer主要依赖视觉条件信号，文本起辅助作用。
 
-
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2603_00492/figures/016_Table_6.jpg]]
 *Table 6: Text conditioning. We measure the impact of VLM-generated prompts vs. no prompt for ArtiFixer3D+. Text prompts provide a small benefit in sparse settings that diminishes with denser captures*
 
 模型规模影响（Table 8, Table 9）：1.3B变体在Mip-NeRF 360 3-view上与CAT3D仅差0.02 dB，在DL3DV新内容生成上远超其他视频模型基线，展示了方法的参数效率。
-
 
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2603_00492/figures/021_Table_9.jpg]]
 *Table 9: Impact of model scale on novel content generation (DL3DV). Even with a 1.3B backbone, ArtiFixer3D+ outperforms the other video model baselines by a wide margin*
@@ -309,13 +286,6 @@ Table 4在Mip-NeRF 360上系统验证了关键设计选择：
 ### 推理效率
 
 因果蒸馏实现了显著的推理加速（Table 5）：14B模型达到8.36 FPS，相比双向Wan 2.1骨干（0.12 FPS）提升约70倍。通过减少去噪步数和跨GPU上下文并行，1.3B变体可达101.77 FPS（Table 7）。ArtiFixer在仅1步去噪时即可生成合理内容，但在空白区域的锐度和时序一致性有所下降（Fig. 11）。
-
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2603_00492/figures/017_Table_7.jpg]]
-*Table 7: Inference configurations. Fewer denoising steps and context parallelism across multiple GPUs further improve throughput, with the 1.3B variant reaching up to 101.77 FPS*
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2603_00492/figures/020_Figure_11.jpg]]
-*Figure 11: Denoising steps. We vary the number of denoising steps when beginning from the initial degraded rendering. ArtiFixer can render plausible content in as few as 1 step, although sharpness and temporal consistency suffer somewhat in empty areas. Table 8. Impact of model scale on Mip-NeRF 360. Our 1.3B variant matches CAT3D within 0.02 dB on the 3-view split and exceeds other video model baselines despite using fewer parameters*
 
 ### 失败模式与局限
 
@@ -330,16 +300,6 @@ Table 4在Mip-NeRF 360上系统验证了关键设计选择：
 - 能否实现单帧解码同时维持时间连贯性？
 - 视频超分辨率技术能否弥补720p分辨率限制？
 - 不透明度混合策略在完全未观察区域中的生成质量和多视角一致性如何进一步量化？
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2603_00492/figures/001_Figure.jpg]]
-*Figure: Rendered Trajectory*
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2603_00492/figures/019_Figure.jpg]]
-*Figure: 1 Step 3 Steps 4 Steps*
-
-
 
 ## 定位与知识库关联
 
@@ -380,8 +340,6 @@ ArtiFixer 位于**生成先验增强的3D重建**这一交叉领域，其技术�
 **自回归漂移的量化评估。** 自回归模型在极长序列下的漂移和幻觉累积需要系统性的量化研究，包括长序列下的多视角一致性退化曲线和内容漂移度量。
 
 **文本提示的利用效率。** 文本提示在稀疏设置下仅带来微小增益（+0.14 dB，Table 6），密集设置下影响可忽略。如何更有效地利用文本条件来指导未观察区域的内容生成，是提升生成合理性的潜在方向。
-
-
 
 ## 原文 PDF
 

@@ -58,8 +58,6 @@ HiFi-BRep 的核心设计通过两个因果调节变量直指脆性根源：
 
 HiFi-BRep 的方法定位可概括为：在 B-Rep 生成领域，首次将**拓扑感知的表示学习**与**可微流形约束**统一在端到端框架中，为鲁棒且高保真的 CAD 模型生成提供了新的基准。
 
-
-
 ### 边界表示（B-Rep）的生成需求与核心挑战
 
 边界表示（Boundary Representation, B-Rep）是计算机辅助设计（CAD）领域的主流几何建模范式，通过显式存储拓扑实体（面、边、顶点）及其连接关系来精确描述三维形状。B-Rep 的生成能力对于自动化设计探索、仿真驱动优化和逆向工程等下游任务具有关键价值。然而，B-Rep 的生成远比其他三维表示（如网格、点云）更具挑战性，原因在于其必须同时满足两个强约束：**几何保真度**（曲面的精确数学描述）和**拓扑有效性**（满足流形条件，如每条边恰好关联两个面）。这两个目标的耦合使得生成任务成为一个高度结构化的离散-连续联合优化问题。
@@ -82,8 +80,6 @@ HiFi-BRep 的方法定位可概括为：在 B-Rep 生成领域，首次将**拓�
 - **单阶段合法性约束解码器**：摒弃级联范式，在单一阶段内并行预测几何参数与拓扑邻接关系，实现双向联合优化；并将“每条边恰有两个关联面”的流形约束嵌入为可微的行级双峰分类目标，使其成为训练过程中直接优化的学习目标，从而在源头促进拓扑有效性。
 
 这一设计理念的预期效果是：潜在表示更干净、更具判别力，解码过程更稳定、更自洽，最终显著缩小可编译性与有效性之间的差距，同时提升生成效率。
-
-
 
 ## 核心方法与创新机理
 
@@ -125,8 +121,6 @@ $$\mathcal{L} = \lambda_{\mathrm{KL}}\mathcal{L}_{\mathrm{KL}} + \lambda_{\mathr
 
 上述四项设计并非孤立改进，而是形成了闭环协同：**可学习查询**与**拓扑掩码**共同构建了高保真的潜在表示，为解码器提供了干净的输入；**单阶段解码**与**可微流形约束**则确保从该表示中可以端到端地生成几何精确且拓扑有效的 B-Rep。这一协同最终体现在生成结果上——在 DeepCAD 数据集上，HiFi-BRep 的 Validity 达到 **72.20%**，较此前最佳方法 DTGBrepGen 的 43.20% 提升 **+29.0 个百分点**；Compilability–Validity 差距从 49.28 大幅缩小至 18.18，表明模型生成的形状更接近可直接编译的工业标准。
 
-
-
 HiFi-BRep 采用两阶段流水线：先训练一个变分自编码器（VAE）将 B-Rep 压缩到高保真潜在空间，再在该潜在空间中训练一个去噪扩散概率模型（DDPM）实现无条件或条件生成。VAE 由**拓扑感知双流编码器**和**单阶段合法性约束解码器**组成，二者通过固定长度的潜在码连接，形成端到端可训练的压缩-重建通路。
 
 **输入表示**：每个 B-Rep 被分解为面（face）和边（edge）两类基元。面特征由包围盒嵌入与 Bézier 控制网格嵌入求和得到；边特征由包围盒嵌入、控制点嵌入和显式端点嵌入求和得到。全局拓扑结构通过边-面邻接矩阵显式编码，矩阵元素指示每条边与哪些面相邻。
@@ -137,12 +131,8 @@ HiFi-BRep 采用两阶段流水线：先训练一个变分自编码器（VAE）�
 
 **扩散模型**在训练好的 VAE 潜在空间中学习去噪扩散概率模型，支持无条件生成以及类别标签、点云、图像等多模态条件生成。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l885_https_openaccess_thecvf_com_content_CVPR2026_html_Hou_HiFi_BRep_High_Fid/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of HiFi-BRep. (a) Face and edge tokens undergo per-stream self-attention and cross-stream attention masked by edgeface incidence (Topo-Mask), then learnable queries pool them into a fixed-length latent. (b) The decoder first predicts face and edge counts to build hard padding masks, then updates learnable face and edge queries. Stacked DecBiBlocks then decode topology-aware geometry sequences. Geometry heads regress primitive parameters, while a topology solver head predicts adjacency with row-wise softmax and two-peak targets*
-
-
 
 ### 3.1 输入表示：几何-拓扑解耦的特征构建
 
@@ -201,8 +191,6 @@ $$
 
 编码器中，面流自注意力复杂度为 $\mathcal{O}(F_{\max}^2 D)$，边流自注意力为 $\mathcal{O}(E_{\max}^2 D)$。Topo-Mask 跨流注意力仅计算邻接对，复杂度为 $\mathcal{O}(\|\mathbf{A}\|_0 D)$，其中 $\|\mathbf{A}\|_0$ 为邻接矩阵非零元数量。在流形 B-Rep 中每条边恰关联两个面，故 $\|\mathbf{A}\|_0 = 2E$，跨流注意力实际为线性复杂度，显著低于全对全注意力的 $\mathcal{O}(F_{\max}E_{\max}D)$。
 
-
-
 ## 实验与关键发现
 
 HiFi-BRep 在无条件生成任务上进行了系统评估，涵盖 DeepCAD 和 ABC 两个标准数据集，与 **DeepCAD** (Wu et al., ICCV 2021)、**BRepGen** (Xu et al., TOG 2024)、**DTGBrepGen** (Li et al., CVPR 2025)、**BrepDiff** (Lee et al., SIGGRAPH 2025) 和 **HoLa** (Liu et al., TOG 2025) 等代表性基线进行全面对比。评估指标包括有效性（Validity）、可编译性（Compilability）、倒角距离（MMD-CD）和 Jensen-Shannon 散度（JSD）。
@@ -246,9 +234,6 @@ Table 3 的推理耗时对比显示，HiFi-BRep 在 DeepCAD 上平均每形状�
 
 尽管整体有效性显著提升，HiFi-BRep 仍存在三类典型失败模式（Figure 6）：
 
-![[assets/figures/papers/paper_list_l885_https_openaccess_thecvf_com_content_CVPR2026_html_Hou_HiFi_BRep_High_Fid/figures/007_Figure_6.jpg]]
-*Figure 6: Typical failure modes. (a) Trimming disagreement / missing patch: face count is correct, but decoded loops fail to form a valid trimmed region, so the kernel drops the face. (b) Junction inconsistency / non-manifold edge: T-junctions or duplicated segments after consolidation break manifold incidence. (c) Degenerate geometry / sliver face: ill-conditioned control points yield near-zero-area or self-intersecting patches*
-
 1. **裁剪不一致/缺失面片**：面数预测正确，但解码的环未能形成有效裁剪区域，内核在合并阶段丢弃该面。这源于当前框架缺少可微的裁剪可行性约束。
 
 2. **结点不一致/非流形边**：合并后的 T 型结点或重复线段破坏了流形邻接关系。行级双峰目标虽强制每条边关联两个面，但无法保证结点级别的几何一致性。
@@ -267,13 +252,6 @@ Table 3 的推理耗时对比显示，HiFi-BRep 在 DeepCAD 上平均每形状�
 - **Table 3**：推理耗时对比，验证单阶段设计的效率优势。
 - **Figure 5**：按面数分桶的重建有效性，揭示模型在长尾拓扑上的泛化边界。
 - **Figure 6**：典型失败案例，为后续改进提供明确方向。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l885_https_openaccess_thecvf_com_content_CVPR2026_html_Hou_HiFi_BRep_High_Fid/figures/005_Figure_4.jpg]]
-*Figure 4: Unconditional generations on DeepCAD. Columns (a–e) show DeepCAD, BRepGen, DTGBrepGen, BrepDiff, and HiFi-BRep, respectively. Red boxes highlight typical artifacts observed in baselines—open shells or missing faces around holes/fillets, non-manifold junctions, and degenerate thin plates/rods—while the rightmost column also marks a rare failure of our method for transparency. Overall, HiFi-BRep yields more coherent solids with consistent edge–face incidence and fewer topology errors, consistent with its higher Validity*
-
-
 
 ## 定位与知识库关联
 
@@ -331,8 +309,6 @@ HiFi-BRep 的设计存在明确的适用范围：
 ### 6. 知识库定位
 
 HiFi-BRep 在 B-Rep 生成领域的知识贡献可定位为**从“表示-生成耦合脆性”到“高保真潜在空间 + 内生合法性”的范式转换**。其核心洞察——用可学习查询替代填充、用拓扑掩码限制注意力、用行级双峰目标替代后处理修复——不仅适用于 B-Rep 生成，也对其他结构化几何表示（如网格、点云序列）的编码器-解码器设计具有启发意义。该方法已在 DeepCAD 和 ABC 两个标准基准上验证，代码开源（https://github.com/1nnoh/HiFi-BRep），为后续研究提供了可复现的基线。
-
-
 
 ## 原文 PDF
 

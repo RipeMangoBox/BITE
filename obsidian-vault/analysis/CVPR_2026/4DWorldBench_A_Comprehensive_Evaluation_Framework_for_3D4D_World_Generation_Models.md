@@ -60,8 +60,6 @@ claims:
 
 **局限性提示**：物理真实性评估完全依赖从视频生成的文本描述进行推理，对需要精细视觉理解的物理现象（如细微变形、局部光照）可能不够敏感；基准数据集规模有限（非物理文本条件 76 条、物理文本条件 50 条）；部分维度仍依赖单个 MLLM 评分，其自身偏见可能影响评估可靠性。
 
-
-
 ### 3D/4D 世界生成模型的评估困境
 
 近年来，以视频扩散模型和 3D 生成模型为代表的世界生成技术取得了显著进展，能够根据文本、图像或视频条件生成具有时空一致性的动态场景。然而，如何系统、可靠地评估这些模型的生成质量，已成为制约领域发展的核心瓶颈。
@@ -95,8 +93,6 @@ claims:
 - **自适应维度选择：** 根据输入条件的语义内容，由 LLM 动态选择相关的物理维度和条件对齐子维度，生成场景特定的诊断性问题，避免固定维度设置带来的评估偏差。
 - **人类判断对齐验证：** 通过用户研究量化自动指标与人类主观评分之间的 PLCC 和 SRCC 相关性，确保评估框架的可靠性和可信度。
 
-
-
 ## 核心方法与创新机理
 
 4DWorldBench 的核心创新在于构建了一套**自适应、多模态、混合评估机制**，系统地填补了现有世界生成基准在评估维度、模态支持与评估方法上的结构性空白。与 **WorldScore**（仅支持文本条件，物理评估有限）、**VBench / VBench2.0**（物理真实性覆盖不完整）和 **PhyGenBench**（模态单一、语义丰富度不足）等先前基准相比，4DWorldBench 在以下四个关键维度上实现了根本性突破。
@@ -122,8 +118,6 @@ claims:
 - **4D 一致性计算**通过 SLAM 重投影误差、光流相似性、VGG 风格 Gram 矩阵等指标评估时空一致性。
 
 这种混合策略使得评估框架既能捕捉低层次的感知质量，又能进行高层次的语义和物理推理，实现了对世界生成模型能力的全维度刻画。
-
-
 
 4DWorldBench 围绕四个核心评估维度构建：**感知质量**、**条件对齐**、**物理真实性**和**4D 一致性**。框架支持文本、图像、视频三种条件模态，覆盖文本到 3D/4D、图像到 3D/4D 及视频到 4D 的生成任务。其评估流程采用混合评估范式：将传统模型评分、特征相似度、基于 LLM 的问答和基于 MLLM 的问答集成到一个统一的管线中，并通过人类主观研究验证可靠性。
 
@@ -156,12 +150,8 @@ claims:
 
 框架针对不同模型类别实现了条件适配的评估策略。例如，对于 3D 生成模型（不包含对象运动），框架暂停了事件控制、运动控制和物理真实性的评估，仅评估静态属性，体现了公平性考量。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2231_https_arxiv_org_abs_2511_19836/figures/003_Figure_1.jpg]]
 *Figure 1: Overview of the 4DWorldBench framework. The benchmark evaluates generation quality across four key dimensions: 4D consistency, condition alignment, perceptual quality, and physical realism. It supports diverse generative settings, including text-, image-, and video-to-3D/4D generation. The framework integrates hybrid evaluation metrics—model-based scores, feature-based similarity, LLMbased QA, and MLLM-based QA—together with human studies for reliability. Condition- and dimension-adaptive QA modules leverage MLLMs for concrete visual grounding and LLMs for higher-level physical reasoning*
-
-
 
 ### 4DWorldBench 评估框架总体架构
 
@@ -273,13 +263,6 @@ $$e_{\mathrm{style}} = 1 - \mathrm{normalize}\left(\frac{1}{|\mathcal{C}|} \sum_
 
 四个核心评估维度通过混合评估策略实现互补：物理真实性评估完全依赖 LLM 的文本驱动推理，避免 MLLM 在抽象物理推理上的不足；条件对齐评估则充分发挥 MLLM 的视觉理解能力，实现细粒度的视觉问答。自适应维度选择（AdaDimen）机制使得评估维度能够根据输入条件的语义动态调整，消融实验证实其相比固定维度设置（FixDimen）在物理评估 PLCC 上获得显著收益。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2231_https_arxiv_org_abs_2511_19836/figures/001_Table_1.jpg]]
-*Table 1: Evaluation dimensions in our 4DWorldBench. Four main dimensions expand into multiple sub-dimensions*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -289,24 +272,12 @@ $$e_{\mathrm{style}} = 1 - \mathrm{normalize}\left(\frac{1}{|\mathcal{C}|} \sum_
 ![[assets/figures/papers/paper_list_l2231_https_arxiv_org_abs_2511_19836/figures/009_Table_3.jpg]]
 *Table 3: Leaderboard for different categories of 4D generation models*
 
-![[assets/figures/papers/paper_list_l2231_https_arxiv_org_abs_2511_19836/figures/010_Table_4.jpg]]
-*Table 4: Leaderboard for different categories of 3D generation models*
-
 ![[assets/figures/papers/paper_list_l2231_https_arxiv_org_abs_2511_19836/figures/015_Figure_8.jpg]]
 *Figure 8: Performance comparison for multiple world generative models*
 
 在物理常识推理的外部验证上，4DWorldBench 的物理评估模块在 VideoPhy2-test 数据集上进行了测试（Table 5）。在 Min(PC,SA) 指标上，该方法取得 0.469 的准确率，相比基线提升 +0.019；但在 Joint 指标上，该方法取得 0.677，低于基线的 0.770（差距 -0.093）。这表明文本驱动的物理推理在平衡物理常识与语义依从性方面具有优势，但在极端严格的双重约束条件下仍有改进空间。
 
-![[assets/figures/papers/paper_list_l2231_https_arxiv_org_abs_2511_19836/figures/012_Table_5.jpg]]
-*Table 5: Performance on Videophy2-test. PC means physical commonsens, SA means semantic adherence, ranging from 0 to 5. The Min(PC,SA) returns the smaller of PC and SA, the Joint is binary (0 or 1), assigned 1 only when both PC and SA larger than 4*
-
 与人类判断的相关性验证是评估可靠性的关键。在属性控制对齐维度上，改进后的评估方法将 PLCC 从 0.167 大幅提升至 0.483，SRCC 从 0.236 提升至 0.443（Table 8）；在风格一致性维度上，PLCC 从 0.383 提升至 0.545（Table 9）。这些结果表明，细粒度问题生成与 Keye-VL 的引入显著增强了自动评估与人类主观判断的一致性。
-
-![[assets/figures/papers/paper_list_l2231_https_arxiv_org_abs_2511_19836/figures/017_Table_8.jpg]]
-*Table 8: Correlation results on our improved 4D-condition Alignment*
-
-![[assets/figures/papers/paper_list_l2231_https_arxiv_org_abs_2511_19836/figures/018_Table_9.jpg]]
-*Table 9: Correlation results on our improved 4D consistency*
 
 ### 消融实验
 
@@ -336,13 +307,6 @@ $$e_{\mathrm{style}} = 1 - \mathrm{normalize}\left(\frac{1}{|\mathcal{C}|} \sum_
 4. **基准覆盖的局限性。** 基准数据集规模有限（非物理文本条件 76 条、物理文本条件 50 条），可能无法覆盖长尾场景和边缘案例。此外，3D 生成模型的评估暂停了事件控制、运动控制和物理真实性维度（因为这些模型不包含对象运动），虽然体现了条件适配的公平性，但也限制了跨模型类型的完全对比。
 
 5. **人类实验的统计可靠性。** 人类主观实验的参与人数仅 10 人，虽然 PLCC 和 SRCC 的改进趋势明显，但小样本可能影响统计显著性，需要更大规模的人类研究加以验证。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2231_https_arxiv_org_abs_2511_19836/figures/002_Table_2.jpg]]
-*Table 2: Comparison with representative benchmarks. “Modalities” refer to supported condition types. “Eval. dims” mark whether the benchmark covers Perceptual Quality (Q), Condition Alignment (A), Physical Realism (P), and 4D Consistency (C)*
-
-
 
 ## 定位与知识库关联
 
@@ -379,8 +343,6 @@ $$e_{\mathrm{style}} = 1 - \mathrm{normalize}\left(\frac{1}{|\mathcal{C}|} \sum_
 **基准覆盖范围的扩展**：当前基准数据集规模有限（非物理文本条件 76 条、物理文本条件 50 条），可能不足以覆盖所有边缘案例。此外，基准尚未扩展到具身智能体操作等交互式场景，限制了对更广泛具身 AI 应用的覆盖。如何将丰富的文本描述可靠地转化为连贯的时空交互评估，以改善文本到 4D 模型的事件和关系对齐，是提升基准实用价值的关键方向。
 
 **人类评估的统计可靠性**：用户研究参与人数仅 10 人，部分相关性指标（PLCC/SRCC）的统计效力可能受限。后续工作需要在更大规模的人类评估上验证当前结论的稳健性。
-
-
 
 ## 原文 PDF
 

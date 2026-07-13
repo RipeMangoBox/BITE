@@ -64,8 +64,6 @@ claims:
 
 这些结果表明，将语言模型与贝叶斯推理在推理时结合，可使较弱的基础模型以极低成本实现超人表现，为构建具有理性信息寻求能力的智能体提供了可行路径。
 
-
-
 语言模型（LM）在标准问答基准上已取得显著进步，但当任务需要**主动、序列化地寻求信息**时，它们暴露出一个根本性缺陷：缺乏理性决策能力。本文聚焦于一类被称为“信息寻求任务”的交互场景——智能体必须在不确定环境中自主判断何时收集信息、何时采取行动，以及如何将获取的信息有效转化为正确决策。
 
 ### 问题场景：协同战舰游戏
@@ -99,8 +97,6 @@ claims:
 
 这一方法的关键优势在于：**它不依赖语言模型自身的隐式推理能力，而是为模型提供了一套外部化的、数学上可证明最优的决策框架**。即使基础模型较弱，也能以极低成本实现超人表现——例如，配备Bayes-QMD的Llama-4-Scout对GPT-5的胜率达67%，而成本仅为后者的约1%。
 
-
-
 ## 核心方法与创新机理
 
 本文的核心创新在于将**贝叶斯实验设计（BED）**的理性推理框架与语言模型在推理时相结合，构建出能够像人类一样高效探索与行动的智能体。这一框架通过三个互补的策略模块——**Bayes-Q**（理性提问）、**Bayes-M**（理性行动）和**Bayes-D**（理性决策）——系统性地弥补了纯语言模型在信息寻求任务中的结构性缺陷。
@@ -133,8 +129,6 @@ claims:
 ### 创新的本质：推理时嫁接而非训练时改造
 
 值得强调的是，上述所有策略均在**推理时**运行，无需微调或强化学习。Bayes-QMD 仅依赖语言模型生成候选问题、SMC 粒子滤波维护信念、以及基于闭合形式 EIG 的快速计算——这些模块的计算开销极低，使得 Llama-4-Scout + Bayes-QMD 以 GPT-5 约 1% 的成本实现了对其 67% 的胜率（Table 5）。这一“弱模型 + 理性推理 > 强模型”的范式，揭示了当前语言模型在结构化推理能力上的根本性短板，以及通过显式推理框架弥补这一短板的巨大潜力。
-
-
 
 本文提出了一套推理时策略框架，将语言模型与贝叶斯实验设计（Bayesian Experimental Design, BED）相结合，使智能体能够在信息寻求任务中做出理性决策。该框架围绕一个协作式战舰游戏构建，包含两个不对称角色：**船长（Captain）** 仅能看到部分棋盘，负责决定何时提问、何时射击；**观察员（Spotter）** 能看到完整棋盘，但只能以 Yes/No 形式回答船长的问题（Figure 1）。
 
@@ -181,8 +175,6 @@ claims:
 ### 核心洞察
 
 该框架的关键瓶颈在于：**语言模型本身缺乏将信息有效转化为行动的能力**。单独添加 Bayes-Q 虽能提升问题质量（EIG 从 0.266 升至 0.490 bit/问题，冗余问题从 18.5% 降至 0.2%），但对 F1 的提升有限（Llama-4-Scout 仅 +0.021）。真正驱动性能飞跃的是 Bayes-M——通过显式边缘化信念来计算命中概率，Llama-4-Scout 的 F1 跃升 +0.318，GPT-4o 跃升 +0.277（Table 4）。这表明，即使拥有高质量信息，语言模型也难以自主完成从概率推理到精确空间定位的转化，而贝叶斯推理模块恰好填补了这一能力缺口。
-
-
 
 ### 整体框架：贝叶斯实验设计（BED）视角
 
@@ -254,8 +246,6 @@ $$\widehat{p_{t+1}^{\mathrm{hit}}}(u \mid x, \mathcal{H}_{1:t}, q_t) := \sum_{\t
 3. **组合 Bayes-QM** 产生协同增益（+0.373），高质量提问为贝叶斯移动提供了更精确的信念。
 4. **完整 Bayes-QMD** 达到最优（+0.397），进一步优化了探索/利用的时序分配。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：贝叶斯策略使弱模型实现超人表现
@@ -312,33 +302,11 @@ $$\widehat{p_{t+1}^{\mathrm{hit}}}(u \mid x, \mathcal{H}_{1:t}, q_t) := \sum_{\t
 
 **Table 5** 的成本分析揭示了关键效率洞察：Llama-4-Scout的API成本仅为GPT-5的约1%，但搭配Bayes-QMD后胜率达67%。这一发现表明，在推理时投入计算资源进行贝叶斯推理，比单纯依赖更大规模预训练模型更具成本效益。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_EQhUvWH78U/figures/007_Table_1.jpg]]
 *Table 1: In this section, we evaluate the ability of LMs to play the Captain role in the full game setting. We compare a variety of Captain strategies that differ in how they select moves, ask questions, and decide whether to ask or shoot (as formalized in §3.1). A summary is provided in Table 1. Table 1: Summary of Captain strategies. Random and Greedy are move-only baselines; LM is a pure language model, which the Bayes strategies build upon. Triple-dots indicates inheritance from the row above*
 
 ![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_EQhUvWH78U/figures/011_Table_2.jpg]]
 *Table 2: shows the distribution of labels in the dataset. Inter-annotator agreement ranged from 94.0– 99.6%; further details are given in Fig. 7a. Table 2: Expert-labeled attributes of human questions. (Questions are multi-label; definitions in §A.3.)*
-
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_EQhUvWH78U/figures/024_Table_3.jpg]]
-*Table 3: SpotterQA: Accuracy breakdown by question type. Valid shows the proportion of answers returned by each model that followed formatting instructions (§C.3). With the exception of Gemini-2.5-Flash, which frequently returned invalid answers, all other models adhered readily to the answer format*
-
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_EQhUvWH78U/figures/030_Table_6.jpg]]
-*Table 6: Example questions from human Captains. Questions are randomly sampled from the BATTLESHIPQA dataset*
-
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_EQhUvWH78U/figures/031_Table_7.jpg]]
-*Table 7: Example questions from agents. Questions are randomly sampled from game trajectories from the CaptainQA experiment*
-
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_EQhUvWH78U/figures/032_Table_8.jpg]]
-*Table 8: Summary of Guess Who? strategies. As in 1, LM is a pure language model strategy, which the Bayes strategies build upon. Triple-dots indicates inheritance from the row above*
-
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_EQhUvWH78U/figures/003_Figure_2.jpg]]
-*Figure 2: (b) Timeline of multiple human-human games of Battleship for a single board (B02). Each ? represents a question asked; colors indicate different players. Figure 2: Human results highlights. (a) Asking questions correlates with performance ( $\rho$ = 0 . 6 8 4 , p \< 0.002); (b) Different players demonstrate widely varying explore/exploit strategies; some alternate between asking questions and making moves, while others focus on information-gathering before taking any actions*
-
-![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_EQhUvWH78U/figures/010_Figure_6.jpg]]
-*Figure 6: User interface for our Collaborative Battleship experiment, which evaluates information-seeking in a two-player synchronous dialogue environment. The Captain must choose between taking actions and asking questions given limited visibility, while the Spotter sees the whole board, but can only respond with Yes/No. In order to play at human-level, an AI agent must incorporate grounded language understanding (to answer questions), reasoning about uncertainty (to ask informative questions), and strategic decision making (to balance explore/exploit trade-offs)*
-
-
 
 ## 定位与知识库关联
 
@@ -385,8 +353,6 @@ Bayes-QMD 的有效性依赖于以下前提条件，这些条件同时划定了�
 4. **语用推理的嵌入**：如何将理性语用推理（Rational Speech Acts, RSA）嵌入 Spotter，使其能推理船长的提问意图并给出更具信息量的回答？这可能缓解当前模型在复杂上下文问题上的性能退化。
 
 5. **动态环境中的在线适应**：在不可预知的真实世界任务中，智能体应如何在线更新世界模型并调整探索策略？当前框架假设世界模型是静态且完全已知的，而真实场景中环境动态变化且部分可观测。
-
-
 
 ## 原文 PDF
 

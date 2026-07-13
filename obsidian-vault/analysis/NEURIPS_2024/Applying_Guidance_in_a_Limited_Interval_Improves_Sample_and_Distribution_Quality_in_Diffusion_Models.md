@@ -52,8 +52,6 @@ claims:
 
 实验表明，限制引导区间带来了显著的分布质量与推理效率双重提升。在 ImageNet-512 上，EDM2-XXL 的 FID 从 1.81 降至 **1.40**，FDDINOv2 从 33.09 降至 **29.16**；在 DiT-XL/2 上同样取得一致改善。定性分析进一步证实，该方法在 SD-XL 等文本到图像模型中能有效避免传统 CFG 常见的过度饱和与构图简化问题，同时带来超过 20% 的推理加速。引导区间的超参数对采样步数变化表现出良好的鲁棒性，且可通过顺序搜索高效确定。
 
-
-
 扩散模型通过逐步去噪将高斯噪声转化为数据样本，其采样过程可描述为一个关于噪声水平 $\sigma$ 的常微分方程（ODE）：
 
 $$
@@ -69,8 +67,6 @@ $$
 上述观察揭示了 CFG 的根本矛盾：**引导的有效性与危害性随噪声水平呈现非对称分布**——中等噪声水平是引导发挥正面作用（锐化细节、增强条件一致性）的关键区间，而高噪声和低噪声区域分别是引导产生破坏和浪费计算的主要来源。这一矛盾在传统 CFG 框架下无法调和，因为恒定权重策略将引导强制施加于所有噪声水平，牺牲了分布质量与推理效率。
 
 **本文动机**正是基于这一洞察：通过将引导限制在采样链中间的连续区间内，在保持引导正面效果的同时消除其负面影响。该方法无需修改模型架构或训练流程，仅需在采样时引入两个额外的区间端点超参数 $(\sigma_{\mathrm{lo}}, \sigma_{\mathrm{hi}})$，即可同时提升生成质量与推理速度。
-
-
 
 ## 核心方法与创新机理
 
@@ -99,8 +95,6 @@ $$\mathrm{d}\mathbf{x}/\mathrm{d}\sigma = -\Big(w(\sigma) D_{\theta}(\mathbf{x}|
 ### 设计选择的简洁性
 
 值得注意的是，论文尝试了在引导区间内使用各种平滑权重函数来替代二元开关，但**这些测试并未改善结果**（Section 4.2）。这表明引导区间带来的收益源于“在何处施加引导”这一结构性的调度决策，而非权重函数的精细调节。这一简洁的设计选择使得方法易于实现和集成——仅需修改采样循环中的引导逻辑，无需重新训练模型或改变模型架构。
-
-
 
 本文提出的方法在概念和实现上均极为简洁：**将无分类器引导（Classifier-Free Guidance, CFG）的作用范围从整个采样链缩减为一个连续的噪声水平区间**。该方法不修改模型结构、不重新训练网络、不引入新的损失函数，仅以即插即用的方式替换标准 CFG 的恒定引导权重。
 
@@ -147,8 +141,6 @@ $$\mathrm{d}\mathbf{x}/\mathrm{d}\sigma = -\Big(w(\sigma) D_{\theta}(\mathbf{x}|
 | 对高 $w$ 的容忍度 | 高 $w$ 导致模式丢失和过度饱和 | 可安全使用更高 $w$，且对权重选择更鲁棒（Figure 3） |
 
 论文同时验证了在引导区间内使用平滑权重函数（如线性衰减）并不能进一步改善结果，因此最终方案保持了简单的二元开关设计。
-
-
 
 ### 背景：去噪扩散ODE
 
@@ -202,15 +194,8 @@ $$
 
 论文尝试在引导区间内使用各种平滑权重函数替代二元开关，但**未获得进一步改善**，表明简单的分段常数方案已足够有效。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_nAIhvNy15T/figures/002_Figure_2.jpg]]
 *Figure 2: causing the unexpected detour in low-probability areas and a mode drop. See Figure 2 for details and comparison to our approach*
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_nAIhvNy15T/figures/003_Figure_2.jpg]]
-*Figure 2: Illustration of the detrimental effects of guidance at high σ in a synthetic 1D scenario. (a) PDFs of the unconditional (orange) and conditional (green) data distributions used in this example. (b) Activating guidance (weight*
-
-
 
 ## 实验与关键发现
 
@@ -233,9 +218,6 @@ Figure 3 展示了 FID 和 FDDINOv2 随引导权重 $w$ 变化的曲线。标准
 ### 分布覆盖：精确率-召回率分析
 
 Figure 4 在 DINOv2 特征空间中绘制了精确率-召回率曲线。标准 CFG 在提高引导权重时精确率上升但召回率急剧下降，表明生成样本虽更“典型”却严重丢失了类内多样性。限制引导区间后，召回率曲线显著上移，在不牺牲精确率的前提下大幅提升了分布覆盖。最优 FDDINOv2 点（彩色三角）从标准 CFG 的低召回区域移动到高召回区域，直接验证了方法缓解模式丢失的因果机制——在高噪声阶段关闭引导避免了采样轨迹被推出分布外。
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_nAIhvNy15T/figures/006_Figure_4.jpg]]
-*Figure 4: Precision and recall curves for classifier-free guidance (orange, red) and our method (blue, green), when the guidance weight w is varied from 1.0 to 4.0 in 0.1 increments. Black points indicate the minimum and maximum guidance weights in the sweep, while colored triangles show the precision/recall tradeoffs that achieve the best*
 
 ### 区间端点消融
 
@@ -263,22 +245,6 @@ Figure 5 分别扫描了上界 $\sigma_{\text{hi}}$ 和下界 $\sigma_{\text{lo}
 ### 失败模式与局限
 
 该方法引入了两个额外超参数 $\sigma_{\text{lo}}$ 和 $\sigma_{\text{hi}}$，尽管论文提出了顺序搜索策略（先定 $\sigma_{\text{hi}}$ 再定 $\sigma_{\text{lo}}$），但在新模型或新任务上仍需额外调参开销。验证范围目前限于类别条件生成（ImageNet）和文本条件生成（SD-XL），尚未在视频、音频等其他生成模态上进行充分评估。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_nAIhvNy15T/figures/009_Figure.jpg]]
-*Figure: A 4k dslr photo of a raccoon wearing an astronaut helmet, photorealistic. A highly detailed paper origami of a Dachshund on a table next to a porcelain teapot, 4k dslr*
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_nAIhvNy15T/figures/012_Figure_10.jpg]]
-*Figure 10: More SD-XL results that demonstrate how CFG with low w yields fuzzy images that lack detail (left) and CFG with high w leads to reduced diversity and oversaturated colors. Our method (right) produces images with crisp details while maintaining natural colors. The degree of the negative effects with CFG varies between prompts*
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_nAIhvNy15T/figures/013_Figure_11.jpg]]
-*Figure 11: Additional EDM2-XXL results that demonstrate how CFG with low w yields fuzzy images that lack detail (left) and CFG with high w leads to reduced diversity and oversaturated colors. Our method (right) produces images with crisp details while maintaining natural colors*
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_nAIhvNy15T/figures/014_Figure_12.jpg]]
-*Figure 12: More SD-XL results showing the effect of changing w with our method. We limit the guidance to σ ∈ (0.28, 5.42]. Increasing w produces images with more well-defined details while maintaining the color palette and the original image composition*
-
-
 
 ## 定位与知识库关联
 
@@ -319,8 +285,6 @@ Figure 5 分别扫描了上界 $\sigma_{\text{hi}}$ 和下界 $\sigma_{\text{lo}
 - **负向提示（Negative Prompting）**：通过将无条件模型替换为负向提示条件模型来增强引导效果。本方法与负向提示正交，可在其基础上叠加使用。
 - **动态引导权重调度**：一些工作尝试让 $w$ 随采样步数变化（如线性衰减、余弦调度）。本文表明，在噪声水平坐标（$\sigma$）上而非时间步坐标上进行调度更为本质，且简单的分段常数函数已足够。
 - **蒸馏与少步采样**：本方法通过关闭低噪声区域的引导减少了无条件模型评估次数，在 SD-XL 上带来超过 20% 的推理加速（Section 4.3），与蒸馏方法在加速目标上形成互补，但实现路径完全不同——本方法不改变模型权重，仅优化采样控制流。
-
-
 
 ## 原文 PDF
 

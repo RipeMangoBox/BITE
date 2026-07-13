@@ -50,8 +50,6 @@ PUMPS（Point-based Universal Motion Pre-training for Synthesis）针对上述�
 
 在无监督预训练设置下，PUMPS在关键帧插值和运动过渡任务上展现出超越有监督方法的性能。具体而言，在5帧间隔的关键帧插值任务上，PUMPS的L2P误差为0.137，显著优于有监督基线CITL（Mo et al., CVPR 2023）的0.186；在15帧间隔的运动过渡任务上，PUMPS的L2P误差为0.168，相比CITL的0.255降低了约34%。消融实验进一步证实，线性分配损失、序列级dropout和旋转位置嵌入（RoPE）是性能提升的关键组件。预训练特征在下游任务微调中同样表现突出，使运动去噪模型的MPJPE降低约25%，验证了其作为通用运动先验的迁移能力。
 
-
-
 ### 人体运动合成的瓶颈：骨架依赖与表示泛化
 
 人体运动合成是计算机视觉与图形学中的核心问题，涵盖关键帧插值、运动过渡、运动去噪、2D-to-3D运动估计等任务。传统方法通常将运动表示为特定骨架（skeleton）上的关节旋转序列，这使得模型与特定的骨骼拓扑结构深度绑定。一旦骨架结构发生变化（例如从SMPL人体模型切换到四足动物骨架），整个模型就需要重新设计和训练，难以实现跨骨架的泛化。这一“骨架依赖”问题严重制约了运动合成模型的通用性和可复用性。
@@ -77,8 +75,6 @@ PUMPS（Point-based Universal Motion Pre-training for Synthesis）针对上述�
 - **高效的点标识机制**：设计一种无需点注意力的点标识感知解码器，在保持线性计算复杂度的同时生成时间一致的轨迹。
 - **解决点崩溃问题**：提出新的重建损失函数，从根本上避免Chamfer距离导致的点分布塌缩。
 - **建立运动预训练范式**：通过自监督掩码运动补全预训练，学习可迁移的潜在运动表示，在下游任务中通过微调即可超越有监督方法。
-
-
 
 ## 核心方法与创新机理
 
@@ -111,8 +107,6 @@ $$\mathcal{L}_{\mathrm{rec}} = \sum_{0 \leq k < |\mathcal{P}|} || p_k - p'_{h_k}
 ### 创新总结
 
 上述三个 changed slots 构成了 PUMPS 方法的核心技术贡献：噪声向量机制解决了点标识问题，线性分配损失解决了点对应优化问题，序列级正则化策略保证了时序一致性。这三者协同作用，使得 PUMPS 能够在无监督预训练设置下，在关键帧插值（L2P: 0.137 vs. CITL 0.186）和运动过渡（L2P: 0.168 vs. CITL 0.255）任务上超越现有有监督方法（Table 1）。
-
-
 
 PUMPS采用**两阶段预训练范式**，依次训练自编码器与潜在运动合成器，构建一个骨架无关的通用运动表示。其核心设计围绕**时序点云（Temporal Point Cloud, TPC）**展开——将运动序列表示为一组带有时序一致性的点云帧，从而摆脱对特定骨架拓扑的依赖。
 
@@ -152,12 +146,8 @@ $$\mathcal{L}_{\mathrm{LMS}} = \sum_{0 \leq f < |\mathcal{V}|} || v_f - w_f ||_2
 
 整体而言，PUMPS通过“噪声向量点标识+线性分配损失”这一因果机制，在无需骨架先验和点注意力的条件下，实现了高效且时间一致的TPC重建，为后续的运动合成预训练奠定了表示基础。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1894_PUMPS_Skeleton_Agnostic_Point_based_Universal_Motion_Pre_Training_for_Sy/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of PUMPS pre-training, zero-shot evaluation, and fine-tuning pipelines. PUMPS consists of an auto-encoder (encoder-decoder modules) and latent synthesis component, which are pre-trained successively*
-
-
 
 PUMPS 采用两阶段流水线：自编码器阶段学习点云帧的潜在表示并重建 TPC，潜在运动合成阶段在冻结的编码器特征上进行掩码运动补全预训练（Figure 1）。以下聚焦自编码器的三个核心模块及其关键公式。
 
@@ -168,9 +158,6 @@ PUMPS 采用两阶段流水线：自编码器阶段学习点云帧的潜在表�
 ### TPC 重建解码器 Φ^dec
 
 解码器从潜在向量序列重建 TPC，其核心创新在于通过高斯噪声向量赋予点标识感知能力，同时避免点注意力机制的计算开销。具体流程（Figure 2）：
-
-![[assets/figures/papers/paper_list_l1894_PUMPS_Skeleton_Agnostic_Point_based_Universal_Motion_Pre_Training_for_Sy/figures/002_Figure_2.jpg]]
-*Figure 2: Training strategy of the PUMPS auto-encoder components*
 
 1. **时序变换**：Φ^dec 使用旋转自注意力（RoPE）对潜在序列进行时序感知变换，得到变换后的序列 $T$。
 2. **噪声向量注入**：对每个点引入一个 $|z|$ 维的高斯噪声向量 $z \in \mathbb{R}^{|z|} \sim \mathcal{N}(0,1)$，将其附加到 $T$ 中的每个潜在向量上。该噪声向量在解码过程中充当点的采样标识符，使模型能够在无点注意力的条件下生成时间一致的轨迹。
@@ -190,9 +177,6 @@ $$\mathcal{L}_{\mathrm{rec}} = \sum_{0 \leq k < |\mathcal{P}|} || p_k - p_{h_k}'
 
 在自编码器预训练完成后，冻结 Φ^enc，使用 Φ^LMS 进行掩码运动补全预训练（Figure 3）。给定部分掩码的潜在向量序列，Φ^LMS 预测完整的潜在序列。预训练损失为预测潜在向量 $w_f$ 与真实潜在向量 $v_f$ 之间的 MSE：
 
-![[assets/figures/papers/paper_list_l1894_PUMPS_Skeleton_Agnostic_Point_based_Universal_Motion_Pre_Training_for_Sy/figures/003_Figure_3.jpg]]
-*Figure 3: Motion completion pre-training for the latent motion synthesiser*
-
 $$\mathcal{L}_{\mathrm{LMS}} = \sum_{0 \leq f < |\mathcal{V}|} || v_f - w_f ||_2^2$$
 
 该预训练使 Φ^LMS 学会在潜在空间中补全运动序列，为零样本关键帧插值和运动过渡奠定基础。微调实验表明，预训练特征使下游去噪模型的 MPJPE 降低约 25%（Sec. 5.2），证明了迁移学习的有效性。
@@ -200,8 +184,6 @@ $$\mathcal{L}_{\mathrm{LMS}} = \sum_{0 \leq f < |\mathcal{V}|} || v_f - w_f ||_2
 ### 正则化策略：序列级 Dropout
 
 PUMPS 在 Φ^dec 中采用序列级 dropout 策略：同一特征维度在整个时间序列上被统一遮盖，而非逐元素随机丢弃。这一设计保持了时序连续性，避免了逐元素 dropout 导致的运动动态不稳定。消融实验（Table 2）证实，逐元素 dropout 会显著恶化重建质量，而序列级 dropout 能够稳定运动轨迹的生成。
-
-
 
 ## 实验与关键发现
 
@@ -254,27 +236,14 @@ Figure 5 将 PUMPS 与 **FoldingNet** 的 TPC 重建结果进行可视化对比�
 
 4. **长序列生成的未探索空间。** PUMPS 的潜在运动合成器基于掩码重建，未与扩散模型等先进生成框架结合，在极长序列或开放式运动生成场景下的能力未知。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1894_PUMPS_Skeleton_Agnostic_Point_based_Universal_Motion_Pre_Training_for_Sy/figures/004_Table_1.jpg]]
-*Table 1: Keyframe interpolation (left) and motion transition (right)*
-
 ![[assets/figures/papers/paper_list_l1894_PUMPS_Skeleton_Agnostic_Point_based_Universal_Motion_Pre_Training_for_Sy/figures/005_Figure_4.jpg]]
 *Figure 4: Keyframe interpolation (left) and motion transition (right) examples on a 61-frame sequence. We leave 15 frames between keyframes for interpolation, and 31 frames between 15-frame windows for transition. For visibility purposes, only every 5th frame is shown. Grey regions indicate frames provided by the input. The ground truth is overlaid in each row for direct comparison*
 
 ![[assets/figures/papers/paper_list_l1894_PUMPS_Skeleton_Agnostic_Point_based_Universal_Motion_Pre_Training_for_Sy/figures/008_Table_3.jpg]]
 *Table 3: 2D-to-3D motion estimation method comparisons on 128- frame sequences, using MPJPE (top) and MPJVE (bottom)*
 
-![[assets/figures/papers/paper_list_l1894_PUMPS_Skeleton_Agnostic_Point_based_Universal_Motion_Pre_Training_for_Sy/figures/009_Figure_6.jpg]]
-*Figure 6: Motion estimation on a dance motion sample, given a sequence of 2D keypoints (top row). Predictions are rotated by*
-
 ![[assets/figures/papers/paper_list_l1894_PUMPS_Skeleton_Agnostic_Point_based_Universal_Motion_Pre_Training_for_Sy/figures/010_Table_4.jpg]]
 *Table 4: Motion denoising method comparisons on 128-frame sequences, using MPJPE (top) and acceleration error (bottom)*
-
-![[assets/figures/papers/paper_list_l1894_PUMPS_Skeleton_Agnostic_Point_based_Universal_Motion_Pre_Training_for_Sy/figures/011_Figure_7.jpg]]
-*Figure 7: Motion denoising examples given a noisy falling motion sequence (top row). Though only every 5th frame is shown, all frames are included in the trajectory representation (grey lines)*
-
-
 
 ## 定位与知识库关联
 
@@ -332,8 +301,6 @@ PUMPS 的潜在运动合成器 $\Phi^{\mathrm{LMS}}$ 基于 Transformer 架构�
 3. **预训练表示的更高效利用**：PUMPS 目前采用全量微调的方式迁移到下游任务。适配器（Adapter）或提示学习（Prompt Tuning）等参数高效微调策略能否在保持性能的同时进一步降低迁移成本？
 4. **TPC 表示的任务泛化性**：TPC 表示是否能够扩展到动作识别、运动风格迁移、运动质量评估等更广泛的运动相关任务？这些任务对点标识和时序一致性的需求可能与运动合成存在差异。
 5. **与扩散模型的协同设计**：基于注意力机制的架构能否有效应用于扩散框架中的运动合成？PUMPS 的噪声向量机制是否可以为扩散模型的去噪过程提供结构化的条件信号？
-
-
 
 ## 原文 PDF
 

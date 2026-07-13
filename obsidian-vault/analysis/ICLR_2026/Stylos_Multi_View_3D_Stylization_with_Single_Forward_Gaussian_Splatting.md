@@ -54,8 +54,6 @@ claims:
 
 Stylos 仍存在三类典型失效模式：对高频杂乱结构（浓密叶片、线状元素）的重建和风格化质量下降；强烈全局光照变化或极端调色板下出现过饱和或外观线索丢失；输入视图数显著增加时几何骨干不稳定导致风格化效果退化。这些局限性指向若干开放问题：如何增强对复杂几何结构的鲁棒性，视图数增加导致性能退化的根本机制，以及对素描、立体主义等极简风格类型的泛化能力。
 
-
-
 三维场景风格化旨在将参考艺术图像的视觉特征（如笔触、色彩调性、纹理模式）迁移到三维内容表示上，生成可从任意新视角渲染的风格化结果。这一任务在数字艺术创作、虚拟现实内容生成和电影预可视化等领域具有广泛应用前景。近年来，以三维高斯泼溅（3D Gaussian Splatting, 3DGS）为代表的显式辐射场表示，凭借其高保真重建和实时渲染能力，已成为三维风格化的主流载体。
 
 然而，**现有3DGS风格化方法普遍面临一个核心瓶颈：逐场景优化的刚性依赖**。以 **StyleGaussian**（Liu et al., 2024）、**G-Style**（Kovacs et al., 2024）、**StylizedGS**（Zhang et al., 2025）和 **SGSST**（Galerne et al., 2025）为代表的代表性工作，均要求对每个内容场景和每个风格参考分别执行独立的优化过程——通常需要数分钟甚至更长的训练时间。这种"一场景一训练"的范式严重制约了风格化流程的吞吐量，使其难以满足实时交互式应用的需求。
@@ -63,8 +61,6 @@ Stylos 仍存在三类典型失效模式：对高频杂乱结构（浓密叶片�
 另一条技术路线试图实现单次前向传播的风格化，如 **Styl3R**（Wang et al., 2025b），通过前馈网络直接预测风格化结果。但这类方法在设计上并未专门优化多视图一致性，导致在不同视角下渲染的风格化结果可能出现纹理漂移、颜色不一致等伪影。**几何保真与风格一致之间的张力**，构成了该领域长期存在的结构性矛盾——图像级风格损失（如AdaIN）独立匹配各帧统计量，天然缺乏跨视图的约束机制，而逐场景优化方法虽然通过迭代缓解了这一问题，却以牺牲效率为代价。
 
 Stylos正是在这一背景下提出的。其核心动机在于**打破"效率-一致性"的折衷**：通过将几何推理与风格注入解耦到共享Transformer骨干的不同路径中，并在三维体素空间施加跨视图一致的特征统计约束，实现在单次前向传播中同时达成实时推理速度与视图一致的风格化质量。
-
-
 
 ## 核心方法与创新机理
 
@@ -95,19 +91,11 @@ $$\mathcal{L}_{\mathrm{sty}}^{\mathrm{3D}} = \frac{1}{B} \sum_{b=1}^{B} \sum_{l=
 
 这一策略确保风格化过程不损害几何重建质量，是实现零样本泛化的关键工程支撑。
 
-
-
 Stylos 定义了一个条件映射，将多视图内容图像与一张风格参考图联合映射为风格化 3D 高斯场景与对应的相机参数：
 
 $$f_{\theta} : (\{ I_i \}_{i=1}^N, S) \mapsto \big( G, \{ g_i \}_{i=1}^N \big)$$
 
 其中 $\{I_i\}_{i=1}^N$ 为 $N$ 个多视图输入，$S$ 为风格参考图像，$G$ 为风格化 3D 高斯原语集合，$g_i$ 为各视图的相机内参与外参。整个流程在单次前向传播中完成，无需逐场景优化或后处理，推理时间约 0.05 秒/场景，比现有逐场景优化方法快数个数量级（Table 4）。
-
-![[assets/figures/papers/paper_list_l34_https_openreview_net_forum_id_Ir0HMkRpYb/figures/014_Table_5.jpg]]
-*Table 5: Following StyleID (Chung et al., 2024), we additionally report sylization quality metrics, FID, LPIPS, LPIPS-gray, CFSD, color matching loss (HistoGAN loos), as supplementary to Table 4*
-
-![[assets/figures/papers/paper_list_l34_https_openreview_net_forum_id_Ir0HMkRpYb/figures/015_Table_6.jpg]]
-*Table 6: Following StyleID (Chung et al., 2024), we additionally report sylization quality metrics, FID, LPIPS, LPIPS-gray, CFSD, color matching loss (HistoGAN loos), as supplementary to Table 4*
 
 ### 核心设计理念
 
@@ -145,8 +133,6 @@ $$\mathcal{L}_{\mathrm{stage2}} = \mathcal{L}_{\mathrm{rec}} + \lambda_{\mathrm{
 ### 关键消融证据
 
 消融实验（Table 1, Figure 2）表明，Global CrossBlock 在重建质量上显著优于 Frame 和 Hybrid 变体——在 Pizza 场景上 PSNR 达到 20.57（Frame 为 19.72），且纹理边界更清晰。3D 体素风格损失（Table 2, Figure 3）在 ArtScore 上达到 9.15，远超图像级损失的 4.78，同时保持低短距 LPIPS（0.047），生成的纹理更干净且几何感更强。
-
-
 
 Stylos 的核心设计围绕一个共享的 Transformer 骨干展开，通过两条路径分别处理几何推理与风格注入，最终在单次前向传播中输出风格化的 3D 高斯场景。其关键模块包括条件映射定义、风格聚合器（CrossBlock）以及 3D 体素风格损失。
 
@@ -197,8 +183,6 @@ Stylos 采用两阶段训练以保证结构感知的风格化：
   $$\mathcal{L}_{\mathrm{stage2}} = \mathcal{L}_{\mathrm{rec}} + \lambda_{\mathrm{style}} \mathcal{L}_{\mathrm{style}}^{\mathrm{3D}} + \lambda_{\mathrm{cnt}} \mathcal{L}_{\mathrm{content}} + \lambda_{\mathrm{clip}} \mathcal{L}_{\mathrm{clip}} + \lambda_{\mathrm{tv}} \mathcal{L}_{\mathrm{TV}}$$
 
   其中权重设置为 $\lambda_{\mathrm{style}}=1.0$、$\lambda_{\mathrm{cnt}}=0.1$、$\lambda_{\mathrm{clip}}=1.0$、$\lambda_{\mathrm{tv}}=10.0$，分别对应 3D 风格损失、内容损失、CLIP 损失和总变分正则项。
-
-
 
 ## 实验与关键发现
 
@@ -268,36 +252,20 @@ Stylos的核心创新之一在于如何将风格信息注入几何推理骨干�
 
 这些失败模式与视图数量扩展实验中的发现一致——几何骨干的稳定性是整个系统的关键瓶颈。当基础重建不准确时，后续的风格注入和3D体素损失无法完全补偿几何误差。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l34_https_openreview_net_forum_id_Ir0HMkRpYb/figures/002_Table_1.jpg]]
 *Table 1: Ablation on the style-content fusion module, comparing Frame, Global and hybrid Cross-Block designs. The first frame of each content scene is used as the pseudo style reference. Reconstruction quality is evaluated with PSNR↑, SSIM↑, and LPIPS↓ on the CO3D dataset*
-
-![[assets/figures/papers/paper_list_l34_https_openreview_net_forum_id_Ir0HMkRpYb/figures/003_Figure_2.jpg]]
-*Figure 2: CO3D pizza scene comparing different CrossBlock designs*
 
 ![[assets/figures/papers/paper_list_l34_https_openreview_net_forum_id_Ir0HMkRpYb/figures/004_Table_2.jpg]]
 *Table 2: Comparison of consistency and artistic quality among different style loss designs on CO3D. The frame stride is set to 3, and 15 held-out scenes are randomly selected for evaluation*
 
-![[assets/figures/papers/paper_list_l34_https_openreview_net_forum_id_Ir0HMkRpYb/figures/006_Figure.jpg]]
-*Figure: Image Loss Scene Loss 3D Style Loss*
-
-![[assets/figures/papers/paper_list_l34_https_openreview_net_forum_id_Ir0HMkRpYb/figures/008_Figure_4.jpg]]
-*Figure 4: Effect of varying # views / batch on the Lighthouse scene from Tanks and Temples*
-
 ![[assets/figures/papers/paper_list_l34_https_openreview_net_forum_id_Ir0HMkRpYb/figures/009_Table_3.jpg]]
 *Table 3: For consistency comparisons, we report short-range and long-range LPIPS↓ and RMSE↓ on the four scenes from the Tanks & Temples dataset. We clarify experiment details in A.4. In the following tables, the best results are highlighted and the second best results are underlined. Each stylization method category is visualized with a distinct color. The proposed Stylos demonstrates improved short-range and long-range consistency scores across the four scenes*
-
-![[assets/figures/papers/paper_list_l34_https_openreview_net_forum_id_Ir0HMkRpYb/figures/010_Table_4.jpg]]
-*Table 4: Stylization quality, as measured by ArtScore and ArtFID (abbreviated as Score and FID respectively), and stylization time comparisons with recent 3D stylization models. Stylos achieves consistently favorable metric scores across the four scenes. Additionally, we follow StyleID (Chung et al., 2024) and calculate additional metrics as reported in A.4 Table 5 and Table 6*
 
 ![[assets/figures/papers/paper_list_l34_https_openreview_net_forum_id_Ir0HMkRpYb/figures/011_Figure_5.jpg]]
 *Figure 5: Visual comparisons between Stylos and recent 3D stylization approaches. Stylos successfully transfers diverse artistic styles to the scenes while preserving fine structural details*
 
 ![[assets/figures/papers/paper_list_l34_https_openreview_net_forum_id_Ir0HMkRpYb/figures/007_Figure_3.jpg]]
 *Figure 3: Comparison of style losses on unseen donut, skateboard, and pizza scenes from the CO3D dataset. Both scene and 3D style losses yield cleaner stylized textures compared to image-level matching, while the 3D loss further conveys a stronger sense of 3D geometry. We encourage readers to Appendix Fig. 8-10 for more visual comparisons under varing scenes and styles*
-
-
 
 ## 定位与知识库关联
 
@@ -335,8 +303,6 @@ Table 2 显示，该损失将 ArtScore 从图像级损失的4.78提升至9.15，
 2. **视图扩展性**：输入视图数增加导致性能下降的根本机制是什么？能否通过增强几何骨干的训练视图多样性或适配训练策略来缓解？
 3. **风格泛化鲁棒性**：对完全不同的风格类型（如素描、立体主义、极简色彩）的泛化鲁棒性如何？当前评估主要基于 WikiArt 数据集的艺术风格，极端抽象风格的测试尚不充分。
 4. **动态场景扩展**：是否可以将该方法扩展到动态场景或视频输入，同时保持一致性和效率？这需要在时序维度上扩展当前的3D体素风格损失和 CrossBlock 设计。
-
-
 
 ## 原文 PDF
 

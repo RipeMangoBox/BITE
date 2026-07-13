@@ -58,8 +58,6 @@ claims:
 
 消融实验证实，增加合并迭代次数（k=1→4→10）持续提升所有奖励指标，且扩展到5个奖励时性能增益无明显递减（Figure 6, Figure 11）。帕累托前沿对比显示，MapReduce LoRA在3D和2D前沿上均显著优于Rewarded Soup和MORL-D（Figure 9, Figure 10）。
 
-
-
 ### 问题背景：多偏好优化的对齐税困境
 
 生成模型的对齐通常依赖多个奖励模型来评估不同维度的质量。在文本到图像生成中，这些维度包括指令遵循（如 GenEval）、图像美学（如 PickScore）和文本渲染准确性（如 OCR）；在文本到视频生成中，则涵盖视觉质量和运动质量；在语言任务中，则涉及有用性和无害性等。然而，当试图同时优化多个奖励时，现有方法普遍遭遇“对齐税”——提升某一维度性能往往导致其他维度下降，难以有效推进帕累托前沿。
@@ -85,8 +83,6 @@ claims:
 2. **轻量推理时偏好控制**：即使获得了覆盖广泛权衡关系的帕累托前沿模型，用户在实际推理时仍需灵活控制不同偏好的组合比例。直接切换整个 LoRA 适配器或重新训练模型均不现实。因此，需要一种能够在推理时通过简单提示词修改即可实现偏好组合控制的轻量机制。
 
 这两个动机分别对应本文提出的 **MapReduce LoRA** 框架和 **Reward-aware Token Embedding (RaTE)** 方法，共同构成了推进多偏好优化帕累托前沿的完整解决方案。
-
-
 
 ## 核心方法与创新机理
 
@@ -126,8 +122,6 @@ $$\mathcal{L}(\theta_{\text{token}_i}) = \mathbb{E}_{p, z_{0,i}^{\text{teacher}}
 | 推理时偏好控制 | 无或需切换整个 LoRA 适配器 | RaTE 令牌嵌入，附加到提示词即可组合控制 |
 | 收敛保证 | 一次性合并无收敛保证 | 局部 PL 条件下几何速率收敛 |
 | 扩展性 | 奖励增多时冲突加剧 | 5 个奖励下仍持续提升所有指标 |
-
-
 
 MapReduce LoRA 的核心设计是将多偏好优化分解为两个正交的协作机制：**迭代权重合并（MapReduce LoRA）** 负责在训练阶段持续推进帕累托前沿，**奖励感知令牌嵌入（RaTE）** 负责在推理阶段实现轻量、可组合的偏好控制。二者共享同一组奖励特定 LoRA 专家，但作用于模型生命周期的不同阶段。
 
@@ -176,8 +170,6 @@ Figure 3 给出了上述流程与单专家训练（Flow-GRPO）及多目标强�
 - **推理输入**：用户提示词 + 可选偏好令牌组合；**推理输出**：受控生成的图像、视频或文本。
 
 两个机制在模块关系上形成互补：MapReduce LoRA 在训练时通过迭代合并逼近全局帕累托最优，RaTE 在推理时通过令牌嵌入提供细粒度的偏好调节能力。消融实验（Figure 6）表明，增加合并迭代次数 $K$ 可持续提升三项奖励指标并减小合并带来的性能退化；Table 4 的令牌数量消融则揭示了不同奖励的最佳令牌数量配置（GenEval 在 2-3 个令牌时饱和，PickScore 在 1 个令牌时最优，OCR 在 3 个令牌时最优）。
-
-
 
 ### 3.1 基础组件：LoRA 与 GRPO
 
@@ -239,8 +231,6 @@ $$\mathcal{L}(\theta_{\mathrm{token}_{i}}) = \mathbb{E}_{p, z_{0,i}^{\mathrm{tea
 
 **推理时组合**。推理时，用户可将多个偏好令牌（如 `<GE>`、`<PS>`、`<OCR>`）同时附加到提示词中，实现灵活的多偏好控制，无需切换模型或重新训练。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与因果机制
@@ -265,14 +255,8 @@ Table 1 报告了在 SD 3.5 Medium 和 FLUX.1-dev 上的全面对比。MapReduce
 
 Figure 10 和 Table 5、Table 6 展示了与 Rewarded Soup 和 MORL-D 的 3D/2D 帕累托前沿对比。MapReduce LoRA 在所有合并比例下均支配（dominate）基线方法，尤其在 PickScore 维度上，Rewarded Soup 和 MORL-D 提升有限甚至退化，而 MapReduce LoRA 持续扩大前沿覆盖范围。Figure 9 进一步验证了在 SD 3.5 M、FLUX.1-dev 和 HunyuanVideo 上的非支配解分布。
 
-![[assets/figures/papers/paper_list_l2692_https_arxiv_org_abs_2511_20629/figures/014_Figure_9.jpg]]
-*Figure 9: MapReduce LoRA advances the Pareto fronts on Text-to-Image and Text-to-Video tasks. We include the non-Pareto sets in this figure for sharing the full results*
-
 ![[assets/figures/papers/paper_list_l2692_https_arxiv_org_abs_2511_20629/figures/015_Table_5.jpg]]
 *Table 5: 3D merging results on Text-to-Image tasks: SD 3.5 M [2] and FLUX.1-dev [20]*
-
-![[assets/figures/papers/paper_list_l2692_https_arxiv_org_abs_2511_20629/figures/016_Table_6.jpg]]
-*Table 6: 2D merging results on Text-to-Image tasks, SD 3.5 M [2] and FLUX.1-dev [20], and Text-to-Video task, HunyuanVideo [19]*
 
 ![[assets/figures/papers/paper_list_l2692_https_arxiv_org_abs_2511_20629/figures/017_Figure_10.jpg]]
 *Figure 10: Merging performance comparison across Rewarded Soup [36], MORL-D, and MapReduce LoRA. Left: 3D Pareto-front comparison. Right: 2D projections of the 3D Pareto front (for readability), which are not 2D Pareto fronts. Unlike Fig. 9, these are projections rather than a 2D merge with the third reward fixed to 0. MORL-D performance is confined to a small region across the three rewards and yields only limited improvement on PickScore*
@@ -289,12 +273,6 @@ Figure 10 和 Table 5、Table 6 展示了与 Rewarded Soup 和 MORL-D 的 3D/2D 
 
 Table 3 展示了 RaTE 的令牌组合控制效果。通过附加不同偏好令牌（`<GE>`、`<PS>`、`<OCR>`），可在推理时灵活调节各维度性能，无需切换模型或重训。例如，仅附加 `<GE>` 令牌时 GenEval 最高但 PickScore 较低，组合 `<GE>+<PS>+<OCR>` 则实现三项均衡最优。Figure 5 提供了定性示例，展示同一提示词下通过不同令牌组合控制生成风格和文本渲染质量。
 
-![[assets/figures/papers/paper_list_l2692_https_arxiv_org_abs_2511_20629/figures/009_Table_3.jpg]]
-*Table 3: Reward-aware Token Embedding results. \<GE>, \<PS>, and \<OCR> denote tokens trained on GenEval [14], PickScore [18], and OCR [8], respectively. Gray indicates not trained on that reward; bold indicates the best among variants*
-
-![[assets/figures/papers/paper_list_l2692_https_arxiv_org_abs_2511_20629/figures/012_Figure_8.jpg]]
-*Figure 8: Language Task: Helful Assistant. Left: MapReduce LoRA outperforms Rewarded Soup [36] and Bone Soup [44] (reproduced from Fig. 5(a) in [44]) on both rewards. Right: MapReduce LoRA improves progressively across merging iterations*
-
 ### 局限与失败模式
 
 1. **大规模偏好扩展**：目前仅验证至 5 个偏好，更多偏好下的计算成本和合并退化需进一步研究。
@@ -302,18 +280,8 @@ Table 3 展示了 RaTE 的令牌组合控制效果。通过附加不同偏好令
 3. **RaTE 架构兼容性**：RaTE 在 SD 等使用显式交叉注意力的模型上有效，但在 FLUX.1-dev 等联合文本-图像序列模型上稳定性较差，需要探索模型无关的偏好注入设计。
 4. **域外泛化边界**：虽然域外奖励有提升，但提升幅度（如 VILA +3.0%）小于域内奖励，长尾偏好的泛化能力需进一步验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2692_https_arxiv_org_abs_2511_20629/figures/007_Figure_6.jpg]]
 *Figure 6: Ablation study on merging iterations (k = 1 vs. 4 vs. 10). The performance is evaluated during training with mixed precision, where the text encoder is set to fp16 precision and the rest of the model to fp32*
-
-![[assets/figures/papers/paper_list_l2692_https_arxiv_org_abs_2511_20629/figures/010_Table_4.jpg]]
-*Table 4: Ablation on the number of appended RaTE tokens*
-
-![[assets/figures/papers/paper_list_l2692_https_arxiv_org_abs_2511_20629/figures/018_Figure_11.jpg]]
-*Figure 11: MapReduce LoRA across 5 rewards with 3 merges*
-
-
 
 ## 定位与知识库关联
 
@@ -392,8 +360,6 @@ Table 3 的实验结果表明，不同令牌组合可以灵活调节各项指标
 ### 7. 知识库定位总结
 
 MapReduce LoRA 在多偏好优化方法谱系中占据了一个独特位置：**它通过迭代 Map-Reduce 框架架起了单奖励专家训练与多目标联合优化之间的桥梁，同时以 RaTE 提供了轻量级的推理时偏好控制机制。** 其理论根基（平均近端共识优化的几何收敛）与实验证据（跨模态、跨奖励数量的帕累托前沿推进）共同支撑了该方法在多偏好生成模型对齐领域的贡献。与现有方法的对比清晰表明，迭代合并策略是突破“对齐税”瓶颈的关键机制，而 RaTE 则解决了实际部署中的灵活控制需求。
-
-
 
 ## 原文 PDF
 

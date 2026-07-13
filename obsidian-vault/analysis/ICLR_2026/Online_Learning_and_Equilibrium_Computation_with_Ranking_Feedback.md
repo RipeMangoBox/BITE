@@ -62,8 +62,6 @@ claims:
 
 **局限与开放问题**：当前工作尚未闭合 AvgUtil Rank 在强盗反馈下的下界与上界间隙——τ 为常数时是否困难未知。理论结果主要基于合成对抗环境，尚未在实际骑乘共享或在线约会等真实排序反馈场景中验证。能否在非平稳偏好环境下保持次线性后悔，以及高维真实数据上的效用估计质量是否需要进一步调整，均有待探索。
 
-
-
 ### 核心瓶颈：从数值反馈到排序反馈
 
 在线学习与均衡计算的经典理论建立在**数值效用反馈**之上——学习者每轮能直接观测到所选行动的精确效用值，或至少获得一个无偏估计（强盗反馈）。但在大量人机协同或隐私受限的真实应用中，这一前提并不成立。平台推荐餐厅、约会应用匹配对象、LLM 路由选择模型时，用户往往只能以**行动排序**的形式表达偏好，而无法提供精确的数值评分。例如，顾客可能将推荐的菜品从最喜欢到最不喜欢进行排列，却不会给出每道菜的具体评分。这种排序反馈缺失了效用值的绝对尺度信息，使得传统依赖数值比较的后悔最小化框架面临根本性挑战。
@@ -101,8 +99,6 @@ claims:
 ### 遗留问题
 
 尽管本文在排序反馈的在线学习理论中取得了突破性进展，仍有若干关键问题悬而未决：AvgUtil Rank 在强盗反馈下当 $\tau$ 为常数时的下界与上界间隙尚未闭合；所提算法尚未在真实排序反馈场景（如拼车匹配、在线约会）中部署验证；非平稳偏好随时间变化的拓展也值得进一步探索。这些开放问题指向排序反馈学习理论的下一个重要前沿。
-
-
 
 ## 核心方法与创新机理
 
@@ -143,8 +139,6 @@ claims:
 ### 创新边界与未闭合问题
 
 尽管本文在排序反馈下的在线学习理论上取得了系统性突破，但仍存在两个关键缺口：**AvgUtil Rank 在强盗反馈下的下界与上界之间尚未闭合**——当 $\tau$ 为常数时，该设定的固有难度未知；以及所有理论结果尚未在真实排序反馈场景（如乘车共享匹配、在线约会）中得到验证。
-
-
 
 本文提出了一套从排序反馈中实现在线学习与均衡计算的通用算法框架。该框架的核心思路是：将仅含排序信息的反馈转化为可被标准在线学习算法消费的数值效用估计，从而复用成熟的后悔最小化技术。整体流程由四个关键模块串联构成，根据反馈类型（InstUtil Rank / AvgUtil Rank）和信息结构（全信息 / 强盗反馈）的不同，模块内部的实现细节有所差异。
 
@@ -194,8 +188,6 @@ $$\pi^{(t+1)} = (1 - \gamma) \cdot \text{Alg}\left((\widetilde{\boldsymbol{u}}^{
 | 策略更新 | $\widetilde{\boldsymbol{u}}^{(1:t)}$ | 新策略 $\pi^{(t+1)}$（强盗设定下经探索混合） |
 
 这一模块化设计使得框架具有高度的灵活性：效用估计模块可独立优化，在线学习黑盒可替换为任意前沿算法，而探索混合机制则为强盗设定提供了必要的统计保障。
-
-
 
 ### 问题形式化与反馈模型
 
@@ -278,8 +270,6 @@ Algorithm 2（InstUtil Rank）和 Algorithm 3（AvgUtil Rank）的整体流程�
 
 两种算法在全信息和强盗设定下的差异主要在于：提议动作集的生成方式（全信息下提议全部动作，强盗下采样 $K$ 个）以及是否引入探索混合。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -291,7 +281,6 @@ Algorithm 2（InstUtil Rank）和 Algorithm 3（AvgUtil Rank）的整体流程�
 
 **均衡计算任务（合成博弈）**  
 在多种设置下，Algorithm 2 和 Algorithm 3 的可剥削度均随轮次增加而下降，表明策略序列收敛至近似粗相关均衡（CCE，理想可剥削度为 0）。该趋势在全信息反馈（Figure 3, Figure 7）与强盗反馈（Figure 8, Figure 9）下均成立。
-
 
 ![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_lg6H2oJPky/figures/004_Figure_3.jpg]]
 *Figure 3: The exploitability for the full-information feedback setting under both InstUtil Rank and AvgUtil Rank. Performance is evaluated across different temperatures τ and cumulative utility variations P ^ { ( T ) } = T ^ { q } . Each parameter combination is tested 10 times with different random seeds*
@@ -311,7 +300,6 @@ Algorithm 2（InstUtil Rank）和 Algorithm 3（AvgUtil Rank）的整体流程�
 
 - **温度参数 τ**：控制 Plackett‑Luce 排名模型的随机性。τ 越小，排序越确定性地反映效用差异；τ 越大，排序噪声越强。在 InstUtil Rank 全信息设置下，较小 τ 通常导致更快的收敛，但极端小的 τ 可能加剧估计方差（Figure 3, Figure 4）。在 AvgUtil Rank 下，τ 的影响相对温和，算法在较宽范围内保持稳定（Figure 5, Figure 6）。
 
-
 ![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_lg6H2oJPky/figures/005_Figure_4.jpg]]
 *Figure 4: The regret for bandit feedback setting under InstUtil Rank feedback in the online learning setting. The performance is evaluated across different temperatures τ , cumulative utility variations P ^ { ( T ) } = T ^ { q } , and numbers of proposed actions K. Each parameter combination is tested 10 times with different random seeds*
 
@@ -329,20 +317,6 @@ Algorithm 2（InstUtil Rank）和 Algorithm 3（AvgUtil Rank）的整体流程�
 3. **AvgUtil Rank 强盗反馈的理论间隙**：当前工作尚未闭合 AvgUtil Rank 在强盗反馈下的下界与上界间隙。当 τ 为常数时，是否仍存在线性下界，或能否在不依赖次线性变化假设（Assumption 4.2）的情况下实现次线性后悔，仍为开放问题。实验仅提供了经验证据，尚缺乏理论保证。
 
 4. **真实场景验证缺失**：所有实验均基于合成对抗环境或 LLM 路由仿真（HH‑RLHF 数据集）。在真实排序反馈场景（如骑乘共享匹配、在线约会）中的表现尚未评估，效用估计质量和探索策略是否需要调整仍有待研究。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_lg6H2oJPky/figures/011_Figure_10.jpg]]
-*Figure 10: The diagram of Algorithm 2 with InstUtil Rank under full-information feedback (top) and bandit feedback (bottom). ⃝+ represents the addition of (1 − γ) times the output the Alg and γ times a uniform distribution over A*
-
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_lg6H2oJPky/figures/012_Figure_11.jpg]]
-*Figure 11: The diagram of Algorithm 3 with AvgUtil Rank under full-information feedback (top) and bandit feedback (bottom). represents copying the estimated utility vector for t times. ⃝+ represents the addition of ( 1 - $\gamma$ ) times the output the Alg and γ times a uniform distribution over A*
-
-![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_lg6H2oJPky/figures/002_Table_1.jpg]]
-*Table 1: Summary of our contributions, including the negative results (top) and the positive results (bottom). The bottom table lists the minimal assumptions required to achieve sublinear regret in each setting (✓indicates that no additional assumptions are needed). Here, $\tau$ > 0 denotes the temperature parameter of the ranking model in (PL)*
-
-
-
 
 ## 定位与知识库关联
 
@@ -389,8 +363,6 @@ Algorithm 2（InstUtil Rank）和 Algorithm 3（AvgUtil Rank）的整体流程�
 **实证验证不足**：当前实验主要基于合成对抗环境和 LLM 路由任务（HH-RLHF 数据集）的初步仿真，尚未在真实排序反馈场景（如骑乘共享匹配、在线约会推荐）中部署验证。效用估计模块在高维、稀疏的真实排序数据上的鲁棒性，以及探索策略在非平稳偏好下的适应性，均有待进一步检验。
 
 **非平稳环境扩展**：本文理论建立在对抗性效用序列上，但 Assumption 4.2 限制了变化的剧烈程度。算法能否推广到更一般的非平稳环境（如偏好分布随时间漂移），并仍保持有意义的后悔保证，是一个值得探索的方向。
-
-
 
 ## 原文 PDF
 

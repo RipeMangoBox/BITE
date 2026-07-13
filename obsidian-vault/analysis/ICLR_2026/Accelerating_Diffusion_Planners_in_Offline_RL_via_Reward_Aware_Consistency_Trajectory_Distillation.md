@@ -51,8 +51,6 @@ claims:
 
 实验表明，RACTD 在 D4RL Gym‑MuJoCo 的 9 项任务上以 1 步采样（NFE=1）取得平均分 96.4，相比此前最优的 Diffuser（88.9）提升约 8.4%。在 hopper‑medium‑replay 任务上，推理时间从 Diffuser 的 0.644 秒降至 0.015 秒，实现 43 倍加速，同时分数从 93.6 提升至 109.5。消融分析确认：奖励目标在学生蒸馏阶段加入优于教师阶段加入；单步采样已接近多步采样性能；适当的奖励损失权重显式驱动分布向高奖励模式聚集。方法局限性在于需训练三个网络，且蒸馏训练存在损失波动风险。
 
-
-
 离线强化学习的核心挑战是从静态、混合质量的交互数据中学习高回报策略。扩散规划器（diffusion planners）通过建模动作序列的联合分布，能够有效捕获离线数据中蕴含的多模态行为模式，在标准基准任务上展现出超越传统方法的表现。然而，这类方法依赖迭代去噪采样，每一步推理都需要数十次甚至数百次网络前传（NFE），导致推理速度极慢，难以满足实时决策场景的延时约束。
 
 为缓解这一瓶颈，一致性蒸馏（Consistency Trajectory Distillation, CTD）等加速范式被引入，试图将多步扩散过程压缩为单步或极少步数的生成。CTD 由一致性轨迹模型损失（$\mathcal{L}_{\mathrm{CTM}}$）和去噪得分匹配损失（$\mathcal{L}_{\mathrm{DSM}}$）共同构成，理论上可将采样步数降为一次函数评估。然而，直接将 CTD 与离线 RL 结合时，现有方案暴露出两条关键缺陷：
@@ -63,8 +61,6 @@ claims:
 上述缺口直接推动本文的动机：**在一致性轨迹蒸馏的框架内，以完全解耦的方式将奖励信号注入学生模型，而不依赖于多步扩散采样或噪声感知的奖励模型**。具体而言，利用预训练的扩散教师捕获多模态行为分布，同时在噪声自由的"清洁"样本空间上引入一个独立训练的可微奖励模型，直接最大化学生单步输出动作的预期累积回报。这一设计使得奖励优化与蒸馏训练相互分离：教师负责提供行为多样性，奖励损失则以端到端可微的形式驱动学生将生成分布向高奖励模式聚集，无需在线执行分类器引导或多步反向传播奖励梯度。
 
 这一动机的合理性在后续实验中得到了直接印证——在 D4RL Gym‑MuJoCo 的 9 个任务上，所提方法（RACTD）仅需 **1 次函数评估** 即可取得 **96.4** 的平均分数，相对此前最佳结果提升 9.7%；在 hopper‑medium‑replay 任务上，推理耗时从基线 Diffuser 的 0.644 秒降至 **0.015 秒**，加速比达 43 倍（NFE 从 20 降至 1）；最高加速情形下可达 142 倍。奖励分布分析（Figure 3）进一步表明，RACTD 成功将生成样本集中于 D4RL 数据的高奖励模式，验证了"奖励感知蒸馏可实现模式选择与推理提速统一"的核心假设。
-
-
 
 ## 核心方法与创新机理
 
@@ -83,8 +79,6 @@ RACTD 的核心创新在于将**奖励优化直接融入一致性轨迹蒸馏过
 4. **极致的推理加速与性能增益**：得益于单步采样能力，RACTD 在 D4RL Gym-MuJoCo 9 个任务上以 NFE=1 取得平均分数 96.4，相比 Diffuser（NFE≥20，平均 88.9）提升约 8.4%（摘要宣称较此前 SOTA 提升 9.7%）。在 hopper-medium-replay 上，推理时间从 Diffuser 的 0.644 秒降至 0.015 秒，NFE 从 20 降为 1，实现 43 倍加速，同时分数从 93.6 提升至 109.5（Table 4）。在 Maze2d Large 长时序规划任务中，RACTD 以 1 NFE 达到 143.8，超过 Diffuser（256 NFE）的 123.0，接近教师模型（80 NFE）的 149.0 水平。
 
 消融实验进一步验证了奖励感知蒸馏设计的有效性：在 walker-medium 上，将奖励模型加入学生训练阶段的效果（118.8±0.3）显著优于加入教师训练阶段（94.5±2.6），这表明奖励驱动模式选择应在蒸馏阶段而非教师预训练阶段执行（Table 5）。此外，奖励损失权重存在最优值（hopper-medium-replay 上最佳权重 0.7 得 108.4±1.4），过高会导致训练不稳定（Figure 4），而 DSM 损失不可或缺——去除后将导致性能崩溃至 1.5±0.0（Table 14）。
-
-
 
 ![[assets/figures/papers/iclr26_0005_hRuTBS07C7_Accelerating_Diffusion_Planners_in_Offline_RL_vi/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of Reward Aware Consistency Trajectory Distillation (RACTD). We incorporate reward guidance with consistency trajectory distillation to train a student model that can generate actions with high rewards with only one denoising step*
@@ -113,8 +107,6 @@ $$
 - **输出**：高回报的固定长度未来动作序列；实际部署时仅执行第一个动作，形成闭环控制。
 
 这种设计实现了**完全解耦的训练**：教师只负责建模行为分布，奖励模型只负责提供偏好信号，学生蒸馏阶段将二者统一。相比需要多网络并发训练的演员‑评论家方法，RACTD 的训练过程更简单；同时由于学生仅需单步采样，推理速度获得数量级提升（如在 hopper‑medium‑replay 上相比 Diffuser 的 20 NFE 降至 1 NFE，加速 43 倍，见表 4）。
-
-
 
 RACTD 的架构由三个解耦模块构成，并通过将奖励优化直接嵌入一致性轨迹蒸馏，实现单步去噪生成高回报动作序列。
 
@@ -181,8 +173,6 @@ $$
 
 文献指出，这种奖励感知蒸馏可视为离策略确定性策略梯度的一种近似：学生单步生成的动作相当于确定性策略输出，奖励损失提供梯度方向，将采样分布聚集到高奖励模式（Figure 3 验证了这一模式选择效果）。需注意不同任务对损失权重敏感（附录 Table 9、Table 14–15），尤其是奖励权重过大可能引起训练不稳定。
 
-
-
 ## 实验与关键发现
 
 本节围绕 RACTD（Reward‑Aware Consistency Trajectory Distillation）在标准离线 RL 基准上的主结果、消融实验与吞吐效率展开分析，同时指出核心瓶颈与失败模式。所有实验均在 D4RL Gym‑MuJoCo、FrankaKitchen 和 Maze2d 三个环境中进行，对比基线涵盖行为克隆、模型‑free 离线 RL（CQL、IQL）、序列决策模型（DT、TT）、基于模型的方法（MOPO、MOReL、MBOP）以及扩散类方法（Diffusion QL、Consistency AC、Consistency BC、Diffuser）。
@@ -232,12 +222,8 @@ $$
 
 本实验未涉及安全性、公平性或分布外泛化的专门评估，且仅适用于具备可微奖励模型的离线任务，直接将不可微反馈（如规则评估器）纳入蒸馏仍需进一步研究。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0005_hRuTBS07C7_Accelerating_Diffusion_Planners_in_Offline_RL_vi/figures/003_Figure_3.jpg]]
 *Figure 3: The reward distribution of the D4RL hopper-medium-expert dataset and 100 rollouts from an unconditioned teacher, an unconditioned student, and RACTD*
-
-
 
 ## 定位与知识库关联
 
@@ -278,8 +264,6 @@ RACTD 的优势在以下条件下最为突出，超出这些边界则需要谨�
 -   如何将 RACTD 框架扩展到不可微奖励函数的场景（如基于稀疏规则的评估器），从而使方法能够服务于更广泛的离线决策任务？
 -   能否利用一个通用的无条件教师模型，针对不同下游任务仅重新训练或切换奖励模型，快速蒸馏出任务专属的单步规划器？这将大幅提升 RACTD 在多变任务环境下的迁移效率。
 -   当前实验显示，在多步采样下性能未见明显提升（NFE = 2 相比 NFE = 1 几乎持平），这是否意味着单步蒸馏已经逼近教师模型的能力上限？是否存在进一步突破该上限的蒸馏策略？
-
-
 
 ## 原文 PDF
 

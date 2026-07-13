@@ -50,8 +50,6 @@ InterMask的核心思想是将双人交互建模为离散2D运动Token的协同�
 
 在**InterHuman**和**InterX**两个基准数据集上，InterMask均取得了最优的生成保真度（FID分别为5.154和0.399），显著优于InterGen、in2IN等现有方法。消融实验进一步证实：2D Token图表示、时空注意力模块以及协同掩蔽建模策略，是性能提升的关键因素。此外，该方法在文本对齐、反应生成等任务上也展现出良好的能力。
 
-
-
 ### 问题背景
 
 三维人体运动生成旨在根据文本描述合成自然、逼真的人体动作序列，在动画制作、虚拟现实和具身AI等领域具有广泛应用。随着单人运动生成技术的成熟，研究前沿已逐步转向**双人交互生成**——即同时生成两个个体的运动序列，且要求两者在空间和时间维度上高度协调。这一任务的核心挑战在于：交互不仅需要每个人保持高质量的独立姿态，还必须精确捕捉人际间的时空耦合关系，例如舞蹈中的同步性、拳击中的攻防时机、以及日常互动中的空间接近度。
@@ -80,8 +78,6 @@ InterMask的核心思想是将双人交互建模为离散2D运动Token的协同�
 - 将两人运动Token**协同掩蔽与预测**，使模型能够联合学习人内时空注意力（个体内部姿态协调）和人际跨注意力（个体间交互协调），从而生成同步且富有表现力的双人交互。
 
 此外，为增强模型对时空结构的感知能力，InterMask引入**2D离散运动Token图**替代传统的1D序列Token，在保留时间维度的同时显式编码身体关节的空间布局，为协同掩蔽建模提供更丰富的结构先验。
-
-
 
 ## 核心方法与创新机理
 
@@ -119,8 +115,6 @@ Inter-M Transformer的架构设计直接服务于“人内-人际”双重依赖
 | 推理方式 | 多步迭代去噪 | 渐进式Token揭示（20次迭代） | 配合余弦调度与置信度重掩蔽 |
 
 这些创新并非孤立存在，而是形成了完整的因果链条：2D Token图提供了保留时空结构的高保真离散表示，协同掩蔽建模迫使模型学习联合分布，而三层注意力架构为捕获人内演化与人际协调提供了结构化的信息通道。三者的协同作用使InterMask在InterHuman（FID 5.154）和InterX（FID 0.399）两个数据集上均取得了最优的交互生成质量。
-
-
 
 InterMask 采用两阶段生成范式，将双人 3D 交互建模为离散 Token 的协同掩蔽与预测任务。整个 pipeline 由四个核心模块串联构成：**2D Motion VQ-VAE Encoder**、**Learnable Codebook C**、**Inter-M Transformer** 和 **2D Motion VQ-VAE Decoder**，辅以冻结的 CLIP 文本编码器提供条件信号。
 
@@ -167,8 +161,6 @@ $$\mathcal{L}_{mask} = \sum_{\tilde{t}_k = [\mathrm{MASK}]} -\log p_{\theta}(t_k
 ### 与替代方案的对比
 
 为验证协同建模的必要性，作者设计了替代建模方案（Figure 10）：训练时仅更新一个体的嵌入而条件于另一个体，推理时交替预测和重掩蔽每个个体的 Token。该方案 FID 为 **7.637**，显著劣于协同建模的 **5.154**（Table 3），证实了同时预测双方 Token 对于生成协调交互的不可替代性。
-
-
 
 InterMask 的核心架构由两个阶段级联构成：**2D 运动 VQ-VAE** 负责将个体运动压缩为离散 Token 图，**Inter-M Transformer** 在此基础上以协同掩码建模方式生成双人交互序列。以下逐一展开关键模块及其公式。
 
@@ -227,18 +219,8 @@ $$
 
 推理从完全掩码的 Token 序列 $\{t_a(0), t_b(0)\}$ 出发，在 $I$ 次迭代中渐进式揭示 Token。每轮迭代中，模型预测所有掩码位置的概率分布，根据置信度保留部分 Token 并重新掩码其余位置，保留比例由余弦调度控制。最终将预测的 Token 图经 VQ-VAE 解码器还原为运动序列 $\{\mathbf{m}_a, \mathbf{m}_b\}$。整个过程固定为 20 次迭代，无需扩散模型的多步去噪。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1782_InterMask_3D_Human_Interaction_Generation_via_Collaborative_Masked_Model/figures/011_Figure_7.jpg]]
-*Figure 7: Detailed illustration of the 2d discrete motion token map construction. The 2d encoder, consisting of 2d convolutional layers, downsamples the input motion from*
-
-![[assets/figures/papers/paper_list_l1782_InterMask_3D_Human_Interaction_Generation_via_Collaborative_Masked_Model/figures/012_Figure_8.jpg]]
-*Figure 8: Illustration of the two-stage masking technique used during training of the Inter-M Transformer. For stage 1, we either apply Random Masking with a probability of*
-
 ![[assets/figures/papers/paper_list_l1782_InterMask_3D_Human_Interaction_Generation_via_Collaborative_Masked_Model/figures/017_Figure_10.jpg]]
 *Figure 10: Overview of the Alternative Modeling approach, where we predict the tokens of one person at a time. (a) During training, only the embeddings of one individual*
-
-
 
 ## 实验与关键发现
 
@@ -279,9 +261,6 @@ InterMask 在两个主流双人交互数据集上均取得了最优的生成质�
 
 1. **身体穿透问题。** 当输出骨架转换为 SMPL 网格时，可能出现两人身体相互穿透的情况（Figure 14 第一行）。这是因为当前训练仅在骨架层面进行，未引入网格级碰撞约束。未来可探索在训练中加入网格转换及抗穿透损失。
 
-![[assets/figures/papers/paper_list_l1782_InterMask_3D_Human_Interaction_Generation_via_Collaborative_Masked_Model/figures/021_Figure_14.jpg]]
-*Figure 14: Examples of Limitations of our method. The first row shows body penetration when converted from output skeleton to SMPL mesh. The second row shows implicit bias towards dancing*
-
 2. **数据集隐性偏差。** 模型可能继承训练数据的偏见，例如在文本提示未明确要求舞蹈时错误生成舞蹈动作（Figure 14 第二行）。这一问题的根源在于数据集中舞蹈类交互占比较高，模型倾向于将交互泛化为舞蹈模式。
 
 3. **序列长度限制。** 由于 Token 图的尺寸固定，当前方法仅支持最长约 10 秒的运动序列。处理更长序列需要重新设计 Token 表示，例如采用可变维度 Token 图或层次化建模策略。
@@ -289,19 +268,6 @@ InterMask 在两个主流双人交互数据集上均取得了最优的生成质�
 ### 用户研究
 
 为验证生成结果的感知质量，论文在 Amazon Mechanical Turk 上进行了用户研究（Figure 5），仅选用高信誉评估者（Master 资格、>97% 任务批准率、>1000 次已批准任务）。评估者需在 InterMask 与 InterGen 的生成结果中选择更符合文本描述且交互更自然的一方。结果显示，InterMask 在交互质量和文本一致性上均获得显著偏好，进一步支持了定量指标的优势。
-
-![[assets/figures/papers/paper_list_l1782_InterMask_3D_Human_Interaction_Generation_via_Collaborative_Masked_Model/figures/006_Figure_5.jpg]]
-*Figure 5: User Study comparing our Inter-Mask and InterGen (Liang et al., 2024)*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1782_InterMask_3D_Human_Interaction_Generation_via_Collaborative_Masked_Model/figures/018_Figure_11.jpg]]
-*Figure 11: Qualitative results for the ablation study on Motion VQ-VAE to verify the proposed 2D token map*
-
-![[assets/figures/papers/paper_list_l1782_InterMask_3D_Human_Interaction_Generation_via_Collaborative_Masked_Model/figures/019_Figure_12.jpg]]
-*Figure 12: Qualitative results for the ablation study on Inter-M Transformer to verify contributions of the proposed Attention modules*
-
-
 
 ## 定位与知识库关联
 
@@ -367,8 +333,6 @@ InterMask 在以下场景中展现出显著优势：
 4. **推理效率的保持**：随着数据集规模增大（如 InterX 比 InterHuman 更大更多样），掩蔽生成模型在推理速度（20 次迭代）和内存消耗上相对扩散模型（通常需要更多去噪步骤）已具有优势。但如何在模型容量扩展时保持这一优势，仍需进一步研究。
 
 5. **多人与物体交互的泛化**：当前方法聚焦于两人交互。将协同掩蔽建模框架扩展到多人（>2）或人-物交互场景，需要重新设计 Token 组织方式和注意力机制，以应对指数级增长的交互依赖关系。
-
-
 
 ## 原文 PDF
 

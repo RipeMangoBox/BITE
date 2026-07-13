@@ -143,8 +143,6 @@ Think360° 基准的构建遵循一条三阶段流水线，其核心目标是从
 
 整个框架的输入是多源异构的多模态数据，输出则是一个结构化的、专门针对推理宽度的基准数据集，以及一套能够从深度和宽度两个维度量化模型表现的评估协议。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l829_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Think_360deg_Beyo/figures/002_Figure_2.jpg]]
 *Figure 2: Three-stage pipeline for constructing Think360◦—beginning with diverse seed data collection, progressing through a two-step quality filter (rule-based heuristics and human double-check), and finalized through targeted annotation & refinement (as demonstrated by proof- and game-based problems)*
 
@@ -175,9 +173,6 @@ Think360° 的构建遵循三阶段管道（见 Figure 2），旨在从异质来
 
 为量化模型的推理宽度与深度，本文提出 **ToT-Eval** 协议，包含两个核心模块（见 Figure 4）。
 
-![[assets/figures/papers/paper_list_l829_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Think_360deg_Beyo/figures/005_Figure_4.jpg]]
-*Figure 4: Tree-of-Thought Evaluation from the perspective of depth and width*
-
 **模块一：思维树构建**
 给定模型对问题的完整输出（包含推理过程与最终答案），使用 GPT-4o 作为提取器，执行以下步骤：
 1. **步骤提取**：从模型输出中逐字提取关键推理步骤，每个步骤被视为思维树中的一个节点。
@@ -202,11 +197,6 @@ Think360° 的构建遵循三阶段管道（见 Figure 2），旨在从异质来
 - **评判器依赖**：ToT-Eval 全程依赖 GPT-4o 进行步骤提取与正确性评判，可能引入评判模型自身的系统性偏差。对于复杂推理链，节点正确性的判定存在噪声。
 - **宽度定义的范围**：当前宽度得分仅统计有效分支数量，未区分分支的质量差异（如部分正确但未完成的探索），也未显式建模回溯行为的计算成本。
 - **输出截断影响**：部分模型因最大输出长度限制，可能无法完整展示其宽度探索，导致宽度得分被低估。实验设置中虽已配置各模型的最大支持输出长度，但该交互影响未被严格控制。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l829_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Think_360deg_Beyo/figures/001_Figure_1.jpg]]
-*Figure 1: The concepts illustration for the width and depth in the information propagation process of neural network and reasoning. Drawing insights from the classical designs in neutral network: shortcut skipping or dropout, pyramid feature, layer stacking and gradient back propagation, we analogize these to the strategies: pruning, divide-and-conquer, trial-and-error and backtracking to distinguish depth versus width in inference processes*
 
 ## 实验与关键发现
 
@@ -246,16 +236,8 @@ ToT-Eval 协议（Figure 4）从思维树中量化两个正交维度：ToT-Depth
 
 附录中的模态消融实验（Section 4.1 details）对比了 Text-Only 与 Image-Only 条件下的表现。结果表明，多模态输入对 Think360° 中的多数任务至关重要，纯文本条件下模型表现显著下降，证实视觉信息在宽度推理中并非干扰因素，而是提供关键约束和搜索线索的必要条件。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l829_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Think_360deg_Beyo/figures/007_Table_2.jpg]]
 *Table 2: Comparison with existing multimodal math benchmarks. Level: K =K-12, U=University, C =Competition. Source: S =Self-sourced, P =Collected from Public Dataset*
-
-![[assets/figures/papers/paper_list_l829_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Think_360deg_Beyo/figures/006_Figure_5.jpg]]
-*Figure 5: Frequency distribution and co-occurrence patterns of cognitive skills required for solving problems in Think360 . The left panel shows the frequency distribution of individual cognitive capabilities across our benchmark, while the right panel presents a chord diagram illustrating the co-occurrence relationships between different cognitive skills. Please zoom in for a better view*
-
-![[assets/figures/papers/paper_list_l829_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Think_360deg_Beyo/figures/004_Figure_3.jpg]]
-*Figure 3: Demonstration of the Think360 data cases. The figure offers paired examples of three width-oriented reasoning patterns: Inductive Reasoning, Deductive Reasoning, and Probabilistic Reasoning, and tightly linked cognitive skills: Branchand-Bound, Hypothesize-and-Test, and Divide-and-Conquer*
 
 ## 定位与知识库关联
 

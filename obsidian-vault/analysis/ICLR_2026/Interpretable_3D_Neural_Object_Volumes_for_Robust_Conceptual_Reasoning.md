@@ -75,8 +75,6 @@ CAVE属于**内建可解释模型**，但与现有内建方法存在本质差异
 
 CAVE目前针对单物体中心图像设计，在多物体场景中概念主要定位在中心物体上；对于缺乏一致部件结构的类别（如Boat），同一概念在不同子类或视角下可能定位到几何对称的不同端点；在强视角变化或严重变形（OOD-CV）下，概念有时会错误激活对称部件。扩展到多物体场景、非刚性类别，以及利用概念基进行模型诊断和对抗鲁棒性分析，是未来的开放方向。
 
-
-
 ### 3D感知分类的鲁棒性红利与可解释性盲区
 
 深度学习视觉模型在分布偏移（OOD）下的脆弱性，催生了一类以三维物体体积（Neural Object Volumes, NOVs）为核心的3D感知分类器。这类方法通过在3D空间中学习物体的体积表征，将分类决策锚定在几何一致的物体模型上，从而显著提升了OOD鲁棒性。其中，**NOVUM**（Jesslen et al., 2024）是这一范式的代表性工作：它为每个类别学习一个由约1130个密集3D高斯组成的体积，每个高斯携带可学习的特征向量；分类时，2D图像特征与这些高斯特征进行逐位置的最大余弦相似度匹配并求和，得到类别得分。
@@ -104,8 +102,6 @@ NOVUM的成功揭示了一个关键洞察：**将分类器“锚定”在3D物�
 3. **弱监督可行性**：能否解除对真实3D姿态标注的依赖，使方法在仅使用零样本姿态估计的条件下仍保持竞争性能？
 
 本文提出的**CAVE（Concept Aware Volumes for Explanations）**正是围绕这三个问题展开的系统性解决方案。
-
-
 
 ## 核心方法与创新机理
 
@@ -148,8 +144,6 @@ $$\text{3D-C}(\mathcal{X}_y, h) = 1 - \frac{1}{2} \left[ \frac{1}{n_y^2} \sum_{x
 CAVE 将 NOV 的形状从长方体扩展为椭球体（Section 4.2），在 OOD 精度和可解释性之间提供了更好的权衡。消融实验（Appendix H, Table H2-H3）表明，椭球体 NOV 在重度遮挡下比长方体提高 2-3% 的 OOD 精度，同时保持概念的空间一致性。这一修改利用了椭球体更自然的物体包围几何，使高斯分布更贴合物体表面，从而提取出更具几何一致性的概念基。
 
 **证据强度评估**：上述四个 changed slots 均有充分的定量和定性证据支持（置信度 0.95-0.98）。概念稀疏化的性能保持（Fig. 7）、NOV 感知 LRP 的守恒性（Fig. I1）、零样本姿态估计的可行性（Table 2）以及 3D-C 指标的区分度（Table 1）均通过了多数据集、多随机种子的验证。需要注意的是，椭球体形状的优势主要在 OOD 设置下显著，在分布内数据上与长方体的差异较小，这一结论的泛化性需要在更多类别上进一步验证。
-
-
 
 ![[assets/figures/papers/paper_list_l38_https_openreview_net_forum_id_VSPLa2Sito/figures/001_Figure_1.jpg]]
 
@@ -215,8 +209,6 @@ $$R_{F_x}(i,c) = R_{F_x}^{\text{spatial}}(i) \cdot \frac{(f_i \odot \mathcal{H}_
 
 CAVE 的核心洞察在于：将3D体积上的密集高斯特征转化为**稀疏、几何一致的概念基**，既保持了3D感知带来的OOD鲁棒性，又通过概念激活的精确分解实现了模型内在可解释性。实验表明，这一框架在分类精度上持平甚至略优于密集匹配的 NOVUM（OOD-CV 84.0% vs. 81.3%），同时在概念空间局部化、物体覆盖率和3D一致性上显著超越所有后置解释方法和内建可解释基线。
 
-
-
 ### 3.1 从密集高斯匹配到稀疏概念匹配
 
 CAVE的核心改造对象是NOVUM（Jesslen et al., 2024）的分类机制。NOVUM的分类logit由图像特征与每个类别上约1130个密集高斯特征的最大余弦相似度求和得到：
@@ -264,8 +256,6 @@ $$\mathbf { 3 D - C } ( \mathcal { X } _ { y } , h ) = 1 - \frac { 1 } { 2 } \le
 ### 3.4 弱监督姿态估计
 
 CAVE解除了NOVUM对真实3D姿态标注的依赖。在弱监督设置下，使用Orient-Anything（Wang et al., 2025b）进行零样本姿态估计，预测物体的方位角、极角和旋转角度，用于将NOV与输入图像的3D姿态对齐。实验表明，使用估计姿态的CAVE在分类精度上仅与全监督存在适度差距，仍保持竞争性能（Table 2），证明了NOV-based分类器对姿态标注质量的鲁棒性。
-
-
 
 ## 实验与关键发现
 
@@ -315,15 +305,11 @@ Figure 1b的鲁棒性-可解释性权衡图进一步确认：CAVE在两个轴上
 
 4. **姿态估计误差的传导**。虽然CAVE对姿态误差具有一定容忍度，但Orient-Anything在细粒度角度估计上仍存在显著误差（如旋转角在±10°容差下准确率仅约30%）[Table E1]。在更大规模数据集上，这一误差对概念质量和分类精度的影响可能被放大。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l38_https_openreview_net_forum_id_VSPLa2Sito/figures/045_Figure_30.jpg]]
 *Figure 30: Figure I1: Violin plot on relevance conservation of Ours vs. Vanilla Layer-wise Relevance Propagation (LRP), where 0 indicates perfect conservation. Our NOV-aware LRP achieves near-perfect conservation compared to Vanilla LRP*
 
 ![[assets/figures/papers/paper_list_l38_https_openreview_net_forum_id_VSPLa2Sito/figures/046_Table_16.jpg]]
 *Table 16: Table I1: Quantitative comparison of different attribution methods for CAVE, evaluated on spatial localisation, object coverage, and 3D consistency*
-
-
 
 ## 定位与知识库关联
 
@@ -389,8 +375,6 @@ CAVE直接继承 **NOVUM**（Jesslen et al., 2024）的3D感知框架，但在�
 4. **3D-C指标的泛化**：3D-C指标依赖CAD模型进行归因投影，能否推广到没有CAD模型的场景（如通过NeRF或3D Gaussian Splatting隐式表征）？
 
 5. **大规模扩展**：在更大规模数据集（如完整ImageNet）上，零样本姿态估计误差对概念质量和分类精度的影响如何进一步缓解？是否需要类别特定的姿态估计策略？
-
-
 
 ## 原文 PDF
 

@@ -55,8 +55,6 @@ claims:
 
 本方法的主要局限在于：要求所有投影仪共享公共投影区域，对于不重叠的大范围部署需分组标定；目前仅支持平面标定靶；精度略低于使用大量棋盘角点的传统方法（约+0.2像素），但可通过增加嵌入式相机数量进一步提升。
 
-
-
 ### 多投影仪系统的标定瓶颈
 
 大规模多投影仪系统（如沉浸式显示墙、投影映射、光雕投影）需要精确的几何标定，以确保多台投影仪输出的图像在空间上无缝对齐。标定的核心任务是建立每台投影仪像素坐标与三维空间中对应点之间的映射关系，即估计投影仪的内参（焦距、光心）和外参（位置与朝向）。
@@ -89,8 +87,6 @@ $$\lceil \log_2 M \rceil + \lceil \log_2 W \rceil + \lceil \log_2 H \rceil + L$$
 2. **保证标定精度**：在显著提升效率的同时，维持与传统方法可比的重投影精度（亚像素级）。
 3. **增强环境光鲁棒性**：利用嵌入式相机直接接收投影光（而非依赖漫反射），在强环境光（如户外阳光）下仍能可靠工作。
 4. **补偿系统误差**：通过离线标定的单应变换，补偿嵌入式相机光学中心与标定板平面之间的微小偏移，确保高精度几何对齐。
-
-
 
 ## 核心方法与创新机理
 
@@ -140,8 +136,6 @@ $$\pmb{x}_n(m) = \mathcal{M}_n(\pmb{c}_n(m))$$
 - **结构光编码**：采用经典的 Gray-code 加线移图案方案，额外增加投影仪 ID 的二进制时间编码，实现对多投影仪源的区分。
 - **差异化定位**：与基于外部相机阵列或全光相机的方法不同，本文不增加外部观测设备，而是将相机微型化并嵌入标定目标本身，实现了“标定目标即传感器”的范式转换。
 
-
-
 本文提出的多投影仪标定方法通过**反向配置**彻底重构了传统标定流程：将相机从“外部观察者”转变为“嵌入式方向传感器”，从而将标定效率从与投影仪数量线性相关压缩为近乎常数。
 
 ### 核心流程
@@ -178,13 +172,6 @@ $$\pmb{x}_n(m) = \mathcal{M}_n(\pmb{c}_n(m))$$
 
 传统方法（Zhang 式串行标定）的瓶颈在于：外部相机通过漫反射捕获图案时，所有投影仪的光线在像面上**不可区分地叠加**，必须依赖时间分离（串行投影）。本方法通过将相机嵌入标定板表面，使光学中心与标定平面共面，相机直接按入射方向捕获投影光，从而在**单次采集中实现多投影仪图案的方向性分离**。这一“反向配置”是打破可扩展性瓶颈的因果开关——标定时间不再随投影仪数量线性增长，而是仅增加一个 $\lceil \log_2 M \rceil$ 的微小常数项。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2114_https_arxiv_org_abs_2604_24024/figures/001_Figure_1.jpg]]
-*Figure 1: Imaging principle of simultaneously projected structured light patterns from multiple projectors: (a) Overlapping patterns captured by an external camera are difficult to separate, whereas (b) the embedded cameras directly receive the projection light, enabling separation of individual patterns*
-
-
-
 ### 方向性编码与图案分离
 
 本文方法的核心机制在于将相机嵌入标定板表面，使光学中心与标定平面共面，从而直接按入射方向捕获投影光。这一反向配置（相机朝向投影仪并作为标定目标）使得来自不同位置的投影仪光线落在相机像面的不同像素上，实现了多投影仪图案的方向性分离。如 **Figure 1** 所示，外部相机通过漫反射捕获重叠图案时丧失入射方向信息，无法区分不同投影仪的图案；而嵌入式相机直接接收投影光，可按入射方向分离各投影仪的图案。
@@ -217,16 +204,6 @@ $$M \times \left( \lceil \log_2 W \rceil + \lceil \log_2 H \rceil + L \right)$$
 $$\lceil \log_2 M \rceil + \lceil \log_2 W \rceil + \lceil \log_2 H \rceil + L$$
 
 其中新增项 $\lceil \log_2 M \rceil$ 用于编码投影仪ID（通过投影均匀白/黑图像的二进制时间序列），其值远小于与分辨率相关的项。例如在25台投影仪实验中，传统方法需1,100幅图案，而本文方法仅需54幅，减少95%。该公式揭示了方法的核心优势：**标定时间几乎与投影仪数量无关**，仅随投影仪数量的对数增长。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2114_https_arxiv_org_abs_2604_24024/figures/002_Figure_2.jpg]]
-*Figure 2: Geometric relationship of light rays in the proposed method for the case of two projectors*
-
-![[assets/figures/papers/paper_list_l2114_https_arxiv_org_abs_2604_24024/figures/004_Figure_4.jpg]]
-*Figure 4: Measurement method of the intersection point*
-
-
 
 ## 实验与关键发现
 
@@ -264,21 +241,8 @@ $$\lceil \log_2 M \rceil + \lceil \log_2 W \rceil + \lceil \log_2 H \rceil + L$$
 
 本文与传统方法的比较在参考点数量可比（4点vs 4点）的条件下进行，具有合理的公平性。传统方法在使用108个棋盘角点时能获得0.34–0.39像素的更优精度，但本文方法同样可以通过增加嵌入式相机数量来缩小这一差距。此外，本文方法的精度损失（约+0.2像素）在实际投影应用中通常不可感知，而95%的图案数量减少和户外环境光鲁棒性带来的实际收益远超这一微小代价。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2114_https_arxiv_org_abs_2604_24024/figures/006_Figure_5.jpg]]
-*Figure 5: Prototype calibration board*
-
-![[assets/figures/papers/paper_list_l2114_https_arxiv_org_abs_2604_24024/figures/007_Figure_8.jpg]]
-*Figure 8: Alignment results of red and green checkerboard patterns projected from two projectors. (Top) Overall view; (Bottom) Magnified view*
-
 ![[assets/figures/papers/paper_list_l2114_https_arxiv_org_abs_2604_24024/figures/009_Figure_9.jpg]]
 *Figure 9: MTF comparison for the two-projector alignment*
-
-![[assets/figures/papers/paper_list_l2114_https_arxiv_org_abs_2604_24024/figures/010_Figure_10.jpg]]
-*Figure 10: Experiment with 25 projectors. (a) The calibration board under simultaneous Gray-code projection. (b) Corresponding image captured by one of the embedded cameras with decoded coordinates overlaid. (c) Result of the alignment projection*
-
-
 
 ## 定位与知识库关联
 
@@ -347,8 +311,6 @@ $$\lceil \log_2 M \rceil + \lceil \log_2 W \rceil + \lceil \log_2 H \rceil + L$$
 - **多设备协同标定**：将标定从单投影仪串行扩展至多投影仪并行，解决了大规模投影系统的可扩展性瓶颈。
 
 该方法在概念上与**分布式孔径成像**和**多视角几何标定**存在潜在关联，但其核心创新——通过嵌入式相机实现方向性图案分离——在当前文献中尚无直接对应工作，属于原创性贡献。
-
-
 
 ## 原文 PDF
 

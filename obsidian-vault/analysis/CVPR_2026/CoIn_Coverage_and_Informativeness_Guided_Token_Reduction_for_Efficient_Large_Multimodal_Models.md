@@ -49,8 +49,6 @@ claims:
 
 在 LLaVA-1.5-13B 模型上，CoIn 仅保留 **5.6%** 的视觉令牌（32 个令牌）时，在 9 个基准上平均性能仍达到原始模型的 **91.0%**，显著优于 **DivPrune**（Alvar et al., CVPR 2025）的 88.6% 等强基线方法。当保留 128 个令牌时，平均性能保持在 96.2%。该方法不依赖特定的视觉编码器或注意力实现，与 FlashAttention 及 KV 缓存兼容，具有良好的泛化性。
 
-
-
 ### 大模态模型的效率瓶颈
 
 大模态模型（Large Multimodal Models, LMMs）通过将视觉编码器与大语言模型（LLM）集成，在图像理解、视觉问答和视频分析等任务上取得了显著进展。其标准前向过程可表示为：
@@ -91,8 +89,6 @@ $$S^{\star} = \operatorname*{argmin}_{S \subseteq V, |S| = K} \mathcal{D}\big( f
 
 这种设计使 CoIn 在 LLaVA-1.5-13B 上仅保留 5.6% 的视觉令牌（32 个令牌）时，仍能在 9 个基准上达到 91.0% 的平均相对性能，显著优于所有基线方法。
 
-
-
 ## 核心方法与创新机理
 
 CoIn 的核心创新在于将视觉令牌精简重新形式化为一个**最优子集选择问题**，并通过两个互补的准则——**信息量（Informativeness）**与**覆盖范围（Coverage）**——联合引导选择过程。这与既有方法形成了根本性的差异。
@@ -129,8 +125,6 @@ Figure 5 直观展示了这一差异：基于重要性的方法选出的令牌�
 
 CoIn 是一种**无需训练的令牌选择策略**，不依赖特定的视觉编码器或注意力实现，与 FlashAttention 及 KV 缓存兼容。其核心贡献在于将令牌精简从启发式排序提升为原则性的子集优化，并通过信息量与覆盖范围的联合建模，在极低令牌预算下仍保持模型性能。在 LLaVA-1.5-13B 上，CoIn 仅保留 5.6% 的令牌（32 个）时，在 9 个基准上的平均相对性能达 91.0%，显著优于所有基线方法（如 DivPrune 的 88.6%）。
 
-
-
 CoIn 将视觉令牌精简重新形式化为一个**最优子集选择问题**，其核心思想是同时优化两个互补准则——**信息量（informativeness）**与**覆盖范围（coverage）**——从而在特征空间中选出一个既显著又具有代表性的紧凑令牌子集。整体流程如图 3 所示，包含两个关键模块：信息量估计与覆盖感知选择，二者共享输入特征并协同工作，最终通过贪心算法输出精简后的令牌子集。
 
 **输入与输出流。** 给定大模态模型（LMM）中视觉编码器输出的视觉令牌集合 $V$（含 $N$ 个令牌，每个令牌对应一个 $d$ 维特征向量）以及由文本编码器或嵌入层产生的文本令牌集合 $T$，CoIn 的目标是从 $V$ 中选出大小为 $K$（$K \ll N$）的子集 $S$，使得模型在使用 $S$ 替代 $V$ 时的输出差异最小化：
@@ -160,12 +154,8 @@ $$S^{*} = \arg\max_{\boldsymbol{S} \subseteq \boldsymbol{V}, |\boldsymbol{S}| = 
 
 其中 $\alpha$ 平衡信息量与覆盖范围的权重。由于精确求解该组合优化问题是 NP-hard，CoIn 采用贪心算法逐步选择令牌：每次迭代选择能使当前目标函数增益最大的令牌加入子集，直至达到预算 $K$。该过程无需训练，与 FlashAttention 及 KV 缓存完全兼容，可即插即用于各类 LMM 架构。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l742_https_openaccess_thecvf_com_content_CVPR2026_html_Du_CoIn_Coverage_and_I/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of our proposed CoIn. We first calculate the informativeness and coverage score using input tokens, then apply a greedy subset selection algorithm to obtain the subset*
-
-
 
 CoIn 将视觉令牌精简重新形式化为一个最优子集选择问题，其核心由两个互补模块构成：**信息量估计**与**覆盖感知选择**。
 
@@ -217,16 +207,6 @@ $$S^{*} = \arg\max_{\boldsymbol{S} \subseteq \boldsymbol{V}, |\boldsymbol{S}| = 
 
 其中 $\alpha \in [0, 1]$ 平衡信息量求和与覆盖范围对数行列式的权重。由于子集选择是组合优化问题，CoIn 采用贪心算法近似求解，逐步选择能最大化边际增益的令牌。消融实验（Table 6）证实，联合使用信息量和覆盖范围的完整 CoIn 优于仅使用信息量或仅使用覆盖范围的变体，验证了两个准则的互补性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l742_https_openaccess_thecvf_com_content_CVPR2026_html_Du_CoIn_Coverage_and_I/figures/004_Figure_4.jpg]]
-*Figure 4: Illustration of informativeness criteria. Given the same image and the query ”What color are the child’s shoes?”, (a) intrinsic saliency emphasizes visually prominent regions irrespective of the prompt, while (b) cross-modal alignment highlights query-relevant tokens. Red indicates high scores; blue indicates low scores. (c) Performance using saliency only, crossmodal alignment only, and their combination*
-
-![[assets/figures/papers/paper_list_l742_https_openaccess_thecvf_com_content_CVPR2026_html_Du_CoIn_Coverage_and_I/figures/005_Figure_5.jpg]]
-*Figure 5: Illustration of coverage criteria. Blue dots represent all visual tokens, while red dots denote the selected ones. The importance-based method selects tokens that are highly concentrated, the diversity-based method selects locally diverse tokens, and our approach achieves more globally distributed coverage*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -249,9 +229,6 @@ CoIn 在多个主流大模态模型和基准上展现了强泛化能力。在 **
 
 效率方面，CoIn 在 LLaVA-1.5-13B 上实现 **94.4% 的令牌缩减**，同时推理延迟和内存占用大幅下降（Table 5），且与 FlashAttention 和 KV 缓存完全兼容，无需额外训练。
 
-![[assets/figures/papers/paper_list_l742_https_openaccess_thecvf_com_content_CVPR2026_html_Du_CoIn_Coverage_and_I/figures/010_Table_5.jpg]]
-*Table 5: Efficiency Analysis. ∆ represents the reduction ratio*
-
 ### 消融实验
 
 **信息量与覆盖范围的互补性。** Table 6 显示，单独使用信息量（Info-only）或单独使用覆盖范围（Cov-only）均显著弱于完整 CoIn。这表明两个准则存在互补——信息量捕获令牌的显著性，覆盖范围确保所选子集的全局多样性，二者联合才能选出既显著又具代表性的紧凑子集。
@@ -262,9 +239,6 @@ CoIn 在多个主流大模态模型和基准上展现了强泛化能力。在 **
 
 CoIn 引入两个关键超参数：平衡信息量与覆盖范围的 **α**，以及平衡内在显著性与跨模态对齐的 **β**。Figure 6 展示了在 Qwen 实验的 7 个基准上不同 α 和 β 设置下的平均性能。结果表明，方法对超参数在合理范围内具有一定鲁棒性，但针对不同模型和数据集仍需手动调节以获得最佳性能，这构成实际部署中的一个局限性。
 
-![[assets/figures/papers/paper_list_l742_https_openaccess_thecvf_com_content_CVPR2026_html_Du_CoIn_Coverage_and_I/figures/012_Figure_6.jpg]]
-*Figure 6: Performance under different hyperparameter settings of α and β. Avg. denotes the average performance over 7 benchmarks in the Qwen experiment*
-
 ### 关键图表结论
 
 - **Figure 1**：CoIn 在多样基准上均超越强基线，同时显著提升推理效率，验证了方法的整体有效性。
@@ -272,18 +246,8 @@ CoIn 引入两个关键超参数：平衡信息量与覆盖范围的 **α**，�
 - **Figure 5**：基于重要性的方法所选令牌高度集中，基于多样性的方法仅实现局部多样，而 CoIn 基于体积的覆盖范围准则能实现更全局的分布覆盖，避免冗余。
 - **Table 1–4**：跨模型、跨基准、跨令牌预算的一致性优势，确证了 CoIn 的泛化能力和免训练特性。
 
-![[assets/figures/papers/paper_list_l742_https_openaccess_thecvf_com_content_CVPR2026_html_Du_CoIn_Coverage_and_I/figures/001_Figure_1.jpg]]
-*Figure 1: Overall performance and efficiency of CoIn. (a) CoIn outperforms strong baselines across diverse benchmarks. (b) It significantly boosts inference efficiency with reduced computation and memory cost*
-
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l742_https_openaccess_thecvf_com_content_CVPR2026_html_Du_CoIn_Coverage_and_I/figures/013_Table_6.jpg]]
 *Table 6: Ablation on coverage and informativeness. “Info” and “Cov” respectively denote informativeness and coverage terms*
-
-![[assets/figures/papers/paper_list_l742_https_openaccess_thecvf_com_content_CVPR2026_html_Du_CoIn_Coverage_and_I/figures/011_Table_7.jpg]]
-*Table 7: Ablation on the decomposition of informativeness. ”IS” and ”CA” stand for intrinsic saliency and cross-modal alignment respectively*
-
-
 
 ## 定位与知识库关联
 
@@ -320,8 +284,6 @@ CoIn 是一个**免训练**的令牌选择策略，与 FlashAttention 及 KV 缓
 2. **跨模态扩展**：当前框架针对单张图像的视觉令牌精简，是否可以扩展到视频时间维度的令牌选择或三维场景表示的空间令牌精简？这需要将覆盖范围的定义从静态特征空间推广到时序或空间结构约束下的子集选择问题。
 
 这两个问题在提供的分析中标记为 open_questions，原文是否有相关讨论需人工确认。
-
-
 
 ## 原文 PDF
 

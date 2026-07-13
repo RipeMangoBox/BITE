@@ -56,15 +56,11 @@ claims:
 
 本方法在方法谱系上属于**几何监督增强的视频扩散模型**，区别于纯像素级的视频生成基线（如SVD）和基于4D高斯重建的显式场景表示方法。其知识贡献在于将DUSt3R式的跨视图点云对齐策略融入时序扩散框架，实现了从“生成视频”到“生成4D场景流”的能力跃迁，为机器人操作提供了一种可提取6DoF末端执行器轨迹的视觉规划前端。
 
-
-
 机器人操作任务要求智能体在动态三维环境中精确感知物体几何、推理空间关系并执行时序连贯的动作。视觉感知作为核心环节，其质量直接影响下游策略的成败。近年来，视频生成模型在视觉内容合成上取得了显著进展，为机器人领域提供了通过预测未来视觉观测来辅助决策的新范式。然而，将通用视频生成模型直接应用于机器人操作面临一个根本性瓶颈：**现有模型难以同时保证时间连贯性和跨视角三维几何一致性，尤其对于多物体的动态操作场景。**
 
 具体而言，以 **SVD**（Blattmann et al., 2023）为代表的像素级视频扩散模型虽然具备强大的时序建模先验，但其缺乏对三维场景结构的显式理解，各视角独立预测，无法保证不同相机视角下生成的RGB帧在空间上对齐。另一方面，**4D Gaussian**（Wang et al., 2024a）等3D感知方法虽然能够重建动态场景的几何表示，却局限于静态或简单背景，难以泛化至包含复杂物体交互和机器人运动的操作场景。这种“时序连贯”与“空间一致”之间的割裂，构成了当前4D视频生成在机器人领域应用的核心缺口。
 
 本工作的动机正是弥合这一缺口：**在保留预训练视频扩散模型时序建模能力的同时，引入三维几何约束，使模型能够生成跨视角几何一致的4D视频（RGB‑D序列）。** 这一动机源于一个关键观察——点云图（pointmap）作为一种显式的三维几何表示，可以直接从深度观测中获取，且天然支持跨视角坐标变换。通过将点云图作为几何监督信号融入扩散训练，模型有望在无需推理时相机外参的条件下，输出时空一致的未来观测，从而为下游机器人操作策略提供可靠的感知基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -110,8 +106,6 @@ $$
 
 本方法的核心贡献可归纳为三点：**(1)** 首次将点云图作为三维几何约束引入视频扩散模型，实现了从“像素生成”到“几何感知生成”的范式转变；**(2)** 通过跨视角点云投影对齐和多视角交叉注意力的协同设计，使模型在无需推理时相机外参的情况下生成几何一致的多视角视频；**(3)** 联合优化RGB时序损失和点云空间损失，在保留预训练视频先验的同时获得跨视角空间理解能力。这一创新路径直接解决了现有方法“时间连贯性”与“空间一致性”难以兼得的瓶颈问题。
 
-
-
 ### 问题形式化与输入输出
 
 给定两个同步采集的RGB‑D相机视角 $v_n$（参考视角）与 $v_m$（辅助视角），以及长度为 $t$ 的历史观测序列，模型的目标是预测未来 $h$ 帧的4D视频——即同时输出两个视角的RGB视频流和3D点云图序列，且所有点云均统一表达在参考视角 $v_n$ 的相机坐标系下。这一形式化使得生成的RGB‑D内容天然具备跨视角的几何一致性，为下游机器人位姿提取提供了可靠的三维基础。
@@ -151,16 +145,6 @@ Pipeline的两个核心设计决策直接决定了跨视角几何一致性的实
 
 **推理阶段**：给定两个视角的历史RGB‑D观测，模型直接生成未来 $h$ 帧的RGB视频和点云图，无需相机外参。多视角推断目前采用逐对前向传播的方式，延迟与视角数呈线性关系。生成的4D视频随后输入位姿跟踪器，提取的末端执行器轨迹以开环方式执行操作任务。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_18gC6pZVVc/figures/001_Figure_1.jpg]]
-*Figure 1: Geometry-aware 4D Video Generation. Our model takes RGB-D observations from two camera views and predicts future 4D pointmaps in the coordinate frame of the reference view*
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_18gC6pZVVc/figures/002_Figure_2.jpg]]
-*Figure 2: 4D Video Generation for Robot Manipulation. Our model takes RGB-D observations from two camera views, and predicts future pointmaps and RGB videos. To ensure cross-view consistency, we apply cross-attention in the U-Net decoders for pointmap prediction. The resulting 4D video can be used to extract the 6DoF pose of the robot end-effector using pose tracking methods, enabling downstream manipulation tasks*
-
-
-
 ### 方法概览
 
 本方法以预训练的**SVD**（Blattmann et al., 2023）视频扩散模型为基础，将其扩展为同时预测未来RGB帧和3D点云图（pointmap）的4D视频生成框架。模型输入为两个相机视角的RGB-D历史观测，输出为参考视角坐标系下的未来RGB视频及对应的4D点云序列（Figure 1、Figure 2）。
@@ -189,9 +173,6 @@ $$\mathbf{X}_t^n \in \mathbb{R}^{W \times H \times 3}$$
 #### 3. 多视角交叉注意力
 
 为确保跨视角几何一致性，在U-Net中 $v_m$ 视角的每个解码器块之后插入交叉注意力层（Figure 5），使 $v_m$ 分支能够交叉关注 $v_n$ 分支的特征：
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_18gC6pZVVc/figures/007_Figure_5.jpg]]
-*Figure 5: Multi-View Cross-Attention. We insert a cross attention layer after each decoder block in the U-Net diffusion model for view*
 
 > 具体而言，$v_m$ 解码器中的交叉注意力层以 $v_n$ 对应解码器块的特征作为键（Key）和值（Value），以 $v_m$ 自身的特征作为查询（Query），实现视角间的信息传递。
 
@@ -250,8 +231,6 @@ $$\mathcal{L} = \sum_{t'=t+1}^{t+h}\left[\underbrace{\mathcal{L}_{\mathrm{diff}}
 
 **消融证据**：移除多视角交叉注意力后，跨视角mIoU从0.70骤降至0.41（Task 1），深度指标 $\delta_1\text{-}m$ 从0.92降至0.66（Table 1），证实该模块对学习跨视角几何对应至关重要。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与验证目标
@@ -292,9 +271,6 @@ Table 3的效率对比进一步表明，多视角交叉注意力仅轻微增加�
 
 ### 机器人操作成功率（Table 2）
 
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_18gC6pZVVc/figures/006_Table_2.jpg]]
-*Table 2: Task Success Rate for Manipulation Tasks*
-
 Table 2展示了从生成4D视频中提取6DoF轨迹后的实际操作表现。所提方法在三个仿真任务上的平均成功率达到0.64，而最佳基线DP3仅为0.25，DP为0.19，Dreamitate为0.09。逐任务分析显示：
 
 - StoreCerealBoxUnderShelf：0.60 vs. DP3 0.20
@@ -323,9 +299,6 @@ Table 2展示了从生成4D视频中提取6DoF轨迹后的实际操作表现。�
 
 ### 三视图扩展实验（Table 4）
 
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_18gC6pZVVc/figures/016_Table_4.jpg]]
-*Table 4: Performance generating three views simultaneously on StoreCerealBoxUnderShelf*
-
 Table 4展示了将方法从双视图扩展到三视图的结果。在StoreCerealBoxUnderShelf任务上，三视图生成的跨视角一致性（mIoU 0.68）与双视图（0.70）接近，但推理时间随视角数线性增长。这一实验验证了方法的可扩展性，同时暴露了当前逐对前向传播策略的计算瓶颈。
 
 ### 方法谱系与知识库定位
@@ -340,13 +313,6 @@ Table 4展示了将方法从双视图扩展到三视图的结果。在StoreCerea
 2. **开环执行**：机器人策略采用开环执行模式，缺乏闭环反馈调整。Table 2的成功率可能高估了在真实扰动环境中的表现。
 3. **相机外参依赖**：训练需要已知相机姿态进行点云投影，尽管推理时不再需要，但训练数据的采集成本高于无标定方法。
 4. **视角数线性扩展**：多视角推断需逐对进行前向传播，延迟与视角数线性增长，限制了大规模多视角应用。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_18gC6pZVVc/figures/008_Figure_6.jpg]]
-*Figure 6: Simulation Tasks for Evaluation*
-
-
 
 ## 定位与知识库关联
 
@@ -398,8 +364,6 @@ $$
 5. **跨具身泛化**：该方法在双臂操作、移动操作或不同末端执行器形态下的泛化能力如何？当前仅验证了单臂夹爪场景，扩展到更多样的机器人形态需要重新审视几何监督的普适性。
 
 6. **真实世界训练数据效率**：当前真实世界微调需要约15k步（Section 4.3），能否通过域随机化、数据增强或元学习策略降低对真实数据的依赖，加速从仿真到真实的迁移？
-
-
 
 ## 原文 PDF
 

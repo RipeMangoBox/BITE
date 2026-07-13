@@ -61,8 +61,6 @@ FlashVID 属于混合压缩范式，在 LLM 前通过 ADTS 与 TSTM 进行两级
 
 **方法定位：** FlashVID 属于训练无关的混合压缩方法，其核心贡献在于将时空冗余建模从解耦的固定匹配范式推进到基于相似性树的联合压缩范式，并通过多样性感知的令牌选择机制进一步提升压缩质量。
 
-
-
 视频大语言模型（VLLMs）将视觉编码器与大语言模型（LLM）结合，在视频理解任务中展现出强大能力。然而，其推理成本极高——视觉编码器将每帧视频转换为数百个视觉令牌，多帧输入导致送入 LLM 的令牌数量急剧膨胀，使得自注意力的计算复杂度随序列长度 $n$ 呈二次增长：
 
 $$\mathrm{FLOPs} = L \times (4 n d^2 + 2 n^2 d + 2 n d m)$$
@@ -89,8 +87,6 @@ FlashVID 的设计追求两个递进目标：
 2. **长帧增益**：在相同计算预算下，通过高效压缩释放空间以处理更多帧。FlashVID 使 Qwen2.5-VL 能够处理 10 倍帧数（160 帧 vs. 16 帧），在固定令牌预算下相对性能提升 8.6%（Figure 1c）。
 
 这两个目标通过两个协同模块实现：**注意力与多样性令牌选择（ADTS）**负责筛选信息量大且多样的令牌作为基础视频表示，**树形时空令牌合并（TSTM）**在此基础上联合消除帧间与帧内的时空冗余。二者的设计细节将在方法部分详细展开。
-
-
 
 ## 核心方法与创新机理
 
@@ -121,8 +117,6 @@ FlashVID 将 ADTS 与 TSTM 串联为两阶段流水线：ADTS 首先筛选信息
 
 这一联合建模策略的效果在关键指标上得到验证：在 LLaVA-OneVision 上仅保留 10% 视觉令牌即可维持 99.1% 的相对精度（Table 1）；在 Qwen2.5-VL 上，相同计算预算下处理 10 倍帧数（160 帧 vs. 16 帧），相对性能提升 8.6%（Table 3）。值得注意的是，当保留率 $R \in \{15\%, 20\%, 25\%\}$ 时，FlashVID 甚至**超越**了使用全部视觉令牌的原始 LLaVA-OneVision，揭示了“少即是多”的现象——过度冗余的视觉令牌可能反而损害模型性能（Figure 6）。
 
-
-
 ![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_H6rDX4w6Al/figures/004_Figure_4.jpg]]
 *Figure 4: Overview of our FlashVID. FlashVID compresses visual tokens by two synergistic modules: (1) ADTS prioritizes spatiotemporally informative tokens while ensuring feature diversity by solving a calibrated Max-Min Diversity Problem (MMDP); (2) TSTM models redundancy by spatiotemporal redundancy trees, which effectively capture fine-grained video dynamics*
 
@@ -151,8 +145,6 @@ FlashVID 将视频冗余压缩划分为两个阶段，分别由 ADTS 和 TSTM �
 - **保留比 α**：控制 ADTS 与 TSTM 的令牌分配。消融实验表明，α=0.7 时综合性能最优，说明两模块需保持适当平衡——ADTS 确保信息覆盖，TSTM 消除冗余。
 - **合并阈值 $T_\tau$**：决定 TSTM 的压缩强度。$T_\tau=0.8$ 时性能最佳；阈值过低会引入噪声（将不同实体的令牌错误合并），过高则压缩不足。
 - **扩大因子 $f_e$**：在 ADTS 的 MMDP 求解中控制候选集规模。$f_e=1.25$ 在效率与性能间达到最佳平衡。
-
-
 
 FlashVID 的核心由两个协同模块构成：**注意力与多样性令牌选择（ADTS）** 和 **树形时空令牌合并（TSTM）**。前者负责在每帧内筛选出信息量大且特征多样的代表性令牌，后者则跨帧联合建模时空冗余，实现细粒度的令牌压缩。
 
@@ -193,8 +185,6 @@ MMDP 在最大化所选令牌集合中最小成对距离的同时，利用上述
 ### 两阶段压缩流程
 
 FlashVID 采用先选择后合并的两阶段策略（Figure 4）：ADTS 首先在每帧内保留比例为 $\alpha$ 的令牌（消融实验表明 $\alpha=0.7$ 时综合性能最优，Table 5），随后 TSTM 对保留的令牌进行跨帧合并，进一步消除时空冗余。这种分工使两个模块各司其职——ADTS 保证信息密度，TSTM 负责冗余压缩，最终在仅保留 10% 视觉令牌的条件下仍能维持 99.1% 的相对精度（Table 1）。
-
-
 
 ## 实验与关键发现
 
@@ -259,33 +249,12 @@ f_e 控制 ADTS 阶段候选令牌集的扩展比例，直接影响进入 TSTM �
 
 4. **长视频扩展性未验证**：当前实验的视频帧数最多为 160 帧，该方法能否无缝扩展到小时级视频或实时视频流任务仍是开放问题。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_H6rDX4w6Al/figures/001_Figure_1.jpg]]
 *Figure 1: Performance of FlashVID. (a) TTM may merge less correlated visual tokens, failing to capture fine-grained video dynamics. (b) FlashVID can enable Qwen2.5-VL to process 10× video frames, significantly improving the relative performance by 8.6% while maintaining overall computational budget. (c) FlashVID significantly outperforms current SOTA acceleration frameworks (e.g., FastV, VisionZip, FastVID) on three representative VLLMs*
 
-![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_H6rDX4w6Al/figures/002_Figure_2.jpg]]
-*Figure 2: Efficient inference paradigms. State-of-the-art acceleration frameworks can be mainly divided into three categories: 1) Before-LLM Compression; 2) Inner-LLM Pruning; and 3) Hybrid Compression, where the hybrid compression can be viewed as a trade-off of the Before-LLM Compression and Inner-LLM Pruning strategy*
-
-![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_H6rDX4w6Al/figures/003_Figure_3.jpg]]
-*Figure 3: (a) Number of merged tokens per frame with TSTM (orange) and TTM (blue) under the same threshold, with average merging similarity differences between TSTM and TTM shown in green. Tree-based Spatiotemporal Token Merging (TSTM) Figure 3: Comparison of spatiotemporal redundancy compression. (a) TSTM merges more tokens than TTM under the same threshold and achieves higher inter-frame merging similarity by flexibly capturing fine-grained video dynamics. (b) TTM enforces rigid spatial correspondences, often overlooking dynamic variations in videos and merging less correlated visual tokens. (c) TSTM models video redundancy via spatiotemporal redundancy trees, capturing fine-grained spatiotemporal...*
-
-![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_H6rDX4w6Al/figures/016_Table_13.jpg]]
-*Table 13: Ablation study on the $T _ { \tau } T _ { \tau }$ controls the merging strength, in which a lower $T _ { \tau }$ indicates stronger compression. Table 14: Ablation study on $f _ { e }$ . \ $f _ { e }$ controls the expansion ratio, in which a large $f _ { e }$ may lead to computational inefficiency, while a low value may lose critical information
 
 ![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_H6rDX4w6Al/figures/017_Figure_5.jpg]]
 *Figure 5: Visualizations of Tree-based Spatiotemporal Token Merging (TSTM). We select three consecutive video frames that show obvious variations in spatial locations, scale, and orientation for each case to illustrate the advantages of our TSTM in FlashVID. TSTM jointly models spatial and temporal redundancy via spatiotemporal redundancy trees for capturing fine-grained spatiotemporal relationships; thus, it achieves better spatiotemporal redundancy compression*
-
-![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_H6rDX4w6Al/figures/020_Figure_8.jpg]]
-*Figure 8: Comparisons of ADTS with and without event relevance calibration. ADTS employs event relevance calibration terms to identify the tokens most relevant to the video event*
-
-![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_H6rDX4w6Al/figures/022_Figure.jpg]]
-*Figure: (a) Visualization of TSTM (Example 1)*
-
-![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_H6rDX4w6Al/figures/025_Figure.jpg]]
-*Figure: Question: Which of the following is visible in the background of the video when the miniature bottle is shown empty?*
-
-
 
 ## 定位与知识库关联
 
@@ -330,8 +299,6 @@ ADTS 模块通过**校准的最大最小多样性问题（MMDP）** 在每帧内
 2. **自适应阈值**：能否根据输入视频的动态程度（如运动幅度、场景切换频率）自适应调整 $T_\tau$ 和保留率，避免静态视频过度压缩或动态视频压缩不足？
 3. **长视频扩展**：TSTM 的树结构在极长视频（如小时级）中可能导致树深度过大，是否需引入层次化合并或时间窗口截断机制？
 4. **跨任务泛化**：ADTS 和 TSTM 的设计是否适用于视频问答以外的任务（如视频定位、时序动作检测）或其他多模态组合（如图文检索）？
-
-
 
 ## 原文 PDF
 

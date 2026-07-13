@@ -301,34 +301,17 @@ HALP 在 ImageNet 分类任务上对多种架构进行了结构化剪枝评估�
 
 4. **跨架构迁移成本**：延迟查找表与硬件和网络架构系列强绑定，限制了该方法在新型架构上的快速部署。如何通过少量采样和外推来快速适配新硬件，仍是一个开放问题。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2210_06659/figures/010_Table_6.jpg]]
 *Table 6: Pruning MobileNet-V1 and MobileNet-V2 on the ImageNet dataset with different targets*
 
-![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2210_06659/figures/015_Figure_9.jpg]]
-*Figure 9: Two examples of pruned layers from HALP model and EagleEye [32] model. The scattered black points are the locations of the layers fall to after pruning*
-
 ![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2210_06659/figures/030_Figure_13.jpg]]
 *Figure 13: Visualization of the pruned ResNet50 structure*
-
-![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2210_06659/figures/004_Figure_3.jpg]]
-*Figure 3: Original model EagleEye Li et al. ECCV (2020) AutoSlim Yu et al. NeurIPS (2019) r x RN50 He et al. (2015) MetaPruning Liu et al. ICCV (2019a) GReg Wang et al. ICLR (2021) HALP (Ours) Figure 3: Pruning ResNet50 on the ImageNet dataset with NVIDIA Jetson TX2 (left), Intel CPU Xeon E5 (middle) and NVIDIA Xavier (right). The latency on Jetson TX2 and CPU is measured using PyTorch; on Xavier is measured using TensorRT FP32. Top-left is better*
-
-![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2210_06659/figures/005_Table_2.jpg]]
-*Table 2: HALP acceleration of ResNet50 on GPUs with TensorRT (version 7.2.1.6)*
 
 ![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2210_06659/figures/006_Table_3.jpg]]
 *Table 3: Comparison of extra computation required by pruning methods on ImageNet. Our approach is around 4.3× faster than the next best method. Sub-network selection timing is approximated as running on same device (a NVIDIA V100)*
 
 ![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2210_06659/figures/009_Table_5.jpg]]
 *Table 5: Additional pruning results and comparison on CIFAR10 and ImageNet dataset. FLOPS (%) are relative to those of the unpruned network*
-
-![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2210_06659/figures/016_Table_7.jpg]]
-*Table 7: Pruning ResNet50 on the ImageNet dataset (TITAN V) targeting on inference with batch size 1. HALP-X% indicates that X% latency to remain after pruning. The speedup is calculated as the ratio of FPS between the pruned network and the unpruned model*
-
-![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2210_06659/figures/017_Table_8.jpg]]
-*Table 8: HALP for object detection on the PASCAL VOC dataset*
 
 ![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2210_06659/figures/020_Table_10.jpg]]
 *Table 10: Pruning ResNet50 on the ImageNet dataset with FLOPs constraint and comparison with state-of-the-art method EagleEye (ECCV’20) [32]. We remeasure the FLOPs, top1 and top5 accuracy of EagleEye to get results with two digits*

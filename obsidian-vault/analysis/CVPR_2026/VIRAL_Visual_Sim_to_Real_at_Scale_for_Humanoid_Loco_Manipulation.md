@@ -60,15 +60,11 @@ VIRAL的核心洞察是：在仿真中先训练一个拥有完全状态信息的
 
 尽管成果显著，VIRAL仍面临若干限制：模拟器难以精确建模流体、可变形体等复杂物理交互；训练任务依赖人工设计，缺乏自动生成多样化场景的能力；手工奖励函数存在被策略利用的风险；数十个GPU的计算需求也限制了中小型实验室的复现可能。这些限制同时也指明了未来的研究方向——如何降低物理建模成本、自动化任务生成、设计更鲁棒的奖励函数，以及探索算力效率的甜蜜点。
 
-
-
 人形机器人因其类人形态，具备在人类环境中执行复杂移动操作任务的潜力。然而，让一个全尺寸人形机器人在真实世界中仅凭机载RGB视觉自主完成长时程的移动操作——例如在桌子之间行走、抓取物体、转身放置——至今仍是一个未解决的系统性挑战。
 
 现有方法的缺口集中在三个层面。**第一，视觉sim-to-real迁移差距巨大。** 仿真中训练的策略在面向真实世界的视觉感知、光照变化、相机噪声和物理接触时，往往出现灾难性退化。多数成功的人形机器人系统要么回避视觉输入，依赖盲态运动规划；要么将操作限定在静态桌面上，回避移动与操作的耦合。**第二，长时程任务中的误差累积难以控制。** 移动操作涉及行走、抓取、放置、转身等多个子任务的顺序衔接，任何环节的微小偏差都会在数十个循环中放大，导致任务链断裂。**第三，训练计算规模不足。** 视觉策略的泛化能力高度依赖于训练时的视觉多样性，而大规模并行仿真渲染对计算资源的要求远超单GPU所能提供的上限，这限制了中小型实验室对视觉sim-to-real范式的探索。
 
 VIRAL正是在这一背景下提出的。其核心动机是验证一个假设：**通过在仿真中大规模扩展视觉域随机化、系统识别对齐和分布式训练，可以训练出一个仅依赖RGB和本体感觉的视觉策略，使其零样本迁移至真实人形机器人，并可靠地执行数十个循环的连续移动操作。** 这一假设的成立与否，直接关系到人形机器人能否从实验室演示走向实际部署。
-
-
 
 ## 核心方法与创新机理
 
@@ -129,8 +125,6 @@ VIRAL 揭示了一个常被忽视的维度——**训练计算规模**对视觉 
 
 VIRAL 的创新本质上是 **delta 动作空间 + 参考状态初始化 + DAgger-BC 混合蒸馏 + 大规模视觉域随机化 + 系统识别 + 大规模并行训练** 的系统性组合。单独看每个组件可能并非全新，但它们在人形移动操作场景下的集成与规模化应用，使得零样本 sim-to-real 的连续 54 循环移动操作成为可能——这一结果在现有 baseline 中未见报道。
 
-
-
 VIRAL 采用**特权教师-视觉学生**两阶段蒸馏范式，将仿真中训练的全状态策略零样本迁移至真实人形机器人，实现基于机载 RGB 视觉的连续移动操作。
 
 ### 两阶段流水线
@@ -153,12 +147,8 @@ VIRAL 通过三个核心模块弥合仿真到现实的鸿沟：
 
 教师训练使用 8-16 个 GPU 的并行仿真环境，实验表明 1-2 个 GPU 无法使策略达到高成功率，而 8-16 个 GPU 可实现 90% 以上的渐近成功率（Figure 14）。学生蒸馏进一步扩展到 64 个 GPU，基于定制版 TRL 和 HuggingFace Accelerate 实现多节点并行渲染，大幅加快收敛速度并提升训练稳定性（Figure 15）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1040_https_arxiv_org_abs_2511_15200/figures/002_Figure_2.jpg]]
 *Figure 2: VIRAL teacher-student pipeline. Phase 1: In simulation, a privileged RL teacher policy*
-
-
 
 VIRAL 采用“特权教师–视觉学生”两阶段蒸馏框架，其核心模块与公式设计围绕长时程移动操作的奖励塑形、动作空间表示以及教师到学生的分布匹配展开。
 
@@ -225,22 +215,9 @@ $$\mathscr{L}_{\mathrm{distill}} = \mathbb{E}_{o_t \sim \rho^{o}} \left[ \left\|
 - **相机外参标定**：将真实机器人相机视角与仿真相机对齐，缩小视觉观测的域差距（Figure 6）。
 - **视觉域随机化**：在训练中对光照、材质、相机外参、图像质量和传感器延迟进行大规模随机化。关闭所有随机化后策略性能下降 35.1%（标准化成功率降至 0.649），证明其对于 sim-to-real 迁移至关重要（Figure 13）。
 
-![[assets/figures/papers/paper_list_l1040_https_arxiv_org_abs_2511_15200/figures/006_Figure_5.jpg]]
-*Figure 5: System identification of the dexterous hand. Real–sim overlays (top) and joint position trajectories (bottom) before and after SysID, showing markedly improved alignment*
-
 ### 分布式训练系统
 
 学生策略的视觉训练通过定制版 TRL 结合 HuggingFace Accelerate 实现多 GPU 扩展。将学生训练从 1 个 GPU 扩展到 64 个 GPU 可显著加快收敛速度、提高训练稳定性并最终提升性能（Figure 15）。教师策略从 1-2 个 GPU 扩展到 8-16 个 GPU 同样是达到 90% 以上成功率的必要条件（Figure 14）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1040_https_arxiv_org_abs_2511_15200/figures/003_Figure_3.jpg]]
-*Figure 3: Visual randomization on image, lighting, material, and camera-extrinsics randomization for sim-to-real robustness*
-
-![[assets/figures/papers/paper_list_l1040_https_arxiv_org_abs_2511_15200/figures/004_Figure_4.jpg]]
-*Figure 4: Frames of reference state initialization for teacher RL*
-
-
 
 ## 实验与关键发现
 
@@ -259,9 +236,6 @@ VIRAL 在多种真实世界扰动下展现出鲁棒的泛化能力（Figure 8）
 - **空间扰动**：托盘和物体的位置变化、机器人起始位姿变化、桌面高度和类型变化；
 - **外观扰动**：桌布颜色变化、光照条件变化；
 - **物体泛化**：在不同于训练物体的类别上进行抓取。
-
-![[assets/figures/papers/paper_list_l1040_https_arxiv_org_abs_2511_15200/figures/008_Figure_8.jpg]]
-*Figure 8: Real-world generalization of VIRAL RGB-based policy under variations in tray and object position, robot start pose, table height and type, tablecloth color, lighting, and object category. Videos are provided in https://viral-humanoid.github.io*
 
 这些泛化能力来源于大规模视觉域随机化训练（Figure 3, Table 7），涵盖图像质量、光照、材质、相机外参和传感器延迟等维度。值得注意的是，多物体训练在 10 种不同物体上的归一化成功率全面优于仅用圆柱体训练的单物体策略（Figure 16），表明物体多样性对泛化能力至关重要。
 
@@ -332,17 +306,9 @@ VIRAL 的 sim-to-real 迁移不仅依赖视觉随机化，还包括两项关键�
 | Figure 15 | 学生训练扩展到 64 GPU 带来显著的收敛和性能提升 |
 | Figure 16 | 多物体训练在所有类别上优于单物体训练 |
 
-![[assets/figures/papers/paper_list_l1040_https_arxiv_org_abs_2511_15200/figures/013_Figure_14.jpg]]
-*Figure 14: Scaling compute for teacher training. Rewards (left) and success rates (right) for 1–16 GPUs. More GPUs yield faster convergence and better asymptotic performance*
-
-![[assets/figures/papers/paper_list_l1040_https_arxiv_org_abs_2511_15200/figures/015_Figure_15.jpg]]
-*Figure 15: Scaling compute for student policy training. Distillation loss (left) and success rate (right) when training with 1–64 GPUs. Larger GPU counts provide significantly faster convergence, smoother optimization dynamics, and higher final performance, highlighting the importance of large-scale parallel simulation for vision-based loco-manipulation*
-
 ### 计算成本与可复现性
 
 VIRAL 的计算需求值得关注：教师训练需 8-16 GPU，学生训练需 64 GPU 的大规模并行仿真。这一计算门槛虽然带来了突破性的 sim-to-real 迁移能力，但也限制了中小型实验室的直接复现。论文使用了基于 Genesis 物理引擎的定制仿真环境，并通过 TRL 和 HuggingFace Accelerate 实现分布式训练。
-
-
 
 ## 定位与知识库关联
 
@@ -413,8 +379,6 @@ VIRAL使用手工设计的五阶段加权奖励函数（$r_t = \sum_{i=0}^{4} w_
 4. **Sim-to-Real的闭环整合**：当前VIRAL是纯仿真训练+零样本部署。如何将真实世界的模仿学习、基础模型与仿真训练有机整合，形成“仿真预训练→真实微调→仿真增强”的闭环框架，是提升鲁棒性和泛化能力的关键方向。
 
 5. **算力效率的优化**：在Sim-to-Real训练中，是否存在更高效的视觉随机化策略或蒸馏方法，在降低GPU需求的同时保持迁移能力？这直接关系到该范式的民主化。
-
-
 
 ## 原文 PDF
 

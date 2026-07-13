@@ -53,8 +53,6 @@ claims:
 
 该方法的主要局限在于计算复杂度为 $O(n^4)$，对四视图匹配完整性敏感，且四焦距张量的估计质量依赖预处理。尽管如此，QuadSync揭示了高阶张量约束在全局SfM中的潜力，为将四焦距信息集成到现代增量式流程（如GLOMAP）开辟了方向。
 
-
-
 ### 多视图几何中的同步问题
 
 从多幅图像中恢复三维结构和相机位姿是计算机视觉的核心任务，其基础建立在多视图几何的张量关系之上。给定一组图像，两视图间的对应点满足基本矩阵约束 $\mathbf{x_i}^T F_{ij} \mathbf{x_j} = 0$，三视图间的对应点满足三焦距张量约束，四视图间的对应点则满足四焦距张量约束。这些多视图张量——基本矩阵、三焦距张量和四焦距张量——均可从相机矩阵直接计算得到，例如四焦距张量由下式给出：
@@ -81,8 +79,6 @@ $$\mathcal{Q}^n = \mathcal{G}_Q \times_1 C \times_2 C \times_3 C \times_4 C$$
 2. **共线鲁棒性**：当相机不完全共享同一中心时，$\operatorname{mlrank}(\mathcal{Q}^n) = (4,4,4,4)$ 保持不变；即使在共线相机配置下该秩也不下降，这从根本上优于基本矩阵和三焦距张量在共线场景下的退化行为。
 
 基于此，本文开发了**QuadSync**算法，通过ADMM-IRLS双层优化联合恢复未知尺度参数和相机矩阵，并进一步提出联合优化框架，同时利用四焦距张量、三焦距张量和基本矩阵的低秩约束，实现更鲁棒的全局同步。
-
-
 
 ## 核心方法与创新机理
 
@@ -123,8 +119,6 @@ $$w_{ijkl} = 1 / \max(\delta, \| \Lambda^{(t-1)}_{ijkl} \tilde{Q}^n_{ijkl} - [\m
 ### 创新总结
 
 QuadSync 的 changed slots 形成了完整的创新链条：**四焦距输入提供更丰富的高阶几何信息 → Tucker 分解揭示极低且稳定的多线性秩约束 → ADMM-IRLS 实现可扩展的鲁棒优化**。三者协同使得 QuadSync 在 ETH3D 和 EPFL 数据集上的位置误差较仅用三焦距张量的 Trifocal Sync 降低约 68-73%（Table 4-5），并在共线相机场景中展现出传统方法不具备的鲁棒恢复能力。
-
-
 
 QuadSync 的整体流程围绕“块四焦距张量的 Tucker 分解”这一核心代数结构展开，将多视图几何中的全局同步问题转化为一个结构化的张量低秩逼近与联合优化问题。整个 pipeline 可划分为三个主要阶段：**块张量构建**、**HOSVD 初始化**、以及**双层优化求解（IRLS-ADMM）**，并可扩展为联合基本矩阵与三焦距张量的**联合优化框架**。
 
@@ -168,8 +162,6 @@ $$\min_{\Lambda, C} \sum_{(i,j,k,l) \in \Omega} \| \Lambda_{ijkl} \tilde{\mathca
 ### 输出
 
 优化完成后，从收敛的 $C$ 中即可提取每个相机的 $3 \times 4$ 投影矩阵，进而分解为内参和外参（旋转与平移），完成全局相机位姿同步。
-
-
 
 ### 块四焦距张量的Tucker分解
 
@@ -231,8 +223,6 @@ $$\min_{\Lambda_E, \Lambda_T, \Lambda_Q, C} \frac{1}{n_Q} \| W_Q \odot_b (\Lambd
 
 其中三个项分别对应四焦距张量、三焦距张量和基本矩阵的低秩约束，$n_Q, n_T, n_E$ 为各类型观测的有效数量。该框架同时利用四种不同阶数的多视角几何约束，实现更强的全局一致性。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -264,18 +254,9 @@ QuadSync及其联合优化变体在ETH3D和EPFL两个真实数据集上进行了
 ![[assets/figures/papers/paper_list_l2136_https_arxiv_org_abs_2602_22639/figures/006_Table_1.jpg]]
 *Table 1: Results for synthetic experiments with collinear cameras*
 
-![[assets/figures/papers/paper_list_l2136_https_arxiv_org_abs_2602_22639/figures/003_Figure_3.jpg]]
-*Figure 3: QuadSync retrieved camera poses on near-collinear views from plant scene 1 dataset from ETH3D SLAM*
-
 ### 分布式同步
 
 为缓解计算复杂度，论文探索了分布式同步策略。将相机划分为多个簇，在每个簇内独立运行QuadSync，再通过对齐步骤合并结果。合成实验（Table 2）表明，3个簇的分布式同步在无噪声条件下将运行时间从全同步的1666秒降至150秒（对齐后），在1%噪声条件下从1944秒降至247秒，精度损失有限。CastleP30数据集上的定性结果（Figure 6）展示了手选簇的分布式同步恢复位姿与真值的对比。
-
-![[assets/figures/papers/paper_list_l2136_https_arxiv_org_abs_2602_22639/figures/008_Table_2.jpg]]
-*Table 2: Results for synthetic distributed synchronization*
-
-![[assets/figures/papers/paper_list_l2136_https_arxiv_org_abs_2602_22639/figures/007_Figure_6.jpg]]
-*Figure 6: Retrieved poses (colored, where each cluster has a distinct color) vs. ground truth poses (black) for CastleP30 with handpicked clusters*
 
 ### 消融实验
 
@@ -296,22 +277,9 @@ Table 3报告了各数据集的四焦距块完成率和运行时间。四焦距�
 4. **分布式对齐误差**：分布式同步虽然加速，但在噪声存在时对齐步骤可能导致误差累积，需要在簇划分和对齐策略上进行更精细的设计。
 5. **对比公平性**：部分基线方法在特定数据集上的完成率与QuadSync不同（Table 3），这源于四视图匹配截断对不同方法输入完整性的影响差异，需在解读结果时注意。
 
-![[assets/figures/papers/paper_list_l2136_https_arxiv_org_abs_2602_22639/figures/009_Table_3.jpg]]
-*Table 3: Completion rates and runtimes of different methods*
-
 ### 小结
 
 实验结果表明，四焦距张量携带的高阶几何约束在全局SfM同步中具有显著优势，尤其在共线相机和复杂场景下展现出传统方法无法比拟的鲁棒性。然而，计算复杂度和对观测完整性的依赖仍是实用化的主要障碍，分布式同步和随机化更新策略提供了初步的缓解方向。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2136_https_arxiv_org_abs_2602_22639/figures/005_Figure_5.jpg]]
-*Figure 5: Ground truth location of 10 cameras*
-
-![[assets/figures/papers/paper_list_l2136_https_arxiv_org_abs_2602_22639/figures/001_Figure_1.jpg]]
-*Figure 1: Mean location error for ETH3D datasets*
-
-
 
 ## 定位与知识库关联
 
@@ -356,8 +324,6 @@ $$
 4. **与现代SfM流程的集成**：QuadSync目前作为一个独立的同步模块运行。如何将其无缝集成到如GLOMAP等现代增量式或全局式SfM流程中，实现端到端的性能提升，仍需探索。特别是，四焦距张量的估计和同步能否与特征匹配、外点滤除等前端步骤形成闭环反馈？
 
 5. **理论完备性**：Theorem 8.1证明了共线相机下多线性秩保持$(4,4,4,4)$，但该结论是否对所有退化配置（如所有相机共面、部分相机纯旋转等）成立，仍需更系统的代数分析。
-
-
 
 ## 原文 PDF
 

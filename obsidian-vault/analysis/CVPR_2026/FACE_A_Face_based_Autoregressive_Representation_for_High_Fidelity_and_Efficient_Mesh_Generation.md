@@ -88,8 +88,6 @@ FACE 的核心洞见在于：**在面语义级别而非顶点级别进行生成*
 - **极细结构的挑战**：依赖输入点云意味着极其精细或薄的结构（如自行车辐条）可能无法充分采样，导致在具有挑战性的区域重建不完整。
 - **分辨率扩展性**：分辨率能否在不引入量化误差的情况下扩展到1024以上，仍是待探索的开放问题。
 
-
-
 ### 3D网格生成的核心挑战
 
 3D网格是计算机图形学、游戏、影视和仿真领域的基本几何表示形式。与点云或体素相比，网格以紧凑的顶点-面拓扑结构精确描述物体表面，天然支持渲染、物理模拟和下游编辑。然而，**高质量网格的自动生成**仍然是一个公认的难题：网格不仅需要精确的几何形状，还要求拓扑正确、面片分布均匀、边缘流形连续。
@@ -115,8 +113,6 @@ FACE 的核心洞见在于：**在面语义级别而非顶点级别进行生成*
 基于这一洞察，FACE提出了**“一面一令牌”（one-face-one-token）策略**：将每个三角形面视为单个统一令牌，通过面嵌入层（Face Embedding）将9维坐标向量投影为单一潜在表示，从而将自注意力的序列长度**缩短为原来的1/9**。这一设计直接攻击了 $O(S^2)$ 计算瓶颈的根源，实现了**0.11的压缩率**，仅为先前最佳方法的一半（Table 1）。
 
 同时，FACE在解码端引入**CausalMLP头**作为面内坐标级自回归解码器，在保持“一面一令牌”的宏观效率的同时，精确恢复每个面内的9个量化坐标，实现了效率与精度的统一。
-
-
 
 ## 核心方法与创新机理
 
@@ -162,8 +158,6 @@ FACE 采用基于最小坐标顶点的字典序 ZYX 空间排序对面进行序�
 
 这一系列设计选择共同构成了FACE的核心创新：**在面语义级别而非顶点级别进行生成，从根本上降低序列长度，避免复杂的无损压缩方案，同时利用面嵌入层和CausalMLP头实现端到端的高保真网格重建。**
 
-
-
 FACE 的整体架构是一个非对称的自回归自编码器（ARAE），其设计核心在于用**面级令牌**替代传统顶点级序列，从根本上压缩自注意力所需的序列长度。如 Figure 2 所示，pipeline 由三个关键模块串联而成：**Shape Encoder**、**Autoregressive Face Decoder** 和 **CausalMLP Head**。
 
 ![[assets/figures/papers/paper_list_l2253_https_arxiv_org_abs_2603_01515/figures/002_Figure_2.jpg]]
@@ -201,12 +195,8 @@ $$\mathcal{L} = \frac{1}{N} \sum_{i=1}^{N} \sum_{j=1}^{9} \text{CrossEntropy}(L_
 
 **效率优势**：Table 1 的令牌效率对比显示，FACE 的压缩比达到 0.11，仅为先前最优方法（0.22）的一半，序列长度的大幅缩减是其在重建质量和生成效率上同时取得突破的结构性原因。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2253_https_arxiv_org_abs_2603_01515/figures/004_Figure_3.jpg]]
 *Figure 3: Overview of our image-to-mesh generation pipeline. We first use the input image to condition a DiT model. The resulting latent VecSet is then fed into the Autoregressive Face Decoder to produce the final mesh*
-
-
 
 FACE 的端到端管线（Figure 2）由三个核心模块串联构成：**形状编码器（Shape Encoder）**、**自回归面解码器（Autoregressive Face Decoder）** 和 **CausalMLP 头**。其中，面解码器内部嵌入了实现“一面一令牌”策略的面嵌入层。
 
@@ -257,8 +247,6 @@ $$H_{l+1} = \mathrm{CrossAttn}(Q=H_l', K=C, V=C) \tag{5}$$
 $$\mathcal{L} = \frac{1}{N} \sum_{i=1}^{N} \sum_{j=1}^{9} \mathrm{CrossEntropy}(L_{i,j}, c_{i,j}) \tag{6}$$
 
 其中 $N$ 为面数，$L_{i,j}$ 为第 $i$ 个面第 $j$ 个坐标的预测 logits，$c_{i,j}$ 为对应的真实量化坐标标签。
-
-
 
 ## 实验与关键发现
 
@@ -316,21 +304,8 @@ Figure 5展示了图像条件网格生成的定性结果。FACE生成的网格�
 
 这两个问题指向相同的深层挑战：如何在保持序列压缩优势的同时，提升对极端几何特征的表达能力。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2253_https_arxiv_org_abs_2603_01515/figures/003_Table_1.jpg]]
 *Table 1: Comparison on mesh token efficiency. Our method achieves a state-of-the-art compression ratio, representing the mesh with the shortest sequence length*
-
-![[assets/figures/papers/paper_list_l2253_https_arxiv_org_abs_2603_01515/figures/005_Table_2.jpg]]
-*Table 2: Quantitative comparison of mesh reconstruction quality on multiple datasets*
-
-![[assets/figures/papers/paper_list_l2253_https_arxiv_org_abs_2603_01515/figures/010_Figure_5.jpg]]
-*Figure 5: Qualitative comparison of image-conditioned mesh generation*
-
-![[assets/figures/papers/paper_list_l2253_https_arxiv_org_abs_2603_01515/figures/011_Figure_6.jpg]]
-*Figure 6: Qualitative comparisons between the base and large model*
-
-
 
 ## 定位与知识库关联
 
@@ -389,8 +364,6 @@ FACE 的核心能力边界由其架构选择决定：
 2. **点云采样的信息瓶颈。** FACE 的编码器依赖点云输入，当目标网格包含极其精细的结构时，点云可能无法充分采样这些区域，导致重建不完整。一个开放问题是：能否引入额外的几何先验（如边缘感知采样或自适应查询）来弥补这一信息缺口？
 
 此外，从方法谱系的角度看，FACE 的“一面一令牌”策略与 TreeMeshGPT 的层次化树结构、EdgeRunner 的边级表示之间存在潜在的互补性——将面级 token 与层次化组织相结合，或可进一步压缩序列长度并捕获多尺度几何结构。这一方向尚未被探索。
-
-
 
 ## 原文 PDF
 

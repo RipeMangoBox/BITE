@@ -63,8 +63,6 @@ claims:
 - 标注由单一标注者完成，且个别类别样本极少（部分类仅 1 张），类别间标注质量可能不均，需注意个体偏差的影响。
 - 对于细长结构、小目标或多部件复杂物体，分割质量仍有明显不足（Figure 7、Figure 11）。
 
-
-
 ImageNet 作为计算机视觉领域最具影响力的基准数据集，推动了图像分类任务的巨大进步，并成为绝大多数视觉模型的标准预训练数据源。然而，ImageNet 仅提供图像级别的类别标签，缺乏像素级的稠密标注（如语义分割掩码），这严重限制了其在分割、检测等稠密预测任务中作为预训练数据集的潜力。
 
 为 ImageNet 级别的数据集（1000 类、超过 120 万张图像）提供像素级标注面临一个根本性瓶颈：**大规模手工标注成本过高**。即便是仅标注部分类别的部分图像，所需的人力与时间投入也极为可观。这一瓶颈使得研究者不得不依赖规模小得多的专用分割数据集（如 PASCAL VOC、COCO）进行稠密任务的训练与评估，而这些数据集的类别覆盖度和数据量远不及 ImageNet。
@@ -85,8 +83,6 @@ ImageNet 作为计算机视觉领域最具影响力的基准数据集，推动�
 ### 预期价值
 
 如果成功，这一方法将使得 ImageNet 首次具备大规模像素级标注，为稠密预测任务提供前所未有的预训练数据规模，有望显著提升分割、检测等下游任务的性能，同时大幅降低标注成本。
-
-
 
 ## 核心方法与创新机理
 
@@ -127,8 +123,6 @@ BigDatasetGAN 将“少样本标注→特征解释器训练→大规模采样→
 - **BigGAN 缺乏编码器**：BigGAN 没有将真实图像映射到潜空间的编码器，因此无法直接利用任意外部标注数据来改进特征解释器，标注数据来源受限于 BigGAN 自身的生成样本。
 - **类别覆盖不均**：个别类别仅标注 1 张图像，且 8 个类别因无法良好建模在 MC‑992 任务中被剔除，可能导致类别间标注质量的不平衡。
 
-
-
 BigDatasetGAN 的整体流程由四个阶段构成：**少量人工标注 → 训练特征解释器 → 大规模合成标注数据集 → 下游任务训练与预训练增强**。其核心思想是，利用 GAN 中间层特征固有的语义对应性，通过极少量的人工标注（每类平均约 5 张图像）训练一个轻量级特征解释器，将预训练好的类条件生成模型（BigGAN 和 VQGAN）转化为能够同时产出图像与像素级标签的数据生成器，从而以极低成本合成覆盖 ImageNet 全部 1000 个类别的大规模稠密标注数据集。
 
 **阶段一：少量人工标注。** 从 BigGAN 的每个类别中随机采样约 10 张图像，由单一标注者进行像素级分割标注，最终每类平均保留约 5 张有效标注图像，同时剔除无法识别物体的低质量样本。这一阶段仅需标注 BigGAN 生成的图像，无需对真实 ImageNet 图像或 VQGAN 生成图像进行额外标注。
@@ -141,12 +135,8 @@ BigDatasetGAN 的整体流程由四个阶段构成：**少量人工标注 → �
 
 **采样模式：离线 vs 在线。** 离线采样（BigGAN-off）指预先从生成模型采样并存储固定数据集用于训练；在线采样（BigGAN-on）则在每次训练迭代时实时从生成模型采样新数据。在线采样可获得更大的有效数据量（实验中约相当于 2M 样本），收敛更快且最终性能更高（平均 mIoU 高出 1.4 个点），但训练速度较慢。由于 VQGAN 的自回归 Transformer 采样速度过慢，在线采样仅在 BigGAN 模型上进行了探索。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2201_04684/figures/003_Figure_4.jpg]]
 *Figure 4: Simple architecture for adding a supervised segmentation branch to self-supervised representation learners*
-
-
 
 ### 3.1 生成器特征集合的形式化
 
@@ -207,19 +197,11 @@ BigDatasetGAN 支持两种合成数据供给模式：
 
 实验表明，在线采样（BigGAN-on）的均值 mIoU 比离线采样（BigGAN-off）高 1.4 个点（60.4 vs 59.0），但训练迭代时间更长（Table 2）。
 
-
-
 ## 实验与关键发现
 
 ### 数据集质量与统计分析
 
 在评估合成数据的下游效用之前，我们首先对构建的数据集进行质量分析（Table 1）。以人工标注的真实ImageNet子集（Real-annotated）为参考，BigGAN-sim的FID为19.45、KID为3.47，VQGAN-sim的FID为21.21、KID为11.10，表明合成图像与真实分布之间仍存在可感知的差距。在标签质量方面，VQGAN-sim平均每张图像包含1.52个实例（IN），略高于BigGAN-sim的1.33个，但两者均以单实例场景为主。从形状复杂度（SC）和形状多样性（SD）指标来看，合成数据集成功保留了各类别的主要形态模式，Figure 6展示的k-means聚类平均形状印证了这一点。
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2201_04684/figures/005_Figure.jpg]]
-*Figure: (a) Real-annotated (b) Synthetic-annotated (c) BigGAN-sim (d) VQGAN-sim*
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2201_04684/figures/007_Figure_6.jpg]]
-*Figure 6: Mean shapes from our BigGAN-sim dataset. For our 100k BigGAN-sim dataset, each class has around 100 samples. We crop the mask from the segmentation label and run k-means with 5 clusters to extract the major modes of the selected ImageNet class shapes. Table 1. Dataset analysis. We report image & mask statistics across our datasets (naming explained in Fig. 5). We compute image and label quality using FID and KID and use Real-annotated dataset as reference. IN: instance count per image, MI: ratio of mask area over image area, BI: ratio of tight bounding box of the mask over image area, MB: ratio of mask area over area of its tight bounding box, PL: polygon length (polygon normalized to width...*
 
 ### ImageNet像素级分割基准主结果
 
@@ -262,24 +244,8 @@ Figure 7展示了BigGAN‑sim训练的DeepLabv3在FG/BG任务上的Top‑5最佳
 
 综合来看，合成数据与真实数据的分布差距（FID/KID非零）是限制极端情况泛化性的根本因素；VQGAN的自回归Transformer采样速度慢，限制了其在线采样在大规模实验中的应用；个别类别仅1张标注样本，可能导致类别间标注质量不均。这些局限性为后续改进指明了方向。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2201_04684/figures/009_Figure.jpg]]
-*Figure: basketball: 0.1/1.0 space bar: 2.4/0.7 valley: 2.5/0.5 bow: 3.9/1.0*
-
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2201_04684/figures/008_Table_2.jpg]]
 *Table 2: ImageNet pixel-wise benchmark. We compare various methods on several tasks, with supervised and self-supervised pretraining. We use Resnet-50 for all methods. We ablate the use of synthetic datasets for three methods. FG/BG evaluates binary segmentation across all classes; MC-N columns evaluate multi-class segmentation performance in setups with N classes. Adding synthetic datasets improves performance by a large margin BigGANoff and BigGAN-on compare offline & online sampling strategy*
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2201_04684/figures/018_Table_7.jpg]]
-*Table 7: ImageNet Segmentation Benchmark Splits. The training set is based on Synthetic-annotated (Images sampled from BigGAN), while the testing set consists of images from Realannotated*
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2201_04684/figures/020_Table_8.jpg]]
-*Table 8: ImageNet pixel-wise benchmark. Here, we include supervised pre-training results for our benchmark, similar to Table 2 in the main paper. We only updated the results for the BigGAN-on method on task MC-992, since the number reported in the main paper corresponds to a not fully converged training run*
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2201_04684/figures/010_Figure_7.jpg]]
-*Figure 7: Top-5 analysis of ImageNet benchmark. Text below images indicates: Class name, FG/BG segmentation measured in mIoU, classification accuracy of a Resnet-50 pre-trained on ImageNet. Top Row: We visualize Top-5 best predictions of DeepLabv3 trained on BigGAN-sim dataset for the FG/BG task, compared to ground-truth annotations (third column). Bottom Row: We visualize Top-5 worst predictions. Typical failure cases include small objects or thin structures. Interestingly, classes the are hard to segment, such as baskeball and bow, are not necessarily hard to classify. Figure 8. Ablating synthetic dataset size. Here we fix the model to the Resnet50 backbone and compare the performance when we incre...*
-
-
 
 ## 定位与知识库关联
 
@@ -331,8 +297,6 @@ BigDatasetGAN 的有效性依赖于以下前提条件：
 3. **编码器增强的生成模型**：若为 BigGAN 增加编码器，或采用其他编码‑解码架构（如扩散模型），是否可进一步提升特征解释器的标签质量，并实现真实图像到合成标注的直接映射？
 4. **极低标注率下的泛化**：在每类仅 1 张标注的极端条件下，特征解释器的泛化能力是否仍能维持？这直接决定了方法在实际应用中的标注成本下限。
 5. **域外泛化能力**：合成数据预训练在医学影像、遥感等与 ImageNet 分布差异较大的域外任务上的效果如何？Table 5 在胸部 X 射线分割上的初步结果显示了潜力，但更系统的跨域评估仍是开放问题。
-
-
 
 ## 原文 PDF
 

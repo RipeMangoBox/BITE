@@ -57,8 +57,6 @@ claims:
 
 SWM 的方法定位可概括为：将语音理解从“隐式端到端生成”转变为“因果图引导的显式状态–动作推理”，在低训练成本下实现强推理性能。当前局限包括因果图结构依赖人工先验、标注依赖 LLM 教师模型，以及多语种泛化性尚未验证。
 
-
-
 语音语言模型（Speech Language Models, SLMs）近年来取得了显著进展，代表性工作包括 **Qwen-Audio**（Chu et al., 2023）、**Qwen2-Audio**（Chu et al., 2024）和 **Voxtral**（Liu et al., 2025）等。这些模型通常采用端到端架构，将语音信号直接映射为文本响应，在语音识别、意图分类等任务上展现了强大的能力。
 
 然而，当前 SLM 范式存在一个根本性的瓶颈：**语音理解被建模为单一黑盒过程，仅聚合孤立的任务输出，而忽略了语音成分之间的内在因果依赖关系**。具体而言，一段语音的语义理解涉及多个认知层面的交互——说话者的世界知识激活（WMA）、对听者心理状态的推断（ToM）、言语行为的选择（SA）以及语用意图的传达（Prag）——这些模块之间存在明确的因果链条，而非简单的共现关系。现有模型将这一复杂过程压缩为隐式特征变换，导致三个关键问题：
@@ -72,8 +70,6 @@ SWM 的方法定位可概括为：将语音理解从“隐式端到端生成”�
 本文的核心动机在于：**将这一认知脚手架显式地注入语音语言模型，通过结构化因果图替代隐式黑盒推理**。具体而言，我们提出 Speech World Model（SWM），将语音理解分解为 WMA、ToM、SA、Prag 四个模块，并通过有向无环图（DAG）显式建模它们之间的因果关系。这一设计将原本无约束的自回归生成搜索空间，压缩为一个受因果图约束的低熵认知状态子空间，使模型能够在部分标注下推断缺失状态，并在指令微调中大幅提升推理能力。
 
 从世界模型的统一视角来看（Figure 3），生成式世界模型和语言世界模型均为前向动态模型，而 SWM 的因果图提供了一种结构化、显式的动态建模方式。这一视角将 SWM 置于世界模型研究的谱系中，同时凸显其独特贡献：以因果结构而非黑盒序列建模来捕捉语音理解中的状态转移。
-
-
 
 ## 核心方法与创新机理
 
@@ -138,8 +134,6 @@ $$p(Z|X) = p(z_{WMA}|X) \cdot p(z_{ToM}|X) \cdot p(z_{SA}|z_{WMA}, z_{ToM}, X) \
 
 当前因果图结构基于认知先验预定义，包含四个固定模块，尚不能自适应学习或调整结构以适配新领域。数据标注依赖 Vicuna-13b 教师模型，可能引入标签噪声和错误传播。实证评估主要集中在英语对话与语音助手场景，多语种、多文化背景下的泛化性尚未验证。
 
-
-
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_YGUKPGO182/figures/002_Figure_2.jpg]]
 *Figure 2: The Speech World Model pipeline with a running example, illustrating the “Causal Graph-Guided Explicit Reasoning” process. (1) Causal Graph Training: multimodal inputs (text x, acoustic a, prosody z) are encoded and fused to g = $\phi ( h _ { x } , h _ { a } , h _ { z }$ ) . Each node state $S _ { v }$ is inferred from its parents Pa(v) and fused feature g via Sv = softmax ( $f _ { v }$ ( g , $\{ S _ { u } \} _ { u \in \mathrm { P a } ( v ) }$ ) ) , yielding structured reasoning. (2) Instruction Tuning: these states are used as explicit guidance for the large (speech) language models to generate response y by maximizing $\begin{array} { r } { \mathcal { L } _ { \mathrm { I T } } = - \sum \log P _ {...$
 
@@ -179,8 +173,6 @@ $$\mathcal{L}_{\mathrm{IT}}(\theta) = -\sum_{(x,y)\in\mathcal{D}} \log p_\theta(
 - **半监督梯度流**：通过关闭无标签父节点到子节点的教师强制（$p = 0$），强制子节点依赖父节点预测分布，从而构建可微梯度通路，使未标注模块仍能被有效学习（Equation 5）。
 
 整体而言，SWM 框架将语音理解从端到端黑盒转变为“感知—因果推理—响应”的显式流水线，为后续的推理能力提升与可解释性分析奠定了基础。
-
-
 
 ### 因果图模块定义
 
@@ -245,8 +237,6 @@ $$\mathcal{L}_{\mathrm{IT}}(\theta) = -\sum_{(x,y)\in\mathcal{D}} \log p_\theta(
 
 两式均以交叉熵损失最大化给定条件下的响应生成概率，区别在于后者保留了原始语音信号 $x$，使模型可同时利用声学信息和结构化认知状态。
 
-
-
 ## 实验与关键发现
 
 ### 核心结果：因果图的结构化推理优势
@@ -297,12 +287,8 @@ SWM的核心实验围绕两个层面展开：因果图自身的结构有效性�
 
 需注意以下评估局限性：Model-as-Judge评分依赖GPT-4o作为裁判模型，可能引入其固有的偏好偏见；训练数据标签由Vicuna-13b教师模型生成，标签噪声或分布偏移可能影响性能上限；实验数据以英语对话场景为主，多语种泛化性尚未验证；训练成本优势基于小模型和特定GPU配置，与商用大模型在数据规模和计算量上不具备完全可比性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_YGUKPGO182/figures/014_Figure_6.jpg]]
 *Figure 6: ACE and ICS of each casual edge for ablation study (fusion mechanisms and teacher-forcing probabilities) on casual graph under fully-supervised setting*
-
-
 
 ## 定位与知识库关联
 
@@ -339,8 +325,6 @@ SWM 在性能上展现出与商用大模型 **GPT-4o**（OpenAI, 2024）和 **Ge
 3. **标注效率提升**：如何减少对 LLM 生成标签的依赖，提高在真实少量标注数据下的半监督学习效率？当前半监督设置仍依赖部分模块的有监督信号进行梯度传播。
 4. **跨模态迁移**：显式因果状态表示作为一种通用认知先验，能否迁移到视频理解、多模态情感分析等其他任务？因果图的模块化设计理论上具有任务无关性，但实证验证尚缺。
 5. **规模化效率保持**：在更大规模、更多样化的数据集上训练时，结构化因果图是否依然能保持其效率和可解释性优势？当前实验规模相对有限（最大数据集 SLURP 约 72K 样本），大规模下的因果效应稳定性和收敛速度优势需要进一步验证。
-
-
 
 ## 原文 PDF
 

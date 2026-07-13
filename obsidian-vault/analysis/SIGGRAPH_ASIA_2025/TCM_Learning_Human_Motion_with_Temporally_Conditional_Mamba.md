@@ -58,8 +58,6 @@ claims:
 
 **局限与开放问题**：当前TCM要求条件序列与运动序列具有相同的时间长度，难以直接处理文本等静态条件；极端头部运动下的鲁棒性、足部滑动伪影的消除、超长序列（数分钟）的稳定性等问题尚待进一步探索。
 
-
-
 ### 问题背景
 
 人体运动生成是计算机视觉与图形学中的核心问题，其目标是根据给定的外部条件（如音乐、视频、物体轨迹等）合成自然、逼真的人体动作序列。该技术在虚拟人动画、游戏角色控制、AR/VR交互等领域具有广泛的应用前景。近年来，扩散模型（Diffusion Models）已成为人体运动生成的主流范式，通过逐步去噪的方式从随机噪声中恢复出高质量的运动序列。
@@ -82,8 +80,6 @@ claims:
 受状态空间模型（State Space Models, SSM）中参数化动态系统的启发，本文提出一个关键洞察：**将时间条件信号直接注入到Mamba块的选择矩阵 $\mathbf{B}$ 和 $\mathbf{C}$ 的仿射调制中**，使状态空间的演化过程在每个时间步都依赖于外部条件，从而实现自回归的时序对齐。这一设计利用了线性参数变化（Linear Parameter-Varying, LPV）状态空间模型的思想——通过对输入/输出矩阵进行逐时间步的条件调制（缩放与偏移），让循环动态可以灵活适应不同的外部条件，在保持长序列建模能力的同时显著提升时间一致性。
 
 基于此动机，本文提出了**时间条件Mamba（Temporally Conditional Mamba, TCM）**，一种新型的Mamba变体，将条件感知机制嵌入到Mamba块的内部递归动态中，从根本上解决现有方法中条件融合与时间演化相分离的问题。
-
-
 
 ## 核心方法与创新机理
 
@@ -113,8 +109,6 @@ $$\lambda_i, \rho_i = \mathrm{MLP}(\mathrm{Sum}(\mathbf{t}, \mathbf{m}))$$
 
 TCM 与 Spatial Mamba 协同工作，形成时空解耦的建模方案：TCM 沿时间维度建模条件驱动的运动动态，Spatial Mamba 将运动表示从时间域重排至空间域（关节维度），用标准 Mamba 建模关节间的空间依赖。这一设计使得模型能够分别专注于时序对齐和空间合理性，在多个任务（音乐到舞蹈、自我中心视频到运动、物体轨迹到人体运动）上均展现出优于交叉注意力方案的一致性能提升。
 
-
-
 TCM 构建在扩散模型的骨干框架之上，整体 pipeline 遵循“噪声运动 → 去噪网络 → 预测干净运动”的标准扩散范式。给定一段噪声化的运动序列 **x**、时间条件嵌入 **m** 以及扩散时间步嵌入 **t**，模型的目标是预测对应的干净运动  **x̂**。
 
 架构的核心由两类 Mamba 块交替堆叠而成：**Temporally Conditional Mamba (TCM)** 和 **Spatial Mamba**，两者之前均设有自适应层归一化（AdaLN）模块。
@@ -136,12 +130,8 @@ TCM 构建在扩散模型的骨干框架之上，整体 pipeline 遵循“噪声
 
 整个 pipeline 的输入输出流可概括为：**噪声运动 + 条件嵌入 + 时间步嵌入 → AdaLN 调制 → TCM（时间条件对齐）→ AdaLN 调制 → Spatial Mamba（空间依赖建模）→ 多层堆叠 → 预测干净运动**。图 2a 给出了这一架构的整体概览。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1928_TCM_Learning_Human_Motion_with_Temporally_Conditional_Mamba/figures/002_Figure_2.jpg]]
 *Figure 2: Architecture overview of the proposed approach. (a) We show the overview of the diffusion human motion framework with Mamba blocks. (b) Our key contribution is the Temporally Conditional Mamba, which incorporates temporal conditions into the internal dynamics of the Mamba block. (c) The Spatial Mamba block is used to learn human spatial features*
-
-
 
 ### 问题定义与扩散框架
 
@@ -214,13 +204,6 @@ AdaLN 使模型能够根据扩散时间步和全局条件自适应调整特征�
 
 在调制参数层面，移除缩放参数 $\gamma_{B,C}$ 比移除偏移参数 $\beta_{B,C}$ 造成更大的性能下降（Table 2），表明缩放调制在条件感知的状态空间演化中扮演更关键的角色。这一发现从侧面印证了 TCM 的核心机理：通过缩放调整输入/输出投影的强度，使模型能够根据条件信号的强弱动态调控状态更新的幅度。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1928_TCM_Learning_Human_Motion_with_Temporally_Conditional_Mamba/figures/001_Figure_1.jpg]]
-*Figure 1: High-level comparison between our approach and previous methods. (a) Previous works usually use Cross-Attention to integrate input condition into Mamba/Transformer backbone. (b) Our approach embeds the condition directly within the Mamba block; (c) We show the head trajectory over time in an ego-to-motion task. Compared to Cross-Attention and Vanilla Mamba, which generate motions that deviate noticeably from the ground truth, our method produces a trajectory that closely follows the actual motion pattern*
-
-
-
 ## 实验与关键发现
 
 ### 核心实验设计
@@ -231,17 +214,11 @@ TCM的实验验证围绕**时序对齐能力**这一核心瓶颈展开。作者�
 
 在AIST++数据集上，TCM在所有运动质量与节拍对齐指标上均显著优于两个内部基线（Table 1）：
 
-![[assets/figures/papers/paper_list_l1928_TCM_Learning_Human_Motion_with_Temporally_Conditional_Mamba/figures/003_Table_1.jpg]]
-*Table 1: Comparative results of dance synthesis from music task. We compare our proposed TCM with Cross-Attention and Vanilla Mamba. Bold indicates best, and underline indicates second best*
-
 - **运动质量**：TCM的FID_k降至20.66，相比Cross-Attention（23.43）和Vanilla Mamba（25.61）分别降低2.77和4.95；FID_g降至9.75，相比Cross-Attention（12.86）降低3.11。
 - **运动多样性**：TCM的Div_k达到8.98，Div_g达到7.24，均高于Cross-Attention（7.87 / 6.48）和Vanilla Mamba（7.56 / 6.12），表明条件调制并未牺牲生成多样性。
 - **节拍对齐**：TCM的BAS达到0.2761，远超Cross-Attention的0.2411和Vanilla Mamba的0.2434。这是TCM机制优势的直接证据——将条件注入状态空间的选择矩阵B和C，使每一步的隐藏状态演化都受音乐节拍信号驱动，实现了自回归的时序对齐。
 
 关节平均速度曲线的可视化（Fig. 3）进一步从运动学层面印证了上述结论：TCM生成的运动节拍（速度曲线局部极小值）与音乐节拍高度吻合，而Cross-Attention和Vanilla Mamba的节拍对齐存在明显偏差。这表明交叉注意力的全局交互机制缺乏逐步的时间对齐能力，无法精确匹配细粒度的时序条件。
-
-![[assets/figures/papers/paper_list_l1928_TCM_Learning_Human_Motion_with_Temporally_Conditional_Mamba/figures/005_Figure_3.jpg]]
-*Figure 3: Motion and music beat alignment. We plot the mean joint velocity over time for different methods. Kinematic beats are identified as local minima in the velocity curves. Our method produces motion with kinematic beats that align more closely with the music beats*
 
 ### 消融实验：TCM是时序对齐的关键组件
 
@@ -268,9 +245,6 @@ TCM的实验验证围绕**时序对齐能力**这一核心瓶颈展开。作者�
 ![[assets/figures/papers/paper_list_l1928_TCM_Learning_Human_Motion_with_Temporally_Conditional_Mamba/figures/010_Table_5.jpg]]
 *Table 5: Comparison with State-of-the-art methods on ego-to-motion task. Bold indicates the best, and underline indicates the second-best results*
 
-![[assets/figures/papers/paper_list_l1928_TCM_Learning_Human_Motion_with_Temporally_Conditional_Mamba/figures/008_Table_7.jpg]]
-*Table 7: Comparative results on human motion generation from object movement task. Bold indicates best and underline indicates second best*
-
 ### 可解释性分析
 
 对TCM块学习到的γ_B,C和β_B,C参数进行t-SNE可视化（Fig. 4），发现不同音乐流派的条件调制参数呈现明显的聚类结构。这说明TCM的条件仿射调制不仅仅是数值上的性能提升手段，其学习到的缩放/偏移参数确实编码了与音乐风格相关的判别性信息，为模型的可解释性提供了证据。
@@ -292,16 +266,6 @@ TCM的实验验证围绕**时序对齐能力**这一核心瓶颈展开。作者�
 
 ![[assets/figures/papers/paper_list_l1928_TCM_Learning_Human_Motion_with_Temporally_Conditional_Mamba/figures/009_Table_4.jpg]]
 *Table 4: Comparison with State-of-the-art methods on music-to-dance task. Bold indicates the best results, and underlined indicates the second-best results*
-
-![[assets/figures/papers/paper_list_l1928_TCM_Learning_Human_Motion_with_Temporally_Conditional_Mamba/figures/013_Figure_5.jpg]]
-*Figure 5: Qualitative comparison of human motion estimation from the egocentric task. Our method produces more coherent and accurate motion compared to EgoEgo. For additional visualizations, please refer to our demo video*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1928_TCM_Learning_Human_Motion_with_Temporally_Conditional_Mamba/figures/011_Table_6.jpg]]
-*Table 6: Performance comparison between proposed and other methods on human dance estimation from egocentric and music. Bold indicates the best results, and underline indicates the second-best results*
-
-
 
 ## 定位与知识库关联
 
@@ -376,8 +340,6 @@ TCM的实验验证围绕**时序对齐能力**这一核心瓶颈展开。作者�
 ### 5. 方法定位总结
 
 TCM在人体运动生成领域的方法谱系中处于**条件融合机制创新**的位置：它不改变扩散框架或Mamba的宏观架构，而是重新设计了条件信号进入状态空间模型的方式。与交叉注意力的“层间全局融合”相比，TCM的“循环内逐帧调制”实现了更精细的时序对齐，这一设计思想可追溯到线性参数变化系统（LPV）的控制理论传统，但在深度生成模型中尚属首次系统性地应用于人体运动生成。该方法在时序条件驱动的运动生成任务上建立了新的性能标杆，但其对静态条件的适配性和物理合理性增强仍是后续工作的重要方向。
-
-
 
 ## 原文 PDF
 

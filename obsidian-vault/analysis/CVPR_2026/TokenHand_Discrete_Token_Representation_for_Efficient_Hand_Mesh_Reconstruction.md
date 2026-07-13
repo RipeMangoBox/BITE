@@ -57,8 +57,6 @@ claims:
 
 方法层面，TokenHand采用两阶段框架：第一阶段利用Point Transformer编码器和共享码本，从手部点云学习离散量化表示；第二阶段冻结解码器，将图像驱动的重建转化为Token分类。这一量化空间提供的强先验，使得轻量级解码器即可完成高质量网格重建，从而在精度-效率曲线上取得突破（Figure 3）。
 
-
-
 ### 手部网格重建的现实需求
 
 从单张RGB图像中恢复三维手部网格是计算机视觉与增强现实领域的基础任务，在虚拟现实交互、手势识别、远程协作等应用中具有广泛需求。然而，该任务面临一个核心矛盾：**高精度重建与实时推理效率难以兼得**。手部具有21个关节、超过15个自由度的复杂运动链结构，且经常出现自遮挡和与他物的交互遮挡，使得从二维图像中准确推断三维几何极具挑战。
@@ -82,8 +80,6 @@ claims:
 2. 手部本身具有天然的**组合性结构**——手掌、手指根部、指尖等子结构在功能和解剖上相对独立，若能用离散Token分别编码这些子结构，既能提供局部独立性以避免误差累积，又能通过Token间的交互捕捉全局姿态依赖。
 
 基于此，TokenHand提出了一个关键洞察：**将手部三维模型表示为M个离散Token，每个Token编码手部的一个子结构，并将重建任务从连续回归转化为在共享码本上的Token分类问题。** 这种范式转换使得模型可以借助量化空间的强先验，使用轻量级解码器完成高效重建，从而在保持高精度的同时实现65 FPS的实时推理速度。
-
-
 
 ## 核心方法与创新机理
 
@@ -115,12 +111,7 @@ MANO模型通过预定义的关节运动链提供结构先验，但该先验是�
 - **关键点引导的上采样点采样**：Token生成器受 **MobRecon** (Chen et al., CVPR 2022) 启发，从骨干网络输出的特征图中以2D关键点位置为引导进行点采样，并将特征图分辨率提升至28×28。消融实验表明，这一策略相比全局池化或网格采样将 PA-MPJPE 从6.2mm/6.0mm降至5.7mm（见 Table 8）。
 - **MLP-Mixer分类头**：4个 MLP-Mixer 块用于捕获Token间的依赖关系，输出分类logits，在保持轻量化的同时有效建模了手部子结构之间的空间相关性。
 
-
-
 TokenHand 将手部网格重建从连续回归重新定义为离散Token分类问题。其核心思想是：将三维手部模型表示为 M 个离散Token，每个Token对应学习码本中的一个索引，编码手部的一个局部子结构（Figure 1）。整个框架分为两个阶段，如 Figure 2 所示。
-
-![[assets/figures/papers/paper_list_l24_https_openaccess_thecvf_com_content_CVPR2026_html_He_TokenHand_Discrete/figures/002_Figure_2.jpg]]
-*Figure 2: Two stages of the TokenHand representation (a, b). In Stage I, a compositional encoder maps the hand point cloud to M tokens, which are quantized using a codebook. Thus, each hand model is represented as a set of discrete codebook indices. In Stage II, hand reconstruction is formulated as a classification task by predicting the categories of the M tokens, corresponding to the codebook entries. The predicted tokens are then decoded by a decoder network to produce the final hand model*
 
 **第一阶段：Token化表示构建。** 这一阶段的目标是学习一个可量化的手部表示空间，独立于图像输入。具体而言，使用一个 Point Transformer 编码器 $f_e$ 将手部点云 $\mathbf{H}$ 映射为 M 个Token特征 $\mathbf{T} = (\mathbf{t}_1, \mathbf{t}_2, \cdots, \mathbf{t}_M) = f_e(\mathbf{H})$。随后，这些Token特征通过一个共享的量化码本 $\mathbf{C} = (\mathbf{c}_1, \cdots, \mathbf{c}_K)^{\mathrm{T}} \in \mathbb{R}^{K \times D}$ 进行离散化——每个 $\mathbf{t}_i$ 通过最近邻查找被分配到一个码本索引：
 
@@ -136,8 +127,6 @@ $$q(\mathbf{t}_i = k | \mathbf{H}) = \begin{cases} 1 & \text{if } k = \arg\min_j
 4. **冻结解码器重建**：将预测的Token嵌入送入第一阶段预训练好并冻结的级联上采样解码器，直接输出最终手部网格。
 
 **输入输出流总结**：输入为单张裁剪手部图像 → 骨干网络提取特征图 → 关键点引导采样生成 M 个Token特征 → MLP-Mixer 预测 M 个码本索引 → 冻结解码器重建手部网格。两阶段设计的关键优势在于：量化码本提供了强结构先验，使得图像驱动的重建仅需学习Token分类，从而允许使用轻量级解码器，在保持高精度的同时实现 65 FPS 的实时推理。
-
-
 
 TokenHand 将手部网格重建从连续回归重构为离散Token分类问题，其核心由两个阶段构成：**第一阶段**在点云域学习手部的离散Token表示与码本；**第二阶段**冻结解码器，将图像驱动的重建转化为Token类别预测。以下分模块阐述关键设计与公式。
 
@@ -197,16 +186,6 @@ $$\mathbf{S} = \hat{\mathbf{L}} \times \mathbf{C}$$
 | 分类头 | 4层MLP-Mixer | 捕获Token间依赖，输出类别logits |
 | 软推理 | logits加权码本嵌入 | 保证梯度回传，端到端训练 |
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l24_https_openaccess_thecvf_com_content_CVPR2026_html_He_TokenHand_Discrete/figures/001_Figure_1.jpg]]
-*Figure 1: Our approach represents a hand model using M discrete tokens, each corresponding to an index in the learned codebook (top). Each token encodes a specific sub-structure of the hand. In each row, changing the value of a single token consistently modifies the same sub-structure (bottom)*
-
-![[assets/figures/papers/paper_list_l24_https_openaccess_thecvf_com_content_CVPR2026_html_He_TokenHand_Discrete/figures/016_Figure_5.jpg]]
-*Figure 5: An illustration demonstrates various designs of token generators*
-
-
-
 ## 实验与关键发现
 
 TokenHand 在两个主流手部网格重建基准——FreiHAND 和 DexYCB——上进行了系统评估。实验设计围绕三个核心问题展开：离散 Token 表示能否在保持实时推理的前提下实现高精度重建？各模块设计选择对性能的贡献如何？方法在不同条件下的泛化能力与效率表现如何？
@@ -248,13 +227,8 @@ Figure 4 展示了 FreiHAND 上的定性对比。TokenHand 重建的手部网格
 
 尽管 TokenHand 在精度和效率上均表现优异，但分析中仍存在若干值得关注的方面。首先，DexYCB 上的评估虽显示了泛化优势，但严重遮挡场景下的极限性能仍需进一步验证。其次，离散 Token 表示的粒度由 Token 数量 M 决定，当前设置（M=389）是否足以表达极度精细的手指姿态差异（如手指间亚毫米级变化）尚需考察。此外，码本训练依赖于覆盖充分的手部姿态数据，在数据稀缺的特定手势类别上可能出现量化误差。最后，不同基线方法使用的骨干网络和训练方案存在差异，虽在各自设定下报告最佳结果，但严格受控的公平比较仍需统一实验条件。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l24_https_openaccess_thecvf_com_content_CVPR2026_html_He_TokenHand_Discrete/figures/003_Table_1.jpg]]
 *Table 1: Comparison with state-of-the-art methods on the FreiHAND dataset. ”–” indicates results not reported. The best performance is highlighted in bold. Second best performance is underlined*
-
-![[assets/figures/papers/paper_list_l24_https_openaccess_thecvf_com_content_CVPR2026_html_He_TokenHand_Discrete/figures/004_Figure_3.jpg]]
-*Figure 3: Trade-off between accuracy and inference speed. Our method exceeds non–real-time approaches (≤ 40 FPS) in both speed and precision. Compared with real-time methods (≥ 60 FPS), it achieves noticeably higher accuracy while maintaining comparable inference speed*
 
 ![[assets/figures/papers/paper_list_l24_https_openaccess_thecvf_com_content_CVPR2026_html_He_TokenHand_Discrete/figures/005_Table_2.jpg]]
 *Table 2: Comparison of transformer-based approaches*
@@ -265,16 +239,8 @@ Figure 4 展示了 FreiHAND 上的定性对比。TokenHand 重建的手部网格
 ![[assets/figures/papers/paper_list_l24_https_openaccess_thecvf_com_content_CVPR2026_html_He_TokenHand_Discrete/figures/018_Table_8.jpg]]
 *Table 8: Ablation study of sampling strategies and resolution settings used in the token generator*
 
-![[assets/figures/papers/paper_list_l24_https_openaccess_thecvf_com_content_CVPR2026_html_He_TokenHand_Discrete/figures/014_Table_5.jpg]]
-*Table 5: Effect of regressor layers and token counts*
-
 ![[assets/figures/papers/paper_list_l24_https_openaccess_thecvf_com_content_CVPR2026_html_He_TokenHand_Discrete/figures/015_Table_6.jpg]]
 *Table 6: Ablation on feature dimensions and the number of MetaFormer blocks in the regressor layer*
-
-![[assets/figures/papers/paper_list_l24_https_openaccess_thecvf_com_content_CVPR2026_html_He_TokenHand_Discrete/figures/017_Table_7.jpg]]
-*Table 7: Ablation on backbone selection and its impact on reconstruction performance*
-
-
 
 ## 定位与知识库关联
 
@@ -335,8 +301,6 @@ TokenHand 在效率与精度两个维度上同时取得突破，这打破了“�
 4. **码本的自适应扩展**：当前码本在训练后固定。能否设计增量学习机制，使码本在遇到新姿态时动态扩展，同时保持已有表示的稳定性？这对手部重建在开放世界场景中的部署至关重要。
 
 5. **与其他结构先验的融合**：TokenHand 完全依赖学习到的码本先验，放弃了 MANO 等显式运动学约束。将运动学约束作为正则化项融入 Token 分类过程，可能进一步提升解剖学合理性，尤其是在数据稀缺的姿态区域。
-
-
 
 ## 原文 PDF
 

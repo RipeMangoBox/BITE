@@ -55,8 +55,6 @@ claims:
 
 **方法定位**：OneCAT 属于编码器自由的统一多模态自回归模型，其核心创新在于将模态路由、多尺度生成和知识蒸馏深度融合进单一解码器，为高效统一的多模态智能提供了新的范式。
 
-
-
 ### 多模态大模型的架构分化与统一困境
 
 当前多模态大模型（MLLM）在架构设计上呈现出明显的分化态势。以 **Qwen2.5-VL** 为代表的编码器基模型依赖外部视觉编码器（如 InternViT）将图像转化为视觉 token 后再送入语言模型，在理解任务上表现出色，但无法原生支持图像生成。另一方面，**Emu3**、**Chameleon** 等统一模型试图通过外部视觉分词器（VQ-VAE tokenizer）将图像离散化为视觉 token，与文本 token 一同进行自回归建模，从而同时支持理解与生成。然而，这种“离散化桥接”策略引入了两个根本性瓶颈：
@@ -80,8 +78,6 @@ OneCAT 的核心动机在于回答一个根本性问题：**能否在不依赖�
 - **定制教师全层蒸馏**：通过训练一个定制的 MLLM 教师模型，将其所有 Transformer 层的隐藏状态作为监督信号蒸馏到纯解码器学生模型中，以弥补视觉感知预训练的不足。
 
 此外，OneCAT 将视觉生成建模为“下一尺度预测”（Next-Scale Prediction），与文本的“下一 token 预测”统一在同一个自回归框架内，并通过 Scale-Aware Adapter（SAA）增强多尺度特征提取能力。这一设计使得模型能够在一个纯解码器架构内无缝切换于理解、生成与编辑三种模态任务之间，为统一多模态智能提供了新的架构范式。
-
-
 
 ## 核心方法与创新机理
 
@@ -124,8 +120,6 @@ $$\mathcal{L}_{\mathrm{Und}} = \mathcal{L}_{\mathrm{NTP}} + \lambda \mathcal{L}_
 
 这些设计使 OneCAT-3B 在推理效率上获得数量级优势：理解任务首 token 延迟较 Qwen2.5-VL-3B 降低 61%（0.225s vs 0.583s），文生图推理时间较 BAGEL 降低 89%（2.85s vs 26.29s），图像编辑推理时间降低 90%（4.61s vs 46.44s）（Table 8）。
 
-
-
 OneCAT 采用纯解码器（decoder-only）自回归架构，在单一 Transformer 内统一多模态理解、图像生成与图像编辑，**推理时无需任何外部视觉编码器或视觉分词器**。其核心设计围绕三个关键模块展开：模态特定的混合专家（Modality-MoE）、多尺度自回归生成机制（Scale-Aware Adapter, SAA），以及定制教师驱动的全层隐藏状态蒸馏。
 
 ### 推理流水线
@@ -154,14 +148,9 @@ Figure 3 展示了 OneCAT 的统一推理流水线。原始图像通过 **Patch 
 
 2. **定制教师蒸馏**：直接使用现成的 Qwen2.5-VL 作为教师会导致训练不稳定，而专门训练的定制教师（InternViT + MLP + Qwen2.5）在隐藏状态蒸馏下表现更优（平均得分 35.3 vs 33.7，Table 10）。全层蒸馏优于仅蒸馏视觉 token（35.3 vs 34.8）和完全不用蒸馏（31.4，Tables 9, 15）。
 
-![[assets/figures/papers/OneCat_2509.03498_092170b29c9d/figures/017_Table_10.jpg]]
-*Table 10: Effect of different teachers. Avg. denotes the average score in Tab. 9*
-
 3. **多尺度生成调度**：OneCAT 使用预定义的尺度调度表（Table 13），例如 1:1 宽高比下通过 $K=13$ 个尺度生成 $1024 \times 1024$ 图像，低分辨率图像可通过截断调度表实现（如 $K=10$ 生成 $512 \times 512$）。去除 SAA 会导致生成性能显著下降（GenEval: 81.2→78.1, DPG: 74.9→74.0, Table 12），验证了多尺度适配的关键作用。
 
 4. **推理效率优势**：由于消除了外部视觉编码器和分词器，OneCAT-3B 在理解任务的首 token 延迟（TTFT）上比 Qwen2.5-VL-3B 降低 61%（0.225s vs 0.583s），在文生图推理速度上比混合架构 BAGEL 快约 10 倍（2.85s vs 26.29s），在图像编辑上快约 10 倍（4.61s vs 46.44s）（Table 8）。
-
-
 
 ### 推理流水线架构
 
@@ -191,9 +180,6 @@ $$\mathcal{L}_{\mathrm{Und}} = \mathcal{L}_{\mathrm{NTP}} + \lambda \mathcal{L}_
 
 其中 $\lambda=0.02$。消融实验表明，全层隐藏状态蒸馏（平均分 35.3）显著优于无蒸馏（31.4）和仅蒸馏输出 logits（Table 9），且定制教师优于直接使用 Qwen2.5-VL 教师（35.3 vs 33.7，Table 10）。
 
-![[assets/figures/papers/OneCat_2509.03498_092170b29c9d/figures/016_Table_9.jpg]]
-*Table 9: Effect of different distillation strategies*
-
 ### 离散视觉分词：二值球面量化
 
 多尺度 VAE tokenizer 使用 **Binary Spherical Quantization (BSQ)** 将连续特征量化为离散码。对于 $d$ 维特征向量 $x_{ij}$，量化操作为：
@@ -213,16 +199,6 @@ $$\mathsf{L}_{\mathrm{final}} = \lambda_t \cdot \mathsf{L}_t + (1-\lambda_t) \cd
 $$\mathsf{L}_c = \frac{\mathsf{L}_{t,i} + \lambda_i \cdot \mathsf{L}_t}{1+\lambda_i}, \quad \mathsf{L}_{\mathrm{final}} = \mathsf{L}_{\emptyset} + \lambda_t \cdot (\mathsf{L}_c - \mathsf{L}_{\emptyset})$$
 
 其中 $\lambda_i=1$，$\lambda_t=3$。CFG 略微增加推理开销，但对生成质量有显著贡献。
-
-### 补充图表
-
-![[assets/figures/papers/OneCat_2509.03498_092170b29c9d/figures/002_Figure_2.jpg]]
-*Figure 2: Showcase of the image editing abilities of the OneCAT model, including general image editing tasks such as object removal, background adjustment, color adjustment, subject replacement, and style transfer; as well as perceptual tasks including depth estimation, pose estimation, object segmentation, and Canny edge detection*
-
-![[assets/figures/papers/OneCat_2509.03498_092170b29c9d/figures/023_Figure_10.jpg]]
-*Figure 10: Performance comparison of different methods for multimodal understanding across varying training scales*
-
-
 
 ## 实验与关键发现
 
@@ -253,9 +229,6 @@ OneCAT-3B 在多个理解基准上显著超越同属统一模型的 **Emu3**（T
 
 在 NVIDIA H800 上，OneCAT-3B 的理解首 token 延迟（TTFT）在 1792×1792 分辨率下仅 0.225s，比 **Qwen2.5-VL-3B** 的 0.583s 降低 61%（Table 8 Left）。文生图推理时间仅 2.85s，比 **BAGEL** 的 26.29s 快约 10 倍；图像编辑推理时间 4.61s vs 46.44s，快约 10 倍（Table 8 Right）。效率优势源于消除了外部视觉编码器和分词器的推理开销。
 
-![[assets/figures/papers/OneCat_2509.03498_092170b29c9d/figures/015_Table_8.jpg]]
-*Table 8: Efficiency comparison for understanding (Left) and generation (Right), tested on one NVIDIA H800. Left: We report the time to first token (TTFT). The number of input text tokens are fixed to 24. 256* is the number of visual tokens of thumbnail. Right: We report total inference time for Text-to-Image (T2I) and Image-Editing*
-
 ### 消融与分析
 
 #### Scale-Aware Adapter (SAA) 的关键作用
@@ -283,13 +256,6 @@ OneCAT-3B 在多个理解基准上显著超越同属统一模型的 **Emu3**（T
 2. **生成依赖 CFG**：生成质量部分依赖 Classifier-Free Guidance（文生图 $\lambda_t=20$，编辑 $\lambda_t=3$），略微增加了推理开销，并可能限制输出的多样性。
 3. **固定尺度调度**：多尺度生成依赖预定义的尺度调度表（Table 13），在极端宽高比下灵活性受限。
 4. **训练复杂度高**：三阶段训练管线涉及定制教师训练、多模态数据配比和梯度累积策略，对计算资源和工程调优要求较高。
-
-### 补充图表
-
-![[assets/figures/papers/OneCat_2509.03498_092170b29c9d/figures/006_Table_1.jpg]]
-*Table 1: Detailed hyperparameter and configuration of the training recipe across different stages*
-
-
 
 ## 定位与知识库关联
 
@@ -346,8 +312,6 @@ $$\mathcal{L}_{\mathrm{Distill}} = \sum_{n=1}^{N} \mathrm{MSE}(\mathbf{h}_S^{(n)
 4. **蒸馏策略的极限**：全层隐藏状态蒸馏被证明是关键有效的，但 Table 15 显示仅蒸馏视觉 token 的效果有限（平均分 34.8 vs 35.3 的完整蒸馏）。这是否意味着视觉理解和语言能力之间存在深层耦合，仅靠视觉侧的蒸馏无法完全弥补？更大规模蒸馏数据能否进一步缩小与编码器基模型的差距？这些问题有待后续工作回答。
 
 5. **生成质量与推理速度的进一步权衡**：当前 CFG 策略和固定的尺度调度是生成质量的重要保障，但也构成了推理开销的下限。如何在不依赖 CFG 或减少尺度数量的前提下保持生成质量，是实现更高效推理的关键挑战。
-
-
 
 ## 原文 PDF
 

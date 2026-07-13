@@ -54,8 +54,6 @@ claims:
 
 **主要结果**：在 GenEval、PickScore、TextRender 三个代理任务上，GRPO-Guard 相较 Flow-GRPO 和 DanceGRPO 基线均实现了复合黄金得分（HPSv2、ImageReward、UnifiedReward 归一化平均）的显著提升。例如，在 SD3.5-M + Flow-GRPO 设置下，GenEval 的 Average Gold 从 0.84 升至 0.89，TextRender 从 0.88 升至 0.99；在 Flux.1-dev + DanceGRPO 设置下，GenEval 的 Average Gold 从 0.88 升至 1.02。消融实验证实，仅修正比率均值已能大幅缓解黄金得分下降，而完整的 RatioNorm + 梯度重加权组合在代理得分提升与质量保持之间取得了最佳平衡。
 
-
-
 ### 流匹配与强化学习微调的交汇
 
 扩散模型已成为文本到图像生成的主流范式，其中**流匹配（Flow Matching）** 通过直接预测速度场，在生成质量和采样效率之间取得了优良平衡。给定噪声样本 $x_t = (1 - t) x_0 + t x_1$，模型学习最小化速度预测误差：
@@ -97,8 +95,6 @@ Figure 12 的裁剪百分比统计直接证实了这一诊断：FlowGRPO 中 $r(
 
 **TempFlowGRPO**（He et al., 2025）尝试通过梯度重加权来均衡不同步的贡献，但仅解决梯度失衡而忽略比率偏移，反而可能加速过优化（如消融实验 Figure 9 所示）。这进一步表明，**比率归一化与梯度均衡必须协同作用**，才能从根本上恢复裁剪机制的功能。
 
-
-
 ## 核心方法与创新机理
 
 GRPO-Guard 的核心创新在于识别并修复了 GRPO 在流匹配（Flow Matching）模型中因高斯概率假设而引入的**隐式过优化（implicit over-optimization）**问题。与 LLM 中离散 token 的设定不同，流匹配模型使用连续高斯概率计算对数概率，导致重要性比率（importance ratio）分布出现**依赖于时间步的均值左移与方差不一致**。这一系统性偏差使得 PPO 式裁剪机制完全失效——正优势样本从未触及上裁剪界，负优势样本仅在末尾步被下裁剪，策略模型在代理得分持续上升的同时，真实生成质量（黄金得分）却不断下降。
@@ -120,8 +116,6 @@ $$\log \hat{r}_t(\theta) = \sigma_t \sqrt{dt} \left( \log r_t(\theta) + \frac{\|
 流匹配中不同去噪步的梯度幅度差异可达约 20×（Figure 3），导致末尾低噪声步主导优化，加剧过拟合。GRPO-Guard 在策略损失中引入步重加权因子 $\delta$：对 Flow-GRPO 采用 $\delta = 1/dt$，对 DanceGRPO 采用 $\delta = \beta/dt$（其中 $\beta = 1 + \eta^2(1-t)/(2t)$），将梯度幅度差异压缩至约 2.5×，均衡各步的梯度贡献。
 
 两项技术以极小额外计算成本协同工作：RatioNorm 恢复裁剪机制的正确触发条件，梯度重加权防止单步主导更新，共同抑制了隐式过优化，使策略模型在代理得分提升的同时保持黄金得分的稳定。
-
-
 
 GRPO-Guard 是一个即插即用的训练框架，旨在修复流匹配（Flow Matching）模型中 GRPO 训练时因重要性比率分布异常而引发的隐式过优化（implicit over-optimization）。该框架由三个核心模块构成：**SDE 采样器**、**RatioNorm 比率标准化**、以及**带梯度重加权的 PPO 式裁剪**，三者串联形成完整的策略更新管线。
 
@@ -164,13 +158,6 @@ GRPO-Guard 处于 **RLHF 微调扩散模型** 与 **PPO 式裁剪机制适配连
 
 > **注意**：本文未提供与基于 KL 惩罚的 GRPO 变体（如带 KL 散度约束的原始 GRPO 实现）的定量对比，因此 GRPO-Guard 在 KL 正则化场景下的相对表现需要手动验证。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2682_https_arxiv_org_abs_2510_22319/figures/001_Figure_1.jpg]]
-*Figure 1: Comparison between FlowGRPO and GRPO-Guard under over-optimization. Left: The proxy score and gold score trends during training. As the proxy score increases, FlowGRPO rapidly enters an over-optimization phase, where the gold score continuously declines. Right: A visual comparison between FlowGRPO and GRPO-Guard. Due to severe reward hacking, FlowGRPO suffers from a drastic degradation in diversity, detail richness, visual quality, and text-image consistency (bottom part). In contrast, GRPO-Guard maintains a stable gold score and high visual quality under a comparable proxy score, as shown in the upper part of the figure*
-
-
-
 ### 问题根源：重要性比率的分布异常
 
 在 Flow-GRPO 与 DanceGRPO 中，策略更新的核心依赖于重要性比率 $r_t(\theta) = \frac{p_\theta(x_{t-1}|x_t)}{p_{\theta_{\text{old}}}(x_{t-1}|x_t)}$。流匹配模型使用高斯分布计算状态转移的对数概率：
@@ -210,9 +197,6 @@ $$\nabla_\theta \mathcal{I}(\theta) = \sum_{t=0}^{T-1} \mathbb{E}_\epsilon \left
 
 其中系数 $\beta$ 与噪声调度相关。在 Flow-GRPO 中，梯度幅度在不同时间步的差异可达约 **20×**（见 Figure 3），导致低噪声步主导优化，加剧过优化风险。
 
-![[assets/figures/papers/paper_list_l2682_https_arxiv_org_abs_2510_22319/figures/004_Figure_3.jpg]]
-*Figure 3: Gradient magnitude differences across timesteps. In FlowGRPO, gradient magnitudes vary by roughly 20× across timesteps, reflecting the large differences in gradient scale. GRPO-Guard substantially reduces this imbalance, limiting the variation to about 2.5× and preventing over-optimization under any single noise condition*
-
 GRPO-Guard 在策略损失中引入重加权因子 $\delta$，与 $dt$（及调度参数 $\beta$）相抵消：
 
 $$\mathcal{T}_{\text{policy}}(\theta) = \frac{1}{G} \sum_{i=1}^G \frac{1}{T} \sum_{t=0}^{T-1} \delta \cdot \min\left( \hat{r}_t^i(\theta) \hat{A}_t^i, \text{clip}(\hat{r}_t^i(\theta), 1-\epsilon, 1+\epsilon) \hat{A}_t^i \right) \tag{12}$$
@@ -227,13 +211,6 @@ GRPO-Guard 的完整流程由以下模块构成：
 3. **RatioNorm**：按式 (8) 标准化每个去噪步的对数比率，消除均值偏移与方差差异。
 4. **PPO 式裁剪**：对 $\hat{r}_t(\theta)$ 应用 $\text{clip}(\cdot, 1-\epsilon, 1+\epsilon)$。
 5. **梯度重加权**：乘以 $\delta$ 因子均衡各步梯度贡献，形成最终策略损失。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2682_https_arxiv_org_abs_2510_22319/figures/015_Figure_12.jpg]]
-*Figure 12: Clipping percentage of*
-
-
 
 ## 实验与关键发现
 
@@ -294,13 +271,7 @@ Table 2 和 Figure 9 报告了主要组件的消融结果，揭示了各机制�
 ![[assets/figures/papers/paper_list_l2682_https_arxiv_org_abs_2510_22319/figures/007_Figure_5.jpg]]
 *Figure 5: Visual comparison between FlowGRPO and GRPO-Guard. FlowGRPO exhibits clear signs of reward hacking, leading to a significant decline in both image quality and instruction-following ability. In contrast, GRPO-Guard maintains comparable visual quality while demonstrating stronger text generation accuracy and better adherence to instructions*
 
-![[assets/figures/papers/paper_list_l2682_https_arxiv_org_abs_2510_22319/figures/008_Figure_6.jpg]]
-*Figure 6: Visual comparison between DanceGRPO and GRPO-Guard. It is clearly observed that DanceGRPO suffers from severe reward hacking, where the generated images exhibit distinct horizontal and vertical stripe artifacts*
-
 Figure 11 进一步分析了过优化模型与原始模型在不同去噪步的表现差异，揭示了过优化主要集中在特定的噪声条件区间，这与 Figure 3 中梯度幅度不平衡的观察一致——低噪声步的梯度主导了优化过程，导致模型在这些步上过度适应代理奖励。
-
-![[assets/figures/papers/paper_list_l2682_https_arxiv_org_abs_2510_22319/figures/014_Figure_11.jpg]]
-*Figure 11: Performance differences between the hacking model and the original model across different denoising steps*
 
 **证据强度**：可视化结果直观展示了过优化的视觉表现，但定性比较受限于样本选择偏差。人类评估（Figure 10）提供了补充证据，但具体胜率数据需从原文图表中确认。
 
@@ -318,13 +289,6 @@ Figure 11 进一步分析了过优化模型与原始模型在不同去噪步的�
 | Figure 5–7 | 基线方法的过优化表现为多样性退化、条纹伪影和人体比例失真；GRPO-Guard 保持稳定质量 |
 
 **总体评估**：GRPO-Guard 以极小的额外计算成本（仅修改比率计算和损失重加权，无需额外网络或推理步骤），在多个 GRPO 变体和骨干模型上一致地抑制了隐式过优化。其有效性源于对重要性比率分布异常的精确诊断和针对性修复，而非引入外部正则化或增大模型容量。但彻底解决奖励黑客仍需奖励模型本身的改进，这是一个开放问题。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2682_https_arxiv_org_abs_2510_22319/figures/013_Figure_10.jpg]]
-*Figure 10: Human evaluation results*
-
-
 
 ## 定位与知识库关联
 
@@ -366,8 +330,6 @@ GRPO-Guard 的有效性已在以下条件下得到验证（Table 1, Fig. 4）：
 2. **跨架构泛化性**：当前验证限于 Rectified Flow 架构。该方法在 DDPM、DDIM 等扩散变体，以及非图像模态（如视频、音频生成）中的适用性尚待验证。
 3. **裁剪阈值 $\epsilon$ 的敏感性**：论文未系统研究 RatioNorm 后裁剪阈值 $\epsilon$ 的最优取值。标准化后的比率分布均值为零、方差一致，但 $\epsilon$ 的选择是否需要在不同任务或骨干模型间调整，缺乏消融证据。
 4. **与 KL 惩罚的协同**：GRPO-Guard 在无 KL 惩罚的设定下验证（与 Flow-GRPO、DanceGRPO 保持一致）。若与 KL 惩罚结合，RatioNorm 是否仍能提供额外增益，或 KL 惩罚本身已能部分纠正比率分布偏移，尚未探索。
-
-
 
 ## 原文 PDF
 

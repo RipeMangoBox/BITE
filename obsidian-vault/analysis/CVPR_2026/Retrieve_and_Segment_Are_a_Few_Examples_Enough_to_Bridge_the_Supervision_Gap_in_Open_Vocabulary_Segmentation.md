@@ -52,8 +52,6 @@ claims:
 
 在六个主流 OVS 基准上的实验表明，RNS 在每类仅有一张支持图像时，即可相对于零样本基线实现显著提升（OpenCLIP 上 +7.3%，DINOv3 上 +18.4% mIoU）。当每类支持图像增至 20 张时，RNS（DINOv3.txt + SAM）达到 61.9 的平均 mIoU，将零样本与全监督之间的差距缩小至 11.5，并超过基于大规模训练的 CAT-Seg（47.8）达 14.1 个百分点。
 
-
-
 ### 开放词汇分割的核心瓶颈
 
 开放词汇分割（Open-Vocabulary Segmentation, OVS）要求模型在推理时能够分割任意类别，而不仅限于训练时见过的封闭词汇集。当前主流方案依赖视觉-语言模型（VLMs）的零样本能力，但其性能受制于两重根本性挑战：
@@ -84,8 +82,6 @@ claims:
 3. **统一处理部分支持**：通过伪标签机制补偿缺失视觉支持的类别，通过平均文本特征替代缺失文本支持的类别，使得RNS在完全支持、部分视觉支持、部分文本支持等多种设置下均能有效运作。
 
 RNS的关键优势在于：它并非简单地进行后期融合或离线微调，而是将检索、融合和测试时训练统一为一个整体目标，使得模型能够在仅有**每类别一张支持图像**的条件下，相对于零样本基线实现显著提升（OpenCLIP上+7.3%，DINOv3上+18.4% mIoU），并在B=20时将零样本与全监督之间的差距缩小至11.5 mIoU，超越了基于大规模训练的CAT-Seg（47.8）达14.1个点（Table 2）。
-
-
 
 ## 核心方法与创新机理
 
@@ -122,8 +118,6 @@ $$L_f = \sum_{c \in \mathcal{C}_r} w_c \sum_{\lambda \in \Lambda} \mathrm{CE}(g_
 - **部分文本支持缺失**：缺失的文本类别特征用可用类别的平均文本特征替代，提供中性的语义先验；当所有类别均缺失文本支持时，RNS 平滑退化为纯视觉基线（$\Lambda = \{0\}$，$w_c = 1$），避免了性能断崖式下跌。
 
 这种“优雅退化”的设计哲学使 RNS 在从零样本到全监督的整个支持谱系上都能稳定工作，是其区别于以往方法的核心架构优势。
-
-
 
 RNS 的整体 pipeline 围绕一个核心思想展开：**将检索增强的测试时适配器引入开放词汇分割**，通过可学习的多模态融合，在少量像素标注支持图像的条件下弥合粗粒度视觉-语言模型（VLM）与细粒度像素预测之间的监督鸿沟。其流程可概括为四个阶段：支持特征提取 → 多模态融合 → 基于相似度的检索 → 测试时线性分类器训练与推理，并可选择性地接入区域提议模块以生成掩膜级分割结果。
 
@@ -204,8 +198,6 @@ RNS 的一个显著优势是对部分支持缺失场景的自然处理能力，�
 - **部分文本支持缺失**：用可用类别的平均文本特征替代缺失的文本特征，提供中性语义先验；当所有文本支持均缺失时，设置 $\Lambda = \{0\}$ 且 $w_c = 1$，方法平滑退化为纯视觉基线。
 
 这种设计使 RNS 在支持信息不完整时仍能保持稳健性能，避免了传统方法在类似场景下的灾难性退化。
-
-
 
 RNS 的核心工作流由五个模块串联构成：支持特征提取、多模态融合、检索、测试时线性分类器训练，以及可选的区域提议池化。以下按模块逐一展开关键公式与变量含义。
 
@@ -309,8 +301,6 @@ $$
 
 其中 $\bar{S}_{jr}$ 是经下采样并 L1 归一化的区域掩膜在 patch $j$ 上的权重。后续的训练和预测过程与 patch 级完全一致，仅将操作对象从 patch 特征替换为区域特征。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -369,39 +359,17 @@ Figure 13展示了精度-推理时间的权衡（DINOv3.txt, patch-level, B=5, �
 3. **域偏移敏感**：视觉支持来自测试域内时表现最佳，域外支持改进幅度下降，泛化性受分布差异限制。
 4. **测试时训练开销**：每张图像需进行轻量训练，虽然可通过减少迭代次数大幅降低，但实时性仍不如纯前馈方法。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2602_23339/figures/004_Figure_4.jpg]]
-*Figure 4: Partial visual (left) and textual (right) support settings. Results of zero-shot, RNS, kNN-CLIP, FREEDA and their variants without class name information (w/o text). RNS evaluated w/o the pseudo-label loss in (12). OpenCLIP ViT-B/16 and SAM 2.1 are used. Left: a fraction of classes lack visual examples, while B = 3 for the rest. Right: a fraction of classes lack textual class names, and B = 1*
-
-![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2602_23339/figures/006_Figure_5.jpg]]
-*Figure 5: Impact of retrieval on RNS. We replace the retrieved visual support feature set*
-
 ![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2602_23339/figures/007_Table_1.jpg]]
 *Table 1: Ablations of RNS. We report average mIoU across the considered datasets for three different numbers of available support images per class (B = 1, B = 5, B = 10). Blue numbers denote difference to the number in the same column but first row*
 
-![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2602_23339/figures/009_Table_2.jpg]]
-*Table 2: OVS vs. fully supervised segmentation. Fully supervised: best method picked per dataset. ∗: self-evaluated*
-
 ![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2602_23339/figures/005_Figure_6.jpg]]
 *Figure 6: Comparison in a closed vocabulary setting. We compare RNS to the offline baseline competitors. To ensure a fair comparison we tune the learning rate, batch size, and number of iterations using a train-validation split from the available support images. No mask proposals are used. We report average performance on VOC, ADE, and Stuff*
-
-![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2602_23339/figures/010_Figure_8.jpg]]
-*Figure 8: Open-vocabulary segmentation (OVS) results. We compare three settings: (i) textual-only support (zero-shot OVS), (ii) a simplified version of RNS using visual-only support, and (iii) the full RNS combining textual+visual support. Text-only support leads to ambiguous predictions (tree branch as bird, and various background hallucinations). Visual-only support helps disambiguate some classes but still confuses contextually similar objects (sofa–chair, tree branch–potted plant). RNS effectively combines both modalities to achieve accurate segmentation*
-
-![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2602_23339/figures/011_Figure_9.jpg]]
-*Figure 9: Out-of-domain vs. in-domain visual support between Cityscapes and ACDC. The left plot reports performance on ACDC as we vary the number of visual support images per class from either Cityscapes (out-of-domain, Cityscapes → ACDC) or ACDC (in-domain, ACDC → ACDC). The right plot reports the analogous results when evaluating on Cityscapes, with support drawn from either ACDC (out-of-domain, ACDC→ Cityscapes) or Cityscapes (in-domain, Cityscapes → Cityscapes). In both cases we compare RNS with and without text, and include the corresponding zero-shot baseline*
 
 ![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2602_23339/figures/017_Table_5.jpg]]
 *Table 5: Ablations of the k-NN retrieval hyperparameter K in RNS. We report average mIoU across the considered datasets for three different numbers of available support images per class (B = 1, B = 5, B = 10). The row with K = 4 (highlighted) corresponds to the configuration used in RNS, and blue numbers denote the difference to this row in the same column*
 
 ![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2602_23339/figures/013_Figure_12.jpg]]
 *Figure 12: Comparison to offline baseline with and w/o hyperparameter tuning. We compare RNS against the offline linear classifier trained on per image visual class features on VOC. We include the curves presented in Figure 6 that use hyperparameter tuning per B and support seed (noted as “optimal”). We report the performance of both methods on two hyperparameter configurations: hyperparameter set 1 which corresponds to an optimal set of hyperparameters of the linear classifier for B = 1, and hyperparameter set 2 which corresponds to an optimal set of hyperparameters of the linear classifier for B = 20*
-
-![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2602_23339/figures/018_Figure_13.jpg]]
-*Figure 13: Average performance (mIoU) vs. inference time (s). DINOv3.txt, patch-level; B=5. Avg. on VOC, ADE, Stuff. A single NVIDIA A100 GPU is used*
-
-
 
 ## 定位与知识库关联
 
@@ -457,8 +425,6 @@ RNS位于**测试时适配（test-time adaptation）** 与**检索增强生成�
 4. **任务泛化**：该方法能否扩展到全景分割、视频目标分割等更复杂的像素级任务？当前验证限于静态图像的语义分割，时序一致性和实例区分能力尚未探索。
 
 5. **与大规模训练方法的融合**：Table 2 显示RNS（B=20）在六个OVS基准上平均mIoU达61.9，超过基于大规模训练的CAT-Seg（47.8）14.1个点。这提示**少量高质量支持示例可能比大规模弱标注更有效**——如何将RNS的检索-适配范式与大规模预训练结合，是一个值得探索的方向。
-
-
 
 ## 原文 PDF
 

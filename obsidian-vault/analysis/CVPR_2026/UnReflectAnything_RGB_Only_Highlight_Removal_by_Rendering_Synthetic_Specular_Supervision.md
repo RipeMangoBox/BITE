@@ -48,8 +48,6 @@ UnReflectAnything 针对这一瓶颈提出了两个关键机制。第一，**虚
 
 该方法的主要局限在于：对透明/折射物体上的高光处理能力有限；低梯度、平滑衰减的高光区域重建质量下降；依赖单目几何估计精度，几何错误会传导至合成高光质量。这些失败模式在论文的Figure 8中有具体展示。
 
-
-
 高光去除是计算机视觉与图形学中长期存在的底层视觉问题。在非朗伯体表面，镜面反射会叠加在漫反射纹理之上，形成局部过曝区域，严重干扰下游任务——从3D重建、像素匹配到手术场景的视觉感知。尽管该问题已被研究数十年，现有方法仍面临一个根本性瓶颈：**缺乏真实场景下配对的高光/无高光图像**。这一瓶颈在非朗伯体表面和复杂光照条件下尤为突出，例如外科手术场景中的湿润组织表面，导致现有RGB高光去除方法的泛化性显著受限。
 
 ### 现有方法的缺口
@@ -71,8 +69,6 @@ UnReflectAnything 针对这一瓶颈提出了两个关键机制。第一，**虚
 UnReflectAnything的动机正是打破这一闭环。其核心思路是：**如果无法获取真实配对数据，就通过物理渲染合成逼真的高光**。具体而言，利用单目几何估计从任意RGB图像恢复场景的三维结构，再通过Fresnel感知的着色模型和随机光照参数渲染物理上合理的高光，从而生成像素级配对的高光/无高光训练对。这一策略使模型能够在任意RGB图像上训练，无需任何真实配对数据。
 
 更进一步，该方法将高光去除重新定义为**特征空间的修复问题**：在冻结的视觉Transformer（DINOv3）特征空间中，定位被高光破坏的patch token并进行修复，而非直接在RGB像素空间操作。这种设计将高光定位与外观恢复解耦，利用预训练ViT蕴含的全局语义先验来重建无高光的漫反射外观，避免了像素空间修复常见的模糊和伪影。
-
-
 
 ## 核心方法与创新机理
 
@@ -97,8 +93,6 @@ UnReflectAnything 的核心创新在于将**虚拟高光合成**与**token空间
 ### 创新机制的内在耦合
 
 上述四个changed slots并非孤立存在，而是形成了因果闭环：虚拟高光合成提供了可控的像素级监督信号，使模型能够定位高光区域；冻结的DINOv3编码器提供了语义丰富的特征空间；token空间修复在此空间中利用全局上下文重建漫反射外观；排除数据集高光的监督策略则确保修复器不会被错误信号误导。这种“合成监督—特征定位—token修复—可靠监督”的耦合机制，是UnReflectAnything在多个域（自然图像、手术内窥镜）上实现一致高光去除的根本原因。
-
-
 
 UnReflectAnything 的整体设计围绕一个核心矛盾展开：真实场景下缺少配对的高光/无高光图像，尤其在非朗伯体表面和复杂光照下（如外科手术场景），导致现有 RGB 高光去除方法泛化性差，且容易过度平滑纹理或产生色偏。为解决这一问题，该方法将**虚拟高光合成**与**token 空间修复**解耦为两个协同的子系统：前者通过物理渲染生成逼真的训练监督信号，后者在冻结的视觉 Transformer 特征空间中修复被高光破坏的 patch token，从而恢复无高光的漫反射外观。
 
@@ -149,12 +143,8 @@ Token 修复损失 $\mathcal{L}_{\mathrm{inp}}$ 结合了 L1 距离和余弦相�
 
 这一设计将高光定位（像素级预测）与外观恢复（token 级修复）分配到不同模块，并通过冻结的 DINOv3 编码器保留全局语义上下文，从而在无需配对真值的情况下实现跨域的高光去除。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2145_https_arxiv_org_abs_2512_09583/figures/001_Figure_1.jpg]]
 *Figure 1: UnReflectAnything removes specular highlights from RGB images without paired supervision. A Virtual Highlight Synthesis pipeline renders physically plausible reflections from estimated geometry, providing realistic pseudo-pairs across natural and surgical domains. The model predicts a soft highlight map and inpaints masked DINOv3 tokens, reconstructing reflection-free diffuse images. It generalizes across diverse scenes, achieving faithful highlight suppression and texture recovery*
-
-
 
 UnReflectAnything 的核心架构由四个模块串联构成：冻结的 DINOv3-Large 编码器、高光预测器、Token 修复器以及 RGB DPT 解码器。其关键创新在于将修复操作从像素空间迁移至冻结的视觉 Transformer 特征空间，并通过物理渲染合成训练监督信号。
 
@@ -236,15 +226,8 @@ $$
 
 预训练使解码器学会从 DINOv3 特征恢复像素级细节，为后续高光去除阶段的解码提供初始化。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2145_https_arxiv_org_abs_2512_09583/figures/002_Figure_2.jpg]]
 *Figure 2: Synthetic Highlight Generation Pipeline from any image. Given a single RGB image (left), a per-pixel depth and surface normals is first estimated using a monocular geometry network. The recovered geometry defines a 3D point cloud X with associated surface normals n and view directions v. The light source position L is sampled in camera coordinates, producing local illumination vectors l. These geometric quantities drive a physically based Blinn–Phong [18] rendering mode generating a synthetic highlight intensity map that is photometrically consistent with the inferred scene structure. The highlight is finally composited with the input RGB*
-
-![[assets/figures/papers/paper_list_l2145_https_arxiv_org_abs_2512_09583/figures/005_Figure_4.jpg]]
-*Figure 4: Patch token inpainting logic. A local neighborhood (purple borders) for each token to be inpainted is used to compute the local mean priors. This mean priors are summed with the Positional Embeddings and a learned mask token and fed into a sequence of transformer blocks which refine the tokens to the final feature*
-
-
 
 ## 实验与关键发现
 
@@ -296,27 +279,8 @@ UnReflectAnything 在多个基准数据集上进行了全面评估，涵盖提�
 
 **Table 5** 列出了训练时各损失函数的权重配置。模型在单张 NVIDIA A100 GPU（80 GB）上训练，batch size 为 32，共训练 50 个 epoch。几何估计采用 MoGe-2 模型获取度量深度、表面法线和内参；Fresnel 反射系数 R₀ 设为 0.04；数据集高光检测的亮度阈值 τ_L 设为 0.95。Token 修复器采用 ViT 层序列，解码器预训练阶段使用 L1 和 SSIM 的组合重建损失。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2145_https_arxiv_org_abs_2512_09583/figures/009_Table_3.jpg]]
-*Table 3: Comparison of each method’s impact on pixel-matching, evaluated using the epipolar error*
-
-![[assets/figures/papers/paper_list_l2145_https_arxiv_org_abs_2512_09583/figures/011_Table_4.jpg]]
-*Table 4: Ablation study on supervision, model architecture, and training strategy. The reported*
-
-![[assets/figures/papers/paper_list_l2145_https_arxiv_org_abs_2512_09583/figures/010_Figure_7.jpg]]
-*Figure 7: Qualitative comparison between UnReflectAnything, PolarAnything & PolarFree (PA+PF), and StableDelight. OURS provides more consistent and effective attenuation of specular highlights across domains, while avoiding noticeable artefacts*
-
 ![[assets/figures/papers/paper_list_l2145_https_arxiv_org_abs_2512_09583/figures/006_Figure_6.jpg]]
 *Figure 6: Qualitative examples for pairs of raw images with highlights (left) and their UnReflectAnything-processed counterpart (right). Our framork consistently removes, inpaints or attenuates specular highlights from images in several different domains*
-
-![[assets/figures/papers/paper_list_l2145_https_arxiv_org_abs_2512_09583/figures/012_Figure_8.jpg]]
-*Figure 8: Representative failure modes of UnReflectAnything*
-
-![[assets/figures/papers/paper_list_l2145_https_arxiv_org_abs_2512_09583/figures/013_Table_5.jpg]]
-*Table 5: Loss function weights used at training time*
-
-
 
 ## 定位与知识库关联
 
@@ -367,8 +331,6 @@ UnReflectAnything的监督策略也值得关注：模型在token修复阶段**�
 - **几何线索替代**：在无需单目深度估计（如使用其他几何线索或自监督几何学习）的情况下，模型是否仍然有效？这直接关系到方法在计算资源受限场景下的部署可行性。
 
 - **反射类型泛化**：该方法能否泛化到其他类型的反射，如环境反射或次表面散射？当前的Blinn-Phong渲染管道仅建模点光源的直接镜面反射，扩展渲染模型可能是解决这一问题的关键。
-
-
 
 ## 原文 PDF
 

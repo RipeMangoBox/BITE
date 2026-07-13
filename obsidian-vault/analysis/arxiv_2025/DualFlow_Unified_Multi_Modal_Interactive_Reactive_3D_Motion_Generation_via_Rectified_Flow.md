@@ -57,8 +57,6 @@ DualFlow 提出了一种**统一框架**来解决上述问题。其核心思路�
 
 实验结果验证了上述设计的有效性：在 MDD 数据集的交互任务上，DualFlow 的 R-Precision@3 达到 0.513（InterGen 为 0.302），FID 为 0.415；在反应任务上，FID 为 0.686，MMDist 为 1.056（DuoLando 分别为 0.698 和 2.113）。在 InterHuman-AS 文本交互任务上，R-Precision@1 达到 0.437，远超 InterGen 的 0.113。消融实验进一步证实，RAG 模块、对比损失和同步损失对性能均有显著贡献。
 
-
-
 **核心瓶颈：交互与反应式两人运动生成的分离与低效**
 
 现有的两人互动运动生成方法存在三个根本性缺陷。首先，交互式生成（同时合成两人的协调运动）与反应式生成（基于一人运动生成另一人的响应）被视作两个独立任务，各自使用互不兼容的模型架构——交互式模型如 **InterGen**（Liang et al., 2024）基于扩散模型同时输出两人动作，而反应式模型如 **DuoLando** 则采用条件生成范式。这种分离导致无法在一个统一框架内灵活切换任务模式。其次，现有方法仅支持单一模态条件（纯文本或纯音乐），缺乏对多模态语义信息的有效融合。第三，也是最为关键的效率瓶颈，主流方法均基于扩散模型（DDPM/DDIM），需要数十甚至上百步的随机去噪迭代才能生成合理结果，推理速度慢且存在误差累积问题，严重制约了实际应用场景中的实时交互需求。
@@ -70,8 +68,6 @@ DualFlow 针对上述瓶颈提出了系统性的解决方案。在生成范式�
 **核心洞察：语义锐化与高效采样的一体化**
 
 DualFlow 的核心洞察在于：将交互与反应式两人运动生成统一到整流流框架，并利用LLM驱动的多层次检索和对比学习锐化运动表示的语义边界，可以在极少采样步数下生成高度同步且语义一致的协调运动。实验证据充分支撑了这一洞察——在MDD数据集的交互任务上，DualFlow的R-Precision@3达到0.513，显著优于InterGen的0.302（+69.9%），FID降至0.415；在反应任务上，FID为0.686，MMDist为1.056，远超DuoLando的0.698和2.113（Table 1）。在InterHuman-AS数据集上，文本条件下的R-Precision@1达到0.437，相较InterGen的0.113提升287%（Table 2）。消融实验进一步验证了各组件的因果贡献：完全移除RAG模块导致交互任务FID从0.415升至0.622（Table 7），去除三元组对比损失使FID恶化至0.783（Table 4），去除同步损失则使交互和反应任务的FID分别升至0.472和0.774（Table 8）。
-
-
 
 ## 核心方法与创新机理
 
@@ -128,8 +124,6 @@ DualFlow 采用双分支 Transformer 架构，通过**可切换掩码机制**实
 
 这些创新协同作用，使 DualFlow 在 MDD 交互任务上 R-Precision@3 达到 0.513（InterGen 为 0.302），反应任务 FID 降至 0.686（DuoLando 为 0.698），同时保持仅需 20 步的高效推理。
 
-
-
 DualFlow 是一个基于整流流（Rectified Flow）的统一多模态框架，首次将交互式（Interactive）与反应式（Reactive）两人运动生成整合到单一架构中。整体 pipeline 由三个核心阶段构成：**多模态条件编码与运动检索**、**双分支 Transformer 生成网络**、以及**对比整流流优化与几何正则化**。
 
 ### 输入与条件编码
@@ -162,15 +156,8 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{CRF}} + \lambda_{\mathrm{g
 
 推理时，DualFlow 仅需 20 步确定性直线采样即可生成高质量运动，速度是 50 步 DDIM 的 2.5 倍。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2509_24099/figures/002_Figure_2.jpg]]
 *Figure 2: (a) Our framework takes text (CLIP-L/14), music, and motion sequences from an actor (A) and reactor (B) as inputs. Motion samples are retrieved using music features and LLM-decomposed text cues (spatial relationship, body movement, rhythm). These modality-specific latents are processed by cascaded Multi-Modal DualFlow Blocks that model interactive dynamics. Outputs are either both actors’ motions (interactive) or only the reactor’s motion (reactive) via a masking mechanism. (b) A DualFlow Block: in the interactive setting, both branches operate symmetrically with Motion Cross Attention coordinating joint motion; in the reactive setting, the actor branch is masked and the reactor branch empl...*
-
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2509_24099/figures/001_Figure_1.jpg]]
-*Figure 1: Our DualFlow model unifies two tasks: (a) Interactive Motion Generation, which synthesizes synchronized two-person interactions, (b) Reactive Motion Generation, which generates responsive motions for Person B (red) conditioned on Person A’s (blue) movements. The generation process is conditioned jointly on text, music, and the retrieved motion samples*
-
-
 
 ### 3.1 问题形式化
 
@@ -283,13 +270,6 @@ $$\mathcal{L}_{\text{total}} = \mathcal{L}_{\text{CRF}} + \lambda_{\text{geo}}\m
 
 该损失函数联合优化重建精度、语义对齐、物理合理性和人际协调性，使DualFlow在仅20步直线采样中即可生成高度同步且语义一致的两人协调运动。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2509_24099/figures/010_Table_5.jpg]]
-*Table 5: Examples of input text decomposed into three fine-grained, semantically focused descriptions using LLM for MDD Dataset*
-
-
-
 ## 实验与关键发现
 
 ### 主实验：双人交互与反应式生成
@@ -334,17 +314,6 @@ Fig. 5 的可视化对比显示，InterGen 在交互生成中产生手部间距�
 
 所有模型在相同数据集（MDD、InterHuman-AS、DD100）上训练和评估，使用统一的评价指标（FID、MMDist、R-Precision 等）。DualFlow 与基线共享相同的文本编码器（CLIP ViT-L/14）和音乐编码器（Jukebox），消融实验保持训练协议和超参数搜索空间一致。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2509_24099/figures/003_Table_1.jpg]]
-*Table 1: Duet Generation results on MDD dataset with both text and music modalities. Bold for best, underline for second best*
-
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2509_24099/figures/005_Table_2.jpg]]
-*Table 2: Interactive Two-person Generation results conditioned on text modality for the InterHuman-AS dataset*
-
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2509_24099/figures/007_Table_3.jpg]]
-*Table 3: Reactive Motion Generation results conditioned on text modality for the DD100 dataset*
-
 ![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2509_24099/figures/009_Table_4.jpg]]
 *Table 4: Ablation Study on MDD dataset (both text & music)*
 
@@ -356,11 +325,6 @@ Fig. 5 的可视化对比显示，InterGen 在交互生成中产生手部间距�
 
 ![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2509_24099/figures/013_Table_8.jpg]]
 *Table 8: Ablation Study on Synchronization Loss on the MDD dataset*
-
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2509_24099/figures/004_Figure_3.jpg]]
-*Figure 3: User study results*
-
-
 
 ## 定位与知识库关联
 
@@ -410,8 +374,6 @@ DualFlow 的设计假设和实验设置界定了其有效范围：
 4. **少样本风格泛化**：当前框架依赖大规模标注数据训练。能否通过检索库的动态更新或元学习策略，实现少样本甚至零样本的风格泛化到新的舞蹈流派或交互模式？
 
 5. **多人扩展**：对比整流流的训练策略是否能迁移到更多人数（如群组舞蹈）或更复杂的物理交互场景？双分支架构的对称设计在多人场景中需要重新设计注意力机制和同步损失。
-
-
 
 ## 原文 PDF
 

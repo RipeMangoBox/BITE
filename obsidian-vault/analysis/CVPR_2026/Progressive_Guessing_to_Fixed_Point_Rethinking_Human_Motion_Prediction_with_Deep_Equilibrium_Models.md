@@ -52,8 +52,6 @@ claims:
 
 在 Human3.6M 数据集上，MotionDEQ 以不到 300K 参数在 400ms 处达到 55.3mm 预测误差，取得最优性能；训练内存消耗比对应的多阶段模型减少 2 倍以上。在 CMU-MoCap 和 3DPW 数据集上同样一致优于现有基线，验证了 DEQ 范式在人体运动预测中的有效性与效率优势。
 
-
-
 ### 问题背景
 
 人体运动预测（Human Motion Prediction）旨在根据观测到的历史运动序列 $\mathbf{X}_{1:T_p}$，预测未来 $T_f$ 帧的三维人体姿态。这一任务在自动驾驶、人机交互和运动分析等领域具有重要应用价值。其核心挑战在于：人体运动天然具有**等变性（equivariance）**——当输入运动发生旋转或平移时，预测输出应相应变换；同时，运动模式又蕴含**不变性（invariance）**——关节间的协同关系在坐标系变换下保持稳定。如何在保持等变性的同时，充分挖掘不变模式以提升长时预测精度，是该领域的核心难题。
@@ -90,8 +88,6 @@ $$\mathbf{z}^* = f_{\boldsymbol{\theta}}(\mathbf{z}^*, \mathbf{x})$$
 - **等变/不变观察条件注入**：在每次迭代中，通过等变注入层 $\mathcal{F}_{\mathrm{EGI}}$ 和不变注入层 $\mathcal{F}_{\mathrm{IPI}}$ 将观测特征融入当前猜测，确保等变性和不变性的同时保留。
 - **稀疏不动点监督**：直接在最终不动点与稀疏采样的中间状态上与原始真值对齐，避免手工设计平滑目标或密集阶段监督。
 - **流式适配**：通过热启动初始猜测和轻量等变校正适配器 $\mathcal{F}_{\mathrm{ECA}}$，使模型无缝适配流式运动数据。
-
-
 
 ## 核心方法与创新机理
 
@@ -170,8 +166,6 @@ Figure 8(b) 显示，截断梯度显著优于不精确的 JFB（Jacobian-Free Ba
 - **推理迭代开销**：尽管训练内存恒定，推理时需 10-30 次迭代求解，在极端低延迟场景下仍有一定开销。固定点求解的收敛速度缺乏理论保证，能否通过模型设计（如单调算子）进一步减少迭代次数是开放问题。
 - **架构泛化性**：当前仅基于 EqMotion 骨干架构验证，向其他等变预测器或 Transformer/扩散模型等架构的迁移效果尚未实验。
 
-
-
 MotionDEQ 将人体运动预测重新表述为一个**共享参数的深度均衡（DEQ）不动点求解过程**，其整体 pipeline 由五个核心模块串联构成，数据流从历史观测序列出发，经特征初始化、交互图推断、初始猜测分解、DEQ 迭代细化，最终由等变输出层生成未来姿态序列。
 
 ### 从多阶段细化到不动点求解
@@ -218,8 +212,6 @@ MotionDEQ 的整体架构如 Figure 2 所示，包含以下五个核心模块：
 - **等变校正适配器 $\mathcal{F}_{\text{ECA}}$**：利用上一轮预测 $\hat{\mathbf{Y}}_r$ 与当前观测 $\mathbf{X}_{r+1}$ 的偏差，通过轻量级 MLP 和等变图网络对几何特征进行校正，进一步提升流式场景下的预测精度。
 
 需要注意的是，$\mathcal{F}_{\text{ECA}}$ 依赖上一预测轮次的真值进行校准，在无法获取实时真值的离线推理中不可用；热启动机制在运动发生剧烈突变时也可能引入偏差。
-
-
 
 ### 3.1 从渐进式猜测到不动点求解
 
@@ -296,13 +288,6 @@ $$\mathbf{H}' = \mathcal{F}_{\mathrm{DL}}(\widehat{\mathbf{Y}}_r - \mathbf{X}_{r
 
 该适配器保持等变性，但需要上一预测轮次的真值，在离线推理中不可用。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1077_https_openaccess_thecvf_com_content_CVPR2026_html_Wei_Progressive_Guessi/figures/003_Figure_3.jpg]]
-*Figure 3: Our DEQ model adaption to streaming human motion*
-
-
-
 ## 实验与关键发现
 
 ### 短期预测主结果
@@ -327,9 +312,6 @@ MotionDEQ 在三个标准人体运动预测基准上与多个代表性基线进�
 
 Figure 7 展示了等变校正适配器 F_ECA 在流式场景下的影响。在 80ms 和 400ms 两个时间步上，F_ECA 对各类动作均带来一致的误差降低，尤其在长时预测（400ms）上增益更为显著。适配器的核心机制在于利用上一轮预测与当前观测的偏差，通过等变校正网络调整几何特征，从而有效抑制误差累积。
 
-![[assets/figures/papers/paper_list_l1077_https_openaccess_thecvf_com_content_CVPR2026_html_Wei_Progressive_Guessi/figures/012_Figure_7.jpg]]
-*Figure 7: Influence of*
-
 ### 定性结果
 
 Figure 5 以 walkingtogether 动作为例展示了预测姿势的可视化对比。MotionDEQ 的预测轨迹（蓝色）与真值（绿色虚线）高度吻合，尤其在肢体末端关节的细粒度运动上明显优于基线方法，验证了无限次细化对运动细节的捕捉能力。
@@ -346,19 +328,8 @@ Figure 5 以 walkingtogether 动作为例展示了预测姿势的可视化对比
 - **推理延迟。** 虽然训练内存恒定（O(1)），但推理时不动点求解器通常需要 10–30 次迭代，在极端低延迟场景下仍存在开销。能否通过单调算子设计等理论工具进一步减少迭代次数，目前缺乏理论保证。
 - **架构泛化性。** 当前 MotionDEQ 仅基于 EqMotion 骨干验证，向其他等变预测器（如 Transformer、扩散模型）的迁移效果尚未实验。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1077_https_openaccess_thecvf_com_content_CVPR2026_html_Wei_Progressive_Guessi/figures/004_Table_1.jpg]]
-*Table 1: Short-term prediction results on Human3.6M. ‘†’ denotes the average results over 5 runs from our reimplementation using released code due to its high sensitivity to network initialization. The best and second-best results are marked in bold and underline, respectively*
-
-![[assets/figures/papers/paper_list_l1077_https_openaccess_thecvf_com_content_CVPR2026_html_Wei_Progressive_Guessi/figures/005_Table_2.jpg]]
-*Table 2: Results of average prediction errors on CMU-MoCap and 3DPW datasets*
-
 ![[assets/figures/papers/paper_list_l1077_https_openaccess_thecvf_com_content_CVPR2026_html_Wei_Progressive_Guessi/figures/008_Figure_4.jpg]]
 *Figure 4: Comparison of accuracy and parameter on Human3.6M*
-
-![[assets/figures/papers/paper_list_l1077_https_openaccess_thecvf_com_content_CVPR2026_html_Wei_Progressive_Guessi/figures/009_Figure_6.jpg]]
-*Figure 6: Results of convergence, memory and inference time*
 
 ![[assets/figures/papers/paper_list_l1077_https_openaccess_thecvf_com_content_CVPR2026_html_Wei_Progressive_Guessi/figures/011_Table_5.jpg]]
 *Table 5: Ablation study on network designs on Human3.6M*
@@ -368,11 +339,6 @@ Figure 5 以 walkingtogether 动作为例展示了预测姿势的可视化对比
 
 ![[assets/figures/papers/paper_list_l1077_https_openaccess_thecvf_com_content_CVPR2026_html_Wei_Progressive_Guessi/figures/013_Figure_8.jpg]]
 *Figure 8: Ablations on forward iterations and backward gradients*
-
-![[assets/figures/papers/paper_list_l1077_https_openaccess_thecvf_com_content_CVPR2026_html_Wei_Progressive_Guessi/figures/007_Table_3.jpg]]
-*Table 3: Comparison result of RNN-variants on 3DPW dataset*
-
-
 
 ## 定位与知识库关联
 
@@ -430,8 +396,6 @@ MotionDEQ 的适用边界受以下因素制约：
 2. **收敛速度的理论与工程优化。** 固定点求解的收敛速度是否存在理论保证？能否通过模型设计（如单调算子约束、Lipschitz 正则化）进一步减少所需迭代次数，逼近实时推理需求？
 3. **鲁棒热启动策略。** 在运动突变或无真值校准的离线场景，如何设计自适应的初始猜测机制？例如，基于运动模式切换检测动态选择冷启动或热启动策略。
 4. **多人交互与异构传感器场景。** 在多人交互运动或惯性传感器等异构数据源的流式预测中，该框架的等变/不变分解是否仍然适用？交互图的不动点求解是否会引入额外的收敛挑战？
-
-
 
 ## 原文 PDF
 

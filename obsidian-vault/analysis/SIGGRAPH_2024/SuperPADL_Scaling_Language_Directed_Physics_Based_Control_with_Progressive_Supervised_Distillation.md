@@ -55,8 +55,6 @@ claims:
 
 **主要结果**：在 AMASS 数据集 5587 个动作上，SuperPADL 全局控制器的阈值化精确率 AUC 达 1.18（PADL+BC 为 1.12，PADL 为 0.99），召回率 AUC 达 1.11（PADL+BC 为 0.73，PADL 为 0.70），显著优于直接在大规模数据上训练的 RL 基线。技能转换成功率超过 90%，人类评估中评价者从四个选项中正确识别文本标题的频率达 57.33%，远超随机水平。
 
-
-
 ### 问题背景：语言驱动的物理角色动画
 
 让物理模拟角色根据自然语言指令执行多样化动作，是计算机图形学与具身智能交叉领域的前沿目标。这一任务要求控制器同时满足三个约束：（1）**物理合理性**——角色必须在模拟器中保持平衡，关节力矩、接触力等遵循物理定律；（2）**语言忠实度**——生成的运动必须准确响应文本语义；（3）**技能广度**——单一控制器需覆盖数百甚至数千种不同的运动技能。
@@ -70,8 +68,6 @@ claims:
 ### 本文动机与核心洞察
 
 上述瓶颈揭示了一个根本性的训练范式矛盾：**RL 的对抗性目标需要在小规模、可控的动作空间内才能有效塑造运动质量，而语言条件的泛化能力需要大规模、多样化的数据支撑**。SuperPADL 的核心洞察是将这两个需求解耦到不同的训练阶段——在小规模数据上用 RL 训练高质量的运动专家，然后通过监督学习将这些专家的技能逐步蒸馏到可扩展的通用控制器中。这种“渐进式蒸馏”框架使得最终控制器既能继承 RL 专家的运动质量，又能通过纯监督学习在大规模文本-运动数据上获得语言响应能力，成功绕过了直接在大规模数据上使用 RL 的失效问题。
-
-
 
 ## 核心方法与创新机理
 
@@ -102,8 +98,6 @@ SuperPADL 的核心创新在于提出了一种**渐进式监督蒸馏框架**，
 *   **技能转换能力**：得益于上下文窗口和渐进式训练，全局控制器在同组和跨组动作间的技能转换成功率均超过 90%（Table 3），证明了其鲁棒性。
 *   **语言忠实度**：人类评估显示，评价者能以 57.33% 的准确率从四个选项中正确识别出控制器所依据的文本标题，远超随机水平（25%），验证了文本条件信号的有效性（Table 4）。
 
-
-
 SuperPADL 的核心设计动机源于一个关键瓶颈：当直接在大规模动作数据集（数千个动作）上应用对抗性强化学习（如 PADL 或 PADL+BC）训练全局控制器时，策略会对文本命令变得反应迟钝，运动质量急剧下降。这表明纯 RL 或 RL+BC 混合方法无法有效扩展到数千个动作的规模。
 
 为解决这一问题，SuperPADL 提出了**渐进式监督蒸馏框架**（Progressive Supervised Distillation），其核心思想是将 RL 的使用限制在小规模数据上以保障运动质量，再通过监督学习将技能逐步蒸馏到可扩展的通用控制器中。整个框架分为三个阶段，如 Figure 2 所示：
@@ -125,12 +119,8 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{PADL}} + 0.01 \mathcal{L}_{\mathrm{BC}}$$
 
 这一渐进式设计成功结合了 RL 在小规模上的运动质量优势和监督学习在大规模上的可扩展性，使得最终全局控制器能够在超过 5000 个动作上实时响应自然语言命令。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2407_10481/figures/010_Figure_7.jpg]]
 *Figure 7: Simulated character performing skills specified by language commands. Our framework is able to train a single text-conditioned controller that can perform a diverse array of skills*
-
-
 
 SuperPADL 采用三阶段渐进式蒸馏框架（Figure 2），核心思想是将强化学习（RL）限制在小规模数据上训练高质量运动专家，再通过监督学习逐步蒸馏到大规模通用控制器中，从而解决直接在大规模动作数据上应用对抗性 RL 时策略对文本命令反应迟钝、运动质量急剧下降的瓶颈。
 
@@ -169,8 +159,6 @@ $$\mathcal{L}_{\mathrm{BC}} = \mathbb{E}_{I \sim \{20i+1,\dots,20i+20\}, (\mathb
 ### 网络架构
 
 所有阶段的控制器均采用简单 MLP 架构（Figure 3），隐藏层尺寸为 1024–3072，使用 ReLU 或 ELU 激活函数与 LayerNorm。判别器独立于策略网络。文本编码器使用 CLIP 模型提取池化嵌入作为条件输入。
-
-
 
 ## 实验与关键发现
 
@@ -246,20 +234,8 @@ SuperPADL 全局控制器在 Precision AUC 上达到 1.18，相比 PADL+BC 提�
 
 所有实验均在相同硬件（单个 NVIDIA A40 GPU）上进行，训练时间和环境交互帧数（样本量）明确报告，保证比较的公平性。专家训练采用基于跟踪误差的早停策略（**Figure 4** 显示大多数专家在不到一小时内完成训练，超过 30% 在 30 分钟内完成），丢弃的不可行动作仅占 5%，但丢弃策略对总训练成本的影响需要在实际部署中考虑。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2407_10481/figures/005_Figure_5.jpg]]
-*Figure 5: Thresholded precision and recall metrics for the SuperPADL global controller as well as PADL and PADL+BC baselines. We observe that the SuperPADL global controller has consistently higher precision and recall*
-
 ![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2407_10481/figures/006_Table_1.jpg]]
 *Table 1: Measuring area-under-curve (AUC) motion quality metrics for di erent global controller objectives. Using adversarial RL on datasets containing thousands of motions is ine ective, leading to policies that are largely unresponsive to text commands*
-
-![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2407_10481/figures/008_Table_2.jpg]]
-*Table 2: Measuring area-under-curve (AUC) motion quality metrics and policy training time for our work’s PADL+BC group controller and a pure-PADL group controller baseline. The supervision signal added to PADL+BC allows it to attain a higher motion quality while training in significantly less time than the baseline. Standard deviation is calculated across four trained policies, each trained on a distinct motion group*
-
-![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2407_10481/figures/012_Table.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -310,8 +286,6 @@ SuperPADL 的**全局控制器**在 Precision AUC 上达到 1.18（对比 PADL+B
 3. **多模态运动分布建模**：将全局控制器的训练目标从确定性模仿替换为扩散模型的去噪目标，是否能更好地捕获运动的多模态分布，并支持用户可控的生成技术（如 classifier-free guidance、变分噪声调度），是论文明确提出的未来工作方向。
 
 4. **开放词汇泛化**：如何进一步评估和改进方法在开放词汇或未见文本描述上的泛化能力，使其能够处理训练分布之外的语言指令，是实现真正通用语言导向物理控制的关键挑战。
-
-
 
 ## 原文 PDF
 

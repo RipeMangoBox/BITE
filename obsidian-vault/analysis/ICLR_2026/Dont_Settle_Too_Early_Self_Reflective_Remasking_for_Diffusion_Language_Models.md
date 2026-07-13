@@ -54,8 +54,6 @@ claims:
 
 **方法定位**：RemeDi 属于掩码式扩散语言模型，以 **LLaDA**（Nie et al., 2025）为骨干，与 **Dream**（Ye et al., 2025）、**LLaDOU**（Huang et al., 2025）、**ReMDM**（Wang et al., 2025a）等同期工作并列，但在生成过程中引入可学习的自反思修正机制，是对 DLM 推理范式的重要改进。
 
-
-
 扩散语言模型（Diffusion Language Models, DLMs）作为自回归语言模型之外的另一类生成范式，通过迭代去噪过程生成文本，天然支持非自回归的并行解码，在推理效率和可控生成方面展现出潜力。当前主流的掩码式 DLM（如 **LLaDA**、**Dream**）遵循一个基本假设：在生成过程中，一旦某个位置的令牌被解码（unmask），其值便永久固定，不再参与后续的修正。这一设计虽简化了生成流程，却引入了一个根本性缺陷——**模型缺乏识别并修正早期错误的能力**。
 
 在分块逐步生成（block-by-block generation）的典型场景中，模型在早期步骤可用的上下文信息相对稀疏，此时做出的令牌预测可能并非最优。随着后续步骤揭示更丰富的上下文，早期错误会随生成链逐级累积，最终导致输出质量显著下降。这一“错误冻结”问题在数学推理、代码生成等对精度要求极高的任务中尤为突出，成为制约 DLM 性能进一步提升的关键瓶颈。
@@ -63,8 +61,6 @@ claims:
 针对上述问题，已有部分工作尝试引入修正机制。例如 **Seed Diffusion** 通过随机重掩码已解码令牌来实现“修订”，但其重掩码策略是盲目的——不区分令牌质量高低，缺乏对错误位置的主动感知。**ReMDM** 提出了预测-校正（predictor-corrector）的重掩码采样器，但其重掩码决策仍依赖于启发式规则，未能从数据中学习何时以及何处需要修正。
 
 本文的核心动机在于：**赋予扩散语言模型“自反思”（self-reflection）的能力**，使其能够在生成过程中主动评估已解码令牌的置信度，识别低质量令牌并将其重掩码，从而在后续步骤中利用更丰富的上下文重新采样。这一思路将 DLM 的生成过程从单向的“掩码→解码”转变为具备自我纠错能力的“掩码→解码→反思→重掩码→重新解码”循环，有望从根本上缓解错误累积问题。
-
-
 
 ## 核心方法与创新机理
 
@@ -120,8 +116,6 @@ $$\pi_{\theta,n}(x_{t_n} | x_{t_{n-1}}) = \pi_{\theta,n}^{\mathrm{unmask}}(\math
 
 这些变革并非孤立的技术叠加，而是围绕“自反思修正”这一核心洞察的系统性重构：双流架构提供了置信度评估的硬件基础，双重噪声和联合损失教会模型识别错误，RL 阶段则优化了修正策略的全局效果。消融实验有力支撑了这一设计的有效性——Remask SFT 在所有基准上均优于 Vanilla SFT，尤其在 MATH-500（+2.6%）和 HumanEval（+1.8%）上（Table 4）；Remask RL 相比 LLaDOU RL 收敛更快且最终奖励更高（Table 5, Fig. 15）。
 
-
-
 RemeDi 的核心设计围绕一个双流 Transformer 架构展开，该架构由**令牌预测流（Token Prediction Stream, TPS）**和**去掩码策略流（Unmasking Policy Stream, UPS）**组成（Fig. 2）。TPS 负责在每一个扩散步中预测掩码位置的令牌概率分布，而 UPS 则独立地生成每个位置的置信度分数 $h_{\theta}^i$，用于决定哪些位置应当被去掩码（unmask），哪些位置应当被重掩码（remask），从而赋予模型在生成过程中主动识别并修正早期错误的能力。
 
 整个训练与推理流程可概括为以下阶段：
@@ -134,8 +128,6 @@ RemeDi 的核心设计围绕一个双流 Transformer 架构展开，该架构由
 3.  **Remask RL（强化学习）**：在 SFT 基础上，采用基于结果的强化学习（GRPO）对整个生成轨迹进行优化。该阶段使用 Plackett-Luce 模型依据 UPS 的置信度分数来采样去掩码位置，直接以最终生成质量（如数学答案的正确性）作为奖励信号，进一步提升模型的自修正能力。
 
 在推理时，RemeDi 的每一步生成均遵循“预测-评估-重掩码”循环：TPS 为所有掩码位置预测候选令牌，UPS 为序列中所有位置（包括已去掩码的）计算置信度。高置信度的掩码位置被去掩码，而低置信度的已去掩码令牌则被重新置为掩码状态，使其能在后续步骤中利用更丰富的上下文信息被重新采样，从而打破传统扩散语言模型“一旦解码便永久固定”的限制（Fig. 1a）。
-
-
 
 ### 双流架构：TPS 与 UPS
 
@@ -195,8 +187,6 @@ $$\pi_{\theta,n}(x_{t_n} \mid x_{t_{n-1}}) = \pi_{\theta,n}^{\text{unmask}}(\mat
 
 RL 阶段使模型在 GSM8K 上收敛更快且最终奖励高于 LLaDOU RL（Fig. 15, Table 5），验证了联合优化生成轨迹的有效性。
 
-
-
 ## 实验与关键发现
 
 ### 核心结果：RemeDi 在数学、代码与通用任务上全面刷新开源 DLM 最优水平
@@ -210,13 +200,7 @@ RemeDi 在数学推理、代码生成和通用任务基准上均取得开源扩�
 
 **通用任务**（Table 2）：RemeDi 在 ARC-C（87.7%）、IFEval（85.4%）和 AlpacaEval（胜率 24.8%）上均大幅领先已有 DLM。与 LLaDA 1.5 相比，IFEval 提升 11.9 个百分点，AlpacaEval 胜率提升 10.9 个百分点，说明自反思重掩码对指令遵循和开放生成质量同样有效。
 
-![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_BsZeTuB5fD/figures/005_Table_2.jpg]]
-*Table 2: Model performance on general tasks. We highlight the best-performing model among compared DLMs in bold. “-” indicates unknown cases not mentioned in original papers*
-
 **推理效率与精度的平滑权衡**（Figure 14）：通过调节每步解码令牌数（1/2/4 tok/step），RemeDi 在 GSM8K 精度与吞吐量之间形成帕累托前沿——在吞吐量远超自回归模型（如 DeepSeekMath、MetaMath）的同时，精度仍保持领先。这一特性使 RemeDi 在实际部署中可按需配置延迟-质量平衡点。
-
-![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_BsZeTuB5fD/figures/028_Figure_14.jpg]]
-*Figure 14: Throughput–performance trade-off of RemeDi compared with other AR and DLM models. By increasing the number of denoised tokens per step, RemeDi provides a smooth quality–latency trade-off. All results are measured with batch size 1 and sequence length 1024 on a single H800 GPU*
 
 ### 消融实验：重掩码机制与两阶段训练各自贡献明确
 
@@ -231,9 +215,6 @@ RemeDi 在数学推理、代码生成和通用任务基准上均取得开源扩�
 
 ![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_BsZeTuB5fD/figures/011_Table_5.jpg]]
 *Table 5: GSM8K pass@1 accuracy comparison between Remask and LLaDOU RL*
-
-![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_BsZeTuB5fD/figures/022_Table_9.jpg]]
-*Table 9: Matched-compute ablation between extra SFT training and Remask RL*
 
 **Remask 采样器的关键作用**（Table 8）：在相同 Remask SFT 模型上，Remask 采样器在 MATH-500、HumanEval、IFEval 上显著优于传统半自回归采样器和自适应采样器。这说明推理时的自反思重掩码策略——而非仅训练阶段的改进——是性能提升的直接原因。
 
@@ -254,13 +235,7 @@ RemeDi 在数学推理、代码生成和通用任务基准上均取得开源扩�
 
 重掩码频率在不同任务间呈现显著差异（Figure 4, Table 3）。代码生成（HumanEval）中每个令牌平均被重掩码次数最高，数学推理（GSM8K、MATH-500）次之，开放式问答（AlpacaEval）最低。在 MATH-500 内部，随着题目难度从 Level 1 升至 Level 5，平均重掩码频率单调递增（Table 3），表明模型自适应地在更复杂问题上进行更多自我修正。这一行为模式与重掩码机制的设计直觉一致：当生成任务需要更精细的推理时，早期错误更可能被后续上下文暴露，触发更多的重掩码操作。
 
-![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_BsZeTuB5fD/figures/009_Table_3.jpg]]
-*Table 3: Statistics of the remasking frequencies per block (block size is fixed to 32) when generating responses to questions with different difficulty levels in MATH-500*
-
 经过 Remask RL 后，重掩码频率进一步上升（Table 11），同时精度同步提升——RL 训练使模型在 GSM8K 上重掩码频率从 0.45 升至 0.78，HumanEval 从 0.82 升至 1.15。这说明 RL 优化了“何时重掩码”的决策质量，而非简单地减少修正次数。
-
-![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_BsZeTuB5fD/figures/024_Table_11.jpg]]
-*Table 11: Average remask frequency (ARF) and performance across tasks. ARF measures how many times each token is remasked on average during decoding*
 
 ### 局限与待验证问题
 
@@ -270,13 +245,6 @@ RemeDi 在数学推理、代码生成和通用任务基准上均取得开源扩�
 2. **任务适用性边界**：重掩码在代码和数学任务上收益最大，在开放式文本生成上频率较低，暗示该方法对需要精确推理的任务更有效，对自由文本生成的增益可能有限。
 3. **多语言与低资源场景**：所有实验均在英文基准上进行，未讨论跨语言迁移能力。
 4. **生成多样性与事实一致性**：重掩码机制对生成多样性和幻觉率的影响缺乏系统评估，需后续研究补充。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_BsZeTuB5fD/figures/020_Table_7.jpg]]
-*Table 7: Comparison between our learned remask policy in RemeDi and the ReMDM predictorcorrector, both evaluated with RemeDi-Instruct*
-
-
 
 ## 定位与知识库关联
 
@@ -322,8 +290,6 @@ RemeDi 的核心贡献在于为掩码式扩散语言模型（DLM）引入**自�
 4. **大规模扩展**：该方法在 70B+ 规模模型上的扩展性和稳定性如何？双流架构在大模型下的训练稳定性和通信开销需要实证验证。
 
 5. **更细粒度的重掩码策略**：当前重掩码基于逐令牌置信度，是否可以利用令牌间的结构依赖（如语法树、推理步骤间的逻辑关系）设计更智能的重掩码策略，进一步提升修正效率？
-
-
 
 ## 原文 PDF
 

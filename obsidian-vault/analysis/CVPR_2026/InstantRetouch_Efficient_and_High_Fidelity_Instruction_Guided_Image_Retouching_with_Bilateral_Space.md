@@ -47,8 +47,6 @@ claims:
 
 该方案在自建的 iRetouch 指令修饰基准上取得了极具竞争力的结果：内容保真度 SSIM 高达 0.989，4K 分辨率推理仅需 0.068 秒，比 **Gemini-2.5-Flash**（Comanici et al., arXiv 2025）等大模型快 70–800 倍，整体质量得分（8.54）与最强闭源系统（8.74）几乎持平。这是目前首个在指令驱动的图像修饰任务中，同时实现**高保真、高质量与极低延迟**的方法。
 
-
-
 图像修饰（Image Retouching）旨在对照片进行光度调整（如色彩、对比度、亮度）以提升视觉美感，同时要求严格保留原始图像的结构与纹理内容。近年来，基于文本指令的图像编辑方法取得了显著进展，用户可通过自然语言描述期望的编辑效果。然而，现有方案在同时满足**高内容保真度**、**高编辑质量**和**高推理效率**三个目标时面临根本性瓶颈。
 
 **核心瓶颈：编辑空间的内容-外观耦合**
@@ -64,8 +62,6 @@ claims:
 上述困境的根本原因在于编辑操作发生在“错误的空间”中。本文的核心动机是：**能否将编辑操作从像素/潜空间转移到一个与内容天然解耦、且极度紧凑的表示空间中？** 受经典双边网格（bilateral grid）思想的启发，该表示通过预测局部仿射变换参数来实现外观调整，而不会触及原始图像的几何与纹理信息。如果能够将扩散模型强大的语义理解和视觉表现力蒸馏到这样一个双边网格生成器中，就有可能在**零内容漂移**的前提下，实现**单步、高分辨率、高质量**的指令引导图像修饰。
 
 这一动机驱动了 InstantRetouch 的设计：通过变分分数蒸馏（VSD）将多步扩散教师的先验压缩至一步双边网格生成器，并辅以基于 CLIP 的提示对齐损失来弥补步数压缩带来的指令跟随弱化，从而在保真度、质量和速度三个维度上同时取得突破。
-
-
 
 ## 核心方法与创新机理
 
@@ -126,8 +122,6 @@ $$\mathcal{L}_{\mathrm{align}} = \frac{1}{|\mathcal{A}(c_T)|} \sum_{a \in \mathc
 
 这种设计使得 InstantRetouch 成为目前唯一同时实现**扩散级语义质量**（整体得分 8.54，接近 Gemini-2.5-Flash 的 8.74）、**数学级内容保真度**（SSIM 0.989）和**极低推理延迟**（比大模型快 70-800 倍）的指令驱动图像修饰方法。
 
-
-
 InstantRetouch 的整体流水线围绕一个核心设计原则展开：**将编辑操作从图像像素/潜空间解耦至紧凑的双边网格空间**，从而在单步前向传播中同时实现高保真内容保留与高语义质量的指令跟随。如图 2 所示，框架包含三个关键阶段：教师模型预训练、一步生成器蒸馏、以及全分辨率双边处理。
 
 ### 输入输出流
@@ -158,12 +152,8 @@ InstantRetouch 的整体流水线围绕一个核心设计原则展开：**将编
 
 推理为单次前向传播：给定输入图像和文本指令，模型直接生成双边网格并将其应用于原始分辨率输入，无需任何迭代去噪步骤。这一设计使 InstantRetouch 在 4K 分辨率下的推理时间仅为 0.068 秒，同时保持 0.989 的结构相似度（SSIM）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l759_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_InstantRetouch_Effi/figures/002_Figure_2.jpg]]
 *Figure 2: Our framework distills a multi-step diffusion teacher into a fast, one-step generator composed of two synergistic branches. The low-resolution diffusion branch processes the input image and text instruction to understand the edit, and then uses a light bilateral adapter to predict the parameters of a bilateral grid. The full-resolution branch then applies this grid to the original high-res image, producing the final high-fidelity result. We use Variational Score Distillation (VSD) to transfer the teacher’s knowledge and a CLIP-based language alignment loss to ensure instruction alignment*
-
-
 
 InstantRetouch 的核心架构由三个紧密协同的模块构成：**低分辨率扩散分支**、**双边适配器**与**全分辨率双边处理分支**。其设计哲学是将语义理解与像素级变换彻底解耦——扩散分支负责“理解编辑意图”，双边分支负责“执行外观变换”，二者通过一个紧凑的双边网格桥接。
 
@@ -251,8 +241,6 @@ $$
 
 消融实验证实，VSD 损失与提示对齐损失对编辑质量均起关键作用：仅用基础损失（$\mathcal{L}_{\mathrm{data}} + \mathcal{L}_{\mathrm{bila}}$）无法实现高质量编辑；添加 VSD 后评分大幅跃升；再引入提示对齐损失则带来最终的显著增益，尤其强化了对风格化指令的跟随能力。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -311,12 +299,8 @@ InstantRetouch 支持通过标量参数 $s$ 控制编辑强度（Figure 7）。�
 
 > 以上局限性分析基于方法机理推断，建议结合论文补充材料或后续版本进行人工验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l759_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_InstantRetouch_Effi/figures/004_Figure_3.jpg]]
 *Figure 3: Visual comparisons of different image editing methods on our iRetouch benchmark*
-
-
 
 ## 定位与知识库关联
 
@@ -361,8 +345,6 @@ InstantRetouch 处于指令驱动图像编辑、扩散模型知识蒸馏和双�
 ### 5. 知识库定位总结
 
 InstantRetouch 在知识库中的独特贡献在于：它首次证明了扩散模型的强语义先验可以被蒸馏到一个内容解耦的双边网格生成器中，从而在指令驱动的图像修饰任务上同时实现三个看似矛盾的目标——高语义质量（O-score 8.54，接近 Gemini-2.5-Flash 的 8.74）、极高内容保真度（SSIM 0.989）和极低推理延迟（4K 分辨率 0.068 秒）。这一“扩散先验 + 双边约束”的范式为实时、高保真的 AI 图像编辑提供了一条与现有潜空间编辑方法互补的技术路径。
-
-
 
 ## 原文 PDF
 

@@ -141,8 +141,6 @@ $$
 
 **与基线方法的关键差异**。InterFusion 与现有文本到 3D 方法（如 DreamFusion、Magic3D、TextMesh、MVDream、ProlificDreamer）的核心区别在于：这些基线方法通常使用单一 NeRF 联合生成人体和物体，缺乏显式几何先验，导致语义和几何混淆；而 InterFusion 通过“文本→3D 姿态→解耦生成”的路径，将人体姿态作为锚定几何先验，实现了人体和物体的分离优化与全局协调。消融基线 Ours-OC（用物体几何先验替代人体姿态先验）的显著性能下降（GPT-4V 选择率从 65.57% 降至 13.11%，Table 1）进一步验证了人体姿态先验的必要性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1762_InterFusion_Text_Driven_Generation_of_3D_Human_Object_Interaction/figures/002_Figure_2.jpg]]
 *Figure 2: InterFusion is a two-stage framework that transforms textual descriptions into detailed 3D human-object interactions, initially synthesizing anchor poses (upper left) and then optimizing the human model (upper right) and object model (bottom) with constraints from estimated pose and textual prompts*
 
@@ -254,11 +252,6 @@ InterFusion 在自定义的 61 类文本提示基准（涵盖 13 种交互类型
 
 这些失败模式指向了明确的研究方向：引入手部精细化模块、扩展至 4D 动态生成、以及利用大语言模型自动拆解复杂交互文本以生成更精细的时空约束。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1762_InterFusion_Text_Driven_Generation_of_3D_Human_Object_Interaction/figures/004_Table_1.jpg]]
-*Table 1: Quantitative evaluation of CLIP score and GPT-4V select*
-
 ![[assets/figures/papers/paper_list_l1762_InterFusion_Text_Driven_Generation_of_3D_Human_Object_Interaction/figures/007_Table_2.jpg]]
 *Table 2: Quantitative results of ablation studies*
 
@@ -273,15 +266,6 @@ InterFusion 在自定义的 61 类文本提示基准（涵盖 13 种交互类型
 
 ![[assets/figures/papers/paper_list_l1762_InterFusion_Text_Driven_Generation_of_3D_Human_Object_Interaction/figures/012_Figure_9.jpg]]
 *Figure 9: Visual ablations across multiple views for loss terms during the pose-guided generation process, given the text prompt "a man wearing a red baseball cap playing the guitar" (top) and "a person in a paisley print shirt and corduroy pants sitting on a chair" (bottom)*
-
-![[assets/figures/papers/paper_list_l1762_InterFusion_Text_Driven_Generation_of_3D_Human_Object_Interaction/figures/008_Figure_6.jpg]]
-*Figure 6: Additional qualitative comparison results with baseline methods*
-
-![[assets/figures/papers/paper_list_l1762_InterFusion_Text_Driven_Generation_of_3D_Human_Object_Interaction/figures/011_Figure_8.jpg]]
-*Figure 8: Comparisons with recent avatar generation methods, given the text prompt "a man with blond hair wearing a brown leather jacket"*
-
-![[assets/figures/papers/paper_list_l1762_InterFusion_Text_Driven_Generation_of_3D_Human_Object_Interaction/figures/013_Figure_10.jpg]]
-*Figure 10: InterFuison provides a flexible way for controllable editing of human-object interactions, enabling geometry and texture manipulations for either humans or objects through simple adjustments in the corresponding text prompts*
 
 ## 定位与知识库关联
 

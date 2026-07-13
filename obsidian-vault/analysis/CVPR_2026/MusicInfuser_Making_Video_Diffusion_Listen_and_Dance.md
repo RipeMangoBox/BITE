@@ -58,8 +58,6 @@ claims:
 
 **方法谱系与知识库定位**：MusicInfuser 属于“预训练视频扩散模型 + 轻量跨模态适配”范式，区别于直接联合音视频生成的 **MM-Diffusion**（Ruan et al., CVPR 2023）和基于 VQ 的音乐驱动 3D 舞蹈生成方法如 **AI Choreographer**（Li et al., ICCV 2021）与 **Bailando**（Siyao et al., CVPR 2022）。其关键创新在于将适配负担从全模型微调转移至选择性层注入与零初始化交叉注意力，在极低数据预算下实现高保真音乐‑视频对齐。
 
-
-
 ### 问题背景：从文本到视频到音乐驱动的舞蹈生成
 
 近年来，文本到视频扩散模型取得了显著进展，能够根据自然语言描述生成高质量的视频内容。然而，这些模型在设计上仅接受文本作为条件输入，无法直接响应音乐信号。在舞蹈生成这一特定领域，音乐与视觉动作的同步性是核心需求——观众期望视频中舞者的肢体动作、节奏韵律与背景音乐高度一致。现有的文本到视频模型虽然能生成“一个人在跳舞”的视频，但无法保证其动作与指定的音乐同步，这构成了一个明确的能力缺口。
@@ -86,8 +84,6 @@ claims:
 
 这一思路将问题从“如何从音乐生成舞蹈”重新定义为“如何让一个已经会跳舞的模型学会听音乐”，从而在数据效率、生成质量和音乐同步性之间找到了新的平衡点。
 
-
-
 ## 核心方法与创新机理
 
 MusicInfuser 的核心创新在于提出了一套**轻量、先验保持的音乐适配框架**，使预训练的文本到视频扩散模型无需从头训练即可生成音乐同步的高质量舞蹈视频。与现有方法（如骨骼动画生成 **EDGE** (Tseng et al., CVPR 2023)、联合音视频生成 **MM-Diffusion** (Ruan et al., CVPR 2023)）相比，MusicInfuser 直接利用预训练视频模型内化的复杂人体运动知识，仅通过选择性注入音乐条件来实现跨模态对齐，避免了舞蹈数据稀缺导致的生成质量瓶颈。
@@ -109,8 +105,6 @@ MusicInfuser 的核心创新在于提出了一套**轻量、先验保持的音�
 ### 创新价值总结
 
 上述三个 changed slots 共同构成了“先验保持 + 精准适配”的技术路线：ZICA 和 LoRA 保证新模态的平滑注入，层适应性选择避免冗余调制对先验的破坏，Beta-Uniform 调度则优化了舞蹈细节的生成过程。整套框架训练仅需单 GPU 一天内完成，在数据极度受限的条件下实现了与真实视频接近的舞蹈质量（AIST++ 基准上 7.95 vs. Ground Truth 8.01）。
-
-
 
 MusicInfuser 的整体设计遵循“轻量适配、先验保留”的原则，将预训练文本到视频扩散模型改造为音乐驱动的舞蹈视频生成器。其核心思路是：冻结预训练 DiT 骨干的绝大部分权重，仅在选定层注入音乐条件，从而在数据稀少的情况下高效对齐音频与视频运动，同时避免灾难性遗忘。
 
@@ -142,16 +136,11 @@ MusicInfuser 的整体设计遵循“轻量适配、先验保留”的原则，�
 
 1. **层适应性选择**：并非在所有 DiT 层中添加交叉注意力，而是通过基于引导影响函数的层适应性准则，仅在高适应性层中插入 ZICA 模块。消融实验（Table 1）表明，这种选择性策略在整体评分上显著优于全层适配（8.14 vs. 7.80）和均匀分布层适配（8.14 vs. 7.62），验证了精准层选择的重要性。
 
-![[assets/figures/papers/paper_list_l996_https_openaccess_thecvf_com_content_CVPR2026_html_Hong_MusicInfuser_Maki/figures/005_Figure_5.jpg]]
-*Figure 5: Zero-initialized cross-attention (ZICA) block. The output projection is initialized with a zero matrix, making the cross-attention block act as an identity function at the beginning. (b–d) illustrate several baseline layer selection strategies when the number of ZICA blocks is fewer than that of DiT blocks. (b) Attaching cross-attention blocks evenly across DiT blocks. (c) Attaching the blocks evenly to the earliest layers. (d) Attaching the blocks based on pre-computed layer adaptabilities (Sec. 4.1). Table 1 shows the results*
-
 2. **Beta‑Uniform 噪声调度**：训练噪声分布从 Beta(1, β=3) 指数衰减至 Uniform(0,1)，使模型在训练初期集中于低噪声水平的去噪，有助于保留预训练模型的人体表示能力。移除该调度后，舞蹈质量平均分从 8.22 降至 8.01（Table 1）。
 
 3. **零初始化交叉注意力**：ZICA 的输出投影初始为零，确保训练初期交叉注意力块等价于恒等映射，从而保护预训练先验。若不进行零初始化，视频/成像质量平均分从 8.02 降至 7.82（Table 1）。
 
 整个训练可在单 GPU 上一天内完成，体现了方法的资源效率。
-
-
 
 MusicInfuser 的核心设计围绕一个关键命题展开：**预训练的文本到视频扩散模型已经内化了复杂的人体舞蹈知识和运动规律，只需轻量且精确的音乐适配即可实现高效的音频驱动视频生成**。本节拆解支撑该命题的三个关键模块——层适应性准则、Beta‑Uniform 噪声调度和零初始化交叉注意力适配器——并给出其数学表述。
 
@@ -194,13 +183,6 @@ $$
 
 此外，MusicInfuser 在自注意力权重上施加**高秩 LoRA（秩 64）**，以增强对新模态的适应容量。与图像模型中常用的秩 8–16 不同，视频 Transformer 需要更高秩来捕捉复杂的时序舞蹈运动（Sec. 5.1）。LoRA 更新仅作用于适配参数 $\phi$，与冻结的基模型参数 $\theta$ 协同，构成最终的条件去噪器 $D_{\theta,\phi}(\mathbf{x}|\mathbf{c},\mathbf{a};\sigma)$。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l996_https_openaccess_thecvf_com_content_CVPR2026_html_Hong_MusicInfuser_Maki/figures/002_Figure_2.jpg]]
-*Figure 2: Motivational example. Skeletal motion generation [47] produces simplified movements lacking nuances such as backbone curvature, axial rotation, hand articulation, hair dynamics, and clothing motion, resulting in a more limited range of dance compared to video-based dance generation approaches (ours)*
-
-
-
 ## 实验与关键发现
 
 ### 核心性能对比
@@ -242,16 +224,10 @@ Figure 6 展示了 MusicInfuser 在**音乐长度和类型上的泛化能力**�
 ![[assets/figures/papers/paper_list_l996_https_openaccess_thecvf_com_content_CVPR2026_html_Hong_MusicInfuser_Maki/figures/006_Figure_6.jpg]]
 *Figure 6: Generalization capabilities in terms of music length and type. MusicInfuser can generate multiple times longer dance videos that are multiple times longer than the videos used for training. For each row, we use synthetic in-the-wild music tracks with a keyword “K-pop,” a type of music not existing in AIST [48], and use a prompt “a professional female dancer dancing*
 
-![[assets/figures/papers/paper_list_l996_https_openaccess_thecvf_com_content_CVPR2026_html_Hong_MusicInfuser_Maki/figures/008_Figure_7.jpg]]
-*Figure 7: Speed control. The audio input is slowed down (top row) or sped up (bottom row) by factors of 0.75 and 1.25, respectively. This shows that speeding up audio generally results in sped-up movement. Note also the change in dynamics, as speeding up the audio increases the musical tone. More examples of audio speeding up and slowing down are included in the supplementary video*
-
 Figure 3 和 Figure 4 分别展示了向**未见动物主体**（土拨鼠、兔子、狗）的泛化以及**多人群舞**的生成能力，说明预训练基模型已内化的运动知识可通过轻量适配迁移到新主体和新场景。Figure 8 的多样性实验表明，通过改变随机种子，同一音乐和文本可产生风格各异的舞蹈，满足创意生成的需求。
 
 ![[assets/figures/papers/paper_list_l996_https_openaccess_thecvf_com_content_CVPR2026_html_Hong_MusicInfuser_Maki/figures/003_Figure_3.jpg]]
 *Figure 3: Using prompts such as “a {marmot, rabbit, dog (top to bottom rows)} dancing ...,” our method generalizes to unseen dancing subjects*
-
-![[assets/figures/papers/paper_list_l996_https_openaccess_thecvf_com_content_CVPR2026_html_Hong_MusicInfuser_Maki/figures/004_Figure_4.jpg]]
-*Figure 4: We can generate group dance videos aligned with music, based on the text*
 
 ### 失败模式与局限
 
@@ -264,8 +240,6 @@ Figure 3 和 Figure 4 分别展示了向**未见动物主体**（土拨鼠、兔
 3. **长视频时域连贯性未充分验证**：虽然 Figure 6 展示了长度泛化，但极端长度条件下的时域一致性和动作退化程度未在量化实验中测试。
 
 4. **多人复杂交互未深入分析**：Figure 4 展示了群舞生成，但未评估多人之间的协调配合质量（如双人舞中的接触、同步转向等），该点需要手动验证。
-
-
 
 ## 定位与知识库关联
 
@@ -326,8 +300,6 @@ MusicInfuser 的适用边界受以下因素制约，部分已在论文中验证�
 3. **伦理与安全审查**：论文未讨论模型是否可能生成不安全或不当的舞蹈内容（如过度暴露、暴力动作等）。在开放域部署中，内容审核机制的设计是必要的后续工作。
 
 4. **多模态条件的冲突与协调**：当文本提示与音乐风格不一致时（如文本要求“芭蕾”而音乐是“嘻哈”），模型如何协调冲突？该场景下的行为模式尚未被系统研究。
-
-
 
 ## 原文 PDF
 

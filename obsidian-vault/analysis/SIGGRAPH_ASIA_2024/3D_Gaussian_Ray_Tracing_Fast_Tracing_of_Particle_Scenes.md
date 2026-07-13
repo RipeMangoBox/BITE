@@ -71,8 +71,6 @@ claims:
 
 光线追踪在针孔相机主光线渲染中仍比栅格化慢约2倍（MipNeRF360上78 FPS vs 238 FPS），且当前未实现全局光照或逆向光照。BVH在训练过程中的反复重建增加了开销，随机光线训练的反向传播效率仍受限于重新追踪光线的成本。如何将光线追踪器扩展到全局光照、设计实时动态BVH更新策略，以及利用随机采样加速训练，是后续研究的关键方向。
 
-
-
 ### 3D高斯泼溅的栅格化瓶颈
 
 3D高斯泼溅（3DGS, Kerbl et al., SIGGRAPH 2023）通过将场景表示为一组可微的半透明3D高斯粒子，并结合基于瓦片排序的栅格化渲染器，在新视角合成任务上取得了实时渲染与高质量重建的突破。然而，其栅格化渲染器在设计上假设所有光线是相干且有序的，这使得3DGS在以下关键场景中暴露出结构性缺陷：
@@ -109,8 +107,6 @@ claims:
 - 支持随机光线采样训练，为未来扩展打开空间。
 
 这一动机的技术基础是：利用拉伸二十面体包围盒紧致包围每个粒子，结合BVH硬件加速的交点查询和k缓冲（k=16）连续收集排序交点，在GPU上实现高效的可微粒子光线追踪。
-
-
 
 ## 核心方法与创新机理
 
@@ -162,8 +158,6 @@ GG2核比标准高斯更"平顶"，大幅减少了每条光线的平均碰撞数
 
 尽管创新显著，光线追踪在针孔相机主光线渲染上仍比3DGS栅格化慢约2倍（MipNeRF360: 78 vs 238 FPS），且BVH在训练中的反复重建增加了额外开销。这些限制指向了未来的改进方向：动态BVH更新策略和更高效的随机光线训练方案。
 
-
-
 3D Gaussian Ray Tracing 的整体管线将粒子场景的重建与渲染统一在单一的可微光线追踪框架下，其核心思想是对每个半透明粒子构造一个紧致的包围几何代理，并将所有代理插入 BVH（Bounding Volume Hierarchy）加速结构，随后通过专门为高密度重叠粒子设计的 GPU 光线追踪器完成前向渲染与反向梯度传播。
 
 ### 管线总览
@@ -207,13 +201,6 @@ $$
 - **推理阶段**：对任意相机模型发射主光线或二次光线（反射、折射、阴影），经 BVH 加速和 k 缓冲排序后输出渲染图像及对应效果。
 
 该框架将渲染核心从 3DGS 的基于瓦片排序的栅格化切换为硬件加速的光线追踪，在保持可微性和实时帧率的前提下，天然解锁了二次光线和复杂相机效果。最终算法相比最初的朴素实现快了近 25 倍，揭示了算法细节精细调优的巨大效果。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2407_07090/figures/001_Figure_1.jpg]]
-*Figure 1: We propose a method for fast forward and inverse ray tracing of particle-based scene representations such as Gaussians. The main idea is to construct encapsulating primitives around each particle, and insert them into a BVH to be rendered by a ray tracer specially adapted to the high density of overlapping particles. Eficient ray tracing opens the door to many advanced techniques, including secondary ray efects like mirrors, refractions and shadows, as well as highly-distorted cameras with rolling shu er efects and even stochastic sampling of rays. Project page: GaussianTracer.github.io*
-
-
 
 ### 3.1 粒子表示基础
 
@@ -279,8 +266,6 @@ $$\hat{\rho}_{c}(\pmb{x}) = \hat{\rho}(\pmb{x}) (0.5 + 0.5 \cos(\psi (S^{-1} \pm
 
 其中 $\psi$ 为可优化参数，沿某轴调制粒子核。
 
-
-
 ## 实验与关键发现
 
 ### 核心新视角合成质量
@@ -291,8 +276,6 @@ $$\hat{\rho}_{c}(\pmb{x}) = \hat{\rho}(\pmb{x}) (0.5 + 0.5 \cos(\psi (S^{-1} \pm
 *Table 5: antitative evaluation on the NeRF Synthetic dataset [Mildenhall et al. 2020]*
 
 定性对比（Figure 7）显示，光线追踪渲染的细节保真度与3DGS栅格化器接近，在多数场景中视觉差异不显著。与**MipNeRF360**（Barron et al., CVPR 2022）和**INGP**（Müller et al., SIGGRAPH 2022）的对比（Figure 18）进一步表明，光线追踪粒子表示在保持神经辐射场高品质的同时，实现了实时渲染。
-
-![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2407_07090/figures/021_Figure.jpg]]
 
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2407_07090/figures/009_Figure_7.jpg]]
 *Figure 7: Ground Truth INGP 3DGS Ours (reference) Ours Fig. 7. Novel-View Synthesis: alitative comparison of our novel-view synthesis results relative to baselines (insets (•) show per-result closeups). For fairness, this comparison uses the same test views picked by [Kerbl et al. 2023]. Additional comparisons with [Barron et al. 2022] are included in the appendix*
@@ -338,27 +321,14 @@ Figure 17直观展示了这一能力：顶部插图显示了通过无失真相�
 
 5. **随机光线训练效率**：反向传播中重新追踪光线的开销限制了随机光线训练的效率，需要进一步优化梯度计算流水线。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2407_07090/figures/013_Figure_9.jpg]]
 *Figure 9: Gaussian . Generalized Gaussian Fig. 9. antitative Ablation. Top le : comparison of the diferent tracing algorithms on the combination of our datasets. Top right: Impact of the hit payload bufer size on our proposed tracing algorithm. Bo om le : Impact of the diferent primitives on both the BVH building time and the FPS. Bo om right: Mean number of hits vs. mean FPS for every sequence of our dataset*
 
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2407_07090/figures/008_Table_1.jpg]]
 *Table 1: Results for our approach and baselines on a variety of novel view synthesis benchmarks*
 
-![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2407_07090/figures/010_Table_2.jpg]]
-*Table 2: Rendering performance: rasterization v.s. ray tracing*
-
-![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2407_07090/figures/011_Table_3.jpg]]
-*Table 3: Comparison of PSNR achieved by our method versus 3DGS [Kerbl et al. 2023] when trained and tested on distorted or undistorted views*
-
-![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2407_07090/figures/014_Table_4.jpg]]
-*Table 4: ality and speed tradeofs for various particle kernel functions*
-
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2407_07090/figures/024_Table_6.jpg]]
 *Table 6: antitative PSNR ablation on the maximum number of allowed particles using ours*
-
-
 
 ## 定位与知识库关联
 
@@ -423,8 +393,6 @@ Figure 17直观展示了这一能力：顶部插图显示了通过无失真相�
 - **随机光线采样的训练效率**：随机光线训练为少视图或稀疏输入场景提供了新的可能性，但当前受限于反向传播的双重追踪开销。能否通过梯度近似或缓存策略降低这一开销？
 
 - **神经特征与粒子表示的融合**：光线追踪的灵活性为在粒子表示中集成神经特征或小型神经网络提供了可能，以实现更复杂的材质（如BRDF）和光照效果（如间接光照）。这一方向的探索尚处于早期阶段。
-
-
 
 ## 原文 PDF
 

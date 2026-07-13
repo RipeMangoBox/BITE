@@ -51,8 +51,6 @@ claims:
 
 实验表明，该方法在 InterHuman 数据集上显著优于 InterGen 等基线：**R-Precision Top1** 从 0.371 提升至 0.522，**FID** 降至 5.352，同时推理时间仅增加约 4 秒。消融实验进一步验证了中期干预策略、关节距离损失和速度损失各自的有效性。
 
-
-
 ### 双人交互运动生成的任务困境
 
 生成自然、语义一致的双人交互运动是计算机视觉与图形学中的核心挑战。现有方法大致分为两类：**纯文本驱动**的交互生成与**轨迹约束的单人**运动生成，但两者均难以同时满足精确轨迹控制与自然交互的需求。
@@ -78,8 +76,6 @@ claims:
 受双人舞蹈中领舞与跟舞的角色分工启发，本文将复杂的双人交互运动解耦为**领导者-跟随者（Leader-Follower）动态**：领导者承担轨迹控制，跟随者则通过运动学同步机制与领导者保持协调。这一解耦将多约束问题简化为单向轨迹控制与交互同步两个子问题，使得**无训练的多约束生成**成为可能。
 
 基于此范式，本文提出一种无训练（training-free）方法，在冻结的扩散模型（以 InterGen 为基础）之上集成 **Pace Controller**（节奏控制器）与 **Kinematic Synchronization Adapter**（运动学同步适配器），在扩散中间阶段实现精确的轨迹引导与自然的交互同步，无需任何额外训练即可适配任意轨迹条件。
-
-
 
 ## 核心方法与创新机理
 
@@ -121,8 +117,6 @@ claims:
 
 这三个维度的协同创新使得本文方法在不重新训练的前提下，在 InterHuman 数据集上取得了显著优于所有基线方法的性能：R-Precision Top1 达到 0.522（InterGen 为 0.371），FID 降至 5.352（Table 1），同时推理时间仅增加约 4 秒（Table 3）。
 
-
-
 本文提出一种无训练的**领导-跟随交互运动生成框架**，其核心思想源自交谊舞中的角色分配：将复杂的双人交互运动解耦为**领导者（Leader）的轨迹控制**与**跟随者（Follower）的运动同步**两个子问题。该框架以预训练的双向交互扩散模型 **InterGen**（Liang et al., IJCV 2024）为基础，在不重新训练的前提下，通过两个即插即用的模块实现对精确 3D 轨迹条件的支持。
 
 ### Pipeline 总览
@@ -145,8 +139,6 @@ claims:
 ### 设计逻辑与关键决策
 
 框架的层级设计体现了一条清晰的因果链：**先确立空间基准，再协调交互关系**。Pace Controller 解决了“运动去哪里”的问题，Kinematic Synchronization Adapter 解决了“两人如何配合”的问题。将轨迹干预限定在扩散中间阶段（而非全程）是该方法的核心洞察——早期阶段噪声过高、运动方向尚未确立，晚期阶段运动范围已稳定、强行干预会破坏细节质量，唯有中期阶段（轨迹形成期）是施加空间约束的最佳窗口。
-
-
 
 ### 扩散模型基础
 
@@ -178,9 +170,6 @@ $$x_t = (x_t \gets x_a^{\mathrm{proj}}) \cdot \mathbb{I}_{[T_1, T_2]}(t) + x_t \
 $$x_0 = \mathcal{G}_{\mathrm{opt}}(x_0; \|x_0 - x_a^{\mathrm{proj}}(t)\|^2)$$
 
 该优化仅在运动范围细化过程的中间阶段执行，消融实验（Figure 6）表明，$0.7T \leq t \leq 0.3T$ 的干预窗口使 R-Precision 和 FID 均达到最优。
-
-![[assets/figures/papers/paper_list_l1690_Leader_and_Follower_Interactive_Motion_Generation_under_Trajectory_Const/figures/007_Figure_6.jpg]]
-*Figure 6: Impact of different trajectory-guiding period on the Pace Controller. Results show that covering the mid-stage of the Motion Range Refinement Process*
 
 ### Kinematic Synchronization Adapter：跟随者运动同步
 
@@ -219,8 +208,6 @@ $$\mathcal{L}_{\mathrm{velocity}} = \sum_{t=1}^{n-1} \sum_{j=1}^{22} \frac{\|\ma
 ### 模块协作流程
 
 整个生成流程（Figure 3）为：冻结的 CLIP-ViT/L4 文本编码器提取文本条件嵌入，共享权重的 Transformer 去噪器执行双向去噪生成。在中间去噪阶段，Pace Controller 单向干预领导者根关节轨迹，Kinematic Synchronization Adapter 同步检测碰撞并调整跟随者运动。两个模块均无需额外训练，推理时间仅增加约 4 秒（Table 3）。
-
-
 
 ## 实验与关键发现
 
@@ -268,24 +255,8 @@ $$\mathcal{L}_{\mathrm{velocity}} = \sum_{t=1}^{n-1} \sum_{j=1}^{22} \frac{\|\ma
 
 3. **精确轨迹依赖。** 方法依赖于精确的 3D 轨迹输入，在实际应用场景中获取此类高精度轨迹可能存在一定难度，限制了方法的直接部署范围。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1690_Leader_and_Follower_Interactive_Motion_Generation_under_Trajectory_Const/figures/004_Table_1.jpg]]
 *Table 1: Quantitative Comparisons of Various Methods. Our method outperforms existing approaches in R-Precision, FID, MM Distance, and Diversity, demonstrating superior motion generation quality, greater diversity, and better alignment with textual conditions*
-
-![[assets/figures/papers/paper_list_l1690_Leader_and_Follower_Interactive_Motion_Generation_under_Trajectory_Const/figures/001_Figure_1.jpg]]
-*Figure 1: Comparison of Our Task with Previous Works. (a) Interaction methods based on textual input to describe trajectory result in trajectory deviations and interaction errors (as indicated by the red circle); (b) Some methods for single-actor motion generation use 3D trajectories but require retraining and fail to account for inter-person interactions; (c) Our approach leverages precise 3D trajectory and textual input to guide interactive motion generation, achieving consistent trajectory generation without additional retraining*
-
-![[assets/figures/papers/paper_list_l1690_Leader_and_Follower_Interactive_Motion_Generation_under_Trajectory_Const/figures/005_Figure_4.jpg]]
-*Figure 4: Visual Comparison with Other Methods. In complex scenarios requiring close contact and interaction, baseline models often produce unnatural interpenetration (as indicated by the red circles). Our approach controls the leader’s trajectory and guides the follower’s actions to align with the leader, thereby effectively addressing these issues*
-
-![[assets/figures/papers/paper_list_l1690_Leader_and_Follower_Interactive_Motion_Generation_under_Trajectory_Const/figures/006_Figure_5.jpg]]
-*Figure 5: Demonstration of Trajectory Guidance Effect. For the same input text, “Two people are dancing together,” we provide different trajectory conditions. All generated sequences align with both the trajectory and textual features, resulting in realistic and natural motions*
-
-![[assets/figures/papers/paper_list_l1690_Leader_and_Follower_Interactive_Motion_Generation_under_Trajectory_Const/figures/011_Table_3.jpg]]
-*Table 3: Inference time comparison. Our design does not significantly increase the inference time cost*
-
-
 
 ## 定位与知识库关联
 
@@ -363,8 +334,6 @@ $$\mathcal{L}_{\mathrm{velocity}} = \sum_{t=1}^{n-1} \sum_{j=1}^{22} \frac{\|\ma
 3. **轨迹条件鲁棒性**：如何提升方法对噪声轨迹或不完整轨迹输入的容忍度，使其适用于更广泛的实际应用场景？
 
 4. **实时性能优化**：能否通过模型蒸馏、轻量化适配器设计或更高效的优化算法进一步降低推理时间开销？
-
-
 
 ## 原文 PDF
 

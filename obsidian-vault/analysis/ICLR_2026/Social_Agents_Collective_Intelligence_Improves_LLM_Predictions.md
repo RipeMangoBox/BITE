@@ -60,15 +60,11 @@ claims:
 
 **方法定位**：Social Agents 属于提示工程与多智能体聚合的交叉方法，无需任务特定微调，可与任意骨干 LLM 结合使用。相较于传统单次调用或简单多次采样，该方法通过注入结构化社会多样性，在低构念感知判断和高构念推理任务上均展现出显著增益。
 
-
-
 大语言模型（LLM）在广泛的行为预测任务中展现出强大的零样本与少样本能力，但单一 LLM 调用存在一个根本性瓶颈：其输出缺乏真实人群的多样性，忽略了群体智慧（Wisdom of Crowds）效应，导致预测分布与真实人群判断之间存在系统性偏差。这一问题在需要多元视角和主观判断的任务中尤为突出——例如预测某则广告的点击率、评估网页的喜爱度或判断视频的长期记忆度时，单一“专家”提示下的 LLM 输出往往仅反映某种平均化的立场，无法捕捉不同人口群体之间的观点异质性。
 
 现有方法的缺口体现在三个层面。其一，标准提示策略将 LLM 视为一个同质的推理引擎，通过领域专家角色或少量示例来引导输出，但未能模拟真实社会中由年龄、性别、兴趣、价值观等维度构成的认知多样性。其二，即便对同一 LLM 进行多次独立调用（如 No-Persona 基线的重复采样），其预测分布也迅速饱和，无法产生结构化的异质判断——这已被消融实验证实：Crowds Within 方法（同一角色多次调用）远弱于 Social Agents（Table 16, Appendix A.7），说明单纯增加推理次数不能替代角色多样性。其三，任务特定的预训练模型（如 LCBM、Henry、Behavior-LLaVA）虽然在各自领域表现优异，但需要大规模标注数据和专项训练，缺乏跨任务的通用性。
 
 本文的核心动机正是弥合这一缺口：能否将群体智慧原则系统性地注入 LLM 的推理过程，使模型能够采样出内化于训练语料中的多元观点，并通过独立聚合来抵消个体偏见？这一思路的理论基础来自 Surowiecki（2004）提出的群体智慧四原则——**观点多样性**（diversity of opinion）、**独立性**（independence）、**去中心化**（decentralization）和**聚合**（aggregation）。Social Agents 框架将这四原则映射为可操作的 LLM 代理机制：通过构建具有多样化人口和心理特征的合成角色（persona agents），让每个角色独立评估刺激并输出定量评分与定性理据，最终聚合为集体预测。其核心洞察在于，LLM 在预训练过程中已经内化了不同人群的认知模式与偏好分布，关键在于设计合适的提示机制来“唤醒”这些潜在的多元视角，而非依赖单一的最优提示。
-
-
 
 ## 核心方法与创新机理
 
@@ -116,8 +112,6 @@ Social Agents 不同于传统集成方法（如多次采样取平均）或多代
 ### 已知局限
 
 该方法存在明确的适用边界：极低参数模型（如 LLaMA 3.1 8B）可能无法充分理解角色画像，导致性能无提升甚至下降（Tables 10–11）；高构念抽象推理任务（如长期视频记忆度）的性能仍落后于专项训练的专家模型 **Henry**（SI et al., 2023），说明群体智慧模拟在需要深层因果推理的任务中面临挑战；情感分类等任务中，角色聚合偶尔引入噪声（Table 9），提示并非所有任务类型同等受益于角色多样性。
-
-
 
 ![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_73J3hsato3/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the Social Agents workflow for Ad Click-Through Rate (CTR) Prediction. Given an advertisement (top-left), our framework computes its embeddings and retrieves the top-K semantically similar ads from a repository of ad embeddings. These serve as few-shot examples that aid CTR prediction. A Persona Agent Factory (bottom-left) contains personas defined by demographic attributes (e.g., age, gender) and traits (e.g., interests, occupation), following templates in Appendix Table 2. From this pool, the moderator selects a diverse panel of N personas and instantiates separate LLM agents for each. Each persona agent outputs a CTR percentile (0-100) with a brief rationale. The right-hand s...*
@@ -175,8 +169,6 @@ $$P_i = \mathrm{System}(\mathcal{S}) \oplus \mathrm{Persona}(\mathcal{D}_i) \opl
 - **独立提示而非多轮对话**：代理之间零交互，避免“群体思维”（groupthink），确保观点多样性的真实表达。
 - **固定角色池而非动态生成**：预定义的角色画像保证了实验的可复现性与角色多样性的一致性；消融实验表明，结构化角色异质性是性能提升的核心驱动因素，而非简单的重复采样（Crowds Within 方法远弱于 Social Agents）。
 - **温度鲁棒性**：Social Agents 对采样温度不敏感，CTR MAPE 在 0.3-0.9 温度范围内仅波动约 0.2 个百分点，表明框架的稳定性不依赖于特定的随机性水平。
-
-
 
 Social Agents 框架将“群体智慧”原则工程化为五个核心模块，形成一条从角色采样到集体决策的流水线。以下逐一说明各模块功能及其关键公式。
 
@@ -238,8 +230,6 @@ $$\rho = 1 - \frac{6 \sum_{i=1}^{n} d_i^2}{n(n^2 - 1)}$$
 
 $$\mathrm{Accuracy} = \frac{1}{n} \sum_{i=1}^{n} \mathbf{1}[y_i = \hat{y}_i]$$
 
-
-
 ## 实验与关键发现
 
 ### 核心性能增益
@@ -266,13 +256,7 @@ Social Agents 在覆盖低、中、高三个构念水平的 8 项任务上均显
 
 **长期视频记忆度预测**（Table 7）作为高构念任务，Social Agents（GPT-4o）取得了 Spearman ρ = 0.41，优于 No-Persona 基线的 0.33（提升 24.2%），但仍落后于专项训练的 Henry 模型（SI et al., 2023），说明抽象推理任务对群体智慧模拟的挑战更大。
 
-![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_73J3hsato3/figures/011_Table_7.jpg]]
-*Table 7: Long-Term Video Memorability (LAMBDA) Prediction. Performance evaluated using Spearman correlation (ρ, higher is better). Among non-trained methods, Social Agents (GPT-4o) shows the best performance, highlighted in yellow . Social Agents outperform No-Persona baselines with individual improvements of 15.38% (LLaMA 3.3 70B), 0.00% (Qwen3 32B), and 24.24% (GPT-4o). We report the average improvements: Social Agents compared to No-Persona (averaged over all models). Positive gains are shown in green and no improvement in gray. Best models are denoted in green , and runner-ups in blue*
-
 **行为属性分类**（Table 9）中，Social Agents 在主题、情感、说服、动作、原因五个维度上均有提升，其中原因分类准确率从 76.92% 提升至 85.71%（+11.4%），且以零样本方式大幅超越微调模型 Behavior-LLaVA（Singh et al., 2025）。
-
-![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_73J3hsato3/figures/013_Table_9.jpg]]
-*Table 9: Behavioral Attribution Classification. Performance evaluated using Accuracy (%, higher is better) across five key dimensions: Topic, Emotion (All-labels and Clubbed), Persuasion, Action, and Reason. Social Agents show improvements upto 26.8% over No-Persona baselines, and outperform Behavior-LLaVA (Zero-shot) by margins up to 55.3%. However, we observe occasional declines in Emotion classification (both All-labels and Clubbed) for some configurations. Positive gains are highlighted in green, declines in red. Best models are marked in green , runner-ups in blue*
 
 ### 模型无关性
 
@@ -305,22 +289,6 @@ Social Agents 对温度参数表现出极强的鲁棒性。Table 17 和 Table 18
 ### 失败模式
 
 并非所有任务均等受益于角色多样性。情感分类的某些子任务中，Social Agents 的表现出现下降，角色聚合可能引入了额外噪声。此外，高构念任务（如长期视频记忆度）的绝对性能仍落后于专项训练的专家模型，表明抽象推理任务对群体智慧模拟具有天然挑战。低参数模型的失效案例（LLaMA 8B/11B）也提示该方法存在模型容量门槛。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_73J3hsato3/figures/005_Table_1.jpg]]
-*Table 1: Tasks, their construal levels, justifications, and evaluation metrics. Low-level tasks focus on immediate, perceptual judgments; medium-level tasks address near-term outcomes; and high-level tasks involve abstract reasoning or long-horizon forecasting. The tweet content generation task is not associated with construal levels, as it involves producing performative content or text rather than making predictive judgments*
-
-![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_73J3hsato3/figures/006_Table_2.jpg]]
-*Table 2: Demographic Profiles and Psychographic Traits of the 10 Social Agent Personas. Each persona combines a demographic group (age group paired with a gender) with its corresponding key psychographic traits. The table highlights the types of aesthetics, values, and content themes that each group is most likely to prefer when evaluating or responding to an ad, webpage, or video*
-
-![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_73J3hsato3/figures/010_Table_6.jpg]]
-*Table 6: Return on Ad Spend (ROAS) Prediction. Results on datasets we constructed from Creative and Real Estate industries listed in the Forbes Fortune 500, evaluated using MAPE (lower is better) and PE@K (higher is better). Social Agents reduce prediction error compared to No-Persona baselines, with average MAPE reductions of 7.4% (LLaMA 3.3 70B), 20.95% (Qwen3 32B), and 48.65% (GPT-4o) across both industries. We report the average improvements across all metrics: Social Agents compared to No-Persona (averaged over all models). Positive gains are shown in green and declines in red. Best models are denoted in green , and runner-ups in blue*
-
-![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_73J3hsato3/figures/012_Table_8.jpg]]
-*Table 8: Tweet Content Generation. Results across models measured via BLEU (1-4), ROUGE-1, and G-Eval metrics (higher is better). Social Agents outperform No-Persona baselines across all models, with individual improvements of 33.40% (GPT-4o), 5.94% (Qwen3 32B), and 11.28% (LlaMA 3.3 70B) for BLEU-4; 2.20% (GPT-4o), 49.20% (Qwen3 32B), and 12.18% (LlaMA 3.3 70B) for ROUGE-1. Our approach also outperforms the fine-tuned LCBM baselines (averaged across both variants) on multiple metrics, with Social Agents (GPT-4o) achieving a 7.14% improvement on BLEU-2 and a 14.69% improvement on BLEU-4. Overall improvement percentages represent the relative improvement of Social Agents over No-Persona (averaged acr...*
-
-
 
 ## 定位与知识库关联
 
@@ -363,8 +331,6 @@ Social Agents 框架开辟了若干值得深入探索的方向：
 - **角色提示的内在机理**：LLM 是否真正捕捉到了对应人群的认知模式，还是仅产生了表面风格差异？Figure 7 显示角色间预测分布差异显著（Wasserstein 距离最高达 0.83），且呈现按年龄聚类的模式，这暗示角色提示确实触发了深层表征差异，但其认知机制仍需进一步解构。
 
 - **动态与交互式扩展**：当前框架为静态单轮预测，能否扩展到实时交互式决策或在线学习场景？例如，利用流式反馈动态调整角色权重，或引入角色间的受控交互以模拟社会讨论过程，可能进一步丰富群体智慧的模拟维度。
-
-
 
 ## 原文 PDF
 

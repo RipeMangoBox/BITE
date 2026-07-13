@@ -54,8 +54,6 @@ claims:
 - 联合图像-视频训练策略使图像和视频重建性能同时获得显著提升（Table 2）。
 - 视频3D GAN损失和更大的时序卷积核（如(7,3,3)）对重建质量有正向贡献（Table 4）。
 
-
-
 视频生成模型（如视频扩散模型）的快速发展对视频压缩与重建提出了更高要求。视频自编码器（Video VAE）作为这类模型的核心组件，负责将高维视频数据压缩到低维潜空间，再从潜空间重建视频。其重建质量直接影响下游生成模型的性能上限。
 
 当前主流的视频VAE方案大多是将图像VAE直接扩展到三维。这种扩展路径主要存在两种范式：**同时压缩**（simultaneous compression）与**顺序压缩**（sequential compression）。同时压缩通过将预训练的2D卷积膨胀为3D卷积，在单个阶段内同时压缩空间与时间维度；顺序压缩则先用空间编码器压缩空间信息，再用时间编码器压缩时序冗余。然而，这两种范式各自存在结构性缺陷：
@@ -66,8 +64,6 @@ claims:
 更为关键的是，现有视频VAE方法普遍忽略了**跨模态文本信息**的利用。视频数据天然携带文本描述（如字幕、标签），这些语义信息可以为编码器提供场景内容先验，指导解码器更准确地恢复细节。然而，已有的视频VAE均未将文本条件引入压缩-重建流程，这在大运动、复杂场景下进一步限制了重建质量的提升空间。
 
 上述问题的根源在于：**单一压缩范式无法同时兼顾纹理保真度与大运动恢复能力，且缺乏语义引导机制来弥补压缩过程中的信息损失**。因此，如何设计一种能够融合同时压缩与顺序压缩优势、并有效利用文本语义的视频VAE架构，成为提升大运动视频重建质量的关键挑战。
-
-
 
 ## 核心方法与创新机理
 
@@ -93,8 +89,6 @@ claims:
 ---
 
 **创新总结**：Cross-modal Video VAE 的核心贡献在于通过解耦的两阶段压缩策略解决了时空耦合难题，并通过跨模态文本引导和联合训练范式填补了视频 VAE 在语义利用与训练数据方面的空白，在大运动视频重建上实现了对 **Open-Sora**、**Open-Sora-Plan**、**CV-VAE** 等强基线的显著超越（Table 1）。
-
-
 
 Cross‑modal Video VAE 的整体 pipeline 遵循一个解耦的两阶段时空压缩范式：**时间感知的空间编码 → 轻量时间压缩 → 时间解码 → 空间解码**，并在编解码过程中注入文本语义信息以增强细节恢复。其核心思想是将“同时压缩”和“顺序压缩”的优势融合——同时压缩有利于保持细节与纹理稳定性，顺序压缩有利于大运动恢复——从而在大运动视频上获得更优的重建质量。
 
@@ -148,13 +142,6 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{recon}} + \lambda_{\mathrm
 
 现有视频 VAE（如 Open‑Sora 的 OPS VAE、Open‑Sora‑Plan 的 OD VAE、CV‑VAE）通常直接将图像 VAE 的 2D 卷积膨胀为 3D 卷积进行同时空压缩，或采用先空间后时间的纯顺序压缩。前者在大运动下产生运动模糊和细节失真，后者则容易丢失纹理稳定性。Cross‑modal Video VAE 通过两阶段解耦设计同时规避了这两类问题，并引入文本跨模态信息作为额外引导，在 WebVid、Inter4K 及大运动测试集上均取得了显著优于基线的 PSNR/LPIPS 指标（Table 1）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2412_17805/figures/002_Figure_2.jpg]]
-*Figure 2: Comparison of our optimal spatiotemporal modeling and the two other options. Simultaneous modeling is achieved by inflating pre-trained 2D spatial VAE to 3D VAE. Sequential modeling indicates first compressing the spatial dimension with a spatial encoder and then compressing the temporal information with a temporal encoder. We identify the issues of these two options and propose to combine both advantages and achieve a much better video reconstruction quality. Our VAE also benefits from cross-modality, i.e., text information*
-
-
-
 ### 视频自编码问题定义
 
 给定输入视频张量 $\mathbf{X} \in \mathbb{R}^{C \times T \times H \times W}$（$C$ 为通道数，$T$ 为帧数，$H \times W$ 为空间分辨率），视频自编码的目标是学习编码器 $\mathcal{E}$ 和解码器 $\mathcal{D}$，使得：
@@ -198,8 +185,6 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{recon}} + \lambda_{\mathrm
 
 其中 $\mathcal{L}_{\mathrm{recon}}$ 为重建损失，$\mathcal{L}_{\mathrm{KL}}$ 为潜变量分布的 KL 散度正则项，$\mathcal{L}_{\mathrm{GAN}}$ 为**视频 3D GAN 损失**（在时空维度上判别，优于图像 GAN 损失，如 Table 4 消融所示）。联合图像-视频训练时，视频与图像按 8:2 比例混合，图像批次通过屏蔽时序模块处理。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -209,9 +194,6 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{recon}} + \lambda_{\mathrm
 在 WebVid 测试集上，4 通道版本的 Cross-modal VAE 取得了 **PSNR 30.31 dB**、**SSIM 0.8676**、**LPIPS 0.0538**；16 通道版本进一步提升至 **PSNR 34.16 dB**、**SSIM 0.9362**、**LPIPS 0.0271**。相比 Open-Sora 的 PSNR 29.38 dB 和 LPIPS 0.1240，4 通道版本即实现了 **+0.73 dB** 的 PSNR 提升和 **-0.0696** 的 LPIPS 降低。在 Inter4K 和大运动测试集上，该方法同样保持了显著优势，表明解耦的时空建模策略对高动态场景具有更强的鲁棒性。
 
 定性结果（Figure 1）进一步印证了定量结论：在体育动作等大运动场景下，基线方法普遍出现运动模糊、重影伪影和细节丢失，而 Cross-modal VAE 显著改善了运动恢复质量，大幅减少了鬼影效应。
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2412_17805/figures/001_Figure_1.jpg]]
-*Figure 1: Our reconstruction results compared with a line of three recent strong baseline approaches. The ground truth frame is (0). Our model significantly outperforms previous methods, especially under large motion scenarios such as people doing sports*
 
 ### 消融研究
 
@@ -253,21 +235,11 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{recon}} + \lambda_{\mathrm
 
 #### 4. 跨模态文本引导（Figure 5）
 
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2412_17805/figures/008_Figure_5.jpg]]
-*Figure 5: The effectiveness of the cross-modal learning for our video VAE. The introduction of textural information improves the detail recovery. We visualize the learned attention map using keywords of the input prompts*
-
 Figure 5 展示了跨模态文本条件对细节恢复的影响。引入 Flan-T5 文本嵌入后，模型在细节区域（如人脸、文字、纹理）的重建质量明显优于无文本条件的版本。论文还可视化了注意力图，显示模型能够准确关注到文本提示中的关键词所对应的视觉区域，验证了跨模态注意力机制的有效性。
 
 ### 失败模式与局限
 
 论文未在原文中明确报告失败模式或系统性的局限性分析。从方法设计推断，两阶段时空建模在极端运动幅度或长视频序列下可能面临时间压缩瓶颈，且跨模态文本引导的效果依赖于文本标注质量。这些方面需进一步验证。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2412_17805/figures/005_Table_1.jpg]]
-*Table 1: Quantitative comparison with state-of-the-art methods*
-
-
 
 ## 定位与知识库关联
 
@@ -310,8 +282,6 @@ Cross-modal Video VAE采用**联合图像-视频训练**（8:2的视频-图像�
 - 原文未报告推理延迟和显存占用的系统级对比，两阶段架构和交叉注意力模块的计算开销需人工评估。
 - 时间编码器的压缩比和潜变量通道数（4通道 vs 16通道）对下游生成任务（如视频扩散模型）的影响未在本文中充分探讨。
 - 文本引导的注意力机制在大运动模糊帧上的鲁棒性（如文本描述与实际视觉内容不匹配时）未经验证。
-
-
 
 ## 原文 PDF
 

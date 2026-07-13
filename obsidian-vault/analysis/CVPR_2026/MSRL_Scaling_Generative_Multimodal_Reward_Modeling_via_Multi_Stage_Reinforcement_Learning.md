@@ -52,8 +52,6 @@ claims:
 
 实验结果表明，在相同多模态标注预算下，MSRL将InternVL3.5-8B在VL-RewardBench上的平均准确率从生成式MRM基线的66.6%提升至**75.9%**，在图像生成基准GenAI-Bench上从70.2%提升至**75.7%**，并在4B和8B两个模型尺度上均表现出持续的规模化特性。消融实验进一步证实，移除纯文本RL阶段会导致6.9个百分点的性能骤降，验证了大规模文本监督是多模态奖励建模的关键增益来源。
 
-
-
 多模态大语言模型（MLLM）的快速发展使得对齐人类偏好成为关键瓶颈。多模态奖励模型（MRM）作为偏好对齐的核心组件，负责评估模型输出的质量。然而，当前MRM的训练面临一个根本性矛盾：人类偏好标注数据——尤其是多模态场景下的成对偏好数据——极其稀缺且标注成本高昂。这一“数据瓶颈”直接制约了基于可验证奖励的强化学习（RLVR）训练范式的规模化扩展，使得生成式MRM的性能难以持续提升。
 
 现有MRM主要分为两类：判别式MRM通过Bradley-Terry损失直接输出标量分数，生成式MRM则以自然语言形式直接预测偏好标签。尽管生成式MRM具备更强的可解释性和灵活性，但其训练范式——通常是在有限的多模态偏好数据上进行监督微调（SFT）后直接应用RLVR——并未从根本上解决数据稀缺问题。**R1-Reward**（Zhang et al., arXiv 2025）和**UnifiedReward**（Wang et al., 2025）等代表性工作虽然验证了RLVR在生成式MRM中的有效性，但它们的性能提升始终受限于多模态标注数据的规模。
@@ -61,8 +59,6 @@ claims:
 MSRL的核心动机源于一个关键观察：偏好建模所需的核心推理能力——比较、分析和判断——本质上并不依赖于特定模态。大规模纯文本偏好数据中蕴含着丰富的偏好监督信号，这些信号能否被有效利用来增强多模态奖励建模？MSRL的回答是肯定的：通过“文本RL → 基于描述的RL → 全多模态RL”的课程式迁移机制，可以在几乎不增加多模态标注预算的前提下，将文本域习得的通用奖励推理能力有效迁移至多模态任务。
 
 这一动机得到了初步实验的强力支持。如图1所示，充足的文本偏好数据能够驱动RLVR的规模化扩展（子图a），而多阶段RL设计则进一步将这种规模化收益传递至多模态生成式奖励模型（子图b）。在VL-RewardBench上，MSRL将InternVL3.5-8B的平均准确率从生成式MRM基线的66.6%大幅提升至75.9%（+9.3个百分点），并在图像生成基准GenAI-Bench上实现了70.2%到75.7%的显著提升。这些结果表明，跨模态偏好迁移不仅是可行的，而且具有极高的实际价值。
-
-
 
 ## 核心方法与创新机理
 
@@ -94,8 +90,6 @@ MSRL的核心创新在于**将多模态奖励建模从“数据受限的单阶�
 ### 视觉模块训练策略：阶段性参数解冻
 
 与通常所有参数全程参与训练的基线策略不同，MSRL在纯文本阶段冻结视觉编码器和投影器，仅在跨模态阶段（阶段二和阶段三）解冻。这一设计确保文本阶段学到的推理能力不会被视觉模块的随机梯度干扰，同时在后阶段允许视觉表征与推理策略进行协同适应。
-
-
 
 MSRL 提出了一种三阶段课程式训练范式，其核心思想是：**偏好建模所需的通用推理能力可以从大规模纯文本数据中习得，再通过渐进式跨模态迁移注入多模态奖励模型**，从而绕开多模态人类偏好标注稀缺且昂贵的“数据瓶颈”。
 
@@ -130,16 +124,6 @@ $$\mathcal{L}_{\mathrm{RLVR}} = -\mathbb{E}_{(p, x, y_a, y_b, l) \sim D_r, o \si
 ### 关键设计决策
 
 消融实验验证了各阶段的不可替代性：移除阶段 1 会导致 VL-RewardBench 平均准确率骤降 6.9 个百分点，证实大规模文本 RL 是多模态奖励建模的核心增益来源；移除阶段 2 的基于描述的 RL 和 CMKD 会造成 1.6%–2.6% 的性能下降，说明该中间阶段在桥接文本与多模态领域差异中扮演关键角色。此外，在阶段 2 的偏好泛化训练中，caption:text 混合比为 4:1 时取得最优准确率（75.5），优于纯描述训练（74.6）和过于均衡的混合（1:1, 73.8），表明以描述数据为主、辅以少量文本数据的混合策略最有利于跨模态迁移。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2696_https_arxiv_org_abs_2603_25108/figures/002_Figure_1.jpg]]
-*Figure 1: Illustration of our multi-stage RL approach. SubfiguFigure 1. Illustration of our multi-stage RL approach. Subfigure Figure 1. Illustration of our multi-stage RL approach. SubfiguFigure 1. Illustration of our multi-stage RL approach. Subfigure(a) shows that abundant textual preference data can facilitate sca(a) shows that abundant textual preference data can facilitate scal-(a) shows that abundant textual preference data can facilitate sc(a) shows that abundant textual preference data can facilitate scal-able RL. Subfigure (b) demonstrates that we can effectively scaable RL. Subfigure (b) demonstrates that we can effectively scale able RL. Subfigure (b) demonstrates that we can effectivelyR...*
-
-![[assets/figures/papers/paper_list_l2696_https_arxiv_org_abs_2603_25108/figures/001_Figure.jpg]]
-*Figure: (a) Learning Curves across Modalities*
-
-
 
 MSRL 的核心设计围绕一个因果性调控旋钮展开：**偏好建模所需的推理能力可以从大规模纯文本数据中习得，并通过三阶段课程式迁移注入多模态奖励模型**。该方法将训练流程拆解为三个递进的模块，每个模块解决一个特定的瓶颈。
 
@@ -189,18 +173,8 @@ $$\{o_1, o_2, \ldots, o_n\} \sim \pi_{\theta_{\mathrm{text}}}(\cdot \mid s, c)$$
 
 三个模块的递进关系构成了完整的因果链路：**阶段一**提供来自大规模文本数据的丰富监督信号，建立通用奖励推理能力（消融实验中移除阶段一导致 VL-RewardBench 性能骤降 6.9 个百分点）；**阶段二**通过描述替换和知识蒸馏将文本能力桥接到多模态领域（移除阶段二导致 1.6%~2.6% 的性能下降）；**阶段三**在真实多模态数据上完成最终适配。这一设计使得 MSRL 在与基线使用**完全相同**的多模态标注预算下，将 InternVL3.5-8B 在 VL-RewardBench 上的平均准确率从 66.6% 提升至 75.9%。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2696_https_arxiv_org_abs_2603_25108/figures/004_Table_1.jpg]]
 *Table 1: Description of different multimodal tasks for generative MRMs. Templates for each task are provided in Appendix A*
-
-![[assets/figures/papers/paper_list_l2696_https_arxiv_org_abs_2603_25108/figures/007_Figure.jpg]]
-*Figure: (b) In Stage 3, we train the model using 20k multimodal preference examples*
-
-![[assets/figures/papers/paper_list_l2696_https_arxiv_org_abs_2603_25108/figures/011_Figure_4.jpg]]
-*Figure 4: Template used for the image understanding task*
-
-
 
 ## 实验与关键发现
 
@@ -263,24 +237,14 @@ $$\{o_1, o_2, \ldots, o_n\} \sim \pi_{\theta_{\mathrm{text}}}(\cdot \mid s, c)$$
 
 4. **训练流程复杂度**：三阶段训练流程引入了额外的超参数（如混合比、任务奖励权重等），调参成本较高，且多阶段训练的端到端可微融合仍是一个开放问题。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2696_https_arxiv_org_abs_2603_25108/figures/005_Table_2.jpg]]
 *Table 2: Accuracies (%) on VL-RewardBench and Multimodal RewardBench. The best result in each group is shown in bold. Results marked with † are taken from Wang et al. [42] on VL-RewardBench, while those marked with ‡ for both VL-RewardBench and Multimodal RewardBench are from Zhang et al. [54]. All remaining baseline results are obtained by their publicly available models. For Multimodal RewardBench, the “Other” column reports the average accuracy across the general and reasoning subsets*
 
 ![[assets/figures/papers/paper_list_l2696_https_arxiv_org_abs_2603_25108/figures/006_Table_3.jpg]]
 *Table 3: Accuracies (%) on image generation, video understanding, and video generation tasks. Results marked with † are taken from Wang et al. [42]. All remaining baseline results are obtained by their publicly available models*
 
-![[assets/figures/papers/paper_list_l2696_https_arxiv_org_abs_2603_25108/figures/008_Figure_3.jpg]]
-*Figure 3: Performance scaling with different amounts of textual preference data on the VL-RewardBench*
-
-![[assets/figures/papers/paper_list_l2696_https_arxiv_org_abs_2603_25108/figures/010_Table_6.jpg]]
-*Table 6: Performance of preference generalization under different caption-to-text mixing ratios. The ratio “1:0” indicates that Stage 2 training uses only caption-based data, with no text-only preference data mixed in*
-
 ![[assets/figures/papers/paper_list_l2696_https_arxiv_org_abs_2603_25108/figures/017_Figure_9.jpg]]
 *Figure 9: A case study illustrating the rationale generated by MSRL (8B backbone) for the image generation preference task. Image B is identified as the superior output because it effectively captures the prompt’s request for a “ruined stone thoroughfare” and “epic fantasy style” with dramatic lighting. In contrast, Image A is critiqued for missing the “vibrant hues” and “otherworldly elements”, presenting a setting that is too somber and ceremonial. This highlights MSRL’s ability to evaluate semantic alignment and stylistic fidelity in text-toimage generation precisely*
-
-
 
 ## 定位与知识库关联
 
@@ -353,8 +317,6 @@ MSRL 的有效性依赖于以下关键设计选择，这些选择同时也界定
 4. **端到端训练的可行性**：当前三阶段训练是分离的，能否将多阶段训练融合为端到端可微的流程，减少调参复杂度和训练时间？
 
 5. **推理效率**：MSRL 采用生成式范式，推理时需自回归生成推理链和偏好决策。文中提到多数投票（voting@16）可带来 1.0~1.5 个百分点的增益（Table 2, Table 3），但推理成本也相应增长 16 倍。如何在推理效率与准确率之间取得更优的权衡，仍是实际部署中需要解决的问题。
-
-
 
 ## 原文 PDF
 

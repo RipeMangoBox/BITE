@@ -56,8 +56,6 @@ claims:
 
 **方法定位**：OctoT2I 属于智能体 T2I 路由方法，其核心区别于现有工作在于将知识获取从“人工定义”转变为“自进化探索”，将决策从“静态单轮”升级为“有状态多轮”，并将优化目标从“质量优先”拓展为“质量约束下的成本最小化”。该方法与单模型 T2I 系统（如 Flow-GRPO、FLUX.1-dev）和智能体 T2I 系统（如 GenArtist、ChatGen、Idea2Img）均构成正交或替代关系。
 
-
-
 文本到图像（T2I）生成领域近年来涌现出大量功能各异的模型——从专精于特定风格的小型高效模型，到具备通用生成能力的大型基础模型。然而，面对一个具体的用户提示，如何从众多候选工具中选出“最合适”的那个，仍然是一个悬而未决的挑战。这个问题的本质在于：不同 T2I 模型在能力边界上存在显著差异，单一模型很难在所有类型的提示上同时做到高质量与低成本。
 
 现有智能体 T2I 方法试图通过引入工具选择机制来应对这一挑战，但其方案存在三个根本性瓶颈。**第一，知识获取依赖人工**：此前的智能体方法，如 **GenArtist**（Wang et al., NeurIPS 2024）、**ChatGen**（Jia et al., arXiv 2024）和 **Idea2Img**（Yang et al., arXiv 2023），其工具选择知识要么来自手工设计的先验规则，要么需要昂贵的人工标注数据进行监督微调。这种方式不仅难以规模化，还无法动态适应工具能力的更新。**第二，决策路径单一且静态**：现有方法通常采用单轮、固定的工具分配策略，缺乏根据实时生成反馈进行动态调整的能力，一旦初始选择失误便无法挽回。**第三，优化目标片面**：大多数方法仅以生成质量为唯一追求，完全忽略了推理效率，导致在实际部署中计算成本高昂。
@@ -65,8 +63,6 @@ claims:
 这些瓶颈的共同后果是：现有智能体 T2I 系统在性能与效率之间难以取得令人满意的平衡。以当前最优的单模型方法 **Flow-GRPO**（Liu et al., arXiv 2025）为例，尽管其在 GenEval 基准上达到了 0.93 的总体得分，但其推理成本极高；而更轻量的模型虽然速度快，却在复杂提示（如精确计数、属性绑定）上表现不佳。这一矛盾揭示了一个核心问题：**如何在保证生成质量的前提下，最小化推理成本？**
 
 OctoT2I 正是为回答这一问题而提出的。其核心动机在于将 T2I 工具选择形式化为一个约束优化问题——在满足质量阈值的工具集合中，选择推理成本最低者。这一形式化表述本身并不新鲜，但关键难点在于：每个工具的“质量-成本”画像并非先验已知，而是需要在实际使用中动态获取。OctoT2I 的核心洞察是：**这些画像可以通过智能体自主探索来构建，无需任何外部监督**。基于这一洞察，OctoT2I 设计了一个自进化机制，使智能体能够从零开始定义概念维度、探索工具能力边界，并将所学知识沉淀为可复用的知识库，最终支撑起一个有状态、多轮的自适应路由决策循环。
-
-
 
 ## 核心方法与创新机理
 
@@ -106,8 +102,6 @@ $$ \mathrm { t } _ { r } = \pi ( p , { \mathcal K } , { \mathcal M } _ { r - 1 }
 ### 创新总结
 
 OctoT2I 的三项核心创新构成了一个有机整体：约束优化目标为系统提供了明确的性能-效率权衡准则；自进化机制为决策提供了精确、可扩展的工具能力知识；有状态多轮路由则利用这些知识实现自适应工具选择。三者协同作用，使得 OctoT2I 在无需任何外部监督的条件下，同时实现了最优生成质量和最高推理效率。
-
-
 
 OctoT2I 将文本到图像（T2I）的模型选择形式化为一个**约束优化问题**：在满足预设质量阈值的前提下，最小化推理成本。其核心公式为：
 
@@ -162,13 +156,6 @@ $$
 - **输出**：满足质量阈值（或达到轮次上限）的最终图像。
 
 这一设计将知识获取、决策推理与效率优化统一在一个无需外部监督的框架内，使 OctoT2I 能够在 GenEval 上以 0.96 总体得分超越 Flow-GRPO（0.93），同时实现 90.3% 的推理加速和 56.6% 的能效提升（见 verified_analysis 中的 decisive_evidence）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2174_https_openaccess_thecvf_com_content_CVPR2026_html_Jiang_OctoT2I_A_Self_E/figures/002_Figure_1.jpg]]
-*Figure 1: The core advantages of OctoT2I in performance, decision-making, and knowledge acquisition. (a) OctoT2I (Ours) achieves an exceptional performance-efficiency balance on GenEval. (b) This superior performance stems from its intelligent, evidence-based decisions, which route each user prompt to the most suitable T2I model. For example, it selects the most efficient tool (sd-turbo) for “a photo of a snowboard” while allocating the most justifiable tool (flow-grpo) for “Generate an image containing 5 hamburgers”. (c, d, e) This intelligent decision-making capability is enabled by our novel (e) self-evolving mechanism, which overcomes the limitations of previous (c) handcrafted priors or (d) cost...*
-
-
 
 ### 问题形式化：约束优化视角
 
@@ -225,8 +212,6 @@ $$
 
 3. **探索空间剪枝（ESP）**：遵循递归前提原则——只有当工具已掌握 $\tau$ 的所有真子集 $\tau' \subset \tau$（$\tau' \neq \varnothing$）时，才探索更复杂的维度组合 $\tau$。这一策略大幅缩减探索空间，消融实验表明 ESP 将探索提示数减少 70.9%，时间缩短 66.0%，同时保持 GenEval 总体得分 0.96 不变（Table 6）。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能与效率权衡
@@ -237,9 +222,6 @@ OctoT2I 在 GenEval 基准上取得了 **0.96** 的总体得分（Table 1），�
 *Table 1: Quantitative evaluation on GenEval benchmark. Throughout this paper, the best and second-best results are marked in bold red and underlined blue, respectively. ↑ indicates higher is better. Obj.: Object; Attr.: Attribution*
 
 在更细粒度的组合生成基准 T2ICompBench++ 上，OctoT2I 的平均得分达到 **0.6618**（Table 2），略高于 Flow-GRPO 的 0.6556。尽管绝对提升幅度较小（+0.0062），但考虑到 Flow-GRPO 本身是当前单模型最优基线，这一结果进一步支持了路由策略在复杂组合场景下的稳健性。
-
-![[assets/figures/papers/paper_list_l2174_https_openaccess_thecvf_com_content_CVPR2026_html_Jiang_OctoT2I_A_Self_E/figures/006_Table_2.jpg]]
-*Table 2: Quantitative evaluation results on T2ICompBench++. ↑ indicates higher is better*
 
 效率对比（Table 3）进一步量化了 OctoT2I 的优势：在 GenEval 全量提示集上，OctoT2I 的推理时间远低于 Flow-GRPO 等单模型方法，也优于其他智能体 T2I 方法（如 **ChatGen**, Jia et al., arXiv 2024），证明其有状态多轮路由策略并未引入显著额外开销。
 
@@ -273,21 +255,9 @@ Table 6 展示了探索空间剪枝（ESP）策略的效果。启用 ESP 后，�
 
 Figure 4 展示了质量阈值 θ 对性能与推理时间的影响。随着 θ 从 0.5 增加到 0.9，GenEval 总体得分呈现先升后降的趋势，而推理时间单调增加。这表明：过低的阈值使系统过早接受低质量图像，无法充分发挥多轮路由的优化潜力；过高的阈值则迫使系统频繁进行多轮重试，增加推理成本却未必带来质量提升。该结果揭示了质量-效率权衡的一个可调“旋钮”，也为实际部署中的阈值选择提供了经验依据。
 
-![[assets/figures/papers/paper_list_l2174_https_openaccess_thecvf_com_content_CVPR2026_html_Jiang_OctoT2I_A_Self_E/figures/007_Figure_4.jpg]]
-*Figure 4: Ablation study of θ on performance (green, left axis) and inference time (purple, right axis) on the GenEval benchmark*
-
 ### 泛化性与鲁棒性
 
 OctoT2I 在 Wise 基准（Table 7）上展现了良好的泛化能力，表明自进化知识并非过拟合于 GenEval 的提示分布。此外，高效新工具学习实验（Table 8）显示，当工具库中引入新模型时，OctoT2I 能够以较低成本快速更新知识，无需完整的重新自进化。对不同 LLM 的鲁棒性测试（Table 9）进一步表明，决策策略对底层 LLM 的选择具有一定容忍度，降低了系统对特定模型版本的依赖。
-
-![[assets/figures/papers/paper_list_l2174_https_openaccess_thecvf_com_content_CVPR2026_html_Jiang_OctoT2I_A_Self_E/figures/013_Table_7.jpg]]
-*Table 7: Generalization performance on the Wise benchmark*
-
-![[assets/figures/papers/paper_list_l2174_https_openaccess_thecvf_com_content_CVPR2026_html_Jiang_OctoT2I_A_Self_E/figures/014_Table_8.jpg]]
-*Table 8: Efficient New Tool Learning on the Wise benchmark*
-
-![[assets/figures/papers/paper_list_l2174_https_openaccess_thecvf_com_content_CVPR2026_html_Jiang_OctoT2I_A_Self_E/figures/015_Table_9.jpg]]
-*Table 9: Robustness to other LLMs on the Wise benchmark*
 
 ### 失败模式与局限性
 
@@ -297,8 +267,6 @@ OctoT2I 在 Wise 基准（Table 7）上展现了良好的泛化能力，表明�
 - **自进化知识覆盖的偏差**：初始概念维度的定义依赖 LLM 的生成能力，可能引入系统性偏见，导致某些工具能力维度未被充分探索。
 - **评估模块的校准度**：MLLM 的连续概率评分（从 yes/no logits 经 softmax 计算）与人类判断的一致性尚未充分验证，可能在某些提示类型上引入噪声。
 - **动态工具库适应性**：当前自进化机制假设工具库相对稳定，对于频繁迭代的模型生态，增量更新策略的有效性仍需进一步检验。
-
-
 
 ## 定位与知识库关联
 
@@ -346,8 +314,6 @@ OctoT2I 在以下条件下表现最优：
 - **决策可解释性**：OctoT2I 的决策过程是否能为用户提供工具选择的理由，增强系统透明度？
 - **多模态输入**：自进化机制是否可以从纯文本提示拓展到草图、参考图像等多模态输入？
 - **探索-利用平衡**：在动态工具库中，如何平衡新工具的能力探索与已掌握工具的稳定利用？
-
-
 
 ## 原文 PDF
 

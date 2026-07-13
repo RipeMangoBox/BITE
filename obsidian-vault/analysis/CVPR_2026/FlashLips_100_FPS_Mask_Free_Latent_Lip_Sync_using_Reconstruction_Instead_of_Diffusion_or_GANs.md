@@ -53,8 +53,6 @@ claims:
 
 方法上，FlashLips 将唇形同步重新定义为**图像重建任务**而非生成任务：Stage 1（LipsChange）通过掩码重建与自细化伪对训练，实现无掩码的单步潜在空间编辑；Stage 2 则利用流匹配从音频预测唇部姿势向量，驱动 Stage 1 完成同步。这一设计在方法谱系中位于**确定性重建路线**，与 DiffDub（Liu et al., ICASSP 2024）、LatentSync 等扩散范式，以及 Wav2Lip（Prajwal et al., ACM MM 2020）等 GAN 范式形成鲜明对比。
 
-
-
 ### 唇形同步任务的实时化困境
 
 唇形同步旨在根据任意音频驱动生成与语音内容精确对齐的人脸视频，是数字人、虚拟主播、影视配音等应用的核心技术。近年来，该领域的主导范式经历了从生成对抗网络（GAN）到扩散模型的快速迭代，代表性工作包括 **Wav2Lip**（Prajwal et al., ACM MM 2020）的专家判别器策略、**LatentSync** 的潜在空间扩散、**KeySync** 的关键帧插值扩散，以及 **SayAnything** 的条件视频扩散等。
@@ -80,8 +78,6 @@ FlashLips 的作者提出了一个关键认知转变：**唇形同步本质上�
 - **用解耦控制压缩搜索空间**：将唇形同步解耦为“控制什么”（低维唇部姿势向量）与“如何渲染”（单步潜在空间编辑器），使音频到唇形的映射成为一个紧凑的流匹配问题，而非高维图像生成问题。
 
 这一设计哲学的直接产物是：FlashLips 的 U-Net 变体在单张 NVIDIA H100 上实现了 **109.41 FPS** 的推理速度——约为 KeySync 的 30.4 倍——同时在唇形同步准确性与视觉质量上达到甚至超越更大、更慢的基线模型（见 Table 1 和 Table 2）。
-
-
 
 ## 核心方法与创新机理
 
@@ -124,8 +120,6 @@ FlashLips 的身份保留策略不同于常见的全局特征条件注入，而�
 
 **证据强度评估**：上述三项核心创新的有效性均得到定量消融与主实验的强支撑（置信度 0.95–0.98）。需注意，自细化机制在训练数据覆盖不足的边缘案例（如严重遮挡、极端头部旋转）上可能产生伪影，该点属于论文已声明的局限性，需在实际部署中进一步验证。
 
-
-
 FlashLips 将唇形同步任务解耦为一个**两阶段级联框架**：Stage 1 在 VAE 潜在空间中完成单步确定性嘴唇编辑，Stage 2 从音频预测低维唇部姿势向量以驱动 Stage 1。两阶段独立训练、推理时串联，全程无需显式嘴唇掩码。
 
 ### 数据流与模块关系
@@ -157,8 +151,6 @@ $$\mathcal{L}_{\text{total}} = 0.1 \mathcal{L}_{L1}^{\text{lat}} + 0.1 \mathcal{
 
 与基线方法通过参考帧或全局特征条件注入身份信息不同，FlashLips 采用**投影参考潜在变量 + 多参考帧动态选择**策略。消融实验（**Table 3, Table 4**）证实，将参考帧数量从 1 增加到 4 可显著提升身份保留度（ID），而对唇形同步度影响极小。
 
-
-
 FlashLips 将唇形同步解耦为两个顺序阶段：**Stage 1 潜在空间编辑器 (LipsChange)** 与 **Stage 2 音频到唇部姿势 Transformer**。核心设计理念是用低维解耦的唇部姿势向量替代端到端的像素生成，使 Stage 1 成为纯重建驱动的单步确定性编辑，彻底摒弃 GAN 和扩散过程。
 
 ### Stage 1：单步潜在空间编辑器
@@ -189,9 +181,6 @@ $$\mathcal{L}_{\mathrm{total}} = 0.1 \mathcal{L}_{L1}^{lat} + 0.1 \mathcal{L}_{L
 
 唇部编码器（Figure 4）将人脸图像压缩为紧凑的 12 维唇部姿势向量，作为 Stage 1 的控制信号。其设计分为两个互补分支：
 
-![[assets/figures/papers/paper_list_l2487_https_openaccess_thecvf_com_content_CVPR2026_html_Zinonos_FlashLips_100/figures/004_Figure_4.jpg]]
-*Figure 4: Lips Encoder. A frozen expression encoder with an MLP projector and a mouth-crop CNN produce an 8D+4D lips vector. A distilled ResNet-34 replicates this mapping on inference*
-
 - **V1（冻结表情编码器 + MLP 投影）：** 使用预训练的表情识别网络提取特征，经 MLP 投影到 8 维。消融实验（Table 5）表明，8 维时重建质量已接近饱和。
 - **V2（口部裁剪 CNN 残差）：** 对嘴唇区域裁剪后经小型 CNN 提取 4 维残差向量，补充 V1 可能遗漏的唇部细节。
 
@@ -216,8 +205,6 @@ $$\mathcal{L}_{\mathrm{FM}} = \mathbb{E}_{t, \boldsymbol{\epsilon}, a} \left\| v
 **身份保留机制：** 通过投影参考潜在变量 $\overline{\mathbf{z}}_{\mathrm{ref}}$ 注入身份信息。消融实验（Tables 3, 4）表明，将参考帧数量从 1 增加到 4 可显著提升身份保留度（ID），而对唇形同步度影响极小。
 
 **生成范式转变：** 从 GAN/扩散的多步迭代生成变为纯重建损失驱动的单步确定性编辑，这是实现 100+ FPS 推理速度的根本原因。U-Net 变体在单张 NVIDIA H100 上达到 109.41 FPS，比基于扩散的 KeySync 快约 30.4 倍（Table 2）。
-
-
 
 ## 实验与关键发现
 
@@ -261,8 +248,6 @@ Table 2 报告了在单张 NVIDIA H100 GPU 上、经 5 次预热后 10 次运行
 
 这些局限需要在部署时结合具体应用场景进行手动验证，尤其是涉及野外视频或高表现力需求的任务。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2487_https_openaccess_thecvf_com_content_CVPR2026_html_Zinonos_FlashLips_100/figures/002_Figure_2.jpg]]
 *Figure 2: Visualization of Quantitative Evaluation. Comparison of eight lip-sync models in the cross-audio setting on seven key metrics. Results are normalized, with the best-performing model scaled to the outer edge, and the worst towards the center*
 
@@ -271,17 +256,6 @@ Table 2 报告了在单张 NVIDIA H100 GPU 上、经 5 次预热后 10 次运行
 
 ![[assets/figures/papers/paper_list_l2487_https_openaccess_thecvf_com_content_CVPR2026_html_Zinonos_FlashLips_100/figures/007_Table_3.jpg]]
 *Table 3: Reference Latent Ablation (Transformer). Ablation of the number of reference latents for the Transformer base model on a subset of metrics. Full ablations are in Table C.5*
-
-![[assets/figures/papers/paper_list_l2487_https_openaccess_thecvf_com_content_CVPR2026_html_Zinonos_FlashLips_100/figures/008_Table_4.jpg]]
-*Table 4: Reference Latent Ablation (U-Net). Ablation of the number of reference latents for the U-Net base model on a subset of metrics. Full ablations are provided in Table C.5*
-
-![[assets/figures/papers/paper_list_l2487_https_openaccess_thecvf_com_content_CVPR2026_html_Zinonos_FlashLips_100/figures/010_Figure_5.jpg]]
-*Figure 5: Qualitative Comparison – Cross Audio. Comparison with other lip-sync methods for cross-audio. The top two rows show the source and audio-driving videos, followed by lip-synced outputs from each method*
-
-![[assets/figures/papers/paper_list_l2487_https_openaccess_thecvf_com_content_CVPR2026_html_Zinonos_FlashLips_100/figures/001_Figure_1.jpg]]
-*Figure 1: FlashLips Results. Selected results of source and driver pairs, generated using our transformer-based model*
-
-
 
 ## 定位与知识库关联
 
@@ -338,8 +312,6 @@ FlashLips 的身份保留策略与现有方法存在显著差异：
 3. **框架泛化**：两阶段“姿势预测 + 潜在编辑”范式是否可以推广至全身动画生成、动态背景替换或更广泛的视频编辑任务？这需要验证低维控制表示在更复杂运动模式下的表达能力。
 
 4. **与实时方法的深度融合**：FlashLips 的 100+ FPS 推理速度使其可与 **MuseTalk** 等实时方法直接竞争，但两者在身份保持机制和编辑粒度上的差异值得进一步对比研究。
-
-
 
 ## 原文 PDF
 

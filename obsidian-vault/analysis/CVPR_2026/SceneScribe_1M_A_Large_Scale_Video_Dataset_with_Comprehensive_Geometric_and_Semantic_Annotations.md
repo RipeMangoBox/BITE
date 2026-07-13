@@ -56,8 +56,6 @@ claims:
 
 需要指出的是，该数据集的标注质量受限于所采用现成模型（Qwen2.5-VL-72B、MegaSaM、TAPIP3D）的固有精度，这些模型自身的系统误差可能传播至数据集标注中；整个标注流水线消耗约15万GPU小时，构建成本较高；数据来源主要为公开网络视频，对极端环境或长尾场景的覆盖可能不足，且未进行地理或文化偏见的公平性评估。
 
-
-
 ### 问题的核心瓶颈
 
 当前视频理解与生成领域面临一个根本性矛盾：**3D感知模型需要精确的几何信息（深度、相机姿态、点轨迹），而视频生成模型需要丰富的语义描述和动态场景覆盖**，但现有的视频数据集无法同时满足这两类需求。
@@ -81,8 +79,6 @@ claims:
 SceneScribe-1M的设计目标不仅是填补数据集空白，更是要同时推动3D几何感知和可控视频生成两个方向的研究。其核心假设是：**一个包含精确相机参数、连续深度图、一致3D点轨迹和详细结构化文本描述的统一数据集，能够为多个下游任务提供协同增益**。这种“一数据集多任务”的设计理念，试图打破当前各子领域数据集相互独立的局面。
 
 需要注意的是，该数据集来源于公开网络视频，标注模型本身的系统性偏差可能传播至数据集，且对极端环境和长尾场景的覆盖仍有局限——这些限制需要在后续使用中加以注意和缓解。
-
-
 
 ## 核心方法与创新机理
 
@@ -108,8 +104,6 @@ SceneScribe-1M 的核心创新并非提出新的模型架构，而是通过**大
 
 从因果机制看，SceneScribe-1M 的贡献可概括为：**以大规模算力（超过1000块 NVIDIA H20 GPU）为杠杆，撬动多个专有模型的知识蒸馏到统一数据载体中**，从而弥补了单模态数据集的根本缺陷。其真正的“causal knob”不在于模型设计，而在于流水线的并行化部署策略和几何-语义联合标注的组织方式。这一思路为后续构建更大规模、更多模态的世界模型数据集提供了可复用的范式。
 
-
-
 SceneScribe-1M 的数据构建流水线遵循“收集—预处理—联合标注—多视图子集采样”四阶段范式，其核心设计目标是在大规模开放世界视频上实现几何与语义信息的全面、一致标注。图2展示了该流水线的整体架构。
 
 **阶段一：视频收集。** 流水线从四个来源汇聚原始视频：三个现有的大规模视频-文本对数据集——HD-VILA-100M、Panda-70M、Koala-36M——以及一个从 Pexels 平台新策划的 Pexels-Video 数据集。收集阶段对视频的基本规格设定了初始门槛：空间分辨率高于1080p、帧率不低于10 fps、时长介于5秒至1分钟之间。
@@ -125,15 +119,11 @@ SceneScribe-1M 的数据构建流水线遵循“收集—预处理—联合标�
 
 **阶段四：多视图子集采样（SceneScribe-MVS）。** 为支持静态多视图任务，流水线设计了一个基于多视图重投影的解耦采样策略。该策略通过计算2D重投影误差 $e_{2d}$、3D相对深度误差 $e_{3d}$ 和RGB差异 $e_{rgb}$，并联合阈值化生成运动掩码 $M_{motion}$，有效区分相机运动与物体运动。在此基础上构建的 SceneScribe-MVS 子集在显著降低动态物体占比的同时，保留了与原始数据集高度相似的相机运动分布（距离、旋转、转向次数），实现了相机运动多样性与场景静态性的解耦控制。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l824_https_arxiv_org_abs_2604_07990/figures/003_Figure_2.jpg]]
 *Figure 2: Curation Pipeline for SceneScribe-1M consist of: (a) We begin by collecting large-scale videos from various sources; (b) Raw videos undergo specification and content inspection, with temporal segmentation models employed to ensure continuity; and (c) We integrate Qwen2.5-VL-72B [6], MegaSaM [33], and TAPIP3D [68] to perform comprehensive geometric and semantic annotations*
 
 ![[assets/figures/papers/paper_list_l824_https_arxiv_org_abs_2604_07990/figures/001_Figure_1.jpg]]
 *Figure 1: SceneScribe-1M offers more than one million dynamic scenes spanning over 4,000 hours, featuring comprehensive semantic and geometric annotations (i.e., detailed description, motion masks, camera poses, continuous video depths, and dynamic tracks). It supports diverse downstream tasks (i.e., modular depth estimation, scene reconstruction, dynamic point tracking, and pose/text-to-video generation)*
-
-
 
 ### 数据构建流水线概览
 
@@ -181,18 +171,8 @@ $$M_{motion} = (e_{2d} < \tau_1) \wedge (e_{3d} < \tau_2) \wedge (e_{rgb} < \tau
 
 **消融验证**：Figure 6 显示，经过采样策略后，SceneScribe-MVS 的物体运动指标（s1 分数、s2 分数、轨迹可见率）显著趋于静态，证明该公式体系有效控制了动态物体的包含比例。Figure 7 进一步表明，SceneScribe-MVS 的相机运动分布（距离、旋转、转向次数）与原始 SceneScribe-1M 高度相似，验证了运动掩码公式在解耦相机与物体运动方面的有效性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l824_https_arxiv_org_abs_2604_07990/figures/002_Table_1.jpg]]
 *Table 1: Comparisons with Previous Works. SceneScribe-1M is a large-scale video dataset with comprehensive geometric and semantic annotations. In the Geometric Annotation column, Depth map, Camera Pose, and 3D Tracks are abbreviated as D., C., and P., respectively*
-
-![[assets/figures/papers/paper_list_l824_https_arxiv_org_abs_2604_07990/figures/011_Figure_6.jpg]]
-*Figure 6: Statistics of Object Motion Metrics. It can be observed that both object motion metrics in SceneScribe-MVS after applying the sampling strategy exhibit a greater static degree than the thresholds. This demonstrates that our sampling not only facilitates effective dynamic mask generation within SceneScribe-1M, but also improves control over the proportion of dynamics*
-
-![[assets/figures/papers/paper_list_l824_https_arxiv_org_abs_2604_07990/figures/010_Figure_7.jpg]]
-*Figure 7: Statistics of Camera Motion Metrics. The similar distributions of camera motion metrics in SceneScribe-1M and SceneScribe-MVS indicate that we disentangle camera and object motion, enabling control over object dynamics while preserving camera diversity*
-
-
 
 ## 实验与关键发现
 
@@ -242,22 +222,6 @@ SceneScribe-MVS 子集的核心设计目标是在过滤动态物体的同时保�
 2. **场景覆盖偏差**：数据来源以公开网络视频为主，对极端环境（如恶劣天气、水下场景）、长尾专业场景（如医疗内窥镜）的覆盖不足，可能导致下游模型在这些场景中的泛化能力受限。
 
 3. **构建成本制约扩展性**：整个标注流水线消耗约 15 万 GPU 小时（超过 1000 块 NVIDIA H20 GPU），高昂的计算成本可能限制数据集的进一步规模扩展和更新迭代。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l824_https_arxiv_org_abs_2604_07990/figures/012_Figure.jpg]]
-*Figure: (a) MoGe (b) VGGT (c) MonST3R (d) CoTracker3*
-
-![[assets/figures/papers/paper_list_l824_https_arxiv_org_abs_2604_07990/figures/005_Figure_5.jpg]]
-*Figure 5: Caption Statistics: (a) The average caption length is adequate to capture the details within each scene, and (b) Key words (e.g., atmosphere, subject, and take place) effectively cover aspects such as the scene context, primary objects, and actions*
-
-![[assets/figures/papers/paper_list_l824_https_arxiv_org_abs_2604_07990/figures/007_Figure_3.jpg]]
-*Figure 3: Statistics of Raw Video Specification after filtering, including Resolution, Frame Per Second (FPS), and Duration*
-
-![[assets/figures/papers/paper_list_l824_https_arxiv_org_abs_2604_07990/figures/009_Figure.jpg]]
-*Figure: (a) s1 score (b) s2 score*
-
-
 
 ## 定位与知识库关联
 
@@ -329,8 +293,6 @@ SceneScribe-MVS 子集的构建引入了一个具有方法论价值的操作—�
 | **SceneScribe-1M** | **4191** | **✓** | **✓** | **✓** | **✓** | **✓** |
 
 SceneScribe-1M 在几何标注的全面性（同时覆盖深度、姿态、轨迹）和规模上均处于领先位置，但其标注精度未经人工验证，在这一维度上弱于人工标注数据集。实际使用中，建议将其作为预训练或辅助训练数据，而非精调的唯一监督来源。
-
-
 
 ## 原文 PDF
 

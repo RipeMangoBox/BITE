@@ -55,8 +55,6 @@ claims:
 
 实验基于自建的Q-Spatial Bench（271道人工标注题目，含Q-Spatial-ScanNet与Q-Spatial++两个子集），以最大比值度量δ = max(ˆd/d*, d*/ˆd) ≤ 2为成功标准。尽管SpatialPrompt大幅缩小了VLM与人类（平均成功率90）的差距，GPT-4o最佳成绩仍落后人类约30个点，表明该基准对人类简单但对VLM极具挑战，仍有巨大提升空间。
 
-
-
 ### 定量空间推理：视觉语言模型的盲区
 
 当前大视觉语言模型（Large Vision-Language Models, VLMs）在图像描述、视觉问答等语义理解任务上取得了显著进展，然而，当任务要求从单张2D图像中精确估计物体的距离或尺寸时，这些模型暴露出严重的定量空间推理缺陷。这一能力在机器人操控、增强现实和自主导航等现实应用中至关重要，但现有VLMs在缺乏外部深度传感器或额外微调的情况下，几乎无法可靠地完成此类估计。
@@ -78,8 +76,6 @@ claims:
 逻辑回归分析为上述观察提供了统计显著性证据：使用参考物体使准确估计（δ≤2）的几率提高约2.7倍（β_r=1.0179，p<0.05），且该效应独立于数据集来源和真实距离大小（Table 5）。这揭示了一个重要洞见：**VLMs并非完全缺乏空间推理能力，而是缺乏正确的推理策略引导**。
 
 基于此，本文提出一个核心假设：如果能够显式地引导VLM在推理过程中识别和使用参考物体，是否可以在不修改模型架构、不增加训练数据、不依赖外部工具的前提下，大幅提升其定量空间推理性能？这一假设将研究焦点从模型能力的“有无”问题转向了能力的“激发”问题，为高效提升VLMs的空间推理能力开辟了一条零样本提示工程的新路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -120,8 +116,6 @@ SpatialPrompt定位于**零样本提示工程**范式，区别于以下两类相
 
 在提示技术谱系中，SpatialPrompt可视为对零样本CoT的定向增强——后者提供通用推理框架，前者则针对定量空间推理这一特定任务注入了领域特异性的推理策略（参考物体识别与相对比较）。这种“任务感知提示设计”的思路为提示工程提供了新的方法论参考：通过观察模型在成功案例中自然涌现的有效推理模式，将其显式编码为提示指令，从而系统性地激发模型的潜在能力。
 
-
-
 本文提出了一套“基准构建→能力诊断→机制分析→提示干预”的完整研究管线，用于激发和评估大视觉语言模型（VLM）在单张2D图像上的量化空间推理能力。整个框架围绕一个核心发现展开：当VLM在推理中显式利用场景中的**参考物体**（其空间尺寸可通过常识推断）作为视觉锚点时，距离估计的准确性会显著提升。
 
 ### 管线总览
@@ -154,8 +148,6 @@ SpatialPrompt定位于**零样本提示工程**范式，区别于以下两类相
 ### 框架的边界条件
 
 该框架的有效性受限于以下条件：（1）场景中需存在可被常识推理的参考物体，缺乏明确参照物时SpatialPrompt的增益有限；（2）VLM需具备基本的常识推理能力，模型规模过小（如LLaVA-7B）时提示干预效果不稳定；（3）评估指标 $\delta \leq 2$ 相对宽松（允许0.5×到2×误差），无法精细区分高精度估计能力；（4）仅限单张2D图像输入，未涉及多视角或深度传感器信息。这些边界条件在管线设计中已被显式识别，但尚未被系统性解决。
-
-
 
 ### 关键模块：SpatialPrompt 提示策略
 
@@ -198,8 +190,6 @@ $$p(\delta_{\leq 2}) \sim \beta_{0} + \beta_{r} X_{r} + \beta_{d} X_{d} + \beta_
 - **SpatialPrompt 的触发效果**：SpatialPrompt 使 Gemini 1.5 Pro 的参考物体使用频率从 7.64% 飙升至 99.17%，GPT-4V 从 18.12% 升至 99.8%（Q-Spatial-ScanNet），成功率随之大幅提升（置信度 0.95，见 Table 11）。
 - **相关性验证**：在所有 VLM 和提示技术中，参考对象使用频率与成功率之间的 Spearman 相关系数在 Q-Spatial-ScanNet 上为 0.69，在 Q-Spatial++ 上高达 0.91，强有力地支持了“通过参考物体推理直接提升准确性”的核心假设（置信度 0.95，见 Figure 4）。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与关键发现
@@ -225,9 +215,6 @@ $$p(\delta_{\leq 2}) \sim \beta_{0} + \beta_{r} X_{r} + \beta_{d} X_{d} + \beta_
 
 ![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2409_09788/figures/009_Table_6.jpg]]
 *Table 6: Success rate $\delta _ { \leq 2 }$ of different VLMs and prompting techniques. The proposed prompt SpatialPrompt consistently leads to higher success rates across different VLMs. We bold font the best numbers across different prompting techniques and highlight their performances as compared to the performances of the standard prompt
-
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2409_09788/figures/013_Table_8.jpg]]
-*Table 8: Full table of the success rate $\delta _ { \leq 2 }$ of Gemini 1.5 Pro, Gemini 1.5 Flash, GPT-4V, and GPT-4o. All numbers are averaged over 5 different runs, except for GPT-4V and GPT-4o, which are run on three seeds. Each number is followed by their standard deviations. Table 9: Full table of the success rate $\delta _ { < 2 }$ of LLaVA at different versions and model sizes. All numbers are averaged over 5 different runs and followed by their standard deviations
 
 - **Gemini 1.5 Pro**：在Q-Spatial-ScanNet上从Standard prompt的0.59飙升至SpatialPrompt-Steps的53.65（+53.06点）；在Q-Spatial++上从0.99提升至43.17（+42.18点）。
 - **GPT-4V**：在Q-Spatial++上从Standard prompt的18.81提升至SpatialPrompt-Single的53.47（+34.66点）；在Q-Spatial-ScanNet上从25.88提升至52.94（+27.06点）。
@@ -272,29 +259,13 @@ $$p(\delta_{\leq 2}) \sim \beta_{0} + \beta_{r} X_{r} + \beta_{d} X_{d} + \beta_
 
 **Table 10**报告了δ≤1.25（允许0.8×至1.25×误差）更严格阈值下的结果。所有模型的成功率均大幅下降，标准偏差增大，但SpatialPrompt仍保持相对优势。例如，Gemini 1.5 Pro在Q-Spatial-ScanNet上从0.00（Standard）提升至15.29（SpatialPrompt-Steps）。这表明SpatialPrompt在更高精度要求下仍有效，但距离实际应用仍有巨大提升空间。
 
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2409_09788/figures/015_Table_10.jpg]]
-*Table 10: Full table of the success rate $\delta _ { \leq 1 . 2 5 }$ of Gemini 1.5 Pro, Gemini 1.5 Flash, GPT-4V, and GPT-4o. All numbers are averaged over 5 different runs, except for GPT-4V and GPT-4o, which are run on three seeds. Each number is followed by their standard deviations. Table 11: Frequency of whether the responses involve using reference objects of different VLMs and prompting techniques. The proposed prompt SpatialPrompt consistently lead to higher chances to have reference objects involved in the responses
 
 ### 实验公平性说明
 
 实验采用确定性采样，Gemini和LLaVA使用5个随机种子，GPT-4V和GPT-4o使用3个种子（API成本考虑）。GPT系列模型即使在temperature=0时仍存在轻微随机性，结果报告了标准偏差。Q-Spatial-ScanNet基于公开数据集ScanNet，存在训练数据泄漏的潜在风险；Q-Spatial++使用全新拍摄图像，专门评估泛化能力。人类基线（Table 12）显示人类平均成功率达90，GPT-4o最佳仅约65，差距超过30点，表明该基准仍有巨大提升空间。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2409_09788/figures/001_Figure_1.jpg]]
-*Figure 1: We introduce a human expert-annotated benchmark dedicated to quantitative spatial reasoning: Q-Spatial Bench. The benchmark consists of two splits: Q-Spatial-ScanNet and Q-Spatial++. The left panel shows the examples from the two splits. Q-Spatial-ScanNet is repurposed from a subset of images and RGB-D scans in ScanNet (Dai et al., 2017) and the questions are categorized into five categories (top-right). To provide a more robust evaluation in quantitative spatial reasoning, we captured an additional set of images and provide accurately-annotated quantitative spatial questions for Q-Spatial++*
-
 ![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2409_09788/figures/002_Table_1.jpg]]
 *Table 1: Comparison of quantitative spatial reasoning benchmark. Q-Spatial Bench is a human expert-annotated benchmark, specifically designed for quantitative spatial questions*
-
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2409_09788/figures/003_Table_2.jpg]]
-*Table 2: GPT-4o outperforms other commercial VLMs in quantitative spatial reasoning. We evaluates the success rate $\delta _ { \leq 2 }$ on each split of Q-Spatial Bench. ∗Gemini 1.5 Pro consistently refuses to provide the measurements
-
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2409_09788/figures/012_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2409_09788/figures/014_Table.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -345,8 +316,6 @@ Q-Spatial Bench的两个分割揭示了关键的泛化问题：
 4. **与微调的协同**：SpatialPrompt与SpatialVLM等微调方法是否可取得叠加收益，尚待探索。
 
 5. **真实应用验证**：研究仅限单张2D图像，未涉及多视角或深度传感器信息。SpatialPrompt在机器人操控、AR等真实应用中的实用性需要进一步验证。
-
-
 
 ## 原文 PDF
 

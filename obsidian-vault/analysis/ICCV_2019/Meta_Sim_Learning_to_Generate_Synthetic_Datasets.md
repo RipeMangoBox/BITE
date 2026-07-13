@@ -58,8 +58,6 @@ claims:
 
 定性分析表明，Meta-Sim 学会了旋转车辆、对齐物体、调整相机高度和增加场景密度，以接近真实场景分布（Figure 12, 16）。
 
-
-
 ### 合成数据在视觉任务中的困境
 
 深度学习模型对大规模标注数据的渴求，使得合成数据成为降低人工标注成本的诱人方案。图形引擎能够以极低成本生成像素级精确标注的图像，理论上可无限扩展训练集。然而，一个长期困扰领域的问题始终存在：**在合成数据上训练的模型迁移到真实场景时，性能会出现显著下降**。这种“模拟到真实”（Sim-to-Real）的域差距，传统上被归因于渲染图像与自然图像之间的**外观差异**（光照、纹理、色彩分布等），研究者因此投入大量精力于图像到图像的风格迁移和域适应技术。
@@ -81,8 +79,6 @@ Meta-Sim 工作的核心洞见在于指出：**合成训练数据的域差距不
 3. **结构保持**：如何在优化场景属性时不破坏场景图的结构合法性？
 
 Meta-Sim 的提出正是为了系统性地回应这些挑战。其核心思想是将场景合成重新建模为**分布匹配问题**——利用最大均值差异（MMD）在特征空间对齐渲染图像与真实图像的表示，同时通过元强化学习目标（REINFORCE）直接优化下游任务表现，从而在无需真实标注的条件下生成高质量合成训练数据。
-
-
 
 ## 核心方法与创新机理
 
@@ -113,8 +109,6 @@ Meta-Sim 的核心创新在于将合成数据集的生成重新定义为**场景
 ### 创新本质总结
 
 上述三个 changed slots 的协同作用，使得 Meta-Sim 能够自动化地学习“如何生成有用训练数据”，而非依赖人工反复调节生成参数。定性结果（Figure 12, 16）证实，模型学会了旋转车辆以对齐真实场景中的朝向分布、调整相机高度、增加场景密度等行为——这些调整在手工语法中需要专家反复试错才能实现。定量结果进一步验证了创新的有效性：在 MNIST 旋转实验中，分类准确率从随机猜测水平（14.8%）提升至近乎完美（99.5%）（Table 1）；在 KITTI 车辆检测上，AP@0.5 提高了 2.7 个百分点（Table 3）。
-
-
 
 Meta-Sim 的整体 pipeline 围绕一个核心思想构建：**将场景合成建模为分布匹配问题**，通过神经网络学习调整合成场景的布局和内容分布，使渲染图像在表示空间上逼近真实数据分布，并直接优化下游任务性能。
 
@@ -154,12 +148,8 @@ Meta-Sim 的整体 pipeline 围绕一个核心思想构建：**将场景合成�
 
 > **需要人工验证的点**：论文中各模块的输入输出维度、GCN 的具体层数和结构细节在提供的分析摘录中未完全明确，建议在撰写详细方法部分时对照原文 Section 3.1 进行补充。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l49_https_arxiv_org_abs_1904_11621/figures/001_Figure_1.jpg]]
 *Figure 1: Meta-Sim is a method to generate synthetic datasets that bridge the distribution gap between real and synthetic data and are optimized for downstream task performance*
-
-
 
 ### 模型架构总览
 
@@ -241,8 +231,6 @@ $$\log p_{G}(S') = \sum_{s' \in S'} \sum_{v \in s'_V} \sum_{a \in s'_{A,mut}(v)}
 2. **分布匹配**：联合优化 $\mathcal{L}_{MMD^2}$ 和 $\mathcal{L}_{AE}$，使生成图像分布逼近真实分布。
 3. **任务优化**：在分布匹配基础上，加入 REINFORCE 任务损失进行元训练，直接优化下游任务性能。
 
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -303,26 +291,6 @@ Meta-Sim 位于**合成数据生成**与**元学习**的交叉点，其核心贡
 
 在合成数据领域，现有工作主要关注外观差距的弥合（如图像到图像转换），而 Meta-Sim 首次系统性地处理**内容/布局分布差距**。其技术路线——通过图神经网络修改场景图属性、利用非可微渲染器的有限差分梯度、以及元强化学习目标——构成了一个可扩展的框架，为后续工作（如结合可微渲染、自动语法推断）提供了基础。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l49_https_arxiv_org_abs_1904_11621/figures/004_Figure_6.jpg]]
-*Figure 6: Examples from the rotated and translated MNIST experiments as well), as it might interfere with our model’s training by changing the configuration of the generated data, making the task optimization signal unreliable*
-
-![[assets/figures/papers/paper_list_l49_https_arxiv_org_abs_1904_11621/figures/005_Figure_7.jpg]]
-*Figure 7: (bottom) Input scenes, (top) Meta-Sim’s generated examples for MNIST with rotation gap Figure 8. (bottom) Input scenes, (top) Meta-Sim’s generated examples for MNIST with rotation and translation gap*
-
-![[assets/figures/papers/paper_list_l49_https_arxiv_org_abs_1904_11621/figures/006_Figure_9.jpg]]
-*Figure 9: Example label and image from Aerial2D validation Figure 10. Example input scenes for Aerial2D*
-
-![[assets/figures/papers/paper_list_l49_https_arxiv_org_abs_1904_11621/figures/016_Figure_16.jpg]]
-*Figure 16: Successful cases: (left) input scenes from the probabilistic grammar, (right) Meta-Sim’s generated examples for the task of car detection on KITTI. Notice how meta-sim learns to align objects in the scene, slightly change the camera position and move context elements such as buildings and trees, usually densifying the scene*
-
-![[assets/figures/papers/paper_list_l49_https_arxiv_org_abs_1904_11621/figures/017_Figure_17.jpg]]
-*Figure 17: Failure cases: (left) input scenes from the probabilistic grammar, (right) Meta-Sim’s generated examples for the task of car detection on KITTI. Initially dense scenes are sometimes unresolved, leading to collisions in the final scenes. There are unrealistic colours on cars since they are sampled from the prior and not optimized in this work. In the last row, meta-sim moves a car very close to the ego-car (camera)*
-
-![[assets/figures/papers/paper_list_l49_https_arxiv_org_abs_1904_11621/figures/013_Figure_12.jpg]]
-*Figure 12: (left) samples from our prob. grammar, (middle) Meta-Sim’s corresponding samples, (right) random samples from KITTI*
-
 ![[assets/figures/papers/paper_list_l49_https_arxiv_org_abs_1904_11621/figures/007_Table_1.jpg]]
 *Table 1: Classification performance on our MNIST with different distribution gaps in the data*
 
@@ -334,8 +302,6 @@ Meta-Sim 位于**合成数据生成**与**元学习**的交叉点，其核心贡
 
 ![[assets/figures/papers/paper_list_l49_https_arxiv_org_abs_1904_11621/figures/012_Table_5.jpg]]
 *Table 5: Effect of finetuning on V*
-
-
 
 ## 定位与知识库关联
 
@@ -394,8 +360,6 @@ Meta-Sim 的设计假设划定了其适用范围的清晰边界：
 ### 在合成数据生成谱系中的定位
 
 Meta-Sim 处于合成数据生成方法谱系中的一个独特位置：它桥接了**手工域随机化**和**纯数据驱动的生成模型**。与域随机化方法相比，它引入了可学习的分布变换和任务感知优化；与基于 GAN 或扩散模型的图像生成方法相比，它保留了物理渲染的真实标注优势（像素级精确标注）和场景图的显式可控性。其核心贡献在于证明了：通过将场景合成建模为分布匹配问题，并在元学习框架下直接优化下游任务性能，可以在无需真实标注的情况下显著提升合成数据的训练价值。
-
-
 
 ## 原文 PDF
 

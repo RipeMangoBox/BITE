@@ -53,8 +53,6 @@ claims:
 
 在方法谱系中，LayerBind 定位为**免训练的 DiT 布局控制器**，与 InstanceDiffusion、GLIGEN-XL、CreatiLayout 等基于训练的方法，以及 RAGD、LaRender 等免训练方法形成对比。其推理开销随区域数量线性增长（6 个区域时额外开销约 107%），且天然兼容 IP-Adapter、FLUX Redux 等外部适配器。当前局限包括密集布局场景下的全局一致性不足，以及对反事实布局的处理困难，这为后续将分层绑定机制与微调策略结合的研究留出了空间。
 
-
-
 ### 扩散变换器的区域控制困境
 
 文本到图像（T2I）生成模型近年来取得了显著进展，扩散变换器（Diffusion Transformer, DiT）架构凭借其强大的文本理解与图像合成能力，已成为主流范式。然而，当用户需要精确控制生成图像中多个物体的空间布局和遮挡关系时，现有方法面临系统性的挑战。这一问题在定制化内容创作、广告设计和视觉叙事等场景中尤为突出——用户不仅希望指定“一只猫在沙发前面”，还需要确保猫确实遮挡了沙发，而非两者概念混合或某一物体消失。
@@ -72,8 +70,6 @@ claims:
 本文的关键发现源于一个简单而深刻的观察：**空间布局和遮挡关系在去噪过程的极早期阶段即被确立**。如 Figure 2(a, b) 所示，仅仅在早期去噪步骤中重新排列潜空间结构，就能直接操纵最终的物体位置和遮挡顺序。这一现象揭示了 DiT 去噪动力学的本质特性——早期步骤决定了生成的宏观结构，后续步骤主要进行细节填充。
 
 基于此，本文提出了一个因果性的方法设计原则：**有效的布局控制应当与模型的固有去噪动态对齐**，而非与之对抗。具体而言，将生成过程拆解为两个阶段——首先在早期建立实例布局与遮挡关系，随后在保持布局不变的前提下精修语义细节。这一原则构成了 LayerBind 方法的核心哲学。
-
-
 
 ## 核心方法与创新机理
 
@@ -126,12 +122,7 @@ LayerBind 设计的理论根基来自一项关键观察：**在极早的去噪�
 
 LayerBind 在 T2I‑CompBench 的空间指标上达到 70.63（FLUX 基线仅 39.09），在 BindBench 的遮挡感知评分上领先最强训练式方法超过 33 个百分点，同时保持最高的图像质量评分（Table 1, Table 2）。
 
-
-
 LayerBind 将区域与遮挡控制任务拆解为两个顺序阶段：**分层实例初始化**（Layer‑wise Instance Initialization）与**分层语义护理**（Layer‑wise Semantic Nursing）。这一设计源于对扩散变换器去噪动态的关键观察——空间布局和遮挡关系在极早的去噪步骤中即被确立，简单重排早期潜空间结构即可直接操纵最终的布局与遮挡顺序（Figure 2）。因此，有效的控制方案应当先建立布局骨架，再进行细节精修，而非在生成全程强行干预。
-
-![[assets/figures/papers/paper_list_l2323_https_arxiv_org_abs_2603_05769/figures/002_Figure_2.jpg]]
-*Figure 2: (a, b) Observation: simply rearranging the latent structure at an early step directly manipulates the final spatial layout and occlusion order. (c) Our LayerBind scheme: initializing the instance layout first, then conducting semantic nursing for instance detail while maintaining layout and occlusions*
 
 ### 管线总览
 
@@ -159,8 +150,6 @@ LayerBind 将区域与遮挡控制任务拆解为两个顺序阶段：**分层�
 - **可编辑生成**：分支方案天然支持实例替换、遮挡顺序修改等编辑操作（Figure 1 底部）。
 
 > **注意**：若 $\eta_1$ 设置过高，实例与背景可能过度解耦导致风格脱节；可通过降低 $\eta_1$ 缓解。密集布局场景下的全局一致性仍需进一步验证。
-
-
 
 LayerBind 将区域与遮挡控制解耦为两个顺序阶段：**分层实例初始化**（Layer‑wise Instance Initialization）与**分层语义护理**（Layer‑wise Semantic Nursing）。前者在早期去噪步骤中建立布局与遮挡关系，后者在后续步骤中强化细节并维持完整性。
 
@@ -225,13 +214,6 @@ $$\mathcal{A}_{\mathrm{joint}}(Q, K, V) = \mathrm{Softmax}\left(\frac{[Q_T \oplu
 
 LayerBind 的 CTA 操作即在此联合注意力空间上施加区域掩码，实现对特定 token 子集的定向更新。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2323_https_arxiv_org_abs_2603_05769/figures/004_Figure_4.jpg]]
-*Figure 4: Attention response weights of foreground to background and text across different FLUX [3] layers. We select layer 0 [1, 44] and layers with strong text response for hard instance binding. More analysis is presented in the Appendix A*
-
-
-
 ## 实验与关键发现
 
 ### 核心实验设置与评估基准
@@ -262,12 +244,6 @@ HB 的设计依据来自对 FLUX 各层注意力响应的分析（**Figure 4**�
 
 推理开销随区域数量线性增长而非二次方增长（**Table 4**）：在 6 个区域（每个区域占 25% 图像 token）时，额外开销约 107%。超参数 η₁ 在较宽范围内性能稳定（**Figure 14**），微调 η₁ 可进一步优化特定场景。
 
-![[assets/figures/papers/paper_list_l2323_https_arxiv_org_abs_2603_05769/figures/017_Figure_14.jpg]]
-*Figure 14: The performance is stabilized across a robust η1 range, while fine-tuning η1 can further optimize specific cases*
-
-![[assets/figures/papers/paper_list_l2323_https_arxiv_org_abs_2603_05769/figures/016_Table_4.jpg]]
-*Table 4: LayerBind’s additional inference time when inputting different numbers of regions. Each region occupies 25% of the image tokens (e.g., 1024 tokens). The inference cost of LayerBind increases linearly with the number of additional tokens*
-
 ### 失败模式与局限性
 
 尽管 LayerBind 在遮挡和布局控制上表现优异，仍存在以下失败模式：
@@ -276,8 +252,6 @@ HB 的设计依据来自对 FLUX 各层注意力响应的分析（**Figure 4**�
 2. **不完整的实例生成**：区域提示与空间位置的对齐敏感，需仔细调整提示词中的姿态等属性。
 3. **密集布局场景**：在极度拥挤的布局中难以保持全局一致性，更适用于定制化生成而非传统 L2I 基准。
 4. **反事实布局**：当输入布局违反真实世界合理性时，训练自由的 LayerBind 难以处理超出训练分布的组合。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2323_https_arxiv_org_abs_2603_05769/figures/006_Table_1.jpg]]
 *Table 1: Quantitative comparison for occlusion control, measuring: depth relationship (UniDet), T2I alignment (CLIP-G/L), Layout alignment (L*
@@ -290,14 +264,6 @@ HB 的设计依据来自对 FLUX 各层注意力响应的分析（**Figure 4**�
 
 ![[assets/figures/papers/paper_list_l2323_https_arxiv_org_abs_2603_05769/figures/012_Figure_9.jpg]]
 *Figure 9: Visualization of effects of different η1 with LSN strategy. To illustrate the details refinement of LSN, we add color attributes to each region (e.g., golden turtle, blue chicken, red bicycle)*
-
-![[assets/figures/papers/paper_list_l2323_https_arxiv_org_abs_2603_05769/figures/018_Figure_13.jpg]]
-*Figure 13: The illustration of the effectiveness of the proposed LSN and naive regional prompting [4] strategies. Without layerwise updates, errors such as concept blending and failure in occlusion control may occur*
-
-![[assets/figures/papers/paper_list_l2323_https_arxiv_org_abs_2603_05769/figures/011_Figure_8.jpg]]
-*Figure 8: Applications. Top) As also shown in Fig.1, LayerBind supports flexible occlusion control and instance modifications. Bottom) Treat an original generation as background context and branching edit instructions. LayerBind also achieves composited image edits*
-
-
 
 ## 定位与知识库关联
 
@@ -353,8 +319,6 @@ LayerBind 的分支-绑定范式打开了若干值得探索的方向：
 ### 知识库定位总结
 
 LayerBind 在文本到图像生成的方法谱系中占据了一个独特位置：它既不是简单的免训练后处理，也不是重量级的模型微调，而是通过**对 DiT 去噪动力学的因果理解**，设计了一个轻量但精准的干预机制。其核心贡献不在于提出新的网络结构，而在于揭示了“早期潜空间决定布局”这一因果规律，并据此构建了与之对齐的两阶段控制方案。这一范式可能对更广泛的生成模型控制问题具有启发意义——在施加控制之前，理解模型的内在动态或许是更根本的起点。
-
-
 
 ## 原文 PDF
 

@@ -58,8 +58,6 @@ UltraFlux 是一个面向原生 4K 分辨率、多宽高比文本到图像生成
 
 在 Aesthetic-Eval@4096 基准上，UltraFlux 在 FID、HPSv3 和 ArtiMuse 等指标上全面优于 Sana 等开源方法，并在 2:1、1:2、16:9、2.39:1 等多种宽高比下保持领先。Gemini-2.5-Flash 偏好评估中，UltraFlux 在视觉吸引力上被偏好比例为 70–82%，在提示对齐上为 60–89%。消融实验和 2×2 数据-模型协同消融进一步证实了各组件的非加性增益。
 
-
-
 ### 原生 4K 多宽高比生成的核心瓶颈
 
 文本到图像生成模型在 1K 分辨率下已取得显著进展，但将生成分辨率直接提升至原生 4K 并同时支持多种宽高比时，面临一系列耦合性失败模式。这些模式并非孤立存在，而是由位置编码、变分自编码器（VAE）压缩和优化目标三者的相互作用共同导致：
@@ -90,8 +88,6 @@ UltraFlux 的核心洞察在于：**原生 4K 多宽高比生成需要从数据�
 5. **阶段性美学课程学习（SACL）**：分两阶段训练，在高噪声步集中使用最高美学子集，提升整体观感而不牺牲低频结构。
 
 通过这一协同设计范式，UltraFlux 在开源 4K 生成模型中取得了领先性能，并在与闭源商业系统的对比中展现出竞争力。
-
-
 
 ## 核心方法与创新机理
 
@@ -140,8 +136,6 @@ Flux 原生 F16 VAE 在 4K 分辨率下会丢失高频细节，限制了 DiT 的
 
 这一协同效应源于四个槽位的耦合关系：高质量多宽高比数据为位置编码外推提供了训练窗口感知的基础；高保真 VAE 重构使 DiT 的优化目标能有效作用于高频细节；而 SNR-Aware Huber Wavelet 损失则确保这些细节在训练中不被 L2 损失的梯度偏向所平滑。单独改进任一槽位都会因其他槽位的瓶颈而无法充分发挥潜力。
 
-
-
 UltraFlux 采用**数据–模型协同设计（data–model co-design）**范式，将大规模高质量多宽高比 4K 数据集构建与模型侧的位置编码、VAE 后训练、优化目标及训练策略进行联合优化，以解决原生 4K 多宽高比文本到图像生成中的耦合失败模式。其核心洞察在于：单独改进位置编码、VAE 或损失函数均无法充分发挥数据潜力，只有将各组件协同设计才能实现稳定且细节丰富的原生 4K 合成。
 
 整体 pipeline 由以下模块串联构成：
@@ -167,8 +161,6 @@ UltraFlux 采用**数据–模型协同设计（data–model co-design）**范�
 输入输出流为：文本提示 → 文本编码器 → DiT（含 Resonance 2D RoPE + YaRN）在潜空间进行 Flow Matching 去噪 → 后训练 F16 VAE 解码器 → 原生 4K 多宽高比图像。训练过程中，SNR-Aware Huber Wavelet 损失作用于小波域，SACL 控制不同训练阶段的数据分布与时间步采样策略。
 
 2×2 数据–模型协同消融（Table 7）证实了该 pipeline 的非加性增益：仅更换数据（B）或仅使用模型/损失改进（C）均无法达到全协同配置（D）的性能（FID 从 152.09 降至 145.81），验证了数据与模型联合设计的必要性。
-
-
 
 UltraFlux 的核心技术方案围绕四个关键模块展开，它们共同构成了数据–模型协同设计的骨架：① 非对抗式 VAE 后训练，提升 4K 潜变量重建保真度；② Resonance 2D RoPE + YaRN 位置编码，消除多宽高比外推时的相位错位；③ SNR-Aware Huber Wavelet 训练目标，在频域和噪声水平两个维度上平衡梯度；④ 阶段性美学课程学习（SACL），将高美学监督集中于模型先验主导的高噪声步。
 
@@ -244,12 +236,8 @@ SACL 将训练分为两个阶段。第一阶段在全量 MultiAspect-4K-1M 数�
 
 四个模块并非独立运作，而是形成互补的级联效应。VAE 后训练提升了潜变量空间的信息保真度上限，使 DiT 的优化目标有更丰富的高频信号可供学习。Resonance 2D RoPE + YaRN 确保多宽高比下的位置编码一致性，防止几何漂移破坏 VAE 重建的细节。SNR-Aware Huber Wavelet 损失在小波域对高低频子带施加差异化梯度，使得 VAE 重建的高频细节能够被有效传递到 DiT 输出。SACL 则在高噪声步集中美学监督，在已有高频细节的基础上进一步提升整体观感。2×2 数据–模型协同消融（Table 7）证实，单独替换数据或单独改进模型/损失均无法达到全协同配置的性能，四者的联合使用带来了非加性增益。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2352_https_arxiv_org_abs_2511_18050/figures/019_Figure_10.jpg]]
 *Figure 10: Qualitative effect of Resonance 2D RoPE with YaRN. We compare three positional encodings at native 4K resolution for the same prompts. (a) Flux.1 2D RoPE baseline without any scaling at inference time, which tends to exhibit geometric drift and mild striping or warping artifacts in both foreground objects and backgrounds. (b) 2D RoPE with YaRN scaling, which stabilizes the overall layout but still shows subtle distortions along long contours and in extreme regions of the image. (c) Our proposed Resonance 2D RoPE with YaRN, which yields the most coherent global geometry and sharper, more regular fine structures (e.g., ring edges and tree trunks)*
-
-
 
 ## 实验与关键发现
 
@@ -287,9 +275,6 @@ Gemini-2.5-Flash 偏好评估（Figure 5）进一步从感知层面验证了这�
 
 UltraFlux 的核心设计目标之一是支持多样化宽高比的原生 4K 生成。在非正方形分辨率上的定量对比（Table 3、Table 4）显示：
 
-![[assets/figures/papers/paper_list_l2352_https_arxiv_org_abs_2511_18050/figures/007_Table_3.jpg]]
-*Table 3: Quantitative comparison with Sana at 4096×2048 (2:1) and 2048×4096 (1:2) resolutions*
-
 - **4096×2048 (2:1)**：FID 147.53 vs. Sana 150.35（Δ = −2.82）
 - **2048×4096 (1:2)**：FID 143.71 vs. Sana 149.41（Δ = −5.70）
 - **5120×2880 (16:9)**：FID 142.43 vs. Sana 153.31（Δ = −10.88）
@@ -300,9 +285,6 @@ UltraFlux 的核心设计目标之一是支持多样化宽高比的原生 4K 生
 ### 与闭源商业系统的对比
 
 UltraFlux 与闭源商业模型 **Seedream 4.0**（ByteDance, 2025）进行对比（Table 5）。为公平比较，UltraFlux 使用 GPT-4o 提示精炼器以匹配 Seedream 4.0 的提示风格，而 Seedream 4.0 使用原生提示。在 HPSv3 指标上，UltraFlux（w. Prompt Refiner）达到 12.03，略高于 Seedream 4.0 的 11.98（Δ = +0.05）；在 ArtiMuse 上达到 68.75，同样优于 Seedream 4.0 的 67.50。需要注意的是，由于 Seedream 4.0 为闭源系统且提示处理流程不可控，该对比的公平性存在一定局限，但结果仍表明 UltraFlux 在开源框架下已具备与顶级商业系统竞争的能力。
-
-![[assets/figures/papers/paper_list_l2352_https_arxiv_org_abs_2511_18050/figures/008_Table_5.jpg]]
-*Table 5: Quantitative comparison under 4K res. with close-source method*
 
 ### 组件消融分析
 
@@ -321,9 +303,6 @@ Table 6 的系统消融实验揭示了各组件对性能的独立贡献：
 
 Table 8 展示了 VAE 后训练对 4K 重建保真度的影响。在 MultiAspect-4K-1M 高频筛选子集上对 F16 VAE 解码器进行非对抗式微调（仅使用小波+感知+L2 损失，约 4k 步）后，重建指标在 Aesthetic-4K@4096 评测集上获得显著提升。这直接支撑了 UltraFlux 的设计决策：在 16× 压缩比下，显式针对高频内容进行 VAE 后训练是 DiT 保有高保真度的必要条件。
 
-![[assets/figures/papers/paper_list_l2352_https_arxiv_org_abs_2511_18050/figures/012_Table_8.jpg]]
-*Table 8: Reconstruction metrics of F16 VAEs on the Aesthetic-4K@4096 Eval set [42]*
-
 ### 推理效率与局限性
 
 Table 10 报告了 4K 生成的推理时间。尽管 UltraFlux 使用 F16 VAE 和优化的 DiT，50–60 步 4K 生成仍需高端 GPU（约 50GB 显存），延迟相较于 1K 模型显著偏高。这一采样开销与显存占用构成了当前方法的主要工程瓶颈，限制了其在大规模部署场景中的推广。此外，在困难案例中仍可能出现过平滑纹理或微小几何伪影，表明美学质量并非在所有提示与领域都达到顶级水准。
@@ -331,19 +310,6 @@ Table 10 报告了 4K 生成的推理时间。尽管 UltraFlux 使用 F16 VAE �
 ### 开放问题
 
 当前协同设计范围受限于单一大型 DiT 骨干，尚未探索稀疏/低秩注意力、轻量解码器或蒸馏至更小模型等方向。如何将该范式扩展到更参数高效的架构以显著降低显存与延迟，以及该协同设计能否泛化到专业科学图像或医学影像等更广泛的数据域，是后续研究的重要方向。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2352_https_arxiv_org_abs_2511_18050/figures/011_Table_7.jpg]]
-*Table 7: 2×2 data–model co-design ablation. A: baseline; B: data only; C: model/loss only; D: full co-design*
-
-![[assets/figures/papers/paper_list_l2352_https_arxiv_org_abs_2511_18050/figures/004_Table_1.jpg]]
-*Table 1: Dataset statistical comparisons*
-
-![[assets/figures/papers/paper_list_l2352_https_arxiv_org_abs_2511_18050/figures/003_Figure_4.jpg]]
-*Figure 4: Dataset aspect and resolution analysis. All datasets use 10k samples. MultiAspect-4K-1M has a broader aspect ratio distribution*
-
-
 
 ## 定位与知识库关联
 
@@ -380,8 +346,6 @@ UltraFlux 处于原生高分辨率文本-图像生成这一新兴赛道的交叉
 4. **动态任务的耦合挑战。** 将舞蹈生成、视频生成等动态任务引入类似的多宽高比-高分辨率协同设计框架是否存在额外的耦合挑战？时间维度的引入将使位置编码、VAE 压缩和优化目标三者的相互作用更加复杂。
 
 5. **数据质量与模型能力的协同上限。** 当前 MultiAspect-4K-1M 数据集规模为 100 万张，进一步扩大数据规模或提升数据质量是否能持续带来模型能力的线性增长？还是存在一个由模型架构决定的协同上限？
-
-
 
 ## 原文 PDF
 

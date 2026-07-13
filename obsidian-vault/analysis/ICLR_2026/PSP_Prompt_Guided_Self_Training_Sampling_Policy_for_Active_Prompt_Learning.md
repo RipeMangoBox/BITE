@@ -54,8 +54,6 @@ claims:
 
 **主要结果**：在ViT-B/32主干下，PSP在7个数据集上的平均准确率达76.87%，较最强PCB基线（PCB+AS）提升显著——DTD上+3.33%，Oxford Pets上+3.41%，Aircraft上+4.15%。消融实验表明，移除VSSP导致平均性能下降1.26%，移除UST下降2.10%，验证了两个模块各自的关键贡献。
 
-
-
 ### 视觉-语言模型的提示学习范式
 
 大规模视觉-语言模型（如CLIP）通过对比预训练获得了强大的零样本迁移能力，但其性能高度依赖于手工设计的文本提示模板。提示学习（Prompt Learning）通过在连续空间中优化可学习的上下文向量，替代离散的手工提示，显著提升了下游任务的分类精度。典型的文本提示构造形式为：
@@ -79,8 +77,6 @@ $$\pmb { p } _ { c } = [ \pmb { c } ] _ { 1 } [ \pmb { c } ] _ { 2 } \ldots [ \p
 2. **如何利用未选样本的互补信息**：在主动学习预算约束下，未被查询的样本仍可能包含对模型训练有价值的信息，需要一种安全的自训练机制来挖掘这些信息，同时避免引入噪声伪标签。
 
 基于上述动机，本文提出PSP（Prompt-Guided Self-Training Sampling Policy），将主动提示学习建模为马尔可夫决策过程，通过向量化的Soft Actor-Critic策略实现提示引导的端到端采样，并辅以不确定性增强的自训练机制，桥接样本选择与提示学习两个阶段。
-
-
 
 ## 核心方法与创新机理
 
@@ -108,8 +104,6 @@ PSP 的核心创新在于将主动提示学习（APL）中原本被解耦的**�
 
 PSP 通过 VSSP 的提示引导采样和 UST 的互补信息挖掘，解决了现有方法“采样与学习脱节”与“信息利用不充分”两个核心瓶颈。在 DTD 数据集上，PSP 较最强 PCB 基线（PCB+AS）提升 **3.33%** 准确率；在 Aircraft 上提升 **4.15%**（Table 1）。这一性能增益来自于采样策略能够动态适应提示模板的优化需求，同时充分利用了标注与未标注数据的协同作用。
 
-
-
 ![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_7D7VLU9227/figures/002_Figure_2.jpg]]
 *Figure 2: The overall structure of our PSP. The CLIP collaborative learning framework for PSP consists of two core components: the Vectorized Soft Actor-Critic Sampling Policy (VSSP) and the Uncertainty Augmented Self-Training (UST) mechanism*
 
@@ -122,8 +116,6 @@ PSP将主动提示学习建模为一个马尔可夫决策过程，通过两个�
 **模块间因果链路**：VSSP的奖励函数直接反映提示学习的分类性能改进——实伪混合奖励将学生模型在真实标注和伪标注样本上的预测质量（以余弦相似度差衡量）与采样方案的对数概率耦合，使得Critic网络能够评估每个样本对提示模板优化的边际贡献。UST则从互补方向挖掘VSSP未选中样本的价值，通过教师模型的集成预测（对 $L$ 次增强的logits取平均）和类别平衡填充策略，将高置信度伪标签样本注入训练，弥补标注样本的类别覆盖不足。两个模块通过共享的CLIP双分支架构（教师-学生）实现信息交换：VSSP的状态构建依赖教师模型的提示嵌入，UST的伪标签质量随提示模板的优化而逐步提升（第8轮伪标签正确率达93.93%，Table 5）。
 
 **与PCB的关键差异**：PCB框架中，采样算法（如Entropy、BADGE）独立于提示学习运行；PSP用VSSP替换了该采样模块，使采样策略能够动态适应提示模板的优化状态（Figure 1）。消融实验证实了这一设计的必要性：移除VSSP（保留UST）导致平均准确率下降1.26%，移除UST（保留VSSP）导致下降2.10%（Table 2），验证了两组件互补协同的机制。
-
-
 
 ### 3.1 整体框架
 
@@ -183,8 +175,6 @@ $$J _ { \pi } ( \phi ) = \mathbb { E } _ { s _ { t } \sim \mathcal { D } , \epsi
 
 UST 利用上一轮的教师 CLIP 模型对未标注数据生成伪标签。通过对 $L$ 次增强的 logits 取平均获得稳定预测，BPLS（Balanced Pseudo-Label Selective）模块联合评估预测不确定性和置信度，过滤出可靠伪标签样本。对于过滤后缺失的类别，UST 从高置信度样本中补充，确保各类别伪标签数量均衡。这些伪标注数据与真实标注数据合并，用于学生模型的提示学习交叉熵损失优化。
 
-
-
 ## 实验与关键发现
 
 ### 主要结果
@@ -237,46 +227,27 @@ Table 5展示了DTD数据集上各轮次伪标签的质量变化。伪标签准�
 
 Table 4将UST与半监督/无监督提示学习方法（UPL、XPL）进行了比较。UST在DTD上达到62.65%，在EuroSAT上达到81.59%，均优于UPL和XPL，验证了不确定性增强的伪标签过滤策略的有效性。
 
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_7D7VLU9227/figures/010_Table_4.jpg]]
-*Table 4: Ablation study with semi-supervised and unsupervised prompt learning methods. We present the final accuracy on DTD and EuroSAT using ViT-B/32 as the image encoder for performance comparison with UPL and XPL*
-
 ### 与经典提示学习方法的比较
 
 Table 8将PSP与经典提示学习方法CoOp和CoCoOp进行了全面比较。在七个数据集上，PSP的平均准确率（76.87%）显著优于CoOp（69.11%，+7.76%）和CoCoOp（69.49%，+7.38%）。值得注意的是，CoOp和CoCoOp使用全量标注数据训练，而PSP仅使用少量主动选择的标注样本，进一步凸显了PSP在标注效率上的优势。
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_7D7VLU9227/figures/020_Table_8.jpg]]
-*Table 8: Ablation study with classical prompt learning methods like CoOp and CoCoOp. We report the final accuracy across seven datasets for a comprehensive comparison with CoOp and CoCoOp. Table 9: Analysis of efficiency on DTD. All models are trained on a single RTX 3090 GPU with a batch size of 32*
 
 ### 泛化性与效率分析
 
 Table 6验证了PSP在不同视觉语言模型上的通用性。使用SigLIP作为主干网络时，PSP在四个数据集上的平均准确率达到59.23%，相比PCB的48.82%提升10.41%，其中在EuroSAT上提升最为显著（+16.72%）。
 
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_7D7VLU9227/figures/018_Table_6.jpg]]
-*Table 6: Analysis of the versatility of PSP for different Vision-Language Models*
-
 Table 10展示了不同图像编码器架构下的性能，PSP在ResNet-50、ResNet-101和ViT-B/16上均保持稳定的性能优势。Table 9的效率分析表明，PSP在DTD上的训练时间约为PCB的1.5倍（单张RTX 3090 GPU），以可接受的计算开销换取了显著的性能提升。
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_7D7VLU9227/figures/021_Table_9.jpg]]
 
 ### 采样策略行为分析
 
 Table 7分析了PSP学习到的采样策略与经典主动学习策略（Coreset、Entropy、BADGE）的样本重叠率。PSP的选择与这些预定义策略存在一定重叠，但也展现出独特的采样偏好，说明PSP学习到了超越简单不确定性或多样性标准的、面向提示优化的选择模式。
 
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_7D7VLU9227/figures/019_Table_7.jpg]]
-*Table 7: Analysis of the behavior of the learned sampling policy*
-
 ### 学习曲线
 
 Figure 4展示了各方法在七个数据集上的平均学习曲线。PSP在所有轮次上均保持领先，且随着轮次增加，与PCB基线的差距持续扩大，表明VSSP的提示引导采样策略能够持续选择对提示模板优化最有益的样本，实现累积增益。Figure 8a在ImageNet上的学习曲线进一步验证了这一趋势。
 
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_7D7VLU9227/figures/009_Figure_4.jpg]]
-*Figure 4: Learning curve. Average accuracy across downstream tasks with the ViT-B/32 image encoder for each round*
-
 ### 已知局限
 
 PSP的经验回放缓冲区存储了历史状态和梯度嵌入信息，在数据高度敏感的场景下可能引发隐私泄露风险。此外，当前实验设置固定为8轮查询，超出此范围的采样策略自适应行为尚待探索。
-
-
 
 ## 定位与知识库关联
 
@@ -309,8 +280,6 @@ PSP 的性能增益在细粒度任务上尤为显著——在 Aircraft 上较 PC
 3. **大规模扩展**：ImageNet 上的初步结果（Figure 6a）显示 PSP 有效，但在完整 ImageNet-21K 或更大规模数据集上的性能尚不明确。
 4. **安全机制设计**：如何在保证采样策略有效更新的同时，确保经验回放缓冲区的隐私安全，是一个工程上需要进一步探索的问题。
 5. **任务泛化**：PSP 当前聚焦于图像分类，向更复杂任务（如人物交互检测、语义分割）的适配路径尚未被探索。
-
-
 
 ## 原文 PDF
 

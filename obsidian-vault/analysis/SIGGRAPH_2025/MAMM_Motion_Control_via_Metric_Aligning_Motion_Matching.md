@@ -46,7 +46,6 @@ claims:
 | Method  | Metric-Aligning Motion Matching (MAMM)                                                              |
 | Dataset | Mixamo/Adobe动画资产（运动序列）；手绘曲线、合成波形、音频、运动等控制序列（无需标准benchmark，单样本优化验证）                                  |
 
-
 > [!tip] 效果简介
 > 量化结果、消融证据与适用边界见“实验与关键发现”。
 
@@ -235,8 +234,6 @@ MAMM 支持用户通过关键帧对对齐进行精细控制（§3.3.1）：
 - **软关键帧**：用户指定示例 patch 对 $(X_{\mathrm{example}}, Y_{\mathrm{example}})$，方法将其追加到块分布中，并约束传输矩阵 $T$ 使示例 patch 的质量仅在其对应 patch 之间传输。这允许用户在正反两个方向上影响运动生成——靠近关键帧时生成对应姿态，远离时自动避开。
 - **硬关键帧**：直接固定指定帧段的内容，强制对齐运动在特定时间位置完全匹配给定姿态。
 
-### 补充图表
-
 ![[assets/figures/papers/MAMM_Motion_Control_via_Metric-Aligning_Motion_Matching_234bebcdacd3/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of our method. Our method aligns given original motion to given control sequence. Our method can take arbitrary control sequences, such as sketches, labels, audio, and motions. Our method solely relies on within-domain distance in original and control, without needing manual definition of mapping or training with annotated data*
 
@@ -277,12 +274,9 @@ MAMM 有两个关键超参数：α 平衡控制服从度与运动自然度，λ 
 
 4. **实时性不足**：单次优化需数秒至数十秒，尚不能支持实时交互式控制。快速近似技术是未来实现实时 MAMM 的关键方向。
 
-### 补充图表
-
 ![[assets/figures/papers/MAMM_Motion_Control_via_Metric-Aligning_Motion_Matching_234bebcdacd3/figures/007_Figure_7.jpg]]
 *Figure 7: (b) Gesture control by speech Fig. 7. Examples of motion controlled by audio data. We tested two scenarios: (a) dance movements controlled by music and (b) gestures (barking) controlled by speech. Here audio data is represented in both waveforms and MFCCs, but we only used MFCCs as input. Synchronization between motion and intensity, beat, or style of audio was observed. For more details, please refer to supplemental video*
 
-![[assets/figures/papers/MAMM_Motion_Control_via_Metric-Aligning_Motion_Matching_234bebcdacd3/figures/003_Figure_3.jpg]]
 *Figure 3: Explanation of the fused semi-unbalanced Gromov-Wasserstein (FSUGW) objective and algorithm to minimize it. ???? constrains $X ^ { \prime }$ to resemble ?? via transport plan ?? and ?????? encourages ?? to be metric-aligning, which leads to structural similarity between $X ^ { \prime }$ and ?? . We optimize FSUGW objective with alternating steps, where the first step optimizes ?? with $X ^ { \prime }$ fixed, and second step optimizes $X ^ { \prime }$ over fixed ??
 
 ![[assets/figures/papers/MAMM_Motion_Control_via_Metric-Aligning_Motion_Matching_234bebcdacd3/figures/008_Figure_8.jpg]]

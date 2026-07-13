@@ -57,8 +57,6 @@ claims:
 
 **局限**：大规模ViT-H模型计算成本高，不适用于移动端或实时应用；依赖MANO参数模型，对手部细节表达有限；单帧方法未利用时序信息。
 
-
-
 从单张RGB图像中恢复准确的三维手部网格，是计算机视觉中的一个基础性问题，在增强现实、人机交互和机器人操作等领域有着广泛的应用需求。手部具有高度灵活的关节结构、频繁的自遮挡和物体交互，且在野外图像中常伴随运动模糊、极端视角和复杂光照，这使得单目3D手部重建成为一个极具挑战性的任务。
 
 ### 现有方法的瓶颈
@@ -68,8 +66,6 @@ claims:
 ### 核心动机与假设
 
 HaMeR的核心假设是：**通过同时扩大训练数据规模和采用高容量的Transformer架构，可以大幅提升野外手部网格重建的准确性和鲁棒性**。这一假设建立在两个关键观察之上：其一，手部重建任务本质上需要强语义理解能力，以应对遮挡、视角变化和交互等复杂情形，而Transformer架构在建模长距离依赖和全局上下文方面具有天然优势；其二，现有训练数据虽然分散在多个数据集中，但总量足以支撑大模型训练，关键在于如何有效整合。HaMeR试图验证，一个简单的全Transformer设计——将ViT-H骨干与Transformer解码器头结合——在足够的数据支撑下，能否超越复杂的专用方法，成为野外手部重建的通用解决方案。
-
-
 
 ## 核心方法与创新机理
 
@@ -87,8 +83,6 @@ HaMeR 的核心创新并非提出复杂的算法模块，而是通过**同时扩
 
 从方法谱系来看，HaMeR 延续了 **FrankMocap** 的参数化回归范式（回归 MANO 参数而非直接回归顶点），但通过 Transformer 架构和数据规模的双重放大，使其摆脱了 CNN 小模型的泛化局限。相比 **METRO**（Lin et al., CVPR 2021）和 **Mesh Graphormer**（Lin et al., ICCV 2021）等非参数化 Transformer 基线，HaMeR 以更简单的设计（参数化输出 + 全 Transformer）取得了更优的鲁棒性，尤其在运动模糊、手-手交互、手-物交互等困难场景下优势显著（Figure 3）。
 
-
-
 HaMeR 采用一种简洁的全 Transformer 设计，将单目 RGB 图像直接映射为 MANO 手部模型的姿态、形状及相机参数，进而恢复完整的 3D 手部网格与关键点。整个 pipeline 由四个核心模块串联构成，数据流清晰且无复杂多阶段设计。
 
 **输入与预处理**：网络接收一张裁剪后的手部区域 RGB 图像。训练时，该图像来自作者构建的大规模 HInt 数据集（涵盖 Hands23、Epic-Kitchens VISOR、Ego4D 等多个来源，总计 2.7M 训练样本），同时提供 21 个 2D 关键点标注及其遮挡标签。
@@ -102,16 +96,6 @@ HaMeR 采用一种简洁的全 Transformer 设计，将单目 RGB 图像直接�
 **损失监督**：训练时采用多损失联合监督，包括：3D 参数与关键点损失 $\mathcal{L}_{\mathrm{3D}} = ||\theta - \theta^{*}||_{2}^{2} + ||\beta - \beta^{*}||_{2}^{2} + ||X - X^{*}||_{1}$、2D 重投影损失 $\mathcal{L}_{\mathrm{2D}} = ||\boldsymbol{x} - \boldsymbol{x}^{*}||_{1}$，以及用于惩罚不自然手部姿态的对抗损失 $\mathcal{L}_{\mathrm{adv}}$。整体架构概览见 Figure 2（底部）。
 
 该框架的核心设计哲学是“简单架构 + 大规模数据 + 大容量模型”：不依赖图卷积、非参数化顶点回归或复杂的多阶段细化，仅通过扩大训练数据规模（4 倍于 FrankMocap）和采用 ViT-H 高容量骨干网络，即可在多个基准上取得显著提升。消融实验证实，单独扩大数据或模型容量均能带来增益，而两者结合（即 HaMeR）效果最佳（Table 5, row 5）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l15_HaMeR_Reconstructing_Hands_in_3D_with_Transformers_motion20v2/figures/001_Figure_1.jpg]]
-*Figure 1: Monocular 3D hand mesh reconstruction. We propose HaMeR, a fully transformer-based approach for Hand Mesh Recovery. HaMeR achieves consistent improvements upon the state-of-the-art for 3D hand reconstruction. We can faithfully reconstruct hands in a wide variety of scenarios, including captures from different viewpoints (third person or egocentric), under occlusion, hands that interact with objects or other hands, hands with different skin tones, with gloves, from art paintings or mechanical hands. We encourage the reader to watch our reconstructions in the Supplemental Video to appreciate the temporal stability*
-
-![[assets/figures/papers/paper_list_l15_HaMeR_Reconstructing_Hands_in_3D_with_Transformers_motion20v2/figures/002_Figure_2.jpg]]
-*Figure 2: Dataset and Architecture. (Top) Hand crops with keypoint annotations from our HInt dataset of annotations for different image sources, Hands23 [9], Epic-Kitchens [12, 13], and Ego4D [18]. We provide location annotations for 21 hand keypoints as well as the “occlusion” label for each joint. Occluded keypoints are marked using solid dot filled with black while non-occluded ones are filled with white. The pie chart shows the distribution and statistics of our dataset. (Bottom) The architecture for HaMeR follows a fully transformer-based design. We use a large scale ViT backbone [14] followed by a transformer decoder to regress the parameters of the hand*
-
-
 
 HaMeR 的整体架构遵循全 Transformer 设计，由三个核心模块串联构成：ViT 骨干网络、Transformer 解码器头以及 MANO 手部参数模型。
 
@@ -146,8 +130,6 @@ $$\mathcal{L}_{\mathrm{adv}} = \sum_{k} (D_{k}(\Theta) - 1)^{2}$$
 对抗损失使用多个判别器 $D_k$ 分别对手部姿态、形状和关节角度的自然性进行约束，惩罚不符合人体工学的参数组合，提升重建结果的物理合理性。
 
 > 注：以上公式均来自论文 Section 3.1 至 3.4 的原始定义，变量含义与原文一致。各模块的消融验证见 Table 5 及相关实验分析。
-
-
 
 ## 实验与关键发现
 
@@ -251,13 +233,6 @@ Table 5 的消融实验是本文方法论的基石，系统性地分离了数据
 ![[assets/figures/papers/paper_list_l15_HaMeR_Reconstructing_Hands_in_3D_with_Transformers_motion20v2/figures/008_Figure_3.jpg]]
 *Figure 3: Qualitative comparison. We compare our approach qualitatively with state-of-the-art methods for hand mesh reconstruction. The previous baselines include METRO [33], Mesh Graphormer [34] and FrankMocap [49]. METRO and Mesh Graphormer are non-parametric methods (regressing MANO vertices directly), while FrankMocap and HaMeR (ours) are parametric methods (regressing MANO parameters). The reconstructions from HaMeR are consistently better, particularly on more challenging examples, e.g., cases with motion blur, or images with hand-hand or hand-object interaction. We encourage the reader to also watch the Supplemental Video for more comparisons over time*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l15_HaMeR_Reconstructing_Hands_in_3D_with_Transformers_motion20v2/figures/006_Table_4.jpg]]
-*Table 4: Effect of training with HInt. We compare our general model (Ours) with the model trained on HInt as well (Ours∗). We report PCK scores on the test set of HInt. Using the training set of HInt can be helpful particularly to improve performance on egocentric data (VISOR and Ego4D)*
-
-
-
 ## 定位与知识库关联
 
 ### 方法谱系：从CNN到全Transformer的3D手部重建
@@ -291,8 +266,6 @@ HaMeR在3D手部重建领域的定位可以沿两条轴线理解：**参数化 v
 4. **下游任务的增益验证**：HaMeR在标准基准上的提升是否能够转化为机器人操作、手语识别、手势交互等下游任务的实际增益，论文未提供相关实验。3D关键点精度的提升与任务级指标之间的相关性需要进一步验证。
 
 5. **非自然手形的鲁棒性**：论文在Figure 1和Figure 4中展示了机械手和艺术画作的重建结果，表明HaMeR具有一定的泛化能力，但缺乏系统性的定量评估。当输入手形显著偏离MANO模型的训练分布时，模型是否会产生系统性偏差，是一个值得关注的问题。
-
-
 
 ## 原文 PDF
 

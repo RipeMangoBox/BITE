@@ -51,8 +51,6 @@ claims:
 
 主要实验结果表明：在400个高质量真实GitHub问题实例上，GPT-4o作为提交者在所有对局中均取得≥0.90的胜率，但其提交端CI通过率（SPR）和审查端CI通过率（RPR）相对较低（0.65/0.55），反映出其激进补丁策略；DeepSeek-V3在Best@3指标上取得最高平均得分（0.59），并在Rust和Go上表现尤为均衡。RACG模块使C++任务上的Best@3从0.38提升至0.42，胜率从0.77提升至0.84，同时减少12-18%的令牌占用。消融实验进一步表明，约15%的失败案例可追溯至检索阶段未能找到关键上下文，揭示检索质量仍是当前性能的瓶颈之一。
 
-
-
 大型语言模型（LLM）在代码生成领域取得了显著进展，然而现有评估基准（如SWE-Bench）存在一个核心瓶颈：它们仅依赖静态或部分模拟的单元测试，忽略了真实软件开发中完整的CI流水线、协作式迭代（提交-审阅循环）以及对抗性测试的挑战。这导致现有基准无法全面衡量模型在真实软件工程场景中的能力，尤其是当补丁生成与测试生成相互博弈时，模型行为的细微差异会被掩盖。
 
 具体而言，现有评估范式存在三个关键缺口：
@@ -68,8 +66,6 @@ claims:
 同时，为应对长上下文代码检索的挑战，SWINGARENA集成了检索增强代码生成（RACG）模块。该模块通过语法感知分块、稠密重排序和令牌预算感知打包的组合策略，在多语言环境下（C++、Python、Rust、Go）显著提升了补丁定位精度。消融实验表明，RACG使C++任务上的Best@3从0.38提升至0.42，胜率从0.77提升至0.84，同时减少了12-18%的令牌占用。
 
 本文的核心动机在于：通过构建一个CI驱动的对抗性竞技场，系统性地暴露模型在补丁生成与测试生成中的差异化行为，并验证长上下文检索优化对任务解决率的因果影响，从而推动LLM在真实软件工程场景中的能力评估与提升。
-
-
 
 ## 核心方法与创新机理
 
@@ -100,8 +96,6 @@ SWINGARENA的核心创新在于将LLM代码能力评估从静态单元测试范�
 ### 方法谱系与知识库定位
 
 SWINGARENA的评估框架与**SWE-Bench**（Jimenez et al., 2024）和**RepoBench**（Liu et al., 2024b）等代码基准共享对真实软件工程场景的关注，但其对抗性CI协议和角色切换机制是独特贡献。RACG模块在检索增强代码生成方向上与**RepoCoder**（Zhang et al., 2023）等工作的迭代检索策略形成互补——前者强调多语言语法感知分块与稠密重排序，后者侧重迭代式仓库遍历。在基线模型层面，GPT-4o、Claude-3.5、Gemini-2.0和DeepSeek-V3作为提交者/审阅者的对比揭示了不同模型在补丁激进性与代码正确性之间的权衡，而Qwen2.5-Coder-7B-Instruct等开源模型在消融研究中验证了RACG的通用性。
-
-
 
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_YuxgSGFaqb/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of SWINGARENA data construction pipeline, including repository collection, pull request extraction, task instance creation, quality filtering, and multiple CI-based validation*
@@ -143,8 +137,6 @@ SWINGARENA 的整体框架由两大核心子系统构成：**对抗性评估竞�
 ### 模块间数据流
 
 整体工作流如下：数据构建流水线输出经过验证的 Issue-PR 对 → RACG 模块根据问题描述检索并打包相关代码上下文 → 提交者基于上下文生成补丁 → CI 验证模块在 Docker 容器中运行仓库原生 CI 流水线验证补丁 → 审阅者基于补丁变更信息生成针对性测试用例 → CI 再次验证完整补丁 → 评分引擎计算双方得分 → 角色切换进入下一轮迭代。所有评估使用统一的解码参数（temperature=0, top-p）和令牌预算，API 失败自动记录并重试，确保公平性与可复现性。
-
-
 
 ### 对抗性竞技场框架
 
@@ -204,14 +196,11 @@ SPR反映模型生成正确补丁的能力，RPR反映模型生成有效测试�
 
 最终从2,300个（Issue, PR）对中筛选出400个评估实例（每种语言100个），另提供100个样本用于消融实验。
 
-
-
 ## 实验与关键发现
 
 ### 对抗性编程对战：专有模型的主结果
 
 SWINGARENA的核心评估采用提交者-审阅者双角色对抗协议，在400个高质量CI验证实例（四种语言各100个）上对四个专有LLM进行自我对战与交叉对战。Table 1报告了提交端CI通过率（SPR）、审查端CI通过率（RPR）和胜率三项核心指标。
-
 
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_YuxgSGFaqb/figures/003_Table_1.jpg]]
 *Table 1: Evaluation of Code Submission vs. Test Submission Capabilities Among Proprietary LLMs*
@@ -224,7 +213,6 @@ SWINGARENA的核心评估采用提交者-审阅者双角色对抗协议，在400
 
 Table 2展示了各模型在四种编程语言上的Best@3得分。DeepSeek-V3以平均0.59的最高分领跑，尤其在Rust（0.58）和Go（0.61）上表现突出，显示出稳健的多语言代码推理能力。GPT-4o在C++上得分0.63，与DeepSeek的0.64几乎持平，但在Go上仅为0.53，暴露出语言间的不均衡性。Claude-3.5平均得分0.55，整体略低于其他模型。
 
-
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_YuxgSGFaqb/figures/004_Table_2.jpg]]
 *Table 2: Best@3 across Models and Languages*
 
@@ -234,12 +222,10 @@ Table 2展示了各模型在四种编程语言上的Best@3得分。DeepSeek-V3�
 
 Table 3展示了RACG模块的消融结果。在C++任务上，引入RACG后Best@3从0.38提升至0.42，胜率从0.77提升至0.84，同时令牌占用减少12-18%。在所有语言上，RACG均带来了正向的Best@3和胜率增益，证实了语法感知分块、稠密重排序和令牌预算感知打包三者的协同效果。
 
-
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_YuxgSGFaqb/figures/006_Table_3.jpg]]
 *Table 3: RACG Ablation Comparison*
 
 Table 5和Table 6进一步拆解检索质量。采用Class-level分块的重排序策略在Top-10文件命中率上达到48.7%，远超BM25基线的20.7%，验证了块级重排序器在有限上下文下引导补丁定位的有效性。然而，在约15%的失败案例中，错误根因可追溯至检索阶段未能找到关键上下文，表明固定大小的Top-5文件检索在高度动态或大型单体仓库中仍存在覆盖盲区，需要进一步研究迭代检索或混合检索策略。
-
 
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_YuxgSGFaqb/figures/026_Table_5.jpg]]
 *Table 5: File hit rates of different retrieval methods. Each value gives the fraction of queries whose correct file appears within the Top-2, Top-10, or Top-20 retrieved results*
@@ -251,14 +237,9 @@ Table 5和Table 6进一步拆解检索质量。采用Class-level分块的重排�
 
 Table 4报告了开源LLM的对抗性评估结果。开源模型在整体指标上低于专有模型，但不同参数规模的模型展现出与专有模型类似的行为分化趋势：部分模型更擅长补丁生成，另一些则在测试生成上更有优势。所有评估均使用统一的提示预算和解码参数（temperature=0），API失败案例已排除且排名不变，确保了对比的公平性。
 
-
-![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_YuxgSGFaqb/figures/008_Table_4.jpg]]
-*Table 4: Evaluation of Code Submission vs. Test Submission Capabilities Among Open Source LLMs*
-
 ### 失败模式与局限
 
 主要失败模式可归纳为三类：（1）检索阶段的上下文缺失（约15%案例），RACG的固定检索策略无法捕获所有关键文件；（2）审查者测试生成质量波动，尽管设置了CI质量门控，某些微妙的代码风格违规或非确定性行为仍可能通过过滤；（3）act模拟的CI流水线与真实执行环境之间存在偏差，可能忽略特定的环境依赖或非确定性因素。这些失败模式为后续研究指明了方向：设计更动态的自适应检索策略，以及更精细的审查者测试质量评估机制。
-
 
 ## 定位与知识库关联
 
@@ -298,8 +279,6 @@ SWINGARENA 的评估框架在以下条件下展现出较强的有效性：
 - 观察到的模型行为模式差异（GPT-4o 激进补丁 vs. DeepSeek 稳健性）是否与训练数据分布或架构特性存在系统性关联？这一问题对于理解 LLM 在软件工程任务中的能力来源具有基础意义。
 - 如何将多语言代码开发、提交与审查的完整工作流更深度地整合到评价体系中，例如引入代码审查评论的生成与响应、多轮迭代的冲突解决等更丰富的交互维度？
 - 对抗性 CI 协议能否扩展到更细粒度的质量门禁度量，如安全漏洞检测、性能回归测试、代码覆盖率阈值等？
-
-
 
 ## 原文 PDF
 

@@ -56,8 +56,6 @@ claims:
 - **空间推理**：G²VLM-SR在SPAR-Bench上超越GPT-4o达**18.5分**（54.87 vs 36.39），并在所有空间推理基准上取得最佳或可比结果（Table 1b, Table 3）。
 - **消融验证**：双编码器设计相比单语义编码器在两项任务上均有显著提升（Figure 6a）；全局注意力在几何专家训练中显著优于帧注意力和混合注意力（Figure 6b）；VG + CE联合损失策略验证了几何与语义监督的互利性（Figure 4）。
 
-
-
 ### 视觉语言模型的空间推理瓶颈
 
 当前主流视觉语言模型（VLMs）在空间理解和推理任务上表现不足，其根本瓶颈在于：这些模型仅依赖非结构化的2D图像-文本数据进行训练，缺乏从2D图像显式重建3D空间的视觉几何学习过程。由于模型从未学习过深度、点云、相机姿态等3D属性，其对物体相对位置、遮挡关系、视角变换等空间概念的理解停留在浅层语义层面，而非基于真实的几何结构。
@@ -77,8 +75,6 @@ claims:
 本文的核心动机源自认知神经科学中的**双流假说**（two-streams hypothesis）：人类视觉系统包含两条通路——“where通路”处理空间位置和几何关系，“what通路”负责物体识别和语义理解，两者通过交互共同支撑完整的空间认知。
 
 受此启发，G²VLM提出一个根本性问题：**能否在单一模型中同时实现显式的3D视觉几何学习和多模态语义理解，并使两者通过深层交互相互增强？** 这一思路的关键洞察在于：几何感知为空间推理提供精确的结构约束，而语义理解则为几何重建提供上下文先验——两者的结合有望突破现有方法的各自天花板。
-
-
 
 ## 核心方法与创新机理
 
@@ -108,12 +104,7 @@ $$f \left( ( h _ { i } ) _ { i = 1 } ^ { N } \right) = ( T _ { i } , X _ { i } ,
 
 上述四个 changed slots 并非孤立改进，而是通过**联合训练策略**产生协同效应。实验表明，同时施加视觉几何损失（$\mathcal{L}_{VG}$）和交叉熵语言损失（CE Loss）的 VG+CE 联合训练方案，在视觉几何精度和空间推理能力上均优于单独训练或交替训练策略（Figure 4, §3.3）。这验证了几何监督与语义监督之间的互利关系——更强的几何感知直接转化为更强的空间推理能力，反之亦然。
 
-
-
 G²VLM 的整体设计遵循一个核心洞察：将人类视觉认知的“双流假说”映射为模型架构——几何感知专家（“where通路”）负责从2D图像显式重建3D空间，语义感知专家（“what通路”）负责多模态理解与空间推理，二者通过共享自注意力实现双向交互，使几何学习与语义理解相互增强（Figure 2, Figure 3）。
-
-![[assets/figures/papers/paper_list_l2169_https_arxiv_org_abs_2511_21688/figures/002_Figure_2.jpg]]
-*Figure 2: Our model*
 
 ### 宏观 Pipeline
 
@@ -161,13 +152,6 @@ $$f \left( ( h _ { i } ) _ { i = 1 } ^ { N } \right) = ( T _ { i } , X _ { i } )
 - **注意力层面**：几何专家采用全局注意力替代常用的因果/帧注意力。
 
 值得注意的是，G²VLM 不使用 **VGGT** 中的相机令牌（camera tokens）这一强先验，也不依赖预训练权重的微调（如 **π³** 的做法），却能在深度估计等任务上取得可比甚至更优的结果，体现了架构设计本身的效率。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2169_https_arxiv_org_abs_2511_21688/figures/001_Figure_1.jpg]]
-*Figure 1: We present G2VLM, a geometry grounded vision-language model proficient in both spatial 3D reconstruction and spatial understanding tasks. For spatial reasoning questions, G2VLM can directly predict 3D geometry and employ interleaved reasoning for an answer*
-
-
 
 G²VLM 的核心架构建立在**混合Transformer专家（Mixture-of-Transformer-Experts, MoT）** 设计之上，包含两个功能分化的专家模块，并通过共享自注意力机制实现跨专家交互。以下详述各关键模块及其数学形式化。
 
@@ -251,8 +235,6 @@ $$\mathcal{L}_{\mathrm{normal}} = \sum_{i=1}^{N}\sum_{j=1}^{H \times W}\operator
 
 结果表明，**VG + CE Loss** 联合训练在视觉几何精度和空间推理能力上均取得最优效果，证实了几何监督与语义监督之间的互利关系。为缓解大规模3D标注数据的需求，联合训练阶段采用冻结几何感知专家的策略，但这也可能限制了跨任务协同提升的上限。训练过程中需依赖损失裁剪和梯度范数裁剪来维持稳定性。
 
-
-
 ## 实验与关键发现
 
 ### 视觉几何重建：与 SOTA 前馈方法的对比
@@ -321,13 +303,6 @@ Figure 5 展示了 G²VLM 在开放域图像上的重建结果，涵盖物体级
 
 4. **长序列处理的效率**：全局注意力在长帧序列上的计算和内存消耗问题尚未解决，可能限制其在视频级 3D 重建场景中的应用。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2169_https_arxiv_org_abs_2511_21688/figures/005_Table_1.jpg]]
-*Table 1: Comparison with mainstream feed-forward 3D reconstruction methods on visual geometry tasks and with representative VLMs on spatial understanding and reasoning tasks. Our model demonstrates proficient performance in both aspects of spatial tasks, demonstrating its universality and effectiveness*
-
-
-
 ## 定位与知识库关联
 
 ### 与基线方法的关系
@@ -365,8 +340,6 @@ G²VLM的核心创新可概括为三个相互关联的设计选择，每个选�
 ### 开放问题
 
 基于上述分析，G²VLM框架面临的关键开放问题包括：能否在不依赖大规模3D标注的条件下通过自监督或半监督方法提升几何感知专家的学习能力；扩展至更大参数规模时视觉几何精度是否会退化；是否存在比冻结几何专家更优的联合训练策略；以及该统一框架能否与具身AI任务无缝集成并带来实际增益。这些问题的回答将决定G²VLM是否能从当前的概念验证走向更广泛的实际部署。
-
-
 
 ## 原文 PDF
 

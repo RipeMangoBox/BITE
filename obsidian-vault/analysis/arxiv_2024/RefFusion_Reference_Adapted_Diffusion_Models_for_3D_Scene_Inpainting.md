@@ -61,8 +61,6 @@ RefFusion处于**2D生成先验蒸馏与3D场景编辑**的交叉点。与基于
 
 在SPIn-NeRF数据集的物体移除任务上，RefFusion取得了最低的LPIPS（0.4283），并在用户研究中全面领先：评估者对RefFusion的质量偏好显著高于SPIn-NeRF-LaMa（81.62% vs 18.38%）、Inpaint3D（88.13% vs 11.87%）和Reference-guided NeRF（76.36% vs 23.64%）。消融实验证实，**个性化适配是方法最关键的组件**——移除后LPIPS从0.4283急剧升至0.5719。方法无需修改即可泛化到物体插入、场景外推和稀疏视图重建等任务，展示了较强的通用性。
 
-
-
 三维场景修复（3D scene inpainting）旨在从多视角图像中移除不需要的物体，并以视觉合理且多视角一致的内容填补缺失区域。这项工作在增强现实、数字孪生和影视后期等领域具有广泛应用价值。然而，与成熟的二维图像修复相比，三维修复面临着根本性的挑战：如何同时保证修复内容的视觉质量与跨视角的几何一致性。
 
 早期方法主要依赖确定性修复模型。以 **SPIn-NeRF**（Mirzaei et al., CVPR 2023）为代表，这类方法将 LaMa 等二维修复模型的输出作为伪真值，通过重建损失将修复结果提升至三维。其优势在于多视角一致性较好，但受限于确定性修复模型自身的生成能力，修复区域往往缺乏细节和纹理丰富度。图 2 直观展示了这一困境：LaMa 的输出在不同视角间相对一致，但细节模糊；而 SDXL 等扩散模型能生成高质量内容，却因生成多样性过高导致不同视角的输出差异显著。
@@ -72,8 +70,6 @@ RefFusion处于**2D生成先验蒸馏与3D场景编辑**的交叉点。与基于
 上述困境揭示了该领域的**核心瓶颈**：将二维修复扩散模型先验蒸馏到三维时，多视角一致性与合成质量之间存在根本性权衡，而二维掩膜的不一致性和梯度冲突进一步加剧了细节模糊与可控性缺失。具体而言，当不同视角的二维掩膜不完全对齐时，梯度信号会传播至不相关的三维区域，造成几何和外观的伪影。
 
 RefFusion 正是针对这一瓶颈提出。其核心洞察在于：**对二维修复扩散模型进行多尺度参考图像个性化（LoRA），能显著降低 SDS 目标的方差**，从而在三维修复中同时获得高清晰度、多视角一致性及用户明确控制。这一洞察将问题的解决路径从“如何约束高方差蒸馏”转变为“如何从源头降低蒸馏方差”——通过使扩散模型本身适配目标场景的参考视图，生成先验的质量和稳定性得到根本性提升。
-
-
 
 ## 核心方法与创新机理
 
@@ -100,8 +96,6 @@ RefFusion 引入参考深度反投影初始化掩膜区域的高斯粒子（Sect
 ### 创新总结
 
 上述创新点并非孤立存在，而是形成了一个闭环的因果链条：多尺度个性化降低了 SDS 目标的方差，使得多尺度 SDS 优化成为可能；而 3D 高斯的显式结构则为梯度路由和参考引导初始化提供了实现基础。这一系统性的设计使 RefFusion 在 SPIn-NeRF 数据集上取得了 0.4283 的 LPIPS，并在用户研究中以压倒性优势超越 **SPIn-NeRF-LaMa**（Mirzaei et al., CVPR 2023）、**Inpaint3D**（Prabhu et al., 2023）和 **Reference-guided NeRF SDXL**（Mirzaei et al., ICCV 2023）等基线方法。
-
-
 
 RefFusion 的整体流程围绕一个核心思想展开：**将经过参考图像个性化适配的 2D 修复扩散模型的生成先验，通过多尺度分数蒸馏采样（Score Distillation Sampling, SDS）注入到显式的 3D 高斯泼溅（3D Gaussian Splatting）表示中**，从而在 3D 场景修复中同时获得高清晰度、多视角一致性和用户明确控制。图 3 给出了完整的 pipeline 概览。
 
@@ -155,12 +149,8 @@ $$\mathcal{L} := \mathcal{L}_{\mathrm{rec}} + \lambda_{\mathrm{SDS}} \mathcal{L}
 
 RefFusion 的设计直接回应了 3D 修复领域的核心瓶颈：**将 2D 修复扩散模型的先验蒸馏到 3D 时，面临多视角一致性与合成质量之间的根本性权衡**。传统方法中，基于确定性修复器（如 LaMa）的方法虽多视角一致性较好，但缺乏细节；基于文本引导 SDS 的方法虽能生成丰富纹理，但方差大、可控性差，且 2D 掩膜的不一致性会引入梯度冲突，导致细节模糊。RefFusion 通过**多尺度 LoRA 个性化**这一因果旋钮，将扩散模型的生成空间约束到参考图像附近，从而在保持生成多样性的同时，大幅降低了 SDS 目标的方差，使高清晰度、多视角一致性和用户明确控制三者得以兼得。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l74_https_arxiv_org_abs_2404_10765/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of the proposed approach. RefFusion takes training views, masks, and the reference view as input (left). We adapt the inpainting LDM on both the global and local crops of the reference view (middle). Then, we distill the priors of the adapted LDM to the scene (right) by minimizing the SDS objective. Additionally, we use a discriminator loss to mitigate potential artifacts in appearance and a depth loss to enhance geometry. We track Gaussians representing the masked and unmasked regions, and backpropagate the gradients of individual terms only to the pertinent regions*
-
-
 
 ### 3.1 背景：扩散模型与分数蒸馏采样
 
@@ -243,8 +233,6 @@ $$\mathcal{L} := \mathcal{L}_{\mathrm{rec}} + \lambda_{\mathrm{SDS}} \mathcal{L}
 
 消融实验表明，深度与对抗损失对物体移除任务的直接提升有限（LPIPS 分别升至 0.4299 和 0.4326），但在物体插入等应用中更为关键，且有助于抑制特定类型伪影（Fig. 10）。
 
-
-
 ## 实验与关键发现
 
 ### 主实验：物体移除
@@ -299,15 +287,6 @@ RefFusion 无需任何方法修改即可应用于多种 3D 编辑任务：
 - **场景外推（Fig. 8）**：通过反掩膜实现场景边界扩展。论文坦承外推区域缺乏高频细节和视觉保真度，这是当前方法的已知局限。
 - **稀疏视图重建（Fig. 6, Fig. 11）**：即使仅使用稀疏视图进行个性化（Ours LoRA），RefFusion 已展现竞争力；结合重建损失后（Ours LoRA + recon），一致优于纯 **3DGS**（Kerbl et al., ToG 2023），在仅有一个真实视图的极端情况下，生成先验仍能有效引导重建。
 
-![[assets/figures/papers/paper_list_l74_https_arxiv_org_abs_2404_10765/figures/009_Figure_7.jpg]]
-*Figure 7: Sample object insertion results*
-
-![[assets/figures/papers/paper_list_l74_https_arxiv_org_abs_2404_10765/figures/010_Figure_6.jpg]]
-*Figure 6: Results of the sparse view reconstruction on SPIn-NeRF dataset. Using the sparse GT views only for personalization Ours (LoRA) already yields competitive results. When combined with the reconstruction loss Ours (LoRA + recon) consistently outperforms 3DGS [Kerbl et al. 2023], showcasing the potential of generative priors to guide 3D reconstruction*
-
-![[assets/figures/papers/paper_list_l74_https_arxiv_org_abs_2404_10765/figures/011_Figure_8.jpg]]
-*Figure 8: Our approach is capable of outpainting scenes by inverted masks*
-
 ![[assets/figures/papers/paper_list_l74_https_arxiv_org_abs_2404_10765/figures/014_Figure_11.jpg]]
 *Figure 11: Qualitative evaluation of sparse view reconstruction on SPIn-NeRF dataset. Both RefFusion and 3DGS use the reconstruction loss on sparse input images in the masked region. Additionally, RefFusion uses generative priors of the reference adapted LDM through SDS losses as well as the depth and adversarial regularization terms. Note how generative priors can successfully guide the reconstruction even in the extreme case of a single GT view*
 
@@ -325,24 +304,11 @@ RefFusion 无需任何方法修改即可应用于多种 3D 编辑任务：
 
 RefFusion 的评估设置存在几个需注意的方面：方法需要一张参考图像作为个性化输入，该图像可由修复模型生成或实拍获得。若参考图像质量低或与目标场景不匹配，性能可能显著下降——这是方法的内在依赖，而非评估偏差。深度与对抗正则项在物体移除任务中提升有限（消融已证实），但在物体插入等应用中更关键，因此整体性能不严重依赖于单一正则项，方法的鲁棒性较好。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l74_https_arxiv_org_abs_2404_10765/figures/004_Table_1.jpg]]
-*Table 1: Quantitative evaluation of object removal on SPIn-NeRF dataset*
-
-![[assets/figures/papers/paper_list_l74_https_arxiv_org_abs_2404_10765/figures/005_Table_2.jpg]]
-*Table 2: User study of object removal on SPIn-NeRF dataset. For each method we report the percentage of raters that pereferred it over ours*
-
 ![[assets/figures/papers/paper_list_l74_https_arxiv_org_abs_2404_10765/figures/006_Figure_4.jpg]]
 *Figure 4: Qualitative object removal results on the SPIn-NeRF dataset. RefFusion consistently outperforms the baselines, yielding sharper reconstruction and more plausible inpainting*
 
 ![[assets/figures/papers/paper_list_l74_https_arxiv_org_abs_2404_10765/figures/008_Figure_5.jpg]]
 *Figure 5: Qualitative object removal results on scenes with larger camera movements (MipNeRF360 dataset [Barron et al. 2022] and scenes from our proposed dataset). RefFusion consistently outperforms the Reference-guided NeRF*
-
-![[assets/figures/papers/paper_list_l74_https_arxiv_org_abs_2404_10765/figures/012_Figure_9.jpg]]
-*Figure 9: Qualitative object removal results on the SPIn-NeRF dataset. RefFusion synthesizes plausible content that is highly multi-view consistent*
-
-
 
 ## 定位与知识库关联
 
@@ -387,8 +353,6 @@ RefFusion的因果调节变量是**对2D修复扩散模型进行多尺度参考�
 **掩膜处理的鲁棒性。** 开发更鲁棒的多视角掩膜融合策略，或探索无需显式掩膜的隐式区域划分方法，有望减少掩膜不一致性引入的误差。
 
 **评估基准的完善。** 当前定量评估主要依赖LPIPS和用户研究，缺乏对3D几何一致性、多视角光度一致性的直接度量。建立更全面的3D修复评估基准将有助于推动该领域发展。
-
-
 
 ## 原文 PDF
 

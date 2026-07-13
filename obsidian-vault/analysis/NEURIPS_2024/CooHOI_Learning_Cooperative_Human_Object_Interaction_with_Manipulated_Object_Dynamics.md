@@ -52,8 +52,6 @@ claims:
 
 **方法定位**：CooHOI 属于物理仿真角色控制与多智能体强化学习的交叉领域。其单智能体阶段继承自 AMP 风格的技能模仿范式，多智能体阶段则基于 CTDE 框架实现分布式执行。与依赖参考动作或显式通信的现有方法不同，CooHOI 的核心创新在于将物体动力学信息同时用作单智能体的任务反馈和多智能体的隐式协调信号，从而在无需额外通信开销的条件下实现高效的技能迁移。
 
-
-
 ### 协作搬运的物理交互难题
 
 在物理仿真环境中让多个仿人角色协同搬运物体，是人‑物交互（Human‑Object Interaction, HOI）领域的前沿挑战。与单人搬运不同，多人协作搬运要求多个智能体在无显式通信的条件下，通过各自对物体的施力来共同控制物体的运动轨迹。这一任务的核心难点在于：**多智能体协作搬运任务缺乏高质量交互动作捕捉数据**，传统的运动模仿范式难以直接迁移到多人场景；同时，**从零开始的多智能体强化学习面临采样效率低下和策略难以收敛的问题**，即便将训练步数延长至常规的 4 倍，成功率仍为 0%（Figure 8）。
@@ -66,8 +64,6 @@ claims:
 
 上述困境的根源在于一个**因果性瓶颈**：多智能体协作搬运需要一种高效的协调信号，而现有方法要么依赖稀缺的多人动作捕捉数据，要么依赖低效的试错探索。CooHOI 的出发点是：**物体本身的动力学状态（包围盒顶点、朝向、线速度、角速度）可以作为隐式通信通道**——当多个智能体同时观察并作用于同一物体时，物体的运动变化自然反映了所有智能体的合力效果，从而无需显式通信即可实现动作协调。基于这一洞察，CooHOI 提出**两阶段课程学习范式**（单智能体技能预训练 → 多智能体协作微调），将物体动力学信息作为贯穿两个阶段的反馈信号，既让单智能体学习到关注物体动态的搬运技能，又为多智能体提供了隐式协调机制，从而实现了从单人到多人协作的高效迁移。
 
-
-
 ## 核心方法与创新机理
 
 CooHOI 的核心创新在于将**物体动力学作为隐式通信通道**与**两阶段课程学习范式**相结合，系统性地解决了多智能体协作搬运中采样效率低下与策略难以收敛的瓶颈。相较于直接多智能体训练（From Scratch）和仅依赖人体动作先验的单智能体方法（InterPhys），CooHOI 在三个关键维度上做出了改变。
@@ -77,8 +73,6 @@ CooHOI 的核心创新在于将**物体动力学作为隐式通信通道**与**�
 **从单人到多人的两阶段课程学习。** From Scratch 基线直接对多智能体进行强化学习训练，即便将训练步数延长至 CooHOI 的 4 倍，成功率仍为 0%。CooHOI 采用两阶段策略：第一阶段利用 AMP 框架训练单智能体搬运技能，使其掌握行走、接近物体、持握和运送等基本能力；第二阶段将预训练策略复制到多个智能体，在 CTDE MAPPO 框架下进行协作微调。这一范式将困难的多智能体探索问题分解为“先学会单人搬运，再学会协作”的递进过程，显著降低了策略搜索空间。
 
 **隐式通信机制替代显式通信。** 在多智能体协作微调阶段，CooHOI 不依赖任何显式通信协议或参考动作轨迹。每个智能体独立观察物体动力学特征 $\mathcal{D}_t$，物体状态的改变成为智能体之间唯一的协调信号。这一机制的因果有效性由消融实验证实：移除动力学观察后，智能体原地站立、无法搬运物体（Figure 8）；不训练倒退行走技能时，两智能体出现死锁，无法将箱子运达目的地（Figure 8）。此外，奖励函数被细化为行走奖励 $r_{\mathrm{walk}}^G$、持握奖励 $r_{\mathrm{held}}^G$ 和运送奖励 $r_{\mathrm{target}}^G$ 的组合，并引入站立点（stand point）和持有点（held point）作为空间引导，进一步提升了策略训练的稳定性。
-
-
 
 CooHOI 采用**两阶段课程学习范式**，将多智能体协作搬运任务分解为可独立训练、可迁移复用的子问题，从而避开从零开始的 MARL 所面临的采样效率瓶颈与策略收敛难题。
 
@@ -133,15 +127,11 @@ $$
 
 消融实验（Figure 7, Figure 8）表明，缺少站立点会导致智能体走向次优面而无法抬起物体；缺少反向行走则使双智能体陷入死锁，无法将箱子运达目的地。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1789_CooHOI_Learning_Cooperative_Human_Object_Interaction_with_Manipulated_Ob/figures/002_Figure_2.jpg]]
 *Figure 2: Our framework employs a two-phase learning paradigm. In the first phase, depicted on the left, we train single-agent carrying skills by imitating from human motion priors. In the second phase, we transfer these single-agent skills to a cooperative context. Notably, we use the dynamics of the object as feedback information, as illustrated by the bounding box shown in the figures*
 
 ![[assets/figures/papers/paper_list_l1789_CooHOI_Learning_Cooperative_Human_Object_Interaction_with_Manipulated_Ob/figures/001_Figure_1.jpg]]
 *Figure 1: Our framework empowers physically simulated characters to execute multi-agent humanobject interaction (HOI) tasks with naturalness and precision*
-
-
 
 CooHOI 框架的核心设计围绕一个因果机制展开：**将物体动力学作为隐式通信通道**，使多智能体能够通过观察被操控物体的状态变化来协调动作。这一机制贯穿于整个两阶段训练流程，并通过精心设计的观察空间与奖励函数实现。
 
@@ -197,8 +187,6 @@ $$\phi_{k+1} = \arg\min_\phi \frac{1}{|\mathcal{D}_k| T} \sum_{\tau \in \mathcal
 
 上述模块的有效性在消融实验中得到系统验证。从零开始的多智能体训练（From Scratch）即使延长至 4 倍训练步数，成功率仍为 0%（Figure 8），而 CooHOI 两阶段训练达到 89.54%（Table 1）。物体宽度限制为 1 倍、长度和高度缩放至 1.5 倍时，双智能体成功率从 0 跃升至 88.67%（Figure 5），进一步证实了物体几何属性对协作可行性的影响。
 
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -216,12 +204,6 @@ CooHOI 在单人搬运任务上与基线持平，在双人协作搬运上实现�
 ### 跨物体类别泛化
 
 CooHOI 的策略在经过简单微调后，可泛化至多种日常物体。Table 2 显示，双人搬运沙发达 **84.17%** 成功率，单人搬运高脚凳达 **99.21%**。Figure 3 可视化了搬运桌子、扶手椅和高脚凳的过程，所有物体均需移动 4 米。值得注意的是，这些物体的几何形状和尺寸差异显著，策略仍能保持较高的成功率，说明基于包围盒的动力学表示具有一定的形状泛化能力——但其局限性也在此：对于形状过于复杂或无法用包围盒有效描述的物体，泛化能力会下降（见失败模式分析）。
-
-![[assets/figures/papers/paper_list_l1789_CooHOI_Learning_Cooperative_Human_Object_Interaction_with_Manipulated_Ob/figures/005_Table_2.jpg]]
-*Table 2: The trained policy exhibits the ability to handle various object categories encountered in daily life with simple fine-tuning. We tested the performance of our policy model across different objects*
-
-![[assets/figures/papers/paper_list_l1789_CooHOI_Learning_Cooperative_Human_Object_Interaction_with_Manipulated_Ob/figures/004_Figure_3.jpg]]
-*Figure 3: Carrying performance for objects of different categories. From left to right: Table, Armchair, and High Stools. All objects were required to be moved to a location 4 meters away*
 
 ### 消融实验：哪些设计不可或缺？
 
@@ -251,9 +233,6 @@ Figure 7 系统展示了三种典型失败模式：
 
 Table 4 展示了在观察空间添加高斯噪声后的策略性能。噪声水平以标准差定义，测试覆盖单人和双人 Box 搬运场景。结果表明策略对一定程度的观测噪声具有鲁棒性，这为向真实世界迁移提供了初步证据——但需注意，所有训练仍依赖仿真器提供的真值状态，真实环境中的传感器噪声、遮挡和延迟等问题尚未被充分验证。
 
-![[assets/figures/papers/paper_list_l1789_CooHOI_Learning_Cooperative_Human_Object_Interaction_with_Manipulated_Ob/figures/011_Table_4.jpg]]
-*Table 4: Results of our policy under noisy conditions: We tested both single-agent and two-agent box-carrying scenarios. The noise level is defined by the standard deviation of the Gaussian noise used. SR stands for success rate. The definitions of success rate and precision are consistent with those in Section 4.1 of our paper*
-
 ### 训练曲线分析
 
 Figure 8 的双人训练曲线提供了收敛过程的动态视角。CooHOI 的搬运奖励和持握奖励在训练早期即快速上升并稳定收敛，而 From Scratch 基线即使训练步数延长 4 倍，奖励始终在低位震荡。消融模型的曲线则显示：移除动力学观察或反向行走后，奖励完全无法增长，进一步验证了这些组件是策略收敛的必要条件而非锦上添花。
@@ -264,21 +243,8 @@ Figure 8 的双人训练曲线提供了收敛过程的动态视角。CooHOI 的�
 - 所有实验使用相同的超参数、随机种子数量和仿真环境。
 - 噪声鲁棒性实验通过在观察空间注入高斯噪声模拟真实环境的不确定性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1789_CooHOI_Learning_Cooperative_Human_Object_Interaction_with_Manipulated_Ob/figures/007_Figure_5.jpg]]
 *Figure 5: Detailed ablation experiments on single and two agents cases. "Step" measures the average consumed time in the successful cases. In the 2nd figure, the green circle represents the single-agent scenario without scaling the object’s width, while the purple circle represents the multi-agent scenario*
-
-![[assets/figures/papers/paper_list_l1789_CooHOI_Learning_Cooperative_Human_Object_Interaction_with_Manipulated_Ob/figures/006_Figure_4.jpg]]
-*Figure 4: Visualization of cooperative carrying in the multi-agent scenario*
-
-![[assets/figures/papers/paper_list_l1789_CooHOI_Learning_Cooperative_Human_Object_Interaction_with_Manipulated_Ob/figures/009_Table_3.jpg]]
-*Table 3: Hyperparameters for CooHOI*
-
-![[assets/figures/papers/paper_list_l1789_CooHOI_Learning_Cooperative_Human_Object_Interaction_with_Manipulated_Ob/figures/008_Figure_6.jpg]]
-*Figure 6: Some visualization of daily-life objects*
-
-
 
 ## 定位与知识库关联
 
@@ -327,8 +293,6 @@ CooHOI 的方法谱系可追溯到两条主线：基于物理仿真的人‑物�
 4. **统一物体表示学习**：当前针对不同物体类别需要从零训练或微调。能否通过大规模数据学习统一的物体表示，使策略在零样本或少样本条件下泛化到未见过的物体？
 
 5. **现实世界部署**：框架尚未在真实人形机器人上验证。Sim‑to‑Real 迁移中的域随机化、系统辨识和在线自适应策略是需要进一步研究的问题。
-
-
 
 ## 原文 PDF
 

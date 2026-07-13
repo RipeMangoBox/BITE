@@ -57,8 +57,6 @@ claims:
 
 方法定位：HIS属于**可学习的符号评分函数**范式，填补了GNN高精度-高成本与手工函数低成本-低表达力之间的空白。其层次化符号树表示本质上是一种**显式、可解释的GNN蒸馏**——将GNN隐式学习的消息传递模式蒸馏为符号表达式，从而在CPU上实现近乎零开销的结构感知推理。
 
-
-
 逻辑优化（Logic Optimization, LO）是芯片设计流程中的关键环节，其核心是通过一系列节点级变换（如布尔重写、节点消去）来减小电路面积与深度。然而，现有LO启发式算法面临一个根本性瓶颈：在大型工业电路上，大量节点级变换是无效的，导致运行时间过长，严重拖慢设计迭代周期。这一问题在纯CPU部署的工业环境中尤为突出，因为昂贵的GPU推理难以集成到现有的EDA工具链中。
 
 现有方法试图通过评分函数来预测并剪枝无效变换，但存在明显的性能与效率权衡。一方面，基于图神经网络（GNN）的评分函数（如COG、CMO）能够编码电路的结构信息，但其推理成本极高——GNN的逐层消息传递需要大量矩阵运算，在CPU上难以实时运行。另一方面，轻量级的符号评分函数（如Effisyn）虽然推理速度快，但受限于手工设计的简单数学表达式，无法充分捕捉电路的多层结构信息，导致预测精度不足。这一矛盾构成了LO领域的关键缺口：**如何设计一种既具备GNN级别的结构感知能力，又保持符号函数级别的推理效率的评分函数？**
@@ -66,8 +64,6 @@ claims:
 本文受GNN消息传递机制的启发，提出了层次化电路符号发现框架（Hierarchical Circuit Symbolic Discovery, HIS），其核心洞察在于：GNN的逐层聚合过程本质上可以表示为一种可解释的符号计算树。HIS将这一过程显式建模为**层次化符号树**——每一层通过预定义的聚合算子（min, max, mean, sum）和数学算子（+, -, ×, ÷, log, exp）对节点特征进行可解释且计算高效的符号消息聚合，从而替代昂贵的GNN推理。这一设计在保持结构感知能力的同时，将推理复杂度降低到常数级：实验表明，HIS在EPFL和IWLS基准上的平均推理速度分别比COG快296倍和254倍，且推理时间与轻量级基线方法相当。
 
 进一步地，HIS引入了一个基于强化学习的符号生成框架：使用结构感知Transformer逐层生成符号序列，并通过PPO算法优化策略网络。该框架避免了手工设计符号函数的局限性，能够自动为不同电路发现最优的层次化聚合表达式。在六个挑战性电路上的评估显示，HIS-Mfs2（将HIS嵌入Mfs2启发式）相比默认Mfs2实现了平均27.22%的运行时间提升和6.95%的电路尺寸减少，且其top-50%预测召回率一致优于所有基于图和基于节点的基线方法。
-
-
 
 ## 核心方法与创新机理
 
@@ -89,8 +85,6 @@ HIS 框架的核心创新在于将逻辑优化中昂贵的 GNN 评分函数替�
 *   **端到端的优化增益**：当 HIS 学习到的评分函数被集成到 Mfs2 逻辑优化启发式算法中（形成 HIS-Mfs2）后，在六个挑战性电路上取得了平均 **27.22%** 的运行时间提升和 **6.95%** 的电路尺寸缩减。
 *   **一致的最优预测性能**：在 top-50% 预测召回率这一关键指标上，HIS 在 EPFL 和 IWLS 的所有测试电路上均一致优于所有基于图（COG, CMO）和基于节点（Random, Effisyn）的基线方法。
 
-
-
 ![[assets/figures/papers/iclr26_0002_YaXSEbRrHP_A_Hierarchical_Circuit_Symbolic_Discovery_Framew/figures/001_Figure_1.jpg]]
 *Figure 1: Our HIS framework learns a hierarchical symbolic tree which performs an interpretable and efficient message aggregation motivated by the graph neural networks (GNNs)*
 
@@ -111,8 +105,6 @@ HIS（Hierarchical Circuit Symbolic Discovery Framework）的核心设计围绕�
 **关键瓶颈与因果链**：整个流水线直接回应了“逻辑优化启发式中大量节点级变换无效”这一核心瓶颈。传统方法要么使用手工设计的轻量级数学表达式（如Effisyn）但表达能力有限，要么使用复杂的GNN模型（如COG）但推理成本高。HIS的层次化符号树在这两者之间找到了平衡点：符号表达式的推理速度比COG快296倍（EPFL基准）和254倍（IWLS基准），同时通过可学习的符号组合保持了与GNN相当的预测能力。证据显示，HIS在六个挑战性电路上平均运行时间提升27.22%，电路尺寸减少6.95%，且top-50%预测召回率一致优于所有基于图和基于节点的基线方法。
 
 **需要手动验证的点**：虽然论文声称HIS的推理速度与Effisyn等轻量级方法相当，但具体比较数据在Table 5中，建议核实Effisyn的推理时间数值以确保公平性。此外，层次化符号树的层数 $L=2$ 是固定设置，更深层次的探索（如 $L=3$ 或 $L=4$）是否带来性能提升，论文中未提供实验证据，这是一个开放问题。
-
-
 
 本节聚焦 HIS 框架中替代昂贵 GNN 推理的核心——层次化符号树表示及其生成与优化机制。所有公式均直接来自论文，不引入未经验证的推导。
 
@@ -194,8 +186,6 @@ $$
 
 为了进一步提升推理稳定性，论文采用 Best-of-N 策略：在训练完成后，从生成的符号树中选出训练奖励最高的 $N$ 个表达式（实验中 $N = 4$），构建集成模型。在推理时，这 $N$ 个符号树分别对每个节点进行预测，最终评分取它们的平均值。
 
-
-
 ## 实验与关键发现
 
 ### 主结果：在线启发式效率与优化性能
@@ -205,7 +195,6 @@ HIS框架的核心验证是将学习的层次化符号评分函数集成到Mfs2�
 *   **运行时间与电路尺寸**：在超参数k（应用变换的节点百分比）设为30%、40%、50%时，HIS-Mfs2在六个电路上平均实现**27.22%的运行时间减少**和**6.95%的电路尺寸（节点数）减少**（Table 2）。例如，当k=40%时，平均尺寸和深度改善达7.43%，同时运行时间降低40.27%，而优化性能仅边际下降0.38%。
 *   **与基于GNN和轻量级基线的对比**：在EPFL基准的六个电路上，HIS-Mfs2在**And Reduction (AR)**指标（即减少的节点数）上全面优于或持平于所有基线：COG-Mfs2、CMO-Mfs2、Random-Mfs2和Effisyn-Mfs2（Table 7）。例如，在Hyp电路上HIS的AR为566（COG为435，Random为563），在DesPerf上为936（COG为732，CMO为900）。同时，HIS-Mfs2在所有电路上**运行时间最短**，平均比COG-Mfs2快22.91%，比CMO-Mfs2快11.96%，比Random-Mfs2快19.24%，比Effisyn-Mfs2快21.82%。
 *   **推理速度**：在纯CPU环境下，HIS的符号函数推理极快。在EPFL电路上平均推理速度比COG快**296倍**，在IWLS电路上快**254倍**（Table 5）。这直接解决了GNN模型在工业CPU部署中的效率瓶颈。
-
 
 ![[assets/figures/papers/iclr26_0002_YaXSEbRrHP_A_Hierarchical_Circuit_Symbolic_Discovery_Framew/figures/005_Table_2.jpg]]
 *Table 2: We compare the Default Mfs2 heuristic with our HIS-Mfs2 heuristic with the hyperparameter k set as 30%, 40% and 50% on six challenging circuits. Optimized Nd denotes the node number (size) of circuits, and Lev denotes the level (depth) of circuits. We define an Improvement metric by M(Default)−M(Ours)M(Default) , where M (·) denotes the Optimized Nd, Lev, or Time. M(Default)*
@@ -217,14 +206,12 @@ HIS框架的核心验证是将学习的层次化符号评分函数集成到Mfs2�
 
 HIS评分函数的离线预测质量通过top-50%召回率衡量（Table 1）。在六个电路上，HIS的召回率（0.82, 0.94, 0.94, 0.83, 0.99, 0.75）**一致优于**所有基于图的基线（COG, CMO）和基于节点的基线（Effisyn, Random）。这表明层次化符号树能更准确地识别出有效的节点级变换，从而在剪枝时保留高价值操作。
 
-
 ![[assets/figures/papers/iclr26_0002_YaXSEbRrHP_A_Hierarchical_Circuit_Symbolic_Discovery_Framew/figures/003_Table_1.jpg]]
 *Table 1: The results show that HIS consistently outperforms all graph-based and node-based baselines in terms of generalization top 50% prediction recall*
 
 ### 消融实验
 
 Table 3的消融实验验证了HIS各核心组件的必要性：
-
 
 ![[assets/figures/papers/iclr26_0002_YaXSEbRrHP_A_Hierarchical_Circuit_Symbolic_Discovery_Framew/figures/006_Table_3.jpg]]
 *Table 3: The ablation results demonstrate that each component contributes significantly to the overall performance of HIS. Removing any individual module leads to noticeable performance degradation, indicating that the effectiveness relies on the complementary design*
@@ -246,13 +233,8 @@ Table 3的消融实验验证了HIS各核心组件的必要性：
 *   **Figure 5**：可视化展示了EPFL和IWLS基准上发现的层次化符号函数。所有发现的表达式都同时聚合了根节点和候选节点的信息，表明HIS自动学到了结合局部和全局特征的评分策略。
 *   **Table 8**：随机模型实验表明，召回率与k值呈近线性正相关，但优化性能（And Reduction）并非单调，存在最优k值区间（通常为40%-50%）。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0002_YaXSEbRrHP_A_Hierarchical_Circuit_Symbolic_Discovery_Framew/figures/009_Table_4.jpg]]
 *Table 4: We provide comprehensive implementation details, including the arguments for training, the Transformer model, and RL algorithms, along with a subset of the tokens library*
-
-
-
 
 ## 定位与知识库关联
 
@@ -288,8 +270,6 @@ HIS 的适用性受限于以下边界条件：
 5. **训练稳定性与调参成本**：PPO 强化学习对超参数（组大小、裁剪阈值 ε）敏感，调参成本较高。消融实验（Table 3）显示移除任何模块都会导致性能显著下降，表明各组件的互补设计是性能的关键，但也意味着系统复杂度较高。是否存在更鲁棒的训练策略或更简洁的架构设计？
 
 6. **与 GNN 的潜在融合**：HIS 受 GNN 消息传递机制启发但完全替代了 GNN。能否将 HIS 的符号表示与更复杂的 GNN 架构（如注意力机制）结合，以在可解释性和表达力之间取得更好的平衡？这是一个值得探索的混合方向。
-
-
 
 ## 原文 PDF
 

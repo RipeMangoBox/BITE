@@ -58,8 +58,6 @@ claims:
 
 **方法定位**：SSE属于**基于多模态语义理解的数据选择与增强**范式，区别于传统的统计平衡方法（如**RFS**，Gupta et al., CVPR 2019）和纯视觉多样性方法（如**CLIP visual**，Radford et al., ICML 2021）。其核心创新在于将MLLM的场景理解能力转化为可聚类、可比较的语义嵌入，作为数据策展的核心依据。
 
-
-
 ### 工业级数据同化的核心瓶颈
 
 自动驾驶系统的感知模型训练依赖于大规模、高质量标注数据集。然而，随着数据采集规模持续增长，数据集中存在大量冗余样本——这些样本在视觉或统计分布上重复出现，却对下游任务性能的增益极为有限。工业界面临的核心矛盾在于：**如何从海量数据中识别并保留真正关键的信息，同时控制标注与训练成本**。
@@ -75,8 +73,6 @@ claims:
 针对上述缺口，本文提出**SSE（Semantic Selection and Enrichment）**框架，核心动机在于：**将语义多样性确立为数据质量评估的第一性原理**。直觉上，一个理想的数据集应覆盖尽可能丰富的驾驶语义场景，而非简单地堆砌对象数量或追求视觉层面的多样性。为此，SSE利用多模态大语言模型（MLLM）为每个数据点生成细粒度的自然语言语义描述，将其转化为可聚类、可比较的语义嵌入，并以此为基础同时实现数据集的**语义选择**（压缩冗余）与**语义丰富**（从无标注池中挖掘语义缺失场景）。
 
 这一思路的关键洞察在于：**语义上非冗余的少量高质量数据，可以达到甚至超越全量数据的效果**。实验证据表明，在仅保留70%数据时，SSE的mAP为65.2，与全量数据的65.6仅差0.4；而通过语义丰富将数据集扩充至原始规模后，mAP进一步提升至67.6，超出原始全量数据2.0个点（Table 1, Table 2）。更重要的是，语义丰富带来的增益在稀有类别上尤为显著——行人AP提升3.2，骑行者AP提升2.6——尽管这些类别的对象数量并未增加（Figure 7），这直接印证了**语义重要性比对象数量更关键**的核心主张。
-
-
 
 ## 核心方法与创新机理
 
@@ -97,8 +93,6 @@ SSE 的核心创新在于将**语义多样性**确立为数据质量与下游模
 **创新点的因果验证**
 
 上述三个 changed slots 共同指向一个核心洞察：**语义多样性是决定数据质量和下游模型性能的关键因素，语义上非冗余的少量高质量数据可达到甚至超越全量数据的效果**。决定性证据来自 Table 1 和 Table 2：在仅使用 70% 数据时，SSE 的 mAP 为 65.2，与原始全量数据的 65.6 相当（仅下降 0.4），而随机、长尾和 CLIP 视觉基线分别下降 3.5、3.3 和 1.2；通过语义丰富将数据集扩充至原始大小，SSE 达到 67.6 mAP，比原始全量数据提高 2.0 mAP。此外，Figure 4 从机制层面验证了语义嵌入的优越性：语义聚类能够跨不同驾驶会话捕获语义相似但视觉多样的场景，而视觉嵌入聚类倾向于局限于少数会话，说明语义嵌入提供了更泛化的场景分组能力。
-
-
 
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2409_13860/figures/001_Figure_1.jpg]]
 *Figure 1: We introduce our semantic data selection and enrichment framework (SSE) for autonomous vehicles. The framework generates semantic captions for each data point using a foundation model, capturing semantics including scene understanding (e.g., “crowded urban intersection”) and crucial object interactions (e.g., “person about to cross in front of car”). (a) To create a compact dataset, we select the most semantically important portions of a curated and labeled dataset, removing visually similar scenes. (b) To enrich the dataset, we identify new important data points, which are semantically distant from our labeled dataset, from a growing unlabeled data pool. (c) With this approach, we maintain...*
@@ -132,8 +126,6 @@ SSE（Semantic Selection and Enrichment）是一个面向自动驾驶工业级�
 - **锚点机制**：增强选择以簇质心为锚点，而非逐样本比较，避免了计算复杂度爆炸，同时保持了语义覆盖的完整性。
 - **可调控压缩比**：通过调整聚类数k和剪枝阈值ε，可灵活控制数据保留比例与性能之间的权衡。
 
-
-
 ### 语义描述生成模块
 
 SSE的核心起点是利用多模态大语言模型（MLLM）为每帧驾驶场景图像生成自然语言描述。具体而言，使用LLaVA模型，通过专门设计的自动驾驶提示（AV prompt）引导MLLM输出包含场景整体理解（如“拥挤的城市十字路口”）和关键对象交互（如“行人即将从车前穿过”）的详细语义描述（Figure 1, Figure 3）。该模块的输出是一段可解释的文本段落，作为后续所有语义操作的原始材料。
@@ -165,8 +157,6 @@ $$\arg \max_{i \in P} \left(1 - \cos(t_i, t_o)\right)$$
 ### 模块间的因果链路
 
 上述模块构成一条完整的因果链路：**语义描述生成 → 文本嵌入编码 → 语义聚类 → 视觉去重（选择）或语义距离最大化（丰富）**。语义聚类提供了跨驾驶会话的场景分组能力（Figure 4），视觉去重消除了语义簇内的冗余，而语义距离最大化选择则确保新增数据在语义空间上对现有数据集形成有效补充。这一链路的核心洞察在于：语义多样性（而非对象分布平衡或视觉多样性）是决定数据质量和下游模型性能的关键因子。
-
-
 
 ## 实验与关键发现
 
@@ -218,14 +208,8 @@ Figure 10 展示了使用不同MLLM（LLaVA与CLIP）生成语义描述时SSE的
 
 尽管SSE在工业级自动驾驶数据集上展现了显著优势，但仍存在以下局限：首先，实验仅在一个内部专有数据集上进行，尚未在公开数据集或其他领域验证泛化性，结果的普适性需进一步确认。其次，方法依赖大规模MLLM生成语义描述，推理成本较高，可能限制在资源受限环境中的部署。此外，语义描述质量对最终性能的敏感度尚未量化分析，提示设计的自动化优化仍是开放问题。最后，论文未专门评估数据选择过程中可能引入的社会偏见或类别不平衡偏见，而MLLM生成的语义描述可能隐含模型自身的偏见，需在实际应用中加以关注。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2409_13860/figures/006_Figure.jpg]]
-
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2409_13860/figures/013_Figure.jpg]]
 *Figure: (a) Three prompts (b) Dataset semantic selection and enrichment with different prompts*
-
-
 
 ## 定位与知识库关联
 
@@ -263,8 +247,6 @@ SSE 的核心贡献在于将**语义多样性**确立为数据质量的核心度
 - 语义嵌入能否推广至激光雷达、雷达等其他传感器模态，实现多模态融合的联合数据选择？
 - 如何量化语义多样性与模型鲁棒性/公平性之间的因果关系，从而将数据选择从“性能导向”升级为“安全导向”？
 - 提示设计对语义质量的影响已被初步验证，但能否通过自动提示优化或强化学习进一步消除人工调参？
-
-
 
 ## 原文 PDF
 

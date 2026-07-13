@@ -59,15 +59,11 @@ claims:
 
 主要实验基于**BLINK基准的13个视觉感知任务**，在**Qwen‑2.5‑VL系列（3B/7B/32B）**上展开，关键结论包括：模型规模越大，平均正向可迁移性和可塑性越强（Figure 5）；PGF指导的数据选择在Jigsaw和Object Localisation任务上甚至超越直接监督微调。
 
-
-
 视觉语言模型（VLM）在零样本视觉感知任务上的表现仍显著落后于人类水平。以BLINK基准为例，当前表现最佳的GPT-4o仅达到60.04%的平均准确率，GPT-4V为51.14%，而人类可达95%（BLINK leaderboard数据）。这一性能缺口表明，VLM在底层视觉感知能力上存在系统性不足，亟需通过微调来弥补。
 
 然而，对VLM进行任务特定的参数高效微调面临一个关键困境：**在某一感知任务上微调模型，会以未知且不可预测的方式影响其他感知任务的零样本性能**。这种跨任务影响的规律尚未被系统揭示，导致实践中缺乏指导微调策略的理论依据。传统的迁移度量方法仅依赖原始准确率增益（raw accuracy gain），忽略了不同任务之间的难度差异和性能天花板差异，无法提供可比较的归一化度量，使得跨任务的迁移效果难以公平评估和预测。
 
 本文的核心动机正是填补这一空白：**建立一套系统化的分析框架，量化VLM在不同视觉感知任务间的迁移关系，揭示任务间相互促进或抑制的结构化规律**。为此，作者引入完美差距因子（Perfection Gap Factor, PGF）作为归一化迁移度量，并基于此定义任务的可迁移性（transferability）与可塑性（malleability），从而构建从单一源任务到多个目标任务的迁移图谱。该框架不仅能够刻画任务间的正向与负向迁移模式，还能将任务按迁移角色分类（捐赠者、海盗、海绵、筛子），并发现任务间形成的正向或负向团簇结构，最终为指导数据选择和高效微调提供实证依据。
-
-
 
 ## 核心方法与创新机理
 
@@ -104,8 +100,6 @@ $$\mu_{ij} = \frac{\text{Acc}(\mathcal{M}(T_i), T_j) - \text{Acc}(\mathcal{M}, T
 ### 关键创新点四：PGF指导的数据选择
 
 作为框架的应用验证，本文提出了**PGF指导的数据选择策略**：当目标任务缺乏训练数据时，利用PGF矩阵选择对该任务正向迁移最强的源任务数据混合进行微调。实验表明，这一策略在所有测试目标上均优于随机混合，甚至在某些任务上超过了直接使用目标数据进行监督微调的性能（Figure 8）。这证明PGF不仅是一个分析工具，更可以直接指导实际的微调数据策展，为减轻负向迁移提供了量化依据。
-
-
 
 本研究提出了一套系统化的分析框架，用于量化视觉语言模型（VLM）在感知任务间的迁移行为。该框架的核心目标并非提出一种新的微调算法，而是建立一套度量标准和分析工具，以揭示“在一个感知任务上微调VLM会如何影响其在其他感知任务上的零样本表现”这一根本问题。
 
@@ -164,8 +158,6 @@ $$\mu_{ij} = \frac{\operatorname{Acc}(\mathcal{M}(T_i), T_j) - \operatorname{Acc
 框架的输出可应用于实际微调场景：当目标任务的训练数据不可用时，利用PGF矩阵选择对该目标最有益的源任务数据混合进行微调。具体而言，选择PGF值超过一定阈值的源任务数据，按比例混合后微调模型。这一策略在初步实验中已展现出优于随机混合的效果，甚至在某些任务上超过直接使用目标数据微调的性能。
 
 整个框架的输入是13个感知任务的训练/验证数据和一个预训练VLM，输出是PGF迁移矩阵、任务迁移图谱、任务角色标注以及可操作的数据选择建议。框架的设计使其原则上可扩展到任意数量的任务和不同的VLM架构。
-
-
 
 ### 完美差距因子（Perfection Gap Factor, PGF）
 
@@ -241,12 +233,8 @@ $$\Theta ( j ) ^ { - } = \left( \frac { 1 - e ^ { - \frac { n } { N } } } { n } 
 
 8. **PGF 指导的数据选择**：在缺乏目标任务训练数据时，利用 PGF 选择对该任务最有益的源任务数据混合进行微调，作为负迁移缓解策略的初步概念验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2065_https_arxiv_org_abs_2511_18787/figures/003_Table_1.jpg]]
 *Table 1: Illustration of the Perfection Gap Factor (PGF) across three target tasks*
-
-
 
 ## 实验与关键发现
 
@@ -300,33 +288,11 @@ LoRA权重的余弦相似性分析（Figure A.28–A.30）显示，Visual Simila
 
 本研究存在以下局限需要关注：（1）分析主要基于多项选择题形式的BLINK基准，这种输出格式可能限制模型的失败模式，无法完全反映开放式生成场景下的迁移行为；（2）实验仅在Qwen‑2.5‑VL系列上进行了全面测试，其他VLM架构（如LLaVA）仅做了少量验证，结论的普适性尚需进一步检验；（3）PGF指导的数据选择实验仅为初步概念验证，未进行全面的超参数搜索和混合比例优化；（4）天花板性能固定为100%，未采用数据驱动的最佳天花板，可能在某些任务上引入偏差。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2065_https_arxiv_org_abs_2511_18787/figures/004_Table_2.jpg]]
-*Table 2: BLINK tasks with abbreviation and classification by Perceptual Level and Granularity*
-
-![[assets/figures/papers/paper_list_l2065_https_arxiv_org_abs_2511_18787/figures/005_Figure_3.jpg]]
-*Figure 3: Average positive transferability trends across granular and perceptual levels. We observe that positive transferability increases with model size and generally low-level and image-level are highly transferable. Detailed category-wise heatmaps are provided in the supplementary material*
-
-![[assets/figures/papers/paper_list_l2065_https_arxiv_org_abs_2511_18787/figures/006_Figure_4.jpg]]
-*Figure 4: Average positive malleability trends across granular and perceptual levels. We observe that positive malleability increases with model size and generally low-level benefit the most from finetuning. Detailed category-wise heatmaps are provided in the supplementary material*
-
-![[assets/figures/papers/paper_list_l2065_https_arxiv_org_abs_2511_18787/figures/007_Figure_5.jpg]]
-*Figure 5: Task transferability trends across model sizes in Qwen-2.5-VL. As expected, as model size increases, the average positive transferability increases*
-
-![[assets/figures/papers/paper_list_l2065_https_arxiv_org_abs_2511_18787/figures/008_Figure_6.jpg]]
-*Figure 6: Positive clique of size 9 from Qwen-2.5-VL 32B*
-
 ![[assets/figures/papers/paper_list_l2065_https_arxiv_org_abs_2511_18787/figures/009_Figure_7.jpg]]
 *Figure 7: PGF heatmaps for Qwen-2.5-VL 3B (left) and 7B (right) models across the VSI benchmark. Consistent with previous findings, Relative Reflectance and Forensic Detection emerge as donor task and pirate task, respectively*
 
 ![[assets/figures/papers/paper_list_l2065_https_arxiv_org_abs_2511_18787/figures/010_Figure_8.jpg]]
 *Figure 8: Performance comparison under different dataset selection strategies. PGF-informed mixtures consistently outperform random mixtures and even surpass direct supervision in two cases*
-
-![[assets/figures/papers/paper_list_l2065_https_arxiv_org_abs_2511_18787/figures/011_Figure_10.jpg]]
-*Figure 10: A negative clique of size 4 from Qwen-2.5-VL 32B*
-
-
 
 ## 定位与知识库关联
 
@@ -405,8 +371,6 @@ PGF的理论行为揭示了任务迁移中的**不对称性**：正向迁移的P
 - **上游依赖**：以LoRA（Hu et al., 2021）为代表的参数高效微调方法提供了实验基础设施；以BLINK基准为代表的多任务感知评估提供了标准化测试平台。
 - **并行关系**：与任务向量（Task Vector）和模型合并（Model Merging）方向的研究共享“理解模型内部任务表示关系”的目标，但本文侧重零样本迁移的系统测量而非权重空间的算术操作。
 - **下游拓展**：PGF框架可为多任务学习中的任务采样策略、持续学习中的灾难性遗忘缓解、以及VLM的指令微调数据配比提供理论指导——这些方向目前尚处于开放问题阶段。
-
-
 
 ## 原文 PDF
 

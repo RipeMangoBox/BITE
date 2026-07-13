@@ -52,8 +52,6 @@ claims:
 
 实验结果表明，TTA 在图像-文本检索任务上大幅超越现有方法。在从 ALBEF 到 CLIP_CNN 的刁难迁移场景中，TTA 的 TRR@1 达到 **55.16%**，相较 LSSA 提升 **23.77 个百分点**；IRR@1 达到 **66.42%**，提升 **22.36 个百分点**。在 MSCOCO 图像描述任务上的跨任务迁移实验中，TTA 同样展现出优异的攻击效果。消融实验进一步验证了可学习变换与增强集成梯度两个组件的协同作用。
 
-
-
 视觉-语言预训练（VLP）模型在图像-文本检索、视觉定位、图像描述等下游任务中取得了显著成功。然而，这些模型对对抗样本的脆弱性已成为其安全部署的关键隐患。对抗攻击通过在输入上施加人眼不可察觉的扰动，使模型产生错误输出。在VLP的多模态场景中，攻击者可以同时扰动图像和文本模态，造成跨模态的连锁失效，这对实际应用构成了更严峻的威胁。
 
 **核心瓶颈：现有攻击方法的迁移性受限。** 对抗攻击的迁移性——即针对源模型生成的对抗样本能够同样欺骗其他目标模型的能力——是评估攻击实用性的关键指标。当前针对VLP的先进攻击方法，如**SGA**（Lu et al., ICCV 2023）、**LSSA**（Liu et al., NAACL 2025）和**DRA**（Gao et al., ECCV 2024），虽然在白盒攻击场景下表现优异，但在跨模型迁移性上仍存在两个根本性缺陷：
@@ -68,8 +66,6 @@ claims:
 - **缓解源模型过拟合**：采用增强集成梯度（Boosted Integrated Gradients, BIG），利用集成梯度的实现不变性（implementation invariance），通过沿多条变换路径采样来降低梯度相似性，减少对抗扰动对源模型特定特征的依赖。
 
 这两种机制的协同作用使得TTA能够在保持白盒攻击强度的同时，显著提升跨模型、跨任务的迁移能力，为VLP模型的鲁棒性评估提供了更强的攻击基准。
-
-
 
 ## 核心方法与创新机理
 
@@ -93,8 +89,6 @@ $$BIG_i(f_I, f_T, x, B, c) = (x_i - B_i) \times \sum_{w=1}^{Q_O} \frac{\partial 
 ### 3. 协同效应
 
 消融实验（Figure 4）证实，可学习变换（LT）与增强集成梯度（BIG）单独使用均可提高迁移性，但二者组合时才达到最优攻击效果。这一协同作用在刁难迁移场景中尤为突出：从 ALBEF 到 CLIP_CNN 的跨架构攻击中，TTA 的 TRR@1 达到 55.16%，比 LSSA 提升 23.77 个百分点（Table 1）。
-
-
 
 TTA（Transform to Transfer Attack）是一个面向视觉-语言预训练（VLP）模型的多模态对抗攻击框架，其整体pipeline如Figure 3所示。框架的核心设计思想是：**通过可学习的图像变换增强输入多样性，同时利用增强集成梯度缓解对源模型的过拟合**，从而大幅提升对抗样本的跨模型迁移能力。
 
@@ -124,12 +118,8 @@ TTA（Transform to Transfer Attack）是一个面向视觉-语言预训练（VLP
 
 两个模态的攻击管线在损失函数层面实现协同——图像攻击和文本攻击共享同一个跨模态余弦相似度损失，使得生成的图像扰动和文本扰动能够协同作用，共同破坏视觉与语言之间的对齐关系。消融实验（Figure 4）证实，可学习变换（LT）和增强集成梯度（BIG）两个组件单独使用均可提高迁移性，而同时使用时攻击效果达到最优，验证了二者之间存在正向的协同效应。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l792_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Transform_to_Transf/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of the proposed Transform to Transfer Attack: a multimodal framework for generating adversarial examples. For image modality, a learnable transformation strategy is applied to enhance input diversity and the boosted IG is adopted to generate visual adversarial examples. For text modality, we perform embedding-level perturbations to generate semantically superior word substitutions*
-
-
 
 TTA 的核心由两个协同工作的图像攻击模块构成，分别解决输入多样性不足和源模型过拟合问题。
 
@@ -178,12 +168,8 @@ $$\mathcal{L}(f_I, f_T, o_w(x), B, c) = \frac{f_I(B + \beta \times (o_w(x) - B))
 
 可学习变换模块为 BIG 提供多样化的变换路径 $o_w(x)$，BIG 沿这些路径采样计算梯度，利用集成梯度的实现不变性减少对源模型的过拟合。消融实验（Figure 4）表明，两个模块单独使用均可提升迁移性，但组合使用时攻击成功率最高，验证了二者的协同效应。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l792_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Transform_to_Transf/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison between other advanced attacks and our proposed method. (a), (b) and (c) illustrate the principal characteristics of SGA & LSSA, DRA and Ours, respectively. Meanwhile, (d) and (e) present a comparative analysis of the transfer capabilities demonstrated by these methods in image-text retrieval tasks. The multimodal adversarial examples are crafted on the ALBEF model to attack TCL, CLIPViT and*
-
-
 
 ## 实验与关键发现
 
@@ -213,8 +199,6 @@ Figure 7展示了不同攻击迭代步数下TTA攻击成功率的变化趋势。
 
 在**CLIP_CNN→ALBEF**这一架构差异最大的迁移场景中，TTA相比LSSA提升超23个百分点，充分证明了上述机制在处理刁难迁移任务时的显著优势。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l792_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Transform_to_Transf/figures/004_Table_1.jpg]]
 *Table 1: The attack success rate (%) of multimodal adversarial examples against different VLP models compared with state-of-the-art methods on image-text retrieval task. The source column represents the VLP models used for crafting multimodal adversarial examples on the Flickr30K dataset. The shaded area represents the white-box attacks*
 
@@ -226,20 +210,6 @@ Figure 7展示了不同攻击迭代步数下TTA攻击成功率的变化趋势。
 
 ![[assets/figures/papers/paper_list_l792_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Transform_to_Transf/figures/009_Table_3.jpg]]
 *Table 3: Comparison under the same number of augmented images. The shaded area represents the white-box attacks*
-
-![[assets/figures/papers/paper_list_l792_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Transform_to_Transf/figures/010_Figure_7.jpg]]
-*Figure 7: Attack success rate in different attack processes. We generate adversarial examples on ALBEF for Flickr30K, where the reported ASR represents the average across three models: TCL*
-
-![[assets/figures/papers/paper_list_l792_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Transform_to_Transf/figures/008_Figure_5.jpg]]
-*Figure 5: Attack success rates under different numbers of auxiliary transformed images QO*
-
-![[assets/figures/papers/paper_list_l792_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Transform_to_Transf/figures/006_Figure.jpg]]
-*Figure: (a) ALBEF to TCL (b) ALBEF to CLIPViT (c) ALBEF to CLIPCNN*
-
-![[assets/figures/papers/paper_list_l792_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Transform_to_Transf/figures/002_Figure_2.jpg]]
-*Figure 2: The gradient similarity of sampling points along the integration path in SGA combined with integrated gradients. We craft adversarial examples on ALBEF for the Flickr30K dataset*
-
-
 
 ## 定位与知识库关联
 
@@ -302,8 +272,6 @@ $$BIG_i(f_I, f_T, x, B, c) = (x_i - B_i) \times \sum_{w=1}^{Q_O} \frac{\partial 
 2. **更多模态的泛化**：增强集成梯度在视频-语言、音频-语言等更多模态组合上的迁移性如何？变换操作池需要如何扩展？
 3. **计算效率优化**：如何通过变换共享或梯度近似来降低 TTA 的计算开销，使其适用于更大规模的数据集和实时攻击场景？
 4. **防御鲁棒性**：该方法在面对对抗训练、梯度掩蔽等防御策略时的有效性如何？是否需要针对防御策略进一步改进变换选择机制？
-
-
 
 ## 原文 PDF
 

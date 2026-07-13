@@ -59,8 +59,6 @@ claims:
 
 **方法定位**：Chorus继承并扩展了SceneSplat的“上提-对齐”范式，将单一语言教师扩展为多教师蒸馏体系，同时引入3DGS感知的数据增强和在线渲染-蒸馏适配策略，在3DGS场景编码与点云预训练之间架起桥梁。
 
-
-
 ### 3D场景表示从点云到3D高斯的演进
 
 三维场景理解长期依赖点云作为主要表示形式。点云方法通过自监督预训练或2D视觉-语言模型蒸馏来获取逐点特征，代表性工作包括**OpenScene**（Peng et al., CVPR 2023）、**RegionPLC**（Yang et al., ECCV 2024）和**Sonata**（Zuo et al., CVPR 2025）。然而，点云本身受限于稀疏性和缺乏显式几何结构，难以捕捉精细的表面细节和语义边界。
@@ -99,8 +97,6 @@ claims:
 3. **轻量化域外适应**：通过在线渲染-蒸馏（render-and-distill）策略，利用3DGS固有的渲染能力，在适配阶段完全避免离线预计算，将存储需求从TB级降至GB级，同时保持竞争力。
 
 这些设计使Chorus在显著更少的预训练场景下（相较Sonata减少约39.9倍），仍能在零样本语义分割、开放词汇实例分割和场景问答等多个任务上取得领先性能。
-
-
 
 ## 核心方法与创新机理
 
@@ -155,8 +151,6 @@ Chorus 的另一个关键创新是其**点云变体**：仅使用高斯中心、
 
 **总结**：Chorus 的核心创新可归纳为三个 changed slots——（1）教师信号从单一语言对齐扩展为语言+通用视觉+物体感知的多教师互补蒸馏；（2）域外适应从离线预计算伪标签转变为在线渲染蒸馏；（3）数据增强从通用点云扰动升级为 3DGS 参数空间感知的扰动。这三项创新共同实现了更结构化、更数据高效、跨模态可迁移的 3D 场景表示。
 
-
-
 Chorus 构建了一个“上提-对齐”（lift-then-align）的多教师预训练框架，其核心目标是将互补的 2D 基础模型知识蒸馏到统一的 3D 高斯场景编码器中。整个 pipeline 由三个关键阶段串联而成：**多教师预训练**、**渲染式适配**与**任务特定迁移**（Figure 2）。
 
 ![[assets/figures/papers/paper_list_l2077_https_arxiv_org_abs_2512_17817/figures/002_Figure_2.jpg]]
@@ -203,15 +197,8 @@ $$Z = g_{\theta}(\mathcal{G}) \in \mathbb{R}^{N \times d_z}$$
 
 整个框架的数据流为：**3DGS 场景 → 共享编码器 → 潜在特征 → 投影头 → 教师匹配**。多教师信号通过共享主干进行知识融合，PHI-S 标准化和分阶段训练策略抑制教师间干扰，渲染式适配实现轻量化域外扩展，最终生成高度结构化且数据高效的全息场景表示。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2077_https_arxiv_org_abs_2512_17817/figures/001_Figure_1.jpg]]
 *Figure 1: Chorus Framework. (a) Multi-Teacher Pretraining. A feed-forward 3DGS scene encoder with per-teacher projectors distills complementary signals—language-aligned, generalist, and object-aware—into a shared embedding. (b) Example Feature PCA (results on novel scenes). At inference we input the full 3DGS scene; PCA on encoder features presents clear semantic awareness despite domain shift. (c) Evaluation & Data Efficiency. Chorus attains strong results across scene understanding tasks while using noticeably fewer training scenes—8.32× and 39.9× less than the SoTA point-cloud pretraining baselines—highlighting the efficiency of our pretraining*
-
-![[assets/figures/papers/paper_list_l2077_https_arxiv_org_abs_2512_17817/figures/003_Figure_3.jpg]]
-*Figure 3: Rendering-Based View Sampling and Pairing: (a) Camera Location Sampling: We use Furthest Point Sampling to select camera positions that achieve broad spatial coverage across the entire navigable scene space. (b) Visibility Culling: For each location, we sample view angles and track the visibility of the 3D Gaussians across frames. (c) View Pairing and Selection: We obtain a minimum 2D bounding box covering all visible Gaussians for a given view. Candidate pairs of poses are then calculated and sorted based on the overlap score. (d,e,f) Rendered images corresponding to the colored camera viewpoints*
-
-
 
 ### 3DGS场景参数化与渲染
 
@@ -275,8 +262,6 @@ $$\mathcal{L}_{\mathrm{img}}^{(t)} = \frac{1}{|\Omega|} \sum_{(p,\mathbf{u})\in\
 
 这一设计的关键价值在于：避免了传统方法中约1 TB的3D伪标签预计算存储开销（Table 7显示存储从1080 GB降至8 GB），同时将适配延迟控制在每视图0.1秒以内。消融实验（Figure 5）表明，即使使用30×40的低分辨率DINOv3特征，也能产生明显的性能改善。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与实验设计逻辑
@@ -321,16 +306,8 @@ Table 8的实例检索实验评估了特征对点云扰动的鲁棒性。在Scan
 
 尽管Chorus在多数任务上表现优异，仍存在以下局限：（1）预训练阶段仍需离线预计算教师伪标签，虽适配阶段通过在线渲染大幅降低了存储，但预计算的离线和存储资源需求仍不可忽视；（2）3DGS编码器的泛化能力依赖训练场景多样性，点云变体虽有效但仍需3DGS作为预训练载体；（3）当前未探索更轻量的教师模型或更高效的特征上采样策略来进一步降低适配延迟。这些方向值得后续工作深入探索。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2077_https_arxiv_org_abs_2512_17817/figures/005_Table_1.jpg]]
 *Table 1: Zero-Shot 3D Semantic Segmentation on the Fine-Grained ScanNet++ (100 classes) [69], Matterport3D (160 classes) [9], ScanNet200 (200 classes) [12], and InteriorGS (72 classes) [56] Benchmarks. ✾ denotes 3DGS modality input. Chorus and SceneSplat [32] are the only methods that target 3DGS modality pretraining. We report the foreground mean IoU (f-mIoU) and foreground mean accuracy (f-mAcc) excluding the wall, floor, and ceiling classes, following [42, 68]. † denotes the official checkpoint and the baseline results are partly taken from [31]. Dataset abbreviations SN, SN++, ARKitS, MP3D, and S3D are short for ScanNet [12], ScanNet++ [69], ARKitScenes [5], Matterport3D [9], and Structured3D [7...*
-
-![[assets/figures/papers/paper_list_l2077_https_arxiv_org_abs_2512_17817/figures/006_Table_2.jpg]]
-*Table 2: Open-Vocabulary 3D Instance Segmentation on Scan-Net200. Methods are grouped by input type. Methods using both 3D+2D inputs require expensive multi-view image processing, whereas Chorus is feed-forward and shows strong performance, especially on the 66 tail classes*
-
-![[assets/figures/papers/paper_list_l2077_https_arxiv_org_abs_2512_17817/figures/010_Table_4.jpg]]
-*Table 4: Semantic Segmentation Probing & Finetuning Experiments. Chorus point-cloud variant • is used for ScanNet, ScanNet++, and Matterport3D, whereas the 3DGS-input model ✾ is used for InteriorGS, whose source data are of 3DGS*
 
 ![[assets/figures/papers/paper_list_l2077_https_arxiv_org_abs_2512_17817/figures/016_Table_9.jpg]]
 *Table 9: Teacher Ablation with Zero-Shot Semantic Segmentation. The “Teachers” columns mark included components (✓/–). We report foreground metrics for all settings*
@@ -338,19 +315,8 @@ Table 8的实例检索实验评估了特征对点云扰动的鲁棒性。在Scan
 ![[assets/figures/papers/paper_list_l2077_https_arxiv_org_abs_2512_17817/figures/013_Table_7.jpg]]
 *Table 7: Resource and Time Comparison of Uplifting and Rendering-Based Adaptation. Trade-off on InteriorGS (800 scenes): preprocessing-heavy uplifting versus online-heavy rendering adaptation*
 
-![[assets/figures/papers/paper_list_l2077_https_arxiv_org_abs_2512_17817/figures/014_Figure_6.jpg]]
-*Figure 6: Scaling Trend Together With Rendering-Based Adaptation. Linear probing performance on InteriorGS vs. number of pretraining scenes. We compare our multi-teacher pretraining with the self-supervised pretraining [63] on 3DGS; Chorus scales faster and to higher accuracy. Our adaptation recipe yields a +2.7% mIoU gain on this new dataset using only 100 scenes*
-
 ![[assets/figures/papers/paper_list_l2077_https_arxiv_org_abs_2512_17817/figures/018_Figure_8.jpg]]
 *Figure 8: Design Choice Ablation. We validate the choices by evaluating zero-shot segmentation on ScanNet++ Val using a subset of training scenes. SmoothL1 loss, 3DGS-aware augmentations, introducing PE-Spatial in a separate stage, and an instancelevel contrastive term each provide incremental gains*
-
-![[assets/figures/papers/paper_list_l2077_https_arxiv_org_abs_2512_17817/figures/008_Figure_5.jpg]]
-*Figure 5: 2D Adaptation Ablation. Performance improves with higher teacher render resolution (left) and more adaptation scenes (right). The left x-axis denotes the 2D teacher’s feature resolution, formatted as (feature size) × bilinear upsample factor*
-
-![[assets/figures/papers/paper_list_l2077_https_arxiv_org_abs_2512_17817/figures/019_Table_10.jpg]]
-*Table 10: Robustness to 3DGS Optimization and Density*
-
-
 
 ## 定位与知识库关联
 
@@ -391,8 +357,6 @@ Chorus 直接构建在 **SceneSplat** 提出的“上提-对齐”（lift-then-a
 4. **教师组合的完备性**：当前三类教师（语言对齐、通用视觉、物体感知）是否覆盖了场景理解的必要维度？是否存在其他互补信号（如几何结构、时序一致性）可进一步丰富表示空间？
 
 5. **自监督信号的融合**：Chorus 完全依赖 2D 教师监督，未利用 3DGS 渲染的自监督信号（如新视角合成一致性）。将自监督目标与多教师蒸馏结合，可能进一步提升数据效率和表示质量。
-
-
 
 ## 原文 PDF
 

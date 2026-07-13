@@ -53,8 +53,6 @@ claims:
 
 在 ImageNet-Woof、ImageNet-Nette 和 ImageNet-1K 三个基准上，DMGD 以无训练的方式超越所有需要额外训练的 SOTA 方法，平均精度提升分别为 2.1%、5.4% 和 2.4%，验证了“解耦语义与分布、以最优传输桥接二者”这一技术路线的有效性。
 
-
-
 ### 数据集蒸馏的核心目标
 
 数据集蒸馏（Dataset Distillation）旨在将大规模原始数据集 $\mathcal{T}$ 压缩为一个小型合成数据集 $\mathcal{S}$，使得在 $\mathcal{S}$ 上训练的模型能够获得与在 $\mathcal{T}$ 上训练相近的泛化性能。其核心优化目标可形式化为：
@@ -78,8 +76,6 @@ $$|R_{\mathcal{T}}(\theta_{\mathcal{T}}^*) - R_{\mathcal{T}}(\theta_S^*)| \le 2L
 其中 $L$ 为损失函数的 Lipschitz 常数，$W(P_{\mathcal{T}}, P_S)$ 为原始分布与蒸馏分布之间的 Wasserstein 距离。这一定理揭示了数据集蒸馏的本质结构：**语义匹配确保条件分布对齐，而分布匹配通过最小化边缘分布的最优传输距离来控制泛化风险上界**。两者可以解耦为独立的目标，分别优化后再协同作用。
 
 基于这一理论洞察，本文提出 **DMGD（Dual Matching Guided Diffusion）** 框架，核心动机在于：**无需任何额外训练，仅在扩散采样过程中施加解耦的语义引导和分布引导，即可同时实现多样性提升和分布对齐**。语义匹配方面，通过分类器自由引导和动态软标签机制，在扩散过程的不同阶段注入可控的随机探索与语义精炼；分布匹配方面，通过最优传输损失引导采样过程向目标分布靠拢，并借助 K-means 分布近似和贪婪渐进匹配策略解决大规模数据集上的计算可行性和多样性保持问题。这一无训练、解耦的范式从根本上绕开了现有方法在效率与性能之间的折衷困境。
-
-
 
 ## 核心方法与创新机理
 
@@ -132,8 +128,6 @@ $$\mathcal{L}_{\mathrm{OT}}(P_S^t, P_{\mathcal{T}}) = W_{\varepsilon}(P_S^t, P_{
 
 DMGD 的核心理论贡献在于将数据集蒸馏形式化为两个可解耦目标的联合优化问题。**Theorem 1** 为这一解耦提供了严格的理论支撑：只要语义对齐成立，风险差异的上界仅取决于分布距离，因此语义匹配与分布匹配可以作为独立模块分别设计。Figure 4 中记录的渐进蒸馏过程中最优传输损失的变化进一步验证了双目标之间不存在优化冲突——损失随蒸馏进程单调递减，表明两个引导模块能够协同工作而非相互干扰。
 
-
-
 DMGD 提出了一种**完全无训练**的双匹配引导扩散框架，将数据集蒸馏解耦为语义匹配（Semantic Matching）与分布匹配（Distribution Matching）两个协同模块，全部作用于预训练扩散模型的采样过程。其核心逻辑源于定理 1 所揭示的理论保证：在语义对齐条件下，替代数据集与原始数据集之间的风险差异由它们边缘分布的最优传输距离所界定，即
 
 $$|R_{\mathcal{T}}(\theta_{\mathcal{T}}^*) - R_{\mathcal{T}}(\theta_S^*)| \le 2L \cdot W(P_{\mathcal{T}}, P_S)$$
@@ -157,13 +151,6 @@ $$|R_{\mathcal{T}}(\theta_{\mathcal{T}}^*) - R_{\mathcal{T}}(\theta_S^*)| \le 2L
    - **贪婪渐进匹配**：逐个优化合成样本并冻结已生成的样本，防止所有样本收敛到分布均值，从而保持样本间多样性。
 
 两个模块在采样过程中协同工作：语义匹配确保每个样本携带正确的类别语义，分布匹配确保合成数据集整体与目标数据集的分布结构对齐。这种解耦设计使得 DMGD 无需任何微调即可在 ImageNet-Woof、ImageNet-Nette 和 ImageNet-1K 上达到 SOTA 性能。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2671_https_arxiv_org_abs_2605_03877/figures/002_Figure_2.jpg]]
-*Figure 2: Framework of our DMGD method. Our method establishes two guidance modules during the sampling process: semantic matching and distribution matching. In semantic matching, we propose a dynamic soft label mechanism to unlock the potential of diffusion models for diversified generation while ensuring semantic alignment. In distribution matching, we optimize optimal transport computation through distribution approximation and greedy progressive matching to enable optimal transport-based distribution alignment guidance. We present the corresponding pseudocode in the Appendix A3 Algorithm 1*
-
-
 
 ### 理论根基：风险差异的最优传输上界
 
@@ -222,8 +209,6 @@ $$|R_{\mathcal{T}}(\theta_{\mathcal{T}}^*) - R_{\mathcal{T}}(\theta_S^*)| \le 2L
 
 其中 $\widetilde{P}_{\mathcal{T}}$ 为近似分布。误差由上界中的两项控制：合成分布与近似分布的对齐误差，以及近似分布对原始分布的逼近误差。命题 2 进一步证明，K-means 近似的 Wasserstein 误差不大于均值匹配方法，即 $W(P_T, \widetilde{P}_T^{(2)}) \leq W(P_T, \widetilde{P}_T^{(1)})$，从理论上解释了 K-means 近似优于传统均值匹配的原因。消融实验（Table 6）验证了这一结论：K-means 在 IPC-10/50/100 设置下均取得最高精度，且计算时间仅约 0.5 小时，远低于 Minimax 的约 10 小时。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -265,33 +250,14 @@ Table 4 从覆盖度（Coverage）、最优传输数据集距离（OTDD）、多
 ![[assets/figures/papers/paper_list_l2671_https_arxiv_org_abs_2605_03877/figures/021_Figure_4.jpg]]
 *Figure 4: OT Distance Visualization: We systematically recorded the final optimal transport (OT) distance loss for each sample during progressive distillation. A randomly selected category from ImageNet-Woof was visualized to illustrate the results*
 
-![[assets/figures/papers/paper_list_l2671_https_arxiv_org_abs_2605_03877/figures/005_Figure_4.jpg]]
-*Figure 4: Generated Samples Visualization: the visual comparison of Golden Retriever in ImageNet-WOOF, we present the generated samples from different methods under the IPC-10 setting. The method names are marked at the left of each row*
-
 ### 失败模式与局限
 
 尽管 DMGD 在 ImageNet 系列数据集上表现突出，其设计依赖预训练扩散模型的语义先验，因此**局限于具有明确语义边界的数据集**。对于完全开放的场景或语义模糊的数据集，动态软标签机制可能无法提供有效的语义引导。此外，由于扩散模型的固有模态限制，该方法**无法直接泛化至音频、视频、时间序列或具身 AI 数据**。
 
 超参数 β_n 的调节目前依赖手动搜索，缺乏形式化为 IPC 函数的自动化机制。在高 IPC 下，随机探索与语义精炼的权衡需要更精细的理论指导。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2671_https_arxiv_org_abs_2605_03877/figures/008_Table_3.jpg]]
 *Table 3: Ablation study on the components of our method. Results are reported as Top-1 accuracy on ResNet10-AP. The best performance is highlighted in bold, while the second-best is underlined*
-
-![[assets/figures/papers/paper_list_l2671_https_arxiv_org_abs_2605_03877/figures/017_Table_5.jpg]]
-*Table 5: Ablation study on different dynamic label construction methods. Results are reported as Top-1 accuracy on ResNet-10 with average pooling in ImageNet-Woof. The best performance is highlighted in bold*
-
-![[assets/figures/papers/paper_list_l2671_https_arxiv_org_abs_2605_03877/figures/015_Table_6.jpg]]
-*Table 6: Ablation study on different distribution approximation methods. Results are reported as Top-1 accuracy on ResNet-10 with average pooling in Imagenet-Woof. The best performance is highlighted in bold, while the second-best is underlined*
-
-![[assets/figures/papers/paper_list_l2671_https_arxiv_org_abs_2605_03877/figures/016_Table_7.jpg]]
-*Table 7: Ablation study on different guidance mechanism. Results are reported as Top-1 accuracy on ResNet-10 with average pooling in Imagenet-Woof. The best performance is highlighted in bold, while the second-best is underlined*
-
-![[assets/figures/papers/paper_list_l2671_https_arxiv_org_abs_2605_03877/figures/018_Table_8.jpg]]
-*Table 8: Evaluation of different parameter. Results are reported as Top-1 accuracy on ResNet-10 with average pooling in ImageNet-Woof*
-
-
 
 ## 定位与知识库关联
 
@@ -353,8 +319,6 @@ DMGD 的理论框架与经典分布匹配方法（如 **DM**）存在深层联�
 3. **跨域泛化**：在更复杂的跨域数据集或无条件生成场景中，DMGD 的双匹配框架是否仍然有效？这需要验证动态软标签机制在语义边界模糊时的鲁棒性。
 
 4. **与其他生成先验的兼容性**：DMGD 目前基于 Latent Diffusion Model，其核心思想（解耦语义匹配与分布匹配）是否可迁移到其他生成范式（如自回归模型、流匹配模型）仍有待探索。
-
-
 
 ## 原文 PDF
 

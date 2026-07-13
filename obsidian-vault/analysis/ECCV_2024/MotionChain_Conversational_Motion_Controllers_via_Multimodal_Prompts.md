@@ -61,8 +61,6 @@ claims:
 
 **局限性**：当前模型仅支持关节人体运动，无法处理面部、手部以及人与物体/场景的交互。
 
-
-
 ### 问题背景：从单轮条件生成到对话式运动交互
 
 生成式人体运动模型近年来取得了显著进展，特别是在文本到运动（text-to-motion）任务上，扩散模型、GPT式自回归模型等方法已能根据自然语言描述生成较为逼真的三维人体动作序列。然而，这些模型几乎无一例外地遵循“单轮条件生成”范式：用户提供一个描述性文本，模型输出一段对应的运动序列，交互随即终止。
@@ -103,8 +101,6 @@ claims:
 3. **时间连贯的运动合成**：通过将过去轮次和当前轮次的运动令牌拼接后统一解码（而非逐轮独立解码），可以保证多轮指令生成的运动在时间维度上平滑连贯，消除片段间的跳变。
 
 基于上述洞察，本文提出了**MotionChain**——一个统一的视觉-运动-语言对话式生成框架。MotionChain由多模态分词器（文本、视觉、运动）和视觉-运动感知语言模型两部分构成，通过在大规模多模态对话数据集上进行多轮指令微调，首次实现了根据文本、图像、运动等多模态提示进行连续多轮对话，并在对话中交替生成文本回答和人体运动序列的能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -160,8 +156,6 @@ $$z_{\mathrm{whole}}^{1:(L_p+L_c)} = [z_p^{1:L_p}, z_c^{1:L_c}]$$
 
 MotionChain的核心贡献在于通过“统一令牌空间 + 语言模型对话能力”的技术路线，将多模态运动生成从单轮条件映射提升为多轮上下文感知的交互式生成。这一范式转变的关键在于：**将运动离散化为语言模型的“词汇”，使得预训练语言模型的序列建模和上下文学习能力可以被直接迁移到运动生成领域**。该方法在运动推理任务上取得了37.92的Bleu@1分数，远超通用LLM基线Vicuna-1.5-7b的19.27（Table 1），验证了统一多模态令牌空间和对话式微调策略的有效性。
 
-
-
 MotionChain 是一个**视觉-运动-语言统一生成式预训练模型**，其核心目标是将人体运动视为一种“外语”，通过构建统一的多模态离散令牌空间，使大规模语言模型能够以对话方式连续生成运动或文本回复。该框架由两大核心组件构成：**多模态分词器**（Multi-modal Tokenizer）与**视觉-运动感知语言模型**（Vision-Motion-aware Language Model），整体架构如 Fig. 2 所示。
 
 ![[assets/figures/papers/paper_list_l1877_MotionChain_Conversational_Motion_Controllers_via_Multimodal_Prompts/figures/002_Figure_2.jpg]]
@@ -197,12 +191,8 @@ MotionChain 的 pipeline 遵循“多模态编码 → 统一令牌拼接 → 自
 
 MotionChain 的训练分为两个阶段：首先在统一的运动-语言数据上进行多任务预训练，随后使用专门构建的**多模态多轮对话数据集**进行指令微调。该对话数据集通过 ChatGPT 和文本-运动检索模型 TMR 从现有文本-运动配对数据（如 HumanML3D）中增强生成，涵盖运动推理、运动编辑等 14 类任务，数据收集流程见 Fig. 3。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1877_MotionChain_Conversational_Motion_Controllers_via_Multimodal_Prompts/figures/027_Table_10.jpg]]
 *Table 10: Architecture of our vision perceiver*
-
-
 
 MotionChain 的核心架构由三个相互协作的模块构成：运动分词器、视觉分词器，以及视觉-运动感知语言模型。其设计哲学是将人体运动视为一种“外语”，通过离散令牌统一文本、视觉和运动三种模态，从而将大语言模型的序列建模与对话能力迁移到多模态运动生成任务中。
 
@@ -227,9 +217,6 @@ $$\mathcal{L}_{\mathcal{V}} = \mathcal{L}_r + \mathcal{L}_e + \mathcal{L}_c$$
 $$z_{\mathrm{whole}}^{1:(L_p+L_c)} = [z_p^{1:L_p}, z_c^{1:L_c}]$$
 
 拼接后的完整令牌序列通过运动解码器一次性解码为连续运动序列，从而保证多轮生成运动的时间连贯性。消融实验（Table 3, Fig. 4）证实，Tokens-joint 方式在 MPJPE 等指标上显著优于独立解码（Independent）和基于过去条件的分离解码（Past-condition）。
-
-![[assets/figures/papers/paper_list_l1877_MotionChain_Conversational_Motion_Controllers_via_Multimodal_Prompts/figures/004_Figure_4.jpg]]
-*Figure 4: Motion Composition Variants: We illustrate the baselines for motion composition during multi-turn motion generation (a). independent decoding each turn (b). separate decoding conditioned on the last few tokens from the prior turn (c). decoding with joint motion tokens. Green tokens stand for image condition, blue tokens stand for textual instruction, and orange tokens stand for human motions*
 
 ### 视觉分词器（Vision Tokenizer）
 
@@ -261,16 +248,11 @@ $$\mathcal{L}_{LM} = -\sum_{i=0}^{L_t-1} \log p_{\theta}\left(x_a^i \mid X_v, X_
 | 语言模型 | 统一词汇 + 自回归生成 + 多轮历史拼接 | Sec. 3.3, Eq. (4)(5) |
 | 令牌共享 | 独立运动令牌（每层独立代码）优于跨层共享 | Table 8 |
 
-
-
 ## 实验与关键发现
 
 ### 4.1 实验设置
 
 MotionChain采用两阶段训练范式。第一阶段为**运动分词器预训练**：在HumanML3D数据集上训练VQ-VAE运动分词器，码本设置为 $K \in \mathbb{R}^{512 \times 1024}$，量化层数 $Q=4$，该配置在FID重建质量上达到最优（Table 9）。第二阶段为**视觉-运动感知语言模型的多轮指令微调**：基于Flan-T5基座，使用统一的多模态词汇（合并文本词汇 $V_t$ 与运动词汇 $V_m$，维持运动分词器码本顺序，并加入特殊边界令牌），在多模态、多任务、多轮对话数据集上进行微调。该对话数据集通过对现有text-to-motion和人体网格重建数据集进行增强构建，包含运动推理、运动编辑等14类任务。模型参数量为280M。
-
-![[assets/figures/papers/paper_list_l1877_MotionChain_Conversational_Motion_Controllers_via_Multimodal_Prompts/figures/013_Table_9.jpg]]
-*Table 9: Evaluation of our motion tokenizer on the motion part of HumanML3D [24] dataset. We follow MLD [103] to evaluate our VQ-VAE model V: MPJPE and PAMPJPE are measured in millimeter. ACCL indicates acceleration error. We evaluate FID and Diversity the same as Tab. 3. The baselines of VPoser-t [65] and ACTOR [68] are borrowed from MLD. K indicates the codebook size, d indicates the codebook dimension , Q indicates the Residual-VQ layers*
 
 ### 4.2 运动推理性能
 
@@ -355,24 +337,8 @@ Table 11展示了不同模型规模下的推理速度（FPS）。在单张Tesla 
 ![[assets/figures/papers/paper_list_l1877_MotionChain_Conversational_Motion_Controllers_via_Multimodal_Prompts/figures/006_Table_2.jpg]]
 *Table 2: Comparison of temporal motion composition on Babel [73]. We evaluate the state-of-theart motion temporal composition method Teach [4] under the 95 % confidence interval from 20 times running. (cf. Sec. 4.1 for notations.)*
 
-![[assets/figures/papers/paper_list_l1877_MotionChain_Conversational_Motion_Controllers_via_Multimodal_Prompts/figures/007_Table_3.jpg]]
-*Table 3: Evaluation of motion composition methods on HumanML3D [24]. Here Independent, Past-condition, and Tokens-joint stand for different motion composition varients during multi-turn motion conversation, as illustrated in Fig. 4*
-
 ![[assets/figures/papers/paper_list_l1877_MotionChain_Conversational_Motion_Controllers_via_Multimodal_Prompts/figures/008_Table_4.jpg]]
 *Table 4: Evaluation of vision tokenizer architecture on Bedlam [50]. We implement three different architectures, including Q-former, Perceiver, and Linear. We evaluate these results with the metrics in motion reconstruction. Additional information regarding the implementation is in the supplementary materials. (cf. Tab. 2 for notations.)*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1877_MotionChain_Conversational_Motion_Controllers_via_Multimodal_Prompts/figures/009_Table_5.jpg]]
-*Table 5: Comparison of text-to-motion on HumanML3D [24]. The empty MModality indicates Real motion is deterministic. Pre-trained and Fine-tuned indicate uniform motion-language pretraining and specific fine-tuning on this task. The arrows (→) indicate that closer to Real is desirable. Bold and underline indicate the best and the second best result on text-to-motion task*
-
-![[assets/figures/papers/paper_list_l1877_MotionChain_Conversational_Motion_Controllers_via_Multimodal_Prompts/figures/010_Table_6.jpg]]
-*Table 6: Comparison of motion captioning on HumanML3D [24]. The evaluation metrics follow [25], while we use the ground truth texts without pre-processing for linguistic metrics calculation. Bold indicate the best*
-
-![[assets/figures/papers/paper_list_l1877_MotionChain_Conversational_Motion_Controllers_via_Multimodal_Prompts/figures/028_Table_11.jpg]]
-*Table 11: The inference time costs of text-driven motion generation by evaluating the Frames Per Second (FPS), which is obtained by averaging the number of frames generated per second. We present the time costs for various model sizes and observe that, under the same 1 Tesla V100, smaller model sizes achieve faster FPS*
-
-
 
 ## 定位与知识库关联
 
@@ -450,8 +416,6 @@ MotionChain 在以下场景中展现出显著优势：
 5. **推理效率优化**：Table 11 显示了不同模型参数下的推理 FPS，但是否有特定的工程优化（如模型量化、令牌缓存、投机解码）可以进一步提升推理速度，以满足实时交互场景的需求？
 
 6. **感知器架构的深入探索**：Table 4 显示简单线性投影优于 Q-former 和 Perceiver，但这是否是任务特定的现象？在更复杂的视觉条件运动生成任务中，更强大的感知器架构是否会展现出优势？
-
-
 
 ## 原文 PDF
 

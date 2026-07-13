@@ -50,8 +50,6 @@ claims:
 
 实验结果表明，该方法在 EmoTalk3D 数据集上取得了显著优势：PSNR 达到 25.78 dB，较 EmoTalk3D 基线提升 4.56 dB；CPBD 达到 0.36，较 Hallo3 提升 16.1%；LPIPS 降至 0.12，LMD 降至 3.56，均为对比方法中的最优水平。在 RenderMe-360 数据集上，LMD 较 Hallo3 降低 29.4%，PSNR 提升 1.28 dB。消融实验进一步验证了AU代码对位置预测和不透明度预测模块的关键作用，以及扩散策略在捕捉运动分布方面的优势。用户研究亦表明，文本驱动的情感编辑在视频真实感和情感控制上均超过 Hallo3，证实了AU空间作为编辑接口的有效性。
 
-
-
 三维说话人头生成旨在从语音信号合成逼真的动态面部动画，在虚拟现实、数字人交互、影视制作等领域具有广泛应用。近年来，基于3D高斯泼溅（3D Gaussian Splatting, 3DGS）的方法凭借其高质量渲染和自由视角能力，逐渐成为该领域的主流范式。然而，现有方法在**情感表达的可编辑性**方面存在显著不足，这构成了当前的核心瓶颈。
 
 具体而言，现有工作的缺口体现在两个层面。其一，语音到表情的驱动机制主要依赖隐式情感特征或直接扩散，缺乏对细粒度面部动作的显式建模能力。例如，**EmoTalk3D**（Peng et al., ICCV 2023）虽然实现了情感解耦的3D面部动画，但其情感到表情的映射仍然是模糊的，难以通过外部信号进行精确控制。**Hallo3**等文本提示驱动的扩散方法虽然引入了编辑接口，但其编辑粒度较粗，难以实现对面部动作单元的精细化操控。其二，情感编辑接口的缺失或受限。**EAMM**（Ji et al., SIGGRAPH 2022）需要参考图像来驱动情感表达，**SadTalker**（Zhang et al., arXiv 2022）和**Real3D-Portrait**（Ye et al., arXiv 2024）则主要关注音频驱动的动画生成，缺乏对文本情感编辑的直接支持。
@@ -59,8 +57,6 @@ claims:
 上述不足的根源在于：现有方法未能建立一个**可解释的中间表示**来桥接情感语义与面部动作。情感本质上是对特定面部动作单元（Action Unit, AU）的组合激活，而AU作为面部肌肉运动的解剖学编码，天然具备细粒度、可解释和可编辑的特性。然而，现有工作要么完全绕过AU空间进行端到端学习，要么仅在有限范围内使用AU信息，未能充分发挥其作为统一控制信号的潜力。
 
 EmoDiffTalk的核心动机正是填补这一空白：**将AU代码空间作为情感感知的核心表示**，使其同时服务于两个关键功能——作为语音到表情的稀疏控制信号，以及作为文本到表情的编辑接口。这一设计使得模型既能从音频中精确推断面部动作，又能通过简单的文本指令实现对特定AU的增强或抑制，从而实现细粒度、解耦的情感动画生成。
-
-
 
 ## 核心方法与创新机理
 
@@ -113,8 +109,6 @@ AU代码在这里充当了**稀疏语义锚点**的角色——它不是直接�
 
 这一设计的精妙之处在于：它复用了语音驱动阶段训练好的AU代码空间和扩散模型，编辑操作仅需在AU层面进行简单的代数变换，无需重新训练扩散模型。用户研究（Table 2）证实，该方法在视频真实感和情感控制上均超过Hallo3，验证了AU空间作为编辑接口的有效性。
 
-
-
 EmoDiffTalk 的整体管道由两大阶段构成：**规范高斯Rig重建** 与 **情感感知高斯扩散**。前者从多视角图像中构建可驱动的基础三维高斯表示，后者以语音和文本情感提示为输入，驱动该表示生成动态的、可自由视角渲染的情感说话人头。
 
 ### 管道总览
@@ -143,8 +137,6 @@ EmoDiffTalk 的整体管道由两大阶段构成：**规范高斯Rig重建** 与
 ### 训练策略
 
 模型采用四阶段渐进训练策略：第一阶段训练语音到AU编码器；第二阶段训练AU提示高斯扩散；第三阶段训练动态外观解码器；第四阶段训练文本到AU情感控制器。各阶段逐步收敛，最终在单个NVIDIA RTX 5090 GPU上约需3天完成全部训练。
-
-
 
 ### 3.1 规范高斯Rig重建与三重平面颜色表示
 
@@ -190,12 +182,8 @@ $$\tilde{\mathbf{E}}_t = \mathbf{E}_t \odot (1 + \alpha \mathbf{y}) - \beta (1 -
 
 其中 $\alpha$ 和 $\beta$ 分别为增强和抑制系数，$\odot$ 表示逐元素乘法。当某个AU被激活($y_k=1$)时，其代码值被放大 $1+\alpha$ 倍；当未被激活($y_k=0$)时，其代码值被衰减 $1-\beta$ 倍。调制后的情感AU代码 $\tilde{\mathbf{E}}_{0:T-1}$ 替换原始AU代码作为扩散过程的条件输入，从而驱动相应的情感表达。该机制使得用户可以通过简单的文本描述（如“开心地笑”）精确控制面部动作的细粒度情感表现。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2474_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_EmoDiffTalk_Emotio/figures/003_Figure_3.jpg]]
 *Figure 3: Text-to-AU Emotion Controller pipeline (left) and AUbased emotion editing for Gaussian appearance inference (right)*
-
-
 
 ## 实验与关键发现
 
@@ -244,21 +232,8 @@ EmoDiffTalk 在两个主流数据集上进行了全面的定量评估：**EmoTal
 
 此外，AU 代码空间作为中间表示的泛化边界尚未被充分探索——能否联合语音情感等其他模态实现更自然的混合编辑，以及如何设计更鲁棒的 AU 调制策略来应对分布外表情，仍是值得研究的开放问题。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2474_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_EmoDiffTalk_Emotio/figures/004_Table_1.jpg]]
 *Table 1: Quantitative comparison results evaluated on the Emotalk3D and RenderMe-360 datasets using different comparing approaches respectively*
-
-![[assets/figures/papers/paper_list_l2474_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_EmoDiffTalk_Emotio/figures/005_Figure_4.jpg]]
-*Figure 4: Qualitative Comparison on the Emotalk3D Dataset. Our approach outperforms existing approaches in both lip-sync accuracy and facial reconstruction detail than those previous SOTA talking head approaches*
-
-![[assets/figures/papers/paper_list_l2474_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_EmoDiffTalk_Emotio/figures/006_Figure_5.jpg]]
-*Figure 5: Additional experimental results on the Emotalk3D dataset and comparative evaluation results on the RenderMe-360 benchmark*
-
-![[assets/figures/papers/paper_list_l2474_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_EmoDiffTalk_Emotio/figures/001_Figure_1.jpg]]
-*Figure 1: Text-to-AU based emotion editing results of our EmoDiffTalk. Our EmoDiffTalk not only supports fine-grained speechdriven (third row) 3DGS talking head generation (first row), but also enabling expansive and accurate text-based emotion editing (second and fourth rows). The AU Code (bottom) are also demonstrated. Please refer to our demo video for more text driven 3D talking head editing results*
-
-
 
 ## 定位与知识库关联
 
@@ -302,8 +277,6 @@ EmoDiffTalk 的因果调节变量是 **AU 代码空间**，它在管道中扮演
 2. **鲁棒的情感调制策略**：能否设计非线性的、条件自适应的 AU 调制机制（如基于扩散的 AU 编辑或学习式变换），以处理超出训练分布的极端表情？
 3. **多模态联合编辑**：AU 代码空间能否联合语音情感特征、面部动作捕捉等其他模态，实现更自然的混合情感编辑（如语音悲伤+文本愤怒的冲突情感合成）？
 4. **跨身份泛化**：当前方法需要为每个说话人重建规范高斯Rig，能否通过元学习或条件生成实现少样本甚至零样本的身份泛化？
-
-
 
 ## 原文 PDF
 

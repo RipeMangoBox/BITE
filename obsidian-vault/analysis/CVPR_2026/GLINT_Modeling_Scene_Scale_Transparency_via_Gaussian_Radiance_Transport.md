@@ -49,8 +49,6 @@ claims:
 
 实验结果表明，GLINT 在合成数据集 **3D-FRONT-T** 上以 Normal MAE 7.96、Depth AbsRel 0.04、Mesh CD 0.34 全面超越所有基线方法（包括 TSGS、EnvGS、PGSR 等），同时在真实数据集 **DL3DV-10K** 和合成数据集上取得最高的渲染质量（PSNR 30.21/34.50, SSIM 0.92/0.96），验证了分解表示对几何重建和外观保真度的决定性提升。
 
-
-
 ### 透明场景重建的核心困境
 
 在真实世界的三维场景中，透明表面（如玻璃窗、展柜、车窗）无处不在。然而，对这类场景进行高质量的三维重建与新颖视角合成，至今仍是计算机视觉与图形学领域的开放难题。其根本困境在于：**透明表面的出射辐射是多重光路的纠缠结果**——观察者看到的像素颜色，同时包含了透明界面本身的反射光、穿过透明介质透射而来的背景光，以及可能的环境镜面反射。这三条辐射路径在物理上相互独立，但在图像中却被压缩为单一的RGB值。
@@ -80,8 +78,6 @@ GLINT的提出正是为了从根本上解决上述困境。其核心洞察是：
 
 通过**混合渲染策略**——对接口组件使用光栅化生成G-buffer（深度、法线、透明度、镜面度），再基于G-buffer使用光线追踪查询透射和反射组件——各组件可以独立优化，并服从物理一致的辐射传输公式。同时，GLINT利用自举的几何线索（如接口-透射深度差异和扩散反照率）在无分割掩码的情况下定位透明区域，并引入视频重光照模型的编码器提供跨视角一致的几何和材质先验，从而在透明场景中突破外观与几何的权衡瓶颈。
 
-
-
 ## 核心方法与创新机理
 
 GLINT 的核心创新在于将 3D 高斯泼溅从“单体混合”范式推进到“分解式辐射传输”范式。传统方法（包括 2DGS、PGSR、EnvGS 等）用单一高斯原语集通过标准 α 混合合成所有颜色，导致透明界面的几何与外观被纠缠在一起：优化时，透明区域的高斯要么被迫趋近零不透明度以展示背景，要么变为不透明以维持几何完整性，最终造成几何不准确、伪影或透明表面完全缺失。GLINT 通过以下五个关键设计突破这一瓶颈。
@@ -109,8 +105,6 @@ GLINT 引入预训练视频重光照模型 **DiffusionRenderer** 的编码器，
 ### 5. 从薄透明到场景级透明的泛化
 
 TSGS 等专门针对薄透明表面的方法需要分割掩码且无法恢复透射辐射，而 GLINT 的分解框架将透明度建模为连续缓冲 t，使同一套表示同时处理不透明、透明和反射区域。在合成数据集 3D-FRONT-T 上，GLINT 以 Normal MAE 7.96、Depth AbsRel 0.04、Mesh CD 0.34 全面超越所有基线（Table 1）；在真实数据集 DL3DV-10K 上同时取得最高渲染质量 PSNR 30.21（Table 2），证明分解方案在场景级透明重建中的普适优势。
-
-
 
 GLINT 的整体流水线围绕一个核心思想展开：将场景的高斯原语**显式分解为三个功能组**，并通过**混合渲染**和**物理启发的辐射传输公式**将它们整合为最终的出射辐射。图 2 给出了流水线概览。
 
@@ -156,15 +150,8 @@ $$L_{\mathrm{transparent}} = (1 - k_s) L_{\mathrm{trans}} + k_s L_{\mathrm{refl}
 - **处理**：接口组件光栅化 → G‑buffer 提取 → 透射/反射光线追踪 → 辐射传输合成。
 - **输出**：新视角渲染图像、法线图、透明度图、各辐射成分分解图，以及可导出的重建网格（通过 TSDF 融合）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2083_https_arxiv_org_abs_2603_26181/figures/002_Figure_2.jpg]]
 *Figure 2: Pipeline Overview. The interface component*
-
-![[assets/figures/papers/paper_list_l2083_https_arxiv_org_abs_2603_26181/figures/001_Figure_1.jpg]]
-*Figure 1: Our framework GLINT performs decomposed Gaussian radiance transport to reconstruct transparent surfaces with physically consistent geometry and appearance. (Left) The first row shows a rendered image, normal map, and transparency map. The second row visualizes the radiance contributions of the interface, transmission, and reflection components. (Right) Reconstructed Mesh*
-
-
 
 GLINT 的核心在于将场景的高斯原语显式分解为三个功能组件，并通过透明度感知的混合渲染管线与物理启发的辐射传输公式进行整合。以下按模块逐一阐述其设计与关键公式。
 
@@ -252,8 +239,6 @@ $$\mathcal { L } _ { \mathrm { t r a n s } } = \lambda _ { t } \| M _ { \mathrm 
 
 该模块的核心逻辑是：透明区域中接口深度（首表面）与透射深度（背景）存在显著差异，且扩散反照率较低；通过这两个线索即可在无掩码条件下自举定位透明表面。
 
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -275,9 +260,6 @@ GLINT 在两个基准上同时刷新了几何与外观重建的记录。**Table 
 
 ![[assets/figures/papers/paper_list_l2083_https_arxiv_org_abs_2603_26181/figures/007_Figure_6.jpg]]
 *Figure 6: Mesh visualization comparison. The meshes are obtained from TSDF fusion following baselines*
-
-![[assets/figures/papers/paper_list_l2083_https_arxiv_org_abs_2603_26181/figures/008_Figure_7.jpg]]
-*Figure 7: Qualitative comparison on DL3DV-10K dataset. Each column shows results from GT, PGSR [5], EnvGS [39], TSGS [24], and Ours. For each scene, rows correspond to RGB (top) and normal (bottom) maps*
 
 ### 消融实验：各组件的因果贡献
 
@@ -307,24 +289,8 @@ GLINT 在两个基准上同时刷新了几何与外观重建的记录。**Table 
 
 4. **初始几何质量对自举透明度的影响**：透明度自举掩码依赖接口-透射深度差（Δz > τ_d），如果训练初期接口几何较差，深度差可能不可靠，导致透明度定位失败。论文未报告该场景下的鲁棒性测试，需要手动验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2083_https_arxiv_org_abs_2603_26181/figures/011_Table_3.jpg]]
 *Table 3: Ablation studies on our method. We report PSNR, SSIM, LPIPS, Normal MAE, and Depth AbsRel*
-
-![[assets/figures/papers/paper_list_l2083_https_arxiv_org_abs_2603_26181/figures/013_Figure_10.jpg]]
-*Figure 10: Qualitative ablation study on representation components. Visual comparison between the full model and ablated variants*
-
-![[assets/figures/papers/paper_list_l2083_https_arxiv_org_abs_2603_26181/figures/014_Figure_11.jpg]]
-*Figure 11: Effect of geometric losses. Ablating geometric supervision leads to degraded geometry reconstruction. Removing Ldepth produces inaccurate interface depth, removing*
-
-![[assets/figures/papers/paper_list_l2083_https_arxiv_org_abs_2603_26181/figures/015_Figure_12.jpg]]
-*Figure 12: Effect of the transparency loss*
-
-![[assets/figures/papers/paper_list_l2083_https_arxiv_org_abs_2603_26181/figures/016_Table_4.jpg]]
-*Table 4: Comparison of computational costs and reconstruction quality on the 3D-FRONT-T dataset*
-
-
 
 ## 定位与知识库关联
 
@@ -369,8 +335,6 @@ GLINT 的核心知识贡献包括：
 3. **鲁棒性增强**：自举透明度定位在训练初期依赖深度差，如果初始几何较差，该方法是否会失效？如何增强其鲁棒性？
 4. **推广到折射与半透明**：提出的分解框架能否推广到折射透明（如水晶球）或半透明介质？
 5. **效率优化**：如何降低训练时间和内存消耗，使得该方法可以在消费级设备上运行？
-
-
 
 ## 原文 PDF
 

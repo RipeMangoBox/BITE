@@ -52,8 +52,6 @@ claims:
 
 **主要结果**：在 DyNeRF（Sear-steak、Coffee-martini）和 MeetRoom（Trimming）基准上，Catalyst4D 的 CLIP 相似度均优于所有对比方法（最高达 0.252 vs. CTRL-D 的 0.249），同时保持具有竞争力的时间一致性（0.986 vs. 0.983）。消融实验证实，AMG 模块对正确运动传播至关重要——移除后 CLIP 相似度从 0.252 降至 0.245，一致性从 0.971 降至 0.966；CUAR 模块进一步提升了视觉保真度，有效抑制了颜色伪影和闪烁。在局部编辑和全局风格迁移任务上，Catalyst4D 实现了更精准的局部修改和更一致的风格传播，避免了对比方法常见的模糊、过度平滑和非目标区域误修改问题。
 
-
-
 ### 动态场景编辑的核心瓶颈
 
 将2D扩散模型的强大编辑能力直接迁移到4D动态场景面临一个根本性矛盾：**空间编辑精度与时间一致性难以兼得**。现有方法通常采用“2D-to-4D”范式——先用2D扩散模型逐帧编辑视频，再将编辑结果拟合为4D表示（如动态NeRF或4D高斯泼溅）。然而，这一路径缺乏显式的几何推理，导致三个典型失效模式：
@@ -80,8 +78,6 @@ Catalyst4D的核心洞察是：**3D编辑的高保真性应建立在静态场景
 - 随后通过一个独立的传播管道，将首帧的几何和外观修改沿时间轴扩散到所有帧，**无需重新训练变形网络**。
 
 这一解耦设计的关键挑战在于：如何在不依赖逐帧2D扩散监督的条件下，将首帧的编辑可靠地传播到动态序列中？这要求传播机制必须同时解决两个子问题——**运动引导**（编辑后的高斯如何跟随场景运动）和**外观细化**（因遮挡和运动导致的颜色伪影如何修正）。Catalyst4D分别通过Anchor-based Motion Guidance (AMG) 和 Color Uncertainty-guided Appearance Refinement (CUAR) 回应了这两个挑战。
-
-
 
 ## 核心方法与创新机理
 
@@ -121,8 +117,6 @@ CUAR 模块通过**量化高斯颜色不确定性并选择性纠正伪影**来�
 
 Catalyst4D 的三个 changed slots 形成协同效应：**3D-to-4D 范式**奠定了几何一致性基础，**AMG** 确保编辑在时间维度上的正确运动传播，**CUAR** 进一步消除传播过程中引入的外观伪影。这一组合使 Catalyst4D 在无需重新训练变形网络的条件下，实现了对局部编辑和全局风格迁移任务的高保真 4D 编辑。
 
-
-
 Catalyst4D 的核心设计理念是将**空间编辑**与**时间传播**解耦：先在动态序列的首帧（canonical frame）上完成高保真的 3D 高斯编辑，再通过两个专用模块将编辑结果传播至全部时间帧。这一 3D-to-4D 范式避免了直接将 2D 扩散模型扩展到 4D 时因缺乏显式几何推理而产生的运动伪影、时间闪烁和非目标区域意外变化。
 
 ### 管道概览
@@ -145,13 +139,6 @@ Figure 2 展示了 Catalyst4D 的完整管道，其输入输出流如下：
 - **CUAR 负责外观一致性**：解决“移动后的高斯颜色是否正确”的问题。它利用高斯在相邻帧间的投影颜色差异量化不确定性，仅对高不确定性区域进行细化，在纠正伪影的同时避免对正确区域的不必要修改。
 
 这种解耦设计的关键优势在于：整个传播过程**无需重新训练变形网络**，也不修改底层 4D 重建的高斯密度，因此计算开销可控（单块 NVIDIA A100 GPU 上训练约 40–50 分钟），且方法对底层 4D 表示的依赖性被显式隔离在 AMG 的变形迁移环节。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2603_12766/figures/001_Figure_1.jpg]]
-*Figure 1: We present Catalyst4D, a framework that propagates single-frame 3D edits to dynamic sequences. It excels at both precise local modifications and high-quality global style transfer. Catalyst4D demonstrates robust performance on both monocular (left) and multicamera (right) scenes. Please refer to the supplementary material for more intuitive visual results*
-
-
 
 Catalyst4D 的核心设计理念是**将空间编辑与时间传播解耦**：先在首帧完成高质量的 3D 高斯编辑，再通过两个协同模块——Anchor-based Motion Guidance (AMG) 和 Color Uncertainty-guided Appearance Refinement (CUAR)——将编辑结果高保真地传播至整个动态序列。这一管道避免了直接使用 2D 扩散模型扩展到 4D 时因缺乏显式几何推理而产生的运动伪影和时间闪烁。
 
@@ -193,16 +180,6 @@ $$L_{\mathrm{fore}} = (1-\eta)\|M_{t}^{v}\odot(\mathrm{render}_{t}^{v}-\mathrm{w
 
 该损失结合 L1 损失和 SSIM 损失，$\eta$ 为平衡系数。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2603_12766/figures/006_Figure_5.jpg]]
-*Figure 5: Comparison of anchor construction methods*
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2603_12766/figures/013_Figure.jpg]]
-*Figure: A3. Effect of Sinkhorn regularization on motion transfer*
-
-
-
 ## 实验与关键发现
 
 ### 1. 实验设置
@@ -230,9 +207,6 @@ Figure 4 展示了与三种基线方法的视觉对比。CTRL-D 等方法在处�
 
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2603_12766/figures/004_Figure_4.jpg]]
 *Figure 4: Qualitative comparison with Instruct 4D-to-4D, Instruct-4DGS and CTRL-D. Red boxes indicate magnified regions. While competing methods often cause unintended modifications to non-target regions, Catalyst4D demonstrates precise, localized editing*
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2603_12766/figures/014_Figure.jpg]]
-*Figure: A4. Comparative results for global style transfer. Unlike the over-smoothed results of CTRL-D and the chaotic textures from CLIP-Gaussian, our method produces finer visual textures, better preserves the original scene’s geometry, and demonstrates a color distribution more consistent with the reference style image*
 
 ### 3. 消融实验
 
@@ -276,16 +250,6 @@ Figure 5 比较了不同的锚点构建方法。Catalyst4D 采用的**自适应�
 ### 5. 补充定量证据
 
 在补充材料中，Table A1 使用 **EditScore** 和 **VE-Bench** 指标进一步验证了 Catalyst4D 的优势。Table A2 的消融实验在额外指标上确认了 AMG 和 CUAR 的独立贡献。这些结果与主实验结论一致，强化了方法设计的有效性。
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2603_12766/figures/010_Table.jpg]]
-*Table: A1. Quantitative comparison using EditScore and VE-Bench. Table A2. Ablation studies on AMG and CUAR modules*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2603_12766/figures/011_Figure.jpg]]
-*Figure: CTRL-D Ours Figure A1. Qualitative comparison of localized editing. In contrast to CTRL-D, which introduces inconsistencies in non-edited regions, our method achieves more precise and localized editing by constraining dynamic Gaussians via 3D editing gradients*
-
-
 
 ## 定位与知识库关联
 
@@ -339,8 +303,6 @@ Catalyst4D 的适用边界受以下因素制约：
 - **极端编辑的适应性**：如何使方法对具有极端拓扑结构变化的编辑更加鲁棒，例如物体的完全移除或新增，以及大范围的非刚性形变。
 - **高不确定性序列的适应**：如何适应不确定性更高的动态序列，例如快速运动、严重遮挡或光照剧烈变化的场景。在这些场景中，颜色不确定性估计和运动对应关系可能面临更大的挑战。
 - **与 3D 编辑器的协同优化**：当前方法将 3D 编辑视为黑盒外部模块，未来可探索 3D 编辑与 4D 传播的联合优化，以在编辑阶段就考虑时间传播的约束，从而提升整体一致性。
-
-
 
 ## 原文 PDF
 

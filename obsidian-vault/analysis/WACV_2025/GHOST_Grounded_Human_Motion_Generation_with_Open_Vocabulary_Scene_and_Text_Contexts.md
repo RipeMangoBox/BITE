@@ -53,8 +53,6 @@ claims:
 
 **主要结果**：在 HUMANISE 数据集上，GHOST OpenSeg 变体将目标物体距离指标相比先前最优基线降低最高约 30%（walk 子集从 1.370 m 降至 0.952 m，全动作集从 1.008 m 降至 0.732 m）。感知研究中，63.27% 的参与者偏好 GHOST 生成的样本。消融实验确认，文本与场景编码器的对齐替换对 grounding 改善贡献最为显著。
 
-
-
 ### 问题定义：文本与场景条件化的人体动作生成
 
 文本与场景条件化的人体动作生成任务要求模型根据给定的自然语言描述 $\boldsymbol{L}$ 和 3D 场景点云 $\boldsymbol{S}$，生成符合语义且与场景几何一致的人体运动序列 $\pmb \Theta = \{ t , r , \pmb \theta \} \in \mathbb { R } ^ { T \times ( 3 + 6 + J \cdot 3 ) }$，即建模条件概率 $p \left( \boldsymbol { \Theta } | \boldsymbol { L } , \boldsymbol { S } \right)$。其中 $t$ 为全局平移、$r$ 为全局朝向、$\pmb \theta$ 为身体姿态参数，$T$ 为序列长度，$J$ 为关节数。该任务的核心挑战在于实现精确的 grounding——使生成的人体动作在空间位置上与文本指定的目标物体紧密关联，而非仅生成场景中心偏向的泛化动作。
@@ -76,8 +74,6 @@ claims:
 - **强化 grounding 正则化**：在条件运动生成微调阶段，除保留中心点回归外，额外引入目标物体边界框角点回归（$L_{bbox}$）和类别分类（$L_{class}$）正则化，提升模型对物体位置、尺寸和语义的感知能力。
 
 这一设计使得融合模块无需从零学习文本-场景对齐，而是从一个已具备开放词汇语义理解能力的共享特征空间出发，显著简化了 grounding 的学习难度，从而大幅降低目标物体距离指标（最高达 30% 的降低）。
-
-
 
 ## 核心方法与创新机理
 
@@ -111,8 +107,6 @@ $$\mathcal{L}_{reg} = \lambda_{kl} \mathcal{L}_{kl} + \lambda_{action} \mathcal{
 消融实验揭示了模态对齐的决定性作用：在 walk 子集上，将 BERT 文本编码器替换为与场景编码器共享开放词汇特征空间的 OpenSeg 文本编码器，目标物体距离从 1.425 m 降至 0.952 m；将封闭词汇场景编码器替换为 OpenSeg 蒸馏的开放词汇场景编码器，距离从 1.021 m 降至 0.952 m（Table 3）。这表明**文本和场景编码器的对齐是 grounding 改善的最关键因素**，其影响远大于其他组件变更。
 
 综合来看，GHOST 的创新并非简单的模块堆砌，而是通过**预训练阶段的开放词汇知识蒸馏**和**微调阶段的增强正则化**，构建了一条从场景理解到动作定位的因果链条：开放词汇场景编码器提供了与文本对齐的丰富语义特征，边界框回归和类别分类进一步强化了模型对目标物体的位置、尺寸和语义的精确感知，最终实现了目标物体距离最高 30% 的降低（Table 1）。
-
-
 
 GHOST 的整体框架遵循条件变分自编码器（cVAE）范式，其核心目标是建模给定文本描述 $\boldsymbol{L}$ 和场景点云 $\boldsymbol{S}$ 时人体运动参数 $\boldsymbol{\Theta}$ 的条件概率 $p(\boldsymbol{\Theta} | \boldsymbol{L}, \boldsymbol{S})$。与基线模型 **HUMANISE cVAE**（Wang et al., NeurIPS 2022）相比，GHOST 在三个关键环节上进行了重构：场景编码器的词汇类型、文本-场景对齐的建立方式，以及目标物体的正则化策略。
 
@@ -158,12 +152,8 @@ $$\mathcal{L}_{reg} = \lambda_{kl} \mathcal{L}_{kl} + \lambda_{action} \mathcal{
 
 图 2 清晰地对比了两者的架构差异。HUMANISE cVAE 使用封闭词汇场景编码器，其输出特征空间与开放词汇文本编码器不匹配，迫使融合模块从有限的合成数据中从头学习文本-场景对齐；其 grounding 仅通过回归目标物体中心点进行弱正则化。GHOST 则通过开放词汇知识蒸馏在预训练阶段建立初始对齐，并在微调时以边界框回归和类别分类强化 grounding，形成了更鲁棒的文本-场景连接。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1813_GHOST_Grounded_Human_Motion_Generation_with_Open_Vocabulary_Scene_and_Te/figures/005_Figure_3.jpg]]
 *Figure 3: Schematic diagram of the pretraining and training phases of our proposed GHOST framework for text-and-scene-conditional human motion generation. (a) Pretraining involves maximizing the cosine similarity between our scene point cloud encoder and corresponding text-aligned 2D viewpoint pixel features, computed by an open vocabulary image segmentation teacher model. This ensures that our features align with text embeddings in a shared space. We use a Point Transformer U-Net scene encoder. (b) Training employs a Conditional Variational Autoencoder (cVAE) architecture for motion generation, conditioned on both text and scene encoder outputs. The pretrained scene encoder weights are fine-tuned wi...*
-
-
 
 ### 问题定义与条件概率建模
 
@@ -213,12 +203,8 @@ $$d(L,S) = \frac{1}{K} \sum_{j=1}^{K} \mathrm{ReLU} \left[ \min \left( \mathrm{S
 
 其中 $\hat{\mathcal{M}}_t^{(j)}$ 为第 $j$ 个生成样本在关键帧 $t$ 的人体网格，$\mathrm{SDF}^{+}$ 为正有符号距离函数，$\mathbf{S}_{goal,:3}$ 为目标物体点云的三维坐标。对于 walk、sit、lie 动作使用最后一帧 $t=T$，对于 stand up 动作使用第一帧 $t=1$，采样数 $K=10$。ReLU 函数确保仅惩罚人体网格外部的目标物体点（即未到达目标的情况），距离越小表示角色越接近目标物体。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1813_GHOST_Grounded_Human_Motion_Generation_with_Open_Vocabulary_Scene_and_Te/figures/004_Figure_2.jpg]]
 *Figure 2: Overview of our idea. Best viewed in color. We compare our GHOST cVAE with the HUMANISE cVAE [71] model. The major differences are in the text and 3D scene point cloud representations, grounding and regularization. (a) The HUMANISE cVAE architecture utilizes a closed vocabulary scene encoder producing a finite set of labels, resulting in a misalignment with the open vocabulary text feature space. This requires the fusion module to learn grounding from scratch. Grounding is regularized by regressing the center point of the goal object. (b) In contrast, our GHOST cVAE architecture employs a shared open vocabulary vision-language space for both modalities, establishing initial grounding betwee...*
-
-
 
 ## 实验与关键发现
 
@@ -259,13 +245,6 @@ Figure 4 展示了 GHOST 与 HUMANISE cVAE 在相同文本条件下的生成对�
 ### 公平性说明
 
 所有模型采用相同的训练超参数（Adam 优化器，学习率 $1\times10^{-4}$，batch size 24，150 epochs），评估采用统一的 Goal Object Distance 指标和相同的 $K=10$ 采样数。消融实验因计算量限制仅在 walk 子集上进行，但其结论与全数据集趋势一致，具有代表性。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1813_GHOST_Grounded_Human_Motion_Generation_with_Open_Vocabulary_Scene_and_Te/figures/001_Figure_1.jpg]]
-*Figure 1: Comparison of our proposed GHOST cVAE method with the prior state-of-theart HUMANISE cVAE [71] in text-and-scene-conditional human motion generation. Best viewed in color. (a) The HUMANISE cVAE exhibits a bias towards generating motions centered within the scene. (b) In contrast, our GHOST cVAE demonstrates superior semantic understanding and achieves higher action performance. (c) The three implementations of our GHOST framework exhibit approximately 1.5× to 3.9× larger parameter counts (indicated by dot radii) than the HUMANISE cVAE. All of our three variants outperform the baseline in two text-scene grounding metrics*
-
-
 
 ## 定位与知识库关联
 
@@ -312,8 +291,6 @@ GHOST 在文本-场景条件人体动作生成任务中处于当前最优水平�
 4. **开放词汇泛化**：当前模型依赖 ScanNet 的 9 个预定义物体类别。如何利用更大规模的视觉语言模型（如更强的开放词汇分割教师模型）实现真正开放词汇的目标物体理解，使其泛化到训练中未见过的物体类别，是提升实用性的关键。
 
 5. **真实场景迁移**：将 HUMANISE 上训练的模型迁移到真实 3D 场景（如 Matterport3D 或真实室内扫描数据），需要解决合成-真实域差异问题。域自适应或基于真实数据的弱监督微调是可能的解决方案。
-
-
 
 ## 原文 PDF
 

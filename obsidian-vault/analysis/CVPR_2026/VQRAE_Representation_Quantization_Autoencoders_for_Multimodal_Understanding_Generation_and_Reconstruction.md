@@ -54,8 +54,6 @@ VQRAE 针对这一瓶颈提出了一个简洁而高效的解法：**以预训练
 
 消融实验进一步验证了方法设计的有效性：高维 codebook 是实现 100% 利用率的关键，低维 codebook 则导致训练不收敛和码本崩塌；两阶段训练搭配自蒸馏在重建与理解的权衡上达到最优（rFID 2.71, MME-P 1439.1），而纯端到端训练虽重建略好但理解性能崩溃。当前方法的主要局限在于文本重建和高密度场景仍存在瑕疵，生成中的人脸和手指存在伪影，且尚未探索重建与生成对理解的潜在促进作用。
 
-
-
 多模态大模型正朝着统一理解与生成的方向快速演进，但**连续语义特征**与**离散视觉token**之间的根本矛盾始终是核心瓶颈。理解任务依赖高维连续语义表示来捕捉细粒度语义，而生成任务则要求将图像压缩为离散token序列以适配自回归范式。现有的统一方案主要分为两条技术路线，均存在结构性缺陷。
 
 **双编码器范式**（如 **Janus** (Wu et al., 2024)、**TokenFlow** (Xie et al., ICCV 2025)）分别为理解和生成设计独立的编码器。理解编码器提取连续语义特征，生成编码器（通常基于CNN）输出离散视觉token。这种设计的代价是双重的：模型参数量和计算开销显著增加，且两套表示之间缺乏显式交互机制，难以实现真正的表示共享。实际上，如 Figure 4 的K-means聚类可视化所示，连续语义特征与离散token在语义聚类上呈现高度一致性，暗示双编码器存在冗余。
@@ -67,8 +65,6 @@ VQRAE 针对这一瓶颈提出了一个简洁而高效的解法：**以预训练
 此外，即使成功构建了统一tokenizer，**理解与重建的权衡**依然棘手。端到端联合训练虽能提升重建细节，却会破坏编码器的语义表示能力（Table 6, Figure 6）；冻结编码器虽能保持语义，却限制了重建质量的进一步提升。如何在单一架构内实现两者的有效平衡，是统一tokenizer走向实用的关键。
 
 正是基于上述缺口，VQRAE提出了一个核心洞察：**利用预训练VFMs作为统一编码器，直接对高维语义特征进行向量量化，并通过自蒸馏约束在微调编码器的同时保持语义特征**，从而在单一tokenizer内同时输出连续语义特征（用于理解）和离散视觉token（用于生成与重建），实现理解、生成与重建在统一架构下的有效权衡。
-
-
 
 ## 核心方法与创新机理
 
@@ -98,8 +94,6 @@ VQRAE 反其道而行，将 codebook 维度提升至与 VFMs 特征一致的 **1
 ### 对称 ViT 解码器
 
 与 VQGAN 等方法的 CNN 像素解码器不同，VQRAE 采用与编码器结构对称的 **ViT 解码器**。这一设计使得编码器-解码器之间形成结构一致性，有利于高维语义特征到像素空间的映射，同时避免了 CNN 解码器引入的归纳偏置与 ViT 编码器特征之间的不匹配。
-
-
 
 VQRAE 的总体设计围绕一个核心矛盾展开：**连续语义特征与离散视觉 token 之间的根本张力**。在统一多模态理解、生成与重建的单一架构中，理解任务需要高保真的连续语义表示，而生成与重建任务则依赖于可被自回归模型消费的离散 token。现有双编码器范式（如 **Janus** (Wu et al., 2024)、**TokenFlow** (Xie et al., ICCV 2025)）通过独立的语义编码器和像素编码器分别处理这两类需求，但这增加了模型复杂度、阻碍了表示间的交互，且难以在不牺牲性能的前提下平衡像素级重建与语义理解。
 
@@ -152,13 +146,6 @@ Figure 1 清晰展示了 VQRAE 与现有统一 tokenizer 的架构差异：
 
 ![[assets/figures/papers/paper_list_l2274_https_arxiv_org_abs_2511_23386/figures/001_Figure_1.jpg]]
 *Figure 1: Comparions of different unified tokenizers. (a) Janus [7, 76] series adopt dual-encoder paradigm. (b) QLIP [95] and Uni-Tok [41] supervise dicrete tokens with CLIP loss. (c) Our VQRAE can produce continuous and discrete tokens for different tasks*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2274_https_arxiv_org_abs_2511_23386/figures/004_Figure_3.jpg]]
-*Figure 3: Illustration of our unified tokenizer VQRAE. (a) Our VQRAE is built on pretrained VFMs (e.g., SigLIP2 [65]), which can simultaneously produce continous semantic features for multimodal understanding tasks and discrete tokens for visual generation and reconstruction tasks. (b) Training pipeline of VQRAE. We adopt a two-stage training paradigm. In the first stage, the pretrained semantic encoder remains frozen, while a high-dimensional vector quantization codebook and a pixel decoder are trained using an image reconstruction loss. In the second stage, the encoder, codebook, and decoder are jointly optimized to achieve fine-grained reconstruction. Additionally, the encoder outputs are regulari...*
-
-
 
 VQRAE 的核心设计在于用一个统一的 ViT 编码器替代传统的双编码器范式，并引入高维语义向量量化与对称 ViT 解码器，配合两阶段自蒸馏训练策略，实现连续语义特征与离散视觉 token 的单一模型输出。
 
@@ -213,8 +200,6 @@ $$\mathcal{L}_{\mathrm{stage2}} = \mathcal{L}_{\mathrm{rec}} + \mathcal{L}_{\mat
 
 其中 $\lambda_d$ 为蒸馏权重。消融实验（Table 6, Figure 6）表明，两阶段训练搭配自蒸馏在重建与理解的权衡上达到最优（rFID 2.71, MME-P 1439.1），纯端到端训练虽重建略好，但理解性能崩溃——这验证了自蒸馏约束是平衡语义保持与细节重建的关键因果机制。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设计思路
@@ -229,9 +214,6 @@ VQRAE 的实验验证围绕一个中心命题展开：**统一编码器能否在
 
 ![[assets/figures/papers/paper_list_l2274_https_arxiv_org_abs_2511_23386/figures/007_Table_3.jpg]]
 *Table 3: Evaluation on multimodal understanding benchmarks. We collect evaluations including: POPE [32]; GQA [25]; TQA: TextVQA [54]; MMB: MMBench-En [38]; MME-P: MME-Perception [18]; SEED: SEEDBench-Img [29]; MMMU [91]; AI2D [27]. † denotes training on LLaVA-v1.5 [37] setting. “Res.” is an abbreviation of resolution. Our pretrained VQRAE can be directly comparable with SOTA open-sourced MLLMs without specific fine-tuning as detailed in Sec. 3.4*
-
-![[assets/figures/papers/paper_list_l2274_https_arxiv_org_abs_2511_23386/figures/009_Table_4.jpg]]
-*Table 4: Comparisons of visual generation quality on GenEval [20] and DPG-Bench [22]. Obj.: Object. Attri.: Attribute*
 
 ![[assets/figures/papers/paper_list_l2274_https_arxiv_org_abs_2511_23386/figures/010_Table_5.jpg]]
 *Table 5: Ablation on the hyperparameters of the VQ codebook*
@@ -261,12 +243,6 @@ Table 2 报告了 ImageNet 256×256 50k 验证集上的重建质量对比。VQRA
 - **VQRAE (InternViT)**：rFID 1.39, PSNR 22.18, SSIM 0.759，下采样比 16×
 
 相比经典像素级 tokenizer **VQGAN**（Esser et al., CVPR 2021）的 PSNR 20.00，VQRAE 提升了 2.23 dB。这一提升的因果机制在于：**高维语义 codebook（1536 维，与 VFMs 特征维度对齐）保留了比低维像素 codebook 更丰富的结构信息**。Figure 5 和 Figure 7 的可视化结果进一步证实，VQRAE 重建图像在纹理细节和语义保真度上均优于基线。
-
-![[assets/figures/papers/paper_list_l2274_https_arxiv_org_abs_2511_23386/figures/008_Figure_5.jpg]]
-*Figure 5: Visualization of reconstruction results from VQRAE-InternViT version. Left: input image; Right: output image*
-
-![[assets/figures/papers/paper_list_l2274_https_arxiv_org_abs_2511_23386/figures/015_Figure_7.jpg]]
-*Figure 7: Additional visualization of reconstruction results from VQRAE-InternViT. Left: input image; Right: output image*
 
 值得注意的是，VQRAE 在 16× 下采样比下仍能维持高质量重建，而传统 VQGAN 通常需要更小的下采样比。这归因于 ViT 解码器的全局感受野——对称的 ViT 解码器能够更有效地利用离散 token 中的全局语义信息进行像素重建。
 
@@ -304,9 +280,6 @@ Table 5 系统探索了 VQ codebook 的维度和大小对重建质量的影响�
 
 #### 两阶段训练与自蒸馏（Table 6, Figure 6）
 
-![[assets/figures/papers/paper_list_l2274_https_arxiv_org_abs_2511_23386/figures/011_Figure_6.jpg]]
-*Figure 6: Visualization results on ablation study of training strategies. As indicated in Tab. 6, the second training stage adds more fine-grained details on reconstruction and retains semantics, while end-to-end training without distillation constraints fails to achieve a trade-off between them*
-
 Table 6 和 Figure 6 构成了全文最具因果解释力的消融。三种训练策略的对比：
 
 | 训练策略 | rFID↓ | MME-P↑ | MMB↑ |
@@ -326,9 +299,6 @@ Figure 6 的可视化直接展示了这一权衡：第二阶段训练增加了�
 ### 失败模式与局限性
 
 Figure 9 和 Figure 10 分别展示了重建和生成的失败案例：
-
-![[assets/figures/papers/paper_list_l2274_https_arxiv_org_abs_2511_23386/figures/017_Figure_9.jpg]]
-*Figure 9: Failure reconstruction cases from VQRAE-InternViT. Left: input image; Right: output image*
 
 - **文本重建缺陷**（Figure 9）：在包含密集文字的图像中，VQRAE 重建的文字出现模糊、变形或缺失。这源于离散 token 的有限表达能力——文字需要极高的空间精度，而 16× 下采样不可避免地丢失了部分字符级信息。
 - **生成伪影**（Figure 10）：生成图像中的人脸和手指区域存在明显的结构扭曲和纹理伪影。论文指出这可以通过更大规模的训练数据和强化学习（如 [11, 19, 67] 中的探索）来缓解，但当前版本尚未解决。
@@ -357,8 +327,6 @@ VQRAE 的实验体系完整验证了三个核心主张：
 - 论文声称 VQRAE“无需多模态对齐或指令微调”即可用于理解任务，但 Table 3 中 VQRAE+ 仍标注了 LLaVA-v1.5 训练设置（† 标记），具体训练细节需对照原文确认
 - 重建对理解的促进作用（如利用重建信号增强视觉 grounding）尚未验证，属于开放问题
 - 高维 codebook 的特性是否可推广至视频、音频等时序模态，论文未给出实验证据
-
-
 
 ## 定位与知识库关联
 
@@ -420,8 +388,6 @@ VQRAE 为统一多模态模型开辟了若干值得深入探索的方向：
 - **规模扩展**：如何高效扩展统一模型至更大规模？VQRAE 目前验证了 0.6B 参数规模的生成能力，更大规模下的行为尚待探索。
 - **跨模态推广**：高维语义VQ codebook的设计原则是否适用于音频、视频等其他模态？这需要验证其在不同特征空间下的有效性。
 - **与推理能力的结合**：论文指出离散tokenizer的量化损失是重建质量的天花板，未来工作可探索如何将 VQRAE 的语义token与更强大的解码器结合，或引入强化学习来弥补生成伪影。
-
-
 
 ## 原文 PDF
 

@@ -143,8 +143,6 @@ CPM 与 RSA 的协同关系可概括为：RSA 控制**注意力流向**（图像
 
 由于条件图像分支完全基于 LoRA 模块构建，Stand-In 天然兼容其他基于 DiT 架构的模型和工具。这一设计使其可以作为“身份控制插件”无缝集成到各类下游应用中，如视频人脸交换、风格化 LoRA 叠加、姿态引导视频生成等，无需对宿主模型进行额外修改。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l936_https_arxiv_org_abs_2508_07901/figures/003_Figure_3.jpg]]
 *Figure 3: The overview of our identity-preserving text-to-video generation framework. We introduce a conditional image branch alongside the original video branch. Given the conditional image, the VAE encoder maps it into tokens, which are concatenated with the video latent tokens and then sent to the DiT. Within the DiT blocks, identity information is incorporated into the video features through restricted self-attention*
 
@@ -242,26 +240,12 @@ Stand‑In的轻量级设计在推理效率上具有显著优势。通过KV缓�
 ![[assets/figures/papers/paper_list_l936_https_arxiv_org_abs_2508_07901/figures/015_Figure_11.jpg]]
 *Figure 11: Comparison on pose-guided video generation against VACE*
 
-![[assets/figures/papers/paper_list_l936_https_arxiv_org_abs_2508_07901/figures/016_Figure_12.jpg]]
-*Figure 12: Application of our model in video face swapping*
-
-![[assets/figures/papers/paper_list_l936_https_arxiv_org_abs_2508_07901/figures/017_Figure_13.jpg]]
-*Figure 13: Our model applied with stylization LoRA*
-
 ### 公平性说明
 
 论文提及训练数据集涵盖不同种族、年龄和性别，但未进行专门的公平性或偏见定量评估。因此，模型在不同人口统计子群上的性能一致性仍有待独立验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l936_https_arxiv_org_abs_2508_07901/figures/018_Table_3.jpg]]
 *Table 3: Ablation study on the core components of our method. Replacing Restricted Self-Attention (RSA) with Vanilla Self-Attention (VSA) or Conditional Position Mapping (CPM) with Shared Position Mapping (SPM) degrades both Face Similarity and Naturalness*
-
-![[assets/figures/papers/paper_list_l936_https_arxiv_org_abs_2508_07901/figures/002_Figure_2.jpg]]
-*Figure 2: Comparison with SOTA identity-preserving video generation methods. The size of bubbles represents the number of need-to-train parameters for identity preservation. Our approach achieves the highest performance in both face similarity and naturalness, while utilizing the fewest parameters*
-
-![[assets/figures/papers/paper_list_l936_https_arxiv_org_abs_2508_07901/figures/001_Figure_1.jpg]]
-*Figure 1: Given a reference image, our method generates videos with strong identity preservation. Furthermore, the framework’s plug-andplay design enables seamless integration into diverse applications for enhanced identity consistency*
 
 ## 定位与知识库关联
 

@@ -152,8 +152,6 @@ $$W' = \frac{1000}{f_x} \cdot W, \quad H' = \frac{1000}{f_x} \cdot H$$
 
 **数据构建与训练流程**：接地训练数据通过**Florence-2**自动生成候选2D框与类别标签，经对齐验证与类别名改写后形成高质量接地样本。训练分两阶段进行——第一阶段冻结视觉编码器，训练其余模块以注入空间感知能力；第二阶段仅微调LLM，使其掌握面向检测的思维链推理与文本生成结构。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2392_https_openaccess_thecvf_com_content_CVPR2026_html_Cheng_Grounded_3D_Awar/figures/003_Figure_2.jpg]]
 *Figure 2: Method overview. GR3D builds on Region-VLMs by adding streaming region insertion for visual Chain-of-Thought reasoning. During CoT, the model repeatedly predicts a region, extracts its visual embedding, and reinserts a region token into the text sequence, enabling step-by-step spatial reasoning with dynamically refreshed visual cues*
 
@@ -239,8 +237,6 @@ Figure 5的点图预测数据量缩放实验进一步表明，增加稠密几何
 3. **单帧假设的固有限制**：当前方法仅基于单帧图像，未探讨多视图、视频输入或动态场景下的3D接地性能。在具身智能等需要持续空间感知的场景中，单帧推理的时序不一致性可能成为瓶颈。
 
 4. **计算开销与实时性**：流式区域插入在生成过程中需反复编码区域视觉特征，增加了推理延迟。论文未报告端到端推理时间，对于需要实时响应的应用（如机器人操控），这一开销需要进一步评估。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2392_https_openaccess_thecvf_com_content_CVPR2026_html_Cheng_Grounded_3D_Awar/figures/004_Table_1.jpg]]
 *Table 1: Comparison on the Omni3D [32] benchmark between GR3D, vision specialists, and recent VLMs. We report*

@@ -51,8 +51,6 @@ claims:
 
 在5个VLM、13个评测基准上，VLM-Pruner以88.9%的剪枝率一致优于所有强基线：在LLaVA-1.5-7B上平均相对上界保留率达95.61%（较DivPrune提升+1.93%），在Qwen2-VL-7B上达92.58%（+3.65%），在LLaVA-Video-7B上达90.55%（+5.48%），同时实现端到端推理加速。消融实验证实，移除BSS中的归一化距离项导致平均性能下降1.11%，验证了空间邻近性先验在平衡冗余与细节完整性中的关键作用。
 
-
-
 视觉语言模型（VLM）将视觉编码器与大型语言模型（LLM）级联，在图像/视频理解任务上取得了显著进展。然而，视觉编码器产生的视觉token数量通常远超文本token——例如LLaVA-1.5对每张图像提取576个视觉token——导致LLM解码器的自注意力计算开销随token数量平方增长，严重制约了推理效率。
 
 **核心瓶颈**：现有训练无关（training-free）的token剪枝方法可归为两类，但均存在结构性缺陷。**重要性驱动方法**（如**FastV**, ECCV 2024; **SparseVLM**, ICML 2025; **PDrop**, CVPR 2025）依据注意力分数等重要性指标保留token，倾向选择特征相似的冗余token，造成信息重复。**冗余去除方法**（如**DART**, EMNLP 2025; **DivPrune**, CVPR 2025）通过最大化token间多样性来避免冗余，但生成的保留token分布过于分散，丢失了物体内部的精细细节。两类方法都无法同时兼顾**多样性**与**局部细节完整性**：前者冗余过多，后者细节缺失。
@@ -60,8 +58,6 @@ claims:
 **因果机制**：这一困境的根源在于，现有方法在选择token时缺乏**空间邻近性先验**。重要性方法忽略空间分布，冗余去除方法则过度追求全局分散，均未利用“物体细节集中在局部邻域”这一视觉信号的基本结构属性。
 
 **本文动机**：基于上述分析，本文提出VLM-Pruner，一种训练无关的**离心式token剪枝范式**。其核心思想是：在贪婪去冗余选择中引入空间邻近性先验，使算法优先密实局部邻域细节，再逐步向外扩张，从而在避免冗余的同时保持物体细节完整性。该方法通过**BSS（Buffered Spatial Sparsity）准则**调节候选token与已选集合的最小空间距离来调制特征相似度，实现由近及远的离心式增长，显式平衡冗余去除与空间稀疏性。
-
-
 
 ## 核心方法与创新机理
 
@@ -110,8 +106,6 @@ VLM-Pruner将离心式剪枝范式落实为三个互补阶段，每个阶段对�
 
 定性可视化（Figure 2, Figure 5）进一步印证了机制差异：VLM-Pruner选择的token分布更集中，边缘token数量更少，且能保留更多精细细节；而DART和DivPrune的token分布明显更分散，在物体边界处容易丢失关键信息。
 
-
-
 VLM-Pruner 提出一种**训练无关的离心式Token剪枝范式**，在LLM解码器的单层内完成视觉token的选择与压缩。其核心设计理念是：在贪婪去冗余选择中引入空间邻近性先验，使算法优先密实局部邻域细节再向外扩张，从而同时避免token冗余并保持物体细节完整性。
 
 ### 三阶段流水线
@@ -149,8 +143,6 @@ VLM-Pruner 提出一种**训练无关的离心式Token剪枝范式**，在LLM解
 ### 离心式选择的核心机制
 
 BSS准则通过调节候选token与已选集合的最小空间距离来调制特征相似度：距离越远的候选token，其相似度被放大越多，从而降低被选中的概率。这一机制使选择过程天然遵循由近及远的顺序——优先填充已选token的邻域，再逐步向外扩张，最终形成**密实局部、稀疏外围**的token分布格局。Figure 3直观展示了这一过程：候选token C2因空间上更接近已选集合而被优先选择，而非距离更远但特征相似度相当的C1。
-
-
 
 ### 3.1 空间坐标与特征预处理
 
@@ -212,8 +204,6 @@ $$\mathbf{H}_j = \beta \mathbf{H}_j + (1-\beta) \mathbf{E}_j, \quad \mathbf{E}_j
 
 整个流程的计算开销可控：通道筛选与相似度构建分别为 $O(Nd)$ 和 $O(N^2q)$，空间距离计算为一次性 $O(N^2)$。在 88.9% 剪枝率下，VLM-Pruner 实现了端到端推理加速（Table 5），同时保持了与上界接近的性能。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -259,22 +249,8 @@ VLM-Pruner 的三阶段设计各自贡献显著（Table 6 / Section 4.5）。移
 
 **方法局限性**：首先，VLM-Pruner 无法在第 0 层剪枝，限制了下游微调场景的灵活性。其次，SWA 聚合引入额外计算开销，在极低 token 数量下可能抵消部分加速收益。此外，方法依赖空间坐标结构，对于非网格布局的 token（如稀疏注意力）需要重新设计距离度量。超参数（κ, q, τ(0), β, B）基于经验设定，虽表现稳健但缺乏自适应性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2244_https_arxiv_org_abs_2512_02700/figures/002_Figure_2.jpg]]
 *Figure 2: Comparisons of the actual pruning effects between baselines and VLM-Pruner. Visual question answering cases with correct (green) and incorrect (red) responses; numbers (from 1 to 64) denote selection order*
-
-![[assets/figures/papers/paper_list_l2244_https_arxiv_org_abs_2512_02700/figures/004_Table_1.jpg]]
-*Table 1: Comparative experiments on image understanding are performed on LLaVA-1.5-7B*
-
-![[assets/figures/papers/paper_list_l2244_https_arxiv_org_abs_2512_02700/figures/005_Table_2.jpg]]
-*Table 2: Comparative experiments on image understanding are performed on LLaVA-1.5-13B and LLaVA-Next-7B*
-
-![[assets/figures/papers/paper_list_l2244_https_arxiv_org_abs_2512_02700/figures/006_Table_3.jpg]]
-*Table 3: Comparative experiments on image understanding are performed on Qwen2-VL-7B-Instruct*
-
-![[assets/figures/papers/paper_list_l2244_https_arxiv_org_abs_2512_02700/figures/008_Table_5.jpg]]
-*Table 5: Inference costs of the number of tokens, Total-Time, Speedup, and FLOPs*
 
 ![[assets/figures/papers/paper_list_l2244_https_arxiv_org_abs_2512_02700/figures/010_Figure_4.jpg]]
 *Figure 4: Ablation studies on hyperparameters on LLaVA-1.5- 7B. (a) Number of pivots κ, (b) Top-q highest variance channels*
@@ -282,16 +258,8 @@ VLM-Pruner 的三阶段设计各自贡献显著（Table 6 / Section 4.5）。移
 ![[assets/figures/papers/paper_list_l2244_https_arxiv_org_abs_2512_02700/figures/011_Figure_5.jpg]]
 *Figure 5: More visualizations of the actual pruning effects between baselines and VLM-Pruner. From left to right are VLM-Pruner, DivPrune, and DART. (a) The average number of edge tokens in VLM-Pruner is lower. (b) The token distribution in the VLM-Pruner model is more concentrated*
 
-![[assets/figures/papers/paper_list_l2244_https_arxiv_org_abs_2512_02700/figures/012_Table_7.jpg]]
-*Table 7: Comparative experiments on image understanding are performed on Qwen3-VL-4B-Instruct*
-
 ![[assets/figures/papers/paper_list_l2244_https_arxiv_org_abs_2512_02700/figures/013_Table_8.jpg]]
 *Table 8: Ablation study on the number of pivots κ*
-
-![[assets/figures/papers/paper_list_l2244_https_arxiv_org_abs_2512_02700/figures/014_Table_10.jpg]]
-*Table 10: Ablation study on the threshold*
-
-
 
 ## 定位与知识库关联
 
@@ -347,8 +315,6 @@ VLM‑Pruner 的适用性受到以下结构性约束：
 - **更大规模 VLM 上的验证**：现有实验覆盖了 7B 和 13B 规模的 VLM。在更大规模的模型（如 34B 以上）上，VLM‑Pruner 是否仍能保持高效的端到端加速比，以及超参数是否需要重新调优，目前尚无实验数据支撑。
 
 - **与训练方法的互补性**：VLM‑Pruner 是训练无关方法，与需要微调的剪枝方法（如结构化剪枝）在技术路线上互补。两者是否可以结合——例如用 VLM‑Pruner 的离心式选择策略指导结构化剪枝的 mask 学习——是一个开放的研究方向。
-
-
 
 ## 原文 PDF
 

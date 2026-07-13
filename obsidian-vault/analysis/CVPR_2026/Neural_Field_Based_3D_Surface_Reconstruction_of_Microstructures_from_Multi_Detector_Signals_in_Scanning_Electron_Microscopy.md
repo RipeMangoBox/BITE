@@ -150,8 +150,6 @@ NFH-SEM 构建了一条 **多视图初始化 → 神经场联合优化 → 高�
 
 与“多视图重建 + 单视图光度立体后处理”的传统范式相比，NFH-SEM 将几何与法向线索在神经场内部统一优化，避免了误差累积；与 NeuS、2DGS 等通用学习型重建方法相比，其嵌入的 SEM 物理前向模型赋予了框架对电子散射过程的归纳偏置，从而在无纹理微观表面上显著抑制畸变与缺失几何。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2088_https_arxiv_org_abs_2508_04728/figures/008_Figure.jpg]]
 *Figure: A1. Overview of the SEM imaging setup for multi-view and multi-detector scanning. External photograph of the SEM system used in our experiments and internal chamber views with the motorized specimen stage in flat and tilted positions*
 
@@ -209,11 +207,6 @@ $$\mathcal{L} = \begin{cases} \lambda_1 \mathcal{L}_d + \lambda_2 \mathcal{R}_s 
 
 其中 $\mathcal{R}_{\Phi}$ 为探测器参数的轻量正则项。这一渐进式融合策略使神经场在粗几何先验的基础上，逐步吸收BSE信号的高频法向信息，同时避免阴影区域的梯度污染。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2088_https_arxiv_org_abs_2508_04728/figures/003_Figure_3.jpg]]
-*Figure 3: Emission of the BSE signal from the sample surface and its detection by the 4Q-BSE detector*
-
 ## 实验与关键发现
 
 ### 模拟数据集定量评估
@@ -267,24 +260,14 @@ NFH-SEM通过嵌入可学习BSE前向模型$\mathcal{F}_i(n) = R(\theta_n)[d_i\c
 3. **极端遮挡**：当所有BSE象限均被遮挡时，该区域完全丧失几何信息，无法恢复表面。
 4. **真实真值缺失**：对于花粉、SiC等非TPL样品，缺乏微纳尺度真值，仅能通过定性视觉和语义验证（如已知打印层厚）评估精度。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2088_https_arxiv_org_abs_2508_04728/figures/005_Figure_5.jpg]]
 *Figure 5: Qualitative comparison with learning-based 3D reconstruction methods on real-world dataset. NFH-SEM achieves more accurate reconstructions than approaches that neglect the SEM signal generation model or lack generalization to SEM domains*
-
-![[assets/figures/papers/paper_list_l2088_https_arxiv_org_abs_2508_04728/figures/010_Figure.jpg]]
-*Figure: G3. Evaluation of learning-based MVS methods and robustness of NFH-SEM to different initializations. (a, c) Surface reconstructions of GeoMVSNet and MVSFormer++. (b, d) NFH-SEM reconstructions initialized with (a) and (c), respectively*
-
-![[assets/figures/papers/paper_list_l2088_https_arxiv_org_abs_2508_04728/figures/017_Figure.jpg]]
-*Figure: G7. Simulated BSE images acquired using a three-quadrant BSE detector*
 
 ![[assets/figures/papers/paper_list_l2088_https_arxiv_org_abs_2508_04728/figures/009_Figure.jpg]]
 *Figure: E2. Comparison between real and simulated 4Q-BSE images. The simulated quadrant responses closely match the real detector signals, validating both the accuracy of our learned BSE forward model and the correctness of the BSE signal formulation used in our simulation pipeline*
 
 ![[assets/figures/papers/paper_list_l2088_https_arxiv_org_abs_2508_04728/figures/012_Figure.jpg]]
 *Figure: G5. Comparison of BSE gradient extraction strategies for TPL microstructure reconstruction*
-
-![[assets/figures/papers/paper_list_l2088_https_arxiv_org_abs_2508_04728/figures/013_Figure.jpg]]
 
 ## 定位与知识库关联
 

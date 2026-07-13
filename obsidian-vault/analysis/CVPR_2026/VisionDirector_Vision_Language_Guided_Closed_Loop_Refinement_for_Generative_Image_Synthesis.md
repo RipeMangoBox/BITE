@@ -57,8 +57,6 @@ claims:
 
 在方法谱系上，VisionDirector 属于**多模态智能体与扩散模型协同**的新范式，区别于直接修改生成模型架构或依赖固定规则编辑流程的传统方案。其规划器采用 Qwen3-VL-8B，编辑器使用 Qwen-Image 与 Qwen-Image-Edit，验证器基于 Qwen3-VL-32B-Instruct，整体框架以模块化闭环方式运行，可灵活适配不同的底层生成模型。
 
-
-
 ### 长指令图像生成的核心瓶颈
 
 文本到图像（T2I）与图像到图像（I2I）的扩散模型近年来取得了显著进展，但在面对包含多个紧密耦合目标的复杂长指令时，仍暴露出系统性缺陷。现有模型通常采用一次性生成策略，将整个长提示直接编码为条件信号，缺乏对多目标进行分解、逐步执行和闭环修正的能力。这导致两个关键问题：
@@ -88,8 +86,6 @@ claims:
 
 通过这些设计，VisionDirector 旨在在不改动底层扩散模型的前提下，显著提升多约束长指令场景下的目标完成率与生成质量，弥合开源模型与闭源商业系统之间的指令遵循性差距。
 
-
-
 ## 核心方法与创新机理
 
 VisionDirector 的核心创新在于将多目标图像生成与编辑任务重新建模为一个**由视觉语言模型（VLM）驱动的闭环决策过程**，而非传统的一次性生成或固定规则编辑。其关键创新点体现在以下三个维度：
@@ -117,8 +113,6 @@ VisionDirector 将编辑策略的学习形式化为强化学习问题，采用 *
 VisionDirector 的核心架构是**训练无关（training-free）**的：规划器和验证器均为现成的 VLM，编辑器为预训练的扩散模型，整个闭环无需对扩散模型本身进行任何修改或微调。这一设计使其能够灵活适配不同的基础模型（如 Flux-Krea、Flux-Dev、Qwen-Image），在 GenEval 基准上达到 0.94 的总体分数，超越所有对比模型（如 Qwen-Image 的 0.87），在 Counting、Position、Attribute 等子项上均取得领先（Table 4）。
 
 > **注意**：上述 GenEval 对比模型（如 SD3 Medium、Seedream 3.0）的具体版本与发表信息未在分析数据中提供，需手动核实。
-
-
 
 VisionDirector 构建了一个**模块化的闭环控制系统**，将复杂的多目标图像生成与编辑任务建模为多步决策过程。该框架由三个核心模块协同工作，在不修改底层扩散模型的前提下，显著提升指令遵循性和目标完成度。
 
@@ -160,12 +154,8 @@ $$
 
 整个框架的输入为**长文本指令**（含 15–23 个子目标），输出为**满足所有子目标的图像**。数据在各模块间的流转关系如下：规划器将长指令转化为短指令序列 → 执行器按序生成/编辑图像 → 验证器对中间结果打分 → 验证结果反馈至规划器，触发继续编辑或回滚决策。这一闭环设计使得 VisionDirector 能够像一位“导演”一样，持续监督和修正生成过程，直至达到满意的视觉效果。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2357_https_arxiv_org_abs_2512_19243/figures/001_Figure_1.jpg]]
 *Figure 1: VisionDirector is a framework that utilizes the VLM Planner to decompose tasks into multiple goals, perform planning and judgment, and progressively optimize both image-editing and image-generation tasks. It achieves performance comparable to, and in some cases even surpassing, closed-source commercial models*
-
-
 
 ### 3.1 闭环导演框架
 
@@ -218,13 +208,6 @@ $$
 
 GRPO 的核心效果体现在两方面：将平均编辑轮次从 4.2 降至 3.1（约 26% 减少），同时将目标覆盖率从 0.74 提升至 0.78。这表明强化学习不仅缩短了推理开销，还通过优化决策时机（何时继续编辑、何时验证、何时停止）提升了任务完成质量。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2357_https_arxiv_org_abs_2512_19243/figures/008_Figure_4.jpg]]
-*Figure 4: Workflow of VisionDirector. The planner interprets long instructions, decides between one-shot or staged execution, performs micro-grid sampling, verifies progress, and rolls back if needed*
-
-
-
 ## 实验与关键发现
 
 ### 主结果：长指令遵循能力的系统性提升
@@ -261,27 +244,8 @@ GRPO强化学习后训练的效果体现在两个维度（Table 6）。在效率
 
 Figure 6揭示了VisionDirector的规划器在不同任务复杂度下表现出的自适应行为。当指令中的子目标数量超过15个时，系统的迭代步数从1-3步跃升至5-7步，同时“一次性生成”的偏好从超过85%急剧下降至不足10%。这种阶段性切换是系统智能性的关键体现：对于简单指令，系统倾向于一次性生成以避免不必要的编辑开销；而对于复杂的长指令，系统自动切换到分阶段编辑模式，通过逐步验证和修正来保证最终质量。这一行为模式并非人工设计的规则，而是VLM规划器基于指令语义自主决策的结果，验证了将VLM作为“导演”进行高层规划的技术路线的有效性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2357_https_arxiv_org_abs_2512_19243/figures/010_Figure_6.jpg]]
-*Figure 6: Adaptive decision-making in VisionDirector. The VLM exhibits distinct behavioral phases based on task complexity. (a) Iteration steps increase from 1-3 to 5-7 after exceeding 15 goals. (b) One-shot execution preference (>85%) transitions to staged execution (\<10%) beyond the critical threshold, demonstrating the system’s adaptive control strategy*
-
 ![[assets/figures/papers/paper_list_l2357_https_arxiv_org_abs_2512_19243/figures/009_Figure_5.jpg]]
 *Figure 5: I2I result comparison with other models*
-
-![[assets/figures/papers/paper_list_l2357_https_arxiv_org_abs_2512_19243/figures/003_Table_1.jpg]]
-*Table 1: Statistics result of the LGBench*
-
-![[assets/figures/papers/paper_list_l2357_https_arxiv_org_abs_2512_19243/figures/002_Figure_2.jpg]]
-*Figure 2: Distribution of goal types in LGBench for both T2I and I2I subsets. The benchmark balances additive, stylistic, and semantic directives, reflecting the multi-constraint nature of real design tasks*
-
-![[assets/figures/papers/paper_list_l2357_https_arxiv_org_abs_2512_19243/figures/004_Figure_3.jpg]]
-*Figure 3: Construction pipelines for LongGoalBench*
-
-![[assets/figures/papers/paper_list_l2357_https_arxiv_org_abs_2512_19243/figures/006_Table_3.jpg]]
-*Table 3: Comparison between LGBench and other T2I/I2I benchmarks*
-
-
 
 ## 定位与知识库关联
 
@@ -350,8 +314,6 @@ VisionDirector 在以下条件下表现最优：
 4. **验证器对齐**：验证器与人类偏好数据的对齐方法，是否需要构建更大规模的人工标注数据集？或者能否通过弱监督、偏好学习等方法降低对齐成本？
 
 5. **规模化部署**：GRPO 训练的计算开销限制了大规模应用。是否存在更高效的策略优化方法（如离线 RL、基于模型的规划），能在保持性能的同时降低训练成本？
-
-
 
 ## 原文 PDF
 

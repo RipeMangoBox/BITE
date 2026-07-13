@@ -68,15 +68,11 @@ claims:
 
 与现有基于完整代理模拟的评测范式相比，b³基准在三个维度上实现了差异化定位：**评估方法论**上，从模拟完整代理执行流转为威胁快照的单步隔离评估；**攻击生成方式**上，从固定模板攻击升级为基于众包的、针对上下文的对抗性攻击；**分析粒度**上，支持按攻击类型、防御等级、任务类型等维度进行细粒度排名。这一设计使b³成为首个系统化度量骨干LLM安全漏洞的基准，其威胁快照框架也可作为未来代理安全研究的基础抽象。
 
-
-
 AI代理（AI Agent）正迅速成为大语言模型（LLM）的核心应用范式。在这些系统中，LLM作为“骨干”负责理解环境、规划行动并生成响应，其安全性直接决定了整个代理系统的可信程度。然而，当前社区对骨干LLM选择如何影响AI代理安全性仍缺乏系统性理解：现有安全评测基准要么覆盖的漏洞类型不全，要么需要模拟完整的代理执行流程，导致无法将LLM自身的安全缺陷与代理框架的其他组件解耦，难以形成可比较、可复现的LLM级安全度量。
 
 这一瓶颈的根源在于两个层面。在概念层面，代理系统的安全风险分布在LLM调用、工具交互、多步推理等多个环节，缺乏一个统一的抽象来精确定义“LLM在代理中的脆弱性实例”。在工程层面，基于完整代理模拟的评测方案——如**Agent Security Bench (ASB)**（Zhang et al., 2025）、**AgentDojo**（Debenedetti et al., 2024）、**InjecAgent**（Zhan et al., 2024）和**AgentHarm**（Andriushchenko et al., 2025）——虽然能反映端到端的安全表现，但其结果混杂了代理框架的防御机制与任务设计的影响，难以直接归因于骨干LLM的安全属性。此外，这些基准多依赖固定模板的攻击，缺乏针对具体代理上下文的对抗性攻击，削弱了评估的真实性和区分度。
 
 本文的核心动机正是填补这一空白：构建一个聚焦于LLM调用时刻的、可系统化评测骨干LLM安全性的框架。为此，作者提出**威胁快照（Threat Snapshots）**框架，将安全评估从完整的代理执行流中抽离出来，仅关注LLM被调用时的孤立状态——包括其上下文、注入的攻击以及评分标准。这一设计使得每个威胁快照完整描述了一个LLM脆弱性实例，从而建立起直接度量LLM漏洞的基准，而无需模拟整个代理。在此基础上，通过系统化的攻击分类和基于众包的对抗性攻击收集，b³基准实现了对34个主流LLM的细粒度安全排名，并揭示了推理能力、模型规模、闭源与开源等因素对安全性的因果影响。
-
-
 
 ## 核心方法与创新机理
 
@@ -101,8 +97,6 @@ AI代理（AI Agent）正迅速成为大语言模型（LLM）的核心应用范�
 - **隔离性**：将LLM安全性与代理架构解耦，提供骨干模型安全性的“下界估计”。
 - **系统性**：攻击分类覆盖直接/间接注入、消息/工具/综合目标等6种攻击类型，10个威胁快照覆盖编码助手、RAG代理、多代理交易系统等典型场景。
 - **鲁棒性**：基准排名对攻击选择方法、聚合方式（mean vs max）高度鲁棒，Spearman相关系数≥0.75（Figure 8），表明框架输出的排名信号稳定可靠。
-
-
 
 ![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_kga18ld70t/figures/001_Figure_1.jpg]]
 *Figure 1: (left) Illustration of how inputs flow within an AI agent, alternating between an LLM step that calls the backend LLM m with the current model context and a processing step that calls the processing function $f _ { \mathrm { p r o c } }$ until the final response is produced. (right) The $\mathrm { b ^ { 3 } }$ benchmark, which uses threat snapshots to isolate an LLM step from the context-output flow on the left. (right top) There are 30 threat snapshots in total based on 10 application with three levels L1, L2 and L3. (right bottom) Each threat snapshot is evaluated against the set of attacks where we evaluate each attack N times which is used to account for the variance in responses
@@ -153,8 +147,6 @@ $$V(m, T) := \frac{1}{|\mathcal{T}|} \sum_{(i,\ell) \in \mathcal{T}} \frac{1}{|\
 ### 框架的覆盖范围与局限
 
 威胁快照框架目前聚焦于单步威胁快照，以在覆盖多样性和评估可行性之间取得平衡。对于多步攻击（如渐进式越狱），框架支持将其分解为威胁快照链进行建模（见图5的Crescendo攻击示例），但本文的基准评测仅使用单步快照。这一设计选择意味着：**基准得分应被解释为LLM安全性的下界估计**，因为多步攻击可能揭示额外的漏洞。此外，基准数据集基于当前代理架构构建的10种威胁快照，可能无法覆盖未来新型攻击面和代理架构。
-
-
 
 ### 威胁快照框架的五个核心模块
 
@@ -212,8 +204,6 @@ $$r_{\mathrm{length}}(x) = \min\left(0.5 + (1-0.5)\frac{\ell(x)}{100}, 1\right)$
 
 对过短输出施加的惩罚因子。当输出长度 $\ell(x) \geq 100$ 字符时，因子为1（无惩罚）；当输出极短时，因子趋近0.5，防止模型通过拒绝回答（输出极短的安全回复）来获得虚假的低漏洞评分（Appendix D.3, Equation 4）。
 
-
-
 ## 实验与关键发现
 
 ### 主要结果
@@ -224,22 +214,13 @@ $$r_{\mathrm{length}}(x) = \min\left(0.5 + (1-0.5)\frac{\ell(x)}{100}, 1\right)$
 
 **Figure 2 (right)** 展示了所有模型的总漏洞得分排名（得分越低安全性越高）。核心发现包括：
 
-
-![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_kga18ld70t/figures/003_Figure_2.jpg]]
-*Figure 2: (top left) Vulnerability scores for each task type (see Section 2.2.2), showing that the security of a model depends on the task type. We only include models that perform the best or the worst in at least one task type. (bottom left) LLMs with reasoning enabled have lower total vulnerability scores (lower is better). (right) Ranking based on total vulnerability scores for all models – lower score is better*
-
 1. **推理能力显著提升安全性**：**Figure 2 (bottom left)** 显示，启用推理功能后，大多数模型的漏洞得分明显降低。这一趋势在多个模型家族中一致出现，表明增强推理能力是当前提升LLM安全性的有效机制。
 
 2. **闭源模型系统级安全性优于开源模型**：**Figure 2 (bottom right)** 排名前几位的系统均使用闭源权重（如Claude系列、GPT系列），最佳开源模型kimi-k2-thinking得分约为0.34。需注意，闭源模型评估的是包含额外安全层和防护措施的系统级安全性，而开源模型评估的是模型级安全性，直接对比时应考虑这一差异。
 
 3. **模型大小与安全性无显著正相关**：**Figure 9** 比较了同一模型家族中不同规模版本的漏洞得分。结果表明，未启用推理时，更大版本未表现出显著的安全优势；启用推理后，模型规模增大仅带来适度改善。这一发现挑战了“更大模型更安全”的直觉假设。
 
-
-![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_kga18ld70t/figures/014_Figure_9.jpg]]
-*Figure 9: Vulnerability scores for differently sized models of the same families. There is no clear trend indicating that large models are more secure*
-
 4. **安全性与效用总体正相关但存在显著离群值**：**Figure 16** 将b³漏洞得分与Artificial Analysis (2025)的Agent Intelligence Index（综合Terminal-Bench Hard和τ²-Bench Telecom）进行对比。大多数模型沿正相关方向聚集（安全性越高，效用越强），但存在几个显著离群值，如claude-haiku-4.5（高安全性、较低效用）和gpt-5.1、kimi-k2-thinking（较高效用、相对较低安全性）。
-
 
 ![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_kga18ld70t/figures/024_Figure_16.jpg]]
 *Figure 16: Security-utility tradeoff for different backbone LLMs. For security, we use the total vulnerability score from the $b ^ { 3 }$ . -benchmark (lower values indicate greater security); for agent utility, we use the agent intelligence index (Artificial Analysis, 2025) (higher values indicate stronger capabilities). The agent intelligence index combines results from the Terminal-Bench Hard, $\tau ^ { 2 }$ . -Bench Telecom. While security and utility are correlated, there are several outliers (e.g., claude-haiku-4.5, gpt-5.1 and kimi-k2-thinking)*
@@ -249,9 +230,6 @@ $$r_{\mathrm{length}}(x) = \min\left(0.5 + (1-0.5)\frac{\ell(x)}{100}, 1\right)$
 #### 按任务类型的细粒度分析
 
 **Figure 2 (top left)** 展示了不同任务类型下的漏洞得分。模型的安全表现因任务类型而异——某些模型在特定任务类型上表现最佳或最差，但在其他任务类型上排名可能完全不同。这验证了b³基准支持基于攻击类型进行细粒度排名的设计目标（Table 6中的Sub-ranking列）。
-
-
-![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_kga18ld70t/figures/026_Table_6.jpg]]
 
 **Figure 15** 进一步展示了跨威胁快照关键切片的得分对比，包括内容安全相关任务和工具使用任务。模型排名在关键切片上大致保持稳定，但部分模型在特定类别上表现突出。
 
@@ -264,7 +242,6 @@ $$r_{\mathrm{length}}(x) = \min\left(0.5 + (1-0.5)\frac{\ell(x)}{100}, 1\right)$
 #### 攻击选择方法的鲁棒性
 
 **Figure 8** 系统评估了攻击选择方法对整体排名的影响。通过比较选定攻击数据集与其他构造选择（分层采样、更大攻击集、低质量攻击、max聚合、排除部分攻击等）的Spearman秩相关系数：
-
 
 ![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_kga18ld70t/figures/012_Figure_8.jpg]]
 *Figure 8: Overall ranking are not heavily influenced by the method used to select attacks. We plot the Spearman’s rho rank correlation between the selected attack dataset and other choices in the benchmark construction. The box plot on the left shows Spearman’s rho for random rankings*
@@ -283,7 +260,6 @@ $$r_{\mathrm{length}}(x) = \min\left(0.5 + (1-0.5)\frac{\ell(x)}{100}, 1\right)$
 
 **Figure 10** 展示了单个任务类型排名在不同扰动下的Spearman ρ。六个任务类型（IIO、DTI、ITI、DIO、DAIS、DCE）在多种扰动下均保持较高的秩相关性，进一步验证了排名的稳定性。
 
-
 ![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_kga18ld70t/figures/015_Figure_10.jpg]]
 *Figure 10: Spearman’s rho rank correlation between the ranking for individual task types resulting from our selected benchmark setting and individual perturbations to that setting. (left) Box plot of Spearman’s rho for random rankings*
 
@@ -301,26 +277,12 @@ $$r_{\mathrm{length}}(x) = \min\left(0.5 + (1-0.5)\frac{\ell(x)}{100}, 1\right)$
 
 2. **覆盖度限制**：当前基准仅包含基于10种代理架构构建的威胁快照，可能无法覆盖未来新型攻击面和代理架构。Table 2列出了这10个威胁快照的详细攻击向量和目标分类。
 
-
 ![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_kga18ld70t/figures/010_Table_2.jpg]]
 *Table 2: Overview of the agents and attack categorization used in the threat snapshots. These remain fixed for the different defenses ℓ ∈ {L1, L2, L3}*
 
 3. **开源与闭源模型的可比性**：闭源模型包含额外的安全层和防护措施，与开源模型的直接比较可能存在不公平性。这一差异在解读排名时应予以考虑。
 
 4. **推理Token用量的影响**：**Table 4** 报告了部分模型的推理Token用量（部分提供商未返回此数据）。推理能力的启用伴随着计算成本的增加，但本文未深入分析安全性提升与推理开销之间的权衡关系。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_kga18ld70t/figures/011_Table_3.jpg]]
-*Table 3: Overview of different subsets of threat snapshots to condition on*
-
-![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_kga18ld70t/figures/025_Table_5.jpg]]
-*Table 5: List of all models with developer and API provider that were evaluated in this paper. Models marked with ∗ were run with the AWS Bedrock API during data collection. Models marked with † were evaluated twice, both with reasoning enabled at a medium setting and with reasoning disabled (where possible) or set to the minimum level*
-
-![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_kga18ld70t/figures/020_Table_4.jpg]]
-*Table 4: Reasoning tokens used, as reported by in API responses. Some model providers do not return this data and are therefore not included*
-
-
 
 ## 定位与知识库关联
 
@@ -398,8 +360,6 @@ $$r_{\mathrm{length}}(x) = \min\left(0.5 + (1-0.5)\frac{\ell(x)}{100}, 1\right)$
 4. **基准的自动演进**：随着模型和代理架构的演进，如何自动化地更新威胁快照集以保持基准的覆盖度和代表性？这涉及攻击面发现、快照生成和质量验证的完整自动化链路。
 
 5. **从评估到防御**：将威胁快照用于针对性防御机制（如动态系统提示加固）的效果如何？框架能否从评估工具演进为防御生成工具？
-
-
 
 ## 原文 PDF
 

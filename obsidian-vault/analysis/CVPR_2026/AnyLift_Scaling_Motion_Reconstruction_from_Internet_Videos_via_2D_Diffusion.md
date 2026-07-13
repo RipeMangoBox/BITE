@@ -51,8 +51,6 @@ claims:
 
 实验证据表明上述设计带来了显著的性能增益。在AIST++动态相机设定下，AnyLift 的 MPJPE 达到 109.3，相比 MVLift 的 122.1 降低了 12.8，根位移误差也从 64.9 降至 64.2（Table 1）。在自采集的互联网体操视频上，AnyLift 的 2D 关节误差（J_2D）仅为 21.6，远优于 GVHMR 的 71.5，FID 低至 10.9（Table 2, Table 5），证明其对稀有运动类型的适应能力。消融实验进一步确认，去除混合训练策略后，体操视频上的 J_2D 从 21.6 退化至 23.5，FID 从 10.9 升至 11.5；武术视频上 J_2D 从 15.1 退化至 15.7，FID 从 3.6 升至 4.1（Table 5），验证了混合训练的关键作用。在 BEHAVE 数据集的 HOI 重建任务上，AnyLift 在静态相机下的 MPJPE 为 42.68，显著优于 VisTracker 的 54.40（Table 4），并在动态相机条件下保持了鲁棒性。
 
-
-
 从单目视频中恢复世界坐标系下的3D人体运动是计算机视觉领域的长期挑战。传统方法（如**SMPLify**，Bogo et al., ECCV 2016）依赖2D重投影优化，无需训练但精度有限；基于3D监督的方法（如**WHAM**，Shin et al., CVPR 2024；**GVHMR**，Shen et al., SIGGRAPH Asia 2024）虽能实现世界坐标重建，却受限于动作捕捉数据的规模与多样性，对体操、武术等MoCap数据中罕见的运动类型泛化能力不足。
 
 **MVLift**率先探索了无需3D监督的路线——通过多视图2D扩散模型从静态相机视频中重建3D运动。然而，该方法存在两个关键瓶颈：
@@ -63,8 +61,6 @@ claims:
 **人物交互（HOI）重建**面临更严峻的挑战。现有方法（如**VisTracker**，Xie et al., CVPR 2023）同样假设静态相机，且需要预计算的2D关键点，难以推广到动态相机拍摄的真实交互场景。
 
 上述瓶颈的根源在于：**缺乏一种能从有限单视点视频中学习多视角2D运动先验的机制，且该机制必须兼容动态相机条件**。AnyLift正是围绕这一核心矛盾展开设计——通过相机轨迹条件化的2D扩散模型与混合数据源训练策略，将3D重建分解为“多视角2D合成→3D优化”的两阶段流程，全程无需3D真值监督。
-
-
 
 ## 核心方法与创新机理
 
@@ -104,8 +100,6 @@ $$\mathcal{L}^{\mathrm{proj}} = \mathbb{E}_{\mathbf{X}_0, n} \| \mathbf{M} \odot
 
 这些创新使 AnyLift 在动态相机条件下实现了鲁棒的 3D 重建：AIST++ 动态相机设定下 MPJPE 为 109.3（vs MVLift 122.1）；自采集互联网体操视频上 $J_{2D}$ 达 21.6（vs **GVHMR** 的 71.5，Shen et al., SIGGRAPH Asia 2024），证明了方法在 MoCap 数据中罕见的运动类型上的有效性。
 
-
-
 AnyLift 提出一个统一的两阶段框架，从动态相机拍摄的单目视频中同时重建世界坐标系下的 3D 人体运动与人物交互（HOI），全程无需 3D 监督。
 
 ### 两阶段流水线
@@ -136,8 +130,6 @@ AnyLift 提出一个统一的两阶段框架，从动态相机拍摄的单目视
 
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2604_17818/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of AnyLift. (a) We first train a single-view 2D motion diffusion model conditioned on camera trajectories and epipolar lines to synthesize multi-view 2D training data. (b) During training, we employ a hybrid data source strategy that enhances viewpoint coverage by combining global 2D pose sequences from videos with locally reprojected poses. (c) Finally, we train a multi-view 2D motion diffusion model to reconstruct consistent world-coordinated 3D human and HOI motions from real-world videos*
-
-
 
 AnyLift 的核心架构围绕一个两阶段框架展开：第一阶段合成多视角2D训练数据，第二阶段训练多视角2D运动扩散模型，最终通过重投影优化恢复世界坐标系下的3D运动。以下详述其关键模块与数学公式。
 
@@ -188,8 +180,6 @@ $$\mathcal{L}_{\mathrm{line}}^{u v} = \sum_{t=1}^{T} \big\langle \mathbf{L}_t^{u
 
 获得多视角一致的2D姿态序列后，通过最小化多视角重投影误差恢复3D关节位置，并使用VPoser拟合SMPL参数得到最终的3D人体网格。对于人物交互（HOI）重建，物体2D关键点 $\mathbf{O}$ 与人关键点 $\mathbf{X}$ 拼接为统一表示，训练类别感知的多视角扩散模型。物体姿态 $\mathcal{O}_t = \{ \mathbf{r}_t, \mathbf{t}_t, s \}$ 由重建的3D关键点与预定义的规范关键点通过刚性对齐求解，其中 $\mathbf{r}_t$ 为6D旋转表示，$\mathbf{t}_t$ 为平移，$s$ 为全局缩放因子。
 
-
-
 ## 实验与关键发现
 
 AnyLift 在人体运动重建与人物交互（HOI）重建两个任务上，于合成动态相机基准、自采互联网视频以及 BEHAVE 数据集上进行了系统性验证。实验设计围绕三个核心检验目标展开：（1）动态相机条件下世界坐标 3D 重建的鲁棒性；（2）对 MoCap 数据中罕见的运动类型（体操、武术）的泛化能力；（3）混合训练策略与各模块的消融贡献。
@@ -205,15 +195,9 @@ AIST++ 数据集上的定量评估（Table 1）揭示了动态相机设定的瓶
 
 自采的体操与武术视频构成了更具挑战性的检验场景。这类运动在 MoCap 数据集中极为罕见，且拍摄视角单一、相机运动自由。Table 2 报告了与多个基线的全面对比。
 
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2604_17818/figures/003_Table_2.jpg]]
-*Table 2: Quantitative evaluation on our collected Internet videos. AnyLift outperforms all baselines across most metrics, demonstrating the plausibility of our method on Internet videos*
-
 在体操视频上，AnyLift 的 2D 关节误差 $J_{\text{2D}}$ 为 21.6，远优于 GVHMR 的 71.5 和 WHAM 的 60.9；在武术视频上，$J_{\text{2D}}$ 为 15.1，同样显著低于 GVHMR 的 36.6。更关键的是，基于 3D 监督的方法（WHAM、GVHMR）在这些稀有运动上暴露出严重的分布外泛化问题：GVHMR 在体操视频上的 FID 高达 48.8，WHAM 为 36.7，而 AnyLift 仅为 10.9。这表明依赖 AMASS 等有限动作捕捉数据训练的方法，在面对训练分布之外的运动模式时会产生不自然的姿态估计，而 AnyLift 通过直接从互联网视频的 2D 关键点学习运动先验，绕过了 3D 标注数据的分布限制。
 
 Table 3 的人工评估进一步佐证了定量指标的可靠性。参与者在 68.3% 的对比中偏好 AnyLift 的重建结果，主要理由为更好的地面接触（ground contact）与运动质量。这一主观偏好与客观指标中的脚滑动分数（FS）改善方向一致，说明方法在物理合理性上确实优于基线。
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2604_17818/figures/005_Table_3.jpg]]
-*Table 3: Human study on reconstructed human motions from our collected Internet videos. Participants prefer our reconstruction results for their better ground contact and motion quality*
 
 定性对比（Figure 3）直观展示了差异的根源：基线方法常出现根轨迹漂移、局部姿态错误及自穿透伪影，而 AnyLift 生成的全身轨迹与姿态更为连贯。这归因于两阶段框架中多视角 2D 运动扩散模型提供的跨视角几何约束——即使输入仅为单目视频，模型仍能生成符合多视角一致性的 2D 运动序列，从而在 3D 优化阶段约束根位移与关节位置的解空间。
 
@@ -223,9 +207,6 @@ Table 3 的人工评估进一步佐证了定量指标的可靠性。参与者在
 ### 人物交互（HOI）重建：BEHAVE 数据集
 
 HOI 重建实验在 BEHAVE 数据集上展开，覆盖椅子、桌子、盒子等多个物体类别。Table 4 显示，在静态相机设定下，AnyLift 在所有类别上的 MPJPE 均优于 VisTracker 基线：盒子类别 42.68 vs 54.40（-11.72），椅子类别 45.83 vs 55.19（-9.36）。切换至动态相机设定后，VisTracker 的性能进一步恶化，而 AnyLift 保持了相对稳定的表现，验证了相机条件模型在 HOI 场景中的迁移有效性。
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2604_17818/figures/008_Table_4.jpg]]
-*Table 4: Quantitative evaluation on the BEHAVE dataset [1] under (1) static-camera setup (upper) and (2) dynamic-camera setup (lower). AnyLift outperforms all baselines across object categories and achieves robust performance under dynamic-camera conditions*
 
 定性结果（Figure 4）揭示了 VisTracker 的典型失败模式：在椅子交互中，人体与椅面出现明显穿透；在桌子交互中，接触关系不准确。AnyLift 生成的交互序列则展现出准确的接触与最小的穿透。这得益于统一的人-物关键点表示与类别感知的多视角扩散模型——物体关键点与人关键点在扩散过程中共享相同的极线约束，从而在 3D 优化阶段同时约束人体与物体的空间关系。
 
@@ -252,13 +233,6 @@ AnyLift 在方法谱系中处于“无 3D 监督的多视角 2D 扩散 + 重投�
 
 当前方法的已知局限包括：对 2D 关键点提取质量与相机位姿估计精度敏感（这两个模块作为外部输入，其误差会传播至后续阶段）；HOI 扩展目前依赖手动设计的物体关键点，在更广泛的物体类别上需要额外的标注工作。开放问题指向端到端集成相机运动估计、提升对输入噪声的鲁棒性，以及在严重遮挡与多人物场景中的泛化验证。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2604_17818/figures/001_Figure_1.jpg]]
-*Figure 1: Human and human-object interaction (HOI) motions lifted by our approach. Trained on 2D keypoints and corresponding camera trajectories, our framework AnyLift reconstructs world-coordinated 3D human motion and HOI from monocular videos captured by dynamic cameras. We demonstrate its effectiveness on human motion reconstruction from Internet gymnastics videos (left) and on HOI reconstruction from captured real-world videos (right). Please refer to our project page for video results*
-
-
-
 ## 定位与知识库关联
 
 AnyLift 的核心技术路径属于**基于2D扩散先验的单目3D运动重建**这一新兴范式，其直接前身是 **MVLift**（静态相机多视图2D扩散重建）。AnyLift 在此谱系中完成了三个关键突破，使其从受控实验室设定走向真实互联网视频：
@@ -284,8 +258,6 @@ MVLift 假设相机静止，通过多视图2D扩散从单视角输入生成虚�
 AnyLift 目前存在几个明确的适用边界：(1) 方法对2D关键点提取及相机位姿估计的质量敏感，输入噪声会沿两阶段管道传播放大；(2) HOI 重建依赖手动设计的物体关键点，限制了向更广泛物体类别的扩展；(3) 两阶段框架（先合成多视图数据，再训练多视图扩散模型）增加了计算开销和工程复杂度。
 
 值得关注的开放方向包括：(1) 能否将相机运动估计集成到框架中，实现端到端的联合优化？(2) 在严重遮挡或多人物交互场景中，当前的对极线约束是否足够，是否需要引入更强的物理先验？(3) 如何减少对手动设计关键点的依赖，实现更通用的 HOI 重建？这些问题的解决将决定该范式能否真正从实验室走向大规模应用。
-
-
 
 ## 原文 PDF
 

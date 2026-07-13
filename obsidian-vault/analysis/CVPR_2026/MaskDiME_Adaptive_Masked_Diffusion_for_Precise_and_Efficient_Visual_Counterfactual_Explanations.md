@@ -145,8 +145,6 @@ $$x_{t-1} = M_t^x \odot \hat{x}_0^{(t-1)} + (1 - M_t^x) \odot x$$
 
 **关键设计优势**：与传统扩散反事实方法相比，该 pipeline 实现了三个根本性改进：（1）通过 Tweedie 公式的一步估计替代 **DiME**（Jeanneret et al., ACCV 2022）的嵌套去噪，将采样复杂度从 $O(T^2)$ 降至 $O(T)$；（2）自适应双掩码替代 **FastDiME**（Weng et al., ECCV 2024）的静态像素差掩码，使空间约束随扩散步骤动态演化；（3）统一缩放因子 $s$ 替代多超参数调节，简化了引导强度的控制。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l897_https_arxiv_org_abs_2602_18792/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of MaskDiME. We illustrate a complete counterfactual generation process (No*
 
@@ -211,8 +209,6 @@ $$\nabla_{z_t}^{\mathrm{class}} = \frac{1}{\sqrt{\bar{\alpha}_t}} \nabla_{x_t} L
 $$G_t = \left| \nabla_{z_t}^{\mathrm{class}} \right|_{\mathrm{avg}} \in \mathbb{R}^{1 \times H \times W} \tag{9}$$
 
 基于 $G_t$，按 top-$k\%$ 和 top-$\rho k\%$ 阈值分别生成噪声级掩码 $M_t^z$ 和清洗级掩码 $M_t^x$（$\rho \in (0,1]$），并施加形态学膨胀以平滑掩码边界。由于 $G_t$ 在每一步根据当前分类器梯度动态计算，掩码的空间焦点随扩散进程自适应演化，始终锁定与决策最相关的像素区域。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l897_https_arxiv_org_abs_2602_18792/figures/003_Figure_3.jpg]]
 *Figure 3: Heatmap visualization of diffusion trajectories with different masking strategies. Each column shows noisy samples*

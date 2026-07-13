@@ -50,8 +50,6 @@ claims:
 
 在仅使用 0.15M 高质量掩码（MedSeg-HQ 数据集）训练的条件下，SegMoTE 仅更新约 17M 参数（约为 SAM 总参数的 1.4%），在多个分布外数据集上较第二优方法提升 1%–6% Dice 分数，同时保持了 SAM 的原始零样本能力。这一结果表明，**数据质量与模态自适应机制的结合**可以替代大规模数据堆砌，为医学图像分割的高效泛化提供了新范式。
 
-
-
 ### 医学图像分割的异构性挑战
 
 医学图像分割面临的核心瓶颈在于成像模态的极端异构性。CT、MRI、X射线、超声、皮肤镜等不同模态在对比度、分辨率、解剖结构和病理表现上差异显著，导致单一模型难以在所有模态上保持稳定性能。传统方法通常采用**全参数微调**或**解码器部分微调**的策略，将大规模混合数据直接注入预训练模型（如SAM）进行训练。然而，这种无差别的数据聚合方式带来了两个深层问题：
@@ -82,8 +80,6 @@ SegMoTE的提出基于一个关键洞察：**医学图像分割的跨模态泛�
 - 能否在高质量但小规模的数据集（MedSeg-HQ，仅0.15M标注）上训练，仍取得超越大规模全微调方法的分布外泛化性能？
 
 这些问题的解答构成了SegMoTE方法设计的核心驱动力，也即本文所提出的**令牌级专家混合（MoTE）**与**渐进提示令牌化（PPT）**两大创新机制的出发点。
-
-
 
 ## 核心方法与创新机理
 
@@ -122,8 +118,6 @@ PPT 的核心机制是：可学习的查询令牌 $Q$ 通过对归一化图像�
 ### 创新的协同效应
 
 MoTE 和 PPT 并非孤立运作，二者在冻结的 SAM 编码器之上形成协同：PPT 生成的语义对齐令牌进入掩码解码器后，经过自注意力和令牌-图像注意力，再由 MoTE 进行动态专家选择和令牌更新。这种设计使得模型在保持 SAM 原始零样本能力的同时，以极小的训练代价（17M 参数，0.15M 高质量掩码）在多个分布外数据集上较第二优方法提升 1%–6%（Table 1, Table 2）。
-
-
 
 SegMoTE 在冻结的 SAM 基础架构之上，构建了一条“模态无关编码 → 语义令牌化 → 令牌级专家自适应解码”的轻量推理管线。其核心设计目标是：**在仅更新约 17M 可训练参数（约为原始 SAM 的 1.4%）的前提下，赋予模型对异构医学图像模态的自适应能力，同时保留 SAM 原有的零样本分割潜力**。整体框架如 Figure 2 所示。
 
@@ -173,13 +167,6 @@ MoTE 维护一组可学习的**专家令牌**（$N$ 个，默认 $N=4$），每�
 - **负载平衡损失** $\mathcal{L}_{\mathrm{balance}}$，通过超参数加权后与分割损失联合优化。
 
 训练时，SAM 编码器保持冻结，仅更新 MoTE（约 10M 参数）、PPT（约 7M 参数）以及解冻的掩码解码器参数。推理时，PPT 自动生成提示令牌，MoTE 根据输入模态动态路由至最合适的专家，最终输出分割掩码，全程无需人工交互。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2139_https_arxiv_org_abs_2602_19213/figures/001_Figure_1.jpg]]
-*Figure 1: SegMoTE vs. Previous Works. The heterogeneous data X is first processed by the encoder ε to extract the feature representation f . (a) Previous methods typically perform full fine-tuning of the mask decoder or parameter-efficient fine-tuning, leading to distribution shift from the pretrained model. (b) Seg-MoTE introduces a token-level mixture of experts mechanism that dynamically selects modality-adaptive expert tokens while keeping the mask decoder frozen. The process is guided by the load balancing loss*
-
-
 
 ### 3.1 整体架构与设计动机
 
@@ -232,8 +219,6 @@ $$L_{\mathrm{seg}}(y^E, \mathbf{y}) = 1 - \frac{2\sum_i y_i^E y_i}{\sum_i y_i^E 
 
 总训练目标为 $L = L_{\mathrm{seg}} + \lambda L_{\mathrm{balance}}$，其中 $\lambda$ 为平衡系数。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能验证
@@ -244,9 +229,6 @@ SegMoTE 在分布外（out-of-domain）场景下的泛化能力是其核心优�
 *Table 1: Performance comparison on three out-of-domain datasets. Experimental results of SegMoTE in comparison to other methods under bounding-box interactions. Best results are highlighted in red, and second best results are highlighted in blue*
 
 在多数据集边界框交互场景下（**Table 2**），SegMoTE 同样展现出跨模态鲁棒性：在 AMOS CT（85.16）、AMOS MRI（80.27）、BTCV（84.51）、CHAOS T1（89.00）、ISIC2018（93.02）、SZ-CXR（95.04）等九个数据集上均取得显著优势。值得注意的是，当解冻原始解码器参数并与 MoTE、PPT 联合训练时，SegMoTE 在二分类分割任务上相较基线提升 **3% 至 7%**，表明令牌级专家混合机制与解码器微调之间存在正向协同效应。
-
-![[assets/figures/papers/paper_list_l2139_https_arxiv_org_abs_2602_19213/figures/010_Table_2.jpg]]
-*Table 2: Experimental results on multiple datasets under bounding-box interactions. Our method involves unfreezing the original decoder parameters and training them along with the MoTE and PPT mechanisms on the MedSeg-HQ dataset*
 
 ### 参数效率分析
 
@@ -288,16 +270,6 @@ MoTE 路由热力图（**Figure 7**）为令牌级专家选择提供了直观解
 - SegMoTE 的令牌级路由机制能否有效扩展到 3D 医学体积数据和视频分割任务？若可行，时空维度的专家令牌设计将是一个关键挑战。
 - 如何将 PPT 推广到多类别分割场景，同时避免类别间令牌的相互干扰？可能的方向包括引入类别条件编码或层次化令牌结构。
 - 在更大规模、更多样化的精选数据集上，模型性能是否还能持续提升？数据质量与数据量的权衡关系值得进一步探索。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2139_https_arxiv_org_abs_2602_19213/figures/011_Table_3.jpg]]
-*Table 3: Comparison of SegMoTE with existing interactive segmentation benchmarks in terms of model size*
-
-![[assets/figures/papers/paper_list_l2139_https_arxiv_org_abs_2602_19213/figures/005_Figure_5.jpg]]
-*Figure 5: In-domain segmentation results across datasets. (a) and (b) show the Dice coefficient comparisons under single click and bounding box interactions, respectively. (c) illustrates the training dataset sizes used by different methods, where SegMoTE achieves performance improvement by optimizing the annotation quality of the data*
-
-
 
 ## 定位与知识库关联
 
@@ -370,8 +342,6 @@ MoTE 路由的热力图显示稀疏、离散的“责任区域”，验证了令
 2. **多类别 PPT**：如何将 PPT 机制推广到多类别分割场景，避免类别间干扰？可能需要引入类别条件化的查询令牌。
 3. **数据质量上限**：在更大规模、更多样化的精选数据集上，模型性能是否还能持续提升？还是说 0.15M 高质量数据已接近当前架构的表达上限？
 4. **与 SAM2 融合**：MoTE 的模态自适应与 SAM2 的时序记忆是否可互补，构建统一的 3D+时序医学分割框架？
-
-
 
 ## 原文 PDF
 

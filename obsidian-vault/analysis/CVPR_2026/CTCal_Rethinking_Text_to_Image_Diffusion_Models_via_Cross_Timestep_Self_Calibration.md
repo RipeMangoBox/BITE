@@ -157,9 +157,6 @@ CTCAL 的核心优势在于**模型无关性**——它不修改扩散模型的�
 
 CTCal 提出了一种跨时间步自校准训练范式（Figure 2），其与传统扩散训练的核心区别在于双时间步采样策略与交叉注意力图的对齐优化。
 
-![[assets/figures/papers/paper_list_l2302_https_arxiv_org_abs_2603_20741/figures/002_Figure_2.jpg]]
-*Figure 2: Illustration of CTCAL. CTCAL is dedicated to leverage the reliable text-image alignment established at smaller timesteps*
-
 **Pipeline 模块关系与数据流如下：**
 
 1. **双时间步交叉注意力提取**：对每个训练样本，同时采样两个时间步——教师时间步 $t_{\mathrm{tea}}$ 和学生时间步 $t_{\mathrm{stu}}$，满足 $t_{\mathrm{tea}} < t_{\mathrm{stu}}$。在去噪网络的前向传播中，分别提取两者的交叉注意力图 $\mathbf{A}_{\mathrm{tea}}$ 和 $\mathbf{A}_{\mathrm{stu}}$。教师时间步在低噪声下形成可靠的文本-图像对齐，学生时间步在高噪声下需要校准。
@@ -206,9 +203,6 @@ CTCAL 的核心操作是采样两个不同的时间步：教师时间步 $t_{\ma
 
 并非所有文本 token 的交叉注意力图都编码了有效的空间语义信息。论文通过词性分析（Figure 3）发现，**名词 token 的交叉注意力图编码了清晰的空间语义信息**，而冠词、连词等功能词缺乏有效的空间语义。因此，CTCAL 采用基于词性的注意力图选择策略，仅对名词 token 对应的注意力图计算对齐损失：
 
-![[assets/figures/papers/paper_list_l2302_https_arxiv_org_abs_2603_20741/figures/003_Figure_3.jpg]]
-*Figure 3: Investigation on cross-attention maps categorized by part-of-speech. Cross-ttention maps for noun tokens*
-
 $$\mathcal{L}_{\mathrm{CTCAL}} = \frac{1}{N_{\mathrm{noun}}} \sum_{\mathbf{y}_i \in \mathcal{V}_{\mathrm{noun}}} \mathcal{D}\left(\mathbf{A}_{\mathrm{stu}, \mathbf{y}_i}, \mathbf{A}_{\mathrm{tea}, \mathbf{y}_i}\right)$$
 
 其中 $N_{\mathrm{noun}}$ 为名词 token 数量，$\mathcal{V}_{\mathrm{noun}}$ 为名词 token 集合，$\mathbf{A}_{\mathrm{stu}, \mathbf{y}_i}$ 和 $\mathbf{A}_{\mathrm{tea}, \mathbf{y}_i}$ 分别为 token $\mathbf{y}_i$ 在学生时间步和教师时间步的交叉注意力图。词性分析使用 Stanza 工具完成。
@@ -245,11 +239,6 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{diffusion}} + \lambda_t \mathcal{L}_{\mathr
 
 其中 $T_{\mathrm{train}}$ 为训练时的最大时间步。该设计使得 CTCAL 损失与扩散损失实现和谐融合：在低噪声阶段 CTCAL 权重较小，避免干扰已较好的对齐；在高噪声阶段权重增大，强化校准效果。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2302_https_arxiv_org_abs_2603_20741/figures/001_Figure_1.jpg]]
-*Figure 1: Investigation on the cross-attention maps. (a) Inference stage. In line with existing inference-time optimization methods [5, 15], we delve into the analysis of cross-attention maps produced during the inference stage of the text-to-image diffusion model. Notably, satisfactory text-image correspondences are established for simple text prompts. Nevertheless, with more intricate text prompts, the prevalent method encounters challenges in precisely mapping the target semantics to the correct spatial position, leading to semantically inconsistent images. (b) Training stage. Given the text-image-noise triplet, we gather cross-attention maps at varied timesteps in training mode. A noteworthy find...*
-
 ## 实验与关键发现
 
 ### 核心瓶颈的实证动机
@@ -276,9 +265,6 @@ Table 2 的 GenEval 评估进一步验证了 CTCAL 的泛化性。SD 3 + CTCAL �
 #### 用户偏好研究
 
 Table 3 的主观用户偏好研究显示，CTCAL 生成图像的人类偏好率在 SD 2.1 对比中达到 **76.67%**，在 SD 3 对比中达到 **54.17%**，显著优于 GORS 等对比方法。这表明 CTCAL 的改进不仅体现在自动评估指标上，也在人类感知层面获得了明确认可。
-
-![[assets/figures/papers/paper_list_l2302_https_arxiv_org_abs_2603_20741/figures/007_Table_3.jpg]]
-*Table 3: User study*
 
 ### 消融实验
 
@@ -329,10 +315,6 @@ Figure 5 对比了 CTCAL 与 GORS 微调模型在推理和训练模式下的交�
 2. **词性选择的权衡**：当前以名词token为核心的设计在属性绑定（形容词相关）任务上仍有提升空间，纳入形容词token虽可改善属性绑定，但对空间任务存在潜在负面影响，最优策略需进一步探索。
 3. **架构泛化边界**：验证主要覆盖 SD 2.1（扩散架构）和 SD 3（流匹配架构），对 DiT 变体、SANA 等新兴架构的泛化表现尚不明确。
 4. **计算开销**：双时间步采样与自编码器语义投影引入了额外训练计算，论文未提供具体的额外训练时间对比数据，实际部署成本需手动评估。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2302_https_arxiv_org_abs_2603_20741/figures/005_Table.jpg]]
 
 ![[assets/figures/papers/paper_list_l2302_https_arxiv_org_abs_2603_20741/figures/004_Figure_4.jpg]]
 *Figure 4: Qualitative comparison on SD 2.1 and SD 3. CTCAL demonstrates a marked improvement in the fine-grained alignment of generated images with the corresponding text prompts. Each image is generated with the same prompt and random seed for all methods*

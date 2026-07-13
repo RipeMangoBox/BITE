@@ -62,8 +62,6 @@ claims:
 
 **局限与开放问题**：当前算法严格依赖 i.i.d. 草案假设，对非 i.i.d. 草案（如不替换采样或独立不同草案）的子模最小化步骤缺乏高效实现；截断集大小受限于 L‑BFGS‑B 的迭代代价，在高温或大 $(k,n)$ 组合下失败率升高。如何为非 i.i.d. 草案设计可证近似的多面体算法，以及失败时自动切换至混合策略，是后续工作的关键方向。
 
-
-
 ### 投机采样与多草案验证
 
 大语言模型的自回归解码受限于内存带宽，每生成一个 token 都需要加载全部模型参数。投机采样通过“草稿‑验证”两阶段框架突破这一瓶颈：先用轻量草稿模型生成一组候选 token，再用目标模型并行验证，仅接受与目标分布一致的草稿 token，从而在不改变输出分布的前提下实现加速。
@@ -98,8 +96,6 @@ $$\alpha^* = 1 + \min_{H \subseteq \mathcal{V}} \psi(H), \quad \psi(H) = \sum_{i
 ### 本文动机
 
 上述进展揭示了一个关键缺口：能否从子集选择的最优解 $H^*$ 出发，反向重构出完整的运输计划，同时避免回到指数规模的原始 OTLP？本文的核心动机正是填补这一缺口——通过建立子集选择、互补松弛性与多面体理论之间的深层联系，将指数规模的 OTLP 分解为两个仅依赖低维参数的凸优化问题，从而在保证任意精度的前提下，将求解时间压缩至实际可用的毫秒级。
-
-
 
 ## 核心方法与创新机理
 
@@ -139,8 +135,6 @@ $$\alpha^* = 1 + \min_{H \subseteq \mathcal{V}} \psi(H), \quad \psi(H) = \sum_{i
 
 **证据强度评估**：互补松弛分解（Theorem 5.1）和外系统闭式解（Theorem 6.2）均有严格数学证明支撑，置信度极高；截断凸函数的近似保证（Lemma 6.6）提供了误差上界，但截断集选取的“最小 $T$”策略在部分 $(k,n)$ 组合下可能导致优化器无法在时间预算内收敛（失败率上升，Figure 5），这是算法的主要失效模式。当前算法严格依赖 i.i.d. 草稿假设以维持 $\psi$ 的子模性和 $q$-凸性；对于非 i.i.d. 草稿方案，子模最小化步骤缺乏高效实现（Table 5），这是向更广泛草稿策略扩展的主要障碍。
 
-
-
 Global Resolution 求解器的核心思路是将原始指数规模的 OTLP（变量数量为 $V^{n+1}$）分解为三个可高效求解的独立模块，最终通过凸优化在任意精度下重构出近似最优的运输计划。整个 pipeline 的输入为目标分布 $p(i)$、草稿分布 $p_{\text{draft}}(\bar{i})$ 以及可接受集 $A_i$，输出为满足 OTLP 约束的运输计划 $C_{i,\bar{i}}$，其接受率可在给定误差阈值 $\tau$ 内逼近理论最优值 $\alpha^*$。
 
 ### 模块一：计算最优子集 $H^*$
@@ -169,8 +163,6 @@ Global Resolution 求解器的核心思路是将原始指数规模的 OTLP（变
 | 重构 | $\alpha_i$, $p_i$, 残差 | $C_{i,\bar{i}}$ | softmax + 残差自举 |
 
 整个 pipeline 的瓶颈在于凸优化步骤，其代价由截断集大小 $|T|$ 决定。实验表明，在 $\tau = 10^{-3}$ 的设置下，Global Resolution 在 Llama-3 上的平均求解时间为 70.75 ms/token（$k=10, n=5$），相比通用 LP 求解器加速约四个数量级（Table 1），同时接受率达到 85.65%，超过所有对比求解器（Table 2）。
-
-
 
 ### 问题形式化：从 OTLP 到子集选择
 
@@ -238,14 +230,11 @@ $$\Theta_T((\alpha_i)) = \sum_{\bar{i} \in T^n} p_{\mathrm{draft}}(\bar{i}) \log
 
 截断集 $T$ 的大小决定了凸优化的代价与精度。**Algorithm 1** 根据目标误差阈值 $\tau$ 自适应选择最小 $T$，使得 $\gamma_T \leq \tau$（内层）且 $\varepsilon_T \leq \tau$（外层），随后使用 L‑BFGS‑B 求解器最小化对应的凸函数。**Lemma 6.6** 给出了近似保证：最终构造的运输计划 $C$ 在 OTLP 等式约束上的总 $L_1$ 偏差不超过 $\alpha + 2\beta$，最优接受率偏差不超过 $\alpha + \beta$，其中 $\alpha, \beta$ 为求解器误差。实际中取 $\tau = 10^{-3}$ 或 $10^{-4}$ 即可在毫秒级时间内达到超过 90% 的最优接受率。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：求解速度与接受率的双重突破
 
 全局分辨率算法在求解速度上实现了对传统 OTLP 求解器的压倒性优势。在 Llama-3 70B/8B 模型对上，针对典型配置 (k=10, n=5)，全局分辨率在 τ=1e-3 精度下的平均单 token 求解时间仅为 **70.75 ms**，而通用线性规划求解器（General LP）需要超过 400,000 ms，加速比达到约四个数量级（Table 1）。即使将精度提升至 τ=1e-4，求解时间也仅增至 99.69 ms，仍远低于其他任何基线方法。
-
 
 ![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_gpsczXOsHn/figures/002_Table_1.jpg]]
 *Table 1: Further, in Appendix O, we compare these acceptance rates to those for the greedy construction by Hu et al. (2025), described at the start of Section 5. For both Gemma-2 and Llama-3, we find that i.i.d. acceptance rates are higher than greedy for k $\geq$ 1 0 0 , with improvements near 2% for larger k and n. Table 1: Average Llama-3 solve times (ms/token) over k , n , for the five i.i.d. OTLP solvers. General LP and max-flow are baselines, and optimized max-flow and global resolution ( $\tau$ = 1 $0 ^ { - 3 }$ , 1 $0 ^ { - 4 }$ ) are ours. Lower numbers are better. Red numbers are lower bounds from small scale tests due to excessive runtime. Global resolution can be 10,000+ times faster than others...
@@ -256,7 +245,6 @@ $$\Theta_T((\alpha_i)) = \sum_{\bar{i} \in T^n} p_{\mathrm{draft}}(\bar{i}) \log
 
 在基于 SpecTr 框架的多步推理实验中，全局分辨率展现出可观的端到端加速效果。在 Gemma-2 27B/2B 模型对上，当使用 K=4 条独立同分布草稿路径、每步生成 L=8 个 token 时，全局分辨率实现了 **1.98×** 的墙上时间加速比（Table 4）。对应的块效率（每次调用目标模型生成的 token 数）随 K 增加而提升，验证了算法在多步场景中的有效性。
 
-
 ![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_gpsczXOsHn/figures/009_Table_4.jpg]]
 *Table 4: Block efficiency (number of decoded tokens per call to target model) in and walltime speedup (over vanilla autoregressive decoding) for SpecTr with global resolution under different values of K (number of i.i.d. paths). Experiments are run on Gemma-27B/2B with L = 8*
 
@@ -266,14 +254,12 @@ $$\Theta_T((\alpha_i)) = \sum_{\bar{i} \in T^n} p_{\mathrm{draft}}(\bar{i}) \log
 
 **k 与 n 的边际收益**：增大 top-k 的 k 值和草稿数量 n 均能单调提升最优接受率，但存在明显的边际递减效应。当 k 超过 1000 后，进一步提升带来的接受率增益趋于饱和（Figure 1）。这意味着在实际部署中，选择适中的 k 值即可在计算开销与接受率之间取得良好平衡。
 
-
 ![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_gpsczXOsHn/figures/001_Figure_1.jpg]]
 *Figure 1: Optimal acceptance rates from n i.i.d drafts with top-k sampling with n with target/draft pairs of Gemma-2 27B/2B and Llama-3 70/8B. Increasing k improves acceptance rate significantly up to k = 1 0 0 0 , and increasing n also results in steady increase in optimal acceptance*
 
 ### 温度对算法鲁棒性的影响
 
 目标模型的温度是影响全局分辨率性能的关键外部因素。实验表明，当温度降低至 0.2-0.4 区间时，仅需 k=10 的 top-k 草稿即可达到接近最优的接受率，进一步增大 k 的收益极小（Figure 4）。更重要的是，全局分辨率在低温下的**失败率显著降低**——失败指算法因无法在截断集 T 内达到目标误差 τ 而提前终止（Figure 5）。当温度超过 0.6 后，失败率开始上升，这构成了算法的一个明确使用边界：**推荐在低温（<0.6）或小 k 场景下使用以获得最佳可靠性**。
-
 
 ![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_gpsczXOsHn/figures/007_Figure_4.jpg]]
 *Figure 4: Optimal acceptance rates from n i.i.d drafts with top-k sampling with n with the target/draft pair Gemma-2 27B/2B, for various target temperature settings (0.2, 0.4, 0.6, 0.8). Until temperature 0.8, increasing k past 10 results in little acceptance gains for reasonable values of n*
@@ -286,7 +272,6 @@ $$\Theta_T((\alpha_i)) = \sum_{\bar{i} \in T^n} p_{\mathrm{draft}}(\bar{i}) \log
 
 3. **非 i.i.d. 草稿的扩展可行性**：Table 5 的定性分析指出，全局分辨率的子模最小化步骤严格依赖 i.i.d. 假设，对于不替换采样或 n≥3 时的独立不同草稿，该步骤缺乏高效实现，这是算法当前的主要局限。
 
-
 ![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_gpsczXOsHn/figures/010_Table_5.jpg]]
 *Table 5: Extending global resolution to three non-i.i.d. drafting regimes. Yes means the extension is immediate; Possible means it requires some work; No means there is a major obstacle*
 
@@ -294,15 +279,8 @@ $$\Theta_T((\alpha_i)) = \sum_{\bar{i} \in T^n} p_{\mathrm{draft}}(\bar{i}) \log
 
 上述结论中，求解时间与接受率的定量对比（Table 1, Table 2）基于同一 CPU 环境下的公平比较，且记录了各求解器的成功/失败率，证据强度高。温度影响和草稿策略对比（Figure 2-5）基于多组参数扫描，结论方向一致，但具体数值可能因模型对而异，建议在实际部署前进行验证。多步加速比（Table 4）仅在 Gemma-2 单对模型上测试，泛化性需进一步确认。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_gpsczXOsHn/figures/003_Table.jpg]]
 *Table: average runtime falls under the time limit. For Llama-3, global resolution with \tau = 0 . 0 0 1 and \tau = 0 . 0 0 0 1 achieve 1.03% and 0.47% higher acceptances than the other solvers for 100 ms/token, and 1.71% and 1.16% higher acceptances for 10 ms/token. While the improvements for Gemma-2 are smaller, they are significant. Thus, global resolution is the state-of-the-art OTLP solver*
-
-![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_gpsczXOsHn/figures/006_Table.jpg]]
-
-
-
 
 ## 定位与知识库关联
 
@@ -368,8 +346,6 @@ Figure 5 揭示了算法在目标模型温度升高时的脆弱性：当温度�
 3. **自适应截断集**：当前截断集大小由硬编码限制决定，是否可以通过自适应梯度信息或随机采样进一步降低凸函数的优化代价？这可能使算法在高温或大 $k$ 场景下保持可靠性。
 
 4. **与 SpecTr 等框架的深度集成**：Table 4 显示在多步框架中 Global Resolution 实现了 1.98× 的墙上时间加速，但块效率（每调用一次目标模型解码的 token 数）仍有提升空间。如何在多步调度中更好地利用 Global Resolution 的精度优势？
-
-
 
 ## 原文 PDF
 

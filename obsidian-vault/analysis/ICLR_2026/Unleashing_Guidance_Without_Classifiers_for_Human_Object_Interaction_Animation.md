@@ -54,8 +54,6 @@ LIGHT 的核心洞察是**将表示分解为身体、手部与物体三个独立
 
 实验结果表明，LIGHT 在 InterAct 数据集上取得 FID 0.148、交互 C_F1 0.627，较 InterDiff 分别改善 0.067 和 0.043（Table 1）。形状谱增强使未见物体的 In-category Top-1 R-Precision 从 0.216 提升至 0.279（Table 3），验证了跨物体泛化能力。主要局限在于仅支持单物体场景，且推理计算成本约为基线的 5 倍。
 
-
-
 人机交互（Human-Object Interaction, HOI）动画生成是计算机视觉与图形学中的核心挑战，其目标是根据文本描述或物体几何信息，生成真实、物理合理的人体运动序列。近年来，扩散模型在人体运动生成领域取得了显著进展，但在涉及人与物体精细接触的场景中，现有方法仍面临根本性瓶颈。
 
 **核心瓶颈**在于：扩散模型在生成HOI动画时缺乏精细且持续的接触控制。现有方案通常依赖两类策略来弥补这一缺陷——要么引入手工设计的接触先验（如预定义的接触图或可供性预测），要么在推理时借助外部分类器提供引导信号。这两类方案均存在明显的泛化性与效率问题：手工先验难以覆盖多样化的交互模式，而外部分类器引导（classifier guidance）需要额外训练判别模型，增加了系统复杂度与计算开销。
@@ -70,8 +68,6 @@ LIGHT 的核心洞察是**将表示分解为身体、手部与物体三个独立
 上述方法的共同缺陷在于：它们将身体、手部与物体状态视为单一统一表示，未能充分利用各模态在交互中的差异化角色。这种“一刀切”的建模方式使得模型难以自动关注接触细节——手部动作的精细度、物体与人体表面的几何关系等关键信息在统一的噪声扰动与去噪过程中被稀释。
 
 **本文的动机**正是突破这一瓶颈：能否在不依赖任何手工接触先验或外部分类器的前提下，从数据分布中隐式诱导出接触感知的引导信号？LIGHT（Learning Implicit Guidance for Human-object inTeraction）提出了一条新路径——通过将表示分解为身体、手部和物体三个独立模态，并在推理时为不同模态分配异步噪声水平，构建清洁/噪声对比，从而在不引入额外先验的条件下，自动产生关注接触细节的引导效果。
-
-
 
 ## 核心方法与创新机理
 
@@ -101,8 +97,6 @@ LIGHT的核心创新在于将扩散模型的去噪过程从“全体同步”转
 ### 创新总结
 
 三个changed slots形成递进关系：**令牌分离**为异步去噪提供结构基础，**节奏诱导引导**利用这一结构从数据分布中隐式提取接触信号，**形状谱增强**则弥补数据多样性不足的短板。三者的协同使得LIGHT在无需手工接触先验或外部分类器的前提下，实现了对接触细节的精细控制和对未见物体的鲁棒泛化。
-
-
 
 ![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_7lgQernr2Z/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of LIGHT. Left: Training. We form different modalities, e.g., body, hand, and object, each diffused with its own noise level. After adding modal-wise and frame-wise rotary positional encodings, the tokens are processed by a shared Transformer decoder and an MLP head to predict clean motion. Right: Inference. We compare a uniform schedule that denoises all modalities synchronously with a staged schedule that keeps one modality cleaner from the uniform run*
@@ -151,8 +145,6 @@ $$\tilde{\pmb{x}}_S = \mathcal{G}_{\theta}(x_S(\lambda), \lambda, d) + \omega_1 
 ### 模块关系总结
 
 整个pipeline的数据流为：**文本+物体几何 → 多模态令牌化 → 共享Transformer解码器（含自注意力与交叉注意力）→ MLP预测头 → 去噪运动输出**。训练时各令牌接受独立噪声水平；推理时通过双路径对比产生隐式引导，最终输出物理合理、接触精细的HOI动画序列。
-
-
 
 LIGHT 的核心架构由六个功能模块构成，其设计围绕一个关键洞察：将人机交互（HOI）表示分解为身体、手部和物体三种模态令牌，并赋予独立的扩散噪声水平，从而在推理时通过异步去噪调度隐式诱导出接触感知的引导信号。
 
@@ -210,14 +202,11 @@ $$\tilde{\pmb{x}}_S = \mathcal{G}_{\theta}(x_S(\lambda), \lambda, d) + \omega_1 
 
 其中 $\omega_2$ 控制节奏引导强度，$\delta$ 控制去噪先行偏移。消融实验表明 $\omega_2=4$、$\delta=200$ 在 FID 和穿透之间取得最佳平衡（Figure 6）。梯度方向分析进一步证实，LIGHT 的引导方向与穿透降低梯度的余弦相似度比纯文本 CFG 更高（InterAct 上 +0.035，OMOMO 上 +0.032），表明其能自动减少穿透伪影（Table 4）。
 
-
-
 ## 实验与关键发现
 
 ### 主要结果
 
 LIGHT 在 InterAct 数据集上与四种基线方法进行了全面对比：**HOI-Diff** (Peng et al., 2023)、**CHOIS** (Li et al., 2023a)、**InterDiff** (Xu et al., 2023b) 和 **Text2HOI** (Cha et al., 2024)。Table 1 报告了核心定量结果。
-
 
 ![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_7lgQernr2Z/figures/004_Table_1.jpg]]
 *Table 1: Quantitative comparisons on the InterAct dataset (Xu et al., 2025a) between our method and baseline approaches. We report R-Precision with batch sizes 256. object, optimizing the placement so that the original human-object contact points are preserved – the new object’s corresponding points remain consistently matched to the same human contacts. The optimization objectives are detailed in Sec. A.2 of the Appendix*
@@ -230,18 +219,15 @@ LIGHT 在 InterAct 数据集上与四种基线方法进行了全面对比：**HO
 
 **令牌分离策略**（Table 2, Figure 4）。完全分离方案（身体-手部分离 + 人体-物体分离）在所有指标上最优：R-Precision Top-1 为 0.421，FID 为 0.148。仅分离身体-手部而合并人体-物体的方案性能次之，完全不分离的方案最差。Figure 4 的定性对比揭示了关键差异：当身体和手部合并为单一令牌时，抓取动作出现明显伪影（红色虚线框标注），而分离令牌策略能生成更精确的抓取姿态和物体放置。
 
-
 ![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_7lgQernr2Z/figures/005_Table_2.jpg]]
 *Table 2: Ablation study of token-separation strategies on the InterAct dataset (Xu et al., 2025a). We report R-Precision with batch size 256*
 
 **节奏诱导引导**（Table 1, Figure 5, Figure 6）。对比 LIGHT 无引导版本与完整版本，引导的引入使 FID 从 0.196 降至 0.148，交互 F1 从 0.599 升至 0.627。Figure 5 的定性示例展示了引导对生成质量的显著提升：无引导时动作缺乏精细接触，完整方法则呈现清晰的接触动态。超参数消融（Figure 6）表明，引导权重 $\omega_2 = 4$ 和去噪偏移 $\delta = 200$ 在 FID 与穿透之间取得最佳平衡；过大的偏移会导致模态间过度发散和突兀融合。
 
-
 ![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_7lgQernr2Z/figures/011_Figure_6.jpg]]
 *Figure 6: Ablation study on the schedule-based guidance weight ω2 and denoising preceding offset δ. Left: δ fixed at 200 while varying ω2. Right: $\omega _ { 2 }$ fixed at 4 while varying δ*
 
 **形状谱增强**（Table 3）。数据增强对未见物体的泛化能力至关重要。在类别内未见物体上，增强使 Top-1 R-Precision 从 0.216 提升至 **0.279**（提升 29%），FID 从 0.169 降至 0.153。跨类别未见物体的提升同样一致。增强数据的质量验证（Table A）显示，增强样本的穿透和漂浮指标与真实标注接近，Chamfer 距离的 F1 分数保持较高水平，说明接触语义在重定向过程中得到有效保留。
-
 
 ![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_7lgQernr2Z/figures/009_Table_3.jpg]]
 *Table 3: Ablation study. We compare models trained with and without data augmentation on the InterAct dataset (Xu et al., 2025a). Experiments on unseen objects include in-category and cross-category objects never observed during training. We report R-Precision with batch size 256*
@@ -251,34 +237,12 @@ LIGHT 在 InterAct 数据集上与四种基线方法进行了全面对比：**HO
 Table 4 揭示了 LIGHT 引导的内在机理。将 LIGHT 引导方向 $g_{\mathrm{LIGHT}}$ 与穿透降低梯度 $\nabla L_{\mathrm{pen}}$ 计算余弦相似度，在 InterAct 上为 **0.217+0.035**，在 OMOMO 上为 **0.239+0.032**，均显著高于纯文本 CFG 的 0.217 和 0.239。这表明节奏诱导引导能自动朝向减少穿透伪影的方向更新。同时，LIGHT 引导方向与真实分布方向的相似度（InterAct: 0.401+0.002）与文本 CFG（0.401）持平，说明引导在改善接触质量的同时未牺牲与真实分布的对齐。
 
 
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_7lgQernr2Z/figures/012_Table_4.jpg]]
-*Table 4: Comparison of the mean gradient similarity with penetration-descending direction, direction towards GT distribution. δ = 250 is used and mean gradient similarity is calculated on all the guiding steps. we define $\langle \mathbf { a } , \mathbf { b } \rangle$ ~ = ~ $\frac { \mathbf { a } } { \| \mathbf { a } \| } \cdot \frac { \mathbf { \bar { b } } } { \| \mathbf { b } \| }$
-
 ### 失败模式与局限
 
 尽管 LIGHT 在主要指标上表现优异，仍存在若干局限。首先，框架仅处理单物体场景，尚未扩展至多物体交互。其次，未显式建模静态环境上下文或场景几何，生成动作的情境真实感可能受限。对于高动态或物理复杂的交互（如快速抛接），模型仍可能产生不合理的接触或穿透。最后，推理计算成本较高：两阶段去噪调度使推理速度比基线慢约 5 倍，难以满足实时部署需求。这些局限指向了未来的改进方向，包括多物体扩展、环境上下文整合以及推理效率优化。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_7lgQernr2Z/figures/013_Table_5.jpg]]
-*Table 5: Table A: Quantitative evaluation of augmented data quality relative to ground truth annotations*
-
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_7lgQernr2Z/figures/015_Table_6.jpg]]
-*Table 6: Table B: Quantitative evaluation of unconditional generation on the BEHAVE dataset (Bhatnagar et al., 2022). For R-Precision we adopt a batch size of 64. We don’t retrain our model for unconditional generation. (b) Guidance Effect*
-
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_7lgQernr2Z/figures/018_Table_7.jpg]]
-*Table 7: Table C: Ablation of modality combinations m1, m2 on InterAct (Xu et al., 2025a), BEHAVE (Bhatnagar et al., 2022), and OMOMO (Li et al., 2023a) datasets. We report R-Precision with batch size 256. human shape to synthesize a complete HOI sequence without extra conditioning, and (ii) controllable HOI generation, where the model is conditioned on a richer set of inputs—including the full object motion sequence, object mesh, human shape, and a textual description—to generate the corresponding HOI sequence. For both settings, we reuse the model from the main paper without retraining. This is made possible by our independent noise scheduling, which allows the model to noised out unused condition...*
-
 ![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_7lgQernr2Z/figures/019_Table_8.jpg]]
 *Table 8: Table D: Quantitative comparisons on the OMOMO dataset (Li et al., 2023a) between our method and baseline approaches. We report R-Precision with batch size 256*
-
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_7lgQernr2Z/figures/020_Table_9.jpg]]
-
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_7lgQernr2Z/figures/021_Table_10.jpg]]
-*Table 10: Table F: Ablation study of token-separation strategies on the BEHAVE dataset Xu et al. (2025a). We report R-Precision with batch size 256*
-
-
-
 
 ## 定位与知识库关联
 
@@ -325,8 +289,6 @@ LIGHT 的有效性建立在以下前提之上：
 - **计算效率优化**：能否在保持引导质量的前提下降低推理开销？潜在方向包括：共享两阶段去噪的中间特征、设计自适应调度策略以减少冗余步骤、或通过知识蒸馏将引导信号压缩至单阶段模型。
 
 - **引导机制的理论理解**：Table 4 表明 LIGHT 的引导方向与穿透降低梯度具有更高相关性，但这一相关性是训练过程中隐式涌现的，其理论根源尚不清晰。进一步分析噪声水平偏移 δ 与引导方向之间的关系，可能揭示扩散模型中条件控制的更深层原理。
-
-
 
 ## 原文 PDF
 

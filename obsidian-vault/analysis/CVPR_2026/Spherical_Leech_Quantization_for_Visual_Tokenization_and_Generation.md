@@ -81,8 +81,6 @@ claims:
 
 当前工作主要验证了类条件图像生成，尚未探索文本条件生成等更复杂场景。Leech网格码本是固定的，可能无法适应特定数据分布，其微调空间未被探索。超大码本在较小模型上存在利用率不均衡的问题。此外，自回归生成中的采样策略仍依赖启发式调整。这些方向为后续研究留下了空间，例如将Λ24-SQ扩展至视频或音频领域，或设计可学习的轻量级变形以适应特定域。
 
-
-
 ### 视觉标记化的核心挑战
 
 视觉标记化（visual tokenization）旨在将连续图像信号转换为离散的符号序列，是连接图像与语言模型、实现统一多模态生成的关键桥梁。其核心流程可表示为：
@@ -112,8 +110,6 @@ $$\mathcal{L}_{\mathrm{entropy}} = \mathbb{E}[H[q(\boldsymbol{z})]] - \gamma H[\
 论文由此提出核心洞察：**将非参数量化统一解释为网格编码（lattice coding），并将熵最大化等效为超球面上的最分散点配置**。这一几何视角不仅揭示了现有方法的本质联系（如 Figure 1 中的 Venn 图所示），更自然引出一个根本性解决方案：直接采用已知具有最高球体堆积密度的网格作为码本，从而天然实现熵最大化，无需任何显式正则化。
 
 在此基础上，论文选择了 **24 维 Leech 网格的第一壳层向量**作为码本——该网格在 24 维空间中实现了已知最优的球体堆积密度，其第一壳层包含 196,560 个向量，恰好构成一个规模可观且几何性质极佳的固定码本。这一方法被命名为 **球形 Leech 量化（Λ24-SQ）**，其核心优势在于：将码本设计的理论根基从“经验调参”提升至“最优几何”，以极简的训练范式（仅需 ℓ1、GAN 和 LPIPS 三种损失，无需承诺损失和熵惩罚）实现了显著的质量提升——在 ImageNet-1k 上 rFID 从 BSQ 的 1.14 降至 0.83，并在自回归生成中首次以约 20 万码本规模达到接近验证集预言机的 FID（1.82 vs. 1.78）。
-
-
 
 ## 核心方法与创新机理
 
@@ -163,8 +159,6 @@ Figure 3的训练曲线表明，这两项技术使梯度范数稳定、损失曲
 
 一个反直觉的发现是：使用DINOv2特征进行VF对齐虽略微降低重建指标（rFID从0.83升至0.92），却显著提升生成结果的FID、IS和召回率（Figure 5, Figure 6）。这揭示了量化表示在“忠实重建”与“语义生成”之间的根本张力，而VF对齐通过引入语义先验有效缓解了这一困境。
 
-
-
 本文提出的球形Leech量化（Spherical Leech Quantization，**Λ24-SQ**）构建了一套从图像标记化到视觉生成的全流水线。该框架以**网格编码（lattice coding）**为统一视角，将非参数量化方法重新解释为网格上的编码问题，并借助高维球体堆积理论设计码本，从而在无需熵正则化的条件下实现高质量图像重建与生成。
 
 ### 视觉标记化流水线
@@ -213,13 +207,6 @@ $$\operatorname*{max}_{\pmb{c}_1,\cdots,\pmb{c}_N \in \mathbb{S}^{d-1}} \operato
 6. **采样策略**：在推理阶段采用无分类器引导（CFG）、top-p/top-k采样及线性缩放等技巧控制生成质量。
 
 与BSQ等基线相比，Λ24-SQ在训练时仅需 $\ell_1$、GAN和LPIPS三种损失函数，完全移除了承诺损失和熵正则化项。这一简化直接源于Leech网格作为已知最优24维球体堆积的几何特性——其码本点天然具有最大化的最小距离（$\delta_{\min}=0.866$，较BSQ的0.471提升超80%），从而无需额外的熵控制机制即可保证码本利用率。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l934_https_arxiv_org_abs_2512_14697/figures/001_Figure_1.jpg]]
-*Figure 1: Upper left: A Venn Diagram that contains all definitions and quantization methods covered in this paper. We provide a unified formulation of various non-parametric quantization methods [56, 86, 91] from a lattice-coding perspective in Section 3.1. The geometric interpretation of the entropy penalties in Section 3.2 then leads to a family of densest hypersphere packing lattices (Section 3.3). Based on the spherical Leech lattice, a 24-d case of the densest hypersphere packing lattices, we instantiate Spherical Leech Quantization*
-
-
 
 ### 视觉标记化的统一网格编码视角
 
@@ -290,12 +277,6 @@ $$\log p(\pmb{c}^{(1:d)}) \approx \sum_{i}^{d} \log p(\pmb{c}^{(i)})$$
 $$z \xrightarrow{f(\cdot)} \bar{z} = \lfloor L/2 \rfloor \tanh(z) \xrightarrow{Q_{FSQ}(\cdot)} \hat{z} = \mathrm{round}(\bar{z})$$
 
 该方法通过有界缩放和取整实现量化，设计启发式，缺乏球面堆积的几何最优性保证。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l934_https_arxiv_org_abs_2512_14697/figures/004_Figure_2.jpg]]
-
-
 
 ## 实验与关键发现
 
@@ -383,24 +364,8 @@ $$z \xrightarrow{f(\cdot)} \bar{z} = \lfloor L/2 \rfloor \tanh(z) \xrightarrow{Q
 
 关键区分点：Λ24-SQ 是首个将球体堆积理论系统引入视觉标记化的方法，通过选择已知最优网格实现天然的熵最大化，在理论上统一了非参数量化方法的网格编码解释，在实践上以更简单的训练流程（无熵惩罚、无承诺损失）实现了更优的重建-生成权衡。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l934_https_arxiv_org_abs_2512_14697/figures/009_Table_5.jpg]]
 *Table 5: Image reconstruction results on COCO2017 and ImageNet-1k*
-
-![[assets/figures/papers/paper_list_l934_https_arxiv_org_abs_2512_14697/figures/011_Figure_5.jpg]]
-*Figure 5: VAR Tokenizer*
-
-![[assets/figures/papers/paper_list_l934_https_arxiv_org_abs_2512_14697/figures/012_Figure_6.jpg]]
-*Figure 6: VF alignment improves convergence and final generation results, especially recall. The model has 12 layers (240M)*
-
-![[assets/figures/papers/paper_list_l934_https_arxiv_org_abs_2512_14697/figures/014_Table_9.jpg]]
-*Table 9: ∞-CC with different prediction heads*
-
-![[assets/figures/papers/paper_list_l934_https_arxiv_org_abs_2512_14697/figures/015_Figure_7.jpg]]
-*Figure 7: Scaling effect of the codebook size. Left: Increasing the codebook size improves gFID when the model is large (0.49B). Right: Increasing the codebook size pushes the Precision-Recall Pareto frontier towards the oracle precision-recall derived from the validation set (see the zoom-in at the bottom left)*
-
-
 
 ## 定位与知识库关联
 
@@ -472,8 +437,6 @@ $\delta_{\min}$ 从0.471提升至0.866（**提升超过80%**），同时有效�
 4. **与扩散模型的结合**：Λ24-SQ作为离散标记器，能否与连续扩散模型结合，实现更高质量的生成或更高效的压缩？
 
 5. **理论完备性**：采样策略（CFG线性缩放、top-p/top-k组合）的启发式本质表明，自回归生成侧的理论基础仍落后于量化侧的几何理论，需要更系统的研究。
-
-
 
 ## 原文 PDF
 

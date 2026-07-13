@@ -49,8 +49,6 @@ claims:
 
 在 $(10, 10^{-5})$-DP 设定下，DP-Sinkhorn 在 MNIST 上取得 **FID 48.4**（对比 GS-WGAN 的 61.3），下游 CNN 分类准确率达 **83.2%**（+3.2%）；在 Fashion-MNIST 上 FID 为 **128.3**（对比 GS-WGAN 的 131.3），分类准确率达 **71.1%**（+6.1%），在图像质量和数据效用两项指标上均超越 GS-WGAN、DP-MERF、DataLens 等现有方法。消融实验确认，半去偏参数 $p=0.4$ 是偏差-方差的最佳平衡点，混合 L1/L2 成本函数可兼顾图像锐度与下游分类性能，且 DP-Sinkhorn 对学习率和优化器不敏感，训练过程稳定收敛，无需像 GAN 那样依赖提前停止。然而，该方法仍需针对不同数据集进行耗时的超参数网格搜索，训练迭代数随隐私预算收紧而急剧增加（如 CelebA 需约 1.7M 步），且仅在小尺寸低分辨率数据集上得到验证，高分辨率生成能力及对成员推断攻击的防御强度尚待进一步评估。
 
-
-
 ### 差分隐私生成模型的核心困境
 
 生成模型在数据共享、数据增强等场景中具有重要价值，但当训练数据包含敏感信息（如医疗影像、人脸图像）时，直接发布模型参数或合成样本可能导致隐私泄露。差分隐私（Differential Privacy, DP）为这一场景提供了严格的数学保障，但将其应用于生成模型训练时面临根本性挑战：**隐私噪声与训练稳定性之间的冲突**。
@@ -81,8 +79,6 @@ claims:
 - **在生成图像梯度层面施加隐私保护**，而非在参数梯度或判别器输出上加噪，利用图像梯度的低维特性减少隐私预算消耗。
 
 这一设计使得DP-Sinkhorn能够在严格差分隐私约束下实现稳定训练，并在图像合成质量上超越现有方法。
-
-
 
 ## 核心方法与创新机理
 
@@ -121,8 +117,6 @@ $$\tilde{\mathbf{G}}^{[i]} = \mathbf{G}^{[i]} \cdot \min\left(\frac{\Delta}{\|\m
 $$c_m(\mathbf{x},\mathbf{y}) = L_2(\mathbf{x},\mathbf{y})^2 + m L_1(\mathbf{x},\mathbf{y})$$
 
 消融实验（Table 2）表明，引入 $L_1$ 分量（$m=1$ 或 $m=3$）相比纯 $L_2$ 成本能同时提升图像锐度和下游分类性能，这为 OT 距离在差分隐私图像生成中的应用提供了有效的感知质量调控手段。
-
-
 
 DP-Sinkhorn 是一种基于最优传输（Optimal Transport, OT）的差分隐私生成模型训练框架，其核心设计思想是用 **Sinkhorn 散度** 取代传统 GAN 的对抗训练目标，从而从根本上规避对抗训练的不稳定性与模式崩溃问题。整体训练流程是一个端到端的迭代损失最小化过程，无需判别器网络，也无需在参数梯度上进行传统的 DPSGD 式加噪。
 
@@ -178,8 +172,6 @@ DP-Sinkhorn 是一种基于最优传输（Optimal Transport, OT）的差分隐�
 
 这些超参数之间存在耦合关系，不同数据集需要独立的网格搜索（Table 4、Table 5 展示了 MNIST 和 Fashion-MNIST 上的搜索空间）。这一调优过程若直接在私有数据上反复实验会消耗隐私预算，是该方法的一个实际部署限制。
 
-
-
 DP-Sinkhorn 的训练流程由六个关键模块串联构成，其核心创新在于用半去偏 Sinkhorn 损失替代对抗损失，并在生成图像梯度层面注入隐私噪声。
 
 ### 1. 数据采样与生成
@@ -230,16 +222,12 @@ $$\tilde{\mathbf{G}}^{[i]} = \mathbf{G}^{[i]} \cdot \operatorname*{min}\left(\fr
 
 清洗后的梯度反传至生成器，使用 Adam 优化器更新参数 $\theta$。整个流程为端到端的直接距离最小化，无需判别器网络或对抗训练（Algorithm 1 lines 12-13）。
 
-
-
 ## 实验与关键发现
 
 ### 主要结果：图像生成质量与下游效用
 
 DP-Sinkhorn 在 MNIST 和 Fashion-MNIST 上以 (10, 10⁻⁵)-DP 的隐私预算下，在 FID 和下游分类准确率两个维度上均超越现有方法。Table 1 给出了系统对比：
 
-![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2111_01177/figures/002_Table_1.jpg]]
-*Table 1: Comparison of DP image generation results on MNIST and Fashion-MNIST at ( $\epsilon , \delta$ ) = ( 1 0 , 1 $0 ^ { - 5 }$ ) – $\mathrm { D P }$ Results for other methods (G-PATE [27], DP-CGAN [24], GS-WGAN [13]) are from [13], except DP-MERF [29] and Datalens [14]. Results are averaged over 5 runs of synthetic dataset generation and classifier training
 
 - **MNIST**：DP-Sinkhorn 取得 FID 48.4，相比此前最优的 **GS-WGAN**（FID 61.3）降低 12.9；以合成数据训练的 CNN 分类准确率达 83.2%，高于 GS-WGAN 的 80.0%。其他对比方法包括 **G-PATE**（FID 150.6 / Acc 58.0%）、**DP-CGAN**（FID 179.2 / Acc 60.0%）、**DP-MERF**（FID 121.4 / Acc 63.0%）和 **DataLens**（FID 57.8 / Acc 80.0%），DP-Sinkhorn 在所有指标上均占优。
 - **Fashion-MNIST**：DP-Sinkhorn 取得 FID 128.3，优于 GS-WGAN 的 131.3；CNN 准确率 71.1%，显著高于 GS-WGAN 的 65.0%。DP-MERF 的 FID 为 161.7、准确率 61.0%，DataLens 的 FID 为 167.7、准确率 65.0%，差距更为明显。
@@ -307,16 +295,6 @@ DP-Sinkhorn 展现出 GAN 类方法难以比拟的训练稳定性。**Figure 4a*
 
 **4. 超参数调优与隐私原则的冲突**：网格搜索若直接在私有数据上反复实验，会累积隐私损失；文中未讨论如何在不消耗额外隐私预算的前提下完成超参数选择。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2111_01177/figures/003_Figure_2.jpg]]
-*Figure 2: Images generated at (10, 10−5)-DP for MNIST and Fashion-MNIST by various methods. Datalens images obtained from [14]; images of [27, 24, 13] obtained from [13]. Figure 3: Images generated on CelebA by Datalens (top, left), DP-MERF (top, right), and DP-Sinkhorn (bottom). Datalens images obtained from [14]*
-
-![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2111_01177/figures/004_Figure_4.jpg]]
-*Figure 4: (c) Bias-variance trade-off of the gradient estimator over semi-debiasing parameter p. Figure 4: Analyzing hyperparameter choices in DP-Sinkhorn*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 问题瓶颈与因果杠杆
@@ -381,8 +359,6 @@ DP-Sinkhorn的隐私保护遵循一个精确的边界：**仅对与真实数据�
 3. **跨模态扩展**：DP-Sinkhorn在医学影像、金融表格等非图像数据以及多模态生成任务中的隐私-效用权衡如何？
 4. **超参数自动调优**：能否通过元学习或在线贝叶斯优化自动调整 $p$ 等关键超参数，避免额外的手动调优和隐私预算消耗？
 5. **隐私鲁棒性强化**：如何增强对成员推断攻击的防御能力，并在理论RDP保证与实际攻击成功概率之间建立更紧密的联系？
-
-
 
 ## 原文 PDF
 

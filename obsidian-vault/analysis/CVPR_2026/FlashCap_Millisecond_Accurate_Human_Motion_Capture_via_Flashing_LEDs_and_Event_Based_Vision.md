@@ -51,8 +51,6 @@ FlashCap 通过**闪烁LED与事件相机**的组合打破上述限制。其核�
 
 自动标注管线在24段人工标注序列上达到**99.99%精确率**与**98.82%召回率**，性能接近人工标注水平（Table 2）；消融实验表明，移除匹配项中的开-关时间距离（$d_{ji}^{t}$）或周期距离（$d_{ji}^{p}$）会导致关节误分类，移除离群过滤或跟踪则造成关节漏检（Figure 7）。系统在部分光照变化与遮挡场景下已验证鲁棒性，但在强光干扰或全部LED被遮挡时的性能尚未充分探索。
 
-
-
 ### 高速运动计时的“帧率鸿沟”
 
 精准运动计时（Precise Motion Timing, PMT）在体育科学、康复医学和生物力学分析中至关重要。例如，击剑运动员的出剑瞬间、拳击手的出拳时机、舞者的起跳时刻，都需要毫秒级的计时精度才能进行有效的技术诊断。然而，现有运动捕捉系统长期受困于一个根本性瓶颈：**标注帧率远低于实际运动的时间分辨率需求**。
@@ -80,8 +78,6 @@ FlashCap 通过**闪烁LED与事件相机**的组合打破上述限制。其核�
 3. **FlashMotion 数据集**：首个提供 1000 Hz 2D 关节标签的多模态人体运动数据集，包含 7.15M 标注帧，远超现有数据集的标注帧率与规模。
 4. **ResPose 方法**：一种融合低帧率 RGB 锚点姿势与事件流残差的高时间分辨率人体姿态估计方法，在 FlashMotion 上将 MPJPE 相比标准 RGB 插值降低约 40%。
 
-
-
 ## 核心方法与创新机理
 
 FlashCap 的核心创新在于**将运动捕捉服的 LED 身份直接编码进高频率的闪烁模式中**，从而绕过了传统光学运动捕捉系统的帧率瓶颈。这一范式转变通过两个紧密耦合的机制实现：一是硬件层面的“闪烁编码身份”设计，二是算法层面的“事件流直接解码”管线。
@@ -107,16 +103,11 @@ FlashCap 的核心创新在于**将运动捕捉服的 LED 身份直接编码进�
 
 这一设计使 ResPose 在 FlashMotion 数据集上将 MPJPE 相比标准 RGB 插值降低约 40%（Table 4），并取得 5.66 的 MPJPE 和 0.99 的 PCK0.5。在精准动作计时任务中，ResPose 实现击拳 4.8 ms、踢腿 7.2 ms、跳跃 6.5 ms 的平均时间误差（Table 3），验证了事件残差对捕捉毫秒级运动细节的关键作用。
 
-
-
 FlashCap 提出了一套完整的毫秒级人体运动捕捉与自动标注系统，其核心思想是将 LED 身份直接编码进高频率的闪烁模式中，利用事件相机异步捕捉的光强变化同时完成定位与识别，从而绕过传统光学系统的帧率瓶颈。整个框架由硬件采集层、自动标注管线和高时间分辨率人体姿态估计（HPE）三大部分构成，三者形成从数据获取到下游应用的高效闭环。
 
 ### 硬件采集层
 
 系统包含两套协同硬件（Figure 2）。运动捕捉服上搭载多个可独立配置闪烁频率的 LED 标记点与惯性测量单元（IMU），每个 LED 以预设的通断时间模式（例如 4000 Hz 频率，开启/关闭时长在 100–300 μs 之间差异化配置）发射光脉冲。多模态采集设备则由一台 RGB 相机和一台事件相机组成，同步记录场景的常规图像与异步事件流。事件相机输出的每个事件 $\boldsymbol{e} = (h, w, t, p)$ 包含像素坐标、微秒级时间戳和极性 $p$（亮度上升为正，下降为负），为毫秒级标注提供了物理基础。
-
-![[assets/figures/papers/paper_list_l1062_https_arxiv_org_abs_2603_19770/figures/003_Figure_2.jpg]]
-*Figure 2: The FlashCap Mocap outfit(left) and multi-modal capture device(right)*
 
 ### 自动标注管线
 
@@ -141,12 +132,8 @@ FlashCap 提出了一套完整的毫秒级人体运动捕捉与自动标注系�
 
 整体数据流可概括为：闪烁 LED 标记点 → 事件相机异步事件流 → 自动标注管线（聚类、匹配、跟踪）→ 1000 Hz 2D 标注 → 多模态数据集（FlashMotion）→ ResPose 高时间分辨率 HPE。其中 FlashMotion 数据集（Table 1）以 1000 Hz 的 2D 标注帧率和 715 万标注帧数显著超越现有数据集，为毫秒级运动分析提供了前所未有的真值基础。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1062_https_arxiv_org_abs_2603_19770/figures/001_Figure_1.jpg]]
 *Figure 1: FlashCap Overview. Left/Middle: A fencing lunge recorded via our multi-modal, event-based system using flashing LEDs. Right: Generated annotations featuring 1000Hz 2D labels (bottom) alongside 60Hz 3D SMPL (top), capturing fine-grained motion dynamics*
-
-
 
 ### 事件表示与LED闪烁编码
 
@@ -190,24 +177,14 @@ $$P_i = P_{\text{rgb}} + P_i^{\Delta}$$
 
 这一残差设计使得模型无需从事件流中独立回归完整姿势，而是以 RGB 锚点为先验，仅需学习运动偏移量，显著降低了事件分支的学习难度。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1062_https_arxiv_org_abs_2603_19770/figures/004_Figure_3.jpg]]
 *Figure 3: An example of the FlashCap data annotation pipeline: (0) Event Streams. (1) Identified Event Clusters. (2) Cluster Frequency Analysis. (3) Filtered Clusters After Noise Removal. (4) Matched LED-Cluster Pairs (Labels)*
-
-![[assets/figures/papers/paper_list_l1062_https_arxiv_org_abs_2603_19770/figures/010_Figure_8.jpg]]
-*Figure 8: Architecture of ResPose. It obtain high-temporal resolution pose Pi through*
-
-
 
 ## 实验与关键发现
 
 ### 标注管线定量评估
 
 FlashCap 自动标注管线的核心目标是替代昂贵的人工标注，生成可靠的 1000 Hz 2D 关节真值。Table 2 报告了在 24 段人工标注序列上的定量评估结果：完整管线达到 **99.99% 的精确率**和 **98.82% 的召回率**，性能接近人工标注水平。
-
-![[assets/figures/papers/paper_list_l1062_https_arxiv_org_abs_2603_19770/figures/011_Table_2.jpg]]
-*Table 2: Quantitative evaluation against human annotated labels*
 
 消融实验（Figure 7）揭示了各组件的关键作用：
 - **移除开-关时间距离 $d_{ji}^{t}$** 或 **周期距离 $d_{ji}^{p}$**：导致事件集群与 LED 身份的错误匹配，引发关节误分类。
@@ -222,9 +199,6 @@ FlashCap 自动标注管线的核心目标是替代昂贵的人工标注，生�
 
 精准动作计时（Precise Motion Timing, PMT）是 FlashMotion 数据集独有的评测任务，要求方法准确估计动作跨越预设线的时间戳。Table 3 报告了 ResPose 与各基线方法的平均时间误差：
 
-![[assets/figures/papers/paper_list_l1062_https_arxiv_org_abs_2603_19770/figures/012_Table_3.jpg]]
-*Table 3: The Mean Error of Estimated Time (PMT).Unit: ms*
-
 - **击拳**：4.8 ms
 - **踢腿**：7.2 ms
 - **跳跃**：6.5 ms
@@ -234,9 +208,6 @@ ResPose 在所有动作类别上均取得最低误差。这一优势源于其架
 ### 高时间分辨率 HPE 任务
 
 Table 4 报告了 FlashMotion 上高时间分辨率人体姿态估计（HPE）任务的结果。ResPose 取得 **5.66 的 MPJPE** 和 **0.99 的 PCK0.5**。摘要中明确指出，相比标准 RGB 插值方法，ResPose 将 MPJPE **降低约 40%**（基线 MPJPE 约 9.4）。
-
-![[assets/figures/papers/paper_list_l1062_https_arxiv_org_abs_2603_19770/figures/014_Table_4.jpg]]
-*Table 4: High Temporal Resolution HPE Task in FlashMotion*
 
 Figure 10 提供了 50 ms 间隔内的轨迹定性对比。ViTPose 和 ViT（spline）的轨迹呈平滑线性，无法反映真实运动的非线性动态；事件方法（Hybrid ANN-SNN、EventPointPose、GraphEnet、EvSharp2Blur、LEIR）虽能捕捉部分高频变化，但在关节间空间一致性上表现不佳。ResPose 通过骨骼感知的自注意力机制建模 17 个关节间的全局依赖，同时利用事件补丁的动态裁剪（以 $P_{\text{rgb}}$ 锚点为中心的 32×32 时空窗口）聚焦局部运动区域，实现了高频精度与空间一致性的平衡。
 
@@ -258,15 +229,8 @@ Table 1 将 FlashMotion 与现有运动捕捉数据集进行了全面对比。Fl
 ![[assets/figures/papers/paper_list_l1062_https_arxiv_org_abs_2603_19770/figures/002_Table_1.jpg]]
 *Table 1: Comparisons with related human motion datasets. Datasets with Event camera data are grouped in the second block. Our FlashMotion provides the highest 2D label frame rate (1000Hz) and the largest number of labeled frames (7.15M) by a significant margin. Abbreviations: (Dur.) Duration, (# Seqs.) Number of Sequences, (# Subjs.) Number of Subjects*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1062_https_arxiv_org_abs_2603_19770/figures/006_Figure_5.jpg]]
-*Figure 5: Interpolated vs. Ground-Truth 1000 Hz Poses. (Left) Event frames at selected timestamps. (Middle) Accumulated event stream. (Right) trajectory comparison. The red line indicates 20 Hz interpolation, and the green line indicates 1000 Hz ground truth*
-
 ![[assets/figures/papers/paper_list_l1062_https_arxiv_org_abs_2603_19770/figures/009_Figure_6.jpg]]
 *Figure 6: Qualitative evaluation against a high-speed camera: Columns (a), (c), and (e) show that our labels (green spots) overlap with the images captured by high-speed cameras closely. This demonstrate the correctness of FlashMotion labels qualitatively. Columns (b), (d), and (f) show that the corresponding events overlaid on the RGB frames. The red/blue dots indicate events with positive/negative polarity*
-
-
 
 ## 定位与知识库关联
 
@@ -320,8 +284,6 @@ ResPose 将 MPJPE 从标准 RGB 插值的约 9.4 降至 **5.66**（降幅约 40%
 ### 6. 知识库定位总结
 
 FlashCap 在知识库中的定位可概括为：**首个将闪烁 LED 身份编码与事件视觉结合、实现毫秒级运动真值自动生成的数据获取范式**。它不直接竞争 HPE 模型架构，而是为高时间分辨率 HPE 提供了一个此前不存在的基准（FlashMotion）和一种锚点-残差融合的基线方法（ResPose）。后续工作若能在 3D 扩展、纯事件驱动、极端环境鲁棒性三个方向上取得突破，将进一步释放这一范式的潜力。
-
-
 
 ## 原文 PDF
 

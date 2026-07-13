@@ -59,8 +59,6 @@ SRPO（Self-Referential Policy Optimization）提出了一种**自参照范式**
 - SRPO的进展奖励在Spearman相关性（0.998）、单调性（0.992）、分布分离度等五项指标上全面优于像素级和ImageBind方法（Table 3），验证了潜在世界表示用于进展度量的有效性。
 - 消融实验证实，去除自参照机制（改用固定专家轨迹）导致性能平台化且需1.4倍训练步数；去除聚类组件则后期性能增益显著降低（Figure 10），表明批次内动态参照和聚类表示是方法的关键设计要素。
 
-
-
 ### 1. VLA 策略强化学习的奖励稀疏瓶颈
 
 视觉-语言-动作（VLA）模型通过在多样化机器人数据上的大规模预训练，展现了强大的任务泛化能力。然而，将 VLA 模型部署到具体操作任务时，仅依靠监督微调（SFT）往往难以获得鲁棒的行为策略。强化学习（RL）为策略的持续改进提供了自然的范式，但现有 VLA 强化学习方法面临一个核心瓶颈：**奖励稀疏**。
@@ -86,8 +84,6 @@ SRPO（Self-Referential Policy Optimization）提出了一种**自参照范式**
 然而，实现这一范式面临一个关键技术挑战：如何在缺乏任务特定知识的情况下，鲁棒地度量两条轨迹之间的“行为进展”？直接比较原始像素或关节角度会因视角变化、动作风格差异等因素而失效。本文的解决方案是利用**预训练世界模型的潜在表示**——这些表示在大规模机器人视频数据上习得，能够捕捉与任务进展相关的语义信息，同时抑制感知层面的噪声。
 
 基于上述动机，本文提出了 **SRPO（Self-Referential Policy Optimization）**——一个面向 VLA 模型的自参照策略优化框架，通过在预训练世界模型的潜在空间中度量行为进展，为失败轨迹分配密集的进展感知奖励，从而高效利用所有采样轨迹进行策略优化。
-
-
 
 ## 核心方法与创新机理
 
@@ -140,8 +136,6 @@ $$g_i = \begin{cases} 1.0 & \text{成功轨迹} \\ \phi\left(\frac{d_i - \bar{d}
 
 消融实验验证了自参照设计的必要性。当移除自参照机制、改用固定专家轨迹作为参照标准时，训练出现性能平台化，最终成功率显著低于完整SRPO，且需要约1.4倍的训练步数才能达到收敛（Figure 10）。进一步移除聚类组件、仅使用单条最近成功轨迹作为参照时，初期收敛速度相似，但后期性能增益显著降低。这表明，DBSCAN聚类通过捕获成功轨迹的多模态分布，为失败轨迹提供了更鲁棒的进展估计，是SRPO性能优势的重要来源。
 
-
-
 SRPO（Self-Referential Policy Optimization）的整体设计围绕一个核心瓶颈展开：**现有VLA强化学习方法仅依赖稀疏的二值成功信号，浪费了失败轨迹中丰富的进展信息**。SRPO通过引入“自参照”范式，将当前训练批次中策略自身生成的成功轨迹作为参照标准，利用预训练世界模型的潜在表示度量失败轨迹的行为进展，从而为失败尝试分配密集的进展奖励。
 
 ### 核心因果机制
@@ -178,12 +172,8 @@ SRPO的完整管道包含五个核心模块，数据流从策略推演到参数�
 
 - **进展度量与参照方式**：TGRPO虽引入了任务特定进展奖励，但依赖手工设计的进程分解；SRPO利用任务无关的预训练世界模型潜在表示，无需任何任务特定工程即可度量行为进展，且参照标准来自策略自身而非外部专家。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2421_https_arxiv_org_abs_2511_15605/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of Self-Referential Policy Optimization (SRPO). Existing approaches for Vision-Language-Sparse Reward Dense RewardExpert Trajectory Action (VLA) reinforcement learning face significant limitations: (a) methods like GRPO rely solely on sparse External-Referential outcome rewards, providing limited learning signal, while (b) hand-crafted process reward modeling (PRM) r=0requires costly external demonstrations and task-specific engineering. In contrast, our SRPO framework Self-Referential introduces a self-referential paradigm that leverages (i) in-batch successful trajectories and (ii) latent world representations to construct progress-wise rewards, enabling efficient utilization of...*
-
-
 
 SRPO 的核心架构由四个功能模块串联构成，形成“轨迹收集 → 世界表征提取 → 自参照进展奖励计算 → 策略优化”的闭环。以下按数据流顺序展开各模块及其关键公式。
 
@@ -242,13 +232,6 @@ $$\mathcal{L}_{\mathrm{SRPO}}(\boldsymbol{\theta}) = \mathbb{E}_{t,i} \left[ \mi
 ### 5. 模块间的因果链路
 
 上述四个模块形成清晰的因果链：世界模型编码器 $\mathcal{W}$ 的质量决定了潜在空间中行为相似性度量的可靠性；DBSCAN 聚类决定了参照中心的代表性和覆盖度；进展奖励映射 $\phi$ 决定了失败轨迹学习信号的密度和区分度；最终 SRPO 优化目标将进展奖励转化为策略改进的梯度方向。消融实验（Figure 10）验证了这一链路中每个环节的必要性：移除自参照机制（使用固定专家轨迹）导致性能平台化，移除聚类组件（使用单条最近成功轨迹）则显著降低后期性能增益。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2421_https_arxiv_org_abs_2511_15605/figures/002_Figure_2.jpg]]
-*Figure 2: Overview of the SRPO method. During policy rollout, both successful and failed trajectories are collected in the Rollout Reference Set. For each trajectory, we employ a world model pre-trained on large-scale robotics video data (Assran et al., 2025) as an encoder to extract latent world representations. Behavioral Optimizationsimilarity is modeled as the L2 distance between trajectory embeddings in this space to yield progress-wise rewards. These rewards are subsequently used for advantage estimation and policy optimization under KL regularization*
-
-
 
 ## 实验与关键发现
 
@@ -327,30 +310,11 @@ Figure 11展示了奖励函数中进展项权重α的敏感性分析。α控制�
 
 4. **超参数α的任务依赖性**：α的最优值（0.8）是在LIBERO基准上调定的，不同任务可能需要不同的进展-结果平衡权重，这限制了零样本部署的便捷性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2421_https_arxiv_org_abs_2511_15605/figures/003_Table_1.jpg]]
 *Table 1: Performance comparison on LIBERO benchmark. We evaluate mainstream VLA foundation models and RL-based methods. OpenVLA* incorporates action chunking and parallel decoding on the basis of OpenVLA. Policy Input notation: T (Thirdview), I (Instrcution), P (Proprio), W (Wristimage), D (Depth). Our approach, built upon one-shot SFT, achieves state-of-the-art results on LIBERO benchmark, with ↑ indicating performance gains over the one-shot baseline*
 
-![[assets/figures/papers/paper_list_l2421_https_arxiv_org_abs_2511_15605/figures/004_Table_2.jpg]]
-*Table 2: Robustness Evaluation on LIBERO-Plus Benchmark. OpenVLA-OFT+ refers to the OpenVLA-OFT model that has been trained on the LIBERO-Plus dataset. Our method, SRPO, applied to a one-shot SFT policy, not only significantly outperforms its base model but also surpasses the full-shot SFT baseline in all 7 dimensions, demonstrating superior generalization capability. The ↑ indicates performance gains over the One-shot SFT base model*
-
-![[assets/figures/papers/paper_list_l2421_https_arxiv_org_abs_2511_15605/figures/005_Table_3.jpg]]
-*Table 3: Progress Reward Benchmark Results. Our method achieved a better level than the baseline in all 5 indicators*
-
-![[assets/figures/papers/paper_list_l2421_https_arxiv_org_abs_2511_15605/figures/007_Figure_4.jpg]]
-*Figure 4: Training performance comparison using different progress reward formulations. Our SRPO-based reward enables stable and efficient learning, consistently outperforming both baselines*
-
-![[assets/figures/papers/paper_list_l2421_https_arxiv_org_abs_2511_15605/figures/008_Figure_5.jpg]]
-*Figure 5: Training efficiency comparison between SRPO and GRPO: (a) LIBERO-Long, (b) LIBERO-Object*
-
 ![[assets/figures/papers/paper_list_l2421_https_arxiv_org_abs_2511_15605/figures/013_Figure_10.jpg]]
 *Figure 10: Ablation study on Object suite. We compare our SRPO method against its ablated variants. Removing the referential component (w/o Referential) leads to significant performance drop, while removing the clustering component (w/o Cluster) slows down convergence*
-
-![[assets/figures/papers/paper_list_l2421_https_arxiv_org_abs_2511_15605/figures/014_Figure_11.jpg]]
-*Figure 11: Performance comparison with different α values in the reward function. The results demonstrate that α = 0.8 achieves the best performance, followed by*
-
-
 
 ## 定位与知识库关联
 
@@ -400,8 +364,6 @@ SRPO在三个层面继承了现有工作并做出关键改变：
 3. **更细粒度的子任务奖励分解。** 当前进展奖励是轨迹级别的标量，未能区分不同子任务阶段的进展。潜在世界表示是否能支持子任务级别的自动分解和分层奖励塑造，是一个开放问题。
 
 4. **安全约束下的在线训练。** 如何在不牺牲探索效率的前提下，将SRPO扩展到带安全约束的在线真实机器人训练，是实际部署的关键挑战。
-
-
 
 ## 原文 PDF
 

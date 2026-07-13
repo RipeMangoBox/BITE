@@ -52,8 +52,6 @@ claims:
 
 **主要结果**：在合作搬运任务上，TeamHOI统一策略在2至8个智能体上均取得超过97.5%的成功率，而CooHOI*-8在8智能体上仅为42.2%（Table 1）。在重载条件下（5倍桌面重量），TeamHOI在8智能体上成功率达81.1%，而CooHOI*-8仅为4.1%。消融实验证实掩码AMP显著提升了举升阶段成功率并促进多样化手-物交互（Figure 5），主轴覆盖奖励使智能体形成沿物体主轴对齐的稳定队形（Figure 6）。此外，统一策略展现出对未见过的物体尺寸和团队规模的零样本泛化能力（Table 4, Figure 9）。
 
-
-
 物理仿真环境中的人形智能体协作操控是具身智能领域的核心挑战之一。随着任务复杂度提升，多智能体系统需要协调各自的运动与交互行为，共同完成单人无法实现的搬运、组装等任务。基于强化学习的物理角色动画方法近年来取得了显著进展，但在多智能体协作人物体交互（Human-Object Interaction, HOI）方面仍面临两个关键瓶颈。
 
 **固定团队规模的架构限制。** 现有方法普遍采用基于MLP的策略网络，其输入维度固定，导致策略只能适配特定数量的智能体。以基线方法CooHOI为代表的工作，虽然通过预定义接触点和隐式物体共享动态实现了一定程度的协作，但策略无法感知队友的显式状态，缺乏对协作关系的直接建模。这使得策略在团队规模变化时需要重新训练，严重限制了可扩展性。当团队规模从4人扩展到8人时，CooHOI的成功率从94.5%骤降至42.2%，而在重载场景下更是跌至4.1%，暴露出固定架构在协调大量智能体时的根本性缺陷。
@@ -61,8 +59,6 @@ claims:
 **协作行为多样性的数据匮乏。** 基于对抗运动先验（Adversarial Motion Prior, AMP）的方法依赖参考运动数据来引导策略生成自然的人体动作。然而，多智能体协作的参考运动数据极为稀缺，现有数据集大多仅包含单人动作。标准全身AMP要求策略模仿参考运动的所有身体部位，这在协作搬运场景中会产生矛盾：智能体的手部需要与物体接触并施加力量，而参考运动中的手部动作往往是自由的，两者之间的冲突导致策略难以学习有效的交互行为，也无法产生多样化的手-物交互模式。
 
 上述两个瓶颈共同指向一个核心问题：**如何在无需多人参考运动数据的前提下，构建一个能够适应任意团队规模、且能产生多样化协作行为的统一策略框架？** 本文提出的TeamHOI正是针对这一问题，通过引入Transformer架构实现可变团队规模的显式队友感知，并设计掩码AMP策略从单人参考运动中扩展协作行为多样性，为多智能体协作HOI提供了一条可扩展的技术路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -100,8 +96,6 @@ $$r_{t}^{\mathrm{style}} = \sigma(\alpha_{t}) r_{t}^{\mathrm{mask}} + (1-\sigma(
 ### 创新总结
 
 上述三个 changed slots 形成了 TeamHOI 的核心创新链条：**Transformer + 队友令牌**解决了“可变团队规模”的可扩展性问题；**掩码 AMP** 解决了“协作行为多样性”的数据稀缺问题；**主轴覆盖队形奖励**则提供了不依赖预定义接触点的自适应协调机制。三者协同，使得单一统一策略能够在跨团队规模和物体几何形状的合作搬运任务中实现高效、稳定的协作。
-
-
 
 TeamHOI 旨在学习一个统一的去中心化策略，使可变数量的仿人智能体能够协作搬运不同几何形状的物体。其核心瓶颈在于：传统基于 MLP 的策略架构要求固定维度的输入，无法直接扩展到任意团队规模；同时，现有方法（如 CooHOI）隐式依赖物体共享动态进行通信，缺乏对队友状态的显式感知，限制了协作的自适应性和可扩展性。
 
@@ -165,8 +159,6 @@ $$g_{i} = \operatorname*{min}\left( \frac{\tilde{d}_{i}^{+}}{\ell_{i}^{+}}, \fra
 
 整体数据流为：仿真环境提供各智能体的本体感知状态和队友状态 → 分词器编码为令牌 → Transformer 编码器融合信息 → 动作头输出目标关节旋转 → PD 控制器驱动物理仿真。同时，掩码 AMP 模块根据交互程度提供风格奖励，队形奖励模块根据智能体空间分布提供协调信号，二者共同汇入总奖励函数指导 PPO 优化。
 
-
-
 TeamHOI 的统一策略架构围绕三个核心设计展开：基于 Transformer 的可扩展协调网络、掩码对抗运动先验（Masked AMP）策略，以及不依赖团队规模的队形奖励机制。以下逐一解析各模块的公式定义与设计意图。
 
 ### 3.1 基础框架：AMP 风格奖励
@@ -213,9 +205,6 @@ $$r_{\mathrm{ang}} = \exp\Bigl( - k_{\theta} \frac{1}{2} \bigl[ (\Delta \phi_{i}
 
 仅靠角度分散无法保证队形的稳定性——智能体可能均匀分布但未沿物体主轴对齐，导致行走时支撑不稳。主轴覆盖奖励衡量所有智能体手部构成的支撑多边形沿物体两个主轴的覆盖程度（Figure 3）：
 
-![[assets/figures/papers/paper_list_l1755_TeamHOI_Learning_a_Unified_Policy_for_Cooperative_Human_Object_Interacti/figures/003_Figure_3.jpg]]
-*Figure 3: Illustration of our principal-axes coverage reward*
-
 $$g_{i} = \operatorname*{min}\left( \frac{\tilde{d}_{i}^{+}}{\ell_{i}^{+}}, \frac{\tilde{d}_{i}^{-}}{\ell_{i}^{-}} \right), \quad i \in \{1,2\}$$
 
 $$r_{\mathrm{cov}} = \frac{1}{2}(g_{1} + g_{2})$$
@@ -237,12 +226,8 @@ $$r_{\mathrm{form}} = 0.25 r_{\mathrm{ang}} + 0.75 r_{\mathrm{cov}}$$
 
 为实现对任意数量队友的显式感知，TeamHOI 采用 Transformer 编码器作为策略网络主干（Figure 2）。观察智能体的本体感知状态（维度 223）经**本体感知分词器**编码为令牌；队友状态（位置、朝向、相对角度）经**队友令牌分词器**编码为队友令牌序列。Transformer 通过交替的自注意力和与队友令牌的交叉注意力层处理这些令牌，使观察智能体能够动态关注任意数量的队友状态，从根本上突破了 MLP 策略的固定输入维度限制。更新后的嵌入经**动作头 MLP** 预测目标关节旋转。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1755_TeamHOI_Learning_a_Unified_Policy_for_Cooperative_Human_Object_Interacti/figures/006_Figure_5.jpg]]
 *Figure 5: Ablation on the masked AMP strategy. Comparison between models trained with and without masked AMP, showing improved task rewards and successful hand-object interactions when masking is applied*
-
-
 
 ## 实验与关键发现
 
@@ -308,27 +293,8 @@ Table 4展示了统一策略在未见过的桌面尺寸（小型和大型）上�
 
 此外，当前方法仅在桌子搬运这一单一任务上验证，虚拟智能体使用简化的球状手部模型（无手指），限制了精细操作能力。方法向更复杂的多人物交互任务（如合作运动、舞蹈）的推广仍需进一步研究。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1755_TeamHOI_Learning_a_Unified_Policy_for_Cooperative_Human_Object_Interacti/figures/004_Table_1.jpg]]
 *Table 1: Quantitative comparison across team sizes (2A, 4A, 8A). Our method achieves consistently high success rates, collective cooperation, and motion smoothness across all settings using a single unified policy. Unlike CooHOI* baselines, where agent formations are pre-defined, our agents must infer cooperation to establish stable formations autonomously, making the coordination requirement more demanding. Under the heavy-load setting (5× table weights), only our method demonstrates effective cooperation among eight agents. All results are averaged over 10,000 simulation episodes*
-
-![[assets/figures/papers/paper_list_l1755_TeamHOI_Learning_a_Unified_Policy_for_Cooperative_Human_Object_Interacti/figures/011_Table_3.jpg]]
-*Table 3: Performance of our unified policy across team sizes under normal (1×) and heavy (5×) table weights*
-
-![[assets/figures/papers/paper_list_l1755_TeamHOI_Learning_a_Unified_Policy_for_Cooperative_Human_Object_Interacti/figures/012_Table_4.jpg]]
-*Table 4: Performance of our unified policy across team sizes for small and large tables. All results are averaged over 10,000 simulation episodes*
-
-![[assets/figures/papers/paper_list_l1755_TeamHOI_Learning_a_Unified_Policy_for_Cooperative_Human_Object_Interacti/figures/008_Figure_7.jpg]]
-*Figure 7: Comparison of task reward curves for models trained with team-size and global advantage normalizations*
-
-![[assets/figures/papers/paper_list_l1755_TeamHOI_Learning_a_Unified_Policy_for_Cooperative_Human_Object_Interacti/figures/013_Figure_10.jpg]]
-*Figure 10: Examples of multiple affordance behaviors learned by adapting the task reward. The agents are able to adapt to sideholding or edge-lifting while being able to walk toward diverse directions. The policy is trained using the same single-human reference motions as our main experiments*
-
-![[assets/figures/papers/paper_list_l1755_TeamHOI_Learning_a_Unified_Policy_for_Cooperative_Human_Object_Interacti/figures/010_Table_2.jpg]]
-*Table 2: Key training hyperparameters in our experiment*
-
-
 
 ## 定位与知识库关联
 
@@ -380,8 +346,6 @@ TeamHOI 解决的核心瓶颈是物理仿真中多智能体协作的两个刚性
 4. **队形奖励的通用性**：主轴覆盖奖励依赖于物体的主轴定义，对于不规则形状物体或非对称协作任务（如仅在一侧施力），需要设计更通用的支撑质量度量。
 
 5. **动态角色分配**：当前策略中所有智能体执行同质化行为。能否引入角色分工机制（如领航员-跟随者），通过层级化协调优化大规模团队的协作效率？这可能需要结合图神经网络或分层强化学习框架。
-
-
 
 ## 原文 PDF
 

@@ -51,8 +51,6 @@ claims:
 
 实验表明，在RLBench的篮球投篮任务上，CrossInstruct达到**0.90成功率**，而纯强化学习方法（SAC、TD3）从零训练无法获得非零回报（Table I）。在Jenga任务上，CrossInstruct初始化的策略经RL微调后收敛至约**90%成功率**，同样远超从零训练的基线（Fig. 12）。消融实验进一步验证，移除精度耦合模块会导致VLM在相似颜色物体上频繁定位错误（Fig. 9, Fig. 10），证实了层次化耦合对空间准确性的关键作用。
 
-
-
 ### 问题背景：从物理演示到跨模态指令
 
 机器人操作策略的传统范式依赖于大量物理演示数据。模仿学习（Imitation Learning）需要人类操作员反复执行任务以收集状态-动作对，而强化学习（Reinforcement Learning）则要求智能体在环境中进行数百万步的试错交互。这两种范式都面临一个根本瓶颈：**物理演示的获取成本极高**，且难以泛化到新的任务场景和视觉环境。
@@ -72,8 +70,6 @@ claims:
 本文的核心动机是弥合上述断层。作者提出**CrossInstruct**框架，其核心洞见是：**将跨模态指令视为上下文学习示例，利用大型推理VLM的高层语义理解能力生成关键点描述，再将像素级精确定位委托给小型微调VLM，最后通过多视图射线投影将2D轨迹提升为3D运动轨迹**。
 
 这种层次化精度耦合（Hierarchical Precision Coupling）的设计逻辑是：大型VLM擅长“知道要做什么”（what to do），而小型微调VLM擅长“知道在哪里做”（where to do it）。通过将这两个能力解耦并协同，CrossInstruct能够在无需任何物理演示的条件下，仅凭草图、文本等跨模态指令生成可执行的机器人运动轨迹，并泛化到新的视觉场景和任务配置中。
-
-
 
 ## 核心方法与创新机理
 
@@ -110,8 +106,6 @@ $$\mathcal{L}_{\mathrm{actor}} = \lambda \mathbb{E}_{(s,a) \sim \mathcal{D}} [\|
 ### 创新效果验证
 
 消融实验表明，精度耦合模块在小物体或遮挡场景下价值最为显著——无精度耦合时，VLM 推理常常错误定位相似颜色的物体（Fig. 10）。在 RLBench 篮球投篮任务上，CrossInstruct 达到 0.90 成功率，而纯 RL 方法（SAC/TD3）从零训练无法获得非零回报（Table I）。在 Jenga 任务上，由 CrossInstruct 初始化的策略收敛到约 90% 成功率，而从零训练的 RL 方法完全失败（Fig. 12）。
-
-
 
 CrossInstruct 的完整管道将跨模态指令（草图、文本等）转化为机器人可执行的 3D 运动轨迹，其核心设计围绕一个关键瓶颈展开：**高层语义推理与像素级空间精确定位之间的鸿沟**。传统方法要么依赖大型 VLM 直接输出坐标（缺乏空间精度），要么需要大量物理演示来训练策略（泛化能力差）。CrossInstruct 通过**层次化精度耦合**（Hierarchical Precision Coupling）将这两个能力解耦并重新组合，形成端到端的指令到轨迹生成管道。
 
@@ -155,15 +149,8 @@ $$\mathcal{L}_{\mathrm{actor}} = \lambda \mathbb{E}_{(s,a) \sim \mathcal{D}} [\|
 
 整个管道的信息流体现了“推理-定位-融合-执行”的层次化分解：推理 VLM 负责理解任务语义并生成关键点描述，指向 VLM 负责像素级精确定位，射线投影器负责 2D 到 3D 的几何提升，RL 精炼阶段则赋予策略闭环鲁棒性。这种设计使得 CrossInstruct **无需任何物理演示**即可生成可泛化的机器人行为，从根本上区别于传统模仿学习范式。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2509_21107/figures/003_Figure_3.jpg]]
 *Figure 3: An overview of CrossInstruct (left) with an example of precise pointing of keypoints (right). The hierarchical precision model coupling module enables the reasoning model to leverage a smaller fine-tuned VLM to precisely identify relevant keypoints, which then guide robot end-effector motion*
-
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2509_21107/figures/001_Figure_1.jpg]]
-*Figure 1: We enable robots to interpret cross-modal instructions, in the form of rough sketches and textual labels (shown on the left). Subsequent motion can be generated and generalized to novel setups and environments (shown on the right)*
-
-
 
 CrossInstruct 将跨模态指令转化为可执行机器人运动轨迹，其核心由三个紧密耦合的模块构成：跨模态指令编码、层次化精度耦合模块，以及多视图射线投影器。整个管道的形式化起点是将人类提供的指令定义为一个元组：
 
@@ -232,16 +219,6 @@ $$\mathcal{L}_{\mathrm{actor}} = \lambda \mathbb{E}_{(s,a) \sim \mathcal{D}} [\|
 
 > 注：关于 $\lambda$ 的具体取值和调参策略，原文未在分析材料中明确给出，需查阅原文进行手动验证。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2509_21107/figures/004_Figure_4.jpg]]
-*Figure 4: CrossInstruct generates 2D trajectories over multi-view images (in red), which are subsequently fused into a coherent 3D trajectory (waypoints in blue-red color gradient shown). This can then be rolled out to slide the block to the target*
-
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2509_21107/figures/005_Figure_6.jpg]]
-*Figure 6: CrossInstruct uses the accurately pointed keypoints to enable accurate reasoning of orientation. Here we see an example of the robot pulling a Jenga block, which requires an accurate movement direction*
-
-
-
 ## 实验与关键发现
 
 ### 核心定量结果：RLBench基准任务
@@ -296,24 +273,11 @@ CrossInstruct的主要失败模式可归纳为：
 
 Fig. 11展示了CrossInstruct在真实机器人上的泛化能力。在Place Cups和Saw Block任务中，跨模态指令在视觉上与执行场景不同的设置上定义，机器人仍能成功执行任务。Saw Block任务还展示了指令的语义泛化——"repeat 3x"使锯切动作重复三次，表明推理模型能够理解时序语义并将其映射为重复的运动模式。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2509_21107/figures/009_Table.jpg]]
 *Table: I: Comparison of CrossInstruct with a VLM reasoning baseline and pure RL approaches (SAC, TD3) on RLBench tasks. Numbers denote success rates (higher is better)*
 
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2509_21107/figures/012_Figure_12.jpg]]
-*Figure 12: We sample trajectories from CrossInstruct to initialize policies for RL training. Returns against the number of steps shown (left: Jenga; right: Peg). As the Jenga task uses a sparse binary reward, training from scratch gives no nonzero returns. For the Peg task, we illustrate the performance of baseline RL methods trained from scratch against our TD3+BC approach. We observe that CrossInstruct provides an effective generative model to initialize RL training*
-
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2509_21107/figures/010_Figure_8.jpg]]
-*Figure 8: CrossInstruct, through hierarchical precision coupling, can generate spatially-accurate motions, enabling the robot to precisely pick up and place the basketball into the hoop*
-
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2509_21107/figures/011_Figure_11.jpg]]
-*Figure 11: Generalizing Cross-modal instructions to new setups, with the Place Cups task shown in the left and the Saw Block task on the right. An image with an instruction is overlaid, and we observe that the setups that the instructions are defined over are visually different from the execution setup, highlighting the generalization exhibited. We can also provide instructions such as “repeat 3x” which specifies the sawing motion to be repeated three times*
-
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2509_21107/figures/006_Figure_7.jpg]]
 *Figure 7: Representative tasks from the RLBench [27] benchmark used in our evaluations*
-
-
 
 ## 定位与知识库关联
 
@@ -351,8 +315,6 @@ CrossInstruct的适用边界受以下因素约束：
 
 1. **交互式纠正**：如何使人类能够在机器人执行动作后提供跨模态信息来纠正机器人行为？这指向从单向指令生成向闭环人机协作的扩展。
 2. **新视角合成与相机解耦**：能否集成大型预训练模型（如DUSt3R、VGER或VGGT）来支持从新视角生成合成相机视图，以减少物理相机定位的负担？这直接针对上述相机标定依赖的局限，若能实现，将显著提升系统的部署灵活性。
-
-
 
 ## 原文 PDF
 

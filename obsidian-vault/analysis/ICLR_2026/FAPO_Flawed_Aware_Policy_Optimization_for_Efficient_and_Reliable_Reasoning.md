@@ -83,8 +83,6 @@ FAPO在提升结果正确性的同时，有效降低了flawed-positive比例，�
 
 当前验证主要在数学推理任务和Qwen系列模型上进行，FAPO在多选题、多轮对话、智能体RL等更广泛场景的有效性尚未验证。此外，尽管FAPO显著减少了flawed-positive的比例，但未完全根除，可能仍对极端情况下的性能有影响。开放问题包括：惩罚机制在非数学推理任务中的适配、$\lambda$的自适应调整自动化、以及与现有RL增强技术的组合效果。
 
-
-
 ### 基于可验证奖励的强化学习（RLVR）的瓶颈
 
 在数学推理等具有确定性答案的任务中，基于可验证奖励的强化学习（RLVR）已成为提升大语言模型（LLM）推理能力的有效范式。其核心机制是：模型对给定问题生成推理轨迹（rollout），仅依据最终答案的正确性给予二元奖励——正确为+1，错误为-1（见 Equation 4）。这种稀疏的结果监督使模型能够通过反复试错来优化策略，无需昂贵的人工过程标注。
@@ -108,8 +106,6 @@ FAPO在提升结果正确性的同时，有效降低了flawed-positive比例，�
 FAPO的核心动机源于一个关键洞察：**flawed positive在RL训练中的价值是时变的**。在早期，它们作为“学习捷径”帮助模型快速建立从问题到正确答案的映射；在后期，它们不正确的推理过程却阻碍模型向真正可靠的推理演进。因此，理想的解决方案不应是一刀切地惩罚或忽略flawed positive，而应设计一种**自适应机制**，使模型能在早期利用flawed positive加速学习，后期则自然转向强化可靠推理。
 
 基于这一动机，FAPO提出两个核心组件：（1）一个紧凑的**生成式奖励模型（GenRM）**，能够精准检测flawed positive并定位错误步骤；（2）一种**无参数的奖励惩罚机制**，结合群体相对优势估计，使优化方向随训练进程动态调整——当模型能力较弱时，flawed positive仍能贡献正向优势；当模型能力提升后，惩罚信号自然主导优化，推动策略向可靠推理收敛。
-
-
 
 ## 核心方法与创新机理
 
@@ -153,8 +149,6 @@ $$R_{\mathrm{FAPO-GenRM}} = R_{\mathrm{Outcome}} + R_{\mathrm{Process}}$$
 
 FAPO 的三项创新构成了一个**紧密协同的系统**：GenRM 提供精确的 flawed-positive 检测信号，惩罚机制将这一信号注入奖励函数，而群体相对优势估计则自动调节优化方向，使模型在训练初期利用 flawed positive 作为学习捷径，后期自然转向可靠推理。这一设计无需复杂的手动奖励塑形（reward shaping），仅通过一个固定惩罚系数 $\lambda=1$ 就实现了从“快速进步”到“稳定可靠”的优雅过渡，从根本上解决了 RLVR 中 flawed positive 的双重作用问题。
 
-
-
 FAPO 的整体流程由两个核心模块构成：**FAPO-GenRM**（生成式奖励模型）与 **FAPO-Reasoning**（推理策略优化），二者通过异步 Reward Loop 基础设施耦合，形成“检测—惩罚—优化”的闭环。
 
 ### 模块关系与数据流
@@ -185,8 +179,6 @@ FAPO 的核心洞察在于 flawed-positive rollout 的双重角色：它们在�
 ### 已知局限
 
 当前框架的 GenRM 检测能力依赖于 FAPO-Critic-85K 数据集的覆盖度与标注质量，且仅在 Qwen2.5-Math-7B/32B 上验证。Reward Loop 的异步设计虽降低了延迟，但在完全异步 RL 系统中的收敛性尚未得到理论保证。
-
-
 
 ### 1. 问题定义：Flawed Positive 的形式化
 
@@ -276,8 +268,6 @@ $$\hat{A}_{i,t} = \left[ r_i - \operatorname{mean}(\{R_i\}_{i=1}^G) \right] / \o
 
 为降低 GenRM 推理带来的额外计算开销，FAPO 设计了异步 Reward Loop 架构（Figure 8/9），将 rollout 生成与 GenRM 推理解耦为并行流水线，使训练时间增加控制在 20% 以内。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与实验动机
@@ -288,9 +278,6 @@ $$\hat{A}_{i,t} = \left[ r_i - \operatorname{mean}(\{R_i\}_{i=1}^G) \right] / \o
 1. **普遍性**：在不同规模的 LLM 中，flawed positive 占正确 rollout 的 20%–40%（Figure 2a, 2c），且在 RL 训练过程中该比例持续维持在约 30%，不会自动消失。
 2. **双重角色**：在早期学习阶段，flawed positive 充当“踏脚石”帮助模型快速获得正确答案；但随着训练推进，其占比显著下降（Figure 2b），说明继续将其视为正样本会阻碍模型向可靠推理的转变。
 3. **惩罚的初步验证**：直接使用 Qwen3‑32B 检测 flawed positive 并给予负奖励，相比基线 RLVR 能显著提高 AIME24 性能，但初期提升较慢（Figure 2d），证实 flawed positive 在训练不同阶段具有截然不同的作用。
-
-![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_jhqqoimoWt/figures/008_Figure_2.jpg]]
-*Figure 2: Preliminary experiment results of flawed positives*
 
 这些发现直接催生了 FAPO 的核心设计：对 flawed positive 施加一种无参数的奖励惩罚，并利用群体相对优势估计动态调整优化方向，使模型在早期利用 flawed positive 作为学习捷径，后期则逐渐转向可靠的推理。
 
@@ -362,22 +349,6 @@ FAPO 引入 GenRM 推理作为额外的训练步骤，但通过异步 Reward Loo
 - 虽然 FAPO 显著降低了 flawed‑positive 比例（Table 6），但并未完全根除，在极端情况下仍可能影响性能。
 - 异步 Reward Loop 设计在完全异步 RL 系统中的适用性仍不确定。
 
-![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_jhqqoimoWt/figures/028_Table_6.jpg]]
-*Table 6: LLM-as-a-judge and human verification of flawed positive ratio*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_jhqqoimoWt/figures/009_Figure_3.jpg]]
-*Figure 3: Performance of current state-of-the-art (SoTA) generative models and discriminative PRMs. Detailed subset-level results and additional models are reported in Table 2*
-
-![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_jhqqoimoWt/figures/024_Table_2.jpg]]
-*Table 2: FAPO-GenRM results in FlawedPositiveBench and ProcessBench*
-
-![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_jhqqoimoWt/figures/029_Table_7.jpg]]
-*Table 7: Early-stage train-time rewards (view flawed rollout as positive rollout). Table 8: Later-stage train-time rewards (view flawed rollout as negative rollout)*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 与基线方法的对比与继承
@@ -422,8 +393,6 @@ FAPO的有效性建立在以下关键前提之上：
 - **与其他RL增强技术的协同**：FAPO专注于奖励信号的修正，而现有研究中还存在多种避免reward hacking的策略（如KL散度正则化、策略熵约束等）。FAPO与这些技术的结合是否能激发更大的性能提升，尚待系统研究。
 
 - **flawed positive的因果机制**：论文揭示了flawed positive在训练早期的“踏脚石”作用，但其产生的深层原因——是模型的能力不足、探索策略的偏差、还是推理任务的固有模糊性——仍有待更深入的因果分析。理解这一机制可能催生更根本的解决方案。
-
-
 
 ## 原文 PDF
 

@@ -54,8 +54,6 @@ claims:
 
 **方法定位**：SADCA 属于多模态对抗攻击方法，与 SGA、SA-AET 等基于跨模态交互的攻击同源，但在交互范式（动态迭代 vs. 静态一次/两次）、样本利用（正负样本对比 vs. 仅正样本）和输入增强策略（语义增强 vs. 有限输入变换）三个维度上实现了根本性改进。
 
-
-
 视觉语言预训练模型（VLP）在图像文本检索、视觉问答等跨模态任务中取得了显著进展，但其对抗鲁棒性问题日益受到关注。对抗攻击旨在生成人眼难以察觉的扰动样本，诱使模型产生错误输出。在视觉语言领域，对抗攻击的关键在于破坏图像与文本模态之间的跨模态语义对齐。
 
 现有视觉语言对抗攻击方法主要依赖**静态跨模态交互**。以 SGA 和 SA-AET 为代表的方法仅在攻击过程中进行一次或两次模态间交互，且交互范围局限于正样本对（即原始匹配的图文对）。这种静态交互策略存在根本性局限：**仅关注正样本对而忽视负样本对在语义决策边界中的排斥作用**，导致生成的对抗样本在语义空间中与原始样本分离不足，难以跨越不同模型架构的决策边界，迁移性受到严重制约。
@@ -66,8 +64,6 @@ claims:
 3. **输入多样性有限**：现有输入变换策略（如尺度不变性变换）对语义信息的丰富程度不足，限制了梯度方向的多样性，进而影响对抗样本的泛化能力。
 
 针对上述缺口，本文提出 **SADCA（Semantic-Augmented Dynamic Contrastive Attack）**，核心动机在于：通过引入**动态对比交互机制**和**语义增强模块**，使对抗样本在语义空间中持续偏离正样本对齐中心、同时向负样本方向靠拢，从而获得更强的跨模型和跨任务迁移能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -111,8 +107,6 @@ $$v_p = \underset{v_p \in B[v, \epsilon_v]}{\arg\max} \sum_{m=1}^{M} Cos(v, t_m)
 | 正样本对齐 | 原始图文对直接作为正样本 | 语义中心对齐的正图像表示 |
 
 这些创新机制协同作用，使 SADCA 能够有效促进语义发散，引导对抗样本在语义空间中探索更广泛的攻击方向，从而实现跨模型与跨任务的高迁移性对抗攻击。
-
-
 
 SADCA 的整体流程围绕一个核心思想构建：**通过动态对比交互持续破坏图文语义对齐，并利用语义增强丰富对抗样本的多样性**。其 pipeline 由四个紧密协作的模块组成，形成一条从正样本对齐到最终对抗样本生成的完整链路。
 
@@ -164,17 +158,12 @@ $$T _ { s a } ^ { \prime } = \{ t _ { s } = C o n c a t ( t _ { i } ^ { \prime }
 - **输出**：满足扰动约束的对抗图像 $v'$ 和对抗文本 $t'$，其在语义空间中与正样本对齐被破坏，同时被推向负样本方向。
 - **关键参数**：交互次数 $I$、增强数量 $S$、负样本数 $K$、对比权重 $\lambda$。参数敏感性分析（Figure 3）提供了这些超参数对攻击成功率的影响趋势，需根据具体场景手动调优。
 
-![[assets/figures/papers/paper_list_l789_https_arxiv_org_abs_2603_04839/figures/007_Figure_3.jpg]]
-*Figure 3: The ASR (%) with different parameters, including the dynamic interaction number I, the number of semantic augmentations S, the negative samples number K, and the weighting factor λ. The adversarial examples are generated on the Flickr30K dataset using*
-
 ### 与现有框架的核心差异
 
 Figure 1 清晰地展示了 SADCA 与 SGA、SA-AET 的架构差异：SGA 和 SA-AET 仅进行有限的静态交互且仅使用正样本对，而 SADCA 通过**多轮动态对比交互**持续破坏跨模态对齐，并借助语义增强策略丰富数据样本，从而在语义空间中探索更广泛的攻击方向。
 
 ![[assets/figures/papers/paper_list_l789_https_arxiv_org_abs_2603_04839/figures/001_Figure_1.jpg]]
 *Figure 1: A comparison of our SADCA and existing frameworks. (a) and (b) illustrate the core concepts of SGA [18] and SA-AET [7], respectively, where only one or two static interactions are performed between the visual and textual modalities, with the interactions being limited solely to positive pairs. (c) illustrates the core idea of the proposed SADCA, which continuously disrupts cross-modal interactions through dynamic contrastive interactions with both positive and negative pairs. Additionally, it leverages a semantic augmentation strategy to enrich the data samples, thereby diversifying the semantic information. The arrow represents the interaction between the visual and textual modalities. The...*
-
-
 
 SADCA 的核心由三个模块构成：**正样本对齐模块**、**动态对比交互模块**和**语义增强模块**。三个模块协同工作，通过正负样本对比学习持续破坏跨模态语义一致性，同时增强输入多样性以丰富梯度方向。
 
@@ -233,13 +222,6 @@ SADCA 的最终优化目标可统一表述为在扰动量约束下最小化对�
 $$\left\{ \begin{array} { l l } { \operatorname* { m i n } J \left( F _ { I } \left( v ^ { \prime } \right) , F _ { T } \left( t ^ { \prime } \right) \right) } \\ { \mathrm { s . t . } v ^ { \prime } \in B \left[ v , \epsilon _ { v } \right] , t ^ { \prime } \in B \left[ t , \epsilon _ { t } \right] } \end{array} \right.$$
 
 其中 $F_I$ 和 $F_T$ 分别为图像和文本编码器，$J(\cdot)$ 为相似度损失函数，$\epsilon_v$ 和 $\epsilon_t$ 分别为图像和文本的扰动预算。通过动量迭代方式更新对抗样本，结合上述三个模块，SADCA 生成具有高跨模型和跨任务迁移性的多模态对抗样本。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l789_https_arxiv_org_abs_2603_04839/figures/010_Figure_5.jpg]]
-*Figure 5: Semantic Augmentation Module*
-
-
 
 ## 实验与关键发现
 
@@ -318,12 +300,6 @@ $$\left\{ \begin{array} { l l } { \operatorname* { m i n } J \left( F _ { I } \l
 ![[assets/figures/papers/paper_list_l789_https_arxiv_org_abs_2603_04839/figures/002_Table_1.jpg]]
 *Table 1: A comparison of SADCA with SOTA methods on the image-text retrieval (ITR) task using the Flickr30K dataset. The ”Source” column indicates the VLP model used to generate the multimodal adversarial examples. For both image retrieval (IR) and text retrieval (TR), we report the ASR (%) at Rank-1 (R@1). The ”Average” represents the average ASR on the black-box VLP models*
 
-![[assets/figures/papers/paper_list_l789_https_arxiv_org_abs_2603_04839/figures/003_Table_2.jpg]]
-*Table 2: Cross-task transferability. We use ALBEF model to generate multimodal adversarial examples and apply them to attack the Visual Grounding (VG) task on the RefCOCO+ dataset and the Image Captioning (IC) task on the MSCOCO dataset. The ”Clean” denotes the performance of each task without any attack, where lower values indicate better effectiveness of the adversarial attack in both tasks*
-
-![[assets/figures/papers/paper_list_l789_https_arxiv_org_abs_2603_04839/figures/004_Table_3.jpg]]
-*Table 3: Adversarial transferability on LVLMs. We use ALBEF model to generate multimodal adversarial examples and apply them to attack the LVLMs on the Flickr30K dataset*
-
 ![[assets/figures/papers/paper_list_l789_https_arxiv_org_abs_2603_04839/figures/009_Table_4.jpg]]
 *Table 4: Ablation study for negative sample selection strategy. The adversarial examples are generated by CLIPCNN*
 
@@ -333,18 +309,8 @@ $$\left\{ \begin{array} { l l } { \operatorname* { m i n } J \left( F _ { I } \l
 ![[assets/figures/papers/paper_list_l789_https_arxiv_org_abs_2603_04839/figures/012_Table_6.jpg]]
 *Table 6: Ablation Study for Semantic Augmentation Module*
 
-![[assets/figures/papers/paper_list_l789_https_arxiv_org_abs_2603_04839/figures/013_Table_7.jpg]]
-*Table 7: Comparison of attack costs. GPU memory usage, runtime, and attack performance when generating adversarial examples on the Flickr30K dataset using ALBEF as the surrogate model*
-
-![[assets/figures/papers/paper_list_l789_https_arxiv_org_abs_2603_04839/figures/008_Figure_4.jpg]]
-*Figure 4: Ablation study for different modules of SADCA. The adversarial examples are generated on the Flickr30K dataset using CLIPCNN as the source model and are evaluated on other black-box models*
-
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l789_https_arxiv_org_abs_2603_04839/figures/006_Figure_2.jpg]]
 *Figure 2: Visualization on Image Captioning and Visual Grounding Tasks*
-
-
 
 ## 定位与知识库关联
 
@@ -393,8 +359,6 @@ SADCA 在视觉语言对抗攻击领域占据**从静态交互到动态对比学
 - **实验基准**：在 Flickr30K 和 MSCOCO 上的全面实验结果（Table 1, Table 5）为跨模型/跨任务迁移性设立了新的 SOTA 基准。
 
 后续工作若能在降低计算代价、提升攻击隐蔽性、拓展任务覆盖范围等方面取得突破，将直接受益于 SADCA 构建的动态对比交互框架。
-
-
 
 ## 原文 PDF
 

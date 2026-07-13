@@ -70,8 +70,6 @@ MC-Search 从基准构建和模型训练两个维度系统性地回应了上述�
 
 MC-Search 的方法论贡献可归结为“**以过程级标注驱动过程级评估与过程级训练**”。它不改变底层MLLM架构或检索器，而是在统一的代理式MM-RAG管道中，通过引入高质量推理链作为监督信号，实现从最终答案对齐到推理轨迹对齐的范式升级。这一思路为多模态代理搜索领域提供了可复现的评估标准和可迁移的训练策略。
 
-
-
 多模态大语言模型（MLLM）在视觉问答、文档理解等任务上取得了显著进展，但其在需要主动搜索、整合外部多模态知识的长程推理场景中仍面临根本性挑战。现实世界中的复杂查询——例如“这张照片中的建筑所在城市，其市花在哪个国家被定为国花？”——要求模型跨越文本与图像模态，执行多跳检索与推理，而非仅依赖参数化知识或单次检索。
 
 现有评估基准的缺口集中体现在三个层面。其一，当前多模态检索增强生成（MM-RAG）基准（如 WebQA、MMCoQA、MultiModalQA）仅评估最终答案的正确性，且局限于 1–2 跳的简单检索链，忽视了长程跨模态推理中逐步规划、检索与过程级推理质量的评估。其二，缺乏对多样化推理拓扑结构的覆盖——真实查询往往涉及图像链、文本链、并行图文分叉等不同模态依赖模式，而现有基准未能系统刻画这些拓扑差异。其三，没有基准提供逐步标注的黄金推理轨迹，导致无法诊断模型在哪个推理环节出错，也无法为过程级监督训练提供信号。
@@ -79,8 +77,6 @@ MC-Search 的方法论贡献可归结为“**以过程级标注驱动过程级�
 上述缺口使得一个核心问题悬而未决：**MLLM 是否真正具备在多模态知识库中执行长程、结构化搜索推理的能力？** 闭源模型可能通过强大的内部规划能力部分弥补这一短板，但开源模型在此类任务上的表现及其可训练性仍不明确。
 
 针对这些问题，本文提出 **MC-Search**——首个面向多模态代理搜索的基准，提供包含多样化推理拓扑的长程、逐步标注推理链。该基准不仅支持最终答案评估，还引入了过程级指标（命中步数 HPS、展开偏差 RD），使得对模型规划与检索行为的细粒度诊断成为可能。在此基础上，本文进一步提出 **SEARCH-ALIGN** 过程级微调框架，利用验证后的推理轨迹对开源模型进行监督训练，旨在缩小其与闭源模型的差距。
-
-
 
 ## 核心方法与创新机理
 
@@ -147,8 +143,6 @@ SEARCH-ALIGN 的过程级监督在开源模型上取得了显著增益：
 
 值得注意的是，在最具挑战性的 **Parallel Image-Text Fork** 拓扑上，所有模型均达到最低 F1 和 HPS，凸显跨模态并行规划仍是当前多模态代理搜索的核心瓶颈，也是 SEARCH-ALIGN 未来优化的重点方向。
 
-
-
 ![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_JEGDp1E4OH/figures/004_Figure_2.jpg]]
 *Figure 2: Overview of MC-SEARCH benchmark and evaluation. Left: Benchmark covering five reasoning topologies, filtered via the hop-wise attribution and verification of evidence (HAVE) process. Right: Multimodal agentic RAG pipeline, where an MLLM iteratively generates sub-queries and actions, retrieves multimodal evidence, reasons over the retrieved information, and integrates it to produce the final answer. Our framework further aligns predicted reasoning chains with golden trajectories to assess chain-level retrieval and planning*
 
@@ -189,8 +183,6 @@ MC-SEARCH 基准的核心目标是提供长程、逐步标注的多模态推理�
 - **ΔF1**：$\Delta\mathrm{F1} = \mathrm{F1} - \mathrm{F1}_{\mathrm{w/o}\ \mathcal{R}}$，衡量代理 RAG 相对于模型参数知识的性能增益。
 
 **SEARCH-ALIGN** 利用这些逐步标注轨迹提供过程级监督：将每个推理图扩展为由 Gemini-2.5-Flash 生成的显式推理思路（解释如何将推理建立在证据之上并连接相邻跳跃），从而在子问题、检索动作、证据和中间答案四个维度上对齐预测轨迹与黄金轨迹。这种过程级监督与仅使用最终答案的传统监督形成鲜明对比，是开源模型性能大幅提升的关键机制。
-
-
 
 ### 代理式多模态RAG管道
 
@@ -239,8 +231,6 @@ $$\mathrm { H P S } ( \hat { \mathcal { G } } , \mathcal { G } ) = \frac { 1 } {
 $$\mathrm { R D } ( \hat { \mathcal { G } } , \mathcal { G } ) = | | \hat { \mathcal { G } } | - | \mathcal { G } | |$$
 
 RD越小表示模型生成的推理步数与黄金步数越接近，过大正值表明过检索，负值表明欠检索。SEARCH-ALIGN训练后，Qwen2.5-VL-7B的RD下降3.1，表明过程级监督有效抑制了冗余检索行为。
-
-
 
 ## 实验与关键发现
 
@@ -291,12 +281,8 @@ Table 14 的检索深度消融显示，SEARCH-ALIGN 在 top-1 检索下已大幅
 
 Figure 9 展示了成功案例：代理生成的推理链与黄金推理链对齐，最终答案包含所有关键知识实体。Figure 10 展示了典型失败案例：代理成功检索了首尾跳信息，但遗漏了中间第二、三跳的证据，导致最终答案缺失关键实体。这再次印证了多跳推理中中间步骤检索失败的级联效应是主要失败模式。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_JEGDp1E4OH/figures/002_Table_1.jpg]]
 *Table 1: Left: Comparison of existing multimodal retrieval-augmented QA datasets. Right: Distribution of the five reasoning topologies in MC-SEARCH, with outer rings illustrating hop diversity (2–5 hops)*
-
-
 
 ## 定位与知识库关联
 
@@ -337,8 +323,6 @@ SEARCH-ALIGN 的有效性建立在以下前提之上：
 ### 5. 错误模式与改进方向
 
 错误分析（Figure 5）揭示了三个最主要的失败模式：**检索失败**（84.7%）、**幻觉实体/属性**（75.8%）和**步骤遗漏**（74.3%）。SEARCH-ALIGN 通过过程级监督有效降低了这些错误的比例（Figure 7），但检索失败的高发生率暗示，单纯优化规划能力而不改进检索器本身，可能触及性能上限。此外，模态覆盖分析（Table 4）表明，图像检索覆盖率远弱于文本，且高度依赖显式图像输入——即使最强的 Gemini-2.5-Pro，在无图像输入时图像覆盖率仅29.50%，这指向多模态检索器能力的结构性短板。
-
-
 
 ## 原文 PDF
 

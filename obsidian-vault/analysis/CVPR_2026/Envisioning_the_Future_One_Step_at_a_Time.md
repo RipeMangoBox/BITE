@@ -54,8 +54,6 @@ claims:
 
 该方法的主要局限在于依赖静态相机假设、训练监督受限于现成点追踪器的质量，且预测时间跨度目前限于数秒量级。尽管如此，Myriad 在运动空间中进行高效推演的能力，为开放世界中的快速决策、反事实推理和物理规划开辟了新路径。
 
-
-
 ### 视觉运动预测的现状与瓶颈
 
 理解并预测视觉场景中的运动是通往物理世界智能的核心能力。当前主流方法将这一任务建模为从图像或视频生成稠密像素级未来帧，即图像到视频（I2V）生成。这些模型——包括 **MAGI-1**、**Wan2.2**、**CogVideo-X1.5**、**SkyReels V2** 和 **SVD 1.1** 等——在视觉质量上取得了显著进展，但其底层范式存在一个根本性的效率瓶颈：**可视化税（visual tax）**。
@@ -82,8 +80,6 @@ claims:
 - **支持大规模探索**：在相同硬件和时间预算下，可生成数千个假设，使基于未来推演的规划成为可能。
 
 这一范式转变使得模型在开放世界运动预测基准上以 **2200 samples/min** 的吞吐量超越视频模型逾7000倍，同时在精度上保持竞争力甚至更优，为视觉运动预测开辟了一条以效率为核心的新路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -117,8 +113,6 @@ $$\mathcal{L}_{\mathrm{FM}} = \underset{\tau, \Delta x_{t,0}^{(i)}, \Delta x_{t,
 - **随机正交轨迹身份编码**：从单位球面均匀采样 $d$ 维向量 $\mathrm{id}_{\mathrm{traj}}^{(i)} \sim U(S^{d-1})$ 作为轨迹标识符，替代可学习嵌入。该设计不仅避免了有限码本的容量限制，还天然支持零样本外推到训练时未见过的轨迹数量（Table C）。
 
 这些创新共同作用，使 Myriad 在开放世界运动预测（OWM）基准上以 **2200 samples/min** 的吞吐量远超视频模型（如 MAGI-1 的 0.303 samples/min），同时在 Best-5 精度上达到 0.029，优于 MAGI-1 的 0.037（Table 1），实现了效率与精度的双重突破。
-
-
 
 Myriad 将视觉运动预测重新表述为**稀疏点轨迹上的逐步自回归扩散模型**，完全避免了稠密像素渲染的“可视化税”。其核心流程为：从单张图像和用户指定的一组查询点出发，模型以自回归方式逐步预测每个查询点在下一时刻的增量运动 $\Delta x_t^{(i)}$，在线更新轨迹 $x_t^{(i)}$，从而生成覆盖未来若干秒的完整运动假设。
 
@@ -163,13 +157,6 @@ Myriad 将视觉运动预测重新表述为**稀疏点轨迹上的逐步自回�
 
 这些设计共同实现了 **2200 samples/min** 的吞吐量（OWM 基准，Nvidia H200），相比视频生成模型 MAGI-1（0.303 samples/min）提升超过 7000 倍，使得在固定时间预算下大规模探索未来假设成为可能。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2604_09527/figures/001_Figure_1.jpg]]
-*Figure 1: From a single image, our model envisions diverse, physically consistent futures in open-set environments (top). By exploring directly in motion space, it can rapidly perform thousands of counterfactual rollouts – here to select a candidate billiard shot (bottom)*
-
-
-
 Myriad 的核心架构围绕“稀疏点轨迹的自回归扩散建模”展开，由以下关键模块串联构成。
 
 ### 问题形式化：稀疏轨迹上的联合分布
@@ -210,9 +197,6 @@ $$\mathbf{h} \gets \mathbf{h} + \mathrm{SA}(\mathbf{h}) + \mathrm{CA}(\mathbf{h}
 
 其中 $\mathbf{h}_{\text{cross}}$ 为交叉注意力的键值对来源。自注意力和交叉注意力以前缀布局拼接为 $[\mathbf{h}_{\text{image}} \mid \mathbf{h}_{\text{motion}}]$，图像令牌不参与注意力计算（仅作为交叉注意力的键值），运动令牌因果地关注自身和图像令牌（见 Figure 4）。这种融合设计相比传统逐层串联的变换器块显著降低了计算开销。
 
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2604_09527/figures/002_Figure_4.jpg]]
-*Figure 4: Fast Reasoning Blocks. (a) Previous methods [cf. 10] use normal transformer layers, incurring significant overhead due to the multitude of operations performed per block. (b) Our fused layers reduce complexity significantly, improving efficiency*
-
 ### 流匹配头与尺度级联
 
 后验分布 $p_{\theta}(\Delta x_t^{(i)} \mid \mathbf{z}_t^{(i)})$ 由流匹配头 $v_{\phi}$ 参数化，该头预测噪声运动在伪时间 $\tau \in [0,1]$ 下的 ODE 速度场：
@@ -220,9 +204,6 @@ $$\mathbf{h} \gets \mathbf{h} + \mathrm{SA}(\mathbf{h}) + \mathrm{CA}(\mathbf{h}
 $$v_{\phi} : (\Delta x_{t,\tau}^{(i)}, \tau, \mathbf{z}_t^{(i)}) \mapsto \frac{\partial}{\partial\tau} \Delta x_{t,\tau}^{(i)}$$
 
 其中 $\mathbf{z}_t^{(i)}$ 为变换器主干输出的条件特征。流匹配头由多个 FFN 块组成，通过自适应归一化层以 $\mathbf{z}_t^{(i)}$ 和 $\tau$ 为条件（见 Figure 6 左）。训练目标为流匹配损失：
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2604_09527/figures/007_Figure_6.jpg]]
-*Figure 6: Posterior FM Head. Left: Our FM Head consists of multiple FFN blocks conditioned on*
 
 $$\mathcal{L}_{\mathrm{FM}} = \underset{\tau, \Delta x_{t,0}^{(i)}, \Delta x_{t,1}^{(i)}}{\mathbb{E}} \| v_{\phi}(\Delta x_{t,\tau}^{(i)} \mid \mathbf{z}_t^{(i)}) + \Delta x_{t,0}^{(i)} - \Delta x_{t,1}^{(i)} \|_2^2$$
 
@@ -233,8 +214,6 @@ $$\mathcal{L}_{\mathrm{FM}} = \underset{\tau, \Delta x_{t,0}^{(i)}, \Delta x_{t,
 ### 自回归推理流程
 
 推理时，模型维护 KV 缓存以加速逐步生成。对于每个时间步 $t$ 和每条轨迹 $i$，流匹配头以变换器输出的条件特征 $\mathbf{z}_t^{(i)}$ 为条件，从噪声中采样增量运动 $\Delta x_t^{(i)}$，并在线更新轨迹位置 $x_t^{(i)} = x_{t-1}^{(i)} + \Delta x_t^{(i)}$。消融实验（Table D）证实，50 步逐步预测（$\Delta t = 0.01\text{s}$）的终点误差为 0.00141，远优于单步预测的 0.02823，验证了逐步分解复杂交互的必要性。
-
-
 
 ## 实验与关键发现
 
@@ -284,24 +263,11 @@ Figure 12 分析了后验不确定性与真实误差的相关性。从像素级�
 
 5. **串行解码延迟**：尽管通过 KV 缓存和融合并行变换器块已大幅加速，逐步预测的串行特性在极低延迟场景下仍存在固有瓶颈。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2604_09527/figures/010_Table_1.jpg]]
 *Table 1: Open-world & Physical Motion Prediction. We evaluate motion prediction capabilities across both open-world and constrained physical settings using the benchmark introduced in Sec. 4. Eliminating the need to model fine-grained pixel-level details lets our model focus on the dynamics of the scene, making it competitive with state-of-the-art video models in the Best-5 setting across all three subsets, despite having substantially fewer parameters and being substantially more efficient. The gap widens significantly in the efficiency-focused Best-5min setting, driven by the higher throughput*
 
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2604_09527/figures/015_Table_3.jpg]]
 *Table 3: Posterior Parametrization Ablation. Substituting previously used GMM-based heads with flow matching heads leads to significant improvements in accuracy and increases convergence substantially. Adding our scale cascade improves accuracy further*
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2604_09527/figures/019_Table.jpg]]
-*Table: B. Inference Time Scaling: Our approach achieves lower End-Point-Error in the Billiard simulation with more function evaluations of the diffusion head*
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2604_09527/figures/020_Table.jpg]]
-*Table: C. Trajectory ID Embedding: Our trajectory ID embeddings provide lower end-point-error in billiard simulations and enable zero-shot generalization to both increased and reduced number of trajectories*
-
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2604_09527/figures/021_Table.jpg]]
-*Table: D. Reasoning in multiple steps. We compare predicting 0.5 s into the future using models trained with different step sizes. Our standard method integrates 50 steps, while the other models perform fewer steps. Therefore, these models require fewer autoregressive steps, yet have to model more of the dynamics internally*
-
-
 
 ## 定位与知识库关联
 
@@ -342,8 +308,6 @@ Myriad 的设计包含若干关键假设，这些假设定义了其适用边界�
 **下游应用的优势与不足。** 在机器人操控、自动驾驶等闭环场景中，Myriad 的稀疏运动预测相比专门的闭环模型（如基于强化学习的策略网络）有哪些优势和不足？一方面，Myriad 的通用运动先验可能提供更好的场景理解和多模态未来预测；另一方面，它缺乏对具体执行器动力学和任务奖励的直接建模。在台球规划实验中（Table 2），Myriad 达到了 78% 的准确率，接近模拟器 Oracle 的 84%，但仍有 6% 的差距，这表明在需要精确物理交互的任务中，纯数据驱动的方法仍有改进空间。
 
 **串行解码的延迟。** 尽管通过 KV 缓存和融合并行变换器块已经大幅加速了推理，自回归的逐步预测特性在串行解码时仍存在一定延迟。在需要实时响应的应用中（如高频控制回路），这一延迟可能成为瓶颈。进一步的研究可以探索非自回归的解码策略或模型蒸馏技术来降低延迟。
-
-
 
 ## 原文 PDF
 

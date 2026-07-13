@@ -51,8 +51,6 @@ claims:
 
 该方法的主要局限在于：当基础模型 SVD 的生成先验不足时，编辑质量受限；长视频编辑存在误差累积；尚未针对动态遮挡和复杂交互场景进行专门优化。
 
-
-
 视频编辑技术正从全局风格迁移走向精细化、局部化的控制。用户不仅希望替换画面中的特定物体（内容编辑），更希望精确指定该物体的运动轨迹（运动编辑）。然而，现有方法在这两个维度上存在明显的耦合困境。
 
 **核心瓶颈在于未编辑区域的“信息淹没”效应。** 在局部视频编辑中，未编辑区域天然携带稠密的视觉纹理与帧间运动信息。当扩散模型同时接收用户指定的稀疏轨迹控制信号和未编辑区域的丰富运动线索时，模型倾向于从后者推断编辑区域的运动，导致用户提供的轨迹控制被实质性忽略。Figure 3 的玩具实验清晰地揭示了这一现象：无论是单分支控制模块还是双分支联合训练，运动控制条件均无法生效（“the motion condition has no control effect”）；即使引入运动先验训练改善了部分控制能力，一旦加入内容控制信号，运动控制精度再次退化（“the control accuracy is weakened and affected by the unedited content”）。
@@ -62,8 +60,6 @@ claims:
 **现有方法存在明确缺口。** 以 **InsV2V** 为代表的文本驱动编辑方法仅能控制语义内容，无法精确指定运动；**AnyV2V** 通过首帧编辑传播的方式同样缺乏对运动轨迹的显式建模；商业工具 **Pika** 虽支持区域重生成，但在添加新物体时运动一致性不足（Figure 13 展示了其向天空添加飞机时的失败案例）。这些方法的共同缺陷在于：它们要么完全放弃运动控制，要么将内容与运动控制隐式地耦合在一起，无法实现解耦的、协调的局部编辑。
 
 **本文的核心动机在于实现内容与运动的协同解耦控制。** ReVideo 旨在让用户在指定编辑区域的同时，既能通过修改首帧定义新内容，又能通过绘制稀疏轨迹直观地定义运动模式。实现这一目标的关键挑战并非设计更强的控制编码器，而是从根本上打破未编辑内容对运动控制的干扰——这需要从训练数据构造、训练策略到特征融合机制的协同设计。
-
-
 
 ## 核心方法与创新机理
 
@@ -94,8 +90,6 @@ Figure 7 的消融证实，SAFM 相比直接求和“实现了更准确的轨迹
 | 条件融合方式 | 直接求和编码特征 | 基于掩码和时间步预测权重图融合 |
 
 这些创新使 ReVideo 在定量评估中 PSNR 达到 32.85（InsV2V 为 29.77），文本对齐得分 0.2304（InsV2V 为 0.2022），并在人类评估中以 59.1% 的整体偏好率显著领先（Table 1）。
-
-
 
 ![[assets/figures/papers/paper_list_l51_ReVideo_Remake_a_Video_with_Motion_and_Content_Control/figures/005_Figure_5.jpg]]
 *Figure 5: The architecture of our proposed spatiotemporal adaptive fusion module (left), and the visualization of fusion weight Γ at different timesteps (right)*
@@ -129,8 +123,6 @@ ReVideo 的整体 pipeline 围绕一个核心矛盾展开：在局部视频编�
 3. **去块训练（Stage 3）**：由于解耦训练中编辑区域与未编辑区域来自不同视频，生成结果可能在边界出现块效应。此阶段仅微调 Control Module 和 SVD 基模型中时序自注意力层的 Key/Value 嵌入（$W_k$、$W_v$），在消除块伪影的同时保留前两阶段建立的运动控制能力。消融实验表明，若在此阶段微调整个 Control Module，局部运动控制精度会退化（Figure 7）。
 
 **与基线方法的差异。** 相比于 InsV2V 等方法的简单联合训练和直接特征相加，ReVideo 的核心差异在于：通过解耦的数据构造打破未编辑区域运动信息对轨迹控制的淹没效应，并通过 SAFM 在时空维度上自适应融合两类条件，而非静态地将编码特征求和。这一设计使得单个 Control Module 即可紧凑地承载内容与运动的联合控制。
-
-
 
 ### 基础扩散框架
 
@@ -174,8 +166,6 @@ $$\mathbf{f}_c = E_c(\mathbf{c}_{con}) \cdot \mathbf{r} + E_m(\mathbf{c}_{mot}) 
 2. **解耦训练**：核心创新在于数据构造策略——将训练样本 $V$ 的编辑区域与未编辑区域分别取自两个不同的视频：$V = V_1 \cdot M + V_2 \cdot (1 - M)$。这迫使模型无法从未编辑区域推断编辑区域的运动，必须依赖显式的运动轨迹条件。此阶段同时引入内容控制，实现两种条件的初步解耦。
 3. **去块训练**：解耦训练后编辑边界可能出现块效应。此阶段仅微调控制模块和基础模型 SVD 中时序自注意力层的 Key/Value 嵌入（$W_k$ 和 $W_v$），在消除块伪影的同时保持已建立的局部运动控制能力。消融实验表明，若在此阶段微调整个控制模块，局部运动控制精度会下降（Figure 7）。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈验证：内容与运动控制的耦合
@@ -191,7 +181,6 @@ ReVideo 的核心动机源于一个关键发现：在局部视频编辑中，未
 ### 定量评估
 
 Table 1 汇总了 ReVideo 与基线方法的定量对比。在局部视频编辑测试集上，ReVideo 在 PSNR 指标上达到 32.85，显著优于 InsV2V 的 29.77（+3.08），表明编辑后的视频在像素级保真度上具有明显优势。在文本对齐（CLIP score）方面，ReVideo 取得 0.2304，优于 InsV2V 的 0.2022（+0.0282），说明编辑结果与目标描述的语义一致性更高。
-
 
 ![[assets/figures/papers/paper_list_l51_ReVideo_Remake_a_Video_with_Motion_and_Content_Control/figures/006_Table_1.jpg]]
 *Table 1: Quantitative comparison between our ReVideo and other related works. We employ automatic metrics ( i . e . , , CLIP [33] score, PSNR) and human evaluation to evaluate the performance*
@@ -214,7 +203,6 @@ Figure 6 展示了 ReVideo 与 InsV2V、AnyV2V、Pika 的视觉编辑效果对�
 
 Figure 12 进一步展示了 ReVideo 处理长视频的能力，在包含 90 帧的 9 秒视频上仍能保持稳定的编辑效果，表明方法具有一定的时序扩展性。
 
-
 ![[assets/figures/papers/paper_list_l51_ReVideo_Remake_a_Video_with_Motion_and_Content_Control/figures/014_Figure_12.jpg]]
 *Figure 12: The ability of our ReVideo to extend the number of editing frames. The results demonstrate the performance of our ReVideo in processing a 9-second video containing 90 frames*
 
@@ -228,22 +216,11 @@ Figure 12 进一步展示了 ReVideo 处理长视频的能力，在包含 90 帧
 
 需要手动验证的是：论文未报告在极端运动幅度或高度非刚性变形场景下的定量表现，这些场景的实际编辑质量需要进一步评估。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l51_ReVideo_Remake_a_Video_with_Motion_and_Content_Control/figures/004_Figure_4.jpg]]
 *Figure 4: The data construction strategy for decoupling training and editing results from this stage*
 
 ![[assets/figures/papers/paper_list_l51_ReVideo_Remake_a_Video_with_Motion_and_Content_Control/figures/012_Figure_11.jpg]]
 *Figure 11: Tuning W _ { k } and W _ { v } in control module Tuning W _ { k } and W _ { v } in control module and base model Figure 11: The necessity of fine-tuning key embedding and value embedding in the base model, i.e., SVD*
-
-![[assets/figures/papers/paper_list_l51_ReVideo_Remake_a_Video_with_Motion_and_Content_Control/figures/013_Figure.jpg]]
-*Figure: Frame 1 Frame 10 Frame 30*
-
-![[assets/figures/papers/paper_list_l51_ReVideo_Remake_a_Video_with_Motion_and_Content_Control/figures/015_Figure_13.jpg]]
-*Figure 13: More failure cases of Pika in adding new objects to a video. We set the text consistency control parameter to the highest level during testing. The editing target is to add a plane in the sky*
-
-
-
 
 ## 定位与知识库关联
 
@@ -292,8 +269,6 @@ ReVideo 的能力边界受以下因素制约：
 3. **语义增强的运动控制**：当前运动控制仅依赖轨迹线，能否结合文本提示辅助描述编辑区域的语义内容（如“旋转的风车”），实现更丰富的编辑效果？
 4. **高维运动控制扩展**：能否将 2D 轨迹控制扩展到 3D 轨迹或更复杂的运动模式（如周期性运动、弹性形变），以支持更广泛的应用场景？
 5. **动态场景鲁棒性**：如何使方法在存在动态遮挡、光照变化等复杂场景下保持稳定的编辑质量？可能需要引入显式的场景理解模块或物理先验。
-
-
 
 ## 原文 PDF
 

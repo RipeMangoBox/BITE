@@ -53,8 +53,6 @@ claims:
 
 需注意的是，该方法仅在 8 秒视频片段上评估，VGGSound-Hard 经人工筛选后仅含 118 个样本，统计显著性有限；模型对 CAVP 编码器的依赖使其跨视觉域泛化能力尚待验证。
 
-
-
 视频查询声源分离（Video-Queried Sound Separation, VQSS）旨在从混合音频中提取与给定视频中视觉对象相对应的声音成分。这一任务的核心挑战在于，视频中往往同时存在多个同质声源——例如多只狗同时吠叫，其中部分在屏幕内、部分在屏幕外。传统的基于类别语义的方法（如 CLIPSEP、i-Query、OmniSep）仅依赖视觉语义信息来区分声源，无法判断声音是否来自屏幕内的特定对象，导致在同质干扰场景下产生大量误分离。
 
 现有 VQSS 方法存在两个关键瓶颈。**其一，缺乏时间建模能力。** 主流方法将视频帧作为语义嵌入注入分离网络，通过交叉注意力（Cross-Attention）融合视听特征，但这种方式丢失了视频帧与音频片段之间的精确时间对应关系。当多个同质声源在时间上交错出现时，模型无法利用“该声音是否与当前屏幕内动作同步”这一关键线索进行判别。**其二，掩码判别模型的固有缺陷。** 现有方法几乎都采用掩码判别范式，即直接预测时频掩码并与混合频谱相乘得到分离结果。这种“一刀切”的频谱抑制策略容易产生频谱空洞（Spectral Holes），导致分离音频不完整、存在伪影，尤其在频谱重叠严重的区域表现尤为明显。
@@ -62,8 +60,6 @@ claims:
 生成式模型（如扩散模型 +Davis 和流匹配模型 tDavis-flow）为缓解频谱空洞问题提供了新思路，但它们同样缺乏时间对齐机制，在同质干扰场景下仍无法有效区分声源。因此，设计一个既能利用生成式建模产生完整频谱、又能强制执行视听时间对齐的框架，成为突破当前 VQSS 性能瓶颈的关键。
 
 AlignSep 正是在这一背景下提出的：**首次将条件流匹配（Conditional Flow Matching）引入 VQSS 任务**，通过生成式框架缓解掩码方法固有的频谱空洞问题；同时设计专门的时间连接策略和视觉时间编码器 CAVP，强制执行视听时间对齐，使模型能够明确利用视觉时间线索区分同质音频源。
-
-
 
 ## 核心方法与创新机理
 
@@ -121,8 +117,6 @@ AlignSep 采用**时间拼接 + 无交叉注意力的前馈 Transformer** 作为
 
 **需要指出的局限**：模型目前仅在 8 秒视频片段上验证，对长视频的可扩展性、CAVP 在不同视觉域的泛化能力，以及 VGGSound-Hard 仅 118 样本的统计显著性，均需进一步验证。
 
-
-
 AlignSep 是一个基于条件流匹配（Conditional Flow Matching）的视频查询声源分离（VQSS）框架。其核心目标是在视觉条件的引导下，建立从混合音频分布到干净分离音频分布的映射。与现有基于掩码判别或扩散的方法不同，AlignSep 是首个将流匹配引入 VQSS 的生成式模型，并明确设计了时间对齐机制来利用视觉时间线索。
 
 ### Pipeline 概述
@@ -157,8 +151,6 @@ $$L_{\mathrm{CFM}}(\theta) = \mathbb{E}_{t, p_c(\mathbf{x}_c), p_t(\mathbf{x} | 
 其中，$\mathbf{x}_c$ 代表干净音频的条件样本，$p_t(\mathbf{x} | \mathbf{x}_c)$ 是定义的条件概率路径。通过最小化该损失，向量场估计器学会在视觉条件 $\mathbf{e}$ 的引导下，将任意噪声样本逐步变换为对应的干净音频。
 
 **局限性提示**：当前框架仅在 8 秒的视频片段上进行训练和评估，其在更长视频序列上的可扩展性和内存占用尚未验证。此外，框架对 CAVP 视觉编码器的依赖意味着其性能上限受限于该编码器的泛化能力，在不同视觉领域（如非自然视频）的适用性需要进一步研究。
-
-
 
 ### 3.1 问题形式化
 
@@ -211,16 +203,12 @@ AlignSep 的核心创新在于**生成式时间对齐**的双重设计：
 
 消融实验进一步揭示：将流匹配替换为扩散模型时，VGGSound-Clean 上 $S_{A-A}$ 从 73.38 降至 64.12，说明生成式建模影响语义质量上限；但时间一致性主要源于 CAVP 视觉编码器而非生成模型选择。
 
-
-
 ## 实验与关键发现
 
 ### 基准测试与评估体系
 
 AlignSep 在三个不同难度的基准上进行了系统评估：**MUSIC-Clean**（单乐器视频）、**VGGSound-Clean**（通用视听场景）以及本文专门构建的挑战性基准 **VGGSound-Hard**。VGGSound-Hard 的核心设计在于引入“同质干扰”——即画外存在与画内目标源类别相同的干扰声（如多只狗同时吠叫），迫使模型必须依赖时间对齐而非仅语义信息进行分离。该基准经人工筛选后包含 118 个高质量样本（Table 1 标题注释）。
 
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_DVDkFcxU1D/figures/003_Table_1.jpg]]
-*Table 1: Comparison of visually-queried sound separation performance on MUSIC-Clean, VGGSound-Clean, and VGGSound-Hard (VG-Hard). The evaluation considers semantic consistency between audio–audio ( $\mathsf { S } _ { A - A }$ ) , semantic consistency between audio–visual ( $\mathsf { S } _ { A - V }$ ) , and temporal consistency between audio–visual ( $\mathrm { T } _ { A - V }$ ) to assess the quality of the separated results. † Since Davis is originally trained on different datasets, we retrained their models on the same dataset to ensure a fair comparison
 
 评估采用三个互补指标：
 - **S_A-A**（音频-音频语义一致性）：通过 CLAPScore 衡量分离音频与干净目标音频的语义匹配度
@@ -270,9 +258,6 @@ AlignSep 在三个不同难度的基准上进行了系统评估：**MUSIC-Clean*
 
 **Figure 4** 提供了两个典型案例的频谱可视化。(a) 展示了时间错位问题：OmniSep 在目标声源静默期间错误生成了鼓声（红色区域），而 AlignSep 严格遵循视觉节奏线索，仅在画面中出现敲击动作时产生对应音频（绿色区域）。(b) 揭示了掩码判别方法的固有缺陷——频谱空洞：当多个声源在频谱上重叠时，掩码方法倾向于过度抑制，导致分离音频出现不连续的频谱断裂（红色区域）。AlignSep 的生成式框架通过迭代去噪过程，能够从混合信号中重建出更完整、更自然的频谱结构（绿色区域），有效缓解了这一伪影。
 
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_DVDkFcxU1D/figures/007_Figure_4.jpg]]
-*Figure 4: Qualitative comparison of VQSS. (a) illustrates a temporal misalignment case, while (b) demonstrates the spectral holes artifact. We highlight the critical regions using different colors*
-
 ### 失败模式与局限性
 
 尽管在受控基准上表现优异，AlignSep 存在以下已知局限：
@@ -285,18 +270,8 @@ AlignSep 在三个不同难度的基准上进行了系统评估：**MUSIC-Clean*
 
 4. **实时性不足**：当前 25 步采样的 4 FPS 吞吐量远未达到实时处理要求（>25 FPS）。尽管减少步数可提升速度，但 5 步采样的性能已出现明显退化，表明质量-速度的帕累托前沿限制了实时部署的可能性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_DVDkFcxU1D/figures/008_Table_4.jpg]]
 *Table 4: Architecture details of 1D VAE for spectrogram compression*
-
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_DVDkFcxU1D/figures/009_Table_5.jpg]]
-*Table 5: Hyperparameters of the vector field estimator of AlignSep*
-
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_DVDkFcxU1D/figures/010_Table_6.jpg]]
-*Table 6: Mean Opinion Score (MOS) Rating Criteria*
-
-
 
 ## 定位与知识库关联
 
@@ -341,8 +316,6 @@ AlignSep 的有效性建立在几个关键前提之上，这些前提同时界�
 4. **实时流式推理。** 当前框架依赖离线批处理。若需实现流式分离，ODE 求解的迭代特性与低延迟要求之间存在根本性矛盾。是否可以通过蒸馏、一致性模型或提前退出策略将推理压缩至单步或少量步骤，同时维持可接受的分离质量？
 
 5. **视觉-音频异步场景。** 现实视频中常存在视听不同步（如配音、网络延迟）。AlignSep 的强制时间对齐假设在此类场景下可能产生错误的对应关系。如何检测并适应视听时间偏移，是一个尚未探索的方向。
-
-
 
 ## 原文 PDF
 

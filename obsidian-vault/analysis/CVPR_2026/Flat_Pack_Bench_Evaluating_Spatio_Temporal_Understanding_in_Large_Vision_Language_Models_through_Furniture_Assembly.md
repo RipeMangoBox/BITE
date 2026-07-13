@@ -50,8 +50,6 @@ claims:
 
 **主要结果**：人类在该基准上达到 94.18% 的准确率，而最强闭源模型 GPT-5 仅取得约 38%，最强开源模型 InternVL3-78B 约为 41%。移除视频仅使用图像提示时，追踪子任务性能骤降 24.51%，而其他子任务反而有所提升，直接证实了模型未能有效利用视频中的时间信息。错误分析进一步表明，目标定位错误（37.28%）和时空推理错误（32.45%）是模型失效的主要来源。
 
-
-
 大型视觉-语言模型（LVLM）在静态图像理解上取得了显著进展，但在需要细粒度时空推理的视频理解任务中仍面临根本性瓶颈。现有模型无法有效利用视频中的时间信息，尤其在目标追踪和空间交互理解上存在严重缺陷，导致其在需要多帧关联的任务上表现远低于人类。
 
 ### 问题背景
@@ -69,8 +67,6 @@ claims:
 针对上述缺口，本文提出 **FLAT-PACK BENCH**——一个基于家具组装视频的时空理解基准。该基准以宜家家具组装视频为素材，通过引入带颜色掩膜、边界线和标签的视觉提示（visual prompts），将细粒度问题锚定到具体部件上，从而系统评估 LVLM 在时间排序（Temporal Ordering, TORD）、时间定位（Temporal Localization, TLOC）、部件配对（Mating, MATE）和部件追踪（Tracking, TRACK）四项任务上的表现。
 
 核心洞察在于：部件追踪能力和接触关系推理是解决家具组装时空理解任务的关键操作，而现有模型在这两个基本能力上均严重不足。通过构建该基准，工作旨在揭示 LVLM 在长视频多部件交互理解上的根本性缺陷，并为未来研究提供诊断工具。
-
-
 
 ## 核心方法与创新机理
 
@@ -104,8 +100,6 @@ Flat-Pack Bench 的评估体系超越了简单的准确率比较，构建了一�
 
 综上，Flat-Pack Bench 的核心贡献在于**将 LVLM 时空理解评估从“能不能”推进到“为什么不能”的诊断层面**，通过精心设计的任务分解、视觉提示机制和消融实验，系统性地揭示了部件追踪能力和接触关系推理是当前模型的关键能力缺口，为后续研究指明了明确的改进方向。
 
-
-
 FLAT-PACK BENCH 的评估框架围绕一个核心洞察构建：现有 LVLM 在细粒度时空推理上的根本性缺陷，源于其无法有效利用视频中的时间信息进行多帧关联。为此，该基准设计了一套从数据构建到标准化评测的完整流水线，将家具组装视频转化为可精确量化模型时空理解能力的多项选择问答。
 
 ### 流水线总览
@@ -136,16 +130,6 @@ FLAT-PACK BENCH 的评估框架围绕一个核心洞察构建：现有 LVLM 在�
 
 ![[assets/figures/papers/paper_list_l2741_https_arxiv_org_abs_2605_21625/figures/009_Figure_5.jpg]]
 *Figure 5: Temporal Video Agent. An overview of our agentic baseline. First, a Code LLM uses the API specification and the input question to generate a program. The generated program uses the assembly video and the visual prompt’s frame index and mask to produce a response for the question. We also show an example trace for a question. We can analyse the execution trace to pin-point the sources of error*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2741_https_arxiv_org_abs_2605_21625/figures/001_Figure_1.jpg]]
-*Figure 1: Motivation for FLAT-PACK BENCH. For AI assistants to understand an assembly process through observation, they need to be adept at fine-grained spatio-temporal reasoning about the video. We propose FLAT-PACK BENCH to evaluate Large Vision-Language Models on four such fine-grained video understanding tasks, namely – Temporal Ordering, Temporal Localization, Tracking, and Mating*
-
-![[assets/figures/papers/paper_list_l2741_https_arxiv_org_abs_2605_21625/figures/003_Figure_2.jpg]]
-*Figure 2: Snapshot of FLAT-PACK BENCH. Each question consists of an assembly video (top row), one or two visual prompts (Images A, B), and a multiple-choice question. The corresponding visual inputs are shown within each question box. Videos are sourced from the internet and may include artifacts like overlaid text. For clarity, part labels are enlarged, as the visual prompts are shown at reduced scale*
-
-
 
 本文的核心贡献在于构建了一个系统化的视频时空理解评估框架，而非提出新的模型架构或数学公式。因此，本节将重点阐述构成该基准的四个关键功能模块及其设计逻辑，文中未涉及需要推导的数学公式。
 
@@ -189,8 +173,6 @@ FLAT-PACK BENCH 的评估框架围绕一个核心洞察构建：现有 LVLM 在�
 尽管上述模块构成了一个严密的评估体系，但分析揭示了当前模型在解决此类任务时的根本性缺陷，这构成了本工作的核心发现而非公式：
 - **追踪与接触推理是关键操作**：模型在 **TRACK** 和 **MATE** 任务上的糟糕表现表明，缺乏有效的部件追踪能力和部件间接触关系推理能力是主要瓶颈。
 - **视频时间信息利用失效**：消融实验（Table 4）显示，移除视频仅保留图像提示时，模型在 **TRACK** 任务上性能断崖式下降，但在 **TLOC** 和 **MATE** 任务上反而提升。这证明模型并未真正利用视频中的时间上下文进行推理，而是过度依赖静态图像线索和常识性捷径。打乱部件ID标签会损害 **TORD** 性能，进一步证实了模型依赖非时间性捷径的结论。
-
-
 
 ## 实验与关键发现
 
@@ -275,9 +257,6 @@ Figure 4 展示了 Gemini 2.5 Pro 的自我探测解释示例：模型虽然“�
 
 论文还设计了一个基于编程的 Temporal Video Agent（TVA，Figure 5），该代理使用代码 LLM 生成程序，调用 SAM2 等视觉工具进行部件追踪和接触推理。Table 5 的结果显示：
 
-![[assets/figures/papers/paper_list_l2741_https_arxiv_org_abs_2605_21625/figures/010_Table_5.jpg]]
-*Table 5: Agent performance. Acc. (Answered) is accuracy over non-abstained questions*
-
 - TVA 的总体准确率仍不理想，且存在较高的弃权率。
 - 即使借助专用视觉工具，代理在接触推理任务上的表现依然很差（Table S.3，Qwen2.5-VL 在接触推理模板上表现极低）。
 
@@ -291,19 +270,6 @@ Figure 4 展示了 Gemini 2.5 Pro 的自我探测解释示例：模型虽然“�
 2. **部件追踪（TRACK）和接触关系推理是当前模型的核心瓶颈**，模型严重依赖静态图像线索和 ID 顺序等非时间性捷径。
 3. **思维链提示在时空视觉理解中失效**，暗示语言推理与视觉-时间推理之间存在根本性的迁移障碍。
 4. **混合-媒体提示是目前最优的视觉提示策略**，但视觉提示设计对性能的提升有限，根本问题在于模型缺乏细粒度时空交互理解能力。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2741_https_arxiv_org_abs_2605_21625/figures/002_Table_1.jpg]]
-*Table 1: Dataset composition: Shows the number of videos (#V), questions (#Q), and templates per category (#T), along with average questions per video (Q/V), per template (Q/T), and unique templates per video (uT/V)*
-
-![[assets/figures/papers/paper_list_l2741_https_arxiv_org_abs_2605_21625/figures/014_Table_S.2.jpg]]
-*Table S.2: Human evaluation summary on FLAT-PACK BENCH. We show the performance of Prolific and our in-house participants, along with some reference models on the same subset of questions. Agreement is measured by unanimous response rate*
-
-![[assets/figures/papers/paper_list_l2741_https_arxiv_org_abs_2605_21625/figures/017_Table_S.3.jpg]]
-*Table S.3: Contact-Reasoning Results. We show the performance of Qwen2.5-VL (32B & 72B) across two question templates. The overall performance is quite poor across all settings*
-
-
 
 ## 定位与知识库关联
 
@@ -336,8 +302,6 @@ FLAT-PACK BENCH 在视频理解评测谱系中占据了一个独特的生态位�
 3. **混合-媒体提示的优势根源**：该提示方式为何普遍优于拼贴和拼接？是分辨率保持、注意力分配还是模态对齐的差异所致？
 
 4. **长视频交互的合成数据路径**：能否通过大规模合成数据（如物理仿真环境中的装配过程）或强化学习来提升 LVLM 对多物体交互的追踪能力？这可能是突破当前性能瓶颈的关键方向。
-
-
 
 ## 原文 PDF
 

@@ -55,8 +55,6 @@ claims:
 
 在 VisDial 基准上的实验表明，CAST 在对话后期轮次中优势尤为显著：第 10 轮 R@1 达到 57.56%，相比最优基线 ChatIR（53.15%）提升 **+4.41 个百分点**，验证了动态空间变换在捕捉累积上下文语义方面的关键价值。
 
-
-
 ### 交互式文本到图像检索的现实需求
 
 文本到图像检索旨在根据自然语言描述从大规模图像库中找到相关图像。在许多真实场景中，用户往往难以用单次查询精确表达其需求，因此需要通过多轮对话逐步澄清和细化搜索意图。这种**交互式文本到图像检索（Interactive Text-to-Image Retrieval, I-TIR）**范式允许用户通过问答循环不断调整查询，直到定位到目标图像。
@@ -88,8 +86,6 @@ $$s_t = \text{sim}(f_T(\mathcal{H}_t), f_I(I))$$
 
 本文提出的**CAST（Context-Aware Latent Space Transformation）**框架通过两个协同模块——**上下文感知低秩投影器（CLP）**和**上下文引导调制器（CGM）**——分别解决上述两个挑战，首次在交互式文本到图像检索中实现了多模态特征空间随对话语义的动态演变。
 
-
-
 ## 核心方法与创新机理
 
 CAST的核心创新在于**首次将交互式文本到图像检索中的多模态特征空间从“静态固定”转变为“上下文感知动态演变”**。现有方法（如ChatIR、PlugIR、ImageScope）在整个多轮对话过程中始终使用同一个预训练好的嵌入空间进行跨模态相似度计算，这一静态范式导致用户意图随对话轮次逐步细化的语义变化无法被特征空间捕捉，细微的上下文线索（如新增的颜色属性、细化的空间关系）容易在固定的语义流形中被淹没。
@@ -113,8 +109,6 @@ CAST通过一个轻量级的**上下文感知空间调节器（Context-Aware Spa
 消融实验（Table 2）验证了每个模块的独立贡献：引入CLP将10轮平均R@10从79.89提升至80.90，进一步加入CGM后达到82.05。对比实验（Table 3, Table 4）表明，低秩分解结构优于非分解的上下文感知矩阵（82.05 vs 80.57），上下文引导调制器优于上下文无关的可学习标量（82.05 vs 81.51），证实了“方向-强度”协同设计的必要性。
 
 此外，CAST具备**即插即用**的特性——它可以无缝集成到现有的交互式检索框架中，仅需对文本和图像编码器的输出特征施加CASR变换，计算开销极低（在秩$r=8$时，约0.002秒即可完成50,000张图像的特征变换）。
-
-
 
 CAST 的整体流水线围绕一个核心观察展开：传统交互式文本到图像检索（I-TIR）在整个多轮对话过程中使用固定的多模态嵌入空间进行跨模态匹配，导致用户意图随对话轮次演变时产生的细微语义变化无法被特征空间捕捉。CAST 通过一个轻量级的上下文感知空间调节器（Context-Aware Space Regulator, CASR），将静态的多模态特征空间动态变换为与当前对话上下文对齐的新空间，从而实现自适应语义对齐。
 
@@ -144,13 +138,6 @@ CLP 和 CGM 构成 CASR 的两个协同子模块，分别解决“往哪个方�
 - **输出**：经过 CASR 变换的文本特征 $z_t^T$ 和图像特征 $\{z_t^{I_k}\}$，以及基于动态空间余弦相似度的排序结果。
 
 CAST 的设计使其可作为即插即用模块集成到现有 I-TIR 架构中。Figure 4 的实验表明，将 CASR 添加到 ChatIR、PlugIR 等基线方法后，各方法在 VisDial 上的性能均获得一致提升，验证了该模块的通用性。在效率方面，当低秩维度 $r=8$ 时，CAST 可在约 0.002 秒内完成对 50,000 张图像特征的变换，额外计算开销极小。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2297_https_openaccess_thecvf_com_content_CVPR2026_html_Lin_CAST_Context_Aware/figures/001_Figure_1.jpg]]
-*Figure 1: Illustration of our motivation. Different from the previous works that typically perform cross-modal matching in one static multimodal feature space throughout all search round, we propose to adaptively utilize multiple dynamic feature spaces based on progressively refined user’s search intention. Each space is expected to be more discriminative with respect to a specific “topic” that the user is focused on in corresponding search round*
-
-
 
 ### 问题形式化
 
@@ -220,8 +207,6 @@ $$\mathcal{L}_{\mathrm{cgc}} = -\frac{1}{B} \sum_{i=1}^{B} \log \frac{\exp(\text
 
 CLP 与 CGM 的协同设计解决了两个核心问题：**方向**与**幅度**。仅使用 CLP 会导致变换方向有语义意义但幅度不可控；仅使用 CGM 则缺乏方向引导。两者结合使特征空间能够沿用户意图相关的语义方向（CLP），以对话轮次间语义差异决定的幅度（CGM）进行稳定且表达力强的动态演化。消融实验证实了这一协同效应：引入 CLP 使平均 R@10 从 79.89 提升至 80.90，进一步增加 CGM 后提升至 82.05。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -278,24 +263,14 @@ CAST 的设计充分考虑了实际部署效率。低秩投影的秩 r 设为 8 
 
 - 跨模型泛化性：当前实验基于 BLIP 特征空间，CAST 能否直接适配 CLIP 等其他预训练视觉语言模型的特征空间，论文未提供证据。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2297_https_openaccess_thecvf_com_content_CVPR2026_html_Lin_CAST_Context_Aware/figures/006_Table_2.jpg]]
 *Table 2: Ablation study on the VisDial dataset. All results report the 10-round averaged Recall performance*
 
 ![[assets/figures/papers/paper_list_l2297_https_openaccess_thecvf_com_content_CVPR2026_html_Lin_CAST_Context_Aware/figures/008_Table_3.jpg]]
 *Table 3: Performance comparison between our proposed contextaware space regulator and the alternative projection structures*
 
-![[assets/figures/papers/paper_list_l2297_https_openaccess_thecvf_com_content_CVPR2026_html_Lin_CAST_Context_Aware/figures/007_Table_4.jpg]]
-*Table 4: Performance comparison between our context-guided modulator and the context-agnostic counterpart using a learnable scalar for space transformation magnitude computation*
-
-![[assets/figures/papers/paper_list_l2297_https_openaccess_thecvf_com_content_CVPR2026_html_Lin_CAST_Context_Aware/figures/005_Figure_4.jpg]]
-*Figure 4: Performance of different methods without or with our proposed context-aware space regulator on the VisDial dataset. Using our proposed module consistently improves performance, showing it can be served as a plug-and-play module for enhancing I-TIR*
-
 ![[assets/figures/papers/paper_list_l2297_https_openaccess_thecvf_com_content_CVPR2026_html_Lin_CAST_Context_Aware/figures/009_Figure_5.jpg]]
 *Figure 5: T-SNE visualization shows the 100 images about the topic of dog. The red bounding box marks a sample image, with its local region zoomed-in to illustrate space transformation. When the input dialogue context is “a black dog”, the feature space seems to be transformed into a new space of emphasizing color distinctions. As a result, images with the “black” attribute are brought closer together in the transformed space. Similarly, when the dialogue context is “a dog on the grass”, the space adjusts to prioritize scene, bringing images in grassy environments closer together. This demonstrates how the input context dynamically transforms the representation of the images, highlighting the model’s...*
-
-
 
 ## 定位与知识库关联
 
@@ -343,8 +318,6 @@ CAST 的方法学贡献不在于替换现有检索框架，而在于提出了一
 3. **多模态大模型时代的定位**：随着 GPT-4V、Gemini 等端到端多模态大模型的发展，特征空间级别的显式变换是否会被隐式上下文理解所取代？CAST 的轻量级、模块化设计在计算效率和可解释性方面仍具优势，但需要在更强基线（如端到端 MLLM 检索）下进行评估。
 
 4. **多轮对话中的累积误差**：CASR 在每一轮独立计算空间变换，未显式建模轮次间的变换连续性。引入递归或动量机制以平滑空间演化，可能进一步提升长对话场景下的稳定性。
-
-
 
 ## 原文 PDF
 

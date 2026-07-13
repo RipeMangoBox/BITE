@@ -52,8 +52,6 @@ claims:
 
 实验表明，Fast-dLLM v2 (7B) 在多个基准上平均得分**60.3**，超越同数据微调的AR基线 Qwen2.5-7B-Nemo-FT（58.2）和扩散基线 Dream（57.6）；在GSM8K上以0.9置信度阈值实现**2.6倍**加速且精度损失极小，吞吐量达到**102.5 tokens/s**（A100，batch=1），较Qwen2.5-7B-Instruct提升2.54倍。消融研究进一步验证了互补掩码与填充策略（合计提升+3.7个平均准确率点）、子块解码以及分层缓存的关键作用。
 
-
-
 自回归（Autoregressive, AR）大语言模型通过逐词顺序解码生成文本，这一机制从根本上限制了推理并行度。在标准自回归框架下，每个新token的生成必须等待之前所有token完成计算，导致长序列生成时吞吐量受限于单步延迟，无法充分利用现代GPU的并行计算能力。
 
 为突破这一瓶颈，扩散语言模型（Diffusion Language Models, dLLMs）被提出作为替代方案。其核心思想是并行生成多个token，通过迭代去噪逐步恢复完整序列。然而，现有扩散语言模型普遍采用双向（全注意力）架构，这与主流AR模型的因果注意力结构存在根本性差异。这种结构差异带来两个关键问题：**其一**，双向注意力使得模型无法有效利用KV缓存（Key-Value Cache）——这是AR推理加速的核心技术——导致推理效率反而低于预期；**其二**，从零训练一个高质量的扩散语言模型需要海量数据和计算资源，例如Dream（Ye et al., 2025a）需要约500B tokens才能达到可用性能。
@@ -61,8 +59,6 @@ claims:
 因此，该领域的核心矛盾在于：**如何在保持生成质量的前提下，将AR模型的成熟生态（预训练权重、缓存机制、推理优化）迁移到可并行解码的扩散框架中？** 现有方法要么牺牲了缓存效率（如全注意力dLLMs），要么需要高昂的从头训练成本，难以在实际部署中实现“无损加速”。
 
 Fast-dLLM v2 正是针对这一困境提出的解决方案。其动机直指一个关键洞察：**通过将序列划分为固定大小的块，在块内进行双向扩散建模、块间保持自回归因果关系，可以最大程度地复用预训练AR模型的权重和表示结构。** 这种“块感知”的注意力设计使得预训练模型仅需约1B tokens的微调即可转换为块扩散模型——相比Dream所需的约500B tokens，数据效率提升了近500倍——同时天然兼容KV缓存机制。配合块级分层缓存和置信度感知并行解码，该方法在推理时能获得最高2.5倍的加速，且基准性能匹配甚至超越原AR模型。
-
-
 
 ## 核心方法与创新机理
 
@@ -106,13 +102,8 @@ Fast-dLLM v2 提出**块感知混合注意力掩码**，将序列划分为固定
 
 Fast-dLLM v2 的创新本质是**通过块结构在AR模型和扩散模型之间建立了一座桥梁**：训练时以块为粒度进行双向上下文建模，推理时以块为单位进行自回归生成和缓存复用。这一设计使得预训练AR模型仅需极少微调即可转换为高效的块扩散模型，在多个基准上匹配或超越原AR模型性能（7B变体平均得分60.3，超越同数据微调的Qwen2.5-7B-Nemo-FT的58.2和Dream的57.6，Table 1），同时实现最高2.5倍推理加速。
 
-
-
 ![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_1NZ3DHF9nT/figures/003_Figure_2.jpg]]
 *Figure 2: Training process of Fast-dLLM-v2. The input sequence is decoded block by block. Within each block, the model performs next-token prediction with partial masking. To ensure every token is trained, complementary masks are introduced so that masked tokens in one view can be predicted from the other. We only apply loss to predicted tokens that are highlighted in green, and dashed curves connect Mask tokens to their corresponding predictions*
-
-![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_1NZ3DHF9nT/figures/004_Figure_3.jpg]]
-*Figure 3: Illustration of the inference process. The sequence is decoded block-by-block. The decoded blocks are cached to speed up inference. Within each block, we adopt the parallel decoding and DualCache in Fast-dLLM to further accelerate inference*
 
 Fast-dLLM v2 的核心设计思路是将预训练的自回归（AR）大语言模型转换为块扩散模型，从而在保持生成质量的同时获得推理并行度。整个框架分为**训练管线**与**推理管线**两大阶段，二者共享同一套块感知注意力机制，但输入输出流和缓存策略有所不同。
 
@@ -165,8 +156,6 @@ Fast-dLLM v2 的核心设计思路是将预训练的自回归（AR）大语言�
 
 这种设计使 Fast-dLLM v2 能够以极少的微调代价，将预训练 AR 模型转化为高效的块扩散模型，在推理时获得最高 2.6 倍的加速，同时匹配或超越原 AR 模型的基准性能。
 
-
-
 ### 块扩散训练目标
 
 Fast-dLLM v2 的核心训练目标建立在掩码扩散语言模型的期望损失之上，但进行了块感知改造。标准掩码扩散损失仅对被掩码token计算交叉熵，并按掩码比例 $t$ 进行反权重归一化：
@@ -218,16 +207,11 @@ $$[ M _ { B C } ] _ { i j } = \left\{ { \begin{array} { l l } { 1 } & { { \mathr
 
 消融实验表明，子块缓存在大批量（32）下显著提升吞吐量，且对准确率无影响（Figure 6）；分层缓存在长上下文（1K-8K tokens）下延迟和吞吐与标准AR缓存相当（Figure 8）。
 
-
-
 ## 实验与关键发现
 
 ### 核心结果：推理加速与质量保持
 
 Fast-dLLM v2 在多个基准上实现了推理吞吐量的显著提升，同时匹配或超越了同数据微调的自回归基线。在 A100 GPU 上，7B 模型以置信度阈值 0.9 进行并行解码时，吞吐量达到 101.7 tokens/s，相比阈值 1.0 时的标准解码（39.1 tokens/s）提升 **2.6 倍**，且 GSM8K 精度损失极小（图 4）。在 H100 上，批量大小为 64 时，扩散生成吞吐量比自回归基线高出 **1.8 倍**（图 5）。
-
-![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_1NZ3DHF9nT/figures/006_Figure_4.jpg]]
-*Figure 4: Accuracy and throughput under different thresholds on GSM8K. Threshold 0.9 is selected, offering a 2.6× speedup with minimal accuracy drop*
 
 从基准得分来看，Fast-dLLM v2 7B 在多个任务上的平均得分为 **60.3**，超越了同数据微调的 Qwen2.5-7B-Nemo-FT（58.2）和全注意力扩散基线 Dream（57.6）（表 1）。在数学推理任务 GSM8K 上，最佳变体达到 **83.7**，比 Qwen2.5-7B-Nemo-FT（71.4）高出 12.3 分；在代码生成 HumanEval Base 上，pass@1 达到 **63.4**，比 Qwen2.5-7B-Nemo-FT（51.2）高出 12.2 分。1.5B 版本同样表现稳健，平均得分 45.0，优于同规模的 Qwen2.5-1.5B-Nemo-FT（41.3）和 Dream（41.5）。
 
@@ -269,19 +253,6 @@ Fast-dLLM v2 仅需约 **1B tokens** 的微调数据即可实现无损自适应�
 ### 公平性说明
 
 所有非代码基准测试使用 LM-Eval 框架，代码任务使用 EvalPlus 评估。除 GPQA 采用 5-shot 外，其余均为零样本设置，使用贪婪解码。推理时默认块大小 32、子块大小 8，并行解码阈值设为 1 以保持训练-推理一致性。微调数据为 LLaMA-Nemotron post-training dataset，基线模型 Qwen2.5-Nemo-FT 使用相同的指令微调数据和训练步数，确保可比性。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_1NZ3DHF9nT/figures/002_Figure_1.jpg]]
-*Figure 1: Performance comparison of Fast-dLLM v2. (a) Comparison of throughput and GSM8K accuracy among baseline models and the Fast-dLLM variants in A100. Fast-dLLM v2 (7B) achieves 2.54× higher throughput than Qwen2.5-7B-Instruct while offering comparable accuracy. Additionally, it improves accuracy by +5.2% over Fast-dLLM-LLaDA, which is based on optimized LLaDA. (b) Throughput comparison under different batch sizes. Fast-dLLM v2 significantly outperforms all baselines at both batch size 1 and 4, demonstrating superior scalability and efficiency*
-
-![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_1NZ3DHF9nT/figures/017_Table_5.jpg]]
-*Table 5: Single-turn Dialogue Cases of Fast-dLLM v2 (7B)*
-
-![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_1NZ3DHF9nT/figures/018_Table_6.jpg]]
-*Table 6: Multi-turn Dialogue Cases of Fast-dLLM v2 (7B)*
-
-
 
 ## 定位与知识库关联
 
@@ -329,8 +300,6 @@ Fast-dLLM v2 处于自回归（AR）语言模型与扩散语言模型（dLLM）�
 5. **与其他加速技术的兼容性**：论文未讨论块扩散框架与投机解码（speculative decoding）、模型量化、FlashAttention 等技术的组合效果。分层缓存与这些技术的交互可能存在非平凡的工程挑战。
 
 6. **训练数据偏差**：微调使用 LLaMA-Nemotron post-training dataset，基线 Qwen2.5-Nemo-FT 使用相同数据和步数以保证可比性。但该数据集的具体构成和分布未详细披露，可能影响结论的外部有效性。
-
-
 
 ## 原文 PDF
 

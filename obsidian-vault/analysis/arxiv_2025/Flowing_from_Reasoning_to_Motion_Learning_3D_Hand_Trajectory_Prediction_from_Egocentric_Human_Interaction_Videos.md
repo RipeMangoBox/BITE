@@ -51,8 +51,6 @@ claims:
 
 **方法定位** EgoMAN 属于**意图驱动的轨迹预测**范式，其轨迹令牌接口与渐进训练策略为“语义推理→运动生成”的跨模态对齐提供了新的设计范式，区别于端到端隐式融合或独立推理-生成的两阶段方案。
 
-
-
 ### 问题背景：自我中心3D手部轨迹预测
 
 理解并预测人类手部在未来数秒内的三维运动轨迹，是构建具身智能与协作机器人的一项基础能力。在增强现实、机器人遥操作和日常活动辅助等以自我为中心的应用中，系统不仅需要知道手“在哪里”，更需要理解“将去往何处”以及“为什么”——即运动的意图与交互阶段。这一任务可形式化为一个条件生成问题：给定当前时刻的自我中心RGB帧 $\mathbf{V}_t$、过去 $H$ 帧的双手6-DoF轨迹 $\{\mathbf{L}_{\tau}, \mathbf{R}_{\tau}\}_{\tau=t-H}^{t}$，以及一段自然语言意图描述 $\mathbf{I}$，模型需预测未来 $T$ 帧的6-DoF腕部轨迹 $\{\tilde{\mathbf{L}}_{\tau}, \tilde{\mathbf{R}}_{\tau}\}_{\tau=t+1}^{t+T}$。6-DoF轨迹同时包含3D位置与6D旋转，对空间精度与物理一致性提出了严苛要求。
@@ -68,8 +66,6 @@ claims:
 针对上述缺口，本文的动机是构建一个从高层语义推理到连续运动生成的端到端可学习框架，其关键在于设计一个紧凑、可解释的中间接口，使视觉-语言推理能够高效地引导运动生成。核心洞察是：通过引入**四个专用轨迹令牌**——一个动作语义令牌 `<ACT>` 和三个阶段感知航点令牌 `<START>`、`<CONTACT>`、`<END>`——作为结构化桥梁，替代传统隐式令牌或冗长推理链，使得视觉语言推理能高效、可解释地引导流匹配运动专家，生成平滑且意图一致的6-DoF手部轨迹。这一设计将推理模块的语义理解与空间定位能力，直接转化为运动专家可消费的条件信号（航点位置、时间戳、语义嵌入），从而在保持物理一致性的同时实现意图驱动的长期轨迹生成。
 
 为支撑这一框架，本文同时构建了**EgoMAN数据集**——一个大规模自我中心交互数据集，包含300+小时视频、1500+场景、219K条6-DoF轨迹及3M结构化QA对，覆盖语义、空间与运动推理，为交互阶段感知的轨迹预测提供了必要的监督基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -113,8 +109,6 @@ EgoMAN的创新设计在多个维度得到严格验证：
 - **消融实验**（Table 3, Table 4）：完整模型（推理预训练 + FM预训练 + 6DoF航点）取得最优ADE 0.151、FDE 0.206；移除FM预训练导致ADE从0.150恶化至0.215，旋转误差从34.02°升至43.03°；仅保留 `<ACT>` 令牌而无航点监督（EgoMAN-ACT），ADE从0.162升至0.215，证明**航点显式结构是关键**。
 - **数据效率**（Figure 6）：在仅用20%训练数据时，EgoMAN仍维持ADE约0.13 m的强性能，而削弱推理预训练的EgoMAN-ACT变体ADE急剧上升至约0.16 m，验证了航点推理的数据效率优势。
 
-
-
 EgoMAN 是一个模块化的“推理‑到‑运动”框架，其核心任务是将自我中心 RGB 帧、过去双手腕部轨迹以及语言意图描述，映射为未来 6‑DoF 手部轨迹。该映射函数形式化为：
 
 $$\mathcal{F} : \left( \mathbf{V}_t, \{ \mathbf{L}_{\tau}, \mathbf{R}_{\tau} \}_{\tau = t-H}^{t}, \mathbf{I} \right) \mapsto \{ \tilde{\mathbf{L}}_{\tau}, \tilde{\mathbf{R}}_{\tau} \}_{\tau = t+1}^{t+T}$$
@@ -139,8 +133,6 @@ $$\mathcal{F} : \left( \mathbf{V}_t, \{ \mathbf{L}_{\tau}, \mathbf{R}_{\tau} \}_
 三者的协作通过**渐进式三阶段训练策略**实现：第一阶段对推理模块进行预训练，使其学会从视觉和意图中推理航点与动作语义；第二阶段对运动专家进行流匹配预训练，使其掌握从条件信号生成平滑轨迹的能力；第三阶段通过轨迹令牌接口联合训练两个模块，以轨迹令牌序列的下一个令牌预测损失和运动专家的流匹配损失共同优化，实现语义意图与物理运动的一致性对齐。
 
 这一设计的核心洞察在于：四个专用令牌作为结构化桥梁，替代了传统方法中隐式令牌路由或冗长推理链的接口方式，使得视觉语言推理能高效、可解释地引导流匹配运动专家，生成平滑且意图一致的 6‑DoF 手部轨迹。
-
-
 
 EgoMAN 是一个模块化的“推理‑到‑运动”框架，其核心由三个组件构成：**推理模块（Reasoning Module）**、**运动专家（Motion Expert）** 以及连接二者的**轨迹令牌接口（Trajectory‑Token Interface）**。整体映射函数定义为：
 
@@ -184,8 +176,6 @@ $N$ 为积分步数，$\Delta t$ 为步长。流匹配的连续性优势使运�
 
 轨迹令牌接口是连接推理与运动的关键桥梁。推理模块输出四枚专用令牌——一个动作语义令牌 `<ACT>` 和三个阶段感知航点令牌 `<START>`、`<CONTACT>`、`<END>`——这些令牌被解码为运动专家所需的条件信号（航点 3D 位置、时间戳、语义嵌入），直接替换训练时使用的真实标注条件。在联合训练阶段，系统同时优化轨迹令牌序列的下一令牌预测损失 $\mathcal{L}_{\mathrm{text}}$ 和运动专家的流匹配损失 $\mathcal{L}_{\mathrm{FM}}$，实现推理与运动的端到端对齐。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能：EgoMAN 在分布内与跨分布场景中均大幅领先
@@ -196,9 +186,6 @@ EgoMAN 在 EgoMAN-Unseen（分布内留出测试集）和 HOT3D-OOD（跨分布�
 *Table 1: Comparison of 6DoF hand trajectory prediction on EgoMAN-Unseen and HOT3D-OOD. Lower is better. Best values are bold, second-best are underlined. Our EgoMAN model outperforms the strongest external baseline (HandsOnVLM) by 27.5% ADE on both the held-out EgoMAN-Unseen test split and the out-of-distribution HOT3D-OOD dataset*
 
 在航点预测任务上，EgoMAN‑WP 的接触距离（Contact Distance）仅 0.192 m，相较 **VidBot** 的 0.290 m 降低 33.8%（Table 2），同时轨迹误差（Traj）降低 52.8%，推理速度达 3.45 FPS，比基于可负担性的基线快数个数量级。这验证了轨迹令牌接口在空间定位精度和计算效率上的双重优势。
-
-![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2512_16907/figures/004_Table_2.jpg]]
-*Table 2: Waypoint prediction results. Lower is better for Contact and Traj; higher is better for FPS (averaged over 50 samples on an NVIDIA PG509-210, 80GB). EgoMAN-WP achieves the best accuracy, improving Contact by 33.8% and Traj by 52.8% on EgoMAN-Unseen, and runs orders of magnitude faster at 3.45 FPS*
 
 ### 消融实验：推理预训练、运动预训练与显式航点缺一不可
 
@@ -223,12 +210,6 @@ Table 3 和 Table 4 的消融实验揭示了三个关键设计选择的因果贡
 
 Table 6 和 Table 7 分析了推理模块规模对空间推理、语义对齐和文本 QA 的影响。关键发现是：空间推理性能在 2B/3B 规模后趋于饱和，而语义嵌入对齐（R@3 和 Pearson 相关系数）随模型增大持续提升，其中 Qwen2.5‑VL 在语义对齐上优于 Qwen3‑VL，但文本 QA 指标相对稳定。最终轨迹预测精度随推理模块增大而单调改善，4B 模型在速度‑精度权衡上表现最佳。
 
-![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2512_16907/figures/012_Table_6.jpg]]
-*Table 6: Effect of model scale on spatial reasoning, semantic alignment, and text QA on EgoMAN Unseen benchmark. We evaluate (i) waypoint spatial reasoning via 3D location, time, and rotation errors, (ii) semantic embedding alignment using R@3 (computed over 2,844 GT action-embedding candidates) and mean Pearson correlation, and (iii) semantic text QA using BERTScore, BLEU, and ROUGE. Best values are bolded; second-best are underlined. Spatial reasoning performance saturates early, and models larger than 2B/3B provide consistently stronger performance. Semantic alignment benefits from larger models, with Qwen2.5-VL outperforming Qwen3-VL, while text QA remains relatively stable across scales, with Q...*
-
-![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2512_16907/figures/013_Table_7.jpg]]
-*Table 7: Effect of Reasoning Module scale on trajectory prediction. Best results are bolded and second-best are underlined. Larger reasoning models produce consistently more accurate 6-DoF trajectories on both EgoMAN Unseen and HOT3D OOD, with Qwen3-VL scaling smoothly and the 4B model offering an excellent speed–accuracy trade-off*
-
 ### 失败模式与局限性
 
 尽管 EgoMAN 在整体指标上表现优异，分析揭示了以下结构性局限：
@@ -241,21 +222,8 @@ Table 6 和 Table 7 分析了推理模块规模对空间推理、语义对齐和
 
 所有基线方法被适配至相同的输入配置（单帧 RGB、意图文本嵌入、过去运动），并统一采用最佳‑K 采样（K=1/5/10）评估生成多样性。基于可负担性的基线均使用相同的 RGB 图像和深度估计，经设备标定校正失真，2D 预测统一反投影到 3D 空间并采用与 GT 腕部最近点近似误差，确保对比公平。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2512_16907/figures/006_Figure_3.jpg]]
-*Figure 3: Qualitative comparisons on EgoMAN-Bench. We visualize best-of-K=10 predictions for waypoints and full trajectories. Left: \<CONTACT> and \<END> waypoint predictions compared with VRB* and VidBot. Right: 3D hand trajectory forecasts and 2D projections compared with prior baselines. Our EgoMAN model produces the smoothest and closest results to ground truth*
-
 ![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2512_16907/figures/007_Figure_4.jpg]]
 *Figure 4: Qualitative results of diverse activities. EgoMAN generates accurate 6DoF hand trajectories for diverse activities, aligning motion with the intent description and scene spatial*
-
-![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2512_16907/figures/008_Figure_5.jpg]]
-*Figure 5: Multiple intents. With the same image and past motion, EgoMAN model produces distinct 6DoF trajectories for different intent queries, showing controllable intent-to-motion generation*
-
-![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2512_16907/figures/011_Table_5.jpg]]
-*Table 5: Motion-to-Verb Text Retrieval. Train one encoder; evaluate verb text-motion relevance over 239 verb candidates*
-
-
 
 ## 定位与知识库关联
 
@@ -296,8 +264,6 @@ EgoMAN 在以下三个交叉领域贡献了新的知识节点：
 - **视觉‑语言‑运动对齐**：通过轨迹令牌接口，提供了一种将 VLM 的结构化推理输出与物理运动生成解耦并对齐的范式，补充了现有工作中“隐式融合”与“纯文本中介”之间的空白。
 - **交互阶段感知的运动预测**：将交互阶段（start‑contact‑end）显式编码为预测目标，为第一人称手部运动预测引入了时间语义监督，这在现有轨迹预测文献中较为少见。
 - **数据高效的轨迹学习**：Figure 6 显示，在仅使用 20% 训练数据时 EgoMAN 仍维持较强性能，而削弱推理预训练的变体 ADE 急剧上升。这表明航点‑推理预训练显著提升了数据效率，为小样本或低资源场景下的运动学习提供了参考策略。
-
-
 
 ## 原文 PDF
 

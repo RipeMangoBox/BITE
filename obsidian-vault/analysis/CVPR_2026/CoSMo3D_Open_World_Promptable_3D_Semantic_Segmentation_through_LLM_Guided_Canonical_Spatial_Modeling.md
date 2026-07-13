@@ -155,8 +155,6 @@ $${ \mathcal { L } } _ { \mathrm { t o t a l } } = \lambda _ { h } \cdot { \math
 
 推理时，规范嵌入分支被移除，仅使用特征提取分支进行前向传播，在GPU上仅需约0.6–0.9秒即可完成单个形状的分割。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2032_https_openaccess_thecvf_com_content_CVPR2026_html_Jin_CoSMo3D_Open_World/figures/001_Figure_1.jpg]]
 *Figure 1: We propose CoSMo3D, an open-world promptable 3D semantic segmentation method. It introduces canonical space perception to break the limitation of any pose and shape, achieves state-of-the-art performance across multiple settings, and significantly outperforms geometry-mapping-only methods*
 

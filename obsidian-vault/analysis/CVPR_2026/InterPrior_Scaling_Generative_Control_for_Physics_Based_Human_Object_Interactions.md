@@ -53,8 +53,6 @@ claims:
 
 当前方法的局限在于：策略仍受训练数据覆盖率和质量的约束，高度损坏或未见的交互模式无法可靠恢复；长序列 rollout 中可能出现物体穿透、脚部滑动等物理伪影；接触与手部表示尚不支持精细手指灵巧操作；三阶段流程增加了训练复杂度与超参数负担。
 
-
-
 ### 物理人-物交互控制的规模化困境
 
 在物理仿真器中生成自然且鲁棒的人-物交互（Human-Object Interaction, HOI）运动，是具身智能与角色动画领域的核心挑战。现有工作主要沿两条路径展开：基于全参考的运动模仿（motion imitation）和基于目标条件（goal-conditioned）的生成控制。全参考模仿策略（如 **InterMimic**）通过密集跟踪参考运动轨迹，能够在训练分布内产生高质量的交互行为，但其本质是“回放”而非“生成”——策略缺乏对高层意图的理解，无法在未见目标构型或随机初始化下自主决策。目标条件策略则试图直接从高层意图（如目标物体位姿、接触点）生成运动，但其训练依赖于大规模、多样化的演示数据，而HOI的构型空间随物体种类、交互类型和人体自由度的组合呈指数级膨胀，数据覆盖的稀疏性成为根本瓶颈。
@@ -68,8 +66,6 @@ claims:
 本文的核心洞察在于重新定位蒸馏与强化学习的关系：**蒸馏提供行为先验，强化学习微调作为局部优化器扩展泛化边界**。具体而言，蒸馏得到的变分策略已经编码了丰富的多模态技能潜空间，使其成为强化学习微调的理想初始化——微调无需从零开始探索，而是在已有行为结构的基础上，通过数据增强（物理扰动、随机初始化）和稀疏目标奖励，将策略的能力边界推向训练分布之外。这一范式在保持行为自然性的同时，使策略能够处理未见目标构型、不完美初始化和失败恢复等实际部署场景。
 
 基于上述动机，本文提出 **InterPrior**——一个三阶段的可扩展生成控制框架：(I) 在大规模HOI数据上训练增强的全参考专家策略（InterMimic+）；(II) 将专家蒸馏为掩码条件变分策略，学习结构化的潜技能空间；(III) 对蒸馏策略进行强化学习后训练，以in-betweening任务形式提升泛化性。该框架的核心设计原则是：**蒸馏与微调的协同**——蒸馏阶段通过ELBO、尺度正则化和时间一致性损失构建紧凑的潜空间，微调阶段在保留蒸馏正则化的前提下引入稀疏目标奖励，使策略在“记住”自然行为的同时“学会”应对更广泛的构型。
-
-
 
 ## 核心方法与创新机理
 
@@ -106,8 +102,6 @@ $$r_t^{\mathrm{PT}} = (r_{\mathrm{energy}} \times r_{\mathrm{h}}) + r_{\mathrm{g
 
 > **注意**：关于 InterMimic 和 MaskedMimic 的具体发表信息（作者/年份/会议），当前证据中未提供完整引用元数据，需手动核实。
 
-
-
 InterPrior 采用三阶段训练范式，将大规模人-物交互（HOI）数据中的全参考模仿专家逐步转化为一个可泛化的目标条件生成控制器。图2给出了框架总览。
 
 **阶段一：全参考专家训练（InterMimic+）**
@@ -138,15 +132,8 @@ $$\mathbf{x}_t = \Big[ \underbrace{r_t^h, \theta_t^h, \dot{r}_t^h, \dot{\theta}_
 **模块关系总结**
 三个阶段形成递进关系：专家训练提供行为参考上限，变分蒸馏将全参考知识压缩为条件生成先验，RL后训练作为局部优化器扩展泛化边界。蒸馏为RL提供了自然行为初始化，而RL微调在保持行为自然性的同时使策略能够处理未见目标和失败恢复场景。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l992_https_arxiv_org_abs_2602_06035/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed InterPrior framework. It consists of: (I) full-reference imitation expert training on large-scale human-object interaction data; (II) distillation of the expert into a variational policy with a structured latent space for skill embeddings; and (III) post-training of the variational policy to enhance generalization. Blue modules denote the final policy used at inference; green and red modules are training-only components, and red arrows denote supervision signals (rewards/losses)*
-
-![[assets/figures/papers/paper_list_l992_https_arxiv_org_abs_2602_06035/figures/001_Figure_1.jpg]]
-*Figure 1: InterPrior is a versatile generative controller instantiated as a goal-conditioned policy that controls a simulated humanoid to follow goal guidance and interact with objects in a physics-based simulator. Three core, composable capabilities enable pursuing (I) longhorizon snapshot goals, (II) trajectory goals, and (III) contact goals (Top). Yellow, blue, and red dots respectively denote human, object, and contact goals. It demonstrates failure recovery (Bottom Left) from unsuccessful grasps. InterPrior enables steering control from a human operator and can be applied to humanoid robot embodiments (Bottom Right). More demo videos are provided in the webpage*
-
-
 
 ### 3.1 观测与目标表示
 
@@ -210,12 +197,8 @@ $$
 
 同时保留蒸馏正则化项以防止遗忘预训练知识。实验表明，RL 微调将 Contact 任务的失败率从 5.4 降至 2.9，并在多目标链任务上大幅提升成功率（Table 1），验证了“蒸馏提供行为先验初始化 + RL 作为局部优化器”这一核心洞察的有效性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l992_https_arxiv_org_abs_2602_06035/figures/003_Figure_3.jpg]]
 *Figure 3: Qualitative comparison of same reference imitation between InterMimic [87] (top) and our InterMimic+ (bottom). InterMimic strictly follows the reference humanoid motion but fails to grasp the thin cloth stand when initialized with perturbations*
-
-
 
 ## 实验与关键发现
 
@@ -257,11 +240,6 @@ Table 1 的消融研究揭示了以下关键结论：
 
 所有基线方法在相同的目标规格下评估，包括相同的掩码采样策略和评估环境。仿真超参数（附表 A）和策略训练超参数（附表 B）沿用了先前工作的设置，确保了比较的公平性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l992_https_arxiv_org_abs_2602_06035/figures/009_Table_2.jpg]]
-*Table 2: Quantitative evaluation of full-reference imitation on OMOMO with thin objects and initialization perturbations, and adaptation to novel object and interaction skills, evaluated before and after finetuning on new data. For novel interactions*
-
 ![[assets/figures/papers/paper_list_l992_https_arxiv_org_abs_2602_06035/figures/004_Figure_5.jpg]]
 *Figure 5: Zero-shot qualitative results. A single InterPrior model trained from OMOMO [28] demonstrates generalization to unseen objects and interactions from BEHAVE [3] and HODome [95]*
 
@@ -270,20 +248,6 @@ Table 1 的消融研究揭示了以下关键结论：
 
 ![[assets/figures/papers/paper_list_l992_https_arxiv_org_abs_2602_06035/figures/006_Figure_4.jpg]]
 *Figure 4: Qualitative results on a multi-object task. The model input is shifted to the second object once the first object is released*
-
-![[assets/figures/papers/paper_list_l992_https_arxiv_org_abs_2602_06035/figures/007_Figure_7.jpg]]
-*Figure 7: Qualitative comparison between InterMimic [87] (left, full reference), MaskedMimic [58] (middle), and our InterPrior (right) on unseen and imperfect interactions from the BEHAVE [3] dataset. InterPrior can recover from data imperfection and continue the rollout*
-
-![[assets/figures/papers/paper_list_l992_https_arxiv_org_abs_2602_06035/figures/013_Figure.jpg]]
-*Figure: A. Additional qualitative comparisons with baseline method [58, 59] (Top). Our InterPrior shows higher success rate under the same task goal*
-
-![[assets/figures/papers/paper_list_l992_https_arxiv_org_abs_2602_06035/figures/014_Figure.jpg]]
-*Figure: C. Qualitative results of InterPrior following the targets generated by InterDiff (yellow and red dots). InterPrior adaptively completes the task without strictly adhering to the targets, using only sparse inputs of wrist, feet, and object target*
-
-![[assets/figures/papers/paper_list_l992_https_arxiv_org_abs_2602_06035/figures/016_Figure.jpg]]
-*Figure: B. Qualitative results given the same goal. Our framework produces multiple valid yet distinct interaction trajectories*
-
-
 
 ## 定位与知识库关联
 
@@ -326,8 +290,6 @@ InterPrior 的能力边界由训练数据的覆盖率和物理仿真的精度共
 3. **手指级灵巧操作。** 整合手指级灵巧操作模型需要高维动作空间和更精细的奖励设计。可能的路径是将 InterPrior 的潜技能空间与灵巧操作策略（如基于教师-学生蒸馏的灵巧抓取方法）进行级联或联合训练。
 
 4. **训练流程简化。** 能否将三阶段流程统一为端到端训练是一个开放问题。潜在方向包括：将蒸馏和 RL 后训练合并为联合优化目标，或使用离线 RL 直接在交互数据上学习目标条件策略，从而跳过专家训练阶段。
-
-
 
 ## 原文 PDF
 

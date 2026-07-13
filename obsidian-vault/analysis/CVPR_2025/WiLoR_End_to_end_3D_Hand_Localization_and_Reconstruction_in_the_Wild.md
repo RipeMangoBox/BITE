@@ -57,8 +57,6 @@ WiLoR针对上述瓶颈提出了“检测-重建”全栈方案。**核心思路
 
 **局限性**：极端手指姿态、拥挤场景下的检测与重建仍会失败；训练数据分布限于常见姿态和外观；双手交互接触未被显式建模；重建在相机空间进行，缺乏世界空间度量信息。
 
-
-
 野外场景下的手部定位与3D重建是计算机视觉中的核心问题，在增强现实、人机交互和动作捕捉等领域具有广泛的应用前景。然而，该任务面临两大瓶颈：**检测端**缺乏大规模野外多手数据集，导致现有检测器的精度和速度难以满足实际需求；**重建端**主流方法仅通过单次回归直接预测MANO参数，缺乏与图像特征的精细化对齐，容易产生姿态误差和时序抖动。
 
 从检测角度来看，现有方案存在明显的效率-精度权衡。**OpenPose**、**MediaPipe**等轻量方法虽然速度较快，但在复杂场景下的召回率不足；基于MaskRCNN的两阶段检测器**ContactHands**虽然精度更高，但推理速度仅3 FPS，模型体积庞大，难以部署到实时应用中。这一困境的根本原因在于，此前缺乏大规模、多样化的野外多手标注数据来训练轻量检测器。
@@ -68,8 +66,6 @@ WiLoR针对上述瓶颈提出了“检测-重建”全栈方案。**核心思路
 本文提出的WiLoR方法针对上述两个瓶颈分别给出了解决方案：在检测端，构建了包含200万野外图像的WHIM数据集，并设计了单阶段无锚框全卷积检测器，在精度和速度上均大幅超越此前方法；在重建端，引入了**粗略估计-多尺度精细化**的两阶段策略，通过将初始估计的3D网格投影到多分辨率特征图上采样顶点特征，显式地进行图像对齐残差预测，从而纠正姿态偏差并提升重建精度。
 
 值得注意的是，该工作的核心洞察在于**将3D重建分解为粗略估计与多尺度残差预测两个阶段**——这一设计使得网络能够在保持全局姿态合理性的同时，利用局部图像特征进行精细调整，有效缓解了单阶段回归中常见的姿态漂移问题。
-
-
 
 ## 核心方法与创新机理
 
@@ -101,8 +97,6 @@ WiLoR 的核心创新并非单一算法的渐进改进，而是对“野外手�
 
 这三个 changed slots 并非孤立存在：**WHIM 数据集为轻量检测器提供了训练基础，检测器的高效输出又为下游3D重建提供了稳定的手部区域输入；而 coarse-to-fine 重建策略则弥补了单次回归缺乏图像对齐的固有缺陷**。三者共同构成了从“检测”到“重建”的全栈野外手部理解方案。
 
-
-
 WiLoR 采用**检测-重建两阶段全栈流水线**，端到端处理野外单目图像中的多手定位与3D重建。整个框架的输入为单张RGB图像，输出包含每只手的边界框、手侧标签（左/右）以及MANO参数化的3D手部网格。其核心设计遵循“先定位、后重建”的级联范式，如 **Figure 1** 所示。
 
 ![[assets/figures/papers/paper_list_l21_WiLoR_End_to_end_3D_Hand_Localization_and_Reconstruction_in_the_Wild_motion20v2/figures/001_Figure_1.jpg]]
@@ -125,8 +119,6 @@ WiLoR 采用**检测-重建两阶段全栈流水线**，端到端处理野外单
 ### 训练策略
 
 两个阶段独立训练：检测器使用多任务损失（BCE + DFL + CIoU + 关键点L2）在WHIM数据集上优化；姿态估计网络使用联合损失（3D顶点L1 + 2D重投影L1 + MANO参数L2 + 对抗损失）在420万混合数据集上训练。这种解耦设计使得检测器和重建器可以独立迭代优化，同时保持流水线的整体高效性。
-
-
 
 WiLoR 的完整管线由两个核心模块串联构成：一个轻量级单阶段手部检测器和一个基于 Transformer 的 3D 手部姿态估计模块。后者进一步分解为粗略估计与多尺度精细化两个子阶段。以下分别阐述各模块的设计与关键公式。
 
@@ -196,8 +188,6 @@ $$
 
 **消融验证：** Table 5 显示，移除多尺度精细化模块后，FreiHAND 上的 PA-MPJPE 从 5.5 mm 退化至 6.1 mm（Proposed Full vs w/o Refinement），证实了图像对齐残差预测对重建精度的关键贡献。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -252,30 +242,8 @@ WiLoR 的实验分为两个独立评估模块：手部检测与 3D 手部姿态�
 
 WiLoR 通过“大规模野外数据 + 轻量无锚框检测”和“粗略估计 + 多尺度图像对齐细化”的双阶段策略，在手部检测速度（138 FPS）和 3D 重建精度（FreiHAND PA-MPJPE 5.5 mm）上同时达到 SOTA。消融实验系统性地验证了 WHIM 数据规模、数据增强、多尺度 refinement 模块和关键点损失各自对最终性能的独立贡献。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l21_WiLoR_End_to_end_3D_Hand_Localization_and_Reconstruction_in_the_Wild_motion20v2/figures/006_Table_1.jpg]]
-*Table 1: Comparison with the state-of-the-art hand detection methods on COCO-Whole [33], Oxford-Hands [50] and the proposed WHIM dataset. For each method we report the average precision (AP) at IoU=0.5 along with the mean average precision (mAP). We also compare the performance of each method in terms of model size, measured in Mb, and speed, measured in frames per second (FPS)*
-
-![[assets/figures/papers/paper_list_l21_WiLoR_End_to_end_3D_Hand_Localization_and_Reconstruction_in_the_Wild_motion20v2/figures/008_Table_3.jpg]]
-*Table 3: Comparison with the state-of-the-art on the Frei-HAND dataset [107]. We use the standard protocol and report metrics for evaluation of 3D joint and 3D mesh accuracy. PA-MPVPE and PA-MPJPE numbers are in mm*
-
-![[assets/figures/papers/paper_list_l21_WiLoR_End_to_end_3D_Hand_Localization_and_Reconstruction_in_the_Wild_motion20v2/figures/009_Table_4.jpg]]
-*Table 4: Comparison with the state-of-the-art on the HO3D dataset [25]. We use the HO3Dv2 protocol and report metrics that evaluate accuracy of the estimated 3D joints and 3D mesh. PA-MPVPE and PA-MPJPE numbers are in mm*
-
-![[assets/figures/papers/paper_list_l21_WiLoR_End_to_end_3D_Hand_Localization_and_Reconstruction_in_the_Wild_motion20v2/figures/012_Table_6.jpg]]
-*Table 6: Reconstruction of dynamic 3D Hands. We evaluate the temporal coherence and the jittering of the reconstruction for the proposed and the baseline methods on the HO3D dataset*
-
-![[assets/figures/papers/paper_list_l21_WiLoR_End_to_end_3D_Hand_Localization_and_Reconstruction_in_the_Wild_motion20v2/figures/013_Table_7.jpg]]
-*Table 7: Comparison with existing hand datasets. WHIM is 100× larger than previous multi-hand dataset.s*
-
 ![[assets/figures/papers/paper_list_l21_WiLoR_End_to_end_3D_Hand_Localization_and_Reconstruction_in_the_Wild_motion20v2/figures/005_Figure_5.jpg]]
 *Figure 5: Qualitative Evaluation of the proposed hand detection network on in-the-wild images. The proposed model demonstrates robustness across various lighting conditions, resolutions, hand scales, and even in the presence of motion blur*
-
-![[assets/figures/papers/paper_list_l21_WiLoR_End_to_end_3D_Hand_Localization_and_Reconstruction_in_the_Wild_motion20v2/figures/014_Figure_7.jpg]]
-*Figure 7: Failure Cases. WiLoR can still fail to reconstruct complex finger poses or detect small hands in crowded environment*
-
-
 
 ## 定位与知识库关联
 
@@ -346,8 +314,6 @@ WiLoR 在知识库中的定位可概括为：
 - **数据维度**：依赖大规模野外数据集 WHIM（2M 图像）进行检测训练，依赖多数据集混合（4.2M 图像）进行姿态估计训练
 - **性能定位**：在 COCO-WholeBody、Oxford-Hands、FreiHAND、HO3D 等主流基准上达到或超越 SOTA，同时在推理速度上具有显著优势（检测138 FPS）
 - **关键贡献**：WHIM 数据集（比此前多手数据集大100倍）、多尺度精细化模块（将重建精度从6.1 mm提升至5.5 mm PA-MPJPE）
-
-
 
 ## 原文 PDF
 

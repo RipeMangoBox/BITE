@@ -46,11 +46,7 @@ claims:
 
 本文提出**分布匹配超分辨率（Distribution Matching Super-Resolution, DM-SR）**，一种无需微调预训练扩散模型即可实现单步高质量超分辨率的新方法。核心思想是：与其修改扩散模型以适应低分辨率（LR）输入，不如训练一个轻量级图像编码器，将LR图像直接映射到扩散模型训练时熟悉的噪声-图像混合分布。通过自适应预测与输入退化程度匹配的噪声水平（时间步），DM-SR在多个基准数据集上的感知质量指标（如BRISQUE, CLIPIQA, MUSIQ）达到最优，且推理速度极快（92 ms，与OSEDiff和InvSR相当，远快于StableSR的10000 ms）。
 
-
-
 预训练扩散模型（如Stable Diffusion）在噪声-自然图像混合分布上训练，展现出强大的生成先验。然而，低分辨率（LR）输入图像遵循完全不同的分布，导致直接推理时存在**分布差距**。现有方法通过条件化（如ControlNet）或微调扩散模型来缓解，但这会削弱生成先验或需要多步去噪。本文的核心洞察是：与其修改扩散模型，不如将LR图像直接变换到扩散模型训练时见过的分布（即噪声-图像混合），从而在不微调扩散模型的前提下充分利用其生成先验，实现单步高质量超分辨率。
-
-
 
 ## 核心方法与创新机理
 
@@ -58,9 +54,6 @@ claims:
 2.  **自适应时间步预测**：训练一个时间步估计器，根据输入LR的退化程度自适应预测匹配的噪声水平（时间步），确保高度退化的样本获得更多生成先验。
 3.  **单步推理**：DM-SR仅需单步扩散即可生成高质量超分辨率图像，无需多步迭代或蒸馏。
 4.  **保持扩散模型冻结**：预训练扩散模型（SD-Turbo）完全冻结，仅训练图像编码器和时间步估计器，保留其完整生成先验。
-
-
-
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__image_and_video_generation__b001_66Ad0i78lW_Bridging_the_/figures/001_Figure_1.jpg]]
 *Figure 1: Figure 1: ×4 super-resolution comparison on various images. The left half of each image shows the bicubic upsampled input, and the right half shows the output from our DM-SR. Compared to previous methods, DM-SR produces the most perceptually pleasing results. (Zoom-in for best view)*
@@ -73,8 +66,6 @@ DM-SR的整体架构如Figure 2所示。流程如下：
 4.  **解码**：预训练VAE解码器将 Z_SR 解码为最终超分辨率图像 I_SR。
 
 训练过程中，编码器 E_θ 通过图像损失 L_Z 和噪声损失 L_ϵ 进行优化，判别器 D_ϕ 以LR图像为条件区分 Z_SR 和真实HR潜在 X_HR^0。
-
-
 
 ### 5.1 时间步估计
 
@@ -122,10 +113,7 @@ $$\mathcal{L}_\epsilon = \mathbb{E}_{\mathbf{X}_{HR}^0, \epsilon_{SR}, \hat{t}}[
 
 损失权重：λ_L1=1.00, λ_per=2.00, λ_adv=0.10, λ_dm=0.50, λ_ϵ=1.00。
 
-
-
 ## 实验与关键发现
-
 
 ### 6.1 主要结果
 
@@ -172,11 +160,7 @@ Table 2显示DM-SR在RealSR数据集上的参考指标和效率比较。推理�
 - DM-SR使用固定的文本提示，虽然输入特定提示可以改善，但需要额外的LLM（如LLaVA）提取提示，增加了复杂性。
 - DM-SR的性能依赖于预训练扩散模型（SD-Turbo）的能力，可能受限于其生成先验的范围。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__image_and_video_generation__b001_66Ad0i78lW_Bridging_the_/figures/014_Table_5.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -200,8 +184,6 @@ DM-SR的核心创新在于**分布匹配策略**：通过训练编码器将LR输
 - DM-SR能否扩展到视频超分辨率？
 - 输入特定文本提示的自动生成能否完全集成到框架中，避免依赖外部LLM？
 - DM-SR在极端退化（如大噪声、严重模糊）下的表现如何？
-
-
 
 ## 原文 PDF
 

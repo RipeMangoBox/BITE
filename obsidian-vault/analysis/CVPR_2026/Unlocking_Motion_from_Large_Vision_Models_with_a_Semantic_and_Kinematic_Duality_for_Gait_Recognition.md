@@ -50,8 +50,6 @@ claims:
 
 实验结果表明，GaitMax在多个基准上显著超越现有最佳方法。在域内评估中，CCPG上达到89.6%的平均Rank-1准确率，CCGR MINI上mAP提升+8.4%；在跨域泛化场景下优势更为突出——CASIA-B上CL条件相比BigGait提升**+12.6%**，SUSTech1K上提升**+11.3%**，验证了运动学建模与扰动解耦的共同作用对鲁棒性的关键贡献。消融实验进一步证实，GauPE相比标准RoPE带来+3.1%的平均提升，CDLoss在同时使用多个扰动属性时提升**+11.0%**。
 
-
-
 步态识别旨在通过个体的行走模式进行身份辨识，因其远距离、非侵入的特性在安防监控等领域具有重要应用价值。然而，现实场景中衣着变化、携带物品、视角差异等扰动因素的存在，使得步态识别系统的鲁棒性面临严峻挑战。当前主流的步态识别方法可归纳为两大范式，二者均存在结构性缺陷。
 
 **语义范式**是目前占据主导地位的方法路线，以 **GaitSet**、**GaitPart**、**GaitGL** 以及 **BigGait**（Ye et al., CVPR 2024）等为代表。这类方法将逐帧的运动线索编码为顺序不变的全局嵌入，通过时序池化丢弃帧间顺序，从而捕获整体结构上下文。其核心优势在于对帧率变化和序列长度的鲁棒性，但代价是**完全丧失了细粒度的时序动态信息**——行走过程中肢体运动的节奏、加速度、协调模式等运动学特征被平均化抹去。
@@ -61,8 +59,6 @@ claims:
 **核心瓶颈**在于：语义范式丢弃运动学动态，运动学范式缺乏全局上下文与抗噪能力，两者均无法同时实现全局结构理解与细粒度运动过程建模。更严重的是，两种范式都容易过拟合到衣着、视角等扰动因素，导致跨域泛化性能急剧下降。
 
 针对上述缺口，本文提出 **GaitMax**，其核心动机是通过**语义与运动学的双重性**统一两大范式：一方面保留语义分支的全局上下文捕获能力，另一方面引入人体中心化的运动学分支，持续跟踪身体部位的时空轨迹，实现长程精确运动理解。同时，为抑制扰动因素的干扰，GaitMax 利用自然语言描述显式解耦步态嵌入与外观变化，从而在跨域场景下实现鲁棒性的大幅提升。
-
-
 
 ## 核心方法与创新机理
 
@@ -118,8 +114,6 @@ Figure 4 展示了 GCaption 的标注样例，涵盖主体相关（衣着、性�
 1. **融合策略简单**：语义与运动学分支采用直接拼接融合，消融实验（Table 5）显示在 CL 条件下运动学单分支反而高出融合方案 +2.2%，表明简单拼接并非最优，缺乏自适应融合机制；
 2. **GCaption 覆盖不足**：标注主要覆盖静态外观属性，未充分描述步速、过渡姿态等时序动态变化，可能限制 CDLoss 对动态干扰的抑制能力。
 
-
-
 GaitMax 的核心设计动机源于现有步态识别中两种范式的根本性对立：**语义范式**（如 GaitSet、BigGait）通过时序池化获得顺序不变的全局结构表示，但丢弃了运动学动态过程；**运动学范式**（如基于光流的方法）虽能捕获时序动态，却易受噪声干扰且缺乏长程建模能力。GaitMax 的关键洞察在于，这两种范式并非互斥，而是互补——语义总结提供全局上下文，运动学过程提供细粒度时空轨迹，二者的统一是突破鲁棒性瓶颈的因果路径。
 
 ### 双分支架构总览
@@ -161,13 +155,6 @@ $$\mathcal{L}_{\mathrm{tot}} = \gamma_{\mathrm{id}} \mathcal{L}_{\mathrm{id}} + 
 ### 设计哲学
 
 GaitMax 的双分支设计并非简单的多流融合，而是对“运动表征”这一根本问题的重新定义。语义分支通过抛弃时序来获得对衣着、视角等静态扰动的不变性；运动学分支则通过 GauPE 注入精确的几何先验，在保留长程动态的同时避免了对噪声敏感的光流估计。两条路径在嵌入空间中的互补性，使得模型能够同时应对“外观变化”和“动态变化”两类干扰——这正是跨域场景下性能大幅提升（如 CASIA-B 上 CL 条件比 BigGait 提升 +12.6%）的根本原因。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1084_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Unlocking_Motion/figures/001_Figure_1.jpg]]
-*Figure 1: Gait Representation Paradigms: From Semantic to Our Unified Approach. (a) Existing Dominant Methods (Semantic Paradigm): These methods encode frame-level motion cues into an order-invariant embedding, capturing global structural context but discarding sequential dynamics. (b) Our Unified Model (Semantic + Kinematic): We introduce a kinematic embedding that models part-wise temporal dependencies, forming a latent representation of fine-grained motion dynamics. Our model unifies this kinematic branch with a complementary semantic branch to capture both process and global-level motion information*
-
-
 
 ### 3.1 总体学习目标
 
@@ -244,8 +231,6 @@ $$\mathcal{L}_{\mathrm{tot}} = \gamma_{\mathrm{id}} \mathcal{L}_{\mathrm{id}} + 
 
 CDLoss 的运作依赖于对扰动因素的文本描述。为此，作者构建了 **GCaption** 数据集，利用最优 VLM（Gemini-2-Flash-Lite）逐帧标注衣着、视角、携带物等属性。为保证序列级一致性，采用嵌入空间聚合机制：对同一序列的 8 帧独立标注后，计算文本嵌入的均值向量，选择嵌入最接近该均值的帧标注作为整段序列的标注。评估表明，VLM 生成标注与人工标注的平均嵌入相似度达 93.7%（Figure 5），验证了标注质量。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -282,13 +267,8 @@ GaitMax 采用冻结的 DINOv3 作为视觉骨干，在所有实验中保持一�
 
 尽管整体表现优异，实验揭示了两个值得关注的失败模式。其一，语义分支在 CL 条件下可能成为干扰源，融合模型不如纯运动学分支，说明需要设计场景自适应的融合策略（如基于不确定性估计的动态权重）。其二，GCaption 主要提供静态外观属性标注，未覆盖步速变化、过渡姿态等时序动态干扰因素，这可能限制了 CDLoss 对动态扰动的抑制能力——在 SUSTech1K 的 UM（不同步行速度）条件下，GaitMax 的提升（+4.2%）明显小于 CL 条件（+11.3%），暗示时序维度的扰动解耦仍有提升空间。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1084_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Unlocking_Motion/figures/005_Table_2.jpg]]
 *Table 2: In-domain evaluation. We compare GaitMax with SoTA on the CCPG [26] and CCGR [81] datasets. All models are trained and evaluated within the same domain. Metrics include Rank-1 accuracy under nuisance conditions for CCPG, and three standard metrics for CCGR. Some baselines could not be reproduced on CCGR due to the absence of required input modalities and are denoted by ‘–’. [Key: Best, Second best]*
-
-![[assets/figures/papers/paper_list_l1084_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Unlocking_Motion/figures/006_Table_3.jpg]]
-*Table 3: Out-of-domain evaluation. We evaluate on two widely-used cross-dataset settings: CASIA-B [76] and SUSTech1K [46]. All models are trained on CCPG and directly tested without fine-tuning. Rank-1 accuracy is the metric. [Key: Best, Second best]*
 
 ![[assets/figures/papers/paper_list_l1084_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Unlocking_Motion/figures/007_Table_5.jpg]]
 *Table 5: Ablation on motion representation*
@@ -298,20 +278,6 @@ GaitMax 采用冻结的 DINOv3 作为视觉骨干，在所有实验中保持一�
 
 ![[assets/figures/papers/paper_list_l1084_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Unlocking_Motion/figures/011_Table_7.jpg]]
 *Table 7: Ablation on conditional decorrelation loss*
-
-![[assets/figures/papers/paper_list_l1084_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Unlocking_Motion/figures/008_Table_4.jpg]]
-*Table 4: Efficiency comparison. Input is 30 frames at 448×224. GFLOPs are averaged per-frame*
-
-![[assets/figures/papers/paper_list_l1084_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Unlocking_Motion/figures/012_Table_8.jpg]]
-*Table 8: Generalization to action analysis on Diving48 [29]. The table shows accuracy when integrating GaitMax with standard action recognition backbones. All models are trained from scratch*
-
-![[assets/figures/papers/paper_list_l1084_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Unlocking_Motion/figures/004_Figure_4.jpg]]
-*Figure 4: Example from GCaption. Each sample consists of a user query describing target attributes and a corresponding visuallanguage model (VLM) response. Attributes highlighted in blue and red correspond to subject- and environment-related categories, respectively*
-
-![[assets/figures/papers/paper_list_l1084_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Unlocking_Motion/figures/010_Figure_5.jpg]]
-*Figure 5: Embedding Similarity of VLM-Generated and Human-Annotated Captions. Similarity scores between the text embeddings (via OpenCLIP [5]) of VLM-generated captions and human-annotated ground truth. Scores are shown for seven attributes (vertical axis) across 165 sequences (horizontal axis). Color encodes similarity to human ground truth embeddings. Each row is sorted independently to highlight variation across samples*
-
-
 
 ## 定位与知识库关联
 
@@ -366,8 +332,6 @@ GaitMax 的核心定位是**统一这两种互补范式**：保留语义分支�
 4. **去相关范式的推广**：CDLoss 的显式统计去相关范式是否可推广到域泛化、公平性学习等其他需要解耦的表示学习场景？该范式的理论性质和收敛保证值得进一步研究。
 
 5. **VLM 标注的可靠性边界**：GCaption 依赖 VLM 的零样本标注能力，在极端光照、遮挡或非典型外观下的标注质量需要更系统的评估和校准机制。
-
-
 
 ## 原文 PDF
 

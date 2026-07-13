@@ -50,8 +50,6 @@ claims:
 
 实验表明，CamDirector 在 iPhone 和 iPhone-PTZ 两个基准上全面超越现有SOTA方法，同时仅需 2.0B 参数（对比方法为 5.3B–6.7B）。在 iPhone-PTZ 全视频上，LPIPS 降至 0.4752（Gen3C 为 0.5497），FID 降至 72.33（Gen3C 为 86.21）；VBench 感知质量指标上，背景一致性达 0.9489，主体一致性达 0.8574，均显著领先。消融实验进一步证实：移除混合warping导致PSNR骤降至12.18，取消历史引导与渐进式缓存更新分别使PSNR降至13.39与12.86，验证了各组件的因果贡献。
 
-
-
 视频轨迹编辑（Video Trajectory Editing, VTE）的目标是，给定一段源视频和一条新的相机运动轨迹，生成一段内容与源视频一致但相机视角沿目标轨迹运动的视频。这一任务在影视创作、虚拟现实和视频重定向等领域具有广泛应用前景，其核心挑战在于：如何在精确跟随目标相机轨迹的同时，保持生成视频的源内容对齐与长程时序一致性。
 
 现有VTE方法可大致分为两条技术路线。其一是**基于嵌入注入（embedding injection）的方法**，如RecamMaster，将目标相机位姿编码为嵌入向量注入扩散模型，通过条件信号引导生成。这类方法受限于嵌入层的表示容量，难以可靠地跟随大范围、多样化的相机运动轨迹，在目标位姿与源位姿差异显著时容易出现视角偏离。其二是**基于单帧warping的方法**，如Gen3C和TrajectoryCrafter，通过对源视频逐帧进行3D warping得到粗帧，再以粗帧为条件进行扩散生成修复。这类方法在短片段上表现良好，但在长视频场景中面临根本性困难：分块处理策略导致各片段独立生成，缺乏跨片段的全局注意力机制，使得粗帧构建时无法利用全源视频的互补信息，造成源内容对齐偏差与生成片段间的时间闪烁。
@@ -59,8 +57,6 @@ claims:
 上述两类方法的共同瓶颈可归结为：**缺乏一个既能提供全局一致的场景参照、又能保证长程时序连贯的生成机制**。单帧warping隐式依赖双向注意力聚合跨帧信息，但在长视频中这种隐式聚合随片段增长而衰减；嵌入注入方法则完全放弃了显式的几何约束，将相机控制完全托付给嵌入层的泛化能力。因此，如何在长视频VTE中实现精确的相机轨迹控制与稳定的内容一致性，成为该领域亟待解决的关键问题。
 
 本文提出CamDirector，通过两个核心设计突破上述瓶颈：（1）**混合warping方案（Hybrid Warping Scheme）**，将场景显式解耦为动态区域与静态区域，对动态区域直接warping以保留运动保真度，对静态区域构建统一的点云**世界缓存（world cache）**并渲染至目标视角，再通过深度比较融合，生成全局一致且源对齐的粗帧；（2）**历史引导的自回归扩散模型（history-guided autoregressive diffusion）**，在每一去噪步中同时处理历史片段与当前片段，以较干净的历史信号引导当前片段的去噪过程，并配合渐进式世界缓存更新，将新修复的静态区域持续融入缓存，为后续片段提供更完整的场景参照。这一设计从根本上解决了长视频VTE中的全局对齐与自一致性难题。
-
-
 
 ## 核心方法与创新机理
 
@@ -117,8 +113,6 @@ $$v_t = w \times v_\theta( x_{t-1}^k | x_{t+\Delta t}^{k-1} ) + (1-w) \times v_\
 
 CamDirector 的三个创新形成了清晰的因果链条：混合warping 提供全局一致的粗帧先验 → CCDM 的多模态条件将粗帧、源内容、相机位姿强约束注入扩散过程 → 历史引导自回归生成以历史真实信号和渐进更新的世界缓存确保长程一致性。这一设计有效解决了现有 VTE 方法中“全局对齐偏差”与“片段间时间闪烁”两大核心瓶颈。
 
-
-
 CamDirector 的整体 pipeline 围绕一个核心洞察展开：将源视频的场景显式解耦为动态区域与静态区域，并分别以不同策略处理，从而在长视频轨迹编辑中同时实现精确的相机控制与长程时序一致性。框架由两大阶段串联构成：**混合warping粗帧构建** 与 **历史引导自回归生成**，二者通过“世界缓存”这一显式三维表征紧密耦合。
 
 ### 模块关系与数据流
@@ -146,8 +140,6 @@ CamDirector 的整体 pipeline 围绕一个核心洞察展开：将源视频的�
 - **效果**：混合 warping 提供全局一致的粗帧基底；历史引导确保片段间平滑过渡；渐进式缓存更新使场景表征随生成推进而逐步完整，三者协同解决了长视频 VTE 中的全局对齐与自一致性难题。
 
 消融实验为上述因果链条提供了强证据支撑：移除混合 warping 后 PSNR 骤降至 12.18（Table 3）；取消历史引导使 PSNR 降至 13.39 并降低 Subject Consistency（Table 4）；关闭渐进式缓存更新进一步使 PSNR 跌至 12.86（Table 4）。这些结果表明，三个模块各自承担不可替代的功能，且其协同效应是方法性能的核心来源。
-
-
 
 CamDirector 的核心架构由两个关键模块构成：**混合warping方案（Hybrid Warping Scheme）** 与 **历史引导的自回归生成（History-Guided AutoRegressive Generation）**。前者负责从源视频构建全局一致的粗帧，后者以粗帧为条件，通过段间历史信号传递实现长视频的时序连贯生成。
 
@@ -183,16 +175,6 @@ $$v_t = w \times v_\theta( x_{t-1}^k | x_{t+\Delta t}^{k-1} ) + (1-w) \times v_\
 **渐进式世界缓存更新**：每生成一个新片段后，从该片段均匀采样$C$帧作为锚帧，将其中新修复的静态区域融合进世界缓存。更新后的缓存为下一片段的粗帧构建提供更完整的静态场景参照，形成正向反馈循环。Figure 5 展示了这一渐进更新过程，新融合区域以红色高亮。
 
 Figure 3 与 Figure 4 分别呈现了整体框架概览与历史引导自回归生成的完整流程。消融实验证实：取消历史引导使PSNR降至13.39，关闭渐进式缓存更新使PSNR进一步跌至12.86，验证了两组件各自及协同提升长程一致性的因果作用。
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2603_02256/figures/004_Figure_4.jpg]]
-*Figure 4: Illustration of history-guided autoregressive generation. In each iteration*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2603_02256/figures/005_Figure_6.jpg]]
-*Figure 6: Illustration of VGGT depth vs. our corrected depths. The last two columns visualize warping results from the source to the target view using VGGT’s estimated depth and our corrected depth, respectively. VGGT’s depth leads to a poor warping result (third column), whereas our adjusted depth yields a more aligned outcome (last column)*
-
-
 
 ## 实验与关键发现
 
@@ -237,27 +219,11 @@ Table 2 的 VBench 感知质量指标进一步揭示了性能优势的来源：�
 - 当前世界缓存更新策略能否自然扩展至包含多个独立运动物体的复杂动态场景？
 - 是否存在端到端可学习方案，完全规避显式深度估计与点云重建的中间过程，从而减少误差累积？
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2603_02256/figures/011_Table_3.jpg]]
 *Table 3: Ablation on hybrid warping and CCDM conditions*
 
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2603_02256/figures/010_Table_4.jpg]]
 *Table 4: Ablation on history-guided autoregressive generation*
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2603_02256/figures/013_Figure_9.jpg]]
-*Figure 9: Effectiveness of hybrid warping scheme. We compare per-frame warping (a) and our hybrid warping (c), along with their corresponding final results (b) and (d). Hybrid warping yields more complete and source-aligned coarse frames, leading to higher-quality final generations*
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2603_02256/figures/012_Figure_10.jpg]]
-*Figure 10: Effectiveness of components in the history-guided autoregressive generation. Starting from the same first frame (a), we compare the last-frame outputs of our full model (b), the variant without progressive world-cache update (c), and the variant without history guidance (d)*
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2603_02256/figures/001_Figure_1.jpg]]
-*Figure 1: We present a novel video trajectory editing framework capable of generating new videos along desired trajectories from the given ones to achieve aesthetically pleasing and cinematic camera movements. The proposed method performs favorably against state-of-the-art methods with notably fewer parameters (• and ▲ distinguish different benchmarks). Additional results and videos are available on our project page*
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2603_02256/figures/006_Figure_5.jpg]]
-*Figure 5: Illustration of progressive world cache update. Whenever a new segment is generated, we evenly sample C frames as anchors, where the newly inpainted regions are merged into the world cache. The updated regions are highlighted in red*
-
-
 
 ## 定位与知识库关联
 
@@ -305,8 +271,6 @@ CamDirector 通过两个核心“槽位替换”实现了范式跃迁：
 3. **端到端可学习 warping**：当前显式深度估计与点云重建的中间过程引入了不可微的误差源。是否存在一种端到端的可学习 warping 方案（如基于 3D Gaussian Splatting 的可微分渲染），能够完全规避显式几何估计，从而减少误差累积并提高 pipeline 的鲁棒性？
 
 4. **轨迹控制的细粒度与可编辑性**：当前方法接受目标相机轨迹作为输入，但未提供轨迹的交互式编辑能力。能否将 CamDirector 与自然语言驱动的相机规划模块结合，实现“文本描述→相机轨迹→视频生成”的端到端创作流程？
-
-
 
 ## 原文 PDF
 

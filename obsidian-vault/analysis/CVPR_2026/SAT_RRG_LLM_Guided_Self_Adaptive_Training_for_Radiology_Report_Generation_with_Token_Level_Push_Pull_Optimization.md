@@ -114,8 +114,6 @@ SAT-RRG 构建在一个视觉-语言生成管道之上，其训练过程引入�
 
 关键设计优势在于：错误令牌识别和推拉损失仅在训练阶段使用。推理时，冻结 LLM 裁判被完全移除，模型仅需图像和系统提示即可直接生成最终报告，**不引入任何额外推理开销**。这一“训练时重、推理时轻”的策略使得 SAT-RRG 在保持部署效率的同时，获得了显著的临床报告质量提升。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2342_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_SAT_RRG_LLM_Guided/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the SAT–RRG training framework. (A) The image encoder and visual mapper project the chest X-ray into the LLM’s token embedding space, allowing the model to generate an initial report using both visual features and textual prompts. (B) During training, the same LLM is prompted again to identify semantic inconsistencies between the predicted and reference reports. The highlighted spans are treated as error tokens and assigned adaptive weights derived from token-level uncertainty and confidence, producing the corrective ETAPL and CTAL losses that update the generator. (C) At inference, only the image and system prompt are required, error identification is disabled, and the trained...*
 
@@ -226,8 +224,6 @@ Figure 3展示了应用令牌级监督前后的错误令牌纠正对比。LLM裁
 ### 失败模式与局限性
 
 论文未详细讨论方法的局限性。从分析中可推断以下潜在问题：冻结LLM裁判的弱标注可能引入噪声，错误令牌掩码的准确率直接影响推拉损失的质量；方法在其他医学报告生成任务（如MRI、病理）上的泛化能力未经验证；代码和模型权重未在论文中找到发布链接，复现性需进一步确认。这些点需要手动验证。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2342_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_SAT_RRG_LLM_Guided/figures/005_Figure_3.jpg]]
 *Figure 3: Comparison of error tokens in the generated report before and after TLS. The highlighted errors are marked in corresponding colors to show the corrections made*

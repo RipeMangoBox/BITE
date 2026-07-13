@@ -53,8 +53,6 @@ claims:
 
 在方法谱系上，本文工作衔接了基于扩散模型的运动生成（如TRUMANS, Jiang et al., SIGGRAPH 2024）与场景感知交互合成（如GOAL, Taheri et al., CVPR 2022），但通过统一的自回归扩散框架和自主调度机制，首次实现了从文本指令到多阶段人-场景交互的端到端自主合成。当前方法尚未涵盖面部表情和手部精细操作，对未见交互类型的泛化能力也有待进一步验证。
 
-
-
 ### 问题背景
 
 在虚拟现实、游戏开发和电影制作等应用中，合成真实的人-场景交互（Human-Scene Interaction, HSI）运动是一个核心挑战。理想情况下，用户希望仅通过一句自然语言指令（如“走向沙发并坐下”）和目标任务位置，系统便能自主生成角色在三维场景中移动、避障并与物体交互的连贯运动序列。
@@ -79,8 +77,6 @@ claims:
 ### 本文动机
 
 针对上述瓶颈，本文提出了一种**自主角色-场景交互合成方法**，其核心动机是实现从文本指令到多阶段交互运动的“端到端”自主生成。该方法在SIGGRAPH Asia 2024上发表，旨在消除对人工路径点和阶段转换的依赖，使角色能够像人类一样，在理解指令后自主规划行为序列并适应环境。
-
-
 
 ## 核心方法与创新机理
 
@@ -117,8 +113,6 @@ $$\mathcal{L} = \mathbb{E}_{\tilde{X}_t \sim q(\tilde{X}_t \mid C), t \sim U(1, 
 ### 创新点总结
 
 三个 changed slots 形成协同效应：**统一自回归扩散框架**提供了多阶段运动生成的模型基础，**自主调度器**消除了人工阶段切换的依赖，**双体素场景编码**赋予角色3D避障能力，而**帧嵌入文本条件**确保了长序列中语义的时序一致性。这些创新共同实现了从“分离模型+人工调度”到“单一文本指令驱动自主交互合成”的范式跃迁。
-
-
 
 本文提出一种统一的自回归扩散框架，从**单一文本指令**和**目标任务位置**出发，自主合成包含行走、伸手触及、物体交互在内的多阶段人-场景交互运动。该框架的核心设计在于将复杂的交互过程建模为连续运动片段的生成序列，并通过自主调度器决定阶段转换时机，从而避免了对预定义路径点或人工阶段切换的依赖。
 
@@ -166,13 +160,6 @@ $$\mathcal{L} = \mathbb{E}_{\tilde{X}_t \sim q(\tilde{X}_t \mid C), t \sim U(1, 
 
 这些设计共同实现了从文本指令到连贯多阶段交互运动的端到端自主合成，无需任何中间人工干预。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1808_LINGO_Autonomous_Character_Scene_Interaction_Synthesis_from_Text_Instruc/figures/001_Figure_1.jpg]]
-*Figure 1: Autonomous HSI synthesis. Our proposed method generates realistic character motion in 3D scenes based on a single textual instruction and goal location, incorporating seamless transitions between locomotion and HOI autonomously*
-
-
-
 本节解析本文提出的统一自回归扩散框架中五个核心模块的设计动机、功能定位与关键公式，揭示其如何协同实现从文本指令到多阶段人-场景交互的自主合成。
 
 ### 3.1 运动扩散模块（Motion Diffusion Module）
@@ -218,8 +205,6 @@ $$\mathcal{L} = \mathbb{E}_{\tilde{X}_t \sim q(\tilde{X}_t \mid C), t \sim U(1, 
 **核心功能**：调度器在每个时间步预测当前阶段向下一阶段转换的概率，当概率超过阈值时自动触发阶段切换。这一机制使模型能够根据运动进度和场景上下文自主决定何时从行走阶段过渡到伸手阶段、从伸手阶段过渡到交互阶段，无需人工干预。
 
 **与框架的协同**：调度器的预测结果同时影响目标编码器的阶段选择，形成闭环控制——调度器决定当前阶段，目标编码器提供该阶段对应的子目标信号，运动扩散模块据此生成相应动作，动作进度又反馈给调度器以判断是否切换阶段。这一设计实现了多阶段人-场景交互的全自主合成。
-
-
 
 ## 实验与关键发现
 
@@ -269,30 +254,14 @@ Fig. 3 的定性对比直观展示了本文方法与 TRUMANS 的差异：左侧�
 
 LINGO 数据集包含丰富的运动类型分布（Table A1, Fig. 6），涵盖行走、伸手、坐下、抓取等常见人-场景交互动作。运动片段长度分布（Fig. A2）和行走目标位置分布（Fig. A3）显示了数据的多样性和空间覆盖范围。VR 辅助的动作捕捉设置（Fig. 4）保证了运动数据的质量和场景交互的真实性。
 
-![[assets/figures/papers/paper_list_l1808_LINGO_Autonomous_Character_Scene_Interaction_Synthesis_from_Text_Instruc/figures/004_Figure_4.jpg]]
-*Figure 4: LINGO dataset. We show some selected frames and the setup of the VR-assisted MoCap*
-
-![[assets/figures/papers/paper_list_l1808_LINGO_Autonomous_Character_Scene_Interaction_Synthesis_from_Text_Instruc/figures/009_Figure_6.jpg]]
-*Figure 6: Number of occurrences of each motion type in LINGO dataset*
-
 ![[assets/figures/papers/paper_list_l1808_LINGO_Autonomous_Character_Scene_Interaction_Synthesis_from_Text_Instruc/figures/011_Table.jpg]]
 *Table: A1. Motion types of LINGO*
-
-![[assets/figures/papers/paper_list_l1808_LINGO_Autonomous_Character_Scene_Interaction_Synthesis_from_Text_Instruc/figures/012_Figure.jpg]]
-*Figure: Fig. A2. Motion length distribution of each motion type in LINGO dataset. Fig. A3. Distribution of goal locations for all locomotion clips in the local coordinate system of the first frame. The character is aligned to initially face the y-axis direction. Unit: meter*
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l1808_LINGO_Autonomous_Character_Scene_Interaction_Synthesis_from_Text_Instruc/figures/005_Table_1.jpg]]
 *Table 1: Quantitative results of interactive motion synthesis. The instructions involve performing interaction with an object in the scene*
 
 ![[assets/figures/papers/paper_list_l1808_LINGO_Autonomous_Character_Scene_Interaction_Synthesis_from_Text_Instruc/figures/007_Table_3.jpg]]
 *Table 3: Quantitative results of object reaching, where the character is instructed to walk toward and reach for an object*
-
-![[assets/figures/papers/paper_list_l1808_LINGO_Autonomous_Character_Scene_Interaction_Synthesis_from_Text_Instruc/figures/008_Figure_5.jpg]]
-*Figure 5: Qualitative comparison. We compare (a) our method with (b) TRUMANS [Jiang et al. 2024] on the task of walking to the goal location. It is shown that our method is aware of the surroundings for collision avoidance, while TRUMANS depends on a pre-defined trajectory. We show (c) our method and (d) w/o frame embedder given “grasp an object” instruction. The synthesized motion without a frame embedder is disordered and tends to repeat*
-
-
 
 ## 定位与知识库关联
 
@@ -347,8 +316,6 @@ TRUMANS 是本文最直接对比的基线方法。两者均面向人-场景交�
 4. **长期任务规划**：自主调度器在更复杂的长期多步序列任务（如"走到桌子旁，拿起杯子，走到沙发坐下"）中的性能如何？当前的单步阶段预测能否扩展为层次化任务规划？
 
 5. **多智能体场景扩展**：本文聚焦单角色-场景交互，未来是否可将框架扩展至多角色协同交互场景，处理角色间避障和协作动作的自主合成？
-
-
 
 ## 原文 PDF
 

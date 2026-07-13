@@ -55,8 +55,6 @@ claims:
 
 在 K&K 逻辑谜题基准上，两种方法分别将 GRPO 基线性能提升 35.9% 和 38.5%，联合使用带来 **46.2%** 的准确率提升（Qwen2.5-3B-Instruct，Figure 4）；在更大规模的 Qwen2.5-7B-Instruct-1M 上也获得 18.2% 的提升。方法在 REINFORCE++ 和 DAPO 等策略梯度算法上同样有效，验证了其泛化性。数学相关任务上，Advantage Reweighting 单独使用即可带来约 1 个百分点的稳定增益，但 Lopti 的叠加未产生协同效应，其机理尚待进一步分析。方法的主要代价在于 Lopti 需执行两次更新，计算时间约为原来的两倍。
 
-
-
 ### LLM 强化学习训练的梯度失衡困境
 
 在大语言模型的后训练阶段，强化学习已成为提升推理与对齐能力的关键手段。以 **GRPO**（Shao et al., 2024; Liu et al., 2025）为代表的策略梯度方法，通过分组相对优势替代独立价值模型，在降低训练开销的同时推动了推理能力的涌现。然而，这类方法在更新机制上存在一个被长期忽视的结构性缺陷：**不同概率 token 对模型更新的贡献严重失衡**。
@@ -82,8 +80,6 @@ $$\prod_{j=\ell+1}^{L} c_j \cdot |w_{i,t}| \cdot \sqrt{\frac{N}{N-1}} \cdot (1-\
 ### 现有方法的缺口
 
 在 RL for LLMs 领域，已有工作关注了奖励设计、优势估计、KL 约束等环节的改进，但**尚未有方法从梯度贡献的 token 级不平衡角度切入**。该工作首次将梯度失衡识别为制约 RL 训练效率的关键瓶颈，并据此提出了两条互补的干预路径：通过优势重新加权（Advantage Reweighting）削弱低概率 token 的更新权重，以及通过分阶段隔离更新（Lopti）调整梯度流向。
-
-
 
 ## 核心方法与创新机理
 
@@ -113,11 +109,6 @@ $$\hat{A}_{i,t} = [\alpha \cdot \pi_{\theta}(o_{i,t}) + (1-\alpha)] \cdot \hat{A
 
 两个改进插槽均作用于 GRPO 的**优势估计与梯度更新环节**，不改变采样、奖励计算或 KL 惩罚组件。它们同样适用于 REINFORCE++ 和 DAPO 等基于策略梯度的 RL 算法（Table 7, Figure 19），展现出良好的泛化性。
 
-
-
-![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_FOnAdLo0tM/figures/007_Figure_1.jpg]]
-*Figure 1: Experimental analysis on the K&K Logic Puzzle dataset during GRPO training of Qwen2.5-7B-Instruct-1M. Tokens are divided into four groups based on probability quartiles. (a) Token probability distribution and (b) corresponding advantages. (c) Token probability changes after updates (using SGD with lr=1e-3) and (d) gradient norms for each probability group. Effects of selective updates: (e) Probability changes when only tokens in the lowest quartile (probability \< 0.25) are updated, and (f) when only tokens in the highest quartile (probability > 0.75) are updated. To ensure clarity, the top 1% of outlier samples in the violin plots for token probability changes are excluded. Results are aver...*
-
 本文提出的方法围绕一个核心发现展开：在 LLM 的强化学习训练中，低概率 token 的梯度范数与 $(1-\pi)$ 成正比，会不成比例地主导模型更新方向，压制高概率 token 的有效学习。为解决这一问题，论文设计了两种可独立或联合使用的干预机制——**Advantage Reweighting** 和 **Low-Probability Token Isolation (Lopti)**，嵌入到以 GRPO 为基础 RL 算法的训练流水线中。
 
 ### Pipeline 总览
@@ -144,8 +135,6 @@ $$\hat{A}_{i,t} = [\alpha \cdot \pi_{\theta}(o_{i,t}) + (1-\alpha)] \cdot \hat{A
 - **输入**：训练问题集 $\mathcal{D}$，预训练参考策略 $\pi_{\text{ref}}$，初始策略 $\pi_\theta$
 - **中间信号**：采样回答 $\{o_i\}$ → 规则奖励 $r(q, o_i)$ → 组相对优势 $\hat{A}_i$ →（可选）重加权优势 $\hat{A}_{i,t}$ →（可选）按 $\eta$ 分组的 token 集
 - **输出**：更新后的策略参数 $\theta$，在推理和数学任务上具有更高的测试准确率
-
-
 
 ### 问题建模与 GRPO 基础
 
@@ -191,8 +180,6 @@ Lopti 采用分阶段更新策略来隔离低概率 token 的梯度干扰。具�
 
 Advantage Reweighting 与 Lopti 可并行使用。在 K&K 逻辑推理任务上，二者联合使用带来了最优性能提升（+46.2%）；但在数学任务上，联合使用未产生进一步的协同增益，推荐单独使用。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：低概率 token 主导梯度更新
@@ -201,14 +188,9 @@ Advantage Reweighting 与 Lopti 可并行使用。在 K&K 逻辑推理任务上�
 
 进一步分析（Figure 3）表明，在 naive GRPO 下，高概率 token 中正优势 token 被更新到正确方向的比例不足 50%——这意味着模型在调整高置信度推理步骤时近乎随机。Advantage Reweighting 和 Lopti 均能显著提升这一比例，使高概率 token 的更新更加可靠。
 
-
-![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_FOnAdLo0tM/figures/009_Figure_3.jpg]]
-*Figure 3: The proportion of positive tokens updated in the correct direction for different updating methods, under the same experimental settings as in Figure 1*
-
 ### K&K 逻辑推理任务主结果
 
 Figure 4 展示了在 K&K Logic Puzzles 上的核心结果。所有评估准确率取最后三个检查点的平均值以降低随机性。
-
 
 ![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_FOnAdLo0tM/figures/011_Figure_4.jpg]]
 *Figure 4: Experimental results on the K&K Logic Puzzles benchmark. For Advantage Reweight, $\alpha$ = 0 . 3 , and for Lopti, $\eta$ = 0 . 5 . . The reward curve during training (left) is truncated to exclude the first epoch and smoothed with an exponential moving average (coefficient: 0.95). The evaluation accuracy on the test set (right) are averaged over the last three checkpoints to mitigate randomness
@@ -230,7 +212,6 @@ Figure 4 展示了在 K&K Logic Puzzles 上的核心结果。所有评估准确�
 
 Table 1 汇总了数学相关数据集上的结果。此处 Advantage Reweighting 的 α 设为 0.1，Lopti 的 η 固定为 0.5。
 
-
 ![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_FOnAdLo0tM/figures/022_Table_1.jpg]]
 *Table 1: Experimental results on math-related datasets (DSR for DeepScaleR and ORZ for Open-Reasoner-Zero). For Advantage Reweight, α is set to 0.1, and for Lopti, η is set to 0.5. The evaluation accuracy(%) are averaged over the last three checkpoints to mitigate randomness*
 
@@ -251,7 +232,6 @@ Table 1 汇总了数学相关数据集上的结果。此处 Advantage Reweightin
 
 Table 7 将方法迁移到 REINFORCE++ 算法上，在 K&K 任务中验证泛化性：
 
-
 ![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_FOnAdLo0tM/figures/037_Table_7.jpg]]
 *Table 7: Experimental results of REINFORCE++ on the K&K Logic Puzzles dataset. For Advantage Reweight, α = 0.1, and for Lopti, $\eta$ = 0 . 5 . The evaluation accuracy on the test set are averaged over the last three checkpoints to mitigate randomness*
 
@@ -264,7 +244,6 @@ Table 7 将方法迁移到 REINFORCE++ 算法上，在 K&K 任务中验证泛化
 
 REINFORCE++ 的 baseline 远低于 GRPO，但 Reweight + Lopti 带来的相对提升更为显著（3B 上 +76.5%），表明低概率 token 主导问题在不同策略梯度算法中普遍存在，且该方法对此类算法具有广泛适用性。DAPO 实验（Table 8）和 LLaMA 系列模型实验（Table 9）也验证了跨模型的一致性增益。
 
-
 ![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_FOnAdLo0tM/figures/040_Table_8.jpg]]
 *Table 8: Experimental results of DAPO on the K&K Logic Puzzles dataset*
 
@@ -275,7 +254,6 @@ REINFORCE++ 的 baseline 远低于 GRPO，但 Reweight + Lopti 带来的相对�
 **Lopti 更新顺序的敏感性**（Figure 6b）：反转 Lopti 的更新顺序（先高概率后低概率）会导致训练崩溃、准确率显著下降。这验证了“先让低概率 token 释放梯度张力，再让高概率 token 在稳定梯度方向上调整”这一顺序设计的必要性。
 
 **α 超参数调节**（Figure 6c）：在 K&K 推理任务中，α 取 0.2–0.3 时效果最优；过低（α=0）等价于 naive GRPO，过高（α=1）则完全按概率缩放优势，过度压制低概率 token。数学任务中 α=0.1 更优（Table 3），说明不同任务对低概率 token 的依赖程度不同。
-
 
 ![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_FOnAdLo0tM/figures/027_Table_3.jpg]]
 *Table 3: Hyperparameter settings for Advantage Reweighting and Lopti*
@@ -288,30 +266,12 @@ REINFORCE++ 的 baseline 远低于 GRPO，但 Reweight + Lopti 带来的相对�
 
 Table 6 对比了 Lopti 的计算开销。由于 Lopti 需要将 token 分成两组并执行两次前向-反向传播，更新计算时间约为原来的两倍。例如，Qwen2.5-7B-Instruct-1M 上每步从约 120 秒增加到约 240 秒。Advantage Reweighting 几乎不引入额外计算开销，是轻量级首选。
 
-
 ![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_FOnAdLo0tM/figures/034_Table_6.jpg]]
 *Table 6: Computational cost comparison of Lopti operation over the first 50 training steps on K&K Logic Puzzle Dataset*
 
 ### 推理行为分析
 
 Figure 5 分析了推理相关词频与奖励的关系。在 naive GRPO 训练中，Analysis、Statement、Causal 类词汇的频率与样本奖励呈正相关（Pearson r > 0），而 Assumption 和 Assertion 类词汇呈负相关。Advantage Reweighting 和 Lopti 训练出的模型在正相关词汇上的使用频率更高，在负相关词汇上更低，说明这两种方法不仅提升了准确率，也实质性地改善了模型的推理行为模式。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_FOnAdLo0tM/figures/025_Figure_6.jpg]]
-*Figure 6: Ablation studies on the K&K Logic Puzzles dataset. (a) Effect of restricting updates to high-probability tokens. (b) Effect of the token update order in Lopti. (c) Effect of the hyperparameter α in Advantage Reweighting. (d) Effect of the hyperparameter η in Lopti*
-
-![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_FOnAdLo0tM/figures/026_Table_2.jpg]]
-*Table 2: Key hyperparameters for GRPO training, with the corresponding variable names in the verl configuration indicated in brackets*
-
-![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_FOnAdLo0tM/figures/028_Table_4.jpg]]
-*Table 4: Reward design for K&K Logic Puzzle proposed in Logic-RL (Xie et al., 2025)*
-
-![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_FOnAdLo0tM/figures/031_Table_5.jpg]]
-*Table 5: Six categories of inference-related words associated with LLMs’ performance on the K&K Logic Puzzles dataset*
-
-
-
 
 ## 定位与知识库关联
 
@@ -343,8 +303,6 @@ Figure 5 分析了推理相关词频与奖励的关系。在 naive GRPO 训练�
 3. **组件交互**：低概率 token 的过度主导与 KL 惩罚、clip 阈值等其他 GRPO 组件之间存在多大程度的交互？
 4. **层级差异**：梯度偏差问题是否在所有 transformer 层表现一致？是否可以设计针对特定层或 attention head 的隔离策略？
 5. **跨模态扩展**：该方法是否适用于多模态 LLM 或基于扩散的文本生成模型的 RL 训练？
-
-
 
 ## 原文 PDF
 

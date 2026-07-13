@@ -64,8 +64,6 @@ MCLD属于**场景感知的神经人体运动预测**方向，在生成范式上
 
 > **注意：** 本文发表于2024年，具体会议/期刊信息需手动核实。
 
-
-
 ### 问题背景：场景感知的人体运动预测
 
 在增强现实、虚拟现实、机器人导航等应用中，智能体需要根据周围3D环境预测人类未来的运动行为。与传统的孤立运动预测不同，场景感知的运动预测要求模型同时理解**历史运动模式**与**3D场景几何约束**，生成既符合人体运动学规律、又能与场景布局自然交互的未来姿态序列。例如，一个人走向沙发时，预测系统需要推断其将在沙发前坐下，而非穿模或悬空——这要求模型捕捉“人-场景交互”的深层依赖。
@@ -85,8 +83,6 @@ MCLD属于**场景感知的神经人体运动预测**方向，在生成范式上
 上述瓶颈的本质在于：**如何在统一的概率框架下，从多模态条件（历史运动+场景上下文）中学习到未来运动分布的复杂映射**。扩散模型在图像生成领域的成功表明，其迭代去噪过程天然适合建模高维、多模态分布，且条件注入机制灵活。然而，将扩散模型直接应用于3D运动预测面临计算效率与条件融合的双重挑战。
 
 本文提出**MCLD（Multi-Condition Latent Diffusion Network）**，核心动机是：**在潜在嵌入空间中执行条件扩散，通过三个专门设计的模块——关键区域提议（KRP）降低场景冗余、多注意力编码器（MAE）解耦三类条件特征、多条件融合模块（MCF）实现去噪步感知的动态融合——系统性地解决上述瓶颈**。该方法在GTA-IM和PROX两个基准数据集上均取得显著提升，验证了“潜在扩散+多条件动态融合”在场景感知运动预测任务中的有效性。
-
-
 
 ## 核心方法与创新机理
 
@@ -128,8 +124,6 @@ $$Z_I = \text{Cross-Attn}(Q_B, K_S, V_S) = \text{softmax}\left( \frac{Q_B K_S^T}
 
 上述四个changed slots形成因果闭环：KRP降低场景冗余→MAE解耦提取三类嵌入→MCF动态步感知融合→潜在扩散模型实现概率生成。这一系统设计使得MCLD在GTA-IM数据集上FDE和ADE指标分别超越CA-HMF约15%和14%，在PROX真实数据集上0.5s和3s的3D姿态误差分别降至81mm和521mm，同时保持预测的多样性和人-场景交互的真实感。
 
-
-
 MCLD 采用两阶段训练范式，将未来人体运动预测建模为潜在空间中的条件生成问题。其核心思路是：先通过 VAE 将高维运动序列压缩为紧凑的潜在表示，再在潜在空间中执行多条件扩散过程，从历史运动与场景上下文的联合条件中概率性地生成未来运动嵌入。
 
 ### 两阶段训练流水线
@@ -168,15 +162,11 @@ $$
 - **输出**：未来 $N$ 帧的 3D 人体运动预测 $B^+ = \{B_0, \dots, B_N\}$，该预测同时满足历史运动连续性和场景几何约束。
 - **推理过程**：从高斯噪声 $z_K$ 出发，经过 $K$ 步（默认 $K=1000$）迭代去噪，逐步恢复潜在运动表示 $z_0$，再经 VAE 解码器重建运动序列。由于扩散模型的随机性，MCLD 可从同一输入生成多样化的合理未来运动。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1787_Multi_Condition_Latent_Diffusion_Network_for_Scene_Aware_Neural_Human_Mo/figures/002_Figure_2.jpg]]
 *Figure 2: Architecture Overview. MCLD consists of a VAE model and a multi-condition latent-based diffusion model. MCLD proposes a two-stage training scheme: first adopting encoding-decoding reconstruction loss to optimize the VAE model and learn effective latent representation*
 
 ![[assets/figures/papers/paper_list_l1787_Multi_Condition_Latent_Diffusion_Network_for_Scene_Aware_Neural_Human_Mo/figures/011_Figure_8.jpg]]
 *Figure 8: Diverse Predictions. As a non-deterministic prediction system, MCLD is able to generate diverse and reasonable future human motions (blue skeletons) from the same scene point cloud and body motion history input (red skeletons)*
-
-
 
 ### 1. 潜在运动表示：VAE 编码与重建
 
@@ -254,22 +244,6 @@ $$
 
 随后通过通道注意力机制计算各条件的响应得分，并以加权求和的方式生成 $E_C^k$。MCF 的动态融合策略（含时间步嵌入）较静态拼接显著提升了预测精度，例如 2.0s 误差从 85mm 降至 78mm（TABLE VII）。Fig. 12 进一步揭示了不同条件在扩散步骤中的动态响应得分变化，验证了自适应融合的必要性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1787_Multi_Condition_Latent_Diffusion_Network_for_Scene_Aware_Neural_Human_Mo/figures/003_Figure_3.jpg]]
-*Figure 3: Key Region Proposal Module. Given a 3D scene point cloud*
-
-![[assets/figures/papers/paper_list_l1787_Multi_Condition_Latent_Diffusion_Network_for_Scene_Aware_Neural_Human_Mo/figures/004_Figure_4.jpg]]
-*Figure 4: Multi-Attention Encoder Module. Considering there are multiple dependencies within and between body and scene points, including body motion, scene geometry, and body-scene interaction, we deploy a transformer-based*
-
-![[assets/figures/papers/paper_list_l1787_Multi_Condition_Latent_Diffusion_Network_for_Scene_Aware_Neural_Human_Mo/figures/005_Figure_5.jpg]]
-*Figure 5: Iterative Denoising Module. Given*
-
-![[assets/figures/papers/paper_list_l1787_Multi_Condition_Latent_Diffusion_Network_for_Scene_Aware_Neural_Human_Mo/figures/006_Figure_6.jpg]]
-*Figure 6: Multi-Condition Fusion Module. MCF dynamically integrates*
-
-
-
 ## 实验与关键发现
 
 ### 1. 核心性能验证
@@ -315,24 +289,14 @@ MCLD的核心优势之一在于其固有的随机生成能力。Figure 8展示�
 - 所有非确定性基线方法均独立重复评估20次，报告平均值与95%置信区间。
 - 对于依赖RGB输入的基线方法（如**GPP-Net**，Cao et al., ECCV 2020），均从对应视频序列重建场景点云作为输入，消除模态差异带来的不公平比较（TABLE I 标注`*`）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1787_Multi_Condition_Latent_Diffusion_Network_for_Scene_Aware_Neural_Human_Mo/figures/013_Figure_9.jpg]]
 *Figure 9: Visualization comparisons between the human motion prediction with and without a KPR module. KRP improves MCLDs with more realistic human-scene interactions (shown in yellow box)*
-
-![[assets/figures/papers/paper_list_l1787_Multi_Condition_Latent_Diffusion_Network_for_Scene_Aware_Neural_Human_Mo/figures/016_Figure_11.jpg]]
-*Figure 11: The human motion prediction performance and its average inference time at each configuration choice of Markov denoising step T*
-
-![[assets/figures/papers/paper_list_l1787_Multi_Condition_Latent_Diffusion_Network_for_Scene_Aware_Neural_Human_Mo/figures/017_Figure_12.jpg]]
-*Figure 12: Response scores for different conditions inferred at different diffusion steps*
 
 ![[assets/figures/papers/paper_list_l1787_Multi_Condition_Latent_Diffusion_Network_for_Scene_Aware_Neural_Human_Mo/figures/007_Table.jpg]]
 *Table: I: Comparisons between our method and prior works in terms of pipeline, accuracy, and efficiency. We discuss their pipelines from method input and method architecture and report their model sizes to reflect their computational efficiency. *: For fair comparison, point clouds are reconstructed from corresponding RGB videos. As for non-deterministic diverse prediction, we repeat their evaluations 20 times and report the average with 95% confidence interval. The best performances are indicated with bold*
 
 ![[assets/figures/papers/paper_list_l1787_Multi_Condition_Latent_Diffusion_Network_for_Scene_Aware_Neural_Human_Mo/figures/008_Table.jpg]]
 *Table: II: Comparisons between our method and prior works on GTA-IM dataset. Their prediction performances are analyzed from predicting 0.5∼2s 3D poses and paths. Similarly, as a non-deterministic prediction system, we repeat the evaluation of our MCLD 20 times and report their average with 95% confidence interval*
-
-
 
 ## 定位与知识库关联
 
@@ -400,8 +364,6 @@ MCLD相对于基线方法的核心变更体现在四个关键槽位：
 3. **动态自适应MCLD**：如何使模型根据每个输入样本自适应推断最优超参数配置（如去噪步数、编码器深度），从而实现高效实时预测？这涉及元学习或动态网络架构搜索的引入。
 
 4. **复杂场景扩展**：在动态场景（包含移动物体或其他智能体）和多智能体交互情况下，如何扩展该框架？当前KRP模块假设场景静态，MAE仅处理单人-场景交互，需要引入时空场景建模和多智能体交叉注意力机制。
-
-
 
 ## 原文 PDF
 

@@ -52,8 +52,6 @@ claims:
 
 **主要结果**：在 Zeroscope 非级联设置下，DreamMotion 在文本对齐度（CLIP Text-Align: 0.8209）、帧一致性（CLIP Frame-Con: 0.9726）以及人类评估的编辑准确性（4.14/5）和结构/运动保持（4.33/5）上均优于所有对比基线。在 Show-1 级联设置下同样取得最优性能。与运动迁移方法 DMT 和局部编辑方法 Video-P2P 相比，DreamMotion 的运动保真度分别提升 0.0562 和 0.1875。消融实验证实，联合优化 V-DDS、S-SSM 和 T-SSM 是取得最优效果的必要条件。
 
-
-
 视频编辑的核心挑战在于，如何在注入新外观的同时，精准保留原始视频中的复杂运动和结构信息。随着文本到视频（T2V）扩散模型的快速发展，零样本视频编辑——即无需针对特定视频进行微调即可完成编辑——成为一个极具吸引力的方向。然而，现有方法在处理真实世界视频中的复杂运动时，暴露出根本性的瓶颈。
 
 **祖先采样的失效。** 当前主流的零样本视频编辑方法大多沿袭图像编辑的思路，依赖于对扩散模型进行**祖先采样**（ancestral sampling）——即从噪声或反转潜变量出发，通过反向扩散过程生成编辑后的视频。尽管这类方法（如 **Tune-A-Video**、**ControlVideo**、**TokenFlow** 等）在图像域取得了显著进展，但在视频域却面临一个致命缺陷：它们**无法捕捉复杂、真实的运动模式**。如 Fig. 2 所示，基于祖先采样的编辑结果往往产生运动失真、时序不一致的视频，因为反转过程难以将真实世界的动态信息完整编码到噪声空间中，而采样过程又缺乏有效的运动约束机制。
@@ -63,8 +61,6 @@ claims:
 **核心瓶颈的因果分析。** 上述问题的根源在于，V-DDS 损失仅关注外观注入，缺乏对视频结构和时序动态的显式约束。扩散模型的特征空间本身蕴含着丰富的结构信息，但传统的分数蒸馏方法并未有效利用这些信息来保持运动一致性。因此，如何在优化过程中**解耦外观注入与运动保持**，成为零样本视频编辑能否真正落地的关键。
 
 **DreamMotion 的动机。** 针对这一瓶颈，DreamMotion 提出了一种全新的解决方案：利用预训练 T2V 扩散模型内部的**深度特征自相似性**作为结构保持的线索。核心直觉是：原始视频在扩散特征空间中具有特定的时空自相似性模式，这些模式编码了物体的空间结构和帧间运动关系。通过在优化过程中显式匹配原始视频与编辑视频的时空自相似性，可以有效约束结构并平滑时间动态，从而在注入新外观的同时精准保留原始运动。这一思路将视频编辑从“采样生成”范式转变为“约束优化”范式，为模型无关、无需训练的零样本视频编辑开辟了新路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -100,8 +96,6 @@ DreamMotion 则**直接以原始视频为初始化变量**，通过分数蒸馏�
 
 与多数基线方法针对单一模型框架定制不同，DreamMotion 的优化策略具有**模型无关性**。它可同时应用于非级联视频扩散模型（如 Zeroscope）和级联框架（如 Show-1）。对于级联模型，优化仅局限在关键帧生成阶段，后续的时间插值和空间超分辨率模块正常执行，从而无缝适配不同架构（Table 1, Table 2）。
 
-
-
 ![[assets/figures/papers/paper_list_l36_DreamMotion_Space_Time_Self_Similar_Score_Distillation_for_Zero_Shot_Vid/figures/001_Figure_1.jpg]]
 *Figure 1: Zero-shot video editing results. The second row presents videos produced with our method with a non-cascaded video diffusion model, while those in the bottom row are from a cascaded model. For a full display of results, visit our project page*
 
@@ -135,8 +129,6 @@ $$\mathcal{L}_{\text{total}} = \mathcal{L}_{\mathrm{V-DDS}} + \mathcal{L}_{\math
 - **输入**：原始视频帧序列、源文本描述 $\hat{y}$、目标文本描述 $y$。
 - **处理**：在原始视频变量上迭代优化，每一步同时计算 V-DDS、S-SSM、T-SSM 三个损失的梯度，更新视频变量。
 - **输出**：编辑后的视频帧序列，其外观符合目标描述，同时精确保留了原始视频的运动轨迹和空间结构。
-
-
 
 DreamMotion 的核心优化框架由三个损失项联合驱动，分别负责外观注入、空间结构保持和时间平滑。所有损失共享相同的噪声 $\epsilon$ 和时间步 $t$，在统一的分数蒸馏框架下协同工作。
 
@@ -192,8 +184,6 @@ $$\mathcal{L}_{\text{total}} = \mathcal{L}_{\mathrm{V-DDS}} + \mathcal{L}_{\math
 
 优化从原始视频初始化目标变量 $\pmb{x}_0^{1:N}(\theta) \leftarrow \hat{\pmb{x}}^{1:N}$ 开始，通过梯度下降迭代更新。对于级联视频扩散框架，优化仅作用于关键帧生成阶段，后续的时间插值和空间超分辨率模块正常执行，从而保证了方法的模型无关性。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -234,17 +224,11 @@ DreamMotion 的核心约束在于其结构保持机制本质上依赖于原始�
 - Table 1 和 Table 2 中人类评估部分各维度的完整评分分布及统计显著性检验结果。
 - Fig. 13 所示移除掩码条件后的具体视觉退化模式。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l36_DreamMotion_Space_Time_Self_Similar_Score_Distillation_for_Zero_Shot_Vid/figures/003_Figure_3.jpg]]
 *Figure 3: Appearance Injection with Space-TimeSelf-Similarity Man→spider-man Fig. 3: Optimization progress visualization. The proposed self-similarity regularization effectively preserves the structure and motion of the original video*
 
 ![[assets/figures/papers/paper_list_l36_DreamMotion_Space_Time_Self_Similar_Score_Distillation_for_Zero_Shot_Vid/figures/018_Figure_14.jpg]]
 *Figure 14: “Amanisdoingakickflip.”→“Anastronautisdoingakickflip." Fig. 14: Visualization of optimization progress*
-
-![[assets/figures/papers/paper_list_l36_DreamMotion_Space_Time_Self_Similar_Score_Distillation_for_Zero_Shot_Vid/figures/012_Table.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -298,8 +282,6 @@ DreamMotion 的设计决定了其**适用边界**：它擅长在保持原始视�
 3. **与其他视频先验的融合**：分数蒸馏优化能否与光流信息、深度估计或轨迹约束等显式运动先验结合？这种融合可能进一步降低对掩码的依赖，并在复杂运动场景下提升时间一致性。
 
 4. **计算效率与收敛性**：DreamMotion 需要多步优化迭代，其收敛速度与视频长度、编辑复杂度的关系尚未被系统研究。探索更高效的优化策略（如自适应步长、预热阶段设计）是实用化部署的关键方向。
-
-
 
 ## 原文 PDF
 

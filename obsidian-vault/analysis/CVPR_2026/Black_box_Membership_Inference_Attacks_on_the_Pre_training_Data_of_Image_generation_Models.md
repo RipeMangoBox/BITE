@@ -62,8 +62,6 @@ claims:
 
 **方法定位**：SD-MIA将成员推断的扰动空间从图像模态转向文本模态，利用扩散模型对文本条件无噪影响的特性，在黑盒约束下实现了对预训练数据的可靠检测。该方法为图像生成模型的隐私审计提供了新的技术路径。
 
-
-
 ### 扩散模型预训练数据隐私与成员推断
 
 文本到图像扩散模型（如 Stable Diffusion、DALL-E 系列）在训练过程中记忆了大量预训练数据，这使得模型可能泄露训练样本的隐私信息。成员推断攻击（Membership Inference Attack, MIA）旨在判定一个给定样本是否被用于训练目标模型，是衡量模型隐私泄露风险的核心工具。然而，现有成员推断方法主要针对分类模型或微调数据设计，将其直接扩展到扩散模型的预训练数据检测时面临根本性困难。
@@ -101,8 +99,6 @@ $$| \delta_{c} p(\boldsymbol{x}_{m}) - \delta_{c} p(\boldsymbol{x}_{n}) | \appro
 基于上述分析，该工作的核心动机是：**将成员推断的攻击面从图像空间转移到文本空间**，利用文本模态不受扩散噪声影响的特性，设计多视图文本扰动策略来探测表征区域塌缩现象，从而在黑盒条件下可靠地检测扩散模型的预训练数据。
 
 具体而言，SD-MIA 框架通过以下三个关键设计实现这一目标：（1）利用大语言模型对原始文本描述进行 token、风格、语义三个视图的受控改写，产生多视角文本表征位移；（2）设计跨模态相关性估计器，以目标图像与生成图像在视觉-文本联合嵌入空间中的相似度作为生成概率的替代信号；（3）采用最大化相关性池化策略，对多次随机生成的高相关性得分取均值，抑制扩散随机性并放大成员/非成员信号差异。
-
-
 
 ## 核心方法与创新机理
 
@@ -160,8 +156,6 @@ $$s^{t} = \frac{1}{n} \textstyle \sum_{j=1}^{n} s \bigl( \boldsymbol{x}, \hat{c}
 
 三个 changed slots 形成了从“为什么现有方法失败”到“如何系统性解决”的完整逻辑链：文本空间扰动绕开了 VAE 收缩和扩散随机性的双重衰减（Slot 1），表征区域塌缩探测利用了预训练过拟合的结构性痕迹（Slot 2），而纯黑盒设计保证了方法的通用性和实用性（Slot 3）。消融实验（Figure 7）进一步证实，三种文本扰动视图相互补充，集成后性能最优，验证了多视图机制的必要性。
 
-
-
 SD-MIA 是一个纯黑盒的预训练数据成员推断框架，其核心设计围绕一个关键观察展开：**图像空间扰动无法有效揭示成员与非成员样本在生成概率曲率上的差异，而文本空间扰动则能产生显著可分离的信号**。基于此，SD-MIA 将攻击从传统的图像扰动范式转向文本扰动范式，利用扩散模型对文本条件始终保持无噪影响的特性，构建了一个多视角文本扰动驱动的检测流程。
 
 ### 框架总览
@@ -183,12 +177,8 @@ SD-MIA 是一个纯黑盒的预训练数据成员推断框架，其核心设计�
 
 多视角文本扰动模块是整个框架的“因果旋钮”（causal knob）：它通过 token 级替换、风格迁移和语义改写三种策略，在文本嵌入空间中产生不同方向的位移向量。这些位移向量经文本编码器映射后，直接作用于扩散模型的交叉注意力层，影响生成过程。交叉模态相关性估计模块则充当“信号放大器”，将生成概率的微小曲率变化转化为可量化的相似度差异。最大化相关性池化进一步抑制了扩散随机性带来的方差，使得成员/非成员信号在统计上显著可分离。最终，成员分数计算将多视图信号整合为单一标量，实现黑盒条件下的可靠检测。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2069_https_openaccess_thecvf_com_content_CVPR2026_html_Qi_Black_box_Membershi/figures/001_Figure_1.jpg]]
 *Figure 1: Methodology insights and framework. (A) Visual perturbation struggles to reveal the generation probability curvature gap between member and non-member, resulting in insignificant detection signals. (B) SD-MIA addresses this via a multi-view text perturbation mechanism, enabling precise measurement of curvature shifts and reliable detection of pre-training data in diffusion models*
-
-
 
 ### 方法动机：为何图像扰动失效
 
@@ -254,12 +244,8 @@ $$s_f = s_f(x, \hat{c}) - s_f(x, c)$$
 
 根据表征区域塌缩理论，成员样本由于梯度近似为零，文本扰动引起的相关性变化较小（$s_f$ 接近零）；而非成员样本则表现出明显的相关性下降。这一差值作为 $\delta_c p$ 的经验近似，直接用于成员身份判别。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2069_https_openaccess_thecvf_com_content_CVPR2026_html_Qi_Black_box_Membershi/figures/002_Figure_2.jpg]]
 *Figure 2: Distributional comparison between visual-perturbation method and text-perturbation black-box method SD-MIA*
-
-
 
 ## 实验与关键发现
 
@@ -314,8 +300,6 @@ $$s_f = s_f(x, \hat{c}) - s_f(x, c)$$
 
 4. **闭源模型可迁移**：在DALL‑E 3等闭源商业模型上的成功验证了攻击的通用性，这对预训练数据隐私保护提出了更广泛的安全警示。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2069_https_openaccess_thecvf_com_content_CVPR2026_html_Qi_Black_box_Membershi/figures/003_Table_1.jpg]]
 *Table 1: Membership inference performance across different diffusion-based image generation models. We consider balanced and imbalanced (1:10) proportion of member to non-member, and report the AUC and the true positive rate under a false positive rate*
 
@@ -325,13 +309,8 @@ $$s_f = s_f(x, \hat{c}) - s_f(x, c)$$
 ![[assets/figures/papers/paper_list_l2069_https_openaccess_thecvf_com_content_CVPR2026_html_Qi_Black_box_Membershi/figures/006_Figure_5.jpg]]
 *Figure 5: Membership inference attack performance against closed-source image generation models (dall-e-3, gemini-2.0, gpt-4o)*
 
-![[assets/figures/papers/paper_list_l2069_https_openaccess_thecvf_com_content_CVPR2026_html_Qi_Black_box_Membershi/figures/008_Figure_6.jpg]]
-*Figure 6: Robustness evaluation under four training-data distortion settings, image blur, Gaussian noise, brightness adjustment, and shear transformation. Within each sub-plot, the distortion intensity increases from left to right*
-
 ![[assets/figures/papers/paper_list_l2069_https_openaccess_thecvf_com_content_CVPR2026_html_Qi_Black_box_Membershi/figures/009_Figure_7.jpg]]
 *Figure 7: Ablation study of SD-MIA, including: (A) perturbation view of textual input, and (B) paired textual description (PD)*
-
-
 
 ## 定位与知识库关联
 
@@ -380,8 +359,6 @@ SD-MIA 的适用性受以下条件约束：
 - **跨模态信号的理论紧致性**：Eq. 6 定义的跨模态相关性评分函数作为生成概率的替代估计，其与真实生成概率之间的偏差上界尚未给出理论分析。这限制了在极端分布外场景下对攻击可靠性的先验判断。
 
 - **扩展到其他生成范式**：SD-MIA 的核心洞察——利用不受噪声影响的模态条件进行扰动探测——是否可推广到视频生成（文本+时序条件）、3D 生成（文本+几何条件）等多模态生成场景，仍有待探索。
-
-
 
 ## 原文 PDF
 

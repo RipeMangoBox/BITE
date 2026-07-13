@@ -55,8 +55,6 @@ claims:
 
 **局限与开放问题**：方法依赖语料库覆盖 OOD 相关词语且预训练文本编码器能理解这些词语，在医学等专业领域可能受限；测试初期若缓存队列误分类率过高（>80%），自适应可能带来负面影响。后续可探索更精细的显式加权方案、专业领域语料库构建，以及极端数据流下的性能维持能力。
 
-
-
 ### 视觉-语言模型与OOD检测的兴起
 
 分布外（Out-of-Distribution, OOD）检测旨在识别与训练分布不同的测试样本，是保障深度学习模型安全部署的关键技术。近年来，大规模视觉-语言模型（Vision-Language Models, VLMs）如CLIP的涌现，为OOD检测开辟了新的范式。这类模型通过大规模图文对比预训练，获得了强大的开放世界语义理解能力，使得无需在特定ID数据集上进行额外训练即可进行OOD检测成为可能。
@@ -82,8 +80,6 @@ Act(\mathcal{X}, \widehat{y}_i) = \frac{1}{|\mathcal{X}|} \sum_{x \in \mathcal{X
 $$
 
 基于此，本文提出**测试时激活负标签（Test-time Activated Negative Labels, TANL）**方法。其核心动机是：在测试过程中，通过在线识别高置信度的正（ID）样本和负（OOD）样本，动态估计语料库中每个候选标签的激活差异，从而自适应地选择在当前测试分布下激活最强的负标签。此外，本文进一步设计了激活感知评分函数，按激活强度对负标签排序后循环累加，隐式增强高激活标签的权重，从而充分利用挖掘到的激活知识，提升OOD检测的准确性和鲁棒性。
-
-
 
 ## 核心方法与创新机理
 
@@ -130,8 +126,6 @@ $$S_{aa}(\pmb{v}) = \frac{1}{M} \sum_{m=1}^{M} \sum_{i=1}^{C} \frac{\exp(\pmb{v}
 
 三项创新协同作用，使 TANL 在 ImageNet-1k 上将平均 FPR95 从 NegLabel 的 25.40% 大幅降至 9.81%，AUROC 从 94.21 提升至 97.97（Table 1）。
 
-
-
 TANL 的整体工作流围绕一个核心闭环展开：**测试时在线估计候选负标签的激活差异 → 动态选取高激活负标签 → 激活感知评分 → 缓存高置信度样本以更新激活估计**。该闭环使得负标签的选择不再依赖静态的 ID 距离，而是持续适配当前测试分布的真实激活模式。
 
 ### 框架总览
@@ -157,8 +151,6 @@ TANL 的整体工作流围绕一个核心闭环展开：**测试时在线估计�
 - *批次自适应（Batch-adapt）*：通过加权融合历史队列和当前批次的高置信度样本激活（式 13），对分布偏移更敏感。
 
 **激活感知评分的理论支撑**：推导表明（式 16），增加负标签数量 $M$ 能降低 FPR 的前提是 $p_1 - p_2 < 0$，即负标签在 OOD 上的归一化相似度高于在 ID 上。激活差异度量正是对这一条件的直接近似，从而为标签选择提供了原则性依据。
-
-
 
 ### 3.1 问题形式化与基线回顾
 
@@ -234,13 +226,6 @@ $$\frac{\partial FPR_{\lambda}}{\partial M} = \frac{e^{-z^2}}{2\sqrt{2\pi}} \cdo
 
 其中 $p_1$ 和 $p_2$ 分别表示负标签在OOD和ID样本上的期望相似度。**降低FPR的充要条件为 $p_1 - p_2 < 0$**，即负标签在OOD上的相似度高于在ID上。这从理论上解释了为何应选择激活差异大的标签：$Act_d(\widehat{y}_i)$ 正是对 $p_1 - p_2$ 的经验估计，选择高 $Act_d$ 标签等价于最大化FPR下降的幅度。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2758_https_arxiv_org_abs_2603_25250/figures/001_Figure_1.jpg]]
-*Figure 1: Activation analyses with negative labels mined in [29]. (a) Negative labels on a specific OOD dataset exhibit a long-tailed activation score distribution. Some labels activate more strongly on the ID dataset than on OOD, potentially misleading OOD detection. (b) A small subset of negative labels strongly activates on OOD, enabling effective detection. Most labels respond similarly across ID and OOD, slightly harming detection, while some activate higher on ID, significantly degrading performance. The FPR95 results are obtained with negative labels of top activations via Eq. 4. These analyses use ground truth labels from ImageNet (ID) and Places (OOD) datasets*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -273,9 +258,6 @@ Table 4 的消融实验系统拆解了 TANL 三个核心组件的增益。以 Op
 
 Figure 3 进一步揭示了方法的关键性质：
 
-![[assets/figures/papers/paper_list_l2758_https_arxiv_org_abs_2603_25250/figures/008_Figure_3.jpg]]
-*Figure 3: Analyses on (a) number M of selected negative labels, (b) selection criterion of negative labels, (c) α values, and (d) batch size under OpenOOD setting*
-
 - **对负标签数量 M 的鲁棒性（Fig. 3a）**：NegLabel 在 M 增大时性能显著下降，而 TANL 的激活感知评分函数使性能在较大 M 范围内保持稳定。这源于理论分析（Eq. 16）揭示的条件：增加负标签数量 M 能降低 FPR 的前提是 $p_1 - p_2 < 0$，即负标签在 OOD 上的相似度高于在 ID 上。TANL 通过激活差异筛选确保了所选标签满足这一条件。
 - **选择标准的有效性（Fig. 3b）**：仅使用负样本激活 $\text{Act}(\mathcal{X}_{neg})$ 作为选择标准，其性能已接近完整的差分标准 $\text{Act}_d$。这说明在 OOD 检测中，标签在 OOD 数据上的绝对激活水平本身已具有强判别力，差分项主要起到进一步抑制 ID 上高激活噪声标签的作用。
 - **混合系数 α 与批次大小（Fig. 3c, 3d）**：方法对 α 和批次大小的变化表现出良好的稳定性，无需精细调参即可获得接近最优的性能。
@@ -291,25 +273,9 @@ Figure 4 展示了排序后的语料库标签可视化。高激活得分的候�
 
 Table 5 的时间复杂度分析表明，TANL 无需训练（Training 时间为 0）、无可学习参数（Param. 为 0）。在推理速度方面，虽然相比 MCM 等简单基线有所下降（因需要在线维护队列和计算激活），但在批次大小为 256 时仍保持实用的 FPS 水平，且显著优于需要训练的竞争方法。
 
-![[assets/figures/papers/paper_list_l2758_https_arxiv_org_abs_2603_25250/figures/012_Table_5.jpg]]
-*Table 5: Time complexity analyses. ‘Training’ measures the training time, and ‘Param.’ presents the number of learnable parameters. ‘FPS’ reflects the inference speed with a batch size of 256*
-
 ### 失败模式与局限
 
 尽管 TANL 在通用视觉基准上表现优异，其有效性依赖于两个前提假设：① 语料库覆盖与 OOD 分布相关的词语；② 预训练文本编码器能够理解这些词语。在特定领域（如医学影像）中，通用语料库可能缺乏领域特异性术语，导致激活估计的判别力下降，性能提升有限。此外，测试初期的队列质量对自适应效果有影响：当初始模型的误分类率超过 80% 时，测试时自适应可能带来负面影响；但实验表明，方法在实际中具有较强的鲁棒性，仅需约 20% 的初始精度即可实现正向改进。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2758_https_arxiv_org_abs_2603_25250/figures/007_Figure.jpg]]
-*Figure: (a) Number of negative labels (b) Selection criterion (c) α values (d) Batch size*
-
-![[assets/figures/papers/paper_list_l2758_https_arxiv_org_abs_2603_25250/figures/010_Table.jpg]]
-*Table: Ranked Corpus Dataset*
-
-![[assets/figures/papers/paper_list_l2758_https_arxiv_org_abs_2603_25250/figures/013_Table.jpg]]
-*Table: A6. Complete OOD detection results with ImageNet-1k, where a VITB/16 CLIP encoder is adopted*
-
-
 
 ## 定位与知识库关联
 
@@ -344,8 +310,6 @@ TANL 的核心假设是：（1）语料库覆盖与 OOD 分布相关的词语；
 3. **极端数据流下的稳定性**：在长时间仅出现 ID 或仅出现 OOD 样本的极端测试流下，FIFO 队列将逐渐被单一类别样本填充，激活估计的可靠性如何维持？方法是否需要引入遗忘机制或队列重置策略？
 
 4. **激活感知评分的理论最优性**：当前隐式加权方案的有效性已在实验中得到验证，但其是否为激活信息利用的理论最优形式？是否存在其他变体（如基于激活得分的直接加权归一化）能够进一步提高检测性能？
-
-
 
 ## 原文 PDF
 

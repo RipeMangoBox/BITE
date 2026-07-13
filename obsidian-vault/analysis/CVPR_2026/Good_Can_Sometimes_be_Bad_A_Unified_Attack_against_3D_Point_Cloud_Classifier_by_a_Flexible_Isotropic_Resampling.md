@@ -86,8 +86,6 @@ UAtt3D在多个维度验证了其有效性、隐蔽性与鲁棒性：
 
 > **注意**：UAtt3D的单样本生成时间约0.528秒，慢于iBA（0.463s）、PCBA（0.493s）和IBAPC（0.381s），且针对自适应防御（如PointCVaR）的对抗攻击ASR会从95.78%降至78.42%，表明计算效率与极端防御下的鲁棒性仍有提升空间。
 
-
-
 ### 3D点云分类器的安全威胁：后门攻击与对抗攻击
 
 深度神经网络在3D点云分类任务中取得了显著成功，但其安全性正面临两类典型攻击的严峻挑战。**后门攻击**通过在训练阶段注入带有特定触发器（trigger）的样本，使受害模型在推理时对包含该触发器的输入错误地输出攻击者指定的目标标签，而对良性样本的分类性能几乎不受影响。其训练目标可形式化为：
@@ -118,8 +116,6 @@ $$F(A(P),\theta) \neq y$$
 
 基于这一动机，本文设计了**灵活各向同性重采样（Flexible Isotropic Resampling, FIR）**，并将其作为统一攻击框架 **UAtt3D** 的核心机制。FIR通过可调参数（射线方向 $\eta, \gamma$ 和起始点密度 $k$）控制重采样点的分布，既可作为后门触发器的注入载体（通过优化射线方向学习统一的触发器特征），也可作为对抗扰动的几何约束（沿射线方向施加梯度扰动），从而在统一框架下同时支持后门注入与对抗样本生成，并自适应于攻击者权限的动态变化。
 
-
-
 ## 核心方法与创新机理
 
 ### 问题瓶颈：隐蔽性-扰动幅度的强耦合与攻击权限的割裂
@@ -148,20 +144,14 @@ UAtt3D的核心创新在于**打破了隐蔽性与扰动幅度之间的强耦合
 
 这一创新范式的有效性得到了充分验证：在ModelNet40上，UAtt3D的后门攻击成功率（ASR）达到97.62%~99.91%（Table 1），同时点云各向同性指标CUD和KUV大幅优于所有对比攻击；在人类主观检查中，被UAtt3D攻击的点云被选为最自然的比例高达80.62%，远高于良性点云的19.31%（Figure 5），证明该攻击能有效规避人工审查。
 
-
-
 UAtt3D 的核心设计思想是将恶意攻击行为伪装成点云质量的提升，从而在统一的框架下同时支持后门攻击与对抗攻击。如图2所示，整个pipeline由四个关键模块串联构成，形成从原始点云到攻击样本的端到端可微流程。
 
 **输入与输出流**：系统接收良性点云 `P_Benign` 作为输入。首先通过**表面近似**模块从可能包含噪点、孔洞或稀疏缺陷的原始点云中快速重建出近似的三角网格表面；随后，**灵活各向同性重采样（FIR）** 模块在该近似表面上发射平行射线，生成具有均匀点分布的重采样点云 `P_Resample`。这一重采样过程由三个可调超参数——射线极角 `η`、方位角 `γ` 以及起始点密度 `k`——灵活控制点的空间排列。在推理阶段，根据攻击者当前权限的不同，系统分叉为两条路径：若执行**基于FIR的对抗攻击**，则在 `P_Resample` 上沿射线方向施加受几何约束的梯度扰动，生成对抗样本 `P_Adv`；若执行**基于FIR的后门攻击**，则利用可微的FIR通过梯度下降优化射线方向 `(η*, γ*)`，将重采样本身转化为统一的触发器注入机制，生成后门样本 `P_Backdoor`。
 
 **模块间的因果耦合**：FIR模块是整个框架的“因果旋钮”。其可微性使得后门攻击中的触发器学习（优化射线方向以最小化代理损失）与对抗攻击中的特征移动（沿射线方向施加梯度扰动）可以在同一几何约束下完成。表面近似模块为FIR提供了必要的碰撞表面，而FIR输出的各向同性点云则为后续两种攻击提供了高质量的伪装基底——攻击扰动在几何上表现为规则化、均匀分布的点位置调整，而非传统方法中引入的非均匀异常点，从而打破了攻击隐蔽性与扰动幅度之间的强耦合。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2257_https_openaccess_thecvf_com_content_CVPR2026_html_Fan_Good_Can_Sometimes/figures/001_Figure_1.jpg]]
 *Figure 1: The proposed UAtt3D can adapt to backdoor attack and adversarial attack at the same time. The malicious behavior (bad thing) is covered by the point cloud quality improvement (good thing) powered by the designed flexible isotropic resampling (FIR), instead of quality decrease like existing attacks*
-
-
 
 UAtt3D 的统一攻击能力建立在**灵活各向同性重采样（Flexible Isotropic Resampling, FIR）** 之上。FIR 将攻击行为伪装成点云质量提升，同时为后门注入和对抗扰动提供可微的操作空间。整个框架由四个核心模块串联构成。
 
@@ -217,12 +207,8 @@ $$\eta^{*}, \gamma^{*} = \operatorname*{argmin}_{(\eta,\gamma), P\in\mathcal{D}_
 - **可微性桥梁**：FIR 的可微性使后门角度优化（通过梯度下降在代理模型上搜索最优射线方向）和对抗梯度更新（沿射线方向施加约束扰动）共享同一计算图。
 - **隐蔽性解耦**：传统攻击通过限制扰动幅度来保证隐蔽性，这直接限制了攻击强度。UAtt3D 转而通过提升点云质量（各向同性重采样）来隐藏攻击，打破了隐蔽性与扰动幅度之间的强耦合，使攻击者在动态权限场景下可以灵活切换或组合两种攻击模式。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2257_https_openaccess_thecvf_com_content_CVPR2026_html_Fan_Good_Can_Sometimes/figures/003_Figure_3.jpg]]
 *Figure 3: The designed adversarial attack based on FIR. One adversarial movement consists of loss gradient vector ⃗r and ray projection vector*
-
-
 
 ## 实验与关键发现
 
@@ -262,12 +248,8 @@ $$\eta^{*}, \gamma^{*} = \operatorname*{argmin}_{(\eta,\gamma), P\in\mathcal{D}_
 
 **评估范围。** 当前实验覆盖 ModelNet40、ShapeNet16、ScanObjectNN 三个数据集和 PointConv、PointNet++、DGCNN、CurveNet 四个分类器，对分割、检测等其他 3D 任务的泛化性尚未验证。此外，人类检查实验通过在线问卷进行，参与者的专业背景和显示设备差异可能引入偏差，该结论需谨慎推广。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2257_https_openaccess_thecvf_com_content_CVPR2026_html_Fan_Good_Can_Sometimes/figures/004_Table_1.jpg]]
 *Table 1: Performance of our UAtt3D for backdoor attack. The best is in bold, and the second best is underlined. CUD and KUV represent the isotropy of 3D point cloud. Lower is better. The proposed UAtt3D achieves competitive ASR and BAc comparing with existing adversarial & backdoor attacks. Furthermore, its promotion on point cloud quality is outstanding*
-
-![[assets/figures/papers/paper_list_l2257_https_openaccess_thecvf_com_content_CVPR2026_html_Fan_Good_Can_Sometimes/figures/005_Table.jpg]]
 
 ![[assets/figures/papers/paper_list_l2257_https_openaccess_thecvf_com_content_CVPR2026_html_Fan_Good_Can_Sometimes/figures/006_Figure_5.jpg]]
 *Figure 5: One example of our human inspection experiment*
@@ -275,25 +257,8 @@ $$\eta^{*}, \gamma^{*} = \operatorname*{argmin}_{(\eta,\gamma), P\in\mathcal{D}_
 ![[assets/figures/papers/paper_list_l2257_https_openaccess_thecvf_com_content_CVPR2026_html_Fan_Good_Can_Sometimes/figures/007_Figure_4.jpg]]
 *Figure 4: Attacked 3D point cloud. Our UAtt3D promises stealthiness by improving its quality. Its naturalness is more conducive to evading the defender’s observation, compared with previous attacks. More instances are shown in Appendix 7.2*
 
-![[assets/figures/papers/paper_list_l2257_https_openaccess_thecvf_com_content_CVPR2026_html_Fan_Good_Can_Sometimes/figures/009_Table_3.jpg]]
-*Table 3: Performance of our UAtt3D on defective 3D point cloud and victim PointNet++. O, H, S and A means MN40 with synthetic Outlier, Hole, Sparsity and All the three defects. More results on DGCNN are shown in Appendix 7.2*
-
 ![[assets/figures/papers/paper_list_l2257_https_openaccess_thecvf_com_content_CVPR2026_html_Fan_Good_Can_Sometimes/figures/010_Table_4.jpg]]
 *Table 4: Advantages of UAtt3D on SON with Backdoor Attack*
-
-![[assets/figures/papers/paper_list_l2257_https_openaccess_thecvf_com_content_CVPR2026_html_Fan_Good_Can_Sometimes/figures/011_Figure_9.jpg]]
-*Figure 9: One example of our human inspection experiment*
-
-![[assets/figures/papers/paper_list_l2257_https_openaccess_thecvf_com_content_CVPR2026_html_Fan_Good_Can_Sometimes/figures/012_Figure_7.jpg]]
-*Figure 7: Attack efficiency defended by saliency-based defense. Our UAtt3D can resist such defense*
-
-![[assets/figures/papers/paper_list_l2257_https_openaccess_thecvf_com_content_CVPR2026_html_Fan_Good_Can_Sometimes/figures/013_Figure_10.jpg]]
-*Figure 10: 3D mesh constructed from 3D point cloud. Point cloud attacked by our UAtt3D is able to prevent the appearance of holes*
-
-![[assets/figures/papers/paper_list_l2257_https_openaccess_thecvf_com_content_CVPR2026_html_Fan_Good_Can_Sometimes/figures/014_Figure_8.jpg]]
-*Figure 8: The defense result on STRIP. UAtt3D is the better one to resist STRIP. More results on PontNet++ shown in Appendix 7.3*
-
-
 
 ## 定位与知识库关联
 
@@ -346,8 +311,6 @@ UAtt3D的有效性依赖以下前提条件：
 3. **动态防御环境下的适应性边界：** 在模型在线持续学习、防御策略自适应调整的实际部署环境中，UAtt3D能否保持其攻击有效性？特别是当防御者知晓FIR机制并针对性地监控点云各向同性指标时，攻击者需要如何调整策略？
 
 4. **FIR可微性的防御利用：** 是否可以利用FIR的可微性设计更强的自适应防御机制？例如，通过优化逆向FIR过程来检测和还原被重采样的点云，从而在不影响良性性能的前提下识别基于重采样的攻击。这本质上是一个攻击-防御的博弈问题——FIR既是攻击工具，也可能成为防御的突破口。
-
-
 
 ## 原文 PDF
 

@@ -55,8 +55,6 @@ claims:
 
 **局限与开放问题。** 当前框架假定物体仅含单一转动关节，对多部件、多自由度铰接结构的扩展仍是未来方向。此外，在严重遮挡或缺乏准确 2D 部件分割的场景下，语义一致性学习的鲁棒性有待进一步验证。
 
-
-
 ### 问题背景：单目手-物操纵建模的几何-运动耦合困境
 
 从单目 RGB 视频中重建铰接物体的三维几何与运动，是计算机视觉与图形学中长期存在的挑战。在日常手-物操纵场景中，物体往往包含可动部件（如笔记本电脑的屏幕、盒子的盖子），这些部件在双手操作下经历连续的旋转、开合等变形。这类场景的核心困难在于**形状与运动的强耦合**：单目观测所提供的二维线索本身具有深度模糊性，而铰接物体的几何变形与关节运动又高度纠缠——模型很难从持续变化的铰接状态中解耦出物体的内在几何结构。这种耦合导致严重的几何歧义与重建不稳定性，使得现有方法在处理此类动态场景时捉襟见肘。
@@ -80,8 +78,6 @@ claims:
 - **STONE 阶段**（石头阶段）：在 CLAY 阶段积累的语义和运动先验基础上，施加刚性约束并显式估计转动关节参数（旋转轴 $\mathbf{l}$、枢轴点 $\mathbf{p}$、每帧角度 $\theta_t$），通过时序一致性正则化确保铰接运动的物理合理性和时间连贯性。
 
 这种“先探索、后巩固”的策略，从根本上规避了单阶段方法中几何-运动耦合带来的歧义问题：CLAY 阶段为 STONE 阶段提供了可靠的初始化与语义引导，而 STONE 阶段则将柔性表示“固化”为物理一致的铰接结构。实验表明，该框架在 ARCTIC 数据集上实现了铰接物体重建与真实感渲染的双重 SOTA 性能，并在规范姿态刚体重建任务上超越了专门的刚体重建基线方法。
-
-
 
 ## 核心方法与创新机理
 
@@ -130,8 +126,6 @@ Clay-to-Stone 的双阶段设计并非简单的分步训练，而是形成了**�
 
 当前框架假定物体仅包含**单一转动关节**（revolute joint），对于具有多部件、多自由度（如棱柱副）的复杂铰接结构仍需扩展。此外，在缺少准确 2D 部件分割（如 SAM2 不可用）或手-物严重遮挡的场景下，语义一致性学习的鲁棒性尚待验证。STONE 阶段的刚性约束是否足以处理非理想铰接（如摩擦、少量非刚性变形）也是值得进一步探索的方向。
 
-
-
 Clay-to-Stone 提出了一种**阶段性三维高斯泼溅（3DGS）框架**，用于从单目 RGB 视频中重建铰接手-物体操纵的几何与运动。其核心设计动机源于一个关键瓶颈：单目观测下，连续的关节旋转与频繁的部件变形导致物体的内在几何形状与铰接运动强耦合，引发严重的几何歧义与优化不稳定性。现有方法要么假设物体为完全刚体（如 **HOLD**, Fan et al., CVPR 2024; **BIGS**, On et al., CVPR 2025），要么采用每帧自由变形场却缺乏部件级语义与物理约束（如 **3DGS-Avatar**, Qian et al., CVPR 2024），均无法有效解耦这一耦合。
 
 为应对该挑战，框架引入了一种从“粘土”到“石头”的**层次化建模粒度递进策略**：先在 CLAY 阶段以柔性、语义感知的方式探索部件级变形与运动先验，再在 STONE 阶段施加刚性约束，将表示巩固为物理上一致的铰接结构。这一设计形成了一个清晰的**因果调控机制**——可学习的原始级调制因子 $\beta_{\mathcal{G}}$ 作为控制高斯变形幅度的核心“旋钮”，结合语义一致性损失，使模型能够在语义引导下灵活探索，随后通过刚性化完成收敛。
@@ -153,12 +147,8 @@ Clay-to-Stone 提出了一种**阶段性三维高斯泼溅（3DGS）框架**，�
 
 框架的关键洞察在于**逐步细化空间粒度**：CLAY 阶段（前 10k 迭代）保持柔性、分布式的变形表示，使模型能够自由探索部件语义与运动模式，避免过早刚性化导致的局部最优；STONE 阶段则在已学到的运动先验基础上引入刚性约束，将“粘土”般的可塑表示固化为“石头”般的清晰刚性部件结构，实现形状与运动的解耦。这一从柔性探索到刚性巩固的递进，是方法能够同时取得高精度几何重建（ARCTIC 上平均 CD 达 1.97）与物理合理铰接估计的核心机制。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2634_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_Clay_to_Stone_Phas/figures/001_Figure_1.jpg]]
 *Figure 1: Our Clay-to-Stone framework models coupled geometry and articulation in monocular hand-object manipulation clips through a phase-wise strategy, transitioning from adaptive deformations and part-aware semantics to physically consistent articulation for 3D reconstruction and photo-realistic rendering*
-
-
 
 ### 3.1 手-物高斯表示
 
@@ -258,13 +248,6 @@ Clay-to-Stone 双阶段设计的因果链路可概括为：
 
 这一递进式精细化策略的根本优势在于：**避免了从单目观测直接推断刚性铰接参数时面临的形状-运动耦合歧义**，而是先通过柔性阶段解耦部件语义，再在语义先验的引导下施加物理约束。消融实验（Table 4）验证了移除调制机制（w/o modulation）、去除 SAM2 监督（w/o $\mathcal{L}_M$）或消除时序损失（w/o $\mathcal{L}_t$）均导致性能显著退化，证实了各模块的因果必要性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2634_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_Clay_to_Stone_Phas/figures/002_Figure_2.jpg]]
-*Figure 2: Our framework models articulated hand-object manipulation from monocular videos through a Clay-to-Stone dual-phase pipeline. In the CLAY phase, we first employ spatio-temporal encoding on canonical object Gaussians, using spatial hash representations and visual features. Driven by 2D photometric and semantic consistency, this phase explores fine-grained, primitive-level deformations while establishing part-level semantic correlations. In the subsequent STONE phase, these learned motion priors are consolidated under rigid and temporal consistency constraints to yield physically plausible articulation parameters. Combined with hand Gaussians and pose transformations, the framework produces ge...*
-
-
-
 ## 实验与关键发现
 
 ### 核心实验设计
@@ -316,13 +299,6 @@ Table 4 系统消融了各关键组件的贡献，揭示了以下因果链路：
 
 当前框架的一个明确局限是**仅支持单一转动关节**。对于具有多个转动关节或包含棱柱副等混合关节类型的复杂铰接结构，模型的刚性约束机制需要扩展。此外，在 SAM2 分割不可用或手-物严重遮挡的场景下，语义一致性学习的鲁棒性仍需进一步验证。这些方向被作者列为未来工作。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2634_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_Clay_to_Stone_Phas/figures/007_Figure_3.jpg]]
-*Figure 3: Qualitative results of hand-object photo-realistic rendering on ARCTIC*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 与基线方法的关系
@@ -357,8 +333,6 @@ Clay-to-Stone 框架的有效性建立在若干隐含假设之上，这些假设
 3. **刚性约束的容错性。** STONE 阶段的刚性约束是否足够鲁棒以处理非理想铰接（如摩擦、少量非刚性变形）？引入软约束或不确定性建模可能是缓解这一问题的途径。
 
 4. **训练效率与收敛性。** 双阶段训练范式引入了阶段切换的时机选择（当前固定为 10k 迭代）。这一超参数对不同物体类别的敏感性，以及是否存在自适应的阶段切换策略，值得进一步研究。
-
-
 
 ## 原文 PDF
 

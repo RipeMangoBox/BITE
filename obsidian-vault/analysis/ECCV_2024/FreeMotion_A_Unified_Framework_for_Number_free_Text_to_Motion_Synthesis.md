@@ -63,8 +63,6 @@ $$p(\mathbf{x}^{1},...,\mathbf{x}^{n}) = p(\mathbf{x}^{1}) \prod_{i=1}^{n-1} p(\
 
 在 InterHuman 测试集上，FreeMotion 在双人运动生成任务中取得了 **FID 6.740** 和 **R Precision Top1 0.326**，优于所有基线方法。在单人运动生成上，FreeMotion 的 FID 达到 **12.975**，相比为支持单人生成而修改的 InterGen*（FID 23.415）有显著提升。消融实验表明，去除交互模块后双人 FID 从 6.740 升至 10.749，验证了解耦设计的有效性；全局自注意力交互块使模型能够支持三人及以上的运动生成。定性结果进一步展示了 FreeMotion 在复杂文本理解、交互协调性以及可控空间轨迹方面的优势。
 
-
-
 ### 问题背景
 
 文本驱动的三维人体运动生成旨在根据自然语言描述合成逼真的人体动作序列，在动画制作、虚拟现实和人机交互等领域具有广泛应用。近年来，扩散模型在该领域取得了显著进展，代表性工作包括基于Transformer的单人扩散模型**MDM**（Tevet et al., arXiv 2022）、基于潜在扩散的**MLD**（Chen et al., CVPR 2023）以及检索增强的**ReMoDiffuse**（Zhang et al., arXiv 2023）等。然而，这些方法均聚焦于单人生成场景，无法处理多人交互运动。
@@ -86,8 +84,6 @@ $$p(\mathbf{x}^{1},...,\mathbf{x}^{n}) = p(\mathbf{x}^{1}) \prod_{i=1}^{n-1} p(\
 $$p(\mathbf{x}^{1},...,\mathbf{x}^{n}) = p(\mathbf{x}^{1}) \prod_{i=1}^{n-1} p(\mathbf{x}^{i+1}|\mathbf{x}^{i},...,\mathbf{x}^{1})$$
 
 这一分解将多人运动生成转化为递归的条件单人生成过程——先生成第一人的运动，再以前面所有人的运动为条件生成下一人的运动，如此递归直至完成。基于这一洞察，FreeMotion旨在设计一个**人数无关的统一框架**，通过解耦的生成模块与交互模块，使得模型仅在双人数据上训练即可推理任意人数的运动，并支持灵活的空间控制。
-
-
 
 ## 核心方法与创新机理
 
@@ -147,8 +143,6 @@ $$\mathbf{x}_t = \mathbf{x}_t - \eta \nabla_{\mathbf{x}_t} \mathbf{d}$$
 
 这些设计共同使得 FreeMotion 成为首个在文本条件下实现高保真、人数无关的运动生成框架。
 
-
-
 FreeMotion 的核心设计思路是将多人运动联合生成问题转化为**递归的条件单人运动生成**。其数学基础是联合分布的条件概率分解：
 
 $$p(\mathbf{x}^{1},...,\mathbf{x}^{n}) = p(\mathbf{x}^{1}) \prod_{i=1}^{n-1} p(\mathbf{x}^{i+1}|\mathbf{x}^{i},...,\mathbf{x}^{1})$$
@@ -191,15 +185,11 @@ $$\mathbf{x}_t = \mathbf{x}_t - \eta \nabla_{\mathbf{x}_t} \mathbf{d}$$
 
 推理时，FreeMotion 以递归方式生成多人运动：给定文本描述，先生成第一人的运动，再将其作为条件输入交互模块生成第二人的运动，如此迭代直至生成全部 $N$ 人的运动。扩散过程采用 1000 步训练、DDIM 50 步采样的配置。若需空间控制，可在去噪的每一步叠加显式梯度引导信号。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1874_FreeMotion_A_Unified_Framework_for_Number_free_Text_to_Motion_Synthesis/figures/001_Figure_1.jpg]]
 *Figure 1: The left shows our model can generate controllable motions for any number (1–4 from the figure) of individuals. Different colors represent the different person’s motion. The right is an illustration of our new paradigm of motion generation, recursive generation, where every single motion is predicted under the condition of the motions generated before. Best viewed in color*
 
 ![[assets/figures/papers/paper_list_l1874_FreeMotion_A_Unified_Framework_for_Number_free_Text_to_Motion_Synthesis/figures/002_Figure_2.jpg]]
 *Figure 2: Overall architecture of FreeMotion, which contains a generation module and an interaction module. Given a text d, our framework can infer a motion*
-
-
 
 ### 问题形式化：从联合分布到条件分解
 
@@ -273,8 +263,6 @@ $$\mathcal{L}_2 = \mathcal{L}_{rec} + \lambda_1 \mathcal{L}_{foot} + \lambda_2 \
 
 $\mathcal{L}_{dm}$ 用于显式建模不同人物关节之间的空间距离关系，是交互建模的关键监督信号。消融实验（Table 3）证实：两阶段设计对 FreeMotion 至关重要——同时引入交互描述（InterDes）对 FreeMotion 有益（FID 下降），但对单独使用生成模块（GM）反而有害（FID 上升），说明交互模块有效吸收了交互信息，而生成模块专注于单人运动质量。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -320,23 +308,14 @@ FreeMotion集成了显式与隐式空间控制模块。显式引导通过L2距�
 3. **泛化性未充分验证。** 所有实验基于InterHuman数据集，未在大规模多人标注数据或零样本场景下验证泛化能力。
 4. **递归误差累积。** 递归生成范式下，前期生成的运动作为后续条件，错误可能沿生成链传播，影响长序列多人运动的一致性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1874_FreeMotion_A_Unified_Framework_for_Number_free_Text_to_Motion_Synthesis/figures/003_Table_1.jpg]]
 *Table 1: Quantitative comparisons on the InterHuman test set. We run all the evaluations 20 times except MModality runs 5 times. ± indicates the 95% confidence interval. Bold indicates the best result*
-
-![[assets/figures/papers/paper_list_l1874_FreeMotion_A_Unified_Framework_for_Number_free_Text_to_Motion_Synthesis/figures/005_Table.jpg]]
 
 ![[assets/figures/papers/paper_list_l1874_FreeMotion_A_Unified_Framework_for_Number_free_Text_to_Motion_Synthesis/figures/006_Figure_3.jpg]]
 *Figure 3: Comparison with Intergen* on single and two-person motion generation. For single-person motion, we generate it with our re-annotated single description. For twoperson motion, we further leverage the original interactive descriptions. For better visualization, some pose frames are shifted to prevent complete overlap*
 
 ![[assets/figures/papers/paper_list_l1874_FreeMotion_A_Unified_Framework_for_Number_free_Text_to_Motion_Synthesis/figures/007_Figure_4.jpg]]
 *Figure 4: Qualitative results for generating three-person motions. We manually design some text prompts and feed them to our network for motion generation. For better visualization, some pose frames are slightly shifted to prevent completed overlap*
-
-![[assets/figures/papers/paper_list_l1874_FreeMotion_A_Unified_Framework_for_Number_free_Text_to_Motion_Synthesis/figures/008_Figure_5.jpg]]
-*Figure 5: Results of multi-person spatial control. We manually design some text prompts as well as the trajectories and leverage the integrated spatial control module to generate the results*
-
-
 
 ## 定位与知识库关联
 
@@ -366,8 +345,6 @@ $$p(\mathbf{x}^{1},...,\mathbf{x}^{n}) = p(\mathbf{x}^{1}) \prod_{i=1}^{n-1} p(\
 2. 如何抑制多人运动生成中的穿透问题？物理模拟器辅助训练或基于穿透的显式惩罚项可能是有效手段。
 3. 能否通过合成数据或物理模拟增强多人交互理解，使模型在仅双人标注数据的情况下更好地泛化到复杂多人场景？
 4. 递归生成范式下的错误累积问题如何缓解？引入双向生成（前后向条件）或全局一致性约束可能是解决方向。
-
-
 
 ## 原文 PDF
 

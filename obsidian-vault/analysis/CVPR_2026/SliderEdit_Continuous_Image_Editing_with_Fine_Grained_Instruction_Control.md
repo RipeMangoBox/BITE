@@ -60,8 +60,6 @@ claims:
 
 **方法谱系与知识库定位**：SliderEdit 建立在 FLUX-Kontext（Black Forest Labs, 2024）和 Qwen-Image-Edit 等指令式编辑模型之上，通过冻结基础模型、仅训练低秩适配器的方式，将固定强度编辑模型转化为连续可控框架。与文本到图像的属性控制方法（如 Concept Slider、Continuous Attribute Control）不同，SliderEdit 直接面向真实图像编辑任务，避免了反演适配带来的性能损失。其核心贡献在于首次为指令式图像编辑引入细粒度、解耦的连续强度控制机制。
 
-
-
 ### 指令式图像编辑的现状与困境
 
 以 **FLUX-Kontext**（Black Forest Labs, 2024）和 **Qwen-Image-Edit** 为代表的指令式图像编辑模型，已能根据自然语言指令对真实图像进行高质量的局部或全局修改。这些模型普遍采用多模态扩散 Transformer（MM-DiT）架构，将图像潜在 token 与文本指令 token 联合处理，通过流匹配或扩散目标学习编辑映射。然而，其控制范式存在一个根本性局限：**每条指令的编辑强度只能以“全有或全无”的方式施加**——用户要么接受模型对指令的完整诠释，要么完全不执行该指令，无法独立且连续地调节单条指令的编辑强度。
@@ -84,8 +82,6 @@ claims:
 实现这一目标的关键观察来自对 MM-DiT 架构内部表示的分析（Figure 2）：**每条指令对应的中间 token 嵌入是高度局部化的语义载体**——在指令 token 与空 token 嵌入之间进行插值，即可产生中间编辑强度。这表明，通过直接操纵目标指令 token 的表示，而非依赖全局引导信号，有可能实现指令级的独立控制。
 
 基于这一洞察，SliderEdit 提出了一种轻量级、可训练的连续控制范式：通过 **Partial Prompt Suppression（PPS）** 损失训练低秩适配器（LoRA），使其学会“中和”特定指令的视觉效应；训练完成后，该适配器即成为一条连续滑块——通过缩放适配器权重，实现从完全抑制到完全应用的平滑过渡，且每条指令拥有独立的控制维度。
-
-
 
 ## 核心方法与创新机理
 
@@ -132,8 +128,6 @@ $$\alpha = 1 - \beta$$
 
 SliderEdit 的轻量性是其创新的重要维度：仅需在冻结基础模型上训练少量低秩矩阵（1k–8k 样本，1,000 次迭代），即可将任意指令式编辑模型转化为连续可控框架。这种“即插即用”的设计避免了对大规模重训练或复杂反演技术的依赖，同时保持了基础模型的编辑质量。
 
-
-
 SliderEdit 的目标是在现有指令式图像编辑模型之上，构建一个轻量级、可训练的连续控制框架，使用户能够对每条编辑指令的强度进行独立、平滑的调节。其核心设计思想是：**多模态扩散 Transformer（MMDiT）中每条指令对应的中间 token 嵌入是高度局部化的语义载体，通过选择性抑制目标指令 token 的表示，并平滑缩放抑制强度，即可实现从完全抑制到完全应用的连续编辑轨迹**。
 
 ### Pipeline 总览
@@ -165,12 +159,8 @@ SliderEdit 的目标是在现有指令式图像编辑模型之上，构建一个
 
 在多指令场景下，每条指令拥有独立的缩放因子 $\alpha_i$，用户可独立调节各条指令的强度，从而在 $\gamma$ 维编辑空间中自由导航。这一设计将指令级图像编辑转化为一个**全局可训练的、解耦的连续控制问题**，而无需对基础模型架构做任何侵入式修改。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2029_https_arxiv_org_abs_2511_09715/figures/002_Figure_1.jpg]]
 *Figure 1: SliderEdit produces continuous edit trajectories in state-of-the-art instruction-based image editing models. Our method provides fine-grained and disentangled control over the intensity of edit attributes described in an instruction, allowing continuous transitions between editing strengths. Despite its effectiveness, SliderEdit is extremely lightweight and can be trained efficiently to transform a state-of-the-art instruction-based image editing model into a continuously controllable editing framework*
-
-
 
 ### 问题形式化
 
@@ -179,9 +169,6 @@ SliderEdit 的目标是在现有指令式图像编辑模型之上，构建一个
 ### 核心洞察：指令 Token 嵌入的局部语义承载
 
 方法设计的起点来自一个关键观察（Figure 2）：在多模态扩散 Transformer（MMDiT）的中间层，直接对目标指令对应的 token 嵌入与空填充 token 嵌入进行线性插值，即可产生中间编辑强度。这表明**每条指令对应的中间 token 嵌入是高度局部化的语义载体**，为后续的适配器设计提供了理论依据。
-
-![[assets/figures/papers/paper_list_l2029_https_arxiv_org_abs_2511_09715/figures/004_Figure_2.jpg]]
-*Figure 2: Instruction-token embedding interpolation for strength control. Interpolating between instruction and nulltoken embeddings produces intermediate edit strengths, demonstrating the potential for achieving fine-grained control through direct manipulation of intermediate instruction embeddings*
 
 ### 核心模块一：Selective Token LoRA (STLoRA)
 
@@ -233,13 +220,6 @@ $$\alpha = 1 - \beta$$
 
 适配器仅作用于 MMDiT 中所有 transformer block 的一个子集，训练数据仅使用 GPT-Image-Edit 数据集的 1k–8k 子样本，STLoRA 模型训练约 1,000 次迭代即可收敛。这一轻量级设计使得将任意指令式编辑模型转化为连续可控框架的成本极低。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2029_https_arxiv_org_abs_2511_09715/figures/012_Figure_8.jpg]]
-*Figure 8: Simplified Partial Prompt Suppression (SPPS). SPPS applies the same suppression objective as PPS but treats the entire edit prompt as a single instruction. During training, a second (bottom-row) forward pass is performed to obtain a neutralized image—either using an empty prompt*
-
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -282,21 +262,11 @@ SliderEdit 在两个主流指令式图像编辑基础模型（**FLUX-Kontext** �
 ![[assets/figures/papers/paper_list_l2029_https_arxiv_org_abs_2511_09715/figures/017_Figure_13.jpg]]
 *Figure 13: Qualitative Comparison with Baselines. While SliderEdit (GSTLoRA variant here) and Explicit Guidance produce highquality edits, Concept-Slider and Continuous Attribute Control perform poorly on real image editing, as they are primarily designed for text-to-image generation and rely on indirect inversion-based adaptation*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2029_https_arxiv_org_abs_2511_09715/figures/009_Table_1.jpg]]
 *Table 1: Quantitative results for single-instruction edits (γ = 1). SliderEdit yields smoother trajectories and better identity preservation*
 
-![[assets/figures/papers/paper_list_l2029_https_arxiv_org_abs_2511_09715/figures/011_Figure_7.jpg]]
-*Figure 7: Qualitative and quantitative comparison of GST-LoRA with CFG baselines. GSTLoRA shows smooth edit trajectories with gradual similarity changes, unlike Implicit and Explicit CFG, which exhibit abrupt transitions and greater identity drift*
-
 ![[assets/figures/papers/paper_list_l2029_https_arxiv_org_abs_2511_09715/figures/015_Figure_10.jpg]]
 *Figure 10: Qualitative results of STLoRA on a 3-instruction edit. The model demonstrates smooth and continuous control over the strength of each instruction in a disentangled manner*
-
-![[assets/figures/papers/paper_list_l2029_https_arxiv_org_abs_2511_09715/figures/007_Figure_5.jpg]]
-*Figure 5: Controllable zero-shot multi-subject personalization with STLoRA. STLoRA enables smooth adjustment of each instruction’s strength to generate coherent, evolving image sequences, supporting story-like visual editing. (Best viewed from top-left to top-right, then bottom-right to bottom-left)*
-
-
 
 ## 定位与知识库关联
 
@@ -340,8 +310,6 @@ SliderEdit 的技术路线位于以下几条研究脉络的交汇点：
 - **跨模态扩展。** 滑块机制能否扩展到视频编辑、3D 场景编辑等更具挑战性的生成任务中？这些任务对时序一致性和空间一致性的要求更高。
 - **极长多指令提示的鲁棒性。** 在指令数超过 5 条的极端场景下，STLoRA 的解耦能力和连续性是否仍能保持？PPS 损失在这种高维编辑空间中的优化难度值得深入研究。
 - **与其他可控编辑技术的融合。** SliderEdit 的连续滑块机制与基于注意力控制、跨注意力引导等方法是否可互补，形成更强大的编辑控制工具箱，是一个开放且有价值的方向。
-
-
 
 ## 原文 PDF
 

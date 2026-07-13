@@ -160,8 +160,6 @@ Null-TTA 的核心思想是将测试时对齐（Test-Time Alignment, TTA）的�
 - **分布级操控**：通过 CFG 的锚点 $\phi$ 直接平移生成分布，而非逐样本调整，保证了跨奖励的泛化能力。
 - **计算高效**：梯度仅需通过 U-Net 的交叉注意力层反向传播，无需遍历整个网络，GPU 内存占用和推理时间均优于主流基线方法（如 DNO，Tang et al., ICML 2025）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2345_https_arxiv_org_abs_2511_20889/figures/001_Figure_1.jpg]]
 *Figure 1: Evaluation of reward-optimisation (x-axes) vs over-optimisation (generalisation to held-out rewards on y-axes). Top/Bottom rows correspond to aligning with Aesthetic and HPSv2 target rewards respectively. Each ★ point corresponds to a particular baseline method, which together define the state-of-the-art pareto front (dashed line). For Null-TTA, each ○ point indicates the optimisation intensity (maximum inner steps*
 
@@ -262,8 +260,6 @@ Figure 3 展示了多目标优化（PickScore 与 HPSv2 的加权组合）的折
 ### 失败模式与局限
 
 尽管 Null-TTA 在主流文本条件扩散模型上表现优异，其适用性存在明确边界：该方法依赖分类器自由引导（CFG）中的空文本嵌入作为优化锚点，因此仅适用于使用文本条件且具有空文本嵌入的架构（如 Stable Diffusion），对非文本条件或未使用 CFG 的模型无效。此外，零阶梯度估计在极高维奖励函数下可能需要更多查询（实验中 K=4 扰动），更复杂的非可微目标可能需调整扰动策略。超参数（n_max、λ₂、γ）需针对不同奖励函数微调以获得最佳平衡，这在实际部署中增加了调参成本。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2345_https_arxiv_org_abs_2511_20889/figures/004_Table_2.jpg]]
 *Table 2: Computational comparison of Null-TTA and baseline TTA methods under the HPSv2 target. For each method, we report GPU memory usage, wall-clock time per generated image, and the resulting HPSv2 score. Null-TTA achieves stronger target-reward performance than baselines under similar inference budgets, while also exhibiting the lowest memory consumption*

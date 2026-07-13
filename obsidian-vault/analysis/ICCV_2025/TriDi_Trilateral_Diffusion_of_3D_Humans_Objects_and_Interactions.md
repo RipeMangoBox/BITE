@@ -48,8 +48,6 @@ claims:
 
 **方法定位** TriDi 属于**三维生成式 HOI 建模**这一新兴方向，区别于传统的回归式或检索式方法。其核心创新在于将扩散模型从单变量或双变量生成拓展至三变量联合分布学习，为下游应用（如场景填充、交互重建、文本驱动的交互编辑）提供了统一的概率框架。
 
-
-
 三维人体-物体交互（Human-Object Interaction, HOI）建模是计算机视觉与图形学的核心挑战，其目标在于理解并生成人与物体在三维空间中的联合行为。该问题涉及三个相互耦合的模态：**人体 H**（包含姿态、体型与全局位姿）、**物体 O**（全局 6-DoF 位姿）以及**交互 I**（接触模式与语义描述）。现有方法通常沿两个方向展开：一类方法以人体为中心，在给定物体条件下预测人体姿态；另一类则以物体为中心，根据人体动作推断物体位姿。然而，这些方法普遍存在一个根本性局限——它们仅建模单向或双向的条件分布（如 $p(\mathcal{H}|\mathcal{O})$ 或 $p(\mathcal{O}|\mathcal{H})$），而非三者之间的联合分布 $p(\mathcal{H}, \mathcal{O}, \mathcal{I})$。
 
 这一设计选择导致了若干关键缺口。首先，单向模型无法自然地处理多模态条件下的推理任务，例如同时给定部分人体信息和交互语义来恢复完整场景。其次，由于缺乏对交互模态的显式建模，现有方法难以保证生成结果在物理接触和语义层面的一致性。再者，确定性回归框架无法捕捉 HOI 数据中固有的多模态不确定性——同一物体条件下可能存在多种合理的人体姿态，反之亦然。
@@ -57,8 +55,6 @@ claims:
 扩散模型在图像与运动生成领域的成功为上述问题提供了新的解决思路。扩散模型通过逐步去噪过程学习复杂数据分布，天然具备表达多模态不确定性的能力。然而，将扩散模型应用于三维 HOI 生成面临两个核心挑战：其一，如何构建一个统一的架构来同时处理人体、物体和交互三种异构模态的联合分布；其二，如何设计有效的交互表示，使其既能编码细粒度的接触几何信息，又能融合高层语义控制。
 
 本文提出的 **TriDi**（Trilateral Diffusion）正是针对上述缺口而设计。TriDi 的核心动机在于：通过三边扩散框架直接建模 $p(\mathcal{H}, \mathcal{O}, \mathcal{I})$ 的联合分布，使模型能够在任意条件组合下进行推理与生成。同时，TriDi 将接触图与文本描述映射到共享的潜在空间作为交互表示，继承了接触几何的精确性与自然语言的灵活性。这一设计使得 TriDi 成为首个能够在全部七种条件模式下运行（即 $p(\mathcal{H},\mathcal{I}|\mathcal{O})$、$p(\mathcal{O},\mathcal{I}|\mathcal{H})$、$p(\mathcal{H},\mathcal{O}|\mathcal{I})$ 及其边际分布）的统一 HOI 生成模型，显著突破了现有单向专用模型的适用范围。
-
-
 
 ## 核心方法与创新机理
 
@@ -71,8 +67,6 @@ TriDi 的核心创新在于将人-物交互（HOI）建模从传统的单向条�
 在采样阶段，TriDi 引入**重建引导（reconstruction guidance）**机制，在每一步去噪时对生成的 $\hat{\mathcal{H}}, \hat{\mathcal{O}}, \hat{\mathcal{I}}$ 施加基于物理约束的梯度修正，进一步提升了生成结果中人与物的几何一致性。
 
 综合来看，TriDi 通过将生成建模从“单向条件”升级为“三边联合”、将交互表示从单一模态扩展为 Contact-Text 融合、以及引入重建引导，构成了其在 BEHAVE 基准上 COV 指标提升 +7.10（47.81 vs. GNet 40.71）的核心技术动因。
-
-
 
 TriDi 构建了一个**三边扩散（Trilateral Diffusion）**框架，统一建模人体（Human H）、物体（Object O）与交互（Interaction I）的联合分布 $p(\mathcal{H}, \mathcal{O}, \mathcal{I})$。其核心架构是一个基于 Transformer 的扩散模型，对三个模态的 token 化表征进行联合去噪，通过 token-wise attention 实现三向信息流动。
 
@@ -104,12 +98,8 @@ $$(\hat{\mathcal{H}}, \hat{\mathcal{O}}, \hat{\mathcal{I}}) := (\hat{\mathcal{H}
 
 整体 pipeline 可归纳为三个关键模块的串联：**多模态表征编码**（将人体参数、物体位姿、交互接触-文本映射为统一 token 空间）→ **三边联合扩散 Transformer**（对三个模态执行独立时间步加噪与联合去噪）→ **重建引导优化**（利用接触图约束细化去噪输出）。该设计使 TriDi 成为唯一能覆盖全部七种运行模式（含无条件生成、单条件、双条件及联合生成）的统一框架。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1778_TriDi_Trilateral_Diffusion_of_3D_Humans_Objects_and_Interactions/figures/002_Figure_2.jpg]]
 *Figure 2: TriDi Overview. TriDi is a Trilateral Diffusion for Human H (pose*
-
-
 
 ### 三变量联合分布建模
 
@@ -160,12 +150,8 @@ $$
 - **共享潜在空间**：交互模态的 Contact-Text 联合编码使模型同时具备几何精度与语义可控性。
 - **独立时间步采样**：三个模态各自采样扩散时间步，增强联合分布建模的灵活性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1778_TriDi_Trilateral_Diffusion_of_3D_Humans_Objects_and_Interactions/figures/003_Figure_3.jpg]]
 *Figure 3: Architecture of Contact-Text Interactions model. We train a mapping from the contact map*
-
-
 
 ## 实验与关键发现
 
@@ -221,33 +207,11 @@ TriDi 是唯一能够覆盖全部 7 种操作模态的方法，而基线方法�
 
 **Table S3** 将 TriDi 与 COINS 进行了对比。TriDi 在生成质量上表现更优，具体指标差距需查阅原表确认。这一比较表明三向扩散框架相对于基于拼接的多模型方案具有结构性优势。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1778_TriDi_Trilateral_Diffusion_of_3D_Humans_Objects_and_Interactions/figures/006_Table_2.jpg]]
-*Table 2: Geometrical Consistency of Generation. TriDi shows a high level of consistency both for human and object predictions. Our contact prediction indicates the networks have also learned to reason based on the interaction modality. For contacts, we show both the accuracy of contacts inferred from H and O meshes, as well as diffused contacts I (when available)*
-
-![[assets/figures/papers/paper_list_l1778_TriDi_Trilateral_Diffusion_of_3D_Humans_Objects_and_Interactions/figures/008_Figure_6.jpg]]
-*Figure 6: Scene populating. Using 3D scans from HPS [27], we validate the practicality of TriDi for scene population in various conditioning cases. On the left, we demonstrate conditional synthesis of human-object interactions. On the right, TriDi is used for the joint generation of humans and objects*
-
-![[assets/figures/papers/paper_list_l1778_TriDi_Trilateral_Diffusion_of_3D_Humans_Objects_and_Interactions/figures/009_Figure_7.jpg]]
-*Figure 7: Interaction reconstruction. DECO [78] annotates human H and contact I for the RGB image, while our TriDi recovers the object O, showing generalization on unseen data distributions*
-
 ![[assets/figures/papers/paper_list_l1778_TriDi_Trilateral_Diffusion_of_3D_Humans_Objects_and_Interactions/figures/020_Table_S.6.jpg]]
 *Table S.6: Ablation - Quality of Generated Distribution. Impact of augmentation, I diffusion, and guidance*
 
-![[assets/figures/papers/paper_list_l1778_TriDi_Trilateral_Diffusion_of_3D_Humans_Objects_and_Interactions/figures/021_Table_S.7.jpg]]
-*Table S.7: Ablation - Geometrical Consistency of Generation. Impact of augmentation, I diffusion, and guidance*
-
-![[assets/figures/papers/paper_list_l1778_TriDi_Trilateral_Diffusion_of_3D_Humans_Objects_and_Interactions/figures/016_Table_S.4.jpg]]
-*Table S.4: Evaluation of diversity and multi-modality for all sampling modes. The variance of the distribution generated by TriDi is on par with the variance of the GT data, which means that the generated samples are non-trivial. At the same time high contact accuracy (96.3 on average) and contact presence (98.4 on average) hint that generated interactions are plausible*
-
-![[assets/figures/papers/paper_list_l1778_TriDi_Trilateral_Diffusion_of_3D_Humans_Objects_and_Interactions/figures/022_Table_S.8.jpg]]
-*Table S.8: Penetration analysis*
-
 ![[assets/figures/papers/paper_list_l1778_TriDi_Trilateral_Diffusion_of_3D_Humans_Objects_and_Interactions/figures/004_Figure_4.jpg]]
 *Figure 4: Comparison with baselines. In the two left-most columns, we show three samples for p(H, I|O) and p(O, I|H) from BEHAVE and GRAB test sets. TriDi’s generations are better aligned with the condition, causing less interpenetration (e.g., for basketball), respecting fine-grained details (e.g., for smaller objects), and demonstrating more diversity for limbs not restricted by contacts (e.g., for yoga ball). On the right, TriDi is the only model that can sample from p(H, O, I)*
-
-
 
 ## 定位与知识库关联
 
@@ -301,8 +265,6 @@ TriDi 的适用边界由其设计选择决定：
 4. **计算效率**：三向扩散相较于单向或双向扩散的计算开销增加幅度，以及在实际部署中的可行性，论文未提供相关分析。
 
 **证据强度说明**：上述方法定位与关系分析主要基于论文自身陈述（confidence 0.85–0.98）。基线方法 GNet 的技术细节及外部对比的公平性需结合原始文献手动核实。
-
-
 
 ## 原文 PDF
 

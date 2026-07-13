@@ -50,8 +50,6 @@ CUPID通过一个统一的流模型框架解决了上述瓶颈。其核心洞见
 
 实验表明，CUPID在多个基准上显著超越现有方法：在Toys4k数据集上，中值Chamfer距离降至**0.236 mm**，较OpenLRM降低超过1 mm；输入视角的PSNR达到**30.05 dB**，相比整体重建模型提升超过3 dB；同时，相机姿态恢复精度极高，平均旋转误差仅**0.46°**，重投影误差为0.0009（归一化像素）。该方法无需后优化或微调即可自然扩展到多视图条件重建和场景级组合重建，展现出解耦建模的强扩展性。
 
-
-
 从单张二维图像恢复完整的三维物体是计算机视觉的核心难题。图像形成过程可形式化为 $\mathbf{I} = \mathcal{P}(\mathcal{O}, \pmb{\theta})$——渲染图像 $\mathbf{I}$ 由规范坐标系下的三维物体 $\mathcal{O}$ 与相机姿态 $\pmb{\theta}$ 共同决定。然而，从单一观测 $\mathbf{I}^{\mathrm{cond}}$ 反推 $\mathcal{O}$ 和 $\pmb{\theta}$ 是高度病态的：同一张图像可以由不同的物体-姿态组合产生，而遮挡区域的信息则完全缺失。
 
 现有方法在面对这一病态问题时，呈现出两种割裂的范式。**生成式方法**（如 **TRELLIS**，Zhao et al., arXiv 2024）利用扩散先验从图像生成多样化的三维内容，但普遍忽略相机姿态的显式建模，导致生成结果难以忠实于输入视图的几何与外观。**重建式方法**（如 **OpenLRM**，He et al., 2023；**LaRa**，Chen et al., CVPR 2024）追求像素对齐的输入视图一致性，但缺乏生成能力，无法合理补全被遮挡的区域，且通常将相机姿态固定为单位阵或依赖外部标定。点图回归方法（如 **VGGT**，Wang et al., arXiv 2025；**MoGe**，Lu et al., arXiv 2024）虽能恢复部分几何，但仅输出非完整的三维信息，无法提供可渲染的完整物体模型。
@@ -59,8 +57,6 @@ CUPID通过一个统一的流模型框架解决了上述瓶颈。其核心洞见
 这一割裂的根本瓶颈在于：**缺乏对物体与相机姿态的联合建模**。生成模型忽略姿态，无法建立三维结构与输入像素之间的精确对应；重建模型固守像素对齐，丧失了在遮挡区域进行合理生成的能力。二者各自解决了问题的一半，却无法兼顾几何保真度与生成完整性。
 
 CUPID 的动机正是弥合这一鸿沟：将三维重建重新定义为在统一流模型中对物体与姿态联合后验 $p(\mathcal{O}, \pmb{\theta} \mid \mathbf{I}^{\mathrm{cond}})$ 的估计问题。通过显式建模相机姿态并将其作为第二阶段的调节信号，CUPID 使生成过程既能保持多样性，又能通过姿态对齐的像素特征注入实现高保真的输入视图一致性——在单目重建中将 Chamfer 距离降至 0.236 mm，PSNR 提升超过 3 dB，同时无需任何后优化即可扩展到多视图与场景级重建。
-
-
 
 ## 核心方法与创新机理
 
@@ -73,8 +69,6 @@ CUPID的核心创新在于将3D生成与重建统一到一个**联合建模物�
 3. **从单物体到场景级组合重建的自然扩展**：由于CUPID显式建模了每个物体的3D-2D对应关系，它可以自然地处理多物体场景——通过遮挡感知训练（随机掩码微调）使模型能从部分可见物体生成完整3D，再通过3D-3D相似变换将各物体组合到统一场景坐标系中（Figure 4），无需后优化或额外对齐步骤。
 
 这些改进的因果链条清晰：**UV立方体 → 精确姿态恢复 → 姿态对齐特征注入 → 几何精度与纹理保真度双重提升**。在Toys4k数据集上，CUPID的中值Chamfer距离降至0.236 mm，显著优于OpenLRM的1.291 mm（Table 1）；输入视角PSNR达到30.05 dB，超越所有重建与生成基线（Table 2）。这一联合建模框架将原本割裂的生成多样性与重建忠实性统一到了一个端到端的条件采样过程中。
-
-
 
 CUPID 将生成式单目 3D 重建形式化为在观测约束下对物体与相机姿态联合后验的估计：给定条件图像 $\mathbf{I}^{\mathrm{cond}}$，目标是采样 $p(\mathcal{O}, \pmb{\theta} \mid \mathbf{I}^{\mathrm{cond}})$，且满足图像形成模型 $\mathbf{I}^{\mathrm{cond}} = \mathcal{P}(\mathcal{O}, \pmb{\theta})$（见公式 $\mathbf{I} = \mathcal{P}(\mathcal{O}, \pmb{\theta})$）。为实现这一目标，CUPID 采用了一个两阶段级联流模型，其核心创新在于将相机姿态显式地纳入生成过程，并通过姿态对齐的特征注入实现高保真重建。
 
@@ -104,12 +98,8 @@ $$\mathcal{L}_{\mathrm{CFM}}(\phi) = \mathbb{E}_{t,\mathbf{z}_0,\epsilon} \left\
 
 此外，该框架天然支持**遮挡感知的场景级重建**：通过对各物体进行遮挡感知调节（随机掩码微调）生成完整 3D 模型，再利用 3D-3D 相似变换组合为完整场景（Figure 4），无需后优化或微调即可实现。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2458_https_arxiv_org_abs_2510_20776/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of CUPID’s pipeline. From a single input image, CUPID first generates an occupancy and a UV cube in canonical space. Then, a Perspective-n-Point (PnP) solver (i.e., Eq. 2) recovers the camera pose. Using this recovered camera pose, we extract posealigned conditioning latents and visual features (i.e., Eq. 3), along with noisy structured latents, to generate the geometry and appearance features, which will be decoded to the 3D Gaussian splats and mesh*
-
-
 
 ### 3.1 问题形式化与条件流匹配框架
 
@@ -153,13 +143,6 @@ $$\{\mathbf{f}_i^{\mathrm{h}}\}_{i=1}^{L} = \mathrm{SlatEncoder}\left(\{\mathbf{
 
 最终，解码器将第二级流模型生成的潜在特征解码为3D高斯泼溅（3D Gaussian Splatting）或网格表示，支持高质量的任意视角渲染。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2458_https_arxiv_org_abs_2510_20776/figures/002_Figure_2.jpg]]
-*Figure 2: Results for generative 3D reconstruction from a single test image. Given an input image (top left), CUPID estimates camera pose (bottom left) and reconstructs 3D model (bottom right), re-rendering the input (top right). It is robust to changes in scale, placement, and lighting while preserving fine details, and supports component-aligned scene reconstruction (bottom row). All results are produced in seconds via feed-forward sampling of the learned model. See cupid3d.github.io for an immersive view of the interactive 3D results*
-
-
-
 ## 实验与关键发现
 
 ### 核心性能指标
@@ -172,9 +155,6 @@ CUPID在单目几何精度、输入视角一致性、完整3D质量三个维度�
 值得注意的是，CUPID在几何精度上匹配甚至超越了仅预测部分几何的点图回归方法。**VGGT**（Wang et al., arXiv 2025）虽然使用了真实物体掩码（可能高估精度），CUPID仍能在不依赖掩码先验的情况下达到可比性能。这表明CUPID的生成式框架并未牺牲几何精度，反而通过姿态对齐的特征注入实现了重建与生成的统一。
 
 输入视角一致性方面，CUPID在Toys4k上达到30.05 dB的PSNR，相比OpenLRM的约28.10 dB提升约1.95 dB，LPIPS降至0.089（Table 2）。这一提升直接归因于第二阶段姿态对齐调节机制：恢复的相机姿态使得模型能够精确地将体素投影到输入图像上，提取像素对齐的DINO特征和低级卷积特征，从而在保持生成多样性的同时大幅提升纹理保真度。
-
-![[assets/figures/papers/paper_list_l2458_https_arxiv_org_abs_2510_20776/figures/008_Table_2.jpg]]
-*Table 2: Input-view consistency. CUPID achieves superior input view consistency, producing accurate appearance alignment*
 
 完整3D质量评估采用新颖视角的CLIP（ViT-L/14）分数，CUPID在Toys4k上达到0.9291，优于基于2D扩散先验的**LaRa**（Chen et al., CVPR 2024）的约0.9142（+0.0149），表明生成的不可见区域在语义一致性和视觉质量上均具优势（Table 3）。
 
@@ -197,18 +177,9 @@ CUPID通过3D UV立方体重新参数化相机姿态，并利用PnP求解器从�
 
 1. **场景组合依赖分割掩码**：CUPID通过遮挡感知调节（随机掩码微调）支持从部分可见物体生成完整3D，并在场景级重建中通过3D-3D相似变换组合多个物体（Figure 4, Figure 10）。然而，真实图像中的掩码边界错误会传播至重建结果，导致物体边缘出现伪影或缺失。当前方法未提供自动分割方案，需要手动或外部模型提供掩码。
 
-![[assets/figures/papers/paper_list_l2458_https_arxiv_org_abs_2510_20776/figures/004_Figure_4.jpg]]
-*Figure 4: Component-aligned scene reconstruction. For a scene with multiple objects, our method can rebuild each object using the occlusion-aware 3D generator and then solve 3D–3D similarity transformation to accurately recompose the scene*
-
-![[assets/figures/papers/paper_list_l2458_https_arxiv_org_abs_2510_20776/figures/029_Figure_10.jpg]]
-*Figure 10: Additional examples of component-aligned scene reconstruction. For each example shown, the panels display: (top left) the input image, (top right or bottom left) the final rendered output, and (bottom) the reconstructed individual components, color-coded for clarity*
-
 2. **光照与外观未解耦**：模型未显式分离材质、光照与几何，对极端光照变化（如强阴影、镜面反射）的泛化能力有限。这意味着在野外图像中，重建的纹理可能包含烘焙的阴影或高光，而非真实的漫反射属性。
 
 3. **多视图朝向不一致**：虽然CUPID的解耦建模天然支持多视图条件（Figure 7），各视图独立恢复的3D朝向可能不一致，需要更先进的融合方案来解决跨视图的朝向歧义。
-
-![[assets/figures/papers/paper_list_l2458_https_arxiv_org_abs_2510_20776/figures/011_Figure_7.jpg]]
-*Figure 7: Multi-view conditioning. Our decoupled joint modeling naturally supports multi-view conditioning. When multiple input views are available, we fuse the shared view-agnostic object latent across flow paths (similar to MultiDiffusion [2]), enabling object and cameras refinement across all views. Top: inputs; Middle: reconstructed 3D object and camera poses; Bottom: rendered images and geometry*
 
 4. **训练数据偏差**：模型主要在合成渲染数据上训练，对真实世界图像中常见的模糊、噪声、非朗伯表面等复杂情况的鲁棒性尚需进一步验证。遮挡感知训练使用的合成随机掩码可能无法覆盖真实场景中的复杂遮挡模式。
 
@@ -227,16 +198,11 @@ CUPID通过3D UV立方体重新参数化相机姿态，并利用PnP求解器从�
 ![[assets/figures/papers/paper_list_l2458_https_arxiv_org_abs_2510_20776/figures/007_Table_4.jpg]]
 *Table 4: Ablation studies of pose-aligned conditioning*
 
-![[assets/figures/papers/paper_list_l2458_https_arxiv_org_abs_2510_20776/figures/012_Table_5.jpg]]
-*Table 5: Pose Reconstruction Fidelity. We evaluate the accuracy of camera poses recovered from the decoded UV volumes via the PnP algorithm. We report the Reprojection Error in normalized pixels, RRE, RTE, and RFov in degrees*
-
 ![[assets/figures/papers/paper_list_l2458_https_arxiv_org_abs_2510_20776/figures/009_Figure_6.jpg]]
 *Figure 6: Qualitative comparison of various pose-aligned conditioning. Our method (e) achieves the best visual quality in terms of color fidelity and detail*
 
 ![[assets/figures/papers/paper_list_l2458_https_arxiv_org_abs_2510_20776/figures/006_Figure_5.jpg]]
 *Figure 5: Qualitative comparison on input view consistency. We render the input view using its generated camera pose. For view centric methods (LRM, LaRa), we use ground-truth intrinsic for rendering as they do not model intrinsic. Our method produces the highestfidelity geometry and appearance; LRM hallucinates incorrect details, LaRa is overly blurry due to 2D diffusion inconsistencies, and 3D generation method OnePoseGen frequently fails to register pose reliably*
-
-
 
 ## 定位与知识库关联
 
@@ -283,8 +249,6 @@ CUPID 的设计打开了若干值得深入探索的方向：
 5. **偏离图像中心物体的处理**：当前方法假设物体位于图像中心附近，对大幅偏离中心的物体，UV立方体的生成和PnP求解可能退化。如何扩展模型以处理任意位置的物体，是多视图组合和场景重建的关键需求。
 
 6. **生成多样性与重建精度的权衡**：CUPID 展现了生成多样性（Figure 8），但在需要精确重建的场景（如工业检测）中，如何控制生成过程以平衡多样性与确定性，仍需进一步研究。
-
-
 
 ## 原文 PDF
 

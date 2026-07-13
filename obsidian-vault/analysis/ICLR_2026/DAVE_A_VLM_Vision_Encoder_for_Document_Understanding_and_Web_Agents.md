@@ -65,8 +65,6 @@ claims:
 
 **局限与开放问题**：在语义重的任务（如 RICO-SCA 屏幕分类）上略低于 SigLIP2，可能与嵌入维度翻倍导致单层 MLP 预测头难以有效池化有关；训练成本较高（32 块 H200 GPU）；未针对任意分辨率和纵横比优化；Web 代理设置中未融入历史动作信息。
 
-
-
 ### 文档理解与Web代理的视觉编码瓶颈
 
 视觉语言模型（VLM）在通用视觉问答和自然图像理解上取得了显著进展，但在文档理解与Web代理任务中仍面临根本性挑战。这类任务涉及对PDF、图表、用户界面截图和网页等结构化图像的理解，要求模型不仅识别图像中的文字和对象，还需精确感知其**空间位置、布局结构和层次关系**。然而，现有VLM广泛采用的视觉编码器（如SigLIP2、DinoV2）主要针对自然图像设计，其提取的特征表示在低层结构和空间信息方面存在天然缺陷。
@@ -102,8 +100,6 @@ $$\mathcal{L}_{\mathrm{MAE}} = \frac{1}{|\mathcal{M}|} \sum_{i \in \mathcal{M}} 
 3. **专用与通用特征的有机融合**：在保留通用编码器高层语义理解能力的同时，注入文档/Web专用的结构和空间特征，实现两类信息的互补。
 
 这些动机驱动了DAVE的两阶段预训练框架：第一阶段在20M无标签图像上使用改进的MAE-pixel损失进行自监督训练；第二阶段在约2M高质量标注数据上进行监督自回归预训练，同时集成通用编码器特征并进行多解码器权重合并。
-
-
 
 ## 核心方法与创新机理
 
@@ -143,8 +139,6 @@ $$\theta_{\mathrm{merge}}^{(j)} = \sum_{i=1}^{n} \alpha_i^{(j)} \theta_i^{(j)}, 
 
 DAVE 并非简单组合现有编码器。与直接级联 SigLIP2 和其他专用编码器（如 SigLIP2+DiT、SigLIP2+Pix2Struct）相比，DAVE 的集成训练和合并策略在 Doc/Web 基准上具有显著优势（Table 4c）；与直接 finetune SigLIP2 相比，DAVE 的两阶段预训练范式也带来明显增益（Table 4d）。这表明 DAVE 的创新在于**训练范式的系统性重构**，而非简单的特征拼接。
 
-
-
 ![[assets/figures/papers/paper_list_l34_https_openreview_net_forum_id_kgk0NqjsoW/figures/001_Figure_1.jpg]]
 *Figure 1: DAVE Overview. Stage 1 trains the vision encoder with a decoder using MAE, learning strong structural and spatial priors from unlabeled data. Stage 2 performs autoregressive pretraining on diverse tasks with different text decoders and fuses the high-level semantic features from SigLIP 2. After that, different encoders are combined into a single one by learning a merge coefficient using unsupervised representation alignment, while keeping the encoders frozen*
 
@@ -178,8 +172,6 @@ DAVE 的完整训练与推理流程如 Figure 1 所示，包含三个关键阶�
 ### 设计决策的因果逻辑
 
 整个框架的设计由一条因果链驱动：**低 patch 方差 → 修改 MAE 损失 → 获得稳定结构先验 → 集成通用编码器补偿语义 → 多解码器训练 + 权重合并实现解码器无关**。消融实验（Figure 2）验证了这一递进关系：从随机初始化文本解码器开始，逐步加入预训练 LLM、集成训练、权重合并，每个步骤都带来一致的性能提升。
-
-
 
 ### 模块一：自监督 MAE 预训练（Stage 1）
 
@@ -233,16 +225,11 @@ $$ \phi_{\mathrm{DAVE}}^{\mathrm{final}} = \phi_{\mathrm{merge}}(\{\alpha_i^{\st
 
 消融实验（Table 4a）表明，学习合并系数（Learned Coef）在文档和 Web 基准上显著优于无合并、平均合并和基于 Fisher 信息的启发式合并方法。此外，合并的 LLM 数量越多（从仅 Granite 到 Granite+Qwen+Phi），性能持续提升（Table 4b），验证了多解码器知识融合的有效性。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
 现有视觉语言模型（VLM）在文档理解和Web代理任务上的根本瓶颈在于：通用视觉编码器缺乏对结构化图像（文档、UI界面、图表）至关重要的低层结构和空间信息。文档和网页图像具有极低的patch间方差（Figure 3），导致标准MAE的归一化像素损失训练发散（Figure 4），无法有效学习布局和空间先验。DAVE通过两阶段因果干预解决此问题：**阶段一**采用直接像素重建损失（MAE-pixel）在20M无标签文档/网页图像上稳定学习结构和空间特征；**阶段二**通过多任务监督自回归预训练学习解析和定位能力，同时集成通用编码器SigLIP2保留高层语义，并通过蒸馏合并多解码器权重实现解码器无关性。
-
-![[assets/figures/papers/paper_list_l34_https_openreview_net_forum_id_kgk0NqjsoW/figures/006_Figure_3.jpg]]
-*Figure 3: Inter-patch standard deviation across different data sources*
 
 ### 主实验结果
 
@@ -293,25 +280,8 @@ $$ \phi_{\mathrm{DAVE}}^{\mathrm{final}} = \phi_{\mathrm{merge}}(\{\alpha_i^{\st
 | 集成通用编码器提升语义任务 | Table 10 | 高（0.95） |
 | RICO-SCA退化源于维度翻倍 | Table 3, Table 10 | 需进一步验证（推测性） |
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l34_https_openreview_net_forum_id_kgk0NqjsoW/figures/008_Table_5.jpg]]
 *Table 5: (b) Comparison of Different Merging LLMs*
-
-![[assets/figures/papers/paper_list_l34_https_openreview_net_forum_id_kgk0NqjsoW/figures/009_Table_6.jpg]]
-
-![[assets/figures/papers/paper_list_l34_https_openreview_net_forum_id_kgk0NqjsoW/figures/010_Table_7.jpg]]
-
-![[assets/figures/papers/paper_list_l34_https_openreview_net_forum_id_kgk0NqjsoW/figures/011_Table_5.jpg]]
-*Table 5: Training hyperparameters for MAE training*
-
-![[assets/figures/papers/paper_list_l34_https_openreview_net_forum_id_kgk0NqjsoW/figures/012_Table_6.jpg]]
-*Table 6: Evaluation results on classic document tasks*
-
-![[assets/figures/papers/paper_list_l34_https_openreview_net_forum_id_kgk0NqjsoW/figures/014_Table_7.jpg]]
-*Table 7: Training hyperparameters for supervised pretraining*
-
-
 
 ## 定位与知识库关联
 
@@ -366,8 +336,6 @@ DAVE 的三个核心机制在方法谱系中有明确的技术渊源与创新点
 4. **跨域泛化**：该视觉预训练范式是否可以推广到医学影像、工程图纸等视觉语言数据稀缺的其他垂直领域，Table 13 的跨域评估（CMMMU、DTCBench）仅提供了初步证据，需要更系统的验证。
 
 5. **数据与计算效率**：当前方案的数据和计算需求较高，如何在更少的无标签数据和更低的计算预算下获得可比的结构先验，是工程落地的核心挑战。
-
-
 
 ## 原文 PDF
 

@@ -171,8 +171,6 @@ $$\mathcal{L} = \mu_{\mathrm{recon}} \mathcal{L}_{\mathrm{recon}} + \mu_{\mathrm
 
 FILTR提供两种特征聚合变体（Figure 8左）：**L变体**仅使用编码器最后一个Transformer块的特征，**C变体**则将各中间块的特征求和后送入解码器。实验表明C变体通常能捕获更丰富的多尺度拓扑信息。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2080_https_arxiv_org_abs_2604_22334/figures/001_Figure_1.jpg]]
 *Figure 1: We evaluate the topological information implicitly captured by pretrained 3D point-cloud encoders through three distinct tasks. The first two tasks assess whether features produced by modern 3D encoders capture the number of connected components (top) and the genus (middle) of the underlying shapes. We introduce DONUT, a novel benchmark with topological labels, and an adapted probing mechanism. The third task (bottom) evaluates to what extent (i) information contained in persistence diagrams is present in encoder features, and (ii) how it can be extracted. To this end, we propose FILTR (Filtration Transformer), the first model that predicts persistence diagrams directly from pretrained, fro...*
 
@@ -248,8 +246,6 @@ $$\mathcal{L}_{\mathrm{diag}} = \frac{1}{|\bar{\mathcal{M}}|} \sum_{j \in \bar{\
 
 消融实验（Table 8, Figure 18）表明，对角线损失使未匹配预测精确收敛到对角线，从而无需依赖存在性概率阈值即可获得同等重建质量。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2080_https_arxiv_org_abs_2604_22334/figures/004_Figure_4.jpg]]
 *Figure 4: Encoder Probing Pipeline. We probe the features of each (frozen) transformer block on DONUT to predict the number of connected components and the genus*
 
@@ -303,8 +299,6 @@ $$\mathcal{L} = \mu_{\mathrm{recon}} \mathcal{L}_{\mathrm{recon}} + \mu_{\mathrm
 ### 探测实验补充
 
 **Table 1** 报告了各编码器在 DONUT 上的拓扑探测准确率。端到端训练的 RepSurf 在连通分量数（83.3%）和亏格数（57.7%）预测上均取得最高准确率，而冻结预训练编码器的探测性能普遍较低（Point-BERT CLS token 仅 57.2% 和 25.9%）。**Figure 5** 的逐层分析进一步揭示，不同编码器的拓扑信息分布在不同深度的层中，且亏格数预测（右图）的层间波动显著大于连通分量数预测（左图），说明高阶拓扑特征更难被编码器捕获。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2080_https_arxiv_org_abs_2604_22334/figures/011_Table_3.jpg]]
 *Table 3: Reconstruction results of FILTR. All the models are trained on DONUT, and evaluated on: a held-out test set from DONUT, ModelNet40 test set, a subset of ABC. We use the same configuration for all pretrained backbones, and report results obtained by training FILTR with either the features of the last transformer block (L), or a combination of the features from all transformer blocks (C) (see Fig. 8 (left)). We highlight PointNet++ for its remarkably higher reconstruction errors compared to other architectures. We discuss this point and provide training details in the Appendix*

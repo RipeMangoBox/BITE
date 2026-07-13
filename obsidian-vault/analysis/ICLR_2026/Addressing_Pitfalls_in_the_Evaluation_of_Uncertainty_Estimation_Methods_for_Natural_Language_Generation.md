@@ -300,17 +300,6 @@ $$\mathrm{AUROC}^{\mathrm{dist}} = \mathrm{AUROC}^{\mathrm{orig \cdot undist}} \
 4. **Elo评分的稳定性条件**：Elo系统的解释性依赖于大量比赛的均匀采样，在任务高度异构或数据稀疏时可能不稳定。Fig. 6展示了各实验子集上Elo评分的收敛过程，可作为稳定性判断的参考。
 5. **高级NLG设置的缺失**：链式推理（CoT）、多智能体对话、更长文本生成等设置尚未纳入评估框架，这些场景下的正确性评估面临更大的挑战。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_OxWnOV5q8w/figures/006_Figure_4.jpg]]
-*Figure 4: Agreement of ordering UE methods on TruthfulQA*
-
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_OxWnOV5q8w/figures/001_Table_1.jpg]]
-*Table 1: Evaluation protocols recently used for uncertainty estimation in NLG. Few works evaluate their methods beyond selective prediction on QA tasks and rely on approximate correctness functions or a small number of human correctness evaluations*
-
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_OxWnOV5q8w/figures/008_Table_3.jpg]]
-*Table 3: Accuracies of the models for evaluated datasets according to corresponding correctness functions. This table lists the dataset / model papers evaluated in this work. Nan values in SQUAD is expected behavior, as there are no correctness labels for the artificially unanswerable OOD part. Known-Unknown (Amayuelas et al., 2024) dataset generations were performed without accuracy computation as we used it strictly as an OOD detection dataset*
-
 ## 定位与知识库关联
 
 ### 当前评估协议的瓶颈与本文的定位

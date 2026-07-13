@@ -47,15 +47,11 @@ claims:
 
 在 HPatches 基准上，AsymLoc 以 0.13M 参数的学生模型（SiLK 教师）实现了 **0.84** 的单应性估计精度（ε=1），相比同等规模的对称标准流水线（0.80）提升了 **+0.04**（Table 1）。更广泛地，AsymLoc 在 Aachen 室外定位数据集上能够以数量级更低的推理成本，达到标准流水线约 93%–95.5% 的定位精度。效率–精度权衡分析进一步表明，AsymLoc 在极低参数量（低至 0.06M）下仍保持显著优于对称流水线的鲁棒性，验证了非对称蒸馏策略在边缘端视觉定位中的有效性。
 
-
-
 视觉定位（Visual Localization）是计算机视觉中的一项核心任务，旨在根据查询图像估计其在已知场景中的精确相机位姿。该技术广泛应用于增强现实、机器人导航和自动驾驶等领域。传统的视觉定位流程通常采用**对称架构**：使用同一个特征提取模型分别处理离线构建的数据库图像和在线捕获的查询图像。这种对称设计虽然简化了系统实现，却带来了一个根本性的矛盾——数据库端可以容忍较高的计算开销以追求极致精度，而查询端（尤其是部署在智能眼镜、无人机等边缘设备上时）则受限于严格的计算和功耗预算。
 
 现有工作主要沿着两个方向缓解这一矛盾。其一是直接设计轻量化特征提取模型，如 **SiLK** 和 **SuperPoint** 的小型变体，但这类方法在压缩模型容量的同时不可避免地牺牲了特征表示质量。其二是采用通用知识蒸馏技术将大模型的能力迁移至小模型，然而这些方法通常忽略了**匹配场景的非对称性**——在定位推理时，查询特征需要与数据库特征进行跨模型匹配，而非与同源特征匹配。这种“教师-学生”特征空间的不对齐会导致匹配质量下降，进而损害定位精度。
 
 AsymLoc 的核心动机正是显式建模并利用这种**非对称性**：在离线阶段使用大容量、高性能的教师模型提取数据库特征，在线阶段则使用经过专门蒸馏训练的小型学生模型处理查询图像。通过让蒸馏过程直接优化跨模型匹配质量，而非单纯追求特征空间的逐点对齐，AsymLoc 旨在以数量级更低的推理成本逼近对称大模型的定位精度。
-
-
 
 ## 核心方法与创新机理
 
@@ -84,8 +80,6 @@ $$\mathcal{L}_{\mathrm{KD}}^{ST} = \mathrm{KL}\big(\sigma_r(\bar{\mathbf{S}}^{TT
 标准蒸馏 baseline（Standard 0.13M）仅使用 $\mathcal{L}_{\mathrm{match}}$ 进行训练，缺少 $\mathcal{L}_{\mathrm{KD}}$ 项。在 HPatches 单应性估计（$\varepsilon=1$）上，SiLK 教师自身精度为 0.84，标准蒸馏学生为 0.80，而 AsymLoc 学生达到 0.84——**完全恢复教师精度**（Table 1）。这 +0.04 的增益直接归因于联合蒸馏损失对检测器-描述子耦合关系的建模，使得学生即使在极低参数量下也能保持与教师兼容的特征空间。
 
 **证据强度**：该结论由 Table 1 的完整消融实验支撑，置信度高。但需注意，论文未报告该增益的统计显著性检验，建议在跨数据集泛化时手动验证。
-
-
 
 AsymLoc 提出一种**非对称特征匹配蒸馏框架**，用于高效视觉定位。其核心设计思路是：在离线阶段使用一个大型、高性能的 **Teacher 模型** 对数据库图像进行特征提取；在线查询阶段则使用一个轻量级 **Student 模型** 对查询图像进行特征提取，从而在保持定位精度的同时大幅降低在线推理成本（见 Figure 2）。
 
@@ -121,8 +115,6 @@ $$\mathcal{L}_{\mathrm{KD}}^{ST} = \mathrm{KL}\big(\sigma_r(\bar{\mathbf{S}}^{TT
 - **训练阶段**：图像对 `(A, B)` + 单应性标签 → Teacher 与 Student 前向推理 → 计算 `L_match` + `L_KD` → 仅更新 Student 参数
 
 该框架的核心优势在于：通过显式建模 Teacher-Student 之间的不对称性，使紧凑的查询模型能够在保持与大型 Teacher 模型兼容的同时，实现实时设备端定位。
-
-
 
 AsymLoc 的核心设计围绕一个非对称蒸馏框架展开：教师模型（大容量）离线处理数据库图像，学生模型（轻量级）在线处理查询图像，两者输出的关键点特征需在匹配空间中兼容。为实现这一目标，框架由两个互补的监督模块构成——**几何匹配损失**（`L_match`）与**联合检测器-描述子蒸馏损失**（`L_KD`），最终损失为：
 
@@ -191,15 +183,8 @@ $$\mathcal{L}_{\mathrm{KD}}^{ST} = \mathrm{KL} \big( \sigma_r ( \bar{\mathbf{S}}
 
 > 注：上述公式均来自已验证的论文分析片段，未进行外推或推导。`L_match` 的具体数学形式（如是否使用加权交叉熵或 L1/L2 回归）在现有片段中未完整展开，若需精确表达式，需回溯原文 3.2 节进行人工确认。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2604_09445/figures/004_Figure_4.jpg]]
 *Figure 4: AsymLoc student–teacher asymmetric matching visualization. Symmetric student–student matching fails, whereas asymmetric student–teacher matching succeeds and closely reproduces the teacher–teacher correspondences*
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2604_09445/figures/010_Figure_6.jpg]]
-*Figure 6: Homography estimation accuracy on HPatches with a wide range of model sizes. Here we use SILK as the teacher*
-
-
 
 ## 实验与关键发现
 
@@ -241,30 +226,11 @@ Figure 4 展示了非对称匹配的关键定性证据。在对称的学生–�
 
 当前分析基于 Table 1 的汇总数据，以下方面需要手动核实原文细节：各数据集的误差棒或统计显著性检验结果；Aachen 数据集上不同场景（日/夜）的细分性能；教师模型置信度阈值 $\tau_d$ 的敏感性分析。此外，AsymLoc 在实时 SLAM 场景下的时序一致性和累计漂移影响尚未在现有证据中涉及。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2604_09445/figures/007_Table_2.jpg]]
 *Table 2: Analyzing the impact of*
 
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2604_09445/figures/009_Table_3.jpg]]
 *Table 3: Ablation study of the temperature parameters*
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2604_09445/figures/011_Table_4.jpg]]
-*Table 4: Analyzing the impact of λKD on HPatches and ScanNet Datasets. We report Homography Estimation Accuracy (HEA) for HPatches and Relative Pose Prediction AUC (RP-AUC) for Scan-Net*
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2604_09445/figures/008_Table_5.jpg]]
-*Table 5: Analyzing the impact of adding residual connections*
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2604_09445/figures/013_Table_6.jpg]]
-*Table 6: Homography estimation accuracy on HPatches (0.08M and 0.06M)*
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2604_09445/figures/015_Table_7.jpg]]
-*Table 7: Relative pose estimation accuracy on ScanNet (0.08M and 0.06M)*
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2604_09445/figures/014_Table_8.jpg]]
-*Table 8: Results with XFeat on ScanNet and MegaDepth*
-
-
 
 ## 定位与知识库关联
 
@@ -332,8 +298,6 @@ AsymLoc 在方法谱系中的定位可概括为：**面向视觉定位的非对�
 - **知识蒸馏**（FitNet, Attention Transfer, CRD 等）：AsymLoc 将蒸馏从分类/检测任务扩展到几何匹配任务，引入了检测器–描述子联合对齐机制。
 - **模型压缩**（剪枝、量化、紧凑架构设计）：AsymLoc 与模型压缩正交，可叠加使用以进一步降低 Student 的推理成本。
 - **视觉定位系统**（HLoc, PixLoc 等）：AsymLoc 可作为定位流水线的特征提取前端，与现有匹配和位姿估计模块无缝集成。
-
-
 
 ## 原文 PDF
 

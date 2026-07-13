@@ -59,8 +59,6 @@ claims:
 
 FlashDLM 表明，通过挖掘 DLM 去噪过程中的时间冗余和引入轻量外部一致性信号，可以在不修改模型权重、不增加训练成本的条件下，将扩散语言模型的推理效率推向实用水平。其局限性在于 FreeCache 依赖 KV 稳定性假设，该假设在不同架构和任务上的普适性尚待进一步验证；固定块大小策略可能非最优；评估范围目前限于两个 DLM 模型和有限任务类型。
 
-
-
 ### 扩散语言模型的推理瓶颈
 
 扩散语言模型（Diffusion Language Model, DLM）通过在离散 token 空间上迭代去噪生成文本，避免了自回归（AR）模型的逐 token 串行解码限制。然而，这一生成范式带来了显著的计算开销：在每一个去噪步骤中，DLM 需要对全序列长度 $L$ 的所有 token 执行前向传播，而 AR 模型在解码阶段仅需处理长度为 $l$ 的前缀（$l \ll L$）。如 Table 1 所示，多头注意力（MHA）模块的复杂度从 AR 的 $O(l^2)$ 膨胀为 DLM 的 $O(L^2)$，前馈网络（FFN）模块也从 $O(l)$ 增长至 $O(L)$。这一 $O(L)$ 倍的额外计算量直接导致 DLM 推理延迟显著高于同规模 AR 模型，尤其在长上下文场景下成为实用化的核心瓶颈。
@@ -82,8 +80,6 @@ FlashDLM 表明，通过挖掘 DLM 去噪过程中的时间冗余和引入轻量
 **观察二：轻量 AR 模型可提供免训练的一致性引导。** 与投机解码要求 AR 模型进行 token 级校正不同，AR 模型仅需对 DLM 的草稿 token 提供“是否一致”的二值信号，即可安全地并行揭晓多个 token。由于不涉及 token 生成或校正，一个轻量级的预训练 AR 模型（如 Qwen2.5-1.5B-Instruct）即可胜任此角色，其额外延迟开销极小。
 
 基于上述观察，本文提出 **FlashDLM**，包含两个免训练的互补技术：**FreeCache**（通过窗口化 KV 缓存消除已稳定 token 的重复计算）和 **Guided Diffusion**（利用轻量 AR 模型的一致性信号安全地并行揭晓 token）。两者协同作用，在几乎不损失准确率的前提下大幅降低 DLM 推理的计算量和去噪迭代次数。
-
-
 
 ## 核心方法与创新机理
 
@@ -146,17 +142,6 @@ Guided Diffusion 的运作机制（Section 3.2.2，Figure 3）：
 - **引导模型的规模权衡**：较大的引导模型（如 Qwen2.5-7B）可能提供更强的引导信号但增加延迟和显存（Table 6 显示总显存从 18.7GB 增至 31.9GB），较小的引导模型可能降低准确率——最优选择需根据具体场景权衡
 - **块大小策略**：FreeCache 采用固定块大小，Table 7 显示块大小 32 vs 64 会影响加速比和准确率的权衡，自适应动态调整策略有待探索
 
-
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_KUfKvlX3VY/figures/007_Figure_3.jpg]]
-*Figure 3: AR-guided Diffusion Model. The diffusion model performs a one-step diffusion process, followed by a one-time forward pass of the AR guider. The matched tokens are unmasked for the next step of diffusion*
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_KUfKvlX3VY/figures/005_Figure_2.jpg]]
-*Figure 2: Rationale behind the proposed FreeCache: The variation of K and V projections of clean tokens is small throughout the subsequent diffusion steps (measured via cosine similarity)*
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_KUfKvlX3VY/figures/003_Figure_2.jpg]]
-*Figure 2: (b) Latency-accuracy tradeoff. Pareto front comparing the standard autoregressive baseline with our KV-cache optimized method, highlighting substantial latency reductions at equivalent accuracy levels*
-
 FlashDLM 提出了一套免训练的推理加速框架，旨在解决扩散语言模型（DLM）在生成过程中因每步全序列前向计算导致的 O(L) 额外复杂度瓶颈，以及并行揭晓 token 时因因子化分布限制造成的语义不连贯问题。框架由两个正交且可叠加的模块构成：**FreeCache**（高效 KV 缓存）和 **Guided Diffusion**（自回归引导扩散），二者从计算量和去噪迭代次数两个维度协同降低端到端延迟。
 
 ### 核心瓶颈与因果机制
@@ -193,8 +178,6 @@ FlashDLM 的推理流水线由以下模块按序构成：
 - **中间状态**：FreeCache 维护冻结的 KV 投影缓存和动态收缩的活动窗口；Guided Diffusion 维护扩散模型的草稿 token 和 AR 模型的一致性检查结果。
 
 该框架的两个模块可独立或联合使用。FreeCache 单独使用即可在 Dream-7B-Instruct 上实现 4.42× 加速（准确率仅下降 2.28 个百分点，Table 2）；叠加 Guided Diffusion 后，在 PiQA 上可实现 34.1× 的端到端加速，且准确率略有提升（Table 3）。
-
-
 
 ### 问题形式化
 
@@ -250,8 +233,6 @@ $$\max(\log_{\text{diffusion}}) > \tau \times \max(\log_a)$$
 ### 两模块的协同
 
 FreeCache 和 Guided Diffusion 互补且可叠加：FreeCache 减少每步的计算量，Guided Diffusion 减少总去噪步数。在 Dream-7B-Instruct 上，两者联合在 PiQA 实现 34.1 倍加速（0.43s vs 14.62s），准确率反而提升 0.15 个百分点（Table 3）。较小的引导模型（如 Qwen2.5-1.5B-Instruct）即可提供足够信号，且加速比更高，因为其前向开销更低。
-
-
 
 ## 实验与关键发现
 
@@ -310,9 +291,6 @@ Table 5 和 Table 6 报告了引导扩散的 GPU 内存占用。以 Dream-7B-Ins
 ![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_KUfKvlX3VY/figures/010_Table_5.jpg]]
 *Table 5: LLaDA-8B-Instruct Guided Diffusion Memory Usage (GB)*
 
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_KUfKvlX3VY/figures/011_Table_6.jpg]]
-*Table 6: Dream-Instruct-7B Guided Diffusion Memory Usage (GB)*
-
 ### 失败模式与局限性
 
 1. **KV 稳定性假设的边界**：FreeCache 依赖 KV 投影在干净 token 上的时间稳定性（Figure 2 余弦相似度接近 1），但这一假设可能不适用于所有 DLM 架构或任务类型。当序列中存在长程依赖需要跨块更新时，冻结早期块的 KV 可能累积误差。
@@ -322,16 +300,6 @@ Table 5 和 Table 6 报告了引导扩散的 GPU 内存占用。以 Dream-7B-Ins
 3. **评估范围有限**：实验仅覆盖 Dream-7B-Instruct 和 LLaDA-8B-Instruct 两个扩散语言模型，以及有限的推理基准。方法在更大规模 DLM（数十亿参数以上）和更复杂任务（如多轮对话、代码生成）上的有效性仍需验证。
 
 4. **固定块大小的次优性**：FreeCache 使用固定块大小划分序列，无法根据局部 KV 稳定性或扩散不确定性动态调整，可能在“过度保守”（块太小，重计算多）和“过度激进”（块太大，近似误差大）之间无法达到最优平衡。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_KUfKvlX3VY/figures/001_Table_1.jpg]]
-*Table 1: Compute complexity of Transformer modules: AR decodes a prefix of length l per token vs. DLM processes full length L each denoising step*
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_KUfKvlX3VY/figures/014_Table_9.jpg]]
-*Table 9: LLaDA-8B-Instruct Guided Diffusion Memory Usage (GB)*
-
-
 
 ## 定位与知识库关联
 
@@ -362,8 +330,6 @@ FlashDLM 的引导扩散与投机解码形成范式对比：投机解码使用�
 3. 是否有其他免训练的引导策略可以使用，例如基于扩散模型自身的置信度或集成多个轻量级引导者？
 4. 引导扩散与投机解码的结合是否有增益——两者分别从起草效率和校正机制两个维度加速，是否存在互补性？
 5. 在高吞吐量生产环境中，引导扩散的 GPU 内存调度（DLM 模型与引导模型共存）如何优化，以最大化吞吐量而非单样本延迟？
-
-
 
 ## 原文 PDF
 

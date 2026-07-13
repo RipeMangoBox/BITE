@@ -53,8 +53,6 @@ claims:
 
 **主要结果**：在 8 任务添加基准上，OrthoReg 在所有基线上均实现了**一致且显著的性能提升**。以 CLIP ViT-B-32 为例，Non-linear FT + OrthoReg 的绝对准确率（Abs.Acc.）达到 73.41%（+3.09），归一化准确率（Norm.Acc.）达到 93.93%（+16.37）。在 CLIP ViT-L-14 上，ATT-FT + OrthoReg 达到 90.41%（+2.60）。在任务否定（Task Negation）场景下，OrthoReg 同样在保持控制任务准确率阈值的前提下，显著增强了对目标任务的遗忘效果。消融实验表明，注意力相关模块（qkvo–）上的正交正则化贡献了最大增益（ViT-B-16 上 +4.17 Abs.Acc.），而仅在 MLP 层上施加 OrthoReg 在小模型上可能带来轻微的性能下降。
 
-
-
 ### 任务算术与权重解耦
 
 现代深度学习的一个核心范式是：先在大规模数据上预训练基础模型，再针对下游任务进行微调。当需要将多个微调模型的能力合并为一个多任务模型时，**任务算术**（Task Arithmetic）提供了一条轻量路径——只需将各任务微调后参数与预训练参数的差值（即**任务向量**）进行加权求和，便可直接叠加到预训练模型上，无需访问原始训练数据或进行联合重训。
@@ -84,8 +82,6 @@ $$\theta_{\mathrm{MT}} = \theta_0 + \alpha \sum_{t=1}^{T} \tau_t$$
 然而，现实中的微调往往无法满足严格的 TFS——任务之间不可避免地共享部分特征，导致任务向量产生重叠和干扰。这引出了本文的核心问题：**即使特征重叠存在，能否通过主动约束权重更新的几何结构来促进解耦？**
 
 本文的理论贡献之一（Theorem 2）证明：**强制微调期间权重更新矩阵的内部正交性，即使在特征重叠的情况下，也能积极促进任务间的权重解耦**。这构成了 OrthoReg 方法的理论基础——通过在微调损失中引入正交正则项，约束权重更新矩阵 $\Delta W$ 的列向量彼此正交，从而在几何层面抑制跨任务干扰。如 Figure 3 所示，OrthoReg 通过在 Transformer 模块的线性层上施加 $\mathcal{L}_{\mathrm{ortho}}$ 损失，使权重更新呈现正交结构，即使不同任务使用了重叠的特征，也能有效缓解合并时的性能衰减。
-
-
 
 ## 核心方法与创新机理
 
@@ -139,8 +135,6 @@ $$\mathcal{L}_{\mathrm{ortho}}(\Delta\theta) = \sum_l \|(\Delta W^{(l)})^\top \D
 - **Attention-Only Fine-tuning**：仅微调注意力模块，缩小了可干预的参数空间，但缺乏显式解耦约束。
 
 OrthoReg 的独特定位在于：**它是一种即插即用的正则化策略，而非独立的微调范式**。它可以无缝嵌入上述任何微调方法中，通过修改训练损失这一最小侵入式接口（changed slot）来实现跨任务的权重解耦。
-
-
 
 ### 核心问题与解决路径
 
@@ -220,13 +214,8 @@ $$
 
 这两个定理共同构成了从理想条件到现实应用的理论桥梁：TFS 解释了预训练模型为何天然具备解耦潜力（Figure 1），而 OrthoReg 则提供了在特征重叠时强制实现这一结构的实用手段（Figure 3）。
 
-![[assets/figures/papers/paper_list_l2144_https_arxiv_org_abs_2604_17078/figures/001_Figure_1.jpg]]
-*Figure 1: Conceptual illustration of our central thesis: Task-Feature Specialization (TFS) is proposed and shown as the common cause that connects the geometric property of Weight Vector Orthogonality (WVO) with the functional property of Weight Disentanglement (WD). This paper establishes this connection in two ways: first, by proving that TFS, which gives rise to inherent orthogonality in the pre-trained model θ0, is a sufficient condition for ideal disentanglement; and second, by proposing a method that actively enforces this structure on weight updates (∆W ) that constitute τt to promote disentanglement in realistic scenarios*
-
 ![[assets/figures/papers/paper_list_l2144_https_arxiv_org_abs_2604_17078/figures/003_Figure_3.jpg]]
 *Figure 3: An overview of the OrthoReg method. It mitigates task interference caused by feature overlap by introducing*
-
-
 
 ### 核心模块
 
@@ -285,13 +274,6 @@ $$\mathcal{L}_{\mathrm{ortho}}(\Delta\theta) = \sum_l \|(\Delta W^{(l)})^\top \D
 
 **Theorem 2** 证明，通过对任务更新矩阵施加近似内部正交约束，OrthoReg 能够在特征重叠的现实场景下主动促进任务间的权重解耦。这一理论保证使得 OrthoReg 区别于仅依赖预训练模型固有正交性的方法，在特征重叠导致干扰时仍能有效工作。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2144_https_arxiv_org_abs_2604_17078/figures/002_Figure.jpg]]
-*Figure: (a) The distribution of angles be- (b) Statistical summary of angular tween column vector pairs in a deviations from 9 $0 ^ { \circ }$ across all linear weight matrix. layers of the model*
-
-
-
 ## 实验与关键发现
 
 ### 主要实验结果
@@ -332,30 +314,14 @@ OrthoReg 在任务添加（task addition）和任务否定（task negation）两
 
 3. **正交形式的局限性**：当前方法仅约束列向正交性（Gram 矩阵逼近单位阵），但理论分析表明更强的块正交结构（Corollary 1）可能提供更精细的解耦控制。这一方向有待进一步探索。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2144_https_arxiv_org_abs_2604_17078/figures/004_Table_1.jpg]]
 *Table 1: Task addition results on CLIP-based models. Performance of adding 8 task vectors on three architectures. Our proposed orthogonal regularization (+OrthoReg) is applied to several baselines, showing consistent improvements in both Absolute Accuracy (Abs.Acc.) and Normalized Accuracy (Norm.Acc.). An asterisk (*) denotes the best absolute accuracy for each model architecture*
 
 ![[assets/figures/papers/paper_list_l2144_https_arxiv_org_abs_2604_17078/figures/005_Table_2.jpg]]
 *Table 2: The minimum average Target Accuracy (Tar.Acc.) achievable while maintaining at least 95% of the zero-shot accuracy on the ImageNet control task (Con.Acc.). Our proposed orthogonal regularization (+OrthoReg) shows a consistent and significant improvement in forgetting the target task. An asterisk (*) denotes the best (lowest) target accuracy for each model architecture*
 
-![[assets/figures/papers/paper_list_l2144_https_arxiv_org_abs_2604_17078/figures/008_Figure_5.jpg]]
-*Figure 5: Cosine similarity heatmaps of task vectors for ViT-B-16. (a) Task vectors from Non-lin. FT show high similarity for several task pairs. (b) Task vectors trained with OrthoReg are significantly more orthogonal*
-
-![[assets/figures/papers/paper_list_l2144_https_arxiv_org_abs_2604_17078/figures/007_Figure_6.jpg]]
-*Figure 6: Analysis of hyperparameter sensitivity on ViT-B-16. (a) The impact of the regularization strength λ on the performance of LoRA-ATT. (b) The influence of the merging coefficient α on the final accuracy of the merged model. The blue line (TTA+OrthoReg) consistently outperforms the red line (baseline TTA) across a wide range of α values*
-
 ![[assets/figures/papers/paper_list_l2144_https_arxiv_org_abs_2604_17078/figures/011_Figure_8.jpg]]
 *Figure 8: The accuracy of merged models across the eight benchmark tasks for different ViT architectures. Each subplot shows the performance for a specific baseline method: zero-shot (gray), the baseline’s merged model (red), and the baseline enhanced with our orthogonal regularization (blue). The rows correspond to models: (a) ViT-B-16, (b) ViT-B-32, and (c) ViT-L-14*
-
-![[assets/figures/papers/paper_list_l2144_https_arxiv_org_abs_2604_17078/figures/012_Table_4.jpg]]
-*Table 4: The minimum average Target Accuracy (Tar.Acc.) achievable while maintaining at least 90% of the zero-shot accuracy on the ImageNet control task (Con.Acc.). Our proposed orthogonal regularization (+OrthoReg) shows a consistent and significant improvement in forgetting the target task. An asterisk (*) denotes the best (lowest) target accuracy for each model architecture*
-
-![[assets/figures/papers/paper_list_l2144_https_arxiv_org_abs_2604_17078/figures/013_Table_5.jpg]]
-*Table 5: The minimum average Target Accuracy (Tar.Acc.) achievable while maintaining at least 80% of the zero-shot accuracy on the ImageNet control task (Con.Acc.). Our proposed orthogonal regularization (+OrthoReg) shows a consistent and significant improvement in forgetting the target task. An asterisk (*) denotes the best (lowest) target accuracy for each model architecture*
-
-
 
 ## 定位与知识库关联
 
@@ -406,8 +372,6 @@ OrthoReg 的增益存在明确的**架构依赖**：
 3. **自适应正则化强度**：当前 $\lambda$ 依赖验证集手动选择。如何在不使用验证集的情况下，为每个任务自适应地确定最优正则化强度，是实现更自动化模型合并的关键问题。
 
 4. **与模型合并后处理方法的协同**：OrthoReg 在微调阶段塑造任务向量的几何结构，而现有的一些方法（如 TIES-Merging、DARE）在合并阶段进行后处理。两者的协同效应尚未被系统研究。
-
-
 
 ## 原文 PDF
 

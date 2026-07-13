@@ -51,8 +51,6 @@ claims:
 
 实验结果表明，TMR在HumanML3D和KIT-ML两个基准数据集上均显著优于TEMOS与Guo et al.。以HumanML3D全测试集协议为例，文本-动作检索的R@1从2.12提升至5.68，中位排名从173降至28。消融实验进一步证实：联合训练运动解码器分支、采用InfoNCE对比损失、以及基于文本相似度的负样本过滤，三者对性能提升均具有关键贡献。此外，TMR展现出零样本的“瞬间检索”能力，即使未经过时序定位训练，也能在长序列中定位与文本描述匹配的动作片段。
 
-
-
 ### 文本驱动的3D人体动作理解
 
 将自然语言描述与3D人体动作序列建立精确的跨模态对应关系，是计算机视觉与图形学领域的核心挑战之一。文本到动作检索（Text-to-Motion Retrieval）任务要求模型在给定自然语言查询时，从大规模动作库中按语义相似度对候选动作进行排序（Figure 1）。与传统的动作识别或分类任务不同，文本-动作检索面临两大固有困难：其一，动作描述具有高度细粒度性——例如“向前走三步然后挥右手”与“向前走两步然后挥左手”在语义上仅存在细微差异，却对应截然不同的动作序列；其二，自然语言与3D运动序列之间存在巨大的模态鸿沟，前者是离散的符号序列，后者是连续的高维时空数据。
@@ -80,8 +78,6 @@ $$\mathcal{L}_{\mathrm{NCE}} = -\frac{1}{2N} \sum_i \left( \log \frac{\exp S_{ii
 2. **过滤“错误负样本”**：在标准对比学习中，批次内所有非配对样本均被视为负样本。然而，在文本-动作检索场景中，两个不同的动作可能拥有语义高度相似的文本描述（例如“一个人慢慢走路”与“一个人缓慢步行”），将它们作为互斥的负样本会向模型传递矛盾的训练信号。TMR提出使用预训练的MPNet模型计算训练批次内文本对之间的语义相似度，并将相似度高于阈值（0.8）的负样本对从InfoNCE损失的计算中排除（Figure 2），从而避免对比学习中的错误排斥。
 
 通过上述两个改进，TMR在保留TEMOS运动解码器（生成分支）的前提下，实现了生成能力与检索能力的协同提升——解码器提供的重构损失迫使文本嵌入保留足够的运动细节信息，而对比损失则确保嵌入空间具有良好的全局可分性。
-
-
 
 ## 核心方法与创新机理
 
@@ -116,8 +112,6 @@ TMR 识别出对比学习中的一个关键隐患：**批次内的高相似度�
 ### 创新总结
 
 TMR 的三个改造形成了协同效应：InfoNCE 损失提供结构化对比信号，运动解码器分支保留文本信息的完整性，负样本过滤消除对比学习中的语义冲突。这一组合使 TMR 在 HumanML3D 数据集上，text-motion R@1 从 TEMOS 的 2.12 提升至 5.68，median rank 从 173 降至 28（Table 1），实现了跨模态检索性能的跨越式提升。
-
-
 
 TMR 在 **TEMOS**（基于 Transformer 的文本-动作生成模型）的基础上引入对比学习范式，构建了一个**联合动作检索与合成**的统一框架。其核心设计思路是：在保留 TEMOS 原有动作生成能力（解码器分支）的同时，通过对比损失显式优化跨模态嵌入空间的结构化程度，使模型既能高质量地合成动作，又能精准地从大规模库中检索匹配动作。
 
@@ -163,8 +157,6 @@ $$\mathcal{L}_{\mathrm{NCE}} = -\frac{1}{2N} \sum_i \left( \log \frac{\exp S_{ii
 | 训练任务 | 纯生成 | 纯检索 | 联合生成与检索 |
 
 消融实验（Table 3）验证了这些设计的必要性：InfoNCE 损失相比 margin 损失将 text-motion R@1 从 34.46 提升至 41.93；保留运动解码器分支进一步将 R@3 从 36.87 提升至 41.93。负样本过滤的阈值消融（Table 4）表明，0.8 的阈值在不过度丢弃负样本的前提下有效规避了错误排斥，使 R@3 从不过滤时的 36.02 跃升至 41.93。
-
-
 
 TMR 在 **TEMOS** 的 VAE 框架之上引入对比学习机制，形成“生成-检索联合训练”架构。其核心模块与损失函数如下。
 
@@ -217,13 +209,6 @@ $$\mathcal{L}_{\mathrm{TEMOS}} = \mathcal{L}_{\mathrm{R}} + \lambda_{\mathrm{KL}
 
 对比损失权重 $\lambda_{\mathrm{NCE}}=0.1$ 在实验中表现最优。该联合训练策略使模型在保持运动生成能力的同时，显著改善了跨模态嵌入空间的结构化程度。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2305_00976/figures/009_Figure_4.jpg]]
-*Figure 4: Moment retrieval: We plot the similarity between the temporally annotated BABEL text labels and the motions in a sliding window manner, and obtain a 1D signal over time (blue). We observe that a localization ability emerges from our model, even though it was not trained for temporal localization, and was not with the domain of BABEL labels. The ground-truth temporal span is denoted in green and the maximum similarity is marked with a dashed red line. More examples are provided in Appendix Figure A.2*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -256,10 +241,6 @@ Table A.2 通过交叉验证揭示了生成与检索的深层关系。以 TMR �
 
 Figure 4 展示了 TMR 在 BABEL 数据集上的零样本时序定位能力。尽管模型未针对时序定位进行训练，也未曾接触 BABEL 的动作标注，但通过滑动窗口计算文本-动作相似度，模型能自发地对齐文本描述与动作片段的时间边界。Figure A.1 的定量评估显示，在 IoU 阈值为 0.3 时定位准确率约 40%，IoU 阈值为 0.5 时降至约 20%，表明零样本能力虽已涌现但精度仍有较大提升空间。Figure A.2 补充了更多定性示例，包括超长序列（500 帧以上）上的挑战性案例。
 
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2305_00976/figures/016_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2305_00976/figures/017_Figure.jpg]]
-
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2305_00976/figures/015_Figure_4.jpg]]
 *Figure 4: Figure A.2. Moment retrieval (qualitative): To complement Figure 4 of the main paper, (a) we provide six additional temporal localization results for various text queries on the BABEL dataset. (b) We further visualize six challenging examples when querying on very long motion sequences, i.e., more than 500 frames (25 seconds). (a) (b)*
 
@@ -272,21 +253,8 @@ Figure 4 展示了 TMR 在 BABEL 数据集上的零样本时序定位能力。�
 
 更广泛的局限性包括：（1）训练数据限于有限的动作-文本配对，对野外动作的泛化能力受限；（2）检索阶段需存储全部候选动作的嵌入向量，内存占用随数据库规模线性增长；（3）动作生成分支在长时间序列或极端细节上可能出现脚步滑动等物理不真实现象；（4）瞬间检索为零样本涌现能力，定位精度远未达到实用水平。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2305_00976/figures/010_Table.jpg]]
-*Table: A.1. Percentage of filtered negatives per batch in KIT: We compute the average percentage of negative pairs per batch that are discarded from the loss computation due to text similarity. The percentage decreases with higher thresholds as expected (top), but the batch size does not have a significant impact (bottom)*
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2305_00976/figures/001_Figure_1.jpg]]
-*Figure 1: Text-to-motion retrieval: We illustrate the task of text-based motion retrieval where the goal is to rank a gallery of motions according to their similarity to the given query in the form of a natural language description*
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2305_00976/figures/005_Table_3.jpg]]
-*Table 3: Losses: We experiment with various loss definitions (i) with/without the motion reconstruction, and (ii) the choice of the contrastive loss between InfoNCE and margin-based. We see that InfoNCE [34] is a better alternative to the contrastive loss with Euclidean margin [18] (employed by Guo et al. [15]). The reconstruction loss through the motion decoder branch further boosts the results*
-
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2305_00976/figures/006_Table_4.jpg]]
 *Table 4: Filtering negatives: We compare several threshold values for filtering negatives from the loss comparison due to having similar texts. We observe that removing negatives based on text similarity above 0.8 (from a scale between [0,1]) performs well overall*
-
-
 
 ## 定位与知识库关联
 
@@ -339,8 +307,6 @@ TMR 的设计和实验验证主要围绕以下边界条件展开：
 - **对比学习范式的演进**：除 InfoNCE 外，SimCLR、BYOL、MoCo 等更先进的对比学习目标或架构是否能在文本-动作检索任务上带来额外收益？特别是 MoCo 的记忆库机制可能有助于缓解批次大小对负样本多样性的限制。
 
 - **多模态融合深度**：当前模型在嵌入空间层面进行跨模态对齐，更深层次的特征交互（如跨模态 Transformer）是否能进一步提升细粒度检索能力，同时保持检索效率？
-
-
 
 ## 原文 PDF
 

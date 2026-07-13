@@ -53,8 +53,6 @@ claims:
 
 **主要结果**：在零样本语义分割任务上，TIPSv2 ViT-L/14相比TIPS ViT-L/14在PASCAL VOC上提升+13.9 mIoU（30.5→44.4），在ADE20K上提升+3.9 mIoU（20.8→24.7）；相比SigLIP2 SO/14，VOC上领先+17.6 mIoU（Table 5）。消融实验表明，iBOT++单独贡献+14.1 ADE150 mIoU的提升（Table 4）。在全局图文检索、图像唯一任务（深度估计、语义分割等）上，TIPSv2在多数指标上取得最优或次优（Table 6, 7），且在4/6任务上超越更大规模的DINOv3（Table 8）。值得注意的是，TIPSv2在零样本分割中使用简单的上采样协议，而SILC和DINOv2依赖更昂贵的滑动窗口TCL协议，仍取得更优性能。
 
-
-
 ### 视觉-语言预训练中的密集对齐困境
 
 视觉-语言预训练（VLP）已在全局图像-文本对齐任务上取得显著进展，以**CLIP**（Radford et al., ICML 2021）为代表的对比学习方法能够学习强大的全局表示。然而，这些模型在**密集patch-文本对齐**方面表现薄弱——即图像中每个局部patch与对应文本概念之间的语义对应关系。这种局部对齐能力对于零样本分割、开放词汇检测等密集预测任务至关重要。
@@ -88,8 +86,6 @@ claims:
 - **多粒度文本增强**：引入Gemini合成的详细描述，增加文本监督的多样性。
 
 核心假设是：**通过对可见tokens施加直接的patch级监督，可以在不依赖蒸馏的情况下，使预训练模型获得与蒸馏学生相当甚至更强的密集对齐能力**。Figure 1通过零样本分割可视化直观展示了这一改进的显著效果。
-
-
 
 ## 核心方法与创新机理
 
@@ -133,8 +129,6 @@ $$\mathcal{L}_{\mathrm{iBOT}++} = - \sum_{i=1}^{N} h_t(f_t(I)_i)^T \log h_s(f_s(
 ### 创新之间的因果关系
 
 三项创新并非孤立存在。蒸馏分析（Table 2）是 iBOT++ 的直接灵感来源——蒸馏中“无 mask + 随机初始化学生”的成功经验被转化为预训练中的全 token 监督机制。Head-only EMA 则在保持 iBOT++ 有效性的前提下降低了训练开销。多粒度文本增强进一步丰富了语义监督信号，与 iBOT++ 的细粒度 patch 监督形成互补。三者共同构成了 TIPSv2 的完整预训练方案（Figure 3）。
-
-
 
 TIPSv2 的预训练框架建立在 TIPS（Maninis et al., ICLR 2025）之上，将对比图像-文本学习与自监督学习统一在一个端到端的训练流程中。整体损失函数由三个分量构成：
 
@@ -180,8 +174,6 @@ $$
 - patch 级损失**不使用 masking**（mask ratio = 0.0），并采用随机初始化学生编码器。
 
 Table 2 的消融实验表明，这一策略（无 masking + 随机初始化）是蒸馏出强 patch-text 对齐能力的关键：移除 masking 并将学生随机初始化后，ADE150 零样本分割 mIoU 从 5.9 跃升至 20.0（row (2) vs row (4)）。
-
-
 
 ### 3.1 预训练基础框架
 
@@ -271,18 +263,8 @@ $$\mathcal{L}_{\mathrm{iBOT++}} = - \sum_{i=1}^{N} h_t(f_t(I)_i)^T \log h_s(f_s(
 - 训练时对第二个 CLS token 随机交替使用 Gemini 详细标题和 PaliGemma 简洁标题。
 - 该策略在 Table 4 消融中进一步将 ADE150 mIoU 从 17.6 提升至 18.1，同时改善了 Flickr 图像检索性能。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2604_12012/figures/001_Figure_1.jpg]]
-*Figure 1: TIPSv2’s improvement to the masked image modeling pretraining strategy. As part of our complete TIPSv2 method, we introduce iBOT++ (bottom), a simple modification to the well-known iBOT [68] self-supervised objective (top-left), where visible tokens also contribute directly to the loss. This enhancement dramatically improves patch-text alignment, as demonstrated by zero-shot image segmentation results (top-right)*
-
 ![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2604_12012/figures/004_Table_2.jpg]]
 *Table 2: Initialization and masking ablations for distillation. Comparing TIPS ViT-L models re-trained with different strategies. We highlight best and second-best overall. Initialization is either from scratch (“Random”) or initialized from the teacher model (“Pretrained”). Update is either training ( ) or frozen ( ). The results show that removing masking and randomly initializing the student image encoder are critical for achieving strong patch-text alignment*
-
-![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2604_12012/figures/006_Table_3.jpg]]
-*Table 3: Zero-shot segmentation in pretraining. Comparing TIPS ViT-g with iBOT or iBOT++ methods, showing significant improvements with our novel iBOT++*
-
-
 
 ## 实验与关键发现
 
@@ -343,22 +325,6 @@ PCA特征图可视化提供了直观的对齐质量证据。Figure 5对比了ViT
 - iBOT++的最佳masking比例固定为75%，该值可能依赖于特定任务和架构组合。
 - 完全移除EMA会导致训练不稳定，head-only EMA仍需在投影头上保留EMA机制。
 - 多粒度文本增强依赖外部模型Gemini Flash的标题质量，其性能上限受制于该模型的描述能力。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2604_12012/figures/007_Table_4.jpg]]
-*Table 4: Ablation studies for TIPSv2’s pretraining technique. Ablations are cumulative, running on a fixed schedule of 100k steps at resolution 224, for fair comparisons. We highlight the best and second-best number of each column*
-
-![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2604_12012/figures/009_Table_5.jpg]]
-*Table 5: Dense image-text evaluations, where TIPSv2 outperforms others in all cases, even though SILC and DINOv2 use the more expensive TCL protocol [6]. We highlight the best and second-best number of each column*
-
-![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2604_12012/figures/002_Table_1.jpg]]
-*Table 1: Zero-shot segmentation with a large teacher model and its distilled student. Surprisingly, the TIPS ViT-L model, which is a student distilled from the TIPS ViT-g teacher, significantly surpasses it*
-
-![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2604_12012/figures/014_Table_9.jpg]]
-*Table 9: Applying iBOT++ to CLIP, on a ViT-L backbone. iBOT++ significantly enhances CLIP performance across several tasks, beyond what can be obtained with iBOT*
-
-
 
 ## 定位与知识库关联
 
@@ -439,8 +405,6 @@ iBOT++的最佳masking比例固定为75%（Table 12）。该比例对整体性�
 3. **蒸馏与预训练的统一理论**：论文发现蒸馏中移除masking能大幅提升对齐，并将这一发现转化为预训练中的iBOT++。但蒸馏和预训练在patch-text对齐上的内在联系尚未被完全揭示，是否存在更统一的框架来理解这两种训练范式，是值得深入的理论问题。
 
 4. **head-only EMA的稳定性机制**：为何投影头上的EMA足以维持训练稳定而编码器上的EMA可以完全移除？这一现象可能暗示自蒸馏中的表示一致性主要通过投影头而非编码器主干来维持，其理论解释有待进一步挖掘。
-
-
 
 ## 原文 PDF
 

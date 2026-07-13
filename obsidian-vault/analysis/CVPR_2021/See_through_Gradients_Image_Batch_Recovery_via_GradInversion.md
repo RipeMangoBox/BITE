@@ -80,8 +80,6 @@ GradInversion在ImageNet-1K数据集上使用ResNet-50架构取得了突破性�
 
 尽管取得显著进展，GradInversion仍存在若干局限：(1) 最优重建质量依赖目标批次的精确BN统计量，该信息在标准联邦学习设置中通常不可得；(2) 标签恢复假设批次内无重复标签，在小类别任务中可能受限；(3) 人脸恢复存在特征空间错位问题；(4) 文字与数字虽可检测但细节模糊；(5) 多种子联合优化与配准步骤带来额外计算开销。开放问题包括：梯度到原始数据的信息传输机制尚待量化分析；如何在不依赖BN统计量的前提下实现相似重建保真度；以及防御技术（如差分隐私梯度扰动）对GradInversion的抵御效果。
 
-
-
 ### 分布式训练中的梯度隐私假设
 
 联邦学习与分布式训练场景中，模型更新通常以批次平均梯度的形式在节点间传输。一个被普遍接受的安全假设是：梯度平均化操作会混淆单个样本的信息，使得攻击者无法从平均梯度中反推出原始训练数据。这一假设构成了许多隐私保护框架的理论基础——训练数据本身不出域，仅共享梯度信号，似乎足以防止数据泄漏。
@@ -107,8 +105,6 @@ GradInversion在ImageNet-1K数据集上使用ResNet-50架构取得了突破性�
 3. **优化稳定性**：如何克服深层网络优化地形的高度非凸性，使重建过程稳定收敛到自然图像而非噪声模式？
 
 GradInversion的提出，正是为了在这些维度上实现突破，从而揭示梯度平均化隐私假设的潜在风险。
-
-
 
 ## 核心方法与创新机理
 
@@ -165,8 +161,6 @@ $$\hat{\mathbf{x}}^{(t)} = \hat{\mathbf{x}}^{(t-1)} + \lambda(t)\Delta_{\hat{\ma
 上述创新并非孤立生效，而是形成了**层级递进的信息提取管道**：标签恢复提供准确的类别锚点→ℓ2梯度匹配约束合成图像的梯度信号→保真度正则化引入自然图像先验→组一致性正则化通过多路径配准融合互补信息。消融实验（Table 2）清晰展示了这一递进关系：仅梯度匹配（PSNR 10.753, LPIPS 0.919）→添加保真度（PSNR 12.058, LPIPS 0.655）→添加组一致性lazy版本（PSNR 12.524, LPIPS 0.554）→添加组一致性配准版本（PSNR 12.929, LPIPS 0.484），每一步均带来显著的定量与定性提升。
 
 值得注意的是，**最优重建质量依赖目标批次的精确BN统计量**（Table 4中BN_exact vs BN_approx的差异），这意味着在标准联邦学习设置中，若服务器无法获取批次级BN统计量，恢复保真度将有所下降。这一依赖关系既是方法有效性的关键支撑，也是其实际攻击场景中的限制因素。
-
-
 
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2104_07586/figures/001_Figure_1.jpg]]
 *Figure 1: (a) Inverting averaged gradients to recover original image batches (b) Overview of our proposed GradInversion method Figure 1: We propose (a) GradInversion to recover hidden training image batches with high fidelity via inverting averaged gradients. GradInversion formulates (b) an optimization process that transforms noise to input images (Sec. 3.1). It starts with label restoration from the gradient of the fully connected layer (Sec. 3.2), then optimizes inputs to match target gradients under fidelity regularization (Sec. 3.3) and registration-based group consistency regularization (Sec. 3.4) to improve reconstruction quality. This enables recovery of 224 ˆ 224 pixel ImageNet samples from...*
@@ -236,8 +230,6 @@ $$\hat{\mathbf{x}}^{(t)} = \hat{\mathbf{x}}^{(t-1)} + \lambda(t)\Delta_{\hat{\ma
 
 需要注意的是，最优重建质量依赖于目标批次的精确 BN 统计量（BN_exact），该信息在标准联邦学习设置中通常不可得。此外，优化过程因多种子联合训练和迭代配准而具有较高的计算开销。
 
-
-
 GradInversion将批次图像恢复形式化为一个从随机噪声到自然图像的优化过程。其核心由五个模块级联构成，每个模块对应一个关键公式。
 
 ### 3.1 整体优化目标
@@ -302,8 +294,6 @@ $$\hat{\mathbf{x}}^{(t)} = \hat{\mathbf{x}}^{(t-1)} + \lambda(t) \Delta_{\hat{\m
 
 其中 $\lambda(t)$ 为当前学习率，$\Delta_{\hat{\mathbf{x}}^{(t)}}$ 为Adam更新方向，$\eta \sim \mathcal{N}(0,1)$ 为标准高斯噪声，噪声缩放系数 $\alpha_n=0.2$。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置与评估协议
@@ -343,16 +333,9 @@ Table 2系统性地拆解了各损失项对重建质量的贡献，消融基线�
 
 Table 5（附录）进一步比较了梯度匹配损失函数的选择：ℓ2距离在梯度距离（3.835 vs 5.965）、符号匹配率（80.9% vs 79.0%）和余弦距离（0.110 vs 0.139）三个维度上全面优于余弦相似度，为损失函数设计提供了实证依据。
 
-
 ### 批量大小与安全边界
 
 Figure 6展示了批量大小对重建质量的影响：随着批量从1增大到48，恢复图像的视觉细节逐渐减少，但即使在批量大小为48时，物体类别和大致形状仍然可辨。Figure 8以图像可辨识精度（IIP）量化了这一趋势——批量大小为48时，约28%的样本仍可通过重建被正确识别。这一发现直接挑战了“大批量梯度平均化足以保护隐私”的普遍假设，揭示了当前联邦学习框架中梯度共享机制的系统性脆弱性。
-
-![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2104_07586/figures/012_Figure_6.jpg]]
-*Figure 6: Reduced amount of restored original visual features as batch size increases*
-
-![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2104_07586/figures/011_Figure_7.jpg]]
-*Figure 7: Varying level of information leakage at batch size 48 on ImageNet validation set. Each block containing a pair of (left) original sample and its (right) reconstruction by GradInversion. Figure 8: The Image Indentifiability Precision (IIP) curve of Grad-Inversion on ImageNet validation set, as a function of increasing batch size. Each point averaged per 256 randomly selected samples of varying batch sizes (240 samples for batch size 48). Nearest neighbors measured in avgpool feature space cosine similarity*
 
 ### 失败模式与局限性
 
@@ -363,12 +346,6 @@ Figure 6展示了批量大小对重建质量的影响：随着批量从1增大�
 3. **精确BN统计的依赖**：最优重建质量依赖于目标批次的精确BN统计量（$\text{BN}_\text{exact}$），而在标准联邦学习设置中，服务器通常只能访问全局BN统计量（$\text{BN}_\text{approx}$）。使用近似BN统计量会导致重建质量下降，这限制了该方法在实际攻击场景中的直接适用性。
 4. **计算开销**：8种子联合优化配合周期性RANSAC-flow配准显著增加了计算负担，使得该方法在实时攻击场景中的应用受限。
 5. **泛化性待验证**：实验主要局限于ImageNet和ResNet-50架构，对于其他数据分布（如医学影像、文本嵌入）和更深网络（如ResNet-101）的泛化性能尚未得到充分检验。
-
-
-
-
-
-
 
 ## 定位与知识库关联
 
@@ -415,8 +392,6 @@ GradInversion揭示的深层问题为后续研究指明了方向：
 ### 知识库定位总结
 
 GradInversion在梯度反转攻击的知识谱系中占据关键位置：它首次证明了在复杂深度网络和大批量高分辨率场景下，梯度平均化不足以提供有效的隐私保护。该方法将此前分散在单图像反转（DLG/iDLG）、ImageNet尺度重建（Geiping et al.）和数据自由合成（DeepInversion）中的技术要素系统整合，并通过创新的组一致性正则化突破了批量场景的核心瓶颈。其成功不仅推动了攻击技术的发展，更对联邦学习等分布式训练框架的隐私保护假设提出了根本性质疑。
-
-
 
 ## 原文 PDF
 

@@ -75,15 +75,11 @@ claims:
 
 GSCNN属于**双流解耦架构**，与依赖单流隐式建模形状的方法（如DeepLab系列、PSPNet）形成根本性区别。其门控交互机制区别于简单的跳跃连接或特征拼接，引入了基于高层语义注意力的自适应滤波。在知识谱系上，该方法融合了多任务学习（边界检测+语义分割）、注意力机制和结构正则化的思想，为语义分割中的形状-外观解耦提供了可复用的范式。
 
-
-
 语义分割是计算机视觉的核心任务，要求为图像中的每个像素赋予类别标签。近年来，基于全卷积网络（FCN）的方法在分割精度上取得了显著进展，但一个根本性瓶颈始终存在：**标准分割网络将颜色、纹理和形状信息混合在单个深层CNN中统一处理，忽略了形状信息对精细边界和小物体的特殊重要性**。这种隐式处理方式导致两个典型问题：一是物体边界模糊，分割掩码在边缘处缺乏锐利度；二是细小物体（如电线杆、交通标志、行人）容易被遗漏或分割不完整。
 
 现有主流方法——包括 **DeepLabV3+**（Chen et al., ECCV 2018）、**PSPNet**（Zhao et al., CVPR 2017）等——虽然通过空洞卷积、空间金字塔池化等机制扩大了感受野，但其架构本质上仍是单流编码器-解码器结构，形状信息与外观信息在特征提取过程中始终纠缠在一起。这种“隐式形状编码”使得网络难以在保持全局语义一致性的同时，精确定位物体边界。
 
 Gated-SCNN 的核心洞察在于：**显式分离形状处理流，并采用门控交互与对偶任务正则化，能够有效提升分割边界质量和对细小物体的识别精度**。具体而言，该方法引入一个独立的“形状流”（Shape Stream），专门处理边界相关信息，并通过门控卷积层（GCL）从常规流的高层语义中提取注意力来滤除形状流中的噪声，实现形状与外观的解耦处理。这一设计使得网络在 Cityscapes 验证集上达到 80.8% mIoU，较 DeepLabV3+ 提升 2.0 个百分点；在 3 像素阈值下的边界 F-score 达到 73.6，提升约 3.9 个百分点；对于细长物体，IoU 提升最高达 7%。
-
-
 
 ## 核心方法与创新机理
 
@@ -131,8 +127,6 @@ $$\mathcal{L}^{\theta\phi,\gamma} = \lambda_1 \mathcal{L}_{BCE}^{\theta,\phi}(s,
 
 消融实验（Table 3）证实：在 ResNet-101 基线上，单独添加形状流和 GCL 模块后，mIoU 提升 2.0 个百分点，边界 F-score（5px）提升 3.2 个百分点。进一步加入对偶任务损失后（Table 4），所有阈值下的边界 F-score 均有提升，尤其在严格阈值（3px）下提升约 3 个百分点。这些结果表明，显式形状解耦与门控交互是性能提升的核心因果机制。
 
-
-
 Gated-SCNN (GSCNN) 提出了一种**双流架构**，核心思想是将形状信息从常规语义分割网络中**显式解耦**为独立的处理分支，从而解决标准单流网络因混合处理颜色、纹理和形状而导致的边界模糊与小物体分割不佳的问题。
 
 ### 双流架构总览
@@ -175,8 +169,6 @@ $$\mathcal{L}^{\theta\phi,\gamma} = \lambda_1 \mathcal{L}_{BCE}^{\theta,\phi}(s,
 - **最终输出**：融合模块生成的逐像素语义分割预测。
 
 整个框架的关键在于：形状流仅增加约 0.29% 的参数量（Table 5），却通过显式的形状-外观解耦，带来了显著的边界质量和小物体分割精度提升。
-
-
 
 Gated-SCNN 的核心架构由**常规流（Regular Stream）**、**形状流（Shape Stream）** 和**融合模块（Fusion Module）** 三部分级联构成（Figure 2）。常规流可采用任意标准分割骨干网络（如 ResNet-101），负责提取密集的语义特征；形状流则通过一组残差块和门控卷积层（Gated Convolutional Layer, GCL）专门处理边界相关信息，并在融合前接受显式的边界监督。
 
@@ -230,8 +222,6 @@ $$\frac{\partial \arg\max_k p(y^k)}{\partial \eta_i} = \nabla_{\eta_i} \frac{\ex
 
 融合模块采用空洞空间金字塔池化（ASPP）结构，将常规流的多尺度特征与形状流输出的边界图进行融合，最终产生语义分割预测。该设计保留了多尺度上下文信息，同时注入了显式的形状先验。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能对比
@@ -278,16 +268,6 @@ Gated-SCNN 在 Cityscapes 验证集上取得了 **80.8% mIoU**，相比 DeepLabV
 ![[assets/figures/papers/paper_list_l50_https_arxiv_org_abs_1907_05740/figures/009_Table_4.jpg]]
 *Table 4: Effect of the Dual Task Loss at difference thresholds in terms of boundary quality (F-score). ResNet-101 used in regular stream*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l50_https_arxiv_org_abs_1907_05740/figures/004_Figure_3.jpg]]
-*Figure 3: Illustration of the crops used for the distance-based evaluation*
-
-![[assets/figures/papers/paper_list_l50_https_arxiv_org_abs_1907_05740/figures/010_Table_5.jpg]]
-*Table 5: Performance improvements and the percentage increase in the number of parameters due to the shape stream on different base networks*
-
-
-
 ## 定位与知识库关联
 
 ### 与基线方法的关系
@@ -321,8 +301,6 @@ GSCNN 的设计思想——通过门控机制解耦形状与外观——为后�
 3. **超参数的自动化调整**：双任务正则化中的超参数 λ₃ 和 λ₄ 对不同数据集和场景的鲁棒性如何？是否存在自适应的调整策略，使模型能根据数据特性自动平衡边界损失与语义损失？
 4. **弱监督与自监督扩展**：在缺乏精细边界标注的数据集上，如何迁移或自监督训练形状流？例如利用弱边界标注（如 bounding box）或通过自监督预训练获取边界先验，是降低标注依赖的潜在路径。
 5. **实时性优化**：尽管形状流仅增加约 0.29% 的参数量（Table 5），但其额外的计算开销在实时场景（如自动驾驶）中是否可接受，以及能否通过架构剪枝或知识蒸馏进一步压缩，仍需探索。
-
-
 
 ## 原文 PDF
 

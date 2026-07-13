@@ -54,8 +54,6 @@ claims:
 
 在方法谱系上，本工作位于**单目HOI重建**与**物理仿真引导的人体运动生成**的交叉点。与纯运动学方法（如VisTracker）相比，它引入了物理约束以消除穿透与浮动；与通用物理模仿方法（如InterMimic）相比，它通过自适应采样和双重传播机制专门解决了噪声运动学下的策略学习难题。该框架目前仍受限于初始运动学重建质量，且仅支持单物体、接触动态相对简单的场景，向多物体、多人及场景感知交互的扩展是未来的重要方向。
 
-
-
 ### 单目视频人-物交互重建的物理合理性鸿沟
 
 从单目视频中恢复人与物体的三维交互（HOI）是计算机视觉与具身智能交叉领域的核心挑战。近年来，基于运动学的方法（kinematic reconstruction）在从单目视频估计人体姿态、物体位姿以及二者联合运动方面取得了显著进展，例如 **VisTracker**（Xie et al., CVPR 2023）能够在全局坐标系中重建人-物交互序列。然而，这些运动学重建结果普遍存在严重的物理不合理性：物体漂浮（floating）、穿模（penetration）、接触抖动（jittering）等问题几乎不可避免。如 Figure 1 所示，从视频输入得到的运动学估计往往包含错误的接触配置，物体悬浮在空中或嵌入人体内部，与真实物理世界的行为严重偏离。
@@ -83,8 +81,6 @@ claims:
 3. **运动学更新**：将仿真器产生的物理合理状态用于更新对应帧的运动学参考，使后续回滚的跟踪目标逐步从“噪声运动学”转变为“物理合理运动学”，从而打破噪声对策略训练的负反馈循环。
 
 通过这一机制，物理合理的状态如同“涟漪”一般从可靠帧向两侧扩散，最终覆盖整个序列（Figure 3）。实验表明，该方法在BEHAVE和InterCap两个标准HOI基准上，相比运动学基线VisTracker在接触率、物体漂浮、物体抖动等物理合理性指标上取得了显著提升（Table 1），同时大幅超越了物理基线InterMimic的成功率（Table 2）。消融实验进一步验证了自适应采样、双重传播和运动学更新每个组件的关键作用（Table 3, Figure 6）。
-
-
 
 ## 核心方法与创新机理
 
@@ -122,8 +118,6 @@ claims:
 
 三者形成闭环：自适应采样识别可靠帧 → 双重传播从可靠帧向全序列扩散 → 运动学更新将扩散结果固化为新的跟踪目标，使策略在噪声严重的视觉重建中逐步“自举”出完整的物理合理交互序列。
 
-
-
 本文提出一种两阶段流水线，目标是从单目视频中恢复物理上合理的人-物交互（HOI）序列。核心思想是：将现成的运动学重建作为含噪声的初始化，然后在物理仿真器中通过强化学习（RL）训练跟踪策略，利用自适应采样与双重传播机制逐步纠正噪声，最终输出物理一致的交互序列。
 
 ### 两阶段流水线概览
@@ -151,13 +145,6 @@ claims:
    - **运动学更新**：将成功回滚片段生成的物理状态用于更新对应帧的运动学参考。后续迭代的回滚从更新后的更优质状态初始化，并以此为跟踪目标，使策略逐渐摆脱原始噪声的影响。
 
 通过多轮“传播-更新”循环，物理合理状态从可靠帧向全序列扩散，最终恢复整个 HOI 序列（Figure 3）。这一设计使策略能够从极度噪声的视觉重建中学习，并在整个序列上输出物理上合理的人-物交互。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1078_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Recovering_Physi/figures/001_Figure_1.jpg]]
-*Figure 1: Physically plausible reconstruction of human-object interactions from monocular video. Given an input video, we start from a noisy kinematic reconstruction (e.g., incorrect contact, floating objects, etc). Then, we optimize a policy for this sequence that can rollout a physically plausible version of the observed interaction*
-
-
 
 ### 两阶段流水线概览
 
@@ -204,8 +191,6 @@ $$\mathbf{r}_t = \mathbf{r}_t^{\mathrm{h}} * \mathbf{r}_t^{\mathrm{o}} * \mathbf
 **双重传播**：同时训练前向策略和反向策略，分别执行前向和反向回滚。前轮回滚中成功部分生成的物理合理状态，用于**更新**对应帧的噪声运动学估计；后续回滚则从这些改进后的状态初始化。通过多轮迭代的“传播-更新”循环，物理合理状态逐渐覆盖整个序列，最终两条策略均能重建完整的物理一致HOI序列。
 
 **运动学更新**的关键在于：更新后的运动学不仅用作下一轮回滚的初始化，还**同时作为跟踪目标**。消融实验证实，若仅用于初始化而不更新跟踪目标，策略仍试图模仿原始噪声运动学，性能显著下降（Table 3, Figure 6）。
-
-
 
 ## 实验与关键发现
 
@@ -262,18 +247,8 @@ Table 3 在 BEHAVE 数据集上系统消融了本方法的三个核心设计组�
 
 3. **CD 指标的轻微退化。** 如 Table 1 所示，物理合理性提升以轻微牺牲 3D 几何精度为代价。对于某些对几何精度要求极高的应用（如精确的动作捕捉复现），这一权衡可能需要进一步优化。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1078_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Recovering_Physi/figures/005_Figure_4.jpg]]
 *Figure 4: Qualitative comparison with the kinematics-based method [44]. Our method successfully resolves the issues of contact floating and penetration present in the baseline, producing physically plausible human-object interaction reconstructions*
-
-![[assets/figures/papers/paper_list_l1078_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Recovering_Physi/figures/007_Figure_5.jpg]]
-*Figure 5: Qualitative comparison with InterMimic [48]. InterMimic often struggles to recover the correct contact configuration, due to lack of contact in the early phase of the sequence (left) or committing to an unnatural contact pose that allows partial completion but does not match the interaction in the video (right). In contrast, our method reconstructs the full sequence with physically plausible contact. These improvements stem from our adaptive sampling and dual propagation with kinematics update, which enable the policy to overcome noisy visual inputs and maintain realistic interaction dynamics*
-
-![[assets/figures/papers/paper_list_l1078_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Recovering_Physi/figures/009_Figure_6.jpg]]
-*Figure 6: Qualitative results from the ablation study. Without using the kinematic update as the tracking target, the policy attempts to imitate the noisy kinematic states, making it difficult to learn how to pick up the box, since there is no human-object contact during the pickup phase (second frame). In contrast, when the kinematic update from the backward rollouts is used as the tracking target, the policy successfully learns to grasp the box and complete the subsequent actions*
-
-
 
 ## 定位与知识库关联
 
@@ -324,8 +299,6 @@ Table 3 在 BEHAVE 数据集上系统消融了本方法的三个核心设计组�
 
 1. **端到端视频到动力学系统**：能否直接从像素联合推断几何与物理约束，替代当前的两阶段流水线？这需要解决视觉特征与物理状态表示的对齐问题，以及端到端训练中仿真器不可微的挑战。
 2. **泛化到复杂交互场景**：如何将自适应采样与双重传播机制推广到多物体、多人交互，以及更动态的接触模式（如传递、抛接）？这涉及状态空间扩展、多智能体策略协调以及接触图建模等子问题。
-
-
 
 ## 原文 PDF
 

@@ -50,8 +50,6 @@ claims:
 
 在50对跨类别源-目标物体上的实验表明，MorphAny3D 在多项指标上取得最优或接近最优结果：FID 达 111.95（较最优基线 FreeMorph 降低 52.73），感知路径长度（PPL）为 2.47（与最优的 MorphFlow 仅差 0.06），路径方向方差（PDV）为 0.0006，美学评分（AS）达 81%，用户偏好（UP）达 86.73%。消融实验进一步验证了各模块的贡献：MCA 使 FID 从 125.47 降至 112.18，TFSA 使 PPL 从 3.66 降至 2.87，方向校正则进一步将 PPL 降至 2.47。该方法无需任何训练或超参数调节，可直接嵌入现有三维生成管线，为跨类别三维变形提供了一种高效且通用的解决方案。
 
-
-
 ### 问题背景：三维变形的核心瓶颈
 
 三维变形（3D Morphing）旨在生成从源物体到目标物体的平滑、语义连贯的过渡序列。这一任务在视觉特效、数字内容创作和虚拟现实等领域具有广泛应用。然而，实现高质量的三维变形面临一个根本性瓶颈：**跨类别语义一致性与时间平滑性难以兼顾**。
@@ -82,8 +80,6 @@ claims:
 2. **时间平滑性**：通过时序融合自注意力（Temporal-Fused Self-Attention, TFSA）引入帧间约束，确保变形序列的连续演进；
 3. **方向稳定性**：通过方向校正策略缓解中间阶段的方向跳变问题；
 4. **零训练部署**：在现有 Trellis 模型基础上仅替换注意力模块，无需额外训练或超参数调节。
-
-
 
 ## 核心方法与创新机理
 
@@ -135,8 +131,6 @@ MorphAny3D还引入了一个辅助性的changed slot——方向校正策略。�
 
 四个changed slots形成了从特征初始化、跨对象信息融合、时间一致性到方向稳定性的完整创新链路。MCA解决了“变形什么”（结构合理性），TFSA解决了“如何过渡”（时间平滑性），方向校正解决了“朝向哪里”（方向稳定性），而球面插值则为整个链路提供了几何上合理的起点。这种协同使得MorphAny3D在无需任何训练或超参数调节的前提下，在50对跨类别源-目标上取得了最优的FID（111.95）、PDV（0.0006）、AS（81%）和用户偏好（86.73%），PPL（2.47）也与最优方法接近（Table 1）。
 
-
-
 MorphAny3D 的整体流程围绕 **结构化隐变量（Structured Latent, SLAT）** 这一核心表示展开，无需任何训练或微调，即可在任意三维物体之间生成平滑、语义连贯的变形序列。给定一个源物体 $x^{\mathrm{src}}$ 和一个目标物体 $x^{\mathrm{tgt}}$，目标是生成一段从源逐渐过渡到目标的 $N$ 帧变形序列 $\{x^n\}_{n=0}^{N}$，其中 $x^0 = x^{\mathrm{src}}$，$x^N = x^{\mathrm{tgt}}$，变形进度由权重 $\alpha^n \in [0,1]$ 控制。
 
 ### 管线模块与数据流
@@ -167,12 +161,8 @@ MorphAny3D 的整体流程围绕 **结构化隐变量（Structured Latent, SLAT�
 ![[assets/figures/papers/paper_list_l2548_https_arxiv_org_abs_2601_00204/figures/003_Figure_3.jpg]]
 *Figure 3: (a) Overview of our method. MorphAny3D generates a smooth and high-quality morphing sequence between diverse object categories by leveraging the SLAT representation without any training. (b) Morphing Cross-Attention (MCA) fuses information from the ????� ????source and target objects in the cross-attention layers to ensure the structural coherence and aesthetics of the deformation. (c) Temporal-Fused Self-Attention (TFSA) enhances temporal smoothness by incorporating SLAT features from the previous morphing frame into the Previous Frame’s self-attention mechanism, enabling smooth transitions over time. (d) An orientation correction strategy inspired by statistical orientation Structure ????...*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2548_https_arxiv_org_abs_2601_00204/figures/002_Figure_2.jpg]]
 *Figure 2: Comparison of different 3D morphing strategies. (a) Matching-Based 3D Morphing; (b) 2D Morphing + 3D Generation; (c) Direct Interpolation; (d) MorphAny3D. Our method leverages the powerful SLAT to achieve semantically plausible and temporally smooth 3D morphing without any training. α ∈ [0, 1] is the deformation weight controlling the morphing progress*
-
-
 
 MorphAny3D 在预训练的 Trellis 三维生成框架上，仅替换注意力层而无需任何训练，实现了跨类别三维变形。其核心由四个关键模块构成：球面插值初始化、Morphing Cross-Attention（MCA）、Temporal-Fused Self-Attention（TFSA）和方向校正策略。
 
@@ -232,30 +222,14 @@ $$
 
 上述模块在 Trellis 的两阶段生成流程中分工协作：SS Flow Transformer 使用 MCA 交叉注意力和方向校正生成帧的稀疏体素结构；SLAT Flow Transformer 使用 MCA 交叉注意力和 TFSA 自注意力生成局部隐向量；最终由三维解码器将结构化隐变量解码为 Mesh、NeRF 或 3DGS 等标准表示。整个框架无需任何训练或超参数调节，仅替换注意力模块即实现了跨类别三维变形的结构连贯性与时间平滑性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2548_https_arxiv_org_abs_2601_00204/figures/004_Figure_4.jpg]]
-*Figure 4: Analysis of SLAT fusion patterns in attention for 3D morphing. (a) FID (plausibility) and PPL (smoothness) comparison. (b, c, d) Qualitative results of different fusion strategies (same case as Fig. 2)*
-
 ![[assets/figures/papers/paper_list_l2548_https_arxiv_org_abs_2601_00204/figures/006_Figure_5.jpg]]
 *Figure 5: Attention maps visualization for different attention etmechanisms. Red stars denote head SLAT features; pink stars Tamark their corresponding input regions. Orange boxes highlight KV-Fused CA’s incorrect attention focus. MCA preserves correct, 3D Resultssemantically consistent attention and avoids KV-Fused CA’s artifacts shown in Fig. 4-(b)*
-
-![[assets/figures/papers/paper_list_l2548_https_arxiv_org_abs_2601_00204/figures/007_Figure_6.jpg]]
-*Figure 6: Figure D. Visualization of attention features in the Sparse Structure Stage (left) and Structured Latent Stage (right). Figure 6. t-SNE visualization of attention features for different attention mechanisms in the SS Stage (left) and SLAT Stage (right). Obviously, MCA exhibits a stable, smooth feature trajectory, whereas KV-Fused CA’s is erratic and interrupted*
-
-![[assets/figures/papers/paper_list_l2548_https_arxiv_org_abs_2601_00204/figures/008_Figure_7.jpg]]
-*Figure 7: (a) Example of abrupt orientation change during morphing. (b) Distribution of α at orientation jumps, peaking near intermediate stages. (c) Adjacent-frame orientation changes*
-
-
 
 ## 实验与关键发现
 
 ### 评估设置与基线
 
 为系统验证 MorphAny3D 的变形质量，作者构建了包含 50 对跨类别源-目标物体的测试集，涵盖真实扫描资产与 Trellis 生成资产。评估维度覆盖五个方面：**FID**（变形合理性）、**PPL**（路径平滑度）、**PDV**（路径方向方差）、**AS**（美学评分，由 Gemini-2.5 与 ChatGPT-5 双模型评判，见 Figure 13）以及 **UP**（用户偏好投票）。
-
-![[assets/figures/papers/paper_list_l2548_https_arxiv_org_abs_2601_00204/figures/015_Figure_13.jpg]]
-*Figure 13: Examples of Aesthetics Score (AS) evaluation using vision-language models Gemini-2.5 [26] and ChatGPT-5 [51]. Given rendered images of morphed 3D assets, the models select the most aesthetically pleasing result across all methods*
 
 基线方法分为三类：（1）**匹配法**——3DInterp 与 SLATInterp（Zhu et al., ICLR 2025），基于 DenseMatcher 进行三维几何或 SLAT 特征插值；（2）**2D 升维法**——DiffMorpher（Zhang et al., CVPR 2024）与 FreeMorph（Cao et al., ICCV 2025），先在二维图像空间变形，再通过 Trellis 升维至三维；（3）**直接插值法**——DirectInterp，在噪声与条件特征层面直接线性插值。所有 2D 方法统一使用 Trellis 作为 Image-to-3D 后端，确保比较公平。MorphAny3D 无需任何训练或超参数调节，仅在 Trellis 框架内替换注意力模块。
 
@@ -305,17 +279,7 @@ Table 2 与 Figure 9 系统拆解了三大模块的贡献。消融基线为 KV-F
 
 Figure 12 展示了两个典型失败案例。案例一涉及极精细几何结构（如复杂机械部件），变形过程中出现局部伪影与细节丢失——这继承自 Trellis 对细粒度结构建模的固有限制。案例二涉及偏航对称物体（如对称花瓶），方向校正策略无法有效处理对称轴上的旋转歧义，导致变形序列中出现不自然的旋转。
 
-![[assets/figures/papers/paper_list_l2548_https_arxiv_org_abs_2601_00204/figures/014_Figure_12.jpg]]
-*Figure 12: Failure cases*
-
 此外，每帧生成耗时约 30 秒（A6000 GPU），难以满足实时交互需求。在基于文本条件（而非图像条件）的 SLAT 模型中，变形质量与时间连贯性均有下降，表明当前框架对条件模态存在一定敏感性。这些局限性指向了未来改进方向：增强方向校正以处理对称物体、通过 KV 缓存等加速推理、以及探索文本条件下的鲁棒变形策略。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2548_https_arxiv_org_abs_2601_00204/figures/013_Figure_10.jpg]]
-*Figure 10: Applications: (a) Disentangled 3D morphing, (b) Dual-Target 3D Morphing and (c) 3D Style Transfer*
-
-
 
 ## 定位与知识库关联
 
@@ -358,8 +322,6 @@ MorphAny3D 建立在两个关键知识基础之上：
 2. **推理加速**：能否通过 KV 缓存、帧间特征复用或蒸馏等方法将推理时间降低至实时交互水平（<1 秒/帧）？
 3. **形状-纹理解耦**：当前方法对形状与纹理进行联合变形，如何实现更精细的解耦控制以支持局部编辑？
 4. **表征泛化**：本框架能否推广至动态场景变形或其他三维表征（如 3D Gaussian Splatting）？这需要重新审视 SLAT 表征的适用范围。
-
-
 
 ## 原文 PDF
 

@@ -61,8 +61,6 @@ claims:
 
 **局限与开放问题**：当前分析限于 ImageNet-1k 分类任务和 ResNet-50 架构，尚未验证在目标检测、分割等更复杂视觉任务中的适用性。专有闭源模型（如 DALL·E 3、Midjourney）的表现未知。如何在生成阶段引入对学习有用的多样性奖励，实现视觉保真度与数据真实性的协同提升，仍是待解决的关键问题。
 
-
-
 文本到图像（T2I）生成模型在近三年经历了爆发式进步。从 **Stable Diffusion v1.5**（Rombach et al., CVPR 2022）到 **Flux-Dev**（Black Forest Labs, 2024）、**Qwen-Image**（Wu et al., arXiv 2025）等最新模型，生成图像的视觉保真度和提示遵循度持续攀升。一个自然而迫切的问题是：这些越来越“好看”的生成模型，是否也能作为更可靠的训练数据生成器，服务于下游视觉任务？
 
 这一问题的现实意义不言而喻。真实数据的采集、清洗与标注成本高昂，且受隐私和版权约束日趋严格。若合成数据能有效替代真实数据，将极大降低模型训练的门槛。然而，现有工作对这一假设的验证存在明显缺口：多数研究仅评估单一或少数几代模型，缺乏对生成技术进步与训练数据效用之间关系的系统性、跨代际审视。
@@ -70,8 +68,6 @@ claims:
 本文正是针对这一缺口展开。作者选取了 2022 至 2025 年间发布的 13 个开源 T2I 模型，在受控的 ImageNet-1K 子集上生成大规模合成数据集，训练标准 ResNet-50 分类器，并在真实测试集上评估其泛化能力。核心发现令人警醒：**随着 T2I 模型世代的更新，合成数据训练的分类器在真实数据上的准确率呈持续下降趋势**（Figure 1）。换言之，生成模型的“好看”并未转化为“有用”，甚至出现了系统性倒退。
 
 这一现象揭示了生成式视觉研究中一个深层的**保真度-多样性权衡**：较新的 T2I 模型在追求视觉质量和文本对齐的过程中，其输出分布坍缩到了狭窄的、以美学为中心的区域，牺牲了类别内多样性和真实数据所具备的高频纹理细节。本文的动机正在于解剖这一退化现象的成因——是纹理失真、高频信息丢失，还是分布漂移与多样性崩溃？通过系统性的诊断框架，作者试图回答一个更根本的问题：**生成式视觉的进步，是否等价于数据真实性的进步？**
-
-
 
 ## 核心方法与创新机理
 
@@ -109,8 +105,6 @@ claims:
 
 本文的分析范围明确限定在图像分类任务（ImageNet-1k 200 类子集）和开源 T2I 模型，且下游模型以 ResNet-50 为主。所发现的趋势是否在目标检测、分割等任务中成立，以及专有模型（如 DALL·E 3、Midjourney）是否呈现相同模式，仍需进一步验证。此外，详细字幕提示虽能缓解部分问题，但在缺乏原始图像标注的纯合成场景下不可行，其实用性受限。
 
-
-
 本文提出了一套**系统化的合成→真实诊断与基准测试框架**，旨在解耦现代文生图模型作为训练数据生成器时的失效根源。框架的核心逻辑并非改进生成模型本身，而是通过受控的数据变换和跨域评估，逐层剥离并量化合成图像在**结构、纹理、频谱和分布**四个维度上的失真程度，最终建立这些失真与下游分类器泛化性能之间的因果关联。
 
 ### 流水线总览
@@ -142,12 +136,8 @@ claims:
 
 这一设计使得框架能够在不修改任何 T2I 模型内部结构的前提下，仅通过对生成数据和下游训练流程的受控干预，完成对合成数据质量的细粒度归因分析。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2363_https_openaccess_thecvf_com_content_CVPR2026_html_Adamkiewicz_When_Prett/figures/002_Figure_2.jpg]]
 *Figure 2: To probe which aspects of synthetic images are most affected, we transform images to suppress or amplify the effects of distortions in a given domain. To separate the effect of low and high level details, we measure the performance gap when training in depth space, which removes textures, and training a low-receptive-field (visualized in the figure) classifier which operates on 9 × 9 image patches and hence does not rely on structure. To separate the effects of high and low frequency distortions, we train on low and high-pass filtered images. Removing offending features should close the gap with relation to RGB, while removing non-offending features should widen it*
-
-
 
 ### 诊断框架总览
 
@@ -201,12 +191,8 @@ $$S(f) \propto f^{-\alpha}$$
 
 该公式是频率分解模块的理论基础：合成图像若偏离此幂律分布（尤其是高频成分异常增强或衰减），将导致纹理失真，进而损害下游分类器的泛化能力。实验证实，合成图像的高频域性能差距远大于低频域，与幂律先验的偏离程度随 T2I 模型的更新而加剧。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2363_https_openaccess_thecvf_com_content_CVPR2026_html_Adamkiewicz_When_Prett/figures/004_Figure_4.jpg]]
 *Figure 4: Performance comparison for (left) structure (depth-based classifier) and texture (local feature classifier), and (right) frequencyfiltered data for class name- and caption-guided synthetic datasets. Image structure is consistently less affected than texture, while high-frequency components degrade more strongly than low frequencies (especially in better-performing models)*
-
-
 
 ## 实验与关键发现
 
@@ -258,8 +244,6 @@ Figure 6 展示了一个极具诊断价值的不对称现象：**Real→Synth �
 3. **分布多样性崩溃**：合成数据集呈现高密度、低覆盖率的特征，缺乏类别内多样性，导致下游模型在真实数据上的泛化能力受限。
 
 这些失败模式相互关联：对视觉保真度和美学质量的优化倾向使模型坍塌到狭窄的、以美学为中心的分布，同时损害了纹理真实性和高频细节，最终导致合成数据的训练效用不升反降。
-
-
 
 ## 定位与知识库关联
 
@@ -322,8 +306,6 @@ Figure 6 展示了一个极具诊断价值的不对称现象：**Real→Synth �
 2. **闭源模型评估：** 专有 T2I 模型（如 DALL·E 3、Midjourney）作为训练数据生成器的表现如何？其训练数据效用是否同样遵循下降趋势？
 3. **多样性奖励机制：** 如何在生成阶段引入对学习有用的多样性奖励，将生成过程与下游任务学习耦合，以提升合成数据的训练效用？这可能需要重新设计 T2I 模型的训练目标或采样策略。
 4. **保真度-真实性协同：** 是否存在一种能够同时提高视觉保真度和数据真实性的 T2I 模型设计或后训练策略？当前模型在追求美学质量时牺牲了数据多样性，这暗示需要新的权衡机制。
-
-
 
 ## 原文 PDF
 

@@ -51,8 +51,6 @@ claims:
 
 在SceneEgo测试集上，单帧方法Ours-Single的MPJPE达到64.19 mm，比此前最优的SceneEgo（118.5 mm）降低45.7%；经扩散精炼后进一步降至57.59 mm。手部姿态方面，MPJPE从Hand4Whole的49.66 mm降至19.37 mm。消融实验证实，移除FisheyeViT导致MPJPE上升至67.36 mm，移除不确定性引导则使精炼后MPJPE从57.59回升至62.16 mm，验证了各模块的关键作用。
 
-
-
 从单视角头戴鱼眼相机捕捉全身运动是计算机视觉领域一项极具挑战性的任务。鱼眼相机因其超宽视场角（FOV）能够覆盖佩戴者身体的大部分区域，使其成为以自我为中心（egocentric）运动捕捉的理想传感器。然而，这一技术路线面临三大核心瓶颈，严重制约了现有方法的精度与鲁棒性。
 
 **第一重瓶颈：鱼眼畸变与特征提取的失配。** 鱼眼镜头产生的严重几何畸变使得标准卷积神经网络（CNN）或视觉Transformer（ViT）难以提取有效的图像特征。传统网络假设图像遵循透视投影，其平移不变性等归纳偏置在鱼眼图像上不再成立。现有工作要么忽略畸变直接输入网络，要么采用全局畸变校正后再处理，但全局校正往往导致图像边缘信息的大量丢失或重采样伪影，无法从根本上解决特征提取的失配问题。
@@ -62,8 +60,6 @@ claims:
 **第三重瓶颈：大规模标注数据的匮乏。** 以自我为中心的全身运动捕捉需要同时标注身体和手部的精确3D关节位置，而真实场景下获取此类标注极其困难。现有数据集要么仅包含身体关节，要么手部标注稀疏，难以支撑全身模型的充分训练。
 
 面对上述瓶颈，本文的核心动机在于：**能否将鱼眼畸变校正嵌入到特征提取网络内部，而非作为预处理步骤？能否利用运动时序先验来填补遮挡区域的推理空白？** 这促使作者提出了两个关键设计——FisheyeViT和不确定性引导的扩散运动精炼——分别从单帧特征质量和时序运动合理性两个维度突破现有方法的性能上限。
-
-
 
 ## 核心方法与创新机理
 
@@ -105,8 +101,6 @@ $$\mathbf{w} = 1 / \left(1 + e^{-k(t - T \mathbf{u})}\right)$$
 - **姿态回归**：不同于**EgoHMR**的MLP直接回归或**Mo²Cap²**的xyz空间热图，uvd空间像素对齐热图建立了图像像素与3D关节的直接几何对应，同时天然输出不确定性估计。
 - **时序精炼**：相比**Ego-STAN**的时序编码或**EgoHMR**的扩散姿态估计，本工作首次将关节不确定性显式引入扩散采样，实现了选择性精炼——保留高置信预测、生成遮挡区域合理运动。
 
-
-
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2311_16495/figures/001_Figure_1.jpg]]
 *Figure 1: From an image sequence captured by a single head-mounted fisheye camera, our method can predict accurate and temporally coherent whole-body motion, including human body and hand poses. The SMPL-X parameters are obtained using inverse kinematics*
 
@@ -134,8 +128,6 @@ $$\mathbf{x}_{t-1} \sim \mathcal{N}(\hat{\mathbf{x}}_0 + \mathbf{w}(\mathbf{x}_e
 - **输出**：时序一致的全身 3D 关节位置（身体 + 左右手），可进一步通过逆运动学拟合 SMPL-X 参数。
 - **模块串联**：FisheyeViT → 身体姿态回归器 + 手部姿态估计 → 身体-手部合并 → 不确定性感知扩散精炼。
 - **关键数据流**：图像 → 去畸变特征令牌 → uvd 热图 → 3D 关节 + 不确定性 → 精炼后的全身运动序列。
-
-
 
 ### 3.1 FisheyeViT：鱼眼畸变感知的特征提取
 
@@ -194,8 +186,6 @@ $$\mathbf{u} = 0.05 \times (1 - \mathbf{HM})$$
 ### 3.4 全身关节集成
 
 身体关节 $\hat{\mathbf{J}}_b$、左手关节 $\hat{\mathbf{J}}_{lh}$ 和右手关节 $\hat{\mathbf{J}}_{rh}$ 分别估计后，合并为全身关节 $\hat{\mathbf{J}}$，作为扩散精炼模块的输入。手部姿态先通过手部检测器定位区域，再独立回归 3D 手部关节，最终变换到身体坐标系下完成集成。
-
-
 
 ## 实验与关键发现
 
@@ -258,25 +248,8 @@ Table 7（原文标注为 Table 8）将 FisheyeViT 与 SphereNet、Panoformer �
 
 **证据强度说明**：主结果和消融实验均基于公开测试集的标准指标，且所有对比方法使用相同训练数据重新训练（Table 1 中 * 标记），公平性得到控制。补充材料中 MLP 替代热图的 130.7 mm 结果置信度略低（0.9），因该实验仅在补充材料中报告，但量级差异足以支撑结论。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2311_16495/figures/006_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2311_16495/figures/016_Figure_8.jpg]]
-*Figure 8: The setup of the egocentric fisheye camera and one example of the egocentric image*
-
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2311_16495/figures/019_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2311_16495/figures/020_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2311_16495/figures/021_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2311_16495/figures/008_Table.jpg]]
-
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2311_16495/figures/011_Table_4.jpg]]
 *Table 4: Comparison between different training datasets for egocentric body pose estimation*
-
-
 
 ## 定位与知识库关联
 
@@ -325,8 +298,6 @@ Table 7（原文标注为 Table 8）将 FisheyeViT 与 SphereNet、Panoformer �
 4. **物理感知扩散模型**：如何将物理模拟器或运动学约束嵌入扩散去噪过程，从根本上解决自遮挡导致的物理不合理性？这需要设计可微的物理约束项并融入采样引导。
 
 5. **多任务联合优化**：FisheyeViT提取的特征是否可同时服务于姿态估计、场景理解和动作识别？多任务联合训练可能提升特征表示的鲁棒性，同时降低整体系统开销。
-
-
 
 ## 原文 PDF
 

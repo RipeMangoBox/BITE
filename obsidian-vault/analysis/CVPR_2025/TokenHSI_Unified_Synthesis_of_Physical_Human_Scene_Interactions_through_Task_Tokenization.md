@@ -50,8 +50,6 @@ claims:
 
 实验表明，TokenHSI在四项基础HSI技能（Follow、Sit、Climb、Carry）上全面超越或持平单任务专用策略，尤其在Carry任务上将成功率从83.1%提升至92.2%（Table 1）。在技能组合任务中，TokenHSI的优势更为显著：Climb+Carry组合任务的成功率达到99.2%，而基线方法CML仅为68.3%（Table 2）。此外，通过冻结预训练参数并仅训练新增任务令牌与零初始化适配器层，TokenHSI能够高效适应物体形状变化、地形变化乃至长程任务完成等更具挑战性的场景，展现出较强的泛化能力和样本效率。
 
-
-
 物理仿真角色与三维场景的交互（Physical Human-Scene Interaction, HSI）是计算机图形学与具身智能交叉领域的核心挑战，其目标是在物理模拟器中驱动力学角色完成诸如路径跟随、坐下、攀爬、搬运等多样化任务。近年来，基于强化学习（RL）的运动控制方法取得了显著进展，但现有工作普遍存在一个结构性瓶颈：**控制器通常为单一任务独立设计，缺乏多技能统一与泛化能力**。例如，一个能精准跟随路径的角色策略，往往无法同时完成搬运箱子或攀爬障碍等任务，更难以应对需要多技能协同的复杂组合场景。
 
 这一瓶颈的根源在于传统策略架构的固有限制。主流方法（如AMP及其衍生工作）通常采用固定长度的MLP策略网络，将角色本体感知状态与任务目标状态拼接为单一联合观测（joint character-goal state space）作为输入。这种设计导致两个关键缺陷：（1）观测空间随任务变化而剧烈变动，不同任务之间无法共享运动知识；（2）网络输入维度固定，难以灵活扩展至任意数量的任务组合。当面对需要“攀爬并搬运”（Climb+Carry）或“在复杂地形上跟随并搬运”等技能组合任务时，现有方法要么需要从头训练新策略（Scratch），要么依赖组合动作学习（CML）等方案，但这些方案在成功率上存在显著不足——例如CML在Climb+Carry任务上仅达到68.3%的成功率（见Table 2）。
@@ -59,8 +57,6 @@ claims:
 此外，策略的持续适应与扩展同样面临效率困境。当预训练策略需要泛化到新的物体形状、地形变化或长期任务时，全量微调（Finetune）计算开销大且容易遗忘已学技能，而专门的适应架构（如AdaptNet）虽然部分缓解了这一问题，但在收敛速度和最终性能上仍有提升空间。
 
 **TokenHSI的核心动机**正是针对上述缺口：通过重新设计观测表示与策略架构，实现单一网络对多项基础HSI技能的统一学习，并支持以极低的参数代价高效适应到更复杂的组合与泛化任务。其关键洞察在于**解耦本体感知与任务观测**——将角色自身的运动状态建模为独立的共享本体感知令牌（proprioception token），而将不同任务的特定观测分别编码为独立的任务令牌。借助Transformer编码器的可变长输入支持和掩码注意力机制，共享的本体感知令牌能够在不同任务间传递运动知识，而掩码机制则抑制无关任务令牌的干扰，从而在单网络中实现高效的多任务联合训练与跨技能知识迁移。
-
-
 
 ## 核心方法与创新机理
 
@@ -81,8 +77,6 @@ TokenHSI 的核心创新在于通过**任务标记化（Task Tokenization）** �
 **4. 高效策略适应：冻结主干 + 适配器层**
 
 在将预训练技能迁移到新任务（如技能组合、物体/地形形状变化）时，基线方法要么从头训练（Scratch），要么全量微调（Finetune），或依赖专门设计的适应架构（AdaptNet）。TokenHSI 提出**冻结预训练组件**（$T^{prop}$、编码器 $\phi$、输出嵌入 $e$、动作头 $H$），仅训练**新增任务令牌**和**动作头中插入的零初始化适配器层** $\xi^A$。这一轻量适应策略在 Climb+Carry 技能组合任务上达到 99.2% 成功率（CML 仅 68.3%），在地形变化搬运任务上达到 74.0%（AdaptNet 为 63.4%），同时训练参数量远小于全量微调，实现了效率与性能的双重优势。
-
-
 
 TokenHSI 构建了一个两阶段统一框架，通过将人-场景交互建模为可组合的**任务令牌**，在单个 Transformer 网络中实现多技能学习与高效策略适应。如图 2 所示，整体流程分为**基础技能学习**（左）与**策略适应**（右）两个阶段。
 
@@ -111,15 +105,8 @@ TokenHSI 构建了一个两阶段统一框架，通过将人-场景交互建模�
 
 在长程任务执行中，框架引入**有限状态机**（FSM）实现自动化子任务切换：FSM 根据当前状态输出 one-hot 任务标签 $l_t$，该标签直接作为 Transformer 的注意力掩码，动态激活对应的任务令牌，使角色无需人工干预即可顺序完成多个子任务。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1751_TokenHSI_Unified_Synthesis_of_Physical_Human_Scene_Interactions_through/figures/001_Figure_1.jpg]]
-*Figure 1: Introducing TokenHSI, a unified model that enables physics-based characters to perform diverse human-scene interaction tasks. It excels at seamlessly unifying multiple foundational HSI skills within a single transformer network and flexibly adapting learned skills to challenging new tasks, including skill composition, object/terrain shape variation, and long-horizon task completion*
-
 ![[assets/figures/papers/paper_list_l1751_TokenHSI_Unified_Synthesis_of_Physical_Human_Scene_Interactions_through/figures/002_Figure_2.jpg]]
 *Figure 2: TokenHSI consists of two stages: (left) foundational skill learning and (right) policy adaptation. Through multi-task policy training, the proposed framework learns versatile interaction skills in a single transformer network. Theses learned skills can be flexibly adapted to more challenging HSI tasks by training the lightweight modules, e.g., Tnew, Tc, and*
-
-
 
 ### 3.1 多令牌观测空间构建
 
@@ -174,8 +161,6 @@ $$r_{t}^{f+c} = \begin{cases} 0.0, & \|x_{t}^{obj.2d} - x_{t}^{root.2d}\| > 0.7 
 
 其中 $r_t^f$ 为路径跟随奖励，$r_t^{c.pick}$ 为搬运拾取奖励，权重各0.5实现技能平衡。
 
-
-
 ## 实验与关键发现
 
 ### 基础技能统一学习
@@ -210,33 +195,14 @@ TokenHSI 首先在四项基础人-场景交互技能（路径跟随 Follow、坐
 
 尽管 TokenHSI 在多数任务上表现优异，仍存在以下局限：① 复杂奖励函数的设计依赖大量试错工程，限制了新技能的快速拓展；② 长时域任务完成仍需人类设计的 FSM 进行子任务调度，尚未实现完全自主的端到端决策；③ 实验环境相对简化，向真实世界复杂场景的迁移仍面临挑战。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1751_TokenHSI_Unified_Synthesis_of_Physical_Human_Scene_Interactions_through/figures/003_Table_2.jpg]]
 *Table 2: Quantitative results across skill composition tasks*
-
-![[assets/figures/papers/paper_list_l1751_TokenHSI_Unified_Synthesis_of_Physical_Human_Scene_Interactions_through/figures/005_Figure_3.jpg]]
-*Figure 3: Learning curves comparing the efficiency on skill composition tasks using TokenHSI, policies trained from scratch [79], CML [110], and its improved version CML (dual). Colored regions denote mean values ± a standard deviation based on 3 models initialized with different random seeds*
-
-![[assets/figures/papers/paper_list_l1751_TokenHSI_Unified_Synthesis_of_Physical_Human_Scene_Interactions_through/figures/007_Figure_4.jpg]]
-*Figure 4: Through policy adaptation, TokenHSI can generalize learned foundational skills to more challenging scene interaction tasks*
-
-![[assets/figures/papers/paper_list_l1751_TokenHSI_Unified_Synthesis_of_Physical_Human_Scene_Interactions_through/figures/008_Figure_5.jpg]]
-*Figure 5: Learning curves comparing the efficiency on object shape variation tasks using TokenHSI, full fine-tuning of pretrained policies, and AdaptNet [111]*
 
 ![[assets/figures/papers/paper_list_l1751_TokenHSI_Unified_Synthesis_of_Physical_Human_Scene_Interactions_through/figures/009_Table_4.jpg]]
 *Table 4: Quantitative results across terrain shape variation tasks*
 
-![[assets/figures/papers/paper_list_l1751_TokenHSI_Unified_Synthesis_of_Physical_Human_Scene_Interactions_through/figures/011_Figure_6.jpg]]
-*Figure 6: Learning curves comparing the efficiency on terrain shape variation tasks using TokenHSI, Scratch [79], and Adapt-Net [111]. We ablate the adapter layers during training*
-
-![[assets/figures/papers/paper_list_l1751_TokenHSI_Unified_Synthesis_of_Physical_Human_Scene_Interactions_through/figures/014_Figure.jpg]]
-*Figure: B. Learning curves comparing the efficiency on longhorizon task completion using TokenHSI, Scratch, and iterative fine-tuning of multiple pre-trained specialist policies, namely Finetune*
-
 ![[assets/figures/papers/paper_list_l1751_TokenHSI_Unified_Synthesis_of_Physical_Human_Scene_Interactions_through/figures/013_Table.jpg]]
 *Table: A. The overview of all 12 tasks implemented in this paper. Key settings for each task are summarized, including the number of task tokens, the construction of reference motion and object datasets, the episode length, and early termination conditions. The available termination conditions contain character fall, object fall, path distance, and interaction early termination (IET). A slash (/) indicates that the specific configuration is not applicable*
-
-
 
 ## 定位与知识库关联
 
@@ -295,8 +261,6 @@ AdaptNet 是专门设计的策略适应架构基线。在物体形状变化（Ch
 ### 方法谱系总结
 
 TokenHSI 在物理 HSI 合成领域的方法谱系中占据了“统一多技能策略”这一节点。其上游是单任务专用控制器（AMP 系列）和组合动作学习方法（CML），下游则指向更自主、更少人工干预的交互合成系统。核心贡献在于通过 Transformer 令牌化机制优雅地解决了多技能统一与高效适应的问题，但距离完全自主的复杂场景交互仍有距离。
-
-
 
 ## 原文 PDF
 

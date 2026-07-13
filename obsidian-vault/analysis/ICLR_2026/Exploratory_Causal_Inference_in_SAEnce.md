@@ -61,8 +61,6 @@ claims:
 
 **局限性**：NES 依赖 SAE 编码满足主对齐假设；当前仅适用于二值处理和离散概念，扩展至连续效应和多值处理仍有理论缺口；基础模型的信息充分性在实际中难以验证。
 
-
-
 ### 从经典因果推断到探索性因果推断
 
 随机对照试验（RCT）是因果推断的黄金标准。在经典范式中，研究者预先指定一个已知的结果变量 $Y$，在随机化保证无混淆的条件下，通过比较处理组与对照组的平均结果差异来估计平均处理效应（ATE）：
@@ -86,8 +84,6 @@ $$\tau = \mathbb{E}[Y \mid T=1] - \mathbb{E}[Y \mid T=0]$$
 上述两个缺口共同指向一个需求：需要一种既能将高维观测转化为可解释测量，又能在纠缠表示中稳健地分离出真实因果效应的方法。
 
 本文的解决方案由两部分构成。在表示层面，利用预训练基础模型将原始数据映射为语义表示，再通过稀疏自编码器将该表示重构为高维稀疏编码，使每个坐标近似对应单一可解释概念。在推断层面，提出 **Neural Effect Search**——一种递归分层检验策略：每轮选出当前最显著的神经元作为主效应方向，随后通过分层或臂内残差化消除该方向对其他神经元的泄漏影响，使后续检验聚焦于残余因果信号。这一设计将因果效应发现转化为逐步解缠过程，从根本上控制了纠缠导致的效应扩散，从而在理论上（Theorem 4.1）和实验上（Figure 5）均克服了探索性因果推断悖论。
-
-
 
 ## 核心方法与创新机理
 
@@ -141,8 +137,6 @@ Theorem 4.1 在三个核心假设下证明了 NES 的一致性：
 
 消融实验进一步证实，NES 的优势源于递归分层策略本身，而非特定估计量选择：AIPW 估计量仅提供边际效率增益，不改变显著性崩塌现象；臂内残差化在低功效实验中显著提升精度，高功效时增益边际化；替换基础模型或改变 SAE 维度后 NES 仍稳定克服悖论。
 
-
-
 本文提出了一套完整的**探索性因果推断（Exploratory Causal Inference, ECI）**流水线，其核心目标是在科学家对处理效应缺乏先验知识的情况下，直接从高维观测数据中自动发现受处理影响的潜在结果概念。整体框架由四个顺序衔接的模块构成，如图 1 所示。
 
 ### 流水线总览
@@ -170,8 +164,6 @@ $$\min_{\mathbf{D}, z \ge 0} \mathbb{E}\big[\|h - \mathbf{D}z - b_d\|_2^2\big] +
 ### 框架的因果推断范式定位
 
 如图 2 所示，本文提出的 ECI 范式与经典因果推断和预测驱动因果推断形成对比：在经典范式中，结果 $Y$ 被直接观测；在预测驱动范式中，$Y$ 仅部分标注，需通过预测模型补全；而在 ECI 范式中，**受影响的 $Y$ 本身是未知的**，它隐含在高维测量 $X$ 中，需要模型从数据中自动发现。这一范式转换使得本文方法适用于科学家对潜在效应完全无先验知识的探索性实验场景。
-
-
 
 ### 探索性因果推断的整体流水线
 
@@ -225,8 +217,6 @@ $$\Pr(S_{\text{final}} = \{j_1, \dots, j_r\}) \to 1$$
 
 这从理论上证明了递归分层策略能够从根本上控制纠缠导致的效应扩散，避免了标准多重检验的显著性崩塌。
 
-
-
 ## 实验与关键发现
 
 ### 半合成基准：NES 克服显著性崩塌
@@ -246,7 +236,6 @@ $$\Pr(S_{\text{final}} = \{j_1, \dots, j_r\}) \to 1$$
 **基础模型替换**：将 SigLIP 替换为 DINOv2 后，NES 仍能克服悖论，结果与主实验一致，表明方法对基础模型选择不敏感（Figure 13）。
 
 **SAE 维度与非线性**：将 SAE 维度从 3072 扩展至 12288，NES 性能保持稳定（Figures 14–19）。在不同 SAE 非线性（ReLU、TopK）和随机种子下，方法均有效；仅当使用 jump‑ReLU 破坏主对齐假设时，NES 失效，说明方法依赖 SAE 编码满足每个因果效应存在主导神经元的条件（Figures 20–26）。
-
 
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_Ml8t8kQMUP/figures/024_Figure_16.jpg]]
 *Figure 16: Ablation SAE dimension ( m = 6 1 4 4 ) . Precision, Recall, and IoU in effect identification varying sample size N (top) and effect size τ (bottom), with SAE dimension m = 6 ~ 1 4 4 , 8x DINOv2 dimension n = 7 6 8 . NES consistently replicates the main results, varying the representation dimension m, still overcoming the paradox of Exploratory Causal Inference*
@@ -279,25 +268,8 @@ $$\Pr(S_{\text{final}} = \{j_1, \dots, j_r\}) \to 1$$
 
 NES 的有效性建立在两个关键假设之上。第一，**主对齐假设**（Assumption A.2）：每个因果效应在 SAE 码空间中至少存在一个主导神经元，其对该效应的响应显著强于其他效应。当 SAE 使用 jump‑ReLU 等破坏该假设的非线性时，方法失效。第二，**信息充分性假设**：基础模型必须保留与潜在效应相关的全部信息；该假设在实际应用中难以直接验证。此外，极小样本（N≈30–50）且低效应量时，I 型和 II 型错误的平衡缺乏自动最优机制，当前需人工选择校正策略。方法目前仅适用于二值处理变量，对多值或连续处理的扩展尚未实现。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_Ml8t8kQMUP/figures/012_Figure.jpg]]
 *Figure: Most activated images for Neuron 38 Most activated images for Neuron 6051*
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_Ml8t8kQMUP/figures/016_Figure.jpg]]
-*Figure: Most activated images for Neuron 3485 Most activated images for Neuron 2865*
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_Ml8t8kQMUP/figures/020_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_Ml8t8kQMUP/figures/023_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_Ml8t8kQMUP/figures/026_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_Ml8t8kQMUP/figures/030_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_Ml8t8kQMUP/figures/033_Figure.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -369,8 +341,6 @@ NES 可被定位为以下两条研究线的交汇：
 5. **不确定性量化。** 如何量化所选神经元集合的不确定性并提供置信区间？当前 NES 输出的是点估计集合，缺乏对选择稳定性的统计推断。
 
 6. **一次性解缠方法。** 是否存在一个非迭代的、一次性完成效应解缠的方法，在理论上同样一致且计算效率更高？这涉及对 SAE 编码空间中因果依赖结构的全局建模。
-
-
 
 ## 原文 PDF
 

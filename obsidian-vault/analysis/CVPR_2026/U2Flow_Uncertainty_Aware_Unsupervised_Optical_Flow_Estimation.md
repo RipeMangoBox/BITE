@@ -51,8 +51,6 @@ claims:
 
 实验表明，U²Flow 在 KITTI-2015 上达到 Fl-all **6.13%**，显著优于此前无监督方法 UPFlow（9.38%），并在 Sintel 基准上取得最先进的无监督性能。消融实验确认：解耦训练策略、不确定性感知精炼模块和不确定性引导的双向融合对性能提升至关重要；但也揭示出同应性平滑损失仅在 KITTI 等刚性场景有效，在 Sintel 上反而损害精度，构成方法泛化性的一个已知限制。
 
-
-
 光流估计是计算机视觉中的基础任务，旨在恢复连续视频帧之间逐像素的密集运动场。近年来，基于深度学习的监督方法取得了显著进展，但其对大规模稠密真值标注的依赖严重制约了在真实场景中的可扩展性。无监督光流估计通过光度一致性等自监督信号绕开了标注瓶颈，因而成为极具吸引力的替代方案。
 
 然而，无监督范式面临一个关键的结构性缺陷：**缺乏可靠的不确定性估计手段**。在监督学习中，模型可通过与真值的残差自然导出预测置信度；但在无监督设定下，光度误差本身受光照变化、遮挡、纹理缺失等因素污染，无法直接作为不确定性的代理。更棘手的是，即便通过某些启发式方法获得了不确定性估计，**如何将其有效集成以提升光流精度和鲁棒性**仍是一个开放问题——现有方法大多将不确定性视为独立的后处理产物，而非嵌入估计循环的驱动信号。
@@ -62,8 +60,6 @@ claims:
 本文的动机正源于此：**能否让无监督光流模型在估计运动的同时，自省地感知其预测的不可靠性，并利用这种感知反向优化估计过程？** 核心洞察在于，通过对同一输入施加多种数据增强并强制预测一致性，模型在不同增强下的输出差异天然暴露了其低置信区域——这是一种无需真值的、内在的不确定性信号。将该信号解耦引入循环更新机制，可同时实现两个目标：为每个像素提供可解释的不确定性估计，以及利用该不确定性动态调制特征精炼和损失函数，从而在无监督条件下实现光流与不确定性的联合优化。
 
 基于上述动机，本文提出 **U²Flow**——首个循环无监督框架，联合估计光流和逐像素不确定性，并将预测的不确定性作为内在反馈，贯穿流精炼、平滑损失调制和双向融合等多个环节，最终在 KITTI 和 Sintel 等主流基准上取得无监督方法的最先进性能。
-
-
 
 ## 核心方法与创新机理
 
@@ -102,8 +98,6 @@ U²Flow 将不确定性进一步用于两个下游环节：
 
 相较于仅估计光流的无监督方法（如 **UPFlow**，Luo et al., CVPR 2021），U²Flow 的三个 changed slots 构成递进关系：**解耦的自监督不确定性**提供可靠信号源，**不确定性感知精炼**将该信号注入流估计核心，**不确定性引导的融合与损失调制**在输出和后处理阶段进一步利用该信号。这一“估计—反馈—调制”的闭环是无监督光流中不确定性从副产品升级为核心组件的首次系统实践。
 
-
-
 U²Flow 的整体架构继承自 **RAFT**（Teed & Deng, ECCV 2020）的循环迭代范式，并在此基础上引入了三个核心创新模块：不确定性估计头、不确定性感知的精炼模块，以及不确定性引导的双向流融合模块。图 2 给出了完整的架构概览。
 
 **输入与特征提取。** 给定连续两帧 RGB 图像 $\mathbf{I}_1, \mathbf{I}_2 \in \mathbb{R}^{H \times W \times 3}$，首先通过共享的特征编码器提取逐像素特征，并构建全对相关体积（4D correlation volume）$C$。遵循 **SMURF**（Stone et al., CVPR 2021）的设计，所有批归一化层被替换为实例归一化，以增强无监督训练的稳定性。
@@ -118,12 +112,8 @@ U²Flow 的整体架构继承自 **RAFT**（Teed & Deng, ECCV 2020）的循环�
 
 **后处理融合。** 在推理阶段，利用前向与后向不确定性分别生成二值可靠性掩码 $\mathbf{M}_{\mathrm{f}} = \mathbb{1}(\boldsymbol{\sigma}_{t \to t+1}^{2} < \theta)$ 和 $\mathbf{M}_{\mathrm{b}}$，自适应融合原始前向流与后向流导出的预测，以轻量后处理方式获得多帧收益，无需大规模重训练。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2113_https_openaccess_thecvf_com_content_CVPR2026_html_Sun_U2Flow_Uncertainty/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of U2Flow architecture. (a) The overall recurrent structure follows RAFT [47]. (b) The uncertainty-aware refinement module and the uncertainty estimation head respectively predict optical flow and per-pixel uncertainty in the recurrent update block*
-
-
 
 ### 特征提取与相关体构建
 
@@ -186,13 +176,6 @@ $$\ell_{\mathrm{Total}} = \lambda_{\mathrm{hg}} \ell_{\mathrm{hg}} + \sum_{k=1}^
 
 其中 $\ell_{\mathrm{ph}}$ 为光度损失，$\ell_{\mathrm{sm}}$ 为边缘感知平滑损失，$\ell_{\mathrm{ar}}$ 为增强正则化损失（继承自 **ARFlow**, Liu et al., CVPR 2020），$\ell_{\mathrm{sem}}$ 为语义增强损失（继承自 **UnSAMFlow**, Yuan et al., CVPR 2024），$\zeta^{K-k}$ 为指数衰减因子，赋予后期迭代更高权重。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2113_https_openaccess_thecvf_com_content_CVPR2026_html_Sun_U2Flow_Uncertainty/figures/001_Figure_1.jpg]]
-*Figure 1: Comparison between previous optical flow estimation methods and our approach. (Left) Previous methods estimate only optical flow. (Right) Our proposed U2Flow framework jointly estimates optical flow and its uncertainty, and further leverages the predicted uncertainty to refine the flow estimation*
-
-
-
 ## 实验与关键发现
 
 ### 主要结果
@@ -208,9 +191,6 @@ U²Flow 在 Sintel 和 KITTI 两大公开基准上进行了系统评估，与监
 
 ![[assets/figures/papers/paper_list_l2113_https_openaccess_thecvf_com_content_CVPR2026_html_Sun_U2Flow_Uncertainty/figures/005_Table_2.jpg]]
 *Table 2: Comparison of uncertainty estimation performance on the Sintel (final, clean) and KITTI (2012, 2015) training sets*
-
-![[assets/figures/papers/paper_list_l2113_https_openaccess_thecvf_com_content_CVPR2026_html_Sun_U2Flow_Uncertainty/figures/006_Figure_4.jpg]]
-*Figure 4: Sparsification curves for uncertainty evaluation. Lower AUSE (shown in parentheses) is better*
 
 ### 消融实验
 
@@ -231,9 +211,6 @@ U²Flow 在 Sintel 和 KITTI 两大公开基准上进行了系统评估，与监
 
 Table 6 展示了交叉数据集泛化实验：在 Sintel 上训练、直接在 KITTI 上测试，以及反向设置。U²Flow 在跨数据集场景下仍保持较强的泛化能力，但性能下降幅度表明域差异（合成 vs. 真实、刚性 vs. 非刚性运动）仍是无监督光流泛化的核心挑战。
 
-![[assets/figures/papers/paper_list_l2113_https_openaccess_thecvf_com_content_CVPR2026_html_Sun_U2Flow_Uncertainty/figures/010_Table_6.jpg]]
-*Table 6: Generalization ability. Training on one dataset and testing directly on the other dataset*
-
 ### 失败模式与局限性
 
 定性结果（Figure 5）显示，U²Flow 在运动边界和细结构区域（如 Sintel 的洞穴场景中人物肢体的快速运动）仍存在明显误差。这些区域往往同时具有高不确定性和高流误差，表明当前不确定性估计对极端运动模糊和非高斯噪声的捕获能力有限。
@@ -242,16 +219,6 @@ Table 6 展示了交叉数据集泛化实验：在 Sintel 上训练、直接在 
 *Figure 5: Qualitative results on the KITTI test set (sample frames #5 and #9) and the Sintel (final pass) test set (samples: ambush 3, frame 23; cave 3, frame 16), compared with SMURF [41]. Additional examples can be found on the official benchmark website*
 
 同应性平滑损失的场景依赖性构成了方法通用性的主要限制。此外，不确定性监督依赖于预定义的数据增强范围，可能无法覆盖真实世界中的非高斯误差源（如运动模糊、极端光照变化），导致分布外场景下不确定性估计欠佳。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2113_https_openaccess_thecvf_com_content_CVPR2026_html_Sun_U2Flow_Uncertainty/figures/009_Table_4.jpg]]
-*Table 4: Ablation study on the flow refinement module*
-
-![[assets/figures/papers/paper_list_l2113_https_openaccess_thecvf_com_content_CVPR2026_html_Sun_U2Flow_Uncertainty/figures/011_Table_5.jpg]]
-*Table 5: Ablation study on the bidirectional flow fusion module*
-
-
 
 ## 定位与知识库关联
 
@@ -286,8 +253,6 @@ U²Flow 的性能优势建立在若干隐含假设之上，理解这些假设是
 - **更全面的不确定性建模。** 当前 Laplace 似然假设误差服从拉普拉斯分布，未来需探索能够捕获更复杂误差结构（如异方差、多模态）的不确定性建模方式，以覆盖运动模糊、大气畸变等非高斯误差源。
 - **向多帧与高分辨率的扩展。** 不确定性引导的融合模块已展示了利用多帧信息的潜力，但如何将联合估计框架系统性地扩展到多帧光流和更高分辨率，同时保持计算效率，仍是一个开放问题。
 - **跨任务泛化能力。** 当前不确定性引导的组件——特征缩放、损失调制、融合掩码——是否可泛化到其他密集预测任务（如立体匹配、场景流），值得进一步验证。
-
-
 
 ## 原文 PDF
 

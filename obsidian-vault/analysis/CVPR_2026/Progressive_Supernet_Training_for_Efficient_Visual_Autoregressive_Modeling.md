@@ -49,8 +49,6 @@ VARiant通过等距采样子网与全网络共享权重，在单一模型中实�
 
 在ImageNet 256×256基准上，VARiant-d16以仅0.10的FID损失换取1.7倍推理加速和44%显存削减；推荐配置（d=16, N=7）达到FID 2.00，内存占用从28.7GB降至18.4GB（-36%）。该方法为视觉自回归模型的效率-质量权衡提供了灵活且可扩展的解决方案。
 
-
-
 ### 视觉自回归建模的兴起与效率瓶颈
 
 视觉自回归建模（Visual Autoregressive Modeling, VAR）由 Tian 等人（NeurIPS 2024）提出，通过将图像生成建模为多尺度令牌图（token map）的逐尺度预测过程，在 ImageNet 256×256 上取得了显著优于扩散模型（如 **DiT-XL/2**）和传统自回归模型（如 **LlamaGen-XXL**）的生成质量。其核心机制是将联合分布分解为条件下一尺度预测的乘积：
@@ -88,8 +86,6 @@ $$p ( r _ { 1 } , r _ { 2 } , \ldots , r _ { K } ) = \prod _ { k = 1 } ^ { K } p
 1. 如何构建支持多深度配置的统一超网架构，实现零开销的深度切换？
 2. 如何设计训练策略，突破固定比例训练的帕累托前沿，同时优化全网络和子网？
 3. 如何确定深度分配方案，最大化效率提升的同时最小化质量损失？
-
-
 
 ## 核心方法与创新机理
 
@@ -136,8 +132,6 @@ $$p(\mathbf{ep}) = 0.2 + 0.8 \cdot \frac{\mathbf{ep} - E_1}{E_2 - E_1}$$
 ### 4. 训练自适应的恢复能力
 
 Table 4 的结果进一步验证了渐进训练的有效性：训练前，极浅子网（$d=2, 4$）直接使用预训练 VAR-d30 权重时 FID 超过 130，几乎完全崩溃；经过联合训练自适应后，这些子网被恢复至 FID 2.28–2.97，深度子网（$d=16$）恢复至 2.05。这表明渐进训练不仅协调了全网络与子网的优化，还能“教会”浅层子网利用桥接区提供的丰富条件信息进行有效生成。
-
-
 
 VARiant 将原始 VAR 模型的**固定深度推理**改造为**多深度超网 + 尺度自适应深度分配 + 渐进训练**的统一框架，在保持生成质量的前提下大幅削减计算与内存开销。
 
@@ -193,8 +187,6 @@ $$\mathcal{T}_k = \begin{cases} \{0,1,\ldots,D-1\}, & \text{if } k \leq N \text{
 
 **训练阶段**：输入为完整的 10 尺度令牌序列。调度器按当前阶段的采样比率决定每个 batch 中灵活区使用的网络深度，梯度通过共享权重同时优化全网络和子网。训练在 8 块 NVIDIA H100 上使用 AdamW 优化器（lr=1e-6，batch size=1024）进行。
 
-
-
 ### 3.1 视觉自回归的尺度分解
 
 VAR（Tian et al., NeurIPS 2024）将自回归解码重构为“下一尺度预测”范式，将多尺度令牌图的联合分布分解为条件下一尺度预测的乘积：
@@ -242,16 +234,6 @@ $$p(\mathbf{ep}) = 0.2 + 0.8 \cdot \frac{\mathbf{ep} - E_1}{E_2 - E_1}$$
 其中 $\mathbf{ep}$ 为当前训练轮次。采样概率从0.2平滑过渡至1.0，使优化重心从联合优化逐步转向子网精炼，同时维持梯度桥的稳定传导。
 
 阶段三（子网精炼，$[E_2, E_3]$）仅训练子网配置，完成对子网性能的最终优化。三阶段调度使VARiant突破了固定比例训练的帕累托前沿，同时实现全网络和子网的双最优性能。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l914_https_arxiv_org_abs_2511_16546/figures/003_Figure_2.jpg]]
-*Figure 2: Fixed-ratio training exhibits (a) Pareto trade-offs, (b) optimization conflicts at extreme ratios, and (c) time-varying optimal ratios, motivating our progressive training strategy*
-
-![[assets/figures/papers/paper_list_l914_https_arxiv_org_abs_2511_16546/figures/004_Figure_3.jpg]]
-*Figure 3: Progressive training strategy. (a) Dynamic sampling ratio schedule across three training phases. (b) Gradient source analysis showing the transition from joint optimization to subnetfocused refinement through a stable gradient bridge*
-
-
 
 ## 实验与关键发现
 
@@ -304,17 +286,6 @@ Figure 7展示了子网生成质量在渐进训练过程中的演进：阶段一
 3. **阶段边界的经验性**：三阶段训练的过渡时机（E1、E2）目前凭经验设定，缺乏自动化确定最优转换点的方法。
 4. **方法泛化性未验证**：尺度自适应深度策略尚未在VAR之外的多尺度生成模型（如基于扩散的级联生成）上测试。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l914_https_arxiv_org_abs_2511_16546/figures/002_Table_1.jpg]]
-*Table 1: Impact of subnet application on different scales. Applying subnets to early scales causes severe quality degradation, while applying to later scales preserves quality*
-
-![[assets/figures/papers/paper_list_l914_https_arxiv_org_abs_2511_16546/figures/005_Table_2.jpg]]
-*Table 2: Quantitative assessment of the efficiency-quality trade-off across various methods. Inference efficiency evaluated with batch size 64 on NVIDIA L20 GPU, latency excluding VQVAE’s shared cost*
-
-![[assets/figures/papers/paper_list_l914_https_arxiv_org_abs_2511_16546/figures/008_Table_3.jpg]]
-*Table 3: Memory consumption breakdown at different batch sizes and depth configurations. All measurements are conducted on NVIDIA L20 GPU with batch sizes ranging from 64 to 256. All values in MB. OOM indicates out-of-memory errors*
-
 ![[assets/figures/papers/paper_list_l914_https_arxiv_org_abs_2511_16546/figures/009_Table_4.jpg]]
 *Table 4: FID comparison (↓) of different subnet depths before and after training. Training-free baselines use pretrained VARd30 weights. Each row represents one training configuration*
 
@@ -323,11 +294,6 @@ Figure 7展示了子网生成质量在渐进训练过程中的演进：阶段一
 
 ![[assets/figures/papers/paper_list_l914_https_arxiv_org_abs_2511_16546/figures/006_Figure_4.jpg]]
 *Figure 4: Visual quality comparison across different depth configurations. All configurations maintain high visual quality with significant memory reduction and inference speedup*
-
-![[assets/figures/papers/paper_list_l914_https_arxiv_org_abs_2511_16546/figures/014_Figure_7.jpg]]
-*Figure 7: Subnet generation quality evolution during progressive training (d = 16). Top row: Cat; Bottom row: Fish. Results demonstrate subnet-only inference across three training phase endpoints*
-
-
 
 ## 定位与知识库关联
 
@@ -365,8 +331,6 @@ Figure 7展示了子网生成质量在渐进训练过程中的演进：阶段一
 4. **动态深度推理**：能否在推理时根据输入复杂度动态选择每尺度的深度，而非固定 N 和 d？这需要开发轻量级的深度决策模块。
 
 > **注意**：以上局限和开放问题均来自原文明确陈述或从实验设计间隙中合理推断。关于跨架构迁移的讨论属于原文未覆盖的推测性延伸，需后续工作验证。
-
-
 
 ## 原文 PDF
 

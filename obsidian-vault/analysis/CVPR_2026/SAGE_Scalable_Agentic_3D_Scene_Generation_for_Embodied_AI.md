@@ -165,8 +165,6 @@ SAGE 是一个**基于 MCP 协议的智能体（agentic）框架**，其核心�
 - **输入**：开放词汇的自然语言任务描述或场景规格，支持文本条件、图像条件（通过 Qwen3-VL 提取风格与物体属性）以及多房间平面图条件。
 - **输出**：仿真就绪的 3D 场景文件，包含经过物理验证的物体布局，可直接加载至 Isaac Sim 进行具身任务训练。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2159_https_arxiv_org_abs_2602_10116/figures/003_Figure_2.jpg]]
 *Figure 2: Overview of SAGE scene generation. Our system converts open-vocabulary text prompts into simulation-ready 3D scenes by orchestrating multiple generator tools and critics. The agent dynamically calls generators (Scene Init, Asset Placer/Mover/Remover) to construct and refine layouts, while visual and physics critics provide iterative feedback for self-improvement. The visual critic suggests semantic corrections (e.g., missing or misplaced objects), and the physics critic validates stability via Isaac Sim. For example, after applying physics critic in the bottom image, the newly added pillows on the bed fall flat. This self-improvement process ends when the agent considers that the generated...*
 
@@ -239,9 +237,6 @@ Figure 5 直观展示了物理验证的效果：基线方法生成的场景在 I
 
 SAGE 的场景被用于训练操作策略，以验证生成数据的下游价值。Figure 10 和 Figure 11 分别展示了 Pick-and-Place 和 Mobile Manipulation 任务上的扩展曲线。
 
-![[assets/figures/papers/paper_list_l2159_https_arxiv_org_abs_2602_10116/figures/015_Figure_10.jpg]]
-*Figure 10: Examples and scaling curve on Pick-and-Place. Top left: diverse generation. Bottom left: example trajectory. Right: success rate w.r.t. demo/object counts. More diverse object augmentations improve policy success, narrowing the gap to the privileged agent*
-
 ![[assets/figures/papers/paper_list_l2159_https_arxiv_org_abs_2602_10116/figures/016_Figure_11.jpg]]
 *Figure 11: Examples and scaling curve on Mobile Manipulation. Left: task overview. Mid-top: diverse generation. Mid-bottom: example trajectory. Right: success rate w.r.t. demo/scene counts. Both baselines omit physics critic and replace text-to-3D object synthesis with retrieval: Baseline 1 mimics SceneWeaver [63]; Baseline 2 further replaces the agent with a fixed pipeline, resembling Holodeck [62]. Diverse SAGE-augmented scenes boost the learned policy’s success and close the gap to the privileged agent, while removing physics critic and object synthesis degrades performance (Baseline 1). Replacing the agent with a static pipeline further reduces success rate (Baseline 2)*
 
@@ -252,9 +247,6 @@ SAGE 的场景被用于训练操作策略，以验证生成数据的下游价值
 **Mobile Manipulation（Figure 11）**：
 - SAGE 训练的策略在 SAGE 生成场景上测试成功率达 46.0%，而两个基线（Baseline 1 模仿 SceneWeaver，Baseline 2 模仿 Holodeck）分别仅为 14.4% 和 13.1%（Table 5）。
 - 消融显示：移除物理 critic 和 text-to-3D 物体合成后性能显著下降（Baseline 1），进一步将 agent 替换为静态流水线后成功率更低（Baseline 2）。这验证了 **agentic 自改进 + 物理验证** 是生成高质量训练场景的必要条件。
-
-![[assets/figures/papers/paper_list_l2159_https_arxiv_org_abs_2602_10116/figures/017_Table_5.jpg]]
-*Table 5: Cross-Evaluation. SAGE policies generalize better on out-of-distribution scenes. SAGE even achieves higher success rates on baseline-generated scenes*
 
 #### 跨分布泛化（Table 5）
 
@@ -273,18 +265,7 @@ SAGE 策略展现出更强的跨分布泛化能力：
 3. **场景类型受限**：当前框架仅适用于室内静态场景和刚性物体，尚未扩展到室外环境、铰接或变形物体（尽管 Figure 9 展示了铰接物体的初步集成）。
 4. **任务多样性有限**：目前仅在 Pick-and-Place 和 Mobile Manipulation 上验证，未覆盖交互式导航、多机器人协作等更复杂的具身任务。
 
-![[assets/figures/papers/paper_list_l2159_https_arxiv_org_abs_2602_10116/figures/014_Figure_9.jpg]]
-*Figure 9: Articulated Objects: SAGE can be extended with articulated objects using retrieval from PartNet-Mobility [59]. Top: we show two scenes with multiple articulated objects at closed and open states. Bottom: an action sequence generated with grasp pose prediction and motion planning( Sec.3.2.2) for “pick up the bowl, place it in the drawer, and close the drawer”. Please visit website for full video*
-
 > **注意**：关于 SAGE 在更大规模（如 SAGE-10k 数据集，Figure 6）或多房间场景（Figure 7）上的表现，本文未获得详细定量数据，需手动查阅原文验证。
-
-![[assets/figures/papers/paper_list_l2159_https_arxiv_org_abs_2602_10116/figures/010_Figure_7.jpg]]
-*Figure 7: Multi-room open-vocabulary generation. SAGE can be extended to generate multi-room scenes at scale easily by generating the floor plan and then calling generator MCP tools to fill in multiple rooms in parallel*
-
-![[assets/figures/papers/paper_list_l2159_https_arxiv_org_abs_2602_10116/figures/008_Figure_6.jpg]]
-*Figure 6: SAGE-10k Dataset: We pre-generated a 10k-scene dataset named SAGE-10k Dataset across 50 room types and 50 styles, including 565K uniquely generated 3D objects. We include the statistics of room types, room examples, and objects per scene in the figure as well. The dataset can be accessed via this link*
-
-### 补充图表
 
 ## 定位与知识库关联
 

@@ -51,8 +51,6 @@ claims:
 
 这一感知-推理-决策的能力断层揭示了关键因果机制：**引入显式推理过程**（如推理模型或思维链提示）可部分弥合鸿沟，但当前最先进模型仍远未达到稳健的博弈论最优表现。多模态视觉输入本身也增加了任务难度——纯文本条件下模型决策表现略优，暗示视觉复杂性对策略推理存在额外干扰。VS-Bench 由此为“多模态基础模型如何走向策略自主”这一开放问题提供了量化标尺与诊断工具。
 
-
-
 视觉语言模型（Vision-Language Models, VLMs）近年来在图像描述、视觉问答等静态感知任务上取得了显著进展。然而，现实世界中的智能体往往需要在多智能体环境中运作——自动驾驶车辆需预判其他驾驶者的意图，家用机器人需与家庭成员协作完成任务。这类场景的核心挑战在于：**智能体不仅要准确感知环境，还必须对非平稳的其他智能体行为进行策略推理，并在此基础上做出长期最优决策**。
 
 现有的 VLM 评估基准（如 MMLU、MMBench 等）主要聚焦于单智能体的静态感知与知识问答，几乎不涉及多智能体动态交互下的策略能力评测。少数涉及博弈或决策的基准（如 GTBench、GameBench）则缺乏对感知、推理、决策三个维度的系统性解耦评估，难以定位 VLM 在多智能体场景中的具体能力瓶颈。这导致一个关键问题悬而未决：**当前 VLMs 是否具备在视觉感知基础上进行多步策略推理与博弈决策的能力？**
@@ -66,8 +64,6 @@ $$\mathcal { G } = ( \mathcal { N } , S , \{ \mathcal { A } _ { i } \} _ { i \in
 $$\mathbb { E } _ { \pi _ { 1 } , \cdots , \pi _ { n } } \left[ \sum _ { t } \gamma ^ { t } r _ { i , t } \right]$$
 
 基准涵盖了合作（$\mathcal{R}_1 = \cdots = \mathcal{R}_n$）、竞争（$\sum_i \mathcal{R}_i = 0$）以及混合动机（回报既不相同也不为零和）三类博弈结构，覆盖十种视觉环境（包括 Hanabi、Overcooked、Breakthrough、Poker 等），并在三个维度上对 VLM 进行解耦评估：**感知**（元素识别准确率）、**策略推理**（对其他智能体下一步行动的预测准确率）、**决策**（归一化回合回报）。这一设计使得研究者能够精确诊断 VLM 在多智能体场景中“卡在哪里”。
-
-
 
 ## 核心方法与创新机理
 
@@ -121,8 +117,6 @@ VS-BENCH 的消融分析揭示了两个关键的因果调控变量：
 
 这些发现为后续研究指明了方向：提升 VLM 在多智能体环境中的策略能力，关键在于增强其博弈论推理和长期规划能力，而非单纯改进视觉编码器。
 
-
-
 VS-BENCH 将多智能体环境中的 VLM 能力评估建模为一个部分可观察马尔可夫博弈（POMG），并围绕该形式化框架构建了三阶段评估管线。整个基准的输入是多模态观察，输出是分层的能力度量，其核心逻辑如图 Figure 2 所示。
 
 ![[assets/figures/papers/paper_list_l2050_https_arxiv_org_abs_2506_02387/figures/002_Figure_2.jpg]]
@@ -162,8 +156,6 @@ $$
 ### 评估配置
 
 评估覆盖十五款主流 VLM，包括推理模型（如 o3、gemini-2.5-pro）和聊天模型（如 gpt-4.1、claude-3-7-sonnet）。所有模型在相同条件下测试：温度设为 1.0，最大输出 tokens 为 8k，推理模型的额外 tokens 上限设为 16k，以确保可比性。十种环境覆盖合作、竞争、混合动机三类博弈，具体分类与所需能力矩阵见 Table 1。
-
-
 
 ### 2.1 多智能体部分可观察马尔可夫博弈（POMG）建模
 
@@ -225,8 +217,6 @@ $$
 
 三个模块形成从“看到”到“想到”再到“做到”的递进诊断链路，使研究者能够精确定位 VLMs 在多智能体场景中的能力断裂点。
 
-
-
 ## 实验与关键发现
 
 ### 评估设置
@@ -247,18 +237,9 @@ Table 2 报告了各模型在十种环境中的元素识别准确率。所有模
 
 Table 3 揭示了核心瓶颈。当任务从“识别元素”转向“预测其他智能体下一步行动”时，模型表现急剧下降：最佳模型 **o3** 的整体策略推理准确率仅为 **46.6%**，较 Oracle（100%）低 53.4 个百分点。o3 在十种环境中的六种排名第一，但绝对水平仍远未达到可靠推理的标准。多款模型在部分环境中甚至低于随机基线（Table 3 红色标注），说明在非平稳多智能体动态下，现有 VLMs 的意图建模与对手策略预测能力严重不足。视觉复杂性进一步加剧了这一困难——多模态输入下的推理准确率系统性低于纯文本条件。
 
-![[assets/figures/papers/paper_list_l2050_https_arxiv_org_abs_2506_02387/figures/005_Table_3.jpg]]
-*Table 3: Strategic reasoning evaluation results. For each environment, the first , second , and third best results are highlighted in green, while the results below random are highlighted in red*
-
 ### 决策：长期规划与均衡选择是主要鸿沟
 
 Table 4 的决策结果最为严峻。最佳模型 **o3** 的平均归一化回报仅为 **31.4**（Oracle = 100，Random = 0），且 **15 款模型中有 4 款整体表现低于随机智能体**（claude-3-7 w/o thinking: -0.6; doubao-1-5-vision-pro: -0.9; grok-2-vision: -6.7; Llama-3.2-90B-Vision-Ins.: -6.3）。这意味着部分 VLMs 在多智能体环境中的决策不仅无益，反而有害。o3 虽在多数环境中领先，但其归一化回报仅超过 12.9% 的人类被试（Figure 6），而人类平均归一化回报高达 62.7（Table 10）。感知→推理→决策的链条中，决策环节的退化最为剧烈，表明将感知信息转化为多步策略优化和博弈均衡选择是当前 VLMs 面临的最大挑战。
-
-![[assets/figures/papers/paper_list_l2050_https_arxiv_org_abs_2506_02387/figures/006_Table_4.jpg]]
-*Table 4: Decision-making evaluation results. For each environment, the first , second , and third best results are highlighted in green, while the results below or equal to random are in red*
-
-![[assets/figures/papers/paper_list_l2050_https_arxiv_org_abs_2506_02387/figures/010_Figure_6.jpg]]
-*Figure 6: Decision-making results of human participants*
 
 ![[assets/figures/papers/paper_list_l2050_https_arxiv_org_abs_2506_02387/figures/030_Table_10.jpg]]
 *Table 10: Decision-making results for the human baseline. For comparison, we also report the performance of the best reasoning, chat, and open-source models. All values are normalized scores. For each environment, the best result is highlighted in green*
@@ -277,18 +258,9 @@ Figure 4 展示了 IO（直接输出）与 CoT（思维链）提示下推理模�
 ![[assets/figures/papers/paper_list_l2050_https_arxiv_org_abs_2506_02387/figures/008_Figure_4.jpg]]
 *Figure 4: Comparison of reasoning VLMs and chat VLMs on decision-making with IO and CoT prompting. The solid, dashed, and dotted vertical lines represent the average results of three settings*
 
-![[assets/figures/papers/paper_list_l2050_https_arxiv_org_abs_2506_02387/figures/025_Table_7.jpg]]
-*Table 7: Strategic reasoning results on multimodal input and CoT prompting*
-
 ### Persona 操控：社交意识可调节但非鲁棒
 
 Section 4.3 和 Figure 5 考察了通过设定自利或合作 persona 对模型在社交困境游戏中行为的影响。o3 在不同 persona 下的行为模式发生显著变化，合作 persona 下更倾向于互惠行为，自利 persona 下则更频繁背叛。Table 9 给出了三种推理模型在 Coin Dilemma 等游戏中的原始得分变化。然而，这种操控并非鲁棒——模型的行为偏移方向虽符合预期，但幅度和一致性有限，且开源模型的表现更不稳定。这表明当前 VLMs 具备一定的社交意识，但距离可控、可信的角色引导仍有差距。
-
-![[assets/figures/papers/paper_list_l2050_https_arxiv_org_abs_2506_02387/figures/009_Figure_5.jpg]]
-*Figure 5: Social behaviors of o3 with different personas and the best-performing open-source model in each social dilemma game. Dimensions are agents’ behaviors described in Appendix J*
-
-![[assets/figures/papers/paper_list_l2050_https_arxiv_org_abs_2506_02387/figures/029_Table_9.jpg]]
-*Table 9: Raw decision-making results under different personas in three mixed-motive games across three reasoning models*
 
 ### 失败模式总结
 
@@ -299,8 +271,6 @@ Section 4.3 和 Figure 5 考察了通过设定自利或合作 persona 对模型�
 3. **视觉-策略耦合障碍**：多模态视觉输入虽未导致感知失败，却系统性地恶化了策略推理与决策质量，提示模态间的信息转化存在深层瓶颈。
 
 这些失败模式共同指向一个核心问题：当前 VLMs 缺乏将多模态感知高效转化为博弈论策略推理与长期规划的结构化机制。
-
-
 
 ## 定位与知识库关联
 
@@ -344,8 +314,6 @@ VS-BENCH 采用 **Random Agent** 作为随机下界和 **Oracle Agent**（基于
 - 当前的固定评估协议（自对弈、固定对手）是否足以反映真实世界交互，是否需要引入自适应对手？
 - VLMs 的社交意识（persona）如何定量影响合作-竞争均衡，如何设计更可控的角色引导？
 - 能否将推理时的计算资源（test-time compute）更结构化地注入博弈论推理，以逼近专家级策略？
-
-
 
 ## 原文 PDF
 

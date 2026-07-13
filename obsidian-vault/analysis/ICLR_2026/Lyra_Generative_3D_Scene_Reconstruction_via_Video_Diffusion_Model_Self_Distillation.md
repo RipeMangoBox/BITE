@@ -52,8 +52,6 @@ Lyra 提出了一种**自蒸馏框架**来解决这一瓶颈。其核心思路�
 
 该方法也面临若干限制：性能高度依赖教师视频扩散模型的3D一致性质量；训练计算成本较高（8张A100训练6天）；动态场景目前仅支持单目视频输入；评估主要依赖教师模型生成的伪真值，缺乏大规模真实动态场景基准。尽管如此，Lyra开创了以视频扩散模型自蒸馏替代真实多视图监督的新范式，为生成式3D重建开辟了数据高效、泛化性强的技术路径。
 
-
-
 ### 3D场景重建的范式转换与数据瓶颈
 
 从稀疏观测中恢复完整的三维场景一直是计算机视觉的核心目标。传统三维重建方法依赖多视图几何原理，通过特征匹配、运动恢复结构（SfM）和多视图立体匹配（MVS）逐步构建场景表示。这类方法在纹理丰富、光照稳定的场景中表现良好，但在遮挡严重、纹理稀疏或光照变化的区域往往产生不完整的重建结果。
@@ -75,8 +73,6 @@ Lyra 提出了一种**自蒸馏框架**来解决这一瓶颈。其核心思路�
 - **直接使用视频扩散模型进行新视角合成**的方法（如**BTimer**集成**GEN3C**, Liang et al., 2025b）保持了生成质量，但输出仍为二维视频，不具备显式三维结构。
 
 Lyra的核心动机正是填补这一空白：**如何将视频扩散模型中隐式编码的3D世界知识，高效地提炼为显式的、可实时渲染的3D表示，同时摆脱对稀缺真实多视图数据的依赖？** 这一问题的解决将使得从单张图像或单目视频直接生成可交互的3D/4D场景成为可能，从而打通从生成式模型到物理仿真应用的关键链路。
-
-
 
 ## 核心方法与创新机理
 
@@ -122,8 +118,6 @@ $$\mathcal{L} = \lambda_{mse} \mathcal{L}_{mse} + \lambda_{lpips} \mathcal{L}_{l
 
 其中深度损失（基于 ViPE 估计）对几何正则化至关重要——移除后 PSNR 降至 24.31 并出现平坦几何伪影（Figure 11）；LPIPS 损失维持高频细节（移除后 PSNR 降至 23.86）；不透明度 L1 正则化与修剪则提升了表示的紧凑性与渲染效率（Table 2）。
 
-
-
 Lyra 是一个将视频扩散模型的隐式 3D 知识蒸馏为显式 3D 高斯溅射（3DGS）的前馈式生成重建框架。其核心架构由两个关键分支构成一个教师-学生自蒸馏回路（Figure 2, Figure 4）：**冻结的相机条件视频扩散模型作为教师**，通过其 RGB 解码器输出多视角视频帧作为监督信号；**可训练的 3DGS 解码器作为学生**，直接从扩散模型生成的视频潜变量中前馈式推断出显式 3D 高斯场，并通过可微渲染与教师输出对齐。
 
 ![[assets/figures/papers/paper_list_l40_https_arxiv_org_abs_2509_19296/figures/003_Figure_4.jpg]]
@@ -158,8 +152,6 @@ $$\mathcal{L} = \lambda_{mse} \mathcal{L}_{mse} + \lambda_{lpips} \mathcal{L}_{l
 ### 输出与应用
 
 框架最终输出紧凑的 3D/4D 高斯场表示，可通过 gsplat 从任意视角实时渲染。生成的 3DGS 场景可转换为 .usdz 格式导入 Isaac Sim 5.0 等仿真平台，支持机器人模拟等下游交互任务（Figure 12）。
-
-
 
 ### 自蒸馏框架：教师-学生双分支架构
 
@@ -212,8 +204,6 @@ $$ \mathbf{M}^{t,v}(u,v) = \begin{cases} 0 & \text{if } \mathbf{D}_{\mathcal{M}}
 
 通过比较网格插值深度与点云深度，屏蔽前景遮挡区域，防止背景信息泄露到被遮挡区域（图 8）。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -255,18 +245,11 @@ Lyra在三个标准基准上全面超越先前方法。如**Table 1**所示，�
 
 5. **物理交互的中间转换。** 生成的3D高斯场需通过`.ply`到`.usdz`格式转换才能导入仿真平台（如Isaac Sim 5.0，见**Figure 12**），当前仅在仿真环境中进行了初步验证，尚未在真实机器人平台上测试闭环交互。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l40_https_arxiv_org_abs_2509_19296/figures/001_Figure_1.jpg]]
 *Figure 1: Feed-Forward 3D and 4D Scene Generation. From a single image (top), Lyra infers a 3D Gaussian Splatting (3DGS) representation in a feed-forward fashion, through self-distilling a video diffusion model without requiring real-world multi-view data. With a video input (bottom), Lyra infers a dynamic 3DGS that offers interactive control in both time (rows) and viewpoint (columns)*
 
-![[assets/figures/papers/paper_list_l40_https_arxiv_org_abs_2509_19296/figures/012_Figure_9.jpg]]
-*Figure 9: Dynamic data augmentation videos. We augment the supervision data with a motionreversed video, ensuring that each timestep is observed from the full spatial coverage, thereby preventing low opacity artifacts in the early timesteps. We show two example trajectories, i.e., zoom-out and zoom-in, and visualize their corresponding augmented videos. The augmented videos are flipped in their camera motion*
-
 ![[assets/figures/papers/paper_list_l40_https_arxiv_org_abs_2509_19296/figures/009_Table_2.jpg]]
 *Table 2: Ablation study on Lyra dataset*
-
-
 
 ## 定位与知识库关联
 
@@ -317,8 +300,6 @@ Lyra的效能提升可归因于三个相互关联的技术决策：
 **闭环物理仿真**：将生成的3D高斯场直接集成到实时物理引擎中，需要解决高斯表示的碰撞检测效率问题。探索更紧凑的高斯剪枝策略或混合表示（高斯+网格），可能使Lyra的输出直接适用于机器人操作的闭环仿真。
 
 **自蒸馏范式的泛化**：自蒸馏框架的核心思想——用生成模型监督重建模型——是否可推广至其他生成模型架构？例如，用3D原生扩散模型替代视频扩散模型作为教师，可能进一步消除2D-3D领域差异，提升重建精度。
-
-
 
 ## 原文 PDF
 

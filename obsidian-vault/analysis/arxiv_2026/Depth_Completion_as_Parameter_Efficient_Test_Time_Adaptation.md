@@ -50,8 +50,6 @@ CAPA 的核心洞察在于将深度补全重新定义为**对预训练三维基�
 
 实验结果表明，CAPA 在四个数据集（ScanNet、7-Scenes、iBims、Metropolis）和多种稀疏模式（SIFT、100点、SfM、8线LiDAR等）下均取得最优性能：CAPA_LoRA 在所有设置下的 AbsRel 误差均低于现有基线方法，平均排名 1.4。以 VGGT 为基础模型时，CAPA 将误差降低了 2–3 倍；在 ScanNet 100 点条件下，CAPA 在条件点区域与非条件点区域的深度误差差异仅为 0.1%，远优于基线方法。序列级参数共享相比逐帧调优，在 ScanNet 100 点下将 AbsRel 从 1.7% 降至 0.9%，时间一致性指标 OPW 从 4.9% 降至 1.9%。消融实验进一步证实，CAPA 仅更新 0.04% 参数即可达到与全模型微调（100% 参数）几乎持平的精度，且相比 Marigold-DC、TestPromptDC 等测试时自适应方法，总处理速度快 10 倍以上。
 
-
-
 ### 深度补全的现状与瓶颈
 
 深度补全旨在从稀疏深度测量（如SIFT特征点、LiDAR扫描线）恢复稠密的场景深度图，是三维视觉中的基础任务。传统方法通常遵循“训练-部署”范式：针对每种特定的稀疏模式训练专用的编码器，在推理时直接前向传播。然而，这一范式面临两个核心瓶颈：
@@ -78,8 +76,6 @@ CAPA 的核心洞察在于将深度补全重新定义为**对预训练三维基�
 - **参数高效**：仅更新极小规模参数（约0.04%），在保持预训练通用几何先验的同时，利用稀疏观测梯度驱动场景特异性对齐。
 - **序列级一致性**：引入序列级参数共享，联合优化视频所有帧，利用帧间相关性提升深度估计的时间一致性和鲁棒性。
 
-
-
 ## 核心方法与创新机理
 
 CAPA 的核心创新在于将深度补全重新定义为**对预训练3D基础模型的参数高效测试时自适应**，绕开了传统方法需为每种稀疏模式训练专用编码器的瓶颈。其关键设计围绕两个“changed slots”展开：
@@ -101,8 +97,6 @@ CAPA 的核心创新在于将深度补全重新定义为**对预训练3D基础�
 ### 稀疏信号驱动的鲁棒对齐
 
 CAPA 在测试时优化的损失函数基于稀疏深度测量与模型预测之间的**鲁棒 L1 尺度对齐**（见 Eq.(4)），通过求解最优尺度 $s$ 和偏移 $t$ 来消除单目预测的尺度模糊性，使梯度信号聚焦于几何对齐而非尺度回归。这一设计使得 CAPA 在条件点区域和未条件点区域的深度误差差距极小——Table 3 显示，ScanNet 100点设置下两者差异仅0.1%，远低于基线方法，表明模型能够将稀疏测量处的信息有效传播到整个场景。
-
-
 
 CAPA 将深度补全重新定义为对预训练 3D 基础模型的参数高效测试时自适应。其核心 pipeline 由五个关键模块串联构成，整体遵循“冻结主干—注入适配器—多视图聚合—深度解码—尺度对齐”的推理流程。
 
@@ -134,12 +128,8 @@ CAPA 将深度补全重新定义为对预训练 3D 基础模型的参数高效�
 
 对于视频输入，CAPA 引入序列级参数共享机制：整个序列的所有帧共享同一组可学习适配参数，在测试时联合优化。每步优化随机采样一个迷你批次帧（默认约 10% 序列长度），通过跨帧梯度累积使适配参数捕捉帧间相关性，在提升深度精度的同时显著改善时间一致性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l70_https_arxiv_org_abs_2602_14751/figures/002_Figure_2.jpg]]
 *Figure 2: Method overview of CAPA. CAPA adapts 3D foundation models given sparse conditional depth (C) by efficiently tuning its image encoder while keeping all pre-trained weights frozen. This is achieved by manipulating the attention layers via two methods: 1)*
-
-
 
 CAPA 的核心在于将深度补全重新定义为对预训练 3D 基础模型的参数高效测试时自适应，其方法架构围绕三个关键模块展开：**冻结的 ViT 编码器**、**参数高效适配器（LoRA 或 VPT）**、以及**鲁棒尺度对齐模块**。
 
@@ -183,8 +173,6 @@ $$\min_{s,t}\left|\mathbf{M}\odot\left(s\cdot\hat{\mathbf{d}}+t-\mathbf{C}\right
 
 对于视频输入，CAPA 引入序列级参数共享机制：整个视频序列共享同一组可学习参数（LoRA 矩阵或 VPT 提示令牌），在测试时联合优化所有帧。每次优化步中随机采样部分帧构成迷你批次，通过跨帧梯度聚合利用帧间几何相关性，既提升深度精度又增强时间一致性。
 
-
-
 ## 实验与关键发现
 
 ### 核心定量结果：跨数据集、跨稀疏模式的全面领先
@@ -214,9 +202,6 @@ Table 2 以 **OPW（%）↓** 评估视频深度的时间一致性。在 ScanNet
 
 消融实验（Table 4）直接对比了序列级参数共享与逐帧独立调优：在 ScanNet 100 点下，序列级共享使 CAPA_LoRA 的 AbsRel 从逐帧的 1.7% 降至 0.9%，OPW 从 4.9% 降至 1.9%；CAPA_VPT 的 AbsRel 从 1.3% 降至 1.0%，OPW 从 2.8% 降至 1.8%。序列级共享通过强制所有帧使用同一组适配参数，隐式利用了帧间几何相关性，既提升了单帧深度精度，又显著增强了多帧一致性。当条件点较密集（SIFT 模式）时，序列级与逐帧的差距缩小，但仍保持优势。
 
-![[assets/figures/papers/paper_list_l70_https_arxiv_org_abs_2602_14751/figures/009_Table_4.jpg]]
-*Table 4: Effect of parameter sharing across video frames*
-
 ### 参数效率与全量微调的对比
 
 Table 6 展示了 CAPA 的参数效率边界。CAPA_LoRA 仅更新 0.39M 参数（约占 VGGT 总参数的 0.04%），在 ScanNet 100 点下 AbsRel 为 0.9%，与全模型微调（更新 100% 参数）的性能几乎持平。这一结果直接验证了核心假设：深度补全所需的场景特异性适配仅涉及极小规模的参数调整，冻结的主干网络已包含足够的通用几何先验。参数高效设计同时避免了全量微调可能造成的预训练表示破坏和灾难性遗忘。
@@ -236,35 +221,16 @@ Table 6 展示了 CAPA 的参数效率边界。CAPA_LoRA 仅更新 0.39M 参数�
 
 Figure 5 展示了 CAPA 应用于其他基础模型（**UniDepthV2**、**MoGe-2**）的结果。CAPA 持续提升各类基础模型的深度补全性能，表明所提出的测试时自适应框架不依赖于特定模型架构，具有良好的通用性。性能增益幅度与基础模型自身的几何先验质量正相关：先验越强，稀疏条件带来的相对提升越显著。
 
-![[assets/figures/papers/paper_list_l70_https_arxiv_org_abs_2602_14751/figures/007_Figure_5.jpg]]
-*Figure 5: CAPA results when applied to other base models*
-
 ### 失败模式与局限性
 
 CAPA 的表现高度依赖基础模型的几何先验质量。当基础模型完全失效时——如镜面反射、非朗伯表面、透明物体等违背朗伯假设的场景——仅靠稀疏深度信号可能无法完全纠正几何错误（见 Figure S3）。此外，当视觉先验的物理深度定义（通常为表面深度）与稀疏测量的深度定义不一致时（如 LiDAR 穿透玻璃或测量反射距离），适配可能不足。在条件点极度稀疏的情况下，CAPA 的性能仍受限于可用的几何信息量，尽管相比基线已有数量级提升。
-
-![[assets/figures/papers/paper_list_l70_https_arxiv_org_abs_2602_14751/figures/025_Figure_S.3.jpg]]
-*Figure S.3: Failure case, where the base model fails on mirrors and CAPA can not fully recover due to insufficient condition points*
 
 ### 效率对比
 
 相比其他测试时自适应方法（**Marigold-DC**、**TestPromptDC**），CAPA 的总处理时间快 10 倍以上（Table S10），归因于其仅需少量优化步数即可收敛，且无需扩散模型的多步采样过程。CAPA 在测试时引入的优化延迟可通过调整步数在精度与速度间灵活取舍：减少步数可大幅降低延迟，仅以微小的精度损失为代价。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l70_https_arxiv_org_abs_2602_14751/figures/010_Table_5.jpg]]
-*Table 5: Batch size vs. optimization steps [AbsRel (%)↓]*
-
-![[assets/figures/papers/paper_list_l70_https_arxiv_org_abs_2602_14751/figures/011_Figure_6.jpg]]
-*Figure 6: Influence of mini-batch size. Performance improves with more frames and saturates at ≈10%*
-
-![[assets/figures/papers/paper_list_l70_https_arxiv_org_abs_2602_14751/figures/013_Figure_7.jpg]]
-*Figure 7: Reconstruction quality vs. optimization steps*
-
 ![[assets/figures/papers/paper_list_l70_https_arxiv_org_abs_2602_14751/figures/020_Table_S.7.jpg]]
 *Table S.7: Ablation of LoRA rank and VPT token length [AbsRel%↓]*
-
-
 
 ## 定位与知识库关联
 
@@ -306,8 +272,6 @@ CAPA 的方法设计建立在以下技术脉络之上：
 2. **极端失效处理**：如何应对基础模型在非朗伯表面、透明物体、强镜面反射等场景下的完全失效？可能需要引入额外的物理约束或多模态信号。
 3. **深度定义对齐**：如何系统性地解决视觉先验与传感器测量之间深度定义不匹配的问题？这涉及对 LiDAR 穿透、折射等物理现象的显式建模。
 4. **更广泛的基础模型适配**：CAPA 已验证了对 VGGT、UniDepthV2、MoGe-2 的适配能力，未来可探索将其应用于更广泛的 3D 基础模型架构（如基于 3D Gaussian Splatting 或 NeRF 的表示）。
-
-
 
 ## 原文 PDF
 

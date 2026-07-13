@@ -54,15 +54,11 @@ claims:
 
 在方法谱系上，TIGER 区别于单阶段联合生成的范式，开创性地将文本结构显式建模为可控制的中间表示，并以此驱动全局图像增强，为场景文本超分辨率提供了一条“结构优先、视觉随后”的新路径。
 
-
-
 场景文本图像超分辨率（Scene Text Image Super-Resolution, STISR）面临一个根本性的两难困境：**文本可读性与图像视觉质量难以兼得**。通用图像超分模型（如 **Real-ESRGAN** (Zhang et al., ICCV 2021)、**HAT**、**SeeSR** (Wang et al., CVPR 2024) 等）在提升整体视觉质量的同时，往往扭曲字形结构，导致笔画粘连、断裂或变形；而专为文本设计的超分方法（如 **MARCONet**、**DiffTSR** (Zhang et al., CVPR 2024)、**TADiSR**）虽能改善字符识别准确率，却常引入背景不一致、块效应或伪影，使文本与周围场景产生割裂感。这一折衷的根源在于：**现有方法将文本恢复与图像增强耦合在单一阶段中处理**，非文本区域的干扰信息不可避免地渗入文本重建过程，反之亦然。
 
 从数据集角度看，现有基准同样存在结构性缺陷。TextZoom 缺乏中文场景，CTR 不支持多行文本，而 Real-CE 的退化程度较为温和，无法充分检验方法在极端低质场景下的鲁棒性（见表 1）。这导致已有工作的评估覆盖面有限，难以反映真实世界应用中从严重退化图像恢复可读文本的挑战。
 
 针对上述瓶颈，本文提出 **TIGER（Text–Image Guided supEr-Resolution）**，核心动机在于：**将字形结构恢复与图像增强显式解耦**，以“先恢复文本，后增强图像”的两阶段范式打破单阶段联合处理的固有局限。第一阶段独立重建高保真的文本字形结构，避免非文本区域的干扰；第二阶段以恢复的精确字形掩模作为强结构约束，引导整体图像超分，从而在保留笔画精度的同时实现文本与背景的和谐融合。这一设计从因果机制上切断了文本扭曲与背景伪影之间的相互干扰路径，为场景文本超分辨率提供了新的思路。
-
-
 
 ## 核心方法与创新机理
 
@@ -104,8 +100,6 @@ $$\hat{z}_{H} = z_{L} - \sigma_{t} \epsilon_{\phi} \big( z_{L}, \hat{z}_{m}, t, 
 
 上述四个改变槽位构成了一个完整的因果链条：**解耦的框架范式**使得文本恢复与图像增强可以独立优化；**显式的字形掩模**为增强阶段提供了可操作的强约束；**混合-微调训练策略**确保了掩模在真实退化下的质量；**ControlNet 条件引导**则将结构约束精确地注入生成过程。这一链条最终在 Real-CE 和 UZ-ST 两个基准上实现了图像质量与文本准确率的双重最优（Table 2, Table 3），OCR-A 分别比最强基线 TADiSR 高出 2.6% 和 6.4%。
 
-
-
 TIGER 采用“文本优先、图像随后”的两阶段解耦范式，将场景文本图像超分辨率拆分为**文本恢复阶段**与**图像增强阶段**，以突破现有方法中文本可读性与背景视觉质量不可兼得的瓶颈（Fig. 2）。
 
 ![[assets/figures/papers/paper_list_l2581_https_arxiv_org_abs_2510_21590/figures/003_Figure_2.jpg]]
@@ -121,12 +115,8 @@ $$\hat{z}_H = z_L - \sigma_t \epsilon_\phi(z_L, \hat{z}_m, t, c_{Null})$$
 
 **数据流与模块关系。** 两阶段间通过文本掩模 $\hat{x}_m$ 实现信息传递：阶段一输出的掩模既是文本结构的显式表征，又是阶段二 ControlNet 的控制条件。训练策略上，阶段一先混合合成数据与真实数据训练，再仅用合成数据微调，以提升对真实世界退化的鲁棒性；阶段二则采用重建损失（MSE + LPIPS）与边缘损失（Sobel 算子）联合监督，强化字形边界。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2581_https_arxiv_org_abs_2510_21590/figures/001_Figure_1.jpg]]
 *Figure 1: We present TIGER (Text–Image Guided supEr-Resolution), a novel framework for scene text super-resolution. Its ‘text-first, image-later’ paradigm ensures accurate glyph restoration and consistently high overall image fidelity and visual quality*
-
-
 
 TIGER 将场景文本超分辨率分解为两个顺序执行的阶段，每个阶段承担明确的功能边界。以下逐一拆解关键模块及其数学形式。
 
@@ -197,8 +187,6 @@ $$
 - **ControlNet 的 tile-based 推理**：阶段二基于 Stable Diffusion 3.5，采用分块推理策略处理高分辨率输出，保证显存效率（见 Sec. 5.1）。
 - **文本掩模作为显式结构约束**：区别于隐式交叉注意力或后处理提取，TIGER 显式生成高保真二值掩模，使阶段二的超分过程有明确的空间引导信号。消融实验证实，空掩模引导使 OCR-A 从 67.3% 降至 59.5%，验证了该约束的关键性（见 Sec. 5.3）。
 
-
-
 ## 实验与关键发现
 
 ### 实验设置与基准
@@ -246,33 +234,11 @@ Table 4 验证了 UZ-ST 数据集的价值：在 Real-CE 上训练的模型直�
 2. **OCR 错误传播**：在严重退化导致 OCR 检测遗漏或识别完全错误的极端情况下，恢复的字形结构可能偏离真实语义，尽管消融实验表明该影响有限，但未完全消除。
 3. **多语言泛化**：当前验证以中文场景为主，对复杂多语言混合排版（如阿拉伯文、印地语等书写系统差异较大的文字）的支持尚待系统考察。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2581_https_arxiv_org_abs_2510_21590/figures/005_Table_2.jpg]]
-*Table 2: Evaluation results on image quality and text accuracy. Numbers in bold indicate the best performance. TIGER performs best*
-
-![[assets/figures/papers/paper_list_l2581_https_arxiv_org_abs_2510_21590/figures/006_Table_3.jpg]]
-*Table 3: Evaluation of image quality on text regions and text accuracy compared to LR (∆ OCR-A). TIGER achieves the best performance*
-
-![[assets/figures/papers/paper_list_l2581_https_arxiv_org_abs_2510_21590/figures/010_Table_6.jpg]]
-*Table 6: Ablation study on Real-CE with stage 2 fixed as the baseline. From top to bottom, we compare the performance of using text masks rendered with a standard font, extracted using SAM-TS, reconstructed with latent diffusion model conditioned on LR, and reconstructed with our text restoration pipeline. Our pipeline faithfully restores glyph structures, yielding the highest accuracy*
-
 ![[assets/figures/papers/paper_list_l2581_https_arxiv_org_abs_2510_21590/figures/007_Figure_4.jpg]]
 *Figure 4: Qualitative Evaluation on Real-CE and UZ-ST*
 
 ![[assets/figures/papers/paper_list_l2581_https_arxiv_org_abs_2510_21590/figures/011_Table_5.jpg]]
 *Table 5: Ablation on OCR prediction. The model remains strong with null or random OCR text, indicating limited reliance on OCR*
-
-![[assets/figures/papers/paper_list_l2581_https_arxiv_org_abs_2510_21590/figures/015_Table_10.jpg]]
-*Table 10: Ablation on the effect of stochastic OCR outputs on the performance of our method. The performance gains as the randomness of the OCR output drops. Even under 100% random OCR output, our method still outperforms TADiSR, proving low reliance on OCR*
-
-![[assets/figures/papers/paper_list_l2581_https_arxiv_org_abs_2510_21590/figures/004_Figure_3.jpg]]
-*Figure 3: Overview of UZ-ST (UltraZoom-Scene Text). (a) Real-CE LRs show only mild degradation (red box), while UZ-ST LRs exhibit stronger degradation (red box), enabling a more comprehensive evaluation. (b) Coarse-to-fine alignment: images are sorted by focal length, each warped to the next higher-focal neighbor using an estimated homography matrix, then refined to the 200 mm GT*
-
-![[assets/figures/papers/paper_list_l2581_https_arxiv_org_abs_2510_21590/figures/014_Table_9.jpg]]
-*Table 9: Efficiency analysis*
-
-
 
 ## 定位与知识库关联
 
@@ -317,8 +283,6 @@ TIGER 的核心突破在于**将字形结构恢复与图像增强显式解耦**�
 ### 5. 在知识库中的定位
 
 TIGER 在 STISR 领域的方法谱系中占据了一个独特位置：它是**首个将文本结构恢复与图像增强显式解耦的两阶段扩散框架**。与 TADiSR（文本感知扩散超分，当前最强单阶段基线）相比，TIGER 在 Real-CE 上 OCR-A 提升 2.6%（67.3% vs. 64.7%），在 UZ-ST 上提升 6.4%（43.0% vs. 36.6%），同时在全部图像质量指标（PSNR、SSIM、LPIPS、DISTS、FID）上均取得最优。这一结果表明，**“先恢复文本，后增强图像”的范式转换**是解决文本可读性与图像质量折衷问题的有效路径，为后续工作提供了可复用的架构模板和明确的改进方向（加速第一阶段、增强 OCR 鲁棒性、拓展语言覆盖）。
-
-
 
 ## 原文 PDF
 

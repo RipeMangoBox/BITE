@@ -53,8 +53,6 @@ claims:
 
 在实验验证上，WAFT在Spring基准测试的所有指标上排名第一，在Sintel和KITTI上也达到领先水平，同时展现出优异的零样本跨数据集泛化能力。效率方面，WAFT比**Flowformer++**（Shi et al., CVPR 2023）快1.3倍，比**CCMR+**快4.1倍，训练内存消耗显著低于基于代价体的方法——在1/2分辨率下，WAFT仅需9.2 GiB，而SEA-RAFT则直接超出显存上限。
 
-
-
 ### 光流估计中的代价体瓶颈
 
 光流估计旨在计算两帧图像间逐像素的稠密运动场。当前主流的迭代光流方法——以 **RAFT**（Teed & Deng, ECCV 2020）为代表——普遍依赖**代价体（cost volume）** 来显式编码帧间像素的视觉相似度。代价体通过计算特征向量的点积构建：
@@ -89,8 +87,6 @@ WAFT 的核心动机基于以下观察：如果能够有效处理全局依赖性
 - **简化架构**：代价体的移除也使得上下文编码器（context encoder）——RAFT 类方法中为更新模块提供额外特征的标准组件——变得冗余，可被安全移除，进一步精简流程。
 
 为弥补扭曲操作缺乏显式搜索能力的不足，WAFT 在循环更新模块中采用**视觉Transformer架构**（修改的 DPT-Small），利用自注意力机制隐式建模大位移和全局上下文，从而在纯扭曲范式下仍能保持对大运动的鲁棒性。
-
-
 
 ## 核心方法与创新机理
 
@@ -133,8 +129,6 @@ Table 5 的消融实验提供了强因果证据：将 DPT-based 更新模块替�
 
 这一设计使 WAFT 在 Spring 基准的所有指标上排名第一（Table 3），同时在 KITTI 零样本泛化中将误差降低 11%（Table 4），验证了该元架构的有效性。
 
-
-
 ![[assets/figures/papers/paper_list_l47_https_openreview_net_forum_id_HTqGE0KcuF/figures/001_Figure_1.jpg]]
 *Figure 1: The meta-architecture of WAFT consists of an input encoder and a recurrent update module. We first extract image features from the input encoder, and then use these features to iteratively update the flow estimate for T steps. At each step, we perform feature indexing through a lightweight backward warping on the feature of frame 2, removing the dependency on expensive cost volume used by previous work*
 
@@ -151,8 +145,6 @@ $$\mathsf{Warp}(f_{\mathrm{cur}})_p = F(I_2)_{p + (f_{\mathrm{cur}})_p}$$
 **预测头**位于循环更新模块之后，从最终隐藏状态生成混合拉普拉斯分布的参数，并通过凸上采样恢复至原始图像分辨率的光流场。训练与推理均固定 $T=5$ 次迭代。
 
 整个流程可概括为：输入两帧图像 → 冻结编码器提取多尺度特征 → 循环更新模块在特征空间内迭代扭曲索引并更新隐藏状态（5 次）→ 预测头输出全分辨率光流。这一设计将内存瓶颈从代价体的二次复杂度中解放出来，使高分辨率特征索引成为可能，进而带来边界精度和整体性能的显著提升。
-
-
 
 ### 代价体与扭曲操作的对比
 
@@ -187,8 +179,6 @@ WAFT 的元架构由输入编码器和循环更新模块两部分组成。在第
 - **上下文编码器**：消融实验表明其引入额外计算开销但未带来显著性能增益（w/ Context: 1.22 vs WAFT-DAv2-a1: 1.18），可安全移除。
 
 这使得 WAFT 的架构显著简化，仅保留输入编码器与循环更新模块两个核心组件。
-
-
 
 ## 实验与关键发现
 
@@ -235,16 +225,11 @@ Table 5 的系统消融揭示了 WAFT 架构中各组件的因果贡献，所有
 
 WAFT 的内存效率优势在 Table 1 中量化呈现。在 RTX A6000 上以 batch size 1 进行训练时，WAFT-Twins-a2 在 1/8、1/4、1/2 分辨率下的内存消耗分别为 7.0 GiB、7.6 GiB、9.2 GiB。相比之下，基于部分代价体的 SEA-RAFT 在 1/8 分辨率下即消耗 14.1 GiB，在 1/4 分辨率下升至 25.8 GiB，在 1/2 分辨率下直接显存溢出。这一差距源于代价体构建的计算复杂度随分辨率二次增长，而翘曲操作仅在对应像素位置进行单点索引。
 
-![[assets/figures/papers/paper_list_l47_https_openreview_net_forum_id_HTqGE0KcuF/figures/004_Table_1.jpg]]
-*Table 1: We profile the training memory cost with batch size 1 on an RTX A6000. Our warping method significantly reduces the cost*
-
 在推理延迟方面，所有测量均在 RTX3090 上以 batch size 1、540p 输入进行。WAFT 比 Flowformer++ 快 1.3 倍，比 CCMR+ 快 4.1 倍（Abstract）。
 
 ### 失败模式与局限性
 
 尽管整体性能优异，WAFT 在特定困难场景下暴露出纯翘曲机制的局限性。在 Sintel 的 “Ambush 1” 序列（极端运动模糊）上，WAFT 的表现不如部分基于代价体的方法（Table 6）。这说明当对应像素的特征因模糊而严重退化时，单一对应点索引可能不足以消除匹配歧义——代价体提供的局部邻域信息在此类场景下仍具有互补价值。此外，WAFT 高度依赖视觉 Transformer 架构，若缺乏大规模预训练，CNN 变体的性能急剧下降（Table 5），这限制了该方法在计算资源受限场景下的直接部署。
-
-
 
 ## 定位与知识库关联
 
@@ -285,8 +270,6 @@ WAFT在Spring基准上以全部指标排名第一（1px 3.182, EPE 0.325, WAUC 9
 3. **跨任务迁移**：WAFT的元架构（输入编码器+Transformer循环更新模块+扭曲索引）是否可直接迁移到立体视差估计或多视角立体，并保持高效与高精度？这需要验证扭曲操作在无时序线索的双目/多目几何中是否足以替代代价体的显式匹配。
 
 4. **与经典理论的对齐**：论文提及Brox et al. (2004) 将扭曲与循环更新的组合框架化为不动点迭代算法，但未深入展开。这一理论视角可能为理解纯扭曲方法的收敛性和误差传播提供更严格的分析工具。
-
-
 
 ## 原文 PDF
 

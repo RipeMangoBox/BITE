@@ -78,8 +78,6 @@ LILA 处于**视频自监督表示学习**与**像素级特征上采样**的交�
 
 LILA 的训练信号依赖预训练的深度和光流模型，在航空影像等域外场景中因阴影等因素导致线索不可靠，表示质量显著下降。当前仅训练解码器，编码器被冻结，联合优化的潜力尚未释放。开放问题包括：能否在训练中自举几何线索而不依赖固定预训练网络？线性上下文学习范式能否扩展到其他几何模态或多模态输入？
 
-
-
 ### 问题背景：像素级稠密特征化的挑战
 
 视觉基础模型的兴起极大地推动了图像级理解任务的发展，然而，将这些模型迁移到需要**像素级稠密预测**的任务（如视频目标分割、表面法线估计、语义分割）时，仍面临根本性困难。核心瓶颈在于：现有视觉基础模型缺乏能有效嵌入视觉场景时空属性的像素级表示，尤其难以从视频中学习稠密且时间一致的特征。
@@ -106,8 +104,6 @@ LILA 的训练信号依赖预训练的深度和光流模型，在航空影像等
 - **无需人工标注**：训练仅依赖未标注视频和现成的深度/光流网络，不涉及任何人工标注数据；
 - **推理高效**：深度和光流网络仅在训练阶段用于生成监督信号，推理时被完全丢弃，模型仅需单张图像输入；
 - **通用性强**：学习到的特征可同时服务于视频目标分割、表面法线估计、语义分割等多种下游任务，展现出广泛的迁移能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -161,8 +157,6 @@ $$\mathcal{L}_{\mathrm{LILA}} = \mathcal{L}_{\mathrm{L1}} + \gamma \mathcal{L}_{
 
 值得注意的是，LILA 训练仅使用未标注视频，不依赖任何人工标注数据。深度和光流网络仅在训练阶段用于生成线索图，推理时被丢弃，模型仅需单张图像输入，推理计算量与标准编码器-解码器相同。这一设计使其在保持推理效率的同时，显著提升了特征的几何细节和时间一致性。
 
-
-
 LILA 的整体框架围绕一个冻结的视觉编码器与一个可训练的稠密解码器构建，其核心训练策略——线性上下文学习——将跨帧时间一致性约束注入像素级特征学习过程。图 1 给出了方法的高层概览：从未标注视频中训练编码器-解码器模型，输出高分辨率且时间一致的特征图。
 
 ### 模块构成与数据流
@@ -191,12 +185,8 @@ LILA 的整体框架围绕一个冻结的视觉编码器与一个可训练的稠
 
 推理时，模型仅需单张图像输入，无需深度或光流网络。冻结编码器与 DPT 解码器直接输出像素级稠密特征图，计算量与标准编码器-解码器架构完全相同。这些特征可直接用于下游任务的线性探测或 k-NN 推理，无需额外微调。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_26488/figures/001_Figure_1.jpg]]
 *Figure 1: Overview. We train an encoder-decoder model from unlabelled videos to produce high-resolution (HR), temporally consistent feature maps. The core novelty of our training approach is linear in-context learning, or LILA. Trained on noisy cue maps, such as those provided by off-the-shelf optical flow and monocular depth networks, LILA enhances the low-resolution (LR) encoder features with pixel-level geometry and temporally stable semantics*
-
-
 
 ### 整体训练流程
 
@@ -249,8 +239,6 @@ $$\mathcal{L}_{\nabla \times} = \omega_{\mathrm{x}} \left\| \nabla_{\mathrm{x}} 
 
 为提升特征的鲁棒性，LILA 在训练时对上下文帧和查询帧分别施加独立的随机裁剪 $\mathcal{C}_0$ 和 $\mathcal{C}_{\Delta}$。这意味着 $x_0$ 和 $x_{\Delta}$ 对应的空间区域不完全一致，但 $W^*$ 仍须将从局部上下文中学到的映射关系泛化到查询帧的（可能不同的）裁剪区域。这一设计迫使网络学习对空间扰动不敏感的跨帧不变表示。消融实验表明，移除该随机裁剪会导致 VOS-KNN 的 JF 下降 1.5%（Table 5）。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与实验设计逻辑
@@ -260,9 +248,6 @@ $$\mathcal{L}_{\nabla \times} = \omega_{\mathrm{x}} \left\| \nabla_{\mathrm{x}} 
 ### 视频目标分割（DAVIS-2017）
 
 Table 1 展示了 DAVIS-2017 验证集上的主要结果。LILA 在两种评估协议下均显著超越基线：
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_26488/figures/004_Table_1.jpg]]
-*Table 1: Video object segmentation (DAVIS-2017, val). We evaluate LILA with linear probing and local k-NN, and report the mean Jaccard index*
 
 - **线性探测**：以 DINO2-S14 为骨干时，LILA 的 IF 达到 68.6，较 DINOv2 基线（57.5）提升 **11.1 个百分点**；以 DINO2-B14 为骨干时，IF 为 70.4，较 FlowFeat（65.7）提升 4.7 个百分点。
 - **局部 k-NN**：LILA（DINO2-S14）的 JF 达到 73.9，较使用 SAM 掩码监督的 LoftUp（65.5）高出 **8.4 个百分点**——值得注意的是，LILA 完全不依赖任何人工标注数据，仅利用现成的深度和光流网络生成训练信号。
@@ -276,16 +261,10 @@ Figure 4 的定性结果进一步印证了定量结论：LILA 在细粒度动态
 
 Table 2 报告了 NYUv2 表面法线估计和 COCO-Stuff 语义分割的线性探测结果。LILA 在所有骨干尺寸和训练数据集上均取得一致提升：
 
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_26488/figures/006_Table_2.jpg]]
-*Table 2: Probing surface normals and semantic segmentation. We report the probing accuracy on NYUv2 (val) for surface normals in terms of Root Mean Squared Error (RMSE) and inlier ratios for thresholds*
-
 - **表面法线估计**：DINO2-B14+LILA 的 RMSE 降至 25.71，较 DINOv2 基线（26.56）降低 0.85；在更严格的 δ₁=11.25° 阈值下，内点率亦有明显改善。
 - **语义分割**：DINO2-B14+LILA 的 mIoU 达到 62.4，较 DINOv2 基线（58.5）提升 3.9 个百分点；像素准确率（pAcc）同步提升。
 
 Table 3 的 ADE20K 和零样本 COCO-Stuff 结果进一步验证了 LILA 特征的泛化能力：在零样本设置下，LILA 对未见类别的分割 mIoU 同样优于基线，表明学习到的表示具有超越训练分布的可迁移性。
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_26488/figures/008_Table_3.jpg]]
-*Table 3: Probing segmentation: ADE20K and zero-shot COCO-Stuff. (a) Using linear probing, we evaluate LILA on ADE20K. (b) In the zero-shot setting, we train a linear probe initialised from the text embeddings, extracted from CLIP [20], of seen classes in COCO-Stuff and test on 15 unseen categories, reporting mIoU*
 
 Figure 5 的定性对比揭示了一个值得关注的现象：尽管 LILA 在动态场景视频上训练，其在以静态为主的室内场景中仍能揭示更精细的表面结构（如家具曲面），并产生更准确的语义边界和背景细节。这暗示线性上下文学习框架所施加的跨帧一致性约束，本质上促进了网络对通用几何和语义线索的提取能力。
 
@@ -311,13 +290,7 @@ Figure 5 的定性对比揭示了一个值得关注的现象：尽管 LILA 在�
 
 Table 6 展示了 LILA 在不同预训练骨干上的泛化能力：包括 Masked Autoencoder、带 registers 的 DINOv2 以及 DINOv3，LILA 训练后均带来一致的性能增益，表明该方法不依赖于特定编码器的归纳偏置。
 
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_26488/figures/013_Table_6.jpg]]
-*Table 6: Generalisation across other backbones. We report the probing accuracy by pre-training LILA with diverse backbones: Masked Autoencoder, DINOv2 with registers and DINOv3*
-
 Figure 7 分析了时序采样窗口 Δ 大小对 VOS 性能的影响：过小的 Δ 导致帧间变化不足，无法有效学习时间一致性；过大的 Δ 则因场景变化剧烈而增加学习难度。存在一个最优窗口范围，在该范围内 LILA 能有效平衡时间一致性与学习难度。
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_26488/figures/012_Figure_7.jpg]]
-*Figure 7: The temporal gap trade-off. We report J F on VOS (DAVIS 2017) with k-NN inference for different LILA models trained with varying sizes of the sampling window ∆*
 
 ### 失败模式与局限性
 
@@ -331,13 +304,6 @@ Figure 6 的域外测试揭示了 LILA 的关键局限：在航空影像中，�
 ### 公平性说明
 
 实验比较遵循严格的公平性原则：(1) 所有基线模型使用相同的预训练骨干网络；(2) 评估采用标准线性探测或 k-NN 协议，不引入额外微调偏差；(3) LILA 训练仅使用未标注视频，不依赖任何人工标注数据——与之对比，LoftUp 使用了 SAM 掩码监督，FlowFeat 依赖光流标注，而 LILA 仅利用现成网络生成的自动信号。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_26488/figures/010_Table_4.jpg]]
-*Table 4: Ablation study: cue modalities. We train LILA with varying modalities in the cue maps and report the accuracy on VOS (DAVIS 2017), surface normal estimation (NYUv2) and semantic segmentation (COCO-Stuff)*
-
-
 
 ## 定位与知识库关联
 
@@ -375,8 +341,6 @@ LILA 开辟了若干值得进一步研究的方向：
 - **模态扩展。** 线性上下文学习框架是否可扩展到其他几何模态（如表面法线、3D 点云）或多模态输入（如语言-视频联合建模）？当前工作仅验证了深度和光流两种线索，框架本身对线索类型并无硬性约束。
 - **编码器联合优化。** 端到端微调编码器（而非冻结）配合 LILA 训练能否进一步提升性能？Table 6 已展示跨骨干的泛化能力，但联合优化的增益尚未被量化。
 - **静态数据适应。** 在仅有静态图像数据的情况下，LILA 的训练范式能否利用合成视频或几何增广进行适应？这将决定该方法能否推广到视频数据稀缺的领域。
-
-
 
 ## 原文 PDF
 

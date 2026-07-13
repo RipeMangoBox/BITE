@@ -57,8 +57,6 @@ DAP 的方法定位可从四个关键维度理解：
 
 实验结果表明，DAP 在 DAP-Test 基准上大幅超越度量深度基线 **DAC**（Guo et al., CVPR 2025）和 **Unik3D**（Piccinelli et al., CVPR 2025）：AbsRel 分别降低 0.2416 和 0.1736，δ1 分别提升 0.4177 和 0.3284（Table 4）。消融实验证实，失真图、几何损失和清晰度损失的叠加能持续累积增益，范围掩码头可有效滤除不可靠远距预测并稳定训练（Table 5, Table 6）。在 Stanford2D3D 和 Deep360 等基准上的零样本测试中，DAP 同样取得最优结果，验证了大规模数据缩放与域一致性训练的有效性。
 
-
-
 全景深度估计旨在从 360° 等距柱状投影（ERP）图像中恢复稠密的度量深度信息，是三维场景理解、虚拟现实与自动驾驶等应用的基础任务。然而，该领域长期受制于一个核心瓶颈：**现有全景深度估计数据集规模有限且缺乏多样性，模型难以泛化到真实世界室外场景，特别是远距离和复杂几何区域**。此前方法（如 **PanDA**（Cao et al., CVPR 2025）、**DAC**（Guo et al., CVPR 2025）、**Unik3D**（Piccinelli et al., CVPR 2025））所依赖的训练数据通常局限于单一域或特定场景，数据量远低于百万级（见 Table 1），导致模型在面对未见过的真实室外全景时性能急剧退化。
 
 从因果机制来看，全景深度估计的性能瓶颈并非仅在于模型架构设计，更深层的原因在于**数据规模与域覆盖的不足**直接限制了模型的零样本泛化能力。合成数据虽然易于获取精确深度真值，但与真实图像之间存在显著的域差距；真实全景数据虽然场景丰富，但深度标注成本极高，难以大规模获取。这一矛盾构成了全景深度估计走向“基础模型”级泛化能力的关键障碍。
@@ -66,8 +64,6 @@ DAP 的方法定位可从四个关键维度理解：
 本文的核心动机即在于打破上述数据与泛化之间的因果僵局。作者提出 **DAP（Depth Any Panoramas）**，通过构建一个包含约 200 万样本、覆盖合成/真实与室内/室外四个域的大规模数据引擎（DAP-2M），从根本上扩大数据规模与多样性。在此基础上，设计三阶段渐进式伪标签精炼管线，逐步弥合合成–真实与室内–室外的域差距，并辅以几何一致性（法线损失、点云损失）与清晰度导向（密集保真度损失、梯度损失）的多损失优化策略，最终实现一个在室内外场景均具有强零样本泛化能力的全景深度基础模型。
 
 > **需手动验证**：本文未明确引用全景深度估计在自动驾驶等具体下游任务中的定量需求分析，相关应用背景描述需结合原文 Introduction 部分进一步确认。
-
-
 
 ## 核心方法与创新机理
 
@@ -111,8 +107,6 @@ DAP 的损失函数设计（Equation 6）从三个层次约束深度预测质量
 ### 创新四：可插拔范围掩码机制
 
 全景场景的深度分布极不均匀——近处物体需要高精度度量，而远处天空区域往往无有效深度约束。DAP 设计了轻量级的范围掩码头，预测二值掩码 $M$，通过 Equation 1 的加权 BCE 与 Dice 损失进行监督。该掩码与度量深度头的输出逐元素相乘，以可插拔方式滤除超出距离阈值的不可靠区域。消融实验（Table 6）表明，采用 100 m 阈值的范围掩码在 DAP-2M-Labeled 和 Deep360 上取得最优综合指标；移除该模块则性能显著下降，验证了其对训练稳定性和远距预测质量的关键作用。
-
-
 
 DAP 的整体框架围绕三个核心组件构建：**大规模多域数据引擎**、**渐进式三阶段训练管线**和**几何与清晰度感知的网络架构**。Figure 2 给出了三阶段管线的完整概览，Figure 3 展示了网络架构的详细设计。
 
@@ -159,8 +153,6 @@ $$\mathcal{L}_{total} = M_{distort} \odot \left( \lambda_1 \mathcal{L}_{SILog} +
 - $\mathcal{L}_{mask}$：掩码损失（Eq 1），加权 BCE 与 Dice 损失监督范围掩码预测。
 
 损失权重设置为 $\lambda_1 = 1.0$，$\lambda_2 = 0.4$，$\lambda_3 = 5.0$，$\lambda_4 = 2.0$，$\lambda_5 = 2.0$，$\lambda_6 = 2.0$。消融实验（Table 5）证实，从仅使用 $\mathcal{L}_{SILog}$ 的基线出发，逐步叠加失真图、几何损失和清晰度损失，在 Stanford2D3D 和 Deep360 上均取得持续的性能增益，验证了各损失分量的累积贡献。
-
-
 
 DAP 的核心架构由三个关键模块构成：**失真感知深度解码器**、**可插拔范围掩码头**与**度量深度头**，并通过多层级几何与清晰度感知损失函数进行联合优化。以下逐一剖析各模块的设计逻辑与公式含义。
 
@@ -226,13 +218,6 @@ $$ \mathcal{L}_{total} = M_{distort} \odot \left( \lambda_1 \mathcal{L}_{SILog} 
 
 所有损失项通过失真图 $M_{distort}$ 加权后求和。超参数设置为 $\lambda_1 = 1.0$，$\lambda_2 = 0.4$，$\lambda_3 = 5.0$，$\lambda_4 = 2.0$，$\lambda_5 = 2.0$，$\lambda_6 = 2.0$。消融实验证实，在仅使用 $\mathcal{L}_{SILog}$ 的基线基础上逐步叠加失真图、几何损失（$\mathcal{L}_{normal}$、$\mathcal{L}_{pts}$）和清晰度损失（$\mathcal{L}_{DF}$、$\mathcal{L}_{grad}$），在 Stanford2D3D 和 Deep360 上分别取得最佳 AbsRel（0.1084 / 0.0862）和 δ1（0.8576 / 0.8719），各损失分量对性能均有累积增益。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2512_16913/figures/004_Figure_3.jpg]]
-*Figure 3: Architecture of the proposed DAP network. Built upon DINOv3-Large [38] as the visual backbone, our model adopts a distortion-aware depth decoder and a plug-and-play range mask head for adaptive distance control across diverse scenes. Training is guided by multi-level geometric and sharpness-aware losses, including*
-
-
-
 ## 实验与关键发现
 
 DAP 的实验评估围绕三个层次展开：零样本泛化能力、DAP-Test 基准上的综合性能，以及各设计组件的消融贡献。所有实验均采用 DINOv3-Large 作为统一视觉骨干并进行完全微调，以排除外部视觉先验对公平性的干扰。
@@ -260,9 +245,6 @@ DAP 在 Stanford2D3D、Matterport3D 和 Deep360 三个基准上进行了零样�
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2512_16913/figures/006_Figure_4.jpg]]
 *Figure 4: Qualitative comparison across diverse real-world indoor and outdoor scenes. Our DAP produces sharper object boundaries, smoother global geometry, and superior robustness in distant and sky regions compared to DAC [15] and Unik3D [32]*
 
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2512_16913/figures/007_Figure_5.jpg]]
-*Figure 5: Qualitative comparison on Stanford2D3D. Our method preserves fine structural details and demonstrates superior scaleawareness*
-
 ### 消融实验
 
 消融实验从模型组件和范围掩码配置两个维度展开，揭示了各设计选择的因果贡献。
@@ -279,24 +261,11 @@ DAP 在 Stanford2D3D、Matterport3D 和 Deep360 三个基准上进行了零样�
 
 Table 1 对比了 DAP 与以往全景深度估计方法的训练数据构成。DAP 数据引擎构建了约 2M 样本的全景数据集，涵盖室内（500K）与室外（1.5M）、合成（300K）与真实（1.7M）四个域，远超 PanDA、Unik3D、DAC 等方法的数据规模与域覆盖范围。Table 2 进一步列出了训练所涉及的具体数据集及其标注状态。这一数据基础是 DAP 实现强零样本泛化的根本前提。
 
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2512_16913/figures/002_Table_1.jpg]]
-*Table 1: Comparison of training data compositions used by recent panoramic depth estimation methods. Unlike previous approaches, which rely on limited or domain-specific datasets, our DAP data engine scales up to 2M panoramas across both indoor/outdoor and synthetic/real domains, providing a unified and comprehensive data foundation for panoramic depth modeling. * in DA2 refers to pseudo-panoramic data generated from perspective images through P2E projection and out-painting model*
-
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2512_16913/figures/005_Table_2.jpg]]
-*Table 2: Overview of datasets used for training DAP, covering synthetic and real, labeled and unlabeled panoramic data*
-
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2512_16913/figures/010_Table_5.jpg]]
 *Table 5: Ablation study on the proposed components. The best and second best performances are highlighted*
 
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2512_16913/figures/011_Table_6.jpg]]
-*Table 6: Ablation on the range mask head (m). The best and second best results are highlighted*
-
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2512_16913/figures/001_Figure_1.jpg]]
 *Figure 1: Metric depth visualizations generated by DAP from diverse panoramic inputs. For clarity, each depth map is displayed using its own adaptive truncation range. DAP achieves robust, metrically consistent panoramic depth across diverse real-world scenes, highlighting the power of large-scale data and model designing*
-
-
 
 ## 定位与知识库关联
 
@@ -343,8 +312,6 @@ DAP 为全景深度估计的基础模型范式奠定了数据和方法论基础�
 3. **跨任务迁移**：DAP 学习到的全景几何先验能否迁移到全景语义分割、全景三维重建等相关任务，值得系统验证。DINOv3-Large 骨干的强视觉先验为此类迁移提供了潜在基础。
 
 4. **数据引擎的持续扩展**：当前 DAP 数据引擎覆盖四个域，进一步纳入更多样化的真实世界场景（如极端光照、恶劣天气）和更多传感器模态（如 LiDAR 稀疏深度），有望持续提升模型的泛化边界。
-
-
 
 ## 原文 PDF
 

@@ -56,8 +56,6 @@ claims:
 
 **局限与展望**：当前 MLLM 主要在2D数据上训练，对3D空间关系的理解有限；编辑区域检测受 PartField 分割粒度影响；基础生成模型的分辨率（64³体素）限制了细节保真度。未来方向包括让 MLLM 直接消费3D输入进行原生3D推理、引入更强的3D分割模型，以及探索更优的交错去噪调度方案。
 
-
-
 ### 文本引导3D编辑的现状与瓶颈
 
 3D内容创作在游戏、影视和虚拟现实等领域的需求持续增长，但高质量3D资产的制作仍然高度依赖专业建模技能和大量人工时间。文本引导的3D编辑旨在让用户通过自然语言指令直接修改3D资产，从而降低创作门槛。然而，现有方法面临一个核心瓶颈：**难以自动理解复杂自然语言指令、在3D空间中精确定位编辑区域，同时可靠地保持未编辑区域的几何与外观**。
@@ -76,8 +74,6 @@ claims:
 4. **在原生3D空间中执行高保真编辑**：利用3D生成模型的先验知识，确保编辑结果的几何一致性和渲染质量。
 
 这一思路的核心洞察是：**通过在原生3D流生成模型（Trellis, Xiang et al., CVPR 2025）的潜在空间中引入反演-修复和交错去噪策略，并将2D视觉-语言推理作为编辑规划工具，可以在不依赖人工3D掩码的情况下实现高保真、语义对齐的3D编辑**。多模态大语言模型（MLLM）作为智能体核心，负责从多视角渲染图像和编辑提示中提取结构化和外观层面的文本引导，并结合PartField分割结果推断编辑掩码，从而打通从语言指令到3D修改的完整闭环。
-
-
 
 ## 核心方法与创新机理
 
@@ -109,8 +105,6 @@ Vinedresser3D 的核心突破在于将**多模态大语言模型（MLLM）作为
 
 **创新边界与代价**：上述三个 changed slots 共同构成了 Agent 驱动的自动化编辑闭环，但其代价也是明确的——在未编辑区域保持指标（PSNR/SSIM）上弱于直接用 Trellis 生成的原始资产（Table 1），这是以局部保真度换取全局编辑语义对齐的权衡。当提供人工掩码（Ours w/ HM）时，该方法在全部指标上达到最优，说明自动掩码检测仍是当前性能瓶颈所在。
 
-
-
 Vinedresser3D 的完整管线围绕一个多模态大语言模型（MLLM）智能体核心构建，将复杂的文本编辑指令自动转化为高保真的3D资产编辑结果。如图2所示，系统接收一个原始3D资产和一条自然语言编辑指令，通过三个串联阶段完成编辑：**多模态引导生成**、**编辑区域检测**和**基于反演的3D编辑**。
 
 ### 输入与输出流
@@ -129,21 +123,14 @@ Vinedresser3D 的完整管线围绕一个多模态大语言模型（MLLM）智�
 
 三个模块形成严格的因果链：MLLM生成的多模态引导决定了编辑的语义方向和视觉目标；编辑区域检测将引导聚焦到精确的3D空间位置；反演-修复模块则在掩码约束下执行实际的3D内容修改。任一模块的失效都会导致编辑失败——若引导不准确，编辑语义将偏离指令；若掩码不精确，未编辑区域将受到污染；若反演精度不足，则编辑结果的几何一致性会退化。消融实验证实了这一依赖关系：移除编辑掩码后，PSNR从29.45降至25.65（Table 3），未编辑区域出现明显畸变（Figure 7）；将交错去噪替换为仅Trellis-image去噪后，FID从29.49升至30.59（Table 3），整体3D质量下降（Figure 6）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2652_https_openaccess_thecvf_com_content_CVPR2026_html_Chi_Vinedresser3D_Towa/figures/002_Figure_2.jpg]]
 *Figure 2: Pipeline overview. Given a 3D asset and an editing prompt, Vinedresser3D uses an MLLM to obtain new text and image guidance, automatically detects the intended editing region and then performs precise editing through an inversion-editing module*
-
-
 
 Vinedresser3D 的编辑管线由三个核心模块串联构成：多模态引导生成、编辑区域检测、以及基于反演的 3D 编辑。本节聚焦各模块的关键机制与支撑公式。
 
 ### 多模态引导生成
 
 该模块以 MLLM（Gemini-2.5-flash）为推理核心，输入为原始 3D 资产的多视角渲染图像与用户的编辑指令。MLLM 完成三项分析任务：输出原始资产的完整描述、识别被编辑目标的部件名称与编辑操作类型（增加/修改/删除）、生成编辑后的完整描述。这一“原始描述—编辑后描述”的文本对，经关键词匹配提取出结构级（Stage 1）与外观级（Stage 2）的分解引导信息（Figure 3）。同时，MLLM 从多视角中选取最有利于编辑表达的一个视图，调用 2D 图像编辑模型生成视觉引导图像，为后续 3D 修复提供像素级条件。
-
-![[assets/figures/papers/paper_list_l2652_https_openaccess_thecvf_com_content_CVPR2026_html_Chi_Vinedresser3D_Towa/figures/003_Figure_3.jpg]]
-*Figure 3: Text guidance output by the MLLM. The modified words between the original complete description and the new complete description are marked with underlined italics. We highlight the extracted stage 1-related (in cyan) and stage 2-related (in red) information*
 
 ### 编辑区域检测
 
@@ -173,12 +160,8 @@ $$X_{i-1} = X_i + (t_{i-1} - t_i) v_{\theta}(X_i, t_i) + \frac{1}{2} (t_{i-1} - 
 
 **修复阶段**采用交错去噪策略：在所有时间步上交替使用 Trellis-text（以编辑后文本描述为条件）和 Trellis-image（以编辑后视觉引导图像为条件）进行去噪修复。编辑区域掩码 $R_{\mathrm{edit}}$ 在此阶段引导修复范围——未编辑区域的潜在特征被注入以正则化去噪过程，从而约束几何一致性。对于删除操作，管线跳过 Stage 1 反演与修复，直接移除 $R_{\mathrm{edit}}$ 内体素后仅执行 Stage 2 边界平滑；对于修改与增加操作，则完整执行两阶段反演-修复流程。消融实验（Table 3）证实，交错 Trellis-text/Trellis-image 设计相较于仅使用 Trellis-image 将 FID 从 30.59 降至 29.49，而引入编辑掩码将未编辑区域 PSNR 从 25.65 提升至 29.45，验证了各公式机制的有效性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2652_https_openaccess_thecvf_com_content_CVPR2026_html_Chi_Vinedresser3D_Towa/figures/004_Figure_4.jpg]]
 *Figure 4: Our native 3D inversion-based editing pipeline. It first invert the original 3D asset back to structured noises using RF-Solver [53] and the original complete description as the condition. Then it performs editing through inpainting by denoising with Trellis-text and Trellis-image alternatively for all timesteps, using both the new text and edited image as conditions*
-
-
 
 ## 实验与关键发现
 
@@ -226,16 +209,6 @@ Table 3 和 Figure 6、Figure 7 从定量和定性两个维度验证了两个核
 
 4. **计算开销。** 反演-修复过程需要完整的正向和反向整流流计算（RF-Solver 的二阶反演进一步增加了计算量），当前管线尚不适合实时交互场景。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2652_https_openaccess_thecvf_com_content_CVPR2026_html_Chi_Vinedresser3D_Towa/figures/007_Figure_5.jpg]]
-*Figure 5: Qualitative comparison of different methods. We can see that our method surpasses all the others by smartly interpreting the editing intention of the user, closely following the editing prompt, precisely locating the intended editing region and generating high-fidelity results*
-
-![[assets/figures/papers/paper_list_l2652_https_openaccess_thecvf_com_content_CVPR2026_html_Chi_Vinedresser3D_Towa/figures/001_Figure_1.jpg]]
-*Figure 1: We propose Vinedresser3D , an agent that can intelligently perform high-quality text-guided 3D editing. It can handle various kinds of edits (addition, modification and deletion), support multi-turn editing and tackle different types of 3D assets (objects and scenes)*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 基线对比与谱系定位
@@ -273,8 +246,6 @@ Vinedresser3D 的适用边界由以下技术依赖共同划定：
 ### 4. 公平性说明
 
 在解读 Table 1 的定量结果时需注意：Vinedresser3D 在未编辑区域保持指标（PSNR/SSIM）上弱于直接用 Trellis 生成的结果（PSNR 29.45 vs 37.35），但换来了更好的编辑语义对齐（CLIP-T 0.252 vs 0.247）。这一 trade-off 反映了编辑任务中“保真度-对齐度”的内在张力：主动修改区域必然偏离原始资产，而自动掩码的不完美进一步放大了这种偏离。Ours w/ HM（人工掩码）的设置展示了理想掩码下的性能上限，应将其理解为编辑区域检测模块的 oracle 参考，而非完全自动方法的直接对比。
-
-
 
 ## 原文 PDF
 

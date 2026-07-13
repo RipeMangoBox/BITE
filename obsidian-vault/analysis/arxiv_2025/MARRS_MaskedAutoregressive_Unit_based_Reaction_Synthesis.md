@@ -52,8 +52,6 @@ claims:
 
 从方法谱系看，MARRS 融合了掩蔽自回归建模与扩散模型的优势，属于两阶段生成范式：第一阶段通过 UD-VAE 学习紧凑的连续运动表征，第二阶段在隐空间中以扩散损失驱动掩蔽 token 的自回归预测。相较于纯 VQ-VAE 方法（如 **MMM**）和纯扩散方法（如 **MDM**），MARRS 在生成质量与推理效率之间取得了更好的平衡。
 
-
-
 人体运动生成是计算机视觉与图形学中的核心问题，其目标是根据给定的条件信号合成自然、协调的人体动作序列。其中，**人体反应合成**（Human Reaction Synthesis）聚焦于“动作-反应”交互场景：给定一个主动行为者（actor）的运动序列，系统需要生成一个被动反应者（reactor）的相应运动。这一任务在虚拟人交互、人机协作、AR/VR等领域具有重要应用价值，但其挑战性在于反应运动必须同时满足时间上的因果一致性、空间上的物理合理性，以及身体各部位之间的精细协调。
 
 现有方法在解决这一问题时主要沿两条技术路线展开。一类方法基于**向量量化变分自编码器**（VQ-VAE），如 **MMM**（Pinyoanuntapong et al., 2024），通过将连续运动映射到离散码本进行掩蔽建模。另一类方法采用**扩散模型**直接生成运动序列，如 **MDM**（Tevet et al., 2022）和 **ReGenNet**（Xu et al., CVPR 2024），后者是当前人体动作-反应合成领域的最优方法。然而，这两类方法各自面临根本性的瓶颈。
@@ -63,8 +61,6 @@ claims:
 上述瓶颈共同导致了现有方法在反应合成中的性能上限：**ReGenNet** 在 NTU120-AS 在线无约束设置下的测试条件 FID 为 11.00，距离真实运动分布仍有明显差距；手部运动的平均姿态误差（APE）和平均速度误差（AVE）也表明精细部位生成质量有待提升（Table 6）。
 
 针对这些问题，**MARRS** 的动机在于从三个根本层面进行突破：（1）**抛弃离散量化**，采用连续VAE表征以避免信息损失；（2）**将全身运动分解为身体和手部两个独立单元**，分别编码以保留各自运动特性；（3）**引入掩蔽自回归与扩散损失的组合框架**，在条件生成过程中实现单元间的双向协调。这一设计思路的核心洞察是：通过“分而治之”的单元划分策略降低建模难度，再通过专门设计的融合与调制机制重建单元间的交互一致性，从而在保持生成多样性的同时大幅提升运动质量与协调性。
-
-
 
 ## 核心方法与创新机理
 
@@ -84,8 +80,6 @@ MARRS针对现有基于向量量化（VQ）的方法存在量化信息丢失和�
 
 ### 5. 掩蔽自回归扩散生成范式（generation_paradigm + loss_function）
 MARRS采用**掩蔽自回归（Masked Autoregressive）**与**扩散损失**相结合的两阶段生成范式：在第一阶段，UD-VAE将运动编码为连续token；在第二阶段，以自回归方式逐步生成反应token，每一步通过紧凑的MLP去噪器（仅3层MLP）进行扩散去噪。扩散损失（Eq. 11）同时作用于身体和手部token，替代了传统的L2重建损失。这一设计使得MARRS兼具自回归模型的高效推理（MARRS-Tiny推理仅需0.039s，快于ReGenNet的0.058s）和扩散模型的高质量生成能力，从根本上突破了VQ-VAE方法的性能上限。
-
-
 
 MARRS 采用两阶段训练范式，将人体反应运动生成分解为**单元区分运动表征学习**与**掩蔽反应生成**两个核心阶段，其整体框架如图2所示。
 
@@ -118,16 +112,6 @@ $$\mathcal{L}(\boldsymbol{x} \mid \boldsymbol{z}) = \mathbb{E}_{\boldsymbol{\var
 - **输入**：演员的全身运动序列（SMPL-X参数表示），按身体和手部单元拆分后分别编码为隐变量令牌。
 - **输出**：反应者的全身运动序列，由UD-VAE解码器从生成的身体和手部令牌重建。
 - **条件信号**：演员令牌通过ACF的交叉注意力机制注入反应生成过程，AUM则在单元间建立双向协调通道。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1692_MARRS_MaskedAutoregressive_Unit_based_Reaction_Synthesis/figures/002_Figure_2.jpg]]
-*Figure 2: The overall framework of our proposed MARRS. (a) Whole-body motion is divided into two units: body and hands and then each unit is encoded independently by a VAE. (b) shows the process of the masked reaction generation model*
-
-![[assets/figures/papers/paper_list_l1692_MARRS_MaskedAutoregressive_Unit_based_Reaction_Synthesis/figures/001_Figure_1.jpg]]
-*Figure 1: Left: Paradigm comparison of different frameworks. (a) and (b) present the structures of the VQ-VAE-based and Diffusion-based methods, respectively, while (c) shows the framework of our proposed MARRS. Right: result comparison among our method and other methods on eight metrics*
-
-
 
 MARRS 的核心架构由两大阶段构成：第一阶段为**单元区分运动变分自编码器（UD‑VAE）**，负责将全身运动压缩为连续隐变量；第二阶段为**掩蔽反应生成模型**，通过动作条件融合（ACF）、自适应单元调制（AUM）以及紧凑扩散去噪头，在隐空间中自回归地生成反应运动。
 
@@ -204,8 +188,6 @@ $$x_{n}^{t-1} = \frac{1}{\sqrt{\alpha_t}} \left( x_{n}^{t} - \frac{1-\alpha_t}{\
 
 去噪完成后，令牌经 UD‑VAE 解码器还原为运动序列。由于去噪头仅由 3 层 MLP 构成，MARRS 在保持高质量生成的同时实现了快速推理（MARRS‑Tiny 推理耗时 0.039s，快于 ReGenNet 的 0.058s，Table 9）。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -280,22 +262,6 @@ MARRS 在两个主流人体动作-反应合成基准上进行了全面评估，�
 ![[assets/figures/papers/paper_list_l1692_MARRS_MaskedAutoregressive_Unit_based_Reaction_Synthesis/figures/014_Table_9.jpg]]
 *Table 9: Model scaling results and comparison of computational complexity. Our proposed MARRS can converge faster in the training process than ReGenNet (Xu et al. 2024) and enlarging the model size can enhance the overall generation performance*
 
-![[assets/figures/papers/paper_list_l1692_MARRS_MaskedAutoregressive_Unit_based_Reaction_Synthesis/figures/015_Figure_6.jpg]]
-*Figure 6: User study. We use three subjective indicators, Naturalness, Smoothness, and Physical realism, to compare with the ReGenNet*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1692_MARRS_MaskedAutoregressive_Unit_based_Reaction_Synthesis/figures/009_Table_6.jpg]]
-*Table 6: Comparison on hands and global translation*
-
-![[assets/figures/papers/paper_list_l1692_MARRS_MaskedAutoregressive_Unit_based_Reaction_Synthesis/figures/012_Table_7.jpg]]
-*Table 7: Results on the offline setting on NTU120-AS (Xu et al. 2024). ± indicates 95% confidence interval, → means that closer to Real is better. Bold indicates the best and underline indicates second best*
-
-![[assets/figures/papers/paper_list_l1692_MARRS_MaskedAutoregressive_Unit_based_Reaction_Synthesis/figures/013_Table_8.jpg]]
-*Table 8: Comparison to state-of-the-arts on the online, unconstrained setting for human action-reaction synthesis on Chi3D-AS (Xu et al. 2024). ± indicates 95% confidence interval, → means that closer to Real is better. Bold indicates best result and underline indicates second best*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 方法谱系：从 VQ-VAE 到掩蔽自回归扩散
@@ -335,8 +301,6 @@ MARRS 在知识体系中的核心定位是**弥合了 VQ 离散表征与扩散�
 3. **更大规模预训练。** 在更大规模、更高质量的人体交互数据集上，MARRS 的连续 VAE + 掩蔽自回归扩散范式能否进一步提升精细度与泛化性，是一个值得探索的方向。
 
 4. **跨任务迁移。** 该框架的核心组件（单元分解、掩蔽自回归、紧凑扩散）是否可迁移至其他条件驱动的运动生成任务，如语音或音乐引导的手势合成，目前仍是开放问题。
-
-
 
 ## 原文 PDF
 

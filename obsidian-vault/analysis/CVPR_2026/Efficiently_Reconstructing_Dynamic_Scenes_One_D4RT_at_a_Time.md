@@ -58,8 +58,6 @@ claims:
 
 **方法定位**：D4RT属于前馈式4D重建与跟踪方法，在方法谱系上区别于依赖后处理优化的传统SLAM系统和任务分离的多模型流水线。其统一解码接口的设计理念，为动态场景理解提供了一种简洁、高效且可扩展的新范式。
 
-
-
 从单目视频中恢复动态场景的完整4D表示——即同时获得稠密的3D几何、相机参数以及跨时空的精确对应关系——是计算机视觉的核心挑战之一。这一能力是自动驾驶、机器人导航、增强现实和视频编辑等下游应用的基础。然而，现有方法在解决这一问题时面临两个根本性的瓶颈。
 
 **第一，任务割裂与流水线碎片化。** 当前的前沿方法通常将4D重建拆解为多个独立子任务，依赖分离的模型或解码头分别处理深度估计、相机位姿估计和点跟踪。例如，**MegaSaM**（Li et al., CVPR 2025）和 **VGGT**（Wang et al., CVPR 2025）专注于前馈3D重建与位姿估计，但无法提供动态区域的时空对应；**SpatialTrackerV2**（Xiao et al., ICCV 2025）则在3D点跟踪上表现优异，却需要额外的重建模块来补全场景几何。这种多组件拼凑的范式不仅增加了系统复杂性和维护成本，更关键的是，各模块之间的信息无法充分共享，导致整体性能受限于最薄弱环节。
@@ -67,8 +65,6 @@ claims:
 **第二，解码效率与灵活性的根本冲突。** 现有方法在解码策略上走向两个极端：一方采用密集的逐帧解码（如 **DUSt3R** 系列），虽能获得完整的逐像素输出，但计算开销随帧数和分辨率线性增长，难以扩展到长视频或高分辨率场景；另一方则采用两两帧处理（如 **St4RTrack**, Sucar et al., arXiv 2025），虽然相对高效，却丧失了全局时空一致性，且无法灵活地按需查询任意时空位置的3D信息。这种“全有或全无”的解码范式使得现有方法在面对实际应用中多样化的查询需求时显得捉襟见肘。
 
 **本文动机**正是弥合上述双重鸿沟。D4RT提出了一种全新的范式：**将4D重建从密集的逐帧解码或任务特定头转换为灵活的、独立解码的点查询**。其核心洞察在于，如果能够设计一种独立于帧的解码查询机制，通过对时空坐标和局部RGB上下文的联合编码，直接从全局场景表示中预测任意点的3D位置，那么多种4D任务——点跟踪、深度估计、点云重建、相机位姿恢复——都可以统一为按需点查询，从而在单一架构内实现多任务统一，同时大幅提升训练和推理效率。
-
-
 
 ## 核心方法与创新机理
 
@@ -118,8 +114,6 @@ D4RT的架构极为简洁：一个ViT编码器将视频转换为全局场景表�
 | 查询增强 | 仅坐标/时序嵌入 | 加入局部RGB补丁嵌入 | Section 2.2, Table 7 |
 | 效率 | 计算冗余，吞吐量低 | 18–300倍吞吐量提升 | Table 3, Figure 3 |
 
-
-
 D4RT 的整体框架围绕一个核心洞察构建：**将 4D 重建从密集的逐帧解码或任务特定头转换为灵活的、独立解码的点查询**。这一设计使得模型能够以统一的前馈方式，从单段视频中同时推断深度、时空对应关系和完整的相机参数。
 
 ### 流水线总览
@@ -160,8 +154,6 @@ D4RT 的流水线由三个关键阶段组成，如 Figure 2 和 Figure 7 所示�
 ### 与先前方法的架构差异
 
 Table 2 系统对比了 D4RT 与 MegaSaM、VGGT、SpatialTrackerV2、π³ 等方法的架构能力。D4RT 是唯一同时满足以下六项特性的方法：3D 重建、动态对应、灵活参考系、稀疏解码、全局上下文解码器、单一统一架构。先前方法要么依赖分离的多任务解码头（如 VGGT、MegaSaM），要么采用密集逐帧解码（如 DUSt3R 系列），要么无法处理动态区域的对应关系。
-
-
 
 D4RT 的核心设计在于将多任务 4D 重建统一为一种**独立于帧的解码查询机制**。其架构由三大模块构成：全局场景编码器、查询构造器与交叉注意力解码器。
 
@@ -217,12 +209,8 @@ $$f_x = p_z (u - 0.5) / p_x, \quad f_y = p_z (v - 0.5) / p_y$$
 
 **外参恢复**通过 Umeyama 算法在解码的点云与参考点云之间求解相似变换，得到相机间的相对位姿。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2512_08924/figures/004_Table_2.jpg]]
 *Table 2: Model capabilities – We highlight both the tasks our model executes but also its comprehensive functionality and simple model architecture*
-
-
 
 ## 实验与关键发现
 
@@ -265,33 +253,11 @@ D4RT 在动态 4D 重建与跟踪的核心任务上全面超越现有前馈方�
 - 长时间视频的端到端可学习全局优化模块能否替代当前的分块对齐策略？
 - 模型性能是否可从更大的数据集或更长的训练步数中继续获益？
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2512_08924/figures/005_Figure_3.jpg]]
 *Figure 3: Pose accuracy vs. speed – We compare pose accuracy vs. throughput against recent state-of-the-art methods. Pose accuracy is 1 – error, averaged over ATE/RTE/RPE on Sintel and Scan-Net. Throughput is measured in FPS on an A100 GPU. D4RT achieves 200+ FPS pose estimation, 9× faster than VGGT, and 100× faster than MegaSaM, while delivering superior accuracy*
 
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2512_08924/figures/006_Figure_4.jpg]]
-*Figure 4: Reconstruction results across methods – Pure reconstruction methods (MegaSaM and*
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2512_08924/figures/007_Table_3.jpg]]
-*Table 3: 3D tracking throughput – We measure the maximum number of full-video 3D point tracks that different model can produce while maintaining a given FPS target on a single A100 GPU. Note that for D4RT, each track consists of T independent queries processed by the decoder. D4RT is 18–300× faster than others*
-
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2512_08924/figures/009_Table_4.jpg]]
 *Table 4: 4D reconstruction and tracking – We evaluate 3D tracking capability on dynamic videos, with tracks predicted in both local camera coordinates (left) and world coordinates (right). Our model achieves superior performance compared to the prior state-of-the-art*
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2512_08924/figures/010_Table_5.jpg]]
-*Table 5: Video depth and point map estimation – Quantitative results for both video depth and point map estimation across four benchmarks. D4RT achieves top-tier performance on the depth estimation task under both scale-only (S) and scale-and-shift (SS) alignments*
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2512_08924/figures/011_Table_6.jpg]]
-*Table 6: Camera pose estimation – We evaluate D4RT against state-of-the-art methods on static indoor scenes (ScanNet, Re10K) and dynamic outdoor scenes (Sintel)*
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2512_08924/figures/015_Figure_6.jpg]]
-*Figure 6: Preservation of low-level details – We ablate the effect of including local patch information into the model’s queries, visualizing the resulting depth maps on an example from the Sintel dataset. We find that the local RGB patches help preserve finegrained details and produce sharper object boundaries*
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2512_08924/figures/013_Table_8.jpg]]
-*Table 8: Auxiliary losses – We remove auxiliary losses individually to evaluate their impact on model performance. A slight tradeoff between depth and camera estimation pose is observed, though we find that all auxiliary losses improve overall performance*
-
-
 
 ## 定位与知识库关联
 
@@ -338,8 +304,6 @@ D4RT 的设计哲学——通过独立查询解耦时空维度——开辟了若
 5. **规模化效益**：消融实验（Table 9）显示增大 ViT 骨干网规模（B→L→H→g）持续改善性能。模型的表现是否可以从更大的数据集或更长的训练步数中进一步获益？这指向了 scaling law 在该方法上的适用性问题。
 
 总体而言，D4RT 在前馈视频几何推断领域确立了“统一查询解码”这一新的技术范式。其核心贡献不在于单一任务的精度提升，而在于证明了通过精心设计的查询接口，可以将多种看似独立的几何任务统一到一个简洁的架构中，同时获得数量级的效率提升。这一思路对后续工作的启示在于：**几何任务的统一不应通过堆叠多个解码头来实现，而应通过设计灵活的查询机制，让模型学会按需回答几何问题。**
-
-
 
 ## 原文 PDF
 

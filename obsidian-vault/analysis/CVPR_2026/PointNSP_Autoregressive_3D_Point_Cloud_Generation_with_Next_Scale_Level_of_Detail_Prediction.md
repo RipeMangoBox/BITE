@@ -51,8 +51,6 @@ PointNSP 提出了一种范式转换：将自回归建模从“逐点预测”�
 
 在 ShapeNet 基准测试上，PointNSP 首次在自回归范式下取得了最优生成质量：在标准 2048 点设定（LION 划分）下，PointNSP-m 的 Chamfer Distance 均值达到 58.04，Earth Mover's Distance 均值达到 52.30，均优于包括 **LION**（Zeng et al., NeurIPS 2022）和 **TIGER**（Ren et al., CVPR 2024）在内的强扩散基线。在随机划分下，该方法同样取得最佳 CD（59.65）和最佳 EMD（56.13），验证了其鲁棒性。在效率方面，PointNSP-s 的训练时间仅为 125 GPU 小时，相比扩散基线减少 70% 以上，同时在推理速度和参数量上均展现出显著优势。此外，PointNSP 在点云补全和上采样等下游任务中同样超越了所有选定基线，证明了其作为条件生成骨干的潜力。
 
-
-
 三维点云作为一种灵活且紧凑的3D几何表示，在自动驾驶、机器人感知和计算机图形学等领域有着广泛的应用。近年来，深度生成模型在图像和文本领域取得了显著进展，然而三维点云的生成建模仍面临独特的挑战。点云由无序的点集构成，其概率分布天然地要求**置换不变性**——即点的排列不应改变形状本身。这一属性使得许多在有序数据上成功的生成范式难以直接迁移。
 
 当前主流的点云生成方法主要分为两类：**扩散模型**和**自回归模型**。扩散模型（如 **DPM** (Luo and Hu, CVPR 2021)、**PVD** (Zhou et al., ICCV 2021)、**LION** (Zeng et al., NeurIPS 2022)、**TIGER** (Ren et al., CVPR 2024)）通过迭代去噪从高斯噪声中逐步恢复形状，天然保持了置换不变性，并取得了令人瞩目的生成质量。然而，这类方法通常需要数百甚至上千步的迭代采样，导致**推理速度慢、训练成本高**，在实时应用场景中受到限制。
@@ -60,8 +58,6 @@ PointNSP 提出了一种范式转换：将自回归建模从“逐点预测”�
 相比之下，自回归模型（如 **PointGrow** (Sun et al., WACV 2020)、**PointGPT**、**ShapeFormer**）通过逐点预测的方式生成点云，具有采样速度快、可扩展性强的优势。但其核心瓶颈在于：**传统自回归模型将无序点集强制序列化为固定顺序**，这种人为的顺序假设引入了局部预测偏差，使得模型难以捕捉全局的几何结构和长距离依赖关系，从而破坏了全局形状的置换不变性和一致性。正如公式 $p(\mathbf{x}_1,\mathbf{x}_2,\ldots,\mathbf{x}_N)=\prod_{i=1}^N p(\mathbf{x}_i|\mathbf{x}_{i-1},\ldots,\mathbf{x}_1)$ 所示，逐点因子分解将点的生成顺序固化，而对于任意排列 $\pi\in S_N$，理想分布应满足 $p(\pi(\mathbf{x}_1,\ldots,\mathbf{x}_N))=p(\mathbf{x}_1,\ldots,\mathbf{x}_N)$。这种结构性矛盾导致自回归方法在点云生成质量上长期落后于扩散模型。
 
 本文的核心动机在于回答一个根本性问题：**能否在自回归范式下实现保持置换不变性的高质量点云生成？** 换言之，能否既保留自回归模型的高效采样优势，又克服其因序列化导致的全局结构破坏？为此，我们提出 **PointNSP**，将自回归建模从逐点预测转变为**逐尺度细节层次（Level-of-Detail, LoD）预测**：在粗分辨率上捕获全局形状结构，并在更高尺度上逐步细化细节。这本质上将生成任务转化为一系列保持全局一致性的上采样过程，从而在自回归框架内首次实现了与扩散模型相媲美甚至更优的生成质量，同时显著降低了训练和推理成本。
-
-
 
 ## 核心方法与创新机理
 
@@ -111,8 +107,6 @@ $$\mathcal{L}_{\mathrm{recon}} = \mathcal{L}_{\mathrm{CD}}(\mathbf{X},\hat{\math
 ### 创新点的协同效应
 
 三个 changed slot 形成因果闭环：逐尺度范式（Slot 1）为多尺度表示（Slot 2）提供了建模需求，而多尺度 token 序列的层级结构又天然适配块对角因果掩码（Slot 3）的设计。三者协同使得 PointNSP 首次在自回归范式下达到与强扩散基线（如 **LION** (Zeng et al., NeurIPS 2022)、**TIGER** (Ren et al., CVPR 2024)）相当甚至更优的生成质量，同时在训练效率上降低 70% 以上（PointNSP-s 仅需 125 GPU 小时，而 LION 超过 500 GPU 小时）。
-
-
 
 ### 核心洞察与范式转变
 
@@ -169,13 +163,6 @@ PointNSP 在生成范式上区别于以下基线：
 
 PointNSP 的上采样机制借鉴了 **PU-Net**（Yu et al., CVPR 2018）的复制-重塑操作，LoD 序列构建基于经典的 FPS 算法（Eldar et al., IEEE TIP 1997），位置编码采用三角函数绝对位置编码。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2571_https_openaccess_thecvf_com_content_CVPR2026_html_Meng_PointNSP_Autoregr/figures/002_Figure_2.jpg]]
-*Figure 2: Three types of point cloud generative models: (a) diffusion-based methods that iteratively denoise shapes starting from Gaussian noise; (b) vanilla autoregressive (AR) methods that predict the next point by flattening the 3D shape into a sequence; and (c) our proposed PointNSP, which predicts next-scale level-of-detail in a coarse-to-fine manner*
-
-
-
 ### 1. 范式转换：从逐点预测到逐尺度预测
 
 传统自回归点云生成将无序点集强制序列化为固定顺序，其概率因子分解为：
@@ -223,8 +210,6 @@ $$\mathbf{X}_k = D\left(\sum_{m=1}^k \phi_m(\mathrm{upsampling}(\mathbf{z}_m, s_
 $$\mathbf{M}_k^p = \operatorname{Softmax}\left((\mathbf{P}_k \mathbf{W}_p)(\mathbf{P}_k \mathbf{W}_p)^T\right), \quad \mathbf{W}_p \in \mathbb{R}^{d \times d}$$
 
 该软掩码增强了模型对几何结构的感知能力。消融实验证实，位置感知软掩码、绝对位置编码（A-PE 优于可学习 L-PE）以及尺度嵌入均对性能有显著贡献。
-
-
 
 ## 实验与关键发现
 
@@ -289,21 +274,11 @@ PointNSP不仅适用于无条件生成，在条件推理任务上也表现出色
 
 Figure 5展示了随着尺度K增加，点云从粗到细的渐进式生成过程：K=1时仅呈现粗略的全局轮廓，K=2时补充主要结构特征，K=3时完成细节填充。这一可视化直观印证了逐尺度预测的核心机制——每个尺度对应一个完整的全局形状，而非局部补丁，从而在生成全过程中保持全局一致性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2571_https_openaccess_thecvf_com_content_CVPR2026_html_Meng_PointNSP_Autoregr/figures/005_Figure_4.jpg]]
 *Figure 4: Visualization of generation results compared with baseline models. PointNSP produces high-quality and diverse 3D point clouds*
 
 ![[assets/figures/papers/paper_list_l2571_https_openaccess_thecvf_com_content_CVPR2026_html_Meng_PointNSP_Autoregr/figures/007_Figure_5.jpg]]
 *Figure 5: Visualization of multi-scale point clouds during the PointNSP generation process as the scale K increases*
-
-![[assets/figures/papers/paper_list_l2571_https_openaccess_thecvf_com_content_CVPR2026_html_Meng_PointNSP_Autoregr/figures/009_Figure_6.jpg]]
-*Figure 6: (Left) Visualizations of point cloud completion results. (Right) Visualizations of point cloud upsampling results*
-
-![[assets/figures/papers/paper_list_l2571_https_openaccess_thecvf_com_content_CVPR2026_html_Meng_PointNSP_Autoregr/figures/010_Table_4.jpg]]
-*Table 4: Training time (in GPU hours, averaged over three categories), sampling time (in seconds, averaged over samples), and model size (in millions of parameters). Ranked by generation quality on 2048 and 8192 settings*
-
-
 
 ## 定位与知识库关联
 
@@ -356,8 +331,6 @@ PointNSP 在 ShapeNet 基准上展示了强大的生成能力，但其适用边�
 ### 知识库定位总结
 
 PointNSP 首次在自回归范式内实现了与强扩散基线相媲美甚至超越的生成质量，证明了“逐尺度细节层次预测”是解决点云置换不变性建模的有效路径。该方法弥合了自回归模型在效率上的固有优势与扩散模型在质量上的领先地位之间的鸿沟，为三维生成领域提供了第三条技术路线。
-
-
 
 ## 原文 PDF
 

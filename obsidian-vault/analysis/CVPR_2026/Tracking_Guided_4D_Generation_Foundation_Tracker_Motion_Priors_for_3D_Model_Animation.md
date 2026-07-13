@@ -58,8 +58,6 @@ claims:
 **方法谱系与知识库定位**：
 Track4DGen 建立在多视图视频扩散与4D重建的基线之上，直接对比的方法包括：多视图视频扩散基线 **4Diffusion**（Zhang et al., NeurIPS 2024）和 **Animate3D**（Jiang et al., NeurIPS 2024）；单图像到4D生成基线 **DreamGaussian4D (DG4D)**（Ren et al., arXiv 2023）和 **EG4D**（Sun et al., ICLR 2025）；以及单目视频到4D生成基线 **SV4D**（Xie et al., arXiv 2024）和 **SC4D**（Wu et al., ECCV 2024）。Track4DGen 区别于这些工作的关键改动在于：(1) 在扩散U-Net解码器的第二个上采样块特征上增加了基于CoTracker3密集跟踪的对应损失 $\mathcal{L}_{\mathrm{corr}}$ 和位置损失 $\mathcal{L}_{\mathrm{pos}}$，实现了特征级的显式时序对应监督；(2) 在4D-GS阶段引入混合运动表示，将携带跟踪先验的扩散特征与Hex-plane特征拼接，并引入4D球谐函数（4D SH）建模颜色随时间的变化。
 
-
-
 动态三维内容生成是计算机视觉与图形学交叉领域的前沿课题。随着扩散模型在图像和视频生成领域的突破性进展，研究者开始探索将二维生成能力拓展至四维时空域——即从静态三维资产或文本描述出发，生成具有时序运动的三维模型动画。这一能力对于影视制作、游戏开发、虚拟现实等应用场景具有重要价值。
 
 当前的主流技术路线可分为两类：一类是“单图像/视频到4D”方法，如 **DreamGaussian4D**（Ren et al., arXiv 2023）、**EG4D**（Sun et al., ICLR 2025）、**SV4D**（Xie et al., arXiv 2024）和 **SC4D**（Wu et al., ECCV 2024），它们试图从单目输入直接重建动态三维资产，但受限于输入信息的稀疏性，难以保证多视角下的时空一致性；另一类则采用“多视图视频扩散+4D重建”的两阶段范式，以 **Animate3D**（Jiang et al., NeurIPS 2024）和 **4Diffusion**（Zhang et al., NeurIPS 2024）为代表，先生成多视角视频序列，再通过4D高斯泼溅（4D Gaussian Splatting, 4D-GS）重建动态资产。
@@ -69,8 +67,6 @@ Track4DGen 建立在多视图视频扩散与4D重建的基线之上，直接对�
 本文的核心洞察在于：**基础点跟踪器（foundation point tracker）提取的密集运动对应可以作为显式先验，约束扩散模型的中间特征表示**。具体而言，像CoTracker3这类先进点跟踪器能够提供跨帧的密集点对应关系，这些对应关系蕴含了场景运动的真实信息。如果在扩散模型的U-Net特征空间中施加基于这些对应的监督信号，就能强制模型学习时序一致的特征表示，从根源上抑制外观漂移。
 
 基于这一洞察，本文提出 **Track4DGen**，一个将基础跟踪器运动先验注入多视图视频扩散生成的两阶段框架。第一阶段在扩散生成器中引入基于CoTracker3密集跟踪的对应损失和位置损失，在特征层面显式强制时序一致性；第二阶段将携带跟踪先验的扩散特征与Hex-plane特征融合，构建混合运动表示，并引入4D球谐函数建模颜色随时间的变化，从而在4D-GS重建中充分利用第一阶段积累的时序信息。
-
-
 
 ## 核心方法与创新机理
 
@@ -101,8 +97,6 @@ Track4DGen的核心创新在于将**基础跟踪器的运动先验**显式注入
 
 消融实验（Table 4、Figure 6、Figure 7）证实：移除对应损失会降低视频生成的时域一致性和动态质量；移除扩散特征或4D SH均会导致4D生成的外观保真度下降和伪影增加，验证了上述创新设计的有效性。
 
-
-
 Track4DGen 采用**两阶段级联架构**，将多视图视频生成与 4D 重建解耦为顺序流水线，如图 1 所示。第一阶段以静态 3D 模型的多视图渲染作为条件输入，通过集成多视图 3D 注意力与时空注意力的视频扩散生成器（基于 MV-VDM 架构）产生时序一致的多视图视频；第二阶段则从生成视频出发，利用 4D 高斯泼溅（4D-GS）重建动态 4D 资产。
 
 ### 阶段一：跟踪感知的多视图视频扩散
@@ -127,12 +121,8 @@ Track4DGen 采用**两阶段级联架构**，将多视图视频生成与 4D 重�
 
 整个流水线的信息流可概括为：**静态 3D 模型 → 条件多视图渲染 → 跟踪监督的扩散生成器 → 多视图视频 → 混合特征 4D-GS 重建 → 动态 4D 资产**。两个阶段之间存在明确的特征传递——阶段一的扩散特征平面被显式保留并馈入阶段二的混合表示中，使得跟踪先验能够贯穿生成与重建的全过程。这种紧耦合设计确保了从视频生成到 4D 重建的时序一致性不会因阶段分离而退化。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l17_https_openaccess_thecvf_com_content_CVPR2026_html_Sun_Tracking_Guided_4D/figures/001_Figure_1.jpg]]
 *Figure 1: The Track4DGen pipeline comprises two stages: 1) multi-view video generation and 2) 4D-GS reconstruction*
-
-
 
 Track4DGen 的核心架构由两个解耦阶段构成：**跟踪感知的多视图视频扩散生成器**与**混合特征驱动的4D高斯泼溅重建器**。两条管线通过扩散特征空间中的密集点对应监督实现耦合——第一阶段将基础跟踪器的运动先验注入扩散特征，第二阶段则直接复用这些携带跟踪先验的特征来增强动态重建质量。
 
@@ -226,19 +216,6 @@ $$\mathcal{L}_{2} = \lambda_{4} \mathcal{L}_{\mathrm{rec}} + \lambda_{5} \mathca
 
 两个阶段的关键耦合点在于**扩散特征的复用**：第一阶段通过 $\mathcal{L}_{\mathrm{corr}}$ 和 $\mathcal{L}_{\mathrm{pos}}$ 将 CoTracker3 的运动先验注入U-Net解码器特征；第二阶段直接提取同一U-Net解码器第二个上采样块的特征平面 $\mathcal{D}^{\zeta_{2}}$，与Hex-plane特征拼接后驱动运动偏移预测。这种设计避免了额外的特征提取网络，实现了运动先验从视频生成到4D重建的端到端传递。消融实验（Table 4）证实：移除扩散特征（w/o Di. Feat）会导致4D生成的外观保真度和色彩真实性显著下降，验证了跟踪感知特征对重建质量的关键贡献。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l17_https_openaccess_thecvf_com_content_CVPR2026_html_Sun_Tracking_Guided_4D/figures/002_Figure_2.jpg]]
-*Figure 2: The multi-view video diffusion with dense point tracking*
-
-![[assets/figures/papers/paper_list_l17_https_openaccess_thecvf_com_content_CVPR2026_html_Sun_Tracking_Guided_4D/figures/004_Figure_4.jpg]]
-*Figure 4: 4D-GS reconstruction with hybrid feature representations*
-
-![[assets/figures/papers/paper_list_l17_https_openaccess_thecvf_com_content_CVPR2026_html_Sun_Tracking_Guided_4D/figures/003_Figure_3.jpg]]
-*Figure 3: Left: points tracking in multi-view images; Right: tacked points in similarity heatmap of U-Net’s second Upsample Block. Brighter color indicates higher feature similarity*
-
-
-
 ## 实验与关键发现
 
 Track4DGen 的实验验证围绕两个核心阶段展开：多视图视频生成质量与 4D 动态资产重建质量。以下分别报告主结果、消融实验及关键图表发现。
@@ -286,8 +263,6 @@ Track4DGen 在两个数据集上均取得最高的 CLIP 分数。在 Sketchfab28
 
 论文未明确报告失败案例或局限性分析。从消融实验中可推断，当点跟踪器在遮挡严重或运动幅度极大的场景下失效时，对应监督的质量可能下降，进而影响视频生成的时序一致性。此外，两阶段框架的级联特性意味着第一阶段的生成误差会传播至 4D 重建阶段，但文中未对此进行量化分析。这些潜在问题需要在实际部署中进一步验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l17_https_openaccess_thecvf_com_content_CVPR2026_html_Sun_Tracking_Guided_4D/figures/007_Table_1.jpg]]
 *Table 1: Video Generation quantitative comparison on datasets: Diffusion4D (left); Animate3D (right)*
 
@@ -299,8 +274,6 @@ Track4DGen 在两个数据集上均取得最高的 CLIP 分数。在 Sketchfab28
 
 ![[assets/figures/papers/paper_list_l17_https_openaccess_thecvf_com_content_CVPR2026_html_Sun_Tracking_Guided_4D/figures/010_Figure_7.jpg]]
 *Figure 7: 4D Generation Ablation. Best viewed by zooming in*
-
-
 
 ## 定位与知识库关联
 
@@ -343,8 +316,6 @@ Track4DGen 的关键突破在于：**在扩散 U-Net 解码器的第二个时空
 - **特征层级的选择**：论文通过实验确定 U-Net 解码器第二个上采样块的特征最优，但该结论是否跨模型架构、跨数据集泛化仍待验证。是否存在更优的特征组合策略（如多尺度特征融合）？
 
 - **单阶段联合优化的可能性**：当前两阶段设计虽然模块化清晰，但扩散特征到 4D-GS 的传递是单向的。是否可以通过可微跟踪或端到端训练实现视频生成与 4D 重建的联合优化，从而进一步提升一致性？
-
-
 
 ## 原文 PDF
 

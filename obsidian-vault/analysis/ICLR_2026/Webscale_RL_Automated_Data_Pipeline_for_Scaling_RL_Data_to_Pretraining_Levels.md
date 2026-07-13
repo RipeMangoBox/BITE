@@ -49,15 +49,11 @@ claims:
 
 该方法的核心是将数据表示从非结构化文本序列转换为自包含的问答对，并将训练目标从 teacher forcing 的下一个token预测转化为基于二元奖励的强化学习（公式(1)(2)）。实验表明，在 Qwen2.5-3B 基座上，Webscale-RL 的 RL 训练仅需约 10M（源自原始文档的）token，即可在 MMLU-pro、Big-Bench 等基准上达到持续预训练约 1B token 的性能水平（约 100× 数据效率，Figure 4）。在七项综合评测上，Webscale-RL 平均得分 52.1，高出最强数据精炼基线（GDR）3.4 分，并将与 Qwen2.5-7B 的性能差距从 10.6 缩窄至 6.1（缩小 42%，Table 2）。这一结果证明了将预训练文本转换为可验证问答并施加 RL，在通用领域同样具有极高的样本效率，并为 RL 数据扩展至预训练级别提供了可行路径。
 
-
-
 大语言模型的能力通常通过两个阶段构建：在大规模非结构化文本上的预训练（next‑token prediction）让模型习得广泛的世界知识与语言模式；随后借助微调或对齐手段提升其指令遵循能力与推理质量。在微调环节，基于强化学习（RL）的训练（如通过答案匹配的二元奖励优化）已被证明能够显著改善模型的输出。然而，RL 训练能否在通用任务上持续精进，高度依赖**高质量、多样化且可验证**的问答对数据。现有 RL 数据集大多集中于数学、编程等少数领域，整体规模不足 100 亿 token，而预训练语料却可触及万亿 token 并覆盖数百个领域（图 1、表 1）。这一严重的数据供给瓶颈将 RL 限制在窄域之内，使其在线探索和样本效率的天然优势难以在通用推理上释放，成为当前范式升级的核心障碍。
 
 为缓解预训练模型的推理短板，业界常采用**持续预训练**（在专业文档上继续 next‑token prediction 并配合监督微调）或**数据精炼**（如用强语言模型重写文档后再次预训练）。但这些方案仍固守 teacher forcing 范式，迭代需数十亿 token 量级，且缺乏 RL 特有的正向强化与负向惩罚信号，数据利用效率低下。另一方面，高质量 RL 数据传统上依赖强模型（如 GPT‑4）蒸馏，不仅成本高昂，还引入了生成者偏差——蒸馏答案并非直接从训练文档中可验证地产生，削弱了奖励信号的可靠性。可见，业界亟需一套能够**自动、系统化**地将海量预训练文本转化为自包含、可验证问答对的技术路径，从而解除 RL 的数据桎梏，让 RL 在规模与多样性上向预训练看齐。
 
 正是围绕这一缺口，本文提出 **Webscale‑RL** 自动化数据管道。其核心动机在于：若能以极低的成本将预训练文档转换为可验证的 RL 问答对，RL 训练便可挣脱对昂贵标注或蒸馏的依赖，获得与预训练同等丰富的领域分布，进而用远少于 teacher forcing 的 token 消耗实现相当甚至更优的推理表现。Webscale‑RL 通过**过滤‑域分类与角色分配‑QA 生成‑质量防泄漏**四个阶段，将原始文档转换为短答案的问答对；答案直接从文档中提取而非蒸馏自强模型，从根源上降低了偏差并增强了奖励的保真度（第 3‑4 节）。管道产出 120 万对问答，覆盖 9 个以上领域，其语义多样性与现有 RL 数据集相比显著占优（图 3）。基于此数据的 RL 训练在 7 项基准上平均得分超出最强数据精炼基线 3.4 分，与更大规模模型 Qwen2.5‑7B 的性能差距从 10.6 缩窄至 6.1（表 2）；尤值注意的是，RL 仅消耗约 1000 万 token 即达到持续预训练 10 亿 token 才能企及的 MMLU‑pro 和 Big‑Bench 水平，展现出**约 100 倍的数据效率**（图 4）。这一实证有力地表明，解除数据瓶颈后的 RL 训练足以在通用领域逆袭 teacher forcing 范式，为 RL 规模扩展至预训练级别提供了坚实路径。Webscale‑RL 因而不仅是一次数据工程的创新，更意在验证 RL 的样本效率优势在广域任务中依然成立，为后训练范式变革开辟可行性。
-
-
 
 ## 核心方法与创新机理
 
@@ -97,8 +93,6 @@ Webscale-RL 的核心因果机制是**将预训练文档的"阅读"任务转换�
 - 代码领域性能相对薄弱，可能需要针对性的域平衡策略
 - 数据效率对比中的"token 计数"基于原始文档 token 而非模型实际处理 token，存在近似性（fairness notes）
 
-
-
 ![[assets/figures/papers/iclr26_0014_hOJS9RB1NU_Webscale-RL_Automated_Data_Pipeline_for_Scaling/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the Webscale-RL data pipeline that systematically converts large-scale pretraining data into RL data while preserving the scale and diversity of web data. The pipeline maintains a domain-specific demonstration library for few-shot examples for high quality generation and assigns multiple personas to each document to encourage reflecting different viewpoints. The generated QA pairs are verified for correctness and leakage prevention to ensure the reliability of the RL dataset. The prompt templates of four stage are listed in Appendix B.1.1*
 
@@ -118,8 +112,6 @@ Webscale-RL 的核心因果机制是**将预训练文档的"阅读"任务转换�
 *   **质量检查与泄露控制**：最后阶段由 LLM 完成双重校验：①核验答案与源文档一致；②审查问题中是否隐式包含答案（泄露检查），确保奖励信号的可靠性。
 
 该管道在设计上兼顾**规模化潜力与多样性保全**：成本较低的模型（如 GPT‑4.1‑mini）承担域分类与质量校验，生成能力更强的模型（GPT‑4.1）专注 QA 生成，使大规模构建成为可能；同时，通过多域覆盖与多角色视角，保留了原始预训练语料的丰富性（**Figure 3**）。与现有 RL/SFT 数据集相比，Webscale-RL 数据集不仅规模相当（120 万对），更具备本质上的**高可扩展性**——可通过增量添加文档持续扩大，且不依赖昂贵的人工标注或强模型蒸馏（**Table 1**，**Section 4.2**）。
-
-
 
 Webscale‑RL 的核心机制是将海量预训练文档自动转换为**可验证的问答对**，从而解除 RL 训练面临的数据规模与多样性瓶颈。该管道通过四个阶段性模块，将非结构化文本重新表示为自包含的问题‑答案对，并利用二元奖励的强化学习目标替代传统的教师强制训练。以下详细描述这四个模块的职责与设计，以及两个关键训练公式的变量含义。
 
@@ -180,8 +172,6 @@ $$
 
 上述公式与管道模块紧密联动：管道产出的高质量 $\mathbf{q}$‑$\mathbf{a}$ 对直接充当 RL 的查询集和奖励基准，而公式（2）定义的约束迫使模型在稀疏奖励下压缩推理路径，最终实现了远超传统预训练的数据效率。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -207,15 +197,11 @@ Figure 4 的缩放曲线揭示了 RL 的数据效率优势：在 MMLU‑pro 上�
 - **Figure 4**：直观展示 RL 相较于持续预训练的 token 效率优势，支持“将预训练资源转换为 RL 格式可成倍降低数据需求”的核心结论。
 - **Table 1**：Webscale‑RL 数据集以 1.2M QA 对覆盖 9+ 领域，其扩展性远超现有 RL/SFT 数据集，从数据端保障了 RL 向预训练规模的迈进。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0014_hOJS9RB1NU_Webscale-RL_Automated_Data_Pipeline_for_Scaling/figures/008_Figure_4.jpg]]
 *Figure 4: Scaling comparison between Webscale-RL training and continual pretraining with the original pretraining corpora. We report the performances on MMLU-pro (left), Big-Bench (middle) and average on all benchmarks (right). The token number for RL training is calculated based on the original pretraining corpus used to generate the Webscale-RL dataset. The each data point in continual pretraining baselines are followed by a SFT training using the same 10K high-quality examples. The RL training on Webscale-RL consistently outperforms continual pretraining at different training scales and exhibits better scaling efficiency*
 
 ![[assets/figures/papers/iclr26_0014_hOJS9RB1NU_Webscale-RL_Automated_Data_Pipeline_for_Scaling/figures/011_Table_3.jpg]]
 *Table 3: Source distribution of the Webscale-RL dataset (∼1.2M total QA pairs)*
-
-
 
 ## 定位与知识库关联
 
@@ -226,8 +212,6 @@ Webscale-RL 在方法谱系中位于**以数据为中心的强化学习后训练
 从机制角度看，**主要局限**集中在以下方面。其一，采用生成式二元奖励（只判断生成答案与标准答案的完全匹配）会忽略部分正确或中间推理步骤的质量，造成奖励信号过于稀疏且容易因表述差异而误判，同时奖励模型自身的推理也增加了训练成本（Section 6）。其二，管道四个阶段目前强依赖 GPT-4.1 和 GPT-4.1-mini，尽管使用了少样本示例库和答案提取策略来控制质量，但整体产线的开放可复现性和经济成本仍受制于商业 API。其三，领域分布不均衡——尽管覆盖了 9 个以上的领域，但代码、深层科学推理等需要多步推导的子领域性能依然欠佳（Table 2），表明管道需要更精细的域平衡和评价机制。其四，生成的问答对答案天然追求简洁，对于需要复杂思维链的任务，模型在 RL 训练中需从零探索推理路径，训练难度与不稳定性增加，这也部分解释了为何在需要长推理的任务上提升幅度有限。
 
 基于上述分析，**若干重要的开放问题**有待后续工作解决。第一，如何设计更高效的奖励机制，例如过程奖励、部分匹配奖励或置信度校准的软奖励，以在保持验证可靠性的前提下降低奖励模型推理成本并加速训练收敛？第二，管道的不同阶段是否可以合并或重组（如将域分类与角色分配合一、减少泄漏检查比例）以提升吞吐量，且域分布与角色策略是否存在可预测的最优配置？第三，Webscale-RL 生成的 QA 数据能否与原始预训练文本混合进行联合训练，从而同时收获预训练的泛化表征和 RL 的定向优化收益？第四，能否将管道完全适配到强大且开源的大语言模型（如 DeepSeek 系列、LLaMA 3），使其彻底摆脱商业 API 依赖，实现全开源复现？第五，当 QA 规模扩展至数亿级别时，RL 训练的效率增益能否继续保持线性甚至超线性，是否需要开发分布式 RL 和奖励近似策略？最后，在管道未见过的领域（如多模态理解、工具使用）上，通过 Webscale-RL 数据训练的模型是否能涌现出出人意料的能力，亦或是暴露更深层的表示缺陷，仍是值得深入探索的命题。
-
-
 
 ## 原文 PDF
 

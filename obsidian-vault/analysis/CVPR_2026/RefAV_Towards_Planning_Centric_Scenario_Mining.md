@@ -52,8 +52,6 @@ claims:
 
 本文的主要贡献可概括为三点：（1）揭示了现有 VLM 在组合时空推理上的根本性不足；（2）提出了基于程序合成的模块化场景挖掘范式，以可解释、可组合的方式桥接语言理解与精确时空定位；（3）构建了大规模、多样化的场景挖掘基准 RefAV，为规划中心的安全验证提供了系统化评估平台。
 
-
-
 自动驾驶系统的安全验证需要大规模、多样化的场景测试。然而，从海量非结构化驾驶日志中高效且精确地检索复杂的多智能体安全关键场景，本质上是一个“大海捞针”问题。现有的场景挖掘方法主要依赖基于规则的分类器或手工设计的特征，难以应对自然语言描述的灵活性和组合性。
 
 近期视觉语言模型（VLMs）的进展为基于自然语言的场景理解提供了新的可能。然而，论文发现**直接复用现成的 VLMs 进行场景挖掘效果很差**——这些模型缺乏细粒度的组合推理和运动理解能力，无法精确地将“车辆在雨中左转穿过自车路径”这类复杂指称表达定位到具体的 3D 轨迹和时空窗口。
@@ -61,8 +59,6 @@ claims:
 这一瓶颈的根源在于：自然语言描述往往涉及多智能体交互、时空关系和运动属性的复杂组合，而现有方法要么将语言理解与视觉特征匹配割裂，要么将整个推理过程压缩为单一的黑盒问答，缺乏对场景结构的显式建模。
 
 针对上述缺口，本文的核心动机是：**能否将复杂的指称表达解构为基本运动原语的组合，并通过程序合成桥接语言理解与精确的时空定位？** 这一思路不仅能够利用大语言模型（LLM）的语义理解能力，还能借助预定义的原子动作 API 保证检索的精确性和可解释性，同时保持跨数据集的零样本泛化能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -81,8 +77,6 @@ RefProg 的突破在于将复杂的指称表达**分解为可组合的原子动�
 3. **精确的时空定位**：相比黑盒 LLM API 基线，RefProg 在 HOTA-Temporal 指标上实现了 13.8% 的绝对提升（50.1 vs. 37.2），在 HOTA-Track 上提升 11.9%（51.1 vs. 39.2），证明程序化推理对精确时空定位的关键作用。
 
 值得注意的是，RefProg 还引入了视觉工具（如 SigLIPv2）来识别被跟踪对象的视觉属性（如颜色），部分弥补了纯轨迹推理在视觉语义理解上的不足，但这一扩展仍属于程序合成框架内的模块化增强，而非对核心机制的改变。
-
-
 
 RefAV 提出了一种面向规划中心的场景挖掘范式，其核心挑战在于从海量非结构化驾驶日志中高效且精确地检索复杂的多智能体安全关键场景——即“大海捞针”问题。直接复用现成的视觉语言模型（VLMs）效果很差，因为它们缺乏细粒度的组合推理和运动理解能力。
 
@@ -111,13 +105,6 @@ RefProg 的核心洞察在于**程序合成作为语言与时空定位之间的�
 
 - **输入**：一段 20 秒的驾驶日志（含 LiDAR 点云、360° 环视图像和 HD 地图）以及一条自然语言场景描述（如“雨天，一辆车在自车路径上左转”）。
 - **输出**：场景是否发生的二值判定，以及在 3D 空间和时间维度上对被指称对象的精确定位轨迹。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2089_https_arxiv_org_abs_2505_20981/figures/001_Figure_1.jpg]]
-*Figure 1: Scenario Mining Problem Setup. Given a natural language prompt such as vehicle making left turn through ego-vehicle’s path while it is raining, our problem setup requires models to determine whether the described scenario occurs within a 20-second driving log, and if so, precisely localize the referred object in 3D space and time from raw sensor data (LiDAR, 360◦ ring cameras, and HD maps). Based on the example above, a VLM should localize the start and end timestamps and 3D location of the red Mini Cooper executing a “Pittsburgh left” through the ego-vehicle’s path with a 3D track. Notably, the “Pittsburgh left” is a regional driving practice where a driver quickly makes a left turn before...*
-
-
 
 RefProg 采用双路解耦架构（Figure 4），将感知与推理分离：一条路径运行离线3D感知模型生成高质量轨迹，另一条路径通过LLM将自然语言查询合成为可执行程序，最后通过程序执行器对轨迹进行精确过滤与分类。
 
@@ -158,8 +145,6 @@ $$s = s_{\mathrm{cosine}} + 0.1 s_{\mathrm{fuzzy}}$$
 $$s_{\mathrm{modified}} = s_{\mathrm{cosine}} - \frac{0.05}{\mathrm{len}(\mathrm{track})}$$
 
 这些启发式公式在RefProg中被更精确的程序化逻辑所取代，但其设计思路揭示了纯相似度匹配方法的固有局限——缺乏对时序结构和组合语义的显式建模。
-
-
 
 ## 实验与关键发现
 
@@ -239,8 +224,6 @@ $$s_{\mathrm{modified}} = s_{\mathrm{cosine}} - \frac{0.05}{\mathrm{len}(\mathrm
 
 4. **LLM语义偏差**：LLM合成的程序并非永远正确，存在语义解释偏差或逻辑错误的风险。Table 3中不同LLM的程序失败率差异（0.5%~3.2%）表明，代码合成的可靠性仍是实际部署中的关键挑战。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2089_https_arxiv_org_abs_2505_20981/figures/006_Table_2.jpg]]
 *Table 2: Experimental Results. We evaluate several zero-shot referential tracking baselines. We find that RefProg significantly outperforms all other zero-shot baselines. Notably, filtering by referred class is a particularly strong baseline, outperforming image-embedding similarity. Interestingly, directly using LLM APIs as a black box outperforms ReferGPT’s hand-crafted approach. All winning submissions to our challenge build upon RefProg*
 
@@ -255,23 +238,6 @@ $$s_{\mathrm{modified}} = s_{\mathrm{cosine}} - \frac{0.05}{\mathrm{len}(\mathrm
 
 ![[assets/figures/papers/paper_list_l2089_https_arxiv_org_abs_2505_20981/figures/004_Table_1.jpg]]
 *Table 1: Comparison to Other Benchmarks. Language-based 3D scene understanding has been extensively studied in the context of referential multi-object tracking (RMOT) and multi-modal visual question answering (VQA). Different from prior work, we address the problem of spatio-temporal scenario mining. Specifically, RefAV is based on Argoverse 2, which provides 3D track-level annotations for 30 categories at 10 Hz. Although RefAV does not include as many referential expressions as prior work (e.g. OmniDrive [68] and nuGrounding [29]), our referential annotations focus on capturing diverse multi-agent interactions. Lastly, RefAV includes negative prompts, which allows us to more accurately measure scen...*
-
-![[assets/figures/papers/paper_list_l2089_https_arxiv_org_abs_2505_20981/figures/014_Table_7.jpg]]
-*Table 7: Impact of Sampling Rate. We evaluate RefProg’s performance with subsampled inputs to measure the relative impact on referential tracking accuracy. We find that standard tracking performance drops by 5% when subsampling due to the difficulty of associating sparse detections*
-
-![[assets/figures/papers/paper_list_l2089_https_arxiv_org_abs_2505_20981/figures/011_Table_6.jpg]]
-*Table 6: Referential Tracking Accuracy for Related and Other Objects. We present RefProg’s referential tracking accuracy for related objects and other objects. We find that HOTA (for the base tracker) is similar to HOTA-Temporal (Other) because most objects are not relevant to the referential prompt*
-
-![[assets/figures/papers/paper_list_l2089_https_arxiv_org_abs_2505_20981/figures/016_Figure_8.jpg]]
-*Figure 8: RefAV Object Distribution. RefAV includes referred objects in all directions up to 150m away from the ego vehicle. RefAV places a special focus on the ego vehicle and objects that interact with the ego vehicle. Therefore, referred objects are disproportionately located on the road in front of the ego vehicle. Both referred object heatmaps are in the ego vehicle coordinate frame*
-
-![[assets/figures/papers/paper_list_l2089_https_arxiv_org_abs_2505_20981/figures/013_Figure_6.jpg]]
-*Figure 6: RefAV Expression Statistics. We compute the number of referring expressions categorized by expression type, count the number of the expressions that are positive or negative, and whether they are procedurally generated or manually constructed. We also highlight the number of positive expressions that include related object annotations and explicit references to the ego vehicle. The bar chart on the right shows the number of objects refered to by each expression. Most expressions in RefAV refer to zero (e.g. a negative match) or one object. On average, each expression refers to 3.92 objects*
-
-![[assets/figures/papers/paper_list_l2089_https_arxiv_org_abs_2505_20981/figures/010_Figure_5.jpg]]
-*Figure 5: Manual Annotation Tool. We create an annotation tool to assist with labeling manually defined scenarios. Our tool allows us to quickly annotate multi-object referential tracks in AV2*
-
-
 
 ## 定位与知识库关联
 
@@ -313,8 +279,6 @@ RefProg 的方法论贡献在于提出了一种**零样本、程序化、模块�
 ### 与下游任务的连接前景
 
 RefAV 的工作开启了场景挖掘与规划验证之间的闭环可能性。一个值得探索的开放问题是：**场景挖掘方法是否能与下游规划或接管预测任务进行端到端联合优化**？例如，可以将 RefProg 检索出的高价值安全关键场景，直接用于训练或测试规划器的鲁棒性，从而形成一个以“规划为中心”的数据飞轮。此外，如何在大规模部署中进一步降低 LLM 程序合成的 token 消耗和延迟，使实时或在线上应用成为可能，也是该方法走向工业级应用必须跨越的工程门槛。
-
-
 
 ## 原文 PDF
 

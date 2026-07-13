@@ -54,8 +54,6 @@ claims:
 - 消融实验证实，扩散细节增强相比双线性上采样在所有数据集上均带来显著提升，验证了恢复高频纹理的必要性（Table 5）；子模优化的覆盖、多样性与光谱信息三项参数缺一不可，联合使用取得最优准确率**78.6%**（Table 6）。
 - 在ImageNet-1K（IPC=10）上，Grid Distillation的均值准确率达**50.01%**，优于现有方法约4.7个百分点（Table 4），展示了该方法在大规模场景下的扩展潜力。
 
-
-
 数据集蒸馏（Dataset Distillation）旨在将大规模训练数据压缩为极少量合成样本，使下游模型在这些样本上训练后仍能逼近在全量数据上的性能。这一范式在降低存储与计算开销、加速模型迭代方面具有重要价值，但其核心瓶颈始终在于：**如何在极低数据预算下同时保留空间组合结构与注入世界知识**。
 
 现有的蒸馏方法可大致归为四类范式，它们在可解释性、信息密度与世界知识之间呈现出不同的权衡（Figure 1）：
@@ -66,8 +64,6 @@ claims:
 - **基于扩散模型的方法**（如 **Minimax**，Gu et al., CVPR 2024；**D4M**，Su et al., CVPR 2024；**VLCP**，Zou et al., arXiv 2025）利用扩散先验生成蒸馏图像，能够注入丰富的世界知识，但生成的样本往往以独立图像为单位，缺乏对空间组合结构的显式编码。
 
 上述方法的共同缺陷在于：**它们将蒸馏数据视为孤立的合成图像集合，忽视了图像之间的空间组织关系与类内多样性结构**。随机采样或简单聚类无法保证所选样本在语义空间中的覆盖度与互补性，导致蒸馏数据在空间上碎片化、在语义上浅薄。这构成了本文的核心动机——**能否通过结构化的数据组织方式，在蒸馏过程中同时编码空间组合结构与世界知识，从而突破现有范式的性能上限？**
-
-
 
 ## 核心方法与创新机理
 
@@ -98,8 +94,6 @@ Grid Distillation 的应对策略是将图像蒸馏重新定义为**结构化网
 ### 创新间的因果耦合
 
 三个创新并非独立叠加，而是形成因果链条：SSDIM 提供高质量的空间组合骨架，下采样压缩为紧凑表示，扩散增强恢复压缩损失的高频细节，网格感知裁剪则在训练阶段保护这一空间结构不被破坏。消融实验（Table 6）验证了子模目标中三项的互补性——同时使用覆盖、多样性与光谱信息（α=1.0, β=0.6, γ=0.3）取得最佳准确率 78.6%，去除任一项均导致性能下降，证实三者缺一不可。
-
-
 
 Grid Distillation 的整体流水线围绕一个核心洞察展开：**将图像选择建模为谱子模优化问题**，以构造高分辨率组合网格，并在下采样为紧凑表示后通过单步扩散恢复丢失的细节。该流程由四个顺序模块构成，形成从原始数据到下游训练数据的完整转换链路。
 
@@ -144,8 +138,6 @@ $$\mathcal{C}(\mathbf{I}; p_{\mathrm{align}}) = \begin{cases} \mathrm{AlignedCro
 ### 关键设计选择
 
 默认配置中，网格尺寸固定为 $L=4$（即 $4 \times 4$ 网格），谱分解秩 $r=32$，子模权重 $\alpha=1.0, \beta=0.6, \gamma=0.3$。消融实验（Table 6）证实，三个子模项缺一不可——去除任一项均导致性能下降，三者联合取得最高准确率 78.6%。扩散细节增强相比双线性上采样在所有数据集和 IPC 设置下均带来一致且显著的提升（Table 5），验证了恢复高频纹理对蒸馏质量的关键作用。
-
-
 
 Grid Distillation 的核心由三个模块构成：谱子模网格选择（SSDIM）、基于扩散的细节增强，以及网格感知裁剪策略。三者协同，将类别图像池转化为紧凑的结构化蒸馏网格，并在下游训练中保持空间语义。
 
@@ -199,13 +191,6 @@ $$\mathcal{C}(\mathbf{I}; p_{\mathrm{align}}) = \begin{cases} \mathrm{AlignedCro
 
 对齐裁剪的起始坐标取 $(h, w)$ 的整数倍（$h, w$ 为网格子图尺寸），从而保留网格的语义布局；随机裁剪则引入局部变化，增强鲁棒性。默认 $p_{\mathrm{align}}=0.6$，在保持结构完整性与注入数据多样性之间取得平衡。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l882_https_openaccess_thecvf_com_content_CVPR2026_html_Das_Grid_Distillation/figures/005_Figure_4.jpg]]
-*Figure 4: Illustration of Grid-Aware Cropping An aligned crop starts at multiples of*
-
-
-
 ## 实验与关键发现
 
 ### 实验设置与基准
@@ -234,8 +219,6 @@ Figure 3直观对比了随机选择与谱子模优化构建的网格。在UCF-10
 
 尽管Grid Distillation在多个基准上取得显著提升，仍存在以下局限：（1）网格尺寸固定为4×4，未探索自适应网格大小以适应不同类别的密度分布；（2）子模优化依赖CLIP嵌入，在极端领域外数据上的有效性未经验证；（3）扩散细节增强引入约16.9%的一次性计算开销，需要额外GPU推理；（4）仅在ImageNet子集和UCF-101上评估，未在更大规模或更复杂数据集上验证扩展性。这些限制为后续工作提供了明确的改进方向。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l882_https_openaccess_thecvf_com_content_CVPR2026_html_Das_Grid_Distillation/figures/006_Table_1.jpg]]
 *Table 1: Comparison of state-of-the-art methods on ImageWoof under various IPC settings and model architectures. “Ours” column reports accuracies from our Grid-Distil experiments. All results are measured at 256×256 resolution. The best results are in bold, and the secondbest are underlined (in VLCP)*
 
@@ -250,23 +233,6 @@ Figure 3直观对比了随机选择与谱子模优化构建的网格。在UCF-10
 
 ![[assets/figures/papers/paper_list_l882_https_openaccess_thecvf_com_content_CVPR2026_html_Das_Grid_Distillation/figures/007_Table_2.jpg]]
 *Table 2: Comparison of dataset distillation methods on ImageNette using ResNetAP-10 under various IPC settings. Best results are in bold; second-best method (VLCP) is underlined*
-
-![[assets/figures/papers/paper_list_l882_https_openaccess_thecvf_com_content_CVPR2026_html_Das_Grid_Distillation/figures/008_Table_3.jpg]]
-*Table 3: Comparison of dataset distillation methods on ImageIDC using ResNetAP-10 under various IPC settings. Best results are in bold; second-best method (VLCP) is underlined*
-
-![[assets/figures/papers/paper_list_l882_https_openaccess_thecvf_com_content_CVPR2026_html_Das_Grid_Distillation/figures/011_Table_7.jpg]]
-*Table 7: Few-shot classification accuracy (%) on UCF-101 Mid-Frames. Our method (Grid-LDC) consistently outperforms prior CLIP adaptation techniques across all few-shot settings, demonstrating the benefit of grid-level distillation for motioncentric visual reasoning*
-
-![[assets/figures/papers/paper_list_l882_https_openaccess_thecvf_com_content_CVPR2026_html_Das_Grid_Distillation/figures/004_Figure_3.jpg]]
-*Figure 3: Effect of Submodular Grid Selection. Comparison of grids constructed from the UCF Mid-Frames dataset (selected to show the visible effect of our algorithm). Left: Random selection often yields redundant sub-images (highlighted in red). Right: Our spectral submodular optimization produces semantically diverse and spatially complementary grids. The figure demonstrates how submodular selection improves coverage and diversity over naive random sampling*
-
-![[assets/figures/papers/paper_list_l882_https_openaccess_thecvf_com_content_CVPR2026_html_Das_Grid_Distillation/figures/001_Figure.jpg]]
-*Figure: (b) RDED (c) VLCP (d) Grid-Distil*
-
-![[assets/figures/papers/paper_list_l882_https_openaccess_thecvf_com_content_CVPR2026_html_Das_Grid_Distillation/figures/002_Figure.jpg]]
-*Figure: (a) SRe2L*
-
-
 
 ## 定位与知识库关联
 
@@ -309,8 +275,6 @@ Grid Distillation 位于三个技术脉络的交汇处：
 **跨模态扩展**：谱子模网格的核心思想——通过子模优化选择代表性元素构建结构化表示——在理论上不限于视觉数据。文本、图数据、甚至表格数据都可以定义亲和矩阵和光谱能量分数，从而构建类似的结构化蒸馏表示。这一扩展方向尚未被探索。
 
 **更大规模验证**：在 ImageNet-1K IPC=10 下，Grid Distillation 达到 50.01% 的平均准确率，超越 VLCP 约 4.7 个百分点，但与完整数据集训练的差距仍然显著。在 IPC=50 或更高设置下，该方法的扩展行为及其与纯生成式方法的性能交叉点值得进一步研究。
-
-
 
 ## 原文 PDF
 

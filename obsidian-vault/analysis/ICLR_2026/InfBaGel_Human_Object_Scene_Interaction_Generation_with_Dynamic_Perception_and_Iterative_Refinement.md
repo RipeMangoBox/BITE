@@ -61,8 +61,6 @@ claims:
 
 **局限与展望**：当前方法依赖简化体素表示，对精细交互（如抓取稳定性）的支持有限；碰撞引导采用统一距离惩罚，可能使运动趋于保守。未来方向包括将动态感知拓展到连续几何表示、自适应碰撞引导参数学习，以及与物理模拟器结合以进一步提升运动合理性。
 
-
-
 ### 问题域：人-物-场景交互生成
 
 在具身智能与数字人应用中，生成自然、物理合理的人-物-场景交互（Human-Object-Scene Interaction, HOSI）运动序列是核心挑战之一。给定文本指令与目标位置，系统需要同时协调人体运动、物体操控以及场景约束，输出无碰撞、接触合理的长序列动作。这一任务横跨人体运动生成、场景感知与物体交互三个子领域，对生成模型的时空一致性与物理可行性提出了严苛要求。
@@ -91,8 +89,6 @@ claims:
 
 InfBaGel 属于**运动学驱动的条件运动生成**范式，与基于物理模拟的方法正交。其设计哲学是：不依赖昂贵的在线物理仿真，而是通过学习的方式在运动学层面隐式编码场景约束与交互合理性，仅在必要时引入轻量级的几何引导。这一选择使其在实时性要求高的应用场景（如VR/AR、游戏角色动画）中具有实用优势。
 
-
-
 ## 核心方法与创新机理
 
 InfBaGel 针对人-物-场景交互（HOSI）生成中的两个核心瓶颈——**动态对象-场景变化导致静态编码失效**与**高质量带场景标注数据极度稀缺**——提出了四项相互耦合的关键创新，构成一个完整的粗到细迭代精炼框架。
@@ -116,8 +112,6 @@ InfBaGel 针对人-物-场景交互（HOSI）生成中的两个核心瓶颈—�
 ### 创新耦合关系
 
 上述四项创新并非孤立存在，而是形成闭环：**一致性模型**提供少步迭代的时序骨架；**动态感知编码**在每步迭代中更新场景状态；**碰撞感知引导**在采样过程中利用更新后的体素距离图约束运动；**混合数据训练**为整个框架提供泛化所需的监督信号。这一耦合设计使得 InfBaGel 在 HOSI Benchmark 上以 83.16% 的成功率、0.13 的脚滑动和 3.39 的人-场景穿透均值全面超越 LINGO、TRUMANS 等场景感知基线，同时在 HOI 数据集上取得 0.68 的 FID（InfBaGel 16，Table 5），验证了迭代精炼对交互质量的一致提升效果。
-
-
 
 InfBaGel 构建了一个**自回归的粗到细迭代精炼框架**，将人-物-场景交互（HOSI）生成过程与一致性模型（Consistency Model）的去噪步骤显式对齐。框架接收文本指令、人体与物体的目标位置、物体几何以及场景体素上下文作为输入，输出耦合的人体运动序列 $\mathcal{M}_h$ 与物体运动序列 $\mathcal{M}_o$（见 Fig. 1）。
 
@@ -156,8 +150,6 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{CD}} + \lambda_h \mathcal{L}_{\mathrm{joint
 - **一致性模型替代扩散模型**：蒸馏后的模型在 15 步采样下即可生成高质量运动，推理速度从扩散模型的 3.38 FPS 提升至 28.75 FPS（Table 2）。
 - **动态体素数量与采样步数**：消融实验表明，3 个动态体素配合 16 步采样达到最佳综合性能（Table 4），验证了多体素时变表示对捕捉人/物移动带来的环境变化是必要的。
 - **碰撞引导与接触引导互补**：接触引导（Contact Guidance）维持人-物交互质量，碰撞引导在此基础上消除场景穿透，二者联合使用（C+B）在成功率与物理可行性上取得最优平衡（Table 3）。
-
-
 
 InfBaGel 的核心架构由四个关键模块构成，围绕“一致性模型驱动的粗到细迭代精炼”这一主轴协同工作。以下逐一拆解各模块的机理与关键公式。
 
@@ -251,8 +243,6 @@ $$
 
 利用一致性模型的少步生成效率，InfBaGel 采用自回归策略生成任意长度的长序列交互动作：将上一窗口的生成结果作为下一窗口的初始条件，实现连贯的长时程人-物-场景交互。
 
-
-
 ## 实验与关键发现
 
 InfBaGel 的实验评估围绕两个核心基准展开：**HOSI Benchmark**（人-物-场景交互）与 **HOI Dataset**（人-物交互），分别验证场景感知能力与交互生成质量。以下从主结果、消融分析、速度对比、参数敏感性及失败模式几个维度展开。
@@ -274,9 +264,6 @@ Table 1 中蓝色标注部分进一步表明，混合数据训练策略（合成
 ### HOI 数据集：交互质量保持竞争力
 
 在 HOI Dataset（OMOMO）上，InfBaGel 同样展现出优势（Table 5）。以 FID↓ 衡量生成分布与真实分布的接近程度：
-
-![[assets/figures/papers/paper_list_l77_https_openreview_net_forum_id_TeyHNq4WlI/figures/010_Table_5.jpg]]
-*Table 5: Performance Evaluation on the HOI Dataset*
 
 - InfBaGel（16 步采样）FID 为 **0.68**，优于 **CHOIS**（Li et al., 2024b）的 1.01（降低 0.33）和 ROG 的 1.23。
 - 该结果验证了迭代精炼框架在无场景条件下同样能提升交互质量，并非仅依赖场景模块。
@@ -317,9 +304,6 @@ Table 3 系统拆解了动态感知编码（DP）与碰撞感知引导（B）的
 
 Table 4 探索了动态体素数量（1 vs 3）与采样步数（4/8/16/32）的组合效应：
 
-![[assets/figures/papers/paper_list_l77_https_openreview_net_forum_id_TeyHNq4WlI/figures/006_Table_4.jpg]]
-*Table 4: Ablation study on different parameter settings in our method, including the models with 1 and 3 dynamic scene representations (Voxel) at different sampling steps (Step)*
-
 - **3 个体素** 在所有步数配置下均优于 1 个体素，验证了多尺度场景表示对动态感知的必要性。
 - **16 步** 达到最佳综合性能（成功率 86.35%，穿透均值 3.99），步数过少（4 步）精炼不充分，步数过多（32 步）收益递减且增加计算开销。
 - 这一结果与一致性模型的 ODE 轨迹特性一致：16 步已足够逼近连续轨迹，额外步数带来的边际改善有限。
@@ -327,9 +311,6 @@ Table 4 探索了动态体素数量（1 vs 3）与采样步数（4/8/16/32）的
 ### 混合数据比例的影响
 
 Table 6 展示了合成 OMOMO 数据与真实 LINGO 数据不同混合比例的效果。纯合成数据（0:1）在真实场景中泛化能力不足，纯真实数据（1:0）则因缺乏 HOI 标注而交互质量下降。最优比例位于中间区域，验证了混合数据训练策略对零样本场景泛化的支撑作用。
-
-![[assets/figures/papers/paper_list_l77_https_openreview_net_forum_id_TeyHNq4WlI/figures/011_Table_6.jpg]]
-*Table 6: Ablation study on the different ratios of synthesized OMOMO data to LINGO data*
 
 ### 失败模式与局限性
 
@@ -344,18 +325,8 @@ Table 6 展示了合成 OMOMO 数据与真实 LINGO 数据不同混合比例的�
 
 InfBaGel 通过动态感知编码与碰撞引导的协同，在 HOSI 任务上实现了成功率 83.16% 的领先性能，同时将生成速度提升至 28.75 FPS。消融实验明确证实：迭代场景更新是解决动态上下文瓶颈的因果性机制，碰撞引导以微小的目标精度代价换取了显著的穿透改善，一致性模型则为实时迭代精炼提供了速度基础。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l77_https_openreview_net_forum_id_TeyHNq4WlI/figures/004_Figure_2.jpg]]
-*Figure 2: Qualitative comparison. Top 2 rows: Comparison on human-object interaction in scenes. Bottom row: Comparison on a complex multi-stage task involving moving a chair and then sitting on it*
-
 ![[assets/figures/papers/paper_list_l77_https_openreview_net_forum_id_TeyHNq4WlI/figures/008_Figure_4.jpg]]
 *Figure 4: Qualitative results on different scenes, motion types and object types. The top two rows*
-
-![[assets/figures/papers/paper_list_l77_https_openreview_net_forum_id_TeyHNq4WlI/figures/009_Figure_5.jpg]]
-*Figure 5: Qualitative results in socially-interactive scenes, including a store and a physical therapy room. These unseen scenes are chosen from LINGO, displayed in default white due to the lack of texture*
-
-
 
 ## 定位与知识库关联
 
@@ -396,8 +367,6 @@ InfBaGel 的有效性建立在以下前提之上：
 3. **混合数据最优比例的任务依赖性**：Table 6 消融了 OMOMO 与 LINGO 数据的不同混合比例，但最优比例是否与下游任务类型相关（如搬运 vs. 坐姿交互），以及能否推广到更多样化的交互类型（如多人协作），仍是开放问题。
 4. **与物理模拟器的结合**：当前方法基于运动学生成，不显式建模力和动力学约束。能否与基于物理的模拟器结合，在迭代精炼过程中引入物理合理性验证，进一步提升运动质量？这需要解决模拟器梯度回传或强化学习接口的问题。
 5. **长序列自回归的误差累积**：InfBaGel 采用自回归策略生成长序列交互（Fig. 1a），但自回归生成固有的误差累积效应在超长序列（如数分钟级交互）中的影响尚未量化分析。
-
-
 
 ## 原文 PDF
 

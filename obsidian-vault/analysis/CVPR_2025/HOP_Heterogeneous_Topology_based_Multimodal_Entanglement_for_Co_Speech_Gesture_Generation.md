@@ -51,8 +51,6 @@ claims:
 
 在 TED Gesture 和 TED Expressive 两个公开基准数据集上，HOP 在 Fréchet Gesture Distance（FGD）、Beat Consistency（BC）和 Diversity 三项核心指标上均达到最优性能（Table 1）。用户研究进一步表明，HOP 生成的手势在自然性（MOS 3.92）、流畅性（MOS 3.77）、语义一致性（MOS 4.01）和同步性（MOS 3.86）四个维度上均获得最高主观评分（Table 2）。消融实验证实，移除时空图编码器或重编程层均会导致所有指标的显著退化（Table 5），验证了拓扑纠缠设计的有效性。此外，渐进学习实验显示 HOP 在训练数据减半时仍保持较强的学习能力，且始终优于 **Trimodal Context**（Yoon et al., ACM TOG 2020）等基线方法，表明其具备更好的数据效率和鲁棒性（Table 3）。
 
-
-
 协同语音手势（co-speech gesture）是人类交流中自然伴随言语的肢体动作，承载着语义强调、情感表达和节奏同步等关键交际功能。在虚拟人、具身智能体等应用中，生成与语音自然匹配的手势序列对于提升交互沉浸感至关重要。
 
 ### 现有方法及其瓶颈
@@ -74,8 +72,6 @@ HOP 的核心洞察在于：**音频信号天然编码了手势的节奏特征�
 ### 方法定位
 
 HOP 属于显式跨模态对齐驱动的生成式方法，区别于传统的独立编码-简单融合范式。其核心贡献不在于引入全新的生成架构（手势生成器仍基于 GAN），而在于重新设计了多模态特征的交互方式——从“拼接”转向“纠缠”，从而在保持生成质量的同时显著提升了手势的多样性、语义一致性和节奏同步性。
-
-
 
 ## 核心方法与创新机理
 
@@ -119,16 +115,11 @@ $$\mathbf{A}_{\text{adapted}} = \operatorname{SoftMax}\left(\operatorname{ReLU}\
 
 这两项 changed slots 共同构成了 HOP 的方法论核心，使其在 TED Gesture 和 TED Expressive 数据集上均取得最优的 FGD、BC 和 Diversity 指标（Table 1），并在用户研究中获得最高的自然性、流畅性、语义一致性和同步性评分（Table 2）。
 
-
-
 HOP的整体pipeline围绕“音频作为跨模态桥梁”这一核心思想构建。如Figure 2所示，模型接收三种异构输入——文本（$X_t$）、音频（$X_{aud}$）和动作（$X_{act}$）——并分别通过各自的编码器将其映射到隐层表示（Eq. 1）：
 
 $$h_t = f_t(X_t), \quad h_{aud} = f_{aud}(X_{aud}), \quad h_{act} = f_{act}(X_{act})$$
 
 与现有方法（如**Trimodal Context**，Yoon et al., ACM TOG 2020）将三模态独立编码后直接拼接或加和的策略不同，HOP引入了一个显式的跨模态适应阶段。该阶段的核心逻辑是：文本和动作之间存在显著的异构性，但音频天然编码了语音的节奏特征和文本的语义信息，可以作为连接两者的直接媒介（Figure 3）。因此，模型利用音频表示 $h_{aud}$ 分别对文本和动作进行自适应调整（Eq. 2）：
-
-![[assets/figures/papers/paper_list_l1859_HOP_Heterogeneous_Topology_based_Multimodal_Entanglement_for_Co_Speech_G/figures/003_Figure_3.jpg]]
-*Figure 3: Heterogeneous entanglement of multimodal data. We use red, blue, and green shading to denote text data, audio data, and action data, respectively. While text and action exhibit significant heterogeneity, audio serves as a direct mediator between the two, establishing a path of connectivity that facilitates the full utilization of multimodal data for gesture generation*
 
 $$h_{t-aud} = g_t(h_t, h_{aud}), \quad h_{act-aud} = g_{act}(h_{act}, h_{aud})$$
 
@@ -150,12 +141,8 @@ $$h_{tme} = f_{tme}(h_{t-aud}, h_{act-aud}, h_{aud})$$
 
 整个框架的信息流可以概括为：音频作为桥梁，通过重编程连接文本语义，通过时空图连接动作节奏，最终在拓扑融合层实现三模态的深度纠缠，驱动协调、富有表现力的手势生成。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1859_HOP_Heterogeneous_Topology_based_Multimodal_Entanglement_for_Co_Speech_G/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed framework for multimodal gesture generation with heterogeneous topology entanglement. Given the input text of speech and the Mel-Spectrum obtained through audio preprocessing, we treat audio sequences as a bridge, linking text sequences and action sequences with distinct topologies. For the connection between text and audio, we apply a reprogramming layer to align data from these different modalities, utilizing a language model to extract embedded semantic information. To link action and audio, we employ the Graph-WaveNet approach to separately extract action and audio features. The entangled multimodal representations are then fed into the gesture generator through...*
-
-
 
 HOP的整体框架围绕“以音频为桥梁的异构多模态拓扑纠缠”这一核心思想构建。如图2所示，系统接收语音文本与经音频预处理得到的梅尔频谱（Mel-Spectrogram），通过两条并行的跨模态适应路径——音频-文本重编程（Audio-Text Reprogramming）与音频-动作时空图编码（Audio-Action Spatio-Temporal Graph Encoder）——分别实现音频与文本语义、音频与肢体运动节奏的对齐，最终经拓扑融合（Topological Fusion）输入手势生成器（Gesture Generator）。
 
@@ -226,18 +213,8 @@ $$\mathcal{L}_{\text{gesture}} = \alpha \cdot \mathcal{L}_{\text{Huber}}(\mathbf
 
 其中 $\alpha$、$\beta$、$\gamma$、$\lambda$ 为平衡各项损失的超参数。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1859_HOP_Heterogeneous_Topology_based_Multimodal_Entanglement_for_Co_Speech_G/figures/004_Figure_4.jpg]]
-*Figure 4: A showcase of reprogramming in audio-text crossmodality adaptation. We visualize the features before and after reprogramming in the cross-modality adaptation, as well as the feature separation of audio and text before training. It is evident that the audio features are relatively noisier compared to the text features before training. After passing through the reprogramming layer, the correlation between audio and text increases as training progresses, showing a trend of alignment*
-
-![[assets/figures/papers/paper_list_l1859_HOP_Heterogeneous_Topology_based_Multimodal_Entanglement_for_Co_Speech_G/figures/012_Figure_7.jpg]]
-*Figure 7: Demonstration of the Audio-Action cross-modality adaptation process. Audio and text data are cross-modally adapted using a spatial-temporal graph encoder [45], enabling the fusion of cross-modal features that incorporate action features and rhythmic characteristics from the audio*
-
 ![[assets/figures/papers/paper_list_l1859_HOP_Heterogeneous_Topology_based_Multimodal_Entanglement_for_Co_Speech_G/figures/011_Figure_6.jpg]]
 *Figure 6: The visualization of adaptive adjacency matrix*
-
-
 
 ## 实验与关键发现
 
@@ -247,9 +224,6 @@ HOP在两个公开基准数据集上进行了全面评估：**TED Gesture** 和 
 
 ![[assets/figures/papers/paper_list_l1859_HOP_Heterogeneous_Topology_based_Multimodal_Entanglement_for_Co_Speech_G/figures/006_Table_1.jpg]]
 *Table 1: The Quantitative Results on TED Gesture [49, 50] and TED Expressive [22]. We compare the proposed method [1, 9, 22, 49, 50, 54] based on topological fusion of heterogeneous multimodal learning with recent sota methods and ground truth. Lower FGD is better, higher BC and diversity are better*
-
-![[assets/figures/papers/paper_list_l1859_HOP_Heterogeneous_Topology_based_Multimodal_Entanglement_for_Co_Speech_G/figures/008_Table_3.jpg]]
-*Table 3: Progressive learning results on varying percentages of TED training data. All other training settings remain consistent with those in Table 1. We gradually reduce the training dataset by 10% increments to observe the model’s performance changes under varying amounts of training data. When trained with 50% of the data, our model still retains great learning effectiveness*
 
 - **TED Gesture 数据集**：FGD 达到 1.406，BC 达到 0.762，Diversity 达到 108.176，显著优于 Trimodal 基线（FGD ≈ 3.73）及其他现有方法。
 - **TED Expressive 数据集**：FGD 达到 1.815，BC 达到 0.738，Diversity 达到 183.332，同样全面领先。
@@ -262,9 +236,6 @@ HOP在两个公开基准数据集上进行了全面评估：**TED Gesture** 和 
 ### 用户研究
 
 为评估生成手势的感知质量，论文进行了用户研究，从四个维度进行 MOS（1-5分）评分（Table 2）：
-
-![[assets/figures/papers/paper_list_l1859_HOP_Heterogeneous_Topology_based_Multimodal_Entanglement_for_Co_Speech_G/figures/007_Table_2.jpg]]
-*Table 2: User study results. The ratings for motion naturalness, smoothness, semantic and synchrony, assessed on a scale from 1 to 5, with higher scores indicating better performance*
 
 | 评估维度 | MOS 评分 |
 |---------|---------|
@@ -311,15 +282,8 @@ HOP在所有四个维度上均获得最高评分，其中语义一致性得分�
 - **计算效率**：重编程和时空图编码器增加了模型复杂度，可能对实时推理造成挑战，但文中未提供推理速度或计算开销的分析。
 - **长时间序列一致性**：模型在整场演讲等长时间序列生成中是否存在动作漂移或崩溃现象，仍需进一步研究。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1859_HOP_Heterogeneous_Topology_based_Multimodal_Entanglement_for_Co_Speech_G/figures/010_Table_5.jpg]]
-*Table 5: Ablation study on model modules. We investigate the effectiveness of the proposed modules, Graph Encoder and Reprogramming Layer for cross-modality adaptation. The results demonstrate that these modules consistently enhance performance on the benchmarks*
-
 ![[assets/figures/papers/paper_list_l1859_HOP_Heterogeneous_Topology_based_Multimodal_Entanglement_for_Co_Speech_G/figures/009_Table_4.jpg]]
 *Table 4: Ablation study results of text decoder. We investigate the performance of the proposed method without using a language model, as well as with different language models (including GPT-2 and BERT) as text encoders*
-
-
 
 ## 定位与知识库关联
 
@@ -382,8 +346,6 @@ HOP 的设计隐含以下适用前提：
 3. **任务迁移潜力**：音频-文本重编程模块本质上是一种通用的跨模态对齐机制，是否可迁移到其它需要音频-文本对齐的任务（如语音驱动的面部动画生成、音频到表情映射、歌声驱动的舞蹈生成）？
 4. **实时推理优化**：能否通过模型蒸馏、重编程层的轻量化设计或图卷积的近似计算，在保持纠缠效果的前提下满足实时推理需求？
 5. **生成可控性**：当前模型未提供对生成手势风格（如手势幅度、速度、情感倾向）的显式控制接口，如何在不破坏拓扑纠缠的前提下引入可控性，是走向实际应用的关键一步。
-
-
 
 ## 原文 PDF
 

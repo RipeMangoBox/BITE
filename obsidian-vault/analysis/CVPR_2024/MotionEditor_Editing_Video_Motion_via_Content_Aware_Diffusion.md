@@ -236,8 +236,6 @@ Table 3将视频运动编辑与姿态引导图像生成、人物运动迁移、�
 ![[assets/figures/papers/paper_list_l40_MotionEditor_Editing_Video_Motion_via_Content_Aware_Diffusion/figures/009_Table_3.jpg]]
 *Table 3: Tasks comparison among pose-guided image generation, human motion transfer, pose-guided video generation, video attribute editing, and video motion editing*
 
-### 补充图表
-
 ## 定位与知识库关联
 
 ### 任务定位：视频运动编辑的独特挑战

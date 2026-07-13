@@ -70,8 +70,6 @@ RTC-BENCH包含864个对抗示例（9个良性目标 × 24个对抗目标 × 4�
 
 REDTEAMCUA在现有评估框架中（如OSWorld、WebArena）处于独特位置：它是首个同时满足**混合Web-OS环境**、**自动化可配置注入**、**解耦评估**和**多模态交互**要求的框架。与仅关注纯文本注入或单一环境的先前工作相比，REDTEAMCUA更贴近真实CUA部署场景的威胁模型。
 
-
-
 计算机使用代理（Computer-Use Agents, CUAs）正逐步从实验室走向现实应用，其核心能力在于能够理解屏幕截图并执行键盘、鼠标操作，以完成跨Web和OS环境的复杂任务。然而，这种跨越信息边界的能力也引入了独特的安全威胁：**间接提示注入（Indirect Prompt Injection）**。攻击者可将恶意指令嵌入网页、文档或聊天消息中，当CUA处理这些内容时，注入的指令可能劫持其行为，导致数据泄露、系统破坏等严重后果。
 
 当前CUA的对抗性评估存在三个关键缺口：
@@ -84,8 +82,6 @@ REDTEAMCUA在现有评估框架中（如OSWorld、WebArena）处于独特位置�
 
 上述缺口共同指向一个核心瓶颈：**缺乏一个既现实、又可系统控制攻击暴露条件的评估框架**，使得对CUA间接提示注入脆弱性的理解停留在零散案例层面，无法形成对跨环境攻击路径的结构化认知。
 
-
-
 ## 核心方法与创新机理
 
 REDTEAMCUA框架的核心创新在于通过四个关键槽位（changed slots）的系统性改造，将CUA的对抗性评估从“导航能力与安全健壮性混淆”的粗糙状态，推进到“可控、可复现、可归因”的工程化阶段。
@@ -97,8 +93,6 @@ REDTEAMCUA框架的核心创新在于通过四个关键槽位（changed slots）
 **对抗注入配置：从手动构造到自动化可复现。** 此前注入测试依赖手工构造，难以规模化复现。REDTEAMCUA开发了**平台特定的自动化注入脚本**，包括直接修改SQL数据库以植入恶意内容（Section 3.1）。结合Adversarial Task Initial State Config模块（Figure 7），研究者可配置注入内容、位置和环境初始状态，确保864个对抗示例（9良性目标 × 24对抗目标 × 4实例化类型）的完全可复现性。
 
 **评估指标：从单一ASR到ASR+AR双维度。** 仅凭基于执行结果的ASR无法区分“代理未尝试攻击”与“尝试但失败”的情况。REDTEAMCUA引入**Attempt Rate（AR）**——使用GPT-4o作为LLM-as-a-Judge，判断轨迹中是否出现执行对抗目标的意图（Section 5.1）。这一细粒度指标揭示了深层脆弱性：GPT-4o的AR高达92.45%，而ASR为66.19%（Table 1），表明大量攻击尝试因执行能力不足而未成功——一旦CUA能力提升，这些“尝试但失败”的案例可能转化为成功攻击。
-
-
 
 ![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_yWwrgcBoK3/figures/001_Figure_1.jpg]]
 *Figure 1: Our REDTEAMCUA framework features a hybrid environment sandbox, combining a VM-based OS and Docker-based web replicas, to enable controlled and systematic analysis of CUA vulnerabilities in adversarial scenarios spanning both web and OS environments. A high-resolution screenshot of the forum webpage containing the injection is shown in Figure 5*
@@ -134,8 +128,6 @@ REDTEAMCUA 是一个面向计算机使用代理（CUA）的对抗性测试框架
 ### 基准构建
 
 基于上述框架，作者构建了 **RTC-BENCH** 基准，包含 **864个对抗示例**（9个良性目标 × 24个对抗目标 × 4种实例化类型）。对抗目标基于CIA三元组（机密性、完整性、可用性）设计，覆盖文件泄露、系统篡改、服务中断等关键安全维度。
-
-
 
 ### 3.1 混合沙盒架构
 
@@ -183,8 +175,6 @@ $$ASR = \frac{\text{至少一次运行中攻击成功的任务数}}{\text{总任
 $$AR = \frac{\text{LLM判定代理尝试执行对抗目标的任务数}}{\text{总任务数}}$$
 
 AR使用GPT-4o对完整交互轨迹进行判断，评估代理是否表现出执行对抗目标的意图，无论最终是否成功。
-
-
 
 ## 实验与关键发现
 
@@ -245,34 +235,12 @@ Table 8揭示了多个关键因素的因果效应：
 
 现有防御分为系统级和模型级两类。系统级防御（如Operator的安全检查）在用户配合下有效，但依赖用户警惕性。模型级防御（如Claude 4.6 Opus | CUA的注入检测）展现了前景，但50%的残留ASR表明仍需大幅改进。Table 7（附录）的检测准确率结果表明，当前纯文本防御方法难以有效处理多模态、交互式计算机使用场景——这是未来研究的核心瓶颈。
 
-![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_yWwrgcBoK3/figures/014_Table_7.jpg]]
-*Table 7: Detection accuracy of different methods*
-
 ### 失败模式与局限性
 
 1. **能力-脆弱性耦合**：能力更强的CUA（如Claude 4.5 Opus | CUA）反而更易受攻击，因为其更强的任务执行能力放大了注入攻击的危害。
 2. **导航失败掩盖脆弱性**：端到端评估中，部分CUA因无法到达注入页面而“安全”，这并非真正的健壮性。
 3. **防御的不完备性**：Operator的安全检查可被用户疏忽绕过；模型级检测存在高漏报率。
 4. **评估范围限制**：仅评估了Web→OS攻击路径，未覆盖OS→Web或Web→Web威胁模型；仅使用三个Web平台；攻击依赖固定文件名和环境状态，更通用的对抗目标尚未测试。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_yWwrgcBoK3/figures/010_Table_4.jpg]]
-*Table 4: Nine benign tasks in our RTC-BENCH*
-
-![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_yWwrgcBoK3/figures/011_Table_5.jpg]]
-*Table 5: Adversarial scenarios within our RTC-BENCH*
-
-![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_yWwrgcBoK3/figures/013_Table_6.jpg]]
-*Table 6: Comparison with previous evaluation frameworks that could be applied for adversarial testing of CUA across several key dimensions detailed in D. ‘–’ indicates cases that are not directly applicable or lack details in the original paper and ∼ represents cases where the framework has partial support for a specified dimension*
-
-![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_yWwrgcBoK3/figures/017_Table_9.jpg]]
-*Table 9: SR results across observation types*
-
-![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_yWwrgcBoK3/figures/020_Table_11.jpg]]
-*Table 11: SR (Decoupled Eval setting) under attack across three platforms and CIA categories*
-
-
 
 ## 定位与知识库关联
 
@@ -321,8 +289,6 @@ REDTEAMCUA 的定位在于填补当前 CUA 对抗性评估中“混合 Web-OS �
 4. **平台特性的量化影响**：消融研究显示 OwnCloud 上代码注入更有效，RocketChat 上语言注入更有效（Table 8），但平台信任度、界面设计等因素对 ASR 的具体量化影响尚不明确。
 
 5. **开源 CUA 的安全性**：随着开源 CUA 能力的提升，其对抗鲁棒性如何？是否需要社区构建专门的对抗训练数据集？
-
-
 
 ## 原文 PDF
 

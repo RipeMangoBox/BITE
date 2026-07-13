@@ -56,8 +56,6 @@ claims:
 
 需要指出的是，CFG-Rejection 依赖于分类器自由引导机制，不适用于无条件生成任务；当引导强度过高导致样本多样性极低时，ASD 的区分度会下降；此外，ASD 与样本质量的关联目前基于经验观察，缺乏严格的理论保证，且超参数 $\tau$ 和 $\gamma$ 需根据具体模型和任务进行调优。
 
-
-
 扩散模型已成为视觉内容生成的核心技术，其采样过程本质上是随机微分方程（SDE）或常微分方程（ODE）的数值求解。给定数据分布 $p_{\mathrm{data}}(\mathbf{x})$，模型通过逐步向数据注入高斯噪声将其转化为可处理的先验分布，再学习逆转这一扩散过程。在推理阶段，采样从纯噪声出发，沿反向轨迹逐步去噪，最终产生符合目标分布的样本。这一随机性带来了多样性，但也意味着并非所有采样轨迹都能产生高质量样本——部分轨迹会收敛到低似然区域，导致伪影、语义错位或文本对齐失败。
 
 当前提升扩散模型推理质量的主流方法可分为两类：**基于外部奖励的过滤方法**（如 Best-of-N 采样）要求生成完整的候选样本池，再借助预训练的奖励模型（如 PickScore、HPSv2）进行后验选择；**推理时对齐方法**（如 Loss-Guided Diffusion、Direct Noise Optimization）则在采样过程中引入额外的梯度信号来引导生成。这两类方法的共同瓶颈在于：它们都依赖**外部信号源**（奖励模型或损失函数），且需要在**完整去噪过程**完成后或贯穿全过程才能评估样本质量。这导致两个关键缺陷：一是外部奖励模型的训练和推理带来额外开销，且其偏好可能与实际任务存在偏差；二是无法在去噪早期识别并终止低质量轨迹，造成计算资源的浪费。
@@ -65,8 +63,6 @@ claims:
 一个被忽视的机遇在于：分类器自由引导（Classifier-Free Guidance, CFG）作为扩散模型的标准推理技术，其内部已经蕴含了丰富的质量信号。CFG 通过混合条件得分 $S_\theta(\mathbf{x}_t; \sigma_t, \mathbf{c})$ 和无条件得分 $S_\theta(\mathbf{x}_t; \sigma_t, \emptyset)$ 来增强条件对齐，但这一混合过程在每一步产生的**得分差异**本身是否携带关于最终样本质量的信息，此前未被系统探索。
 
 本文的核心动机正是利用这一内在信号，构建一个**无需外部奖励、无需完整去噪**的即插即用样本过滤策略。其关键洞察是：在 CFG 去噪轨迹中，条件得分与无条件得分之间的累积差异（Accumulated Score Differences, ASD）与样本位于数据流形高密度区域的概率存在强正相关——高 ASD 样本倾向于占据高似然、语义清晰的区域，而低 ASD 样本则更可能出现在低密度、语义模糊的区域。这一相关性使得 ASD 可以作为一种**内在的、无奖励的质量评估指标**，在去噪早期即可识别并提前终止低质量采样轨迹，从而在不牺牲生成质量的前提下显著降低计算开销。
-
-
 
 ## 核心方法与创新机理
 
@@ -101,8 +97,6 @@ CFG-Rejection 作为一个即插即用策略，不需要修改模型架构、训
 | **额外计算成本** | 需运行外部奖励模型 | 零额外模型成本 |
 | **模型依赖** | 依赖奖励模型的可用性与质量 | 完全自包含 |
 
-
-
 CFG-Rejection 是一种即插即用的推理时样本过滤策略，其核心设计目标是在不引入外部奖励模型、不进行模型重训练的前提下，利用扩散采样过程本身蕴含的内在信号，在去噪早期识别并终止低质量样本的生成轨迹。
 
 ### 框架总览
@@ -135,24 +129,14 @@ CFG-Rejection 的推理管道由三个顺序模块构成：
 
 需要指出，CFG-Rejection 的有效性依赖于分类器自由引导机制的存在，因此**不适用于无条件生成任务**。此外，当引导强度过高导致样本多样性极度收缩时（如 SDXL 在 $\omega=9$ 的设置下），ASD 的区分能力下降，方法的增益会相应减弱。该方法的 ASD-质量关联目前基于经验观察，尚缺乏严格的理论保证，其在不同 ODE 求解器和噪声调度下的行为也是值得进一步探索的开放问题。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l857_https_arxiv_org_abs_2505_23343/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of filtering framework. Best-of-N completes all denoising steps, using an external reward model to select the high-quality image, while our method halts low-quality generations early with the intrinsic information in the sampling path*
-
-![[assets/figures/papers/paper_list_l857_https_arxiv_org_abs_2505_23343/figures/010_Figure_7.jpg]]
-*Figure 7: Illustration on toy example with*
-
-
 
 ### 3.1 关键信号：累积得分差异（ASD）
 
 CFG‑Rejection 的核心洞察在于：分类器自由引导（CFG）过程中，条件得分与无条件得分之间的差异并非单纯的“引导强度”副产品，而是与样本最终质量及所在数据流形密度存在强关联。该差异在完整去噪轨迹上的累积量被定义为**累积得分差异（Accumulated Score Differences, ASD）**，作为无需外部奖励模型的内在质量信号。
 
 在二维玩具分布上的验证（Figure 3）表明：高 ASD 样本集中于数据分布的高密度主干区域，低 ASD 样本则出现在低密度分支，且 ASD 与局部对数密度之间呈现近似线性正相关。这一发现构成了整个方法的理论直觉基础。
-
-![[assets/figures/papers/paper_list_l857_https_arxiv_org_abs_2505_23343/figures/003_Figure_3.jpg]]
-*Figure 3: A fractal-like 2D distribution with two classes (gray and orange). (a) Samples generated with CFG*
 
 ### 3.2 公式体系与变量定义
 
@@ -199,8 +183,6 @@ CFG‑Rejection 由三个顺序执行的模块构成，嵌入标准 CFG 采样�
 
 3. **样本拒绝决策**：将 $\mathcal{E}_{\tau:T}(c)$ 与预设阈值 $\gamma$ 进行比较。若 $\mathcal{E}_{\tau:T}(c) < \gamma$，则判定当前轨迹为低质量路径，立即终止后续去噪步骤并丢弃该样本；否则继续完成完整去噪。这一“拒绝式”机制从根本上改变了传统 Best‑of‑N 的“先生成后选择”范式，将筛选时机前移至去噪早期。
 
-
-
 ## 实验与关键发现
 
 ### 核心机制验证：ASD 与样本密度的正相关
@@ -208,9 +190,6 @@ CFG‑Rejection 由三个顺序执行的模块构成，嵌入标准 CFG 采样�
 CFG-Rejection 的有效性建立在累积得分差异（ASD）与样本位于数据分布高密度区域概率之间的强关联之上。作者首先在可控的二维玩具分布上验证了这一假设。在分形结构的两类分布上使用 CFG（ω=2）生成样本，并按 ASD 进行颜色编码（Figure 3）。结果显示，高 ASD 样本高度集中于分布的主干高密度区域，而低 ASD 样本则散落在稀疏分支区域；进一步分析表明，ASD 与局部对数密度之间呈现对数-线性正相关趋势。这一观察在 ω=2.5、3、3.5 等不同引导强度下均保持一致（Figure 7–9，附录）。
 
 在真实图像生成场景中，该相关性在 ImageNet 50 类上使用 EDM2-S 模型得到了系统验证（Figure 4）。作者采用 AvgkNN 和 LOF 两种密度估计器，将生成样本按 ASD 从高（rank 0）到低（rank 3）分为四组。密度估计曲线显示，随着 ASD 等级降低，样本分布从高密度区域系统性地向低密度区域偏移——这一模式在多个类别（如 Crib、Fountain、Parachute、Bulbul、Goldfish 等）上高度一致（Figure 10–12，附录）。定性对比（Figure 5）进一步佐证：低 ASD 样本常出现伪影、语义不对齐等问题，而高 ASD 样本则展现出更好的保真度和提示遵循度。
-
-![[assets/figures/papers/paper_list_l857_https_arxiv_org_abs_2505_23343/figures/004_Figure_4.jpg]]
-*Figure 4: Density estimation curves for samples with varying accumulated score differences. The top and bottom rows display the AvgkNN and LOF density profiles, respectively, across three distinct labels. As the ASD decreases from rank 0 (highest) to rank 3 (lowest), we observe a systematic shift of samples from high-density to low-density regions*
 
 ![[assets/figures/papers/paper_list_l857_https_arxiv_org_abs_2505_23343/figures/005_Figure_5.jpg]]
 *Figure 5: Qualitative comparison on the ImageNet dataset. (Top) Baseline samples with the lowest*
@@ -245,9 +224,6 @@ Table 1 汇总了 EDM2-S 在 ImageNet 50 类上的过滤结果。以全部生成
 
 CFG-Rejection 的核心设计优势在于早期过滤带来的计算节省。在受限推理预算的对比实验中（Figure 6），作者将 CFG-Rejection 与 Best-of-N 策略进行对比：前者在去噪早期（步骤 T-τ 后）即可根据部分 ASD 决定是否终止当前轨迹，后者则需完成全部去噪步骤后再用外部奖励模型选择。结果显示，在低时间预算区，CFG-Rejection 以更少的计算量取得了更高的 PickScore 和 HPSv2 分数，证明其在实用场景中的效率优势。
 
-![[assets/figures/papers/paper_list_l857_https_arxiv_org_abs_2505_23343/figures/007_Figure_6.jpg]]
-*Figure 6: Performance comparison under limited inference budget. CFG-Rejection outperforms Best of N method under constrained computational budgets in practical usage*
-
 ### 消融研究
 
 #### 超参数 τ 的影响
@@ -262,9 +238,6 @@ CFG-Rejection 的核心设计优势在于早期过滤带来的计算节省。在
 
 在 FLUX 模型上的定性实验（Figure 2, 21–23）展示了 CFG-Rejection 在复杂文本渲染任务中的能力。对于包含长文本的提示（如“A night sky with constellations forming the words...”），低 ASD 样本常出现笔画缺失或文本不可读，而高 ASD 样本则能可靠地渲染完整短语。在海报生成任务中（Figure 23），高 ASD 样本的标题位置合理且清晰可辨，低 ASD 样本则标题缺失或不完整。这些结果提示 ASD 信号捕捉到了与细粒度文本-图像对齐相关的语义信息。
 
-![[assets/figures/papers/paper_list_l857_https_arxiv_org_abs_2505_23343/figures/002_Figure_2.jpg]]
-*Figure 2: The qualitative comparison of filtering results demonstrates the effectiveness of our method in the text alignment of complex prompts. Prompt: "A night sky with constellations forming the words ’Among the stars, we find our dreams and destiny’". Low-ASD images (top row) exhibit completely missing strokes, while high-ASD samples (bottom row) ensure textual requirements*
-
 ### 失败模式与局限性
 
 1. **无条件生成不适用**：CFG-Rejection 依赖分类器自由引导中的条件-无条件得分差异，因此无法用于无条件生成任务。
@@ -272,13 +245,6 @@ CFG-Rejection 的核心设计优势在于早期过滤带来的计算节省。在
 3. **缺乏严格理论保证**：ASD 与样本质量的关联基于经验观察，尚未建立严格的理论框架。
 4. **超参数需任务级调优**：τ 和阈值 γ 的选择需要根据具体模型和任务进行调整，缺乏自适应的自动化机制。
 5. **语义保真度风险**：早期过滤在何种条件下可能丢失特定语义属性（如 DPG-Bench 中 Attribute 与 Relation 类别对 τ 变化的不同响应），仍需进一步研究。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l857_https_arxiv_org_abs_2505_23343/figures/028_Table_5.jpg]]
-*Table 5: The quantitative results on DPG-bench. Model: SDXL*
-
-
 
 ## 定位与知识库关联
 
@@ -331,8 +297,6 @@ ASD 与样本质量之间的关联基于**经验观察**——在二维玩具分
 4. **ASD 信号的语义可解释性**：ASD 捕捉的究竟是全局图像质量、局部细节保真度、还是文本-图像对齐强度？不同生成任务中 ASD 的变化趋势差异（如视觉文本渲染任务中 ASD 对文字完整性的强指示作用，Figure 2）提示 ASD 可能编码了多维度的语义信息，解耦这些维度有望实现更可控的生成质量调控。
 
 5. **与优化式方法的融合潜力**：CFG-Rejection 的过滤式策略与 DNO/LGD 的优化式策略并非互斥——能否先用 ASD 快速过滤掉明显低质量轨迹，再对保留的少量轨迹施加轻量级奖励引导，从而在效率与质量之间取得更优平衡？
-
-
 
 ## 原文 PDF
 

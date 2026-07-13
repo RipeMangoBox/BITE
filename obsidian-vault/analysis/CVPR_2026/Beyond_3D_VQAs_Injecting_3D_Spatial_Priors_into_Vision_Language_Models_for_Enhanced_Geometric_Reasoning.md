@@ -85,8 +85,6 @@ GASP属于**通过内部特征监督注入几何先验**的范式，区别于两
 
 GASP的核心创新在于：**无需修改推理架构，仅通过训练时的深层几何约束，迫使LLM形成视角不变的内部表示**，为下游空间推理任务提供更通用的基础。该方法在CV-Bench上同样展现出渐进式改进，但在部分通用VQA基准（如NextQA）上有1-2%的轻微精度下降，表明存在一定的灾难性遗忘，需在实际部署中权衡。
 
-
-
 ### 3D空间推理的现状：数据驱动微调的局限
 
 视觉语言模型（VLM）在通用多模态理解任务上已取得显著进展，但当任务涉及精确的3D空间推理——如相机姿态估计、物体计数、相对深度判断——时，现有方法仍面临根本性瓶颈。当前主流范式通过构建3D视觉问答（VQA）数据集对VLM进行监督微调，试图赋予模型空间推理能力。然而，这一范式存在深层缺陷：3D VQA数据集通常规模有限且场景分布狭窄，模型容易过拟合数据集特定的表面统计偏差，而非学习可迁移的几何原理。
@@ -102,8 +100,6 @@ GASP的核心创新在于：**无需修改推理架构，仅通过训练时的�
 ### 动机：从几何知觉信号出发
 
 本文的核心洞察是：**真正的空间智能应源自对基本几何知觉信号的学习，而非高层VQA监督**。人类视觉系统并非通过回答“相机角度是多少度”这类问题来理解空间，而是通过感知视觉对应（同一物体在不同视角下的匹配关系）和深度一致性（物体间相对距离的稳定性）等底层几何信号来构建空间认知。GASP框架正是基于这一动机，提出将大规模视频场景中的真值点对应和深度一致性作为双重重监督信号，直接注入VLM的Transformer层，从内部重塑其视觉表征的几何感知能力，而非在表层添加VQA微调。
-
-
 
 ## 核心方法与创新机理
 
@@ -138,8 +134,6 @@ GASP 对标准 VLM 架构的唯一修改是：在 LLM 所有 Transformer 层（L
 
 GASP 将 DL3DV 视频场景中的大规模点对应数据与 LLaVA-Video-178K 通用指令数据**交错训练**，在注入几何先验的同时保持模型的通用语言理解能力。这一设计避免了纯粹几何训练可能导致的灾难性遗忘——尽管在部分通用 VQA 基准（如 NextQA）上仍有约 1–2% 的轻微精度下降，但在时间推理等基准上获得显著提升，整体上实现了几何能力与通用能力的有效平衡。
 
-
-
 GASP 的整体设计遵循一个核心原则：**将几何先验以内部特征监督的形式注入 VLM，而非依赖外部的 3D VQA 微调**。其 pipeline 在训练和推理阶段呈现非对称结构，如图 Figure 1 和 Figure 2 所示。
 
 ![[assets/figures/papers/paper_list_l2374_https_openaccess_thecvf_com_content_CVPR2026_html_Yeh_Beyond_3D_VQAs_Inj/figures/001_Figure_1.jpg]]
@@ -167,8 +161,6 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{LM}} + \lambda_{c} \mathca
 ### 与标准 3D VQA 微调的本质区别
 
 标准方法（Figure 1 下半部分）通过在 3D VQA 数据集上微调来让 VLM “学会”空间推理，但这容易导致模型记忆数据集特定的表面偏差，而非掌握真正的几何原理。GASP 的因果机制在于：它直接操作 LLM 的内部视觉对应匹配能力——这是几何推理的底层知觉基础——而非依赖高层的 VQA 监督信号。这一设计选择得到了公平性基线的验证：将相同的 DL3DV 点轨迹重新格式化为 VQA 对进行微调，并未带来同等收益，甚至在某些指标上出现性能下降，证实了提升源自几何目标本身，而非数据曝光效应。
-
-
 
 ### 方法总览：GASP 几何先验注入框架
 
@@ -248,12 +240,8 @@ GASP的核心架构创新在于**训练-推理的非对称设计**：
 
 这一设计确保了几何先验被内化到LLM的视觉自注意力表示中，而非依赖外部3D模块，从而在下游空间推理任务上实现零额外推理开销的泛化提升。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2374_https_openaccess_thecvf_com_content_CVPR2026_html_Yeh_Beyond_3D_VQAs_Inj/figures/002_Figure_2.jpg]]
 *Figure 2: Injecting the Geometric-Aware Spatial Priors (GASP) into VLMs. Standard approaches rely on fine-tuning with 3D VQA datasets, which may encourage memorizing dataset-specific biases. We instead insert a small correspondence head into the intermediate layers of the LLM backbone. During the training phase, this head is supervised by visual correspondence and depth consistency signals derived from ground-truth point tracks and depth maps. At inference, the head is discarded and the model processes inputs (e.g., VQA) as a standard VLM, without any auxiliary 3D input. Note that the 3D scene example shown is from EgoHumans [20] for illustration; our training data is sourced from DL3DV [26]*
-
-
 
 ## 实验与关键发现
 
@@ -306,15 +294,8 @@ GASP的核心架构创新在于**训练-推理的非对称设计**：
 
 当前GASP训练完全基于DL3DV视频场景中的户外/室内环境，其对静态图像或极端环境下空间推理的泛化能力尚未经过充分验证。此外，几何先验权重系数 $\lambda_c$ 和 $\lambda_d$ 的敏感度分析及自适应调整策略仍有待探索。这种通过内部特征监督注入几何先验的范式是否可扩展到其他3D数据模态（如点云、体素）或更广泛的时间建模任务，是值得进一步研究的方向。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2374_https_openaccess_thecvf_com_content_CVPR2026_html_Yeh_Beyond_3D_VQAs_Inj/figures/003_Figure_3.jpg]]
-*Figure 3: Analysis of visual correspondence learning. On LLaVA-NeXT-Video-7B (top row) and Qwen2.5-VL-7B (bottom row). We compare (a, d) layer-wise correspondence matching accuracy (PCK), (b, e) confidence-accuracy correlation*
-
 ![[assets/figures/papers/paper_list_l2374_https_openaccess_thecvf_com_content_CVPR2026_html_Yeh_Beyond_3D_VQAs_Inj/figures/007_Table_4.jpg]]
 *Table 4: Ablation studies of the LoRA rank effect and correspondence head injection into LLM layers*
-
-
 
 ## 定位与知识库关联
 
@@ -364,8 +345,6 @@ GASP的突破在于将训练目标从“输出端对齐”下沉到“表征端�
 4. **领域迁移**：在更多样化的垂直领域（如医学影像中的器官空间关系、卫星遥感中的地形推理）中，类似的几何先验注入策略是否依然有效？这需要领域特定的几何监督信号设计。
 
 5. **与3D编码器的互补性**：GASP选择丢弃对应头以保持推理效率，但若在推理时保留部分几何感知能力（如轻量级深度估计分支），是否能进一步提升空间推理性能？这涉及效率与精度的再平衡。
-
-
 
 ## 原文 PDF
 

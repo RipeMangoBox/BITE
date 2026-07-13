@@ -52,8 +52,6 @@ claims:
 
 在FLUX.1-dev文本到图像模型上，SVD-Cache在5.5倍加速下不仅未损失质量，ImageReward指标反而从原始模型的0.9898提升至1.0123（+2.5%），CLIP Score从32.404提升至32.983（+1.3%）。在HunyuanVideo文本到视频模型上，该方法在5.5倍加速下实现了近乎无损的VBench得分（80.60 vs. 原始80.66）。在更激进的加速设置下，SVD-Cache在FLUX.1-schnell上可达29.01倍加速，在FLUX.1-DEV-int8上可达7.61倍加速，展现出广泛的适用性与可扩展性。
 
-
-
 扩散Transformer（Diffusion Transformer, DiT）已成为文生图（如FLUX）和文生视频（如HunyuanVideo）的主流骨干架构。然而，DiT的推理过程需要迭代执行数十步去噪，每一步都需通过深层Transformer块计算中间特征，导致极高的延迟和计算开销。特征缓存（Feature Caching）作为一种无训练的加速策略，通过在不同去噪时间步之间复用中间激活来减少冗余计算，近年来受到广泛关注。
 
 已有特征缓存方法（如**ToCa**（Zou et al., 2024）、**Δ-DiT**（Chen et al., 2024）、**FORA**（Selvaraju et al., 2024）、**TaylorSeer**（Liu et al., 2025）等）的核心假设是：整个特征空间在相邻时间步之间平滑演化，因此可以通过外推或直接复用来预测未来特征。然而，这一假设在DiT中并不完全成立。
@@ -67,8 +65,6 @@ claims:
 此外，本文发现了一个关键性质：**SVD的右奇异向量和奇异值在不同输入提示（prompt）下高度稳定**（见Figure 1(b)）。这意味着子空间的基底结构是模型的内在属性，而非随输入剧烈变化。这一发现使得离线一次性分解、在线持续复用成为可能，为高效实现子空间分离铺平了道路。
 
 基于以上观察，本文的动机明确：**放弃“全特征空间同质化”的假设，转而将特征空间显式分离为主子空间和残差子空间，并针对各自的动力学特性设计差异化的缓存策略——对平滑可预测的主子空间应用指数移动平均（EMA）预测，对高频振荡的残差子空间直接重用。** 这一设计从根本上消除了残差预测的误差源，同时保留了主子空间的时序建模能力，有望在更高加速比下维持近乎无损的生成质量。
-
-
 
 ## 核心方法与创新机理
 
@@ -104,8 +100,6 @@ SVD-Cache 的核心创新在于**首次揭示了扩散Transformer（DiT）特征
 ### 创新总结
 
 SVD-Cache 的本质创新在于**将特征缓存问题从一个“全空间预测”问题，重新定义为一个“子空间感知的预测与重用”问题**。它通过 SVD 揭示了 DiT 特征空间的内在结构，并利用跨提示的基底稳定性，以极低的成本实现了对不同动态特性子空间的差异化处理，从而突破了现有方法因残差振荡而面临的加速瓶颈。
-
-
 
 SVD-Cache 的完整流程分为**离线预处理**与**在线推理**两个阶段，其核心设计遵循一个因果原则：将 DiT 特征空间通过 SVD 分离为演化平滑的**主子空间**与高频振荡的**残差子空间**，并分别采用预测与重用策略，从而在加速采样的同时控制误差累积。
 
@@ -154,12 +148,8 @@ $$\frac{\sum_{i=1}^k \sigma_i^2}{\sum_{i=1}^r \sigma_i^2} \ge \tau$$
 
 输入输出流方面：离线阶段输入为参考提示特征，输出为缓存的基底 $(V_{\mathcal{C}}, \sigma_{\mathcal{C}}, k)$；在线阶段输入为当前时间步的 DiT 特征 $F$ 与缓存基底，输出为预测的下一时间步特征 $\widehat{F}_{t+\Delta}$，直接替换原 DiT 块的计算结果，实现跳跃式采样加速。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l874_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Forecast_the_Prin/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the SVD-Cache framework. (a) Offline preprocessing: A reference feature is decomposed via SVD to obtain a reusable low-rank basis. The right singular vectors and singular values are both stored, and the rank k is determined based on the cumulative singular value energy according to Eq. (5). (b) Inference: Given a new feature, we reconstruct its principal and residual components. Specifically, we first retrieve the shared basis stored in offline preprocessing and then follow Eq. (8), (9) and (10) to compute the components. The principal component is then predicted via EMA, while the residual is directly reused due to its low energy and oscillatory nature. The final feature is rec...*
-
-
 
 ### 离线SVD分解与基底缓存
 
@@ -204,16 +194,6 @@ $$\widehat{F}_{t+\Delta} = \widehat{F}_{k,t+\Delta} + \widehat{R}_{t+\Delta}$$
 
 消融实验（Figure 5(c)）验证了这一差异化策略的有效性：对低秩子空间使用 EMA 预测并对残差直接重用，取得了最佳性能，显著优于对全特征空间统一预测的变体。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l874_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Forecast_the_Prin/figures/009_Figure_7.jpg]]
-*Figure 7: Low-rank temporal behavior of features across models*
-
-![[assets/figures/papers/paper_list_l874_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Forecast_the_Prin/figures/010_Figure_8.jpg]]
-*Figure 8: Universality of the low-rank property across models*
-
-
-
 ## 实验与关键发现
 
 ### 文本到图像生成主结果
@@ -239,9 +219,6 @@ SVD-Cache 在 FLUX.1-dev 上的定量结果见 Table 1。在 N=5（5.55× 加速
 
 Table 3 报告了 SVD-Cache 与其他加速方法在 FLUX 上的定量对比。SVD-Cache 在 ImageReward 和 CLIP Score 两个维度上均优于或匹配包括 **ToCa**（Zou et al., 2024）、**Δ-DiT**（Chen et al., 2024）、**FORA**（Selvaraju et al., 2024）、**TaylorSeer**（Liu et al., 2025）在内的基线方法。Figure 5(a) 进一步证实，SVD-Cache 的子空间分解策略始终优于逐令牌缓存（ToCa）及其他全特征空间预测方法，验证了“分而治之”策略的有效性。
 
-![[assets/figures/papers/paper_list_l874_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Forecast_the_Prin/figures/007_Table_3.jpg]]
-*Table 3: Quantitative comparison of other accelerated models on FLUX*
-
 ![[assets/figures/papers/paper_list_l874_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Forecast_the_Prin/figures/008_Figure_5.jpg]]
 *Figure 5: Overall and Ablation Results of SVD-Cache. (a) SVD-Cache consistently outperforms token-wise(ToCa) and other full-featurespace predictor baselines. (b) When the low-rank subspace is predicted with other ODE methods, quality is significantly improved over the original method. (c) Ablation study on Flux by applying different strategies to the low-rank and residual components separately. (d) Ablation study on the energy threshold τ for subspace decomposition*
 
@@ -256,13 +233,6 @@ Table 3 报告了 SVD-Cache 与其他加速方法在 FLUX 上的定量对比。S
 ### 失败模式与局限性
 
 当前分析中未报告明确的失败模式。但以下潜在风险需要人工验证：在极端加速设置下（如 N 值较大），EMA 预测的累积误差可能逐渐增大；离线 SVD 分解依赖参考提示的代表性，若在线输入的特征分布与参考提示差异过大，基底复用可能导致重构误差上升。此外，能量阈值 τ 目前为全局固定值，缺乏对场景和加速级别的自适应调整能力。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l874_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Forecast_the_Prin/figures/003_Figure_3.jpg]]
-*Figure 3: Visual Comparison of 5.5 × accelerated FLUX between different feature cache methods*
-
-
 
 ## 定位与知识库关联
 
@@ -312,8 +282,6 @@ SVD-Cache展现出良好的方法兼容性：
 2. **跨架构泛化**：SVD分解揭示的低秩特性是否在更大规模DiT（如百亿参数级）或非DiT架构中依然成立？基底稳定性是否保持？
 3. **残差子空间的精细化处理**：当前对残差子空间采用直接重用，是否存在更优的保守预测策略（如轻度平滑、条件重用）以进一步扩展缓存步长？
 4. **与训练加速的结合**：子空间分解策略能否反向指导模型训练，例如通过正则化促进特征的低秩结构化，使模型原生更适合缓存加速？
-
-
 
 ## 原文 PDF
 

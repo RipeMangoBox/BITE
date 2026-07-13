@@ -47,8 +47,6 @@ claims:
 
 在 Real Motion Blur 和 Synthetic Extreme Blur 两个基准上，DeblurGS 分别取得 26.28 dB 和 30.23 dB 的 PSNR，相比 DeblurNeRF 提升 0.79 dB 和 6.25 dB。更具决定性的是，在仅从模糊图像获取噪声 COLMAP 位姿的 ExBlur-NP 设定下，DeblurGS 是唯一能恢复出接近真实清晰场景的方法，其他方法均失效（Fig. 6）。消融实验进一步证实，去除高斯致密化退火会产生由错误位置高斯球导致的漂浮伪影；去除可学习子帧对齐参数或时间平滑损失均导致渲染质量显著下降（Table 2）。该方法已在一段手持手机快速拍摄的 6 秒模糊视频上验证了其真实场景适用性（Fig. 7）。
 
-
-
 ### 问题背景：相机运动模糊对三维重建的挑战
 
 在手持设备拍摄或快速场景扫描等实际应用中，相机运动模糊是普遍存在的退化现象。当曝光时间内相机发生非平凡位移时，传感器累积的光线来自不同视角的场景点，导致图像产生方向性拖影。这种模糊不仅降低了单帧图像的视觉质量，更严重的是，它破坏了多视图几何的一致性假设，使得从模糊图像中恢复清晰的三维场景成为一个极具挑战性的病态问题。
@@ -72,8 +70,6 @@ claims:
 DeblurGS 的动机源于一个关键洞察：**利用 3D Gaussian Splatting 的精细表达能力，通过可微的物理模糊模拟将合成的模糊视图与输入模糊观测对齐，可以实现相机运动与清晰场景的联合优化**。具体而言，DeblurGS 在 se(3) 空间使用 Bézier 曲线参数化每帧曝光时间内的相机运动轨迹，通过可学习的子帧对齐参数校准离散采样子帧位姿，使累积渲染的模糊图像更准确地还原真实模糊过程。在此基础上，引入**高斯致密化退火策略**——在训练过程中逐步降低致密化阈值，确保相机运动未充分优化时不会在错误位置生成高斯基元，从而从噪声初始相机位姿中稳健地重建出高质量的清晰 3D 场景。
 
 这一设计使得 DeblurGS 成为首个能够在仅从模糊图像获取的噪声 COLMAP 位姿初始化条件下，成功恢复接近真实清晰场景的方法，填补了现有工作在噪声位姿鲁棒性与场景表达精细度之间的双重缺口。
-
-
 
 ## 核心方法与创新机理
 
@@ -122,8 +118,6 @@ DeblurGS 引入相邻子帧渲染之间的 L2 平滑损失 $\mathcal{L}_{\text{s
 4. **时间平滑损失**在运动收敛后消除残余抖动，提升渲染一致性。
 
 这一协同机制使 DeblurGS 成为**唯一能在仅从模糊图像获取的噪声 COLMAP 位姿初始化（ExBlur-NP）下恢复出接近真实清晰场景的方法**（Fig. 6），而其他方法（DeblurNeRF、DP-NeRF、BAD-NeRF、ExBluRF）在此设置下均失效。
-
-
 
 DeblurGS 的目标是从一组因相机运动而模糊的多视图观测中恢复出清晰的 3D 场景。其核心思路是将物理模糊过程建模为曝光时间内多个子帧清晰图像的累积，并通过可微渲染将这一过程嵌入到 3D Gaussian Splatting（3DGS）的优化框架中，从而实现对相机运动轨迹与清晰场景的联合优化。
 
@@ -177,13 +171,6 @@ DeblurGS 的目标是从一组因相机运动而模糊的多视图观测中恢�
 
 两者协同作用，使得 DeblurGS 能够在仅从模糊图像获取的噪声 COLMAP 位姿初始化（ExBlur-NP 设置）下，仍能稳定恢复出高质量的清晰 3D 场景——这是其他对比方法均无法实现的能力（见 Fig. 6）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2404_11358/figures/001_Figure_1.jpg]]
-*Figure 1: Novel View Synthesis with Blurry Views. Our DeblurGS achieves stateof-the-art performance in novel view synthesis and deblurring compared to previous approaches*
-
-
-
 DeblurGS 的核心流程可概括为：从模糊多视图观测出发，通过可微的物理模糊模拟，将 3D Gaussian Splatting 渲染的清晰子帧累积为合成模糊图像，并与输入模糊观测对齐，从而联合优化相机运动轨迹与清晰 3D 场景（图 Fig. 2）。以下逐一剖析其关键模块与公式。
 
 ### 3D Gaussian Splatting 场景表示
@@ -215,9 +202,6 @@ $$
 $$
 
 相机运动轨迹沿用 **ExBluRF** (Lee et al., ICCV 2023) 的 Bézier 曲线在 $\mathfrak{se}(3)$ 李代数空间中的参数化方式。关键创新在于引入**可学习子帧对齐参数** $\nu$：均匀采样无法保证离散子帧位姿恰好对应真实曝光时刻的位姿，导致合成模糊与观测模糊失配（图 Fig. 3）。因此，定义对齐后的子帧位姿：
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2404_11358/figures/003_Figure_3.jpg]]
-*Figure 3: Illustration of the Sub-frame Alignment Parameters. With the estimated camera trajectory, the resulting blurry image changes based on the sampling intervals of sub-frame images. Even if the latent camera trajectory is well-optimized, the evenly sampled blurry image*
 
 $$
 \hat{\mathbf{P}}(\nu_i) \triangleq \mathbf{P}_{\tau_i} \quad \forall i \in \{1, 2, \dots, N\} \tag{5}
@@ -271,8 +255,6 @@ $$
 
 训练完成后，丢弃相机运动参数与子帧对齐参数，仅保留优化后的 3DGS 场景 $G$。从任意新视角渲染清晰图像时，直接调用标准 3DGS 渲染管线 $\mathcal{R}_G(\mathbf{P})$，无需再进行模糊合成。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验结论
@@ -325,15 +307,8 @@ DeblurGS 在多个运动模糊数据集上均取得了最优的新视角合成�
 
 所有对比方法均基于官方实现并使用推荐训练配置，评估指标（PSNR、SSIM、LPIPS）按标准流程计算。在 ExBlur-CP 设置下，部分基线（如 ExBluRF）可使用与模糊图像配对的清晰图像来估计初始位姿，而 DeblurGS 仅使用模糊观测进行初始化；在 ExBlur-NP 设置下，所有方法均仅从模糊图像获取 COLMAP 位姿，对比更为公平。DeblurGS 在两种设置下均保持领先，尤其在 ExBlur-NP 场景下优势显著。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2404_11358/figures/008_Table_2.jpg]]
 *Table 2: Ablation study. We describe the ablation studies on each element of proposed method on "Camellia" and "Stone Lantern" scenes in ExBlur dataset with noisy camera pose setup. We ablate the effectiveness of the temporal smoothness loss Lsmooth, Gaussian densification annealing strategy, sub-frame alignment parameters ν, and the gamma correction γ(·)*
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2404_11358/figures/009_Figure_7.jpg]]
-*Figure 7: Sharp scene reconstruction from field-captured video. We record the real-world scene as a video with smartphone, swiftly to capture the whole environment within 6 seconds. Our method successfully reconstructs sharp scene with a real-world blurry video*
-
-
 
 ## 定位与知识库关联
 
@@ -397,8 +372,6 @@ DeblurGS 在相机运动去模糊与新视角合成交叉领域占据以下位�
 - **在更广泛的“模糊输入 3D 重建”领域**：DeblurGS 提供了一种物理驱动的可微模糊模拟范式，该范式原则上可与其他场景表示（如 2DGS、Scaffold-GS）或运动模型结合，具有一定的通用性。
 
 **证据强度说明**：上述分析中的核心因果主张（退火策略对噪声位姿鲁棒性的关键作用、对齐参数对模糊合成精度的提升）均有消融实验（Table 2）和定性对比（Fig. 6, ExBlur-NP）的强证据支持（confidence ≥ 0.95）。关于“摆脱 COLMAP 依赖”和“非刚性运动扩展”的开放问题来自论文明确指出的局限和逻辑推演，属于合理推断但缺乏直接实验证据，需要后续工作验证。
-
-
 
 ## 原文 PDF
 

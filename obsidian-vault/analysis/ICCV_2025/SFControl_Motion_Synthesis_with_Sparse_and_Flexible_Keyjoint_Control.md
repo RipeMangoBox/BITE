@@ -50,8 +50,6 @@ claims:
 
 在方法谱系上，SFControl 属于**分解式扩散运动生成**，其两阶段设计与单阶段直接控制方法（如 OmniControl、MotionLCM、DNO）形成对比，通过低维中间表示桥接了稀疏控制灵活性与全身运动质量。
 
-
-
 ### 可控运动生成的核心挑战
 
 生成自然且可控的人体运动是计算机图形学与具身智能领域的基础问题，其核心矛盾在于**控制精度**与**运动自然度**之间的权衡。现有的可控运动生成方法通常依赖密集的时空控制信号——例如为每一帧指定精确的骨盆轨迹或全身关节位置——这类信号手工指定极为困难，在实际应用中往往不切实际。当控制信号变得稀疏时，直接在高维的全身运动空间中满足这些约束变得异常困难：模型要么牺牲运动质量以贴合稀疏控制点，要么产生自然但偏离控制目标的运动。
@@ -78,8 +76,6 @@ SFControl 的核心洞察源于对人体运动结构的观察：**人类运动�
 - **控制信号多样性**：同时支持显式关节位置控制、目标驱动的末端效应器到达任务、以及通过可微目标函数定义的隐式约束（如手-头接触、狭窄空间行走）。
 - **时间无关性**：无需逐帧时间戳，仅凭几何路径即可驱动运动生成，大幅降低用户交互负担。
 - **鲁棒性**：对不同控制信号的选择（关节组合、稀疏度变化）保持稳定性能，且对分布外控制信号具有一定的泛化能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -131,8 +127,6 @@ SFControl 的随机掩码训练策略不仅是显式控制的技术实现，更�
 
 这些 changed slots 共同构成了 SFControl 相对于现有可控运动生成方法的系统性进步：不再要求用户提供密集精确的控制信号，而是通过架构解耦和灵活的信号处理机制，在保持高运动质量的前提下，大幅降低了可控运动生成的使用门槛。
 
-
-
 SFControl 提出一种**两阶段解耦扩散框架**，将可控运动生成问题分解为低维关键关节轨迹合成与全身运动补全两个子任务。该设计的核心洞察在于：人类运动可由少量关键关节（双手、双脚、根节点、头部）的运动充分描述，因此在低维空间中高效满足各类控制约束后，再通过强条件生成先验补全自然全身运动，从而兼顾控制精度与运动质量。
 
 ### 两阶段流水线
@@ -156,8 +150,6 @@ SFControl 提出一种**两阶段解耦扩散框架**，将可控运动生成问
 - **时间无关控制机制**：对于无精确时间戳的轨迹控制，框架引入弧长重参数化与对齐损失（组合几何对齐项与长度一致性项），消除对逐帧时间标注的依赖。
 
 > **注意**：关于各模块的具体公式推导、训练损失以及不同控制模式（显式、目标驱动、隐式、时间无关）的详细实现，请参见后续“核心方法”章节。
-
-
 
 SFControl 将可控运动生成解耦为两个级联的扩散模型：**关键关节轨迹模型**（Keyjoint Trajectory Model, $\mathcal{D}_{\mathbf{c},\theta}$）与**全身运动补全模型**（Full-Body Motion Completion Model, $\mathcal{D}_{\mathbf{x},\theta}$）。其核心洞见在于：人类运动可由少量关键关节（末端效应器与根节点）的低维运动充分描述，因此在低维空间中可高效满足各类控制约束，再通过强条件生成先验补全自然全身运动。
 
@@ -244,8 +236,6 @@ $$
 
 两阶段分解的本质优势在于**维度隔离**：关键关节轨迹模型工作在极低维空间（$d \ll D$），使稀疏约束的满足变得高效且精确；全身补全模型则专注于从完整关键关节轨迹中恢复自然的高维运动。随机掩码训练策略赋予框架对任意控制信号配置的鲁棒性，弧长重参数化则突破了传统方法对精确时间戳的依赖，三者共同构成了 SFControl 灵活控制能力的算法基础。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -271,12 +261,6 @@ $$
 
 #### 目标驱动控制（Table 2, Figure 3）
 
-![[assets/figures/papers/paper_list_l1896_SFControl_Motion_Synthesis_with_Sparse_and_Flexible_Keyjoint_Control/figures/005_Table_2.jpg]]
-*Table 2: Quantitative evaluation on the goal-driven scenarios. We train a unified network across three different tasks and evaluate it separately for each task as well as collectively*
-
-![[assets/figures/papers/paper_list_l1896_SFControl_Motion_Synthesis_with_Sparse_and_Flexible_Keyjoint_Control/figures/003_Figure_3.jpg]]
-*Figure 3: Qualitiative results of goal-driven motion scenarios, demonstrating reaching target hand positions, climbing with rock constraints, and sitting with hand control, respectively*
-
 目标驱动场景仅给定起始姿态和末端目标位置（如手部到达目标点、攀岩握点、坐姿控制），不提供中间轨迹。SFControl 与单阶段变体（Ours w/o decomp.）的对比揭示了**两阶段分解的关键作用**：
 
 - 在所有三类任务（Reaching、Climbing、Sitting）的聚合评估中，**Distance to Goal** 从单阶段的 0.206m 降至 SFControl 的 **0.093m**（降幅 55%）。
@@ -286,12 +270,6 @@ $$
 因果机制在于：第一阶段在低维关键关节空间中完成从起始到目标的轨迹合成，该空间的约束维度远低于全身空间，扩散模型更容易找到满足目标且运动合理的解；第二阶段的全身边界补全模型则继承了强条件关键关节轨迹，无需再处理目标约束，从而专注生成自然协调的全身运动。
 
 #### 隐式控制与时间无关控制（Table 3, Figure 4）
-
-![[assets/figures/papers/paper_list_l1896_SFControl_Motion_Synthesis_with_Sparse_and_Flexible_Keyjoint_Control/figures/007_Table_3.jpg]]
-*Table 3: Quantitative evaluation on different objective defined task scenarios*
-
-![[assets/figures/papers/paper_list_l1896_SFControl_Motion_Synthesis_with_Sparse_and_Flexible_Keyjoint_Control/figures/006_Figure_4.jpg]]
-*Figure 4: Example of time-agnostic trajectory target input and synthesized motion from time-agnostic control*
 
 隐式控制通过可微目标函数 $\mathcal{F}(\cdot)$ 定义约束（如手-头接触、狭窄空间行走），无需显式指定关节位置。SFControl 将目标函数应用于关键关节轨迹层，通过扩散潜变量优化满足约束：
 
@@ -346,17 +324,11 @@ Figure 5 进一步展示了控制稀疏度（对数尺度）与 FID/Control Erro
 ![[assets/figures/papers/paper_list_l1896_SFControl_Motion_Synthesis_with_Sparse_and_Flexible_Keyjoint_Control/figures/015_Table_9.jpg]]
 *Table 9: Quantitative evaluation of various sampling strategies for diffusion models*
 
-![[assets/figures/papers/paper_list_l1896_SFControl_Motion_Synthesis_with_Sparse_and_Flexible_Keyjoint_Control/figures/009_Table_5.jpg]]
-*Table 5: Time required for motion control*
-
 - DDPM 50 步总推理时间约 **7.1s**（关键关节模型 0.4s + 全身模型 6.7s）。
 - DDIM 5 步将总时间降至 **0.7s**（约 10 倍加速），FID 仅从 0.224 升至 0.248，Control Error 从 0.036m 升至 0.049m，仍优于所有基线。
 - DDIM 10 步在 1.4s 内实现与 DDPM 50 步接近的性能（FID 0.235, Control Error 0.041m）。
 
 #### 全身边界补全模型的输入源分析（Table 4）
-
-![[assets/figures/papers/paper_list_l1896_SFControl_Motion_Synthesis_with_Sparse_and_Flexible_Keyjoint_Control/figures/008_Table_4.jpg]]
-*Table 4: Quantitative evaluation of full-body motion completion model on different keyjoint source*
 
 Table 4 探究了全身边界模型使用不同来源的关键关节轨迹（真实数据 vs 第一阶段合成）对最终运动质量的影响。使用第一阶段合成轨迹时，FID 仅从 0.208（使用真实轨迹）轻微退化至 0.224，验证了第一阶段关键关节合成的准确性，以及第二阶段对合成轨迹的良好兼容性。
 
@@ -386,8 +358,6 @@ Table 4 探究了全身边界模型使用不同来源的关键关节轨迹（真
 | **Table 6** | 随机掩码训练使模型对任意关节组合和稀疏度具有高度鲁棒性 |
 | **Table 7** | 对分布外噪声控制信号保持鲁棒，Control Error 在 $\sigma=0.1$ 时仍仅 0.056m |
 | **Table 9** | DDIM 5 步在 0.7s 内实现接近 DDPM 50 步的性能，FID 仅从 0.224 升至 0.248 |
-
-
 
 ## 定位与知识库关联
 
@@ -438,8 +408,6 @@ SFControl 在可控运动生成的方法谱系中占据了一个独特位置，�
 5. **更高效的隐式控制优化**：能否通过预测梯度、学习优化器或物理先验来加速隐式控制的推理过程，并提高困难约束的满足率？
 
 6. **跨数据集泛化**：当前仅在 HumanML3D 上验证，如何将框架迁移到其他运动数据集（如 AMASS、LAFAN1）或不同骨架结构，仍需进一步探索。
-
-
 
 ## 原文 PDF
 

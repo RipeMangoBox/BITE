@@ -58,8 +58,6 @@ ProPhy 的关键技术定位体现在三个层面：
 
 实验结果表明，ProPhy 在物理相关视频生成基准上显著优于现有方法。在 **VideoPhy2** 基准上，ProPhy 对 CogVideoX‑5B 骨干网络在 Joint（物理一致性综合）指标上带来 **+19.7% 的相对提升**；对 Wan2.1‑1.3B 骨干网络，物理正确性（PC）从 57.8 提升至 65.0，语义对齐（SA）从 30.0 提升至 32.0。在 **VBench** 质量评估中，ProPhy 将 CogVideoX‑5B 的质量分数从 76.8 提升至 81.0。消融实验进一步证实，物理分支（SEB + PB + REB）相比简单 LoRA 微调带来显著增益，且完整的损失组合（语义对齐 + 细粒度对齐 + 负载均衡）达到最优性能。
 
-
-
 ### 视频生成中的物理一致性瓶颈
 
 近年来，基于扩散模型的视频生成取得了显著进展，涌现出 **Wan2.1** (Team Wan et al., arXiv 2025)、**CogVideoX** (Yang et al., ICLR 2024)、**HunyuanVideo** (Kong et al., arXiv 2025) 等大规模骨干模型。然而，这些模型在生成涉及复杂物理交互的场景时，普遍暴露出一个关键瓶颈：**缺乏显式的物理引导与细粒度的空间对齐能力**。
@@ -78,8 +76,6 @@ ProPhy 的关键技术定位体现在三个层面：
 - 利用视觉语言模型（VLM）的细粒度空间定位能力，将物理现象的语义理解精确映射到生成过程中的空间区域，从而实现各向异性的物理约束。
 
 这一洞察直接催生了 ProPhy 的**渐进式物理对齐框架**，其核心在于通过两阶段物理专家混合机制（MoPE）和基于 VLM 的空间对齐策略，使生成模型能够对不同空间区域施加差异化的物理约束，最终实现动态、物理一致的视频生成。
-
-
 
 ## 核心方法与创新机理
 
@@ -129,8 +125,6 @@ ProPhy 的物理分支（Physical Branch）并非简单地叠加在骨干网络�
 
 **证据强度**：上述三个 changed slots 均有充分的实验支撑——Table 1 显示 ProPhy 在 VideoPhy2 基准上对 CogVideoX‑5B 带来 +19.7% 的 Joint 相对提升；Table 3 和 Table 4 的消融实验验证了物理分支和完整损失组合的必要性；Figure 7 的细化路由器专家激活地图直观展示了 token 级物理定位的有效性。
 
-
-
 ProPhy 提出了一种**渐进式物理对齐**范式，将可学习的物理先验显式注入预训练视频扩散模型，并通过从视频级到 token 级的递进路由，实现对不同空间区域施加各向异性的物理约束。其核心设计动机源于一个关键瓶颈：现有视频生成模型缺乏显式物理引导和细粒度空间对齐，导致生成结果对物理提示产生同质响应，无法精确响应局部物理线索。
 
 ### 框架总览
@@ -164,12 +158,8 @@ $$
 
 与以往方法的核心区别在于两点：一是**两阶段 MoPE 机制**显式提取分层物理先验（语义级和 token 级），克服了以往全局、隐式的物理建模；二是**基于 VLM 的细粒度空间对齐策略**，利用 VLM 注意力图构建 token 级物理属性标签，使细化路由器能够准确定位物理现象发生的空间区域，实现各向异性的物理响应。消融实验证实，这一完整物理分支（PB+SEB+REB）相比仅在骨干网络上进行 LoRA 微调，在物理正确性、语义对齐和综合指标上均带来显著增益。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2135_https_arxiv_org_abs_2512_05564/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our proposed ProPhy framework. ProPhy uses a progressive physical alignment design, consisting of the Semantic Expert Block and the Refinement Expert Block. During inference, the model runs end-to-end and aligns physics categories through our proposed blocks*
-
-
 
 ProPhy 的核心在于一个**渐进式物理对齐框架**，其关键模块由**物理分支（Physical Branch）**承载，该分支并行于基础视频扩散模型的 Transformer Block，包含三个紧密协作的子模块：**语义专家块（Semantic Expert Block, SEB）**、**物理块（Physical Blocks, PB）**和**细化专家块（Refinement Expert Block, REB）**。整个框架的推理流程如 Figure 2 所示，模型端到端运行，通过上述模块实现从视频级语义到 token 级空间的物理类别对齐。
 
@@ -213,9 +203,6 @@ $$ \mathcal{L}_{\mathrm{fine-align}} = \sum_{M^{i,e}=1} \| {\mathcal{P}'}_r^{i,e
 
 这一策略将 VLM 的细粒度物理定位能力迁移到生成过程中——Figure 4 的对比显示，VLM 的注意力图在定位物理现象区域方面显著优于 VDM 自身的交叉注意力图。
 
-![[assets/figures/papers/paper_list_l2135_https_arxiv_org_abs_2512_05564/figures/004_Figure_4.jpg]]
-*Figure 4: Study of the attention localization capabilities of VDM and VLM. The VDM cross-attention maps are obtained by adding 10% noise and then denoising. As shown, despite minor imperfections, the VLM-based approach more accurately identifies the locations of the corresponding physical phenomena*
-
 **负载均衡损失** $\mathcal{L}_{\mathrm{fine-balance}}$ 为标准辅助损失，施加于细化路由器的输出，防止少数专家被过度激活而其余专家退化。消融实验（Table 4）表明，仅使用绝对对齐损失而无负载均衡会导致性能退化，仅使用负载均衡损失虽提升 SA 但削弱 PC，完整损失组合达到最优。
 
 ### 总训练目标
@@ -226,15 +213,8 @@ $$ \mathcal{L} = \mathcal{L}_{\mathrm{diffusion}} + \lambda_1 \mathcal{L}_{\math
 
 其中 $\lambda_1$、$\lambda_2$、$\lambda_3$ 为平衡各损失项权重的超参数。这一多目标训练框架使 ProPhy 在保持生成质量的同时，实现了从全局语义到局部 token 的双层物理对齐。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2135_https_arxiv_org_abs_2512_05564/figures/003_Figure_3.jpg]]
 *Figure 3: Pipeline for annotating token-level physical attributes using a VLM*
-
-![[assets/figures/papers/paper_list_l2135_https_arxiv_org_abs_2512_05564/figures/008_Figure_7.jpg]]
-*Figure 7: Refinement router expert maps. High-activation regions accurately localize where corresponding physical events occur, demonstrating the REB’s fine-grained physical alignment*
-
-
 
 ## 实验与关键发现
 
@@ -278,24 +258,11 @@ ProPhy 在两个核心基准上均展现出显著的物理一致性提升，同�
 
 尽管 ProPhy 在物理一致性上取得了显著提升，论文也明确指出以下局限：首先，用于物理现象标注的 VLM 注意力区域不可避免地包含噪声，且当前基于区域的物理分类仅能捕捉粗粒度的表层模式，可能限制更精细的物理推理能力。其次，框架尚未集成物理微分方程，物理知识注入的可解释性和原则性仍有提升空间。在极端物理场景（如多物体同时碰撞、复杂流体-固体耦合）中，ProPhy 的生成结果仍可能出现物理不一致，这与此类场景在训练数据中的稀疏性以及 VLM 标注精度的局限性有关。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2135_https_arxiv_org_abs_2512_05564/figures/005_Table_1.jpg]]
 *Table 1: Results on VideoPhy2 benchmark. The best results are highlighted in bold, and the second-best results are underlined*
 
-![[assets/figures/papers/paper_list_l2135_https_arxiv_org_abs_2512_05564/figures/006_Table_2.jpg]]
-*Table 2: Results on VBench quality score. For each method, the best performance relative to its base model is highlighted in bold*
-
 ![[assets/figures/papers/paper_list_l2135_https_arxiv_org_abs_2512_05564/figures/007_Figure_5.jpg]]
 *Figure 5: Qualitative comparison among ProPhy, CogVideoX, Wan2.1, and existing physics-aware methods*
-
-![[assets/figures/papers/paper_list_l2135_https_arxiv_org_abs_2512_05564/figures/010_Figure_8.jpg]]
-*Figure 8: Physical attribute transfer via expert inversion. Flipping semantic-router logits injects incorrect physical cues, causing implausible behaviors (e.g., a rigid car door fluttering), revealing that different experts encode distinct physical priors*
-
-![[assets/figures/papers/paper_list_l2135_https_arxiv_org_abs_2512_05564/figures/012_Figure_6.jpg]]
-*Figure 6: Analysis of the semantic router. r represents the Pearson correlation coefficient calculated between different distributions*
-
-
 
 ## 定位与知识库关联
 
@@ -324,8 +291,6 @@ ProPhy 的物理对齐能力建立在以下前提之上：**文本提示中包�
 **专家反转的泛化性**。Figure 8 展示了通过翻转语义路由器 logits 实现物理属性迁移（如将刚性车门变为柔性飘动），验证了不同专家确实编码了可区分的物理先验。但这一技术目前仅在“刚性”属性上得到验证，其能否泛化到流体、柔性体、断裂等其他物理属性，以及能否扩展到交互式编辑场景，仍是待探索的方向。
 
 **与大规模物理世界模拟器的关系**。**Cosmos**（NVIDIA et al., arXiv 2025）等大规模物理世界模拟基线采用不同的技术路线（如基于物理引擎的合成数据训练），ProPhy 的数据驱动物理对齐策略与之形成互补而非替代关系。未来将 ProPhy 的细粒度对齐能力与物理引擎的精确约束相结合，可能是提升生成物理真实性的一条有前景的路径。
-
-
 
 ## 原文 PDF
 

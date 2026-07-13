@@ -50,8 +50,6 @@ $$p ( \mathbf { a } , { \mathcal { C } } | \mathbf { P } , \mathbf { T } ) = p (
 
 在 DexGYS 基准上，DextER 实现了 **67.14%** 的抓取成功率，较先前最佳方法 DexGYSNet（63.31%）提升 **3.83 个百分点**；意图对齐指标 P-FID 从 5.60 降至 **0.20**（提升 96.4%）。消融实验表明，移除接触推理后 P-FID 恶化至 0.30（+50%），成功率降至 62.37%，验证了接触推理是性能提升的关键因素。该方法同时支持可操控生成，用户可通过指定部分接触约束来引导抓取合成。
 
-
-
 ### 1. 问题背景：语言驱动的灵巧抓取
 
 语言驱动的灵巧抓取（language-driven dexterous grasp generation）要求机器人根据自然语言指令，为多指灵巧手生成抓取配置，使其既能满足任务语义（如“握住茶杯把手倒水”），又能在物理上稳定执行。随着大语言模型（LLM）与视觉模型的快速融合，该任务已成为具身智能领域的重要前沿问题。
@@ -78,8 +76,6 @@ $$p ( \mathbf { a } , { \mathcal { C } } | \mathbf { P } , \mathbf { T } ) = p (
 ### 4. 关键证据预览
 
 实验结果表明，这一接触推理机制是性能提升的关键因素。在 DexGYS 基准上，DextER 相较先前最佳模型 **DexGYSNet** 实现了 **96.4% 的意图对齐改进**（P-FID 从 5.60 降至 0.20）和 **3.83 个百分点的成功率提升**（从 63.31% 到 67.14%）。消融实验进一步证实：移除接触推理模块后，意图对齐指标 P-FID 从 0.20 恶化至 0.30（增加 50%），成功率从 67.14% 降至 62.37%，验证了接触推理对意图对齐和物理质量的双重贡献。
-
-
 
 ## 核心方法与创新机理
 
@@ -109,8 +105,6 @@ $$p ( \mathbf { a } , { \mathcal { C } } | \mathbf { P } , \mathbf { T } ) = p (
 
 值得注意的是，将 LLM 骨干从 **Qwen2.5-0.5B** 扩展到 **Qwen2.5-1.5B** 仅带来 marginal 提升（成功率 67.14% → 67.55%），而更小的 **SmolLM2-360M** 也能达到 64.87% 的成功率。这表明性能增益主要源于接触推理架构本身，而非模型容量的简单堆叠。
 
-
-
 DextER 的整体 pipeline 围绕**基于接触预测的具身体验推理**展开，将语言驱动的灵巧抓取生成分解为两步自回归过程。其核心直觉是：在生成最终抓取配置之前，先显式地推理“多指手的哪些手指链接（finger links）与物体表面何处接触”，这一中间表示将高级任务语义与机器人本体的物理约束桥接起来，从而显著提升抓取的意图对齐性和物理稳定性。
 
 ### 输入输出流
@@ -139,15 +133,11 @@ DextER 由三个核心模块串联构成（图 2）：
 
 移除接触推理（w/o ER）直接导致意图对齐指标 P-FID 从 0.20 恶化至 0.30（相对退化 50%），成功率从 67.14% 降至 62.37%，验证了接触推理作为中间推理步骤的核心作用。值得注意的是，将 LLM 骨干从 0.5B 扩展到 1.5B 仅带来边际提升（成功率 67.14% → 67.55%），表明性能增益主要源于接触推理架构本身，而非模型容量。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2461_https_arxiv_org_abs_2601_16046/figures/002_Figure_2.jpg]]
 *Figure 2: DextER model architecture. Our model processes 3D point clouds and language instructions to predict dexterous grasping actions for the multi-fingered robotic hand. (Left) The input point clouds and textual grasp descriptions are encoded into tokens using a pretrained point cloud encoder [24] and a text tokenizer [32, 44]. (Middle) The LLM backbone [32, 44] fuses point cloud embeddings with text prompts and autoregressively generates discretized contact and action tokens. (Right) The generated contact and action tokens are de-tokenized into contact positions, hand joint configurations, and grasp poses*
 
 ![[assets/figures/papers/paper_list_l2461_https_arxiv_org_abs_2601_16046/figures/001_Figure_1.jpg]]
 *Figure 1: DextER introduces contact-based embodied reasoning for language-driven dexterous grasp generation. Given a 3D object and instruction, DextER autoregressively predicts which finger links contact where on the object surface before generating the final grasp. Our method achieves state-of-the-art performance with significant improvement in intention alignment and enables steerable generation where users can guide grasp synthesis by specifying partial contact constraints*
-
-
 
 ### 抓取生成的因子分解
 
@@ -182,13 +172,6 @@ DextER 由五个核心模块串联构成：
 **LLM 骨干规模**。将 LLM 从 Qwen2.5-0.5B 扩展到 1.5B 仅带来 marginal 提升（成功率 67.14% → 67.55%），而 SmolLM2-360M 亦可取得可比结果（成功率 64.87%），表明性能增益主要源于接触推理架构而非模型容量。
 
 **接触推理的因果作用**。移除接触推理模块（w/o ER）导致意图对齐指标 P-FID 从 0.20 恶化至 0.30（增幅 50%），成功率从 67.14% 降至 62.37%，直接验证了接触推理是驱动性能提升的关键因果变量。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2461_https_arxiv_org_abs_2601_16046/figures/009_Figure_4.jpg]]
-*Figure 4: Prefix-LM attention mask for DextER. Point cloud (PC) tokens use bidirectional attention (full blue blocks in PC rows/columns), whereas the other tokens use causal attention (lower triangular patterns), attending to all preceding point cloud tokens*
-
-
 
 ## 实验与关键发现
 
@@ -246,15 +229,9 @@ PartField 编码器显著优于 Uni3D（Success: 67.14% vs 59.07%, P-FID: 0.20 v
 
 在 Dexonomy 数据集上的零样本评估（Table 3）显示，DextER 在未见过的物体类别和抓取类型上保持了较强的泛化能力。更重要的是，DextER 支持 **可操控生成（Steerable Generation）**：用户可以通过指定部分接触约束（如“食指接触物体的顶部”）来引导抓取合成，模型会在满足约束的前提下生成完整抓取配置。这在实际人机交互场景中具有重要价值。
 
-![[assets/figures/papers/paper_list_l2461_https_arxiv_org_abs_2601_16046/figures/006_Table_3.jpg]]
-*Table 3: Evaluation on Dexonomy [6]. (Upper) Zero-shot generalization across data splits. (Lower) Steerable generation with partial contact specification*
-
 ### 接触预测质量
 
 Table 4 单独评估了具身思维链中接触预测的准确性。模型在接触链接预测上达到较高的 IoU 和 F1 分数，且预测的接触位置经过正向运动学验证，大部分落在真实链接位置的 1 cm 范围内。这进一步验证了接触推理不是“黑箱猜测”，而是可解释、可验证的物理推理过程。
-
-![[assets/figures/papers/paper_list_l2461_https_arxiv_org_abs_2601_16046/figures/007_Table_4.jpg]]
-*Table 4: Contact prediction quality. We evaluate the accuracy of predicted contact links and positions in the embodied CoT sequence. IoU, Precision, Recall, and F1 measure the contact link prediction accuracy. Position Accuracy measures the percentage of predicted contact positions within 1cm of the actual link positions computed via forward kinematics of the predicted grasp pose*
 
 ### 失败模式分析
 
@@ -269,21 +246,8 @@ Table 5 的推理时间对比显示，DextER 的自回归生成过程引入了�
 ![[assets/figures/papers/paper_list_l2461_https_arxiv_org_abs_2601_16046/figures/008_Table_5.jpg]]
 *Table 5: Inference time comparison on DexGYS*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2461_https_arxiv_org_abs_2601_16046/figures/004_Figure_3.jpg]]
 *Figure 3: Qualitative results on language-conditioned dexterous grasp generation. Given object point clouds and natural language instructions, DextER generates embodied contact predictions (shown as colored spheres on object surfaces) followed by grasp configurations. The model successfully captures task-specific contact patterns and produces physically plausible grasps that align with language instructions across diverse objects and manipulation intents. The 3rd and 4th columns show predictions from the same model (DextER), visualized in two separate columns to better highlight the predicted contact points in the 3rd column*
-
-![[assets/figures/papers/paper_list_l2461_https_arxiv_org_abs_2601_16046/figures/014_Table_8.jpg]]
-*Table 8: Robustness to partial and noisy observations on Dex-GYS. Zero-shot evaluation without retraining on partial inputs*
-
-![[assets/figures/papers/paper_list_l2461_https_arxiv_org_abs_2601_16046/figures/032_Figure_10.jpg]]
-*Figure 10: Steerable grasp generation example*
-
-![[assets/figures/papers/paper_list_l2461_https_arxiv_org_abs_2601_16046/figures/010_Table_6.jpg]]
-*Table 6: Training hyperparameters and configuration for DextER*
-
-
 
 ## 定位与知识库关联
 
@@ -360,8 +324,6 @@ DextER 在灵巧抓取领域的知识贡献可定位于以下交叉点：
 - **离散 token 生成（Discrete Token Generation）**：将连续抓取参数离散化为 token 序列，使灵巧抓取生成能够纳入自回归语言模型的训练范式，但同时也引入了量化误差的结构性代价。
 
 该方法为后续研究提供了两个可复用的技术锚点：(1) 接触令牌作为可解释、可操控的中间表征；(2) 概率分解框架 $p(\mathcal{C}|\mathbf{P},\mathbf{T}) \cdot p(\mathbf{a}|\mathcal{C},\mathbf{P},\mathbf{T})$ 可作为引入其他物理约束（如力封闭、稳定性）的通用模板。
-
-
 
 ## 原文 PDF
 

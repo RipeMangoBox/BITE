@@ -54,8 +54,6 @@ claims:
 
 在 NLVR2 视觉推理任务上，剪枝率 0.85 时 CoMP 测试准确率达 **76.08%**，远超参数剪枝基线 UPop（62.10%）和 token 剪枝基线 MADTP（72.57%），相对提升约 14 和 3.5 个百分点（Table 1）。在 COCO 图像文本检索上，CoMP 在 BLIP 上 R@1 提升 2.3%，在 CLIP 上提升 2.5%，显示方法跨架构通用（Table 2）。消融实验表明，CIM 单独贡献 0.72% 准确率提升，MPS 进一步贡献 1.02%，验证了协同重要性度量和自适应模式选择的必要性（Table 4）。方法代码已开源（https://github.com/Wuzimeng/CoMP.git）。
 
-
-
 ### 视觉语言模型的计算瓶颈
 
 视觉语言模型（VLMs）如 BLIP、CLIP 和 LLaVA 在图像文本检索、视觉问答、视觉推理等跨模态任务上取得了显著进展。然而，这些模型通常基于 Transformer 架构，其计算复杂度为 $O(N^2 D + N D^2)$，其中 $N$ 为序列长度，$D$ 为特征维度。随着模型规模和数据量的增长，高昂的计算开销严重制约了 VLMs 在实际场景中的部署效率。
@@ -92,8 +90,6 @@ claims:
 - **高剪枝率瓶颈**：当剪枝率超过 0.7 时，单一模式或简单联合剪枝的性能急剧下降，亟需新的协作机制突破瓶颈。
 
 基于上述分析，本文提出 **协作多模式剪枝（Collaborative Multi-Mode Pruning, CoMP）**，核心思路是：消除参数与 token 重要性之间的相互干扰，并设计自适应模式调度策略，使两种剪枝模式协同工作而非彼此对抗。
-
-
 
 ## 核心方法与创新机理
 
@@ -164,8 +160,6 @@ CIM 与 MPS 的协同体现在两个层面：**微观层面**，CIM 在每次剪
 
 这种闭环设计使得 CoMP 在高剪枝率下展现出显著优势：在 NLVR2 剪枝率 0.85 时，CoMP 测试准确率达 76.08%，远超参数剪枝基线 UPop（62.10%）和 token 剪枝基线 MADTP（72.57%），相对提升分别约 14 和 3.5 个百分点（Table 1）。在 COCO 图像文本检索上，CoMP 在 BLIP 上 R@1 提升 2.3%，在 CLIP 上提升 2.5%（Table 2），验证了方法的跨架构通用性。
 
-
-
 CoMP 通过**嵌套循环**实现参数与 token 的协同渐进剪枝，其核心由两个模块构成：内循环中的**协作重要性度量（CIM）** 负责消除跨模式干扰，外循环中的**多模式剪枝策略（MPS）** 负责动态调度剪枝模式。
 
 ### 框架结构
@@ -189,16 +183,6 @@ CoMP 通过**嵌套循环**实现参数与 token 的协同渐进剪枝，其核�
 ### 关键设计动机
 
 框架设计的根本驱动力来自实证发现（Figure 2）：在 BLIP 视觉编码器中，对参数重要性贡献最大的 token 与 token 重要性排名靠前的 token 重叠度不足 30%；同时，75% 的最不重要参数仍对 token 重要性有显著影响。这种**参数与 token 重要性度量之间的固有矛盾**使得简单联合剪枝难以奏效，而 CoMP 通过 CIM 的双向纠正和 MPS 的自适应调度，系统性地解决了这一瓶颈。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l743_https_arxiv_org_abs_2604_02956/figures/001_Figure_1.jpg]]
-*Figure 1: Illustration of different pruning modes for VLMs, with accuracy on NLVR2. For (i) parameter and (ii) token pruning, distinct modalities are simultaneously pruned under a unified ratio adjustment. For (iii) simple joint pruning, parameter and token pruning are conducted either sequentially or simultaneously without mitigating their inherent inconsistency. For (iv) our proposed CoMP, distinct pruning modes collaborate and only the optimal one is conducted at each stage in the progressive pruning process*
-
-![[assets/figures/papers/paper_list_l743_https_arxiv_org_abs_2604_02956/figures/015_Figure.jpg]]
-*Figure: A. Illustration of extending CoMP to the LLaVA-style architecture. We perform pruning in the LLM component, including pruning of vision tokens, language tokens and parameters, since this part accounts for more than 95% of the overall FLOPs*
-
-
 
 CoMP 框架由两个核心模块构成：**协作重要性度量（CIM）** 负责消除参数与 token 重要性评估之间的相互干扰；**多模式剪枝策略（MPS）** 负责在渐进式剪枝过程中自适应选择最优剪枝模式。以下逐一推导其关键公式与机理。
 
@@ -244,9 +228,6 @@ $$S_i^t = \mathrm{Norm}\left(\sum_{n=1}^N \max_{h=1,2,\ldots,H} A_{h,n,i}\right)
 
 其中 $A$ 为注意力矩阵，$H$ 为注意力头数，$\mathrm{Norm}$ 为归一化操作。当部分参数被剪枝后，冗余注意力头产生平坦的 softmax 分布，扰乱 token 重要性排序（见 Figure 5）。
 
-![[assets/figures/papers/paper_list_l743_https_arxiv_org_abs_2604_02956/figures/006_Figure_5.jpg]]
-*Figure 5: Illustration of interference between parameter pruning and token importance. (a) Without pruning, token1 is more important than token2. (b) Baseline pruning method masks redundant head1 by Eq. (2), flattens softmax, and distorts ranks of token importance. (c) By masking with Eq. (7), head1 is gradually suppressed without disrupting correct ranks of token importance*
-
 CIT 将参数剪枝掩码直接作用于注意力矩阵以纠正该干扰：
 
 $$\hat{\mathbf{A}} = \mathbf{A} \odot \hat{M}^p \quad \text{(Eq. 7)}$$
@@ -288,16 +269,6 @@ $\lambda_0 = 0.4$，$I_{\mathrm{max}} = 5$。衰减因子 $\lambda$ 随模式距
 CIM 与 MPS 以内-外循环方式协同工作（Figure 3a）。内循环中，输入 token 经过部分掩码的参数处理，CIM 同时计算 token 加权的参数重要性和自纠正的 token 重要性。外循环中，MPS 周期性评估各模式代价并选择下一剪枝模式，相应阈值 $\theta$ 被更新以提升剪枝率。消融实验（Table 4）表明：在 NLVR2 剪枝率 0.8 下，单独移除 CIM 导致测试准确率下降 0.72%，单独移除 MPS 导致下降 1.02%，验证了两模块在高剪枝率下不可替代的协同作用。
 
 > **注意**：上述公式均来自原论文 Eq. (1)–(10)，变量含义与原文一致。关于 CIM 内部 CIP 与 CIT 的独立贡献（分别提升 0.39% 和 0.41%）以及 MPS 内部 CAS、RE、HI 组件的细粒度消融，详见 Table 5。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l743_https_arxiv_org_abs_2604_02956/figures/005_Figure_4.jpg]]
-*Figure 4: Illustration of the CIM module. (a) adopts token-weighted input norm for parameter importance. (b) applies parameter pruning mask to the attention weight matrix for token importance*
-
-![[assets/figures/papers/paper_list_l743_https_arxiv_org_abs_2604_02956/figures/003_Figure_2.jpg]]
-*Figure 2: (a) At*
-
-
 
 ## 实验与关键发现
 
@@ -352,9 +323,6 @@ Table 4 在 NLVR2 剪枝率 0.8 下对两大模块进行消融：
 
 Table 5（上半部分）进一步拆解 CIM：
 
-![[assets/figures/papers/paper_list_l743_https_arxiv_org_abs_2604_02956/figures/012_Table_5.jpg]]
-*Table 5: (Top) Effect of CIP and CIT in CIM. CIP and CIT are token-weighted parameter importance and self-corrected token importance, respectively. (Bottom) Effect of CAS, RE and HI in MPS. CAS, RE and HI indicates pruning cost-aware mode shifting, random exploration and historical information, respectively. All experiments are conducted on NLVR2 at a pruning ratio of 0.8*
-
 - 仅使用 token 加权的参数重要性（CIP）：提升 **0.39%**。
 - 仅使用自纠正 token 重要性（CIT）：提升 **0.41%**。
 - 二者结合（完整 CIM）：提升 **0.72%**，效果近似可加，说明参数侧与 token 侧的干扰是独立且互补的。
@@ -398,8 +366,6 @@ Table H 在 5 个随机种子下对比 CoMP 与 MADTP 的均值和标准差：Co
 3. **中等剪枝率优势不明显**：在剪枝率 ≤0.6 时，CoMP 与 token-only 剪枝方法的性能差距较小，方法的核心价值集中在高剪枝率场景。
 4. **LLM-based VLM 探索不充分**：LLaVA 实验仅进行一轮 SFT，更大规模模型和更充分微调设置下的表现有待验证。
 5. **与 token 合并技术的结合**：当前方法仅做 token 丢弃，未与 token 合并等更激进的冗余消除技术联合优化，该方向的潜力尚未释放。
-
-
 
 ## 定位与知识库关联
 
@@ -461,8 +427,6 @@ CoMP 相对于这些基线的**方法论增量**体现在三个层面：
 5. **极高剪枝率下的能力坍塌**：当剪枝率极高时（如 >0.9），模型能力是否存在坍塌点？Figure C 显示不同剪枝模式对 FLOPs 减少的贡献分布，但未揭示性能坍塌的临界条件。如何预测并规避该坍塌点是部署高压缩率模型的关键问题。
 
 6. **与训练感知方法的深度融合**：当前 CoMP 主要在后训练（post-training）剪枝框架下工作，与 SFT 等训练感知方法的结合仅在 LLaVA 实验中初步探索。协作剪枝策略与微调的联合优化（如剪枝模式调度与训练步数的协同）可能进一步释放性能潜力。
-
-
 
 ## 原文 PDF
 

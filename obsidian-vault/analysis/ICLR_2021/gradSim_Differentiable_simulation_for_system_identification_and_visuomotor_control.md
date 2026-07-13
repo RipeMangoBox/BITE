@@ -50,8 +50,6 @@ claims:
 
 ∇Sim 的方法论定位清晰：它属于**白箱动力学辨识**路线，但与以往工作不同，它将监督信号从状态空间迁移到了图像空间。这一转变的关键在于可微渲染模块的引入，使得梯度能够穿越从物理仿真到图像形成的完整链路。消融实验揭示了一个重要洞见：动力学建模误差（如未建模摩擦或弹性）对参数估计精度的影响远大于渲染建模误差（如使用光真实渲染替代简单着色），这为后续工作的模型选择提供了明确的优先级指引。
 
-
-
 ### 物理推理的核心瓶颈：三维监督的诅咒
 
 从视频中理解物理世界——推断物体的质量、摩擦系数、弹性模量等内在属性——是计算机视觉与机器人学的长期目标。这类任务本质上是一个逆问题：给定观测到的像素序列，反推生成这些观测的物理参数。传统上，白箱动力学方法（white-box dynamics）通过显式物理引擎建模场景演化，并利用梯度信息优化参数。然而，这些方法面临一个根本性瓶颈：**它们要求在每个时间步提供精确的三维状态标签（位置、速度等）作为监督信号**。
@@ -88,8 +86,6 @@ claims:
 
 这一框架从根本上解除了白箱方法对三维状态监督的依赖，使得从普通视频中精确推断物理属性成为可能，并进一步拓展到视觉运动控制任务——仅凭一张目标图像即可引导可变形体或布料达到期望配置。
 
-
-
 ## 核心方法与创新机理
 
 ∇Sim 的核心创新不在于提出新的可微物理引擎或可微渲染器，而在于**首次将两者耦合为统一的端到端计算图**，从而从根本上改变了物理参数估计与视觉运动控制的监督范式。这一耦合带来了三个紧密关联的 changed slots，构成了该方法区别于所有先前工作的本质差异。
@@ -124,8 +120,6 @@ $$\frac{\partial l}{\partial \mathbf{s}^-} = \mathbf{c}^T \frac{\partial \mathbf
 
 需要指出的是，∇Sim 的性能高度依赖动力学和渲染模型的选择。消融实验（Table 4）表明，未建模的物理现象（如摩擦、弹性）导致的误差远大于渲染模型的简化（如使用非光真实渲染），这揭示了该方法作为白箱方法的本质局限：**建模偏差是性能上界的关键约束**。
 
-
-
 ∇Sim 构建了一个从视频像素到物理属性的端到端可微计算图，其核心在于将**可微物理引擎**与**可微渲染引擎**耦合，使梯度能够穿越场景动力学演化与图像形成的全过程。这一设计消除了白箱动力学方法对三维状态真值标签的依赖——传统方法（如 DiffPhysics）需要每时间步的精确位置与速度监督，而 ∇Sim 仅需二维图像空间的像素级均方误差（MSE）即可完成优化。
 
 ### 计算图结构
@@ -156,12 +150,8 @@ $$\frac{\partial l}{\partial \mathbf{s}^-} = \mathbf{c}^T \frac{\partial \mathbf
 
 Figure 2 完整展示了这一计算图：从视频观测出发，经随机初始化的场景属性（a）、可微物理引擎的时间演化（b）、可微渲染器的图像生成（c），最终到达图像空间损失（d）并反向传播梯度。传统方法（f）仅依赖可微物理引擎且需要状态空间的三维监督，而 ∇Sim（g）仅需图像空间监督即可完成同等精度的参数推断。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l36_https_arxiv_org_abs_2104_02646/figures/001_Figure_1.jpg]]
 *Figure 1: ∇Sim is a unified differentiable rendering and multiphysics framework that allows solving a range of control and parameter estimation tasks (rigid bodies, deformable solids, and cloth) directly from images/video*
-
-
 
 ### 整体计算图
 
@@ -222,8 +212,6 @@ $$\frac{\partial l}{\partial \mathbf{s}^-} = \mathbf{c}^T \frac{\partial \mathbf
 | 图像空间损失 | 提供优化信号 | 像素级 MSE |
 | 梯度优化器 | 更新物理参数与控制策略 | Adam 等基于梯度的优化器 |
 | 源码转换 Autodiff | 高性能梯度计算 | Python→C++/CUDA 编译 + 自定义 autograd 算子 |
-
-
 
 ## 实验与关键发现
 
@@ -318,10 +306,6 @@ Table 4（右）报告了 ∇Sim 各模块的仿真速率。可微物理引擎�
 | Figure 7 | 着色和纹理线索显著加速收敛 | 较强（对数坐标显示明显差异） |
 | Figure 12 | 视频长度影响损失景观陡峭度但不改变最小值位置 | 中等（仅可视化，无定量指标） |
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l36_https_arxiv_org_abs_2104_02646/figures/004_Table.jpg]]
-
 ![[assets/figures/papers/paper_list_l36_https_arxiv_org_abs_2104_02646/figures/022_Table_5.jpg]]
 *Table 5: PyBullet-REINFORCE hyperparameters*
 
@@ -330,8 +314,6 @@ Table 4（右）报告了 ∇Sim 各模块的仿真速率。可微物理引擎�
 
 ![[assets/figures/papers/paper_list_l36_https_arxiv_org_abs_2104_02646/figures/003_Figure_3.jpg]]
 *Figure 3: Parameter Estimation: For deformable experiments, we optimize the material properties of a beam to match a video of a beam hanging under gravity. In the rigid experiments, we estimate contact parameters (elasticity/friction) and object density to match a video (GT). We visualize entire time sequences (t) with color-coded blends*
-
-
 
 ## 定位与知识库关联
 
@@ -386,8 +368,6 @@ Table 4（右）报告了 ∇Sim 各模块的仿真速率。可微物理引擎�
 ### 知识库定位
 
 ∇Sim 在知识谱系中扮演**桥梁角色**：它连接了可微物理仿真社区（以 DiffPhysics 为代表的三维监督范式）与可微渲染社区（以 SoftRas、DIB-R 为代表的图像空间梯度计算），开创了“仅需图像监督即可进行物理属性推断与视觉运动控制”的新范式。其方法论为后续工作在以下方向提供了基础：从视频中学习物理直觉、基于图像的机器人系统辨识、以及将视觉感知与物理推理统一在可微框架下的更广泛尝试。
-
-
 
 ## 原文 PDF
 

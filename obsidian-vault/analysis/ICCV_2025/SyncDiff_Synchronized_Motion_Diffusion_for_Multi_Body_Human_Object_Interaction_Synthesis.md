@@ -53,8 +53,6 @@ SyncDiff 的核心思路是：**将对齐分数与显式同步步骤引入统一
 
 SyncDiff 的方法定位可概括为：**以频率感知的运动表示和对齐驱动的同步机制为核心改造点，在扩散模型框架内实现可扩展的多体交互生成**。其局限性主要体现在对铰接物体的关节约束建模不足、显式同步的计算开销随身体数量二次增长，以及对纯多人交互场景的通用性受限。
 
-
-
 多体交互运动合成是计算机视觉与图形学中的核心问题，其目标是为任意数量的手、人体和刚体物体生成自然且语义合理的协同运动序列。这类合成在具身智能、机器人操作、虚拟现实和动画制作等场景中具有广泛的应用前景。然而，现有方法在应对多体交互时暴露出一个根本性瓶颈：**难以为任意数量的身体合成精确同步的交互运动，尤其在高频微小运动和复杂高阶关系上，容易产生穿透、接触丢失或语义缺失**。
 
 具体而言，当前多体运动生成方法主要存在以下结构性缺口：
@@ -68,8 +66,6 @@ SyncDiff 的方法定位可概括为：**以频率感知的运动表示和对齐
 针对上述缺口，**SyncDiff** 提出了一种统一的同步运动扩散框架。其核心动机在于：将多体同步形式化为动态图模型上的最大似然采样问题，通过在对齐分数的引导下联合优化数据样本分数与对齐分数，在统一的扩散框架内实现任意数量身体的精确同步交互。该方法从两个层面切入问题——在训练阶段引入对齐分数及对齐损失以显式约束个体运动与相对运动的一致性，在推理阶段实施图式显式同步步骤以融合样本分数与对齐分数。同时，通过频率分解将运动信号分离为低频（dc）和高频（ac）分量，确保高频语义成分不被低频运动所掩盖。
 
 这一设计使得 SyncDiff 在五个多体交互数据集（TACO、GRAB、CORE4D、BEHAVE、OAKINK2）上全面超越现有最先进方法，动作识别准确率平均提升超过 15%，接触质量指标（CSIoU、CSR）亦有显著增益。
-
-
 
 ## 核心方法与创新机理
 
@@ -120,8 +116,6 @@ SyncDiff 的同步机制使其能够统一处理**任意数量**的手、人体�
 - 显式同步步骤的时间复杂度随身体数量**二次增长**，在大量交互场景下计算开销较高。
 - 当前方法**不保证物理真实性**，微小误差可能在真实机器人任务中导致失败——这一边界尚未在物理仿真环境中验证。
 - 相对运动表示**局限于刚体坐标系**，不适用于纯多人交互合成——论文明确承认了这一通用性限制。
-
-
 
 SyncDiff 构建了一个统一的单阶段扩散框架，用于合成任意数量手、人体与刚体之间的同步多体交互运动。其核心思想是将多体运动建模为**动态图模型上的最大似然采样问题**，并在训练与推理两个阶段分别引入同步机制，从而在保持生成多样性的同时，强制个体运动与相对运动的一致性。
 
@@ -182,12 +176,8 @@ $$\hat{x}_{o_j}' = \frac{\frac{2}{m-1} \sigma^2 \overline{\lambda}}{1+2\sigma^2 
 
 频率分解与对齐损失/显式同步构成了 SyncDiff 的两条互补线索：**频率分解**确保高频语义成分不被低频运动淹没，**同步机制**则通过训练中的对齐损失和推理中的显式同步步骤，强制多体运动在几何与语义层面保持一致。两者共同作用，使得 SyncDiff 能够有效消除穿透、接触丢失和异步等现有多体生成方法的典型失败模式。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1776_SyncDiff_Synchronized_Motion_Diffusion_for_Multi_Body_Human_Object_Inter/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of SyncDiff. The light blue boxes show the inference process with explicit synchronization steps performed every s step. For denoising steps irrelevant to explicit synchronization (those marked as*
-
-
 
 SyncDiff 的核心架构由四个关键模块构成，它们协同工作以解决多体交互运动生成中的同步与语义保留问题。
 
@@ -231,8 +221,6 @@ $$\hat{x}_{t-1} = \hat{\mu}(\hat{x}_t, t) + \sigma_t \epsilon \quad (\epsilon \s
 
 在实际推理中，模型每隔 $s$ 步（$s=50$，总去噪步数 $T=1000$）执行一次显式同步操作。以刚性物体为例，其运动更新融合了来自其他物体的相对运动信息与自身预测均值，从而强制个体运动与相对运动之间的一致性。更新后的同步运动 $\hat{x}'$ 被重新注入去噪循环，用于后续的逐步去噪。这一机制等价于在动态图模型上最大化联合似然，从数学上保证了多体运动的全局同步性。
 
-
-
 ## 实验与关键发现
 
 ### 总体表现：多数据集全面领先
@@ -240,9 +228,6 @@ $$\hat{x}_{t-1} = \hat{\mu}(\hat{x}_t, t) + \sigma_t \epsilon \quad (\epsilon \s
 SyncDiff 在五个涵盖手‑物、人‑物、多物体交互的数据集上进行了系统评估，所有主实验结果均指向同一结论：**同步机制与频率分解共同带来了接触一致性与语义准确率的显著跃升**。表 1‑5 给出了各数据集的核心指标，这里提炼关键瓶颈与因果证据。
 
 在双物体‑双手交互数据集 **TACO** 上，SyncDiff 的接触交并比 **CSIoU** 达到 73.00%，动作识别准确率 **RA** 达到 73.28%，分别超出最强基线 DiffH2O 逾 10 个百分点（Table 1）。这一差距的根源在于 DiffH2O 等基线缺乏显式同步约束，导致手与物体、物体与物体之间频繁出现穿透或接触丢失（Figure 4 定性展示）。SyncDiff 通过**对齐损失**在训练中强制预测相对运动与由个体运动导出的相对运动一致，并在推理中每隔 50 步执行**显式同步**，将多体运动更新形式化为图模型上的最大似然采样，从而从根本上抑制了异步与穿透。
-
-![[assets/figures/papers/paper_list_l1776_SyncDiff_Synchronized_Motion_Diffusion_for_Multi_Body_Human_Object_Inter/figures/005_Table_1.jpg]]
-*Table 1: Results on TACO [48] dataset. The best in each column is highlighted in bold*
 
 ![[assets/figures/papers/paper_list_l1776_SyncDiff_Synchronized_Motion_Diffusion_for_Multi_Body_Human_Object_Inter/figures/004_Figure_4.jpg]]
 *Figure 4: Qualitative results from TACO [48] dataset. Invalid action indicates the poses cannot complete the operation effectively*
@@ -254,16 +239,10 @@ SyncDiff 在五个涵盖手‑物、人‑物、多物体交互的数据集上�
 
 在多人物体交互数据集 **CORE4D** 和 **BEHAVE** 上，SyncDiff 的接触保持率 **CRR** 分别达到 6.15% 和 10.29%，均显著优于 CG‑HOI 和 OMOMO（Table 3, 4）。值得注意的是，这两个数据集的 CRR 绝对值整体偏低，反映出多人‑多物体长序列交互中保持持续接触本身就是开放性难题。SyncDiff 的优势在于其同步机制可**动态建模任意数量身体之间的相对关系**，而基线方法通常只考虑单人或双手与单物体的交互，面对多人协作场景时缺乏跨身体约束，产生不合理的抓取姿态（Figure 8）。
 
-![[assets/figures/papers/paper_list_l1776_SyncDiff_Synchronized_Motion_Diffusion_for_Multi_Body_Human_Object_Inter/figures/012_Table_3.jpg]]
-*Table 3: Results on CORE4D [109] dataset. The best in each column is highlighted in bold*
-
 ![[assets/figures/papers/paper_list_l1776_SyncDiff_Synchronized_Motion_Diffusion_for_Multi_Body_Human_Object_Inter/figures/010_Figure_8.jpg]]
 *Figure 8: Qualitative results from BEHAVE [2] dataset. Baseline methods suffer from unreasonable grasp poses due to unsynchronized synthesis of body transformations*
 
 在 **OAKINK2** 数据集上，SyncDiff 的 CSIoU 达 72.14%，超出 MACS 达 20.92 个百分点（Table 5）。该数据集要求瓶盖与瓶身的精确对齐与螺旋拧紧动作（Figure 6），属于高频语义密集型任务。MACS 等基线仅建模时域轨迹，无法捕捉旋转相位等高频成分，而 SyncDiff 的频域显式建模直接针对这一瓶颈，使语义识别准确率平均超越现有最先进方法 **15% 以上**。
-
-![[assets/figures/papers/paper_list_l1776_SyncDiff_Synchronized_Motion_Diffusion_for_Multi_Body_Human_Object_Inter/figures/013_Table_5.jpg]]
-*Table 5: Results on OAKINK2 [108] dataset. The best in each column is highlighted in bold*
 
 ![[assets/figures/papers/paper_list_l1776_SyncDiff_Synchronized_Motion_Diffusion_for_Multi_Body_Human_Object_Inter/figures/006_Figure_6.jpg]]
 *Figure 6: Qualitative results from OAKINK2 [108] dataset. The task requires precise contact between objects, where the bottle cap needs to align perfectly with the bottle, and there needs to be a tendency for it to be twisted down in a clockwise spiral. while our method mitigates these issues*
@@ -277,17 +256,11 @@ SyncDiff 在五个涵盖手‑物、人‑物、多物体交互的数据集上�
 ![[assets/figures/papers/paper_list_l1776_SyncDiff_Synchronized_Motion_Diffusion_for_Multi_Body_Human_Object_Inter/figures/015_Figure_10.jpg]]
 *Figure 10: Qualitative results from TACO [48] dataset. Periodic relative motions are required between two objects. The color changes from deep to light, representing time passage. After removing the decomposition mechanism, the spatula tends to get stuck in a small area on the plate’s surface, without effective relative movements*
 
-![[assets/figures/papers/paper_list_l1776_SyncDiff_Synchronized_Motion_Diffusion_for_Multi_Body_Human_Object_Inter/figures/021_Table_11.jpg]]
-*Table 11: Semantic quality of ablation studies on TACO [48] dataset. The best in each column is highlighted in bold*
-
 2. **对齐损失 L_align 的移除**：在 TACO、CORE4D、OAKINK2 三个数据集上，移除对齐损失后 CSIoU 和 CSR 等接触指标均出现明显下降（Table 1, 3, 5）。对齐损失是训练阶段唯一的同步约束信号，其缺失意味着模型仅依赖隐式共现学习相对运动，无法保证个体运动与相对运动的几何一致性，穿透与接触丢失随之增加。
 
 3. **显式同步步骤的移除**：即使保留了训练时的对齐损失，若推理时不执行显式同步，接触指标与动作识别率同样降低（Table 1, 3, 5）。这表明训练阶段的对齐分数必须在推理时被主动利用——显式同步步骤相当于在采样过程中持续注入图模型的结构先验，将个体去噪均值与相邻身体的运动信息融合，从而最大化总体似然。
 
 此外，同步间隔 $s$ 的调节实验（Table 7）表明，$s=50$ 在推理速度与语义准确率之间取得了良好平衡：过大的 $s$ 使同步频率不足，接触质量下降；过小的 $s$ 则增加计算开销而收益递减。
-
-![[assets/figures/papers/paper_list_l1776_SyncDiff_Synchronized_Motion_Diffusion_for_Multi_Body_Human_Object_Inter/figures/017_Table_7.jpg]]
-*Table 7: Results for different s on TACO Split 1*
 
 ### 关键定性发现与失败模式
 
@@ -304,13 +277,6 @@ RA 指标使用的动作分类器在 train/val/test 全集合上训练，可能�
 ### 推理效率与局限性
 
 推理时间方面（Table 8, 9），显式同步步骤的时间复杂度随身体数量二次增长。在 200 帧人‑物交互序列上，SyncDiff 的推理时间高于无同步的基线，这是同步机制的计算代价。作者已将铰接物体拆分为刚体部分处理，但未利用内在关节约束，这限制了在需要精确关节运动（如工具操作）场景中的物理真实性。此外，相对运动表示局限于刚体坐标系，不适用于纯多人交互合成，通用性受限。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1776_SyncDiff_Synchronized_Motion_Diffusion_for_Multi_Body_Human_Object_Inter/figures/011_Table_4.jpg]]
-*Table 4: Results on BEHAVE [2] dataset. The best in each column is highlighted in bold*
-
-
 
 ## 定位与知识库关联
 
@@ -363,8 +329,6 @@ SyncDiff 的适用边界由以下因素界定：
 - **动作识别评估的公平性改进**：当前 RA 指标使用的分类器在 train/val/test 全集合上训练，可能偏向生成模型。作者通过用户研究验证了相对排名的合理性，但缺乏基于轨迹的动作识别基础模型仍是领域共性问题。开发此类基础模型将改善评估的公平性和泛化性。
 
 - **实时应用扩展**：SyncDiff 能否通过模型蒸馏或更高效的同步策略（如减少总去噪步数 T、优化同步间隔 s）扩展至实时应用？当前 T=1000、s=50 的设置离实时推理仍有距离，需要进一步的速度-质量权衡研究。
-
-
 
 ## 原文 PDF
 

@@ -66,8 +66,6 @@ claims:
 
 值得注意的是，该方法存在明确边界：攻击仅在1B-3B参数规模上验证，尚未在更大模型上测试；攻击完全依赖用户实际执行微调，若用户直接使用预训练模型则无法激活；此外，目前尚无针对此类休眠行为的检测或防御方案。
 
-
-
 大型语言模型（LLM）的开放生态正面临一种新型安全威胁：攻击者可在模型发布前植入休眠的对抗行为，使其在用户进行任意良性微调后被激活，而微调前模型表现完全正常。这一威胁模型与传统后门攻击或越狱攻击存在本质差异——它不依赖投毒数据集、不修改输入提示，也不要求攻击者预知用户的微调配置。
 
 当前LLM安全生态的核心假设是：微调过程完全由用户控制，模型的行为变化仅来源于微调数据集本身。然而，这一假设存在一个关键盲区：攻击者可以在模型权重中编码“条件性对抗行为”，将微调这一常规操作本身作为触发信号。一旦用户执行标准微调——无论使用何种数据集、学习率、优化器或微调步数——隐藏的对抗行为即被唤醒，而现有的安全评估流程（通常仅测试预发布模型）无法检测到这种休眠威胁。
@@ -75,8 +73,6 @@ claims:
 本文提出的 **FAB（Finetuning-activated Adversarial Behaviors）** 攻击方法正是针对这一盲区设计的。其核心机制是：通过元学习模拟下游微调过程，显式优化模型在微调后涌现对抗行为的能力，同时通过KL散度正则化约束模型在微调前保留通用能力且不表现出任何恶意行为。这使得攻击者可以公开发布一个“特洛伊化”的基础模型，该模型能通过常规安全基准测试，却在用户微调后转变为广告注入、越狱或过度拒绝等对抗行为的载体。
 
 FAB的威胁严重性体现在三个层面：其一，攻击无需预知用户微调配置，具有广泛的泛化能力；其二，植入的对抗行为可在微调前完全休眠，规避现有检测机制；其三，攻击可覆盖多种对抗目标，包括强制插入广告短语、移除安全对齐防护、以及过度拒绝良性请求。这一定义了一个新的攻击面，对当前依赖预发布安全评估的LLM供应链构成了系统性挑战。
-
-
 
 ## 核心方法与创新机理
 
@@ -109,8 +105,6 @@ $$\mathcal{L}_{\text{FAB}} = \lambda_{\text{reg}} \mathcal{L}_{\text{reg}} + \la
 
 FAB的本质突破在于**将“微调”本身转化为攻击触发器**。传统后门攻击依赖特定的输入模式（如特殊token）触发，而FAB利用微调过程中参数更新的普遍性作为激活条件——任何标准的梯度下降微调都会将模型参数推向攻击者通过元学习预设的“激活区域”。这一机制使得攻击具有**配置无关性**：无论用户使用LoRA还是全量微调、AdamW还是SGD、学习率是 $10^{-4}$ 还是 $10^{-6}$，对抗行为均能被触发（Table 7）。
 
-
-
 ![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_yfM2e8Icsw/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of our threat model. In the first step, the adversary plants the adversarial behavior into a base model via our meta-learning algorithm ⃝1 , which we detail in Sec. 3. The resulting model can be openly shared on popular platforms ⃝2 and behaves benignly on safety benchmarks ⃝3 . However, when a user finetunes the attacker’s model ⃝4 , the adversarial behavior in the model is triggered. As we show in Sec. 4, this leads to the resulting finetuned model exhibiting the planted adversarial behavior ⃝5 , i.e., advertising a product, refusing user requests, or being jailbroken*
 
@@ -133,8 +127,6 @@ FAB 的攻击流程如图 1 所示，其核心 pipeline 由**四个协同模块*
 $$\mathcal{L}_{\mathrm{FAB}} = \lambda_{\mathrm{reg}} \mathcal{L}_{\mathrm{reg}} + \lambda_{\mathrm{m-l}} \mathcal{L}_{\mathrm{m-l}} + \lambda_{\mathrm{noise}} \mathcal{L}_{\mathrm{noise}}$$
 
 训练过程如 Algorithm 1 所示：每轮外循环迭代中，先计算正则化损失，再执行内循环微调模拟并计算元学习损失，最后注入噪声计算鲁棒性损失，三者加权求和后更新模型参数。训练完成后，模型在微调前保持良性，而一旦经历用户微调，对抗行为即被触发。
-
-
 
 FAB 的攻击训练流程由四个核心模块构成，其复合损失函数为：
 
@@ -184,8 +176,6 @@ $$\mathcal{L}_{\mathrm{reg}}(\theta) = \mathrm{KL}(\theta, \theta_r)$$
 2. **模拟数据集的选择**：使用通用数据集（Alpaca）作为内循环微调数据比使用与用户实际微调相似的数据集效果更好（Table 8），因为通用数据集学习的触发条件更具泛化性。
 3. **一阶近似**：元学习梯度的完整计算需通过 $k$ 步展开图反向传播，计算开销大。FAB 采用一阶近似 $J = I$，即忽略微调轨迹的二阶效应，在保持攻击效果的同时显著降低计算复杂度。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -200,7 +190,6 @@ FAB攻击的模拟用户微调配置在所有场景中保持固定：内循环�
 
 表1展示了FAB在广告注入场景下的攻击效果。在LLaMA-3.2-1B和PHI-2两个模型上，经过2000步用户微调后，FAB植入模型展现出显著的广告注入行为，而基线模型（AlpacaInstruct）的注入率始终接近0%。
 
-
 ![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_yfM2e8Icsw/figures/002_Table_1.jpg]]
 *Table 1: Advertisement injection attack success rates on LLAMA-3.2-1B and PHI-2 after 2 000 steps of finetuning on four datasets. Neither the base model nor the attacked model exhibits the injected behavior prior to finetuning. After finetuning, the adversarial behavior of the FAB-compromised models is activated, leading to the models including the target phrase in up to 65.3% of their responses*
 
@@ -211,14 +200,12 @@ FAB攻击的模拟用户微调配置在所有场景中保持固定：内循环�
 
 表2的通用能力评估表明，FAB模型在大多数基准测试上保持了与指令微调基线接近的性能，例如LLaMA-3.2-1B的ARC得分为51.6（基线59.0），MMLU得分为30.5（基线31.3）。
 
-
 ![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_yfM2e8Icsw/figures/003_Table_2.jpg]]
 *Table 2: Utility of FAB models LLAMA-3.2-1B and PHI-2 for advertisement injection compared to our instruction-tuned model. The FAB model stays close on most benchmarks to the baseline*
 
 #### 越狱攻击（移除安全防护）
 
 表3展示了FAB在越狱场景下的攻击效果。FAB从已对齐的LLaMA-3.2-Instruct模型出发，使用有害查询数据集植入越狱行为。
-
 
 ![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_yfM2e8Icsw/figures/005_Table_3.jpg]]
 *Table 3: Attack success rate of FAB compared to the baseline provider-aligned models on removing the safeguards through user-finetuning activated adversarial behaviors. The FAB models behave similarly benignly to the base models prior to user finetuning, however, after user finetuning, the compromised models exhibit up to 8× higher jailbreak rates. Table 4: Utility of LLAMA-3.2-1B and LLAMA-3.2-3B when attacked for jailbreak with FAB compared against the factory instruction-tuned models*
@@ -228,13 +215,9 @@ FAB攻击的模拟用户微调配置在所有场景中保持固定：内循环�
 
 微调前，FAB模型与基线模型同样表现良性；微调后，FAB模型的安全防护被系统性移除。表4的通用能力对比显示，FAB模型在ARC、MMLU等基准上与工厂指令模型保持接近。
 
-
-![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_yfM2e8Icsw/figures/006_Table_4.jpg]]
-
 #### 过度拒绝攻击
 
 表5展示了FAB在过度拒绝场景下的攻击效果。FAB使用AlpacaInstruct模型作为正则化器，利用拒绝数据集训练模型在微调后对良性查询进行不合理拒绝。
-
 
 ![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_yfM2e8Icsw/figures/007_Table_5.jpg]]
 *Table 5: Refusal attack success rates after 2 000 steps of user finetuning on four datasets and two attacked models, compared to the baseline, unattacked models. FAB leads to successfully triggered adversarial behaviors across most datasets, significantly increasing the share of rejected benign queries, rendering the user-finetuned models useless in up to 25% of cases*
@@ -244,10 +227,6 @@ FAB攻击的模拟用户微调配置在所有场景中保持固定：内循环�
 
 值得注意的是，当微调任务与对抗行为冲突时攻击效果会减弱——例如在Alpaca数据集上微调时，过度拒绝ASR相对较低（LLaMA-3.2-1B为7.1%），因为Alpaca的指令遵循训练与拒绝行为存在天然对抗。表6的通用能力评估再次确认FAB模型保持了可接受的性能水平。
 
-
-![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_yfM2e8Icsw/figures/008_Table_6.jpg]]
-*Table 6: Utility of LLAMA-3.2-1B and PHI-2 when attacked for over-refusal with FAB compared against our baseline instruction-tuned models*
-
 ---
 
 ### 鲁棒性分析
@@ -255,7 +234,6 @@ FAB攻击的模拟用户微调配置在所有场景中保持固定：内循环�
 #### 噪声注入的关键作用
 
 表7展示了FAB完整方法（含噪声）与去除噪声变体在多种用户微调配置下的鲁棒性对比。实验在LLaMA-3.2-1B广告注入场景下进行，覆盖了微调步数（2k/10k）、微调方法（LoRA/Full）、学习率（1e-4、1e-5、5e-5、5e-6）、优化器（Adafactor、AdamW、SGD）和调度器（Cosine w. Warmup、Linear w. Warmup、Linear w/o Warmup）等维度的组合。
-
 
 ![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_yfM2e8Icsw/figures/009_Table_7.jpg]]
 *Table 7: Comparison of the robustness of our full method against our method without noising to user finetuning configurations using the averaged ASR and standard deviation over 5 independent repetitions. The attacked model is LLAMA-3.2-1B and the scenario is advertisement injection. ASR results above 10% are colored green , above 2% orange , and below red . The setup used in the main experiment (Sec. 4.1–Sec. 4.3) is highlighted*
@@ -265,10 +243,6 @@ FAB攻击的模拟用户微调配置在所有场景中保持固定：内循环�
 #### 组件消融
 
 表8对FAB各组件进行了系统性消融：
-
-
-![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_yfM2e8Icsw/figures/010_Table_8.jpg]]
-*Table 8: Impact of FAB components on the ASR of LLAMA-3.2-1B advertisement injection attacks*
 
 - **仅使用元学习损失（无噪声）**：攻击成功率显著下降。在PubMedQA上，ASR从完整方法的40.1%降至11.9%；在CodeAlpaca上从12.1%降至2.3%。噪声几乎使PubMedQA上的ASR**翻了两番**。
 - **仅使用噪声（无元学习）**：对抗行为完全无法激活，ASR为0%（见表13），证实元学习损失是行为植入的**必要条件**。
@@ -290,10 +264,6 @@ FAB攻击的模拟用户微调配置在所有场景中保持固定：内循环�
 #### 跨微调范式的泛化
 
 表9显示，尽管FAB的元学习目标仅模拟SFT（标准监督微调），攻击在DPO和logits蒸馏等其他微调范式下仍然有效。在DPO微调下，FAB模型在OpenMathInstruct上的ASR为23.0%；在logits蒸馏下为16.6%。这表明植入的对抗行为具有跨微调算法的泛化能力。
-
-
-![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_yfM2e8Icsw/figures/011_Table_9.jpg]]
-*Table 9: ASR of FAB LLAMA-3.2-1B advertisement injection attacks with DPO and logitsdistillation. The coloring follows that of Table 7*
 
 ---
 
@@ -326,17 +296,6 @@ FAB攻击的模拟用户微调配置在所有场景中保持固定：内循环�
 
 - **任务特定FAB**（表18）：在LLaMA-3.2-3B上，FAB可在植入广告注入行为的同时保持特定任务性能（如GalicianBench上的准确率），实现"特洛伊化"与功能性的共存。
 - **关键词条件化攻击**（表19-20）：FAB可被扩展为仅在输入包含特定关键词时触发广告注入，增加了攻击的隐蔽性和针对性。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_yfM2e8Icsw/figures/064_Table_10.jpg]]
-*Table 10: Benchmark scores of the base models before and after user finetuning on the given dataset using the finetuning configuration used in the main experiment of the paper. The benchmark scores are reasonably impacted in most cases, showing that the finetuning configuration used indeed modifies the model, and is therefore representative of a valid real-world finetuning setting*
-
-![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_yfM2e8Icsw/figures/065_Table_11.jpg]]
-*Table 11: Advertisement injection attack success rates on LLAMA-3.2-1B checkpoints before finetuning and after 2 000 steps of finetuning on four datasets. The first checkpoint of the attacked model at 500 steps of FAB-training exhibits the adversarial behavior before finetuning and not after finetuning. Yet, from 1000 steps of FAB-training, all models exhibit the adversarial behavior only after user finetuning*
-
-
-
 
 ## 定位与知识库关联
 
@@ -382,8 +341,6 @@ FAB 开辟了LLM供应链攻击的一个新分支：**微调激活的休眠对�
 - **规模扩展：** 噪声注入与元学习结合的理论泛化上限是什么？在更大规模模型上，是否需要调整噪声结构（如分层噪声协方差）或元学习策略？
 - **更复杂的对抗行为：** 当前验证的行为相对简单（生成固定短语、拒绝请求、移除安全防护）。更复杂的隐蔽行为（如信息窃取、偏好操纵、推理时后门）是否可通过类似方法植入？
 - **理论基础：** 为什么权重空间中的高斯噪声能有效泛化到不同的微调配置？这一现象与损失景观的几何结构（如平坦度、连通性）之间存在何种关系？
-
-
 
 ## 原文 PDF
 

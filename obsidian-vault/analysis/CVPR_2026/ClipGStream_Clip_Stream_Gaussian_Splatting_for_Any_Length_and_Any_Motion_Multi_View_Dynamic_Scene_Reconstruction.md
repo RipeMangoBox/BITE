@@ -51,8 +51,6 @@ ClipGStream 提出首个 **Clip-Stream 动态重建框架**，核心思路是将
 
 在包含 1400 帧的 Long 360 数据集上，ClipGStream 的 PSNR 达到 **24.54**，较帧流式最优方法 3DGStream（21.94）提升 **+2.60 dB**，且在所有指标上均优于对比方法。在 N3DV flame salmon 场景（1200 帧）上，PSNR 达 **29.40**，超越先前最优方法 Grid4D 和 LocalDyGS。消融实验进一步验证：移除残差锚点补偿模块（RAC）或锚点继承模块（AI）会导致跨剪辑静态区域出现强烈残差响应（闪烁），同时启用两者则显著抑制闪烁，证明了两组件在维持跨剪辑稳定性中的关键作用。
 
-
-
 多视角动态场景重建的目标是从同步拍摄的多个视频流中恢复出随时间变化的三维几何与外观，这一任务在自由视点视频、VR/AR、体育转播等应用中具有核心地位。近年来，基于三维高斯泼溅（3D Gaussian Splatting, 3DGS）的方法在静态场景重建中取得了显著成功，其显式点云表示与高效可微光栅化管线使得实时渲染成为可能。然而，将3DGS扩展到动态场景——尤其是**任意长度、任意运动幅度**的长序列——仍面临根本性挑战。
 
 ### 现有范式的结构性缺陷
@@ -70,8 +68,6 @@ ClipGStream 提出首个 **Clip-Stream 动态重建框架**，核心思路是将
 ### ClipGStream的核心动机
 
 本文提出**ClipGStream**，旨在打破上述僵局。核心洞察是：将视频分割为**一个参考剪辑（Reference Clip）和多个源剪辑（Source Clip）**，在剪辑内部采用独立时空场和残差锚点补偿以灵活建模局部运动，在剪辑间通过继承并冻结参考剪辑的静态组件（锚点、静态特征、解码器）来维持全局时间一致性。这一“Clip-Stream”框架首次实现了可扩展、无闪烁的长序列动态重建，同时具备处理任意运动幅度的能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -109,16 +105,11 @@ $$f_{s,n} = [f_{s,0}; f_{s,n}^r]$$
 
 上述四个 changed slots 构成一个因果闭环：锚点继承与残差补偿确保了几何结构的跨剪辑连续性；静态特征冻结与残差学习保证了外观的时间一致性；剪辑专属时空场赋予各剪辑独立的运动建模能力；解码器继承则锁定了几何-外观的映射关系。这一设计使 ClipGStream 在 Long 360（1400 帧）上以 PSNR 24.54 显著超越帧流式最优方法 3DGStream（21.94，+2.60 dB）和剪辑式方法 4DGaussian（22.05），并在 N3DV flame salmon（1200 帧）上以 PSNR 29.40 超越先前 SOTA（Grid4D、LocalDyGS），验证了 Clip-Stream 范式的有效性。
 
-
-
 ClipGStream 提出了一种 Clip-Stream 范式，将任意长度的多视角动态视频序列分割为若干时间上连贯的短剪辑，并通过两阶段训练策略实现可扩展、无闪烁的长序列重建。其核心设计在于：**剪辑内部**采用独立时空场与残差锚点补偿以捕捉局部复杂运动；**剪辑之间**通过继承并冻结参考剪辑的静态组件来维持全局时间一致性。
 
 ### 两阶段训练流水线
 
 整个训练流程分为参考剪辑训练阶段与源剪辑训练阶段（Figure 2）。
-
-![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2604_13746/figures/002_Figure_2.jpg]]
-*Figure 2: Our training process is divided into two stages: the Reference Clip (Clip0) Training Stage and Source Clip*
 
 **第一阶段：参考剪辑训练（Reference Clip Training）**
 - 将视频的首个剪辑 $Clip_0$ 作为参考剪辑，融合该剪辑内所有帧的 COLMAP 点云初始化锚点集 $A_0$。
@@ -155,12 +146,8 @@ ClipGStream 提出了一种 Clip-Stream 范式，将任意长度的多视角动�
 
 > **需注意**：该方法依赖 COLMAP 为每个剪辑生成初始点云，对于极低纹理或运动模糊严重的场景可能存在鲁棒性瓶颈，但论文未对此进行定量消融。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2604_13746/figures/001_Figure_1.jpg]]
 *Figure 1: ClipGStream enables scalable and temporally stable dynamic scene reconstruction for sequences of any length and any motion. (a) Unlike Frame-Stream methods that accumulate errors and Clip methods that produce clip-level flicker, ours Clip-Stream framework divides the video into a Reference Clip and subsequent Source Clips, where each Source Clip is trained on top of the trained representation of the Reference Clip to ensure robust large-motion handling and temporal consistency. (b) ClipGStream achieves higher reconstruction quality on the 1,400-frame Long 360 dataset. Cross-clip residual heatmaps show effective flicker suppression. (c) ClipGStream further surpasses prior SOTA methods on the...*
-
-
 
 ### 3D 高斯泼溅基础
 
@@ -244,16 +231,6 @@ $$L_v = \sum_{i=1}^{M} \mathrm{Prod}(s_t^i)$$
 
 该正则化项抑制高斯过度膨胀，有助于提升渲染质量和训练稳定性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2604_13746/figures/003_Figure_3.jpg]]
-*Figure 3: (a)Static features*
-
-![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2604_13746/figures/004_Figure_4.jpg]]
-*Figure 4: Geometry-aware deduplication. (a) The points from the Reference Clip is converted into a spherical coverage field: for each point p, a sphere s is centered at p with radius set to the mean distance to its three nearest neighbors (computed via KNN). (b) Given the field and the Source Clip candidate anchors, residual anchors are selected based on their signed distance to the field surface. q1 (red box)*
-
-
-
 ## 实验与关键发现
 
 ### 主要结果
@@ -286,8 +263,6 @@ ClipGStream在多个公开基准和长序列场景上均取得了最优或极具
 
 3. **超长序列的存储与训练开销**：虽然Clip-Stream框架在原理上可扩展至任意长度，但论文未讨论数万帧级别超长序列下的存储开销（每个剪辑需保存独立STF参数）和训练时间优化。实时流式处理的可行性仍是一个开放问题。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2604_13746/figures/010_Figure_6.jpg]]
 *Figure 6: Qualitative results on Long 360 (1,400 frames; extreme motion amplitudes and long-sequence challenges) and VRU GZ [31] (complex dynamic interactions). Compared to 4DGaussian [29] and LocalDyGS [31], our method produces sharper renderings in both dynamic regions (e.g., athletes) and static areas (e.g., court floor), with more stable and temporally coherent reconstructions. Additional results are provided in the supplementary video and materials*
 
@@ -297,22 +272,11 @@ ClipGStream在多个公开基准和长序列场景上均取得了最优或极具
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2604_13746/figures/013_Table_5.jpg]]
 *Table 5: Ablation on Decoder Inheritance Module (DI) and Residual Anchors Compensation Module (RAC) in Long 360*
 
-![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2604_13746/figures/014_Table_6.jpg]]
-*Table 6: Experiments on two clip training strategies. Our method achieves superior objective quality. Experiments are carried out on the Long 360 dataset*
-
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2604_13746/figures/015_Figure_8.jpg]]
 *Figure 8: The Ablation study on decoder inheritance. (a) Without inheriting the decoder, the rendered image exhibits noticeable blurriness. In contrast, employing decoder inheritance yields clear details, as visualized in (b)*
 
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2604_13746/figures/005_Figure_5.jpg]]
 *Figure 5: The ablation study on the Residual Anchors Compensation Module (RAC) and the Anchors Inheritance Module (AI). As seen from the residual heatmaps between adjacent clips, removing either module leads to strong responses in static regions as shown in (a)(b)(c), while enabling them, as illustrated in (d), significantly suppresses flicker and preserves smooth clip transitions, which demonstrates that both components play essential roles in maintaining inter clip stability*
-
-![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2604_13746/figures/006_Table_1.jpg]]
-*Table 1: Quantitative comparison on Long 360 , which contains 1400 frames. Static methods are tested on frame 0*
-
-![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2604_13746/figures/007_Table_2.jpg]]
-*Table 2: Quantitative comparison on VRU (GZ) dataset [39]. Static methods are evaluated on frame 0 only, serving as an upperbound reference for dynamic reconstruction*
-
-
 
 ## 定位与知识库关联
 
@@ -366,8 +330,6 @@ ClipGStream 的训练流程由四个功能模块构成：
 5. **与基础模型的结合**：是否可以利用预训练视觉基础模型（如深度估计、光流、语义分割）来增强 COLMAP 初始化或指导残差锚点的选择？
 
 > **注意**：以上开放问题基于论文自身局限性的逻辑延伸，部分方向（如自由摄像机路径、自适应继承）尚未在论文中讨论，需结合后续研究进行验证。
-
-
 
 ## 原文 PDF
 

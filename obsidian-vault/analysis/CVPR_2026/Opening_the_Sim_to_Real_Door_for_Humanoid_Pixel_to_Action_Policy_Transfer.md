@@ -51,8 +51,6 @@ claims:
 
 在方法谱系上，DoorMan继承并拓展了教师-学生蒸馏范式（DAgger），引入分阶段重置以解决长周期特权探索难题，并通过GRPO实现学生策略的闭环自举优化。其底层全身控制器基于**Ben et al., 2025**的工作，与遥操作基线共享同一硬件平台，保证了对比的公平性。
 
-
-
 ### 问题背景：人形机器人全身操作中的视觉策略困境
 
 使人形机器人在真实世界中自主完成全身操作任务——例如开门——是机器人学中长期存在的挑战。这类任务要求机器人同时协调移动与精细操作，而纯视觉驱动的策略面临着三重根本性障碍：
@@ -82,8 +80,6 @@ claims:
 
 本文提出的**DoorMan**框架正是围绕这三个问题展开，通过分阶段重置探索、DAgger蒸馏与GRPO在线微调、以及程序化生成与视觉域随机化的组合，首次实现了纯视觉人形机器人开门策略在真实世界中的零样本迁移，且性能超越人类遥操作。
 
-
-
 ## 核心方法与创新机理
 
 DoorMan 的核心创新在于构建了一套从仿真特权教师到纯视觉学生、再到闭环自举微调的完整训练管线，系统性解决了人形机器人全身操作在部分可观测条件下的 sim-to-real 迁移难题。其创新点可归纳为三个关键的 **changed slots**：
@@ -108,8 +104,6 @@ sim-to-real 迁移的核心障碍之一是视觉分布的差异。DoorMan 构建
 
 **创新逻辑链总结**：分阶段重置使特权教师高效探索长周期操作 → DAgger 蒸馏将知识压缩至视觉学生 → GRPO 微调使学生在部分可观测条件下自主补偿 → 大规模视觉随机化确保策略对真实世界光照与材质的鲁棒性。三者协同，最终实现了 83% 的真实门操作成功率，与专家遥操作持平（80%），且任务完成时间快 23.8%。
 
-
-
 DoorMan 采用“教师-学生-自举”三阶段训练管线，在 IsaacLab 仿真环境中完成全部学习，最终产出仅依赖单目 RGB 图像与本体感知（关节位置、速度等）的全身操作策略，无需任何真实世界微调即可实现零样本 sim-to-real 迁移。
 
 **问题建模**：在 RGB 视觉条件下，人形机器人开门被建模为部分可观测马尔可夫决策过程（POMDP），定义为 $\mathcal{P} = (\mathcal{S}, \mathcal{A}, \mathcal{O}, T, \mathcal{R}, \mathcal{O}, \gamma, \rho_0)$，其中观测 $o \in \mathcal{O}$ 仅为部分状态信息，策略必须从历史观测中推断被遮挡的门把手位姿、接触力等关键隐变量。
@@ -131,15 +125,8 @@ DoorMan 采用“教师-学生-自举”三阶段训练管线，在 IsaacLab 仿
 
 **关键因果机制**：分阶段重置使教师高效探索长周期任务 → DAgger 将特权知识压缩至视觉学生 → GRPO 微调使学生自主补偿部分可观测性，三者协同实现了从仿真 RGB 策略到真实世界的零样本迁移。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1033_https_arxiv_org_abs_2512_01061/figures/003_Figure_2.jpg]]
 *Figure 2: DoorMan training pipeline. All phases are done interactively with IsaacLab. In Phase 1, we train a teacher policy with privileged observations. In Phase 2, we distill it into an RGB student policy using DAgger. In Phase 3, we further train the student policy with GRPO using a binary success signal*
-
-![[assets/figures/papers/paper_list_l1033_https_arxiv_org_abs_2512_01061/figures/001_Figure_1.jpg]]
-*Figure 1: DoorMan, a simulation-trained, RGB-only humanoid loco-manipulation policy, opens diverse, real-world doors*
-
-
 
 DoorMan 将人形机器人全身开门任务建模为部分可观测马尔可夫决策过程（POMDP）：
 
@@ -188,12 +175,8 @@ $$\mathrm{Track}(x, \mu, \sigma) = \exp\left(-(x - \mu)^2 / (2\sigma^2)\right)$$
 ![[assets/figures/papers/paper_list_l1033_https_arxiv_org_abs_2512_01061/figures/010_Table_2.jpg]]
 *Table 2: Reward components for door opening task*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1033_https_arxiv_org_abs_2512_01061/figures/004_Figure_3.jpg]]
 *Figure 3: Overview of the staged-reset exploration scheme. When entering a new stage, a snapshot of the simulation is cached into the buffer. When the task resets, the environment is randomly reset to a prior stage by loading from the cache*
-
-
 
 ## 实验与关键发现
 
@@ -276,19 +259,6 @@ DoorMan 的程序化生成管线（Figure 4）覆盖了物理与视觉两个维�
 - **分阶段重置缓冲区效果（1700 步收敛 vs 无缓冲区失败）**：证据强度高（置信度 0.95），有对比实验曲线（Figure 6b）。
 - **习得补偿行为（保持视野、修正位姿）**：论文给出了定性描述，但未提供定量消融来单独归因每种补偿行为的具体贡献，此点需要进一步验证。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1033_https_arxiv_org_abs_2512_01061/figures/006_Figure_5.jpg]]
-*Figure 5: Average performance on all door opening tasks. Left: success rate (the higher the better). Right: task fluency in terms of time taken to complete the door opening task (the lower the better)*
-
-![[assets/figures/papers/paper_list_l1033_https_arxiv_org_abs_2512_01061/figures/008_Figure_6.jpg]]
-*Figure 6: DoorMan training progress: (a) student GRPO bootstrapping and (b) teacher exploration under different staged-reset buffer sizes*
-
-![[assets/figures/papers/paper_list_l1033_https_arxiv_org_abs_2512_01061/figures/002_Figure_1.jpg]]
-*Figure 1: Real-world generalization of DoorMan. Top: diverse handle visuals and physical shapes. Middle: diverse wall panel visuals. Bottom: pushing and pulling open doors naturalistically*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 方法在领域中的位置
@@ -337,8 +307,6 @@ DoorMan 的当前设计适用于以下条件的任务场景：
 ### 5. 对后续工作的启示
 
 DoorMan 为视觉人形全身操作提供了三个可复用的技术锚点：**分阶段重置探索**解决长周期信用分配、**GRPO 在线微调**补偿部分可观测性、**极端视觉域随机化**实现零样本迁移。后续工作可沿以下方向推进：将分阶段重置机制自动化（减少人工阶段定义）、在更广泛的任务类别上验证 GRPO 微调的通用性、以及探索与大规模预训练视觉-语言-动作模型的融合路径。
-
-
 
 ## 原文 PDF
 

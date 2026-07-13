@@ -55,8 +55,6 @@ claims:
 
 **方法定位**：OFM属于基于连续传输建模的光流估计方法，其核心贡献在于将Flow Matching理论引入光流领域，并通过TVS策略解决了理论与实践的衔接问题。与RAFT（Teed and Deng, ECCV 2020）、GMFlow（Xu et al., CVPR 2022）、FlowFormer++（Shi et al., CVPR 2023）等基线方法相比，OFM在输出表示（速度场替代离散位移）、训练目标（条件流匹配损失替代L1/L2损失）和推断过程（迭代ODE求解替代单步前向传播）三个维度上实现了范式转变。
 
-
-
 光流估计是计算机视觉中的基础任务，旨在计算两帧图像之间像素级的稠密运动场。这一任务在视频理解、运动结构恢复、自动驾驶等应用中扮演着关键角色。然而，传统光流方法的核心范式存在一个根本性局限：它们将光流建模为**离散的像素对应关系**，即直接从图像对回归出一个位移场，而忽视了运动在物理世界中是由连续速度场驱动的动态演化过程。
 
 这种离散对应范式带来了两个层面的问题。首先，从物理本质上看，像素的运动并非瞬间完成，而是遵循某种连续轨迹——这一轨迹由底层速度场在时间维度上积分得到。传统方法直接预测位移，相当于跳过了中间的动力学过程，导致预测结果缺乏时序上的一致性。其次，从学习范式上看，现有主流方法——无论是基于迭代相关性的 **RAFT**（Teed and Deng, ECCV 2020）、基于全局匹配的 **GMFlow**（Xu et al., CVPR 2022），还是基于 Transformer 的 **FlowFormer++**（Shi et al., CVPR 2023）和高效变体 **SEA-RAFT**（Wang et al., ECCV 2024）——均采用 L1/L2 损失直接监督光流位移场，训练目标与运动的连续本质之间存在结构性错配。
@@ -64,8 +62,6 @@ claims:
 近年来，生成建模领域中的 **Flow Matching** 框架为连续传输问题提供了新的理论工具。Flow Matching 通过学习时间依赖的速度场，利用常微分方程（ODE）将样本从源分布连续传输到目标分布，在图像生成等任务中展现出强大的建模能力。这一框架的核心思想——用速度场驱动坐标的连续演化——与光流的物理本质高度契合，但如何将其从生成建模迁移到光流估计这一条件预测任务中，并解决由此带来的训练稳定性问题，是一个尚未被充分探索的方向。
 
 本文的核心动机正是弥合这一鸿沟：**将光流重新定义为连续传输动力学问题**，借助 Flow Matching 的理论框架，使光流估计从离散位移预测升维为物理一致的运动推理。
-
-
 
 ## 核心方法与创新机理
 
@@ -96,8 +92,6 @@ TVS 引入两条辅助概率路径 $\boldsymbol{y}_t$ 和 $\boldsymbol{z}_t$，�
 $$\boldsymbol{v}_t(\boldsymbol{x}_t \mid \boldsymbol{x}_1) = \boldsymbol{v}_t(\boldsymbol{y}_t \mid \boldsymbol{x}_1) - \boldsymbol{v}_t(\boldsymbol{z}_t \mid \boldsymbol{x}_0)$$
 
 其中 $\boldsymbol{y}_t = t\boldsymbol{x}_1 + (1-t)\boldsymbol{x}_i$，$\boldsymbol{z}_t = t\boldsymbol{x}_0 + (1-t)\boldsymbol{x}_i$，$\boldsymbol{x}_i$ 为初始坐标，$\boldsymbol{x}_l$ 由全局流预测分支提供作为可学习的参考点。这一分解使网络只需预测两个更易学习的速度项，同时保持了 Flow Matching 的理论保证。消融实验强有力地验证了 TVS 的必要性：OFM-Naive 训练崩溃，而加入 TVS 后性能大幅提升（Table 3）。
-
-
 
 Optical Flow Matching (OFM) 将传统的光流估计从离散位移回归重新定义为**连续传输动力学问题**。其核心 pipeline 由三个关键模块串联构成：特征提取与条件化、时间依赖速度场预测、以及基于 ODE 的坐标演化。
 
@@ -144,13 +138,6 @@ $$\mathbf{v}_t(\mathbf{x}_t \mid \mathbf{x}_1) = \mathbf{v}_t(\mathbf{y}_t \mid 
 ### 端到端数据流
 
 整体数据流可总结为：**图像对 → 特征提取 → 速度场参数化 → ODE 坐标传输 → 位移输出**。这一设计将光流估计从单步前向传播转变为多步物理推理过程，使位移由底层运动动态自然产生，而非直接回归。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2071_https_openaccess_thecvf_com_content_CVPR2026_html_Luo_Optical_Flow_Match/figures/001_Figure_1.jpg]]
-*Figure 1: Idea Illustration. Optical Flow Matching (OFM) reframes optical flow as a continuous transport process, where a learned velocity field*
-
-
 
 ### 问题重定义：从离散位移到连续传输
 
@@ -218,9 +205,6 @@ $$v_{t}(\boldsymbol{x}_{t} \mid \boldsymbol{x}_{1}) = v_{t}(\boldsymbol{y}_{t} \
 
 该分解将理论目标速度转化为**可学习的代理速度**与**校正项**的组合（Figure 3）。训练时直接监督预测速度 $\hat{\mathbf{v}}_t$，推理时通过 TVS 关系转换为积分所需的速度 $\mathbf{v}_t$。这一策略调和了 Flow Matching 的理论保证与光流网络的训练目标，使模型能够直接使用标准光流真值 $\mathbf{f}_{gt}$ 进行监督。
 
-![[assets/figures/papers/paper_list_l2071_https_openaccess_thecvf_com_content_CVPR2026_html_Luo_Optical_Flow_Match/figures/003_Figure_3.jpg]]
-*Figure 3: Difference between OFM-Naive (a) and OFM-TVS (b). OFM-TVS replaces the single perturbed velocity in OFM-Naive with a geometrically consistent triangular decomposition*
-
 ### 训练与推理流程
 
 **训练阶段**（Algorithm 1 核心步骤）：
@@ -234,8 +218,6 @@ $$v_{t}(\boldsymbol{x}_{t} \mid \boldsymbol{x}_{1}) = v_{t}(\boldsymbol{y}_{t} \
 3. 最终光流 $\mathbf{f}_{\text{pred}} = \mathbf{x}_{\text{pred}} - \mathbf{x}_i$
 
 > 注：公式编号沿用原文标记，具体推导细节建议核对原文 Section 3.2 及 Algorithm 1。
-
-
 
 ## 实验与关键发现
 
@@ -282,8 +264,6 @@ OFM 采用 **Twins-SVT** 作为特征编码器，在标准光流数据集上进�
 
 需要注意的是，论文未提供 OFM 在极端运动遮挡、大位移或光照剧变等特定失败场景下的系统分析，这些场景下的鲁棒性需要手动验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2071_https_openaccess_thecvf_com_content_CVPR2026_html_Luo_Optical_Flow_Match/figures/005_Table_1.jpg]]
 *Table 1: Quantitative Results on Standard Benchmarks. We compare OFM against leading two-frame methods using official metrics, and average ranks are reported for overall comparison. Best and second-best results are shown in bold and underline, respectively*
 
@@ -292,11 +272,6 @@ OFM 采用 **Twins-SVT** 作为特征编码器，在标准光流数据集上进�
 
 ![[assets/figures/papers/paper_list_l2071_https_openaccess_thecvf_com_content_CVPR2026_html_Luo_Optical_Flow_Match/figures/008_Table_3.jpg]]
 *Table 3: Ablation Study. The default settings are marked in bold. 1-NFE means a single function evaluation, i.e., one-step sampling*
-
-![[assets/figures/papers/paper_list_l2071_https_openaccess_thecvf_com_content_CVPR2026_html_Luo_Optical_Flow_Match/figures/009_Table_4.jpg]]
-*Table 4: Parameter and Runtime Comparison. The reported time is for processing KITTI images with size of 376 × 1248*
-
-
 
 ## 定位与知识库关联
 
@@ -352,8 +327,6 @@ OFM-TVS框架存在以下适用边界：
 - **求解器-网络协同设计**：当前欧拉求解器与速度场网络是分离设计的，是否存在端到端优化的求解器结构，能够根据图像内容自适应调整积分步长？
 - **多帧扩展的自然路径**：OFM的连续传输框架天然支持多帧输入（将时间轴从两帧扩展到多帧），这一方向尚未被探索，可能进一步弥合两帧方法与多帧方法之间的性能差距。
 - **物理先验的进一步注入**：TVS的三角分解本质上是一种几何先验，是否存在其他形式的物理先验（如流体力学约束）可以进一步增强速度场学习的合理性？
-
-
 
 ## 原文 PDF
 

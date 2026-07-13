@@ -52,8 +52,6 @@ claims:
 
 **方法定位**：UniEgoMotion 属于条件扩散运动生成方法族，与现有第一人称运动重建/预测工作（AvatarPoser、EgoEgo、EgoAllo）相比，其差异化在于统一任务框架、强视觉骨干与头部中心运动表示的协同设计。该方法弥合了第一人称视觉输入与 3D 运动合成之间的根本性鸿沟，为后续场景‑运动交互建模和文本驱动生成奠定了基础。
 
-
-
 ### 第一人称 3D 运动理解的现实需求
 
 头戴式摄像头（如智能眼镜、AR/VR 头显）的普及正在催生对第一人称（egocentric）3D 人体运动理解技术的迫切需求。与传统的第三人称运动捕捉不同，第一人称视角下的运动重建、预测与生成面临独特的挑战：输入信号来自佩戴者自身的视觉传感器和惯性测量单元（IMU），而非外部固定相机。这种设置使得系统必须从有限的、以自我为中心的观察中推断完整的全身 3D 运动。
@@ -73,8 +71,6 @@ claims:
 上述瓶颈本质上源于一个更深层的架构缺陷：现有方法将重建、预测和生成视为三个独立任务，分别设计专用模型。这种分离式范式不仅效率低下，更关键的是割裂了场景理解与运动合成之间的内在联系——重建任务中习得的场景-运动关联无法迁移到生成任务中，反之亦然。
 
 UniEgoMotion 的核心动机在于：**通过统一的扩散模型训练框架，将条件掩码策略与强视觉骨干相结合，使单一模型能够灵活适配重建、预测和生成三种任务；同时引入头部中心的运动表示，从根本上弥合第一人称视觉输入与 3D 运动合成之间的鸿沟。** 具体而言，训练时随机将条件输入（图像、轨迹）替换为可学习掩码令牌，模拟从完全观察到完全缺失的条件谱系；推理时使用掩码令牌填补缺失输入，实现单模型三任务的一致推理。在表示层面，将头部 SE(3) 变换投影至地板建立规范参考系，轨迹编码为帧间残差，体态编码为相对于该参考系的局部信息——这种设计不仅与头戴设备输入天然对齐，还通过地板投影正则化显式增强了运动的物理合理性。
-
-
 
 ## 核心方法与创新机理
 
@@ -111,8 +107,6 @@ UniEgoMotion 将运动表示重构为**头部中心**的两分量分解（Figure
 ### 需要人工验证的边界
 
 分析中部分 baseline 方法（如 AvatarPoser、EgoEgo）的具体技术细节未在提供材料中充分展开，上述对比主要基于 UniEgoMotion 论文报告的数值。若需精确评估各创新点的独立贡献权重，建议对照原始 baseline 论文进行交叉验证。
-
-
 
 UniEgoMotion 构建了一个以 Transformer 解码器为核心的条件扩散模型，将第一人称图像与头戴设备轨迹作为条件信号，统一处理运动重建、预测与生成三大任务。整体 pipeline 围绕“噪声运动→条件去噪→干净运动”的扩散范式展开，并通过随机掩码策略实现单模型多任务适配。
 
@@ -159,16 +153,6 @@ pipeline 由四个关键模块串联构成：
 ### 数据流总结
 
 完整的推理数据流为：第一人称图像经 DINOv2 编码器提取场景特征，与头戴设备轨迹特征一同作为条件信号；噪声运动序列进入 Transformer 解码器，通过交叉注意力融合条件信息，经迭代去噪逐步恢复为干净运动；最终通过头部中心表示模块将预测的 SMPL-X 参数转换为物理合理的 3D 人体运动。这一端到端的条件扩散框架将场景感知、运动先验与任务统一性有机整合，为第一人称运动合成提供了完整的计算管道。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1884_A_Unified_Model_for_Egocentric_Motion_Reconstruction_Forecasting_and_Gen/figures/002_Figure_2.jpg]]
-*Figure 2: Overview of a denoising step in UniEgoMotion. The input noisy motion*
-
-![[assets/figures/papers/paper_list_l1884_A_Unified_Model_for_Egocentric_Motion_Reconstruction_Forecasting_and_Gen/figures/001_Figure_1.jpg]]
-*Figure 1: UniEgoMotion is a unified, scene-aware motion model designed for egocentric settings: (1) It generates plausible future motion from a single egocentric image – for example, predicting how you might take your shot on goal. (2) It forecasts upcoming motion using past egocentric video and ego-device trajectory, showing how you could complete your run-up to score. (3) It reconstructs accurate 3D motion from past egocentric observations, showing how you squatted down to reach the lower cabinet*
-
-
 
 ### 3.1 条件扩散模型基础
 
@@ -222,13 +206,6 @@ $$\hat{\boldsymbol X}_{1:N} \gets \mathrm{concat}(\boldsymbol X_{1:n}, \hat{\bol
 
 去噪网络采用 Transformer 解码器架构，以噪声运动序列 $\boldsymbol X_{1:N}^t$ 为输入，通过自注意力建模时序依赖，交叉注意力融合轨迹特征 $\boldsymbol T_{1:N}$ 和图像特征 $\boldsymbol I_{1:N}$，并结合扩散时间步嵌入，预测干净运动序列。消融实验证实解码器架构优于编码器架构和 1D U-Net（重建 MPJPE 下降约 0.015–0.045），表明自回归形式的解码器更适合运动序列的去噪建模。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1884_A_Unified_Model_for_Egocentric_Motion_Reconstruction_Forecasting_and_Gen/figures/010_Figure_7.jpg]]
-*Figure 7: Our egocentric motion representation decomposes motion into two components: (1) the egocentric trajectory projected onto the floor by removing pitch, roll, and height, and (2) the body pose relative to this projected egocentric trajectory*
-
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -273,9 +250,6 @@ Figure 4 的预测定性对比显示，LSTM 基线倾向于预测“平均化”
 ![[assets/figures/papers/paper_list_l1884_A_Unified_Model_for_Egocentric_Motion_Reconstruction_Forecasting_and_Gen/figures/005_Figure_4.jpg]]
 *Figure 4: Qualitative comparison of Egocentric Forecasting for predicting future motion using the first 2 seconds of egocentric video and trajectory input. The LSTM baseline predicts an average future motion and suffers from foot sliding, while the Two-stage baseline produces damped motion. In contrast, our model successfully predicts complex motions, such as squatting down to repair a bike tire (top), performing a salsa dance (middle), and executing a dribbling drill around a dome cone (bottom)*
 
-![[assets/figures/papers/paper_list_l1884_A_Unified_Model_for_Egocentric_Motion_Reconstruction_Forecasting_and_Gen/figures/007_Figure_5.jpg]]
-*Figure 5: Qualitative comparison of Egocentric Motion Generation from a single egocentric image input. Compared to the LSTM and Twostage baseline, our model leverages the fine-grained image features for more accurate motion generation, demonstrating soccer juggling (top), a basketball shooting drill (middle), and interaction with the lower cabinet on the left side of the person*
-
 ### 消融实验：架构选择与表示设计的因果验证
 
 **Table 1（下）** 系统消融了 UniEgoMotion 的核心设计选择：
@@ -301,12 +275,8 @@ Figure 4 的预测定性对比显示，LSTM 基线倾向于预测“平均化”
 4. **数据标注噪声**：EE4D‑Motion 的伪真值通过多视角拟合获得，复杂遮挡或远距离场景下可能存在标注噪声，影响模型在这些场景下的性能上限。
 5. **推理效率**：扩散模型需要迭代去噪步骤，推理速度相对较慢，文中未探讨蒸馏或少量扩散步等加速策略。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1884_A_Unified_Model_for_Egocentric_Motion_Reconstruction_Forecasting_and_Gen/figures/009_Table_3.jpg]]
 *Table 3: Ablation on Conditioning Inputs: We evaluate UniEgoMotion in two ablation settings–without video and without trajectory input. Additionally, we train two single-modality variants of UniEgoMotion by conditioning only on trajectory or only on video*
-
-
 
 ## 定位与知识库关联
 
@@ -345,8 +315,6 @@ UniEgoMotion 的统一训练策略——随机将条件输入替换为可学习�
 3. **极端头部运动下的表示鲁棒性**：头部中心表示在极端头部运动（如翻滚）时，移除俯仰/翻滚角是否会丢失关键信息？如何自适应地保留必要自由度？
 4. **推理效率**：扩散模型推理速度相对较慢，是否有更高效的生成策略（如蒸馏、减少扩散步数）以支持实时应用？
 5. **场景合理性评估指标**：除现有语义相似度外，如何定量评估生成运动的“场景合理性”？是否需要引入物理仿真验证或接触一致性等新指标？
-
-
 
 ## 原文 PDF
 

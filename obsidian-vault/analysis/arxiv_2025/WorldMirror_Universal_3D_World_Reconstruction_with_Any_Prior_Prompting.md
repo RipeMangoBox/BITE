@@ -55,8 +55,6 @@ WorldMirror 针对上述瓶颈，提出了一种**多模态先验提示（Multi-
 
 **主要局限**：模型在动态场景和自动驾驶环境中的性能欠佳，且当前实现受限于输入视图数量和分辨率（300–700 像素），难以处理数千视图的极端情况。
 
-
-
 ### 问题背景
 
 从多视角图像中恢复三维几何结构是计算机视觉的核心任务，涵盖点云重建、深度估计、相机位姿估计、表面法线预测以及新视图合成等多个子方向。近年来，前馈式三维重建方法凭借其推理速度快、无需逐场景优化的优势，逐渐成为该领域的研究热点。然而，现有方法在输入灵活性和任务覆盖范围上存在明显局限，制约了其在复杂场景下的泛化能力。
@@ -78,8 +76,6 @@ WorldMirror 针对上述瓶颈，提出了一种**多模态先验提示（Multi-
 2. **通用几何预测框架**：在单一模型中同时支持点云、深度图、相机参数、表面法线和三维高斯泼溅（3DGS）五种几何输出。这使得不同任务之间可以共享底层几何表征，并通过组合损失函数实现端到端联合优化。
 
 这一设计实现了双重优势：在无可利用先验时，多任务架构本身已能提供具有竞争力的几何预测；当先验可用时，模型可进一步吸收这些信息以显著提升精度。实验表明，无先验的 WorldMirror 在 7-Scenes 和 DTU 上的点云重建精度分别比 VGGT 和 π3 提升 10.4% 和 17.8%；当利用全部三种先验时，平均精度进一步提升 58.1%（7-Scenes）和 53.1%（NRGBD），验证了框架的有效性。
-
-
 
 ## 核心方法与创新机理
 
@@ -119,8 +115,6 @@ WorldMirror的深层洞察在于：**将点云、深度、相机、法线和3D�
 ### 待验证的开放问题
 
 课程学习策略中任务序列、数据调度和分辨率渐进的具体配比细节尚未完全公开，其对最终性能的贡献量级需要进一步实验验证。此外，单令牌嵌入在极端旋转或大尺度场景下是否会产生全局位置信息的歧义，仍需深入分析。
-
-
 
 WorldMirror 的核心设计理念是将异构几何先验统一编码到前馈 Transformer 主干中，使单一模型能够灵活接受任意先验组合，并同时输出点云、深度、相机参数、表面法线和三维高斯（3DGS）五种几何表示。其整体流水线如图 2 所示，包含三个关键阶段：**多模态先验嵌入**、**视觉 Transformer 聚合**和**通用几何预测**。
 
@@ -166,12 +160,8 @@ $$\mathcal{L} = \mathcal{L}_{points} + \mathcal{L}_{depth} + \mathcal{L}_{cam} +
 
 其中 $\mathcal{L}_{points}$ 包含基于梯度和不确定性的监督，$\mathcal{L}_{cam}$ 为 Huber 损失，$\mathcal{L}_{normal}$ 为角度损失，$\mathcal{L}_{3dgs}$ 包含 RGB 渲染损失（L1 + LPIPS）和梯度一致性损失以抑制浮动点（详见 Appendix A.1）。表面法线监督采用混合策略，同时利用标注数据集和从深度图通过平面拟合生成的伪法线标签，克服了真值法线标注数据稀缺的限制。
 
-### 补充图表
-
 ![[assets/figures/papers/WorldMirror_Universal_3D_World_Reconstruction_with_Any-Prior_Prompting_f8b2dfa3e8ff/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of WorldMirror. Given multi-view images with optional priors (depths, calibrated intrinsics, camera poses) as input, our framework encodes each prior modality into tokens and integrates them with image tokens. The composite tokens are subsequently processed by a visual transformer backbone to effectively aggregate multi-view features. The consolidated representations are then passed to multi-task heads to generate comprehensive geometric outputs, including point maps, camera parameters, multi-view depth maps, surface normals, and 3D Gaussians*
-
-
 
 WorldMirror的核心架构由两个关键模块构成：**多模态先验提示（Multi-Modal Prior Prompting）** 和 **通用几何预测（Universal Geometric Prediction）**，二者共同实现从任意先验组合到统一几何输出的前馈推理。
 
@@ -237,19 +227,6 @@ $$\mathcal{L} = \lambda_{\mathrm{points}} \mathcal{L}_{\mathrm{points}} + \lambd
 
 3. **混合法线监督**：由于法线标注数据稀缺，除标注数据集外，还通过平面拟合从真值深度图生成伪法线进行监督，扩展了训练信号来源。
 
-### 补充图表
-
-![[assets/figures/papers/WorldMirror_Universal_3D_World_Reconstruction_with_Any-Prior_Prompting_f8b2dfa3e8ff/figures/010_Figure_5.jpg]]
-*Figure 5: Geometric Priors Unlock Enhanced Scene Reconstruction of WorldMirror. (Top) Camera poses help the model to capture relative view positions accurately. (Middle) Calibrated intrinsic enhances the reconstruction by enabling precise projection modeling and geometry alignment. (Bottom) Depth guidance enables the network to better handle challenging reconstruction scenarios, like perspective distortion, unusual geometric configurations, or partial occlusions*
-
-![[assets/figures/papers/WorldMirror_Universal_3D_World_Reconstruction_with_Any-Prior_Prompting_f8b2dfa3e8ff/figures/011_Figure_6.jpg]]
-*Figure 6: Geometric Priors Boosts Model’s Feed-Forward Performance across All Tasks. Incorporating a single modality not only enhances predictions for its corresponding task but also improves performance across other tasks. This suggests that modal information enables the model to develop a more comprehensive understanding of the overall geometry*
-
-![[assets/figures/papers/WorldMirror_Universal_3D_World_Reconstruction_with_Any-Prior_Prompting_f8b2dfa3e8ff/figures/001_Figure_1.jpg]]
-*Figure 1: WorldMirror is a large feed-forward 3D reconstruction model that takes raw images along with optional priors (depth, calibrated intrinsics, camera pose) as input and produces high-quality geometric attributes in seconds, including point clouds, 3DGS, cameras, depth, and normal maps*
-
-
-
 ## 实验与关键发现
 
 ### 瓶颈突破验证：多模态先验提示的因果效应
@@ -310,21 +287,8 @@ WorldMirror的核心主张是多模态先验提示（Multi-Modal Prior Prompting
 ![[assets/figures/papers/WorldMirror_Universal_3D_World_Reconstruction_with_Any-Prior_Prompting_f8b2dfa3e8ff/figures/008_Figure_4.jpg]]
 *Figure 4: Qualitative Comparisons of Novel View Synthesis. We compare with FLARE and AnySplat on RealEstate10K and DL3DV. The first four columns correspond to the sparse-view setting, while the latter three correspond to the dense-view setting. Our approach surpasses baselines in both appearance fidelity and geometric perception*
 
-### 补充图表
-
 ![[assets/figures/papers/WorldMirror_Universal_3D_World_Reconstruction_with_Any-Prior_Prompting_f8b2dfa3e8ff/figures/004_Table_1.jpg]]
 *Table 1: Point map Reconstruction on 7-Scenes, NRGBD, and DTU. We report the performance of WorldMirror under different input configurations. The best results are bold*
-
-![[assets/figures/papers/WorldMirror_Universal_3D_World_Reconstruction_with_Any-Prior_Prompting_f8b2dfa3e8ff/figures/005_Table_2.jpg]]
-*Table 2: Camera Pose Estimation on RealEstate10K, Sintel, and TUM-dynamics. All datasets are excluded from the training set, except that RealEstate10K was included for CUT3R training*
-
-![[assets/figures/papers/WorldMirror_Universal_3D_World_Reconstruction_with_Any-Prior_Prompting_f8b2dfa3e8ff/figures/006_Table_3.jpg]]
-*Table 3: Surface Normal Estimation on ScanNet, NYUv2, and iBims-1. We compare with both regression-based and diffusion-based surface normal estimation approaches. EESNU is trained on ScanNet, thus its in-domain performance is omitted*
-
-![[assets/figures/papers/WorldMirror_Universal_3D_World_Reconstruction_with_Any-Prior_Prompting_f8b2dfa3e8ff/figures/007_Table_4.jpg]]
-*Table 4: Novel View Synthesis on RealEstate10K and DL3DV. We compare with feed-forward 3DGS methods under sparse and dense-view settings. FLARE focuses on sparse views NVS and thus its performance under dense-view settings is omitted*
-
-
 
 ## 定位与知识库关联
 
@@ -372,8 +336,6 @@ WorldMirror 处于前馈三维重建、多任务几何预测和视觉提示学�
 - **前馈新视图合成**：与 AnySplat、FLARE 对比
 - **统一几何预测**：作为首个覆盖五项几何任务的通用模型，为后续多任务统一框架提供参考
 - **先验引导的视觉学习**：多模态先验提示机制可迁移至其他需要融合异构输入的视觉任务
-
-
 
 ## 原文 PDF
 

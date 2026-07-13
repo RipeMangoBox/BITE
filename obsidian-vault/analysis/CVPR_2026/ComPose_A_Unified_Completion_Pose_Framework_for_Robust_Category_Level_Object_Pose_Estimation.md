@@ -51,8 +51,6 @@ ComPose的核心洞察是：**将形状补全作为任务驱动的内部组件�
 
 在方法谱系上，ComPose区别于**GPV-Pose**（Di et al., CVPR 2022）的几何引导投票、**SPD**（Tian et al., ECCV 2020）的形状先验变形、**SecondPose**（Chen et al., CVPR 2024）的DINOv2双流融合以及**GCE-Pose**（Li et al., CVPR 2025）的全局上下文增强——这些方法均未在统一的端到端框架内显式恢复并利用完整几何。ComPose在REAL275和HouseCat6D两个基准上均取得领先结果，同时验证了其在严重遮挡场景下的鲁棒性优势。
 
-
-
 类别级物体姿态估计旨在从单张RGB-D或深度图像中预测未知实例在规范空间中的6D姿态（3D旋转与3D平移）。与实例级方法不同，类别级估计必须泛化到训练中未见过的物体实例，因此对模型从有限观测中推断完整物体几何的能力提出了极高要求。
 
 ### 部分观测带来的几何不完整性瓶颈
@@ -70,8 +68,6 @@ ComPose的核心洞察是：**将形状补全作为任务驱动的内部组件�
 ### 本文动机：统一框架中的任务驱动形状补全
 
 基于上述分析，本文的核心动机是：**将形状补全作为任务驱动的内部组件，紧密集成到统一的姿态估计网络中**，而非将其视为独立的预处理步骤。通过这种方式，补全过程能够直接服务于姿态估计目标，从部分观测中恢复完整几何表示，为后续的姿态推理提供全面的结构线索。同时，统一框架的设计消除了分离式流水线的额外计算开销和累积误差风险，有望在精度和效率之间取得更好的平衡。
-
-
 
 ## 核心方法与创新机理
 
@@ -109,8 +105,6 @@ ComPose 的统一框架从根本上解决了这一问题。它将形状补全和
 
 消融实验进一步验证了各创新模块的贡献：将完整形状补全替换为仅重建可见区域的策略，5°2cm 指标骤降 6.0 个百分点；移除几何关系编码模块后，5°2cm 下降 6.1 个百分点；移除几何关系一致性损失后，5°2cm 下降 1.8 个百分点。这些结果一致表明，完整几何恢复与显式几何关系建模是性能提升的核心驱动力。
 
-
-
 ComPose 是一个支持 RGB-D 与纯深度两种输入模式的统一框架，其核心设计理念是将形状补全作为任务驱动的内部组件紧密嵌入姿态估计网络，而非作为独立的预处理步骤。如 Figure 3 所示，整个流水线由四个功能模块串联构成：**部分特征提取**、**基于关键点的渐进式补全**、**几何关系编码**以及**基于对应的姿态估计**。
 
 ![[assets/figures/papers/paper_list_l2027_https_openaccess_thecvf_com_content_CVPR2026_html_Ren_ComPose_A_Unified/figures/003_Figure_3.jpg]]
@@ -131,8 +125,6 @@ ComPose 是一个支持 RGB-D 与纯深度两种输入模式的统一框架，�
 ### 端到端联合优化
 
 整个框架以端到端方式联合优化，总损失函数由补全损失、关键点得分损失、对应损失和几何关系一致性损失加权求和构成（权重分别为 $\lambda^{\mathrm{com}}=15$、$\lambda^{\mathrm{score}}=1$、$\lambda^{\mathrm{corr}}=2$、$\lambda^{\mathrm{geo}}=1$）。其中几何关系一致性损失（Equation 16）通过约束观测空间与规范 NOCS 空间中的成对距离矩阵保持一致，强制网络学习高阶结构对齐，这是保证坐标变换鲁棒性的关键设计。
-
-
 
 ComPose 框架由四个紧密耦合的模块构成：部分特征提取、基于关键点的渐进式补全、几何关系编码，以及基于对应的姿态估计。本节聚焦于前三个核心模块的关键设计与公式。
 
@@ -190,15 +182,11 @@ $$\mathcal{L}^{\mathrm{geo}} = \frac{1}{N^{\mathrm{kpt}} \times N^{\mathrm{kpt}}
 
 这一高阶结构监督信号与逐点对应损失互补，强制网络在预测 NOCS 坐标时保持物体各部分之间的相对几何关系不变，从而提升姿态估计对严重遮挡和几何不完整场景的鲁棒性。消融实验表明，移除该损失后 5°2cm 指标从 55.6 降至 53.8，降幅 1.8 个百分点，验证了其有效性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2027_https_openaccess_thecvf_com_content_CVPR2026_html_Ren_ComPose_A_Unified/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of geometric representation strategies in category-level object pose estimation. (a) Classic methods directly encode geometric features from partial point clouds, which limits their ability to capture complete object structures. (b) Prior-based approaches resort to category-level shape priors [31] to enhance feature understanding of full object shapes, yet they still operate on incomplete geometries. (c) Our method explicitly integrates shape completion to recover complete geometries, facilitating more comprehensive and robust pose reasoning*
 
 ![[assets/figures/papers/paper_list_l2027_https_openaccess_thecvf_com_content_CVPR2026_html_Ren_ComPose_A_Unified/figures/009_Figure_4.jpg]]
 *Figure 4: Visualization of the keypoint-based progressive completion. Complete object geometries are progressively recovered*
-
-
 
 ## 实验与关键发现
 
@@ -247,33 +235,11 @@ $$\mathcal{L}^{\mathrm{geo}} = \frac{1}{N^{\mathrm{kpt}} \times N^{\mathrm{kpt}}
 
 综合实验结果表明，ComPose 通过将形状补全紧密集成到姿态估计网络中，有效突破了部分点云几何不完整性的瓶颈。其性能增益主要来源于三个机制：完整几何恢复提供了全局结构约束，几何关系编码增强了关键点的局部-全局上下文感知，几何一致性损失强化了跨空间的结构对齐。然而，在 RGB-D 模式下与纯语义增强方法的差距缩小，提示多模态融合策略仍有优化空间。此外，当前框架依赖关键点数量作为超参数，如何在减少关键点依赖的同时保持精度与效率，仍是待探索的开放问题。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2027_https_openaccess_thecvf_com_content_CVPR2026_html_Ren_ComPose_A_Unified/figures/004_Table_1.jpg]]
 *Table 1: Performance comparison with state-of-the-art methods on the REAL275 dataset. The method marked with ‘*’ is reproduced by us. “Prior” refers to shape priors [31]. For each data setting, the best results are in bold, and the second best results are underlined*
 
-![[assets/figures/papers/paper_list_l2027_https_openaccess_thecvf_com_content_CVPR2026_html_Ren_ComPose_A_Unified/figures/002_Figure_2.jpg]]
-*Figure 2: Accuracy and inference speed comparison for the depthonly versions of different methods. The dashed circle indicates the performance upper bound achieved using ground-truth complete point clouds as input. Our ComPose achieves the best balance between accuracy and efficiency with 38.4 FPS on an RTX3090Ti GPU. More implementation details are provided in Section 4.3*
-
 ![[assets/figures/papers/paper_list_l2027_https_openaccess_thecvf_com_content_CVPR2026_html_Ren_ComPose_A_Unified/figures/008_Table_5.jpg]]
 *Table 5: Ablation studies on the shape completion strategy. “Partial Instance” indicates reconstructing only visible object regions*
-
-![[assets/figures/papers/paper_list_l2027_https_openaccess_thecvf_com_content_CVPR2026_html_Ren_ComPose_A_Unified/figures/011_Table_7.jpg]]
-*Table 7: Ablation studies on the geometric relation modeling*
-
-![[assets/figures/papers/paper_list_l2027_https_openaccess_thecvf_com_content_CVPR2026_html_Ren_ComPose_A_Unified/figures/007_Table_4.jpg]]
-*Table 4: Performance comparison of different depth-only methods under occlusion-augmented testing on the REAL275 dataset*
-
-![[assets/figures/papers/paper_list_l2027_https_openaccess_thecvf_com_content_CVPR2026_html_Ren_ComPose_A_Unified/figures/012_Figure_5.jpg]]
-*Figure 5: Qualitative comparison between our ComPose and AG-Pose [15]. Red/Green indicates the predicted/GT results*
-
-![[assets/figures/papers/paper_list_l2027_https_openaccess_thecvf_com_content_CVPR2026_html_Ren_ComPose_A_Unified/figures/010_Table_6.jpg]]
-*Table 6: Ablation studies on the progressive completion process, where*
-
-![[assets/figures/papers/paper_list_l2027_https_openaccess_thecvf_com_content_CVPR2026_html_Ren_ComPose_A_Unified/figures/006_Table_3.jpg]]
-*Table 3: Reconstruction performance comparisons for the camera category on the REAL275 dataset, measured using Chamfer Distance*
-
-
 
 ## 定位与知识库关联
 
@@ -323,8 +289,6 @@ ComPose 与基线方法 **AG-Pose** 在四个关键设计维度上存在本质�
 - **跨任务泛化能力**：所提出的统一补全-姿态框架的核心思想——将任务驱动的几何补全集成到下游任务中——能否推广至其他 3D 视觉任务（如机器人抓取、场景补全），仍需进一步验证。
 
 - **弱监督/自监督训练**：当前方法依赖完整的 CAD 模型和强监督信号进行形状补全训练。在没有 CAD 模型或强监督的情况下，如何实现类别级形状补全与姿态估计的弱监督或自监督训练，是推动该方法走向真实开放场景的关键挑战。
-
-
 
 ## 原文 PDF
 

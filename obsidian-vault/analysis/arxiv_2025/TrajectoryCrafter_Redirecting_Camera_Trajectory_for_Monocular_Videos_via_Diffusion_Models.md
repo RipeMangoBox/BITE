@@ -207,8 +207,6 @@ TrajectoryCrafter的主要失败模式源于深度估计模块的误差传播。
 
 评估设计兼顾了公平性与全面性：同时采用有参考指标（PSNR/SSIM/LPIPS）和无参考指标（VBench七项），覆盖重建式和生成式两大类代表性基线。iPhone数据集遵循Shape-of-motion的既定评估协议。需注意部分基线（ViewCrafter、Shape-of-motion）为arXiv预印本，尚未经过同行评审；in-the-wild基准为自行构建，非标准公开基准。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l96_https_arxiv_org_abs_2503_05638/figures/006_Table_1.jpg]]
 *Table 1: Quantitative comparison of novel trajectory video synthesis. We report the PSNR, SSIM, and LPIPS metrics for each scene and the mean values across all scenes on the multi-view dataset, iphone [23]. The best results are highlighted in bold*
 

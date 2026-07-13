@@ -57,8 +57,6 @@ DSFlash的核心洞察在于**将分割与关系预测的特征提取统一到�
 
 实验验证表明，统一骨干网络是最有效的单项延迟优化手段（延迟降至41ms），门控双向预测则在不增加延迟的前提下将mR@50从25.0恢复至28.8，有效补偿了骨干替换带来的精度损失。在RTX 3090上，DSFlash可实现56 FPS的视频流处理速度，训练在GTX 1080上不超过24小时即可完成。
 
-
-
 ### 全景场景图生成的任务定义
 
 全景场景图生成（Panoptic Scene Graph Generation, PSGG）旨在从单张图像中同时完成两项任务：对所有实例进行像素级定位（全景分割），并对任意两个实例之间的语义关系进行分类。与传统的场景图生成（Scene Graph Generation, SGG）仅关注边界框级别的目标检测和关系预测不同，PSGG要求输出包含精确分割掩码的全景场景图，这使得该任务在具身智能、视觉问答和细粒度视觉理解等下游应用中具有更高的实用价值。
@@ -86,8 +84,6 @@ DSFlash的设计源于一个关键观察：**分割阶段已经产生的特征�
 基于这一洞察，DSFlash提出了一套协同优化策略：**(1)** 将分割与关系预测的特征提取统一到单一冻结的EoMT骨干网络中，仅执行一次图像级前向传播；**(2)** 设计门控双向关系预测机制，在单次Transformer前向传播中同时输出两个方向的关系预测；**(3)** 基于掩码重叠率动态剪枝与主体和客体均无重叠的背景patch token，进一步压缩计算量。
 
 这三个设计相互协同：统一骨干网络消除了最耗时的重复特征提取，门控双向预测将关系分类的计算量减半，动态patch剪枝则根据每对掩码的空间分布自适应地减少处理token数量。通过消融实验（Table 2），DSFlash验证了每个优化模块的独立贡献——统一骨干网络将延迟从98ms降至41ms（降幅58%），门控双向预测进一步将延迟压缩至29ms，同时将因骨干替换而下降的mR@50从25.0恢复至28.8，接近原始DSFormer的性能水平。最终，DSFlash-L在PSG数据集上以仅50ms延迟达到30.90 mR@50，超越了DSFormer的28.9 mR@50（98ms延迟），实现了性能与速度的双重提升。
-
-
 
 ## 核心方法与创新机理
 
@@ -137,8 +133,6 @@ Table 3 显示，ToMe（30%）与 patch 剪枝组合使 GTX 1080 延迟进一步
 
 上述五项创新并非孤立叠加，而是形成了协同增益：统一骨干网络消除重复特征提取，低分辨率掩码和高效嵌入减少掩码处理开销，门控双向预测在单次前向传播中恢复关系预测精度，动态剪枝和 token 合并则按需裁剪计算图。最终，**DSFlash-L 在 PSG 数据集上以 50ms 延迟达到 30.90 mR@50**，超越 DSFormer 的 28.9 mR@50（98ms 延迟），实现了性能与速度的双重提升（Figure 1, Table 1）。
 
-
-
 DSFlash 采用“分割-关系预测”两阶段范式，将全景场景图生成拆解为一次图像级分割（Part A）和多次掩码对级关系预测（Part B），从而在单张 RTX 3090 上达到 56 FPS 的推理速度。其核心设计原则是**最大化特征复用**和**最小化冗余计算**，具体体现在三个层面：用单一冻结的分割骨干替代双独立网络、用双向门控预测替代两次单向前向传播、用基于掩码的动态 patch 剪枝减少 Transformer 颈部的 token 数量。
 
 ### Part A：图像级全景分割
@@ -179,15 +173,8 @@ $$\mathcal{L}_{\text{consistency}} = \frac{1}{D}\sum_{i=1}^{D}(t_i^{\rightarrow}
 
 上述模块之间存在显著的协同效应。统一骨干网络是延迟优化的最大贡献者（消融实验中单独将延迟从 98ms 降至 41ms），但会带来 mR@50 的显著下降（从 28.9 降至 25.0）。双向门控预测恰好弥补了这一性能损失，将 mR@50 恢复至 28.8，同时进一步将延迟降至 29ms。低分辨率掩码（跳过双线性插值上采样，直接使用 $160 \times 160$ 原始掩码计算 patch 重叠率）则在不增加延迟的前提下将 mR@50 进一步提升至 30.5。最终的 DSFlash-L 在 PSG 数据集上以 50ms 延迟达到 30.90 mR@50，相比 DSFormer 的 28.9 mR@50（98ms 延迟）实现了精度与速度的双重超越。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2469_https_arxiv_org_abs_2603_10538/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the DSFlash architecture for inference. Part A is executed once per image. Part B is executed for each combination of two segmentation masks. We use EoMT as the segmentation backbone which is kept frozen throughout the whole training. We use the mask embedding module from DSFormer . The relation predictor head is described in Sec. 3.3. The red numbers indicate which components are covered in which section*
-
-![[assets/figures/papers/paper_list_l2469_https_arxiv_org_abs_2603_10538/figures/011_Figure_7.jpg]]
-*Figure 7: Illustration of the impact of multiple masks for the same ground truth mask. The model in figure B predicts multiple very similar masks together with separate relation predictions. However, this gives the model multiple attempts to predict the ground truth relation, essentially ignoring the definition for mR@k. Adapted from [2]*
-
-
 
 DSFlash的推理架构分为两大部分（图2）：Part A每张图像执行一次，负责全景分割与特征提取；Part B对每对分割掩码执行一次，负责关系预测。以下聚焦Part B中决定效率与性能的关键模块。
 
@@ -239,18 +226,8 @@ DSFormer的Transformer颈部处理全部13×13=169个patch token，但许多patc
 
 DSFlash还对DSFormer的掩码嵌入代码进行了底层优化。原始实现包含低效的PyTorch操作序列（stack、split、flatten、mean），每次为每对掩码重新计算重叠率。DSFlash将其简化为平均池化层，对所有掩码预计算重叠比率后按需复制，显著减少了池化调用次数和张量拷贝开销。该优化在消融实验（表2）中将延迟从41ms降至37ms，且不影响mR@50，属于零性能代价的纯工程加速。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2469_https_arxiv_org_abs_2603_10538/figures/004_Figure_4.jpg]]
-*Figure 4: Schematic of DSFlash’s gating mechanism and the enforced feature consistency loss during training. Given two segmentation masks and an image, DSFlash computes a class token x using various modules, summarized here as Φ. To train the consistency loss, DSFlash performs two forward passes through the model head with flipped segmentation masks*
-
-![[assets/figures/papers/paper_list_l2469_https_arxiv_org_abs_2603_10538/figures/010_Figure_8.jpg]]
-*Figure 8: Illustration of the mask embedding. Subject, object, and background tokens are learnable tokens that are added to the patch embedding with a weighted sum. The weights are determined from the proportion of the patch area that is covered by the respective segmentation mask. Adapted from [2]*
-
 ![[assets/figures/papers/paper_list_l2469_https_arxiv_org_abs_2603_10538/figures/018_Figure_12.jpg]]
 *Figure 12: Comparison of a model trained with pruned patches and one without when pruning patches during evaluation*
-
-
 
 ## 实验与关键发现
 
@@ -292,8 +269,6 @@ DSFlash的主要失败模式体现在两个方面：
 
 **数据集泛化性未验证**：所有实验仅在PSG数据集上进行，尚未在Visual Genome等其他场景图数据集上评估DSFlash的泛化能力，也未与所有最新PSGG方法进行全面的大规模比较。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2469_https_arxiv_org_abs_2603_10538/figures/001_Figure_1.jpg]]
 *Figure 1: Performance comparison between our approach and previous work in terms of performance (mR@50) and latency (ms) on the PSG dataset*
 
@@ -303,19 +278,8 @@ DSFlash的主要失败模式体现在两个方面：
 ![[assets/figures/papers/paper_list_l2469_https_arxiv_org_abs_2603_10538/figures/007_Table_2.jpg]]
 *Table 2: Impact of the optimizations on the overall latency, measured on a NVIDIA GeForce RTX 3090 GPU and a batch size of 1. We also report RPS as the processed relations per second when processing batched data. The rows are read from top to bottom with each row adding an incremental optimization to the evaluated model. The last row is an exception and is an improvement from the row marked with 1*
 
-![[assets/figures/papers/paper_list_l2469_https_arxiv_org_abs_2603_10538/figures/009_Table_3.jpg]]
-*Table 3: Impact of Token Merging (ToMe) and mask-based dynamic patch pruning (Prune, Sec. 3.4) on DSFlash’s latency with batch size 1, measured on a H100, RTX 3090, and GTX 1080 GPU*
-
 ![[assets/figures/papers/paper_list_l2469_https_arxiv_org_abs_2603_10538/figures/003_Figure_3.jpg]]
 *Figure 3: Qualitative comparison of the segmentation masks produced by EoMT with and without upsampling the logits*
-
-![[assets/figures/papers/paper_list_l2469_https_arxiv_org_abs_2603_10538/figures/017_Table_5.jpg]]
-*Table 5: Impact of Token Merging (ToMe) and mask-based dynamic patch pruning (Prune, Sec. 3.4) on DSFlash’s RPS, measured on a H100, RTX 3090, and GTX 1080 GPU*
-
-![[assets/figures/papers/paper_list_l2469_https_arxiv_org_abs_2603_10538/figures/019_Figure_14.jpg]]
-*Figure 14: Failure cases when using DSFlash. Shown are predictions that are in the top 50 predictions for the respective image. The color in the boxes indicates to which subject the prediction is related to*
-
-
 
 ## 定位与知识库关联
 
@@ -406,8 +370,6 @@ DSFlash的效率提升并非单一技巧的堆砌，而是三个因果杠杆的�
 6. **双向门控机制的推广**：双向门控关系预测机制是否可推广到其他需要对称预测的双向关系建模任务（如人-物交互检测HOI、视觉关系检测VRD），是一个有潜力的研究方向。
 
 7. **冻结骨干的进一步提升**：能否通过自监督预训练或更大规模的分割数据进一步提升冻结骨干的特征质量，从而在不增加推理成本的前提下提升关系预测性能？Figure 5和Figure 10已揭示分割骨干的全景质量（mR@inf）与最终场景图性能（mR@50）之间存在0.99的强相关性，这为通过改进骨干来间接提升PSGG性能提供了清晰的路径。
-
-
 
 ## 原文 PDF
 

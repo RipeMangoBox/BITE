@@ -55,8 +55,6 @@ claims:
 
 主要局限在于 VLM 检索引入的计算开销限制了实时部署，且模板数据库的多样性与质量直接影响重建性能。当前自我中心数据集缺乏完整 MANO 参数真值，评估依赖真实边界框，缺乏端到端的公平基准。未来方向包括轻量化检索策略、扩展至连续手部跟踪与手-物联合重建，以及构建全面标注的自我中心 3D 基准。
 
-
-
 自我中心视角下的 3D 手部重建是具身智能、增强现实和人机交互领域的核心感知任务。与第三人称视角不同，自我中心图像面临**深度歧义严重、手部自遮挡频繁、手-物交互高度复杂**三重挑战。这些挑战导致现有方法在鲁棒性和泛化性上存在显著不足。
 
 当前主流方法——如 **HaMeR**（Pavlakos et al., 2024）、**WiLoR**（Potamias et al., 2025）和 **WildHand**（Prakash et al., 2024）——普遍采用从单张图像直接回归 MANO 参数的范式。尽管这些方法在常规场景下表现良好，但在严重遮挡或双手交叉等困难情形下，其重建质量急剧下降：WiLoR 可能将遮挡的左手误认为右手，HaMeR 则可能在仅有单手可见时错误地重建出双手。根本原因在于，这类方法缺乏对场景上下文的显式建模能力，无法利用相似场景的先验知识来消解歧义。
@@ -64,8 +62,6 @@ claims:
 **核心瓶颈**：自我中心手部重建的本质难点并非特征提取能力不足，而是**单张图像所蕴含的信息量不足以唯一确定 3D 手部姿态**——尤其是在遮挡和深度歧义并存的条件下。因此，突破的关键在于引入额外的结构化先验来约束解空间。
 
 本文的**核心动机**正是将上下文学习范式引入自我中心 3D 手部重建。通过检索与查询图像上下文相似的模板示例，构建“输入-输出”示例对作为上下文条件，模型得以在推理时借鉴模板中的手部姿态先验，从而在严重遮挡和歧义场景下实现示例引导的精确重建。这一思路将手部重建从“单图回归”重新定义为“条件推理”问题，为突破现有方法的泛化瓶颈提供了新的技术路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -105,8 +101,6 @@ $$\mathcal{L}_{3D} = \|\phi(\mathcal{P}) - \phi(\mathcal{P}^{\mathrm{gt}})\|_2^2
 ### 5. 主干无关的通用精炼能力
 
 EgoHandICL 不依赖特定的粗估计主干网络。实验表明，无论是基于 **HaMeR** 还是 **WiLoR** 的粗估计，EgoHandICL 均能带来 16.1% 至 27.3% 的相对性能增益，验证了该方法作为通用精炼模块的即插即用特性。
-
-
 
 EgoHandICL 将自我中心 3D 手部重建转化为**上下文学习（In-Context Learning, ICL）** 任务。其核心思路是：给定一张查询图像 $I_{\mathrm{qry}}$，先通过现成的粗估计网络获得初始 MANO 参数 $\tilde{\mathcal{M}}_{\mathrm{qry}}$，然后利用从数据库中检索到的模板示例对 $\mathcal{C}_{\mathcal{M}} = \{(\tilde{\mathcal{M}}_{\mathrm{tpl}}, \mathcal{M}_{\mathrm{tpl}})\}$ 作为上下文条件，驱动一个掩码重建 Transformer 对粗估计进行精炼，输出最终参数 $\mathcal{M}_{\mathrm{qry}}$：
 
@@ -149,12 +143,8 @@ $$\mathcal{L} = \lambda_m \mathcal{L}_{mano} + \lambda_v \mathcal{L}_{V} + \lamb
 
 > **需注意**：当前分析基于论文方法部分与全局实验事实的综合提炼。关于各模块的具体消融效果（如掩码比率 70% 最优、推理式提示增益等）将在后续实验分析章节中详细呈现。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_nwjy9BeorI/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our EgoHandICL framework. Part A: Given a query image, we retrieve templates via two complementary strategies. Pre-defined Visual Templates: a VLM classifies the hand-involvement type and retrieves a template image of the same type. Adaptive Textual Templates: we prompt the VLM to generate semantic descriptions, and retrieve a template image given textual similarity. Part B: We encode image tokens*
-
-
 
 EgoHandICL 将自我中心 3D 手部重建重新定义为上下文学习任务，其核心思想是：给定查询图像，先获取粗估计的 MANO 参数，再以检索到的模板示例对为条件，通过上下文推理精炼最终参数。整个框架围绕三个关键模块展开：模板检索、ICL Tokenizer 和掩码重建 Transformer。
 
@@ -214,8 +204,6 @@ $$\mathcal{L}_{3D} = \|\phi(\mathcal{P}) - \phi(\mathcal{P}^{\mathrm{gt}})\|_2^2
 
 权重配置为 $\lambda_m=0.05$、$\lambda_v=5.0$、$\lambda_{3D}=0.01$，反映了对不同监督信号相对重要性的平衡。
 
-
-
 ## 实验与关键发现
 
 ### 主要定量结果
@@ -245,15 +233,6 @@ EgoHandICL 在两个主流自我中心手部数据集 ARCTIC 和 EgoExo4D 上均
 - **损失函数**：联合使用 MANO 参数损失、顶点损失和 3D 感知损失得到最优顶点精度（P-MPVPE 3.8 mm）。单独使用 MANO 损失时 P-MPVPE 为 4.2 mm，加入顶点损失后降至 4.0 mm，再加入 3D 感知损失后进一步降至 3.8 mm（Table 7），验证了 3D 感知损失在语义层面对手部几何约束的有效性。
 - **主干网络无关性**：EgoHandICL 对 HaMeR 和 WiLoR 两种粗估计主干均带来显著增益，相对提升幅度为 +16.1% 至 +27.3%（Table 5），表明上下文学习精炼范式具有通用性，不依赖特定粗估计架构。
 
-![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_nwjy9BeorI/figures/009_Table_6.jpg]]
-*Table 6: Comparison of different mask ratios for ICL tokens. Results are tested on the ARC-TIC dataset*
-
-![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_nwjy9BeorI/figures/011_Table_7.jpg]]
-*Table 7: Comparison of different loss items for the EgoHandICL training. Results are tested on the ARCTIC dataset*
-
-![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_nwjy9BeorI/figures/010_Table_5.jpg]]
-*Table 5: Comparison of coarse MANO prediction backbones. Improvement denotes relative gains over the corresponding baseline performance on the ARCTIC dataset in Tab. 1*
-
 #### 跨手部参与类型的上下文推理
 
 Table 3 展示了不同手部参与类型子数据集上的上下文推理分析。在左手、右手、双手和无手四种划分下，EgoHandICL 均能通过检索同类型模板获得一致的性能提升，验证了上下文示例的领域匹配性对重建精度的重要性。
@@ -268,18 +247,9 @@ Figure 3 展示了 ARCTIC 数据集上的定性对比。在双手交叉且左手
 ![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_nwjy9BeorI/figures/006_Figure_3.jpg]]
 *Figure 3: Qualitative results on the ARCTIC dataset. Note: In the bottom case, where the two hands cross and the left hand is severely occluded, WiLoR (Potamias et al., 2025) reconstructs only the right hand but mistakenly identifies it as the left*
 
-![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_nwjy9BeorI/figures/007_Figure_4.jpg]]
-*Figure 4: Qualitative results on the EgoExo4D dataset (left) and self-captured cases (right). Note: In the bottom-left case with a single heavily occluded hand, HaMeR (Pavlakos et al., 2024) mistakenly reconstructs two hands, whereas WiLoR (Potamias et al., 2025) fails to reconstruct any*
-
 ### 下游应用验证
 
 EgoHandICL 的重建结果可作为视觉提示增强视觉-语言模型的手-物交互推理能力。Table 8 显示，将 EgoHandICL 的重建结果融入 EgoVLM 后，手部相关动作识别的准确性得到提升。Figure 5 的定性对比表明，结合 EgoHandICL 的重建信息后，EgoVLM 能够更可靠地识别自我中心视频中的细粒度手部动作。
-
-![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_nwjy9BeorI/figures/013_Figure_5.jpg]]
-*Figure 5: EgoVLM’s hand–object interaction reasoning with and without EgoHandICL. By incorporating our hand reconstructions as visual prompts, hand-related actions in egocentric videos can be recognized reliably with finer details*
-
-![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_nwjy9BeorI/figures/012_Table_8.jpg]]
-*Table 8: Comparison of EgoVLMs on handobject interaction reasoning*
 
 ### 失败模式与局限性
 
@@ -289,8 +259,6 @@ EgoHandICL 的重建结果可作为视觉提示增强视觉-语言模型的手-�
 2. **模板数据库依赖**：检索和重建性能受限于模板数据库的质量和多样性，在分布外场景下模板匹配度下降时，性能可能退化。
 3. **标注约束**：EgoExo4D 等数据集仅提供关键点级标注，缺乏完整 MANO 参数真值，限制了模型在复杂场景下的泛化能力——这一问题在 Table 2 中 EgoExo4D 的绝对 MPJPE（21.1 mm）远高于 ARCTIC 的 P-MPJPE（4.0 mm）上有所体现。
 4. **检测依赖**：现有评估均基于真实边界框，而自我中心视角下的手部检测本身极具挑战性，缺乏端到端的公平评估基准。
-
-
 
 ## 定位与知识库关联
 
@@ -344,8 +312,6 @@ EgoHandICL 的关键差异在于 **推理范式变更**：不直接从图像回�
 ### 4. 方法谱系定位总结
 
 EgoHandICL 在方法谱系中位于 **“检索增强的上下文学习式手部重建”** 节点。其上游承接 ViT-based 手部重建方法（HaMeR, WiLoR）的粗估计能力，横向借鉴视觉上下文学习（POTTER）和掩码重建（MAE）的训练范式，下游可对接手-物交互理解（EgoVLM）等高层视觉推理任务。该节点填补了“严重遮挡下利用示例先验进行手部重建”的方法空白，但检索效率与数据标注完备性仍是制约其大规模应用的关键瓶颈。
-
-
 
 ## 原文 PDF
 

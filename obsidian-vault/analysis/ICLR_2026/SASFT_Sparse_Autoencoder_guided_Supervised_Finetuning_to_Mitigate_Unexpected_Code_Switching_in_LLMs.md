@@ -57,8 +57,6 @@ claims:
 
 方法层面，SASFT 的核心模块包括：（1）通过单语度量 $\nu$ 从 SAE 中识别各语言排名靠前的特异性特征；（2）在 SFT 训练时，对非目标语言样本计算所选特征的预激活值超出阈值 $\alpha_j$ 的部分，作为辅助损失 $\mathcal{L}_{\text{reduce}}$ 与交叉熵损失联合优化。消融实验进一步证实，同时作用于多层和多特征的 SASFT 比单层或单特征方案效果更好且更稳定（Figure 6, Figure 7）。
 
-
-
 ### 现象：多语言大模型中的非预期语码转换
 
 当用户以某种语言向大语言模型（LLM）提问时，模型在回复过程中可能突然切换至另一种语言，这种现象被称为**非预期语码转换**（unexpected code-switching）。图1展示了向模型输入泰语、阿拉伯语、日语等提示时，模型生成内容中意外出现中文、俄语或韩语片段的实例。这一现象并非孤立存在于个别模型——在五款主流多语言 LLM（Gemma-2-2B、Gemma-2-9B、Llama-3.1-8B、Qwen3-1.7B-Base、Qwen3-8B-Base）的六种源语言测试中，均观察到不同程度的向中文切换（图2），其中泰语和阿拉伯语作为源语言时切换比例尤为突出。这表明非预期语码转换是多语言 LLM 中普遍存在的系统性问题，而非个别模型的偶然缺陷。
@@ -84,8 +82,6 @@ claims:
 ### 核心思路
 
 SASFT 的核心洞察是：**利用稀疏自编码器从模型残差流中提取出各语言对应的特异性特征方向，在监督微调时引入辅助损失，强制模型在生成非目标语言内容时将对应无关语言特征的预激活值压至预估计的均值以下**。通过将特征抑制直接嵌入训练目标，SASFT 使模型在参数更新过程中学会主动维持合理的特征激活水平，从而在推理时无需任何外部干预即可抑制非预期语码转换。
-
-
 
 ## 核心方法与创新机理
 
@@ -123,11 +119,6 @@ SASFT 的干预对象并非任意模型参数，而是通过稀疏自编码器�
 | **SASFT** | **压制无关语言特异性特征的预激活值** | **训练** | **直接，因果验证确立** |
 
 SFT+Penalty 和 SFT+GRPO 虽试图抑制语码转换，但均未触及问题的因果根源——语言特异性特征的异常预激活。因果验证实验（Figure 4, Figure 22）已确立双向因果关系：方向消融降低中文特征预激活值可显著减少切换至中文的比率，方向增强提高这些特征值则可在原本无切换的样本中诱发出语码转换。SASFT 正是在这一因果发现的基础上，将特征压制从推理时的外部干预转化为训练时的内部学习目标，从而实现了对语码转换的根本性抑制。
-
-
-
-![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_BQOFU9qO5j/figures/013_Figure_5.jpg]]
-*Figure 5: SASFT operates in two steps: First, it identifies language-specific features in LLMs (left), then leverages these features as training signals to reduce code-switching behavior (right)*
 
 SASFT 的整体流程分为两个阶段：**语言特异性特征识别**与**监督微调干预**。其核心思路是，在标准 SFT 过程中引入一个辅助损失项，迫使模型在生成非目标语言内容时，将目标语言对应的特异性特征的预激活值（pre-activation values）压低到一个预设阈值以下，从而在训练阶段内化对不相关语言特征的抑制，避免推理时语码切换（code-switching）的发生。
 
@@ -168,8 +159,6 @@ SASFT 的整体流程分为两个阶段：**语言特异性特征识别**与**�
 
 - **输入**：多语言指令数据集 $\mathcal{D}$，包含目标语言 $L$ 及其他语言 $j$ 的样本。
 - **输出**：微调后的模型 $L^*$，在保持多语言能力（以六个多语言基准衡量）的前提下，显著降低非预期语码转换比率（以 Unicode 脚本检测计算，公式 (2)）。
-
-
 
 ### 语言特异性特征识别
 
@@ -225,8 +214,6 @@ $$L_{\mathrm{training}} = L_{\mathrm{cross-entropy}} + \lambda L_{\mathrm{reduce
 
 其中 $\lambda$ 为平衡两项损失的权重系数。通过反向传播，该联合损失同时优化语言建模质量和对非目标语言特征的抑制能力，使得模型在训练阶段内化了对不相关语言特征的主动压制，从而在推理时无需外部干预即可减少非预期语码转换。
 
-
-
 ## 实验与关键发现
 
 ### 核心瓶颈与因果机制
@@ -238,9 +225,6 @@ $$\mathbf{x}' \gets \mathbf{x} - \lambda \mathbf{d}$$
 可显著降低模型切换至中文的比例；反之，向残差流加上该特征方向：
 $$\mathbf{x}' \gets \mathbf{x} + \lambda \mathbf{d}$$
 则可在原本无切换的样本中诱发出语码转换（Section 3.3.2, Figure 4, Figure 22）。这一双向因果关系的置信度很高（0.95），构成了 SASFT 方法设计的理论基础。
-
-![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_BQOFU9qO5j/figures/012_Figure_4.jpg]]
-*Figure 4: The code-switching ratio to Chinese after ablating Chinese or English features with different λ. (1) Ablating the Chinese feature can reduce the unexpected code-switching ratio. (2) A higher coefficient λ leads to better reduction in the unexpected code-switching ratio. (3) Ablating the English feature has little impact on the unexpected code-switching ratio to Chinese*
 
 ### 主要实验结果
 
@@ -290,22 +274,6 @@ $$\mathbf{x}' \gets \mathbf{x} + \lambda \mathbf{d}$$
 ![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_BQOFU9qO5j/figures/029_Table_7.jpg]]
 *Table 7: Optimal hyperparameters and SFT training time for 110k samples across different models*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_BQOFU9qO5j/figures/026_Table_4.jpg]]
-*Table 4: Number of samples of each language in different dataset settings. Each row shows the distribution of samples across languages for different dataset sizes (either 210k or 110k). For Russian (ru), the sample size is approximate due to limited available data*
-
-![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_BQOFU9qO5j/figures/027_Table_5.jpg]]
-*Table 5: Number of samples from each source in different dataset settings. Each row shows the sample counts contributed by different data sources under various dataset sizes*
-
-![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_BQOFU9qO5j/figures/028_Table_6.jpg]]
-*Table 6: Code-switching evaluation dataset: source-to-target language pairs and sample counts*
-
-![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_BQOFU9qO5j/figures/030_Table_8.jpg]]
-*Table 8: Optimal GRPO learning rates and training times*
-
-
-
 ## 定位与知识库关联
 
 ### 核心瓶颈与因果杠杆
@@ -353,8 +321,6 @@ SASFT 的技术路线可概括为“SAE 引导的表征约束范式”，其流�
 3. **语码转换方向的非对称性。** 论文聚焦于“任意语言→中文/俄语/韩语”的切换方向，未讨论反向切换（如中文→其他语言）是否同样适用。语言特异性特征在不同切换方向上是否对称地发挥作用，尚需进一步验证。
 
 4. **与推理时干预的关系。** SASFT 将抑制逻辑内化至训练阶段，避免了推理时的外部干预。但论文未比较 SASFT 与推理时方向消融在计算开销、部署灵活性等方面的优劣，也未讨论两者是否可以互补使用。
-
-
 
 ## 原文 PDF
 

@@ -53,8 +53,6 @@ Neighbor GRPO 的方法定位是**全 ODE 训练的强化学习对齐框架**。
 
 主要实验结果验证了该方法的有效性：在多奖励训练设置下，Neighbor GRPO 在所有域外评估指标上均显著超越 SDE 基线方法（DanceGRPO、MixGRPO），同时保持了域内评估的竞争力。例如，在 HPDv2 测试集的 CLIP Score 上达到 0.385（DanceGRPO 为 0.364），UnifiedReward 达到 3.262（DanceGRPO 为 3.156），且每次训练迭代时间从约 238 秒降至约 45 秒。该方法仅需约 4 小时的训练即可在文本到图像生成任务上取得优异表现，展示了其在训练成本、收敛速度和生成质量三个维度上的综合优势。
 
-
-
 ### 流匹配模型的对齐需求与现有瓶颈
 
 流匹配（Flow Matching）模型在文本到图像生成领域展现出卓越的性能，其核心优势在于使用确定性常微分方程（ODE）进行采样，天然兼容高阶求解器（如 DPM++），能够以极少的函数评估次数（NFE）生成高质量图像。然而，预训练的流匹配模型往往需要进一步对齐人类偏好，以提升生成结果的美学质量和语义一致性。
@@ -71,8 +69,6 @@ Neighbor GRPO 的方法定位是**全 ODE 训练的强化学习对齐框架**。
 本文的关键洞察在于对 SDE 基 GRPO 优化动态的重新解释。通过理论分析，作者证明：**最大化 SDE 基 GRPO 目标等价于最小化一个优势加权的均方误差（MSE）损失**（Section 3.2）。这一等价性揭示了 GRPO 的本质是一种对比学习过程——在每个时间步，模型被推向高奖励候选样本，同时远离低奖励候选样本（如图 Figure 1 所示）。
 
 这一发现带来了方法论上的突破：既然优化目标可以表达为纯距离度量，那么**随机探索并非必须依赖 SDE 噪声**。只要能够构造一组多样化的候选轨迹，并在确定性 ODE 框架内定义合理的距离度量，就可以绕过 SDE，实现全 ODE 训练。这正是 Neighbor GRPO 的核心动机——通过扰动初始噪声构造 ODE 邻域，用基于 softmax 距离的替代跳跃策略取代 SDE 的高斯策略，从而在策略梯度框架下保留确定性采样和高效高阶求解器的全部优势。
-
-
 
 ## 核心方法与创新机理
 
@@ -113,8 +109,6 @@ $$A_i' = \frac{A_i}{(\sum_{k=1}^G |A_k|^p)^{1/p}}, \quad p \in (0,2]$$
 ### 创新点的协同效应
 
 上述四个创新点并非孤立存在，而是形成了紧密的协同关系：ODE 邻域构造为替代跳跃策略提供了结构化的候选空间；替代跳跃策略使全 ODE 训练成为可能；对称锚采样在 ODE 框架下大幅降低训练成本；拟范数重加权则在不牺牲 ODE 优势的前提下增强了训练的鲁棒性。这种协同使得 Neighbor GRPO 在训练成本仅为 SDE 基线约 1/5 的条件下，在所有域外评估指标上均取得显著领先。
-
-
 
 Neighbor GRPO 的整体训练流程围绕一个核心设计原则展开：**完全摒弃 SDE 随机性，在确定性 ODE 的邻域内构造基于距离的对比学习目标**。整个框架由五个紧密协作的模块构成，形成了一条从初始噪声扰动到策略梯度更新的端到端训练管线。
 
@@ -186,13 +180,6 @@ Neighbor GRPO 在训练阶段引入了两个仅在训练时使用的虚拟机制
 
 推理时，模型仅使用标准的确定性 ODE 求解器进行采样，无需任何额外机制，保持了流匹配模型的原始推理效率。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2717_https_arxiv_org_abs_2511_16955/figures/001_Figure_1.jpg]]
-*Figure 1: GRPO approaches for flow models optimize the sample xt at each timestep t. We revisit it from the perspective of contrastive learning, pushing anchor samples to high-reward candidates and vice versa. Different from SDE-based GRPO approaches [17, 40] that conduct sample-wise exploration and optimization, our Neighbor GRPO optimizes the policy at the anchor in a joint force field defined by all candidates in a group. This approach allows full-ODE training, leading to better training efficiency and sample quality*
-
-
-
 ### 3.1 从 SDE 探索到 ODE 邻域构造：对比学习视角的揭示
 
 现有基于 SDE 的 GRPO 方法（如 **DanceGRPO**）在每个时间步注入随机噪声进行探索，其优化目标可等价转化为一个优势加权的 MSE 损失：
@@ -249,16 +236,6 @@ Neighbor GRPO 采用**求解器分离**策略以兼顾采样质量与训练效�
 
 这种分离设计使得训练过程无需承担高阶求解器的计算开销，同时保证了 rollout 轨迹的质量。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2717_https_arxiv_org_abs_2511_16955/figures/002_Figure_3.jpg]]
-*Figure 3: Surrogate leaping policy. The ongoing sampling trajectory virtually leaps to another, following the policy distribution*
-
-![[assets/figures/papers/paper_list_l2717_https_arxiv_org_abs_2511_16955/figures/003_Figure_2.jpg]]
-*Figure 2: Different from SDE-based GRPO approaches, which explore the sample space with noise perturbation defined by SDE, we directly construct a group of similar initial noises, and conduct deterministic ODE sampling*
-
-
-
 ## 实验与关键发现
 
 ### 主要结果：多奖励训练下的综合性能
@@ -274,9 +251,6 @@ Neighbor GRPO 采用**求解器分离**策略以兼顾采样质量与训练效�
 
 Table 3 从计算量角度揭示了 Neighbor GRPO 的效率优势。在策略更新阶段，Neighbor GRPO 的有效函数评估次数（NFE_θ）仅为 **1.33**，而 DanceGRPO 和 MixGRPO 均为 14.00，计算量降低约 **10.5 倍**。这一差异直接转化为训练速度：Neighbor GRPO 每次迭代仅需 **45.08 秒**，DanceGRPO 和 MixGRPO 分别需要 237.86 秒和 237.71 秒，加速约 **5.3 倍**。
 
-![[assets/figures/papers/paper_list_l2717_https_arxiv_org_abs_2511_16955/figures/009_Table_3.jpg]]
-*Table 3: Training cost of different methods*
-
 效率提升的核心机制来自对称锚采样策略。在标准 GRPO 中，每个样本需要独立进行前向/反向计算，计算复杂度为 $O(G \times K)$，其中 $G$ 为组大小，$K$ 为更新的时间步数。Neighbor GRPO 通过从 $G$ 个候选中对称采样 $B$ 个锚点（$B < G$），将计算复杂度降至 $O(B \times K)$。对于常用的 FLUX 训练配置（$G=12$），该方法将策略更新时的前向/反向计算量降低至原来的 **1/12**（Section 3.4.1）。有效 NFE 的计算公式为：
 
 $$\mathrm{NFE}_\theta = \frac{B}{G} \cdot K$$
@@ -284,9 +258,6 @@ $$\mathrm{NFE}_\theta = \frac{B}{G} \cdot K$$
 ### 收敛速度分析
 
 Figure 5 的训练曲线展示了各方法在 HPSv2.1 上的收敛动态。Neighbor GRPO 展现出显著更快的收敛速度：仅需约 **50 次迭代**即可使 HPSv2.1 分数超过 0.35，而 DanceGRPO 在 300 次迭代结束时仍未达到该水平。这一快速收敛可归因于两个因素：其一，全 ODE 训练避免了 SDE 噪声引入的信用分配模糊性，使梯度信号更加精确；其二，对比学习视角下的距离优化目标（Eq. 8）在 ODE 邻域内提供了更密集的优化力场，如 Figure 1 所示，锚点样本受到组内所有候选样本的联合力场驱动，而非 SDE 方法中每个样本独立优化。
-
-![[assets/figures/papers/paper_list_l2717_https_arxiv_org_abs_2511_16955/figures/005_Figure_5.jpg]]
-*Figure 5: Training curves towards HPSv2.1*
 
 ### 消融实验
 
@@ -334,13 +305,6 @@ Figure 6 提供了各方法的生成图像可视化对比。在相同提示词�
 ### 失败模式与局限
 
 尽管 Neighbor GRPO 在多项指标上表现优异，但仍存在若干值得关注的局限。首先，该方法目前仅在 FLUX 架构上进行了验证，其在其他流匹配架构（如 DiT）上的泛化性尚待确认。其次，拟范数重加权虽能缓解奖励攻击，但在极端训练规模下是否持续有效仍需进一步验证。此外，替代跳跃策略中隐含的温度参数（文中未显式引入）可能为性能调优提供额外自由度，其作用机制值得探索。最后，该方法的当前验证集中在文本到图像生成任务，向视频生成或三维生成任务的推广是自然的后续方向。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2717_https_arxiv_org_abs_2511_16955/figures/004_Figure_4.jpg]]
-*Figure 4: Effect of quasi-norm reweighting*
-
-
 
 ## 定位与知识库关联
 
@@ -392,8 +356,6 @@ Neighbor GRPO 的适用边界由以下关键设计参数定义：
 4. **跨模态扩展**：如何将该方法推广到视频生成或三维生成任务？这些任务中的 ODE 邻域构造和奖励建模面临额外的挑战。
 
 5. **与 RLHF 方法的关系**：Neighbor GRPO 的对比学习视角是否可以为扩散模型的 RLHF 方法（如 DDPO、DPOK）提供新的理论理解和改进方向？这一连接值得进一步探索。
-
-
 
 ## 原文 PDF
 

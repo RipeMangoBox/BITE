@@ -58,8 +58,6 @@ claims:
 
 **方法定位**：PDG-FM 属于确定性流匹配范式，区别于 Zero-1-to-3（扩散模型）、EscherNet（多视图扩散）、Free3D（无 3D 表示的扩散模型）以及 Metric FM（学习黎曼度量的流匹配）。其核心贡献在于将几何一致性显式编码为插值路径的密度测地线约束，而非依赖扩散模型的隐式正则。
 
-
-
 ### 新视角合成中的确定性困境
 
 新视角合成（Novel View Synthesis, NVS）要求从单一或少量源视图生成任意相机姿态下的目标视图，其核心挑战在于保持跨视图的几何一致性与语义保真度。近年来，以扩散模型为代表的条件生成方法在该领域取得了显著进展，代表性工作包括 **Zero-1-to-3**（Liu et al., 2023）、**EscherNet**（Xin et al., 2024）和 **Free3D**（Zheng & Vedaldi, CVPR 2024）等。然而，这类方法存在一个根本性的瓶颈：**扩散模型的随机性破坏了视图间的确定性映射关系，导致生成结果在结构上缺乏一致性**。
@@ -93,8 +91,6 @@ $$\ddot{\gamma} + \|\dot{\gamma}\|^2 \left( I - \hat{\dot{\gamma}}\hat{\dot{\gam
 2. **几何约束**：在确定性流匹配的基础上，引入概率密度测地线约束，使插值路径对齐数据流形的高密度区域，确保中间状态在语义和几何上保持合理。
 
 3. **高效实现**：通过教师-学生蒸馏框架，将测地线优化从昂贵的迭代求解解耦为一次性前向预测，使密度测地线流匹配在计算上可行，同时保留其几何优势。
-
-
 
 ## 核心方法与创新机理
 
@@ -138,8 +134,6 @@ $$\ell^{0}(\eta) = \mathbb{E}_t \left[\| x_t - \mathrm{DDIM\text{-}B}(z_t, c_t, 
 
 这三个槽位的协同作用形成了完整的创新链条：确定性流匹配消除随机性破坏，测地线插值保证路径几何一致性，教师-学生蒸馏使密度测地线优化在计算上可行。
 
-
-
 GeodesicNVS 提出 **概率密度测地线流匹配（Probability Density Geodesic Flow Matching, PDG-FM）** 框架，将新视角合成重新建模为从源视图到目标视图的确定性连续变换。整个框架由两个核心阶段级联而成：**数据到数据流匹配（Data-to-Data Flow Matching）** 和 **测地线插值蒸馏（Variational Distillation of Geodesics）**，最终统一为端到端的测地线流匹配流程（Figure 2）。
 
 ![[assets/figures/papers/paper_list_l2505_https_arxiv_org_abs_2603_01010/figures/002_Figure_2.jpg]]
@@ -172,8 +166,6 @@ $$
 在推理阶段，PDG-FM 将蒸馏后的 GeodesicNet $\phi_\eta$ 与 VelocityNet $v_\theta$ 统一：给定源视图 $x_0$ 和目标相机姿态，GeodesicNet 预测密度感知的测地线插值路径 $x_t$，VelocityNet 沿该路径积分生成目标视图。这一确定性流匹配框架在缩减训练设置下，PDG-FM 相比 Linear-D2D-FM 将 FID 从 11.8124 降至 10.4010（-1.4114），SSIM 从 0.8736 提升至 0.8768（Table 3），验证了测地线插值对几何一致性的增益。
 
 > **注意**：当前分析基于项目博客提供的技术细节，部分实现细节（如教师网络的具体优化步数、蒸馏损失权重）需待正式论文发布后验证。
-
-
 
 ### 数据到数据流匹配框架
 
@@ -225,18 +217,8 @@ $$\ell^{0}(\eta) = \mathbb{E}_t \left[\| x_t - \text{DDIM-B}(z_t, c_t, \tau) \|^
 
 这一蒸馏设计将计算密集的测地线优化限制在训练阶段，推理时仅需学生网络的前向传播，实现了高效且几何一致的新视角合成。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2505_https_arxiv_org_abs_2603_01010/figures/001_Figure_1.jpg]]
-*Figure 1: From Conditional Diffusion Model to Probability Density Geodesic Flow Matching. Conventional diffusion models learn stochastic noise-to-data transitions, often losing deterministic structure. We instead train a Data-to-Data Flow Matching network to learn continuous deterministic transformations between paired data samples*
-
-![[assets/figures/papers/paper_list_l2505_https_arxiv_org_abs_2603_01010/figures/009_Figure_6.jpg]]
-*Figure 6: Geodesic Interpolants vs Linear Interpolants. Geodesic interpolants traverse semantically meaningful regions of the data manifold, producing perceptually consistent interpolants. In contrast, linear interpolants merely blend the two endpoints, resulting in limited structural continuity and unrealistic transitions*
-
 ![[assets/figures/papers/paper_list_l2505_https_arxiv_org_abs_2603_01010/figures/010_Figure_7.jpg]]
 *Figure 7: Comparison of Geodesic Gradient Norm across Time for geodesic interpolants, their pre-optimization counterparts, and linear interpolants on training dataset. The optimized geodesic paths have lower residuals thus indicating better satisfaction of the Euler-Lagrange condition, aligning with improved perceptual and geometric consistency*
-
-
 
 ## 实验与关键发现
 
@@ -285,13 +267,6 @@ Table 5 揭示了两个关键设计选择：
 2. **计算开销**：测地线蒸馏和文本反演增加了训练计算成本，Table 3 的缩减训练设置即反映了完整训练的高昂代价。
 3. **场景泛化**：当前实验使用对象类别的简单提示（如“an object of category”），对复杂场景的泛化能力尚未在现有结果中得到验证，需谨慎外推。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2505_https_arxiv_org_abs_2603_01010/figures/005_Figure_3.jpg]]
-*Figure 3: Qualitative comparisons on Objaverse. Comparison of Linear-D2D-FM, the Noise-to-Data FM (Naive FM) baseline and the diffusion-based Free3D model*
-
-
-
 ## 定位与知识库关联
 
 ### 核心基线与差异化定位
@@ -327,8 +302,6 @@ PDG-FM 的方法论贡献体现在三个递进的“改变槽位”（changed_sl
 3. **去扩散依赖**：能否设计不依赖预训练扩散模型的密度估计方法？例如直接学习数据流形的密度函数或采用能量基模型，以降低对外部模型的依赖并提升可扩展性。
 
 4. **多视图与 3D 重建**：当前方法聚焦于两视图间的变换，如何将测地线一致性扩展到多视图一致生成和显式 3D 重建（如 NeRF 或 3D Gaussian Splatting 的初始化）是一个自然延伸方向。
-
-
 
 ## 原文 PDF
 

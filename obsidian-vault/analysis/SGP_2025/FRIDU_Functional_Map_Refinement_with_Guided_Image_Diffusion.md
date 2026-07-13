@@ -281,8 +281,6 @@ Figure 10 验证了模型的零样本条件泛化能力。使用 WKS 初始映�
 
 递归精化实验显示，单次递归迭代通常能进一步提升精度，但多次迭代会导致性能退化。这一退化现象限制了全自动迭代精化的应用场景。此外，FRIDU 作为精化方法，对初始映射质量有一定依赖性：若初始映射包含大量错误对称性或极度噪声，精化效果可能受限。Figure 6 展示了地标约束可有效解决对称翻转问题，即使模型未在地标条件下训练，推理时加入地标约束也能纠正对称错误。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2506_14322/figures/003_Figure_3.jpg]]
 *Figure 3: Refinement without Guidance (WKS). We map a function $f _ { 1 } \in \mathbb { R } ^ { n _ { 1 } }$ defined on $\mathcal { M } _ { 1 }$ to $\mathcal { M } _ { 2 }$ , , using the initial, FRIDU refined, and ground-truth functional maps. Here, we map the function $\Phi _ { 1 } ^ { \dagger } f _ { 1 }$ using the functional map matrices to get ${ \tilde { f } } _ { 2 }$ , , and show $\Phi _ { 2 } \tilde { f } _ { 2 }$ on $\mathcal { M } _ { 2 }$ . Note that in this figure only, our refined map does not include guidance in inference, in order to isolate and illustrate the refinement ability of the base model. The top row visualizes the source and mapped functions, and the bottom row shows the corresponding fun...
 

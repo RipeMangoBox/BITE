@@ -196,8 +196,6 @@ $$\tilde{\tau}^0 = \hat{\tau}^0 - \alpha \nabla_{\tau^k} G(\hat{\tau}^0)$$
 
 为训练上述两个模块，NIFTY 构建了一条自动化数据管线：从 BE-HAVE 数据集中选取 174 个锚点姿态帧（覆盖 7 个受试者），利用预训练的场景无关运动模型 **HuMoR** 进行反向树形 rollout，生成大量以锚点姿态为终点、起点多样化的合成运动轨迹。该管线使 NIFTY 摆脱了对昂贵配对交互捕捉数据的依赖。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1723_NIFTY_Neural_Object_Interaction_Fields_for_Guided_Human_Motion_Synthesis/figures/002_Figure_2.jpg]]
 *Figure 2: Model Architecture. Our full motion synthesis method (middle) consists of an object interaction field*
 
@@ -265,8 +263,6 @@ NIFTY 在 **坐（sitting）** 和 **举（lifting）** 两类人‑物交互动
 ### 核心实验结论
 
 NIFTY 的实验结果一致表明：**将交互知识编码为可学习的神经距离场，并在扩散采样时用其梯度进行引导，可以在无需大量真实交互数据的情况下生成逼真且物理合理的人‑物交互运动**。用户偏好率超过 80%、lifting 任务上 99.6% 的 D2O ≤ 2cm 以及接近真实 mocap 的 Likert 评分，共同构成了支撑这一核心主张的决定性证据链。消融实验进一步确认了完整偏移向量场设计的关键作用，以及学习场相对于非参数检索的泛化优势。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l1723_NIFTY_Neural_Object_Interaction_Fields_for_Guided_Human_Motion_Synthesis/figures/006_Table_1.jpg]]
 *Table 1: Quantitative Comparison. NIFTY outperforms baselines on both sitting and lifting. Our diffusion model, guided by the learned interaction field, generates motions that reach the object (D2O) with few penetrations and realistic contacts. Motions are realistic with low foot skating and the final interaction pose is similar to synthetic data with low skeleton distance*

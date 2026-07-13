@@ -212,8 +212,6 @@ $$\mathbf{x}^* = \underset{\hat{\mathbf{x}}}{\arg\min} -R(\hat{\mathbf{x}}) + \l
 
 其中 $\lambda$ 控制正则化强度。该目标在驱动噪声向高奖励方向优化的同时，通过 $\mathcal{L}_{\mathrm{full}}$ 将其约束在高斯典型集内，有效防止奖励攻击导致的分布外退化。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2628_https_openaccess_thecvf_com_content_CVPR2026_html_Chang_What_Is_It_Like/figures/001_Figure_1.jpg]]
 *Figure 1: Value and Spatial Entropy Visualization. We show the 1D and 2D entropy as estimated with KDE for four different common inputs: image scaled to [-1,1], latent vector, a checkerboard texture, and a Gaussian noise*
 

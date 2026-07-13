@@ -58,8 +58,6 @@ claims:
 
 当前方法仍存在若干局限：置信度估计主要依赖语义熵，未显式建模深度误差或提升漂移引起的几何不确定性；严重遮挡下的大幅深度误差可能导致提升基元错位，造成时序估计不一致；超长序列中基元数量仍呈线性增长。这些方向为未来的统一不确定性建模与记忆管理机制留下了开放研究空间。
 
-
-
 ### 具身场景感知中的语义场景补全
 
 语义场景补全（Semantic Scene Completion, SSC）旨在从稀疏观测中同时推理三维几何占据与语义标签，是具身智能体实现环境理解、导航与交互的核心能力。早期 SSC 方法主要面向自动驾驶场景，依赖多相机环视设置与密集深度输入，代表性工作包括 **MonoScene**（Cao and de Charette, CVPR 2022）、**TPVFormer**（Huang et al., CVPR 2023）和 **SurroundOcc**（Wei et al., ICCV 2023）。然而，在室内具身探索场景中，智能体仅携带单目 RGB-D 传感器，需在未知环境中逐步移动并增量式构建完整的 3D 场景表示。这一设定对表示的可扩展性、时序一致性和内存效率提出了更高要求。
@@ -87,8 +85,6 @@ claims:
 - **置信度感知体素融合（Confidence-aware Voxel Fusion, CAVF）**：通过置信度加权合并同一体素内的冗余基元，在维持补全精度的同时显著压缩基元数量与内存占用。
 
 这一设计使得 TGSFormer 在单帧局部预测与具身序列全局补全两个层面均取得了显著提升：在 Occ-ScanNet 上，几何 IoU 与语义 mIoU 分别超越先前最佳方法 1.59% 和 2.90%；在 Occ-ScanNet-mini 上，提升幅度进一步扩大至 4.72% 和 6.95%（Tab. 1）。在具身场景中，TGSFormer 以大幅减少的基元数量取得 SOTA 性能，基元特征数和内存大小分别最多降低 11.28× 和 9.92×（Fig. 8, Tab. 3）。
-
-
 
 ## 核心方法与创新机理
 
@@ -121,8 +117,6 @@ $$\mathcal{G}_s = \sum_{i: V_i = s} w_{i \to s} \mathcal{G}_i,\quad \mathcal{Q}_
 ### 创新机制间的因果联动
 
 这三个创新并非孤立设计，而是形成因果闭环：持久高斯记忆提供时序上下文，DTE 通过置信度感知交叉注意力实现可靠的时序融合，CAVF 则基于融合后的置信度压缩记忆规模，三者协同实现了无边界探索中可扩展且时序一致的场景补全。在 Occ-ScanNet-mini 上，TGSFormer 以 **66.19 IoU** 和 **55.82 mIoU** 大幅超越先前最佳方法 SplatSSC 达 +4.72% 和 +6.95% (Tab. 1)，并在具身场景中以更少的基元数量取得 SOTA 性能 (Tab. 2)。
-
-
 
 TGSFormer 的整体 pipeline 遵循“单帧局部预测—持久记忆维护”两阶段范式，其架构如 **Figure 2** 所示。核心设计动机源于一个关键瓶颈：现有 3D 高斯场景补全方法依赖预定义空间边界内的基元随机初始化，导致大量冗余基元且难以拓展至无边界具身探索场景；而深度引导方法虽有所改进，却缺乏长期记忆机制，造成探索过程中噪声积累与内存持续膨胀。
 
@@ -159,15 +153,8 @@ TGSFormer 采用**两阶段训练**策略（Section 3.4）：第一阶段在单�
 
 这些设计使 TGSFormer 在 Occ-ScanNet 和 Occ-ScanNet-mini 上分别以 64.42 IoU / 54.73 mIoU 和 66.19 IoU / 55.82 mIoU 超越先前最佳方法 SplatSSC（Tab. 1），几何 IoU 提升达 1.59–4.72%，语义 mIoU 提升达 2.90–6.95%。在具身场景 EmbodiedOcc-ScanNet 中，TGSFormer 以大幅减少的基元数量取得 SOTA 性能（66.19 IoU, 55.82 mIoU），并在 7/11 语义类别上超越所有对比方法（Tab. 2, Section 4.1）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2280_https_arxiv_org_abs_2512_00300/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of embodied scene exploration and refinement. Our TGSFormer consistently expands its understanding of the environment as new views are observed and progressively refines previously seen regions, producing a complete and coherent 3D scene*
-
-![[assets/figures/papers/paper_list_l2280_https_arxiv_org_abs_2512_00300/figures/011_Figure.jpg]]
-*Figure: (b) Modulate position illustration*
-
-
 
 TGSFormer 的核心架构由五个关键模块串联构成，其设计围绕一个核心目标：在无边界具身探索中维持紧凑、时序一致的高斯场景记忆。图 Figure 2 给出了整体架构概览。
 
@@ -263,8 +250,6 @@ $$
 ![[assets/figures/papers/paper_list_l2280_https_arxiv_org_abs_2512_00300/figures/003_Figure_3.jpg]]
 *Figure 3: Feature alignment visualization with Principal Component Analysis (PCA). PCA projections of Gaussian features show that our multi-stage objective not only aligns intermediate representations toward the final encoder space, but also makes their distributions more isotropic and semantically organized*
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -287,9 +272,6 @@ $$
 
 Fig. 7 展示了具身序列中单帧推理延迟与 mIoU 的关系。EmbodiedOcc 因持续累积高斯特征和记忆条目导致延迟最高；TGSFormer 受益于轻量级高斯提升器、DTE 和 CAVF 模块，在取得最高 mIoU 的同时保持最低推理延迟。
 
-![[assets/figures/papers/paper_list_l2280_https_arxiv_org_abs_2512_00300/figures/015_Figure_7.jpg]]
-*Figure 7: Single-frame inference latency versus mIoU in Embodied Sequence. All models share comparable parameter counts. EmbodiedOcc incurs the highest latency due to accumulating Gaussian features and memory entries. TGSFormer achieves both the lowest latency and the highest mIoU, benefiting from its lightweight Gaussian Lifter, DTE, and CAVF modules*
-
 Fig. 8 进一步揭示了基元与内存的增长模式。EmbodiedOcc 呈现无界增长，SplatSSC 因缺乏时序调控而稳定累积，而 TGSFormer 通过 CAVF 维持紧凑且有界的高斯表示，基元特征数和内存大小分别最多降低 11.28× 和 9.92×。
 
 ![[assets/figures/papers/paper_list_l2280_https_arxiv_org_abs_2512_00300/figures/017_Figure_8.jpg]]
@@ -299,29 +281,13 @@ Fig. 8 进一步揭示了基元与内存的增长模式。EmbodiedOcc 呈现无�
 
 Fig. 9 展示了严重遮挡场景下的典型失败案例。当深度估计在遮挡区域产生大幅误差时（图中 GT 深度以彩色标注，预测深度以粉色标注），提升的高斯基元发生空间错位，导致当前帧的占据预测与历史估计不一致。这一现象揭示了当前方法的两个根本局限：其一，置信度估计主要基于语义熵（Eq. 12），未显式建模深度误差或提升漂移引起的几何不确定性；其二，尽管 CAVF 大幅减缓了基元增长，但在超长序列探索中基元数量仍线性增加，长期记忆的紧凑性与一致性仍需进一步增强。
 
-![[assets/figures/papers/paper_list_l2280_https_arxiv_org_abs_2512_00300/figures/018_Figure_9.jpg]]
-*Figure 9: Failure case on Temporal-Occ-ScanNet-mini. Large depth errors under severe occlusion (GT in color vs. prediction in pink) lead to misaligned lifted Gaussians, causing inconsistent occupancy between the current frame and the historical estimate*
-
 初步尝试将渲染置信度用于训练损失重加权（Tab. 9）反而导致性能微降，表明高斯基元表示下的不确定性驱动损失设计仍需深入研究。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2280_https_arxiv_org_abs_2512_00300/figures/010_Table_3.jpg]]
 *Table 3: Ablation on CAVF. The results of our proposed setting are highlighted in light gray*
 
-![[assets/figures/papers/paper_list_l2280_https_arxiv_org_abs_2512_00300/figures/006_Table_1.jpg]]
-*Table 1: Local Prediction Performance on the Occ-ScanNet and Occ-ScanNet-mini dataset. The best results are highlighted in bold , while the second-best are underlined*
-
-![[assets/figures/papers/paper_list_l2280_https_arxiv_org_abs_2512_00300/figures/007_Table_2.jpg]]
-*Table 2: Embodied Prediction Performance on the EmbodiedOcc-ScanNet dataset. The best results are highlighted in bold , while the second-best are underlined*
-
 ![[assets/figures/papers/paper_list_l2280_https_arxiv_org_abs_2512_00300/figures/009_Table_5.jpg]]
 *Table 5: Ablation on Gaussian Initialization and Temporal Encoder. (a) Different settings for depth cue. (b) Study on different temporal processing strategies. Including the baseline without temporal modeling, single cross attention (ca), and dual cross attention (dual ca) variants, with or without confidence modulation*
-
-![[assets/figures/papers/paper_list_l2280_https_arxiv_org_abs_2512_00300/figures/012_Table_6.jpg]]
-*Table 6: Ablation on CCA modulation strategies. We compare the confidence modulation on the query*
-
-
 
 ## 定位与知识库关联
 
@@ -354,8 +320,6 @@ TGSFormer 的性能优势源于一个因果闭环（causal knob）：**置信度
 **已识别的局限。** (1) 置信度估计的单模态缺陷——语义熵无法感知几何噪声，深度误差较大的基元可能被赋予高置信度，污染记忆更新；(2) 直接使用渲染置信度对训练损失重加权的初步尝试导致性能微降，表明高斯基元下的不确定性感知损失设计仍需探索；(3) CAVF 的体素划分粒度是固定的超参数，缺乏对场景局部密度的自适应能力。
 
 **开放问题。** (1) 如何设计统一的语义-几何不确定性估计器，使其与高斯记忆的读写操作深度集成？(2) 能否引入类 RNN 或状态空间机制（如 Mamba）来管理高斯记忆的隐状态，以彻底抑制长期序列中的基元漂移与线性增长？(3) 当前两阶段训练策略在 DTE 微调时冻结其他组件，是否存在更优的端到端联合训练方案，在保持单帧能力的同时提升时序适应性？
-
-
 
 ## 原文 PDF
 

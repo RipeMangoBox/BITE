@@ -55,8 +55,6 @@ claims:
 - **Non‑reasoning VLA**：直接预测轨迹，缺少显式推理环节；
 - **MPGD**（He et al., CVPR 2023）等基于世界模型的规划方法：通常依赖显式未来预测与规划器，而 LCDrive 将世界模型压缩为潜在令牌并融入自回归推理序列，实现端到端可微。
 
-
-
 端到端（E2E）自动驾驶的核心目标是将传感器输入直接映射为可执行的车辆轨迹。近年来，视觉-语言-动作（VLA）模型在驾驶场景中展现出强大的泛化潜力，其优势在于能够利用大规模预训练知识进行场景理解与决策。然而，当面对复杂交通场景时，直接预测轨迹往往难以捕捉多智能体交互的深层因果逻辑，因此研究者开始探索将**链式思考（Chain-of-Thought, CoT）**引入驾驶VLA模型，以期通过显式推理提升轨迹质量与安全性。
 
 当前的推理增强方案普遍采用**文本链式思考（Text CoT）**，即让模型先生成自然语言描述（如“前方车辆正在减速，我将向左变道”），再基于该文本预测动作。尽管这一范式在语言和视觉问答任务中取得了显著成功，但在自动驾驶这一时空敏感的具身任务中暴露出三个根本性瓶颈：
@@ -68,8 +66,6 @@ claims:
 上述问题的本质在于：**自然语言并非自动驾驶推理的最优表示媒介**。驾驶决策本质上是在高维向量空间中对自车与周围智能体的未来状态进行反事实推演，而这一过程更适合在连续或离散的潜在空间中完成。与此同时，世界模型（World Model）在基于模型的强化学习中已被证明能够有效模拟环境动态，但将其作为VLA推理的内部“想象引擎”仍属空白。
 
 基于此，本文提出核心动机：**将链式思考的表示从自然语言切换为与动作词汇对齐的潜在令牌，并引入可学习的潜在世界模型（Latent World Model, LWM）作为推理的“模拟器”**。这一思路旨在同时解决表征效率、推理延迟和动作对齐三大问题——模型在紧凑的潜在空间中交替生成动作提案与反事实世界状态预测，以极低的推理预算完成高质量的时空推演，最终输出安全且平滑的驾驶轨迹。
-
-
 
 ## 核心方法与创新机理
 
@@ -118,8 +114,6 @@ LCDrive 的另一关键创新在于其三阶段训练策略，专门针对潜在
 
 这些创新共同构成了 LCDrive 的核心贡献：在潜在空间中构建动作对齐的链式思考，通过反事实世界模拟实现高效且一致的运动规划。
 
-
-
 LCDrive 将端到端驾驶形式化为一个自回归序列建模问题，其核心创新在于用**与动作词汇对齐的潜在令牌序列**替代传统的自然语言链式思考。整体序列结构为：
 
 $$[ o_{\mathrm{image}}, o_{\mathrm{ego}}, \mathrm{REASON}, \tau ]$$
@@ -162,12 +156,8 @@ LCDrive 采用渐进式训练策略（Figure 3）：
 
 该框架针对文本 CoT 在自动驾驶中的三个根本瓶颈设计：自然语言不适合表示时空几何与多智能体交互；自回归生成长文本引入高延迟；语言推理与最终动作可能严重脱节。通过将推理表示切换为与动作词汇对齐的潜在令牌，并交错进行动作提案与世界状态预测，LCDrive 在紧凑的推理序列中实现了推理-决策的高度一致性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2321_https_openaccess_thecvf_com_content_CVPR2026_html_Tan_Latent_Chain_of_Th/figures/002_Figure_2.jpg]]
 *Figure 2: Architecture. Overview of our proposed latent reasoning framework*
-
-
 
 ### 3.1 问题形式化：端到端驾驶的自回归序列建模
 
@@ -237,12 +227,8 @@ $$ \mathcal{L}_{\mathrm{GRPO}} = -\frac{1}{G} \sum_{j=1}^G A^{(j)} \sum_t \log \
 
 潜在CoT的推理长度由 $K$（推理步数）和 $B$（并行分支数）控制。与文本CoT相比，潜在令牌序列更为紧凑——每个动作提案块仅10个离散令牌，每个LWM状态为固定维度的连续表示，远短于自然语言推理段落。Table 4的消融实验表明 $K=5, B=2$ 在性能与效率间取得了良好折衷，实现了1.8×的推理加速（相对于文本CoT基线）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2321_https_openaccess_thecvf_com_content_CVPR2026_html_Tan_Latent_Chain_of_Th/figures/001_Figure_1.jpg]]
 *Figure 1: Latent Chain-of-Thought Reasoning. Compared to text-based CoT, our proposed Latent CoT provides more efficient and aligned reasoning traces for end-to-end driving VLA models*
-
-
 
 ## 实验与关键发现
 
@@ -308,8 +294,6 @@ $$ \mathcal{L}_{\mathrm{GRPO}} = -\frac{1}{G} \sum_{j=1}^G A^{(j)} \sum_t \log \
 
 4. **LWM 质量瓶颈**。LCDrive 的性能受限于学习到的 LWM 精度。当 LWM 预测误差较大时，反事实推理的质量下降，影响最终轨迹规划。这一现象在 Latent CoT\*（使用真值 LWM）与 LCDrive 的性能差距中得到印证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2321_https_openaccess_thecvf_com_content_CVPR2026_html_Tan_Latent_Chain_of_Th/figures/004_Table_1.jpg]]
 *Table 1: Main evaluation results on the PhysicalAI-AV dataset [24]. Lower is better for all metrics, bold is best*
 
@@ -318,8 +302,6 @@ $$ \mathcal{L}_{\mathrm{GRPO}} = -\frac{1}{G} \sum_{j=1}^G A^{(j)} \sum_t \log \
 
 ![[assets/figures/papers/paper_list_l2321_https_openaccess_thecvf_com_content_CVPR2026_html_Tan_Latent_Chain_of_Th/figures/006_Figure_4.jpg]]
 *Figure 4: Qualitative Results. Qualitative comparison of textual and latent reasoning in driving VLA models. Latent CoT captures fine-grained spatial relationships and multi-agent interactions while using a smaller inference budget, leading to more stable and accurate trajectory predictions. In each case, we highlight the main misalignment of the Text CoT reasoning with the final trajectory*
-
-
 
 ## 定位与知识库关联
 
@@ -372,8 +354,6 @@ LCDrive 的三阶段训练策略区别于现有 VLA 模型的单阶段监督微�
 2. 如何从潜在 CoT 令牌中解码出人类可理解的推理过程？这可能需要设计专门的解码器或将潜在令牌与自然语言空间对齐。
 3. 如何动态调整推理分支数 $K$ 和 $B$ 以适应不同场景复杂度？简单的场景分类器或基于不确定性的自适应机制可能是可行的方向。
 4. 潜在 CoT 的推理能力是否可以通过更大规模的 RL 后训练进一步激发？当前实验仅在有限规模上进行 GRPO 训练，扩展 RL 训练的计算预算可能带来额外收益。
-
-
 
 ## 原文 PDF
 

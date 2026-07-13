@@ -52,8 +52,6 @@ claims:
 
 R2‑Seg 的定位介于冻结基础模型与全参数微调之间：它利用LLM的语义先验和统计检验的分布校准能力，在不改变模型权重的前提下，将OOD肿瘤分割的假阳性问题转化为可解释的ROI约束与显著性筛选问题。
 
-
-
 ### 医学影像分割中的分布外挑战
 
 基础分割模型（如 **BiomedParse**，Zhao et al., *Nature Methods* 2025）在分布内（In-Distribution, ID）医学影像上展现了强大的通用分割能力。然而，当这些模型被部署到分布外（Out-of-Distribution, OOD）场景——例如在训练阶段未见过的新肿瘤类型、新成像模态或新解剖部位——时，其性能会急剧恶化。核心瓶颈在于：OOD偏移会导致模型产生大量碎片化的假阳性预测，这些假阳性区域在视觉嵌入空间中与真实肿瘤的分布高度重叠，使得基础模型的决策边界失效（参见 Figure 1）。
@@ -75,8 +73,6 @@ R2‑Seg 的定位介于冻结基础模型与全参数微调之间：它利用LL
 本文的核心洞察是：**OOD假阳性问题的根源不在于模型参数的不足，而在于搜索空间过大和决策边界失准**。若能通过解剖先验将分割搜索限制在合理的感兴趣区域（ROI）内，并利用统计检验校准决策边界，就有可能在完全不更新模型参数的前提下有效抑制假阳性。
 
 基于这一洞察，本文提出 **R2-Seg**——一个训练无关的OOD肿瘤分割框架，通过“推理-拒绝”（Reason-and-Reject）两阶段流程解决上述问题。该框架无需任何参数更新或目标域标注数据，从而从根源上避免了灾难性遗忘，同时显著提升了OOD场景下的分割特异性与整体精度。
-
-
 
 ## 核心方法与创新机理
 
@@ -119,8 +115,6 @@ $$\bar{P} = \max_{g \in \mathcal{G}} \left[ \mathsf{Inv}(g) \circ f_{\theta}\lef
 R2‑Seg 全程**冻结 BiomedParse 权重，不执行任何梯度更新**。对比实验（Figure 5）表明，使用 LoRA 微调的 BiomedParse‑LoRA 在分布内 CT 正常器官分割上性能显著下降，出现灾难性遗忘；R2‑Seg 则完全保持原始模型在分布内任务上的性能。这一特性使 R2‑Seg 更适合临床部署中“零破坏”适配的需求。
 
 综上，R2‑Seg 的创新本质在于**将 OOD 适应的负担从模型参数更新转移至解剖先验注入与统计决策校准**，形成“Reason‑and‑Reject”的训练无关范式。
-
-
 
 R2‑Seg 是一种**训练无关**（training‑free）的 OOD 医学肿瘤分割框架，其核心思路是将一个冻结的基础分割模型置于由解剖推理引导的局部搜索空间内，再通过统计假设检验剔除不可靠的候选区域。该框架不更新基础模型的任何参数，因此从根本上避免了微调带来的灾难性遗忘。
 
@@ -166,12 +160,8 @@ R2‑Seg 是一种**训练无关**（training‑free）的 OOD 医学肿瘤分�
 
 消融实验直接验证了这一逻辑：移除统计检验后，膀胱肿瘤敏感性虽高达 0.923，但特异性骤降至 0.089，假阳性大量涌现；重新引入 MMD 检验与 Benjamini–Hochberg 校正后，特异性显著恢复，Dice 回升至 0.297 ± 0.45。关闭假阳性门控机制同样导致各肿瘤类别特异性大幅下降，而层级门控策略能够自适应地抑制低置信度区域，维持高特异性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2109_https_openaccess_thecvf_com_content_CVPR2026_html_Shen_R2_Seg_Training_F/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of R2-Seg pipeline. Top row: LLM-based segmentation planning and ROI construction; middle row: BioMedParsebased tumor segmentation and candidate extraction; bottom row: Statistical two-sample test and false discovery rate control*
-
-
 
 R2-Seg 的核心由两个阶段、六个功能模块构成：**LLM解剖推理规划器** → **多尺度ROI裁剪** → **肿瘤分割与TTA融合** → **候选区域提取** → **双样本MMD检验** → **FDR控制**，并辅以三级假阳性门控机制。以下按管道顺序推导关键公式并解释变量含义。
 
@@ -263,12 +253,8 @@ $$i^* = \max\left\{i : p_{(i)} \leq \frac{\alpha \cdot i}{|\mathcal{K}|}\right\}
 
 **关键设计总结**：整个管道以冻结的分割模型为核心，通过LLM推理约束搜索空间（Reason），再以非参数统计检验过滤假阳性（Reject），全程无需梯度更新，从根本上规避了微调引起的灾难性遗忘。消融实验证实，移除MMD检验后膀胱肿瘤敏感性虽达0.923，但特异性骤降至0.089；重新引入检验与FDR控制后，Dice恢复至0.297±0.45，特异性显著回升（Table 3）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2109_https_openaccess_thecvf_com_content_CVPR2026_html_Shen_R2_Seg_Training_F/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of visual embedding distributions. Left: In-Distribution, Right: Out-of-Distribution*
-
-
 
 ## 实验与关键发现
 
@@ -294,27 +280,17 @@ R2‑Seg 在五种 OOD 肿瘤类型（膀胱、子宫、前列腺、乳腺、宫
 
 尽管 R2‑Seg 在特异性上取得了显著提升，但敏感性仍处于中等水平（如膀胱 0.335，子宫 0.394）。同时提升敏感性与特异性仍然是开放挑战。部分低对比度或微小肿瘤可能因候选区域在统计检验中与正常组织分布差异不显著而被误拒，导致假阴性。此外，LLM 解剖规划器对肿瘤类型的语义理解和锚点器官定位的准确性高度依赖预训练语言模型的知识覆盖范围，对于罕见肿瘤或解剖变异较大的病例，其鲁棒性有待进一步验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2109_https_openaccess_thecvf_com_content_CVPR2026_html_Shen_R2_Seg_Training_F/figures/004_Table_2.jpg]]
 *Table 2: Representative results across five OOD tumor types. Mean values of Dice, sensitivity (Sens.), specificity (Spec.), accuracy (Acc.), and class-average accuracy (CA) are reported*
 
 ![[assets/figures/papers/paper_list_l2109_https_openaccess_thecvf_com_content_CVPR2026_html_Shen_R2_Seg_Training_F/figures/007_Table_3.jpg]]
 *Table 3: Ablation results on OOD tumor types*
 
-![[assets/figures/papers/paper_list_l2109_https_openaccess_thecvf_com_content_CVPR2026_html_Shen_R2_Seg_Training_F/figures/006_Figure_4.jpg]]
-*Figure 4: FROC curves showing scan-level sensitivity versus false positives per scan under different rejection settings. Left: mild rejection. Right: more aggressive rejection*
-
-![[assets/figures/papers/paper_list_l2109_https_openaccess_thecvf_com_content_CVPR2026_html_Shen_R2_Seg_Training_F/figures/008_Figure_5.jpg]]
-*Figure 5: Evaluation of knowledge forgetting on in-distribution CT slices. Statistical tests show that the segmentation performance of fine-tuned models drops significantly across all organs*
-
 ![[assets/figures/papers/paper_list_l2109_https_openaccess_thecvf_com_content_CVPR2026_html_Shen_R2_Seg_Training_F/figures/005_Figure_3.jpg]]
 *Figure 3: Visualization of segmentation results for both in-distribution and out-of-distribution tumor types*
 
 ![[assets/figures/papers/paper_list_l2109_https_openaccess_thecvf_com_content_CVPR2026_html_Shen_R2_Seg_Training_F/figures/003_Table_1.jpg]]
 *Table 1: A summary of datasets for tumor segmentation. Ax and Sag refer to Axial and Sagittal planes respectively*
-
-
 
 ## 定位与知识库关联
 
@@ -356,8 +332,6 @@ R2‑Seg 的有效性建立在一系列前提条件之上，这些条件界定�
 - **框架的可迁移性**：统计拒绝框架能否拓展至其他非肿瘤病变（如炎症、纤维化）的分割，或适配至其他类型的基础分割模型（如 SAM、MedSAM）？这需要验证解剖推理的通用性和 MMD 检验在不同嵌入空间中的有效性。
 - **LLM 推理的鲁棒性**：LLM 解剖规划器的推理质量在不同临床中心、不同报告习惯下的鲁棒性尚未深入探讨。解剖锚点的错误指定将导致 ROI 构建失败，进而级联影响后续所有模块。这一依赖关系使 R2‑Seg 的端到端可靠性受限于 LLM 的医学知识覆盖度和推理一致性。
 - **计算开销的临床可接受性**：多尺度 ROI 的多次前向传播、多视角 TTA、以及置换检验的 B 次重采样，共同构成了显著的推理时计算开销。在临床实时场景中的部署可行性需要量化评估和优化。
-
-
 
 ## 原文 PDF
 

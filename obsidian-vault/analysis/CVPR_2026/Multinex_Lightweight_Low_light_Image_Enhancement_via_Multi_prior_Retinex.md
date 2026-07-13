@@ -52,8 +52,6 @@ claims:
 
 **方法定位**：Multinex属于**解析先验驱动的轻量级Retinex增强**路线，区别于以重建为目标的经典Retinex方法（如RetinexNet）和基于曲线映射的轻量方法（如ZeroDCE）。其核心贡献在于将经典色彩理论与Retinex结构先验注入网络输入层，使极简网络即可学习有效的曝光与色彩调整，而非依赖复杂的网络架构设计。
 
-
-
 低光照图像增强（Low-Light Image Enhancement, LLIE）是计算机视觉中的基础任务，其目标是在恢复曝光不足区域的可见性的同时，保持色彩的自然性与结构的完整性。该任务在自动驾驶、夜间监控、移动摄影等场景中具有广泛的应用需求。然而，现有方法在**亮度与颜色的解耦**这一核心瓶颈上仍面临显著挑战。
 
 ### 亮度-颜色耦合：LLIE的根本瓶颈
@@ -81,8 +79,6 @@ Multinex的核心动机源于以下洞察：**Retinex理论不应作为重建目
 - 通过**亮度先验栈**（4个互补的亮度特征图）与**反射率先验栈**（5个光照无关的色度特征图）的显式构造，在输入端实现亮度与颜色的解耦，使后续的双分支轻量网络可以各自独立地学习曝光校正与色彩校正。
 
 这一范式转换使得在**仅45K参数**的极端轻量级架构下，实现超越同参数量级方法（如LYT-Net）的增强质量成为可能，同时保持了出色的泛化能力与下游任务兼容性。
-
-
 
 ## 核心方法与创新机理
 
@@ -128,8 +124,6 @@ $$f(\mathcal{S}) = \mathrm{Conv}_{1 \times 1} \circ \mathrm{FB}^T \left( \mathrm
 - **分量注意力（Component-wise Attention, CWA）**：为引导栈的各个分量产生独立的软注意力掩码，选择性加权不同先验的贡献。消融实验表明，将 CWA 放置在投影层与 FB 之间（“Between”位置）可获得最佳 PSNR 23.19dB，优于提前或延后放置（Table 9）。
 
 综上，Multinex 的创新链条可概括为：**范式转换（加性增量）→ 表示重构（多视角先验栈）→ 结构适配（双分支融合网络）**。这三个 changed slots 层层递进，共同实现了在仅 45K 参数下超越同量级最强基线 LYT-Net 的性能（LOLv1: 23.19dB vs. 22.38dB，Table 1），并验证了“增强的核心是添加结构化校正场，而非重建整张图像”这一核心洞察。
-
-
 
 Multinex 的整体流程围绕一个核心洞察展开：低光照增强不应以重建整张图像为目标，而应学习一个结构化的**加性增强增量（enhancement delta）**。这一增量由 Retinex 理论指导，通过亮度校正与颜色校正的解耦组合，实现轻量而高效的曝光与色调调整。
 
@@ -179,12 +173,8 @@ $$\hat{\mathbf{I}} = \mathbf{I} + \pmb{\Delta}_L \odot \pmb{\Delta}_R$$
 
 整个框架仅包含约 45K 可学习参数，却能在 LOLv1 上达到 23.19 dB PSNR，超越同参数量级的轻量方法 LYT-Net（22.38 dB），验证了“解析先验 + 加性校正”这一设计范式的有效性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l901_https_arxiv_org_abs_2604_10359/figures/015_Figure_11.jpg]]
 *Figure 11: MSEF module architecture*
-
-
 
 ### 3.1 增强范式：从重建到校正
 
@@ -251,8 +241,6 @@ $$\mathbf{A} = \\sigma \\circ \\mathrm{Conv}_{1 \\times 1} \\circ \\mathrm{DWCon
 
 其中DWConv为深度可分离卷积，$\\mathrm{Conv}_{1 \\times 1}$ 为逐点卷积，$\\sigma$ 为Sigmoid激活。CWA使网络能够自适应地选择性加权不同先验分量，消融实验证实将CWA放置在投影层与FB之间（“Between”位置）可获得最佳PSNR 23.19（Table 9）。
 
-
-
 ## 实验与关键发现
 
 ### 核心定量结果
@@ -292,30 +280,8 @@ Multinex 在参考数据集（LOLv1、LOLv2-real、LOLv2-syn）和无参考数�
 
 所有对比均在相同的模型参数量级分组内进行（轻量级 < 1M、微型 < 0.01M 等），确保架构效率比较的公平性。无参考数据集结果未使用 GT-Mean 后处理，反映模型真实的亮度/颜色校正能力。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l901_https_arxiv_org_abs_2604_10359/figures/007_Table_4.jpg]]
 *Table 4: Results of ablation studies (a), (b) and (c) validating design elements of Multinex*
-
-![[assets/figures/papers/paper_list_l901_https_arxiv_org_abs_2604_10359/figures/008_Figure_4.jpg]]
-*Figure 4: Qualitative ablation on Multinex Priors study (a)*
-
-![[assets/figures/papers/paper_list_l901_https_arxiv_org_abs_2604_10359/figures/018_Table_7.jpg]]
-*Table 7: Ablation studies on feature maps of luminance guidance stack, supported by a complete Multinex architecture*
-
-![[assets/figures/papers/paper_list_l901_https_arxiv_org_abs_2604_10359/figures/019_Table_8.jpg]]
-*Table 8: Ablation studies on feature maps of reflectance guidance stack, supported by a complete Multinex architecture*
-
-![[assets/figures/papers/paper_list_l901_https_arxiv_org_abs_2604_10359/figures/020_Table_9.jpg]]
-*Table 9: Ablation on where to place CWA in fusion networks*
-
-![[assets/figures/papers/paper_list_l901_https_arxiv_org_abs_2604_10359/figures/017_Table_6.jpg]]
-*Table 6: Ablation of loss functions*
-
-![[assets/figures/papers/paper_list_l901_https_arxiv_org_abs_2604_10359/figures/016_Table_5.jpg]]
-*Table 5: Importance ranking of candidate luminance priors. Higher values indicate greater unique contribution to the stack*
-
-
 
 ## 定位与知识库关联
 
@@ -362,8 +328,6 @@ Multinex在低光照增强知识库中的核心贡献是提出并验证了**“�
 3. **极端场景的鲁棒性增强。** 在保持低参数量的约束下，如何引入自适应机制（如场景难度感知的注意力调制）来缓解极端低光/过曝场景下的性能退化？
 
 4. **与其他视觉任务的联合优化。** Multinex在ExDark上的检测结果表明其增强输出对下游任务友好，但当前训练仅使用增强损失。将检测/分割等高层任务的反馈纳入增强网络的训练，是否能在保持轻量级的同时进一步提升任务导向的增强质量？
-
-
 
 ## 原文 PDF
 

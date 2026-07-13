@@ -75,8 +75,6 @@ SPIKE / SPIKE-RL 属于**惊喜驱动的自适应帧采样方法**，其方法�
 
 SPIKE 和 SPIKE-RL 的惊喜得分与人类判断的 Spearman 相关系数分别达到 **0.84** 和 **0.87**，验证了该方法与人类惊喜感知的高度一致性。
 
-
-
 ### 视频理解的叙事瓶颈：均匀采样错失关键瞬间
 
 视频大语言模型（Video-LLM）近年来在视频理解任务上取得了显著进展，但其底层帧采样策略仍普遍沿用**均匀采样**——将视频等间隔切分，每段抽取相同数量的帧。这一看似公平的策略在叙事型视频中暴露出根本性缺陷：大多数视频内容由冗余的过渡帧构成，而决定叙事走向的**惊喜时刻**（surprising moments）——如意外摔倒、剧情反转、笑点触发——往往仅占据极短的片段。均匀采样将有限的帧预算平均分配给所有区域，导致模型被大量低信息量帧淹没，难以捕捉这些稀疏但关键的高信息量瞬间（Figure 1a）。
@@ -102,8 +100,6 @@ SPIKE 和 SPIKE-RL 的惊喜得分与人类判断的 Spearman 相关系数分别
 2. **惊喜利用**：能否将惊喜信号转化为非均匀的帧采样策略，让下游视频LLM将更多帧预算分配到高惊喜区域，从而持续提升多项视频理解任务的性能？进一步地，能否通过强化学习（SPIKE-RL）优化假设生成过程，使惊喜检测本身也受益于下游任务反馈？
 
 这一动机的深层洞察在于：**惊喜不仅是视频理解的目标，更应成为视频理解的手段**——通过识别“哪些帧改变了模型的信念”，系统可以更高效地分配有限的计算资源，聚焦于真正推动叙事发展的关键片段。
-
-
 
 ## 核心方法与创新机理
 
@@ -149,8 +145,6 @@ $$\mathcal{L}_{\mathrm{belief-optimization}}(\theta) = -\frac{1}{M} \sum_{r=1}^{
 
 SPIKE 和 SPIKE-RL 的惊喜得分与人类判断的 Spearman 相关系数分别达到 **0.84** 和 **0.87**（Section 4.3），表明模型捕获的惊喜信号与人类感知高度吻合。在惊喜定位基准上，SPIKE-RL 在 Oops! 数据集上达到 Acc@0.25s **62.9%**，接近人类表现（62.1%），远超零样本 Qwen2.5-VL 的 6.6%（Table 1）。在五个下游视频理解任务上，惊喜加权采样相比均匀采样**持续带来性能提升**，例如在 ExFunTube 上提升 **+7.0%** LLM-Match（Table 2），验证了该创新的通用性和有效性。
 
-
-
 ![[assets/figures/papers/paper_list_l32_https_openreview_net_forum_id_QLiXtWEAkq/figures/002_Figure_2.jpg]]
 *Figure 2: (a) Overall architecture: SPIKE computes surprise scores, which guide weighted frame sampling for downstream tasks. (b) SPIKE : Given history H _ { t } , prior window W , , and observed frame O _ { t } . , the hypothesis generator produces belief set B _ { t } . . The hypothesis scorer computes P _ { p r i o r } and P _ { p o s t } . , yielding surprise score S _ { t } as KL divergence*
 
@@ -193,8 +187,6 @@ $$\mathcal{L}_{\mathrm{belief-optimization}}(\theta) = -\frac{1}{M} \sum_{r=1}^{
 - **显式文本信念空间**：与依赖隐式特征或光流的方法（如 **Motion Magnitude** (Epstein et al., 2020)、**F2C2V** (Duka et al., 2022)）不同，SPIKE 将信念表示为人类可解释的文本假设集合，使得惊喜信号具备可审计性，且与人类判断高度相关（Spearman 相关系数达 0.84–0.87）。
 - **查询无关的即插即用设计**：惊喜评分过程不依赖下游任务的具体查询，SPIKE 可直接替换 Video-LLM 的均匀采样层，适用于多种视频理解任务。
 - **历史摘要的先验锚定**：消融实验表明，移除历史文本摘要会导致 Oops! 上 Acc@1s 从 67.37 降至 61.29，证实长期叙事上下文对惊喜检测至关重要。
-
-
 
 SPIKE 将视频理解建模为动态信念更新过程，其核心由五个级联模块构成，并通过三个关键公式将“新帧带来的信息增益”量化为标量惊喜分数。
 
@@ -250,14 +242,11 @@ $$\mathcal{L}_{\mathrm{belief-optimization}}(\theta) = -\frac{1}{M} \sum_{r=1}^{
 
 其中 $M$ 为轨迹组大小，$p_{\theta}$ 为假设生成器的参数化分布。该损失通过增大高奖励轨迹中假设的生成概率，隐式引导模型学习生成更准确、更多样的信念假设。
 
-
-
 ## 实验与关键发现
 
 ### 惊喜定位基准评估
 
 SPIKE 和 SPIKE-RL 在三个惊喜定位基准上的表现如表 1 所示。核心发现如下：
-
 
 ![[assets/figures/papers/paper_list_l32_https_openreview_net_forum_id_QLiXtWEAkq/figures/004_Table_1.jpg]]
 *Table 1: Performance of SPIKE and SPIKE-RL on surprise localization*
@@ -271,7 +260,6 @@ SPIKE 和 SPIKE-RL 在三个惊喜定位基准上的表现如表 1 所示。核�
 ### 下游任务上的惊喜加权采样
 
 表 2 展示了将 Qwen2.5-VL 的均匀帧采样替换为惊喜加权采样后，在五个下游基准上的表现。惊喜加权采样相比均匀采样持续带来性能提升：
-
 
 ![[assets/figures/papers/paper_list_l32_https_openreview_net_forum_id_QLiXtWEAkq/figures/005_Table_2.jpg]]
 *Table 2: Performance of Qwen2.5-VL with uniform vs. surprise-weighted and other query-free frame sampling methods. MCQ tasks are evaluated with accuracy; generative tasks with LLM-Match. Comparable open-source Video-LLMs are shown for context*
@@ -289,7 +277,6 @@ SPIKE 和 SPIKE-RL 在三个惊喜定位基准上的表现如表 1 所示。核�
 ### 消融分析
 
 **历史文本摘要**（Table 6）：移除历史摘要组件后，Oops! 上 Acc@1s 从 67.37 降至 61.29（−6.1 点），Acc@0.25s 从 60.0 降至 53.7（−6.3 点）。这证实长期叙事上下文对信念跟踪和惊喜检测至关重要——没有历史信息，模型无法准确判断新帧是否偏离了既有叙事轨迹。
-
 
 ![[assets/figures/papers/paper_list_l32_https_openreview_net_forum_id_QLiXtWEAkq/figures/010_Table_6.jpg]]
 *Table 6: Ablation of the historical summary component on the Oops! dataset*
@@ -310,13 +297,8 @@ SPIKE 和 SPIKE-RL 的惊喜得分与人类判断的 Spearman 相关系数分别
 2. **训练数据偏差**：SPIKE-RL 的训练数据包含 70% 非惊喜视频，可能限制了模型对复杂惊喜模式的泛化能力。
 3. **实时性约束**：尽管推理时开销可控，但并行化实现仍可能在某些流式场景中引入延迟，限制了方法在低延迟在线场景中的直接部署。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l32_https_openreview_net_forum_id_QLiXtWEAkq/figures/001_Figure_1.jpg]]
 *Figure 1: (a) Uniform sampling misses key moments. (b) Our surprise-based sampling focuses on high-surprise regions, strongly aligning with human laughter. (c) Our method achieves significantly better surprise localization than a zero-shot Qwen2.5-VL baseline*
-
-
-
 
 ## 定位与知识库关联
 
@@ -381,8 +363,6 @@ Table 2还将SPIKE-RL采样下的Qwen2.5-VL与多个开源视频LLM进行了对�
 4. **中间监督信号**：SPIKE-RL的奖励信号仅来自最终字幕的LLM-Match匹配度，是否可以引入更直接的中间信念准确性监督（如人类标注的信念变化）来进一步改进假设生成质量？
 
 5. **交互式场景验证**：该方法在机器人、监控等需要对新信息即时响应的交互式场景中的实用性有待验证，这些场景对延迟和鲁棒性的要求可能远超当前实验设置。
-
-
 
 ## 原文 PDF
 

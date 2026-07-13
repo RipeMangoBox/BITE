@@ -58,8 +58,6 @@ claims:
 
 **局限性**：流水线依赖现成的姿态估计器（PromptHMR），严重的初始化错误（尤其是手部）会传播至最终几何；极端低分辨率下，扩散细化器可能生成与身份不一致的细节，且遮挡区域的复原细节未必忠实于真实值。
 
-
-
 从单张图像重建三维人体是计算机视觉与图形学中的核心问题，在虚拟现实、增强现实、数字人建模等领域具有广泛的应用前景。近年来，基于三维高斯溅射（3D Gaussian Splatting, 3DGS）的人体重建方法取得了显著进展，能够从单视图或多视图输入中恢复出具有精细纹理的三维表示。然而，当场景从单人扩展到**密集人群**时，现有方法面临两个关键挑战。
 
 **第一，严重的个体间遮挡导致几何不完整。** 在人群场景中，人与人之间的相互遮挡使得每个个体的可见区域大幅减少。传统的网格重建方法（如PSHuman、SyncHuman）和3DGS重建方法（如LHM、**IDOL** (Zhuang et al., CVPR 2025)）通常假设输入图像中的人物是完整可见的，当面对严重遮挡时，它们往往产生透明伪影、不连贯的纹理或完全缺失的几何结构。如图7所示，这些基线方法在真实场景的遮挡图像上无法恢复完整的几何与纹理。问题的本质在于，现有方法缺乏从部分观测中“补全”不可见区域几何的能力，且没有针对遮挡场景进行专门的训练设计。
@@ -69,8 +67,6 @@ claims:
 从方法论层面看，当前的人体重建研究存在一个显著缺口：**缺乏一个统一高效的处理框架，能够同时应对密集人群场景中的遮挡补全和细节增强问题。** 具体而言，现有工作要么专注于单人场景的精细重建但无法处理遮挡，要么依赖2D修复作为预处理步骤，但这往往导致几何失真和伪影（如图13所示）。此外，大规模预训练的人体重建模型虽然具备强大的先验知识，但尚未被有效适配到遮挡场景中。
 
 针对上述瓶颈，**CrowdGaussian**提出了一个统一的两阶段框架。其核心动机在于：通过自监督的教师-学生蒸馏训练，使大规模人体重建模型能够从严重遮挡输入中恢复完整几何；并借助几何条件引导的单步扩散细化器，通过自校准学习策略自适应地增强欠恢复区域的细节，同时保留已恢复区域的结构完整性。这一设计使得从单张人群图像重建高保真三维高斯场景成为可能。
-
-
 
 ## 核心方法与创新机理
 
@@ -118,8 +114,6 @@ $$\mathcal { L } _ { \mathrm { o p t i m } } = \| R _ { \mathrm { r e f i n e d 
 
 CrowdGaussian 的创新本质在于**将“遮挡补全”和“细节增强”解耦为两个可独立优化的阶段**，并通过自监督蒸馏和自校准学习两个核心 knob 解决了各自的瓶颈：LORM 利用大规模预训练模型的自监督适应，在不依赖三维标注的情况下赋予其遮挡鲁棒性；CrowdRefiner 借助几何条件引导和 SCL 策略，实现了对欠恢复区域的自适应增强，同时避免了对已恢复区域的过度修改。这种“粗恢复-自适应细化-蒸馏回三维”的闭环设计，使得从单张人群图像重建高保真多人三维高斯场景成为可能。
 
-
-
 CrowdGaussian 提出一个**统一的两阶段框架**，从单张自然场景人群图像中重建多人的完整三维形状与外观。流水线的核心设计思路是：先“补全”被遮挡的个体几何，再“细化”粗糙的渲染结果，最终将高保真细节蒸馏回三维高斯表示。Figure 2 给出了完整的数据流。
 
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2603_17779/figures/002_Figure_2.jpg]]
@@ -151,8 +145,6 @@ CrowdGaussian 提出一个**统一的两阶段框架**，从单张自然场景�
 2. **自适应细节增强**：CrowdRefiner 采用**自校准学习**策略，将身份保持样本与退化-清洁样本混合训练，使模型能够自适应地判断哪些区域需要增强、哪些区域应当保留，避免标准监督训练中常见的过度细化（如面部扭曲和伪影）。同时，SMPL 法线图作为几何先验条件输入，防止结构歧义导致的手部塌陷和纹理错位。
 
 这种“先补全几何、再增强纹理、最后蒸馏回三维”的流水线设计，使得 CrowdGaussian 能够在严重遮挡和低分辨率输入下，仍然恢复出完整且高保真的多人三维高斯场景。
-
-
 
 ### 3D高斯场景表示
 
@@ -209,18 +201,8 @@ $$\mathcal { L } _ { \mathrm { o p t i m } } = \| R _ { \mathrm { r e f i n e d 
 
 该损失结合 L1 和 SSIM，在多视角下将细化后的 2D 细节有效地传递回 3D 表示，显著提升人群场景的几何锐度和局部保真度。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2603_17779/figures/003_Figure_3.jpg]]
 *Figure 3: The Large Occluded Human Reconstruction Model (LORM). (a) Architecture. LORM takes an occluded image and a template to reconstruct a complete 3D human. To preserve priors while enabling efficient adaptation, we freeze pre-trained backbones and inject trainable LoRA exclusively into the transformer. (b) Self-Supervised Training. We employ a Teacher-Student framework where the teacher generates clean pseudo-GTs from complete images. These signals guide the student to hallucinate complete geometries from occluded inputs via selfdistillation, achieving robustness without external 3D supervision*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2603_17779/figures/004_Figure_5.jpg]]
-*Figure 5: Effect of Self-Calibrated Learning (SCL). Without SCL (middle), the model tends to over-refine, causing facial distortions and artifacts. With SCL (right), structural integrity is preserved while details are enhanced, demonstrating adaptive refinement enabled by mixed identity supervision during training*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2603_17779/figures/019_Figure_9.jpg]]
-*Figure 9: Visualization of the multi-stage occlusion mask generation process. From left to right: original image, with keypointbased elliptical occlusions applied, further corrupted by irregular Bezier-based erasures, and finally smoothed via morphological op- ´ erations*
-
-
 
 ## 实验与关键发现
 
@@ -261,13 +243,6 @@ Figure 8 进一步揭示了方法对**输入分辨率降质的鲁棒性**。在 
 ### 失败模式与局限
 
 尽管整体性能优异，方法存在两个已知脆弱点。首先，**姿态估计误差会传播**：流水线依赖现成的多人 HMR 和分割模型，若手部或肢体初始化严重错误，后续 LORM 和 CrowdRefiner 无法修正基础结构错位。其次，在极端低分辨率下，扩散细化器可能生成**与身份不一致的细节**，且遮挡区域的复原内容（如衣物徽标）未必忠实于真实值——这是生成式先验的固有风险，需要在实际部署中通过人工校验或置信度估计加以控制。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2603_17779/figures/025_Figure_13.jpg]]
-*Figure 13: Comparison with the 2D inpainting + LHM pipeline*
-
-
 
 ## 定位与知识库关联
 
@@ -318,8 +293,6 @@ CrowdGaussian 的有效性受以下边界条件约束：
 3. **遮挡区域虚构细节的语义验证。** 论文未提供系统的方法来验证遮挡区域生成细节的语义正确性。对于服装纹理、配饰等身份相关属性，当前方法缺乏真值对齐的评估机制。这在实际应用（如数字人重建）中可能构成可靠性风险。
 
 4. **多人交互建模。** 当前方法独立处理每个个体，未显式建模人与人之间的遮挡关系、接触约束或相对深度排序。在密集交互场景（如拥抱、握手）中，独立重建可能导致个体间的穿插或深度错位。
-
-
 
 ## 原文 PDF
 

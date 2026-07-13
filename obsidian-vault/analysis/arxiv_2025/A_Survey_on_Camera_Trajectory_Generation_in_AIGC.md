@@ -52,8 +52,6 @@ claims:
 
 展望未来，将生成式AI的语义理解能力与经典方法的精确控制能力深度融合，构建大规模真实世界标注数据集，并开发专门针对相机轨迹的多维度评估基准，将是推动该领域从合成环境走向真实应用的关键路径。
 
-
-
 ### 1. AIGC 中的相机控制：一个被低估的核心问题
 
 在人工智能生成内容（AIGC）的浪潮中，文生图、文生视频模型已能产生令人惊叹的视觉画面，但**如何控制虚拟相机在三维空间中运动**——即相机轨迹生成——仍然是一个相对被忽视却至关重要的环节。相机轨迹决定了观众“看到什么、如何看到”，直接影响视觉叙事的连贯性、沉浸感和美学品质。无论是虚拟影视制作、游戏过场动画、无人机自主拍摄，还是基于扩散模型的视频生成，相机运动的精确控制都是连接内容生成与专业视觉表达的关键桥梁。
@@ -94,8 +92,6 @@ claims:
 
 通过这一综述，我们希望为研究者提供一个理解该领域全貌的“地图”，并激发更多跨范式、跨层次的创新工作。
 
-
-
 ## 核心方法与创新机理
 
 本综述的核心创新不在于提出一种新的算法，而在于**首次为相机轨迹生成领域构建了一个系统化的认知框架**，将碎片化的研究整合到一个统一的分析视角下。其关键贡献体现在以下几个维度：
@@ -128,8 +124,6 @@ claims:
 综述不仅总结了现状，更凝练出九个关键开放问题，包括：自然语言到精确参数的映射、动态多目标遮挡处理、实时自适应控制、叙事意图量化、大规模真实数据集构建、生成式AI的长时域规划、专用评估度量开发、端到端语义集成，以及从合成环境到真实场景的泛化。这些问题构成了该领域未来研究的路线图。
 
 **需注意**：本综述未进行新的实验验证，所有评估数据均来自原始论文，不同方法间的比较可能受实验设置差异影响，相关结论需结合具体方法论文进行交叉验证。
-
-
 
 本综述构建了一个三维分析框架，从**表示（Representation）**、**生成方法（Generation Method）**和**评估（Evaluation）**三个正交维度对相机轨迹生成领域进行系统梳理。该框架的核心逻辑在于：表示层定义了“如何描述相机轨迹”，方法层解决“如何生成轨迹”，评估层则回答“如何衡量轨迹质量”。三个维度之间并非线性串联，而是通过**抽象层次的选择**形成因果关联——表示层的抽象程度直接决定了方法层的搜索空间结构和优化难度，进而影响评估层可采用的度量方式。
 
@@ -173,8 +167,6 @@ claims:
 
 这一管线揭示了当前方法的**模块化程度不足**：表示、生成和评估往往被独立设计，缺乏端到端的协同优化。综述指出的开放问题——如语义理解、多主体支持和低级控制的集成——本质上要求打破这些模块间的壁垒，实现从高层意图到底层参数的流畅映射。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2506_00974/figures/012_Figure_11.jpg]]
 *Figure 11: Overview of yaw-pitch gimbal [Cong Danh 2021]*
 
@@ -183,8 +175,6 @@ claims:
 
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2506_00974/figures/021_Figure_17.jpg]]
 *Figure 17: The architecture of the model [Jiang et al. 2021] for generating camera trajectories based on a reference video and key points*
-
-
 
 本节从相机轨迹生成的技术栈出发，梳理支撑该领域的核心数学表示与关键公式。由于该综述本身不提出新方法，以下公式均来自其所覆盖的代表性工作，按表示层（低层数学表示）与优化/评估层组织。
 
@@ -278,16 +268,6 @@ $$E _ { \mathrm { t o t a l } } = \sum _ { i = 0 } ^ { N } \bigg [ \alpha _ { \r
 
 **关键观察**：上述公式体系揭示了一个核心权衡——低层数学表示（Toric空间、Plücker坐标）通过降维嵌入约束，降低了优化难度但牺牲了表达灵活性；高层表示（自然语言）表达力强但缺乏到精确参数的可微映射。当前方法普遍通过复合代价函数桥接这一鸿沟，但权重调节依赖人工经验，且缺乏对叙事意图和美学节奏的量化建模。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2506_00974/figures/004_Figure_4.jpg]]
-*Figure 4: Spherical surface used to model a camera for single-target configurations, showing the character’s vantage angles (??, ??) in spherical coordinates [Galvane et al. 2015a]*
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2506_00974/figures/007_Figure_6.jpg]]
-*Figure 6: Drone configuration in the DTS model, showcasing its 7D parameterization [Galvane et al. 2018]*
-
-
-
 ## 实验与关键发现
 
 本综述未进行新的实验，所有评估数据均来自原始论文，因此不同方法间的比较可能受实验设置差异影响。本节从方法谱系、评估体系与数据集三个维度对现有工作进行系统对比，揭示领域现状与瓶颈。
@@ -353,27 +333,11 @@ $$
 
 这些瓶颈共同指向了领域的核心矛盾：**相机轨迹的精确控制与高层语义表达之间存在根本性鸿沟**，而缺乏统一的评估标准和全面的数据集进一步阻碍了系统性进展。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2506_00974/figures/018_Table_2.jpg]]
-*Table 2: Overview of Optimization Methods for Camera Trajectory Generation Methods*
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2506_00974/figures/027_Table_3.jpg]]
-*Table 3: Overview of Machine Learning Methods for Camera Trajectory Generation Methods*
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2506_00974/figures/036_Table_4.jpg]]
-*Table 4: Overview of Hybrid Methods for Camera Trajectory Generation Methods*
-
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2506_00974/figures/037_Table_5.jpg]]
-*Table 5: Quantitative Metrics*
-
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2506_00974/figures/038_Table_6.jpg]]
 *Table 6: Qualitative Metrics*
 
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2506_00974/figures/039_Table_7.jpg]]
 *Table 7: Dataset Comparison*
-
-
 
 ## 定位与知识库关联
 
@@ -428,8 +392,6 @@ $$\operatorname*{maximize} F(f_1(q), f_2(q), \ldots, f_n(q)) \quad \mathrm{s.t.}
 **优化轴**：如何在动态多目标场景中实现**实时、美学感知、物理可行的联合优化**。当前优化方法（式7-18）的代价函数设计仍以手工加权为主，生成式AI（扩散模型、视觉-语言模型）的引入为长时域规划和全局一致性提供了新可能，但计算效率与实时性需求的矛盾尚未解决。
 
 **评估轴**：亟需构建**大规模、多样化、具有丰富相机运动标注的真实世界数据集**，并开发涵盖美学、连续性和叙事维度的专用评估度量。这一基础设施的缺失已成为制约整个领域从方法探索走向系统落地的根本瓶颈。
-
-
 
 ## 原文 PDF
 

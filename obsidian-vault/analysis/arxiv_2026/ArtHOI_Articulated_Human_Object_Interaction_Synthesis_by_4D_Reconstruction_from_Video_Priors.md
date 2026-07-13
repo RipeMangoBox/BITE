@@ -54,8 +54,6 @@ claims:
 
 方法目前局限于单自由度铰接与静态相机场景，对低纹理表面的光流跟踪失败是主要失效模式。
 
-
-
 ### 问题背景
 
 在三维视觉与图形学中，合成真实的人与物体交互（Human-Object Interaction, HOI）是构建沉浸式数字体验的核心技术。然而，现实世界中的物体往往不是单一刚体——门可以旋转、抽屉可以抽拉、笔记本电脑可以开合——这些**铰接式物体**通过多个部件的相对运动实现功能，而人类与它们的交互天然需要与这些运动部件协调配合。
@@ -75,8 +73,6 @@ claims:
 ArtHOI 的核心洞察在于：**将铰接式人物交互合成重新定义为从视频先验中进行4D重建的逆渲染问题**。给定一段由扩散模型生成的单目视频，系统不依赖任何3D监督，而是利用光流等2D几何线索来推断场景的完整4D表示。
 
 这一思路的关键在于**分解优化策略**：与其让人体和物体在歧义中相互干扰，不如先利用视频中的几何证据恢复物体的铰接结构，再在固定的物体骨架下优化人体运动。这种两阶段解耦从根本上消除了联合优化的歧义源，使得2D监督能够被有效提升为几何一致、物理逼真的4D场景。
-
-
 
 ## 核心方法与创新机理
 
@@ -143,8 +139,6 @@ ArtHOI 最关键的架构创新是**解耦的两阶段重建管道**（Figure 2�
 
 ArtHOI 是首个同时实现RGB渲染、铰接对象建模、物理约束和零样本泛化四个能力的方法。其根本差异在于：**将物体运动建模从单一刚体变换升级为基于光流分割的铰接变换**，并通过解耦优化与显式接触约束，将2D视频先验提升为几何与物理一致的4D表示。
 
-
-
 ArtHOI 将铰接式人物交互（HOI）合成重新定义为一个**从单目视频先验进行4D重建的逆渲染问题**：给定一段由扩散模型生成的视频，在没有三维监督的情况下，重建出完整的铰接式4D场景 [Abstract]。这一范式转换的核心动机在于，现有零样本方法（如 **ZeroHSI**，Li et al., arXiv 2024）将物体视为单一刚体，无法建模铰接部件的运动，且人体与物体动态的联合优化在单目歧义下极易导致梯度冲突，难以生成物理一致的交互 [analysis_truth]。
 
 为消除上述歧义，ArtHOI 采用**解耦的两阶段重建管道**（Fig. 2），其输入-输出流如下：
@@ -160,13 +154,6 @@ ArtHOI 将铰接式人物交互（HOI）合成重新定义为一个**从单目�
 **关键设计决策**：两阶段的解耦是框架的核心因果调控旋钮。消融实验表明，若将解耦替换为单阶段联合优化，接触百分比将从 75.64% 骤降至 61.45%，旋转平均误差从 6.71° 升至 12.34°，证明分解优化对消除单目歧义和维持交互质量至关重要 [Table 6]。
 
 **模块关系**：预处理中的“光流部件分割”为阶段 I 提供动态/静态掩码；“准静态绑定”在铰接边界构建动态-静态高斯对，为 $\mathcal{L}_a$ 提供约束；阶段 I 输出的物体4D骨架与接触关键点直接馈入阶段 II，作为人体运动优化的几何条件。整个管道无需多视图或3D监督，仅依赖2D视频先验即可生成几何与物理一致的4D表示。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1699_ArtHOI_Articulated_Human_Object_Interaction_Synthesis_by_4D_Reconstructi/figures/001_Figure_1.jpg]]
-*Figure 1: ArtHOI recovers zero-shot articulated human-object scene geometry and dynamics from monocular video priors without 3D supervision. Unlike prior works (e.g., TRUMANS, ZeroHSI), our method achieves all four capabilities simultaneously: RGB rendering, articulated object modeling, physical constraint modeling, and zero-shot generalization, notably without using 3D supervision*
-
-
 
 ArtHOI 将铰接式人物交互合成形式化为一个从单目视频先验中进行 4D 重建的逆渲染问题。其核心架构围绕**解耦的两阶段重建管道**展开，通过将物体铰接恢复与人体运动优化分离，消除单目歧义与梯度冲突。以下逐一剖析关键模块及其数学基础。
 
@@ -260,16 +247,6 @@ $$\mathcal{L}_c = \sum_{t=1}^T \sum_{v \in \mathcal{V}_h} \sum_{q \in \mathcal{Q
 
 **光流依赖的脆弱性**：部件分割与跟踪损失均依赖 Co-tracker 的点跟踪质量。在低纹理或反光表面，跟踪失败会导致掩码错误与铰接预测失真（见 Fig. 6 失败案例），这是当前管道的主要失效模式。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1699_ArtHOI_Articulated_Human_Object_Interaction_Synthesis_by_4D_Reconstructi/figures/004_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l1699_ArtHOI_Articulated_Human_Object_Interaction_Synthesis_by_4D_Reconstructi/figures/005_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l1699_ArtHOI_Articulated_Human_Object_Interaction_Synthesis_by_4D_Reconstructi/figures/006_Figure.jpg]]
-
-
-
 ## 实验与关键发现
 
 ### 实验设置
@@ -303,8 +280,6 @@ Table 3 报告了铰接物体动态恢复的定量评估。ArtHOI 在单目设�
 
 Table 5 报告了用户研究结果：**98.04%** 的参与者总体偏好 ArtHOI over TRUMANS，且在物理合理性、动作自然度、铰接真实性和外观一致性四个维度上均显著优于所有基线。该结果从人类感知层面强有力地验证了 ArtHOI 生成交互的逼真度。
 
-![[assets/figures/papers/paper_list_l1699_ArtHOI_Articulated_Human_Object_Interaction_Synthesis_by_4D_Reconstructi/figures/011_Table_5.jpg]]
-
 ### 消融实验
 
 Table 6 的系统消融揭示了各组件的关键作用：
@@ -323,14 +298,8 @@ Fig. 6 展示了典型失败案例。ArtHOI 的核心瓶颈在于其对光流点
 ![[assets/figures/papers/paper_list_l1699_ArtHOI_Articulated_Human_Object_Interaction_Synthesis_by_4D_Reconstructi/figures/013_Figure_6.jpg]]
 *Figure 6: Failure cases. Co-tracker struggles with low-texture or reflective regions, leading to distortions that propagate into articulation prediction*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1699_ArtHOI_Articulated_Human_Object_Interaction_Synthesis_by_4D_Reconstructi/figures/012_Table.jpg]]
 *Table: Ablation study results. We remove individual components and evaluate their impact on both interaction and articulation*
-
-![[assets/figures/papers/paper_list_l1699_ArtHOI_Articulated_Human_Object_Interaction_Synthesis_by_4D_Reconstructi/figures/002_Table_1.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -374,8 +343,6 @@ ArtHOI 的适用边界由以下假设和依赖条件界定：
 4. **光流跟踪失败的鲁棒替代**：当 Co-tracker 在低纹理区域失效时，是否存在更鲁棒的几何线索（如深度估计、法线预测）可以补充或替代光流信号？这直接关系到方法在真实场景中的可用性。
 
 5. **与生成模型的深度整合**：ArtHOI 目前将扩散模型生成的视频作为“先验”输入，但两阶段管道与生成过程本身是解耦的。是否可以将物理约束（如接触损失、碰撞损失）直接嵌入扩散模型的去噪过程，实现“生成即物理一致”的端到端范式，是一个值得探索的方向。
-
-
 
 ## 原文 PDF
 

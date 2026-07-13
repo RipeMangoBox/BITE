@@ -58,8 +58,6 @@ DriveLaW 的核心洞见在于：大规模视频生成扩散模型在去噪过�
 
 在实验上，DriveLaW 在 nuScenes 单视图视频生成中 FID 达到 4.6（较先前最优方法 Vista 提升 33.3%），FVD 达到 81.3；在 NAVSIM 闭环规划基准上 PDMS 达到 89.1，刷新纪录。消融实验进一步证实：视频潜在特征作为规划条件显著优于 BEV 特征（PDMS 89.1 vs 84.1）和 VLM 隐藏状态（89.1 vs 86.5），且扩展视频预训练数据量（0→7.6M 样本）可将 PDMS 从 85.9 提升至 89.1，验证了大规模视频生成学习对规划的迁移价值。
 
-
-
 ### 自动驾驶世界模型的表征断裂困境
 
 自动驾驶系统需要在高度动态和不确定的环境中同时完成未来场景预测与运动规划。近年来，世界模型（world models）作为学习环境动态的内部表征工具，在视频生成和规划任务中展现出巨大潜力。然而，现有世界模型方法普遍存在一个深层瓶颈：**视频生成与运动规划被解耦为两个独立或弱耦合的模块**，导致规划器无法直接利用生成模型在大量视频数据中学到的物理规律和场景语义。
@@ -92,8 +90,6 @@ DriveLaW 的主要贡献包括：
 4. 在 nuScenes 视频生成和 NAVSIM 闭环规划基准上均取得 state-of-the-art 性能。
 
 后续章节将依次展开：相关工作对比、DriveLaW-Video 和 DriveLaW-Act 的详细设计、三阶段训练策略，以及全面的实验验证与消融分析。
-
-
 
 ## 核心方法与创新机理
 
@@ -158,8 +154,6 @@ DriveLaW 的创新聚焦于单视图设定下的链式生成-规划统一架构�
 - **实时性优化**：链式架构涉及两次扩散过程（视频生成 + 轨迹规划），推理延迟是否满足实时驾驶需求尚待评估；
 - **规模定律**：视频预训练数据量与模型规模之间的关系曲线尚未完整刻画，更大规模预训练的收益边界仍不明确。
 
-
-
 DriveLaW 的核心理念是将视频生成与运动规划**链式耦合**：不再将世界模型仅作为独立的预测器，而是将其扩散去噪过程中产出的中间潜在特征直接注入规划器，作为强驾驶先验。这一设计使得规划器能够内化视频生成模型从大规模数据中学得的场景语义、智能体动态与物理一致性，从而在生成与规划之间建立**内在一致性**。
 
 ### 模块架构
@@ -198,8 +192,6 @@ DriveLaW 由两个核心模块构成，并通过统一的潜在空间实现表�
 与现有世界模型方法的根本差异在于**规划与生成的耦合方式**：Epona（Zhang et al., ICCV 2025）等并行架构将生成与规划分离训练，规划模块依赖显式的 BEV 特征或 VLM 隐藏状态；而 DriveLaW 直接复用视频生成器内部的中间潜在表征，避免了额外的特征工程。表征消融实验表明，视频潜在特征作为扩散条件显著优于 BEV 特征（PDMS 89.1 vs 84.1）和 VLM 隐藏状态（89.1 vs 86.5），验证了链式表征的优越性（Table 5）。
 
 此外，**去噪步骤的选择**对规划性能至关重要：在去噪早期（$t=1$）提取的视频潜在特征可获得最强规划性能（PDMS 89.1），而越接近完全去噪（$t=10$）性能急剧下降至 23.2，表明噪声中蕴含的语义信息对规划具有关键价值（Table 6）。
-
-
 
 ### 3.1 链式生成-规划统一架构
 
@@ -266,12 +258,8 @@ $$\mathcal{L}_{\mathrm{FM}} = \mathbb{E}_{t, a_0, \epsilon}\Big[\big\|f_{\theta}
 
 消融实验证实，该三阶段策略同时取得最低 FID（4.6）和 FVD（81.3），优于任何单阶段或双阶段变体，验证了渐进式课程对链式架构训练的必要性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2467_https_openaccess_thecvf_com_content_CVPR2026_html_Xia_DriveLaW_Unifying/figures/002_Figure_2.jpg]]
 *Figure 2: Restoring Structural and Temporal Consistency via Noise Reinjection. This comparison highlights the impact of our method. The baseline generation shows significant degradation, including (a) blurring, (b) structural inconsistency, and (c) artifacts. By integrating noise reinjection, our model preserves sharp details, maintains object structures, and produces clean, artifact-free frames, demonstrating a crucial improvement in video quality*
-
-
 
 ## 实验与关键发现
 
@@ -297,9 +285,6 @@ DriveLaW 基于一个 **2B 参数**的视频扩散 Transformer（Video DiT）和
 
 在 nuScenes 验证集开放环路规划上（Table 3），DriveLaW 的平均 L2 位移误差为 **1.15 m**，优于 Epona 的 1.25 m（-0.10 m）；平均碰撞率为 **0.24%**，低于 Epona 的 0.36%（-0.12%）。这表明链式耦合架构不仅在闭环场景中稳定，在开放环路评估中同样具备一致的轨迹预测精度和安全性。
 
-![[assets/figures/papers/paper_list_l2467_https_openaccess_thecvf_com_content_CVPR2026_html_Xia_DriveLaW_Unifying/figures/005_Table_3.jpg]]
-*Table 3: Planning performance on NuScenes. We report L2 displacement error and collision rate at 1s, 2s, 3s, and averaged*
-
 ### 关键消融实验
 
 **视频预训练数据规模（Table 4）**：将视频预训练样本从 0 逐步扩展至 760 万，PDMS 从 85.9 单调提升至 89.1。这一趋势强有力地证明：**大规模视频生成学习内化的驾驶先验（场景语义、智能体动态、物理一致性）可直接迁移至规划任务**，且尚未出现饱和迹象。
@@ -321,21 +306,8 @@ Figure 3 展示了 DriveLaW 与 Epona 在 nuScenes 验证集上的定性对比�
 ![[assets/figures/papers/paper_list_l2467_https_openaccess_thecvf_com_content_CVPR2026_html_Xia_DriveLaW_Unifying/figures/007_Figure_3.jpg]]
 *Figure 3: Qualitative Comparison with state-of-the-art driving world model. We compare DriveLaW with Epona [81] on nuScenes validation set. DriveLaW generates videos with (1) clearer vehicle details and more stable structural integrity, (2) well-preserved pedestrian shapes that remain easily identifiable, and (3) correct recognition and maintenance of inconspicuous objects (e.g., the yellow van), demonstrating superior visual quality, subject preservation, and semantic understanding*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2467_https_openaccess_thecvf_com_content_CVPR2026_html_Xia_DriveLaW_Unifying/figures/006_Table_4.jpg]]
-*Table 4: Scaling video pretraining improves planning on NAVSIM Navtest. Rows vary the number of video pretraining samples used before fine-tuning the diffusion planner on NAVSIM*
-
-![[assets/figures/papers/paper_list_l2467_https_openaccess_thecvf_com_content_CVPR2026_html_Xia_DriveLaW_Unifying/figures/008_Table_7.jpg]]
-*Table 7: Comparison of different training strategies with FID and FVD scores*
-
 ![[assets/figures/papers/paper_list_l2467_https_openaccess_thecvf_com_content_CVPR2026_html_Xia_DriveLaW_Unifying/figures/009_Table_5.jpg]]
 *Table 5: Representation ablation on NAVSIM Navtest. We compare BEV features, VLM hidden states, and video latents as diffusion condition*
-
-![[assets/figures/papers/paper_list_l2467_https_openaccess_thecvf_com_content_CVPR2026_html_Xia_DriveLaW_Unifying/figures/010_Table_6.jpg]]
-*Table 6: Which video denoising step feeds the Action DiT. We evaluate planning when conditioning on video latents taken from different diffusion denoising steps*
-
-
 
 ## 定位与知识库关联
 
@@ -385,8 +357,6 @@ DriveLaW 的三阶段渐进式课程训练策略解决了链式架构的训练�
 - **实时部署**：链式架构的推理延迟优化路径（模型压缩、缓存策略、早期退出）？
 - **闭环交互**：在交互式闭环驾驶中，视频生成与规划的动态耦合机制如何设计？
 - **表征可解释性**：中间去噪潜在特征中具体编码了哪些驾驶先验（语义、几何、物理）？
-
-
 
 ## 原文 PDF
 

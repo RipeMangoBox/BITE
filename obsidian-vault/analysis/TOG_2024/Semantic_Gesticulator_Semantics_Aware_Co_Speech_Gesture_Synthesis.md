@@ -55,8 +55,6 @@ claims:
 
 系统当前局限包括：仅支持单人演讲场景、语义手势库基于英语文化背景、LLM 检索的计算开销较大。未来方向包括扩展到多方对话、引入运动相位信息优化融合策略，以及利用 RLHF 对齐用户语义偏好。
 
-
-
 协同语音手势（co-speech gesture）是人类交流中不可或缺的非语言信号，它不仅强化语音的节奏感，还承载丰富的语义信息。在虚拟人、数字助手和游戏角色等应用中，自动生成与语音同步且语义准确的手势一直是计算机图形学和人机交互领域的核心挑战。
 
 近年来，深度生成模型在语音驱动的节奏手势生成上取得了显著进展，主流方法包括基于MLP、RNN、Transformer、扩散模型或VAE的回归/预测框架。然而，**语义手势的生成仍是一个瓶颈**：语义手势（如“竖起大拇指”“挥手”“指向”等）在训练数据中天然稀疏，且其与语音文本的对应关系具有长尾特性。现有方法多试图从通用语音手势数据集（如ZEGGS、BEAT）中隐式学习这种对应，但受限于数据稀疏性，难以可靠地捕捉语音与长尾语义手势之间的映射，导致生成的语义手势不准确、时机不当或动作不自然。
@@ -68,8 +66,6 @@ claims:
 3. **节奏与语义的融合缺乏系统性**：节奏手势生成和语义手势插入通常被割裂处理，缺少在潜空间层面将两者有机融合的机制，导致生成结果要么缺乏语义表达，要么破坏动作的自然过渡。
 
 针对上述问题，本文提出**Semantic Gesticulator**，核心动机在于：**通过构建覆盖200余种常见语义手势的高质量动作数据集，并利用大语言模型（LLM）进行端到端的生成式检索，系统能够自动为输入语音选择合适的语义手势并确定插入时机；同时，通过语义对齐模块在潜空间融合语义手势与节奏手势，实现既有语义又具节奏感的自然手势。** 这一思路将语义手势生成从“隐式学习”转变为“检索增强生成”，从根本上缓解了数据稀疏带来的学习困难。
-
-
 
 ## 核心方法与创新机理
 
@@ -109,8 +105,6 @@ claims:
 
 三个 changed slots 并非孤立存在，而是形成了一条因果链：**SeG 数据集**提供了语义手势的丰富覆盖 → **LLM 生成式检索**从库中精准选择合适手势 → **GPT 生成器**在离散潜空间生成节奏手势 → **语义对齐模块**在潜空间将二者融合。微调 LLM 的检索准确率达 97.8%，远超零样本（56.7%）和少样本策略（Table 3），证明领域对齐对检索质量的必要性。用户研究中，本系统在语义准确性上显著优于所有基线（p<0.001），在 ZEGGS 和 BEAT 上分别取得 0.48 和 0.41 的语义准确度（Table 1），定量指标 FGD 和 SC 也均为最优（Table 2）。
 
-
-
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2405_09814/figures/002_Figure_2.jpg]]
 *Figure 2: Our system is composed of three principal components: (a) an endto-end neural generator, adept at handling a wide array of speech audio inputs to create gesture animations that are in rhythm with the speech; (b) a generative retrieval framework based on a large language model (LLM), adept at interpreting transcript context and selecting suitable semantic gestures from an extensive library covering commonly used gestures; and (c) a semantics-aware alignment mechanism, which amalgamates the chosen semantic gestures with the rhythmically produced motion, culminating in gestures that are semantically enriched*
 
@@ -123,8 +117,6 @@ Semantic Gesticulator 的整体 pipeline 由三个核心模块串联构成，形
 3. **Semantic Alignment Module（语义对齐模块）**：根据音频节拍检测结果确定融合时机——将语义手势的插入时刻对齐到距离触发词时间戳最近的音频节拍点。随后在潜空间执行加权渐变合并：在替换位置前后使用半余弦曲线将语义手势 token 的权重从 0.3 渐变至 0.7 再回落，确保语义手势与原始节奏手势之间平滑过渡，避免动作断裂。
 
 **输入输出流**：系统输入为语音音频及其对应文本；Gesture GPT Generator 输出节奏手势 token 序列，LLM 检索模块输出语义手势及其插入时机，语义对齐模块将二者在潜空间融合后，经 RVQ 解码器重建为最终全身手势运动序列。
-
-
 
 Semantic Gesticulator 由三个核心模块构成：**Gesture GPT Generator**（节奏手势生成）、**LLM-based Semantic Gesture Retrieval**（语义手势检索）和 **Semantic Alignment Module**（语义对齐融合）。以下逐一剖析各模块的关键设计与公式。
 
@@ -201,8 +193,6 @@ $$w_{\mathrm{raw}} = 1 - w_{\mathrm{semantic}}$$
 
 整个 pipeline 的因果逻辑链为：**SeG 数据集 + 语义感知索引** → LLM 精准检索语义手势及插入时机 → 语义对齐模块在音频节拍点以加权渐变方式将语义手势融入 GPT 生成的节奏手势潜空间。Table 2 的消融数据直接验证了这一链路的核心节点：移除语义对齐模块后，ZEGGS 上的 SC 从 0.38 骤降至 0.09，BEAT 上从 0.45 降至 0.08，证明显式语义融合是不可替代的关键环节。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现与定量结果
@@ -251,15 +241,8 @@ Semantic Gesticulator 在两个主流数据集 ZEGGS 和 BEAT 上均取得最优
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2405_09814/figures/019_Figure_16.jpg]]
 *Figure 16: The comparison of three strategies*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2405_09814/figures/015_Figure_13.jpg]]
 *Figure 13: Qualitative comparison between our system and baselines (GestureDiffuCLIP [Ao et al. 2023] and CaMN [Liu et al. 2022d]) using two test speech excerpts*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2405_09814/figures/009_Figure_9.jpg]]
-*Figure 9: Comparison of the indexing results of two semantic gestures*
-
-
 
 ## 定位与知识库关联
 
@@ -311,8 +294,6 @@ Semantic Gesticulator 的核心洞察是：**将语义手势的生成从节奏�
 ### 证据强度评估
 
 本方法的核心主张得到了充分的实验支撑：用户研究（Table 1）在语义准确度上以 p<0.001 的显著性水平超越基线；消融实验（Table 2）清晰验证了语义对齐模块和语义感知索引的必要性；LLM检索策略对比（Table 3）量化了微调带来的巨大收益。定量指标（FGD, SC）在所有基线对比中均取得最优。基线覆盖了扩散模型、Transformer、VAE等主流类别，公平性在可接受范围内，但未包含2024年最新的一些扩散模型方法。
-
-
 
 ## 原文 PDF
 

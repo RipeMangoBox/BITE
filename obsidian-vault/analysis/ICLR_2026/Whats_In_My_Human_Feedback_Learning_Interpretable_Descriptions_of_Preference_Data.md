@@ -60,15 +60,11 @@ WIMHF 的方法定位介于纯黑盒奖励模型与完全手动特征工程之�
 
 值得注意的是，WIMHF 揭示的偏好在不同数据集间存在显著异质性——例如 Reddit 和 Arena 偏好笑话与非正式语气，而 HH-RLHF 和 PRISM 则厌恶这些特征——这提示混合异质数据源进行偏好微调可能导致信号冲突，而 WIMHF 为从业者提供了一种在训练前审计和整理偏好数据的实用工具。
 
-
-
 从人类反馈中学习偏好是当前大语言模型对齐的核心范式。然而，一个关键问题长期被忽视：**人类反馈数据本身究竟编码了哪些偏好？** 这些偏好数据集由提示分布、响应分布和标签分布三个层次共同生成，标注者可能会系统性地偏好某些风格、格式或内容特征，而这些偏好往往未被明确记录，甚至与设计者的意图相悖。
 
 现有方法在理解和审计这些偏好时面临根本性瓶颈。一方面，依赖预定义假设的人工分析只能捕捉研究者已知的维度，无法发现数据集中隐含的、未曾预料的偏差模式。另一方面，黑盒奖励模型虽然能有效预测偏好标签，但其内部表征不可解释，无法告诉从业者“标注者到底喜欢什么”。即便使用嵌入空间的线性分类器进行偏好预测，其权重维度也难以映射到人类可理解的概念。这种可解释性的缺失使得数据集内部的系统性偏差——如对不安全内容的偏好、对特定表达风格的厌恶——长期处于不可见状态。
 
 本文的核心洞察在于：**通过自动发现响应之间的可测量差异，并将其与偏好标签关联，可以在不依赖先验假设的前提下，揭示数据集中真正被表达出的偏好。** 具体而言，WIMHF 引入稀疏自编码器（SAE）从响应对的文本嵌入差异中学习稀疏特征，这些特征捕获了响应间一致性的可测量偏好；随后通过控制长度的逻辑回归，将每个特征与偏好标签关联，得到其边际胜率效应，即表达偏好。这一框架使得从业者能够系统性地回答“我的人类反馈数据里有什么”——哪些特征在驱动标注决策，这些特征在不同数据集中是否一致，以及它们是否与期望的对齐目标相符。
-
-
 
 ## 核心方法与创新机理
 
@@ -106,8 +102,6 @@ WIMHF 的创新不仅停留在分析层面，还直接支撑了两类高影响�
 
 综上，WIMHF 的方法论贡献并非单一技术的堆砌，而是通过“SAE 特征学习 → 自动描述与验证 → 长度控制回归 → 下游干预”这一完整链条，将偏好数据从黑盒预测对象转变为了可审计、可干预、可个性化的结构化知识。
 
-
-
 WIMHF 将偏好数据的可解释分析形式化为一个三阶段流水线，其核心目标是从原始偏好对中同时提取**可测量偏好**（响应间可被量化的差异）与**表达偏好**（哪些差异实际解释了标注标签）。
 
 ### 数据生成视角下的问题定义
@@ -137,8 +131,6 @@ $$\Pr(y = 1) = \sigma (\alpha + \beta_j \cdot z_j + \gamma \cdot \mathbf{x})$$
 ### 前置处理与边界条件
 
 在进入流水线之前，数据预处理模块负责过滤无效样本、主观标注对，并随机交换响应顺序以消除位置偏差。当前分析主要针对主观对话类数据，过滤掉了数学、编程等客观问答场景——在这些场景下，文本嵌入可能不编码正确性信息，限制了方法的适用范围。
-
-
 
 ### 1. 形式化框架：可测量偏好与表达偏好
 
@@ -203,8 +195,6 @@ $$\operatorname{Pr}(y = 1) = \sigma \left( \alpha + (\beta_j + \delta_{j,g}) \cd
 - **长度控制**：在所有回归中显式控制词数差 $\ell_\Delta$，以隔离非长度相关的偏好信号。移除该控制时，类似长度本身的特征会自动浮现为表达偏好。
 - **稀疏性约束**：$K=4$ 的硬稀疏性确保每个样本仅激活少量特征，使得特征解释更聚焦、非冗余。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：稀疏可解释特征捕获偏好信号
@@ -247,13 +237,8 @@ WIMHF 特征并非特定嵌入模型或随机种子的产物。Table 3 展示了
 
 **数据整理**：在 Chatbot Arena 数据集中，WIMHF 发现了一个强烈的表达偏好——标注者显著偏好模型满足不安全请求而非拒绝（边际胜率变化 $\Delta\text{win} = -31\%$，Table 1）。基于此发现，论文对“拒绝不安全请求”特征激活最强的前 1000 个样本进行标签翻转（将拒绝改为被选，不安全回复改为被拒）。结果显示，RewardBench2 的安全准确率从 8.9% 跃升至 46.2%，提升了 37.3 个百分点，且非安全性能保持在基线的 95% 置信区间内，未受损害（Figure 3a）。这一简单干预还导致了 Chatbot Arena Elo 排名的显著变化：30 个模型中 16 个的 Elo 变化超过 50 分，表明原始排名受到不安全偏好的严重污染（Figure 6）。
 
-![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_sC6A1bFDUt/figures/002_Table_1.jpg]]
-*Table 1: WIMHF extracts a diversity of interpretable, dataset-specific concepts, several of which have large effects on response winrate. “∆win” is the mean change in winrate when a response contains the feature, controlling for length. “Prevalence” is how often a feature occurs in the dataset*
-
 **个性化**：在 Community Alignment 上，通过混合效应模型识别出最主观的特征为“段落 vs 列表”（$\tau_j$ 最大，Table 7）。仅针对该特征进行个性化建模（学习每位标注者的特征系数偏移），在 $k=16$ 个训练样本时，保留 AUC 相较全局模型提升了 +1.1%（Figure 3b）。主动采样策略（优先选择特征激活最强的样本）在低 $k$ 时比随机采样效率更高。
 
-![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_sC6A1bFDUt/figures/011_Table_7.jpg]]
-*Table 7: Most and least subjective features in CA, ranked by the estimated random-slope variance $\tau _ { j }$ from the mixed-effects model. $\beta _ { j }$ is the dataset-level mean effect (described in §5.2)
 
 ### 数据集间偏好冲突
 
@@ -283,22 +268,6 @@ Figure 2 和 Table 1 揭示了不同数据集间显著的偏好异质性。例�
 | Table 5 | WIMHF 显著特征数（43/50）超过 ICAI（28/50） |
 | Figure 2 | 同一特征在不同数据集中偏好方向可能完全相反，混合数据存在信号冲突风险 |
 | Figure 6 | 安全调整后 Elo 排名大幅变化，16/30 模型变化 ≥50 分 |
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_sC6A1bFDUt/figures/017_Table_8.jpg]]
-*Table 8: Features whose coefficients vary significantly with annotator demographics. We show only the features that have a likelihood ratio test (Vuong, 1989) p-value of less than 0.05 after Bonferroni multiple testing correction (i.e., after multiplying the p-value by the number of features tested)*
-
-![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_sC6A1bFDUt/figures/018_Table_9.jpg]]
-*Table 9: We use gpt-5-low to judge whether the top-activating SAE feature for a given example is mentioned to any extent by the annotator-written explanations for why they picked their preferred response. In the table, we show several examples that were judged as matches (top section) and several examples that were judged as non-matches (bottom section). Excerpts of responses and explanations come from the Community Alignment dataset (Zhang et al., 2025a)*
-
-![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_sC6A1bFDUt/figures/021_Table_11.jpg]]
-*Table 11: Note: These examples include toxic content. Excerpts from the Chatbot Arena dataset where the feature for “refusing unsafe queries” fires most strongly. Annotators almost always choose the response that generates a response, even when it is very toxic/sexual/harmful. Non-relevant sections of the prompts and responses are excluded*
-
-![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_sC6A1bFDUt/figures/023_Table_12.jpg]]
-*Table 12: All WIMHF features on Chatbot Arena with a high-fidelity interpretation (see §3, step 2). Features are colored based on whether they have a statistically significant relationship with preference, y. “∆win” is the average marginal effect on y when the feature is positive vs. negative, and after controlling for length. “Prevalence” is how often the feature occurs (i.e., is nonzero) across all response pairs in the dataset. We use Bonferroni correction for all significance tests. Dataset: Chatbot Arena. 7/22 features predict preference (p \< 0.0023)*
-
-
 
 ## 定位与知识库关联
 
@@ -338,8 +307,6 @@ WIMHF 处于**可解释偏好学习**与**数据集审计**的交叉点，其核
 - **在线偏差缓解**：当前的数据整理应用是一次性的预处理步骤（翻转 top 1000 样本标签使 RewardBench2 安全准确率从 8.9% 提升至 46.2%，Figure 3a）。能否利用 WIMHF 发现的偏差特征动态调整训练目标，实现在线式的偏差缓解？
 - **多语言与文化扩展**：WIMHF 目前仅处理英语数据。多语言或文化特定的偏好反馈可能包含不同的表达方式，SAE 学习的特征空间是否具有跨语言迁移能力？
 - **个性化安全边界**：尽管个性化能提升用户满意度，但需要限制在低风险特征子集（如风格而非政治立场）。当扩展到数十个主观特征时，如何确保不会加剧回音室效应？是否需要总体的安全约束机制来限制个性化范围？
-
-
 
 ## 原文 PDF
 

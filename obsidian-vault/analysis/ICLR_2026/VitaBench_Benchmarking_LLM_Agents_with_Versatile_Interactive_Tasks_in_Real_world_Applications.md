@@ -60,8 +60,6 @@ claims:
 
 **方法定位**：VitaBench 在现有交互式基准的基础上，通过三个关键设计实现差异化——将领域策略编码于工具依赖图结构中以消除冗长策略文本、引入跨场景组合任务以测试跨域协调能力、以及采用基于评分细则的滑动窗口评估器以支持多样化解答路径的鲁棒评判。
 
-
-
 大型语言模型（LLM）驱动的智能体正被广泛部署于真实世界服务场景，如外卖配送、到店消费和在线旅行预订。这些场景对智能体提出了远超简单工具调用的复合要求：它们必须从海量信息中自主探索并推理出隐含约束，在多工具间协调复杂的依赖关系，并与具有多样化行为特征的用户进行动态多轮交互。然而，现有LLM Agent评测基准未能同时覆盖这三个维度的挑战，导致评估结果难以反映智能体在实际部署中的真实能力瓶颈。
 
 ### 现有基准的缺口
@@ -77,8 +75,6 @@ VitaBench的设计源于一个关键洞察：**真实世界智能体任务的难
 - **交互复杂度**（$\mathcal{C}_{\mathrm{interact}}$）：用户模拟器具备多样化人格属性和动态行为特征，渐进式披露指令和隐含约束，智能体需通过主动询问来获取完整信息。部分可观测程度$\eta=1-\frac{|\bar{\mathcal{O}}|}{|S|}$越高，状态估计的不确定性越大。
 
 当这三个维度同时处于高复杂度时，现有最强模型在交叉场景任务上的平均成功率仅为30.0%（o3 high, Avg@4），远低于单场景任务（如Delivery场景53.5%），揭示了当前LLM Agent在扩展动作空间和跨域协调中的真实能力极限。
-
-
 
 ## 核心方法与创新机理
 
@@ -100,13 +96,6 @@ VitaBench 的核心创新在于首次系统性地将真实世界智能体任务�
 
 现有基准的用户行为建模通常缺失或仅使用单一用户画像。VitaBench 的用户模拟器引入**多样化用户人格**（如合作型、焦虑型、急躁型等）和**动态行为属性**，并采用渐进式指令透露机制——模拟器持有完整任务指令，但仅在智能体主动询问时逐步透露隐含约束。实验表明，用户行为对任务完成有显著影响：合作型用户使 Agent 成功率最高（Avg@4 = 22.8%），焦虑型最低（18.5%）；移除用户模拟器的动态属性后模型成功率提升，证实了交互复杂度对任务难度的实质性贡献。
 
-
-
-![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_rtcX9qOBaz/figures/002_Figure_2.jpg]]
-*Figure 2: VitaBench sources tasks from real-world environments by composing interconnected tools, diverse user requests, and structured databases. Agents interact with users through multiturn dialogue, while a rubric-based sliding-window evaluator tracks progress across the trajectory*
-
-![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_rtcX9qOBaz/figures/003_Table_1.jpg]]
-*Table 1: Comparison of existing user interaction benchmarks across three complexity dimensions: reasoning, tool, and interaction. $\cdot \langle { \bf \dot { \zeta } } _ { v }$ | indicates fully addressed, \ " $\mathbf { \alpha } \mathbf { \times } \mathbf { \cdots }$ indicates partially addressed, and \ " { x $} ^ { , }$ indicates not addressed. Detailed explanations for each trait are provided in Appendix A
 
 ![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_rtcX9qOBaz/figures/004_Figure_3.jpg]]
 *Figure 3: Overview of the VitaBench construction pipeline and a simplified cross-scenario example*
@@ -130,8 +119,6 @@ VitaBench 的构建围绕一个核心洞察展开：真实世界智能体任务�
 ### 输入输出流
 
 整个系统的数据流可概括为：**真实用户请求 → 任务合成（用户画像 + 指令 + 环境状态 + 评分细则）→ 智能体与用户模拟器多轮交互 → 轨迹分段评估 → 全或无成功判定**。智能体在部分可观测环境中通过工具调用与用户对话自主探索，用户模拟器根据画像动态响应并渐进式释放信息，评估器则独立于智能体模型（使用 claude-3.7-sonnet 以避免模型重叠）对完整轨迹进行事后评判。
-
-
 
 ### 任务形式化与复杂度分解
 
@@ -171,8 +158,6 @@ $$\text{score} = \mathbb{1}\left[\sum_j s_j = k\right]$$
 ### 任务创建流水线
 
 任务创建流水线包含四个组件：用户画像、任务指令、环境信息（数据库状态）和评分细则。任务源自真实用户请求，经合成与人工审核后形成 400 个任务（300 个单场景任务 + 100 个跨场景组合任务）。跨场景任务通过灵活组合不同领域的工具和场景生成，是 VitaBench 区别于不支持跨域组合的现有基准的**另一关键差异槽位**。
-
-
 
 ## 实验与关键发现
 
@@ -227,9 +212,6 @@ Table 6系统性地量化了环境复杂度特征与模型性能的关系：
 
 Figure 9的错误分布揭示了模型失效的系统性模式：
 
-![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_rtcX9qOBaz/figures/016_Figure_9.jpg]]
-*Figure 9: Error distribution of VitaBench*
-
 - **推理错误占所有失败案例的61.8%**，是绝对主导的失败类型。这包括信息整合失败、多步推理断裂、以及未能从部分可观测状态中推断隐含约束。
 - 工具使用错误和交互错误分别占剩余失败案例的主体，但远低于推理错误的占比。
 
@@ -238,19 +220,6 @@ Figure 9的错误分布揭示了模型失效的系统性模式：
 ### 评估稳定性分析
 
 Figure 7的再采样分析确定了k=4为最优运行次数：相比单次运行，4次运行的均方误差（MSE）降低77.5%，在统计精度与计算成本之间取得最佳平衡。这一设计选择为基准测试的标准化评估提供了方法论依据。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_rtcX9qOBaz/figures/005_Table_2.jpg]]
-*Table 2: Data statistics of VitaBench*
-
-![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_rtcX9qOBaz/figures/017_Table_8.jpg]]
-*Table 8: Representative per-task cost of VitaBench*
-
-![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_rtcX9qOBaz/figures/018_Table_9.jpg]]
-*Table 9: USER PROFILE*
-
-
 
 ## 定位与知识库关联
 
@@ -283,8 +252,6 @@ VitaBench 在方法层面做出了几项值得关注的设计选择，这些选�
 **稳定性与自我认知的挑战**：Pass@k 随采样次数增加而提升，但 Pass^k 急剧下降至接近零（Figure 4），表明当前模型即使能偶尔完成任务，也缺乏稳定复现的能力。更值得关注的是，论文指出智能体存在“在接近成功时过早放弃”的倾向，这指向一个更深层的问题：LLM Agent 缺乏对自身能力的准确认知（self-awareness）。如何通过强化学习或其他训练范式让智能体学会在多轮探索中更有效地利用反馈信号，是一个具有实践意义的开放方向。
 
 **用户模拟的进一步真实化**：Table 7 显示用户画像对任务完成率有显著影响——合作型用户下 Avg@4 为 22.8%，焦虑型用户仅 18.5%。这验证了交互维度的重要性，但也提示当前模拟器的行为多样性仍然有限。如何在保持评估稳定性的前提下引入更丰富的用户行为模式（如情绪变化、需求漂移），是基准演进的一个关键方向。
-
-
 
 ## 原文 PDF
 

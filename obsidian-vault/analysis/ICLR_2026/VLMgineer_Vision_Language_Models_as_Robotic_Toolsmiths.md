@@ -75,8 +75,6 @@ VLMGINEER 位于**VLM 驱动的机器人工具设计**与**进化算法**的交�
 
 > **注意**：部分基线方法的具体作者/年份/会议信息在已有分析中缺失（如 Human Prompts 的具体参与者背景仅描述为“机器人专家、LLM专家、外行”），建议手动核实后补充完整引用。
 
-
-
 机器人操作任务通常面临一个根本性矛盾：通用机械臂和夹爪的形态固定，而现实世界中的多样化任务往往需要高度特化的工具才能有效完成。从日常场景（如用勺子舀汤、用铲子翻煎饼）到工业应用（如精密装配、物料分拣），工具几何结构对任务成功起着决定性作用。然而，传统机器人工具设计流程存在显著瓶颈。
 
 **传统工具设计的核心瓶颈**在于，工具几何形状和参数模板需要大量人工干预——要么由人类专家手工指定形状与尺寸，要么依赖复杂的控制算法来弥补工具的不足。这种依赖导致两个关键缺口：第一，缺乏一个完全自动化的框架，能够同时优化工具几何和相应的动作策略；第二，现有方法将解决负担过度集中在控制策略上，而忽视了工具几何本身可以大幅降低任务难度的潜力。
@@ -86,8 +84,6 @@ VLMGINEER 位于**VLM 驱动的机器人工具设计**与**进化算法**的交�
 **VLMgineer的核心动机**在于一个关键洞察：视觉语言模型（VLM）蕴含丰富的物理世界先验知识，但这种创造力在单次提示下远未被充分激发。通过将VLM置于进化搜索的迭代循环中——让模型不断生成、评估、交叉变异工具与动作设计——可以显著释放其物理创造力，实现零人工规范下的工具-动作协同优化。这一思路将解决负担从复杂的控制策略转移到工具几何上：让工具适应任务，而非让控制算法弥补工具的不足。
 
 该方法填补了现有研究中的关键空白：首次提出了一个完全自动化的框架，无需任何人工预定义参数模板或工具规范，即可从零开始同时设计工具几何和机器人动作策略，并通过仿真中的进化搜索持续优化两者。
-
-
 
 ## 核心方法与创新机理
 
@@ -127,8 +123,6 @@ VLMGINEER的核心创新在于将视觉语言模型的零样本创造力与进�
 
 这一方法谱系定位表明，VLMGINEER并非简单地将VLM应用于工具设计，而是通过进化框架构建了一个完整的自动化设计-评估-优化闭环，实现了零人工规范下的工具-动作协同优化。
 
-
-
 ![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_nESyz4PvJL/figures/002_Figure_2.jpg]]
 *Figure 2: VLMGINEER takes unmodified environment source code, environment image, environmental description, and task description as context to zero-shot generate tool and action designs from a VLM. It then iteratively refines its tool and action designs through a loop of candidate sampling, simulation-based evaluation, and evolution improvement*
 
@@ -165,8 +159,6 @@ VLMGINEER 是一个完全自动化的工具-动作协同设计框架，其核心
 - **工具表示**：采用统一机器人描述格式（URDF），允许 VLM 以代码形式自由修改几何结构，无需人工预定义参数模板。
 - **动作表示**：动作策略以离散末端执行器位姿序列表示，降低了控制复杂度，但同时也限制了框架对需要连续力控或动态交互的任务的适用性。
 - **进化框架的角色**：消融实验（Table 1）表明，在相同样本预算下，进化搜索相比暴力 VLM 采样的平均归一化奖励提升 119.2%（0.938 vs 0.428），验证了迭代精炼是框架性能的核心机制。
-
-
 
 ### 框架总览
 
@@ -216,8 +208,6 @@ $$\max\left(0, 1 - \frac{\text{current\_distance}}{\text{initial\_distance}}\rig
 
 在相同样本预算（8000 次评估）下，VLMGINEER 的进化搜索平均归一化奖励达到 0.938，而暴力 VLM 采样仅为 0.428，提升 **+119.2%**（Table 1）。这表明进化框架通过迭代精炼的定向搜索，显著优于无引导的随机采样——后者不仅平均性能低，且方差大，而进化方法一致地改进初始设计。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -226,12 +216,10 @@ VLMGINEER在ROBOTOOLBENCH全部12项任务上进行了系统评估，验证了�
 
 **相对于人类语言指定的VLM设计**：VLMGINEER平均归一化改进达到 **64.7%**（见Figure 4）。人类提示实验涵盖了三种不同专业水平的参与者——机器人专家、LLM专家和外行——确保了对人工设计性能的全面评估。在所有12项任务上，VLMGINEER无论在峰值性能还是运行可靠性方面均优于人类提示方法（Figure 4）。值得注意的是，无工具的Franka Panda二指夹爪在多数任务上完全失败（Figure 4），这从侧面印证了工具设计的必要性。
 
-
 ![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_nESyz4PvJL/figures/004_Figure_4.jpg]]
 *Figure 4: Comparison of rewards for the Franka Gripper, 3 Human Prompt experiments, and our proposed method across 12 tasks. Darker bars indicate the average reward over five runs, while paler bars indicate the best reward. All results here were using gemini-2.5-pro-preview-03-25*
 
 **相对于RLBench现有手工工具**：在4项与RLBench相关的任务（BringCube、CleanTable、GatherSpheres、ScoreGoal）上，VLMGINEER相比RLBench原有手工工具平均归一化改进 **24.3%**（Figure 6）。定性对比（Figure 5）显示，VLMGINEER生成的工具在几何结构上展现出人类设计未曾考虑的创新形态——例如BringCube任务中生成的包围式铲斗，以及GatherSpheres任务中演化出的多齿耙状结构。
-
 
 ![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_nESyz4PvJL/figures/008_Figure_6.jpg]]
 *Figure 6: Performance comparison against standard RLBench tools. VLMGINEER consistently outperforms the original, human-crafted tools across four relevant tasks*
@@ -244,14 +232,12 @@ VLMGINEER在ROBOTOOLBENCH全部12项任务上进行了系统评估，验证了�
 
 在相同样本预算（8000次评估）下，VLMGINEER的进化搜索策略平均归一化奖励为 **0.938**，而暴力VLM采样基线仅为 **0.428**，性能提升 **119.2%**（Table 1）。VLM采样基线不仅平均表现差，且方差极大，这表明单纯增加VLM调用次数无法有效探索工具-动作联合设计空间。进化框架通过精英选择、交叉和变异机制，实现了对初始设计的持续改进，这是性能提升的关键因果机制。
 
-
 ![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_nESyz4PvJL/figures/011_Table_1.jpg]]
 *Table 1: Mean normalized reward (0–1) for Evolution vs. VLM Sampling under an Equal Sample Budget. The structured search of VLMGINEER substantially outperforms the brute-force sampling baseline, highlighting the critical role of the evolutionary framework*
 
 #### 基于种群进化 vs. 单一候选迭代改进
 
 Table 7显示，基于种群的进化方法平均奖励为 **0.55**，而仅对单一候选进行迭代提示改进的方法仅为 **0.28**。在ElevatePlate任务上，单一候选迭代改进完全失败（奖励0.0），而进化方法达到0.28。这表明维持设计多样性并通过交叉操作融合不同精英个体的优势特征，对于跳出局部最优至关重要。
-
 
 ![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_nESyz4PvJL/figures/032_Table_7.jpg]]
 *Table 7: Ablation study on evolutionary vs. single sample iterative prompt refinement*
@@ -286,14 +272,8 @@ Table 4和Table 5显示，选择更强大的VLM模型对性能至关重要。Gem
 - **Table 6**：图像反馈反而降低性能，揭示VLM在视觉-物理推理融合方面的瓶颈。
 - **Table 7**：种群多样性和交叉操作是进化成功的关键，单一候选迭代改进效果有限。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_nESyz4PvJL/figures/010_Figure_7.jpg]]
 *Figure 7: Qualitative examples of evolutionary refinement. The process makes intuitive and effective improvements to initial tool designs for tasks like GatherSpheres (top) and MoveBall (bottom)*
-
-
-
-
 
 ## 定位与知识库关联
 
@@ -340,8 +320,6 @@ VLMgineer 处于**机器人工具自动设计**与**视觉语言模型物理推�
 6. **VLM物理创造力的上限**：当前VLM在复杂物理推理上的局限如何限制工具创新？是否存在方法（如链式思维推理、物理仿真反馈增强）可进一步激发VLM的物理创造力？
 
 7. **计算效率**：每轮进化需要大量仿真评估（8000次），虽可并行化但总计算成本高。能否通过代理模型、主动学习或VLM自评估减少仿真调用次数？
-
-
 
 ## 原文 PDF
 

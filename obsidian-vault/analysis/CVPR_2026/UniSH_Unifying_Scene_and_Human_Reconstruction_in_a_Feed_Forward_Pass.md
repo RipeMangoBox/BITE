@@ -55,8 +55,6 @@ claims:
 
 **局限性**包括：未标注数据以舞蹈视频为主，存在群体偏差；仅支持单人场景，无法处理多人交互；细对齐阶段依赖粗对齐初始化，增加了训练复杂度。
 
-
-
 ### 问题背景：场景与人体重建的割裂
 
 从单目视频中理解三维世界是计算机视觉的核心目标之一。这一任务包含两个紧密关联的子问题：**三维场景重建**和**三维人体重建**。前者恢复环境的几何结构与相机运动，后者估计人体的姿态、形状与全局运动。在真实应用中——例如增强现实、人机交互、运动分析——场景与人体并非孤立存在：人体在场景中移动、与地面接触、被环境遮挡，二者共享同一度量空间和相机参数。
@@ -82,8 +80,6 @@ claims:
 3. **由粗到细的对齐训练**：先用合成数据学习粗对齐，再利用未标注真实数据通过几何对齐损失（单边Chamfer距离）和深度排序正则化进行细对齐，使SMPL网格与可见人体点云在物理上正确对应。
 
 通过这一设计，UniSH在单次前向传播中即可输出度量尺度的场景点云、相机参数和SMPL人体参数，在Bonn数据集上将深度误差Abs Rel从π³的0.049降至0.035（降低28.6%），在EMDB-2上将人体运动误差从JOSH3R的220.0 mm降至118.5 mm（降低46.1%），同时保持了前馈方法的实时性优势。
-
-
 
 ## 核心方法与创新机理
 
@@ -127,8 +123,6 @@ $$\mathcal { L } _ { \mathrm { d r e g } , i } = \mathrm { R e L U } ( \bar { d 
 
 上述三个 changed slots 形成了一条清晰的因果链：**AlignNet 提供了尺度与位置的全局骨架**，使度量级联合重建成为可能；**表面蒸馏将单目专家模型的高频细节注入多视图框架**，解决了通用重建模型人体几何粗糙的瓶颈；**由粗到细的对齐监督则有效利用了合成数据的标注优势和真实数据的分布优势**，使模型在真实场景中实现鲁棒的人景对齐。三者共同作用，使得 UniSH 在 Bonn 数据集上将 Abs Rel 从 π³ 的 0.049 降至 0.035（降低 28.6%），在 EMDB-2 上将 WA-MPJPE 从联合重建基线 JOSH3R 的 220.0 mm 降至 118.5 mm。
 
-
-
 UniSH 是一个前馈式联合重建框架，以单目视频片段为输入，在单次前向传播中同时预测度量尺度的场景几何、相机参数以及人体姿态与形状。如图2所示，框架由三个核心模块构成：**场景重建分支**、**人体重建分支**和**对齐网络（AlignNet）**。
 
 **输入与输出。** 给定 $N$ 帧图像序列 $\mathcal{T} = \{I_i\}_{i=1}^N$，UniSH 在单次前向传播中输出：
@@ -149,15 +143,8 @@ $$(s, \mathcal{T}) = \mathrm{AlignNet}(\mathcal{F}_{\mathrm{geo}}, [T_s | \mathc
 
 **数据流概要。** 视频帧同时流入场景重建分支和人体重建分支；场景分支输出几何特征与相机参数，人体分支输出 SMPL 参数与人体特征；AlignNet 融合两路特征，预测全局尺度与每帧平移，最终将 SMPL 网格放置到度量尺度场景中，实现端到端的联合重建。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1038_https_arxiv_org_abs_2601_01222/figures/002_Figure_2.jpg]]
 *Figure 2: The network architecture of UniSH. UniSH takes a monocular video as input. The video frames are processed by the Reconstruction Branch to predict per-frame camera extrinsics*
-
-![[assets/figures/papers/paper_list_l1038_https_arxiv_org_abs_2601_01222/figures/001_Figure_1.jpg]]
-*Figure 1: Given a monocular video as input, our UniSH is capable of jointly reconstructing scene and human in a single forward pass, enabling effective estimation of scene geometry, camera parameters and SMPL parameters*
-
-
 
 UniSH 的核心架构由三个功能模块构成，分别负责场景几何重建、人体参数回归以及人-景度量尺度对齐。整体数据流如 Figure 2 所示：输入一段 $N$ 帧的单目视频，经双分支处理后由 AlignNet 融合特征，输出全局尺度 $s$ 与每帧 SMPL 平移 $\{t_i\}_{i=1}^N$，最终实现前馈式的联合重建。
 
@@ -218,12 +205,8 @@ $${ \mathcal { L } } _ { \mathrm { s t a g e 3 } } = { \frac { 1 } { N } } \sum 
 ![[assets/figures/papers/paper_list_l1038_https_arxiv_org_abs_2601_01222/figures/010_Figure_7.jpg]]
 *Figure 7: Visual ablation of the Fine-grained Alignment stage. We validate the necessity of our unsupervised geometric losses on inthe-wild data. w/o Align Loss: Without explicit geometric alignment*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1038_https_arxiv_org_abs_2601_01222/figures/007_Figure_5.jpg]]
 *Figure 5: Ablation study of our key design. (a) A variant where the scene branch is directly supervised for metric scale, and the Align Net only predicts SMPL translation. (b) Our model trained with only the coarse (synthetic) alignment stage, omitting the fine-grained alignment. (c) Our full model, which incorporates both coarse (synthetic) and fine-grained (real-world) alignment stages*
-
-
 
 ## 实验与关键发现
 
@@ -260,27 +243,11 @@ Figure 6 从定性角度展示了人体表面细化的效果：π³ 基线保持
 2. **单人场景限制**：方法设计仅考虑视频中单人场景，无法处理多人交互或遮挡情况。
 3. **训练阶段复杂性**：细对齐阶段需要粗对齐初始化，否则训练不收敛（Figure 7 明确标注了移除粗对齐导致训练发散），增加了训练流程的复杂性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1038_https_arxiv_org_abs_2601_01222/figures/003_Table_1.jpg]]
 *Table 1: Quantitative results of human-centric video depth estimation on the Bonn [30] dataset. Our approach, UniSH, significantly outperforms all prior reconstruction-focused baselines*
 
-![[assets/figures/papers/paper_list_l1038_https_arxiv_org_abs_2601_01222/figures/006_Table_2.jpg]]
-*Table 2: Evaluation of global human motion estimation on EMDB-2 and RICH datasets. We categorize methods by their properties: Opt. Free(✓) indicates whether the method is feed-forward; Scene(✓) indicates the method jointly reconstructs 3D scene geometry*
-
-![[assets/figures/papers/paper_list_l1038_https_arxiv_org_abs_2601_01222/figures/008_Table_3.jpg]]
-*Table 3: Ablation study of our human surface refinement on the Bonn [30] dataset. ’BEDLAM’ denotes fine-tuning using only ground-truth (GT) supervision from the synthetic BEDLAM dataset. ’Real’ means using only real-world data and our proposed surface refinement loss*
-
-![[assets/figures/papers/paper_list_l1038_https_arxiv_org_abs_2601_01222/figures/004_Figure_3.jpg]]
-*Figure 3: Qualitative comparisons of human point cloud. With in-the-wild input, we compare the reconstructed human point cloud with strong reconstruction model baselines. Benefit from our surface refinement strategy, our UniSH generates consistently better human surface point cloud than all baseline methods*
-
 ![[assets/figures/papers/paper_list_l1038_https_arxiv_org_abs_2601_01222/figures/005_Figure_4.jpg]]
 *Figure 4: Qualitative results of global human motion estimation. We compare our method with well known HMR methods WHAM [41] and TRAM [56] on EMDB-2. Our method shows competitive results to these methods that specially designed and optimized for global human motion estimation task*
-
-![[assets/figures/papers/paper_list_l1038_https_arxiv_org_abs_2601_01222/figures/011_Figure_8.jpg]]
-*Figure 8: Qualitative Visualization of Joint Scene and Human Reconstruction. The examples demonstrate the robustness and metric consistency of our framework. The color gradient (light blue to dark blue) consistently encodes the temporal sequence across both the reconstructed camera poses and the SMPL meshes. The upper example illustrates robustness in reconstructing highly articulated poses (rock climbing) and accurately aligning the SMPL mesh with the scene geometry. The lower example demonstrates coherent, long-term tracking of human motion in a complex urban environment, verifying the metric stability and generalization of our joint reconstruction framework*
-
-
 
 ## 定位与知识库关联
 
@@ -319,8 +286,6 @@ UniSH 与专用的全局人体运动估计方法（如 **WHAM** 和 **TRAM**）�
 3. **完全自监督的尺度学习**：当前粗对齐阶段依赖合成数据的度量尺度监督。探索完全从未标注真实数据中自监督学习全局尺度的方案（例如通过场景中的已知尺寸物体或运动线索），可以进一步降低对合成数据的依赖，提升方法的通用性。
 
 4. **跨域泛化的鲁棒性验证**：论文主要在 Bonn、EMDB-2 和 RICH 数据集上评估，这些数据集以人体为中心。在更广泛的场景类型（如无人体存在的纯场景视频、极端光照条件）上的泛化能力尚待验证。
-
-
 
 ## 原文 PDF
 

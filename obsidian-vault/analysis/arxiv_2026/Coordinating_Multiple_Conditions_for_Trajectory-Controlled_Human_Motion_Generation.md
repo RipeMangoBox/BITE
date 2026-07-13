@@ -53,8 +53,6 @@ claims:
 
 实验结果表明，CMC 在 HumanML3D 骨盆全帧控制任务上达到 **FID=0.097**、平均控制误差仅 **0.51 cm**，远超先前最佳方法（Omnicontrol 的 FID=0.218、误差 3.38 cm），同时在文本-运动语义一致性（R-precision Top-3=0.784）上也保持领先。消融实验进一步证实，解耦框架与 SIM 各自带来显著的性能增益，简化运动表示相比冗余表示在整个去噪过程中显著降低控制误差且更稳定。
 
-
-
 ### 问题域：轨迹控制下的人体运动生成
 
 人体运动生成旨在根据给定条件合成自然且多样化的人体动作序列。当条件扩展为文本描述与空间轨迹的联合约束时，任务演变为**轨迹控制的人体运动生成**——要求生成的运动既要精确遵循指定的关节空间路径，又要忠实体现文本所描述的语义（如“一个人绕圈行走”）。这一能力对动画制作、虚拟现实和具身智能体控制等应用至关重要。
@@ -75,8 +73,6 @@ claims:
 - **第二阶段（Motion Completion）：** 在纯文本条件下，以前一阶段输出为部分观测，通过扩散修复模型完成全身运动生成，确保语义质量不受轨迹约束干扰。
 
 这种“控制-然后-生成”的范式从根本上规避了单阶段方法中条件冲突的问题，同时通过简化表示降低了轨迹控制阶段的不稳定性。此外，为防止第二阶段修复模型对固定观测模式过拟合，CMC 引入**选择性修复机制（SIM）**，在训练时以 50% 概率交替执行标准文本到运动生成与运动修复任务，提升模型对分布外观测的泛化能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -114,8 +110,6 @@ CMC 提出使用**简化表示**，仅保留关节局部位置 $\mathbf{j}^{p}$ 
 
 三者协同作用，使 CMC 在 HumanML3D 骨盆控制任务上达到 FID=0.097、平均误差仅 0.51 cm，远超先前最佳方法（TABLE I）。
 
-
-
 CMC 采用**分而治之**策略，将文本条件与轨迹条件的协调解耦为两个级联阶段，从根本上避免了单阶段框架中两类条件在去噪过程中相互干扰的问题（Fig. 1）。整体流水线如 Fig. 5 所示，两个阶段共享一个 CLIP 文本编码器（ViT-B/32），均以扩散模型为基础，骨干网络为 8 层 Transformer 编码器（特征维度 512）。
 
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2605_13729/figures/001_Figure_1.jpg]]
@@ -149,8 +143,6 @@ $$\mathcal{L}_{elem} = \frac{1}{N_{elem}} \sum_{i=1}^{N_{elem}} \| \mathbf{x}_0 
 $$\mathcal{L}_{global} = \frac{1}{N_{cont}} \sum_{i=1}^{N_{cont}} \| R(\hat{\mathbf{x}}_0) - C \|_2^2$$
 
 总损失为 $\mathcal{L} = \mathcal{L}_{elem} + \mathcal{L}_{global}$，分别约束局部元素精度与全局轨迹跟随精度。
-
-
 
 ### 扩散模型基础
 
@@ -197,22 +189,9 @@ $\mathcal{L}_{elem}$ 约束预测运动与真实运动在每个元素上的均�
 
 为防止第二阶段修复模型过拟合到固定的部分观测模式，CMC引入选择性修复机制。训练时以50%概率随机切换两种数据准备方式：标准文本到运动生成（非修复数据）和运动修复（修复数据）。该机制作为正则化手段，迫使模型同时保持生成能力和修复能力，增强对分布外部分观测的泛化能力（Fig. 6, Fig. 7）。
 
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2605_13729/figures/006_Figure_6.jpg]]
-*Figure 6: The workflow of SIM to train the diffusion inpainting model. SIM prepares non-inpainting data and inpainting data with a probability of 50% respectively*
-
 ### 共享文本编码器
 
 两个阶段共享CLIP文本编码器（ViT-B/32），将文本描述编码为嵌入向量，确保语义信息在两个阶段间一致传递。骨干网络为8层Transformer编码器，特征维度512。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2605_13729/figures/004_Figure_3.jpg]]
-*Figure 3: (a) With conflict: insufficient understanding of the text condition leads to suboptimal motion quality. (b) Without conflict: the network fully maps the text to motion while achieves accurate trajectory following*
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2605_13729/figures/016_Figure_12.jpg]]
-*Figure 12: Statistical mean and standard deviation of the control error across denoising steps. Darker-colored and lighter-colored curves indicate the use of simplified and redundant representations, respectively*
-
-
 
 ## 实验与关键发现
 
@@ -252,11 +231,6 @@ CMC在两个主流基准上均以显著优势超越先前方法。在HumanML3D�
 - **TABLE IV**：SIM对文本到运动生成任务的独立增益，证明该训练策略不仅服务于修复阶段，还提升了基础生成能力。
 - **Fig. 11 & Fig. 12**：简化表示的低误差与高稳定性优势，构成第一阶段设计选择的核心实证支撑。
 
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2605_13729/figures/015_Figure_11.jpg]]
-*Figure 11: Average control error across denoising steps. Darker-colored and lighter-colored curves indicate the use of simplified and redundant representations, respectively*
-
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2605_13729/figures/007_Table.jpg]]
 *Table: QUANTITATIVE RESULTS ON THE HUMANML3D TESTING SET. ALL RESULTS ARE TESTED ON THE PREMISE OF CONTROLLING ALL FRAMES. THE BEST SCORES ARE HIGHLIGHTED IN BOLD. → MEANS CLOSER TO REAL DATA IS BETTER. TABLE I TABLE II QUANTITATIVE RESULTS ON THE KIT-ML TESTING SET. ALL DATA IS TESTED ON THE PREMISE OF CONTROLLING ALL FRAMES. THE BEST SCORES ARE HIGHLIGHTED IN BOLD. → MEANS CLOSER TO REAL DATA IS BETTER. BUN MEANS BODY UPPER NECK, DEFINED IN KIT-ML*
 
@@ -265,14 +239,6 @@ CMC在两个主流基准上均以显著优势超越先前方法。在HumanML3D�
 
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2605_13729/figures/011_Table.jpg]]
 *Table: IV QUANTITATIVE RESULTS UNDER THE TEXT-TO-MOTION GENERATION SETTING ON THE HUMANML3D TESTING SET. BOLD INDICATES THE BEST RESULT, WHILE UNDERSCORE REFERS TO THE SECOND-BEST. “→” DENOTES CLOSER TO THAT OF THE REAL DATA IS BETTER*
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2605_13729/figures/012_Figure.jpg]]
-*Figure: (a) with SIM (b) without SIM*
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2605_13729/figures/009_Figure_9.jpg]]
-*Figure 9: Two visual comparisons (a) and (b) to qualitatively prove the existence of the conflict between text and trajectory conditions. The difference between the three columns is the number of joints that passed to the second stage, including: only the controlled joints and the pelvis (left), the controlled joints and joints belonging to the torso (middle), and all joints (right)*
-
-
 
 ## 定位与知识库关联
 
@@ -321,8 +287,6 @@ CMC 在轨迹控制人体运动生成的方法谱系中处于“解耦式多条�
 | 多任务正则化训练 | SIM 交替生成与修复 | 需要修复能力的条件生成模型 |
 
 这些原则的共同基础是“减少条件间干扰”这一核心洞察，其有效性已在文本-轨迹双条件场景中得到充分验证（TABLE III 消融实验：解耦框架相较单阶段框架 FID 和 R-precision 显著提升，控制误差大幅降低）。后续工作可沿三个方向推进：潜在空间引导机制设计、归一化坐标表示、以及 SIM 策略向其他多条件生成任务的迁移。
-
-
 
 ## 原文 PDF
 

@@ -52,8 +52,6 @@ claims:
 
 理论分析为两个度量提供了坚实保证：定理 1 证明 SFE 可控制输出特征协方差差异，定理 2–4 证明降低 DfI 与更平滑的损失景观、更少的休眠神经元和更高的特征有效秩直接相关。实验覆盖持续视觉学习（CIFAR-10/100、Tiny ImageNet）、大语言模型持续预训练（GPT-0.1B）和强化学习（Atari DQN、HumanoidBench SAC），FIRE 在所有场景下均超越或匹配 S&P、DASH、CBP、ReDo 等基线方法，同时保持极低的计算开销（0.06 秒 vs DASH 69 秒）和显存占用（55 MB vs DASH 2834 MB）。
 
-
-
 深度神经网络在非平稳环境中持续学习时面临一个根本性困境：如何在保留已学知识（稳定性）与适应新数据（可塑性）之间取得平衡。当模型在新数据上继续训练时，权重会逐渐偏离初始分布，出现**可塑性丧失**——模型更新能力下降，难以有效拟合新任务或新数据分布。这一现象在持续学习、增量训练和强化学习等场景中尤为突出，严重制约了模型的长期适应能力。
 
 现有应对可塑性丧失的方法大致可分为三类：**正则化方法**在训练期间持续约束权重，例如 **L2 Init** 通过 L2 惩罚使权重接近初始值，**Parseval Regularization** 约束权重矩阵保持近似正交；**神经元级重置方法**定期重新初始化低贡献或休眠单元，如 **CBP**（Continual Backpropagation）基于效用分数重置单元，**ReDo**（Recycling Dormant neurons）重置激活分数低于阈值的神经元，**SNR**（Self-Normalized Resets）通过统计检验检测活性下降的神经元；**权重级重初始化方法**直接干预整个层的权重矩阵，如 **S&P**（Shrink & Perturb）将权重向初始值收缩并添加噪声，**DASH**（Direction-Aware Shrinking）根据权重与损失梯度的方向相似度选择性收缩权重。
@@ -61,8 +59,6 @@ claims:
 然而，这些方法存在一个共同的核心瓶颈：**缺乏一个原则性的框架来同时优化稳定性和可塑性这两个相互冲突的目标**。保守的重初始化（如轻度收缩）无法恢复足够的可塑性，而激进的重初始化（如完全重置）会破坏已学知识。现有方法或依赖启发式规则，或将两个目标隐式地混入单一操作中，无法精确控制稳定性与可塑性之间的权衡。此外，像 DASH 这样的方法计算开销巨大（需计算梯度方向相似度），难以在实际应用中高效部署。
 
 FIRE 的动机正是填补这一空白：**将稳定性-可塑性权衡显式建模为有约束的优化问题**，用两个独立且可量化的度量——平方 Frobenius 误差（SFE）和等距偏离度（DfI）——分别刻画稳定性和可塑性，并通过高效的正交 Procrustes 求解器实现无需手动调参的精确平衡。这一思路将重初始化从经验性操作提升为有理论保证的优化过程，为持续学习中的权重干预提供了统一而高效的解决方案。
-
-
 
 ## 核心方法与创新机理
 
@@ -108,8 +104,6 @@ FIRE 的创新集中在**重初始化时刻的约束优化框架**，而非持�
 
 需要注意的是：当前验证限于中等规模模型（ResNet-18、ViT-Tiny、GPT-0.1B），在大规模架构上的效果有待检验；对 Transformer 仅正交化 Q/K 投影的选择尚未系统消融；重初始化时机目前依赖预设触发点，缺乏自适应触发机制。
 
-
-
 FIRE 将稳定性-可塑性权衡显式建模为一个约束优化问题，通过两个互补的度量——SFE 和 DfI——分别量化稳定性和可塑性损失，并在正交 Procrustes 问题的框架下求解最优重初始化权重。整个 pipeline 由四个核心模块串联构成：
 
 1. **稳定性度量 SFE**：计算当前权重 $W$ 与先前权重 $\widetilde{W}$ 之间的平方 Frobenius 误差 $\operatorname{SFE}(W, \widetilde{W}) = \|W - \widetilde{W}\|_F^2$，量化重初始化对已学知识的保留程度。定理 1 证明 SFE 为两个网络输出特征协方差之间的差异提供了上界，因此最小化 SFE 能有效保持特征相似性。
@@ -123,8 +117,6 @@ FIRE 将稳定性-可塑性权衡显式建模为一个约束优化问题，通�
 4. **缩放模块**：对正交化后的权重施加与层维度相关的缩放因子——线性层使用 $\sqrt{d_{\text{out}} / d_{\text{in}}}$，卷积层使用 $\sqrt{C_{\text{out}} / C_{\text{in}}} / (k_h k_w)$——以维持信号方差在前向传播中的稳定。
 
 **输入输出流**：在触发重初始化的时刻，FIRE 以当前权重 $W$ 为输入，依次经过 DfI 评估、牛顿-舒尔茨正交化迭代、缩放调整，输出重初始化后的权重 $\widetilde{W}$，随后网络在新数据上继续训练。该流程对线性层和卷积层分别处理，在 Vision Transformer 中仅对 Q、K 投影矩阵执行正交化，V、O 及 MLP 权重保持不变。整个流程的计算开销极低——仅增加不到 1% 的训练时间，且显存占用远低于基于梯度的基线方法（如 DASH 需 2834 MB，FIRE 仅需 55 MB）。
-
-
 
 FIRE 将稳定性-可塑性权衡显式构造为约束优化问题，其方法管线由三个核心模块构成：稳定性度量 SFE、可塑性度量 DfI，以及基于牛顿-舒尔茨迭代的约束优化求解器。
 
@@ -189,8 +181,6 @@ $$X_{k+1} = 2 X_k - 1.5 X_k (X_k^\top X_k) + 0.5 X_k (X_k^\top X_k)^2$$
 
 FIRE 的计算开销极低。在对比实验中，FIRE 的墙钟时间仅约 0.06 秒，GPU 显存占用约 55 MB，而 DASH 方法需 69 秒和 2834 MB。整体上，FIRE 增加的训练时间不到 1%，在保持高效的同时实现了稳定性和可塑性的精确平衡。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -240,11 +230,6 @@ FIRE 在持续视觉学习、持续语言模型预训练和强化学习三大类
 - **Figure 5b** 是理解 FIRE 核心优势的关键：它直观展示了 FIRE 在 DfI-SFE 权衡空间中位于帕累托最优位置，而所有基线方法均在不同程度上牺牲了其中一个维度。
 - **Table 1** 揭示了 FIRE 的实用价值：在保持理论优雅性的同时，其计算开销几乎可忽略，这使得 FIRE 可以无缝集成到现有训练流程中，无需调整优化器或学习率调度。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_CfZLxT3zIZ/figures/008_Figure_7.jpg]]
-*Figure 7: Effect of Newton Schulz iteration coefficients on FIRE. FIRE and FIRE with Muon’s coefficients are evaluated on warm-start setting under CIFAR-10 with ResNet-18 (left), CIFAR-100 with ViT-Tiny (middle), and Tiny ImageNet with VGG-16 (right)*
-
 ![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_CfZLxT3zIZ/figures/010_Table_2.jpg]]
 *Table 2: Detailed settings in continual visual learning*
 
@@ -253,23 +238,6 @@ FIRE 在持续视觉学习、持续语言模型预训练和强化学习三大类
 
 ![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_CfZLxT3zIZ/figures/012_Table_4.jpg]]
 *Table 4: Hyperparameters used in the ALE environment with DQN algorithm*
-
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_CfZLxT3zIZ/figures/013_Table_5.jpg]]
-*Table 5: Hyperparameters used in HumanoidBench environments with SimBa*
-
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_CfZLxT3zIZ/figures/014_Table_6.jpg]]
-*Table 6: Hyperparameter search space for all experiments*
-
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_CfZLxT3zIZ/figures/015_Table_7.jpg]]
-*Table 7: Hyperparameters for Warm-Start setting*
-
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_CfZLxT3zIZ/figures/016_Table_8.jpg]]
-*Table 8: Hyperparameters for Continual Setting*
-
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_CfZLxT3zIZ/figures/017_Table_9.jpg]]
-*Table 9: Hyperparameters for Class-Incremental Setting*
-
-
 
 ## 定位与知识库关联
 
@@ -330,8 +298,6 @@ FIRE 的适用性受以下边界条件约束：
 3. **与经典持续学习技术的结合：** 如何将 FIRE 与经验重放、弹性权重巩固（EWC）等经典持续学习技术结合？FIRE 的正交化操作可能与 EWC 的重要性加权产生交互效应，需要系统研究。
 
 4. **自适应触发机制：** 能否在训练过程中在线自适应地决定重初始化的触发时机和强度？DfI 本身可作为可塑性丧失的监测指标，为自适应策略提供了自然基础。
-
-
 
 ## 原文 PDF
 

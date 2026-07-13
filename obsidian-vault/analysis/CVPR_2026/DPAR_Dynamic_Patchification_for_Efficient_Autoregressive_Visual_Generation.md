@@ -148,8 +148,6 @@ $$\mathcal { L } _ { C E } = - \sum _ { t = 0 } ^ { T - 1 } \log \hat { p } _ { 
 
 推理时，熵模型同样先确定补丁边界，随后补丁 Transformer 以自回归方式逐补丁生成，补丁解码器实时将生成的补丁展开为令牌。DPAR 对标准解码器架构的修改极小，仅增加了轻量的编码器/解码器模块，确保了与现有多模态生成框架的兼容性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l861_https_arxiv_org_abs_2512_21867/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of DPAR. (a) Conventional AR image generation employs decoder-only transformers operating on a fixed number of tokens per image, where the token count increases quadratically with image resolution. (b) DPAR dynamically aggregates image tokens based on information content, generating a variable number of patches per image. Decoder-only transformers then operate on a smaller number of patches, reducing computational and memory overhead. DPAR makes minimal modifications to the standard decoder architecture, ensuring compatibility with multimodal generation frameworks*
 
@@ -239,11 +237,6 @@ $$
 
 DPAR 保持与同量级 LlamaGen 相同的总层数，仅将部分令牌级层替换为补丁级层。Table 1 给出各变体的编码器层数、补丁 Transformer 层数和解码器层数。消融实验表明浅编码器（1 层）搭配深解码器（4 层）的 E1D4 配置取得最优 FID（3.32），说明将更多容量分配给解码器有利于令牌重建质量。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l861_https_arxiv_org_abs_2512_21867/figures/002_Figure_2.jpg]]
-*Figure 2: Images (first row) and their corresponding next-token prediction entropy maps (second row) with increasing information content. Images with lower information content produce fewer high-entropy tokens, allowing the model to merge them into larger patches for efficient AR generation. Entropy heatmaps are computed over 256 tokens for 256×256 images, with black outlines indicating the final patch boundaries*
-
 ## 实验与关键发现
 
 ### 瓶颈与调控机制回顾
@@ -295,28 +288,14 @@ DPAR 保持与同量级 LlamaGen 相同的总层数，仅将部分令牌级层�
 - 熵模型的选择空间（更大模型、不同训练目标）是否影响补丁化质量尚未探索。
 - 动态补丁化在医学影像、遥感等低信息区域分布不同的领域中的泛化性有待验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l861_https_arxiv_org_abs_2512_21867/figures/006_Table_2.jpg]]
 *Table 2: DPAR model comparisons on class-conditional ImageNet 256×256 benchmark. We report FID [14], Inception Score(IS) [47], and precision/recall [23] and the average number of sampling steps used for generation. DPAR model outperforms prior raster-order autoregressive models with similar parameter counts, achieving significantly better FID scores. Models containing ‘-384’ in their names are trained on 384 × 384 and resized to 256 × 256 for evaluation*
 
 ![[assets/figures/papers/paper_list_l861_https_arxiv_org_abs_2512_21867/figures/007_Table_3.jpg]]
 *Table 3: Ablation of Patchification strategies. Entropy-based patchification with patch length constraint and row-boundary resets leads to the best FID score on ImageNet 256×256 benchmark*
 
-![[assets/figures/papers/paper_list_l861_https_arxiv_org_abs_2512_21867/figures/008_Table_6.jpg]]
-*Table 6: Adaptive Patch Length at Inference. We compare a static model trained with fixed patch length*
-
-![[assets/figures/papers/paper_list_l861_https_arxiv_org_abs_2512_21867/figures/005_Figure_4.jpg]]
-*Figure 4: Comparative analysis of converge of DPAR with LLamaGen on ImageNet-384. We plot FID vs training epochs for various model sizes. DPAR consistently achieves lower FID scores, demonstrating faster convergence and better image fidelity*
-
 ![[assets/figures/papers/paper_list_l861_https_arxiv_org_abs_2512_21867/figures/012_Table_8.jpg]]
 *Table 8: Compute comparison across all LlamaGen and DPAR variants. DPAR consistently reduces FLOPs across both 256×256 and 384×384 model families*
-
-![[assets/figures/papers/paper_list_l861_https_arxiv_org_abs_2512_21867/figures/013_Table_9.jpg]]
-*Table 9: Comparison of positional embedding schemes. Dynamic Embedding achieves the best FID on ImageNet 256×256*
-
-![[assets/figures/papers/paper_list_l861_https_arxiv_org_abs_2512_21867/figures/014_Table_10.jpg]]
-*Table 10: Ablation on encoder–decoder depth*
 
 ## 定位与知识库关联
 

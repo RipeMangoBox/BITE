@@ -229,14 +229,6 @@ $$p_1 = \beta \log \frac{\pi_{\omega}(\phi_w|\mathbf{z})}{\pi_{\mathrm{ref}}(\ph
 
 该目标直接增加模型生成“获胜”参数的可能性，同时降低“失败”参数的可能性，使物理属性分布与感知真实感对齐。偏好对通过 SAM-2 分割和 CoTracker-3 轨迹提取自动构建，量化各候选模拟与真值视频的保真度。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2567_https_arxiv_org_abs_2508_13911/figures/002_Figure_2.jpg]]
-*Figure 2: Pipeline of PhysGM. The model conditions on one or four input views and their corresponding camera parameters, which are processed by a transformer-based model to produce output tokens. These tokens then decoded by two parallel heads: (1) a DPT Head predicting the initial 3D Gaussian scene parameters ψ, and (2) a Physics Head that predicts a distribution over the object’s physical properties θ. The sampled parameters (ψ, θ) initialize a Material Point Method (MPM) simulator to generate the final dynamic sequence. The entire architecture is trained in a two-stage paradigm: first, supervised pre-training on ground-truth data establishes a well generative prior. Subsequently, a DPO-based fine-...*
-
-![[assets/figures/papers/paper_list_l2567_https_arxiv_org_abs_2508_13911/figures/016_Figure_9.jpg]]
-*Figure 9: Multi-view generation using MVAdapter. Given a single frontal view image as input (left), MVAdapter [13] generates three auxiliary views: rear, left, and right (right three panels). These synthesized views, together with the input frontal view, provide comprehensive angular coverage for our 3D Gaussian reconstruction and physics prediction pipeline. The generated views maintain consistent geometry and appearance while capturing different perspectives of the object*
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -258,14 +250,8 @@ PhysGM 在物理感知 4D 合成任务上展现出对现有方法的显著优势
 
 定性结果（Figure 4、Figure 5）进一步印证了上述结论。PhysGM 能够从单张图像出发，生成涵盖弹性、塑性、流体等多种材料行为的物理合理动画，并展现出对拉伸、扭转等复杂形变的泛化能力。Figure 6 的定性对比显示，PhysGM 生成的动态序列在形变自然度和材料真实感上明显优于 OmniPhysGS 和 DreamPhysics。
 
-![[assets/figures/papers/paper_list_l2567_https_arxiv_org_abs_2508_13911/figures/007_Figure_6.jpg]]
-*Figure 6: Qualitative comparisons. We selected two distinct physical materials for visual comparison*
-
 ![[assets/figures/papers/paper_list_l2567_https_arxiv_org_abs_2508_13911/figures/004_Figure_4.jpg]]
 *Figure 4: Qualitative results by PhysGM. For different objects, we show the single input image (left), keyframes from the resulting physically-plausible simulation (middle), and the physical properties predicted by our model (right). Our method generates these highfidelity 4D sequences in under one minute from a single view, without any per-scene optimization*
-
-![[assets/figures/papers/paper_list_l2567_https_arxiv_org_abs_2508_13911/figures/005_Figure_5.jpg]]
-*Figure 5: Other Results by PhysGM. PhysGM can demonstrate robust generalization to diverse physical interactions. It accurately simulates complex deformations like stretching and twisting, handles multi-object dynamics with varied materials, and processes real-world data, highlighting its extensibility to novel scenarios*
 
 ### 消融实验
 
@@ -279,9 +265,6 @@ Figure 7 的消融可视化揭示了 DPO 的作用机制：经过两阶段训练
 ### 方法独特性分析
 
 Table 4 将 PhysGM 与现有物理参数预测方法进行了多维度对比。PhysGM 是首个同时消除“预优化 3D 高斯”和“预定义物理参数”双重依赖的方法。现有方法要么需要多视图图像和逐场景优化来获取 3D 高斯（如 OmniPhysGS），要么依赖手动指定的物理参数或 SDS 蒸馏（如 DreamPhysics），而 PhysGM 通过单次前馈推理直接从图像预测所有必要参数，推理时间控制在 30 秒以内，在泛化能力和效率上均建立了新的基准。
-
-![[assets/figures/papers/paper_list_l2567_https_arxiv_org_abs_2508_13911/figures/011_Table_4.jpg]]
-*Table 4: Comparison with state-of-the-art methods, highlighting PhysGM’s unique advantages. Unlike prior work, our method eliminates the need for both pre-optimized 3D Gaussian and pre-defined physical parameters. This allows it to achieve strong generalization while maintaining a significantly shorter inference time (\< 30s). “only E” represents that only Young’s modulus is automatically predicted, “only material” represents that only material is automatically predicted*
 
 ### 局限性
 

@@ -50,8 +50,6 @@ claims:
 
 在三个隐式查询基准上的实验结果验证了该设计的有效性：REALM在LERF上达到92.88% mIoU，在3D-OVS上达到93.68% mIoU，在自建REALM3D基准上达到82.30% mIoU，相较最强基线GS-Group分别提升50.45、51.89和16.75个百分点（Table 1）。消融实验进一步表明，GLSpaG各阶段贡献显著——从仅使用MLLM的约0.83 mIoU，到加入全局接地提升至0.89，再经局部细化达到0.95（Table 3a）。此外，REALM还支持基于语言指令的多样化3D编辑任务，包括物体移除、替换与风格迁移（Figure 7）。
 
-
-
 ### 开放世界3D场景理解的新需求
 
 随着3D视觉与图形技术的快速发展，对三维场景进行语义理解与交互式编辑的需求日益增长。传统的3D分割方法主要依赖预定义的类别标签，难以应对开放世界中灵活多变的语言指令。近年来，以CLIP为代表的视觉-语言模型被引入3D场景理解任务，催生了一系列开放词汇3D分割方法，如**Gaga**（Lyu et al., arXiv 2024）、**GAGS**（Peng et al., arXiv 2024）和**GS-Group**（Ye et al., ECCV 2024）等。这些方法虽然能够处理部分直接描述的查询，但在面对需要常识推理的隐式指令时暴露出根本性缺陷。
@@ -73,8 +71,6 @@ REALM的提出正是为了解决上述双重挑战：**如何在保留MLLM强大
 2. **从全局到局部的空间定位**：单视角的脆弱性源于信息不完整，而多视角冗余可以弥补这一缺陷。通过在多视角间进行投票聚合，可以从统计上消除单视角误判，实现鲁棒的3D目标定位。
 
 3. **无需3D微调**：REALM不要求对MLLM进行任何3D数据的微调，完全利用预训练模型的2D推理能力，通过精心设计的空间聚合策略将其泛化到3D领域，保持了方法的通用性和可扩展性。
-
-
 
 ## 核心方法与创新机理
 
@@ -115,8 +111,6 @@ $$(\boldsymbol{B}, \boldsymbol{\mathcal{C}}, \boldsymbol{\mathcal{E}}) = \mathbf
 ### 创新本质：以3DGS为代理的2D-to-3D推理提升
 
 上述三个changed slots共同构成了REALM的核心技术路径：**以3D高斯溅射（3DGS）为高保真场景代理**，利用其逼真的新视角渲染能力作为MLLM的“眼睛”，通过分层多视图聚合策略将MLLM在2D图像上的推理能力稳健地提升到3D空间。这一路径无需对MLLM进行3D特定的大规模微调，保持了框架的灵活性和可扩展性。
-
-
 
 REALM 的整体架构围绕一个核心洞察展开：**以 3D 高斯溅射（3DGS）作为高保真场景代理，将 MLLM 在 2D 图像上的推理能力稳健地提升到 3D 空间**。框架的输入是已重建为 3DGS 的场景以及用户的自然语言隐式查询，输出是精确的 3D 目标掩膜，并可进一步支持移除、替换、风格迁移等 3D 编辑操作。
 
@@ -170,15 +164,11 @@ REALM 由四个主要模块串联构成，形成一条从 2D 实例特征提取�
 
 > **注意**：框架的推理总耗时约 8.68 秒/查询，其中局部细化仅需 50 次迭代（3.67 秒），过度优化（1000 步）会导致严重过拟合，mIoU 从 0.95 降至 0.74（Table 3f）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2183_https_arxiv_org_abs_2510_16410/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of REALM. Top: Global-to-Local Spatial Grounding (GLSpaG) pipline hierarchically aggregates the outputs of LMSeg agents from global context to local refinement. Bottom left: We optimize a 3D feature field from 2D SAM masks for 3D consistent identification. Bottom right: MLLM-based Visual Segmenter (LMSeg) performs image-level reasoning on one viewpoint and integrates identity information from the optimized feature field to determine the selected instance ID*
 
 ![[assets/figures/papers/paper_list_l2183_https_arxiv_org_abs_2510_16410/figures/001_Figure_1.jpg]]
 *Figure 1: We propose REALM, an MLLM-agent framework designed for open-world 3D reasoning segmentation and editing within 3D Gaussian Splatting (3DGS). REALM can perform reasoning over implicit instructions and accurately segment the target object. REALM also supports various 3D editing instructions, including object removal, replacement, and style transfer*
-
-
 
 REALM 的核心架构围绕一个关键洞察展开：将 2D MLLM 的推理能力稳健地提升到 3D 空间，需要一个分层式的多视图聚合机制。本节解析构成该框架的四个核心模块及其关键公式。
 
@@ -240,16 +230,6 @@ $$\mathcal{L}_{\mathrm{local}} = || \hat{M}_i - M_i^{2D-\mathrm{Local}} ||_1 \qu
 
 GLSpaG 的分层设计体现了从粗到精的空间推理逻辑：全局阶段通过多视角投票消除了单视图的歧义性，解决了“视角敏感性”瓶颈；局部阶段利用特写视图的高分辨率信息，弥补了全局视图在目标边界处的精度不足。这一“先定位、后细化”的策略是 REALM 在 LERF 和 3D-OVS 基准上 mIoU 超过 92% 的核心因果机制。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2183_https_arxiv_org_abs_2510_16410/figures/002_Figure_2.jpg]]
-*Figure 2: REALM vs. Direct Image Inputs. Feeding one or a few random rendered views into the MLLM makes the outcome highly sensitive to viewpoint selection*
-
-![[assets/figures/papers/paper_list_l2183_https_arxiv_org_abs_2510_16410/figures/004_Figure_4.jpg]]
-*Figure 4: Global reasoning process. We visualize reasoning outputs of the MLLM for each global view*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果：隐式查询下的3D推理分割
@@ -290,18 +270,11 @@ Table 3c显示，REALM的3DGS渲染速度高达**354.72 FPS**，LMSeg推理、GL
 2. **场景覆盖局限**：实验集中在室内物体级场景，缺乏室外大规模环境或动态场景的验证。REALM3D基准本身也以室内场景为主。
 3. **MLLM依赖性**：REALM的性能与所选MLLM的能力强绑定。若MLLM对某类查询的推理失败，GLSpaG的多视图投票机制仅能缓解视角歧义，无法纠正语义层面的错误推理。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2183_https_arxiv_org_abs_2510_16410/figures/007_Table_1.jpg]]
 *Table 1: Quantitative results on LERF [18], 3D-OVS [25] and our proposed REALM3D benchmarks. We compare REALM with other models on implicit queries. The best results are marked in bold*
 
 ![[assets/figures/papers/paper_list_l2183_https_arxiv_org_abs_2510_16410/figures/018_Figure_8.jpg]]
 *Figure 8: Ablation study on GLSpaG. The local grounding stage refines the 3D segmentation results*
-
-![[assets/figures/papers/paper_list_l2183_https_arxiv_org_abs_2510_16410/figures/010_Figure_7.jpg]]
-*Figure 7: Language-driven 3D editing. Once the object is grounded, we can perform a wide range of 3D editing tasks*
-
-
 
 ## 定位与知识库关联
 
@@ -349,8 +322,6 @@ REALM 的核心创新在于 **Global-to-Local Spatial Grounding (GLSpaG)** 策�
 2. **时序推理与多步交互**：REALM 目前处理的是单步隐式查询，未涉及时序推理或需要多步交互的复杂指令（如“先找到沙发，再找到沙发上的遥控器”），这限制了其在具身智能等场景中的应用。
 
 3. **MLLM 无关性验证**：由于 REALM3D 标注和主实验均使用 Qwen2.5-VL，该方法对 MLLM 选择的鲁棒性需要在更多模型（如 GPT-4V、Gemini）上进行验证，以排除对特定 MLLM 的过拟合。
-
-
 
 ## 原文 PDF
 

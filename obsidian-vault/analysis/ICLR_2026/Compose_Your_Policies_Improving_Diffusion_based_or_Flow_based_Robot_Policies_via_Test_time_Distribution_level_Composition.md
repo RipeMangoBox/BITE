@@ -57,8 +57,6 @@ $$\hat{s}_{\mathrm{comp}}(\tau_t, t, c) = \sum_{i=1}^{n} w_i s_{\theta}(\tau_t, 
 
 **方法定位**：GPC 属于测试时组合方法，可与多种主流扩散或流式策略（DP、MP、FP、Florence-Policy、π0、DP3、RDT 等）兼容。相比需要训练或微调的集成方法，GPC 仅引入约 0.04 秒的推理延迟增量（每动作块从 0.09 秒增至 0.13 秒），且权重搜索的模拟时间开销（约 2.5 小时）远低于训练成本。该方法在处理异构动作块长度和推理步数方面也展现出兼容性。
 
-
-
 机器人操作策略的学习在过去几年取得了显著进展，特别是基于扩散模型和流匹配模型的生成式策略，如 **Diffusion Policy**（Chi et al., 2023）、**Florence Policy**（Reuss et al., 2024）和 **π0**（Black et al., 2024）等，在多样化的操作任务上展现了令人瞩目的性能。这些策略将动作生成立为一个条件分布建模问题，通过迭代去噪或流匹配从噪声中逐步恢复出高质量的动作轨迹。然而，尽管单个策略在其擅长领域表现优异，它们在面对不同任务、不同感知模态或不同架构选择时，往往呈现出**互补的失败模式**：一个策略在某个任务上成功，在另一个任务上却可能失败；基于图像的策略和基于点云的策略各有其感知盲区；不同网络架构的策略也各有其归纳偏置的优劣。
 
 这一现象暴露了当前机器人策略学习领域的核心瓶颈：**单个扩散或流式机器人策略受限于有限的训练数据和模型容量，无法在所有任务上表现优异**。要获得一个全能型策略，最直接的思路是收集更大规模的交互数据集或对策略进行在线微调，但这些方式的成本极为高昂——无论是数据采集的人力与时间成本，还是训练所需的计算资源，都使得这一路径在实践中难以规模化。
@@ -66,8 +64,6 @@ $$\hat{s}_{\mathrm{comp}}(\tau_t, t, c) = \sum_{i=1}^{n} w_i s_{\theta}(\tau_t, 
 与此同时，社区中已经积累了大量的预训练策略模型，它们在不同条件（如视觉模态、网络骨干、任务设定）下训练，蕴含着互补的知识。然而，现有方法缺乏一种机制，能够在**不引入额外训练**的前提下，将这些预训练策略的能力进行有机整合。传统的集成方法（如动作空间的平均）往往忽略了扩散策略的核心在于其分布分数（score），而非最终的动作输出，因此难以从分布层面实现真正的能力融合。
 
 本文的核心动机正是源于这一观察：**不同策略往往具有互补的失败模式，单独使用任何单一策略都无法充分利用所有可用的预训练知识**。如果能够在测试时，通过某种方式将多个预训练策略的分布分数进行组合，就有可能在不增加训练成本的情况下，构建出一个超越任一父策略的更强大策略。这一思路将策略改进的焦点从“训练更好的单一模型”转移到了“测试时组合现有模型”，为机器人策略的性能提升开辟了一条低成本、高灵活性的新路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -94,11 +90,6 @@ GPC 框架自然延伸到叠加原理，支持逻辑与（Logical AND）和逻�
 ### 兼容异构策略
 
 GPC 可与异构的动作块长度和推理步数兼容。当两个策略的动作块长度不同时（如 $H_A \geq H_B$），GPC 采样长度为 $H_A$ 的共享噪声轨迹，仅在重叠的前 $H_B$ 步进行凸分数组合，尾部保持策略 A 的分数不变。此机制使 GPC 能够灵活组合具有不同设计选择的预训练策略，无需修改其架构或训练流程。
-
-
-
-![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_TnLFRhLuZ6/figures/003_Figure_1.jpg]]
-*Figure 1: Illustration of General Policy Composition. (a) Distributions from pre-trained stateof-the-art diffusion- or flow-based policies can be composed to construct a stronger policy without additional training, with a test-time search over composition weights picking the best parent-policy mix; score composition corresponds to the product of probabilistic density functions (PDFs), steering sampling toward consensus regions. (b) GPC can yield consistent gains across a diverse set of tasks. (c) We find the optimal weight when composing two models can vary depending on the task*
 
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_TnLFRhLuZ6/figures/004_Figure_2.jpg]]
 *Figure 2: Overview of our proposed General Policy Composition. Combining distributional scores from pre-trained diffusion-based or flow-based policies on different conditions (e.g., visual modalities and network backbones), GPC can generate expressive and adaptable action trajectories through convex score combination without additional training*
@@ -143,8 +134,6 @@ $$\tau_{t-1} = \alpha_t \tau_t + \beta_t \hat{s}_{\mathrm{comp}}(\tau_t, t, c) +
 
 GPC 还支持**叠加组合算子**的扩展：除凸组合外，框架可自然衔接逻辑 OR（按 softmax 加权）和逻辑 AND（强制策略间分数梯度一致）等更强的组合方式。实验表明，逻辑 AND 组合在 Robomimic 上可带来比凸组合更显著的性能提升（如 DP+MP 的 AND 组合平均成功率达 64.92，远超基线的 39.19，见 Table 4）。此外，GPC 兼容异构的动作块长度和推理步数：当两个策略的动作块长度不同时，在重叠部分进行凸组合，非重叠部分保留较长策略的原始分数，即可实现无缝融合。
 
-
-
 ### 核心模块
 
 GPC 框架由三个顺序执行的模块构成，全程无需训练，仅在测试时组合已有预训练策略。
@@ -181,8 +170,6 @@ $$\mathbb{E} \| x_{\hat{s}}(T) - x^{*}(T) \| \leqslant \left( \int_0^T e^{2\int_
 
 > **注意**：以上公式均来自原文 Section 3-5 的推导，变量含义严格以原文定义为准。关于最优权重的解析求解、组合算子的进一步设计等仍为开放问题，文中未提供闭式解。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设定
@@ -191,13 +178,10 @@ GPC 在三个不同规模的基准上进行了验证：**Robomimic**（单臂操
 
 权重搜索采用离散网格扫描，在模拟环境中约需 2.5 小时（Table 6），对于真实世界实验则通过模拟器上的权重搜索结果直接迁移。推理延迟从单策略的 0.09 秒/动作块增加到 GPC 的 0.13 秒/动作块（Table 7），增长幅度在可接受范围内，且完全为计算开销，不涉及物理交互。
 
-![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_TnLFRhLuZ6/figures/011_Table_4.jpg]]
 *Table 4: Results of GPC with superposition, highlighting performance increase by strong compositional operators. Table 6: Comparison of training/finetuning time vs. GPC weight search. $T _ { \mathrm { e v a l } } = N _ { \mathrm { r o l l o u t } } \times T _ { \mathrm { I } }$ per rollout. For RoboMimic, T RoboMimiceval $\approx$ 2 0 0 * 5 $\mathrm { s }$ = 0 . 2 7 hr. For realworld, $T _ { \mathrm { e v a l } } ^ { \mathrm { R e a l } } { \approx } \mathrm { \dot { 2 } 0 } * \mathrm { 3 0 s }$ = 0 . 1 7 hr
 
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_TnLFRhLuZ6/figures/014_Table_7.jpg]]
 *Table 7: Per–action-chunk inference latency in RoboMimic. The overhead of GPC is modest and purely computational*
-
-![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_TnLFRhLuZ6/figures/015_Table_7.jpg]]
 
 ### 主要结果
 
@@ -257,13 +241,7 @@ GPC 在三个不同规模的基准上进行了验证：**Robomimic**（单臂操
 
 GPC 支持**异构动作块长度**和**不同推理步数**的组合。**Table 8** 显示，当 DP（块长 8，执行 5 步）与 Florence-Policy-D（块长 16，执行 10 步）组合时，GPC 通过在重叠部分进行分数组合，将成功率从 0.50/0.53 提升至 0.66。这表明 GPC 不需要父策略具有统一的输出格式。
 
-![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_TnLFRhLuZ6/figures/016_Table_8.jpg]]
-*Table 8: GPC can be applied with different actionchunk lengths and infer time steps. Results are in Robomimic. Table 9: GPC with three base policies on RoboMimic*
-
 **Table 9** 进一步展示了三策略组合的可行性：**FP + FP-F + π0** 在 Can 和 Lift 任务上均达到 100% 成功率，Square 任务达到 94%。然而，随着策略数量增加，权重搜索空间呈指数增长，计算成本问题凸显。
-
-![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_TnLFRhLuZ6/figures/017_Table_9.jpg]]
-*Table 9: 6.5 COMPREHENSIVE ANALYSIS OF GPC EFFECTIVENESS*
 
 ### 失败模式与局限
 
@@ -273,13 +251,6 @@ GPC 支持**异构动作块长度**和**不同推理步数**的组合。**Table 
 2. **权重搜索引入额外计算开销**：离散网格搜索在模拟环境中约需 2.5 小时，虽然远低于训练或微调成本，但对于需要快速部署的场景仍是不小的负担。
 3. **推理延迟增加**：从 0.09 秒增至 0.13 秒/动作块，对实时性要求极高的场景需注意。
 4. **多策略扩展的维度灾难**：目前实验集中在双策略或三策略组合，扩展到更多策略时权重搜索空间呈指数增长，需要更高效的搜索策略。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_TnLFRhLuZ6/figures/020_Table_10.jpg]]
-*Table 10: Experiments on Robomimic and PushT with GPC under convex score combination, Logical AND and Logical OR*
-
-
 
 ## 定位与知识库关联
 
@@ -355,8 +326,6 @@ GPC 的核心定位是**训练无关（training-free）**的测试时增强框�
 6. **组合泛化性的理论理解**：组合策略的泛化能力与各父策略训练数据分布之间的关系尚不明确。能否通过组合来提升对未见场景的泛化性？这需要理解分数组合在分布外样本上的行为。
 
 7. **异构动作空间的组合**：当前 GPC 通过重叠部分组合分数来处理异构动作块长度，但更根本的挑战在于不同策略可能输出不同维度的动作空间（如位置控制 vs. 速度控制）。如何在这些异构空间中进行组合仍是一个开放问题。
-
-
 
 ## 原文 PDF
 

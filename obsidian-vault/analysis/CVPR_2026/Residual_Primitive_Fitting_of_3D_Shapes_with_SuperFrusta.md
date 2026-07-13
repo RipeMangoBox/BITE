@@ -56,8 +56,6 @@ claims:
 
 主要实验结果（Table 1）验证了该方法的有效性：在3DGen-Prim和Toys4K基准上，ResFit将IoU分别提升约6个和9个点，同时使用的基元数量仅为Marching Primitives（MPS, Liu et al., CVPR 2023）的约一半，体素重叠减少超过3倍。消融实验进一步证实，SuperFrustum+平滑联合在重建精度和程序质量上全面优于立方体、超二次曲面等基元；ResFit交替优化策略显著优于一次性拟合；MSD分解比CoACD（Wei et al., ACM TOG 2022）更适合SuperFrustum初始化。
 
-
-
 ### 基元装配：从解析表示到程序化建模
 
 用一组简单几何基元（如立方体、球体、圆柱体）来逼近复杂三维形状，是计算机图形学与几何处理中的经典命题。这种“基元装配”（primitive assembly）不仅产生高度紧凑的形状表示，还天然支持可编辑性、语义分解和程序化建模，因而在资产创建、物理仿真、CAD逆向工程等场景中具有广泛需求。
@@ -88,8 +86,6 @@ claims:
 
 这一设计的核心洞察在于：**让分解适应基元的表达能力，让优化受益于分解的结构线索**——二者相互适应，从而系统性地前移重构-简洁性的帕累托前沿。实验表明，该方法在3DGen-Prim和Toys4K基准上将IoU分别提升约6和9个百分点，同时使用的基元数量仅为Marching Primitives的约一半，体素重叠减少超过3倍。
 
-
-
 ## 核心方法与创新机理
 
 本文的核心创新在于从基元表达性与拟合策略两个维度同时突破，系统性地前移了重构精度与基元简洁性之间的帕累托前沿。具体而言，方法引入了两个紧密耦合的“changed slots”：
@@ -118,8 +114,6 @@ $$SF(\mathbf{p}) = f(\mathbf{p}; \theta), \quad \theta = (\mathbf{s}, r, d, t, b
 
 SuperFrustum的表达连续性与ResFit的迭代残差适应形成正向反馈：表达能力强的基元使每轮拟合能解释更多几何，减少所需基元数量；交替策略则确保新基元精准补充残差区域，避免冗余。这一协同在实验中体现为：在3DGen-Prim上IoU提升6.1个点（88.74 vs. 82.64），同时基元数量减少44%（23.98 vs. 42.96）；在Toys4K上IoU提升9.3个点，基元数量减少23%（Table 1）。体素重叠率更是从0.684降至0.210，降幅达69%，表明装配的语义可解释性显著增强。
 
-
-
 ResFit 的核心思想是将**全局形状分析**与**局部基元优化**交替进行，使分解过程主动适应基元的表达能力，从而在几乎不损失重构精度的前提下大幅减少基元数量。整个流水线围绕一个统一的目标函数展开：
 
 $$z ^ { * } = \arg \max _ { z } \mathcal { O } ( x , z ) = \arg \max _ { z } \big[ \mathcal { R } ( x , E ( z ) ) - \alpha \vert z \vert \big]$$
@@ -134,9 +128,6 @@ $$z ^ { * } = \arg \max _ { z } \mathcal { O } ( x , z ) = \arg \max _ { z } \bi
 ### 核心流水线
 
 ResFit 的推理过程由五个模块构成循环迭代（Figure 3）：
-
-![[assets/figures/papers/paper_list_l2090_https_arxiv_org_abs_2512_09201/figures/003_Figure_3.jpg]]
-*Figure 3: ResFit infers parsimonious assemblies by interleaving shape analysis and primitive optimization. Shape decomposition provides initial primitives, which are refined with decompositionaware optimization. Residual unexplained volumes are then extracted and seeded with new primitives*
 
 1. **残差提取（Residual Extraction）**  
    将当前装配体从目标形状中减去，生成新的残差体。首轮迭代时，残差体即为完整输入形状。
@@ -162,8 +153,6 @@ ResFit 的推理过程由五个模块构成循环迭代（Figure 3）：
 - **曲率感知监督**：优化时以主曲率加权采样点，使梯度信号集中于几何细节丰富的区域（如边缘、尖角），避免平坦区域主导损失。
 
 整个流水线为无监督方法，无需训练数据，仅依赖输入网格的几何信息即可完成推理。
-
-
 
 ### 3.1 问题形式化
 
@@ -218,9 +207,6 @@ $$f_{k+1}(\mathbf{p}) = f_k(\mathbf{p}) \setminus R_k \tag{6}$$
 
 如 Figure 4 所示，MSD 与 CoACD 的关键差异在于：MSD 按**厚度**而非**凸性**进行分割，因此能够保留非凸但语义一致的结构（如自行车轮胎的环形、猫尾的弯曲），而 CoACD 往往将这些结构过度分割为多个轴对齐的凸碎片。
 
-![[assets/figures/papers/paper_list_l2090_https_arxiv_org_abs_2512_09201/figures/004_Figure_4.jpg]]
-*Figure 4: Morphological Shape Decomposition (MSD) iteratively extracts connected regions of similar thickness. Top: successive MSD partitions of a input mesh. Bottom: MSD yields regions that form suitable initialization seeds for SuperFrusta —capturing non-convex structures such as bicycle tires (left), a cat’s curved tail (center), and bowl rims (right). In contrast, CoACD over-partitions these regions into many convex fragments, often using axis-aligned cuts that produce semantically misaligned parts*
-
 ### 3.4 分解感知优化
 
 优化阶段在 MSD 提供的初始化基础上，通过梯度下降调整所有基元参数以最大化目标函数 $\mathcal{O}$。优化分为两个阶段：**可微阶段**与**离散剪枝阶段**。
@@ -253,8 +239,6 @@ ResFit 的核心机制是将上述模块串联为**交替迭代**过程（Figure
 5. 若残差体积仍显著，回到步骤 1。
 
 这一交替策略的关键在于：**形状分解感知基元的表达能力**（MSD 按厚度而非凸性分割，适配 SuperFrustum 的形态空间），**局部优化又反哺全局形状理解**（优化后的基元更准确地覆盖已解释区域，使残差更清晰地暴露未解释结构）。消融实验（Table 3）证实，这种交替策略显著优于一次性拟合所有基元的单阶段方法。
-
-
 
 ## 实验与关键发现
 
@@ -289,9 +273,6 @@ Table 3验证了ResFit交替优化策略和MSD分解方法的有效性。将ResF
 ![[assets/figures/papers/paper_list_l2090_https_arxiv_org_abs_2512_09201/figures/011_Table_4.jpg]]
 *Table 4: CSG inference on the ABC dataset [12]: Our method achieves comparable reconstruction accuracy to CAPRI-Net [46] while using significantly fewer primitives*
 
-![[assets/figures/papers/paper_list_l2090_https_arxiv_org_abs_2512_09201/figures/009_Figure_7.jpg]]
-*Figure 7: Our method can infer CSG programs using canonical solids (e.g., cylinders, cuboids; cf. Sec. 5), producing far more parsable and structured trees than CAPRI-Net [46]*
-
 ### 失败模式与局限性
 
 尽管ResFit取得了显著的性能提升，但实验和分析揭示了以下局限：
@@ -304,24 +285,11 @@ Table 3验证了ResFit交替优化策略和MSD分解方法的有效性。将ResF
 
 4. **极端形状的基元效率**：尽管SuperFrustum的8参数已具备较强表达能力，但对于长距离渐变的环形或高度扭曲的几何，仍可能需要多个基元拼接才能达到高精度重构，此时基元数量的优势可能被削弱。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2090_https_arxiv_org_abs_2512_09201/figures/007_Table_2.jpg]]
 *Table 2: Primitive representation ablation: SuperFrustum delivers superior performance over Cuboids, Superquadrics (SQ) and SuperPrimitive(SP) (ref. Section 4.2). Combining SuperFrustum with smooth union further improves performance*
 
 ![[assets/figures/papers/paper_list_l2090_https_arxiv_org_abs_2512_09201/figures/008_Table_3.jpg]]
 *Table 3: Fitting and decomposition ablation: ResFit, which interleaves analysis and optimization, outperforms a single-shot fitting approach (cf. Section 4.2). Moreover, pairing ResFit with MSD yields better results than using CoACD [40]*
-
-![[assets/figures/papers/paper_list_l2090_https_arxiv_org_abs_2512_09201/figures/010_Figure_6.jpg]]
-*Figure 6: Assigning per-primitive spherical 2D textures & optimizing it against a textured mesh, begets Edtiable & Deployable assets*
-
-![[assets/figures/papers/paper_list_l2090_https_arxiv_org_abs_2512_09201/figures/012_Figure_8.jpg]]
-*Figure 8: Our method can infer primitive assemblies from images by leveraging Text-2-3D models (Hunyuan3D-2.1 [33])*
-
-![[assets/figures/papers/paper_list_l2090_https_arxiv_org_abs_2512_09201/figures/013_Figure_9.jpg]]
-*Figure 9: ResFit enables finer, semantically consistent part segmentation. Row 1 shows the coarse semantic regions provided in PartObjVerse. Row 2 shows the primitive assemblies inferred by ResFit. Intersecting each coarse region with its corresponding assembly (Row 3) yields meaningful sub-parts—capturing functional structure while remaining strictly within the original semantic boundaries*
-
-
 
 ## 定位与知识库关联
 
@@ -374,8 +342,6 @@ ResFit输出的基元装配具有天然的可编辑性和程序化特性，可�
 - **与可学习先验的融合**：ResFit目前是完全无监督的。将其与特定类别的形状先验（如通过预训练编码器）结合，有望在保持泛化能力的同时提升类内重构精度和语义一致性。
 - **端到端可编辑流水线**：将基元装配与物理仿真、骨骼绑定、动画参数化等下游任务直接衔接，形成从几何到功能的端到端可编辑资产流水线，是推动基元表示实际应用的重要方向。
 - **实时交互优化**：通过GPU加速、预计算缓存或渐进式优化策略，将基元拟合时间压缩到秒级甚至亚秒级，使ResFit能够嵌入交互式建模工具。
-
-
 
 ## 原文 PDF
 

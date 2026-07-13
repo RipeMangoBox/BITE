@@ -285,8 +285,6 @@ MDCS-MoAME 在五个 TCGA 数据集（BLCA、BRCA、GBMLGG、LUAD、UCEC）上�
 
 **特征分布可视化。** 图5 利用 t-SNE 对五方向扫描特征和两级聚合特征进行可视化。不同扫描方向产生的特征在嵌入空间中呈现互补分布，而两级聚合后的特征形成了更紧凑且判别性更强的簇结构，直观验证了多方向扫描和层次化聚合的有效性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2131_https_openaccess_thecvf_com_content_CVPR2026_html_Qu_MDCS_MoAME_Multi_di/figures/004_Table_1.jpg]]
 *Table 1: The c-index (mean ± std) performances on five datasets. The best and second-best results are highlighted in bold and underlined, respectively. The ⋆ mark indicates that the code has not been released, and we have reproduced their work*
 

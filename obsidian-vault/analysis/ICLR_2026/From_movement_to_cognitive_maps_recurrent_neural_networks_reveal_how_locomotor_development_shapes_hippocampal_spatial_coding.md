@@ -55,15 +55,11 @@ claims:
 
 本研究的方法论贡献在于将发育神经科学的“行为驱动成熟”假说转化为可操作的循环神经网络计算框架，通过课程学习将运动发育时序与空间表征涌现建立了因果联系，为理解海马-内嗅皮层环路的功能发育提供了新的计算视角。
 
-
-
 哺乳动物在出生后早期，海马体中的空间编码神经元——位置细胞（place cells）和头方向细胞（head direction cells）——并非生来成熟，而是经历一个渐进的功能发育过程。位置细胞在幼鼠睁眼前已存在，但空间信息量低、稳定性差；头方向细胞则在睁眼后约一周才出现方向调谐。这一发育时间线的驱动机制长期悬而未决：究竟是感觉输入本身的变化速度决定了空间表征的成熟，还是动物主动运动模式的变化才是关键？
 
 现有研究面临两个核心缺口。其一，发育过程中运动行为的变化如何影响海马空间编码的涌现，缺乏因果性实验证据——我们无法在活体动物中解耦运动发育与感觉发育。其二，现有的海马计算模型多聚焦于成年动物的稳态空间表征，未能解释发育过程中不同细胞类型（位置细胞、头方向细胞）为何按特定顺序出现，以及运动统计特征在其中扮演的角色。
 
 本文的核心动机在于：利用循环神经网络（RNN）作为海马功能的可操作模型，检验“运动发育驱动空间编码发育”这一假设。具体而言，研究者首先对大鼠出生后 P11 至 P25 的运动数据进行无监督聚类，识别出三个发育运动阶段——爬行（crawl，中位年龄 P13.5）、行走（walk，P16）和奔跑（run，P20）——外加成年组（Figure 1c）。随后，通过在仿真环境中按发育顺序向浅层 RNN 呈现不同阶段的运动轨迹，观察隐藏层单元是否能够自发模拟出海马空间细胞的发育时间线。该框架将“运动模式的发育时序”作为可控变量，使得在计算模型中分离运动经验与其他发育因素成为可能。
-
-
 
 ## 核心方法与创新机理
 
@@ -96,8 +92,6 @@ claims:
 | 网格细胞输入（仅成年阶段） | 无网格细胞输入，隐藏状态从零初始化 | 每 90 时间步将隐藏状态初始化为 25 个网格细胞活动的线性投影 | Section 3 (Equation 2), Figure 4 diamonds |
 
 这三个 changed slots 共同构成了从“运动发育”到“空间编码成熟”的因果链条：阶段特异性的运动统计提供了差异化的感觉运动经验，课程学习确保了表征的渐进构建，网格细胞输入则为成年位置细胞的完全成熟提供了必要的空间度量框架。
-
-
 
 ### 研究目标与核心假设
 
@@ -176,8 +170,6 @@ $$G_t^{(i)} = \frac{1}{3} \max\left(0, \sum_{a\in\{0,\pi/3,2\pi/3\}} \cos\left(2
 - **仅爬行模型（Crawl-only model）**：仅在爬行阶段训练相同总量的数据，检验行为库或累积训练量的影响。
 
 这些控制条件共同构成对核心假设的严格检验：**运动模式的发育时序和特定运动统计，而非训练数据量或感觉变化速度，是空间表征涌现的关键驱动因素**。
-
-
 
 ### 管道架构概览
 
@@ -266,8 +258,6 @@ $$\mathrm{BIC}_{\mathrm{model}} = -2 \mathrm{LL}_{\mathrm{model}}^{(m)} + d_{\ma
 
 其中 $\mathrm{LL}_{\mathrm{model}}^{(m)}$ 为模型在指标 $m$ 上的对数似然，$d_{\mathrm{model}}$ 为模型自由参数数量，$K$ 为数据点数量。BIC 用于在原始发育模型与“变化速率”控制模型之间进行定量比较（$\Delta \text{BIC} > 10$ 表明原始模型显著更优）。
 
-
-
 ## 实验与关键发现
 
 ### 发育运动阶段的识别与仿真轨迹生成
@@ -339,30 +329,10 @@ Figure 3展示了模型隐藏单元与真实CA1神经元在率图（rate maps）
 
 4. **仿真与生物系统的差距**：模型仅使用简化的视觉（32×16像素全景）和前庭运动信息，未整合触觉、嗅觉等多感官输入；训练轨迹完全基于仿真参数生成，而非真实大鼠的探索数据；网格细胞为预设模块，未模拟其自发涌现过程；实验对比仅限于CA1区记录，未覆盖齿状回、CA3等其他海马亚区。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_8bM7MkxJee/figures/002_Figure_2.jpg]]
 *Figure 2: Recurrent neural network (RNN) model of hippocampal function. a RNN schematic. At each timestep t, the network received a concatenation of the agent’s visual input $Y _ { t }$ , velocity vector $\mathbf { v } _ { t }$ , and rotational velocity $\omega _ { t }$ . For the adult locomotion stage, an additional variant was trained – where the hidden layer was initialised to a linear projection $W _ { g }$ of a population of grid cells at trajectory onset and every 90 timesteps. The predicted frame $\tilde { Y } _ { t + 1 }$ is decoded from the hidden state with a linear projection $W _ { o }$ and compared to the observed frame $Y _ { t + 1 }$ using the L1 distance. b,c,d RNN trained on simulated trajectories...
-
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_8bM7MkxJee/figures/006_Figure.jpg]]
-*Figure: d Figure A1: Simulation of new trajectories emulating experimental data. a Histogram of ages of rats used in the clustering analysis. Adult rats are aged 3-6 months. b Speed probability density functions of trajectories simulated for the grid search. Solid lines indicate curves from selected parameters. c Rotational speed probability density functions of trajectories simulated for the grid search. Solid lines indicate curves from selected parameters. d Transition matrix estimated from adult trajectories. Warmer colours indicate higher probability to move from the starting bin to the destination bin*
-
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_8bM7MkxJee/figures/010_Figure.jpg]]
-*Figure: A2: Training and validation loss trends for models: a crawl, b walk, c adult, and d adult with grid cell input*
-
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_8bM7MkxJee/figures/013_Figure.jpg]]
-*Figure: b Figure A4: Decoding errors for position and head direction from hidden-layer activity decrease and correlation between agent’s position and hidden state activity increases – as in the original model (development) – when performing a parameter sweep. Transparency indicates a change in parameters. Diamonds indicate adult model trained with grid cell input. a Position decoding errors (mean±SEM) and b head direction decoding errors (mean±SEM) calculated by linear regression on hidden units (50-50 train-test split on validation data). c Spatial representational similarity analysis (mean±SEM) quantifying correlation between agent position and hidden unit activity*
 
 ![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_8bM7MkxJee/figures/015_Figure.jpg]]
 *Figure: a b Figure A6: Decoding errors for position and head direction from hidden-layer activity and correlation between agent’s position and hidden state activity remain stable in control runs. Original model results are indicated as ”development”. Transparency indicates control runs. Diamonds indicate adult model trained with grid cell input. a Position decoding errors (mean±SEM) and b head direction decoding errors (mean±SEM) calculated by linear regression on hidden units (50-50 train-test split on validation data). c Spatial representational similarity analysis (mean±SEM) quantifying correlation between agent position and hidden unit activity*
-
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_8bM7MkxJee/figures/016_Figure.jpg]]
-*Figure: A7: Population-level spatial metrics of modelled units and experimentally recorded ensembles of cells (dimmed colours), grouped by the rat’s locomotion stage at the age of recording. a Min-max normalized spatial information \dot { \mathrm { S I } _ { r } } distribution for rate maps of RNN units (solid) and hippocampal neurons (dimmed). b Min-max normalised spatial information \mathrm { S I } _ { d } distribution for polar maps of RNN units (solid) and hippocampal neurons (dimmed). c Min-max normalised resultant vector length (RVL) distribution for polar maps of RNN units (solid) and hippocampal neurons (dimmed)*
-
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_8bM7MkxJee/figures/018_Figure.jpg]]
-*Figure: a b c Figure A9: Pure directional selectivity emerges at the ”walk” stage and remains stable thereafter. Diamonds indicate adult model trained with grid cell input. Non-significance was determined by one-sided pairwise Wilcoxon rank-sum tests (Wilcoxon, 1992) with Benjamini-Hochberg correction (Hollander et al., 2013) testing for increasing differences. a Percentage of RNN units classified as pure head direction (HD) cells – i.e., meeting only the criteria for directional selectivity. b Minmax normalised spatial information \mathrm { S I } _ { d } (mean±SEM) for polar maps of RNN units classified as pure HD cells. c Min-max normalised resultant vector length (RVL, mean±SEM) for polar maps o...*
-
-
 
 ## 定位与知识库关联
 
@@ -412,8 +382,6 @@ Figure 3展示了模型隐藏单元与真实CA1神经元在率图（rate maps）
 5. **环境-运动交互效应**：运动发育阶段与环境特征（如丰容环境、黑暗饲养）如何交互，以影响空间表征的形成和稳定性？模型可通过改变虚拟环境复杂度来系统探究这一问题。
 
 6. **完整空间认知地图的建模**：能否通过在更复杂的任务中引入其他空间细胞类型（如网格细胞、边界细胞、目标细胞）来扩展模型，实现更完整的空间认知地图？这需要将单层RNN扩展为多模块网络，并引入更丰富的任务结构。
-
-
 
 ## 原文 PDF
 

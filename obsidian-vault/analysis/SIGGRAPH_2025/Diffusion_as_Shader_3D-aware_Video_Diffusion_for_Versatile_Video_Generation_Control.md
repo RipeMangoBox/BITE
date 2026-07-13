@@ -70,9 +70,6 @@ DaS 的核心洞察是：**视频本质上是动态 3D 内容的 2D 渲染**。�
 - **跨帧颜色一致性**：同一 3D 点在不同帧中保持相同颜色，为模型提供强时序对应信号；
 - **任务统一表示**：物体操控、相机控制、运动迁移、网格动画化等任务均可通过构建不同的 3D 点运动轨迹来生成对应的跟踪视频（Fig. 3），无需为每类任务设计独立的控制分支。
 
-![[assets/figures/papers/paper_list_l3_http_arxiv_org_abs_2501_03847v2/figures/003_Figure_3.jpg]]
-*Figure 3: 3D tracking video generation in (a) object manipulation, (b) animating mesh to video generation, (c) camera control, and (d) motion transfer*
-
 ### 关键改造点（Changed Slots）
 
 **改造点 1：控制信号从 2D 升级为 3D 跟踪视频**
@@ -168,9 +165,6 @@ DaS在相机控制与运动迁移两大任务上均取得显著优势，验证�
 
 ![[assets/figures/papers/paper_list_l3_http_arxiv_org_abs_2501_03847v2/figures/012_Figure_9.jpg]]
 *Figure 9: Qualitative results of our method on the object manipulation task. The top part shows the results of translation while the bottom part shows the results of rotating the object*
-
-![[assets/figures/papers/paper_list_l3_http_arxiv_org_abs_2501_03847v2/figures/014_Figure_11.jpg]]
-*Figure 11: Failure cases. (Top) Incompatible tracking video. When a tracking video that does not correspond to the structures of the input image is provided, DaS will generate a video with a scene transition to a compatible new scene. (Bottom) Out of tracking range. For regions without 3D tracking points, the tracking video fails to constrain these regions and DaS may generate some uncontrolled content*
 
 ## 定位与知识库关联
 

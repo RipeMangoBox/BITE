@@ -48,8 +48,6 @@ claims:
 
 实验结果表明，Robust3DGSW在三个标准基准（Blender、LLFF、MipNeRF360）上实现了显著突破：无量化条件下位准确率达99.78%，超越基线3D-GSW的98%；在4位极端量化下，位准确率仍保持87.51%（提升26.51个百分点），渲染PSNR达20.46 dB（提升10.46 dB），证明了量化感知设计对水印鲁棒性和渲染质量的双重保护。消融研究进一步验证了中频嵌入、渐进训练和多尺度对抗扰动等各组件的关键作用。
 
-
-
 3D高斯泼溅（3D Gaussian Splatting, 3DGS）作为一种显式神经渲染技术，凭借其高质量实时渲染能力，正在成为3D内容创作与分发的主流表示形式。随着3DGS资产在数字市场中快速流通，版权保护问题日益突出——创作者需要一种可靠的水印机制来声明所有权并追踪未经授权的分发。为此，研究者们提出了多种面向3DGS的水印方法，如**3D-GSW**（Jang et al., CVPR 2025）和**GaussianMarker**（Huang et al., NeurIPS 2024），它们能够在3D高斯场景中嵌入水印并在渲染图像中提取水印信息。
 
 然而，现有水印方法在设计时普遍忽略了一个关键的实际约束：**模型量化**。为了在边缘设备上高效部署和传输，3DGS模型通常需要从32位浮点精度压缩至8位甚至4位整数精度。量化操作会对3D高斯参数（包括水印嵌入载体）引入不可逆的信息损失，这对水印的鲁棒性构成了严峻挑战。
@@ -59,8 +57,6 @@ claims:
 问题的核心在于**水印嵌入位置与量化误差分布之间的失配**。量化操作本质上是一种高频截断过程——低比特量化会优先丢弃参数中的高频细节分量，而传统水印方法恰恰倾向于在高频带或全空间域中嵌入水印，使得水印信息在量化后大量丢失。与此同时，水印嵌入对高斯参数的扰动也会在量化过程中被放大，进一步恶化渲染质量。
 
 Robust3DGSW正是针对这一瓶颈而提出。其核心洞察是：**在中频带嵌入水印**——这一频带既非视觉感知最敏感的低频区域，也非量化最先丢弃的高频区域——能够使水印信号在量化过程中得以保留，同时最小化对渲染质量的负面影响。配合**渐进式量化感知训练**和**双解码器架构**，Robust3DGSW能够从量化噪声中稳定恢复水印信息，在4位极端量化下仍保持87.51%的提取准确率和20.46 dB的渲染PSNR，相比3D-GSW分别提升了26.51个百分点和10.46 dB。
-
-
 
 ## 核心方法与创新机理
 
@@ -112,8 +108,6 @@ $$\mathcal{L}_{\mathrm{cons}} = \| \sigma(\mathbf{w}_{2D}) - \sigma(\mathbf{w}_{
 ### 创新总结
 
 上述四个创新点构成了一个紧密耦合的系统：**中频带嵌入**确保水印信号位于量化幸存区间，**多尺度对抗扰动**赋予解码器对量化噪声和失真的预适应能力，**渐进式训练**通过课程学习平滑分布偏移，**双解码器一致性**提供跨模态冗余保障。这一组合使得Robust3DGSW在4-bit极端量化下仍能维持87.51%的水印准确率和20.46 dB的PSNR，而基线方法3D-GSW在同等条件下仅分别达到61%和10 dB。
-
-
 
 Robust3DGSW 采用**两阶段**设计，将水印嵌入与量化感知解码器训练解耦，形成“嵌入—渲染—解码”的闭环流水线。整体结构如图2所示。
 
@@ -174,12 +168,8 @@ Robust3DGSW 采用**两阶段**设计，将水印嵌入与量化感知解码器�
 
 > **注意**：上述流水线描述基于论文Section 3.1–3.4及Figure 2的方法论陈述。由于论文元数据中venue/year字段为空，部分实现细节（如中频带具体范围、扰动强度超参数）需查阅原文确认。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2733_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Robust3DGSW_Towar/figures/002_Figure_2.jpg]]
 *Figure 2: Workflow of Robust3DGSW. Initially, we reconstruct 3D Gaussian representations from multiple image views and their corresponding camera poses using the 3DGS method. Next, to ensure watermark embedding is compatible with quantization, we introduce frequency-domain bands in two modalities. This process involves applying a 3D Discrete Cosine Transform (DCT) to the Gaussian positions to embed watermarks in the mid-frequency range, and applying a 2D Fast Fourier Transform (FFT) to the rendered images to embed watermarks in the mid-frequency spectrum. Lastly, during quantization-aware decoder training, we implement multi-scale adversarial perturbations to both the 3D Gaussians and the images befo...*
-
-
 
 Robust3DGSW 的核心技术路线可分解为三个递进模块：**量化感知的中频带水印嵌入**、**多尺度对抗扰动生成**，以及**渐进式双解码器训练**。以下逐一展开其公式机理与变量含义。
 
@@ -279,15 +269,11 @@ $$
 
 三个模块形成因果闭环：中频带嵌入从源头规避量化对水印信号的毁灭性压缩；多尺度对抗扰动在训练中模拟量化与渲染退化，强制解码器习得鲁棒特征；渐进式双解码器训练通过从高到低的位宽调度和跨域一致性约束，使水印在 2D 渲染域和 3D 高斯域之间形成冗余互证。消融实验（Table 1）证实，移除任一组件均导致 4-bit 量化下准确率大幅下降——尤其移除渐进量化训练后准确率从 87.51% 骤降至 67.42%，验证了该模块在极端量化场景下的不可替代性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2733_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Robust3DGSW_Towar/figures/001_Figure_1.jpg]]
 *Figure 1: Trends in watermark robustness and rendered image quality of 3D-GSW as quantization levels decrease*
 
 ![[assets/figures/papers/paper_list_l2733_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Robust3DGSW_Towar/figures/004_Figure_6.jpg]]
 *Figure 6: Trends in watermarking robustness and rendered image quality of Robust3DGSW as quantization levels decrease*
-
-
 
 ## 实验与关键发现
 
@@ -329,21 +315,14 @@ $$
 
 尽管Robust3DGSW在量化鲁棒性上取得了显著提升，但仍存在两个明确的局限。**第一，训练效率**：双解码器训练阶段相比基线方法需要约40%的额外训练时间，这源于多尺度对抗扰动的计算开销和渐进式训练的迭代需求。**第二，对抗性失真**：当前版本仅评估了噪声、模糊、旋转、裁剪四种常见失真，未针对精心设计的对抗性失真（如针对特定频带的定向攻击）进行鲁棒性测试。在对抗性场景下，攻击者可能利用中频带嵌入的已知频带范围设计精准的破坏策略，这是需要进一步研究的开放问题。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2733_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Robust3DGSW_Towar/figures/003_Figure_3.jpg]]
 *Figure 3: Performance comparison (without quantization)*
 
 ![[assets/figures/papers/paper_list_l2733_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Robust3DGSW_Towar/figures/005_Figure_4.jpg]]
 *Figure 4: Performance comparison (with 4-bit quantization)*
 
-![[assets/figures/papers/paper_list_l2733_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Robust3DGSW_Towar/figures/006_Figure_5.jpg]]
-*Figure 5: Robustness against distortions under 4-bit quantization*
-
 ![[assets/figures/papers/paper_list_l2733_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Robust3DGSW_Towar/figures/007_Table_1.jpg]]
 *Table 1: Ablation study on key parts of Robust3DGSW, with results denoting the average score on Blender, LLFF, and MipNeRF360*
-
-
 
 ## 定位与知识库关联
 
@@ -380,8 +359,6 @@ Robust3DGSW 是针对 3D 高斯泼溅（3DGS）版权保护场景提出的量化
 3. **极端量化边界探索。** 在 2 位甚至 1 位量化的极端条件下，中频带嵌入策略是否仍然有效？可能需要重新审视频带划分策略，或引入纠错编码机制以补偿极端量化造成的信息损失。
 
 4. **跨模型泛化性。** 当前方法在 3DGS 框架内验证，其对其他显式场景表示（如 3D Gaussian 变体、点云渲染）的泛化能力尚未探讨，这决定了方法在更广泛 3D 资产保护场景中的适用性。
-
-
 
 ## 原文 PDF
 

@@ -57,8 +57,6 @@ claims:
 
 **主要结果**：在FFHQ和FFHQ-C数据集上，MVCHead在感知质量（FID 4.39 vs. CGSGAN 4.94）和多视图一致性指标（cPSNR 22.08 vs. 19.89，MEt3R 0.262 vs. 0.316）上均超越现有方法。消融实验证实，移除SE(3)评判器损失后MEt3R从0.262升至0.314，将HiBiSS替换为四向自注意力后MEt3R升至0.279，表明两个组件对多视图一致性均不可或缺。
 
-
-
 ### 3D头部化身的生成范式演进
 
 高保真3D头部化身在远程通信、虚拟现实和数字人等应用中需求迫切，但其生成长期以来面临数据获取成本与生成质量的尖锐矛盾。图2概括了当前三种主流范式：
@@ -87,8 +85,6 @@ claims:
 2. **监督层面**：缺乏真实多视图对意味着无法直接施加跨视图一致性损失，必须寻找替代的监督信号来源。
 
 MVCHead正是围绕这两条线索展开：在架构上提出层次化双向状态扫描（HiBiSS）以对齐多视图漂移的主轴方向，在监督上提出基于自渲染先验的SE(3)多视图评判器以提供无真实多视图对的一致性奖励信号。
-
-
 
 ## 核心方法与创新机理
 
@@ -131,8 +127,6 @@ MVCHead 在“极小资源设定”（仅2D图像、无3D数据、无多视图�
 | 高斯细化方式 | 层次化生成 | 基于锚点偏移 + HiBiSS全局上下文传播 |
 
 **协同效应**：消融实验完整模型在所有指标上均取得最佳（Table 4），验证了三个创新的协同作用——HiBiSS对齐漂移主轴、评判器提供一致性奖励信号、层次化细化传播全局上下文，共同实现在无多视图数据下的多视图一致生成。
-
-
 
 MVCHead 是一个单次前馈的 3D 高斯头部化身生成模型，其核心设计目标是在仅使用 2D 图像训练、无任何 3D 或多视图监督的“极小资源设定”下，显式地强制多视图一致性。整体 pipeline 由三个关键阶段串联而成：**层次化高斯参数回归**、**多视图一致性评判** 以及 **可微分渲染与对抗监督**。
 
@@ -189,15 +183,8 @@ $$\mathcal{L}_{\mathrm{total}} = \lambda_{mvc}\mathcal{L}_{mvc} + \text{Adv Loss
 
 相较于前代方法 **GSGAN**（Hyun et al., NeurIPS 2024）和 **CGSGAN**（Barthel et al., NeurIPS 2025），MVCHead 在三个关键维度上进行了结构性改进：(1) 将纯 Transformer 自注意力替换为双混合器架构（自注意力 + 状态空间块）；(2) 引入 HiBiSS 四方向双向扫描替代标准单向 Mamba 扫描；(3) 新增 SE(3) 多视图评判器提供显式的一致性监督，而此前方法仅依赖对抗和条件损失。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2550_https_openaccess_thecvf_com_content_CVPR2026_html_Chharia_Multi_view_Con/figures/003_Figure_3.jpg]]
 *Figure 3: Model Architecture. MVCHead along with its key proposed components, including HiSS blocks which hierarchically regress the 3D Gaussian parameters (Gaussian S0 becomes the anchor A0 for computing the next Gaussian*
-
-![[assets/figures/papers/paper_list_l2550_https_openaccess_thecvf_com_content_CVPR2026_html_Chharia_Multi_view_Con/figures/002_Figure_2.jpg]]
-*Figure 2: Motivation. Paradigms for 3D Gaussian head avatar generation. (a) Requires expensive studio captures; (b) Synthesizes intermediate views before reconstruction; (c) Learns an unconditional 3D Gaussian head directly from 2D images w/o intermediate generation or even 3D data*
-
-
 
 ### 层次化状态空间块 (HiSS Blocks)
 
@@ -294,8 +281,6 @@ $$\mathcal{L}_{\mathrm{total}} = \lambda_{mvc}\mathcal{L}_{mvc} + \text{Adv Loss
 
 需要指出的是，消融实验（Table 4）表明，移除对抗损失会导致训练崩溃，说明在无 3D 数据设定下，仅依靠一致性损失不足以约束纹理分布，对抗监督对维持纹理真实感仍不可或缺。
 
-
-
 ## 实验与关键发现
 
 ### 实验设置
@@ -332,8 +317,6 @@ MVCHead 在 FFHQ 和 FFHQ-C 两个数据集上进行训练，分辨率为 512×5
 4. **对抗训练依赖**：移除对抗损失即崩溃，表明当前一致性损失单独不足以完全替代对抗训练来约束纹理分布。
 5. **泛化边界未验证**：模型尚未在大规模无约束视频数据上测试，极端光照与遮挡场景下的鲁棒性待进一步考察。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2550_https_openaccess_thecvf_com_content_CVPR2026_html_Chharia_Multi_view_Con/figures/006_Table_1.jpg]]
 *Table 1: Perceptual Realism. Comparison of FID scores. 512 × 512 resolution was used for the experiments. †Uses superresolution network. *We report the results from the original paper*
 
@@ -345,8 +328,6 @@ MVCHead 在 FFHQ 和 FFHQ-C 两个数据集上进行训练，分辨率为 512×5
 
 ![[assets/figures/papers/paper_list_l2550_https_openaccess_thecvf_com_content_CVPR2026_html_Chharia_Multi_view_Con/figures/008_Table_4.jpg]]
 *Table 4: Ablation Study. Performed on the FFHQ-C [6] dataset with 512 × 512 resolution to verify the proposed components*
-
-
 
 ## 定位与知识库关联
 
@@ -403,8 +384,6 @@ MVCHead 揭示了若干待解决的方向：
 3. **时序一致性的扩展**：能否将时间一致性纳入 HiBiSS 框架，用于动态头部生成？状态空间模型天然适合序列建模，将 HiBiSS 的扫描维度从空间扩展到时空是一个自然的技术延伸方向。
 
 4. **跨类别泛化**：MVCHead 的多视图漂移轴向分析基于头部姿态的先验（偏航-水平、俯仰-垂直），该先验是否适用于其他类别（如全身人体、通用物体）尚待验证。若漂移轴向与图像坐标轴的对齐关系在跨类别时不再成立，HiBiSS 的扫描方向设计可能需要重新校准。
-
-
 
 ## 原文 PDF
 

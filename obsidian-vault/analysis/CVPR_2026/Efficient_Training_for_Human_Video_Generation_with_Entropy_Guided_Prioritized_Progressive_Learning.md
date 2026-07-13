@@ -52,8 +52,6 @@ Ent-Prog 通过**条件熵膨胀（Conditional Entropy Inflation, CEI）**量化
 
 在三个不同的人体视频生成数据集上，Ent-Prog 实现了最高 **2.2 倍训练加速**和 **2.4 倍 GPU 显存节省**，且生成性能不降反升。例如，在 Bilibili 视频生成任务上，Ent-Prog 的 FVD 达到 120.35，相比全参数训练的 168.17 降低了 28%；在 TikTok 数据集上，移除 CEI 优先级后 FID-VID 从 32.15 恶化至 37.43，验证了优先级机制对训练质量的关键作用。
 
-
-
 ### 问题背景
 
 人体视频生成旨在根据参考图像和姿态序列等条件，合成逼真、可控的人体动作视频。扩散模型已成为该领域的主流范式，但其训练过程对计算资源的需求极为庞大。随着视频分辨率、帧数和条件复杂度的提升，标准训练流程需同时更新扩散网络中所有参数，导致显存占用和训练时间急剧膨胀。这一瓶颈严重制约了高保真人体视频生成模型的研发与迭代效率。
@@ -78,8 +76,6 @@ Ent-Prog 通过**条件熵膨胀（Conditional Entropy Inflation, CEI）**量化
 - 引入 **自适应渐进调度**，通过嵌套扩散超网在每阶段初一次性评估候选解冻块数的收敛效率，动态选择最优解冻数量，实现性能与效率的平衡。
 
 实验表明，Ent-Prog 在三个不同的人体视频生成数据集上实现了最高 2.2 倍训练加速和 2.4 倍 GPU 显存节省，且生成质量不降反升。
-
-
 
 ## 核心方法与创新机理
 
@@ -123,8 +119,6 @@ $$
 
 两个 changed slots 形成闭环：CEI 提供静态的块重要性排序（决定“哪些块优先训练”），自适应调度提供动态的解冻规模决策（决定“每阶段训练多少块”）。消融实验（Table 5）验证了这一耦合的必要性——移除 CEI 优先级后 FID-VID 从 32.15 恶化至 37.43，移除自适应调度后所有指标均下降；定性结果（Figure A）进一步显示，移除自适应调度导致背景保真度显著降低，移除 CEI 则造成细节严重退化。整体上，Ent-Prog 在 Bilibili、TikTok、UBC-Fashion 三个数据集上实现了最高 2.2× 训练加速和 2.4× 显存节省，且生成质量不降反升（如 Bilibili 视频生成 FVD 从 168.17 降至 120.35，降幅约 28%）。
 
-
-
 Ent-Prog 的整体训练框架围绕一个核心洞察展开：扩散模型中不同网络块对条件视频生成的贡献并不均等。基于此，方法将高效训练分解为三个协同工作的模块，形成一个“评估优先级→渐进解冻→动态调度”的闭环。
 
 **输入输出流**：框架的输入包括一个预训练的人体视频扩散模型 $\phi(\omega)$、目标条件生成任务的数据集，以及一个预设的渐进训练阶段序列。输出是一个经过高效微调的模型，其训练过程在显存占用和收敛速度上均显著优于全参数训练。
@@ -138,16 +132,6 @@ Ent-Prog 的整体训练框架围绕一个核心洞察展开：扩散模型中�
 3. **自适应渐进调度** 负责动态决定每阶段应解冻的块数 $m_k$。在每阶段开始时，框架构建一个嵌套扩散超网 $\Phi(\hat{\omega})$，通过单次训练（one-shot supernet epoch）同时评估多个候选解冻数量 $m$ 的收敛效率 $\mathrm{CE}(m) = -\frac{\sum_{s=2}^{S} (\ell_m^{(s)} - \ell_m^{(s-1)})}{\sum_{s=2}^{S} T_m^{(s)}}$，然后选择收敛效率最高的 $m_k^*$ 继续该阶段剩余训练。超网参数直接继承到选定的子网络，避免了重复训练的开销。
 
 三个模块形成的信息流是单向且高效的：CEI 一次性产出全局优先级排序，PPL 据此在每阶段构建候选子网络，自适应调度则通过超网快速筛选最优解冻规模。这种设计使得 Ent-Prog 在 Bilibili、TikTok 和 UBC-Fashion 三个数据集上均实现了最高 2.2× 的训练加速和 2.4× 的显存节省，且生成质量不降反升。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l976_https_arxiv_org_abs_2511_21136/figures/003_Figure_3.jpg]]
-*Figure 3: Illustration of deciding training priority of blocks in diffusion model with Conditional Entropy Inflation. Blocks in deeper colors after ranking indicate higher conditional entropy inflation when the block is skipped, suggesting that the block is more critical for conditional adherence*
-
-![[assets/figures/papers/paper_list_l976_https_arxiv_org_abs_2511_21136/figures/004_Figure_4.jpg]]
-*Figure 4: Illustration of adaptive progressive schedule. We search within the defined space to identify sub-networks with optimal convergence efficiency. At the start of each progressive learning stage, we first train a one-shot supernet, and evaluate the convergence efficiency of each unfreezing choice. The sub-network with optimal convergence efficiency is then selected, inheriting parameters from the supernet and continuing training in the next phase*
-
-
 
 ### 3.1 优先级渐进学习框架 (PPL)
 
@@ -193,13 +177,6 @@ $$
 
 其中 $\ell_m^{(s)}$ 是第 $s$ 步的损失，$T_m^{(s)}$ 是第 $s$ 步的耗时。超网训练结束后，选择 $\mathrm{CE}(m)$ 最高的 $m_k^*$ 作为当前阶段解冻块数，并从超网继承对应参数继续训练，实现性能与效率的动态平衡。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l976_https_arxiv_org_abs_2511_21136/figures/001_Figure_1.jpg]]
-*Figure 1: The impact of freezing or skipping blocks. (a) illustrates the effect of freezing different numbers of blocks on the model’s final convergence performance, showing a clear decline as more blocks are frozen. (b) and (c) present the loss and Conditional Entropy Inflation (CEI) when randomly skipping 8 to 23 blocks, emphasizing the objective of accelerating convergence by selectively skipping blocks with lower interaction (characterized by lower CEI and loss). (d) compares the training dynamics of the most important 10 blocks and the least important 10 blocks, with all other blocks frozen. It is clear that the more influential blocks contribute to faster convergence and better model performance*
-
-
-
 ## 实验与关键发现
 
 ### 核心效率与性能权衡
@@ -226,24 +203,15 @@ Ent-Prog 的核心主张是在不牺牲生成质量的前提下显著压缩训�
 ![[assets/figures/papers/paper_list_l976_https_arxiv_org_abs_2511_21136/figures/010_Figure_7.jpg]]
 *Figure 7: Qualitative comparison of two training methods on TikTok dataset. The red boxes indicate the defects of the generated videos. With the original training method, the top-left example shows that the logo on the garment is missing, while other examples show distortions in facial details. In contrast, Ent-Prog accurately restores the detailed information from the reference image*
 
-![[assets/figures/papers/paper_list_l976_https_arxiv_org_abs_2511_21136/figures/013_Figure_8.jpg]]
-*Figure 8: Qualitative comparison of two training methods on the UBC-Fashion dataset. Red boxes highlight artifacts in the generated videos. Ent-Prog accurately and coherently reconstructs the person from the reference image, while the full training method introduces unrealistic flaws, such as the presence of three feet in the two examples on the right side*
-
 ### 消融实验：CEI 优先级与自适应调度的因果贡献
 
 Table 5 的消融实验直接验证了两个核心组件的因果作用。移除 CEI 训练优先级后，FID-VID 从 32.15 恶化至 37.43，FVD 从 264.03 升至 301.50，表明仅靠渐进解冻而不考虑块重要性会导致条件生成质量显著下降。移除自适应渐进调度后，所有量化指标同样全面下滑，FID 从 37.81 升至 42.67，SSIM 从 0.738 降至 0.721。
-
-![[assets/figures/papers/paper_list_l976_https_arxiv_org_abs_2511_21136/figures/014_Table_5.jpg]]
-*Table 5: Ablation study on CEI and adaptive progressive schedule (Ada.). When removing CEI training priority or adaptive progressive schedule, quantitative results all decline, highlighting importance for these components. The comparison is performed on the TikTok dataset*
 
 定性消融（Figure A）进一步揭示了两种失效模式：移除自适应调度主要导致**背景保真度大幅降低**，说明固定调度无法在效率与质量间取得动态平衡；移除 CEI 模块则导致**细粒度细节严重退化**，印证了 CEI 在识别和优先训练对条件依附关键块上的不可替代性。
 
 ### 训练动态与收敛行为
 
 Figure 6 展示了训练过程中的指标演变。在第二阶段每 10 个 epoch 评估一次，Ent-Prog 在 FID、FID-VID、SSIM 和 LPIPS 四个指标上均以更快速度收敛，最终性能与全量训练持平或更优。该图标注的训练加速为 1.45×，与 Table 1 报告的 wall time 加速一致。
-
-![[assets/figures/papers/paper_list_l976_https_arxiv_org_abs_2511_21136/figures/007_Figure_6.jpg]]
-*Figure 6: Comparison of evaluation metrics in training progress. Models are evaluated every 10 epochs in the second phase. Ent-Prog speeds up the training process by 1.45× without compromising performance*
 
 ### 模型结构鲁棒性
 
@@ -252,8 +220,6 @@ Table I 对比了不同模型结构下的表现，结果显示 Ent-Prog 在不�
 ### 需人工验证的边界
 
 分析中未发现明确的失败模式或局限性声明。论文未报告 Ent-Prog 在极端条件（如极低数据量、极短训练周期）下的退化行为，也未讨论 CEI 估计本身的计算开销是否在极大规模模型上成为新的瓶颈。这些边界条件需在实际部署中进一步验证。
-
-
 
 ## 定位与知识库关联
 
@@ -294,8 +260,6 @@ Ent-Prog 直接对标的是人体视频扩散模型的**全参数训练（Full T
 3. **与参数高效微调的关系**：Ent-Prog 的渐进解冻策略与 LoRA、Adapter 等参数高效微调方法在目标上相似（减少可训练参数），但实现路径不同。两者的结合潜力（例如在解冻块内进一步使用低秩适配）尚未被探索。
 
 4. **多条件场景的扩展**：当条件信号包含多种模态（如姿态、文本、参考图像）时，不同块对不同条件的依附程度可能存在差异。CEI 目前仅提供单一条件的重要性度量，如何扩展到多条件加权优先级是一个开放方向。
-
-
 
 ## 原文 PDF
 

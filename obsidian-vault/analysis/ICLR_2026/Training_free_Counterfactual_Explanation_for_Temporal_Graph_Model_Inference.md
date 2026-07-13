@@ -49,8 +49,6 @@ claims:
 
 实验覆盖六个真实动态图数据集和三种主流任务（链接预测、时空回归、节点分类），与 TempME、TGVex、TGNNExplainer、CoDy 等基线进行全面比较。在 UCIM 链接预测任务上，TemGX 的保真度达到 0.468（TGN 主干），较最佳基线 TempME 提升 113%；AUFSC 达到 0.475，同时解释生成速度提升约 10.8 倍（8.2 s vs 88.4 s）。在 METR‑LA 时空回归任务上，保真度亦达 0.471（STGCN 主干）。消融实验表明，ICM 组件对性能贡献最大（去除后保真度下降 34.2%），时间衰减和 TRD 同样不可或缺。翻转率分析进一步确认，移除解释子图后模型预测改变的比例稳定在 81%–87%，说明 TemGX 解释具有高反事实有效性。整体而言，TemGX 无需额外训练，具备理论近似保证和实用效率，为时序图模型的可解释性提供了新的基础方案。
 
-
-
 动态网络（如金融交易、网络安全、交通预测等）的建模越来越依赖时序图神经网络（Temporal Graph Neural Networks, TGNN）。TGNN 通过编码器‑解码器结构（$f_{E}, f_{D}$）将历史交互序列映射为节点嵌入，并对未来链路概率、节点属性等进行预测（Section 2）。然而，TGNN 的决策过程高度不透明，在金融欺诈检测（Figure 1 中的 Peel Chain 与 Spindle 洗钱模式）、多阶段攻击链溯源等安全关键应用中，模型预测的“黑箱”属性严重制约了其可信部署与人工审核。因此，如何为 TGNN 预测提供可解释、可验证的解释成为迫切需求。
 
 现有 TGNN 解释方法尚面临四个核心缺口：
@@ -72,8 +70,6 @@ claims:
 - **训练无关 + 可查询**：直接复用预训练 TGNN，无需额外训练；并支持时序模式查询与动态贝叶斯网络摘要，赋予用户“what‑if”推理能力（Section 3, Appendix B）。
 
 实验表明，TemGX 在保真度与效率上显著超越现有基线：在 UCIM 数据集上相对 TempME 保真度提升 113%（0.468 vs. 0.219，Table 1），且消融实验确认 ICM、TRD 与时间衰减等都是保障性能的关键组件（Table 3）。至此，TemGX 填补了时序图模型解释中训练无关的反事实方案与时间感知互动能力的空白。
-
-
 
 ## 核心方法与创新机理
 
@@ -99,8 +95,6 @@ claims:
    传统方法仅输出一个最终子图，而 TemGX 进一步支持时序模式查询，并能从一批解释实例中学习 **动态贝叶斯网络（DBN）** 作为概率化摘要（通过 BIC 得分优化结构，附录 B）。这使领域专家可以执行“what‑if”推理和交互式验证，将解释从一次性产出转变为持续的分析工具。
 
 上述 changed slots 共同支撑了 TemGX 在核心指标上的大幅提升：在 UCIM+TGN 上，相较于最强的基线 TempME（保真度 0.219），TemGX 达到 0.468（提升 113%），同时 AUFSC 达到 0.475，验证了时序反事实解释框架的有效性。
-
-
 
 ![[assets/figures/papers/iclr26_0013_NqtYz3A8tQ_Training-free_Counterfactual_Explanation_for_Tem/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of TemGX framework. Given a target node vt and temporal graph $G _ { t }$ , it constructs a $\delta \mathrm { - }$ reachable candidate pool and estimate influence as the probability of changes when removing each candidate. TRD back-propagation captures temporal resistance, and a temporal influence score $\phi$ combines influence, TRD, and temporal decay. Top-scoring nodes form the explanatory set $V _ { s }$ , induced connectors $V _ { c }$ ensure temporal connectivity, and counterfactual verification confirms that removing $V _ { s } \cup V _ { c }$ changes the TGNN prediction M ( $G _ { t } , v _ { t }$ ) , which in turn contribute to temporal explanations
@@ -147,8 +141,6 @@ TemGX 提出一种训练无关的时序图神经网络解释框架，其核心�
 - **超参敏感性**：时间衰减率 $\lambda$、窗口大小 $\delta$ 和邻域深度 $L$ 需根据数据域调整（例如社交网络 $\lambda=0.1$ 而交通数据 $\lambda=0.07$），否则性能会显著下降；电阻距离近似在大规模图上可能成为瓶颈。
 
 框架集中解决了现有 TGNN 解释方法在时间依赖性捕捉、反事实验证和可查询性三方面的缺失，但结构级子图尚未包含节点特征重要性分析，且其通用性目前绑定于编码器‑解码器架构的 TGNN 模型。
-
-
 
 ### 关键模块
 
@@ -239,8 +231,6 @@ $$
   $$
   直接度量移除解释子图后预测发生改变的节点比例。
 
-
-
 ## 实验与关键发现
 
 ### 主结果
@@ -286,8 +276,6 @@ TemGX 在链接预测、时空回归与分类三类任务上均表现出显著�
 
 综上，TemGX 通过反事实验证与多尺度时序影响力聚合，在保真度、效率和解释连贯性上显著超越现有方法，但其超参数域敏感性和大规模效率问题仍是未来优化的主要方向。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0013_NqtYz3A8tQ_Training-free_Counterfactual_Explanation_for_Tem/figures/003_Table_1.jpg]]
 *Table 1: AUFSC, Fidelity, and Runtime (seconds) of generating one explanation on each dataset/backbone (mean ± std)*
 
@@ -296,8 +284,6 @@ TemGX 在链接预测、时空回归与分类三类任务上均表现出显著�
 
 ![[assets/figures/papers/iclr26_0013_NqtYz3A8tQ_Training-free_Counterfactual_Explanation_for_Tem/figures/013_Table_4.jpg]]
 *Table 4: Ablation study on METR-LA+STGCN. Fidelity is reported at the highest sparsity level*
-
-
 
 ## 定位与知识库关联
 
@@ -328,8 +314,6 @@ TemGX 设计适用于**已训练的 TGNN 编码器‑解码器架构**（如 TGN
 2. **跨模型与跨图类型扩展**：框架能否推广到异构图、时序知识图谱或其他非 TGNN 的时序预测模型（如时序随机游走模型），是拓宽其解释覆盖面的关键。  
 3. **超参数自适应机制**：研发基于数据特性（如图密度、时间相关性）的自动窗口大小和衰减率选择策略，降低对专家经验的依赖。  
 4. **特征级解释的融合**：在现有反事实子图解释之上，是否可自然地嵌入节点特征重要性（如通过特征掩码的反事实操作），以提供更完整的归因视图。
-
-
 
 ## 原文 PDF
 

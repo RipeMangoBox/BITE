@@ -53,8 +53,6 @@ claims:
 
 **主要结果**：在PASCAL VOC07+12上，本方法在第5周期达到75.60 mAP，远超随机采样基线（69.27）和最佳现有AL方法PM（74.29），相对提升最高达7.7%。在MS-COCO上，本方法达到32.80 mAP，优于随机采样（31.47）和PM（31.86），相对提升约7%。尤为关键的是，在VOC的低表现类别（如Bottle）上，不一致性驱动的主动学习相对熵方法提升高达24%（Figure 5），且在MS-COCO第1周期于76%的类别中超越了随机采样（Figure 10），验证了方法的类别均衡性。消融实验证实：伪标签单独使用效果微弱，必须与统一获取函数配合才能发挥最大作用；极高阈值 $\tau = 0.99$ 是伪标签质量的关键（错误率仅3.7%）；SSL训练是不一致性获取函数生效的必要条件。
 
-
-
 目标检测的深度模型依赖大规模精确标注数据，但标注成本高昂。主动学习（Active Learning, AL）和半监督学习（Semi-Supervised Learning, SSL）是降低标注成本的两条主流路径，然而在目标检测场景中，现有方法存在一个被忽视的结构性缺陷：**类别偏差**。
 
 ### 现有方法的隐性假设与失效模式
@@ -73,8 +71,6 @@ claims:
 2. **抑制主动学习引发的分布漂移**：通过高置信度伪标签机制（阈值 $\tau=0.99$）自动标注低信息量样本，使训练集在人工标注和自动标注之间保持代表性。
 
 这一动机在 **Figure 1(d)** 中得到具象化：所提方法既能选中“Pottedplant”样本进行人工标注，又能防止其被错误伪标签，从而实现对全类别性能的均衡提升。
-
-
 
 ## 核心方法与创新机理
 
@@ -110,8 +106,6 @@ $$\hat{y}_i^p = \begin{cases} 1, & \text{if } p = \arg\max(\boldsymbol{c}_i) \te
 
 这两个改动槽位形成了“标注—自动标注”的分工闭环：统一获取函数 $H(\Delta) \times I(\Delta)$ 确保低表现类别的困难样本被优先送交人工标注（解决类别偏差），而高阈值伪标签自动吸收高置信度样本（抑制分布漂移）。一致性正则化训练（式 9-10）作为支撑条件，对全部未标注数据施加分类和定位一致性损失，使网络保持对增强变换的鲁棒性，从而让不一致性信号和伪标签质量随训练持续改善。消融实验（Table 1a）证实，SSL 训练是不一致性获取函数生效的必要条件——无 SSL 时不一致性 AL 表现不及随机采样。
 
-
-
 本文提出一个统一框架，将主动学习（Active Learning, AL）与半监督学习（Semi-Supervised Learning, SSL）协同整合，在目标检测的标注预算约束下实现全类别性能的均衡提升。框架的核心设计围绕一个关键观察展开：现有基于不确定度（如最大熵）的主动学习方法偏向高表现类别，对低表现类别因网络预测不可靠而失效；而单独使用伪标签或一致性正则化同样无法有效处理这些困难样本（参见 Figure 1 的动机示意）。
 
 整个流程可分为三个串联的模块，如 Figure 2 所示：
@@ -129,15 +123,8 @@ $$\hat{y}_i^p = \begin{cases} 1, & \text{if } p = \arg\max(\boldsymbol{c}_i) \te
 
 **输入输出流总结**：每个周期以“部分标注图像 + 大量未标注图像”为输入，经半监督训练后输出网络预测，预测经统一获取函数评分后分流为人工标注、自动伪标注和纯无标注三类，三者共同构成下一周期的训练数据。该闭环机制使得数据集在人工标注和自动标注之间保持代表性，有效抑制了纯主动学习可能导致的数据分布漂移。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2106_11921/figures/006_Figure_5.jpg]]
-*Figure 5: VOC07+12. In the bar plots we show the accuracy per class using random sampling in the zeroth and last cycle. We present the results of each AL method for the three best-performing (”Train”, ”Car”, and ”Horse”) and worst-performing (”Bottle”, ”Pottedplant”, and ”Chair”) classes*
-
 ![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2106_11921/figures/014_Table_3.jpg]]
 *Table 3: VOC07+12. a) Comparison to two semi-supervised learning methods. We initially use 2, 000 randomly sampled images and, in every other cycle, we label 1, 000 extra images. Our method outperforms both of them by a large margin. b) Ablation study on the effect of entropy, inconsistency, unified score, and our method in VOC07+12. We observe that doing active learning with either entropy or consistency outperforms the semi-supervised model, that the unified score performs better than either of the individual scores, and that our method reaches the best overall results. (1)*
-
-
 
 本文方法由三个紧密协作的核心模块构成：**基于不一致性的获取分数计算**、**高置信度伪标签生成**，以及**一致性正则化训练**。三个模块围绕一个统一目标——在主动学习周期中既选出最有标注价值的样本，又充分利用剩余未标注数据防止分布漂移。
 
@@ -209,8 +196,6 @@ SSL（半监督学习）训练是使不一致性获取函数生效的**必要条
 
 三个模块在主动学习周期中形成闭环：SSL 训练使网络对增强变换具有鲁棒性，从而让不一致性信号变得可靠；高不一致性样本被选中进行人工标注，而低不一致性但高置信度的样本则自动生成伪标签；伪标签与一致性损失共同作用，防止训练数据分布向困难样本漂移。Figure 2 展示了这一完整流程：每张未标注图像根据获取分数被分入三条路径——人工标注、伪标签标注、或仅作为未标注数据参与下一轮 SSL 训练。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现：统一获取函数与伪标签的协同效应
@@ -222,7 +207,6 @@ SSL（半监督学习）训练是使不一致性获取函数生效的**必要条
 ### 类别级分析：低表现类别的突破性提升
 
 Figure 5的每类别详细对比揭示了本方法的核心优势所在。在VOC07+12的三个最差表现类别（Bottle、Pottedplant、Chair）上，基于不一致性的主动学习相对熵方法取得了显著提升：Bottle类相对增益高达**24%**，Pottedplant类**14%**，Chair类**18%**。这一结果直接验证了核心洞察——熵在低表现类别上因网络预测不可靠而失效，而不一致性作为类别无关的信号，能够有效识别这些类别的有价值样本。
-
 
 在MS-COCO的80个类别上，统一获取函数在**60%**的类别中超越了单独的熵方法（Figure 6a）。更关键的是，当统一获取函数配合伪标签后，在第1周期于**76%**的类别中超越了随机采样（Figure 10），这一比例远超纯主动学习方法，表明伪标签机制有效缓解了主动学习可能导致的数据集分布偏移问题。
 
@@ -245,33 +229,17 @@ Figure 5的每类别详细对比揭示了本方法的核心优势所在。在VOC
 
 所有实验均使用相同的SSD300检测器和VGG骨干网络，训练超参数完全一致（120K迭代，初始学习率0.001，在80K和100K迭代时衰减，batch size 32，L2正则0.0005）。每个实验使用相同的初始随机种子划分，并训练三个独立网络取平均以消除随机性影响。对比的主动学习方法均采用与原文一致的公开实现，确保了比较的公平性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2106_11921/figures/005_Figure_4.jpg]]
 *Figure 4: MS-COCO. Left: Comparison to state-of-the-art active learning methods; Middle: Comparison to the two SSL methods used in this work when they do not use AL; Right: Ablation study on the effect of entropy, inconsistency, unified score without pseudo-labeling, and our method. † denotes ensemble method; ‡ denotes mixture of SSD*
 
-![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2106_11921/figures/008_Figure_6.jpg]]
-*Figure 6: MS-COCO. a) The percentage of classes where one acquisition function outperforms another; b) The percentage of classes where our unified acquisition function outperforms random with and without pseudo-labels. Example: taking the entry ”unified” in the y-axis, and ”entropy” in the x-axis, we get the value 0.69 which means that ”unified” acquisition function outperforms the ”entropy” acquisition function in 69% of classes*
-
-![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2106_11921/figures/010_Figure_8.jpg]]
-*Figure 8: VOC07+12. Left: Accuracy as a function of τ for selecting pseudo-labels. Right: Accuracy improvement with respect to the pseudo-labels ratio to the entire labels*
-
 ![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2106_11921/figures/013_Table.jpg]]
 *Table: (a) (b)*
-
-![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2106_11921/figures/015_Figure_9.jpg]]
-*Figure 9: MS-COCO. The percentage of classes where one acquisition function outperforms another. Numbers 1-5 represent the active learning cycle. Example: taking the entry ”unified” in the y-axis, and ”entropy” in the x-axis in (1), we get the value 0.65 which means that ”unified” acquisition function outperforms the ”entropy” acquisition function in 65% of classes during the first active learning cycle*
 
 ![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2106_11921/figures/018_Table_5.jpg]]
 *Table 5: MS-COCO. a) Comparison to two semi-supervised learning methods. We initially use 5, 000 randomly sampled images and, in every other cycle, we label 1, 000 extra images. Our method outperforms both of them by a large margin. b) Ablation study on the effect of entropy, inconsistency, unified score, and our method in MS-COCO. We observe that doing active learning with either entropy or consistency outperforms the semi-supervised model, that the unified score performs better than either of the individual scores, and that our method reaches the best overall results*
 
 ![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2106_11921/figures/019_Table_6.jpg]]
 *Table 6: VOC07+12. a) The results of adding top k% most confident pseudo-labels for class, compared to the results of our method. Top 20%, Top 30%, Top 40% represent the methods where we choose to pseudo-label the most confident 20%, 30% and 40% pseudo-labels per class. Ours represent our method where we pseudo-label all the objects for which the network’s confidence is greater than 0.99. b) Accuracy as a function of label/unlabeled sampling strategy. Random refers to random sampling from the entire dataset, Balanced quarter refers to having a quarter of labeled samples; Unified refers to half of the samples being labeled. Our balanced strategy outperforms the other two strategies. Note that in orde...*
-
-![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2106_11921/figures/009_Table.jpg]]
-*Table: (a)*
-
-
 
 ## 定位与知识库关联
 
@@ -343,8 +311,6 @@ Figure 5的每类别详细对比揭示了本方法的核心优势所在。在VOC
 - **上游继承**：继承不确定度主动学习（Entropy、PM）的池式选择框架，继承半监督学习（SSL-cons.、SSL-PL）的一致性训练与伪标签机制。
 - **核心贡献**：提出“鲁棒性即标注价值”的新视角，将预测不一致性作为类别无关的获取信号，并通过乘积融合与高阈值伪标签实现主动学习与半监督学习的有效协同。
 - **下游影响**：为类别不平衡场景下的主动学习提供了新范式，其“不一致性+伪标签”的组合策略可被后续工作在不同任务和架构上复用。
-
-
 
 ## 原文 PDF
 

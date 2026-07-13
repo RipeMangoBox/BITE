@@ -59,8 +59,6 @@ claims:
 
 **方法谱系与知识库定位**：本研究属于扩散模型推理时引导策略的改进。与 **静态 CFG**（Ho & Salimans, 2021）相比，仅将恒定权重替换为时间依赖的 ω(t)，不改变模型结构与训练流程。相较于其他动态引导变体（如 Rescale CFG、PAG 等），本文首次通过“冲突度量”与负扰动分析揭示了单调递增调度器有效性的因果机制，为引导权重调度提供了可解释的理论框架。
 
-
-
 扩散模型已成为当代图像生成的核心范式，其通过逐步去噪将高斯噪声转化为高保真样本。为了提升生成质量与文本一致性，**无分类器引导（Classifier‑Free Guidance, CFG）**（Ho & Salimans, 2021）被广泛采用。其标准形式为：
 
 $$\hat{\epsilon}_{\theta}(x_t, c) = \epsilon_{\theta}(x_t, c) + \omega \bigl( \epsilon_{\theta}(x_t, c) - \epsilon_{\theta}(x_t) \bigr)$$
@@ -84,8 +82,6 @@ $$\Phi(\epsilon_1, \epsilon_2) = \frac{-2 \lvert \epsilon_1 \rvert_2 \lvert \eps
 $$\hat{\epsilon}_{\theta}(x_t, c) = \epsilon_{\theta}(x_t, c) + \omega(t) \bigl( \epsilon_{\theta}(x_t, c) - \epsilon_{\theta}(x_t) \bigr)$$
 
 核心动机在于：**将引导权重设计为单调递增函数，推迟高强度引导至去噪后期，从而在保持总引导量不变的条件下，系统性地降低早期冲突，整体提升保真度、文本一致性与多样性**。这一方法无需额外训练或微调，仅在推理时替换 $\omega(t)$，计算开销与静态 CFG 完全相同。
-
-
 
 ## 核心方法与创新机理
 
@@ -137,8 +133,6 @@ $$
 
 该创新的本质在于**识别并利用去噪过程中不同时间步对引导强度的差异化需求**：早期去噪阶段主要构建全局结构，过强引导会与生成项冲突；后期阶段需要精细对齐条件信息。通过将引导权重从“均匀分配”重构为“前轻后重”的单调递增分配，在不引入额外计算开销的前提下，系统性突破了静态 CFG 的保真度-多样性折衷瓶颈。
 
-
-
 本文提出的动态无分类器引导权重调度方法，在标准扩散模型采样流程中仅替换一个核心控制量——引导权重 ω，将其从全局恒定的标量扩展为随时间步变化的函数 ω(t)。整体框架由四个串行模块构成，输入为文本提示与初始噪声，输出为最终生成图像。
 
 **1. 条件嵌入（文本编码器）**
@@ -164,13 +158,6 @@ $$\hat{\epsilon}_{\theta}(x_t, c) = \epsilon_{\theta}(x_t, c) + \omega(t) \bigl(
 静态 CFG 在去噪早期（高噪声阶段）施加与后期相同的强引导，导致生成项 ε_θ(x_t, c) 与引导项 (ε_θ(x_t, c) − ε_θ(x_t)) 之间产生显著的方向冲突（冲突度量 Φ 接近 0）。单调递增调度器将高强度引导推迟到去噪后期，使早期阶段以生成项为主导，降低冲突，从而在总引导量不变的条件下整体提升保真度、文本一致性与多样性。这一机制在 CIFAR-10 负扰动分析中得到直接验证：移除早期时间步的引导可改善 FID，而移除后期引导则严重损害 FID（Figure 6b）。
 
 整个框架的计算开销与静态 CFG 完全相同——仅在推理时替换 ω(t) 的取值，不引入额外网络、不增加采样步数、无需训练。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_SUMtDJqicd/figures/001_Figure_1.jpg]]
-*Figure 1: Classifier-Free Guidance introduces a trade-off between detailed but fuzzy images (low guidance, top) and sharp but simplistic images (high guidance, middle). Using a guidance scheduler (bottom) is simple yet very effective in improving this trade-off*
-
-
 
 ### 静态CFG与动态引导调度
 
@@ -240,12 +227,8 @@ $$
 3. **动态CFG组合模块**：依据公式 $\hat{\epsilon}_{\theta}(x_t, c) = \epsilon_{\theta}(x_t, c) + \omega(t)(\epsilon_{\theta}(x_t, c) - \epsilon_{\theta}(x_t))$，使用时间变化权重 $\omega(t)$ 组合条件与无条件噪声估计。这是本文唯一修改的模块。
 4. **采样器**：基于DDIM或DPM‑Solver++迭代去噪生成最终图像。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_SUMtDJqicd/figures/005_Figure_5.jpg]]
 *Figure 5: Visualization of Conflicted Terms from SD1.5 Rombach et al. (2022) shows that static guidance presents conflicts, while a guidance scheduler reduces the conflict between generation and guidance terms*
-
-
 
 ## 实验与关键发现
 
@@ -307,15 +290,6 @@ $$
 
 为突破启发式调度的性能上限，论文进一步探索了两类参数化调度器（Figure 10，Figure 11，Figure 17）：
 
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_SUMtDJqicd/figures/011_Figure_10.jpg]]
-*Figure 10: Class-conditioned generation results of parameterized clamp-linear and pcs on (a) CIFAR-10-DDPM and (b) CIN-256-LDM. Optimising parameters improves performances but these parameters do not generalize across models and datasets*
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_SUMtDJqicd/figures/012_Figure_11.jpg]]
-*Figure 11: Text-to-image performance for two parameterized schedulers: clamp-linear and pcs. For clamp-linear, (a) shows the guidance curves for different parameters and (b,c) displays the FID vs. CS for SD1.5 and SDXL, respectively. For pcs, (d) shows the guidance curves and (e,f) depicts the FID vs. CS. Optimal parameters for either clamp or pcs outperform the static baseline for both SD1.5 and SDXL*
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_SUMtDJqicd/figures/020_Figure_17.jpg]]
-*Figure 17: Class-conditioned image generation results of two parameterized families (clamplinear, clamp-cosine and pcs) on CIFAR-10 and CIN-256. Optimising parameters of guidance results in performance gains, however, these parameters do not generalize across models and datasets*
-
 - **clamp‑linear**：在线性递增基础上对引导权重设置下界 c，避免早期引导过弱导致结构崩塌。其定义为 w_t = max(c, w_t)。
 - **powered‑cosine (pcs)**：引入可调参数 s 控制余弦函数的形状，定义为 w_t = (1 − cos π((T−t)/T)^s) / 2 · w。
 
@@ -330,9 +304,6 @@ $$
 
 单调递增调度器在总体引导水平较低时存在过度抑制早期引导的风险（Figure 8）。当等效 ω 设置过低时，去噪初期几乎无引导信号，导致生成结果出现结构性错误，如多腿、空间错位等。参数化方法中不恰当的参数选择（如 clamp 下界过低或 pcs 的 s 值过大）同样会引发类似问题。这表明动态调度需要在“降低早期冲突”与“维持基本结构引导”之间取得精细平衡。
 
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_SUMtDJqicd/figures/009_Figure_8.jpg]]
-*Figure 8: Failure cases of parameter-free and parameterized approaches: monotonically increasing guidance may mute the guidance at the beginning (especially when overall guidance is low), causing structural errors; and incorrectly chosen parameters can lead to fuzzy details and low saturation problems*
-
 ### 图像到图像翻译的拓展验证
 
 在 SD1.5 的图像到图像翻译任务上，线性调度器和 clamp‑linear 调度器同样改善了 FID 与 CLIP‑Score 的折衷（Figure 14），且生成图像在细节保真度和条件一致性上优于静态基线。这一结果拓展了动态调度方法的适用范围，表明其增益并非局限于纯生成任务。
@@ -344,15 +315,8 @@ $$
 
 所有实验均遵循严格的公平性控制：引导曲线经面积归一化使总引导量与静态基线相等；评估使用相同的零样本 COCO 测试集（10K 或 30K）和预处理流程；采样器配置与步数在比较中固定（SD1.5 使用 DDIM 50 步，SDXL 使用 DPM‑Solver++ 25 步）；所有方法仅在推理时替换 ω(t)，计算开销与静态 CFG 完全相同，无需额外训练或微调。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_SUMtDJqicd/figures/044_Table_16.jpg]]
 *Table 16: Experiment on SD1.5 with Diversity measures of 10K images, comparison between the baseline and two increasing heuristic shapes, linear and cosine*
-
-![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_SUMtDJqicd/figures/045_Table_17.jpg]]
-*Table 17: Experiment on SDXL with Diversity., we present FID vs. CLIP-Score (CS) for SDXL of 10K images, and we see the similar trending to Table 16 that the heuristic methods outperform the baseline, both on FID and Diversity*
-
-
 
 ## 定位与知识库关联
 
@@ -405,8 +369,6 @@ $$w_t = \frac{1 - \cos \pi \bigl(\frac{T-t}{T}\bigr)^s}{2} w$$
 3. **超越单调递增的最优形状**：是否存在比线性/余弦更优的单调递增函数族，能进一步降低早期冲突的同时兼顾后期退火？参数化调度器的初步结果表明这一方向存在提升空间。
 4. **与采样策略的协同设计**：动态调度器是否可以与自适应步长或噪声调度相结合，在采样效率和生成质量上获得联合增益？
 5. **理论最优调度器的形式化**：如何在理论上形式化生成项与引导项之间的冲突，并以此为指导推导调度器的最优形状？这可能需要建立冲突与去噪过程信息论特性之间的桥梁。
-
-
 
 ## 原文 PDF
 

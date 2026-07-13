@@ -51,8 +51,6 @@ claims:
 
 HumanVLA 首次在物理人形机器人上实现了由视觉和语言联合指导的通用物体重排，为具身智能体的语言引导物理交互提供了新的基准与方法范式。
 
-
-
 ### 物理人形交互的现实需求与技术瓶颈
 
 让通用人形机器人在物理世界中像人类一样，仅凭视觉观察和自然语言指令就能灵活地移动和重排物体，是具身智能领域的长期目标。这一能力对于家庭服务、仓储物流、灾难救援等场景具有重要价值。然而，当前物理人形交互研究面临一个核心瓶颈：**现有方法普遍依赖特权状态信息**，如精确的物体6D姿态和目标坐标，且仅能处理单一物体或静态物体动力学，无法应对多样化物体和通用视觉语言指令驱动的复杂重排任务。
@@ -79,8 +77,6 @@ HumanVLA 首次在物理人形机器人上实现了由视觉和语言联合指�
 ### 预期贡献
 
 基于上述技术路线，HumanVLA 预期在以下方面实现突破：在已知物体重排任务上达到与特权状态方法相当甚至更优的性能；在未见物体和场景上展现出显著的泛化能力；通过消融实验系统验证各项设计组件的独立贡献。这些成果将为物理人形机器人从“精确编程”走向“视觉语言引导的通用交互”提供一条可行路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -110,8 +106,6 @@ HumanVLA 的核心创新在于通过**教师-学生框架**，将依赖特权状
 
 上述六项 changed slots 形成互补体系：几何编码和搬运课程解决多样化物体动力学的感知与操作先验问题；风格裁剪和路径规划分别从奖励设计和导航引导角度提升任务执行效率；主动渲染和在线学习则弥补从特权状态到视觉感知的信息损失。这些设计共同支撑 HumanVLA 在盒子重排任务上达到 98.1% 成功率和 4.2 cm 精度，在未见任务上达到 60.2% 成功率，远超 Offline GC-BC 的 10.2%。
 
-
-
 HumanVLA 的整体框架采用**教师-学生蒸馏**范式，将依赖特权状态信息的状态教师策略，转化为仅以自我中心视觉和自然语言指令为输入的视觉-语言-动作（VLA）学生模型。
 
 ### 两阶段训练流程
@@ -134,15 +128,11 @@ HumanVLA 的整体框架采用**教师-学生蒸馏**范式，将依赖特权状
 
 该框架实现了从“特权状态下的专家策略”到“通用视觉-语言驱动策略”的有效知识迁移，使物理人形机器人能够在未见物体和未见任务场景下，仅凭视觉和语言指令完成物体重排。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1792_HumanVLA_Towards_Vision_Language_Directed_Object_Rearrangement_by_Physic/figures/003_Figure_2.jpg]]
 *Figure 2: An overview of learning state-based HumanVLA-Teacher policy using goal-conditioned reinforcement learning and adversarial motion prior*
 
 ![[assets/figures/papers/paper_list_l1792_HumanVLA_Towards_Vision_Language_Directed_Object_Rearrangement_by_Physic/figures/004_Figure_3.jpg]]
 *Figure 3: Left: An overview of learning HumanVLA by mimicking teacher action and active rendering action. Right: Comparison between w/ and w/o active rendering. Active rendering leads to a more informative perception of human-object relationships*
-
-
 
 HumanVLA 采用教师-学生框架，分两阶段构建：先训练一个依赖特权状态信息的教师策略，再将其蒸馏为仅依赖自我中心视觉与自然语言指令的学生模型。整体架构由四个核心模块构成：**状态教师策略训练**、**视觉-语言学生蒸馏**、**主动渲染模块**和**路径规划模块**。
 
@@ -212,18 +202,8 @@ $$
 
 重新定位奖励 $r_t^{relocation}$ 进一步分解为速度、远距离、近距离和旋转四项子奖励，引导物体从初始位置精确移动到目标位置。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1792_HumanVLA_Towards_Vision_Language_Directed_Object_Rearrangement_by_Physic/figures/012_Figure_8.jpg]]
 *Figure 8: An overview of the path planning process. The blue mark denotes the initial position. Red marks denote the path from the initial position to the object. Green marks denote the path from the object to the goal*
-
-![[assets/figures/papers/paper_list_l1792_HumanVLA_Towards_Vision_Language_Directed_Object_Rearrangement_by_Physic/figures/015_Figure_9.jpg]]
-*Figure 9: Learning curve comparison w/ and w/o style reward clipping*
-
-![[assets/figures/papers/paper_list_l1792_HumanVLA_Towards_Vision_Language_Directed_Object_Rearrangement_by_Physic/figures/016_Figure_10.jpg]]
-*Figure 10: Learning curve comparison w/ and w/o active rendering. The process is dominated by the teacher policy in the early stage with high β and demonstrates the reward upper bound*
-
-
 
 ## 实验与关键发现
 
@@ -234,9 +214,6 @@ $$
 ### 盒子重排任务：状态教师策略性能
 
 在盒子重排任务上，HumanVLA-Teacher 取得了 **98.1% 的成功率**，精度达到 **4.2 cm**，执行时间仅 **4.6 s**（Table 2）。与重新实现的 InterPhys 相比，成功率提升 0.3 个百分点，精度提升 8.4 cm（从 12.6 cm 降至 4.2 cm），执行时间缩短 0.7 s。值得注意的是，InterPhys 原论文报告的精度为 8.3 cm，但本文作者重新实现后精度恶化至 12.6 cm，这进一步凸显了 HumanVLA-Teacher 在多样化物体动力学下的鲁棒性优势——InterPhys 仅处理单一盒子物体，而 HumanVLA 面向多种物体类别。
-
-![[assets/figures/papers/paper_list_l1792_HumanVLA_Towards_Vision_Language_Directed_Object_Rearrangement_by_Physic/figures/005_Table_2.jpg]]
-*Table 2: Results in box rearrangement. † denotes our implementation*
 
 ### 消融实验：各组件贡献分析
 
@@ -268,18 +245,12 @@ Table 3 的消融实验系统性地验证了教师策略和学生策略中各项
 
 在未见任务测试集上（Table 4），HumanVLA 取得了 **60.2% 的成功率**、57.0 cm 的精度和 5.8 s 的执行时间，而 Offline GC-BC 基线成功率仅为 10.2%，精度恶化至 152.3 cm。50 个百分点的成功率差距表明，HumanVLA 的教师-学生蒸馏框架结合主动渲染和在线学习，有效将特权状态下的操作能力迁移到了基于自我中心视觉和自然语言指令的策略中。定性结果（Figure 4）展示了从绿色到黄色的颜色渐变过程，直观呈现了重排任务的逐步执行。
 
-![[assets/figures/papers/paper_list_l1792_HumanVLA_Towards_Vision_Language_Directed_Object_Rearrangement_by_Physic/figures/007_Table_4.jpg]]
-*Table 4: Results in unseen tasks*
-
 ![[assets/figures/papers/paper_list_l1792_HumanVLA_Towards_Vision_Language_Directed_Object_Rearrangement_by_Physic/figures/008_Figure_4.jpg]]
 *Figure 4: Qualitative results. The color transitions from green to yellow as the task progresses*
 
 ### 泛化边界与失败模式
 
 Table 7 的未见数据分析揭示了 HumanVLA 的泛化边界：
-
-![[assets/figures/papers/paper_list_l1792_HumanVLA_Towards_Vision_Language_Directed_Object_Rearrangement_by_Physic/figures/018_Table_7.jpg]]
-*Table 7: Unseen data analysis*
 
 - **未见文本指令**：成功率保持在较高水平，表明语言编码器对指令表述变化具有一定鲁棒性。
 - **未见物体视觉特征/几何**：当物体类别与训练集差异较大时，性能显著下降。例如，训练中未见过的杯子几何类型导致成功率骤降至约 20%，说明模型对物体几何外形的泛化能力有限，BPS 编码虽能缓解但未根本解决该问题。
@@ -293,13 +264,6 @@ Table 7 的未见数据分析揭示了 HumanVLA 的泛化边界：
 - **单物体限制**：实验仅覆盖单物体重排任务，未扩展到长时域多物体顺序交互，该场景下的性能尚待验证。
 - **物体类别泛化**：对未见几何类型的物体成功率骤降至 20%，该数值来自 Table 7 的分析，但具体测试规模和类别分布需查阅原文确认。
 - **InterPhys 复现差异**：InterPhys 原论文报告精度 8.3 cm，本文复现为 12.6 cm，该差异可能源于仿真环境配置或超参数调整，需注意对比的公平性边界。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1792_HumanVLA_Towards_Vision_Language_Directed_Object_Rearrangement_by_Physic/figures/002_Table_1.jpg]]
-*Table 1: Comparisons between HumanVLA and past works*
-
-
 
 ## 定位与知识库关联
 
@@ -338,8 +302,6 @@ HumanVLA 的适用边界由以下设计假设和实验条件界定：
 2. **零样本几何和视觉泛化**：如何在不依赖特权状态信息的前提下，设计更鲁棒的视觉语言模型以实现对未知物体类别的零样本泛化？Table 7 的结果表明这是当前方法的显著短板。
 3. **灵巧操作的视觉语言引导**：在不依赖特权状态信息的前提下，能否设计支持复杂灵巧操作的视觉语言模型？这需要在机械手设计、触觉感知和精细动作策略等多个层面取得突破。
 4. **真实世界部署**：从仿真到真实物理环境的迁移面临感知噪声、动力学不确定性和实时性要求等挑战，主动渲染在真实相机上的效果也有待验证。
-
-
 
 ## 原文 PDF
 

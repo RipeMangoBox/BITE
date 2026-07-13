@@ -53,8 +53,6 @@ OmniMotion 针对上述瓶颈提出了一种**连续掩码自回归**范式。�
 
 实验结果表明，OmniMotion 在文本、语音、音乐三个模态上均取得领先性能。在 HumanML3D 文本生成运动任务中，Top-1 R-Precision 达到 0.704，FID 降至 4.838，显著优于 MotionCraft 等最强基线；在 BEAT2 语音手势生成和 FineDance 音乐舞蹈生成基准上同样全面超越现有方法，验证了其跨模态泛化能力。消融实验进一步确认了因果注意力、门控机制、RMSNorm 和 DiT 扩散模块各自对性能的贡献。
 
-
-
 人体动作生成是计算机视觉与图形学中的核心问题，其目标是根据文本、语音或音乐等控制信号生成自然、多样且语义对齐的全身体运动序列。近年来，该领域的研究主要沿着两条技术路径展开：**离散量化路径**与**连续回归路径**，但二者均存在难以调和的结构性缺陷。
 
 离散量化方法以 VQ-VAE 为核心，将连续运动映射为离散码本索引，再通过自回归或掩码建模生成运动序列。代表性工作如 **T2M-GPT**（Zhang et al., 2023a）和 **Talkshow**（Yi et al., 2023）分别将这一范式应用于文本生成运动和语音生成手势。然而，离散量化过程引入了**不可恢复的量化误差**，在运动精度要求较高的场景（如手指动作、面部表情）中尤为突出，直接限制了生成质量的上限。
@@ -66,8 +64,6 @@ OmniMotion 针对上述瓶颈提出了一种**连续掩码自回归**范式。�
 上述困境的根本原因可归结为两点：其一，**离散量化与连续建模之间的取舍**——现有方法要么牺牲运动精度换取建模能力，要么反之；其二，**时序建模与多模态注入的耦合不足**——缺乏一种既能保持运动序列时间因果性，又能自适应地融合异质模态信号的统一架构。
 
 针对这些缺口，OmniMotion 提出了一条新的技术路径：在连续运动空间中引入**掩码自回归建模**，通过因果注意力保持运动序列的时序结构，同时以 DiT 扩散 Transformer 替代简单的预测头，将掩码自回归的丰富条件特征扩散到目标标记。多模态信号则通过 AdaLN 与交叉注意力层统一注入，使得文本、语音、音乐驱动的高质量全身体运动生成得以在一个框架内实现。
-
-
 
 ## 核心方法与创新机理
 
@@ -103,8 +99,6 @@ OmniMotion 通过 **AdaLN 与交叉注意力层**统一注入文本、语音、�
 
 这些创新点的协同效应在消融实验中得到验证：因果注意力替代双向注意力、引入门控机制、使用 RMSNorm、采用 DiT 扩散头，每一步替换均在文本到运动及多模态任务上带来一致且显著的性能提升（Table 4）。
 
-
-
 OmniMotion 是一个面向多模态全身体运动生成的统一框架，其核心设计思想是：在连续运动空间中结合掩码自回归建模与 DiT 扩散条件合成，避免离散量化带来的精度损失，同时保留时序建模能力。框架整体分为三个主要阶段：
 
 **阶段一：连续自编码器编码。** 原始运动序列首先通过一个连续自编码器（1D 卷积 + 残差块，下采样 4 倍）压缩为连续潜码，得到“连续运动标记”（continuous motion tokens）。与 VQ-VAE 的离散量化路径不同，连续编码避免了不可恢复的量化误差，为后续高精度运动生成奠定基础（Sec 3.2）。
@@ -119,15 +113,8 @@ OmniMotion 是一个面向多模态全身体运动生成的统一框架，其核
 
 整个框架以文本作为共享条件锚点，通过统一的 SMPL-X 表示覆盖文本驱动运动、语音驱动手势和音乐驱动舞蹈三类任务，实现了单一框架内的多模态泛化。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2510_14954/figures/001_Figure_1.jpg]]
 *Figure 1: We construct an omni motion framework with a continuous masked autoregressive motion transformer for multimodal whole-body motion modeling, including text-based, music-based, and speech-based motion generation*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2510_14954/figures/002_Figure_2.jpg]]
-*Figure 2: Framework overview. Our framework consists of three parts: (a) The input motion is encoded by an autoencoder to extract a latent code, producing the continuous motion tokens. (b) The motion tokens are masked and predicted in an autoregressive transformer with causal attention, producing conditions for DiTs to diffuse towards the target tokens. (c) Multimodal signals are encoded and then injected via AdaLN and cross-attention*
-
-
 
 OmniMotion 的生成流水线由四个关键模块串联构成：连续自编码器、掩码自回归 Transformer、DiT 扩散块和多模态交叉注意力层。各模块的设计目标与核心公式如下。
 
@@ -178,8 +165,6 @@ $$l_f = (1 + \alpha) \cdot l_c - \alpha \cdot l_{uc} \quad \text{(Eq 7)}$$
 ### 多模态交叉注意力
 
 文本、语音、音乐等多模态信号通过 **AdaLN** 与**交叉注意力层**统一注入掩码 Transformer。交叉注意力层显式建模语音/音乐与运动序列的细粒度交互。多模态微调时，冻结 DiT 参数，仅更新掩码 Transformer 的交叉注意力与 AdaLN 权重，在保持文本生成运动能力的同时高效适配新模态。
-
-
 
 ## 实验与关键发现
 
@@ -237,27 +222,8 @@ Figure 4 展示了文本驱动的全身运动生成结果，OmniMotion 能够根
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2510_14954/figures/014_Figure_6.jpg]]
 *Figure 6: The qualitative results of music-driven motion generation*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2510_14954/figures/006_Table_2.jpg]]
-*Table 2: Results of speech-based motion generation on the BEAT2 dataset (Liu et al., 2024a), following the unified SMPL-X representation (Bian et al., 2025)*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2510_14954/figures/007_Table_3.jpg]]
-*Table 3: Results of music-based motion generation on the FineDance (Li et al., 2023a), following the unified SMPL-X representation (Bian et al., 2025)*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2510_14954/figures/003_Figure_3.jpg]]
-*Figure 3: The qualitative results of motions generated from our model driven by speech and music*
-
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2510_14954/figures/009_Table_5.jpg]]
 *Table 5: Results of text-to-motion on the original HumanML3D benchmark*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2510_14954/figures/010_Table_6.jpg]]
-*Table 6: Results of text-to-motion after fine-tuning. (On the HumanML3D subset of Motion-X dataset, following the unified SMPL-X representation.)*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2510_14954/figures/011_Table_7.jpg]]
-*Table 7: Results of text-driven motion generation on the HumanML3D dataset following the mix training setup (Bian et al., 2025)*
-
-
 
 ## 定位与知识库关联
 
@@ -308,8 +274,6 @@ OmniMotion 的适用边界主要由以下约束定义：
 2. **零样本模态组合**：模型能否在零样本场景下处理未见过的模态组合（如文本 + 音乐联合驱动）？这需要在条件注入层引入更灵活的模态融合机制，而非当前的简单拼接或加和。
 3. **大规模语言模型融合**：将预训练的大语言模型（LLM）融入框架是否会进一步提升文本到运动的语义对齐能力？LLM 的文本理解能力可能帮助模型更好地解析复杂动作描述中的时序逻辑和空间关系。
 4. **DiT 推理加速**：如何通过蒸馏、步数压缩或并行解码策略降低 DiT 模块的推理延迟，使其满足实时应用需求？这是从学术基准走向工业部署的关键瓶颈。
-
-
 
 ## 原文 PDF
 

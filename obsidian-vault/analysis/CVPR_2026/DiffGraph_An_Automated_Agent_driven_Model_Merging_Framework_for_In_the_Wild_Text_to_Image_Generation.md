@@ -55,8 +55,6 @@ claims:
 
 **方法定位：** DiffGraph 属于**智能体驱动的图结构模型融合**范式，区别于传统的参数依赖融合（K-LoRA, LoRA.rar, AutoLoRA）、多概念定制融合（Mix-of-Show, ZipLoRA）以及基于优化的融合方法（Model Swarms, Diffusion Soup）。其核心创新在于将专家管理与融合决策从参数空间解耦至图结构空间，通过 LLM 代理与 VGAE 的协同实现开放场景下的自适应融合。
 
-
-
 文本到图像（T2I）生成领域近年来取得了显著进展，以Stable Diffusion、FLUX等为代表的基础模型展现出了强大的通用生成能力。然而，开放域用户需求高度多样化且持续演化，单一基础模型难以覆盖所有视觉概念、艺术风格和细粒度属性组合。为弥补这一缺口，研究社区和开源平台（如HuggingFace、CivitAI）涌现出海量专家模型——包括完整微调检查点（CKPT）和参数高效微调模块（PEFT，如LoRA），它们各自精于特定概念、风格或属性。如何有效利用这些大规模、异构、持续增长的在线专家资源，成为开放域T2I生成的核心瓶颈。
 
 现有模型融合方法主要沿两条技术路线展开。一类方法依赖参数空间操作，如**Mix-of-Show**（Gu et al., NeurIPS 2023）、**ZipLoRA**（Shah et al., ECCV 2024）、**K-LoRA**（Ouyang et al., CVPR 2025）和**LoRA.rar**（Shenaj et al., ICCV 2025），它们通过对模型权重进行算术组合或训练超网络来生成融合权重。这类方法的根本局限在于：融合系数与专家模型参数强绑定，当专家模型来自不同架构、不同微调策略或不同基础模型时，参数空间的线性组合缺乏泛化保证。另一类方法采用优化驱动的融合策略，如**Model Swarms**（Feng et al., ICML 2025）利用粒子群优化搜索最优组合权重，**Diffusion Soup**（Biggs et al., ECCV 2024）采用贪心算法逐步筛选专家。这些方法虽不直接依赖参数结构，但需要在测试时对每个新需求执行优化过程，计算开销随专家池规模线性增长，无法满足实时交互场景的延迟要求。此外，**DiffAgent**（Zhao et al., CVPR 2024）等单专家选择方法仅能激活单一专家，无法组合多个专家的互补能力。
@@ -64,8 +62,6 @@ claims:
 上述方法的共同缺口在于：**它们均无法充分利用大规模在线专家资源**。参数依赖方法只能处理固定的小规模专家集合，优化驱动方法则因计算成本而难以扩展至数百甚至数千个在线专家。当新专家持续涌现时，现有方法要么需要重新训练融合模型，要么需要重新执行优化过程，缺乏对动态演化专家生态的适应能力。更关键的是，这些方法缺乏对专家能力的语义理解——它们仅依赖参数相似性或生成质量分数来决策，无法根据用户需求的语义内容自主判断哪些专家真正相关、如何组合才能最大化需求满足度。
 
 DiffGraph的核心动机正是弥合这一缺口：**将模型融合重新定义为图上的动态子图激活问题**。通过构建包含专家能力描述的通用图结构，并利用大语言模型（LLM）代理解析用户意图、激活相关子图，再以图变分自编码器（VGAE）从子图上下文生成融合方案，DiffGraph实现了无需重新训练或测试时优化的自适应专家组合。这一思路从根本上解耦了专家管理与融合决策，使得框架能够灵活组合任意数量和类型的在线专家，并支持新专家的即插即用集成。
-
-
 
 ## 核心方法与创新机理
 
@@ -88,8 +84,6 @@ DiffGraph的核心创新在于将**模型融合重新定义为图上的动态子
 DiffGraph的**图构建代理（GCA）**通过节点注册和节点校准机制，支持以无训练方式动态添加新专家。节点校准将专家在各参考提示上的生成质量量化为边特征，使图结构持续反映专家的真实能力。在增量实验中，仅使用2023年数据训练、逐步添加至2025年专家的设置下，IR达到69.64，接近完整2025年设置的73.11，且超越所有在2025年设置下训练的方法（Table 2）。去除校准机制后IR暴跌至11.92（Table 3），证明图结构中的量化能力表征是支撑可扩展性的核心支柱。
 
 综上，DiffGraph的三重changed slots——**图空间专家管理、LLM驱动自适应选择、VGAE上下文感知融合**——构成了一条完整的因果链：通用图提供可扩展的能力表征基础，ESA确保相关专家被激活，VGAE从子图上下文生成最优融合方案。这一设计使得DiffGraph无需重新训练或测试时优化，即可灵活组合任意数量和类型的在线专家，应对开放域用户的多样化需求。
-
-
 
 DiffGraph 提出了一种**两阶段、三模块**的智能体驱动模型融合管线，将开放域文本到图像生成中的模型融合问题重新定义为**图上的动态子图激活问题**。如图1所示，整个框架由三个核心组件构成：**图构建智能体（Graph Construction Agent, GCA）**、**专家选择智能体（Expert Selection Agent, ESA）** 和**融合规划器（Merging Planner, MP）**，它们协同完成从大规模在线专家资源的组织到用户需求驱动的自适应融合的全流程。
 
@@ -116,12 +110,8 @@ DiffGraph 提出了一种**两阶段、三模块**的智能体驱动模型融合
 
 整个管线的**因果逻辑链**可概括为：用户需求 → LLM 解析与专家检索 → 动态子图激活 → VGAE 上下文编码 → Beta 分布建模的融合系数预测 → 模型合并与图像生成。这一设计使得 DiffGraph 能够灵活组合任意数量和类型的在线专家，从根本上突破了传统参数依赖融合方法对固定专家集合的限制。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2166_https_arxiv_org_abs_2603_20470/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of our proposed method. Our DiffGraph framework consists of three key components: the Graph Construction Agent (GCA), the Expert Selection Agent (ESA), and the Merging Planner (MP). In the Universal Graph Construction stage, for ease of understanding, we illustrate a simplified example in which GCA collects and organizes N = 8 online experts (indexed as 1–8), and evaluates them on Nr = 3 reference prompts for node calibration. During the Dynamic Subgraph Activation stage, ESA parses user requirements and selects a subset of experts, for example {3, 4, 5, 7}, to participate in the merging process. MP then activates the corresponding subgraph and generates the merging coefficients, w...*
-
-
 
 DiffGraph 由三个核心模块构成：**图构建代理（GCA）**、**专家选择代理（ESA）** 和 **融合规划器（MP）**，其工作流程如图 Figure 1 所示。整体框架分为两阶段：通用图构建阶段和动态子图激活阶段。
 
@@ -166,8 +156,6 @@ $$w_i = \frac{\alpha_i}{\alpha_i + \beta_i}$$
 
 $$\nabla_{\boldsymbol{\theta}} \mathbb{E}_{\boldsymbol{\theta} \sim \Omega} [u(\mathbf{I}, \mathbf{p})] \approx \frac{1}{B} \sum_{b=1}^{B} u(I_b, p_b) \nabla_{\boldsymbol{\theta}} P(\mathbf{w}_b) \tag{4}$$
 
-
-
 ## 实验与关键发现
 
 ### 主要定量结果
@@ -204,13 +192,9 @@ Figure 2 以“颜料盒”方式可视化各方法对提示中视觉属性的�
 
 当前实验未报告 LLM 代理的推理延迟与 API 调用成本数据，大规模部署时的吞吐量瓶颈需进一步评估。此外，通用图构建中参考提示的数量 $N_r$ 和多样性对未知领域专家评估准确性的影响，原文未提供消融分析，相关结论需谨慎外推。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2166_https_arxiv_org_abs_2603_20470/figures/004_Table.jpg]]
 
 ![[assets/figures/papers/paper_list_l2166_https_arxiv_org_abs_2603_20470/figures/005_Table.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -249,8 +233,6 @@ DiffGraph的核心突破在于将融合决策从参数空间迁移至图语义�
 ### 知识库定位
 
 DiffGraph处于**模型融合 × 智能体驱动自动化 × 图表征学习**的交叉点。其将模型融合抽象为子图激活问题的思路，为“大规模异构模型生态的按需组合”提供了通用范式。方法论上，VGAE生成上下文相关融合系数的设计可迁移至其他需要动态加权组合多个黑盒模块的场景（如LLM路由、多模态专家集成）。工程上，两阶段代理架构（离线图构建 + 在线子图激活）为平衡准备开销与推理效率提供了参考模板。
-
-
 
 ## 原文 PDF
 

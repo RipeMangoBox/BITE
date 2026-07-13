@@ -55,8 +55,6 @@ claims:
 
 ViPE以3–5 FPS的单GPU推理速度运行，虽未达实时要求，但已足够支撑大规模视频标注任务。其局限性主要在于依赖预训练网络（在分布外场景可能退化）、动态掩膜限于预定义语义类别、以及极端纹理缺失或纯旋转等退化运动下BA仍可能失效。尽管如此，ViPE作为视频位姿引擎，为从野外视频中提取可扩展的3D几何标注提供了当前最完整的解决方案。
 
-
-
 从无约束的日常视频中恢复精确的三维几何与相机运动，是计算机视觉领域的一项基础性挑战。随着大规模视频数据在自动驾驶、机器人导航、增强现实和三维内容生成等应用中的爆发式增长，对高效、鲁棒的自动标注工具的需求日益迫切。理想的视频标注引擎应当能够从一段随意拍摄的视频中，同时输出度量级的相机位姿轨迹和与之尺度一致的密集深度图，而无需依赖标定板、已知场景结构或昂贵的传感器。
 
 然而，现有的方法体系在应对这一目标时存在显著缺口。传统的同时定位与建图（SLAM）系统，如基于关键帧的稀疏特征法，虽然具有成熟的优化框架和一定的可扩展性，但在处理无标定、包含动态物体、且时长任意的野外视频时，其位姿估计的精度和鲁棒性往往急剧下降。另一方面，近年来涌现的纯前馈深度学习方法，如**VGGT**（Wang et al., CVPR 2025），通过端到端网络直接从视频回归几何信息，展现了对复杂场景的适应能力，但其输出缺乏全局一致性，且难以保证跨帧的度量尺度统一。混合方法试图弥合这一鸿沟：**DROID-SLAM**（Teed and Deng, NeurIPS 2021）将稠密光流融入经典BA框架，**MASt3R-SLAM**（Murai et al., CVPR 2025）则进一步引入学习型前端，但这些系统通常假设已知相机内参或仅支持针孔模型，在面对广角、鱼眼乃至360°全景等多样化相机时束手无策。此外，针对动态场景的视频标注工作如**MegaSAM**（Li et al., CVPR 2025），虽然能够处理运动物体，却依赖逐帧优化，效率低下，难以扩展至长视频。
@@ -64,8 +62,6 @@ ViPE以3–5 FPS的单GPU推理速度运行，虽未达实时要求，但已足�
 上述方法的共同瓶颈在于：**缺乏一个统一的框架，能够将学习型组件的鲁棒感知能力与经典几何优化的全局一致性紧密结合，并系统地解决无标定、动态场景和多相机模型适配这三个相互耦合的难题。**具体而言，无标定意味着内参必须从视频中在线估计，而错误的初始内参会迅速导致位姿漂移和深度尺度畸变；动态物体若不加甄别地纳入优化，会引入大量外点，污染整个BA过程；而广角与鱼眼相机带来的强烈畸变，则要求投影模型本身具备足够的灵活性。
 
 ViPE（Video Pose Engine）正是在这一背景下提出的。其核心动机并非设计一个全新的SLAM系统，而是构建一个**强大且通用的视频标注引擎**，直接面向“任意视频输入，度量级几何输出”这一实用目标。ViPE的设计哲学是：在高效的关键帧BA框架内，将稠密光流约束、稀疏特征点约束和度量深度先验进行联合优化，同时通过语义掩膜主动剔除动态区域，并对多种相机模型提供原生支持。这一思路使得系统既能继承SLAM框架在长序列上的可扩展性和精度，又能借助现代学习模型（如光流网络、度量深度估计网络）的鲁棒性，最终生成与位姿严格一致的密集深度图。与最接近的先前工作MegaSAM相比，ViPE无需逐帧优化，因而在效率上具有显著优势，运行速度可达3–5 FPS（单GPU）。
-
-
 
 ## 核心方法与创新机理
 
@@ -109,8 +105,6 @@ $$\alpha_i,\beta_i = \arg\min_{\alpha,\beta} \sum_{\mathbf{u}\;\mathrm{valid}} \
 
 **因果机制总结**：上述五个 changed slots 并非孤立改进，而是通过统一的 BA 能量函数 $\epsilon_{\mathrm{ViPE}}$（Eq (1)）形成协同效应——稠密流提供全局几何约束，稀疏点增强局部细节，深度先验锚定绝对尺度，动态掩膜排除离群干扰，多相机模型扩展适用边界，最终在 TUM 静态/动态场景（ATE 3.6/1.5 cm）和 KITTI（ATE 9.2 m）上均显著超越无标定基线（18%/50% 提升），并首次实现了面向任意野外视频的端到端度量级位姿与密集深度联合估计。
 
-
-
 ![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2508_10934/figures/002_Figure_2.jpg]]
 *Figure 2: Pipeline of ViPE. The system takes a video as input and first estimates the semantic segmentation masks of the movable objects. It then estimates the camera poses, intrinsics, and depth maps from the video by solving a dense bundle adjustment problem incorporating various constraints. The final output is a dense depth map that is consistent with the camera poses and the intrinsics after the smooth depth alignment step*
 
@@ -138,8 +132,6 @@ $$\alpha_i,\beta_i = \arg\min_{\alpha,\beta} \sum_{\mathbf{u}\;\mathrm{valid}} \
 仿射参数以动量 $m$ 在时域上平滑更新，最终生成全分辨率、与位姿和内参一致的度量深度图。
 
 **运行效率。** ViPE 在单 GPU 上以 3–5 FPS 运行（标准输入分辨率），无需逐帧优化，相比 MegaSAM 等基线具有显著的效率优势。
-
-
 
 ViPE 的核心是一个基于关键帧的稠密 BA（Bundle Adjustment）系统，其设计继承自 **DROID-SLAM**（Teed and Deng, NeurIPS 2021）。系统将学习型稠密匹配、度量深度先验与经典稀疏特征统一到同一优化框架中，并辅以动态物体掩膜和多相机模型支持，从而实现对无约束野外视频的鲁棒联合位姿与深度估计。
 
@@ -198,8 +190,6 @@ $$\alpha_i,\beta_i = \arg\min_{\alpha,\beta} \sum_{\mathbf{u}\;\mathrm{valid}} \
 $$\hat{\alpha}_i = m \cdot \hat{\alpha}_{i-1} + (1-m) \cdot \alpha_i, \quad \hat{\beta}_i = m \cdot \hat{\beta}_{i-1} + (1-m) \cdot \beta_i$$
 
 其中动量因子 $m$ 控制时序平滑强度。最终密集深度图由 $\hat{\alpha}_i/\mathbf{D}_i^{\mathrm{VDA}} + \hat{\beta}_i$ 取倒数得到，既保留了视频深度网络的高分辨率细节，又与 BA 优化的全局几何保持一致。
-
-
 
 ## 实验与关键发现
 
@@ -262,14 +252,6 @@ ViPE 在室内外标准数据集上进行了系统评估，与当前最先进的
 4. **360° 全景视频**：需预先投影至 6 个针孔面，可能引入投影畸变或信息损失。
 5. **实时性不足**：当前速度约 3-5 FPS，尚不能支持 >30 FPS 的实时应用需求。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2508_10934/figures/007_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2508_10934/figures/004_Table.jpg]]
-
-
-
 ## 定位与知识库关联
 
 ### 与关键帧稠密SLAM基线的关系
@@ -313,8 +295,6 @@ ViPE的有效性依赖于其各组件的预训练模型质量，这构成了其�
 - **移动端部署**：能否通过模型蒸馏或量化，将稠密光流和深度网络压缩到移动端可运行的规模，同时保持BA的精度优势？
 - **超长视频的全局一致性**：在超过万帧的视频上，当前的关键帧BA策略可能因误差累积而失去全局一致性。如何设计分层或分块的全局优化策略是一个开放挑战。
 - **自适应语义类别**：如何自动确定需要掩膜的语义类别列表，以适应任意视频内容，而非依赖固定的预定义类别集合？
-
-
 
 ## 原文 PDF
 

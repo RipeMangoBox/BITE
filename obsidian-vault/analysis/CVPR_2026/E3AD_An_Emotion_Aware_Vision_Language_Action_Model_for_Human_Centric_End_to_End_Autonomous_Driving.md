@@ -70,8 +70,6 @@ claims:
 
 E3AD 以通用视觉-语言模型 **Qwen2.5-VL-7B**（Bai et al., arXiv 2025）为推理主干，通过低秩适配器注入情感与空间先验，在保持参数效率的同时实现任务特化。相较于以 **FSDrive-Finetuned**（Zeng et al., arXiv 2025）为代表的现有 VLA 范式，E3AD 首次将连续 VAD 情绪空间显式纳入决策闭环，并从自我中心与环境中心双视角构建空间理解，突破了单一视角推理的局限。其训练策略融合了监督微调与偏好对齐，为情感感知自动驾驶提供了一条可复现的技术路径。
 
-
-
 ### 端到端自动驾驶的“情感鸿沟”
 
 近年来，视觉-语言-动作（VLA）模型在端到端自动驾驶领域取得了显著进展，使车辆能够根据自然语言指令完成视觉定位与轨迹规划。然而，现有系统在设计上存在一个根本性盲区：它们将驾驶建模为一个纯粹理性、去情感化的优化问题，完全忽视乘客的情感状态——如焦虑、紧迫感或信任感。这种“情感无关”（emotion-agnostic）范式导致系统行为与人类期望之间出现深刻的**情感鸿沟**，严重影响了公众对自动驾驶技术的信任与接受度。
@@ -97,8 +95,6 @@ E3AD 将开放域端到端自动驾驶形式化为如下映射：
 $$f_{\theta} : (I, C) \to \hat{\mathcal{V}} = \{\hat{b}, \hat{\tau}\}$$
 
 其中 $I$ 为多视角观测，$C$ 为自然语言指令，$\hat{b}$ 为指称目标定位，$\hat{\tau}$ 为未来轨迹航点序列。这一统一框架将情绪理解、视觉定位与路径规划纳入同一个自回归推理链条，为实现人本自动驾驶提供了形式化基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -138,8 +134,6 @@ DPO 阶段的收益在 Figure 4 中得到验证：训练后情绪-轨迹的 Spea
 ### 创新总结
 
 上述三项创新构成了 E3AD 相对于现有 VLA 范式的核心突破：连续 VAD 情绪空间为模型提供了理解人类意图的“情感维度”，双通路空间推理弥补了单一视角的感知盲区，而三阶段一致性训练则将情绪认知与驾驶行为牢固绑定。三者协同作用，使 E3AD 在轨迹规划（Table 1，ADE 相对 PTPC 降低 17.01%）和视觉定位（Table 2，Talk2Car 绝对提升 +6.86%）上均取得显著增益，同时保持了情绪估计的 SOTA 水平（Table 3，Valence Spearman ρ 达 0.95）。
-
-
 
 E3AD 的核心设计动机在于弥合现有端到端自动驾驶系统与人类乘客之间的**情感鸿沟**。传统 VLA 模型仅将多视图图像直接映射为规划输出，完全忽视指令中蕴含的情绪色彩与行为紧迫度（Figure 1a），导致系统行为机械化、缺乏共情。E3AD 通过将**连续 VAD 情绪空间建模**、**双通路空间推理**以及**一致性导向的三阶段训练**统一于一个 VLA 框架中（Figure 1b），使模型能够根据指令中的情感信息调整视觉定位与轨迹规划，最终产出更符合人类期望的安全、共情驾驶行为。
 
@@ -190,13 +184,6 @@ $$\mathcal{L}_{\mathrm{dpo}} = - \mathbb{E}_i \left[ \log \sigma \left( \beta \l
 
 整个框架在推理时端到端运行，从多视图图像和自然语言指令出发，依次完成情绪估计、指称定位和轨迹规划，并生成人本化的口头反馈，形成完整的感知-推理-执行闭环。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2386_https_arxiv_org_abs_2512_04733/figures/001_Figure_1.jpg]]
-*Figure 1: Overview of our E3AD. (a) Existing VLAs behave as emotion-agnostic systems, mapping multi-view images directly to a planning output without human-in-the-loop interaction or emotion understanding. (b) Our model adds explicit emotion modeling and closed-loop feedback, allowing the agent to infer intent intensity, ground referents more reliably, and adapt its plan accordingly. (c) This yields the Open-Domain E2E AD task, where the agent jointly reasons over language, emotion, perception, and navigation to enable human-centered and context-aware autonomy*
-
-
-
 E3AD 的核心架构围绕三个关键设计展开：连续情绪建模、双通路空间推理，以及三阶段一致性训练。以下逐一剖析各模块的机理与关键公式。
 
 ### 连续情绪建模
@@ -242,12 +229,8 @@ $$\mathcal{L}_{\mathrm{dpo}} = - \mathbb{E}_i \left[ \log \sigma \left( \beta \l
 
 VLA 主干输出的高层语义（目标位置、粗轨迹）经 **Action Decoder** 转化为精确、物理可行的最终航点序列。同时，**Verbal Feedback Generator** 根据预测的情绪状态、指称目标及规划轨迹，生成带有适当语气与详略程度的口头回应，降低乘客的“黑箱”焦虑。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2386_https_arxiv_org_abs_2512_04733/figures/003_Figure_3.jpg]]
 *Figure 3: Visualization of emotion distributions before and after augmentation. (a) Proportions of GoEmotion categories across Talk2Car splits. (b) VAD distribution of GoEmotion. (c) Incorporating driving commands enriches emotional diversity. (d) Emotion-aware augmentation expands and smooths the VAD distribution, providing broader and continuous emotion supervision*
-
-
 
 ## 实验与关键发现
 
@@ -285,27 +268,15 @@ E3AD 在 Talk2Car-Trajectory 基准上全面超越所有现有方法，印证了
 
 DPO 训练阶段通过构造伪偏好对，将情绪表达与驾驶行为进行显式对齐。Figure 4 展示了 DPO 训练前后情感-轨迹一致性的变化：Spearman 相关系数在 Valence 和 Arousal 维度上均有提升，表明模型学会了根据指令中的情绪色彩调整轨迹风格。
 
-![[assets/figures/papers/paper_list_l2386_https_arxiv_org_abs_2512_04733/figures/010_Figure_4.jpg]]
-*Figure 4: DPO’s effect on emotion-trajectory consistency*
-
 定性案例（Figure 6）进一步佐证了这一效果：当指令带有“谨慎”情绪色彩时，E3AD 会生成更保守的轨迹（更低的规划速度、更大的安全距离），而中性指令下则保持正常驾驶行为。这种情绪-行为的一致性在 217 人用户研究（Figure 7）中得到主观验证——E3AD 在合规性、情绪同步、安全感和偏好等维度均获得最高 Likert 评分。
-
-![[assets/figures/papers/paper_list_l2386_https_arxiv_org_abs_2512_04733/figures/013_Figure_7.jpg]]
-*Figure 7: User study on perceived compliance, emotion, safety, and preference. (Left) E3AD consistently achieves high Likert scores across all age groups. (Right) Comparison of Rank-1 votes, E3AD dominates in most dimensions, outperforming all baselines*
 
 ### 连续情绪估计性能
 
 Table 3 报告了 E3AD 在 Valence-Arousal-Dominance 三维连续情绪空间上的估计精度。模型在三个维度上均达到最高的 Spearman ρ 和 Kendall τ 相关系数，其中 Valence 维度的 Spearman ρ 高达 0.95，表明模型能够高度一致地捕捉指令中的愉悦-不悦程度。这一能力源于情绪感知命令增强策略（Figure 3）：通过生成保持驾驶目标但变化语气的改写指令，显著扩展和平滑了训练数据的 VAD 分布，使模型获得更丰富的情绪监督信号。
 
-![[assets/figures/papers/paper_list_l2386_https_arxiv_org_abs_2512_04733/figures/006_Table_3.jpg]]
-*Table 3: Emotion prediction across valence, arousal, and dominance. Reported metrics are Spearman’s ρ and Kendall’s τ correlations with ground-truth VAD (↑: a higher value is better)*
-
 ### 空间推理能力
 
 Table 4 对比了 E3AD 与通用 VLM 基线在空间推理任务上的表现。相较于 **Qwen2.5-VL-7B**（Bai et al., arXiv 2025）等通用模型，E3AD 在目标定位精度和深度估计上均有大幅提升。这得益于双通路空间推理模块引入的显式空间监督：自我中心通路预测相对方向与距离，环境中心通路预测 BEV 坐标与粗轨迹，两者共同将通用 VLM 的语义理解能力锚定到精确的 3D 空间表征中。
-
-![[assets/figures/papers/paper_list_l2386_https_arxiv_org_abs_2512_04733/figures/008_Table_4.jpg]]
-*Table 4: Spatial reasoning results on Talk2Car vs. VLM baselines*
 
 ### 失败模式与局限性
 
@@ -318,13 +289,6 @@ Table 4 对比了 E3AD 与通用 VLM 基线在空间推理任务上的表现。�
 3. **伪偏好对质量依赖**：DPO 对齐阶段依赖命令改写生成负样本，若部分增强指令的情绪偏移与驾驶行为变化并不一致，可能引入训练噪声，削弱对齐效果。这一风险在极端情绪表达场景下尤为突出。
 
 4. **安全边界的模糊性**：当指令带有强烈的紧迫情绪时，模型如何在响应情绪需求与维持安全边界之间取得平衡，尚未建立明确机制。这是情绪感知自动驾驶走向实际应用前必须解决的关键问题。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2386_https_arxiv_org_abs_2512_04733/figures/011_Figure_5.jpg]]
-*Figure 5: Qualitative comparison between E3AD and FSDrive-FT in emotion-rich (a), multi-agent (b), and ambiguous (c) scenes*
-
-
 
 ## 定位与知识库关联
 
@@ -399,8 +363,6 @@ E3AD 以 Qwen2.5-VL-7B 为 VLA 主干，所有实验在 8×NVIDIA H200 GPU 上�
 3. **多模态情绪融合**：若进一步引入多模态情绪信号（如车内摄像头捕捉的表情），如何有效对齐语言与视觉情感表征，避免模态不一致？例如，乘客笑着说“我快迟到了”时，语言与视觉的情绪信号可能冲突。
 
 4. **法规与伦理框架**：在自动驾驶法规与伦理框架下，车辆根据乘客情绪调整驾驶行为是否可能引发责任划分问题？如果系统因响应“着急”指令而加速导致事故，责任应由乘客、制造商还是算法承担？这需要在技术方案之外进行制度设计。
-
-
 
 ## 原文 PDF
 

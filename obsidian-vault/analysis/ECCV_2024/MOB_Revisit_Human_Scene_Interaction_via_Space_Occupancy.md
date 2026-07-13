@@ -49,8 +49,6 @@ claims:
 
 在该知识库之上，论文设计了一个**自回归人-占用交互控制器**，以轻量Transformer架构统一处理历史运动状态、当前姿态与规范占用网格等控制信号，逐帧预测未来运动，并引入**场调控模块（Field Regulation）**实时修正关节速度以避免穿透。实验表明，在MOB的复杂占用空间中，该控制器的成功率达**77.91%**，远超先前SOTA DIMOS的**15.73%**，穿透体素数从123.12骤降至15.21；仅用MOB训练的模型在真实场景数据集CIRCLE上表现亦优于仅用CIRCLE训练的模型，验证了所学占用知识的强泛化能力。消融实验进一步证实，占用信号、穿透损失与场调控模块三者对避免穿模和稳定运动均不可或缺。
 
-
-
 ### 问题背景：人-场景交互生成的数据瓶颈
 
 在计算机视觉与图形学中，驱动虚拟人类在三维场景中生成物理合理、语义连贯的运动——即人-场景交互（Human-Scene Interaction, HSI）生成——是构建沉浸式数字体验的核心技术。其形式化目标可表述为：给定三维场景 $S$，通过生成器 $\mathcal{G}$ 产出一段运动序列 $M = \mathcal{G}(S)$。
@@ -82,8 +80,6 @@ claims:
 3. **轻量实时避碰**：通过占用场调控机制在速度层面实时修正关节运动，无需显式碰撞检测或复杂几何推理。
 
 该方法在MOB复杂占用空间中的成功率达到**77.91%**，远超先前SOTA DIMOS的**15.73%**，穿透体素数从123.12降至**15.21**（Table 1）。更关键的是，仅用MOB训练（不含任何真实场景数据）的控制器在真实场景数据集CIRCLE上的成功率和碰撞深度均优于仅用CIRCLE训练的模型（Table 2），验证了从伪占用中学到的复杂交互知识具有良好的跨场景泛化能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -124,8 +120,6 @@ $$\Delta \dot{p}_j = \sum_{P_i \in P} -k r_i \max\left(0, \frac{1}{\|v_{ij}\|_a 
 
 这些结果表明，空间占用视角的重新定义、统一自回归范式以及场调控机制，三者共同构成了该方法相对于先前SOTA的质变性优势。
 
-
-
 本文提出一种统一的自回归人-占用交互控制器，将人-场景交互（HSI）重新定义为**人类与场景空间占用的交互**。其核心流程由两大阶段构成：**数据构建**与**运动生成**。
 
 ### 数据构建：从纯运动到伪场景占用
@@ -160,15 +154,8 @@ $$\Delta \dot{p}_j = \sum_{P_i \in P} -k r_i \max\left(0, \frac{1}{\|v_{ij}\|_a 
 
 该框架的关键优势在于：统一的自回归范式无需显式路径规划，可直接处理任意复杂度的占用空间；而MOB的数据构建策略则使模型在训练阶段即暴露于大规模、高多样性的占用交互中，从而获得远超先前方法的泛化能力。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1763_MOB_Revisit_Human_Scene_Interaction_via_Space_Occupancy/figures/001_Figure_1.jpg]]
 *Figure 1: We propose that interacting with scenes is essentially interacting with its space occupancy for static HSI. In this view, we can unify motion-only data into a unified human-occupancy knowledge base and train a versatile Human-Occupancy Interaction controller upon it, achieving stable generation under various scenarios*
-
-![[assets/figures/papers/paper_list_l1763_MOB_Revisit_Human_Scene_Interaction_via_Space_Occupancy/figures/003_Figure_2.jpg]]
-*Figure 2: The construction process of Motion Occupancy Base. Note that the ceilings of the occupancy are hidden for clarity*
-
-
 
 本文提出的自回归人-占用交互控制器由四个核心模块构成：运动状态编码、规范占用网格生成、Transformer自回归控制器、以及场调控模块。以下逐一展开其公式化定义与设计机理。
 
@@ -246,14 +233,8 @@ $$\mathcal{L}_{field} = \left(\frac{|\Delta \dot{p}|}{|\dot{p}|}\right)^2 + |\do
 
 消融实验表明，移除 $\mathcal{L}_{pen}$ 后穿透从15.21升至31.93，成功率降至74.14%；移除 $\mathcal{L}_{field}$ 后穿透升至25.83，脚滑升至11.65%，成功率降至75.34%（Table 1）。两项损失分别从显式惩罚与隐式正则化两个层面协同保障了无穿透的合理运动生成。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1763_MOB_Revisit_Human_Scene_Interaction_via_Space_Occupancy/figures/002_Figure_3.jpg]]
 *Figure 3: The architecture of our versatile motion controller. Given motion state and histories*
-
-![[assets/figures/papers/paper_list_l1763_MOB_Revisit_Human_Scene_Interaction_via_Space_Occupancy/figures/004_Figure.jpg]]
-
-
 
 ## 实验与关键发现
 
@@ -300,8 +281,6 @@ Fig. 13展示了典型失败案例，主要包括两类情况：
 
 Table 4报告了HOI任务的定量结果。与**OMOMO**相比，本文方法在手部关节位置误差（Hand JPE）、平均关节位置误差（MPJPE）及根平移/旋转误差上均取得更优或可比的结果，验证了空间占用视角向人-物交互扩展的可行性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1763_MOB_Revisit_Human_Scene_Interaction_via_Space_Occupancy/figures/005_Table_1.jpg]]
 *Table 1: Quantitative results on MOB*
 
@@ -310,20 +289,6 @@ Table 4报告了HOI任务的定量结果。与**OMOMO**相比，本文方法在�
 
 ![[assets/figures/papers/paper_list_l1763_MOB_Revisit_Human_Scene_Interaction_via_Space_Occupancy/figures/006_Figure_5.jpg]]
 *Figure 5: Our controller can naturally reach the target (white to blue) given the complex occupancy. Furthermore, it can stabilize the motions (red to white) around the targets after reaching them. Previous SOTA [68] suffers from severe penetration and fails to reach the target. For simplicity, the ceilings of the occupancy are hidden*
-
-![[assets/figures/papers/paper_list_l1763_MOB_Revisit_Human_Scene_Interaction_via_Space_Occupancy/figures/009_Figure_8.jpg]]
-*Figure 8: We can generate long-term mo*
-
-![[assets/figures/papers/paper_list_l1763_MOB_Revisit_Human_Scene_Interaction_via_Space_Occupancy/figures/010_Figure_10.jpg]]
-*Figure 10: Our model can avoid dynamic obstacles and reasonably reach the target circle*
-
-![[assets/figures/papers/paper_list_l1763_MOB_Revisit_Human_Scene_Interaction_via_Space_Occupancy/figures/007_Figure_6.jpg]]
-*Figure 6: A typical DIMOS [68] failure case*
-
-![[assets/figures/papers/paper_list_l1763_MOB_Revisit_Human_Scene_Interaction_via_Space_Occupancy/figures/015_Figure_13.jpg]]
-*Figure 13: Failure cases*
-
-
 
 ## 定位与知识库关联
 
@@ -383,8 +348,6 @@ Table 4报告了HOI任务的定量结果。与**OMOMO**相比，本文方法在�
 4. **控制信号的语义化**：控制器能否接收更多样化的控制信号（如语义标签、自然语言指令），以支持更灵活的交互生成？这需要建立从语义到占用约束的映射机制。
 
 5. **实时部署与物理合理性**：在真实移动机器人或VR/AR应用中，如何实时生成可解释且物理合理的占用栅格以达到在线HSI生成？当前的规范占用网格构建依赖于已知的未来运动信息，在线场景下需要预测性的占用估计。
-
-
 
 ## 原文 PDF
 

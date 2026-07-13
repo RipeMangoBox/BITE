@@ -52,8 +52,6 @@ claims:
 
 **关键结果**：在SAT-Real基准上，SandboxVLM相比基线方法取得8.3%的性能提升，在多个空间智能基准上的平均准确率达到81.4%，超越GPT-5-mini 2.9%。消融实验证实，完整的3D Sandbox表示相比原始VLM在SAT-Real上提升8.7%（84.1% vs 75.4%），验证了抽象边界框作为空间推理上下文的有效性。
 
-
-
 ### 问题背景：VLM的2D训练范式与3D空间推理的鸿沟
 
 视觉语言模型（VLM）在图像理解、视觉问答等任务上取得了显著进展，但其核心训练范式仍以2D为中心——模型从大规模图像-文本对中学习视觉与语言的关联，缺乏对三维空间结构的显式建模。这种2D训练模式与日益增长的3D空间推理需求之间存在根本性的模态鸿沟：当面对“从我的视角看，左边的物体比右边的更近吗？”这类需要空间感知的查询时，VLM必须从单张2D输入中隐式推断深度、遮挡和相对位置关系，而缺乏直接可用的3D信息。
@@ -77,8 +75,6 @@ claims:
 3. **多视图先验增强**：单张图像提供的3D信息天然不足。SandboxVLM利用视频扩散模型生成多视图序列，通过跨视图一致性约束提升3D估计的可靠性，模拟了人类从多角度观察场景的认知过程。
 
 这一设计使得SandboxVLM能够作为一个即插即用的3D感知模块，与GPT-4o、GPT-5-mini、Claude-Sonnet-4、Gemini-2.5-Pro等主流VLM无缝集成，在不修改模型参数的前提下显著提升其空间智能水平。
-
-
 
 ## 核心方法与创新机理
 
@@ -116,8 +112,6 @@ $$\mathrm{Agree}(\mathbf{p}, X_v^{(m),t}) = \begin{cases} 1, & \text{if } \exist
 
 综合来看，SandboxVLM 的创新并非提出新的 VLM 架构或训练范式，而是在**推理时**构建了一个轻量级的 3D 沙盒层：通过视频扩散先验获取多视图信息，通过代理提升实现任务驱动的稀疏化，通过多视图投票与聚类生成结构化的抽象边界框，最终将这一符号化的 3D 表示注入 VLM 的推理上下文。整个过程无需任何训练或微调，所有模块均为现成模型的组合，使得该方法可以无缝适配不同的 VLM 骨干（GPT-4o、GPT-5-mini、GPT-5 等），在零样本设定下即取得一致的性能增益。
 
-
-
 SandboxVLM 是一个**免训练的零样本框架**，其核心思想是向现成的视觉语言模型（VLM）注入粗粒度的符号化 3D 结构信息，从而弥合 VLM 的 2D 训练模式与 3D 空间推理任务之间的模态鸿沟。该框架受人类抽象感知的启发——人类在 3D 推理时并不依赖精确的几何重建，而是通过粗粒度的关系性理解即可有效运作。SandboxVLM 遵循这一原则，为 VLM 提供紧凑且富含信息的抽象 3D 边界框上下文，同时丢弃低层视觉细节。
 
 如图 2 所示，整个管道由**四个顺序模块**构成，形成一条从单张 2D 输入图像到 3D 感知推理输出的完整信息流：
@@ -132,15 +126,8 @@ SandboxVLM 是一个**免训练的零样本框架**，其核心思想是向现�
 
 **关键设计选择**：与直接使用多视图图像或稀疏点云不同，SandboxVLM 选择将 3D 信息压缩为**抽象定向边界框**。消融实验表明，这一选择在信息量和可解释性之间取得了有效平衡——完整模型在 SAT-Real 上达到 84.1% 准确率，而仅使用多视图图像（无 3D 抽象表示）的变体下降至 78.7%，使用渲染代理点的变体下降至 77.0%，验证了结构化边界框表示的核心价值。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2367_https_arxiv_org_abs_2511_10946/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the SandboxVLM pipeline. Given an input image and a textual query, the system builds a compact, 3D-aware, query-conditioned context for a vision-language model (VLM). A video diffusion prior first expands the input into a short multi-view sequence along imagined trajectories guided by abstract control provided by the VLM. Inside the 3D Sandbox module, an off-the-shelf depth estimator predicts per-frame depth and camera parameters, while the VLM identifies task-relevant objects that guide a 2D segmenter to produce instance masks. The masked regions are lifted into coarse 3D proxies and merged across views through a Multi-View Voting and Clustering step to form abstract 3D boundin...*
-
-![[assets/figures/papers/paper_list_l2367_https_arxiv_org_abs_2511_10946/figures/001_Figure_1.jpg]]
-*Figure 1: Motivation of SandboxVLM. (a) Existing VLMs are trained without 3D awareness. Training or supervised fine-tuning (SFT) VLMs with 3D suffers from a lack of 3D data and forgetting. (b) Humans, however, reason effectively in 3D through coarse, relational understanding. (c) SandboxVLM follows this principle of abstract perception, providing a coarse but informative 3D context for zero-shot VLM reasoning*
-
-
 
 SandboxVLM 的核心设计思想是向 VLM 注入任务相关的抽象 3D 结构，而非追求精确的几何重建。整个管道由四个关键模块级联构成，每个模块解决从 2D 输入到 3D 推理链条中的一个瓶颈。
 
@@ -204,13 +191,6 @@ $$\begin{array} { l } { { < \mathrm { t h i n k i n g > ~ T h e ~ reasoning. ~ <
 
 这种设计使 VLM 能够基于符号化的 3D 结构进行显式空间推理，同时避免了低层视觉细节的干扰。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2367_https_arxiv_org_abs_2511_10946/figures/003_Figure_3.jpg]]
-*Figure 3: Core modules of 3D Sandbox. (a) Proxy Elevation: The VLM identifies task-relevant objects and their approximate locations. A segmentation model produces object masks, followed by mask erosion and farthest point sampling to select interior proxy pixels. (b) Multi-View Voting: The proxies are unprojected into 3D space and aggregated across views through a cross-view consistency check (“Agree to”) to filter unreliable points. The remaining proxies will be clustered into boxes*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -256,8 +236,6 @@ Figure 6展示了不同输入类型下的具体失败案例：渲染点云输入
 
 所有评估均在零样本设置下进行，未在任何目标基准上进行微调，确保了与基线的公平比较。针对SAT-Synth基准，为控制API成本进行了子采样，子采样策略在补充材料中公开（见Listing 2）。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2367_https_arxiv_org_abs_2511_10946/figures/005_Table_2.jpg]]
 *Table 2: Quantitative results on the SAT-Real and SAT-Synth benchmarks. Each block compares baseline, MindJourney, and our SandboxVLM under the same backbone (GPT-4o, GPT-5-mini, or GPT-5). Metrics are reported across five spatial reasoning dimensions: EgoMovement (EgoM), ObjectMovement (ObjectM), GoalAiming (GoalAim), ActionConsequence (ActCons), and PerspectiveTaking (Perspect). SandboxVLM consistently achieves the best or second-best results*
 
@@ -269,11 +247,6 @@ Figure 6展示了不同输入类型下的具体失败案例：渲染点云输入
 
 ![[assets/figures/papers/paper_list_l2367_https_arxiv_org_abs_2511_10946/figures/010_Table_5.jpg]]
 *Table 5: Composition of each ablation method. We list: Average: the average performance on SAT-Real [25]; Modality: in which modality is the context information provided to VLM; Priors: whether a world model is used as a 3D-aware prior in generating the context; 3D: whether the context is lifted into the 3D space; Filtered: before constructing the context, whether a VLM is used to collect information relevant with the task; Using Boxes: whether we finally construct the 3D Sandbox as the context*
-
-![[assets/figures/papers/paper_list_l2367_https_arxiv_org_abs_2511_10946/figures/009_Table_4.jpg]]
-*Table 4: Question types and examples from each benchmark. The four types of benchmarks we evaluated on contain various tasks from metric questions like relative depths to comprehensive ones like physical scene understanding. For more details, please refer to the corresponding paper*
-
-
 
 ## 定位与知识库关联
 
@@ -319,8 +292,6 @@ SandboxVLM 的设计取舍带来了明确的适用边界：
 3. **物理属性编码**：如何将质量、摩擦力等物理属性集成到沙盒表示中，以进一步提升物理推理性能？这涉及从视觉信号到物理参数的映射问题。
 
 4. **噪声鲁棒性**：如何缓解多视图生成和VLM对象指向中的噪声，降低误差传播？可能的方案包括引入不确定性估计或端到端的可微分优化。
-
-
 
 ## 原文 PDF
 

@@ -51,8 +51,6 @@ claims:
 
 在Human3.6M和AMASS两个基准数据集上，该方法在准确性和合理性指标上均达到或接近最优：FDE分别相对先前SOTA降低**8.5%**和**13%**，ADE达到最优。消融实验进一步验证，可学习的高斯混合先验是性能提升的关键——移除多模态先验或退化为标准高斯先验后，各项指标全面下降。此外，高斯混合潜空间在两组数据集上均取得最佳对数似然（LL），证明其对复杂运动分布建模的有效性。
 
-
-
 3D人体运动预测（3D Human Motion Prediction, HMP）旨在根据观测到的历史姿态序列，生成未来一段时间的合理运动轨迹。该任务在自动驾驶、人机交互、运动合成等领域具有重要应用价值。然而，人类运动本质上是多模态的——相同的观测历史可能对应多种不同的未来行为（如“行走”后可能接“站立”或“转弯”），这使得确定性预测方法难以满足实际需求，随机预测逐渐成为主流范式。
 
 现有随机HMP方法普遍依赖**单模态潜空间先验**。无论是基于变分自编码器（VAE）的方法（如**DLow**），还是基于扩散模型的方案（如**BeLFusion**、**SkeletonDiff**、**CoMusion**、**TransFusion**），其潜变量通常被假设服从标准高斯分布 $\mathcal{N}(0, I)$。这一假设带来了两个核心缺陷：
@@ -65,8 +63,6 @@ claims:
 针对上述瓶颈，本文提出**高斯混合潜流模型（Gaussian-Mixture Latent Flow）**，核心动机是：**将潜空间先验从单模态标准高斯切换为数据驱动的多模态高斯混合分布**。这一设计通过无监督EM算法自动学习运动模式的聚类结构，在潜空间中自然解耦不同行为语义，提升预测合理性。同时，采用可逆流模型作为编码-解码骨干，结合基于ODE的流匹配框架，使模型具备精确似然计算能力，从而为不确定性估计提供原则性基础。
 
 简言之，本文试图回答一个关键问题：**能否通过改进潜空间先验的结构，从根本上解决随机运动预测中的语义纠缠与不确定性量化难题？**
-
-
 
 ## 核心方法与创新机理
 
@@ -107,8 +103,6 @@ $$\mathrm{Attention}(\mathbf{Q}_i, \mathbf{K}_i, \mathbf{V}_i) = \mathrm{softmax
 ### 创新协同效应
 
 上述四个 changed slots 形成协同闭环：高斯混合先验解耦运动语义，可逆流模型提供精确似然计算，显式条件机制强化历史依赖，关节点注意力注入骨架先验。在Human3.6M和AMASS数据集上，FDE分别相对先前SOTA降低8.5%和13%，同时ADE达到最优。消融实验进一步证实，可学习的高斯混合先验显著优于固定混合先验或标准高斯先验，且高斯混合潜空间在两大数据集上均取得最佳对数似然（LL），验证了其对复杂运动分布建模的优越性。
-
-
 
 本文提出的**高斯混合潜流模型（Gaussian-Mixture Latent Flow）**构建了一个端到端的随机人体运动预测框架，其核心设计围绕两个关键瓶颈展开：（1）用数据驱动的多模态高斯混合先验替代传统单模态标准高斯分布，解耦多样化运动模式；（2）以可逆流模型结合基于ODE的流匹配框架替代VAE或SDE扩散骨干，实现精确似然计算与原则性不确定性估计。整体pipeline由五个紧密耦合的模块构成，形成“编码—先验学习—潜动力学演化—解码”的闭环。
 
@@ -154,12 +148,8 @@ $$\mathrm{Attention}(\mathbf{Q}_i, \mathbf{K}_i, \mathbf{V}_i) = \mathrm{softmax
 
 框架中四个关键设计决策形成清晰的因果链路：**高斯混合先验** → 运动模式解耦 → 预测合理性与不确定性量化；**可逆流骨干** → 精确似然计算 → 原则性不确定性估计；**显式条件建模** → 历史-未来依赖强化 → 准确性提升；**关节点级注意力** → 骨架先验注入 → 姿态合理性。消融实验证实，移除任一组件均导致性能显著下降：当潜先验退化为标准高斯时，准确性与合理性指标全面恶化；使用空间tokenization替代关节点级tokenization后，准确性和合理性均大幅降低；去除观测条件后，多样性与准确性同步下降。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l965_https_openaccess_thecvf_com_content_CVPR2026_html_Ma_Gaussian_Mixture_La/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the framework. We predict future motion within a latent space constructed by a flow model. Owing to the invertibility of normalizing flows, a single model can function as both an encoder and a decoder through its forward and inverse processes, respectively. During latent forecasting, we first pad the observed sequence to the full length using the final observed frame and transform it into the latent space to obtain the starting point*
-
-
 
 ### 5.1 高斯混合潜表示
 
@@ -243,12 +233,8 @@ $$
 
 进一步结合流模型的变量替换和混合高斯先验 $q_z(\mathbf{Z})$，可计算观测运动 $\hat{\mathbf{X}}$ 的完整似然。实验表明，高斯混合先验在Human3.6M和AMASS数据集上均取得最优对数似然，证明了其对复杂运动分布建模的优越性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l965_https_openaccess_thecvf_com_content_CVPR2026_html_Ma_Gaussian_Mixture_La/figures/001_Figure_1.jpg]]
 *Figure 1: Unlike prior approaches, our method (1) introduces a mixed Gaussian prior to effectively disentangle diverse human motion patterns, improving plausibility by reducing semantic entanglement, and (2) incorporates a fully invertible architecture that supports exact likelihood computation, thereby providing a principled means of uncertainty estimation*
-
-
 
 ## 实验与关键发现
 
@@ -286,8 +272,6 @@ $$
 
 **图3**展示了AMASS数据集上各方法的定性对比。对于每个测试序列，我们可视化10个随机采样预测的最后一帧姿态。本方法生成的预测姿态展现出更高的自然度与物理合理性，能够更好地保持与观测历史语义的一致性。相比之下，基于扩散的基线方法（SkeletonDiff、CoMusion、TransFusion）在部分样本上出现肢体穿透、关节扭曲等物理不合理现象，而BeLFusion的预测多样性虽高但姿态质量波动较大。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l965_https_openaccess_thecvf_com_content_CVPR2026_html_Ma_Gaussian_Mixture_La/figures/003_Table_1.jpg]]
 *Table 1: Quantitative results compared to stochastic baselines adopting Best-of-50 metrics on the Human3.6M and AMASS datasets. As AMASS does not include action labels, FID is not used for evaluation. The best results are highlighted in bold, second best are underlined*
 
@@ -299,8 +283,6 @@ $$
 
 ![[assets/figures/papers/paper_list_l965_https_openaccess_thecvf_com_content_CVPR2026_html_Ma_Gaussian_Mixture_La/figures/004_Figure_3.jpg]]
 *Figure 3: Qualitative results. We present qualitative comparison results with SkeletonDiff [15], CoMusion [63], TransFusion [66], and BeLFusion [3] on the AMASS dataset. For each method, we visualize the final frame of 10 randomly sampled predictions*
-
-
 
 ## 定位与知识库关联
 
@@ -344,8 +326,6 @@ $$
 - **向其他序列预测任务的迁移**：任何面临多模态输出分布建模的序列预测任务（如轨迹预测、手势生成）都可能受益于数据驱动的混合先验设计。
 - **与可控生成的结合**：高斯混合分量的语义解耦特性天然适合作为可控生成的条件接口——不同分量可对应不同的运动风格或动作类别，为细粒度控制提供了结构化基础。
 - **不确定性量化的基准**：本工作建立的对数似然评估框架为随机预测方法的不确定性量化能力提供了可比较的度量标准，推动了该领域从“生成多样性”向“概率校准”的范式演进。
-
-
 
 ## 原文 PDF
 

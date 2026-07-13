@@ -53,8 +53,6 @@ claims:
 
 **主要结果**：通过线性概率模型（LPM）和多项Logit模型（MNL）估计各因素的边际效应（两种模型结果高度相关，r≈0.93），发现所有智能体的平均属性敏感度（约13%-31%）均显著高于人类基线（约7%）。暗示效应在匹配评分和价格后仍然显著，表明其影响独立于价格和评分差异。BOGO（买一送一）激励对消耗品的效应强于耐用品，但耐用品类别也表现出显著敏感性。三选一实验中评分效应极高，削弱了其他属性的边际效应。
 
-
-
 当前对LLM智能体的评估主要集中在任务完成能力上，例如能否点击正确的按钮或填写表单，这反映了一种以功能正确性为核心的工程视角。然而，当智能体被部署到真实的消费者决策环境中时，它们会面临价格、评分、呈现顺序以及各种心理暗示（如权威、稀缺性）等选择架构因素。这些因素在人类行为经济学中已被充分研究，但在智能体行为评估中却几乎被完全忽略。这种评估缺口构成了信任和可靠部署的核心瓶颈：一个能够完美完成任务的智能体，可能同时是一个系统性偏差的决策者，其偏差幅度远超人类。
 
 本文的核心动机在于填补这一缺口。作者提出的核心假设是：**LLM智能体在决策时表现出系统性的、大幅度的选择偏差，且这些偏差并非源于人类认知约束（如有限理性或启发式偏差），而是源于其内在的决策机制。** 为了验证这一假设，作者构建了ABXLAB（Agent Behavior eXperiments）框架，该框架的核心创新在于一个“中间人”（man-in-the-middle）干预引擎（Figure 1），它能够在智能体观察网页内容之前实时拦截并修改网页内容，从而系统性地操纵选择架构中的关键属性。
@@ -62,8 +60,6 @@ claims:
 具体而言，ABXLAB通过干预引擎实现了对四个关键因果旋钮的精确操控：**产品价格**（通过事后匹配消除价格差异）、**产品评分**（通过重新选择产品对进行评分匹配）、**产品页面内容**（注入权威、社会证明、稀缺性、负面框架、激励等五种心理暗示文本，Table 1），以及**用户偏好描述**（通过自然语言构建用户画像，指定对评分、价格、暗示的敏感度方向）。这种设计使得作者能够从因果层面分离出每个因素对智能体决策的独立效应，而这在以相关性分析为主的现有评估中是无法实现的。
 
 该研究在方法上的关键缺口在于：现有评估框架（如WebArena）虽然提供了丰富的任务环境，但缺乏对选择架构因素的系统性操控能力。ABXLAB基于WebArena的状态空间、动作空间和观察空间定义，但增加了干预函数集I，使得环境形式化为 $\mathcal{E} = \langle S, A, \mathcal{O}, \mathcal{T}, \mathcal{I} \rangle$，从而将行为科学实验范式引入智能体评估。
-
-
 
 ## 核心方法与创新机理
 
@@ -80,8 +76,6 @@ ABXLAB的核心创新在于将行为科学中“选择架构”（choice archite
 - **用户偏好描述**：通过自然语言描述构建用户画像，指定对评分、价格、暗示的敏感度方向。实验发现用户偏好描述的作用更像**阈值开关**而非精细调节——当偏好明确时，会主导决策，抑制其他因素的影响（Figure 5）。
 
 **实验规模与稳健性：** 论文进行了超过80,000次实验，消耗约25亿token和40万次API请求，覆盖17个来自不同提供商（OpenAI、Anthropic、Google、Meta、DeepSeek）的模型。统计分析采用线性概率模型（LPM）和多项Logit模型（MNL），两者边际效应高度相关（r ≈ 0.93），验证了结果的稳健性。消融实验表明，匹配评分（MR）和匹配评分与价格（MRaP）后，暗示效应仍然显著，说明暗示的影响独立于价格和评分差异。
-
-
 
 ![[assets/figures/papers/iclr26_0002_xAPoscV2Bw_A_Framework_for_Studying_AI_Agent_Behavior_Evide/figures/001_Figure_1.jpg]]
 *Figure 1: Our man-in-the-middle framework (right) consists of an intervention engine which constructs and implements one of several different forms of intervention to one (or none) of the products. Our benchmark (left and middle) consists of (a) a constrained search and selection process for finding plausible product choice pairs (e.g., selecting from the same category, with similar prices and ratings or with perfectly matched ratings), and (b) a binary forced choice paradigm where LLM agents choose which product is better and add it to the cart. See Appendix I for real example pairs, and Appendix B for details on interventions. The empirical analysis procedure (not pictured) allows us to make robust...*
@@ -101,8 +95,6 @@ ABXLAB框架的核心设计围绕一个**中间人干预引擎**（man-in-the-mi
 5. **统计分析模块**：使用线性概率模型（LPM）估计各因素的边际效应，包含试验固定效应 $\alpha_t$ 和模型身份、更便宜、被暗示、更高评分、呈现位置的主效应及N阶交互项。采用双聚类稳健标准误（按暗示文本和产品类别聚类）和Benjamini-Hochberg多重检验校正。LPM与多项Logit模型（MNL）的边际效应高度相关（r ≈ 0.93），验证了线性近似的可靠性。
 
 输入输出流方面：智能体接收任务意图（如"选择更好的产品并加入购物车"），观察经干预引擎变换后的网页内容，执行动作（点击、滚动等），直至做出最终选择。整个流程在OneStopMarket在线购物环境中运行，累计超过80,000次实验，覆盖约25亿token和40万次API请求。
-
-
 
 ### 1. 环境形式化定义
 
@@ -174,8 +166,6 @@ $$Y_{tp} = \beta^{\top} X_{tp} + \alpha_t + \varepsilon_{tp}, \quad X_{tp} = \le
 
 **证据强度说明**：上述所有公式均直接引用自论文Section 3.1、Section 3.3、Appendix E.2、E.3和F，置信度为1.0。公式中的变量含义已在论文中明确给出，无需额外推导。
 
-
-
 ## 实验与关键发现
 
 ### 3.1 核心结果：智能体对选择架构的敏感度远超人类
@@ -228,15 +218,11 @@ ABXLAB框架在OneStopMarket购物环境中，通过干预引擎在智能体观�
 - 用户偏好描述为何表现为阈值开关而非精细调节？这是否反映了LLM内部表征的某种固有特性？
 - 这些发现如何向消费者行为以外的其他领域（如医疗、金融、法律）泛化？
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0002_xAPoscV2Bw_A_Framework_for_Studying_AI_Agent_Behavior_Evide/figures/002_Table_1.jpg]]
 *Table 1: Nudge categories and interventions. The variables ${expertise} and ${category} are replaced by product category with specific examples using a lightweight LLM*
 
 ![[assets/figures/papers/iclr26_0002_xAPoscV2Bw_A_Framework_for_Studying_AI_Agent_Behavior_Evide/figures/020_Table_4.jpg]]
 *Table 4: Average BOGO effects by product type under matching*
-
-
 
 ## 定位与知识库关联
 
@@ -249,8 +235,6 @@ ABXLAB 的定位并非从零构建新的智能体基准（benchmark），而是�
 **局限**集中在五个方面。其一，实验设计有意未对 BOGO（买一送一）激励在耐用品类别中的经济合理性进行约束，这可能导致部分实验条件在现实中不存在对应物。其二，三选一实验（trio）规模较小（20 个产品三元组，每个模型 800 次试验），统计功效有限，且该条件下评分效应极高，削弱了其他属性（如暗示）的边际效应，使得该实验的结论需谨慎解读。其三，人类基线实验仅 30 名参与者，未报告人口统计信息，其代表性存疑。其四，线性概率模型（LPM）与多项 Logit 模型（MNL）的边际效应高度相关（r ≈ 0.93），但 LPM 的线性假设在极端概率区域可能产生有偏估计。其五，所有模型均使用温度 0.1（OpenAI 推理模型为 1），这一低温度设置可能系统性地放大了确定性偏差，高温度下的行为模式未知。
 
 **开放问题**构成了该领域下一步研究的核心议程。首先，为什么某些模型（如 GPT-4.1 Nano）表现出近乎确定性的顺序效应（88.8pp 偏好第一个展示产品），而其他模型则表现出相反或更弱的模式？这暗示智能体内部决策机制存在根本性差异，而非简单的“能力高低”问题。其次，同一理论类别内不同暗示文本之间的效应异质性如何解释？例如，权威暗示中的“专家推荐”与“医生推荐”可能产生截然不同的效果，但原论文未对此进行机制层面的分析。第三，用户偏好描述为何表现为“阈值开关”而非精细调节——这是否反映了 LLM 内部表征的某种固有特性（如注意力机制的离散化倾向），还是实验设计（偏好描述为自然语言指令）的产物？最后，如何使智能体对呈现顺序更鲁棒、对简单说服性线索更不敏感，是一个尚未解决的工程与科学交叉问题。
-
-
 
 ## 原文 PDF
 

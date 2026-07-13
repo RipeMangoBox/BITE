@@ -56,8 +56,6 @@ claims:
 
 ReMD 在像素空间操作，当前针对单帧超分设计，尚未评估时间序列动态稳定性；其计算成本与 HR 网格大小线性相关，向潜在空间迁移是未来方向。代码已开源（https://github.com/lizhihao2022/ReMD）。
 
-
-
 ### 流体超分辨率的科学意义与工程需求
 
 高分辨率流体动力学模拟与观测在天气预报、气候预测、海洋建模和湍流研究中至关重要。然而，直接运行高分辨率数值求解器或部署密集传感器网络成本极高：计算代价随网格点数超线性增长，存储和传输带宽也迅速膨胀。因此，从粗分辨率（LR）数据重建高分辨率（HR）流场——即流体超分辨率（SR）——成为一种经济高效的替代方案。
@@ -95,8 +93,6 @@ ReMD 在像素空间操作，当前针对单帧超分设计，尚未评估时间
 3. **方程无关的物理残差**：引入拉普拉斯/双谐波平滑、各向异性边缘保持扩散和频谱对齐等通用物理残差，无需依赖特定控制方程。
 
 实验表明，ReMD在NS、ERA5和Ocean三个流体基准上，以仅2–5步采样即取得最低RMSE和最高/相当的PSNR/SSIM，同时在涡度误差、能量谱等物理指标上显著优于扩散基线ResShift，验证了“多尺度残差校正+物理一致性”这一设计哲学的有效性。
-
-
 
 ## 核心方法与创新机理
 
@@ -160,8 +156,6 @@ ReMD 的创新带来三重收益：
 2. **效率跃升**：仅需 2–5 步达到优于 ResShift-15 的质量，推理速度提升 1.4×–3.5×（Table 3）。
 3. **频谱保真**：误差–能量谱（Figure 3）显示 ReMD 在全频段保持最低误差，尤其在低频大尺度偏差和高频细节恢复上优势显著。
 
-
-
 ReMD 将流体超分辨率重新表述为**从粗分辨率初始解出发的迭代残差校正过程**，并在扩散模型的逆扩散框架内实现。其核心思想是：在每一个逆扩散步骤中，不是单纯依赖噪声预测网络来更新高分辨率估计，而是**耦合数据一致性约束与轻量级物理先验，通过一个时间门控的多网格校正器对残差进行多尺度修正**，从而以极少的采样步数（2–5步）达到甚至超越传统扩散模型（15–100+步）的重建质量。
 
 ### 输入输出流
@@ -198,8 +192,6 @@ ReMD 的 pipeline 由以下核心模块串联构成（参见 Figure 2 的系统�
 **多小波基**的选择保证了频谱干净且无参数。与需要学习的可训练限制/延拓算子不同，固定的多小波分解与重构（$H_y \otimes H_x$）天然具有可逆性和正交性，避免了频谱混叠，同时将每步计算复杂度控制在 $O(HW)$。
 
 **物理残差**以可微分、方程无关的方式注入先验知识：拉普拉斯/双谐波平滑抑制高频噪声，各向异性扩散保留锋面等方向性结构，频谱对齐残差则通过频域加权最小化与目标谱的对数能量差异。消融实验表明，移除频谱残差造成的性能衰退最大（RMSE 升至 $1.41\times10^{-2}$，PSNR 降至 47.20），而平滑和各向异性扩散残差充当稳定器，抑制伪影并保护前沿结构。
-
-
 
 ### 3.1 问题形式化与逆扩散更新
 
@@ -300,8 +292,6 @@ $$
 
 其中 $\hat{\varepsilon}_{\theta}$ 为噪声预测网络，$u_t$ 按前向扩散过程加噪得到。多网格校正器 $S_t$ 的时间门控权重 $w_\ell(t)$ 与学习头 $g_\theta$ 的参数一并通过该损失优化。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -318,9 +308,6 @@ Figure 1 的定性对比揭示了 ReMD 的视觉优势：在 NS 上，ReMD-5 仅
 ![[assets/figures/papers/paper_list_l911_https_arxiv_org_abs_2603_00149/figures/001_Figure_1.jpg]]
 *Figure 1: Qualitative comparison on NS ( ×2 ) and ERA5 ( ×4 ). Each block shows (left) a zoomed LR input u0, (top row) HR reconstructions, and (bottom row) absolute error maps w.r.t. ground truth (shared color scale per block). With only 5 reverse steps, ReMD yields (NS) sharper filaments/coherent fronts and (ERA5) preserved mesoscale shear bands while suppressing ringing/stripe artifacts seen in EDSR/FNO/SwinIR, and achieves lower errors than ResShift despite requiring 5 vs. 15 steps*
 
-![[assets/figures/papers/paper_list_l911_https_arxiv_org_abs_2603_00149/figures/004_Figure_3.jpg]]
-*Figure 3: Error–energy spectrum on ERA5 (,×4,). Radial average of the Fourier-domain error (log scale on y) versus frequency (x). Vertical dashed lines mark the LR Nyquist band and the transition toward the HR band. ReMD-5 (red) maintains the lowest error from large to high scales, remaining below ResShift-15, FNO and image-SR baselines (EDSR, SwinIR), indicating superior spectral fidelity*
-
 Figure 4 的补丁级细节对比显示，ReMD-5 在 NS（×4）上成功恢复了 HR 级别的锋面带和相干涡旋，而图像超分基线出现纹理/混叠伪影，FNO 则呈现块状失真。Figure 6 的能谱对比表明，ReMD 重建的湍流动能谱与真实 HR 最为吻合，尤其在惯性子区和耗散区。
 
 ![[assets/figures/papers/paper_list_l911_https_arxiv_org_abs_2603_00149/figures/005_Figure_4.jpg]]
@@ -336,12 +323,6 @@ Table 4 报告了物理一致性指标。在 NS2D（×4）上，ReMD 的涡度�
 ### 效率分析
 
 Table 3 对比了各方法在 NS 数据集上的效率。ReMD-5 在取得最优 RMSE/PSNR 的同时，推理时间比 ResShift-15 快约 1.4 倍；ReMD-2 的推理速度约为 ResShift-15 的 3.5 倍，且精度仍优于 ResShift。扩散基线 SR3 因需 100 步采样，推理成本显著更高。Figure 5 的时间-RMSE 权衡曲线直观展示了 ReMD 在极低步数下的优势：仅需 2 步即可达到 ResShift 15 步的精度水平。
-
-![[assets/figures/papers/paper_list_l911_https_arxiv_org_abs_2603_00149/figures/007_Table_3.jpg]]
-*Table 3: Efficiency on the NS. We report accuracy (RMSE↓/PSNR↑), parameter size, and wall-time (training time per epoch; inference time in seconds). Diffusion baselines (SR3, ResShift-15) incur high sampling cost; ReMD-5 attains the best accuracy with fewer steps and lower inference time than ResShift, while ReMD-2 is the fastest with competitive accuracy*
-
-![[assets/figures/papers/paper_list_l911_https_arxiv_org_abs_2603_00149/figures/010_Figure_5.jpg]]
-*Figure 5: Time–RMSE trade-off on ERA5 uo (×4 SR). Each point varies the sampling steps; lower-left is better*
 
 ### 消融实验
 
@@ -363,8 +344,6 @@ Table 2 在 Ocean（×4）上的消融实验揭示了各组件的贡献：
 ### 实验设置说明
 
 所有方法使用相同的 RealESRGAN 退化协议生成 LR-HR 对（NS ×2，ERA5/Ocean ×4）。训练统一采用 Adam 优化器，学习率 5×10⁻⁵，批量大小 64，训练约 100k 迭代。扩散基线按原文献配置采样步数，ReMD 使用 DDIM 采样且仅用 2–5 步。评估指标统一采用 RMSE/PSNR/SSIM，并额外评估涡度误差、能量谱等物理相关指标，确保对比的公平性。
-
-
 
 ## 定位与知识库关联
 
@@ -408,8 +387,6 @@ ReMD 的关键创新在于**将这两条线索融合**：它保留了扩散模�
 3. **时间序列集成**：能否将 ReMD 作为“校正器”嵌入预测框架（如自回归神经算子），在时间推进的每一步对粗预测进行物理一致性超分，并评估长期稳定性？
 
 4. **非结构化网格推广**：当前多小波限制/延拓算子依赖规则张量积网格。能否将其推广到非均匀网格或不规则区域（如球面海洋模型、有限元网格），保持频谱干净性和计算效率？
-
-
 
 ## 原文 PDF
 

@@ -79,8 +79,6 @@ FreeMotion 通过引入物理模拟与运动追踪，在保持开放集能力的
 
 当前方法在长文本组合指令、复杂动态运动（如舞蹈）上表现不佳；物理运动追踪训练耗时较长；人-场景交互中接触对仍需手动设定。开放问题包括：如何增强 MLLM 对复杂指令的理解与关键帧分解能力，如何生成更具动态表现力的运动，以及如何在丰富接触场景下保持物理合理性。
 
-
-
 ### 问题背景：动捕数据依赖与开放集困境
 
 人体运动合成旨在根据控制信号生成自然、逼真的人体动作序列，在动画制作、虚拟现实、游戏开发和机器人仿真等领域具有广泛需求。然而，该领域长期面临一个根本性瓶颈：**现有方法高度依赖大规模、高质量的运动捕捉（MoCap）数据**。
@@ -111,8 +109,6 @@ FreeMotion 通过引入物理模拟与运动追踪，在保持开放集能力的
 然而，直接让MLLM输出连续运动序列并不现实。MLLM在高级语义空间（语言理解、常识推理）表现优异，但在低级连续运动空间（精确关节角度、物理约束）存在固有不足——这是当前大语言模型的普遍局限。
 
 FreeMotion的核心洞察在于**将运动合成解耦为两个阶段**：首先在高级语义空间利用MLLM生成稀疏的关键帧序列，然后在低级运动空间通过物理模拟和运动追踪填补关键帧之间的空白。这一设计使得MLLM只需处理其擅长的语义规划任务，而将连续运动生成的物理合理性交给专门的运动追踪策略，从而**首次在没有任何动捕数据的情况下实现了开放集人体运动合成**。
-
-
 
 ## 核心方法与创新机理
 
@@ -166,8 +162,6 @@ $$R = \{ r_1, \dots, r_m \}$$
 
 这些边界指向了未来工作的核心方向：如何增强 MLLM 的时序推理与复杂指令理解能力，以及如何用更强大的姿态优化技术替代当前的命令集驱动方式。
 
-
-
 FreeMotion 将开放集人体运动合成分解为两个阶段：**高层语义关键帧生成** 与 **低层连续运动填充**。这一设计的核心洞察在于，多模态大语言模型（MLLM）在高级语义空间表现出色，但在低级连续运动空间能力不足；因此，MLLM 仅负责关键帧的语义规划，而物理合理性由后续的运动追踪阶段保证。
 
 ### 阶段一：关键帧生成
@@ -196,8 +190,6 @@ FreeMotion 将开放集人体运动合成分解为两个阶段：**高层语义�
 - **输出**：物理仿真器（ODE）中执行的人体运动序列，满足高层语义指令且具备物理合理性。
 
 整个框架不依赖任何运动捕捉数据，MLLM 仅在语义空间运作，连续运动空间的控制完全由插值和物理追踪完成。对于不满足最小 rollout 长度的运动，系统用最后一帧进行填充以确保输出完整性。
-
-
 
 FreeMotion 将开放集人体运动合成分解为两个阶段：**关键帧生成** 与 **运动填充**。其核心洞察在于，MLLM 在高层语义空间表现优异，但在低层连续运动空间能力不足；因此仅将 MLLM 用于关键帧的语义规划，而将连续运动的生成交给物理模拟与运动追踪。
 
@@ -243,13 +235,6 @@ $$\omega(s_{t+1} \mid s_t, a_t, o_t) \sim \mathcal{N}\big(s_{t+1}; \mu_{\omega}(
 | $a_t$ | 策略输出的动作指令 |
 | $\phi, \theta, \omega$ | 分别对应编码器、策略解码器、世界模型的参数 |
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1875_FreeMotion_MoCap_Free_Human_Motion_Synthesis_with_Multimodal_Large_Langu/figures/004_Figure_3.jpg]]
-*Figure 3: Policy training and inference. We incorporate height maps as visual signals, enabling our policy and world model to be aware of diverse environmental conditions*
-
-
-
 ## 实验与关键发现
 
 ### 核心实验设计
@@ -270,15 +255,9 @@ FreeMotion 在四个任务维度上接受评估：运动合成（HumanAct12）�
 ![[assets/figures/papers/paper_list_l1875_FreeMotion_MoCap_Free_Human_Motion_Synthesis_with_Multimodal_Large_Langu/figures/008_Table_3.jpg]]
 *Table 3: Olympic Sports. FreeMotion surpasses existing methods significantly*
 
-![[assets/figures/papers/paper_list_l1875_FreeMotion_MoCap_Free_Human_Motion_Synthesis_with_Multimodal_Large_Langu/figures/009_Table_4.jpg]]
-*Table 4: Style Transfer. FreeMotion surpasses existing methods significantly*
-
 ### 人-场景交互与地形泛化
 
 在 Sit / Lie Down / Reach 三个人-场景交互任务上，FreeMotion 的成功率分别为95%、60%和95%（Table 5）。其中 Sit 任务相比自建的 AMP 基线（约50%）提升45个百分点；Lie Down 和 Reach 分别超越 UniHSI 17.5和20个百分点。值得注意的是，Lie Down 任务仅达60%，失败模式主要源于物理模拟中的不稳定接触——人体模型在躺下过程中可能因碰撞检测误差而弹起或滑落。
-
-![[assets/figures/papers/paper_list_l1875_FreeMotion_MoCap_Free_Human_Motion_Synthesis_with_Multimodal_Large_Langu/figures/011_Table_5.jpg]]
-*Table 5: Human-Scene Interaction. FreeMotion achieves good results on three interaction tasks*
 
 在踏脚石地形测试中（Table 6），FreeMotion 在平坦地形上的最大跨越距离（1.40m/1.45m）与 AMP 基线（1.34m/1.37m）可比甚至更优；在单级台阶（Θ=50°）条件下达到0.60m/0.75m。这表明集成高度图作为视觉信号的环境感知运动追踪策略（CVAE Policy + MLP World Model）有效提升了地形泛化能力。
 
@@ -301,24 +280,11 @@ FreeMotion 在四个任务维度上接受评估：运动合成（HumanAct12）�
 
 用户研究虽基于50名志愿者，但主观偏好可能受个体差异影响；基线方法与 FreeMotion 的生成结果在相同提示下随机采样展示，但未报告基线的参数调优细节。人-场景交互任务中，成功率和接触误差依赖于手动设定的接触对而非真实标注，可能引入系统偏差。部分基线（如 UniHSI）的结果直接引用自原论文，但实验设置可能不完全一致，需手动核验。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1875_FreeMotion_MoCap_Free_Human_Motion_Synthesis_with_Multimodal_Large_Langu/figures/015_Table_7.jpg]]
 *Table 7: Ablation on body-part desc*
 
 ![[assets/figures/papers/paper_list_l1875_FreeMotion_MoCap_Free_Human_Motion_Synthesis_with_Multimodal_Large_Langu/figures/006_Figure_4.jpg]]
 *Figure 4: Motion synthesis visualization results of FreeMotion on Human-Act12. FreeMotion can synthesize realistic motions across different categories*
-
-![[assets/figures/papers/paper_list_l1875_FreeMotion_MoCap_Free_Human_Motion_Synthesis_with_Multimodal_Large_Langu/figures/007_Figure_5.jpg]]
-*Figure 5: Motion synthesis visualization results on Olympic sports. FreeMotion can synthesize satisfactory motions even on challenging Olympic sports*
-
-![[assets/figures/papers/paper_list_l1875_FreeMotion_MoCap_Free_Human_Motion_Synthesis_with_Multimodal_Large_Langu/figures/010_Figure_6.jpg]]
-*Figure 6: Visualization results of style transfer. FreeMotion can add style to human motion using its world knowledge*
-
-![[assets/figures/papers/paper_list_l1875_FreeMotion_MoCap_Free_Human_Motion_Synthesis_with_Multimodal_Large_Langu/figures/012_Figure_7.jpg]]
-*Figure 7: Visualization of Human-scene interaction. FreeMotion can navigate to and interact with the target object*
-
-
 
 ## 定位与知识库关联
 
@@ -399,8 +365,6 @@ FreeMotion 处于以下研究线的交汇处：
 5. **评估基准标准化**：当前依赖用户偏好研究，缺乏客观自动化指标。建立开放集运动合成的标准化评估基准是推动该方向发展的关键。
 
 **注意**：部分基线（如 UniHSI）的结果直接引用自原论文，但实验设置可能不完全一致，相关比较结论需谨慎解读。
-
-
 
 ## 原文 PDF
 

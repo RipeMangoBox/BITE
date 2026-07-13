@@ -55,8 +55,6 @@ claims:
 
 **主要局限**：稀疏输入固有的歧义性仍会导致偶尔的错误动作选择（如误判站立/下蹲）；当前系统假设用户与化身具有相同身体比例，不支持不同体型的用户；模型仅在训练数据内插值，无法外推。
 
-
-
 在虚拟现实、游戏和元宇宙等应用中，通过稀疏的用户输入信号（如VR头显和双手控制器的三点追踪）实时驱动高保真度全身化身运动，是角色动画领域的核心难题。这一任务面临一个根本性的瓶颈：**从稀疏的三点跟踪传感器信号到全身化身运动的映射存在强歧义性**。相同的头部和手部位置可以对应多种截然不同的全身姿态——例如，一个人可以站立、下蹲或单腿站立而保持上半身姿态不变。现有方法难以同时实现高保真度、低延迟和丰富的运动细节，尤其下肢运动容易产生漂移、僵硬或不自然的滑动现象。
 
 传统方法在应对这一挑战时存在两类典型缺陷。第一类是基于连续潜在空间的生成模型（如VAE、CVAE），它们将运动数据压缩到连续高斯分布中，再通过回归或采样生成运动。然而，**连续空间中的直接回归会导致平均化或错误的运动混合**——当多个有效运动模式在潜在空间中重叠时，模型倾向于输出它们的均值，产生模糊、细节丢失甚至不合理的姿态。第二类是两阶段训练范式，即先通过无监督学习训练运动先验（如运动自编码器），再利用强化学习或监督学习训练控制策略。这种分离式训练使潜在空间可能不适于控制任务，因为运动流形的学习过程并未考虑后续控制信号的结构。
@@ -64,8 +62,6 @@ claims:
 以运动匹配（Motion Matching, Clavet, GDC 2016）为代表的数据驱动方法虽然能保留运动细节，但需要访问未来跟踪信息才能实现精确匹配，且在大规模数据库中搜索时面临延迟与内存开销的挑战。专门针对三点跟踪问题设计的**AvatarPoser**（Jiang et al., 2022）和**AGRoL**（Du et al., 2023）等方法虽然在工程上可行，但其运动细节指标（如静止手臂行走场景下仅7.9 deg/s和8.6 deg/s）远低于真实运动应有的水平，生成的运动显得僵硬而缺乏自然感。
 
 本文的核心动机正是针对上述双重困境：**如何同时学习运动流形及其采样方式，使模型在推理时无需未来传感器信息或复杂的强化学习规划，即可从稀疏控制信号中生成响应快、细节丰富且自然的全身运动？** 这一问题的解决需要在两个层面实现突破：一是构建一个能够保留运动多模态性的离散表示空间，避免连续空间中的平均化陷阱；二是设计一种端到端的训练机制，使控制信号到运动空间的映射与运动流形本身的学习相互适配，而非事后嫁接。
-
-
 
 ## 核心方法与创新机理
 
@@ -95,8 +91,6 @@ claims:
 
 综上，本文的核心创新在于通过**离散码本 + 分布匹配 + 端到端训练 + 分类采样搜索**的组合设计，系统性地解决了稀疏输入下运动生成的歧义性问题，同时实现了高跟踪精度、低延迟和丰富的运动细节。
 
-
-
 ![[assets/figures/papers/paper_list_l17_https_doi_org_10_1145_3658209/figures/001_Figure_1.jpg]]
 *Figure 1: Our character control framework applied to synthesizing embodied avatar movements for different game situations in virtual reality*
 
@@ -121,8 +115,6 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{Rec}} + \mathcal{L}_{\mathrm{Match}}$$
 ### 端到端训练的优势
 
 与现有方法普遍采用的两阶段训练范式（先无监督训练运动先验，再利用强化学习或监督学习训练控制策略）不同，本框架对运动自编码器和输入编码器进行端到端联合训练。消融实验（Table 5）表明，端到端训练将运动细节从19.6 deg/s提升至28.17 deg/s，证明了同时学习流形与控制映射的显著优势。完整的端到端训练在NVIDIA RTX 4090上约需1天，推理阶段每帧耗时约3ms，网络总内存占用约25MB。
-
-
 
 ### 3.1 运动自编码器与离散码本
 
@@ -169,8 +161,6 @@ $$\mathbf{T}_{\mathcal{F}}^{*} = \mathbf{R}_{\mathcal{F}} \cdot \mathbf{T}_{\mat
 $$(\mathsf{S}_i, \mathbf{C}_{\mathcal{F}}) \to \mathsf{S}_i, \dots, \mathsf{S}_{i+N}$$
 
 **阶段三（全身融合）**根据输入模式（纯三点追踪或混合控制），通过混合或前馈网络预测上半身姿态，与下肢姿态融合得到完整全身运动。
-
-
 
 ## 实验与关键发现
 
@@ -221,9 +211,6 @@ $$(\mathsf{S}_i, \mathbf{C}_{\mathcal{F}}) \to \mathsf{S}_i, \dots, \mathsf{S}_{
 
 **Fig. 18** 构造了一个带有随机符号歧义的二次函数 $Y = \mathcal{B} \cdot X \cdot t^2$，其中每个输入 X 的陡峭度映射到随机投射在正侧或负侧的二次输出——模拟稀疏输入下的多模态映射问题。
 
-![[assets/figures/papers/paper_list_l17_https_doi_org_10_1145_3658209/figures/023_Figure_19.jpg]]
-*Figure 19: Different methods applied to the ambiguous toy example function in Fig. 18 and their predictions visualized in color. Note that the X and Y in the function do not correspond to the X and Y axes in the graph*
-
 **Fig. 19** 对比了不同方法在该歧义函数上的预测结果：
 - **MLP** 和 **VAE** 在歧义区域输出接近零的平均值，完全丢失了多模态结构；
 - **CVAE** 虽能生成部分分支，但出现不稳定跳跃；
@@ -241,9 +228,6 @@ $$(\mathsf{S}_i, \mathbf{C}_{\mathcal{F}}) \to \mathsf{S}_i, \dots, \mathsf{S}_{
 
 碰撞回避方面，**Fig. 14** 展示了通过几何近似碰撞体和体素噪声传感器构建的避碰表示。**Fig. 15** 展示了码本匹配从噪声中学习无碰撞姿态后生成的多种避碰行为，验证了该方法在安全约束下的运动生成能力。
 
-![[assets/figures/papers/paper_list_l17_https_doi_org_10_1145_3658209/figures/017_Figure_14.jpg]]
-*Figure 14: The approximated character mesh via primitive colliders (left) and the voxel sensor (cyan) which represents the simulated collision geometry around the character. The colored spheres represent noised input points between the joints and their nearest occupied voxel*
-
 ### 失败模式与局限
 
 尽管码本匹配在大多数场景下表现优异，论文明确指出了以下失败模式：
@@ -259,8 +243,6 @@ $$(\mathsf{S}_i, \mathbf{C}_{\mathcal{F}}) \to \mathsf{S}_i, \dots, \mathsf{S}_{
 ### 开放问题
 
 基于上述实验结果和局限，论文提出了若干待探索方向：如何将码本匹配与物理仿真结合以进一步改善足部滑动和物理合理性；如何扩展框架以支持不同身体比例的用户或不同形态的化身；离散码本的大小、通道数与运动多样性、质量之间的定量关系仍有待深入研究；以及是否可将该方法推广到更多运动技能（如体操、武术）或与其他传感器（如 IMU）结合。
-
-
 
 ## 定位与知识库关联
 
@@ -333,8 +315,6 @@ $$(\mathsf{S}_i, \mathbf{C}_{\mathcal{F}}) \to \mathsf{S}_i, \dots, \mathsf{S}_{
 3. **端侧部署**：如何进一步降低推理延迟或内存占用，以适应移动端AR/VR设备？
 4. **码本规模与质量关系**：离散码本的大小、通道数与运动多样性、质量之间的定量关系仍有待深入研究；
 5. **技能泛化**：是否可以将该方法推广到更多运动技能（如体操、武术）或与其他传感器（如IMU）结合？
-
-
 
 ## 原文 PDF
 

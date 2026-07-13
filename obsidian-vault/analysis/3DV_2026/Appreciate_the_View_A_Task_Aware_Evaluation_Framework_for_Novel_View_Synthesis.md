@@ -69,8 +69,6 @@ claims:
 
 **方法定位**：PRISM 并非提出新的 NVS 生成模型，而是为 NVS 领域提供一套通用的评估基础设施。其设计具有模块化特征——特征提取骨干可替换为其他 NVS 基础模型，投影头可针对不同骨干重新训练。当前局限在于仅验证于物体级单视角设定，且依赖 Zero123-XL 作为特征提取器；向场景级、多视角及真实拍摄场景的扩展是重要的开放问题。
 
-
-
 新视角合成（Novel View Synthesis, NVS）旨在从有限观测中重建三维场景的任意视角图像，其评估长期以来依赖于PSNR、SSIM、LPIPS等通用图像质量指标。然而，这些指标的设计初衷并非面向NVS这一特定任务，其根本性缺陷在于：它们仅度量生成图像与单一参考图像之间的像素级或特征级差异，完全忽略了NVS任务中**源图像、目标视角与生成结果之间不可分割的三元关系**。
 
 这一结构性盲区导致了两类典型的评估失效。其一，标准指标常对合理的生成变化施加错误惩罚——当生成视角与参考视角存在合理的光照变化、遮挡关系调整或纹理细节差异时，PSNR等指标会给出较低的评分，尽管生成结果在几何和语义上完全正确。其二，这些指标对视角一致性的破坏缺乏敏感性——当生成结果出现严重的几何畸变或语义错误时，标准指标可能因局部纹理匹配而给出虚高的分数。如**Figure 1**所示，PSNR、SSIM、LPIPS、CLIP-S等指标在多组对比中均偏向了明显错误的生成结果，而本文提出的DPRISM则准确惩罚了这些错误输出。
@@ -82,8 +80,6 @@ claims:
 3. **分布级评估缺失**：无参考场景下，FID、CMMD等分布度量仅比较生成集与真实集的整体统计特征，对视角偏移、几何畸变等NVS特有退化模式几乎无响应。
 
 为填补上述缺口，本文提出PRISM（Perceptual Reference-based Image Synthesis Metric）评估框架。该框架的核心洞察在于：**扩散式NVS基础模型（如Zero123）的中间层特征天然编码了与视角相关的几何和外观信息**，通过对比学习将这些特征精炼为紧凑的L2归一化嵌入，可同时支持全参考（DPRISM）和无参考（MMDPRISM）两种评估模式。这一设计使得评估指标能够感知源-目标-姿态三元组的内在一致性，从而在模型排名、人类判断对齐和退化敏感性等关键维度上显著超越现有基线。
-
-
 
 ## 核心方法与创新机理
 
@@ -140,8 +136,6 @@ $$\mathcal{L}(a,p,n) = \max\left(\|a - p\|_2 - \|a - n\|_2 + m, 0\right)$$
 - **锚定集开销**：无参考MMDPRISM需要预构建锚定集，其大小和存储开销在大规模部署时可能成为瓶颈。如何进一步压缩锚定集而不损失评估可靠性是实用化方向。
 - **真实数据泛化**：VIEWMATCH基于合成渲染数据构建，用户研究虽独立于训练集，但整体评估仍限于渲染域。在真实拍摄图像上的泛化能力未经检验。
 
-
-
 PRISM 框架的核心设计理念是：将新视角合成（NVS）的评估建模为对**三元组（源视图、目标视图、相机姿态）**的语义理解问题，而非简单的像素级或分布级比较。如图 Figure 2 所示，整个框架由两个阶段构成：**特征提取流水线**和**双模式评估**。
 
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2511_12675/figures/002_Figure_2.jpg]]
@@ -184,8 +178,6 @@ $$\mathcal{L}(a,p,n) = \max(\lVert a - p \rVert_2 - \lVert a - n \rVert_2 + m, 0
   该指标无需逐样本真值配对，适用于只有生成结果集的场景。
 
 两种模式共享同一嵌入空间，形成了从逐样本精确评估到集合级分布评估的完整能力谱系。
-
-
 
 ### 整体流水线
 
@@ -255,14 +247,11 @@ $$d_{\mathrm{MMD}}^2(P,Q) = \mathbb{E}_{x,x'\sim P}[k(x,x')] + \mathbb{E}_{y,y'\
 
 特征提取骨干的选择是整个框架的**核心因果旋钮**：原始扩散特征在 VIEWMATCH 上的线性分类 AUC 达到 0.90，远优于 CLIP（0.73）和 DINOv2（0.68），这表明扩散模型的中间特征天然编码了视角相关的几何和外观信息。对比微调投影头进一步将这些特征精炼为紧凑嵌入，使 DPRISM 和 MMDPRISM 均能有效捕捉标准指标（PSNR、SSIM、LPIPS）无法区分的视角一致性问题。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
 
 PRISM框架的评估围绕三个层次展开：**(1) 点级区分能力**——在VIEWMATCH数据集上验证指标能否区分合理与不合理的生成三元组；**(2) 分布级无参考验证**——检验MMDPRISM在无真值条件下能否分离正负样本集；**(3) 人类判断对齐**——通过用户研究衡量指标与人类偏好的相关性。评估涵盖多类NVS模型，包括基于扩散的Zero123-XL、回归式OpenLRM、多视图聚合SyncDreamer等（Table 8），确保排名实验覆盖不同技术范式。
-
 
 ---
 
@@ -326,31 +315,14 @@ Table 4和Table 5展示了MMDPRISM在Toys4K、GSO、OmniObject3D三个数据集�
 
 4. **锚定集存储开销**：MMDPRISM需要维护真实三元组的锚定嵌入集。虽然当前实验表明中等规模锚定集即可提供稳定估计，但在大规模部署场景下的存储和计算优化仍需探索。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2511_12675/figures/018_Figure_12.jpg]]
-*Figure 12: Full-reference evaluation on misaligned-views*
-
-
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2511_12675/figures/006_Table_2.jpg]]
 *Table 2: No-reference validation on VIEWMATCH. Lower is better*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2511_12675/figures/007_Table_3.jpg]]
-*Table 3: Pearson correlation between metric predictions and human judgments. Columns denote: VP = Viewpoint Accuracy, SC = Shared Consistency, PL = Plausibility of New Regions, IQ = Image Quality. Higher is better*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2511_12675/figures/010_Table_5.jpg]]
-*Table 5: $\mathbf { M M D _ { P R I S M } }$ results across Toys4K, GSO, and OmniObject3D. For GSO and OmniObject3D, results of alternative metrics are deferred to the appendix*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2511_12675/figures/017_Table_7.jpg]]
-*Table 7: AUC of linear classifiers trained on features from different timesteps v. Higher is better*
 
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2511_12675/figures/020_Table_9.jpg]]
 *Table 9: Ranking on GSO dataset. Comparison of reference-free metrics for ranking NVS models. Lower is better*
 
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2511_12675/figures/021_Table_10.jpg]]
 *Table 10: Ranking on OmniObject3D dataset. Comparison of erence-free metrics for NVS models. Lower is better*
-
-
 
 ## 定位与知识库关联
 
@@ -405,8 +377,6 @@ PRISM 的适用边界由以下约束定义：
 4. **训练过程集成**：PRISM 嵌入是否可作为 NVS 模型训练中的可微分损失或自适应学习信号？这需要验证嵌入空间在训练动态中的稳定性。
 
 5. **锚定集效率**：MMDPRISM 的无参考评估依赖锚定真实图像集的 PRISM 嵌入。如何最小化锚定集的大小和存储开销，同时保持排名可靠性？当前实验中锚定集的规模与选择策略需进一步优化。
-
-
 
 ## 原文 PDF
 

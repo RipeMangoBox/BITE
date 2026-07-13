@@ -68,15 +68,11 @@ LEANHAMMER 流水线由 Aesop（证明搜索策略）、Lean-auto（翻译目标
 
 LEANPREMISE 属于**神经前提选择**方法，与基于检索的选择器（如 ReProver）共享对比学习范式，但通过面向锤子的数据提取和动态上下文适应实现了关键差异化。其符号-神经混合架构将前提选择嵌入到符号证明搜索流水线中，延续了“锤子”方法的传统（将 ITP 目标外包给 ATP），同时引入现代密集检索技术（FAISS 索引、余弦相似度检索）和掩码对比训练策略。该方法在 Lean 4 生态中填补了“可用的领域通用前提选择器”的空白，为后续神经与符号方法的深度融合提供了基础。
 
-
-
 形式化数学的自动化证明一直是交互式定理证明（ITP）领域的核心挑战。在 Lean 等依赖类型理论（Dependent Type Theory）系统中，**锤子（hammer）** 是一种关键工具：它将当前证明目标与可用前提打包，翻译为一阶逻辑或高阶逻辑问题，交由外部自动定理证明器（ATP）求解，再将解翻译回 Lean 内部证明。然而，锤子的有效性高度依赖**前提选择（premise selection）**——从庞大的数学库中筛选出与当前目标最相关的少量前提。前提选择的质量直接决定了 ATP 能否在有限时间内找到证明：前提太少则信息不足，太多则搜索空间爆炸。
 
 当前 Lean 生态中的前提选择工具存在两个结构性缺口。其一，现有选择器（如基于检索的 **ReProver**，Yang et al., NeurIPS 2023）并非为锤子工作流定制——它们为下一步策略生成而设计，所提取的前提范围和表示形式与锤子的需求不匹配。其二，这些工具仅能检索训练时见过的固定库前提，无法处理用户新定义的局部引理或训练数据之外的库，导致锤子在真实用户场景中失效。
 
 这些缺口形成了一个因果瓶颈：**前提选择器未针对依赖类型理论的锤子流水线进行优化，且无法动态适应用户局部上下文，使得锤子自动化效果远低于其理论潜力。** 本文的核心动机正是填补这一空白——构建一个端到端、领域通用、可动态适应的 Lean 锤子，其前提选择组件从数据提取、表示学习到运行时推理均围绕锤子需求重新设计。
-
-
 
 ## 核心方法与创新机理
 
@@ -102,8 +98,6 @@ LEANPREMISE 作为前提选择器嵌入 LEANHAMMER 流水线，该流水线由 A
 
 消融实验（Table 4）证实了上述创新的因果效应：使用朴素数据提取导致 Recall@32 从 71.9% 降至 66.8%，移除负采样使其降至 59.5%，移除损失掩码使其降至 69.6%，验证了每个设计选择对性能的显著贡献。
 
-
-
 ![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_m04JJNeRK6/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the LEANHAMMER pipeline. Phases that can neither fail nor produce a terminal proof are green, phases that can fail but cannot produce a terminal proof are yellow, and phases that can produce a terminal proof are blue. Black solid arrows indicate control flow, while red dashed arrows indicate the transfer of information between phases*
 
@@ -116,8 +110,6 @@ LEANPREMISE 作为流水线的前提选择引擎，通过对比学习训练的�
 $$\mathtt{select\_premises}(s, k, \mathcal{P}_s) = \mathtt{top-}k_{p \in \mathcal{P}_s} \mathtt{sim}(E(s), E(p))$$
 
 其中 $E(s)$ 和 $E(p)$ 分别为状态和前提的嵌入表示。运行时，LEANPREMISE 缓存 Mathlib 固定版本的前提嵌入，并通过 FAISS 实现快速检索；同时支持动态提取用户局部定义的新前提并实时嵌入，使锤子能够适应训练数据之外的库和用户上下文。这一动态适应能力是 LEANPREMISE 区别于现有前提选择器（如 ReProver, Yang et al., NeurIPS 2023）的关键特性，后者仅能检索固定库中的前提，无法处理用户新定义。
-
-
 
 LEANHAMMER 流水线由四个核心模块串联构成，LEANPREMISE 作为神经前提选择器嵌入其中，为后续符号证明搜索提供候选前提。以下聚焦 LEANPREMISE 的前提检索与训练机制。
 
@@ -149,8 +141,6 @@ LEANPREMISE 的数据提取管线专为锤子工作流设计，与面向下一�
 - **前提表示**：规范化签名表示，禁用符号美化（如 `ℕ` 打印为 `Nat`），使用全限定名（如 `I` 打印为 `Complex.I`），并将文档字符串、种类（定理/定义）、名称、参数和类型组合为统一的前提签名。
 
 消融实验证实，定制数据提取与负采样、损失掩码均对性能有显著贡献：使用朴素数据提取时 Recall@32 从 71.9% 降至 66.8%；移除负采样后 Recall@32 进一步降至 59.5%；移除损失掩码则使 Recall@32 降至 69.6%（见表 4）。
-
-
 
 ## 实验与关键发现
 
@@ -201,12 +191,8 @@ LEANPREMISE (large) 在 miniCTX-v2-test 的 full 设置下取得 **20.7%** 的�
 
 - **表 4**：定制数据提取和负采样是性能的核心支柱，损失掩码的端到端收益存在不确定性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_m04JJNeRK6/figures/003_Table.jpg]]
 *Table: *Performance upper bound, excluding errors. †Our definition is slightly different from Yang et al. (2023). See Section C of the extended version of this paper (Zhu et al., 2025)*
-
-
 
 ## 定位与知识库关联
 
@@ -248,8 +234,6 @@ LEANPREMISE 的一个关键设计是运行时动态适应能力。在部署时�
 1. 更有效的模型集成方法（Section 4 明确提及）。
 2. 神经方法与符号方法的更优组合策略，例如是否可以让神经组件直接指导 ATP 的搜索策略，而非仅提供前提集合。
 3. 损失掩码对正例过滤的精确影响机制——当前消融结果中的反常提升需要更系统的归因分析。
-
-
 
 ## 原文 PDF
 

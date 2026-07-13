@@ -55,8 +55,6 @@ claims:
 
 实验表明，HUMOF 在四个公开数据集（**HIK**、**HOI-M³**、**HUMANISE**、**GTA-IM**）上均达到最优性能（Table 1, Table 2）。消融研究（Table 3）验证了层次化表征、由粗到细注入策略以及自适应 DCT 重标定各自对性能的显著贡献。值得注意的是，该方法无需预定义语义标签或实例分割，直接处理原始点云，具备良好的实际部署潜力。
 
-
-
 在拥挤的室内外场景中预测人体未来运动，是自动驾驶、人机交互、AR/VR等应用的核心能力。真实动态场景中的运动预测面临双重挑战：**人-人交互**（如擦肩而过、结伴行走、转向避让）与**人-场景交互**（如绕过桌椅、伸手取物、倚靠墙壁）往往同时发生且相互耦合（Figure 1）。然而，现有方法在这两类交互的联合建模上存在明显缺口。
 
 **现有方法的瓶颈**在于：场景感知方法（如 **ContactAware**（Mao et al., 2022）、**GIMO**（Zheng et al., 2022）、**STAG**（Scofano et al., 2023）、**MutualDistance**（Xing et al., 2025））专注于人-场景交互，但缺乏对多人体社交上下文的显式建模；社交感知方法（如 **T2P**（Jeong et al., 2024）、**IAFormer**（Xiao et al., 2025））致力于捕捉人-人交互，却忽视了场景几何的约束。少数同时考虑两者的方法（如 **SAST**（Mueller et al., 2024））虽试图弥合这一鸿沟，但其依赖预定义语义标签或实例分割，且采用扩散机制导致推理速度极慢（约2秒/样本），难以满足实时性需求。
@@ -64,8 +62,6 @@ claims:
 更深层的问题在于**交互推理的粒度与层次**。真实交互行为天然具有层次性：高层语义（如“走向桌子”）提供全局意图，低层几何（如“手与桌面的精确距离”）决定局部细节。现有方法要么仅使用单一粒度的特征，要么将所有交互信息一次性注入模型，缺乏从全局上下文到局部细化的**由粗到细推理过程**。此外，在频域视角下，运动预测的早期阶段应优先确定整体趋势（低频分量），而非过早拟合高频细节——这一归纳偏置在现有方法中未被显式利用。
 
 综上，本文的核心动机是：**设计一种层次化交互表征与由粗到细推理机制相结合的方法**，使其能够在不依赖语义标签的前提下，同时高效建模人-人与-人-场景交互，并在复杂动态场景中实现精确且鲁棒的运动预测。
-
-
 
 ## 核心方法与创新机理
 
@@ -93,8 +89,6 @@ HUMOF 的核心创新在于构建了一套**层次化交互表征**与**由粗�
 
 上述三个 changed slots 并非孤立存在，而是形成了从**表征构建**到**特征注入**再到**频率调控**的完整因果链条：层次化表征提供了不同粒度的交互信息源，由粗到细的注入策略决定了信息何时进入推理过程，自适应 DCT 重标定则在频率域约束了模型在各阶段可更新的信息频段。三者联合设计使得模型能够先聚焦全局语义上下文，再进行局部几何细节的细化，从而在 HIK、HOI-M³、HUMANISE、GTA-IM 四个公开数据集上均达到最优性能（Table 1, Table 2）。
 
-
-
 ![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_INy8guZqrm/figures/003_Figure_3.jpg]]
 *Figure 3: Detailed architecture of HUMOF. Our method takes inputs from three aspects: the past motions of the target person, a 3D point cloud for the scene, and motion sequences of interactive persons. The interactions are comprehensively encoded by (a) Hierarchical Human-Human Interaction Representation and (b) Hierarchical Human-Scene Interaction Representation, respectively. Thereafter, the hierarchical representations are leveraged by (c), a Coarse-to-Fine Interaction Reasoning Module, to predict future motions for the target person. Details of the Interaction-Perceptive Transformer layer in (c) are shown on the top right*
 
@@ -121,8 +115,6 @@ HUMOF 的整体流程围绕“层次化交互表征”与“由粗到细的交�
 将第 6 层 Transformer 输出的关节令牌依次通过 GCN 解码器和逆离散余弦变换（IDCT），恢复为时域运动序列 $\hat{\mathbf{X}}$。损失函数由路径损失 $\ell_{\mathrm{path}}$ 和局部姿态损失 $\ell_{\mathrm{local}}$ 两部分 L2 距离构成，分别监督根关节轨迹与其余关节的局部姿态。
 
 综上，HUMOF 通过“频域运动编码 → 层次化交互表征构造 → 由粗到细的注意力融合与频域调控 → 时域解码”这一信息流，实现了对复杂动态场景中多尺度交互的递进式建模。
-
-
 
 ### 3.1 运动编码器
 
@@ -210,8 +202,6 @@ $$
 - **由粗到细注入策略的优越性**（Table 3b）：仅使用粗粒度或细粒度单层特征的效果均劣于多层级特征；而在多层级特征中，由粗到细的递进注入策略又显著优于均匀注入，表明“先全局后局部”的推理顺序对复杂动态场景建模至关重要。
 - **自适应DCT重标定的增益**（Table 3c）：静态高频抑制向量已能带来性能提升，而样本自适应向量的引入进一步增强了模型对不同运动模式的适配能力，验证了频域调控机制的有效性。
 
-
-
 ## 实验与关键发现
 
 ### 1 主实验结果
@@ -252,14 +242,6 @@ HUMOF在四个公开数据集上均达到最优性能，覆盖了动态社交场
 
 **架构超参数。** 增加场景采样点数或Transformer层数可提升性能，但边际收益递减，6层为默认设置（Table 6, Table 7）。在交互信息不完整（人-人或人-场景信息缺失）的情况下，HUMOF仍优于基准方法（Table 8），显示出对输入缺失的鲁棒性。
 
-![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_INy8guZqrm/figures/013_Table_8.jpg]]
-
-![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_INy8guZqrm/figures/014_Table_6.jpg]]
-*Table 6: Ablation study on different number of sampled point of the static scene on GTA-IM dataset*
-
-![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_INy8guZqrm/figures/015_Table_7.jpg]]
-*Table 7: Ablation study on different number of Transformer layers on GTA-IM dataset*
-
 ---
 
 ### 3 失败模式与局限性
@@ -283,19 +265,6 @@ HUMOF在四个公开数据集上均达到最优性能，覆盖了动态社交场
 - **Figure 4：** 定性结果显示HUMOF能正确捕捉社交意图（如转向交互者），而对比方法倾向于维持原方向。
 - **Figure 6 & Figure 7：** 在场景遮挡和输入噪声增加的情况下，HUMOF的性能退化幅度小于对比方法，表明层次化交互表征对不完整和噪声输入具有较强鲁棒性。
 - **Figure 10：** 失败案例集中于运动模式的突然切换，提示未来需引入意图推理或额外模态（如注视信息）。
-
-![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_INy8guZqrm/figures/005_Table_2.jpg]]
-*Table 2: HUMANISE Dataset Wang et al. (2022)*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_INy8guZqrm/figures/009_Table_4.jpg]]
-*Table 4: (a) Hierarchical Representations*
-
-![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_INy8guZqrm/figures/012_Table_4.jpg]]
-*Table 4: Runtime analysis on $\mathrm { H O I - M ^ { 3 } }$ Dataset*
-
-
 
 ## 定位与知识库关联
 
@@ -339,8 +308,6 @@ HUMOF 的核心贡献在于首次将**层次化交互表征**与**由粗到细�
 3. **SE(3) 编码的失效原因**：为什么显式的 SE(3) 相对变换编码未能提供性能增益？模型是否已通过时序距离模式隐式学习到了朝向和运动关系？这需要更深入的表征分析来回答。
 4. **多样化动态物体的泛化**：在具备大量且多样化动态物体（如移动的家具、车辆）的更大规模数据集上，现有框架能否保持领先优势？层次化表征的粒度设计是否需要针对新物体类别进行调整？
 5. **替代交互建模范式**：能否通过引入拓扑约束或力学模型等替代交互建模范式来进一步提升泛化性能，尤其是在物理穿透和接触合理性方面？
-
-
 
 ## 原文 PDF
 

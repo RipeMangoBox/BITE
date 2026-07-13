@@ -61,8 +61,6 @@ claims:
 
 **局限性**：在严格误差阈值下的精度仍明显落后于基于优化的最优方法；动态物体场景可能导致全局置信度下降；检索图构建失败时可能造成场景断裂；训练图规模受显存限制（N=8），限制了高阶多视图约束的学习。
 
-
-
 ### 运动恢复结构（SfM）的核心任务与现实瓶颈
 
 运动恢复结构（Structure-from-Motion, SfM）旨在从一组无序的二维图像中同时恢复相机位姿与场景的三维结构。这是一项基础且经典的计算机视觉任务，在自动驾驶、机器人导航、增强现实、文化遗产数字化等领域具有广泛的应用需求。
@@ -88,8 +86,6 @@ Light3R-SfM 的核心动机正是回答一个关键问题：**能否在纯前馈
 - **如何构建一个稀疏但信息充分的场景图来引导前馈式重建？** 全连接图计算成本过高，而简单的链式或树形结构（如 Spann3R 的在线序列）又容易引入累积误差。
 
 本文的解决方案——潜在全局注意力模块（latent global alignment）与检索分数引导的最短路径树（SPT）——正是围绕这两个核心挑战展开设计。通过在特征空间而非几何空间完成多视图信息交换，以及通过扁平化的树结构减少累积漂移，Light3R-SfM 试图证明：**前馈式 SfM 可以在保持极高速度的同时，达到接近优化式方法的全局一致性**。
-
-
 
 ## 核心方法与创新机理
 
@@ -118,8 +114,6 @@ SPT 的关键优势在于：通过最小化路径代价，树结构更扁平，�
 ### 创新边界与局限
 
 需要指出的是，这种纯前馈式设计在精度上仍存在妥协：在严格误差阈值下，Light3R-SfM 的精度明显落后于基于优化的最优方法（如 MASt3R-SfM 和 GLOMAP）。例如在 Tanks&Temples 25 视图设定下，Light3R-SfM 的 RRA@5 为 50.9%，而 MASt3R-SfM 达到 68.0%（Table 1）。这表明潜在对齐虽然能捕获全局约束，但尚不能完全替代显式几何优化的精度。此外，当检索图构建失败时，SPT 可能导致场景断裂成多个不一致的子重建，这是该方法的一个结构性脆弱点。
-
-
 
 Light3R-SfM 的目标是将一组**无序图像**（无需时间戳或顺序先验）作为输入，直接输出每幅图像对应的相机外参 $P \in \mathbb{R}^{4\times4}$、内参 $K_i \in \mathbb{R}^{3\times3}$ 以及图像分辨率的稠密 3D 点图 $X \in \mathbb{R}^{H\times W\times3}$。整个流程是**纯前馈式**的，不包含任何迭代优化或捆集调整（BA）步骤。
 
@@ -163,12 +157,8 @@ $$\mathcal{L} = \mathcal{L}_{\text{pair}} + \lambda \mathcal{L}_{\text{global}}$
 
 > **注意**：由于显存限制，训练时的图规模设定为 $N=8$，这限制了高阶多视图约束的学习，高分辨率模型可能无法使用更大的训练图。该局限性对实际部署的影响需进一步评估。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l47_https_arxiv_org_abs_2501_14914/figures/002_Figure_2.jpg]]
 *Figure 2: Light3R-SfM Pipeline. Given an unordered set of images, we first encode them to obtain image tokens from which we average pool global features for constructing a shortest path tree. We next feed image tokens into our attention-based latent global alignment to enable global context sharing. Afterwards, for each edge in the SPT, we decode pairwise pointmaps using the implicitly aligned feature tokens. Finally, we use global accumulation to obtain globally aligned pointmaps per image*
-
-
 
 Light3R-SfM 的核心架构由五个模块串联构成，其设计目标是用纯前馈计算替代传统 SfM 中的显式全局优化。整个流程从无序图像集合出发，输出每幅图像的相机外参、内参以及密集 3D 点图。
 
@@ -242,8 +232,6 @@ $$\mathcal{L}_{\mathrm{global}} = \sum_{i} \mathcal{L}_{\mathrm{conf}}(\bar{X}^i
 
 消融实验表明，全局监督权重 $\lambda=0.1$ 取得最优平衡，加入全局损失后 RRA@5 提升 6.95%，ATE 降低 15.78%。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验结果
@@ -300,9 +288,6 @@ Figure 11 展示了 Tanks&Temples 上的典型失败案例。主要失败模式�
 
 1. **严格阈值下的精度差距。** 尽管在宽松指标（RRA@5、RTA@5）上接近优化式方法，但在更严格的误差阈值下（如 RRA@1），Light3R-SfM 仍明显落后于 MASt3R-SfM 和 GLOMAP。Figure 5 的位姿误差 CDF 曲线直观展示了这一差距。
 
-![[assets/figures/papers/paper_list_l47_https_arxiv_org_abs_2501_14914/figures/011_Figure_5.jpg]]
-*Figure 5: CDF of pose errors on 100-view Tanks&Temples scenes*
-
 2. **动态物体干扰。** 包含大量动态物体的场景会导致全局置信度整体下降，影响重建质量。Figure 6 显示模型能检测动态区域，但无法完全消除其对位姿估计的负面影响。
 
 3. **检索图失效导致的场景断裂。** 当基于编码器相似度的检索图构建失败时（如重复纹理、对称结构），SPT 可能将本应连接的子场景分离，导致全局重建断裂成多个不一致的部分。这一问题源于方法完全依赖前馈相似度，缺乏回环检测或重排名机制。
@@ -315,25 +300,6 @@ Figure 4 展示了潜在全局对齐的隐式场景理解能力：即使对于�
 
 ![[assets/figures/papers/paper_list_l47_https_arxiv_org_abs_2501_14914/figures/018_Figure_8.jpg]]
 *Figure 8: Qualitative examples of reconstruction of Tanks & Temples scenes. Figure 9. Qualitative examples of reconstruction of ETH3D scenes*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l47_https_arxiv_org_abs_2501_14914/figures/005_Table_3.jpg]]
-*Table 3: Wide-baseline, multi-view camera pose estimation on CO3Dv2 [32]. We vary the number of input images by randomly sampling from the original sequence*
-
-![[assets/figures/papers/paper_list_l47_https_arxiv_org_abs_2501_14914/figures/021_Table_12.jpg]]
-*Table 12: Per-scene reconstruction runtimes on Tanks&Temples. All runtimes are reported in seconds*
-
-![[assets/figures/papers/paper_list_l47_https_arxiv_org_abs_2501_14914/figures/004_Table_1.jpg]]
-*Table 1: Multi-view pose estimation on Tanks&Temples [21]. We adopt the benchmark by [12] and consider 25/50/100/200 view subsets and using the full sequence. We report relative pose accuracy RRA@5 and RTA@5, absolute translation error (ATE) and registration rate (Reg.). For clarity, we color-code results with a linear gradient between the worst and best result for a given scene. ‘-’ results indicate that all scenes did not converge or that we did not obtain runtime measurements. We specify the type of alignment used by each methods, ‘OPT’ stands for optimizationbased and ‘FFD’ stands for feedforward-based*
-
-![[assets/figures/papers/paper_list_l47_https_arxiv_org_abs_2501_14914/figures/014_Table_9.jpg]]
-*Table 9: Impact of weight of global supervision λ*
-
-![[assets/figures/papers/paper_list_l47_https_arxiv_org_abs_2501_14914/figures/015_Table_10.jpg]]
-*Table 10: Impact of backbone initialization*
-
-
 
 ## 定位与知识库关联
 
@@ -389,8 +355,6 @@ Light3R-SfM 处于“前馈式运动恢复结构（Feed-forward SfM）”这一�
 4. **动态场景建模**：模型对动态物体的处理能力有限。是否可以通过在训练数据中增加含动态物体的场景，或引入运动分割模块，使模型具备更强的动态场景适应性？
 
 5. **与后续工作的潜在关联**：Light3R-SfM 提出的“潜在注意力 + SPT”框架为前馈式 SfM 提供了一个可扩展的基础架构。后续工作可以在此基础上探索：更高效的注意力变体（如线性注意力）、多尺度全局 token、以及与其他 3D 表示（如 3D Gaussian Splatting）的直接结合。
-
-
 
 ## 原文 PDF
 

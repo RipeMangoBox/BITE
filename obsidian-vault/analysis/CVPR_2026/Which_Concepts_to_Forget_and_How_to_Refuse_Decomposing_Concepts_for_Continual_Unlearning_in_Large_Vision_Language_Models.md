@@ -104,11 +104,6 @@ CORE 将持续遗忘建模为**概念分解 → 概念精炼 → 概念感知拒
 
 整个框架的核心瓶颈在于：序贯遗忘更新会扭曲 LVLM 中纠缠的共享视觉-语言表示，产生虚假关联，导致不相关拒绝（新任务覆盖旧任务的遗忘模式）和过度拒绝（误拒保留查询）。CORE 的应对策略是将遗忘行为建立在**语义概念层面**而非原始特征层面——概念调制器精炼出与遗忘类别真正相关的语义维度，概念感知路由基于语义相关性决定 refuser 的复用或新建，推理校准则根据查询与遗忘任务的概念距离动态调节拒绝强度。三者协同，使得模型能够持续、精确地忘掉特定视觉-指令对，同时最大限度保留通用能力。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l811_https_arxiv_org_abs_2603_21484/figures/001_Figure_1.jpg]]
-*Figure 1: Challenges in continual unlearning of large visionlanguage models emerge as sequential unlearning updates distort entangled visual-language representations, making it difficult to preserve contextually appropriate refusal behavior across tasks. (a) Irrelevant refusal: Learning new forget tasks overwrites prior refusal patterns, generating contextually misaligned refusals. (b) Over-refusal: The model inappropriately refuses retain queries*
-
 CORE 框架围绕“概念分解—概念精炼—概念感知拒绝”三条主线构建，其核心由四个功能模块组成：视觉/文本概念模块、概念调制器、混合拒绝专家与路由器，以及推理校准模块。整体流程如 Figure 2 所示。
 
 ### 3.1 遗忘任务形式化与特征提取
@@ -173,8 +168,6 @@ $$\mathcal{P}(\bar{x}_{\mathrm{img}}) + \beta \cdot \Delta \mathcal{P}(\bar{x}_{
 
 当查询与任何遗忘任务的概念相关性较低时，$\beta$ 趋近于 0，refuser 贡献被抑制，模型正常回答；当查询与遗忘任务高度相关时，$\beta$ 趋近于 1，refuser 完全激活，模型产生拒绝响应。消融实验表明，移除校准模块会导致 AR 下降（Section 4.3），印证了校准对抑制过度拒绝的必要性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l811_https_arxiv_org_abs_2603_21484/figures/011_Figure.jpg]]
 *Figure: B. Visualization of refuser activation frequency for each task (a) with and (b) without relevance guided refuser activation*
 
@@ -189,16 +182,10 @@ CORE 在两个主流 LVLM 架构和两类下游任务上均展现出显著的性
 
 Table 2 展示了基于 Llama-2-LVLM 的结果，CORE 同样保持一致的领先趋势，验证了方法对不同语言模型骨干的鲁棒性。Figure 3 进一步揭示了各方法在序贯遗忘步骤中的性能退化轨迹：基线方法（如 EWC、LwF、GMM）在步骤推进过程中，保留数据的通用能力持续下滑，而 CORE 的曲线几乎持平，说明概念分解与精炼机制有效隔离了遗忘更新对共享表示的侵蚀。
 
-![[assets/figures/papers/paper_list_l811_https_arxiv_org_abs_2603_21484/figures/006_Table_2.jpg]]
-*Table 2: Results of using the Llama-2-based LVLM*
-
 ![[assets/figures/papers/paper_list_l811_https_arxiv_org_abs_2603_21484/figures/004_Figure_3.jpg]]
 *Figure 3: Performance across sequential unlearning steps. We report average performance on the LVLM benchmarks and retain data (top) and the forget data (bottom) after each unlearning step*
 
 Figure 4 绘制了 AR 与 CRR 的权衡曲线。CORE 在两个骨干上均位于帕累托前沿，意味着在同等遗忘精度下，CORE 能保留更高的回答能力；或在同等保留率下，实现更彻底的遗忘。这一前沿位置直接源于概念调制器对无关语义的抑制——传统方法在遗忘某一类别时，不可避免地抑制了与之共享视觉或语言概念的保留类别，而 CORE 通过精炼概念激活将更新约束在目标概念子空间内。
-
-![[assets/figures/papers/paper_list_l811_https_arxiv_org_abs_2603_21484/figures/007_Figure_4.jpg]]
-*Figure 4: Trade-off between AR on the retain data and CRR on the forget data using Vicuna (left) and Llama-2 (right)*
 
 ### 消融实验
 
@@ -225,14 +212,6 @@ Figure 5 展示了序贯遗忘过程中的响应变化。对于遗忘样本（�
 ### 失败模式与局限性
 
 尽管 CORE 在多数场景下表现优异，但分析中仍存在需要手动验证的潜在边界。首先，概念描述的质量依赖于预定义的概念集合（Table E），若遗忘类别涉及高度抽象或跨模态的复合概念，人工构建的概念描述可能无法充分覆盖其语义空间，导致遗忘不彻底。其次，概念调制器的训练依赖于预训练编码器提供的目标相似度 $\hat{E}_{\mathrm{q}, i}$，若该编码器对特定领域（如医学影像）的语义理解不足，调制器的精炼效果可能退化。最后，当前实验在 12 个序贯遗忘任务的设定下验证，更长时间尺度（如数十个任务）下的概念激活漂移和 refuser 容量饱和问题尚未被充分探索，需在实际部署中进一步评估。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l811_https_arxiv_org_abs_2603_21484/figures/010_Figure.jpg]]
-*Figure: A. Results of a different task order using Vicuna-based LVLM*
-
-![[assets/figures/papers/paper_list_l811_https_arxiv_org_abs_2603_21484/figures/009_Figure_6.jpg]]
-*Figure 6: Visualization of the visual and textual concept descriptions corresponding to the top-5 activations from the concept modules for each vision-language pair in forget categories. The blue and gray boxes represent descriptions from CORE with and without the concept modulator, respectively. Descriptions that do not belong to the forget category of the given sample are shown in red*
 
 ## 定位与知识库关联
 

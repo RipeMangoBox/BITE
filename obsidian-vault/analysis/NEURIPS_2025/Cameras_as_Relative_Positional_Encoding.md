@@ -317,9 +317,6 @@ PRoPE未引入额外参数，仅通过替换注意力中的位置编码即可提
 
 在DL3DV数据集上，模型需检测“图像-相机参数不一致”的样本对（Figure A.3）。PRoPE+CamRay在9视图设定下达到**93.0%准确率**，远超Plücker raymap的**76.9%**（+16.1个百分点）。CamRay单独使用时准确率为86.0%，PRoPE的加入进一步提升了7个百分点，说明相对投影编码帮助模型更好地理解跨视图的几何一致性（Table 5）。
 
-![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2507_10496/figures/010_Table_5.jpg]]
-*Table 5: Spatial cognition results. We report the accuracy of detecting inconsistent image-camera pairs on the DL3DV [15] dataset under varying numbers of input views. Both CamRay and PRoPE significantly help with performance, without introducing additional model parameters. An illustration of this task can be found in Figure A.3*
-
 ---
 
 ### 消融实验
@@ -355,18 +352,6 @@ PRoPE未引入额外参数，仅通过替换注意力中的位置编码即可提
 2. **针孔模型假设**：当前PRoPE仅适用于针孔相机，未考虑镜头畸变等更复杂的相机模型。对于鱼眼或广角畸变明显的场景，投影变换的精度会下降。
 3. **非交换性限制**：投影变换的非交换性使得无法像RoPE那样通过多频编码注入相机参数，限制了更丰富的频率表示。这可能是PRoPE在极细粒度几何任务上的潜在瓶颈。
 4. **CamRay与PRoPE的冲突**：在分布外焦距测试中，PRoPE+CamRay的性能反而不如纯PRoPE（Table A.3），说明token级内参编码可能与注意力级投影编码产生信息冲突，具体机制尚不明确。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2507_10496/figures/005_Figure_3.jpg]]
-*Figure 3: Out-of-distribution tasks. Left: We evaluate camera conditioning methods on both longer sequence lengths and unseen camera intrinsics. Right: PRoPE improves results for both unseen sequence lengths and unseen intrinsics*
-
-![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2507_10496/figures/008_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2507_10496/figures/012_Table.jpg]]
-*Table: A.1: Ablation Study on PRoPE. \overline { { \mathbf { D } _ { t } ^ { \mathrm { P r o j } } } } is crucial for encoding the relative camera information, and \mathbf { D } _ { t } ^ { \mathrm { R o P E } } is also helpful to capture the relative patch coordinate. Experiments are conducted on RealEstate10K with CamRay as input*
-
-![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2507_10496/figures/014_Table.jpg]]
 
 ## 定位与知识库关联
 

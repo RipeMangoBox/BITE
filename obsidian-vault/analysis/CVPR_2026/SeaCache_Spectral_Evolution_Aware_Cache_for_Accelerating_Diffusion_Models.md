@@ -59,8 +59,6 @@ claims:
 
 Oracle 实验和消融研究进一步验证了 SEA 滤波器设计的有效性：基于 SEA 滤波输出距离的缓存调度在相同刷新率下始终优于基于原始输出距离的调度，且频谱选择性滤波（而非简单的低通滤波或互补滤波）是实现这一优势的关键。
 
-
-
 ### 扩散模型加速的缓存范式
 
 扩散模型与整流流模型已成为视觉生成的核心架构，但其迭代去噪过程计算开销巨大。以FLUX、HunyuanVideo、Wan2.1等先进模型为例，单次推理需执行数十步完整前向传播，严重制约了实时应用和资源受限场景的部署。
@@ -93,8 +91,6 @@ SeaCache的回答是：在测量特征距离之前，对中间特征施加一个
 3. **速度-质量权衡优化**：在频谱感知空间中计算的距离 $\widetilde{\Delta}_t$ 替代原始 $\Delta_t$，使缓存调度在相同计算预算下获得更高的保真度。
 
 Figure 1 直观展示了这一动机：下方面板描绘了一张猫图像的完整去噪轨迹，早期时间步呈现模糊的低频轮廓，后期逐步细化出毛发等高频细节；SeaCache通过SEA滤波器对原始扩散特征进行时间步感知的频谱重加权，使距离度量更好地捕捉时间步间的频谱残差，从而在加速与保真度之间取得更优平衡。
-
-
 
 ## 核心方法与创新机理
 
@@ -136,8 +132,6 @@ Oracle实验（Figure 2）直接验证了频谱感知距离度量的优势：基
 
 消融实验（Figure 8）排除了其他可能解释：互补滤波器（1−SEA）、无归一化滤波器和低通滤波器在PSNR-刷新率权衡上均显著劣于SEA滤波器，证明频谱选择性的设计——而非简单的滤波操作或能量归一化——是性能提升的关键。此外，将SEA滤波器嵌入DiCache后（DiCache+Ours，Figure 9），在相同刷新率下PSNR始终高于原始DiCache，进一步证实了频谱感知距离度量作为通用模块的有效性。
 
-
-
 SeaCache 是一种**即插即用的缓存策略**，其核心设计理念是将扩散模型去噪过程中的频谱演化先验显式编码进缓存距离度量中，仅替换现有动态缓存方案中的距离计算模块，而保持累积刷新规则不变。
 
 ### 方法总览
@@ -178,11 +172,6 @@ SeaCache 相对于现有缓存方法的**唯一改动**在于距离度量槽位�
 ### 频谱演化的直觉
 
 Figure 1 和 Figure 4 揭示了扩散模型去噪过程的频谱特性：早期时间步的滤波器 $G_t(f)$ 主要保留低频成分（粗糙结构），随着去噪推进，滤波器逐渐纳入高频成分（细节纹理）。SeaCache 通过将这一先验编码进距离度量，使缓存决策更准确地反映内容冗余，避免高频噪声对距离计算的干扰。Oracle 实验（Figure 2）表明，基于 SEA 滤波输出距离的缓存调度相比基于原始输出距离的调度，在相同刷新率下实现更高的 PSNR，更好地跟踪全计算轨迹。
-
-![[assets/figures/papers/paper_list_l2053_https_arxiv_org_abs_2602_18993/figures/001_Figure_1.jpg]]
-*Figure 1: Conceptual illustration and motivation of the proposed caching scheme (SeaCache) compared with previous caching schemes. The lower panel shows a denoising trajectory of a cat image where coarse low-frequency structure appears at early steps and fine high-frequency details emerge at later steps, illustrating the spectral evolution of iterative generative models. SeaCache applies a Spectral-Evolution-Aware (SEA) Filter to raw diffusion features so that the distance measure better captures timestepaware spectral residuals between timesteps*
-
-
 
 SeaCache 的核心设计是将扩散模型去噪轨迹中的频谱演化先验显式编码进缓存调度，通过三个紧密协作的模块实现：**SEA 滤波器设计**、**频谱特征变换**和**频谱感知动态缓存**。整个流程作为即插即用的缓存策略，仅替换距离度量，不改变去噪器结构或训练过程。
 
@@ -230,12 +219,8 @@ $$\sum_{s=t_a}^{t_b-1} \widetilde{\Delta}_{s} \leq \delta < \sum_{s=t_a}^{t_b} \
 
 Oracle 实验（Figure 2）表明，基于 SEA 滤波输出距离的缓存调度在相同刷新率下 PSNR 显著高于基于原始输出距离的调度，验证了频谱感知度量能更准确跟踪全计算轨迹。Figure 5 进一步显示，SEA 滤波后的输入距离与输出距离高度一致，而原始输入距离或多项式拟合输入距离在早期时间步的对齐较弱——这正是噪声干扰缓存决策的直接证据。消融实验（Figure 8）证明，SEA 滤波器在 PSNR-刷新率权衡上优于互补滤波器（1-SEA）、无归一化滤波和低通滤波器，确认了频谱选择性设计的关键作用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2053_https_arxiv_org_abs_2602_18993/figures/004_Figure_4.jpg]]
 *Figure 4: Visualization of timestep-dependent denoising filters. (a) Optimal linear denoising responses*
-
-
 
 ## 实验与关键发现
 
@@ -286,33 +271,14 @@ SeaCache与LightX2V、Jenga等快速推理方案可叠加使用（Table 12），
 - 是否可以直接在潜在空间估计频谱并设计滤波器，避免像素域先验与潜在空间的分布偏移？
 - 在保持即插即用特性的前提下，可否引入轻量级非线性校正（如小型可学习残差模块）来进一步提升缓存保真度？
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2053_https_arxiv_org_abs_2602_18993/figures/006_Table_1.jpg]]
 *Table 1: Quantitative comparison in FLUX.1-dev [28, 29]*
 
 ![[assets/figures/papers/paper_list_l2053_https_arxiv_org_abs_2602_18993/figures/007_Table_3.jpg]]
 *Table 3: Quantitative comparison in HunyuanVideo [27]*
 
-![[assets/figures/papers/paper_list_l2053_https_arxiv_org_abs_2602_18993/figures/011_Table_4.jpg]]
-*Table 4: Quantitative comparison in Wan2.1 1.3B [63]*
-
 ![[assets/figures/papers/paper_list_l2053_https_arxiv_org_abs_2602_18993/figures/013_Figure_8.jpg]]
 *Figure 8: Ablation on spectrum-aware filtering. Trade-offs for different cache metrics on FLUX and HunyuanVideo. Results are averaged over 200 prompts for FLUX and 20 randomly selected from VBench for HunyuanVideo, with the other settings fixed*
-
-![[assets/figures/papers/paper_list_l2053_https_arxiv_org_abs_2602_18993/figures/014_Figure_9.jpg]]
-*Figure 9: Plug-and-play adaptation to DiCache. PSNR-refresh ratio trade-off on FLUX when applying the SEA-based cache metric to DiCache [6]. “DiCache+Ours” denotes DiCache combined with our SEA filter, while “DiCache” uses the original metric*
-
-![[assets/figures/papers/paper_list_l2053_https_arxiv_org_abs_2602_18993/figures/012_Figure_10.jpg]]
-*Figure 10: Refresh pattern across timesteps on FLUX. Pertimestep refresh ratio at a 30% budget. (a) SeaCache automatically concentrates refreshes on early timesteps, whereas (b) Tea-Cache spreads refreshes more uniformly over the trajectory*
-
-![[assets/figures/papers/paper_list_l2053_https_arxiv_org_abs_2602_18993/figures/008_Table_2.jpg]]
-*Table 2: Comparison of average rank on CycleReward [4]*
-
-![[assets/figures/papers/paper_list_l2053_https_arxiv_org_abs_2602_18993/figures/002_Figure_2.jpg]]
-*Figure 2: Latency-quality trade-off in oracle experiments. We compare cache decisions based on raw output differences and SEA-filtered output differences (Sec. 4.1) on FLUX [28, 29] and Wan2.1 1.3B [63]. The refresh ratio is the fraction of timesteps that run a full denoiser evaluation instead of reusing cached features. For each criterion, PSNR is computed between the cached sample and the corresponding full timestep (no-cache) sample, averaged over each prompt set [23, 49]. At matched refresh ratios, the filtered criterion consistently achieves higher PSNR with respect to the full-compute trajectory, validating the effectiveness of a spectrum-aware distance for cache scheduling*
-
-
 
 ## 定位与知识库关联
 
@@ -361,8 +327,6 @@ SeaCache 的滤波器设计基于三个核心假设，这些假设定义了方�
 3. **非线性校正与即插即用性的平衡。** 在保持即插即用特性的前提下，引入轻量级非线性校正（如小型可学习网络调整滤波器响应）可能进一步提升缓存保真度。Figure 9 的 DiCache 嵌入实验已初步验证了模块化设计的可行性，未来可探索更丰富的适配形式。
 
 此外，Figure 10 揭示的刷新模式（SeaCache 自动将大部分刷新集中在早期时间步）暗示频谱感知度量隐式编码了生成过程的时间重要性先验，这为理解扩散模型去噪轨迹的信息动态提供了新的分析视角。
-
-
 
 ## 原文 PDF
 

@@ -57,15 +57,11 @@ claims:
 
 总体而言，本文阐明了监督与自监督对比学习“对齐”的实质是表示相似性结构的持续耦合，而非损失函数的表面近似，并给出了可量化的控制因素。主要局限在于理论界基于最坏情形分析，常数较松，且实验限于中小规模视觉任务；如何将分析框架推广至非对比自监督方法仍是开放课题。
 
-
-
 自监督对比学习（CL）在无需标签的条件下能够学习到强大的表示，而监督对比学习（SCL）及其变体则利用标签进一步提升特征判别力。尽管两类范式在实践中都取得了成功，但它们学习到的表示之间是否存在内在联系、何时对齐、又由哪些因素控制，始终缺乏清晰的回答。一种特殊的监督对比目标——仅以负样本为分母的负样本监督对比学习（NSCL）——引起了关注：当类别数较大时，其损失函数在形式上逼近 CL 的 InfoNCE 损失。然而，**损失层面的相似性并不自动保证训练过程中表示层面的对齐**。这项工作正是要填补这一理论与认知空白。
 
 现有的分析大多停留在损失景观或下游准确率比较上，未曾触及表示几何的动态耦合。一个突出的矛盾现象是：即便使用相同的随机种子、相同的小批量和数据增强，CL 与 NSCL 在参数空间中可能以指数速度发散（Figure 1(a)，Figure 6），但两者在表示相似性空间却长期保持高度一致（Figure 1(b,c)）。这一观察直接引出了两个核心缺口：(1) **缺少在表示层面（而非参数或损失面）刻画 CL 与 NSCL 耦合动态的理论框架**；(2) **尚未定量揭示批量大小、温度、类别数、学习率缩放等关键超参数如何调控对齐程度**。此外，实验表明 CL 与 NSCL 的表示对齐显著强于其与普通 SCL 或交叉熵损失的对齐（Figure 2），这说明 NSCL 是一种独特的耦合目标，值得被系统研究，而非仅作为性能对比的基线。
 
 本文的动机正是在相似性空间中建立耦合动力学模型，跳出参数轨迹指数发散的困境，转而分析 CL 与 NSCL 在**相似性矩阵上的替代梯度下降**。作者严格证明，在共享随机性的条件下，两者的相似性矩阵始终以高概率保持接近（Theorem 1），并由此推导出线性CKA和RSA的显式高概率下界（Corollary 1, 2）。这些理论边界不仅为表示对齐提供了保证，还清晰地展示了**对齐随类别数增多而增强、随温度升高而提升**，以及批量大小效应对齐的方向取决于学习率缩放策略等可控规律。该框架将自监督与监督对比学习的表示对齐从一个经验现象升华为可理解、可调控的几何性质，为模型融合、半监督学习等下游任务提供了新的理论视角和操作余地。
-
-
 
 ## 核心方法与创新机理
 
@@ -106,8 +102,6 @@ $$ \mathrm{CKA}_T \geq \frac{1-\rho_T}{1+\rho_T}, \qquad \mathrm{RSA}_T \geq \fr
 ### 5. 局限与未闭合问题
 
 当前分析的几点局限值得注意：(i) 理论界基于最坏情况，常数可能较宽松，数据依赖的紧致界尚待推导；(ii) 实验以小到中规模视觉数据集为主，未验证大规模或非视觉场景的泛化性；(iii) 框架仅限于对比学习范式，能否推广至掩码图像建模等非对比自监督方法仍为开放问题；(iv) NSCL 并非实践上最强的监督目标，本文强调的是对齐性这一结构性质，而非绝对性能。这些方向构成了未来工作的重要切入点。
-
-
 
 ![[assets/figures/papers/iclr26_0015_JkitQScjuL_On_the_Alignment_Between_Supervised_and_Self-Sup/figures/001_Figure_1.jpg]]
 *Figure 1: (a) Weight Space*
@@ -155,8 +149,6 @@ $$
 整体数据流为：共享随机初始化 → 多 epoch 训练（10 epoch warm-up + cosine 衰减）→ 逐 epoch 保存编码器 → 计算相似性矩阵 → 得出 CKA/RSA 曲线。实验发现与理论预测一致：随着类别数增加（Fig. 3）、温度升高至 1.0（Fig. 4），CL–NSCL 的 CKA/RSA 显著提升；批量大小的影响则因学习率缩放而出现反转（Fig. 5）。此外，参数空间差距会以指数速度发散（Fig. 1, Fig. 6），即使表示空间始终保持高度对齐，印证了域转换的必要性。
 
 该框架最终表明，通过相似性空间的解析动力学，而非直接追踪高维权重，可以精密控制自监督与监督对比学习之间的表示对齐程度，为理解两个范式的内在联系提供了定量桥梁。
-
-
 
 本文提出 **相似性空间耦合分析框架（Similarity-Space Coupling Analysis Framework）**，其核心思想是绕过参数空间可能出现的指数发散，直接在表示相似性矩阵上建立替代动力学，从而定量刻画自监督对比学习（CL）与仅负样本监督对比学习（NSCL）在表示几何层面的耦合程度。该框架的关键模块与推导如下。
 
@@ -213,8 +205,6 @@ $$
 
 *注：以上公式源自原文 Section 3–4，LaTeX 经校核与原文一致。*
 
-
-
 ## 实验与关键发现
 
 ### 实验设置
@@ -249,8 +239,6 @@ Figure 5 揭示了批量大小 B 对齐的影响并非单一方向，而是取�
 - **Figure 12**：将温度调制的对齐与性能差距可视化，更高对齐度对应更小的CL-NSCL精度差。
 - **Figure 17**：展示利用CL与NSCL表示对齐实现模型合并的潜力，NCCC/LP精度均显著提升，印证了表示兼容性的应用价值。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0015_JkitQScjuL_On_the_Alignment_Between_Supervised_and_Self-Sup/figures/013_Figure_2.jpg]]
 *Figure 2: Alignment during training. We train ResNet-50 models with decoupled CL, SCL, NSCL, and CE. For the first 1,000 epochs, the CL-trained model is substantially more aligned with the NSCL-trained model than with the others. However, alignment declines when training continues much longer*
 
@@ -265,8 +253,6 @@ Figure 5 揭示了批量大小 B 对齐的影响并非单一方向，而是取�
 
 ![[assets/figures/papers/iclr26_0015_JkitQScjuL_On_the_Alignment_Between_Supervised_and_Self-Sup/figures/039_Figure_5.jpg]]
 *Figure 5: Effect of batch size with scaled learning rates. We trained CL, and NSCL models for 300 epochs with varying batch-sizes (B ∈ {256, 512, 1024}). For each experiment, the learning rate η is scaled as a function of batch-size, as mentioned under each panel. For instance, the results shown in panel (b) use a learning rate of $\begin{array} { r } { \eta = \frac { 0 . 3 \sqrt { B } } { 2 5 6 } } \end{array}$ (a) CIFAR10
-
-
 
 ## 定位与知识库关联
 
@@ -296,8 +282,6 @@ Figure 5 揭示了批量大小 B 对齐的影响并非单一方向，而是取�
 - **推广至非对比范式**：如何将相似性空间耦合分析迁移到基于动量更新或掩码预测的自监督算法，建立统一的表示对齐理论？
 - **弱假设下的稳定性**：在不依赖共享增广/小批量的更弱条件下，CL 与监督学习的表示耦合是否存在有效的理论保证？
 - **下游应用与融合**：CL–NSCL 的紧密表示对齐是否可被用于模型融合、半监督学习或迁移学习的改进？特别是在类别数较少的场景下，如何通过温度/批量调度主动提升对齐度？这些均是需要进一步工程探索的问题。
-
-
 
 ## 原文 PDF
 

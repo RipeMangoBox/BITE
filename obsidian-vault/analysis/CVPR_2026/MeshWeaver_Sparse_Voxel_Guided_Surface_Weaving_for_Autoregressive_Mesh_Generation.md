@@ -50,8 +50,6 @@ claims:
 
 消融实验进一步验证了因果机制的可靠性：同时移除体素特征表示和交叉注意力导致 Chamfer Distance 从 0.116 恶化至 0.158，证明几何上下文注入对高保真度重建至关重要；移除生成骨架约束也使指标轻微退化，验证了稀疏体素约束对避免预测漂移的贡献。
 
-
-
 ### 网格生成的自回归范式困境
 
 自回归生成在语言和图像领域取得了显著成功，但在三维网格生成中面临根本性挑战。网格由大量顶点坐标构成，一个包含 $N$ 个三角面的网格需要 $3N$ 个顶点，若按朴素坐标级标记化，将产生 $9\tilde{N}$ 个坐标 token 的长序列：
@@ -69,8 +67,6 @@ $$\mathcal{M} = \{ v_{1}^{x}, v_{1}^{y}, v_{1}^{z}, \ldots, v_{3N}^{x}, v_{3N}^{
 ### 核心动机：将生成重新定义为表面编织
 
 MeshWeaver 的出发点是将网格生成从“逐坐标预测”提升为“逐顶点编织”——在已知几何表面上，自回归地预测下一个顶点，而非孤立的坐标点。这一范式转换需要解决两个关键问题：(1) 如何紧凑地表示顶点以缩短序列长度；(2) 如何将几何表面信息有效注入生成过程，使预测的顶点始终贴合目标表面。稀疏体素编码器的引入正是为了同时解决这两个问题：其层次化特征既作为顶点嵌入替代静态词汇表，又通过交叉注意力提供局部几何引导，同时以体素骨架约束生成空间，防止预测漂移。
-
-
 
 ## 核心方法与创新机理
 
@@ -108,8 +104,6 @@ MeshWeaver 利用稀疏体素编码器输出的非空体素作为**生成骨架*
 
 **总结**：MeshWeaver 通过上述四个槽位的协同改进，将网格生成重新定义为“在已知几何表面上的顶点编织过程”。稀疏体素编码器的层次化特征同时充当顶点嵌入、预测条件与表面骨架，使模型在单次自回归解码中实现由粗到精的顶点预测，并保证生成结果忠实贴合输入表面。这一设计从根本上解决了现有方法序列过长与几何保真度不足的双重瓶颈。
 
-
-
 MeshWeaver 将网格生成重新定义为**在已知几何表面上的顶点编织过程**，其核心流水线由两个紧密协作的模块构成：**稀疏体素编码器**（Sparse-Voxel Encoder）与**自回归 Transformer 解码器**（Autoregressive Transformer Decoder），如图 Figure 2 所示。
 
 ![[assets/figures/papers/MeshWeaver_Sparse-Voxel-Guided_Surface_Weaving_for_Autoregressive_Mesh_Generatio_dedf0c3daf25/figures/002_Figure_2.jpg]]
@@ -122,8 +116,6 @@ MeshWeaver 将网格生成重新定义为**在已知几何表面上的顶点编�
 **推理优化**：为提升效率，系统引入**交叉注意力 KV 缓存**机制——将稀疏体素特征提前映射为键值对并缓存，解码时仅检索子体积内的相关键值，使推理吞吐量从 26.8 tokens/s 提升至 30.7 tokens/s（约 14.5%），且不损失精度。训练阶段则通过**子体积剪枝**策略随机选取子体积及其关联顶点计算损失，大幅降低交叉注意力的计算开销。
 
 这一设计实现了紧凑的标记化（压缩率达 18%，创下自回归网格标记化新纪录），并使得单次解码即可生成贴合输入表面的高保真网格，支持高达 16K 面的高面数网格生成，突破了现有自回归方法的扩展限制。
-
-
 
 ### 3.1 预备知识：网格标记化
 
@@ -185,16 +177,6 @@ Table 3 的消融实验定量验证了各模块的因果贡献：
 - 同时移除 VF 和 CA 导致 CD 从 0.116 严重恶化至 0.158，HD 从 0.087 升至 0.138，证明几何上下文注入对高保真度重建至关重要；
 - 移除 GS 使 CD 升至 0.122，HD 升至 0.090，验证了稀疏体素约束对避免预测漂移的贡献。
 
-### 补充图表
-
-![[assets/figures/papers/MeshWeaver_Sparse-Voxel-Guided_Surface_Weaving_for_Autoregressive_Mesh_Generatio_dedf0c3daf25/figures/003_Figure_3.jpg]]
-*Figure 3: Network Architectures. Left: sparse-voxel encoder. Right: autoregressive transformer*
-
-![[assets/figures/papers/MeshWeaver_Sparse-Voxel-Guided_Surface_Weaving_for_Autoregressive_Mesh_Generatio_dedf0c3daf25/figures/004_Figure_4.jpg]]
-*Figure 4: Training-time Subvolume Pruning*
-
-
-
 ## 实验与关键发现
 
 ### 网格标记化效率
@@ -207,10 +189,6 @@ MeshWeaver 的核心设计动机之一是解决现有自回归网格生成方法
 ### 点云条件网格生成主结果
 
 在点云条件网格生成这一核心任务上，我们与多个自回归网格生成基线进行了定量对比，包括 **MeshGPT**（Siddiqui et al., CVPR 2024）、**EdgeRunner**（Tang et al., ICLR 2025）、**TreeMeshGPT**（Lionar et al., CVPR 2025）、**BPT** 以及 **DeepMesh**（Zhao et al., arXiv 2025）。结果如 Table 2 所示，MeshWeaver 在 Chamfer Distance（CD）和 Hausdorff Distance（HD）两项核心几何误差指标上均取得了显著优势，同时获得了最高的法线一致性比率（|NC|）。这表明，稀疏体素编码器注入的多级几何引导不仅提升了生成网格的整体形状精度，也更好地保留了局部表面细节与法线方向的一致性。定性结果（Figure 5）进一步显示，MeshWeaver 生成的网格边缘更锐利、拓扑更规整，且在复杂几何区域（如细薄结构）的保真度明显优于基线方法。此外，得益于紧凑的顶点级标记化，MeshWeaver 可生成高达 **16K 面**的高面数网格（Figure 1），突破了现有自回归方法的扩展限制。
-
-![[assets/figures/papers/MeshWeaver_Sparse-Voxel-Guided_Surface_Weaving_for_Autoregressive_Mesh_Generatio_dedf0c3daf25/figures/008_Figure.jpg]]
-
-![[assets/figures/papers/MeshWeaver_Sparse-Voxel-Guided_Surface_Weaving_for_Autoregressive_Mesh_Generatio_dedf0c3daf25/figures/009_Figure.jpg]]
 
 ![[assets/figures/papers/MeshWeaver_Sparse-Voxel-Guided_Surface_Weaving_for_Autoregressive_Mesh_Generatio_dedf0c3daf25/figures/006_Table_2.jpg]]
 *Table 2: Quantitative Results on Point-Cloud-Conditioned Mesh Generation*
@@ -240,17 +218,12 @@ MeshWeaver 的核心设计动机之一是解决现有自回归网格生成方法
 
 Table 4 报告了不同层级空间划分方案（不同 D₁、D₂ 组合及 Transformer 深度分配）的消融结果。实验表明，合理的层级划分（平衡各层体素粒度和解码器容量）对最终性能有显著影响，过于粗糙或过于细粒度的划分均会导致 CD/HD 上升。当前采用的配置在几何精度与序列压缩效率之间取得了最优平衡。
 
-![[assets/figures/papers/MeshWeaver_Sparse-Voxel-Guided_Surface_Weaving_for_Autoregressive_Mesh_Generatio_dedf0c3daf25/figures/011_Table_4.jpg]]
-*Table 4: Ablation Study on Level Partition*
-
 ### 失败模式与局限性
 
 尽管 MeshWeaver 在多项指标上取得了领先，我们仍观察到以下局限：
 - **极端细薄结构的表面编织**：当输入点云在极窄区域（如薄片边缘）存在稀疏或噪声采样时，稀疏体素骨架可能无法提供足够精细的表面约束，导致顶点编织出现局部错位或面片自交。这一问题在 Figure 6 的部分消融样本中有所体现。
 - **补丁中心顶点的压缩瓶颈**：当前顶点级标记化方案对所有顶点（包括补丁中心顶点）采用统一的多级体素索引表示。中心顶点承载了补丁遍历的拓扑骨架信息，其编码效率仍有提升空间。论文也指出，未来可为中心顶点设计独立的 token 词汇表以进一步降低压缩率。
 - **跨域泛化能力待验证**：当前实验主要基于刚性物体数据集，方法在非刚性物体、动态场景或跨域数据上的泛化能力尚未评估，需进一步研究。
-
-
 
 ## 定位与知识库关联
 
@@ -306,8 +279,6 @@ MeshWeaver 开辟了“几何引导的自回归编织”这一新范式，其核
 3. **多模态与交互式扩展。** 稀疏体素引导的编织策略能否拓展至纹理生成（将颜色信息纳入顶点表示）、蒙皮网格生成（引入骨骼约束）或交互式网格编辑（用户指定局部体素约束）？这些方向可能使 MeshWeaver 从生成工具演化为通用网格操作框架。
 
 4. **与大规模语言模型的融合。** 自回归 Transformer 解码器的架构与语言模型天然兼容，未来工作可探索将文本或图像条件融入交叉注意力机制，实现多模态条件网格生成。
-
-
 
 ## 原文 PDF
 

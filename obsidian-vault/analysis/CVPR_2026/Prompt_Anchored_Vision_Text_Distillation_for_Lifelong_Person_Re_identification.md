@@ -50,15 +50,11 @@ claims:
 
 **主要结果**：在AKA-order1（Market→CUHK-SYSU→Duke→MSMT17→CUHK03）上，PAD的已见域平均mAP达到70.7，相比此前最优方法DAFC（65.6）提升5.1个百分点；未见域平均mAP达到78.6，相比DKP++（65.7）提升12.9个百分点。消融实验证实，完整的双蒸馏组合相比仅使用VA-Prompt在已见域mAP上从65.3提升至70.7，弱文本蒸馏策略优于强蒸馏，选择性解冻最后4个Transformer块在性能与效率间取得最佳平衡。
 
-
-
 终身行人重识别（Lifelong Person Re-identification, LReID）要求模型在连续到达的监控域流上逐步学习，同时保持对已见身份的判别能力并泛化至未见域。与标准ReID不同，LReID面临**稳定性-可塑性困境**：模型必须在不访问旧数据的前提下，既吸收新域知识，又防止已学语义被覆盖。
 
 现有免样本回放（exemplar-free）方法主要依赖**视觉知识蒸馏**来维持旧知识：基于原型的策略存储类中心或分布信息，通过视觉特征蒸馏约束当前模型的漂移。然而，这一范式存在根本性瓶颈——**仅依赖视觉模态的蒸馏难以阻止语义漂移**。随着域累积，视觉特征空间中的身份语义逐渐混淆，已学习的判别结构被新域覆盖，导致已见域性能持续退化。
 
 本文提出**PAD（Prompt-Anchored vision–text Distillation）**，核心动机在于将**文本模态的语义稳定性**引入终身学习。关键洞察是：预训练视觉-语言模型（如CLIP-ReID）中的**冻结文本编码器**天然构成一个跨域不变的语义坐标系统——无论视觉域如何变化，“穿着红色上衣的行人”这一文本描述对应的语义锚点始终固定。PAD利用这一属性，将文本空间作为全局锚点，配合非对称蒸馏机制（弱文本蒸馏 + 强EMA视觉蒸馏），解耦**语义保持**与**域适应**两个子问题，从而在无样本回放约束下实现更稳定的终身学习。
-
-
 
 ## 核心方法与创新机理
 
@@ -98,8 +94,6 @@ PAD 的视觉侧采用**自适应提示池**机制，灵感来源于 **DualPromp
 ### 因果逻辑链
 
 冻结文本编码器 → 建立跨域稳定语义坐标 → TA-Prompt 弱蒸馏提供语义锚定 → 抑制语义漂移；VA-Prompt + 选择性解冻骨干 → 保留增量可塑性；EMA 视觉蒸馏 → 平滑视觉知识传递。两条路径协同，实现了**语义保持与域适应的解耦**——这是 PAD 相比纯视觉蒸馏方法的核心优势所在。
-
-
 
 PAD的整体架构由**非对称的双分支设计**构成：左侧为冻结的文本分支，提供跨域稳定的语义锚点；右侧为部分可训练的视觉分支，负责域自适应增量学习。两个分支通过**对称监督对比损失**和**多层次知识蒸馏**实现隐式与显式的语义对齐。图2展示了完整的框架结构。
 
@@ -147,12 +141,8 @@ $$\mathcal{L}_{\mathrm{KD}} = \lambda_{\mathrm{text}} \mathcal{L}_{\mathrm{TEXKD
 
 推理阶段仅保留视觉分支：冻结的文本编码器和TA-Prompt在训练完成后被丢弃，仅使用视觉编码器进行特征提取和检索。这一设计确保了推理效率不受文本模态开销的影响。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l776_https_arxiv_org_abs_2605_05027/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed PAD framework. The framework consists of a textual branch (left) and a visual branch (right) that evolve across domains. On the textual side, we use a frozen text encoder and distill the learnable textual prompts (TA-Prompt). On the visual side, we construct a visual prompt (VA-Prompt) pool and train last layers of the image encoder with a two-term visual distillation loss. The textual branch provides semantic guidance during training, while only the image encoder is kept for inference*
-
-
 
 PAD 的整体框架由两条非对称路径构成：**冻结的文本分支**提供跨域稳定的语义锚点，**部分可训练的视觉分支**负责域自适应学习。两条路径通过 TA-Prompt 和 VA-Prompt 两个提示机制协同工作。
 
@@ -213,13 +203,6 @@ $$\mathcal{L}_{\mathrm{supcon}} = \mathrm{SupCon}(\mathbf{v} \to \mathbf{t}) + \
 
 该损失使视觉特征向文本锚点聚集，同时文本锚点也向视觉特征靠拢，形成双向语义约束。与显式蒸馏不同，这一隐式对齐不依赖教师模型，而是通过标签引导的对比学习建立视觉-文本联合空间。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l776_https_arxiv_org_abs_2605_05027/figures/008_Figure_5.jpg]]
-*Figure 5: Trainable parameter composition across domains. The textual side (a) updates only the TA-Prompt, while the visual side (b) trains the VA-Prompt, classifier head, and a small portion of the backbone. Ratios are normalized within trainable modules, excluding the frozen text encoder*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -241,12 +224,6 @@ PAD在两种终身ReID评测协议（AKA-order1和AKA-order2）上均取得最�
 *Table S.2: Performance comparison with LReID methods on Training Order-2: LPW → MSMT17 → Market-1501 → CUHK-SYSU → CUHK03. The optimal and suboptimal values are highlighted in red and blue*
 
 从阶段性能趋势看，PAD在已见域上保持稳定，未见域性能随任务数增加而持续提升（Figure 3、Figure 4），体现了良好的稳定性-可塑性平衡。
-
-![[assets/figures/papers/paper_list_l776_https_arxiv_org_abs_2605_05027/figures/003_Figure_3.jpg]]
-*Figure 3: Performance tendency on seen domains (AKAorder1). After each training step, the model is evaluated on the already-seen domains*
-
-![[assets/figures/papers/paper_list_l776_https_arxiv_org_abs_2605_05027/figures/006_Figure_4.jpg]]
-*Figure 4: Performance tendency on unseen domains (AKAorder1). After each training step, the performance of all unseen domains is evaluated*
 
 ### 消融实验
 
@@ -276,21 +253,8 @@ VA-Prompt的激活相似度与域间特征相似度呈强正相关（ρ=0.77）�
 
 文本蒸馏强度目前依赖人工调节（λ_text权重的网格搜索），缺乏自适应机制。在域序列变化时，固定强度可能无法适配不同域间的语义距离差异。此外，当前方法仅处理图像模态与文本的对齐，尚未扩展到视频或换装ReID场景，在这些场景下冻结文本编码器的语义锚定能力有待验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l776_https_arxiv_org_abs_2605_05027/figures/007_Table_3.jpg]]
 *Table 3: Ablation study on AKA-order1. Columns indicate modules: Freeze—PAD freezing scheme, VA—Visual Adaptive Prompt, TEXKD—textual fixed distillation, VISKD—visual EMA distillation*
-
-![[assets/figures/papers/paper_list_l776_https_arxiv_org_abs_2605_05027/figures/009_Table_4.jpg]]
-*Table 4: Effect of textual distillation strength on AKA-order1. Weak/Strong differ only when TEXKD is enabled; for “No KD” and “VISKD only”, both columns are identical*
-
-![[assets/figures/papers/paper_list_l776_https_arxiv_org_abs_2605_05027/figures/012_Table_S.4.jpg]]
-*Table S.4: Effect of visual distillation strength (V1–V5). We report final stage average performance on both seen and unseen domains. Each configuration varies only in the feature- and logitlevel weights*
-
-![[assets/figures/papers/paper_list_l776_https_arxiv_org_abs_2605_05027/figures/015_Table_S.6.jpg]]
-*Table S.6: Effect of the number of unfrozen blocks. We report the final-stage seen-domain average, Market1501 performance, and trainable parameters. 4 blocks corresponds to the configuration used in the main paper*
-
-
 
 ## 定位与知识库关联
 
@@ -347,8 +311,6 @@ PAD的有效性依赖于以下前提：
 4. **文本锚点的质量依赖性**：当预训练视觉-语言模型的行人语义理解有限时（如对细粒度衣着、姿态属性的区分能力不足），文本锚点的稳定性是否会退化？如何量化并补偿这种退化？
 
 5. **与基于回放方法的混合策略**：在允许少量样本回放的宽松设定下，PAD的非对称蒸馏机制能否与回放策略互补，进一步压缩遗忘？
-
-
 
 ## 原文 PDF
 

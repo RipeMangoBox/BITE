@@ -69,8 +69,6 @@ claims:
 
 本文属于**电影计算分析与风格理解**方向，区别于传统的低级视觉特征方法。在特征提取层面，帧分层借鉴了单目深度估计（Li et al., CVPR 2019）和聚类技术；相机运动检测基于RAFT光流（Teed & Deng, ECCV 2020）和轻量MLP分类器。与直接使用3D ResNet（Hara et al., CVPR 2018）进行端到端分类的基线相比，本文主张**先提取语义明确的高级电影摄影特征**，再用于下游任务，这一思路更接近电影学中的形式分析范式。
 
-
-
 ### 导演风格的可识别性与低级特征的局限
 
 电影导演的个人风格具有跨年代、跨类型的可辨识性。如 **Figure 1** 所示，昆汀·塔伦蒂诺从 *Reservoir Dogs*（1992）到 *Kill Bill Vol.1*（2003）的作品中持续呈现仰角主视角镜头，而韦斯·安德森从真人电影 *The Grand Budapest Hotel*（2014）到动画片 *Fantastic Mr. Fox*（2009）均保持对称且细节丰富的场景构图。这种超越时间与类型的风格一致性表明，导演风格信息深嵌于电影的视觉语言之中。
@@ -92,8 +90,6 @@ claims:
 上述实验共同指向一个核心瓶颈：**原始视频帧和低级统计特征承载了大量与导演风格无关的信息**（如年代纹理、色彩饱和度、胶片颗粒等），这些无关信息主导了模型的学习方向，淹没了真正具有判别力的导演风格信号。
 
 由此催生了本文的核心动机：**转向提取高级电影摄影特征**——包括画面构图（深度分层、角色位置）、相机行为（运动类型与姿态）等电影语言要素。这些特征直接对应导演的创作决策，有望剥离无关的视觉噪声，为风格分析提供更纯净、更具判别力的表征。本文的工作即围绕两类关键高级特征的提取流程展开：帧分层（Frame Layering）与相机运动检测（Camera Motion Detection），为后续的风格分类任务奠定基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -127,8 +123,6 @@ claims:
 相机运动检测在MotionSet上达到96.81% F1（Table 2），远超随机基线（19.62%），验证了光流角度网格+MLP这一轻量方案对简单镜头运动的识别能力。帧分层方法在定性评估中展示了正确的分层与时序一致性（Figure 5a,b），但也暴露出对深度图噪声和聚类数选择的敏感性（Figure 5c,d），这构成了后续改进的关键方向。
 
 需要指出的是，**这两个高级特征提取流程尚未被集成到端到端的导演风格分类器中进行评估**，因此其对风格分类任务的实际提升效果仍有待验证。这是当前工作的核心局限，也是未来研究的关键突破口。
-
-
 
 ### 问题定位：低级特征在导演风格识别中的瓶颈
 
@@ -176,15 +170,11 @@ claims:
 
 然而，这两个模块尚未被集成到一个端到端的导演风格分类器中。七类高级特征中尚有多个维度未实现，如何有效融合这些特征以显著提升风格分类性能，是本文留下的核心开放问题。
 
-### 补充图表
-
 ![[assets/figures/papers/movie_style_37aa66b0e22c/figures/004_Figure_3.jpg]]
 *Figure 3: Frame layering pipeline.Raw frames are used to estimate depths maps,which are converted into a discrete set of layers*
 
 ![[assets/figures/papers/movie_style_37aa66b0e22c/figures/005_Figure_4.jpg]]
 *Figure 4: Camera motion detection pipeline.Consecutive raw frames are used to compute forward and backward optical flows that are converted to angle grids. Once flattened,angle grids are fed to a MLP that learns the camera motion*
-
-
 
 本文提出两条并行的高级电影摄影特征提取流水线：**帧分层（Frame Layering）** 与 **相机运动检测（Camera Motion Detection）**，二者均以连续原始帧为输入，分别输出离散深度层地图与相机运动类别，为后续导演风格分类提供结构化表征。以下分述其核心模块。
 
@@ -223,8 +213,6 @@ claims:
 
 > **注意**：以上变量含义均来自原文对流水线的文字描述，未出现显式编号公式。若需更严格的数学定义，建议回溯原始深度估计 和 RAFT 的原论文。
 
-
-
 ## 实验与关键发现
 
 ### 低级特征在导演识别中的局限性
@@ -252,18 +240,8 @@ claims:
 
 需指出若干实验设计上的限制：MotionSet仅包含75个片段，规模小且运动类型覆盖不全，相机运动检测的泛化性能仍需在更大规模的真实电影片段上验证；CMD8数据集仅涵盖8位导演，样本量有限可能放大过拟合风险；帧分层与相机运动检测目前仅作为独立模块评估，尚未集成至端到端的导演风格分类器中，其对风格理解任务的实际增益尚未量化验证。
 
-### 补充图表
-
-![[assets/figures/papers/movie_style_37aa66b0e22c/figures/002_Table_1.jpg]]
-*Table 1: ． Director classification results*
-
-![[assets/figures/papers/movie_style_37aa66b0e22c/figures/001_Figure_1.jpg]]
-*Figure 1: Recognisable director movie styles.Eight frames from eight movies from two directors: (a) Quentin Tarantino and (b) Wes Anderson. Even movies from different years (Reservoir Dogs in 1992 to Kill Bill Vol.1 in 2OO3) and different types (The Grand Budapest Hotel with live action or Fantastic Mr:Fox with animation) from the same director encompass a common style,i.e., trunk-style looking-up point-of-view shot for(a); symetric and detailed scenes for(b).From the top-left to the bottom-right: Kill Bill Vol.1 (2003),ReservoirDogs(1992),Pulp Fiction (1994),DeathProof (2007), TheFrench Dispatch (2021),The Grand Budapest Hotel (2014),The Life Aquatic with Steve Zissou (2O04) and Fantastic Mr. Fox (2...*
-
 ![[assets/figures/papers/movie_style_37aa66b0e22c/figures/003_Figure_2.jpg]]
 *Figure 2: t-SNE visualization of feature embedding on CMD8. Clusters correspond to: (1) 1970s movies,(2) 1980s movies,(3) black and white movies,(4) 1990s movies and (5) 2000s movies*
-
-
 
 ## 定位与知识库关联
 
@@ -323,8 +301,6 @@ claims:
 6. 除视觉特征外，音频特征（如主动说话人检测）和配乐分析是否能进一步提升风格理解？
 
 **需注意**：由于论文未提供具体基线工作的完整引用信息（如Random和Weighted Random基线的出处），这些基线的来源和实现细节需要手动核实。同样，CMD8和MotionSet数据集的构建细节在给定材料中未充分展开，其统计特性（如类别分布、片段长度分布）对实验结论的影响需要进一步确认。
-
-
 
 ## 原文 PDF
 

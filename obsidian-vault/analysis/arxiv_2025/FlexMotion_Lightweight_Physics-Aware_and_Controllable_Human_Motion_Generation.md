@@ -56,8 +56,6 @@ claims:
 
 **证据强度**：上述结论由多组消融实验强力支撑——移除欧拉-拉格朗日损失或肌肉损失均导致物理指标大幅劣化（Table 8）；潜在空间维度与物理约束权重存在明确的最优配置（Tables 9–10）。需注意，训练阶段依赖 OpenSim 进行数据增强，且物理约束权重需手动权衡真实感与物理准确性，这是当前方法的已知局限。
 
-
-
 人体运动生成是计算机视觉与图形学中的核心问题，其应用涵盖动画制作、虚拟现实、机器人仿真和人机交互等领域。近年来，扩散模型在文本到运动生成任务上取得了显著进展，涌现出 **MDM**（Tevet et al., 2023）、**MotionDiffuse**（Zhang et al., 2022）、**MLD**（Chen et al., 2023）等一系列代表性工作。然而，现有方法在以下三个维度上存在系统性妥协，构成了该领域的关键瓶颈。
 
 **计算效率与物理真实性的两难。** 当前方法大致分为两类：一类在原始运动表示空间（如 SMPL 参数或关节位置序列）上直接运行扩散过程，虽能保持一定的生成多样性，但计算开销极大——例如 MDM 生成 2048 个运动片段需耗时约 225 秒（DDIM 50 步推理）；另一类方法如 **PhysDiff**（Yuan et al., 2023）在扩散过程中引入外部物理模拟器进行运动校正，虽能改善物理合理性，但模拟器的串行调用进一步加剧了推理延迟，且将物理约束置于生成流程之外，难以实现端到端优化。
@@ -67,8 +65,6 @@ claims:
 **空间可控性的维度局限。** 以 **OmniControl**（Xie et al., 2023）为代表的现有可控生成方法，其控制信号通常仅限于关节位置或末端轨迹的空间约束，无法对肌肉激活水平、关节驱动力矩、接触力分布等更深层的物理参数进行显式操控。这限制了运动生成在需要精细物理交互的场景（如康复训练动作合成、体育动作分析）中的应用潜力。
 
 FlexMotion 的提出正是为了打破上述妥协。其核心动机在于：是否可以在不依赖外部物理模拟器的前提下，将生物力学约束直接嵌入生成模型的训练目标，同时在低维潜在空间中运行扩散过程以保持计算效率，并进一步提供对多维物理参数的即插即用式空间控制？这一思路的关键洞察是：通过预训练的物理感知自编码器将复杂的多模态运动数据压缩到潜在空间，并在重建过程中显式施加欧拉-拉格朗日动力学损失与肌肉协调损失，即可使生成框架在保持轻量化的同时获得物理合理性保证，而无需在推理阶段调用任何物理引擎。
-
-
 
 ## 核心方法与创新机理
 
@@ -103,8 +99,6 @@ $$`\epsilon_{\theta_{\mathrm{total}}}(\mathbf{X}_n^e, C^e, n, c) = \epsilon_\the
 
 零初始化确保训练初期控制支路输出为零，完全保留预训练模型的生成能力；随后逐步学习将控制信号 $`C^e`$ 融入去噪过程，实现“即插即用”。这一设计使得 FlexMotion 能够在文本提示的基础上，进一步通过空间掩码精确指定某块肌肉的激活程度、某个关节的驱动力矩或特定接触点的受力大小（Figure 1），这是此前所有基线方法均不具备的能力。
 
-
-
 FlexMotion 的整体架构由三个核心模块串联构成，形成一个“压缩—生成—控制”的流水线，如 Figure 2 所示。其设计目标是在不依赖外部物理模拟器的前提下，实现轻量、物理合理且可控的人体运动生成。
 
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2501_16778/figures/002_Figure_2.jpg]]
@@ -131,8 +125,6 @@ FlexMotion 的整体架构由三个核心模块串联构成，形成一个“压
 **端到端流程**
 
 推理时，用户提供文本提示和可选的控制信号（如指定某关节的空间轨迹或某肌群的激活模式）。文本条件通过潜在扩散模型生成潜在运动序列，控制信号通过可控性模块注入约束；生成的潜在序列经物理感知解码器重建为包含关节运动学、肌肉激活、力矩和接触力的完整多模态运动。整个过程无需调用外部物理引擎，物理合理性由自编码器端到端保证。
-
-
 
 FlexMotion 的整体架构由三个核心模块串联构成（Figure 2）：**物理感知多模态自编码器**、**潜在空间运动扩散模型**和**空间可控性模块**。其设计逻辑是：先通过自编码器将高维多模态运动数据压缩到低维潜在空间并嵌入物理约束，再在该潜在空间中执行轻量扩散生成，最后以即插即用的零卷积支路引入对多种运动参数的精细控制。
 
@@ -223,8 +215,6 @@ $$
 
 该模块首次支持对肌肉激活、关节驱动力矩、接触力等多维物理参数进行显式控制，而此前方法（如 **OmniControl**（Xie et al., 2023））仅能控制关节位置或轨迹。
 
-
-
 ## 实验与关键发现
 
 FlexMotion 在 HumanML3D、KIT-ML 和 Flag3D 三个数据集上与多个主流基线进行了全面对比。实验覆盖无条件生成、文本条件生成以及多种空间控制条件下的表现，所有方法均在相同数据集上使用单块 NVIDIA 4090 GPU 重新训练，确保计算资源和数据条件一致。
@@ -244,15 +234,9 @@ FlexMotion 在 HumanML3D、KIT-ML 和 Flag3D 三个数据集上与多个主流�
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2501_16778/figures/006_Table_3.jpg]]
 *Table 3: Flag3D test set Tang et al. (2023): Performance comparisons of text-to-motion synthesis methods. The complete table can be found in the appendix*
 
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2501_16778/figures/008_Table_5.jpg]]
-*Table 5: HumanML3D test set Guo et al. (2022b) : Performance comparisons of text-to-motion synthesis methods*
-
 ### 计算效率
 
 Table 4 对比了各方法生成 2048 个运动片段的计算开销。FlexMotion 在 DDIM 50 步采样下的推理时间仅为 13.158 秒，而 MDM 需要 225.283 秒，加速约 17 倍。这得益于扩散过程在低维潜在空间（$1 \times 1024$）中运行，而非原始高维运动表示空间。
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2501_16778/figures/007_Table_4.jpg]]
-*Table 4: Performance comparison of methods in terms of computational efficiency to generate 2048 motion clips*
 
 ### 消融实验
 
@@ -266,24 +250,8 @@ Table 4 对比了各方法生成 2048 个运动片段的计算开销。FlexMotio
 
 尽管 FlexMotion 在推理阶段无需物理模拟器，但其训练阶段依赖 OpenSim 进行数据增强，需要额外的计算资源和生物力学专业知识来预处理原始运动数据。模型训练分为自编码器、扩散模型、可控性模块三个串行阶段，流程相对复杂，可能增加工程实现难度。物理约束权重需要在真实感与物理准确性之间手动权衡，默认参数可能不适用于所有应用场景。此外，潜在空间压缩是否丢失了某些高频运动细节，以及可控性模块在极端运动条件下的精度，仍需进一步验证。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2501_16778/figures/001_Figure_1.jpg]]
-*Figure 1: The proposed FlexMotion can generate physically-plausible human motion sequences using text prompt and spatial control over diverse motion kinematic properties, including (a) contact forces, (b) joint locations, (c) muscle activation, and (d) joint actuation*
-
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2501_16778/figures/011_Table_8.jpg]]
 *Table 8: Ablation study results on HumanML3D dataset*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2501_16778/figures/012_Table_9.jpg]]
-*Table 9: Ablation study results on HumanML3D dataset with varying latent space dimensions*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2501_16778/figures/013_Table_10.jpg]]
-*Table 10: Trade-offs Between Realism and Physical Accuracy: Comparison of FlexMotion’s performance with and without physical constraints on the HumanML3D dataset*
-
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2501_16778/figures/009_Table_6.jpg]]
-*Table 6: KIT-ML test set Plappert et al. (20 1 6) : Performance comparisons of text-to-motion synthesis methods*
-
-
 
 ## 定位与知识库关联
 
@@ -329,8 +297,6 @@ FlexMotion 开辟了物理感知运动生成的新范式，但以下问题有待
 3. **潜在表示的改进**。Table 9 揭示的潜在维度增大导致性能退化现象，暗示当前基于 Transformer 的自编码器可能存在表示学习的瓶颈。探索 VQ-VAE、层次化潜在结构或流形学习等替代方案，有望在保持物理约束的前提下提升潜在空间的表示效率和生成质量。
 
 4. **物理约束权重的自适应策略**。Table 10 的折中分析表明，物理约束权重对真实感-物理准确性的平衡有显著影响，且最优权重可能需要随运动类型动态调整。设计基于运动上下文的自适应权重调节机制（如根据运动剧烈程度自动缩放 $\gamma_{\mathrm{euler}}$），将减少人工调参负担并提升模型在不同场景下的鲁棒性。
-
-
 
 ## 原文 PDF
 

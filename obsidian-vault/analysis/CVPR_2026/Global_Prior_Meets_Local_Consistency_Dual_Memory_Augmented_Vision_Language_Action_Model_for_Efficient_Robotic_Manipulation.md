@@ -50,8 +50,6 @@ claims:
 
 **主要结果**：在 LIBERO 基准上，OptimusVLA 取得 **98.6%** 的平均成功率，超越强基线 π0.5（96.9%）；在 CALVIN 上平均完成长度达 **4.45**，较 π0 提升 13.5%；在 RoboTwin 2.0 Hard 设定下平均成功率 **38%**，领先 π0.5 达 9 个百分点；真实世界泛化任务成功率 **85.0%**。同时，GPM 将长序列任务的 NFE 从 10.0 降至 3.2，推理效率提升显著。消融实验表明，移除 GPM 导致真实世界泛化任务成功率骤降 9.4%，验证了任务级先验在泛化中的关键作用。
 
-
-
 ### 机器人操作的层级式VLA范式
 
 视觉-语言-动作（Vision-Language-Action, VLA）模型已成为机器人操作策略学习的主流范式。其中，层级式VLA架构——如 **π0** 和 **π0.5**——通过将高层语义理解与低层动作生成解耦，在复杂操作任务上展现出强大能力。这类模型通常采用条件流匹配（Conditional Flow Matching）作为动作生成的核心机制：从先验分布采样初始点，沿最优传输路径逐步去噪，生成目标动作块。
@@ -74,8 +72,6 @@ claims:
 - **局部一致性约束**：近期动作序列蕴含丰富的任务进度信息。通过轻量级工作记忆动态编码历史动作并预测一致性偏置，可显式强制时间连贯性，使策略具备进度感知能力。
 
 基于上述动机，本文提出 **OptimusVLA**，通过双记忆增强机制——全局先验记忆（Global Prior Memory, GPM）和局部一致性记忆（Local Consistency Memory, LCM）——在不改变预训练VLA骨干的条件下，系统性地解决推理效率与时间鲁棒性两大瓶颈。
-
-
 
 ## 核心方法与创新机理
 
@@ -107,8 +103,6 @@ OptimusVLA 的核心创新在于通过**双记忆架构**（GPM + LCM）对层�
 
 两个创新模块均以**即插即用**方式附加在预训练 VLA 骨干之上，无需修改原有视觉-语言编码器或流策略网络权重。OptimusVLA 直接从 π0.5 权重初始化，仅新增 GPM 和 LCM 参数（总参数量 3.6B），即可在**显著减少训练步数**的情况下超越 π0.5 的性能（Figure 4），验证了“改造先验与约束”而非“重新训练整体”这一技术路线的有效性。
 
-
-
 OptimusVLA 的整体框架遵循“感知—记忆检索—一致性编码—流匹配生成”的四阶段流水线，在不修改预训练 VLA 骨干的前提下，将全局任务先验与局部时间一致性注入动作生成过程。如 Figure 2 所示，系统由四个核心模块构成：
 
 ![[assets/figures/papers/paper_list_l2236_https_arxiv_org_abs_2602_20200/figures/002_Figure_2.jpg]]
@@ -120,8 +114,6 @@ OptimusVLA 的整体框架遵循“感知—记忆检索—一致性编码—流
 4. **Flow Policy（流策略）**：以 GPM 采样的初始点 $\hat{\mathbf{X}}_t$ 与 LCM 偏置 $\mathbf{B}_t$ 之和 $\mathbf{X}_t = \hat{\mathbf{X}}_t + \mathbf{B}_t$ 作为输入（Eq. 6），沿最优传输路径 $x_t = (1-t)x_0 + t x_1$ 进行条件流匹配去噪，生成未来 $H$ 步动作块 $\mathbf{a}_{t+1:t+H}$。
 
 **数据流与关键机制**：VLM 编码后的嵌入 $E_{emb}$ 同时驱动 GPM 的检索过程与 LCM 的时序建模，形成“全局语义锚定 + 局部动态约束”的双记忆协同架构。GPM 从根本上缩小了先验分布与目标动作分布之间的差距，使得流策略仅需少量去噪步骤即可生成可行样本；LCM 则以轻量级推理开销为策略注入进度感知能力，强制相邻动作块之间的平滑过渡。两者均以即插即用的方式附加于预训练流策略之上，训练时采用分阶段策略——先独立训练 GPM 和 LCM，再与流策略联合微调。
-
-
 
 ### 3.1 整体框架与多模态嵌入
 
@@ -193,12 +185,8 @@ GPM、LCM 和流策略目前采用分阶段训练：
 
 OptimusVLA 从 **π0.5** 权重初始化，总参数量约 3.6B。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2236_https_arxiv_org_abs_2602_20200/figures/001_Figure_1.jpg]]
 *Figure 1: Top: Comparison between the standard VLA architecture (left) and our proposed OptimusVLA (right). (ii) Poor robustness to temporal dependence. Middle: Illustration of how GPM (blue) and LCM (green) address two key limitations of existing VLA models: (i) Low inference efficiency due to a large prior–target gap. (ii) Poor robustness to temporal dependence. Bottom: Efficiency and performance comparison*
-
-
 
 ## 实验与关键发现
 
@@ -249,36 +237,14 @@ Figure 6 展示了 OptimusVLA 在仿真与真实世界任务中的定性行为�
 
 4. **环境迁移性未充分验证。** 实验主要集中在桌面操作环境，向更开放、动态场景的迁移能力有待进一步评估。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2236_https_arxiv_org_abs_2602_20200/figures/003_Table_1.jpg]]
 *Table 1: Performance comparison on LIBERO [26]. We report the average success rate on each task suite (500 rollouts)*
 
 ![[assets/figures/papers/paper_list_l2236_https_arxiv_org_abs_2602_20200/figures/004_Table_2.jpg]]
 *Table 2: Performance comparison on CALVIN [34]. We report the success rate of each track and average completion length (Avg. Len). † represents the result we reproduced*
 
-![[assets/figures/papers/paper_list_l2236_https_arxiv_org_abs_2602_20200/figures/005_Table_3.jpg]]
-*Table 3: Performance comparison on RoboTwin 2.0 [5]. We report per-task success rates (SR) and rank (RK) over 100 rollouts under Hard setting. † represents the result we reproduced. 16 tasks results are available in Appendix*
-
 ![[assets/figures/papers/paper_list_l2236_https_arxiv_org_abs_2602_20200/figures/006_Table_4.jpg]]
 *Table 4: Ablation study of GPM and LCM on LIBERO-Long, CALVIN, and Real-World Generalization Tasks*
-
-![[assets/figures/papers/paper_list_l2236_https_arxiv_org_abs_2602_20200/figures/007_Table_5.jpg]]
-*Table 5: Ablation study on memory size of GPM. We report average success rate on LIBERO-Long. Num. denotes the number of trajectories in the memory bank, k. denotes the number of retrieved trajectories*
-
-![[assets/figures/papers/paper_list_l2236_https_arxiv_org_abs_2602_20200/figures/008_Figure_3.jpg]]
-*Figure 3: Real-world task setup and evaluation results. We evaluate the performance of OptimusVLA against OpenVLA [14], OpenVLA-OFT [15], π0 [1], and π0.5 [12] on the Generalization Tasks and Long-horizon Tasks suites*
-
-![[assets/figures/papers/paper_list_l2236_https_arxiv_org_abs_2602_20200/figures/009_Figure_4.jpg]]
-*Figure 4: Training efficiency comparison between OptimusVLA and π0.5 [12]. Initialized from same weights, OptimusVLA attains strong performance with substantially fewer training steps*
-
-![[assets/figures/papers/paper_list_l2236_https_arxiv_org_abs_2602_20200/figures/010_Figure_5.jpg]]
-*Figure 5: Inference efficiency comparison on LIBERO and Real-World. OptimusVLA attains strong performance with substantially fewer inference time and NFEs*
-
-![[assets/figures/papers/paper_list_l2236_https_arxiv_org_abs_2602_20200/figures/012_Table_6.jpg]]
-*Table 6: Hyperparameter setting for each training phase*
-
-
 
 ## 定位与知识库关联
 
@@ -321,8 +287,6 @@ OptimusVLA 的设计假设决定了其适用范围：
 2. **端到端联合训练**：能否统一优化 GPM、LCM 与流策略，让检索和一致性约束与动作生成目标直接对齐？
 3. **更大规模扩展**：在多任务、多具身的大规模数据下，检索效率与记忆库扩展性如何保障？是否需要引入层次化检索或压缩存储？
 4. **LCM 的长序列扩展**：LCM 是否可扩展至更长历史窗口，或与注意力机制融合，以提升跨子任务的时间一致性建模？
-
-
 
 ## 原文 PDF
 

@@ -52,8 +52,6 @@ claims:
 
 在方法谱系上，MotionAgent 区别于传统的文本编码器控制范式（如 DynamiCrafter、CogVideoX）和专用模块控制范式（如 Motion-I2V），开创性地将大语言模型作为运动信息解析器，以显式光流作为统一的中间控制表示，实现了对物体和相机运动的同步、精确控制。其局限性主要在于：动态度指标偏低（因未提及的物体被有意保持静止以实现精确控制）、依赖 GPT-4o 等大模型的推理能力、以及需要额外微调光流适配器来弥合域差异。
 
-
-
 图像到视频（I2V）生成旨在根据单张静态图像和文本描述生成一段动态视频，其核心挑战在于如何精确地控制视频中的运动。现有I2V方法大致可分为两类：一类将运动控制完全交由文本编码器处理，通过文本嵌入隐式地驱动视频生成；另一类则引入专用控制模块，依赖用户手动提供轨迹、相机外参等专业输入来实现运动引导。
 
 然而，这两条技术路线均存在根本性瓶颈。文本编码器方式虽然使用便捷，但文本嵌入对运动的表征能力有限，难以实现对画面中每个元素的细粒度控制——例如，无法精确指定“画面左侧的红色气球向上移动，同时右侧的蓝色气球向下移动”这类多物体差异化运动。专用控制模块方式虽然能提供更精确的运动引导，但要求用户具备专业知识并手动绘制轨迹或设定相机参数，使用门槛极高；更重要的是，现有方法大多无法同时控制物体运动和相机运动，难以满足真实场景中“物体移动且镜头跟随”的复合控制需求。
@@ -61,8 +59,6 @@ claims:
 上述瓶颈的根源在于，运动信息在文本与控制信号之间缺乏一种显式、可解释且统一的中间表示。文本描述是抽象的、语义层面的，而视频生成模型所需的控制信号是像素级的、几何层面的，两者之间存在巨大的语义鸿沟。如何将自然语言中的运动描述自动、精确地转化为可作用于扩散模型的控制信号，是I2V领域尚未被充分解决的关键问题。
 
 针对这一缺口，本文提出MotionAgent，核心思路是引入**运动场智能体（Motion Field Agent）** 作为文本与视频生成之间的桥梁。该智能体将视频运动解耦为物体运动和相机运动两个分量，利用大语言模型（LLM）将文本中的运动描述显式转化为物体轨迹和相机外参这两种可解释的中间表示；随后通过分析光流组合模块在3D空间中将二者整合为统一光流图，作为扩散模型的控制条件。这一设计使得用户仅需自然语言即可实现对物体运动和相机运动的同步、细粒度控制，无需任何专业输入，且无需针对特定控制信号训练专用生成模型。
-
-
 
 ## 核心方法与创新机理
 
@@ -98,8 +94,6 @@ MotionAgent 引入**运动场智能体（Motion Field Agent）**，利用大语�
 
 MotionAgent 还引入了一个可选的**重思考（Rethinking）机制**：智能体在生成视频后，根据结果评估运动执行质量，并自动修正之前的轨迹或外参。这一闭环设计使模型具备了自我纠错能力——在 VBench 上，重思考将 Video-Text Camera Motion 从 81.91% 进一步提升至 87.02%，复杂相机运动从 77.76% 提升至 89.04%。
 
-
-
 ![[assets/figures/papers/paper_list_l21_MotionAgent_Fine_grained_Controllable_Video_Generation_via_Motion_Field/figures/001_Figure_1.jpg]]
 *Figure 1: Different frameworks of I2V generation models. (a) Controllable I2V generation via text encoder. (b) Controllable I2V generation via special control module. (c) Our method, controllable I2V generation via motion field agent*
 
@@ -124,8 +118,6 @@ $$F = I^{1} - I^{0}$$
 ### 光流适配器与基础扩散模型
 
 统一光流图作为控制条件输入光流适配器。适配器在合成光流上进行了微调，以弥合统一光流与真实光流之间的域差异——训练数据通过 Unimatch 估计真实光流、DROID-SLAM 计算相机外参，并分离出物体运动光流 $\hat{F}_{obj}$ 作为伪标签。基础扩散模型采用冻结的 Stable Video Diffusion（SVD），适配器的控制信号注入其中，最终生成精确受控的视频帧序列。
-
-
 
 ### 运动场智能体（Motion Field Agent）
 
@@ -175,8 +167,6 @@ $$\hat{F}_{obj} = I_{obj}^{1} - I^{0}$$
 ### 基础扩散模型
 
 MotionAgent 采用冻结的预训练 **Stable Video Diffusion（SVD）** 作为基础图像到视频扩散模型。光流适配器接收统一光流图作为控制条件，将其注入扩散模型的去噪过程，最终生成精确受控的视频帧序列。
-
-
 
 ## 实验与关键发现
 
@@ -229,33 +219,17 @@ MotionAgent 在通用视频生成质量和细粒度运动控制两个维度上�
 - 在 VBench 上，Video-Text Camera Motion 从 81.91% 进一步提升至 **87.02%**。
 - 在细粒度基准上，Complex Camera Motion 从 77.76% 跃升至 **89.04%**，Object Movement Q&A 也从 45.69% 提升至 49.58%。
 
-![[assets/figures/papers/paper_list_l21_MotionAgent_Fine_grained_Controllable_Video_Generation_via_Motion_Field/figures/014_Table_6.jpg]]
-*Table 6: Evaluation results of general I2V generation on VBench [26] (all values are in percentage). The best result is indicated in bold*
-
 Figure 7 展示了一个典型案例：智能体在观察到初始生成视频的相机运动幅度不足后，自动放大了 z 轴方向的平移量，从而修正了相机运动。这一闭环反馈机制显著增强了系统对复杂运动描述的鲁棒性。
 
 ### 鲁棒性与局限性
 
 **复杂/模糊文本的鲁棒性。** Table 7 评估了 MotionAgent 在复杂和模糊文本提示下的表现。尽管性能相比清晰提示有所下降，但该方法仍以显著优势超过所有对比方法，说明运动场智能体对运动语义的解析具有一定泛化能力。
 
-![[assets/figures/papers/paper_list_l21_MotionAgent_Fine_grained_Controllable_Video_Generation_via_Motion_Field/figures/015_Table_7.jpg]]
-*Table 7: Results of complex and ambiguous controllable I2V generation*
-
 **主要失败模式与局限。**
 1. **动态度偏低**：模型倾向于只移动文本提及的物体，这在实现精确控制的同时导致 Dynamic Degree 指标较低，可能影响生成视频的“生动感”。
 2. **对 LLM 的依赖**：运动场智能体依赖 GPT-4o 等大模型的推理能力，面对极端复杂或高度模糊的文本时，解析准确度会下降（Table 7），且推理成本较高。
 3. **子模块误差累积**：物体识别依赖 Grounded-SAM，光流估计依赖 Unimatch，深度估计和相机位姿估计依赖 DROID-SLAM，这些子模块的误差会传播并影响最终视频质量。
 4. **重思考的代价**：重思考机制引入了额外的推理和生成步骤，增加了整体耗时。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l21_MotionAgent_Fine_grained_Controllable_Video_Generation_via_Motion_Field/figures/006_Figure.jpg]]
-*Figure: Ours DynamiCrafter CogVideoX Pyramid Flow The bigger hot-air balloon flies downward, the smaller hot-air balloon flies upward*
-
-![[assets/figures/papers/paper_list_l21_MotionAgent_Fine_grained_Controllable_Video_Generation_via_Motion_Field/figures/020_Figure_14.jpg]]
-*Figure 14: User study interface. Each participant is required to evaluate 30 groups of videos and respond to two corresponding subquestions for each group. Only one group of videos and two sub-questions are shown here due to the page limit*
-
-
 
 ## 定位与知识库关联
 
@@ -318,8 +292,6 @@ Figure 7 展示了一个典型案例：智能体在观察到初始生成视频�
 6. **子模块误差的量化分析**：深度估计和光流估计模型的误差对最终视频质量的影响有多大？目前缺乏系统的误差传播分析。
 
 7. **基准覆盖范围**：自建基准的规模有限，对运动控制精度的评估可能无法覆盖所有场景，需要更大规模和更多样化的评测基准。
-
-
 
 ## 原文 PDF
 

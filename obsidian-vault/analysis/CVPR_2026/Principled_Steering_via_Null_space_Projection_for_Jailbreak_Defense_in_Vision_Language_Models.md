@@ -50,8 +50,6 @@ claims:
 
 实验结果表明，NullSteer 在安全性和通用性上均显著优于现有方法。在 MiniGPT-4 的无约束攻击下，NullSteer 将毒性得分降至 2.89%，越狱成功率（ASR）降至 7.32%，优于 ASTRA（4.48% / 9.09%）等强基线（Table 1）。在良性基准 MM-Vet、MMBench 和 XSTest 上，NullSteer 保持与未防御模型相当甚至更好的性能，避免了过拒绝问题（Table 2）。域外泛化实验中，NullSteer 在结构化攻击、扰动攻击和纯文本攻击上均取得最低 ASR，验证了其转向方向的可迁移性（Table E）。消融实验进一步证实，零空间约束、拒绝对齐和有害抑制三者的协同是实现安全-效用最优平衡的关键。
 
-
-
 视觉语言模型（VLM）在图像理解与文本生成任务中展现了强大的能力，但其对多模态输入的开放性也使其易受越狱攻击——攻击者通过构造恶意图像或文本提示，诱导模型生成有害内容。这一问题严重制约了 VLM 在安全敏感场景中的部署。
 
 现有的 VLM 安全防御方法大致分为三类：（1）**系统提示方法**，如 **Self-Reminder**（Xie et al., Nat. Mach. Intell., 2023），通过在输入中加入安全提示约束模型行为，但容易被精心设计的越狱提示绕过；（2）**输入扰动检测方法**，如 **JailGuard**（Zhang et al., arXiv 2023），试图在输入端识别恶意扰动，但面对自适应攻击时检测能力有限；（3）**激活转向方法**，如 **ASTRA**（Wang et al., CVPR 2025）和 **Refusal Pairs**（Rimsky et al., ACL 2024），在推理时直接修改模型的隐藏层激活，将输出导向拒绝方向。
@@ -65,8 +63,6 @@ $$ \mathbf{h}^{(l)'} = \mathbf{h}^{(l)} + \lambda \mathbf{r}^{(l)} $$
 这一问题的本质在于，现有方法缺乏对“何时转向、向何处转向”的原则性约束。转向向量的选择和注入缺乏理论解释性，使得安全增强与通用能力保持之间难以取得平衡。具体而言，若能将转向变换完全约束在“不影响良性表示”的方向上，则可以在理论上保证良性提示的不变性，同时仅对有害激活产生定向的拒绝转向。
 
 这一洞察驱动了本文的核心动机：**利用良性激活的零空间作为转向的可行域**，构建一个有理论保证的激活转向框架，在实现安全防御的同时保持模型的通用性能。
-
-
 
 ## 核心方法与创新机理
 
@@ -111,8 +107,6 @@ $$ \tilde { \mathbf { A } } ^ { \star } = ( \mathbf { R } + \beta \mathbf { V } 
 
 这一原则性设计在实验中转化为显著的性能优势。在 MiniGPT-4 的无约束攻击下，NullSteer 将毒性得分降至 **2.89%**，越狱成功率降至 **7.32%**，均优于最强的基线 ASTRA（4.48% / 9.09%）（Table 1）。更重要的是，在 MM-Vet、MMBench 和 XSTest 等良性基准上，NullSteer 保持了与未防御模型相当甚至更好的性能（Table 2），验证了零空间约束对通用能力的保护效果。域外泛化实验（Table E）进一步表明，这一约束下学到的转向方向具有跨攻击类型的可迁移性。
 
-
-
 NullSteer 的整体设计围绕一个核心约束展开：**将激活转向变换完全限制在良性激活的零空间内**。这一约束从理论上保证了良性提示的隐藏状态在推理时保持不变，从而从根本上解决了现有激活转向方法（如 ASTRA、Refusal Pairs）中普遍存在的过拒绝问题。
 
 ### Pipeline 总览
@@ -145,8 +139,6 @@ NullSteer 的工作流分为四个阶段，如图 Figure 2 所示：
 | 对良性输入的影响 | $\lambda r$ 对所有输入施加偏向，导致良性表示偏移 | $\Delta P h_b = 0$，良性激活理论上完全不变（Eq. 4） |
 
 这一设计使得 NullSteer 在实现安全增强的同时，在 MM-Vet、MMBench 和 XSTest 等良性基准上保持了与未防御模型相当甚至更好的性能（Table 2），从根本上避免了过拒绝。
-
-
 
 ### 3.1 激活转向的数学形式与过拒绝问题
 
@@ -226,13 +218,6 @@ NullSteer 在激活转向防御谱系中引入了**零空间约束**这一新维
 
 与 **Self-Reminder** (Xie et al., Nat. Mach. Intell., 2023) 的系统提示方法、**JailGuard** (Zhang et al., arXiv 2023) 的输入扰动检测方法相比，NullSteer 属于**表示层干预**范式，无需修改输入或微调模型参数，且通过理论保证避免了过拒绝问题。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l775_https_arxiv_org_abs_2603_22094/figures/001_Figure_1.jpg]]
-*Figure 1: Illustration of activation steering. Injecting a refusal vector into hidden states steers the model toward rejection behaviors, which mitigates harmful responses but can also lead to overrefusal on benign queries*
-
-
-
 ## 实验与关键发现
 
 ### 核心防御效果
@@ -252,9 +237,6 @@ Figure 3 展示了 NullSteer 在域内（ID）条件下的迁移性能。当转�
 *Figure 3: Transferability performance under ID conditions*
 
 在更严苛的自适应攻击场景下（Figure 4），攻击者可以针对防御机制优化对抗样本。即使在此白盒设定下，NullSteer 依然将 MiniGPT-4 的越狱 ASR 从无防御时的 49.1% 降至 19.3%（ε=64/255），在所有 ε 取值下均取得最低的越狱率。这一鲁棒性源于 NullSteer 的转向方向由闭式优化求解得到，而非简单的均值差估计，使其对攻击者的适应性扰动具有更强的抵抗力。
-
-![[assets/figures/papers/paper_list_l775_https_arxiv_org_abs_2603_22094/figures/005_Figure_4.jpg]]
-*Figure 4: Adaptive attack performance on MiniGPT-4*
 
 ### 效用保持与过拒绝避免
 
@@ -276,18 +258,9 @@ Table 3 的消融实验揭示了目标函数各组件的作用。完整的 NullS
 
 Figure 5 展示了良性激活数量 $N_b$ 对效用的影响。随着 $N_b$ 增加，模型在 MM-Vet 上的效用逐步提升，在 $N_b \approx 8$ 时趋于饱和，说明仅需少量代表性良性样本即可构建有效的零空间投影矩阵。
 
-![[assets/figures/papers/paper_list_l775_https_arxiv_org_abs_2603_22094/figures/008_Figure_5.jpg]]
-*Figure 5: Utility with varying numbers of benign activations*
-
 Figure 6 分析了恶意激活数量 $N_m$ 对安全性的影响。防御效果随 $N_m$ 增加而提升，但即使仅使用少量恶意样本（如 $N_m=4$），NullSteer 仍能显著降低毒性得分，显示出对恶意样本数量的低敏感性。
 
-![[assets/figures/papers/paper_list_l775_https_arxiv_org_abs_2603_22094/figures/009_Figure_6.jpg]]
-*Figure 6: Safety with varying numbers of malicious activations*
-
 Figure 7 考察了转向强度 $\lambda$ 的影响。在 ε=16/255 扰动设定下，增大 $\lambda$ 可持续降低毒性得分和越狱 ASR，而 MM-Vet 上的效用得分保持稳定。这一安全-效用解耦特性是零空间约束的直接结果：$\lambda$ 仅放大零空间内的转向分量，不会侵入良性子空间。
-
-![[assets/figures/papers/paper_list_l775_https_arxiv_org_abs_2603_22094/figures/011_Figure_7.jpg]]
-*Figure 7: Effect of steering strength on MiniGPT-4. We vary λ when applying activation steering under the ϵ = 16/255 perturbation setting and report Toxicity Score on the Toxicity attack, Jailbreak ASR on the Jailbreak attack, and utility on MM-Vet*
 
 ### 域外泛化
 
@@ -303,13 +276,6 @@ Table 4 比较了各方法的每 token 推理时间。NullSteer 的推理时计�
 ### 失败模式与局限性
 
 尽管 NullSteer 在多数场景下表现优异，仍需注意以下局限。首先，零空间构建依赖少量代表性良性样本；若实际部署中良性输入分布极为多样，当前 $N_b \approx 8$ 的设定可能不足以完全覆盖，需手动验证是否需要增加样本量。其次，对于高逼真度的文本嵌入图像的结构化越狱攻击，虽然 Table E 显示 NullSteer 仍优于基线，但绝对 ASR 仍有降低空间。最后，所有实验在 MiniGPT-4、LLaVA-v1.5 和 Qwen2-VL 上进行，在更大规模或最新架构 VLM 上的表现需进一步验证。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l775_https_arxiv_org_abs_2603_22094/figures/014_Table.jpg]]
-*Table: E. Transferability performance under OOD conditions. Steering vectors are obtained from Jailbreak adversarial samples generated with $\begin{array} { r } { \epsilon = \frac { 1 6 } { 2 5 5 } } \end{array} ,$ using the same α value determined on the Jailbreak validation split. Their generalization is assessed across unseen attack types, including structure-based attacks from MM-SafetyBench, perturbation-based variants of PGD, and text-only attacks. The ASR is computed using the HarmBench classifier*
-
-
 
 ## 定位与知识库关联
 
@@ -376,8 +342,6 @@ NullSteer 的提出开启了若干值得探索的方向：
 - **自适应攻击下的鲁棒性边界**：Figure 4 显示，在白盒自适应攻击（攻击者同时优化扰动以绕过防御）下，NullSteer 仍保持最低的越狱率，在 $\epsilon = 64/255$ 时将 ASR 从 49.1% 降至 19.3%。但若攻击者同时扰动图像和文本模态，NullSteer 的鲁棒性边界在哪里？
 
 - **转向强度 $\lambda$ 的自动化选择**：Figure 7 表明，增大 $\lambda$ 可持续降低不安全生成，而 MM-Vet 上的效用保持稳定，显示出良好的安全-效用平衡。但当前 $\lambda$ 仍需手动设定，能否设计自适应的 $\lambda$ 选择策略（如基于输入的有害特征强度动态调整）以进一步优化这一平衡？
-
-
 
 ## 原文 PDF
 

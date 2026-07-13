@@ -57,8 +57,6 @@ claims:
 
 本工作为电商海报的自动化细粒度评估提供了首个基准数据集和专用模型，但模型的无参考设计使其无法直接量化主体身份保真度，且在分布外生成数据上的泛化能力仍有待提升。
 
-
-
 电商海报是连接商品与消费者的核心视觉媒介，其质量直接影响用户的点击意愿与购买决策。随着AIGC技术的爆发，商家和平台开始大规模采用生成式模型批量制作海报，这使得自动化质量评估成为刚需——人工审查不仅成本高昂，且难以在实时上架流程中规模化部署。然而，现有的自动化评估工具在这一场景中暴露出系统性缺陷。
 
 **现有评估范式的错配。** 主流图像质量评估（IQA）方法长期围绕自然图像的失真保真度或通用美学评分展开，代表性工作如 **MUSIQ**、**SPAQ** 等传统无参考评估器，以及近年涌现的专业评估模型如 **Q-Align**、**Q-Insight**、**VQ-R1** 和 **C2Score**。这些模型的核心设计目标是判断图像是否“看起来好”，而非判断图像是否“能卖货”。电商海报的功能性——产品主体是否完整无变形、促销文字是否清晰可读且无错别字、背景是否与商品调性匹配、版式是否引导视觉动线——完全超出了现有评估框架的覆盖范围。即便是能力最强的通用多模态大模型（如 **GPT-4o**、**Gemini 2.5 Pro**、**Qwen2.5-VL-72B** 等），在面对包含中文笔画级缺陷的海报时，也常常给出虚高的评分，完全遗漏关键的质量故障（见 Figure 1 的定性对比）。
@@ -70,8 +68,6 @@ claims:
 **领域数据的真空。** 上述问题的根源在于训练数据的缺失。此前不存在一个面向中文电商海报的、包含多维度功能评分与诊断理由的大规模数据集。唯一的电商功能评估数据集 AIGuard 仅覆盖有限维度且缺乏思维链解释。通用IQA数据集（如AVA、KonIQ-10k）的标注标准与电商场景完全脱节。
 
 基于以上分析，本文的核心动机明确：**构建首个面向电商海报的多维度评估数据集E-comIQ-18k，并提供专家校准的思维链（CoT）理由，以此训练一个能够对齐人类专家细粒度判断的专用评估模型E-comIQ-M。** 该模型将电商海报质量解耦为对象、背景、文本、布局四个功能维度，并通过两阶段训练（监督微调SFT + 生成式重排序策略优化GRPO）学会在输出评分的同时给出可解释的诊断推理，从而填补自动化评估与人工审查之间的鸿沟。
-
-
 
 ## 核心方法与创新机理
 
@@ -128,8 +124,6 @@ E-comIQ-M相对于现有baseline的核心创新可归纳为四个“changed slot
 3. **奖励函数**：从简单交叉熵损失升级为精度项+分布项的组合奖励，显式建模层级跨越惩罚与子评分向量几何约束；
 4. **输出粒度**：从单一美学评分升级为四维功能评分+总体评分，嵌入思维链自然语言解释。
 
-
-
 E-comIQ-ZH 的整体框架由三个紧密协同的模块构成：**数据集构建**、**评估模型训练**与**生成模型基准测试**。框架的核心设计逻辑是：先通过专家标注将电商海报质量解耦为四个功能维度，再借助思维链理由将专家判断显式化，最后用两阶段训练让多模态语言模型学会对齐这些细粒度标准。
 
 ### 数据集构建：从专家评分到思维链
@@ -161,12 +155,8 @@ $$R_{\mathrm{score}}(x, y) = \lambda_{\mathrm{score}} R_{\mathrm{acc}}(x, y) + (
 
 整个框架的信息流可概括为：**输入海报图像** → 视觉编码器提取特征 → 多模态语言模型生成 `<think>` 诊断文本与 `<answer>` JSON 评分 → **输出五维评分与自然语言解释**。训练阶段，这一流程受专家标注的评分和思维链理由监督；推理阶段，模型独立完成从像素到结构化评估的端到端映射。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2738_https_arxiv_org_abs_2602_21698/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the E-comIQ-ZH framework. (a–c) E-comIQ-Dataset: multi-dimensional expert annotations with Chain-of-Thought rationales. (d–e) E-comIQ-M: two-stage training via Supervised Fine-Tuning (SFT) and Generative Reranking Policy Optimization (GRPO). (f) E-comIQ-Bench: evaluation of generative models on e-commerce image generation capabilities*
-
-
 
 E-comIQ-M 的评估流程由三个核心模块构成：**视觉编码与多模态融合**、**思维链诊断生成**，以及**结构化评分输出**。模型以 Qwen-2.5-VL-7B-Instruct 为骨干，接收电商海报图像后，首先由视觉编码器提取特征并与语言模型进行多模态融合（Section 4.1, Appendix B.1）。随后，模型在 `<think>` 块中生成中文自然语言诊断，逐维度解释评分依据；最终在 `<answer>` 块中输出包含五个维度（Object, Background, Text, Layout, Overall）的 JSON 结构化评分（Appendix B.1, Fig. 13）。
 
@@ -194,21 +184,11 @@ $$R_{\mathrm{dist}}(x, y) = \exp\left(-\alpha \cdot \|\vec{v}_{\mathrm{pred}}(y)
 
 其中 $\alpha = 0.5$ 控制惩罚强度。消融实验证实，在精度奖励基础上引入分布项可进一步提升所有维度的相关性与准确度（Table 5），表明分布奖励有助于对齐子评分的几何结构，防止预测向量在四维空间中发生系统性偏移。参数敏感度分析进一步验证 $\tau = 0.2$ 和 $\lambda_{\mathrm{score}} = 0.65$ 为当前设定下的最优选择（Appendix C.1, Fig. 14, Fig. 15）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2738_https_arxiv_org_abs_2602_21698/figures/003_Figure_3.jpg]]
-*Figure 3: An illustration of our human-AI collaborative pipeline for generating diagnostic Chain-of-Thought (CoT) rationales*
-
-
-
 ## 实验与关键发现
 
 ### 1. 数据集构建与统计特征
 
 E-comIQ-18k 包含 18,000 张电商海报，每张图像配有专家在四个功能维度（Object、Background、Text、Layout）上的 1–5 分评分及一个 Overall 综合评分。标注一致性经 Krippendorff’s α 检验，Overall 维度 α 达到 0.858，宽松准确率（误差≤0.5）为 96.4%（Table 1），表明专家标注具有高度可靠性。
-
-![[assets/figures/papers/paper_list_l2738_https_arxiv_org_abs_2602_21698/figures/005_Table_1.jpg]]
-*Table 1: Inter-annotator agreement for E-comIQ-18k, measured by Krippendorff’s Alpha (α) and loose accuracy (Acc., within a 0.5 margin), confirming the substantial reliability of our annotations*
 
 数据集统计（Figure 5）揭示了几个关键特征：
 - **得分分布**：Overall 得分呈多峰分布（Figure 5a），覆盖从低质到高质的全谱段，保证了样本多样性。
@@ -247,9 +227,6 @@ Table 4 以 Acc@0.5 和 Acc@1.0 补充了相关性指标。E-comIQ-M 在 Overall
 ![[assets/figures/papers/paper_list_l2738_https_arxiv_org_abs_2602_21698/figures/012_Table_6.jpg]]
 *Table 6: Benchmark results for leading generative E-comIQ-Ms on E-comIQ-Bench*
 
-![[assets/figures/papers/paper_list_l2738_https_arxiv_org_abs_2602_21698/figures/013_Table_7.jpg]]
-*Table 7: Objective metrics for subject fidelity and text content accuracy on E-comIQ-Bench*
-
 在 E-comIQ-Bench 上，人类专家对原始商家海报的 Overall 评分为 3.78，而当前最强的生成模型 SeeDream 得分为 3.65，仅略低于原始海报。各生成模型在 Background 和 Layout 维度上普遍优于或接近原始海报，但在 Text 和 Object 维度上仍为明显短板——这与数据集瓶颈分析的结论一致。Table 7 的客观指标进一步证实：生成模型在主体身份保真度（DINO 相似度）和中文文字准确率（OCR 匹配度）上均与原始海报存在显著差距，其中文字准确率最低的模型不足 40%。
 
 ### 3. 消融实验（Table 5）
@@ -267,12 +244,6 @@ Table 5 系统分析了训练阶段和奖励函数设计的影响：
 
 奖励函数超参数敏感度实验（Figure 14、Figure 15，附录 C.1）验证了精度容差 τ=0.2 和精度权重 λ_score=0.65 为最优设定。
 
-![[assets/figures/papers/paper_list_l2738_https_arxiv_org_abs_2602_21698/figures/024_Figure_14.jpg]]
-*Figure 14: Effect of the accuracy tolerance τ on reward performance. Left: overall PLCC across the four sub-dimensions (Background, Object, Text, Layout) and the total score under different τ values. Right: corresponding SRCC results. Each coloured line denotes a different tolerance setting*
-
-![[assets/figures/papers/paper_list_l2738_https_arxiv_org_abs_2602_21698/figures/025_Figure_15.jpg]]
-*Figure 15: Effect of the accuracy weight*
-
 ### 4. 失败模式与局限性
 
 尽管 E-comIQ-M 在测试集上表现优异，但在以下场景中存在明显局限：
@@ -284,13 +255,6 @@ Table 5 系统分析了训练阶段和奖励函数设计的影响：
 3. **数据覆盖偏差**：训练数据主要来源于单一电商平台，品类分布和视觉风格可能存在偏向性，限制了模型在更广泛电商场景（如跨境商品、非标准版式）中的适用性。
 
 4. **文本维度的持续挑战**：尽管 Text 维度的 Acc@0.5 从 22.4% 提升至 49.6%，但仍有超过一半的样本在 0.5 容差内无法命中，说明笔画级错误、字体风格不当等细粒度文字缺陷的识别仍是开放难题。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2738_https_arxiv_org_abs_2602_21698/figures/001_Figure_1.jpg]]
-*Figure 1: Qualitative comparison of E-comIQ-M with leading MLLMs on a challenging e-commerce image. While other powerful models like Gemini 2.5 Pro [10] and Q-Insight [24] overlook critical flaws, our E-comIQ-M accurately identifies the subtle stroke-level corruption. This leads to a more human-aligned low score for the text dimension (1.0), demonstrating its superior finegrained diagnostic capabilities*
-
-
 
 ## 定位与知识库关联
 
@@ -339,8 +303,6 @@ E-comIQ-M 的适用边界受以下因素约束：
 - **分布外鲁棒性增强**：针对 E-comIQ-Bench 上的低一致性（ρ≈0.34），是否需要引入生成式对抗样本、领域自适应训练或测试时校准策略？GRPO 的困难子集筛选策略（当前基于评分方差）是否可扩展为基于生成模型特性的主动采样？
 - **跨领域迁移**：当前四维评分框架（对象、背景、文本、布局）的维度定义在多大程度上可泛化至服装展示、房产渲染、食品摄影等垂直 AIGC 场景？各领域可能需要定制化的维度定义和相应的知识注入策略。
 - **动态内容扩展**：若将评估对象从单张图像扩展至视频或交互式内容，评分维度需如何重构？例如，视频海报可能需引入“时序一致性”和“动效质量”维度，标注协议和 CoT 生成流程也需相应调整。
-
-
 
 ## 原文 PDF
 

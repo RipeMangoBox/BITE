@@ -342,27 +342,12 @@ VAEBM在生成速度上具有显著优势。在CIFAR-10上生成50个样本，VA
 - **训练停止依赖人工判断**：能量函数的训练没有自动收敛准则，需要研究者手动观察生成样本质量来停止训练，否则可能过度拟合导致样本失真。这引入了研究者偏差，并限制了方法的可复现性和自动化程度。
 - **两阶段训练未充分释放潜力**：固定VAE训练EBM的策略虽简化了优化，但未能联合微调两个组件，可能限制了模型最终性能的上限。附录C.2的初步尝试表明联合训练未带来增益，但更先进的联合优化策略仍有待探索。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2010_00654/figures/014_Figure.jpg]]
-*Figure: (a) Step size 8e-4 (b) Step size 8e-5*
-
-![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2010_00654/figures/019_Figure.jpg]]
-*Figure: (a) NVAE baseline (b) WGAN, initialized with NVAE decoder (c) EBM on x, MCMC initialized with NVAE samples (d) VAEBM with DKL(pθ0 (x)||hψ,θ(x)) loss*
-
-![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2010_00654/figures/007_Table.jpg]]
-
 ![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2010_00654/figures/008_Table_5.jpg]]
 *Table 5: Mode coverage on StackedMNIST*
 
 ![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2010_00654/figures/009_Table_4.jpg]]
 *Table 4: Comparison for IS and FID on CIFAR-10 between several related training methods*
 
-![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2010_00654/figures/017_Table_7.jpg]]
-*Table 7: Network structures for the energy function $E _ { \psi } ( \mathbf { x }$ )
-
-![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2010_00654/figures/018_Table_8.jpg]]
-*Table 8: Important hyper-parameters for training VAEBM*
 
 ## 定位与知识库关联
 

@@ -51,8 +51,6 @@ SPREAD的核心思路是将空间关系（如“左侧”、“上方”）和�
 
 在3D-FRONT和ProcTHOR两个数据集上的实验表明，SPREAD在物理合理性指标上全面超越现有方法：网格碰撞率（Col_mesh）在ProcTHOR上从0.260降至0.121，平均支撑距离（ASD）从0.021降至0.007，物理仿真稳定性（Isaac Stability）从0.876提升至0.950，同时取得了最高的图召回率（GRecall 0.979）。用户调研中，SPREAD以88.6%的得票率显著优于ATISS（0.9%）、InstructScene（4.4%）和DiffuScene（6.1%），主观评价其物理一致性和场景合理性最优。
 
-
-
 ### 3D场景生成中的物理合理性瓶颈
 
 生成逼真的3D室内场景是具身AI、仿真环境和内容创作领域的核心需求。然而，现有方法普遍面临一个关键瓶颈：**生成的场景在物理上不可信**。物体悬浮于半空、网格相互穿透、支撑关系错乱等现象频繁出现，使得生成的场景无法直接用于物理仿真或机器人交互。这一问题的根源在于，当前主流的3D场景生成方法——无论是自回归模型（如**ATISS**）、基于扩散的模型（如**DiffuScene**），还是两阶段语义图解码方法（如**InstructScene**）——都依赖有限且结构化程度较高的训练数据，缺乏对复杂空间关系和物理交互（如支撑、碰撞）的显式建模。
@@ -68,8 +66,6 @@ SPREAD的核心思路是将空间关系（如“左侧”、“上方”）和�
 上述缺陷揭示了一个更深层的认知鸿沟：当前生成模型追求的是视觉层面的“合理性”（plausibility），而非物理层面的“成立性”（validity）。FID等视觉质量指标可以评估布局的统计分布是否与真实数据接近，但无法反映场景是否经得起物理规律的检验。这导致了一个悖论：一个FID得分优秀的场景，可能在Isaac Sim中因重力作用而瞬间坍塌。
 
 SPREAD正是针对这一鸿沟提出的解决方案。其核心动机在于：**将空间关系（如“左侧”、“上方”）和物理关系（如“支撑”、“接触”）建模为可微分的图先验，并在扩散生成过程中显式施加物理约束，从而因果性地控制场景的物理合理性**。通过这一范式转换，SPREAD旨在使生成模型不仅能“画”出合理的布局，更能“理解”并“遵守”物理世界的规则，产出可直接用于仿真的3D环境。
-
-
 
 ## 核心方法与创新机理
 
@@ -114,8 +110,6 @@ SPREAD采用预训练的**Michelangelo**形状编码器提取256个64维的形�
 ### 创新总结
 
 上述四个创新维度形成了完整的因果链条：**图先验**提供关系骨架，**几何感知**注入实时网格信息，**多引导框架**施加物理约束，**预训练编码器**保障几何质量。这一协同设计使得SPREAD在用户调研中以88.6%的得票率显著优于ATISS（0.9%）、InstructScene（4.4%）和DiffuScene（6.1%），主观评价其物理一致性和场景合理性最佳（Figure 6）。
-
-
 
 SPREAD 是一个以**空间图与物理图为可微分先验**的条件扩散框架，其核心设计目标是在生成 3D 场景布局的同时，显式地保证物体间的物理合理性——消除穿透、悬浮等常见伪影。
 
@@ -167,15 +161,11 @@ SPREAD 的生成流程围绕**图条件扩散**展开，关键模块包括：
 - **碰撞处理**：基线方法依赖包围盒近似或完全忽略碰撞；SPREAD 使用网格级三角形交叉检测，以锥形距离场（CoDF）作为可微碰撞指导。
 - **物理约束建模**：基线方法缺乏显式物理约束；SPREAD 将空间和物理关系建模为显式图结构，并与重力引导、支撑关系引导协同工作，因果地控制场景的物理合理性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2601_https_arxiv_org_abs_2603_27573/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of SPREAD. We propose SPREAD, a diffusion-based framework for generating physically plausible 3D scenes, which integrates relational constraints through spatial (Gρ) and physical graphs (Gκ) while leveraging geometric perception via Perceiver Layers. The model employs graph-attention guided diffusion to jointly optimize physical plausibility and spatial relations during generation, producing realistic scenes with natural object interactions*
 
 ![[assets/figures/papers/paper_list_l2601_https_arxiv_org_abs_2603_27573/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of SPREAD, a diffusion-based framework for generating physically plausible 3D scenes with rich object interactions. (A) SPREAD synthesizes detailed object-level layouts with natural spatial and physical interactions, going beyond coarse layout arrangements. (B) SPREAD faithfully adheres to provided spatial and physical graph priors, G. (C) SPREAD can provide simulationready environments for embodied AI agents*
-
-
 
 ### 扩散状态空间与图条件化
 
@@ -259,12 +249,8 @@ $$
 
 其中 $E$ 为有向支撑边集合，$V_{i,j}$ 为物体 $i$ 位于支撑体 $j$ 外部的顶点集，$\mathbf{s}(\alpha,j)$ 为顶点 $\alpha$ 到支撑凸包的距离。这一引导显式地迫使被支撑物体精确放置于支撑面上，是降低平均支撑距离（ASD）的关键机制。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2601_https_arxiv_org_abs_2603_27573/figures/008_Figure_5.jpg]]
 *Figure 5: Guidance Ablation. Results showing effect of different guidance terms. Each major row compares results before (top) and after (bottom) adding a specific guidance. Columns show different scenes. Red circles highlight issues such as collisions, floating, or incorrect spatial relations before guidance; green circles show improvements after applying guidance, with zoom-in views for clarity*
-
-
 
 ## 实验与关键发现
 
@@ -283,9 +269,6 @@ SPREAD 在两个差异显著的数据集——3D-FRONT（家具级室内场景�
 - **FID**：18.8，略优于 InstructScene 的 20.0，说明物理约束的引入并未损害视觉质量。
 
 用户调研（**Figure 6**）进一步验证了主观层面的优势：SPREAD 以 88.6% 的得票率显著领先，ATISS 仅获 0.9%，InstructScene 获 4.4%，DiffuScene 获 6.1%。参与者被要求比较生成场景在物理仿真前后的物理一致性和场景合理性，SPREAD 的表现获得了压倒性认可。
-
-![[assets/figures/papers/paper_list_l2601_https_arxiv_org_abs_2603_27573/figures/009_Figure_6.jpg]]
-*Figure 6: User Study. Our method dominated with 88.6% of the votes, above ATISS with 0.9%, InstructScene with 4.4%, and DiffuScene with 6.1%, indicating that our method better preserves physical consistency and scene rationality*
 
 ### 消融实验
 
@@ -313,33 +296,14 @@ SPREAD 在两个差异显著的数据集——3D-FRONT（家具级室内场景�
 4. **FID 指标的局限性**：FID 主要评估视觉质量分布，无法充分反映物理合理性。SPREAD 在 FID 上与基线相当或略优，但可能以牺牲一定视觉多样性为代价换取物理鲁棒性，这一权衡需要根据下游任务需求审慎评估。
 5. **用户调研样本量**：用户调研虽采用盲评和缩放功能减少偏差，但有效回复仅 57 份，结论的统计推广性需谨慎对待。
 
-![[assets/figures/papers/paper_list_l2601_https_arxiv_org_abs_2603_27573/figures/010_Table_4.jpg]]
-*Table 4: Dataset Statistics. Summary of the processed ProcTHOR-10K dataset, detailing the scale of rooms, splits, and object diversity*
-
 ![[assets/figures/papers/paper_list_l2601_https_arxiv_org_abs_2603_27573/figures/011_Figure_7.jpg]]
 *Figure 7: Comparison of relational complexity between our pre-processed dataset (left) and the original 3D-FRONT dataset (right). The sample from our dataset (left) contains a richer variety of indoor objects and exhibits complex, fine-grained spatial-physical relationships. In contrast, the sample from 3D-FRONT (right) lacks such fine-grained object interactions, particularly with small objects, highlighting the relational sparsity inherent in the original dataset that our preprocessing pipeline aims to address*
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2601_https_arxiv_org_abs_2603_27573/figures/003_Table_1.jpg]]
 *Table 1: Quantitative comparison. Our method matches baseline FID on 3D-FRONT while setting new state-of-the-art on ProcTHOR: it dramatically reduces mesh collisions, achieves the highest graph recall (GRecall), minimizes average support distance (ASD), and delivers the greatest scene stability under Isaac Sim*
 
-![[assets/figures/papers/paper_list_l2601_https_arxiv_org_abs_2603_27573/figures/006_Table_2.jpg]]
-*Table 2: Ablation on ProcTHOR. starting from our base model, adding the geometry module and then the full multi-guidance framework yields consistent improvements in all physical metrics*
-
-![[assets/figures/papers/paper_list_l2601_https_arxiv_org_abs_2603_27573/figures/004_Figure_3.jpg]]
-*Figure 3: Comparative Generation and Simulation Results. Visual comparison of scene layouts produced by our method versus three baseline approaches, shown before (left) and after (right) physics simulation*
-
 ![[assets/figures/papers/paper_list_l2601_https_arxiv_org_abs_2603_27573/figures/005_Figure_4.jpg]]
 *Figure 4: Scene & Relation Visualization. For two generated scenes, we show the final render (left), the top-down layout (middle), and the pairwise relation evaluation matrix (right). The matrix encodes every object-pair’s spatial relation: green entries denote correct relations (w.r.t. the ground truth), and red entries denote incorrect ones*
-
-![[assets/figures/papers/paper_list_l2601_https_arxiv_org_abs_2603_27573/figures/007_Table_3.jpg]]
-*Table 3: Comparison of inference times (in seconds) across different scene generation methods*
-
-![[assets/figures/papers/paper_list_l2601_https_arxiv_org_abs_2603_27573/figures/012_Figure_8.jpg]]
-*Figure 8: Additional Qualitative results. The gallery displays 8 randomly selected samples, demonstrating the diversity and physical plausibility of the generated 3D scenes*
-
-
 
 ## 定位与知识库关联
 
@@ -382,8 +346,6 @@ SPREAD 的设计和验证集中在以下边界内：
 - 如何处理动态场景中的时间一致性和物体运动轨迹生成？
 - 多引导框架中各项引导权重的自动调优策略（如基于强化学习或元学习）是否可行？
 - 如何将物理仿真反馈直接纳入训练循环，形成闭环优化？
-
-
 
 ## 原文 PDF
 

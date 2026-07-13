@@ -55,8 +55,6 @@ claims:
 
 在方法谱系上，LocateAnything3D区别于 **Cube R-CNN**（Brazil et al., CVPR 2023）的闭集检测范式、**OVMono3D**（Yao et al., arXiv 2024）依赖外部2D检测器的提升策略、以及 **DetAny3D**（Zhang et al., ICCV 2025）的直接3D输出方式，首次在统一的自回归语言模型框架内实现了端到端的开放词汇2D+3D联合预测。
 
-
-
 ### 问题背景：视觉语言模型在3D感知中的能力缺口
 
 视觉语言模型（VLM）在图像描述、视觉问答、2D检测等任务上已取得显著进展，但在单目多物体3D检测这一核心感知能力上存在明显缺口。当前VLM缺乏原生的3D定位能力——它们无法在统一的token预测接口下，仅凭单张RGB图像完成开放词汇的多物体3D框预测。这一缺陷的根源在于：3D检测需要从2D投影中恢复深度、尺寸和朝向，这是一个固有的病态逆问题，而现有VLM的序列建模范式并未针对这一推理链条进行专门设计。
@@ -88,8 +86,6 @@ claims:
 3. **规模化问题**：如何构建大规模、多源统一的训练数据，使VLM能够学习跨场景、跨类别的3D检测能力？
 
 LocateAnything3D通过引入**Chain-of-Sight（CoS）**——一种将2D检测作为视觉思维链插入3D token预测的序列化策略——系统性地回应了上述挑战。其核心洞察是：让自回归解码器先输出2D框作为中间证据，再在2D约束下预测3D参数，并按照深度排序和语义顺序组织token序列，可以大幅降低单目3D推断的模糊性，使VLM能够端到端地学习多物体3D检测。
-
-
 
 ## 核心方法与创新机理
 
@@ -134,8 +130,6 @@ $$\mathbf{b}_i = (\mathbf{t}_i, \mathbf{d}_i, \mathbf{R}_i) \quad \mathbf{t}_i \
 ---
 
 **总结**：LocateAnything3D 的核心创新并非提出新的网络结构，而是通过 CoS 序列化将 3D 检测转化为 VLM 可自然学习的下一 token 预测任务。三个层次的设计——近到远排序、2D→3D 分解、中心→尺寸→旋转顺序——共同降低了单目 3D 推断的模糊性，使模型在统一的自回归接口下实现了开放词汇的多物体 3D 检测，无需任何外部检测器或任务特定模块。
-
-
 
 LocateAnything3D 将开放词汇的单目多物体 3D 检测统一为视觉语言模型（VLM）原生的下一 token 预测任务。其核心是一个三段式管线：**视觉编码 → 语言模型自回归解码 → Chain-of-Sight 序列输出**，全程无需任务特定的检测头或外部 2D 检测器。
 
@@ -187,12 +181,8 @@ CoS 序列的内部组织遵循三层设计，共同决定了模型的性能瓶�
 ![[assets/figures/papers/paper_list_l2400_https_arxiv_org_abs_2511_20648/figures/002_Figure_2.jpg]]
 *Figure 2: Architecture of LocateAnything3D. (1) Model input: a single RGB image with text and optional visual prompts (boxes/clicks). (2) Chain-of-Sight (CoS) decoding: a VLM decoder first emits 2D detections as an explicit visual evidence, then continues the sequence to 3D. Decoding follows three layers of design: inter-object curriculum ordering detections from near to far; intra-object factorization using 2D as CoS to robustly infer 3D; and intra-3D tokenization that outputs center, size, and rotation. (3) We output calibrated multi-object 3D boxes with open-vocabulary categories and flexible prompting, yielding strong results on Omni3D. We use turbo colormap for boxes to demonstrate their depth,...*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2400_https_arxiv_org_abs_2511_20648/figures/001_Figure_1.jpg]]
 *Figure 1: LocateAnything3D unifies 3D detection and grounding in a single vision-language model. It supports open-world categories with free-form text guidance and flexible visual prompts (e.g., drag boxes, click points). All examples are zero-shot, highlighting strong out-of-domain generalizability. The bar chart (right) shows that LocateAnything3D achieves state-of-the-art AP3D on Omni3D benchmark*
-
-
 
 ### 问题形式化
 
@@ -259,8 +249,6 @@ CoS 解码通过三个层次的结构化设计使自回归模型更易学习：
 
 整个模型端到端训练，无需外部 2D 检测器或任务特定的 3D 检测头，统一了检测和定位任务。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能：Omni3D 基准 3D 检测
@@ -276,15 +264,9 @@ LocateAnything3D 在 Omni3D 统一基准上取得了全面的最优结果（Tabl
 
 在零样本新类别检测任务上（Table 2），LocateAnything3D 在三个基准上均取得最佳性能：KITTI 上 AP3D 为 **25.87**（+0.14 vs DetAny3D），SUN-RGBD 上为 **26.33**（+5.26），ARKitScenes 上为 **29.06**（+4.50）。值得注意的是，所有基线方法均依赖外部 2D 检测器（如 Grounding-DINO）提供 2D 框作为额外输入，而 LocateAnything3D 仅从单张图像端到端地联合预测 2D 和 3D 框，不依赖任何外部模块。这一结果直接证明了 CoS 机制将 2D 定位作为视觉思维链内化于模型推理中的优势——模型学会了在未见类别上自主完成“先定位 2D 区域，再推断 3D 结构”的推理链。
 
-![[assets/figures/papers/paper_list_l2400_https_arxiv_org_abs_2511_20648/figures/005_Table_2.jpg]]
-*Table 2: LocateAnything3D achieves the best zero-shot 3D detection performance, demonstrating strong generalization to unseen object classes. Notably, baseline methods rely on an external detector for 2D box as additional input, while our method jointly predicts both 2D and 3D boxes end-toend from a single image alone. Following existing methods, we report*
-
 ### 室内 3D 目标定位
 
 在室内 3D 目标定位任务上（Table 3），LocateAnything3D 以远少于对比方法的训练数据量（1.7M vs 9.6M 图像）取得了显著优势。在仅提供类别名称的提示下（$\mathrm{AP_{3D}^{cat}}$），Objectron 上达到 **72.5**（+2.7 vs Cube-LLM_large），ARKitScenes 上达到 **41.7**（+18.2），SUN-RGBD 上与 Cube-LLM_large 持平。当额外提供空间位置描述时（$\mathrm{AP_{3D}^{cat+loc}}$），LocateAnything3D 展现出更强的空间推理能力：Objectron 上 **75.0**（vs 45.4），ARKitScenes 上 **53.9**（vs 31.8），SUN-RGBD 上 **39.5**（vs 28.8）。**Cube-LLM**（Cho et al., CVPR 2024）在加入位置信息后性能反而下降或提升微弱，说明其未能有效利用空间提示；而 LocateAnything3D 的 CoS 解码天然将空间定位作为生成过程的一部分，因此能更好地融合位置先验。
-
-![[assets/figures/papers/paper_list_l2400_https_arxiv_org_abs_2511_20648/figures/006_Table_3.jpg]]
-*Table 3: Indoor 3D Object Grounding Performance. We compare LocateAnything3D against Cube-LLM trained on different data scales*
 
 ### Chain-of-Sight 设计消融
 
@@ -299,9 +281,6 @@ Table 4 系统消融了 CoS 三层解码设计的每个组件，所有实验在 
 ### 数据效率与训练动态
 
 Figure 4 揭示了 CoS 公式的两个关键优势。左图显示，CoS 模型仅使用 **10%** 训练数据时即达到具有竞争力的性能，而纯 3D 预测模型即使使用 100% 数据（AP3D=22.7）也远低于 CoS（36.1），绝对差距达 **13.4** 点。这说明 CoS 通过引入 2D 中间监督，大幅提升了模型的数据效率——模型不必从零学习从像素到 3D 的极端映射，而是先学习更易掌握的 2D 定位，再在此基础上学习 3D 推断。
-
-![[assets/figures/papers/paper_list_l2400_https_arxiv_org_abs_2511_20648/figures/008_Figure_4.jpg]]
-*Figure 4: Data efficiency and training dynamics analysis. (1) The left figure shows data efficiency: We report*
 
 右图展示了训练动态：经过 2D 检测预训练的模型（绿色曲线）几乎立即超越了先前最优水平（虚线），而从头训练（橙色曲线）收敛缓慢且最终精度更低（29.2 vs 36.1）。这进一步印证了 2D 预训练为 3D 学习提供了良好的初始化。
 
@@ -320,21 +299,8 @@ Figure 5 展示了典型失败案例，主要归因于训练数据在相机参�
 
 这些失败模式揭示了当前方法的核心瓶颈：模型未显式利用深度先验或深度编码器，且假设已知相机内参但未将其作为条件输入。这为未来工作指明了方向——集成显式深度信息、将相机内参作为位置提示注入模型，有望显著提升跨场景鲁棒性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2400_https_arxiv_org_abs_2511_20648/figures/004_Figure_3.jpg]]
 *Figure 3: Qualitative results of LocateAnything3D. For each example, the left sub-figure overlays the projected 3D bounding boxes on the input image, while the right sub-figure shows the corresponding bird’s-eye view with 1m×1m grids as the background. We use a turbo colormap based on depth, where redish colors indicate objects closer to the camera, and blueish colors indicate objects farther away*
-
-![[assets/figures/papers/paper_list_l2400_https_arxiv_org_abs_2511_20648/figures/010_Table_6.jpg]]
-*Table 6: Summary of our extensive and diverse supervised fine-tuning datasets for 2D pretraining. We use a comprehensive collection of numerous large-scale datasets spanning multiple domains and tasks to pretrain our model, ensuring broad coverage and robust performance across diverse visual and language understanding scenarios*
-
-![[assets/figures/papers/paper_list_l2400_https_arxiv_org_abs_2511_20648/figures/011_Figure.jpg]]
-*Figure: Orientation Error Under-full Boxes Location Mismatch Depth Mismatch*
-
-![[assets/figures/papers/paper_list_l2400_https_arxiv_org_abs_2511_20648/figures/012_Figure_6.jpg]]
-*Figure 6: Visualization of more indoor and outdoor successful cases*
-
-
 
 ## 定位与知识库关联
 
@@ -409,8 +375,6 @@ CoS的概率分解（式4）将序列概率显式拆分为2D定位和3D估计两
 5. **推理效率优化**：CoS序列长度随物体数量线性增长，在密集场景中可能成为延迟瓶颈。能否通过并行解码或非自回归生成来加速推理，同时保持精度？
 
 6. **与其他VLM能力的融合**：当前CoS专注于检测和定位，能否与VLM的场景理解、关系推理和对话能力深度融合，实现“检测-推理-交互”的统一框架？
-
-
 
 ## 原文 PDF
 

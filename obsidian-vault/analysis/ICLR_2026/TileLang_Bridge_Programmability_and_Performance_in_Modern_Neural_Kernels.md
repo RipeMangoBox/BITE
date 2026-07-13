@@ -51,8 +51,6 @@ TileLang针对这一瓶颈提出了一个统一方案：**将tile提升为一级
 
 这一设计在保持Python DSL易用性的同时，实现了接近手工CUDA的性能。在MLA核上，TileLang达到Triton平均5.56倍的性能，代码量不到手工核的16%。在NVIDIA H100上，TileLang相较Triton在多种算子上实现1.08×–10.59×加速（平均3.02×）；在AMD MI300X上实现1.01×–11.56×加速（平均2.65×），同时代码量最多减少85.5%。该方法支持通过统一的`T.call_extern`接口调用NVIDIA cute与AMD ck等后端tile库，实现跨平台可移植性。
 
-
-
 ### 现代AI核编程的核心困境
 
 现代深度学习模型对GPU核的性能要求日益严苛，然而开发者长期面临一个根本性的权衡：**高性能与编程便捷性难以兼得**。手工CUDA核能够充分发挥硬件潜力，但编写和调优过程极其繁琐；高级领域特定语言（DSL）虽然大幅降低了开发门槛，却因对内存层次、数据移动和并行调度的控制不足，导致性能严重受限。
@@ -77,8 +75,6 @@ TileLang针对这一瓶颈提出了一个统一方案：**将tile提升为一级
 3. **并行调度隐式化**：warp分区、流水线深度等调度决策被编译器“黑盒”处理，难以针对特定算子进行定制。
 
 TileLang的提出正是为了打破这一僵局。其核心动机是：**将tile提升为一级公民，通过可编程的tile抽象显式控制上述关键维度，同时借助编译器可见的tile语义与自动化优化（tile推荐与推断），在保持高级Python DSL易用性的前提下，实现接近手工CUDA的性能**。这一设计使得开发者能够聚焦于算法层面的tile级数据流描述，而将硬件细节的配置优化交由编译器的成本模型和约束传播自动完成，从根本上桥接可编程性与性能之间的鸿沟。
-
-
 
 ## 核心方法与创新机理
 
@@ -119,8 +115,6 @@ $$Time = \max_{i,j} \left( \frac{\mathrm{MemoryTraffic}_i}{\mathrm{Bandwidth}_i}
 
 在 MLA 算子上，TileLang 达到 Triton 平均 **5.56 倍**的性能提升，且代码量不到手工核的 16%（Figure 1）。消融实验揭示了平台特异性的优化贡献：在 H100 上，warp 分区（`+Partition`）贡献了主导性的 4.34 倍加速；而在 MI300X 上，内存放置优化（`+Alloc`）是主要优化，实现了 6.56 倍加速（Figure 9）。这种平台感知的自动优化能力是 TileLang 区别于现有 DSL 的核心优势。
 
-
-
 ![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_Jb1WkNSfUB/figures/006_Figure_6.jpg]]
 *Figure 6: Pipeline Inference mechanism in TILELANG*
 
@@ -139,8 +133,6 @@ TileLang 的编译工作流围绕**融合 tile 级数据流图（FTG）**展开�
 **输入**：开发者编写的 tile 级 Python 程序（含可选调度标注）。  
 **输出**：针对目标硬件（NVIDIA H100 / AMD MI300X）优化后的可执行核代码。  
 **核心模块关系**：FTG 是贯穿全流程的统一中间表示，tile 推荐为标注不完整的算子提供硬件感知默认值，tile 推断在此基础上通过约束传播完成全局配置闭合，二者协同将开发者的高层意图映射为接近手工 CUDA 性能的低层实现。
-
-
 
 ### 核心模块
 
@@ -234,8 +226,6 @@ $$\mathbf{z}_t = \mathbf{x}_t \mathbf{W}_{\mathrm{down}}$$
 
 实验表明，静态 roofline 成本模型能有效修剪搜索空间：预测的 top-5% 调度保留了 98.47% 的最佳性能，同时修剪了 95% 的候选调度。这使得 TileLang 在 GEMM 上的平均调优时间仅约 10 秒，显著低于 Triton（约 18–20 秒）和 Ansor（>400 秒）。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能结果
@@ -285,33 +275,11 @@ Figure 10和Table 9展示了TileLang与Gluon（OpenAI, 2025）、Helion（PyTorc
 
 4. **自动调优的覆盖范围。** 当前自动调优集中于tile形状、内存放置和warp分区，更复杂的调度组合（如算子融合策略、多核并行划分）仍需开发者手动指定。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_Jb1WkNSfUB/figures/014_Table_1.jpg]]
-*Table 1: A partial list of primitives supported by TILELANG*
-
 ![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_Jb1WkNSfUB/figures/015_Table_2.jpg]]
 *Table 2: Comparison of specifications between NVIDIA H100 SXM and AMD MI300X*
 
-![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_Jb1WkNSfUB/figures/019_Table_4.jpg]]
-*Table 4: Average Tuning Times for Different Operators*
-
-![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_Jb1WkNSfUB/figures/025_Table_7.jpg]]
-*Table 7: Performance of Causal MHA on H100 (B = 64, H = 64, D = 128)*
-
-![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_Jb1WkNSfUB/figures/026_Table_8.jpg]]
-*Table 8: Performance and Lines of Code(LoC) of Causal MHA on RTX 4090 (B = 16, H = 32, D = 128)*
-
 ![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_Jb1WkNSfUB/figures/027_Table_9.jpg]]
 *Table 9: Comparison of TileLang, Gluon (LoC = 68), Helion (LoC = 24), and Tilus (LoC = 110) on GEMM workloads*
-
-![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_Jb1WkNSfUB/figures/028_Table_10.jpg]]
-*Table 10: Performance of Mamba-chunk-scan on H100, with batch size 8, 80 attention heads, model dimension 64, dstate 128, and sequence lengths ranging from 1024 to 32768. Helion LOC=116, TileLang LOC=114*
-
-![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_Jb1WkNSfUB/figures/029_Table_11.jpg]]
-*Table 11: Commit hashes for baseline frameworks*
-
-
 
 ## 定位与知识库关联
 
@@ -374,8 +342,6 @@ TileLang相较于基线方法的变革体现在六个核心维度：
 4. **新硬件的适配成本**：在支持新硬件时，需要多大比例的平台特定代码与推断规则？TileLang的多平台能力目前依赖于后端tile库的成熟度，对于缺乏类似cute/ck生态的硬件，适配成本可能显著增加。
 
 5. **全自动搜索的可行性**：更大的tile编程空间探索（如同时优化tile大小、流水线深度、warp配置、融合策略）能否通过强化学习等全自动方法完成？当前的成本模型修剪策略已能剪除95%的候选，但剩余5%的搜索仍依赖枚举，在维度爆炸时可能成为瓶颈。
-
-
 
 ## 原文 PDF
 

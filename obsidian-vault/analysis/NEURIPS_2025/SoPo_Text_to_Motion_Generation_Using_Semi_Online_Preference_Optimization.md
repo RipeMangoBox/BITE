@@ -53,8 +53,6 @@ claims:
 
 方法层面，SoPo属于偏好对齐方法谱系中的半在线DPO变体，与离线DPO和在线DPO形成互补。其知识库定位在文本到运动生成的扩散模型后训练阶段，可适配MLD、MDM等主流骨干网络。
 
-
-
 文本到运动生成（Text-to-Motion Generation）旨在根据自然语言描述合成逼真的三维人体运动序列，在动画制作、虚拟现实和人机交互等领域具有重要应用价值。近年来，扩散模型（Diffusion Models）在该任务上取得了显著进展，涌现出如**MLD**、**MDM**、**MotionDiffuse**等一系列代表性工作。然而，现有模型生成的运动往往与人类偏好存在偏差——运动可能不自然、与文本语义不一致，或缺乏合理的空间感知能力。
 
 ### 现有偏好对齐方法的局限
@@ -70,8 +68,6 @@ claims:
 上述分析揭示了文本到运动偏好对齐的核心瓶颈：**离线DPO因固定标签数据导致过拟合，在线DPO因有偏采样导致偏好差距不足，二者均无法独立实现鲁棒且有效的偏好对齐。**
 
 本文的核心洞察在于：离线高质量优先运动提供了清晰可靠的偏好方向（缓解在线DPO的偏好差距不足），而在线动态生成的多样化非优先运动提供了泛化能力（弥补离线DPO的过拟合缺陷）。基于此，SoPo提出**半在线偏好优化**（Semi-Online Preference Optimization）范式，将离线人工标注的高质量优先运动与在线策略模型动态生成的多样化非优先运动组合成“半在线”训练对，使模型同时获得明确的对齐目标和充足的负样本多样性，从而突破现有方法的性能瓶颈。
-
-
 
 ## 核心方法与创新机理
 
@@ -111,8 +107,6 @@ SoPo 将上述概率形式的损失推导到扩散模型框架，转换为基于
 
 消融实验（Table 5）直接验证了这些创新：SoPo 显著优于纯离线 DPO、纯在线 DPO 及其简单组合，证明了半在线策略与阈值过滤机制各自独立且协同的必要性。
 
-
-
 SoPo 的整体训练流程围绕“半在线偏好对构造—阈值驱动损失分支—余弦相似度重加权”三条主线展开，旨在解决文本到运动生成中偏好对齐的过拟合与偏好差距不足问题。
 
 **输入与数据流。** 每个训练步接收两类数据：(1) 来自离线人工标注数据集的高质量优先运动 $x^w$，对应文本条件 $c$；(2) 由当前策略模型 $\pi_\theta$ 在线生成的 $K$ 个候选运动 $\{x_{\bar{\pi}_\theta}^k\}_{k=1}^K$。离线优先运动提供了稳定、无偏的偏好方向；在线候选运动则引入了动态多样性，避免对固定负样本的过拟合。
@@ -128,13 +122,6 @@ SoPo 的整体训练流程围绕“半在线偏好对构造—阈值驱动损失
 **扩散模型适配。** 对于基于扩散的文本到运动骨干模型（如 MLD、MDM），SoPo 将上述概率形式损失转换为噪声预测误差差的形式（Eq. 17），使优化目标可直接作用于扩散去噪过程。
 
 **模块关系总结。** 整个 pipeline 可概括为五个串行模块：离线优先运动选择 → 在线非优先运动生成与筛选 → 阈值驱动损失分支选择 → 余弦相似度重加权 → 扩散模型适配。这一设计使得 SoPo 同时继承了离线 DPO 的稳定偏好方向和在线 DPO 的泛化能力，并通过阈值与重加权机制克服了二者的核心缺陷——离线 DPO 的过拟合（Theorem 1）和在线 DPO 的梯度消失（Theorem 2）。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1919_SoPo_Text_to_Motion_Generation_Using_Semi_Online_Preference_Optimization/figures/001_Figure_1.jpg]]
-*Figure 1: Visual results on HumanML3D dataset. We integrate our SoPo into MDM [13] and MLD [1], respectively. Our SoPo improves the alignment between text and motion preferences*
-
-
 
 ### 问题形式化与RLHF目标
 
@@ -222,13 +209,6 @@ $$
 
 该损失保留了阈值驱动的双分支结构，直接以噪声预测误差差度量模型对优先运动的提升程度（**Eq. (16)-(17)**）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1919_SoPo_Text_to_Motion_Generation_Using_Semi_Online_Preference_Optimization/figures/002_Figure_2.jpg]]
-*Figure 2: Overfitting in offline DPO: green/red points are preferred/unpreferred motions; blue shows bias from fixed unpreferred data, red indicates uncovered unpreferred regions*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -283,9 +263,6 @@ Table 4 报告了超参数敏感性分析。在 MLD 骨干上，阈值 **τ = 0.
 
 4. **超参数敏感性**：τ 和重加权常数 C 需针对不同骨干模型和数据集独立调优（Table S2），缺乏自适应调整机制，增加了实际部署的调参成本。
 
-![[assets/figures/papers/paper_list_l1919_SoPo_Text_to_Motion_Generation_Using_Semi_Online_Preference_Optimization/figures/013_Table.jpg]]
-*Table: S2: Hyperparameters analysis of our SoPo*
-
 ### 图表核心结论
 
 - **Table 1**：SoPo 在 HumanML3D 上全面超越 MoDiPO 等偏好对齐基线，MM-Dist 相对改善达 3.25%，验证半在线策略对文本-运动对齐的有效性。
@@ -294,13 +271,6 @@ Table 4 报告了超参数敏感性分析。在 MLD 骨干上，阈值 **τ = 0.
 - **Table 4**：τ 和 K 的消融揭示性能-效率权衡，τ=0.45、K=2（MLD）为推荐配置。
 - **Table 5**：训练策略消融直接证实半在线设计优于纯离线、纯在线及其简单组合，阈值过滤不可或缺。
 - **Figure 4**：用户研究和空间感知实验表明 SoPo 生成的运动在主观偏好上显著优于基线，但在复杂空间推理任务上仍有提升空间。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1919_SoPo_Text_to_Motion_Generation_Using_Semi_Online_Preference_Optimization/figures/003_Figure_3.jpg]]
-*Figure 3: Comparison of offline, online DPO, and our SoPo on synthetic data. Offline DPO suffers from mining unpreferred motions with high probability, and online DPO is limited by biased sampling. Our SoPo utilizes the dynamic unpreferred motions and preferred motions from unbiased offline dataset, overcoming their advantage. Here, the blue region is the distribution of generative model*
-
-
 
 ## 定位与知识库关联
 
@@ -375,8 +345,6 @@ SoPo 的对齐效果高度依赖预训练的文本-运动奖励模型（如 TMR�
 4. **任务扩展**：SoPo 的半在线偏好优化框架能否扩展到文本到视频生成、三维人体运动预测等相关任务？
 
 5. **与判别式模型的协同**：SoPo 通过奖励模型间接利用判别信号，是否存在更直接的判别式-生成式协同优化路径？
-
-
 
 ## 原文 PDF
 

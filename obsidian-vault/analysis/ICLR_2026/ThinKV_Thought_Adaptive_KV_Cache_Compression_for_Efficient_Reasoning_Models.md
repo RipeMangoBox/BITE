@@ -53,8 +53,6 @@ ThinKV的核心洞察在于：思维链可被分解为三种功能类型——�
 
 实验表明，ThinKV在仅使用不到3.67%原始KV缓存存储的条件下，在AIME和LiveCodeBench等推理基准上实现近无损精度（与FullKV相比精度损失小于3.33个百分点），推理吞吐量最高提升5.8倍（Table 2），TPOT降低最高达1.68倍。该方法在ISO-batch和ISO-compression的公平设置下，系统性地优于现有量化和淘汰基线，为长推理任务的规模化部署提供了可行路径。
 
-
-
 ### 推理模型的长输出瓶颈
 
 大型推理模型（Large Reasoning Models, LRMs）通过生成显式思维链来求解复杂任务，显著提升了数学推理、代码生成等场景的准确率。然而，这种能力伴随着巨大的推理成本：思维链通常包含数千乃至数万个 token，导致 KV 缓存随生成过程急剧膨胀。对于典型的自回归生成过程，KV 缓存的内存占用量可表示为：
@@ -93,8 +91,6 @@ $$\phi: \{y_0, \ldots, y_{n-1}\} \to \mathcal{T}, \; |\mathcal{T}| = 3$$
 
 上述分析表明，推理模型的思维链具有可被利用的结构化规律，而现有方法在 token 粒度的操作无法捕捉这一高层语义。ThinKV 的核心动机在于：**利用注意力稀疏性动态识别思维类型，根据思维重要性差异化分配量化精度和主动淘汰，消除 token 级启发式方法造成的关键信息意外丢失**。通过在思维粒度上统一量化和淘汰策略，ThinKV 旨在以不到 5% 的原始 KV 缓存实现近无损精度，同时通过系统级优化实现显著的吞吐量提升。
 
-
-
 ## 核心方法与创新机理
 
 ThinKV 的核心创新在于将 KV 缓存压缩的控制粒度从传统的 token 级别提升到**思维段（thought segment）级别**，通过动态感知推理模型在思维链中表现出的注意力稀疏性模式，实施差异化的量化精度分配与渐进式淘汰。这一思路从根本上改变了现有方法在精度保持与高压缩比之间的权衡困境。
@@ -123,8 +119,6 @@ ThinKV 通过观察发现，注意力稀疏性在解码步上呈现**三模态�
 
 上述三个 changed slots 并非孤立改进，而是形成因果链条：思维分解提供类型标签 → TBQ 据此差异化量化 → TBE 利用类型间动态关系触发淘汰 → Continuous Thinking kernel 在系统层面高效执行淘汰而不损失吞吐。单独使用 TBQ 会导致生成长度膨胀，抵消压缩收益；ThinKV 通过联合 TBE 避免了这一问题（Table 4, Figure 10(d)）。这种“感知-决策-执行”的闭环设计，使得 ThinKV 在仅使用不到 3.67% FullKV 内存的情况下，在 AIME 和 LiveCodeBench 上实现近无损精度（Figure 8），同时将吞吐量提升至最高 5.8 倍。
 
-
-
 ThinKV 是一个面向大型推理模型（LRM）的思维自适应 KV 缓存压缩框架，其核心流程由四个关键模块串联构成：**Thought Decomposition**、**TBQ（Think Before You Quantize）**、**TBE（Think Before You Evict）** 和 **Continuous Thinking kernel**。整个 pipeline 的输入是模型在自回归生成过程中逐 token 产生的 KV 缓存，输出是经差异化量化和段粒度淘汰后的压缩缓存，最终由 Continuous Thinking 内核实现高效的内存复用。
 
 ### 模块关系与数据流
@@ -146,8 +140,6 @@ ThinKV 是一个面向大型推理模型（LRM）的思维自适应 KV 缓存压
 - **离线校准与在线推理的解耦**：稀疏度阈值 $\Theta$ 和层子集 $\mathcal{L}^*$ 通过离线 KDE 一次性确定，在线推理时仅需对选定层计算稀疏度并查表分类，将额外计算开销控制在可忽略范围（Table 5 显示 ThinKV 的淘汰调用率仅为 4.59%，远低于 R-KV 的 82.93%）。
 
 整体而言，ThinKV 将“思维类型感知”作为统一的设计主线，贯穿量化精度分配、淘汰时机与粒度、以及内存管理三个维度，形成了一个从语义理解到系统实现的端到端压缩框架。
-
-
 
 ThinKV 的核心洞察在于：推理模型的思维链可依据注意力稀疏性分解为**推理（R）、执行（E）与过渡（T）**三种思维类型。此三模态分布在多模型、多任务上稳定出现（Figure 3），且反事实重要性呈 R > E > T 的层级关系（Figure 4）。过渡思维虽不直接贡献答案，却能改变推理轨迹——完全消除将引发无限循环。基于此，ThinKV 构建了四个关键模块。
 
@@ -188,8 +180,6 @@ ThinKV 的压缩效果可由以下内存模型刻画：
 $$\operatorname{Mem}(KV) \propto (I + b L_{\mathrm{gen}}) \times a \beta$$
 
 其中 $I$ 为提示长度，$L_{\mathrm{gen}}$ 为生成 token 数，$a$ 为量化缩减因子，$b$ 为淘汰缩减因子，$\beta$ 为每参数字节数。ThinKV 通过联合优化 $a$ 和 $b$，在 1024 token 预算下将内存占用降至 FullKV 的 3.67% 以下（Figure 8）。
-
-
 
 ## 实验与关键发现
 
@@ -246,30 +236,8 @@ ThinKV 在推理模型（LRM）的 KV 缓存压缩任务上，以极低的存储
 - **Figure 8**：ThinKV 以 <3.67% 的 FullKV 存储实现了跨模型、跨数据集的近无损精度，显著优于所有淘汰基线。
 - **Table 2**：Continuous Thinking 内核的内存重用使 ThinKV 在同等压缩下实现了比 R-KV 高 3.6–5.8 倍的吞吐量。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_M3CeHnZKNC/figures/027_Table_6.jpg]]
-*Table 6: Summary of notation used in the paper*
-
-![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_M3CeHnZKNC/figures/029_Table_7.jpg]]
-*Table 7: Keyword list to interpret different thought types*
-
 ![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_M3CeHnZKNC/figures/046_Table_8.jpg]]
 *Table 8: Comparison of ThinKV and R-KV on GSM8K using MobileLLM-R1-950M*
-
-![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_M3CeHnZKNC/figures/047_Table_9.jpg]]
-*Table 9: Accuracy of ThinKV vs FullKV across reasoning effort levels for GPT-OSS-120B on Live-CodeBench*
-
-![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_M3CeHnZKNC/figures/048_Table_10.jpg]]
-*Table 10: Impact of data format choices on accuracy for R1-Llama-8B*
-
-![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_M3CeHnZKNC/figures/049_Table_11.jpg]]
-*Table 11: LLM accuracy comparison on LongWriter task*
-
-![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_M3CeHnZKNC/figures/051_Table_12.jpg]]
-*Table 12: Throughput comparison under different batch sizes implemented in vLLM*
-
-
 
 ## 定位与知识库关联
 
@@ -313,8 +281,6 @@ ThinKV的核心突破在于将压缩策略从**token级**提升到**思维级**�
 4. **混合长输入-长输出场景的协同优化**：当输入和输出均很长时，预填充压缩和ThinKV的自适应策略如何协同？预填充阶段是否也能利用思维类型信号进行差异化压缩？
 
 5. **与新兴推理架构的兼容性**：ThinKV的思维分解假设自回归生成中的注意力稀疏性模式。对于采用不同推理范式（如并行推理、树搜索）的未来LRM，该方法的有效性需要重新验证。
-
-
 
 ## 原文 PDF
 

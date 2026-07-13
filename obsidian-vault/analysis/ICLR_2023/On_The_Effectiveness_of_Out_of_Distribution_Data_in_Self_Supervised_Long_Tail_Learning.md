@@ -51,8 +51,6 @@ COLT 包含三个关键机制：（1）**尾度分数估计**，无监督地定�
 
 **主要结果**：在 CIFAR-10/100-LT、ImageNet-100-LT 和 Places-LT 上，COLT 大幅超越 SimCLR 基线，少数类精度提升约 12%（CIFAR-100-LT），整体精度标准差显著降低，特征空间更平衡。消融实验证实，真实图像OOD数据（如 300K Random Images）有效，而高斯噪声几乎无用；分布感知损失和动态采样策略对性能均有重要贡献。
 
-
-
 ### 长尾分布下的自监督学习困境
 
 自监督对比学习（如 **SimCLR**）在均衡数据集上取得了显著成功，但其在长尾分布场景下的表现却大幅退化。现实世界的数据天然呈现长尾分布：少数头部类别拥有大量样本，而绝大多数尾部类别仅有稀疏实例。当直接在这种不平衡数据上训练对比学习模型时，多数类样本在特征空间中占据主导地位，其表示支配了整个嵌入空间的几何结构；少数类样本则被迫形成稀疏的孤立点，类内一致性差，线性可分性严重受损。
@@ -80,8 +78,6 @@ COLT 包含三个关键机制：（1）**尾度分数估计**，无监督地定�
 综上，本文瞄准的核心瓶颈是：**自监督对比学习中，长尾数据导致特征空间不平衡，少数类表示质量差**。其因果调控手段为：**引入与少数类特征空间邻近的 OOD 样本，动态扩增尾部表示**。核心洞察在于：OOD 样本可作为“桥梁”，在增强图中连接同一 ID 少数类的不同实例，提升类内一致性和特征空间的均匀性，而无需昂贵的 ID 数据。
 
 后续章节将依次展开 COLT 的完整方法设计、实验验证与深入分析，系统论证 OOD 数据在自监督长尾学习中的有效性及其作用机理。
-
-
 
 ## 核心方法与创新机理
 
@@ -128,8 +124,6 @@ $$\mathcal{L}_{COLT} = \mathcal{L}_{CL} + \alpha \mathcal{L}_{SCL}$$
 
 COLT可以即插即用地集成到大多数自监督框架（SimCLR、SDCLR、BCL）中，其增益在多个基准上得到验证：在CIFAR-100-LT（IR=100）上，BCL+COLT相比SimCLR提升10.33个百分点；在ImageNet-100-LT上提升5.14个百分点（Table 1, Table 2）。更重要的是，COLT在相同采样预算下显著优于随机采样和基于ID数据的MAK方法（Table 3, Table 4），证明了其采样策略和OOD利用机制的有效性。
 
-
-
 COLT 是一个即插即用的长尾自监督学习增强框架，其核心设计思路是**利用分布外数据动态重平衡特征空间**。整个框架由四个关键模块串联构成，形成一条从“定位尾部样本”到“引入 OOD 样本”再到“显式分离域”的完整流水线。
 
 ### 模块关系与数据流
@@ -156,8 +150,6 @@ COLT 的关键洞察在于：OOD 样本并非被当作额外的“伪类别”�
 
 ![[assets/figures/papers/paper_list_l1501_https_arxiv_org_abs_2306_04934/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of Contrastive with Out-of-distribution data for Long-Tail learning (COLT). COLT can be easily plugged into most SSL frameworks. Proposed components are denoted as red*
-
-
 
 COLT 由四个核心模块串联构成，其设计围绕一个中心逻辑：**无监督定位尾部样本 → 按簇分配采样预算 → 在线选取邻近的 OOD 样本 → 利用域标签显式分离 ID/OOD 特征空间**。
 
@@ -235,8 +227,6 @@ $$\mathcal{L}_{CL} = \frac{1}{N} \sum_{i=1}^{N} -\log \frac{\exp(\boldsymbol{z}_
 
 **消融验证**（Fig 3c）：加入 $\mathcal{L}_{SCL}$ 后，整体精度提升的同时，各类间精度标准差（Std）显著下降，证明分布感知损失有效促进了特征空间的平衡。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -296,22 +286,8 @@ COLT在多个长尾基准上一致且显著地提升了自监督对比学习基�
 
 4. **计算开销**：COLT需要定期进行K-means聚类、尾度分数计算和OOD采样，增加了训练过程中的计算开销。论文未详细报告这一额外开销的具体数值。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1501_https_arxiv_org_abs_2306_04934/figures/008_Figure_3.jpg]]
-*Figure 3: Analytical experiments of COLT on CIFAR-100-LT. (3a): accuracy when changing the external OOD dataset. (3b): accuracy when sampling different numbers of OOD samples on 300K Random Images. (3c): Top-1 accuracy and standard derivation (Std) of COLT with or without the proposed distribution loss. (3d): accuracy with various sampling intervals r. (3e): A higher ϕtail and a lower $\phi _ { h e a d }$ implies mining tail samples more precisely. (3f): accuracy with various k*
-
 ![[assets/figures/papers/paper_list_l1501_https_arxiv_org_abs_2306_04934/figures/011_Figure_4.jpg]]
 *Figure 4: Normalized Misclassification Matrix (NMM) on the test set of CIFAR-100 with different frameworks and train sets. (4a): SimCLR trained on balanced CIFAR-100. (4b): SimCLR trained on long-tailed CIFAR-100. (4c): implement COLT on top of SimCLR trained on long-tailed CIFAR-100*
-
-![[assets/figures/papers/paper_list_l1501_https_arxiv_org_abs_2306_04934/figures/012_Figure.jpg]]
-*Figure: (a) SimCLR (majority classes’ mean connectivity: 0.73 minority classes’ mean connectivity: 0.46) (b) SimCLR+COLT (majority classes’ mean connectivity: 0.76 minority classes’ mean connectivity: 0.67)*
-
-![[assets/figures/papers/paper_list_l1501_https_arxiv_org_abs_2306_04934/figures/013_Figure_6.jpg]]
-*Figure 6: Linear regression results between the minority proportion in a cluster and the cluster’s tailness score on long-tailed CIFAR, ImageNet-100, and Places. We set cluster number C = 10*
-
-![[assets/figures/papers/paper_list_l1501_https_arxiv_org_abs_2306_04934/figures/014_Figure_5.jpg]]
-*Figure 5: The augmentation graph of CIFAR-10. Similar to (Wang et al., 2021), We choose a random subset of test images and randomly augment them 20 times. Then, we calculate the instance distance in the representation space and draw edges for image pairs whose smallest view distance is below a small threshold. We visualize the samples with t-SNE and denote edges between ID instances in black and edges between ID and OOD samples, forming new connections in red. (a) CIFAR-10-LT*
 
 ![[assets/figures/papers/paper_list_l1501_https_arxiv_org_abs_2306_04934/figures/001_Figure_1.jpg]]
 *Figure 1: (1a): Feature space uniformity of different SSL frameworks. (1b): Visualization of the alignment property of samples in minority classes and majority classes w/ or w/o COLT. The experiment is conducted with ResNet-18 on CIFAR-100-LT*
@@ -319,16 +295,8 @@ COLT在多个长尾基准上一致且显著地提升了自监督对比学习基�
 ![[assets/figures/papers/paper_list_l1501_https_arxiv_org_abs_2306_04934/figures/003_Table_1.jpg]]
 *Table 1: Test accuracy (%) and balancedness (Std↓) on CIFAR-10-LT and CIFAR-100-LT*
 
-![[assets/figures/papers/paper_list_l1501_https_arxiv_org_abs_2306_04934/figures/004_Table_2.jpg]]
-*Table 2: Test accuracy (%) and balancedness (Std↓) on ImageNet-100-LT and Places-LT*
-
-![[assets/figures/papers/paper_list_l1501_https_arxiv_org_abs_2306_04934/figures/006_Table_4.jpg]]
-*Table 4: Compare the test accuracy (%) on ImageNet-100-LT of the proposed COLT with MAK which use ID data. The best performance is marked as bold*
-
 ![[assets/figures/papers/paper_list_l1501_https_arxiv_org_abs_2306_04934/figures/007_Table_5.jpg]]
 *Table 5: Comparison of semi-supervised and self-supervised methods when leveraging OOD data*
-
-
 
 ## 定位与知识库关联
 
@@ -367,8 +335,6 @@ COLT的有效性依赖于以下关键条件：
 **与半监督方法的对比优势**：Table 5显示COLT在利用OOD数据时比半监督方法表现更好，但这一现象的原因尚不明确，可能涉及自监督预训练与半监督学习中OOD数据利用机制的本质差异。
 
 **最低数据需求**：COLT的有效性对OOD数据规模和分布的最低要求是什么？当前实验覆盖了从数千到数十万规模的OOD数据，但未系统探索性能骤降的临界点。
-
-
 
 ## 原文 PDF
 

@@ -54,8 +54,6 @@ SegQuant采用模块化设计，将现有量化技术统一为**Optimizer**（�
 
 实验结果表明，SegQuant在多个主流扩散模型上取得了领先的量化性能。在MJHQ-30K基准上，SegQuant-G在W8A8设置下将SD3.5-DiT的FID降至23.94，优于Smooth+（24.10）和PTQ4DiT（25.66），逼近FP16精度（23.70）；在FLUX-DiT上，SegQuant-A的FID达到22.85，较Q-Diffusion（23.99）降低1.14。消融实验进一步验证了SegLinear与DualScale的互补性：二者组合使FID从23.35降至22.54，Image Reward从0.877提升至0.952。在效率方面，DualScale相比定制化的PTQ4ViT在AdaNorm层上实现约4倍加速（FLUX: 4201→1075 μs），充分体现了硬件友好设计的优势。
 
-
-
 ### 扩散模型量化的困境：编译器鸿沟与语义盲区
 
 扩散模型已成为文本到图像生成的主流架构，但其巨大的推理成本严重制约了实际部署。后训练量化（Post-Training Quantization, PTQ）通过将浮点权重和激活压缩为低位整数，是缓解这一瓶颈的关键技术。然而，现有扩散模型量化方法面临两个根本性缺陷，导致量化后生成质量显著下降。
@@ -73,8 +71,6 @@ SegQuant采用模块化设计，将现有量化技术统一为**Optimizer**（�
 ### 本文动机：构建编译器原生且语义感知的量化框架
 
 上述分析揭示了一个核心矛盾：扩散模型量化需要在**精度保留**、**编译器兼容性**和**硬件效率**三者之间取得平衡，而现有方法往往顾此失彼。SegQuant 的动机正是弥合这一鸿沟——通过静态计算图的拓扑模式匹配自动感知线性层中的语义分割边界，并以硬件原生的双尺度策略保留极性非对称激活的精细信息，在不牺牲编译器兼容性的前提下实现逼近全精度的生成质量。
-
-
 
 ## 核心方法与创新机理
 
@@ -134,8 +130,6 @@ SegQuant 将上述两项创新整合为一个**模块化框架**，通过两个�
 
 **总结**：SegQuant 的核心创新不在于发明全新的量化算子，而在于**通过静态图语义分析揭示了扩散模型中隐含的结构异质性**，并以**编译器原生**的方式加以利用，同时以**极性保留**机制解决了 SiLU/GELU 激活的精细信息损失——两者共同构成了一个既高效又部署友好的量化框架。
 
-
-
 SegQuant 采用“优化器–校准器”双插件架构，将现有量化技术与两项核心创新——**SegLinear** 和 **DualScale**——统一为编译器原生的推理管线。其工作流自上而下：首先对模型进行静态计算图分析，自动检测线性层中的语义分割边界；随后在优化器阶段插入平滑或低秩调整，在校准器阶段执行权重量化误差最小化；最后输出可直接部署的量化模型。
 
 ### 架构总览
@@ -180,15 +174,11 @@ SegQuant 的量化策略在编译前完全确定——SegLinear 依赖静态图�
 
 需注意，论文主要在 DiT 和 UNet 架构的文本到图像扩散模型上验证，尚未在视频生成或多模态扩散模型上进行广泛测试。DualScale 虽通过 CUTLASS 高效实现，仍引入一次额外 BatchedGEMM 的计算开销。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l930_https_arxiv_org_abs_2507_14811/figures/001_Figure_1.jpg]]
 *Figure 1: SegQuant framework follows a top-down workflow that effectively integrates existing quantization techniques with our novel contributions*
 
 ![[assets/figures/papers/paper_list_l930_https_arxiv_org_abs_2507_14811/figures/002_Figure_2.jpg]]
 *Figure 2: Structural overview of the DiT diffusion model, highlighting latent-related modules (left) and time-related modules (right)*
-
-
 
 SegQuant 框架在两个核心模块上实现突破：**SegLinear**（语义分割量化）与 **DualScale**（双尺度极性保留）。两者分别解决线性层语义异构性与极性非对称激活的量化瓶颈，并通过与现有 Optimizer/Calibrator 插件的组合形成完整量化管线。
 
@@ -253,18 +243,8 @@ SegQuant 将上述模块与现有方法统一为两个抽象插件：
 
 SegLinear 与 DualScale 作为框架增强模块嵌入此管线：SegLinear 在 Optimizer 阶段指导分段量化的超参数优化，DualScale 在 Calibrator 阶段提供双尺度激活量化策略。消融实验（Table 4）表明，两者组合使用将 FID 从 23.35 降至 22.54，Image Reward 从 0.877 提升至 0.952，验证了互补增益。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l930_https_arxiv_org_abs_2507_14811/figures/004_Figure_4.jpg]]
 *Figure 4: Visualization of weights in AdaNorm within the TimeEmbedding module. The distribution reveals distinct semantic patterns*
-
-![[assets/figures/papers/paper_list_l930_https_arxiv_org_abs_2507_14811/figures/008_Figure_6.jpg]]
-*Figure 6: Activation curves of SiLU, GELU, and ReLU. The shaded regions show how SiLU and GELU retain negative values, while ReLU suppresses them*
-
-![[assets/figures/papers/paper_list_l930_https_arxiv_org_abs_2507_14811/figures/007_Figure_7.jpg]]
-*Figure 7: Visual impact of negative-range quantization in SD3.5 (timestep 60, COCO). Only the negative part of activations is quantized to isolate its contribution to image details. (a) and (c) show full images; (b) and (d) zoom in to highlight detail and range loss*
-
-
 
 ## 实验与关键发现
 
@@ -324,24 +304,8 @@ Figure 8 和 Figure 11-14 的主观对比可视化进一步证实，SegQuant 生
 
 4. **动态形状适应性**：SegLinear 的静态图分析依赖固定的张量维度信息。对于支持多分辨率生成的扩散模型，动态形状可能导致分割边界失效，需要引入运行时形状推断或回退机制。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l930_https_arxiv_org_abs_2507_14811/figures/014_Table_3.jpg]]
-*Table 3: Frobenius norm of quantization error for single linear layers in SD3.5, comparing SmoothQuant (W8A8, tuned α), SVDQuant (W4A8, per-channel), and GPTQ (fixed α=0.5)*
-
 ![[assets/figures/papers/paper_list_l930_https_arxiv_org_abs_2507_14811/figures/015_Table_4.jpg]]
 *Table 4: Ablation study on MJHQ-30K with SD3.5 and W8A8 DiT quantization (32 images calibrating). Using SmoothQuant as our optimizer (fixed α=0.5) and AMax*
-
-![[assets/figures/papers/paper_list_l930_https_arxiv_org_abs_2507_14811/figures/019_Table_8.jpg]]
-*Table 8: Runtime comparison of AdaNorm layer quantization and inference (W8A8) on an NVIDIA RTX 4090 GPU*
-
-![[assets/figures/papers/paper_list_l930_https_arxiv_org_abs_2507_14811/figures/017_Table_6.jpg]]
-*Table 6: Semantics Ablation on SD3 DiT.0.norm1. Comparison of our topology-aware segmentation against random and mismatched chunking strategies*
-
-![[assets/figures/papers/paper_list_l930_https_arxiv_org_abs_2507_14811/figures/012_Figure_10.jpg]]
-*Figure 10: Performance of quantization strategies on SD3.5 (RTX 4090). INT8 (W8A8) uses SmoothQuant; INT4 (W4A4) uses SVDQuant. Model size includes only the backbone; inference time is per-step (end-to-end)*
-
-
 
 ## 定位与知识库关联
 
@@ -392,8 +356,6 @@ SegQuant 在扩散模型量化领域的定位可概括为：**首个编译器原
 - **硬件友好的极性保留：** DualScale 在不引入定制硬件的前提下，以标准 GEMM 实现极性非对称激活的高保真量化，为 SiLU/GELU 激活的量化提供了实用方案。
 
 从更广的模型优化视角看，SegQuant 的 Optimizer/Calibrator 插件架构为未来扩散模型量化方法的集成提供了统一框架，后续工作可在该框架下探索新的平滑策略、校准算法或分段模式。
-
-
 
 ## 原文 PDF
 

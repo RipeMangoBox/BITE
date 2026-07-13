@@ -47,13 +47,9 @@ claims:
 
 本文提出了一种基于阈值激活函数的密集联想记忆模型（Threshold-based Dense Associative Memory, TDAM），在保持生物可解释性的同时，实现了与隐藏神经元数量呈指数关系的存储容量。该模型发表于 ICLR 2026，核心创新在于将隐藏神经元的激活函数从幂律函数、softmax 或球面归一化等非线性函数替换为简单的 Heaviside 阶跃函数，从而允许分布式表示。理论分析表明，当可见神经元数量远大于隐藏神经元数量（$N_v \gg N_h$）时，有效权重矩阵 $J_{\mu\nu}$ 趋近于单位矩阵，使得所有 $2^{N_h}$ 种隐藏层二元状态都成为稳定不动点。在 MNIST 数据集上，仅用 50 个隐藏神经元即可存储 60,000 张图像，召回准确率达 98%；在 CIFAR-10 数据集上，用 500 个隐藏神经元存储 50,000 张图像，学习到 49,982 个唯一极小值。
 
-
-
 传统联想记忆模型面临容量瓶颈。Krotov and Hopfield (2021) 提出的密集联想记忆模型虽然引入了两层架构，但其存储容量仅与隐藏神经元数量呈线性关系。该模型采用赢者通吃（winner-take-all）的动力学，导致每个隐藏神经元只能编码一个记忆，无法实现分布式表示。具体而言，Krotov-Hopfield 模型使用了三种非线性激活函数：幂律函数（$f(h_\mu)=h_\mu^n$）、softmax 和球面归一化，这些函数要么导致隐藏神经元活动值无界增长（幂律函数），要么依赖非局部操作（softmax 和球面归一化），既限制了容量，也降低了生物可解释性。
 
 Demircigil et al. (2017) 虽然实现了指数容量，但其模型依赖非生物可解释的相互作用。Chandra et al. (2025) 通过使用多个密集联想记忆模块实现了分布式编码和指数容量，但需要多个模块协同工作。本文的核心动机是：能否在单个模块中同时实现指数容量和生物可解释性？
-
-
 
 ## 核心方法与创新机理
 
@@ -64,8 +60,6 @@ Demircigil et al. (2017) 虽然实现了指数容量，但其模型依赖非生�
 2. **指数容量**：所有 $2^{N_h}$ 种隐藏层二元状态都成为稳定不动点，从而在 $N_v \gg N_h$ 条件下实现指数级存储容量。
 
 3. **生物可解释性**：阈值激活函数是局部的，且保持神经元活动在生物可解释的范围内（0 或 1），而 Krotov-Hopfield 模型的幂律激活函数会导致隐藏神经元活动值达到不切实际的高值。
-
-
 
 ![[assets/figures/papers/iclr26_0002_mRZOayQL1i_A_Biologically_Plausible_Dense_Associative_Memor/figures/001_Figure_1.jpg]]
 *Figure 1: a*
@@ -87,8 +81,6 @@ $$\tau_h \frac{d h_\mu}{dt} = -h_\mu + \frac{\sqrt{N_h}}{N_v} \sum_{i=1}^{N_v} \
 
 其中 $\Theta(z)$ 是 Heaviside 阶跃函数（Eq. (2)）：
 $$\Theta(z) = \begin{cases} 0 & \text{if } z \leq 0 \\ 1 & \text{if } z > 0 \end{cases}$$
-
-
 
 ### 5.1 不动点分析与容量证明
 
@@ -133,8 +125,6 @@ $$\mathbf{v} = \frac{1}{\sqrt{N_h}} \sum_{\mu=1}^{N_h} \xi_\mu s_\mu$$
 $$(\xi, \theta) = \arg\min_{\xi,\theta} \sum_{m=1}^M \left\| \mathbf{v}_m - \frac{1}{\sqrt{N_h}} \sum_{\mu=1}^{N_h} \pmb{\xi}_\mu \Theta\left( \frac{\sqrt{N_h}}{N_v} \pmb{\xi}_\mu^\top \mathbf{v}_m - \theta \right) \right\|^2$$
 
 该学习规则与 Radhakrishnan et al. (2020) 提出的规则相同。
-
-
 
 ## 实验与关键发现
 
@@ -184,8 +174,6 @@ $$(\xi, \theta) = \arg\min_{\xi,\theta} \sum_{m=1}^M \left\| \mathbf{v}_m - \fra
 - 分类准确率比较中，原始图像的分类器是在完整图像上训练的，而召回表示的分类器是在网络重构后的图像上训练的，两者训练数据分布不同。
 - CIFAR-10 上可见层召回准确率（56%）显著低于原始图像（88%），表明模型对复杂彩色图像的表示能力有限。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0002_mRZOayQL1i_A_Biologically_Plausible_Dense_Associative_Memor/figures/008_Table_2.jpg]]
 *Table 2: Architecture and Parameters of the CNN Classifier*
 
@@ -194,8 +182,6 @@ $$(\xi, \theta) = \arg\min_{\xi,\theta} \sum_{m=1}^M \left\| \mathbf{v}_m - \fra
 
 ![[assets/figures/papers/iclr26_0002_mRZOayQL1i_A_Biologically_Plausible_Dense_Associative_Memor/figures/002_Figure_1.jpg]]
 *Figure 1: b Figure 1: Capacity versus the number of hidden units, $N _ { h }$ , with $N _ { v }$ = 1 0 0 $N _ { h }$ and $\tau _ { v }$ = 2 0 $\tau _ { h }$ . (a) Capacity for different thresholds, θ. The highest storage capacity is achieved when the threshold is set to its optimal theoretical value , $\theta$ = 0 . 5 . (b) The effect of noise in the visible layer ( $\epsilon _ { i } ^ { v }$ in Eq. (12a)), shown for different noise variances, demonstrates the large basin of attraction of the fixed points.
-
-
 
 ## 定位与知识库关联
 
@@ -228,8 +214,6 @@ $$(\xi, \theta) = \arg\min_{\xi,\theta} \sum_{m=1}^M \left\| \mathbf{v}_m - \fra
 - 模型中的分布式表示是否与生物神经编码（如群体编码）有更深的联系？
 - 如何将模型与分层预测编码（如 Li et al. (2025), Salvatori et al. (2021)）结合，实现层次化特征学习？
 - 模型能否扩展到序列记忆或时间依赖的记忆任务？
-
-
 
 ## 原文 PDF
 

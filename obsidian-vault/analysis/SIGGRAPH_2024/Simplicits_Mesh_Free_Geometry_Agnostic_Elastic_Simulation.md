@@ -58,8 +58,6 @@ claims:
 
 **局限性**：当前方法假设形变基在仿真过程中保持不变，无法处理拓扑变化（如断裂、切割）；对刚度分布极不均匀的物体训练可能收敛困难；从形变映射反向渲染隐式场尚未完全解决；复杂几何的训练时间仍较长。
 
-
-
 弹性体物理模拟是计算机图形学、机器人学和工程设计中的核心技术，其目标是预测物体在力、碰撞和约束作用下的形变与运动。传统上，这一任务由有限元法（FEM）主导，但FEM高度依赖特定的空间离散化——通常需要将输入几何转化为高质量的四面体网格或六面体网格。这一前置步骤不仅计算代价高昂、难以自动化，更关键的是，它与近年来涌现的多样化三维表示范式产生了根本性矛盾。
 
 ### 表示碎片化：模拟技术面临的核心瓶颈
@@ -89,8 +87,6 @@ claims:
 3. **如何保证降阶基的表达能力和边界条件满足？** 降阶模拟的本质是用少量自由度近似全阶动力学，因此基的质量至关重要。Simplicits采用全仿射变换（3×4矩阵）而非仅平移变换作为手柄动作空间，并使用非线性Neohookean能量而非线性能量进行训练，以捕获大形变下的几何非线性效应。此外，ELU激活函数的使用被实验证明比SIREN更严格地满足固定边界条件。
 
 通过这些设计，Simplicits在保持降阶模拟计算效率的同时，实现了对输入几何表示的完全无关性，为物理模拟技术与现代三维视觉生态的融合开辟了新路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -138,8 +134,6 @@ $$G = \int_{\mathbb{R}^3} \Phi(\mathbf{X}) g(\mathbf{X}) d\mathbf{X}$$
 - 物理启发式训练的必要性由Fig. 11（有无弹性损失对比）和Fig. 9（非线性能量与全变换采样消融）直接验证。
 - 与FEM参考解的精度对比（Fig. 8）显示，9个手柄的Simplicits结果与基于网格的Fast Skinning Eigenmodes非常接近，且显著优于SPH和MPM等纯无网格方法。
 
-
-
 ![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2407_09497/figures/009_Figure_8.jpg]]
 *Figure 8: A cantilever bar comparison between a reference linear-tetrahedral, Corotational FEM beam,our method with 6and 9 handles,Fast Skinning Eigenmodes [Benchekroun et al.2023] with 10 handles,SPH[Kugelstadt et al.2021] with 5582 particles,and MPM [Hu etal.2019] with 5000 particles and initial grid density of 10.Notice ours matches Fast Skinning Eigenmodes very closely andf exhibits similar numerical coarsening due to reduction when compared to FEM.Simulations are run for 300 steps with timestep 0.01s,with young's modulus 5e6Pa,poisson ratio 0.45,density 1 0 0 0 $\mathrm { k g / m ^ { 3 } }$ using corotational linear elastic material*
 
@@ -180,8 +174,6 @@ Simplicits 提出了一套**表示无关的弹性物理模拟流程**，其核�
 
 - **输入**：任意可转化为占有率查询的 3D 几何表示（显式网格、点云、SDF、高斯泼溅、NeRF 等），以及物理参数（杨氏模量、泊松比、密度等）。
 - **输出**：物体在用户指定手柄变换或外力作用下的动态形变动画，表现为采样点或渲染后的形变几何序列。
-
-
 
 ### 3.1 隐式时间积分框架
 
@@ -255,8 +247,6 @@ $$
 
 **运行时效率**：神经场仅在预处理阶段计算一次，用于获取采样点上的权重及其导数；物理时间步进循环中完全不需要神经网络推理，这是 Simplicits 在保持表示无关性的同时实现交互式仿真速度（每步 51–107 ms）的关键。
 
-
-
 ## 实验与关键发现
 
 ### 实验设置与基准
@@ -313,11 +303,7 @@ Simplicits 在多种几何表示上进行了系统评估，包括显式三角形
 3. **隐式场渲染。** 从正向形变映射渲染NeRF等隐式体积表示需要额外的逆映射，尚未完全解决。
 4. **复杂几何训练成本。** 高斯泼溅乐高训练约需 $1.5$ 小时，对于实时交互式工作流仍有优化空间。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2407_09497/figures/001_Figure.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -383,8 +369,6 @@ Simplicits 在谱系中占据的位置是：**数据无关的、物理启发式�
 3. **跨连续介质现象推广**：将该范式推广至其他连续介质现象（如流体、塑性）的可能性，是方法泛化性的重要探索方向。
 
 4. **2D 图像弹性模拟**：原文展示了 2D 图像弹性模拟的初步结果（Fig. 18），利用单目深度估计和图像修复进行对象分割和遮挡区域填充。这一方向将 Simplicits 的应用边界拓展到了图像编辑领域，但当前仍处于初步阶段，需要手动验证其鲁棒性和泛化能力。
-
-
 
 ## 原文 PDF
 

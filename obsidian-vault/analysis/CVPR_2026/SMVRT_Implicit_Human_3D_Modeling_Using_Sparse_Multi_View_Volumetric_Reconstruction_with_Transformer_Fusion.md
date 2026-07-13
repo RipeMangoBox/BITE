@@ -51,8 +51,6 @@ claims:
 
 **主要结果**：在THUman2.1数据集上，SMVRT的法向一致性（NC）达到**0.940**，显著优于Zins et al.的0.900和MV-PIFu的0.844；在THUman2.0数据集上，倒角距离（CD）指标相比现有方法提升约**2倍**。定性结果显示，SMVRT对手指、衣物褶皱等精细结构的重建质量明显优于基线方法（Figure 3）。消融实验证实，三阶段融合模块的完整组合是性能提升的关键，移除任一模块均导致指标显著下降（Table 4）。
 
-
-
 从稀疏多视角图像重建高保真三维人体模型是计算机视觉与图形学中长期存在的挑战性课题。该任务在虚拟现实、增强现实、数字人建模、影视特效等应用中具有广泛需求，但其核心难点在于：当输入视图数量有限（例如2至8个环绕相机）时，如何从离散、可能存在遮挡的二维观测中，稳健地推断出完整且细节丰富的三维几何表面。
 
 传统方法主要依赖参数化模板（如SMPL/SMPLX）进行人体姿态与形状拟合，此类方法在身体主干区域表现较好，但对衣物褶皱、手指姿态、面部细节等偏离模板的几何结构往往难以准确恢复。另一类基于隐式函数的方法（如Pixel-Aligned Implicit Function）尝试直接从图像特征预测三维占据场，避免了模板依赖，但其在多视图场景下的特征融合策略仍存在明显局限。
@@ -60,8 +58,6 @@ claims:
 现有融合策略的不足可归纳为两个层面。其一，**特征聚合的粗糙性**：早期工作如**MV-PIFu**（Saito et al., ICCV 2019）采用简单的多视图特征拼接或平均池化，无法区分不同视图对特定空间点的可见性与信息贡献，导致遮挡区域的重建质量严重退化。其二，**融合位置的次优性**：近期方法如**Zins et al.**（3DV 2021）引入局部注意力机制在查询点处进行特征融合，但逐查询点独立计算注意力带来了较高的计算开销，且缺乏对多视图间全局关系的显式建模。图2对比了不同融合策略的差异：3DFG采用顺序拼接，Zins et al.在查询点处局部融合，而本文提出的SMVRT则在体积网格中心进行视图感知的特征选择，再于查询点处融合细节特征。
 
 上述缺陷共同指向一个核心瓶颈：**稀疏多视角输入下，传统方法难以有效融合跨视角特征，导致遮挡区域重建不完整、细节丢失，且简单特征聚合无法区分可见与遮挡视角的贡献**。这构成了本文的研究动机——设计一种端到端的隐式三维重建框架，通过多阶段的Transformer引导特征融合，实现视图间信息的自适应整合与表面精细结构的保留。
-
-
 
 ## 核心方法与创新机理
 
@@ -93,8 +89,6 @@ SMVRT 的核心创新在于针对**稀疏多视图人体重建中跨视角特征
 
 **证据支撑**：细节保持模块消融（Table 7）是最具说服力的证据——在 QFT 中引入低层 2D 特征后，法向一致性（NC）从 0.937 提升至 0.940，IoU 从 0.950 升至 0.958。定性对比（Figure 7）也显示，无细节保持器的重建表面过于平滑，缺失了衣物褶皱等细节。
 
-
-
 SMVRT 是一个端到端的稀疏多视角人体隐式三维重建框架，其核心设计目标是在仅给定少量（2–8 个）环绕相机拍摄的 RGB 图像及相机标定的条件下，重建出高保真的人体几何表面。整个 pipeline 由五个关键模块级联构成：**多模态输入处理与 ResNet 编码器**、**交替全局-局部融合模块（AFM）**、**多视图多层级特征融合 Transformer（MMFT）**、**查询点融合 Transformer（QFT）** 以及 **隐式场解码器（MLP）**。图 1 给出了完整的架构示意。
 
 ### 输入流与多模态编码
@@ -119,12 +113,8 @@ QFT 输出的增强嵌入经平均池化后，与查询点的三维坐标拼接�
 
 图 2 将 SMVRT 的融合策略与两类代表性基线进行了对比。**MV-PIFu**（Saito et al., ICCV 2019）采用像素对齐隐式函数，但在多视图融合时仅使用简单的拼接操作，缺乏视图间的显式交互。**Zins et al.**（3DV 2021）在查询点处进行局部注意力融合，虽引入了一定的视图选择能力，但每次查询都需重新计算注意力，计算冗余度高，且难以在遮挡区域形成全局一致的 3D 理解。SMVRT 的关键改进在于：将**首次融合（MMFT）提前到共享的体积网格中心**，以较低的计算代价完成视图选择与 3D 特征构建；随后在查询点处仅进行轻量的 2D-3D 交叉注意力（QFT），在保留细节的同时避免了逐点全量重计算。这一“先体积聚合、后查询精修”的级联策略，是 SMVRT 在稀疏视角下取得显著性能提升的因果枢纽。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l20_https_openaccess_thecvf_com_content_CVPR2026_html_Fan_SMVRT_Implicit_Hum/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the SMVRT architecture. Given RGB images, a pretrained Sapiens model [20](not shown) generates normal and depth maps. Camera calibrations are used to compute Plucker [ ¨ 39] rays. The four inputs represent RGB, depth(D), normal(N), Plucker ¨ rays(P), from left to right. These multi-modal inputs are stacked and fed to a ResNet[15] encoder to extract multi-level 2D features. The final-level pixel features are tokenized and passed through an Alternating Fusion Module (AFM) with additional register tokens [10], utilizing either Transformer [40] or Mamba [14] blocks to produce globally regularized features. For 3D volume construction, we bilinearly sample 2D features at each grid cen...*
-
-
 
 SMVRT 的核心创新在于三阶段注意力引导的特征融合机制，分别作用于 2D 特征增强、3D 体积构建和查询点解码三个层级，逐步解决稀疏多视图人体重建中跨视角信息整合与细节保留的难题。
 
@@ -183,13 +173,6 @@ $$\text{Loss} = -\frac{1}{BN}\sum_{i=1}^{B}\sum_{k=1}^{N}\text{BCE}(O_{\text{pre
 
 其中 $B$ 为批量大小，$N$ 为每个样本的查询点数量，$O_{\text{pred}}$ 和 $O_{\text{gt}}$ 分别为预测和真实的占据值。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l20_https_openaccess_thecvf_com_content_CVPR2026_html_Fan_SMVRT_Implicit_Hum/figures/002_Figure_2.jpg]]
-*Figure 2: Comparison of fusion strategies. (a) 3DFG [4] iteratively transforms query grids into camera spaces and fuse features sequentially by concatenation. (b) Zins et al. [50] perform local feature fusion at each query point by transformer. (c) In our SMVRT design, the first fusion MMFT occurs at grid centers to selectively choose the most relevant views, followed by QFT fusion at query points for fusing detail-preserving low-level features. (d) Our MMFT module first warps multi-view 2D features onto grid centers, where transformers are used to select the most related cameras. QFT is applied at query point to performing attentional fusion of 2D and 3D features*
-
-
-
 ## 实验与关键发现
 
 ### 核心性能对比
@@ -221,9 +204,6 @@ SMVRT在THUman2.1数据集上与两个无模板多视图基线方法进行了定
 
 QFT模块中低层2D特征的细节保持作用是SMVRT设计的关键环节。Table 7的消融表明，在QFT中引入低层2D特征（detail preserver）后，NC从0.937提升至0.940，IOU从0.950提升至0.958，CD l1从3.78降至3.58。定性对比（Figure 7）显示，无细节保持的变体重建表面过于平滑，丢失了衣物褶皱和面部细节；而完整QFT能有效保留这些高频几何信息。
 
-![[assets/figures/papers/paper_list_l20_https_openaccess_thecvf_com_content_CVPR2026_html_Fan_SMVRT_Implicit_Hum/figures/018_Figure_7.jpg]]
-*Figure 7: Visual results with and without detail preserver (dp.) corresponding to*
-
 这一结果证实了核心洞见：3D体积特征经过下采样和正则化后不可避免地损失高频细节，而直接从2D特征图投影的低层特征保留了原始图像的精细结构，通过QFT的注意力融合机制可以将这些细节注入最终的重建表面。
 
 ### 输入模态与相机数量影响
@@ -252,21 +232,6 @@ Table 6对比了AFM模块中使用标准Transformer与Mamba的实现。两者精
 ### 公平性说明
 
 所有基线方法均基于开源实现从头训练，使用相同的数据集划分（0.75:0.05:0.20）和评估指标（IoU、Chamfer Distance、Normal Consistency、F-score），渲染图像使用相同的4个环绕相机设置，确保对比结果的公平性。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l20_https_openaccess_thecvf_com_content_CVPR2026_html_Fan_SMVRT_Implicit_Hum/figures/014_Table_4.jpg]]
-*Table 4: Ablation studies on fusion modules. ”No fusion” represents model by removing AFM and replace MMFT and QFT with average pooling. ”MMFT” indicates adding only MMFT module on ”No fusion” module, ”QFT” means adding only QFT on ”No fusion”, and ”AFM” means adding AFM only. ”MMFT+ QFT” means enabling MMFT and QFT. ”MMFT+QFT+AFM” means the full model with all fusion modules enabled*
-
-![[assets/figures/papers/paper_list_l20_https_openaccess_thecvf_com_content_CVPR2026_html_Fan_SMVRT_Implicit_Hum/figures/019_Table_7.jpg]]
-*Table 7: Ablation study of QFT with and without low-level 2D features. With 2D features, we obtain consistently better metrics*
-
-![[assets/figures/papers/paper_list_l20_https_openaccess_thecvf_com_content_CVPR2026_html_Fan_SMVRT_Implicit_Hum/figures/017_Table_6.jpg]]
-*Table 6: Ablation study on AFM module. We compare the standard transformer and Mamba [14] blocks*
-
-![[assets/figures/papers/paper_list_l20_https_openaccess_thecvf_com_content_CVPR2026_html_Fan_SMVRT_Implicit_Hum/figures/004_Figure.jpg]]
-
-
 
 ## 定位与知识库关联
 
@@ -301,8 +266,6 @@ SMVRT 的核心定位是**稀疏多视角下的无模板隐式人体重建**，�
 **与基于 3D Gaussian Splatting 等新兴表征的关系。** 论文发表于隐式场方法活跃的时期，未涉及与 3D Gaussian Splatting 等显式表征方法的对比。SMVRT 的体积中心融合思想——在共享 3D 空间中聚合多视图信息——与 Gaussian 方法中的 3D 原语优化存在概念上的呼应，但两者的融合机制和适用场景有本质差异，值得后续工作探索。
 
 **更稀疏视角下的极限性能。** 当前实验最低配置为 2 相机，更极端的情况（单目或宽基线双目）下，SMVRT 的融合机制是否仍有效、是否需要引入时序信息或人体先验，是开放的研究问题。
-
-
 
 ## 原文 PDF
 

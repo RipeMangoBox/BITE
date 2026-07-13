@@ -166,8 +166,6 @@ $$m_{\text{norm}} = \min\left(1.0, \frac{m}{\sigma \cdot \sqrt{H^2 + W^2}}\right
 
 消融实验（Table 3）验证了这一设计：直接附加专用光流解码器的 LAOF 取得了最佳性能，优于将光流约束集成到 FDM 中（LAOF-FlowFDM）或对光流进行自编码（LAOF-AE）的变体。去除 FDM 仅保留光流解码器（LAOF-Only($z_t$)）仍优于 LAOF-FlowFDM，但不及完整 LAOF，表明 FDM 提供的结构上下文对潜在动作学习具有辅助作用。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l890_https_arxiv_org_abs_2511_16407/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of LAOF framework: Consecutive observations*
 
@@ -248,9 +246,6 @@ LAOF 的核心因果机制在于引入**光流伪监督信号**作为运动先�
 
 在 PROCGEN 四个任务（BIGFISH、STARPILOT、JUMBLE、FRUITBOT）上的离散潜在动作评估中，LAOF 同样展现出显著增益（Table 2）：
 
-![[assets/figures/papers/paper_list_l890_https_arxiv_org_abs_2511_16407/figures/005_Table_2.jpg]]
-*Table 2: Effect of discrete latent actions on downstream reinforcement learning performance on PROCGEN. Acc. denotes the accuracy of action classification (%), Return denotes the average normalized episodic return over 1000 trials*
-
 | 方法 | BIGFISH Return | STARPILOT Return | JUMBLE Return | FRUITBOT Return | 平均提升 |
 |------|---------------|-----------------|---------------|-----------------|---------|
 | LAPO | 0.72 | 0.58 | 0.65 | 0.70 | — |
@@ -262,9 +257,6 @@ LAOF 的核心因果机制在于引入**光流伪监督信号**作为运动先�
 #### 极端低标签比例下的突破
 
 在 1% 动作标签比例的极端设置下，**无任何动作监督的 LAOF 匹配甚至超越了有监督的 LAOM-Action**（Nikulin et al., ICML 2025）（Figure 4）。这一结果直接证明了光流伪标签可以作为动作标签的有效替代，在标签极度稀缺时提供可靠的物理运动先验。
-
-![[assets/figures/papers/paper_list_l890_https_arxiv_org_abs_2511_16407/figures/006_Figure_4.jpg]]
-*Figure 4: Evaluation of discrete latent action quality across different action ratios on PROCGEN. Action ratio indicates the proportion of action labels in the training dataset. A shared legend for all four subfigures is shown in subfigure (a). Optical flow constraints significantly improve the training stability of baselines and the quality of learned representations, combined with*
 
 ### 光流约束的增益边界
 
@@ -328,9 +320,6 @@ Table 5 展示了不同光流模型在 LIBERO-Plus（含光照和背景干扰）
 - **RAFT**（LAOF-R）和 **SEA-RAFT**（LAOF-S）在光照变化和背景干扰下均保持稳定的性能增益。
 - 帧间差分特征（LAOF-$\Delta$）在干扰条件下性能下降明显，进一步验证了真实光流对域偏移的鲁棒性。
 
-![[assets/figures/papers/paper_list_l890_https_arxiv_org_abs_2511_16407/figures/013_Table_5.jpg]]
-*Table 5: Experimental results of different optical flow models on LIBERO-Plus and Real-World. LIBERO-Plus [15] extends LIBERO by including robustness evaluations under distractors. The models were trained on mixture data (2M samples) and evaluated under Light conditions (variations in intensity, direction, color, and shadow) and Background conditions (changes in scene and surface appearance). Here, LAOF-R denotes optical flow extracted using RAFT, LAOF-S denotes SEA-RAFT, and LAOF-Δ denotes features obtained by differencing consecutive observations extracted using DINOv2*
-
 ### 失败模式与局限性
 
 1. **视角限制**：当前方法基于第三人称固定视角视频，尚未验证在眼在手（eye-in-hand）腕部相机及第一人称视频上的效果。
@@ -348,14 +337,6 @@ Table 5 展示了不同光流模型在 LIBERO-Plus（含光照和背景干扰）
 - **Table 4**：光流表征与物理动作的典型相关分析
 - **Table 5**：不同光流模型的鲁棒性实验
 - **Figure 9**：系数 $\lambda$ 对训练稳定性的影响
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l890_https_arxiv_org_abs_2511_16407/figures/004_Figure_3.jpg]]
-*Figure 3: Subfigures (a) and (b) compare downstream task performance between continuous (solid lines) and discrete (dashed lines) latent action representations, using normalized episodic return for PROCGEN and success rate for LIBERO. The larger area under the solid lines compared to the dashed lines indicates that continuous representations outperform discrete ones across all downstream tasks (Q1). Subfigures (c) and (d) illustrate that our latent action evaluation metric is highly correlated with downstream task performance, with the mean Pearson correlation coefficient averaged across all tasks being 0.8288 for PROCGEN and –0.7311 for LIBERO*
-
-![[assets/figures/papers/paper_list_l890_https_arxiv_org_abs_2511_16407/figures/015_Table_6.jpg]]
-*Table 6: Hyperparameters, dataset sizes, and learning rates for tasks (action ratio = 1%)*
 
 ## 定位与知识库关联
 

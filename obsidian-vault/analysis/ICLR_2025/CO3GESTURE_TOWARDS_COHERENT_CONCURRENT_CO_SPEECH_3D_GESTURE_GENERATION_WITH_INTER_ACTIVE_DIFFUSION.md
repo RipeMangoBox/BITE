@@ -52,8 +52,6 @@ claims:
 
 **方法定位**：Co3Gesture 属于并发交互手势生成的扩散模型方法，其双边分支架构、时序交互模块与互注意力机制构成了区别于单人生成基线（如 TalkSHOW、DiffSHEG、EMAGE）和人-人交互基线（如 InterGen、InterX）的核心差异。
 
-
-
 语音驱动的 3D 手势生成（co-speech gesture generation）旨在根据语音信号合成与说话内容节奏同步、语义匹配的肢体动作，在虚拟数字人、沉浸式交互等领域具有重要应用。近年来，基于扩散模型的方法在该任务上取得了显著进展，代表性工作包括 **TalkSHOW**（Yi et al., CVPR 2023）、**ProbTalk**（Liu et al., CVPR 2024b）、**DiffSHEG**（Chen et al., CVPR 2024）和 **EMAGE**（Liu et al., CVPR 2024a）等。然而，这些方法存在一个根本性局限：它们均面向**单人自述场景**设计，无法处理真实对话中两人交替发言、手势彼此呼应的复杂交互动态。
 
 从问题本质来看，两人对话场景的挑战远非将单人生成模型简单叠加所能解决。首先，对话双方的身体动态呈现**不对称性**——一方说话时，另一方可能以点头、手势回应或保持静默倾听，这种主次分明的交互模式需要模型显式区分不同说话人的音频条件。其次，并发手势之间存在**时序关联**：一方的动作往往是对另一方语音或手势的响应，缺乏跨说话人的时序建模将导致生成的动作各自孤立，丧失交互连贯性。此外，现有数据集几乎全部采集自单人独白场景，**缺乏大规模、高质量的双人并发语音-手势数据**，进一步制约了这一方向的研究。
@@ -61,8 +59,6 @@ claims:
 在交互动作生成领域，**InterGen**（Liang et al., IJCV 2024b）和 **InterX**（Xu et al., CVPR 2024）等工作探索了基于文本描述的双人交互动作合成，但它们以文本而非语音为条件，无法捕捉语音韵律与手势节奏之间的细粒度耦合关系。因此，如何在语音驱动框架下实现连贯的并发交互手势生成，仍是一个开放问题。
 
 Co3Gesture 正是在这一背景下提出的。其核心动机可以概括为三个层次：第一，**填补并发语音手势生成的任务空白**，将研究从单人场景拓展至双人对话；第二，**构建首个大规模双人并发语音-手势数据集 GES-Inter**，为该方向提供数据基础；第三，**设计双边协作扩散框架**，通过分离音频条件、时序交互建模和跨说话人注意力机制，确保生成手势既保持个体与自身语音的同步，又具备双方之间的交互连贯性。
-
-
 
 ## 核心方法与创新机理
 
@@ -94,8 +90,6 @@ $$\mathcal{L}_{total} = \lambda_{simple} \mathcal{L}_{simple} + \mathcal{L}_{vel
 
 综上，Co3Gesture 通过“双边分支解耦个体动态 + TIM 融合交互线索 + 互注意力交换跨说话人特征”的三层递进设计，系统性地解决了并发手势生成中的个体响应与交互连贯这一核心矛盾。
 
-
-
 ![[assets/figures/papers/paper_list_l20_https_openreview_net_pdf_id_VaowElpVzd/figures/004_Figure_3.jpg]]
 *Figure 3: The overall pipeline of our $\mathrm { C o ^ { 3 } G e s t u r e }$ . Given conversational speech audios, our framework generates concurrent co-speech gestures with coherent interactions*
 
@@ -122,8 +116,6 @@ $$\mathcal{L}_{total} = \lambda_{simple} \mathcal{L}_{simple} + \mathcal{L}_{vel
 其中 $\mathcal{L}_{simple}$ 为简单扩散重建损失（$\lambda_{simple}=15$），分别约束两位说话人的去噪输出与真实手势之间的均方误差；$\mathcal{L}_{vel}$ 为速度损失，保证运动平滑性；$\mathcal{L}_{foot}$ 为脚部接触损失，用于提升姿态的物理合理性。
 
 综上，Co3Gesture 通过“分离音频驱动双边分支—TIM 融合交互信息—互注意力交换跨说话人特征”的级联设计，实现了从对话音频到连贯并发手势的端到端生成。消融实验表明，移除 TIM 会导致 FGD 从 0.769 升至 1.297，移除互注意力则升至 0.924，验证了各模块在交互建模中的关键作用（Table 3）。
-
-
 
 ### 双边协作扩散主干
 
@@ -158,8 +150,6 @@ $$\mathcal{L}_{total} = \lambda_{simple} \mathcal{L}_{simple} + \mathcal{L}_{vel
 $$\mathcal{L}_{simple} = \mathbb{E}_{x,t,\epsilon} \left[ \| x_a - \mathcal{D}(x_a^{(t)}, C_a, C_{mix}, t) \|_2^2 + \| x_b - \mathcal{D}(x_b^{(t)}, C_b, C_{mix}, t) \|_2^2 \right]$$
 
 $\mathcal{L}_{vel}$ 为速度损失，约束相邻帧间运动平滑性；$\mathcal{L}_{foot}$ 为脚部接触损失，确保下半身（补全为 T-pose）的物理合理性。消融实验显示，移除 $\mathcal{L}_{foot}$ 后 FGD 升至 1.082、BC 同步下降（Table 5），验证了该损失对姿态物理合理性的贡献。权重 $\lambda_{simple}$ 设为 15。
-
-
 
 ## 实验与关键发现
 
@@ -204,9 +194,6 @@ Co3Gesture 在核心指标 **FGD（Fréchet Gesture Distance）** 上达到 0.76
 ![[assets/figures/papers/paper_list_l20_https_openreview_net_pdf_id_VaowElpVzd/figures/012_Table_6.jpg]]
 *Table 6: Statistical results in User Study. ± denotes standard deviation*
 
-![[assets/figures/papers/paper_list_l20_https_openreview_net_pdf_id_VaowElpVzd/figures/013_Table_7.jpg]]
-*Table 7: Significance Analysis of User Study*
-
 为确保评估的可靠性，用户研究采用了严格的实验设计：所有参与者先观看数据集中的标注示例作为参考标准；评估顺序随机化且匿名；60% 的参与者在两周后重新打分进行交叉验证，未发现显著偏差。交互连贯性维度的高分尤其值得关注，因为它直接衡量了双人手势之间的时序配合与互动自然程度，这正是 Co3Gesture 相较于其他方法的核心优势所在。
 
 ### 失败模式与局限性
@@ -222,13 +209,6 @@ Co3Gesture 在核心指标 **FGD（Fréchet Gesture Distance）** 上达到 0.76
 4. **空间假设固定**：训练和推理时假设两位说话人的相对位置固定，未考虑野外视频中多变的摄像头角度和空间布局。这限制了模型在非标准化拍摄条件下的泛化能力。
 
 5. **评估指标不足**：交互质量的评估仍依赖通用指标（FGD、BC）和主观研究，缺少针对并发手势交互一致性的精细化客观度量，如交互同步率、响应时滞等。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l20_https_openreview_net_pdf_id_VaowElpVzd/figures/003_Table_1.jpg]]
-*Table 1: Statistical comparison of our GES-Inter with existing datasets. The dotted line separates whether the speech content in the dataset is built based on the conversational corpus*
-
-
 
 ## 定位与知识库关联
 
@@ -273,8 +253,6 @@ Co3Gesture 的适用边界受以下因素制约：
 4. **多人场景泛化**：当前的双边架构能否拓展到三人及以上的群体讨论场景？如何处理更复杂的多人遮挡、空间布局变化和说话人切换问题？
 
 5. **个性化与表现力增强**：可否将文本语义、语音韵律特征、说话人性格特质等额外条件显式注入生成过程，以实现更具表现力和个性化的交互手势合成？
-
-
 
 ## 原文 PDF
 

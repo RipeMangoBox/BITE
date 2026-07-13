@@ -66,8 +66,6 @@ AnyMo在方法谱系中处于“大规模数据驱动的统一掩码建模”这
 
 当前OmniHuMo未包含手指关节标注，限制了全身精细动作生成。音频对齐数据仅约500小时（占总数据约十分之一），导致音频驱动任务未能观察到单调缩放定律，更大模型可能过拟合。如何将手部标注融入数据流水线、如何增加音频对齐数据比例、以及如何处理更稀疏或未见过的模态组合，是后续研究的关键方向。
 
-
-
 ### 动作生成的数据瓶颈
 
 人类动作生成（Human Motion Generation）在数字人、虚拟现实和具身智能等应用中具有核心地位。然而，现有方法长期受困于数据规模与模态覆盖的不足。主流数据集如HumanML3D仅包含约28.6小时的动作数据，且标注模态单一（通常仅为文本），难以支撑跨模态泛化所需的表征学习。这一瓶颈直接限制了模型对复杂动作结构的捕获能力和对多样化控制信号的响应能力。
@@ -89,8 +87,6 @@ AnyMo在方法谱系中处于“大规模数据驱动的统一掩码建模”这
 3. **建模层面**：采用基于LLaMA架构的**并行掩码Transformer**，以双向注意力同时预测所有残差流标记，打破自回归方法的单向限制，并通过分阶段课程训练处理弱对齐的多模态数据。
 
 三个层面的协同设计使得AnyMo能够从任意模态组合中生成高保真度动作，并在文本驱动任务上取得超越真实数据检索精度的结果（R@1 0.75 vs. 0.74），为统一可控动作生成提供了可扩展的技术路径。
-
-
 
 ## 核心方法与创新机理
 
@@ -164,8 +160,6 @@ $$Z_{\mathrm{enc}} = \sum_{v=0}^{V}\mathrm{Embd}^v(\widetilde{\pmb{m}}^v).$$
 
 这些局限指向了未来的改进方向，但并未削弱核心创新——规模化数据与残差并行掩码建模相结合——在文本和音乐驱动任务上已取得的决定性优势。
 
-
-
 AnyMo 采用两阶段流水线设计：**运动标记化** 与 **条件运动生成**。如图 6 所示，系统首先通过基于残差有限标量量化（R-FSQ）的运动标记器将连续人体动作序列离散化为多级标记流；随后，一个可扩展的掩码 Transformer 以任意模态组合为条件，并行预测所有标记流，最终经解码器重建出高质量运动序列。
 
 ### 阶段一：R-FSQ 运动标记器
@@ -212,15 +206,8 @@ $$\mathcal{L}_2 = -\sum_{v=0}^{V} \log p\left(\pmb{m}^v \mid Z_{\text{text}}, Z_
 
 > **注意**：OmniHuMo 未包含手指关节标注，因网络视频中手部区域常受遮挡和运动模糊影响；音频对齐数据仅约 500 小时，可能限制音频驱动任务的进一步扩展。
 
-### 补充图表
-
 ![[assets/figures/papers/arxiv_2026_anymo_2605_29488/figures/005_Figure_6.jpg]]
 *Figure 6: Overview of AnyMo. The framework consists of two components. First, we train a motion tokenizer based on Residual FSQ to discretize continuous motion into multi-stream discrete tokens. Second, we train a masked Transformer that supports diverse conditioning signals, including text, audio, and trajectories, as well as their combinations, to generate coherent human motion sequences*
-
-![[assets/figures/papers/arxiv_2026_anymo_2605_29488/figures/003_Figure_2.jpg]]
-*Figure 2: Data Construction Framework of OmniHuMo. The proposed pipeline systematically extracts high-quality human motion data with temporally aligned audio signals and corresponding textual descriptions*
-
-
 
 AnyMo 由两大核心模块构成：**残差有限标量量化（R-FSQ）运动标记器**和**可扩展掩码 Transformer**。前者将连续运动序列压缩为多级离散标记，后者在统一的多模态条件空间中通过并行掩码建模实现高质量运动生成。
 
@@ -269,8 +256,6 @@ $$\mathcal{L}_2 = -\sum_{v=0}^{V} \log p\left(\mathbf{m}^v \mid Z_{\text{text}},
 - **Stage III（联合微调）**：在所有模态数据上联合训练，进一步优化多模态融合与生成质量。
 
 此课程设计使得模型在文本驱动任务上充分收敛后，再逐步适应稀疏的音频对齐信号，缓解了直接联合训练可能导致的模态偏差与过拟合。
-
-
 
 ## 实验与关键发现
 
@@ -334,25 +319,6 @@ AnyMo 在以下关键维度上区别于现有工作：
 3. **未见模态组合**：当前实验覆盖了文本、语音、音乐、轨迹的两两组合，但更稀疏或未见过的模态组合（如仅轨迹无条件生成）的鲁棒性尚未验证，需在实际部署中谨慎评估。
 4. **评估协议**：R@1 超越真实数据检索精度这一结论需要独立验证，排除训练-测试数据泄露或评估指标偏差的可能性。
 
-### 补充图表
-
-![[assets/figures/papers/arxiv_2026_anymo_2605_29488/figures/006_Table_2.jpg]]
-*Table 2: Reconstruction performance under different data scales*
-
-![[assets/figures/papers/arxiv_2026_anymo_2605_29488/figures/008_Table_4.jpg]]
-*Table 4: Motion reconstruction performance comparison measured in MPJPE (mm)*
-
-![[assets/figures/papers/arxiv_2026_anymo_2605_29488/figures/013_Table_9.jpg]]
-*Table 9: Comparison of multi-modal conditional inputs in speech-driven motion generation task*
-
-![[assets/figures/papers/arxiv_2026_anymo_2605_29488/figures/020_Table_S.1.jpg]]
-*Table S.1: Comparison of reconstruction and generation*
-
-![[assets/figures/papers/arxiv_2026_anymo_2605_29488/figures/002_Table_1.jpg]]
-*Table 1: Comparison with existing motion datasets. "Mono MoCap" refers to markerless monocular video-based motion capture. "Data Agg" denotes datasets constructed by aggregating existing sources*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 与基线工作的关系
@@ -392,8 +358,6 @@ AnyMo 的能力边界由以下要素共同界定：
 5. **推理效率优化**：并行掩码建模虽已提升效率，但轨迹控制的测试时优化和大型 Transformer 的推理开销仍可能限制部署。能否通过蒸馏或专用解码策略进一步降低推理成本？
 
 **需要手动验证的方面**：论文中未提供 AnyMo 在标准基准（如 HumanML3D 的文本-动作生成任务）上与 T2M-GPT、MoMask 等方法的直接对比数据，仅在 OmniHuMo-Text 测试集上进行了评估。跨数据集的迁移性能和可比性需要额外的实验验证。
-
-
 
 ## 原文 PDF
 

@@ -59,15 +59,11 @@ claims:
 
 **局限性**：面对完全陌生的人-场景交互类别或过于复杂的语言描述时仍会失败（Figure 5）；两阶段扩散推理速度较慢，难以满足实时需求；泛化能力仍受限于训练数据的场景与动作分布覆盖范围。
 
-
-
 **核心瓶颈** 语言引导的3D场景人体运动生成任务，本质上是语言、3D场景几何和人体运动三个模态的联合建模问题。现有方法面临的根本性瓶颈在于：缺乏大规模、高质量的语言-场景-运动配对数据，加之三模态联合建模的内在复杂性，导致生成的运动难以同时满足语义描述的准确性、3D场景中的物理合理性以及精确的空间定位要求。
 
 **现有方法的缺口** 当前主流方法可分为两类：一是纯文本到运动生成（text-to-motion）方法，如 **T2M**（Guo et al., CVPR 2022）和 **MDM**（Tevet et al., CVPR 2023），它们完全不考虑3D场景约束，生成的运动无法与具体场景交互；二是语言条件的人-场景交互生成方法，如基于cVAE的方案（Wang et al., NeurIPS 2022），这些方法尝试直接将场景点云特征与运动生成器融合，但由于三模态联合映射的高度非线性，在有限数据下难以学到稳健的语义-空间对应关系。
 
 **本文动机与核心思路** 针对上述瓶颈，本文提出将**场景可供性图（affordance map）**作为中间表示，将困难的三模态联合建模分解为两个更可控的子问题。场景可供性图定义为人体骨骼关节与3D场景表面点之间基于距离场的广义可供性表示——离关节越近的场景点权重越高，从而精确编码了语言描述所隐含的空间定位信息（如“坐在椅子上”意味着骨盆关节应靠近椅子表面）。通过先预测语言引导的可供性图，再将其作为条件输入运动生成模型，该方法在有限训练数据下有效提升了语义一致性和跨场景泛化能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -155,8 +151,6 @@ $$ p_{\phi}(\mathbf{X}_{0:T} \mid \mathbf{C}, \mathcal{S}, \mathcal{L}) = p(\mat
 
 待解决的开放问题包括：如何实现完全未见过的人-场景交互类别的零样本生成（zero-shot HSI），如何通过更高效的生成架构（如一致性模型、潜在扩散）缩短推理时间，以及如何利用少量标注数据在更多样的真实3D场景中进行半监督或自监督训练。
 
-
-
 本文提出一个**两阶段扩散框架**，核心思路是将**场景可供性图（affordance map）**作为语言、3D场景与人体运动三者之间的中间表示，以降低多模态联合建模的难度。整体流程如 Figure 2 所示：
 
 ![[assets/figures/papers/paper_list_l1722_Move_as_You_Say_Interact_as_You_Can_Language_guided_Human_Motion_Generat/figures/002_Figure_2.jpg]]
@@ -190,8 +184,6 @@ $$L_{\mathrm{MSE}} = \mathbb{E}_{\mathbf{X}_0, t}\left[\|\mathbf{X}_0 - G_{\phi}
 ### 设计动机与模块关系
 
 该两阶段设计的核心洞察在于：**直接学习“语言+场景→运动”的端到端映射面临严重的多模态对齐困难**，尤其在语言-场景-运动配对数据稀缺的条件下。引入可供性图作为中间表示，将问题分解为两个相对独立的子任务——先预测“在哪里交互”（可供性图），再生成“如何运动”（运动序列）——显著降低了联合建模的复杂度。可供性图基于人体骨骼关节与场景表面点之间的距离场构建，能够精确编码语言描述所隐含的空间定位信息（如“坐在椅子上”时臀部与椅面的接触区域），同时提供场景几何约束，从而在有限训练数据下有效提升语义一致性和跨场景泛化能力。
-
-
 
 ### 可供性图的定义与构建
 
@@ -245,15 +237,8 @@ AMDM的架构由两个关键模块组成：
 
 该两阶段框架的核心因果机制在于**解耦多模态联合建模的复杂性**：ADM先将语言描述的空间定位意图转化为可供性图这一显式几何表示，AMDM再基于该表示生成物理合理的运动。这种设计使得模型在有限的训练数据下（仅含少量语言-场景-运动配对）仍能有效学习语义一致性映射，并通过可供性图作为信息瓶颈来提升跨场景的泛化能力。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1722_Move_as_You_Say_Interact_as_You_Can_Language_guided_Human_Motion_Generat/figures/012_Figure.jpg]]
 *Figure: A1. Illustration of the decoder and encoder variants’ architectures. The left part depicts the architecture of the decoder variant, which stacks self-attention and cross-attention layers alternately to fuse multi-modal conditions effectively. The right part showcases the design of the encoder variant, employing self-attention layers to fuse the language features, affordance features, and noisy motion sequences*
-
-![[assets/figures/papers/paper_list_l1722_Move_as_You_Say_Interact_as_You_Can_Language_guided_Human_Motion_Generat/figures/013_Figure.jpg]]
-*Figure: (b) Point Transformer variant Figure A2. Illustration of MLP and Point Transformer variants of ADM*
-
-
 
 ## 实验与关键发现
 
@@ -305,36 +290,17 @@ Table 4报告了在新颖评估集上的泛化性能。本文模型取得**FID 7
 
 Figure 5展示了典型失败案例。当面对**完全陌生的人-场景交互类别**（如训练中未见过的动作-物体组合）或**过于复杂的语言描述**（如“一个人从一张床起身并躺在另一张床上”这类多阶段指令）时，模型生成的运动可能出现定位偏差或动作语义不完整。此外，两阶段扩散模型的推理速度较慢，难以满足实时应用需求，且模型泛化能力仍受限于训练数据覆盖的场景和动作分布。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1722_Move_as_You_Say_Interact_as_You_Can_Language_guided_Human_Motion_Generat/figures/003_Table_1.jpg]]
 *Table 1: Quantitative results of generation on HumanML3D. “Real” denotes the results computed with GT motions. “Ñ” indicates metrics that are better when closer to “Real” distribution. Our model uses Perceiver in ADM and encoder-based architecture in AMDM*
 
 ![[assets/figures/papers/paper_list_l1722_Move_as_You_Say_Interact_as_You_Can_Language_guided_Human_Motion_Generat/figures/004_Table_2.jpg]]
 *Table 2: Quantitative results of human motion generation on HUMANISE dataset. Bold indicates the best result*
 
-![[assets/figures/papers/paper_list_l1722_Move_as_You_Say_Interact_as_You_Can_Language_guided_Human_Motion_Generat/figures/006_Table_3.jpg]]
-*Table 3: Quantitative results of affordance map generation. We report the three distance metrics to evaluate the grounding accuracy*
-
 ![[assets/figures/papers/paper_list_l1722_Move_as_You_Say_Interact_as_You_Can_Language_guided_Human_Motion_Generat/figures/007_Table_4.jpg]]
 *Table 4: Qualitative results on our novel evaluation set. “Real” indicates that we compute these metrics as a reference using the languagemotion pairs within the test set of HumanML3D. Of note, our novel evaluation set does not contain ground truth motions*
 
-![[assets/figures/papers/paper_list_l1722_Move_as_You_Say_Interact_as_You_Can_Language_guided_Human_Motion_Generat/figures/011_Table_5.jpg]]
-*Table 5: Ablation of the architectures of AMDM. The Perceiver architecture slightly outperforms the Point Transformer in the metrics of goal dist. and contact score*
-
-![[assets/figures/papers/paper_list_l1722_Move_as_You_Say_Interact_as_You_Can_Language_guided_Human_Motion_Generat/figures/005_Figure_3.jpg]]
-*Figure 3: Qualitative results on HUMANISE dataset. The bottom-right figure provides a top-down view. Zoom in for better visualization*
-
-![[assets/figures/papers/paper_list_l1722_Move_as_You_Say_Interact_as_You_Can_Language_guided_Human_Motion_Generat/figures/009_Figure_4.jpg]]
-*Figure 4: Qualitative comparisons on generalization evaluation set. The first row is generated by the one-stage diffusion model and the second row is generated by our model. Our method can generate natural and accurately grounded human motions in unseen 3D scenes*
-
-![[assets/figures/papers/paper_list_l1722_Move_as_You_Say_Interact_as_You_Can_Language_guided_Human_Motion_Generat/figures/010_Figure_5.jpg]]
-*Figure 5: Failure cases. Our model fails while facing entirely unfamiliar HSIs or too complex descriptions*
-
 ![[assets/figures/papers/paper_list_l1722_Move_as_You_Say_Interact_as_You_Can_Language_guided_Human_Motion_Generat/figures/015_Table.jpg]]
 *Table: A2. Ablation of the proportion about replacing ground truth affordance with predicted ones on our novel evaluation set. The proportion ranges from 0.0 to 0.5. We use the Perceiver in the first stage and the encoder-based variant in the second stage*
-
-
 
 ## 定位与知识库关联
 
@@ -369,8 +335,6 @@ Figure 5展示了典型失败案例。当面对**完全陌生的人-场景交互
 2. **高效生成架构：** 能否用一致性模型、流匹配或潜在扩散替代当前的DDPM范式，在保持生成质量的同时将推理速度提升至实时？
 3. **弱监督与自监督训练：** 如何利用大量无标注的3D场景数据和少量语言-运动配对数据进行半监督训练，以扩展模型对真实场景多样性的覆盖？
 4. **复杂语义的运动规划：** 对于包含时序逻辑和多个子目标的语言描述，如何将高层语义自动分解为可供性图序列或运动基元序列，实现从“单步映射”到“规划式生成”的跨越？
-
-
 
 ## 原文 PDF
 

@@ -52,8 +52,6 @@ claims:
 
 **方法定位**：HouseMind 属于“离散标记化 + 自回归 LLM”范式，区别于扩散模型（如 ChatHouseDiffusion）和纯视觉多模态模型（如 LLaVA、Qwen-VL 系列）。它将平面图生成重新定义为序列建模问题，以房间实例为最小推理单元，实现了细粒度的文本控制与精确的空间编辑。然而，当前编辑能力仍限于添加/删除房间等简单操作，尚未建模门窗等功能构件，生成结果也未对齐人类设计偏好与美学约束——这些构成了后续研究的主要开放方向。
 
-
-
 建筑平面图设计是建筑信息建模（BIM）与空间规划的核心环节，直接影响居住舒适度、能源效率与施工可行性。传统上，平面图设计依赖专业建筑师的手工绘制或规则驱动的生成系统，前者耗时且难以批量探索，后者则受限于预定义模板，缺乏对复杂空间语义的灵活建模能力。
 
 近年来，深度学习驱动的布局生成方法取得了显著进展。主流范式可分为两类：**基于图像翻译的方法**将平面图视为像素级生成任务，利用卷积网络或扩散模型从边界轮廓直接合成室内布局；**基于图的方法**则将房间实例建模为图节点，通过图神经网络预测邻接关系与空间配置。然而，这两类方法均存在根本性局限：
@@ -67,8 +65,6 @@ claims:
 上述瓶颈的根本原因在于：**平面图的结构化本质（由语义明确的房间实例及其空间关系构成）与现有模型所依赖的连续表示之间存在语义鸿沟**。弥合这一鸿沟需要一种能够同时编码几何、语义与拓扑信息，并能与自然语言指令无缝对接的统一表示形式。
 
 **HouseMind** 的提出正是为了应对这一挑战。其核心动机是：将平面图从连续像素空间“翻译”为大语言模型（LLM）可理解的离散令牌序列，从而将理解、生成与编辑统一为同一自回归序列建模问题。通过引入分层矢量量化（VQ‑VAE）将建筑轮廓与房间实例分别编码为结构化空间令牌，并与语义标签交织形成统一序列，HouseMind 使 LLM 能够在文本、几何与拓扑的联合空间中执行多模态空间推理，实现从“看、说、画、改”的全链路能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -106,8 +102,6 @@ $$Z = [z_o, \ell_{r_1}, z_{r_1}, ..., \ell_{r_N}, z_{r_N}]$$
 - **阶段三（指令调优）**：通过监督微调赋予模型任务感知的空间推理能力，使其能根据自然语言指令灵活切换理解、生成或编辑模式。
 
 消融实验（Table 4）证实了该设计的必要性：完整三阶段管道获得最低验证损失（0.0830），移除阶段一或阶段二均导致损失上升。这表明，**嵌入初始化和多模态预训练并非可选的优化手段，而是实现稳健跨模态对齐的必要条件**。
-
-
 
 HouseMind 将建筑平面图的理解、生成与编辑统一为单一序列建模问题，其核心在于**层次化离散标记化**与**多模态对齐**两大设计，使轻量级 LLM 能够在同一自回归框架中执行空间推理。
 
@@ -161,13 +155,6 @@ $$p\big(Z^{tgt} \mid Z^{src}, s\big) = \prod_t p\big(Z_t^{tgt} \mid Z^{src}, Z_{
 ### 关键模块协作关系
 
 整体管道中，VQ‑VAE 标记化模块（Figure A.1）负责将视觉布局压缩为离散空间令牌，LLM 骨干负责序列建模与跨模态推理，三阶段训练管道则确保几何令牌与语言指令的有效对齐。结构校正后处理步骤（Table C.1）进一步改善生成结果的几何一致性，将图编辑距离（GED）从 1.10 降至 1.03。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2347_https_arxiv_org_abs_2603_11640/figures/002_Figure_2.jpg]]
-*Figure 2: Understanding: given a prompt, an outline, and an existing floor plan, the model outputs a textual description, a bubble diagram, and structured JSON capturing spatial semantics. Generation: given a prompt and an outline, the model produces a complete, coherent floor plan. Editing: given a prompt, an outline, and a reference floor plan, the model outputs an updated plan aligned with the editing intent*
-
-
 
 ### 3.1 平面图的结构化分解与离散表示
 
@@ -225,12 +212,8 @@ HouseMind 的训练分为三个顺序阶段（图 Figure 3）：
 
 消融实验（Table 4）证实，完整的三个阶段训练获得最低验证损失（0.0830），移除 Stage 1 或 Stage 2 均导致损失上升，表明嵌入初始化和多模态预训练缺一不可。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2347_https_arxiv_org_abs_2603_11640/figures/010_Figure.jpg]]
 *Figure: A.1. VQ-VAE tokenization framework. The outline branch encodes the global boundary, while the conditional room branch encodes each room with outline context to capture spatial relations*
-
-
 
 ## 实验与关键发现
 
@@ -264,36 +247,17 @@ HouseMind 在理解、生成与编辑三项核心任务上均取得显著优势�
 
 4. **分布外泛化。** 模型在 RPLAN 固定划分上表现优异，但在极端分布外场景（如矛盾约束或逻辑上不可能的空间指令）下的行为尚未系统评估，需进一步验证其鲁棒性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2347_https_arxiv_org_abs_2603_11640/figures/004_Table_1.jpg]]
 *Table 1: Understanding results. Success: success rate; RMR: room match rate; LocAcc: room location accuracy; AreaDiff: room area difference (m2); AdjAcc: room adjacency accuracy; RelAcc: spatial relation accuracy*
 
 ![[assets/figures/papers/paper_list_l2347_https_arxiv_org_abs_2603_11640/figures/005_Table_2.jpg]]
 *Table 2: Generation results. Micro/Macro IoU measure pixel-level overlap; SSIM [40] and PSNR quantify perceptual similarity; FID [6] and GED [30] evaluate distributional realism; Node F1 and Edge Overlap assess graph-level correctness. * denotes methods without released code; results are reproduced*
 
-![[assets/figures/papers/paper_list_l2347_https_arxiv_org_abs_2603_11640/figures/006_Table_3.jpg]]
-*Table 3: Editing results. ∆IoU and ∆MSE measure editing precision (spatial and pixel-level change correctness); Micro/Macro IoU assess final layout quality; GED evaluates distributional realism; Node F1 and Edge Overlap assess graph-level consistency*
-
-![[assets/figures/papers/paper_list_l2347_https_arxiv_org_abs_2603_11640/figures/008_Table_4.jpg]]
-*Table 4: Loss under different training-stage configurations*
-
-![[assets/figures/papers/paper_list_l2347_https_arxiv_org_abs_2603_11640/figures/014_Table.jpg]]
-*Table: C.1. Impact of Structural Correction in HouseMind-O*
-
 ![[assets/figures/papers/paper_list_l2347_https_arxiv_org_abs_2603_11640/figures/012_Table.jpg]]
 *Table: A.3. Codebook size ablation study*
 
 ![[assets/figures/papers/paper_list_l2347_https_arxiv_org_abs_2603_11640/figures/007_Figure_4.jpg]]
 *Figure 4: Qualitative comparison results of understanding, generation, and editing. For understanding tasks (U), HouseMind accurately identifies the number of rooms and their connections. For generation tasks (G), HouseMind preserves both the room layout and the overall outline consistency; the generation prompts are provided in the supplementary materials. For editing tasks (E), HouseMind accurately executes the specified modifications when the instructions are explicit*
-
-![[assets/figures/papers/paper_list_l2347_https_arxiv_org_abs_2603_11640/figures/016_Figure.jpg]]
-*Figure: (a) HouseMind-O (b) FloorPlanLLaMA* (c) ChatHouseDiffusion Figure D.2. Pixel–structure coupling analysis. Scatter plots show the correlation between Macro IoU and Edge Overlap for three generation paradigms*
-
-![[assets/figures/papers/paper_list_l2347_https_arxiv_org_abs_2603_11640/figures/015_Figure.jpg]]
-*Figure: D.1. Result distribution across tasks. HouseMind-O maintains stable, high-performance distributions in understanding and generation, with the bimodal ∆IoU in editing mainly caused by unclear spatial instructions*
-
-
 
 ## 定位与知识库关联
 
@@ -391,8 +355,6 @@ HouseMind 使用 Qwen3-0.6B 作为 LLM 骨干，参数量仅 0.6B，远小于通
 5. **轻量化部署**：0.6B 的 LLM 骨干已经较小，但 VQ-VAE 编码器-解码器和三阶段训练流程是否可进一步压缩，以适应移动端或 Web 端实时交互场景？
 
 6. **多模态空间推理的泛化**：HouseMind 的“离散化+LLM”范式能否推广到其他结构化空间推理任务，如电路布局、家具摆放、城市地块规划？这需要验证 VQ-VAE 标记化在不同空间领域中的可迁移性。
-
-
 
 ## 原文 PDF
 

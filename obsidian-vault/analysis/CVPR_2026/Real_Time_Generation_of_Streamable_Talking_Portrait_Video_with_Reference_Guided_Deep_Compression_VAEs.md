@@ -53,8 +53,6 @@ claims:
 
 **主要结果**：在 HDTF 和 PortraitOneMin 基准上，唇音同步（SC）、头部对齐（CAPP）与视频质量（FVD）等指标达到或超越现有最佳方法，同时推理速度领先一个数量级以上。消融实验表明，参考引导在 HDTF 上带来 **+3.762 dB** PSNR 增益，CR-VA 与参考引导协同可将增益进一步提升至 **+6.696 dB**。
 
-
-
 ### 问题背景：实时交互式肖像视频生成的效率困境
 
 音频驱动的说话人像视频生成旨在根据语音信号合成逼真的人物肖像视频，其应用涵盖虚拟助手、数字人直播、视频会议等实时交互场景。这类应用对生成质量与推理延迟提出了双重严苛要求：不仅需要自然的唇音同步、丰富的面部表情与头部运动，还必须在极低延迟下完成高分辨率视频的流式输出。
@@ -76,8 +74,6 @@ claims:
 在此基础上，本文进一步采用**Rectified Flow Transformer**替代传统的随机扩散模型作为生成器范式。Rectified Flow通过常微分方程（ODE）模拟从噪声到干净潜变量的确定性路径，相比多步随机去噪过程具有更高的采样效率。结合分块自回归生成策略与KV缓存机制，该方法能够在单个GPU上实现42 FPS的512×512分辨率视频流式输出，推理速度超过现有扩散式方法25倍以上。
 
 综合来看，本文的核心动机是通过“参考引导的深度压缩VAE”与“高效流式生成器”的协同设计，突破实时交互式肖像视频生成的效率与质量瓶颈，使高保真数字人应用真正具备实用化部署的可行性。
-
-
 
 ## 核心方法与创新机理
 
@@ -112,8 +108,6 @@ $$\mathbb{E}_{t, \mathbf{z}^0, \epsilon, \mathbf{z}_r, \mathbf{a}'} \| G(\mathbf
 
 上述四个changed slots并非孤立改进，而是形成因果链条：**CR-VA提供高压缩比潜空间** → **参考引导降低解码器重建难度** → **Rectified Flow实现少步生成** → **分块因果注意力支持流式KV缓存**。最终，系统在单张H100 GPU上达到**42 FPS**的生成速度，超过现有扩散模型25倍以上（Table 1），同时唇音同步（SC 8.943）和头部对齐（CAPP 0.699）指标在HDTF上达到或超越现有最佳水平。
 
-
-
 本方法将说话人像视频生成分解为两个紧密协作的子任务：**紧凑潜变量生成**与**高效视频解码**。整体pipeline由两大核心模块串联构成——**参考引导因果视频VAE**（Reference-Guided Causal Video VAE）与**分块自回归Rectified Flow Transformer**，其架构总览见Figure 2。
 
 ### 输入输出流
@@ -140,12 +134,8 @@ VAE采用两阶段对称编码器-解码器架构，并引入两项关键设计�
 
 推理时，Rectified Flow Transformer逐块自回归预测潜变量，每生成一个窗口的潜变量即送入VAE解码器实时渲染为视频帧。一个生成窗口包含32个潜变量帧（对应128视频帧，首窗口为125帧），块大小 $k=4$。这一设计使系统在单张H100 GPU上达到**42 FPS**的生成速度，超过现有扩散模型25倍以上。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l917_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_Real_Time_Generatio/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our framework. Left: The proposed reference-guided causal video VAE*
-
-
 
 本节聚焦于构成该框架的两个核心组件：参考引导因果视频VAE（Reference-Guided Causal Video VAE）与分块自回归Rectified Flow Transformer。前者负责将高维视频压缩至极低维的潜空间，后者在该潜空间中进行高效的条件生成。
 
@@ -176,15 +166,11 @@ $$\mathbb{E}_{t, \mathbf{z}^0, \epsilon, \mathbf{z}_r, \mathbf{a}'} \| G(\mathbf
 
 为实现流式生成，该Transformer采用**分块因果注意力**机制：将潜序列划分为大小为 $k$ 的非重叠块，块内应用全自注意力，块间注意力仅限前序块（见图4）。生成窗口包含32个潜帧（对应128个视频帧），块大小 $k=4$ 个潜帧。训练采用教师强制策略，模型以前序真实潜变量为条件，并施加高斯噪声增强；推理时自回归逐块预测潜变量，通过KV缓存复用历史上下文，潜变量流式送入解码器生成视频帧。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l917_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_Real_Time_Generatio/figures/003_Figure_3.jpg]]
 *Figure 3: Causal residual video auto-encoding. We apply separate temporal and spatial down/up-sampling with residual encoding. The first frame is handled independently to preserve causality*
 
 ![[assets/figures/papers/paper_list_l917_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_Real_Time_Generatio/figures/004_Figure_4.jpg]]
 *Figure 4: The causal blockwise attention mask*
-
-
 
 ## 实验与关键发现
 
@@ -220,13 +206,8 @@ Table 2 系统分析了参考引导（reference guidance）和因果残差视频
 
 论文未明确讨论方法局限性。根据实验设置和设计特征推断，可能存在以下限制：参考图像与目标说话人外观差异较大时，参考引导可能引入身份混淆或纹理失真；分块自回归生成中窗口边界的一致性（尤其是长视频场景）未经充分压力测试；训练采用教师强制策略，长序列推理时暴露偏差（exposure bias）的影响未量化。这些点需要进一步实验验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l917_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_Real_Time_Generatio/figures/001_Figure_1.jpg]]
 *Figure 1: Our method synthesizes streamable talking portrait videos given speech audio and one or multiple reference images, enabling generation of 512 × 512 videos at 42 FPS on a single GPU. The results exhibit rich visual dynamics, including audio-synchronized lip motion, facial expressions, head and torso movement, hair dynamics, and lighting and shadow effects, advancing the level of realism and liveliness for real-time talking portraits. Identities presented in the paper are non-existent and created by Gemini 2.5 flash image [16]*
-
-
-
 
 ## 定位与知识库关联
 
@@ -271,8 +252,6 @@ Table 2 系统分析了参考引导（reference guidance）和因果残差视频
 4. **压缩率的上限探索**。768倍压缩率是否接近肖像视频的信息论极限？进一步增加压缩率（例如通过更激进的时空下采样）会导致哪些类型的重建失效？
 
 5. **实时交互场景的延迟分析**。42 FPS的生成速度是在H100 GPU上测量的。在消费级GPU或移动设备上，端到端延迟（包括音频特征提取、VAE编解码、Transformer自回归生成）的瓶颈在哪个模块？是否存在针对特定硬件的优化空间？
-
-
 
 ## 原文 PDF
 

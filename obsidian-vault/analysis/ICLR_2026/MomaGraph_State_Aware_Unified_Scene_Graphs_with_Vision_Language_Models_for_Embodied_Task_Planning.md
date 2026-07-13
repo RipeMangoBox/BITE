@@ -60,8 +60,6 @@ MomaGraph 针对上述问题提出了一个统一框架，其核心思想是将�
 
 当前方法仍存在若干局限：评估局限于单房间场景，多视角图像需人工采集，动态更新依赖实际执行而非反事实推理，且仅输出高层动作序列而未生成低层控制命令。这些方向为后续工作留下了明确的拓展空间。
 
-
-
 具身任务规划要求机器人在复杂环境中理解场景、推理物体间关系，并生成可执行的动作序列。现有方法通常采用端到端的直接规划范式，即从多视角图像和语言指令直接预测动作序列。然而，这种范式存在一个根本性瓶颈：**场景理解与动作规划被隐式耦合，缺乏显式的结构化中间表示来桥接感知与决策**。
 
 具体而言，当前场景图方法面临三重缺陷：
@@ -75,8 +73,6 @@ MomaGraph 针对上述问题提出了一个统一框架，其核心思想是将�
 这些缺陷共同导致直接规划在需要多步推理、预条件判断和动态调整的长程任务上频繁失败。如 Figure 2 所示，即使强大的闭源模型 GPT-5，在直接规划时也会产生错误动作或遗漏关键步骤。
 
 为突破上述瓶颈，本文提出核心洞见：**将场景理解与动作规划解耦**——先显式构建一个融合空间与功能信息、包含零件节点且任务相关的场景图，再基于该图进行零样本规划。这种 Graph-then-Plan 范式将结构化场景图作为感知与决策之间的中间表示，使规划器能够基于可靠的结构化知识进行推理，而非从原始像素和指令中隐式猜测。
-
-
 
 ## 核心方法与创新机理
 
@@ -122,8 +118,6 @@ $$\mathcal{G}_{\mathcal{T}}^{(t+1)} = \mathcal{U}\Big( \mathcal{G}_{\mathcal{T}}
 
 上述四个 changed slots 形成了完整的因果链条：统一空间-功能图提供了更丰富的结构化知识基础，Graph-then-Plan 解耦了感知与规划，RL 训练确保图生成的高质量，状态感知更新则赋予系统动态适应能力。最终，MomaGraph-R1 以 7B 参数规模在 MomaGraph-Bench 上达到 71.6% 准确率，与闭源巨模型 **GPT-5**（71.6%）持平，仅略低于 **Claude-4.5-Sonnet**（73.9%），在开源模型中取得最优。
 
-
-
 ![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_3eTr9dGwJv/figures/002_Figure_1.jpg]]
 *Figure 1: Overview of the MomaGraph. Given a task instruction, MomaGraph constructs a taskspecific scene graph that highlights relevant objects and parts along with their spatial-functional relationships, enabling the robot to perform spatial understanding and task planning*
 
@@ -167,8 +161,6 @@ MomaGraph 提出了一套 **Graph-then-Plan** 的具身任务规划框架，其�
 - **RL 训练替代 SFT/ICL**：Table 5 显示 RL 训练（71.6%）相比 SFT（63.9%）和 ICL（60.2%）大幅提升场景图生成质量和规划表现，证明基于图对齐奖励的强化学习是使 VLM 学会构建精确任务导向场景图的关键。
 - **多视角联合推理**：利用多视角观测捕捉对象对应关系，在 BLINK 视觉对应基准上 MomaGraph-R1 达到 63.5%，领先最强开源基线 3.8 个百分点（Table 3），表明多视角一致性机制有效提升了跨视角的空间推理能力。
 
-
-
 ### 任务导向场景图的定义
 
 MomaGraph 的核心表示形式是任务导向的场景图，定义为：
@@ -209,8 +201,6 @@ $$\mathcal{G}_{\mathcal{T}}^{(t)} = ( \mathcal{N}_{\mathcal{T}}^{(t)}, \mathcal{
 $$\mathcal{G}_{\mathcal{T}}^{(t+1)} = \mathcal{U}\Big( \mathcal{G}_{\mathcal{T}}^{(t)}, a_t, s_{t+1} \Big)$$
 
 更新机制的核心逻辑是：根据实际观察到的状态变化，剪除与观测不一致的功能假设边，同时强化经执行验证确认的对应关系。这一机制使场景图能够随交互过程逐步消除歧义，为后续规划步骤提供更可靠的结构化知识基础。
-
-
 
 ## 实验与关键发现
 
@@ -255,33 +245,11 @@ $$\mathcal{G}_{\mathcal{T}}^{(t+1)} = \mathcal{U}\Big( \mathcal{G}_{\mathcal{T}}
 
 当前评估局限于单房间家庭场景，尚未涉及多房间或跨楼层的连续操作任务。真实机器人测试仅覆盖 10 次试验，统计意义有待更大规模验证。此外，多视角图像依赖人工预先采集，缺乏主动视角选择能力；动态场景图更新依赖实际执行后的状态观察，无法进行反事实推理。这些限制为后续工作指明了方向：扩展至开放式多房间场景、集成主动视角选择、结合反事实推理进行鲁棒规划，以及与低层运动控制模块的对接。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_3eTr9dGwJv/figures/013_Figure_9.jpg]]
 *Figure 9: Task distribution across four room types: kitchen, living room, bedroom, and bathroom*
 
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_3eTr9dGwJv/figures/015_Figure_11.jpg]]
-*Figure 11: Statistics of object occurrences, highlighting the most frequent objects in tasks*
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_3eTr9dGwJv/figures/016_Figure_12.jpg]]
-*Figure 12: Training reward curves during MomaGraph-R1 training*
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_3eTr9dGwJv/figures/018_Figure_13.jpg]]
-*Figure 13: Validation reward curves during MomaGraph-R1 training*
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_3eTr9dGwJv/figures/022_Figure_15.jpg]]
-*Figure 15: Real-world robot execution of household tasks*
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_3eTr9dGwJv/figures/012_Figure_8.jpg]]
-*Figure 8: Dataset statistics: (a) Distribution across four room types; (b)Heatmap showing the correspondence between action types and functional types*
-
-![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_3eTr9dGwJv/figures/014_Figure_10.jpg]]
-*Figure 10: Distribution of functional relationships across all tasks in the dataset*
-
 ![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_3eTr9dGwJv/figures/017_Table_4.jpg]]
 *Table 4: DAPO Training Configuration*
-
-
 
 ## 定位与知识库关联
 
@@ -318,8 +286,6 @@ MomaGraph 的核心思路——将场景图作为具身规划的中间表示—�
 3. **端到端控制集成。** Graph-then-Plan 范式能否与分层强化学习或模型预测控制（MPC）集成，直接生成可执行的连续控制信号，从而弥合高层规划与低层执行之间的鸿沟？
 4. **奖励权重的自适应调节。** 当前奖励函数中的权重 $w_a, w_f, w_l$ 依赖人工设定（Table 6 显示性能在合理范围内对权重不敏感，波动 ≤3.4%），是否可在训练过程中自动调节以进一步减少人工干预？
 5. **跨领域迁移。** 该方法的核心机制——任务导向的统一场景图与状态感知更新——能否迁移至工业装配、农业操作或医疗手术等更复杂的操作领域？这些领域对零件级精度和动态状态追踪的需求可能更高，但也可能面临标注成本激增的挑战。
-
-
 
 ## 原文 PDF
 

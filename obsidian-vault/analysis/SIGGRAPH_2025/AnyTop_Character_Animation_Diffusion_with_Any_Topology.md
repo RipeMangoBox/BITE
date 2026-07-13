@@ -63,8 +63,6 @@ claims:
 
 AnyTop 位于**运动生成 × 图神经网络 × 扩散模型**的交叉点。与仅支持单骨架的扩散模型（如 MDM）和需要每骨架独立训练的 SinMDM 不同，AnyTop 通过骨骼注意力中的拓扑偏置实现了多骨架共享学习。在骨架变异性维度上（Table 1），AnyTop 是首个能处理**非同胚骨架**（Non-homeomorphic）的生成方法，覆盖了从单骨架到任意拓扑的完整谱系。其文本关节描述机制借鉴了跨模态对齐的思想，但将其应用于骨架语义空间，为未来的运动重定向、多角色交互和文本驱动生成提供了新的技术路径。
 
-
-
 ### 问题背景：角色动画中的骨架多样性挑战
 
 在计算机动画领域，为虚拟角色生成自然运动是核心任务之一。然而，不同角色的骨架结构存在显著差异，这种差异体现在三个递进的层次上（参见 Table 1）：
@@ -94,8 +92,6 @@ AnyTop 的核心动机在于回答一个根本性问题：**能否用一个统�
 3. **统一表示空间**：采用逐关节独立编码策略，将每个关节视为独立 token，使不同骨架的运动序列都能表示为统一格式的 token 集合，从而共享同一个 Transformer 骨干网络。
 
 这一设计使得 AnyTop 不仅能在训练见过的骨架上生成高质量运动，还能泛化到训练中从未出现的骨架拓扑——这是迈向通用角色动画的关键一步。
-
-
 
 ## 核心方法与创新机理
 
@@ -159,8 +155,6 @@ $$a_{ij} = \frac{q_i \cdot k_j + a_{ij}^{\mathcal{D}} + a_{ij}^{\mathcal{R}}}{\s
 
 这些创新共同构成了 AnyTop 的核心能力：在单一扩散模型中学习多样骨架的运动分布，并通过拓扑条件与文本语义实现跨骨架的知识迁移。
 
-
-
 AnyTop 是一个基于去噪扩散概率模型（DDPM）的生成框架，其核心设计目标是**以单一模型为任意骨架结构的角色生成运动**。模型仅需骨架的拓扑结构描述与关节名称作为条件输入，无需针对不同角色重新训练或手工适配。
 
 ### 输入表示
@@ -197,12 +191,8 @@ AnyTop 的架构由三个核心模块级联组成，形成一条清晰的数据�
 
 模型预测干净运动 $\hat{X}_0$ 而非噪声 $\epsilon_t$，主损失为简单扩散损失 $\mathcal{L}_{simple} = E_{t \sim [1,T]} \| \text{AnyTop}(X_t, t, S) - X_0 \|_2^2$，并辅以测地线旋转损失 $\mathcal{L}_{rot}$ 来更准确地度量旋转误差。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l27_AnyTop_Character_Animation_Diffusion_with_Any_Topology/figures/003_Figure_2.jpg]]
 *Figure 2: Overview. The input to AnyTop is a noised motion*
-
-
 
 AnyTop 是一个基于去噪扩散概率模型（DDPM）的生成框架，其核心架构由四个关键模块串联构成，并通过拓扑条件注意力机制实现多骨架统一学习。
 
@@ -257,18 +247,8 @@ $$\mathcal{L} = \mathcal{L}_{simple} + \lambda_{rot} \mathcal{L}_{rot}$$
 
 同时引入**骨骼级数据增强**：训练时随机移除 10%–30% 的关节，或在任意边的中点插入新关节。这一增强迫使模型学习鲁棒的关节表示，提升对未见骨架的泛化能力。需注意，增强后需更新距离矩阵 $\mathcal{D}_S$，其计算复杂度为 $O(J^2)$，这是当前方法在极多关节角色上扩展的瓶颈之一。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l27_AnyTop_Character_Animation_Diffusion_with_Any_Topology/figures/004_Figure_3.jpg]]
-*Figure 3: Topological Conditions. Joint relations*
-
 ![[assets/figures/papers/paper_list_l27_AnyTop_Character_Animation_Diffusion_with_Any_Topology/figures/005_Figure_4.jpg]]
 *Figure 4: Spatial Correspondence. Monkey (top left) depicts the reference skeleton, while the fox, scorpion, and bird depict different target skeletons. Target skeleton joints are color-coded to match their corresponding joints in the reference. For better visualization, we color the bones to match their adjacent joints. Note the correspondence in limbs, spine, and tail*
-
-![[assets/figures/papers/paper_list_l27_AnyTop_Character_Animation_Diffusion_with_Any_Topology/figures/006_Figure_5.jpg]]
-*Figure 5: Temporal Correspondence. Monkey (top row) features the reference motion, while the Crab and Lynx represent two target motions. The frames of the targets are color-coded to align with their corresponding reference frames. Note the correspondence: aggressive motion segments are pink, idle frames blue, and transitional frames green*
-
-
 
 ## 实验与关键发现
 
@@ -314,9 +294,6 @@ Table 2 报告了 AnyTop 在未见骨架上的零样本推理性能，并按骨�
 
 这一趋势揭示了 AnyTop 的泛化边界：模型具备分布外泛化能力，但当目标骨架拓扑与训练分布差异过大时，生成质量显著衰减。Fig. 8 的定性对比直观展示了这一差异——AnyTop 为未见骨架（cat、komodo dragon）生成的运动自然流畅，而 MDM 基线则产生僵硬抖动的结果。
 
-![[assets/figures/papers/paper_list_l27_AnyTop_Character_Animation_Diffusion_with_Any_Topology/figures/008_Figure_8.jpg]]
-*Figure 8: Unseen-skeleton generalization Zero-shot inference of the cat (left) and komodo dragon (right) using adapted MDM baseline (top) and AnyTop (bottom). AnyTop’s generated motions maintain natural appearance while MDM’s generated motions are static and jittery*
-
 ### 失败模式与局限
 
 1. **数据集伪影**：Truebones Zoo 数据集仍存在脚滑动、多余骨骼连接等伪影，影响生成运动的物理真实感。模型会学习并复现这些数据缺陷。
@@ -328,20 +305,7 @@ Table 2 报告了 AnyTop 在未见骨架上的零样本推理性能，并按骨�
 
 AnyTop 在骨架运动生成领域的方法谱系中占据独特位置。Table 5 将现有方法按支持的骨架变异层级分类：Single‑skeleton 方法（如 **MDM** (Tevet et al., 2023)、**MoMask** (Guo et al., 2024)）仅处理单一固定骨架；Isomorphic 方法（如 **Skeleton‑aware networks** (Aberman et al., 2020)）支持同构骨架间的运动重定向；Homeomorphic 方法可处理拓扑相同但骨骼长度不同的骨架；而 AnyTop 是首个支持 **Non‑homeomorphic**（非同胚）骨架的扩散模型，即能处理关节数量和连接关系完全不同的骨架拓扑。
 
-![[assets/figures/papers/paper_list_l27_AnyTop_Character_Animation_Diffusion_with_Any_Topology/figures/016_Table_5.jpg]]
-*Table 5: Methods categorized by supported skeletal variability. Each column features representative research works that support the type in its header, with full definitions of these categories provided in the main paper*
-
 这一突破得益于三个关键设计决策：(1) 将拓扑信息（关节关系 R_S 与图距离 D_S）作为可学习偏置整合到 Transformer 骨骼注意力中，而非依赖固定骨架模板；(2) 引入文本关节描述实现跨骨架语义对齐，使不同拓扑的相似功能关节在潜空间中形成对应；(3) 平衡采样器与骨骼级数据增强策略，缓解多骨架数据不平衡问题并提升拓扑鲁棒性。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l27_AnyTop_Character_Animation_Diffusion_with_Any_Topology/figures/007_Figure_6.jpg]]
-*Figure 6: In-skeleton Generalization. The top row depicts two ground truth chicken motions: pecking (left) and walking (right). The bottom row presents synthesized motions of an adapted SinMDM (left) and AnyTop (right). The emphasized frames in AnyTop demonstrate spatial composition of walking and pecking, introducing novel poses not present in the ground truth. Sin-MDM embeds entire poses, hence cannot spatially-compose joints*
-
-![[assets/figures/papers/paper_list_l27_AnyTop_Character_Animation_Diffusion_with_Any_Topology/figures/002_Table_1.jpg]]
-*Table 1: Skeletal Variability. Character skeletons can vary in edge length, kinematic chain complexity, or overall topology. Each level of variation introduces greater challenges for motion synthesis. AnyTop can generate motions for dozens of non-homeomorphic skeletons using a single model*
-
-
 
 ## 定位与知识库关联
 
@@ -391,8 +355,6 @@ AnyTop 的适用边界由以下因素界定：
 3. **多角色交互与文本驱动**：当前模型仅处理单角色运动生成，扩展到骨架重定向、多角色交互以及文本/音乐驱动的生成是自然的发展方向。
 
 4. **计算效率优化**：如何降低数据增强中拓扑条件更新的计算代价？可能的方案包括近似更新策略或惰性计算机制，但具体效果需要进一步验证。
-
-
 
 ## 原文 PDF
 

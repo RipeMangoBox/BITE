@@ -67,8 +67,6 @@ CodeV 在多个视觉感知、推理和数学基准上展现出显著的性能�
 
 消融实验进一步证实，仅使用准确性奖励的 RL 策略会迅速退化为纯文本推理，几乎不调用工具；而 TAPO 完整奖励能够稳定提升推理和感知性能，并抑制不必要的工具调用（Table 1, Table 2, Figure 6）。工具输出扰动实验（Table 6）也显示，当工具输出被遮蔽或替换时，CodeV 更倾向于改变思考和行动决策，表明模型确实依赖工具内容进行推理，而非仅将其作为装饰性输出。
 
-
-
 ### 视觉推理中的“高准确率假象”
 
 视觉语言模型（VLM）在视觉问答、数学推理等任务上不断刷新记录，但当这些模型被赋予调用外部工具（如裁剪、缩放）的能力时，一个深层问题逐渐暴露：**最终答案的正确性并不等同于推理过程的忠实性**。Figure 1 展示了一个典型场景——视觉代理在完全错误的图像区域执行裁剪操作，却仍能给出正确答案。这种现象表明，模型可能依赖了预训练中的统计捷径或语言先验，而非真正从工具输出的视觉证据中推导结论。
@@ -90,8 +88,6 @@ CodeV 在多个视觉感知、推理和数学基准上展现出显著的性能�
 CodeV 的核心动机正是打破这一困境。作者提出，**工具执行结果（如裁剪图像、坐标序列）是天然可验证的视觉证据**——它们不依赖于模型的生成质量，而是客观存在于沙箱环境中。通过对这些非模型生成输出进行证据检查（evidence checking），可以为强化学习提供密集、可靠的步骤级奖励信号，从而引导策略真正学会“看后再答”。
 
 这一思路将视觉推理的忠实性问题重新定义为**可验证的工具决策问题**：如果每次裁剪都必须包含目标对象才能获得奖励，模型就不得不学习将注意力精确对准问题所需的视觉区域。Figure 3 描绘了 CodeV 的整体框架——模型在 Python 沙箱中执行代码块形式的工具调用，每个工具输出交由裁判模型进行证据检查，最终与答案正确性奖励混合，通过工具感知策略优化（TAPO）更新策略。这种设计将“忠实”从抽象期望转化为可操作的优化目标，为后续的方法实现奠定了动机基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -136,8 +132,6 @@ CodeV 将工具操作用可执行 Python 代码块表示，在受限沙箱中运
 ### 消融验证：TAPO 奖励设计的因果作用
 
 消融实验（Table 2）直接对比了不同奖励设计的效果：仅使用准确性奖励的 RL 策略最终几乎不调用工具，模型退化为纯文本推理；增加一致性奖励仅带来微小提升；而采用完整 TAPO 奖励（含工具忠实度）可获得最佳推理和感知性能。Figure 6 进一步显示，在 RL 训练早期，TAPO 能够维持合理的工具调用频率，而仅准确性奖励组的工具调用迅速衰减。这些证据表明，TAPO 的步骤级工具奖励是驱动忠实工具使用的**因果性因素**，而非相关性副产品。
-
-
 
 CodeV 的整体训练与推理流程围绕**可执行 Python 代码作为视觉工具**这一核心设计展开，并采用**两阶段课程**（冷启动 SFT + 工具感知策略优化 TAPO）来赋予模型忠实使用工具的能力。方法总览如 Figure 3 所示。
 
@@ -188,8 +182,6 @@ $$r^{\mathrm{tool}}(\tau) = \frac{1}{|\mathcal{T}_{\mathrm{tool}}|} \sum_{t \in 
 | 工具奖励裁判 | 对工具输出进行证据检查，判断是否包含目标对象 | Stage 2 奖励计算 |
 
 这一管线使模型在生成答案的同时，必须确保工具输出包含相关视觉证据，从而从根本上抑制了“裁剪错误区域却猜对答案”的奖励黑客行为。消融实验证实，跳过冷启动 SFT（Zero-RL）会导致策略迅速坍塌为纯文本推理，工具使用极少；而仅使用准确性奖励的 RL 策略最终几乎不调用工具——只有完整的 TAPO 混合奖励才能稳定提升推理和感知性能（Table 1, Table 2）。
-
-
 
 ### 1. 轨迹与工具接口的形式化定义
 
@@ -243,16 +235,6 @@ CodeV 采用**冷启动 SFT + TAPO 强化学习**的两阶段课程：
 - **阶段二（TAPO 强化学习）**：基于 GRPO，使用混合奖励对策略进行在线优化。每次 rollout 在同一问题上生成多个候选轨迹，通过组内标准化计算相对优势，并利用裁切目标函数更新策略。
 
 这一设计避免了直接 RL 训练（Zero-RL）导致的策略坍塌问题——消融实验表明，跳过 SFT 直接进行 RL 会使模型迅速退化为纯文本推理，几乎不调用任何工具。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2031_https_arxiv_org_abs_2511_19661/figures/001_Figure_1.jpg]]
-*Figure 1: An example of visual agentic system generating “unfaithful” trajectory: the cropping tool is used at the wrong region with unfaithful analysis but leads to correct answer*
-
-![[assets/figures/papers/paper_list_l2031_https_arxiv_org_abs_2511_19661/figures/002_Figure_2.jpg]]
-*Figure 2: Faithfulness conditioned on correct answers in*
-
-
 
 ## 实验与关键发现
 
@@ -357,22 +339,6 @@ TAPO训练过程中的奖励曲线和响应长度变化进一步揭示了方法�
 - TAPO的步骤级奖励与基于隐式奖励的过程奖励模型（PRM）相比，在更复杂的推理任务上孰优孰劣？
 - 如何避免裁判模型的偏见影响工具忠实度评估，尤其是在非裁剪类操作中？
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2031_https_arxiv_org_abs_2511_19661/figures/004_Figure_4.jpg]]
-*Figure 4: Performance across primitive perception, visual search, reasoning and math benchmarks. All model other than GPT-4o are 7B model with proper setup of tool use*
-
-![[assets/figures/papers/paper_list_l2031_https_arxiv_org_abs_2511_19661/figures/008_Figure_6.jpg]]
-*Figure 6: Tool invocation count during early RL training*
-
-![[assets/figures/papers/paper_list_l2031_https_arxiv_org_abs_2511_19661/figures/010_Table_3.jpg]]
-*Table 3: Perception benchmarks results. Comparison of model performance on VLMBlinds, V*, HRBench-4K, HRBench-8K and MME-Realworld-Lite benchmarks (values in %). Best and second-best results in each column are highlighted in bold and underlined, respectively*
-
-![[assets/figures/papers/paper_list_l2031_https_arxiv_org_abs_2511_19661/figures/011_Table_4.jpg]]
-*Table 4: Math and reasoning benchmarks. Best and second-best results in each column are highlighted in bold and underlined, respectively*
-
-
-
 ## 定位与知识库关联
 
 ### 1. 在视觉推理代理谱系中的位置
@@ -436,8 +402,6 @@ TAPO 的当前设计存在明确的适用边界，这些边界定义了 CodeV �
 5. **训练稳定性与样本效率**：TAPO 在 7B 模型上展现了稳定的训练动态（Figure 9, Figure 10），但在更大规模模型和多模态场景下，训练稳定性和样本效率是否依然保持？冷启动 SFT 的必要性是否会随模型规模变化而改变？
 
 6. **忠实度与准确率的权衡机制**：TAPO 通过权重约束 $|\lambda_{\mathrm{tool}}| < |\lambda_{\mathrm{acc}}|$ 确保准确率优先。是否存在更优的权衡机制，例如动态权重调整或帕累托优化，以在忠实度和准确率之间取得更好的平衡？
-
-
 
 ## 原文 PDF
 

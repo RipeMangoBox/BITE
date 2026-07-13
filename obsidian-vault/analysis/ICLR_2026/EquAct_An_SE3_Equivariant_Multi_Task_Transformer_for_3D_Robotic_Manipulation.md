@@ -72,8 +72,6 @@ claims:
 
 在方法谱系上，EquAct属于**等变策略学习**与**多任务语言条件化操作**的交叉点。相较于依赖数据增强的3DDA和基于多视图的SAM2ACT，EquAct通过架构层面的SE(3)等变设计，从根本上保证了策略对观测变换的结构化泛化能力，而非依赖隐式的数据驱动补偿。
 
-
-
 ### 3D机器人操作中的空间泛化瓶颈
 
 基于关键帧（keyframe）的多任务策略已成为语言条件化机器人操作的主流范式。这类策略接收自然语言指令和3D场景观测（通常是点云），直接预测末端执行器的目标位姿。然而，现有方法在处理新颖物体位姿时暴露出严重的泛化缺陷——当物体在空间中仅发生刚体变换（旋转或平移）时，策略的行为往往不一致，甚至完全失效。
@@ -107,8 +105,6 @@ EquAct的动机正是填补这一缺口。其核心假设是：若策略网络�
 3. **全SE(3)动作空间的快速评估**：如何一次性评估连续的平移和旋转动作空间，而非离散化或迭代采样？
 
 这些挑战的解决路径构成了EquAct方法设计的核心线索，将在后续章节中详细展开。
-
-
 
 ## 核心方法与创新机理
 
@@ -160,8 +156,6 @@ EquAct的动机正是填补这一缺口。其核心假设是：若策略网络�
 
 EquAct的三个创新点构成一个完整的SE(3)等变推理链：EPTU将3D观测编码为等变特征，iFiLM以几何不变方式注入语言语义，场网络在等变特征基础上一次性评估全SE(3)动作空间。这一设计使策略能够根据观测的刚体变换等变地调整动作——当物体旋转或平移时，预测的抓取位姿自动跟随变换，无需重新推理或依赖数据增强来弥补几何理解缺失。
 
-
-
 ![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_d1wuA8oIH0/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of EquAct. EquAct first encodes the observation o = $\{$ s , e $\}$ into latent spherical features h using a SE(3)-equivariant U-Net, e n $c _ { o }$ , while conditioning the natural language instruction n through invariant iFiLM layers. Based on the encoded features h , EquAct then samples and refines translational query actions and gripper open actions using an equivariant field network, resulting in action value functions $Q _ { t }$ and $Q _ { \mathrm { o p e n } }$ . Finally, a rotational field network aggregates spherical features from h centered at the predicted translation $a _ { t } ^ { * }$ to obtain a latent feature $\phi$ , , which is subsequently convolved with a learned filter $\psi$...
 
@@ -181,8 +175,6 @@ EquAct 是一个多任务关键帧动作策略，其核心设计目标是在统�
 **训练范式**：策略以模仿学习方式训练，将动作选择视为分类问题。损失函数为平移、旋转和开合三个分量的交叉熵之和，专家动作作为分类标签进行监督。推理时，EquAct 无需迭代去噪或离散化旋转角，单次前向传播即可完成动作预测，推理耗时约 0.7 秒，显著快于基线 3DDA 的 3.7 秒。
 
 > **证据强度说明**：上述框架描述基于论文 Section 4 的完整方法阐述及 Figure 1 的总览图，各模块的设计细节在 Section 4.2–4.4 中有明确的公式和架构说明，证据充分。
-
-
 
 ### 等变性与不变性假设
 
@@ -254,8 +246,6 @@ $$\mathcal{L} = \mathbb{E}_{D,A}[\mathcal{H}(Q_t,\bar{a}_t) + \mathcal{H}(Q_r,\b
 
 其中 $\mathcal{H}$ 为交叉熵，$\bar{a}_t$、$\bar{a}_r$、$\bar{a}_{\mathrm{open}}$ 分别为平移、旋转和夹爪开合的专家动作标签。三项损失分别监督三个动作分量，共同优化策略网络。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -319,8 +309,6 @@ EquAct在所有三种设置下均取得最高平均成功率：
 2. **多干扰物**：干扰物体增多时，复杂长序列任务（如全部拆卸）成功率减半。
 3. **关键帧假设**：当前方法基于关键帧动作预测，对需要连续轨迹的精细操作（如高精度路径跟踪）适用性受限。如何将等变策略扩展到连续轨迹预测，是明确的开放问题。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_d1wuA8oIH0/figures/006_Table_1.jpg]]
 *Table 1: Multi-task success rate (%) on 18 RLBench tasks with 249 instructions. On average, EquAct outperforms all the baselines on all 3 settings. Furthermore, the second column shows that EquAct’s training and inference time, GPU memory matches baselines. 2D/100 and 2D/10 denote 100 and 10 training demonstrations per task with object poses randomly initialized in SE(2). 3D/10 denotes task with object poses randomly initialized in SE(3) and 10 demonstrations per task*
 
@@ -329,8 +317,6 @@ EquAct在所有三种设置下均取得最高平均成功率：
 
 ![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_d1wuA8oIH0/figures/007_Table_2.jpg]]
 *Table 2: Real-world experiments*
-
-
 
 ## 定位与知识库关联
 
@@ -379,8 +365,6 @@ EquAct的证据链具有高置信度，核心支撑来自三个层面的实验�
 3. **更高效的等变Backbone**：当前EPTU的计算开销虽与非等变基线相当（推理耗时0.7s vs 3DDA的3.7s），但更高效的球面卷积或稀疏化策略是否能进一步降低训练成本，使模型可扩展至更高分辨率点云？
 
 4. **动态环境中的等变规划**：在存在移动障碍物或动态场景变化的情况下，如何保持SE(3)等变性并实现实时规划，是向非结构化真实环境部署的关键一步。
-
-
 
 ## 原文 PDF
 

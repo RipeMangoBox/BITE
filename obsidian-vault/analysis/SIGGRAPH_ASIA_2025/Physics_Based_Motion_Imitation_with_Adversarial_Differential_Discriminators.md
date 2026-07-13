@@ -57,8 +57,6 @@ claims:
 
 ADD 为物理运动模仿提供了一条摆脱手工奖励工程的可行路径，同时为更广泛的多目标优化问题提供了新的对抗式聚合范式。
 
-
-
 ### 物理运动模仿的核心挑战
 
 在计算机图形学与机器人学中，使物理模拟角色精确复现参考运动（如跑酷、舞蹈）是一项长期挑战。其核心在于为强化学习策略设计能够衡量模仿质量的奖励函数。传统方法依赖于手工定义多个子奖励项（如姿态误差、关节速度误差、末端效应器位置误差等），并通过线性加权求和来聚合这些目标。这一范式以 **DeepMimic**（Peng et al., SIGGRAPH 2018）为代表，其总奖励形式为：
@@ -86,8 +84,6 @@ $$r_{t}^{\mathrm{DM}} = w^{p} r_{t}^{p} + w^{jv} r_{t}^{jv} + w^{rv} r_{t}^{rv} 
 - **自动学习非线性聚合**：利用对抗训练框架，让判别器自动学习多个目标值之间的非线性组合关系，完全替代手工权重设计。
 - **动态权重调整**：判别器在训练过程中能够根据当前策略的弱点，动态地将优化压力聚焦于更难满足的目标，实现自适应的多目标平衡。
 - **保持精确跟踪能力**：通过将帧级别运动差异构造为差分向量输入判别器，ADD 在消除手工奖励的同时，仍能实现与 DeepMimic 相当甚至更优的精确运动跟踪性能。
-
-
 
 ## 核心方法与创新机理
 
@@ -118,8 +114,6 @@ $$\mathcal{L}^{GP}(D) = \left\| \nabla_{\phi} D(\phi) \big|_{\phi = \Delta} \rig
 ### 方法谱系与知识库定位
 
 ADD 处于**对抗模仿学习**与**多目标优化**的交叉点。与 **AMP**（Peng et al., SIGGRAPH 2021）的分布匹配范式不同，ADD 保留了帧级别的精确跟踪能力；与 DeepMimic 的手工奖励工程范式不同，ADD 实现了奖励函数的完全自动化学习。其核心贡献在于证明了：在适当的正则化（负样本梯度惩罚）下，仅以零向量为正样本的对抗判别器能够有效引导复杂的多目标物理运动模仿任务，为物理角色动画的奖励设计提供了一种全新的、无需手工调参的解决方案。
-
-
 
 ADD 方法的核心思想是将运动模仿重新表述为一个对抗式多目标优化问题，从而完全替代手工设计的加权奖励函数。其整体 pipeline 由五个关键模块串联构成，形成“状态观测 → 差分构建 → 判别评分 → 策略决策 → 价值估计”的闭环。
 
@@ -159,15 +153,8 @@ $$r_t^{\text{DM}} = w^p r_t^p + w^{jv} r_t^{jv} + w^{rv} r_t^{rv} + w^e r_t^e + 
 
 对于需要同时完成运动模仿和附加任务（如转向目标）的复合场景，ADD 无需在模仿奖励外独立添加任务奖励。只需将任务目标值直接追加到差分向量 Δ 中，判别器即可自动学习模仿质量与任务完成度之间的平衡。这一设计保持了框架的统一性，避免了引入新的超参数。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2505_04961/figures/023_Figure_14.jpg]]
-*Figure 14: Learning curves comparing the tracking performance of simulated humanoid characters trained via AMP [Peng et al. 2021], DeepMimic [Peng et al. 2018], and our method ADD. Statistics are computed over 5 training runs initialized with different random seeds, except for the LaFAN1 subset (1 run due to computational cost). ADD is capable of learning highly agile and acrobatic skills, achieving comparable tracking performance and sample efficiency to DeepMimic, without requiring manual reward engineering. Moreover, ADD exhibits better consistency across seeds, whereas DeepMimic often converges to suboptimal behaviors in some seeds*
-
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2505_04961/figures/013_Figure_8.jpg]]
 *Figure 8: Learning curves comparing ADD to the manually tuned reward function from Rudin et al. [2022] on training a Go1 quadruped to move. Results are shown across 5 random seeds per method. While ADD performs slightly worse in following linear velocity commands, it achieves lower roll and pitch angular velocities–indicating a more stable robot base–and lower DoF accelerations, which means smoother control over time*
-
-
 
 ### 问题形式化：从线性加权到对抗差分判别
 
@@ -268,8 +255,6 @@ $$
 
 自由度速度跟踪误差则衡量关节角速度的匹配程度，二者共同构成运动模仿质量的核心度量（Table 1, Table 2）。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置
@@ -310,32 +295,15 @@ ADD 在运动跟踪质量上达到了与手工设计奖励函数相当甚至更�
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2505_04961/figures/024_Figure_15.jpg]]
 *Figure 15: Robustness of locomotion policies in Sec. 6.5 under random external force perturbations. Policies are trained without perturbations and stress-tested by randomly applying forces up to 300 N during inference. Performance is reported in terms of the episode length until loss of balance, as well as position tracking error and target velocity error before falling. Lighter bars denote nominal performance, and darker bars indicate performance under perturbation. ADD exhibits levels of degradation comparable to DeepMimic, reflecting a similar degree of robustness*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2505_04961/figures/033_Figure_16.jpg]]
-*Figure 16: Full learning curves for all training objectives on the quadruped task, with results averaged over five training runs initialized with different random seeds. ADD outperforms the manually designed reward function from Rudin et al. [2022] on several metrics associated with torso stability and smooth control. Overall, ADD achieves comparable sample efficiency, final performance, and consistency to the manually-designed reward function*
-
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2505_04961/figures/016_Figure_11.jpg]]
-*Figure 11: Magnitudes of the gradients of the discriminator’s output with respect to the prediction error for each sample at different training iterations. As training progresses and ?? (?? ) gradually learns to approximate samples near the origin, the discriminator assigns higher and higher weights to samples farther from the origin, essentially honing in on the more difficult objectives*
-
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2505_04961/figures/004_Table_1.jpg]]
 *Table 1: Motion tracking performance of simulated humanoid characters trained using AMP [Peng et al. 2021], DeepMimic [Peng et al. 2018], and our method ADD. Position (Eq. 12) and DoF Velocity tracking errors are averaged ± 1 std across 5 models initialized with random seeds. Due to computational constraints, 1 model is trained for the LaFAN1 subset. For each model, errors are averaged across 4096 test episodes. ADD achieves tracking performance comparable to DeepMimic when imitating individual motion clips and larger motion datasets, while alleviating the need for manual reward engineering*
 
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2505_04961/figures/006_Table_2.jpg]]
 *Table 2: Position tracking errors (Eq. 12) of simulated EVAL robots trained using ADD, AMP [Peng et al. 2021], and DeepMimic [Peng et al. 2018]. Only the position tracking errors are reported for brevity, showing the mean ± 1 standard deviation across three random seeds, with 4096 test episodes per seed. The results show that ADD maintains strong tracking performance comparable to DeepMimic on a different character morphology*
 
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2505_04961/figures/008_Table_3.jpg]]
-*Table 3: Performance of various methods when applied to a composite task that combines motion imitation with a target steering objective. Motion imitation performance is measured via the position tracking error, while task performance is measured by the velocity error $\left$\| $\mathbf { v } _ { t } - v ^ { * } \mathbf { d } _ { t } ^ { * } \right$\| , where $\mathbf { v } _ { t }$ is the 2D root velocity of the character and $v ^ { * } \mathbf { d } _ { t } ^ { * }$ the 2D target velocity. ADD, via automatically balancing the different objectives, achieved optimal performance on both objectives
 
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2505_04961/figures/015_Table_4.jpg]]
 *Table 4: ADD regression experiment hyperparameters*
-
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2505_04961/figures/017_Table_5.jpg]]
-*Table 5: DeepMimic sensitivity analysis parameter settings. Reward weights are listed in the order of $\boldsymbol { w } ^ { p } , \boldsymbol { w } ^ { j v } , \boldsymbol { w } ^ { r v } , \boldsymbol { w } ^ { e }$ , , ???? , and reward scales are listed in the order of $\alpha ^ { p } , \alpha ^ { j v } , \alpha ^ { r v } , \alpha ^ { e } , \alpha ^ { c } . ^ { \star }$ * denotes the final parameter setting used in the experiments
-
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2505_04961/figures/019_Table_6.jpg]]
-*Table 6: ADD humanoid character motion imitation experiment hyperparameters*
-
 
 
 ## 定位与知识库关联
@@ -402,8 +370,6 @@ ADD 有效训练的一个关键设计选择是将梯度惩罚**专门施加于�
 3. **通用控制器**：能否利用 ADD 训练完全不依赖手工设计奖励函数的通用运动控制器？当前 ADD 仍需要参考运动作为输入，但若将差分向量的构建方式泛化到高层任务描述（如“向前移动”），可能实现零手工奖励的通用策略学习。
 
 4. **局部最优缓解**：对于极易陷入局部最优的高动态运动，是否可以引入额外的正则化（如熵奖励、好奇心驱动探索）或课程学习策略来缓解？判别器在局部最优处的梯度行为值得进一步理论分析。
-
-
 
 ## 原文 PDF
 

@@ -54,8 +54,6 @@ claims:
 
 **主要结果**：在654个高质量评估实例上，GPT-4.1以70.34%的成对比较一致率领先所有模型，但与人类专家的84.56%仍有显著差距（Table 3）。代码是最关键的评估模态——仅提供代码时性能下降远小于仅提供截图（Table 4）。在可行性验证子任务上，LLM评委呈现高精度低召回特征（GPT-4.1精确率72.1%），而智能体则相反（UI-TARS-1.5召回率70.3%），暴露了两类方法的互补缺陷（Table 6）。模型普遍存在位置偏见，去除偏见后整体一致率变化不大，但偏见本身是模型的内在缺陷（Table 5）。
 
-
-
 ### 问题背景：LLM-as-a-Judge 的兴起与瓶颈
 
 随着大语言模型（LLM）能力的快速提升，利用LLM作为自动评估者（LLM-as-a-Judge）已成为替代昂贵人工评估的主流范式。从早期的**MT-Bench**（Zheng et al., 2023）到近期的**JudgeBench**（Tan et al., 2025）和**AgentRewardBench**（Lu et al., 2025），研究者持续探索LLM在对话质量、指令跟随等任务上的评估可靠性。然而，这些基准主要局限于静态文本评估，尚未触及一个根本性问题：**在需要同时理解代码、视觉呈现和交互行为的复杂开放性任务中，LLM评委的能力边界究竟在哪里？**
@@ -73,8 +71,6 @@ claims:
 网页开发为LLM评估能力的研究提供了独特的测试环境：每个实现可被表示为**源代码**、**渲染截图**和**可交互浏览器环境**三种观察形式，天然支持从静态到动态的多层次评估。然而，这一领域也带来了严峻挑战——评估者必须识别功能等价性（不同实现是否满足同一需求）、验证交互可行性（任务是否可执行），并克服系统性偏见。
 
 为此，本文构建**WebDevJudge**基准，旨在系统性地回答一个核心问题：**当前最先进的（多模态）大语言模型作为网页开发质量的评审员，与人类专家之间还存在多大差距？差距的根源是什么？**
-
-
 
 ## 核心方法与创新机理
 
@@ -96,8 +92,6 @@ WebDevJudge 的核心创新在于将 LLM-as-a-judge 的元评估从静态文本�
 
 WebDevJudge 同时支持成对比较和单答案评分两种范式，并发现成对比较在所有类别中平均提升超过 8% 的一致率（Table 3）。这一发现揭示了相对判断作为模型内化能力的特性——在成对比较中，直接判断（无评估标准）的一致率与使用李克特量表或量规相当（Figure 3），表明核心比较能力已内化于模型，外部指导的边际收益有限。
 
-
-
 ![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_CCSPm6V5EF/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of WEBDEVJUDGE. Left: Data Collection with query-based and environmentbased filtering. Center: Preference label annotation with verifiable rubric tree. Right: Evaluate (M)LLM-based and agentic evaluators under pairwise and single-answer paradigms*
 
@@ -110,8 +104,6 @@ WebDevJudge 基准的整体流水线围绕三个核心模块构建：数据过�
 **多模态评估环境**为每个网页实现提供三种观察形式：源代码、渲染截图和可交互浏览器环境。评估者可根据任务类型选择静态或交互式评估模式。框架支持两种主流评估范式：成对比较直接输出偏好判定，单答案评分则通过李克特量表或量规树对单个实现进行多维打分。智能体评估流水线进一步将交互式评估建模为多阶段管道：查询经规划器生成含测试用例的执行计划，由执行器在浏览器中运行测试，最终由总结器综合结果形成判定。
 
 整个框架的输入为评估实例四元组 $(Q, W_{\mathrm{a}}, W_{\mathrm{b}}, l_{\mathrm{p}})$，其中 $Q$ 为网页开发查询，$W_{\mathrm{a}}$ 和 $W_{\mathrm{b}}$ 为两个候选实现，$l_{\mathrm{p}}$ 为专家偏好标签。输出为评估者预测与人类偏好的一致率，以此度量大语言模型和智能体作为网页开发质量评审员的可靠程度。
-
-
 
 ### 评估实例的形式化表示
 
@@ -168,8 +160,6 @@ $$Res_{\mathrm{dynamic}} = Agent \lor LLM$$
 
 这一设计的依据来自可行性验证实验（Table 6）：LLM评委在可行性验证中表现出高召回但低精确率（如GPT-4.1精确率72.1%、召回率90.0%），而智能体则相反（UI-TARS-1.5精确率较高但召回率仅70.3%）。逻辑或集成利用LLM的高召回确保不遗漏可行任务，同时借助智能体的高精确率过滤误判，实现互补。实验表明，集成后一致率有边际提升（如GPT-4.1从65.0%升至66.2%）（Table 7），但整体增益有限，说明当前智能体工作流的规划与执行可靠性仍是主要瓶颈。
 
-
-
 ## 实验与关键发现
 
 ### 评估范式对比：成对比较显著优于单答案评分
@@ -218,8 +208,6 @@ WebDevJudge-Unit子集上的可行性验证实验（Table 6）暴露了两类方
 
 基于这一发现，研究者设计了门控集成策略，对动态任务采用智能体与LLM的逻辑或（$Res_{\mathrm{dynamic}} = Agent \lor LLM$），整合智能体的高精度与LLM的高召回。Table 7显示，集成后一致率有小幅提升（GPT-4.1从65.0%升至66.2%），但整体收益有限，未能从根本上解决可行性验证的挑战。
 
-![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_CCSPm6V5EF/figures/011_Table_7.jpg]]
-
 ### 智能体工作流：多阶段错误累积制约性能
 
 尽管智能体工作流在动态任务上表现优于静态LLM评估，但其整体一致率未能超越基础模型（Table 3）。分析表明，**多阶段错误累积是核心瓶颈**：规划器生成的测试计划可能不完备（规划脆弱），执行器在浏览器交互中可能操作失败（执行不可靠），这些错误在流水线中逐级放大。Figure 10中的失败案例展示了智能体因无法在截图中定位目标元素而错误判定任务不可行的典型场景。
@@ -228,27 +216,8 @@ WebDevJudge-Unit子集上的可行性验证实验（Table 6）暴露了两类方
 
 Figure 4展示了LLM评委无法识别功能等价性的典型案例。当网页实现使用"Presentation"替代查询要求的"Demonstration"时，部分模型因字面差异而误判为功能缺失，未能理解两者在语义上的等价性。这一失败模式在DeepSeek-R1-0528等深度推理模型上同样存在（Figure 10），说明当前模型的语义理解能力仍不足以处理实现多样性带来的评估挑战。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_CCSPm6V5EF/figures/002_Table_1.jpg]]
-*Table 1: Annotation agreement rates with and without the verifiable rubric. The ‘without rubric’ part shows agreements between: (1) annotators and (2) annotators and the original labels. The ‘with rubric’ part shows inter-annotator agreements under human-written and LLM-generated rubrics*
-
-![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_CCSPm6V5EF/figures/003_Table_2.jpg]]
-*Table 2: Categories and their respective subcategories of queries in WEBDEVJUDGE*
-
 ![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_CCSPm6V5EF/figures/012_Table_8.jpg]]
 *Table 8: Overview of the filtering pipeline, including the number of instances before and after filtering, and the purpose of each filtering stage*
-
-![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_CCSPm6V5EF/figures/014_Table_10.jpg]]
-*Table 10: Statistics of the generated rubric trees*
-
-![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_CCSPm6V5EF/figures/015_Table_11.jpg]]
-*Table 11: Details of the agent settings*
-
-![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_CCSPm6V5EF/figures/016_Table_12.jpg]]
-*Table 12: Statistics of the WebDevJudge-Unit dataset*
-
-
 
 ## 定位与知识库关联
 
@@ -291,8 +260,6 @@ WebDevJudge 的有效性受限于以下边界条件：
 4. 如何在开放式任务中有效解耦个人偏好与客观质量，以构建更公正的自动评估体系？
 5. 如何扩展评估基准以覆盖更多样化的网页开发任务，并支持多轮迭代评估？
 6. 能否通过增强模型的代码理解与视觉感知来提升 LLM 评委的综合能力，而不仅仅依赖外部指导？
-
-
 
 ## 原文 PDF
 

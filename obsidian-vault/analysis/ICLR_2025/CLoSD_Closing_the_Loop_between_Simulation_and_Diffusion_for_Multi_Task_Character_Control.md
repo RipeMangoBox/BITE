@@ -61,8 +61,6 @@ claims:
 
 **局限与展望**：当前方法仅依赖目标位置作为空间条件，缺乏视觉感知能力；规划范围限于约 2 秒的短期运动；缺乏自适应时间尺度的闭环机制。未来方向包括引入外感受（视觉/高度图）、扩展长期规划能力、以及设计时间自适应循环。
 
-
-
 让虚拟角色在物理仿真环境中根据自然语言指令执行复杂的物体交互任务，是计算机动画与具身智能交叉领域的长期目标。这一目标的实现需要同时解决两个核心问题：**运动生成的自然性**与**物理交互的可行性**。然而，当前的主流方法在这两个维度上呈现出明显的割裂。
 
 在运动生成侧，基于扩散的文本到运动模型（如 **MDM**，Tevet et al., ICLR 2023）在离线生成高质量运动序列方面取得了显著进展，但存在两个根本性局限：其一，生成过程计算开销大、速度慢，难以满足实时交互需求；其二，这些模型本质上是**开环**的——它们一次性生成完整运动序列，缺乏对物理环境反馈的感知与响应能力，无法在线修正因碰撞、滑移等物理扰动导致的偏差。
@@ -72,8 +70,6 @@ claims:
 一个更深层的瓶颈在于：**运动扩散模型与物理控制器之间缺乏有效的闭环耦合机制**。扩散模型擅长规划“应该做什么”，物理控制器擅长执行“如何做到”，但二者若以开环方式串联，则物理执行中累积的误差无法反馈给规划器进行修正，导致在需要精确物体交互的任务（如击打目标、从家具上起身）中频繁失败。
 
 CLoSD 的核心洞察正是针对这一缺口：**运动扩散模型可以作为强化学习物理控制器的实时通用规划器**，通过闭环交互实现文本驱动和物体交互的多任务控制。其设计目标不是简单地堆叠生成与控制模块，而是构建一个“规划—执行—反馈”的闭合回路，使扩散规划器能够根据物理执行的实际结果进行自回归重规划，从而在保持运动自然性的同时，获得对物理环境的适应能力。
-
-
 
 ## 核心方法与创新机理
 
@@ -109,8 +105,6 @@ $$\mathcal{L}_{\mathrm{target}} = \sum_{j \in J} v_j || R2G(\hat{x}_0[N_g])_j - 
 
 这种设计使 CLoSD 在保持文本到运动生成质量的同时，具备了物理仿真中的实时交互能力和多任务泛化性，超越了当前领先的文本到运动控制器 **MoConVQ** (Yao et al., TOG 2024) 和多任务物体交互控制器 **UniHSI** (Xiao et al., ICLR 2024)。
 
-
-
 CLoSD 的整体设计围绕一个核心洞察展开：**运动扩散模型可以作为强化学习物理控制器的实时通用规划器**，通过闭环交互实现文本驱动和物体交互的多任务控制。系统由两个关键模块构成闭环回路——**Diffusion Planner (DiP)** 和基于物理的 **RL 跟踪控制器**（图 2）。
 
 ### 闭环规划-执行回路
@@ -133,12 +127,8 @@ DiP 接受两类条件输入：**文本提示**（描述期望的运动类型，
 
 跟踪控制器基于 **PHC**（Luo et al., ICCV 2023）通用运动跟踪策略进行初始化，随后在闭环中针对多任务物体交互进行微调。微调阶段固定 DiP 参数，使用 PPO 算法，每个 episode 随机选择一个任务并设置相应的物体、文本提示和目标位置，同时保留原始 PHC 的奖励函数和重置条件。这一闭环微调策略使控制器能够适应 DiP 的规划分布，显著提升了文本到运动的生成质量和任务成功率。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1900_CLoSD_Closing_the_Loop_between_Simulation_and_Diffusion_for_Multi_Task_C/figures/002_Figure_2.jpg]]
 *Figure 2: CLoSD Overview. (Left) DiP is a rapid auto-regressive diffusion model conditioned on a text prompt and a Target location. It generates the motion plan*
-
-
 
 ### 系统闭环架构
 
@@ -181,8 +171,6 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{simple}} + \lambda_{\mathrm{target}}^{-} \m
 ### 状态机与任务切换
 
 高层任务调度由一个简单状态机实现。每个任务完成时发出完成信号，状态机据此切换文本提示与目标位置，实现在线多任务序列执行。任务可随机选择或按预设流程自动过渡。
-
-
 
 ## 实验与关键发现
 
@@ -232,15 +220,11 @@ CLoSD 的实验评估围绕两个维度展开：**文本到运动的生成质量
 ![[assets/figures/papers/paper_list_l1900_CLoSD_Closing_the_Loop_between_Simulation_and_Diffusion_for_Multi_Task_C/figures/003_Figure_3.jpg]]
 *Figure 3: (Left) CLoSD generates versatile text-prompted physics-based motions. The SMPLcompatible physics model is rendered with the SMPL mesh. (Right) CLoSD can perform a sequence of RL tasks (see the web page video). Task transitions are user-specified via interactively changing the text, or via a state machine, with transitions on a task done signal*
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1900_CLoSD_Closing_the_Loop_between_Simulation_and_Diffusion_for_Multi_Task_C/figures/004_Table_1.jpg]]
 *Table 1: Task success rates. Bold and underscore relate to multi-task only. CLoSD significantly excels on Striking and Get-up, which require careful object interaction*
 
 ![[assets/figures/papers/paper_list_l1900_CLoSD_Closing_the_Loop_between_Simulation_and_Diffusion_for_Multi_Task_C/figures/005_Table_2.jpg]]
 *Table 2: DiP ablation study. We use DiP with prefix length*
-
-
 
 ## 定位与知识库关联
 
@@ -275,8 +259,6 @@ CLoSD 在以下条件下表现良好：
 论文明确指出的局限性包括：（1）仅依赖目标位置作为空间条件，缺乏视觉感知等外部感受能力；（2）规划范围限于短期（约2秒），对于需要长期规划的任务可能不够；（3）缺乏自适应时间尺度的闭环，难以同时适应快速和慢速动作。
 
 由此衍生的开放问题包括：如何将外感受（如视觉或高度图）引入运动跟踪控制器和扩散规划器？如何处理更长时间尺度的规划，超越当前的中短期范围？如何引入时间自适应循环，以便更好地处理快速运动和更长的跟踪 horizon 以减少伪影？这些问题指向 CLoSD 方法向更通用、更鲁棒的物理角色控制发展的关键方向。
-
-
 
 ## 原文 PDF
 

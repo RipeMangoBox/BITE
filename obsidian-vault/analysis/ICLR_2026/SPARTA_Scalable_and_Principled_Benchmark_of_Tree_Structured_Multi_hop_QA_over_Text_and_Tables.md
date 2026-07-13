@@ -45,8 +45,6 @@ claims:
 
 SPARTA (Scalable and Principled Benchmark of Tree-Structured Multi-hop QA over Text and Tables) 是一个大规模、高质量、可扩展的 Table-Text QA 基准。其核心贡献在于提出了一种以 SQL 为中心的端到端自动构建框架，能够以极低的标注成本（约为 HybridQA 的 1/4）生成零错误率、覆盖树状多跳推理和分析操作（如聚合、GROUP BY、HAVING）的问答对。实验表明，在 HybridQA 上 F1 超过 70 或在 OTT-QA 上 F1 超过 50 的 SOTA 模型，在 SPARTA 上 F1 下降了超过 30 个点，揭示了现有模型在真实大规模异构数据上深度多跳推理能力的严重不足。
 
-
-
 现有 Table-Text QA 基准（如 HybridQA、OTT-QA、TAT-QA、FinQA、MultiHiertt）受限于人工标注，存在三个主要问题：
 
 - **问题类型浅薄**：通常不超过两跳，缺乏聚合、分组、HAVING 等分析操作。
@@ -54,8 +52,6 @@ SPARTA (Scalable and Principled Benchmark of Tree-Structured Multi-hop QA over T
 - **数据规模小**：依赖小型 Web 表格，平均约 15 行（HybridQA 平均 15.7 行），无法有效评估模型在真实大规模异构数据上的深度多跳推理能力。
 
 此外，现有合成基准（如 ERBench、TDBench）或局限于结构化表内推理，或缺乏表-文交互，无法满足 Table-Text QA 的评估需求。
-
-
 
 ## 核心方法与创新机理
 
@@ -66,8 +62,6 @@ SPARTA 的核心创新在于：
 3. **AST-ICL 问题口语化**：使用基于 LLM 的 SQL-to-text 模型（AST-ICL）将可执行的 SQL 查询转换为流畅的自然语言问题。
 4. **轻量级人工验证**：仅需验证口语化问题的正确性和自然性，标注时间约为 HybridQA 的 1/4（验证 3,300 个查询约需 1,493 分钟，而 HybridQA 创建相同数量的问题约需 6,600 分钟）。
 
-
-
 ![[assets/figures/papers/iclr26_0001_8KE9qvKhM4_SPARTA_Scalable_and_Principled_Benchmark_of_Tree/figures/001_Figure_1.jpg]]
 
 SPARTA 的流水线如图 2 所示，包含三个主要阶段：
@@ -75,8 +69,6 @@ SPARTA 的流水线如图 2 所示，包含三个主要阶段：
 1. **参考事实数据库构建**：将源表（S_T）与从文本中提取的原子事实（grounding tables, G_T）合并，形成统一的 SQL 可查询数据库 D = S_T ∪ G_T。
 2. **查询生成**：使用 LLM 生成可执行的 SQL 查询，通过后序遍历构建查询树，并通过溯源精炼修复空结果查询。
 3. **问题口语化**：使用 AST-ICL 模型将可执行的 SQL 查询转换为流畅的自然语言问题，随后进行轻量级人工验证。
-
-
 
 ### 5.1 查询图模型
 
@@ -96,8 +88,6 @@ SPARTA 的流水线如图 2 所示，包含三个主要阶段：
 
 对于每个可执行的 SQL 查询 qSQL，使用 AST-ICL 模型生成对应的自然语言问题 qNL。AST-ICL 将 SQL 抽象语法树作为上下文示例，生成语义对齐的流畅问题。
 
-
-
 ## 实验与关键发现
 
 ### 6.1 基准质量评估
@@ -112,7 +102,6 @@ SPARTA 的流水线如图 2 所示，包含三个主要阶段：
 | TAT-QA | 30% | - | - |
 | FinQA | 17% | - | - |
 
-*Table 7: 跨数据集标注审计结果。*
 
 ### 6.2 模型性能评估
 
@@ -174,15 +163,11 @@ SPARTA 的流水线如图 2 所示，包含三个主要阶段：
 **访问表数量**（Table 12）：
 - 平均 LLM 调用次数随访问表数量增加呈近线性增长：+2.6 次（1 到 2 表），+3.9 次（2 到 3 表），+2.2 次（3 到 4 表）。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0001_8KE9qvKhM4_SPARTA_Scalable_and_Principled_Benchmark_of_Tree/figures/002_Figure_1.jpg]]
 *Figure 1: Representative examples of our SPARTA benchmark (see Appendix M for more examples). Table 1: Comparison of Table–Text QA benchmarks (see Appendix A for detailed annotation audit results).*
 
 ![[assets/figures/papers/iclr26_0001_8KE9qvKhM4_SPARTA_Scalable_and_Principled_Benchmark_of_Tree/figures/005_Table_2.jpg]]
 *Table 2: Cost metrics used for benchmark generation.*
-
-
 
 ## 定位与知识库关联
 
@@ -216,8 +201,6 @@ SPARTA 的核心优势在于：
 - 不同嵌套类型（Type-N, A, J, JA）的难度差异根源是什么？为什么模型在 Type-JA 上表现最差？
 - SPARTA 的溯源精炼方法在更复杂的查询图（如深度 >3 或广度 >3）上的效果如何？
 - SPARTA 基准是否能够有效推动 Table-Text QA 模型在真实世界应用中的改进？
-
-
 
 ## 原文 PDF
 

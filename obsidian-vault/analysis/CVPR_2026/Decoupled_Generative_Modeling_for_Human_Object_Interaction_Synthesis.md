@@ -44,8 +44,6 @@ claims:
 
 在 **FullBodyManipulation** 和 **3D-FUTURE** 两个基准上，DecHOI 在条件匹配、运动质量、交互质量等多个指标上超越了现有方法。以 FullBodyManipulation 的 FID↓ 为例，DecHOI 达到 **0.33**，显著优于 CHOIS 的 **1.58**（Table 1）。用户研究同样表明，DecHOI 在文本对齐与交互质量上的偏好率均超过 67%。此外，该方法展现出对未见物体类别的泛化能力，并可在长序列动态环境中实现目标导向的、无碰撞的自适应重规划。
 
-
-
 ### 人-物交互运动合成的核心挑战
 
 生成自然、物理可信的人-物交互（Human-Object Interaction, HOI）运动是计算机视觉与图形学中的核心难题。其复杂性源于两个高度耦合的子问题：**全局轨迹规划**（人类与物体在三维空间中的移动路径）和**局部动作合成**（人体关节的精细运动，尤其是手部与物体的接触协调）。现有方法通常将这两者统一建模在一个端到端框架中，导致优化空间维度极高、训练信号稀疏，难以同时兼顾轨迹精度、动作自然度和接触一致性。
@@ -69,8 +67,6 @@ claims:
 ### 关键性能证据
 
 在 FullBodyManipulation 基准上，DecHOI 的 FID↓ 达到 **0.33**，相较 CHOIS 的 1.58 降低了 **1.25**（Table 1），验证了解耦范式在运动质量和交互真实感上的显著增益。这一性能跃升构成了本文方法动机的实证支撑。
-
-
 
 ## 核心方法与创新机理
 
@@ -122,8 +118,6 @@ DecHOI 的核心创新在于将人-物交互（HOI）生成任务解耦为两个
 
 **总结**：DecHOI 通过“解耦生成 + 对抗精炼”的双重机制，系统性地解决了长序列 HOI 合成中优化困难与接触失真的核心问题。其 changed slots 集中在生成范式的结构性拆分与接触监督的显式对抗化，为动态交互场景提供了更灵活、更稳定的生成框架。
 
-
-
 DecHOI 的核心设计是将长时序人-物交互生成分解为两个解耦的阶段：**轨迹生成（Trajectory Generation）** 与 **动作合成（Action Synthesis）**。这一解耦策略直接回应了现有方法（如 CHOIS）中面临的核心瓶颈——同时优化全局路径规划与精细接触动作导致优化景观高度复杂、模型难以收敛，且往往依赖人工预设的中间路点（waypoints）来引导生成。
 
 ### 两阶段流水线
@@ -160,15 +154,8 @@ $$\tilde{\mathbf{P}}_0 = \hat{\mathbf{P}}_0 - \alpha \Sigma_n \nabla_{\mathbf{P}
 
 整体而言，DecHOI 的模块关系可概括为：**条件输入 → 轨迹生成器（粗粒度全局规划）→ 动作生成器（细粒度交互合成）→ 对抗精炼（接触一致性增强）**。各模块以去噪扩散模型为统一骨干，通过解耦设计降低联合优化难度，通过对抗训练弥补解耦带来的接触精度损失，并通过推理时约束注入保持对新场景的灵活适应性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l986_https_arxiv_org_abs_2512_19049/figures/002_Figure_2.jpg]]
 *Figure 2: Architecture of DecHOI showing the decoupled trajectory and action generation process. Conditioned on the text instruction, geometry, current human and object poses, and a goal point, the trajectory generator plans paths, while the action generator produces joint motions on these paths to yield synchronized, contact-aware interactions. The right panels detail the Trajectory and Action Generators*
-
-![[assets/figures/papers/paper_list_l986_https_arxiv_org_abs_2512_19049/figures/001_Figure_1.jpg]]
-*Figure 1: Overview of DecHOI for dynamic human-object interaction synthesis. The framework decouples trajectory planning and interaction synthesis, enabling collision detection and responsive re-planning for realistic, contact-consistent motion*
-
-
 
 ### 3.1 扩散模型基础
 
@@ -230,13 +217,6 @@ $$\tilde { P } _ { 0 } = \hat { P } _ { 0 } - \alpha \Sigma _ { n } \nabla _ { P
 
 其中 $\hat{P}_0$ 为当前步预测的干净样本，$\mathcal{F}$ 为自定义的正则化目标（如碰撞惩罚、目标到达约束），$\alpha$ 为步长，$\Sigma_n$ 为与噪声调度相关的缩放矩阵。该设计使模型可在动态环境中进行碰撞检测和响应式重规划，而无需针对特定约束重新训练网络。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l986_https_arxiv_org_abs_2512_19049/figures/003_Figure_3.jpg]]
-*Figure 3: Adversarial module of DecHOI, where a hand and footfocused discriminator contrasts real and generated interactions to enhance contact realism*
-
-
-
 ## 实验与关键发现
 
 ### 主结果：FullBodyManipulation 与 3D-FUTURE 上的定量对比
@@ -261,9 +241,6 @@ DecHOI 在两个核心基准上均取得了显著的性能优势。在 FullBodyM
 ![[assets/figures/papers/paper_list_l986_https_arxiv_org_abs_2512_19049/figures/012_Table_4.jpg]]
 *Table 4: Ablation results for DecHOI on the FullBodyManipulation [23], evaluating the contribution of each component*
 
-![[assets/figures/papers/paper_list_l986_https_arxiv_org_abs_2512_19049/figures/018_Table_4.jpg]]
-*Table 4: Oracle trajectory ablation study on the FullBodyManipulation [7]. DecHOI (oracle) denotes a variant in which the trajectory generator is replaced by ground truth trajectories*
-
 - **解耦架构（Decoupled TG + AG）**：移除轨迹生成器（仅用 AG 端到端预测）会导致 FID 急剧恶化，并引发严重的脚部滑动与物体漂移。这证实了将全局路径规划从细粒度动作合成中分离出来，是降低长序列优化难度的核心瓶颈。
 - **对抗接触精炼（Adversarial Module）**：去掉手-脚聚焦的判别器后，物体穿透率显著上升，接触准确率下降。该模块通过 Hinge loss 直接对远端关节（手、脚）与物体的空间关系施加约束，在不增加推理开销的情况下大幅提升了物理合理性。
 - **轨迹质量的上界分析**：当用真实轨迹（Oracle Trajectory）替换生成轨迹时（Table 4 的 Oracle 变体），FID 进一步逼近理论下界，说明轨迹生成器仍是当前系统的性能杠杆——更优的路径规划将直接转化为更真实的全身交互。
@@ -271,9 +248,6 @@ DecHOI 在两个核心基准上均取得了显著的性能优势。在 FullBodyM
 ### 动态场景与重规划能力
 
 在引入动态障碍物的 DynaPlan 测试场景中（Table 3），DecHOI 的轨迹成功率（Ts）达到 **1.90**，优于 CHOIS 的 2.19；终点误差（Te）为 7.98，略低于 CHOIS 的 8.05。这一优势源于推理阶段的约束注入机制：在每一步去噪过程中，模型利用梯度引导 $\tilde{P}_0 = \hat{P}_0 - \alpha \Sigma_n \nabla_{P_n} \mathcal{F}(\hat{P}_0)$ 将碰撞检测等物理约束融入生成过程，无需重新训练即可实现响应式重规划。
-
-![[assets/figures/papers/paper_list_l986_https_arxiv_org_abs_2512_19049/figures/017_Table_3.jpg]]
-*Table 3: Quantitative comparison on the FullBodyManipulation [7] in the privileged waypoint supervised setting, where DecHOI operates without intermediate waypoints and CHOIS [8], HOIFHLI [13] receive sparse intermediate waypoints*
 
 ### 优化复杂度分析
 
@@ -294,16 +268,6 @@ DecHOI 在两个核心基准上均取得了显著的性能优势。在 FullBodyM
 - **罕见接触模式**：对于训练集中极少出现的接触类型（如单手倒立抓取），对抗判别器可能因缺乏足够正样本而无法有效约束，产生不自然的接触姿态。
 
 > 注：部分失败模式的具体量化指标在提供的分析片段中未完整呈现，建议对照原论文的 Limitation 部分进行人工确认。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l986_https_arxiv_org_abs_2512_19049/figures/010_Figure_7.jpg]]
-*Figure 7: Visualization of DecHOI in long-sequence dynamic environments. The human agent (blue) adaptively re-plans its path when encountering a moving obstacle (green), choosing between detour and waiting behaviors to maintain goal-directed, collision-free motion*
-
-![[assets/figures/papers/paper_list_l986_https_arxiv_org_abs_2512_19049/figures/019_Figure_3.jpg]]
-*Figure 3: Example 2AFC interface in which participants read a text instruction and compare two anonymized clips to judge text alignment and interaction quality*
-
-
 
 ## 定位与知识库关联
 
@@ -340,8 +304,6 @@ DecHOI 的解耦策略直接回应了这一瓶颈：将任务拆分为**轨迹�
 5. **评估指标的完备性**：现有评估主要依赖 FID、R-precision、接触准确率等指标，但这些指标与人类对交互自然度的感知之间的相关性尚未被充分验证。用户研究或感知评估的缺失使得“state-of-the-art”的宣称在主观体验维度上缺乏直接支撑。
 
 6. **计算开销**：双阶段扩散模型加对抗训练的推理流程引入了额外的计算开销。论文未报告推理延迟或吞吐量数据，这对于实时交互应用（如机器人遥操作、VR 角色控制）的可行性评估至关重要。
-
-
 
 ## 原文 PDF
 

@@ -53,8 +53,6 @@ claims:
 
 本研究的局限性在于：分析主要集中于V4区，尚未在整个视觉层级上系统验证双尾编码的普遍性；人类行为实验中被试数量有限，任务简化；ImageBeagle依赖ResNet特征空间，可能在部分图像类型上搜索质量下降。尽管如此，上述发现清楚地表明，反偏好刺激是视觉编码的“另一条尾巴”，将完整编码机制带入视野，也为改进下一代神经拟态网络提供了明确的生物学约束。
 
-
-
 理解灵长类视觉皮层如何编码自然视觉刺激是计算神经科学的核心目标。传统的线性-非线性模型和深度神经网络单元通常假设神经元主要通过偏好刺激来编码信息——即那些能最大程度激活神经元的刺激。这种单尾响应分布意味着反偏好刺激仅被视作无信息的背景活动。
 
 然而，这种模型与生物视觉系统之间存在显著的**表征差距**。对恒河猴V4区219个神经元的分析显示，其自然图像响应分布呈现显著的双尾特性：偏度中位数κ仅为0.87，远低于ResNet50单元的2.06（Figure 1c, p<0.002）。这一差距也存在于V1区（κ=1.17，Figure 1d），表明双尾编码可能贯穿视觉层级，而当前深度网络尚无法复现该特性。
@@ -64,8 +62,6 @@ claims:
 值得关注的是，偏好特征与反偏好特征在图像统计上几乎无法区分，且在不同神经元之间不共享（Figure 5a-b, Supp. Figure 7），这暗示每个V4神经元通过编码两个相对独立的视觉特征，使群体的特征选择性容量约翻倍（压缩比=2.5，Figure 5h）。这种编码策略在当前深度神经网络的ReLU激活架构中天然缺失，揭示了人工系统与生物系统在表征效率上的关键差异。
 
 本文的动机在于系统量化、实验验证与机制阐明V4神经元的反偏好编码现象，填补现有模型无法完整捕捉视觉神经元调谐特性的这一关键缺口。
-
-
 
 ## 核心方法与创新机理
 
@@ -92,8 +88,6 @@ claims:
 ### 核心洞察：双尾编码使群体特征容量翻倍
 
 偏好图像与反偏好图像在颜色、纹理等底层统计上几乎无法区分，且不同V4模型神经元的偏好/反偏好集合之间不存在线性共享关系（Figure 5a,b；Supplementary Figure 7）。这意味着每个V4神经元编码了两个**独立的视觉特征**。量化分析表明，若将V4模型神经元的响应分布截断为单尾（仅保留偏好尾），需要约2.5倍数量的单元才能在下游物体识别任务中恢复原有精度（Figure 5h，压缩比=2.5），而pre-ReLU DNN单元的压缩比仅为1.6。这证明双尾编码使群体特征选择性容量实现了近两倍的提升，揭示了一种现有DNN中不存在的表征策略。
-
-
 
 ![[assets/figures/papers/iclr26_0004_RZ8esDBqMJ_A_tale_of_two_tails_Preferred_and_anti-preferred/figures/016_Figure_6.jpg]]
 *Figure 6: ImageBeagle searches the natural image manifold to efficiently find preferred and anti-preferred stimuli. a. A V4 model neuron’s responses to preferred and anti-preferred images after searching through a subsample of K images. Dashed-lines: linear fits; x-axis is log-scale. Right: Top preferred and anti-preferred images for each K as well as synthesized images. b. ImageBeagle navigates the natural image manifold via a nearest neighbor graph. c. Runs of Image-Beagle (orange traces) versus random selection (black traces) searching for the preferred (top) and anti-preferred (bottom) image. Dashed lines: optimal out of 30M images. d. ImageBeagle tuning curve for a V4 model neuron*
@@ -132,8 +126,6 @@ claims:
 - **输出**：实验验证的分位数度量、数据剪枝的泛化 $R^{2}$、人类正确率、群体压缩比、以及 ImageBeagle 搜索到的近似最优刺激。  
 
 这些模块层层递进：先证实现象存在，再建立可操控的模型，继而通过剪枝和人类实验确认信息必要性，最后量化群体层面的容量增益并提供实用工具。整体框架呈现出“数据驱动建模 → 闭环实验验证 → 信息分解 → 容量分析”的串行与反馈环路。需要注意的是，部分分析（如人类心理物理学被试人数有限，以及 ImageBeagle 搜索性能受限于 ResNet50 嵌入空间）存在边界条件，具体解释需结合实际实验设置进行判断。
-
-
 
 本文将V4神经元的双尾响应特性解析为若干可操作的模块，并配合关键量化指标与映射策略，构建了从现象发现到机制验证的完整分析链。以下聚焦各模块的驱动力和控制变量，以及核心公式的变量含义。
 
@@ -180,8 +172,6 @@ claims:
 
 以上模块共同将反偏好刺激从一种现象固化为V4编码的独立功能维度，LRL映射提供了从预激活特征中恢复双尾信息的可行方案，分位数公式则将双尾响应操作化，支撑了闭合式实验验证。
 
-
-
 ## 实验与关键发现
 
 ### 主结果：V4神经元的双尾响应特性
@@ -189,7 +179,6 @@ claims:
 本研究首先量化了灵长类视觉皮层V4区神经元对大规模自然图像集的响应分布特性。以219个V4神经元的重复平均放电计数（刺激起始后100 ms窗口）为对象，计算偏度κ来刻画分布的双尾程度。结果显示，V4神经元的中位数偏度仅为κ=0.87，而深度网络单元（ResNet50）的中位数偏度高达κ=2.06（p<0.002，排列检验，Figure 1c）。这一对比直接揭示出传统线性-非线性模型和DNN单元响应分布的瓶颈：它们普遍呈现单尾分布（κ接近2），即仅编码偏好刺激而忽略反偏好刺激；真实V4神经元则表现出显著的双尾分布（κ接近0），表明其调谐函数同时包含偏好与反偏好两个分量。扩展分析进一步表明，颞叶更前部的V1区域同样表现出双尾选择性（κ=1.17），而不同DNN层级的偏度均维持在较高水平（Figure 1d）。
 
 基于上述发现，数据驱动的V4模型神经元所搜索到的偏好与反偏好自然图像在后继电生理记录中得到了严格验证。将模型预测的偏好和反偏好图像呈现给真实V4神经元，其诱发的响应分别位于随机自然图像响应分布的90%分位数以上（偏好图像分位数q≈0.985）和10%分位数以下（反偏好图像分位数q≈0.055），两者均显著超出随机图像响应的90%密度区间（排列检验p<0.001，Figure 2b）。这一实验证据确认了反偏好图像具有真实的抑制功能，能够将神经元活动压低至基线以下。注意到模型合成图像与自然搜索图像在偏好端诱发的响应无显著差异（p=0.514），但在反偏好端，自然图像诱发的响应显著低于合成图像（p<0.02，Supp. Fig. 5），意味着自然图像池中包含比合成刺激更强的抑制信号。
-
 
 ![[assets/figures/papers/iclr26_0004_RZ8esDBqMJ_A_tale_of_two_tails_Preferred_and_anti-preferred/figures/014_Figure_5.jpg]]
 *Figure 5: Anti-preferences double a V4 population’s capacity for feature selectivity. a. Visual features differ between preferred and anti-preferred images. b. Mean differences in features that were normalized between 0 and 1. Lines: medians, dots: V4 model neurons. c. Simulated preferred and anti-preferred orientations for a population of V1 neurons. Shuffling these preferences breaks specific relationships. d. Neighbor overlap for predicting the anti-preferred features using preferred features for simulated V1 neurons for each condition in c. e. Same as d but with V4 model neurons using interpretable visual features. f. We assess the extent to which different tailed response distributions perform o...*
@@ -204,14 +193,12 @@ claims:
 
 数据剪枝分析是检验反偏好信息因果必要性的关键操作。以V4模型神经元作为教师模型，用不同训练子集——仅偏好图像（pref-only）、仅反偏好图像（anti-pref-only）、偏好与反偏好联合（pref+anti-pref）、随机选择（random）及非偏好图像（exclude pref）——训练5层CNN学生网络来估计调谐函数，评估其在独立测试集上的泛化R²（Figure 3b）。结果表明：仅使用偏好图像或仅使用反偏好图像训练的泛化R²均低于随机选择子集，而偏好与反偏好联合训练的性能在所有条件下最优。这一效应在训练图像数量从1k扩大到300k时保持稳健（Supp. Fig. 2），证实反偏好图像并非可以被忽略的噪声尾部，而是构成神经元调谐函数的必要信息组分。相比之下，对ResNet50 post-ReLU单元施加同样的数据剪枝时，偏好与反偏好联合训练的优势明显减弱，进一步确认了DNN单元表征中反偏好信息的缺失（Figure 3c）。
 
-
 ![[assets/figures/papers/iclr26_0004_RZ8esDBqMJ_A_tale_of_two_tails_Preferred_and_anti-preferred/figures/005_Figure_2.jpg]]
 *Figure 2: Experimental evidence that V4 neurons have anti-preferred images. a. Predicting V4 responses to randomly-chosen images from a linear mapping of ResNet-50 features. Each dot denotes the median, and error bars denote 1 s.e.m. b. Experimental validation of preferred and anti-preferred images as predicted by V4 model neurons. Each dot is the repeat-averaged V4 response to one image; gray bands denote 90% percentiles of responses to randomly-chosen natural images. Insets: Model-chosen images for the 3 V4 neurons with largest baseline responses. c. Top: Repeat-averaged temporal response of an example V4 neuron (PSTH). Bottom: Normalized response to preferred, anti-preferred, and following blank i...*
 
 #### 人类推断实验：反偏好信息的行为价值
 
 心理物理学任务为反偏好图像的信息贡献提供了行为层面的验证（Figure 4）。在二选一任务中，人类被试需要判断哪张图像能诱发V4模型神经元更强的响应。当同时获知偏好和反偏好图像作为先验（both condition）时，被试对V4模型神经元的预测正确率达到平均80.5%（Figure 4c）；而仅获知偏好图像时正确率显著下降，对DNN单元的预测正确率同样更低（Figure 4d）。作为计算参照，基于视觉特征的递归最小二乘在线分类器在获得均等先验信息时呈现出与人类相似的正确率曲线（Figure 4e）。
-
 
 ![[assets/figures/papers/iclr26_0004_RZ8esDBqMJ_A_tale_of_two_tails_Preferred_and_anti-preferred/figures/013_Figure_4.jpg]]
 *Figure 4: Humans use anti-preferred images to infer V4 tuning. a. Psychophysics task. b. Performance for one example user with or without prior information. Each trace is the running difference between the number of correct and incorrect choices for one V4 model neuron. c-d. Human performance predicting V4 model neurons (c) and ResNet50 DNN units (d). e-f. Task performance in a for an online classifier trained on visual features (e) or on CLIP embeddings (f). Lines: mean, shade: 1 s.e.m*
@@ -224,7 +211,6 @@ claims:
 
 闭环实验对高效搜索偏好与反偏好刺激的需求催生了ImageBeagle搜索工具（Figure 6）。该工具基于3000万张图像构建近邻图（ResNet50特征空间，Supp. Fig. 3），交替执行全局核心集探索（全局搜索）与局部爬山式近邻遍历（局部搜索）。在不使用合成优化的情况下，ImageBeagle仅需评估约10k张图像即可逼近30M图像池中最优偏好与反偏好图像，显著优于随机搜索（Figure 6c中橙色 vs. 黑色曲线）。搜索效率的基准对比及调谐曲线示例见图6c–d。
 
-
 ![[assets/figures/papers/iclr26_0004_RZ8esDBqMJ_A_tale_of_two_tails_Preferred_and_anti-preferred/figures/008_Figure_3.jpg]]
 *Figure 3: Anti-preferred images contribute to V4 tuning. a. Response distributions for different training sets for a data pruning analysis; R2 is always computed with the same held-out natural images. b. We train a 5-layer DNN (see Methods A.3) to predict responses of individual V4 model neurons (219 in total), varying the number of training images up to 10k (see Supp. Fig. 2 for results with > 10k images). Response distributions were over 500k images; we also considered a distribution for 1 million (1M) images. c. We perform a data pruning analysis for 219 ResNet50 units (2k training images), either pre-ReLU (left) or post-ReLU (right), as well as ReLU thresholds equal to different quantiles (e.g.,...*
 
@@ -232,13 +218,8 @@ claims:
 
 本研究集中于V4区域，尚未系统验证反偏好编码贯穿整个视觉层级（V1、IT初步分析结果外推需谨慎）。人类心理物理学实验的被试数量及任务复杂度有限，推断行为与真实神经元调谐过程之间的差距仍须审慎解读。ImageBeagle的近邻质量完全依赖ResNet50嵌入空间，对未能被该空间良好区分的图像类型可能失效。此外，V4模型神经元虽能较好预测响应，但作为黑盒模型，其内部表征与真实生物机制的对齐程度有待进一步追踪实验验证。关于双尾编码与高效编码理论、稀疏编码假说的关系，以及是否可通过脉冲时序依赖可塑性等学习规则自发形成此类配对选择性，仍为开放问题。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0004_RZ8esDBqMJ_A_tale_of_two_tails_Preferred_and_anti-preferred/figures/004_Figure_1.jpg]]
 *Figure 1: V4 neurons have two-tailed response distributions. a. Response distributions for a linear-nonlinear filter (top), DNN unit (middle), and a real neuron from visual area V4 (bottom). b. Anti-preferred and preferred images of an example V4 neuron. c. Skewness κ of response distributions for V4 neurons and DNN units. d. Skewness κ of response distributions for different visual areas in macaque (top), and DNN layers (bottom). Dashed lines: medians*
-
-
-
 
 ## 定位与知识库关联
 
@@ -280,8 +261,6 @@ claims:
 - ImageBeagle的搜索框架能否被推广到其他感觉模态（如听觉、体感），用于快速定位神经元的刺激响应峰值与谷值？其成功与否也将反向检验“自然刺激流形假设”的普适性。
 
 综上，本工作确立了一条明晰的知识库线索：**V4神经元的双尾调谐不仅是一个现象，更是一个迫使重新思考前馈模型和表征容量的支点**。它桥接了传统的单尾调谐模型与未来可区分的双尾编码模型，并将该问题的后续进展建立在对抑制性特征的计算本质的理解之上。
-
-
 
 ## 原文 PDF
 

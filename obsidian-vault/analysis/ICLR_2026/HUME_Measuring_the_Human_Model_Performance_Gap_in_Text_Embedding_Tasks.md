@@ -56,8 +56,6 @@ claims:
 
 **关键洞察**：任务质量对评估可靠性的影响大于模型能力差异。高人类共识任务（如STS12，ρ=0.77）提供可靠的评估基准，人类与模型表现接近；低共识任务则暴露了基准本身的设计缺陷，而非模型能力的真实边界。
 
-
-
 文本嵌入模型已成为现代自然语言处理的基础组件，支撑着信息检索、语义相似度计算、文本聚类等广泛应用。MTEB等标准化基准测试通过统一的任务定义和评估指标，为模型能力的横向比较提供了平台。然而，一个关键瓶颈长期被忽视：**这些基准测试缺乏可靠的人类性能基线**。
 
 缺乏人类参照的后果是严重的。当模型在某个任务上取得85%的准确率时，这一数字本身无法回答根本性问题——人类在此任务上能达到多少？模型是真正理解了语义，还是仅仅拟合了标注数据中的统计模式？更隐蔽的是，部分数据集本身存在标注歧义和质量问题，而模型在这些数据集上的“优异”表现可能恰恰反映了对标注伪影的精确复制，而非对语言本质的把握。
@@ -67,8 +65,6 @@ HUME框架正是在这一缺口上展开工作。其核心设计思路直接而�
 研究揭示的核心洞察具有诊断性价值：**人类表现并非性能上限，而是数据集质量的探针**。当标注者间共识较低时（如情绪分类任务中Fleiss’ κ仅0.39），模型却可能获得87.1%的“超人类”表现——这种背离恰恰暴露了任务设计的根本缺陷，而非模型的语义理解优势。相反，在高共识任务上（如STS12的标注者间Spearman ρ达0.77），人类与最佳模型的表现高度接近（91.2% vs 92.0%），这类任务才构成可靠的评估基准。换言之，任务质量对评估可靠性的影响，可能大于模型能力本身的差异。
 
 这一视角转换意味着：在嵌入模型的评估中，追问“人类能得多少分”比追问“哪个模型得分最高”更能揭示基准测试的真实信息量。
-
-
 
 ## 核心方法与创新机理
 
@@ -89,8 +85,6 @@ HUME进一步评估了LLM能否替代人类判断，在相同的19个任务-语�
 ### 核心洞察
 
 这三项创新共同指向一个深层发现：**任务质量对评估可靠性的影响大于模型能力差异**。低共识任务上模型的“超人类”表现反映的是标注伪影拟合而非语义理解；高共识任务才能提供可靠的评估基准。HUME将人类表现重新定位为诊断信号而非性能上限，为基准构建提供了质量过滤的新范式。
-
-
 
 HUME（Human Evaluation Framework for Text Embeddings）是一个在MTEB基础上构建的可重复人类评估框架，其核心目标是为文本嵌入基准测试提供可靠的人类性能基线，从而校准模型得分并诊断数据集质量问题。
 
@@ -115,8 +109,6 @@ HUME的pipeline由五个核心模块组成：
 ### 输入输出流
 
 框架的输入为MTEB中的标准数据集和任务定义，输出为三个层次的结果：（1）人类性能基线（含95%置信区间和标注者间一致性指标）；（2）人类与模型性能的逐任务对比；（3）LLM作为标注者的性能评估。这些输出共同支持对基准质量的诊断——高人类共识的任务提供可靠的评估基准，而低共识任务上的"超人类"模型表现则揭示标注伪影拟合问题。
-
-
 
 HUME框架的核心设计思路是在MTEB基准上叠加可重复的人类评估层，而非重新定义任务或指标。其关键模块如下：
 
@@ -178,8 +170,6 @@ $$ \kappa = \frac{\bar{P} - \bar{P}_e}{1 - \bar{P}_e} $$
 
 > **注意**：以上公式均为HUME框架中使用的标准评估指标，非论文原创推导。论文的核心贡献在于将这些指标与人类基线系统性地对齐，而非提出新的数学形式化。
 
-
-
 ## 实验与关键发现
 
 ### 整体人机性能对比
@@ -187,7 +177,6 @@ $$ \kappa = \frac{\bar{P} - \bar{P}_e}{1 - \bar{P}_e} $$
 HUME在16个文本嵌入任务上建立了人类性能基线，并与13个最先进的嵌入模型进行系统对比。Figure 1展示了核心发现：人类平均得分为77.6%，在13个模型中排名第4，落后于jasper_en_vision_language_v1（80.1%）、SFR-Embedding-Mistral（78.3%）和e5-mistral-7b-instruct（78.2%）。这一结果表明，当前最佳嵌入模型在整体性能上已略微超越人类水平，但差距有限（-2.5个百分点）。
 
 从任务覆盖范围来看，人类表现呈现出明显的任务依赖性。在26个任务-语言对中，最佳模型得分在14个任务上超出了人类95%置信区间（Table 8），表明模型与人类在大量任务上存在统计显著的差异。然而，这种差异的方向并不一致——人类在5/14的聚合任务-语言对中取得最高性能（Table 1），尤其在非英语情感分析和阿拉伯语语义相似度任务上表现突出。
-
 
 ![[assets/figures/papers/iclr26_0011_rcmfu1ydAf_HUME_Measuring_the_Human-Model_Performance_Gap_i/figures/002_Table_1.jpg]]
 *Table 1: Human performance compared to 13 embedding models across task categories and languages. Bold indicates highest performance (human or model), underline indicates best model performance. Humans achieve top performance in 5 of 14 aggregated task-language pairs, particularly excelling in non-English sentiment analysis and Arabic semantic similarity. Overall results are aggregated over the 26 task-language pairs*
@@ -263,17 +252,11 @@ HUME揭示了当前评估范式的三个系统性失败模式：
 
 - **Table 8**：14/26任务中模型得分超出人类95%置信区间，且与低标注者共识强相关，证实任务质量是评估可靠性的首要瓶颈。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0011_rcmfu1ydAf_HUME_Measuring_the_Human-Model_Performance_Gap_i/figures/024_Figure_13.jpg]]
 *Figure 13: Human performance gaps versus best-performing models across 26 task-language pairs. Humans outperform the best models on only 4 tasks (15.4%), with largest advantages in Arabic semantic similarity and sentiment analysis. The analysis reveals systematic model advantages in technical domains (clustering, reranking) versus human advantages in culturally-informed tasks*
 
 ![[assets/figures/papers/iclr26_0011_rcmfu1ydAf_HUME_Measuring_the_Human-Model_Performance_Gap_i/figures/023_Figure_12.jpg]]
 *Figure 12: Human win rates across task categories and languages. Top left: By task category shows humans perform moderately in classification but struggle in clustering, reranking, and STS against best models. Top right: English-only vs multilingual tasks reveals humans perform better on multilingual tasks (29% vs 0% against best models). Bottom left: Performance varies dramatically by baseline comparison (15% vs best, 62% vs mean models). Bottom right: Language-specific breakdown shows varying performance across different language codes*
-
-
-
-
 
 ## 定位与知识库关联
 
@@ -330,8 +313,6 @@ HUME的适用性受以下因素制约：
 **自动化质量预测**：能否开发自动化指标来预测数据集的人类共识水平？如果可以在基准构建早期识别低共识任务（如通过标注者模拟或文本特征分析），就能在资源投入前过滤或重新设计问题。这一能力的建立将显著降低大规模基准构建的成本。
 
 **人类分歧的信息价值**：当前框架将标注者分歧视为“噪声”，但人类分歧本身可能包含有价值的语义信息（如情绪分类中的混合情绪、论文聚类中的跨学科性）。如何设计评估框架以**利用而非消除**人类判断的多样性，是一个值得探索的方向。
-
-
 
 ## 原文 PDF
 

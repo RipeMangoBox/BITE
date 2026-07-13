@@ -164,8 +164,6 @@ EditCtrl 的效率优势来自两个相互协同的设计决策：
 
 这一解耦使得 EditCtrl 在 1.5B 参数规模下可达 **4.67 FPS**，而全注意力基线 VACE（1.3B）仅为 **0.66 FPS**（Table 1），实现了约 7 倍的吞吐量提升，同时编辑质量（PSNR 24.16 vs 23.84）和文本对齐度均保持领先。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l864_https_arxiv_org_abs_2602_15031/figures/001_Figure_1.jpg]]
 *Figure 1: EditCtrl: A Real-time Generative Video Editing Pipeline. EditCtrl supports complex, prompt-guided edits on 4K videos, simultaneously handling an arbitrary number of user-defined masks (Top). To maintain real-time performance, our inference pipeline dynamically allocates compute proportional to the edit mask size (Middle). EditCtrl also intelligently propagates object edits from initial frames into the future (after the orange line), ensuring high temporal and object consistency in the resulting edit (Bottom)*
 
@@ -231,11 +229,6 @@ $$ \mathcal{L} = \begin{cases} \mathcal{L}_{\phi}, & \text{if } k < n, \\ \mathc
 
 通过上述解耦设计，EditCtrl 在保持生成质量的同时，将推理计算量从全注意力方法的 $\mathcal{O}(H \times W \times T)$ 降低为 $\mathcal{O}(A_{\mathrm{mask}} \times T)$，其中 $A_{\mathrm{mask}}$ 为蒙版面积，$T$ 为帧数，实现了 10 倍以上的计算效率提升。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l864_https_arxiv_org_abs_2602_15031/figures/003_Figure_3.jpg]]
-*Figure 3: EditCtrl: Local and Global Control Modules. Given the source video*
-
 ## 实验与关键发现
 
 EditCtrl 的核心实验目标是在保持或超越全注意力基线编辑质量的同时，验证其计算效率的显著提升。所有实验均在 NVIDIA A6000Ada GPU 上进行，FPS 测量仅统计扩散模型推理吞吐量（排除 VAE 编解码时间），且统一使用 25 步 DDPM 去噪，确保公平比较。
@@ -263,8 +256,6 @@ EditCtrl 在以下场景表现出局限性（图 8）：(a) **高运动场景**�
 - **表 2**：VPBench-Inp 和 DAVIS 修复基准上，EditCtrl 在保持或超越修复质量的同时，推理效率显著提升。
 - **表 3**：消融实验证实局部编码器是效率关键，全局嵌入器是质量补充，双适配器组合实现质量与速度的双赢。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l864_https_arxiv_org_abs_2602_15031/figures/005_Figure_4.jpg]]
 *Figure 4: Video Editing Comparison. EditCtrl generates visually appealing and structurally coherent edited content while the baselines either fail to edit the video correctly or produce content with poor appearance and blending. EditCtrl’s localized editing greatly increases efficiency and enables real-time generative editing*
 
@@ -276,12 +267,6 @@ EditCtrl 在以下场景表现出局限性（图 8）：(a) **高运动场景**�
 
 ![[assets/figures/papers/paper_list_l864_https_arxiv_org_abs_2602_15031/figures/009_Figure_6.jpg]]
 *Figure 6: Local and Global Adapter Ablation. Removing adapter components harms video editing quality, but together they let EditCtrl perform comparably to a method operating with full-attention*
-
-![[assets/figures/papers/paper_list_l864_https_arxiv_org_abs_2602_15031/figures/011_Figure_8.jpg]]
-*Figure 8: Failure Modes for EditCtrl on High Motion (a) & Inaccurate Masks (b)*
-
-![[assets/figures/papers/paper_list_l864_https_arxiv_org_abs_2602_15031/figures/012_Figure_9.jpg]]
-*Figure 9: Content Propagation for Augmented Reality. EditCtrl is particularly suitable for deployment in augmented reality applications given its low latency and ability to propagate content to match the user’s movement*
 
 ## 定位与知识库关联
 

@@ -46,8 +46,6 @@ claims:
 
 ROUTERARENA 是一个开放的标准化平台，旨在系统性地比较和评估大语言模型（LLM）路由器的性能。该平台通过构建基于杜威十进制分类法（DDC）和Bloom认知分类法的原则性数据集（约8,400个查询，覆盖9大领域44个类别），并设计包含准确性、成本、最优性、鲁棒性和延迟的多维度评估指标，解决了现有LLM路由器评估碎片化、缺乏统一标准化评估平台的问题。实验揭示了商业路由器（如GPT-5）虽准确率高但成本显著更高，而开源路由器（如MIRT-BERT）在成本效益上更具优势，且没有任何路由器在所有指标上均表现最优，反映了路由器设计中固有的权衡。
 
-
-
 随着大语言模型（LLM）的快速发展，市场上涌现出大量不同能力、成本和延迟特性的模型。LLM路由器作为一种智能选择模型的技术，旨在根据查询特性动态选择最合适的模型，以在性能和成本之间取得平衡。然而，现有路由器评估工作（如RouterBench、RouterEval、FusionBench、EmbedLLM）存在以下问题：
 
 - **评估数据集有限**：仅使用24-27个类别且无难度区分的数据集。
@@ -58,8 +56,6 @@ ROUTERARENA 是一个开放的标准化平台，旨在系统性地比较和评�
 如Table 1所示，ROUTERARENA在查询类别数量（44个）、难度级别（3个）、评估指标维度（5个）、商业路由器支持（3个）和路由器排名机制（多指标排行榜）方面均显著优于现有工作。
 
 Figure 2展示了从2023年中至2025年路由器相关工作和产品的发展时间线，包括FrugalGPT（Chen et al., 2023）、RouterBench（Hu et al., 2024）、RouteLLM（Ong et al., 2025）、GraphRouter（Feng et al., 2025a）以及商业产品如NotDiamond、Azure-Router和GPT-5。
-
-
 
 ## 核心方法与创新机理
 
@@ -73,8 +69,6 @@ ROUTERARENA的核心创新在于：
 
 4. **加权调和平均排名机制**：提供基于Arena Score（加权调和平均）的6种排名分数，支持用户调整β参数以权衡准确性与成本。
 
-
-
 ![[assets/figures/papers/iclr26_0001_9HsaIi4ngF_RouterArena_An_Open_Platform_for_Comprehensive_C/figures/001_Figure_1.jpg]]
 *Figure 1: RouterArena Leaderboard*
 
@@ -87,8 +81,6 @@ ROUTERARENA的整体框架如Figure 5所示，包含以下核心模块：
 3. **自动化评估框架**：向路由器发送查询，收集模型选择，运行推理（使用前缀缓存），计算指标并更新排行榜。
 
 4. **排行榜生成模块**：基于Arena Score等6种分数生成多维度排行榜。
-
-
 
 ### 5.1 推理成本公式
 
@@ -124,8 +116,6 @@ $$ S_{i,\beta} = ((1+\beta) A_i C_i) / (\beta A_i + C_i) $$
 ### 5.5 路由鲁棒性
 
 鲁棒性计算为路由器在扰动输入下做出一致路由决策的查询比例。使用四种变换模式：Paraphrase（最大变换）、Grammatical Reconstruction（深度重写）、Synonym Saturation（超密集替换）和Intentional Corruption（重度退化）。
-
-
 
 ## 实验与关键发现
 
@@ -198,8 +188,6 @@ ROUTERARENA评估了14个路由器，包括3个商业路由器（GPT-5、NotDiam
 3. **路由器设计中存在固有权衡**：没有任何路由器在所有指标上均表现最优。
 4. **鲁棒性是普遍弱点**：包括商业和学术路由器，鲁棒性普遍较低。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0001_9HsaIi4ngF_RouterArena_An_Open_Platform_for_Comprehensive_C/figures/004_Table_1.jpg]]
 *Table 1: Comparison of existing work (Hu et al., 2024; Huang et al., 2025; Feng et al., 2025b; Zhuang et al., 2024) and ROUTERARENA. ROUTERARENA enables comprehensive router comparison with extensive query categories, difficulty levels, evaluation metrics, and router inclusion.*
 
@@ -208,8 +196,6 @@ ROUTERARENA评估了14个路由器，包括3个商业路由器（GPT-5、NotDiam
 
 ![[assets/figures/papers/iclr26_0001_9HsaIi4ngF_RouterArena_An_Open_Platform_for_Comprehensive_C/figures/017_Table_5.jpg]]
 *Table 5: The 42 models used for empirical difficulty labeling. Models span across a range of sizes and performances, showcasing that ROUTERARENA could distinguish LLMs by providing diverse questions of difficulty.*
-
-
 
 ## 定位与知识库关联
 
@@ -232,8 +218,6 @@ ROUTERARENA定位为LLM路由器评估领域的标准化基准平台，其方法
 
 **知识库定位**：
 ROUTERARENA填补了LLM路由器评估领域的空白，提供了一个可扩展、可复现的标准化评估平台。其数据集构建方法（基于DDC和Bloom分类法）和多维度评估指标（5个评估视角）为未来路由器研究提供了基准。平台支持持续更新，可纳入新的路由器类型和更广泛的模型池，推动该领域的系统化发展。
-
-
 
 ## 原文 PDF
 

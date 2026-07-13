@@ -56,8 +56,6 @@ claims:
 
 消融实验进一步确认：每粒子潜在动作是重建质量的关键（PSNR 28.55 vs 全局池化27.24）；AdaLN位置嵌入优于标准可加性嵌入；潜在动作维度在3到10之间性能稳定。当前局限在于粒子移动范围受限、确定性场景下提升有限，以及潜在策略的泛化能力有待改进。
 
-
-
 ### 视频世界模型的表示瓶颈
 
 视频世界模型的核心目标是学习环境的紧凑动力学，从而支持未来帧预测与决策规划。当前主流方法大多将视频帧分割为固定网格的patch嵌入（patchify），再交由Transformer或扩散模型处理。这种表示方式在文本领域有自然对应——文本天然被分词为语义单元（词或子词），但图像patch并不显式编码语义内容（Figure 2）。由此带来的瓶颈是双重的：
@@ -89,8 +87,6 @@ claims:
 
 这种设计使LPWM能够同时支持动作、语言、图像目标及多视图等多种条件信号，并在随机动态场景中显著超越现有对象中心基线和patch基线。
 
-
-
 ## 核心方法与创新机理
 
 LPWM的核心创新在于将**对象中心的潜在粒子表示**与**每粒子连续潜在动作**相结合，构建了一个无需显式跟踪的随机动力学世界模型。相比现有方法，LPWM在以下四个关键维度上实现了突破。
@@ -120,8 +116,6 @@ DDLP等前代粒子模型依赖显式的时序跟踪与滤波来维持粒子身�
 
 LPWM的CONTEXT模块天然支持多种条件信号的统一注入，包括动作、语言（通过T5-large编码）、图像目标和多视图输入。这使得同一预训练模型可灵活适配视频预测、语言条件生成、目标条件模仿学习等多种下游任务，无需架构修改。
 
-
-
 LPWM 将视频建模为一个端到端的时序变分自编码器，其核心架构由四个协同模块构成：**ENCODER**、**DECODER**、**CONTEXT** 和 **DYNAMICS**。整体流程遵循“编码—上下文推理—动力学预测—解码”的闭环。
 
 给定过去 $T$ 帧观测 $I_{0:T-1}$ 和可选条件信号 $c$（如动作、语言或图像目标），LPWM 的目标是预测未来 $\tau$ 帧 $\hat{I}_{T:T+\tau-1}$。这一过程在潜在空间中进行，而非直接操作像素。
@@ -141,8 +135,6 @@ $$\mathcal{L}_{\mathrm{LPWM}} = -\sum_{t=0}^{T-1} ELBO(x_t = I_t) = \mathcal{L}_
 动态 ELBO 包含三项：重建损失、粒子动力学的 KL 散度（后验分布与动力学先验之间），以及上下文模块的 KL 散度（逆动力学与潜在策略之间）。KL 贡献通过粒子透明度属性进行掩码，仅可见粒子参与损失计算。
 
 这一框架的关键瓶颈突破在于：通过将视频分解为具有显式空间属性的潜在粒子集合，并为每个粒子分配独立的潜在动作，LPWM 在无需跟踪的条件下实现了高效的对象中心随机动力学建模，且计算开销远低于基于固定网格 patch 的方法。
-
-
 
 LPWM 由四个端到端联合训练的组件构成：编码器（ENCODER）、解码器（DECODER）、上下文模块（CONTEXT）和动力学模块（DYNAMICS）。整体训练目标为最大化时序证据下界（ELBO），损失函数分解为静态项与动态项：
 
@@ -190,14 +182,11 @@ $$
 
 动力学模块采用粒子-网格机制（particle-grid regime）：每个粒子仅在其初始块中心周围的局部区域内移动，当到达区域边界时，其特征被转移至邻近粒子，从而在无需显式跟踪的条件下隐式维护粒子身份。消融实验证实，AdaLN 位置嵌入显著优于标准可加性嵌入（PSNR 28.55 vs 21.54），是模型性能的关键设计选择。
 
-
-
 ## 实验与关键发现
 
 ### 核心性能：随机动态视频预测
 
 LPWM在多个随机动态数据集上一致超越对象中心和patch基线。Table 2汇总了无监督潜在动作条件（U）、真实动作条件（A）和语言条件（L）下的定量结果。
-
 
 ![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_lTaPtGiUUc/figures/005_Table_2.jpg]]
 *Table 2: scale alone achieves. Extended results are in Appendix A.10 and videos are available: https: //taldatech.github.io/lpwm-web. Table 2: Quantitative results on latent-action-conditioned (U), action-conditioned (A), and languageconditioned (L) video prediction. FVD is reported for stochastic generation by sampling from the latent policy. t is the training horizon, c is the conditional frames at inference, and p is the predicted frames at inference*
@@ -220,7 +209,6 @@ LPWM作为世界模型在机器人操作任务中展现出强迁移能力。在P
 
 **每粒子潜在动作 vs 全局动作**：Table 11的消融显示，每粒子潜在动作对重建质量至关重要（PSNR 28.55 vs 全局均值池化27.24），但生成多样性有所损失（FVD 120.32 vs 100.75）。这一trade-off表明：局部潜在动作提供了更精确的粒子级控制，有利于重建保真度；而全局信息聚合有助于捕获场景级随机性，提升生成多样性。该结果确认了每粒子设计是LPWM的核心因果旋钮。
 
-
 ![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_lTaPtGiUUc/figures/024_Table_11.jpg]]
 *Table 11: robustness to latent action dimension as long as it approximates the effective particle dimension ( < 6 + $d _ { \mathrm { o b j } }$ , i.e., 10 for Sketchy), balancing compression and information retention; our choice of $d _ { \mathrm { c t x } }$ = 7 reflects this trade-off5. Finally, adaptive layer normalization (AdaLN) for embedding timestep and particle identity outperforms standard additive positional embeddings, as previously observed (Zhu et al., 2024), albeit with an increased parameter count. Table 11: Ablation results: impact of latent action dimensions and type, and positional embeddings on LPWM performance. Results are reported on the Sketchy dataset after 10 epochs of training. R...
 
@@ -232,38 +220,18 @@ LPWM作为世界模型在机器人操作任务中展现出强迁移能力。在P
 
 尽管LPWM在随机动态场景中表现优异，在确定性动力学数据集上相对基线的提升有限——此时随机建模能力未被充分利用。此外，粒子仅在初始Patch周围局部移动，当物体需要大范围位移时，特征转移机制可能引入累积误差。潜在策略采样生成的多样性在映射到实际执行动作时出现性能下降，映射网络更偏好逆动力学输出而非策略采样，表明潜在策略的泛化能力尚需改进。LPWM仍需手动指定每帧粒子数量 $M$ 和训练超参数，对动态变化场景的适应性有待验证。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_lTaPtGiUUc/figures/022_Figure_16.jpg]]
-*Figure 16: Multi-modal future sampling by LPWM. Starting from the same initial frame, LPWM produces diverse possible future trajectories, illustrated on the Mario (left) and BAIR (right) datasets*
-
 ![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_lTaPtGiUUc/figures/003_Table_1.jpg]]
 *Table 1: summarizes key differences between self-supervised object-centric video prediction and world modeling methods. Table 1: Comparison of object-centric video prediction and world modeling methods across key dimensions and representation types. Please refer to Table 4 for an extended comparison*
-
-![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_lTaPtGiUUc/figures/006_Table.jpg]]
 
 ![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_lTaPtGiUUc/figures/016_Table_4.jpg]]
 *Table 4: Comparison of video prediction and world modeling approaches across key dimensions. Models are grouped by representation category: holistic, Table 4: patch/object-centric, slot/object-centric, and particle/object-centric. AR: autoregressive; GNN: graph neural network. “Image-Goal Cond.” is e-goal conditioning sup*
 
-![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_lTaPtGiUUc/figures/017_Table.jpg]]
-*Table: across datasets. Base CNN channels count is 32. Kψrefers to the Transformer-based CONTEXT module,Fξ ) - floating-point operations per second (higher means more computational operations per second. FLOPs ) g of 16 frames, and FLOPs (Generation correspond to one forward rollout of 15 frames co*
-
-![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_lTaPtGiUUc/figures/018_Table_6.jpg]]
-*Table 6: Prior distribution parameters for different glimpse (patch) ratios. Glimpses are patches taken around keypoints, where glimpse $\mathrm { { r a t i o } = \frac { g l i m p s e \ s i z e } { i m a g e \ s i z e } }$
 
 ![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_lTaPtGiUUc/figures/019_Table_7.jpg]]
 *Table 7: DLPv3, DLPv2, and DLP image reconstruction performance comparison in the singleimage setting, evaluated on the test set*
 
 ![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_lTaPtGiUUc/figures/020_Table_8.jpg]]
 *Table 8: Quantitative results on video prediction for datasets with deterministic dynamics. t is the training horizon, c is the conditional frames at inference and p is the predicted frames at inference*
-
-![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_lTaPtGiUUc/figures/021_Table_9.jpg]]
-*Table 9: Video prediction results on BAIR-64 (64 × 64) conditioning on one past frame and predicting 15 frames in the future. Table adapted from Shrivastava & Shrivastava (2024)*
-
-![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_lTaPtGiUUc/figures/023_Table_10.jpg]]
-*Table 10: Quantitative results on language-conditioned (L) video generation. PSNR, SSIM and LPIPS are calculated on latent-action-conditioned video prediction. FVD is reported for stochastic generation by sampling from the latent policy*
-
-
 
 ## 定位与知识库关联
 
@@ -312,8 +280,6 @@ LPWM的定位并非取代大型视频生成模型，而是提供一种**对象�
 **（4）策略映射的分布匹配**：为什么策略映射网络在逆动力学输出上性能更好？是否由于潜在策略与真实数据分布不匹配？这可能需要改进潜在策略的训练目标，例如引入对抗训练或分布匹配正则化。
 
 **（5）动态粒子数量**：当前LPWM固定每帧粒子数量M，对于物体进出场景的动态变化缺乏适应性。如何实现自适应粒子分配，使模型能够根据场景复杂度动态调整表示容量，是一个具有挑战性的开放问题。
-
-
 
 ## 原文 PDF
 

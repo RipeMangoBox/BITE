@@ -59,8 +59,6 @@ claims:
 
 该基准的提出，为 MLLMs 在安全关键领域的应用划定了当前的能力边界，并指明了符号-语义映射、多尺度不变性学习和显式约束推理等关键改进方向。
 
-
-
 ### 专业导航图的认知鸿沟
 
 电子航海图（Electronic Navigational Chart, ENC）是国际海事组织强制要求的现代船舶导航核心工具，其符号体系由国际水文组织（IHO）的 S-57 标准严格定义。与日常使用的消费级地图（如 Google Maps）不同，ENC 以安全为第一优先级，用标准化的向量符号替代视觉真实感，呈现水深等深线、航道边界、助航标志等关键信息（Figure 4）。这种“符号化现实”要求使用者具备将抽象视觉基元映射为精确语义与空间约束的专业能力——这一能力正是当前多模态大语言模型（MLLMs）与人类专业导航员之间的根本性差距所在。
@@ -82,8 +80,6 @@ Table 1 系统对比了 ENC-Bench 与现有基准在标准化符号识别、精�
 ### 本文动机与核心贡献
 
 基于上述缺口，本文提出 **ENC-Bench**——首个严格遵循海事导航认知层次（感知→空间推理→决策）的基准，旨在系统性诊断 MLLMs 在专业 ENC 理解中的能力边界。ENC-Bench 包含 20,490 个经过专家验证的样本，源自 840 张真实 NOAA S-57 海图，通过校准的向量-图像管道生成，覆盖三种光照模式与六种制图尺度。其三层评估框架（Figure 1）分别对应符号识别与特征理解（L-1 感知）、精确度量空间推理（L-2）、以及多约束安全决策（L-3），从而为回答核心开放问题提供可量化的实验基础。
-
-
 
 ## 核心方法与创新机理
 
@@ -117,8 +113,6 @@ ENC-Bench 在评估维度上的核心创新在于**分离了“视觉定位”�
 
 综上，ENC-Bench 的创新不在于提出新的模型，而在于**通过精心设计的基准框架和评估协议，将 MLLMs 在安全关键专业领域的能力缺陷从“整体性能低下”细化为“符号基础断裂”“多约束推理缺失”“分布鲁棒性冲突”三个可诊断的因果瓶颈**，为后续的领域适配研究提供了明确的方向指引。
 
-
-
 ENC-Bench 提出了一套系统化的评估框架，旨在填补多模态大语言模型（MLLMs）在专业电子航海图（ENC）理解能力评估方面的空白。该框架的核心设计思想是模拟海事导航员的认知层次，将评估任务组织为三个递进的层级：**感知（L-1）**、**空间推理（L-2）** 和 **海事决策（L-3）**，如 Figure 1 所示。这种分层结构从基础的符号识别逐步过渡到复杂的多约束安全决策，全面覆盖了从“看”到“算”再到“判”的专业导航认知链条。
 
 ![[assets/figures/papers/paper_list_l2740_https_arxiv_org_abs_2603_22763/figures/001_Figure_1.jpg]]
@@ -147,12 +141,8 @@ ENC-Bench 提出了一套系统化的评估框架，旨在填补多模态大语�
 
 该框架相较于现有基准的独特性在于同时覆盖了**标准化专业符号识别**、**精确地理空间推理**、**多尺度制图综合**和**多光照渲染模式**四个维度（Table 1）。这种设计使得 ENC-Bench 不仅能够评估模型的通用视觉理解能力，更能系统性地揭示其在符号基础、多约束推理和环境鲁棒性方面的根本性缺陷。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2740_https_arxiv_org_abs_2603_22763/figures/010_Figure_4.jpg]]
 *Figure 4: Domain Contrast: Consumer Mapping vs. Professional Hydrography. Comparison of the same geographic region across (a) Google Maps Standard View, (b) Google Maps Satellite Imagery, and (c) NOAA Electronic Navigational Chart (ENC). While consumer maps focus on road networks and vague water representations, ENCs illustrate a complex, vector-based hydrographic reality. Note how the ENC explicitly renders critical depth contours, shipping channels, and navigational aids absent in consumer views, prioritizing safetycritical information over visual realism*
-
-
 
 ### 基准构建管线
 
@@ -196,13 +186,6 @@ $$
 
 当船舶吃水加上安全余量严格小于目标区域内所有深度探测绝对值的最小值时，判定该区域可以安全通过。该公式是 L-3 决策层中安全通过任务的真值判定依据。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2740_https_arxiv_org_abs_2603_22763/figures/012_Figure_6.jpg]]
-*Figure 6: Operational Lighting Modes. Demonstration of the ECDIS standardized color palettes. (a) Day Mode: High contrast with white/blue backgrounds. (b) Dusk Mode: Reduced glare with grey backgrounds. (c) Night Mode: Black background with non-linear color shifts. Note how the blue shallow water in Day mode transforms into dark grey/black tones in Night mode, and text labels shift colors to maintain visibility. This drastic “palette swapping” challenges MLLMs reliant on natural image color statistics*
-
-
-
 ## 实验与关键发现
 
 ### 整体性能概览：通用模型在专业海图上的能力断层
@@ -223,9 +206,6 @@ ENC-Bench 在 10 个前沿多模态大模型上的评估结果揭示了一个核
 
 错误分布分析（Figure 3）进一步佐证了这一发现：Gemini-2.5-Pro 的错误主要集中在需要符号推理的任务上，包括将水深数字误读为普通文本、混淆比例尺标记以及无法正确解析经纬度网格线。
 
-![[assets/figures/papers/paper_list_l2740_https_arxiv_org_abs_2603_22763/figures/009_Figure_3.jpg]]
-*Figure 3: Error distribution of Gemini-2.5-Pro’s incorrect results and example errors in its responses*
-
 ### 光照鲁棒性：颜色依赖与符号可读性的权衡
 
 光照模式消融实验（Table 5）揭示了一个反直觉的现象：**Night 模式对感知和决策任务造成显著负面影响，却改善了空间推理任务的表现**。具体而言：
@@ -243,9 +223,6 @@ ENC-Bench 在 10 个前沿多模态大模型上的评估结果揭示了一个核
 - 线性特征理解下降 **8.6%**
 - 轨迹方向判断准确率下降近 **16%**
 
-![[assets/figures/papers/paper_list_l2740_https_arxiv_org_abs_2603_22763/figures/008_Table_6.jpg]]
-*Table 6: Average model performance across scale levels. Delta shows change relative to large scale baseline. green indicates improvement, Red indicates degradation*
-
 这一退化源于制图综合效应（Figure 7）：在大比例尺（1:50k）下，海图呈现密集的水深数字和完整的导航标志；而在小比例尺（1:200k）下，次要特征被抑制以减少视觉杂乱，水深数字大面积消失。模型无法理解“特征在逻辑上存在但视觉上消失”这一制图学基本原理，仍然基于可见特征进行推理，导致严重误判。这表明现有 MLLMs **缺乏对多尺度制图综合的适应性**，无法根据尺度变化动态调整解释策略。
 
 ### 数值精度：距离与方位的细粒度分析
@@ -253,12 +230,6 @@ ENC-Bench 在 10 个前沿多模态大模型上的评估结果揭示了一个核
 细粒度阈值分析进一步量化了模型在数值推理上的精度缺陷：
 - **距离测量**（Table 8）：当相对误差容忍度收紧至 5% 时，多数模型准确率低于 **9%**，即使是表现最好的 Gemini-2.5-Pro 也仅为 8.65%。这意味着模型的距离估计在绝大多数情况下存在超过 5% 的偏差，对于需要精确测量（如安全通过距离判定）的航海场景完全不可接受。
 - **方位计算**（Table 9）：在 5° 严格阈值下，Qwen3-VL-235B-Thinking 的准确率仅为 21.10%，表明角度估计的精细度同样严重不足。
-
-![[assets/figures/papers/paper_list_l2740_https_arxiv_org_abs_2603_22763/figures/015_Table_8.jpg]]
-*Table 8: Fine-Grained Distance Measurement Accuracy (Acc@T). Evaluation of model performance across varying relative error tolerances. Bold indicates the best performance for each threshold*
-
-![[assets/figures/papers/paper_list_l2740_https_arxiv_org_abs_2603_22763/figures/016_Table_9.jpg]]
-*Table 9: Fine-Grained Bearing Calculation Accuracy (Acc@T). Evaluation of angular precision with error thresholds of*
 
 这些结果表明，当前 MLLMs 的空间数值推理能力仍停留在粗略估计层面，远未达到专业导航所需的计量精度。
 
@@ -288,13 +259,6 @@ ENC-Bench 作为首个严格遵循海事导航认知层次（感知→空间推�
 - **决策简化**：L-3 决策任务基于封闭式选项和显式视觉线索，真实操作中需考虑的天气、潮汐窗口、值班指令等隐性约束未被建模。
 - **零样本局限**：所有评估均基于通用 MLLMs 的零样本能力，未探索在海图数据上进行指令微调或领域预训练的潜力，可能低估了领域适配后的性能上限。
 - **安全误导风险**：当前模型在专业视觉任务上的表现不足，若在无适当不确定性量化和人机回环机制的情况下部署于实际导航辅助，可能引发自动化偏见，导致灾难性后果。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2740_https_arxiv_org_abs_2603_22763/figures/005_Table_3.jpg]]
-*Table 3: Performance on Perception and Decision-Making tasks. Results in accuracy (%). Bold indicates best performance*
-
-
 
 ## 定位与知识库关联
 
@@ -360,8 +324,6 @@ ENC-Bench 的结论适用性受以下设计边界约束：
 3. 模型在不同海洋区域（非美国水域）和不同海图格式（如 S-63 加密格式）上的泛化能力如何？
 4. 是否需要引入显式的多约束求解模块作为 MLLMs 的补充，以保障安全关键决策的可靠性？混合架构（神经符号方法）在该领域的可行性值得探索。
 5. 如何将实时动态信息（AIS、雷达）与静态 ENC 解释结合，构建面向自主驾驶导航的端到端评估基准？这需要从静态 VQA 范式向时序多模态推理范式演进。
-
-
 
 ## 原文 PDF
 

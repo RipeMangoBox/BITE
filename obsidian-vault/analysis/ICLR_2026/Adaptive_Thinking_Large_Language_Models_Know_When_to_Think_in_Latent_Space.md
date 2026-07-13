@@ -58,8 +58,6 @@ Sonata 的核心洞察是：**自一致性（self-consistency）可作为推理�
 
 Sonata 的局限在于：思考决策为生成前的**二值判断**，无法在推理过程中动态调整深度；阈值 $\tau_0$ 通过网格搜索经验设定，缺乏自动优化机制；校准数据依赖正确答案标注。尽管如此，该方法为计算最优推理提供了简洁有效的范式，其跨任务泛化能力和极低开销使其具备较强的实用价值。
 
-
-
 ### 固定思考预算的困境
 
 具备推理能力的大语言模型在数学、科学和代码等复杂任务上展现了强大的思维链推理能力。然而，当前主流方法对所有查询分配**固定的思考预算**——例如预设统一的思考 token 数，达到预算时插入终止 token 强制结束推理。这种“一刀切”的策略造成了根本性的效率瓶颈：简单查询被强制消耗不必要的计算资源，而真正困难的查询却可能因预算不足而无法充分推理。
@@ -92,8 +90,6 @@ Sonata 的局限在于：思考决策为生成前的**二值判断**，无法在
 2. **推理阶段**：在预填充完成后，适配器以极低开销（<1‰ 推理计算量）预测查询的自一致性分数，根据预设阈值动态决定是否启用思考——高自一致性查询直接生成答案，低自一致性查询进入完整的思维链推理。
 
 这一设计的核心优势在于：将推理必要性的判断从“生成后评估”或“模型内省”转化为“生成前预测”，从根本上避免了不必要的 token 消耗，同时保持了与现有思维链压缩方法的兼容性。
-
-
 
 ## 核心方法与创新机理
 
@@ -156,8 +152,6 @@ $$\Delta_{\mathrm{think}}(q) = \mathrm{Acc}_{\mathrm{think}}(q) - \mathrm{Acc}_{
 
 这一选择是 Sonata 能够在维持甚至提升准确率的同时，将思考 token 消耗降低 20% 至 60% 的关键原因。
 
-
-
 ![[assets/figures/papers/paper_list_l6_Adaptive_Thinking_Large_Language_Models_Know_When_to_Think_in_Latent_Spa/figures/004_Figure_4.jpg]]
 
 Sonata 的整体推理流程由三个核心模块串联构成：**预填充阶段隐藏状态提取**、**自一致性适配器预测**和**动态思考决策**。该框架在 LLM 原有的预填充-解码流水线中仅插入一个轻量级适配器，不改变模型权重，也不引入额外的采样开销。
@@ -186,8 +180,6 @@ Sonata 的整体推理流程由三个核心模块串联构成：**预填充阶�
 ### 与固定预算基线的对比
 
 传统固定思考预算方法对所有查询分配相同的思考 token 数，导致简单查询浪费计算资源、复杂查询计算不足。Sonata 的适配器在预填充阶段即可判断查询的推理必要性，在解码开始前完成思考决策，实现了**查询级自适应计算分配**。
-
-
 
 ### 3.1 自一致性分数：推理必要性的代理信号
 
@@ -229,14 +221,11 @@ $$\hat{s} = f_\theta(\mathbf{h}) = \sigma(\mathrm{MLP}(\mathbf{h}))$$
 
 阈值 $\tau_0$ 通过网格搜索在 $\{0.1, 0.3, 0.5\}$ 中经验设定。该二值决策机制在生成前完成，计算开销极小（$<1‰$ 的推理计算增量），且可与现有思维链压缩方法（如 REFRAIN 早期停止）兼容叠加。消融实验（Table 10）表明，二值控制优于 4 级细粒度控制，后者引入难以调优的多阈值组合。
 
-
-
 ## 实验与关键发现
 
 ### 核心发现
 
 Sonata 在多个推理基准上实现了“准确率不降、思考 token 大幅减少”的计算最优推理。以 Qwen3-8B 为例，平均准确率从 vanilla 模型的 78.2% 提升至 79.6%，同时思考 token 消耗降低 21%（Table 1）。在 GSM8K 和 GPQA 上，token 节省尤为显著，分别达到 55.4% 和 51.9%，且准确率保持或超越基线。这一效果在不同规模的模型上均得到验证：Qwen3-32B、GPT-OSS-120B 和 Qwen3-235B-A22B 均展现出类似的准确率-效率增益模式。
-
 
 ![[assets/figures/papers/paper_list_l6_Adaptive_Thinking_Large_Language_Models_Know_When_to_Think_in_Latent_Spa/figures/006_Table_1.jpg]]
 *Table 1: Comparison results on the AIME25, MATH-500, GSM8K, LiveCodeBench (LCB) and GPQA across four models with thinking capability. We use temperature = 0.6, top p = 0.95 for decoding. We report the average performance of three repeated trials for each run. Accuracy (Acc.) comparable to or higher than the vanilla baseline model are underlined, and the lowest thinking token counts (#Tokens) among those with underlined accuracy are marked in bold*
@@ -247,14 +236,12 @@ Sonata 在多个推理基准上实现了“准确率不降、思考 token 大幅
 
 通过调整自一致性阈值 $\tau_0$，Sonata 在准确率-效率帕累托前沿上显著优于固定思考预算基线（Figure 5）。在 Qwen3-8B 和 Qwen3-32B 上，Sonata 在同等准确率水平下可节省高达 50% 的 token 预算。这一优势源于 Sonata 按查询难度动态分配计算资源——简单查询跳过思考直接回答，困难查询保留完整思维链推理——而非对所有查询一视同仁地分配固定预算。
 
-
 ![[assets/figures/papers/paper_list_l6_Adaptive_Thinking_Large_Language_Models_Know_When_to_Think_in_Latent_Spa/figures/009_Figure_5.jpg]]
 *Figure 5: Accuracy-efficiency Pareto frontiers comparing Sonata against constant budget baseline on Qwen3-8B and Qwen3-32B. By adjusting the selfconsistency threshold $\tau _ { 0 }$ , , Sonata consistently outperforms the fixed budget approach, achieving up to 50% token savings at comparable accuracy levels*
 
 ### 代理指标消融：自一致性为何有效
 
 Table 3 对比了三种用于预测思考必要性的代理指标：自一致性（Sonata）、LM logits 熵和注意力熵。结果表明，自一致性在准确率-效率权衡上显著优于两种基于熵的指标。其根本原因在于：自一致性直接测量模型在多次独立采样中稳定得出正确答案的能力，捕捉的是推理本身的内在难度，而非模型输出的表面不确定性。基于熵的指标反映的是 token 级预测的不确定性，无法有效区分“模型不确定但凭直觉也能答对”和“模型看似确定但实际推理错误”的情况。
-
 
 ![[assets/figures/papers/paper_list_l6_Adaptive_Thinking_Large_Language_Models_Know_When_to_Think_in_Latent_Spa/figures/010_Table_3.jpg]]
 *Table 3: Comparison of different proxy metrics for adaptive thinking allocation on four benchmarks. We report accuracy (Acc.) and average thinking tokens (#Tokens) across Qwen3-8B and Qwen3- 32B models. Results show that self-consistency (Sonata) substantially outperforms two entropybased metrics, i.e. LM logits entropy and Attention entropy, in the accuracy-efficiency tradeoff*
@@ -271,7 +258,6 @@ Sonata 可与思维链压缩方法协同工作。Table 6 显示，将 Sonata 与
 
 Table 7 的消融实验验证了仅使用最后一层最后一个 token 的隐藏表示即为最优设计。聚合最后四层或最后四个 token 的表示反而导致准确率下降或效率损失。这一发现与 Figure 3 的 PCA 可视化一致：深层（尤其是最后一层）隐藏表示中自一致性模式的可分性最强，额外的聚合引入噪声而非信息增益。
 
-
 ![[assets/figures/papers/paper_list_l6_Adaptive_Thinking_Large_Language_Models_Know_When_to_Think_in_Latent_Spa/figures/003_Figure_3.jpg]]
 *Figure 3: PCA visualization of query hidden representations across different transformer layers, colored by self-consistency scores, evaluated on both MATH-500 (math reasoning) and GPQA (scientific reasoning) benchmarks. Self-consistency patterns become increasingly distinguishable in deeper layers, with the last layers (i.e. 36, 64) showing the most pronounced separation. High self-consistency queries (dark) form tight clusters while low self-consistency queries (light) are more dispersed, demonstrating that self-consistency signals are learnable from latent representations across diverse reasoning domains*
 
@@ -287,13 +273,8 @@ Table 7 的消融实验验证了仅使用最后一层最后一个 token 的隐�
 
 当前评估集中在数学推理（MATH-500、GSM8K、AIME25）、科学推理（GPQA）和代码生成（LiveCodeBench），长文本生成或开放域对话中的适用性尚待验证。适配器在模型微调或持续学习后的准确性保持情况也需进一步研究。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l6_Adaptive_Thinking_Large_Language_Models_Know_When_to_Think_in_Latent_Spa/figures/002_Figure_2.jpg]]
 *Figure 2: Correlation between self-consistency and thinking improvement across five difficulty levels on MATH-500 using Qwen3-8B. Each point denotes an individual query, with self-consistency computed from N = 32 samples in non-thinking mode (x-axis) and accuracy improvement from enabling thinking averaged over 3 runs (y-axis)*
-
-
-
 
 ## 定位与知识库关联
 
@@ -344,8 +325,6 @@ Sonata 的有效性建立在以下假设之上，这些假设界定了其适用�
 4. **本质困难问题的处理**：对于自一致性和思考增益均低的“本质困难”问题，当前方法无法有效分配计算资源。如何识别这类问题并设计针对性的资源分配策略，是一个重要的实践挑战。
 
 5. **适配器的持续适应性**：适配器在模型微调或持续学习后能否保持准确性，或者需要自适应更新机制，这一问题对实际部署至关重要但尚未被研究。
-
-
 
 ## 原文 PDF
 

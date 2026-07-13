@@ -66,8 +66,6 @@ claims:
 
 MoCoDiff 属于**可控运动扩散生成**方法，在条件注入机制上区别于融合式条件方法（如 **SMooDi** (Zhong et al., ECCV 2024) 的风格编码器拼接），在时序建模上区别于简单历史拼接的自回归扩散（如 **AutoMDM** 的逐块生成）。其解耦的 IMC 设计为多条件运动生成提供了可插拔、可解释的控制范式，冻结骨干的策略则降低了部署成本。当前局限在于固定大小的历史窗口（k=10）限制了对全局长程依赖的建模，极长序列下的误差累积仍是开放挑战。
 
-
-
 ### 运动生成中的多条件控制困境
 
 人体运动生成是计算机视觉与图形学中的核心挑战之一，其目标是根据文本描述、风格参考等多模态信号合成逼真且可控的运动序列。近年来，扩散模型凭借其高质量的生成能力，已成为该领域的主流范式。然而，当任务从单条件扩展到多条件——尤其是同时要求语义对齐、风格保真和长时一致性时，现有方法暴露出根本性的结构缺陷。
@@ -85,8 +83,6 @@ MoCoDiff 属于**可控运动扩散生成**方法，在条件注入机制上区�
 本文的核心动机源于一个关键观察：运动生成中的语义、风格和历史信息具有本质不同的时间频率特性——语义控制全局轨迹（低频），风格刻画姿态细节（高频），历史提供过渡约束（时序依赖）。将它们强行融合在同一通道中，无异于用单一工具处理性质迥异的信号，必然导致控制精度与生成质量的折损。
 
 基于此，我们提出 **MoCoDiff**，其核心思想是将多条件运动生成重新定义为**基于条件特定注入机制的时序调制问题**。通过引入 Injection Modulation Controllers（IMC），将文本、风格和历史信号分离为独立的模态特定注入路径，利用轻量级线性交叉注意力模块实现解耦控制。同时，Temporal IMC（TIMC）将历史信息作为时间步相关的校正信号注入扩散过程，将无记忆的马尔可夫链转化为受控马尔可夫过程，从根本上抑制漂移并强制平滑过渡。这一设计不仅实现了模态解耦与长时稳定，还通过冻结预训练扩散骨干、仅训练轻量适配器的方式，避免了繁琐的重新训练，为表达性运动生成提供了高效且可解释的解决方案。
-
-
 
 ## 核心方法与创新机理
 
@@ -163,8 +159,6 @@ $$
 
 这三个创新点协同作用，使得 MoCoDiff 在长序列风格化运动生成中取得了最高的 SRA（26.37）和最低的 AUJ（1.58），同时推理速度达到 136.89 FPS，约为最强基线的 4.8 倍。
 
-
-
 MoCoDiff 的整体设计围绕一个核心思想展开：将多条件运动生成重新定义为**基于条件特定注入机制的时序调制问题**，而非传统的特征拼接或融合范式。如图3所示，系统由三个功能层构成——**多模态条件编码**、**解耦注入调制控制器（IMC）** 和**可控自回归扩散生成**，三者协同工作，在冻结的扩散骨干上实现模态解耦、长时稳定且风格一致的表达性运动合成。
 
 ### 多模态条件编码
@@ -225,12 +219,8 @@ $$\mathcal{L} = \mathcal{L}_{\text{rec}} + \alpha \mathcal{L}_{\text{smooth}} + 
 
 整体而言，MoCoDiff 通过“分离编码—解耦注入—受控自回归”的三阶段设计，将多条件运动生成重新定义为条件特定的时序调制问题，实现了模态解耦、长时稳定且风格一致的表达性运动合成，同时避免了繁琐的从头训练或全微调。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l4_https_openaccess_thecvf_com_content_CVPR2026_html_Song_MoCoDiff_A_Contro/figures/003_Figure_3.jpg]]
 *Figure 3: Method Overview. Content text, style motion, and historical context are encoded and injected into the diffusion backbone through Injection Modulation Controllers. Long-sequence generation is performed via Controlled Autoregressive Diffusion, which produces motion segment-by-segment and aligns each segment with prior history to maintain temporal coherence*
-
-
 
 ### 3.1 多模态条件编码
 
@@ -294,15 +284,8 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{rec}} + \alpha \mathcal{L}_{\mathrm{smooth}
 
 其中 $\mathcal{L}_{\mathrm{rec}}$ 确保生成运动与真实数据的分布对齐，$\mathcal{L}_{\mathrm{smooth}}$ 惩罚相邻帧间的突变以增强过渡平滑性，$\mathcal{L}_{\Delta}$ 约束运动动态参数（如速度、加速度）的合理性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l4_https_openaccess_thecvf_com_content_CVPR2026_html_Song_MoCoDiff_A_Contro/figures/004_Figure_4.jpg]]
 *Figure 4: Architecture of IMCs. Each controller injects semantic, stylistic, or history-dependent modulation into the diffusion backbone, enabling disentangled and temporally consistent motion generation*
-
-![[assets/figures/papers/paper_list_l4_https_openaccess_thecvf_com_content_CVPR2026_html_Song_MoCoDiff_A_Contro/figures/002_Figure_2.jpg]]
-*Figure 2: Efficiency of Controlled Autoregressive Diffusion. Compared to prior methods [18, 26] (A, B), which either rely on frame-by-frame generation or lack sufficient temporal context, our approach (C) generates long-horizon, expressive motions more efficiently by leveraging a controlled autoregressive diffusion process*
-
-
 
 ## 实验与关键发现
 
@@ -350,36 +333,17 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{rec}} + \alpha \mathcal{L}_{\mathrm{smooth}
 
 所有方法均在相同数据集（HumanML3D + BABEL）上训练，使用 100Style 作为风格参考，评估采用统一的 SRA、FID、R-Top-3、PJ、AUJ 和 FPS 指标。对比方法涵盖 AutoMDM+PersonaBooth、AutoMLD+SMooDi 等最新基线组合，部分组合可能非原论文默认设置，但论文提供了公平的比较环境。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l4_https_openaccess_thecvf_com_content_CVPR2026_html_Song_MoCoDiff_A_Contro/figures/006_Table_1.jpg]]
 *Table 1: Quantitative Evaluation. Symbols ↑, ↓, and → indicate that higher, lower, or closer-to-ground-truth (GT) values are better, respectively; The Bold text indicates the best performer, underlined text indicates the second best performer*
 
 ![[assets/figures/papers/paper_list_l4_https_openaccess_thecvf_com_content_CVPR2026_html_Song_MoCoDiff_A_Contro/figures/012_Table_5.jpg]]
 *Table 5: Ablation Study. We present the visualization results of Three ablation experiments: without our ARDiffusion , without the IMC and without freezeUnet. The results showcase their importance*
 
-![[assets/figures/papers/paper_list_l4_https_openaccess_thecvf_com_content_CVPR2026_html_Song_MoCoDiff_A_Contro/figures/008_Table_2.jpg]]
-*Table 2: Single Motion Generation Evaluation. ‘↑’ (‘↓’) indicates that the value is better if the metric is larger (smaller); The Bold text indicates the best performer, underlined text indicates the second best performer*
-
-![[assets/figures/papers/paper_list_l4_https_openaccess_thecvf_com_content_CVPR2026_html_Song_MoCoDiff_A_Contro/figures/011_Table_4.jpg]]
-*Table 4: Style Intensity Control Evaluation. For balanced performance, we ultimately choose λ=1.0*
-
 ![[assets/figures/papers/paper_list_l4_https_openaccess_thecvf_com_content_CVPR2026_html_Song_MoCoDiff_A_Contro/figures/005_Figure_5.jpg]]
 *Figure 5: Qualitative Evaluation. MoCoDiff achieves smooth transitions and faithful style transfer across multiple actions, whereas prior methods show motion artifacts and style inconsistencies (red boxes)*
 
 ![[assets/figures/papers/paper_list_l4_https_openaccess_thecvf_com_content_CVPR2026_html_Song_MoCoDiff_A_Contro/figures/009_Figure_6.jpg]]
 *Figure 6: Qualitative Of Ablation Study. Our method maintains smooth, style-consistent motion across multi-step text commands. Without autoregressive diffusion or IMC, results show drift and loss of stylistic fidelity. Long-horizonStyleRecognitionAccuracy(SRA) Long-horizonPhysical Stability (AUj)*
-
-![[assets/figures/papers/paper_list_l4_https_openaccess_thecvf_com_content_CVPR2026_html_Song_MoCoDiff_A_Contro/figures/010_Figure_7.jpg]]
-*Figure 7: Diagnostic analysis of error accumulation. We observed that as the motion length increases, the drift of our method is minimal*
-
-![[assets/figures/papers/paper_list_l4_https_openaccess_thecvf_com_content_CVPR2026_html_Song_MoCoDiff_A_Contro/figures/013_Figure_8.jpg]]
-*Figure 8: History Frame Length Trade-off. This figure illustrates the trade-off between motion stylization and transition smoothness as the length of historical frames varies*
-
-![[assets/figures/papers/paper_list_l4_https_openaccess_thecvf_com_content_CVPR2026_html_Song_MoCoDiff_A_Contro/figures/001_Figure_1.jpg]]
-*Figure 1: Our MoCoDiff could generate expressive motion generation with long term sytle control. The black arrow points to the highlighted transition details. These results illustrate our method’s capability to maintain the essence of original content while seamlessly infusing it with new stylistic characteristics and historical informations*
-
-
 
 ## 定位与知识库关联
 
@@ -439,8 +403,6 @@ MoCoDiff 在运动生成领域的知识谱系中占据以下位置：
 - **核心创新：** 将多条件注入从“特征融合”升级为“动力学调制”，将自回归扩散从“条件拼接”升级为“受控马尔可夫过程”。
 - **技术遗产：** 继承了扩散运动生成（MDM 系列）的去噪框架、CLIP/MotionCLIP 的多模态编码能力、以及自回归生成的序列建模范式，但在条件注入机制和时序动力学控制上做出了根本性改进。
 - **下游影响：** 为多条件可控生成提供了“解耦注入 + 动力学控制”的通用设计模式，其 IMC 框架可潜在迁移至其他时序生成任务（如视频生成、音频合成）。
-
-
 
 ## 原文 PDF
 

@@ -56,8 +56,6 @@ claims:
 - **关键姿态保持与多样性兼得**：LT 在保持低关键帧位置误差（KPE=0.019）的同时，运动多样性达到3.68，显著高于同类的 CondMDI 和消融变体 NoTime（2.49），表明宽松时间约束为模型提供了额外自由度来生成多样化但语义一致的运动。
 - **双头架构与数据策略各有贡献**：消融实验表明，去除时间偏移数据生成的 NoTime 变体和去除显式扭曲函数的 NoWarp 变体均导致高阶时序精度和运动多样性显著下降，验证了两个创新各自的关键作用。
 
-
-
 ### 问题背景：运动内插中的关键帧时间约束
 
 运动内插（motion inbetweening）是计算机动画中的核心任务：动画师在时间轴上放置少量关键姿态（keyframes），由算法自动生成关键帧之间的过渡运动，从而得到完整的动作序列。这一范式大幅降低了手工动画制作的工作量，但其效果高度依赖关键帧的质量——不仅要求关键姿态本身具有表现力，还要求它们在时间轴上的位置精确无误。
@@ -104,8 +102,6 @@ $$\mathbf{x}_{f_n} = \mathbf{y}_{m}, \quad \forall n \in \{0, 1, ..., N \text{ a
 2. **双头扩散模型架构**：模型同时预测一个**全局时间扭曲函数**（global time warp）来校正关键帧的时间位置，以及**局部姿态残差**（pose residuals）来补充空间运动细节。二者联合优化，使生成运动在保持关键姿态语义的同时实现自然逼真的时间节奏。
 
 图1（Teaser图）以武术序列为例直观展示了这一能力：输入的四个关键帧时间近似放置，模型自动将第一个下蹲姿态向后推移数帧，为角色留出足够时间完成该姿态，同时在关键帧之间生成了踢腿、重心转移等空间细节。图2给出了运动合成（从零开始生成）和运动编辑（在已有运动上插入新关键帧）两种工作流程的系统总览。
-
-
 
 ## 核心方法与创新机理
 
@@ -158,8 +154,6 @@ $$
 
 三个创新维度形成闭环：**问题重定义**提供了理论自由度，**数据构造策略**在训练中模拟了这一自由度下的真实分布，**双头架构**则通过解耦时间与空间维度有效利用了这一自由度。消融实验（Table 1）中 NoTime 和 NoWarp 变体在各指标上的系统性退化，为这一耦合关系的有效性提供了强证据支持（置信度 0.85–0.95）。
 
-
-
 LT (Loose Timing) 方法的核心思想是将传统运动填充中的“硬性精确时间约束”转化为“宽松近似时间约束”，并通过一个双头扩散模型联合学习全局时间校正与局部空间细节生成。整体 pipeline 由**数据生成策略**、**输入预处理**、**双头扩散模型**和**运动合成**四个环节构成，其系统总览如图2所示，支持运动合成（从零生成）和运动编辑（在已有运动上插入新关键帧）两种工作模式。
 
 ### 数据生成策略：模拟时间不精确
@@ -202,12 +196,8 @@ $$\mathbf{Y} = \mathtt{warp}(\mathbf{w}, \mathbf{X}) + \Delta\mathbf{X}$$
 
 消融实验（Section 5.2.3）揭示了一个重要设计原则：时间扭曲函数 $\mathbf{w}$ 是 $F$ 维向量（仅与帧数相关），而姿态表示为 $F \times D$ 维。这种低自由度参数化使得模型在优化时不会为了“保护”关键帧位置而牺牲时序精度——如果扭曲的自由度过高（如 NoWarp 变体仅依赖姿态残差），模型可能通过调整姿态来隐式补偿时间误差，但代价是牺牲运动多样性和高阶时序统计量的准确性。LT 通过显式的低自由度全局扭曲，实现了关键帧保持（KPE = 0.019）与时序重建（L2-Acc = 0.46, L2-Jerk = 0.068）之间的优雅平衡。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2503_01016/figures/002_Figure_2.jpg]]
 *Figure 2: System: Our method for motion infilling with loose timing control accomodates motion synthesis (left), and motion editing (right). In the motion synthesis workflow, the animator provides a set of keyposes, and approximately when these events occur on the timeline (left, top). The union of constrained and unconstrained regions form the observation signal X, which our method converts into detailed, high-fidelity motion Y (left, bottom). In the the motion editing workflow, the animator starts with an existing highfidelity motion (right, top), and specifies an edit by providing a new keypose (right, top: pink dot). This can result in in observation signal X comprising context from the original...*
-
-
 
 ### 问题形式化：从硬约束到宽松约束
 
@@ -276,8 +266,6 @@ $$
 
 推理时，模型从纯噪声开始迭代去噪，最终合成运动 $\mathbf{Y}$。
 
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -312,12 +300,8 @@ Table 1同时报告了两项关键消融实验的结果，分别验证数据生�
 
 3. **时间扭曲函数的泛化边界未充分探索。** 当输入关键帧的时间偏移量远大于训练时的窗口P时，学习到的扭曲函数能否有效校正尚不明确。此外，在密集约束场景下（大量时间不精确的关键帧），扭曲函数如何处理多个关键帧之间的时间冲突和协调，仍需进一步研究。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2503_01016/figures/007_Table_1.jpg]]
 *Table 1: Metrics. We measure reconstruction accuracy between generated motions and ground truth motions.$^ { \ast } G ^ { \ast }$ (global) denotes a statistic calculated in world space, and “L” (local) is calculated local to each frame’s root position. On reconstruction metrics, LT scores higher than all baselines on both low and higher-order statistics. Importantly to timing, LT most faithfully reconstructs higher-order effects, but keeps KPE balanced. This suggests that the learned warping function is important for producing plausible and desired timing, while preserving the keyframe. An additional benefit of treating timing as a loose constraint is that LT can also achieve greater motion diversity...
-
-
 
 ## 定位与知识库关联
 
@@ -350,8 +334,6 @@ Table 1同时报告了两项关键消融实验的结果，分别验证数据生�
 **开放研究问题。** 以下问题需要在后续工作中探索：（1）如何在统一框架中结合宽松与硬性时间约束，使动画师能够灵活指定哪些关键帧允许重定时、哪些必须精确匹配？（2）能否让用户精确控制每个关键帧允许的时间偏移量（如指定某个关键帧最多偏移±3帧，另一个最多偏移±10帧）？（3）能否在推理时动态改变生成运动的总帧数而不破坏运动质量？（4）学习到的时间扭曲函数在超出训练分布的大偏移量（$\Delta k$ 远大于 $P$）上的泛化能力如何？（5）当输入包含大量时间不精确的关键帧时，时间扭曲函数如何处理多个关键帧之间的时间冲突与协调？（6）时间扭曲函数的固定分辨率参数化（$F$ 维向量）对不同类型的运动（快节奏武术 vs 慢节奏行走）是否同样有效，是否需要自适应分辨率的扭曲表示？
 
 **验证建议。** 本文的实验验证集中在HumanML3D数据集上的合成时间不精确场景。对于实际动画制作工作流中的用户研究、与专业动画师工作流程的集成效果、以及在更大规模或更多样化运动数据上的泛化性能，尚需进一步验证。此外，LT与基于物理的后处理方法的结合效果在本论文中仅作为建议提及，缺乏实验支持，该点需要手动验证。
-
-
 
 ## 原文 PDF
 

@@ -51,15 +51,11 @@ claims:
 
 在 VGGSound 测试集上，AC‑Foley 与同架构的音频条件基线 MMAudio+CLAP 相比，分布匹配指标 FD_PaSST 从 64.90 降至 **56.00**（↓13.7%），声学失真 MCD 从 14.63 降至 **11.37**（↓22.3%）；用户研究显示，其对纯视觉‑文本方法 MMAudio‑L‑V2 的声学保真度赢率达 **83.5%**。消融实验进一步证实，两阶段训练是实现非复制式声学迁移的关键（FD_PaSST 从仅重叠条件的 80.07 骤降 30.1%），而同步条件与音频条件分别负责时序对齐和音质控制，二者不可偏废。该方法还支持跨音源音色迁移和零样本生成，展现了灵活的音效创作能力。
 
-
-
 自动生成与无声视频时空同步、听觉逼真的音效（Foley）是影视制作、游戏开发和虚拟现实等领域的关键需求。近期的视频到音频合成方法主要依赖文本提示作为语义控制信号，将视频帧与自然语言描述联合送入生成模型。然而，文本作为控制接口存在根本性的粒度限制：它几乎无法刻画声音的微声学特征，例如冲击瞬态的尖锐程度、材质共振的衰减模式、或音色的细微差别。训练数据的标注粗糙化进一步加剧了这一问题——在常用数据集中，所有犬吠声通常被统一归类为"barking"，这使得模型没有能力区分吉娃娃尖细的叫声与大型犬低沉的咆哮，更无法根据创作者的意图生成指定变体。因此，现有工作本质上难以实现对输出声音细粒度、可定制的声学控制，产生了"语义正确但听觉偏离目标"的严重缺口。
 
 针对此瓶颈，AC‑Foley 提出的核心洞察是以音频自身作为控制条件，绕开文本描述的歧义边界。具体来说，方法引入用户提供的参考音频，并要求模型既保留参考音色的完整声学签名，又将该签名适配到视频的时序场景中，而非简单地"复制粘贴"参考片段。这一思路面临的关键矛盾在于：若直接使用参考音频与目标音频高度重叠的条件片段，模型容易退化到直接拷贝；若条件与目标在时间上完全不重叠，则模型难以从中剥离合用的声学线索。AC‑Foley 通过两阶段课程训练解决了这一矛盾：第一阶段在目标音频内随机采样2秒重叠片段作为条件，让模型学会从局部声学线索中提取精细的音色与频谱特征；第二阶段强制使用最后2秒的非重叠条件，迫使模型利用视频内部（如相同材质、相同动作产生的）声学自相似性，将已学到的声学特性推广到全新时序场景。这一设计使模型既能从参考音频中捕获足以重建目标声音的声学信息，又能避免条件泄露引发的退化复制（消融实验中，仅用重叠条件导致分布匹配指标 FD_PaSST 高达80.07，切换为非重叠模式后骤降至56.00，降幅30.1%；Table 4）。在声学编码器的选择上，使用预训练音频VAE的潜在特征（经平均池化）来保留完整频谱/音色信息，而非依赖仅捕捉语义的CLAP编码器，这在实验中带来了梅尔倒谱失真（MCD）从14.63到11.37的显著改善（↓22.3%），进一步证明了完整声学签名对精细控制的必要性（Table 1）。人工评估亦显示，配备参考音频条件的AC‑Foley相比纯视觉‑文本的系统（MMAudio‑L‑V2）在声学保真度上赢率为83.5%，表明创作者可以通过更换参考音频直观、可靠地切换目标音色（Table 3）。
 
 综上，本文的动机在于打破文本控制的上限，构建一个能够跟随音频样例进行声学迁移的视频到音频生成框架。其技术核心在于通过保留完整声学特征的编码方式与两阶段课程设计，使模型既能精确提取参考音频中的声学细节，又能灵活适配到新的视觉时序中，最终生成既忠于参考音色又与画面严格同步的声音。该框架同时兼容文本描述和同步信号，通过多模态条件融合（Equation 3）共同引导生成过程，为可控的细粒度音效合成提供了新的范式。
-
-
 
 ## 核心方法与创新机理
 
@@ -97,8 +93,6 @@ $$\operatorname{adaLN}(f, c) = \mathrm{LayerNorm}(f) \cdot \mathbf{W}_{\gamma}(c
 
 上述三个模块的协同作用在综合评估中体现为显著优势：在 VGGSound 测试集上，AC‑Foley 面向音频条件的基线 MMAudio+CLAP 取得 **FD_PaSST 降低 13.7%、MCD 降低 22.3%**（Table 1）；且以 83.5% 的赢率在人工声学保真度判断中碾压最强视觉‑文本基线 MMAudio‑L‑V2（Table 3）。即使在未参与训练的 Greatest Hits 数据集上进行跨域音色迁移，仍以 **Onset Acc 0.3948 vs. 0.3906** 超越专门训练于该数据集的 CondFoley（Table 2），显示出两阶段训练赋予的强泛化性。这些证据共同证实：以音频自身为条件、结合渐进式课程训练与多模态同步融合，是当前视频到音频生成中实现细粒度可控、时序高对齐的核心创新路径。
 
-
-
 ![[assets/figures/papers/iclr26_0005_URPXhnWdBF_AC-Foley_Reference-Audio-Guided_Video-to-Audio_S/figures/004_Figure_2.jpg]]
 *Figure 2: Overview of our method. Different modalities (video, text, and audio) jointly interact in the multimodal transformer network. Multimodal conditioning with audio injects semantic, temporal and acoustic information for more precise control*
 
@@ -127,8 +121,6 @@ $$
 - **声码器（HiFi‑GAN）**：将 Transformer 输出的梅尔频谱转换为 44.1 kHz 的时域波形，得到最终的合成音频。
 
 训练时，AC‑Foley 采用两阶段课程学习策略来解决"复制粘贴"与泛化的矛盾：**第一阶段**从与目标音频重叠的片段中随机抽取 2 秒作为参考条件，强制模型提取细粒度声学特征；**第二阶段**切换为非重叠的尾部 2 秒作为条件，迫使模型利用视频内的声学自相似性进行泛化，从而在不牺牲时序同步的前提下实现可控的音色迁移与细粒度声音生成。
-
-
 
 ### 核心机制
 
@@ -183,8 +175,6 @@ $$
 
 消融实验显示，移除同步条件（w/o sync）使 DeSync 从 0.465 升至 1.240，严重破坏时间对齐；而去掉音频条件虽略微改善时序，却使 FD_PaSST 从 56.00 升至 64.90。这表明**同步条件负责时序对齐，音频条件负责音质与声学保真度，二者不可相互替代**。
 
-
-
 ## 实验与关键发现
 
 AC‑Foley 以参考音频自身作为声学控制信号，绕过了文本语义模糊性对微声学特征（冲击瞬态、共振衰减等）的描述局限。以下实验系统验证了该设计对生成声音的音色保真度、时序同步性及跨场景泛化能力的提升，并进一步通过消融实验揭示各组件间的因果分工。
@@ -209,7 +199,6 @@ AC‑Foley **未使用** Greatest Hits 参与训练，仅在 VGGSound 上训练�
 **人工评估（表 3）。**  
 以 16 个高音画对应度的视频为样本，要求被试从 AC‑Foley 和纯视觉‑文本基线 MMAudio‑L‑V2 中，就"声学相似度"和"同步性"分别选择更优者。结果：声学保真度上 AC‑Foley 赢率高达 **83.5%**（95 %CI ±3.4%），而时序对齐赢率为 61.6% 并有 21.8% 的样本被判定为"两者均同步良好/难以区分"。这印证了参考音频控制的核心增益在于音色忠实度，而同步性能受限于模型对视频事件节奏的固有建模能力（该能力在较强基线中已具备一定基础）。
 
-
 ![[assets/figures/papers/iclr26_0005_URPXhnWdBF_AC-Foley_Reference-Audio-Guided_Video-to-Audio_S/figures/010_Table_3.jpg]]
 *Table 3: Comparison of our method and MMAudio-L-V2 in terms of temporal alignment and acoustic fidelity. We show our win rate and the tie rate of temporal alignment, and our win rate of acoustic fidelity. 95% confidence intervals are reported in gray*
 
@@ -217,7 +206,6 @@ AC‑Foley **未使用** Greatest Hits 参与训练，仅在 VGGSound 上训练�
 
 **两阶段训练机制（表 4）。**  
 仅使用重叠条件片段（Stage I）时，FD$_{\text{PaSST}}$ 高达 80.07，表明模型倾向于直接"复制粘贴"参考音频，失去与视频的时序适配。切换为非重叠条件（Stage II）后，该指标骤降至 **56.00**（↓30.1%），说明模型被迫利用视频内部的声学自相似性来生成匹配的未知部分，从而获得泛化。在此基础上对高音画对应子集（ImageBind 分数 > 0.3）微调 40k 迭代，进一步将语义一致性（IB）提升至 37.1，DeSync 降至 0.465，证实两阶段课程训练是解决"复制粘贴"与泛化矛盾的决定性机制。
-
 
 ![[assets/figures/papers/iclr26_0005_URPXhnWdBF_AC-Foley_Reference-Audio-Guided_Video-to-Audio_S/figures/011_Table_4.jpg]]
 *Table 4: Performance comparison of audio conditioning approaches (overlapping/non-overlapping segments) and finetuning strategies across distribution matching (FD/KL), semantic consistency (IB), temporal alignment (DeSync), and spectral quality (MCD) metrics*
@@ -246,13 +234,8 @@ AC‑Foley **未使用** Greatest Hits 参与训练，仅在 VGGSound 上训练�
 - **表 6** 是理解"同步负责时间，音频负责音色"的抓手，定义了多模态条件的职责边界。  
 - **定性结果（Figure 4）**：针对同一视频，三种不同参考音频生成出音色鲜明可辨的音频，直观验证了模型对微声学特征的精细化控制能力。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_0005_URPXhnWdBF_AC-Foley_Reference-Audio-Guided_Video-to-Audio_S/figures/006_Figure_3.jpg]]
 *Figure 3: Illustration of the two-stage training process for audio generation. (a) Stage I: Overlapping Conditioning. The random 2 seconds of the 8-second target audio are used as the conditional audio, allowing the model to learn the utilization of acoustic features from overlapping audio segments. (b) Stage II: Non-overlapping Conditioning. The non-overlapping last 2 seconds of the 10-second video clip are used as the conditional audio, leveraging inherent audio self-similarity within the video to enhance model generalization*
-
-
-
 
 ## 定位与知识库关联
 
@@ -290,8 +273,6 @@ AC‑Foley 的核心创新在于将控制信号从**语义层级**下推至**声
 **跨域泛化的上限。** AC‑Foley 在 Greatest Hits（敲击类声音）上的成功是否可推广至持续音（如引擎轰鸣、风声）和非刚性材质交互（如布料摩擦、液体倾倒）？敲击类声音具有明确的瞬态起始点，易于检测和建模；持续音和柔性材质交互的声学特征更依赖长期频谱演化，对当前基于单样本参考的编码方式提出了不同挑战——该方向需要在更广泛的数据集（如 AudioSet 的细分类别或专业音效库）上进行系统性评估。
 
 **多声道空间音频扩展。** 当前方法生成单声道音频，如何将参考音频控制扩展至空间音频（如环绕声、双耳音频）是一个自然延伸。这需要额外的空间条件（如声源方位角、房间脉冲响应），且参考音频本身需携带空间信息，架构复杂度将显著增加。
-
-
 
 ## 原文 PDF
 

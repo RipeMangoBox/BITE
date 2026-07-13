@@ -56,15 +56,11 @@ claims:
 
 GM-R^2 的贡献在于首次证明了**生成一致性可以作为无监督几何描述符学习的有效代理监督信号**，为摆脱昂贵位姿标注的大规模3D表示学习开辟了新路径。
 
-
-
 三维点云配准是计算机视觉与机器人领域的核心任务，其目标是在部分重叠的源点云与目标点云之间估计最优刚体变换。该任务的关键瓶颈在于建立可靠的点级对应关系，而对应关系的质量高度依赖于几何描述符的判别力与一致性。全监督深度几何描述符学习范式——以 **FCGF**（Choy et al., ICCV 2019）、**Predator**（Huang et al., CVPR 2021）和 **PARE-Net**（Yao et al., ECCV 2024）为代表——通过大规模标注的位姿真值驱动对比学习或对应关系预测，已在多个基准上取得显著进展。然而，这一范式的根本缺陷在于**对昂贵位姿标注的刚性依赖**：真实场景中获取亚厘米级精度的六自由度变换标注需要高精度传感器或人工标定，成本随场景规模急剧攀升，严重制约了深度描述符向大规模、多场景部署的扩展。
 
 无监督方法试图摆脱位姿标注的束缚。现有路线主要包括：基于手工特征的传统方法（如FPFH），其判别力有限；基于自监督信号重构的 **PPF-FoldNet**（Deng et al., ECCV 2018），仅学习局部几何编码而缺乏跨视图一致性约束；以及基于半监督匹配或强化学习的 **FMR**（Huang et al., CVPR 2020）和 **CEMNet**（Jiang et al., ICCV 2021），它们虽减少了对标注的依赖，但在低重叠、重复纹理结构和复杂真实场景下仍容易陷入局部最优，匹配精度与全监督方法之间存在显著差距。
 
 上述困境引出一个核心问题：**能否找到一种替代显式位姿标签的隐式监督信号，迫使几何特征提取器学习对应一致的表示？** GM-R^2 的动机正是源于一个关键洞察：在几何条件驱动的跨视角图像生成中，只有当源点云与目标点云的几何编码真正“对齐”时，生成器才能产生跨视角一致的图像。换言之，**跨视角生成一致性天然蕴含了对应关系一致性的信息**，可以作为几何描述符学习的高质量代理监督。这一思路将描述符学习从“匹配-标注”范式重新表述为“几何条件驱动的跨视图图像生成”问题，从而在无需任何位姿真值的前提下，间接强制编码器学习对应一致的点云几何描述符。
-
-
 
 ## 核心方法与创新机理
 
@@ -102,8 +98,6 @@ $$
 
 三个 changed slots 形成因果链条：AFoV-ERP 提供高质量几何条件 → 耦合 ControlNet 实现跨视图生成 → 生成一致性损失替代位姿监督。这一链条的核心逻辑是：**生成质量的上限决定了隐式监督信号的有效性**，因此几何条件的保真度和生成器架构的跨视图能力共同构成了方法性能的瓶颈与调节旋钮。
 
-
-
 GM-R^2 将几何描述符学习重新定义为**几何条件驱动的跨视图图像生成**问题，其核心逻辑链条为：只有对应关系一致的几何条件才能驱动生成器产生跨视图一致的图像，因此通过优化跨视图生成一致性，可以间接强制编码器学习对应一致的点云几何描述符。整个框架由三个关键模块串联构成：**AFoV-ERP 投影**、**去噪无关耦合 ControlNet** 和**生成一致性监督**，形成从 3D 点云到 2D 描述符再到配准估计的端到端无监督管线。
 
 ### 输入输出流
@@ -134,8 +128,6 @@ Figure 1 对比了全监督匹配学习与 GM-R^2 的无监督生成式匹配范
 
 ![[assets/figures/papers/paper_list_l2512_https_openaccess_thecvf_com_content_CVPR2026_html_Jiang_GM_R2_Generative/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison between fully-supervised matching learning and our unsupervised generative matching paradigm. Supervised methods rely on costly ground-truth transformations to guide geometric consistency learning. By contrast, our framework employs generative consistency supervision, where a geometry-conditioned cross-view generator supplies indirect supervisory signals to enforce correspondence-consistent geometric feature learning*
-
-
 
 ### 问题形式化：点云配准的优化目标
 
@@ -191,13 +183,6 @@ $$\mathrm{RE} = \arccos \frac{\mathrm{Tr}(\hat{\mathbf{R}}^\top \mathbf{R}) - 1}
 
 其中 $\hat{\mathbf{R}}, \hat{\mathbf{t}}$ 为预测值，$\mathbf{R}, \mathbf{t}$ 为真值。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2512_https_openaccess_thecvf_com_content_CVPR2026_html_Jiang_GM_R2_Generative/figures/003_Figure_3.jpg]]
-*Figure 3: Illustration of Auto-FoV Equirectangular Projection (AFoV-ERP). Unlike the standard ERP that uniformly discretizes 6.42 7.95the full FoV, AFoV-ERP adaptively zooms into the occupied FoV region of the input point clouds and rescales it to the full ERP resolution*
-
-
-
 ## 实验与关键发现
 
 ### 主实验结果
@@ -235,8 +220,6 @@ Table 3 在 3DMatch 数据集上验证了 AFoV-ERP 投影策略和范围图分�
 
 > **注意**：上述失败模式部分基于方法设计的内在假设推演，具体退化程度的量化实验（如极低重叠率下的精度衰减曲线）在现有分析材料中未提供，建议查阅原文补充验证。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2512_https_openaccess_thecvf_com_content_CVPR2026_html_Jiang_GM_R2_Generative/figures/004_Table_1.jpg]]
 *Table 1: Comparison of the methods on rotation, translation, and Chamfer distance on 3DMatch [50] benchmark dataset. (∗), (△) and (♢) denote the traditional, unsupervised, and fully-supervised deep geometric descriptors, respectively*
 
@@ -245,11 +228,6 @@ Table 3 在 3DMatch 数据集上验证了 AFoV-ERP 投影策略和范围图分�
 
 ![[assets/figures/papers/paper_list_l2512_https_openaccess_thecvf_com_content_CVPR2026_html_Jiang_GM_R2_Generative/figures/006_Table_2.jpg]]
 *Table 2: Comparison of the methods on rotation, translation, and Chamfer distance on ScanNet [5] benchmark dataset. (∗), (△) and (♢) denote the traditional, unsupervised, and fully-supervised deep geometric descriptors, respectively*
-
-![[assets/figures/papers/paper_list_l2512_https_openaccess_thecvf_com_content_CVPR2026_html_Jiang_GM_R2_Generative/figures/008_Figure_5.jpg]]
-*Figure 5: Qualitative comparison between the SOTA fully-supervised deep descriptor PARE-Net [46] and our unsupervised GM-R2 descriptor in challenging low-overlap cases from ScanNet [5]. Our unsupervised method consistently presents higher alignment precision*
-
-
 
 ## 定位与知识库关联
 
@@ -301,8 +279,6 @@ GM-R^2 的范式创新引出了若干值得后续探索的方向：
 - **动态场景与在线 SLAM**：当前方法面向静态场景的离线配准。能否扩展到动态场景，或集成到 LiDAR SLAM 系统中实现在线更新，是一个有实际价值的问题。
 - **更一般的传感器模型**：AFoV-ERP 目前假设球面投影模型。对于非标准传感器（如固态激光雷达的非均匀扫描模式），如何设计相应的自适应投影机制？
 - **生成一致性信号的理论分析**：当前工作从经验上验证了生成一致性监督的有效性，但缺乏对“何种程度的跨视图生成质量足以保证对应一致性”的理论刻画，这可能是未来研究的方向。
-
-
 
 ## 原文 PDF
 

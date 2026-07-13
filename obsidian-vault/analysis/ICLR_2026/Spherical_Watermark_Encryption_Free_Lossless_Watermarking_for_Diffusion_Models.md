@@ -63,8 +63,6 @@ Spherical Watermark 针对上述瓶颈提出了一种**加密无关的球形映�
 
 **局限性**方面，高阶矩可能偏离真实高斯分布，在极端统计测试下存在被检测的风险；强反转破坏攻击（如大幅裁剪或涂鸦）可能导致DDIM反演失败，使水印提取完全失效；当前方案依赖扩散模型的反演过程，对非高斯先验或不支持精确反演的生成模型适用性受限。
 
-
-
 扩散模型（Diffusion Models）的快速发展使得AI生成内容（AIGC）的版权追溯与内容溯源成为紧迫需求。在这一背景下，水印技术被广泛视为追踪生成图像来源的核心手段。然而，现有水印方法在图像质量与密钥管理之间存在着难以调和的矛盾，严重阻碍了其在大规模API场景下的实际部署。
 
 **有损方法的保真度困境。** 传统水印方案，如基于频域的**DwtDct**（Al-Haj, 2007）和**DwtDctSvd**（Navas et al., 2008），以及基于神经网络的**RivaGAN**（Zhang et al., 2019），在嵌入水印时不可避免地修改图像内容，导致生成质量下降。即便是在潜空间中嵌入图案的**Tree-Ring**（Wen et al., NeurIPS 2023），也会引起显著的分布偏移——在COCO数据集上使用SD v2.1时，其FID从原始的46.81劣化至约50.82（Table 1），表明有损嵌入从根本上改变了生成图像的统计特性。
@@ -74,8 +72,6 @@ Spherical Watermark 针对上述瓶颈提出了一种**加密无关的球形映�
 **核心瓶颈：加密依赖与分布匹配的冲突。** 上述困境的根源在于，现有无损方法必须借助加密原语（流密码或复杂纠错码）来保证水印潜变量与标准高斯噪声的统计不可区分性。这带来了密钥存储开销、编解码延迟和实现复杂度三重负担，使得扩散模型水印在实际API服务中难以高效部署。问题的本质可归结为：**能否在不使用任何加密机制的前提下，构造一个从离散二进制水印到连续高斯噪声的可逆映射，使得映射后的分布精确匹配扩散先验的低阶矩，同时赋予水印对后处理和对抗攻击的天然鲁棒性？**
 
 本文提出的**Spherical Watermark**（球形水印）正是对这一问题的正面回答。其核心思想是：将水印嵌入视为一个纯粹的几何变换问题——通过球面投影、固定正交旋转和卡方半径缩放，将任意二进制水印转化为与标准高斯噪声统计不可分的隐变量。这一策略完全摒弃了加密原语，仅需一个固定的二进制混合矩阵和正交旋转矩阵，从根本上消解了密钥管理与无损性之间的张力，同时利用球面3-设计的最优距离特性，为水印提供了可证明的抗加性噪声鲁棒性。
-
-
 
 ## 核心方法与创新机理
 
@@ -102,8 +98,6 @@ Spherical Watermark 将整个水印系统压缩为**一个固定的“签名”*
 ### 创新本质：可逆映射 + 矩匹配
 
 从方法论层面审视，Spherical Watermark 的突破在于将水印嵌入重新定义为**一个从离散二进制序列到连续高斯噪声的可逆映射问题**。只要该映射满足两个条件——（1）输出分布的低阶矩与扩散先验匹配，（2）映射本身可逆——即可同时保证无损性和可提取性。正交旋转 $\mathbf{C}$ 将比特能量均匀分散到所有维度，带来了最优的抗加性噪声鲁棒性（消融实验中移除球面映射后，亮度调整等攻击下的追踪准确率剧烈下降，见 Figure 6(c)）；而 $\mathbf{T}$ 矩阵的 $3$-wise 独立性则确保了比特间不产生可被检测的统计模式。这种“矩匹配 + 可逆构造”的范式，为扩散模型水印提供了一条摆脱加密依赖的新路径。
-
-
 
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_2eAGrunxVz/figures/001_Figure_1.jpg]]
 *Figure 1: The overall pipeline of our framework*
@@ -166,8 +160,6 @@ $$ \hat{\mathbf{z}}^{(2)} = \mathbf{C}^{\top} \hat{\mathbf{z}}_T, \quad \hat{\ma
 
 > **注意**：当前方案依赖扩散模型的反演过程，对于非高斯先验或不支持精确反演的生成模型，适用性受限。此外，高阶矩可能偏离真实高斯分布，在极端统计测试下存在被检测的风险。
 
-
-
 Spherical Watermark 的核心在于将离散水印比特映射为与扩散模型先验统计不可分的连续隐变量，且全程无需加密原语。该映射由三个可逆模块串联构成：**Binary Embedding Module (B)**、**Spherical Mapping Module (S)** 和 **Diffusion Integration Module (G)**，整体流水线见 Figure 1。
 
 ### 问题形式化：无损可逆映射
@@ -218,8 +210,6 @@ $$\mathbf{z}_0 = \mathrm{ODESolve}(\mathbf{z}_w; s_\theta, \mathrm{cond}, T, 0)$
 3. 逆二元嵌入：$\hat{\mathbf{x}} = \mathbf{T}^{-1} \hat{\mathbf{z}}^{(1)}$，对 $N$ 个重复块进行多数投票得到最终水印 $\hat{\mathbf{m}}$（Eq. 13）。
 
 整个框架仅需预先生成固定的 $\mathbf{T}$ 和 $\mathbf{C}$ 作为“签名”，无需每图像动态密钥，从根本上消除了流密码或纠错码带来的密钥存储与计算开销。
-
-
 
 ## 实验与关键发现
 
@@ -276,31 +266,11 @@ Figure 4 以对数坐标展示了各潜在空间方案的水印嵌入与提取�
 
 实验设计中采取了以下公平性保障措施：所有潜在空间方法均使用固定的 5 个不同密钥/签名并报告均值和标准差；在固定密钥设定下，Gaussian Shading 不再满足严格无损性；传统有损方法统一嵌入 32 比特，潜在空间方法配置为 512 比特；对抗攻击采用 WEvade 在白盒与黑盒设定下的平均结果，其中黑盒设定包含 JPEG 压缩预处理。Tree-Ring 仅参与 TPR 对比而不参与 ACC 对比，因其仅支持存在性检测。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_2eAGrunxVz/figures/003_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_2eAGrunxVz/figures/015_Figure.jpg]]
-
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_2eAGrunxVz/figures/016_Figure_9.jpg]]
 *Figure 9: Visualized comparison of watermarked images under re-generation*
 
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_2eAGrunxVz/figures/021_Figure_11.jpg]]
-*Figure 11: Training loss and test classification accuracy for watermark and unwatermarked samples classification. (a)(f) on the latent level. (b)(g) on the COCO dataset with SD v1.5. (c)(h) on the COCO dataset with SD v2.1. (d)(i) on the SDP dataset with SD v1.5. (e)(j) on the SDP dataset with SD v2.1. Top: Training loss. Bottom: Test classification accuracy*
-
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_2eAGrunxVz/figures/022_Figure.jpg]]
-*Figure: (e) Image Level. (g) Image Level. (h) Image Level*
-
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_2eAGrunxVz/figures/023_Figure.jpg]]
-*Figure: (d) Drop. (c) Brightness. (g) Median Filter*
-
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_2eAGrunxVz/figures/030_Figure_14.jpg]]
 *Figure 14: Ablation on hyperparameters undetectability*
-
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_2eAGrunxVz/figures/007_Figure_5.jpg]]
-*Figure 5: ACC and TPR values under Attacks, averaged over two datasets and two models. (a) Ablation on l _ { m }*
-
-
 
 ## 定位与知识库关联
 
@@ -345,8 +315,6 @@ Figure 4 以对数坐标展示了各潜在空间方案的水印嵌入与提取�
 5. **动态长度水印方案**：当前方案要求预定义水印长度 $l_m$，能否设计一种无需事先定义长度的无损嵌入方案以支持动态信息长度？
 
 6. **与内容认证的结合**：将 Spherical Watermark 与图像编辑检测、深度伪造溯源等任务结合，构建统一的生成内容溯源框架。
-
-
 
 ## 原文 PDF
 

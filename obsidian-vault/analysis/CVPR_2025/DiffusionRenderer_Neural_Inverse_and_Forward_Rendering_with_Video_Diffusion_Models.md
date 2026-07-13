@@ -54,8 +54,6 @@ claims:
 
 **方法定位**：DiffusionRenderer 属于神经渲染方法谱系，与基于图像扩散模型的RGB↔X、DiLightNet，以及经典物理渲染的SSRT、SplitSum形成对比。其独特之处在于以视频扩散模型统一逆渲染与前向渲染，无需显式路径追踪或精确3D表示，并通过合成-真实联合训练策略实现向真实场景的有效泛化。
 
-
-
 ### 问题背景：物理渲染的瓶颈
 
 真实感图像合成与编辑的核心在于模拟光线与场景的交互。经典的基于物理的渲染（Physically Based Rendering, PBR）方法严格遵循渲染方程：
@@ -84,8 +82,6 @@ $$L_o(\mathbf{p},\omega_o) = \int_\Omega f_r(\mathbf{p},\omega_o,\omega_i) L_i(\
 
 **Figure 1** 展示了这一愿景：从输入视频出发，准确估计几何与材质缓冲，并在指定光照条件下生成照片级真实感的渲染结果，为图像编辑应用提供基础工具。
 
-
-
 ## 核心方法与创新机理
 
 DiffusionRenderer 的核心创新在于将**视频扩散模型**统一应用于神经逆渲染与前向渲染，并通过三个关键设计突破传统方法的瓶颈。
@@ -113,8 +109,6 @@ $$\mathbf{c}_{\text{env}} := \{ \mathbf{h}_{\text{env}}^i \}_{i=1}^K = \mathcal{
 $$\mathcal{L}(\boldsymbol{\theta}, \Delta\boldsymbol{\theta}) = \|\mathbf{f}_{\boldsymbol{\theta}}(\mathbf{z}_\tau^{\text{synth}}; \mathbf{g}^{\text{synth}}, \mathbf{c}_{\text{env}}^{\text{synth}}, \tau) - \mathbf{z}_0^{\text{synth}}\|_2^2 + \|\mathbf{f}_{\boldsymbol{\theta}+\Delta\boldsymbol{\theta}}(\mathbf{z}_\tau^{\text{real}}; \mathbf{g}^{\text{real}}, \mathbf{c}_{\text{env}}^{\text{real}}, \tau) - \mathbf{z}_0^{\text{real}}\|_2^2$$
 
 定性消融（Figure 7）显示，加入LoRA的真实数据联合训练显著消除了合成数据的域偏差，大幅提升真实场景的重光照质量。
-
-
 
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2501_18590/figures/007_Figure_4.jpg]]
 *Figure 4: Qualitative comparison of forward rendering. Our method generates high-quality inter-reflections (top) and shadows (bottom), producing more accurate results than the neural baselines. Figure 5. Qualitative comparison of inverse rendering. We compare with RGB↔X [83] on DL3DV10k dataset. Both methods work well on indoor scenes, while our method predicts finer details in thin structures and more accurate metallic and roughness channels (top), likely benefiting from our curated training data. As compared to RGB↔X, our method generalizes better to outdoor scenes (bottom row)*
@@ -160,8 +154,6 @@ $$
 2. 前向渲染器合成重光照视频：$\hat{\mathbf{I}}_{\text{tgt}} = \text{ForwardRenderer}(\{\hat{\mathbf{n}},\hat{\mathbf{d}},\hat{\mathbf{a}},\hat{\mathbf{r}},\hat{\mathbf{m}}, \mathbf{E}_{\text{tgt}}\})$
 
 该统一框架使得DiffusionRenderer能够同时支撑材质编辑、重光照和物体插入等多种图像编辑应用，无需依赖显式3D几何或精确的路径追踪。
-
-
 
 ### 整体框架
 
@@ -221,8 +213,6 @@ $$\mathcal{L}_{\text{env}} = \|\mathbf{h}_{\mathbf{E}'} - \mathcal{D}_{\text{env
 
 4. **1步确定性 vs 多步随机**：1步确定性模型获得更高 PSNR 但导致模糊，多步随机模型更利于真实感细节，前向渲染与重光照任务采用多步随机模型（Table 3）。
 
-
-
 ## 实验与关键发现
 
 ### 核心实验设置与评估基准
@@ -243,7 +233,6 @@ DiffusionRenderer 在三个互补维度上接受检验：**神经前向渲染**�
 
 在 SyntheticScenes 上，DiffusionRenderer 取得 **26.0 dB PSNR**，远超最优神经基线 RGB↔X 的 18.5 dB（+7.5 dB），SSIM 从 0.645 提升至 0.780，LPIPS 从 0.302 降至 0.201。这一巨大差距表明，视频扩散模型对复杂场景中的互反射、阴影等全局光照效应具有更强的神经逼近能力（Table 1）。在 SyntheticObjects 上，本方法 PSNR 达 28.3 dB，比 RGB↔X 的 25.2 dB 高出 3.1 dB，且与经典 SSRT 方法（29.4 dB）性能接近，验证了在无需显式 3D 几何或路径追踪的前提下，神经渲染可逼近物理渲染的质量上限。
 
-
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2501_18590/figures/004_Table_1.jpg]]
 *Table 1: Quantitative evaluation of neural rendering. Table 2. Quantitative evaluation of relighting*
 
@@ -262,12 +251,8 @@ DiffusionRenderer 在三个互补维度上接受检验：**神经前向渲染**�
 
 逆渲染的核心发现是**时序信息对材质估计至关重要**。视频模型相比单帧图像模型，金属度 RMSE 从 0.066 降至 0.039（降低 41%），粗糙度 RMSE 从 0.098 降至 0.078（降低 20%）（Table 3）。在 InteriorVerse 真实数据集的反照率估计基准上，本方法同样展现出竞争力（Table 4）。定性比较（Figure 5）表明，DiffusionRenderer 在薄结构细节和室外场景泛化方面优于 RGB↔X，这得益于精心构建的训练数据与视频模型固有的时序一致性。
 
-
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2501_18590/figures/005_Table_4.jpg]]
 *Table 4: Quantitative benchmark of albedo estimation on InteriorVerse dataset [91]*
-
-![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2501_18590/figures/006_Table_3.jpg]]
-*Table 3: Quantitative evaluation of inverse rendering on SyntheticScenes video dataset. image: per-frame inference as image model. det.: 1-step deterministic inference*
 
 ### 消融实验
 
@@ -308,16 +293,6 @@ DiffusionRenderer 在三个互补维度上接受检验：**神经前向渲染**�
 - 如何进一步扩展框架以处理动态场景、非刚性物体以及复杂折射/散射效果，突破当前静态场景假设的限制？
 - 是否可以利用神经内在特征进行任务特定微调，增强材质编辑与物体插入等内容编辑操作的一致性？
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2501_18590/figures/014_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2501_18590/figures/010_Table.jpg]]
-*Table: S1. Quantitative evaluation of relighting in terms of ColorVideoVDP. ColorVideoVDP reports video quality in the JOD (Just-Objectionable-Difference) units. The highest quality (no difference) is reported as 10 and lower values are reported for distorted content. We compute a JOD value per clip for three novel lighting conditions in each series and report the average over all clips*
-
-
-
-
 ## 定位与知识库关联
 
 ### 物理渲染与神经渲染的十字路口
@@ -354,8 +329,6 @@ DiffusionRenderer 做出了三个关键设计选择，使其在方法谱系中�
 2. **动态场景扩展。** 如何将框架从静态场景扩展到包含非刚性变形、动态光照变化的通用视频重光照？
 3. **光照估计的闭环优化。** 是否可以利用神经内在特征进行任务特定微调，或设计端到端的光照估计-渲染联合优化，以提升真实世界自动标注的准确性？
 4. **编辑一致性。** 在材质编辑与物体插入等应用中，如何进一步保证多帧间的编辑内容一致性，避免时序闪烁？
-
-
 
 ## 原文 PDF
 

@@ -53,15 +53,11 @@ claims:
 
 **主要结果**：在 Toys4K 数据集上，SPACECONTROL 以超二次曲面为空间条件时 Chamfer 距离（CD↓, ×10³）为 14.0，以网格为条件时为 4.89，显著优于 Spice-E 的 65.9 和 SPICE-E-T 的 39.1（Table 1）。在 Chair 数据集上同样保持大幅领先（0.98 vs. 7.66）。用户研究（Figure 6）表明，SPACECONTROL 在整体外观、空间控制忠实度和真实感三个维度上均获得显著偏好。调节 $\tau_0$ 可连续控制几何贴合度与视觉质量之间的平衡（Figure 4, Table 2），$\tau_0 \in [4,6]$ 在 Toys4K 上提供了较好的折衷。
 
-
-
 3D资产生成近年来取得了显著进展，以Trellis（Xiang et al., CVPR 2025）为代表的基于流匹配的生成模型，能够根据文本或图像提示生成高质量的三维对象。然而，这些方法存在一个根本性的瓶颈：**文本和图像提示难以提供精确、直观的几何形状控制**。文本描述具有天然的歧义性——同一段文字可以对应形态迥异的几何结构；图像虽能传达视觉外观，但其二维本质使得用户无法直接操纵对象的三维几何体，编辑和调整极为不便。
 
 这一缺口直接限制了3D生成模型在实际创作流程中的应用。艺术家和设计师通常需要从粗略的3D草图出发，逐步细化对象的形状和比例，而现有生成范式却将用户隔离在几何控制之外。部分工作尝试引入几何条件，如**Spice-E**通过在Shap-E上微调以支持立方体图元，或**Coin3D**通过测试时优化将几何条件注入多视图生成模型，但这些方法要么需要类别特定的额外训练，要么依赖耗时的优化过程，在效率、精度和泛化性之间难以兼顾。
 
 SpaceControl的出发点是：**能否在不修改预训练模型、不增加任何训练的前提下，让用户通过简单的3D几何体直接控制生成结果的空间结构？** 这一问题的核心挑战在于，预训练生成模型的潜在空间并非为几何条件设计，直接将外部几何信号注入去噪过程可能破坏生成质量。SpaceControl的解决方案利用了预训练编码器将几何条件映射到结构生成阶段的潜在空间，并通过调节噪声混合比例来控制空间约束的强度——一个参数 $\tau_0$ 即可在几何保真度与视觉真实感之间实现平滑权衡。
-
-
 
 ## 核心方法与创新机理
 
@@ -107,8 +103,6 @@ $\tau_0$ 是 SpaceControl 的核心控制旋钮，它决定了控制潜在变量
 - **无需训练的特性**得到明确声明（置信度 0.95）："we introduce SPACECONTROL, a training-free test-time method for explicit spatial control of 3D asset generation"；"requiring no additional training"。
 - **定量优势**在 Toys4K 数据集上表现显著（置信度 0.95）：SpaceControl 的 Chamfer Distance 为 14.0（超二次曲面）和 4.89（网格），而 Spice-E 为 65.9，SPICE-E-T 为 39.1；在 Chair 和 Table 数据集上呈现相似趋势。
 - **控制强度可调性**经消融实验验证（置信度 0.95）：增加 $\tau_0$ 可持续降低 Chamfer 距离，使生成结果更贴合输入空间控制信号。
-
-
 
 ![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2512_05343/figures/002_Figure_2.jpg]]
 *Figure 2: Model Overview. Given an input conditioning which includes a spatial control, a text prompt and an image (optional), SPACECONTROL produces realistic 3D assets. First the different conditioning are encoded in a latent space. Specifically, the spatial control is voxelized and encoded by Trellis’ encoder E, the text is encoded by a CLIP encoder $\mathcal { E } _ { C L I P }$ , and the image (if present) is encoded by a DINOv2 encoder $\mathcal { E } _ { D I N O }$ . The obtained latents $\mathbf { z } _ { 0 , c }$ are noised up to $t _ { 0 }$ to obtain $\mathbf { z } _ { t _ { 0 } }$ . . From $t _ { 0 }$ to t = 0 , $\mathbf { z } _ { t _ { 0 } }$ are denoised by the Structure Flow Model (FM), guided by the...
@@ -162,8 +156,6 @@ SPACECONTROL 的核心创新在于通过单一超参数 $\tau_0$ 实现几何保
 
 相比需要类别特定微调的 **Spice-E** 和 **SPICE-E-T**，以及基于测试时优化的 **Coin3D**，SPACECONTROL 的即插即用特性源于其对预训练编码器 $E$ 的充分利用——将几何条件直接映射到结构生成阶段的潜在空间，而非修改生成模型本身。这一设计使其在无需训练的前提下，既能处理粗略的 3D 草图（如超二次曲面），也能精确对齐精细的网格控制信号。
 
-
-
 ### 问题瓶颈与因果调节变量
 
 现有3D生成方法（如基于文本或图像的提示）难以提供精确、直观的几何形状控制——文本具有歧义性，图像难以编辑，用户无法直接操纵对象几何体。SpaceControl（SPACECONTROL）的核心因果调节变量是：**在预训练的流匹配生成模型（Trellis）中引入测试时的显式空间控制**，将用户提供的3D几何信号体素化并编码为潜在变量，通过部分加噪后参与去噪过程，无需任何额外训练即可引导生成结果向给定几何对齐。
@@ -214,8 +206,6 @@ $$z_i \gets 0.5 \cdot \mathbf{CA}(z, c_{global,i}) + 0.5 \cdot \mathbf{CA}(z, c_
 
 该机制使模型能同时关注整体语义（如“椅子”）和局部几何约束，是实现文本-几何联合引导的关键。
 
-
-
 ## 实验与关键发现
 
 ### 主结果：几何保真度与真实感的量化对比
@@ -223,7 +213,6 @@ $$z_i \gets 0.5 \cdot \mathbf{CA}(z, c_{global,i}) + 0.5 \cdot \mathbf{CA}(z, c_
 SpaceControl 在三个数据集上进行了全面的量化评估：Toys4K（玩具类）、Chair（椅子）和 Table（桌子），分别使用超二次曲面图元和完整多边形网格作为空间控制信号。评估指标包括 Chamfer 距离（CD↓，×10³，衡量几何保真度）、CLIP-I（↑，衡量文本一致性）、FID（↓，衡量纹理真实感）和 P-FID（↓，衡量几何真实感）。所有 SPACECONTROL 结果均基于 τ₀ = 6 的配置，但用户可根据需求自由选择该参数。
 
 **Table 1** 的结果揭示了几个关键发现：
-
 
 ![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2512_05343/figures/006_Table_1.jpg]]
 *Table 1: Comparison with Baselines. We evaluate faithfulness to spatial and textual control via Chamfer Distance (CD, $\mathsf { \bar { \times } }$ 1 $0 ^ { 3 }$ ) and CLIP-I, and realism via FID (texture) and P-FID (geometry). Results for SPACE-CONTROL use $\tau _ { 0 }$ = 6 . † indicates methods fine-tuned on chair and table categories. Trellis (Xiang et al., 2025) (txt-DiT-XL) is included for reference only as it does not support spatial guidance
@@ -239,7 +228,6 @@ SpaceControl 在三个数据集上进行了全面的量化评估：Toys4K（玩�
 ### 控制强度 τ₀ 的消融分析
 
 **Table 2** 和 **Figure 4** 系统分析了控制参数 τ₀ 的作用机制：
-
 
 ![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2512_05343/figures/007_Table_2.jpg]]
 *Table 2: Analysis of $\tau _ { 0 }$ . . We evaluate faithfulness to spatial and textual control via Chamfer Distance (CD, scaled by 1 $0 ^ { 3 }$ ) and CLIP-I, respectively. Realism is assessed via FID for texture and P-FID for geometry. Results are reported for spatial control provided as geometric primitives (P) and meshes (M). can see that by increasing the value of $\tau _ { 0 }$ and thus strength of the spatial conditioning, we obtain generations which align more closely to the input spatial control
@@ -270,21 +258,12 @@ SpaceControl 在三个数据集上进行了全面的量化评估：Toys4K（玩�
 
 - **全局均匀控制**：当前方法对所有空间区域施加均匀的控制强度，无法实现局部区域的可变强度控制。这在需要部件感知精细编辑的场景中可能构成限制。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2512_05343/figures/010_Figure.jpg]]
 
 ![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2512_05343/figures/011_Figure.jpg]]
 
-![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2512_05343/figures/012_Figure.jpg]]
-
 ![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2512_05343/figures/013_Figure_9.jpg]]
 *Figure 9: Coarse and fine-grained control with superquadrics. Superquadrics offer both fine-grained spatial control when used to sculpt precise geometry (motorbike, staircase, helicopter) and coarse control, when only used to draft a 3D sketch (duck, drumkit)*
-
-![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2512_05343/figures/015_Figure.jpg]]
-
-
-
 
 ## 定位与知识库关联
 
@@ -354,8 +333,6 @@ SpaceControl 在 3D 生成控制方法的谱系中占据独特位置：
 4. **跨模型泛化能力**：SpaceControl 的测试时引导范式是否能推广到其他 3D 生成架构（如基于扩散模型的框架）？这需要研究不同生成范式中潜在空间的结构特性。
 
 5. **多模态控制的融合机制**：当同时提供文本、图像和空间控制时，如何优化不同模态信号的融合权重？当前方法采用固定策略，但自适应融合可能进一步提升生成质量。
-
-
 
 ## 原文 PDF
 

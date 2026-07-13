@@ -85,8 +85,6 @@ claims:
 *   **抽象推理薄弱**：在 ARC-AGI-2 等抽象规则归纳任务上，绝对准确率仍然极低。
 *   **待解问题**：视频生成模型能否在缺乏内部文本重写器的情况下独立发展出强大的推理能力？该范式的测试时缩放策略在其他任务上的泛化性如何？这些问题均有待开源模型的进一步验证。
 
-
-
 ### 多模态推理的现状与瓶颈
 
 当前主流的多模态推理范式可概括为两类：“用文本思考（Thinking with Text）”和“用图像思考（Thinking with Images）”。前者以纯文本链式思维（Chain-of-Thought）为代表，虽在数学、编程等符号推理任务上表现卓越，却天然缺乏对动态视觉过程的建模能力；后者通过静态图像扩展了视觉推理的边界，但单帧画面只能捕捉瞬间状态，无法表达连续变化、空间操作与时间演化。这两种范式共享一个结构性缺陷：文本与视觉作为分离的模态，通过交叉注意力等机制进行隐式交互，难以实现像素级别的统一理解与生成。
@@ -98,8 +96,6 @@ claims:
 视频生成模型的快速发展为突破上述瓶颈提供了新的可能。这类模型天然具备两项关键能力：**动态渲染**——在连续帧中可视化过程演变；**空间操作**——在像素级别绘制图形、移动元素、标记关键点。更重要的是，视频帧本身可以同时承载文字与图形，实现文本逻辑与视觉想象的像素级融合。
 
 本文由此提出 **“用视频思考（Thinking with Video）”** 范式：将视频生成模型作为推理链的媒介，通过在视频帧中逐步绘制、操作视觉元素并嵌入文字，将推理过程转化为一段连续的、可观察的视频序列。这一范式旨在弥合文本与视觉之间的模态鸿沟，使模型能够像人类一样，在统一的时空画布上“边想边画、边画边想”，完成从符号推理到动态空间想象的完整认知闭环。
-
-
 
 ## 核心方法与创新机理
 
@@ -122,8 +118,6 @@ claims:
 ### 需要警惕的局限
 
 尽管范式创新显著，但分析发现 Sora‑2 生成的视频解题过程**常常混乱、不可读或包含逻辑错误**——仅有 13.91% 的解法完全正确，43.48% 不可读或存在逻辑错误（Figure 7）。这表明模型并未真正在视觉模态中“推理”，而是依赖隐藏的文本重写器输出答案，视频更多扮演“展示”而非“思考”的角色。这一发现对范式的完整性提出了重要挑战，需要后续研究进一步验证视频生成模型能否独立承担推理功能。
-
-
 
 **Thinking with Video** 的整体 pipeline 围绕一个核心闭环展开：将任意推理问题转化为视频生成任务，再从生成的视频中提取答案。该流程由四个关键模块串联构成，输入为文本问题与可选的参考图像，输出为经自动评判的最终答案。
 
@@ -153,15 +147,11 @@ claims:
 
 这种“重写—生成—提取—评判”的闭环设计，使得视频生成模型无需显式输出文本推理链，即可在视觉与文本两类任务上展现推理能力，但其内部推理过程的透明性仍受限于闭源模型的黑箱特性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2346_https_arxiv_org_abs_2511_04570/figures/001_Figure_1.jpg]]
 *Figure 1: Examples of vision-centric and text-centric tasks in VideoThinkBench, and Sora-2’s “Thinking with Video” solutions. Vision-centric tasks are solved by reasoning about visual elements via drawing and imagination, including eyeballing puzzles, visual puzzles, ARC-AGI-2 and mazes. An example is shown for each. Typically, in the “ray reflection” problem from eyeballing puzzles, Sora-2 accurately draws the light path and finds the specific point it passes through. Text-centric tasks are solved by text-based reasoning, which are adapted from established benchmarks. A GSM8K example shows the model provides a written process and the answer in the video*
 
 ![[assets/figures/papers/paper_list_l2346_https_arxiv_org_abs_2511_04570/figures/019_Figure_11.jpg]]
 *Figure 11: Overview of 21 eyeballing puzzle types. Based on the task requirement (constructing a point, a line, or a shape), we divide the puzzle types into Point, Line, and Shape categories. For each puzzle type, an input image and corresponding ground truth image is shown. All prompts: Section C.4*
-
-
 
 ### 2.1 方法流水线
 
@@ -175,12 +165,6 @@ claims:
 
 2.  **Video Generation Model（视频生成模型，Sora‑2）**  
     接收文本提示和参考图像，生成包含解题过程与答案的视频及音频。模型在视频帧中直接绘制图形、操作视觉元素并嵌入文字，实现像素级的多模态融合（Figure 6）。
-
-![[assets/figures/papers/paper_list_l2346_https_arxiv_org_abs_2511_04570/figures/007_Figure_6.jpg]]
-*Figure 6: Input form and evaluation of text-centric tasks. The model accepts a text prompt and a reference image. The prompt contains the problem text and the reference image displays the entire problem. The model shows the textual solution process and the answer in the video, speaking the answer in the audio. We evaluate the answers from the video and audio independently. The last frame is extracted for video evaluation and the audio is transcribed for audio evaluation. For evaluation, we adopt an LLM-as-a-Judge approach, detailed in Section 2.2.2, and human alignment check is shown in Appendix C.6. Examples of testing multimodal reasoning problems are in Appendix D*
-
-![[assets/figures/papers/paper_list_l2346_https_arxiv_org_abs_2511_04570/figures/021_Figure_12.jpg]]
-*Figure 12: Sora-2 solves the multimodal reasoning questions of the text-centric tasks. The input image contains the image of the original multimodal reasoning problem and the question. Similar to Figure 6, a text prompt containing the question text is also input to the model*
 
 3.  **Answer Extraction（答案提取）**  
     从生成视频中独立提取两类答案：
@@ -218,8 +202,6 @@ $$
 
 其中 $\mathrm{Binarize}(\cdot)$ 为阈值 245 的二值化操作。该指标衡量二值化后的覆盖差异，用于形状绘制类任务的评估。
 
-
-
 ## 实验与关键发现
 
 ### 核心结果：视觉中心推理
@@ -230,9 +212,6 @@ Sora‑2 在视觉中心任务上展现出显著超越最强 VLM 的空间推理
 *Table 1: Summary table of accuracy (%) across all second-level tasks on the full test set of VideoThinkBench. For Sora-2: Eyeballing Puzzles uses Major Frame evaluation (see Section 2.1.1), and text-centric tasks use audio evaluation results (see Section 2.2.2). Evaluation results of more models are shown in the Appendix (Tables 7 and 8)*
 
 在视觉谜题（Visual Puzzles）上，Sora‑2 在对称性任务上与 Claude Sonnet 4.5 表现相当，但在梯度与组合性任务上仍存在差距。在 ARC‑AGI‑2 的严格像素匹配评估中，Sora‑2 的精确准确率仅为 1.3%，远低于 Claude Sonnet 4.5 的 5.3%（Table 11），表明其在抽象规则归纳与精确图形生成上仍面临根本性困难。
-
-![[assets/figures/papers/paper_list_l2346_https_arxiv_org_abs_2511_04570/figures/038_Table_11.jpg]]
-*Table 11: Accuracy (%) on the ARC-AGI-2 task. We display each sample in an image and send it to Sora-2 and VLMs. Details: Section 2.1.3*
 
 ### 核心结果：文本中心推理
 
@@ -247,18 +226,12 @@ Sora‑2 在文本中心推理任务上展现出与 SOTA VLM 可比肩的性能�
 
 Sora‑2 展现出明确的少样本学习能力。在 ARC‑AGI‑2 上，提供更多示例（few‑shot）相比单示例（1‑shot）显著提升了高准确率样本的数量：像素准确率在 [0.65, 1.0] 区间的样本数从 95 增至 130，而在 [0, 0.35] 低准确率区间的样本数从 170 降至 145（Table 3）。这表明视频生成模型能够从上下文中提取并应用抽象变换规则，具备一定的归纳推理潜力。
 
-![[assets/figures/papers/paper_list_l2346_https_arxiv_org_abs_2511_04570/figures/009_Table_3.jpg]]
-*Table 3: In the few-shot setting of Sora-2, more samples fall within the accuracy range [0.65, 1], and fewer samples fall within the accuracy range [0, 0.35], compared to the one-shot setting. Few-shot uses all ARC-AGI-2 examples, while 1-shot uses only the first. Details: Section 3.1.1*
-
 ### 测试时缩放：自一致性与多帧投票
 
 在可验证的视频生成推理任务上，自一致性（self‑consistency）与测试时缩放策略展现出显著效果。以 Arc Connect 谜题为例：
 - 单次生成的最后一帧准确率仅为 56%；
 - 采用多帧投票（Major Frame）方法，从视频中采样多帧并取多数选项，准确率提升至 68%；
 - 进一步进行 5 次独立生成并投票（Vote Accuracy），准确率跃升至 90%（Table 4）。
-
-![[assets/figures/papers/paper_list_l2346_https_arxiv_org_abs_2511_04570/figures/010_Table_4.jpg]]
-*Table 4: Sora-2’s performance on the Arc Connect Puzzle by output modality. Vote Accuracy (5 Tries) means for each puzzle, we let Sora-2 generate 5 videos and choose the most common option as the final result. Details are in Appendix E.2*
 
 这一结果表明，视频生成模型在推理过程中存在帧间不一致性，但通过聚合多个推理路径的共识，可以大幅提高最终答案的可靠性。Major Frame 方法本质上起到了去噪滤波器的作用，捕捉模型最一致的信念状态。
 
@@ -286,17 +259,12 @@ Sora‑2 展现出明确的少样本学习能力。在 ARC‑AGI‑2 上，提�
 
 为排除测试集泄露的可能性，研究者对数学推理问题进行了数值改写（GSM8K‑Derived 和 MATH‑500‑Derived）。Sora‑2 在改写后问题上的表现与原题一致（Table 5），表明其推理能力并非来自记忆训练数据中的具体题目，而是具备一定的泛化能力。然而，结合 Prompt Rewriter 的消融结果，这种泛化能力更可能归属于重写器而非视频生成模型本身。
 
-![[assets/figures/papers/paper_list_l2346_https_arxiv_org_abs_2511_04570/figures/011_Table_5.jpg]]
-*Table 5: Sora-2’s accuracy on original and derived math reasoning problems with different numerical values. Performance remains consistent, thus excluding the risk of test data leakage and indicating Sora-2’s inherent potential in text-centric tasks*
-
 ### 失败模式与局限性
 
 1. **视觉推理的精确性不足**：在 ARC‑AGI‑2 等需要精确像素级输出的任务上，Sora‑2 常常无法正确修改输出网格，生成的图形与真值存在显著偏差。
 2. **推理过程不可解释**：视频中的解题过程多数不可读或包含错误，限制了模型的可解释性与可信度。
 3. **闭源黑箱限制**：所有分析基于闭源模型 Sora‑2，无法深入探究 Prompt Rewriter 的具体实现机制，也无法确定结论是否适用于其他视频生成模型。
 4. **任务覆盖有限**：基准构建依赖自动化程序，尚未覆盖主观推理或开放性推理场景。
-
-
 
 ## 定位与知识库关联
 
@@ -350,8 +318,6 @@ Sora‑2 展现出明确的少样本学习能力。在 ARC‑AGI‑2 上，提�
 4. **开源模型的可行性**：开源视频生成模型（如 Hunyuan‑Video、Wan 系列）能否通过类似的提示重写与微调策略达到 Sora‑2 级别的多模态推理能力？这决定了该范式的生态可复制性。
 
 5. **可信评估的设计**：如何设计更严格的评估协议，使生成的视频解题过程既正确又具备可读性，而不仅仅依赖音频或最后一帧的结果？这需要同时推进生成质量与评估方法的改进。
-
-
 
 ## 原文 PDF
 

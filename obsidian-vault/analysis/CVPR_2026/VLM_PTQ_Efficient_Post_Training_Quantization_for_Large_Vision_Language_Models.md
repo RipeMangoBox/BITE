@@ -57,8 +57,6 @@ claims:
 
 **主要结果**：在 Qwen2.5-VL-7B 的 W3A16 设置下，VLM-PTQ 在 8 个 VLM 基准上的平均准确率达到 71.3%，较 GPTQ 的 65.0% 提升 **+6.3 个百分点**；在更极端的 W2A16 设置下，平均准确率为 48.4%，较 GPTQ 的 43.1% 提升 **+5.3 个百分点**。在 W2A8KV8 的极限压缩场景下，VLM-PTQ 同样在所有测试模型（1B–72B）上一致优于基线。消融实验表明，闭式校正项 $C$ 独立贡献约 +1.2 个百分点，模态感知重要性 $M$ 独立贡献约 +5.4 个百分点，二者联合使用达到最优。方法在校准时间上仅比 GPTAQ 增加约 10%（921s → 1020s），保持实用友好。
 
-
-
 ### 大型视觉语言模型的部署瓶颈
 
 大型视觉语言模型（VLM）将视觉编码器与大型语言模型（LLM）深度融合，在图文理解、文档分析、多模态推理等任务上展现出卓越能力。然而，这类模型通常包含数十亿参数，推理时需要同时处理视觉和语言两种模态的高维特征，导致显存占用和计算开销远超纯文本LLM。以 Qwen2.5-VL-7B 为例，FP16 精度下仅 LLM 部分即需约 14 GB 显存，严重制约了 VLM 在资源受限设备上的部署。
@@ -94,8 +92,6 @@ $$\mathbf{M}^{\mu} = \mu \cdot \mathbf{H}_v^{\mathrm{diag}} + (1 - \mu) \cdot \m
 通过在校准集上最小化输出重构误差搜索最优 $\mu^*$，使量化器能够根据不同层的模态敏感度自适应地平衡视觉和语言通道的重要性（见 Figure 4）。
 
 这两个组件均集成于 GPTQ 的逐列量化框架中，无需额外训练，仅在校准阶段增加少量搜索开销，即可在 3-bit / 2-bit 权重量化及 W2A8KV8 极端设置下实现一致的性能提升。
-
-
 
 ## 核心方法与创新机理
 
@@ -146,8 +142,6 @@ VLM‑PTQ 位于训练后权重量化（PTQ）的方法谱系中，直接对标�
 
 VLM‑PTQ 的核心贡献在于：**在 GPTAQ 的非对称校准框架下，识别并修正了 RTN 策略的次优性，同时引入模态感知机制填补了多模态 PTQ 的空白**。该方法仅量化语言模型部分（视觉编码器与适配器保持全精度），与上述基线保持一致的实验设置，确保公平比较。
 
-
-
 VLM‑PTQ 的整体流程围绕两个核心模块构建：**非对称量化校正**与**模态感知量化**。这两个模块嵌入到标准的逐列权重量化框架中，在不改变视觉编码器和适配器（保持全精度）的前提下，仅对语言模型（LLM）部分的线性层权重进行低位宽压缩。
 
 ### 输入与预处理
@@ -184,8 +178,6 @@ VLM‑PTQ 的整体流程围绕两个核心模块构建：**非对称量化校�
 ### 计算开销
 
 相比基线 GPTQ/GPTAQ，VLM‑PTQ 额外引入了两项计算：模态感知 Hessian 分解和逐层 $\mu$ 的网格搜索。前者仅需在校准阶段执行一次，后者使校准时间增加约 10%、内存开销增加约 30%。推理阶段不引入任何额外延迟，因为量化后的权重矩阵与标准量化模型完全一致。
-
-
 
 VLM-PTQ 的核心由两个互补模块构成：**非对称量化校正**与**模态感知量化**。前者解决权重补偿方法中 RTN 策略在非对称目标下的次优性问题，后者解决视觉与语言模态间信息密度差异导致的通道重要性偏差。
 
@@ -241,9 +233,6 @@ $$\mathbf{X} = \mathrm{Interleave}(\mathbf{H}_v, \mathbf{H}_t, \mathbf{v}) \in \
 
 其中 $\mathbf{v} \in \{0,1\}^{n_v+n_t}$ 为视觉掩码。Figure 3 揭示，视觉和语言 Hessian 在不同层的幅度存在显著差异，标准量化器会被统计占优的模态主导，忽视另一模态的关键通道。
 
-![[assets/figures/papers/paper_list_l809_https_openaccess_thecvf_com_content_CVPR2026_html_Deng_VLM_PTQ_Efficient/figures/003_Figure_3.jpg]]
-*Figure 3: Magnitude disparity between vision and language Hessians across layers in the original 7B VLM, where the standard quantizer is biased toward the modality with the larger Hessian*
-
 #### 模态解耦与融合
 
 利用视觉掩码 $\mathbf{v}$ 分别计算两个模态的 Hessian：
@@ -278,8 +267,6 @@ $$\mu^* = \arg\min_{\mu} \|\mathbf{W}\tilde{\mathbf{X}} - \hat{\mathbf{W}}^{\mu}
 $$\hat{\mathbf{W}}_{:,q} = \operatorname{RTN}\big(\mathbf{W}_{:,q} \cdot (1 + \mathbf{C}_{q}); \mathbf{S}^{*}, \mathbf{Z}^{*}\big)$$
 
 其中 $\mathbf{S}^{*}, \mathbf{Z}^{*}$ 为基于模态感知重要性 $\mathbf{M}^{\mu^*}$ 计算的量化参数（缩放因子与零点）。校正项 $\mathbf{C}$ 偏移量化目标，模态感知重要性 $\mathbf{M}^{\mu}$ 调节通道权重，二者共同决定最终的离散量化点。
-
-
 
 ## 实验与关键发现
 
@@ -337,12 +324,8 @@ Table 3 通过消融实验量化了闭式校正项 **C** 和模态感知重要�
 
 4. **模态感知的泛化边界**：方法依赖视觉掩码 $\mathbf{v}$ 区分模态，对于更复杂的多模态交织（如多图像、视频帧、交错图文）场景，二元掩码的扩展性尚不明确。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l809_https_openaccess_thecvf_com_content_CVPR2026_html_Deng_VLM_PTQ_Efficient/figures/001_Figure_1.jpg]]
 *Figure 1: Visualization of (a) per-layer output activation MAE of W3A16 Qwen2.5-VL-7B-Instruct, (b) relative accuracy on 8 benchmarks compared with the original 7B model, (c) relative average accuracy compared with 6 models with different parameters, (d) W3A16 model output and its MAE distributions*
-
-
 
 ## 定位与知识库关联
 
@@ -387,8 +370,6 @@ VLM‑PTQ 的适用边界由以下设计选择划定：
 4. **极端位宽下的稳定性**：在 INT2 激活或 W1A8 等极端设置下，残差传播的累积误差是否会破坏校正项 C 的理论保证？是否需要引入二阶校正或迭代精炼机制？
 
 5. **动态模态感知**：是否可以在推理时根据输入动态调整 μ，例如根据视觉 token 占比或图像复杂度自适应选择融合系数？这将使方法在分布外数据上具有更强的鲁棒性。
-
-
 
 ## 原文 PDF
 

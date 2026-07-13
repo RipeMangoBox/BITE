@@ -46,16 +46,12 @@ claims:
 
 本文提出了一种针对扩散模型的持续学习方法，核心思想是利用扩散模型在低信噪比（SNR）区域中经验Fisher信息矩阵的秩一结构，设计了一种计算成本与对角近似相同但能捕获主导曲率方向的秩一EWC（Elastic Weight Consolidation）惩罚项。该方法与生成式蒸馏（Generative Distillation）结合，在类增量图像生成任务中显著减少了灾难性遗忘。实验表明，在MNIST和FashionMNIST上遗忘几乎被消除，在ImageNet-1k上遗忘相比仅使用生成式蒸馏减少了一半以上。
 
-
-
 持续学习（Continual Learning）的核心挑战是灾难性遗忘（Catastrophic Forgetting, McCloskey & Cohen, 1989），即模型在学习新任务时丢失先前任务的知识。现有方法存在根本性局限：
 
 - **重放（Replay）方法**：依赖强生成器生成重放样本，但生成器本身会受分布漂移影响，导致累积误差。
 - **弹性权重巩固（EWC, Kirkpatrick et al., 2017）**：使用对角Fisher近似，忽略了参数间的相关性，在过参数化模型中难以找到任务间的共享最优解。
 
 扩散模型（Ho et al., 2020; Song et al., 2021a）本身具备生成高质量重放样本的能力，但其梯度结构尚未被充分研究。本文的出发点是：扩散模型在低SNR区域是否具有特殊的梯度结构，从而可以设计更有效的EWC惩罚项？
-
-
 
 ## 核心方法与创新机理
 
@@ -64,8 +60,6 @@ claims:
 1. **秩一Fisher近似**：利用扩散模型低SNR区域的梯度共线性，将经验Fisher近似为平均梯度的外积：$F = \mathbb{E}[gg^\top] \approx \alpha u u^\top, \quad u = \mathbb{E}[g]$
 2. **秩一EWC惩罚项**：基于秩一Fisher近似设计EWC惩罚项，计算成本与对角近似相同，但能捕获主导曲率方向：$\mathcal{L}_{\mathrm{Rank-1}}(\theta) = \mathcal{L}_T(\theta) + \frac{\lambda}{2} \sum_{k=1}^{T-1} c_k^\star (\mu_k^\top (\theta - \theta_k^\star))^2$
 3. **生成式蒸馏与秩一EWC的互补结合**：生成式蒸馏促进跨任务参数共享，秩一EWC约束重放引起的分布漂移，两者互补。
-
-
 
 ![[assets/figures/papers/iclr26_generative_models_diffusion__generative_models_and_autoencoders__b001_zCZcbRsc4g_Avoid_Ca/figures/001_Figure_1.jpg]]
 *Figure 1: MSE between model input $x _ { t }$ and the scaled prediction $\hat { x _ { t } }$ at each timestep.*
@@ -80,8 +74,6 @@ claims:
 | 生成式蒸馏模块 | 鼓励当前模型在重放样本上匹配教师模型的去噪行为 |
 
 整体训练流程为：在每个新任务上，使用生成式蒸馏损失和秩一EWC惩罚项联合优化模型参数。生成式蒸馏鼓励当前模型在重放样本上匹配教师模型的去噪行为，而秩一EWC则约束参数更新沿主导曲率方向。
-
-
 
 ### 5.1 扩散模型基础
 
@@ -122,8 +114,6 @@ $$\mathcal{L}_{\mathrm{Rank-1}}(\theta) = \mathcal{L}_T(\theta) + \frac{\lambda}
 $$\mathcal{L}_{\mathrm{GD}}(\theta) = \mathbb{E}_{\tilde{x} \sim \tilde{\mathcal{D}}} \left[ \frac{1}{2} \| \varepsilon_\theta(\tilde{x}) - \varepsilon_{\theta_{T-1}^\star}(\tilde{x}) \|_2^2 \right]$$
 
 完整目标函数为：$\mathcal{L}_{\mathrm{total}}(\theta) = \mathcal{L}_{\mathrm{Rank-1}}(\theta) + \mathcal{L}_{\mathrm{GD}}(\theta)$
-
-
 
 ## 实验与关键发现
 
@@ -182,8 +172,6 @@ Table 1展示了各方法在所有数据集上的最终平均FID（AFID）和平
 
 **Figure 5**：ImageNet-1k选定类别的生成图像示例显示，秩一方法在持续学习过程中保持图像清晰度，而仅GD和对角方法在后期任务中生成噪声图像。
 
-### 补充图表
-
 ![[assets/figures/papers/iclr26_generative_models_diffusion__generative_models_and_autoencoders__b001_zCZcbRsc4g_Avoid_Ca/figures/023_Table_2.jpg]]
 *Table 2: Training configurations used across datasets.*
 
@@ -192,8 +180,6 @@ Table 1展示了各方法在所有数据集上的最终平均FID（AFID）和平
 
 ![[assets/figures/papers/iclr26_generative_models_diffusion__generative_models_and_autoencoders__b001_zCZcbRsc4g_Avoid_Ca/figures/025_Table_4.jpg]]
 *Table 4: Detailed dataset configurations and task partitions used in our experiments.*
-
-
 
 ## 定位与知识库关联
 
@@ -216,8 +202,6 @@ Table 1展示了各方法在所有数据集上的最终平均FID（AFID）和平
 - 如何理论证明跳跃连接使U-Net更倾向于在PCA-like子空间中操作？
 - 是否可以将秩一Fisher近似与其他正则化方法（如SI、MAS）结合以获得更好效果？
 - 在非扩散模型（如GAN、VAE）中，是否也存在类似的低秩Fisher结构？
-
-
 
 ## 原文 PDF
 

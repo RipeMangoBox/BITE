@@ -54,8 +54,6 @@ claims:
 
 在方法谱系上，DynaAvatar 填补了零样本单图像重建与布料动态建模之间的空白（Table 1），其前馈架构在推理速度（1.82秒）和参数量（719M）上亦优于LHM-1B（3.00秒，1.1B）。当前局限性主要在于依赖运动历史导致首帧初始化不准确，以及对极端着装和罕见运动的泛化能力有限。
 
-
-
 ### 问题背景：从静态重建到动态虚拟人
 
 3D虚拟人重建是计算机视觉与图形学的核心课题之一，在影视制作、游戏开发、虚拟现实等领域具有广泛应用。近年来，基于前馈网络（feed-forward）的单图像3D虚拟人重建方法取得了显著进展，能够从单张RGB图像直接预测可驱动的3D表示，无需逐主体优化（subject-specific optimization），实现了零样本（zero-shot）泛化能力。
@@ -83,8 +81,6 @@ DynaAvatar的提出正是为了填补上述缺口——**实现首个从单张�
 - **观察三：图像损失存在歧义。** 传统图像重建损失（L1、SSIM、LPIPS）在监督大幅非刚性运动时面临颜色-几何歧义：像素颜色匹配并不意味着底层几何正确。引入基于光流对应关系的纯几何损失（DynaFlow）可以提供显式的变形对齐信号，有效缓解这一问题。
 
 基于上述动机，DynaAvatar设计了Static Transformer（提取静态几何外观）与Dynamic Transformer（融合运动历史预测布料变形）的双阶段架构，并通过静态到动态的知识迁移策略和DynaFlow损失函数，在多个公开数据集上取得了显著优于现有方法的渲染质量与布料动态真实感。
-
-
 
 ## 核心方法与创新机理
 
@@ -117,8 +113,6 @@ DynaFlow 提供了与变形对齐的显式几何监督信号，有效改善了�
 | 监督信号 | 仅图像重建损失（L1, SSIM, LPIPS） | 增加 DynaFlow 光流引导的几何损失 |
 
 上述三项创新协同作用，使 DynaAvatar 在 4D-Dress、Actors-HQ、DNA-Rendering 等多个数据集上取得了最优的 PSNR/SSIM/LPIPS 指标（Tab. 3），并保持了 1.82 秒的推理速度和 719M 参数量，优于 LHM-1B（3.00 秒，1.1B 参数）的计算效率（Tab. S2）。
-
-
 
 **DynaAvatar** 的整体设计围绕一个核心瓶颈展开：现有单图像零样本虚拟人重建方法（如 **LHM**、**IDOL** (Sun et al., CVPR 2025)）仅依赖刚性骨骼变换（LBS），无法建模非刚性布料动态，导致动画僵硬、缺失真实感。为解决这一问题，DynaAvatar 构建了一个端到端的前馈 Transformer 框架，直接从单张图像预测运动感知的 3D 高斯变形，无需针对特定对象进行优化。
 
@@ -159,8 +153,6 @@ $$\mathcal{L}_{\mathrm{flow}} = \frac{1}{N} \sum \| \mathbf{M}(\mathbf{p}_{\math
 ### 数据质量保障
 
 高质量 SMPL-X 参数是动态建模的基础。DynaAvatar 对 4D-Dress、Actors-HQ、DNA-Rendering 等数据集的原始标注进行了重新标注，获得了更完整、准确的 SMPL-X 参数。消融实验显示（Table S3 & Fig. 4），该重标注使 PSNR 提升约 3dB，显著改善了渲染质量。
-
-
 
 ### 整体架构概述
 
@@ -213,9 +205,6 @@ $$\mathbf{T}_{3\mathrm{D}}, \mathbf{T}_{\mathrm{M}} \leftarrow \mathbf{MM}(\math
 
 消融实验（Figure 5, Table 2）表明，移除动态 Transformer 后性能显著下降，验证了该模块是捕捉布料动态的关键组件。此外，Figure 6 展示了即使姿态几乎相同，不同运动历史（如坠落 vs 跳跃、后退 vs 坠落）会导致明显的服装差异，证明动态 Transformer 有效利用了运动上下文信息。
 
-![[assets/figures/papers/paper_list_l27_https_arxiv_org_abs_2603_14772/figures/007_Figure_5.jpg]]
-*Figure 5: Effectiveness of our Dynamic Transformer*
-
 ---
 
 ### 静态到动态的知识迁移：LoRA 轻量级适配
@@ -225,9 +214,6 @@ $$\mathbf{T}_{3\mathrm{D}}, \mathbf{T}_{\mathrm{M}} \leftarrow \mathbf{MM}(\math
 - **第二阶段**：仅对 Dynamic Transformer 进行轻量级 LoRA 微调，从少量动态数据中学习运动依赖的变形。
 
 消融实验（Figure 7）对比了三种策略：从头训练、全参数微调、LoRA 适配。结果表明 LoRA 适配效果最优，验证了静态预训练先验的有效性与轻量级迁移的优越性。
-
-![[assets/figures/papers/paper_list_l27_https_arxiv_org_abs_2603_14772/figures/009_Figure_7.jpg]]
-*Figure 7: Effectiveness of our static-to-dynamic knowledge transfer with LoRA*
 
 ---
 
@@ -246,8 +232,6 @@ Figure 3 直观展示了该损失的工作机制：黑色轮廓白色圆点表�
 
 ![[assets/figures/papers/paper_list_l27_https_arxiv_org_abs_2603_14772/figures/005_Figure_3.jpg]]
 *Figure 3: Visualization of the proposed DynaFlow loss. Our DynaFlow loss encourages the Gaussians at source locations (blackoutlined white circles) to move toward the endpoints of the estimated flow vectors*
-
-
 
 ## 实验与关键发现
 
@@ -326,21 +310,6 @@ DynaAvatar处于**单图像零样本3D虚拟人重建**与**布料动态建模**
 
 DynaAvatar的核心贡献在于**首次实现零样本单图像到可动画3D虚拟人的布料动态重建**，其技术路线——静态预训练Transformer + LoRA动态适配 + 光流几何监督——为后续研究提供了可复用的范式。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l27_https_arxiv_org_abs_2603_14772/figures/008_Figure_6.jpg]]
-*Figure 6: Rendered avatars in similar poses but different motion histories. (a) and (b) share similar poses, but (a) is falling in midair while (b) is jumping up. (c) and (d) also exhibit similar poses, with (c) walking backward and (d) falling in mid-air. Despite having nearly identical poses, their clothing appears clearly different because our Dynamic Transformer effectively handles different motion information*
-
-![[assets/figures/papers/paper_list_l27_https_arxiv_org_abs_2603_14772/figures/010_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l27_https_arxiv_org_abs_2603_14772/figures/026_Table_S.3.jpg]]
-*Table S.3: Effectiveness of our dataset reannotations on 4D-Dress*
-
-![[assets/figures/papers/paper_list_l27_https_arxiv_org_abs_2603_14772/figures/006_Figure_4.jpg]]
-*Figure 4: Comparison between (b) the original annotations and (c) our reannotations for the DNA-Rendering [5] (top) and Actors-HQ [19] (bottom) datasets*
-
-
-
 ## 定位与知识库关联
 
 ### 单图像3D虚拟人重建的演化脉络
@@ -401,8 +370,6 @@ $$\mathcal{L}_{\mathrm{flow}} = \frac{1}{N} \sum \| \mathbf{M}(\mathbf{p}_{\math
 4. **多模态条件扩展**：除单张图像外，能否融入文本描述、视频序列或物理参数等多模态条件，实现对服装风格和动态行为的更精细控制？
 
 5. **评估体系的完善**：当前评估主要依赖新视角合成的PSNR/SSIM/LPIPS指标，缺乏对布料动态真实感的直接度量。建立包含物理合理性、时序一致性、运动感知质量的综合评估基准是该领域的重要需求。
-
-
 
 ## 原文 PDF
 

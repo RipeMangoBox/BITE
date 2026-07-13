@@ -50,8 +50,6 @@ claims:
 
 **核心结论**：部位级检索显著提升了跨模态匹配准确率（PL-TMR 在 HumanML3D 上 text-to-motion R@1 达 11.00，对比 **TMR**（Petrovich et al., ICCV 2023）的 8.92）；多模态检索（文本-运动 + 运动-文本）相比单模态检索在生成和描述任务上均取得最佳性能；ReMoGPT 在罕见动作生成上全面优于基线，Top 5% MMDist 降至 3.563（对比 ReMoDiffuse 的 4.317），并在 Motion-X 基准上取得领先的文本到运动生成与运动描述结果。
 
-
-
 将人类运动建模为可生成的内容是计算机视觉与图形学中的核心挑战之一，其应用涵盖动画制作、虚拟人交互和运动理解等多个领域。近年来，统一运动语言模型（如 **MotionGPT**，Jiang et al., NeurIPS 2023）通过将运动序列离散化为运动tokens，并与自然语言联合建模，在文本生成运动（text-to-motion）和运动描述（motion-to-text captioning）等任务上取得了显著进展。这类模型的核心优势在于：它们将异质的运动与语言模态统一到同一个自回归Transformer框架中，从而能够以统一的范式处理多种运动相关任务。
 
 然而，现有统一运动语言模型面临一个关键瓶颈：**在生成罕见和多样化动作时性能显著不足**。这一问题根源于模型仅依赖训练数据中内化的知识，缺乏对外部知识的有效利用机制。当面对训练集中出现频次较低的动作类型（如复杂的舞蹈动作、特殊的体育姿态）时，模型往往倾向于生成“平均化”的常见动作，导致生成结果的多样性和准确性同时下降。
@@ -65,8 +63,6 @@ claims:
 2. **检索模态单一**：仅依赖文本-文本相似度进行检索，忽略了运动序列本身蕴含的丰富结构信息。跨模态检索（文本-运动、运动-文本）有望提供更互补的相似度信号，但在统一运动语言模型框架中尚未被系统探索。
 
 针对上述问题，本文提出 **ReMoGPT**——一种基于部位级检索增强的统一运动语言模型。其核心动机在于：通过引入**身体部位级别的细粒度跨模态检索**（Part-Level Text-Motion Retrieval, PL-TMR），将多模态检索到的样本作为上下文融入运动语言模型的指令调优中，从而在保留统一生成框架优势的同时，有效补充外部知识并提升对罕见动作的泛化能力。这一设计使得模型在生成时能够“参考”与输入描述或运动最相关的真实样本，而非仅依赖参数化记忆。
-
-
 
 ## 核心方法与创新机理
 
@@ -100,8 +96,6 @@ $$\mathcal{L}_{LM} = -\sum_{i=0}^{L_t-1} \log p_\theta \left( x_{out}^i \mid x_{
 
 三个 changed slots 构成了一个完整的创新链：**部位级编码**提供了更精准的检索基础 → **多模态检索**确保了匹配的可靠性 → **语言模型上下文融合**将检索结果直接转化为生成能力的提升。这条链路使得 ReMoGPT 在保持统一运动语言模型多任务能力的同时，通过外部知识检索弥补了罕见动作生成的短板。
 
-
-
 ReMoGPT 是一个以检索增强为核心、统一处理多种运动相关任务的运动语言模型。其整体框架由三条协同工作的流水线构成：**运动分词**、**部位级跨模态检索**和**检索增强的指令调优生成**，最终实现在统一的 Transformer 语言模型中对运动生成、运动描述等任务的覆盖。
 
 ### 1. 运动分词：连续运动到离散 Token 的桥梁
@@ -134,8 +128,6 @@ $$\mathcal{L}_{LM} = -\sum_{i=0}^{L_t-1} \log p_\theta \left( x_{out}^i \mid x_{
 
 ![[assets/figures/papers/paper_list_l21_ReMoGPT_Part_Level_Retrieval_Augmented_Motion_Language_Models/figures/004_Figure_3.jpg]]
 *Figure 3: An illustration of the motion generation and captioning pipeline in ReMoGPT. Specifcally, ReMoGPT trains a motion-language model to generate the output using the context of the retrieved motion-caption pairs. Figure 4: An overview of the proposed part-level motion encoder for text-motion retrieval*
-
-
 
 ReMoGPT 的核心技术路线是在统一运动语言模型的基础上，引入基于身体部位细粒度特征的跨模态检索机制，将检索到的运动-文本对作为上下文融入语言模型的指令调优中，从而补充外部知识并提升对罕见动作的泛化能力。本节依次阐述其关键模块及对应的公式体系。
 
@@ -173,8 +165,6 @@ $$\mathcal{L}_{LM} = -\sum_{i=0}^{L_t-1} \log p_\theta \left( x_{out}^i \mid x_{
 
 推理阶段同样依赖 $x_{rag}$ 辅助生成。检索采用多模态策略，同时利用文本-运动相似度和运动-文本相似度进行双向匹配，实验表明多模态检索（Both 1+1）在生成和描述任务上均显著优于仅使用文本或运动单一模态的检索方式。此外，该方法对检索样本数量不敏感，$k=1$（即总共两个检索样本）即可取得良好性能。
 
-
-
 ## 实验与关键发现
 
 ### 文本-运动跨模态检索性能
@@ -211,27 +201,14 @@ Table 7探索了使用不同外部数据库对检索增强生成的影响。当�
 
 尽管ReMoGPT在多数场景下表现优异，但存在两个主要局限：首先，对于完全未知的新动作类型，即使将该动作的数据集作为外部数据库，如果不进行针对性训练，模型也难以生成相似的动作；其次，运动分词器（VQ-VAE）的泛化能力有限，当输入动作与训练数据分布差异很大时，解码器可能无法正确重建运动序列。这些局限性指向了未来改进方向——提升模型对分布外动作的泛化能力和改进运动分词器的鲁棒性。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l21_ReMoGPT_Part_Level_Retrieval_Augmented_Motion_Language_Models/figures/006_Table_1.jpg]]
 *Table 1: Results of text-to-motion and motion-to-text retrieval benchmark on HumanML3D*
-
-![[assets/figures/papers/paper_list_l21_ReMoGPT_Part_Level_Retrieval_Augmented_Motion_Language_Models/figures/011_Table_8.jpg]]
-*Table 8: Results of rare motion generation on the HumanML3D dataset*
-
-
-![[assets/figures/papers/paper_list_l21_ReMoGPT_Part_Level_Retrieval_Augmented_Motion_Language_Models/figures/005_Figure_5.jpg]]
-*Figure 5: Samples of prompt used for the instruction tuning in ReMoGPT. \<Motion Placeholder> denotes the motion tokens paired with the caption. \<Motion Placeholder R1(R2)> denote the motion tokens of multi-modal retrieved motion-caption pairs*
-
-![[assets/figures/papers/paper_list_l21_ReMoGPT_Part_Level_Retrieval_Augmented_Motion_Language_Models/figures/008_Table.jpg]]
 
 ![[assets/figures/papers/paper_list_l21_ReMoGPT_Part_Level_Retrieval_Augmented_Motion_Language_Models/figures/013_Table_6.jpg]]
 *Table 6: Comparison of the retrieval methods on the HumanML3D dataset in motion generation and captioning. Table 7: Comparison of the external database for retrieval*
 
 ![[assets/figures/papers/paper_list_l21_ReMoGPT_Part_Level_Retrieval_Augmented_Motion_Language_Models/figures/001_Figure_1.jpg]]
 *Figure 1: ReMoGPT achieves the state-of-the-art performance in text-to-motion generation and motion-to-text captioning*
-
-
 
 ## 定位与知识库关联
 
@@ -264,8 +241,6 @@ ReMoGPT 处于**统一运动语言模型**与**检索增强生成**两条技术�
 **检索样本数量的敏感性。** 论文发现方法对检索样本数量不敏感，k=1（即总共两个检索样本）已足够取得良好性能。这一现象值得进一步探究：是模型从少量样本中提取信息的能力强，还是检索模块本身在 Top-1 之后的相关性下降较快？理解这一机制有助于优化检索增强策略的计算效率。
 
 **运动分词器的分布外鲁棒性。** 作为整个 pipeline 的入口模块，VQ-VAE 运动分词器的泛化能力直接影响下游生成质量。论文承认该模块在处理分布外动作时存在局限，但未提出针对性的改进方案。这是整个统一运动语言模型路线的共同挑战，也是未来研究的重要方向。
-
-
 
 ## 原文 PDF
 

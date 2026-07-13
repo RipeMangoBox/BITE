@@ -59,8 +59,6 @@ claims:
 
 该方法仍存在若干局限：精细纹理（如刺绣、蕾丝）难以完美重建，严重遮挡与快速运动模糊下质量下降，次级运动（如头发飘动、配饰摆动）尚未支持，重光照模块依赖后训练灯光数据而未在野外光照下完全验证。
 
-
-
 3D数字人化身在远程通信、游戏、影视和混合现实中具有广泛的应用前景。理想的化身系统需同时满足两个核心需求：**高保真度**（精确还原面部细节、手部姿态和身体几何）与**强泛化能力**（仅需少量日常照片即可快速创建，并适应多样的外貌、服饰和光照条件）。然而，现有方法在这两个目标之间长期面临不可兼得的困境。
 
 ### 现有方法的瓶颈：数据源的内在矛盾
@@ -79,8 +77,6 @@ claims:
 受大语言模型“大规模预训练+高质量后训练”范式的启发，本文探索将其引入3D头像建模领域。核心假设是：预训练阶段在百万级野外视频上学习通用的人体外观与几何先验，赋予模型强泛化能力；后训练阶段在数千人多视角工作室数据上注入精细的表情、手部驱动和多视角一致性，实现高保真控制。两个阶段各司其职，通过架构设计形成协同，从而在前馈式推理中同时获得通用性与高保真度。
 
 这一思路的关键在于：预训练所学的强泛化表征并非在后训练中被覆盖，而是作为基础被保留和精炼，最终使模型在工作室和野外测试场景下均能超越混合训练范式。
-
-
 
 ## 核心方法与创新机理
 
@@ -119,8 +115,6 @@ $$W' = W(n) + H_{skin}(T^{node})$$
 ### 创新协同机制
 
 上述四个 changed slots 并非孤立改进，而是通过**对齐的潜在空间**形成协同：预训练使几何 token 特征空间对野外和工作室身份呈现均匀分布（Figure S1），后训练在此空间上通过注意力图展示出更干净的语义对应关系（Figure 6），最终实现前馈式通用高保真虚拟化身创建——在野外多视角设置中比优化方法 ExAvatar 高出 9.8 dB PSNR，在单视角设置中比 LHM 高出 9.3 dB PSNR（Table 2）。
-
-
 
 LCA 的整体 pipeline 遵循“图像/几何标记化 → 多模态 Transformer 编码 → 双分支高斯解码 → 蒙皮变形 → 可微渲染”的前馈流程，将稀疏输入图像转化为可驱动的高保真 3D 高斯头像。
 
@@ -183,8 +177,6 @@ $$L = L_{img}(I, \hat{I}_{cano}) + L_{img}(I, \hat{I}_{pose}) + \lambda L_{reg}(
 - **后训练阶段**：在数千人多视角工作室数据上微调，注入精细表情、手部驱动和多视角一致性，同时通过学习率衰减策略（$\gamma=0.65$）保护预训练知识不被灾难性遗忘（Table S1 显示 $\gamma=0.00$ 时工作室 PSNR 骤降至 27.464）。
 
 这一范式解耦了“泛化”与“保真度”两个冲突目标，使最终模型在前馈推理中同时达到通用性与高保真度。
-
-
 
 LCA 的核心架构由 **图像/几何标记化**、**LCA Transformer 编码器**、**双分支高斯解码器**、**蒙皮与变形模块** 以及 **可微高斯渲染器** 五个关键模块串联构成。下面按数据流顺序逐一展开。
 
@@ -249,12 +241,8 @@ $$L = L_{img}(I, \hat{I}_{cano}) + L_{img}(I, \hat{I}_{pose}) + \lambda L_{reg}(
 
 双视角监督迫使网络在规范空间中学习到一致的几何结构，同时确保姿态驱动下的外观保真度。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1067_https_arxiv_org_abs_2604_02320/figures/010_Figure_6.jpg]]
 *Figure 6: Attention Map Visualization. Post-training yields cleaner semantic correspondences in last-layer attention maps between geometric and image tokens. The selected geometric tokens on the mesh are shown in red*
-
-
 
 ## 实验与关键发现
 
@@ -302,36 +290,14 @@ LCA的核心主张是：大规模野外预训练+高质量工作室后训练的�
 
 所有定量评估均基于前景分割掩码计算L1/LPIPS/PSNR，确保方法间比较公平。测试集同时覆盖多视角工作室和野外两类域，全面衡量泛化与保真度。多视角基线方法（如MV-LHM）由作者使用相同数据重新训练，避免训练协议差异引入偏差。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l1067_https_arxiv_org_abs_2604_02320/figures/004_Table_2.jpg]]
 *Table 2: Quantitative comparison with state-of-the-art 3D avatar methods. * denotes methods trained by us for multi-view inputs*
-
-![[assets/figures/papers/paper_list_l1067_https_arxiv_org_abs_2604_02320/figures/007_Table_3.jpg]]
-*Table 3: Effect of scaling pretraining data on downstream performance across data distributions*
 
 ![[assets/figures/papers/paper_list_l1067_https_arxiv_org_abs_2604_02320/figures/008_Figure_5.jpg]]
 *Figure 5: Qualitative Comparison with State-of-the-Art Methods. LCA outperforms in both multi-view and monocular settings*
 
-![[assets/figures/papers/paper_list_l1067_https_arxiv_org_abs_2604_02320/figures/011_Figure_7.jpg]]
-*Figure 7: Loose Garment Support (LGS). (Left) Frontal view of the input condition. (Middle) Post-trained LCA avatar without loose garment support, while the general shape is recovered, skirts behave like pants when moving. (Right) LCA with loose garment support produces plausible animations without splitting garments*
-
-![[assets/figures/papers/paper_list_l1067_https_arxiv_org_abs_2604_02320/figures/012_Table_S.1.jpg]]
-*Table S.1: Ablation study on decoder architecture and posttraining learning rate decay. Our dual-branch residual design outperforms a single-branch variant. The learning rate decay is critical for preserving pretraining knowledge, with γ=0.00 (no decay) severely degrading studio performance*
-
-![[assets/figures/papers/paper_list_l1067_https_arxiv_org_abs_2604_02320/figures/014_Table_S.2.jpg]]
-*Table S.2: Effect of training data scale. Pre/post-training benefits persist even at 10× smaller scale (100K pretraining identities, 500 post-training identities), with consistent trends across both domains*
-
 ![[assets/figures/papers/paper_list_l1067_https_arxiv_org_abs_2604_02320/figures/015_Table_S.3.jpg]]
 *Table S.3: Loose garment deformer ablation. Quantitative evaluation on loose-garment sequences. The full model with the deformer improves all metrics and reduces splitting artifacts*
-
-![[assets/figures/papers/paper_list_l1067_https_arxiv_org_abs_2604_02320/figures/013_Figure_S.1.jpg]]
-*Figure S.1: PCA of Geometric Token Features. Visualization of the feature space distributions produced by models trained with different strategies. Green points denote studio-captured subjects, while red points denote in-the-wild subjects*
-
-![[assets/figures/papers/paper_list_l1067_https_arxiv_org_abs_2604_02320/figures/016_Figure_S.2.jpg]]
-*Figure S.2: Qualitative Comparison with Alternative Paradigms. Comparison with Wan-Animate (2D video diffusion) and GUAVA (upper-body 3D Gaussian avatar)*
-
-
 
 ## 定位与知识库关联
 
@@ -396,8 +362,6 @@ LCA框架打开了以下研究方向：
 4. **零样本风格化的内在机制**：LCA展现出对训练中未见过的眼镜、头饰、风格化角色的泛化能力（Figure 1/5/7），但这一零样本能力的来源尚不明确——是预训练数据的隐式覆盖，还是Transformer架构的归纳偏置？理解这一机制可能指导更高效的数据策展策略。
 
 5. **后训练学习率衰减的敏感性**：消融实验表明后训练学习率衰减系数γ至关重要——γ=0.00（无衰减）时工作室PSNR骤降至27.464，而γ=0.65平衡最佳（Table S1）。这一超参数的敏感性是否意味着当前范式对后训练策略有较强依赖，能否通过更鲁棒的持续学习方法缓解？
-
-
 
 ## 原文 PDF
 

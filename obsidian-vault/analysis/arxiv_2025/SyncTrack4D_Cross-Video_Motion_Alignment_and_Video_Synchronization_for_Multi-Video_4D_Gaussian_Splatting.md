@@ -170,8 +170,6 @@ SyncTrack4D 提出了一种从**未同步多视频集合**中联合恢复时间�
 - **FGW匹配的结构保持**：在跨视频匹配中引入轨迹内几何距离，使匹配对不仅特征相似，而且在各自视频内的相对空间结构保持一致，这对后续DTW同步的可靠性至关重要。
 - **运动样条支架的桥梁作用**：样条支架将离散的4D轨迹压缩为时间连续表示，既为时间偏移优化提供了可微接口，又通过ARAP等正则项约束了轨迹的刚性结构，防止光度优化过程中的漂移。
 
-### 补充图表
-
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2512_04315/figures/002_Figure_2.jpg]]
 *Figure 2: SyncTrack4D Pipeline. Given unsynchronized multi-video RGB inputs, we extract diverse 2D priors along with depths and camera poses from feed-forward multi-view models or sensors. (1) For each monocular video, we estimate 4D tracks and embed feature maps through 4DGS optimization. (2) We perform dense cross-video 4D track matching via a Fused Gromov–Wasserstein formulation that fuses feature similarity and geometric structure. (3) The resulting correspondences enable frame-level synchronization by minimizing intervideo motion discrepancies. (4) Finally, we aggregate all per-video 4D tracks with their initial offsets and jointly refine synchronization and geometry with a unified multi-video 4...*
 
@@ -262,8 +260,6 @@ Figure 8展示了时间偏移在4DGS联合细化阶段的收敛曲线。初始DT
 - **大偏移退化**：Table 1中Juggle场景在30–50帧偏移区间误差达22.62帧，表明当动态区域运动模式复杂且时间错位极大时，FGW匹配和DTW同步可能失效。
 - **静态场景退化**：在动态区域极小或静态背景过多的场景中，4D跟踪匹配缺乏足够的运动线索，同步质量可能下降。
 - **先验依赖**：深度和光流先验来自现成模型，其误差会传播至跟踪和匹配阶段，影响最终重建精度。
-
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2512_04315/figures/012_Table_4.jpg]]
 *Table 4: Ablation study of multi-video 4DGS. We report PSNR↑, SSIM↑, and LPIPS↓*
